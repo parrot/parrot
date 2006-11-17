@@ -34,7 +34,7 @@ my %opt;
 sub get_fp {
     # s. also fingerprint_c.pl
     my $compat_file = 'PBC_COMPAT';
-    open IN, $compat_file or die "Can't read $compat_file";
+    open IN, '<', $compat_file or die "Can't read $compat_file";
     my @lines = <IN>;
     close IN;
 
@@ -45,7 +45,7 @@ sub get_fp {
 
 sub get_version {
     my $version_file = 'VERSION';
-    open IN, $version_file or die "Can't read $version_file";
+    open IN, '<', $version_file or die "Can't read $version_file";
     my $v = <IN>;
     close IN;
     $v =~ /^(\d+)\.(\d+)/;
@@ -56,7 +56,7 @@ sub update_fp {
     my $fp = get_fp;
     my ($major, $minor)  = get_version;
     for my $f (@ARGV) {
-        open F, "+<$f" or die "Can't open $f: $!";
+        open F, "+<", "$f" or die "Can't open $f: $!";
         seek F, 2, 0;   # pos 2: major, minor
         print F pack "cc", $major, $minor;
         seek F, 6, 0;   # pos 6: pad = finger_print
@@ -67,7 +67,7 @@ sub update_fp {
 
 sub pbc_info {
     for my $f (@ARGV) {
-        open F, "<$f" or die "Can't open $f: $!";
+        open F, "<", "$f" or die "Can't open $f: $!";
         my $header;
         read F, $header, 16;
         my (@fields) = qw( wordsize byteorder major minor

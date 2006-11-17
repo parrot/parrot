@@ -88,7 +88,7 @@ foreach my $da_file (@dafiles) {
     # block (.bb) files.
     my $cmd = "gcov -f -b -o $dirname $src_filename";
     print "Running $cmd\n" if $DEBUG;
-    open (GCOVSUMMARY, "$cmd |") or die "Error invoking '$cmd': $!";
+    open (GCOVSUMMARY, '<', "$cmd |") or die "Error invoking '$cmd': $!";
     my $tmp;
     my %generated_files;
     while (<GCOVSUMMARY>) {
@@ -178,7 +178,7 @@ exit(0);
 
 sub write_index {
     print "Writing $HTMLDIR/index.html..\n" if $DEBUG;
-    open (OUT, ">$HTMLDIR/index.html") or
+    open (OUT, ">", "$HTMLDIR/index.html") or
       die "Can't open $HTMLDIR/index.html for writing: $!\n";
 
     $totals{line_coverage}   = sprintf("%.2f", ($totals{lines}    ? ($totals{covered_lines} / $totals{lines} * 100)       : 0));
@@ -214,7 +214,7 @@ sub write_index {
 sub write_file_coverage_summary {
 
     print "Writing $HTMLDIR/file_summary.html..\n" if $DEBUG;
-    open (OUT, ">$HTMLDIR/file_summary.html") or
+    open (OUT, ">", "$HTMLDIR/file_summary.html") or
       die "Can't open $HTMLDIR/file_summary.html for writing: $!\n";
 
     print OUT page_header("File Coverage Summary");
@@ -259,7 +259,7 @@ sub write_file_coverage_summary {
 sub write_function_coverage_summary {
 
     print "Writing $HTMLDIR/function_summary.html..\n" if $DEBUG;
-    open (OUT, ">$HTMLDIR/function_summary.html") or
+    open (OUT, ">", "$HTMLDIR/function_summary.html") or
       die "Can't open $HTMLDIR/function_summary.html for writing: $!\n";
 
     print OUT page_header("Function Coverage Summary");
@@ -320,8 +320,8 @@ sub filter_gcov {
 
     my $outfile = "$outfile_base.lines.html";
     print "Writing $outfile..\n" if $DEBUG;
-    open (IN, "<$infile") or die "Can't read $infile: $!\n";
-    open (OUT, ">$outfile") or die "Can't write $outfile: $!\n";
+    open (IN, "<", "$infile") or die "Can't read $infile: $!\n";
+    open (OUT, ">", "$outfile") or die "Can't write $outfile: $!\n";
 
     print OUT page_header("Line Coverage for $source_file");
     print OUT "<pre>";
@@ -338,8 +338,8 @@ sub filter_gcov {
 
     $outfile = "$outfile_base.branches.html";
     print "Writing $outfile..\n" if $DEBUG;
-    open (IN, "<$infile") or die "Can't read $infile: $!\n";
-    open (OUT, ">$outfile") or die "Can't write $outfile: $!\n";
+    open (IN, "<", "$infile") or die "Can't read $infile: $!\n";
+    open (OUT, ">", "$outfile") or die "Can't write $outfile: $!\n";
 
     print OUT page_header("Branch Coverage for $source_file");
     print OUT "<pre>";
@@ -356,8 +356,8 @@ sub filter_gcov {
 
     $outfile = "$outfile_base.calls.html";
     print "Writing $outfile..\n" if $DEBUG;
-    open (IN, "<$infile") or die "Can't read $infile: $!\n";
-    open (OUT, ">$outfile") or die "Can't write $outfile: $!\n";
+    open (IN, "<", "$infile") or die "Can't read $infile: $!\n";
+    open (OUT, ">", "$outfile") or die "Can't write $outfile: $!\n";
 
     print OUT page_header("Call Coverage for $source_file");
     print OUT "<pre>";

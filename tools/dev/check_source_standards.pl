@@ -75,7 +75,7 @@ if ($files[0] eq "all_source") {
 FILE:
 foreach my $file (@files) {
     $file =~ s/^\.\///g;
-    if (!open(F, "<$file")) {
+    if (!open(F, "<", "$file")) {
         error($file, 0, "Unable to open $file: $!\n");
         next;
     }
@@ -393,7 +393,7 @@ sub check_mandatory_boilerplate {
 
 
 sub check_manifest {
-    open(F, "<MANIFEST") || die "Unable to read MANIFEST: $!\n";
+    open(F, "<", "MANIFEST") || die "Unable to read MANIFEST: $!\n";
 
     my %files_in_dir_nocase;
     my %files_in_dir_8dot3;

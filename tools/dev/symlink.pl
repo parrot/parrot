@@ -51,7 +51,7 @@ my @topsrcdir = @toolsrcdir[0..$#toolsrcdir - 2];
 my $topsrcdir = File::Spec->catdir(@topsrcdir);
 my $manifest = File::Spec->catfile($topsrcdir, "MANIFEST");
 my @srcfiles = ();
-if (open(MANIFEST, $manifest)) {
+if (open(MANIFEST, '<', $manifest)) {
     my %dstdir;
     while (<MANIFEST>) {
 	next if /^\#/;

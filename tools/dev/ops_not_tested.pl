@@ -48,7 +48,7 @@ File::Find::find({wanted => \&wanted}, 't/');
 sub wanted {
         return unless /\.pbc$/i; # We only want *.pbc files
 
-        open F, "$cwd/disassemble $cwd/$name |";
+        open F, '<', "$cwd/disassemble $cwd/$name |";
         while(<F>) {
                 s/L\w+\:\s+//;  # Remove the Lxx marks
                 s/^(\w+).*/$1/; # Extract the opcode    

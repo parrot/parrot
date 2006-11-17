@@ -282,7 +282,7 @@ for my $f (@ARGV) {
 	warn "$ME: No such file: $f\n";
 	next;
     }
-    if (open(NM, "$nm_cmd $nm_opt $f |")) {
+    if (open(NM, '<', "$nm_cmd $nm_opt $f |")) {
 	my $o = "?";
 	$o = $f if $f =~ /\.o$/;
 	my $file;

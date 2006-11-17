@@ -149,7 +149,7 @@ $| = 1;
 my @H = qw(include/parrot/embed.h include/parrot/extend.h);
 
 for my $h (@H) {
-    if (open(H, $h)) {
+    if (open(H, '<', $h)) {
 	while (<H>) {
 	    if (/^\w+\s+(Parrot_\w+)\(/) {
 		$ParrotAPI{$1}++;
@@ -174,7 +174,7 @@ my %DataR;
 my %Undef;
 my %API;
 
-if (open(NM, "perl tools/dev/nm.pl -BDo '$Obj' |")) {
+if (open(NM, '<', "perl tools/dev/nm.pl -BDo '$Obj' |")) {
     while (<NM>) {
 	my ($o, $s, $v) = split;
 	$API{$s} = $o;

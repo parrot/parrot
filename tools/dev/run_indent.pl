@@ -83,7 +83,7 @@ foreach my $file (@ARGV) {
     }
     
     # now a little trick.  Weed out the ones we know aren't used in this file.
-    open(F, "<$file") || die "Can't read $file: $!\n";
+    open(F, "<", "$file") || die "Can't read $file: $!\n";
     {
         local $/=undef;
         my $contents = <F>;

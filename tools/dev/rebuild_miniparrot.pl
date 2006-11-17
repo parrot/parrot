@@ -120,7 +120,7 @@ sub write_buildscripts {
     ## GCC ##
 
     print "- miniparrot/build_gcc.sh\n";
-    open(F, ">miniparrot/build_gcc.sh") ||
+    open(F, ">", "miniparrot/build_gcc.sh") ||
         die "Unable to write miniparrot/build_gcc.sh: $!\n";
     print F "#!/bin/sh\n";
     print F "\nset -x -e\n";

@@ -51,7 +51,7 @@ sub create_s {
 
 sub parse_s {
     my $s = shift;
-    open IN, "<$s" or die "Can't read '$s': $1";
+    open IN, "<", "$s" or die "Can't read '$s': $1";
     my ($in_comment);
     $in_comment = 1;
     print "/*\n";
@@ -92,7 +92,7 @@ sub parse_s {
 
 sub add_glue {
     my $s = shift;
-    open IN, "<$s" or die "Can't read '$s': $1";
+    open IN, "<", "$s" or die "Can't read '$s': $1";
     while (<IN>) {
         if (/\/\*INTERFACE/) {
             my $text = "";

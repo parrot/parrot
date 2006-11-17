@@ -32,7 +32,7 @@ use warnings;
 
 my $cflags = shift;
 
-open F, $cflags or die "open $cflags: $!\n";
+open F, '<', $cflags or die "open $cflags: $!\n";
 
 my @options;
 
