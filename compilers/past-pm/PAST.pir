@@ -266,6 +266,12 @@ for compiling programs in Parrot.
     .return self.'attr'('returns', value, has_value)
 .end
 
+.sub 'islvalue' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('islvalue', value, has_value)
+.end
+
 .namespace [ 'PAST::Block' ]
 
 .sub 'blocktype' :method
