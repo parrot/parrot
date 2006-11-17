@@ -156,11 +156,13 @@ transform past (ABC::Grammar::expr) :language('PIR') {
 
     .local pmc optable, optok
     .local string pasttype, pirop, returns
+    .local int islvalue
     optable = get_hll_global [ 'ABC::Grammar' ], '$optable'
     optok = optable[type]
     pasttype = optok['past']
     pirop = optok['pirop']
     returns = optok['returns']
+    islvalue = optok['lvalue']
 
     .local pmc past, iter
     past = new 'PAST::Op'
@@ -169,14 +171,15 @@ transform past (ABC::Grammar::expr) :language('PIR') {
     $P0 = node.'get_array'()
     if null $P0 goto iter_end
     iter = new .Iterator, $P0
-  iter_loop:
     unless iter goto iter_end
+    $P0[0;'islvalue'] = islvalue
+  iter_loop:
     .local pmc cnode, cpast
     cnode = shift iter
     cpast = tree.'get'('past', cnode, 'ABC::Grammar::expr')
     if null cpast goto iter_loop
     past.'push'(cpast)
-    goto iter_loop
+    if iter goto iter_loop
   iter_end:
     .return (past)
 
@@ -201,20 +204,27 @@ transform past_term (ABC::Grammar::expr) :language('PIR') {
   term_ident:
     .local string name
     name = node['ident']
+    .local int islvalue
+    islvalue = node['islvalue']
     past = new 'PAST::Var'
-    past.'init'('node'=>node, 'name'=>name, 'viviself'=>'.Integer')
+    past.'init'('node'=>node, 'name'=>name, 'viviself'=>'.Integer', 'islvalue'=>islvalue)
     .return (past)
 
   term_keyed:
     .local string name
     name = node['ident']
     name = concat name, '_array'
-    past = new 'PAST::Var'
-    past.'init'('node'=>node, 'name'=>name)
-    .local pmc exprnode, exprpast
+    .local int islvalue
+    islvalue = node['islvalue']
+    .local pmc exprnode, exprpast, basepast
     exprnode = node['expression'; 0]
     exprpast = tree.'get'('past', exprnode, 'ABC::Grammar::expression')
-    past = past.'new'('PAST::Var', past, exprpast, 'node'=>node, 'scope'=>'keyed', 'vivibase'=>'.ResizablePMCArray', 'viviself'=>'.Integer')
+    basepast = exprpast.'new'('PAST::Var', 'node'=>node, 'name'=>name)
+    past = exprpast.'new'('PAST::Var', basepast, exprpast, 'node'=>node, 'scope'=>'keyed', 'viviself'=>'.Integer', 'islvalue'=>islvalue)
+    unless islvalue goto term_keyed_end
+    basepast.'islvalue'(islvalue)
+    basepast.'viviself'('.ResizablePMCArray')
+  term_keyed_end:
     .return (past)
 }
 
