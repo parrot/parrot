@@ -55,7 +55,7 @@ sub import      # IMPLEMENT PRECOMPILER BEHAVIOUR UNDER:
 
                 my ($sourcefile, $class) = @ARGV;
 
-                open IN, $sourcefile
+                open IN, '<', $sourcefile
                         or _die("Can't open grammar file '$sourcefile'");
 
                 my $grammar = join '', <IN>;
@@ -83,7 +83,7 @@ sub Precompile
                 $modulefile =~ s/.*:://;
                 $modulefile .= ".pm";
 
-                open OUT, ">$modulefile"
+                open OUT, ">", "$modulefile"
                         or croak("Can't write to new module file '$modulefile'");
 
                 print STDERR "precompiling grammar from file '$sourcefile'\n",
@@ -2603,7 +2603,7 @@ sub _generate($$$;$$)
                 if (defined $::RD_TRACE)
                 {
                         print STDERR "printing code (", length($code),") to RD_TRACE\n";
-                        open TRACE_FILE, ">RD_TRACE"
+                        open TRACE_FILE, ">", "RD_TRACE"
                         and print TRACE_FILE "my \$ERRORS;\n$code"
                         and close TRACE_FILE;
                 }
@@ -2844,7 +2844,7 @@ sub _parserepeat($$$$$$$$$)     # RETURNS A REF TO AN ARRAY OF MATCHES
 my $errortext;
 my $errorprefix;
 
-open (ERROR, ">&STDERR");
+open (ERROR, ">&", "STDERR");
 format ERROR =
 @>>>>>>>>>>>>>>>>>>>>: ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $errorprefix,          $errortext
@@ -2861,7 +2861,7 @@ my $tracemsg;
 my $tracecontext;
 my $tracerulename;
 
-open (TRACE, ">&STDERR");
+open (TRACE, ">&", "STDERR");
 format TRACE =
 |@|||||||||@^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<|
 $tracerulename, '|', $tracemsg
@@ -2872,7 +2872,7 @@ $tracerulename, '|', $tracemsg
 select TRACE;
 $| = 1;
 
-open (TRACECONTEXT, ">&STDERR");
+open (TRACECONTEXT, ">&", "STDERR");
 format TRACECONTEXT =
 |@|||||||||@                                      |^<<<<<<<<<<<<<<<<<<<<<<<<<<<<
  $tracerulename, '|',                              $tracecontext

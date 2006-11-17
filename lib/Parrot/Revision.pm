@@ -40,7 +40,8 @@ sub __get_revision {
         }
     }
     elsif ( defined $svn_entries and -r $svn_entries) {
-        open FH, $svn_entries or die "Unable to open file ($svn_entries). Aborting. Error returned was: $!";
+        open FH, '<', $svn_entries 
+	    or die "Unable to open file ($svn_entries). Aborting. Error returned was: $!";
         while (<FH>) {
             /^ *committed-rev=.(\d+)./ or next;
             $revision = $1;

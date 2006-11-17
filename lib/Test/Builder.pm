@@ -1161,7 +1161,7 @@ sub _new_fh {
     }
     else {
         $fh = do { local *FH };
-        open $fh, ">$file_or_fh" or 
+        open $fh, ">", "$file_or_fh" or 
             die "Can't open test output log $file_or_fh: $!";
 	_autoflush($fh);
     }
@@ -1214,8 +1214,8 @@ sub _open_testhandles {
     return if $Opened_Testhandles;
     # We dup STDOUT and STDERR so people can change them in their
     # test suites while still getting normal test output.
-    open(TESTOUT, ">&STDOUT") or die "Can't dup STDOUT:  $!";
-    open(TESTERR, ">&STDERR") or die "Can't dup STDERR:  $!";
+    open(TESTOUT, ">&", "STDOUT") or die "Can't dup STDOUT:  $!";
+    open(TESTERR, ">&", "STDERR") or die "Can't dup STDERR:  $!";
     $Opened_Testhandles = 1;
 }
 
