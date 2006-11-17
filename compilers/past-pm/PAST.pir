@@ -233,13 +233,11 @@ for compiling programs in Parrot.
     .return self.'attr'('viviself', value, has_value)
 .end
 
-
-.sub 'vivibase' :method
+.sub 'islvalue' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('vivibase', value, has_value)
+    .return self.'attr'('islvalue', value, has_value)
 .end
-
 
 .sub 'bindvalue' :method
     .param pmc value           :optional
