@@ -83,5 +83,6 @@ the strings?).
          0.4.5          2006-Jun-19
 
  Chip    0.4.6          2006-Aug-08
+         0.4.7          2006-Nov-14     "Caique"
 
 =cut
