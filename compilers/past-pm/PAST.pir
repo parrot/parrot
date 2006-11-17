@@ -221,17 +221,30 @@ for compiling programs in Parrot.
 
 .namespace [ 'PAST::Var' ]
 
+.sub 'scope' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('scope', value, has_value)
+.end
+
+.sub 'viviself' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('viviself', value, has_value)
+.end
+
+
+.sub 'vivibase' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('vivibase', value, has_value)
+.end
+
+
 .sub 'bindvalue' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .return self.'attr'('bindvalue', value, has_value)
-.end
-
-
-.sub 'vivicode' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('vivicode', value, has_value)
 .end
 
 

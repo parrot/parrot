@@ -14,15 +14,15 @@ transform post (PAST::Block) :language('PIR') {
     post.'init'('node'=>node, 'name'=>name)
     .local pmc iter
     iter = node.'iterator'()
-  iter_loop:
     unless iter goto iter_end
+  iter_loop:
     .local pmc cpast, cpost
     cpast = shift iter
     cpost = tree.'get'('post', cpast)
     post.'push'(cpost)
-    goto iter_loop
-  iter_end:
+    if iter goto iter_loop
     post.'result'(cpost)
+  iter_end:
 
     $S0 = node.'blocktype'()
     if $S0 != 'immediate' goto end
@@ -124,6 +124,8 @@ transform pirop (PAST::Op) :language('PIR') {
     inc aindex
     goto iter_loop
   iter_end:
+    $P0 = post[0]
+    post.'result'($P0)
     $S0 = substr atypes, 0, 1
     if $S0 == 'v' goto pirop_void
     if $S0 == 'r' goto pirop_reg
@@ -337,20 +339,57 @@ transform post (PAST::Val) :language('PIR') {
 
 
 transform post (PAST::Var) :language('PIR') {
-    .local pmc name, post
-    name = node.'name'()
-    name = node.'escape'(name)
+    .local pmc post
     post = new 'POST::Ops'
     post.'init'('node'=>node)
+
+    .local string ireg, scope
+    ireg = post.'unique'('$I')
+    scope = node.'scope'()
+    if scope == 'keyed' goto scope_keyed
+
+  scope_package:
+    .local string name
+    name = node.'name'()
+    name = node.'escape'(name)
     post.'push_pirop'('get_global', post, name)
-    .local pmc vivicode
-    vivicode = node.'vivicode'()
-    unless vivicode goto end
+    goto vivifyself
+
+  scope_keyed:
+    .local pmc basepast, keypast
+    .local pmc basepost, keypost
+    keypast = node[1]
+    keypast.'atype'('*')
+    keypost = tree.'get'('post', keypast)
+    post.'push'(keypost)
+    basepast = node[0]
+    basepost = tree.'get'('post', basepast)
+    post.'push'(basepost)
+    post.'result'(basepost)
+    .local string key
+    key = basepost.'result'()
+    key = concat key, '['
+    $S0 = keypost.'result'()
+    key .= $S0
+    key .= ']'
+    .local pmc labelpost
+    labelpost = post.'new'('POST::Label', 'name'=>'defvar_')
+    post.'push_pirop'('defined', ireg, post)
+    post.'push_pirop'('unless', ireg, labelpost)
+    post.'push_pirop'('set', post, key)
+    post.'push'(labelpost)
+    goto vivifyself
+
+  vivifyself:
+    .local pmc viviself
+    viviself = node.'viviself'()
+    unless viviself goto end
   vivify:
     .local pmc varlabel
     varlabel = post.'new'('POST::Label', 'name'=>'var_')
-    post.'push_pirop'('unless_null', post, varlabel)
-    post.'push_pirop'('new', post, vivicode)
+    post.'push_pirop'('defined', ireg, post)
+    post.'push_pirop'('if', ireg, varlabel)
+    post.'push_pirop'('new', post, viviself)
     post.'push'(varlabel)
   end:
     .return (post)
