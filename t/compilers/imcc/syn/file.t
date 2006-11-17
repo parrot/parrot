@@ -27,7 +27,7 @@ my $PARROT = ".$PConfig{slash}parrot$PConfig{exe}";
 my $PERL5  = $PConfig{perl};
 
 ##############################
-open FOO, ">temp.pasm" or die "Can't write temp.pasm\n";
+open FOO, ">", "temp.pasm" or die "Can't write temp.pasm\n";
 print FOO <<'ENDF';
   .constant BAR 42
 ENDF
@@ -49,7 +49,7 @@ OUT
 unlink "temp.pasm";
 
 ##############################
-open FOO, ">temp.pir" or die "Can't write temp.pir\n";
+open FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
 print FOO <<'ENDF';
   .const int BAR = 42
 ENDF
@@ -71,7 +71,7 @@ OUT
 unlink "temp.pir";
 
 ##############################
-open FOO, ">temp.inc" or die "Can't write temp.inc\n";
+open FOO, ">", "temp.inc" or die "Can't write temp.inc\n";
 print FOO <<'ENDF';
   .const int BAR = 42
 ENDF
@@ -94,7 +94,7 @@ unlink "temp.inc";
 
 ##############################
 my $file = '_test.inc';
-open F, ">$file";
+open F, ">", "$file";
 print F <<'EOF';
 .sub _foo		# sub foo(int a, int b)
    .param int a
@@ -144,7 +144,7 @@ OUT
 # test load_bytecode branches and subs
 
 # write sub2
-open FOO, ">temp.pir" or die "Can't write temp.pir\n";
+open FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
 print FOO <<'ENDF';
 .pcc_sub _sub2
     print "sub2\n"
@@ -175,7 +175,7 @@ sub2
 OUT
 
 # write sub2
-open FOO, ">temp.pir" or die "Can't write temp.pir\n";
+open FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
 print FOO <<'ENDF';
 .pcc_sub _sub2
     print "sub2\n"
@@ -210,7 +210,7 @@ back
 OUT
 
 # write sub2
-open FOO, ">temp.pir" or die "Can't write temp.pir\n";
+open FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
 print FOO <<'ENDF';
 .pcc_sub _not_sub2
     print "not sub2\n"
@@ -246,7 +246,7 @@ sub2
 OUT
 
 # write sub2
-open FOO, ">temp.pir" or die "Can't write temp.pir\n";
+open FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
 print FOO <<'ENDF';
 .pcc_sub _sub2
     print "sub2\n"
@@ -304,7 +304,7 @@ back
 OUT
 
 # write subs
-open FOO, ">temp.pir" or die "Can't write temp.pir\n";
+open FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
 print FOO <<'ENDF';
 .pcc_sub _sub1
     print "sub1\n"
@@ -340,7 +340,7 @@ OUT
   # include a non-existent file and catch the error message
   my $err_msg;
   {
-    open FOO, ">temp.pir" or die "Can't write temp.pir\n";
+    open FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
     print FOO << 'END_PIR';
 # Including a non-existent file should produce an error
 .include "non_existent.pir"
@@ -352,22 +352,22 @@ OUT
 END_PIR
     close FOO;
     local *OLDERR;
-    open OLDERR, ">&STDERR" or die "Can't save STDERR\n";
-    open STDERR, ">temp.out" or die "Can't write temp.out\n";
+    open OLDERR, ">&", "STDERR" or die "Can't save STDERR\n";
+    open STDERR, ">", "temp.out" or die "Can't write temp.out\n";
     system "$PARROT temp.pir";
-    open FOO, "<temp.out" or die "Can't read temp.out\n";
+    open FOO, "<", "temp.out" or die "Can't read temp.out\n";
     { local $/; $err_msg = <FOO>; }
     close FOO;
-    open STDERR, ">&OLDERR" or die "Can't restore STDERR\n";
+    open STDERR, ">&", "OLDERR" or die "Can't restore STDERR\n";
     unlink "temp.out";
   }
 
   # read a non-existent file and catch the error message
   my $enoent_err_msg;
   {
-    open FOO, "<non_existent.file";
+    open FOO, "<", "non_existent.file";
     my $ENOENT = $! + 0;
-    open FOO, ">temp.pir" or die "Can't write temp.pir\n";
+    open FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
     print FOO << "END_PIR";
 .sub test \:main
   # run a OS command, and get the errmessge for the exit code

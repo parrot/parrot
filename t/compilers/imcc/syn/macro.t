@@ -156,7 +156,7 @@ pasm_output_is(<<'CODE', 'foo', "constant defined, used in a macro call");
   end
 CODE
 
-open FOO, ">macro.tempfile";
+open FOO, ">", "macro.tempfile";
 print FOO <<'ENDF';
   set S0, "Betelgeuse\n"
 ENDF
@@ -175,7 +175,7 @@ Betelgeuse
 Betelgeuse
 OUTPUT
 
-open FOO, ">macro.tempfile";   # Clobber previous
+open FOO, ">", "macro.tempfile";   # Clobber previous
 print FOO <<'ENDF';
 .macro multiply(A,B)
 	new P0, .Float

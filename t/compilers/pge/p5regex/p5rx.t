@@ -67,7 +67,7 @@ Column 6, if present, contains a description of what is being tested.
 
 
 my @file_path = split m{/}, 't/compilers/pge/p5regex/re_tests';
-open my $test_file, catfile($PConfig{build_dir}, @file_path)
+open my $test_file, '<', catfile($PConfig{build_dir}, @file_path)
     or die "Can't open ".catfile ($PConfig{build_dir}, @file_path);
 
 ## figure out how many tests there are

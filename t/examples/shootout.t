@@ -70,7 +70,7 @@ foreach my $script (@shootouts) {
     }
     my $file = "$DIR/$script";
     # parse first line
-    open(FILE,$file) or die "unable to open file [$file] : $!";
+    open(FILE, '<', $file) or die "unable to open file [$file] : $!";
     my $shebang = <FILE>;
     close FILE;
     my $expected = slurp_file( "$file$EXT" );
