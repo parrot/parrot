@@ -21,6 +21,7 @@ all: abc.pbc
 
 SOURCES = abc.pir \
   src/abc.pg \
+  src/builtins.pir \
   src/parse2past.tg 
 
 # the default target

@@ -93,6 +93,8 @@ compiled code as a PMC.
 .end
 
 
+.include 'src/builtins.pir'
+
 .namespace [ 'ABC::Grammar' ]
 .include 'src/abc_gen.pir'
 
