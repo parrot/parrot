@@ -66,23 +66,23 @@ the strings?).
          0.0.11.2       2003-Sep-22
 
  Leo     0.0.13         2003-Oct-31
-         0.1.0          2004-Feb-29
-         0.1.1          2004-Oct-09
-         0.1.2          2005-Mar-06
-         0.2.0          2005-May-08
-         0.2.1          2005-Jun-04
-         0.2.2          2005-Jul-03
-         0.2.3          2005-Aug-05
-         0.3.0          2005-Oct-01
-         0.3.1          2005-Nov-06
-         0.4.0          2005-Dec-04
-         0.4.1          2006-Jan-08
-         0.4.2          2006-Feb-22
-         0.4.3          2006-Apr-02
-         0.4.4          2006-May-14
-         0.4.5          2006-Jun-19
+         0.1.0          2004-Feb-29     "Leaping Kakapo"
+         0.1.1          2004-Oct-09     "Poicephalus"
+         0.1.2          2005-Mar-06     "Phoenix"
+         0.2.0          2005-May-08     "NLnet"
+         0.2.1          2005-Jun-04     "APW"
+         0.2.2          2005-Jul-03     "Geeksunite"
+         0.2.3          2005-Aug-05     "Serenity"
+         0.3.0          2005-Oct-01     "Alex"
+         0.3.1          2005-Nov-06     "Wart"
+         0.4.0          2005-Dec-04     "Luthor"
+         0.4.1          2006-Jan-08     "Foghorn Leghorn"
+         0.4.2          2006-Feb-22     "GPW"
+         0.4.3          2006-Apr-02     "Cold Conure"
+         0.4.4          2006-May-14     "Feather"
+         0.4.5          2006-Jun-19     n/a
 
- Chip    0.4.6          2006-Aug-08
+ Chip    0.4.6          2006-Aug-08     n/a
          0.4.7          2006-Nov-14     "Caique"
 
 =cut
