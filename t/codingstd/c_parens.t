@@ -87,12 +87,12 @@ sub check_parens {
         }
     }
 
-## L<PDD07/Code Formatting/"There should be one space between C keywords and following open parenthesis">
+## L<PDD07/Code Formatting/"there should be at least one space between a C keyword and any subsequent open parenthesis">
     ok( !scalar(@keyword_paren) )
         or diag( "incorrect spacing between C keyword and following open parenthesis found in "
             . scalar @keyword_paren . " files:\n@keyword_paren" );
 
-## L<PDD07/Code Formatting/"There should be no space between function names and following open parenthesis">
+## L<PDD07/Code Formatting/"There should be no space between a function name and the following open parenthesis">
     ok( !scalar(@non_keyword_paren) )
         or diag( "incorrect spacing between function name and following open parenthesis found in "
             . scalar @non_keyword_paren . " files:\n@non_keyword_paren" );
