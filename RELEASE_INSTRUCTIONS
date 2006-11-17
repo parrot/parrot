@@ -28,7 +28,8 @@ To prepare a release:
 
         c.  Update README.
 
-        d.  Update ChangeLog, NEWS, docs/ROADMAP.pod, and docs/BROKEN.pod.
+        d.  Update ChangeLog, NEWS, docs/parrothist.pod, docs/ROADMAP.pod,
+            and docs/BROKEN.pod.
 
         e.  Make sure RESPONSIBLE_PARTIES is still accurate.
 
