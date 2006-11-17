@@ -31,6 +31,10 @@ and registers the "compile" subroutine as the "ABC" compiler.
     load_bytecode 'Parrot/HLLCompiler.pbc'
     load_bytecode 'PAST-pm.pbc'
 
+    # import PGE::Util::die into ABC::Grammar
+    $P0 = get_hll_global ['PGE::Util'], 'die'
+    set_hll_global ['ABC::Grammar'], 'die', $P0
+
     $P0 = getclass 'TGE::Grammar'
     $P1 = subclass $P0, 'ABC::PAST::Grammar'
 
@@ -62,7 +66,7 @@ compiled code as a PMC.
   parse:
     .local pmc parse
     .local pmc match
-    parse = find_global 'ABC::Grammar', 'statement'
+    parse = find_global 'ABC::Grammar', 'program'
     match = parse(code, 'grammar'=>'ABC::Grammar', 'pos'=>0)
 
     unless match goto return_match

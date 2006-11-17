@@ -15,7 +15,7 @@ rule print {
     print [ <string> | <expression> ] [ , [ <string> | <expression> ] ]*
 }
 
-rule compound_statement { \{ <statement>? [ ; <statement>? ]* \} }
+rule compound_statement { \{ <statement_list> \} }
 rule if_statement { if \( <expression> \) <statement> [ else <statement> ]? }
 rule while_statement { while \( <expression> \) <statement> }
 rule for_statement {
@@ -32,8 +32,11 @@ rule statement {
     | return [ \( <expression> \) ]?
     | <expression>
 }
+rule statement_list { <statement>? [ ; <statement>? ]* }
+rule program { ^ <statement_list> [ $ | <die: parse error> ] }
 
 rule pseudo_statement { limits | quit | warranty }
+
 
 
 ## create operator precedence parser

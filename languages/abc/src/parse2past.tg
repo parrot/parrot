@@ -2,8 +2,9 @@ transform root (ROOT) :language('PIR') {
     .local pmc past
     past = new 'PAST::Block'
     past.'init'('node'=>node, 'name'=>'anon')
-    .local pmc cpast
-    cpast = tree.'get'('past', node, 'ABC::Grammar::statement')
+    .local pmc cnode, cpast
+    cnode = node['statement_list']
+    cpast = tree.'get'('past', cnode, 'ABC::Grammar::statement_list')
     past.'push'(cpast)
     .return (past)
 }
@@ -21,7 +22,8 @@ transform past (ABC::Grammar::statement) :language('PIR') {
   compound_statement:
     $P0 = node['compound_statement']
     if null $P0 goto for_statement
-    .return tree.'get'('past', $P0, 'ABC::Grammar::compound_statement')
+    $P0 = $P0['statement_list']
+    .return tree.'get'('past', $P0, 'ABC::Grammar::statement_list')
   for_statement:
     $P0 = node['for_statement']
     if null $P0 goto expression
@@ -120,9 +122,7 @@ transform past (ABC::Grammar::for_statement) :language('PIR') {
 }
 
 
-
-
-transform past (ABC::Grammar::compound_statement) :language('PIR') {
+transform past (ABC::Grammar::statement_list) :language('PIR') {
     .local pmc past
     past = new 'PAST::Stmts'
     past.'init'('node'=>node)
