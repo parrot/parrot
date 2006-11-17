@@ -26,7 +26,7 @@ t/codingstd/gmt_utc.t - checks for GMT/UTC timezone in generated files
 
 =head1 DESCRIPTION
 
-Generated files which have timezone information should have this as either 
+Generated files which have timezone information should have this as either
 GMT or UTC.
 
 =head1 SEE ALSO
@@ -63,7 +63,7 @@ foreach my $file (@files) {
 }
 
 ok( !scalar(@failures), 'Generated timestamps correct' )
-    or diag( "Non GMT/UTC timestamp found in " . scalar @failures . 
+    or diag( "Non GMT/UTC timestamp found in " . scalar @failures .
         " files:\n@failures" );
 
 exit;

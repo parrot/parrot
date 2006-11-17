@@ -61,7 +61,7 @@ else {
         'Lex file'
     );
     check_cppcomments(
-        [ map( $_->files_of_type('Parrot opcod file'), $DIST->ops_source_file_directories() ) ],
+        [ map( $_->files_of_type('Parrot opcode file'), $DIST->ops_source_file_directories() ) ],
         'Parrot opcode file'
     );
 }
