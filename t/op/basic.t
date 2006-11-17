@@ -45,7 +45,7 @@ pasm_output_is(<<'CODE', 'Parrot flies', "print double-quoted string");
        end
 CODE
 
-pasm_output_is(<<'CODE', 'Parrot        flies', "print double-quoted string, tabs");
+pasm_output_is(<<'CODE', "Parrot\tflies", "print double-quoted string, tabs");
        print "Parrot\tflies"
        end
 CODE
