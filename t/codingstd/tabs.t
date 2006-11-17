@@ -52,6 +52,7 @@ foreach my $file (@files) {
     close $fh;
 }
 
+## L<PDD07/Code Formatting/"Indentation must consist only of spaces">
 ok( !scalar(@tabs), "tabs in leading whitespace" )
     or diag("Found tab in leading whitespace in " . scalar(@tabs)
         . " files.  Files affected:\n@tabs");

@@ -75,6 +75,7 @@ foreach my $file (@files) {
     }
 }
 
+## L<PDD07/Code Formatting/"Source line width is limited to 100 characters">
 ok( !scalar(@lines_too_long), 'Line length ok' )
     or diag( "Lines longer than coding standard limit in " .
         scalar @lines_too_long . " files:\n@lines_too_long" );
