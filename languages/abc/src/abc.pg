@@ -56,7 +56,7 @@ proto 'prefix:--'   is equiv('postfix:++') { ... }
 
 ## negation
 proto 'prefix:-'    is looser('postfix:++')
-    is post('neg')
+    is pirop('neg')
     { ... }
 
 ## exponentiation
