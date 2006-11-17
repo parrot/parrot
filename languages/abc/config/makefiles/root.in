@@ -50,18 +50,19 @@ help:
 	@echo "  help:              Print this help message."
 	@echo ""
 
-test: all
-	$(PERL) t/harness
+test: abc.pbc
+	prove -r t
 
 # this target has nothing to do
 testclean:
+	$(RM_RF) "t/*.pir" "t/*.out"
 
 CLEANUPS = \
   abc.pbc \
   src/abc_gen.pir \
-  src/parse2past_gen.pir 
+  src/parse2past_gen.pir
 
-clean: 
+clean: testclean
 	$(RM_RF) $(CLEANUPS)
 
 realclean: clean
