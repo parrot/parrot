@@ -5,7 +5,7 @@ grammar ABC::Grammar;
 ## recognize terms
 token term { 
     | $<integer>:=[\d+] 
-    | $<ident>:=[\w+]
+    | $<ident>:=[\w+] [ \[ <expression> \] ]?
 }
 
 token string { \" <-["]>* \" }

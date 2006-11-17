@@ -187,6 +187,8 @@ transform past (ABC::Grammar::expr) :language('PIR') {
 
 transform past_term (ABC::Grammar::expr) :language('PIR') {
     .local pmc past
+    $P0 = node['expression']
+    unless null $P0 goto term_keyed
     $P0 = node['ident']
     unless null $P0 goto term_ident
 
@@ -197,9 +199,22 @@ transform past_term (ABC::Grammar::expr) :language('PIR') {
     .return (past)
 
   term_ident:
-    $S0 = node['ident']
+    .local string name
+    name = node['ident']
     past = new 'PAST::Var'
-    past.'init'('node'=>node, 'name'=>$S0, 'vivicode'=>'.Integer')
+    past.'init'('node'=>node, 'name'=>name, 'viviself'=>'.Integer')
+    .return (past)
+
+  term_keyed:
+    .local string name
+    name = node['ident']
+    name = concat name, '_array'
+    past = new 'PAST::Var'
+    past.'init'('node'=>node, 'name'=>name)
+    .local pmc exprnode, exprpast
+    exprnode = node['expression'; 0]
+    exprpast = tree.'get'('past', exprnode, 'ABC::Grammar::expression')
+    past = past.'new'('PAST::Var', past, exprpast, 'node'=>node, 'scope'=>'keyed', 'vivibase'=>'.ResizablePMCArray', 'viviself'=>'.Integer')
     .return (past)
 }
 
