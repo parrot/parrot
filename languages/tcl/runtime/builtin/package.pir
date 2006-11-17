@@ -11,5 +11,5 @@
 .sub "&package"
     .param pmc args :slurpy
 
-    tcl_return ''
+    .return('')
 .end
