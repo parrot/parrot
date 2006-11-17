@@ -48,6 +48,10 @@ proto 'term:'       is precedence('=')
     is parsed(&term)
     { ... }
 
+proto 'circumfix:( )'  is equiv('term:') 
+    is pirop('set')
+    { ... }
+
 ## autoincrement
 proto 'postfix:++'  is looser('term:')     { ... }
 proto 'postfix:--'  is equiv('postfix:++') { ... }
