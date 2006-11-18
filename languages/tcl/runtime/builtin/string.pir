@@ -379,7 +379,7 @@ bad_length:
   $I2 = __index($S3,$S1)
 
 range_do:
-###  if index_1 > $I2 goto done   XXX (#40768): no such label
+###  if index_1 > $I2 goto done   RT#40768: no such label
   if index_1 >= 0  goto range_top
   index_1 = 0
 range_top:
@@ -460,7 +460,7 @@ bad_repeat:
   tcl_error 'wrong # args: should be "string repeat string count"'
 .end
 
-# XXX (#40769): stub
+# RT#40769: stub
 .sub 'map'
   .param pmc argv
 
@@ -602,8 +602,8 @@ bad_args:
 .end
 
 
-# XXX (#40770): doesn't currently respect the -options.
-# XXX (#40771): Mdiep will probably want to change this to a hash-dispatch
+# RT#40770: doesn't currently respect the -options.
+# RT#40771: Mdiep will probably want to change this to a hash-dispatch
 .sub 'is'
   .param pmc argv
   .local int argc
@@ -677,7 +677,7 @@ alpha_check:
   the_cclass = .CCLASS_ALPHABETIC
   goto cclass_check
 ascii_check:
-  goto bad_args #XXX (#40772):
+  goto bad_args # RT#40772:
 control_check:
   the_cclass = .CCLASS_CONTROL
   goto cclass_check
@@ -748,7 +748,7 @@ xdigit_check:
 
 cclass_check:
   # Loop over the string. Die immediately if we fail.
-  # XXX (#40773): Tie the index of the string into --failvar
+  # RT#40773: Tie the index of the string into --failvar
   .local int len,ii
   len = length the_string
   ii = 0

@@ -1,7 +1,7 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-# XXX (#40754): This implementation uses a lot of temp vars that should be named -coke
+# RT#40754: This implementation uses a lot of temp vars that should be named -coke
 
 .sub '&split'
   .param pmc argv :slurpy
@@ -14,7 +14,7 @@
 
   .local string splitchars,splitstring
   splitstring = argv[0]
-  # XXX (#40755): Make this the default whitespace splitchars.
+  # RT#40755: Make this the default whitespace splitchars.
   splitchars = ' '
 
   if argc == 1 goto got_splitchars
@@ -71,7 +71,7 @@ split_done:
   inc result_key
 
 split_really_done:
-  $P1 = result_key #XXX (#40756): another TclList hack, truncate the list to the right
+  $P1 = result_key # RT#40756: another TclList hack, truncate the list to the right
   # number of elements...
   .return ($P1)
 

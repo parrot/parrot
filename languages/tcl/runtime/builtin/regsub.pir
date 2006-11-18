@@ -10,13 +10,13 @@
 
   .local string expression, target, subSpec
  
-  # XXX (#40758): not handling options. 
+  # RT#40758: not handling options. 
 
   expression = argv[0]
   target     = argv[1]
-  subSpec    = argv[2] # XXX (#40759): not respecting any special chars in this yet.
+  subSpec    = argv[2] # RT#40759: not respecting any special chars in this yet.
  
-   .local pmc tclARE # XXX (#40760): for now, just use P5 regexen
+   .local pmc tclARE # RT#40760: for now, just use P5 regexen
    tclARE = compreg 'PGE::P5Regex'
 
    .local pmc rule,match 

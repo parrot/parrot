@@ -70,7 +70,7 @@ few_args:
 .HLL '_Tcl', ''
 .namespace [ 'helpers'; 'file' ]
 
-.sub 'normalize' # XXX (#40721): Stub for testing
+.sub 'normalize' # RT#40721: Stub for testing
   .param pmc argv
   $P0 = argv[0]
   .return ($P0)
@@ -84,7 +84,7 @@ few_args:
   if argc == 0 goto bad_args
 
   .local string dirsep
-  dirsep = '/' # XXX (#40730): should pull from parrot config.
+  dirsep = '/' # RT#40730: should pull from parrot config.
 
   .local string result
   result = ''
@@ -174,7 +174,7 @@ bad_args:
 
   .return('')
 
-# XXX (#40731): should be more discriminating about the error messages .OS generates
+# RT#40731: should be more discriminating about the error messages .OS generates
 no_file:
   $S0  = 'could not read "'
   $S0 .= file
@@ -210,7 +210,7 @@ bad_args:
 true:
   .return(1)
 
-# XXX (#40732): should be more discriminating about the error messages .OS generates
+# RT#40732: should be more discriminating about the error messages .OS generates
 no_file:
   $S0  = 'could not read "'
   $S0 .= file
@@ -247,7 +247,7 @@ bad_args:
 true:
   .return(1)
 
-# XXX (#40733): should be more discriminating about the error messages .OS generates
+# RT#40733: should be more discriminating about the error messages .OS generates
 no_file:
   $S0  = 'could not read "'
   $S0 .= file
@@ -282,7 +282,7 @@ bad_args:
   $S1 = $P4[$I3]
   .return ($S1)
 
-# XXX (#40734): should be more discriminating about the error messages .OS generates
+# RT#40734: should be more discriminating about the error messages .OS generates
 no_file:
   $S0  = 'could not read "'
   $S0 .= file
@@ -310,7 +310,7 @@ bad_args:
   $I1 = $P2[7]
   .return ($I1)
 
-# XXX (#40735): should be more discriminating about the error messages .OS generates
+# RT#40735: should be more discriminating about the error messages .OS generates
 no_file:
   $S0  = 'could not read "'
   $S0 .= file
@@ -338,7 +338,7 @@ bad_args:
   $I1 = $P2[8]
   .return ($I1)
 
-# XXX (#40736): should be more discriminating about the error messages .OS generates
+# RT#40736: should be more discriminating about the error messages .OS generates
 no_file:
   $S0  = 'could not read "'
   $S0 .= file
@@ -366,7 +366,7 @@ bad_args:
   $I1 = $P2[9]
   .return ($I1)
 
-# XXX (#40737): should be more discriminating about the error messages .OS generates
+# RT#40737: should be more discriminating about the error messages .OS generates
 no_file:
   $S0  = 'could not read "'
   $S0 .= file
@@ -376,49 +376,49 @@ bad_args:
   tcl_error 'wrong # args: should be "file mtime name"'
 .end
 
-# XXX (#40722): Stub for test parsing
+# RT#40722: Stub for test parsing
 .sub 'dirname'
   .param pmc argv
   .return(0)
 .end
 
-# XXX (#40723): Stub for test parsing
+# RT#40723: Stub for test parsing
 .sub 'tail'
   .param pmc argv
   .return(0)
 .end
 
-# XXX (#40724): Stub for test parsing
+# RT#40724: Stub for test parsing
 .sub 'readable'
   .param pmc argv
   .return(0)
 .end
 
-# XXX (#40725): Stub for test parsing
+# RT#40725: Stub for test parsing
 .sub 'delete'
   .param pmc argv
   .return(0)
 .end
 
-# XXX (#40726): Stub for test parsing
+# RT#40726: Stub for test parsing
 .sub 'exists'
   .param pmc argv
   .return(0)
 .end
 
-# XXX (#40727): Stub for test parsing
+# RT#40727: Stub for test parsing
 .sub 'copy'
   .param pmc argv
   .return(0)
 .end
 
-# XXX (#40728): Stub for test parsing
+# RT#40728: Stub for test parsing
 .sub 'rootname'
   .param pmc argv
   .return(0)
 .end
 
-# XXX (#40729): Stub for test parsing
+# RT#40729: Stub for test parsing
 .sub 'ext'
   .param pmc argv
   .return(0)

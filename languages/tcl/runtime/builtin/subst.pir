@@ -10,11 +10,11 @@
 
   .local string a_string
  
-  # XXX (#40781): not handling options. 
+  # RT#40781: not handling options. 
 
   a_string = argv[0]
 
-  # XXX (#40779): not handling anything. Just a slightly better stub.
+  # RT#40779: not handling anything. Just a slightly better stub.
   .return (a_string)
 
 badargs:

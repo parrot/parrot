@@ -316,37 +316,37 @@ find_level:
   .return(level)
 .end
 
-#XXX (#40743): globals - should be doable. - just walk the "Tcl" namespace.
+# RT#40743: globals - should be doable. - just walk the "Tcl" namespace.
 #    this is a stub just to assist parsing.
 .sub 'globals'
   .param pmc argv
   .return(0)
 .end
 
-# XXX (#40739): stub
+# RT#40739: stub
 .sub 'script'
   .param pmc argv
   .return(0)
 .end
 
-# XXX (#40740): stub
+# RT#40740: stub
 # sharedlibextension - should be able to pull this from parrot config.
 .sub 'sharedlibextension'
   .param pmc argv
   .return(0)
 .end
 
-# XXX (#40741): stub
+# RT#40741: stub
 .sub 'nameofexecutable'
   .param pmc argv
   .return('parrot tcl.pbc')
 .end
 
-# XXX (#40742): stub
+# RT#40742: stub
 .sub 'loaded'
   .param pmc argv
   .return(0)
 .end
 
-#XXX (#40745): default - watch out for return value and default value.
-#XXX (#40744): cmdcount - not being tracked. :(
+# RT#40745: default - watch out for return value and default value.
+# RT#40744: cmdcount - not being tracked. :(

@@ -425,7 +425,7 @@ bad_args:
   tcl_error 'wrong # args: should be "namespace parent ?name?"'
 .end
 
-# XXX (#40753): Stub
+# RT#40753: Stub
 .sub 'which'
   .return ('')
 .end

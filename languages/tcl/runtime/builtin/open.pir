@@ -18,7 +18,7 @@
   pir_access = '<'
   if access == '' goto done_access
   if access == 'r' goto done_access
-  # XXX (#40780): assume r & w are the only options for now.
+  # RT#40780: assume r & w are the only options for now.
   pir_access = '>'
 
  done_access:

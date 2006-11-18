@@ -15,4 +15,4 @@ eval_is {flush toilet} \
   {can not find channel named "toilet"} \
   {invalid channel name}
 
-# XXX (#40627): test actual flushing.
+# RT#40627: test actual flushing.

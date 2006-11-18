@@ -154,7 +154,7 @@ args_loop_done:
 
 store_info:
   # Save the args for the proc for [info args]
-  # XXX (#40750): When dealing with defaults, this will have to be updated.
+  # RT#40750: When dealing with defaults, this will have to be updated.
   $P1 = get_root_global ['_tcl'], 'proc_args'
   $P1[full_name] = args_info
 
@@ -171,7 +171,7 @@ emit_args:
   code .= args_code
   
   # Convert the remaining elements returned by foldup into a TclList
-  # XXX (#40751): This code lifted from Tcl::&list - eventually factor this out.
+  # RT#40751: This code lifted from Tcl::&list - eventually factor this out.
   code.emit(<<"END_PIR")
   unless args goto NO_SLURPY_ARGS
   .local pmc arg_list
@@ -239,7 +239,7 @@ END_PIR
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
 
-  # (see note on trans_charset in lib/parser.pir) XXX (#40752):
+  # (see note on trans_charset in lib/parser.pir) RT#40752:
   $S0 = code
   $I0 = find_charset 'ascii'
   $S0 = trans_charset $I0

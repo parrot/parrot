@@ -4,7 +4,7 @@
 # At the moment, this is *much* weaker testing harness than the one that
 # comes with tcl. However, it's very good for partcl in the short term.
 
-# XXX (#40713): put this in a namespace to avoid global pollution
+# RT#40713: put this in a namespace to avoid global pollution
 
 proc skip_all {} {
     puts 1..0
@@ -63,7 +63,7 @@ proc is {value expected {description ""} {special {}}}  {
     }
 }
 
-# XXX (#40714): Need to handle the case where we expect an exception.
+# RT#40714: Need to handle the case where we expect an exception.
 proc eval_is {code expected {description ""} {special {}}}  {
     global very_bad_global_variable_test_num
     # The one case where skip actually means "don't do that"
@@ -120,7 +120,7 @@ proc diag {diagnostic} {
   puts stderr "# $diagnostic"
 }
 
-# XXX (#40720): hacks to help avoid translating the actual tcl tests, until 
+# RT#40720: hacks to help avoid translating the actual tcl tests, until 
 # we actually support tcltest.
 
 # A placeholder that simulates the real tcltest's exported test proc.
@@ -130,7 +130,7 @@ proc test {num description code args} {
     if {[llength $args] == 0} {
         pass $full_desc [list SKIP $excuse]
     } elseif {[llength $args] == 1} {
-        # XXX (#40716): Some of these tests cause pathological harness
+        # RT#40716: Some of these tests cause pathological harness
         # failures. skip them.  Put the skip here instead of in the test 
         # file to keep all our hacks in one basket.
         if {
@@ -183,7 +183,7 @@ proc test {num description code args} {
     }
 }
 
-# XXX (#40717): hacks to allow compilation of tests.
+# RT#40717: hacks to allow compilation of tests.
 
 # Constraints are like skip conditions that
 # can be specified by a particular invocation to test. Since we're ingoring

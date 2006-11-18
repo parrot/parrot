@@ -33,7 +33,7 @@ chew_flag:
   if $P0 == '-integer' goto c_int
   if $P0 == '-real' goto c_real
   if $P0 == '-dictionary' goto c_dict
-  # XXX (#40749): command etc necessary
+  # RT#40749: command etc necessary
   branch bad_opt
 
 c_dict:

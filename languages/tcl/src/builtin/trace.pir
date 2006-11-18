@@ -1,4 +1,4 @@
-# XXX (#40703): Stub 
+# RT#40703: Stub 
 # help tcltest compile
 
 .HLL '_Tcl', ''

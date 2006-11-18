@@ -126,7 +126,7 @@ which_format:
   if formatChar == 'A' goto format_A
   if formatChar == 'x' goto format_x
 
-  .return (0)  # XXX (#40762) Implement the rest of the [binary] format chars.
+  .return (0)  # RT#40762 Implement the rest of the [binary] format chars.
 
 format_a:
   .getBinaryArg()
@@ -219,7 +219,7 @@ out_of_args:
   set = get_root_global ['_tcl'], '__set'
   set(varname, '')
 
-  .return (0) # XXX (#40763): Hack to avoid parsing errors for tcl tests.
+  .return (0) # RT#40763: Hack to avoid parsing errors for tcl tests.
 
 bad_args:
   tcl_error 'wrong # args: should be "binary scan value formatString ?varName varName ...?"'
