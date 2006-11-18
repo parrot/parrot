@@ -20,7 +20,7 @@ Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg.
 
 [from Porting/pumpkin.pod in the Perl source code distribution]
 
-Chip Salzenberg gets credit for that, with a nod to his cow orker,
+Chip Salzenberg gets credit for that, with a nod to his coworker,
 David Croy.  We had passed around various names (baton, token, hot
 potato) but none caught on.  Then, Chip asked:
 
