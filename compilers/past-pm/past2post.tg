@@ -365,7 +365,7 @@ transform post (PAST::Var) :language('PIR') {
 
   package_bind:
     post = new 'POST::Op'
-    post.'init'('node'=>node, 'pirop'=>'set_global')
+    post.'init'('node'=>node, 'pirop'=>'set_global', 'result'=>bindvalue)
     post.'arglist'(name, bindvalue)
     .return (post)
 
