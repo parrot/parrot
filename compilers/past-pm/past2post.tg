@@ -70,7 +70,7 @@ transform post (PAST::Op) :language('PIR') {
 
 
 transform call (PAST::Op) :language('PIR') {
-    .local pmc post, name
+    .local pmc post
     post = new 'POST::Op'
     post.'init'('node'=>node, 'pirop'=>'call')
     .local pmc iter, arglist
@@ -88,8 +88,11 @@ transform call (PAST::Op) :language('PIR') {
   iter_end:
     .local pmc name, result
     name = node.'name'()
+    unless name goto have_arglist
     name = node.'escape'(name)
-    post.'arglist'(name, arglist :flat)
+    unshift arglist, name
+  have_arglist:
+    post.'arglist'(arglist :flat)
     .return (post)
 }
 
