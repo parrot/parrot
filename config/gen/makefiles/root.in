@@ -188,14 +188,17 @@ GEN_MAKEFILES = \
     editor/Makefile \
     ext/Makefile \
     languages/Makefile \
+    languages/abc/Makefile \
     languages/amber/Makefile \
     languages/APL/Makefile \
     languages/bc/Makefile \
     languages/befunge/Makefile \
     languages/bf/Makefile \
+    languages/c99/Makefile \
     languages/cardinal/Makefile \
     languages/cola/Makefile \
     languages/ecmascript/Makefile \
+    languages/forth/Makefile \
     languages/HQ9plus/Makefile \
     languages/jako/Makefile \
     languages/lisp/Makefile \
@@ -206,6 +209,7 @@ GEN_MAKEFILES = \
     languages/parrot_compiler/Makefile \
     languages/perl6/Makefile \
     languages/pheme/Makefile \
+    languages/plumhead/Makefile \
     languages/pugs/Makefile \
     languages/punie/Makefile \
     languages/regex/Makefile \
