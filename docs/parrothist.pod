@@ -57,15 +57,15 @@ the strings?).
  Jeff    0.0.5          2002-Apr-16
          0.0.6          2002-Jun-04
          0.0.7          2002-Jul-18
-         0.0.8          2002-Sep-01
+         0.0.8          2002-Sep-01     "Octarine"
          0.0.8.1        2002-Sep-01
 
- Steve   0.0.9          2002-Dec-19
-         0.0.10         2003-Mar-16
-         0.0.11         2003-Sep-20
+ Steve   0.0.9          2002-Dec-19     "Nazgul"
+         0.0.10         2003-Mar-16     "Juice"
+         0.0.11         2003-Sep-20     "Dubloon"
          0.0.11.2       2003-Sep-22
 
- Leo     0.0.13         2003-Oct-31
+ Leo     0.0.13         2003-Oct-31     "Screaming Pumpkin"
          0.1.0          2004-Feb-29     "Leaping Kakapo"
          0.1.1          2004-Oct-09     "Poicephalus"
          0.1.2          2005-Mar-06     "Phoenix"
