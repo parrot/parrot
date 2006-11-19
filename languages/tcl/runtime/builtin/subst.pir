@@ -1,6 +1,8 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
+# RT#40779: this is only a stub.
+
 .sub '&subst'
   .param pmc argv :slurpy
  
@@ -10,11 +12,8 @@
 
   .local string a_string
  
-  # RT#40781: not handling options. 
-
   a_string = argv[0]
 
-  # RT#40779: not handling anything. Just a slightly better stub.
   .return (a_string)
 
 badargs:
