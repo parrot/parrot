@@ -6,6 +6,9 @@
 
 # RT#40713: put this in a namespace to avoid global pollution
 
+# get listing of all the tests we can't run.
+source lib/skipped_tests.tcl
+
 proc skip_all {} {
     puts 1..0
 }
@@ -125,56 +128,14 @@ proc diag {diagnostic} {
 
 # A placeholder that simulates the real tcltest's exported test proc.
 proc test {num description code args} {
+    global skipped_tests
     set excuse "can't deal with this version of test yet."
     set full_desc "$num $description"
     if {[llength $args] == 0} {
         pass $full_desc [list SKIP $excuse]
     } elseif {[llength $args] == 1} {
-        # RT#40716: Some of these tests cause pathological harness
-        # failures. skip them.  Put the skip here instead of in the test 
-        # file to keep all our hacks in one basket.
-        if {
-            $num eq "append-4.21"  ||
-            $num eq "append-4.22"  ||
-            $num eq "compExpr-old-14.14" ||
-            $num eq "error-7.0"    ||
-            $num eq "execute-2.1"  || 
-            $num eq "execute-2.2"  || 
-            $num eq "expr-14.14"   || 
-            $num eq "expr-old-2.38"|| 
-            $num eq "expr-old-32.41"|| 
-            $num eq "expr-old-32.42"|| 
-            $num eq "expr-old-32.49"|| 
-            $num eq "expr-old-34.9"|| 
-            $num eq "expr-old-34.10"|| 
-            $num eq "expr-old-36.3"|| 
-            $num eq "expr-old-36.4"|| 
-            $num eq "expr-old-36.8"|| 
-            $num eq "foreach-2.9"  ||
-            $num eq "foreach-3.1"  ||
-            $num eq "format-3.1"   ||
-            $num eq "format-3.2"   ||
-            $num eq "format-8.17"  ||
-            $num eq "format-8.18"  ||
-            $num eq "get-2.4"      || 
-            $num eq "incr-1.14"    ||
-            $num eq "incr-2.14"    ||
-            $num eq "lsetComp-2.4" ||
-            $num eq "lsetComp-2.7" ||
-            $num eq "lsetComp-3.4" ||
-            $num eq "lsetComp-3.7" ||
-            $num eq "obj-32.1"     ||
-            $num eq "set-1.14"     ||
-            $num eq "set-3.14"     ||
-            $num eq "string-13.6"  ||
-            $num eq "string-13.8"  ||
-            $num eq "string-14.11" ||
-            $num eq "string-18.7"  ||
-            $num eq "string-18.9"  ||
-            $num eq "string-20.4"  ||
-            $num eq "string-20.5"
-           } {
-            pass $full_desc [list SKIP "skip exploding test"]
+        if {! [catch {set reason $skipped_tests($num)}]} {
+            pass $full_desc [list SKIP $reason]
         } else {
           eval_is $code [lindex $args 0] $full_desc
         }
@@ -206,8 +167,8 @@ proc child-trusted      {args} {return 0}
 proc makeDirectory      {args} {return 0}
 proc removeDirectory    {args} {return 0}
 proc dict               {args} {return 0}
+proc testobj            {args} {return 0}
 namespace eval tcltest  {
     set verbose 0
     proc temporaryDirectory {args} {return 0}
 } 
-
