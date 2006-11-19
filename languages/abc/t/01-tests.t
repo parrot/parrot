@@ -62,7 +62,7 @@ $ prove languages/abc/t/01-tests.t
 my $abcdir = "$PConfig{'build_dir'}/languages/abc";
 
 # files to load tests from
-my @files = qw( abc_basic );
+my @files = qw( abc_basic abc_special_variables abc_statement );
 
 # for each test file given calculate full path
 my @test_files;
@@ -104,7 +104,7 @@ foreach my $file (@test_files) {
             next;
         }
 
-        $expect =~ s/^'(.*)'$/\1/;    # remove surrounding quotes (for '')
+        $expect =~ s/^'(.*)'$/$1/;    # remove surrounding quotes (for '')
         $expect =~ s/\\n/\n/g;        # treat \n as newline
 
         # build pir code

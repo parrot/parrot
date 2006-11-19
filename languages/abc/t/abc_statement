@@ -17,15 +17,15 @@
 1;if(3+4>=8*2-10)2;3	1\n2\n3\n	if with >=
 1;if(3+4>=8*2-9)2;3	1\n2\n3\n	if with >=
 1;if(3+4>=8*2+10)2;3	1\n3\n		if with >=
-1;if(3+4>8*2-10)2;3	1\n2\n3		if with >
-1;if(3+4>8*2-9)2;3	1\n3		if with >
+1;if(3+4>8*2-10)2;3	1\n2\n3\n       if with >
+1;if(3+4>8*2-9)2;3	1\n3\n          if with >
 1;if(3+4>8*2+10)2;3	1\n3\n		if with >
 
 # for statement
 for(i=0;i<2;i++)i	0\n1\n		simple for
-for(i=0;i<2;i++){i}	0\n1\n		simpre for with compound statement
+for(i=0;i<2;i++){i}	0\n1\n		simple for with compound statement
 
 # while statement
-while(i<5)i++;		0\n1\n2\n3\n4\n5\n	simple while
-while(i<5){i++;}	0\n1\n2\n3\n4\n5\n	simple while with compound
+while(i<5)i++;		0\n1\n2\n3\n4\n   simple while
+while(i<5){i++;}	0\n1\n2\n3\n4\n   simple while with compound
 

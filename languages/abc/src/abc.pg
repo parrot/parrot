@@ -54,10 +54,10 @@ proto 'circumfix:( )'  is equiv('term:')
     { ... }
 
 ## autoincrement
-proto 'postfix:++'  is looser('term:')     { ... }
-proto 'postfix:--'  is equiv('postfix:++') { ... }
-proto 'prefix:++'   is equiv('postfix:++') { ... }
-proto 'prefix:--'   is equiv('postfix:++') { ... }
+proto 'postfix:++'  is looser('term:')     is lvalue(1) { ... }
+proto 'postfix:--'  is equiv('postfix:++') is lvalue(1) { ... }
+proto 'prefix:++'   is equiv('postfix:++') is lvalue(1) { ... }
+proto 'prefix:--'   is equiv('postfix:++') is lvalue(1) { ... }
 
 ## negation
 proto 'prefix:-'    is looser('postfix:++')

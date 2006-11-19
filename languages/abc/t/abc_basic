@@ -91,10 +91,9 @@ a;b;a=4;b=5;c=6;a;b;c   0\n0\n4\n5\n6\n   assign several lexicals
 
 # increment and decrement
 a=a+1;a;a               1\n1\n          simple increment
-++k;                    1\n             two left plus sigil increment
-k++;                    1\n             two right plus sigil increment
---k;                    -1\n            two left minus sigil decrement 
-k--;                    -1\n            two right minus sigil decrement 
-++a;a                   1\n1\n          two plus sigil increment
-a;a=1;a;++a;a           0\n1\n2\n2\n    imcrement test
+++k;k                   1\n1\n          pre-increment
+k++;k                   0\n1\n          post-increment
+--k;k                   -1\n-1\n        pre-decrement
+k--;k                   0\n-1\n         post-decrement
+a;a=1;a;++a;a           0\n1\n2\n2\n    increment test
 a;a=1;1;--a;a           0\n1\n0\n0\n    decrement test
