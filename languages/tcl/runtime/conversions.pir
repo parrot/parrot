@@ -203,6 +203,8 @@ Given an expression, return a subroutine, or optionally, the raw PIR
 .sub __expr
     .param string expression
     .param int    pir_only :named('pir_only') :optional
+    .param pmc    ns       :named('ns')       :optional
+    .param int    has_ns   :opt_flag
 
     .local pmc parse
     .local pmc match
@@ -231,6 +233,19 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     astbuilder = astgrammar.apply(match)
     ast = astbuilder.get('past')
 
+    .local string namespace
+    namespace = ''
+    unless has_ns goto build_pir
+
+    $P0 = ns.name()
+    $S0 = shift $P0
+    $I0 = elements $P0
+    if $I0 == 0 goto build_pir
+    $S0 = join "'; '", $P0
+    $S0 = "['" . $S0
+    $S0 = $S0 . "']"
+    namespace = $S0
+
   build_pir:
     .local pmc pirgrammar, pirbuilder
     .local string result
@@ -246,7 +261,7 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     pir = new 'PGE::CodeString'
 
     pir.emit(".HLL 'Tcl', ''")
-    pir.emit(".namespace")
+    pir.emit(".namespace %0", namespace)
     pir.emit(".sub '_anon' :anon")
     pir .= result
     pir.emit("  .return(%0)", ret)
@@ -281,6 +296,8 @@ Given a chunk of tcl code, return a subroutine.
 .sub __script
     .param string code
     .param int    pir_only :named('pir_only') :optional
+    .param pmc    ns       :named('ns')       :optional
+    .param int    has_ns   :opt_flag
 
     .local pmc parse
     .local pmc match
@@ -309,6 +326,19 @@ Given a chunk of tcl code, return a subroutine.
     astbuilder = astgrammar.apply(match)
     ast = astbuilder.get('past')
 
+    .local string namespace
+    namespace = ''
+    unless has_ns goto build_pir
+
+    $P0 = ns.name()
+    $S0 = shift $P0
+    $I0 = elements $P0
+    if $I0 == 0 goto build_pir
+    $S0 = join "'; '", $P0
+    $S0 = "['" . $S0
+    $S0 = $S0 . "']"
+    namespace = $S0
+
   build_pir:
     .local pmc pirgrammar, pirbuilder
     .local string result
@@ -325,7 +355,7 @@ Given a chunk of tcl code, return a subroutine.
 
     pir.emit(".HLL 'Tcl', ''")
     pir.emit(".loadlib 'tcl_ops'")
-    pir.emit(".namespace")
+    pir.emit(".namespace %0", namespace)
     pir.emit(".include 'languages/tcl/src/returncodes.pir'")
     pir.emit(".sub '_anon' :anon")
     pir .= result

@@ -15,6 +15,10 @@
 
     if argc == 0 goto no_args
 
+    .local pmc ns
+    $P0 = getinterp
+    ns  = $P0['namespace'; 1]
+
     # we have to do arg checking first, to make sure we got the proper type of
     # exception. but [expr] checking has to happen before that. so replace each
     # string expression with a Sub that represents it. and while we're at it,
@@ -22,7 +26,7 @@
 
     # convert to the expression to a Sub
     $S0 = argv[0]
-    $P0 = __expr($S0)
+    $P0 = __expr($S0, 'ns'=>ns)
 
     $I0 = 1
     if $I0 == argc goto no_script
@@ -100,7 +104,7 @@ loop:
     $P1 = cond()
     $I1 = __boolean($P1)
     unless $I1 goto next
-    $P0 = __script(code)
+    $P0 = __script(code, 'ns'=>ns)
     .return $P0()
 
 next:
@@ -125,7 +129,7 @@ elseif:
 else:
     inc $I0
     code = argv[$I0]
-    $P0  = __script(code)
+    $P0  = __script(code, 'ns'=>ns)
     .return $P0()
 
 extra_words_after_else:
