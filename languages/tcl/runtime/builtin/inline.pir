@@ -23,11 +23,25 @@
 
   $P1 = compreg language
   if null $P1 goto fail
-  $P0 = $P1(code)
-  $P0()
-
-  # RT#40748: Should catch exceptions in the code and return the error message
+  push_eh compiler_error
+    $P0 = $P1(code)
+  clear_eh
+  push_eh runtime_error
+    $P0()
+  clear_eh
   .return ('')
+
+
+# First pass at RT#40748
+compiler_error:
+  get_results'(0,0)', $P1, $S1
+  $S1 = "compile error: " . $S1
+  tcl_error $S1
+
+runtime_error:
+  get_results'(0,0)', $P1, $S1
+  $S1 = "runtime error: " . $S1
+  tcl_error $S1
 
 bad_args:
   tcl_error 'wrong # args: should be "inline language code"'
