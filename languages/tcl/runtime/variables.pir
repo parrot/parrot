@@ -66,9 +66,9 @@ cant_read_not_array:
 scalar:
   variable = __find_var(name)
   if null variable goto no_such_variable
-  
-  $I0 = does variable, 'hash'
-  if $I0 goto cant_read_array
+ 
+  $S0 = typeof variable 
+  if $S0 == "TclArray" goto cant_read_array
   .return(variable)
 
 cant_read_array:

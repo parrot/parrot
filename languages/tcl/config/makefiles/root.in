@@ -26,7 +26,8 @@ PMCS = \
  tclint \
  tclfloat \
  tcllist \
- tclarray
+ tclarray \
+ tcldict
 
 GENERATED_INLINES = \
  $(C_BUILTIN)/break.pir \
@@ -142,6 +143,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/compExpr.t \
   t_tcl/compExpr_old.t \
   t_tcl/concat.t \
+  t_tcl/dict.t \
   t_tcl/error.t \
   t_tcl/eval.t \
   t_tcl/expr.t \
@@ -196,8 +198,7 @@ SEGFAULTING_TCL_TESTS = \
 
 # Tests we couldn't possibly pass any anyway:
 UNIMPLEMENTED_TCL_TESTS = \
-  t_tcl/clock.t \
-  t_tcl/dict.t
+  t_tcl/clock.t
 
 # These tests parse but fail (or skip) every test.
 FAILING_TCL_TESTS = \
