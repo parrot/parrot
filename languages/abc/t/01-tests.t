@@ -97,13 +97,15 @@ foreach my $file (@test_files) {
 
         # split by tabs or 3+ spaces
         my ($expr, $expect, $description ) = split / *\t\s*|\s{3,}/, $_;
-        $expect =~ s/\\n/\n/g; # hack to solve \n dilema
 
         # do some simple checking
         if ($expr eq '' or $expect eq '' or $description eq '') {
             warn "$file line $. doesn't match a valid test!";
             next;
         }
+
+        $expect =~ s/^'(.*)'$/\1/;    # remove surrounding quotes (for '')
+        $expect =~ s/\\n/\n/g;        # treat \n as newline
 
         # build pir code
         my $pir_code = abc_template();
