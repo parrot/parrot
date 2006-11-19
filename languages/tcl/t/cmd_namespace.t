@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 37;
 use Test::More;
 use vars qw($TODO);
 
@@ -250,10 +250,6 @@ TCL
 
 OUT
 
-TODO: {
-
-local $TODO = 'RT#40909';
-
 # prolly not portable, patches welcome.
 my $source_filename = 'tmp.tcl';
 open( my $tmpfile, '>', $source_filename ) or die $!;
@@ -271,8 +267,6 @@ OUT
 
 # clean up temp file.
 unlink($source_filename);
-
-}
 
 # Local Variables:
 #   mode: cperl

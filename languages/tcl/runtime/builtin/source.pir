@@ -18,11 +18,14 @@
   .local pmc __script
   __script = get_root_global ['_tcl'], '__script'
 
-  $P1 = argv[0] 
+  .local pmc ns
+  $P0 = getinterp
+  ns  = $P0['namespace'; 1]
 
 file:
-  filename = $P1
-  handle = open filename, '<'
+  filename = argv[0]
+  handle   = open filename, '<'
+
   $I0 = typeof handle
   if $I0 == .Undef goto badfile
   contents = ''
@@ -63,7 +66,7 @@ not_space:
   goto backslash_loop
 
 execute:
-  $P2 = __script(contents)
+  $P2 = __script(contents, 'ns'=>ns)
   .return $P2()
 
 badfile:
