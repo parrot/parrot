@@ -8,19 +8,53 @@ use Test::More;
 use Parrot::Test;
 use Parrot::Config;
 
-use Data::Dumper;
-
 =head1 NAME
 
-XXX
+languages/abc/t/01-tests.t - test harness for Parrot abc
 
 =head1 DESCRIPTION
 
-XXX
+This file is the current implementation for the abc test harness. The 
+tests are actually in simple text files, this harness given this list of
+tests sources, executes all the tests.
+
+The test source is a plain text file divided in three columns. The 
+columns are separated by three white spaces C<\s{3,}> or at least one
+tab C<\t+>. The three collumns are:
+
+=over 4
+
+=item B<expression>
+
+The exact expression that is passed to the abc compiler as source code.
+
+=item B<expected>
+
+The expected result for the compiled source. Note that you can use (and
+probably sould) C<\n> in the expected result to represent newlines.
+
+=item B<description>
+
+This should be a string describing the test that is being made.
+
+=back
+
+Since this is supposed to be a temporary harness. We're expecting to be 
+able to capture the result of the compilation to write this file in PIR.
+The skip and todo tests are defined in the test source file itself, so
+that later when the harness is changed we don't have to bother to convert
+the skip/todo tests list. So, you can simply set a test to be todo or
+skipped by adding the C<SKIP> or C<TODO> keywords in the begging of the
+test descriptio. For example:
+
+1+2+3           6       SKIP no add yet
+
+B<NOTE:> to add more source test files remember to update the C<@files> 
+array in this file.
 
 =head1 SYNOPSIS
 
-XXX
+$ prove languages/abc/t/01-tests.t
 
 =cut
 
@@ -40,7 +74,9 @@ foreach (@files) {
 my $numtests = 0;
 foreach my $f (@test_files) {
     open F, $f;
-    while(<F>) { $numtests++ unless $_ =~ m/^#/; }
+    # for each line in the given files if it's not a comment line
+    # or an empty line, the it's a test
+    while(<F>) { $numtests++ unless ( ($_ =~ m/^#/)or($_=~m/^\s*$/) ); }
     close F;
 }
 
@@ -53,17 +89,44 @@ foreach my $file (@test_files) {
     while (<TEST>) {
         chomp;
         s/\r//g;
+
         # skip comment lines
         $_ =~ /^#/ and next;
+        # skip empty lines
+        $_ =~ /^\s*$/ and next;
 
         # split by tabs or 3+ spaces
         my ($expr, $expect, $description ) = split /\t+|\s{3,}/, $_;
         $expect =~ s/\\n/\n/g; # hack to solve \n dilema
 
+        # do some simple checking
+        if ($expr eq '' or $expect eq '' or $description eq '') {
+            warn "$file line $. doesn't match a valid test!";
+            next;
+        }
+
         # build pir code
         my $pir_code = abc_template();
         $pir_code =~ s/<<EXPR>>/$expr/g;
 
+        # check if we need to skip this test
+        if ($description =~ m/^SKIP|skip\s+(.*)/) {
+            SKIP: { 
+                skip $1, 1;
+                pir_output_is($pir_code, $expect, $description);
+            }
+            next;
+        }
+        # check if we need to todo this test
+        if ($description =~ m/^TODO|todo\s+(.*)/) {
+            TODO: {
+                local $TODO = $1;
+                pir_output_is($pir_code, $expect, $description);
+            }
+            next;
+        }
+
+        # no skip or todo -- run test
         pir_output_is($pir_code, $expect, $description);
     }
 }
@@ -83,6 +146,13 @@ sub abc_template {
 .end
 PIR
 }
+
+=head1 AUTHOR
+
+Nuno 'smash' Carvalho  <mestre.smash@gmail.com>
+
+=cut
+
 
 # Local Variables:
 #   mode: cperl
