@@ -496,7 +496,9 @@ store_sub(Interp *interp, PMC *pmc_key, STRING *str_key,
     else if (str_key)
         ns = Parrot_make_namespace_keyed_str(interp, ns, str_key);
 
-    Parrot_store_global_n(interp, ns, sub_name, sub_pmc);
+    /* only store the sub if it's not :anon */
+    if (!(PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_ANON))
+        Parrot_store_global_n(interp, ns, sub_name, sub_pmc);
 
     /* TEMPORARY HACK - cache invalidation should be a namespace function */
     if (! PMC_IS_NULL(pmc_key)) {
@@ -629,24 +631,17 @@ store_named_in_namespace(Parrot_Interp interp, PMC* sub_pmc)
 void
 Parrot_store_sub_in_namespace(Parrot_Interp interp, PMC *sub)
 {
-    if (!(PObj_get_FLAGS(sub) & SUB_FLAG_PF_ANON)) {
-        INTVAL cur_id = CONTEXT(interp->ctx)->current_HLL;
-        /* PF structures aren't fully constructed yet */
-        Parrot_block_DOD(interp);
-        /* store relative to HLL namespace */
-        CONTEXT(interp->ctx)->current_HLL = PMC_sub(sub)->HLL_id;
+    INTVAL cur_id = CONTEXT(interp->ctx)->current_HLL;
+    /* PF structures aren't fully constructed yet */
+    Parrot_block_DOD(interp);
+    /* store relative to HLL namespace */
+    CONTEXT(interp->ctx)->current_HLL = PMC_sub(sub)->HLL_id;
 
-        store_named_in_namespace(interp, sub);
+    store_named_in_namespace(interp, sub);
 
-        /* restore HLL_id */
-        CONTEXT(interp->ctx)->current_HLL = cur_id;
-        Parrot_unblock_DOD(interp);
-    }
-    else {
-        PMC *stash =
-            Parrot_get_HLL_namespace(interp, PMC_sub(sub)->HLL_id);
-        PMC_sub(sub)->namespace_stash = stash;
-    }
+    /* restore HLL_id */
+    CONTEXT(interp->ctx)->current_HLL = cur_id;
+    Parrot_unblock_DOD(interp);
 }
 /*
 

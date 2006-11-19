@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 41;
 use Parrot::Config;
 
 =head1 NAME
@@ -297,6 +297,19 @@ calling Foo::foo
   fie
 calling baz
 Null PMC access in invoke\(\)/
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'get namespace of :anon .sub');
+.namespace ['lib']
+.sub main :main :anon
+    $P0 = get_namespace
+    $P0 = $P0.'name'()
+    $S0 = join "::", $P0
+    say $S0
+    end
+.end
+CODE
+parrot::lib
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::bar");
