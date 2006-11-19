@@ -274,20 +274,6 @@ unlink($source_filename);
 
 }
 
-TODO: {
-
-local $TODO = 'blocking tcltest...';
-
-language_output_is( "tcl", <<TCL, <<OUT, "namespace persists inside if block" );
-namespace eval Z {
-    proc A {} { puts "ok" }
-    if 1 { A } 
-}
-TCL
-ok
-OUT
-}
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
