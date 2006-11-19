@@ -602,8 +602,7 @@ bad_args:
 .end
 
 
-# RT#40770: doesn't currently respect the -options.
-# RT#40771: Mdiep will probably want to change this to a hash-dispatch
+# RT#40770: doesn't respect the -strict or -failindex switches
 .sub 'is'
   .param pmc argv
   .local int argc
@@ -645,6 +644,7 @@ bad_args:
   select_option  = get_root_global ['_tcl'], 'select_option'
   class = select_option(options, class, 'class')
 
+  # RT#40771: Mdiep will probably want to change this to a hash-dispatch
   if class == 'alnum' goto alnum_check
   if class == 'alpha' goto alpha_check
   if class == 'ascii' goto ascii_check
