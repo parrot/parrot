@@ -1,8 +1,6 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-# RT#40754: This implementation uses a lot of temp vars that should be named -coke
-
 .sub '&split'
   .param pmc argv :slurpy
 
@@ -26,68 +24,73 @@ got_splitchars:
   .local pmc charHash 
   charHash = new .Hash
 
-  $I1 = length splitchars
-  $I2 = 0
+  .local int sc_len, pos
+  .local string split_char
+  sc_len = length splitchars
+  pos = 0
 hash_loop:
-  if $I2 == $I1 goto done_hash_loop
-  $S1 = substr splitchars, $I2, 1
+  if pos == sc_len goto done_hash_loop
+  split_char = substr splitchars, pos, 1
 
-  charHash[$S1] = 1
-  inc $I2
+  charHash[split_char] = 1
+  inc pos
   goto hash_loop
 
 done_hash_loop:
 
   # Loop over each character in the string. Is it one of the split
   # chars?
-  $P1 = new .TclList
-  $I1 = length splitstring
+  .local pmc results
+  results = new .TclList
+  .local int str_len
+  str_len = length splitstring
 
   .local int begin,len,last_match,result_key
+  .local string check_char
   last_match = -1
-  $I2 = 0
+  pos = 0
   result_key = 0
 
 split_loop:
-  if $I2 == $I1 goto split_done
-  $S1 = substr splitstring, $I2, 1 
-  $I3 = exists charHash[$S1]
-  unless $I3 goto next_split_loop
+  if str_len == pos goto split_done
+  split_char = substr splitstring, pos, 1 
+  $I1 = exists charHash[split_char]
+  unless $I1 goto next_split_loop
   begin = last_match + 1
-  len = $I2 - begin
-  $S2 = substr splitstring, begin, len
-  $P1[result_key] = $S2
+  len = pos - begin
+  check_char = substr splitstring, begin, len
+  results[result_key] = check_char
   last_match = begin + len
   inc result_key
 next_split_loop:
-  inc $I2
+  inc pos
   goto split_loop
 split_done:
-  if last_match == $I1 goto split_really_done
+  if last_match == str_len goto split_really_done
   begin = last_match + 1
-  len = $I1 - begin
-  $S2 = substr splitstring, begin, len
-  $P1[result_key] = $S2
+  len = str_len - begin
+  $check_char= substr splitstring, begin, len
+  results[result_key] = check_char
   inc result_key
 
 split_really_done:
-  $P1 = result_key # RT#40756: another TclList hack, truncate the list to the right
+  results = result_key # RT#40756: another TclList hack, truncate the list to the right
   # number of elements...
-  .return ($P1)
+  .return (results)
 
 split_empty:
-  $P1 = new .TclList
-  $I1 = length splitstring
-  $I2 = 0
+  results = new .TclList
+  str_len = length splitstring
+  pos = 0
 split_empty_loop:
-  if $I2 == $I1 goto empty_done
-  $S1 = substr splitstring, $I2, 1
-  $P1[$I2] = $S1
-  inc $I2
+  if pos == str_len goto empty_done
+  split_char = substr splitstring, pos, 1
+  results[pos] = split_char
+  inc pos
   goto split_empty_loop
 
 empty_done:
-  .return($P1)
+  .return(results)
 
 bad_args:
   tcl_error 'wrong # args: should be "split string ?splitChars?"'
