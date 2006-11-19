@@ -96,7 +96,7 @@ foreach my $file (@test_files) {
         $_ =~ /^\s*$/ and next;
 
         # split by tabs or 3+ spaces
-        my ($expr, $expect, $description ) = split /\t+|\s{3,}/, $_;
+        my ($expr, $expect, $description ) = split / *\t\s*|\s{3,}/, $_;
         $expect =~ s/\\n/\n/g; # hack to solve \n dilema
 
         # do some simple checking
