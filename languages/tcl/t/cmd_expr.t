@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 238
+plan 239
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -239,6 +239,9 @@ foreach function $function_list {
     {expected floating-point number but got "a"} \
     "string $function"
 }
+
+# test namespaces with operators
+is [namespace eval lib {if {+2} {}}] {} {[expr] in a namespace}
 
 # infinity tests
 set TODO {TODO "pending Inf implementation"}

@@ -148,10 +148,14 @@ transform pir (PAST::Op) {
     .local pmc retval
     retval = pir.unique('$P')
     pir .= retval
-    pir .= " = '"
+    pir .= " = get_hll_global '"
     $S0 = node['opfunc']
     pir .= $S0
-    pir .= "'("
+    pir .= "'\n"
+    pir .= retval
+    pir .= " = "
+    pir .= retval
+    pir .= "("
     $S0 = join ", ", args
     pir .= $S0
     pir .= ")\n" 
