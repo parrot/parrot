@@ -198,6 +198,8 @@ transform past (APL::Grammar::decimal_representation) :language('PIR') {
     $S0 = node
     $I0 = index $S0, '.'
     if $I0 >= 0 goto have_float
+    $I0 = index $S0, 'E'
+    if $I0 >= 0 goto have_float
     concat $S0, '.'
   have_float:
     value = new .String

@@ -124,7 +124,7 @@ END_PIR
     %t = $I1
 END_PIR
 
-    itable['monadic:+']      =  "    noop"             # conjugate
+    itable['monadic:+']      =  "    noop # %v"        # conjugate
     itable['monadic:|']      =  "    %t = abs %0"      # magnitude
     itable['monadic:!']      =  <<'END_PIR'
     $I1 = %0                   # monadic:! (factorial)
@@ -140,7 +140,7 @@ END_PIR
 END_PIR
     itable[unicode:"monadic:\x{f7}"] =  <<'END_PIR'
     $N1 = %0                   # monadic:\x{f7} (reciprocal)
-    $N1 = 1.0 / $N100
+    $N1 = 1.0 / $N1
     %t = $N1
 END_PIR
 
