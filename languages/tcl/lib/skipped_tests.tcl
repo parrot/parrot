@@ -10,6 +10,12 @@ array set skipped_tests {
   append-4.21          explode
   append-4.22          explode
   compExpr-old-14.14   explode
+  error-1.3            stacktrace
+  error-2.3            stacktrace
+  error-2.6            stacktrace
+  error-4.2            stacktrace
+  error-4.3            stacktrace
+  error-4.4            stacktrace
   expr-14.14           explode
   expr-old-2.38        explode
   expr-old-32.41       explode
@@ -20,6 +26,7 @@ array set skipped_tests {
   expr-old-36.3        explode
   expr-old-36.4        explode
   expr-old-36.8        explode
+  for-3.6              {[lsearch -regexp]}
   format-3.1           explode
   format-3.2           explode
   format-8.17          explode
