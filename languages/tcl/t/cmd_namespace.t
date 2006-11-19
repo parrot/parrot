@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 37;
 use Test::More;
 use vars qw($TODO);
 
@@ -249,6 +249,30 @@ language_output_is( "tcl", <<'TCL', <<'OUT', "namespace children, missed pattern
 TCL
 
 OUT
+
+TODO: {
+
+local $TODO = 'fails to work';
+
+# prolly not portable, patches welcome.
+my $source_filename = 'tmp.tcl';
+open( my $tmpfile, '>', $source_filename ) or die $!;
+print {$tmpfile} <<'EOF';
+ proc okay {} { puts okay }
+EOF
+close $tmpfile;
+
+language_output_is( "tcl", <<TCL, <<OUT, "source inside namespace" );
+namespace eval bork { source tmp.tcl }
+okay
+TCL
+invalid command name "okay"
+OUT
+
+# clean up temp file.
+unlink($source_filename);
+
+}
 
 # Local Variables:
 #   mode: cperl
