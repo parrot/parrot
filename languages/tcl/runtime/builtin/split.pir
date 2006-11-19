@@ -69,7 +69,7 @@ split_done:
   if last_match == str_len goto split_really_done
   begin = last_match + 1
   len = str_len - begin
-  $check_char= substr splitstring, begin, len
+  check_char = substr splitstring, begin, len
   results[result_key] = check_char
   inc result_key
 
