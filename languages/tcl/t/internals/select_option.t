@@ -57,7 +57,7 @@ done_1:
     # 2
     message='exact match' 
     $S1 = select_option(options,'dark')
-    is($S1,"dark",message)
+    is("dark",$S1,message)
 
     # 3
     message='no match' 
@@ -70,7 +70,7 @@ eh_3:
     get_results '(0,0)', $P2, $S2
 check_3:
     $S3 = 'bad option "punk": must be dank, dark, or dunk'
-    is($S2,$S3,message)
+    is($S3,$S2,message)
 
     # 4
     message='no match' 
@@ -96,7 +96,7 @@ eh_5:
     get_results '(0,0)', $P2, $S2
 check_5:
     $S3 = 'bad coke "punk": must be dank, dark, or dunk'
-    is($S2,$S3,message)
+    is($S3,$S2,message)
 
     # 6
     message='no match' 
@@ -109,6 +109,6 @@ eh_6:
     get_results '(0,0)', $P2, $S2
 check_6:
     $S3 = 'ambiguous particle "da": must be dank, dark, or dunk'
-    is($S2,$S3,message)
+    is($S3,$S2,message)
     
 .end
