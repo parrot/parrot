@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 38;
 use Test::More;
 use vars qw($TODO);
 
@@ -252,7 +252,7 @@ OUT
 
 TODO: {
 
-local $TODO = 'fails to work';
+local $TODO = 'RT#40909';
 
 # prolly not portable, patches welcome.
 my $source_filename = 'tmp.tcl';
@@ -272,6 +272,20 @@ OUT
 # clean up temp file.
 unlink($source_filename);
 
+}
+
+TODO: {
+
+local $TODO = 'blocking tcltest...';
+
+language_output_is( "tcl", <<TCL, <<OUT, "namespace persists inside if block" );
+namespace eval Z {
+    proc A {} { puts "ok" }
+    if 1 { A } 
+}
+TCL
+ok
+OUT
 }
 
 # Local Variables:
