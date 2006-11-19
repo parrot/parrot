@@ -4,8 +4,9 @@ grammar ABC::Grammar;
 
 ## recognize terms
 token term { 
+    | $<float>:=[ \d+\.\d* | \.\d+ ]
     | $<integer>:=[\d+] 
-    | $<ident>:=[\w+] [ \[ <expression> \] ]?
+    | $<ident>:=[<[a..z]><[_a..z0..9]>*] [ \[ <expression> \] ]?
 }
 
 token string { \" <-["]>* \" }

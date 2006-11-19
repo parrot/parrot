@@ -41,7 +41,7 @@ transform past (ABC::Grammar::statement) :language('PIR') {
   say_result:
     $P0 = past.'new'('PAST::Var', 'name'=>'last', 'islvalue'=>1)
     past = past.'new'('PAST::Op', $P0, past, 'pasttype'=>'assign', 'islvalue'=>1)
-    past = past.'new'('PAST::Op', past, 'pirop'=>'say')
+    past = past.'new'('PAST::Op', past, 'name'=>'saynum')
   end:
     .return (past)
 }
@@ -197,11 +197,17 @@ transform past_term (ABC::Grammar::expr) :language('PIR') {
     unless null $P0 goto term_keyed
     $P0 = node['ident']
     unless null $P0 goto term_ident
+    $P0 = node['float']
+    unless null $P0 goto term_float
 
   term_integer:
-    $I0 = node
     past = new 'PAST::Val'
     past.'init'('node'=>node, 'vtype'=>'.Integer', 'name'=>node, 'ctype'=>'n')
+    .return (past)
+
+  term_float:
+    past = new 'PAST::Val'
+    past.'init'('node'=>node, 'vtype'=>'.Float', 'name'=>node, 'ctype'=>'n')
     .return (past)
 
   term_ident:
