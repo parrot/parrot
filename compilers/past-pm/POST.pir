@@ -25,17 +25,20 @@ for compiling programs in Parrot.
 
     .local pmc pirtable
     pirtable = new .Hash
-    pirtable['add'] = 'TPn'
-    pirtable['sub'] = 'TPn'
-    pirtable['mul'] = 'TPn'
-    pirtable['div'] = 'TPn'
-    pirtable['n_add'] = 'rPn'
-    pirtable['n_sub'] = 'rPn'
-    pirtable['n_mul'] = 'rPn'
-    pirtable['n_div'] = 'rPn'
-    pirtable['concat'] = 'TPs'
-    pirtable['abs'] = 'T'
-    pirtable['say'] = 'v'
+    pirtable['add'] = '%tP+'
+    pirtable['sub'] = '%tP+'
+    pirtable['mul'] = '%tP+'
+    pirtable['div'] = '%tP+'
+    pirtable['n_add'] = '%rP+'
+    pirtable['n_sub'] = '%rP+'
+    pirtable['n_mul'] = '%rP+'
+    pirtable['n_div'] = '%rP+'
+    pirtable['concat'] = '%tP~'
+    pirtable['abs'] = '%t'
+    pirtable['say'] = '%v'
+    pirtable['set'] = '%rP'
+    pirtable['call'] = '%r****************'                # FIXME: 
+    pirtable['callmethod'] = '%r****************'          # FIXME:
     set_hll_global ['POST'], '%pirtable', pirtable
     .return ()
 .end
@@ -158,8 +161,8 @@ for compiling programs in Parrot.
     $P0 = arglist[$I0]
     $I1 = isa $P0, 'POST::Node'
     if $I1 == 0 goto argc_next
-    $P0 = $P0.'result'()
-    arglist[$I0] = $P0
+    $S0 = $P0.'result'()
+    arglist[$I0] = $S0
   argc_next:
     inc $I0
     if $I0 < argc goto argc_loop
@@ -176,6 +179,7 @@ for compiling programs in Parrot.
     .local string pirop
     pirop = self.'pirop'()
     if pirop == 'call' goto pir_call
+    if pirop == 'inline' goto pir_inline
     code.'emit'('    %n %,', arglist :flat, 'n'=>pirop)
     .return (code)
 
@@ -184,6 +188,13 @@ for compiling programs in Parrot.
     result = self.'result'()
     name = shift arglist
     code.'emit'('    %r = %n(%,)', arglist :flat, 'r'=>result, 'n'=>name)
+    .return (code)
+
+  pir_inline:
+    .local pmc result, inline
+    result = self.'result'()
+    inline = shift arglist
+    code.'emit'(inline, arglist :flat, 'r'=>result, 't'=>result, 'u'=>result)
     .return (code)
 .end
 

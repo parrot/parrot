@@ -202,12 +202,12 @@ transform past_term (ABC::Grammar::expr) :language('PIR') {
 
   term_integer:
     past = new 'PAST::Val'
-    past.'init'('node'=>node, 'vtype'=>'.Integer', 'name'=>node, 'ctype'=>'n')
+    past.'init'('node'=>node, 'vtype'=>'.Integer', 'name'=>node, 'ctype'=>'i+')
     .return (past)
 
   term_float:
     past = new 'PAST::Val'
-    past.'init'('node'=>node, 'vtype'=>'.Float', 'name'=>node, 'ctype'=>'n')
+    past.'init'('node'=>node, 'vtype'=>'.Float', 'name'=>node, 'ctype'=>'n+')
     .return (past)
 
   term_ident:
