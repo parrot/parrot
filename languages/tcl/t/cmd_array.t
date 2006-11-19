@@ -59,7 +59,7 @@ eval_is {
  catch {unset a}
  set a 1
  array size a
-} 0 {array not array}
+} 0 {}
 
 eval_is {
  catch {unset a}
