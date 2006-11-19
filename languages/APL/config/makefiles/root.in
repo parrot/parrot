@@ -29,12 +29,9 @@ $(PARROT):
 	@$(PERL) -e "exit 1"
 
 SOURCES = APL.pir \
-  lib/APLGrammar.pir \
-  lib/pge2past.pir \
-  lib/past2pir.pir \
-  lib/pasteval.pir \
-  lib/PAST.pir \
-  lib/APLFunctions.pir
+  src/APLGrammar.pir \
+  src/parse2past.pir \
+  src/APLFunctions.pir
 
 APL.pbc: $(PARROT) $(APL_GROUP) $(SOURCES) 
 	$(PARROT) --output=APL.pbc APL.pir
@@ -53,8 +50,8 @@ interactive: APL.pbc
 .pg.pir :
 	$(PARROT) $(PGE_DIR)/pgc.pir --encoding=utf8 --output=$@ $<
 
-lib/APLFunctions.pir: tools/gen_operator_defs.pl
-	$(PERL) tools/gen_operator_defs.pl > lib/APLFunctions.pir
+src/APLFunctions.pir: tools/gen_operator_defs.pl
+	$(PERL) tools/gen_operator_defs.pl > src/APLFunctions.pir
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -92,11 +89,12 @@ testclean:
 clean: testclean
 	$(RM_F) \
   APL.pbc \
+  src/parse2past.pir \
   lib/pge2past.pir \
   lib/past2pir.pir \
   lib/pasteval.pir \
-  lib/APLGrammar.pir \
-  lib/APLFunctions.pir \
+  src/APLGrammar.pir \
+  src/APLFunctions.pir \
   $(PMC_DIR)/*.h \
   $(PMC_DIR)/*.c \
   $(PMC_DIR)/*.dump \
