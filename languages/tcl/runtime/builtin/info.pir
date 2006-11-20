@@ -116,6 +116,11 @@ bad_args:
   tcl_error 'wrong # args: should be "info body procname"'
 .end
 
+# XXX stub to compile tcltest.tcl
+.sub 'complete'
+  .return (1)
+.end
+
 .sub 'functions'
   .param pmc argv
 
