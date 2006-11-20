@@ -33,14 +33,14 @@
   options[13] = 'set'
   options[14] = 'size'
   options[15] = 'unset'
-  options[16] = 'trim'
+  options[16] = 'update'
   options[17] = 'values'
   options[18] = 'with'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
   .local string canonical_subcommand
-  canonical_subcommand = select_option(options, subcommand_name)
+  canonical_subcommand = select_option(options, subcommand_name, 'subcommand')
 
   .local pmc subcommand_proc
   null subcommand_proc
@@ -53,7 +53,7 @@ bad_args:
   .return ('') # once all commands are implemented, remove this...
 
 no_args:
-  tcl_error 'wrong # args: should be "dict option arg ?arg ...?"'
+  tcl_error 'wrong # args: should be "dict subcommand ?arg ...?"'
 
 .end
 
