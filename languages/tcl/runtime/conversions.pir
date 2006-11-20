@@ -3,7 +3,7 @@
 
 =head2 _Tcl::__list
 
-Given a PMC, get a list from it. If the PMC is a TclLst,
+Given a PMC, get a list from it. If the PMC is a TclList,
 this is as simple as returning the list. If it's a string,
 use __stringToList.
 
@@ -21,6 +21,33 @@ use __stringToList.
 done:
   .return(value)
 .end
+
+
+=head2 _Tcl::__dict
+
+Given a PMC, get a list from it. If the PMC is a TclDict
+this is as simple as returning the dictionary. If it's a string,
+use __stringToDict.
+
+=cut
+
+.sub __dict
+  .param pmc value
+
+  $I0 = typeof value
+  if $I0 == .TclDict goto done
+  if $I0 == .TclList goto listy
+
+  $S0 = value
+  .return __stringToDict($S0)
+
+listy:
+  .return __listToDict(value)
+
+done:
+  .return(value)
+.end
+
 
 =head2 _Tcl::__number
 

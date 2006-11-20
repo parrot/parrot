@@ -98,6 +98,7 @@ bad_args:
 
   .local pmc dictionary
   dictionary = shift argv
+  dictionary = __dict(dictionary)
 
   .local pmc key
 loop:
@@ -129,6 +130,7 @@ bad_args:
   .local pmc retval
   $P1 = argv[0]
   retval = clone $P1
+  retval = __dict(retval)
   if argc == 1 goto done
   $P2 =  shift argv # discard
 
@@ -138,6 +140,7 @@ dict_loop:
   $I1 = elements argv
   unless $I1 goto done
   dictionary = shift argv 
+  dictionary = __dict(dictionary)
   iterator = new .Iterator, dictionary
 key_loop:
   unless iterator goto dict_loop 
@@ -162,6 +165,7 @@ nothing:
 
   .local pmc dictionary
   dictionary = shift argv
+  dictionary = __dict(dictionary)
  
   .local int size
   size = elements dictionary

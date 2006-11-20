@@ -165,3 +165,37 @@ unmatched_open_brace:
 done:
   .return(retval)
 .end
+
+.sub __listToDict
+  .param pmc list
+
+  .local int sizeof_list
+  sizeof_list = elements list
+
+  .local pmc result
+  result = new .TclDict 
+
+  .local int pos
+  pos = 0
+  
+loop:
+  if pos >= sizeof_list goto done
+  $S1 = list[pos]
+  inc pos
+  $S2= list[pos]
+  inc pos
+  result[$S1] = $S2
+  goto loop
+
+done:
+  .return (result)
+
+.end
+
+.sub __stringToDict
+  .param string str
+
+  .local pmc list
+  list = __stringToList(str)
+  .return __listToDict(list)
+.end
