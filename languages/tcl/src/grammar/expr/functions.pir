@@ -461,8 +461,25 @@ is_string:
     tcl_error $S0
 .end
 
+# RT#40689: implement wide() - this is just int()
 .sub '&wide'
-    .return (0) # RT#40689: implement wide()
+    .param pmc a
+    
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+    clear_eh
+    
+    $I0 = a
+    $P0 = new 'TclInt'
+    $P0 = $I0
+    
+    .return ($P0)
+
+is_string:
+    tcl_error "argument to math function didn't have numeric value"
 .end
 
 =head2 Binary Functions
