@@ -94,7 +94,7 @@ Generic method for compilers invoked from a shell command line.
     getopts = new 'Getopt::Obj'
     getopts.'notOptStop'(1)
     push getopts, 'target=s'
-    push getopts, 'trace|t'
+    push getopts, 'trace|t=s'
     push getopts, 'encoding|e=s'
     push getopts, 'output|o=s'
     push getopts, 'combine'
@@ -182,7 +182,10 @@ Generic method for compilers invoked from a shell command line.
     $I0 = isa $P0, 'String'
     if $I0 goto evalcode_string
     if target != '' goto evalcode_dump
+    $I0 = opts['trace']
+    trace $I0
     $P0()
+    trace 0
     ret
   evalcode_dump:
     '_dumper'($P0, target)
