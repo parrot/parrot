@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 38;
 
 =head1 NAME
 
@@ -1189,6 +1189,35 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'splice replace');
 CODE
 A3
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'iterate subclass of rpa');
+.sub main :main
+    .local pmc arr, iter
+    $P0 = subclass 'ResizablePMCArray', 'MyArray'
+
+    arr = new 'MyArray'
+    push arr, 11
+    push arr, 13
+    push arr, 15
+    $I0 = elements arr
+    print $I0
+    print "\n"
+
+    iter = new .Iterator, arr
+  loop:
+    unless iter goto end
+    $P2 = shift iter
+    say $P2
+    goto loop
+  end:
+.end
+CODE
+3
+11
+13
+15
+OUTPUT
+
 
 # don't forget to change the number of tests
 
