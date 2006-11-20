@@ -8,7 +8,7 @@ length(111)		3\n		length function
 
 # scale function
 scale(1)		0\n		scale function
-# todo: scale(1.0)	1\n		scale function
+scale(1.0)		1\n		TODO scale function
 scale(1.1)		1\n		scale function
 scale(1.12)		2\n		scale function
 scale(1.123)		3\n		scale function

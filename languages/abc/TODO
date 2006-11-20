@@ -7,6 +7,3 @@ enclosing for statement to start the next iteration.
 * halt -- TODO? (extension)
 * return -- Return  the  value  of the expression from a function.
 
-Testing harness:
-
-* Add capability to "todo" tests.

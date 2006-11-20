@@ -47,7 +47,8 @@ the skip/todo tests list. So, you can simply set a test to be todo or
 skipped by adding the C<SKIP> or C<TODO> keywords in the begging of the
 test descriptio. For example:
 
-1+2+3           6       SKIP no add yet
+1+2+3           6       SKIP no add operation yet
+1-2-3           6       TODO no minus operation yet
 
 B<NOTE:> to add more source test files remember to update the C<@files> 
 array in this file.
@@ -112,19 +113,18 @@ foreach my $file (@test_files) {
         $pir_code =~ s/<<EXPR>>/$expr/g;
 
         # check if we need to skip this test
-        if ($description =~ m/^SKIP|skip\s+(.*)/) {
+        if ($description =~ m/^(SKIP|skip)\s+(.*)/) {
             SKIP: { 
-                skip $1, 1;
+                skip $2, 1;
                 pir_output_is($pir_code, $expect, $description);
             }
             next;
         }
         # check if we need to todo this test
-        if ($description =~ m/^TODO|todo\s+(.*)/) {
-            TODO: {
-                local $TODO = $1;
-                pir_output_is($pir_code, $expect, $description);
-            }
+        if ($description =~ m/^(TODO|todo)\s+(.*)/) {
+            my @todo = ();
+            push @todo, todo => $2;
+            pir_output_is($pir_code, $expect, $description, @todo);
             next;
         }
 
