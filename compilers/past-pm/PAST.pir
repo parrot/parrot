@@ -62,7 +62,7 @@ Other node attributes are generally defined by subclasses of C<PAST::Node>.
 
 Initialize a PAST node with the given children and attributes.
 Adds each child to the node (using the C<push> method, below) and
-calls the appropriate accessor method for each attribute.  
+calls the appropriate accessor method for each attribute.
 
 =cut
 
@@ -146,7 +146,7 @@ array of children.  Returns the newly created PAST node.
 
 =item iterator( )
 
-Returns a newly initialized iterator for the invocant's list of 
+Returns a newly initialized iterator for the invocant's list of
 children.
 
 =cut
@@ -334,8 +334,8 @@ integer might use a language-specific C<['MyInt']> class.
 
 =item ctype([value])
 
-Get/set the argument types for which this C<PAST::Val> node may be 
-rendered directly into PIR code as a Parrot constant instead of 
+Get/set the argument types for which this C<PAST::Val> node may be
+rendered directly into PIR code as a Parrot constant instead of
 first generating a PMC.  C<value> is a sequence of character
 representing the various argument types for which the node's
 name is a usable constant:
@@ -370,9 +370,10 @@ C<name> attribute.
 
 =item scope([value])
 
-Get/set the PAST::Var node's scope.  Allowable values include
-"package", "lexical", and "keyed", representing HLL global,
-lexical, and array/hash variables respectively.
+Get/set the PAST::Var node's "scope" (i.e., how the variable
+is accessed or set).  Allowable values include "package", "lexical",
+and "keyed", representing HLL global, lexical, and array/hash
+variables respectively.
 
 =cut
 
@@ -468,7 +469,7 @@ bind       - Bind the variable given by the node's first child
 if         - Evaluate the first child; if the first child is
              true then evaluate the second child (if any)
              otherwise evaluate the third child (if any).
-             If either the second or third child are missing, 
+             If either the second or third child are missing,
              then they evaluate as the result of the first child.
 
 unless     - Same as 'if' above, but reverse the evaluation
@@ -572,7 +573,7 @@ child as an lvalue (e.g., for assignment).
 Get/set the code to be used for inline PIR when C<pasttype> is
 "inline".  The C<code> argument is PIR text to be inserted in
 the final generated code sequence.  Sequences of "%0", "%1",
-"%2", ... "%9" in C<code> are replaced with the evaluated 
+"%2", ... "%9" in C<code> are replaced with the evaluated
 results of the first, second, third, ..., tenth children nodes.
 (If you need more than ten arguments to your inline PIR, consider
 making it a subroutine call instead.)
