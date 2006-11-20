@@ -11,8 +11,10 @@
   argc = elements argv
 
   .local int retval
-  .local pmc code_retval
+  .local pmc code_retval, ns
   .local string varname,sigil_varname,code
+  $P0 = getinterp
+  ns = $P0['namespace'; 1]
 
   .local pmc __script
   __script = get_root_global ['_tcl'], '__script'
@@ -22,7 +24,7 @@
 
   code = argv[0]
   push_eh non_ok
-    $P2 = __script(code)
+    $P2 = __script(code, 'ns' => ns)
     code_retval = $P2()
     retval = TCL_OK  # no exception => TCL_OK
   clear_eh
