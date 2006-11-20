@@ -26,13 +26,35 @@ static STRING *luastring_name;
 static INTVAL dynpmc_LuaBoolean;
 static INTVAL dynpmc_LuaNil;
 static INTVAL dynpmc_LuaNumber;
+static INTVAL dynpmc_LuaString;
 
 static PMC *
-find_meth(Interp* interpreter, PMC *pmc, const char *name) {
-extern PMC* Parrot_LuaBase_find_metamethod(Interp*, PMC*, STRING* method_name);
+find_meth(Interp* interp, PMC *obj, const char *name) {
+    PMC *meta = NULL;
 
-    return Parrot_LuaBase_find_metamethod(interpreter, pmc,
-                                          const_string(interpreter, name));
+    if (dynpmc_LuaString == obj->vtable->base_type) {
+        meta = Parrot_find_global_cur(interp,
+                                      const_string(interp, "mt_string"));
+    }
+    else if (VTABLE_isa(interp, obj, const_string(interp, "base_lua"))) {
+        meta = VTABLE_getprop(interp, obj,
+                              const_string(interp, "__metatable"));
+        if (meta != NULL && meta->pmc_ext != NULL
+         && !VTABLE_isa(interp, meta, const_string(interp, "table"))) {
+            meta->vtable->isa(interp, meta, const_string(interp, "table"));
+            return meta;
+        }
+    }
+    if (meta != NULL && meta->pmc_ext != NULL) {
+        PMC *method;
+        PMC *key = pmc_new(interp, dynpmc_LuaString);
+        PMC_str_val(key) = const_string(interp, name);
+        method = VTABLE_get_pmc_keyed(interp, meta, key);
+        if (dynpmc_LuaNil != method->vtable->base_type) {
+            return method;
+        }
+    }
+    return NULL;
 }
 
 
@@ -56,6 +78,8 @@ pmclass LuaString
               const_string(INTERP, "LuaNil"));
             dynpmc_LuaNumber = pmc_type(INTERP,
               const_string(INTERP, "LuaNumber"));
+            dynpmc_LuaString = pmc_type(INTERP,
+              const_string(INTERP, "LuaString"));
         }
     }
 
@@ -1021,6 +1045,21 @@ MMD_DEFAULT: {
 =head2 Specific Methods
 
 =over 4
+
+=item C<PMC *get_metatable()>
+
+=cut
+
+*/
+    METHOD PMC* get_metatable() {
+        PMC *retval = Parrot_find_global_cur(INTERP,
+                             const_string(INTERP, "mt_string"));
+        if (retval != NULL)
+            return retval;
+        return pmc_new(INTERP, dynpmc_LuaNil);
+    }
+
+/*
 
 =item C<PMC* len()>
 

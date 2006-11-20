@@ -17,14 +17,44 @@ with the behaviour of the Lua C<Thread> type.
 .sub 'init_thread' :load :anon
     load_bytecode 'Parrot/Coroutine.pbc'
     load_bytecode 'languages/lua/type/base_lua.pir'
-#    $P0 = subclass 'Parrot::Coroutine', 'thread'
-#    $P1 = getclass 'base_lua'
-    $P0 = subclass 'base_lua', 'thread'
-    $P1 = getclass 'Parrot::Coroutine'
+    $P0 = subclass 'Parrot::Coroutine', 'thread'
+    $P1 = getclass 'base_lua'
     addparent $P0, $P1
 .end
 
 .namespace [ 'thread' ]
+
+.sub '__get_bool' :method
+    $I0 = 1
+    .return ($I0)
+.end
+
+.sub '__logical_not' :method
+    .param pmc dummy
+    .local pmc ret
+    $I0 = isfalse self
+    new ret, .LuaBoolean
+    set ret, $I0
+    .return (ret)
+.end
+
+.sub '__get_pmc_keyed' :method
+    .param pmc key
+    ex_index()
+.end
+
+.sub '__set_pmc_keyed' :method
+    .param pmc key
+    .param pmc value
+    ex_index()
+.end
+
+.sub 'ex_index' :anon
+    .local pmc ex
+    ex = new .Exception
+    ex['_message'] = "attempt to index a thread value"
+    throw ex
+.end
 
 .sub '__is_equal' :method :multi(thread, thread)
     .param pmc value

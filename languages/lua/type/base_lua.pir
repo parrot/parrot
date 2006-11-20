@@ -18,7 +18,7 @@ C<base_lua> provides an abstract base class for some Lua types.
 .HLL '', 'lua_group'
 
 .sub 'init_base' :load :anon
-    $P0 = newclass 'base_lua'
+    $P0 = subclass 'LuaBase', 'base_lua'
 .end
 
 .namespace [ 'base_lua' ]
@@ -46,53 +46,9 @@ C<base_lua> provides an abstract base class for some Lua types.
     .return ($S0)
 .end
 
-=item C<__get_bool>
+=item C<neg>
 
-Returns C<true>.
-
-=cut
-
-.sub 'get_bool' :method :vtable
-    $I0 = 1
-    .return ($I0)
-.end
-
-
-=item C<__get_pmc_keyed>
-
-=item C<__set_pmc_keyed>
-
-Throws an exception.
-
-=cut
-
-.sub 'get_pmc_keyed' :method :vtable
-    .param pmc key
-    $S0 = classname self
-    ex_index($S0)
-.end
-
-.sub 'set_pmc_keyed' :method :vtable
-    .param pmc key
-    .param pmc value
-    $S0 = classname self
-    ex_index($S0)
-.end
-
-.sub 'ex_index' :anon
-    .param string type
-    .local pmc ex
-    ex = new .Exception
-    $S0 = "attempt to index a "
-    $S0 .= type
-    $S0 .= " value" 
-    ex['_message'] = $S0
-    throw ex
-.end
-
-=item C<__neg>
-
-=item C<__i_neg>
+=item C<i_neg>
 
 Throws an exception.
 
@@ -128,283 +84,6 @@ L1:
     ex_arithmetic($S0)
 .end
 
-=item C<__logical_not>
-
-Always returns C<false>.
-
-=cut
-
-.sub 'logical_not' :method :vtable
-    .param pmc dummy
-    .local pmc ret
-    $I0 = isfalse self
-    new ret, .LuaBoolean
-    set ret, $I0
-    .return (ret)
-.end
-
-=item C<__defined>
-
-Always returns C<true>.
-
-=cut
-
-.sub 'defined' :method :vtable
-    $I0 = 1
-    .return ($I0)
-.end
-
-=item C<__invoke>
-
-=cut
-
-.sub 'invoke' :method :vtable
-    .param pmc next
-#    .local pmc ret
-#    .local pmc meth
-#    meth = self.'find_metamethod'('__call')
-#    if_null meth, L1
-##    ret = meth(self, next :flat)
-#    ret = meth(self)
-#    unless_null ret, L2
-#    new ret, .LuaNil
-#L2:
-#    .return (ret)
-#L1:
-    .local pmc ex
-    ex = new .Exception
-    $S0 = "attempt to call a "
-    $S1 = classname self 
-    $S0 .= $S1
-    $S0 .= " value" 
-    ex['_message'] = $S0
-    throw ex
-.end
-
-=back
-
-=head2 non-Vtable Methods
-
-=over 4
-
-=item C<__add>
-
-=item C<__i_add>
-
-=item C<__subtract>
-
-=item C<__i_substract>
-
-=item C<__multiply>
-
-=item C<__i_multiply>
-
-=item C<__divide>
-
-=item C<__i_divide>
-
-=item C<__modulus>
-
-=item C<__i_modulus>
-
-=item C<__pow>
-
-=item C<__i_pow>
-
-=item C<__concatenate>
-
-=item C<__i_concatenate>
-
-Throws an exception.
-
-=cut
-
-.sub '__add' :method :multi(base_lua, pmc)
-    .param pmc value
-    .param pmc dest
-    .local pmc meth
-    meth = self.'find_metamethod'('__add')
-    if_null meth, L1
-    dest = meth(self, value)
-    unless_null dest, L2
-    new dest, .LuaNil
-L2:
-    .return (dest)
-L1: 
-    $S0 = classname self
-    ex_arithmetic($S0)
-.end
-
-.sub '__i_add' :method :multi(base_lua, pmc)
-    .param pmc value
-    .local pmc meth
-    meth = self.'find_metamethod'('__add')
-    if_null meth, L1
-    self = meth(self, value)
-    unless_null self, L2
-    new self, .LuaNil
-L2:
-    .return (self)
-L1: 
-    $S0 = classname self
-    ex_arithmetic($S0)
-.end
-
-.sub '__subtract' :method :multi(base_lua, pmc)
-    .param pmc value
-    .param pmc dest
-    .local pmc meth
-    meth = self.'find_metamethod'('__sub')
-    if_null meth, L1
-    dest = meth(self, value)
-    unless_null dest, L2
-    new dest, .LuaNil
-L2:
-    .return (dest)
-L1: 
-    $S0 = classname self
-    ex_arithmetic($S0)
-.end
-
-.sub '__i_subtract' :method :multi(base_lua, pmc)
-    .param pmc value
-    .local pmc meth
-    meth = self.'find_metamethod'('__sub')
-    if_null meth, L1
-    self = meth(self, value)
-    unless_null self, L2
-    new self, .LuaNil
-L2:
-    .return (self)
-L1: 
-    $S0 = classname self
-    ex_arithmetic($S0)
-.end
-
-.sub '__multiply' :method :multi(base_lua, pmc)
-    .param pmc value
-    .param pmc dest
-    .local pmc meth
-    meth = self.'find_metamethod'('__mul')
-    if_null meth, L1
-    dest = meth(self, value)
-    unless_null dest, L2
-    new dest, .LuaNil
-L2:
-    .return (dest)
-L1: 
-    $S0 = classname self
-    ex_arithmetic($S0)
-.end
-
-.sub '__i_multiply' :method :multi(base_lua, pmc)
-    .param pmc value
-    .local pmc meth
-    meth = self.'find_metamethod'('__mul')
-    if_null meth, L1
-    self = meth(self, value)
-    unless_null self, L2
-    new self, .LuaNil
-L2:
-    .return (self)
-L1: 
-    $S0 = classname self
-    ex_arithmetic($S0)
-.end
-
-.sub '__divide' :method :multi(base_lua, pmc)
-    .param pmc value
-    .param pmc dest
-    .local pmc meth
-    meth = self.'find_metamethod'('__div')
-    if_null meth, L1
-    dest = meth(self, value)
-    unless_null dest, L2
-    new dest, .LuaNil
-L2:
-    .return (dest)
-L1: 
-    $S0 = classname self
-    ex_arithmetic($S0)
-.end
-
-.sub '__i_divide' :method :multi(base_lua, pmc)
-    .param pmc value
-    .local pmc meth
-    meth = self.'find_metamethod'('__div')
-    if_null meth, L1
-    self = meth(self, value)
-    unless_null self, L2
-    new self, .LuaNil
-L2:
-    .return (self)
-L1: 
-    $S0 = classname self
-    ex_arithmetic($S0)
-.end
-
-.sub '__modulus' :method :multi(base_lua, pmc)
-    .param pmc value
-    .param pmc dest
-    .local pmc meth
-    meth = self.'find_metamethod'('__mod')
-    if_null meth, L1
-    dest = meth(self, value)
-    unless_null dest, L2
-    new dest, .LuaNil
-L2:
-    .return (dest)
-L1: 
-    $S0 = classname self
-    ex_arithmetic($S0)
-.end
-
-.sub '__i_modulus' :method :multi(base_lua, pmc)
-    .param pmc value
-    .local pmc meth
-    meth = self.'find_metamethod'('__mod')
-    if_null meth, L1
-    self = meth(self, value)
-    unless_null self, L2
-    new self, .LuaNil
-L2:
-    .return (self)
-L1: 
-    $S0 = classname self
-    ex_arithmetic($S0)
-.end
-
-.sub '__pow' :method :multi(base_lua, pmc)
-    .param pmc value
-    .param pmc dest
-    .local pmc meth
-    meth = self.'find_metamethod'('__pow')
-    if_null meth, L1
-    dest = meth(self, value)
-    unless_null dest, L2
-    new dest, .LuaNil
-L2:
-    .return (dest)
-L1: 
-    $S0 = classname self
-    ex_arithmetic($S0)
-.end
-
-.sub '__i_pow' :method :multi(base_lua, pmc)
-    .param pmc value
-    .local pmc meth
-    meth = self.'find_metamethod'('__pow')
-    if_null meth, L1
-    self = meth(self, value)
-    unless_null self, L2
-    new self, .LuaNil
-L2:
-    .return (self)
-L1: 
-    $S0 = classname self
-    ex_arithmetic($S0)
-.end
-
 .sub 'ex_arithmetic' :anon
     .param string type
     .local pmc ex
@@ -416,57 +95,11 @@ L1:
     throw ex
 .end
 
-.sub '__concatenate' :method :multi(base_lua, pmc)
-    .param pmc value
-    .param pmc dest
-    .local pmc meth
-    meth = self.'find_metamethod'('__concat')
-    if_null meth, L1
-    dest = meth(self, value)
-    unless_null dest, L2
-    new dest, .LuaNil
-L2:
-    .return (dest)
-L1: 
-    $S0 = classname self
-    ex_concat($S0)
-.end
+=back
 
-.sub '__i_concatenate' :method :multi(base_lua, pmc)
-    .param pmc value
-    .local pmc meth
-    meth = self.'find_metamethod'('__concat')
-    if_null meth, L1
-    self = meth(self, value)
-    unless_null self, L2
-    new self, .LuaNil
-L2:
-    .return (self)
-L1: 
-    $S0 = classname self
-    ex_arithmetic($S0)
-.end
+=head2 non-Vtable Methods
 
-.sub 'ex_concat' :anon
-    .param string type
-    .local pmc ex
-    ex = new .Exception
-    $S0 = "attempt to concatenate a " 
-    $S0 .= type
-    $S0 .= " value" 
-    ex['_message'] = $S0
-    throw ex
-.end
-
-=item C<__is_equal>
-
-=cut
-
-.sub '__is_equal' :method :multi(base_lua, pmc)
-    .param pmc value
-    $I0 = 0
-    .return ($I0)
-.end
+=over 4
 
 =item C<__cmp>
 
@@ -532,30 +165,7 @@ L7:
 
 =over 4
 
-=item C<len>
-
 =cut
-
-.sub 'len' :method
-    .local pmc meth
-    .local pmc ret
-    meth = self.'find_metamethod'('__len')
-    if_null meth, L1
-    ret = meth(self)
-    unless_null ret, L2
-    new ret, .LuaNil
-L2:
-    .return (ret)
-L1: 
-    .local pmc ex
-    ex = new .Exception
-    $S0 .= "attempt to get length of a "
-    $S1 = classname self
-    $S0 .= $S1
-    $S0 .= " value"
-    ex['_message'] = $S0
-    throw ex
-.end
 
 =item C<PMC* rawequal (PMC* value)>
 
@@ -570,37 +180,6 @@ L1:
     if $I1 != $I2 goto L1
     set ret, 1
 L1:
-    .return (ret)
-.end
-
-=item C<tonumber>
-
-=cut
-
-.sub 'tonumber' :method
-    .local pmc ret
-    new ret, .LuaNil
-    .return (ret)
-.end
-
-=item C<tostring>
-
-=cut
-
-.sub 'tostring' :method
-    .local pmc meth
-    .local pmc ret
-    meth = self.'find_metamethod'('__tostring')
-    if_null meth, L1
-    ret = meth(self)
-    unless_null ret, L2
-    new ret, .LuaNil
-L2:
-    .return (ret)
-L1: 
-    new ret, .LuaString
-    $S0 = self.'get_string'()
-    ret = $S0
     .return (ret)
 .end
 
