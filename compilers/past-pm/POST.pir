@@ -204,9 +204,20 @@ for compiling programs in Parrot.
 .sub 'pir' :method
     .local string name
     name = self.'name'()
+    .local pmc outerpost
+    .local string outer
+    outer = ''
+    outerpost = self.'outer'()
+    if null outerpost goto have_outer
+    unless outerpost goto have_outer
+    outer = outerpost.'name'()
+    outer = outerpost.'escape'(outer)
+    outer = concat ':outer(', outer
+    outer = concat outer, ')'
+  have_outer:
     .local pmc code
     code = new 'PGE::CodeString'
-    code.'emit'("\n.sub '%0'", name)
+    code.'emit'("\n.sub '%0' %1", name, outer)
     .local pmc iter, cpost
     iter = self.'iterator'()
   iter_loop:
@@ -226,6 +237,13 @@ for compiling programs in Parrot.
     code = new 'PGE::CodeString'
     code.'emit'("    %0 = find_name '%1'", value, name)
     .return (code)
+.end
+
+
+.sub 'outer' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('outer', value, has_value)
 .end
 
 

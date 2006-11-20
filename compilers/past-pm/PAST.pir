@@ -227,6 +227,12 @@ for compiling programs in Parrot.
     .return self.'attr'('scope', value, has_value)
 .end
 
+.sub 'ismy' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('ismy', value, has_value)
+.end
+
 .sub 'viviself' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
@@ -244,6 +250,7 @@ for compiling programs in Parrot.
     .param int has_value       :opt_flag
     .return self.'attr'('bindvalue', value, has_value)
 .end
+
 
 
 .namespace [ 'PAST::Op' ]

@@ -9,9 +9,12 @@ transform post (PAST::Block) :language('PIR') {
     if name != '' goto with_name
     name = node.unique('_block')
   with_name:
+    .local pmc outerpost
+    outerpost = get_hll_global ['POST'], '$?BLOCK'
     .local pmc post
     post = new 'POST::Sub'
-    post.'init'('node'=>node, 'name'=>name)
+    post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost)
+    set_hll_global ['POST'], '$?BLOCK', post
     .local pmc iter
     iter = node.'iterator'()
     unless iter goto iter_end
@@ -23,6 +26,7 @@ transform post (PAST::Block) :language('PIR') {
     if iter goto iter_loop
     post.'result'(cpost)
   iter_end:
+    set_hll_global ['POST'], '$?BLOCK', outerpost
 
     $S0 = node.'blocktype'()
     if $S0 != 'immediate' goto end
@@ -364,20 +368,19 @@ transform post (PAST::Val) :language('PIR') {
 
 
 transform post (PAST::Var) :language('PIR') {
-    .local pmc post, vivibindop
+    .local pmc post, vivibindop, bindvalue
     .local string scope
     scope = node.'scope'()
+    bindvalue = node.'bindvalue'()
     if scope == 'keyed' goto keyed
 
-  package:
     .local string name
-    .local pmc bindvalue
     name = node.'name'()
     name = node.'escape'(name)
-    bindvalue = node.'bindvalue'()
-    if bindvalue goto package_bind
+    if scope == 'lexical' goto lexical
 
-  package_rvalue:
+  package:
+    if bindvalue goto package_bind
     post = new 'POST::Ops'
     post.'init'('node'=>node)
     post.'push_pirop'('get_global', post, name)
@@ -389,6 +392,25 @@ transform post (PAST::Var) :language('PIR') {
     post = new 'POST::Op'
     post.'init'('node'=>node, 'pirop'=>'set_global', 'result'=>bindvalue)
     post.'arglist'(name, bindvalue)
+    .return (post)
+
+  lexical:
+    post = new 'POST::Ops'
+    post.'init'('node'=>node)
+    $I0 = node.'ismy'()
+    if $I0 == 0 goto lexical_1
+    $P0 = post.'push_new'('POST::Op', 'pirop'=>'.lex')
+    $P0.'arglist'(name, $P0)
+  lexical_1:
+    if bindvalue goto lexical_bind
+    post.'push_pirop'('find_lex', post, name)
+    vivibindop = post.'new'('POST::Op', 'pirop'=>'store_lex')
+    vivibindop.'arglist'(name, post)
+    goto check_vivify
+
+  lexical_bind:
+    $P0 = post.'push_new'('POST::Op', 'node'=>node, 'pirop'=>'store_lex', 'result'=>bindvalue)
+    $P0.'arglist'(name, bindvalue)
     .return (post)
 
   keyed:
@@ -409,7 +431,6 @@ transform post (PAST::Var) :language('PIR') {
     $S0 = keypost.'result'()
     key .= $S0
     key .= ']'
-    bindvalue = node.'bindvalue'()
     if bindvalue goto keyed_bind
 
   keyed_rvalue:
