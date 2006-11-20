@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 10
+plan 11
 
 eval_is {
   catch {
@@ -60,3 +60,11 @@ eval_is {
   list [catch {incr} msg] $msg
 } {1 {wrong # args: should be "incr varName ?increment?"}} \
   {catch {incr} msg}
+
+eval_is {
+  namespace eval abc {
+    proc a {} {return "ok"}
+    proc b {} {catch {a} msg; return $msg }
+    b
+  }
+} ok {catch should respect the namespace it is invoked in}
