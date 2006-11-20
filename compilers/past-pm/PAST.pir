@@ -293,6 +293,12 @@ for compiling programs in Parrot.
     .return self.'attr'('blocktype', value, has_value)
 .end
 
+.sub 'symtable' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('symtable', value, has_value)
+.end
+
 
 .include 'POST.pir'
 
