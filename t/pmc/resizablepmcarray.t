@@ -1190,7 +1190,7 @@ CODE
 A3
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'iterate subclass of rpa');
+pir_output_is(<<'CODE', <<'OUTPUT', 'iterate subclass of rpa (RT #40958)');
 .sub main :main
     .local pmc arr, iter
     $P0 = subclass 'ResizablePMCArray', 'MyArray'
