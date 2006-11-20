@@ -473,7 +473,9 @@ is_string:
     .return($I0)
 
 is_string:
-    $I0 = iseq a, b
+    $S0 = a
+    $S1 = b
+    $I0 = iseq $S0, $S1
     .return ($I0)
 .end
 
@@ -494,7 +496,9 @@ is_string:
     .return($I0)
 
 is_string:
-    $I0 = isne a, b
+    $S0 = a
+    $S1 = b
+    $I0 = isne $S0, $S1
     .return ($I0)
 .end
 

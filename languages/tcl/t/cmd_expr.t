@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 239
+plan 241
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -116,6 +116,9 @@ is [expr 2==2] 1 {==, eq}
 is [expr 2==1] 0 {==, ne}
 is [expr 1!=1] 0 {!=, eq}
 is [expr 2!=1] 1 {!=, ne}
+
+is [expr {[list \;] == {{;}}}] 1 {==, string and list}
+is [expr {[list \;] != {{;}}}] 0 {!=, string and list}
 
 # short circuting ops
 is [expr 2&&2] 1 {&&}
