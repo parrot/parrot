@@ -61,6 +61,44 @@ no_args:
 
 .namespace [ 'helpers'; 'dict' ]
 
+.sub 'append'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc < 2 goto bad_args
+
+  .local pmc dictionary
+  dictionary = shift argv
+  dictionary = __dict(dictionary)
+
+  .local string key, value
+  key = shift argv
+  value = dictionary[key]
+
+  .local string append
+loop:
+  argc = elements argv
+  unless argc goto loop_done
+  append = shift argv 
+  value .= append
+  goto loop
+
+loop_done:
+  dictionary[key] = value
+  
+  .local pmc result
+  result = new .TclList
+  push result, key
+  push result, value
+  .return (result)
+
+bad_args:
+  tcl_error 'wrong # args: should be "dict append varName key ?value ...?"'
+
+.end
+
+
 .sub 'create'
   .param pmc argv
 
