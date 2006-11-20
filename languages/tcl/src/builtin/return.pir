@@ -16,8 +16,9 @@
   if argc == 0 goto noargs
   if argc == 1 goto onearg
 
-  pir_code = "tcl_error \"XXX: bad call to return\"\n"
-  .return(register_num,pir_code)
+  # don't handle this case staticly
+  null $P0
+  .return(register_num,$P0)
 
 onearg:
   pir_code = "tcl_return "

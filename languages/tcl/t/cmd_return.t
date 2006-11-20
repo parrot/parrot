@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 use Test::More;
 
 language_output_is( "tcl", <<'TCL', <<OUT, "simple return with value" );
@@ -25,6 +25,14 @@ language_output_is( "tcl", <<'TCL', <<OUT, "simple return with no value" );
  puts [joe]
 TCL
 
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', '-code error');
+  proc joe {} { return -code error "bad args" }
+  joe
+  puts foo
+TCL
+bad args
 OUT
 
 # Local Variables:
