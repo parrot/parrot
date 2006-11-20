@@ -9,8 +9,7 @@
 $Id$
 
 This transformation takes a XML abstract syntax tree as generated 
-by phc from PHP source. It generates an XML of the kind of PAST
-that is used by punie.
+by phc from PHP source. It generates an XML equivalent to PAST-pm.
 
 -->
 <xsl:output method='xml' indent='yes' />
@@ -40,14 +39,14 @@ that is used by punie.
 <xsl:template match="phc:AST_method" >
 </xsl:template>
 <xsl:template match="phc:AST_method[phc:AST_signature[phc:Token_method_name[phc:value='%run%']]]">
-  <past:Stmts>
-    <xsl:apply-templates select="phc:AST_statement_list" />
-  </past:Stmts>                                                                  
+  <xsl:apply-templates select="phc:AST_statement_list" />
 </xsl:template>
 
 <xsl:template match="phc:AST_statement_list" >
-  <xsl:apply-templates select="phc:AST_eval_expr" />
-  <xsl:apply-templates select="phc:AST_if" />
+  <past:Stmts>
+    <xsl:apply-templates select="phc:AST_eval_expr" />
+    <xsl:apply-templates select="phc:AST_if" />
+  </past:Stmts>                                                                  
 </xsl:template>
 
 <xsl:template match="phc:AST_eval_expr" >
@@ -66,45 +65,62 @@ that is used by punie.
 </xsl:template>
 
 <xsl:template match="phc:AST_actual_parameter" >
-  <xsl:apply-templates select="phc:Token_string | phc:Token_int | phc:Token_real | phc:AST_bin_op | phc:AST_variable" />
+  <xsl:apply-templates select="phc:Token_string | phc:Token_int | phc:Token_real | phc:AST_bin_op | phc:AST_unary_op | phc:AST_variable" />
 </xsl:template>
 
 <xsl:template match="phc:AST_bin_op" >
-  <past:Op op="infix:+" >
-    <xsl:attribute name="op" >infix:<xsl:value-of select="phc:Token_op/phc:value" /></xsl:attribute>
-    <xsl:apply-templates select="phc:Token_int | phc:Token_real | phc:AST_bin_op" />
+  <past:Op>
+    <xsl:attribute name="pirop" >
+      <xsl:choose>
+        <xsl:when test="phc:Token_op/phc:value = '+'"   >n_add</xsl:when>
+        <xsl:when test="phc:Token_op/phc:value = '-'"   >n_sub</xsl:when>
+        <xsl:when test="phc:Token_op/phc:value = '*'"   >n_mul</xsl:when>
+        <xsl:when test="phc:Token_op/phc:value = '/'"   >n_div</xsl:when>
+        <xsl:when test="phc:Token_op/phc:value = '%'"   >n_mod</xsl:when>
+      </xsl:choose>
+    </xsl:attribute>
+    <xsl:apply-templates select="phc:Token_int | phc:Token_real | phc:AST_bin_op | phc:AST_unary_op" />
+  </past:Op>
+</xsl:template>
+
+<xsl:template match="phc:AST_unary_op" >
+  <past:Op >
+    <xsl:attribute name="name" >
+      <xsl:value-of select="concat('prefix:', phc:Token_op/phc:value)" />
+    </xsl:attribute>
+    <xsl:apply-templates select="phc:Token_int | phc:Token_real | phc:AST_bin_op | phc:AST_unary_op" />
   </past:Op>
 </xsl:template>
 
 <xsl:template match="phc:AST_assignment" >
-  <past:Op op='infix:=' >
+  <past:Op name='infix:=' pasttype='assign' >
     <xsl:apply-templates select="phc:AST_variable" />
     <xsl:apply-templates select="phc:Token_string" />
   </past:Op>
 </xsl:template>
 
 <xsl:template match="phc:AST_variable" >
-  <past:Var vartype="scalar" scope="global" >
-    <xsl:attribute name="varname" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
+  <past:Var >
+    <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
   </past:Var>
 </xsl:template>
 
 <xsl:template match="phc:Token_string" >
-  <past:Val ctype="s" >
+  <past:Val ctype="s~" vtype=".String" >
     <xsl:attribute name="encoding" ><xsl:value-of select="phc:value/@encoding" /></xsl:attribute>
     <xsl:attribute name="name" ><xsl:value-of select="phc:value" /></xsl:attribute>
   </past:Val>
 </xsl:template>
 
 <xsl:template match="phc:Token_int" >
-  <past:Val ctype="int" >
-    <xsl:apply-templates select="phc:value" />
+  <past:Val ctype="n" vtype=".Integer" >
+    <xsl:attribute name="name" ><xsl:value-of select="phc:value" /></xsl:attribute>
   </past:Val>
 </xsl:template>
 
 <!-- looks like phc is running into a floating point issue -->
 <xsl:template match="phc:Token_real" >
-  <past:Val ctype="num" >
+  <past:Val ctype="n" >
     <xsl:apply-templates select="phc:source_rep" />
   </past:Val>
 </xsl:template>
@@ -114,11 +130,15 @@ that is used by punie.
 </xsl:template>
 
 <xsl:template match="phc:AST_if" >
-  <past:Stmt>
-    <past:Op op="print" >
-      <past:Val ctype="s" encoding="base64" name="ICAgIDxzdHJvbmc+Q29uZGl0aW9uIGlzIHRydWUuPC9zdHJvbmc+CiAg" />
-    </past:Op>
-  </past:Stmt>
+  <past:Op pasttype="if" >
+    <xsl:apply-templates select="phc:Token_string | phc:Token_int | phc:Token_real | phc:AST_bin_op | phc:AST_unary_op | phc:AST_variable" />
+    <past:Block blocktype="immediate" >
+      <xsl:apply-templates select="phc:AST_statement_list[1]" />
+    </past:Block>
+    <past:Block blocktype="immediate" >
+      <xsl:apply-templates select="phc:AST_statement_list[2]" />
+    </past:Block>
+  </past:Op>
 </xsl:template>
 
 </xsl:stylesheet>

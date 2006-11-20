@@ -39,10 +39,10 @@ plumhead.pbc: $(PARROT) plumhead.pir
 test: all test-php test-phc-to-past
 
 test-php:
-	cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-php
+	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-php
 
 test-phc-to-past:
-	cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-phc-to-past
+	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-phc-to-past
 
 # Nothing needs to be built
 build:
