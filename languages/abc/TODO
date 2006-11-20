@@ -1,0 +1,23 @@
+Expressions:
+
+* expr ^ expr -- The result of the expression is the value of the first 
+raised to the second.
+* boolean operators && (and) and || (or)
+
+Functions:
+
+* length -- The  value  of  the length function is the number of significant 
+digits in the expression.
+* read -- TODO? (extension)
+* scale -- The value of the scale function is the number of digits after 
+the decimal point in the expression.
+* sqrt -- The value of the sqrt function is the square root of the expression.
+
+Statements:
+
+* break -- This statement causes a forced exit of the most recent enclosing 
+while statement or for statement.
+* continue -- The continue statement (an extension) causes the most recent 
+enclosing for statement to start the next iteration.
+* halt -- TODO? (extension)
+* return -- Return  the  value  of the expression from a function.
