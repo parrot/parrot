@@ -93,6 +93,34 @@ Copy the contents of other to self.
         }
     }
 
+/*  
+    
+=item C<STRING *get_string()>
+    
+Returns the dict as a string
+
+=cut
+
+*/
+
+    STRING* get_string () {
+        PMC *dictToString, *namespace;
+        STRING *_tcl_namespace, *sub, *value;
+
+        _tcl_namespace = string_from_const_cstring(INTERP, "_tcl", 4);
+        sub            = string_from_const_cstring(INTERP, "__dictToString",14);
+
+        namespace = interpinfo_p(INTERP, NAMESPACE_ROOT);
+        namespace = VTABLE_get_pmc_keyed_str(INTERP, namespace, _tcl_namespace);
+        dictToString = VTABLE_get_pmc_keyed_str(INTERP, namespace, sub);
+
+        CONTEXT(INTERP->ctx)->constants =
+          PMC_sub(dictToString)->seg->const_table->constants;
+        value        = Parrot_runops_fromc_args
+                         (INTERP, dictToString, "SP", SELF);
+        return value;
+
+    }
 }
 
 /*
