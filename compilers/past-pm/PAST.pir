@@ -144,7 +144,7 @@ array of children.  Returns the newly created PAST node.
 .end
 
 
-=item iterator()
+=item iterator( )
 
 Returns a newly initialized iterator for the invocant's list of 
 children.
@@ -162,7 +162,7 @@ children.
 
 =item node([val])
 
-Set's the invocant's C<source> and C<pos> attributes to those
+Sets the invocant's C<source> and C<pos> attributes to those
 of C<val>.  If C<val> is another PAST node, then C<source> and C<pos>
 are simply copied from that node, otherwise C<val> is assumed to be
 a C<Match> object and obtains source/position information from that.
@@ -305,7 +305,7 @@ to executable code (but not executed).
     .return (past)
 .end
 
-=back 4
+=back
 
 =head2 PAST::Val
 
@@ -358,7 +358,7 @@ a newly generated PMC initialized with the node's name.
 .end
 
 
-=back 4
+=back
 
 =head2 PAST::Var
 
@@ -418,7 +418,7 @@ implementation) a PAST tree to create the value.
 
 =item islvalue([flag])
 
-Get/set the C<isvalue> attribute, which indicates whether this
+Get/set the C<islvalue> attribute, which indicates whether this
 variable is being used in an lvalue context.
 
 =cut
@@ -443,7 +443,7 @@ variable at runtime (e.g., for binding or assignment).
     .return self.'attr'('bindvalue', value, has_value)
 .end
 
-=back 4
+=back
 
 =head2 PAST::Op
 
@@ -571,9 +571,11 @@ child as an lvalue (e.g., for assignment).
 
 Get/set the code to be used for inline PIR when C<pasttype> is
 "inline".  The C<code> argument is PIR text to be inserted in
-the final generated code sequence.  Sequences of "%0", "%1", "%2",
-etc. in C<code> are replaced with the evaluated results of the 
-first, second, third, etc. children nodes.
+the final generated code sequence.  Sequences of "%0", "%1",
+"%2", ... "%9" in C<code> are replaced with the evaluated 
+results of the first, second, third, ..., tenth children nodes.
+(If you need more than ten arguments to your inline PIR, consider
+making it a subroutine call instead.)
 
 The register to hold the result of the inline PIR operation is
 given by "%r", "%t", or "%u" in the C<code> string:
@@ -595,7 +597,7 @@ given by "%r", "%t", or "%u" in the C<code> string:
     .return self.'attr'('inline', value, has_value)
 .end
 
-=back 4
+=back
 
 =head2 PAST::Block
 
@@ -603,6 +605,10 @@ C<PAST::Block> nodes represent lexical scopes within an abstract
 syntax tree, and roughly translate to individual Parrot subroutines.
 A C<PAST::Block> node nested within another C<PAST::Block> node
 acts like a nested lexical scope.
+
+If the block has a C<name> attribute, that becomes the name of
+the resulting Parrot sub, otherwise a unique name is automatically
+generated for the block.
 
 =over 4
 
@@ -649,7 +655,7 @@ attribute.
 .include 'past2post_gen.pir'
 
 
-=back 4
+=back
 
 =head1 AUTHOR
 
