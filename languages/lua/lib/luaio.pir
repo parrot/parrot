@@ -37,7 +37,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 .sub 'init_io' :load :anon
 
     load_bytecode 'languages/lua/type/table.pbc'
-    load_bytecode 'languages/lua/type/userdata.pbc'
+    load_bytecode 'languages/lua/type/userdata.pir'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua I/O\n"
@@ -161,7 +161,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     $P1 = 'stdin'
     $P2 = getstdin
     $P0 = new [ 'userdata' ]
-    setattribute $P0, 0, $P2
+    setattribute $P0, 'data', $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
     $P3 = 0
@@ -170,7 +170,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     $P1 = 'stdout'
     $P2 = getstdout
     $P0 = new [ 'userdata' ]
-    setattribute $P0, 0, $P2
+    setattribute $P0, 'data', $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
     $P3 = 1
@@ -179,7 +179,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     $P1 = 'stderr'
     $P2 = getstderr
     $P0 = new [ 'userdata' ]
-    setattribute $P0, 0, $P2
+    setattribute $P0, 'data', $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
     $P3 = 2
@@ -320,7 +320,7 @@ L2:
     .const .LuaString key = 'file'
     mt_file = _lua__REGISTRY[key]
     unless mt == mt_file goto L1
-    ret = getattribute file, 0
+    ret = getattribute file, 'data'
     if_null ret, L2
     .return (ret)
 L2:
@@ -347,7 +347,7 @@ L1:
     f = tofile(file)
     close f
     null f
-    setattribute file, 0, f
+    setattribute file, 'data', f
     new ret, .LuaBoolean
     ret = 1
     .return (ret)
@@ -397,7 +397,7 @@ error code.
     argerror(file)
 L3:
     ret = newfile()
-    setattribute ret, 0, f
+    setattribute ret, 'data', f
     setiofile(0, ret)
     goto L1
 L2:
@@ -446,7 +446,7 @@ L1:
     argerror($S1)
 L2:
     file = newfile()
-    setattribute file, 0, f
+    setattribute file, 'data', f
 L3:
     $P0 = file[key]
     ret = $P0(file)
@@ -508,7 +508,7 @@ in the standard C function C<fopen>.
     f = open $S1, $S3
     unless f goto L1
     ret = newfile()
-    setattribute ret, 0, f
+    setattribute ret, 'data', f
     .return (ret)
 L1:
     new ret, .LuaNil
@@ -542,7 +542,7 @@ Similar to C<io.input>, but operates over the default output file.
     argerror(file)
 L3:
     ret = newfile()
-    setattribute ret, 0, f
+    setattribute ret, 'data', f
     setiofile(1, ret)
     goto L1
 L2:
@@ -630,7 +630,7 @@ handle, and B<nil> if C<obj> is not a file handle.
     goto L3
 L1:
     ret = new .LuaString
-    f = getattribute obj, 0
+    f = getattribute obj, 'data'
     unless_null f, L2
     ret = "closed file"
     goto L3
@@ -749,7 +749,7 @@ STILL INCOMPLETE.
     .local pmc ret
     .local pmc f
     tofile(self)
-    f = getattribute self, 0
+    f = getattribute self, 'data'
     if formats, L1
     ret = read_line(f)
     .return (ret)
@@ -851,7 +851,7 @@ position to the end of the file, and returns its size.
     $S1 = optstring(whence, 'cur')
     $I1 = checkoption($S1, options)
     $I2 = optint(offset, 0)
-    f = getattribute self, 0
+    f = getattribute self, 'data'
     seek f, $I2, $I1
     $I3 = tell f
     new ret, .LuaNumber
@@ -905,7 +905,7 @@ NOT YET IMPLEMENTED.
     $S1 = checkstring(mode)
     $I1 = checkoption($S1, options)
     $I2 = optint(size, 512)
-    f = getattribute self, 0
+    f = getattribute self, 'data'
     not_implemented()
     .return (ret)
 .end
@@ -927,7 +927,7 @@ or C<string.format> before write.
     .local int i
     .local pmc f
     tofile(self)
-    f = getattribute self, 0
+    f = getattribute self, 'data'
     argc = argv
     i = 0
 L1:
@@ -955,7 +955,7 @@ L2:
     .local pmc f
     .local pmc ret
     new ret, .LuaString
-    f = getattribute self, 0
+    f = getattribute self, 'data'
     unless f goto L1
     $S0 = "file ("
     $S1 = self

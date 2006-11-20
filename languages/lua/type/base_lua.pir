@@ -27,7 +27,7 @@ C<base_lua> provides an abstract base class for some Lua types.
 
 =cut
 
-.sub '__clone' :method
+.sub 'clone' :method :vtable
     .return (self)
 .end
 
@@ -35,7 +35,7 @@ C<base_lua> provides an abstract base class for some Lua types.
 
 =cut
 
-.sub '__get_string' :method
+.sub 'get_string' :method :vtable
     new $P0, .Array
     $P0 = 2
     $S0 = classname self
@@ -52,7 +52,7 @@ Returns C<true>.
 
 =cut
 
-.sub '__get_bool' :method
+.sub 'get_bool' :method :vtable
     $I0 = 1
     .return ($I0)
 .end
@@ -66,13 +66,13 @@ Throws an exception.
 
 =cut
 
-.sub '__get_pmc_keyed' :method
+.sub 'get_pmc_keyed' :method :vtable
     .param pmc key
     $S0 = classname self
     ex_index($S0)
 .end
 
-.sub '__set_pmc_keyed' :method
+.sub 'set_pmc_keyed' :method :vtable
     .param pmc key
     .param pmc value
     $S0 = classname self
@@ -98,7 +98,7 @@ Throws an exception.
 
 =cut
 
-.sub '__neg' :method
+.sub 'neg' :method :vtable
     .param pmc value
     .local pmc meth
     .local pmc ret
@@ -114,7 +114,7 @@ L1:
     ex_arithmetic($S0)
 .end
 
-.sub '__i_neg' :method
+.sub 'i_neg' :method :vtable
     .local pmc meth
     meth = self.'find_metamethod'('__unm')
     if_null meth, L1
@@ -134,7 +134,7 @@ Always returns C<false>.
 
 =cut
 
-.sub '__logical_not' :method
+.sub 'logical_not' :method :vtable
     .param pmc dummy
     .local pmc ret
     $I0 = isfalse self
@@ -149,7 +149,7 @@ Always returns C<true>.
 
 =cut
 
-.sub '__defined' :method
+.sub 'defined' :method :vtable
     $I0 = 1
     .return ($I0)
 .end
@@ -158,7 +158,7 @@ Always returns C<true>.
 
 =cut
 
-.sub '__invoke' :method
+.sub 'invoke' :method :vtable
     .param pmc next
 #    .local pmc ret
 #    .local pmc meth
@@ -599,7 +599,7 @@ L2:
     .return (ret)
 L1: 
     new ret, .LuaString
-    $S0 = self.'__get_string'()
+    $S0 = self.'get_string'()
     ret = $S0
     .return (ret)
 .end

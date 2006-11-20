@@ -16,7 +16,7 @@ with the behaviour of the Lua C<Thread> type.
 
 .sub 'init_thread' :load :anon
     load_bytecode 'Parrot/Coroutine.pbc'
-    load_bytecode 'languages/lua/type/base_lua.pbc'
+    load_bytecode 'languages/lua/type/base_lua.pir'
 #    $P0 = subclass 'Parrot::Coroutine', 'thread'
 #    $P1 = getclass 'base_lua'
     $P0 = subclass 'base_lua', 'thread'

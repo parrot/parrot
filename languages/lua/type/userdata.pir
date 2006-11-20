@@ -15,14 +15,14 @@ the Lua C<Userdata> type.
 .HLL '', 'lua_group'
 
 .sub 'init_userdata' :load :anon
-    load_bytecode 'languages/lua/type/base_lua.pbc'
+    load_bytecode 'languages/lua/type/base_lua.pir'
     $P0 = subclass 'base_lua', 'userdata'
     addattribute $P0, 'data'
 .end
 
 .namespace [ 'userdata' ]
 
-.sub '__get_pmc_keyed' :method
+.sub 'get_pmc_keyed' :method :vtable
     .param pmc key
     .local pmc meth
     .local pmc ret

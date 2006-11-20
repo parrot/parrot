@@ -21,7 +21,7 @@ See "Lua 5.1 Reference Manual", section 5.1 "Basic Functions".
 
 .sub 'init_basic' :load :anon
 
-    load_bytecode 'languages/lua/type/table.pbc'
+    load_bytecode 'languages/lua/type/table.pir'
     load_bytecode 'languages/lua/lib/luaaux.pbc'
 
 #    print "init Lua Basic\n"

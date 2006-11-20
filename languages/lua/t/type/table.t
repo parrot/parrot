@@ -8,19 +8,19 @@ t/pmc/table.t - Lua Table
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/table.t
+    % perl -I../../lib t/type/table.t
 
 =head1 DESCRIPTION
 
 Tests C<table> type
-(implemented in F<languages/lua/lib/table.pir>).
+(implemented in F<languages/lua/type/table.pir>).
 
 =cut
 
 use strict;
 use warnings;
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
@@ -146,7 +146,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check key PMC' );
 .sub _main
-    load_bytecode 'languages/lua/type/table.pbc'
+    load_bytecode 'languages/lua/type/table.pir'
     find_type $I0, 'table'
     .local pmc pmc1
     pmc1 = new $I0
@@ -177,9 +177,46 @@ value2
 nil
 OUTPUT
 
-pir_output_like( << 'CODE', << 'OUTPUT', 'check key nil' );
+TODO: {
+local $TODO = ':vtable fails with load_bytecode PBC';
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'check key PMC' );
 .sub _main
     load_bytecode 'languages/lua/type/table.pbc'
+    find_type $I0, 'table'
+    .local pmc pmc1
+    pmc1 = new $I0
+    find_type $I0, 'LuaString'
+    .local pmc val1
+    val1 = new $I0
+    val1 = "value1"
+    .local pmc val2
+    val2 = new $I0
+    val2 = "value2"
+    pmc1[val1] = val1
+    pmc1[val2] = val2
+    .local pmc ret
+    ret = pmc1[val1]
+    print ret
+    print "\n"
+    ret = pmc1[val2]
+    print ret
+    print "\n"
+    ret = pmc1[pmc1]
+    print ret
+    print "\n"
+    end
+.end
+CODE
+value1
+value2
+nil
+OUTPUT
+}
+
+pir_output_like( << 'CODE', << 'OUTPUT', 'check key nil' );
+.sub _main
+    load_bytecode 'languages/lua/type/table.pir'
     find_type $I0, 'table'
     .local pmc pmc1
     pmc1 = new $I0
@@ -199,7 +236,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check deletion by assignment of nil' );
 .sub _main
-    load_bytecode 'languages/lua/type/table.pbc'
+    load_bytecode 'languages/lua/type/table.pir'
     find_type $I0, 'table'
     .local pmc pmc1
     pmc1 = new $I0
@@ -241,9 +278,8 @@ OUTPUT
 pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
 .sub _main
     load_bytecode 'languages/lua/type/table.pbc'
-    find_type $I0, 'table'
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new 'table'
     print pmc1
     print "\n"
     $P0 = pmc1.'tostring'()
@@ -260,9 +296,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .sub _main
     load_bytecode 'languages/lua/type/table.pbc'
-    find_type $I0, 'table'
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new 'table'
     $P0 = pmc1.'tonumber'()
     print $P0
     print "\n"

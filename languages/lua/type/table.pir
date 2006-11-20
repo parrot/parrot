@@ -11,7 +11,7 @@ C<table> extends C<base_lua> to provide a class with the behaviour of
 the Lua C<table> type.
 
 TRIVIAL IMPLEMENTATION : C<table> is just a Parrot C<Hash>, like in Lua 4.0.
-Now, Lua 5.0 uses a hybrid data structure with a Hash part and an Array part.
+Now, Lua 5 uses a hybrid data structure with a Hash part and an Array part.
 
 =head2 Functions
 
@@ -22,16 +22,16 @@ Now, Lua 5.0 uses a hybrid data structure with a Hash part and an Array part.
 .HLL '', 'lua_group'
 
 .sub 'init_table' :load :anon
-    load_bytecode 'languages/lua/type/base_lua.pbc'
+    load_bytecode 'languages/lua/type/base_lua.pir'
     $P0 = subclass 'base_lua', 'table'
     addattribute $P0, 'hash'
 .end
 
 .namespace [ 'table' ]
 
-.sub '__init' :method
+.sub 'init' :method :vtable
     new $P0, .Hash
-    setattribute self, 0, $P0 
+    setattribute self, 'hash', $P0 
 .end
 
 .sub '_make_key' :anon
@@ -42,11 +42,11 @@ Now, Lua 5.0 uses a hybrid data structure with a Hash part and an Array part.
     .return ($S0)
 .end
 
-.sub '__get_pmc_keyed' :method
+.sub 'get_pmc_keyed' :method :vtable
     .param pmc key
     .local pmc meth
     .local pmc ret
-    $P0 = getattribute self, 0
+    $P0 = getattribute self, 'hash'
     $S0 = _make_key(key)
     $I0 = exists $P0[$S0]
     if $I0 goto L1
@@ -70,7 +70,7 @@ L2:
     .return (ret) 
 .end
 
-.sub '__set_pmc_keyed' :method
+.sub 'set_pmc_keyed' :method :vtable
     .param pmc key
     .param pmc value
     $I0 = isa key, 'LuaNil'
@@ -81,7 +81,7 @@ L2:
     throw ex
 L1:
     .local pmc meth
-    $P0 = getattribute self, 0
+    $P0 = getattribute self, 'hash'
     $S0 = _make_key(key)
     $I0 = exists $P0[$S0]
     if $I0 goto L2
@@ -105,8 +105,8 @@ L5:
 L4:
 .end
 
-.sub '__elements' :method
-    $P0 = getattribute self, 0
+.sub 'elements' :method :vtable
+    $P0 = getattribute self, 'hash'
     $I0 = elements $P0
     .return ($I0)
 .end
@@ -192,7 +192,7 @@ L4:
 .sub 'rawget' :method
     .param pmc key
     .local pmc ret
-    $P0 = getattribute self, 0
+    $P0 = getattribute self, 'hash'
     $S0 = _make_key(key)
     $I0 = exists $P0[$S0]
     unless $I0 goto L1
@@ -218,7 +218,7 @@ L1:
     ex['_message'] = "table index is nil"
     throw ex
 L1:
-    $P0 = getattribute self, 0
+    $P0 = getattribute self, 'hash'
     $S0 = _make_key(key)
     $I0 = isa value, 'LuaNil'
     unless $I0 goto L2

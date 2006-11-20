@@ -90,7 +90,8 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
     .local pmc val1
     val1 = new .Array
     .local pmc pmc1
-    pmc1 = new $I0, val1
+    pmc1 = new $I0
+    setattribute pmc1, 'data', val1
     print pmc1
     print "\n"
     end
@@ -106,7 +107,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
     .local pmc val1
     val1 = new .Array
     .local pmc pmc1
-    pmc1 = new $I0, val1
+    pmc1 = new $I0
+    setattribute pmc1, 'data', val1
     .local int bool1
     bool1 = istrue pmc1
     print bool1
@@ -124,7 +126,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
     .local pmc val1
     val1 = new .Array
     .local pmc pmc1
-    pmc1 = new $I0, val1
+    pmc1 = new $I0
+    setattribute pmc1, 'data', val1
     find_type $I0, 'LuaBoolean'
     .local pmc pmc2
     pmc2 = new $I0
@@ -145,11 +148,11 @@ OUTPUT
 pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
 .sub _main
     load_bytecode 'languages/lua/type/userdata.pbc'
-    find_type $I0, 'userdata'
     .local pmc val1
     val1 = new .Array
     .local pmc pmc1
-    pmc1 = new $I0, val1
+    pmc1 = new 'userdata'
+    setattribute pmc1, 'data', val1
     print pmc1
     print "\n"
     $P0 = pmc1.'tostring'()
@@ -166,11 +169,11 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .sub _main
     load_bytecode 'languages/lua/type/userdata.pbc'
-    find_type $I0, 'userdata'
     .local pmc val1
     val1 = new .Array
     .local pmc pmc1
-    pmc1 = new $I0, val1
+    pmc1 = new 'userdata'
+    setattribute pmc1, 'data', val1
     $P0 = pmc1.'tonumber'()
     print $P0
     print "\n"
