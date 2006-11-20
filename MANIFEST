@@ -566,6 +566,7 @@ examples/pasm/small.xml                                     [main]doc
 examples/pasm/stack.pasm                                    [main]doc
 examples/pasm/trace.pasm                                    [main]doc
 examples/pasm/xml_parser.pasm                               [main]doc
+examples/past/01-sub.pir                                    [main]doc
 examples/pge/README                                         [main]doc
 examples/pge/all.pir                                        [main]doc
 examples/pge/benchmarks/ambs1/Makefile                      [main]doc
