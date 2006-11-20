@@ -2,7 +2,7 @@
 
 source lib/test_more.tcl
 
-plan 15
+plan 16
 
 is [list]     {}    {no elements}
 is [list a]   {a}   {one element}
@@ -22,3 +22,4 @@ is [list "$"]   {{$}}  {dollar}
 is [list "\\"]  {\\}   {backslash}
 is [list \[]    {{[}}  {open bracket}
 is [list \]]    {\]}   {close bracket}
+is [list #]     {{#}}  {comment hash}
