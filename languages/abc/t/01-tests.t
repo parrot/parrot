@@ -62,7 +62,7 @@ $ prove languages/abc/t/01-tests.t
 my $abcdir = "$PConfig{'build_dir'}/languages/abc";
 
 # files to load tests from
-my @files = qw( abc_basic abc_special_variables abc_statement );
+my @files = qw( abc_basic abc_special_variables abc_statement abc_functions );
 
 # for each test file given calculate full path
 my @test_files;
