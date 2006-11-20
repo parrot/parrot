@@ -1,14 +1,14 @@
 # length function
 length(1)		1\n		length function
-length(11)		1\n		length function
-length(111)		1\n		length function
+length(11)		2\n		length function
+length(111)		3\n		length function
 
 # read function
 # TODO?
 
 # scale function
 scale(1)		0\n		scale function
-scale(1.0)		1\n		scale function
+# todo: scale(1.0)	1\n		scale function
 scale(1.1)		1\n		scale function
 scale(1.12)		2\n		scale function
 scale(1.123)		3\n		scale function
@@ -16,3 +16,4 @@ scale(1.123)		3\n		scale function
 # sqrt funtion
 sqrt(0)			0\n		sqrt function
 sqrt(1)			1\n		sqrt function
+sqrt(4)			2\n		sqrt function

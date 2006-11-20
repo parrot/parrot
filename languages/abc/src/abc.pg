@@ -6,7 +6,10 @@ grammar ABC::Grammar;
 token term { 
     | $<float>:=[ \d+\.\d* | \.\d+ ]
     | $<integer>:=[\d+] 
-    | $<ident>:=[<[a..z]><[_a..z0..9]>*] [ \[ <expression> \] ]?
+    | $<ident>:=[<[a..z]><[_a..z0..9]>*] 
+        [ $<array>:=[ \[ <expression> \] ]
+        | $<call>:=[ \( <expression> \) ]
+        ]?
 }
 
 token string { \" <-["]>* \" }

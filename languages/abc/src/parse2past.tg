@@ -193,8 +193,10 @@ transform past (ABC::Grammar::expr) :language('PIR') {
 
 transform past_term (ABC::Grammar::expr) :language('PIR') {
     .local pmc past
-    $P0 = node['expression']
-    unless null $P0 goto term_keyed
+    $P0 = node['array']
+    unless null $P0 goto term_array
+    $P0 = node['call']
+    unless null $P0 goto term_call
     $P0 = node['ident']
     unless null $P0 goto term_ident
     $P0 = node['float']
@@ -219,7 +221,7 @@ transform past_term (ABC::Grammar::expr) :language('PIR') {
     past.'init'('node'=>node, 'name'=>name, 'viviself'=>'.Integer', 'islvalue'=>islvalue)
     .return (past)
 
-  term_keyed:
+  term_array:
     .local string name
     name = node['ident']
     name = concat name, '_array'
@@ -230,10 +232,18 @@ transform past_term (ABC::Grammar::expr) :language('PIR') {
     exprpast = tree.'get'('past', exprnode, 'ABC::Grammar::expression')
     basepast = exprpast.'new'('PAST::Var', 'node'=>node, 'name'=>name)
     past = exprpast.'new'('PAST::Var', basepast, exprpast, 'node'=>node, 'scope'=>'keyed', 'viviself'=>'.Integer', 'islvalue'=>islvalue)
-    unless islvalue goto term_keyed_end
+    unless islvalue goto term_array_end
     basepast.'islvalue'(islvalue)
     basepast.'viviself'('.ResizablePMCArray')
-  term_keyed_end:
+  term_array_end:
+    .return (past)
+
+  term_call:
+    .local pmc exprnode, exprpast
+    name = node['ident']
+    exprnode = node['expression'; 0]
+    exprpast = tree.'get'('past', exprnode, 'ABC::Grammar::expression')
+    past = exprpast.'new'('PAST::Op', exprpast, 'node'=>node, 'name'=>name, 'pasttype'=>'call')
     .return (past)
 }
 
