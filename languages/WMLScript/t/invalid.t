@@ -8,7 +8,7 @@ t/invalid.t - WMLScript invalid & conversion
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/invalid.t
+    % perl -I../lib WMLScript/t/invalid.t
 
 =head1 DESCRIPTION
 

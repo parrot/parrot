@@ -8,7 +8,7 @@ t/float.t - WMLScript floating-point & conversion
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/float.t
+    % perl -I../lib WMLScript/t/float.t
 
 =head1 DESCRIPTION
 

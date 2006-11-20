@@ -8,7 +8,7 @@ t/string.t - WMLScript string & conversion
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/string.t
+    % perl -I../lib  WMLScript/t/string.t
 
 =head1 DESCRIPTION
 

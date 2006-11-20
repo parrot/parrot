@@ -8,7 +8,7 @@ t/lang.t - WMLScript Lang library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/lang.t
+    % perl -I../lib WMLScript/t/lang.t
 
 =head1 DESCRIPTION
 

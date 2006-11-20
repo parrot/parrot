@@ -8,7 +8,7 @@ t/pragmas.t - WMLScript Pragmas
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/pragmas.t
+    % perl -I../lib WMLScript/t/pragmas.t
 
 =head1 DESCRIPTION
 

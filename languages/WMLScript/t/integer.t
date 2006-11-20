@@ -8,7 +8,7 @@ t/integer.t - WMLScript integer & conversion
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/number.t
+    % perl -I../lib WMLScript/t/number.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/boolean.t - WMLScript boolean & conversion
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/boolean.t
+    % perl -I../lib WMLScript/t/boolean.t
 
 =head1 DESCRIPTION
 

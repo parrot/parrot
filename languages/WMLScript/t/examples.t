@@ -8,7 +8,7 @@ t/examples.t - some WMLScript code examples
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/examples.t
+    % perl -I../lib WMLScript/t/examples.t
 
 =head1 DESCRIPTION
 

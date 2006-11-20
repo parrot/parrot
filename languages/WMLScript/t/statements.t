@@ -8,7 +8,7 @@ t/statements.t - WMLScript Statements
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/statements.t
+    % perl -I../lib WMLScript/t/statements.t
 
 =head1 DESCRIPTION
 

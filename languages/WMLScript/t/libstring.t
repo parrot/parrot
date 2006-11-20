@@ -8,7 +8,7 @@ t/libstring.t - WMLScript String library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/libstring.t
+    % perl -I../lib WMLScript/t/libstring.t
 
 =head1 DESCRIPTION
 

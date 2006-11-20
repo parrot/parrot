@@ -8,7 +8,7 @@ t/literals.t - WMLScript literals
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/literals.t
+    % perl -I../lib WMLScript/t/literals.t
 
 =head1 DESCRIPTION
 

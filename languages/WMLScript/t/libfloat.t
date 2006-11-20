@@ -8,7 +8,7 @@ t/libfloat.t - WMLScript Float library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/libfloat.t
+    % perl -I../lib WMLScript/t/libfloat.t
 
 =head1 DESCRIPTION
 

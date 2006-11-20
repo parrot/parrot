@@ -8,7 +8,7 @@ t/expr.t - WMLScript expressions
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/expr.t
+    % perl -I../lib WMLScript/t/expr.t
 
 =head1 DESCRIPTION
 

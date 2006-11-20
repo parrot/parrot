@@ -8,7 +8,7 @@ t/functions.t - WMLScript functions
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/functions.t
+    % perl -I../lib WMLScript/t/functions.t
 
 =head1 DESCRIPTION
 

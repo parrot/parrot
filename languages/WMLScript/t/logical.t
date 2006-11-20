@@ -8,7 +8,7 @@ t/logical.t - Logical operators
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -IWMLScript/t WMLScript/t/logical.t
+    % perl -I../lib WMLScript/t/logical.t
 
 =head1 DESCRIPTION
 
