@@ -48,6 +48,10 @@ check_left_bracket:
   $I0 = index str, '['
   if $I0 != -1 goto quote
 
+check_hash:
+  $I0 = index str, '#'
+  if $I0 != -1 goto quote
+
 check_dollar_sign:
   $I0 = index str, '$'
   if $I0 != -1 goto quote
@@ -64,6 +68,7 @@ check_right_bracket:
 check_backslash:
   $I0 = index str, '\'
   if $I0 != -1 goto escape
+
 
   # {}'d constructs
 check_spaces:
