@@ -93,10 +93,10 @@ Copy the contents of other to self.
         }
     }
 
-/*  
-    
+/*
+
 =item C<STRING *get_string()>
-    
+
 Returns the dict as a string
 
 =cut
