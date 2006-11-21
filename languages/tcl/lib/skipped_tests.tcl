@@ -10,8 +10,15 @@ array set skipped_tests {
   append-4.21          explode
   append-4.22          explode
   compExpr-old-14.14   explode
-  dict-2.3             {[lsearch -exact]}
-  dict-21.13           {[dict udpate]}
+  dict-2.3             {lsearch -exact}
+  dict-11.1            {expr wide()}
+  dict-11.2            {expr wide()}
+  dict-11.3            {expr wide()}
+  dict-11.4            {expr wide()}
+  dict-11.5            {expr wide()}
+  dict-11.6            {expr wide()}
+  dict-11.7            {expr wide()}
+  dict-21.13           {dict udpate}
   error-1.3            stacktrace
   error-2.3            stacktrace
   error-2.6            stacktrace

@@ -193,6 +193,76 @@ bad_args:
   tcl_error 'wrong # args: should be "dict get dictionary ?key key ...?"'
 .end
 
+.sub 'incr'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc < 2 goto bad_args
+  if argc > 3 goto bad_args
+
+  .local pmc read, set
+  read = get_root_global ['_tcl'], '__read'
+  set  = get_root_global ['_tcl'], '__set'
+
+  .local pmc dictionary, dict_name
+  dict_name = shift argv
+  push_eh dict_error
+    dictionary = read(dict_name)
+  clear_eh
+  dictionary = __dict(dictionary)
+  goto got_dict
+
+dict_error:
+  get_results '(0,0)', $P0, $S0
+  $I0 = index $S0, 'variable is array'
+  if $I0 != -1 goto cant_dict_array
+  dictionary = new .TclDict
+  __set(dict_name, dictionary)
+
+got_dict:
+  .local pmc key
+  key = shift argv   
+
+  .local pmc increment
+  increment = new .TclInt
+  increment = 1
+  
+  if argc == 2 goto got_increment
+  increment = shift argv
+  increment = __integer (increment)
+
+  .local pmc value
+
+got_increment:
+  $I0 = exists dictionary[key]
+  if $I0 goto vivified
+  value = increment
+  goto done
+
+vivified:
+  value = dictionary[key] 
+  value = __integer(value)
+  value += increment
+
+done:
+  dictionary[key] = value
+  $P1 = new .TclList
+  $P1[0] = key
+  $P1[1] = value
+  .return ($P1)
+
+cant_dict_array:
+  $S1 = dict_name
+  $S1 = "can't set \"" . $S1
+  $S1 .= "\": variable is array"
+  tcl_error $S1
+
+bad_args:
+  tcl_error 'wrong # args: should be "dict incr varName key ?increment?"'
+.end
+
+
 # This is a stub, doesn't actually generate the info.
 # it's exposing the guts of the interface, not sure how if it's appropriate
 # to do this in partcl.
@@ -321,6 +391,7 @@ loop_done:
 bad_args:
   tcl_error 'wrong # args: should be "dict remove dictionary ?key ...?"'
 .end
+
 
 .sub 'replace'
   .param pmc argv
