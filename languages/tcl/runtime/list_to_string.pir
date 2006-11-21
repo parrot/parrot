@@ -49,6 +49,7 @@ check_left_bracket:
   if $I0 != -1 goto quote
 
 check_hash:
+  if i > 0 goto check_dollar_sign # only check hashes on first elem.
   $I0 = index str, '#'
   if $I0 != -1 goto quote
 

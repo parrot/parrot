@@ -2,7 +2,7 @@
 
 source lib/test_more.tcl
 
-plan 16
+plan 18
 
 is [list]     {}    {no elements}
 is [list a]   {a}   {one element}
@@ -22,4 +22,8 @@ is [list "$"]   {{$}}  {dollar}
 is [list "\\"]  {\\}   {backslash}
 is [list \[]    {{[}}  {open bracket}
 is [list \]]    {\]}   {close bracket}
-is [list #]     {{#}}  {comment hash}
+
+# hashes are protected only if they're the first char in the first element.
+is [list #]     {{#}}    {comment hash}
+is [list #foo]  {{#foo}} {comment hash}
+is [list #foo #bar]  {{#foo} #bar} {comment hash}
