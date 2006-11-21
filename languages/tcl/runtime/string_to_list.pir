@@ -174,17 +174,22 @@ done:
   .local pmc result
   result = new .TclDict 
 
-  .local int pos
+  .local pmc pos
+  pos = new .Integer
   pos = 0
   
 loop:
   if pos >= sizeof_list goto done
   $S1 = list[pos]
   inc pos
-  $S2= list[pos]
-is_string:
+  $P2 = list[pos]
+  $P2 = clone $P2
   inc pos
-  result[$S1] = $S2
+  $S0 = typeof $P2
+  if $S0 == 'TclConst' goto is_string
+  $P2 = __listToDict($P2)
+is_string:
+  result[$S1] = $P2
   goto loop
 
 done:

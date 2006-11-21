@@ -158,6 +158,42 @@ bad_args:
 
 .end
 
+.sub 'get'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc < 1 goto bad_args
+
+  .local pmc dictionary
+  dictionary = shift argv
+  dictionary = __dict(dictionary)
+
+  if argc < 0 goto loop_done
+
+  .local pmc key
+loop:
+  argc = elements argv
+  unless argc goto loop_done
+  key = shift argv 
+  dictionary = dictionary[key]
+  if_null dictionary, not_exist
+  goto loop
+
+loop_done:
+  .return (dictionary)
+
+not_exist:
+  $S1 = key
+  $S1 = 'key "' . $S1
+  $S1 .= '" not known in dictionary'
+  tcl_error $S1
+
+bad_args:
+  tcl_error 'wrong # args: should be "dict get dictionary ?key key ...?"'
+.end
+
+
 .sub 'merge'
   .param pmc argv
 
