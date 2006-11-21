@@ -166,6 +166,13 @@ transform call (PAST::Op) :language('PIR') {
 }
 
 
+transform callmethod (PAST::Op) :language('PIR') {
+    node.'pirop'('callmethod')
+    $P0 = tree.'get'('pirop', node)
+    .return ($P0)
+}
+
+
 transform inline (PAST::Op) :language('PIR') {
     node.'pirop'('inline')
     .return tree.'get'('pirop', node)

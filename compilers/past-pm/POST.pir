@@ -38,7 +38,7 @@ for compiling programs in Parrot.
     pirtable['say'] = '%v'
     pirtable['set'] = '%rP'
     pirtable['call'] = '%r****************'                # FIXME: 
-    pirtable['callmethod'] = '%r****************'          # FIXME:
+    pirtable['callmethod'] = '%rP***************'          # FIXME:
     set_hll_global ['POST'], '%pirtable', pirtable
     .return ()
 .end
@@ -179,6 +179,7 @@ for compiling programs in Parrot.
     .local string pirop
     pirop = self.'pirop'()
     if pirop == 'call' goto pir_call
+    if pirop == 'callmethod' goto pir_callmethod
     if pirop == 'inline' goto pir_inline
     code.'emit'('    %n %,', arglist :flat, 'n'=>pirop)
     .return (code)
@@ -188,6 +189,14 @@ for compiling programs in Parrot.
     result = self.'result'()
     name = shift arglist
     code.'emit'('    %r = %n(%,)', arglist :flat, 'r'=>result, 'n'=>name)
+    .return (code)
+
+  pir_callmethod:
+    .local pmc result, name, invocant
+    result = self.'result'()
+    name = shift arglist
+    invocant = shift arglist
+    code.'emit'('    %r = %i.%n(%,)', arglist :flat, 'r'=>result, 'i'=>invocant, 'n'=>name)
     .return (code)
 
   pir_inline:

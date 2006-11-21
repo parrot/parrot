@@ -495,15 +495,14 @@ inline     - Execute the sequence of PIR statements given
              by the node's C<inline> attribute (a string).
              See the C<inline> method below for details.
 
-callmethod - (unimplemented) Invokes a method on an object,
-             using children nodes as arguments.  If the node
-             has a C<name> attribute, then the first child
-             is the invocant and any remaining children
-             are arguments.  If the node doesn't have a
-             C<name> attribute, then the first child evaluates
-             to the method to be called, the second child is
-             the invocant, and the remaining children are
-             arguments to the method call.
+callmethod - Invokes a method on an object, using children
+             nodes as arguments.  If the node has a C<name>
+             attribute, then the first child is the invocant
+             and any remaining children are arguments.  If
+             the node doesn't have a C<name> attribute, then
+             the first child evaluates to the method to be
+             called, the second child is the invocant, and
+             the remaining children are arguments to the method call.
 
 If a node doesn't have a value set for C<pasttype>, then it
 assumes "pirop" if its C<pirop> attribute is set, otherwise it
