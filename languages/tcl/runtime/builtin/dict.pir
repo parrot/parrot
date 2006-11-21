@@ -193,6 +193,27 @@ bad_args:
   tcl_error 'wrong # args: should be "dict get dictionary ?key key ...?"'
 .end
 
+# This is a stub, doesn't actually generate the info.
+# it's exposing the guts of the interface, not sure how if it's appropriate
+# to do this in partcl.
+.sub 'info'  
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc != 1 goto bad_args
+
+  .local pmc dictionary
+  dictionary = shift argv
+  dictionary = __dict(dictionary)
+
+  .return (dictionary)
+
+bad_args:
+  tcl_error 'wrong # args: should be "dict info dictionary"'
+
+.end
+
 .sub 'keys'
   .param pmc argv
 
