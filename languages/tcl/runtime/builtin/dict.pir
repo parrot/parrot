@@ -230,6 +230,33 @@ nothing:
 
 .end
 
+.sub 'remove'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc < 1  goto bad_args
+
+  .local pmc dictionary
+  dictionary = shift argv
+  dictionary = __dict(dictionary)
+  dictionary = clone dictionary
+ 
+  .local pmc key, value
+loop:
+  argc = elements argv
+  unless argc goto loop_done
+  key   = shift argv 
+  delete dictionary[key]
+  goto loop
+
+loop_done:
+  .return (dictionary)
+
+bad_args:
+  tcl_error 'wrong # args: should be "dict remove dictionary ?key ...?"'
+.end
+
 .sub 'replace'
   .param pmc argv
 
@@ -265,6 +292,7 @@ odd_args:
 bad_args:
   tcl_error 'wrong # args: should be "dict replace dictionary ?key value ...?"'
 .end
+
 
 .sub 'size'
   .param pmc argv
