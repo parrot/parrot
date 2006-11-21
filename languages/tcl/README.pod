@@ -1,6 +1,6 @@
 =head1 partcl
 
-A from scratch implementation of Tcl on Parrot. 
+A from scratch implementation of Tcl on Parrot.
 
 To build the tcl compiler, first build parrot and the parrot utilities.
 From the top level parrot directory:
@@ -43,7 +43,7 @@ the PIR on STDOUT. This PIR can then be compiled to parrot bytecode, or
 run directly through parrot. (Works with C<-e>.).
 
 To pretty print the PIR that is generated, you can use the I<experimental>
-utility in C<../../tools/util/pirtidy.pl>. 
+utility in C<../../tools/util/pirtidy.pl>.
 
 =back
 
@@ -64,14 +64,14 @@ See C<docs/> and C<TODO>
 
 =head2 Tcl Version
 
-Note that we are targetting Tcl's cvs-latest, which is 8.5 (a4).  This allows us
+Note that we are targetting Tcl's cvs-latest, which is 8.5.  This allows us
 to test against what will likely be state of the art by the time we approach
 completion. As we get closer to that day, we'll probably settle down and
 code against the most recent version (which hopefully won't be 9.x by then).
 
-This has the disadvantage that for side by side testing, you'll need to 
-build your own tcl (please use at least 8.5a4). Partcl users don't need 
-to worry about this, and even most partcl developers can simply code 
-against the test suite.
+This has the disadvantage that for side by side testing, you'll need to
+build your own tcl (please use at least 8.5, revision a5). Partcl users
+don't need to worry about this, and even most partcl developers can simply
+code against the test suite.
 
 =cut
