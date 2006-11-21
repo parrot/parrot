@@ -305,7 +305,10 @@ sub print_head {
 static INTVAL
 get_nci_I(Interp *interp, struct call_state *st, int n)
 {
-    assert(n < st->src.n);
+    if (n >= st->src.n) {
+        real_exception(interp, NULL, E_ValueError,
+                    "too few arguments passed to NCI function");
+    }
     Parrot_fetch_arg_nci(interp, st);
 
     return UVal_int(st->val);
@@ -314,7 +317,10 @@ get_nci_I(Interp *interp, struct call_state *st, int n)
 static FLOATVAL
 get_nci_N(Interp *interp, struct call_state *st, int n)
 {
-    assert(n < st->src.n);
+    if (n >= st->src.n) {
+        real_exception(interp, NULL, E_ValueError,
+                    "too few arguments passed to NCI function");
+    }
     Parrot_fetch_arg_nci(interp, st);
 
     return UVal_num(st->val);
@@ -323,7 +329,11 @@ get_nci_N(Interp *interp, struct call_state *st, int n)
 static STRING*
 get_nci_S(Interp *interp, struct call_state *st, int n)
 {
-    assert(n < st->src.n);
+    /* TODO or act like below? */ 
+    if (n >= st->src.n) {
+        real_exception(interp, NULL, E_ValueError,
+                    "too few arguments passed to NCI function");
+    }
     Parrot_fetch_arg_nci(interp, st);
 
     return UVal_str(st->val);
