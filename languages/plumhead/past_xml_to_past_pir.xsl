@@ -43,6 +43,13 @@ a Patrick Michaud PAST and runs the PAST.
     .return ($N0)
 .end
 
+.sub 'infix:>'
+    .param pmc a
+    .param pmc b
+    $I0 = cmp_num a, b
+    $I0 = isgt $I0, 0
+    .return ($I0)
+.end
 
 
 .sub '__onload' :load :init
@@ -65,14 +72,14 @@ a Patrick Michaud PAST and runs the PAST.
 
   <xsl:apply-templates />
 
-   # '_dumper'(past_node_<xsl:value-of select="generate-id(.)" />, 'past')
+  # '_dumper'(past_node_<xsl:value-of select="generate-id(.)" />, 'past')
 
   # .local pmc post
   # post = past_node_<xsl:value-of select="generate-id(.)" />.'compile'( 'target' => 'post' )
   # '_dumper'(post, 'post')
 
   # .local pmc pir
-   # pir = past_node_<xsl:value-of select="generate-id(.)" />.'compile'( 'target' => 'pir' )
+  # pir = past_node_<xsl:value-of select="generate-id(.)" />.'compile'( 'target' => 'pir' )
   # print pir
                                                                   
   .local pmc eval
@@ -109,29 +116,7 @@ a Patrick Michaud PAST and runs the PAST.
   # start of past:Val
   .local pmc past_node_<xsl:value-of select="generate-id(.)" />
   past_node_<xsl:value-of select="generate-id(.)" /> = new 'PAST::Val'                             
-  <xsl:choose>
-    <xsl:when test="@ctype = 's~'" >
-      .local string val_<xsl:value-of select="generate-id(.)" />
-      <xsl:choose>
-        <xsl:when test="@encoding = 'base64'" >
-          val_<xsl:value-of select="generate-id(.)" /> = decode_base64( "<xsl:value-of select="@name" />" )
-        </xsl:when>
-        <xsl:otherwise>
-          val_<xsl:value-of select="generate-id(.)" /> = "<xsl:value-of select="@name" />"
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:when>
-    <xsl:when test="@ctype = 'n'" >
-      .local int val_<xsl:value-of select="generate-id(.)" />
-      val_<xsl:value-of select="generate-id(.)" /> = <xsl:value-of select="@name" />
-    </xsl:when>
-    <xsl:when test="@ctype = 'num'" >
-      .local num val_<xsl:value-of select="generate-id(.)" />
-      val_<xsl:value-of select="generate-id(.)" /> = <xsl:value-of select="@name" />
-    </xsl:when>
-  </xsl:choose>
-  past_node_<xsl:value-of select="generate-id(.)" />.'attr'( 'name', val_<xsl:value-of select="generate-id(.)" />, 1 )                              
-
+  <xsl:apply-templates select="@name"/>
   <xsl:apply-templates select="@ctype"/>
   <xsl:apply-templates select="@vtype"/>
   past_node_<xsl:value-of select="generate-id(..)" />.'push'( past_node_<xsl:value-of select="generate-id(.)" /> )      
@@ -140,6 +125,20 @@ a Patrick Michaud PAST and runs the PAST.
 </xsl:template>
 
 <!-- handle attributes -->
+<xsl:template match="@name">
+  <xsl:choose>
+    <xsl:when test="../@encoding = 'base64'" >
+      .local string decoded
+      decoded = decode_base64( "<xsl:value-of select="." />" )
+      past_node_<xsl:value-of select="generate-id(..)" />.'attr'( '<xsl:value-of select="name()" />', decoded, 1 )                              
+      null decoded
+    </xsl:when>
+    <xsl:otherwise>
+      past_node_<xsl:value-of select="generate-id(..)" />.'attr'( '<xsl:value-of select="name()" />', '<xsl:value-of select="." />', 1 )                              
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
 <xsl:template match="@*">
   past_node_<xsl:value-of select="generate-id(..)" />.'attr'( '<xsl:value-of select="name()" />', '<xsl:value-of select="." />', 1 )                              
 </xsl:template>

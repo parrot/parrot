@@ -70,6 +70,7 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
 
 <xsl:template match="phc:AST_bin_op" >
   <past:Op>
+
     <xsl:attribute name="pirop" >
       <xsl:choose>
         <xsl:when test="phc:Token_op/phc:value = '+'"   >n_add</xsl:when>
@@ -79,7 +80,19 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
         <xsl:when test="phc:Token_op/phc:value = '%'"   >n_mod</xsl:when>
       </xsl:choose>
     </xsl:attribute>
+
+    <xsl:attribute name="name" >
+      <xsl:choose>
+        <xsl:when test="phc:Token_op/phc:value/@encoding = 'base64'" >
+          <xsl:choose>
+            <xsl:when test="phc:Token_op/phc:value = 'Pg=='" >infix:&gt;</xsl:when>
+          </xsl:choose>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:attribute>
+
     <xsl:apply-templates select="phc:Token_int | phc:Token_real | phc:AST_bin_op | phc:AST_unary_op" />
+
   </past:Op>
 </xsl:template>
 
