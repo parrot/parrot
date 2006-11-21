@@ -372,8 +372,8 @@ C<name> attribute.
 
 Get/set the PAST::Var node's "scope" (i.e., how the variable
 is accessed or set).  Allowable values include "package", "lexical",
-and "keyed", representing HLL global, lexical, and array/hash
-variables respectively.
+"parameter", and "keyed", representing HLL global, lexical, block
+parameter, and array/hash variables respectively.
 
 =cut
 

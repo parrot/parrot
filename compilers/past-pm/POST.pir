@@ -227,6 +227,8 @@ for compiling programs in Parrot.
     .local pmc code
     code = new 'PGE::CodeString'
     code.'emit'("\n.sub '%0' %1", name, outer)
+    $P0 = self.'paramcode'()
+    code .= $P0
     .local pmc iter, cpost
     iter = self.'iterator'()
   iter_loop:
@@ -253,6 +255,33 @@ for compiling programs in Parrot.
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .return self.'attr'('outer', value, has_value)
+.end
+
+
+.sub 'paramcode' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('paramcode', value, has_value)
+.end
+
+
+.sub 'push_param' :method
+    .param string regtype
+    .param string pname
+    .param string flags        :optional
+    .param int has_flags       :opt_flag
+
+    .local pmc paramcode
+    paramcode = self.'paramcode'()
+    if paramcode goto add_param
+    paramcode = new 'PGE::CodeString'
+    self.'paramcode'(paramcode)
+  add_param:
+    if has_flags goto have_flags
+    flags = ''
+  have_flags:
+    paramcode.'emit'('    .param %0 %1    %2', regtype, pname, flags)
+    .return ()
 .end
 
 

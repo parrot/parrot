@@ -10,11 +10,11 @@ transform post (PAST::Block) :language('PIR') {
     name = node.unique('_block')
   with_name:
     .local pmc outerpost
-    outerpost = get_hll_global ['POST'], '$?BLOCK'
+    outerpost = get_hll_global ['POST'], '$?SUB'
     .local pmc post
     post = new 'POST::Sub'
     post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost)
-    set_hll_global ['POST'], '$?BLOCK', post
+    set_hll_global ['POST'], '$?SUB', post
     .local pmc iter
     iter = node.'iterator'()
     unless iter goto iter_end
@@ -26,7 +26,7 @@ transform post (PAST::Block) :language('PIR') {
     if iter goto iter_loop
     post.'result'(cpost)
   iter_end:
-    set_hll_global ['POST'], '$?BLOCK', outerpost
+    set_hll_global ['POST'], '$?SUB', outerpost
 
     $S0 = node.'blocktype'()
     if $S0 != 'immediate' goto end
@@ -385,6 +385,7 @@ transform post (PAST::Var) :language('PIR') {
     name = node.'name'()
     name = node.'escape'(name)
     if scope == 'lexical' goto lexical
+    if scope == 'parameter' goto parameter
 
   package:
     if bindvalue goto package_bind
@@ -457,6 +458,18 @@ transform post (PAST::Var) :language('PIR') {
   keyed_bind:
     post.'push_pirop'('set', key, bindvalue)
     post.'push_pirop'('set', post, key)
+    .return (post)
+
+  parameter:
+    post = new 'POST::Op'
+    post.'pirop'('.lex')
+    .local string pname
+    pname = post.'unique'('param_')
+    post.'arglist'(name, pname)
+    post.'result'(pname)
+    .local pmc subpost
+    subpost = get_hll_global ['POST'], '$?SUB'
+    subpost.'push_param'('pmc', pname)
     .return (post)
 
   check_vivify:
