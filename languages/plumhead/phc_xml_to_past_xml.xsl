@@ -119,8 +119,17 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
 </xsl:template>
 
 <xsl:template match="phc:AST_variable" >
-  <past:Var >
+  <past:Var>
     <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
+  </past:Var>
+</xsl:template>
+
+<xsl:template match="phc:AST_variable[phc:AST_expr_list]" >
+  <past:Var>
+    <past:Var>
+      <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
+    </past:Var>
+    <xsl:apply-templates select="phc:AST_expr_list/phc:Token_string" />
   </past:Var>
 </xsl:template>
 
