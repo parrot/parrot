@@ -36,6 +36,9 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
     bool1 = isa pmc1, 'base_lua'
     print bool1
     print "\n"
+    bool1 = isa pmc1, 'LuaBase'
+    print bool1
+    print "\n"
     bool1 = isa pmc1, 'table'
     print bool1
     print "\n"
@@ -43,6 +46,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .end
 CODE
 0
+1
 1
 1
 OUTPUT

@@ -86,7 +86,7 @@ Handle arguments from command line.
 
 Try to use Parse::RecDescent (the original Lua uses a LL parser).
 
-=head1 Lua PMC
+=head1 Lua Types
 
 There are eight basic types in Lua, each of them is implemented by a PMC,
 or by a PIR class.
@@ -113,7 +113,8 @@ Currently, C<file> in I/O library is an C<userdata>.
 =item * thread F<languages/lua/type/thread.pir>
 
 This type is used to implement coroutines.
-The current implementation use the library Parrot::Coroutine.
+The current implementation use the library
+F<runtime/parrot/library/Parrot/Coroutine.pir>.
 
 =item * table F<languages/lua/type/table.pir>
 
@@ -121,11 +122,11 @@ This type is I<the> data structure of the language.
 
 =back
 
-F<languages/lua/type/base_lua.pir> provides an abstract base class for 
-Lua types (table, userdata, thread).
-
 F<languages/lua/pmc/luabase.pmc> provides an abstract base class for all 
 Lua types.
+
+F<languages/lua/type/base_lua.pir> provides an abstract base class for 
+Lua types implemented in PIR (table, userdata, thread).
 
 F<languages/lua/pmc/lua.pmc> is a singleton PMC what holds some static methods.
 

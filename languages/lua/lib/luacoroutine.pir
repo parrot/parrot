@@ -78,8 +78,8 @@ Returns this new coroutine, an object with type C<"thread">.
     if $I0 goto L1
     argerror('Lua function expected')
 L1:
-    find_type $I0, 'thread'
-    ret = new $I0, f
+    ret = new 'thread'
+    ret.'init_pmc'(f)
     .return (ret)
 .end
 

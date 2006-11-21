@@ -7,7 +7,8 @@ lib/base.pir - Lua abstract base class
 
 =head1 DESCRIPTION
 
-C<base_lua> provides an abstract base class for some Lua types.
+C<base_lua> extends C<LuaBase> to provide an abstract base class for some 
+Lua types implemented in PIR.
 
 =head2 Functions
 

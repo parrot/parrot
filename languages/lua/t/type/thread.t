@@ -34,7 +34,10 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
     .local pmc pmc1
     pmc1 = new $I0, F1 
     .local int bool1
-    bool1 = isa pmc1, 'Parrot::Coroutine'
+    bool1 = isa pmc1, 'scalar'
+    print bool1
+    print "\n"
+    bool1 = isa pmc1, 'LuaBase'
     print bool1
     print "\n"
     bool1 = isa pmc1, 'base_lua'
@@ -50,6 +53,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
     end
 .end
 CODE
+0
 1
 1
 1

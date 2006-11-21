@@ -7,8 +7,9 @@ lib/thread.pir - Lua Thread
 
 =head1 DESCRIPTION
 
-C<thread> extends C<Parrot::Coroutine> and C<base_lua> to provide a class 
-with the behaviour of the Lua C<Thread> type.
+C<thread> extends C<base_lua> to provide a class with the behaviour of 
+the Lua C<Thread> type. 
+This implementation is based on C<Parrot::Coroutine>.
 
 =cut
 
@@ -17,43 +18,17 @@ with the behaviour of the Lua C<Thread> type.
 .sub 'init_thread' :load :anon
     load_bytecode 'Parrot/Coroutine.pbc'
     load_bytecode 'languages/lua/type/base_lua.pir'
-    $P0 = subclass 'Parrot::Coroutine', 'thread'
-    $P1 = getclass 'base_lua'
-    addparent $P0, $P1
+    $P0 = subclass 'base_lua', 'thread'
+    addattribute $P0, 'co'
 .end
 
 .namespace [ 'thread' ]
 
-.sub '__get_bool' :method
-    $I0 = 1
-    .return ($I0)
-.end
-
-.sub '__logical_not' :method
-    .param pmc dummy
-    .local pmc ret
-    $I0 = isfalse self
-    new ret, .LuaBoolean
-    set ret, $I0
-    .return (ret)
-.end
-
-.sub '__get_pmc_keyed' :method
-    .param pmc key
-    ex_index()
-.end
-
-.sub '__set_pmc_keyed' :method
-    .param pmc key
-    .param pmc value
-    ex_index()
-.end
-
-.sub 'ex_index' :anon
-    .local pmc ex
-    ex = new .Exception
-    ex['_message'] = "attempt to index a thread value"
-    throw ex
+.sub 'init_pmc' :method :vtable
+    .param pmc f
+    $I0 = find_type 'Parrot::Coroutine'
+    $P0 = new $I0, f
+    setattribute self, 'co', $P0 
 .end
 
 .sub '__is_equal' :method :multi(thread, thread)
@@ -65,6 +40,20 @@ with the behaviour of the Lua C<Thread> type.
     $I0 = 1
 L1:
     .return ($I0)
+.end
+
+.sub 'resume' :method
+    .param pmc argv :slurpy
+    $P0 = getattribute self, 'co'
+    ($P1 :slurpy) = $P0.'resume'(argv :flat)
+    .return ($P1 :flat)
+.end
+
+.sub 'yield' :method
+    .param pmc argv :slurpy
+    $P0 = getattribute self, 'co'
+    ($P1 :slurpy) = $P0.'yield'(argv :flat)
+    .return ($P1 :flat)
 .end
 
 =head1 AUTHORS
