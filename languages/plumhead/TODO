@@ -10,9 +10,9 @@ TODO:
   - Start a builtins library
   - Call 'php' from plumhead.pir, make testing more simple
   - Support for floating point numbers
-  - Relational operators, decode base64 encoded op names 
 
 DONE:
+  - Relational operators, decode base64 encoded op names 
   - if { ... } else { .. }
   - Migrate to Patrick Michauds PAST
   - Rewrite plumhead.pl in PIR

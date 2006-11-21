@@ -24,11 +24,14 @@ use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 use Parrot::Config (); 
 use Parrot::Test;
-use Test::More     tests => 1;
+use Test::More     tests => 12;
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'less than' );
+# True tests
+my $expected = "Condition is true.\n";
+
+language_output_is( 'Plumhead', <<'END_CODE', $expected, 'less than' );
 <?php
-if ( 1 > 2 )
+if ( 1 < 2 )
 {
 ?>
 Condition is true.
@@ -42,5 +45,203 @@ Condition is false.
 }
 ?>
 END_CODE
+
+
+language_output_is( 'Plumhead', <<'END_CODE', $expected, 'less equal' );
+<?php
+if ( 1 <= 1 )
+{
+?>
+Condition is true.
+<?php
+}
+else
+{
+?>
 Condition is false.
-END_EXPECTED
+<?php
+}
+?>
+END_CODE
+
+
+language_output_is( 'Plumhead', <<'END_CODE', $expected, 'equal' );
+<?php
+if ( 1 == 1 )
+{
+?>
+Condition is true.
+<?php
+}
+else
+{
+?>
+Condition is false.
+<?php
+}
+?>
+END_CODE
+
+
+language_output_is( 'Plumhead', <<'END_CODE', $expected, 'greater equal' );
+<?php
+if ( 1 >= 1 )
+{
+?>
+Condition is true.
+<?php
+}
+else
+{
+?>
+Condition is false.
+<?php
+}
+?>
+END_CODE
+
+
+language_output_is( 'Plumhead', <<'END_CODE', $expected, 'greater than' );
+<?php
+if ( 2 > 1 )
+{
+?>
+Condition is true.
+<?php
+}
+else
+{
+?>
+Condition is false.
+<?php
+}
+?>
+END_CODE
+
+
+language_output_is( 'Plumhead', <<'END_CODE', $expected, 'unequal' );
+<?php
+if ( 1 != 2 )
+{
+?>
+Condition is true.
+<?php
+}
+else
+{
+?>
+Condition is false.
+<?php
+}
+?>
+END_CODE
+
+$expected = "Condition is false.\n";
+
+language_output_is( 'Plumhead', <<'END_CODE', $expected, 'not less than' );
+<?php
+if ( 2 < 1 )
+{
+?>
+Condition is true.
+<?php
+}
+else
+{
+?>
+Condition is false.
+<?php
+}
+?>
+END_CODE
+
+
+language_output_is( 'Plumhead', <<'END_CODE', $expected, 'not less equal' );
+<?php
+if ( 2 <= 1 )
+{
+?>
+Condition is true.
+<?php
+}
+else
+{
+?>
+Condition is false.
+<?php
+}
+?>
+END_CODE
+
+
+language_output_is( 'Plumhead', <<'END_CODE', $expected, 'not equal' );
+<?php
+if ( 1 == 2 )
+{
+?>
+Condition is true.
+<?php
+}
+else
+{
+?>
+Condition is false.
+<?php
+}
+?>
+END_CODE
+
+
+language_output_is( 'Plumhead', <<'END_CODE', $expected, 'not greater equal' );
+<?php
+if ( 1 >= 2 )
+{
+?>
+Condition is true.
+<?php
+}
+else
+{
+?>
+Condition is false.
+<?php
+}
+?>
+END_CODE
+
+
+language_output_is( 'Plumhead', <<'END_CODE', $expected, 'not greater than' );
+<?php
+if ( 2 > 2 )
+{
+?>
+Condition is true.
+<?php
+}
+else
+{
+?>
+Condition is false.
+<?php
+}
+?>
+END_CODE
+
+
+language_output_is( 'Plumhead', <<'END_CODE', $expected, 'not unequal' );
+<?php
+if ( 1 != 1 )
+{
+?>
+Condition is true.
+<?php
+}
+else
+{
+?>
+Condition is false.
+<?php
+}
+?>
+END_CODE
+

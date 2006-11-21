@@ -85,9 +85,15 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
       <xsl:choose>
         <xsl:when test="phc:Token_op/phc:value/@encoding = 'base64'" >
           <xsl:choose>
+            <xsl:when test="phc:Token_op/phc:value = 'PA=='" >infix:&lt;</xsl:when>
+            <xsl:when test="phc:Token_op/phc:value = 'PD0='" >infix:&lt;=</xsl:when>
+            <xsl:when test="phc:Token_op/phc:value = 'Pj0='" >infix:&gt;=</xsl:when>
             <xsl:when test="phc:Token_op/phc:value = 'Pg=='" >infix:&gt;</xsl:when>
           </xsl:choose>
         </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat('infix:', phc:Token_op/phc:value)" />
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
 

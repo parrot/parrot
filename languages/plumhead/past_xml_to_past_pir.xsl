@@ -43,11 +43,55 @@ a Patrick Michaud PAST and runs the PAST.
     .return ($N0)
 .end
 
-.sub 'infix:>'
+
+.sub 'infix:&lt;'
+    .param pmc a
+    .param pmc b
+    $I0 = cmp_num a, b
+    $I0 = islt $I0, 0
+    .return ($I0)
+.end
+
+
+.sub 'infix:&lt;='
+    .param pmc a
+    .param pmc b
+    $I0 = cmp_num a, b
+    $I0 = isle $I0, 0
+    .return ($I0)
+.end
+
+.sub 'infix:=='
+    .param pmc a
+    .param pmc b
+    $I0 = cmp_num a, b
+    $I0 = iseq $I0, 0
+    .return ($I0)
+.end
+
+.sub 'infix:&gt;='
+    .param pmc a
+    .param pmc b
+    $I0 = cmp_num a, b
+    $I0 = isge $I0, 0
+    .return ($I0)
+.end
+
+
+.sub 'infix:&gt;'
     .param pmc a
     .param pmc b
     $I0 = cmp_num a, b
     $I0 = isgt $I0, 0
+    .return ($I0)
+.end
+
+
+.sub 'infix:!='
+    .param pmc a
+    .param pmc b
+    $I0 = cmp_num a, b
+    $I0 = isne $I0, 0
     .return ($I0)
 .end
 
