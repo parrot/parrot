@@ -15,8 +15,7 @@ use __stringToList.
   $I0 = typeof value
   if $I0 == .TclList goto done
 
-  $S0 = value
-  .return __stringToList($S0)
+  .return __stringToList(value)
 
 done:
   .return(value)
@@ -37,9 +36,8 @@ use __stringToDict.
   $I0 = typeof value
   if $I0 == .TclDict goto done
   if $I0 == .TclList goto listy
-
-  $S0 = value
-  .return __stringToDict($S0)
+  
+  .return __stringToDict(value)
 
 listy:
   .return __listToDict(value)

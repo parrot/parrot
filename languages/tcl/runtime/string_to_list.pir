@@ -170,12 +170,14 @@ done:
 
   .local int sizeof_list
   sizeof_list = elements list
+  
+  $I0 = mod sizeof_list, 2
+  if $I0 == 1 goto odd_args
 
   .local pmc result
   result = new .TclDict 
 
-  .local pmc pos
-  pos = new .Integer
+  .local int pos
   pos = 0
   
 loop:
@@ -183,10 +185,10 @@ loop:
   $S1 = list[pos]
   inc pos
   $P2 = list[pos]
-  $P2 = clone $P2
   inc pos
   $S0 = typeof $P2
-  if $S0 == 'TclConst' goto is_string
+  if $S0 == 'TclConst'  goto is_string
+  if $S0 == 'TclString' goto is_string
   $P2 = __listToDict($P2)
 is_string:
   result[$S1] = $P2
@@ -195,6 +197,8 @@ is_string:
 done:
   .return (result)
 
+odd_args:
+  tcl_error 'missing value to go with key'
 .end
 
 .sub __stringToDict

@@ -230,6 +230,42 @@ nothing:
 
 .end
 
+.sub 'replace'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc < 1  goto bad_args
+  if argc == 2 goto bad_args
+
+  .local pmc dictionary
+  dictionary = shift argv
+  dictionary = __dict(dictionary)
+  dictionary = clone dictionary
+ 
+  if argc < 0 goto loop_done
+  $I0 = mod argc, 2
+  if $I0 == 0 goto odd_args # we shifted the dict off, above...
+
+  .local pmc key, value
+loop:
+  argc = elements argv
+  unless argc goto loop_done
+  key   = shift argv 
+  value = shift argv
+  dictionary[key] = value
+  goto loop
+
+loop_done:
+  .return (dictionary)
+
+odd_args:
+  tcl_error "missing value to go with key"
+
+bad_args:
+  tcl_error 'wrong # args: should be "dict replace dictionary ?key value ...?"'
+.end
+
 .sub 'size'
   .param pmc argv
 
