@@ -357,3 +357,49 @@ bad_args:
   tcl_error 'wrong # args: should be "dict size dictionary"'
 
 .end
+
+.sub 'values'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc < 1 goto bad_args
+  if argc > 2 goto bad_args
+
+  .local pmc dictionary
+  dictionary = shift argv
+  dictionary = __dict(dictionary)
+
+  .local string pattern
+  pattern = '*'
+  if argc == 1 goto got_pattern
+  pattern = shift argv
+
+got_pattern:
+  .local pmc globber
+  globber = compreg 'PGE::Glob'
+
+  .local pmc rule, match
+  rule = globber.'compile'(pattern)
+ 
+  .local pmc iterator
+  iterator = new .Iterator, dictionary
+
+  .local pmc results, key, value
+  results = new .TclList
+loop:
+  unless iterator goto loop_done
+  key = shift iterator
+  value = dictionary[key]
+  match = rule(value)
+  unless match goto loop
+  push results, value 
+  goto loop
+
+loop_done:
+  .return (results)
+
+bad_args:
+  tcl_error 'wrong # args: should be "dict values dictionary ?pattern?"'
+.end
+
