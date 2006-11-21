@@ -67,6 +67,7 @@ sub new
             $self->new_item('Specifies the files to leave out of MANIFEST.', 'MANIFEST.SKIP'),
         ),
         $self->new_group('History', '',
+            $self->new_item('The Parrot history records', 'docs/parrothist.pod'),
             $self->new_item('Provide a timeline of changes made to the project.', 'ChangeLog'),
             $self->new_item('Documents incompatible changes to Parrot that invalidate existing bytecode files. This is the new experimental alternative to the fingerprint produced by tools/build/fingerprint_c.pl.', 'PBC_COMPAT'),
         ),
