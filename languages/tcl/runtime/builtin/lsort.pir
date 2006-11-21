@@ -170,8 +170,8 @@ done:
 .end
 
 .sub 'ascii'
-  .param pmc s1
-  .param pmc s2
+  .param string s1
+  .param string s2
   .param int is_decr
   if is_decr goto decreasing
   $I0 = cmp_str s1, s2

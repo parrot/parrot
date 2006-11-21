@@ -141,10 +141,9 @@ found_close_bracket:
   $S0 = substr str, pos, $I0
   pos += $I0
   pos += 1
-  
-  $I0 = find_type 'TclString'
-  $P0 = new $I0
-  $P0 = $S0
+
+  # Now process this as a list
+  $P0 = __stringToList($S0)
   push retval, $P0
   
   goto eat_space
@@ -183,6 +182,7 @@ loop:
   $S1 = list[pos]
   inc pos
   $S2= list[pos]
+is_string:
   inc pos
   result[$S1] = $S2
   goto loop
