@@ -45,6 +45,13 @@ L1:
 .sub 'resume' :method
     .param pmc argv :slurpy
     $P0 = getattribute self, 'co'
+    $P1 = getattribute $P0, 'state'
+    if $P1 goto L1
+    .local pmc ex
+    ex = new .Exception
+    ex['_message'] = "cannot resume dead coroutine"
+    throw ex
+L1:
     ($P1 :slurpy) = $P0.'resume'(argv :flat)
     .return ($P1 :flat)
 .end

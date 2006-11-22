@@ -61,6 +61,9 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
     $P1 = 'yield'
     _coroutine[$P1] = _coroutine_yield
 
+    $P0 = new .ResizablePMCArray
+    global '_COROUTINE_STACK' = $P0
+
 .end
 
 =item C<coroutine.create (f)>
@@ -103,8 +106,11 @@ C<resume> returns B<false> plus the error message.
     .param pmc argv :slurpy
     .local pmc ret
     .local pmc status
+    .local pmc co_stack
+    co_stack = global '_COROUTINE_STACK'
     new status, .LuaBoolean
     checktype(co, 'thread')
+    push co_stack, co
     push_eh _handler
     (ret :slurpy) = co.'resume'(argv :flat)
     status = 1
@@ -117,6 +123,7 @@ _handler:
     status = 0
     new msg, .LuaString
     msg = s
+    $P0 = pop co_stack
     .return (status, msg)
 .end
 
@@ -125,12 +132,21 @@ _handler:
 
 Returns the running coroutine, or B<nil> when called by the main thread.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub '_coroutine_running' :anon
-    not_implemented()
+    .local pmc co_stack
+    .local pmc ret
+    co_stack = global '_COROUTINE_STACK'
+    $I0 = elements co_stack
+    if $I0 goto L1
+    new ret, .LuaNil
+    goto L2
+L1:
+    ret = pop co_stack
+    push co_stack, ret 
+L2:    
+    .return (ret)
 .end
 
 
@@ -143,7 +159,7 @@ yet; C<"normal"> if the coroutine is active but not running (that is, it has
 resumed another coroutine); and C<"dead"> if the coroutine has finished its
 body function, or if it has stopped with an error.
 
-DUMMY IMPLEMENTATION.
+STILL INCOMPLETE.
 
 =cut
 
@@ -152,7 +168,14 @@ DUMMY IMPLEMENTATION.
     .local pmc ret
     checktype(co, 'thread')
     new ret, .LuaString
+    $P0 = getattribute co, 'co'
+    $P1 = getattribute $P0, 'state'
+    if $P1 goto L1
+    ret = 'dead'
+    goto L2
+L1:
     ret = 'suspended'
+L2:
     .return (ret)
 .end
 
@@ -186,7 +209,10 @@ Any arguments to C<yield> are passed as extra results to C<resume>.
 .sub '_coroutine_yield' :anon
     .param pmc argv :slurpy
     .local pmc ret
-    .local pmc co   # current coroutine ?
+    .local pmc co
+    .local pmc co_stack
+    co_stack = global '_COROUTINE_STACK'
+    co = pop co_stack 
     (ret :slurpy) = co.'yield'(argv :flat)
     .return (ret :flat)
 .end

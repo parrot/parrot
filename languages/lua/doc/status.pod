@@ -179,8 +179,6 @@ F<languages/lua/lib/luaaux.pir> is the equivalent of Auxiliary Library.
 
 Except math library, all of these libraries are incomplete.
 
-And the coroutine library does not work.
-
 =head1 Next Milestones
 
 Understand how work PGE & TGE and write an interpreter in PIR.

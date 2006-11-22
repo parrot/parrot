@@ -26,9 +26,6 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 8;
 use Test::More;
 
-TODO: {
-local $TODO = 'coroutine';
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'foo1' );
 function foo1 (a)
     print("foo", a)
@@ -62,7 +59,6 @@ co-body	x	y
 main	true	10	end
 main	false	cannot resume dead coroutine
 OUT
-}
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function ()
@@ -73,10 +69,6 @@ print(co)
 CODE
 /thread: [0-9A-Fa-f]{8}/
 OUT
-
-
-TODO: {
-local $TODO = 'coroutine';
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function ()
@@ -91,7 +83,6 @@ suspended
 hi
 dead
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function ()
@@ -128,7 +119,6 @@ co	9
 co	10
 false	cannot resume dead coroutine
 OUT
-}
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function (a,b,c)
@@ -140,10 +130,6 @@ CODE
 co	1	2	3
 OUT
 
-
-TODO: {
-local $TODO = 'coroutine';
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function (a,b)
         coroutine.yield(a + b, a - b)
@@ -153,7 +139,6 @@ print(coroutine.resume(co, 20, 10))
 CODE
 true	30	10
 OUT
-
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function ()
@@ -165,7 +150,6 @@ coroutine.resume(co, 4, 5)
 CODE
 co	4	5
 OUT
-}
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );
 co = coroutine.create(function ()
