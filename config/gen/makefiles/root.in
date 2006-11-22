@@ -241,7 +241,6 @@ GEN_CONFIGS = \
     CFLAGS \
     $(IMCC_DIR)/CFLAGS \
     config_lib.pasm \
-    compilers/ast/ast.y.flag \
     $(BUILD_TOOLS_DIR)/dynpmc.pl \
     $(BUILD_TOOLS_DIR)/dynoplibs.pl \
     parrot.pc \
