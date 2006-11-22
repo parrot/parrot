@@ -1,15 +1,7 @@
-=head1 HISTORY
-
-This was originally written as a perl5 script. Rather than doing bootstrapping,
-I foolishly decided it would be fun to write the parser IN parrot assembly,
-esp. as this would help implementing "eval" and "proc" (Of course, in
-retrospect, I really wish I had kept with the bootstrapping effort, as I think
-it would have generated usable results sooner.
-
 =head1 OVERVIEW 
 
 This is a from-scratch implementation, based primarily on the tcl man page(s),
-and the cvs-current test suite for tcl.
+and the cvs-current test suite for tcl (8.5)
 
 Another interesting project would have been to modify the tcl source and 
 have it generate parrot directly. Many people smarter than I am have
@@ -51,52 +43,9 @@ command line options to be used with this bytecode file.
 
 This C<PIR> files are generated from their corresponding C<.tg> and C<.pg>
 files. These grammar files allow us to use PGE's implementation of perl6
-rules to more simply specify our parsing rules. At the moment, only the
-[expr] rules are used. This might eventually be extended to replace
-the entire parsing system used by tcl, which was originally hand-rolled
-in C<PIR>.
-
-=back
-
-=head2 Classes
-
-The classes are not user-visible, but are internal helper classes designed
-to simplify the parser/interpreter. They are written in PIR and are in
-C<src/classes>. All the helper classes provide a C<compile> method, which can
-be invoked by the top level compiler, or by a container class. For example, in
-C<TclConst>, the compilation is a very straightforward register load, while
-C<TclCommandList> compiles each of the C<TclCommand>s it contains, which in
-turn compile their arguments, and their method name, and setup an invocation
-of the PIR subroutine that corresponds to the tcl proc or builtin.
-
-=over 4
-
-=item TclCommand
-
-A class representing a Tcl command made up of a name and arguments.
-
-=item TclCommandList
-
-A list of TclCommands used to represent a body of code. This returns the value
-of the last command.
-
-=item TclConst
-
-A constant Tcl value created during parsing.
-
-=item TclVar
-
-A class representing Tcl variables.
-
-=item TclWord
-
-A TclWord handles the concatenation of arguments. For instance, given
-
-  puts ab$c
-
-the parser will generate a C<TclWord> containing an C<TclConst>==C<ab> 
-and a C<TclVar>==C<c>. When compiled, a C<TclWord> compiles each of its
-elements and concatenates the results.
+rules to more simply specify our parsing rules. We use these rules to handle
+both the general parsing for tcl itself, as well as the sub-"language"
+used by expressions in [expr] and elsewhere.
 
 =back
 
@@ -135,6 +84,13 @@ Overrides the default stringification provided by parrot Arrays.
 Hash like container, corresponding to values created with the C<[array]>
 builtin.
 
+=item TclDict
+
+Hash like container, corresponding to values created with the C<[dict]>
+builtin. Unlike arrays, dictionaries can nest, having dictionaries as
+values; Also, dictionaries act more like TclLists in terms of their
+conversion to string and back.
+
 =item TclObject
 
 A virtual type, which is used to provide some shimmer (aka morph) methods
@@ -150,26 +106,22 @@ Occasional failures are suspected against svn-head; there should be no
 failures in a released version, however.
 
 To run the tcl test suite, type C<make tcl-test>. This will checkout the latest
-cvs copy of the tests from the tcl repository and run them. Warning:
-
-=over 4
-
-=item 1 Slow
-
-There are a lot of tests, and we setup and breakdown an instance of
-parrot for *each* test we try to run.
-
-=item 2 Incomplete
-
-We convert the tests to use Perl's TAP instead of running
-them natively. The conversion process is flawed, and we don't claim to
-implement 100% of Tcl yet anyway. Expect a low pass rate.
-
-=back
+cvs copy of the tests from the tcl repository and run them.  Warning, this can
+be a little slow.
 
 =head1 EXAMPLES
 
 There are examples in the C<examples> directory that are vaguely more
 interesting. Change to that directory and type C<make> for directions.
+
+=head1 HISTORY
+
+This was originally written as a perl5 script. Rather than doing bootstrapping,
+I foolishly decided it would be fun to write the parser IN parrot assembly,
+esp. as this would help implementing "eval" and "proc" 
+
+partcl has gone through many iterations since its original beginnings,
+requiring many updates as various parts of parrot have changed, and as we
+implement features which require extensions to our framework.
 
 =cut
