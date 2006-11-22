@@ -55,14 +55,22 @@
   .local string input_line
   .local pmc STDIN
   STDIN = getstdin
-
+  .local int readlineInd
+  readlineInd = 1
+  $I0 = STDIN.'set_readline_interactive'(1)
+  if $I0 >=0  goto got_readline_status
+  readlineInd = 0
+got_readline_status:
+  
   input_line = ''
 
-  __prompt(1)
+  .local int level
+  level = 1
 input_loop:
-  $S0 = readline STDIN
+  $P0 = __prompt(level, readlineInd)
+  if null $P0 goto done
+  $S0 = $P0
   input_line .= $S0
-  unless STDIN goto done
   push_eh loop_error
     $P2 = __script(input_line)
     retval = $P2()
@@ -89,12 +97,12 @@ loop_error_real:
   #goto input_loop_continue
 
 input_loop_continue:
-  __prompt(1)
+  level = 1
   input_line = ''
   goto input_loop
 
 input_loop_continue2:
-  __prompt(2)
+  level = 2
   goto input_loop
 
 open_file: 
@@ -228,9 +236,12 @@ exit_exception:
 
 .sub __prompt
   .param int level
-  
+  .param int readlineInd 
+ 
   .local pmc STDOUT
   STDOUT = getstdout
+  .local pmc STDIN
+  STDIN = getstdin
 
   .local string default_prompt
   default_prompt = ''
@@ -247,6 +258,9 @@ got_prompt:
   .local pmc __script
   __script = get_root_global ['_tcl'], '__script'
 
+  # XXX Should trap the printed output here, and then display
+  # it using the readilne prompt, like everything else.
+  # XXX Should be testing this
   push_eh no_prompt
     $P0 = find_global varname
     $P2 = __script($P0)
@@ -254,11 +268,19 @@ got_prompt:
   clear_eh
 
   STDOUT.'flush'()
-  .return()
+  .return STDIN.'readline'('')
 
 no_prompt:
+  # XXX Why does readline() behave differently on prompting depending on
+  #     the presence of readline? Shouldn't it *always* print the prompt?
+  if readlineInd == 1 goto has_readline
   print default_prompt
   STDOUT.'flush'()
-  .return()
+has_readline:
+  $P0 = STDIN.'readline'(default_prompt)
+  if null STDIN goto got_nothing 
+  .return ($P0)
+
+got_nothing:
 .end
 
