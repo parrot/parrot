@@ -545,6 +545,33 @@ store_sub_in_namespace(Parrot_Interp interp, PMC* sub_pmc,
     }
 }
 
+/* XXX in mmd.c ? */
+STRING* Parrot_multi_long_name(Parrot_Interp interp, PMC* sub_pmc);
+
+STRING*
+Parrot_multi_long_name(Parrot_Interp interp, PMC* sub_pmc)
+{
+    PMC *multi_sig;
+    STRING* sub_name, *sig;
+    INTVAL i, n;
+
+    sub_name = PMC_sub(sub_pmc)->name;
+    multi_sig = PMC_sub(sub_pmc)->multi_signature;
+    n = VTABLE_elements(interp, multi_sig);
+    /*
+     * foo :multi(STRING, Integer) =>
+     *
+     * foo_@STRING_@Integer
+     */
+    for (i = 0; i < n; ++i) {
+        sig = VTABLE_get_string_keyed_int(interp, multi_sig, i);
+        sub_name = string_concat(interp, sub_name,
+                const_string(interp, "_@"), 0);
+        sub_name = string_concat(interp, sub_name, sig, 0);
+    }
+    return sub_name;
+}
+
 static void
 store_named_in_namespace(Parrot_Interp interp, PMC* sub_pmc)
 {
@@ -587,6 +614,9 @@ store_named_in_namespace(Parrot_Interp interp, PMC* sub_pmc)
         }
         else
             VTABLE_push_pmc(interp, multi_sub, sub_pmc);
+
+        long_name = Parrot_multi_long_name(interp, sub_pmc);
+        store_sub_in_namespace(interp, sub_pmc, namespace, long_name);
 
         c_meth = string_to_cstring(interp, sub_name);
         if ( (func_nr = Parrot_MMD_method_idx(interp, c_meth))  >= 0) {
