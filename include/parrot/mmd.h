@@ -76,8 +76,6 @@ PARROT_API PMC *Parrot_MMD_dispatch_func(Interp *, PMC *multi, STRING *meth);
 PARROT_API PMC *Parrot_MMD_search_default_infix(Interp *, STRING *meth,
         INTVAL left_type, INTVAL right_type);
 
-PARROT_API int Parrot_run_maybe_mmd_meth(Interp*, PMC *object, STRING *meth);
-PARROT_API int Parrot_run_maybe_mmd_func(Interp*, STRING *meth);
 /*
  * in src/objects.c :
  */
