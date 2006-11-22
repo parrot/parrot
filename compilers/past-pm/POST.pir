@@ -37,8 +37,8 @@ for compiling programs in Parrot.
     pirtable['abs'] = '%t'
     pirtable['say'] = '%v'
     pirtable['set'] = '%rP'
-    pirtable['call'] = '%r****************'                # FIXME: 
-    pirtable['callmethod'] = '%rP***************'          # FIXME:
+    pirtable['call'] = '%rPPPPPPPPPPPPPPPP'                # FIXME:
+    pirtable['callmethod'] = '%rPPPPPPPPPPPPPPPP'          # FIXME:
     set_hll_global ['POST'], '%pirtable', pirtable
     .return ()
 .end
@@ -208,83 +208,6 @@ for compiling programs in Parrot.
 .end
 
 
-.namespace [ 'POST::Sub' ]
-
-.sub 'pir' :method
-    .local string name
-    name = self.'name'()
-    .local pmc outerpost
-    .local string outer
-    outer = ''
-    outerpost = self.'outer'()
-    if null outerpost goto have_outer
-    unless outerpost goto have_outer
-    outer = outerpost.'name'()
-    outer = outerpost.'escape'(outer)
-    outer = concat ':outer(', outer
-    outer = concat outer, ')'
-  have_outer:
-    .local pmc code
-    code = new 'PGE::CodeString'
-    code.'emit'("\n.sub '%0' %1", name, outer)
-    $P0 = self.'paramcode'()
-    code .= $P0
-    .local pmc iter, cpost
-    iter = self.'iterator'()
-  iter_loop:
-    unless iter goto iter_end
-    cpost = shift iter
-    $P1 = cpost.'pir'()
-    code .= $P1
-    goto iter_loop
-  iter_end:
-    .local string value
-    value = self.'result'()
-    code.'emit'("    .return (%0)\n.end\n", value)
-    $P0 = get_hll_global ['POST'], '$!subpir'
-    code .= $P0
-    set_hll_global ['POST'], '$!subpir', code
-
-    code = new 'PGE::CodeString'
-    code.'emit'("    %0 = find_name '%1'", value, name)
-    .return (code)
-.end
-
-
-.sub 'outer' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('outer', value, has_value)
-.end
-
-
-.sub 'paramcode' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('paramcode', value, has_value)
-.end
-
-
-.sub 'push_param' :method
-    .param string regtype
-    .param string pname
-    .param string flags        :optional
-    .param int has_flags       :opt_flag
-
-    .local pmc paramcode
-    paramcode = self.'paramcode'()
-    if paramcode goto add_param
-    paramcode = new 'PGE::CodeString'
-    self.'paramcode'(paramcode)
-  add_param:
-    if has_flags goto have_flags
-    flags = ''
-  have_flags:
-    paramcode.'emit'('    .param %0 %1    %2', regtype, pname, flags)
-    .return ()
-.end
-
-
 .namespace [ 'POST::Label' ]
 
 .sub 'result' :method
@@ -312,3 +235,132 @@ for compiling programs in Parrot.
     code .= ":\n"
     .return (code)
 .end
+
+
+.namespace [ 'POST::Sub' ]
+
+.sub 'pir' :method
+    $S0 = self.'compiler'()
+    unless $S0 goto post_pir
+    .return self.'hll_pir'()
+  post_pir:
+    .local string name
+    name = self.'name'()
+    name = self.'escape'(name)
+    .local pmc outerpost
+    .local string outer
+    outer = ''
+    outerpost = self.'outer'()
+    if null outerpost goto have_outer
+    unless outerpost goto have_outer
+    outer = outerpost.'name'()
+    outer = outerpost.'escape'(outer)
+    outer = concat ':outer(', outer
+    outer = concat outer, ')'
+  have_outer:
+    .local pmc code
+    code = new 'PGE::CodeString'
+    code.'emit'("\n.sub %0 %1", name, outer)
+    $P0 = self.'paramcode'()
+    code .= $P0
+    .local pmc iter, cpost
+    iter = self.'iterator'()
+  iter_loop:
+    unless iter goto iter_end
+    cpost = shift iter
+    $P1 = cpost.'pir'()
+    code .= $P1
+    goto iter_loop
+  iter_end:
+    .local string value
+    value = self.'result'()
+    code.'emit'("    .return (%0)\n.end\n", value)
+    $P0 = get_hll_global ['POST'], '$!subpir'
+    code .= $P0
+    set_hll_global ['POST'], '$!subpir', code
+
+    code = new 'PGE::CodeString'
+    code.'emit'("    %0 = find_name %1", value, name)
+    .return (code)
+.end
+
+
+.sub 'hll_pir' :method
+    .local string compname, name
+    compname = self.'compiler'()
+    name = self.'name'()
+    .local pmc adverbs
+    adverbs = new .Hash
+    adverbs['target'] = 'pir'
+    adverbs['name'] = name
+    adverbs['grammar'] = ''
+    .local pmc outerpost
+    outerpost = self.'outer'()
+    unless outerpost goto have_outer
+    $S0 = outerpost.'name'()
+    adverbs['outer'] = $S0
+  have_outer:
+    .local pmc sourcecode, compiler, pircode
+    sourcecode = self[0]
+    compiler = compreg compname
+    $I0 = isa compiler, 'Sub'
+    if $I0 goto compile_sub
+    pircode = compiler.'compile'(sourcecode, adverbs :flat :named)
+    goto have_pircode
+  compile_sub:
+    pircode = compiler(sourcecode, adverbs :flat :named)
+  have_pircode:
+    $P0 = get_hll_global ['POST'], '$!subpir'
+    pircode .= $P0
+    set_hll_global ['POST'], '$!subpir', pircode
+    .local string result
+    result = self.'result'()
+    name = self.'escape'(name)
+    .local pmc code
+    code = new 'PGE::CodeString'
+    code.'emit'("    %0 = find_name %1", result, name)
+    .return (code)
+.end
+
+
+.sub 'outer' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('outer', value, has_value)
+.end
+
+
+.sub 'paramcode' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('paramcode', value, has_value)
+.end
+
+
+.sub 'compiler' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('compiler', value, has_value)
+.end
+
+
+.sub 'push_param' :method
+    .param string regtype
+    .param string pname
+    .param string flags        :optional
+    .param int has_flags       :opt_flag
+
+    .local pmc paramcode
+    paramcode = self.'paramcode'()
+    if paramcode goto add_param
+    paramcode = new 'PGE::CodeString'
+    self.'paramcode'(paramcode)
+  add_param:
+    if has_flags goto have_flags
+    flags = ''
+  have_flags:
+    paramcode.'emit'('    .param %0 %1    %2', regtype, pname, flags)
+    .return ()
+.end
+
+

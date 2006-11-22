@@ -636,9 +636,6 @@ and other similar statements).
 Get/set the symbol table for the block.  In the current implementation,
 the data structure for the symbol table is left entirely up to the
 caller; PAST doesn't use C<symtable> for any code generation.
-However, upon encountering a new nested C<PAST::Block> node, the
-new node is given a copy (clone) of its outer block's C<symtable>
-attribute.
 
 =cut
 
@@ -646,6 +643,21 @@ attribute.
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .return self.'attr'('symtable', value, has_value)
+.end
+
+
+=item compiler([name])
+
+Indicate that the children nodes of this block are to be 
+compiled using compiler C<name> instead of the standard 
+PAST compiler.
+
+=cut
+
+.sub 'compiler' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('compiler', value, has_value)
 .end
 
 

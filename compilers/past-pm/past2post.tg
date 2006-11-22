@@ -4,7 +4,7 @@ transform root (PAST::Block) :language('PIR') {
 
 
 transform post (PAST::Block) :language('PIR') {
-    .local pmc name
+    .local string name
     name = node.'name'()
     if name != '' goto with_name
     name = node.unique('_block')
@@ -15,6 +15,10 @@ transform post (PAST::Block) :language('PIR') {
     post = new 'POST::Sub'
     post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost)
     set_hll_global ['POST'], '$?SUB', post
+    .local string compiler
+    compiler = node.'compiler'()
+    if compiler goto hll_block
+  past_block:
     .local pmc iter
     iter = node.'iterator'()
     unless iter goto iter_end
@@ -26,12 +30,23 @@ transform post (PAST::Block) :language('PIR') {
     if iter goto iter_loop
     post.'result'(cpost)
   iter_end:
-    set_hll_global ['POST'], '$?SUB', outerpost
+    goto end
 
-    $S0 = node.'blocktype'()
-    if $S0 != 'immediate' goto end
-    post = post.'new'('POST::Op', post, 'node'=>node, 'pirop'=>'call', 'arglist'=>post)
+  hll_block:
+    post.'compiler'(compiler)
+    iter = node.'iterator'()
+  hll_loop:
+    unless iter goto end
+    $P0 = shift iter
+    post.'push'($P0)
+    goto hll_loop
+
   end:
+    set_hll_global ['POST'], '$?SUB', outerpost
+    $S0 = node.'blocktype'()
+    if $S0 != 'immediate' goto blocktype_end
+    post = post.'new'('POST::Op', post, 'node'=>node, 'pirop'=>'call', 'arglist'=>post)
+  blocktype_end:
     .return (post)
 }
 
@@ -406,10 +421,12 @@ transform post (PAST::Var) :language('PIR') {
     post = new 'POST::Ops'
     post.'init'('node'=>node)
     $I0 = node.'ismy'()
-    if $I0 == 0 goto lexical_1
+    if $I0 == 0 goto lexical_outer
     $P0 = post.'push_new'('POST::Op', 'pirop'=>'.lex')
+    if bindvalue goto lexical_my_bind
     $P0.'arglist'(name, $P0)
-  lexical_1:
+    goto check_vivify
+  lexical_outer:
     if bindvalue goto lexical_bind
     post.'push_pirop'('find_lex', post, name)
     vivibindop = post.'new'('POST::Op', 'pirop'=>'store_lex')
@@ -418,6 +435,7 @@ transform post (PAST::Var) :language('PIR') {
 
   lexical_bind:
     $P0 = post.'push_new'('POST::Op', 'node'=>node, 'pirop'=>'store_lex', 'result'=>bindvalue)
+  lexical_my_bind:
     $P0.'arglist'(name, bindvalue)
     .return (post)
 
