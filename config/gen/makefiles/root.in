@@ -292,6 +292,7 @@ GEN_MODULES = \
     lib/Parrot/OpLib/core.pm
 
 GEN_LIBRARY = \
+    $(LIBRARY_DIR)/CGI/QueryHash.pbc \
     $(LIBRARY_DIR)/config.pbc \
     $(LIBRARY_DIR)/Data/Dumper/Base.pbc \
     $(LIBRARY_DIR)/Data/Dumper/Default.pbc \

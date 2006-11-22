@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-t/library/mime_base64.t - test MIME::Base64
+t/library/mime_base64.t - test [ 'MIME'; 'Base64' ]
 
 =head1 SYNOPSIS
 
@@ -11,13 +11,15 @@ t/library/mime_base64.t - test MIME::Base64
 
 =head1 DESCRIPTION
 
-Test MIME::Base64.
+Test [ 'MIME'; 'Base64' ]
 Test cases taken from base64.t of MIME::Base64.
 
 =cut
+
 .include "library/dumper.pir"
 
-.sub main :main
+.sub test :main
+
     load_bytecode 'Test/More.pir'
     load_bytecode 'MIME/Base64.pir'
     load_bytecode 'PGE.pbc'
@@ -30,12 +32,7 @@ Test cases taken from base64.t of MIME::Base64.
     ok   = get_hll_global ['Test::More'], 'ok'
 
     plan(550)
-######################
-# ETOOMANYERROS
-#   plan(1)
-#   ok(0, 'too many errors - skipped')
-#   end
-#######################
+
     .local pmc JSON
     JSON = compreg "JSON"
 
