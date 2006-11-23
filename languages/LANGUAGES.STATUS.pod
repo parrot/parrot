@@ -134,17 +134,22 @@ Bernhard Schmalhofer
 =item Description
 
 Based on ANTLR and Python. ANTLR is needed only for maintainance, for
-generation of Python runtime files.  A new implementation with Java
-code generated with ANTLR 3 is under construction.
+generation of Python runtime files. A new implementation with Java
+code generated with ANTLR 3 has been investigated as well.
 
 =item Status
 
-Very simple arithmetic expressions are working. Some test failures
+Very simple arithmetic expressions are working. Some test failures.
 Part of languages smoke testing.
+
+'languages/bc' is no longer activly developed. Bernhard is moving
+his ANTLR 3 experiments over to 'languages/plumhead'. When that is done,
+'languages/bc' will be removed. A shiny new PGE/TGE based implementation
+of bc can be found in 'languages/abc'.
 
 =item Last verified with parrot version
 
-0.4.5
+0.4.7
 
 =item Location
 
