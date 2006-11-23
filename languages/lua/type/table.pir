@@ -42,10 +42,11 @@ Now, Lua 5 uses a hybrid data structure with a Hash part and an Array part.
     .return ($S0)
 .end
 
-.sub '_set' :method
+.sub '_set' :anon
+    .param pmc t
     .param pmc key
     .param pmc value
-    $P0 = getattribute self, 'hash'
+    $P0 = getattribute t, 'hash'
     $S0 = _make_key(key)
     $I0 = isa value, 'LuaNil'
     unless $I0 goto L1
@@ -57,11 +58,12 @@ L1:
 L2:
 .end
 
-.sub '_get' :method
+.sub '_get' :anon
+    .param pmc t
     .param pmc key
     .local pmc ret
     null ret
-    $P0 = getattribute self, 'hash'
+    $P0 = getattribute t, 'hash'
     $S0 = _make_key(key)
     ret = $P0[$S0]
     .return (ret)
@@ -71,7 +73,7 @@ L2:
     .param pmc key
     .local pmc ret
     .local pmc value
-    value = self.'_get'(key)
+    value = _get(self, key)
     unless_null value, L1
     .local pmc meth
     meth = self.'find_metamethod'('__index')
@@ -102,7 +104,7 @@ L4:
     ex['_message'] = "table index is nil"
     throw ex
 L1:
-    $P0 = self.'_get'(key)
+    $P0 = _get(self, key)
     unless_null $P0, L2
     .local pmc meth
     meth = self.'find_metamethod'('__newindex')
@@ -115,7 +117,7 @@ L3:
     meth(self, key, value)
     goto L4
 L2:
-    self.'_set'(key, value)
+    _set(self, key, value)
 L4:
 .end
 
@@ -185,12 +187,12 @@ L1:
     new key, .LuaNumber
     idx = 1
     key = idx
-    value = self.'_get'(key)
+    value = _get(self, key)
 L3:
     if_null value, L4
     inc idx
     key = idx
-    value = self.'_get'(key)
+    value = _get(self, key)
     goto L3
 L4:
     dec idx
@@ -206,7 +208,7 @@ L4:
     .param pmc key
     .local pmc value
     .local pmc ret
-    value = self.'_get'(key)
+    value = _get(self, key)
     if_null value, L1
     ret = clone value
     .return (ret)
@@ -229,7 +231,7 @@ L1:
     ex['_message'] = "table index is nil"
     throw ex
 L1:
-    self.'_set'(key, value)
+    _set(self, key, value)
 .end
 
 =back
