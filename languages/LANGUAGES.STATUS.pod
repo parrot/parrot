@@ -869,7 +869,9 @@ Bernhard Schmalhofer
 
 =item Description
 
-A toy implementation of PHP. Playing with XSLT.
+A toy implementation of PHP. Playing with phc and XSLT.
+The grand idea is to have side by side comparison of
+phc, PGE and ANTLR3 parsing.
 
 =item Status
 
@@ -877,7 +879,7 @@ Started.
 
 =item Last verified with parrot version
 
-0.4.6
+0.4.7
 
 =item Location
 
