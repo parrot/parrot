@@ -31,7 +31,7 @@ Now, Lua 5 uses a hybrid data structure with a Hash part and an Array part.
 
 .sub 'init' :method :vtable
     new $P0, .Hash
-    setattribute self, 'hash', $P0 
+    setattribute self, 'hash', $P0
 .end
 
 .sub '_make_key' :anon
@@ -42,32 +42,54 @@ Now, Lua 5 uses a hybrid data structure with a Hash part and an Array part.
     .return ($S0)
 .end
 
-.sub 'get_pmc_keyed' :method :vtable
+.sub '_set' :method
     .param pmc key
-    .local pmc meth
-    .local pmc ret
+    .param pmc value
     $P0 = getattribute self, 'hash'
     $S0 = _make_key(key)
-    $I0 = exists $P0[$S0]
-    if $I0 goto L1
-    meth = self.'find_metamethod'('__index')
-    if_null meth, L3
-    $I0 = isa meth, 'table'
-    unless $I0 goto L4
-    ret = meth[key]
-    goto L2
-L4:
-    $P1 = meth(self, key)
-L3:
-    unless_null $P1, L5
-    new ret, .LuaNil
+    $I0 = isa value, 'LuaNil'
+    unless $I0 goto L1
+    delete $P0[$S0]
     goto L2
 L1:
-    $P1 = $P0[$S0]
-L5:
-    ret = clone $P1
+    $P1 = clone value
+    $P0[$S0] = $P1
 L2:
-    .return (ret) 
+.end
+
+.sub '_get' :method
+    .param pmc key
+    .local pmc ret
+    null ret
+    $P0 = getattribute self, 'hash'
+    $S0 = _make_key(key)
+    ret = $P0[$S0]
+    .return (ret)
+.end
+
+.sub 'get_pmc_keyed' :method :vtable
+    .param pmc key
+    .local pmc ret
+    .local pmc value
+    value = self.'_get'(key)
+    unless_null value, L1
+    .local pmc meth
+    meth = self.'find_metamethod'('__index')
+    if_null meth, L2
+    $I0 = isa meth, 'table'
+    unless $I0 goto L3
+    ret = meth[key]
+    goto L4
+L3:
+    value = meth(self, key)
+L2:
+    unless_null value, L1
+    new ret, .LuaNil
+    goto L4
+L1:
+    ret = clone value
+L4:
+    .return (ret)
 .end
 
 .sub 'set_pmc_keyed' :method :vtable
@@ -80,11 +102,9 @@ L2:
     ex['_message'] = "table index is nil"
     throw ex
 L1:
+    $P0 = self.'_get'(key)
+    unless_null $P0, L2
     .local pmc meth
-    $P0 = getattribute self, 'hash'
-    $S0 = _make_key(key)
-    $I0 = exists $P0[$S0]
-    if $I0 goto L2
     meth = self.'find_metamethod'('__newindex')
     if_null meth, L2
     $I0 = isa meth, 'table'
@@ -95,13 +115,7 @@ L3:
     meth(self, key, value)
     goto L4
 L2:
-    $I0 = isa value, 'LuaNil'
-    unless $I0 goto L5
-    delete $P0[$S0]
-    goto L4
-L5:
-    $P1 = clone value
-    $P0[$S0] = $P1
+    self.'_set'(key, value)
 L4:
 .end
 
@@ -163,7 +177,7 @@ L2:
     new ret, .LuaNil
 L2:
     .return (ret)
-L1: 
+L1:
     .local pmc key
     .local pmc value
     .local int idx
@@ -171,13 +185,12 @@ L1:
     new key, .LuaNumber
     idx = 1
     key = idx
-    value = self[key]
+    value = self.'_get'(key)
 L3:
-    $I0 = isa value, 'LuaNil'
-    if $I0 goto L4
+    if_null value, L4
     inc idx
     key = idx
-    value = self[key]
+    value = self.'_get'(key)
     goto L3
 L4:
     dec idx
@@ -191,15 +204,13 @@ L4:
 
 .sub 'rawget' :method
     .param pmc key
+    .local pmc value
     .local pmc ret
-    $P0 = getattribute self, 'hash'
-    $S0 = _make_key(key)
-    $I0 = exists $P0[$S0]
-    unless $I0 goto L1
-    $P1 = $P0[$S0]
-    ret = clone $P1
-    .return (ret) 
-L1: 
+    value = self.'_get'(key)
+    if_null value, L1
+    ret = clone value
+    .return (ret)
+L1:
     new ret, .LuaNil
     .return (ret)
 .end
@@ -218,16 +229,7 @@ L1:
     ex['_message'] = "table index is nil"
     throw ex
 L1:
-    $P0 = getattribute self, 'hash'
-    $S0 = _make_key(key)
-    $I0 = isa value, 'LuaNil'
-    unless $I0 goto L2
-    delete $P0[$S0]
-    goto L3
-L2:
-    $P1 = clone value
-    $P0[$S0] = $P1
-L3:
+    self.'_set'(key, value)
 .end
 
 =back

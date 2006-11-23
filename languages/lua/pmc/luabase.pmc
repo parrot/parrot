@@ -73,6 +73,19 @@ Returns C<true>.
 
 /*
 
+=item C<void *get_pointer()>
+
+Returns the address of the PMC.
+
+=cut
+
+*/
+    void* get_pointer () {
+        return SELF;
+    }
+
+/*
+
 =item C<PMC* get_pmc_keyed (PMC* key)>
 
 Throws an exception.
