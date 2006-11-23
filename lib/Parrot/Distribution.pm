@@ -94,7 +94,7 @@ sub c_source_file_directories
 
     return
         map $self->directory_with_name($_) =>
-            map("compilers/$_" => qw<ast bcg/src bcg/src/pmc imcc>),
+            map("compilers/$_" => qw<bcg/src bcg/src/pmc imcc>),
             'config/gen/cpu/i386',
             map("config/gen/platform/$_" =>
                 qw<aix ansi cygwin darwin generic
@@ -147,7 +147,7 @@ sub c_header_file_directories
 
     return
         map $self->directory_with_name($_) =>
-            map("compilers/$_" => qw<ast bcg/include imcc>),
+            map("compilers/$_" => qw<bcg/include imcc>),
             'config/gen/platform',
             map("config/gen/platform/$_" =>
                 qw<aix ansi cygwin darwin generic
@@ -247,7 +247,6 @@ sub yacc_source_file_directories
 
     return
         map $self->directory_with_name($_) =>
-            'compilers/ast/',
             'compilers/imcc/',
             'languages/cola/',
             'languages/lua/doc',
@@ -292,7 +291,6 @@ sub lex_source_file_directories
 
     return
         map $self->directory_with_name($_) =>
-            'compilers/ast/',
             'compilers/imcc/',
             'languages/cola/',
     ;
