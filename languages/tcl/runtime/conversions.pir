@@ -121,7 +121,7 @@ Given a PMC, get an integer from it.
   
   .local pmc integer
 
-  push_eh not_integer
+  push_eh not_integer_eh
     integer = __number(value)
   clear_eh
   $I0 = typeof integer
@@ -137,6 +137,12 @@ not_integer:
   $S0 .= $S1
   $S0 .= '"'
   tcl_error $S0
+
+not_integer_eh:
+  get_results '(0,0)', $P99, $S99
+  $I0 = index $S99, 'expected integer'
+  if $I0 == -1 goto not_integer # got some other exception, rewrap it.
+  rethrow $P99 # preserves the invalid octal message.
 .end
 
 =head2 _Tcl::__index
@@ -144,22 +150,22 @@ not_integer:
 =cut
 
 .sub __index
-  .param string index
+  .param string idx
   .param pmc    list
 
-  if index == 'end' goto end
+  if idx == 'end' goto end
 
-  $S0 = substr index, 0, 4
+  $S0 = substr idx, 0, 4
   if $S0 == 'end-' goto before_end
   if $S0 == 'end+' goto after_end
 
   push_eh bad_index
-    $I0 = __integer(index)
+    $I0 = __integer(idx)
   clear_eh
   .return($I0)
 
 before_end:
-  $S0 = substr index, 4
+  $S0 = substr idx, 4
   push_eh bad_index
     $I0 = __integer($S0)
   clear_eh
@@ -170,7 +176,7 @@ before_end:
   .return($I0)
 
 after_end:
-  $S0 = substr index, 4
+  $S0 = substr idx, 4
   push_eh bad_index
     $I0 = __integer($S0)
   clear_eh
@@ -186,9 +192,17 @@ end:
   .return($I0)
 
 bad_index:
+  get_results '(0,0)', $P99, $S99
   $S0 = 'bad index "'
-  $S0 .= index
+  $S0 .= idx
   $S0 .= '": must be integer?[+-]integer? or end?[+-]integer?'
+  $S1 = ' (looks like invalid octal number)'
+  $I0 = index $S99, $S1
+  if $I0 == -1 goto bad_index_done
+  $I0 = index idx, '--'
+  if $I0 != -1 goto bad_index_done # don't squawk on negative indices..
+  $S0 .= $S1
+bad_index_done:
   tcl_error $S0
 .end
 

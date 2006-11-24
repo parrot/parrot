@@ -37,11 +37,13 @@ array set skipped_tests {
   expr-old-36.3        explode
   expr-old-36.4        explode
   expr-old-36.8        explode
+  eval-2.5             stacktrace
   for-3.6              {[lsearch -regexp]}
   format-3.1           explode
   format-3.2           explode
   format-8.17          explode
   format-8.18          explode
+  lindex-3.7           {expr wide()}
   string-13.6          explode
   string-13.8          explode
   string-14.11         explode
