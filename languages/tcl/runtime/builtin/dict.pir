@@ -68,34 +68,59 @@ no_args:
   argc = elements argv
   if argc < 2 goto bad_args
 
-  .local pmc dictionary
-  dictionary = shift argv
+  .local pmc read, set
+  read = get_root_global ['_tcl'], '__read'
+  set  = get_root_global ['_tcl'], '__set'
+
+  .local pmc dictionary, dict_name
+  dict_name = shift argv
+  push_eh dict_error
+    dictionary = read(dict_name)
+  clear_eh
   dictionary = __dict(dictionary)
+  goto got_dict
 
-  .local string key, value
-  key = shift argv
-  value = dictionary[key]
+dict_error:
+  get_results '(0,0)', $P0, $S0
+  $I0 = index $S0, 'variable is array'
+  if $I0 != -1 goto cant_dict_array
+  dictionary = new .TclDict
 
-  .local string append
+got_dict:
+  .local pmc key, value
+  key = shift argv   
+
+  # argv now contains all the new elements to append.
+
+  $I0 = exists dictionary[key]
+  if $I0 goto vivified
+  value = new .TclString
+  value = ''
+  goto loop
+
+vivified:
+  value = dictionary[key] 
+
 loop:
   argc = elements argv
   unless argc goto loop_done
-  append = shift argv 
-  value .= append
+  $S1 = shift argv
+  value .= $S1
   goto loop
-
 loop_done:
+
   dictionary[key] = value
-  
-  .local pmc result
-  result = new .TclList
-  push result, key
-  push result, value
-  .return (result)
+  set(dict_name, dictionary)
+  .return (dictionary)
+
+cant_dict_array:
+  $S1 = dict_name
+  $S1 = "can't set \"" . $S1
+  $S1 .= "\": variable is array"
+  tcl_error $S1
 
 bad_args:
   tcl_error 'wrong # args: should be "dict append varName key ?value ...?"'
-
 .end
 
 
