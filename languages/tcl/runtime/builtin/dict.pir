@@ -365,6 +365,68 @@ bad_args:
 
 .end
 
+.sub 'lappend'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc < 2 goto bad_args
+
+  .local pmc read, set
+  read = get_root_global ['_tcl'], '__read'
+  set  = get_root_global ['_tcl'], '__set'
+
+  .local pmc dictionary, dict_name
+  dict_name = shift argv
+  push_eh dict_error
+    dictionary = read(dict_name)
+  clear_eh
+  dictionary = __dict(dictionary)
+  goto got_dict
+
+dict_error:
+  get_results '(0,0)', $P0, $S0
+  $I0 = index $S0, 'variable is array'
+  if $I0 != -1 goto cant_dict_array
+  dictionary = new .TclDict
+
+got_dict:
+  .local pmc key, value
+  key = shift argv   
+
+  # argv now contains all the new list elements to lappend.
+
+  $I0 = exists dictionary[key]
+  if $I0 goto vivified
+  value = new .TclList
+  goto loop
+
+vivified:
+  value = dictionary[key] 
+  value = __list(value)
+
+loop:
+  argc = elements argv
+  unless argc goto loop_done
+  $P1 = shift argv
+  push value, $P1
+  goto loop
+loop_done:
+
+  dictionary[key] = value
+  set(dict_name, dictionary)
+  .return (dictionary)
+
+cant_dict_array:
+  $S1 = dict_name
+  $S1 = "can't set \"" . $S1
+  $S1 .= "\": variable is array"
+  tcl_error $S1
+
+bad_args:
+  tcl_error 'wrong # args: should be "dict lappend varName key ?value ...?"'
+.end
+
 .sub 'keys'
   .param pmc argv
 
