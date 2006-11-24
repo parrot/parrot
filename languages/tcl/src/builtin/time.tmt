@@ -13,13 +13,13 @@ time_loop:
   
 time_done:
   $N0 = time
-  t -= $N0
+  t = $N0 - t
   t *= 1000000
   
   $N0 = $count
   t /= $N0
-  
-  $S0 = t
+  $I0 = t  
+  $S0 = $I0
   $S0 .= ' microseconds per iteration'
   
   $R = new .TclString

@@ -15,7 +15,7 @@ eval_is {time {set a} 3.2} \
   {expected integer but got "3.2"} \
   {float count}
 
-like [time {expr 2+2}] {\d+ microseconds per iteration} {return value}
+like [time {expr 2+2}] {[0-9]+ microseconds per iteration} {return value}
 
 eval_is {
  time {set a 2} 3 
