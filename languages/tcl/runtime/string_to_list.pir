@@ -142,9 +142,8 @@ found_close_bracket:
   pos += $I0
   pos += 1
 
-  # Now process this as a list
-  $P0 = __stringToList($S0)
-  push retval, $P0
+  # Now add that list as another element:
+  push retval, $S0
   
   goto eat_space
 
