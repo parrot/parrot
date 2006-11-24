@@ -210,9 +210,9 @@ eval_is {
 } {{b c}} {array names, insure list results}
 
 eval_is {array names a b c} \
-  {bad option "b": must be -exact, -glob, or -regexp} \
+  {} \
   {array names, bad option} \
-  {SKIP {this test doesn't work in tclsh8.5...}}  
+  {SKIP {verified behavior in 8.5}}
 
 eval_is {array names a b c d}\
   {wrong # args: should be "array names arrayName ?mode? ?pattern?"}\
