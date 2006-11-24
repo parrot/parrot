@@ -54,6 +54,7 @@ array set skipped_tests {
   var-6.3              {Cannot get character of empty string}
   var-7.12             {Cannot take substr outside string}
   var-12.1             {Cannot take substr outside string}
+  while-old-4.6        stacktrace
 }
 
 # Tests after which there is non-test code which causes an error. Another

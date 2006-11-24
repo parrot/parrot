@@ -21,3 +21,5 @@ while_loop_exception:
   .rethrow()
 
 while_loop_done:
+  $R = new .TclString
+  $R = ''
