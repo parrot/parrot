@@ -193,6 +193,7 @@ bad_args:
   tcl_error 'wrong # args: should be "dict get dictionary ?key key ...?"'
 .end
 
+
 .sub 'incr'
   .param pmc argv
 
@@ -218,7 +219,7 @@ dict_error:
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
   dictionary = new .TclDict
-  __set(dict_name, dictionary)
+  set(dict_name, dictionary)
 
 got_dict:
   .local pmc key
@@ -429,6 +430,68 @@ bad_args:
   tcl_error 'wrong # args: should be "dict replace dictionary ?key value ...?"'
 .end
 
+.sub 'set'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc < 3 goto bad_args
+
+  .local pmc read, set
+  read = get_root_global ['_tcl'], '__read'
+  set  = get_root_global ['_tcl'], '__set'
+
+  .local pmc dictionary, dict_name
+  dict_name = shift argv
+  push_eh dict_error
+    dictionary = read(dict_name)
+  clear_eh
+  dictionary = __dict(dictionary)
+  goto got_dict
+
+dict_error:
+  get_results '(0,0)', $P0, $S0
+  $I0 = index $S0, 'variable is array'
+  if $I0 != -1 goto cant_dict_array
+  dictionary = new .TclDict
+  set(dict_name, dictionary)
+
+got_dict:
+  .local pmc value
+  value = pop argv
+
+  .local pmc key, sub_dict
+  sub_dict = dictionary
+loop:
+  argc = elements argv
+  if argc <= 1 goto loop_done
+  key = shift argv 
+  sub_dict = sub_dict[key]
+  # Does this key exist? set it.
+  if null sub_dict goto new_key
+  goto loop 
+new_key:
+  $P1 = new .TclDict
+  sub_dict[key] = $P1
+  sub_dict = $P1
+  goto loop
+loop_done:
+  key = shift argv # should be the last one..
+  sub_dict[key] = value
+
+  .return (dictionary)
+
+cant_dict_array:
+  $S1 = dict_name
+  $S1 = "can't set \"" . $S1
+  $S1 .= "\": variable is array"
+  tcl_error $S1
+
+bad_args:
+  tcl_error 'wrong # args: should be "dict set varName key ?key ...? value"'
+.end
+
+
 
 .sub 'size'
   .param pmc argv
@@ -449,6 +512,66 @@ bad_args:
   tcl_error 'wrong # args: should be "dict size dictionary"'
 
 .end
+
+.sub 'unset'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc < 2 goto bad_args
+
+  .local pmc read, set
+  read = get_root_global ['_tcl'], '__read'
+  set  = get_root_global ['_tcl'], '__set'
+
+  .local pmc dictionary, dict_name
+  dict_name = shift argv
+  push_eh dict_error
+    dictionary = read(dict_name)
+  clear_eh
+  dictionary = __dict(dictionary)
+  goto got_dict
+
+dict_error:
+  get_results '(0,0)', $P0, $S0
+  $I0 = index $S0, 'variable is array'
+  if $I0 != -1 goto cant_dict_array
+  dictionary = new .TclDict
+  set(dict_name, dictionary)
+
+got_dict:
+
+  .local pmc key, sub_dict
+  sub_dict = dictionary
+loop:
+  argc = elements argv
+  if argc <=1 goto loop_done
+  key = shift argv 
+  sub_dict = sub_dict[key]
+  if null sub_dict goto not_exist
+  goto loop 
+loop_done:
+  key = shift argv # should be the last one..
+  delete sub_dict[key]
+
+  .return (dictionary)
+
+not_exist:
+  $S1 = key
+  $S1 = 'key "' . $S1
+  $S1 .= '" not known in dictionary'
+  tcl_error $S1
+
+cant_dict_array:
+  $S1 = dict_name
+  $S1 = "can't set \"" . $S1
+  $S1 .= "\": variable is array"
+  tcl_error $S1
+
+bad_args:
+  tcl_error 'wrong # args: should be "dict unset varName key ?key ...?"'
+.end
+
 
 .sub 'values'
   .param pmc argv
