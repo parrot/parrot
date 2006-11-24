@@ -12,11 +12,16 @@
 
   .local string splitchars,splitstring
   splitstring = argv[0]
+  if splitstring != "" goto check_splitchars
+  .return ('')
+
+check_splitchars:
   # RT#40755: Make this the default whitespace splitchars.
-  splitchars = ' '
+  splitchars = " \r\n\t"
 
   if argc == 1 goto got_splitchars
   splitchars = argv[1]
+
 
 got_splitchars:
   if splitchars == '' goto split_empty
