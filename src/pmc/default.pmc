@@ -489,13 +489,7 @@ Store the method as a global in the namespace of this class.
 
 
     PMC* find_method(STRING* method_name) {
-        PMC *method = Parrot_find_method_with_cache(INTERP, SELF, method_name);
-        if (method && method->vtable->base_type == enum_class_MultiSub &&
-                INTERP->current_args) {
-            return Parrot_MMD_dispatch_func(interp,
-                    method, method_name);
-        }
-        return method;
+        return Parrot_find_method_with_cache(INTERP, SELF, method_name);
     }
 
     void add_method(STRING *method_name, PMC *sub_pmc) {
