@@ -170,6 +170,10 @@ handle_endswitch:
 bad_argument:
   dec pos
   unless catchbad goto loop_done
+  unless endswitch goto throw_error
+  switches = clone switches
+  push switches, '-'
+throw_error:
   $S1 = 'bad switch "-'
   $S1 .= arg
   $S1 .= '": must be '
