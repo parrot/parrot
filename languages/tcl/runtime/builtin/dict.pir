@@ -158,6 +158,81 @@ bad_args:
 
 .end
 
+.sub 'filter'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc < 2 goto bad_args
+
+  .local pmc dictionary
+  dictionary = shift argv
+  dictionary = __dict(dictionary)
+
+  .local pmc options
+  options = new .TclList
+  options[0] = 'key'
+  options[1] = 'script'
+  options[2] = 'value'
+
+  .local pmc select_option
+  select_option  = get_root_global ['_tcl'], 'select_option'
+  .local pmc option
+  option = shift argv  
+  option = select_option(options, option, 'filterType')
+
+  .local pmc results, key, value
+  results = new .TclDict
+
+  if option == 'script' goto do_script_loop
+
+  .local pmc globber, pattern
+  globber = compreg 'PGE::Glob'
+  if argc != 3 goto missing_glob
+  pattern = shift argv 
+
+  .local pmc rule, match, iterator
+  rule = globber.'compile'(pattern)
+  iterator = new .Iterator, dictionary
+
+  if option == 'key' goto do_key_loop
+
+do_value_loop:
+  unless iterator goto do_value_done
+  key = shift iterator
+  value = dictionary[key]
+  match = rule(value) 
+  unless match goto do_value_loop
+  results[key] = value
+  goto do_value_loop
+do_value_done:
+  .return (results)
+
+do_key_loop:
+  unless iterator goto do_key_done
+  key = shift iterator
+  match = rule(key) 
+  unless match goto do_key_loop
+  value = dictionary[key]
+  results[key] = value
+  goto do_key_loop
+do_key_done:
+  .return (results)
+
+do_script_loop:
+  tcl_error 'XXX implement [dict filter dictionaryValue script ..]'
+
+missing_glob:
+  $S1 = option
+  $S1 = 'wrong # args: should be "dict filter dictionary ' . $S1
+  $S1 .= ' globPattern"'
+  tcl_error $S1
+
+bad_args:
+  tcl_error 'wrong # args: should be "dict filter dictionary filterType ..."'
+.end
+
+
 .sub 'get'
   .param pmc argv
 
@@ -192,6 +267,7 @@ not_exist:
 bad_args:
   tcl_error 'wrong # args: should be "dict get dictionary ?key key ...?"'
 .end
+
 
 
 .sub 'incr'
