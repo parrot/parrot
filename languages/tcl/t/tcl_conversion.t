@@ -1,82 +1,46 @@
-#!/usr/bin/perl
+#!../../parrot tcl.pbc
 
-use strict;
-use warnings;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
+source lib/test_more.tcl
+plan 12
 
-use Parrot::Test tests => 10;
-use Test::More;
-
-language_output_is( "tcl", <<'TCL', <<OUT, "{} conversion to list" );
-  puts [llength {a 
+is [llength {a 
   "a b"   
   		b {b c}		  c {c d}
-  }]
-TCL
-6
-OUT
+  }] 6 {{} conversion to list" }
 
-language_output_is( "tcl", <<'TCL', <<OUT, "\"\" conversion to list" );
-  puts [llength "a 
+is [llength "a 
   \"a b\"   
   		b {b c}		  c {c d}
-  "]
-TCL
-6
-OUT
+  "] 6 {"\ conversion to list}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "\"\" conversion to list" );
-  set a "a {b c}  d"
-  puts [llength $a]
-  puts [lindex $a 1]
-  puts [lindex $a 2]
-TCL
-3
-b c
-d
-OUT
+set a "a {b c}  d"
+is [ llength $a ]  3     {" conversion to list 1}
+is [ lindex $a 1 ] {b c} {" conversion to list 1}
+is [ lindex $a 2 ] d     {" conversion to list 1}
+catch {unset a}
 
-language_output_is( 'tcl', <<'TCL', <<'OUT', '\S after }' );
-lindex {{a b}3 4} 1
-TCL
-list element in braces followed by "3" instead of space
-OUT
+eval_is {lindex {{a b}3 4} 1} \
+  {list element in braces followed by "3" instead of space} \
+  "non space after }"
 
-language_output_is( 'tcl', <<'TCL', <<'OUT', '\S after }' );
-lindex {{a b}3} 1
-TCL
-list element in braces followed by "3" instead of space
-OUT
+eval_is { lindex {{a b}3} 1} \
+  {list element in braces followed by "3" instead of space} \
+  "non space after }"
 
-language_output_is( 'tcl', <<'TCL', <<'OUT', '\S after "' );
-lindex {"a b"3 4} 1
-TCL
-list element in quotes followed by "3" instead of space
-OUT
+eval_is {lindex {"a b"3 4} 1} \
+  {list element in quotes followed by "3" instead of space} \
+  {non space after "}
 
-language_output_is( 'tcl', <<'TCL', <<'OUT', '\S after "' );
-lindex {"a b"3} 1
-TCL
-list element in quotes followed by "3" instead of space
-OUT
+eval_is {lindex {"a b"3} 1} \
+  {list element in quotes followed by "3" instead of space} \
+  {non space after "}
 
-language_output_is( 'tcl', <<'TCL', <<'OUT', '[ in list' );
-  puts [list \{\[]
-TCL
-\{\[
-OUT
 
-language_output_is( 'tcl', <<'TCL', <<'OUT', '\" in "" in list' );
-  puts [lindex {"a \" b"} 0]
-TCL
-a " b
-OUT
+is [list \{\[] {\{\[} {[ in list}
 
-language_output_is( 'tcl', <<'TCL', <<'OUT', '\" in {} in list' );
-  puts [lindex {{a \" b}} 0]
-TCL
-a \" b
-OUT
+is [lindex {"a \" b"} 0] {a " b} {escaped quote in quotes in list}
+
+is [lindex {{a \" b}} 0] {a \" b} {escaped quote in braces in list}
 
 # Local Variables:
 #   mode: cperl
