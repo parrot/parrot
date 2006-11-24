@@ -274,8 +274,6 @@ bad_args:
   tcl_error 'wrong # args: should be "dict get dictionary ?key key ...?"'
 .end
 
-
-
 .sub 'incr'
   .param pmc argv
 
@@ -301,7 +299,6 @@ dict_error:
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
   dictionary = new .TclDict
-  set(dict_name, dictionary)
 
 got_dict:
   .local pmc key
@@ -330,6 +327,7 @@ vivified:
 
 done:
   dictionary[key] = value
+  set(dict_name, dictionary)
   $P1 = new .TclList
   $P1[0] = key
   $P1[1] = value
