@@ -18,7 +18,9 @@ array set skipped_tests {
   dict-11.5            {expr wide()}
   dict-11.6            {expr wide()}
   dict-11.7            {expr wide()}
-  dict-21.13           {dict udpate}
+  dict-14.12           stacktrace
+  dict-17.13           stacktrace
+  dict-21.13           {dict update}
   error-1.3            stacktrace
   error-2.3            stacktrace
   error-2.6            stacktrace
