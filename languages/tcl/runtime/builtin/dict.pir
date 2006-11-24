@@ -249,13 +249,19 @@ bad_args:
   .local pmc key
 loop:
   argc = elements argv
-  unless argc goto loop_done
+  if argc <= 1 goto loop_done
   key = shift argv 
   dictionary = dictionary[key]
   if_null dictionary, not_exist
+  dictionary = __dict(dictionary) # might be a string, error out if so
   goto loop
 
 loop_done:
+  if argc == 0 goto done
+  key = shift argv 
+  dictionary = dictionary[key]
+  if_null dictionary, not_exist
+done:
   .return (dictionary)
 
 not_exist:
