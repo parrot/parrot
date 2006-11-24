@@ -1,4 +1,4 @@
-# $Id: relops.t 15749 2006-11-21 20:44:16Z bernhard $
+# $Id$
 
 =head1 NAME
 

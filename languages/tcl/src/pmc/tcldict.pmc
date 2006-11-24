@@ -1,7 +1,7 @@
 /* TclDict.pmc
  *  Copyright (C) 2001-2003, The Perl Foundation.
  *  SVN Info
- *     $Id: /parrot/offline/languages/tcl/src/pmc/tclarray.pmc 1993 2006-11-10T07:22:35.166212Z coke  $
+ *     $Id$
  *  Overview:
  *     These are the vtable functions for the TclDict base class
  *  Data Structure and Algorithms:
