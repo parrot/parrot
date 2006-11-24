@@ -182,7 +182,7 @@ set_loop:
   .return ('')
 
 bad_args:
-  tcl_error 'wrong # args: should be array set arrayName list'
+  tcl_error 'wrong # args: should be "array set arrayName list"'
 
 odd_args:
   tcl_error 'list must have an even number of elements'

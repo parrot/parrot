@@ -44,6 +44,8 @@ array set skipped_tests {
   format-8.17          explode
   format-8.18          explode
   lindex-3.7           {expr wide()}
+  set-2.1              stacktrace
+  set-4.1              stacktrace
   string-13.6          explode
   string-13.8          explode
   string-14.11         explode
