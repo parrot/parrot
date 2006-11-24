@@ -79,7 +79,7 @@ ambiguous:
   tcl_error error
 .end
 
-=head1 hash options = _Tcl::select_switches(array switches, array argv, ?endswitch:0?, ?catchbad:0?)
+=head1 hash options = _Tcl::select_switches(array switches, array argv, ?endswitch:0?, ?catchbad:0?, ?name: 'switch'?)
 
 Given an array of valid switches, and an argv array (which should begin with
 possible switches and be followed by the remaining args), return a hash
@@ -99,6 +99,8 @@ the array. If the switch takes a parameter, then specify it as "foo:s".
 If 'catchbad' is specified with a true value, then an exception is thrown
 if a bad switch is specified.
 
+The 'name' parameter is only used if catchbad is true : if set, it is used
+to customize the error message slightly.
 =cut
 
 .sub select_switches
@@ -108,13 +110,19 @@ if a bad switch is specified.
   .param int has_ends  :opt_flag
   .param int catchbad  :optional
   .param int has_catch :opt_flag
+  .param string name   :optional
+  .param int has_name  :opt_flag
 
   if has_ends goto check_catch
   endswitch = 0
 
 check_catch:
-  if has_catch goto init
+  if has_catch goto check_name
   catchbad = 0
+
+check_name:
+  if has_name goto init 
+  name = 'switch'
 
 init:
   # setup types
@@ -174,7 +182,9 @@ bad_argument:
   switches = clone switches
   push switches, '-'
 throw_error:
-  $S1 = 'bad switch "-'
+  $S1 = 'bad '
+  $S1 .= name
+  $S1 .= ' "-'
   $S1 .= arg
   $S1 .= '": must be '
   $S2 = __switches_to_string(switches)

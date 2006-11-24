@@ -32,7 +32,7 @@ builtins.
 
     load_bytecode 'languages/tcl/runtime/tcllib.pir'
 
-    plan(28)
+    plan(29)
     .local string message
 
     # 1
@@ -196,7 +196,7 @@ check_23:
     argv = new .ResizablePMCArray
     argv[0] = '-joke'
     argv[1] = 'bag_o_donuts'
-    message='invalid option specified, w/ exception'
+    message='invalid option specified, w/ exception and --'
 
     push_eh eh_24
       $P1 = select_switches(options, argv, 1, 1)
@@ -210,7 +210,25 @@ eh_24:
 check_24:
     is($S2, 'bad switch "-joke": must be -baz, -bob, -joe, or --', message)
 
-    # 25-28
+    # 25
+    argv = new .ResizablePMCArray
+    argv[0] = '-joke'
+    argv[1] = 'bag_o_donuts'
+    message='invalid option specified, w/ exception, --, and override name'
+
+    push_eh eh_25
+      $P1 = select_switches(options, argv, 1, 1, 'frob')
+    clear_eh
+   
+    $S2= ''   
+    goto check_25
+
+eh_25: 
+    get_results '(0,0)', $P2, $S2
+check_25:
+    is($S2, 'bad frob "-joke": must be -baz, -bob, -joe, or --', message)
+
+    # 26-29
     options[2] = 'joe:s' # change this to take a value..
 
     argv = new .ResizablePMCArray
