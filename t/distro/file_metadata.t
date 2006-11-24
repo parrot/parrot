@@ -51,8 +51,17 @@ TEST_MIME: {
     # find test files
     my $test_suffix = '.t';
     my @test_files = grep { m/\Q$test_suffix\E$/ } @manifest_files;
-    verify_attributes( 'svn:mime-type', 'text/plain', 0, $mime_types, \@test_files );
+    my $test = 'svn:mime-type';
+    my $expected = 'text/plain';
+    my @failed = verify_attributes( $test, $expected, 0, $mime_types, \@test_files );
 
+    if (@failed) {
+        my $failure = join " ($expected)\n", @failed;
+        $failure = "\n" . $failure . " ($expected)\n";
+        is ($failure, "", $test);
+    } else {
+        pass($test);
+    }
 }    # TEST_MIME
 
 ## keyword expansion should be set for any manifest files with an explicit
@@ -72,15 +81,25 @@ KEYWORD_EXP: {
         }
     }
 
-    my $keywords = get_attribute( 'svn:keywords', @plain_files );
+    my $test = 'svn:keywords';
+    my $expected = 'Author Date Id Revision';
+    my $keywords = get_attribute( $test, @plain_files );
 
-    verify_attributes( 'svn:keywords', 'Author Date Id Revision', 1, $keywords );
+    my @failed = verify_attributes( $test, $expected, 1, $keywords );
+
+    if (@failed) {
+        my $failure = join " ($expected)\n", @failed;
+        $failure = "\n" . $failure . " ($expected)\n";
+        is ($failure, "", $test);
+    } else {
+        pass($test);
+    }
 
 }    # KEYWORD_EXP
 
 =for skip
 
-# When unskipped, rewrite to use get_attribute()...
+# When unskipped, rewrite to conform to other tests.
 
 SKIP: {
     skip 'custom svn keywords not yet supported' => 1;
@@ -119,7 +138,7 @@ BEGIN {
     unless ( $Parrot::Revision::current or `svk ls .` ) {
         plan skip_all => 'not a working copy';
     }
-    else { plan 'no_plan' }
+    else { plan tests => 2 }
 }
 
 exit;
@@ -197,20 +216,26 @@ sub verify_attributes {
         @files = keys %$results;
     }
 
+    my @failures;
     foreach my $file ( sort @files ) {
-        my $actual = "$file - (" . ( $results->{$file} || '' ) . ")";
-        my $platonic;
+        my $actual = $results->{$file};
+        if (! defined $actual) {
+           push @failures, $file; 
+           next;
+        }
         if ($exact) {
-            $platonic = "$file - ($expected)";
-            is( $actual, $platonic, "$file ($attribute)" );
+            if ($actual ne $expected) {
+                push @failures, $file; 
+            }
         }
         else {
-            $platonic = qr{^$file - \($expected};
-            like( $actual, $platonic, "$file ($attribute)" );
+            if ($actual !~ /^$expected/) {
+                push @failures, $file; 
+            }
         }
     }
 
-    return;
+    return @failures;
 }
 
 # Local Variables:
