@@ -138,11 +138,15 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/append.t \
   t_tcl/appendComp.t \
   t_tcl/apply.t \
+  t_tcl/basic.t \
   t_tcl/binary.t \
+  t_tcl/cmdAH.t \
   t_tcl/compExpr.t \
   t_tcl/compExpr_old.t \
+  t_tcl/compile.t \
   t_tcl/concat.t \
   t_tcl/dict.t \
+  t_tcl/env.t \
   t_tcl/error.t \
   t_tcl/eval.t \
   t_tcl/expr.t \
@@ -157,9 +161,11 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/incr.t \
   t_tcl/incr_old.t \
   t_tcl/info.t \
+  t_tcl/ioCmd.t \
   t_tcl/join.t \
   t_tcl/lindex.t \
   t_tcl/linsert.t \
+  t_tcl/listObj.t \
   t_tcl/llength.t \
   t_tcl/lrange.t \
   t_tcl/lrepeat.t \
@@ -169,12 +175,14 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/misc.t \
   t_tcl/namespace_old.t \
   t_tcl/package.t \
+  t_tcl/parse.t \
   t_tcl/parseOld.t \
   t_tcl/platform.t \
   t_tcl/proc.t \
   t_tcl/proc_old.t \
   t_tcl/pwd.t \
   t_tcl/regexp.t \
+  t_tcl/regexComp.t \
   t_tcl/rename.t \
   t_tcl/scan.t \
   t_tcl/security.t \
@@ -186,28 +194,29 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/stringComp.t \
   t_tcl/switch.t \
   t_tcl/unknown.t \
+  t_tcl/uplevel.t \
   t_tcl/upvar.t \
   t_tcl/util.t \
+  tcl/var.t \
   t_tcl/while.t \
   t_tcl/while_old.t
-
-# These tests segfault or exit before any tests results are shown
-SEGFAULTING_TCL_TESTS = \
-  t_tcl/utf.t
 
 # Tests we couldn't possibly pass any anyway:
 UNIMPLEMENTED_TCL_TESTS = \
   t_tcl/clock.t
 
-# These tests parse but fail (or skip) every test.
+# These tests either fail to parse, or parse but fail (or skip) every test.
 FAILING_TCL_TESTS = \
   t_tcl/case.t \
   t_tcl/config.t \
-  t_tcl/init.t            
-
-# These tests parse but all are skipped due to harder [test] format.
-# interp skips all due to lack of [interp] command
-SKIPPED_TCL_TESTS = \
+  t_tcl/event.t \
+  t_tcl/init.t \
+  t_tcl/utf.t \
+  t_tcl/macOSXFCmd.t \
+  t_tcl/unixFCmd.t \
+  t_tcl/ioUtil.t \
+  t_tcl/source.t \
+  t_tcl/unixFile.t \
   t_tcl/assocd.t \
   t_tcl/chan.t \
   t_tcl/cmdInfo.t \
@@ -231,90 +240,30 @@ SKIPPED_TCL_TESTS = \
   t_tcl/winConsole.t \
   t_tcl/winFCmd.t \
   t_tcl/winNotify.t \
-  t_tcl/winTime.t
+  t_tcl/winTime.t \
+  t_tcl/parseExpr.t \
+  t_tcl/main.t \
+  t_tcl/tm.t 
 
 # These test files die for various reasons.
 #
-# invalid command name "package"
 #t_tcl/safe.t             t_tcl/winPipe.t         t_tcl/unixInit.t
-#t_tcl/tm.t               t_tcl/opt.t
-#
-# invalid command name "set"
-#t_tcl/uplevel.t
-#
-# invalid command name "update"
-#t_tcl/event.t
-#
-# invalid command name "cleanupTests" ( namespace import/tcltest combo issue)
-#t_tcl/parse.t            t_tcl/source.t
-#
-# bad option "command": must be args, body, cmdcount, commands, complete, 
+#t_tcl/opt.t
 #t_tcl/interp.t
-#
-# invalid command name "cd" (odd, since it *is* defined)
-#t_tcl/cmdAH.t            t_tcl/ioUtil.t          t_tcl/macOSXFCmd.t
-#t_tcl/unixFile.t         t_tcl/unixFCmd          
-#
-# can't read "env(test)": no such element in array
-#t_tcl/env.t
-#
-#Name 'prefix:!' not found
 #t_tcl/io.t
-#
-#[oops; continuation <foo> of type <bar> is trying to jump from runloop <baz> to runloop 1]
-#t_tcl/ioCmd.t           t_tcl/main.t             
-#
-# src/string.c:972: failed assertion `src->encoding == Parrot_fixed_8_encoding_ptr'
-#t_tcl/parseExpr.t        
-#
-# No such file or directory
 #t_tcl/fileSystem.t      t_tcl/tcltest.t          t_tcl/fCmd.t
 #t_tcl/fileName.t
-#
-# invalid command name "testobj"
 #t_tcl/execute.t
-#
-# can't delete "run": command doesn't exist
-#t_tcl/basic.t
-#
-# The opcode 'tcl_error' (tcl_error<0>) was not found
 #t_tcl/async.t
-#
-# bad option "exist": must be args, body, cmdcount, commands, complete ...
 #t_tcl/unixNotfy.t
-#
-# invalid command name "close"
 #t_tcl/exec.t            t_tcl/winFile.t
-#
-# invalid command name "auto_load"
 #t_tcl/autoMkindex.t
-#
-# Null PMC access in type()
-#tcl/var.t             t_tcl/winDde.t          t_tcl/reg.t
-#
-# extra characters after close-brace (These tests require {expand}[list])
+#t_tcl/winDde.t          t_tcl/reg.t
 #t_tcl/encoding.t       t_tcl/namespace.t       t_tcl/iogt.t
 #t_tcl/pkgMkIndex.t     t_tcl/trace.t
-#
-# can't read "result": no such variable
-#t_tcl/regexComp.t
-#
-# invalid command name "x"
 #t_tcl/timer.t
-#
-# invalid command name "PowerSet" {{ probable nested namespace bug }}
 #t_tcl/msgcat.t
-#
-# can't read "expected": no such variable
-#t_tcl/compile.t
-#
-# can't read "actual": no such variable
-#t_tcl/listObj.t
-#
-# syntax error, unexpected LABEL (the compiled PIR is truncated. memory issue?)
 #t_tcl/stringObj.t
-#
-# couldn't read file "0/httpd": no such file or directory
 #t_tcl/http.t            t_tcl/httpold.t
 
 tcl-test: t_tcl tcl.pbc

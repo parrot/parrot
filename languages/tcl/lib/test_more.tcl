@@ -129,18 +129,28 @@ proc diag {diagnostic} {
 # A placeholder that simulates the real tcltest's exported test proc.
 proc test {num description code args} {
     global skipped_tests
+    global abort_after
     set excuse "can't deal with this version of test yet."
     set full_desc "$num $description"
+    if {! [catch {set abort $abort_after($num)}]} {
+        set abort 1
+    } else {
+        set abort 0
+    } 
     if {[llength $args] == 0} {
         pass $full_desc [list SKIP $excuse]
     } elseif {[llength $args] == 1} {
         if {! [catch {set reason $skipped_tests($num)}]} {
             pass $full_desc [list SKIP $reason]
         } else {
-          eval_is $code [lindex $args 0] $full_desc
+            eval_is $code [lindex $args 0] $full_desc
         }
     } else {
         pass $full_desc [list SKIP $excuse]
+    }
+    if $abort {
+       plan no_plan
+       exit 0
     }
 }
 

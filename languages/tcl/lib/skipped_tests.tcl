@@ -49,4 +49,25 @@ array set skipped_tests {
   string-18.9          explode
   string-20.4          explode
   string-20.5          explode
+  var-6.3              {Cannot get character of empty string}
+  var-7.12             {Cannot take substr outside string}
+  var-12.1             {Cannot take substr outside string}
+}
+
+# Tests after which there is non-test code which causes an error. Another
+# hack which allows us to count passing tests that would otherwise be dropped
+# on the floor.
+
+array set abort_after {
+  uplevel-5.2          {invalid command name "set"}
+  utf-1.4              {Invalid character for UTF-8 encoding}
+  env-1.3              {can't read "env(test)" no such element in array}
+  event-4.2            {invalid command name "update"}
+  parse-19.4           {invalid command name "cleanupTests"}
+  source-7.6           {invalid command name "cleanupTests"}
+  cmdAH-31.13          {invalid command name "cd"}
+  ioUtil-2.8           {invalid command name "cd"}
+  iocmd-12.8           {invalid command name "close"}
+  basic-49.2           {can't delete "run" command doesn't exist}
+  filename-11.13       {invalid command name "cd"}
 }
