@@ -621,7 +621,6 @@ dict_error:
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
   dictionary = new .TclDict
-  set(dict_name, dictionary)
 
 got_dict:
   .local pmc value
@@ -633,9 +632,10 @@ loop:
   argc = elements argv
   if argc <= 1 goto loop_done
   key = shift argv 
-  sub_dict = sub_dict[key]
+  $P1= sub_dict[key]
   # Does this key exist? set it.
-  if null sub_dict goto new_key
+  if null $P1 goto new_key
+  sub_dict = $P1
   goto loop 
 new_key:
   $P1 = new .TclDict
@@ -646,6 +646,7 @@ loop_done:
   key = shift argv # should be the last one..
   sub_dict[key] = value
 
+  set(dict_name, dictionary)
   .return (dictionary)
 
 cant_dict_array:
