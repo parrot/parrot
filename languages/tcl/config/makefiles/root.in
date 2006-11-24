@@ -58,7 +58,6 @@ $(C_BUILTIN)/flush.pir \
 $(C_BUILTIN)/glob.pir \
 $(C_BUILTIN)/interp.pir \
 $(C_BUILTIN)/list.pir \
-$(C_BUILTIN)/lsearch.pir \
 $(C_BUILTIN)/return.pir \
 $(C_BUILTIN)/trace.pir \
 $(C_BUILTIN)/update.pir \
