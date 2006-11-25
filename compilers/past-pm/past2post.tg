@@ -286,7 +286,7 @@ transform while (PAST::Op) :language('PIR') {
 transform until (PAST::Op) :language('PIR') {
     .return tree.'get'('while', node)
 }
-    
+
 
 transform xor (PAST::Op) :language('PIR') {
     .local pmc ops
@@ -351,6 +351,51 @@ transform assign (PAST::Op) :language('PIR') {
     post.'push'(lpost)
     post.'result'(lpost)
     .return (post)
+}
+
+
+transform chain (PAST::Op) :language('PIR') {
+    .local pmc clist, cpast
+    clist = new .ResizablePMCArray
+    cpast = node
+  chain_loop:
+    $I0 = isa cpast, 'PAST::Op'
+    if $I0 == 0 goto chain_end
+    .local string pasttype
+    pasttype = cpast.'pasttype'()
+    if pasttype != 'chain' goto chain_end
+    push clist, cpast
+    cpast = cpast[0]
+    goto chain_loop
+  chain_end:
+
+    .local pmc ops, endlabel, apast, apost
+    ops = new 'POST::Ops'
+    ops.'init'('node'=>node)
+    cpast = pop clist
+    endlabel = ops.'new'('POST::Label', 'name'=>'chain_end_')
+    apast = cpast[0]
+    apost = tree.'get'('post', apast)
+    ops.'push'(apost)
+
+  clist_loop:
+    .local pmc bpast, bpost
+    bpast = cpast[1]
+    bpost = tree.'get'('post', bpast)
+    .local string name
+    name = cpast.'name'()
+    name = cpast.'escape'(name)
+    ops.'push'(bpost)
+    $P0 = ops.'push_pirop'('call', name, apost, bpost)
+    $P0.'result'(ops)
+    unless clist goto clist_end
+    ops.'push_pirop'('unless', ops, endlabel)
+    cpast = pop clist
+    apost = bpost
+    goto clist_loop
+  clist_end:
+    ops.'push'(endlabel)
+    .return (ops)
 }
 
 
