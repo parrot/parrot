@@ -26,7 +26,7 @@ an empty string.
 
 =item result
 
-The expected result of the match. Either C<y> or for a successful match, C<n>
+The expected result of the match. Either C<y> for a successful match, C<n>
 for a failed one. Otherwise the output is expected to begin and end with
 C</>.
 
