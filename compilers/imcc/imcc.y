@@ -315,6 +315,11 @@ set_lexical(Interp *interp, SymReg *r, char *name)
     SymReg *n;
     r->usage |= U_LEXICAL;
     n = mk_const(interp, name, 'S');
+    if (n == r->reg) {
+        IMCC_fataly(interp, E_SyntaxError,
+            "register %s already declared as lexical %s",
+            r->name, n->name);
+    }
     /* chain all names in r->reg */
     n->reg = r->reg;
     r->reg = n;
