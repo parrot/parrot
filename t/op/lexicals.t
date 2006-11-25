@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 42;
 
 
 =head1 NAME
@@ -93,6 +93,16 @@ pir_output_is(<<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (.local pmc ab)
 .end
 CODE
 ok
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', '.lex - same lex twice');
+.sub main
+ .lex '$a', $P0
+ .lex '$a', $P1
+ say "ok"
+.end
+CODE
 ok
 OUTPUT
 
