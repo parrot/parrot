@@ -400,10 +400,27 @@ bad_args:
   .return(0)
 .end
 
-# RT#40726: Stub for test parsing
 .sub 'exists'
-  .param pmc argv
-  .return(0)
+    .param pmc argv
+
+    .local int argc
+    argc = elements argv
+    if argc != 1 goto badargs
+
+    .local pmc os
+    os = new .OS
+    $S0 = argv[0]
+    push_eh false
+      $P0 = os.'stat'($S0)
+    clear_eh
+
+    .return(1)
+
+false:
+    .return(0)
+
+badargs:
+    tcl_error 'wrong # args: should be "file exists name"'
 .end
 
 # RT#40727: Stub for test parsing
