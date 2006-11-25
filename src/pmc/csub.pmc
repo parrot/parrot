@@ -39,10 +39,6 @@ pmclass CSub {
         return SELF == value;
     }
 
-    void set_same (PMC* value) {
-        PMC_struct_val(SELF) = PMC_struct_val(value);
-    }
-
     INTVAL is_equal (PMC* value) {
         return (SELF->vtable == value->vtable
                 && PMC_struct_val(SELF) == PMC_struct_val(value));
