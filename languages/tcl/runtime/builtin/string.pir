@@ -450,11 +450,16 @@ bad_match:
 
   if argc != 2 goto bad_repeat
   .local string the_string
-  .local int    the_repeat
+  .local pmc    the_repeat
   the_string = argv[0]
   the_repeat = argv[1]
+ 
+  .local pmc __integer
+  __integer = get_root_global ['_tcl'], '__integer'
+  the_repeat = __integer(the_repeat)
 
-  $S0 = repeat the_string, the_repeat
+  $I0 = the_repeat
+  $S0 = repeat the_string, $I0
   .return($S0)
 
 bad_repeat:
