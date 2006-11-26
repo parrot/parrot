@@ -57,15 +57,18 @@ eval_is {
   incr a a
 } {expected integer but got "a"} {expected integer, got alpha}
 
+# This test fails in tclsh8.5a5:
+# https://sourceforge.net/tracker/?func=detail&atid=110894&aid=1602991&group_id=10894
 eval_is {
   set a 1
   incr a 1.5
 } {expected integer but got "1.5"} {expected integer, got float}
 
+# as of 8.5, this autovivifies the variable
 eval_is {
   catch {unset a}
   incr a
-} {can't read "a": no such variable} {no such variable}
+} 1 {no such variable}
 
 
 # Uses the same parsing mechanism as
