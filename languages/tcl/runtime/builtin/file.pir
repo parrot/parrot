@@ -14,38 +14,39 @@
 
   .local pmc options
   options = new .ResizablePMCArray
-  options[0] = 'atime'
-  options[1] = 'attributes'
-  options[2] = 'channels'
-  options[3] = 'copy'
-  options[4] = 'delete'
-  options[5] = 'dirname'
-  options[6] = 'executable'
-  options[7] = 'exists'
-  options[8] = 'extension'
-  options[9] = 'isdirectory'
-  options[10] = 'isfile'
-  options[11] = 'join'
-  options[12] = 'link'
-  options[13] = 'lstat'
-  options[14] = 'mtime'
-  options[15] = 'mkdir'
-  options[16] = 'nativename'
-  options[17] = 'normalize'
-  options[18] = 'pathtype'
-  options[19] = 'readable'
-  options[20] = 'readlink'
-  options[21] = 'rename'
-  options[22] = 'rootname'
-  options[23] = 'separator'
-  options[24] = 'size'
-  options[25] = 'split'
-  options[26] = 'stat'
-  options[27] = 'system'
-  options[28] = 'tail'
-  options[29] = 'type'
-  options[30] = 'volumes'
-  options[31] = 'writable'
+  push options, 'atime'
+  push options, 'attributes'
+  push options, 'channels'
+  push options, 'copy'
+  push options, 'delete'
+  push options, 'dirname'
+  push options, 'executable'
+  push options, 'exists'
+  push options, 'extension'
+  push options, 'isdirectory'
+  push options, 'isfile'
+  push options, 'join'
+  push options, 'link'
+  push options, 'lstat'
+  push options, 'mtime'
+  push options, 'mkdir'
+  push options, 'nativename'
+  push options, 'normalize'
+  push options, 'owned'
+  push options, 'pathtype'
+  push options, 'readable'
+  push options, 'readlink'
+  push options, 'rename'
+  push options, 'rootname'
+  push options, 'separator'
+  push options, 'size'
+  push options, 'split'
+  push options, 'stat'
+  push options, 'system'
+  push options, 'tail'
+  push options, 'type'
+  push options, 'volumes'
+  push options, 'writable'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
@@ -439,4 +440,15 @@ badargs:
 .sub 'ext'
   .param pmc argv
   .return(0)
+.end
+
+# XXX: Stub
+.sub 'owned'
+  .param pmc argv
+  .local int argc
+  argc = elements argv
+  if argc != 1 goto bad_args
+  .return(0)
+bad_args:
+  tcl_error 'wrong # args: should be "file owned name"'
 .end
