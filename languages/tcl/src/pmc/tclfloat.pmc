@@ -26,16 +26,17 @@ pmclass TclFloat
     STRING* get_string () {
         UINTVAL buflen;
         int check_flag;
-        STRING * buff;
-        STRING * dot;
-        STRING * e;
-        STRING * dot_zero;
-        STRING * precision_var =
-            string_from_cstring(INTERP, "$tcl_precision", 14);
+        STRING *buff;
+        STRING *dot;
+        STRING *e;
+        STRING *dot_zero;
+        STRING *_precision = string_from_cstring(INTERP, "$tcl_precision", 14);
+        STRING *_tcl = string_from_cstring(INTERP, "tcl", 3);
 
-        PMC * const hll_ns = Parrot_get_ctx_HLL_namespace(INTERP);
+        PMC * const root_ns = INTERP->root_namespace;
+        PMC * const hll_ns  = VTABLE_get_pmc_keyed_str(INTERP, root_ns, _tcl);
         PMC * precision_pmc =
-            Parrot_find_global_op(INTERP, hll_ns, precision_var, NULL);
+            Parrot_find_global_op(INTERP, hll_ns, _precision, NULL);
         INTVAL* precision = VTABLE_get_integer(INTERP, precision_pmc);
 
         if (precision == 0)
