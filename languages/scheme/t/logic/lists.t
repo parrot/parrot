@@ -1,6 +1,7 @@
-#! perl -w
+#! perl
 # $Id$
 
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../..";
 
