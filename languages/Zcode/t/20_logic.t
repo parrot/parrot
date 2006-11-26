@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!perl
 # vim:ft=perl:
 
 use strict;
