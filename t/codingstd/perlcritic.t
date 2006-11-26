@@ -50,18 +50,19 @@ my $config = Perl::Critic::Config->new( -exclude => [qr/.*/] );
 # For a list of available policies, perldoc Perl::Critic
 if ( !keys %policies ) {
     %policies = (
-        'TestingAndDebugging::RequireUseStrict'      => 1,
-        'TestingAndDebugging::RequireUseWarnings'    => 1,
-        'Variables::ProhibitConditionalDeclarations' => 1,
-        'InputOutput::ProhibitTwoArgOpen'            => 1,
-        'InputOutput::ProhibitBarewordFileHandles'   => 1,
-        'NamingConventions::ProhibitAmbiguousNames'  => 1,
-        'Subroutines::ProhibitBuiltinHomonyms'       => 1,
-        'Subroutines::ProhibitExplicitReturnUndef'   => 1,
-        'Subroutines::ProhibitSubroutinePrototypes'  => 1,
-        'CodeLayout::UseParrotCoda'                  => 1,
-        'CodeLayout::ProhibitHardTabs'               => { allow_leading_tabs => 0 },
-        'CodeLayout::RequireTidyCode'                => { perltidyrc => $perl_tidy_conf },
+        'TestingAndDebugging::RequireUseStrict'        => 1,
+        'TestingAndDebugging::RequireUseWarnings'      => 1,
+        'TestingAndDebugging::RequirePortableShebang'  => 1,
+        'Variables::ProhibitConditionalDeclarations'   => 1,
+        'InputOutput::ProhibitTwoArgOpen'              => 1,
+        'InputOutput::ProhibitBarewordFileHandles'     => 1,
+        'NamingConventions::ProhibitAmbiguousNames'    => 1,
+        'Subroutines::ProhibitBuiltinHomonyms'         => 1,
+        'Subroutines::ProhibitExplicitReturnUndef'     => 1,
+        'Subroutines::ProhibitSubroutinePrototypes'    => 1,
+        'CodeLayout::UseParrotCoda'                    => 1,
+        'CodeLayout::ProhibitHardTabs'                 => { allow_leading_tabs => 0 },
+        'CodeLayout::RequireTidyCode'                  => { perltidyrc => $perl_tidy_conf },
 
         #40564 [TODO] fix perlcritic Subroutines::RequireFinalReturn policy
         # below commented out because it does not ignore subs which 'exit'
