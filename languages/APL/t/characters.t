@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! perl
 
 use lib qw( APL . lib ../lib ../../lib ../../../lib);
 use t::APL tests => 6;
