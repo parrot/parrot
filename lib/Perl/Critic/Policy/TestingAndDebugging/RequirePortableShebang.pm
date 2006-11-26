@@ -37,7 +37,7 @@ sub violates {
             if ($element !~ m{^\#!     # get shebang part at line's start
                                \s*     # any number of spaces
                                perl    # the word 'perl'
-                               \s*     # any number of spaces
+                               \s+     # any number of spaces
                                .*$     # and any characters up to end of line
                               }xs) {
                 my $sev = $self->get_severity();
