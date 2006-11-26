@@ -622,24 +622,25 @@ bad_args:
 
   .local pmc options
   options = new .ResizablePMCArray
-  options[0] = 'alnum'
-  options[1] = 'alpha'
-  options[2] = 'ascii'
-  options[3] = 'control'
-  options[4] = 'boolean'
-  options[5] = 'digit'
-  options[6] = 'double'
-  options[7] = 'false'
-  options[8] = 'graph'
-  options[9] = 'integer'
-  options[10] = 'lower'
-  options[11] = 'print'
-  options[12] = 'punct'
-  options[13] = 'space'
-  options[14] = 'true'
-  options[15] = 'upper'
-  options[16] = 'wordchar'
-  options[17] = 'xdigit'
+  push options, 'alnum'
+  push options, 'alpha'
+  push options, 'ascii'
+  push options, 'control'
+  push options, 'boolean'
+  push options, 'digit'
+  push options, 'double'
+  push options, 'false'
+  push options, 'graph'
+  push options, 'integer'
+  push options, 'lower'
+  push options, 'print'
+  push options, 'punct'
+  push options, 'space'
+  push options, 'true'
+  push options, 'upper'
+  push options, 'wideinteger'
+  push options, 'wordchar'
+  push options, 'xdigit'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
@@ -662,14 +663,9 @@ bad_args:
   if class == 'space' goto space_check
   if class == 'true' goto true_check
   if class == 'upper' goto upper_check
+  if class == 'wideinteger' goto integer_check # XXX implement this check
   if class == 'wordchar' goto wordchar_check
   if class == 'xdigit' goto xdigit_check
-
-bad_class:
-  $S0 = 'bad class "'
-  $S0 .= class
-  $S0 .= '": must be alnum, alpha, ascii, control, boolean, digit, double, false, graph, integer, lower, print, punct, space, true, upper, wordchar, or xdigit'
-  tcl_error $S0
 
 alnum_check:
   the_cclass = .CCLASS_ALPHANUMERIC
@@ -683,12 +679,19 @@ control_check:
   the_cclass = .CCLASS_CONTROL
   goto cclass_check
 boolean_check:
-  if the_string == 'true' goto yep 
-  if the_string == 'false' goto yep 
   if the_string == 'yes' goto yep 
   if the_string == 'no' goto yep 
   if the_string == '1' goto yep 
   if the_string == '0' goto yep 
+  if the_string == 'true' goto yep 
+  if the_string == 'tru'  goto yep 
+  if the_string == 'tr'   goto yep 
+  if the_string == 't'    goto yep 
+  if the_string == 'false' goto yep 
+  if the_string == 'fals'  goto yep 
+  if the_string == 'fal'   goto yep 
+  if the_string == 'fa'    goto yep 
+  if the_string == 'f'     goto yep 
   goto nope 
 digit_check:
   the_cclass = .CCLASS_NUMERIC
@@ -704,9 +707,13 @@ double_check:
   if $I0 == .TclInt   goto yep
   goto nope
 false_check:
-  if the_string == 'false' goto yep 
   if the_string == 'no' goto yep 
   if the_string == '0' goto yep 
+  if the_string == 'false' goto yep 
+  if the_string == 'fals'  goto yep 
+  if the_string == 'fal'   goto yep 
+  if the_string == 'fa'    goto yep 
+  if the_string == 'f'     goto yep 
   goto nope 
 graph_check:
   the_cclass = .CCLASS_GRAPHICAL
@@ -733,9 +740,12 @@ space_check:
   the_cclass = .CCLASS_WHITESPACE
   goto cclass_check
 true_check:
-  if the_string == 'true' goto yep 
   if the_string == 'yes' goto yep 
   if the_string == '1' goto yep 
+  if the_string == 'true' goto yep 
+  if the_string == 'tru'  goto yep 
+  if the_string == 'tr'   goto yep 
+  if the_string == 't'    goto yep 
   goto nope 
 upper_check:
   the_cclass = .CCLASS_UPPERCASE
