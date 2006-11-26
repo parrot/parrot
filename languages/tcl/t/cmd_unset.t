@@ -132,7 +132,7 @@ eval_is {
   set c 4
   unset array(b)
   set c
-} {can't read "c": no such variable} \
+} {variable "c" already exists} \
   {unset an aliased array elem}
 
 eval_is {
