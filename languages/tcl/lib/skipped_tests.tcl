@@ -9,7 +9,24 @@
 array set skipped_tests {
   append-4.21          explode
   append-4.22          explode
+  append-5.1           explode
+  append-7.1           {trace}
+  append-7.2           {trace}
+  append-7.3           {trace}
+  append-7.4           {trace}
+  append-7.5           {trace}
+  appendComp-7.1       {trace}
+  appendComp-7.2       {trace}
+  appendComp-7.3       {trace}
+  appendComp-7.4       {trace}
+  appendComp-7.5       {trace}
+  appendComp-7.6       {trace}
+  appendComp-7.7       {trace}
+  appendComp-7.8       {trace}
+  appendComp-7.9       {trace}
   compExpr-old-14.14   explode
+  basic-1.1            {interp}
+  basic-10.1           {interp}
   dict-2.3             {lsearch -exact}
   dict-11.1            {expr wide()}
   dict-11.2            {expr wide()}

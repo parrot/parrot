@@ -185,10 +185,6 @@ format_done:
   goto format_loop
 end_format_loop:
 
-  print 'ESCAPED OUTPUT IS:'
-  $S0 = escape outputString
-  print $S0
-  print_newline
   .return(outputString)
 
 bad_args:
