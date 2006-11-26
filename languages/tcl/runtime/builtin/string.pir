@@ -17,27 +17,28 @@
 
   .local pmc options
   options = new .ResizablePMCArray
-  options[0] = 'bytelength'
-  options[1] = 'compare'
-  options[2] = 'equal'
-  options[3] = 'first'
-  options[4] = 'index'
-  options[5] = 'is'
-  options[6] = 'last'
-  options[7] = 'length'
-  options[8] = 'map'
-  options[9] = 'match'
-  options[10] = 'range'
-  options[11] = 'repeat'
-  options[12] = 'replace'
-  options[13] = 'tolower'
-  options[14] = 'toupper'
-  options[15] = 'totitle'
-  options[16] = 'trim'
-  options[17] = 'trimleft'
-  options[18] = 'trimright'
-  options[19] = 'wordend'
-  options[20] = 'wordstart'
+  push options, 'bytelength'
+  push options, 'compare'
+  push options, 'equal'
+  push options, 'first'
+  push options, 'index'
+  push options, 'is'
+  push options, 'last'
+  push options, 'length'
+  push options, 'map'
+  push options, 'match'
+  push options, 'range'
+  push options, 'repeat'
+  push options, 'replace'
+  push options, 'reverse'
+  push options, 'tolower'
+  push options, 'toupper'
+  push options, 'totitle'
+  push options, 'trim'
+  push options, 'trimleft'
+  push options, 'trimright'
+  push options, 'wordend'
+  push options, 'wordstart'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
@@ -449,15 +450,11 @@ bad_match:
 
   if argc != 2 goto bad_repeat
   .local string the_string
-  .local pmc    the_repeat
+  .local int    the_repeat
   the_string = argv[0]
   the_repeat = argv[1]
 
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__integer'
-  the_repeat = __integer(the_repeat)
-  $I0 = the_repeat
-  $S0 = repeat the_string, $I0
+  $S0 = repeat the_string, the_repeat
   .return($S0)
 
 bad_repeat:
@@ -625,24 +622,25 @@ bad_args:
 
   .local pmc options
   options = new .ResizablePMCArray
-  options[0] = 'alnum'
-  options[1] = 'alpha'
-  options[2] = 'ascii'
-  options[3] = 'control'
-  options[4] = 'boolean'
-  options[5] = 'digit'
-  options[6] = 'double'
-  options[7] = 'false'
-  options[8] = 'graph'
-  options[9] = 'integer'
-  options[10] = 'lower'
-  options[11] = 'print'
-  options[12] = 'punct'
-  options[13] = 'space'
-  options[14] = 'true'
-  options[15] = 'upper'
-  options[16] = 'wordchar'
-  options[17] = 'xdigit'
+  push options, 'alnum'
+  push options, 'alpha'
+  push options, 'ascii'
+  push options, 'control'
+  push options, 'boolean'
+  push options, 'digit'
+  push options, 'double'
+  push options, 'false'
+  push options, 'graph'
+  push options, 'integer'
+  push options, 'lower'
+  push options, 'print'
+  push options, 'punct'
+  push options, 'space'
+  push options, 'true'
+  push options, 'upper'
+  push options, 'wideinteger'
+  push options, 'wordchar'
+  push options, 'xdigit'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
@@ -665,14 +663,9 @@ bad_args:
   if class == 'space' goto space_check
   if class == 'true' goto true_check
   if class == 'upper' goto upper_check
+  if class == 'wideinteger' goto integer_check # XXX implement this check
   if class == 'wordchar' goto wordchar_check
   if class == 'xdigit' goto xdigit_check
-
-bad_class:
-  $S0 = 'bad class "'
-  $S0 .= class
-  $S0 .= '": must be alnum, alpha, ascii, control, boolean, digit, double, false, graph, integer, lower, print, punct, space, true, upper, wordchar, or xdigit'
-  tcl_error $S0
 
 alnum_check:
   the_cclass = .CCLASS_ALPHANUMERIC
@@ -686,12 +679,19 @@ control_check:
   the_cclass = .CCLASS_CONTROL
   goto cclass_check
 boolean_check:
-  if the_string == 'true' goto yep 
-  if the_string == 'false' goto yep 
   if the_string == 'yes' goto yep 
   if the_string == 'no' goto yep 
   if the_string == '1' goto yep 
   if the_string == '0' goto yep 
+  if the_string == 'true' goto yep 
+  if the_string == 'tru'  goto yep 
+  if the_string == 'tr'   goto yep 
+  if the_string == 't'    goto yep 
+  if the_string == 'false' goto yep 
+  if the_string == 'fals'  goto yep 
+  if the_string == 'fal'   goto yep 
+  if the_string == 'fa'    goto yep 
+  if the_string == 'f'     goto yep 
   goto nope 
 digit_check:
   the_cclass = .CCLASS_NUMERIC
@@ -707,9 +707,13 @@ double_check:
   if $I0 == .TclInt   goto yep
   goto nope
 false_check:
-  if the_string == 'false' goto yep 
   if the_string == 'no' goto yep 
   if the_string == '0' goto yep 
+  if the_string == 'false' goto yep 
+  if the_string == 'fals'  goto yep 
+  if the_string == 'fal'   goto yep 
+  if the_string == 'fa'    goto yep 
+  if the_string == 'f'     goto yep 
   goto nope 
 graph_check:
   the_cclass = .CCLASS_GRAPHICAL
@@ -736,9 +740,12 @@ space_check:
   the_cclass = .CCLASS_WHITESPACE
   goto cclass_check
 true_check:
-  if the_string == 'true' goto yep 
   if the_string == 'yes' goto yep 
   if the_string == '1' goto yep 
+  if the_string == 'true' goto yep 
+  if the_string == 'tru'  goto yep 
+  if the_string == 'tr'   goto yep 
+  if the_string == 't'    goto yep 
   goto nope 
 upper_check:
   the_cclass = .CCLASS_UPPERCASE
@@ -943,8 +950,6 @@ bad_args:
   tcl_error 'wrong # args: should be "string trim string ?chars?"'
 
 .end
-         
-
                   
 .sub 'compare'
   .param pmc argv
@@ -1003,6 +1008,22 @@ arg_length:
 bad_args:
   tcl_error 'wrong # args: should be "string compare ?-nocase? ?-length int? string1 string2"'
 
+.end
+
+.sub 'reverse'
+  .param pmc argv
+ 
+  .local int argc
+  argc = elements argv
+  if argc != 1 goto bad_args
+ 
+  $S0 = shift argv
+  $P0 = new .TclString
+  $S0 = $P0.'reverse'($S0) 
+  .return ($S0)
+
+bad_args:
+  tcl_error 'wrong # args: should be "string reverse string"'
 .end
 
 .sub 'wordend'
