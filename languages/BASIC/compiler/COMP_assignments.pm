@@ -1,6 +1,7 @@
-#! perl -w
+#! perl
 
 use strict;
+use warnings;
 
 
 # Variable name may have a SIGIL and is in S1

@@ -1,8 +1,9 @@
-#! perl -w
+#! perl
 
 use subs qw(fetchvar);
 use vars qw(@builtins @keywords);
 use strict;
+use warnings;
 
 my $retcount=200;
 my $currentexpr;
