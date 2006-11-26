@@ -102,3 +102,10 @@ is( $pmc->get_string(), 'BAR FOO ',
 $pmc    = $foo->invoke( 'PS', 'out of scope' );
 is( $pmc->get_string(), 'Hello, out of scope!',
 		'... even if interpreter object has gone out of scope' );
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
