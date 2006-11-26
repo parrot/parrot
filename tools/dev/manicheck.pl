@@ -41,6 +41,9 @@ my @missing   = ExtUtils::Manifest::manicheck();
 my @extra     = ExtUtils::Manifest::filecheck();
 # my @ignored   = ExtUtils::Manifest::skipcheck();
 
+# strip '~' backup files from the extra list
+@extra = grep !m/~$/, @extra;
+
 printf "Found %d distinct files among MANIFEST and directory contents.\n\n",
   scalar( keys %{$file_list} );
 
