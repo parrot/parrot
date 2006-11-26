@@ -1,5 +1,6 @@
-#! perl -w
+#! perl
 use strict;
+use warnings;
 
 my $o = new Foo();
 for my $i (1 .. 500000) {

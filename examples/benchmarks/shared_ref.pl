@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
 
@@ -17,6 +17,7 @@ Shares references between threads.
 =cut
 
 use strict;
+use warnings;
 use threads;
 use threads::shared;
 

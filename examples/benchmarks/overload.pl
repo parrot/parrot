@@ -1,6 +1,7 @@
-#! perl -w
+#! perl
 package Foo;
 use strict;
+use warnings;
 
 use overload '*' => \&my_mul, 'fallback' => 1;
 

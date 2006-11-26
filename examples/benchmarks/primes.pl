@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
 
@@ -16,6 +16,8 @@ Calculates all the prime numbers up to 50000 and prints out the number
 of primes and the last one found.
 
 =cut
+
+use warnings;
 
 my $i1 = 1;
 my $i2 = 10000;

@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
 
@@ -18,6 +18,7 @@ unspecified).
 =cut
 
 use strict;
+use warnings;
 
 sub fib {
 	my $n = shift;

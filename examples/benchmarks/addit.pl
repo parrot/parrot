@@ -1,4 +1,4 @@
-#! perl -w
+#! perl
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
 
@@ -19,6 +19,7 @@ prints the result (21001097.97).
 =cut
 
 use strict;
+use warnings;
 sub varargs_adder {
     my $sum = 0;
     for (my $a = $#_; $a >= 0; --$a) {
