@@ -17,27 +17,28 @@
 
   .local pmc options
   options = new .ResizablePMCArray
-  options[0] = 'bytelength'
-  options[1] = 'compare'
-  options[2] = 'equal'
-  options[3] = 'first'
-  options[4] = 'index'
-  options[5] = 'is'
-  options[6] = 'last'
-  options[7] = 'length'
-  options[8] = 'map'
-  options[9] = 'match'
-  options[10] = 'range'
-  options[11] = 'repeat'
-  options[12] = 'replace'
-  options[13] = 'tolower'
-  options[14] = 'toupper'
-  options[15] = 'totitle'
-  options[16] = 'trim'
-  options[17] = 'trimleft'
-  options[18] = 'trimright'
-  options[19] = 'wordend'
-  options[20] = 'wordstart'
+  push options, 'bytelength'
+  push options, 'compare'
+  push options, 'equal'
+  push options, 'first'
+  push options, 'index'
+  push options, 'is'
+  push options, 'last'
+  push options, 'length'
+  push options, 'map'
+  push options, 'match'
+  push options, 'range'
+  push options, 'repeat'
+  push options, 'replace'
+  push options, 'reverse'
+  push options, 'tolower'
+  push options, 'toupper'
+  push options, 'totitle'
+  push options, 'trim'
+  push options, 'trimleft'
+  push options, 'trimright'
+  push options, 'wordend'
+  push options, 'wordstart'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
@@ -939,8 +940,6 @@ bad_args:
   tcl_error 'wrong # args: should be "string trim string ?chars?"'
 
 .end
-         
-
                   
 .sub 'compare'
   .param pmc argv
@@ -999,6 +998,22 @@ arg_length:
 bad_args:
   tcl_error 'wrong # args: should be "string compare ?-nocase? ?-length int? string1 string2"'
 
+.end
+
+.sub 'reverse'
+  .param pmc argv
+ 
+  .local int argc
+  argc = elements argv
+  if argc != 1 goto bad_args
+ 
+  $S0 = shift argv
+  $P0 = new .TclString
+  $S0 = $P0.'reverse'($S0) 
+  .return ($S0)
+
+bad_args:
+  tcl_error 'wrong # args: should be "string reverse string"'
 .end
 
 .sub 'wordend'
