@@ -35,11 +35,10 @@ sub violates {
 
             # if we have a platform-specific shebang, barf
             if ($element !~ m{^\#!     # get shebang part at line's start
-                               \s*     # any number of spaces
+                               [ ]*    # any number of spaces
                                perl    # the word 'perl'
-                               \s+     # any number of spaces
-                               .*$     # and any characters up to end of line
-                              }xs) {
+                               \s      # a space
+                              }xms) {
                 my $sev = $self->get_severity();
                 return Perl::Critic::Violation
                     ->new( $desc, $expl, $element, $sev ); 
