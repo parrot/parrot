@@ -128,6 +128,8 @@ env_loop_done:
   $P1['byteOrder'] = 'bigEndian'
 
  done_endian: 
+  $I1 = config['intsize']
+  $P1['wordSize'] = $I1
 
   # Set default precision.
   $P1 = new 'TclInt'
