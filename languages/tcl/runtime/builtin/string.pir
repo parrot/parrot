@@ -1060,3 +1060,51 @@ return:
 bad_args:
   tcl_error 'wrong # args: should be "string wordend string index"'
 .end
+
+.sub 'wordstart'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc != 2 goto bad_args
+
+  .local string str
+  .local pmc    idx
+  str = argv[0]
+  idx = argv[1]
+
+  .local pmc __index
+  __index = get_root_global ['_tcl'], '__index'
+  idx = __index(idx, str)
+  
+  .local int pos
+  pos = idx
+  # XXX should these checks be in __index itself?
+  if pos >0 goto check_upper
+  pos = 0
+  goto pre_loop
+check_upper:
+  $I1 = length str
+  dec $I1
+  if pos <= $I1 goto pre_loop
+  pos = $I1
+pre_loop:
+  .local int old_idx
+  old_idx = pos
+loop:
+  if pos < 0 goto loop_done
+
+  $I1 = is_cclass .CCLASS_WORD, str, pos
+  unless $I1 goto loop_done
+
+  dec pos
+  goto loop
+loop_done:
+  if pos == old_idx goto ret_val
+  inc pos
+ret_val:  
+  .return(pos)
+
+bad_args:
+  tcl_error 'wrong # args: should be "string wordstart string index"'
+.end
