@@ -22,12 +22,12 @@ all: abc.pbc
 SOURCES = abc.pir \
   src/abc.pg \
   src/builtins.pir \
-  src/parse2past.tg 
+  src/PASTGrammar.tg
 
 # the default target
 abc.pbc: $(PARROT) $(PGE_DIR)/pgc.pir $(SOURCES)
 	$(PARROT) $(PGE_DIR)/pgc.pir --output=src/abc_gen.pir src/abc.pg
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/parse2past_gen.pir src/parse2past.tg
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/PASTGrammar_gen.pir src/PASTGrammar.tg
 	$(PARROT) -o abc.pbc abc.pir
 
 # This is a listing of all targets, that are meant to be called by users
@@ -60,7 +60,7 @@ testclean:
 CLEANUPS = \
   abc.pbc \
   src/abc_gen.pir \
-  src/parse2past_gen.pir
+  src/PASTGrammar_gen.pir
 
 clean: testclean
 	$(RM_RF) $(CLEANUPS)

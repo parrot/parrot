@@ -1,4 +1,7 @@
-transform root (ROOT) :language('PIR') {
+grammar ABC::PAST::Grammar is TGE::Grammar;
+
+transform past (ROOT) :language('PIR') {
+    node = node['program']
     .local pmc past
     past = new 'PAST::Block'
     past.'init'('node'=>node, 'name'=>'anon')

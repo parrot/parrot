@@ -2,6 +2,8 @@ grammar ABC::Grammar;
 
 ## an example 'bc' grammar
 
+token apply { <program> }
+
 ## recognize terms
 token term { 
     | $<float>:=[ \d+\.\d* | \.\d+ ]
