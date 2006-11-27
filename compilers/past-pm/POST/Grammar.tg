@@ -1,3 +1,5 @@
+grammar POST::Grammar is TGE::Grammar;
+
 transform root (PAST::Block) :language('PIR') {
     .return tree.'get'('post', node)
 }

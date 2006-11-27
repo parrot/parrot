@@ -275,35 +275,20 @@ Accessor method -- sets/returns the C<name> attribute of the invocant.
     .return self.'attr'('atype', value, has_value)
 .end
 
+=item compile(code [, adverbs :slurpy :named])
 
-=item compile(node, ['target'=>target, ...])
-
-Compile the abstract syntax tree given by C<past> into the form
-given by C<target>.  Current targets include "past", "post", "pir";
-if no C<target> is supplied then the abstract syntax tree is compiled
-to executable code (but not executed).
+(Deprecated.)  Compile the given PAST tree according to C<adverbs>.
 
 =cut
 
 .sub 'compile'
-    .param pmc past
+    .param pmc source
     .param pmc adverbs         :slurpy :named
 
-    .local string target
-    target = adverbs['target']
-    target = downcase target
-    if target == 'past' goto return_past
-    if target == 'parse' goto return_past
-
-    .local pmc postgrammar, postbuilder, post
-    postgrammar = new 'POST::Grammar'
-    postbuilder = postgrammar.'apply'(past)
-    post = postbuilder.'get'('root')
-    .return post.'compile'(adverbs :flat :named)
-
-  return_past:
-    .return (past)
+    $P0 = compreg 'PAST'
+    .return $P0.'compile'(source, adverbs :flat :named)
 .end
+
 
 =back
 
@@ -673,12 +658,6 @@ Get/set any pragmas (PIR) for this block.
     .param int has_value       :opt_flag
     .return self.'attr'('pragma', value, has_value)
 .end
-
-
-.include 'POST.pir'
-
-.namespace [ 'POST::Grammar' ]
-.include 'past2post_gen.pir'
 
 
 =back
