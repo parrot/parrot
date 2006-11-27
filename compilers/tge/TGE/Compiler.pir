@@ -394,7 +394,7 @@ loop_end:
     code .= "' ]"
   no_type:
     code .= "\n\n"
-    code .= ".sub '__onload' :load\n"
+    code .= ".sub '__onload' :load :init\n"
     code .= "    load_bytecode 'TGE.pbc'\n"
     code .= "    $I0 = find_type '"
     code .= type
