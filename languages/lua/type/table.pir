@@ -69,6 +69,15 @@ L2:
     .return (ret)
 .end
 
+.sub '_has' :anon
+    .param pmc t
+    .param pmc key
+    $P0 = getattribute t, 'hash'
+    $S0 = _make_key(key)
+    $I0 = exists $P0[$S0]
+    .return ($I0)
+.end
+
 .sub 'get_pmc_keyed' :method :vtable
     .param pmc key
     .local pmc ret
@@ -104,8 +113,8 @@ L4:
     ex['_message'] = "table index is nil"
     throw ex
 L1:
-    $P0 = _get(self, key)
-    unless_null $P0, L2
+    $I0 = _has(self, key)
+    if $I0 goto L2
     .local pmc meth
     meth = self.'find_metamethod'('__newindex')
     if_null meth, L2
