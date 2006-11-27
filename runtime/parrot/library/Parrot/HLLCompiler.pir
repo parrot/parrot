@@ -1,6 +1,6 @@
 =head1 NAME
 
-HLLCompiler - base class for HLL compiler objects
+HLLCompiler - base class for compiler objects
 
 =head1 DESCRIPTION
 
@@ -18,11 +18,11 @@ running compilers from a command line.
     addattribute $P0, '$!compsub'
 .end
 
-=head2 Methods 
+=head2 Methods
 
 =over 4
 
-=item C<register(string name, pmc compsub)>
+=item register(string name, pmc compsub)
 
 Registers this compiler object as C<name> and using C<compsub>
 as the subroutine to call for performing compilation.
@@ -39,11 +39,11 @@ as the subroutine to call for performing compilation.
 .end
 
 
-=item C<compile(PMC source, PMC adverbs :slurpy :named)>
+=item compile(source [, adverbs :slurpy :named])
 
 Compile C<source> according to any options given by
 C<adverbs>.  If no compiler has been registered
-via C<compsub> above, then simply return C<source>.
+via C<compsub> above, then throw an exception.
 
 =cut
 
@@ -56,11 +56,13 @@ via C<compsub> above, then simply return C<source>.
     if null compsub goto default
     .return compsub(source, adverbs :flat :named)
   default:
-    .return (source)
+    $P0 = new .Exception
+    $P0['_message'] = 'No language-specific compiler method provided'
+    throw $P0
 .end
 
 
-=item C<parse_name(STRING name)>
+=item parse_name(string name)
 
 Split C<name> into its component namespace parts.  The
 default is simply to split based on double-colons.
@@ -72,9 +74,9 @@ default is simply to split based on double-colons.
     $P0 = split '::', name
     .return ($P0)
 .end
-    
 
-=item C<command_line(PMC args)>
+
+=item command_line(PMC args)
 
 Generic method for compilers invoked from a shell command line.
 
@@ -140,7 +142,7 @@ Generic method for compilers invoked from a shell command line.
     close ifh
     bsr evalcode
     goto save_output
-    
+
     ## combine all input file(s) and process the result
   combine:
     code = ''
