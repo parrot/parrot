@@ -614,11 +614,12 @@ generated for the block.
 
 =item blocktype([STRING type])
 
-Get/set the type of the block.  Currently the only understood
-C<blocktype> value is "immediate", which indicates a lexical
-block that is to be immediately executed when it is evaluated
-in the AST (e.g., the immediate blocks in Perl 6 C<if>, C<while>,
-and other similar statements).
+Get/set the type of the block.  The currently understood values
+are 'declaration' and 'immediate'.  'Declaration' indicates
+that a block is simply being defined at this point, while
+'immediate' indicates a block that is to be immediately
+executed when it is evaluated in the AST (e.g., the immediate
+blocks in Perl6 C<if>, C<while>, and other similar statements).
 
 =cut
 
@@ -658,6 +659,19 @@ PAST compiler.
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .return self.'attr'('compiler', value, has_value)
+.end
+
+
+=item pragma([pragma])
+
+Get/set any pragmas (PIR) for this block.
+
+=cut
+
+.sub 'pragma' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('pragma', value, has_value)
 .end
 
 

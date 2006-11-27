@@ -258,9 +258,11 @@ for compiling programs in Parrot.
     outer = concat ':outer(', outer
     outer = concat outer, ')'
   have_outer:
+    .local string pragma
+    pragma = self.'pragma'()
     .local pmc code
     code = new 'PGE::CodeString'
-    code.'emit'("\n.sub %0 %1", name, outer)
+    code.'emit'("\n.sub %0 %1 %2", name, outer, pragma)
     $P0 = self.'paramcode'()
     code .= $P0
     .local pmc iter, cpost
@@ -280,7 +282,10 @@ for compiling programs in Parrot.
     set_hll_global ['POST'], '$!subpir', code
 
     code = new 'PGE::CodeString'
+    $S0 = self.'blocktype'()
+    if $S0 == 'declaration' goto skip_declaration
     code.'emit'("    %0 = find_name %1", value, name)
+  skip_declaration:
     .return (code)
 .end
 
@@ -327,6 +332,20 @@ for compiling programs in Parrot.
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .return self.'attr'('outer', value, has_value)
+.end
+
+
+.sub 'pragma' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('pragma', value, has_value)
+.end
+
+
+.sub 'blocktype' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('blocktype', value, has_value)
 .end
 
 

@@ -4,16 +4,18 @@ transform root (PAST::Block) :language('PIR') {
 
 
 transform post (PAST::Block) :language('PIR') {
-    .local string name
+    .local string name, pragma, blocktype
     name = node.'name'()
     if name != '' goto with_name
     name = node.unique('_block')
   with_name:
+    pragma = node.'pragma'()
+    blocktype = node.'blocktype'()
     .local pmc outerpost
     outerpost = get_hll_global ['POST'], '$?SUB'
     .local pmc post
     post = new 'POST::Sub'
-    post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost)
+    post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'pragma'=>pragma, 'blocktype'=>blocktype)
     set_hll_global ['POST'], '$?SUB', post
     .local string compiler
     compiler = node.'compiler'()
@@ -43,8 +45,7 @@ transform post (PAST::Block) :language('PIR') {
 
   end:
     set_hll_global ['POST'], '$?SUB', outerpost
-    $S0 = node.'blocktype'()
-    if $S0 != 'immediate' goto blocktype_end
+    if blocktype != 'immediate' goto blocktype_end
     post = post.'new'('POST::Op', post, 'node'=>node, 'pirop'=>'call', 'arglist'=>post)
   blocktype_end:
     .return (post)
