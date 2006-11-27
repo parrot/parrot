@@ -137,7 +137,7 @@ parse tree.
 
     parsegrammar_name = self.'parsegrammar'()
     unless parsegrammar_name goto err_no_parsegrammar
-    apply = find_method parsegrammar_name, 'apply'
+    apply = get_hll_global parsegrammar_name, 'apply'
     .return apply(source, 'grammar' => parsegrammar_name)
 
   err_no_parsegrammar:
