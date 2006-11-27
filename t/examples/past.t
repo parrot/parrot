@@ -34,10 +34,13 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 
 # Set up expected output for examples
+
+## XXX below tests neds 2 trailing spaces to succed
+#      this is really bad
 my %expected = (
     '01-sub.pir'        =>  << 'END_EXPECTED',
 
-.sub "foo" 
+.sub "foo"  
     new $P10, .Integer
     assign $P10, 4
     clone $P10, $P10
