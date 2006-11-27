@@ -55,7 +55,7 @@ the output to the correct output file.
 
 =cut
 
-.namespace [ 'PGE::P6Grammar' ]
+.namespace [ 'PGE::P6Grammar::Compiler' ]
 
 .sub 'main' :main
     .param pmc args
@@ -117,13 +117,13 @@ the output to the correct output file.
 
     ##   create the PGE::P6Grammar compiler object
     .local pmc pgc
-    pgc = new [ 'HLLCompiler' ]
-    $P0 = get_global 'compile_p6grammar'
-    pgc.'register'('PGE::P6Grammar', $P0)
+    $P99 = subclass 'HLLCompiler', 'PGE::P6Grammar::Compiler'
+    pgc = new [ 'PGE::P6Grammar::Compiler' ]
+    pgc.'language'('PGE::P6Grammar')
 .end
 
 
-.sub 'compile_p6grammar'
+.sub 'compile' :method
     .param pmc source
     .param pmc adverbs         :slurpy :named
 
@@ -143,7 +143,7 @@ the output to the correct output file.
     match = $P0(source, 0, 'PGE::P6Grammar')
 
     .local pmc stmtrule
-    stmtrule = get_global 'statement'
+    stmtrule = get_hll_global ['PGE::P6Grammar'], 'statement'
 
   stmt_loop:
     match = stmtrule(match)

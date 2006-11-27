@@ -11,10 +11,12 @@ running compilers from a command line.
 
 =cut
 
-.namespace [ 'HLLCompiler' ]
+.namespace
 
 .sub '__onload' :load :init
     $P0 = newclass [ 'HLLCompiler' ]
+    addattribute $P0, '$parsegrammar'
+    addattribute $P0, '$astgrammar'
     addattribute $P0, '$!compsub'
 .end
 
@@ -22,10 +24,160 @@ running compilers from a command line.
 
 =over 4
 
-=item register(string name, pmc compsub)
+=item attr(string attrname, pmc value, int has_value)
 
-Registers this compiler object as C<name> and using C<compsub>
-as the subroutine to call for performing compilation.
+Helper method for accessors -- gets/sets an attribute given
+by C<attrname> based on C<has_value>.
+
+=cut
+
+.namespace [ 'HLLCompiler' ]
+
+.sub 'attr' :method
+    .param string attrname
+    .param pmc value
+    .param int has_value
+    if has_value goto set_value
+    value = getattribute self, attrname
+    unless null value goto end
+    value = new .Undef
+    goto end
+  set_value:
+    setattribute self, attrname, value
+  end:
+    .return (value)
+.end
+
+
+=item 'language'(string name)
+
+Register this object as the compiler for C<name> using the
+C<compreg> opcode.
+
+=cut
+
+.sub 'language' :method
+    .param string name
+    compreg name, self
+    .return ()
+.end
+
+
+=item parsegrammar([string grammar])
+
+Accessor for the 'parsegrammar' attribute.
+
+=item astgrammar([string grammar])
+
+Accessor for the 'astgrammar' attribute.
+
+=cut
+
+.sub 'parsegrammar' :method
+    .param string value        :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('$parsegrammar', value, has_value)
+.end
+
+
+.sub 'astgrammar' :method
+    .param string value        :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('$astgrammar', value, has_value)
+.end
+
+
+=item compile(pmc code [, adverbs :slurpy :named])
+
+Compile C<source> according to any options given by
+C<adverbs>.  If a compsub has been registered for this
+compiler, use it, otherwise use the C<parsegrammar> and
+C<astgrammar> attributes, otherwise throw an exception.
+
+=cut
+
+.sub 'compile' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+    .local pmc compsub
+
+    #   $!compsub is deprecated
+    compsub = getattribute self, '$!compsub'
+    if null compsub goto default
+    .return compsub(source, adverbs :flat :named)
+  default:
+    .local string target
+    target = adverbs['target']
+    target = downcase target
+
+    .local pmc result
+    result = self.'parse'(source, adverbs :flat :named)
+    if target == 'parse' goto have_result
+    result = self.'ast'(result, adverbs :flat :named)
+    if target == 'past' goto have_result
+    $P0 = compreg 'PAST'
+    result = $P0.'compile'(result, adverbs :flat :named)
+  have_result:
+    .return (result)
+.end
+
+
+=item parse(source [, adverbs :slurpy :named])
+
+Parse C<source> using the compiler's C<parsegrammar> according
+to any options given by C<adverbs>, and return the resulting
+parse tree.
+
+=cut
+
+.sub 'parse' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+    .local pmc parsegrammar_name, apply
+
+    parsegrammar_name = self.'parsegrammar'()
+    unless parsegrammar_name goto err_no_parsegrammar
+    apply = find_method parsegrammar_name, 'apply'
+    .return apply(source, 'grammar' => parsegrammar_name)
+
+  err_no_parsegrammar:
+    $P0 = new .Exception
+    $P0['_message'] = 'Missing parsegrammar in compiler'
+    throw $P0
+.end
+
+
+=item ast(source [, adverbs :slurpy :named])
+
+Transform C<source> using the compiler's C<astgrammar>
+according to any options given by C<adverbs>, and return the
+resulting ast.
+
+=cut
+
+.sub 'ast' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+    .local string astgrammar_name
+    .local pmc astgrammar, astbuilder
+    astgrammar_name = self.'astgrammar'()
+    unless astgrammar_name goto err_no_astgrammar
+    $I0 = find_type astgrammar_name
+    astgrammar = new $I0
+    astbuilder = astgrammar.'apply'(source)
+    .return astbuilder.'get'('past')
+
+  err_no_astgrammar:
+    $P0 = new .Exception
+    $P0['_message'] = 'Missing astgrammar in compiler'
+    throw $P0
+.end
+
+
+=item register(string name, pmc compsub)  # DEPRECATED
+
+(Deprecated.) Registers this compiler object as C<name> and 
+using C<compsub> as the subroutine to call for performing compilation.
 
 =cut
 
@@ -39,33 +191,11 @@ as the subroutine to call for performing compilation.
 .end
 
 
-=item compile(source [, adverbs :slurpy :named])
-
-Compile C<source> according to any options given by
-C<adverbs>.  If no compiler has been registered
-via C<compsub> above, then throw an exception.
-
-=cut
-
-.sub 'compile' :method
-    .param pmc source
-    .param pmc adverbs         :slurpy :named
-    .local pmc compsub
-
-    compsub = getattribute self, '$!compsub'
-    if null compsub goto default
-    .return compsub(source, adverbs :flat :named)
-  default:
-    $P0 = new .Exception
-    $P0['_message'] = 'No language-specific compiler method provided'
-    throw $P0
-.end
-
-
 =item parse_name(string name)
 
-Split C<name> into its component namespace parts.  The
-default is simply to split based on double-colons.
+Split C<name> into its component namespace parts, as
+required by pdd21.  The default is simply to split the name
+based on double-colon separators.
 
 =cut
 
