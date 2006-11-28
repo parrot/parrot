@@ -15,6 +15,7 @@ array set skipped_tests {
   append-7.3           {trace}
   append-7.4           {trace}
   append-7.5           {trace}
+  appendComp-5.1       explode
   appendComp-7.1       {trace}
   appendComp-7.2       {trace}
   appendComp-7.3       {trace}
