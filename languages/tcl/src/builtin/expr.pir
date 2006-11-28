@@ -46,7 +46,7 @@ not_const:
   .return(register_num, $P0)
 
 bad_args:
-  .return(register_num, "tcl_error 'wrong # args: should be \"eval arg ?arg ...?\"'\n")
+  .return(register_num, "tcl_error 'wrong # args: should be \"expr arg ?arg ...?\"'\n")
 
 exception:
   .catch()
