@@ -463,7 +463,7 @@ badargs:
     .return('')
 
   bad_args:
-    tcl_error 'wrong # args: should be "file ext name"'
+    tcl_error 'wrong # args: should be "file extension name"'
 .end
 
 # XXX: Stub
