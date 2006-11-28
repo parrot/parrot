@@ -127,28 +127,24 @@ proc diag {diagnostic} {
 # we actually support tcltest.
 
 # A placeholder that simulates the real tcltest's exported test proc.
-proc test {num description code args} {
+proc test {num description args} {
     global skipped_tests
     global abort_after
-    set excuse "can't deal with this version of test yet."
     set full_desc "$num $description"
-    if {! [catch {set abort $abort_after($num)}]} {
-        set abort 1
+
+    if {! [catch {set reason $skipped_tests($num)}]} {
+        pass $full_desc [list SKIP $reason]
+    } elseif {[llength $args] == 2} {
+        eval_is [lindex $args 0] [lindex $args 1] $full_desc
+    } elseif {[llength $args] == 3} {
+        # XXX : we're just skipping the constraint here...
+        eval_is [lindex $args 1] [lindex $args 2] $full_desc
     } else {
-        set abort 0
-    } 
-    if {[llength $args] == 0} {
-        pass $full_desc [list SKIP $excuse]
-    } elseif {[llength $args] == 1} {
-        if {! [catch {set reason $skipped_tests($num)}]} {
-            pass $full_desc [list SKIP $reason]
-        } else {
-            eval_is $code [lindex $args 0] $full_desc
-        }
-    } else {
-        pass $full_desc [list SKIP $excuse]
+        # Skip test if too many or two few args.
+        pass $full_desc [list SKIP {can't deal with this version of test yet}]
     }
-    if $abort {
+
+    if {! [catch {set abort $abort_after($num)}]} {
        plan no_plan
        exit 0
     }
@@ -177,6 +173,7 @@ proc child-trusted      {args} {return 0}
 proc makeDirectory      {args} {return 0}
 proc removeDirectory    {args} {return 0}
 proc testobj            {args} {return 0}
+proc testsetplatform    {args} {return 0}
 namespace eval tcltest  {
     set verbose 0
     proc temporaryDirectory {args} {return 0}
