@@ -1,7 +1,13 @@
 grammar POST::Grammar is TGE::Grammar;
 
 transform root (PAST::Block) :language('PIR') {
-    .return tree.'get'('post', node)
+    .local pmc post
+    post = tree.'get'('post', node)
+    $I0 = isa post, 'POST::Sub'
+    if $I0 goto end
+    post = post.'new'('POST::Sub', post)
+  end:
+    .return (post)
 }
 
 
