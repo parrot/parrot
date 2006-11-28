@@ -8,6 +8,8 @@ PAST::Compiler implements a basic compiler for PAST nodes.
 By default PAST::Compiler transforms a PAST tree into POST,
 and then invokes POST::Compiler on the resulting POST tree.
 
+=over
+
 =cut
 
 .namespace [ 'PAST::Compiler' ]

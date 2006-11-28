@@ -19,8 +19,6 @@ compiling programs into Parrot.
 
 .include 'POST/Compiler.pir'
 
-=back
-
 =head1 AUTHOR
 
 Patrick Michaud <pmichaud@pobox.com> is the author and maintainer.

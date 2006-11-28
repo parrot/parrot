@@ -77,7 +77,7 @@ next_item:
     .return (query_hash)
 .end
 
-=head2 urldecode
+=item urldecode
 
 convert %xx to char 
 
