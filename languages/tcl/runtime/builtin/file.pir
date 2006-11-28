@@ -436,10 +436,34 @@ badargs:
   .return(0)
 .end
 
-# RT#40729: Stub for test parsing
-.sub 'ext'
-  .param pmc argv
-  .return(0)
+.sub 'extension'
+    .param pmc argv
+    .local int argc
+
+    # check if filename arg exists
+    argc = elements argv
+    if argc != 1 goto bad_args
+
+    # get our filename
+    $S0 = argv[0]
+
+    # test if filename has dots
+    $I0 = index $S0, '.'
+    if $I0 == -1 goto no_dot
+
+    # calculate file extension
+    $P0 = split '.', $S0
+    $S1 = pop $P0
+    # include dot
+    $S1 = '.' . $S1
+
+    .return($S1)
+
+  no_dot:
+    .return('')
+
+  bad_args:
+    tcl_error 'wrong # args: should be "file ext name"'
 .end
 
 # XXX: Stub
