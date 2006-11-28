@@ -50,9 +50,7 @@ foreach my $file (@files) {
     while (<$fh>) {
         next unless /(FIXME|XXX|TODO)/;
 
-        if (! m/\((?:RT)?#+\d+\)/) {
-            push @fixme, "file '$path', line $.: $1\n";
-        }
+        push @fixme, "file '$path', line $.: $1\n";
     }
     close $fh;
 }
