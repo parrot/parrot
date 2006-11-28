@@ -68,11 +68,7 @@ typedef struct _MMD_table {
 } MMD_table;
 
 
-PARROT_API PMC *Parrot_MMD_search_default_func(Interp *, STRING *meth);
-PARROT_API PMC *Parrot_MMD_search_default_inline(Interp *, STRING *meth,
-        STRING *signature, ...);
-
-PARROT_API PMC *Parrot_MMD_dispatch_func(Interp *, PMC *multi, STRING *meth);
+PARROT_API PMC *Parrot_mmd_sort_candidate_list(Interp *, PMC *candidates);
 PARROT_API PMC *Parrot_MMD_search_default_infix(Interp *, STRING *meth,
         INTVAL left_type, INTVAL right_type);
 

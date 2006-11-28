@@ -859,67 +859,10 @@ static PMC* mmd_search_default(Interp *, STRING *meth, PMC *arg_tuple);
 static PMC* mmd_search_scopes(Interp *, STRING *meth, PMC *arg_tuple);
 static void mmd_search_classes(Interp *, STRING *meth, PMC *arg_tuple, PMC *,
         INTVAL start);
-static int  mmd_search_lexical(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
-static int  mmd_search_package(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
-static int  mmd_search_global(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
+static int  mmd_search_cur_namespace(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
 static void mmd_search_builtin(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
 static int  mmd_maybe_candidate(Interp *, PMC *pmc, PMC *arg_tuple, PMC *cl);
 static void mmd_sort_candidates(Interp *, PMC *arg_tuple, PMC *cl);
-
-/*
-
-=item C<PMC *Parrot_MMD_search_default_inline(Interp *,
-                                              STRING *meth,
-                                              STRING *signature, ...)>
-
-Default implementation of MMD lookup. The signature contains the letters
-"INSP" for the argument types. B<PMC> arguments are given in the function call.
-
-=item C<PMC *Parrot_MMD_search_default_func(Interp *, STRING *meth)>
-
-Default implementation of MMD lookup. The signature contains the letters
-"INSP" for the argument types. B<PMC> arguments are taken from
-the argument tuple.
-
-=cut
-
-*/
-
-/*
- * TODO move to header, when API is sane
- */
-
-PMC *
-Parrot_MMD_search_default_inline(Interp *interp, STRING *meth,
-        STRING *signature, ...)
-{
-    va_list args;
-    PMC* arg_tuple;
-    /*
-     * 1) create argument tuple
-     */
-    va_start(args, signature);
-    arg_tuple = mmd_arg_tuple_inline(interp, signature, args);
-    va_end(args);
-    /*
-     * default search policy
-     */
-    return mmd_search_default(interp, meth, arg_tuple);
-}
-
-PMC *
-Parrot_MMD_search_default_func(Interp *interp, STRING *meth)
-{
-    PMC* arg_tuple;
-    /*
-     * 1) create argument tuple
-     */
-    arg_tuple = mmd_arg_tuple_func(interp);
-    /*
-     * default search policy
-     */
-    return mmd_search_default(interp, meth, arg_tuple);
-}
 
 PMC *
 Parrot_MMD_search_default_infix(Interp *interp, STRING *meth,
@@ -936,53 +879,37 @@ Parrot_MMD_search_default_infix(Interp *interp, STRING *meth,
 
 /*
 
-=item C<PMC* Parrot_MMD_dispatch_func(Interp *, PMC *multi)>
+=item C<PMC *Parrot_mmd_sort_candidate_list(Interp *interp, PMC *candidates)>
 
-Given a multi sub PMC (usually the multi method of one class) return the
-best matching function for the call signature and call arguments according
-to pdd03.
+Given an array PMC (usually a MultiSub) sort the mmd candidates by their
+manhatten distance to the current args.
 
 =cut
 
 */
 
-PMC *
-Parrot_MMD_dispatch_func(Interp *interp, PMC *multi, STRING *meth)
+PMC *Parrot_mmd_sort_candidate_list(Interp *interp, PMC *candidates)
 {
-    PMC* arg_tuple, *pmc;
-    PMC *candidate_list;
+    PMC *arg_tuple;
     INTVAL n;
-    /*
-     * 1) create argument tuple
-     */
-    arg_tuple = mmd_arg_tuple_func(interp);
 
-    n = VTABLE_elements(interp, multi);
+    n = VTABLE_elements(interp, candidates);
     if (!n)
-        return NULL;
+        return PMCNULL;
+    if (n == 1)
+        return candidates;
 
-    candidate_list = VTABLE_clone(interp, multi);
-    /*
-     * 4) go through all parents of MRO and check for methods
-     *    where the first argument matches
-     *
-     *    XXX do we need this?
-     */
-    if (meth)
-        mmd_search_classes(interp, meth, arg_tuple, candidate_list, 1);
-    /*
-     * 5) sort the list
-     */
-    if (n > 1)
-        mmd_sort_candidates(interp, arg_tuple, candidate_list);
-    n = VTABLE_elements(interp, candidate_list);
+    arg_tuple  = mmd_arg_tuple_func(interp);
+    candidates = VTABLE_clone(interp, candidates);
+    mmd_sort_candidates(interp, arg_tuple, candidates);
+
+    /* if there aren't any variants that match the current args, we could end
+       up with an empty list */
+    n = VTABLE_elements(interp, candidates);
     if (!n)
-        return NULL;
-    /*
-     * 6) Uff, return first one
-     */
-    pmc = VTABLE_get_pmc_keyed_int(interp, candidate_list, 0);
-    return pmc;
+        return PMCNULL;
+
+    return candidates;
 }
 
 /*
@@ -1059,7 +986,7 @@ mmd_arg_tuple_func(Interp *interp)
      * if there is no signature e.g. because of
      *      m = getattribute l, "__add"
      * - we have to return the MultiSub
-     * - create a BoundMulit
+     * - create a BoundMulti
      * - dispatch in invoke - yeah ugly
      */
 
@@ -1280,7 +1207,7 @@ mmd_cvt_to_types(Interp* interp, PMC *multi_sig)
         if (sig_elem->vtable->base_type == enum_class_String) {
             sig = VTABLE_get_string(interp, sig_elem);
             if (memcmp(sig->strstart, "__VOID", 6) == 0) {
-                PMC_int_val(ar)--;  /* XXX */
+                PMC_int_val(ar)--;  /* XXX */   
                 break;
             }
             type = pmc_type(interp, sig);
@@ -1472,16 +1399,8 @@ mmd_search_scopes(Interp *interp, STRING *meth, PMC *arg_tuple)
     int stop;
 
     candidate_list = pmc_new(interp, enum_class_ResizablePMCArray);
-    /*
-     * XXX disabled during LexPad / ScratchPad transisition
-    stop = mmd_search_lexical(interp, meth, arg_tuple, candidate_list);
-    if (stop)
-        return candidate_list;
-     */
-    stop = mmd_search_package(interp, meth, arg_tuple, candidate_list);
-    if (stop)
-        return candidate_list;
-    stop = mmd_search_global(interp, meth, arg_tuple, candidate_list);
+
+    stop = mmd_search_cur_namespace(interp, meth, arg_tuple, candidate_list);
     if (stop)
         return candidate_list;
     mmd_search_builtin(interp, meth, arg_tuple, candidate_list);
@@ -1562,26 +1481,7 @@ mmd_maybe_candidate(Interp *interp, PMC *pmc, PMC *arg_tuple, PMC *cl)
 
 /*
 
-=item C<static int mmd_search_lexical(Interp *, STRING *meth,
-                                      PMC *arg_tuple, PMC *cl)>
-
-Search the current lexical pad for matching candidates. Return TRUE if the
-MMD search should stop.
-
-=cut
-
-*/
-
-static int
-mmd_search_lexical(Interp *interp, STRING *meth, PMC *arg_tuple, PMC *cl)
-{
-    /* TODO */
-    return 0;
-}
-
-/*
-
-=item C<static int mmd_search_package(Interp *, STRING *meth,
+=item C<static int mmd_search_cur_namespace(Interp *, STRING *meth,
                                       PMC *arg_tuple, PMC *cl)>
 
 Search the current package namespace for matching candidates. Return
@@ -1592,36 +1492,11 @@ TRUE if the MMD search should stop.
 */
 
 static int
-mmd_search_package(Interp *interp, STRING *meth, PMC *arg_tuple, PMC *cl)
+mmd_search_cur_namespace(Interp *interp, STRING *meth, PMC *arg_tuple, PMC *cl)
 {
     PMC *pmc;
 
     pmc = Parrot_find_global_cur(interp, meth);
-    if (pmc) {
-        if (mmd_maybe_candidate(interp, pmc, arg_tuple, cl))
-            return 1;
-    }
-    return 0;
-}
-
-/*
-
-=item C<static int mmd_search_global(Interp *, STRING *meth,
-                                     PMC *arg_tuple, PMC *cl)>
-
-Search the global namespace for matching candidates. Return TRUE if
-the MMD search should stop.
-
-=cut
-
-*/
-
-static int
-mmd_search_global(Interp *interp, STRING *meth, PMC *arg_tuple, PMC *cl)
-{
-    PMC *pmc;
-
-    pmc = Parrot_find_global_n(interp, interp->root_namespace, meth);
     if (pmc) {
         if (mmd_maybe_candidate(interp, pmc, arg_tuple, cl))
             return 1;
@@ -1798,7 +1673,6 @@ Register MMD functions for this PMC type.
 =cut
 
 */
-
 
 void
 Parrot_mmd_register_table(Interp* interp, INTVAL type,

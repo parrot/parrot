@@ -443,21 +443,10 @@ Parrot_find_name_op(Interp *interp, STRING *name, void *next)
     if (PMC_IS_NULL(g))
         g = Parrot_find_builtin(interp, name);
 
-    if (! PMC_IS_NULL(g)) {
-        if (g->vtable->base_type == enum_class_MultiSub &&
-                interp->current_args) {
-            /*
-             * inside a function call, we have an args signature
-             */
-            g = Parrot_MMD_search_default_func(interp, name);
-            if (! PMC_IS_NULL(g))
-                return g;
-        }
-        else
-            return g;
-    }
-
-    return PMCNULL;
+    if (! PMC_IS_NULL(g))
+        return g;
+    else
+        return PMCNULL;
 }
 
 

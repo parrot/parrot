@@ -58,11 +58,10 @@ pmclass MultiSub extends ResizablePMCArray need_ext does array {
     }
 
     void* invoke(void *next) {
-        PMC *func = Parrot_MMD_dispatch_func(INTERP, SELF, NULL);
-        if (! func) {
-            real_exception(interp, NULL, METH_NOT_FOUND,
-                           "Method not found.");
-        }
+        PMC *list = Parrot_mmd_sort_candidate_list(interp, SELF);
+        PMC *func = PMCNULL;
+        if (!PMC_IS_NULL(list))
+            func = VTABLE_get_pmc_keyed_int(interp, list, 0);
         return VTABLE_invoke(INTERP, func, next);
     }
 }
