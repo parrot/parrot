@@ -13,6 +13,10 @@ Plumhead is short for Plum-headed Parakeet.
 
 Show an example for using XSLT for creating PAST.
 
+=head1 Status
+
+21 out of 2692 tests in the PHP 5.2.0 test suite pass.
+
 =head1 Implementation
 
 Take XML output from PHC. XSLT creates PIR that sets up PAST.

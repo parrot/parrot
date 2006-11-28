@@ -4,12 +4,13 @@ TODO:
   - unified testing
   - Implementation with PGE, make it the default implementation
   - Implementation with ANTLR3, C# backend ?
-  - Support for POST and GET
+  - Support for the superglobals  _POST and _GET
   - map variables
   - scalar variables
   - Start a builtins library
   - Call 'php' from plumhead.pir, make testing more simple
   - Support for floating point numbers
+  - Implement php_sapi_name(), as it is used for skipping in the PHP test suite
 
 DONE:
   - Relational operators, decode base64 encoded op names 

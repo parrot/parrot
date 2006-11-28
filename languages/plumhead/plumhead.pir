@@ -15,12 +15,20 @@ Run the PAST with the help of TGE.
 
 .const string VERSION="0.0.1"
 
+.include "library/dumper.pir"
+
 .sub plumhead :main
     .param pmc argv
+    # _dumper( argv )
 
+    .local string rest, php_source_fn
     .local pmc    opt
-    .local string php_source_fn
-    ( opt, php_source_fn ) = parse_options(argv)
+    ( opt, rest ) = parse_options(argv)
+
+    php_source_fn = opt['f']
+    if php_source_fn goto got_php_source_fn
+        php_source_fn = rest
+got_php_source_fn:
 
     .local string cmd, err_msg
     .local int ret
@@ -50,9 +58,9 @@ Run the PAST with the help of TGE.
     # Clean up temporary files
     .local pmc os
     os = new .OS
-    os."rm"('plumhead_phc_ast.xml')
-    os."rm"('plumhead_past.xml')
-    os."rm"('plumhead_past.pir')
+    # os."rm"('plumhead_phc_ast.xml')
+    # os."rm"('plumhead_past.xml')
+    # os."rm"('plumhead_past.pir')
 
     exit 0
 
@@ -83,10 +91,13 @@ error:
     # Specification of command line arguments.
     # --version, --debug, --inv=nnn, --builtin=name, --nc, --help
     .local pmc getopts
-    getopts = new "Getopt::Obj"
-    push getopts, "version"
-    push getopts, "debug"
-    push getopts, "help"
+    getopts = new 'Getopt::Obj'
+    push getopts, 'version'
+    push getopts, 'debug'
+    push getopts, 'help'
+    push getopts, 'd:%'
+    push getopts, 'r=s'
+    push getopts, 'f=s'
 
     .local pmc opt
     opt = getopts."get_options"(argv)
@@ -117,13 +128,13 @@ n_help:
 n_deb:
 
     .local int argc
-    .local string php_source_fn
+    .local string rest
     argc = elements argv
     if argc < 1 goto help
     dec argc
-    php_source_fn = argv[argc]
+    rest = argv[argc]
 
-    .return (opt, php_source_fn )
+    .return (opt, rest )
 .end
 
 =head1 SEE ALSO
