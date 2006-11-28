@@ -332,7 +332,6 @@ docs/dev/nanoparrot.c                                       [main]doc
 docs/dev/optimizer.pod                                      [main]doc
 docs/dev/pmc_freeze.pod                                     [devel]doc
 docs/dev/pmc_object_design_meeting_notes.pod                [main]doc
-docs/dev/status_matrix.txt                                  [main]doc
 docs/dev/wranglers.pod                                      [main]doc
 docs/embed.pod                                              [main]doc
 docs/extend.pod                                             [main]doc
