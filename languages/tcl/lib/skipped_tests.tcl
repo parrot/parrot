@@ -15,6 +15,11 @@ array set skipped_tests {
   append-7.3           {trace}
   append-7.4           {trace}
   append-7.5           {trace}
+  apply-2.2            stacktrace
+  apply-2.3            stacktrace
+  apply-2.4            stacktrace
+  apply-2.5            stacktrace
+  apply-5.1            stacktrace
   appendComp-5.1       explode
   appendComp-7.1       {trace}
   appendComp-7.2       {trace}
@@ -61,12 +66,15 @@ array set skipped_tests {
   format-3.2           explode
   format-8.17          explode
   format-8.18          explode
+  iocmd-12.6           stacktrace
   incr-2.30            stacktrace 
   incr-2.31            stacktrace 
   incr-old-2.4         stacktrace
   incr-old-2.5         stacktrace
   lindex-3.7           {expr wide()}
   misc-1.2             stacktrace
+  parse-9.2            stacktrace
+  parse-10.14          stacktrace
   set-2.1              stacktrace
   set-4.1              stacktrace
   string-13.6          explode
