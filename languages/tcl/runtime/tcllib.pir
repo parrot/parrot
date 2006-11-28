@@ -131,6 +131,9 @@ env_loop_done:
   $I1 = config['intsize']
   $P1['wordSize'] = $I1
 
+  $S1 = config['osname']
+  $P1['os'] = $S1
+
   # Set default precision.
   $P1 = new 'TclInt'
   $P1 = 0
