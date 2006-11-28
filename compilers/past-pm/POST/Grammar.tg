@@ -5,7 +5,8 @@ transform root (PAST::Block) :language('PIR') {
     post = tree.'get'('post', node)
     $I0 = isa post, 'POST::Sub'
     if $I0 goto end
-    post = post.'new'('POST::Sub', post)
+    $S0 = post.'unique'('__anon_')
+    post = post.'new'('POST::Sub', post, 'name'=>$S0)
   end:
     .return (post)
 }
