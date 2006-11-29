@@ -182,7 +182,7 @@ no_file:
   $S0 .= '": no such file or directory'
   tcl_error $S0
 bad_args:
-  tcl_error 'wrong # args: should be "file state name varName"'
+  tcl_error 'wrong # args: should be "file stat name varName"'
 .end
 
 .sub 'isdirectory'
