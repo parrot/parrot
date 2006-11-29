@@ -31,6 +31,12 @@ a Patrick Michaud PAST and runs the PAST.
   .local pmc decode_base64
   decode_base64 = get_global [ "MIME"; "Base64" ], 'decode_base64'
     
+  # the superglobals
+  .local pmc superglobal_GET
+  superglobal_GET = new .Hash
+  superglobal_GET['as'] = 'df'
+  set_global "_GET", superglobal_GET
+
   # The root node of PAST.
   .local pmc past_node_<xsl:value-of select="generate-id(.)" />                                                  
   past_node_<xsl:value-of select="generate-id(.)" />  = new 'PAST::Block'
