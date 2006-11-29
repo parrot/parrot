@@ -32,7 +32,7 @@ Excercise select_options() - the feature that lets us specify, for example
 
     load_bytecode 'languages/tcl/runtime/tcllib.pir'
 
-    plan(6)
+    plan(8)
     .local string message
 
     # 1
@@ -109,6 +109,38 @@ eh_6:
     get_results '(0,0)', $P2, $S2
 check_6:
     $S3 = 'ambiguous particle "da": must be dank, dark, or dunk'
+    is($S2,$S3,message)
+
+    # 7
+    message='no comma with only two options'
+    options = new .ResizablePMCArray
+    options[0] = 'bill'
+    options[1] = 'bob'
+    push_eh eh_7
+      $S1 = select_option(options,'frank')
+    clear_eh
+    $S2 = ''
+    goto check_7
+eh_7:
+    get_results '(0,0)', $P2, $S2
+check_7:
+    $S3 = 'bad option "frank": must be bill or bob'
+    is($S2,$S3,message)
+
+    # 8
+    message='no comma with only two options, ambiguous'
+    options = new .ResizablePMCArray
+    options[0] = 'bill'
+    options[1] = 'bob'
+    push_eh eh_8
+      $S1 = select_option(options,'b')
+    clear_eh
+    $S2 = ''
+    goto check_8
+eh_8:
+    get_results '(0,0)', $P2, $S2
+check_8:
+    $S3 = 'ambiguous option "b": must be bill or bob'
     is($S2,$S3,message)
     
 .end

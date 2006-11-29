@@ -31,6 +31,7 @@ array set skipped_tests {
   appendComp-7.8       {trace}
   appendComp-7.9       {trace}
   compExpr-old-14.14   explode
+  cmdMZ-5.7            stacktrace
   basic-1.1            {interp}
   basic-10.1           {interp}
   dict-2.3             {lsearch -exact}

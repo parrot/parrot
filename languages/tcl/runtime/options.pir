@@ -227,7 +227,11 @@ done:
     error .= ', '
     goto loop_out_next
   add_or:
+    if ii == 0 goto bare_or # don't add the , with only two items..
     error .= ', or '
+    goto loop_out_next
+  bare_or:
+    error .= ' or '
   loop_out_next:
     inc ii
     goto loop_out
