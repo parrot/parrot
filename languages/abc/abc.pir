@@ -41,6 +41,13 @@ and registers the "compile" subroutine as the "ABC" compiler.
 
 .end
 
+
+.sub 'main' :main
+    .param pmc args
+    $P0 = compreg 'ABC'
+    .return $P0.'command_line'(args)
+.end
+
 .include 'src/builtins.pir'
 
 .namespace [ 'ABC::Grammar' ]
