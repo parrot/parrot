@@ -107,7 +107,11 @@ done:
   .return(number)
 
 NaN:
-  tcl_error 'Not a number!'
+  $S1 = 'expected floating-point number but got "'
+  $S0 = number
+  $S1 .= $S0
+  $S1 .= '"'
+  tcl_error $S1
 .end
 
 =head2 _Tcl::__integer

@@ -278,9 +278,9 @@ pos:
   .param pmc s2
   .param int is_decr
 
-  # check that they're actually integers.
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__number'
+  # check that they're actually numbers
+  .local pmc __number
+  __number = get_root_global ['_tcl'], '__number'
   s1 = __number(s1)
   s2 = __number(s2)
 
