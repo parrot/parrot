@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 241
+plan 244
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -22,6 +22,10 @@ eval_is {expr trues}  \
 eval_is {expr falses} \
  {syntax error in expression "falses": the word "falses" requires a preceding $ if it's a variable or function arguments if it's a function} \
  {falses}
+eval_is {expr 0b1001}    9 {binary}
+eval_is {expr 0b10}      2 {binary}
+eval_is {expr 0b101010} 42 {binary}
+
 
 eval_is {expr {}} {syntax error in expression "": premature end of expression}
 
