@@ -30,6 +30,7 @@ array set skipped_tests {
   appendComp-7.7       {trace}
   appendComp-7.8       {trace}
   appendComp-7.9       {trace}
+  basic-46.1           explode
   compExpr-old-14.14   explode
   cmdMZ-5.7            stacktrace
   basic-1.1            {interp}
