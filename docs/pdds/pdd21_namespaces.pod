@@ -501,7 +501,7 @@ subroutine that calls the store function.
     # $a = 'x';
     $P0 = new .PerlString
     $P0 = "x"
-    set_global "$a", a
+    set_global "$a", $P0
     # ${"Foo::$a"} = 5;
     $P1 = new PerlString
     $P1 = "Foo::"
