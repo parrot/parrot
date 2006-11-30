@@ -52,13 +52,14 @@ Get parameters for POST method.
 .sub 'parse_post' 
 
     .local pmc my_env, in, query_hash
-    .local string query
+    .local string content_length, query
     .local int len
 
-    my_env     = new .Env
-    len        = my_env['CONTENT_LENGTH']
-    in         = getstdin
-    query      = read in, len
+    my_env          = new .Env
+    content_length  = my_env['CONTENT_LENGTH']
+    len             = content_length
+    in              = getstdin
+    query           = read in, len
     query_hash = parse( query )
     close in
 
@@ -74,6 +75,8 @@ Split inta a hash.
 
 .sub 'parse' 
     .param string query
+
+    unless query goto END
 
     .local pmc query_hash, items, items_tmp_1, items_tmp_2
     .local string query, kv, k, v, item_tmp_1, item_tmp_2
@@ -116,13 +119,14 @@ no_val:
     k = kv
     v = 1
 set_val:
-    k = urldecode(k)
+    v = urldecode(v)
     query_hash[k] = v
 
 next_item:
     inc i
     if i < n goto lp_items
-    
+   
+END:   
     .return (query_hash)
 .end
 
@@ -146,18 +150,25 @@ START:
     if pos_in >= len goto END
     substr char_in, in, pos_in, 1
     char_out = char_in
+    if char_in != "+" goto NOT_A_PLUS
+	char_out = ' '
+        goto INC_IN
+
+NOT_A_PLUS:
     if char_in != "%" goto INC_IN
-    # OK this was a escape character, next two are hexadecimal
-    inc pos_in
-    substr hex, in, pos_in, 2
-    c_out = hex_to_int (hex)
-    chr char_out, c_out
-    inc pos_in
+        # OK this was a escape character, next two are hexadecimal
+        inc pos_in
+        substr hex, in, pos_in, 2
+        c_out = hex_to_int (hex)
+        chr char_out, c_out
+        inc pos_in
+        goto INC_IN
 
 INC_IN:
     concat out, char_out
     inc pos_in
     goto START
+
 END:
    .return( out )
 .end
