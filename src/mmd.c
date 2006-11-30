@@ -1207,7 +1207,7 @@ mmd_cvt_to_types(Interp* interp, PMC *multi_sig)
         if (sig_elem->vtable->base_type == enum_class_String) {
             sig = VTABLE_get_string(interp, sig_elem);
             if (memcmp(sig->strstart, "__VOID", 6) == 0) {
-                PMC_int_val(ar)--;  /* XXX */   
+                PMC_int_val(ar)--;  /* XXX */
                 break;
             }
             type = pmc_type(interp, sig);
@@ -1269,6 +1269,10 @@ mmd_distance(Interp *interp, PMC *pmc, PMC *arg_tuple)
          * different native types are very different, except a PMC
          * which matches any PMC
          */
+        if (type_call <= 0 && type_sig == enum_type_PMC) {
+            dist++;
+            continue;
+        }
         if ((type_sig <= 0 && type_sig != enum_type_PMC) || type_call <= 0) {
             dist = MMD_BIG_DISTANCE;
             break;

@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 40;
 
 =head1 NAME
 
@@ -1294,6 +1294,33 @@ pir_output_is(<<'CODE', <<'OUTPUT', "autoboxing on multis");
 .end
 CODE
 BMU autobox type: String
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', '_ matches native types');
+.sub main :main
+  .local pmc asub
+  asub = get_global 'main'
+
+  foo('world', asub) # should call :multi(_, Sub)
+.end
+
+.sub foo :multi(_, Sub)
+  .param pmc x
+  .param pmc y
+  print x
+  print " "
+  say ":multi(_, Sub)"
+.end
+
+.sub foo :multi(Integer, Sub)
+  .param int x
+  .param pmc y
+  print x
+  print " "
+  say ":multi(int, Sub)"
+.end
+CODE
+world :multi(_, Sub)
 OUTPUT
 
 # Local Variables:
