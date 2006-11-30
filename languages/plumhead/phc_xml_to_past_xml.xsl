@@ -119,16 +119,25 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
 </xsl:template>
 
 <xsl:template match="phc:AST_variable" >
-  <past:Var>
+  <past:Var viviself=".Undef" islvalue="1" >
     <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
   </past:Var>
 </xsl:template>
 
-<xsl:template match="phc:AST_variable[phc:AST_expr_list]" >
+<xsl:template match="phc:AST_variable[phc:AST_expr_list/phc:Token_string]" >
   <past:Var scope="keyed" >
-    <past:Var scope="package" >
-      <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
-    </past:Var>
+    <xsl:choose>
+      <xsl:when test="phc:Token_variable_name/phc:value = '_GET'" >
+        <past:Var scope="package" >
+          <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
+        </past:Var>
+      </xsl:when>
+      <xsl:otherwise>
+        <past:Var viviself=".Hash" islvalue="1" >
+          <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
+        </past:Var>
+      </xsl:otherwise>
+    </xsl:choose>
     <xsl:apply-templates select="phc:AST_expr_list/phc:Token_string" />
   </past:Var>
 </xsl:template>
