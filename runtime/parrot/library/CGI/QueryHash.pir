@@ -9,9 +9,17 @@
 
 =head1 SYNOPSIS
 
-  load_bytecode 'CGI/QueryHash.pbc'
+    load_bytecode 'CGI/QueryHash.pbc'
 
-=head2 Functions
+    parse_get_sub = get_global [ 'CGI'; 'QueryHash' ], 'parse_get'
+    .local pmc    params_from_get
+    params_from_get = parse_get_sub()
+
+    parse_post_sub = get_global [ 'CGI'; 'QueryHash' ], 'parse_post'
+    .local pmc    params_from_post
+    params_from_post = parse_post_sub()
+
+=head1 Functions
 
 =over
 
@@ -24,13 +32,54 @@ Get parameters for GET method.
 
 .sub 'parse_get' 
 
-    .local pmc my_env, query_hash, items, items_tmp_1, items_tmp_2
+    .local pmc my_env, query_hash
+    .local string query
+
+    my_env          = new .Env
+    query           = my_env['QUERY_STRING']
+    query_hash      = parse( query )
+
+    .return (query_hash)
+.end
+
+=item parse_post
+
+Get parameters for POST method.
+
+=cut
+
+
+.sub 'parse_post' 
+
+    .local pmc my_env, in, query_hash
+    .local string query
+    .local int len
+
+    my_env     = new .Env
+    len        = my_env['CONTENT_LENGTH']
+    in         = getstdin
+    query      = read in, len
+    query_hash = parse( query )
+    close in
+
+    .return (query_hash)
+.end
+
+
+=item parse
+
+Split inta a hash.
+
+=cut
+
+.sub 'parse' 
+    .param string query
+
+    .local pmc query_hash, items, items_tmp_1, items_tmp_2
     .local string query, kv, k, v, item_tmp_1, item_tmp_2
     .local int i, j, n, o
 
     query_hash      = new .Hash
-    my_env          = new .Env
-    query           = my_env['QUERY_STRING']
     items           = new .ResizableStringArray
 
     # split by '&' and ';'
@@ -115,6 +164,7 @@ END:
 
 .sub hex_to_int
     .param pmc hex
+
     .return hex.'to_int'(16)
 .end
 
@@ -126,6 +176,7 @@ Splitting of query string is taken from HTTP/Daemon.pir.
 
 =head1 TODO
 
+Better method names.
 Add stuff that Plumhead needs.
 Find or write a test suite for CGI.
 
