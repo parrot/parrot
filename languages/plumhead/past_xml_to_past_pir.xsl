@@ -27,39 +27,51 @@ a Patrick Michaud PAST and runs the PAST.
 
 .sub plumhead :main                                                     
                                                                   
-  # phc encodes most but not all strings in base64
-  .local pmc decode_base64
-  decode_base64 = get_global [ "MIME"; "Base64" ], 'decode_base64'
+    # look for subs in other namespaces
+    .local pmc decode_base64_sub, parse_get_sub, parse_post_sub  
+    decode_base64_sub = get_global [ "MIME"; "Base64" ], 'decode_base64'
+    parse_get_sub  = get_global [ 'CGI'; 'QueryHash' ], 'parse_get'
+    parse_post_sub = get_global [ 'CGI'; 'QueryHash' ], 'parse_post'
     
-  # the superglobals
-  .local pmc superglobal_GET
-  superglobal_GET = new .Hash
-  superglobal_GET['as'] = 'df'
-  set_global "_GET", superglobal_GET
+    # the superglobals
+    .local pmc my_env, superglobal_GET, superglobal_POST
+    .local string request_method
+    my_env = new .Env
+    request_method = my_env['REQUEST_METHOD']
 
-  # The root node of PAST.
-  .local pmc past_node_<xsl:value-of select="generate-id(.)" />                                                  
-  past_node_<xsl:value-of select="generate-id(.)" />  = new 'PAST::Block'
-  past_node_<xsl:value-of select="generate-id(.)" />.init('name' => 'plumhead_main')
+    superglobal_GET = new .Hash
+    unless request_method == 'GET' goto get_was_handled
+        ( superglobal_GET ) = parse_get_sub()
+get_was_handled:
+    set_global "_GET", superglobal_GET
 
-  # set up _POST and _GET
+    superglobal_POST = new .Hash
+    unless request_method == 'POST' goto post_was_handled
+        ( superglobal_POST ) = parse_post_sub()
+post_was_handled:
+    set_global "_POST", superglobal_POST
 
-  <xsl:apply-templates />
+    # The root node of PAST.
+    .local pmc past_node_<xsl:value-of select="generate-id(.)" />                                                  
+    past_node_<xsl:value-of select="generate-id(.)" />  = new 'PAST::Block'
+    past_node_<xsl:value-of select="generate-id(.)" />.init('name' => 'plumhead_main')
 
-  # '_dumper'(past_node_<xsl:value-of select="generate-id(.)" />, 'past')
+    <xsl:apply-templates />
 
-  # .local pmc post
-  # post = past_node_<xsl:value-of select="generate-id(.)" />.'compile'( 'target' => 'post' )
-  # '_dumper'(post, 'post')
+    # '_dumper'(past_node_<xsl:value-of select="generate-id(.)" />, 'past')
 
-  # .local pmc pir
-  # pir = past_node_<xsl:value-of select="generate-id(.)" />.'compile'( 'target' => 'pir' )
-  # print pir
+    # .local pmc post
+    # post = past_node_<xsl:value-of select="generate-id(.)" />.'compile'( 'target' => 'post' )
+    # '_dumper'(post, 'post')
+
+    # .local pmc pir
+    # pir = past_node_<xsl:value-of select="generate-id(.)" />.'compile'( 'target' => 'pir' )
+    # print pir
                                                                   
-  .local pmc eval
-  eval = past_node_<xsl:value-of select="generate-id(.)" />.'compile'( )
-  eval()
-  # '_dumper'(eval, 'eval')
+    .local pmc eval_past
+    eval_past = past_node_<xsl:value-of select="generate-id(.)" />.'compile'( )
+    eval_past()
+    # '_dumper'(eval, 'eval')
 
 .end                                                              
                                                                   
@@ -103,7 +115,7 @@ a Patrick Michaud PAST and runs the PAST.
   <xsl:choose>
     <xsl:when test="../@encoding = 'base64'" >
       .local string decoded
-      decoded = decode_base64( "<xsl:value-of select="." />" )
+      decoded = decode_base64_sub( "<xsl:value-of select="." />" )
       past_node_<xsl:value-of select="generate-id(..)" />.'attr'( '<xsl:value-of select="name()" />', decoded, 1 )                              
       null decoded
     </xsl:when>

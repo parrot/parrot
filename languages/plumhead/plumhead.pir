@@ -70,9 +70,9 @@ error:
     # Clean up temporary files
     .local pmc os
     os = new .OS
-    os."rm"('plumhead_phc_ast.xml')
-    os."rm"('plumhead_past.xml')
-    os."rm"('plumhead_past.pir')
+    #os."rm"('plumhead_phc_ast.xml')
+    #os."rm"('plumhead_past.xml')
+    #os."rm"('plumhead_past.pir')
 
    exit ret
 
@@ -98,6 +98,7 @@ error:
     push getopts, 'd:%'
     push getopts, 'r=s'
     push getopts, 'f=s'
+    push getopts, 'C'
 
     .local pmc opt
     opt = getopts."get_options"(argv)

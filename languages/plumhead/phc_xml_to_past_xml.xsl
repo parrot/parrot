@@ -127,7 +127,7 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
 <xsl:template match="phc:AST_variable[phc:AST_expr_list/phc:Token_string]" >
   <past:Var scope="keyed" >
     <xsl:choose>
-      <xsl:when test="phc:Token_variable_name/phc:value = '_GET'" >
+      <xsl:when test="phc:Token_variable_name/phc:value = '_GET' or phc:Token_variable_name/phc:value = '_POST'" >
         <past:Var scope="package" >
           <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
         </past:Var>
