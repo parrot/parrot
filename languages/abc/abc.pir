@@ -42,11 +42,20 @@ and registers the "compile" subroutine as the "ABC" compiler.
 .end
 
 
+=item main([arg1, ...]) :main
+
+Start the compiler from the command line.  We simply pass any
+command line argument's to the ABC compiler's <command_line>
+method (inherited from C<HLLCompiler>).
+
+=cut
+
 .sub 'main' :main
     .param pmc args
     $P0 = compreg 'ABC'
     .return $P0.'command_line'(args)
 .end
+
 
 .include 'src/builtins.pir'
 
@@ -56,6 +65,10 @@ and registers the "compile" subroutine as the "ABC" compiler.
 .include 'src/PASTGrammar_gen.pir'
 
 =back
+
+=head1 AUTHOR
+
+Patrick R. Michaud <pmichaud@pobox.com>
 
 =cut
 

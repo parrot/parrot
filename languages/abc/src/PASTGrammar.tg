@@ -102,7 +102,7 @@ transform past (ABC::Grammar::for_statement) :language('PIR') {
 
     .local pmc bpast, wpast, past, expr1past, expr2past, expr3past, stmtpast
 
-    # build node for stmt+iterator 
+    # build node for stmt+iterator
     bpast = new 'PAST::Stmts'
     bpast.'init'('node'=>node)
     stmtpast = tree.'get'('past', stmtnode, 'ABC::Grammar::statement')
@@ -123,7 +123,7 @@ transform past (ABC::Grammar::for_statement) :language('PIR') {
     expr1past = tree.'get'('past', expr1node, 'ABC::Grammar::expression')
     past.'push'(expr1past)
     past.'push'(wpast)
-    
+
     .return (past)
 }
 
@@ -147,7 +147,7 @@ transform past (ABC::Grammar::statement_list) :language('PIR') {
   iter_end:
     .return (past)
 }
-    
+
 
 transform past (ABC::Grammar::expression) :language('PIR') {
     $P0 = node['expr']
