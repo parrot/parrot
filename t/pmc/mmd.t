@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 41;
 
 =head1 NAME
 
@@ -1321,6 +1321,52 @@ pir_output_is(<<'CODE', <<'OUTPUT', '_ matches native types');
 .end
 CODE
 world :multi(_, Sub)
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'type mix with _');
+.sub main :main
+    $P0 = new .Integer
+    $P0 = 3
+    'foo'($P0)
+    'foo'(2)
+    'foo'("1")
+    $P0 = new .String
+    $P0 = "0"
+    'foo'($P0)
+    $P0 = new .Hash
+    'foo'($P0)
+.end
+
+.sub 'foo' :multi(Integer)
+    .param pmc i
+    print "foo(Integer)\n"
+.end
+
+.sub 'foo' :multi(_)
+    .param pmc i
+    print "foo(_)\n"
+.end
+
+.sub 'foo' :multi(int)
+    .param int i
+    print "foo(int)\n"
+.end
+
+.sub 'foo' :multi(String)
+    .param pmc i
+    print "foo(String)\n"
+.end
+
+.sub 'foo' :multi(string)
+    .param string i
+    print "foo(string)\n"
+.end
+CODE
+foo(Integer)
+foo(int)
+foo(string)
+foo(String)
+foo(_)
 OUTPUT
 
 # Local Variables:
