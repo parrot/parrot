@@ -278,7 +278,6 @@ no_prompt:
   STDOUT.'flush'()
 has_readline:
   $P0 = STDIN.'readline'(default_prompt)
-  if null STDIN goto got_nothing 
   .return ($P0)
 
 got_nothing:

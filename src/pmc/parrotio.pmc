@@ -117,15 +117,15 @@ old interactive setting
 
 =back
 
-=item C<METHOD STRING* readline(STRING* prompt)>
+=item C<METHOD PMC* readline(STRING* prompt)>
 
 Reads a line from the given PIO. If readline is interactive and a prompt
 is not empty, it will be displayed. The interactive feature is not
 available with the C<readline> opcode (which will be removed anyway).
 Interactive mode adds non-empty lines to the readline history.
 
-Returns the line without the newline or NULL, indicating the end of input (for
-example, after ^D or at the end of the file.)
+Returns the line without the newline in a String PMC. If ^D/eof occurred,
+this will return a Null PMC.
 
 SYNOPSIS
 
@@ -135,8 +135,8 @@ SYNOPSIS
       printerr "set_readline_interactive failed: "
       ...
   loop:
-      s = pio.'readline'('hello polly> ')
-      if null s goto ex
+      $P1 = pio.'readline'('hello polly> ')
+      if null $P1  goto ex
       ..
       goto loop
   ex:
@@ -168,8 +168,9 @@ SYNOPSIS
 #endif
     }
 
-    METHOD STRING* readline(STRING* prompt) {
+    METHOD PMC* readline(STRING* prompt) {
         ParrotIO *io = PMC_data(SELF);
+        PMC *pmc_res;
         STRING *res = NULL;
         UINTVAL len;
 
@@ -185,8 +186,11 @@ SYNOPSIS
                     add_history(r);
                 res = string_from_cstring(INTERP, r, 0);
                 free(r);
+                pmc_res = pmc_new(INTERP,enum_class_String);
+                PMC_str_val(pmc_res) = res;
+                return pmc_res;
             }
-            return res;
+            return PMCNULL;
         }
         else
 #endif
