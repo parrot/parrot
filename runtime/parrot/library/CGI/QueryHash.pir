@@ -33,12 +33,17 @@ Get parameters for GET method.
 .sub 'parse_get' 
 
     .local pmc my_env, query_hash
-    .local string query
+    .local int does_exist
 
+    query_hash      = new .Hash
     my_env          = new .Env
-    query           = my_env['QUERY_STRING']
-    query_hash      = parse( query )
+    does_exist = exists my_env['QUERY_STRING']
+    unless does_exist goto end_parse_get
+        .local string query
+        query           = my_env['QUERY_STRING']
+        query_hash      = parse( query )
 
+end_parse_get:
     .return (query_hash)
 .end
 
@@ -51,18 +56,24 @@ Get parameters for POST method.
 
 .sub 'parse_post' 
 
-    .local pmc my_env, in, query_hash
-    .local string content_length, query
-    .local int len
+    .local pmc my_env, query_hash
+    .local int does_exist
 
-    my_env          = new .Env
-    content_length  = my_env['CONTENT_LENGTH']
-    len             = content_length
-    in              = getstdin
-    query           = read in, len
-    query_hash = parse( query )
-    close in
+    query_hash   = new .Hash
+    my_env       = new .Env
+    does_exist   = exists my_env['CONTENT_LENGTH']
+    unless does_exist goto end_parse_post
+        .local pmc in
+        .local string content_length, query
+        .local int len
+        content_length  = my_env['CONTENT_LENGTH']
+        len             = content_length
+        in              = getstdin
+        query           = read in, len
+        close in
+        query_hash = parse( query )
 
+end_parse_post:
     .return (query_hash)
 .end
 
