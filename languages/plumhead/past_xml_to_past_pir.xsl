@@ -34,21 +34,12 @@ a Patrick Michaud PAST and runs the PAST.
     parse_post_sub = get_global [ 'CGI'; 'QueryHash' ], 'parse_post'
     
     # the superglobals
-    .local pmc my_env, superglobal_GET, superglobal_POST
-    .local string request_method
-    my_env = new .Env
-    request_method = my_env['REQUEST_METHOD']
-
-    superglobal_GET = new .Hash
-    unless request_method == 'GET' goto get_was_handled
-        ( superglobal_GET ) = parse_get_sub()
-get_was_handled:
+    .local pmc superglobal_GET
+    ( superglobal_GET ) = parse_get_sub()
     set_global "_GET", superglobal_GET
 
-    superglobal_POST = new .Hash
-    unless request_method == 'POST' goto post_was_handled
-        ( superglobal_POST ) = parse_post_sub()
-post_was_handled:
+    .local pmc superglobal_POST
+    ( superglobal_POST ) = parse_post_sub()
     set_global "_POST", superglobal_POST
 
     # The root node of PAST.
@@ -59,6 +50,8 @@ post_was_handled:
     <xsl:apply-templates />
 
     # '_dumper'(past_node_<xsl:value-of select="generate-id(.)" />, 'past')
+    # '_dumper'(superglobal_POST , 'superglobal_POST')
+    # '_dumper'(superglobal_GET , 'superglobal_GET')
 
     # .local pmc post
     # post = past_node_<xsl:value-of select="generate-id(.)" />.'compile'( 'target' => 'post' )

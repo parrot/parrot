@@ -50,14 +50,14 @@ got_php_source_fn:
     ret = spawnw cmd
     if ret goto error
 
-    err_msg = 'Executing past.pir with parrot failed'
+    err_msg = 'Executing plumhead_past.pir with parrot failed'
     cmd = './parrot plumhead_past.pir'
     ret = spawnw cmd
     if ret goto error
 
     # Clean up temporary files
-    .local pmc os
-    os = new .OS
+    #.local pmc os
+    #os = new .OS
     # os."rm"('plumhead_phc_ast.xml')
     # os."rm"('plumhead_past.xml')
     # os."rm"('plumhead_past.pir')
@@ -68,8 +68,8 @@ error:
     printerr err_msg
     printerr "\n"
     # Clean up temporary files
-    .local pmc os
-    os = new .OS
+    #.local pmc os
+    #os = new .OS
     #os."rm"('plumhead_phc_ast.xml')
     #os."rm"('plumhead_past.xml')
     #os."rm"('plumhead_past.pir')
