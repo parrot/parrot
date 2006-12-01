@@ -229,9 +229,10 @@ specifies the encoding to use for the input (e.g., "utf8").
     unless encoding goto interactive_loop
     push stdin, encoding
   interactive_loop:
-    .local string code
+    .local pmc code
     unless stdin goto interactive_end
     code = stdin.'readline'('> ')
+    if null code goto interactive_end
     unless code goto interactive_loop
     self.'eval'(code, adverbs :flat :named)
     goto interactive_loop
