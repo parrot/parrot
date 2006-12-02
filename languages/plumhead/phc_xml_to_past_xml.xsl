@@ -115,7 +115,7 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
 <xsl:template match="phc:AST_assignment" >
   <past:Op name='infix:=' pasttype='assign' >
     <xsl:apply-templates select="phc:AST_variable" />
-    <xsl:apply-templates select="phc:Token_string" />
+    <xsl:apply-templates select="phc:Token_string | phc:Token_int | phc:AST_bin_op" />
   </past:Op>
 </xsl:template>
 
@@ -151,7 +151,7 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
 </xsl:template>
 
 <xsl:template match="phc:Token_int" >
-  <past:Val ctype="n" vtype=".Integer" >
+  <past:Val ctype="i+" vtype=".Integer" >
     <xsl:attribute name="name" ><xsl:value-of select="phc:value" /></xsl:attribute>
   </past:Val>
 </xsl:template>
