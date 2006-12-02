@@ -449,184 +449,81 @@ Parrot_find_name_op(Interp *interp, STRING *name, void *next)
         return PMCNULL;
 }
 
-
-/*
- * store a subroutine
- *
- * FIXME - This should not be here!
- * It's generic logic that should apply whenever a Sub is stored anywhere,
- *  and since lots of things can be invoked, maybe more than just Subs.
- * Where it _should_ be, I don't know for sure.
- *
- * if pmc_key is provided, it wins.
- * else if str_key is provided, it is used.
- * if neither is provided, the HLL namespace is used.
- */
-
-static void
-store_sub(Interp *interp, PMC *pmc_key, STRING *str_key,
-          STRING *sub_name, PMC *sub_pmc)
+static PMC *
+get_namespace_pmc(Parrot_Interp interp, PMC *sub)
 {
-    int hll_id;
-    PMC *ns;
+    PMC *nsname = PMC_sub(sub)->namespace;
+    PMC *nsroot = Parrot_get_HLL_namespace(interp, PMC_sub(sub)->HLL_id);
 
-    if (sub_pmc->vtable->base_type == enum_class_MultiSub) {
-        PMC *one_sub;
-
-        one_sub = VTABLE_get_pmc_keyed_int(interp, sub_pmc, 0);
-        hll_id = PMC_sub(one_sub)->HLL_id;
-    }
+    /* If we have a NULL, return the HLL namespace */
+    if (PMC_IS_NULL(nsname))
+        return nsroot;
+    /* If we have a String, do a string lookup */
+    else if (nsname->vtable->base_type == enum_class_String)
+        return Parrot_make_namespace_keyed_str(interp, nsroot, PMC_str_val(nsname));
+    /* Otherwise, do a PMC lookup */
     else
-        hll_id = PMC_sub(sub_pmc)->HLL_id;
-
-    ns = Parrot_get_HLL_namespace(interp, hll_id);
-    if (!PMC_IS_NULL(pmc_key))
-        ns = Parrot_make_namespace_keyed(interp, ns, pmc_key);
-    else if (str_key)
-        ns = Parrot_make_namespace_keyed_str(interp, ns, str_key);
-
-    /* only store the sub if it's not :anon */
-    if (!(PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_ANON))
-        Parrot_store_global_n(interp, ns, sub_name, sub_pmc);
-
-    /* TEMPORARY HACK - cache invalidation should be a namespace function */
-    if (! PMC_IS_NULL(pmc_key)) {
-        if (pmc_key->vtable->base_type == enum_class_String)
-            Parrot_invalidate_method_cache(interp,
-                                           PMC_str_val(pmc_key), sub_name);
-    }
-    else if (str_key)
-        Parrot_invalidate_method_cache(interp, str_key, sub_name);
-
-    /* MultiSub isa R*PMCArray and doesn't have a PMC_sub structure
-     * MultiSub could also contain subs from various namespaces,
-     * so it doesn't make much sense to associate a namespace
-     * with a multi.
-     */
-    if (sub_pmc->vtable->base_type != enum_class_MultiSub)
-        PMC_sub(sub_pmc)->namespace_stash = ns;
+        return Parrot_make_namespace_keyed(interp, nsroot, nsname);
 }
 
 static void
-store_sub_in_namespace(Parrot_Interp interp, PMC* sub_pmc,
-                       PMC *pmc_key, STRING *sub_name)
+store_sub_in_multi(Parrot_Interp interp, PMC *sub, PMC *ns)
 {
-    /*
-     * pmc_key is either a String, or a Key, or NULL
-     */
-    if (PMC_IS_NULL(pmc_key))
-        store_sub(interp, PMCNULL, NULL, sub_name, sub_pmc);
-    else {
-        INTVAL type = pmc_key->vtable->base_type;
-        switch (type) {
-            case enum_class_String:
-                store_sub(interp, PMCNULL, PMC_str_val(pmc_key),
-                          sub_name, sub_pmc);
-                break;
-            case enum_class_Key:
-                store_sub(interp, pmc_key, NULL, sub_name, sub_pmc);
-                break;
-            default:
-                internal_exception(1,
-                                   "Namespace constant is neither "
-                                   "String nor Key");
-        }
-    }
-}
-
-/* XXX in mmd.c ? */
-STRING* Parrot_multi_long_name(Parrot_Interp interp, PMC* sub_pmc);
-
-STRING*
-Parrot_multi_long_name(Parrot_Interp interp, PMC* sub_pmc)
-{
-    PMC *multi_sig;
-    STRING* sub_name, *sig;
-    INTVAL i, n;
-
-    sub_name = PMC_sub(sub_pmc)->name;
-    multi_sig = PMC_sub(sub_pmc)->multi_signature;
-    n = VTABLE_elements(interp, multi_sig);
-    /*
-     * foo :multi(STRING, Integer) =>
-     *
-     * foo_@STRING_@Integer
-     */
-    for (i = 0; i < n; ++i) {
-        sig = VTABLE_get_string_keyed_int(interp, multi_sig, i);
-        sub_name = string_concat(interp, sub_name,
-                const_string(interp, "_@"), 0);
-        sub_name = string_concat(interp, sub_name, sig, 0);
-    }
-    return sub_name;
-}
-
-static void
-store_named_in_namespace(Parrot_Interp interp, PMC* sub_pmc)
-{
-    STRING* sub_name;
-    PMC *multi_sig;
-    PMC *namespace;
     INTVAL func_nr;
     char *c_meth;
+    STRING *subname = PMC_sub(sub)->name;
+    PMC   *multisub = VTABLE_get_pmc_keyed_str(interp, ns, subname);
 
-    sub_name  = PMC_sub(sub_pmc)->name;
-    namespace = PMC_sub(sub_pmc)->namespace;
-    multi_sig = PMC_sub(sub_pmc)->multi_signature;
-
-    if (PMC_IS_NULL(multi_sig)) {
-        store_sub_in_namespace(interp, sub_pmc, namespace, sub_name);
+    /* is there an existing MultiSub PMC? or do we need to create one? */
+    if (PMC_IS_NULL(multisub)) {
+        multisub = pmc_new(interp, enum_class_MultiSub);
+        /* we have to push the sub onto the MultiSub before we try to store
+        it because storing requires information from the sub */
+        VTABLE_push_pmc(interp, multisub, sub);
+        VTABLE_set_pmc_keyed_str(interp, ns, subname, multisub);
     }
-    else {
-        STRING *long_name;
-        PMC *multi_sub;
-        PMC *stash;
+    else
+        VTABLE_push_pmc(interp, multisub, sub);
 
-        /* If namespace is NULL, we need to look in the root HLL namespace. But
-           since we haven't actually run code yet, the context hasn't been set
-           to include the HLL, so we have to do the work ourselves. */
-        stash = Parrot_get_HLL_namespace(interp, PMC_sub(sub_pmc)->HLL_id);
-        if (! PMC_IS_NULL(namespace))
-            stash = VTABLE_get_pmc_keyed(interp, stash, namespace);
-        multi_sub = PMC_IS_NULL(stash)
-            ? PMCNULL
-            : VTABLE_get_pmc_keyed_str(interp, stash, sub_name);
-
-        /* is there an existing MultiSub PMC? or do we need to create one? */
-        if (PMC_IS_NULL(multi_sub)) {
-            multi_sub = pmc_new(interp, enum_class_MultiSub);
-            /* we have to push the sub onto the MultiSub before we try to store
-               it because storing requires information from the sub */
-            VTABLE_push_pmc(interp, multi_sub, sub_pmc);
-            store_sub_in_namespace(interp, multi_sub,
-                    namespace, sub_name);
-        }
-        else
-            VTABLE_push_pmc(interp, multi_sub, sub_pmc);
-
-        long_name = Parrot_multi_long_name(interp, sub_pmc);
-        store_sub_in_namespace(interp, sub_pmc, namespace, long_name);
-
-        c_meth = string_to_cstring(interp, sub_name);
-        if ( (func_nr = Parrot_MMD_method_idx(interp, c_meth))  >= 0) {
-            Parrot_mmd_rebuild_table(interp, -1, func_nr);
-        }
-        string_cstring_free(c_meth);
+    c_meth = string_to_cstring(interp, subname);
+    if ( (func_nr = Parrot_MMD_method_idx(interp, c_meth))  >= 0) {
+        Parrot_mmd_rebuild_table(interp, -1, func_nr);
     }
+    string_cstring_free(c_meth);
 }
-
-/* TODO - this looks like it doesn't understand nested namespaces */
 
 void
 Parrot_store_sub_in_namespace(Parrot_Interp interp, PMC *sub)
 {
     INTVAL cur_id = CONTEXT(interp->ctx)->current_HLL;
+    PMC *ns;
     /* PF structures aren't fully constructed yet */
     Parrot_block_DOD(interp);
     /* store relative to HLL namespace */
     CONTEXT(interp->ctx)->current_HLL = PMC_sub(sub)->HLL_id;
 
-    store_named_in_namespace(interp, sub);
+    ns = get_namespace_pmc(interp, sub);
+
+    /* attach a namespace to the sub for lookups */
+    PMC_sub(sub)->namespace_stash = ns;
+
+    /* store a :multi sub */
+    if (!PMC_IS_NULL( PMC_sub(sub)->multi_signature) )
+        store_sub_in_multi(interp, sub, ns);
+    /* store other subs (as long as they're not :anon) */
+    else if (!(PObj_get_FLAGS(sub) & SUB_FLAG_PF_ANON)) {
+        STRING *name   = PMC_sub(sub)->name;
+        PMC    *nsname = PMC_sub(sub)->namespace;
+
+        Parrot_store_global_n(interp, ns, name, sub);
+
+        /* TEMPORARY HACK - cache invalidation should be a namespace function */
+        if (!PMC_IS_NULL(nsname))
+        {
+            STRING *nsname_s = VTABLE_get_string(interp, nsname);
+            Parrot_invalidate_method_cache(interp, nsname_s, name);
+        }
+    }
 
     /* restore HLL_id */
     CONTEXT(interp->ctx)->current_HLL = cur_id;
