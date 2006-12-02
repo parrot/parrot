@@ -1,0 +1,9 @@
+tests/basic/001.phpt
+tests/basic/002.phpt
+ tests/basic/003.phpt
+ tests/basic/004.phpt
+tests/basic/005.phpt
+tests/basic/006.phpt
+tests/basic/007.phpt
+tests/basic/008.phpt
+tests/basic/009.phpt

@@ -25,7 +25,7 @@ by the generated PIR. Something like this worked for me under Linux.
   export TEST_PHP_EXECUTABLE=languages/plumhead.pir
   export TEST_PHP_CGI_EXECUTABLE=languages/plumhead/plumhead.pir
   php run-tests.php 
-  php run-tests.php -v --keep-all
+  php run-tests.php -v --keep-all -r languagues/plumhead/t/selection.txt
   # try to no send mail to PHP QA
   
 Good luck.
