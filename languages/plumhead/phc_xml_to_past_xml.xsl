@@ -55,7 +55,8 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
 </xsl:template>
 
 <xsl:template match="phc:AST_method_invocation" >
-  <past:Op name='print' >
+  <past:Op>
+    <xsl:attribute name="name" ><xsl:value-of select="phc:Token_method_name/phc:value" /></xsl:attribute>
     <xsl:apply-templates select="phc:AST_actual_parameter_list" />
   </past:Op>
 </xsl:template>
@@ -97,7 +98,7 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
       </xsl:choose>
     </xsl:attribute>
 
-    <xsl:apply-templates select="phc:Token_int | phc:Token_real | phc:AST_bin_op | phc:AST_unary_op" />
+    <xsl:apply-templates select="phc:Token_string | phc:Token_int | phc:Token_real | phc:AST_bin_op | phc:AST_unary_op | phc:AST_variable" />
 
   </past:Op>
 </xsl:template>

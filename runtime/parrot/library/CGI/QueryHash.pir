@@ -41,6 +41,7 @@ Get parameters for GET method.
     unless does_exist goto end_parse_get
         .local string query
         query           = my_env['QUERY_STRING']
+	#_dumper( query, 'queryGET:' )
         query_hash      = parse( query )
 
 end_parse_get:
@@ -71,6 +72,7 @@ Get parameters for POST method.
         in              = getstdin
         query           = read in, len
         close in
+	#_dumper( query, 'queryPOST:' )
         query_hash = parse( query )
 
 end_parse_post:
