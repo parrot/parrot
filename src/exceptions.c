@@ -197,7 +197,8 @@ Parrot_pop_mark(Interp *interp, INTVAL mark)
         const Stack_Entry_t * const e
             = stack_entry(interp, interp->dynamic_env, 0);
         if (!e)
-            internal_exception(1, "mark not found");
+            real_exception(interp, NULL, 1,
+                           "Mark %d not found.", mark);
         (void)stack_pop(interp, &interp->dynamic_env,
                         NULL, e->entry_type);
         if (e->entry_type == STACK_ENTRY_MARK) {

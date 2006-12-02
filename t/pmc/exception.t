@@ -340,7 +340,7 @@ pasm_output_like(<<'CODE', <<'OUTPUT', "pushmark - pop wrong one");
     print "never\n"
     end
 CODE
-/mark not found/
+/Mark 500 not found/
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "pushaction, throw");
