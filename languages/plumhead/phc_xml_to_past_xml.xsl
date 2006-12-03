@@ -137,7 +137,7 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
         </past:Var>
       </xsl:when>
       <xsl:otherwise>
-        <past:Var viviself=".Hash" islvalue="1" >
+        <past:Var viviself=".Capture" islvalue="1" >
           <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
         </past:Var>
       </xsl:otherwise>
