@@ -90,6 +90,7 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
             <xsl:when test="phc:Token_op/phc:value = 'PD0='" >infix:&lt;=</xsl:when>
             <xsl:when test="phc:Token_op/phc:value = 'Pj0='" >infix:&gt;=</xsl:when>
             <xsl:when test="phc:Token_op/phc:value = 'Pg=='" >infix:&gt;</xsl:when>
+            <xsl:when test="phc:Token_op/phc:value = 'Jg=='" >infix:&amp;</xsl:when>
           </xsl:choose>
         </xsl:when>
         <xsl:otherwise>
