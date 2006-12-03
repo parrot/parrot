@@ -94,6 +94,8 @@ my @tests
       [ '.1', '0.1', 'Parrot says 0.1', ],
       [ '-.1', '-0.1', 'Parrot bc says -0.1',],
       [ '-1.0000001', '-1.0000001', 'probably limited precission of Float PMC', ],
+      [ '1 & 3', '1', 'bitwise and', ],
+      [ '1 | 2', '3', 'bitwise or', ],
     );
 
 plan( tests => scalar(@tests) );

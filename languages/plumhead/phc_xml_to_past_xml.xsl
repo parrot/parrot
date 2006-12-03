@@ -66,7 +66,7 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
 </xsl:template>
 
 <xsl:template match="phc:AST_actual_parameter" >
-  <xsl:apply-templates select="phc:Token_string | phc:Token_int | phc:Token_real | phc:AST_bin_op | phc:AST_unary_op | phc:AST_variable" />
+  <xsl:apply-templates select="phc:AST_method_invocation | phc:Token_string | phc:Token_int | phc:Token_real | phc:AST_bin_op | phc:AST_unary_op | phc:AST_variable" />
 </xsl:template>
 
 <xsl:template match="phc:AST_bin_op" >

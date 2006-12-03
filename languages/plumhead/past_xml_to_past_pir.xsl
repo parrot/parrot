@@ -290,6 +290,12 @@ a Patrick Michaud PAST and runs the PAST.
   .return()
 .end
 
+# For now, only plain old CGI is supported
+# Lie about the 'fcgi', in order to keep in line with the reference implementation
+.sub 'php_sapi_name'
+  .return( 'cgi-fcgi' )
+.end
+
 </xsl:template>
 
 <xsl:template name="php-init" >
