@@ -13,6 +13,7 @@ TODO:
   - Implement var_dump()
 
 DONE:
+  - String comparison ops
   - Implement php_sapi_name(), as it is used for skipping in the PHP test suite
   - bitwise op '|' and '&' 
   - Set up list of tests that are expected to succeed

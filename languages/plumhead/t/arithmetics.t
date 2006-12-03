@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-plumhead/t/hello.t - tests for Plumhead
+plumhead/t/arithmetics.t - tests for Plumhead
 
 =head1 DESCRIPTION
 

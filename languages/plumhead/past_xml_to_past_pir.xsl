@@ -189,12 +189,42 @@ a Patrick Michaud PAST and runs the PAST.
     .return ($I0)
 .end
 
-.sub 'infix:=='
+.sub 'infix:==' 
     .param pmc a
     .param pmc b
 
     $I0 = cmp_num a, b
     $I0 = iseq $I0, 0
+
+    .return ($I0)
+.end
+
+.sub 'infix:!='
+    .param pmc a
+    .param pmc b
+
+    $I0 = cmp_num a, b
+    $I0 = isne $I0, 0
+
+    .return ($I0)
+.end
+
+.sub 'infix:eq' 
+    .param pmc a
+    .param pmc b
+
+    $I0 = cmp_str a, b
+    $I0 = iseq $I0, 0
+
+    .return ($I0)
+.end
+
+.sub 'infix:ne'
+    .param pmc a
+    .param pmc b
+
+    $I0 = cmp_str a, b
+    $I0 = isne $I0, 0
 
     .return ($I0)
 .end

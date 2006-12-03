@@ -17,9 +17,11 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
-use Parrot::Config (); 
-use Parrot::Test;
+# core Perl modules
 use Test::More     tests => 5;
+
+# Parrot modules
+use Parrot::Test;
 
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
