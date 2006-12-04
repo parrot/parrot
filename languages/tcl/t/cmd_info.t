@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 33
+plan 41
 
 eval_is {info} \
   {wrong # args: should be "info option ?arg arg ...?"} \
@@ -139,3 +139,32 @@ eval_is {
 
 eval_is {info level -1} {bad level "-1"} {info level - bad level}
 eval_is {info level a} {expected integer but got "a"} {info level - not integer}
+
+# [info defaults] tests...
+proc defaults1 {a {b c} d} {}
+eval_is {
+  info default
+} {wrong # args: should be "info default procname arg varname"} {no args}
+eval_is {
+  info default a 
+} {wrong # args: should be "info default procname arg varname"} {1 args}
+eval_is {
+  info default a b
+} {wrong # args: should be "info default procname arg varname"} {2 args}
+eval_is {
+  info default a b c d
+} {wrong # args: should be "info default procname arg varname"} {4 args}
+eval_is {
+  info default bad_proc a a
+} {"bad_proc" isn't a procedure} {invalid procedure}
+eval_is {
+  info default defaults1 x x
+} {procedure "defaults1" doesn't have an argument "x"} \
+  {invalid argument to a procedure}
+eval_is {
+  list [info default defaults1 b x] $x
+} {1 c} {something with a default}
+eval_is {
+  catch {unset x}
+  list [info default defaults1 a x] $x
+} {0 {}} {something without a default}

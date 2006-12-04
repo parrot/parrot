@@ -129,7 +129,18 @@ default_arg:
   lexpad['$%1'] = $P1
 END_PIR
 
-    $S1 = arg[1]
+   $P1 = get_root_global ['_tcl'], 'proc_defaults'
+   $P2 = $P1[full_name]
+   if_null $P2, vivify_key
+   goto got_default_key
+vivify_key:
+   $P2 = new .TclDict
+   $P1[full_name] = $P2
+got_default_key:
+   $S0 = arg[0]
+   $S1 = arg[1]
+   $P2[$S0] = $S1
+
     defaults.emit(<<'END_PIR', i, $S0, $S1)
 default_%0:
   $P1 = new TclString

@@ -116,10 +116,74 @@ bad_args:
   tcl_error 'wrong # args: should be "info body procname"'
 .end
 
+
 # XXX stub to compile tcltest.tcl
 .sub 'complete'
   .return (1)
 .end
+
+.sub 'default'
+  .param pmc argv
+
+  .local int argc
+  argc = argv
+  if argc != 3 goto bad_args
+
+  .local pmc retval
+
+  .local string procname, argname, varname
+  procname = argv[0]
+  argname  = argv[1]
+  varname  = argv[2]
+
+  .local pmc __set
+  __set = get_root_global ['_tcl'], '__set'
+  $P1 = get_root_global ['_tcl'], 'proc_defaults'
+  $P2 = $P1[procname]
+  if_null $P2, not_proc
+
+  $P3 = $P2[argname]
+  if_null $P3, check_arg
+  __set(varname, $P3) 
+
+  # store in variable
+  .return (1)
+
+check_arg:
+  # there's no default. is there even an arg?
+  $P1 = get_root_global ['_tcl'], 'proc_args'
+  $P2 = $P1[procname]
+  $P3 = __list($P2)
+  $P4 = new .Iterator, $P3
+loop:
+  unless $P4 goto not_argument 
+  $S1 = shift $P4
+  if $S1==argname goto no_default 
+  goto loop
+
+not_argument:
+  $S0 = 'procedure "'
+  $S0 .= procname
+  $S0 .= "\" doesn't have an argument \""
+  $S0 .= argname
+  $S0 .= '"' 
+  tcl_error $S0
+
+no_default:
+  __set(varname, '') 
+  .return (0)
+
+not_proc:
+  $S0 = '"'
+  $S0 .= procname
+  $S0 .= "\" isn't a procedure"
+  tcl_error $S0
+
+
+bad_args:
+  tcl_error 'wrong # args: should be "info default procname arg varname"'
+.end
+
 
 .sub 'functions'
   .param pmc argv
@@ -353,5 +417,4 @@ find_level:
   .return(0)
 .end
 
-# RT#40745: default - watch out for return value and default value.
 # RT#40744: cmdcount - not being tracked. :(

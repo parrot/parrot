@@ -184,6 +184,9 @@ env_loop_done:
   $P1 = new .TclArray
   store_global 'proc_args', $P1
 
+  $P1 = new .TclDict
+  store_global 'proc_defaults', $P1
+
   # Global variable initialization
 
    #version info
