@@ -4,15 +4,15 @@
 
 =head1 NAME
 
-examples/mops/mops.c - Calculate M ops/s
+examples/benchmarks/mops.c - Calculate M ops/s
 
 =head1 SYNOPSIS
 
-    % perl examples/mops/mops.pl
+    % perl examples/benchmarks/mops.pl
 
 =head1 DESCRIPTION
 
-A Perl implementation of the F<examples/mops/mops.pasm> example program,
+A Perl implementation of the F<examples/benchmarks/mops.pasm> example program,
 for speed comparisons.
 
 Calculates a value for M ops/s (million operations per second) using
