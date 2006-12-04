@@ -4,6 +4,7 @@
 package init::hints::vms;
 
 use strict;
+use warnings;
 
 sub runstep
 {

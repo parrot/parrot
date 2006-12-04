@@ -4,6 +4,7 @@
 package init::hints::os2;
 
 use strict;
+use warnings;
 
 sub runstep
 {

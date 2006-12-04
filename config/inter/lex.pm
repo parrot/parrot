@@ -15,6 +15,7 @@ least the user-specified minimum version, defaulting to 2.5.33.
 package inter::lex;
 
 use strict;
+use warnings;
 
 use vars qw( $description @args $prompt $util );
 

@@ -4,6 +4,7 @@
 package init::hints::msys;
 
 use strict;
+use warnings;
 
 sub runstep
 {

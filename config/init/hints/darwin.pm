@@ -4,6 +4,7 @@
 package init::hints::darwin;
 
 use strict;
+use warnings;
 
 sub runstep
 {

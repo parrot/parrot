@@ -4,6 +4,7 @@
 package init::hinits::irix;
 
 use strict;
+use warnings;
 
 sub runstep
 {

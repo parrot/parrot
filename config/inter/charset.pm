@@ -14,6 +14,7 @@ Asks the user to select which charset files to include.
 package inter::charset;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

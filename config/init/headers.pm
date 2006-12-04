@@ -14,6 +14,7 @@ Uses C<ExtUtils::Manifest> to determine which headers are nongenerated.
 package init::headers;
 
 use strict;
+use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 

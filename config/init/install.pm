@@ -49,6 +49,7 @@ Sets up the installation paths
 package init::install;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

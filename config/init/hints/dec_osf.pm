@@ -4,6 +4,7 @@
 package init::hints::dec_osf;
 
 use strict;
+use warnings;
 
 sub runstep
 {

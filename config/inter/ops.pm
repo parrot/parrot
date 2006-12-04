@@ -14,6 +14,7 @@ Asks the user to select which ops files to include.
 package inter::ops;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

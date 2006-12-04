@@ -4,6 +4,7 @@
 package init::hints::mswin32;
 
 use strict;
+use warnings;
 
 sub runstep
 {

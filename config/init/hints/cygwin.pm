@@ -4,6 +4,7 @@
 package init::hints::cygwin;
 
 use strict;
+use warnings;
 
 sub runstep
 {

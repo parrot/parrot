@@ -4,6 +4,7 @@
 package init::hints::netbsd;
 
 use strict;
+use warnings;
 
 sub runstep
 {

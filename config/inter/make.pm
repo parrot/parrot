@@ -14,6 +14,7 @@ Determines whether C<make> is installed and if it's actually GNU C<make>.
 package inter::make;
 
 use strict;
+use warnings;
 
 use vars qw( $description @args $prompt $util );
 

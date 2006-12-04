@@ -4,6 +4,7 @@
 package init::hints::linux;
 
 use strict;
+use warnings;
 
 use Config;
 

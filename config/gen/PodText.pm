@@ -41,6 +41,7 @@ Accepts a L<Parrot::Configure> object followed by a flattened hash.
 package gen::PodText;
 
 use strict;
+use warnings;
 use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);

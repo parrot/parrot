@@ -12,6 +12,7 @@ Adds -fPIC to x86_64 (AMD64) ccflags, if necessary.
 package gen::cpu::x86_64::auto;
 
 use strict;
+use warnings;
 
 sub runstep
 {

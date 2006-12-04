@@ -15,6 +15,7 @@ so this field is empty.
 package gen::revision;
 
 use strict;
+use warnings;
 use vars qw($description $result);
 
 use base qw(Parrot::Configure::Step::Base);

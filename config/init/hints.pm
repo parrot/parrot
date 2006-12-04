@@ -15,6 +15,7 @@ F<config/init/default.pm>.
 package init::hints;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

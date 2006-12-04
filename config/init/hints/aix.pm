@@ -4,6 +4,7 @@
 package init::hints::aix;
 
 use strict;
+use warnings;
 
 sub runstep
 {
