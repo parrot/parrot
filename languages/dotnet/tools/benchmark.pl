@@ -1,3 +1,4 @@
+use warnings;
 use Time::HiRes qw(time);
 
 close STDERR;

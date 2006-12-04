@@ -7,6 +7,7 @@
 
 package SRM::OptRegister;
 use strict;
+use warnings;
 use SRM::Base;
 our @ISA = qw/SRM::Base/;
 

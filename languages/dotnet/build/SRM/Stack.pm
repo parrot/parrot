@@ -4,6 +4,7 @@
 
 package SRM::Stack;
 use strict;
+use warnings;
 use SRM::Base;
 our @ISA = qw/SRM::Base/;
 

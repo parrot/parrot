@@ -4,6 +4,7 @@
 package DotNetTesting;
 
 use strict;
+use warnings;
 
 require Exporter;
 our @ISA = qw(Exporter);

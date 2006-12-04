@@ -9,6 +9,7 @@
 # #############################################################################
 
 use strict;
+use warnings;
 use lib '../../lib';    # probably fails when parrot_path is passed in
 
 use Getopt::Long;

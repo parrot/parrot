@@ -3,6 +3,7 @@
 
 package SRM::Base;
 use strict;
+use warnings;
 
 # Constructor always throws an exception, so we never instantiate this class.
 sub new() {
