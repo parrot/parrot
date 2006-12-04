@@ -290,7 +290,13 @@ options are passed to the evaluator.
     close ifh
     goto iter_loop
   iter_end:
-    .return self.'eval'(code, adverbs :flat :named)
+    $P0 = self.'eval'(code, adverbs :flat :named)
+    if null $P0 goto end
+    $I0 = isa $P0, 'String'
+    if $I0 == 0 goto end
+    say $P0
+  end:
+    .return ($P0)
 
   err_infile:
     $P0 = new .Exception
