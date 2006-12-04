@@ -9,7 +9,7 @@
 #
 
 use strict;
-eval "use warnings 'all';";
+use warnings qw(all);
 
 package Jako::Symbol;
 

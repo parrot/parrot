@@ -11,7 +11,7 @@
 #
 
 use strict;
-eval "use warnings";
+use warnings;
 
 package Jako::Construct;
 
