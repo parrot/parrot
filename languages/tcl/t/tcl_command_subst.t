@@ -1,104 +1,67 @@
-#! perl
+#! ../../parrot tcl.pbc
 
-use strict;
-use warnings;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
+source lib/test_more.tcl
+plan 13
 
-use Parrot::Test tests => 13;
-use Test::More;
-
-language_output_is( "tcl", <<'TCL', <<'OUT', "all" );
+eval_is {
  set a 5
- puts [set a]
-TCL
-5
-OUT
+ set b [set a]
+} 5 {entire word}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "leading" );
+eval_is {
  set a 5
- puts [set a]b
-TCL
-5b
-OUT
+ set b [set a]b
+} 5b {beginning of word}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "trailing" );
+eval_is {
  set a 5
- puts b[set a]
-TCL
-b5
-OUT
+ set b b[set a]
+} b5 {end of word}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "escaped brace" );
+eval_is {
  set a "St\[ring Parsing"
- puts $a
-TCL
-St[ring Parsing
-OUT
+ set b $a
+} {St[ring Parsing} {escaped bracket}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "escaped brace" );
+eval_is {
  set a "St\\\[ring Parsing"
- puts $a
-TCL
-St\[ring Parsing
-OUT
+ set b $a
+} {St\[ring Parsing} {escaped backslash, escaped brace}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "embedded escaped open brace" );
+eval_is {
  set a [set b \[]
- puts $a
-TCL
-[
-OUT
+ set b $a
+} {[} {embedded escaped open bracket}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "embedded escaped close brace" );
+eval_is {
  set a [set b \]]
- puts $a
-TCL
-]
-OUT
+ set b $a
+} {]} {embedded escaped close bracket}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "command subst inside string" );
+eval_is {
  set a "2 [set b 3]"
- puts $a
-TCL
-2 3
-OUT
+ set b $a
+} {2 3} {command subst inside string}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "nested command subst" );
- puts [set a [set b 2]]
-TCL
-2
-OUT
+eval_is {
+ set b [set a [set b 2]]
+} 2 {nested command sub}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "] in \"\"s" );
- puts [set a "]"]
-TCL
-]
-OUT
+eval_is {
+ set b [set a "]"]
+} {]} {] in quotes}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', '] in ""s in [expr]' );
-  puts [expr {4*[llength "]"]}]
-TCL
-4
-OUT
+eval_is {
+  set b [expr {4*[llength "]"]}]
+} 4 {] in " in [expr]}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', '" in []s in ""s in [expr]' );
-puts [expr {4*"[llength "]"]"}]
-TCL
-4
-OUT
+eval_is {
+  set b [expr {4*"[llength "]"]"}]
+} 4 {" in ] in " in [expr]}
 
-language_output_is( 'tcl', <<'TCL', <<'OUT', '\n after last command' );
-puts [
+eval_is {
+  set b [
     set x {}
     set x 3
-]
-TCL
-3
-OUT
-
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
-# vim: expandtab shiftwidth=4:
+  ]
+} 3 {newline after last command}

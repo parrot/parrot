@@ -1,161 +1,130 @@
-#! perl
+#!../../parrot tcl.pbc
 
-use strict;
-use warnings;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
+source lib/test_more.tcl
+plan 20
 
-use Parrot::Test tests => 20;
-use Test::More;
-
-language_output_is( "tcl", <<'TCL', <<OUT, "middle" );
+eval_is {
+  catch {unset a}
   set a whee
-  puts "foo $a bar"
-TCL
-foo whee bar
-OUT
+  set b "foo $a bar"
+} {foo whee bar} {middle of ""}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "left" );
+eval_is {
+  catch {unset a}
   set a whee
-  puts "$a bar"
-TCL
-whee bar
-OUT
+  set b "$a bar"
+} {whee bar} {beginning of ""}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "right" );
+eval_is {
+  catch {unset a}
   set a whee
-  puts "bar $a"
-TCL
-bar whee
-OUT
+  set b "bar $a"
+} {bar whee} {end of ""}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "all" );
+eval_is {
+  catch {unset a}
   set a whee
-  puts $a
-TCL
-whee
-OUT
+  set b $a
+} whee {entire word}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "array" );
+eval_is {
+   catch {unset a}
    set a(b) whee
-   puts $a(b)
-TCL
-whee
-OUT
+   set b $a(b)
+} whee {array, entire word}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "scalar as array" );
+eval_is {
+  catch {unset a}
   set a 2
-  puts $a(b)
-TCL
-can't read "a(b)": variable isn't array
-OUT
+  set b $a(b)
+} {can't read "a(b)": variable isn't array} {try to use scalar as array}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "array as scalar" );
+eval_is {
+  catch {unset a}
   set a(b) 2
-  puts $a
-TCL
-can't read "a": variable is array
-OUT
+  set b $a
+} {can't read "a": variable is array} {try to use array as scalar}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', '${} substitute an array' );
+eval_is {
+  catch {unset x}
   set x(0) 44
-  puts ${x(0)}
-TCL
-44
-OUT
+  set b ${x(0)}
+} 44 {${} substitute an array item}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "read global" );
+eval_is {
+  catch {unset x}
   set x foo
-  puts $::x
-TCL
-foo
-OUT
+  set b $::x
+} foo {explicit global}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'read absolute namespace var');
+eval_is {
   namespace eval lib { variable version 0.1 }
-  puts $::lib::version
-TCL
-0.1
-OUT
+  set b $::lib::version
+} 0.1 {absolute namespace var}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "write global" );
+eval_is {
+  catch {unset x}
   set ::x foo
-  puts $x
-TCL
-foo
-OUT
+  set b $x
+} foo {write to explicit global}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'write absolute namespace var');
+eval_is {
   namespace eval lib { variable version }
   set ::lib::version 0.1
-  puts $::lib::version
-TCL
-0.1
-OUT
+  set b $::lib::version
+} 0.1 {write to absolute namespace var}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', 'puts $array($key)' );
-array set array {test ok}
-set key test
-puts $array($key)
-TCL
-ok
-OUT
+eval_is {
+  catch {unset array}
+  array set array {test ok}
+  set key test
+  set b $array($key)
+} ok {variable index into array}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', 'puts $foo($bar) - can\'t read' );
-  puts $foo($bar)
-TCL
-can't read "bar": no such variable
-OUT
+eval_is {
+  catch {unset bar}
+  set b $foo($bar)
+} {can't read "bar": no such variable} {invalid variable as key}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', 'puts $foo($)' );
+eval_is {
+  catch {unset foo}
   array set foo {$ ok}
-  puts $foo($)
-TCL
-ok
-OUT
+  set b $foo($)
+} ok {single $ as index}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', 'puts $foo([set key])' );
+eval_is {
+  catch {unset foo}
   array set foo {) ok}
   set key )
-  puts $foo([set key])
-TCL
-ok
-OUT
+  set b $foo([set key])
+} ok {use ) as a key}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', 'puts $foo([set key) - syntax error' );
+eval_is {
+  catch {unset array}
+  catch {unset foo}
   array set array {a 1 b 2 c 3}
   set foo b
-  puts $array([set foo)
-TCL
-missing close-bracket
-OUT
+  set b $array([set foo)
+} {missing close-bracket} {missing ] in subcommand as key}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', 'puts $foo([set key]a)' );
+eval_is {
+  catch {unset array}
+  catch {unset foo}
   array set array {a 1 b 2 c 3}
   set foo b
-  puts $array([set foo]a)
-TCL
-can't read "array(ba)": no such element in array
-OUT
+  set b $array([set foo]a)
+} {can't read "array(ba)": no such element in array} {invalid key}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', 'puts $array([set )])' );
+eval_is {
+  catch {unset array}
   array set array {a 1 b 2 c 3}
   set ) b
-  puts $array([set )])
-TCL
-2
-OUT
+  set b $array([set )])
+} 2 {use literal ) inside the array key}
 
-language_output_is( 'tcl', <<'TCL', <<'OUT', '$x\\::bar' );
-  namespace eval foo {  proc bar {} { puts ok }  }
+eval_is {
+  catch {unset x}
+  namespace eval foo {  proc bar {} { return ok }  }
   set x foo
   $x\::bar
-TCL
-ok
-OUT
-
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
-# vim: expandtab shiftwidth=4:
+} ok {namespace variable with escaped colon}
