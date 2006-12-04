@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 42;
 
 =head1 NAME
 
@@ -1367,6 +1367,64 @@ foo(int)
 foo(string)
 foo(String)
 foo(_)
+OUTPUT
+
+
+pir_output_is(<<'CODE', <<'OUTPUT', ':multi with :outer (RT #41047)');
+.sub main :main
+    new $P0, .String
+    assign $P0, 'arg0'
+    new $P1, .String
+    assign $P1, 'arg1'
+
+    $P99 = "foo"($P0)
+
+    $P99 = "foo"($P0, $P1)
+
+    $P99 = "bar"($P0)
+
+    $P99 = "bar"($P0, $P1)
+.end
+
+
+.sub "foo" :multi(_)
+    .param pmc x
+    print "foo(_)  : "
+    say x
+    .return (x)
+.end
+
+.sub "foo" :multi(_,_)
+    .param pmc x
+    .param pmc y
+    print "foo(_,_): "
+    print x
+    print " "
+    say y
+    .return (y)
+.end
+
+.sub "bar" :outer("main") :multi(_)
+    .param pmc x
+    print "bar(_)  : "
+    say x
+    .return (x)
+.end
+
+.sub "bar" :outer("main") :multi(_,_)
+    .param pmc x
+    .param pmc y
+    print "bar(_,_): "
+    print x
+    print " "
+    say y
+    .return (y)
+.end
+CODE
+foo(_)  : arg0
+foo(_,_): arg0 arg1
+bar(_)  : arg0
+bar(_,_): arg0 arg1
 OUTPUT
 
 # Local Variables:
