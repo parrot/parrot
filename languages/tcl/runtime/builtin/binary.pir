@@ -14,8 +14,8 @@
 
   .local pmc options
   options = new .ResizablePMCArray
-  options[0] = 'format'
-  options[1] = 'scan'
+  push options, 'format'
+  push options, 'scan'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
@@ -33,7 +33,7 @@ bad_args:
   .return ('') # once all commands are implemented, remove this...
 
 no_args:
-  tcl_error 'wrong # args: should be "binary option ?arg ...?"'
+  tcl_error 'wrong # args: should be "binary option ?arg arg ...?"'
 
 .end
 
