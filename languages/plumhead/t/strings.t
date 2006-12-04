@@ -1,4 +1,4 @@
-# $Id: arithmetics.t 15935 2006-12-03 11:25:00Z bernhard $
+# $Id$
 
 =head1 NAME
 
