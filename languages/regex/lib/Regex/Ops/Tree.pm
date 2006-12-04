@@ -1,6 +1,7 @@
 package Regex::Ops::Tree;
 use base 'Exporter';
 use strict;
+use warnings;
 use Carp qw(confess);
 
 @Regex::Ops::Tree::EXPORT = qw(rop);

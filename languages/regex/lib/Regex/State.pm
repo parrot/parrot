@@ -1,4 +1,5 @@
 package Regex::State;
+use warnings;
 
 sub new {
     my ($class, %options) = @_;

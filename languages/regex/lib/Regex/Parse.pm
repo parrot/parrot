@@ -2,6 +2,7 @@ package Regex::Parse;
 
 use Regex::Grammar;
 use strict;
+use warnings;
 require 'Regex.pm';
 
 sub new {

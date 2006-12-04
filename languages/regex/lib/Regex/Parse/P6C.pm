@@ -3,6 +3,7 @@
 package Regex::Parse::P6C;
 
 use strict;
+use warnings;
 use Carp qw(confess);
 use Regex::Ops::Tree;
 use P6C::Util qw(is_string);

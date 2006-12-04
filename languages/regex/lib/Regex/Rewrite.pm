@@ -3,6 +3,7 @@ use Regex::Ops::Tree;
 use Regex::Ops::List;
 require 'Regex.pm';
 use strict;
+use warnings;
 
 *aop = *Regex::Rewrite::aop;
 *rop = *Regex::Rewrite::rop;

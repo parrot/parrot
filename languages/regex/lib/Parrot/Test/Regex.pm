@@ -5,6 +5,7 @@ require Parrot::Test;
 package Parrot::Test::Regex;
 
 use strict;
+use warnings;
 
 use Data::Dumper;
 use File::Basename;

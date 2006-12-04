@@ -1,6 +1,7 @@
 package Regex::CodeGen;
 require 'Regex.pm';
 use strict;
+use warnings;
 
 sub new {
     my ($proto, %options) = @_;

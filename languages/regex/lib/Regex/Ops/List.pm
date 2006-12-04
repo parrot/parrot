@@ -4,6 +4,7 @@ package Regex::Ops::List;
 use Regex::Grammar;
 use base 'Exporter';
 use strict;
+use warnings;
 
 use vars qw(@AsmOps @EXPORT);
 

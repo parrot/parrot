@@ -2,6 +2,7 @@ package Regex::CodeGen::Rx;
 use Regex::Ops::Tree ();
 use base 'Regex::CodeGen';
 use strict;
+use warnings;
 
 my $fail_label = Regex::Ops::Tree::mark('FAIL');
 

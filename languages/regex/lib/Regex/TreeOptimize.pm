@@ -6,6 +6,7 @@ package Regex::TreeOptimize;
 use Regex::Ops::Tree qw(rop);
 use Carp qw(croak);
 use strict;
+use warnings;
 
 sub new {
     my ($proto, %opts) = @_;

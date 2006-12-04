@@ -4,6 +4,7 @@ package Regex::CodeGen::Re;
 use Regex::RegexOps ();
 use base 'Regex::CodeGen';
 use strict;
+use warnings;
 
 sub output_preamble {
     my $self = shift;

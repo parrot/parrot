@@ -1,5 +1,6 @@
 package Regex::Generate;
 use strict;
+use warnings;
 
 ############### SIMPLE OUTPUT ##############
 

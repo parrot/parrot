@@ -1,5 +1,6 @@
 package Regex::Ops;
 
+use warnings;
 use vars qw(%MARKERS);
 sub mark {
     my $name = shift || '';

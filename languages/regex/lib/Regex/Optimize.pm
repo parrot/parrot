@@ -17,6 +17,7 @@ package Regex::Optimize;
 use Regex::Ops::List;
 use Regex::State;
 use strict;
+use warnings;
 require 'Regex.pm';
 
 sub new {

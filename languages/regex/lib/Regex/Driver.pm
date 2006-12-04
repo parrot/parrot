@@ -2,6 +2,7 @@
 
 package Regex::Driver;
 use strict;
+use warnings;
 
 sub new {
     my ($class, $language, %options) = @_;
