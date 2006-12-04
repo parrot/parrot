@@ -3,6 +3,7 @@
 # $Id$
 
 package t::pmc;
+use warnings;
 use Parrot::Test 'no_plan';
 use Test::More;
 
