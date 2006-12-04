@@ -20,6 +20,7 @@ if ($@) {
 }
 
 use strict;
+use warnings;
 use Exporter;
 
 use vars qw(@ISA @EXPORT %PConfig);
