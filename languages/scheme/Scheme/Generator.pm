@@ -3,6 +3,7 @@
 package Scheme::Generator;
 
 use strict;
+use warnings;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use Carp;
 

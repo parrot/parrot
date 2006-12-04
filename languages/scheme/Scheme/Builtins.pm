@@ -1,6 +1,7 @@
 package Scheme::Builtins;
 
 use strict;
+use warnings;
 
 # nice for debugging
 use Data::Dumper;

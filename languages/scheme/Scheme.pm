@@ -3,6 +3,7 @@
 package Scheme;
 
 use strict;
+use warnings;
 
 use Data::Dumper;
 
