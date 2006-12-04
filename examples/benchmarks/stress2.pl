@@ -15,6 +15,8 @@ Creates 200 arrays of 10000 elements each.
 
 =cut
 
+use warnings;
+
 foreach (1..20) {
     my @arr;
     foreach (1..10) {

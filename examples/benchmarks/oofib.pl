@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 
 package A;
 sub fib {

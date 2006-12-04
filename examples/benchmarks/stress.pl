@@ -15,6 +15,8 @@ Creates 50 arrays with 10000 elements each.
 
 =cut
 
+use warnings;
+
 my @arr;
 foreach (1..10) {
     $arr[$_] = buildarray();

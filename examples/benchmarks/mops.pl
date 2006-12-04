@@ -34,6 +34,8 @@ Prints out:
 
 =cut
 
+use warnings;
+
 sub time_hires { time() }
 
 $I2 = 0;                      # set    I2, 0
