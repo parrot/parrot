@@ -290,13 +290,7 @@ options are passed to the evaluator.
     close ifh
     goto iter_loop
   iter_end:
-    $P0 = self.'eval'(code, adverbs :flat :named)
-    if null $P0 goto end
-    $I0 = isa $P0, 'String'
-    if $I0 == 0 goto end
-    say $P0
-  end:
-    .return ($P0)
+    .return self.'eval'(code, adverbs :flat :named)
 
   err_infile:
     $P0 = new .Exception
@@ -364,10 +358,10 @@ Generic method for compilers invoked from a shell command line.
 
   save_output:
     .local string output
-    output = adverbs['output']
-    unless output goto end
     .local pmc ofh
     ofh = getstdout
+    output = adverbs['output']
+    if output == '' goto save_output_1
     if output == '-' goto save_output_1
     ofh = open output, '>'
     unless ofh goto err_output
