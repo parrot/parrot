@@ -14,6 +14,7 @@ Determines if the C library has a working C<S_ISREG>.
 package auto::isreg;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

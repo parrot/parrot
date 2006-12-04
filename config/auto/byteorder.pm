@@ -14,6 +14,7 @@ Computes the native byteorder for Parrot's wordsize.
 package auto::byteorder;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use Parrot::Configure::Step qw(:auto);

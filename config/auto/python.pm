@@ -18,6 +18,7 @@ Store version of Python.
 package auto::python;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

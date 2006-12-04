@@ -37,6 +37,7 @@ Use the malloc in F<src/res_lea.c> with tracing enabled.
 package auto::gc;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

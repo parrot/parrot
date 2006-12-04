@@ -14,6 +14,7 @@ Determines some signal stuff.
 package auto::signal;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

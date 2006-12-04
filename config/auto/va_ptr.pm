@@ -14,6 +14,7 @@ Tests which kind of PARROT_VA_TO_VAPTR to use.
 package auto::va_ptr;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

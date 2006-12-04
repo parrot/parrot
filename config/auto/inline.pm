@@ -14,6 +14,7 @@ Determines whether the compiler supports C<inline>.
 package auto::inline;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

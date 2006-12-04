@@ -14,6 +14,7 @@ Determines the sizes of various types.
 package auto::sizes;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

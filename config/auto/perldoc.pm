@@ -14,6 +14,7 @@ Determines whether perldoc exists on the system.
 package auto::perldoc;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

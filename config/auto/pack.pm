@@ -14,6 +14,7 @@ Figures out how to C<pack()> Parrot's types.
 package auto::pack;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

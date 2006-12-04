@@ -14,6 +14,7 @@ Figures out what formats should be used for C<sprintf()>.
 package auto::format;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

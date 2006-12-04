@@ -14,6 +14,7 @@ Verifies that the compiler supports function pointer casts.
 package auto::funcptr;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);

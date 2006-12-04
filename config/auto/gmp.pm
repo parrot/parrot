@@ -14,6 +14,7 @@ Determines whether the platform supports GMP.
 package auto::gmp;
 
 use strict;
+use warnings;
 use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
