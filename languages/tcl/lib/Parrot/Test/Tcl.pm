@@ -1,5 +1,6 @@
 package Parrot::Test::Tcl;
 
+use warnings;
 use File::Basename;
 
 require Parrot::Test;
