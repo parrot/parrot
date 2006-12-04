@@ -3,6 +3,7 @@
 package URM::Test;
 
 use strict;
+use warnings;
 use vars qw(@EXPORT @ISA);
 
 use Parrot::Config;
