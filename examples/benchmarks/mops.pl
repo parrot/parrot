@@ -38,9 +38,9 @@ use warnings;
 
 sub time_hires { time() }
 
-$I2 = 0;                      # set    I2, 0
+#$I2 = 0;                      # set    I2, 0
 $I3 = 1;                      # set    I3, 1
-$I4 = 10000000;              # set    I4, 10000000
+$I4 = 10000000;               # set    I4, 10000000
                               #
 print "Iterations:    $I4\n"; # print  "Iterations:    "
                               # print  I4
