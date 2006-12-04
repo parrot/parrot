@@ -466,7 +466,6 @@ bad_repeat:
   tcl_error 'wrong # args: should be "string repeat string count"'
 .end
 
-# RT#40769: stub
 .sub 'map'
   .param pmc argv
 
