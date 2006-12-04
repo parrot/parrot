@@ -2,6 +2,9 @@
 
 package Regex;
 
+use strict;
+use warnings;
+
 use base 'Exporter';
 BEGIN {
     @Regex::EXPORT_OK = qw(expr_to_tree tree_to_list list_to_pasm compile);
@@ -14,9 +17,6 @@ use Regex::Optimize;
 
 use Regex::Rewrite;
 use Regex::CodeGen::IMCC;
-
-use strict;
-use warnings;
 
 # Class method to get a global state object
 use vars qw($GLOBAL_STATE);

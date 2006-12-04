@@ -1,8 +1,8 @@
 package Parrot::Interpreter;
 
+use warnings;
 our $VERSION = '0.02';
 
-use warnings;
 use Parrot::Embed;
 
 1;

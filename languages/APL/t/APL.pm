@@ -2,6 +2,8 @@ package t::APL;
 
 # Fail a little more gracefully for those without Test::Base installed.
 
+use warnings;
+
 BEGIN {
   eval {
     require Test::Base;
@@ -13,7 +15,6 @@ BEGIN {
   }
 }
 
-use warnings;
 use Parrot::Config;
 use Parrot::Test;
 
