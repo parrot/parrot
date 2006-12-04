@@ -1233,7 +1233,8 @@ mmd_distance(Interp *interp, PMC *pmc, PMC *arg_tuple)
         /* has to be a builtin multi method */
         multi_sig = PMC_pmc_val(pmc);
     }
-    else if (pmc->vtable->base_type == enum_class_Sub) {
+    else if (pmc->vtable->base_type == enum_class_Sub ||
+             pmc->vtable->base_type == enum_class_Closure) {
         multi_sig = PMC_sub(pmc)->multi_signature;
         if (!multi_sig) {
             /* some method */

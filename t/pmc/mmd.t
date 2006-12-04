@@ -1370,7 +1370,7 @@ foo(_)
 OUTPUT
 
 
-pir_output_is(<<'CODE', <<'OUTPUT', ':multi with :outer (RT #41047)');
+pir_output_is(<<'CODE', <<'OUTPUT', ':multi with :outer');
 .sub main :main
     new $P0, .String
     assign $P0, 'arg0'
