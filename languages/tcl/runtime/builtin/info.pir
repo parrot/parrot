@@ -144,7 +144,9 @@ bad_args:
 
   $P3 = $P2[argname]
   if_null $P3, check_arg
-  __set(varname, $P3) 
+  push_eh error_on_set
+    __set(varname, $P3) 
+  clear_eh
 
   # store in variable
   .return (1)
@@ -170,8 +172,19 @@ not_argument:
   tcl_error $S0
 
 no_default:
-  __set(varname, '') 
+  push_eh error_on_set
+    print "ABOUT TO SET $"
+    print varname
+    print " to the empty string\n"
+    __set(varname, '') 
+  clear_eh
   .return (0)
+
+error_on_set:
+  $S0 = "couldn't store default value in variable \""
+  $S0 .= varname
+  $S0 .= '"'
+  tcl_error $S0
 
 not_proc:
   $S0 = '"'
