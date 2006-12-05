@@ -357,6 +357,8 @@ Generic method for compilers invoked from a shell command line.
     self.'interactive'(args :flat, adverbs :flat :named)
 
   save_output:
+    if null result goto end
+    unless result goto end
     .local string output
     .local pmc ofh
     ofh = getstdout
