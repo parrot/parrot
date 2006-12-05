@@ -16,7 +16,7 @@ jako/t/examples.t - Test examples in F<jako/examples>
 
 =head1 SYNOPSIS
 
-	% prove languages/jako/t/examples.t
+        % prove languages/jako/t/examples.t
 
 =head1 DESCRIPTION
 
