@@ -7,7 +7,7 @@ Parrot::Docs::Section::EditorPlugins - Editor Plugins documentation section
 
 =head1 SYNOPSIS
 
-	use Parrot::Docs::Section::EditorPlugins;
+        use Parrot::Docs::Section::EditorPlugins;
 
 =head1 DESCRIPTION
 
@@ -34,12 +34,12 @@ Returns a new section.
 
 sub new
 {
-	my $self = shift;
-	
-	return $self->SUPER::new(
-		'Editor Plugins', 'editor.html', '',
-		$self->new_item('', 'editor')
-	);
+        my $self = shift;
+        
+        return $self->SUPER::new(
+                'Editor Plugins', 'editor.html', '',
+                $self->new_item('', 'editor')
+        );
 }
 
 =back

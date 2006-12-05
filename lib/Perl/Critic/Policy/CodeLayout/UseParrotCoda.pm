@@ -47,21 +47,21 @@ sub violates {
         return $self->violation( $desc, $expl, $last_node );
     }
     else {
-	for ($last_node = $doc->last_element;
-	     $last_node && @coda_lines;
-	     $last_node = $last_node->previous_sibling) {
+        for ($last_node = $doc->last_element;
+             $last_node && @coda_lines;
+             $last_node = $last_node->previous_sibling) {
 
-	    # Skip (optional) __DATA__ block...
-	    next if ( $last_node->isa('PPI::Statement::Data') );
-	    next if ( $last_node->isa('PPI::Token::Whitespace') );
-	    last if ( !$last_node->isa('PPI::Token::Comment') );
+            # Skip (optional) __DATA__ block...
+            next if ( $last_node->isa('PPI::Statement::Data') );
+            next if ( $last_node->isa('PPI::Token::Whitespace') );
+            last if ( !$last_node->isa('PPI::Token::Comment') );
 
-	    my $last_coda_line = $coda_lines[-1];
-	    my $last_actual_line = $last_node->content;
-	    chomp $last_actual_line;
-	    last if ( $last_coda_line ne $last_actual_line );
-	    pop @coda_lines;
-	}
+            my $last_coda_line = $coda_lines[-1];
+            my $last_actual_line = $last_node->content;
+            chomp $last_actual_line;
+            last if ( $last_coda_line ne $last_actual_line );
+            pop @coda_lines;
+        }
     }
 
     return if ( !@coda_lines ); # We made it through all the coda lines

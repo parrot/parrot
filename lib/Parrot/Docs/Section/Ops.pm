@@ -7,7 +7,7 @@ Parrot::Docs::Section::Ops - Parrot ops documentation section
 
 =head1 SYNOPSIS
 
-	use Parrot::Docs::Section::Ops;
+        use Parrot::Docs::Section::Ops;
 
 =head1 DESCRIPTION
 
@@ -34,17 +34,17 @@ Returns a new section.
 
 sub new
 {
-	my $self = shift;
-	
-	return $self->SUPER::new(
-		'Ops', 'ops.html', '',
-		$self->new_group('Tools', '',
-			$self->new_item('', 'tools/build/ops2c.pl'),
-			$self->new_item('', 'src/ops/ops.num'),
-			$self->new_item('', 'tools/build/ops2pm.pl'),
-		),
-		$self->new_group('Op Libs', '', 'src/ops'),
-	);
+        my $self = shift;
+        
+        return $self->SUPER::new(
+                'Ops', 'ops.html', '',
+                $self->new_group('Tools', '',
+                        $self->new_item('', 'tools/build/ops2c.pl'),
+                        $self->new_item('', 'src/ops/ops.num'),
+                        $self->new_item('', 'tools/build/ops2pm.pl'),
+                ),
+                $self->new_group('Op Libs', '', 'src/ops'),
+        );
 }
 
 =back

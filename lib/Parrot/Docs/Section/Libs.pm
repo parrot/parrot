@@ -7,7 +7,7 @@ Parrot::Docs::Libs - Parrot libraries documentation section
 
 =head1 SYNOPSIS
 
-	use Parrot::Docs::Libs;
+        use Parrot::Docs::Libs;
 
 =head1 DESCRIPTION
 
@@ -34,13 +34,13 @@ Returns a new section.
 
 sub new
 {
-	my $self = shift;
-	
-	return $self->SUPER::new(
-		'Libraries', 'libs.html', '',
-		$self->new_group('Parrot Core Libraries', '', 'runtime/parrot/library'),
-		$self->new_group('Dynamic Libraries', '', 'src/dynoplibs'),
-	);
+        my $self = shift;
+        
+        return $self->SUPER::new(
+                'Libraries', 'libs.html', '',
+                $self->new_group('Parrot Core Libraries', '', 'runtime/parrot/library'),
+                $self->new_group('Dynamic Libraries', '', 'src/dynoplibs'),
+        );
 }
 
 =back

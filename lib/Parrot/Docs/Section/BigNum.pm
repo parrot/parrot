@@ -7,7 +7,7 @@ Parrot::Docs::Section::BigNum - Big Number documentation section
 
 =head1 SYNOPSIS
 
-	use Parrot::Docs::Section::BigNum;
+        use Parrot::Docs::Section::BigNum;
 
 =head1 DESCRIPTION
 
@@ -34,17 +34,17 @@ Returns a new section.
 
 sub new
 {
-	my $self = shift;
-	
-	return $self->SUPER::new(
-		'Big Number Arithmetic', 'bignum.html', '',
-		$self->new_group('Decimal Arithmetic', '',
-			$self->new_item('', 'src/bignum.c', 'src/bignum.h'),
-		),
-		$self->new_group('Testing', '',
-			$self->new_item('', 't/pmc/bignum.t' ),
-		),
-	);
+        my $self = shift;
+        
+        return $self->SUPER::new(
+                'Big Number Arithmetic', 'bignum.html', '',
+                $self->new_group('Decimal Arithmetic', '',
+                        $self->new_item('', 'src/bignum.c', 'src/bignum.h'),
+                ),
+                $self->new_group('Testing', '',
+                        $self->new_item('', 't/pmc/bignum.t' ),
+                ),
+        );
 }
 
 =back

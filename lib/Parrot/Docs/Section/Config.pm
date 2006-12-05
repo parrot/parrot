@@ -7,7 +7,7 @@ Parrot::Docs::Section::Config - Configuration documentation section
 
 =head1 SYNOPSIS
 
-	use Parrot::Docs::Section::Config;
+        use Parrot::Docs::Section::Config;
 
 =head1 DESCRIPTION
 
@@ -67,24 +67,24 @@ Returns a new section.
 
 sub new
 {
-	my $self = shift;
-	
-	return $self->SUPER::new(
-		'Configuration', 'config.html', 'Parrot is configured by running
+        my $self = shift;
+        
+        return $self->SUPER::new(
+                'Configuration', 'config.html', 'Parrot is configured by running
 the <i>Configure.pl</i> script. This is essentially just a wrapper around
 <code>Parrot::Configure</code>. The steps are listed below in the order in
 which they are performed.',
-		$self->new_item('', 'Configure.pl'),
-		$self->config_groups,
+                $self->new_item('', 'Configure.pl'),
+                $self->config_groups,
         $self->new_group('Documentation', '',
-		    $self->new_item('How to add new configuration steps.', 
-		        'docs/configuration.pod')
-		),
-		$self->new_group('Library', '',
-		    $self->new_item('PASM/IMC access to Parrot configuration data.', 
-		        'runtime/parrot/library/config.pir')
-		),
-	);
+                    $self->new_item('How to add new configuration steps.', 
+                        'docs/configuration.pod')
+                ),
+                $self->new_group('Library', '',
+                    $self->new_item('PASM/IMC access to Parrot configuration data.', 
+                        'runtime/parrot/library/config.pir')
+                ),
+        );
 }
 
 =back

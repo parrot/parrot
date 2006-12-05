@@ -7,7 +7,7 @@ Parrot::Docs::Section::DynaPMCs - Dynamic PMCs documentation section
 
 =head1 SYNOPSIS
 
-	use Parrot::Docs::Section::DynaPMCs;
+        use Parrot::Docs::Section::DynaPMCs;
 
 =head1 DESCRIPTION
 
@@ -34,13 +34,13 @@ Returns a new section.
 
 sub new
 {
-	my $self = shift;
-	
-	return $self->SUPER::new(
-		'Dynamic PMCs', 'dynapmc.html', '',
-		$self->new_group('Loading', '', 'src/dynpmc'),
-		$self->new_group('Runtime', '', 'runtime/parrot/include'),
-	);
+        my $self = shift;
+        
+        return $self->SUPER::new(
+                'Dynamic PMCs', 'dynapmc.html', '',
+                $self->new_group('Loading', '', 'src/dynpmc'),
+                $self->new_group('Runtime', '', 'runtime/parrot/include'),
+        );
 }
 
 =back
