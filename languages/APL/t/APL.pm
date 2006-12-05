@@ -15,6 +15,7 @@ BEGIN {
   }
 }
 
+use warnings;
 use Parrot::Config;
 use Parrot::Test;
 
