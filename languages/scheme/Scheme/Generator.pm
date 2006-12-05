@@ -61,7 +61,7 @@ sub _save_set {
   for my $type (keys %regs) {
     for my $count (0..31) {
       $self->_add_inst ('', 'save', ["$type$count"])
-	if $regs{$type}->{$count};
+        if $regs{$type}->{$count};
     }
   }
 }
@@ -96,7 +96,7 @@ sub _restore_set {
   for my $type (reverse keys %regs) {
     for (my $count=31; $count>=0; $count--) {
       $self->_add_inst ('','restore',["$type$count"])
-	if $regs{$type}->{$count};
+        if $regs{$type}->{$count};
     }
   }
 }
@@ -269,9 +269,9 @@ sub _op_quasiquote {
   my ($self, $node) = @_;
   my $return = $self->_save_1 ('P');
   my $special = { 
-		  unquote => \&_qq_unquote,
-		  'unquote-splicing' => \&_qq_unquote_splicing
-		};
+                  unquote => \&_qq_unquote,
+                  'unquote-splicing' => \&_qq_unquote_splicing
+                };
 
   _num_arg ($node, 1, 'quote');
 
@@ -489,7 +489,7 @@ sub _op_cond {
   if ($clauses[-1]->{children}->[0]->{value} eq 'else') {
     my $elseclause = pop @clauses;
     $transnode = { children => [ { value => 'begin'},
-				 _get_args($elseclause) ] };
+                                 _get_args($elseclause) ] };
   }
   else {
     $transnode = { value => '#f' };
@@ -497,10 +497,10 @@ sub _op_cond {
 
   for my $clause ( reverse @clauses ) {
     $transnode = { children => [ { value => 'if' },
-				 _get_arg($clause,0),
-				 { children => [ { value => 'begin' },
-						 _get_args($clause,1) ] },
-				 $transnode ] };
+                                 _get_arg($clause,0),
+                                 { children => [ { value => 'begin' },
+                                                 _get_args($clause,1) ] },
+                                 $transnode ] };
   }
 
   $self->_generate($transnode);
@@ -555,11 +555,11 @@ sub _op_let {
   }
 
   my $let = { children => [
-			   { children => [ { value => 'lambda' },
-					   { children => [ @variables ] },
-					   @body ]},
-			   @values
-			  ]};
+                           { children => [ { value => 'lambda' },
+                                           { children => [ @variables ] },
+                                           @body ]},
+                           @values
+                          ]};
 
   $return = $self->_generate($let);
 
@@ -1944,21 +1944,21 @@ sub _call_function_obj {
   while (my $arg = shift) {
     if ($arg ne "P$count") {
       if ($arg =~ /^[INS]/) {
-	$self->_morph("P$count", $arg);
-	$count++;
-	next;
+        $self->_morph("P$count", $arg);
+        $count++;
+        next;
       }
       # Check if any later argument needs the old value of P$count
       my $moved;
       for (@_) {
-	if ($_ eq "P$count") {
-	  $moved = $_;
-	  $_ = $empty;
-	}
+        if ($_ eq "P$count") {
+          $moved = $_;
+          $_ = $empty;
+        }
       }
       if ($moved) {
-	$self->_add_inst ('', 'set',[$empty,"P$count"]);
-	$empty = $moved;
+        $self->_add_inst ('', 'set',[$empty,"P$count"]);
+        $empty = $moved;
       }
       $self->_add_inst ('','set',["P$count",$arg]);
     }
@@ -2036,11 +2036,11 @@ sub _generate {
     if (exists $func->{value}) {
       my $symbol = $func->{value};
       if (exists $global_ops{$symbol}) {
-	$return = $global_ops{$symbol}->($self, $node);
+        $return = $global_ops{$symbol}->($self, $node);
       } else {
-	my @args = map { $self->_generate($_); } _get_args($node);
-	$return = $self->_call_function_sym($symbol, @args);
-	$self->_restore(@args);
+        my @args = map { $self->_generate($_); } _get_args($node);
+        $return = $self->_call_function_sym($symbol, @args);
+        $self->_restore(@args);
       }
     } else {
       my @args = map { $self->_generate($_); } _get_args($node, 0);

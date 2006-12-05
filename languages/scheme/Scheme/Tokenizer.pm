@@ -57,7 +57,7 @@ sub tokenize {
             $token =~ /^\s/) {    # White can follow white
       $token .= $ch;
     } elsif($ch =~ /@/ and
-	    $token =~ /^,$/) {    # token ,@
+            $token =~ /^,$/) {    # token ,@
       $token .= $ch;
     } else {
       push @$tokref,$token;
