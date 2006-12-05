@@ -91,8 +91,8 @@ sub runstep
         my @opt_and_vers = (
             0 =>
                 "-W -Wall -Wstrict-prototypes -Wmissing-prototypes -Winline"
-		." -Wshadow -Wpointer-arith -Wcast-qual"
-		." -Wwrite-strings -Waggregate-return -Winline -Wno-unused"
+                ." -Wshadow -Wpointer-arith -Wcast-qual"
+                ." -Wwrite-strings -Waggregate-return -Winline -Wno-unused"
                 .($maint ? " -Wlarger-than-4096" : ""),
 
             # others; ones we might like marked with ?

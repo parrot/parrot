@@ -77,7 +77,7 @@ sub runstep
     # (Alternatively, and more generally, perhahs we should run an
     # ieee-conformance test and then call back into a hints-file trigger
     # to set platform-specific flags.
-    #	A. Dougherty  7 March 2005
+    #   A. Dougherty  7 March 2005
     # We don't know which compiler we're using till after the gccversion test.
     my $solaris_ieee_cb = sub {
         my ($key, $gccversion) = @_;

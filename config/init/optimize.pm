@@ -41,10 +41,10 @@ sub runstep
         $conf->data->add(' ', ccflags => "-DDISABLE_GC_DEBUG=1 -DNDEBUG");
         if ($optimize eq "1") {
             # use perl5's value
-	    # gcc 4.1 doesn't like -mcpu=xx, i.e. it's deprecated
-	    # XXX do we know compiler (version) already?
-	    my $opts = $Config{optimize};
-	    $opts =~ s/-mcpu=\S+//;
+            # gcc 4.1 doesn't like -mcpu=xx, i.e. it's deprecated
+            # XXX do we know compiler (version) already?
+            my $opts = $Config{optimize};
+            $opts =~ s/-mcpu=\S+//;
             $conf->data->add(' ', ccflags => $opts);
             # record what optimization was enabled
             $conf->data->set(optimize => $opts);

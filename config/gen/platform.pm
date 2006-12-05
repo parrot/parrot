@@ -99,11 +99,11 @@ END_HERE
             open IN_H, "<", "$header_file" 
                 or die "Can't open $header_file: $!";
 
-	    # slurp in the header file
-	    my $in_h = <IN_H>;
+            # slurp in the header file
+            my $in_h = <IN_H>;
 
-	    # remove the (in this case) superfluous coda
-	    $in_h =~ s{\Q$coda\E\n*\z}{}xgs;
+            # remove the (in this case) superfluous coda
+            $in_h =~ s{\Q$coda\E\n*\z}{}xgs;
 
             print PLATFORM_H <<"END_HERE";
 /*
@@ -184,11 +184,11 @@ END_HERE
         local $/ = undef;
         open IN_C, "<", "config/gen/platform/$platform/begin.c" or die "Can't open begin.c: $!";
 
-	# slurp in the C file
-	my $in_c = <IN_C>;
+        # slurp in the C file
+        my $in_c = <IN_C>;
 
-	# remove the (in this case) superfluous coda
-	$in_c =~ s{\Q$coda\E\n*\z}{}xgs;
+        # remove the (in this case) superfluous coda
+        $in_c =~ s{\Q$coda\E\n*\z}{}xgs;
 
         print PLATFORM_C <<"END_HERE";
 /*
@@ -217,11 +217,11 @@ END_HERE
             print("\t$impl_file\n") if defined $verbose && $verbose == 2;
             open IN_C, "<", "$impl_file" or die "Can't open $impl_file: $!";
 
-	    # slurp in the C file
-	    my $in_c = <IN_C>;
+            # slurp in the C file
+            my $in_c = <IN_C>;
 
-	    # remove the (in this case) superfluous coda
-	    $in_c =~ s{\Q$coda\E\n*\z}{}xgs;
+            # remove the (in this case) superfluous coda
+            $in_c =~ s{\Q$coda\E\n*\z}{}xgs;
 
             print PLATFORM_C <<"END_HERE";
 /*

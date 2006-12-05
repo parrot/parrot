@@ -70,15 +70,15 @@ sub runstep
     my $has_readline = 0;
     eval { cc_build() };
     if (!$@) {
-	if (cc_run()) {
-	    $has_readline = 1;
-	    print " (yes) " if $verbose;
-	    $self->set_result('yes');
-	}
-	$conf->data->set(
-	    readline     => 'define',
-	    HAS_READLINE => $has_readline,
-	);
+        if (cc_run()) {
+            $has_readline = 1;
+            print " (yes) " if $verbose;
+            $self->set_result('yes');
+        }
+        $conf->data->set(
+            readline     => 'define',
+            HAS_READLINE => $has_readline,
+        );
     }
     unless ($has_readline) {
 

@@ -85,7 +85,7 @@ sub sort_pmcs
             $sorted_pmcs[$pmc_order->{$_}] = $_;
 
             #if (exists $pmc_order->{"const$_"}) {
-            #	$sorted_pmcs[$pmc_order->{"const$_"}] = "const$_";
+            #   $sorted_pmcs[$pmc_order->{"const$_"}] = "const$_";
             #}
         } else {
             $sorted_pmcs[$n++] = $_;
@@ -148,16 +148,16 @@ E_NOTE
         $parent_headers .= "src/pmc/pmc_$_.h " foreach (pmc_parents($pmc));
         $TEMP_pmc_build .= <<END
 src/pmc/$pmc.c : src/pmc/$pmc.dump
-	\$(PMC2CC) src/pmc/$pmc.pmc
+\t\$(PMC2CC) src/pmc/$pmc.pmc
 
 src/pmc/$pmc.dump : vtable.dump $parent_dumps lib/Parrot/Pmc2c.pm \\
-		src/pmc/$pmc.pmc
-	\$(PMC2CD) src/pmc/$pmc.pmc 
+\t\tsrc/pmc/$pmc.pmc
+\t\$(PMC2CD) src/pmc/$pmc.pmc 
 
 src/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 
 src/pmc/$pmc\$(O): src/pmc/$pmc.str \$(NONGEN_HEADERS) \\
-        $parent_headers
+\t\t$parent_headers
 
 END
     }

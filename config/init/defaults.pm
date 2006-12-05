@@ -205,20 +205,20 @@ sub runstep
     my $m = $conf->options->get('m');
     my $archname = $Config{archname};
     if ($m) {
-	if ($archname =~ /x86_64/ && $m eq '32') { 
-	    $archname =~ s/x86_64/i386/;
+        if ($archname =~ /x86_64/ && $m eq '32') { 
+            $archname =~ s/x86_64/i386/;
 
-	    # adjust gcc?
-	    for my $cc qw(cc cxx link ld) {
-		$conf->data->add(' ', $cc, '-m32');
-	    }
-	    # and lib flags
-	    for my $lib qw(ld_load_flags ld_share_flags ldflags linkflags) {
-		my $item = $conf->data->get($lib);
-		(my $ni = $item) =~ s/lib64/lib/g;
-		$conf->data->set($lib, $ni);
-	    }
-	}
+            # adjust gcc?
+            for my $cc qw(cc cxx link ld) {
+                $conf->data->add(' ', $cc, '-m32');
+            }
+            # and lib flags
+            for my $lib qw(ld_load_flags ld_share_flags ldflags linkflags) {
+                my $item = $conf->data->get($lib);
+                (my $ni = $item) =~ s/lib64/lib/g;
+                $conf->data->set($lib, $ni);
+            }
+        }
     }
     # TODO adjust lib install-path /lib64 vs. lib
     # remember corrected archname - jit.pm was using $Config('archname')
