@@ -74,7 +74,7 @@ sub prebuild_classes {
         my $src = $obj;
         $src =~ s/src\/pmc\/(.*)\.o/$1\.c/g;
 
-	push @src, $src;
+        push @src, $src;
     }
 
     run_command("cd src/pmc && make @src");
@@ -83,8 +83,8 @@ sub prebuild_classes {
 sub clean {
     print "** $0: removing files in miniparrot directory\n";
     find(sub {
-	     return if ($File::Find::dir =~ /\.svn/);
-	     unlink($_) if (-f $_);
+             return if ($File::Find::dir =~ /\.svn/);
+             unlink($_) if (-f $_);
          }, 'miniparrot');
 }
 
@@ -110,9 +110,9 @@ sub copy_src {
 sub write_buildscripts {
     my @compiled_files;
     foreach my $obj (@ARGV) {
-	my $src = $obj;
-	$src =~ s/\.o/\.c/g;
-	push @compiled_files, [ $src, $obj ];
+        my $src = $obj;
+        $src =~ s/\.o/\.c/g;
+        push @compiled_files, [ $src, $obj ];
     }
 
     print "** $0: writing parrot build scripts\n";
@@ -125,7 +125,7 @@ sub write_buildscripts {
     print F "#!/bin/sh\n";
     print F "\nset -x -e\n";
     foreach (@compiled_files) {
-	print F "gcc -DMINIPARROT -I./include -c $_->[0] -o $_->[1]\n";
+        print F "gcc -DMINIPARROT -I./include -c $_->[0] -o $_->[1]\n";
     }
     my @obj_files = map { $_->[1] } @compiled_files;
     print F "gcc -lm -o parrot " . (join ' ', @obj_files) . "\n";

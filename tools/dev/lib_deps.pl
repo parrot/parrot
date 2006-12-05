@@ -213,7 +213,7 @@ sub do_object {
             
             if ($type eq 'U') {
                 $defined_in{$symbol} ||= undef;
-		push @{$referenced_in{$symbol}}, $obj;
+                push @{$referenced_in{$symbol}}, $obj;
             } else {
                 $defined_in{$symbol} .= "$obj ";
             }

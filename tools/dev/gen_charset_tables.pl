@@ -12,7 +12,7 @@ tools/dev/gen_charset_tables.pl -- generate charset tables
 
 =head1 SYNOPSIS
 
-	perl tools/dev/gen_charset_tables.pl
+        perl tools/dev/gen_charset_tables.pl
 
 =head1 DESCRIPTION
 

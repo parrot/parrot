@@ -150,14 +150,14 @@ my @H = qw(include/parrot/embed.h include/parrot/extend.h);
 
 for my $h (@H) {
     if (open(H, '<', $h)) {
-	while (<H>) {
-	    if (/^\w+\s+(Parrot_\w+)\(/) {
-		$ParrotAPI{$1}++;
-	    }
-	}
-	close(H);
+        while (<H>) {
+            if (/^\w+\s+(Parrot_\w+)\(/) {
+                $ParrotAPI{$1}++;
+            }
+        }
+        close(H);
     } else {
-	die "$0: Header '$h': $!\n";
+        die "$0: Header '$h': $!\n";
     }
 }
 
@@ -176,21 +176,21 @@ my %API;
 
 if (open(NM, '<', "perl tools/dev/nm.pl -BDo '$Obj' |")) {
     while (<NM>) {
-	my ($o, $s, $v) = split;
-	$API{$s} = $o;
-	if ($v eq 'T') {
-	    $Code{$s} = $o;
-	} elsif ($v =~ /[BDR]/) {
-	    if ($v eq 'B') {
-		$DataB{$s} = $o;
-	    } elsif ($v eq 'D') {
-		$DataD{$s} = $o;
-	    } elsif ($v eq 'R') {
-		$DataR{$s} = $o;
-	    }
-	} elsif ($v eq 'U') {
-	    $Undef{$s} = $o;
-	}
+        my ($o, $s, $v) = split;
+        $API{$s} = $o;
+        if ($v eq 'T') {
+            $Code{$s} = $o;
+        } elsif ($v =~ /[BDR]/) {
+            if ($v eq 'B') {
+                $DataB{$s} = $o;
+            } elsif ($v eq 'D') {
+                $DataD{$s} = $o;
+            } elsif ($v eq 'R') {
+                $DataR{$s} = $o;
+            }
+        } elsif ($v eq 'U') {
+            $Undef{$s} = $o;
+        }
     }
     close(NM);
 } else {
@@ -203,7 +203,7 @@ for my $api (keys %API) {
 printf "+++ Parrot API: %d +++\n", scalar @ParrotAPI;
 if (@ParrotAPI) {
     for my $api (@ParrotAPI) {
-	printf "%s\t%s\tOK\n", $api, $API{$api} || "-";
+        printf "%s\t%s\tOK\n", $api, $API{$api} || "-";
     }
 }
 
@@ -219,45 +219,45 @@ my $ParrotPrefix = qr/^(Parrot|PDB|PF|PIO|PackFile)_/;
 
 for my $api (@API) {
     unless ($api =~ $ParrotPrefix) {
-	push @NoParrotPrefix, $api;
+        push @NoParrotPrefix, $api;
     }
     unless (exists $ParrotAPI{$api} || $api =~ $ParrotPrefix) {
-	push @UnParrotAPI, $api;
+        push @UnParrotAPI, $api;
     }
 }
 
 if (@NoParrotAPI) {
     printf "--- Missing Parrot API: %d ---\n", scalar @NoParrotAPI;
     for my $api (@NoParrotAPI) {
-	printf "%s\t%s\tMISSING_API\n", $api, "-";
+        printf "%s\t%s\tMISSING_API\n", $api, "-";
     }
 }
 
 if (@NoParrotPrefix) {
     printf "--- No Parrot prefix: %d ---\n", scalar @NoParrotPrefix;
     for my $api (@NoParrotPrefix) {
-	printf "%s\t%s\tBAD_PREFIX\n", $api, $API{$api};
+        printf "%s\t%s\tBAD_PREFIX\n", $api, $API{$api};
     }
 }
 
 if (@UnParrotAPI) {
     printf "--- No Parrot API: %d ---\n", scalar @UnParrotAPI;
     for my $api (@UnParrotAPI) {
-	printf "%s\t%s\tNO_API\n", $api, $API{$api};
+        printf "%s\t%s\tNO_API\n", $api, $API{$api};
     }
 }
 
 if (keys %DataB) {
     printf "--- Uninitialized Modifiable Data: %d ---\n", scalar keys %DataB;
     for my $api (sort keys %DataB) {
-	printf "%s\t%s\tUMD\n", $api, $DataB{$api};
+        printf "%s\t%s\tUMD\n", $api, $DataB{$api};
     }
 }
 
 if (keys %DataD) {
     printf "--- Initialized Modifiable Data: %d ---\n", scalar keys %DataD;
     for my $api (sort keys %DataD) {
-	printf "%s\t%s\tIMD\n", $api, $DataD{$api};
+        printf "%s\t%s\tIMD\n", $api, $DataD{$api};
     }
 }
 
