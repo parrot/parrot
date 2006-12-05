@@ -35,7 +35,7 @@ foreach (1..20) {
 sub buildarray {
     my @foo;
     foreach (1..10000) {
-	$foo[$_] = $_;
+        $foo[$_] = $_;
     }
     return \@foo;
 }

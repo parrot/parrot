@@ -4,8 +4,8 @@ use warnings;
 
 my $o = new Foo();
 for my $i (1 .. 500000) {
-	$o->i($i);
-	$o->j($i);
+        $o->i($i);
+        $o->j($i);
 }
 print $o->i, "\n";
 

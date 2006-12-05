@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 for my $i (1 .. 100000) {
-	my $o = new Foo();
+        my $o = new Foo();
 }
 my $o = new Foo();
 print $o->[0], "\n";

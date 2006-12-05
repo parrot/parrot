@@ -35,10 +35,10 @@ for ($i = 0; $i < 10; $i++) {
 # set up all 5 element permutations of qw( A B C D E F G H I J )
 for my $e (0..3) {
     for ($i = 0; $i < 10; $i++) {
-	for $s (@k) {
-	    my $nk = $s . chr(65 + $i);
-	    push @nk, $nk;
-	}
+        for $s (@k) {
+            my $nk = $s . chr(65 + $i);
+            push @nk, $nk;
+        }
     }
     @k = @nk;
     @nk = ();
