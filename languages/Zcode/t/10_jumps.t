@@ -39,8 +39,8 @@ my $parrot = $parrot_exe; # just look in path if you don't find it in build dir
 for (@dirs) { 
     my $p = File::Spec->catfile($_, $parrot_exe);
     if (-f $p && -x _) {
-	$parrot = $p;
-	last;
+        $parrot = $p;
+        last;
     } 
 }
 (print "Bail out! Unable to find an executable\n"),exit unless $parrot;
