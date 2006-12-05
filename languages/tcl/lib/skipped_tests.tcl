@@ -75,6 +75,8 @@ array set skipped_tests {
   incr-old-2.5         stacktrace
   lindex-3.7           {expr wide()}
   misc-1.2             stacktrace
+  namespace-old-2.5    explode
+  namespace-old-2.7    explode
   parse-9.2            stacktrace
   parse-10.14          stacktrace
   set-2.1              stacktrace
