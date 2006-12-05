@@ -140,12 +140,12 @@ sub rewrite_test {
     my ($self, $op, $op1, $test, $op2, $dest, $lastback) = @_;
     my $continue = $self->genlabel('after_test');
     my $rev_test = { "==" => "!=",
-		     "!=" => "==",
-		     "<" => ">=",
-		     ">" => "<=",
-		     "<=" => ">",
-		     ">=" => "<",
-		 }->{$test};
+                     "!=" => "==",
+                     "<" => ">=",
+                     ">" => "<=",
+                     "<=" => ">",
+                     ">=" => "<",
+                 }->{$test};
 
     if ($dest->{name} eq 'goto') {
         return aop('if', [ $op1, $test, $op2, $dest->[1] ]);
@@ -577,18 +577,18 @@ sub rewrite_dynamic_alternate {
                  @N_ops,
          $try => $self->dbprint("matching dynalt[%<$counter>]\n"),
                  @R_ops,
-		 aop('pushint', [ $counter, "dynamic alt counter" ]),
-		 aop('goto', [ $next ]),
-	$fail => $self->dbprint("failed dynalt, advancing from dynalt[%<$counter>]/%<$N>\n"),
+                 aop('pushint', [ $counter, "dynamic alt counter" ]),
+                 aop('goto', [ $next ]),
+        $fail => $self->dbprint("failed dynalt, advancing from dynalt[%<$counter>]/%<$N>\n"),
                  aop('add', [ $counter, 1 ]),
-		 aop('ge', [ $counter, $N, $lastback ]),
-		 aop('goto', [ $try ]),
-	$back => $self->op_restore_rxlocals($op),
+                 aop('ge', [ $counter, $N, $lastback ]),
+                 aop('goto', [ $try ]),
+        $back => $self->op_restore_rxlocals($op),
                  aop('popint', [ $counter, 'dynamic alt counter' ]),
                  $self->dbprint("backtracking into dynalt's index %<$counter> match\n"),
-		 aop('goto', [ $R_back ]),
-	$next => $self->op_save_rxlocals($op),
-		 );
+                 aop('goto', [ $R_back ]),
+        $next => $self->op_save_rxlocals($op),
+                 );
 
     return ($back, @ops);
 }

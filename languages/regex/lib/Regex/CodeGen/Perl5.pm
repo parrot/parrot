@@ -254,7 +254,7 @@ sub output_pushmark {
     my ($self) = @_;
     my @ops;
     if ($self->{DEBUG}) {
-	push @ops, (qq(print "PUSHED ).(@_>1?$_[1]:"mark").qq(\\n";));
+        push @ops, (qq(print "PUSHED ).(@_>1?$_[1]:"mark").qq(\\n";));
     }
     push @ops, "push \@<rx_stack>, -1; # pushmark";
     return @ops;

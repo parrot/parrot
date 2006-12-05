@@ -120,17 +120,17 @@ sub optimize {
 
     # Merge adjacent (equivalent) labels, renaming them
     for my $stmt (@$ops) {
-	if (ref $stmt && $stmt->{name} eq 'LABEL') {
-	    push @equivs, $stmt;
-	} else {
-	    if (@equivs) {
-		my $megalabel = $self->combineLabels(@equivs);
-		$_->{label} = $megalabel foreach (@equivs);
-		push @output, $equivs[0];
-		@equivs = ();
-	    }
-	    push @output, $stmt;
-	}
+        if (ref $stmt && $stmt->{name} eq 'LABEL') {
+            push @equivs, $stmt;
+        } else {
+            if (@equivs) {
+                my $megalabel = $self->combineLabels(@equivs);
+                $_->{label} = $megalabel foreach (@equivs);
+                push @output, $equivs[0];
+                @equivs = ();
+            }
+            push @output, $stmt;
+        }
     }
     die "The final 'terminate' is supposed to make this impossible!"
       if @equivs;
@@ -155,13 +155,13 @@ sub optimize {
     my @output2; # ( { label => ?label, code => op } : tagged_op )
     my %labels; # { label string => tagged_op }
     foreach my $stmt (@output) {
-	if ($stmt->{name} eq 'LABEL') {
-	    $curlabel = $stmt;
-	} else {
-	    push @output2, { label => $curlabel, code => $stmt };
-	    $labels{$curlabel->{label}} = $output2[-1] if $curlabel;
-	    undef $curlabel;
-	}
+        if ($stmt->{name} eq 'LABEL') {
+            $curlabel = $stmt;
+        } else {
+            push @output2, { label => $curlabel, code => $stmt };
+            $labels{$curlabel->{label}} = $output2[-1] if $curlabel;
+            undef $curlabel;
+        }
     }
 
     # Second, scan for label references and follow goto's until the
@@ -170,7 +170,7 @@ sub optimize {
 
     foreach my $stmt (@output2) {
         # $stmt : { label => ?label, code => op }
-	my ($label, $actual) = @$stmt{'label','code'};
+        my ($label, $actual) = @$stmt{'label','code'};
 
         # Find statements that can branch to a label
         my @labels;
@@ -208,8 +208,8 @@ sub optimize {
     # move around.
     my $next;
     for my $stmt (reverse @output2) {
-	$stmt->{'next'} = $next;
-	$next = $stmt;
+        $stmt->{'next'} = $next;
+        $next = $stmt;
     }
 
     # Push first statement on the queue
@@ -217,13 +217,13 @@ sub optimize {
 
   BBLOCK:
     while (my $stmt = shift(@Q)) {
-	next if $stmt->{label}->{reachable}; # Already reached here
-	$stmt->{label}->{reachable} = 1;
+        next if $stmt->{label}->{reachable}; # Already reached here
+        $stmt->{label}->{reachable} = 1;
 
-	# Loop over the basic block starting at $stmt
-	my $prev;
-	do {
-	    if (ref $stmt->{code}) {
+        # Loop over the basic block starting at $stmt
+        my $prev;
+        do {
+            if (ref $stmt->{code}) {
                 my @labels = $self->label_indices($stmt->{code});
                 foreach my $pos (@labels) {
                     push @Q, $labels{$stmt->{code}->{args}->[$pos]->{label}};
@@ -233,12 +233,12 @@ sub optimize {
                     next BBLOCK;
                 }
             }
-	    $prev = $stmt;
-	    $stmt = $stmt->{next};
-	} while ($stmt && ! $stmt->{label});
+            $prev = $stmt;
+            $stmt = $stmt->{next};
+        } while ($stmt && ! $stmt->{label});
 
-	# Fallthrough reachable
-	push @Q, $stmt if $stmt;
+        # Fallthrough reachable
+        push @Q, $stmt if $stmt;
     }
 
     # Eliminate unreachable code
@@ -246,32 +246,32 @@ sub optimize {
                  # compiler's work for it.
     my $keeping = 1;
     foreach my $stmt (@output2) {
-	if ($stmt->{label}) {
-	    $keeping = $stmt->{label}->{reachable}; # Keep if reachable
-	}
-	push @output3, $stmt if $keeping;
+        if ($stmt->{label}) {
+            $keeping = $stmt->{label}->{reachable}; # Keep if reachable
+        }
+        push @output3, $stmt if $keeping;
     }
 
     # Reset the 'next' pointers
     undef $next;
     for my $stmt (reverse @output3) {
-	$stmt->{next} = $next;
-	$next = $stmt;
+        $stmt->{next} = $next;
+        $next = $stmt;
     }
 
     # Eliminate gotos to the following address
     my @output4;
     foreach my $stmt (@output3) {
-	if (ref $stmt->{code} && $stmt->{code}->{name} eq 'goto') {
-	    if ($stmt->{next}->{label}
+        if (ref $stmt->{code} && $stmt->{code}->{name} eq 'goto') {
+            if ($stmt->{next}->{label}
                 && $stmt->{code}->{args}->[0] == $stmt->{next}->{label})
             {
-		# If the label of the goto is the label of the following
-		# block of code:
-		next;
-	    }
-	}
-	push @output4, $stmt;
+                # If the label of the goto is the label of the following
+                # block of code:
+                next;
+            }
+        }
+        push @output4, $stmt;
     }
 
     # Delete labels that are not the destination of any jump (these

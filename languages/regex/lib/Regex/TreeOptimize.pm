@@ -44,19 +44,19 @@ sub pass1 {
         # R.(S.T) => R.S.T
         # Or parenthetically, seq(R,seq(\alpha)) => seq(R, \alpha)
         #
-	my @pre_pieces = map { $self->pass1($_, $ctx) } @{ $t->{args} };
-	my @pieces;
-	foreach (@pre_pieces) {
-	    if (ref $_ && $_->{name} eq 'seq') {
-		push @pieces, @{$_->{args}};
-	    } else {
-		push @pieces, $_;
-	    }
-	}
-	return rop('seq', \@pieces);
+        my @pre_pieces = map { $self->pass1($_, $ctx) } @{ $t->{args} };
+        my @pieces;
+        foreach (@pre_pieces) {
+            if (ref $_ && $_->{name} eq 'seq') {
+                push @pieces, @{$_->{args}};
+            } else {
+                push @pieces, $_;
+            }
+        }
+        return rop('seq', \@pieces);
     } elsif ($type eq 'alternate') {
-	# Pull out common prefixes, and convert alternation with null
-	# expressions to optional matches:
+        # Pull out common prefixes, and convert alternation with null
+        # expressions to optional matches:
         #
         # opt(aR|aS) => a(R|S)
         # opt(R|)    => opt(R)?
@@ -167,17 +167,17 @@ sub matchsame {
     return 0 if $R->{name} ne $S->{name};
     my $type = $R->{name};
     if ($type eq 'match') {
-	return $R->{args}[0] == $S->{args}[0];
+        return $R->{args}[0] == $S->{args}[0];
     } elsif ($type eq 'classmatch') {
-	return $R->{args}[0] eq $S->{args}[0];
+        return $R->{args}[0] eq $S->{args}[0];
     } elsif ($type eq 'start' || $type eq 'end') {
-	return 0;
+        return 0;
     } else {
         my @Rargs = @{ $R->{args} };
         my @Sargs = @{ $S->{args} };
-	return 0 if (@Rargs != @Sargs);
-	for (0..$#Rargs) { return 0 if $Rargs[$_] ne $Sargs[$_] };
-	return 1;
+        return 0 if (@Rargs != @Sargs);
+        for (0..$#Rargs) { return 0 if $Rargs[$_] ne $Sargs[$_] };
+        return 1;
     }
 }
 

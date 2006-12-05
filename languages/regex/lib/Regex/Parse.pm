@@ -48,13 +48,13 @@ sub compile {
     };
     my $parser = new Regex::Grammar;
     return $parser->YYParse(yylex => $lexer,
-			    yyerror => sub {
-				my $parser = shift;
-				die "Error: expected ".join(" ", $parser->YYExpect)
-				    ." got `".$parser->YYCurtok."', rest=".join(" ", @$types)."\nfrom ".join(" ", @$vals)."\n";
-			    },
-#			    yydebug => 0x1f,
-			    yydebug => 0,
+                            yyerror => sub {
+                                my $parser = shift;
+                                die "Error: expected ".join(" ", $parser->YYExpect)
+                                    ." got `".$parser->YYCurtok."', rest=".join(" ", @$types)."\nfrom ".join(" ", @$vals)."\n";
+                            },
+#                           yydebug => 0x1f,
+                            yydebug => 0,
                            );
 }
 

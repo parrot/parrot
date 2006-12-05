@@ -90,8 +90,8 @@ sub output_label {
 use vars qw(%OUTPUT);
 sub gather {
     foreach (keys %Regex::Generate::) {
-	next unless /^output_(\w+)$/;
-	$OUTPUT{$1} = $Regex::Generate::{$_};
+        next unless /^output_(\w+)$/;
+        $OUTPUT{$1} = $Regex::Generate::{$_};
     }
 }
 gather();
@@ -100,19 +100,19 @@ sub output {
     my @r;
     my $curlabel = "\t";
     for my $op (@_) {
-	if (! ref($op)) {
-	    push @r, $curlabel . $op;
-	    $curlabel = "\t";
-	} elsif ($op->[0] eq 'label') {
-	    $curlabel = "$op->[1]:" . $curlabel;
-	} elsif (my $outfunc = $OUTPUT{$op->[0]}) {
-	    my @args = @$op;
-	    shift(@args);
-	    push @r, $curlabel . $outfunc->(@args);
-	    $curlabel = "\t";
-	} else {
-	    die "Unable to output $op->[0]";
-	}
+        if (! ref($op)) {
+            push @r, $curlabel . $op;
+            $curlabel = "\t";
+        } elsif ($op->[0] eq 'label') {
+            $curlabel = "$op->[1]:" . $curlabel;
+        } elsif (my $outfunc = $OUTPUT{$op->[0]}) {
+            my @args = @$op;
+            shift(@args);
+            push @r, $curlabel . $outfunc->(@args);
+            $curlabel = "\t";
+        } else {
+            die "Unable to output $op->[0]";
+        }
     }
     return @r;
 }
