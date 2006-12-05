@@ -55,9 +55,9 @@ sub gen_output
   # STDERR is written into same output file
   my $diag = '';
   my $parrot_exit_code = Parrot::Test::run_command( $cmd, 
-						    CD     => $self->{relpath},
-						    STDOUT => $out_f, 
-						    STDERR => $out_f );
+                                                    CD     => $self->{relpath},
+                                                    STDOUT => $out_f, 
+                                                    STDERR => $out_f );
   $diag .= "'$cmd' failed with exit code $parrot_exit_code." if $parrot_exit_code;
   $self->{builder}->diag( $diag ) if $diag;
   
