@@ -135,12 +135,6 @@ L1:
     throw ex
 .end
 
-.sub 'elements' :method :vtable
-    $P0 = getattribute self, 'hash'
-    $I0 = elements $P0
-    .return ($I0)
-.end
-
 =back
 
 =head2 non-Vtable Methods

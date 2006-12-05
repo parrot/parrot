@@ -244,6 +244,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check deletion by assignment of nil' );
     find_type $I0, 'table'
     .local pmc pmc1
     pmc1 = new $I0
+    $P0 = getattribute pmc1, 'hash'
     find_type $I0, 'LuaString'
     .local pmc val1
     val1 = new $I0
@@ -252,22 +253,22 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check deletion by assignment of nil' );
     val2 = new $I0
     val2 = "value2"
     .local int nb1
-    nb1 = elements pmc1
+    nb1 = elements $P0
     print nb1
     print "\n"
     pmc1[val1] = val1
-    nb1 = elements pmc1
+    nb1 = elements $P0
     print nb1
     print "\n"
     pmc1[val2] = val2
-    nb1 = elements pmc1
+    nb1 = elements $P0
     print nb1
     print "\n"
     find_type $I0, 'LuaNil'
     .local pmc nil
     nil = new $I0
     pmc1[val1] = nil
-    nb1 = elements pmc1
+    nb1 = elements $P0
     print nb1
     print "\n"
     end
