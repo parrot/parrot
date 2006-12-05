@@ -430,4 +430,8 @@ find_level:
   .return(0)
 .end
 
-# RT#40744: cmdcount - not being tracked. :(
+# RT#40744: stub
+.sub 'cmdcount'
+  .param pmc argv
+  .return(0)
+.end
