@@ -36,12 +36,6 @@ while (@ARGV) {
     }
     elsif ( $arg =~ /^--(.*)/ ) {
         $policies{$1} = 1;
-        if ($1 eq 'CodeLayout::ProhibitHardTabs') {
-            $policies{$1} = { allow_leading_tabs => 0 };
-        }
-        elsif ($1 eq 'CodeLayout::RequireTidyCode') {
-            $policies{$1} = { perltidyrc => $perl_tidy_conf };
-        }
         shift @ARGV;    # discard
     }
     else {
