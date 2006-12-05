@@ -214,14 +214,16 @@ L4:
 
 .sub 'next' :method
     .param pmc index
+    .local pmc value
     .local pmc ret
     if index goto L1
     new index, .LuaNumber
     set index, 0.0
 L1:
     inc index
-    ret = _get(self, index)
-    if_null ret, L2
+    value = _get(self, index)
+    if_null value, L2
+    ret = clone value
     .return (index, ret)
 L2:
     new ret, .LuaNil
