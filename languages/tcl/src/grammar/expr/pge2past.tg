@@ -340,6 +340,8 @@ transform past (integer) {
     past = new 'PAST::Val'
     past.set_node(node)
 
+    $P0 = node['binary']
+    unless null $P0 goto binary
     $P0 = node['octal']
     unless null $P0 goto octal
     $P0 = node['hex']
@@ -361,6 +363,25 @@ transform past (integer) {
 
   bignum_hack:
     past['value'] = 0
+    past['class'] = "TclInt"
+    .return(past)
+
+  binary:
+    .local int bvalue
+    bvalue = 0
+    $S0 = $P0[0]
+    $I0 = 0
+    $I1 = length $S0
+  binary_loop:
+    if $I0 >= $I1 goto binary_done
+    shl bvalue, 1
+    $S2 = substr $S0, $I0, 1
+    inc $I0
+    if $S2 == '0' goto binary_loop
+    bvalue += 1
+    goto binary_loop
+  binary_done:
+    past['value'] = bvalue
     past['class'] = "TclInt"
     .return(past)
  
