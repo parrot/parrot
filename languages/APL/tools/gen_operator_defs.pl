@@ -19,15 +19,15 @@ END_OF_PIR
 
 my %scalar = (
     '+' => [ 'Add', '%1 = %1 + %2' ],
-	'*' => [ 'Power', << 'END_PIR' ],
-	# XXX This is too restrictive. Need better tests
+        '*' => [ 'Power', << 'END_PIR' ],
+        # XXX This is too restrictive. Need better tests
     if %1 >= 0 goto power_ok
 %% DOMAIN_ERROR %%
 power_ok:
     $N1 = %1
     $N2 = %2
     $N1 = pow $N1, $N2
-	%1 = $N1
+        %1 = $N1
 
 END_PIR
 
@@ -793,11 +793,11 @@ END_PIR
            if ($type1 eq 'APLVector') {
                $vector = "op1";
                $scalar = "op2";
-			   @order = qw/ $P1 $P2 /;
+                           @order = qw/ $P1 $P2 /;
            } else {
                $vector = "op2";
                $scalar = "op1";
-			   @order = qw/ $P2 $P1 /;
+                           @order = qw/ $P2 $P1 /;
            }
 
            $template .= << "END_PIR";
@@ -814,7 +814,7 @@ END_PIR
     if \$S1 != 'String' goto got_args
     %% DOMAIN_ERROR %%
   got_args:
-	\$P2 = clone $scalar
+        \$P2 = clone $scalar
 END_PIR
    
      $template .= interpolate($code, @order);
