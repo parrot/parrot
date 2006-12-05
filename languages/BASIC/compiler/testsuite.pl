@@ -9,30 +9,30 @@ use warnings;
 
 $tn=0;
 while(1) {
-	{
-		local $/="";
-		$_=<DATA>;
-	}
-	if (/type / or /select/) { # /function/
-		print "Skipped\n";
-		next;
-	}
-	last unless $_;
-	last if /STOPPLEASE/;
-	@c=m/^'\s*(.*)/gm;
-	print join("\n", @c), "\n====================== $tn\n" if @c;
-	$tn++;
-	open(OF, ">", "_testsuite.bas") || die;
-	print OF $_;
-	close(OF);
-	if ( ! system("perl compile.pl _testsuite.bas")) {
-		system("perl testrun.pl > _output2");
-		open(O, '>', "_output2") || die;
-		print <O>;
-		close(O);
-		print "\n";
-	}
-	
+        {
+                local $/="";
+                $_=<DATA>;
+        }
+        if (/type / or /select/) { # /function/
+                print "Skipped\n";
+                next;
+        }
+        last unless $_;
+        last if /STOPPLEASE/;
+        @c=m/^'\s*(.*)/gm;
+        print join("\n", @c), "\n====================== $tn\n" if @c;
+        $tn++;
+        open(OF, ">", "_testsuite.bas") || die;
+        print OF $_;
+        close(OF);
+        if ( ! system("perl compile.pl _testsuite.bas")) {
+                system("perl testrun.pl > _output2");
+                open(O, '>', "_output2") || die;
+                print <O>;
+                close(O);
+                print "\n";
+        }
+        
 }
 
 __DATA__
@@ -42,10 +42,10 @@ print a$
 STOPPLEASE
 ' Expect 10
 sub second(b() )
-	b(5)=10
+        b(5)=10
 end sub
 sub first(a() )
-	call second(a())
+        call second(a())
 end sub
 dim t(),f()
 call first(t())
@@ -60,10 +60,10 @@ B$(0)="development.
 keys a$(), b$()
 i=0
 do
-	t$=a$(i)
-	print t$,
-	print tab$(10),b$(t$)
-	i=i+1
+        t$=a$(i)
+        print t$,
+        print tab$(10),b$(t$)
+        i=i+1
 loop while t$ <> ""
 
 ' 5 and PI
@@ -76,13 +76,13 @@ print m(99)
 ' basic I/O  1..5
 open "_testfile" for output as #3
 for i=1 to 5
-	print #3, i
+        print #3, i
 next i
 close #3
 open "_testfile" for input as #5
 for i = 1 to 5
-	input #5,a$
-	print a$,
+        input #5,a$
+        print a$,
 next i
 close #5
 print
@@ -90,11 +90,11 @@ print
 ' Expect 5, 0, "Hello"
 common i, a$
 sub mysub
-	print "In the sub\n"
-	print i
-	print j
-	print a$
-	print c$
+        print "In the sub\n"
+        print i
+        print j
+        print a$
+        print c$
 end sub
 j=2
 i=5
@@ -105,10 +105,10 @@ call mysub()
 
 ' Expect 10
 sub second(b() )
-	b(5)=10
+        b(5)=10
 end sub
 sub first(a() )
-	call second(a())
+        call second(a())
 end sub
 dim t(),f()
 call first(t())
@@ -119,16 +119,16 @@ print t(5)
 y=59.7363
 x=19.506
 if ( y > 0 ) and (x > 0) then
-	print "OK"
+        print "OK"
 end if
 
 
 
 ' Passing string arrays, expect 99 and "Hello"
 function foo(i, thing$())
-	print i
-	print thing$(10)
-	foo=1
+        print i
+        print thing$(10)
+        foo=1
 end function
 dim fool$()
 fool$(10)="Hello"
@@ -193,24 +193,24 @@ Sub2:
                    'program - only to SUB1.
 ' Exit tests
 sub mysub(b,c)
-	print "Print me"
-	exit sub
-	print "Don't print me"
+        print "Print me"
+        exit sub
+        print "Don't print me"
 end sub
 function foo$
-	foo$="Right one"
-	exit function
-	foo$="Wrong one"
+        foo$="Right one"
+        exit function
+        foo$="Wrong one"
 end function
 call mysub( 78, 80)
 t$=foo$
 print t$
 t=0
 do
-	print "This is right"
-	exit do
-	print "This is wrong"
-	t=t+1
+        print "This is right"
+        exit do
+        print "This is wrong"
+        t=t+1
 loop until t>1
 
 ' Mathmagic
@@ -235,14 +235,14 @@ print int(3.14)
 
 ' Simple subs, Made it here
 sub mysub()
-	print "Made it here"
+        print "Made it here"
 end sub
 call mysub()
 
 ' Arguments.  Expect 2 and 4
 sub twice(a)
-	print a
-	a=a*2
+        print a
+        a=a*2
 end sub
 t=2
 call twice t
@@ -250,11 +250,11 @@ print t
 
 ' Passing arrays, twice, expect 12
 function aftwo(y())
-	print y(4)
+        print y(4)
 end function
 function arrfunc(x())
-	u=aftwo(x())
-	arrfunc=55
+        u=aftwo(x())
+        arrfunc=55
 end function
 dim g(10)
 g(5)=666
@@ -264,8 +264,8 @@ y=arrfunc(g())
 
 ' Passing arrays (expect 12)
 function arrfunc(x())
-	print x(4)
-	arrfunc=55
+        print x(4)
+        arrfunc=55
 end function
 dim g(10)
 g(4)=12
@@ -273,11 +273,11 @@ y=arrfunc(g())
 
 ' Function Array scopes, expect 4, 5.6
 function mine(a)
-	dim t(6)
-	s=32
-	t(3)=2
-	mine=a*2
-	print t(3)*2
+        dim t(6)
+        s=32
+        t(3)=2
+        mine=a*2
+        print t(3)*2
 end function
 dim t(7)
 z=55
@@ -286,7 +286,7 @@ a=mine(5)
 print t(3)
 
 1740 print "Branched"
-	end
+        end
 ' Logical Operators 
 print "      AND   OR    XOR   EQV   IMP   a & ! b"
 for i = 0 to 1
@@ -302,10 +302,10 @@ next j,i
 
 ' Function Array scopes, expect 4, 5.6
 function mine(a)
-	dim t(6)
-	t(3)=2
-	mine=a*2
-	print t(3)*2
+        dim t(6)
+        t(3)=2
+        mine=a*2
+        print t(3)*2
 end function
 dim t(7)
 t(3)=5.6
@@ -368,7 +368,7 @@ IF E$ <> "O" THEN 5030
 print "Wrong!"
 end
 5030 print "Ok"
-	end
+        end
 
 ' Equals bug, should print = greeting
 dim a$(1)
@@ -381,22 +381,22 @@ print a$
 ' Do/While/Loop stuff.  All 5
 a=0
 do while a<5
-	a=a+1
+        a=a+1
 loop
 print a
 a=0
 do until a>4
-	a=a+1
+        a=a+1
 loop
 print a
 a=0
 do
-	a=a+1
+        a=a+1
 loop while a<5
 print a
 a=0
 do
-	a=a+1
+        a=a+1
 loop until a>4
 print a
 
@@ -469,7 +469,7 @@ on t goto 100, 200, 300
 print "No match\n"
 FIN:
 for i = 1 to 3
-	on i gosub oats, peas, beans
+        on i gosub oats, peas, beans
 next i
 print
 end
@@ -480,14 +480,14 @@ end
 300 print "300!"
     goto FIN
 oats:
-	print "Oats",
-	return
+        print "Oats",
+        return
 peas:
-	print "Peas",
-	return
+        print "Peas",
+        return
 beans:
-	print "Beans",
-	return
+        print "Beans",
+        return
 
 ' Truth
 s$="Hello"
@@ -505,19 +505,19 @@ if i then print "This is true" else print "Oops (flo)"
 
 ' Expect OK
 if 2 > 1 then
-	print "Ok"
+        print "Ok"
 else
-	print "All is not right"
+        print "All is not right"
 end if
 
 ' Count from 9 to 0, print 5
 dim y(10)
 i=10
 tloop:
-	y(i)=i
-	i=i-1
-	print i
-	if i then goto tloop
+        y(i)=i
+        i=i-1
+        print i
+        if i then goto tloop
 print y(5)
 
 
@@ -542,30 +542,30 @@ randomize timer
 max=10
 dim a(max)
 for i = 0 to 100
-	b=rnd*max+1
-	a(b)=a(b)+1
+        b=rnd*max+1
+        a(b)=a(b)+1
 next i
 for i = 1 to max
-	print ,
-	for j = 0 to a(i)
-		print "*";
-	next j
-	print 
+        print ,
+        for j = 0 to a(i)
+                print "*";
+        next j
+        print 
 next i
 
 ' Trig
 w=15
 dim a$(w)
 for i = 0 to (22/7)*2 step 0.40
-	for j = 1 to w*2
-		a$(j)=" "
-	next j
-	a$(w+w*sin(i)+1)="*"
-	a$(w+w*cos(i)+1)="+"
-	for j = 1 to w*2
-		print a$(j);
-	next j
-	print
+        for j = 1 to w*2
+                a$(j)=" "
+        next j
+        a$(w+w*sin(i)+1)="*"
+        a$(w+w*cos(i)+1)="+"
+        for j = 1 to w*2
+                print a$(j);
+        next j
+        print
 next i
 
 ' Expect Correct
@@ -583,11 +583,11 @@ print " World"
 ' Expect 21 and "Correct"
 print 1+int(20)
 if t = 6 then 
-	print "Hi"
+        print "Hi"
 elseif t=1 then
-	print "Wrong"
+        print "Wrong"
 else
-	print "Correct"
+        print "Correct"
 end if
 if p$ = "Hello" then print "Whoa"
 
@@ -601,9 +601,9 @@ next t
 
 ' Expect OK
 if 2 > 1 then
-	print "Ok"
+        print "Ok"
 else
-	print "All is not right"
+        print "All is not right"
 end if
 
 ' Three random numbers
@@ -623,15 +623,15 @@ c=c+a(z)
 
 ' String function, whoa
 function a$
-	a$="Whoa"
+        a$="Whoa"
 end function
 print a$
 
 
 ' Changed ref'd var from 5 to 12
 function myfunc(a)
-	print a
-	a=12
+        print a
+        a=12
         myfunc=80
 end function
 z=5
@@ -644,7 +644,7 @@ print a$
 
 ' Simplest function, return 10
 function twice(number)
-	twice=2*number
+        twice=2*number
 end function
 a=twice(5)
 print a
@@ -659,7 +659,7 @@ print (2+3*5-(6+abs(0-3)))+1
 
 
 ' Expect a Hello, World!
-print "Hello, ";	' COmment
+print "Hello, ";        ' COmment
 print "World!"
 
 ' Expect Correct
@@ -675,25 +675,25 @@ IF A(RO,5)=0 THEN GOSUB 20: REM GOO
 t=0
 g=0
 if t then
-	print "Wrong"
+        print "Wrong"
 else 
-	if g then
-		print "Wrong again"
-	else 
-		print "Correct"
-	end if
+        if g then
+                print "Wrong again"
+        else 
+                print "Correct"
+        end if
 end if
 
 ' Expect Correct
 t=0
 g=0
 if t then
-	' t is false, don't go here.
-	print "Mistake"
+        ' t is false, don't go here.
+        print "Mistake"
 elseif g then
-	print "Also a mistake"
+        print "Also a mistake"
 else 
-	print "Correct"
+        print "Correct"
 end if
 
 ' Simple variable assignment, expect 7
@@ -728,45 +728,45 @@ if t then print "Wrong" else print "Correct"
 ' Expect correct
 t=0
 if t then
-	print "Wrong"
+        print "Wrong"
 else 
-	print "Correct"
+        print "Correct"
 end if
 
 ' Expect correct
 t=1
 if t then
-	print "Correct"
+        print "Correct"
 else 
-	print "Wrong"
+        print "Wrong"
 end if
 
 ' Factorial of 5 is 120
 function factorial(a)
-	if a then factorial=a*factorial(a-1) else factorial=1
+        if a then factorial=a*factorial(a-1) else factorial=1
 end function
 T=factorial(5)
 print T!
 
 ' Correct and factorial of 4 is 24
 function factorial(a)
-	if a then factorial=a*factorial(a-1) else factorial=1
+        if a then factorial=a*factorial(a-1) else factorial=1
 end function
 t=0
 g=0
 if t then
-	print "Mistake"
+        print "Mistake"
 elseif g then
-	print "Also a mistake"
+        print "Also a mistake"
 else 
-	print "Correct now 24"
-	print factorial(4)
+        print "Correct now 24"
+        print factorial(4)
 end if
 
 ' Changed ref'd var from 5 to 12
 function myfunc(a)
-	print a
-	a=12
+        print a
+        a=12
         myfunc=80
 end function
 z=5
@@ -785,14 +785,14 @@ print c$
 
 ' String function, whoa
 function a$
-	a$="Whoa"
+        a$="Whoa"
 end function
 print a$
 
 ' String reference, no way
 function a$(u$)
-	u$="No way"
-	a$="Hello"
+        u$="No way"
+        a$="Hello"
 end function
 t$="Not me"
 e$=a$(t$)
@@ -800,14 +800,14 @@ print t$
 
 ' references to references, expect 99
 function last(t)
-	t=99
-	last=0
+        t=99
+        last=0
 end function
 function middle(s)
-	middle=last(s)
+        middle=last(s)
 end function
 function start(r)
-	start=middle(r)
+        start=middle(r)
 end function
 h=12
 y=start(h)
@@ -815,9 +815,9 @@ print h
 
 ' Basic structure  6, Hello and PI
 type newtype
-	foo as integer
-	bar as string
-	narf as double
+        foo as integer
+        bar as string
+        narf as double
 end type
 dim t as newtype
 t.foo=6
@@ -829,17 +829,17 @@ print t.narf
 
 ' Variable-depth structure references
 type first
-	foo as integer
-	bar as string
+        foo as integer
+        bar as string
 end type
 type second
-	other as first
-	narf as integer
-	pnext as first
+        other as first
+        narf as integer
+        pnext as first
 end type
 type third
-	number as integer
-	start as second
+        number as integer
+        start as second
 end type
 dim t as first
 dim u as second
@@ -854,17 +854,17 @@ print v.start.pnext.bar
 
 ' Member functions, give 0 and 3 (modified)
 type first
-	foo as integer
-	bar as string
+        foo as integer
+        bar as string
 end type
 type second
-	other as first
-	narf as double
-	pnext as first
+        other as first
+        narf as double
+        pnext as first
 end type
 type third
-	number as integer
-	start as second
+        number as integer
+        start as second
 end type
 dim y as third
 t=y.start.narf+3
@@ -873,15 +873,15 @@ print t
 
 ' Deep-copy of structures, 34 (NOT 99)
 type first
-	foo as integer
-	bar as string
+        foo as integer
+        bar as string
 end type
 type second
-	link as first
+        link as first
 end type
 type third
-	poit as integer
-	fwd as second
+        poit as integer
+        fwd as second
 end type
 dim x as third
 dim y as third
@@ -894,13 +894,13 @@ print y.fwd.link.foo
 ' Structure assignment torture
 ' Expect: 99, 1, "user-type first"
 type first
-	foo as integer
-	bar as string
+        foo as integer
+        bar as string
 end type
 type second
-	other as first
-	narf as integer
-	pnext as first
+        other as first
+        narf as integer
+        pnext as first
 end type
 dim x as second
 dim y as second
@@ -919,14 +919,14 @@ print t
 ' Passing structures
 ' Expect:  100, 12 and 103
 type first
-	foo as integer
-	bar as string
+        foo as integer
+        bar as string
 end type
 function mine (a, b, c as first)
-	a=12
-	b=99
-	c.foo=103
-	mine=100
+        a=12
+        b=99
+        c.foo=103
+        mine=100
 end function
 dim z as first
 z.foo=13
@@ -936,16 +936,16 @@ print z.foo
 
 ' Should print 100, 103
 type first
-	foo as integer
-	bar as string
+        foo as integer
+        bar as string
 end type
 type second
-	pointer as first
-	number as integer
+        pointer as first
+        number as integer
 end type
 function mine (a, b, q as first)
-	q.foo=103
-	mine=100
+        q.foo=103
+        mine=100
 end function
 dim z as second
 z.number=13
@@ -955,8 +955,8 @@ print z.pointer.foo
 
 ' Array access, 132
 type first
-	foo as integer
-	bar as string
+        foo as integer
+        bar as string
 end type
 dim y(5)
 y(3)=66
@@ -965,8 +965,8 @@ print y(3)*2
 
 ' Array structure access, 56/0
 type first
-	foo as integer
-	bar as string
+        foo as integer
+        bar as string
 end type
 dim u(5) as first
 u(2).foo=56
@@ -988,10 +988,10 @@ print y!(i)
 dim y(10)
 i=10
 tloop:
-	y(i)=i
-	i=i-1
-	print i
-	if i then goto tloop
+        y(i)=i
+        i=i-1
+        print i
+        if i then goto tloop
 print y(5)
 
 ' Truth
@@ -1010,8 +1010,8 @@ if i then print "This is true" else print "Oops (flo)"
 
 ' Passing arrays (expect 12)
 function arrfunc(x())
-	print x(4)
-	arrfunc=55
+        print x(4)
+        arrfunc=55
 end function
 dim g(10)
 g(5)=666
@@ -1021,11 +1021,11 @@ y=arrfunc(g())
 
 ' Passing arrays, twice, expect 12
 function aftwo(y())
-	print y(4)
+        print y(4)
 end function
 function arrfunc(x())
-	u=aftwo(x())
-	arrfunc=55
+        u=aftwo(x())
+        arrfunc=55
 end function
 dim g(10)
 g(5)=666
@@ -1035,20 +1035,20 @@ y=arrfunc(g())
 
 ' For loops, by two and backwards
 for i = 0 to 10 step 2
-	print i,
+        print i,
 next i
 print
 for i = 10 to 3 step -1
-	print i
+        print i
 next i
 print
 
 ' For loops.  3..6 nested in 1..3
 function foo
-	for y=3 to 6
-	print y,
-	next y
-	foo=99
+        for y=3 to 6
+        print y,
+        next y
+        foo=99
 end function
 for t%=1 to 3
   h=foo()
@@ -1065,8 +1065,8 @@ print a$,b$
 
 ' Anti-crawling, gives 0
 function foo
-	print y
-	foo=99
+        print y
+        foo=99
 end function
 y=66.66
 u=foo()
@@ -1104,22 +1104,22 @@ END
 ' Do/While/Loop stuff.  All 5
 a=0
 do while a<5
-	a=a+1
+        a=a+1
 loop
 print a
 a=0
 do until a>4
-	a=a+1
+        a=a+1
 loop
 print a
 a=0
 do
-	a=a+1
+        a=a+1
 loop while a<5
 print a
 a=0
 do
-	a=a+1
+        a=a+1
 loop until a>4
 print a
 
@@ -1143,24 +1143,24 @@ Sub2:
                    'program - only to SUB1.
 ' Exit tests
 sub mysub(b,c)
-	print "Print me"
-	exit sub
-	print "Don't print me"
+        print "Print me"
+        exit sub
+        print "Don't print me"
 end sub
 function foo$
-	foo$="Right one"
-	exit function
-	foo$="Wrong one"
+        foo$="Right one"
+        exit function
+        foo$="Wrong one"
 end function
 call mysub 78, 80
 t$=foo$
 print t$
 t=0
 do
-	print "This is right"
-	exit do
-	print "This is wrong"
-	t=t+1
+        print "This is right"
+        exit do
+        print "This is wrong"
+        t=t+1
 loop until t>1
 
 ' Function test:  A, 3, 90
@@ -1185,48 +1185,48 @@ next j,i
 t=50
 select case t
 case 10
-	print "Wrong"
+        print "Wrong"
 case 50
-	select case g
-	case 6
-		print "Wrong again!"
-	case 0
-		print "Right (nest)!"
-	end select
-	print "Ongoing (right also)"
+        select case g
+        case 6
+                print "Wrong again!"
+        case 0
+                print "Right (nest)!"
+        end select
+        print "Ongoing (right also)"
 end select
 select case t*1+0
 case 1 to 10, t*2, >100
-	print "Wrong 1!"
+        print "Wrong 1!"
 case 49 to 49, t*2, g
-	print "Wrong 2!"
+        print "Wrong 2!"
 case t
-	print "Ok!"
+        print "Ok!"
 end select
 select case h
 case 99
-	print "Wrong 3!"
+        print "Wrong 3!"
 case <5
-	print "Ok!"
+        print "Ok!"
 case <10   ' Fallthrough
-	print "Ok (not!)"
+        print "Ok (not!)"
 end select
 select case h
 case 1
-	print "Nothing!"
+        print "Nothing!"
 case 2
-	print "Wrong-o!"
+        print "Wrong-o!"
 case else
-	print "Right!"
+        print "Right!"
 end select
 a$="one"
 select case a$
 case "zero"
-	print "Bzzt"
+        print "Bzzt"
 case "two"
-	print "not"
+        print "not"
 case "one"
-	print "Correct!"
+        print "Correct!"
 end select
 
 ' mid/left/right  2-9, 1-5, 6-0
@@ -1257,7 +1257,7 @@ print string$(20, "-")
 ' Read, data, restore
 ' Numbers, symbols in two rows and then two rows of identical numbers
 type foo
-	first as integer
+        first as integer
 end type
 dim y as foo
 read a,b,y.first
@@ -1265,14 +1265,14 @@ read a$,t$,d$
 print a,b,y.first
 print a$,t$,d$
 for i=1 to 5
-	read h
-	print h,
+        read h
+        print h,
 next i
 print
 restore 20
 for i=1 to 5
-	read h
-	print h,
+        read h
+        print h,
 next i
 print 
 data 56, -78, 12.3, "Foo", lol, +#^
@@ -1281,13 +1281,13 @@ data 56, -78, 12.3, "Foo", lol, +#^
 ' basic I/O  1..5
 open "_testfile" for output as #3
 for i=1 to 5
-	print #3, i
+        print #3, i
 next i
 close #3
 open "_testfile" for input as #2
 for i = 1 to 5
-	input #2,a$
-	print a$,
+        input #2,a$
+        print a$,
 next i
 close #2
 print
@@ -1298,7 +1298,7 @@ on t goto 100, 200, 300
 print "No match\n"
 FIN:
 for i = 1 to 3
-	on i gosub oats, peas, beans
+        on i gosub oats, peas, beans
 next i
 print
 end
@@ -1309,29 +1309,29 @@ end
 300 print "300!"
     goto FIN
 oats:
-	print "Oats",
-	return
+        print "Oats",
+        return
 peas:
-	print "Peas",
-	return
+        print "Peas",
+        return
 beans:
-	print "Beans",
-	return
+        print "Beans",
+        return
 
 ' Random number distribution
 randomize timer
 max=10
 dim a(max)
 for i = 0 to 100
-	b=rnd*max+1
-	a(b)=a(b)+1
+        b=rnd*max+1
+        a(b)=a(b)+1
 next i
 for i = 1 to max
-	print ,
-	for j = 0 to a(i)
-		print "*";
-	next j
-	print 
+        print ,
+        for j = 0 to a(i)
+                print "*";
+        next j
+        print 
 next i
 
 ' Square roots and sgn
@@ -1341,25 +1341,25 @@ print 0,sqr(0)
 print 0.5,sqr(0.5)
 print 2,sqr(2)
 for i = -1 to 1
-	print "Sign of ";i;" is ",sgn(i)
+        print "Sign of ";i;" is ",sgn(i)
 next i
 
 
 ' "shared" Whoa, 66666, Goodbye, 909090, 101010
 type struct
-	first as integer
+        first as integer
 end type
 sub foo
-	shared thing$
-	shared narf as struct
-	shared bar()
-	shared lot$()
-	shared poit() as struct
-	thing$="Whoa"
-	bar(5)=66666
-	lot$(2)="Goodbye"
-	narf.first=909090
-	poit(4).first=101010
+        shared thing$
+        shared narf as struct
+        shared bar()
+        shared lot$()
+        shared poit() as struct
+        thing$="Whoa"
+        bar(5)=66666
+        lot$(2)="Goodbye"
+        narf.first=909090
+        poit(4).first=101010
 end sub
 dim narf as struct
 dim bar(1)
@@ -1380,15 +1380,15 @@ print poit(4).first
 
 ' ADD bug, Return OK
 function foo$
-	foo$="Return OK"
-	a$="Blah"
+        foo$="Return OK"
+        a$="Blah"
 end function
 print foo$()
 
 ' Some assembly required
 print "Hello, world"
 _STARTASM
-	print "Include me in the assembly.\n"
+        print "Include me in the assembly.\n"
 _ENDASM
 print "Goodbye, world"
 
@@ -1411,23 +1411,23 @@ data "SHIELDS","SOS","SRSCAN","STATUS","TORPEDO","TRANSFER","VISUAL","WARP"
 ' Nested if/else bug
 bump=1
 LOOPY:
-	if bump < -1 then goto LAST
-	if bump < 1 then
-		if bump = 0 then
-			print "Second"
-		else 
-			print "Third"
-		end if
-	end if
-	print "First, and every"
-	bump=bump-1
-	goto LOOPY
+        if bump < -1 then goto LAST
+        if bump < 1 then
+                if bump = 0 then
+                        print "Second"
+                else 
+                        print "Third"
+                end if
+        end if
+        print "First, and every"
+        bump=bump-1
+        goto LOOPY
 LAST:
-	print "All done"
+        print "All done"
 
 ' Mystery typeshift bug (OK)
 type foo
-	first as integer
+        first as integer
 end type
 dim a as foo
 print a.first=x
@@ -1437,14 +1437,14 @@ print "OK"
 ' Default case fallthrough
 t=3
 select case t
-	case 1
-		print "One"
-	case 2
-		print "Two"
-	case 3
-		print "Correct"
-	case else
-		print "WRONG!"
+        case 1
+                print "One"
+        case 2
+                print "Two"
+        case 3
+                print "Correct"
+        case else
+                print "WRONG!"
 end select
 print "All done."
 
