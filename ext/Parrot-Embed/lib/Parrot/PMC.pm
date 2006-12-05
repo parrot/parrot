@@ -19,15 +19,15 @@ Version 0.02
 
 =head1 SYNOPSIS
 
-	# find a subroutine to invoke
-	my $sub_pmc       = $interp->find_global( 'some_parrot_sub' );
-	my $other_sub_pmc = $interp->find_global( 'another_sub', 'NameSpace' );
+        # find a subroutine to invoke
+        my $sub_pmc       = $interp->find_global( 'some_parrot_sub' );
+        my $other_sub_pmc = $interp->find_global( 'another_sub', 'NameSpace' );
 
-	# invoke the subroutine
-	my $result_pmc    = $sub_pmc->invoke( $signature, @args );
+        # invoke the subroutine
+        my $result_pmc    = $sub_pmc->invoke( $signature, @args );
 
-	# get the values out of it
-	my $string_val    = $result_pmc->get_string( $interp );
+        # get the values out of it
+        my $string_val    = $result_pmc->get_string( $interp );
 
 =head1 METHODS
 

@@ -19,29 +19,29 @@ Version 0.02
 
 =head1 SYNOPSIS
 
-	# the first interpreter created in the program
-	my $interp       = Parrot::Interpreter->new();
+        # the first interpreter created in the program
+        my $interp       = Parrot::Interpreter->new();
 
-	# all subsequent interpreters need a parent
-	my $child_interp = $interp->new( $interp );
+        # all subsequent interpreters need a parent
+        my $child_interp = $interp->new( $interp );
 
-	# load a file that Parrot can recognize as code
-	$interp->load_file( 'some_parrot_file.pbc' );
-	$interp->load_file( 'some_parrot_file.pir' );
-	$interp->load_file( 'some_parrot_file.pasm' );
+        # load a file that Parrot can recognize as code
+        $interp->load_file( 'some_parrot_file.pbc' );
+        $interp->load_file( 'some_parrot_file.pir' );
+        $interp->load_file( 'some_parrot_file.pasm' );
 
-	# compile a string of Parrot code
-	$interp->compile( $some_parrot_code );
+        # compile a string of Parrot code
+        $interp->compile( $some_parrot_code );
 
-	# find a subroutine to invoke
-	my $sub_pmc       = $interp->find_global( 'some_parrot_sub' );
-	my $other_sub_pmc = $interp->find_global( 'another_sub', 'NameSpace' );
+        # find a subroutine to invoke
+        my $sub_pmc       = $interp->find_global( 'some_parrot_sub' );
+        my $other_sub_pmc = $interp->find_global( 'another_sub', 'NameSpace' );
 
-	# invoke the subroutine
-	my $result_pmc    = $sub_pmc->invoke( $signature, @args );
+        # invoke the subroutine
+        my $result_pmc    = $sub_pmc->invoke( $signature, @args );
 
-	# get the values out of it
-	print "Invoking the Sub gave ", $result_pmc->get_string( $interp ), "!\n";
+        # get the values out of it
+        print "Invoking the Sub gave ", $result_pmc->get_string( $interp ), "!\n";
 
 All Parrot access goes through an I<interpreter>, mediated through a
 C<Parrot::Interpreter> object.  There is always one or more interpreters active
