@@ -10,14 +10,14 @@ our @ISA = qw/SRM::Base/;
 
 # Constructor. Just base this class on a hash.
 sub new() {
-	my $invocant = shift;
-	return bless {}, $invocant;
+        my $invocant = shift;
+        return bless {}, $invocant;
 }
 
 # Pre-translation hook.
 sub pre_translation() {
-	# We need to emit PIR that sets up a dummy stack.
-	return <<'PIR';
+        # We need to emit PIR that sets up a dummy stack.
+        return <<'PIR';
 .local string strPC
 ${INS} = concat <<"CODE"
     .local pmc s
@@ -28,20 +28,20 @@ PIR
 
 # Post translation hook.
 sub post_translation() {
-	# Nothing to do.
-	return "";
+        # Nothing to do.
+        return "";
 }
 
 # Extra subroutines required for the mapper.
 sub subs() {
-	# No extra subs.
-	return "";
+        # No extra subs.
+        return "";
 }
 
 # Label generation.
 sub gen_label() {
-	# We'll emit a label for every single instruction.
-	return <<'PIR';
+        # We'll emit a label for every single instruction.
+        return <<'PIR';
 strPC = ${PC}
 ${INS} = concat "LAB"
 ${INS} = concat strPC
@@ -51,21 +51,21 @@ PIR
 
 # Pre and post stack operation (op class instructions) hooks.
 sub pre_op($$) {
-	my $self = shift;
-	my ($pops, $pushes) = @_;
-	my $register_num = 0;
-	my $push_num = 0;
-	
-	# Emit initial code.
-	my $pir = <<'PIR';
+        my $self = shift;
+        my ($pops, $pushes) = @_;
+        my $register_num = 0;
+        my $push_num = 0;
+        
+        # Emit initial code.
+        my $pir = <<'PIR';
 # Get current stack types array size.
 ${ITEMP0} = elements ${STYPES}
 PIR
 
-	# Do code for each pop. Need to set up mv's and pop stuff off the stack
-	# we're maintaining.
-	for (1..$pops) {
-		$pir .= <<'PIR';
+        # Do code for each pop. Need to set up mv's and pop stuff off the stack
+        # we're maintaining.
+        for (1..$pops) {
+                $pir .= <<'PIR';
 # Get type (so we can find register type).
 dec ${ITEMP0}
 ${PTEMP0} = ${STYPES}[${ITEMP0}]
@@ -82,14 +82,14 @@ ${STACK$register_num} = ${STEMP0}
 ${INS} = concat ${STACK$register_num}
 ${INS} = concat " = pop s\n"
 PIR
-		$pir =~ s/\$register_num/$register_num/g;
-		$register_num++;
-	}
+                $pir =~ s/\$register_num/$register_num/g;
+                $register_num++;
+        }
 
-	# Do code for each push.
-	$pir .= "\${ITEMP0} = 0\n";
-	for (1..$pushes) {
-		$pir .= <<'PIR';
+        # Do code for each push.
+        $pir .= "\${ITEMP0} = 0\n";
+        for (1..$pushes) {
+                $pir .= <<'PIR';
 # Get type (so we can find register type).
 ${PTEMP0} = ${DTYPES}[${ITEMP0}]
 
@@ -104,51 +104,51 @@ ${DEST$push_num} = ${STEMP0}
 # Increment dtypes index.
 inc ${ITEMP0}
 PIR
-		$pir =~ s/\$register_num/$register_num/g;
-		$pir =~ s/\$push_num/$push_num/g;
-		$register_num++;
-		$push_num++;
-	}
+                $pir =~ s/\$register_num/$register_num/g;
+                $pir =~ s/\$push_num/$push_num/g;
+                $register_num++;
+                $push_num++;
+        }
 
-	# Return generated code.
-	return $pir;
+        # Return generated code.
+        return $pir;
 }
 
 sub post_op($$) {
-	my $self = shift;
-	my ($pops, $pushes) = @_;
-	my $pir = "";
+        my $self = shift;
+        my ($pops, $pushes) = @_;
+        my $pir = "";
 
-	# Emit code to push stuff back onto the stack.
-	for (1..$pushes) {
-		$pir .= <<'PIR';
+        # Emit code to push stuff back onto the stack.
+        for (1..$pushes) {
+                $pir .= <<'PIR';
 ${INS} = concat "push s, "
 ${INS} = concat ${DEST$push_num}
 ${INS} = concat "\n"
 PIR
-		$pir =~ s/\$push_num/$_ - 1/ge;
-	}
+                $pir =~ s/\$push_num/$_ - 1/ge;
+        }
 
-	# Return it.
-	return $pir;
+        # Return it.
+        return $pir;
 }
 
 # Pre and post branch operation hooks.
 sub pre_branch($) {
-	my $self = shift;
-	my $pops = shift;
-	my $register_num = 0;
-	
-	# Emit initial code.
-	my $pir = <<'PIR';
+        my $self = shift;
+        my $pops = shift;
+        my $register_num = 0;
+        
+        # Emit initial code.
+        my $pir = <<'PIR';
 # Get current stack types array size.
 ${ITEMP0} = elements ${STYPES}
 PIR
 
-	# Do code for each pop. Need to set up mv's and pop stuff off the stack
-	# we're maintaining.
-	for (1..$pops) {
-		$pir .= <<'PIR';
+        # Do code for each pop. Need to set up mv's and pop stuff off the stack
+        # we're maintaining.
+        for (1..$pops) {
+                $pir .= <<'PIR';
 # Get type (so we can find register type).
 dec ${ITEMP0}
 ${PTEMP0} = ${STYPES}[${ITEMP0}]
@@ -165,76 +165,76 @@ ${STACK$register_num} = ${STEMP0}
 ${INS} = concat ${STACK$register_num}
 ${INS} = concat " = pop s\n"
 PIR
-		$pir =~ s/\$register_num/$register_num/g;
-		$register_num++;
-	}
+                $pir =~ s/\$register_num/$register_num/g;
+                $register_num++;
+        }
 
-	# Return generated code.
-	return $pir;
+        # Return generated code.
+        return $pir;
 }
 
 sub post_branch($) {
-	# Nothing to do here.
-	return "";
+        # Nothing to do here.
+        return "";
 }
 
 # Pre and post load operation hooks.
 sub pre_load($) {
-	my $self = shift;
-	my $need_dest = shift;
-	my $pir = "";
+        my $self = shift;
+        my $need_dest = shift;
+        my $pir = "";
 
-	# If we need a destination, emit PIR to generate one. Otherwise, we've
-	# nothing to do here.
-	if ($need_dest) {
-		$pir .= <<'PIR'
+        # If we need a destination, emit PIR to generate one. Otherwise, we've
+        # nothing to do here.
+        if ($need_dest) {
+                $pir .= <<'PIR'
 # Just got it in the 0th register of the appropriate type.
 ${DEST0} = "$"
 ${STEMP0} = ${LOADTYPE}["reg_type_short"]
 ${DEST0} = concat ${STEMP0}
 ${DEST0} = concat "0"
 PIR
-	}
+        }
 
-	return $pir;
+        return $pir;
 }
 
 sub post_load($) {
-	my $self = shift;
-	my $need_dest = shift;
-	my $pir = "";
+        my $self = shift;
+        my $need_dest = shift;
+        my $pir = "";
 
-	if ($need_dest) {
-		# Translator needs to emit an instruction to push the loaded value onto
-		# the stack.
-		$pir .= <<'PIR'
+        if ($need_dest) {
+                # Translator needs to emit an instruction to push the loaded value onto
+                # the stack.
+                $pir .= <<'PIR'
 ${INS} = concat "push s, "
 ${INS} = concat ${DEST0}
 ${INS} = concat "\n"
 PIR
-	} else {
-		# Translator needs to emit an instruction to push the value in the
-		# load register onto to the stack.
-		$pir .= <<'PIR'
+        } else {
+                # Translator needs to emit an instruction to push the value in the
+                # load register onto to the stack.
+                $pir .= <<'PIR'
 ${INS} = concat "push s, "
 ${INS} = concat ${LOADREG}
 ${INS} = concat "\n"
 PIR
-	}
+        }
 
-	return $pir;
+        return $pir;
 }
 
 # Pre and post store operation hooks.
 sub pre_store($) {
-	my $self = shift;
-	my $dest_reg = shift;
-	my $pir = "";
+        my $self = shift;
+        my $dest_reg = shift;
+        my $pir = "";
 
-	# If the destination is not going to be a register, the translation code
-	# needs the value on the stack top, so pop it off into a register.
-	if (!$dest_reg) {
-		$pir .= <<'PIR'
+        # If the destination is not going to be a register, the translation code
+        # needs the value on the stack top, so pop it off into a register.
+        if (!$dest_reg) {
+                $pir .= <<'PIR'
 # Get type.
 ${ITEMP0} = elements ${STYPES}
 dec ${ITEMP0}
@@ -250,26 +250,26 @@ ${STACK0} = concat "0"
 ${INS} = concat ${STACK0}
 ${INS} = concat " = pop s\n"
 PIR
-	}
+        }
 
-	return $pir;
+        return $pir;
 }
 
 sub post_store($) {
-	my $self = shift;
-	my $dest_reg = shift;
-	my $pir = "";
+        my $self = shift;
+        my $dest_reg = shift;
+        my $pir = "";
 
-	# If destination is a register then it is up to the SRM to do the store.
-	# Otherwise, there's nothing to do here.
-	if ($dest_reg) {
-		$pir .= <<'PIR'
+        # If destination is a register then it is up to the SRM to do the store.
+        # Otherwise, there's nothing to do here.
+        if ($dest_reg) {
+                $pir .= <<'PIR'
 ${INS} = concat ${STOREREG}
 ${INS} = concat " = pop s\n"
 PIR
-	}
+        }
 
-	return $pir;
+        return $pir;
 }
 
 sub pre_call() {
