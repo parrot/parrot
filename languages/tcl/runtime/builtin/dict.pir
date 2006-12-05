@@ -200,8 +200,10 @@ bad_args:
   options[1] = 'script'
   options[2] = 'value'
 
-  .local pmc select_option
+  .local pmc select_option, __script, __boolean
   select_option  = get_root_global ['_tcl'], 'select_option'
+  __script  = get_root_global ['_tcl'], '__script'
+  __boolean  = get_root_global ['_tcl'], '__boolean'
   .local pmc option
   option = shift argv  
   option = select_option(options, option, 'filterType')
@@ -209,7 +211,7 @@ bad_args:
   .local pmc results, key, value
   results = new .TclDict
 
-  if option == 'script' goto do_script_loop
+  if option == 'script' goto do_script_prelude
 
   .local pmc globber, pattern
   globber = compreg 'PGE::Glob'
@@ -244,8 +246,57 @@ do_key_loop:
 do_key_done:
   .return (results)
 
-do_script_loop:
-  tcl_error 'XXX implement [dict filter dictionaryValue script ..]'
+do_script_prelude:
+  argc = elements argv
+  if argc != 2 goto bad_script_args
+
+  .local pmc vars, body
+  vars = shift argv
+  vars = __list(vars)
+  $I0 = elements vars
+  if $I0 != 2 goto bad_list_size
+
+  body = shift argv 
+  .local string keyVar,valueVar
+  keyVar   = vars[0]
+  valueVar = vars[1]
+
+  .local pmc iterator
+  iterator = new .Iterator, dictionary
+  .local pmc retval
+  retval = new .TclDict
+  .local pmc body_proc
+  body_proc = __script(body)
+
+  .local pmc check_key,check_value
+script_loop:
+  unless iterator goto end_script_loop
+  check_key = shift iterator
+  __set(keyVar,check_key)
+  check_value = dictionary[check_key]
+  __set(valueVar,check_value)
+  push_eh body_handler
+    $P1 = body_proc()
+  clear_eh
+  $P1 = __boolean($P1)
+  unless $P1 goto script_loop
+  retval[check_key] = check_value 
+  goto script_loop
+end_script_loop:
+  .return (retval)
+
+body_handler:
+  .catch()
+  .get_return_code($I0)
+  if $I0 == TCL_CONTINUE goto script_loop
+  if $I0 == TCL_BREAK goto end_script_loop
+  .rethrow()
+
+bad_script_args:
+  tcl_error 'wrong # args: should be "dict filter dictionary script {keyVar valueVar} filterScript"'
+
+bad_list_size:
+  tcl_error 'must have exactly two variable names'
 
 missing_glob:
   $S1 = option
