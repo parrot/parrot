@@ -15,7 +15,7 @@ t/library/md5.t - test MD5 library
 
 =head1 SYNOPSIS
 
-	% prove t/library/md5.t
+        % prove t/library/md5.t
 
 =head1 DESCRIPTION
 
@@ -81,10 +81,10 @@ my $code = join
     ("\n\n",
      map
      {
-	 <<CODE
-	     \$P0 = _md5sum ("$_")
-	     _md5_print (\$P0)
-	     print "\\n"
+         <<CODE
+             \$P0 = _md5sum ("$_")
+             _md5_print (\$P0)
+             print "\\n"
 CODE
 ;
      }

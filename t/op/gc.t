@@ -15,7 +15,7 @@ t/op/gc.t - Garbage Collection
 
 =head1 SYNOPSIS
 
-	% prove t/op/gc.t
+        % prove t/op/gc.t
 
 =head1 DESCRIPTION
 
@@ -227,7 +227,7 @@ pasm_output_is(<<'CODE', <<OUTPUT, "failing if regsave is not marked");
     end
 
 .namespace ["Source"]
-.pcc_sub __get_string:	# buffer
+.pcc_sub __get_string:  # buffer
     get_params "(0)", P2
     getprop P12, "buffer", P2
     sweep 1

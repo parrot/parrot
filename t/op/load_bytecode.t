@@ -14,7 +14,7 @@ t/op/load_bytecode.t - loading bytecode tests
 
 =head1 SYNOPSIS
 
-	% prove t/op/load_bytecode.t
+        % prove t/op/load_bytecode.t
 
 =head1 DESCRIPTION
 
@@ -32,7 +32,7 @@ OUTPUT
 
 pir_output_like(<<'CODE', <<'OUTPUT', "load_bytecode on non-existent file");
 .sub main :main
-	load_bytecode 'no_file_by_this_name'
+        load_bytecode 'no_file_by_this_name'
 .end
 CODE
 /Couldn't find file 'no_file_by_this_name'/

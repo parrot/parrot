@@ -15,7 +15,7 @@ t/compilers/pge/02-match.t - test the Match class
 
 =head1 SYNOPSIS
 
-	% prove t/compilers/pge/02-match.t
+        % prove t/compilers/pge/02-match.t
 
 =head1 DESCRIPTION
 

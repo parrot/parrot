@@ -16,7 +16,7 @@ t/op/calling.t - Parrot Calling Conventions
 
 =head1 SYNOPSIS
 
-	% prove t/op/calling.t
+        % prove t/op/calling.t
 
 =head1 DESCRIPTION
 
@@ -373,27 +373,27 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "more autobox");
 .sub main :main
-	foo( 101, 0.77, 'seven and seven is' )
+        foo( 101, 0.77, 'seven and seven is' )
 .end
 
 .sub foo
-	.param pmc some_int
-	.param pmc some_float
-	.param pmc some_string
+        .param pmc some_int
+        .param pmc some_float
+        .param pmc some_string
 
-	$S0 = typeof some_int
-	print $S0
-	print "\n"
+        $S0 = typeof some_int
+        print $S0
+        print "\n"
 
-	$S0 = typeof some_float
-	print $S0
-	print "\n"
+        $S0 = typeof some_float
+        print $S0
+        print "\n"
 
-	$S0 = typeof some_string
-	print $S0
-	print "\n"
+        $S0 = typeof some_string
+        print $S0
+        print "\n"
 
-	.return()
+        .return()
 .end
 CODE
 Integer
@@ -1097,16 +1097,16 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "call :slurpy with :flat");
 .sub _fn1
-	.param pmc rest_arg :slurpy
-	print "[in _fn1]\n"
-	print rest_arg
-	print "\n"
+        .param pmc rest_arg :slurpy
+        print "[in _fn1]\n"
+        print rest_arg
+        print "\n"
 .end
 .sub main :main
-	$P34 = new Array
-	$P34 = 0
-	## normal flattening direct call, non-slurpy returns
-	$P35 = _fn1($P34 :flat)
+        $P34 = new Array
+        $P34 = 0
+        ## normal flattening direct call, non-slurpy returns
+        $P35 = _fn1($P34 :flat)
 .end
 CODE
 [in _fn1]
@@ -1618,53 +1618,53 @@ pir_output_is(<<'CODE', <<'OUTPUT', "newclosure followed by tailcall");
 ## parrot to reuse the context, which seems to requires having other calls that
 ## use particular numbers of registers (and probably a fair amount of luck).
 .sub _main :main
-	## debug 0x80
-	.lex "MAIN-CONT", $P41
-	$I42 = 10
-	$P41 = new .Continuation
-	set_addr $P41, L2
-	goto L3
+        ## debug 0x80
+        .lex "MAIN-CONT", $P41
+        $I42 = 10
+        $P41 = new .Continuation
+        set_addr $P41, L2
+        goto L3
 L2:
-	get_results '(0)', $P45
-	print "got "
-	print $P45
-	print ".\n"
-	.return ()
+        get_results '(0)', $P45
+        print "got "
+        print $P45
+        print ".\n"
+        .return ()
 L3:
-	.const .Sub $P49 = "___internal_main_test_"
-	newclosure $P48, $P49
-	.return _try_it($I42, $P48)
+        .const .Sub $P49 = "___internal_main_test_"
+        newclosure $P48, $P49
+        .return _try_it($I42, $P48)
 .end
 
 .sub ___internal_main_test_ :outer('_main')
-	.param pmc arg1
-	print "[in test]\n"
-	find_lex $P41, "MAIN-CONT"
-	$P55 = new "Undef"
-	if arg1 != 3 goto L3
-	$P58 = arg1
-	$P59 = arg1
-	$P57 = n_mul $P58, $P59
-	set_args '(0)', $P57
-	tailcall $P41
+        .param pmc arg1
+        print "[in test]\n"
+        find_lex $P41, "MAIN-CONT"
+        $P55 = new "Undef"
+        if arg1 != 3 goto L3
+        $P58 = arg1
+        $P59 = arg1
+        $P57 = n_mul $P58, $P59
+        set_args '(0)', $P57
+        tailcall $P41
 L3:
-	print "not "
-	print arg1
-	print "\n"
+        print "not "
+        print arg1
+        print "\n"
 .end
 
 
 .sub _try_it
-	.param int n
-	.param pmc closure
-	$P42 = new "Undef"
-	$P42 = 0
-	goto L4
+        .param int n
+        .param pmc closure
+        $P42 = new "Undef"
+        $P42 = 0
+        goto L4
 L2:
-	closure($P42)
-	$P42 = $P42 + 1
+        closure($P42)
+        $P42 = $P42 + 1
 L4:
-	if $P42 < n goto L2
+        if $P42 < n goto L2
 .end
 CODE
 [in test]
@@ -1826,15 +1826,15 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', ":optional followed by :slurpy (empty)");
 .sub main :main
-	_write_thing(3)
+        _write_thing(3)
 .end
 .sub _write_thing
-	.param pmc arg1 :optional
-	.param pmc rest_arg :slurpy
-	print arg1
-	print ' '
-	print rest_arg
-	print "\n"
+        .param pmc arg1 :optional
+        .param pmc rest_arg :slurpy
+        print arg1
+        print ' '
+        print rest_arg
+        print "\n"
 .end
 CODE
 3 0
@@ -1842,15 +1842,15 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', ":optional followed by :slurpy (used)");
 .sub main :main
-	_write_thing(3, 4, 5)
+        _write_thing(3, 4, 5)
 .end
 .sub _write_thing
-	.param pmc arg1 :optional
-	.param pmc rest_arg :slurpy
-	print arg1
-	print ' '
-	print rest_arg
-	print "\n"
+        .param pmc arg1 :optional
+        .param pmc rest_arg :slurpy
+        print arg1
+        print ' '
+        print rest_arg
+        print "\n"
 .end
 CODE
 3 2
@@ -2048,7 +2048,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "named optional - set");
 
 .sub foo
         .param int d :named('b')
-	.param int c :named('a') :optional
+        .param int c :named('a') :optional
         print d
         print ' '
         print c
@@ -2067,7 +2067,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "named optional - set");
 
 .sub foo
         .param int 'b' => d
-	.param int 'a' => c  :optional
+        .param int 'a' => c  :optional
         print d
         print ' '
         print c
@@ -2086,9 +2086,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "named optional - set, :opt_flag");
 
 .sub foo
         .param int d :named('b') :optional
-	.param int has_d :opt_flag
-	.param int c :named('a') :optional
-	.param int has_c :opt_flag
+        .param int has_d :opt_flag
+        .param int c :named('a') :optional
+        .param int has_c :opt_flag
         print d
         print ' '
         print has_d
@@ -2114,9 +2114,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "named optional - mix");
 
 .sub foo
         .param int d :named('b') :optional
-	.param int has_d :opt_flag
-	.param int c :named('a') :optional
-	.param int has_c :opt_flag
+        .param int has_d :opt_flag
+        .param int c :named('a') :optional
+        .param int has_c :opt_flag
         print d
         print ' '
         print has_d
@@ -2192,15 +2192,15 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "default value for an unused :optional");
 .sub main :main
-	print 1
-	foo(1)
-	foo(2)
-	foo()
-	print "\n"
+        print 1
+        foo(1)
+        foo(2)
+        foo()
+        print "\n"
 .end
 .sub foo
-	.param int var :optional
-	print var
+        .param int var :optional
+        print var
 .end
 CODE
 1120
@@ -2216,7 +2216,7 @@ pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch - missing named");
 
 .sub foo
         .param int d :named('b') 
-	.param int c :named('a') 
+        .param int c :named('a') 
         print d
         print ' '
         print c
@@ -2236,7 +2236,7 @@ pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch - missing named");
 
 .sub foo
         .param int d :named('b') 
-	.param int c :named('a') 
+        .param int c :named('a') 
         print d
         print ' '
         print c
@@ -2256,7 +2256,7 @@ pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch - too many named");
 
 .sub foo
         .param int d :named('b') 
-	.param int c :named('a') 
+        .param int c :named('a') 
         print d
         print ' '
         print c
@@ -2276,7 +2276,7 @@ pir_output_like(<<'CODE', <<'OUTPUT', "argc mismatch - duplicate named");
 
 .sub foo
         .param int d :named('b') 
-	.param int c :named('a') 
+        .param int c :named('a') 
         print d
         print ' '
         print c
@@ -2399,21 +2399,21 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "RT #40490 - flat/slurpy named arguments", todo => 'unimplemented');
 .sub 'main' :main
-	.local pmc args
-	args = new .Hash
-	args['foo'] = 1
-	args['bar'] = 2
+        .local pmc args
+        args = new .Hash
+        args['foo'] = 1
+        args['bar'] = 2
 
-	bar_only( args :flat :named )
+        bar_only( args :flat :named )
 .end
 
 .sub 'bar_only'
-	.param string bar  :named( 'bar' )
-	.param pmc    args :named :slurpy
+        .param string bar  :named( 'bar' )
+        .param pmc    args :named :slurpy
 
-	print "Have bar: "
-	print bar
-	print "\n"
+        print "Have bar: "
+        print bar
+        print "\n"
 .end
 CODE
 Have bar: 2

@@ -16,7 +16,7 @@ t/op/pushaction.t - Test the C<pushaction> Instruction
 
 =head1 SYNOPSIS
 
-	% prove t/pmc/pushaction.t
+        % prove t/pmc/pushaction.t
 
 =head1 DESCRIPTION
 

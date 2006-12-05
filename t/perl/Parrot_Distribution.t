@@ -67,7 +67,7 @@ my @old_directory_list = (
 for my $dir (@old_directory_list) {
     my $path = $d->directory_with_name($dir)->path();
     ok( exists $pmc_source_file_directories{$path},
-   	    "Directory from hardcoded list $dir found through MANIFEST" );
+            "Directory from hardcoded list $dir found through MANIFEST" );
 }
 
 # Local Variables:

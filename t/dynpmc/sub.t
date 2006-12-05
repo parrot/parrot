@@ -16,7 +16,7 @@ t/dynpmc/sub.t - test if Sub is overridable by .HLL_map
 
 =head1 SYNOPSIS
 
-	% prove t/dynpmc/sub.t
+        % prove t/dynpmc/sub.t
 
 =head1 DESCRIPTION
 

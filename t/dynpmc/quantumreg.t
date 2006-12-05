@@ -16,7 +16,7 @@ t/dynpmc/quantumreg.t - test the QuantumReg PMC
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/dynpmc/quantumreg.t
+        % perl -Ilib t/dynpmc/quantumreg.t
 
 =head1 DESCRIPTION
 

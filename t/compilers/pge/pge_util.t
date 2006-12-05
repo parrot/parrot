@@ -16,7 +16,7 @@ t/library/pge_util.t - Parrot Grammar Engine tests of utility rules
 
 =head1 SYNOPSIS
 
-	% prove -Ilib t/library/pge_util.t
+        % prove -Ilib t/library/pge_util.t
 
 =cut
 

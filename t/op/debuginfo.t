@@ -15,7 +15,7 @@ t/op/debuginfo.t - Debugging Info
 
 =head1 SYNOPSIS
 
-	% prove t/op/debuginfo.t
+        % prove t/op/debuginfo.t
 
 =head1 DESCRIPTION
 

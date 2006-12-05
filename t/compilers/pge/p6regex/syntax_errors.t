@@ -21,7 +21,7 @@ exceptions that get thrown.
 
 =head1 SYNOPSIS
 
-	% prove t/compilers/pge/p6regex/syntax_errors.t
+        % prove t/compilers/pge/p6regex/syntax_errors.t
 
 =cut
 

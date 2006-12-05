@@ -17,7 +17,7 @@ t/native_pbc/number.t - Floating-Point Numbers
 
 =head1 SYNOPSIS
 
-	% prove t/native_pbc/number.t
+        % prove t/native_pbc/number.t
 
 =head1 DESCRIPTION
 

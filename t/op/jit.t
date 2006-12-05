@@ -15,7 +15,7 @@ t/op/jit.t - JIT register allocation
 
 =head1 SYNOPSIS
 
-	% prove t/op/jit.t
+        % prove t/op/jit.t
 
 =head1 DESCRIPTION
 
@@ -831,89 +831,89 @@ OUTPUT
 
 # tests for JIT CGP
 pasm_output_is(<<'CODE', <<'OUTPUT', "1 non jit");
-	set I0, 16
-	print "ok 1\n"
-	end
+        set I0, 16
+        print "ok 1\n"
+        end
 CODE
 ok 1
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "2 non jit");
-	print "ok 1\n"
-	print "ok 2\n"
-	end
+        print "ok 1\n"
+        print "ok 2\n"
+        end
 CODE
 ok 1
 ok 2
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "2 non jit");
-	set I0, 16
-	print "ok 1\n"
-	print "ok 2\n"
-	end
+        set I0, 16
+        print "ok 1\n"
+        print "ok 2\n"
+        end
 CODE
 ok 1
 ok 2
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "2 non jit, JITed branch to JIT");
-	set I0, 42
-	print I0
-	print "\n"
-	eq I0, 42, sub
+        set I0, 42
+        print I0
+        print "\n"
+        eq I0, 42, sub
 ret:
-	end
+        end
 sub:
-	set I0, 43
-	print I0
-	print "\n"
-	branch ret
+        set I0, 43
+        print I0
+        print "\n"
+        branch ret
 CODE
 42
 43
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "2 non jit, non JITed branch to JIT");
-	set I0, 42
-	print I0
-	print "\n"
-	bsr sub
-	end
+        set I0, 42
+        print I0
+        print "\n"
+        bsr sub
+        end
 sub:
-	set I0, 43
-	print I0
-	print "\n"
-	ret
+        set I0, 43
+        print I0
+        print "\n"
+        ret
 CODE
 42
 43
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "2 non jit, JITed branch to non JIT");
-	set I0, 42
-	print I0
-	print "\n"
-	eq I0, 42, sub
+        set I0, 42
+        print I0
+        print "\n"
+        eq I0, 42, sub
 ret:
-	end
+        end
 sub:
-	print "ok\n"
-	branch ret
+        print "ok\n"
+        branch ret
 CODE
 42
 ok
 OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "2 non jit, non JITed branch to non JIT");
-	set I0, 42
-	print I0
-	print "\n"
-	bsr sub
-	end
+        set I0, 42
+        print I0
+        print "\n"
+        bsr sub
+        end
 sub:
-	print "ok\n"
-	ret
+        print "ok\n"
+        ret
 CODE
 42
 ok
@@ -1016,27 +1016,27 @@ set N0, 4000
 set P0, 123
 div P0, P0, N0
 
-save	N0
-save	N1
-save	N2
+save    N0
+save    N1
+save    N2
 
-set	N0, P0
-set	N1, 0.03074969250307496925
-sub	N2, N1,N0
-abs	N2, N2
-gt	N2, 0.000001, local__fp_eq__FPEQNOK__1
+set     N0, P0
+set     N1, 0.03074969250307496925
+sub     N2, N1,N0
+abs     N2, N2
+gt      N2, 0.000001, local__fp_eq__FPEQNOK__1
 
 restore N2
-restore	N1
-restore	N0
-branch	EQ1
+restore N1
+restore N0
+branch  EQ1
 local__fp_eq__FPEQNOK__1:
 restore N2
-restore	N1
-restore	N0
+restore N1
+restore N0
 print P0
 print "not "
-EQ1:	print "ok 1"
+EQ1:    print "ok 1"
 print "\n"
 end
 CODE
@@ -1183,7 +1183,7 @@ OUTPUT
 my $code;
 for (0..4096)
 {
-	$code .= qq{   set S0, "hello"\n};
+        $code .= qq{   set S0, "hello"\n};
 }
 $code .= <<CODE;
    print S0

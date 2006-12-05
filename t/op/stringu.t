@@ -16,7 +16,7 @@ t/op/stringu.t - Unicode String Test
 
 =head1 SYNOPSIS
 
-	% prove t/op/stringu.t
+        % prove t/op/stringu.t
 
 =head1 DESCRIPTION
 

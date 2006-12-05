@@ -16,7 +16,7 @@ t/library/pge_globs.t - Parrot Grammar Engine tests of globs
 
 =head1 SYNOPSIS
 
-	% prove -Ilib t/library/pge_globs.t
+        % prove -Ilib t/library/pge_globs.t
 
 =cut
 

@@ -15,7 +15,7 @@ t/op/00ff-unix.t - UNIX File format
 
 =head1 SYNOPSIS
 
-	% prove t/op/00ff-unix.t
+        % prove t/op/00ff-unix.t
 
 =head1 DESCRIPTION
 

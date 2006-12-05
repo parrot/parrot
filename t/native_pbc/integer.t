@@ -17,7 +17,7 @@ t/native_pbc/integer.t - Integers
 
 =head1 SYNOPSIS
 
-	% prove t/native_pbc/integer.t
+        % prove t/native_pbc/integer.t
 
 =head1 DESCRIPTION
 

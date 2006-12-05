@@ -15,7 +15,7 @@ t/op/stacks.t - Stacks
 
 =head1 SYNOPSIS
 
-	% prove t/op/stacks.t
+        % prove t/op/stacks.t
 
 =head1 DESCRIPTION
 
@@ -38,44 +38,44 @@ where C<*> is not C<p>.
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq(J,K,L)
-	save	N0
-	save	N1
-	save	N2
+        save    N0
+        save    N1
+        save    N2
 
-	set	N0, .J
-	set	N1, .K
-	sub	N2, N1,N0
-	abs	N2, N2
-	gt	N2, 0.000001, .$FPEQNOK
+        set     N0, .J
+        set     N1, .K
+        sub     N2, N1,N0
+        abs     N2, N2
+        gt      N2, 0.000001, .$FPEQNOK
 
-	restore N2
-	restore	N1
-	restore	N0
-	branch	.L
+        restore N2
+        restore N1
+        restore N0
+        branch  .L
 .local $FPEQNOK:
-	restore N2
-	restore	N1
-	restore	N0
+        restore N2
+        restore N1
+        restore N0
 .endm
 .macro fp_ne(J,K,L)
-	save	N0
-	save	N1
-	save	N2
+        save    N0
+        save    N1
+        save    N2
 
-	set	N0, .J
-	set	N1, .K
-	sub	N2, N1,N0
-	abs	N2, N2
-	lt	N2, 0.000001, .$FPNENOK
+        set     N0, .J
+        set     N1, .K
+        sub     N2, N1,N0
+        abs     N2, N2
+        lt      N2, 0.000001, .$FPNENOK
 
-	restore	N2
-	restore	N1
-	restore	N0
-	branch	.L
+        restore N2
+        restore N1
+        restore N0
+        branch  .L
 .local $FPNENOK:
-	restore	N2
-	restore	N1
-	restore	N0
+        restore N2
+        restore N1
+        restore N0
 .endm
 ENDOFMACRO
 
@@ -84,28 +84,28 @@ ENDOFMACRO
 
 # Test proper stack chunk handling
 pasm_output_is(<<CODE, <<'OUTPUT', 'save_i & restore_i');
-	set     I3, 1
+        set     I3, 1
 
 testloop:
-	set     I0, 0
-	set     I1, I3
+        set     I0, 0
+        set     I1, I3
 
 saveloop:
-	inc     I0
-	save    I0
-	ne      I0, I1, saveloop
+        inc     I0
+        save    I0
+        ne      I0, I1, saveloop
 
 restoreloop:
-	restore I0
-	ne      I0, I1, error
-	dec	I1
-	ne      I1, 0, restoreloop
+        restore I0
+        ne      I0, I1, error
+        dec     I1
+        ne      I1, 0, restoreloop
 
-	add     I3, I3, 1
-	ne      I3, 769, testloop	# At least 3 stack chunks
+        add     I3, I3, 1
+        ne      I3, 769, testloop       # At least 3 stack chunks
 
-	print	"OK\\n"
-error:	end
+        print   "OK\\n"
+error:  end
 CODE
 OK
 OUTPUT
@@ -348,58 +348,58 @@ OUTPUT
 
 pasm_output_is(<<CODE, <<OUTPUT, "save, restore");
 @{[ $fp_equality_macro ]}
-	set	I0, 1
-	save	I0
-	set	I0, 2
-	print	I0
-	print	"\\n"
-	restore	I0
-	print	I0
-	print	"\\n"
+        set     I0, 1
+        save    I0
+        set     I0, 2
+        print   I0
+        print   "\\n"
+        restore I0
+        print   I0
+        print   "\\n"
 
-	set	N0, 1.0
-	save	N0
-	set	N0, 2.0
-	.fp_eq	(N0, 2.0, EQ1)
-	print	"not "
-EQ1:	print	"equal to 2.0\\n"
-	restore	N0
-	.fp_eq	(N0, 1.0, EQ2)
-	print	"not "
-EQ2:	print	"equal to 1.0\\n"
+        set     N0, 1.0
+        save    N0
+        set     N0, 2.0
+        .fp_eq  (N0, 2.0, EQ1)
+        print   "not "
+EQ1:    print   "equal to 2.0\\n"
+        restore N0
+        .fp_eq  (N0, 1.0, EQ2)
+        print   "not "
+EQ2:    print   "equal to 1.0\\n"
 
-	set	S0, "HONK\\n"
-	save	S0
-	set	S0, "HONK HONK\\n"
-	print	S0
-	restore	S0
-	print	S0
+        set     S0, "HONK\\n"
+        save    S0
+        set     S0, "HONK HONK\\n"
+        print   S0
+        restore S0
+        print   S0
 
-	save	123
-	restore	I0
-	print	I0
-	print	"\\n"
+        save    123
+        restore I0
+        print   I0
+        print   "\\n"
 
-	save	3.14159
-	restore	N0
-	.fp_eq	(N0, 3.14159, EQ3)
-	print	"<kansas> not "
-EQ3:	print	"equal to PI\\n"
+        save    3.14159
+        restore N0
+        .fp_eq  (N0, 3.14159, EQ3)
+        print   "<kansas> not "
+EQ3:    print   "equal to PI\\n"
 
-	save	"All the world's people\\n"
-	restore	S0
-	print	S0
+        save    "All the world's people\\n"
+        restore S0
+        print   S0
 
-	new	P0, .String
-	set	P0, "never to escape\\n"
-	save	P0
-	new	P0, .String
-	set	P0, "find themselves caught in a loop\\n"
-	print	P0
-	restore	P0
-	print	P0
+        new     P0, .String
+        set     P0, "never to escape\\n"
+        save    P0
+        new     P0, .String
+        set     P0, "find themselves caught in a loop\\n"
+        print   P0
+        restore P0
+        print   P0
 
-	end
+        end
 CODE
 2
 1
@@ -415,31 +415,31 @@ never to escape
 OUTPUT
 
 pasm_output_is(<<CODE, <<OUTPUT, "entrytype");
-	set	I0, 12
-	set	N0, 0.1
-	set	S0, "Difference Engine #2"
-	new	P0, .String
-	set	P0, "Shalmaneser"
+        set     I0, 12
+        set     N0, 0.1
+        set     S0, "Difference Engine #2"
+        new     P0, .String
+        set     P0, "Shalmaneser"
 
-	save	P0
-	save	S0
-	save	"Wintermute"
-	save	N0
-	save	1.23
-	save	I0
-	save	12
+        save    P0
+        save    S0
+        save    "Wintermute"
+        save    N0
+        save    1.23
+        save    I0
+        save    12
 
-	print	"starting\\n"
+        print   "starting\\n"
 
-	set	I1, 0
-LOOP:	entrytype	I0, I1
-	print	I0
-	print	"\\n"
-	inc	I1
-	lt	I1, 7, LOOP
+        set     I1, 0
+LOOP:   entrytype       I0, I1
+        print   I0
+        print   "\\n"
+        inc     I1
+        lt      I1, 7, LOOP
 
-	print	"done\\n"
-	end
+        print   "done\\n"
+        end
 CODE
 starting
 1
@@ -453,11 +453,11 @@ done
 OUTPUT
 
 pasm_output_is(<<CODE, <<OUTPUT, "entrytype, beyond stack depth");
-	save	12
-	print	"ready\\n"
-	entrytype	I0, 1
-	print	"done\\n"
-	end
+        save    12
+        print   "ready\\n"
+        entrytype       I0, 1
+        print   "done\\n"
+        end
 CODE
 ready
 Stack Depth wrong
@@ -581,26 +581,26 @@ SKIP: {
   skip("no stack limit currently", 3);
 pasm_output_is(<<CODE, <<'OUTPUT', "check limit - User");
 lp:
-	save I0
-	branch lp
-	end
+        save I0
+        branch lp
+        end
 CODE
 Stack 'User' too deep
 OUTPUT
 
 pasm_output_is(<<CODE, <<'OUTPUT', "check limit - Pad");
 lp:
-	new_pad 0
-	branch lp
-	end
+        new_pad 0
+        branch lp
+        end
 CODE
 Stack 'Pad' too deep
 OUTPUT
 
 pasm_output_is(<<CODE, <<'OUTPUT', "check limit - Control");
 lp:
-	bsr lp
-	end
+        bsr lp
+        end
 CODE
 Stack 'Control' too deep
 OUTPUT

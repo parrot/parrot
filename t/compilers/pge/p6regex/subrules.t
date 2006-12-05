@@ -21,7 +21,7 @@ ver. 7, in the B<'Named regexes'> section
 
 =head1 SYNOPSIS
 
-	% prove t/p6regex/subrules.t
+        % prove t/p6regex/subrules.t
 
 =cut
 

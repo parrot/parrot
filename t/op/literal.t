@@ -15,7 +15,7 @@ t/op/literal.t - Testing the PIR and PASM lexer
 
 =head1 SYNOPSIS
 
-	% prove t/op/literal.t
+        % prove t/op/literal.t
 
 =head1 DESCRIPTION
 

@@ -16,7 +16,7 @@ t/dynpmc/dynlexpad.t - test the DynLexPad PMC
 
 =head1 SYNOPSIS
 
-	% prove t/dynpmc/dynlexpad.t
+        % prove t/dynpmc/dynlexpad.t
 
 =head1 DESCRIPTION
 

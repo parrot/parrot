@@ -15,7 +15,7 @@ t/op/random.t - Random numbers
 
 =head1 SYNOPSIS
 
-	% prove t/op/random.t
+        % prove t/op/random.t
 
 =head1 DESCRIPTION
 

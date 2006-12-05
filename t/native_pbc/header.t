@@ -18,7 +18,7 @@ t/native_pbc/header.t - PBC header format
 
 =head1 SYNOPSIS
 
-	% prove t/native_pbc/header.t
+        % prove t/native_pbc/header.t
 
 =head1 DESCRIPTION
 

@@ -11,19 +11,19 @@ use Parrot::Test tests => 7;
 
 
 SKIP: {
-	skip("changed eval semantics - see t/pmc/eval.t", 7);
+        skip("changed eval semantics - see t/pmc/eval.t", 7);
 
 ##############################
 pir_output_is(<<'CODE', <<'OUT', "eval pasm");
 .sub test :main
-	$S0 = 'set S1, "in eval\n"'
-	concat $S0, "\n"
-	concat $S0, "print S1\nend\n"
-	compreg $P0, "PASM"
-	compile P0, $P0, $S0
-	invoke
-	print "back\n"
-	end
+        $S0 = 'set S1, "in eval\n"'
+        concat $S0, "\n"
+        concat $S0, "print S1\nend\n"
+        compreg $P0, "PASM"
+        compile P0, $P0, $S0
+        invoke
+        print "back\n"
+        end
 .end
 CODE
 in eval
@@ -32,15 +32,15 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "eval pir");
 .sub test :main
-	$S1 = ".sub _foo\n"
-	concat $S1, '$S1 = "42\n"'
-	concat $S1, "\nprint $S1\nend\n"
-	concat $S1, "\n.end\n"
-	compreg $P0, "PIR"
-	compile P0, $P0, $S1
-	invoke
-	print "back\n"
-	end
+        $S1 = ".sub _foo\n"
+        concat $S1, '$S1 = "42\n"'
+        concat $S1, "\nprint $S1\nend\n"
+        concat $S1, "\n.end\n"
+        compreg $P0, "PIR"
+        compile P0, $P0, $S1
+        invoke
+        print "back\n"
+        end
 .end
 CODE
 42
@@ -137,16 +137,16 @@ OUT
 pir_output_is(<<'CODE', <<'OUT', "eval - same constants");
 .sub test :main
         print "hello"
-	print "\n"
-	$S0 = 'print "hello"'
-	concat $S0, "\n"
-	concat $S0, 'print "\n"'
-	concat $S0, "\nend\n"
-	compreg $P0, "PASM"
-	compile P0, $P0, $S0
-	invoke
-	print "back\n"
-	end
+        print "\n"
+        $S0 = 'print "hello"'
+        concat $S0, "\n"
+        concat $S0, 'print "\n"'
+        concat $S0, "\nend\n"
+        compreg $P0, "PASM"
+        compile P0, $P0, $S0
+        invoke
+        print "back\n"
+        end
 .end
 CODE
 hello

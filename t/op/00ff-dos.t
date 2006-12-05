@@ -15,7 +15,7 @@ t/op/00ff-dos.t - DOS File Format
 
 =head1 SYNOPSIS
 
-	% prove t/op/00ff-dos.t
+        % prove t/op/00ff-dos.t
 
 =head1 DESCRIPTION
 

@@ -15,7 +15,7 @@ t/op/spawnw.t - Run OS commands and tell about the exit code
 
 =head1 SYNOPSIS
 
-	% prove t/op/spawnw.t
+        % prove t/op/spawnw.t
 
 =head1 DESCRIPTION
 
@@ -52,7 +52,7 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 0");
         set     S1, 'perl -e "exit(0)"'
         set     I1, 99
         spawnw  I1, S1
-	shr	I2, I1, 8
+        shr     I2, I1, 8
         print   "return code: "
         print   I2
         print   "\n"
@@ -65,7 +65,7 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 123");
         set     S1, 'perl -e "exit(123)"'
         set     I1, 99
         spawnw  I1, S1
-	shr	I2, I1, 8
+        shr     I2, I1, 8
         print   "return code: "
         print   I2
         print   "\n"
@@ -78,7 +78,7 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 3");
         set     S1, 'perl -e "exit(3)"'
         set     I1, 99
         spawnw  I1, S1
-	shr	I2, I1, 8
+        shr     I2, I1, 8
         print   "return code: "
         print   I2
         print   "\n"
@@ -97,7 +97,7 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 0");
         set     P0[2], "exit(0)"
         set     I1, 99
         spawnw  I1, P0
-	shr	I2, I1, 8
+        shr     I2, I1, 8
         print   "return code: "
         print   I2
         print   "\n"
@@ -114,7 +114,7 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 123");
         set     P0[2], "exit(123)"
         set     I1, 99
         spawnw  I1, P0
-	shr	I2, I1, 8
+        shr     I2, I1, 8
         print   "return code: "
         print   I2
         print   "\n"
@@ -131,7 +131,7 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 3");
         set     P0[2], "exit(3)"
         set     I1, 99
         spawnw  I1, P0
-	shr	I2, I1, 8
+        shr     I2, I1, 8
         print   "return code: "
         print   I2
         print   "\n"

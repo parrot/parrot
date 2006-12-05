@@ -17,7 +17,7 @@ t/op/hacks.t - IO Ops
 
 =head1 SYNOPSIS
 
-	% prove t/op/hacks.t
+        % prove t/op/hacks.t
 
 =head1 DESCRIPTION
 

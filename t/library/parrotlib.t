@@ -16,7 +16,7 @@ t/library/parrotlib.t - testing library/parrotlib.pir
 
 =head1 SYNOPSIS
 
-	% prove t/library/parrotlib.t
+        % prove t/library/parrotlib.t
 
 =head1 DESCRIPTION
 

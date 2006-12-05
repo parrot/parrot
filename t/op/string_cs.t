@@ -16,7 +16,7 @@ t/op/string_cs.t - String Charset Tests
 
 =head1 SYNOPSIS
 
-	% prove t/op/string_cs.t
+        % prove t/op/string_cs.t
 
 =head1 DESCRIPTION
 
@@ -427,7 +427,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "trans_charset_s_s_i unicode to iso-8859-1");
     set S0, unicode:"abc_\xe4_"
-    bytelength I2, S0	# XXX its 7 for utf8 only
+    bytelength I2, S0   # XXX its 7 for utf8 only
     print I2
     print "\n"
     find_charset I0, "iso-8859-1"

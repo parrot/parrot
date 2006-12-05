@@ -15,7 +15,7 @@ t/parser.t - TGE::Parser tests
 
 =head1 SYNOPSIS
 
-	$ prove t/compilers/tge/parser.t
+        $ prove t/compilers/tge/parser.t
 
 =cut
 

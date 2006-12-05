@@ -16,7 +16,7 @@ t/dynpmc/foo.t - Test for a very simple dynamic PMC
 
 =head1 SYNOPSIS
 
-	% prove t/dynpmc/foo.t
+        % prove t/dynpmc/foo.t
 
 =head1 DESCRIPTION
 

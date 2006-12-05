@@ -152,21 +152,21 @@ OUT
 #
 
 # pseudo source code:
-#	main () {
-#	  int i=5;
-#	  foreach addtwo(i) {
-#	    print $_, "\n";
-#	  }
-#	  print "done in main\n";
-#	}
+#       main () {
+#         int i=5;
+#         foreach addtwo(i) {
+#           print $_, "\n";
+#         }
+#         print "done in main\n";
+#       }
 #
-#	addtwo (int a) {
-#	  int i;
-#	  for (i=0; i<10; i++) {
-#	    yield a+i;
-#	  }
-#	  print "done in coroutine\n";
-#	}
+#       addtwo (int a) {
+#         int i;
+#         for (i=0; i<10; i++) {
+#           yield a+i;
+#         }
+#         print "done in coroutine\n";
+#       }
 
 pir_output_is(<<'CODE', <<'OUT', "coroutine iterator");
 .sub test :main
@@ -403,17 +403,17 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "\:main defined twice");
 .sub foo :main
-	set S0, 'not ok'
-	print S0
-	print "\r\n"
-	end
+        set S0, 'not ok'
+        print S0
+        print "\r\n"
+        end
 .end
 
 .sub bar :main
-	set S0, 'ok'
-	print S0
-	print "\r\n"
-	end
+        set S0, 'ok'
+        print S0
+        print "\r\n"
+        end
 .end
 CODE
 ok
@@ -493,23 +493,23 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUT', "()=foo() syntax, no return values");
 .sub main :main
-	() = foo()
+        () = foo()
 .end
 .sub foo
-	print "foo\n"
-.end	
+        print "foo\n"
+.end    
 CODE
 foo
 OUT
 
 pir_output_is(<<'CODE', <<'OUT', "()=foo() syntax, skip returned value");
 .sub main :main
-	() = foo()
+        () = foo()
 .end
 .sub foo
-	print "foo\n"
+        print "foo\n"
     .return(1)
-.end	
+.end    
 CODE
 foo
 OUT

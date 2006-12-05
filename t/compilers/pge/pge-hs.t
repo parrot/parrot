@@ -15,7 +15,7 @@ t/library/pge-hs.t - Grammar Engine Haskell Output tests
 
 =head1 SYNOPSIS
 
-	% prove t/library/pge-hs.t
+        % prove t/library/pge-hs.t
 
 =cut
 

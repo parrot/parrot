@@ -15,7 +15,7 @@ t/compilers/pge/pge_codestring.t - test the CodeString class
 
 =head1 SYNOPSIS
 
-	% prove t/compilers/pge/pge_codestring.t 
+        % prove t/compilers/pge/pge_codestring.t 
 
 =head1 DESCRIPTION
 

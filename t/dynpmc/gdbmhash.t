@@ -16,7 +16,7 @@ t/dynpmc/gdbmhash.t - test the GDBMHash PMC
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/dynpmc/gdbmhash.t
+        % perl -Ilib t/dynpmc/gdbmhash.t
 
 =head1 DESCRIPTION
 

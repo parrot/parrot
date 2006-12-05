@@ -15,7 +15,7 @@ t/op/jitn.t - JIT register allocation
 
 =head1 SYNOPSIS
 
-	% prove t/op/jitn.t
+        % prove t/op/jitn.t
 
 =head1 DESCRIPTION
 
@@ -277,7 +277,7 @@ OUTPUT
 
 pasm_output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n mapped same");
 set N2, 1
-add N2, N2, N2	# reserve first reg
+add N2, N2, N2  # reserve first reg
 add N2, N2, N2
 set N0, 10.0
 set N1, 20.0

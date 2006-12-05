@@ -15,7 +15,7 @@ t/native_pbc/string.t - PBC string tests
 
 =head1 SYNOPSIS
 
-	% prove t/native_pbc/string.t
+        % prove t/native_pbc/string.t
 
 =head1 DESCRIPTION
 

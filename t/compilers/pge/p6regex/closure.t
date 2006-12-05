@@ -21,7 +21,7 @@ ver. 7, in the B<'Bracket rationalization'> section
 
 =head1 SYNOPSIS
 
-	% prove t/p6regex/closure.t
+        % prove t/p6regex/closure.t
 
 =cut
 

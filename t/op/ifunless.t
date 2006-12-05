@@ -15,7 +15,7 @@ t/op/ifunless.t - If/Unless
 
 =head1 SYNOPSIS
 
-	% prove t/op/ifunless.t
+        % prove t/op/ifunless.t
 
 =head1 DESCRIPTION
 
@@ -25,32 +25,32 @@ Tests the conditional C<if> and C<unless> operations.
 
 
 pasm_output_is(<<CODE, <<OUTPUT, "if_i_ic");
-	set	I0, 2147483647
-	set	I1, -2147483648
-	set	I2, 0
+        set     I0, 2147483647
+        set     I1, -2147483648
+        set     I2, 0
 
-	if      I0, ONE
+        if      I0, ONE
         branch  ERROR
-	print	"bad\\n"
+        print   "bad\\n"
 
 ONE:
-	print	"ok 1\\n"
-	if      I1, TWO
+        print   "ok 1\\n"
+        if      I1, TWO
         branch ERROR
-	print	"bad\\n"
+        print   "bad\\n"
 
 TWO:
-	print	"ok 2\\n"
-	if      I2, ERROR
+        print   "ok 2\\n"
+        if      I2, ERROR
         branch  THREE
-	print	"bad\\n"
+        print   "bad\\n"
 
 THREE:
-	print	"ok 3\\n"
-	end
+        print   "ok 3\\n"
+        end
 
 ERROR:
-	print	"bad\\n"
+        print   "bad\\n"
         end
 CODE
 ok 1
@@ -59,32 +59,32 @@ ok 3
 OUTPUT
 
 pasm_output_is(<<CODE, <<OUTPUT, "if_n_ic");
-	set	N0, 0.1
-	set	N1, -0.1
-	set	N2, 0.0
+        set     N0, 0.1
+        set     N1, -0.1
+        set     N2, 0.0
 
-	if N0, ONE
+        if N0, ONE
         branch  ERROR
-	print	"bad\\n"
+        print   "bad\\n"
 
 ONE:
-	print	"ok 1\\n"
-	if	N1, TWO
+        print   "ok 1\\n"
+        if      N1, TWO
         branch ERROR
-	print	"bad\\n"
+        print   "bad\\n"
 
 TWO:
-	print	"ok 2\\n"
-	if	N2, ERROR
+        print   "ok 2\\n"
+        if      N2, ERROR
         branch  THREE
-	print	"bad\\n"
+        print   "bad\\n"
 
 THREE:
-	print	"ok 3\\n"
-	end
+        print   "ok 3\\n"
+        end
 
 ERROR:
-	print	"bad\\n"
+        print   "bad\\n"
         end
 CODE
 ok 1
@@ -93,25 +93,25 @@ ok 3
 OUTPUT
 
 pasm_output_is(<<CODE, <<OUTPUT, "if_s_ic");
-	set	S0, "Hello World"
-	set	S1, ""
+        set     S0, "Hello World"
+        set     S1, ""
 
-	if      S0, ONE
+        if      S0, ONE
         branch  ERROR
-	print	"bad\\n"
+        print   "bad\\n"
 
 ONE:
-	print	"ok 1\\n"
-	if	S1, ERROR
+        print   "ok 1\\n"
+        if      S1, ERROR
         branch  TWO
-	print	"bad\\n"
+        print   "bad\\n"
 
 TWO:
-	print	"ok 2\\n"
-	end
+        print   "ok 2\\n"
+        end
 
 ERROR:
-	print	"bad\\n"
+        print   "bad\\n"
         end
 CODE
 ok 1
@@ -119,25 +119,25 @@ ok 2
 OUTPUT
 
 pasm_output_is(<<CODE, <<OUTPUT, "unless_i_ic");
-	set	I0, 0
-	set	I1, -2147483648
+        set     I0, 0
+        set     I1, -2147483648
 
-	unless	I0, ONE
+        unless  I0, ONE
         branch  ERROR
-	print	"bad\\n"
+        print   "bad\\n"
 
 ONE:
-	print	"ok 1\\n"
-	unless	I1, ERROR
+        print   "ok 1\\n"
+        unless  I1, ERROR
         branch TWO
-	print	"bad\\n"
+        print   "bad\\n"
 
 TWO:
-	print	"ok 2\\n"
-	end
+        print   "ok 2\\n"
+        end
 
 ERROR:
-	print	"bad\\n"
+        print   "bad\\n"
         end
 CODE
 ok 1
@@ -145,25 +145,25 @@ ok 2
 OUTPUT
 
 pasm_output_is(<<CODE, <<OUTPUT, "unless_n_ic");
-	set	N0, 0.0
-	set	N1, -0.1
+        set     N0, 0.0
+        set     N1, -0.1
 
-	unless N0, ONE
+        unless N0, ONE
         branch  ERROR
-	print	"bad\\n"
+        print   "bad\\n"
 
 ONE:
-	print	"ok 1\\n"
-	unless	N1, ERROR
+        print   "ok 1\\n"
+        unless  N1, ERROR
         branch TWO
-	print	"bad\\n"
+        print   "bad\\n"
 
 TWO:
-	print	"ok 2\\n"
-	end
+        print   "ok 2\\n"
+        end
 
 ERROR:
-	print	"bad\\n"
+        print   "bad\\n"
         end
 CODE
 ok 1
@@ -171,25 +171,25 @@ ok 2
 OUTPUT
 
 pasm_output_is(<<CODE, <<OUTPUT, "unless_s_ic");
-	set	S1, "Hello World"
-	set	S0, ""
+        set     S1, "Hello World"
+        set     S0, ""
 
-	unless S0, ONE
+        unless S0, ONE
         branch  ERROR
-	print	"bad\\n"
+        print   "bad\\n"
 
 ONE:
-	print	"ok 1\\n"
-	unless	S1, ERROR
+        print   "ok 1\\n"
+        unless  S1, ERROR
         branch TWO
-	print	"bad\\n"
+        print   "bad\\n"
 
 TWO:
-	print	"ok 2\\n"
-	end
+        print   "ok 2\\n"
+        end
 
 ERROR:
-	print	"bad\\n"
+        print   "bad\\n"
         end
 CODE
 ok 1
