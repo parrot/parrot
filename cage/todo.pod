@@ -209,12 +209,6 @@ L<http://www.oreillynet.com/onlamp/blog/2006/07/calling_for_parrot_janitors.html
 
 =over 4
 
-=item * C<interpinfo .INTERPINFO_NAMESPACE_ROOT>
-
-The new C<get_root_namespace> opcode obsoletes, and should replace each
-usage of, the old C<interpinfo .INTERPINFO_NAMESPACE_ROOT> feature.  (Which
-can then be eliminated.)
-
 =back
 
 =head2 Clean up skipped tests

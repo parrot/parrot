@@ -208,21 +208,19 @@ or the C<find_global> op:
 
 =head2 How can I delete a global
 
-You can retrieve the namespace hash and use the C<delete> opcode.  Nested
-namespace names have a NULL char prepended to their name.
+You can retrieve the namespace hash and use the C<delete> opcode.
 
   .sub main :main
     $P0 = new .Integer
-    store_global "foo", $P0
-    store_global "Bar", "baz", $P0
+    store_hll_global "foo", $P0
+    store_hll_global ["Bar"], "baz", $P0
     # ...
-    .include "interpinfo.pasm"
     .local pmc ns, Bar_ns
-    ns = interpinfo .INTERPINFO_NAMESPACE_ROOT
-    delete ns["foo"]                # delete from top level
-    Bar_ns = ns["\0Bar"]            # get Bar namespace
+    ns = get_hll_namespace
+    delete ns["foo"]              # delete from top level
+    Bar_ns = ns["Bar"]            # get Bar namespace
     delete Bar_ns["baz"]
-    $P0 = find_global "Bar", "baz"
+    $P0 = get_hll_global ["Bar"], "baz"
     print "never\n"
   .end
 

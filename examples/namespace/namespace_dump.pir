@@ -5,7 +5,7 @@
     .include "interpinfo.pasm"
     .include "iterator.pasm"
     .local pmc ns
-    ns = interpinfo .INTERPINFO_NAMESPACE_ROOT
+    ns = get_root_namespace
     dump(ns, 0)
 .end
 

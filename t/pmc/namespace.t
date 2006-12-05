@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 39;
 use Parrot::Config;
 
 =head1 NAME
@@ -120,25 +120,6 @@ ok
 bar
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar root");
-.sub 'main' :main
-    .include "interpinfo.pasm"
-    $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
-    $P1 = $P0["parrot";"Foo"]
-    $P2 = $P1["bar"]
-    print "ok\n"
-    $P2()
-.end
-
-.namespace ["Foo"]
-.sub 'bar'
-    print "bar\n"
-.end
-CODE
-ok
-bar
-OUTPUT
-
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz");
 .sub 'main' :main
     $P2 = find_global ["Foo";"Bar"], "baz"
@@ -198,24 +179,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash 2");
 .sub 'main' :main
     $P0 = find_global "Foo"
     $P1 = $P0["Bar" ; "baz"]
-    print "ok\n"
-    $P1()
-.end
-
-.namespace ["Foo"; "Bar"]
-.sub 'baz'
-    print "baz\n"
-.end
-CODE
-ok
-baz
-OUTPUT
-
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash 3");
-.sub 'main' :main
-    .include "interpinfo.pasm"
-    $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
-    $P1 = $P0["parrot";"Foo";"Bar" ; "baz"]
     print "ok\n"
     $P1()
 .end
@@ -411,9 +374,8 @@ OUT
 pir_output_is(<<'CODE', <<'OUTPUT', "verify root and parrot namespaces");
 # name may change though
 .sub main :main
-    .include "interpinfo.pasm"
     # root namespace
-    $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
+    $P0 = get_root_namespace
     typeof $S0, $P0
     print $S0
     print "\n"
@@ -437,7 +399,7 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', "ns.name()");
 .sub main :main
     .include "interpinfo.pasm"
-    $P0 = interpinfo .INTERPINFO_NAMESPACE_ROOT
+    $P0 = get_root_namespace
     $P1 = $P0["parrot"]
     $P3 = new .NameSpace
     $P1["Foo"] = $P3
@@ -577,8 +539,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "HLL and vars");
 
 .HLL '_Tcl', ''
 
-.include 'interpinfo.pasm'
-
 .sub huh 
   $P0 = new .Integer
   $P0 = 3.14
@@ -590,10 +550,9 @@ pir_output_is(<<'CODE', <<'OUTPUT', "HLL and vars");
 
 .sub foo :main
   huh()
-  $P1 = interpinfo .INTERPINFO_NAMESPACE_ROOT
-  $P2 = $P1['_tcl']
-  $P3 = $P2['$variable'] 
-  print $P3
+  $P1 = get_root_namespace ['_tcl']
+  $P2 = $P1['$variable'] 
+  print $P2
   print "\n"
 .end
 CODE
@@ -629,9 +588,8 @@ pir_output_is(<<'CODE', <<'OUTPUT', ":anon subs still get default namespace");
 
 .sub what
    load_bytecode 'temp_a.pir'
-  .include 'interpinfo.pasm'
   .local pmc var
-   var = interpinfo .INTERPINFO_NAMESPACE_ROOT
+   var = get_root_namespace
    var = var['eek']
    var = var['bark']
 
@@ -692,8 +650,7 @@ pir_output_is(<<"CODE", <<'OUTPUT', "export_to");
     .local pmc nsr, nsa, nsb, ar
     ar = new .ResizableStringArray
     push ar, "b_foo"
-    .include "interpinfo.pasm"
-    nsr = interpinfo .INTERPINFO_NAMESPACE_ROOT
+    nsr = get_root_namespace
     nsa = nsr['a']
     nsb = nsr['b']
     nsb."export_to"(nsa, ar)

@@ -784,15 +784,13 @@ OUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "__add as function - Int, Float");
 .sub main :main
-    .local pmc d, l, r, ns, a
+    .local pmc d, l, r, a
     d = new Integer
     l = new Integer
     r = new Float
     l = 3
     r = 39.42
-    .include "interpinfo.pasm"
-    ns = interpinfo .INTERPINFO_NAMESPACE_ROOT
-    a = ns["__parrot_core"; "__add"]
+    a = get_root_global ["__parrot_core"], "__add"
     a(l, r, d)
     print d
     print "\n"

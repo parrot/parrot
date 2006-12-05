@@ -762,7 +762,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_GLOBALS| CLONE_HLL");
     print "not "
 okay1:
     print "ok 1\n"
-    $P1 = interpinfo .INTERPINFO_NAMESPACE_ROOT
+    $P1 = get_root_namespace
     $P1 = $P1['test']
     $P1 = $P1['x']
     $P1 = 43
@@ -779,7 +779,7 @@ okay2:
 .sub main :main
     .local pmc setup
     .local pmc test
-    setup = interpinfo .INTERPINFO_NAMESPACE_ROOT
+    setup = get_root_namespace
     setup = setup['test']
     test = setup['test']
     setup = setup['setup']

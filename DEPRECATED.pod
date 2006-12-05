@@ -8,6 +8,11 @@ Use the C<find_method> opcode instead.
 
 TODO remove this para and DELETED_fetchmethod from ops.
 
+=item interpinfo .INTERPINFO_NAMESPACE_ROOT
+
+This interpinfo constant has been deprecated in favor of the get_root_namespace
+opcode.
+
 =back
 
 =head1 .imc file extension
