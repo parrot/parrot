@@ -18,9 +18,6 @@ use Regex::Optimize;
 use Regex::Rewrite;
 use Regex::CodeGen::IMCC;
 
-use strict;
-use warnings;
-
 # Class method to get a global state object
 use vars qw($GLOBAL_STATE);
 sub global_state {
