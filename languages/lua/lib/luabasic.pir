@@ -458,7 +458,7 @@ The behavior of C<next> is I<undefined> if, during the traversal, you assign
 any value to a non-existent field in the table. You may however modify
 existing fields. In particular, you may clear existing fields.
 
-STILL INCOMPLETE (see next in luapir.pir).
+STILL INCOMPLETE (see next in table.pir).
 
 =cut
 
@@ -468,7 +468,7 @@ STILL INCOMPLETE (see next in luapir.pir).
     .local pmc idx
     .local pmc value
     checktype(table, 'table')
-    (idx, value) = next(table, index)
+    (idx, value) = table.'next'(index)
     unless idx goto L1
     .return (idx, value)
 L1:

@@ -152,7 +152,7 @@ B<DEPRECATED>
     checktype(f, 'function')
     new idx, .LuaNil
 L1:
-    (idx, value) = next(table, idx)
+    (idx, value) = table.'next'(idx)
     unless idx goto L2
     (ret) = f(idx, value)
     $I0 = defined ret
@@ -271,7 +271,7 @@ Returns the largest positive numerical index of the given table, or zero if
 the table has no positive numerical indices. (To do its job this function
 does a linear traversal of the whole table.)
 
-STILL INCOMPLETE (see next in luapir.pir).
+STILL INCOMPLETE (see next in table.pir).
 
 =cut
 
@@ -285,7 +285,7 @@ STILL INCOMPLETE (see next in luapir.pir).
     max = 0
     new idx, .LuaNil
 L1:
-    (idx, value) = next(table, idx)
+    (idx, value) = table.'next'(idx)
     unless idx goto L2
     $I0 = isa idx, 'LuaNumber'
     unless $I0 goto L1

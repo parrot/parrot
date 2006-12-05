@@ -107,12 +107,7 @@ L4:
     .param pmc key
     .param pmc value
     $I0 = isa key, 'LuaNil'
-    unless $I0 goto L1
-    .local pmc ex
-    ex = new .Exception
-    ex['_message'] = "table index is nil"
-    throw ex
-L1:
+    if $I0 goto L1
     $I0 = _has(self, key)
     if $I0 goto L2
     .local pmc meth
@@ -128,6 +123,16 @@ L3:
 L2:
     _set(self, key, value)
 L4:
+    .return ()
+L1:
+    ex_index()
+.end
+
+.sub 'ex_index' :anon
+    .local pmc ex
+    ex = new .Exception
+    ex['_message'] = "table index is nil"
+    throw ex
 .end
 
 .sub 'elements' :method :vtable
@@ -209,6 +214,26 @@ L4:
     .return (ret)
 .end
 
+=item C<next (index)>
+
+=cut
+
+.sub 'next' :method
+    .param pmc index
+    .local pmc ret
+    if index goto L1
+    new index, .LuaNumber
+    set index, 0.0
+L1:
+    inc index
+    ret = _get(self, index)
+    if_null ret, L2
+    .return (index, ret)
+L2:
+    new ret, .LuaNil
+    .return (ret)
+.end
+
 =item C<rawget (key)>
 
 =cut
@@ -234,13 +259,11 @@ L1:
     .param pmc key
     .param pmc value
     $I0 = isa key, 'LuaNil'
-    unless $I0 goto L1
-    .local pmc ex
-    ex = new .Exception
-    ex['_message'] = "table index is nil"
-    throw ex
-L1:
+    if $I0 goto L1
     _set(self, key, value)
+    .return ()
+L1:
+    ex_index()
 .end
 
 =back

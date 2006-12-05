@@ -197,27 +197,6 @@ Support variable number of arguments function call.
 .end
 
 
-=item C<next (table, index)>
-
-=cut
-
-.sub 'next'
-    .param pmc table
-    .param pmc index
-    .local pmc value
-    if index goto L1
-    new index, .LuaNumber
-    index = 0.0
-L1:
-    inc index
-    value = table[index]
-    unless value goto L2
-    .return (index, value)
-L2:
-    .return (value)		# nil
-.end
-
-
 =item C<not_implemented ()>
 
 =cut
