@@ -8,7 +8,7 @@ ook/t/basic.t - testing ook
 
 =head1 SYNOPSIS
 
-	% cd languages && perl ook/t/basic.t
+        % cd languages && perl ook/t/basic.t
 
 =head1 DESCRIPTION
 
