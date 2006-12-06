@@ -21,16 +21,221 @@ such as a file, keyboard, or text console. Streams are also called
 
 =head1 DESCRIPTION
 
-This document defines Parrot's I/O subsystem, for both streams and
-network I/O. Parrot has both synchronous and asynchronous I/O
-operations. This section describes the interface, and the
-L<IMPLEMENTATION> section provides more details on general
-implementation questions and error handling. 
+=over 4
+
+=item - Parrot I/O objects support both streams and network I/O. 
+
+=item - Parrot has both synchronous and asynchronous I/O operations.
+
+=item - Asynchronous operations must interact safely with Parrot's other
+concurrency models.
+
+=back
+
+=head1 IMPLEMENTATION
+
+=head2 Composition
+
+Currently, the Parrot I/O subsystem uses a per-interpreter stack to
+provide a layer-based approach to I/O. Each layer implements a subset of
+the C<ParrotIOLayerAPI> vtable. To find an I/O function, the layer stack
+is searched downwards until a non-NULL function pointer is found for
+that particular slot. This implementation will be replaced with a
+composition model. Rather than living in a stack, the module fragments
+that make up the ParrotIO class will be composed and any conflicts
+resolved when the class is loaded. This strategy eliminates the need to
+search a stack on each I/O call, while still allowing a "layered"
+combination of functionality for different platforms.
+
+=head2 Concurrency Model for Asynchronous I/O
+
+Currently, Parrot only implements synchronous I/O operations. For the
+1.0 release the asynchronous operations will be implemented separately
+from the synchronous ones. There may be an implementation that uses one
+variant to implement the other someday, but it's not an immediate
+priority.
+
+Synchronous opcodes are differentiated from asynchronous opcodes by the
+presence of a callback argument in the asynchronous calls.  Asynchronous
+calls that don't supply callbacks (perhaps if the user wants to manually
+check later if the operation succeded) are enough of a fringe case that
+they don't need opcodes. They can access the functionality via methods
+on ParrotIO objects.
+
+Asynchronous operations don't use Parrot threads, they use a
+light-weight concurrency model for asynchronous operations. The
+asynchronous I/O implementation will use the composition model to
+allow some platforms to take advantage of their built-in asynchronous
+operations instead of using Parrot's concurrency implementation.
+
+[Type up review of options for the I/O concurrency model.]
+
+Communication between the calling code and the asynchronous operation
+thread will be handled by a shared status object. The operation thread
+will update the status object whenever the status changes, and the
+calling code can check the status object at any time. The status object
+contains a reference to the returned result of an asynchronous I/O call.
+
+
+
+=head2 I/O PMC API
+
+Methods
+
+[Over and over again throughout this section, I keep wanting an API that
+isn't possible with current low-level PMCs. This could mean that
+low-level PMCs need a good bit of work to gain the same argument passing
+capabilities as higher-level Parrot objects (which is true, long-term).
+It could mean that Parrot I/O objects would be better off defined in a
+higher-level syntax, with embedded C (via NCI, or a lighter-weight
+embedding mechanism) for those pieces that really are direct C access.
+Or, it could mean that I'll come back and rip this interface down to a
+bare minimum.]
+
+=over 4
+
+=item new
+
+  $P0 = new ParrotIO
+
+Creates a new I/O stream object. [Note that this is usually performed
+via the C<open> opcode.]
+
+=item open
+
+  $P0.open()
+  $P0.open($S1)
+  $P0.open($S1, $S2)
+
+Opens a stream on an existing I/O stream object. With no arguments, it
+can be used to reopen a previously opened I/O stream. $S1 is a file path
+and $S2 is an optional mode for the stream (read, write, read/write,
+etc), using the same format as the C<open> opcode.
+
+I'm very tempted by named parameters for 'open':
+
+  path   - The path to the file
+  read   - A flag for read mode
+  write  - A flag for write mode (both read and write means read/write), create a new file if it doesn't exist
+  append - Start writing at the end of the file, or create a new file if it doesn't exist
+  pipe   - A flag for pipe mode
+
+  $P0.open('path'=>'/tmp/file')             # Default is read-only
+  $P0.open('path'=>'/tmp/file', 'write'=>1) # write-only
+
+It would make for some rather verbose C<open> operations, though
+certainly more readable, and probably just as easy to generate.
+
+=item close
+
+  $P0.close()
+  $P0.close($P1)
+
+Closes an I/O stream, but leaves destruction of the I/O object to the GC.
+
+The asynchronous version takes an additional final PMC callback argument
+$P1. When the close operation is complete, it invokes the callback,
+passing it a status object. [There's not really much advantage in this
+over just leaving the object for the GC to clean-up, but it does give
+you the option of executing an action when the stream has been closed.]
+
+=item print
+
+  $P0.print($I1)
+  $P0.print($N1)
+  $P0.print($S1)
+  $P0.print($P1)
+  $P0.print($I1, $P2)
+  $P0.print($N1, $P2)
+  $P0.print($S1, $P2)
+  $P0.print($P1, $P2)
+
+Writes an integer, float, string, or PMC value to an I/O stream object.
+
+The asynchronous version takes an additional final PMC callback
+argument $P2. When the print operation is complete, it invokes the callback,
+passing it a status object.
+
+=item read
+
+  $S0 = $P1.read($I2)
+  $P0 = $P1.read($I2, $P3)
+
+Retrieves a specified number of bytes $I2, from a stream $P1 into a
+string $S0. By default it reads in bytes, but the ParrotIO object can be
+configured to read in code points instead.
+
+The asynchronous version takes an additional final PMC callback argument
+$P3, and only returns a status object $P0. When the read operation is
+complete, it invokes the callback, passing it a status object and a
+string of bytes.
+
+=item readline
+
+  $S0 = $P1.readline()
+  $P0 = $P1.readline($P2)
+
+Retrieves a single line from a stream $P1 into a string $S1. Calling
+C<readline> flags the stream as operating in line-buffer mode (see the
+C<buffer_type> method below).
+
+The asynchronous version takes an additional final PMC callback argument
+$P2, and only returns a status object $P0. When the readline operation
+is complete, it invokes the callback, passing it a status object and a
+string of bytes.
+
+=item record_separator
+
+  $S0 = $P1.record_separator()
+  $P0.record_separator($S1)
+
+Accessor (get and set) for the I/O stream's record separator attribute.
+
+=item buffer_type
+
+  $I0 = $P1.buffer_type()
+  $S0 = $P1.buffer_type()
+  $P0.buffer_type($I1)
+  $P0.buffer_type($S1)
+
+Accessor (get and set) for the I/O stream's buffer type attribute. The
+attribute is returned as an integer value of one of the following
+constants, or a string value of 'unbuffered', 'line-buffered', or
+'full-buffered'.
+
+  0    PIOCTL_NONBUF
+           Unbuffered I/O. Bytes are sent as soon as possible.
+  1    PIOCTL_LINEBUF
+	   Line buffered I/O. Bytes are sent when a newline is
+           encountered.
+  2    PIOCTL_FULLBUF
+	   Fully buffered I/O. Bytes are sent when the buffer is full.
+	   [Note, the constant was called "BLKBUF" because bytes are
+	   sent as a block, but line buffering also sends them as a
+           block, so changed to "FULLBUF".]
+
+=item buffer_size
+
+  $I0 = $P1.buffer_size()
+  $P0.buffer_size($I1)
+
+Accessor (get and set) for the I/O stream's buffer size attribute.
+
+=item get_fd
+
+  $I0 = $P1.'get_fd'()
+
+Retrieves the UNIX integer file descriptor of a stream object. No
+asynchronous version.
+
+=back
+
+=head2 I/O Opcodes
 
 The signatures for the asynchronous operations are nearly identical to
 the synchronous operations, but the asynchronous operations take an
 additional argument for a callback, and the only return value from the
-asynchronous operations is a status object. When the callbacks invoked,
+asynchronous operations is a status object. When the callbacks are invoked,
 they are passed the status object as their sole argument. Any return
 values from the operation are stored within the status object.
 
@@ -45,21 +250,17 @@ implementation section.
 
 =over 4
 
-=item *
+=item open
 
-C<open> opens a stream object based on a string path. It takes an
-optional string argument specifying the mode of the stream (read, write,
+  $P0 = open $S1
+  $P0 = open $S1, $S2
+
+Opens a stream object based on a file path in $S1 in read/write mode. The
+optional string argument $S2 specifies the mode of the stream (read, write,
 append, read/write, etc.), and returns a stream object. Currently the
 mode of the stream is set with a string argument similar to Perl 5
-syntax, but a set of defined constants may fit better with Parrot's
-general architecture. 
-
-  0    PIOMODE_READ (default)
-  1    PIOMODE_WRITE
-  2    PIOMODE_APPEND
-  3    PIOMODE_READWRITE
-  4    PIOMODE_PIPE (read)
-  5    PIOMODE_PIPEWRITE
+syntax, but a language-agnostic mode string is preferable, using 'r' for
+read, 'w' for write, 'a' for append, and 'p' for pipe.
 
 The asynchronous version takes a PMC callback as an additional final
 argument. When the open operation is complete, it invokes the callback
@@ -148,6 +349,9 @@ string of bytes.
 
 =item *
 
+['peek', 'seek', 'tell', and 'poll' are all candidates for moving from
+opcodes to ParrotIO object methods.]
+
 C<peek> retrieves the next byte from a stream into a string, but doesn't
 remove it from the stream. By default it reads from standard input, but
 it also takes a stream object argument for an alternate source.
@@ -188,9 +392,39 @@ No asynchronous version.
 
 =item *
 
-C<getfd> retrieves the UNIX integer file descriptor of a stream object.
+C<poll> polls a stream or socket object for particular types of events
+(an integer flag) at a frequency set by seconds and microseconds (the
+final two integer arguments). [At least, that's what the documentation
+in src/io/io.c says. In actual fact, the final two arguments seem to be
+setting the timeout, exactly the same as the corresponding argument to
+the system version of C<poll>.]
 
-No asynchronous version.
+See the system documentation for C<poll> to see the constants for event
+types and return status.
+
+This opcode is inherently synchronous (poll is "synchronous I/O
+multiplexing"), but it can retrieve status information from a stream or
+socket object whether the object is being used synchronously or
+asynchronously.
+
+=back
+
+=head3 Deprecated opcodes
+
+=over
+
+=item *
+
+C<write> prints to standard output but it cannot select another stream.
+It only accepts a PMC value to write. This is redundant with the
+C<print> opcode, so it will be deprecated.
+
+=item *
+
+C<getfd> retrieves the UNIX integer file descriptor of a stream object.
+The opcode has been replaced by a 'get_fd' method on the ParrotIO
+object.
+
 
 =item *
 
@@ -198,6 +432,9 @@ C<pioctl> provides low-level access to the attributes of a stream
 object. It takes a stream object, an integer flag to select a command,
 and a single integer argument for the command. It returns an integer
 indicating the success or failure of the command.
+
+This opcode has been replaced with methods on the ParrotIO object, but
+is kept here for reference.
 
 The following constants are defined for the commands that C<pioctl> can
 execute:
@@ -228,45 +465,20 @@ buffer-type commands:
            encountered.
   2    PIOCTL_BLKBUF
 	   Fully buffered I/O. Bytes are sent when the buffer is full.
-	   [Called "BLKBUF" because bytes are sent as a block, but line
-	   buffering also sends them as a block, so "FULBUF" might make
-           more sense.]
-
-[This opcode may be deprecated and replaced with methods on stream
-objects.]
-
-=item *
-
-C<poll> polls a stream or socket object for particular types of events
-(an integer flag) at a frequency set by seconds and microseconds (the
-final two integer arguments). [At least, that's what the documentation
-in src/io/io.c says. In actual fact, the final two arguments seem to be
-setting the timeout, exactly the same as the corresponding argument to
-the system version of C<poll>.]
-
-See the system documentation for C<poll> to see the constants for event
-types and return status.
-
-This opcode is inherently synchronous (poll is "synchronous I/O
-multiplexing"), but it can retrieve status information from a stream or
-socket object whether the object is being used synchronously or
-asynchronously.
-
-=back
-
-=head3 Deprecated opcodes
-
-=over
-
-=item *
-
-C<write> prints to standard output but it cannot select another stream.
-It only accepts a PMC value to write. This is redundant with the
-C<print> opcode, so it will be deprecated.
 
 =back
 
 =head2 Filesystem Opcodes
+
+[Okay, I'm seriously considering moving most of these to methods on the
+ParrotIO object. More than that, moving them into a role that is
+composed into the ParrotIO object when needed. For the ones that have
+the form 'opcodename parrotIOobject, arguments', I can't see that it's
+much less effort than 'parrotIOobject.methodname(arguments)' for either
+manually writing PIR or generating PIR. The slowest thing about I/O is
+I/O, so I can't see that we're getting much speed gain out of making
+them opcodes. The ones to keep as opcodes are 'unlink', 'rmdir', and
+'opendir'.]
 
 =over 4
 
@@ -394,6 +606,10 @@ callback, passing it a status object.
 Most of these opcodes conform to the standard UNIX interface, but the
 layer API allows alternate implementations for each.
 
+[These I'm also considering moving to methods in a role for the ParrotIO
+object. Keep 'socket' as an opcode, or maybe just make 'socket' an
+option on creating a new ParrotIO object.]
+
 =over 4
 
 =item *
@@ -503,41 +719,6 @@ type of shutdown:
 =back
 
 
-=head1 IMPLEMENTATION
-
-The Parrot I/O subsystem uses a per-interpreter stack to provide a
-layer-based approach to I/O. Each layer implements a subset of the
-C<ParrotIOLayerAPI> vtable. To find an I/O function, the layer stack is
-searched downwards until a non-NULL function pointer is found for that
-particular slot. [We need to look into the implementation of IO layers
-for simplifications.]
-
-=head2 Synchronous and Asynchronous Operations
-
-Currently, Parrot only implements synchronous I/O operations. For the
-1.0 release the asynchronous operations will be implemented separately
-from the synchronous ones. [Eventually there may be an implementation
-that uses one variant to implement the other, but it's not an immediate
-priority.]
-
-Asynchronous operations don't use Parrot threads, they use a
-light-weight concurrency model for asynchronous operations. The
-asynchronous I/O implementation will use Parrot's I/O layer architecture
-so some platforms can take advantage of their built-in asynchronous
-operations instead of using Parrot's concurrency implementation.
-
-Communication between the calling code and the asynchronous operation
-thread will be handled by a shared status object. The operation thread
-will update the status object whenever the status changes, and the
-calling code can check the status object at any time. The status object
-contains a reference to the returned result of an asynchronous I/O call.
-
-Synchronous opcodes are differentiated from asynchronous opcodes by the
-presence of a callback argument in the asynchronous calls.  Asynchronous
-calls that don't supply callbacks (perhaps if the user wants to manually
-check later if the operation succeded) are enough of a fringe case that
-they don't need opcodes. They can access the functionality via methods
-on ParrotIO objects.
 
 =head2 Error Handling
 
