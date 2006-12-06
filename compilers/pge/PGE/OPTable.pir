@@ -275,8 +275,8 @@ Adds (or replaces) a syntactic category's defaults.
     termstack = new .ResizablePMCArray
 
     newfrom = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = newfrom(mob, 0)
-    pos = mfrom
+    $P0 = getclass 'PGE::Match'
+    (mob, pos, target, mfrom, mpos) = $P0.'new'(mob, adverbs :flat :named)
     lastpos = length target
     circumnest = 0
     expect = PGE_OPTABLE_EXPECT_START
