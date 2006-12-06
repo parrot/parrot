@@ -84,10 +84,10 @@ automatic step.
 
 =head2 Configuring Configuration
 
-The configuration system gets it's own configuration data from and is invoked
-via the F<Configure.pl> script.  The system is invoked by instantiating a
-L<Parrot::Configure> object, registers one or more steps with that object, and
-then call it's L<Parrot::Configure/runsteps> method.
+The configuration system gets its own configuration data from, and is invoked
+via, the F<Configure.pl> script.  The system is invoked by instantiating a
+L<Parrot::Configure> object, registering one or more steps with that object, 
+and then calling its L<Parrot::Configure/runsteps> method.
 
 =head2 Adding New Steps
 
@@ -207,7 +207,7 @@ The second step is F<config/init/defaults.pm>, which sets up some defaults in a
 L<Parrot::Configure::Data> object contained by the main L<Parrot::Configure>
 object.  It can be accessed via the L<Parrot::Configure/data>method.  You get
 and set configuration system's data by interacting with this object.  Some of
-it's methods are summarized below.
+its methods are summarized below.
 
 =over 4
 
