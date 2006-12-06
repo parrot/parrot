@@ -78,24 +78,20 @@ Given a PMC, get a number from it.
   .local pmc match
 
   parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'number'
-  $P0   = get_root_global ['parrot'; 'PGE::Match'], 'newfrom'
-  match = $P0(number, 0, 'TclExpr::Grammar')
   $I0 = find_not_cclass .CCLASS_WHITESPACE, str, 0, len
-  match.from($I0)
-  match.to($I0)
-  match = parse(match)
-  
-  $I0 = match.to()
+  match = parse(str, 'pos'=>$I0, 'grammar'=>'TclExpr::Grammar')
+
+  $I0 = match.'to'()
   $I1 = len - $I0
   $I0 = find_not_cclass .CCLASS_WHITESPACE, str, $I0, $I1
   if $I0 < len goto NaN
-    
+
   # the following will dump out the match object
   #load_bytecode 'dumper.pbc'
   #load_bytecode 'PGE/Dumper.pbc'
   #$P0 = get_root_global ['parrot'], '_dumper'
   #$P0(match)
- 
+
   unless match goto NaN
 
   .local pmc astgrammar, astbuilder, ast
@@ -107,7 +103,7 @@ Given a PMC, get a number from it.
   .local pmc    value
   class = ast['class']
   value = ast['value']
-  
+
   $I0    = find_type class
   number = new $I0
   assign number, value
@@ -261,17 +257,14 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     .local pmc match
 
     parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'expression'
-    $P0   = get_root_global ['parrot'; 'PGE::Match'], 'newfrom'
-    match = $P0(expression, 0, 'TclExpr::Grammar')
-    match.to(0)
-    match = parse(match)
-    
+    match = parse(expression, 'pos'=>0, 'grammar'=>'TclExpr::Grammar')
+
     # the following will dump out the match object
     #load_bytecode 'dumper.pbc'
     #load_bytecode 'PGE/Dumper.pbc'
     #$P0 = get_root_global ['parrot'], '_dumper'
     #$P0(match)
- 
+
     unless match goto premature_end
     $I0 = length expression
     $I1 = match.to()
@@ -354,17 +347,14 @@ Given a chunk of tcl code, return a subroutine.
     .local pmc match
 
     parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'program'
-    $P0   = get_root_global ['parrot'; 'PGE::Match'], 'newfrom'
-    match = $P0(code, 0, 'TclExpr::Grammar')
-    match.to(0)
-    match = parse(match)
-    
+    match = parse(code, 'pos'=>0, 'grammar'=>'TclExpr::Grammar')
+
     # the following will dump out the match object
     #load_bytecode 'dumper.pbc'
     #load_bytecode 'PGE/Dumper.pbc'
     #$P0 = get_root_global ['parrot'], '_dumper'
     #$P0(match)
- 
+
     unless match goto premature_end
     $I0 = length code
     $I1 = match.to()
