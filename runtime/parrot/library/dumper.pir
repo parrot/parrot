@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 dumper.pir - PIR version of Data::Dumper
@@ -8,21 +10,21 @@ version 0.10
 
 =head1 SYNOPSIS
 
-	...
-	# dump the P0 register
-	_dumper( P0 )
+    ...
+    # dump the P0 register
+    _dumper( P0 )
 
-	# dump the P0 register, with "name"
-	_dumper( P0, "name" )
-	...
+    # dump the P0 register, with "name"
+    _dumper( P0, "name" )
+    ...
 
-	END
-	.include "library/dumper.pir"
+    END
+    .include "library/dumper.pir"
 
 
 =head1 DESCRIPTION
 
-    PIR implementation of Perl's Data::Dumper module.
+    PIR implementation of Perl5's Data::Dumper module.
 
 =cut
 
@@ -78,6 +80,7 @@ B<Note: #2> Hash keys are now sorted using C<_sort()> (library/sort.pir)
     .param int has_name   :opt_flag
     .param string ident   :optional
     .param int has_ident  :opt_flag
+
     $P2 = _global_dumper()
     if has_ident goto w_ident
     unless has_name goto wo_name        # XXX argument order, opt 1st
@@ -94,7 +97,7 @@ ex:
 =item _register_dumper( id, sub )
 
 Registers a dumper for new PMC type. B<UNIMPLEMENTED>
-But see B<method __dunp> below.
+But see B<method __dump> below.
 
 =over 4
 
@@ -110,8 +113,8 @@ a Sub pmc, that gets called in order to dump the content of the given PMC
 
 For example:
 
-	sub = find_name "_dump_PerlArray"
-	_register_dumper( .PerlArray, sub )
+    sub = find_name "_dump_PerlArray"
+    _register_dumper( .PerlArray, sub )
 
 This function returns nothing.
 
@@ -163,9 +166,7 @@ create_type:
     store_global "Data::Dumper", "global", self
 
 END:
-    .pcc_begin_return
-    .return self
-    .pcc_end_return
+    .return( self )
 .end
 
 =back
@@ -178,6 +179,6 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, The Perl Foundation.
+Copyright (C) 2004-2006, The Perl Foundation.
 
 =cut
