@@ -15,7 +15,9 @@ use __stringToList.
   $I0 = typeof value
   if $I0 == .TclList goto done
 
-  .return __stringToList(value)
+  $P0 = __stringToList(value)
+  morph value, .Undef
+  assign value, $P0
 
 done:
   .return(value)
@@ -37,10 +39,16 @@ use __stringToDict.
   if $I0 == .TclDict goto done
   if $I0 == .TclList goto listy
   
-  .return __stringToDict(value)
+  $P0 = __stringToDict(value)
+  morph value, .Undef
+  assign value, $P0
+  .return(value)
 
 listy:
-  .return __listToDict(value)
+  $P0 = __listToDict(value)
+  morph value, .Undef
+  assign value, $P0
+  .return(value)
 
 done:
   .return(value)

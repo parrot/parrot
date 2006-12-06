@@ -66,6 +66,10 @@ Copy the contents of other to self.
 
 */
 
+    void set_pmc (PMC *other) {
+        SELF.assign_pmc(other);
+    }
+
     void assign_pmc (PMC *other) {
         STRING *hash   = string_from_const_cstring(INTERP, "hash", 4);
         STRING *undef  = string_from_const_cstring(INTERP, "Undef", 5);
