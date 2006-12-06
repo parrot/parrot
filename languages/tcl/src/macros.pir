@@ -92,9 +92,8 @@ Simplistic implementation of C<__clone>
 
 .sub __clone :method
   .sym pmc obj
-  $I0 = typeof self
-  obj = new $I0
-  obj = self
+  obj = new .Undef
+  assign obj, self
   .return(obj)
 .end
 
