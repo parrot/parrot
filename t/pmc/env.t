@@ -153,16 +153,22 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
     .local pmc pmc1
     pmc1 = new Env
     .local int bool1
+
+    does bool1, pmc1, "hash"
+    print bool1
+    print "\n"
+
     does bool1, pmc1, "scalar"
     print bool1
     print "\n"
+
     does bool1, pmc1, "no_interface"
     print bool1
     print "\n"
-    end
 .end
 CODE
 1
+0
 0
 OUTPUT
 
