@@ -1,11 +1,12 @@
 # $Id$
 
 # Setup some commands
-PERL    = @perl@
 PARROT   = ../../parrot@exe@
+PERL     = @perl@
+RM_F     = @rm_f@
 
 # default
-all:
+all: build
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -30,11 +31,11 @@ help:
 	@echo "  help:              Print this help message."
 	@echo ""
 
-all: plumhead.pbc
+plumhead.pbc: src/plumhead.pir
+	$(PARROT) -o plumhead.pbc src/plumhead.pir
 
-# the default target
-plumhead.pbc: $(PARROT) plumhead.pir
-	$(PARROT) -o plumhead.pbc plumhead.pir
+plumheadlib.pbc: src/builtins.pir
+	$(PARROT) -o plumheadlib.pbc src/builtins.pir
 
 test: all test-php test-phc-to-past
 
@@ -44,10 +45,10 @@ test-php:
 test-phc-to-past:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-phc-to-past
 
-# Nothing needs to be built
-build:
+build: plumheadlib.pbc plumhead.pbc
 
 clean: clean-test
+	$(RM_F) plumheadlib.pbc plumhead.pbc
 
 # Leave the generated test files in place
 clean-test:
