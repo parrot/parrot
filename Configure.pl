@@ -202,7 +202,7 @@ of: C<gc>, C<libc>, C<malloc> or C<malloc-trace>. The default is C<gc>.
 
 =back
 
-ICU Options
+International Components For Unicode (ICU) Options
 
 =over
 
