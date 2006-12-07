@@ -70,7 +70,7 @@ The method name may also be a string variable representing a method name:
   m = "bold"
   curses_obj.m()
 
-=head2 How do I locate or create a subroutine object
+=head2 How do I locate or create a subroutine object?
 
 There are several ways to achieve this, depending on the location of
 the subroutine.
@@ -109,7 +109,7 @@ opcode:
 
 This searches the sub "foo" in the "Foo" namespace.
 
-=head2 How do I create a Closure or Coroutine
+=head2 How do I create a Closure or Coroutine?
 
 Both carry dynamic state, therefore you use one of the above ways to
 locate the sub object, then you just clone it to get a distinct copy
@@ -177,7 +177,7 @@ to get the rest of the arguments
     num_varargs = varargs
     ...
 
-=head2 How do I pass optional arguments
+=head2 How do I pass optional arguments?
 
 Use the C<:optional> and C<:opt_flag> pragmas:
 
@@ -206,7 +206,7 @@ or the C<find_global> op:
 
     find_global $P0, "name_of_the_global"
 
-=head2 How can I delete a global
+=head2 How can I delete a global?
 
 You can retrieve the namespace hash and use the C<delete> opcode.
 
@@ -291,17 +291,17 @@ to a class (not to individual objects) like so:
 
 =head2 How do I add instance methods to a class?
 
-Methods are declared as functions in the class namespace with the C<method>
+Methods are declared as functions in the class namespace with the C<:method>
 keyword appended to the function declaration:
 
   .namespace [ "Animal" ]
 
-  .sub __init method
+  .sub __init :method
     $P0 = new .Integer
     setattribute self, "legs", $P0
     ...
   .end
-  .sub run method
+  .sub run :method
     ...
   .end
 
@@ -373,7 +373,7 @@ Just define a method named C<__init> in the namespace of the class.
 
     .namespace ["Dog"]
 
-    .sub __init method
+    .sub __init :method
       # ...
 
 Or you can specify the constructor method by setting the BUILD
@@ -400,7 +400,7 @@ or for short:
 
 During the C<new> opcode the constructor is called.
 
-=head2 How can I pass arguments to an constructor?
+=head2 How can I pass arguments to a constructor?
 
 You can pass only a single argument to a constructor.  By convention,
 a hash PMC is passed to the constructor that contains the arguments as
