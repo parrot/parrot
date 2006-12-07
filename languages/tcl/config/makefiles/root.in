@@ -197,7 +197,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/uplevel.t \
   t_tcl/upvar.t \
   t_tcl/util.t \
-  tcl/var.t \
+  t_tcl/var.t \
   t_tcl/while.t \
   t_tcl/while_old.t
 
