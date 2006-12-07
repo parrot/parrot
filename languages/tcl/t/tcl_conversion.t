@@ -40,11 +40,4 @@ is [list \{\[] {\{\[} {[ in list}
 
 is [lindex {"a \" b"} 0] {a " b} {escaped quote in quotes in list}
 
-is [lindex {{a \" b}} 0] {a \" b} {escaped quote in braces in list}
-
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
-# vim: expandtab shiftwidth=4:
+is [lindex {{a \" b}} 0] {a \" b} {escaped quote in sub-list}
