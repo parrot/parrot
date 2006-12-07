@@ -346,7 +346,7 @@ no_file:
   $S0 .= '": no such file or directory'
   tcl_error $S0
 bad_args:
-  tcl_error 'wrong # args: should be "file atime name"'
+  tcl_error 'wrong # args: should be "file atime name ?time?"'
 .end
 
 .sub 'mtime'
@@ -374,7 +374,7 @@ no_file:
   $S0 .= '": no such file or directory'
   tcl_error $S0
 bad_args:
-  tcl_error 'wrong # args: should be "file mtime name"'
+  tcl_error 'wrong # args: should be "file mtime name ?time?"'
 .end
 
 # RT#40722: Stub for test parsing
