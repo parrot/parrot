@@ -372,8 +372,6 @@ bad_args:
 
 .end
 
-
-
 .sub 'get'
   .param pmc argv
 
@@ -384,7 +382,6 @@ bad_args:
   .local pmc dictionary
   dictionary = shift argv
   dictionary = __dict(dictionary)
-
   if argc < 0 goto loop_done
 
   .local pmc key
@@ -977,4 +974,78 @@ loop_done:
 bad_args:
   tcl_error 'wrong # args: should be "dict values dictionary ?pattern?"'
 .end
+
+.sub 'with'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc ==0  goto bad_args
+
+  .local pmc read, set
+  read = get_root_global ['_tcl'], '__read'
+  set  = get_root_global ['_tcl'], '__set'
+
+  .local pmc dictionary, dict_name
+  dict_name = shift argv
+  push_eh dict_error
+    dictionary = read(dict_name)
+  clear_eh
+  dictionary = __dict(dictionary)
+  goto got_dict
+
+dict_error:
+  get_results '(0,0)', $P0, $S0
+  $I0 = index $S0, 'variable is array'
+  if $I0 != -1 goto cant_dict_array
+  dictionary = new .TclDict
+
+got_dict:
+  .local pmc body
+  body = pop argv
+  # walk to point in hierarchy for keys..
+
+while_keys:
+  .local pmc key
+  $I0 = elements argv
+  unless $I0 goto done_keys
+  key = shift argv
+  dictionary=dictionary[key]
+
+done_keys:
+  .local pmc iterator
+  iterator = new .Iterator, dictionary
+  
+alias_keys:
+  unless iterator goto done_alias
+  $P1 = shift iterator 
+  $P2 = dictionary[$P1]
+  __set($P1,$P2)
+  goto alias_keys
+done_alias:
+  .local pmc retval
+  $P1 = __script(body)
+  retval = $P1()
+
+  iterator = new .Iterator, dictionary
+update_keys:
+  unless iterator goto done_update
+  $P1 = shift iterator
+  $P2 = __read($P1)
+  dictionary[$P1] = $P2
+  goto update_keys
+
+done_update:
+  .return (retval)
+
+cant_dict_array:
+  $S1 = dict_name
+  $S1 = "can't set \"" . $S1
+  $S1 .= "\": variable is array"
+  tcl_error $S1
+
+bad_args:
+  tcl_error 'wrong # args: should be "dict with dictVar ?key ...? script"'
+.end
+
 
