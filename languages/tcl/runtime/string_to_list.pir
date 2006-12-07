@@ -190,9 +190,6 @@ loop:
   if $S0 == 'TclString'  goto is_string
   if $S0 == 'String'  goto is_string
 is_list:
-  print "TYPE IS "
-  print $S0
- print "\n"
   $P2 = __listToDict($P2)
   result[$S1] = $P2
   goto loop
