@@ -234,11 +234,17 @@ specifies the encoding to use for the input (e.g., "utf8").
     code = stdin.'readline'('> ')
     if null code goto interactive_end
     unless code goto interactive_loop
+    push_eh interactive_trap
     $P0 = self.'eval'(code, adverbs :flat :named)
+    clear_eh
     if null $P0 goto interactive_loop
     $I0 = isa $P0, 'String'
     if $I0 == 0 goto interactive_loop
     say $P0
+    goto interactive_loop
+  interactive_trap:
+    get_results '(0,0)', $P0, $S0
+    print $S0
     goto interactive_loop
   interactive_end:
     .return ()
