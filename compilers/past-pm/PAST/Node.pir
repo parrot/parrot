@@ -489,6 +489,10 @@ callmethod - Invokes a method on an object, using children
              called, the second child is the invocant, and
              the remaining children are arguments to the method call.
 
+try        - (preliminary) Execute the code given by the first 
+             child, and if any exceptions occur then handle them 
+             using the code given by the second child.
+
 If a node doesn't have a value set for C<pasttype>, then it
 assumes "pirop" if its C<pirop> attribute is set, otherwise it
 assumes "call".

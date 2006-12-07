@@ -298,6 +298,31 @@ transform until (PAST::Op) :language('PIR') {
 }
 
 
+transform try (PAST::Op) :language('PIR') {
+    .local pmc trypast, trypost, post, traplabel, endlabel
+    trypast = node[0]
+    trypost = tree.'get'('post', trypast)
+    post = trypost.'new'('POST::Ops', 'node'=>node, 'result'=>trypost)
+    $S0 = node.'unique'('trap_')
+    traplabel = post.'new'('POST::Label', 'result'=>$S0)
+    $S0 = concat $S0, '_end'
+    endlabel = post.'new'('POST::Label', 'result'=>$S0)
+    post.'push_pirop'('push_eh', traplabel)
+    post.'push'(trypost)
+    post.'push_pirop'('clear_eh')
+    post.'push_pirop'('goto', endlabel)
+    post.'push'(traplabel)
+    .local pmc catchnode, catchpast
+    catchnode = node[1]
+    unless catchnode goto have_catch
+    catchpast = tree.'get'('post', catchnode)
+    post.'push'(catchpast)
+  have_catch:
+    post.'push'(endlabel)
+    .return (post)
+}
+
+
 transform xor (PAST::Op) :language('PIR') {
     .local pmc ops
     ops = new 'POST::Ops'
@@ -361,6 +386,11 @@ transform assign (PAST::Op) :language('PIR') {
     post.'push'(lpost)
     post.'result'(lpost)
     .return (post)
+}
+
+
+transform bind (PAST::Op) :language('PIR') {
+    .return tree.'get'('assign', node)
 }
 
 
