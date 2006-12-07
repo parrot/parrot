@@ -189,7 +189,7 @@ Debian, DG/UX, Domain/OS, DragonFlyBSD, DYNIX/ptx, Embedix, EPOC,
 FreeBSD, Gentoo, HP-UX, IRIX, Linux, Mac OS (Classic), Mac OS X,
 Mandriva, Minix, MS-DOS, NetBSD, NetWare, NonStop-UX, OpenBSD, OS/2,
 Plan 9, Red Hat, RISC OS, Slackware, Solaris, SuSE, Syllable, Symbian,
-Tivo (Linux), Ubuntu, VMS, VOS, WinCE, Windows
+TiVo (Linux), Tru64, Ubuntu, VMS, VOS, WinCE, Windows
 95/98/Me/NT/2000/XP/Vista, and z/OS.
 
 Recognizing the fact that ports depend on volunteer labor, the minimum
