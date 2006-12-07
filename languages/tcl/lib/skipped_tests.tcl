@@ -36,6 +36,15 @@ array set skipped_tests {
   basic-1.1            {interp}
   basic-10.1           {interp}
   dict-2.3             {lsearch -exact}
+  dict-3.5             {nested lists}
+  dict-3.6             {nested lists}
+  dict-3.7             {nested lists}
+  dict-3.8             {nested lists}
+  dict-3.9             {nested lists}
+  dict-3.10            {nested lists}
+  dict-9.3             {nested lists}
+  dict-9.4             {nested lists}
+  dict-9.5             {nested lists}
   dict-11.1            {expr wide()}
   dict-11.2            {expr wide()}
   dict-11.3            {expr wide()}
@@ -43,9 +52,14 @@ array set skipped_tests {
   dict-11.5            {expr wide()}
   dict-11.6            {expr wide()}
   dict-11.7            {expr wide()}
+  dict-15.3            {nested lists}
+  dict-15.5            {nested lists}
+  dict-16.4            {nested lists}
   dict-14.12           stacktrace
   dict-17.13           stacktrace
-  dict-21.13           {dict update}
+  dict-21.8            {lassign}
+  dict-22.9            {nested lists}
+  dict-22.10           {nested lists}
   error-1.3            stacktrace
   error-2.3            stacktrace
   error-2.6            stacktrace
