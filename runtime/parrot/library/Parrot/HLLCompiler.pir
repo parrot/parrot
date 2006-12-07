@@ -33,6 +33,8 @@ by C<attrname> based on C<has_value>.
 
 .namespace [ 'HLLCompiler' ]
 
+.include 'cclass.pasm'
+
 .sub 'attr' :method
     .param string attrname
     .param pmc value
@@ -197,14 +199,11 @@ options provided.
     if $I0 goto end
     .local string target
     target = adverbs['target']
-    if target != '' goto evalcode_dump
+    if target != '' goto end
     $I0 = adverbs['trace']
     trace $I0
     $P0 = $P0(args :flat)
     trace 0
-    goto end
-  evalcode_dump:
-    '_dumper'($P0, target)
   end:
     .return ($P0)
 .end
@@ -221,7 +220,9 @@ specifies the encoding to use for the input (e.g., "utf8").
 .sub 'interactive' :method
     .param pmc adverbs         :slurpy :named
     .local pmc stdin
-    .local string encoding
+    .local string target, encoding
+    target = adverbs['target']
+    target = downcase target
 
     stdin = getstdin
     $I0 = stdin.'set_readline_interactive'(1)
@@ -238,12 +239,20 @@ specifies the encoding to use for the input (e.g., "utf8").
     $P0 = self.'eval'(code, adverbs :flat :named)
     clear_eh
     if null $P0 goto interactive_loop
-    $I0 = isa $P0, 'String'
-    if $I0 == 0 goto interactive_loop
+    unless target goto interactive_loop
+    if target == 'pir' goto target_pir
+    '_dumper'($P0, target)
+    goto interactive_loop
+  target_pir:
     say $P0
     goto interactive_loop
   interactive_trap:
     get_results '(0,0)', $P0, $S0
+    $S1 = substr $S0, -1, 1
+    $I0 = is_cclass .CCLASS_NEWLINE, $S1, 0
+    if $I0 goto have_newline
+    $S0 = concat $S0, "\n"
+  have_newline:
     print $S0
     goto interactive_loop
   interactive_end:
@@ -269,6 +278,9 @@ options are passed to the evaluator.
     unless null adverbs goto have_adverbs
     adverbs = new .Hash
   have_adverbs:
+    .local string target
+    target = adverbs['target']
+    target = downcase target
     .local string encoding
     encoding = adverbs['encoding']
     $I0 = does files, 'array'
@@ -296,7 +308,12 @@ options are passed to the evaluator.
     close ifh
     goto iter_loop
   iter_end:
-    .return self.'eval'(code, adverbs :flat :named)
+    $P0 = self.'eval'(code, adverbs :flat :named)
+    if target == '' goto end
+    if target == 'pir' goto end
+    '_dumper'($P0, target)
+  end:
+    .return ($P0)
 
   err_infile:
     $P0 = new .Exception
@@ -365,6 +382,10 @@ Generic method for compilers invoked from a shell command line.
   save_output:
     if null result goto end
     unless result goto end
+    .local string target
+    target = adverbs['target']
+    target = downcase target
+    if target != 'pir' goto end
     .local string output
     .local pmc ofh
     ofh = getstdout
