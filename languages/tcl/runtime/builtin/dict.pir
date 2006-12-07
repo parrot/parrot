@@ -308,6 +308,71 @@ bad_args:
   tcl_error 'wrong # args: should be "dict filter dictionary filterType ..."'
 .end
 
+.sub 'for'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc != 3 goto bad_args
+
+  .local pmc set, script
+  set     = get_root_global ['_tcl'], '__set'
+  script  = get_root_global ['_tcl'], '__script'
+
+  .local pmc varNames 
+  .local string keyVar, valueVar
+
+  varNames = shift argv
+  varNames = __list(varNames)
+  $I0 = elements varNames
+  if $I0 != 2 goto bad_list_size
+  keyVar   = varNames[0]
+  valueVar = varNames[1]
+
+  .local pmc dictionary
+  dictionary = shift argv
+  dictionary = __dict(dictionary)
+
+  .local pmc body,code
+  body = shift argv
+  code = __script(body)
+
+  .local pmc iterator
+  iterator = new .Iterator, dictionary
+for_loop:
+  unless iterator goto for_loop_done
+  $P1 = shift iterator
+  __set(keyVar,   $P1)  
+  $S1 = $P1
+  $P2 = dictionary[$S1]
+  __set(valueVar, $P2)  
+
+  push_eh loop_handler
+    code() 
+  clear_eh
+
+  goto for_loop
+
+loop_handler:
+  .catch()
+  .get_return_code($I0)
+  if $I0 == TCL_CONTINUE goto for_loop
+  if $I0 == TCL_BREAK goto for_loop_done
+  .rethrow()
+
+for_loop_done:
+
+  .return('')
+
+bad_list_size:
+  tcl_error 'must have exactly two variable names'
+
+bad_args:
+  tcl_error 'wrong # args: should be "dict for {keyVar valueVar} dictionary script"'
+
+.end
+
+
 
 .sub 'get'
   .param pmc argv
@@ -788,8 +853,6 @@ bad_args:
 
 .end
 
-
-
 .sub 'size'
   .param pmc argv
 
@@ -867,6 +930,84 @@ cant_dict_array:
 
 bad_args:
   tcl_error 'wrong # args: should be "dict unset varName key ?key ...?"'
+.end
+
+.sub 'update'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+  if argc < 4 goto bad_args
+  $I0 = argc % 2
+  if $I0 goto bad_args
+
+  .local pmc read, set
+  read = get_root_global ['_tcl'], '__read'
+  set  = get_root_global ['_tcl'], '__set'
+
+  .local pmc dictionary, dict_name
+  dict_name = shift argv
+  push_eh dict_error
+    dictionary = read(dict_name)
+  clear_eh
+  dictionary = __dict(dictionary)
+  goto got_dict
+
+dict_error:
+  get_results '(0,0)', $P0, $S0
+  $I0 = index $S0, 'variable is array'
+  if $I0 != -1 goto cant_dict_array
+  dictionary = new .TclDict
+
+got_dict:
+  .local pmc body
+  body = pop argv
+
+  .local pmc keys,varnames
+  keys = new .ResizablePMCArray
+  varnames = new .ResizablePMCArray
+  # get lists of both keys & varnames, setting the variables.
+key_loop:
+  $I0 = elements argv
+  unless $I0 goto done_key_loop
+  $P1 = shift argv
+  push keys, $P1
+  $P2 = shift argv
+  push varnames, $P2
+  $P3 = dictionary[$P1]
+  __set($P2, $P3)
+  goto key_loop
+done_key_loop: 
+# run the body of the script. save the return vaalue.
+  .local pmc retval
+  $P1 = __script(body)
+  retval = $P1()
+
+# go through the varnames, setting the appropriate keys to those values.
+  .local pmc iter1,iter2
+  iter1 = new .Iterator, keys
+  iter2 = new .Iterator, varnames
+set_loop:
+  unless iter1 goto set_loop_done
+  $P1 = shift iter1
+  $P2 = shift iter2
+  $P3 = __read($P2)
+  dictionary[$P1] = $P3
+  goto set_loop
+set_loop_done:
+
+done:
+  .return (retval)
+
+cant_dict_array:
+  $S1 = dict_name
+  $S1 = "can't set \"" . $S1
+  $S1 .= "\": variable is array"
+  tcl_error $S1
+
+bad_args:
+  tcl_error 'wrong # args: should be "dict update varName key varName ?key varName ...? script"'
+
 .end
 
 
