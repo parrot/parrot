@@ -58,8 +58,6 @@ array set skipped_tests {
   dict-14.12           stacktrace
   dict-17.13           stacktrace
   dict-21.8            {lassign}
-  dict-22.9            {nested lists}
-  dict-22.10           {nested lists}
   error-1.3            stacktrace
   error-2.3            stacktrace
   error-2.6            stacktrace

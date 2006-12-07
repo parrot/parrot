@@ -187,9 +187,28 @@ loop:
   inc pos
   $S0 = typeof $P2
   if $S0 == 'TclConst'  goto is_string
-  if $S0 == 'TclString' goto is_string
+  if $S0 == 'TclString'  goto is_string
+  if $S0 == 'String'  goto is_string
+is_list:
+  print "TYPE IS "
+  print $S0
+ print "\n"
   $P2 = __listToDict($P2)
+  result[$S1] = $P2
+  goto loop
+  
 is_string:
+  # Can we listify the value here? If so, make it into a dictionary.
+  $P3 = __list($P2)
+  $I0 = elements $P3
+  if $I0 <= 1 goto only_string
+  push_eh only_string
+    $P3 = __listToDict($P3)
+  clear_eh
+  result[$S1] = $P3
+  goto loop
+
+only_string:
   result[$S1] = $P2
   goto loop
 
