@@ -181,16 +181,33 @@ optimizing one-liners or code that'll run only once or twice.
 
 =back
 
+=head1 Target Platforms
+
+The ultimate goal of Parrot is portability to more-or-less the same
+platforms as Perl 5, including AIX, BeOS, BSD/OS, Cygwin, Darwin,
+Debian, DG/UX, Domain/OS, DragonFlyBSD, DYNIX/ptx, Embedix, EPOC,
+FreeBSD, Gentoo, HP-UX, IRIX, Linux, Mac OS (Classic), Mac OS X,
+Mandriva, Minix, MS-DOS, NetBSD, NetWare, NonStop-UX, OpenBSD, OS/2,
+Plan 9, Red Hat, RISC OS, Slackware, Solaris, SuSE, Syllable, Symbian,
+Tivo (Linux), Ubuntu, VMS, VOS, WinCE, Windows
+95/98/Me/NT/2000/XP/Vista, and z/OS.
+
+Recognizing the fact that ports depend on volunteer labor, the minimum
+requirements for the 1.0 launch of Parrot are portability to major
+versions of Linux, BSD, Mac OS X, and Windows released within 2 years
+prior to the 1.0 release. As we approach the 1.0 release we will
+actively seek porters for as many other platforms as possible.
+
 =head1 VERSION
 
 =head2 CURRENT
 
-    Maintainer: Dan Sugalski
+    Maintainer: Allison Randal
     Class: Meta
     PDD Number: 1
     Version: 1
     Status: Developing
-    Last Modified: 12 August 2003
+    Last Modified: 6 December 2006
     PDD Format: 1
     Language: English
 
