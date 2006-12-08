@@ -19,7 +19,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 # core Perl modules
-use Test::More     tests => 4;
+use Test::More     tests => 5;
 
 # Parrot modules
 use Parrot::Test;
@@ -76,5 +76,14 @@ if ( 'asdf' != 'jklö' )
 ?>
 END_CODE
 != for unequal strings
+END_EXPECTED
+
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'var_dump()' );
+<?php
+var_dump( 'asdf' );
+?>
+END_CODE
+string(4) "asdf"
 END_EXPECTED
 

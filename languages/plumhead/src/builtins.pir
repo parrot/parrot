@@ -207,6 +207,24 @@
 .sub var_dump
     .param pmc a
 
+    .local string type_of_pmc
+    type_of_pmc = typeof a
+
+    ne type_of_pmc, 'String', not_a_string
+        .local int string_len
+
+	string_len = a
+        print 'string('
+	print string_len
+	print ') "'
+	print a
+	print '"'
+	say ''
+
+       .return()
+
+not_a_string:
+
     _dumper(a)
 
     .return()

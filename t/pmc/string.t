@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2006, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 47;
 
 =head1 NAME
 
@@ -1352,6 +1352,19 @@ pir_output_like( <<'CODE', <<'OUTPUT', "to_int 3");
 .end
 CODE
 /invalid conversion to int - bad base 37/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "elements gives length of string");
+.sub 'main' :main
+    .local pmc s
+    s = new .String
+    s = "123456789"
+    $I0 = elements s
+    print $I0
+    say ''
+.end
+CODE
+9
 OUTPUT
 
 # Local Variables:
