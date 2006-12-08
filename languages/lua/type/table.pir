@@ -93,8 +93,8 @@ L2:
     goto L4
 L3:
     value = meth(self, key)
-L2:
     unless_null value, L1
+L2:
     new ret, .LuaNil
     goto L4
 L1:
