@@ -213,13 +213,13 @@
     ne type_of_pmc, 'String', not_a_string
         .local int string_len
 
-	string_len = a
+        string_len = elements a
         print 'string('
-	print string_len
-	print ') "'
-	print a
-	print '"'
-	say ''
+        print string_len
+        print ') "'
+        print a
+        print '"'
+        say ''
 
        .return()
 
