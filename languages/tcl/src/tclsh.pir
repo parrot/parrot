@@ -276,10 +276,16 @@ no_prompt:
   if readlineInd == 1 goto has_readline
   print default_prompt
   STDOUT.'flush'()
+  $S0 = readline STDIN
+  unless STDIN goto eof
+  .return($S0)
+
+eof:
+  null $P0
+  .return($P0)
+
 has_readline:
   $P0 = STDIN.'readline'(default_prompt)
   .return ($P0)
-
-got_nothing:
 .end
 
