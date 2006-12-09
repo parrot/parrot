@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 31;
 use Test::More;
 
 language_output_is( 'tcl', <<'TCL', <<'OUT', 'multiple foreaches. seems to need puts to trigger.' );
@@ -148,6 +148,18 @@ OUT
 
 language_output_is( "tcl", <<'TCL', <<'OUT', "extra characters after close-brace" );
   list {a}a
+TCL
+extra characters after close-brace
+OUT
+
+language_output_is( "tcl", <<'TCL', <<'OUT', "extra characters after close-quote" );
+  puts [list "a"a]
+TCL
+extra characters after close-quote
+OUT
+
+language_output_is( "tcl", <<'TCL', <<'OUT', "extra characters after close-brace" );
+  puts [list {a}a]
 TCL
 extra characters after close-brace
 OUT

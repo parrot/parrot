@@ -40,8 +40,8 @@ token command_substitution {
 
 token subcommand {
     | \# \N*
-    | [ $<word>:=( <quoted_word>
-                 | <braced_word>
+    | [ $<word>:=( <quoted_word> [<before [<[\];\n\r\t\ ]>|$]> | <error: extra characters after close-quote> ]
+                 | <braced_word> [<before [<[\];\n\r\t\ ]>|$]> | <error: extra characters after close-brace> ]
                  | $<chunk>:=( <substitution> | \$ | <-[[$\]\\;\n\r\t\ ]>+ )+
                  ) \h*
       ]+
