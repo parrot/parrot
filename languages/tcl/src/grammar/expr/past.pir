@@ -7,14 +7,15 @@ PAST - Abstract syntax tree nodes for tcl expressions.
 This file implements the various abstract syntax tree nodes
 needed for tcl expressions. The currently defined ast nodes:
 
-    PAST::Node       - base class for all ast nodes
+    PAST::Node           - base class for all ast nodes
 
-    PAST::Command    - a tcl command to be evaluated.
-    PAST::Cond       - a conditional expression.
-    PAST::Op         - a operation
-    PAST::MathFunc   - a math function
-    PAST::Val        - a constant value
-    PAST::Var        - a variable
+    PAST::DynamicCommand - a (dynamic) tcl command to be evaluated
+    PAST::StaticCommand  - a (static) tcl command to be evaluated
+    PAST::Cond           - a conditional expression
+    PAST::Op             - a operation
+    PAST::MathFunc       - a math function
+    PAST::Val            - a constant value
+    PAST::Var            - a variable
 
 The C<PAST::Node> class itself is derived from C<Hash>, so
 that it's easy to store and retrieve attributes from each
@@ -42,7 +43,8 @@ Creates the C<PAST::*> classes.
     addattribute base, '$.source'                  # original source
     addattribute base, '$.pos'                     # offset position
 
-    $P0 = subclass base, 'PAST::Command'
+    $P0 = subclass base, 'PAST::DynamicCommand'
+    $P0 = subclass base, 'PAST::StaticCommand'
     $P0 = subclass base, 'PAST::Cond'
     $P0 = subclass base, 'PAST::Expr'
     $P0 = subclass base, 'PAST::MathFunc'

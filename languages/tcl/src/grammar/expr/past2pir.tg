@@ -195,7 +195,134 @@ transform pir (PAST::MathFunc) {
     .return (pir)
 }
 
-transform pir (PAST::Command) {
+transform pir (PAST::StaticCommand) {
+    .local pmc args, children, iter, pir, reg
+    
+    pir  = new 'PGE::CodeString'
+    args = new .ResizablePMCArray
+    children = node.'get_children'()
+    iter = new .Iterator, children
+
+    .local string name
+    $P0  = shift iter
+    name = $P0['value']
+
+  iter_loop: 
+    unless iter goto iter_done
+    $P1 = shift iter
+    $P0 = tree.get('pir', $P1)
+    reg = $P1['ret']
+    push args, reg
+    pir .= $P0
+    pir.emit("%0 = clone %0", reg)
+    goto iter_loop
+  iter_done:
+    .local string retval
+    retval = pir.unique('$P')
+
+    .local string invalid_, done_, exec_
+    invalid_ = pir.unique('invalid_')
+    done_    = pir.unique('done_')
+    exec_    = pir.unique('exec_')
+
+    $P0 = shift children
+    $S0 = $P0['value']
+    $P1 = get_root_global ['_tcl'; 'builtins'], $S0
+    if null $P1 goto dynamic
+
+    .local pmc serno
+    .local int register_num
+    serno = get_root_global ['parrot'; 'PGE::CodeString'], "$!serno"
+    register_num = serno
+
+    (register_num, $P0) = $P1(register_num,children,args)
+    if null $P0 goto dynamic
+    serno = register_num
+
+    .local pmc epoch
+    epoch = get_root_global ['_tcl'], 'epoch'
+    $S0 = pir.unique('dynamic_')
+    pir.emit('  if epoch != %0 goto %1', epoch, $S0)
+    pir .= $P0
+    pir.emit('  %0 = $P%1', retval, register_num)
+    pir.emit('  goto %0', done_)
+    pir.emit('%0:', $S0)
+
+  dynamic:
+    .local string ns
+    ns  = ''
+    $S0 = join ", ", args
+    $I0 = index name, "::"
+    if $I0 == -1 goto no_ns
+
+    .local pmc split, colons
+    split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
+    colons = get_root_global ['_tcl'], 'colons'
+    $P0    = split(colons, name)
+    $S1    = pop $P0
+
+    $S1 = '&' . $S1
+    $S1 = pir.escape($S1)
+
+    $S2 = $P0[0]
+    if $S2 == "" goto root_ns
+
+    ns = join "'; '", $P0
+    ns = "['" . ns
+    ns = ns . "'], "
+
+    .local string root_
+    root_ = pir.unique('root_')
+    pir.emit(<<'END_PIR', retval, ns, $S1, root_, exec_)
+    %0 = get_global %1 %2
+    if null %0 goto %3
+    goto %4
+%3:
+END_PIR
+    unshift $P0, ""
+
+  root_ns:
+    $S2 = shift $P0
+    $I0 = elements $P0
+    if $I0 == 0 goto root_ns_emit
+
+    ns = join "'; '", $P0
+    ns = "['" . ns
+    ns = ns . "'], "
+
+  root_ns_emit:
+    pir.emit(<<'END_PIR', retval, ns, $S1, invalid_, exec_)
+    %0 = get_hll_global %1 %2
+    if null %0 goto %3
+%4:
+END_PIR
+    goto emit
+
+  no_ns:
+    $S1 = '&' . name
+    $S1 = pir.escape($S1)
+    pir.emit(<<'END_PIR', retval, $S1, invalid_)
+    %0 = find_name %1
+    if null %0 goto %2
+END_PIR
+
+  emit:
+    $S3  = pir.escape(name)
+    pir.emit(<<'END_PIR', retval, $S3, $S0, invalid_, done_)
+    %0 = %0(%2)
+    goto %4
+%3:
+    $S0 = %1
+    $S0 = 'invalid command name "' . $S0
+    $S0 .= '"'
+    tcl_error $S0
+%4:
+END_PIR
+    node['ret'] = retval
+    .return(pir)
+}
+
+transform pir (PAST::DynamicCommand) {
     .local pmc args, children, iter, pir, reg
     
     pir  = new 'PGE::CodeString'
@@ -218,46 +345,24 @@ transform pir (PAST::Command) {
     
     $S1 = pir.unique('invalid_')
     $S2 = pir.unique('done_')
-    $S3 = pir.unique('dynamic_')
 
     $P0 = shift children
     $S0 = $P0['value']
-    $P1 = get_root_global ['_tcl'; 'builtins'], $S0
-    if null $P1 goto dynamic
-
-    .local pmc serno
-    .local int register_num
-    serno = get_root_global ['parrot'; 'PGE::CodeString'], "$!serno"
-    register_num = serno
-
-    (register_num, $P0) = $P1(register_num,children,args)
-    if null $P0 goto dynamic
-    serno = register_num
-
-    .local pmc epoch
-    epoch = get_root_global ['_tcl'], 'epoch'
-    pir.emit('  if epoch != %0 goto %1', epoch, $S3)
-    pir .= $P0
-    pir.emit('  %0 = $P%1', retval, register_num)
-    pir.emit('goto %0', $S2)
-
-dynamic:
     $S0 = join ", ", args
     $S4 = pir.unique('curr_namespace')
     $S5 = pir.unique('root_namespace')
-    pir.emit(<<'END_PIR', retval, name, $S0, $S1, $S2, $S3, $S4, $S5)
-%5:
+    pir.emit(<<'END_PIR', retval, name, $S0, $S1, $S2, $S4, $S5)
   $S0 = %1
   $P0 = split(colons, $S0)
   $S0 = ""
   $I0 = elements $P0
-  if $I0 == 0 goto %6
+  if $I0 == 0 goto %5
   $S0 = pop $P0
-  if $I0 == 1 goto %6
+  if $I0 == 1 goto %5
   $S1 = $P0[0]
-  if $S1 != "" goto %6
+  if $S1 != "" goto %5
   $S1 = shift $P0
-%7:
+%6:
   %0 = get_hll_namespace $P0
   if null %0 goto %3
   $S1 = '&' . $S0
@@ -265,12 +370,12 @@ dynamic:
   if null %0 goto %3
   %0  = %0(%2)
   goto %4
-%6:
+%5:
   %0 = get_namespace $P0
-  if null %0 goto %7
+  if null %0 goto %6
   $S1 = '&' . $S0
   %0  = %0[$S1]
-  if null %0 goto %7 # try the root namespace if it's not in the current
+  if null %0 goto %6 # try the root namespace if it's not in the current
   %0  = %0(%2)
   goto %4
 %3:

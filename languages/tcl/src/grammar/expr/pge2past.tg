@@ -514,15 +514,28 @@ transform past (array) {
 }
 
 transform past (command) {
-    .local pmc past
-    past = new 'PAST::Command'
-    past.set_node(node)
-    
-    .local pmc words, iter
+    .local pmc past, words, iter
     words = node['word']
     if null words goto empty
 
-    iter  = new .Iterator, words
+    iter = new .Iterator, words
+    $P0 = shift iter
+    $P0 = tree.'get'('dispatch', $P0, 'TclExpr::Grammar')
+
+    $I0 = find_type 'PAST::Val'
+    $I1 = typeof $P0
+    if $I0 == $I1 goto static
+
+    $I0 = find_type 'PAST::DynamicCommand'
+    goto create_node
+
+static:
+    $I0 = find_type 'PAST::StaticCommand'
+create_node:
+    past = new $I0
+    past.set_node(node)
+    past.'add_child'($P0)
+    
 loop:
     unless iter goto end
     $P0 = shift iter
