@@ -37,10 +37,10 @@ transform pir (PAST::Program) {
     pir = new 'PGE::CodeString'
 
     pir.emit(<<'END_PIR')
-  .local pmc colons, split, epoch
-  colons = get_root_global ['_tcl'], 'colons'
-  split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
-  epoch = get_root_global ['_tcl'], 'epoch'
+    .local pmc colons, split, epoch
+    colons = get_root_global ['_tcl'], 'colons'
+    split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
+    epoch = get_root_global ['_tcl'], 'epoch'
 END_PIR
 
     .local pmc iter, child
@@ -207,6 +207,9 @@ transform pir (PAST::StaticCommand) {
     $P0  = shift iter
     name = $P0['value']
 
+    .local int pastvar
+    pastvar = find_type 'PAST::Var'
+
   iter_loop: 
     unless iter goto iter_done
     $P1 = shift iter
@@ -214,7 +217,9 @@ transform pir (PAST::StaticCommand) {
     reg = $P1['ret']
     push args, reg
     pir .= $P0
-    pir.emit("%0 = clone %0", reg)
+    $I0 = typeof $P1
+    unless $I0 == pastvar goto iter_loop
+    pir.emit("    %0 = clone %0", reg)
     goto iter_loop
   iter_done:
     .local string retval

@@ -182,6 +182,7 @@ loop:
     unless iter goto end
     $P0 = shift iter
     $P0 = tree.'get'('past', $P0, 'command')
+    if null $P0 goto loop
     past.'add_child'($P0)
     goto loop
 end:
@@ -546,10 +547,7 @@ end:
     .return(past)
 
 empty:
-    past = new 'PAST::Val'
-    past.set_node(node)
-    past['class'] = 'TclString'
-    past['value'] = ''
+    null past
     .return(past)
 }
 
