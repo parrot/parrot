@@ -27,7 +27,7 @@ Test  [ 'CGI'; 'QueryHash' ]
     is   = get_hll_global ['Test::More'], 'is'
     ok   = get_hll_global ['Test::More'], 'ok'
 
-    plan(6)
+    plan(7)
 
     .local int    is_defined
     .local pmc    query_hash
@@ -57,6 +57,11 @@ Test  [ 'CGI'; 'QueryHash' ]
     is( val, 'green', 'second of three GET params' )
     val = query_hash['water']
     is( val, 'wet', 'third of three GET params' )
+
+    my_env['QUERY_STRING'] = 'a=1'
+    query_hash = parse_get_sub()
+    val = query_hash['a']
+    is( val, '1', 'numeric value' )
 
 .end   
 

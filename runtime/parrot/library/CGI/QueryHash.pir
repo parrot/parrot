@@ -82,7 +82,8 @@ end_parse_post:
 
 =item parse
 
-Split inta a hash.
+Split into a hash.
+'[]' indicates that the value should be put into an array.
 
 =cut
 
@@ -92,8 +93,8 @@ Split inta a hash.
     unless query goto END
 
     .local pmc query_hash, items, items_tmp_1, items_tmp_2
-    .local string query, kv, k, v, item_tmp_1, item_tmp_2
-    .local int i, j, n, o
+    .local string query, kv, k, v, item_tmp_1, item_tmp_2, last_chars_of_k
+    .local int i, j, n, o, len_of_k
 
     query_hash      = new .Hash
     items           = new .ResizableStringArray
@@ -133,6 +134,19 @@ no_val:
     v = 1
 set_val:
     v = urldecode(v)
+    # a special case: [] indicates an array
+    len_of_k = length k
+    if len_of_k <= 2 goto v_isnt_array 
+    last_chars_of_k = substr k, -2
+    ne last_chars_of_k, '[]', v_isnt_array 
+        .local pmc v_array
+	# TODO: This should be an array
+	v_array = new .Hash
+	v_array[0] = v
+        substr k, -2, 2, ''
+        query_hash[k] = v_array
+        branch next_item
+v_isnt_array:
     query_hash[k] = v
 
 next_item:
