@@ -128,7 +128,7 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
   </past:Var>
 </xsl:template>
 
-<xsl:template match="phc:AST_variable[phc:AST_expr_list/phc:Token_string]" >
+<xsl:template match="phc:AST_variable[phc:AST_expr_list/phc:Token_string | phc:AST_expr_list/phc:Token_int]" >
   <past:Var scope="keyed" >
     <xsl:choose>
       <xsl:when test="phc:Token_variable_name/phc:value = '_GET' or phc:Token_variable_name/phc:value = '_POST'" >
@@ -137,12 +137,12 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
         </past:Var>
       </xsl:when>
       <xsl:otherwise>
-        <past:Var viviself=".Capture" islvalue="1" >
+        <past:Var viviself=".Hash" islvalue="1" >
           <xsl:attribute name="name" ><xsl:value-of select="phc:Token_variable_name/phc:value" /></xsl:attribute>
         </past:Var>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:apply-templates select="phc:AST_expr_list/phc:Token_string" />
+    <xsl:apply-templates select="phc:AST_expr_list/phc:Token_string | phc:AST_expr_list/phc:Token_int" />
   </past:Var>
 </xsl:template>
 

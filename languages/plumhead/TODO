@@ -8,6 +8,7 @@ TODO:
   - Call 'php' from plumhead.pir, make testing more simple
   - Support for the superglobals  _POST and _GET
   - Implement var_dump()
+  - Subclass OrderedHash for PlumheadArray
 
 DONE:
   - Start a builtins library
