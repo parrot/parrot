@@ -51,8 +51,8 @@ dispatch:
     unless null $P0 goto number
     $P0 = node['quoted_word']
     unless null $P0 goto quoted_word
-    $P0 = node['function']
-    unless null $P0 goto function
+    $P0 = node['mathfunc']
+    unless null $P0 goto mathfunc
     $P0 = node['command']
     unless null $P0 goto program
     $P0 = node['subcommand']
@@ -85,8 +85,8 @@ chunks:
 operator:
     .return tree.get('past', node, 'operator')
 
-function:
-    .return tree.get('past', $P0, 'function')
+mathfunc:
+    .return tree.get('past', $P0, 'mathfunc')
 
 quoted_word:
     .return tree.get('past', $P0, 'quoted_word')
@@ -189,7 +189,7 @@ end:
     .return(past)
 }
 
-transform past (function) {
+transform past (mathfunc) {
     .local string function_name
     .local pmc args
     .local int argc

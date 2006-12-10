@@ -68,7 +68,7 @@ token term {
     | <quoted_word>
     | <braced_word>
     | <number>
-    | <function>
+    | <mathfunc>
     | <nested>
     | <boolean>
     | <[a..zA..Z]> <syntax_error_variable_or_function>
@@ -103,7 +103,7 @@ token unary_function {
 
 token binary_function { atan2 | fmod | hypot | pow }
 
-token function {
+token mathfunc {
   [ <binary_function> | <unary_function> | <nullary_function> 
   | ( <[a..zA..Z]>\w* )  \(  <unknown_math_function>  ]
         \( [<expression> [, <expression>]*]? \)
