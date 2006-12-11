@@ -28,7 +28,7 @@ token substitution {
 }
 
 token quoted_word {
-    " $<chunk>:=( <substitution> | \$ | <-[[$\\"]>+ )* "
+    " $<chunk>:=( <substitution> | \$ | <-[[$\\"]>+ )* [ " | <error: missing "> ]
 }
 
 token braced_word { <PGE::Text::bracketed: {}> }

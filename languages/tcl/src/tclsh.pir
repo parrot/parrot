@@ -89,7 +89,7 @@ loop_error:
   # Are we just missing a close-foo?
   if exception_msg == 'missing close-brace'   goto input_loop_continue2
   if exception_msg == 'missing close-bracket' goto input_loop_continue2
-  if exception_msg == "missing quote"         goto input_loop_continue2
+  if exception_msg == 'missing "'             goto input_loop_continue2
   
 loop_error_real:
   .get_stacktrace($S0)
