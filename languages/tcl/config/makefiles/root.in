@@ -182,7 +182,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/proc_old.t \
   t_tcl/pwd.t \
   t_tcl/regexp.t \
-  t_tcl/regexComp.t \
+  t_tcl/regexpComp.t \
   t_tcl/rename.t \
   t_tcl/scan.t \
   t_tcl/security.t \
