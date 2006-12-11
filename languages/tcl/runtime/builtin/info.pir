@@ -11,7 +11,7 @@
   .param pmc argv :slurpy
 
   .local int argc
-  argc = argv
+  argc = elements argv
   unless argc goto bad_args
 
   .local string subcommand_name
@@ -68,7 +68,7 @@ bad_subcommand:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc != 1 goto bad_args
 
   .local pmc retval
@@ -94,7 +94,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc != 1 goto bad_args
 
   .local pmc retval
@@ -130,6 +130,8 @@ bad_args:
   .return(1)
  
 nope:
+  get_results '(0,0)', $P0, $S0
+  say $S0
   .return(0)
  
 bad_args:
@@ -140,7 +142,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc != 3 goto bad_args
 
   .local pmc retval
@@ -216,7 +218,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc > 1 goto bad_args
 
   .local pmc mathfunc,iterator,retval
@@ -226,34 +228,26 @@ bad_args:
   iterator = 0
   retval = new .TclList
 
-  if argc == 0 goto loop
   .local pmc globber,rule,match
   globber = compreg 'PGE::Glob'
+  if argc == 1 goto got_glob
+  $S1 = '&*'
+  goto compile
+got_glob:
   $S1 = argv[0]
   $S1 = '&' . $S1
+compile:
   rule = globber.'compile'($S1)
-pattern_loop:
-  unless iterator goto pattern_end
+loop:
+  unless iterator goto end
   $S0 = shift iterator
   $P0 = mathfunc[$S0]
-  $I0 = isa $P0, 'Sub'
-  unless $I0 goto pattern_loop
   match = rule($S0)
-  unless match goto pattern_loop
-  $P0 = new .TclString
+  unless match goto loop
   $S1 = substr $S0, 1
-  $P0 = $S1
-  push retval, $P0
-pattern_end:
-  .return(retval)
-
-loop:
-  $S0 = shift iterator
-  $P0 = new .TclString
-  $S1 = substr $S0, 1
-  $P0 = $S1
-  push retval, $P0
-  if iterator goto loop
+  push retval, $S1
+  goto loop
+end:
   .return(retval)
 
 bad_args:
@@ -264,7 +258,7 @@ bad_args:
     .param pmc argv
 
     .local int argc
-    argc = argv
+    argc = elements argv
     if argc > 1 goto bad_args
     .local pmc matching 
     null matching
@@ -316,7 +310,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc != 1 goto bad_args
 
   .local string varname
@@ -339,7 +333,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   if argc != 0 goto bad_args
 
@@ -412,11 +406,44 @@ find_level:
   .return(level)
 .end
 
-# RT#40743: globals - should be doable. - just walk the "Tcl" namespace.
-#    this is a stub just to assist parsing.
 .sub 'globals'
   .param pmc argv
-  .return(0)
+
+  .local int argc
+  argc = elements argv
+  if argc > 1 goto bad_args
+
+  .local pmc ns,iterator,retval
+
+  ns = get_root_namespace ['tcl']
+  iterator = new .Iterator, ns
+  iterator = 0
+  retval = new .TclList
+
+  .local pmc globber,rule,match
+  globber = compreg 'PGE::Glob'
+  if argc == 1 goto got_glob
+  $S1 = "$*"
+  goto compile
+got_glob:
+  $S1 = argv[0]
+  $S1 = '$' . $S1
+compile:
+  rule = globber.'compile'($S1)
+loop:
+  unless iterator goto end
+  $S0 = shift iterator
+  $P0 = ns[$S0]
+  match = rule($S0)
+  unless match goto loop
+  $S1 = substr $S0, 1
+  push retval, $S1
+  goto loop
+end:
+  .return(retval)
+
+bad_args:
+  tcl_error 'wrong # args: should be "info globals ?pattern?"'
 .end
 
 # RT#40739: stub
