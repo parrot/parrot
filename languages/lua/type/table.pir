@@ -25,6 +25,7 @@ Now, Lua 5 uses a hybrid data structure with a Hash part and an Array part.
     load_bytecode 'languages/lua/type/base_lua.pir'
     $P0 = subclass 'base_lua', 'table'
     addattribute $P0, 'hash'
+    addattribute $P0, 'iter'
 .end
 
 .namespace [ 'table' ]
@@ -39,7 +40,9 @@ Now, Lua 5 uses a hybrid data structure with a Hash part and an Array part.
     $S0 = classname key
     $S1 = key
     $S0 .= $S1
-    .return ($S0)
+    new $P0, .Key
+    set $P0, $S0 
+    .return ($P0)
 .end
 
 .sub '_set' :anon
@@ -47,14 +50,17 @@ Now, Lua 5 uses a hybrid data structure with a Hash part and an Array part.
     .param pmc key
     .param pmc value
     $P0 = getattribute t, 'hash'
-    $S0 = _make_key(key)
+    $P1 = _make_key(key)
     $I0 = isa value, 'LuaNil'
     unless $I0 goto L1
-    delete $P0[$S0]
+    delete $P0[$P1]
     goto L2
 L1:
-    $P1 = clone value
-    $P0[$S0] = $P1
+    $P2 = clone key
+    $P3 = clone value
+    new $P4, .Pair
+    $P4[$P2] = $P3
+    $P0[$P1] = $P4
 L2:
 .end
 
@@ -64,8 +70,11 @@ L2:
     .local pmc ret
     null ret
     $P0 = getattribute t, 'hash'
-    $S0 = _make_key(key)
-    ret = $P0[$S0]
+    $P1 = _make_key(key)
+    $P2 = $P0[$P1]
+    if_null $P2, L1
+    ret = $P2.'value'() 
+L1:
     .return (ret)
 .end
 
@@ -73,8 +82,8 @@ L2:
     .param pmc t
     .param pmc key
     $P0 = getattribute t, 'hash'
-    $S0 = _make_key(key)
-    $I0 = exists $P0[$S0]
+    $P1 = _make_key(key)
+    $I0 = exists $P0[$P1]
     .return ($I0)
 .end
 
@@ -189,18 +198,17 @@ L2:
     .return (ret)
 L1:
     .local pmc key
-    .local pmc value
     .local int idx
     new ret, .LuaNumber
     new key, .LuaNumber
     idx = 1
     key = idx
-    value = _get(self, key)
+    $I0 = _has(self, key)
 L3:
-    if_null value, L4
+    unless $I0 goto L4
     inc idx
     key = idx
-    value = _get(self, key)
+    $I0 = _has(self, key)
     goto L3
 L4:
     dec idx
@@ -214,18 +222,29 @@ L4:
 
 .sub 'next' :method
     .param pmc index
-    .local pmc value
-    .local pmc ret
+    $P0 = getattribute self, 'hash'
+    push_eh _handler
     if index goto L1
-    new index, .LuaNumber
-    set index, 0.0
+    $P1 = new .Iterator, $P0
+    setattribute self, 'iter', $P1
+    goto L2
 L1:
-    inc index
-    value = _get(self, index)
-    if_null value, L2
-    ret = clone value
-    .return (index, ret)
+    $P1 = getattribute self, 'iter'
 L2:
+    $P2 = shift $P1
+    $P3 = $P0[$P2]
+    .local pmc key
+    .local pmc value
+    $P4 = $P3.'key'()
+    key = clone $P4 
+    $P4 = $P3.'value'()
+    value = clone $P4 
+    .return (key, value)
+_handler:
+    .local pmc ret
+#    removeattribute self, 'iter'
+    null $P0
+    setattribute self, 'iter', $P0    
     new ret, .LuaNil
     .return (ret)
 .end

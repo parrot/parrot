@@ -23,7 +23,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 5;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for ipairs' );
@@ -38,6 +38,15 @@ CODE
 3	Tuesday
 OUT
 
+language_output_is( 'lua', <<'CODE', <<'OUT', 'for ipairs (hash)' );
+t = {a=10, b=100}
+
+for i, v in ipairs(t) do
+    print(i, v)
+end
+CODE
+OUT
+
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for pairs' );
 a = {"Sunday", "Monday", "Tuesday"}
 
@@ -48,6 +57,17 @@ CODE
 1
 2
 3
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'for pairs (hash)' );
+t = {a=10, b=100}
+
+for k in pairs(t) do
+    print(k)
+end
+CODE
+a
+b
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for break' );

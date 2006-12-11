@@ -487,8 +487,6 @@ will iterate over all key--value pairs of table C<t>.
 
 See C<next> for the caveats of modifying the table during its traversal.
 
-STILL INCOMPLETE (see next).
-
 =cut
 
 .sub '_lua_pairs' :anon

@@ -271,8 +271,6 @@ Returns the largest positive numerical index of the given table, or zero if
 the table has no positive numerical indices. (To do its job this function
 does a linear traversal of the whole table.)
 
-STILL INCOMPLETE (see next in table.pir).
-
 =cut
 
 .sub '_table_maxn' :anon

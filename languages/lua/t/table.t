@@ -26,7 +26,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 13;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function concat' );
@@ -72,6 +72,14 @@ CODE
 1	a
 2	b
 3	c
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function foreach (hash)' );
+t = {a=10, b=100}
+table.foreach(t, print)
+CODE
+a	10
+b	100
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function foreachi' );
@@ -124,11 +132,20 @@ print(table.maxn(t))
 t[1] = "a"
 t[2] = "b"
 print(table.maxn(t))
--- t[6] = "g"
--- print(table.maxn(t))
+t[6] = "g"
+print(table.maxn(t))
 CODE
 0
 2
+6
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function maxn' );
+a = {}
+a[10000] = 1
+print(table.maxn(a))
+CODE
+10000
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function remove' );
