@@ -70,6 +70,7 @@ input_loop:
   $P0 = __prompt(level, readlineInd)
   if null $P0 goto done
   $S0 = $P0
+  $S0 .= "\n" # add back in the newline the prompt chomped
   input_line .= $S0
   push_eh loop_error
     $P2 = __script(input_line)
