@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 41
+plan 42
 
 eval_is {info} \
   {wrong # args: should be "info option ?arg arg ...?"} \
@@ -68,6 +68,11 @@ proc say {a} {
   puts $a
   #fun
 } {info body normal proc}
+
+eval_is {info body ::say} {
+  puts $a
+  #fun
+} {info body should respect fully qualified procs}
 
 eval_is {info functions a b} \
   {wrong # args: should be "info functions ?pattern?"} \
