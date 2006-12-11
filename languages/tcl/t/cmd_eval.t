@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 7
+plan 8
 
 eval_is {eval} \
   {wrong # args: should be "eval arg ?arg ...?"} \
@@ -23,3 +23,8 @@ eval_is {
 eval_is {eval "set a \{"}  {missing close-brace}   {close brace}
 eval_is {eval "set a \["}  {missing close-bracket} {close bracket}
 eval_is {eval {set a "}}   {missing "}             {close quote}
+
+eval_is {eval {set a "
+bar"}} {
+bar} {keep whitespace inside quotes}
+
