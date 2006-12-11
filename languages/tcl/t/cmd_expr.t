@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 246
+plan 247
 
 # simple scalars
 is [expr 42]     42   {int}
