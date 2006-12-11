@@ -116,10 +116,24 @@ bad_args:
   tcl_error 'wrong # args: should be "info body procname"'
 .end
 
-
-# XXX stub to compile tcltest.tcl
 .sub 'complete'
-  .return (1)
+  .param pmc argv
+  .local int argc
+  argc = elements argv
+  if argc != 1 goto bad_args
+
+  .local pmc body
+  body = argv[0]
+  push_eh nope
+    $P1 = __script(body)
+  clear_eh
+  .return(1)
+ 
+nope:
+  .return(0)
+ 
+bad_args:
+  tcl_error 'wrong # args: should be "info complete command"'
 .end
 
 .sub 'default'
