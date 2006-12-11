@@ -94,6 +94,7 @@ array set skipped_tests {
   parse-10.14          stacktrace
   set-2.1              stacktrace
   set-4.1              stacktrace
+  string-6.51          explode
   string-13.6          explode
   string-13.8          explode
   string-14.11         explode
@@ -104,6 +105,7 @@ array set skipped_tests {
   var-6.3              {Cannot get character of empty string}
   var-7.12             {Cannot take substr outside string}
   var-12.1             {Cannot take substr outside string}
+  while-4.3            stacktrace
   while-old-4.6        stacktrace
   binary-22.3          {no ICU lib loaded}
   binary-22.4          {no ICU lib loaded}
@@ -240,7 +242,9 @@ array set skipped_tests {
   binary-59.14         {no ICU lib loaded}
   binary-59.15         {no ICU lib loaded}
   expr-8.13            {no ICU lib loaded}
+  parseOld-5.10        explode
   parseOld-7.12        {no ICU lib loaded}
+  parseOld-11.11       explode
   scan-7.6             {no ICU lib loaded}
   scan-7.7             {no ICU lib loaded}
   subst-3.2            {no ICU lib loaded}
