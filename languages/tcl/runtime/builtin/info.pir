@@ -131,7 +131,12 @@ bad_args:
  
 nope:
   get_results '(0,0)', $P0, $S0
-  say $S0
+  if $S0 == 'missing close-brace'   goto fail
+  if $S0 == 'missing close-bracket' goto fail
+  if $S0 == 'missing "'             goto fail
+  rethrow $P0
+
+fail:
   .return(0)
  
 bad_args:
