@@ -88,6 +88,7 @@ array set skipped_tests {
   lindex-3.7           {expr wide()}
   misc-1.2             stacktrace
   namespace-old-2.5    explode
+  namespace-old-2.6    explode
   namespace-old-2.7    explode
   parse-9.2            stacktrace
   parse-10.14          stacktrace
@@ -295,4 +296,5 @@ array set abort_after {
   iocmd-12.8           {invalid command name "close"}
   basic-49.2           {can't delete "run" command doesn't exist}
   filename-11.13       {invalid command name "cd"}
+  namespace-old-10.8   explode
 }
