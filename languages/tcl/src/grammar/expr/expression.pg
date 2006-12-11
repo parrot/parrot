@@ -31,11 +31,15 @@ token quoted_word {
     " $<chunk>:=( <substitution> | \$ | <-[[$\\"]>+ )* [ " | <error: missing "> ]
 }
 
-token braced_word { <PGE::Text::bracketed: {}> }
+token braced_word {
+    <PGE::Text::bracketed: {}>
+  | \{ <error: missing close-brace>
+}
 
 token command_substitution {
     \[ \]
-  | \[ <[;\n\r\t\ ]>* <subcommand> [ <?ws> <[\n;]> <?ws> <subcommand>? ]* [ \] | <error: missing close-bracket> ]
+  | \[ <[;\n\r\t\ ]>* <subcommand> [ <?ws> <[\n;]> <?ws> <subcommand>? ]* \]
+  | \[ <error: missing close-bracket>
 }
 
 token subcommand {
