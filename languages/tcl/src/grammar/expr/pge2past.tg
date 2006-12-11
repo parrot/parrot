@@ -126,7 +126,7 @@ command_substitution:
 
     # we have an empty command substitution []
     $P0 = new 'PAST::Val'
-    $P0['class'] = 'TclConst'
+    $P0['class'] = 'TclString'
     $P0['value'] = ''
     .return($P0)
 
