@@ -485,13 +485,20 @@ throw an exception.
 
 .sub __boolean
     .param pmc value
-    
-    if value == '1' goto true
-    if value == '0' goto false
-    if value == 'true'  goto true
-    if value == 'false' goto false
-    if value == 'yes' goto true
-    if value == 'no'  goto false
+
+    .local string lc 
+    $S0 = value
+    lc = downcase $S0
+ 
+    if lc == '1' goto true
+    if lc == '0' goto false
+    if lc == 'true'  goto true
+    if lc == 'false' goto false
+    if lc == 'yes' goto true
+    if lc == 'no'  goto false
+    if lc == 'on'  goto true
+    if lc == 'off' goto false
+
 
     .local pmc __number
     __number = get_hll_global '__number'
