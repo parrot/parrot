@@ -595,7 +595,7 @@ invalid
 2
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.format');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.format', cflags => '-On');
 extern function main()
 {
     var a = 45;
