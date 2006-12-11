@@ -476,3 +476,9 @@ badargs:
 bad_args:
   tcl_error 'wrong # args: should be "file owned name"'
 .end
+
+# XXX: Stub for test parsing
+.sub 'writable'
+  .param pmc argv
+  .return(1)
+.end
