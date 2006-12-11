@@ -392,7 +392,7 @@ bad_args:
 # RT#40724: Stub for test parsing
 .sub 'readable'
   .param pmc argv
-  .return(0)
+  .return(1)
 .end
 
 # RT#40725: Stub for test parsing
