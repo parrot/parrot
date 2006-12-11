@@ -31,9 +31,10 @@ Functions are very similar to ops, so handle them similarly here.
     clear_eh
     
     .local pmc b
-    b = clone a
-    b = neg b
-    .return (b)
+    $I0 = typeof a
+    b = new $I0
+    b = abs a
+    .return(b)
 
 is_string:
     tcl_error "argument to math function didn't have numeric value"

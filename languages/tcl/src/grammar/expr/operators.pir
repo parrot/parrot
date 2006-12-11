@@ -63,9 +63,10 @@ empty_string:
 
 .sub 'prefix:-' :multi(pmc)
     .param pmc a
-    $N0 = a
-    $N0 = neg $N0
-    .return ($N0)
+    .local pmc b
+    b = clone a
+    b = -b
+    .return(b)
 .end
 
 # bit-wise NOT
