@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 28;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function assert' );
@@ -85,6 +85,35 @@ CODE
 1
 2
 3
+nil
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function next (no arg)' );
+a = next()
+print(a)
+CODE
+/table expected, got no value/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function next (invalid key)' );
+t = {"a","b","c"}
+a = next(t, 6)
+print(a)
+CODE
+/invalid key to 'next'/
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function next (unorderer)' );
+t = {"a","b","c"}
+a = next(t, 2)
+print(a)
+a = next(t, 1)
+print(a)
+a = next(t, 3)
+print(a)
+CODE
+3
+2
 nil
 OUTPUT
 

@@ -458,8 +458,6 @@ The behavior of C<next> is I<undefined> if, during the traversal, you assign
 any value to a non-existent field in the table. You may however modify
 existing fields. In particular, you may clear existing fields.
 
-STILL INCOMPLETE (see next in table.pir).
-
 =cut
 
 .sub '_lua_next' :anon

@@ -33,6 +33,8 @@ Now, Lua 5 uses a hybrid data structure with a Hash part and an Array part.
 .sub 'init' :method :vtable
     new $P0, .Hash
     setattribute self, 'hash', $P0
+    $P1 = iter $P0
+    setattribute self, 'iter', $P1
 .end
 
 .sub '_make_key' :anon
@@ -220,19 +222,27 @@ L4:
 
 =cut
 
+.include 'iterator.pasm'
+
 .sub 'next' :method
     .param pmc index
-    $P0 = getattribute self, 'hash'
-    push_eh _handler
+    $P1 = getattribute self, 'iter'
     if index goto L1
-    $P1 = new .Iterator, $P0
-    setattribute self, 'iter', $P1
+    set $P1, .ITERATE_FROM_START
     goto L2
 L1:
-    $P1 = getattribute self, 'iter'
+    $I0 = _has(self, index)
+    unless $I0 goto L3 
+    set $P1, .ITERATE_FROM_START
+L4:
+    $P2 = shift $P1    
+    $P3 = $P1[$P2]
+    $P4 = $P3.'key'()
+    unless $P4 == index goto L4
 L2:
+    push_eh _handler
     $P2 = shift $P1
-    $P3 = $P0[$P2]
+    $P3 = $P1[$P2]
     .local pmc key
     .local pmc value
     $P4 = $P3.'key'()
@@ -242,11 +252,13 @@ L2:
     .return (key, value)
 _handler:
     .local pmc ret
-#    removeattribute self, 'iter'
-    null $P0
-    setattribute self, 'iter', $P0    
     new ret, .LuaNil
     .return (ret)
+L3:
+    .local pmc ex
+    ex = new .Exception
+    ex['_message'] = "invalid key to 'next'"
+    throw ex
 .end
 
 =item C<rawget (key)>
