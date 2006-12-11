@@ -1107,7 +1107,7 @@ A from scratch implementation of a Tcl 8.5 compiler in parrot.
 
 =item Status
 
-Passes over 12% of tcl's (lightly converted) test suite, using a
+Passes over 15% of tcl's (lightly converted) test suite, using a
 Test::More like harness. (Don't run enough of tcl yet to simply
 use tcltest.tcl)
 
