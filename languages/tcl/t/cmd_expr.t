@@ -1,7 +1,7 @@
 #!../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 244
+plan 246
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -172,6 +172,9 @@ set TODO {TODO "correct precision"}
 
 # math functions, happy path
 is [expr abs(-1)]       1
+is [expr abs(1)]        1
+is [expr abs(1.0)]      1
+is [expr abs(-1.0)]     1
 is [expr acos(0)]       1.5707963267948966 {} $TODO
 is [expr asin(1)]       1.5707963267948966 {} $TODO
 is [expr atan(1)]       0.7853981633974483
