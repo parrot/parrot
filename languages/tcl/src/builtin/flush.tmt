@@ -1,0 +1,4 @@
+[flush channelId:channel]
+    $channelId.'flush'()
+    $R = new .TclString
+    $R = ''
