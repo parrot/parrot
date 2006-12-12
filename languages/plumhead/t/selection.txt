@@ -9,3 +9,6 @@ tests/basic/008.phpt
 tests/basic/009.phpt
 tests/basic/010.phpt
 tests/basic/013.phpt
+tests/run-test/test001.phpt
+tests/run-test/test002.phpt
+tests/run-test/test003.phpt
