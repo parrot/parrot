@@ -7,6 +7,8 @@ RM_RF    = @rm_rf@
 PARROT   = ../../parrot@exe@
 TOOL_DIR = ../..
 TGE_DIR  = ../../compilers/tge
+PGE_DIR  = ../../compilers/pge
+TEST_DIR = ../../t/compilers/past-pm
 CP       = @cp@
 BUILD    = $(PERL) @build_dir@/tools/build/dynpmc.pl
 O        = @o@
@@ -54,16 +56,24 @@ help:
 	@echo "  help:              Print this help message."
 	@echo ""
 
-test: all
-	cd $(TOOL_DIR); prove -r t/compilers/pge
+test: all NoneParser.pir NoneGrammar.pir
+	cd $(TOOL_DIR); prove -r t/compilers/past-pm
+
+# NoneParser and NoneGrammar are external modules for some of
+# the tests. They will be moved into the test file later.
+NoneParser.pir: $(TEST_DIR)/NoneParser.pg
+	$(PARROT) $(PGE_DIR)/pgc.pir \
+	    --output=$(TEST_DIR)/NoneParser.pir \
+	    $(TEST_DIR)/NoneParser.pg
+
+NoneGrammar.pir: $(TEST_DIR)/NoneGrammar.tg
+	$(PARROT) $(TGE_DIR)/tgc.pir \
+	    --output=$(TEST_DIR)/NoneGrammar.pir \
+	    $(TEST_DIR)/NoneGrammar.tg
 
 testclean:
-	$(RM_RF) "../../t/compilers/pge/*.pir" \
-	    "../../t/compilers/pge/p5regex/*.pir" \
-	    "../../t/compilers/pge/p6regex/*.pir"
-	$(RM_RF) "../../t/compilers/pge/*.pbc" \
-	    "../../t/compilers/pge/p5regex/*.pbc" \
-	    "../../t/compilers/pge/p6regex/*.pbc"
+	$(RM_RF) $(TEST_DIR)/*.pir \
+	    $(TEST_DIR)/*.pbc
 
 clean: testclean
 	$(RM_RF) \
