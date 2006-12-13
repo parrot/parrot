@@ -62,6 +62,8 @@ tag 'all' is allowed for todo tests that should fail on any system
 =cut
 
 
+.const int TESTS = 308
+
 .sub main :main
     load_bytecode 'Test/Builder.pir'
     load_bytecode 'PGE.pbc'
@@ -111,7 +113,7 @@ tag 'all' is allowed for todo tests that should fail on any system
     # how many tests to run?
     # XXX: this should be summed automatically from test_files data
     #      until then, it's set to no plan
-    test.'plan'(308)
+    test.'plan'(TESTS)
 
   outer_loop:
     unless file_iterator goto end_outer_loop
