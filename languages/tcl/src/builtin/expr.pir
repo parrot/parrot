@@ -2,9 +2,9 @@
 .namespace [ 'builtins' ]
 
 .sub 'expr'
-  .param int register_num
-  .param pmc raw_args
-  .param pmc argv
+  .param string retval
+  .param pmc    raw_args
+  .param pmc    argv
 
   .local pmc pir
   .local int argc
@@ -37,16 +37,16 @@ end:
   pir = new 'PGE::CodeString'
   pir .= $P0
 
-  pir.emit("  $P%0 = %1", register_num, $S0)
+  pir.emit("  %0 = %1", retval, $S0)
 
-  .return(register_num, pir)
+  .return(pir)
 
 not_const:
   null $P0
-  .return(register_num, $P0)
+  .return($P0)
 
 bad_args:
-  .return(register_num, "tcl_error 'wrong # args: should be \"expr arg ?arg ...?\"'\n")
+  .return("tcl_error 'wrong # args: should be \"expr arg ?arg ...?\"'\n")
 
 exception:
   .catch()
@@ -60,5 +60,5 @@ exception:
   error = "tcl_error \""
   error .= $S0
   error .= "\"\n"
-  .return(register_num, error)
+  .return(error)
 .end

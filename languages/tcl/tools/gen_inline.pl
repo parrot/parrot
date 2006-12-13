@@ -142,17 +142,20 @@ sub inlined_header {
     my $code = <<"END_PIR";
     
 .sub '$cmd'
-  .param int register
-  .param pmc raw_argv
-  .param pmc argv
+  .param string retval
+  .param pmc    raw_argv
+  .param pmc    argv
 
   .local int argc
   .local string pir
   pir = ''
   argc = elements argv
+
   # the number for the loops
+  .local pmc codestring
   .local int loop_num
-  loop_num = register
+  codestring = new 'PGE::CodeString'
+  loop_num   = codestring.unique()
 
 END_PIR
 
@@ -414,12 +417,12 @@ sub inlined_body {
         }
 
         # $R
-        $line =~ s/\$R\b/\$P%1/g;
+        $line =~ s/\$R\b/%1/g;
 
-        $code .= emit( $line, 'loop_num', 'register' );
+        $code .= emit( $line, 'loop_num', 'retval' );
     }
 
-    $code .= "  .return(register, pir) \n";
+    $code .= "  .return(pir) \n";
 
     return $code;
 }
@@ -465,7 +468,7 @@ sub inlined_badargs {
     my $usage = create_usage(@args);
     my $code  =
           "bad_args: \n"
-        . "  .return(register, \"  tcl_error 'wrong # args: should be "
+        . "  .return(\"  tcl_error 'wrong # args: should be "
         . "\\\"$cmd$usage\\\"' \\n\") \n";
 
     return $code;

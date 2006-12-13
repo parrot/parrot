@@ -5,9 +5,9 @@
 .namespace [ 'builtins' ]
 
 .sub 'return'
-  .param int register_num
-  .param pmc raw_args
-  .param pmc argv
+  .param string retval
+  .param pmc    raw_args
+  .param pmc    argv
 
   .local string pir_code
   .local int argc 
@@ -18,16 +18,16 @@
 
   # don't handle this case staticly
   null $P0
-  .return(register_num,$P0)
+  .return($P0)
 
 onearg:
   pir_code = "tcl_return "
   $S1 = argv[0]
   pir_code.= $S1
   pir_code.= "\n"
-  .return(register_num,pir_code)
+  .return(pir_code)
 
 noargs:
   pir_code = "tcl_return \"\"\n"
-  .return(register_num,pir_code)
+  .return(pir_code)
 .end

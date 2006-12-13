@@ -235,21 +235,14 @@ transform pir (PAST::StaticCommand) {
     $P1 = get_root_global ['_tcl'; 'builtins'], $S0
     if null $P1 goto dynamic
 
-    .local pmc serno
-    .local int register_num
-    serno = get_root_global ['parrot'; 'PGE::CodeString'], "$!serno"
-    register_num = serno
-
-    (register_num, $P0) = $P1(register_num,children,args)
+    $P0 = $P1(retval, children,args)
     if null $P0 goto dynamic
-    serno = register_num
 
     .local pmc epoch
     epoch = get_root_global ['_tcl'], 'epoch'
     $S0 = pir.unique('dynamic_')
     pir.emit('  if epoch != %0 goto %1', epoch, $S0)
     pir .= $P0
-    pir.emit('  %0 = $P%1', retval, register_num)
     pir.emit('  goto %0', done_)
     pir.emit('%0:', $S0)
 
