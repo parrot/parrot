@@ -9,17 +9,18 @@ use __stringToList.
 
 =cut
 
-.sub __list
-  .param pmc value
+.sub __list :multi(TclList)
+  .param pmc list
+  .return(list)
+.end
 
-  $I0 = typeof value
-  if $I0 == .TclList goto done
+.sub __list :multi(_)
+  .param pmc value
 
   $P0 = __stringToList(value)
   morph value, .Undef
   assign value, $P0
 
-done:
   .return(value)
 .end
 
@@ -32,25 +33,28 @@ use __stringToDict.
 
 =cut
 
-.sub __dict
-  .param pmc value
+.sub __dict :multi(TclDict)
+  .param pmc dict
+  .return(dict)
+.end
 
-  $I0 = typeof value
-  if $I0 == .TclDict goto done
-  if $I0 == .TclList goto listy
+.sub __dict :multi(TclList)
+  .param pmc list
+
+  $P0 = __listToDict(list)
+  morph list, .Undef
+  assign list, $P0
+
+  .return(list)
+.end
+
+.sub __dict :multi(_)
+  .param pmc value
   
   $P0 = __stringToDict(value)
   morph value, .Undef
   assign value, $P0
-  .return(value)
 
-listy:
-  $P0 = __listToDict(value)
-  morph value, .Undef
-  assign value, $P0
-  .return(value)
-
-done:
   .return(value)
 .end
 
@@ -61,12 +65,18 @@ Given a PMC, get a number from it.
 
 =cut
 
-.sub __number
-  .param pmc number
+.sub __number :multi(TclInt)
+  .param pmc n
+  .return(n)
+.end
 
-  $I0 = typeof number
-  if $I0 == .TclInt goto done
-  if $I0 == .TclFloat goto done
+.sub __number :multi(TclFloat)
+  .param pmc n
+  .return(n)
+.end
+
+.sub __number :multi(_)
+  .param pmc number
 
   .local string str
   .local int    len
@@ -107,7 +117,7 @@ Given a PMC, get a number from it.
   $I0    = find_type class
   number = new $I0
   assign number, value
-done:
+
   .return(number)
 
 NaN:
@@ -124,7 +134,12 @@ Given a PMC, get an integer from it.
 
 =cut
 
-.sub __integer
+.sub __integer :multi(TclInt)
+  .param pmc n
+  .return(n)
+.end
+
+.sub __integer :multi(_)
   .param pmc value
   
   .local pmc integer
