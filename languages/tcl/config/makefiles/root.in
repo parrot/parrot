@@ -31,8 +31,10 @@ PMCS = \
 
 GENERATED_INLINES = \
  $(C_BUILTIN)/break.pir \
+ $(C_BUILTIN)/continue.pir \
  $(C_BUILTIN)/eof.pir \
  $(C_BUILTIN)/exit.pir \
+ $(C_BUILTIN)/flush.pir \
  $(C_BUILTIN)/for.pir \
  $(C_BUILTIN)/incr.pir \
  $(C_BUILTIN)/join.pir \
@@ -50,11 +52,9 @@ $(C_BUILTIN)/auto_execok.pir \
 $(C_BUILTIN)/auto_load.pir \
 $(C_BUILTIN)/cd.pir \
 $(C_BUILTIN)/close.pir \
-$(C_BUILTIN)/continue.pir \
 $(C_BUILTIN)/exec.pir \
 $(C_BUILTIN)/expr.pir \
 $(C_BUILTIN)/fconfigure.pir \
-$(C_BUILTIN)/flush.pir \
 $(C_BUILTIN)/glob.pir \
 $(C_BUILTIN)/interp.pir \
 $(C_BUILTIN)/list.pir \
