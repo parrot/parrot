@@ -801,6 +801,10 @@ Sets $1 to 1 or 0, depending on whether $2 is true or not.
 
 Sets $1 to 1 or 0, depending on whether $2 is false or not.
 
+=item B<isnull>(out INT, in PMC)
+
+Sets $1 to 1 if the object is null, 0 otherwise.
+
 =cut
 
 inline op issame(out INT, invar PMC, invar PMC) {
@@ -836,6 +840,11 @@ inline op istrue(out INT, invar PMC) {
 
 inline op isfalse(out INT, invar PMC) {
     $1 = !VTABLE_get_bool(interp, $2);
+    goto NEXT();
+}
+
+inline op isnull(out INT, in PMC) {
+    $1 = PMC_IS_NULL($2);
     goto NEXT();
 }
 

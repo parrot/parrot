@@ -1224,3 +1224,5 @@ stm_commit_ic                  1193
 stm_wait_ic                    1194
 stm_abort                      1195
 stm_depth_i                    1196
+isnull_i_p                     1197
+isnull_i_pc                    1198
