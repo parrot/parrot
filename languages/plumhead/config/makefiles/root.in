@@ -19,8 +19,10 @@ help:
 	@echo ""
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
-	@echo "  test-php:          Run the test suite."
-	@echo "  test-phc-to-past:  Run the test suite."
+	@echo "  test-php:          Run the test suite for the reference implementation."
+	@echo "  test-phc-to-past:  Run the test suite for the Phc2Past variant."
+	@echo "  test-antlr3:       Run the test suite for the Antlr3 variant."
+	@echo "  test-partridge:    Run the test suite."
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             makes clean-test."
@@ -37,13 +39,19 @@ plumhead.pbc: src/plumhead.pir
 plumheadlib.pbc: src/builtins.pir
 	$(PARROT) -o plumheadlib.pbc src/builtins.pir
 
-test: all test-php test-phc-to-past
+test: all test-php test-phc-to-past test-antlr3 test-partridge
 
 test-php:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-php
 
 test-phc-to-past:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-phc-to-past
+
+test-antlr3:
+	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-antlr3
+
+test-partridge:
+	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-partridge
 
 build: plumheadlib.pbc plumhead.pbc
 

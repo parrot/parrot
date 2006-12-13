@@ -11,7 +11,20 @@ Plumhead is short for Plum-headed Parakeet.
 
 =head1 Goals
 
-Show an example for using XSLT for creating PAST.
+Provide a side by side comparison for different implementation
+strategies of PHP on Parrot.
+
+=over
+
+=item php - the reference implementation PHP 5.2.0
+
+=item phc2past  - XSLT munges output from phc, started
+
+=item antlr3    - ANTLR3, planned
+
+=item partridge - Parrot compiler toolchain, planned
+
+=back
 
 =head1 Status
 
@@ -50,6 +63,8 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 =item L<http://en.wikipedia.org/wiki/Plum-headed_parakeet>
 
 =item L<http://www.parrotcode.org/docs/compiler_tools.html>
+
+=item L<http://www.antlr.org/v3/index.html>
 
 =back
 
