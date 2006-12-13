@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 77;
+use Parrot::Test tests => 78;
 
 
 =head1 NAME
@@ -1301,5 +1301,51 @@ CODE
 101
 OUTPUT
 
+
+pasm_output_is(<<'CODE', <<OUTPUT, "cmp");
+        set I0, 10
+        cmp I1, I0, 9
+        set N0, -2.4
+        cmp I2, -2.4, N0
+        set S0, "Bruhaha"
+        cmp I3, S0, "Crumbum"
+        new P0, .Integer
+        new P1, .Integer
+        set P0, 452
+        set P1, -15
+        cmp I4, P0, P1
+
+        print I1
+        print "\n"
+        print I2
+        print "\n"
+        print I3
+        print "\n"
+        print I4
+        print "\n"
+
+        set I5, 9
+        set I6, 10
+        set I7, 11
+        cmp I1, I0, I5
+        cmp I2, I0, I6
+        cmp I3, I0, I7
+        print I1
+        print "\n"
+        print I2
+        print "\n"
+        print I3
+        print "\n"
+
+        end
+CODE
+1
+0
+-1
+1
+1
+0
+-1
+OUTPUT
 
 
