@@ -8,7 +8,7 @@
 
 #include <math.h>
 
-const _LIB_VERSION_TYPE _LIB_VERSION = _IEEE_;
+_LIB_VERSION_TYPE _LIB_VERSION = _IEEE_;
 
 /*
  * return true if the Numval has a negative sign.
