@@ -1,0 +1,5 @@
+grammar NoneParser;
+
+token apply    { ^<op>$ }
+token op { test <?ws> <val> <?ws> }
+token val {thingy}
