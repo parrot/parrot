@@ -570,22 +570,70 @@ op ge_num (invar PMC, invar PMC, labelconst INT) :base_core {
   goto NEXT();
 }
 
+########################################
+
+=item B<if_null>(invar PMC, labelconst INT)
+
+Branch to $2 if $1 is a NULL PMC.
+
+=item B<if_null>(invar STR, labelconst INT)
+
+Branch to $2 if $1 is a NULL STRING.
+
+=cut
+
+op if_null(invar PMC, labelconst INT) {
+  if (PMC_IS_NULL($1)) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
+op if_null(invar STR, labelconst INT) {
+  if (!$1) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
+########################################
+
+=item B<unless_null>(invar PMC, labelconst INT)
+
+Branch to $2 if $1 is I<not> a NULL PMC.
+
+=item B<unless_null>(invar STR, labelconst INT)
+
+Branch to $2 if $1 is I<not> a NULL STRING.
+
+=cut
+
+op unless_null(invar PMC, labelconst INT) {
+  if (!PMC_IS_NULL($1)) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
+op unless_null(invar STR, labelconst INT) {
+  if ($1) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
 =back
 
 =cut
 
+
 ###############################################################################
 
-=head2 Flow control comparison operators
+=head2 Non-flow control comparison ops
 
-These operators branch based on the relationship between
-their operands.
+These ops do comparisons and truth testing without doing flow control.
 
 =over 4
-
-=cut
-
-########################################
 
 =item B<cmp>(out INT, in INT, in INT)
 
@@ -665,118 +713,6 @@ inline op cmp_num(out INT, invar PMC, invar PMC) :base_core {
   $1 = mmd_dispatch_i_pp(interp, $2, $3, MMD_NUMCMP);
   goto NEXT();
 }
-
-=back
-
-=cut
-
-###############################################################################
-
-=head2 Logical operations
-
-These operations apply logical functions to their arguments.
-
-=over 4
-
-=cut
-
-########################################
-
-=item B<and>(out INT, in INT, in INT)
-
-Short-circuiting logical and.  Returns $2 if it's false, else returns $3.
-
-=cut
-
-inline op and(out INT, in INT, in INT) :base_core {
-  $1 = $2 ? $3 : $2;
-  goto NEXT();
-}
-
-########################################
-
-=item B<not>(inout INT)
-
-=item B<not>(invar PMC)
-
-Set the boolean state of $1 to the opposite of the boolean state from $1.
-
-=item B<not>(out INT, in INT)
-
-=item B<not>(out PMC, invar PMC)
-
-=item B<n_not>(out PMC, invar PMC)
-
-Set the boolean state of $1 to the opposite of the boolean state from $2.
-
-=cut
-
-inline op not(inout INT) :base_core {
-  $1 = ! $1;
-  goto NEXT();
-}
-
-inline op not(out INT, in INT) :base_core {
-  $1 = ! $2;
-  goto NEXT();
-}
-
-inline op not(invar PMC) :base_core {
-  $2->vtable->i_logical_not(interp, $1);
-  goto NEXT();
-}
-
-inline op not(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->logical_not(interp, $2, $1);
-  goto NEXT();
-}
-
-inline op n_not(out PMC, invar PMC) :base_core {
-  $1 = $2->vtable->logical_not(interp, $2, NULL);
-  goto NEXT();
-}
-
-########################################
-
-=item B<or>(out INT, in INT, in INT)
-
-Short-circuiting logical or.  Returns $2 if it's true, else returns $3.
-
-=cut
-
-inline op or(out INT, in INT, in INT) :base_core {
-  $1 = $2 ? $2 : $3;
-  goto NEXT();
-}
-
-########################################
-
-=item B<xor>(out INT, in INT, in INT)
-
-Logical xor.  Returns $2 if it's true and $3 isn't,
-returns $3 if it's true and $2 isn't, else returns false.
-
-=cut
-
-inline op xor(out INT, in INT, in INT) :base_core {
-  $1 = ($2 && ! $3) ? $2 : ($3 && ! $2) ? $3 : 0;
-  goto NEXT();
-}
-
-=back
-
-=cut
-
-
-###############################################################################
-
-=head2 Non-flow control comparison ops
-
-These ops do comparisons and truth testing without doing flow control.
-
-=over 4
-
-=cut
 
 ########################################
 
@@ -1020,61 +956,108 @@ inline op isne(out INT, invar PMC, invar PMC) {
   goto NEXT();
 }
 
-########################################
-
-=item B<if_null>(invar PMC, labelconst INT)
-
-Branch to $2 if $1 is a NULL PMC.
-
-=item B<if_null>(invar STR, labelconst INT)
-
-Branch to $2 if $1 is a NULL STRING.
+=back
 
 =cut
 
-op if_null(invar PMC, labelconst INT) {
-  if (PMC_IS_NULL($1)) {
-    goto OFFSET($2);
-  }
-  goto NEXT();
-}
 
-op if_null(invar STR, labelconst INT) {
-  if (!$1) {
-    goto OFFSET($2);
-  }
+###############################################################################
+
+=head2 Logical operations
+
+These operations apply logical functions to their arguments.
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<and>(out INT, in INT, in INT)
+
+Short-circuiting logical and.  Returns $2 if it's false, else returns $3.
+
+=cut
+
+inline op and(out INT, in INT, in INT) :base_core {
+  $1 = $2 ? $3 : $2;
   goto NEXT();
 }
 
 ########################################
 
-=item B<unless_null>(invar PMC, labelconst INT)
+=item B<not>(inout INT)
 
-Branch to $2 if $1 is I<not> a NULL PMC.
+=item B<not>(invar PMC)
 
-=item B<unless_null>(invar STR, labelconst INT)
+Set the boolean state of $1 to the opposite of the boolean state from $1.
 
-Branch to $2 if $1 is I<not> a NULL STRING.
+=item B<not>(out INT, in INT)
+
+=item B<not>(out PMC, invar PMC)
+
+=item B<n_not>(out PMC, invar PMC)
+
+Set the boolean state of $1 to the opposite of the boolean state from $2.
 
 =cut
 
-op unless_null(invar PMC, labelconst INT) {
-  if (!PMC_IS_NULL($1)) {
-    goto OFFSET($2);
-  }
+inline op not(inout INT) :base_core {
+  $1 = ! $1;
   goto NEXT();
 }
 
-op unless_null(invar STR, labelconst INT) {
-  if ($1) {
-    goto OFFSET($2);
-  }
+inline op not(out INT, in INT) :base_core {
+  $1 = ! $2;
+  goto NEXT();
+}
+
+inline op not(invar PMC) :base_core {
+  $2->vtable->i_logical_not(interp, $1);
+  goto NEXT();
+}
+
+inline op not(out PMC, invar PMC) :base_core {
+  $1 = $2->vtable->logical_not(interp, $2, $1);
+  goto NEXT();
+}
+
+inline op n_not(out PMC, invar PMC) :base_core {
+  $1 = $2->vtable->logical_not(interp, $2, NULL);
+  goto NEXT();
+}
+
+########################################
+
+=item B<or>(out INT, in INT, in INT)
+
+Short-circuiting logical or.  Returns $2 if it's true, else returns $3.
+
+=cut
+
+inline op or(out INT, in INT, in INT) :base_core {
+  $1 = $2 ? $2 : $3;
+  goto NEXT();
+}
+
+########################################
+
+=item B<xor>(out INT, in INT, in INT)
+
+Logical xor.  Returns $2 if it's true and $3 isn't,
+returns $3 if it's true and $2 isn't, else returns false.
+
+=cut
+
+inline op xor(out INT, in INT, in INT) :base_core {
+  $1 = ($2 && ! $3) ? $2 : ($3 && ! $2) ? $3 : 0;
   goto NEXT();
 }
 
 =back
 
 =cut
+
 
 ###############################################################################
 
