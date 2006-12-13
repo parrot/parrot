@@ -139,11 +139,18 @@ to any options and return the resulting parse tree.
     parsegrammar_name = self.'parsegrammar'()
     unless parsegrammar_name goto err_no_parsegrammar
     apply = get_hll_global parsegrammar_name, 'apply'
-    .return apply(source, 'grammar' => parsegrammar_name)
+    .local pmc match
+    match = apply(source, 'grammar' => parsegrammar_name)
+    unless match goto err_failedparse
+    .return (match)
 
   err_no_parsegrammar:
     $P0 = new .Exception
     $P0['_message'] = 'Missing parsegrammar in compiler'
+    throw $P0
+  err_failedparse:
+    $P0 = new .Exception
+    $P0['_message'] = 'Failed to parse source'
     throw $P0
 .end
 
