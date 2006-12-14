@@ -7,9 +7,6 @@
         # impossible
 
 array set skipped_tests {
-  append-4.21          explode
-  append-4.22          explode
-  append-5.1           explode
   append-7.1           {trace}
   append-7.2           {trace}
   append-7.3           {trace}
@@ -20,7 +17,6 @@ array set skipped_tests {
   apply-2.4            stacktrace
   apply-2.5            stacktrace
   apply-5.1            stacktrace
-  appendComp-5.1       explode
   appendComp-7.1       {trace}
   appendComp-7.2       {trace}
   appendComp-7.3       {trace}
@@ -30,8 +26,9 @@ array set skipped_tests {
   appendComp-7.7       {trace}
   appendComp-7.8       {trace}
   appendComp-7.9       {trace}
-  basic-46.1           explode
-  compExpr-old-14.14   explode
+  basic-46.1           stacktrace
+  cmdMZ-2.10           stacktrace
+  cmdMZ-3.5            stacktrace
   cmdMZ-5.7            stacktrace
   basic-1.1            {interp}
   basic-10.1           {interp}
@@ -64,22 +61,12 @@ array set skipped_tests {
   error-4.2            stacktrace
   error-4.3            stacktrace
   error-4.4            stacktrace
-  expr-14.14           explode
-  expr-old-2.38        explode
-  expr-old-32.41       explode
-  expr-old-32.42       explode
-  expr-old-32.49       explode
-  expr-old-34.9        explode
-  expr-old-34.10       explode
-  expr-old-36.3        explode
-  expr-old-36.4        explode
-  expr-old-36.8        explode
   eval-2.5             stacktrace
   for-3.6              {[lsearch -regexp]}
-  format-3.1           explode
-  format-3.2           explode
-  format-8.17          explode
-  format-8.18          explode
+  format-3.1           segfault
+  format-3.2           segfault
+  format-8.17          {Cannot get character past end of string}
+  format-8.18          {Cannot get character past end of string} 
   iocmd-12.6           stacktrace
   incr-2.30            stacktrace 
   incr-2.31            stacktrace 
@@ -94,14 +81,13 @@ array set skipped_tests {
   parse-10.14          stacktrace
   set-2.1              stacktrace
   set-4.1              stacktrace
-  string-6.51          explode
-  string-13.6          explode
-  string-13.8          explode
-  string-14.11         explode
-  string-18.7          explode
-  string-18.9          explode
-  string-20.4          explode
-  string-20.5          explode
+  string-13.6          {Cannot repeat with negative arg}
+  string-13.8          {Cannot repeat with negative arg}
+  string-14.11         {Can only replace inside string or index after end of string}
+  string-18.7          {Cannot take substr outside string}
+  string-18.9          {Cannot take substr outside string}
+  string-20.4          {Cannot take substr outside string}
+  string-20.5          {Cannot take substr outside string}
   var-6.3              {Cannot get character of empty string}
   var-7.12             {Cannot take substr outside string}
   var-12.1             {Cannot take substr outside string}
@@ -241,10 +227,10 @@ array set skipped_tests {
   binary-59.13         {no ICU lib loaded}
   binary-59.14         {no ICU lib loaded}
   binary-59.15         {no ICU lib loaded}
+  cmdIL-4.24           {no ICU lib loaded}
+  cmdIL-4.25           {no ICU lib loaded}
   expr-8.13            {no ICU lib loaded}
-  parseOld-5.10        explode
   parseOld-7.12        {no ICU lib loaded}
-  parseOld-11.11       explode
   scan-7.6             {no ICU lib loaded}
   scan-7.7             {no ICU lib loaded}
   subst-3.2            {no ICU lib loaded}
@@ -289,6 +275,7 @@ array set skipped_tests {
 # on the floor.
 
 array set abort_after {
+  cmdMZ-5.7            {invalid command name "cleanupTests"}
   uplevel-5.2          {invalid command name "set"}
   utf-1.4              {Invalid character for UTF-8 encoding}
   env-1.3              {can't read "env(test)" no such element in array}
