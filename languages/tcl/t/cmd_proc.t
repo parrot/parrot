@@ -1,7 +1,7 @@
 #! ../../parrot tcl.pbc
 
 source lib/test_more.tcl
-plan 18
+plan 19
 
 eval_is {
  set a [proc me {} {
@@ -122,3 +122,9 @@ eval_is {
   catch {test foo}
   set a
 } 4 {reset call_level on bad args}
+
+eval_is {
+ proc nothing {} {
+    # empty proc
+ }
+} {} {empty procs are ok}
