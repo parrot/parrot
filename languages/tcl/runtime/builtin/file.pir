@@ -383,10 +383,43 @@ bad_args:
   .return(0)
 .end
 
-# RT#40723: Stub for test parsing
+# RT#40723: Stub (unixy)
 .sub 'tail'
   .param pmc argv
-  .return(0)
+  .local int argc
+  argc = elements argv
+  if argc != 1 goto bad_args
+  $S0 = argv[0]
+  if $S0 == '' goto whole
+  $S1 = substr $S0, -1, 1
+
+  # Trailing dirsep is removed.
+  if $S1 != "/" goto continue
+  chopn $S0, 1
+
+continue:
+  .local int pos, idx, last_idx
+  pos = 0
+  idx = -1
+  last_idx = -1
+get_last_index:
+  idx = index $S0, '/', pos
+  if idx == -1 goto done
+
+  pos = idx + 1
+  last_idx = idx
+  goto get_last_index
+
+done:
+  if last_idx == -1 goto whole
+  inc last_idx
+  substr $S0, 0, last_idx, ''
+
+whole:
+  .return($S0)
+
+bad_args:
+  tcl_error 'wrong # args: should be "file tail name"'
 .end
 
 # RT#40724: Stub for test parsing
@@ -481,4 +514,17 @@ bad_args:
 .sub 'writable'
   .param pmc argv
   .return(1)
+.end
+
+# XXX: Stub
+.sub 'volumes'
+  .param pmc argv
+  .local int argc
+  argc = elements argv
+  if argc != 0 goto bad_args
+
+  .return('/')
+
+bad_args:
+  tcl_error 'wrong # args: should be "file volumes"'
 .end
