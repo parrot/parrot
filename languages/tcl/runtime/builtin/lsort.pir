@@ -189,15 +189,18 @@ decreasing:
   # check that they're actually integers.
   .local pmc __integer
   __integer = get_root_global ['_tcl'], '__integer'
-  s1 = __integer(s1)
-  s2 = __integer(s2)
+  .local pmc i1,i2
+  i1 = clone s1
+  i2 = clone s2
+  i1 = __integer(i1)
+  i2 = __integer(i2)
 
   if is_decr goto decreasing
-  $I0 = cmp_num s1, s2
+  $I0 = cmp_num i1, i2
   .return ($I0)
 
 decreasing:
-  $I0 = cmp_num s2, s1
+  $I0 = cmp_num i2, i1
   .return ($I0)
 .end
 
