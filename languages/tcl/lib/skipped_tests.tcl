@@ -27,6 +27,32 @@ array set skipped_tests {
   appendComp-7.8       {trace}
   appendComp-7.9       {trace}
   basic-46.1           stacktrace
+  basic-11.1           {interp}
+  basic-12.1           {interp}
+  basic-12.2           {interp}
+  basic-13.1           {interp}
+  basic-13.2           {interp}
+  basic-14.1           {expand}
+  basic-14.2           {expand}
+  basic-15.1           {expand}
+  basic-18.1           {expand}
+  basic-18.3           {expand}
+  basic-18.4           {expand}
+  basic-18.6           {expand}
+  basic-20.1           {expand}
+  basic-22.1           {expand}
+  basic-24.1           {interp}
+  basic-24.2           {expand}
+  basic-36.1           {expand, interp}
+  cmdAH-2.2            {file}
+  cmdAH-2.3            {file}
+  cmdAH-2.4            {file}
+  cmdAH-2.5            {file}
+  cmdAH-2.6            {file}
+  cmdAH-2.6.1          {file}
+  cmdAH-2.6.2          {file}
+  cmdIL-4.26           {scan}
+  cmdIL-4.27           {scan}
   cmdMZ-2.10           stacktrace
   cmdMZ-3.5            stacktrace
   cmdMZ-5.7            stacktrace
@@ -68,6 +94,9 @@ array set skipped_tests {
   format-8.17          {Cannot get character past end of string}
   format-8.18          {Cannot get character past end of string} 
   iocmd-12.6           stacktrace
+  if-5.3               stacktrace
+  if-6.4               stacktrace
+  if-10.6              {trace}
   incr-2.30            stacktrace 
   incr-2.31            stacktrace 
   incr-old-2.4         stacktrace
@@ -88,6 +117,7 @@ array set skipped_tests {
   string-18.9          {Cannot take substr outside string}
   string-20.4          {Cannot take substr outside string}
   string-20.5          {Cannot take substr outside string}
+  switch-4.1           stacktrace
   var-6.3              {Cannot get character of empty string}
   var-7.12             {Cannot take substr outside string}
   var-12.1             {Cannot take substr outside string}
@@ -275,6 +305,7 @@ array set skipped_tests {
 # on the floor.
 
 array set abort_after {
+  basic-47.1           {need interp before these can work}
   cmdMZ-5.7            {invalid command name "cleanupTests"}
   uplevel-5.2          {invalid command name "set"}
   utf-1.4              {Invalid character for UTF-8 encoding}

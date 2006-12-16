@@ -174,6 +174,7 @@ proc makeDirectory      {args} {return 0}
 proc removeDirectory    {args} {return 0}
 proc testobj            {args} {return 0}
 proc testsetplatform    {args} {return 0}
+proc testevalex         {args} {return 0}
 namespace eval tcltest  {
     set verbose 0
     proc temporaryDirectory {args} {return 0}
