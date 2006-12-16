@@ -5,6 +5,7 @@ package init::hints::mswin32;
 
 use strict;
 use warnings;
+use Win32;
 
 sub runstep
 {
@@ -28,6 +29,12 @@ sub runstep
         make_c            => '$(PERL) -e "chdir shift @ARGV; system \'$(MAKE)\', @ARGV; exit $$? >> 8;"',
         ncilib_link_extra => '-def:src/libnci_test.def',
     );
+    
+    my $build_dir = $conf->data->get('build_dir');
+    
+    if($build_dir ~= /\s/) {
+        $conf->data->set(build_dir => Win32::GetShortPathName($build_dir));
+    }
 
     if ($is_msvc) {
 
