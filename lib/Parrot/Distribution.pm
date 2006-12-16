@@ -413,6 +413,77 @@ sub get_c_language_files
     );
 }
 
+=item C<get_perl_language_files()>
+
+Returns the Perl language source files within Parrot.  Namely:
+
+=over 4
+
+=item Perl source files C<*.pl>
+
+=item Perl module files C<*.pm>
+
+=item .in files C<*.in>
+
+=item test files C<*.t>
+
+=back
+
+=cut
+
+sub get_perl_language_files
+{
+    my $self = shift;
+    my @files;
+    my $manifest = ExtUtils::Manifest::maniread('MANIFEST');
+
+    foreach my $file ( keys(%$manifest) ) {
+        next unless $self->is_perl($file);
+        push @files, $file;
+    }
+
+    return @files;
+}
+
+=item C<is_perl()>
+
+Determines if the given filename is Perl source
+
+=cut
+
+sub is_perl {
+    my $self = shift;
+    my $filename = shift;
+
+    if ( !-f $filename ) {
+        return 0;
+    }
+
+    # modules and perl scripts should always be tested..
+    if ( $filename =~ /\.(?:pm|pl)$/ ) {
+        return 1;
+    }
+
+    # test files (.t) and configure (.in) files might need testing.
+    # ignore everything else.
+    if ( $filename !~ /\.(?:t|in)$/ ) {
+        return 0;
+    }
+
+    # Now let's check to see if there's a perl shebang.
+
+    open my $file_handle, '<', $filename 
+	or die "Could not open $filename for reading";
+    my $line = <$file_handle>;
+    close $file_handle;
+
+    if ( $line && $line =~ /^#!.*perl/ ) {
+        return 1;
+    }
+
+    return 0;
+}
+
 =item C<file_for_perl_module($module)>
 
 Returns the Perl module file for the specified module.
