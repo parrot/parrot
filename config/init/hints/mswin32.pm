@@ -32,7 +32,7 @@ sub runstep
     
     my $build_dir = $conf->data->get('build_dir');
     
-    if($build_dir ~= /\s/) {
+    if ($build_dir =~ /\s/) {
         $conf->data->set(build_dir => Win32::GetShortPathName($build_dir));
     }
 
