@@ -49,7 +49,7 @@ sub __get_revision {
         }
         close FH;
     }
-    elsif (my @svk_info = qx/svk info/ and $? == 0) {
+    elsif (my @svk_info = qx/svk info 2>$nul/ and $? == 0) {
         if (my ($line) = grep /(?:file|svn|https?)\b/, @svk_info) {
             ($revision) = $line =~ / (\d+)$/;
         } elsif (my ($source_line) = grep /^(Copied|Merged) From/, @svk_info) {
