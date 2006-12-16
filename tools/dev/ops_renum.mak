@@ -18,7 +18,6 @@ OPS_FILES = \
     $(OPS_DIR)/object.ops \
     $(OPS_DIR)/pic.ops \
     $(OPS_DIR)/pmc.ops \
-    $(OPS_DIR)/python.ops \
     $(OPS_DIR)/set.ops \
     $(OPS_DIR)/stack.ops \
     $(OPS_DIR)/string.ops \
