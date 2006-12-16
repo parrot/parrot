@@ -185,13 +185,14 @@ SP              [ ]
 
 <*>^"#line"{SP}{DIGITS}{SP}["] {
         yy_push_state(cmt2, yyscanner);
-        valp->t = atoi(yytext+6);
+        IMCC_INFO(interp)->line = atoi(yytext+6);
         return LINECOMMENT;
     }
 <cmt2>[^"]+ {
         yy_pop_state(yyscanner);
         yy_push_state(cmt3, yyscanner);
-        valp->s = str_dup(yytext);
+        IMCC_INFO(interp)->frames->s.file = str_dup(yytext);
+        IMCC_INFO(interp)->cur_unit->file = str_dup(yytext);
         return FILECOMMENT;
     }
 <cmt3>["] {
@@ -201,7 +202,7 @@ SP              [ ]
 <*>setfile{SP}+["] { yy_push_state(cmt2, yyscanner); }
 <*>setline{SP}+ { yy_push_state(cmt1, yyscanner);  }
 <cmt1>{DIGITS} {
-        valp->t = atoi(yytext);
+        IMCC_INFO(interp)->line = atoi(yytext);
         yy_pop_state(yyscanner);
         yy_push_state(cmt4, yyscanner);
         return LINECOMMENT;
