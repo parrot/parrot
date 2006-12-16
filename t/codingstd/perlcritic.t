@@ -11,6 +11,7 @@ use ExtUtils::Manifest qw(maniread);
 use Fatal qw(open);
 use File::Find;
 use Test::More;
+use Parrot::Distribution;
 
 BEGIN {
     eval { require Test::Perl::Critic; };
@@ -86,13 +87,9 @@ if ($list_policies) {
     exit;
 }
 
+my $DIST = Parrot::Distribution->new();
 if ( !@ARGV ) {
-    my $manifest = maniread('MANIFEST');
-
-    foreach my $file ( keys(%$manifest) ) {
-        next unless is_perl($file);
-        push @files, $file;
-    }
+    @files = $DIST->get_perl_language_files();
 }
 else {
 
@@ -149,39 +146,6 @@ foreach my $file ( sort @files ) {
     }
 
     Test::Perl::Critic::critic_ok($file);
-}
-
-# Since .t files might be written in any language, we can't *just* check the
-# filename to see if something should be treated as perl.
-sub is_perl {
-    my $filename = shift;
-
-    if ( !-f $filename ) {
-        return 0;
-    }
-
-    # modules and perl scripts should always be tested..
-    if ( $filename =~ /\.(?:pm|pl)$/ ) {
-        return 1;
-    }
-
-    # test files (.t) and configure (.in) files might need testing.
-    # ignore everything else.
-    if ( $filename !~ /\.(?:t|in)$/ ) {
-        return 0;
-    }
-
-    # Now let's check to see if there's a perl shebang.
-
-    open my $file_handle, '<', $filename or die "eek";
-    my $line = <$file_handle>;
-    close $file_handle;
-
-    if ( $line && $line =~ /^#!.*perl/ ) {
-        return 1;
-    }
-
-    return 0;
 }
 
 __END__
