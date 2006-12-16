@@ -419,13 +419,6 @@ value of the attribute will also change.
 
 Set the attribute of object Px with the fully qualified name Sy to Pz
 
-=item fetchmethod Px, Py, Sz
-
-Find the PMC for method Sz of object Py, and put it in Px. Note that how the
-method PMC returned behaves if it goes out of scope or if the class hierarchy
-changes or the method definitions change is entirely up to the class that
-provides the PMC.
-
 =item callmethod
 
 =item callmethod Sz

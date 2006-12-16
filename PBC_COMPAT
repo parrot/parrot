@@ -28,6 +28,7 @@
 
 # please insert tab separated entries at the top of the list
 
+2006.12.16	paultcochrane	deleted fetchmethod opcode
 2006.11.14	chip	released 0.4.7
 2006.11.07	tewk	added comp_flags to parrot_sub_t	
 2006.09.23	bernhard	remove ops from dotgnu.ops

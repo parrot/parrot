@@ -43,9 +43,6 @@ Like above, but use continuation $3 instead of creating a new continuation.
 
 Make a tailcall to method $2 with invocant $1.
 
-=item B<DELETED_fetchmethod>(out PMC, invar PMC, in STR)
-
-Use B<find_method> instead.
 =cut
 
 op callmethodcc(invar PMC, in STR) :object_base {
@@ -157,10 +154,6 @@ op tailcallmethod(invar PMC, invar PMC) :object_base {
   interp->current_method = VTABLE_get_string(interp, method_pmc);
   dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
   goto ADDRESS(dest);
-}
-
-op DELETED_fetchmethod(out PMC, invar PMC, in STR) {
-  goto NEXT();
 }
 
 =item B<addmethod>(invar PMC, in STR, invar PMC)
