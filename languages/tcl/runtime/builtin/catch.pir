@@ -20,7 +20,7 @@
   __script = get_root_global ['_tcl'], '__script'
 
   if argc == 0 goto bad_args
-  if argc  > 2 goto bad_args
+  if argc  > 3 goto bad_args
 
   code = argv[0]
   push_eh non_ok
