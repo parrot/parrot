@@ -16,7 +16,8 @@ sub runstep
     chomp $OSVers;
     {
         local $^W;
-        if ($OSVers >= 7) {
+        $OSVers =~ /(\d+)/;
+        if ($1 >= 7) {
             $libs =~ s/-ldl//;
         }
     }
