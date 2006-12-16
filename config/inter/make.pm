@@ -40,6 +40,7 @@ sub runstep
 
     # precedence of sources for the program:
     # default -> probe -> environment -> option -> ask
+    $prog ||= $conf->data->get($util);
     $prog ||= $conf->options->get($util);
     $prog ||= $ENV{uc($util)};
 

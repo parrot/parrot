@@ -58,6 +58,7 @@ sub runstep
 
             make_c     => q{$(PERL) -e "chdir shift @ARGV;}
                 . q{system '$(MAKE)', '-nologo', @ARGV; exit $$? >> 8;"},
+            make       => 'nmake',
 
             # ZI messes with __LINE__
             cc_debug             => '-Zi',

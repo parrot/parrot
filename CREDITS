@@ -152,6 +152,10 @@ D: JIT and EXEC subsystems
 N: Danny Werner
 D: Test for literals
 
+N: Dave Woldrich
+D: Win32 build fixes
+E: dave@woldrich.com
+
 N: David M. Loyd
 
 N: David Romano
