@@ -28,6 +28,10 @@ my @steps;
 sub wanted { /^.*\.pm\z/s && push @steps, $File::Find::name; }
 find({wanted => \&wanted}, 'config'); 
 
+if ($^O !~ /win32/i) {
+    @steps = grep { $_ !~ /win32/i } @steps;
+}
+
 plan tests => scalar @steps;
 foreach my $step (@steps) {
     require_ok($step);
