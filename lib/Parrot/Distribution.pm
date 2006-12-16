@@ -451,6 +451,8 @@ Determines if the given filename is Perl source
 
 =cut
 
+# Since .t files might be written in any language, we can't *just* check the
+# filename to see if something should be treated as perl.
 sub is_perl {
     my $self = shift;
     my $filename = shift;
