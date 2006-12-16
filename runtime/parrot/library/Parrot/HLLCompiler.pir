@@ -226,20 +226,30 @@ specifies the encoding to use for the input (e.g., "utf8").
 
 .sub 'interactive' :method
     .param pmc adverbs         :slurpy :named
-    .local pmc stdin
     .local string target, encoding
     target = adverbs['target']
     target = downcase target
 
+    .local pmc stdin
+    .local int has_readline
     stdin = getstdin
-    $I0 = stdin.'set_readline_interactive'(1)
+    has_readline = stdin.'set_readline_interactive'(1)
     encoding = adverbs['encoding']
     unless encoding goto interactive_loop
     push stdin, encoding
   interactive_loop:
     .local pmc code
     unless stdin goto interactive_end
+    ##  FIXME:  we have to avoid stdin.'readline'() when readline
+    ##  libraries aren't present (RT #41103)
+    if has_readline < 0 goto no_readline
     code = stdin.'readline'('> ')
+    goto have_code
+  no_readline:
+    $S0 = readline stdin
+    code = new .String
+    code = $S0
+  have_code:
     if null code goto interactive_end
     unless code goto interactive_loop
     push_eh interactive_trap
