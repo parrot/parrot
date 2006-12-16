@@ -315,11 +315,11 @@ programming is one place where using goto is not bad form!
 In this example we define a factorial function and recursively call it to
 compute factorial.
 
-  .sub fact
+  .sub factorial
       # Get input parameter.
       .param int n
 
-      # return (n > 1 ? n * _fact(n - 1) : 1)
+      # return (n > 1 ? n * factorial(n - 1) : 1)
       .local int result
 
       if n > 1 goto recurse
@@ -328,7 +328,7 @@ compute factorial.
 
   recurse:
       $I0 = n - 1
-      result = fact($I0)
+      result = factorial($I0)
       result *= n
 
   return:
@@ -342,7 +342,7 @@ compute factorial.
       # We'll do factorial 0 to 10.
       i = 0
   loop:
-      f = fact(i)
+      f = factorial(i)
 
       print "Factorial of "
       print i
@@ -364,23 +364,23 @@ by the name C<n> for the rest of the sub.
 Much of what follows has been seen in previous examples, apart from the line
 reading:
 
-  result = fact($I0)
+  result = factorial($I0)
 
 This single line of PIR actually represents quite a few lines of PASM. First,
 the value in register C<$I0> is moved into the appropriate register for it to
-be received as an integer parameter by the C<_fact> function. Other calling
-related registers are then set up, followed by C<_fact> being invoked. Then,
-once C<_fact> returns, the value returned by C<_fact> is placed into the
+be received as an integer parameter by the C<factorial> function. Other calling
+related registers are then set up, followed by C<factorial> being invoked. Then,
+once C<factorial> returns, the value returned by C<factorial> is placed into the
 register given the name C<result>.
 
-Right before the C<.end> of the C<_fact> sub, a C<.return> directive is used to
-ensure the value held in the register named C<result> is placed into the
+Right before the C<.end> of the C<factorial> sub, a C<.return> directive is used
+to ensure the value held in the register named C<result> is placed into the
 correct register for it to be seen as a return value by the code calling the
 sub.
 
-The call to C<_fact> in main works in just the same was as the recursive call
-to C<_fact> within the sub C<_fact> itself. The only remaining bit of new
-syntax is the C<:main>, written after C<.sub _main>. By default, PIR assumes
+The call to C<factorial> in main works in just the same was as the recursive call
+to C<factorial> within the sub C<factorial> itself. The only remaining bit of new
+syntax is the C<:main>, written after C<.sub main>. By default, PIR assumes
 that execution begins with the first sub in the file. This behavior can be
 changed by marking the sub to start in with C<:main>.
 
