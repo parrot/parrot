@@ -283,39 +283,39 @@ $OUTPUT_AUTOFLUSH = 1;
 # warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # Installation directories:
 
-
 # Handle options
 
 my @valid_opts = qw(ask bindir cc ccflags ccwarn cgoto cxx datadir debugging define exec-prefix
-                    execcapable floatval gc help icu-config icudatadir icuheaders icushared
-                    includedir infodir inline intval jitcapable ld ldflags lex libdir libexecdir
-                    libs link linkflags localstatedir m maintainer mandir miniparrot nomanicheck
-                    oldincludedir opcode ops optimize parrot_is_shared pmc prefix profile sbindir
-                    sharedstatedir step sysconfdir verbose verbose-step=N version without-gdbm
-                    without-gmp without-icu yacc);
+    execcapable floatval gc help icu-config icudatadir icuheaders icushared
+    includedir infodir inline intval jitcapable ld ldflags lex libdir libexecdir
+    libs link linkflags localstatedir m maintainer mandir miniparrot nomanicheck
+    oldincludedir opcode ops optimize parrot_is_shared pmc prefix profile sbindir
+    sharedstatedir step sysconfdir verbose verbose-step=N version without-gdbm
+    without-gmp without-icu yacc);
 
 my %args;
 for (@ARGV) {
-  my($key, $value) = m/--([-\w]+)(?:=(.*))?/;
-  $key   = 'help' unless defined $key;
-  $value = 1      unless defined $value;
+    my ( $key, $value ) = m/--([-\w]+)(?:=(.*))?/;
+    $key   = 'help' unless defined $key;
+    $value = 1      unless defined $value;
 
-  unless (grep $key eq $_, @valid_opts) {
-      die qq/Invalid option $key. See "perl Configure.pl --help" for valid options\n/;
-  }
+    unless ( grep $key eq $_, @valid_opts ) {
+        die qq/Invalid option $key. See "perl Configure.pl --help" for valid options\n/;
+    }
 
-  for ($key) {
-    m/version/ && do {
-      my $svnid = '$Id$';
-      print <<"END";
+    for ($key) {
+        m/version/ && do {
+            my $svnid =
+                '$Id$';
+            print <<"END";
 Parrot Version $parrot_version Configure 2.0
 $svnid
 END
-      exit;
-    };
+            exit;
+        };
 
-    m/help/    && do {
-      print <<"EOT";
+        m/help/ && do {
+            print <<"EOT";
 $0 - Parrot Configure 2.0
 
 General Options:
@@ -430,13 +430,13 @@ Install Options:
     --mandir=DIR            man documentation [PREFIX/man]
 
 EOT
-      exit;
-    };
-    $args{$key} = $value;
-  }
+            exit;
+        };
+        $args{$key} = $value;
+    }
 }
 
-$args{debugging} = 1 unless ((exists $args{debugging}) && !$args{debugging});
+$args{debugging} = 1 unless ( ( exists $args{debugging} ) && !$args{debugging} );
 $args{maintainer} = 1 if defined $args{lex} or defined $args{yacc};
 
 print <<"END";
@@ -515,6 +515,7 @@ my @steps = qw(
 
 my $conf = Parrot::Configure->new;
 {
+
     # XXX $Parrot::Configure::Step::conf is a temporty hack
     no warnings qw(once);
     $Parrot::Configure::Step::conf = $conf;
@@ -523,14 +524,15 @@ $conf->add_steps(@steps);
 $conf->options->set(%args);
 
 if ( exists $args{step} ) {
-  $conf->data()->slurp();
-  $conf->runstep($args{step});
-  print "\n";
-  exit(0);
+    $conf->data()->slurp();
+    $conf->runstep( $args{step} );
+    print "\n";
+    exit(0);
 }
 else {
-  # Run the actual steps
-  $conf->runsteps or exit(1);
+
+    # Run the actual steps
+    $conf->runsteps or exit(1);
 }
 
 # tell users what to do next
