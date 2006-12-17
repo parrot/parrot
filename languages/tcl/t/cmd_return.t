@@ -27,7 +27,7 @@ TCL
 
 OUT
 
-language_output_is('tcl', <<'TCL', <<'OUT', '-code error');
+language_output_is( 'tcl', <<'TCL', <<'OUT', '-code error' );
   proc joe {} { return -code error "bad args" }
   joe
   puts foo

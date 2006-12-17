@@ -93,7 +93,7 @@ sub parse_usage {
 
     my @results;
     my $types = join '|', keys %conversions;
-    my $type  = qr{
+    my $type = qr{
         (\??)             # literal, optional ?
 
         (-?)              # option marker
@@ -466,7 +466,7 @@ sub inlined_badargs {
     my ( $cmd, @args ) = @_;
 
     my $usage = create_usage(@args);
-    my $code  =
+    my $code =
           "bad_args: \n"
         . "  .return(\"  tcl_error 'wrong # args: should be "
         . "\\\"$cmd$usage\\\"' \\n\") \n";

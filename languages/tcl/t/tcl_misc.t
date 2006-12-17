@@ -234,7 +234,7 @@ TCL
 2
 OUT
 
-language_output_is('tcl', <<'TCL', <<'OUT', '{\n}');
+language_output_is( 'tcl', <<'TCL', <<'OUT', '{\n}' );
 proc new {} {
 }
 puts [new]

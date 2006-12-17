@@ -90,7 +90,7 @@ TCL
 4
 OUT
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'uplevel - info level interaction');
+language_output_is( 'tcl', <<'TCL', <<'OUT', 'uplevel - info level interaction' );
   proc test {} {uplevel {info level}}
   puts [test]
 TCL
