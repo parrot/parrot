@@ -186,6 +186,17 @@ loop:
     past.'add_child'($P0)
     goto loop
 end:
+
+    $P0 = past.'get_children'()
+    $I0 = elements $P0
+    if $I0 == 0 goto empty
+
+    .return(past)
+
+empty:
+    past = new 'PAST::Val'
+    past['value'] = ''
+    past['class'] = 'TclString'
     .return(past)
 }
 
