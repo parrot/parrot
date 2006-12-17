@@ -14,12 +14,11 @@ package gen::cpu::x86_64::auto;
 use strict;
 use warnings;
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $ccflags = $conf->data->get('ccflags');
-    $conf->data->add(' ', ccflags => "-fPIC") unless $ccflags =~ /-fPIC/;
+    $conf->data->add( ' ', ccflags => "-fPIC" ) unless $ccflags =~ /-fPIC/;
 }
 
 1;

@@ -25,34 +25,36 @@ $description = 'Determining whether perldoc is installed';
 
 @args = qw();
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $version = 0;
-    my $a       = capture_output('perldoc -ud c99da7c4.tmp perldoc') || undef;
+    my $a = capture_output('perldoc -ud c99da7c4.tmp perldoc') || undef;
 
-    if (defined $a) {
-        if ($a =~ m/^Unknown option:/) {
-            $a       = capture_output('perldoc perldoc') || '';
+    if ( defined $a ) {
+        if ( $a =~ m/^Unknown option:/ ) {
+            $a = capture_output('perldoc perldoc') || '';
             $version = 1;
             $self->set_result('yes, old version');
-        } else {
-            if (open FH, "<", "c99da7c4.tmp") {
+        }
+        else {
+            if ( open FH, "<", "c99da7c4.tmp" ) {
                 local $/;
                 $a = <FH>;
                 close FH;
                 $version = 2;
                 $self->set_result('yes');
-            } else {
+            }
+            else {
                 $a = undef;
             }
         }
-        unless (defined $a && $a =~ m/perldoc/) {
+        unless ( defined $a && $a =~ m/perldoc/ ) {
             $version = 0;
             $self->set_result('failed');
         }
-    } else {
+    }
+    else {
         $self->set_result('no');
     }
     unlink "c99da7c4.tmp";

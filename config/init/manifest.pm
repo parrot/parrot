@@ -26,11 +26,10 @@ $description = 'Checking MANIFEST';
 
 @args = qw(nomanicheck);
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
-    if ($conf->options->get('nomanicheck')) {
+    if ( $conf->options->get('nomanicheck') ) {
         $self->set_result('skipped');
         return $self;
     }

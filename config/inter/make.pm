@@ -27,14 +27,13 @@ $description = "Determining whether $util is installed";
 $prompt      = "Do you have a make utility like 'gmake' or 'make'?";
 @args        = qw( make ask );
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $verbose = $conf->options->get('verbose');
 
     # undef means we don't have GNU make... default to not having it
-    $conf->data->set(gmake_version => undef);
+    $conf->data->set( gmake_version => undef );
 
     my $prog;
 
@@ -42,16 +41,16 @@ sub runstep
     # default -> probe -> environment -> option -> ask
     $prog ||= $conf->data->get($util);
     $prog ||= $conf->options->get($util);
-    $prog ||= $ENV{uc($util)};
+    $prog ||= $ENV{ uc($util) };
 
     # never override the user.  If a non-existent program is specified then
     # the user is responsible for the consequences.
-    if (defined $prog) {
-        $conf->data->set($util => $prog);
+    if ( defined $prog ) {
+        $conf->data->set( $util => $prog );
         $self->set_result('yes');
-    } else {
-        $prog = check_progs(['gmake', 'mingw32-make', 'nmake', 'make'],
-            $verbose);
+    }
+    else {
+        $prog = check_progs( [ 'gmake', 'mingw32-make', 'nmake', 'make' ], $verbose );
 
         unless ($prog) {
 
@@ -61,15 +60,15 @@ sub runstep
         }
     }
 
-    if ($conf->options->get('ask')) {
-        $prog = prompt($prompt, $prog ? $prog : $conf->data->get($util));
+    if ( $conf->options->get('ask') ) {
+        $prog = prompt( $prompt, $prog ? $prog : $conf->data->get($util) );
     }
 
-    my ($stdout, $stderr, $ret) = capture_output($prog, '--version');
+    my ( $stdout, $stderr, $ret ) = capture_output( $prog, '--version' );
 
     # don't override the user even if the program they provided appears to be
     # broken
-    if ($ret == -1 and !$conf->options->get('ask')) {
+    if ( $ret == -1 and !$conf->options->get('ask') ) {
 
         # fall back to default
         $self->set_result('no');
@@ -77,17 +76,18 @@ sub runstep
     }
 
     # if '--version' returns a string assume that this is gmake.
-    if ($stdout =~ /GNU \s+ Make \s+ (\d+) \. (\d+)/x) {
-        $conf->data->set(gmake_version => "$1.$2");
+    if ( $stdout =~ /GNU \s+ Make \s+ (\d+) \. (\d+)/x ) {
+        $conf->data->set( gmake_version => "$1.$2" );
     }
 
-    $conf->data->set($util => $prog);
+    $conf->data->set( $util => $prog );
     $self->set_result('yes');
 
     # setup make_C
-    if ($conf->data->get('gmake_version')) {
-        $conf->data->set(make_c => "$prog -C");
-    } else {
+    if ( $conf->data->get('gmake_version') ) {
+        $conf->data->set( make_c => "$prog -C" );
+    }
+    else {
 
         # get the default value
         my $make_c = $conf->data->get('make_c');
@@ -97,7 +97,7 @@ sub runstep
         # with a variable that recursively refers to itself
         $make_c =~ s/\$\(MAKE\)/$prog/;
 
-        $conf->data->set(make_c => $make_c);
+        $conf->data->set( make_c => $make_c );
     }
 
     return $self;

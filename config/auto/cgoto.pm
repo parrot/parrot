@@ -24,21 +24,21 @@ use Parrot::Configure::Step ':auto';
 $description = 'Determining whether your compiler supports computed goto';
 @args        = qw(cgoto miniparrot verbose);
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
-    if ($conf->options->get('miniparrot')) {
+    if ( $conf->options->get('miniparrot') ) {
         $self->set_result('skipped');
         return $self;
     }
 
-    my ($cgoto, $verbose) = $conf->options->get(qw(cgoto verbose));
+    my ( $cgoto, $verbose ) = $conf->options->get(qw(cgoto verbose));
 
     my $test;
-    if (defined $cgoto) {
+    if ( defined $cgoto ) {
         $test = $cgoto;
-    } else {
+    }
+    else {
         cc_gen('config/auto/cgoto/test_c.in');
         $test = eval { cc_build(); 1; } || 0;
         cc_clean();
@@ -71,7 +71,8 @@ EOF
         );
         print " (yes) " if $verbose;
         $self->set_result('yes');
-    } else {
+    }
+    else {
         $conf->data->set(
             TEMP_cg_h => '',
             TEMP_cg_c => '',

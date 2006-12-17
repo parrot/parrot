@@ -7,11 +7,10 @@ use strict;
 use warnings;
 use Win32;
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
-    my ($cc, $ccflags, $libs) = $conf->data->get(qw(cc ccflags libs));
+    my ( $cc, $ccflags, $libs ) = $conf->data->get(qw(cc ccflags libs));
 
     # Later in the Parrot::Configure::RunSteps->runsteps process,
     # inter/progs.pl will merge the command-line overrides with the defaults.
@@ -24,16 +23,16 @@ sub runstep
     my $is_bcc   = grep { $cc eq $_ } (qw(bcc32 bcc32.exe));
 
     $conf->data->set(
-        win32             => 1,
-        PQ                => '"',
-        make_c            => '$(PERL) -e "chdir shift @ARGV; system \'$(MAKE)\', @ARGV; exit $$? >> 8;"',
+        win32  => 1,
+        PQ     => '"',
+        make_c => '$(PERL) -e "chdir shift @ARGV; system \'$(MAKE)\', @ARGV; exit $$? >> 8;"',
         ncilib_link_extra => '-def:src/libnci_test.def',
     );
-    
+
     my $build_dir = $conf->data->get('build_dir');
-    
-    if ($build_dir =~ /\s/) {
-        $conf->data->set(build_dir => Win32::GetShortPathName($build_dir));
+
+    if ( $build_dir =~ /\s/ ) {
+        $conf->data->set( build_dir => Win32::GetShortPathName($build_dir) );
     }
 
     if ($is_msvc) {
@@ -56,27 +55,27 @@ sub runstep
             cc_exe_out => '-out:',
             cc_ldflags => '/link',
 
-            make_c     => q{$(PERL) -e "chdir shift @ARGV;}
+            make_c => q{$(PERL) -e "chdir shift @ARGV;}
                 . q{system '$(MAKE)', '-nologo', @ARGV; exit $$? >> 8;"},
-            make       => 'nmake',
+            make => 'nmake',
 
             # ZI messes with __LINE__
-            cc_debug             => '-Zi',
-            ld_debug             => '-debug',
-            ld_share_flags       => '-dll',
-            ld_load_flags        => '-dll',
-            ld_out               => '-out:',
-            ldflags              => '-nologo -nodefaultlib',
-            libparrot_static     => 'libparrot'.$conf->data->get('a'),
-            libparrot_shared     => 'libparrot$(SHARE_EXT)',
-            ar_flags             => '',
-            ar_out               => '-out:',
-            slash                => '\\',
-            blib_dir             => 'blib\\lib',
-            ccflags              => $ccflags,
-            ccwarn               => '',
-            has_dynamic_linking  => 1,
-            parrot_is_shared     => 1,
+            cc_debug            => '-Zi',
+            ld_debug            => '-debug',
+            ld_share_flags      => '-dll',
+            ld_load_flags       => '-dll',
+            ld_out              => '-out:',
+            ldflags             => '-nologo -nodefaultlib',
+            libparrot_static    => 'libparrot' . $conf->data->get('a'),
+            libparrot_shared    => 'libparrot$(SHARE_EXT)',
+            ar_flags            => '',
+            ar_out              => '-out:',
+            slash               => '\\',
+            blib_dir            => 'blib\\lib',
+            ccflags             => $ccflags,
+            ccwarn              => '',
+            has_dynamic_linking => 1,
+            parrot_is_shared    => 1,
 
             sym_export => '__declspec(dllexport)',
             sym_import => '__declspec(dllimport)'
@@ -84,21 +83,22 @@ sub runstep
 
         # If we are building shared, need to include dynamic libparrot.lib, otherwise
         # the static libparrot.lib.
-        if ($conf->data->get('parrot_is_shared')) {
-            $conf->data->set(libparrot_ldflags => 'libparrot$(A)');
+        if ( $conf->data->get('parrot_is_shared') ) {
+            $conf->data->set( libparrot_ldflags => 'libparrot$(A)' );
         }
 
         # 'link' needs to be link.exe, not cl.exe.
         # This makes 'link' and 'ld' the same.
-        $conf->data->set(link => $conf->data->get('ld'));
+        $conf->data->set( link => $conf->data->get('ld') );
 
         # We can't use -opt: and -debug together.
-        if ($conf->data->get('ld_debug') =~ /-debug/) {
+        if ( $conf->data->get('ld_debug') =~ /-debug/ ) {
             my $linkflags = $conf->data->get('linkflags');
             $linkflags =~ s/-opt:\S+//;
-            $conf->data->set(linkflags => $linkflags);
+            $conf->data->set( linkflags => $linkflags );
         }
-    } elsif ($is_intel) {
+    }
+    elsif ($is_intel) {
         $conf->data->set(
             share_ext  => '.dll',
             load_ext   => '.dll',
@@ -109,35 +109,36 @@ sub runstep
             cc_ldflags => '/link',
 
             # ZI messes with __LINE__
-            cc_debug             => '-Zi',
-            libs                 => "$libs libircmt.lib",
-            ld                   => 'xilink',
-            ld_debug             => '-debug',
-            ld_share_flags       => '-dll',
-            ld_load_flags        => '-dll',
-            ld_out               => '-out:',
-            ldflags              => '-nologo -nodefaultlib',
-            ar                   => 'xilib',
-            ar_flags             => '',
-            ar_out               => '-out:',
-            slash                => '\\',
-            blib_dir             => 'blib\\lib',
-            ccflags              => $ccflags,
-            ccwarn               => '',
-            has_dynamic_linking  => 1
+            cc_debug            => '-Zi',
+            libs                => "$libs libircmt.lib",
+            ld                  => 'xilink',
+            ld_debug            => '-debug',
+            ld_share_flags      => '-dll',
+            ld_load_flags       => '-dll',
+            ld_out              => '-out:',
+            ldflags             => '-nologo -nodefaultlib',
+            ar                  => 'xilib',
+            ar_flags            => '',
+            ar_out              => '-out:',
+            slash               => '\\',
+            blib_dir            => 'blib\\lib',
+            ccflags             => $ccflags,
+            ccwarn              => '',
+            has_dynamic_linking => 1
         );
 
         # 'link' needs to be xilink.exe, not icl.exe.
         # This makes 'link' and 'ld' the same.
-        $conf->data->set(link => $conf->data->get('ld'));
+        $conf->data->set( link => $conf->data->get('ld') );
 
         # We can't use -opt: and -debug together.
-        if ($conf->data->get('ld_debug') =~ /-debug/) {
+        if ( $conf->data->get('ld_debug') =~ /-debug/ ) {
             my $linkflags = $conf->data->get('linkflags');
             $linkflags =~ s/-opt:\S+//;
-            $conf->data->set(linkflags => $linkflags);
+            $conf->data->set( linkflags => $linkflags );
         }
-    } elsif ($is_bcc) {
+    }
+    elsif ($is_bcc) {
         $conf->data->set(
             o          => '.obj',
             a          => '.lib',
@@ -169,47 +170,50 @@ sub runstep
             blib_dir => 'blib\\lib',
             make_and => "\n\t",
         );
-    } elsif ($is_mingw) {
+    }
+    elsif ($is_mingw) {
         my $make = $conf->data->get(qw(make));
-        if ($make =~ /nmake/i) {
+        if ( $make =~ /nmake/i ) {
 
             # ActiveState Perl or PXPerl
             $conf->data->set(
-                a              => '.a',
-                ar             => 'ar',
-                cc             => 'gcc',
-                ccflags        => '-DWIN32 ',
-                ld             => 'g++',
-                ldflags        => '',
-                libs           =>
-                    '-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion -lodbc32 ',
-                link              => 'gcc',
-                linkflags         => '',
-                o                 => '.o',
-                slash             => '\\',
-                blib_dir          => 'blib\\lib',
+                a       => '.a',
+                ar      => 'ar',
+                cc      => 'gcc',
+                ccflags => '-DWIN32 ',
+                ld      => 'g++',
+                ldflags => '',
+                libs =>
+'-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion -lodbc32 ',
+                link      => 'gcc',
+                linkflags => '',
+                o         => '.o',
+                slash     => '\\',
+                blib_dir  => 'blib\\lib',
             );
-            if ($conf->data->get(qw(optimize)) eq "1") {
-                $conf->data->set(optimize => '-O2');
+            if ( $conf->data->get(qw(optimize)) eq "1" ) {
+                $conf->data->set( optimize => '-O2' );
             }
-        } elsif ($make =~ /dmake/i) {
+        }
+        elsif ( $make =~ /dmake/i ) {
 
             # mingw Perl
-        } else {
+        }
+        else {
             warn "unknown configuration";
         }
 
         $conf->data->set(
-            parrot_is_shared     => 1,
-            has_dynamic_linking  => 1,
-            ld_load_flags        => '-shared ',
-            ld_share_flags       => '-shared ',
-            libparrot_ldflags    => $conf->data->get('build_dir') . '/libparrot.dll',
-            ncilib_link_extra    => 'src/libnci_test.def',
-            sym_export           => '__declspec(dllexport)',
-            sym_import           => '__declspec(dllimport)',
-            make                 => 'mingw32-make',
-            make_c               => 'mingw32-make -C',
+            parrot_is_shared    => 1,
+            has_dynamic_linking => 1,
+            ld_load_flags       => '-shared ',
+            ld_share_flags      => '-shared ',
+            libparrot_ldflags   => $conf->data->get('build_dir') . '/libparrot.dll',
+            ncilib_link_extra   => 'src/libnci_test.def',
+            sym_export          => '__declspec(dllexport)',
+            sym_import          => '__declspec(dllimport)',
+            make                => 'mingw32-make',
+            make_c              => 'mingw32-make -C',
         );
     }
 }

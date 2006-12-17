@@ -6,16 +6,15 @@ package init::hints::hpux;
 use strict;
 use warnings;
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $libs = $conf->data->get('libs');
-    if ($libs !~ /-lpthread/) {
+    if ( $libs !~ /-lpthread/ ) {
         $libs .= ' -lpthread';
     }
 
-    $conf->data->set(libs => $libs);
+    $conf->data->set( libs => $libs );
 }
 
 1;

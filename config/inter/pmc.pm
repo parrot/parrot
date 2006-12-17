@@ -27,14 +27,13 @@ my %PMC_PARENTS;
 
 # Return the (lowercased) name of the immediate parent of the given
 # (lowercased) pmc name.
-sub pmc_parent
-{
+sub pmc_parent {
     my ($pmc) = @_;
 
     return $PMC_PARENTS{$pmc} if defined $PMC_PARENTS{$pmc};
 
     local $/;
-    open(PMC, "<", "src/pmc/$pmc.pmc")
+    open( PMC, "<", "src/pmc/$pmc.pmc" )
         or die "open src/pmc/$pmc.pmc failed: $!";
     local $_ = <PMC>;
     close PMC;
@@ -48,19 +47,17 @@ sub pmc_parent
 }
 
 # Return an array of all
-sub pmc_parents
-{
+sub pmc_parents {
     my ($pmc) = @_;
 
     my @parents = ($pmc);
-    push @parents, pmc_parent($parents[-1]) until $parents[-1] eq 'default';
+    push @parents, pmc_parent( $parents[-1] ) until $parents[-1] eq 'default';
     shift(@parents);
-  
+
     return @parents;
 }
 
-sub get_pmc_order
-{
+sub get_pmc_order {
     open IN, '<', 'src/pmc/pmc.num' or die "Can't read src/pmc/pmc.num";
     my %order;
     while (<IN>) {
@@ -74,30 +71,29 @@ sub get_pmc_order
     return \%order;
 }
 
-sub sort_pmcs
-{
+sub sort_pmcs {
     my @pmcs      = @_;
     my $pmc_order = get_pmc_order();
-    my $n         = scalar keys(%{$pmc_order});
+    my $n         = scalar keys( %{$pmc_order} );
     my @sorted_pmcs;
     for (@pmcs) {
-        if (exists $pmc_order->{$_}) {
-            $sorted_pmcs[$pmc_order->{$_}] = $_;
+        if ( exists $pmc_order->{$_} ) {
+            $sorted_pmcs[ $pmc_order->{$_} ] = $_;
 
             #if (exists $pmc_order->{"const$_"}) {
             #   $sorted_pmcs[$pmc_order->{"const$_"}] = "const$_";
             #}
-        } else {
-            $sorted_pmcs[$n++] = $_;
+        }
+        else {
+            $sorted_pmcs[ $n++ ] = $_;
         }
     }
     ## print "***\n", join(' ', @sorted_pmcs), "\n";
     @sorted_pmcs;
 }
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my @pmc = (
         sort
@@ -107,9 +103,9 @@ sub runstep
     @pmc = sort_pmcs(@pmc);
 
     my $pmc_list = $conf->options->get('pmc')
-        || join(' ', grep { defined $_ } @pmc);
+        || join( ' ', grep { defined $_ } @pmc );
 
-    if ($conf->options->get('ask')) {
+    if ( $conf->options->get('ask') ) {
         print <<"END";
 
 
@@ -117,7 +113,7 @@ The following PMC files are available:
   @pmc
 END
         {
-            $pmc_list = prompt('Which PMC files would you like?', $pmc_list);
+            $pmc_list = prompt( 'Which PMC files would you like?', $pmc_list );
         }
     }
 
@@ -126,8 +122,8 @@ END
     # so there would be tests needed, that check for vital classes
 
     # names of class files for src/pmc/Makefile
-    (my $TEMP_pmc_o   = $pmc_list) =~ s/\.pmc/\$(O)/g;
-    (my $TEMP_pmc_str = $pmc_list) =~ s/\.pmc/\.str/g;
+    ( my $TEMP_pmc_o   = $pmc_list ) =~ s/\.pmc/\$(O)/g;
+    ( my $TEMP_pmc_str = $pmc_list ) =~ s/\.pmc/\.str/g;
 
     # calls to pmc2c.pl for src/pmc/Makefile
     my $TEMP_pmc_build = <<"E_NOTE";
@@ -136,16 +132,16 @@ END
 
 E_NOTE
 
-    foreach my $pmc (split(/\s+/, $pmc_list)) {
+    foreach my $pmc ( split( /\s+/, $pmc_list ) ) {
         $pmc =~ s/\.pmc$//;
-        next if ($pmc =~ /^const/);
+        next if ( $pmc =~ /^const/ );
 
         # make each pmc depend upon its parent.
-        my $parent = pmc_parent($pmc) . ".pmc";
+        my $parent       = pmc_parent($pmc) . ".pmc";
         my $parent_dumps = '';
-        $parent_dumps .= "src/pmc/$_.dump " foreach reverse((pmc_parents($pmc)));
+        $parent_dumps .= "src/pmc/$_.dump " foreach reverse( ( pmc_parents($pmc) ) );
         my $parent_headers = '';
-        $parent_headers .= "src/pmc/pmc_$_.h " foreach (pmc_parents($pmc));
+        $parent_headers .= "src/pmc/pmc_$_.h " foreach ( pmc_parents($pmc) );
         $TEMP_pmc_build .= <<END
 src/pmc/$pmc.c : src/pmc/$pmc.dump
 \t\$(PMC2CC) src/pmc/$pmc.pmc
@@ -166,15 +162,15 @@ END
 
     # build list of libraries for link line in Makefile
     my $slash = $conf->data->get('slash');
-    (my $TEMP_pmc_classes_o   = $TEMP_pmc_o)   =~ s/^| / src${slash}pmc${slash}/g;
-    (my $TEMP_pmc_classes_str = $TEMP_pmc_str) =~ s/^| / src${slash}pmc${slash}/g;
-    (my $TEMP_pmc_classes_pmc = $pmc_list)     =~ s/^| / src${slash}pmc${slash}/g;
+    ( my $TEMP_pmc_classes_o   = $TEMP_pmc_o )   =~ s/^| / src${slash}pmc${slash}/g;
+    ( my $TEMP_pmc_classes_str = $TEMP_pmc_str ) =~ s/^| / src${slash}pmc${slash}/g;
+    ( my $TEMP_pmc_classes_pmc = $pmc_list )     =~ s/^| / src${slash}pmc${slash}/g;
 
     # Gather the actual names (with MixedCase) of all of the
     # non-abstract built-in PMCs.
     my @names;
-    PMC: foreach my $pmc_file (split(/\s+/, $pmc_list)) {
-        next if ($pmc_file =~ /^const/);
+PMC: foreach my $pmc_file ( split( /\s+/, $pmc_list ) ) {
+        next if ( $pmc_file =~ /^const/ );
         my $name;
         open PMC, "<", "src/pmc/$pmc_file"
             or die "open src/pmc/$pmc_file: $!";
@@ -183,7 +179,7 @@ END
             if (/^pmclass (\w+)(.*)/) {
                 $name = $1;
                 my $decl = $2;
-                $decl .= <PMC> until ($decl =~ s/\{.*//);
+                $decl .= <PMC> until ( $decl =~ s/\{.*// );
                 $const = 1 if $decl =~ /\bconst_too\b/;
                 next PMC if $decl =~ /\babstract\b/;
                 next PMC if $decl =~ /\bextension\b/;
@@ -202,7 +198,7 @@ END
 
     $conf->data->set(
         pmc                  => $pmc_list,
-        pmc_names            => join(" ", @names),
+        pmc_names            => join( " ", @names ),
         TEMP_pmc_o           => $TEMP_pmc_o,
         TEMP_pmc_build       => $TEMP_pmc_build,
         TEMP_pmc_classes_o   => $TEMP_pmc_classes_o,

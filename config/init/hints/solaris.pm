@@ -8,18 +8,17 @@ use warnings;
 
 use Parrot::Configure::Step qw(cc_gen cc_run);
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $libs = $conf->data->get('libs');
-    if ($libs !~ /-lpthread/) {
+    if ( $libs !~ /-lpthread/ ) {
         $libs .= ' -lpthread';
     }
-    if ($libs !~ /-lrt\b/) {
+    if ( $libs !~ /-lrt\b/ ) {
         $libs .= ' -lrt';    # Needed for sched_yield.
     }
-    $conf->data->set(libs => $libs);
+    $conf->data->set( libs => $libs );
 
     ################################################################
     # If we're going to be using ICU (or any other C++-compiled library) we
@@ -29,25 +28,26 @@ sub runstep
     # been asked.)
     my $solaris_link_cb = sub {
         use Carp;
-        my ($key, $cc) = @_;
+        my ( $key, $cc ) = @_;
         my %gnuc;
         my $link = $conf->data->get('link');
         cc_gen("config/auto/gcc/test_c.in");
 
         # Can't call cc_build since we haven't set all the flags yet.
         # This should suffice for this test.
-        Parrot::Configure::Step::_run_command("$cc -o test test.c", 'test.cco', 'test.cco')
+        Parrot::Configure::Step::_run_command( "$cc -o test test.c", 'test.cco', 'test.cco' )
             and confess "C compiler failed (see test.cco)";
         %gnuc = eval cc_run() or die "Can't run the test program: $!";
-        if (defined $gnuc{__GNUC__}) {
+        if ( defined $gnuc{__GNUC__} ) {
             $link = 'g++';
-        } else {
+        }
+        else {
             $link =~ s/\bcc\b/CC/;
         }
-        $conf->data->set(link => $link);
-        $conf->data->deltrigger("cc", "solaris_link");
+        $conf->data->set( link => $link );
+        $conf->data->deltrigger( "cc", "solaris_link" );
     };
-    $conf->data->settrigger("cc", "solaris_link", $solaris_link_cb);
+    $conf->data->settrigger( "cc", "solaris_link", $solaris_link_cb );
 
     ################################################################
     # cc_shared:  Flags to instruct the compiler to use position-independent
@@ -56,16 +56,17 @@ sub runstep
     # gccversion test.
     # XXX Should this go into the shlibs.pl Configure.pl unit instead?
     my $solaris_cc_shared_cb = sub {
-        my ($key, $gccversion) = @_;
+        my ( $key, $gccversion ) = @_;
 
         if ($gccversion) {
-            $conf->data->set(cc_shared => '-fPIC');
-        } else {
-            $conf->data->set(cc_shared => '-KPIC');
+            $conf->data->set( cc_shared => '-fPIC' );
         }
-        $conf->data->deltrigger("gccversion", "solaris_cc_shared");
+        else {
+            $conf->data->set( cc_shared => '-KPIC' );
+        }
+        $conf->data->deltrigger( "gccversion", "solaris_cc_shared" );
     };
-    $conf->data->settrigger("gccversion", "solaris_cc_shared", $solaris_cc_shared_cb);
+    $conf->data->settrigger( "gccversion", "solaris_cc_shared", $solaris_cc_shared_cb );
 
     ################################################################
     # Parrot usually aims for IEEE-754 compliance.
@@ -80,19 +81,20 @@ sub runstep
     #   A. Dougherty  7 March 2005
     # We don't know which compiler we're using till after the gccversion test.
     my $solaris_ieee_cb = sub {
-        my ($key, $gccversion) = @_;
+        my ( $key, $gccversion ) = @_;
 
         if ($gccversion) {
 
             # Don't know how to do this for gcc.
-        } else {
+        }
+        else {
             my $linkflags = $conf->data->get('linkflags');
-            $conf->data->add(' ', linkflags => '-xlibmieee')
+            $conf->data->add( ' ', linkflags => '-xlibmieee' )
                 unless $linkflags =~ /-xlibmieee/;
         }
-        $conf->data->deltrigger("gccversion", "solaris_ieee");
+        $conf->data->deltrigger( "gccversion", "solaris_ieee" );
     };
-    $conf->data->settrigger("gccversion", "solaris_ieee", $solaris_ieee_cb);
+    $conf->data->settrigger( "gccversion", "solaris_ieee", $solaris_ieee_cb );
 }
 
 1;

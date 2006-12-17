@@ -25,26 +25,26 @@ $description = 'Test the type of va_ptr (this test is likely to segfault)';
 
 @args = qw();
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $va_type;
     cc_gen('config/auto/va_ptr/test_c.in');
     eval { cc_build('-DVA_TYPE_X86'); };
 
-    if ($@ || cc_run() !~ /^ok/) {
+    if ( $@ || cc_run() !~ /^ok/ ) {
         eval { cc_build('-DVA_TYPE_PPC'); };
-        if ($@ || cc_run() !~ /^ok/) {
+        if ( $@ || cc_run() !~ /^ok/ ) {
             die "Unknown va_ptr type";
         }
         $va_type = 'ppc';
-    } else {
+    }
+    else {
         $va_type = 'x86';
     }
     cc_clean();
     $self->set_result($va_type);
-    $conf->data->set(va_ptr_type => $va_type);
+    $conf->data->set( va_ptr_type => $va_type );
 
     return $self;
 }

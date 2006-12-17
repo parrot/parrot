@@ -30,11 +30,10 @@ $description = 'Tweaking settings for miniparrot';
 
 @args = qw(miniparrot);
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
-    unless ($conf->options->get('miniparrot')) {
+    unless ( $conf->options->get('miniparrot') ) {
         $self->set_result('skipped');
         return $self;
     }
@@ -76,8 +75,9 @@ sub runstep
     foreach (
         qw(assert complex ctype errno locale math setjmp signal stdarg
         stdio stdlib string time)
-        ) {
-        $conf->data->set("i_$_" => 1);
+        )
+    {
+        $conf->data->set( "i_$_" => 1 );
     }
 
     return $self;

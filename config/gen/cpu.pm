@@ -26,11 +26,10 @@ $description = 'Generating CPU specific stuff';
 
 @args = qw(miniparrot verbose);
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
-    if ($conf->options->get('miniparrot')) {
+    if ( $conf->options->get('miniparrot') ) {
         $self->set_result('skipped');
         return $self;
     }
@@ -43,8 +42,9 @@ sub runstep
 
     eval "use $hints";
     unless ($@) {
-        $hints->runstep($conf, @_);
-    } else {
+        $hints->runstep( $conf, @_ );
+    }
+    else {
         print "(no cpu specific hints)" if $verbose;
     }
 

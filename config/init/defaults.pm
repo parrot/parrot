@@ -28,9 +28,8 @@ $description = q{Setting up Configure's default values};
 
 @args = qw(debugging optimize profile verbose m);
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     # We need a Glossary somewhere!
     $conf->data->set(
@@ -43,7 +42,7 @@ sub runstep
         # (Usually cc or cl, or something like that.)
         cc      => $Config{cc},
         ccflags => $Config{ccflags},
-        ccwarn  => exists($Config{ccwarn}) ? $Config{ccwarn} : '',
+        ccwarn  => exists( $Config{ccwarn} ) ? $Config{ccwarn} : '',
 
         # Flags used to indicate this object file is to be compiled
         # with position-independent code suitable for dynamic loading.
@@ -84,7 +83,7 @@ sub runstep
 
         # Flags to tell ld to build a dynamically loadable module, e.g.
         # -shared for GNU ld.
-        ld_load_flags     => $Config{lddlflags},
+        ld_load_flags => $Config{lddlflags},
 
         libs => $Config{libs},
 
@@ -119,14 +118,14 @@ sub runstep
         sym_import => '',
 
         # Library build directory
-        blib_dir      => 'blib/lib',
+        blib_dir => 'blib/lib',
 
         # libparrot library names
-        libparrot_static => 'libparrot'.$Config{_a},
-        libparrot_shared => 'libparrot.'.$Config{so},
+        libparrot_static => 'libparrot' . $Config{_a},
+        libparrot_shared => 'libparrot.' . $Config{so},
 
         # does the system know about static/dynamic linking?
-        has_static_linking => 1,
+        has_static_linking  => 1,
         has_dynamic_linking => 0,
 
         # default behaviour for linking parrot to a static or shared libparrot
@@ -172,7 +171,7 @@ sub runstep
         MAJOR   => $main::parrot_version[0],
         MINOR   => $main::parrot_version[1],
         PATCH   => $main::parrot_version[2],
-        DEVEL   => (-e 'DEVELOPING' ? '-devel' : ''),
+        DEVEL   => ( -e 'DEVELOPING' ? '-devel' : '' ),
 
         configdate => scalar localtime,
         PQ         => "'",
@@ -193,7 +192,7 @@ sub runstep
     # FIXME gcc syntax
     # we should have this in the hints files e.g. cc_profile
     # FIXME move profiling to it's own step
-    if ($conf->options->get('profile')) {
+    if ( $conf->options->get('profile') ) {
         $conf->data->set(
             cc_debug => " -pg ",
             ld_debug => " -pg ",
@@ -202,27 +201,29 @@ sub runstep
 
     # adjust archname, cc and libs for e.g. --m=32
     # TODO this is maybe gcc only
-    my $m = $conf->options->get('m');
+    my $m        = $conf->options->get('m');
     my $archname = $Config{archname};
     if ($m) {
-        if ($archname =~ /x86_64/ && $m eq '32') { 
+        if ( $archname =~ /x86_64/ && $m eq '32' ) {
             $archname =~ s/x86_64/i386/;
 
             # adjust gcc?
             for my $cc qw(cc cxx link ld) {
-                $conf->data->add(' ', $cc, '-m32');
+                $conf->data->add( ' ', $cc, '-m32' );
             }
+
             # and lib flags
             for my $lib qw(ld_load_flags ld_share_flags ldflags linkflags) {
                 my $item = $conf->data->get($lib);
-                (my $ni = $item) =~ s/lib64/lib/g;
-                $conf->data->set($lib, $ni);
+                ( my $ni = $item ) =~ s/lib64/lib/g;
+                $conf->data->set( $lib, $ni );
             }
         }
     }
+
     # TODO adjust lib install-path /lib64 vs. lib
     # remember corrected archname - jit.pm was using $Config('archname')
-    $conf->data->set('archname', $archname);
+    $conf->data->set( 'archname', $archname );
 
     return $self;
 }

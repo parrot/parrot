@@ -27,34 +27,40 @@ $description = 'Enabling optimization';
 
 @args = qw(verbose optimize);
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     # A plain --optimize means use perl5's $Config{optimize}.  If an argument
-    # is given, however, use that instead. 
+    # is given, however, use that instead.
     my $optimize = $conf->options->get('optimize');
-    if (defined $optimize) {
+    if ( defined $optimize ) {
         $self->set_result('yes');
+
         # disable debug flags
-        $conf->data->set(cc_debug => '');
-        $conf->data->add(' ', ccflags => "-DDISABLE_GC_DEBUG=1 -DNDEBUG");
-        if ($optimize eq "1") {
+        $conf->data->set( cc_debug => '' );
+        $conf->data->add( ' ', ccflags => "-DDISABLE_GC_DEBUG=1 -DNDEBUG" );
+        if ( $optimize eq "1" ) {
+
             # use perl5's value
             # gcc 4.1 doesn't like -mcpu=xx, i.e. it's deprecated
             # XXX do we know compiler (version) already?
             my $opts = $Config{optimize};
             $opts =~ s/-mcpu=\S+//;
-            $conf->data->add(' ', ccflags => $opts);
+            $conf->data->add( ' ', ccflags => $opts );
+
             # record what optimization was enabled
-            $conf->data->set(optimize => $opts);
-        } else {
-            # use what was passed to --optimize on the CLI
-            $conf->data->add(' ', ccflags => $optimize);
-            # record what optimization was enabled
-            $conf->data->set(optimize => $optimize);
+            $conf->data->set( optimize => $opts );
         }
-    } else {
+        else {
+
+            # use what was passed to --optimize on the CLI
+            $conf->data->add( ' ', ccflags => $optimize );
+
+            # record what optimization was enabled
+            $conf->data->set( optimize => $optimize );
+        }
+    }
+    else {
         $self->set_result('no');
         print "(none requested) " if $conf->options->get('verbose');
     }

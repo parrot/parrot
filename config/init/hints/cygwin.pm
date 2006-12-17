@@ -6,9 +6,8 @@ package init::hints::cygwin;
 use strict;
 use warnings;
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     # cygwin's perl is compiled with -lutil, which for some reason is not
     # in the standard installation, so we get rid of it
@@ -33,18 +32,19 @@ sub runstep
         has_static_linking  => 0,
         has_dynamic_linking => 1,
         parrot_is_shared    => 1,
-        sym_export => '__declspec(dllexport)',
-        sym_import => '__declspec(dllimport)'
+        sym_export          => '__declspec(dllexport)',
+        sym_import          => '__declspec(dllimport)'
     );
 
     # inet_aton needs to be defined on Cygwin.
     my $define = $conf->options->get('define');
     unless ($define) {
         $define = 'inet_aton';
-    } elsif ($define !~ /inet_[ap]ton/) {
-        $define = join(',', 'inet_aton', $define);
     }
-    $conf->options->set(define => $define);
+    elsif ( $define !~ /inet_[ap]ton/ ) {
+        $define = join( ',', 'inet_aton', $define );
+    }
+    $conf->options->set( define => $define );
 }
 
 1;

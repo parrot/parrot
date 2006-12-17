@@ -25,9 +25,8 @@ $description = 'Verifying that the compiler supports function pointer casts';
 
 @args = qw(verbose);
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $jitcapable = $conf->data->get('jitcapable');
 
@@ -35,7 +34,7 @@ sub runstep
         cc_gen('config/auto/funcptr/test_c.in');
         eval { cc_build(); };
 
-        if ($@ || cc_run() !~ /OK/) {
+        if ( $@ || cc_run() !~ /OK/ ) {
             print <<"END";
 Although it is not required by the ANSI C standard,
 Parrot requires the ability to cast from void pointers to function

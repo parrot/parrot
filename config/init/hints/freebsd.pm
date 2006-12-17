@@ -6,9 +6,8 @@ package init::hints::freebsd;
 use strict;
 use warnings;
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $libs = $conf->data->get('libs');
 
@@ -19,9 +18,10 @@ sub runstep
     # which must be assumed to do the right thing.
 
     my $osversion;
-    if (-e "/sbin/sysctl") {
+    if ( -e "/sbin/sysctl" ) {
         $osversion = `/sbin/sysctl -n kern.osreldate`;
-    } else {
+    }
+    else {
         $osversion = `/usr/sbin/sysctl -n kern.osreldate`;
     }
     chomp $osversion;
@@ -29,15 +29,15 @@ sub runstep
     $libs .= ' -pthread';
 
     $conf->data->set(
-        libs                    => $libs,
-        link                    => 'g++',
-        rpath                   => '-Wl,-R',
+        libs  => $libs,
+        link  => 'g++',
+        rpath => '-Wl,-R',
 
-        has_dynamic_linking     => 1,
-        parrot_is_shared        => 1,
-        libparrot_shared        => 'libparrot$(SHARE_EXT).$(SOVERSION)',
-        libparrot_shared_alias  => 'libparrot$(SHARE_EXT)',
-        libparrot_soname        => '-Wl,-soname=libparrot$(SHARE_EXT).$(SOVERSION)',
+        has_dynamic_linking    => 1,
+        parrot_is_shared       => 1,
+        libparrot_shared       => 'libparrot$(SHARE_EXT).$(SOVERSION)',
+        libparrot_shared_alias => 'libparrot$(SHARE_EXT)',
+        libparrot_soname       => '-Wl,-soname=libparrot$(SHARE_EXT).$(SOVERSION)',
     );
 }
 

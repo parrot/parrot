@@ -6,9 +6,8 @@ package init::hints::aix;
 use strict;
 use warnings;
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     $conf->data->set(
         cc           => 'cc_r',

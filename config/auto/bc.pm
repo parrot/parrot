@@ -28,9 +28,8 @@ $description = 'Determining whether GNU bc is installed';
 
 @args = qw();
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $has_gnu_bc;
     my $osname = $Config{osname};
@@ -44,19 +43,19 @@ sub runstep
         MSWin32 => 1,
     );
 
-    if ($bc_does_not_hang{$osname}) {
+    if ( $bc_does_not_hang{$osname} ) {
 
         # This seems to work for GNU bc 1.06
-        my $answer = capture_output('bc', '-v') || '';
-        $has_gnu_bc =
-            ($answer =~ m/^bc / && $answer =~ m/Free Software Foundation/) ? 1 : 0;
+        my $answer = capture_output( 'bc', '-v' ) || '';
+        $has_gnu_bc = ( $answer =~ m/^bc / && $answer =~ m/Free Software Foundation/ ) ? 1 : 0;
 
-    } else {
+    }
+    else {
         $has_gnu_bc = 0;
     }
 
-    $conf->data->set(has_gnu_bc => $has_gnu_bc);
-    $self->set_result($has_gnu_bc ? 'yes' : 'no');
+    $conf->data->set( has_gnu_bc => $has_gnu_bc );
+    $self->set_result( $has_gnu_bc ? 'yes' : 'no' );
 
     return $self;
 }

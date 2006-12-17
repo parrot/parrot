@@ -24,9 +24,8 @@ use Parrot::Revision;
 
 $description = "Determining Parrot's revision";
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $revision = $Parrot::Revision::current;
     my $entries  = $Parrot::Revision::svn_entries;
@@ -36,9 +35,10 @@ sub runstep
         SVN_ENTRIES => $entries
     );
 
-    if ($revision >= 1) {
+    if ( $revision >= 1 ) {
         $self->set_result("r$revision");
-    } else {
+    }
+    else {
         $self->set_result("done");
     }
 

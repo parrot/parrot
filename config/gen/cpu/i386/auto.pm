@@ -21,29 +21,29 @@ use warnings;
 
 use Parrot::Configure::Step qw(cc_gen cc_build cc_run cc_clean);
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $verbose = $conf->options->get('verbose');
 
     my @files = qw( memcpy_mmx.c memcpy_sse.c );
     for my $f (@files) {
         print " $f " if $verbose;
-        my ( $suffix ) = $f =~ /memcpy_(\w+)/;
+        my ($suffix) = $f =~ /memcpy_(\w+)/;
         $f = "config/gen/cpu/i386/$f";
         cc_gen($f);
-        eval(cc_build("-DPARROT_CONFIG_TEST"));
+        eval( cc_build("-DPARROT_CONFIG_TEST") );
         if ($@) {
             print " $@ " if $verbose;
-        } else {
-            if (cc_run() =~ /ok/) {
+        }
+        else {
+            if ( cc_run() =~ /ok/ ) {
                 $conf->data->set(
                     "i386_has_$suffix" => '1',
                     "HAS_i386_$suffix" => '1',
                 );
                 print " (\U$suffix) " if ($verbose);
-                $conf->data->add(' ', TEMP_generated => $f);
+                $conf->data->add( ' ', TEMP_generated => $f );
             }
         }
         cc_clean();

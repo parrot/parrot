@@ -25,27 +25,27 @@ $description = 'Determining if your compiler supports inline';
 
 @args = qw(inline verbose);
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $test;
-    my ($inline, $verbose) = $conf->options->get(qw(inline verbose));
+    my ( $inline, $verbose ) = $conf->options->get(qw(inline verbose));
 
-    if (defined $inline) {
+    if ( defined $inline ) {
         $test = $inline;
-    } else {
+    }
+    else {
         cc_gen('config/auto/inline/test_1.in');
         eval { cc_build(); };
-        if (!$@) {
+        if ( !$@ ) {
             $test = cc_run();
             chomp $test if $test;
         }
         cc_clean();
-        if (!$test) {
+        if ( !$test ) {
             cc_gen('config/auto/inline/test_2.in');
             eval { cc_build(); };
-            if (!$@) {
+            if ( !$@ ) {
                 $test = cc_run();
                 chomp $test if $test;
             }
@@ -54,14 +54,15 @@ sub runstep
         if ($test) {
             print " ($test) " if $verbose;
             $self->set_result('yes');
-        } else {
+        }
+        else {
             print " no " if $verbose;
             $self->set_result('no');
-            $test   = '';
+            $test = '';
         }
     }
 
-    $conf->data->set(inline => $test);
+    $conf->data->set( inline => $test );
 
     return $self;
 }

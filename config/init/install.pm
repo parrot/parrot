@@ -24,7 +24,7 @@ Sets up the installation paths
 #                           [/usr/local]
 #   --exec-prefix=EPREFIX   install architecture-dependent files in EPREFIX
 #                           [PREFIX]
-# 
+#
 # By default, `make install' will install all the files in
 # `/usr/local/bin', `/usr/local/lib' etc.  You can specify
 # an installation prefix other than `/usr/local' using `--prefix',
@@ -59,62 +59,74 @@ use Parrot::Configure::Step;
 $description = q{Setting up installation paths};
 
 @args = qw( prefix exec-prefix bindir sbindir libexecdir datadir sysconfdir
-        sharedstatedir localstatedir libdir includedir oldincludedir infodir
-        mandir );
+    sharedstatedir localstatedir libdir includedir oldincludedir infodir
+    mandir );
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
-    my $prefix = $conf->options->get('prefix') || "/usr/local";
+    my $prefix  = $conf->options->get('prefix')      || "/usr/local";
     my $eprefix = $conf->options->get('exec-prefix') || $prefix;
-#  --bindir=DIR           user executables [EPREFIX/bin]
+
+    #  --bindir=DIR           user executables [EPREFIX/bin]
     my $bindir = $conf->options->get('bindir') || $eprefix . "/bin";
-#  --sbindir=DIR          system admin executables [EPREFIX/sbin]
+
+    #  --sbindir=DIR          system admin executables [EPREFIX/sbin]
     my $sbindir = $conf->options->get('sbindir') || $eprefix . "/sbin";
-#  --libexecdir=DIR       program executables [EPREFIX/libexec]
+
+    #  --libexecdir=DIR       program executables [EPREFIX/libexec]
     my $libexecdir = $conf->options->get('libexecdir') || $eprefix . "/libexec";
-#  --datadir=DIR          read-only architecture-independent data [PREFIX/share]
+
+    #  --datadir=DIR          read-only architecture-independent data [PREFIX/share]
     my $datadir = $conf->options->get('datadir') || $prefix . "/share";
-#  --sysconfdir=DIR       read-only single-machine data [PREFIX/etc]
+
+    #  --sysconfdir=DIR       read-only single-machine data [PREFIX/etc]
     my $sysconfdir = $conf->options->get('sysconfdir') || $prefix . "/etc";
-#  --sharedstatedir=DIR   modifiable architecture-independent data [PREFIX/com]
+
+    #  --sharedstatedir=DIR   modifiable architecture-independent data [PREFIX/com]
     my $sharedstatedir = $conf->options->get('sharedstatedir')
         || $prefix . "/com";
-#  --localstatedir=DIR    modifiable single-machine data [PREFIX/var]
+
+    #  --localstatedir=DIR    modifiable single-machine data [PREFIX/var]
     my $localstatedir = $conf->options->get('localstatedir')
         || $prefix . "/var";
-#  --libdir=DIR           object code libraries [EPREFIX/lib]
+
+    #  --libdir=DIR           object code libraries [EPREFIX/lib]
     my $libdir = $conf->options->get('libdir') || $eprefix . "/lib";
-#  --includedir=DIR       C header files [PREFIX/include]
+
+    #  --includedir=DIR       C header files [PREFIX/include]
     my $includedir = $conf->options->get('includedir') || $prefix . "/include";
-#  --oldincludedir=DIR    C header files f|| non-gcc [/usr/include]
+
+    #  --oldincludedir=DIR    C header files f|| non-gcc [/usr/include]
     my $oldincludedir = $conf->options->get('oldincludedir') || "/usr/include";
-#  --infodir=DIR          info documentation [PREFIX/info]
+
+    #  --infodir=DIR          info documentation [PREFIX/info]
     my $infodir = $conf->options->get('infodir') || $prefix . "/info";
-#  --mandir=DIR           man documentation [PREFIX/man]
+
+    #  --mandir=DIR           man documentation [PREFIX/man]
     my $mandir = $conf->options->get('mandir') || $prefix . "/man";
 
     $conf->data->set(
-        prefix          => $prefix,
-        exec_prefix     => $eprefix,
-        bin_dir         => $bindir, # deprecated
-        bindir          => $bindir,
-        sbindir         => $sbindir,
-        libexecdir      => $libexecdir,
-        datadir         => $datadir,
-        sysconfdir      => $sysconfdir,
-        sharedstatedir  => $sharedstatedir,
-        localstatedir   => $localstatedir,
-        libdir          => $libdir,
-        lib_dir         => $libdir, # deprecated
-        includedir      => $includedir,
-        include_dir     => $includedir, # deprecated
-        oldincludedir   => $oldincludedir,
-        infodir         => $infodir,
-        mandir          => $mandir,
+        prefix         => $prefix,
+        exec_prefix    => $eprefix,
+        bin_dir        => $bindir,           # deprecated
+        bindir         => $bindir,
+        sbindir        => $sbindir,
+        libexecdir     => $libexecdir,
+        datadir        => $datadir,
+        sysconfdir     => $sysconfdir,
+        sharedstatedir => $sharedstatedir,
+        localstatedir  => $localstatedir,
+        libdir         => $libdir,
+        lib_dir        => $libdir,           # deprecated
+        includedir     => $includedir,
+        include_dir    => $includedir,       # deprecated
+        oldincludedir  => $oldincludedir,
+        infodir        => $infodir,
+        mandir         => $mandir,
+
         # parrot internal use only
-        doc_dir         => $datadir . "/doc/parrot",
+        doc_dir => $datadir . "/doc/parrot",
     );
 
     return $self;

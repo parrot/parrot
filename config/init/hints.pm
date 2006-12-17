@@ -26,9 +26,8 @@ $description = 'Loading platform and local hints files';
 
 @args = qw( cc verbose define );
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $verbose = $conf->options->get('verbose');
 
@@ -43,18 +42,18 @@ sub runstep
 
     # call the runstep method if it exists.  Otherwise the step must have done
     # it's work when it was loaded.
-    $hints->runstep($conf, @_) if $hints->can('runstep');
+    $hints->runstep( $conf, @_ ) if $hints->can('runstep');
     $hints_used++;
 
     $hints = "init::hints::local";
     print "$hints " if $verbose;
     eval "use $hints";
     unless ($@) {
-        $hints->runstep($conf, @_) if $hints->can('runstep');
+        $hints->runstep( $conf, @_ ) if $hints->can('runstep');
         $hints_used++;
     }
 
-    if ($hints_used == 0) {
+    if ( $hints_used == 0 ) {
         print "(no hints) " if $verbose;
     }
 

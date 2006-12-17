@@ -24,23 +24,22 @@ use Parrot::Configure::Step ':auto';
 $description = 'Determining if your C library has setenv / unsetenv';
 @args        = qw(verbose);
 
-sub runstep
-{
-    my ($self, $conf) = (shift, shift);
+sub runstep {
+    my ( $self, $conf ) = ( shift, shift );
 
     my $verbose = $conf->options->get('verbose');
 
-    my ($setenv, $unsetenv) = (0, 0);
+    my ( $setenv, $unsetenv ) = ( 0, 0 );
 
     cc_gen('config/auto/env/test_setenv.in');
     eval { cc_build(); };
-    unless ($@ || cc_run() !~ /ok/) {
+    unless ( $@ || cc_run() !~ /ok/ ) {
         $setenv = 1;
     }
     cc_clean();
     cc_gen('config/auto/env/test_unsetenv.in');
     eval { cc_build(); };
-    unless ($@ || cc_run() !~ /ok/) {
+    unless ( $@ || cc_run() !~ /ok/ ) {
         $unsetenv = 1;
     }
     cc_clean();
@@ -50,16 +49,19 @@ sub runstep
         unsetenv => $unsetenv
     );
 
-    if ($setenv && $unsetenv) {
+    if ( $setenv && $unsetenv ) {
         print " (both) " if $verbose;
         $self->set_result('both');
-    } elsif ($setenv) {
+    }
+    elsif ($setenv) {
         print " (setenv) " if $verbose;
         $self->set_result('setenv');
-    } elsif ($unsetenv) {
+    }
+    elsif ($unsetenv) {
         print " (unsetenv) " if $verbose;
         $self->set_result('unsetenv');
-    } else {
+    }
+    else {
         print " (no) " if $verbose;
         $self->set_result('no');
     }

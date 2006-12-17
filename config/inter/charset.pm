@@ -25,9 +25,8 @@ $description = 'Determining what charset files should be compiled in';
 
 @args = qw(ask charset);
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my @charset = (
         sort
@@ -35,9 +34,9 @@ sub runstep
     );
 
     my $charset_list = $conf->options->get('charset')
-        || join(' ', grep { defined $_ } @charset);
+        || join( ' ', grep { defined $_ } @charset );
 
-    if ($conf->options->get('ask')) {
+    if ( $conf->options->get('ask') ) {
         print <<"END";
 
 
@@ -45,12 +44,12 @@ The following charsets are available:
   @charset
 END
         {
-            $charset_list = prompt('Which charsets would you like?', $charset_list);
+            $charset_list = prompt( 'Which charsets would you like?', $charset_list );
         }
     }
 
     # names of class files for src/pmc/Makefile
-    (my $TEMP_charset_o = $charset_list) =~ s/\.c/\$(O)/g;
+    ( my $TEMP_charset_o = $charset_list ) =~ s/\.c/\$(O)/g;
 
     my $TEMP_charset_build = <<"E_NOTE";
 
@@ -58,7 +57,7 @@ END
 
 E_NOTE
 
-    foreach my $charset (split(/\s+/, $charset_list)) {
+    foreach my $charset ( split( /\s+/, $charset_list ) ) {
         $charset =~ s/\.c$//;
         $TEMP_charset_build .= <<END
 src/charset/$charset\$(O): src/charset/$charset.h src/charset/ascii.h src/charset/$charset.c \$(NONGEN_HEADERS)

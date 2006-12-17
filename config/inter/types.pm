@@ -26,18 +26,17 @@ $description = 'Determining what types Parrot should use';
 
 @args = qw(ask intval opcode floatval);
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $intval   = $conf->options->get('intval')   || 'long';
     my $floatval = $conf->options->get('floatval') || 'double';
     my $opcode   = $conf->options->get('opcode')   || 'long';
 
-    if ($conf->options->get('ask')) {
-        $intval   = prompt("\n\nHow big would you like your integers to be?", $intval);
-        $floatval = prompt("And your floats?",                                $floatval);
-        $opcode   = prompt("What's your native opcode type?",                 $opcode);
+    if ( $conf->options->get('ask') ) {
+        $intval   = prompt( "\n\nHow big would you like your integers to be?", $intval );
+        $floatval = prompt( "And your floats?",                                $floatval );
+        $opcode   = prompt( "What's your native opcode type?",                 $opcode );
         print "\n";
     }
 

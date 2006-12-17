@@ -23,11 +23,10 @@ use Parrot::Configure::Step ':gen';
 our $description = 'Configuring languages';
 our @args;
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
-    genfile('config/gen/makefiles/languages.in' => 'languages/Makefile');
+    genfile( 'config/gen/makefiles/languages.in' => 'languages/Makefile' );
 
     my @languages = qw{
         APL amber abc bc befunge bf cardinal c99 cola ecmascript forth HQ9plus
@@ -36,15 +35,14 @@ sub runstep
     };
 
     foreach my $language (@languages) {
-      genfile ("languages/$language/config/makefiles/root.in" =>
-               "languages/$language/Makefile");
+        genfile( "languages/$language/config/makefiles/root.in" => "languages/$language/Makefile" );
     }
 
-    genfile('languages/tcl/config/makefiles/examples.in' => 'languages/tcl/examples/Makefile');
+    genfile( 'languages/tcl/config/makefiles/examples.in' => 'languages/tcl/examples/Makefile' );
 
     genfile(
-        'languages/tcl/config/makefiles/root.in'     => 'languages/tcl/Makefile',
-        expand_gmake_syntax                          => 1,
+        'languages/tcl/config/makefiles/root.in' => 'languages/tcl/Makefile',
+        expand_gmake_syntax                      => 1,
     );
 
     return $self;

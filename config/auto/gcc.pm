@@ -25,9 +25,8 @@ $description = 'Determining if your C compiler is actually gcc';
 
 @args = qw(miniparrot verbose);
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $verbose = $conf->options->get('verbose');
     my $maint   = $conf->options->get('maintainer');
@@ -39,7 +38,7 @@ sub runstep
     %gnuc = eval cc_run() or die "Can't run the test program: $!";
     cc_clean();
 
-    my ($gccversion, $warns, $ccwarn);
+    my ( $gccversion, $warns, $ccwarn );
     $ccwarn = $conf->data->get('ccwarn');
 
     # Set gccversion to undef.  This will also trigger any hints-file
@@ -47,26 +46,26 @@ sub runstep
 
     # This key should always exist unless the program couldn't be run,
     # which should have been caught by the 'die' above.
-    unless (exists $gnuc{__GNUC__}) {
-        $conf->data->set(gccversion => undef);
+    unless ( exists $gnuc{__GNUC__} ) {
+        $conf->data->set( gccversion => undef );
         return $self;
     }
 
     my $major = $gnuc{__GNUC__};
     my $minor = $gnuc{__GNUC_MINOR__};
-    unless (defined $major) {
+    unless ( defined $major ) {
         print " (no) " if $verbose;
         $self->set_result('no');
-        $conf->data->set(gccversion => undef);
+        $conf->data->set( gccversion => undef );
         return $self;
     }
-    if ($major =~ tr/0-9//c) {
-        undef $major; # Don't use it
+    if ( $major =~ tr/0-9//c ) {
+        undef $major;    # Don't use it
     }
-    if (defined $minor and $minor =~ tr/0-9//c) {
-        undef $minor; # Don't use it
+    if ( defined $minor and $minor =~ tr/0-9//c ) {
+        undef $minor;    # Don't use it
     }
-    if (defined $major) {
+    if ( defined $major ) {
         $gccversion = $major;
         $gccversion .= ".$minor" if defined $minor;
     }
@@ -89,11 +88,10 @@ sub runstep
         # determined in a non-strict environment.  An example is Solaris 8.
 
         my @opt_and_vers = (
-            0 =>
-                "-W -Wall -Wstrict-prototypes -Wmissing-prototypes -Winline"
-                ." -Wshadow -Wpointer-arith -Wcast-qual"
-                ." -Wwrite-strings -Waggregate-return -Winline -Wno-unused"
-                .($maint ? " -Wlarger-than-4096" : ""),
+                  0 => "-W -Wall -Wstrict-prototypes -Wmissing-prototypes -Winline"
+                . " -Wshadow -Wpointer-arith -Wcast-qual"
+                . " -Wwrite-strings -Waggregate-return -Winline -Wno-unused"
+                . ( $maint ? " -Wlarger-than-4096" : "" ),
 
             # others; ones we might like marked with ?
             # ? -Wundef for undefined idenfiers in #if
@@ -123,9 +121,9 @@ sub runstep
             #      -O2 and -O3
             #      -falign-functions=16 is the real alignment, no exponent
             3.0 => "-falign-functions=16"
-                   ." -Wformat-nonliteral -Wformat-security -Wpacked"
-                   ." -Wdisabled-optimization -mno-accumulate-outgoing-args"
-                   ." -Wno-shadow",
+                . " -Wformat-nonliteral -Wformat-security -Wpacked"
+                . " -Wdisabled-optimization -mno-accumulate-outgoing-args"
+                . " -Wno-shadow",
 
             # -Wsequence-point is part of -Wall
             # -Wfloat-equal may not be what we want
@@ -134,13 +132,13 @@ sub runstep
             # -Wunreachable-code might be useful in a non debugging version
         );
         $warns = "";
-        while (my ($vers, $opt) = splice @opt_and_vers, 0, 2) {
+        while ( my ( $vers, $opt ) = splice @opt_and_vers, 0, 2 ) {
             last if $vers > $gccversion;
-            next unless $opt; # Ignore blank lines
+            next unless $opt;    # Ignore blank lines
 
-            if ($opt =~ /-mno-accumulate-outgoing-args/) {
+            if ( $opt =~ /-mno-accumulate-outgoing-args/ ) {
                 use Config;
-                if ($Config{archname} !~ /86/) {
+                if ( $Config{archname} !~ /86/ ) {
                     $opt =~ s/-mno-accumulate-outgoing-args//;
                 }
             }
@@ -150,7 +148,7 @@ sub runstep
         # if the user overwrites the warnings remove it from $warns
         if ($ccwarn) {
             my @warns = split ' ', $warns;
-            foreach my $w (split ' ', $ccwarn) {
+            foreach my $w ( split ' ', $ccwarn ) {
                 $w =~ s/^-W(?:no-)?(.*)$/$1/;
                 @warns = grep !/^-W(?:no-)?$w$/, @warns;
             }
@@ -158,7 +156,7 @@ sub runstep
         }
     }
 
-    if (defined $conf->options->get('miniparrot') && $gccversion) {
+    if ( defined $conf->options->get('miniparrot') && $gccversion ) {
 
         # make the compiler act as ANSIish as possible, and avoid enabling
         # support for GCC-specific features.
@@ -177,7 +175,7 @@ sub runstep
         HAS_aligned_funcptr => 1
     );
 
-    $conf->data->set(HAS_aligned_funcptr => 0)
+    $conf->data->set( HAS_aligned_funcptr => 0 )
         if $^O eq 'hpux';
 
     return $self;

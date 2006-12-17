@@ -28,9 +28,8 @@ $description = 'Generating C headers';
 
 @args = ('define');
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     genfile(
         'config/gen/config_h/config_h.in', 'include/parrot/config.h',
@@ -41,13 +40,13 @@ sub runstep
 
     genfile(
         'config/gen/config_h/feature_h.in', 'include/parrot/feature.h',
-        comment_type  => '/*',
-        ignore_pattern=> 'PARROT_CONFIG_DATE',
-        feature_file  => 1
+        comment_type   => '/*',
+        ignore_pattern => 'PARROT_CONFIG_DATE',
+        feature_file   => 1
     );
 
     my $hh = "include/parrot/has_header.h";
-    open(HH, ">", "$hh.tmp")
+    open( HH, ">", "$hh.tmp" )
         or die "Can't open has_header.h: $!";
 
     print HH <<EOF;
@@ -63,11 +62,12 @@ sub runstep
 
 EOF
 
-    for (sort($conf->data->keys())) {
+    for ( sort( $conf->data->keys() ) ) {
         next unless /i_(\w+)/;
-        if ($conf->data->get($_)) {
+        if ( $conf->data->get($_) ) {
             print HH "#define PARROT_HAS_HEADER_\U$1 1\n";
-        } else {
+        }
+        else {
             print HH "#undef  PARROT_HAS_HEADER_\U$1\n";
         }
     }
@@ -98,9 +98,9 @@ EOF
  */
 
 EOF
-    for (sort($conf->data->keys())) {
+    for ( sort( $conf->data->keys() ) ) {
         next unless /HAS_(\w+)/;
-        if ($conf->data->get($_)) {
+        if ( $conf->data->get($_) ) {
             print HH "#define PARROT_HAS_\U$1 1\n";
         }
     }
@@ -111,10 +111,10 @@ EOF
  */
 
 EOF
-    for (sort($conf->data->keys())) {
+    for ( sort( $conf->data->keys() ) ) {
         next unless /D_(\w+)/;
         my $val;
-        if ($val = $conf->data->get($_)) {
+        if ( $val = $conf->data->get($_) ) {
             print HH "#define PARROT_\U$1 $val\n";
         }
     }
@@ -132,7 +132,7 @@ EOF
 
     close HH;
 
-    move_if_diff("$hh.tmp", $hh);
+    move_if_diff( "$hh.tmp", $hh );
 
     return $self;
 }

@@ -24,20 +24,19 @@ use ExtUtils::Manifest qw(maniread);
 our $description = 'Determining nongenerated header files';
 our @args;
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
     my $inc = 'include/parrot';
 
     my @headers = (
         sort
             map { m{^$inc/(.*\.h)\z} }
-            keys %{maniread()}
+            keys %{ maniread() }
     );
 
     $_ = "\$(INC_DIR)/$_" for @headers;
-    my $TEMP_nongen_headers = join("\\\n        ", @headers);
+    my $TEMP_nongen_headers = join( "\\\n        ", @headers );
 
     $conf->data->set(
         inc                 => $inc,

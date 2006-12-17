@@ -27,11 +27,10 @@ $description = 'Determining if your platform supports gdbm';
 
 @args = qw(verbose without-gmp);
 
-sub runstep
-{
-    my ($self, $conf) = @_;
+sub runstep {
+    my ( $self, $conf ) = @_;
 
-    my ($verbose, $without) = $conf->options->get(@args);
+    my ( $verbose, $without ) = $conf->options->get(@args);
 
     if ($without) {
         $conf->data->set( has_gdbm => 0 );
@@ -49,29 +48,31 @@ sub runstep
     # On OS X check the presence of the gdbm header in the standard
     # Fink location. TODO: Need a more generalized way for finding
     # where Fink lives.
-    if ($osname =~ /darwin/) {
-        if (-f "/sw/include/gdbm.h") {
-            $conf->data->add(' ', linkflags => '-L/sw/lib');
-            $conf->data->add(' ', dflags    => '-L/sw/lib');
-            $conf->data->add(' ', cflags    => '-I/sw/include');
+    if ( $osname =~ /darwin/ ) {
+        if ( -f "/sw/include/gdbm.h" ) {
+            $conf->data->add( ' ', linkflags => '-L/sw/lib' );
+            $conf->data->add( ' ', dflags    => '-L/sw/lib' );
+            $conf->data->add( ' ', cflags    => '-I/sw/include' );
         }
     }
 
     cc_gen('config/auto/gdbm/gdbm.in');
-    if ($^O =~ /mswin32/i) {
-        if ($cc =~ /^gcc/i) {
-            eval { cc_build('', '-llibgdbm'); };
-        } else {
-            eval { cc_build('', 'gdbm.lib'); };
+    if ( $^O =~ /mswin32/i ) {
+        if ( $cc =~ /^gcc/i ) {
+            eval { cc_build( '', '-llibgdbm' ); };
         }
-    } else {
-        eval { cc_build('', '-lgdbm'); };
+        else {
+            eval { cc_build( '', 'gdbm.lib' ); };
+        }
+    }
+    else {
+        eval { cc_build( '', '-lgdbm' ); };
     }
     my $has_gdbm = 0;
-    if (!$@) {
+    if ( !$@ ) {
         my $test = cc_run();
         unlink "gdbm_test_db";
-        if ($test eq "gdbm is working.\n") {
+        if ( $test eq "gdbm is working.\n" ) {
             $has_gdbm = 1;
             print " (yes) " if $verbose;
             $self->set_result('yes');
@@ -80,13 +81,13 @@ sub runstep
     unless ($has_gdbm) {
 
         # The Config::Data settings might have changed for the test
-        $conf->data->set(libs      => $libs);
-        $conf->data->set(ccflags   => $ccflags);
-        $conf->data->set(linkflags => $linkflags);
+        $conf->data->set( libs      => $libs );
+        $conf->data->set( ccflags   => $ccflags );
+        $conf->data->set( linkflags => $linkflags );
         print " (no) " if $verbose;
         $self->set_result('no');
     }
-    $conf->data->set(has_gdbm => $has_gdbm); # for gdbmhash.t and dynpmc.in
+    $conf->data->set( has_gdbm => $has_gdbm );    # for gdbmhash.t and dynpmc.in
 
     return $self;
 }
