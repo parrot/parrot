@@ -15,7 +15,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Test create BCG pmc" );
 CODE
 OUTPUT
 
-
 pir_output_is( <<'CODE', <<'OUTPUT', "Test startCodeGen()" );
 .sub test :main
    	loadlib P1, "bcg_group"
@@ -221,7 +220,7 @@ catch:
 CODE
 Expected BCG to be in IN_CALL state.
 OUTPUT
- 
+
 pir_output_is( <<'CODE', <<'OUTPUT', "Test bad endCall()" );
 .sub test :main
     loadlib P1, "bcg_group"
@@ -313,7 +312,7 @@ catch:
 CODE
 Expected BCG to be in IN_CALL state.
 OUTPUT
- 
+
 pir_output_is( <<'CODE', <<'OUTPUT', "Test bad endOp()" );
 .sub test :main
     loadlib P1, "bcg_group"
