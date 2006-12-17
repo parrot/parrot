@@ -21,28 +21,27 @@ sub get_out_fn {
     return Parrot::Test::per_test( '_antlr3.out', $count );
 }
 
-
 sub get_test_prog {
     my $self = shift;
     my ( $count, $options ) = @_;
 
-    my $lang_fn = Parrot::Test::per_test( '.bc', $count );
+    my $lang_fn = Parrot::Test::per_test( '.bc',         $count );
     my $pir_fn  = Parrot::Test::per_test( '_antlr3.pir', $count );
 
     return ( "java Bc languages/${lang_fn} languages/${pir_fn}",
-             "$self->{parrot} languages/${pir_fn}" );
+        "$self->{parrot} languages/${pir_fn}" );
 }
- 
 
 sub skip_why {
     my $self = shift;
-    my ( $options ) = @_;
+    my ($options) = @_;
 
-    if ( ! exists $options->{with_antlr3} || $options->{with_antlr3} ) {
+    if ( !exists $options->{with_antlr3} || $options->{with_antlr3} ) {
         return;
-    } else {
+    }
+    else {
         return 'Not implemented with ANTLR3';
     }
 }
- 
+
 1;
