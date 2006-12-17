@@ -56,6 +56,12 @@ compile to Parrot bytecode and then run the bytecode.
 
 Run optimized to the specified level.
 
+=item C<-D[number]>
+
+Pass the specified debug bits to the parrot interpreter.  Note that 
+C<-D40> (fill I, N registers with garbage) is always enabled.  
+See 'parrot --help-debug' for available flags.
+
 =back
 
 There are also long command line options:
@@ -105,7 +111,7 @@ my $run_exec = grep { $_ eq '--run-exec' } @ARGV;
 
 # Suck the short options into the TEST_PROG_ARGS evar:
 my %opts;
-getopts('wgjPCSefbvdr?hO:', \%opts);
+getopts('wgjPCSefbvdr?hO:D:', \%opts);
 if ($opts{'?'} || $opts{h}) {
     print <<"EOF";
 perl t/harness [options] [testfiles]
@@ -121,6 +127,7 @@ perl t/harness [options] [testfiles]
     -d         ... run debug
     -r         ... assemble to PBC run PBC
     -O[012]    ... optimize
+    -D[number] ... pass debug flags to parrot interpreter
     --running-make-test
     --gc-debug
     --html
@@ -128,8 +135,12 @@ EOF
     exit;
 }
 
+# add -D40;  merge it with any existing -D argument
+$opts{D} = sprintf( '%x', hex(40) | (exists $opts{D} ? hex($opts{D}) : 0));
+
 my $args = join(' ', map { "-$_" } keys %opts );
-$args =~ s/-O/-O$opts{O}/ if $opts{O};
+$args =~ s/-O/-O$opts{O}/ if exists $opts{O};
+$args =~ s/-D/-D$opts{D}/;
 $args .= ' --gc-debug'    if $gc_debug;
 # XXX find better way for passing run_exec to Parrot::Test
 $args .= ' --run-exec'    if $run_exec; 
