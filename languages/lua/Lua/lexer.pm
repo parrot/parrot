@@ -23,8 +23,7 @@ sub Error {
         $parser->YYData->{nb_error} = 1;
     }
 
-    print STDOUT 'lua: ', $parser->YYData->{srcname}, ':',
-        $parser->YYData->{lineno}, ': ', $msg
+    print STDOUT 'lua: ', $parser->YYData->{srcname}, ':', $parser->YYData->{lineno}, ': ', $msg
         if ( exists $parser->YYData->{verbose_error}
         and $parser->YYData->{verbose_error} );
     return;
@@ -43,8 +42,7 @@ sub Warning {
         $parser->YYData->{nb_warning} = 1;
     }
 
-    print STDOUT 'lua: ', $parser->YYData->{srcname}, ':',
-        $parser->YYData->{lineno}, ': ', $msg
+    print STDOUT 'lua: ', $parser->YYData->{srcname}, ':', $parser->YYData->{lineno}, ': ', $msg
         if ( exists $parser->YYData->{verbose_warning}
         and $parser->YYData->{verbose_warning} );
     return;
@@ -63,8 +61,7 @@ sub Info {
         $parser->YYData->{nb_info} = 1;
     }
 
-    print STDOUT 'lua: ', $parser->YYData->{srcname}, ':',
-        $parser->YYData->{lineno}, ': ', $msg
+    print STDOUT 'lua: ', $parser->YYData->{srcname}, ':', $parser->YYData->{lineno}, ': ', $msg
         if ( exists $parser->YYData->{verbose_info}
         and $parser->YYData->{verbose_info} );
     return;
@@ -83,40 +80,37 @@ sub _DoubleQuoteStringLexer {
                 and return ( $type, $str );
 
             s/^([^"\\]+)//
-                and $str .= $1,
-                last;
+                and $str .= $1, last;
 
             s/^\\([\\"'])//
-                and $str .= $1,        # backslash, quotation mark, apostrophe
+                and $str .= $1,    # backslash, quotation mark, apostrophe
                 last;
             s/^\\a//
-                and $str .= "\a",      # bell
+                and $str .= "\a",    # bell
                 last;
             s/^\\b//
-                and $str .= "\b",      # backspace
+                and $str .= "\b",    # backspace
                 last;
             s/^\\f//
-                and $str .= "\f",      # form feed
+                and $str .= "\f",    # form feed
                 last;
             s/^\\n//
-                and $str .= "\n",      # new line
+                and $str .= "\n",    # new line
                 last;
             s/^\\r//
-                and $str .= "\r",      # carriage return
+                and $str .= "\r",    # carriage return
                 last;
             s/^\\t//
-                and $str .= "\t",      # horizontal tab
+                and $str .= "\t",    # horizontal tab
                 last;
             s/^\\v//
                 and $str .= "\x0b",    # vertical tab
                 last;
             s/^\\([0-9]{1,3})//
-                and $str .= chr $1,
-                last;
+                and $str .= chr $1, last;
 
             s/^\\//
-                and $parser->Error("Invalid escape sequence $_ .\n"),
-                last;
+                and $parser->Error("Invalid escape sequence $_ .\n"), last;
         }
     }
 
@@ -138,40 +132,37 @@ sub _SingleQuoteStringLexer {
                 and return ( $type, $str );
 
             s/^([^'\\]+)//
-                and $str .= $1,
-                last;
+                and $str .= $1, last;
 
             s/^\\([\\"'])//
-                and $str .= $1,        # backslash, quotation mark, apostrophe
+                and $str .= $1,    # backslash, quotation mark, apostrophe
                 last;
             s/^\\a//
-                and $str .= "\a",      # bell
+                and $str .= "\a",    # bell
                 last;
             s/^\\b//
-                and $str .= "\b",      # backspace
+                and $str .= "\b",    # backspace
                 last;
             s/^\\f//
-                and $str .= "\f",      # form feed
+                and $str .= "\f",    # form feed
                 last;
             s/^\\n//
-                and $str .= "\n",      # new line
+                and $str .= "\n",    # new line
                 last;
             s/^\\r//
-                and $str .= "\r",      # carriage return
+                and $str .= "\r",    # carriage return
                 last;
             s/^\\t//
-                and $str .= "\t",      # horizontal tab
+                and $str .= "\t",    # horizontal tab
                 last;
             s/^\\v//
                 and $str .= "\x0b",    # vertical tab
                 last;
             s/^\\([0-9]{1,3})//
-                and $str .= chr $1,
-                last;
+                and $str .= chr $1, last;
 
             s/^\\//
-                and $parser->Error("Invalid escape sequence $_ .\n"),
-                last;
+                and $parser->Error("Invalid escape sequence $_ .\n"), last;
         }
     }
 
@@ -198,16 +189,13 @@ sub _LongStringLexer {
         for ( $parser->YYData->{INPUT} ) {
 
             s/^(\n)//
-                and $parser->YYData->{lineno}++,
-                $str .= $1,
-                last;
+                and $parser->YYData->{lineno}++, $str .= $1, last;
 
             s/^\]$level\]//
                 and return ( $type, $str );
 
             s/^(.)//
-                and $str .= $1,
-                last;
+                and $str .= $1, last;
         }
     }
 
@@ -237,8 +225,7 @@ sub _LongCommentLexer {
 
         for ( $parser->YYData->{INPUT} ) {
             s/^\n//
-                and $parser->YYData->{lineno}++,
-                last;
+                and $parser->YYData->{lineno}++, last;
             s/^\]$level\]//
                 and return;
             s/^.//
@@ -260,28 +247,24 @@ sub _Lexer {
             if ( $parser->YYData->{shebang} ) {
                 $parser->YYData->{shebang} = undef;
                 s/^#(.*)\n//    # Shebang
-                    and $parser->YYData->{lineno}++,
-                    last;
+                    and $parser->YYData->{lineno}++, last;
             }
 
             s/^[ \r\t\f\013]+//;    # Whitespace
             s/^\n//
-                and $parser->YYData->{lineno}++,
-                last;
+                and $parser->YYData->{lineno}++, last;
 
             s/^\-\-\[(=*)\[//       # LongComment
-                and $parser->_LongCommentLexer($1),
-                last;
+                and $parser->_LongCommentLexer($1), last;
             s/^\-\-(.*)\n//         # ShortComment
-                and $parser->YYData->{lineno}++,
-                last;
+                and $parser->YYData->{lineno}++, last;
 
             s/^(0[Xx])([0-9A-Fa-f]+)//
                 and return ( 'NUMBER', hex($2) );
 
             s/^(\d+(\.\d*)?|\.\d+)([Ee][+\-]?\d+)?//
 
-#                and return ('NUMBER', new Math::BigFloat($1));
+                #                and return ('NUMBER', new Math::BigFloat($1));
                 and return ( 'NUMBER', $1 . ( $3 || q{} ) );
 
             s/^\"//
@@ -313,8 +296,7 @@ sub _Lexer {
                 and return ( $1, $1 );    # punctuator
 
             s/^([\S]+)//
-                and $parser->Error("lexer error $1.\n"),
-                last;
+                and $parser->Error("lexer error $1.\n"), last;
         }
     }
 }

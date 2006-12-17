@@ -205,9 +205,9 @@ simple string
 OUTPUT
 
 TODO: {
-local $TODO = 'empty string not handled by PIR.';
+    local $TODO = 'empty string not handled by PIR.';
 
-pir_output_is( << 'CODE', << 'OUTPUT', '.const & empty string' );
+    pir_output_is( << 'CODE', << 'OUTPUT', '.const & empty string' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     .const .LuaString cst1 = ''

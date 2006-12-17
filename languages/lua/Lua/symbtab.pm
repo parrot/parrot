@@ -71,7 +71,7 @@ use base qw(Lua::symbtab);
                         if ( exists $symbtab->{table}{$symb} ) {
                             my $defn = $symbtab->{table}{$symb};
 
-                        #                        warn "\tfound in $symbtab\n";
+                            #                        warn "\tfound in $symbtab\n";
                             return $defn;
                         }
                     }

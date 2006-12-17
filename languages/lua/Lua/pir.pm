@@ -38,8 +38,7 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH}
-            "  $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}\n";
+        print {$FH} "  $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}\n";
         return;
     }
 
@@ -48,12 +47,11 @@ package pirVisitor;
         my ($op) = @_;
         my $FH   = $self->{fh};
         if ( $op->{result} == $op->{arg1} ) {
-            print {$FH}
-                "  $op->{op} $op->{result}->{symbol}, $op->{arg2}->{symbol}\n";
+            print {$FH} "  $op->{op} $op->{result}->{symbol}, $op->{arg2}->{symbol}\n";
         }
         else {
             print {$FH}
-                "  $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}, $op->{arg2}->{symbol}\n";
+"  $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}, $op->{arg2}->{symbol}\n";
         }
         return;
     }
@@ -79,8 +77,7 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH}
-            "  $op->{result}->{symbol} = $op->{arg1}->{symbol}\[$op->{arg2}->{symbol}\]\n";
+        print {$FH} "  $op->{result}->{symbol} = $op->{arg1}->{symbol}\[$op->{arg2}->{symbol}\]\n";
         return;
     }
 
@@ -88,8 +85,7 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH}
-            "  $op->{result}->{symbol}\[$op->{arg1}->{symbol}\] = $op->{arg2}->{symbol}\n";
+        print {$FH} "  $op->{result}->{symbol}\[$op->{arg1}->{symbol}\] = $op->{arg2}->{symbol}\n";
         return;
     }
 
@@ -105,8 +101,7 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH}
-            "  $op->{result}->{symbol} = get_global '$op->{arg1}'\n";
+        print {$FH} "  $op->{result}->{symbol} = get_global '$op->{arg1}'\n";
         return;
     }
 
@@ -114,8 +109,7 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH}
-            "  $op->{result}->{symbol} = find_lex '$op->{arg1}->{symbol}'\n";
+        print {$FH} "  $op->{result}->{symbol} = find_lex '$op->{arg1}->{symbol}'\n";
         return;
     }
 
@@ -123,8 +117,7 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH}
-            "  store_lex '$op->{arg1}->{symbol}', $op->{arg2}->{symbol}\n";
+        print {$FH} "  store_lex '$op->{arg1}->{symbol}', $op->{arg2}->{symbol}\n";
         return;
     }
 
@@ -132,8 +125,7 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH}
-            "  $op->{result}->{symbol} = clone $op->{arg1}->{symbol}\n";
+        print {$FH} "  $op->{result}->{symbol} = clone $op->{arg1}->{symbol}\n";
         return;
     }
 
@@ -149,12 +141,12 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH}
-            "  $op->{result}->{symbol} = newclosure $op->{arg1}->{symbol}\n";
+        print {$FH} "  $op->{result}->{symbol} = newclosure $op->{arg1}->{symbol}\n";
         return;
     }
 
     sub visitNoOp {
+
         #my $self = shift;
         #my ($op) = @_;
         #my $FH   = $self->{fh};
@@ -242,11 +234,10 @@ package pirVisitor;
         my $FH   = $self->{fh};
         if ( exists $op->{op} ) {
             print {$FH}
-                "  if $op->{arg1}->{symbol} $op->{op} $op->{arg2}->{symbol} goto $op->{result}->{symbol}\n";
+"  if $op->{arg1}->{symbol} $op->{op} $op->{arg2}->{symbol} goto $op->{result}->{symbol}\n";
         }
         else {
-            print {$FH}
-                "  if $op->{arg1}->{symbol} goto $op->{result}->{symbol}\n";
+            print {$FH} "  if $op->{arg1}->{symbol} goto $op->{result}->{symbol}\n";
         }
         return;
     }
@@ -257,11 +248,10 @@ package pirVisitor;
         my $FH   = $self->{fh};
         if ( exists $op->{op} ) {
             print {$FH}
-                "  unless $op->{arg1}->{symbol} $op->{op} $op->{arg2}->{symbol} goto $op->{result}->{symbol}\n";
+"  unless $op->{arg1}->{symbol} $op->{op} $op->{arg2}->{symbol} goto $op->{result}->{symbol}\n";
         }
         else {
-            print {$FH}
-                "  unless $op->{arg1}->{symbol} goto $op->{result}->{symbol}\n";
+            print {$FH} "  unless $op->{arg1}->{symbol} goto $op->{result}->{symbol}\n";
         }
         return;
     }
@@ -270,8 +260,7 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH}
-            "  unless_null $op->{arg1}->{symbol}, $op->{result}->{symbol}\n";
+        print {$FH} "  unless_null $op->{arg1}->{symbol}, $op->{result}->{symbol}\n";
         return;
     }
 
@@ -317,12 +306,10 @@ package pirVisitor;
         my ($dir) = @_;
         my $FH    = $self->{fh};
         if ( exists $dir->{pragma} ) {
-            print {$FH}
-                "  .param $dir->{result}->{type} $dir->{result}->{symbol} $dir->{pragma}\n";
+            print {$FH} "  .param $dir->{result}->{type} $dir->{result}->{symbol} $dir->{pragma}\n";
         }
         else {
-            print {$FH}
-                "  .param $dir->{result}->{type} $dir->{result}->{symbol} :optional\n";
+            print {$FH} "  .param $dir->{result}->{type} $dir->{result}->{symbol} :optional\n";
         }
         return;
     }
@@ -346,12 +333,11 @@ package pirVisitor;
     }
 
     sub visitLocalDir {
-        my $self  = shift;
+        my $self = shift;
         my ($dir) = @_;
-        return if ($dir->{result}->{symbol} =~ /^\$/);
-        my $FH    = $self->{fh};
-        print {$FH}
-            "  .local $dir->{result}->{type} $dir->{result}->{symbol}\n";
+        return if ( $dir->{result}->{symbol} =~ /^\$/ );
+        my $FH = $self->{fh};
+        print {$FH} "  .local $dir->{result}->{type} $dir->{result}->{symbol}\n";
         return;
     }
 
@@ -359,8 +345,7 @@ package pirVisitor;
         my $self  = shift;
         my ($dir) = @_;
         my $FH    = $self->{fh};
-        print {$FH}
-            "  .lex '$dir->{arg1}->{symbol}', $dir->{arg1}->{symbol}\n";
+        print {$FH} "  .lex '$dir->{arg1}->{symbol}', $dir->{arg1}->{symbol}\n";
         return;
     }
 
@@ -368,8 +353,7 @@ package pirVisitor;
         my $self  = shift;
         my ($dir) = @_;
         my $FH    = $self->{fh};
-        print {$FH}
-            "  .const .$dir->{type} $dir->{result}->{symbol} = '$dir->{arg1}'\n";
+        print {$FH} "  .const .$dir->{type} $dir->{result}->{symbol} = '$dir->{arg1}'\n";
         return;
     }
 

@@ -182,9 +182,9 @@ nil
 OUTPUT
 
 TODO: {
-local $TODO = ':vtable fails with load_bytecode PBC';
+    local $TODO = ':vtable fails with load_bytecode PBC';
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'check key PMC' );
+    pir_output_is( << 'CODE', << 'OUTPUT', 'check key PMC' );
 .sub _main
     load_bytecode 'languages/lua/type/table.pbc'
     find_type $I0, 'table'

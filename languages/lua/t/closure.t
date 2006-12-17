@@ -67,9 +67,9 @@ CODE
 OUT
 
 TODO: {
-local $TODO = 'each execution of a local statement defines new local variables';
+    local $TODO = 'each execution of a local statement defines new local variables';
 
-language_output_is( 'lua', <<'CODE', <<'OUT', '' );
+    language_output_is( 'lua', <<'CODE', <<'OUT', '' );
 a = {}
 local x = 20
 for i=1,10 do

@@ -40,8 +40,7 @@ package Lua::opcode;
         if ( $visitor->can($func) ) {
             return $visitor->$func( $self, @_ );
         }
-        warn "Please implement a function 'visit", ref $self, "' in '",
-            ref $visitor, "'.\n";
+        warn "Please implement a function 'visit", ref $self, "' in '", ref $visitor, "'.\n";
         return;
     }
 

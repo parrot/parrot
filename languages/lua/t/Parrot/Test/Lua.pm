@@ -52,14 +52,12 @@ foreach my $func ( keys %language_test_map ) {
         my $lua_test = $ENV{PARROT_LUA_TEST_PROG} || q{};
         my $lang_fn = Parrot::Test::per_test( '.lua', $count );
         my $pir_fn  = Parrot::Test::per_test( '.pir', $count );
-        my $lua_out_fn = Parrot::Test::per_test(
-            $lua_test eq 'lua' ? '.orig_out' : '.parrot_out', $count );
+        my $lua_out_fn =
+            Parrot::Test::per_test( $lua_test eq 'lua' ? '.orig_out' : '.parrot_out', $count );
         my $test_prog_args = $ENV{TEST_PROG_ARGS} || q{};
         my @test_prog;
         if ( $lua_test eq 'lua' ) {
-            @test_prog = (
-                "$ENV{PARROT_LUA_TEST_PROG} ${test_prog_args} languages/${lang_fn}",
-            );
+            @test_prog = ( "$ENV{PARROT_LUA_TEST_PROG} ${test_prog_args} languages/${lang_fn}", );
         }
         elsif ( $lua_test eq 'monkey' ) {
             @test_prog = (
@@ -78,8 +76,9 @@ foreach my $func ( keys %language_test_map ) {
             @test_prog = (
                 "perl -Ilanguages/lua languages/lua/luac.pl languages/${lang_fn}",
                 "$self->{parrot} --no-gc languages/${pir_fn}",
-#                "$self->{parrot} languages/lua/test_lex.pir languages/${lang_fn}",
-#                "$self->{parrot} languages/lua/luac.pir languages/${lang_fn}",
+
+                #                "$self->{parrot} languages/lua/test_lex.pir languages/${lang_fn}",
+                #                "$self->{parrot} languages/lua/luac.pir languages/${lang_fn}",
             );
         }
 
@@ -97,9 +96,9 @@ foreach my $func ( keys %language_test_map ) {
         my $builder_func = $language_test_map{$func};
 
         # That's the reason for:   no strict 'refs';
-        my $pass = $self->{builder}
-            ->$builder_func( Parrot::Test::slurp_file($lua_out_fn),
-            $output, $desc );
+        my $pass =
+            $self->{builder}
+            ->$builder_func( Parrot::Test::slurp_file($lua_out_fn), $output, $desc );
         unless ($pass) {
             my $diag = q{};
             my $test_prog = join ' && ', @test_prog;
