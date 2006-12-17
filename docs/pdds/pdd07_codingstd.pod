@@ -450,7 +450,7 @@ C<i> that's visible after it's used, which is confusing at best.
 
 The Parrot core will be split into a number of subsystems, each with an
 associated API. For the purposes of naming files, data structures, etc, each
-subsystem will be assigned a short nickname, eg I<pmc>, I<gc>, I<io>. All code
+subsystem will be assigned a short nickname, e.g. I<pmc>, I<gc>, I<io>. All code
 within the core will belong to a subsystem; miscellaneous code with no obvious
 home will be placed in the special subsystem called I<misc>.
 
@@ -461,7 +461,7 @@ may not have two different files called F<Foo> and F<foo>. Normal source-code
 filenames should be all lower-case; filenames with upper-case letters in them
 are reserved for notice-me-first files such as F<README>, and for files which
 need some sort of pre-processing applied to them or which do the preprocessing
-- eg a script F<foo.SH> might read F<foo.TEMPLATE> and output F<foo.c>.
+- e.g. a script F<foo.SH> might read F<foo.TEMPLATE> and output F<foo.c>.
 
 The characters making up filenames must be chosen from the ASCII set
 A-Z,a-z,0-9 plus .-_
@@ -540,38 +540,30 @@ local ones) should all follow these general guidelines.
 =item *
 
 Multiple words or components should be separated with underscores rather than
-using tricks such as capitalization, eg C<new_foo_bar> rather than C<NewFooBar>
+using tricks such as capitalization, e.g. C<new_foo_bar> rather than C<NewFooBar>
 or (gasp) C<newfoobar>.
 
 =item *
 
-The names of entities should err on the side of verbosity, eg
+The names of entities should err on the side of verbosity, e.g.
 C<create_foo_from_bar()> in preference to C<ct_foo_bar()>. Avoid cryptic
 abbreviations wherever possible.
 
 =item *
 
 All entities should be prefixed with the name of the subsystem they appear in,
-eg C<pmc_foo()>, C<struct io_bar>. They should be further prefixed with the
-word 'perl' if they have external visibility or linkage, namely, non-static
-functions, plus macros and typedefs etc which appear in public header files.
-(Global variables are handled specially; see below.) For example:
-
-    perlpmc_foo()
-    struct perlio_bar
-    typedef struct perlio_bar Perlio_bar
-    #define PERLPMC_readonly_TEST ...
-
-In the specific case of the use of global variables and functions within a
-subsystem, convenience macros will be defined (in foo_private.h) that allow use
-of the shortened name in the case of functions (ie C<pmc_foo()> instead of
-C<perlpmc_foo()>), and hide the real representation in the case of global
-variables.
-
+e.g. C<pmc_foo()>, C<struct io_bar>.
 
 =item *
 
-Variables and structure names should be all lower-case, eg C<pmc_foo>.
+Functions with external visibility should be of the form C<Parrot_foo>,
+and should only use typedefs with external visibility (or types defined
+in C89).  Generally these functions should not be used inside the core,
+but this is not a hard and fast rule.
+
+=item *
+
+Variables and structure names should be all lower-case, e.g. C<pmc_foo>.
 
 =item *
 
@@ -580,70 +572,70 @@ name should incorporate the structure's name or an abbreviation of it.
 
 =item *
 
-Typedef names should be lower-case except for the first letter, eg C<Foo_bar>.
+Typedef names should be lower-case except for the first letter, e.g. C<Foo_bar>.
 The exception to this is when the first component is a short abbreviation, in
 which case the whole first component may be made uppercase for readability
-purposes, eg C<IO_foo> rather than C<Io_foo>.  Structures should generally be
+purposes, e.g. C<IO_foo> rather than C<Io_foo>.  Structures should generally be
 typedefed.
 
 =item *
 
 Macros should have their first component uppercase, and the majority of the
 remaining components should be likewise. Where there is a family of macros, the
-variable part can be indicated in lowercase, eg C<PMC_foo_FLAG>,
+variable part can be indicated in lowercase, e.g. C<PMC_foo_FLAG>,
 C<PMC_bar_FLAG>, ....
 
 =item *
 
-A macro which defines a flag bit should be suffixed with C<_FLAG>, eg
+A macro which defines a flag bit should be suffixed with C<_FLAG>, e.g.
 C<PMC_readonly_FLAG> (although you probably want to use an C<enum> instead.)
 
 =item *
 
-A macro which tests a flag bit should be suffixed with C<_TEST>, eg C<if
+A macro which tests a flag bit should be suffixed with C<_TEST>, e.g. C<if
 (PMC_readonly_TEST(foo)) ...>
 
 =item *
 
-A macro which sets a flag bit should be suffixed with C<_SET>, eg
+A macro which sets a flag bit should be suffixed with C<_SET>, e.g.
 C<PMC_readonly_SET(foo);>
 
 =item *
 
-A macro which clears a flag bit should be suffixed with C<_CLEAR>, eg
+A macro which clears a flag bit should be suffixed with C<_CLEAR>, e.g.
 C<PMC_readonly_CLEAR(foo);>
 
 =item *
 
-A macro defining a mask of flag bits should be suffixed with C<_MASK>, eg
+A macro defining a mask of flag bits should be suffixed with C<_MASK>, e.g.
 C<foo &= ~PMC_STATUS_MASK> (but see notes on extensibility below).
 
 =item *
 
 Macros can be defined to cover common flag combinations, in which case they
 should have C<_SETALL>, C<CLEARALL>, C<_TESTALL> or <_TESTANY> suffixes as
-appropriate, to indicate aggregate bits, eg C<PMC_valid_CLEARALL(foo)>
+appropriate, to indicate aggregate bits, e.g. C<PMC_valid_CLEARALL(foo)>
 
 =item *
 
 A macro defining an auto-configuration value should be prefixed with C<HAS_>,
-eg C<HAS_BROKEN_FLOCK>, C<HAS_EBCDIC>.
+e.g. C<HAS_BROKEN_FLOCK>, C<HAS_EBCDIC>.
 
 =item *
 
 A macro indicating the compilation 'location' should be prefixed with C<IN_>,
-eg C<PERL_IN_CORE>, C<PERL_IN_PMC>, C<PERL_IN_X2P>. Individual include file
+e.g. C<PERL_IN_CORE>, C<PERL_IN_PMC>, C<PERL_IN_X2P>. Individual include file
 visitations should be marked with C<PERL_IN_FOO_H> for file foo.h
 
 =item *
 
 A macro indicating major compilation switches should be prefixed with C<USE_>,
-eg C<PERL_USE_STDIO>, C<USE_MULTIPLICITY>.
+e.g. C<PERL_USE_STDIO>, C<USE_MULTIPLICITY>.
 
 =item *
 
 A macro that may declare stuff and thus needs to be at the start of a block
-should be prefixed with C<DECL_>, eg C<DECL_SAVE_STACK>. Note that macros which
+should be prefixed with C<DECL_>, e.g. C<DECL_SAVE_STACK>. Note that macros which
 implicitly declare and then use variables are strongly discouraged, unless it
 is essential for portability or extensibility. The following are in decreasing
 preference style-wise, but increasing preference extensibility-wise.
@@ -706,7 +698,7 @@ files.
 
 =item Developer files
 
-Each source file (eg a F<foo.c> F<foo.h> pair), should contain inline POD
+Each source file (e.g. a F<foo.c> F<foo.h> pair), should contain inline POD
 documentation containing information on the implementation decisions associated
 with the source file. (Note that this is in contrast to PDDs, which describe
 design decisions). In addition, more discussive documentation can be placed in
@@ -743,18 +735,18 @@ When appropriate, some simple examples of usage.
 
 A description of the contents of the file, how the implementation works, data
 structures and algorithms, and anything that may be of interest to your
-successors, eg benchmarks of differing hash algorithms, essays on how to do
+successors, e.g. benchmarks of differing hash algorithms, essays on how to do
 integer arithmetic.
 
 =item HISTORY
 
-Record major changes to the file, eg "we moved from a linked list to a hash
+Record major changes to the file, e.g. "we moved from a linked list to a hash
 table implementation for storing Foos, as it was found to be much faster".
 
 =item SEE ALSO
 
 Links to pages and books that may contain useful info relevant to the stuff
-going on in the code - eg the book you stole the hash function from.
+going on in the code - e.g. the book you stole the hash function from.
 
 =back
 
@@ -809,7 +801,7 @@ schmuck trying subsequently to replace it with something 'cleaner'.
 While there is no need to go mad commenting every line of code, it is immensely
 helpful to provide a "running commentary" every 10 or so lines say; if nothing
 else, this makes it easy to quickly locate a specific chunk of code. Such
-comments are particularly useful at the top of each major branch, eg
+comments are particularly useful at the top of each major branch, e.g.
 
     if (FOO_bar_BAZ(**p+*q) <= (r-s[FOZ & FAZ_MASK]) || FLOP_2(z99)) {
         /* we're in foo mode: clean up lexicals */
