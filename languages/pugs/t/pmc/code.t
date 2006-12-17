@@ -5,7 +5,7 @@
 use warnings;
 use t::pmc;
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "a sub ought to be PugsCode");
+pir_output_is( << 'CODE', << 'OUTPUT', "a sub ought to be PugsCode" );
 .HLL "Perl6", "pugs_group"
 
 .sub main :main

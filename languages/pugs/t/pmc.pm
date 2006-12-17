@@ -10,11 +10,11 @@ use Test::More;
 sub import {
     my $class = shift;
 
-    my (undef, $file, undef) = caller();
+    my ( undef, $file, undef ) = caller();
     $file =~ /(\w+)\.t$/ or die "malformed file: $file";
     my $type = "Pugs\u$1";
 
-    main::pir_output_is(<< 'CODE', << 'OUTPUT', "check sanity for pugs_group");
+    main::pir_output_is( << 'CODE', << 'OUTPUT', "check sanity for pugs_group" );
 .sub _main
     loadlib $P1, "pugs_group"
     $I0 = defined $P1 
@@ -27,7 +27,7 @@ CODE
 ok
 OUTPUT
 
-main::pir_output_is(<< "CODE", << "OUTPUT", "check sanity for creation");
+    main::pir_output_is( << "CODE", << "OUTPUT", "check sanity for creation" );
 .HLL "Perl6", "pugs_group"
 .sub _main
     .local pmc pmc1
