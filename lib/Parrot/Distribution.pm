@@ -475,7 +475,7 @@ sub is_perl {
     # Now let's check to see if there's a perl shebang.
 
     open my $file_handle, '<', $filename 
-	or die "Could not open $filename for reading";
+        or die "Could not open $filename for reading";
     my $line = <$file_handle>;
     close $file_handle;
 

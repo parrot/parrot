@@ -1163,7 +1163,7 @@ sub _new_fh {
         $fh = do { local *FH };
         open $fh, ">", "$file_or_fh" or 
             die "Can't open test output log $file_or_fh: $!";
-	_autoflush($fh);
+        _autoflush($fh);
     }
 
     return $fh;
@@ -1491,10 +1491,10 @@ sub _ending {
     # Exit if plan() was never called.  This is so "require Test::Simple" 
     # doesn't puke.
     if( ($self->{Original_Pid} != $$) or
-	(!$self->{Have_Plan} && !$self->{Test_Died}) )
+        (!$self->{Have_Plan} && !$self->{Test_Died}) )
     {
-	_my_exit($?);
-	return;
+        _my_exit($?);
+        return;
     }
 
     # Figure out if we passed or failed and print helpful messages.
