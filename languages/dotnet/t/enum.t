@@ -10,7 +10,7 @@ use Test::More tests => 7;
 
 ## Testing class for this file.t';
 #
-die unless compile_cs("t.dll", <<'CSHARP');
+die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
 {
     using System;
@@ -86,10 +86,10 @@ namespace Testing
 CSHARP
 
 ## Attempt to translate.
-ok(translate("t.dll", "t.pbc"), 'translate');
+ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
 ## Tests.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'value');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'value' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -102,7 +102,7 @@ PIR
 2
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'or');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'or' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -115,7 +115,7 @@ PIR
 7
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'or_int');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'or_int' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -128,7 +128,7 @@ PIR
 7
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'cond_1');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'cond_1' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -145,7 +145,7 @@ PIR
 1
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'cond_2');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'cond_2' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -162,7 +162,7 @@ PIR
 0
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'argument');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'argument' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"

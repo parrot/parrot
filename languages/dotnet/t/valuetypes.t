@@ -10,7 +10,7 @@ use Test::More tests => 7;
 
 ## Testing class for this file.t';
 #
-die unless compile_cs("t.dll", <<'CSHARP');
+die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
 {
     public struct value_type {
@@ -93,10 +93,10 @@ namespace Testing
 CSHARP
 
 ## Attempt to translate.
-ok(translate("t.dll", "t.pbc"), 'translate');
+ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
 ## Tests.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'locals_1');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'locals_1' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -109,7 +109,7 @@ PIR
 3
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'locals_2');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'locals_2' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -122,7 +122,7 @@ PIR
 5
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'locals_3');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'locals_3' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -135,7 +135,7 @@ PIR
 7
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'pass');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'pass' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -148,7 +148,7 @@ PIR
 6
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'pass ref');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'pass ref' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -161,7 +161,7 @@ PIR
 24
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'method');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'method' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"

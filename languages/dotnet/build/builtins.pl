@@ -8,17 +8,15 @@ use warnings;
 use Getopt::Long;
 
 # Grab parameters.
-my ($input_file, $output_file);
-GetOptions(
-    "output=s"    => \$output_file
-) or usage();
+my ( $input_file, $output_file );
+GetOptions( "output=s" => \$output_file ) or usage();
 $input_file = shift @ARGV;
 usage() if !$input_file || @ARGV;
 
 # Parse the file to get the methods.
 my $fh;
 open $fh, "<", "$input_file" or die "Could not open $input_file: $!\n";
-my $input = join('', <$fh>);
+my $input = join( '', <$fh> );
 close $fh;
 my @methods = parse($input);
 
@@ -67,7 +65,6 @@ open $fh, ">", "$output_file" or die "Cannot open $output_file: $!\n";
 print $fh $output;
 close $fh;
 
-
 ##############################################################################
 # Subroutines.
 ##############################################################################
@@ -75,15 +72,17 @@ close $fh;
 # This parses the input file, extracting each method.
 # ###################################################
 sub parse {
-    my $input = shift;
+    my $input   = shift;
     my @methods = ();
     my $cur_method;
     my $line_count = 1;
-    
+
     # Loop over lines of input.
-    foreach my $line (split(/\n/, $input)) {
+    foreach my $line ( split( /\n/, $input ) ) {
+
         # Is this the start of a new method?
-        if ($line =~ /^\[([\w\.]+)\s*\:\:\s*(\w+)\s*(\:unimplemented)?\s*\]\s*$/) {
+        if ( $line =~ /^\[([\w\.]+)\s*\:\:\s*(\w+)\s*(\:unimplemented)?\s*\]\s*$/ ) {
+
             # If there is an existing one, stash it.
             if ($cur_method) {
                 push @methods, $cur_method;
@@ -91,26 +90,31 @@ sub parse {
 
             # Initiate new method info.
             $cur_method = {
-                class           => $1,
-                method          => $2,
-                unimplemented   => $3 ? 1 : 0,
-                body            => ''
+                class         => $1,
+                method        => $2,
+                unimplemented => $3 ? 1 : 0,
+                body          => ''
             };
 
-        # Have we got a blank line that we should skip over?
-        } elsif ($line eq "" && (!$cur_method || $cur_method->{'unimplemented'})) {
+            # Have we got a blank line that we should skip over?
+        }
+        elsif ( $line eq "" && ( !$cur_method || $cur_method->{'unimplemented'} ) ) {
+
             # Do nothing.
 
-        # Have we got a non-blank line when we've got no method specified yet?
-        } elsif (!$cur_method) {
+            # Have we got a non-blank line when we've got no method specified yet?
+        }
+        elsif ( !$cur_method ) {
             die "Syntax error at line $line_count\n";
 
-        # Have we got a non-blank line in an unimplemented method?
-        } elsif ($cur_method->{'unimplemented'}) {
+            # Have we got a non-blank line in an unimplemented method?
+        }
+        elsif ( $cur_method->{'unimplemented'} ) {
             die "Unimplemented method given body at line $line_count\n";
 
-        # Otherwise, just append it to current method.
-        } else {
+            # Otherwise, just append it to current method.
+        }
+        else {
             $cur_method->{'body'} .= "$line\n";
         }
 
@@ -126,25 +130,25 @@ sub parse {
     return @methods;
 }
 
-
 # Generate the lookup table.
 # ##########################
 sub generate_lookup {
     my @methods = @_;
-    my $pir = "";
+    my $pir     = "";
 
     # Group methods by class.
     my %classes = ();
     foreach (@methods) {
-        if ($classes{$_->{'class'}}) {
-            push @{$classes{$_->{'class'}}}, $_;
-        } else {
-            $classes{$_->{'class'}} = [$_];
+        if ( $classes{ $_->{'class'} } ) {
+            push @{ $classes{ $_->{'class'} } }, $_;
+        }
+        else {
+            $classes{ $_->{'class'} } = [$_];
         }
     }
 
     # Build classes dispatch table.
-    foreach (keys %classes) {
+    foreach ( keys %classes ) {
         my $label = "CLASS_$_";
         $label =~ s/\./_/g;
         $pir .= "if class_name == \"$_\" goto $label\n";
@@ -152,16 +156,19 @@ sub generate_lookup {
     $pir .= "goto FAIL\n";
 
     # Now build method dispatch table for each class.
-    foreach (keys %classes) {
+    foreach ( keys %classes ) {
+
         # Stick label at top.
         my $label = "CLASS_$_";
         $label =~ s/\./_/g;
         $pir .= "$label:\n";
 
         # Now do dispatch for each method.
-        foreach (@{$classes{$_}}) {
-            my $label = $_->{'unimplemented'} ? 'UNIMPLEMENTED' : 
-                        "BODY_$_->{'class'}___$_->{'method'}";
+        foreach ( @{ $classes{$_} } ) {
+            my $label =
+                $_->{'unimplemented'}
+                ? 'UNIMPLEMENTED'
+                : "BODY_$_->{'class'}___$_->{'method'}";
             $label =~ s/\./_/g;
             $pir .= "if method_name == \"$_->{'method'}\" goto $label\n";
         }
@@ -177,10 +184,10 @@ FAIL:
 PIR
 }
 
-
 # Generate the bodies.
 # ####################
 sub generate_bodies {
+
     # Just loop over the methods and emit code to set body and go to the end.
     my $pir = '';
     foreach (@_) {
@@ -194,7 +201,6 @@ sub generate_bodies {
     return $pir;
 }
 
-
 # Usage message.
 # ##############
 sub usage {
@@ -204,7 +210,6 @@ Usage:
 USAGE
     exit(1);
 }
-
 
 # Local Variables:
 # mode: cperl

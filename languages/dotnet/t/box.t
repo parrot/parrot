@@ -9,7 +9,7 @@ use DotNetTesting;
 use Test::More tests => 3;
 
 ## Testing class for this file.
-die unless compile_cs("t.dll", <<'CSHARP');
+die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
 {
     public struct value_type {
@@ -47,10 +47,10 @@ namespace Testing
 CSHARP
 
 ## Attempt to translate.
-ok(translate("t.dll", "t.pbc"), 'translate');
+ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
 ## Tests.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'box_1');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'box_1' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -63,7 +63,7 @@ PIR
 11
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'box_2');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'box_2' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"

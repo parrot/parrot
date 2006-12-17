@@ -9,7 +9,7 @@ use DotNetTesting;
 use Test::More tests => 5;
 
 ## Testing class for this file.
-die unless compile_cs("t.dll", <<'CSHARP');
+die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
 {
     public class test_elem
@@ -56,10 +56,10 @@ namespace Testing
 CSHARP
 
 ## Attempt to translate.
-ok(translate("t.dll", "t.pbc"), 'translate');
+ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
 ## Tests.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'create_array');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'create_array' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -72,7 +72,7 @@ PIR
 5
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'array_length');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'array_length' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -86,7 +86,7 @@ PIR
 5
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'create_and_length');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'create_and_length' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -99,7 +99,7 @@ PIR
 5
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'loadstore_test');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'loadstore_test' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"

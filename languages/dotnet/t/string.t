@@ -10,7 +10,7 @@ use Test::More tests => 4;
 
 ## Testing class for this file.t';
 #
-die unless compile_cs("t.dll", <<'CSHARP');
+die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
 {
     public class Test
@@ -34,10 +34,10 @@ namespace Testing
 CSHARP
 
 ## Attempt to translate.
-ok(translate("t.dll", "t.pbc"), 'translate');
+ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
 ## Tests.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'ret_string');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'ret_string' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -49,7 +49,7 @@ PIR
 Hello world!
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'ret_string_with_quotes');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'ret_string_with_quotes' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -61,7 +61,7 @@ PIR
 I said, "Hello world!"
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'ret_string_with_quotes_s');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'ret_string_with_quotes_s' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"

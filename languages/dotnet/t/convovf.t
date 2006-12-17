@@ -10,7 +10,7 @@ use Test::More tests => 43;
 
 ## Testing class for this file.t';
 #
-die unless compile_cs("t.dll", <<'CSHARP');
+die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
 {
     public class Test
@@ -94,10 +94,10 @@ namespace Testing
 CSHARP
 
 ## Attempt to translate.
-ok(translate("t.dll", "t.pbc"), 'translate');
+ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
 ## Tests.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u1');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u1' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -110,7 +110,7 @@ PIR
 200
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u1');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u1' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -127,7 +127,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u1');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u1' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -144,7 +144,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i1');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i1' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -157,7 +157,7 @@ PIR
 100
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i1');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i1' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -171,7 +171,7 @@ PIR
 -5
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i1');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i1' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -188,7 +188,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i1');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i1' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -205,7 +205,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u2');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u2' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -218,7 +218,7 @@ PIR
 33000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u2');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u2' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -235,7 +235,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u2');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u2' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -252,7 +252,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i2');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i2' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -265,7 +265,7 @@ PIR
 10000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i2');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i2' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -279,7 +279,7 @@ PIR
 -5
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i2');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i2' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -296,7 +296,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i2');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i2' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -313,7 +313,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u4');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u4' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -326,7 +326,7 @@ PIR
 5000000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u4');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u4' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -343,7 +343,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u1_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u1_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -356,7 +356,7 @@ PIR
 200
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u1_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u1_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -373,7 +373,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i1_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i1_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -386,7 +386,7 @@ PIR
 100
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i1_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i1_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -403,7 +403,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i1_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i1_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -420,7 +420,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u2_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u2_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -433,7 +433,7 @@ PIR
 33000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u2_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u2_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -450,7 +450,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i2_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i2_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -463,7 +463,7 @@ PIR
 10000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i2_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i2_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -480,7 +480,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i2_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i2_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -497,7 +497,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i4_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i4_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -510,7 +510,7 @@ PIR
 5000000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i4_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i4_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -527,7 +527,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u1_f');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u1_f' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -540,7 +540,7 @@ PIR
 200.000000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u1_f');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u1_f' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -557,7 +557,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u1_f');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u1_f' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -574,7 +574,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i1_f');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i1_f' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -587,7 +587,7 @@ PIR
 100.000000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i1_f');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i1_f' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -601,7 +601,7 @@ PIR
 -5.000000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i1_f');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i1_f' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -618,7 +618,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i1_f');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i1_f' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -635,7 +635,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u2_f');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u2_f' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -648,7 +648,7 @@ PIR
 33000.000000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u2_f');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u2_f' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -665,7 +665,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'u2_f');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'u2_f' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -682,7 +682,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i2_f');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i2_f' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -695,7 +695,7 @@ PIR
 10000.000000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i2_f');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i2_f' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -709,7 +709,7 @@ PIR
 -5.000000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i2_f');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i2_f' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -726,7 +726,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'i2_f');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'i2_f' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"

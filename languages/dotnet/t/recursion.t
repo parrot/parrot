@@ -10,7 +10,7 @@ use Test::More tests => 2;
 
 ## Testing class for this file.t';
 #
-die unless compile_cs("t.dll", <<'CSHARP');
+die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
 {
     public class Test
@@ -27,10 +27,10 @@ namespace Testing
 CSHARP
 
 ## Attempt to translate.
-ok(translate("t.dll", "t.pbc"), 'translate');
+ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
 ## Tests.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'factorial');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'factorial' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"

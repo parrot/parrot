@@ -10,7 +10,7 @@ use Test::More tests => 6;
 
 ## Testing class for this file.t';
 #
-die unless compile_cs("t.dll", <<'CSHARP');
+die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
 {
     public class Test
@@ -49,10 +49,10 @@ namespace Testing
 CSHARP
 
 ## Attempt to translate.
-ok(translate("t.dll", "t.pbc"), 'translate');
+ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
 ## Tests.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'is_same');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'is_same' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -77,7 +77,7 @@ PIR
 1
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'is_lt');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'is_lt' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -102,7 +102,7 @@ PIR
 0
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'is_lt_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'is_lt_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -127,7 +127,7 @@ PIR
 0
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'is_gt');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'is_gt' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -152,7 +152,7 @@ PIR
 0
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'is_gt_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'is_gt_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"

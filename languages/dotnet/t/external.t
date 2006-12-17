@@ -10,7 +10,7 @@ use Test::More tests => 5;
 
 ## Testing classes for this file.t';
 #
-die unless compile_cs("external.dll", <<'CSHARP');
+die unless compile_cs( "external.dll", <<'CSHARP');
 namespace ExportsStuff
 {
     public class Monkey
@@ -25,7 +25,7 @@ namespace ExportsStuff
     }
 }
 CSHARP
-die unless compile_cs("t.dll", <<'CSHARP', '-r:external.dll');
+die unless compile_cs( "t.dll", <<'CSHARP', '-r:external.dll' );
 namespace Testing
 {
     using System;
@@ -55,11 +55,11 @@ namespace Testing
 CSHARP
 
 ## Attempt to translate.
-ok(translate("external.dll", "external.pbc"), 'translate');
-ok(translate("t.dll", "t.pbc"), 'translate');
+ok( translate( "external.dll", "external.pbc" ), 'translate' );
+ok( translate( "t.dll",        "t.pbc" ),        'translate' );
 
 ## Tests.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'create_monkey');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'create_monkey' );
 .sub main
 	.local pmc obj
     load_bytecode "external.pbc"
@@ -75,7 +75,7 @@ PIR
 ok
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'monkey_age_doubled');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'monkey_age_doubled' );
 .sub main
 	.local pmc obj
     load_bytecode "external.pbc"
@@ -90,7 +90,7 @@ PIR
 16
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'monkey_talk');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'monkey_talk' );
 .sub main
 	.local pmc obj
     load_bytecode "external.pbc"

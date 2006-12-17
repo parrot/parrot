@@ -10,7 +10,7 @@ use Test::More tests => 4;
 
 ## Testing class for this file.t';
 #
-die unless compile_cs("t.dll", <<'CSHARP');
+die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
 {
     public class Test
@@ -37,10 +37,10 @@ namespace Testing
 CSHARP
 
 ## Attempt to translate.
-ok(translate("t.dll", "t.pbc"), 'translate');
+ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
 ## Tests.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'set_x');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'set_x' );
 .HLL 'dotnet', ''
 .sub main
 	.local pmc obj
@@ -56,7 +56,7 @@ PIR
 26
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'set_y');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'set_y' );
 .HLL 'dotnet', ''
 .sub main
 	.local pmc obj
@@ -72,7 +72,7 @@ PIR
 16
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'add');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'add' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"

@@ -10,7 +10,7 @@ use Test::More tests => 13;
 
 ## Testing class for this file.t';
 #
-die unless compile_cs("t.dll", <<'CSHARP');
+die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
 {
     public class Test
@@ -49,10 +49,10 @@ namespace Testing
 CSHARP
 
 ## Attempt to translate.
-ok(translate("t.dll", "t.pbc"), 'translate');
+ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
 ## Tests.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'add_ovf');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'add_ovf' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -65,7 +65,7 @@ PIR
 572
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'add_ovf');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'add_ovf' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -82,7 +82,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'add_ovf_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'add_ovf_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -95,7 +95,7 @@ PIR
 572
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'add_ovf_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'add_ovf_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -113,7 +113,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'sub_ovf');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'sub_ovf' );
 .sub main
     .local pmc obj
     load_bytecode "t.pbc"
@@ -130,7 +130,7 @@ PIR
 -28
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'sub_ovf');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'sub_ovf' );
 .sub main
     .local pmc obj
     load_bytecode "t.pbc"
@@ -147,7 +147,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'sub_ovf_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'sub_ovf_un' );
 .sub main
     .local pmc obj
     load_bytecode "t.pbc"
@@ -160,7 +160,7 @@ PIR
 428
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'sub_ovf_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'sub_ovf_un' );
 .sub main
     .local pmc obj
     load_bytecode "t.pbc"
@@ -177,7 +177,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'mul_ovf');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'mul_ovf' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -190,7 +190,7 @@ PIR
 10000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'mul_ovf');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'mul_ovf' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -207,7 +207,7 @@ PIR
 success
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'mul_ovf_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'mul_ovf_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -220,7 +220,7 @@ PIR
 10000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'mul_ovf_un');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'mul_ovf_un' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"

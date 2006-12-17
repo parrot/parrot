@@ -11,7 +11,7 @@ use Test::More tests => 9;
 # Testing class for the managed pointer PMC and related ops. Note that thist';
 #
 # does not consider translating any .NET code, just tests the functionality.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'int reg');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'int reg' );
 .loadlib "dotnet_ops"
 .sub main :main
 	.local int the_test
@@ -44,7 +44,7 @@ PIR
 Jonathan will be 21 years old tomorrow! :-O
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'float reg');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'float reg' );
 .loadlib "dotnet_ops"
 .sub main :main
 	.local num the_test
@@ -76,7 +76,7 @@ PIR
 4.800000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'pmc reg');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'pmc reg' );
 .loadlib "dotnet_ops"
 .sub main :main
 	.local pmc the_test
@@ -112,7 +112,7 @@ PIR
 42
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'int element');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'int element' );
 .loadlib "dotnet_ops"
 .sub main :main
 	.local int the_test
@@ -146,7 +146,7 @@ PIR
 42
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'float element');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'float element' );
 .loadlib "dotnet_ops"
 .sub main :main
 	.local num the_test
@@ -180,7 +180,7 @@ PIR
 11.800000
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'pmc element');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'pmc element' );
 .loadlib "dotnet_ops"
 .sub main :main
     .local pmc ptr, arr, the_test
@@ -220,7 +220,7 @@ PIR
 11.8
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'int field');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'int field' );
 .loadlib "dotnet_ops"
 .sub main :main
     .local int the_test
@@ -257,7 +257,7 @@ The monkey was 20 years old.
 The monkey is now 21 years old.
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'float field');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'float field' );
 .loadlib "dotnet_ops"
 .sub main :main
     .local num the_test
@@ -294,7 +294,7 @@ The monkey was 1.790000 meters tall.
 The monkey is now 1.82 meters tall.
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'pmc field');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'pmc field' );
 .loadlib "dotnet_ops"
 .sub main :main
     .local pmc the_test, ptr, obj

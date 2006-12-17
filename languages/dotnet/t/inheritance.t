@@ -10,7 +10,7 @@ use Test::More tests => 6;
 
 ## Testing class for this file.t';
 #
-die unless compile_cs("t.dll", <<'CSHARP');
+die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
 {
     using System;
@@ -80,10 +80,10 @@ namespace Testing
 CSHARP
 
 ## Attempt to translate.
-ok(translate("t.dll", "t.pbc"), 'translate');
+ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
 ## Tests.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'test_2_up');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'test_2_up' );
 .sub main
 	.local pmc obj1, obj2
 	load_bytecode "t.pbc"
@@ -97,7 +97,7 @@ PIR
 18
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'test_1_up');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'test_1_up' );
 .sub main
 	.local pmc obj1, obj2
 	load_bytecode "t.pbc"
@@ -111,7 +111,7 @@ PIR
 20
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'test_cur');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'test_cur' );
 .sub main
 	.local pmc obj1, obj2
 	load_bytecode "t.pbc"
@@ -125,7 +125,7 @@ PIR
 22
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'override 1');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'override 1' );
 .sub main
 	.local pmc obj1, obj2
 	load_bytecode "t.pbc"
@@ -139,7 +139,7 @@ PIR
 666
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'override 2');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'override 2' );
 .sub main
 	.local pmc obj1, obj2
 	load_bytecode "t.pbc"

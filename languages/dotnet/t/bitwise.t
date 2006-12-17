@@ -9,7 +9,7 @@ use DotNetTesting;
 use Test::More tests => 5;
 
 ## Testing class for this file.
-die unless compile_cs("t.dll", <<'CSHARP');
+die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
 {
     public class Test
@@ -48,10 +48,10 @@ namespace Testing
 CSHARP
 
 ## Attempt to translate.
-ok(translate("t.dll", "t.pbc"), 'translate');
+ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
 ## Tests.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'and');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'and' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -64,7 +64,7 @@ PIR
 64
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'or');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'or' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -77,7 +77,7 @@ PIR
 1089
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'xor');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'xor' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -90,7 +90,7 @@ PIR
 135
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'not');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'not' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"

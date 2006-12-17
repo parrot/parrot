@@ -10,7 +10,7 @@ use Test::More tests => 7;
 
 ## Testing classes for this file.t';
 #
-die unless compile_cs("t.dll", <<'CSHARP');
+die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
 {
     using System;
@@ -173,10 +173,10 @@ namespace Testing
 CSHARP
 
 ## Attempt to translate.
-ok(translate("t.dll", "t.pbc"), 'translate');
+ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
 ## Tests.
-is (run_pir(<<'PIR'), <<'OUTPUT', 'unwind over');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'unwind over' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -189,7 +189,7 @@ PIR
 42
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'unwind over 2');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'unwind over 2' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -202,7 +202,7 @@ PIR
 50
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'try...finally');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'try...finally' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -215,7 +215,7 @@ PIR
 42
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'mixed');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'mixed' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -228,7 +228,7 @@ PIR
 55
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'nested 1');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'nested 1' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -245,7 +245,7 @@ PIR
 33
 OUTPUT
 
-is (run_pir(<<'PIR'), <<'OUTPUT', 'nested 2');
+is( run_pir(<<'PIR'), <<'OUTPUT', 'nested 2' );
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"

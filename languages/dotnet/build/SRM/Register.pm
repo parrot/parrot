@@ -11,16 +11,17 @@ our @ISA = qw/SRM::Base/;
 
 # Constructor. Just base this class on a hash.
 sub new() {
-        my $invocant = shift;
-        return bless {}, $invocant;
+    my $invocant = shift;
+    return bless {}, $invocant;
 }
 
 # Pre-translation hook.
 sub pre_translation() {
-        # We need a stack depth and a string for label gen and some
-        # storage for stack depths and stack type states that we are
-        # propogating.
-        return <<'PIR';
+
+    # We need a stack depth and a string for label gen and some
+    # storage for stack depths and stack type states that we are
+    # propogating.
+    return <<'PIR';
 .local string strPC
 .local int stack_depth
 .local pmc prop_type_state, prop_stack_depth
@@ -32,55 +33,58 @@ PIR
 
 # Post translation hook.
 sub post_translation() {
-        # Nothing to do.
-        return "";
+
+    # Nothing to do.
+    return "";
 }
 
 # Extra subroutines required for the mapper.
 sub subs() {
-        # No extra subs.
-        return "";
+
+    # No extra subs.
+    return "";
 }
 
 # Label generation.
 sub gen_label() {
-        # We'll emit a label for every single instruction. While we kinda find
-        # basic blocks, we don't discover backward branches until late to do
-        # otherwise. Also, putting a label everywhere doesn't hurt the final
-        # Parrot bytecode that is produced.
-        my $pir = <<'PIR';
+
+    # We'll emit a label for every single instruction. While we kinda find
+    # basic blocks, we don't discover backward branches until late to do
+    # otherwise. Also, putting a label everywhere doesn't hurt the final
+    # Parrot bytecode that is produced.
+    my $pir = <<'PIR';
 strPC = ${PC}
 ${INS} = concat "LAB"
 ${INS} = concat strPC
 ${INS} = concat ": "
 PIR
-        
-        # This is also a good place (as we call gen_label before translating
-        # every instruction) to see if we need to instate a stack type state
-        # that was propogated to this instruction.
-        $pir .= <<'PIR';
+
+    # This is also a good place (as we call gen_label before translating
+    # every instruction) to see if we need to instate a stack type state
+    # that was propogated to this instruction.
+    $pir .= <<'PIR';
 ${PTEMP0} = prop_type_state[${PC}]
 if null ${PTEMP0} goto NOWT_TO_PROPOGATE
 stack_depth = prop_stack_depth[${PC}]
 NOWT_TO_PROPOGATE:
 PIR
 
-        # Return.
-        return $pir;
+    # Return.
+    return $pir;
 }
 
 # Pre and post stack operation (op class instructions) hooks.
 sub pre_op($$) {
-        my $self = shift;
-        my ($pops, $pushes) = @_;
-        my $register_num = 0;
-        my $push_num = 0;
-        my $pir = '';
+    my $self = shift;
+    my ( $pops, $pushes ) = @_;
+    my $register_num = 0;
+    my $push_num     = 0;
+    my $pir          = '';
 
-        # Do code for each pop. Need to set up mv's and pop stuff off the stack
-        # we're maintaining.
-        for (1..$pops) {
-                $pir .= <<'PIR';
+    # Do code for each pop. Need to set up mv's and pop stuff off the stack
+    # we're maintaining.
+    for ( 1 .. $pops ) {
+        $pir .= <<'PIR';
 # Get type (so we can find register type).
 ${PTEMP0} = ${STYPES}[stack_depth]
 
@@ -95,14 +99,14 @@ ${STACK$register_num} = ${STEMP0}
 # Decrement stack height.
 dec stack_depth
 PIR
-                $pir =~ s/\$register_num/$register_num/g;
-                $register_num++;
-        }
+        $pir =~ s/\$register_num/$register_num/g;
+        $register_num++;
+    }
 
-        # Do code for each push.
-        $pir .= "\${ITEMP0} = 0\n";
-        for (1..$pushes) {
-                $pir .= <<'PIR';
+    # Do code for each push.
+    $pir .= "\${ITEMP0} = 0\n";
+    for ( 1 .. $pushes ) {
+        $pir .= <<'PIR';
 # Increment stack depth.
 inc stack_depth
 
@@ -120,30 +124,31 @@ ${DEST$push_num} = ${STEMP0}
 # Increment dtypes index.
 inc ${ITEMP0}
 PIR
-                $pir =~ s/\$push_num/$push_num/g;
-                $push_num++;
-        }
+        $pir =~ s/\$push_num/$push_num/g;
+        $push_num++;
+    }
 
-        # Return generated code.
-        return $pir;
+    # Return generated code.
+    return $pir;
 }
 
 sub post_op($$) {
-        # Nothing to do.
-        return "";
+
+    # Nothing to do.
+    return "";
 }
 
 # Pre and post branch operation hooks.
 sub pre_branch($) {
-        my $self = shift;
-        my $pops = shift;
-        my $register_num = 0;
-        my $pir = '';
+    my $self         = shift;
+    my $pops         = shift;
+    my $register_num = 0;
+    my $pir          = '';
 
-        # Do code for each pop. Need to set up mv's and pop stuff off the stack
-        # we're maintaining.
-        for (1..$pops) {
-                $pir .= <<'PIR';
+    # Do code for each pop. Need to set up mv's and pop stuff off the stack
+    # we're maintaining.
+    for ( 1 .. $pops ) {
+        $pir .= <<'PIR';
 # Get type (so we can find register type).
 ${PTEMP0} = ${STYPES}[stack_depth]
 
@@ -158,24 +163,24 @@ ${STACK$register_num} = ${STEMP0}
 # Decrement stack height.
 dec stack_depth
 PIR
-                $pir =~ s/\$register_num/$register_num/g;
-                $register_num++;
-        }
+        $pir =~ s/\$register_num/$register_num/g;
+        $register_num++;
+    }
 
-        # Return generated code.
-        return $pir;
+    # Return generated code.
+    return $pir;
 }
 
 sub post_branch($) {
-        my $self = shift;
-        my $pops = shift;
-        my $pir = '';
+    my $self = shift;
+    my $pops = shift;
+    my $pir  = '';
 
-        # Branches mean we need to deal with basic block-ish stuff. If the branch
-        # did not pop anything it is unconditional, so next instruction needs to
-        # have an empty stack type state propogated to it if nothing has been
-        # propogated there already.
-        $pir .= <<'PIR';
+    # Branches mean we need to deal with basic block-ish stuff. If the branch
+    # did not pop anything it is unconditional, so next instruction needs to
+    # have an empty stack type state propogated to it if nothing has been
+    # propogated there already.
+    $pir .= <<'PIR';
 if 0x${CURIC} == 0x45 goto POST_BRANCH_switch_${CURIC}
 ${ITEMP0} = ${NEXTPC} + I_arg_0 # XXX Can't use ${ARG0} :-(
 prop_type_state[${ITEMP0}] = ${STYPES}
@@ -196,19 +201,19 @@ POST_BRANCH_switch_${CURIC}_LOOP_EXIT:
 
 POST_BRANCH_NOT_switch_${CURIC}:
 PIR
-        return $pir;
+    return $pir;
 }
 
 # Pre and post load operation hooks.
 sub pre_load($) {
-        my $self = shift;
-        my $need_dest = shift;
-        my $pir = "";
+    my $self      = shift;
+    my $need_dest = shift;
+    my $pir       = "";
 
-        # If we need a destination, we simply supply the register to load
-        # into here.
-        if ($need_dest) {
-                $pir .= <<'PIR'
+    # If we need a destination, we simply supply the register to load
+    # into here.
+    if ($need_dest) {
+        $pir .= <<'PIR'
 inc stack_depth 
 ${DEST0} = "$"
 ${STEMP0} = ${LOADTYPE}["reg_type_short"]
@@ -216,21 +221,21 @@ ${DEST0} = concat ${STEMP0}
 ${STEMP0} = stack_depth
 ${DEST0} = concat ${STEMP0}
 PIR
-        }
+    }
 
-        return $pir;
+    return $pir;
 }
 
 sub post_load($) {
-        my $self = shift;
-        my $need_dest = shift;
-        my $pir = "";
+    my $self      = shift;
+    my $need_dest = shift;
+    my $pir       = "";
 
-        # If the register name to load from was supplied, we need to generate
-        # the name of the destination register emulating the stack position and
-        # generate a move instruction.
-        if (!$need_dest) {
-                $pir .= <<'PIR'
+    # If the register name to load from was supplied, we need to generate
+    # the name of the destination register emulating the stack position and
+    # generate a move instruction.
+    if ( !$need_dest ) {
+        $pir .= <<'PIR'
 inc stack_depth 
 ${STEMP0} = "$"
 ${STEMP1} = ${LOADTYPE}["reg_type_short"]
@@ -243,20 +248,20 @@ ${INS} = concat " = "
 ${INS} = concat ${LOADREG}
 ${INS} = concat "\n"
 PIR
-        }
+    }
 
-        return $pir;
+    return $pir;
 }
 
 # Pre and post store operation hooks.
 sub pre_store($) {
-        my $self = shift;
-        my $dest_reg = shift;
-        my $pir = "";
+    my $self     = shift;
+    my $dest_reg = shift;
+    my $pir      = "";
 
-        # If the destination isn't a register, determine register name now.
-        if (!$dest_reg) {
-                $pir .= <<'PIR'
+    # If the destination isn't a register, determine register name now.
+    if ( !$dest_reg ) {
+        $pir .= <<'PIR'
 # Get type (so we can find register type).
 ${PTEMP0} = ${STYPES}[stack_depth]
 
@@ -271,20 +276,20 @@ ${STACK0} = ${STEMP0}
 # Decrement stack height.
 dec stack_depth
 PIR
-        }
+    }
 
-        return $pir;
+    return $pir;
 }
 
 sub post_store($) {
-        my $self = shift;
-        my $dest_reg = shift;
-        my $pir = "";
+    my $self     = shift;
+    my $dest_reg = shift;
+    my $pir      = "";
 
-        # If destination is a register then it is up to the SRM to do the store.
-        # Otherwise, there's nothing to do here.
-        if ($dest_reg) {
-                $pir .= <<'PIR'
+    # If destination is a register then it is up to the SRM to do the store.
+    # Otherwise, there's nothing to do here.
+    if ($dest_reg) {
+        $pir .= <<'PIR'
 # Get type (so we can find register type).
 ${PTEMP0} = ${STYPES}[stack_depth]
 
@@ -304,9 +309,9 @@ ${INS} = concat "\n"
 # Decrement stack height.
 dec stack_depth
 PIR
-        }
+    }
 
-        return $pir;
+    return $pir;
 }
 
 # Pre and post call hooks.
@@ -388,10 +393,11 @@ PIR
 }
 
 sub post_call {
+
     # Nothing to do.
     return "";
 }
 
 sub pop_all {
-    return "stack_depth = -1\n"
+    return "stack_depth = -1\n";
 }
