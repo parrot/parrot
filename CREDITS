@@ -176,6 +176,11 @@ E: dmitry@karasik.eu.org
 N: Eirik Berg Hanssen
 D: Use unix98 ps option in signal.t
 
+N: Eric Lubow
+D: makefile fixes
+E: eric@lubow.org
+W: http://eric.lubow.org/
+
 N: Felix Gallo
 D: delegate.pmc patch
 
