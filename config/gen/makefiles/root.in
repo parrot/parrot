@@ -1667,13 +1667,15 @@ splint2 : $(PARROT)
 #
 ###############################################################################
 
-install : installable
+install:
 	@echo "WARNING:"
 	@echo "  Installing Parrot may interfere with developing Parrot"
 	@echo "  on the same machine.  This is a temporary flaw in the"
-	@echo "  Parrot build system.  If you are not sure this is OK,"
-	@echo "  press ^C (or your interrupt key) in the next ten seconds."
-	$(PERL) -e "sleep(10)"
+	@echo "  Parrot build system."
+	@echo "  To use the make install target, remove the following line"
+	@echo "  in the Makefile that says: \$$(PERL) -e \"exit(1)\"."
+	$(PERL) -e "exit(1)"
+	make installable
 	$(PERL) tools/dev/install_files.pl \
     --buildprefix=$(BUILDPREFIX) \
     --prefix=$(PREFIX) \
