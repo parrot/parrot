@@ -54,11 +54,12 @@ sub compile_cmd {
 
     # XXX Reference to BGC - need long term solution for passing in include paths
     return
-        "$CC $CFLAGS " .
+        "$CC " .
         '@cc_o_out@' . $target . " " .
         "-I" . $PATHQUOTE . '@build_dir@@slash@include' . $PATHQUOTE . " " .
         "-I" . $PATHQUOTE . '@build_dir@@slash@src@slash@pmc' . $PATHQUOTE . " " .
         "-I" . $PATHQUOTE . '@build_dir@@slash@compilers@slash@bcg@slash@include' . $PATHQUOTE . " " .
+        "$CFLAGS " .
         $source;
 };
 
@@ -90,10 +91,10 @@ sub partial_link_cmd {
     }
 
     return
-        "$LD $LDFLAGS $LD_LOAD_FLAGS ".
+        "$LD ".
         '@ld_out@' . $target . " " .
         join(" ", map {"$PATHQUOTE$_$PATHQUOTE"} @$sources) .
-        " $liblist $PATHQUOTE$LIBPARROT$PATHQUOTE";
+        " $liblist $LDFLAGS $LD_LOAD_FLAGS $PATHQUOTE$LIBPARROT$PATHQUOTE";
 }
 
 our $NOW = time();

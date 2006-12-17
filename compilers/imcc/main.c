@@ -402,7 +402,7 @@ do_pre_process(Parrot_Interp interp)
     do_yylex_init ( interp, &yyscanner );
 
     IMCC_push_parser_state(interp);
-    while ( (c = yylex(&val, interp, yyscanner)) ) {
+    while ( (c = yylex(&val, yyscanner, interp)) ) {
         switch (c) {
             case EMIT:          printf(".emit\n"); break;
             case EOM:           printf(".eom\n"); break;

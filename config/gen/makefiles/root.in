@@ -752,23 +752,23 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
 $(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/parrot_config$(O) \
     $(MINIPARROT)
-	$(LINK) @ld_out@$@ $(LINKFLAGS) $(LINK_DYNAMIC) \
-    $(IMCC_DIR)/main$(O) @rpath_blib@ $(ALL_PARROT_LIBS) \
+	$(LINK) @ld_out@$@ \
+    $(IMCC_DIR)/main$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC) \
     $(SRC_DIR)/parrot_config$(O)
 #
 # TODO build the real miniparrot
 #
 $(MINIPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
-	$(LINK) @ld_out@$@ $(LINKFLAGS) $(IMCC_DIR)/main$(O) \
-    @rpath_blib@ $(ALL_PARROT_LIBS) $(SRC_DIR)/null_config$(O)
+	$(LINK) @ld_out@$@ $(IMCC_DIR)/main$(O) \
+    @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(SRC_DIR)/null_config$(O)
 
 $(INSTALLABLEPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/install_config$(O) \
     $(PARROT)
-	$(LINK) @ld_out@$@ $(LINKFLAGS) \
+	$(LINK) @ld_out@$@ \
     $(IMCC_DIR)/main$(O) \
-    $(ALL_PARROT_LIBS) $(SRC_DIR)/install_config$(O)
+    $(ALL_PARROT_LIBS) $(LINKFLAGS) $(SRC_DIR)/install_config$(O)
 
 $(SRC_DIR)/parrot_config.c :  runtime/parrot/include/config.fpmc \
     $(BUILD_TOOLS_DIR)/parrot_config_c.pl
@@ -835,12 +835,12 @@ $(SRC_DIR)/pdb$(O) : $(GENERAL_H_FILES)
 $(PDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pdb$(O) \
-    $(LINKFLAGS) @rpath_blib@ $(ALL_PARROT_LIBS)
+    @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 $(INSTALLABLEPDB) : $(SRC_DIR)/pdb$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pdb$(O) \
-    $(LINKFLAGS) $(ALL_PARROT_LIBS)
+    $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 #
 # Parrot Disassembler
@@ -851,12 +851,12 @@ $(SRC_DIR)/disassemble$(O) : $(GENERAL_H_FILES)
 $(DIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/disassemble$(O) \
-    $(LINKFLAGS) @rpath_blib@ $(ALL_PARROT_LIBS)
+    @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 $(INSTALLABLEDIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/disassemble$(O) \
-    $(LINKFLAGS) $(ALL_PARROT_LIBS)
+    $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 #
 # Parrot Dump
@@ -865,24 +865,24 @@ $(INSTALLABLEDIS) : $(SRC_DIR)/disassemble$(O) $(LIBPARROT)
 $(PDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pdump$(O) \
-    $(SRC_DIR)/packdump$(O) $(LINKFLAGS) @rpath_blib@ $(ALL_PARROT_LIBS)
+    $(SRC_DIR)/packdump$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 $(INSTALLABLEPDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pdump$(O) \
-    $(SRC_DIR)/packdump$(O) $(LINKFLAGS) $(ALL_PARROT_LIBS)
+    $(SRC_DIR)/packdump$(O) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 
 # pbc_info
 $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_info$(O) \
-    $(LINKFLAGS) @rpath_blib@ $(ALL_PARROT_LIBS)
+    @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 $(INSTALLABLEPINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_info$(O) \
-    $(LINKFLAGS) $(ALL_PARROT_LIBS)
+    $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 #
 # Parrot Bytecode File Merger
@@ -892,13 +892,13 @@ $(PBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT) $(SRC_DIR)/parrot_config$(O)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_merge$(O) \
     $(SRC_DIR)/parrot_config$(O) \
-    $(LINKFLAGS) $(LINK_DYNAMIC) @rpath_blib@ $(ALL_PARROT_LIBS)
+    @rpath_blib@ $(ALL_PARROT_LIBS) $(LINK_DYNAMIC) $(LINKFLAGS)
 
 $(INSTALLABLEPBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_merge$(O) \
     $(SRC_DIR)/install_config$(O) \
-    $(LINKFLAGS) $(ALL_PARROT_LIBS)
+    $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 
 ###############################################################################
@@ -1734,7 +1734,7 @@ win32-inno-installer : world install
 ###############################################################################
 
 exec : $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) $(LIBPARROT)
-	$(LINK) @ld_out@$(EXEC)$(EXE) $(LINKFLAGS) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) @rpath_blib@ $(ALL_PARROT_LIBS)
+	$(LINK) @ld_out@$(EXEC)$(EXE) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 ###### OS depend targets ##########
 
