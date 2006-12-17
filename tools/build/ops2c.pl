@@ -128,15 +128,15 @@ my %arg_dir_mapping = (
 # Look at the command line options
 #
 sub Usage {
-    return pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+    return pod2usage( -exitval => 1, -verbose => 0, -output => \*STDERR );
 }
 
 my ( $nolines_flag, $help_flag, $dynamic_flag, $core_flag );
 GetOptions(
-    "no-lines"      => \$nolines_flag,
-    "help"          => \$help_flag,
-    "dynamic|d"     => \$dynamic_flag,
-    "core"          => \$core_flag,
+    "no-lines"  => \$nolines_flag,
+    "help"      => \$help_flag,
+    "dynamic|d" => \$dynamic_flag,
+    "core"      => \$core_flag,
 ) || Usage();
 
 Usage() if $help_flag;
@@ -152,12 +152,13 @@ eval "require $trans_class";
 my $trans = $trans_class->new();
 
 # Not used
-my $prefix  = $trans->prefix();
-my $suffix  = $trans->suffix();
+my $prefix = $trans->prefix();
+my $suffix = $trans->suffix();
+
 # Used as ${defines}
-my $defines = $trans->defines();
+my $defines      = $trans->defines();
 my $opsarraytype = $trans->opsarraytype();
-my $core_type = $trans->core_type();
+my $core_type    = $trans->core_type();
 
 my $file = $core_flag ? 'core.ops' : shift @ARGV;
 
@@ -167,15 +168,16 @@ $base =~ s/\.ops$//;
 my $incdir  = "include/parrot/oplib";
 my $include = "parrot/oplib/${base}_ops${suffix}.h";
 my $header  = "include/$include";
+
 # SOURCE is closed and reread, which confuses make -j
 # create a temp file and rename it
-my $source  = "src/ops/${base}_ops${suffix}.c.temp";
+my $source = "src/ops/${base}_ops${suffix}.c.temp";
 
-if ($base =~ m!^src/dynoplibs/! || $dynamic_flag) {
-    $source  =~ s!src/ops/!!;
+if ( $base =~ m!^src/dynoplibs/! || $dynamic_flag ) {
+    $source =~ s!src/ops/!!;
     $header = "${base}_ops${suffix}.h";
     $base =~ s!^.*[/\\]!!;
-    $include = "${base}_ops${suffix}.h";
+    $include      = "${base}_ops${suffix}.h";
     $dynamic_flag = 1;
 }
 
@@ -189,16 +191,16 @@ my %hashed_ops;
 
 my $ops;
 if ($core_flag) {
-    $ops = Parrot::OpsFile->new( [ "src/ops/$file" ], $nolines_flag );
-    $ops->{OPS} = $Parrot::OpLib::core::ops;
+    $ops = Parrot::OpsFile->new( ["src/ops/$file"], $nolines_flag );
+    $ops->{OPS}      = $Parrot::OpLib::core::ops;
     $ops->{PREAMBLE} = $Parrot::OpLib::core::preamble;
 }
 else {
     my %opsfiles;
     my @opsfiles;
 
-    foreach my $opsfile ($file, @ARGV) {
-        if ($opsfiles{$opsfile}) {
+    foreach my $opsfile ( $file, @ARGV ) {
+        if ( $opsfiles{$opsfile} ) {
             print STDERR "$0: Ops file '$opsfile' mentioned more than once!\n";
             next;
         }
@@ -212,26 +214,24 @@ else {
     $ops = Parrot::OpsFile->new( \@opsfiles, $nolines_flag );
 
     my $cur_code = 0;
-    for(@{$ops->{OPS}}) {
-        $_->{CODE}=$cur_code++;
+    for ( @{ $ops->{OPS} } ) {
+        $_->{CODE} = $cur_code++;
     }
 }
-
 
 my $version       = $ops->version;
 my $major_version = $ops->major_version;
 my $minor_version = $ops->minor_version;
 my $patch_version = $ops->patch_version;
-my $num_ops     = scalar $ops->ops;
-my $num_entries = $num_ops + 1; # For trailing NULL
-
+my $num_ops       = scalar $ops->ops;
+my $num_entries   = $num_ops + 1;          # For trailing NULL
 
 #
 # Open the output files:
 #
 
-if (!$dynamic_flag && ! -d $incdir) {
-    mkdir($incdir, 0755) or die "ops2c.pl: Could not mkdir $incdir $!!\n";
+if ( !$dynamic_flag && !-d $incdir ) {
+    mkdir( $incdir, 0755 ) or die "ops2c.pl: Could not mkdir $incdir $!!\n";
 }
 
 open my $HEADER, '>', $header
@@ -239,7 +239,6 @@ open my $HEADER, '>', $header
 
 open my $SOURCE, '>', $source
     or die "ops2c.pl: Cannot open source file '$source' for writing: $!!\n";
-
 
 #
 # Print the preamble for the HEADER and SOURCE files:
@@ -258,7 +257,7 @@ my $preamble = <<END_C;
 
 END_C
 
-my $mmp_v = "${major_version}_${minor_version}_${patch_version}";
+my $mmp_v     = "${major_version}_${minor_version}_${patch_version}";
 my $init_func = "Parrot_DynOp_${base}${suffix}_$mmp_v";
 
 print $HEADER $preamble;
@@ -274,8 +273,7 @@ $sym_export extern op_lib_t *$init_func(long init);
 END_C
 my $cg_func = $trans->core_prefix . $base;
 
-
-if ($trans->can("run_core_func_decl")) {
+if ( $trans->can("run_core_func_decl") ) {
     my $run_core_func = $trans->run_core_func_decl($base);
     print $HEADER "$run_core_func;\n";
 }
@@ -305,11 +303,10 @@ my $text = $ops->preamble($trans);
 $text =~ s/\bops_addr\b/${bs}ops_addr/g;
 print $SOURCE $text;
 
-
-if ($trans->can("ops_addr_decl")) {
+if ( $trans->can("ops_addr_decl") ) {
     print $SOURCE $trans->ops_addr_decl($bs);
 }
-if ($trans->can("run_core_func_decl")) {
+if ( $trans->can("run_core_func_decl") ) {
     print $SOURCE $trans->run_core_func_decl($base);
     print $SOURCE "\n{\n";
     print $SOURCE $trans->run_core_func_start;
@@ -323,58 +320,58 @@ my @op_funcs;
 my @op_func_table;
 my @cg_jump_table;
 my $index = 0;
-my ($prev_src, $prev_index);
+my ( $prev_src, $prev_index );
 
 $prev_src = '';
-foreach my $op ($ops->ops) {
-    my $func_name  = $op->func_name($trans);
-    my $arg_types  = "$opsarraytype *, Interp *";
-    my $prototype  = "$sym_export $opsarraytype * $func_name ($arg_types)";
-    my $args       = "$opsarraytype *cur_opcode, Interp *interp";
+foreach my $op ( $ops->ops ) {
+    my $func_name = $op->func_name($trans);
+    my $arg_types = "$opsarraytype *, Interp *";
+    my $prototype = "$sym_export $opsarraytype * $func_name ($arg_types)";
+    my $args      = "$opsarraytype *cur_opcode, Interp *interp";
     my $definition;
-    my $comment    = '';
-    my $one_op     = "";
+    my $comment = '';
+    my $one_op  = "";
 
-    if ($suffix =~ /cg/) {
+    if ( $suffix =~ /cg/ ) {
         $definition = "PC_$index:";
-        $comment    = "/* ". $op->full_name() ." */";
-    } elsif ($suffix =~ /switch/) {
+        $comment    = "/* " . $op->full_name() . " */";
+    }
+    elsif ( $suffix =~ /switch/ ) {
         $definition = "case $index:";
-        $comment    = "/* ". $op->full_name() ." */";
+        $comment    = "/* " . $op->full_name() . " */";
     }
     else {
         $definition = "$prototype;\n$opsarraytype *\n$func_name ($args)";
     }
 
     my $src = $op->source($trans);
-    $src    =~ s/\bop_lib\b/${bs}op_lib/g;
-    $src    =~ s/\bops_addr\b/${bs}ops_addr/g;
+    $src =~ s/\bop_lib\b/${bs}op_lib/g;
+    $src =~ s/\bops_addr\b/${bs}ops_addr/g;
 
-    if ($suffix =~ /cg/) {
-        if ($prev_src eq $src) {
+    if ( $suffix =~ /cg/ ) {
+        if ( $prev_src eq $src ) {
             push @cg_jump_table, "        &&PC_$prev_index,\n";
         }
         else {
             push @cg_jump_table, "        &&PC_$index,\n";
         }
     }
-    elsif ($suffix eq '') {
-        push @op_func_table, sprintf("  %-50s /* %6ld */\n",
-            "$func_name,", $index);
+    elsif ( $suffix eq '' ) {
+        push @op_func_table, sprintf( "  %-50s /* %6ld */\n", "$func_name,", $index );
     }
-    if ($prev_src eq $src) {
+    if ( $prev_src eq $src ) {
         push @op_funcs, "$comment\n";
     }
     else {
         $one_op .= "$definition $comment {\n$src}\n\n";
         push @op_funcs, $one_op;
-        $prev_src = $src if ($suffix eq '_cgp' || $suffix eq '_switch');
+        $prev_src = $src if ( $suffix eq '_cgp' || $suffix eq '_switch' );
         $prev_index = $index;
     }
     $index++;
 }
 
-if ($suffix =~ /cg/) {
+if ( $suffix =~ /cg/ ) {
     print $SOURCE @cg_jump_table;
     print $SOURCE <<END_C;
         NULL
@@ -383,7 +380,7 @@ END_C
     print $SOURCE $trans->run_core_after_addr_table($bs);
 }
 
-if ($suffix =~ /cgp/) {
+if ( $suffix =~ /cgp/ ) {
     print $SOURCE <<END_C;
 #ifdef __GNUC__
 # ifdef I386
@@ -395,14 +392,13 @@ if ($suffix =~ /cgp/) {
     goto **cur_opcode;
 
 END_C
-} elsif ($suffix =~ /cg/) {
+}
+elsif ( $suffix =~ /cg/ ) {
     print $SOURCE <<END_C;
 goto *${bs}ops_addr[*cur_opcode];
 
 END_C
 }
-
-
 
 print $SOURCE <<END_C;
 /*
@@ -415,44 +411,44 @@ END_C
 # Finish the SOURCE file's array initializer:
 #
 my $CORE_SPLIT = 300;
-for (my $i = 0; $i < @op_funcs; $i++) {
-    if ($i && $i % $CORE_SPLIT == 0 && $trans->can("run_core_split")) {
+for ( my $i = 0 ; $i < @op_funcs ; $i++ ) {
+    if ( $i && $i % $CORE_SPLIT == 0 && $trans->can("run_core_split") ) {
         print $SOURCE $trans->run_core_split($base);
     }
     print $SOURCE $op_funcs[$i];
 }
 
-if ($trans->can("run_core_finish")) {
+if ( $trans->can("run_core_finish") ) {
     print $SOURCE $trans->run_core_finish($base);
 }
-
 
 #
 # reset #line in the SOURCE file.
 #
 
 close($SOURCE);
-open($SOURCE, '<', $source) || die "Error re-reading $source: $!\n";
-my $line = 0; while (<$SOURCE>) { $line++; } $line+=2;
+open( $SOURCE, '<', $source ) || die "Error re-reading $source: $!\n";
+my $line = 0;
+while (<$SOURCE>) { $line++; }
+$line += 2;
 close($SOURCE);
-open($SOURCE, '>>', $source) || die "Error appending to $source: $!\n";
+open( $SOURCE, '>>', $source ) || die "Error appending to $source: $!\n";
 unless ($nolines_flag) {
     my $source_escaped = $source;
     $source_escaped =~ s|\.temp||;
-    $source_escaped =~ s|(\\)|$1$1|g; # escape backslashes
+    $source_escaped =~ s|(\\)|$1$1|g;    # escape backslashes
     print $SOURCE qq{#line $line "$source_escaped"\n};
 }
-
 
 #
 # write op_func_func
 #
 
-my ($op_info, $op_func, $getop);
+my ( $op_info, $op_func, $getop );
 $op_info = $op_func = 'NULL';
 $getop = '( int (*)(const char *, int) )NULL';
 
-if ($suffix eq '') {
+if ( $suffix eq '' ) {
     $op_func = "${bs}op_func_table";
     print $SOURCE <<END_C;
 
@@ -475,12 +471,13 @@ END_C
 END_C
 }
 
-my (%names, $tot);
-if ($suffix eq '') {
+my ( %names, $tot );
+if ( $suffix eq '' ) {
     $op_info = "${bs}op_info_table";
-#
-# Op Info Table:
-#
+
+    #
+    # Op Info Table:
+    #
     print $SOURCE <<END_C;
 
 /*
@@ -492,30 +489,36 @@ END_C
 
     $index = 0;
 
-    foreach my $op ($ops->ops) {
-        my $type       = sprintf("PARROT_%s_OP", uc $op->type);
-        my $name       = $op->name;
+    foreach my $op ( $ops->ops ) {
+        my $type = sprintf( "PARROT_%s_OP", uc $op->type );
+        my $name = $op->name;
         $names{$name} = 1;
-        my $full_name  = $op->full_name;
-        my $func_name  = $op->func_name($trans);
-        my $body       = $op->body;
-        my $jump       = $op->jump || 0;
-        my $arg_count  = $op->size;
+        my $full_name = $op->full_name;
+        my $func_name = $op->func_name($trans);
+        my $body      = $op->body;
+        my $jump      = $op->jump || 0;
+        my $arg_count = $op->size;
 
-    ## 0 inserted if arrays are empty to prevent msvc compiler errors
-        my $arg_types  = "{ " . join(", ", scalar $op->arg_types
-            ? map { sprintf("PARROT_ARG_%s", uc $_) } $op->arg_types
-            : 0
-        ) . " }";
-        my $arg_dirs   = "{ " . join(", ", scalar $op->arg_dirs
+        ## 0 inserted if arrays are empty to prevent msvc compiler errors
+        my $arg_types = "{ "
+            . join( ", ",
+            scalar $op->arg_types
+            ? map { sprintf( "PARROT_ARG_%s", uc $_ ) } $op->arg_types
+            : 0 )
+            . " }";
+        my $arg_dirs = "{ "
+            . join(
+            ", ", scalar $op->arg_dirs
             ? map { $arg_dir_mapping{$_} } $op->arg_dirs
             : 0
-        ) . " }";
-        my $labels     = "{ " . join(", ",  scalar $op->labels
+            ) . " }";
+        my $labels = "{ "
+            . join(
+            ", ", scalar $op->labels
             ? $op->labels
             : 0
-        ) . " }";
-        my $flags      = 0;
+            ) . " }";
+        my $flags = 0;
 
         print $SOURCE <<END_C;
   { /* $index */
@@ -541,14 +544,13 @@ END_C
 END_C
 }
 
-if ($suffix eq '' && !$dynamic_flag) {
+if ( $suffix eq '' && !$dynamic_flag ) {
     $getop = 'get_op';
     my $hash_size = 3041;
     $tot = $index + scalar keys(%names);
-    if ($hash_size < $tot * 1.2) {
-        print STDERR
-            "please increase hash_size ($hash_size) in tools/build/ops2c.pl " .
-            "to a prime number > ", $tot *1.2, "\n";
+    if ( $hash_size < $tot * 1.2 ) {
+        print STDERR "please increase hash_size ($hash_size) in tools/build/ops2c.pl "
+            . "to a prime number > ", $tot * 1.2, "\n";
     }
     print $SOURCE <<END_C;
 
@@ -686,12 +688,12 @@ END_C
 
 # generate initfunc
 my $init1_code = "";
-if ($trans->can("init_func_init1")) {
+if ( $trans->can("init_func_init1") ) {
     $init1_code = $trans->init_func_init1($base);
 }
 
 my $init_set_dispatch = "";
-if ($trans->can("init_set_dispatch")) {
+if ( $trans->can("init_set_dispatch") ) {
     $init_set_dispatch = $trans->init_set_dispatch($bs);
 }
 

@@ -21,24 +21,17 @@ use warnings;
 use lib 'lib';
 use Parrot::Docs::Directory;
 
-my $dir = Parrot::Docs::Directory->new(shift || '.');
+my $dir = Parrot::Docs::Directory->new( shift || '.' );
 my $ignore = shift || '^(icu)$';
 
-foreach my $file ($dir->files(1, $ignore))
-{
+foreach my $file ( $dir->files( 1, $ignore ) ) {
     next unless $file->contains_pod;
     next unless $file->num_pod_errors;
 
     my $errors = $file->pod_errors;
 
-    print "\n",
-        $file->path,
-        ' has ',
-        $file->num_pod_errors,
-        ' error',
-        $file->num_pod_errors != 1 ? 's' : '',
-        ":\n",
-        $errors;
+    print "\n", $file->path, ' has ', $file->num_pod_errors, ' error',
+        $file->num_pod_errors != 1 ? 's' : '', ":\n", $errors;
 }
 
 exit 0;

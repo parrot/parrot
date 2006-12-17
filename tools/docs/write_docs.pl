@@ -22,13 +22,13 @@ use lib 'lib';
 use Getopt::Long;
 use Parrot::Docs::Section::Parrot;
 
-my ($silent, $delete);
+my ( $silent, $delete );
 
-die unless GetOptions('silent' => \$silent, 'delete' => \$delete);
+die unless GetOptions( 'silent' => \$silent, 'delete' => \$delete );
 
 my $docs = Parrot::Docs::Section::Parrot->new;
 
-$docs->write_docs($silent, $delete);
+$docs->write_docs( $silent, $delete );
 
 exit 0;
 

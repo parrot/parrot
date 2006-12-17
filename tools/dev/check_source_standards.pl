@@ -56,7 +56,7 @@ exit 0;
 ###############################################################################
 
 sub check_manifest {
-    open(F, "<", "MANIFEST") || die "Unable to read MANIFEST: $!\n";
+    open( F, "<", "MANIFEST" ) || die "Unable to read MANIFEST: $!\n";
 
     my %files_in_dir_nocase;
     my %files_in_dir_8dot3;
@@ -67,63 +67,56 @@ sub check_manifest {
         chomp;
 
         unless (/[A-Za-z0-9\.\-_\/]+\s+\[\w*\]\w*/) {
-            error("MANIFEST", $line, "malformed entry for filename ($_)");
+            error( "MANIFEST", $line, "malformed entry for filename ($_)" );
         }
 
-        my ($filename, $dirname) = fileparse($_);
+        my ( $filename, $dirname ) = fileparse($_);
 
-        my ($filebase, $extension) = ($filename =~ /^(.*)\.(.*)/);
-        $filebase ||= $filename;
+        my ( $filebase, $extension ) = ( $filename =~ /^(.*)\.(.*)/ );
+        $filebase  ||= $filename;
         $extension ||= '';
-        if ($filebase =~ /\./) {
-            error("MANIFEST", $line, "$_: more than one '.' in a filename");
+        if ( $filebase =~ /\./ ) {
+            error( "MANIFEST", $line, "$_: more than one '.' in a filename" );
         }
-        $filebase  = substr($filebase, 0, 8);
-        $extension = substr($extension, 0, 3);
+        $filebase  = substr( $filebase,  0, 8 );
+        $extension = substr( $extension, 0, 3 );
         my $filename_8dot3 = lc("$filebase.$extension");
 
-        if (exists $files_in_dir_8dot3{$dirname}{$filename_8dot3}) {
-            error("MANIFEST", $line, 
-                  "$_: 8.3 name collision with "
-                  . "$files_in_dir_8dot3{$dirname}{$filename_8dot3} "
-                  . "($filename_8dot3)");
+        if ( exists $files_in_dir_8dot3{$dirname}{$filename_8dot3} ) {
+            error( "MANIFEST", $line,
+                      "$_: 8.3 name collision with "
+                    . "$files_in_dir_8dot3{$dirname}{$filename_8dot3} "
+                    . "($filename_8dot3)" );
         }
-        $files_in_dir_8dot3{$dirname}{$filename_8dot3}=$_;
+        $files_in_dir_8dot3{$dirname}{$filename_8dot3} = $_;
 
-        if (exists $files_in_dir_nocase{$dirname}{lc($filename)}) {
-            error("MANIFEST", $line,
-                  "$_: case-insensitive collision with " 
-                  . $files_in_dir_nocase{$dirname}{lc($filename)});
+        if ( exists $files_in_dir_nocase{$dirname}{ lc($filename) } ) {
+            error( "MANIFEST", $line,
+                "$_: case-insensitive collision with "
+                    . $files_in_dir_nocase{$dirname}{ lc($filename) } );
         }
-        $files_in_dir_nocase{$dirname}{lc($filename)}=$_;
+        $files_in_dir_nocase{$dirname}{ lc($filename) } = $_;
     }
 
     close(F);
 }
 
-
-
 sub info {
-    my ($file, $line, $message) = @_;
+    my ( $file, $line, $message ) = @_;
 
-    print "$file:$line (INFO) "
-      . Text::Wrap::wrap("", "        ", $message) . "\n";
+    print "$file:$line (INFO) " . Text::Wrap::wrap( "", "        ", $message ) . "\n";
 }
-
 
 sub warning {
-    my ($file, $line, $message) = @_;
+    my ( $file, $line, $message ) = @_;
 
-    print "$file:$line (WARNING) "
-      . Text::Wrap::wrap("", "        ", $message) . "\n";
+    print "$file:$line (WARNING) " . Text::Wrap::wrap( "", "        ", $message ) . "\n";
 }
 
-
 sub error {
-    my ($file, $line, $message) = @_;
+    my ( $file, $line, $message ) = @_;
 
-    print "$file:$line (ERROR) " .
-      Text::Wrap::wrap("", "        ", $message) . "\n";
+    print "$file:$line (ERROR) " . Text::Wrap::wrap( "", "        ", $message ) . "\n";
 }
 
 # Local Variables:

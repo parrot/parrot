@@ -25,7 +25,7 @@ my $cwd  = getcwd();
 
 $self = readlink($self) while -l $self;
 
-$self = File::Spec->catfile($cwd, $self)
+$self = File::Spec->catfile( $cwd, $self )
     unless File::Spec->file_name_is_absolute($self);
 
 my $toolsrcdir  = dirname($self);
@@ -33,66 +33,68 @@ my $toolsrcbase = basename($self);
 
 use vars qw($v);
 
-if ($toolsrcdir ne '' && -d $toolsrcdir && lc $toolsrcbase eq 'symlink.pl') {
-    my $trydir  = File::Spec->catdir("include", "parrot");
-    my $tryfile = File::Spec->catfile("src", "parrot.c");
+if ( $toolsrcdir ne '' && -d $toolsrcdir && lc $toolsrcbase eq 'symlink.pl' ) {
+    my $trydir  = File::Spec->catdir( "include", "parrot" );
+    my $tryfile = File::Spec->catfile( "src",    "parrot.c" );
     die "$0: Do not run this under the original Parrot tree.\n"
-        if (-d $trydir) && (-f $tryfile && ! -l $tryfile);
-} else {
+        if ( -d $trydir ) && ( -f $tryfile && !-l $tryfile );
+}
+else {
     die "$0: I am very confused.\n";
 }
 
 my @toolsrcdir = File::Spec->splitdir($toolsrcdir);
 die "$self: not in tools/dev\n"
-  unless @toolsrcdir >= 2 &&
-         lc($toolsrcdir[-1]) eq 'dev' &&
-         lc($toolsrcdir[-2]) eq 'tools';
-my @topsrcdir = @toolsrcdir[0..$#toolsrcdir - 2];
+    unless @toolsrcdir >= 2
+    && lc( $toolsrcdir[-1] ) eq 'dev'
+    && lc( $toolsrcdir[-2] ) eq 'tools';
+my @topsrcdir = @toolsrcdir[ 0 .. $#toolsrcdir - 2 ];
 my $topsrcdir = File::Spec->catdir(@topsrcdir);
-my $manifest = File::Spec->catfile($topsrcdir, "MANIFEST");
-my @srcfiles = ();
-if (open(MANIFEST, '<', $manifest)) {
+my $manifest  = File::Spec->catfile( $topsrcdir, "MANIFEST" );
+my @srcfiles  = ();
+if ( open( MANIFEST, '<', $manifest ) ) {
     my %dstdir;
     while (<MANIFEST>) {
         next if /^\#/;
         if (/^(.+?)\s+\[/) {
             my $manifile = $1;
-            my @manifile = split('/', $manifile);
-            my $dstfile = File::Spec->catfile(@manifile);
-            my $srcfile = File::Spec->catfile($topsrcdir, @manifile);
-            unless (-f $srcfile) {
+            my @manifile = split( '/', $manifile );
+            my $dstfile  = File::Spec->catfile(@manifile);
+            my $srcfile  = File::Spec->catfile( $topsrcdir, @manifile );
+            unless ( -f $srcfile ) {
                 warn "$self: cannot find $dstfile\n";
                 next;
             }
             push @srcfiles, $srcfile;
-            if (@manifile > 1) {
-                for my $i (0..$#manifile-1) {
-                    my $dstdir  = File::Spec->catdir(@manifile[0..$i]);
-                    if (!-d $dstdir && !$dstdir{$dstdir}++) {
-                        unless (mkdir($dstdir, 0755)) {
+            if ( @manifile > 1 ) {
+                for my $i ( 0 .. $#manifile - 1 ) {
+                    my $dstdir = File::Spec->catdir( @manifile[ 0 .. $i ] );
+                    if ( !-d $dstdir && !$dstdir{$dstdir}++ ) {
+                        unless ( mkdir( $dstdir, 0755 ) ) {
                             warn "$self: mkdir $dstdir failed: $!\n";
                         }
                     }
                 }
             }
             my $readlink;
-            if (-e $dstfile) {
-                if (-l $dstfile) {
-                    unless(defined($readlink = readlink($dstfile))) {
+            if ( -e $dstfile ) {
+                if ( -l $dstfile ) {
+                    unless ( defined( $readlink = readlink($dstfile) ) ) {
                         warn "$self: readlink $dstfile failed: $!\n";
                     }
-                } else {
+                }
+                else {
                     warn "$self: $dstfile exists but is not a symlink\n";
                 }
             }
-            if (!defined $readlink || $readlink ne $srcfile) {
+            if ( !defined $readlink || $readlink ne $srcfile ) {
                 print "$dstfile\n" if $v;
-                if (defined $readlink) {
-                    unless (unlink($dstfile)) {
+                if ( defined $readlink ) {
+                    unless ( unlink($dstfile) ) {
                         warn "$self: unlink $dstfile failed: $!\n";
                     }
                 }
-                unless (symlink($srcfile, $dstfile)) {
+                unless ( symlink( $srcfile, $dstfile ) ) {
                     warn "$self: symlink $srcfile $dstfile failed: $!\n";
                 }
             }
@@ -100,12 +102,12 @@ if (open(MANIFEST, '<', $manifest)) {
     }
     warn "$self: could not find any files to symlink\n" unless @srcfiles;
     close(MANIFEST);
-} else {
+}
+else {
     die "$self: Failed to open $manifest: $!\n";
 }
 
 exit(0);
-
 
 # Local Variables:
 # mode: cperl

@@ -21,7 +21,7 @@ foreach my $file (@ARGV) {
     my $formatter = new Parrot::PIR::Formatter();
 
     foreach my $line (<$ifh>) {
-      $formatter->add_pir( $line );
+        $formatter->add_pir($line);
     }
 
     my $output = $formatter->get_formatted();

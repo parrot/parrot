@@ -6,9 +6,9 @@ use warnings;
 use lib 'lib';
 use Parrot::Vtable;
 
-my $vtable = parse_vtable( 'vtable.tbl' );
+my $vtable = parse_vtable('vtable.tbl');
 
-my ($funcs, $protos) = vtbl_embed( $vtable );
+my ( $funcs, $protos ) = vtbl_embed($vtable);
 
 my $header = <<'EOH';
 /* ex: set ro:

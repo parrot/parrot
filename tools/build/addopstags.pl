@@ -16,7 +16,6 @@ Add src/ops/*.ops to tags file.
 
 =cut
 
-
 my %seen;
 my @tags;
 
@@ -24,11 +23,13 @@ my @tags;
 while (<>) {
     if (/\bop \s+ (\w+) \s* \(/x) {
         next if $seen{$1}++;
+
         # tag file excmd xflags
         push @tags, join( "\t", $1, $ARGV, qq{$.;"}, "f" ) . "\n";
     }
-} continue {
-    close ARGV if eof;           # reset $.
+}
+continue {
+    close ARGV if eof;    # reset $.
 }
 
 # Pull existing tags

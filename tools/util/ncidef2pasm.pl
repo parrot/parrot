@@ -143,49 +143,49 @@ Taken from an I register
 use strict;
 use warnings;
 
-my ($from_file, $to_file) = @ARGV;
+my ( $from_file, $to_file ) = @ARGV;
+
 # If there is no destination file, strip off the extension of the
 # source file and add a .pasm to it
-if (!defined $to_file) {
-  $to_file = $from_file;
-  $to_file =~ s/\..*$//;
-  $to_file .= ".pasm";
+if ( !defined $to_file ) {
+    $to_file = $from_file;
+    $to_file =~ s/\..*$//;
+    $to_file .= ".pasm";
 }
 
-open my $INPUT, '<', "$from_file" or die "Can't open up $from_file, error $!";
-open my $OUTPUT, '>', "$to_file" or die "Can't open up $to_file, error $!";
+open my $INPUT,  '<', "$from_file" or die "Can't open up $from_file, error $!";
+open my $OUTPUT, '>', "$to_file"   or die "Can't open up $to_file, error $!";
 
 # To start, save all the registers, just in case
 print $OUTPUT "saveall\n";
 
-
 my @libs;
-my ($cur_package, $line, $cur_section);
+my ( $cur_package, $line, $cur_section );
 
 # Our dispatch table
 my (%dispatch) = (
     package => \&package_line,
-    lib => \&lib_line,
-    defs => \&def_line,
+    lib     => \&lib_line,
+    defs    => \&def_line,
 );
 
-while ($line = <$INPUT>) {
+while ( $line = <$INPUT> ) {
 
-  # Throw away trailing newlines, comments, and whitespace. If the
-  # line's empty, then off to the next line
-  chomp $line;
-  $line =~ s/#.*//;
-  $line =~ s/\s*$//;
-  next unless $line;
+    # Throw away trailing newlines, comments, and whitespace. If the
+    # line's empty, then off to the next line
+    chomp $line;
+    $line =~ s/#.*//;
+    $line =~ s/\s*$//;
+    next unless $line;
 
-  # Is it a section line? If so, extract the section and set it.
-  if ($line =~ /\[(\w+)\]/) {
-    $cur_section = $1;
-    next;
-  }
+    # Is it a section line? If so, extract the section and set it.
+    if ( $line =~ /\[(\w+)\]/ ) {
+        $cur_section = $1;
+        next;
+    }
 
-  # Everything else goes to the handler
-  $dispatch{$cur_section}->($line);
+    # Everything else goes to the handler
+    $dispatch{$cur_section}->($line);
 
 }
 
@@ -195,29 +195,29 @@ print $OUTPUT "end\n";
 close $OUTPUT;
 
 sub package_line {
-  my $line = shift;
+    my $line = shift;
 
-  # Trim leading and trailing spaces
-  $line =~ s/^\s*//;
-  $line =~ s/\s*$//;
+    # Trim leading and trailing spaces
+    $line =~ s/^\s*//;
+    $line =~ s/\s*$//;
 
-  # Set the global current package
-  $cur_package = $line;
+    # Set the global current package
+    $cur_package = $line;
 
 }
 
 sub lib_line {
-  my $line = shift;
-  print $OUTPUT "loadlib P1, '$line'\n";
+    my $line = shift;
+    print $OUTPUT "loadlib P1, '$line'\n";
 }
 
 sub def_line {
-  my $line = shift;
-  my ($return_type, $name, @params) = split ' ', $line;
-  unshift @params, $return_type;
-  my $signature = join("", @params);
-  print $OUTPUT "dlfunc P2, P1, '$name', '$signature'\n";
-  print $OUTPUT "store_global '${cur_package}::${name}', P2\n";
+    my $line = shift;
+    my ( $return_type, $name, @params ) = split ' ', $line;
+    unshift @params, $return_type;
+    my $signature = join( "", @params );
+    print $OUTPUT "dlfunc P2, P1, '$name', '$signature'\n";
+    print $OUTPUT "store_global '${cur_package}::${name}', P2\n";
 }
 
 # Local Variables:

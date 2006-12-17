@@ -8,18 +8,14 @@ use Pod::Usage;
 use lib 'lib';
 use SmartLink;
 
-
 ## process command-line optional arguments
-GetOptions( \my(%o),
-    qw/ check syndir=s outdir=s css=s help fast testres /
-) or pod2usage(2);
+GetOptions( \my (%o), qw/ check syndir=s outdir=s css=s help fast testres / ) or pod2usage(2);
 
 $o{help} and pod2usage(1);
-$o{man}  and pod2usage(-exitstatus => 0, -verbose => 2);
+$o{man} and pod2usage( -exitstatus => 0, -verbose => 2 );
 
 $o{css}    ||= 'http://dev.perl.org/css/perl.css';
 $o{outdir} ||= '.';
-
 
 ## process command-line required arguments
 pod2usage(1) unless @ARGV;
@@ -27,11 +23,11 @@ pod2usage(1) unless @ARGV;
 mkdir $o{outdir}
     unless -d $o{outdir};
 
-
 ## retrieve/compile smartlink-related data
-my $sls= SmartLinkServer->new;
+my $sls = SmartLinkServer->new;
 
-use Data::Dumper; $Data::Dumper::Indent= 1;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
 
 ## scan test files; collect smartlinks and positional info.
 ## relate and store smartlink info with test filenames and line numbers
@@ -44,7 +40,6 @@ use Data::Dumper; $Data::Dumper::Indent= 1;
 ## TODO: integrate smartlink info, emit html
 print Dumper $sls;
 print Dumper $sls->mergetree;
-
 
 __END__
 

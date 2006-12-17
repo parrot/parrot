@@ -32,7 +32,7 @@ my @lines = <$IN>;
 close $IN;
 
 my $len = 10;
-my $fingerprint = md5_hex join "\n", grep { ! /^#/ } @lines;
+my $fingerprint = md5_hex join "\n", grep { !/^#/ } @lines;
 
 print << "EOF";
 /* ex: set ro:
@@ -50,16 +50,16 @@ print << "EOF";
 
 EOF
 
-if (-e 'DEVELOPING') {
+if ( -e 'DEVELOPING' ) {
 
-print "/* $fingerprint */\n";
-print "static const unsigned char fingerprint[] = {\n";
-for my $i (0..$len-1) {
-  print '    0x', substr ($fingerprint, $i*2, 2), ",\n";
-}
-print "};\n";
+    print "/* $fingerprint */\n";
+    print "static const unsigned char fingerprint[] = {\n";
+    for my $i ( 0 .. $len - 1 ) {
+        print '    0x', substr( $fingerprint, $i * 2, 2 ), ",\n";
+    }
+    print "};\n";
 
-print << "EOF";
+    print << "EOF";
 
 int
 PackFile_check_fingerprint (void *cursor)
@@ -75,9 +75,10 @@ PackFile_write_fingerprint (void *cursor)
 }
 EOF
 
-} else { # !DEVELOPING
+}
+else {    # !DEVELOPING
 
-  print << "EOF";
+    print << "EOF";
 /* fingerprint checking is only enabled in development versions */
 
 int
@@ -94,7 +95,7 @@ PackFile_write_fingerprint (void *cursor)
 }
 EOF
 
-} # endif DEVELOPING
+}    # endif DEVELOPING
 
 # append the C code coda
 print << "EOF";

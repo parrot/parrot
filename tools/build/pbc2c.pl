@@ -37,8 +37,7 @@ $Data::Dumper::Useqq  = 1;
 $Data::Dumper::Terse  = 1;
 $Data::Dumper::Indent = 0;
 
-my $ops = new Parrot::OpsFile (split(' ', $PConfig{ops}));
-
+my $ops = new Parrot::OpsFile( split( ' ', $PConfig{ops} ) );
 
 #
 # dump_const_table()
@@ -49,9 +48,9 @@ sub dump_const_table {
 
     my $count = $pf->const_table->const_count;
 
-    if ($count < 1) {
+    if ( $count < 1 ) {
         warn "Disassembling without opcode table fingerprint!";
-            return;
+        return;
     }
 
 =for COMMENT
@@ -65,17 +64,15 @@ sub dump_const_table {
 
     my $constant_num = 0;
 
-    foreach ($pf->const_table->constants) {
-        printf("%04x: %08x %08x %08x %08x %s\n",
-            $constant_num, $_->flags, $_->encoding, $_->type,
-            $_->size, $_->data);
+    foreach ( $pf->const_table->constants ) {
+        printf( "%04x: %08x %08x %08x %08x %s\n",
+            $constant_num, $_->flags, $_->encoding, $_->type, $_->size, $_->data );
 
         $constant_num++;
     }
 
     return;
 }
-
 
 #
 # compile_byte_code()
@@ -84,11 +81,11 @@ sub dump_const_table {
 my @args = ();
 
 sub compile_byte_code {
-    my ($pf, $file_name) = @_;
+    my ( $pf, $file_name ) = @_;
     my ($byte_code);
     my $pc;
     my $new_pc = 0;
-    my $offset=0;
+    my $offset = 0;
     my $op_code;
     my $op;
     my %leaders;
@@ -104,7 +101,7 @@ END_C
     print $trans->defines;
     print $ops->preamble($trans);
 
-    my $length = length($pf->byte_code);
+    my $length = length( $pf->byte_code );
 
     # First instruction in bytecode must be the leader of a block
     $leaders{$new_pc} = 1;
@@ -112,28 +109,28 @@ END_C
     # This loop tries to identify instructions that may be the target
     # of control flow changing opcodes including the possible targets of ret
     # opcodes
-    while ($offset + sizeof('op') <= $length) {
-        my ($src, $is_branch);
+    while ( $offset + sizeof('op') <= $length ) {
+        my ( $src, $is_branch );
 
-        $pc       = $new_pc;
-        $op_code  = unpack "x$offset l", $pf->byte_code;
-        $op       = $ops->op($op_code) ||
-          die "Can't find an op for opcode $op_code\n";
-        $offset  += sizeof('op');
+        $pc      = $new_pc;
+        $op_code = unpack "x$offset l", $pf->byte_code;
+        $op      = $ops->op($op_code)
+            || die "Can't find an op for opcode $op_code\n";
+        $offset += sizeof('op');
         push @pc_list, $pc;
         $opcodes{$pc}->{op} = $op;
-        $new_pc   = $pc + $op->size;
+        $new_pc = $pc + $op->size;
 
         @args = ();
 
-        foreach (1 .. scalar($op->arg_types) - 1) {
+        foreach ( 1 .. scalar( $op->arg_types ) - 1 ) {
             die "$0: Premature end of bytecode in argument.\n"
-                if ($offset + sizeof('op')) > $length;
+                if ( $offset + sizeof('op') ) > $length;
             my $arg = unpack "x$offset l", $pf->byte_code;
             $offset += sizeof('op');
             push @args, $arg;
         }
-        push @{$opcodes{$pc}->{args}}, @args;
+        push @{ $opcodes{$pc}->{args} }, @args;
 
         $src = $op->full_body();
 
@@ -141,26 +138,27 @@ END_C
         # forms of goto recognized by Parrot/OpsFile.pm and Parrot/Op.pm
 
         # absolute address goto
-        while($src =~ /{{=(.*?)}}/g){
+        while ( $src =~ /{{=(.*?)}}/g ) {
             my $offset = $1;
             $is_branch = 1;
         }
+
         # relative branch
-        while($src =~ /{{(\-|\+)=(.*?)}}/g){
-            my $dir = $1;
+        while ( $src =~ /{{(\-|\+)=(.*?)}}/g ) {
+            my $dir         = $1;
             my $forward_off = $2;
 
             # Substitute constant branch values
-            if($forward_off =~ /\@(\d+)/){
-                $forward_off = $args[$1 - 1]
+            if ( $forward_off =~ /\@(\d+)/ ) {
+                $forward_off = $args[ $1 - 1 ]
                     if $op->arg_type($1) eq 'ic';
             }
 
-            if($forward_off =~ /^-?\d+$/){
+            if ( $forward_off =~ /^-?\d+$/ ) {
                 $forward_off = -$forward_off if $dir eq '-';
 
-                if($forward_off != $op->size){
-                    $leaders{$forward_off + $pc} = 1;
+                if ( $forward_off != $op->size ) {
+                    $leaders{ $forward_off + $pc } = 1;
                     $is_branch = 1;
                 }
             }
@@ -176,8 +174,8 @@ END_C
 
 FINDENTERN:
     foreach my $cur_op (@$Parrot::OpLib::core::ops) {
-        if($cur_op->full_name eq 'enternative'){
-            $enternative = pack_op($cur_op->code);
+        if ( $cur_op->full_name eq 'enternative' ) {
+            $enternative = pack_op( $cur_op->code );
             last FINDENTERN;
         }
     }
@@ -187,24 +185,26 @@ FINDENTERN:
     $byte_code = $pf->byte_code;
 
     # First block
-    push @blocks, [shift @pc_list ];
+    push @blocks, [ shift @pc_list ];
 
     # change instructions at block leaders to enternative calls
-    substr($byte_code, 0, sizeof('op')) = $enternative;
+    substr( $byte_code, 0, sizeof('op') ) = $enternative;
 
     while (@pc_list) {
         my $instr_pc = shift @pc_list;
+
         # block leader found, start new block
-        if(exists $leaders{$instr_pc}) {
+        if ( exists $leaders{$instr_pc} ) {
+
             #substr($byte_code, $instr_pc, sizeof('op')) = $enternative;
-            push @blocks, [$instr_pc ];
+            push @blocks, [$instr_pc];
         }
         else {
-            push @{$blocks[-1]}, $instr_pc;
+            push @{ $blocks[-1] }, $instr_pc;
         }
     }
 
-    print<<END_C;
+    print <<END_C;
 static opcode_t* run_compiled(Interp *interpreter,
                               opcode_t *cur_opcode, opcode_t *start_code);
 
@@ -219,8 +219,8 @@ END_C
     $byte_code = $pf->pack();
 
     $offset = 0;
-    while($offset < length($byte_code)){
-        print join(',', unpack("c*", substr($byte_code, $offset, 20)));
+    while ( $offset < length($byte_code) ) {
+        print join( ',', unpack( "c*", substr( $byte_code, $offset, 20 ) ) );
         print ",\n";
         $offset += 20;
     }
@@ -285,14 +285,13 @@ switch_label:
 
 END_C
 
-
     foreach my $cur_blk (@blocks) {
         printf "case %d: PC_%d: {\n", $cur_blk->[0], $cur_blk->[0];
 
-        foreach $pc (@{$cur_blk}) {
+        foreach $pc ( @{$cur_blk} ) {
             $op = $opcodes{$pc}->{op};
             $trans->pc($pc);
-            $trans->args(@{$opcodes{$pc}->{args}});
+            $trans->args( @{ $opcodes{$pc}->{args} } );
             my $source = $op->source($trans);
 
             $new_pc = $pc + $op->size;
@@ -301,7 +300,7 @@ END_C
             $source =~ s/#line.*\n//mg;
             $source =~ s/CUR_OPCODE/(start_code + $pc)/mg;
 
-            printf("\n    /* %s */\n    {\n%s}\n", $op->full_name, $source);
+            printf( "\n    /* %s */\n    {\n%s}\n", $op->full_name, $source );
         }
 
         print "}\n\n";
@@ -319,7 +318,6 @@ END_C
     return 0;
 }
 
-
 #
 # compile_file()
 #
@@ -329,10 +327,10 @@ sub compile_file {
 
     my $pf = Parrot::PackFile->new;
     $pf->unpack_file($file_name)
-      or die "Unable to unpack file $file_name: $!";
+        or die "Unable to unpack file $file_name: $!";
 
-#    dump_const_table($pf);
-    compile_byte_code($pf, $file_name);
+    #    dump_const_table($pf);
+    compile_byte_code( $pf, $file_name );
 
     undef $pf;
 
@@ -346,7 +344,7 @@ sub compile_file {
 @ARGV = qw(-) unless @ARGV;
 
 foreach (@ARGV) {
-    compile_file($_)
+    compile_file($_);
 }
 
 exit 0;

@@ -29,18 +29,22 @@ use File::Basename;
 use File::Find;
 use POSIX qw(strftime);
 
-
-my $SRCDIR  = "./"; # with trailing /
+my $SRCDIR  = "./";                # with trailing /
 my $HTMLDIR = "parrot_coverage";
 my $DEBUG   = 1;
 
-if ($ARGV[0] && $ARGV[0] =~ /recompile/) {
+if ( $ARGV[0] && $ARGV[0] =~ /recompile/ ) {
 
     # clean up remnants of prior biulds
-    File::Find::find({wanted => sub {
-                          /\.(bb|bba|bbf|da|gcov)$/ &&
-                            unlink($File::Find::name)
-                        }}, $SRCDIR);
+    File::Find::find(
+        {
+            wanted => sub {
+                /\.(bb|bba|bbf|da|gcov)$/
+                    && unlink($File::Find::name);
+                }
+        },
+        $SRCDIR
+    );
 
     # build parrot with coverage support
     system("perl Configure.pl --ccflags=\"-fprofile-arcs -ftest-coverage\"");
@@ -53,18 +57,23 @@ if ($ARGV[0] && $ARGV[0] =~ /recompile/) {
 # And generate the reports.
 
 my @dafiles;
-File::Find::find({wanted => sub {
-                  /\.da$/ && push @dafiles, $File::Find::name }}, $SRCDIR);
+File::Find::find(
+    {
+        wanted => sub {
+            /\.da$/ && push @dafiles, $File::Find::name;
+            }
+    },
+    $SRCDIR
+);
 
-my (%file_line_coverage, %file_branch_coverage, %file_call_coverage);
-my (%function_line_coverage, %function_branch_coverage,
-    %function_call_coverage);
+my ( %file_line_coverage,     %file_branch_coverage,     %file_call_coverage );
+my ( %function_line_coverage, %function_branch_coverage, %function_call_coverage );
 my (%real_filename);
 my %totals = (
     lines            => 0,
     covered_lines    => 0,
     branches         => 0,
-    covered_branches => 0,              
+    covered_branches => 0,
     calls            => 0,
     covered_calls    => 0
 );
@@ -77,7 +86,7 @@ foreach my $da_file (@dafiles) {
     my $filename     = basename($da_file);
     my $src_filename = $da_file;
     $src_filename =~ s/\.da$/.c/;
-    
+
     # gcov must be run from the directory that the compiler was
     # invoked from.  Currently, this is the parrot root directory.
     # However, it also leaves it output file in this directory, which
@@ -88,77 +97,83 @@ foreach my $da_file (@dafiles) {
     # block (.bb) files.
     my $cmd = "gcov -f -b -o $dirname $src_filename";
     print "Running $cmd\n" if $DEBUG;
-    open (GCOVSUMMARY, '<', "$cmd |") or die "Error invoking '$cmd': $!";
+    open( GCOVSUMMARY, '<', "$cmd |" ) or die "Error invoking '$cmd': $!";
     my $tmp;
     my %generated_files;
     while (<GCOVSUMMARY>) {
         if (/^Creating (.*)\./) {
             my $path = "$dirname/$1";
-            rename($1, "$dirname/$1")
-              or die("Couldn't rename $1 to $dirname/$1.");
+            rename( $1, "$dirname/$1" )
+                or die("Couldn't rename $1 to $dirname/$1.");
             $path =~ s/\Q$SRCDIR\E//g;
             $generated_files{$path} = $tmp;
             $tmp = '';
-        } else {
+        }
+        else {
             $tmp .= $_;
         }
     }
     close(GCOVSUMMARY);
 
-    foreach my $gcov_file (keys %generated_files) {
+    foreach my $gcov_file ( keys %generated_files ) {
         my $source_file = $gcov_file;
         $source_file =~ s/\.gcov$//g;
 
-        # avoid collisions where multiple files are generated from the 
+        # avoid collisions where multiple files are generated from the
         # same back-end file (core.ops, for example)
-        if (exists($file_line_coverage{$source_file})) {
+        if ( exists( $file_line_coverage{$source_file} ) ) {
             $source_file = "$source_file (from $da_file)";
         }
 
         print "Processing $gcov_file ($source_file)\n";
 
-        foreach (split "\n", $generated_files{$gcov_file}) {
-            my ($percent, $total_lines, $real_filename) = /\s*([^%]+)% of (\d+)(?: source)? lines executed in file (.*)/;
+        foreach ( split "\n", $generated_files{$gcov_file} ) {
+            my ( $percent, $total_lines, $real_filename ) =
+                /\s*([^%]+)% of (\d+)(?: source)? lines executed in file (.*)/;
             if ($total_lines) {
-                my $covered_lines = int(($percent/100) * $total_lines);
-                $totals{lines} += $total_lines;
+                my $covered_lines = int( ( $percent / 100 ) * $total_lines );
+                $totals{lines}         += $total_lines;
                 $totals{covered_lines} += $covered_lines;
                 $file_line_coverage{$source_file} = $percent;
-                $real_filename{$source_file} = $real_filename;
+                $real_filename{$source_file}      = $real_filename;
                 next;
             }
 
-            ($percent, $total_lines, my $function) = /\s*([^%]+)% of (\d+)(?: source)? lines executed in function (.*)/;
+            ( $percent, $total_lines, my $function ) =
+                /\s*([^%]+)% of (\d+)(?: source)? lines executed in function (.*)/;
             if ($total_lines) {
                 $function_line_coverage{$source_file}{$function} = $percent;
                 next;
             }
 
-            ($percent, my $total_branches) = /\s*([^%]+)% of (\d+) branches taken at least once in file/;
+            ( $percent, my $total_branches ) =
+                /\s*([^%]+)% of (\d+) branches taken at least once in file/;
             if ($total_branches) {
-                my $covered_branches = int(($percent/100) * $total_branches);
-                $totals{branches} += $total_branches;
+                my $covered_branches = int( ( $percent / 100 ) * $total_branches );
+                $totals{branches}         += $total_branches;
                 $totals{covered_branches} += $covered_branches;
                 $file_branch_coverage{$source_file} = $percent;
                 next;
             }
 
-            ($percent, $total_branches, $function) = /\s*([^%]+)% of (\d+) branches taken at least once in function (.*)/;
+            ( $percent, $total_branches, $function ) =
+                /\s*([^%]+)% of (\d+) branches taken at least once in function (.*)/;
             if ($total_branches) {
                 $function_branch_coverage{$source_file}{$function} = $percent;
                 next;
             }
 
-            ($percent, my $total_calls, $function) = /\s*([^%]+)% of (\d+) calls executed in function (.*)/;
+            ( $percent, my $total_calls, $function ) =
+                /\s*([^%]+)% of (\d+) calls executed in function (.*)/;
             if ($total_calls) {
                 $function_call_coverage{$source_file}{$function} = $percent;
                 next;
             }
 
-            ($percent, $total_calls) = /\s*([^%]+)% of (\d+) calls executed in file/;
+            ( $percent, $total_calls ) = /\s*([^%]+)% of (\d+) calls executed in file/;
             if ($total_calls) {
-                my $covered_calls = int(($percent/100) * $total_calls);
-                $totals{calls} += $total_calls;
+                my $covered_calls = int( ( $percent / 100 ) * $total_calls );
+                $totals{calls}         += $total_calls;
                 $totals{covered_calls} += $covered_calls;
                 $file_call_coverage{$source_file} = $percent;
                 next;
@@ -175,16 +190,18 @@ write_index();
 
 exit(0);
 
-
 sub write_index {
     print "Writing $HTMLDIR/index.html..\n" if $DEBUG;
-    open (OUT, ">", "$HTMLDIR/index.html") or
-      die "Can't open $HTMLDIR/index.html for writing: $!\n";
+    open( OUT, ">", "$HTMLDIR/index.html" )
+        or die "Can't open $HTMLDIR/index.html for writing: $!\n";
 
-    $totals{line_coverage}   = sprintf("%.2f", ($totals{lines}    ? ($totals{covered_lines} / $totals{lines} * 100)       : 0));
-    $totals{branch_coverage} = sprintf("%.2f", ($totals{branches} ? ($totals{covered_branches} / $totals{branches} * 100) : 0));
-    $totals{call_coverage}   = sprintf("%.2f", ($totals{calls}    ? ($totals{covered_calls} / $totals{calls} * 100)       : 0));
-    
+    $totals{line_coverage} = sprintf( "%.2f",
+        ( $totals{lines} ? ( $totals{covered_lines} / $totals{lines} * 100 ) : 0 ) );
+    $totals{branch_coverage} = sprintf( "%.2f",
+        ( $totals{branches} ? ( $totals{covered_branches} / $totals{branches} * 100 ) : 0 ) );
+    $totals{call_coverage} = sprintf( "%.2f",
+        ( $totals{calls} ? ( $totals{covered_calls} / $totals{calls} * 100 ) : 0 ) );
+
     print OUT page_header("Parrot Test Coverage");
     print OUT qq(
             <ul>
@@ -210,12 +227,11 @@ sub write_index {
     print OUT page_footer();
 }
 
-
 sub write_file_coverage_summary {
 
     print "Writing $HTMLDIR/file_summary.html..\n" if $DEBUG;
-    open (OUT, ">", "$HTMLDIR/file_summary.html") or
-      die "Can't open $HTMLDIR/file_summary.html for writing: $!\n";
+    open( OUT, ">", "$HTMLDIR/file_summary.html" )
+        or die "Can't open $HTMLDIR/file_summary.html for writing: $!\n";
 
     print OUT page_header("File Coverage Summary");
     print OUT qq(
@@ -229,11 +245,11 @@ sub write_file_coverage_summary {
                   <th>Call Coverage</th>
                 </tr>
     );
-    
-    foreach my $source_file (sort keys %file_line_coverage) {
+
+    foreach my $source_file ( sort keys %file_line_coverage ) {
         my $outfile_base = $source_file;
         $outfile_base =~ s/\//_/g;
-        
+
         print OUT qq(
            <tr>
              <td>$source_file</td>
@@ -244,7 +260,7 @@ sub write_file_coverage_summary {
           </tr>
        );
     }
-    
+
     print OUT qq(
             </tbody>
           </table>
@@ -254,20 +270,18 @@ sub write_file_coverage_summary {
     close(OUT);
 }
 
-
-
 sub write_function_coverage_summary {
 
     print "Writing $HTMLDIR/function_summary.html..\n" if $DEBUG;
-    open (OUT, ">", "$HTMLDIR/function_summary.html") or
-      die "Can't open $HTMLDIR/function_summary.html for writing: $!\n";
+    open( OUT, ">", "$HTMLDIR/function_summary.html" )
+        or die "Can't open $HTMLDIR/function_summary.html for writing: $!\n";
 
     print OUT page_header("Function Coverage Summary");
     print OUT qq(
             <i>You may click on a percentage to see line-by-line detail</i>
     );
 
-    foreach my $source_file (sort keys %file_line_coverage) {
+    foreach my $source_file ( sort keys %file_line_coverage ) {
 
         print OUT qq(
             <hr noshade>
@@ -282,10 +296,10 @@ sub write_function_coverage_summary {
                   <th>Call Coverage</th>
     );
 
-        my $outfile_base = $source_file; 
+        my $outfile_base = $source_file;
         $outfile_base =~ s/\//_/g;
 
-        foreach my $function (sort keys %{$function_line_coverage{$source_file}}) {
+        foreach my $function ( sort keys %{ $function_line_coverage{$source_file} } ) {
 
             print OUT qq(
            <tr>
@@ -307,27 +321,26 @@ sub write_function_coverage_summary {
     close(OUT);
 }
 
-
 sub filter_gcov {
     my ($infile) = @_;
-    
+
     my $source_file = $infile;
     $source_file =~ s/\.gcov$//g;
 
-    my $outfile_base = $source_file; 
+    my $outfile_base = $source_file;
     $outfile_base =~ s/\//_/g;
     $outfile_base = "$HTMLDIR/$outfile_base";
 
     my $outfile = "$outfile_base.lines.html";
     print "Writing $outfile..\n" if $DEBUG;
-    open (IN, "<", "$infile") or die "Can't read $infile: $!\n";
-    open (OUT, ">", "$outfile") or die "Can't write $outfile: $!\n";
+    open( IN,  "<", "$infile" )  or die "Can't read $infile: $!\n";
+    open( OUT, ">", "$outfile" ) or die "Can't write $outfile: $!\n";
 
     print OUT page_header("Line Coverage for $source_file");
     print OUT "<pre>";
 
     # filter out any branch or call coverage lines.
-    do_filter(sub { /^(call|branch)/ } );
+    do_filter( sub { /^(call|branch)/ } );
 
     print OUT "</pre>";
     print OUT page_footer();
@@ -335,17 +348,16 @@ sub filter_gcov {
     close(OUT);
     close(IN);
 
-
     $outfile = "$outfile_base.branches.html";
     print "Writing $outfile..\n" if $DEBUG;
-    open (IN, "<", "$infile") or die "Can't read $infile: $!\n";
-    open (OUT, ">", "$outfile") or die "Can't write $outfile: $!\n";
+    open( IN,  "<", "$infile" )  or die "Can't read $infile: $!\n";
+    open( OUT, ">", "$outfile" ) or die "Can't write $outfile: $!\n";
 
     print OUT page_header("Branch Coverage for $source_file");
     print OUT "<pre>";
 
     # filter out any call coverage lines.
-    do_filter(sub { /^call/ } );
+    do_filter( sub { /^call/ } );
 
     print OUT "</pre>";
     print OUT page_footer();
@@ -353,17 +365,16 @@ sub filter_gcov {
     close(OUT);
     close(IN);
 
-
     $outfile = "$outfile_base.calls.html";
     print "Writing $outfile..\n" if $DEBUG;
-    open (IN, "<", "$infile") or die "Can't read $infile: $!\n";
-    open (OUT, ">", "$outfile") or die "Can't write $outfile: $!\n";
+    open( IN,  "<", "$infile" )  or die "Can't read $infile: $!\n";
+    open( OUT, ">", "$outfile" ) or die "Can't write $outfile: $!\n";
 
     print OUT page_header("Call Coverage for $source_file");
     print OUT "<pre>";
 
     # filter out any branch coverage lines.
-    do_filter(sub { /^branch/ } );
+    do_filter( sub { /^branch/ } );
 
     print OUT "</pre>";
     print OUT page_footer();
@@ -371,44 +382,48 @@ sub filter_gcov {
     close(OUT);
     close(IN);
 
-
     return;
 
     sub do_filter {
         my ($skip_func) = @_;
-        
+
         while (<IN>) {
             s/&/&amp;/g;
             s/</&lt;/g;
             s/>/&gt;/g;
 
-            next if (&{$skip_func}($_));
-            
-            my $atag="";
-            if (/^\s*([^\(\s]+)\(/) {
-                $atag="<a name=\"$1\"></a>";
-            } 
+            next if ( &{$skip_func}($_) );
 
-            my ($initial) = substr($_, 0, 16);
-            if ($initial =~ /^\s*\d+\s*$/) {
-                print OUT qq($atag<font color="green">$_</font>)
-            } elsif ($_ =~ /branch \d+ taken = 0%/) {
-                print OUT qq($atag<font color="red">$_</font>)
-            } elsif ($_ =~ /call \d+ returns = 0%/) {
-                print OUT qq($atag<font color="red">$_</font>)
-            } elsif ($_ =~ /^call \d+ never executed/) {
-                print OUT qq($atag<font color="red">$_</font>)
-            } elsif ($_ =~ /^branch \d+ never executed/) {
-                print OUT qq($atag<font color="red">$_</font>)
-            } elsif ($initial =~ /\#\#\#/) {
-                print OUT qq($atag<font color="red">$_</font>)
-            } else {
+            my $atag = "";
+            if (/^\s*([^\(\s]+)\(/) {
+                $atag = "<a name=\"$1\"></a>";
+            }
+
+            my ($initial) = substr( $_, 0, 16 );
+            if ( $initial =~ /^\s*\d+\s*$/ ) {
+                print OUT qq($atag<font color="green">$_</font>);
+            }
+            elsif ( $_ =~ /branch \d+ taken = 0%/ ) {
+                print OUT qq($atag<font color="red">$_</font>);
+            }
+            elsif ( $_ =~ /call \d+ returns = 0%/ ) {
+                print OUT qq($atag<font color="red">$_</font>);
+            }
+            elsif ( $_ =~ /^call \d+ never executed/ ) {
+                print OUT qq($atag<font color="red">$_</font>);
+            }
+            elsif ( $_ =~ /^branch \d+ never executed/ ) {
+                print OUT qq($atag<font color="red">$_</font>);
+            }
+            elsif ( $initial =~ /\#\#\#/ ) {
+                print OUT qq($atag<font color="red">$_</font>);
+            }
+            else {
                 print OUT $_;
             }
         }
     }
 }
-
 
 sub page_header {
     my ($title) = @_;
@@ -423,7 +438,6 @@ sub page_header {
             <hr noshade>
     );
 }
-
 
 sub page_footer {
     "<hr noshade><i>Last Updated: @{[ scalar(localtime) . strftime(' (%Z)', localtime(time)) ]} </i>

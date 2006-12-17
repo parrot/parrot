@@ -118,22 +118,24 @@ use File::Spec;
 
 # When run from the makefile, which is probably the only time this
 # script will ever be used, all of these defaults will get overridden.
-my %options = ( buildprefix => '',
-                prefix      => '/usr',
-                destdir     => '',
-                exec_prefix => '/usr',
-                bindir      => '/usr/bin',
-                libdir      => '/usr/lib',
-                includedir  => '/usr/include',
-                docdir      => '/usr/share/doc',
-                'dry-run'   => 0,
-              );
+my %options = (
+    buildprefix => '',
+    prefix      => '/usr',
+    destdir     => '',
+    exec_prefix => '/usr',
+    bindir      => '/usr/bin',
+    libdir      => '/usr/lib',
+    includedir  => '/usr/include',
+    docdir      => '/usr/share/doc',
+    'dry-run'   => 0,
+);
 
 my @manifests;
 foreach (@ARGV) {
     if (/^--([^=]+)=(.*)/) {
         $options{$1} = $2;
-    } else {
+    }
+    else {
         push @manifests, $_;
     }
 }
@@ -145,16 +147,16 @@ my @files;
 my @installable_exe;
 my %directories;
 @ARGV = @manifests;
-while(<>) {
+while (<>) {
     chomp;
 
-    s/\#.*//; # Ignore comments
-    next if /^\s*$/; # Skip blank lines
+    s/\#.*//;    # Ignore comments
+    next if /^\s*$/;    # Skip blank lines
 
-    my ($src, $meta, $dest) = split(/\s+/, $_);
+    my ( $src, $meta, $dest ) = split( /\s+/, $_ );
     $dest ||= $src;
 
-    if ($seen{$src}++) {
+    if ( $seen{$src}++ ) {
         print STDERR "$ARGV:$.: Duplicate entry $src\n";
     }
 
@@ -163,79 +165,88 @@ while(<>) {
     my $generated = $meta =~ s/^\*//;
     my ($package) = $meta =~ /^\[(.*?)\]/;
     $meta =~ s/^\[(.*?)\]//;
-    next unless $package; # Skip if this file belongs to no package
+    next unless $package;    # Skip if this file belongs to no package
 
-    next unless $package =~ /main|library/; # XXX -lt
+    next unless $package =~ /main|library/;    # XXX -lt
 
     my %meta;
-    @meta{split(/,/, $meta)} = ();
-    $meta{$_} = 1 for (keys %meta); # Laziness
+    @meta{ split( /,/, $meta ) } = ();
+    $meta{$_} = 1 for ( keys %meta );          # Laziness
 
-    if ($meta{lib}) {
+    if ( $meta{lib} ) {
+
         # don't allow libraries to be installed into subdirs of libdir
-        $dest = File::Spec->catdir($options{libdir}, basename($dest));
-    } elsif ($meta{bin}) {
+        $dest = File::Spec->catdir( $options{libdir}, basename($dest) );
+    }
+    elsif ( $meta{bin} ) {
         my $copy = $dest;
-        $dest =~ s/^installable_//; # parrot with different config
-        $dest = File::Spec->catdir($options{bindir}, $dest);
-        if ($copy =~ /^installable/) {
-            push @installable_exe, [$src, $dest];
+        $dest =~ s/^installable_//;            # parrot with different config
+        $dest = File::Spec->catdir( $options{bindir}, $dest );
+        if ( $copy =~ /^installable/ ) {
+            push @installable_exe, [ $src, $dest ];
             next;
         }
-    } elsif ($meta{include}) {
+    }
+    elsif ( $meta{include} ) {
         $dest =~ s/^include//;
-        $dest = File::Spec->catdir($options{includedir}, $dest);
-    } elsif ($meta{doc}) {
-        $dest = File::Spec->catdir($options{docdir}, $dest);
-    } elsif ($meta{pkgconfig}) {
+        $dest = File::Spec->catdir( $options{includedir}, $dest );
+    }
+    elsif ( $meta{doc} ) {
+        $dest = File::Spec->catdir( $options{docdir}, $dest );
+    }
+    elsif ( $meta{pkgconfig} ) {
+
         # For the time being this is hardcoded as being installed under libdir
         # as it is typically donw with automake installed packages.  If there
         # is a use case to make this configurable we'll add a seperate
         # --pkgconfigdir option.
-        $dest = File::Spec->catdir($options{libdir}, 'pkgconfig', $dest);
-    } else {
+        $dest = File::Spec->catdir( $options{libdir}, 'pkgconfig', $dest );
+    }
+    else {
         $dest =~ s/^runtime/lib/;
-        $dest = File::Spec->catdir($options{prefix}, $dest);
+        $dest = File::Spec->catdir( $options{prefix}, $dest );
     }
 
-    $dest = File::Spec->catdir($options{buildprefix}, $dest)
-      if $options{buildprefix};
+    $dest = File::Spec->catdir( $options{buildprefix}, $dest )
+        if $options{buildprefix};
 
-    $directories{dirname($dest)} = 1;
-    push(@files, [ $src => $dest ]);
-} continue {
-    close ARGV if eof; # Reset line numbering for each input file
+    $directories{ dirname($dest) } = 1;
+    push( @files, [ $src => $dest ] );
+}
+continue {
+    close ARGV if eof;    # Reset line numbering for each input file
 }
 
-unless ($options{'dry-run'}) {
-    for my $dir (map { $options{destdir} . $_ } keys %directories) {
-        unless (-d $dir) {
+unless ( $options{'dry-run'} ) {
+    for my $dir ( map { $options{destdir} . $_ } keys %directories ) {
+        unless ( -d $dir ) {
+
             # Make full path to the directory $dir
             my @dirs;
-            while (! -d $dir) { # Scan up to nearest existing ancestor
+            while ( !-d $dir ) {    # Scan up to nearest existing ancestor
                 unshift @dirs, $dir;
                 $dir = dirname($dir);
             }
             foreach (@dirs) {
-                mkdir($_, 0777) or die "mkdir $_: $!\n";
+                mkdir( $_, 0777 ) or die "mkdir $_: $!\n";
             }
         }
     }
 }
 print("Installing ...\n");
-foreach (@files, @installable_exe) {
-    my ($src, $dest) = @$_;
-    $dest = $options{destdir}.$dest;
-    if ($options{'dry-run'}) {
+foreach ( @files, @installable_exe ) {
+    my ( $src, $dest ) = @$_;
+    $dest = $options{destdir} . $dest;
+    if ( $options{'dry-run'} ) {
         print "$src -> $dest\n";
         next;
     }
     else {
         next unless -e $src;
-        copy($src, $dest) or die "copy $src to $dest: $!\n";
+        copy( $src, $dest ) or die "copy $src to $dest: $!\n";
         print "$dest\n";
     }
-    my $mode = (stat($src))[2];
+    my $mode = ( stat($src) )[2];
     chmod $mode, $dest;
 }
 

@@ -39,16 +39,17 @@ my $manifest  = ExtUtils::Manifest::maniread();
 my $file_list = ExtUtils::Manifest::manifind();
 my @missing   = ExtUtils::Manifest::manicheck();
 my @extra     = ExtUtils::Manifest::filecheck();
+
 # my @ignored   = ExtUtils::Manifest::skipcheck();
 
 # strip '~' backup files from the extra list
 @extra = grep !m/~$/, @extra;
 
 printf "Found %d distinct files among MANIFEST and directory contents.\n\n",
-  scalar( keys %{$file_list} );
+    scalar( keys %{$file_list} );
 
-printf "  %5d missing\n",  scalar @missing;
-printf "  %5d extra\n",    scalar @extra;
+printf "  %5d missing\n", scalar @missing;
+printf "  %5d extra\n",   scalar @extra;
 
 # TODO: Use Data::Dumper
 if (@missing) {

@@ -74,11 +74,11 @@ main();
 
 sub open_file {
     my $direction = shift;
-    my $filename = shift;
+    my $filename  = shift;
 
     my %actions = (
-        "<" => "Reading",
-        ">" => "Writing",
+        "<"  => "Reading",
+        ">"  => "Writing",
         ">>" => "Appending",
     );
 
@@ -87,7 +87,6 @@ sub open_file {
     open my $fh, $direction, $filename or die "$action $filename: $!\n";
     return $fh;
 }
-
 
 sub extract_functions {
     my $text = shift;
@@ -132,37 +131,34 @@ sub extract_functions {
 sub function_components {
     my $proto = shift;
 
-    my @parts = split( /\n/, $proto, 2 );
+    my @parts      = split( /\n/, $proto, 2 );
     my $returntype = $parts[0];
-    my $parms = $parts[1];
+    my $parms      = $parts[1];
 
     $parms =~ s/\s+/ /g;
     $parms =~ s/([^(]+)\s*\((.+)\);?/$2/ or die "Couldn't handle $proto";
     my $funcname = $1;
     $parms = $2;
     my @parms = split( /\s*,\s*/, $parms );
-    for ( @parms ) {
-      /\S+\s+\S+/ || ($_ eq "...") || ($_ eq "void") || /theINTERP/
-        or die "Bad parms in $proto";
+    for (@parms) {
+        /\S+\s+\S+/ || ( $_ eq "..." ) || ( $_ eq "void" ) || /theINTERP/
+            or die "Bad parms in $proto";
     }
 
     my $static;
     $returntype =~ s/^((static)\s+)?//i;
     $static = $2 || "";
 
-    return [$static, $returntype, $funcname, @parms];
+    return [ $static, $returntype, $funcname, @parms ];
 }
 
-
 sub main {
-    GetOptions(
-        "verbose"   => \$opt{verbose},
-    ) or exit(1);
+    GetOptions( "verbose" => \$opt{verbose}, ) or exit(1);
 
     my $nfuncs = 0;
     my @ofiles = @ARGV;
     my %files;
-    for my $ofile ( @ofiles ) {
+    for my $ofile (@ofiles) {
         next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/;
 
         my $cfile = $ofile;
@@ -179,18 +175,18 @@ sub main {
 
         print "\n=== $cfile ===\n";
 
-        die "can't find HEADER directive in '$cfile'" 
-          unless $source =~ m#/\*\s+HEADER:\s+([^*]+?)\s+\*/#s;
+        die "can't find HEADER directive in '$cfile'"
+            unless $source =~ m#/\*\s+HEADER:\s+([^*]+?)\s+\*/#s;
         my $hfile = $1;
         die "'$hfile' not found (referenced from '$cfile')" unless -f $hfile;
 
-        my @funcs = extract_functions( $source );
+        my @funcs = extract_functions($source);
 
-        for my $func ( @funcs ) {
-            push( @{$files{$hfile}->{$cfile}}, function_components( $func ) );
+        for my $func (@funcs) {
+            push( @{ $files{$hfile}->{$cfile} }, function_components($func) );
             ++$nfuncs;
         }
-    } # for @cfiles
+    }    # for @cfiles
     my $nfiles = scalar keys %files;
     print Dumper( \%files ) if $opt{verbose};
     print "$nfuncs funcs in $nfiles files\n";
@@ -199,7 +195,7 @@ sub main {
         my $cfiles = $files{$hfile};
 
         open my $FILE, '<', $hfile or die "couldn't read '$hfile': $!";
-        my $header = do {local $/=undef; <$FILE>};  # slurp
+        my $header = do { local $/ = undef; <$FILE> };    # slurp
         close $FILE;
 
         for my $cfile ( sort keys %$cfiles ) {
@@ -212,28 +208,26 @@ sub main {
 
                 my $ret_type = shift @$func;
                 my $funcname = shift @$func;
-                my @args = @$func;
+                my @args     = @$func;
 
                 push( @function_defs,
                     sprintf "PARROT_API %s %s( %s );\n",
-                        $ret_type,
-                        $funcname,
-                        join( ",\n\t", @args ),
+                    $ret_type, $funcname, join( ",\n\t", @args ),
                 );
             }
 
             my $function_defs = join( "\n", @function_defs );
-            my $STARTMARKER = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
-            my $ENDMARKER   = qr#/\* HEADERIZER END: $cfile \*/\n?#;
+            my $STARTMARKER   = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
+            my $ENDMARKER     = qr#/\* HEADERIZER END: $cfile \*/\n?#;
             $header =~ s#($STARTMARKER)(?:.*?)($ENDMARKER)#$1$function_defs$2#s
                 or die "no HEADERIZER markers for '$cfile' found in '$hfile'";
-        } # for %cfiles
+        }    # for %cfiles
 
         open $FILE, '>', $hfile or die "couldn't write '$hfile': $!";
         print $FILE $header;
         close $FILE;
         print "Wrote '$hfile'\n";
-    } # for %files
+    }    # for %files
 
     return;
 }

@@ -28,19 +28,16 @@ F<tools/build/pmc2c.pl>, F<docs/vtables.pod>.
 
 =cut
 
-
 use strict;
 use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 use Parrot::Vtable;
 
-
 my $vtbl = parse_vtable("$FindBin::Bin/../../vtable.tbl");
 
 my $classname = shift
     or die "No classname given!\n";
-
 
 ## emit file header
 print <<"EOF";
@@ -65,14 +62,15 @@ EOF
 
 ## emit method bodies
 for (@$vtbl) {
-    my ($retval, $methname, $args) = @$_;
-    if ($methname eq 'type' || $methname eq 'name' || $methname =~ /prop/) {
+    my ( $retval, $methname, $args ) = @$_;
+    if ( $methname eq 'type' || $methname eq 'name' || $methname =~ /prop/ ) {
+
         # default.pmc handles these
         next;
     }
 
     print "    $retval $methname ($args) {\n";
-    if($retval ne 'void') {
+    if ( $retval ne 'void' ) {
         print "        return ($retval)0;\n";
     }
     print "    }\n\n";

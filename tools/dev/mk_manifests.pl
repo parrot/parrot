@@ -62,56 +62,62 @@ F<install_files.pl>
 use strict;
 use warnings;
 
-my %options = ( prefix => '/usr',
-                exec_prefix => '/usr',
-                bindir => '/usr/bin',
-                libdir => '/usr/lib',
-                includedir => '/usr/include',
-              );
+my %options = (
+    prefix      => '/usr',
+    exec_prefix => '/usr',
+    bindir      => '/usr/bin',
+    libdir      => '/usr/lib',
+    includedir  => '/usr/include',
+);
 
 my $manifest;
 foreach (@ARGV) {
     if (/^--([^=]+)=(.*)/) {
         $options{$1} = $2;
-    } else {
+    }
+    else {
         $manifest = $_;
     }
 }
 
-my %FILES; # { package => file }
+my %FILES;    # { package => file }
 @ARGV = ($manifest);
-while(<>) {
+while (<>) {
     chomp;
-    my ($file, $meta, $dest) = split(/\s+/, $_);
+    my ( $file, $meta, $dest ) = split( /\s+/, $_ );
     $dest ||= $file;
     my $generated = $meta =~ s/^\*//;
     my ($package) = $meta =~ /^\[(.*?)\]/;
     $meta =~ s/^\[(.*?)\]//;
     next if $package eq "";
     my %meta;
-    @meta{split(/,/, $meta)} = ();
-    $meta{$_} = 1 for (keys %meta); # Laziness
+    @meta{ split( /,/, $meta ) } = ();
+    $meta{$_} = 1 for ( keys %meta );    # Laziness
 
     my $entry;
 
-    if ($meta{doc}) {
+    if ( $meta{doc} ) {
         $entry = "%doc $dest";
-    } elsif ($meta{lib}) {
+    }
+    elsif ( $meta{lib} ) {
         $entry = "$options{libdir}/$dest";
-    } elsif ($meta{bin}) {
+    }
+    elsif ( $meta{bin} ) {
         $entry = "$options{bindir}/$dest";
-    } elsif ($meta{include}) {
+    }
+    elsif ( $meta{include} ) {
         $entry = "$options{includedir}/$dest";
-    } else {
+    }
+    else {
         $entry = "$options{prefix}/$dest";
     }
 
     push @{ $FILES{$package} }, $entry;
 }
 
-while (my ($package, $files) = each %FILES) {
+while ( my ( $package, $files ) = each %FILES ) {
     my $manifest = "MANIFEST.$package";
-    open(MANIFEST, ">", "$manifest") or die "create $manifest: $!";
+    open( MANIFEST, ">", "$manifest" ) or die "create $manifest: $!";
     print MANIFEST "$_\n" foreach (@$files);
     close MANIFEST;
     print "Wrote $manifest\n";

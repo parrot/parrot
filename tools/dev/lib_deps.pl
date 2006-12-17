@@ -46,29 +46,29 @@ use warnings;
 use File::Find;
 use File::Spec;
 
-
 my %defined_in;
 my %referenced_in;
 my %ansi_c89_symbol;
 my %ansi_c89_header;
 
-my ($mode, @files) = @ARGV;
+my ( $mode, @files ) = @ARGV;
 
-if ($mode !~ /^(source|object)$/ || ! @files) {
-    die "Usage: $0 object <object files..>\n" .
-        "       $0 source <source files..>\n";
+if ( $mode !~ /^(source|object)$/ || !@files ) {
+    die "Usage: $0 object <object files..>\n" . "       $0 source <source files..>\n";
 }
 
 while (<DATA>) {
-    next if /^\s*#/; chomp;
-    my ($symbol, $file) = /(\S+)\s+(\S+)/;
-    $ansi_c89_symbol{$symbol} = $file unless ($symbol eq "UNDEF");
-    push @{$ansi_c89_header{$file}}, $symbol;
+    next if /^\s*#/;
+    chomp;
+    my ( $symbol, $file ) = /(\S+)\s+(\S+)/;
+    $ansi_c89_symbol{$symbol} = $file unless ( $symbol eq "UNDEF" );
+    push @{ $ansi_c89_header{$file} }, $symbol;
 }
 
-if ($mode eq "object") {
+if ( $mode eq "object" ) {
     do_object();
-} else {
+}
+else {
     do_source();
 }
 
@@ -78,62 +78,68 @@ exit(0);
 
 sub do_source {
 
-    if ($files[0] eq "all_source") {
+    if ( $files[0] eq "all_source" ) {
+
         # do a little "find" action for now.
-        
+
         @files = ();
-        File::Find::find({wanted => sub {
-                              /^.*\.[ch]\z/s &&
-                                push @files, $File::Find::name;
-                          }}, '.');
+        File::Find::find(
+            {
+                wanted => sub {
+                    /^.*\.[ch]\z/s
+                        && push @files, $File::Find::name;
+                    }
+            },
+            '.'
+        );
     }
 
     # note: need to run this a second time so the database is built.
     # should just use the build process to do it the first time.
     my $devnull = File::Spec->devnull;
-    my $cmd = "cxref -raw -Iinclude -xref @files";
+    my $cmd     = "cxref -raw -Iinclude -xref @files";
     print "Running cxref (pass 1)\n";
     system("$cmd > $devnull 2>$devnull");
     print "Running cxref (pass 2)\n";
-    open(F, '<', "$cmd 2>$devnull|")
-      || die "Can't run $cmd.\n";
+    open( F, '<', "$cmd 2>$devnull|" )
+        || die "Can't run $cmd.\n";
 
     my %external_calls;
     my %internal_calls;
     my %variable_visible;
     my %system_include;
-    my ($file, $function, $variable);
+    my ( $file, $function, $variable );
     while (<F>) {
-        
+
         if (/----------------------------------------/) {
             undef $file if defined($file);
             next;
         }
 
         if (/^INCLUDES : '(.*)' \[System file\]/) {
-            next if ($1 =~ /^include\//);
+            next if ( $1 =~ /^include\// );
             $system_include{$1}{$file}++;
             next;
         }
-        
-        if (! $file && /^FILE : '(.*)'$/) {
+
+        if ( !$file && /^FILE : '(.*)'$/ ) {
             $file = $1;
             next;
         }
-        
+
         # skip anything between files.
         next unless $file;
-        
+
         # beginning of function block
         if (/FUNCTION : (.*) \[(.*)\]/) {
             $function = $1;
             my $function_scope = $2;
-            
+
             next;
         }
-        
+
         # end of function block
-        if ($function && /^\s*$/) {
+        if ( $function && /^\s*$/ ) {
             undef $function;
             next;
         }
@@ -142,102 +148,112 @@ sub do_source {
         if (/VARIABLE : (.*) \[(.*)\]/) {
             $variable = $1;
             my $variable_scope = $2;
-            if ($variable_scope eq "Local") {
+            if ( $variable_scope eq "Local" ) {
                 $variable_visible{$file}{$1}++;
-            } else {
+            }
+            else {
                 $variable_visible{"ALL"}{$1}++;
             }
-            
+
             next;
         }
-        
+
         # end of variable block
-        if ($variable && /^\s*$/) {
+        if ( $variable && /^\s*$/ ) {
             undef $variable;
             next;
         }
-        
+
         if ($function) {
-            if (/Calls (.*) : (.*)/) {                                
+            if (/Calls (.*) : (.*)/) {
+
                 # calling another function within parrot.
-                $internal_calls{$1}{"$file:$function"}++ 
-                  unless ($variable_visible{$file}{$1} || 
-                          $variable_visible{ALL}{$1});
-            } elsif (/Calls (.*)/) {
+                $internal_calls{$1}{"$file:$function"}++
+                    unless ( $variable_visible{$file}{$1}
+                    || $variable_visible{ALL}{$1} );
+            }
+            elsif (/Calls (.*)/) {
+
                 # calling a function outside of parrot!
                 $external_calls{$1}{"$file:$function"}++
-                  unless ($variable_visible{$file}{$1} ||
-                          $variable_visible{ALL}{$1});
+                    unless ( $variable_visible{$file}{$1}
+                    || $variable_visible{ALL}{$1} );
             }
         }
     }
-    
+
     close(F);
 
     # filter out things that start with _.  Probably internal libc stuff.
-    my @external_calls = grep { ! /^_/ } sort keys %external_calls;
-    my @internal_calls = grep { ! /^_/ } sort keys %internal_calls;
-    my @non_ansi_external_calls = grep { ! exists($ansi_c89_symbol{$_}) } @external_calls;
-    
-    printf("Found %d functions which are defined and called within the %d supplied source files.\n", scalar(@internal_calls), scalar(@files));
-    printf("Found %d external functions which were called.\n", scalar(@external_calls));
-    printf("Of these, %d are not defined by ANSI C89:\n", scalar(@non_ansi_external_calls));
-    
+    my @external_calls          = grep { !/^_/ } sort keys %external_calls;
+    my @internal_calls          = grep { !/^_/ } sort keys %internal_calls;
+    my @non_ansi_external_calls = grep { !exists( $ansi_c89_symbol{$_} ) } @external_calls;
+
+    printf(
+        "Found %d functions which are defined and called within the %d supplied source files.\n",
+        scalar(@internal_calls), scalar(@files) );
+    printf( "Found %d external functions which were called.\n", scalar(@external_calls) );
+    printf( "Of these, %d are not defined by ANSI C89:\n",      scalar(@non_ansi_external_calls) );
+
     foreach (@non_ansi_external_calls) {
         print "    $_:\n";
-        foreach (sort keys %{$external_calls{$_}}) {
+        foreach ( sort keys %{ $external_calls{$_} } ) {
             print "        $_\n";
         }
     }
 
     print "\nThe following non-ansi system includes are used:\n";
-    foreach my $include (sort keys %system_include) {
-        if (! exists($ansi_c89_header{$include})) {
+    foreach my $include ( sort keys %system_include ) {
+        if ( !exists( $ansi_c89_header{$include} ) ) {
             print "    $include, included by:\n";
-            foreach my $file (sort keys %{$system_include{$include}}) {
+            foreach my $file ( sort keys %{ $system_include{$include} } ) {
                 print "        $file\n";
             }
         }
     }
 }
 
-
 sub do_object {
     foreach my $obj (@files) {
-        open(F, '<', "nm -a $obj|") || die "Can't run nm on $obj\n";
-        
-        while(<F>) {
+        open( F, '<', "nm -a $obj|" ) || die "Can't run nm on $obj\n";
+
+        while (<F>) {
             chomp;
-            
-            my ($type, $symbol) = /^........ (\S) (.*)/;
-            
-            if ($type eq 'U') {
+
+            my ( $type, $symbol ) = /^........ (\S) (.*)/;
+
+            if ( $type eq 'U' ) {
                 $defined_in{$symbol} ||= undef;
-                push @{$referenced_in{$symbol}}, $obj;
-            } else {
+                push @{ $referenced_in{$symbol} }, $obj;
+            }
+            else {
                 $defined_in{$symbol} .= "$obj ";
             }
         }
-        
+
         close(F);
     }
 
     # omit symbols which begin with _.  These are likely to be internal
     # variables used by libc macros.
-    my @symbols = grep { ! /^_/ } sort keys %defined_in;
-    
-    my @external_symbols = sort grep { ! defined($defined_in{$_}) } @symbols;
-    my @internal_symbols = sort grep { defined($defined_in{$_}) } @symbols;
-    my @non_ansi_external_symbols = grep { ! exists($ansi_c89_symbol{$_}) } @external_symbols;
-    
-    printf("Found %d symbols defined within the %d supplied object files.\n", scalar(@internal_symbols), scalar(@files));
-    printf("Found %d external symbols\n", scalar(@external_symbols));
-    printf("Of these, %d are not defined by ANSI C89:\n", scalar(@non_ansi_external_symbols));
+    my @symbols = grep { !/^_/ } sort keys %defined_in;
 
-    print "    $_ (in " . (join ',', @{$referenced_in{$_}}) . ")\n" foreach (@non_ansi_external_symbols);
+    my @external_symbols          = sort grep { !defined( $defined_in{$_} ) } @symbols;
+    my @internal_symbols          = sort grep { defined( $defined_in{$_} ) } @symbols;
+    my @non_ansi_external_symbols = grep      { !exists( $ansi_c89_symbol{$_} ) } @external_symbols;
+
+    printf(
+        "Found %d symbols defined within the %d supplied object files.\n",
+        scalar(@internal_symbols),
+        scalar(@files)
+    );
+    printf( "Found %d external symbols\n",                 scalar(@external_symbols) );
+    printf( "Of these, %d are not defined by ANSI C89:\n", scalar(@non_ansi_external_symbols) );
+
+    print "    $_ (in " . ( join ',', @{ $referenced_in{$_} } ) . ")\n"
+        foreach (@non_ansi_external_symbols);
 }
 
-    
 __END__
 # The following symbols are available in a C89 Hosted Implementation
 # (not sure if I got this right- it came from a C99 reference, so some 99isms

@@ -6,8 +6,8 @@ use warnings;
 use strict;
 
 my ($svnid) =
-  '$Id$'
-  =~ /^\$[iI][dD]:\s(.*)\$$/;
+    '$Id$' =~
+    /^\$[iI][dD]:\s(.*)\$$/;
 
 =head1 NAME
 
@@ -31,12 +31,11 @@ subsequently created Interpreters.
 
 =cut
 
-
 use strict;
 
-my ($mini_parrot, $install_parrot);
+my ( $mini_parrot, $install_parrot );
 
-$mini_parrot = 1    if @ARGV && $ARGV[0] =~ /mini/;
+$mini_parrot    = 1 if @ARGV && $ARGV[0] =~ /mini/;
 $install_parrot = 1 if @ARGV && $ARGV[0] =~ /install/;
 
 print << "EOF";
@@ -63,15 +62,13 @@ Parrot_set_config_hash_internal (const unsigned char* parrot_config,
 
 static const unsigned char parrot_config[] = {
 EOF
-;
 
 if ($mini_parrot) {
     print "    0\n";
 }
 else {
 
-    my $image_file = $install_parrot ?
-        'install_config.fpmc' : 'runtime/parrot/include/config.fpmc';
+    my $image_file = $install_parrot ? 'install_config.fpmc' : 'runtime/parrot/include/config.fpmc';
     open my $F, '<', $image_file or die "Can't read '$image_file': $!";
     my $image;
     local $/;
@@ -87,7 +84,7 @@ else {
     for (@c) {
         printf "0x%02x", ord($_);
         ++$i;
-        print ', ', if ($i < scalar(@c));
+        print ', ', if ( $i < scalar(@c) );
         print "\n    " unless $i % 8;
     }
     print "\n";

@@ -94,9 +94,9 @@ Sebastian Riedel, C<sri@oook.de>
 
 =cut
 
-# Create Default Configuration 
+# Create Default Configuration
 my %cfg = (
-    config_file  => File::Spec->catdir( $FindBin::Bin , 'parrotbench.conf' ),
+    config_file  => File::Spec->catdir( $FindBin::Bin, 'parrotbench.conf' ),
     bench_path   => undef,
     list_only    => undef,
     use_times    => undef,
@@ -119,50 +119,48 @@ GetOptions(
 );
 
 # Read Configuration File
-die
-    'Unable to access configuration file ',
-    $cfg{config_file} unless -r $cfg{config_file};
+die 'Unable to access configuration file ', $cfg{config_file} unless -r $cfg{config_file};
 
 my $ini = Config::IniFiles->new( -file => $cfg{config_file} );
 
 # Merge Configuration
-if ( ! defined $cfg{bench_path} ) {
+if ( !defined $cfg{bench_path} ) {
     $cfg{bench_path} = $ini->val( global => 'directory' );
 }
-if ( ! defined $cfg{list_only} ) {
+if ( !defined $cfg{list_only} ) {
     $cfg{list_only} = $ini->val( global => 'list' );
 }
-if ( ! defined $cfg{use_times} ) {
+if ( !defined $cfg{use_times} ) {
     $cfg{use_times} = $ini->val( global => 'time' );
 }
-if ( ! defined $cfg{display_help} ) {
+if ( !defined $cfg{display_help} ) {
     $cfg{display_help} = $ini->val( global => 'help' );
 }
 
 pod2usage 1 if $cfg{display_help};
 
-if ( ! defined $cfg{method} ) {
+if ( !defined $cfg{method} ) {
     $cfg{method} = $ini->val( global => 'method', 1 );
 }
 
-if ( ! @{ $cfg{run_bench} } ) {
-    my @regexes = grep defined, $ini->val( regexes => 'include');
+if ( !@{ $cfg{run_bench} } ) {
+    my @regexes = grep defined, $ini->val( regexes => 'include' );
     @{ $cfg{run_bench} } = @regexes ? @regexes : '[\d\D]';
 }
-if ( ! @{ $cfg{skip_bench} } ) {
-    my @regexes = grep defined, $ini->val( regexes => 'exclude');
+if ( !@{ $cfg{skip_bench} } ) {
+    my @regexes = grep defined, $ini->val( regexes => 'exclude' );
     @{ $cfg{skip_bench} } = @regexes ? @regexes : '[^\d\D]';
 }
 
 # Frequently Used Variables
 my %bench;
-my @section = sort $ini->GroupMembers( 'benchmark' );
+my @section = sort $ini->GroupMembers('benchmark');
 my @program = map { /^benchmark\s+(.*)$/ } @section;
 my %suffix;
-$suffix{ $_ } = [ map quotemeta, $ini->val($_, 'type') ] for @section;
-my $ticks = POSIX::sysconf( &POSIX::_SC_CLK_TCK );
+$suffix{$_} = [ map quotemeta, $ini->val( $_, 'type' ) ] for @section;
+my $ticks    = POSIX::sysconf(&POSIX::_SC_CLK_TCK);
 my %Get_Time = (
-    1 => sub { my @times = times();  return $times[2] + $times[3] },
+    1 => sub { my @times = times(); return $times[2] + $times[3] },
     2 => sub { return ( POSIX::times() )[0] / $ticks },
 );
 
@@ -172,20 +170,19 @@ find sub {
     for my $regex ( @{ $cfg{run_bench} } ) {
         $pass++ and last if /$regex/;
     }
-    return if ! $pass;
+    return if !$pass;
     my $fail;
     for my $regex ( @{ $cfg{skip_bench} } ) {
         $fail++ and last if /$regex/;
     }
     return if $fail;
     for my $index ( 0 .. $#section ) {
-        my ($name, $p, $ext) =
-          fileparse($_, @{ $suffix{ $section[ $index ] } });
-        next if ! $ext;
-        $bench{ $name }{ $program[ $index ] } = $ext;
+        my ( $name, $p, $ext ) = fileparse( $_, @{ $suffix{ $section[$index] } } );
+        next if !$ext;
+        $bench{$name}{ $program[$index] } = $ext;
     }
 }, $cfg{bench_path};
-die "No benchmarks found" if ! keys %bench;
+die "No benchmarks found" if !keys %bench;
 
 # List Names Of Benchmarks With Pretty Output
 if ( $cfg{list_only} ) {
@@ -196,19 +193,19 @@ if ( $cfg{list_only} ) {
     }
     my @max;
     for ( 0 .. @program ) {
-        for my $row ( @rows ) {
-            Longest( $max[$_] , length $row->[$_] );
+        for my $row (@rows) {
+            Longest( $max[$_], length $row->[$_] );
         }
     }
-    for my $col ( @rows ) {
-        print map { sprintf("%-$max[$_]s  ", $col->[$_]) } 0 .. $#$col; 
+    for my $col (@rows) {
+        print map { sprintf( "%-$max[$_]s  ", $col->[$_] ) } 0 .. $#$col;
         print "\n";
     }
     exit;
 }
 
 # Run The Benchmarks With Pretty Output
-if ( ! $cfg{use_times} && @program < 2 ) {
+if ( !$cfg{use_times} && @program < 2 ) {
     print "WARNING: Switching percentage to time - not enough executables\n";
     $cfg{use_times} = 1;
 }
@@ -221,45 +218,42 @@ else {
 }
 print "\n";
 
-open (COPYOUT, ">&STDOUT") or die "Unable to copy STDOUT";
-open (STDOUT, '>', File::Spec->devnull) or die "Unable to redirect STDOUT";
+open( COPYOUT, ">&STDOUT" ) or die "Unable to copy STDOUT";
+open( STDOUT, '>', File::Spec->devnull ) or die "Unable to redirect STDOUT";
 select COPYOUT;
 $| = 1;
 
 my @max = $cfg{method} == 1 ? (5) x @program : (6) x @program;
 Longest( $max[0], length $_ ) for 'Benchmark', keys %bench;
-Longest( $max[ $_ + 1 ] , length $program[$_] ) for 0 .. $#program;
-printf("%-$max[0]s  ", 'Benchmark');
-printf("%-$max[$_ + 1]s  ", $program[$_]) for 0 .. $#program;
+Longest( $max[ $_ + 1 ], length $program[$_] ) for 0 .. $#program;
+printf( "%-$max[0]s  ", 'Benchmark' );
+printf( "%-$max[$_ + 1]s  ", $program[$_] ) for 0 .. $#program;
 
 for my $name ( sort keys %bench ) {
     my $base = 0;
-    printf("\n%-$max[0]s  ", $name);
+    printf( "\n%-$max[0]s  ", $name );
     for ( 0 .. $#section ) {
-        my ($prog, $sect) = ($program[$_], $section[$_]);
-        if ( $bench{ $name }{ $prog } ) {
+        my ( $prog, $sect ) = ( $program[$_], $section[$_] );
+        if ( $bench{$name}{$prog} ) {
             my $start = $Get_Time{ $cfg{method} }->();
-            system(
-                $ini->val($sect, 'exe') . " " 
-                   . File::Spec->catdir( $cfg{bench_path}, $name
-                                         . $bench{$name}{$prog})
-                  );
+            system( $ini->val( $sect, 'exe' ) . " "
+                    . File::Spec->catdir( $cfg{bench_path}, $name . $bench{$name}{$prog} ) );
             my $stop = $Get_Time{ $cfg{method} }->();
             my $used = $stop - $start;
             $base ||= $used;
-            printf("%-$max[$_ + 1]s  ", $cfg{use_times}
-                 ? sprintf("%.3f", $used)
-                 : sprintf( "%d%%", $used / ($base / 100) )
-            );
+            printf( "%-$max[$_ + 1]s  ",
+                $cfg{use_times}
+                ? sprintf( "%.3f", $used )
+                : sprintf( "%d%%", $used / ( $base / 100 ) ) );
         }
         else {
-            printf ("%-$max[$_ + 1]s  ", '-');
+            printf( "%-$max[$_ + 1]s  ", '-' );
         }
     }
 }
 
 sub Longest {
-    $_[0] = $_[1] and return if ! defined $_[0];
+    $_[0] = $_[1] and return if !defined $_[0];
     $_[0] = $_[1] if $_[1] > $_[0];
 }
 

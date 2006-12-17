@@ -23,7 +23,7 @@ use warnings;
 
 use File::Find;
 
-my @dirs;  # will be filled in wanted
+my @dirs;    # will be filled in wanted
 
 # XXX Most of these can probably be cleaned up
 my %special = qw(
@@ -68,8 +68,8 @@ my %special = qw(
     vtable.tbl                                      [devel]
 );
 
-my $keyword = '$' . 'Id$'; # avoid an svn issue.
-my $time = scalar gmtime;
+my $keyword = '$' . 'Id$';     # avoid an svn issue.
+my $time    = scalar gmtime;
 open my $MANI, '>', 'MANIFEST';
 print {$MANI} <<"END_HEADER";
 # ex: set ro:
@@ -104,8 +104,8 @@ print {$SKIP} <<"END_HEADER";
 END_HEADER
 
 my @MANI = ();
-find(\&wanted, '.');
-print $MANI $_ for (sort @MANI);
+find( \&wanted, '.' );
+print $MANI $_ for ( sort @MANI );
 
 my $svnignore = `svn propget svn:ignore @dirs`;
 my %ignore;
@@ -125,52 +125,51 @@ foreach (@ignore) {
     }
 }
 
-foreach my $dir (sort keys %ignore) {
+foreach my $dir ( sort keys %ignore ) {
     print $SKIP "# generated from svn:ignore of '$dir/'\n";
-    foreach (sort split /\n/, $ignore{$dir}) {
-        s/\./\\./g; s/\*/.*/g;
-        print $SKIP
-            $dir ne '.' ?
-            "^$dir/$_\$\n^$dir/$_/\n" :
-            "^$_\$\n^$_/\n";
+    foreach ( sort split /\n/, $ignore{$dir} ) {
+        s/\./\\./g;
+        s/\*/.*/g;
+        print $SKIP $dir ne '.'
+            ? "^$dir/$_\$\n^$dir/$_/\n"
+            : "^$_\$\n^$_/\n";
     }
 }
-
 
 sub wanted {
 
     return if $File::Find::name =~ m[/\.svn|blib|debian];
 
-    # This is currently the only ignored directory    
+    # This is currently the only ignored directory
     return if $File::Find::name =~ m{runtime.parrot.library.PAST};
 
     $File::Find::name =~ s[^\./][];
     -d and push @dirs, $File::Find::name;
     -f and -e ".svn/text-base/$_.svn-base" and MANIFEST();
 
-    return; # ignored
+    return;    # ignored
 }
 
 sub MANIFEST {
     my $loc = '[]';
     for ($File::Find::name) {
         $loc =
-        exists($special{$_}) ? $special{$_} :
-        !m[/]             ? '[]' :
-        m[^LICENSES/]     ? '[main]doc' :
-        m[^docs/]         ? '[main]doc' :
-        m[^editor/]       ? '[devel]' :
-        m[^examples/]     ? '[main]doc' :
-        m[^include/]      ? '[main]include' :
-        (m[^languages/(\w+)/] and $1 ne 'conversion') ? "[$1]" :
-        m[^lib/]          ? '[devel]' :
-        m[^runtime/]      ? '[library]' :
-        m[^tools/docs/]   ? '[devel]' :
-        m[^tools/dev/]    ? '[devel]' :
-        m[^(apps/\w+)/]   ? "[$1]" :
-        '[]';
+              exists( $special{$_} ) ? $special{$_}
+            : !m[/]                  ? '[]'
+            : m[^LICENSES/]          ? '[main]doc'
+            : m[^docs/]              ? '[main]doc'
+            : m[^editor/]            ? '[devel]'
+            : m[^examples/]          ? '[main]doc'
+            : m[^include/]           ? '[main]include'
+            : ( m[^languages/(\w+)/] and $1 ne 'conversion' ) ? "[$1]"
+            : m[^lib/]        ? '[devel]'
+            : m[^runtime/]    ? '[library]'
+            : m[^tools/docs/] ? '[devel]'
+            : m[^tools/dev/]  ? '[devel]'
+            : m[^(apps/\w+)/] ? "[$1]"
+            :                   '[]';
     }
-    push @MANI, sprintf("%- 59s %s\n", $File::Find::name, $loc);
+    push @MANI, sprintf( "%- 59s %s\n", $File::Find::name, $loc );
 
     return;
 }

@@ -32,6 +32,7 @@ my %opt;
 &main;
 
 sub get_fp {
+
     # s. also fingerprint_c.pl
     my $compat_file = 'PBC_COMPAT';
     open IN, '<', $compat_file or die "Can't read $compat_file";
@@ -39,7 +40,7 @@ sub get_fp {
     close IN;
 
     my $len = 10;
-    my $fingerprint = md5 join "\n", grep { ! /^#/ } @lines;
+    my $fingerprint = md5 join "\n", grep { !/^#/ } @lines;
     return substr $fingerprint, 0, $len;
 }
 
@@ -49,17 +50,17 @@ sub get_version {
     my $v = <IN>;
     close IN;
     $v =~ /^(\d+)\.(\d+)/;
-    ($1, $2);
+    ( $1, $2 );
 }
 
 sub update_fp {
     my $fp = get_fp;
-    my ($major, $minor)  = get_version;
+    my ( $major, $minor ) = get_version;
     for my $f (@ARGV) {
         open F, "+<", "$f" or die "Can't open $f: $!";
-        seek F, 2, 0;   # pos 2: major, minor
+        seek F, 2, 0;    # pos 2: major, minor
         print F pack "cc", $major, $minor;
-        seek F, 6, 0;   # pos 6: pad = finger_print
+        seek F, 6, 0;    # pos 6: pad = finger_print
         print F $fp;
         close F;
     }
@@ -73,19 +74,17 @@ sub pbc_info {
         my (@fields) = qw( wordsize byteorder major minor
             intvalsize floattype );
         print "$f\n";
-        for my $i (0..5) {
+        for my $i ( 0 .. 5 ) {
             my $c = substr $header, $i, 1;
             $c = unpack 'c', $c;
-            printf "\t%-12s= %s\n", $fields[$i],$c;
+            printf "\t%-12s= %s\n", $fields[$i], $c;
         }
     }
 }
 
 sub main {
-    my ($result, $upd_fp);
-    $result = GetOptions(
-        "update-fingerprint"     => \$upd_fp,
-    );
+    my ( $result, $upd_fp );
+    $result = GetOptions( "update-fingerprint" => \$upd_fp, );
 
     $upd_fp and do {
         update_fp;

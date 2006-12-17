@@ -53,11 +53,11 @@ while (<F>) {
         die "syntax error in $cflags: line $., $_\n";
     }
 
-    for (;;) {
+    for ( ; ; ) {
         if (s/^([-+])\{(.*?)\}\s*//) {
             next unless $2;
-            my ($sign, $options) = ($1, $2);
-            foreach my $option (split ' ', $options) {
+            my ( $sign, $options ) = ( $1, $2 );
+            foreach my $option ( split ' ', $options ) {
                 push @options, [ $regex, $sign, $option ];
             }
         }
@@ -78,27 +78,29 @@ while (<F>) {
 
 my ($cfile) = grep /\.c$/, @ARGV;
 
-my ($inject_point, $where);
+my ( $inject_point, $where );
 
 foreach (@ARGV) {
-  last if $_ eq '';
-  ++$where;
+    last if $_ eq '';
+    ++$where;
 }
 if ($where) {
-  # Found a "" - remove it
-  splice @ARGV, $where, 1;
-  $inject_point = $where;
-} else {
-  $inject_point = 1;
+
+    # Found a "" - remove it
+    splice @ARGV, $where, 1;
+    $inject_point = $where;
+}
+else {
+    $inject_point = 1;
 }
 
 if ($cfile) {
     foreach my $option (@options) {
-        if ($cfile =~ $option->[0]) {
-            if ($option->[1] eq '+') {
+        if ( $cfile =~ $option->[0] ) {
+            if ( $option->[1] eq '+' ) {
                 splice @ARGV, $inject_point, 0, $option->[2];
             }
-            elsif ($option->[1] eq '-') {
+            elsif ( $option->[1] eq '-' ) {
                 @ARGV = grep { $_ ne $option->[2] } @ARGV;
             }
             else {
@@ -112,7 +114,7 @@ if ($cfile) {
     # print "@ARGV\n";
     print "$cfile\n";
 }
-exit system(@ARGV)/256;
+exit system(@ARGV) / 256;
 
 # Local Variables:
 # mode: cperl
