@@ -23,24 +23,23 @@ use warnings;
 use Data::Dumper;
 
 # declaration of lexicals
-my (%ha, , $i, @k, @nk, $s);
+my ( %ha,, $i, @k, @nk, $s );
 
-# same as @k = qw( A B C D E F G H I J ); 
-for ($i = 0; $i < 10; $i++) {
-    $s = chr(65 + $i);
+# same as @k = qw( A B C D E F G H I J );
+for ( $i = 0 ; $i < 10 ; $i++ ) {
+    $s = chr( 65 + $i );
     push @k, $s;
 }
 
-
 # set up all 5 element permutations of qw( A B C D E F G H I J )
-for my $e (0..3) {
-    for ($i = 0; $i < 10; $i++) {
+for my $e ( 0 .. 3 ) {
+    for ( $i = 0 ; $i < 10 ; $i++ ) {
         for $s (@k) {
-            my $nk = $s . chr(65 + $i);
+            my $nk = $s . chr( 65 + $i );
             push @nk, $nk;
         }
     }
-    @k = @nk;
+    @k  = @nk;
     @nk = ();
 }
 

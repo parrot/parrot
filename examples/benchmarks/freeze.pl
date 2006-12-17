@@ -24,21 +24,21 @@ use Time::HiRes qw( time );
 
 my @a;
 my $s = time();
-for my $i (0..99999) {
+for my $i ( 0 .. 99999 ) {
     push @a, $i;
-};
+}
 my $e = time();
-printf "constr.time %.6f\n", $e-$s;
+printf "constr.time %.6f\n", $e - $s;
 
 $s = time();
-my $image = freeze(\@a);
+my $image = freeze( \@a );
 $e = time();
-printf "freeze time %.6f\n", $e-$s;
+printf "freeze time %.6f\n", $e - $s;
 
 $s = time();
 my @b = @{ thaw $image };
 $e = time();
-printf "  thaw time %.6f\n", $e-$s;
+printf "  thaw time %.6f\n", $e - $s;
 
 #$s = time();
 #my $c = dclone \@a;

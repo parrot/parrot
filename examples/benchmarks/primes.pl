@@ -27,25 +27,25 @@ my $i5;
 my $i6 = 0;
 my $i7;
 printf("N primes up to ");
-printf("%d", $i2);
+printf( "%d", $i2 );
 printf(" is: ");
 
- REDO:
-    $i3 = 2;
+REDO:
+$i3 = 2;
 $i4 = $i1 / 2;
- LOOP:
-    $i5 = $i1 % $i3;
-  if ($i5) {goto OK;}
-  goto NEXT;
- OK:
-  $i3++;
-  if ($i3 <= $i4) {goto LOOP;}
-     $i6++;
-     $i7 = $i1;
- NEXT:
-  $i1++;
-  if ($i1 <= $i2) {goto REDO;}
-  print $i6, "\nlast is: $i7\n";
+LOOP:
+$i5 = $i1 % $i3;
+if ($i5) { goto OK; }
+goto NEXT;
+OK:
+$i3++;
+if ( $i3 <= $i4 ) { goto LOOP; }
+$i6++;
+$i7 = $i1;
+NEXT:
+$i1++;
+if ( $i1 <= $i2 ) { goto REDO; }
+print $i6, "\nlast is: $i7\n";
 
 =head1 SEE ALSO
 
@@ -57,7 +57,6 @@ F<examples/benchmarks/primes2.pasm>,
 F<examples/benchmarks/primes2.py>.
 
 =cut
-
 
 # Local Variables:
 #   mode: cperl

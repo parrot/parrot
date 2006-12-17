@@ -4,23 +4,21 @@ use strict;
 use warnings;
 
 my $big;
-my $string="just another perl hacker";
+my $string = "just another perl hacker";
 
-for (0 .. 99999) {
+for ( 0 .. 99999 ) {
     $big++;
-    my @str=split(//,$string);
-    my $f=shift(@str);
-    push(@str,$f);
-    $string=join('',@str);
+    my @str = split( //, $string );
+    my $f = shift(@str);
+    push( @str, $f );
+    $string = join( '', @str );
 }
 
 print "$big;
 $string
 ";
+
 # ende
-
-
-
 
 # Local Variables:
 #   mode: cperl
