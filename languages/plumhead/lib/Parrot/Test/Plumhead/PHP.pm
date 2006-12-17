@@ -20,17 +20,17 @@ sub get_test_prog {
     my $self = shift;
     my ( $count, $options ) = @_;
 
-    my $lang_fn        = Parrot::Test::per_test( '.php', $count );
+    my $lang_fn = Parrot::Test::per_test( '.php', $count );
     $ENV{SCRIPT_FILENAME} = "languages/$lang_fn";
-    return ( 'php-cgi -q ' );
+    return ('php-cgi -q ');
 }
- 
+
 # never skip the reference implementation
 sub skip_why {
     my $self = shift;
-    my ( $options ) = @_;
+    my ($options) = @_;
 
     return;
 }
- 
+
 1;

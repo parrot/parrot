@@ -20,18 +20,18 @@ sub get_test_prog {
     my $self = shift;
     my ( $count, $options ) = @_;
 
-    my $lang_fn        = Parrot::Test::per_test( '.php', $count );
+    my $lang_fn = Parrot::Test::per_test( '.php', $count );
     my $test_prog_args = $ENV{TEST_PROG_ARGS} || '';
 
-    return ( "./parrot languages/plumhead/plumhead.pbc ${test_prog_args} languages/${lang_fn}" );
+    return ("./parrot languages/plumhead/plumhead.pbc ${test_prog_args} languages/${lang_fn}");
 }
- 
+
 # never skip the reference implementation
 sub skip_why {
     my $self = shift;
-    my ( $options ) = @_;
+    my ($options) = @_;
 
     return;
 }
- 
+
 1;

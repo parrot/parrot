@@ -24,13 +24,13 @@ sub get_test_prog {
 
     return "./parrot languages/plumhead/plumhead.pbc --variant antlr3 languages/${lang_fn}";
 }
- 
+
 # never skip the reference implementation
 sub skip_why {
     my $self = shift;
-    my ( $options ) = @_;
+    my ($options) = @_;
 
     return 'antlr3 variant not implemented yet';
 }
- 
+
 1;
