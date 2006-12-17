@@ -75,9 +75,10 @@ foreach (@files) {
 my $numtests = 0;
 foreach my $f (@test_files) {
     open F, $f;
+
     # for each line in the given files if it's not a comment line
     # or an empty line, the it's a test
-    while(<F>) { $numtests++ unless ( ($_ =~ m/^#/)or($_=~m/^\s*$/) ); }
+    while (<F>) { $numtests++ unless ( ( $_ =~ m/^#/ ) or ( $_ =~ m/^\s*$/ ) ); }
     close F;
 }
 
@@ -93,14 +94,15 @@ foreach my $file (@test_files) {
 
         # skip comment lines
         $_ =~ /^#/ and next;
+
         # skip empty lines
         $_ =~ /^\s*$/ and next;
 
         # split by tabs or 3+ spaces
-        my ($expr, $expect, $description ) = split / *\t\s*|\s{3,}/, $_;
+        my ( $expr, $expect, $description ) = split / *\t\s*|\s{3,}/, $_;
 
         # do some simple checking
-        if ($expr eq '' or $expect eq '' or $description eq '') {
+        if ( $expr eq '' or $expect eq '' or $description eq '' ) {
             warn "$file line $. doesn't match a valid test!";
             next;
         }
@@ -113,29 +115,29 @@ foreach my $file (@test_files) {
         $pir_code =~ s/<<EXPR>>/$expr/g;
 
         # check if we need to skip this test
-        if ($description =~ m/^(SKIP|skip)\s+(.*)/) {
-            SKIP: { 
+        if ( $description =~ m/^(SKIP|skip)\s+(.*)/ ) {
+        SKIP: {
                 skip $2, 1;
-                pir_output_is($pir_code, $expect, $description);
+                pir_output_is( $pir_code, $expect, $description );
             }
             next;
         }
+
         # check if we need to todo this test
-        if ($description =~ m/^(TODO|todo)\s+(.*)/) {
+        if ( $description =~ m/^(TODO|todo)\s+(.*)/ ) {
             my @todo = ();
             push @todo, todo => $2;
-            pir_output_is($pir_code, $expect, $description, @todo);
+            pir_output_is( $pir_code, $expect, $description, @todo );
             next;
         }
 
         # no skip or todo -- run test
-        pir_output_is($pir_code, $expect, $description);
+        pir_output_is( $pir_code, $expect, $description );
     }
 }
 
 # end
 exit;
-
 
 sub abc_template {
     return <<"PIR";
@@ -154,7 +156,6 @@ PIR
 Nuno 'smash' Carvalho  <mestre.smash@gmail.com>
 
 =cut
-
 
 # Local Variables:
 #   mode: cperl
