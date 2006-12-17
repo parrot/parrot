@@ -73,7 +73,7 @@ my $load_perl = <<'END_PASM';
     find_type I28, 'PerlUndef'
 END_PASM
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "size of the array");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "size of the array" );
 
     new P0, I21
     set P0,0
@@ -98,7 +98,7 @@ CODE
 5
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "set/get by index");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "set/get by index" );
     new P0, I21
     set P0[0],3
     set I1,P0[0]
@@ -133,7 +133,7 @@ hey
 42
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "same, but with implicit resizing");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "same, but with implicit resizing" );
     new P0, I21
     set P0[0],3
     set I1,P0[0]
@@ -165,7 +165,7 @@ hey
 42
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "If P");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "If P" );
     new P0,  I21
     if P0, TR
     print "false\n"
@@ -199,7 +199,7 @@ true
 false
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "Negative and Positive array accesses");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "Negative and Positive array accesses" );
     new P0, I21
 
     set I0,P0
@@ -393,7 +393,7 @@ ok 27
 ok 28
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "Bracketed access test suite");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "Bracketed access test suite" );
     new P0,  I21
 
     #
@@ -602,7 +602,7 @@ ok 16
 ok 17
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "PerlArray integer access, two locations");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "PerlArray integer access, two locations" );
     new P0,  I21
 
     set P0[0],37
@@ -638,7 +638,8 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "PerlArray integer/register access, two locations");
+pasm_output_is(
+    $load_perl . <<'CODE', <<'OUTPUT', "PerlArray integer/register access, two locations" );
     new P0,  I21
 
     set I0,0
@@ -676,7 +677,8 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "PerlArray string register/access, two locations");
+pasm_output_is(
+    $load_perl . <<'CODE', <<'OUTPUT', "PerlArray string register/access, two locations" );
     new P0,  I21
 
     set I0,0
@@ -714,7 +716,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "PerlArray string access, two locations");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "PerlArray string access, two locations" );
     new P0,  I21
 
     set P0[0],"foo"
@@ -750,7 +752,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "PerlArray numeric access, two locations");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "PerlArray numeric access, two locations" );
     new P0,  I21
 
     set P0[0],3.100000
@@ -786,7 +788,8 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "PerlArray numeric/register access, two locations");
+pasm_output_is(
+    $load_perl . <<'CODE', <<'OUTPUT', "PerlArray numeric/register access, two locations" );
     new P0,  I21
 
     set I0,0
@@ -824,7 +827,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "Resize negative index");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "Resize negative index" );
     new P0,  I21
     set P0[-1], 55
     set I0, P0[0]
@@ -843,7 +846,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "Testing clone");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "Testing clone" );
     new P0,  I21
     set P0[0], 1
     set P0[1], 2
@@ -885,7 +888,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "Testing multi-level fetch");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "Testing multi-level fetch" );
     new P0,  I21
     new P1,  I21
     set P1[0], "0;0"
@@ -944,7 +947,7 @@ CODE
 1;1
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "push/pop");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "push/pop" );
     new P0,  I21
     new P1, I24
     set P1, 42
@@ -986,7 +989,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "unshift/shift");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "unshift/shift" );
     new P0,  I21
     new P1, I24
     set P1, 42
@@ -1028,7 +1031,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "set intial size");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "set intial size" );
     new P1,  I21
     set P1[0], 0    # size key
     set I1, 100000    # value
@@ -1046,7 +1049,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "splice");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "splice" );
     new P0,  I21
     new P1,  I21
     push P0, 100
@@ -1178,7 +1181,7 @@ ok 6
 ok 7
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "defined");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "defined" );
     new P0,  I21
     defined I0, P0
     print I0
@@ -1213,7 +1216,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "exists");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "exists" );
     new P0,  I21
     set P0, 5
     set P0[0], 1
@@ -1240,7 +1243,7 @@ CODE
 1
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "set_integer_keyed - nested #19328");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "set_integer_keyed - nested #19328" );
     new P0,  I21
     new P1,  I21
     push P1, 9
@@ -1283,8 +1286,7 @@ CODE
 4 3 2 9 0 -
 OUTPUT
 
-
-pasm_output_is($load_perl . <<'CODE', <<OUT, "multikeyed access I arg");
+pasm_output_is( $load_perl . <<'CODE', <<OUT, "multikeyed access I arg" );
     new P0,  I21
     new P1,  I21
     set P0[10], P1
@@ -1309,7 +1311,7 @@ PerlArray
 20202020
 OUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUT, "multikeyed access P arg");
+pasm_output_is( $load_perl . <<'CODE', <<OUT, "multikeyed access P arg" );
     new P0,  I21
     new P1,  I21
     new P3, I24
@@ -1336,8 +1338,7 @@ PerlArray
 20202020
 OUT
 
-
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "Fetching undefined values (no warnings)");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "Fetching undefined values (no warnings)" );
 @{[ $fp_equality_macro ]}
     warningsoff 1
     new P0,  I21
@@ -1366,7 +1367,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_like($load_perl . <<"CODE", <<'OUTPUT', "Fetching undefined values (with warnings)");
+pasm_output_like( $load_perl . <<"CODE", <<'OUTPUT', "Fetching undefined values (with warnings)" );
 @{[ $fp_equality_macro ]}
     warningson 1
     new P0,  I21
@@ -1404,7 +1405,7 @@ ok 4
 $/
 OUTPUT
 
-pir_output_is( <<"CODE", <<'OUTPUT', "check whether interface is done");
+pir_output_is( <<"CODE", <<'OUTPUT', "check whether interface is done" );
 .sub _main :main
     $load_perl
 
@@ -1428,7 +1429,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<'OUTPUT', "Keyed access");
+pasm_output_is( $load_perl . <<"CODE", <<'OUTPUT', "Keyed access" );
 @{[ $fp_equality_macro ]}
     new P0,  I21
     new P1, .Key
@@ -1460,7 +1461,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "freeze/thaw a PerlArray");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "freeze/thaw a PerlArray" );
     new P0,  I21
     new P1, .Integer
     set P1, 666
@@ -1490,7 +1491,7 @@ PerlArray 2
 777
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "freeze PerlArray self-ref");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "freeze PerlArray self-ref" );
     new P0,  I21
     new P1, .Integer
     set P1, 666
@@ -1503,7 +1504,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "freeze/thaw PerlArray self-ref");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "freeze/thaw PerlArray self-ref" );
     new P1, .Integer
     set P1, 666
     new P0,  I21
@@ -1539,7 +1540,8 @@ PerlArray 3
 666
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "freeze/thaw PerlArray self-ref, contained Arrray");
+pasm_output_is(
+    $load_perl . <<'CODE', <<'OUTPUT', "freeze/thaw PerlArray self-ref, contained Arrray" );
     new P1, .Integer
     set P1, 666
     new P0,  I21
@@ -1591,7 +1593,6 @@ PerlArray 4
 666
 777
 OUTPUT
-
 
 1;
 

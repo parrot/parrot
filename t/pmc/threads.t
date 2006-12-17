@@ -23,7 +23,7 @@ platform.
 
 =cut
 
-my %platforms = map {$_=>1} qw/
+my %platforms = map { $_ => 1 } qw/
     aix
     cygwin
     darwin
@@ -35,26 +35,26 @@ my %platforms = map {$_=>1} qw/
     openbsd
     solaris
     MSWin32
-/;
+    /;
 
-if ($^O eq "cygwin" ) {
+if ( $^O eq "cygwin" ) {
     my @uname = split / /, qx'uname -v';
 
-    if ($uname[0] eq "2004-09-04" ) {
-    plan skip_all => "This cygwin version is known to fail the thread tests";
-    exit;
+    if ( $uname[0] eq "2004-09-04" ) {
+        plan skip_all => "This cygwin version is known to fail the thread tests";
+        exit;
     }
 }
-if ($platforms{$^O}) {
-   plan tests => 20;
+if ( $platforms{$^O} ) {
+    plan tests => 20;
 }
 else {
-   plan skip_all => "No threading yet or test not enabled for '$^O'";
-   # plan skip_all => "Needs COPY for argument passing";
+    plan skip_all => "No threading yet or test not enabled for '$^O'";
+
+    # plan skip_all => "Needs COPY for argument passing";
 }
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "interp identity");
+pasm_output_is( <<'CODE', <<'OUTPUT', "interp identity" );
     getinterp P2
     clone P3, P2
     ne P3, P2, ok1
@@ -77,7 +77,7 @@ OUTPUT
 SKIP: {
     skip 'busted on win32' => 2 if $^O eq 'MSWin32';
 
-pir_output_is(<<'CODE', <<'OUTPUT', "thread type 1");
+    pir_output_is( <<'CODE', <<'OUTPUT', "thread type 1" );
 .sub main :main
     .local pmc threadfunc
     .local pmc thread
@@ -112,7 +112,7 @@ thread
 main 10
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "thread type 1 -- repeated");
+    pir_output_is( <<'CODE', <<'OUTPUT', "thread type 1 -- repeated" );
 .sub real_main :main
     $I0 = 0
 loop:
@@ -158,7 +158,7 @@ main 10
 OUTPUT
 }
 
-pir_output_is(<<'CODE', <<'OUTPUT', "thread type 2");
+pir_output_is( <<'CODE', <<'OUTPUT', "thread type 2" );
 .sub main :main
     set I5, 10
     .local pmc thread
@@ -201,7 +201,7 @@ ParrotThread tid 1
 from 10 interp
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'thread - kill');
+pir_output_is( <<'CODE', <<'OUTPUT', 'thread - kill' );
 .sub main :main
     .local pmc threadsub
     .local pmc thread
@@ -233,9 +233,8 @@ start 1
 in thread
 done
 OUTPUT
-    
 
-pir_output_is(<<'CODE', <<'OUTPUT', "join, get retval");
+pir_output_is( <<'CODE', <<'OUTPUT', "join, get retval" );
 .sub _main
     .const int MAX = 1000
     .sym pmc kid
@@ -287,8 +286,8 @@ CODE
 OUTPUT
 
 SKIP: {
-    skip("detatch broken on $^O", 1) if ($^O =~ /MSWin32/);
-pir_output_like(<<'CODE', <<'OUTPUT', "detach");
+    skip( "detatch broken on $^O", 1 ) if ( $^O =~ /MSWin32/ );
+    pir_output_like( <<'CODE', <<'OUTPUT', "detach" );
 .sub main :main
     .local pmc foo
     .local pmc queue
@@ -317,7 +316,7 @@ CODE
 OUTPUT
 }
 
-pir_output_is(<<'CODE', <<'OUTPUT', "share a PMC");
+pir_output_is( <<'CODE', <<'OUTPUT', "share a PMC" );
 .sub main :main
     .local pmc foo
     foo = global "_foo"
@@ -353,7 +352,7 @@ done
 21
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUT', "multi-threaded");
+pir_output_is( <<'CODE', <<'OUT', "multi-threaded" );
 .sub main :main
     .local pmc queue
     queue = new TQueue
@@ -401,7 +400,7 @@ done thread
 done main
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "sub name lookup in new thread");
+pir_output_is( <<'CODE', <<'OUT', "sub name lookup in new thread" );
 .sub check
     $P0 = find_global 'Foo', 'foo'
     $I0 = isa $P0, 'Sub'
@@ -434,7 +433,7 @@ ok
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "CLONE_CODE only");
+pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE only" );
 
 .namespace [ 'Test2' ]
 .sub test2
@@ -493,7 +492,7 @@ ok 4
 ok 5
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_GLOBALS");
+pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_GLOBALS" );
 
 .namespace [ 'Foo' ]
 .sub 'is'
@@ -575,8 +574,7 @@ ok beta2
 ok beta3
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass not built-in");
+pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass not built-in" );
 .namespace [ 'Foo' ]
 
 .sub foometh :method
@@ -661,7 +659,7 @@ Foo? 1
 Bar? 1
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass built-in");
+pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass built-in" );
 .namespace [ 'Foo' ]
 
 .sub foometh :method
@@ -747,7 +745,7 @@ Foo? 1
 Bar? 1
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_GLOBALS| CLONE_HLL");
+pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_GLOBALS| CLONE_HLL" );
 .HLL 'Test', ''
 .sub setup 
     $P0 = new .Integer
@@ -806,7 +804,7 @@ ok 1
 ok 2
 OUTPUT
 
-pir_output_unlike(<<'CODE', qr/not/, "globals + constant table subs issue");
+pir_output_unlike( <<'CODE', qr/not/, "globals + constant table subs issue" );
 .namespace [ 'Foo' ]
 
 .include 'interpinfo.pasm'
@@ -937,7 +935,7 @@ okay:
 .end
 CODE
 
-pir_output_is(<<'CODE', <<'OUTPUT', "CLONE_CODE|CLONE_GLOBALS|CLONE_HLL|CLONE_LIBRARIES");
+pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE|CLONE_GLOBALS|CLONE_HLL|CLONE_LIBRARIES" );
 .HLL 'Perl', 'perl_group'
 
 .include 'interpinfo.pasm'
@@ -1009,7 +1007,7 @@ ok (equal)
 42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUT', 'multi-threaded strings via SharedRef');
+pir_output_is( <<'CODE', <<'OUT', 'multi-threaded strings via SharedRef' );
 .sub main :main
     .local pmc queue
     .local pmc tmp_string
@@ -1063,8 +1061,8 @@ done main
 OUT
 
 SKIP: {
-skip("no shared Strings yet", 2);
-pasm_output_is(<<'CODE', <<'OUT', "thread safe queue strings 1");
+    skip( "no shared Strings yet", 2 );
+    pasm_output_is( <<'CODE', <<'OUT', "thread safe queue strings 1" );
     new P10, .TQueue
     print "ok 1\n"
     set I0, P10
@@ -1093,7 +1091,7 @@ ok 2
 ok 3
 OUT
 
-pasm_output_is(<<'CODE', <<'OUT', "multi-threaded strings");
+    pasm_output_is( <<'CODE', <<'OUT', "multi-threaded strings" );
     new P10, .TQueue
     new P7, .String
     set P7, "ok 1\n"

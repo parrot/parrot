@@ -8,7 +8,6 @@ use lib qw( t . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 1;
 
-
 =head1 NAME
 
 t/library/pge-hs.t - Grammar Engine Haskell Output tests
@@ -19,9 +18,8 @@ t/library/pge-hs.t - Grammar Engine Haskell Output tests
 
 =cut
 
-
 # 1
-pir_output_is(<<'CODE', <<'OUT', "PGE::Hs match");
+pir_output_is( <<'CODE', <<'OUT', "PGE::Hs match" );
 .sub _main
     .local pmc match, add_rule
     .local string result
@@ -43,5 +41,4 @@ OK:
 CODE
 ok 1
 OUT
-
 

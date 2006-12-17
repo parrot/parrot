@@ -10,7 +10,6 @@ use Test::More;
 use Parrot::Test tests => 160;
 use Parrot::Config;
 
-
 =head1 NAME
 
 t/op/string.t - Parrot Strings
@@ -24,7 +23,6 @@ t/op/string.t - Parrot Strings
 Tests Parrot string registers and operations.
 
 =cut
-
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'set_s_s|sc' );
 	set	S4, "JAPH\n"
@@ -118,7 +116,7 @@ japh
 JAPH
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', 'chopn, OOB values');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'chopn, OOB values' );
 	set	S1, "A string of length 21"
 	chopn	S1, 0
 	print	S1
@@ -141,7 +139,7 @@ A st
 ** nothing **
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', 'Three argument chopn');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'Three argument chopn' );
 	set	S1, "Parrot"
 
 	chopn	S2, S1, 0
@@ -196,7 +194,7 @@ Parrot
 Par
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', 'Three argument chopn, OOB values');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'Three argument chopn, OOB values' );
 	set	S1, "Parrot"
 
 	chopn	S2, S1, 7
@@ -246,7 +244,7 @@ JAPHJAPHJAPHJAPHJAPHJAPHJAPHJAPH
 OUTPUT
 
 # negative offsets
-pasm_output_is(<<'CODE', <<'OUTPUT', 'neg substr offset');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'neg substr offset' );
 	set	S0, "A string of length 21"
 	set I0, -9
 	set I1, 6
@@ -262,7 +260,7 @@ length
 OUTPUT
 
 # This asks for substring it shouldn't be allowed...
-pasm_output_is(<<'CODE', <<'OUTPUT', 'substr OOB');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'substr OOB' );
 	set	S0, "A string of length 21"
 	set I0, -99
 	set I1, 6
@@ -273,7 +271,7 @@ Cannot take substr outside string
 OUTPUT
 
 # This asks for substring it shouldn't be allowed...
-pasm_output_is(<<'CODE', <<'OUTPUT', 'substr OOB');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'substr OOB' );
 	set S0, "A string of length 21"
 	set I0, 99
 	set I1, 6
@@ -284,7 +282,7 @@ Cannot take substr outside string
 OUTPUT
 
 # This asks for substring much greater than length of original string
-pasm_output_is(<<'CODE', <<'OUTPUT', 'len>strlen');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'len>strlen' );
 	set	S0, "A string of length 21"
 	set I0, 12
 	set I1, 1000
@@ -300,7 +298,7 @@ length 21
 OUTPUT
 
 # The same, with a negative offset
-pasm_output_is(<<'CODE', <<'OUTPUT', 'len>strlen, -ve os');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'len>strlen, -ve os' );
 	set	S0, "A string of length 21"
 	set I0, -9
 	set I1, 1000
@@ -648,7 +646,7 @@ pasm_output_is( <<'CODE', '<><', 'concat_s_s|sc, null onto null' );
  end
 CODE
 
-pasm_output_is(<<'CODE', <<'OUTPUT', 'concat_s_sc, repeated two-arg concats' );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'concat_s_sc, repeated two-arg concats' );
   set S12, ""
   set I0, 0
 WHILE:
@@ -661,7 +659,6 @@ WHILE:
 CODE
 hihihihihihihihihihi
 OUTPUT
-
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'concat_s_s|sc, "foo1" onto null' );
  concat S0, "foo1"
@@ -725,8 +722,7 @@ CODE
 JAPH
 OUTPUT
 
-
-pasm_output_is(<<"CODE", <<'OUTPUT', 'clears');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'clears' );
 @{[ set_str_regs( sub {"BOO $_[0]\\n"} ) ]}
 	clears
 @{[ print_str_regs() ]}
@@ -737,20 +733,12 @@ done
 OUTPUT
 
 my @strings = (
-  "hello", "hello",
-  "hello", "world",
-  "world", "hello",
-  "hello", "hellooo",
-  "hellooo", "hello",
-  "hello", "hella",
-  "hella", "hello",
-  "hella", "hellooo",
-  "hellooo", "hella",
-  "hElLo", "HeLlO",
-  "hElLo", "hElLo"
+    "hello",   "hello", "hello", "world", "world", "hello", "hello", "hellooo",
+    "hellooo", "hello", "hello", "hella", "hella", "hello", "hella", "hellooo",
+    "hellooo", "hella", "hElLo", "HeLlO", "hElLo", "hElLo"
 );
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'eq_s_s_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'eq_s_s_ic' );
 @{[ compare_strings( 0, "eq", @strings ) ]}
     print "ok\\n"
     end
@@ -761,7 +749,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'eq_sc_s_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'eq_sc_s_ic' );
 @{[ compare_strings( 1, "eq", @strings ) ]}
     print "ok\\n"
     end
@@ -772,7 +760,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'eq_s_sc_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'eq_s_sc_ic' );
 @{[ compare_strings( 2, "eq", @strings ) ]}
     print "ok\\n"
     end
@@ -783,7 +771,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'eq_sc_sc_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'eq_sc_sc_ic' );
 @{[ compare_strings( 3, "eq", @strings ) ]}
     print "ok\\n"
     end
@@ -794,7 +782,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'ne_s_s_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'ne_s_s_ic' );
 @{[ compare_strings( 0, "ne", @strings ) ]}
     print "ok\\n"
     end
@@ -805,7 +793,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'ne_sc_s_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'ne_sc_s_ic' );
 @{[ compare_strings( 1, "ne", @strings ) ]}
     print "ok\\n"
     end
@@ -816,7 +804,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'ne_s_sc_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'ne_s_sc_ic' );
 @{[ compare_strings( 2, "ne", @strings ) ]}
     print "ok\\n"
     end
@@ -827,7 +815,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'ne_sc_sc_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'ne_sc_sc_ic' );
 @{[ compare_strings( 3, "ne", @strings ) ]}
     print "ok\\n"
     end
@@ -838,7 +826,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'lt_s_s_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'lt_s_s_ic' );
 @{[ compare_strings( 0, "lt", @strings ) ]}
     print "ok\\n"
     end
@@ -849,7 +837,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'lt_sc_s_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'lt_sc_s_ic' );
 @{[ compare_strings( 1, "lt", @strings ) ]}
     print "ok\\n"
     end
@@ -860,7 +848,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'lt_s_sc_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'lt_s_sc_ic' );
 @{[ compare_strings( 2, "lt", @strings ) ]}
     print "ok\\n"
     end
@@ -871,7 +859,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'lt_sc_sc_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'lt_sc_sc_ic' );
 @{[ compare_strings( 3, "lt", @strings ) ]}
     print "ok\\n"
     end
@@ -882,7 +870,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'le_s_s_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'le_s_s_ic' );
 @{[ compare_strings( 0, "le", @strings ) ]}
     print "ok\\n"
     end
@@ -893,7 +881,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'le_sc_s_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'le_sc_s_ic' );
 @{[ compare_strings( 1, "le", @strings ) ]}
     print "ok\\n"
     end
@@ -904,7 +892,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'le_s_sc_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'le_s_sc_ic' );
 @{[ compare_strings( 2, "le", @strings ) ]}
     print "ok\\n"
     end
@@ -915,7 +903,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'le_sc_sc_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'le_sc_sc_ic' );
 @{[ compare_strings( 3, "le", @strings ) ]}
     print "ok\\n"
     end
@@ -926,7 +914,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'gt_s_s_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'gt_s_s_ic' );
 @{[ compare_strings( 0, "gt", @strings ) ]}
     print "ok\\n"
     end
@@ -937,7 +925,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'gt_sc_s_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'gt_sc_s_ic' );
 @{[ compare_strings( 1, "gt", @strings ) ]}
     print "ok\\n"
     end
@@ -948,7 +936,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'gt_s_sc_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'gt_s_sc_ic' );
 @{[ compare_strings( 2, "gt", @strings ) ]}
     print "ok\\n"
     end
@@ -959,7 +947,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'gt_sc_sc_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'gt_sc_sc_ic' );
 @{[ compare_strings( 3, "gt", @strings ) ]}
     print "ok\\n"
     end
@@ -970,7 +958,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'ge_s_s_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'ge_s_s_ic' );
 @{[ compare_strings( 0, "ge", @strings ) ]}
     print "ok\\n"
     end
@@ -981,7 +969,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'ge_sc_s_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'ge_sc_s_ic' );
 @{[ compare_strings( 1, "ge", @strings ) ]}
     print "ok\\n"
     end
@@ -992,7 +980,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'ge_s_sc_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'ge_s_sc_ic' );
 @{[ compare_strings( 2, "ge", @strings ) ]}
     print "ok\\n"
     end
@@ -1003,7 +991,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', 'ge_sc_sc_ic');
+pasm_output_is( <<"CODE", <<'OUTPUT', 'ge_sc_sc_ic' );
 @{[ compare_strings( 3, "ge", @strings ) ]}
     print "ok\\n"
     end
@@ -1014,7 +1002,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', 'same constant twice bug');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'same constant twice bug' );
        set     S0, ""
        set     S1, ""
        set     S2, "foo"
@@ -1027,7 +1015,7 @@ CODE
 foo
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT','2-param ord, empty string');
+pasm_output_is( <<'CODE', <<'OUTPUT', '2-param ord, empty string' );
 	ord I0,""
 	print I0
 	end
@@ -1035,7 +1023,7 @@ CODE
 Cannot get character of empty string
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT','2-param ord, empty string register');
+pasm_output_is( <<'CODE', <<'OUTPUT', '2-param ord, empty string register' );
 	ord I0,S0
 	print I0
 	end
@@ -1043,7 +1031,7 @@ CODE
 Cannot get character of empty string
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT','3-param ord, empty string');
+pasm_output_is( <<'CODE', <<'OUTPUT', '3-param ord, empty string' );
 	ord I0,"",0
 	print I0
 	end
@@ -1051,7 +1039,7 @@ CODE
 Cannot get character of empty string
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT','3-param ord, empty string register');
+pasm_output_is( <<'CODE', <<'OUTPUT', '3-param ord, empty string register' );
 	ord I0,S0,0
 	print I0
 	end
@@ -1059,52 +1047,52 @@ CODE
 Cannot get character of empty string
 OUTPUT
 
-pasm_output_is(<<'CODE',ord('a'),'2-param ord, one-character string');
+pasm_output_is( <<'CODE', ord('a'), '2-param ord, one-character string' );
 	ord I0,"a"
 	print I0
 	end
 CODE
 
-pasm_output_is(<<'CODE',ord('a'),'2-param ord, multi-character string');
+pasm_output_is( <<'CODE', ord('a'), '2-param ord, multi-character string' );
 	ord I0,"abc"
 	print I0
 	end
 CODE
 
-pasm_output_is(<<'CODE',ord('a'),'2-param ord, one-character string register');
+pasm_output_is( <<'CODE', ord('a'), '2-param ord, one-character string register' );
 	set S0,"a"
 	ord I0,S0
 	print I0
 	end
 CODE
 
-pasm_output_is(<<'CODE',ord('a'),'3-param ord, one-character string');
+pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string' );
 	ord I0,"a",0
 	print I0
 	end
 CODE
 
-pasm_output_is(<<'CODE',ord('a'),'3-param ord, one-character string register');
+pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string register' );
 	set S0,"a"
 	ord I0,S0,0
 	print I0
 	end
 CODE
 
-pasm_output_is(<<'CODE',ord('b'),'3-param ord, multi-character string');
+pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string' );
 	ord I0,"ab",1
 	print I0
 	end
 CODE
 
-pasm_output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register');
+pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string register' );
 	set S0,"ab"
 	ord I0,S0,1
 	print I0
 	end
 CODE
 
-pasm_output_is(<<'CODE', <<'OUTPUT','3-param ord, multi-character string');
+pasm_output_is( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string' );
 	ord I0,"ab",2
 	print I0
 	end
@@ -1112,7 +1100,7 @@ CODE
 Cannot get character past end of string
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT','3-param ord, multi-character string');
+pasm_output_is( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string' );
 	set S0,"ab"
 	ord I0,S0,2
 	print I0
@@ -1121,33 +1109,34 @@ CODE
 Cannot get character past end of string
 OUTPUT
 
-pasm_output_is(<<'CODE',ord('a'),'3-param ord, one-character string, from end');
+pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string, from end' );
 	ord I0,"a",-1
 	print I0
 	end
 CODE
 
-pasm_output_is(<<'CODE',ord('a'),'3-param ord, one-character string register, from end');
+pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string register, from end' );
 	set S0,"a"
 	ord I0,S0,-1
 	print I0
 	end
 CODE
 
-pasm_output_is(<<'CODE',ord('b'),'3-param ord, multi-character string, from end');
+pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string, from end' );
 	ord I0,"ab",-1
 	print I0
 	end
 CODE
 
-pasm_output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register, from end');
+pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string register, from end' );
 	set S0,"ab"
 	ord I0,S0,-1
 	print I0
 	end
 CODE
 
-pasm_output_is(<<'CODE',<<'OUTPUT','3-param ord, multi-character string register, from end, OOB');
+pasm_output_is(
+    <<'CODE', <<'OUTPUT', '3-param ord, multi-character string register, from end, OOB' );
 	set S0,"ab"
 	ord I0,S0,-3
 	print I0
@@ -1156,25 +1145,25 @@ CODE
 Cannot get character before beginning of string
 OUTPUT
 
-pasm_output_is(<<'CODE',chr(32),'chr of 32 is space in ASCII');
+pasm_output_is( <<'CODE', chr(32), 'chr of 32 is space in ASCII' );
         chr S0, 32
         print S0
         end
 CODE
 
-pasm_output_is(<<'CODE',chr(65),'chr of 65 is A in ASCII');
+pasm_output_is( <<'CODE', chr(65), 'chr of 65 is A in ASCII' );
         chr S0, 65
         print S0
         end
 CODE
 
-pasm_output_is(<<'CODE',chr(122),'chr of 122 is z in ASCII');
+pasm_output_is( <<'CODE', chr(122), 'chr of 122 is z in ASCII' );
         chr S0, 122
         print S0
 	end
 CODE
 
-pasm_output_is(<<'CODE', <<'OUTPUT', 'if_s_ic');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'if_s_ic' );
 	set	S0, "I've told you once, I've told you twice..."
 	if	S0, OK1
 	print	"not "
@@ -1243,7 +1232,7 @@ ok 9
 ok 10
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', 'repeat_s_s|sc_i|ic');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'repeat_s_s|sc_i|ic' );
 	set S0, "x"
 
 	repeat S1, S0, 12
@@ -1285,12 +1274,12 @@ XXXXXXXXXXXX
 >< done
 OUTPUT
 
-pasm_output_is(<<'CODE',"Cannot repeat with negative arg\n",'repeat OOB');
+pasm_output_is( <<'CODE', "Cannot repeat with negative arg\n", 'repeat OOB' );
 	repeat S0, "japh", -1
 	end
 CODE
 
-pasm_output_is(<<'CODE',<<'OUTPUT','index, 3-arg form');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'index, 3-arg form' );
       set S0, "Parrot"
       set S1, "Par"
       index I1, S0, S1
@@ -1314,7 +1303,7 @@ CODE
 -1
 OUTPUT
 
-pasm_output_is(<<'CODE',<<'OUTPUT','index, 4-arg form');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'index, 4-arg form' );
       set S0, "Barbarian"
       set S1, "ar"
       index I1, S0, S1, 0
@@ -1337,7 +1326,7 @@ CODE
 -1
 OUTPUT
 
-pasm_output_is(<<'CODE',<<'OUTPUT','index, 4-arg form, bug 22718');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'index, 4-arg form, bug 22718' );
 	set S1, "This is not quite right"
 	set S0, " is "
 	index I0, S1, S0, 0
@@ -1351,7 +1340,7 @@ CODE
 42
 OUTPUT
 
-pasm_output_is(<<'CODE',<<'OUTPUT','index, null strings');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'index, null strings' );
       set S0, "Parrot"
       set S1, ""
       index I1, S0, S1
@@ -1403,7 +1392,7 @@ CODE
 -1
 OUTPUT
 
-pasm_output_is(<<'CODE',<<'OUTPUT','index, embedded nulls');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'index, embedded nulls' );
       set S0, "Par\0\0rot"
       set S1, "\0"
       index I1, S0, S1
@@ -1420,7 +1409,7 @@ CODE
 4
 OUTPUT
 
-pasm_output_is(<<'CODE',<<'OUTPUT','index, big strings');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'index, big strings' );
       set S0, "a"
       repeat S0, S0, 10000
       set S1, "a"
@@ -1444,7 +1433,7 @@ CODE
 -1
 OUTPUT
 
-pasm_output_is(<<'CODE',<<'OUTPUT','index, big, hard to match strings');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'index, big, hard to match strings' );
 # Builds a 24th iteration fibonacci string (approx. 100K)
       set S1, "a"
       set S2, "b"
@@ -1469,7 +1458,7 @@ CODE
 -1
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT','index with different charsets');
+pir_output_is( << 'CODE', << 'OUTPUT', 'index with different charsets' );
 
 .sub test :main
 
@@ -1522,7 +1511,7 @@ binary - binary:
 -1
 OUTPUT
 
-pasm_output_is(<<'CODE',<<'OUTPUT','negative index #35959');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'negative index #35959' );
     index I1, "u", "t", -123456
     print I1
     print "\n"
@@ -1536,8 +1525,8 @@ CODE
 OUTPUT
 
 SKIP: {
-skip("Pending rework of creating non-ascii literals",2);
-pasm_output_is(<<'CODE',<<'OUTPUT','index, multibyte matching');
+    skip( "Pending rework of creating non-ascii literals", 2 );
+    pasm_output_is( <<'CODE', <<'OUTPUT', 'index, multibyte matching' );
     set S0, "\xAB"
     find_chartype I0, "8859-1"
     set_chartype S0, I0
@@ -1566,7 +1555,7 @@ equal
 0
 OUTPUT
 
-pasm_output_is(<<'CODE',<<'OUTPUT','index, multibyte matching 2');
+    pasm_output_is( <<'CODE', <<'OUTPUT', 'index, multibyte matching 2' );
     set S0, "\xAB\xBA"
     set S1, "foo\xAB\xAB\xBAbar"
     find_chartype I0, "8859-1"
@@ -1591,7 +1580,7 @@ CODE
 OUTPUT
 }
 
-pasm_output_is(<<'CODE',<<'OUTPUT','num to string');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'num to string' );
     set N0, 80.43
     set S0, N0
     print S0
@@ -1607,7 +1596,7 @@ CODE
 -1.11111
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', 'string to int');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'string to int' );
 	set	S0, "123"
 	set	I0, S0
 	print	I0
@@ -1641,7 +1630,6 @@ CODE
 0
 0
 OUTPUT
-
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'concat/substr (COW)' );
 	set S0, "<JA"
@@ -1756,7 +1744,7 @@ CODE
 It's all good
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', 'sprintf');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'sprintf' );
     branch MAIN
 
 NEWARYP:
@@ -1900,7 +1888,7 @@ Hello, Hello, Pa!
 That's all, folks!
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', 'other form of sprintf op');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'other form of sprintf op' );
     branch MAIN
 
 PRINTF:
@@ -1929,7 +1917,7 @@ CODE
 128 is 200
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'sprintf - left justify');
+pir_output_is( <<'CODE', <<'OUTPUT', 'sprintf - left justify' );
 .sub main :main
   $P0 = new .ResizablePMCArray
   $P1 = new .Integer
@@ -1949,8 +1937,9 @@ CODE
 foo        - bar
 OUTPUT
 
-{ my $output = substr(('f' x ($PConfig{intvalsize} * 2)) . (' ' x 20), 0, 20);
-pir_output_is(<<'CODE', $output, 'Correct precision for %x'); }
+{
+    my $output = substr( ( 'f' x ( $PConfig{intvalsize} * 2 ) ) . ( ' ' x 20 ), 0, 20 );
+    pir_output_is( <<'CODE', $output, 'Correct precision for %x' ); }
 .sub main :main
   $P0 = new .ResizablePMCArray
   $P0[0] = -1
@@ -1960,7 +1949,7 @@ pir_output_is(<<'CODE', $output, 'Correct precision for %x'); }
 .end
 CODE
 
-pasm_output_is(<<'CODE', <<'OUTPUT', 'exchange');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'exchange' );
     set S0, "String #0\n"
     set S1, "String #1\n"
     exchange S0, S1
@@ -1979,8 +1968,8 @@ String #2
 OUTPUT
 
 SKIP: {
-skip("Peding reimplementation of find_encoding", 1);
-pasm_output_is(<<'CODE', <<'OUTPUT', 'find_encoding');
+    skip( "Peding reimplementation of find_encoding", 1 );
+    pasm_output_is( <<'CODE', <<'OUTPUT', 'find_encoding' );
       find_encoding I0, "singlebyte"
       print I0
       print "\n"
@@ -2003,8 +1992,8 @@ OUTPUT
 }
 
 SKIP: {
-skip("no more visible encoding", 1);
-pasm_output_is(<<'CODE', <<'OUTPUT', 'string_encoding');
+    skip( "no more visible encoding", 1 );
+    pasm_output_is( <<'CODE', <<'OUTPUT', 'string_encoding' );
       set I0, 0
       new S0, 0, I0
       string_encoding I1, S0
@@ -2103,7 +2092,7 @@ Parrot
 Parrot
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bands NULL string');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bands NULL string' );
 	null S1
 	set S2, "abc"
 	bands S1, S2
@@ -2137,7 +2126,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bands 2');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bands 2' );
 	set S1, "abc"
 	set S2, "EE"
 	bands S1, S2
@@ -2151,7 +2140,7 @@ A@
 EE
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bands 3');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bands 3' );
 	set S1, "abc"
 	set S2, "EE"
 	bands S0, S1, S2
@@ -2168,7 +2157,7 @@ abc
 EE
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bands COW');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bands COW' );
   set S1, "foo"
   substr S2, S1, 0, 3
   bands S1, "bar"
@@ -2179,7 +2168,7 @@ CODE
 foo
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bors NULL string');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bors NULL string' );
      null S1
      null S2
      bors S1, S2
@@ -2253,7 +2242,7 @@ ok 9
 ok 10
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bors 2');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bors 2' );
 	set S1, "abc"
 	set S2, "EE"
 	bors S1, S2
@@ -2267,7 +2256,7 @@ egc
 EE
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bors 3');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bors 3' );
 	set S1, "abc"
 	set S2, "EE"
 	bors S0, S1, S2
@@ -2284,7 +2273,7 @@ abc
 EE
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bors COW');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bors COW' );
   set S1, "foo"
   substr S2, S1, 0, 3
   bors S1, "bar"
@@ -2295,7 +2284,7 @@ CODE
 foo
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors NULL string');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors NULL string' );
      null S1
      null S2
      bxors S1, S2
@@ -2369,7 +2358,7 @@ ok 9
 ok 10
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors 2');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors 2' );
  set S1, "a2c"
  set S2, "Dw"
  bxors S1, S2
@@ -2392,7 +2381,7 @@ ABCX
    X
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors 3');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors 3' );
  set S1, "a2c"
  set S2, "Dw"
  bxors S0, S1, S2
@@ -2421,7 +2410,7 @@ abc
    Y
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors COW');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors COW' );
   set S1, "foo"
   substr S2, S1, 0, 3
   bxors S1, "bar"
@@ -2432,7 +2421,7 @@ CODE
 foo
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bnots NULL string');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bnots NULL string' );
      null S1
      null S2
      bnots S1, S2
@@ -2460,8 +2449,8 @@ ok 3
 OUTPUT
 
 SKIP: {
-skip("No unicode yet", 1);
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bnots 2');
+    skip( "No unicode yet", 1 );
+    pasm_output_is( <<'CODE', <<'OUTPUT', 'bnots 2' );
  getstdout P0
  push P0, "utf8"
  set S1, "a2c"
@@ -2485,7 +2474,7 @@ a2c
 OUTPUT
 }
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bnots COW');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bnots COW' );
   set S1, "foo"
   substr S2, S1, 0, 3
   bnots S1, S1
@@ -2497,8 +2486,8 @@ foo
 OUTPUT
 
 SKIP: {
-skip("no more transcode", 1);
-pasm_output_is( <<'CODE', <<'OUTPUT', 'transcode to utf8');
+    skip( "no more transcode", 1 );
+    pasm_output_is( <<'CODE', <<'OUTPUT', 'transcode to utf8' );
   set S1, "ASCII is the same as UTF8\n"
   find_encoding I1, "utf8"
   transcode S2, S1, I1
@@ -2512,8 +2501,8 @@ OUTPUT
 }
 
 SKIP: {
-skip("no more chartype", 1);
-pasm_output_is(<<'CODE', <<'OUTPUT', 'string_chartype');
+    skip( "no more chartype", 1 );
+    pasm_output_is( <<'CODE', <<'OUTPUT', 'string_chartype' );
     set S0, "Test String"
     find_chartype I0, "usascii"
     set_chartype S0, I0
@@ -2533,67 +2522,69 @@ OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)
 sub set_str_regs {
-  my $code = shift;
-  my $rt;
-  for (0..31) {
-    $rt .= "\tset S$_, \"".&$code($_)."\"\n";
-  }
-  return $rt;
-}
-# print string registers, no additional prints
-sub print_str_regs {
-  my $rt;
-  for (0..31) {
-    $rt .= "\tprint S$_\n";
-  }
-  return $rt;
-}
-# Generate code to compare each pair of strings in a list
-sub compare_strings {
-  my $const = shift;
-  my $op = shift;
-  my @strings = @_;
-  my $i = 1;
-  my $rt;
-  while (@strings) {
-    my $s1 = shift @strings;
-    my $s2 = shift @strings;
-    my $arg1;
-    my $arg2;
-    if ($const == 3) {
- $arg1 = "\"$s1\"";
- $arg2 = "\"$s2\"";
+    my $code = shift;
+    my $rt;
+    for ( 0 .. 31 ) {
+        $rt .= "\tset S$_, \"" . &$code($_) . "\"\n";
     }
-    elsif ($const == 2) {
- $rt .= "    set S0, \"$s1\"\n";
- $arg1 = "S0";
- $arg2 = "\"$s2\"";
-    }
-    elsif ($const == 1) {
- $rt .= "    set S0, \"$s2\"\n";
- $arg1 = "\"$s1\"";
- $arg2 = "S0";
-    }
-    else {
- $rt .= "    set S0, \"$s1\"\n";
- $rt .= "    set S1, \"$s2\"\n";
- $arg1 = "S0";
- $arg2 = "S1";
-    }
-    if (eval "\"$s1\" $op \"$s2\"") {
-      $rt .= "    $op $arg1, $arg2, OK$i\n";
-      $rt .= "    branch ERROR\n";
-    }
-    else {
-      $rt .= "    $op $arg1, $arg2, ERROR\n";
-    }
-    $rt .= "OK$i:\n";
-    $i++;
-  }
-  return $rt;
+    return $rt;
 }
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'split on empty string');
+# print string registers, no additional prints
+sub print_str_regs {
+    my $rt;
+    for ( 0 .. 31 ) {
+        $rt .= "\tprint S$_\n";
+    }
+    return $rt;
+}
+
+# Generate code to compare each pair of strings in a list
+sub compare_strings {
+    my $const   = shift;
+    my $op      = shift;
+    my @strings = @_;
+    my $i       = 1;
+    my $rt;
+    while (@strings) {
+        my $s1 = shift @strings;
+        my $s2 = shift @strings;
+        my $arg1;
+        my $arg2;
+        if ( $const == 3 ) {
+            $arg1 = "\"$s1\"";
+            $arg2 = "\"$s2\"";
+        }
+        elsif ( $const == 2 ) {
+            $rt .= "    set S0, \"$s1\"\n";
+            $arg1 = "S0";
+            $arg2 = "\"$s2\"";
+        }
+        elsif ( $const == 1 ) {
+            $rt .= "    set S0, \"$s2\"\n";
+            $arg1 = "\"$s1\"";
+            $arg2 = "S0";
+        }
+        else {
+            $rt .= "    set S0, \"$s1\"\n";
+            $rt .= "    set S1, \"$s2\"\n";
+            $arg1 = "S0";
+            $arg2 = "S1";
+        }
+        if ( eval "\"$s1\" $op \"$s2\"" ) {
+            $rt .= "    $op $arg1, $arg2, OK$i\n";
+            $rt .= "    branch ERROR\n";
+        }
+        else {
+            $rt .= "    $op $arg1, $arg2, ERROR\n";
+        }
+        $rt .= "OK$i:\n";
+        $i++;
+    }
+    return $rt;
+}
+
+pasm_output_is( <<'CODE', <<'OUTPUT', 'split on empty string' );
 _main:
     split P1, "", ""
     set I1, P1
@@ -2615,7 +2606,7 @@ CODE
 ab
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'split on non-empty string');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'split on non-empty string' );
 _main:
     split P0, "a", "afooabara"
     set I0, P0
@@ -2639,7 +2630,7 @@ r
 
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'join');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'join' );
 _main:
     new P0, .ResizablePMCArray
     join S0, "--", P0
@@ -2662,7 +2653,7 @@ a
 a--b
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'join: __get_string returns a null string');
+pir_output_is( <<'CODE', <<'OUTPUT', 'join: __get_string returns a null string' );
 
 .sub _main
     newclass P0, "Foo"
@@ -2696,7 +2687,7 @@ CODE
 abc
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'eq_addr/ne_addr');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'eq_addr/ne_addr' );
         set S0, "Test"
         set S1, S0
         eq_addr S1, S0, OK1
@@ -2724,7 +2715,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'if_null_s_ic');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'if_null_s_ic' );
 	set S0, "foo"
 	if_null S0, ERROR
 	print "ok 1\n"
@@ -2739,7 +2730,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'upcase');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'upcase' );
   set S0, "abCD012yz\n"
   upcase S1, S0
   print S1
@@ -2751,7 +2742,7 @@ ABCD012YZ
 ABCD012YZ
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'downcase');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'downcase' );
   set S0, "ABcd012YZ\n"
   downcase S1, S0
   print S1
@@ -2763,7 +2754,7 @@ abcd012yz
 abcd012yz
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'titlecase');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'titlecase' );
   set S0, "aBcd012YZ\n"
   titlecase S1, S0
   print S1
@@ -2775,7 +2766,7 @@ Abcd012yz
 Abcd012yz
 OUTPUT
 
-pasm_output_is(<<'CODE',ord('a'),'3-param ord, one-character string register, I');
+pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string register, I' );
 	set S0,"a"
 	set I1, 0
 	ord I0,S0,I1
@@ -2783,14 +2774,14 @@ pasm_output_is(<<'CODE',ord('a'),'3-param ord, one-character string register, I'
 	end
 CODE
 
-pasm_output_is(<<'CODE',ord('b'),'3-param ord, multi-character string, I');
+pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string, I' );
 	set I1, 1
 	ord I0,"ab",I1
 	print I0
 	end
 CODE
 
-pasm_output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register, I');
+pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string register, I' );
 	set I1, 1
 	set S0,"ab"
 	ord I0,S0,I1
@@ -2798,7 +2789,7 @@ pasm_output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register, 
 	end
 CODE
 
-pasm_output_is(<<'CODE', <<'OUTPUT','3-param ord, multi-character string, I');
+pasm_output_is( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string, I' );
 	set I1, 2
 	ord I0,"ab",I1
 	print I0
@@ -2807,7 +2798,7 @@ CODE
 Cannot get character past end of string
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT','3-param ord, multi-character string, I');
+pasm_output_is( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string, I' );
 	set I1, 2
 	set S0,"ab"
 	ord I0,S0,I1
@@ -2817,14 +2808,14 @@ CODE
 Cannot get character past end of string
 OUTPUT
 
-pasm_output_is(<<'CODE',ord('a'),'3-param ord, one-character string, from end, I');
+pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string, from end, I' );
 	set I1, -1
 	ord I0,"a",I1
 	print I0
 	end
 CODE
 
-pasm_output_is(<<'CODE',ord('a'),'3-param ord, one-character string register, from end, I');
+pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string register, from end, I' );
 	set I1, -1
 	set S0,"a"
 	ord I0,S0,I1
@@ -2832,14 +2823,14 @@ pasm_output_is(<<'CODE',ord('a'),'3-param ord, one-character string register, fr
 	end
 CODE
 
-pasm_output_is(<<'CODE',ord('b'),'3-param ord, multi-character string, from end, I');
+pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string, from end, I' );
 	set I1, -1
 	ord I0,"ab",I1
 	print I0
 	end
 CODE
 
-pasm_output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register, from end, I');
+pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string register, from end, I' );
 	set I1, -1
 	set S0,"ab"
 	ord I0,S0,I1
@@ -2847,7 +2838,8 @@ pasm_output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register, 
 	end
 CODE
 
-pasm_output_is(<<'CODE',<<'OUTPUT','3-param ord, multi-character string register, from end, OOB, I');
+pasm_output_is(
+    <<'CODE', <<'OUTPUT', '3-param ord, multi-character string register, from end, OOB, I' );
 	set I1, -3
 	set S0,"ab"
 	ord I0,S0,I1
@@ -2857,7 +2849,7 @@ CODE
 Cannot get character before beginning of string
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUT', 'more string_to_int');
+pir_output_is( <<'CODE', <<'OUT', 'more string_to_int' );
    .sub 'main' :main
       print_as_integer('-4')
       print_as_integer('X-4')
@@ -2899,5 +2891,4 @@ CODE
 -89
 0
 OUT
-
 

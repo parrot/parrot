@@ -7,8 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Test tests => 9;
 
-
-pir_output_is(<<'CODE', <<'OUT', "allocate 1");
+pir_output_is( <<'CODE', <<'OUT', "allocate 1" );
 #
 # Test the ability of the register allocator to
 # generate spills.
@@ -81,8 +80,7 @@ CODE
 40
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "spill 1");
+pir_output_is( <<'CODE', <<'OUT', "spill 1" );
 #
 # Test the ability of the register allocator to
 # generate spills.
@@ -237,7 +235,7 @@ CODE
 6165697377
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "pcc arg overflow 1");
+pir_output_is( <<'CODE', <<'OUT', "pcc arg overflow 1" );
 #
 # Test the ability of the register allocator in
 # combination with PCC calling convention and overflow arguments.
@@ -329,7 +327,7 @@ CODE
 40
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "spill 4");
+pir_output_is( <<'CODE', <<'OUT', "spill 4" );
 #
 # Another spill test
 #
@@ -429,7 +427,7 @@ CODE
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "bug #32996");
+pir_output_is( <<'CODE', <<'OUT', "bug #32996" );
 
 .namespace ["Foo"]
 
@@ -605,35 +603,36 @@ In method 2
 OUT
 
 sub repeat {
-    my ($template, $count, %substs) = @_;
-    my ($code, $n, $start);
-    foreach (split(/\n/, $template)) {
-        $n = $count;
+    my ( $template, $count, %substs ) = @_;
+    my ( $code, $n, $start );
+    foreach ( split( /\n/, $template ) ) {
+        $n     = $count;
         $start = 0;
         if (/^(.*)=(\w+)=(.*)/) {
-            my ($pre, $key, $post) = ($1, $2, $3);
-            if ($key eq 'ARGS') {
+            my ( $pre, $key, $post ) = ( $1, $2, $3 );
+            if ( $key eq 'ARGS' ) {
                 my @params;
-                for my $i (0..$n-1) {
-                    (my $new = $substs{$key}) =~ s/\<index\>/$i/g;
+                for my $i ( 0 .. $n - 1 ) {
+                    ( my $new = $substs{$key} ) =~ s/\<index\>/$i/g;
                     push @params, $new;
                 }
-                $code .= $pre . join(',', @params) . "$post\n";
+                $code .= $pre . join( ',', @params ) . "$post\n";
                 next;
             }
-            $start = $n / 2 if ($key eq 'TESTS2');
-            for my $i ($start..$n-1) {
-                (my $new = $substs{$key}) =~ s/\<index\>/$i/g;
+            $start = $n / 2 if ( $key eq 'TESTS2' );
+            for my $i ( $start .. $n - 1 ) {
+                ( my $new = $substs{$key} ) =~ s/\<index\>/$i/g;
                 $code .= "$pre$new$post\n";
             }
-        } else {
+        }
+        else {
             $code .= "$_\n";
         }
     }
 
     return $code;
 }
-    my $template2 = <<'TEMPLATE';
+my $template2 = <<'TEMPLATE';
 .sub _main
     =LOCALS=
     =INITS=
@@ -655,50 +654,58 @@ fail:
 .end
 TEMPLATE
 
-my $code = repeat($template2, 18,
-               LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
-               INITS => 'a<index> = <index>',
-               ARGS => 'a<index>',
-               PARAMS => '.param Integer a<index>',
-               TESTS => "set I0, a<index>\nne I0, <index>, fail",
-               TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
+my $code = repeat(
+    $template2, 18,
+    LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
+    INITS  => 'a<index> = <index>',
+    ARGS   => 'a<index>',
+    PARAMS => '.param Integer a<index>',
+    TESTS  => "set I0, a<index>\nne I0, <index>, fail",
+    TESTS2 => "set I0, a<index>\nne I0, <index>, fail"
+);
 
-pir_output_is($code, <<'OUT', "overflow pmcs 18 spill");
+pir_output_is( $code, <<'OUT', "overflow pmcs 18 spill" );
 all params ok
 OUT
 
-$code = repeat($template2, 22,
-               LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
-               INITS => 'a<index> = <index>',
-               ARGS => 'a<index>',
-               PARAMS => '.param Integer a<index>',
-               TESTS => "set I0, a<index>\nne I0, <index>, fail",
-               TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
+$code = repeat(
+    $template2, 22,
+    LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
+    INITS  => 'a<index> = <index>',
+    ARGS   => 'a<index>',
+    PARAMS => '.param Integer a<index>',
+    TESTS  => "set I0, a<index>\nne I0, <index>, fail",
+    TESTS2 => "set I0, a<index>\nne I0, <index>, fail"
+);
 
-pir_output_is($code, <<'OUT', "overflow pmcs 22 spill");
+pir_output_is( $code, <<'OUT', "overflow pmcs 22 spill" );
 all params ok
 OUT
 
-$code = repeat($template2, 40,
-               LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
-               INITS => 'a<index> = <index>',
-               ARGS => 'a<index>',
-               PARAMS => '.param Integer a<index>',
-               TESTS => "set I0, a<index>\nne I0, <index>, fail",
-               TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
+$code = repeat(
+    $template2, 40,
+    LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
+    INITS  => 'a<index> = <index>',
+    ARGS   => 'a<index>',
+    PARAMS => '.param Integer a<index>',
+    TESTS  => "set I0, a<index>\nne I0, <index>, fail",
+    TESTS2 => "set I0, a<index>\nne I0, <index>, fail"
+);
 
-pir_output_is($code, <<'OUT', "overflow pmcs 40 spill");
+pir_output_is( $code, <<'OUT', "overflow pmcs 40 spill" );
 all params ok
 OUT
 
-$code = repeat($template2, 60,
-               LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
-               INITS => 'a<index> = <index>',
-               ARGS => 'a<index>',
-               PARAMS => '.param Integer a<index>',
-               TESTS => "set I0, a<index>\nne I0, <index>, fail",
-               TESTS2 => "set I0, a<index>\nne I0, <index>, fail");
+$code = repeat(
+    $template2, 60,
+    LOCALS => ".local Integer a<index>\n\ta<index> = new Integer",
+    INITS  => 'a<index> = <index>',
+    ARGS   => 'a<index>',
+    PARAMS => '.param Integer a<index>',
+    TESTS  => "set I0, a<index>\nne I0, <index>, fail",
+    TESTS2 => "set I0, a<index>\nne I0, <index>, fail"
+);
 
-pir_output_is($code, <<'OUT', "overflow pmcs 60 spill");
+pir_output_is( $code, <<'OUT', "overflow pmcs 60 spill" );
 all params ok
 OUT

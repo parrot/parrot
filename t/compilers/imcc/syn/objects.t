@@ -12,8 +12,7 @@ use Parrot::Test tests => 11;
 ##############################
 # Parrot Calling Conventions
 
-
-pir_output_is(<<'CODE', <<'OUT', "meth call syntax");
+pir_output_is( <<'CODE', <<'OUT', "meth call syntax" );
 
 .sub test :main
     .local pmc class
@@ -37,7 +36,7 @@ in meth
 done
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "meth call syntax m.o(arg)");
+pir_output_is( <<'CODE', <<'OUT', "meth call syntax m.o(arg)" );
 .sub test :main
     .local pmc class
     .local pmc obj
@@ -63,7 +62,7 @@ ok
 done
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "meth call ret = o.m(arg)");
+pir_output_is( <<'CODE', <<'OUT', "meth call ret = o.m(arg)" );
 .sub test :main
     .local pmc class
     .local pmc obj
@@ -92,7 +91,7 @@ ok
 done
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "meth call syntax, string");
+pir_output_is( <<'CODE', <<'OUT', "meth call syntax, string" );
 .sub test :main
     .local pmc class
     .local pmc obj
@@ -122,7 +121,7 @@ in meth
 done
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "initializer");
+pir_output_is( <<'CODE', <<'OUT', "initializer" );
 .sub test :main
     newclass P1, "Foo"
     subclass P2, P1, "Bar"
@@ -162,7 +161,7 @@ in sub
 done
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "meth call syntax - method, self");
+pir_output_is( <<'CODE', <<'OUT', "meth call syntax - method, self" );
 
 .sub test :main
     .local pmc class
@@ -190,7 +189,7 @@ ok
 done
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax");
+pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax" );
 
 .sub test :main
     .local pmc class
@@ -215,7 +214,7 @@ in meth
 done
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, meth var");
+pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax, meth var" );
 
 .sub test :main
     .local pmc class
@@ -242,7 +241,7 @@ CODE
 in meth
 done
 OUT
-pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax, args");
+pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax, args" );
 
 .sub test :main
     .local pmc class
@@ -280,7 +279,7 @@ ok
 done
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "explicit meth call syntax");
+pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax" );
 
 .sub test :main
     .local pmc class
@@ -305,7 +304,7 @@ in meth
 done
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "meth call syntax - reserved word");
+pir_output_is( <<'CODE', <<'OUT', "meth call syntax - reserved word" );
 
 .sub test :main
     .local pmc class

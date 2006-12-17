@@ -22,7 +22,7 @@ Tests the object/class subsystem.
 
 =cut
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "find_type (base class)");
+pasm_output_is( <<'CODE', <<'OUTPUT', "find_type (base class)" );
     newclass P1, "Foo"
 
     find_type I0, "Foo"
@@ -40,7 +40,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "find_type (subclass)");
+pasm_output_is( <<'CODE', <<'OUTPUT', "find_type (subclass)" );
     newclass P1, "Foo"
     subclass P2, P1, "Bar"
 
@@ -65,7 +65,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "find_type nested, with key");
+pasm_output_is( <<'CODE', <<'OUTPUT', "find_type nested, with key" );
     newclass P1, ["Foo"; "Bar"]
 
     find_type I0, ["Foo"; "Bar"]
@@ -81,7 +81,7 @@ CODE
 new
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "find_type nested, with array [EXPERIMENTAL]");
+pasm_output_is( <<'CODE', <<'OUTPUT', "find_type nested, with array [EXPERIMENTAL]" );
     newclass P1, ["Foo"; "Bar"]
 
     new P2, 'ResizablePMCArray'
@@ -101,7 +101,7 @@ CODE
 new
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "classname");
+pasm_output_is( <<'CODE', <<'OUTPUT', "classname" );
     newclass P1, "Foo"
     classname S0, P1
     print S0
@@ -123,7 +123,7 @@ Bar
 Baz
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "getclass");
+pasm_output_like( <<'CODE', <<'OUTPUT', "getclass" );
     newclass P1, "Foo"
     getclass P2, "Foo"
     classname S2, P2
@@ -143,9 +143,10 @@ CODE
 FooBar
 Class 'NoSuch' doesn't exist/
 OUTPUT
+
 # ' for vim
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "isa");
+pasm_output_is( <<'CODE', <<'OUTPUT', "isa" );
     new P1, .Boolean
     isa I0, P1, "Boolean"
     print I0
@@ -184,7 +185,7 @@ CODE
 001
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "does scalar");
+pasm_output_is( <<'CODE', <<'OUTPUT', "does scalar" );
     new P1, .Boolean
     does I0, P1, "Boolean"
     print I0
@@ -198,7 +199,7 @@ CODE
 001
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "does array");
+pasm_output_is( <<'CODE', <<'OUTPUT', "does array" );
     new P1, .OrderedHash
     does I0, P1, "Boolean"
     print I0
@@ -214,7 +215,7 @@ CODE
 0011
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "new object");
+pasm_output_is( <<'CODE', <<'OUTPUT', "new object" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -224,7 +225,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "new object - type, isa");
+pasm_output_is( <<'CODE', <<'OUTPUT', "new object - type, isa" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -244,7 +245,7 @@ ok 2
 1
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "new object - classname");
+pasm_output_is( <<'CODE', <<'OUTPUT', "new object - classname" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -271,7 +272,7 @@ Foo
 Foo
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "isa subclass");
+pasm_output_is( <<'CODE', <<'OUTPUT', "isa subclass" );
     newclass P1, "Foo"
     subclass P2, P1, "Bar"
     isa I0, P1, "Foo"
@@ -308,7 +309,7 @@ ok 4
 ok 5
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "isa subclass - objects");
+pasm_output_is( <<'CODE', <<'OUTPUT', "isa subclass - objects" );
     newclass P3, "Foo"
     subclass P4, P3, "Bar"
     find_type I0, "Foo"
@@ -350,7 +351,7 @@ ok 4
 ok 5
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "addattribute");
+pasm_output_is( <<'CODE', <<'OUTPUT', "addattribute" );
     newclass P1, "Foo"
 # Check that addattribute doesn't blow up
     addattribute P1, "foo_i"
@@ -376,7 +377,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "addattribute subclass");
+pasm_output_is( <<'CODE', <<'OUTPUT', "addattribute subclass" );
     newclass P1, "Foo"
     addattribute P1, "foo_i"
     print "ok 1\n"
@@ -389,7 +390,7 @@ ok 1
 ok 2
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "addattribute subclass - same name");
+pir_output_is( <<'CODE', <<'OUTPUT', "addattribute subclass - same name" );
 .sub main :main
     newclass P1, "Foo"
     addattribute P1, "i"
@@ -450,7 +451,7 @@ Foo.i Foo.j Bar.j Bar.k
 Foo.i Foo.j Bar.j Bar.k
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "classoffset: normal operation");
+pasm_output_like( <<'CODE', <<'OUTPUT', "classoffset: normal operation" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -461,7 +462,7 @@ CODE
 /\d+/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "classoffset: invalid parent class");
+pasm_output_like( <<'CODE', <<'OUTPUT', "classoffset: invalid parent class" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -472,7 +473,7 @@ CODE
 /Class not parent of object/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "classoffset: non-object argument");
+pasm_output_like( <<'CODE', <<'OUTPUT', "classoffset: non-object argument" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, .Undef
@@ -483,7 +484,7 @@ CODE
 /Not an object/
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "set/get object attribs");
+pasm_output_is( <<'CODE', <<'OUTPUT', "set/get object attribs" );
     newclass P1, "Foo"
     addattribute P1, "i"
     find_type I0, "Foo"
@@ -503,7 +504,7 @@ CODE
 1024
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "set/get multiple object attribs");
+pasm_output_is( <<'CODE', <<'OUTPUT', "set/get multiple object attribs" );
     newclass P1, "Foo"
     addattribute P1, "i"
     addattribute P1, "j"
@@ -533,7 +534,7 @@ CODE
 Value
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "setting non-existent attribute");
+pasm_output_like( <<'CODE', <<'OUTPUT', "setting non-existent attribute" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -546,7 +547,7 @@ CODE
 /No such attribute/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "setting non-existent by name");
+pasm_output_like( <<'CODE', <<'OUTPUT', "setting non-existent by name" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -558,7 +559,7 @@ CODE
 /No such attribute 'Foo\\0no_such'/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "getting NULL attribute");
+pasm_output_like( <<'CODE', <<'OUTPUT', "getting NULL attribute" );
     newclass P1, "Foo"
     addattribute P1, "i"
     find_type I0, "Foo"
@@ -571,7 +572,7 @@ CODE
 /Null PMC access/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "setting non-existent attribute - 1");
+pasm_output_like( <<'CODE', <<'OUTPUT', "setting non-existent attribute - 1" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -585,7 +586,7 @@ CODE
 /No such attribute/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "getting non-existent attribute");
+pasm_output_like( <<'CODE', <<'OUTPUT', "getting non-existent attribute" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -598,8 +599,7 @@ CODE
 /No such attribute/
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "attribute values are specific to objects");
+pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values are specific to objects" );
     newclass P1, "Foo"
     addattribute P1, "i"
     find_type I0, "Foo"
@@ -627,7 +627,7 @@ CODE
 One hundred
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "attribute values and subclassing");
+pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values and subclassing" );
     newclass P1, "Foo"
     addattribute P1, "i"
     addattribute P1, "j"
@@ -681,7 +681,7 @@ CODE
 101
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "attribute values and subclassing 2");
+pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values and subclassing 2" );
     newclass P1, "Foo"
     # must add attributes before object instantiation
     addattribute P1, ".i"
@@ -751,7 +751,7 @@ l
 Bar
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
+pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meths " );
     newclass P1, "Foo"
     # must add attributes before object instantiation
     addattribute P1, ".i"
@@ -879,7 +879,7 @@ in Bar::get
 l
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
+pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, inherited access meths" );
     newclass P1, "Foo"
     # must add attributes before object instantiation
     addattribute P1, ".i"
@@ -997,7 +997,7 @@ l
 m
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "overridden vtables");
+pasm_output_is( <<'CODE', <<'OUTPUT', "overridden vtables" );
 .include "pmctypes.pasm"
 .include "mmd.pasm"
     newclass P1, "Foo"
@@ -1088,8 +1088,7 @@ OUTPUT
 # B
 # OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "typeof objects");
+pasm_output_is( <<'CODE', <<'OUTPUT', "typeof objects" );
     newclass P0, "A"
     newclass P1, "B"
 
@@ -1110,7 +1109,7 @@ A
 B
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "multiple inheritance, with attributes");
+pasm_output_is( <<'CODE', <<'OUTPUT', "multiple inheritance, with attributes" );
     newclass P1, "Star"
     addattribute P1, "Spectral Type"
 
@@ -1145,7 +1144,7 @@ G
 $100,000,000
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "two levels of inheritance");
+pasm_output_is( <<'CODE', <<'OUTPUT', "two levels of inheritance" );
     newclass P0, "Astronomical Object"
     addattribute P0, "Location"
 
@@ -1171,7 +1170,7 @@ CODE
 Taurus
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "addparent exceptions #1");
+pasm_output_like( <<'CODE', <<'OUTPUT', "addparent exceptions #1" );
     newclass P0, "Astronomical Object"
     new P1, .String
     set P1, "Not a class"
@@ -1180,9 +1179,10 @@ pasm_output_like(<<'CODE', <<'OUTPUT', "addparent exceptions #1");
 CODE
 /Parent isn't a ParrotClass/
 OUTPUT
+
 # '
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "addparent exceptions #2");
+pasm_output_like( <<'CODE', <<'OUTPUT', "addparent exceptions #2" );
     new P0, .Hash
     newclass P1, "Trashcan"
     addparent P0, P1
@@ -1190,9 +1190,10 @@ pasm_output_like(<<'CODE', <<'OUTPUT', "addparent exceptions #2");
 CODE
 /Class isn't a ParrotClass/
 OUTPUT
+
 # '
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "class op test");
+pasm_output_is( <<'CODE', <<'OUTPUT', "class op test" );
     newclass P0, "City"
     find_type I0, "City"
     new P1, I0
@@ -1206,24 +1207,26 @@ CODE
 City
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "subclassing a non-existent class");
+pasm_output_like( <<'CODE', <<'OUTPUT', "subclassing a non-existent class" );
     subclass P1, "Character", "Nemo"
     print "Uh-oh...\n"
     end
 CODE
 /Class 'Character' doesn't exist/
 OUTPUT
+
 # '
-pasm_output_like(<<'CODE', <<'OUTPUT', "anon. subclass of non-existent class");
+pasm_output_like( <<'CODE', <<'OUTPUT', "anon. subclass of non-existent class" );
     subclass P1, "Character"
     print "Uh-oh...\n"
     end
 CODE
 /Class 'Character' doesn't exist/
 OUTPUT
+
 # '
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "anon. subclass classname");
+pasm_output_like( <<'CODE', <<'OUTPUT', "anon. subclass classname" );
     newclass P0, "City"
     subclass P1, P0
     classname S0, P1
@@ -1234,7 +1237,7 @@ CODE
 /anon_\d+/
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "get attrib by name");
+pasm_output_is( <<'CODE', <<'OUTPUT', "get attrib by name" );
     newclass P1, "Foo"
     addattribute P1, "i"
     find_type I1, "Foo"
@@ -1251,7 +1254,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "get attrib by name subclass");
+pasm_output_is( <<'CODE', <<'OUTPUT', "get attrib by name subclass" );
     newclass P0, "Bar"
     addattribute P0, "j"
     subclass P1, P0, "Foo"
@@ -1277,7 +1280,7 @@ foo i
 bar j
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "set attrib by name subclass");
+pasm_output_is( <<'CODE', <<'OUTPUT', "set attrib by name subclass" );
     newclass P0, "Bar"
     addattribute P0, "j"
     subclass P1, P0, "Foo"
@@ -1303,7 +1306,7 @@ foo i
 bar j
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "addattribute duplicate");
+pasm_output_like( <<'CODE', <<'OUTPUT', "addattribute duplicate" );
     newclass P1, "Foo"
     addattribute P1, "i"
     addattribute P1, "j"
@@ -1314,7 +1317,7 @@ CODE
 /Attribute 'Foo(.*?i)?' already exists/
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "PMC as classes");
+pasm_output_is( <<'CODE', <<'OUTPUT', "PMC as classes" );
     getclass P0, "Integer"
     print "ok 1\n"
     getclass P0, "Integer"
@@ -1329,7 +1332,7 @@ ok 2
 Integer
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - subclass");
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - subclass" );
 
 .sub main :main
   .local pmc MyInt
@@ -1353,7 +1356,7 @@ MyInt
 11
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - instantiate");
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - instantiate" );
 
 .sub main :main
   .local pmc MyInt
@@ -1373,7 +1376,7 @@ ok 2
 ok 3
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - methods");
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - methods" );
 
 .sub main :main
   .local pmc MyInt
@@ -1425,7 +1428,7 @@ ok 4
 MyInt(42)
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - mmd methods");
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - mmd methods" );
 
 
 .sub main :main
@@ -1468,7 +1471,7 @@ CODE
 MyInt(42)
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods");
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods" );
 
 .sub main :main
   .local pmc MyInt
@@ -1513,7 +1516,7 @@ in add
 106
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 1");
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 1" );
 
 .sub main :main
   .local pmc MyInt
@@ -1577,7 +1580,7 @@ ok 4
 MyInt2(42)
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 2");
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 2" );
 
 .sub main :main
   .local pmc MyInt
@@ -1653,7 +1656,7 @@ ok 4
 MyInt2(42)
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "PMC as classes - derived 3");
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 3" );
 
 .sub main :main
   .local pmc MyInt
@@ -1717,8 +1720,7 @@ ok 4
 MyInt2(42)
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "subclassing ParrotClass");
+pir_output_is( <<'CODE', <<'OUTPUT', "subclassing ParrotClass" );
 
 .sub main :main
     .local pmc cl
@@ -1740,8 +1742,8 @@ Foo
 OUTPUT
 
 SKIP: {
-    skip("instantiate disabled", 2);
-pasm_output_is(<<'CODE', <<'OUTPUT', "instantiate");
+    skip( "instantiate disabled", 2 );
+    pasm_output_is( <<'CODE', <<'OUTPUT', "instantiate" );
     subclass P2, "Integer", "Foo"
     set I0, 0
     set I3, 1
@@ -1765,7 +1767,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "instantiate - PIR");
+    pir_output_is( <<'CODE', <<'OUTPUT', "instantiate - PIR" );
 
 .sub main :main
     .local pmc cl
@@ -1795,8 +1797,7 @@ CODE
 OUTPUT
 }
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "namespace vs name");
+pir_output_is( <<'CODE', <<'OUTPUT', "namespace vs name" );
 .sub main :main
     .local pmc o, cl, f
     newclass cl, "Foo"
@@ -1826,7 +1827,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "Wrong way to create new objects");
+pasm_output_like( <<'CODE', <<'OUTPUT', "Wrong way to create new objects" );
     new P0, .ParrotObject
     end
 CODE
@@ -1835,7 +1836,7 @@ OUTPUT
 
 #' for vim
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "multpile anon classes - #33103");
+pasm_output_is( <<'CODE', <<'OUTPUT', "multpile anon classes - #33103" );
      newclass P0, "City"
      subclass P1, P0
      newclass P2, "State"
@@ -1846,7 +1847,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "subclassed Integer bug");
+pir_output_is( <<'CODE', <<'OUTPUT', "subclassed Integer bug" );
 .sub _main :main
    .local pmc class
    .local pmc a
@@ -1875,7 +1876,7 @@ CODE
 1 * 1 = 1
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "short name attributes");
+pasm_output_is( <<'CODE', <<'OUTPUT', "short name attributes" );
     newclass P1, "Foo"
     addattribute P1, "i"
     addattribute P1, "j"
@@ -1929,7 +1930,7 @@ CODE
 20
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "init with and w/o arg");
+pir_output_is( <<'CODE', <<'OUTPUT', "init with and w/o arg" );
 .sub 'main' :main 
     .local pmc cl, o, h, a
     cl = newclass "Foo"
@@ -1965,7 +1966,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "newclass [] parsing)");
+pasm_output_is( <<'CODE', <<'OUTPUT', "newclass [] parsing)" );
     newclass P0, ['Foo';'Bar']
     print "ok\n"
     end
@@ -1973,7 +1974,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "verfiy namespace types");
+pasm_output_is( <<'CODE', <<'OUTPUT', "verfiy namespace types" );
     newclass P0, ['Foo';'Bar']
     getinterp P0
     .include "iglobals.pasm"
@@ -1991,7 +1992,7 @@ NameSpace
 NameSpace
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "verfiy data type");
+pasm_output_like( <<'CODE', <<'OUTPUT', "verfiy data type" );
     newclass P0, ['Foo';'Bar']
     getinterp P0
     .include "iglobals.pasm"
@@ -2005,7 +2006,7 @@ CODE
 /\d+/
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "new keyed");
+pir_output_is( <<'CODE', <<'OUTPUT', "new keyed" );
 .sub main :main
     .local pmc cl, o
     cl = newclass ['Foo';'Bar']
@@ -2021,7 +2022,7 @@ __init
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "new keyed 2");
+pir_output_is( <<'CODE', <<'OUTPUT', "new keyed 2" );
 .sub main :main
     .local pmc c1, c2, o1, o2
     c1 = newclass ['Foo';'Bar']
@@ -2045,7 +2046,7 @@ __init Baz
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "new keyed 3");
+pir_output_is( <<'CODE', <<'OUTPUT', "new keyed 3" );
 .sub main :main
     .local pmc c1, c2, c3, o1, o2, o3
     c1 = newclass ['Foo';'Bar']
@@ -2076,7 +2077,7 @@ __init Foo
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "subclass keyed");
+pir_output_is( <<'CODE', <<'OUTPUT', "subclass keyed" );
 .sub main :main
     .local pmc base, o1, o2
     base = subclass 'Hash', ['Perl6'; 'PAST'; 'Node']
@@ -2106,7 +2107,7 @@ __init Stmt
 ok 2
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "class name");
+pir_output_is( <<'CODE', <<'OUTPUT', "class name" );
 .sub main :main
     .local pmc base, o1, o2
     base = subclass 'Hash', ['Perl6'; 'PAST'; 'Node']
@@ -2118,7 +2119,7 @@ CODE
 Perl6;PAST;Node
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "getclass");
+pir_output_is( <<'CODE', <<'OUTPUT', "getclass" );
 .sub main :main
     .local pmc base, o1, o2
     base = subclass 'Hash', ['Perl6'; 'PAST'; 'Node']
@@ -2131,7 +2132,7 @@ CODE
 Perl6;PAST;Node
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "isa (#39045)");
+pir_output_is( <<'CODE', <<'OUTPUT', "isa (#39045)" );
 .sub main :main
     .local pmc base, o1, o2
     base = subclass 'Hash', ['Perl6'; 'PAST'; 'Node']
@@ -2148,7 +2149,7 @@ CODE
 110
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "new nested ordering");
+pir_output_is( <<'CODE', <<'OUTPUT', "new nested ordering" );
 .sub main :main
     .local pmc c1, c2, o
     c1 = newclass ['Foo']
@@ -2169,7 +2170,7 @@ __init Bar
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "vtable override once removed (#39056)");
+pir_output_is( <<'CODE', <<'OUTPUT', "vtable override once removed (#39056)" );
 .sub main :main
     .local pmc base
     $P0 = getclass 'Integer'
@@ -2194,8 +2195,7 @@ CODE
 ok bar
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "super __init called twice (#39081)");
+pir_output_is( <<'CODE', <<'OUTPUT', "super __init called twice (#39081)" );
 .sub main :main
     $P0 = newclass 'Foo'
     $P1 = subclass $P0, 'Bar'
@@ -2213,8 +2213,7 @@ CODE
 foo constructor
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "Using key from classname op with new");
+pir_output_is( <<'CODE', <<'OUTPUT', "Using key from classname op with new" );
 .sub main :main
     $P0 = newclass [ "Monkey" ; "Banana" ]
     $P0 = new [ "Monkey" ; "Banana" ]
@@ -2233,7 +2232,6 @@ CODE
 Ook!
 Ook!
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

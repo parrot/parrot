@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 6;
 use Parrot::Config;
 
-
 =head1 NAME
 
 t/library/parrotlib.t - testing library/parrotlib.pir
@@ -24,7 +23,6 @@ This test program test whether the library 'parrotlib.pir' returns the
 expected absolute filenames.
 
 =cut
-
 
 # Common code in the test files
 
@@ -44,8 +42,7 @@ my $template_bottom = << 'END_CODE';
 .end
 END_CODE
 
-
-# Testing include_file_location 
+# Testing include_file_location
 
 pir_output_is( << "END_CODE", << 'END_OUT', 'include_file_location' );
 $template_top
@@ -64,7 +61,6 @@ $template_bottom
 END_CODE
 
 END_OUT
-
 
 # Testing imcc_compile_file_location
 
@@ -86,7 +82,6 @@ END_CODE
 
 END_OUT
 
-
 # Testing dynext_location
 
 pir_output_is( << "END_CODE", << "END_OUT", 'dynext_location' );
@@ -107,7 +102,6 @@ END_CODE
 
 END_OUT
 
-
 =head1 AUTHOR
 
 Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>
@@ -117,6 +111,4 @@ Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>
 F<runtime/parrot/library/parrotlib.pir>
 
 =cut
-
-
 

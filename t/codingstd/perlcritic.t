@@ -18,7 +18,7 @@ BEGIN {
     if ($@) {
         plan skip_all => 'Test::Perl::Critic not installed';
     }
-    Test::Perl::Critic->import(-verbose => 2);
+    Test::Perl::Critic->import( -verbose => 2 );
 }
 
 my $perl_tidy_conf = 'tools/util/perltidy.conf';
@@ -33,6 +33,10 @@ while (@ARGV) {
     }
     if ( $arg eq '--list' ) {
         $list_policies = 1;
+        shift @ARGV;    # discard
+    }
+    elsif ( $arg =~ /^--(\w*::\w*)\s*=>\s*{\s*(\w*)\s*=>\s*([\w\d\/\.]*)\s*}/ ) {
+        $policies{$1} = { $2 => "$3" };
         shift @ARGV;    # discard
     }
     elsif ( $arg =~ /^--(.*)/ ) {
@@ -51,21 +55,21 @@ my $config = Perl::Critic::Config->new( -exclude => [qr/.*/] );
 # For a list of available policies, perldoc Perl::Critic
 if ( !keys %policies ) {
     %policies = (
-        'TestingAndDebugging::RequireUseStrict'            => 1,
-        'TestingAndDebugging::RequireUseWarnings'          => 1,
-        'TestingAndDebugging::RequirePortableShebang'      => 1,
-        'TestingAndDebugging::ProhibitShebangWarningsArg'  => 1,
-        'TestingAndDebugging::MisplacedShebang'            => 1,
-        'Variables::ProhibitConditionalDeclarations'       => 1,
-        'InputOutput::ProhibitTwoArgOpen'                  => 1,
-        'InputOutput::ProhibitBarewordFileHandles'         => 1,
-        'NamingConventions::ProhibitAmbiguousNames'        => 1,
-        'Subroutines::ProhibitBuiltinHomonyms'             => 1,
-        'Subroutines::ProhibitExplicitReturnUndef'         => 1,
-        'Subroutines::ProhibitSubroutinePrototypes'        => 1,
-        'CodeLayout::UseParrotCoda'                        => 1,
-        'CodeLayout::ProhibitHardTabs'                     => { allow_leading_tabs => 0 },
-        'CodeLayout::RequireTidyCode'                      => { perltidyrc => $perl_tidy_conf },
+        'TestingAndDebugging::RequireUseStrict'           => 1,
+        'TestingAndDebugging::RequireUseWarnings'         => 1,
+        'TestingAndDebugging::RequirePortableShebang'     => 1,
+        'TestingAndDebugging::ProhibitShebangWarningsArg' => 1,
+        'TestingAndDebugging::MisplacedShebang'           => 1,
+        'Variables::ProhibitConditionalDeclarations'      => 1,
+        'InputOutput::ProhibitTwoArgOpen'                 => 1,
+        'InputOutput::ProhibitBarewordFileHandles'        => 1,
+        'NamingConventions::ProhibitAmbiguousNames'       => 1,
+        'Subroutines::ProhibitBuiltinHomonyms'            => 1,
+        'Subroutines::ProhibitExplicitReturnUndef'        => 1,
+        'Subroutines::ProhibitSubroutinePrototypes'       => 1,
+        'CodeLayout::UseParrotCoda'                       => 1,
+        'CodeLayout::ProhibitHardTabs'                    => { allow_leading_tabs => 0 },
+        'CodeLayout::RequireTidyCode'                     => { perltidyrc => $perl_tidy_conf },
 
         #40564 [TODO] fix perlcritic Subroutines::RequireFinalReturn policy
         # below commented out because it does not ignore subs which 'exit'
@@ -128,15 +132,15 @@ foreach my $policy ( keys %policies ) {
     $config->add_policy(
         -policy => $policy,
         ref $policies{$policy} ? ( -config => $policies{$policy} ) : (),
-        )
-        or die;
+    ) or die;
 }
 
 Test::Perl::Critic->import(
-#    -format => '[%p] %m at %l,%c',
+
+    #    -format => '[%p] %m at %l,%c',
     -verbose => 2,
-    -config => $config,
-    -top => 1,
+    -config  => $config,
+    -top     => 1,
 );
 
 foreach my $file ( sort @files ) {

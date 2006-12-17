@@ -7,8 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Test tests => 1;
 
-
-pir_2_pasm_like(<<'CODE', <<'OUT', 'end in :main');
+pir_2_pasm_like( <<'CODE', <<'OUT', 'end in :main' );
 .sub _main :main
      noop
 .end
@@ -18,7 +17,6 @@ CODE
   end
 /
 OUT
-
 
 # Local Variables:
 #   mode: cperl

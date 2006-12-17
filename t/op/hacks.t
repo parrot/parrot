@@ -10,7 +10,6 @@ use Parrot::Test tests => 2;
 use Parrot::Config;
 use Config;
 
-
 =head1 NAME
 
 t/op/hacks.t - IO Ops
@@ -25,19 +24,18 @@ Tests basic file IO operations.
 
 =cut
 
-
 sub has_signal {
-  my $sig = shift;
-  foreach my $name (split(' ', $Config{sig_name})) {
-    return 1 if ("SIG$name" eq $sig);
-  }
-  return 0;
+    my $sig = shift;
+    foreach my $name ( split( ' ', $Config{sig_name} ) ) {
+        return 1 if ( "SIG$name" eq $sig );
+    }
+    return 0;
 }
 
 SKIP: {
-  skip("no universal SIGFPE handling", 2);
+    skip( "no universal SIGFPE handling", 2 );
 
-pasm_output_is(<<'CODE', <<OUT, "catch a SIGFPE");
+    pasm_output_is( <<'CODE', <<OUT, "catch a SIGFPE" );
     push_eh _handler
     div I10, 0
     print "not reached\n"
@@ -60,7 +58,7 @@ error -8
 severity 0
 OUT
 
-pasm_output_is(<<'CODE', <<OUT, "catch a SIGFPE 2");
+    pasm_output_is( <<'CODE', <<OUT, "catch a SIGFPE 2" );
     push_eh _handler
     div I10, 0
     print "not reached\n"
@@ -79,5 +77,4 @@ catched it
 ok
 OUT
 }
-
 

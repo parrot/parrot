@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : (tests => 2);
+plan $^O =~ m/MSWin32/ ? ( skip_all => 'broken on win32' ) : ( tests => 2 );
 
 =head1 NAME
 
@@ -23,7 +23,6 @@ t/src/list.t - List Subsystem
 Tests the various C<list_*> functions.
 
 =cut
-
 
 my $main = <<'CODE';
 
@@ -51,7 +50,7 @@ main(int argc, char* argv[])
 
 CODE
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "data types");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "data types" );
 
 static opcode_t*
 the_test(Parrot_Interp interp, opcode_t *cur_op, opcode_t *start)
@@ -313,7 +312,7 @@ insert 2 ok
 Done.
 OUTPUT
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "arbitrary sized");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "arbitrary sized" );
 
 static opcode_t*
 the_test(Parrot_Interp interp, opcode_t *cur_op, opcode_t *start)
@@ -375,6 +374,7 @@ CODE
 ok 1
 ok 2
 OUTPUT
+
 # TODO
 
 # Local Variables:

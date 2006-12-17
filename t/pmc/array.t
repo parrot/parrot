@@ -23,7 +23,6 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq ( J, K, L )
     save	N0
@@ -67,7 +66,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Setting array size");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
     new P0,.Array
 
     set I0,P0
@@ -104,7 +103,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Setting first element");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
         new P0, .Array
         set P0, 1
 
@@ -133,7 +132,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Setting second element");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
         new P0, .Array
         set P0, 2
 
@@ -162,7 +161,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
+pasm_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
         new P0, .Array
         set P0, 1
 
@@ -174,7 +173,7 @@ CODE
 current instr/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
+pasm_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
         new P0, .Array
         set P0, 1
 
@@ -185,7 +184,7 @@ CODE
 current instr/
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "defined");
+pasm_output_is( <<'CODE', <<OUTPUT, "defined" );
     new P0, .Array
     defined I0, P0
     print I0
@@ -231,7 +230,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "exists");
+pasm_output_is( <<'CODE', <<OUTPUT, "exists" );
     new P0, .Array
     set P0, 5
     set P0[0], 1
@@ -269,7 +268,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
+pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
 @{[ $fp_equality_macro ]}
      new P0, .Array
      set P0, 4
@@ -318,7 +317,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
+pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
 @{[ $fp_equality_macro ]}
      new P0, .Array
      set P0, 1024
@@ -364,7 +363,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUT, "multikeyed access I arg");
+pasm_output_is( <<'CODE', <<OUT, "multikeyed access I arg" );
     new P0, .Array
     set P0, 1
     new P1, .Array
@@ -391,7 +390,7 @@ Array
 20202020
 OUT
 
-pasm_output_is(<<'CODE', <<OUT, "multikeyed access P arg");
+pasm_output_is( <<'CODE', <<OUT, "multikeyed access P arg" );
     new P0, .Array
     set P0, 1
     new P1, .Array
@@ -420,7 +419,7 @@ Array
 20202020
 OUT
 
-pasm_output_is(<<'CODE', <<OUT, "delete");
+pasm_output_is( <<'CODE', <<OUT, "delete" );
     new P0, .Array
     set P0, 3
     set P0[0], 10
@@ -441,7 +440,7 @@ CODE
 21030
 OUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
@@ -465,7 +464,6 @@ CODE
 OUTPUT
 
 1;
-
 
 # Local Variables:
 #   mode: cperl

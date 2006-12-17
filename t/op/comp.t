@@ -8,7 +8,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 7;
 
-
 =head1 NAME
 
 t/op/comp.t - Conditionals
@@ -23,10 +22,9 @@ Tests various conditional branch operations.
 
 =cut
 
-
 # some of these were failing with JIT/i386
 
-pasm_output_is(<<'CODE', <<OUTPUT, "gt_ic_i_ic");
+pasm_output_is( <<'CODE', <<OUTPUT, "gt_ic_i_ic" );
         set I0, 10
         gt 11, I0, ok1
         print "nok gt\n"
@@ -44,7 +42,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "ge_ic_i_ic");
+pasm_output_is( <<'CODE', <<OUTPUT, "ge_ic_i_ic" );
         set I0, 10
         ge 11, I0, ok1
         print "nok ge\n"
@@ -67,7 +65,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "le_ic_i_ic");
+pasm_output_is( <<'CODE', <<OUTPUT, "le_ic_i_ic" );
         set I0, 10
         le 9, I0, ok1
         print "nok le\n"
@@ -90,7 +88,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "lt_ic_i_ic");
+pasm_output_is( <<'CODE', <<OUTPUT, "lt_ic_i_ic" );
         set I0, 10
         lt 9, I0, ok1
         print "nok lt\n"
@@ -108,7 +106,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "eq_ic_i_ic");
+pasm_output_is( <<'CODE', <<OUTPUT, "eq_ic_i_ic" );
         set I0, 10
         eq 9, I0, nok1
         print "ok 1\n"
@@ -133,7 +131,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "ne_ic_i_ic");
+pasm_output_is( <<'CODE', <<OUTPUT, "ne_ic_i_ic" );
         set I0, 10
         ne 9, I0, ok1
         print "nok 1\n"
@@ -159,7 +157,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "eq_num");
+pasm_output_is( <<'CODE', <<OUTPUT, "eq_num" );
         new P0, .Float
         set P0, -1.2
         new P1, .String

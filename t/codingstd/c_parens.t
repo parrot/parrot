@@ -32,7 +32,6 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
-
 my $keywords = join '|' => sort { length $a cmp length $b } qw/
     auto      double    int       struct
     break     else      long      switch
@@ -42,18 +41,15 @@ my $keywords = join '|' => sort { length $a cmp length $b } qw/
     continue  for       signed    void
     default   goto      sizeof    volatile
     do        if        static    while
-/;
+    /;
 
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my @no_space_before_open_paren;
 
-
-check_parens( @files );
-
+check_parens(@files);
 
 exit;
-
 
 sub check_parens {
     my @keyword_paren;
@@ -90,17 +86,20 @@ sub check_parens {
 ## L<PDD07/Code Formatting/"there should be at least one space between a C keyword and any subsequent open parenthesis">
     ok( !scalar(@keyword_paren) )
         or diag( "incorrect spacing between C keyword and following open parenthesis found in "
-            . scalar @keyword_paren . " files:\n@keyword_paren" );
+            . scalar @keyword_paren
+            . " files:\n@keyword_paren" );
 
 ## L<PDD07/Code Formatting/"There should be no space between a function name and the following open parenthesis">
     ok( !scalar(@non_keyword_paren) )
         or diag( "incorrect spacing between function name and following open parenthesis found in "
-            . scalar @non_keyword_paren . " files:\n@non_keyword_paren" );
+            . scalar @non_keyword_paren
+            . " files:\n@non_keyword_paren" );
 
 ## L<PDD07/Code Formatting/"parentheses should not have space immediately after the opening parenthesis nor immediately before the closing parenthesis">
     ok( !scalar(@space_between_parens) )
         or diag( "incorrect spacing between parentheses found in "
-            . scalar @space_between_parens . " files:\n@space_between_parens" );
+            . scalar @space_between_parens
+            . " files:\n@space_between_parens" );
 }
 
 # Local Variables:

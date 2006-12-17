@@ -50,16 +50,17 @@ TEST_MIME: {
 
     # find test files
     my $test_suffix = '.t';
-    my @test_files = grep { m/\Q$test_suffix\E$/ } @manifest_files;
-    my $test = 'svn:mime-type';
-    my $expected = 'text/plain';
-    my @failed = verify_attributes( $test, $expected, 0, $mime_types, \@test_files );
+    my @test_files  = grep { m/\Q$test_suffix\E$/ } @manifest_files;
+    my $test        = 'svn:mime-type';
+    my $expected    = 'text/plain';
+    my @failed      = verify_attributes( $test, $expected, 0, $mime_types, \@test_files );
 
     if (@failed) {
         my $failure = join " ($expected)\n", @failed;
         $failure = "\n" . $failure . " ($expected)\n";
-        is ($failure, "", $test);
-    } else {
+        is( $failure, "", $test );
+    }
+    else {
         pass($test);
     }
 }    # TEST_MIME
@@ -81,7 +82,7 @@ KEYWORD_EXP: {
         }
     }
 
-    my $test = 'svn:keywords';
+    my $test     = 'svn:keywords';
     my $expected = 'Author Date Id Revision';
     my $keywords = get_attribute( $test, @plain_files );
 
@@ -90,8 +91,9 @@ KEYWORD_EXP: {
     if (@failed) {
         my $failure = join " ($expected)\n", @failed;
         $failure = "\n" . $failure . " ($expected)\n";
-        is ($failure, "", $test);
-    } else {
+        is( $failure, "", $test );
+    }
+    else {
         pass($test);
     }
 
@@ -219,18 +221,18 @@ sub verify_attributes {
     my @failures;
     foreach my $file ( sort @files ) {
         my $actual = $results->{$file};
-        if (! defined $actual) {
-           push @failures, $file; 
-           next;
+        if ( !defined $actual ) {
+            push @failures, $file;
+            next;
         }
         if ($exact) {
-            if ($actual ne $expected) {
-                push @failures, $file; 
+            if ( $actual ne $expected ) {
+                push @failures, $file;
             }
         }
         else {
-            if ($actual !~ /^$expected/) {
-                push @failures, $file; 
+            if ( $actual !~ /^$expected/ ) {
+                push @failures, $file;
             }
         }
     }

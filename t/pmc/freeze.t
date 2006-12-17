@@ -23,9 +23,9 @@ Tests the freeze/thaw archiving subsystem.
 
 =cut
 
-END { unlink "temp.fpmc"; };
+END { unlink "temp.fpmc"; }
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Integer");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Integer" );
     new P1, .Integer
     set P1, 777
     freeze S0, P1
@@ -41,7 +41,7 @@ CODE
 Integer 777
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a String");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a String" );
     new P1, .String
     set P1, "foo"
     freeze S0, P1
@@ -57,7 +57,7 @@ CODE
 String foo
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Float");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Float" );
     new P1, .Float
     set P1, 3.14159
     freeze S0, P1
@@ -73,7 +73,7 @@ CODE
 Float 3.14159
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Hash");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Hash" );
     new P1, .Integer
     set P1, 666
     new P0, .Hash
@@ -103,7 +103,7 @@ Hash 2
 777
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Hash");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Hash" );
     new P1, .Integer
     set P1, 666
     new P0, .Hash
@@ -133,7 +133,7 @@ Hash 2
 777
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Integer with prop");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Integer with prop" );
     new P1, .Integer
     set P1, 666
     new P2, .Integer
@@ -157,7 +157,7 @@ Integer 666
 42
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw Array w Integer with prop");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw Array w Integer with prop" );
     new P0, .ResizablePMCArray
     new P1, .Integer
     set P1, 666
@@ -195,7 +195,7 @@ ResizablePMCArray 2
 42
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a NULL pmc");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a NULL pmc" );
     null P0
     freeze S0, P0
     thaw P10, S0
@@ -208,7 +208,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw array w NULL pmc");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw array w NULL pmc" );
     new P0, .ResizablePMCArray
     null P1
     push P0, P1
@@ -240,7 +240,7 @@ ok
 10
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Sub");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Sub" );
     find_global P1, "_foo"
     freeze S0, P1
 
@@ -260,7 +260,7 @@ in sub _foo
 back
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray" );
     new P0, .FixedPMCArray
     set P0, 3
     new P1, .Integer
@@ -302,7 +302,7 @@ FixedPMCArray 3
 ok diff
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray" );
     new P0, .FixedPMCArray
     set P0, 3
     new P1, .Integer
@@ -342,7 +342,7 @@ FixedPMCArray 3
 ok same
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze class");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class" );
     newclass P10, "Foo"
     classname S10, P10
     print S10
@@ -360,7 +360,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "thaw class into new interpreter");
+pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class into new interpreter" );
     set S3, "temp.fpmc"
     .include "stat.pasm"
     stat I0, S3, .STAT_FILESIZE
@@ -384,7 +384,7 @@ ok 2
 Foo
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw simple class");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw simple class" );
     newclass P10, "Foo"
     classname S10, P10
     print S10
@@ -403,8 +403,7 @@ ok
 Foo
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze class w attr");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class w attr" );
     newclass P10, "Foo"
     addattribute P10, ".aa"
     classname S10, P10
@@ -423,7 +422,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "thaw class w attr into new interpreter");
+pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr into new interpreter" );
     set S3, "temp.fpmc"
     .include "stat.pasm"
     stat I0, S3, .STAT_FILESIZE
@@ -463,7 +462,7 @@ ok 4
 ok 5
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "thaw class w attr same interp");
+pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
     newclass P10, "Foo"
     addattribute P10, ".aa"
     addattribute P10, ".bb"
@@ -514,7 +513,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter");
+pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter" );
     newclass P10, "Foo"
     addattribute P10, ".aa"
     addattribute P10, ".bb"
@@ -558,7 +557,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "thaw object w attr into new interpreter");
+pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into new interpreter" );
     set S3, "temp.fpmc"
     .include "stat.pasm"
     stat I0, S3, .STAT_FILESIZE
@@ -600,7 +599,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze Key");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze Key" );
     new P0, .Hash
     new P1, .FixedPMCArray
     set P1, 2
@@ -634,7 +633,7 @@ ok 2
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a ResizableBooleanArray");
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a ResizableBooleanArray" );
 .sub test :main
     .local pmc original_arr, thawed_arr
     .local string frozen_arr
@@ -698,7 +697,7 @@ ResizableBooleanArray
 0
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a ResizablePMCArray");
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a ResizablePMCArray" );
 .sub test :main
     .local pmc original_arr, thawed_arr
     .local string frozen_arr
@@ -763,7 +762,7 @@ ResizablePMCArray
 three.14
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Conure");
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Conure" );
 .sub main :main
     .local pmc cl, o
     cl = newclass 'Conure'
@@ -785,7 +784,7 @@ CODE
 37
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw obj of class w Hash attrs");
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw obj of class w Hash attrs" );
 .sub main :main
     .local pmc cl, o
     #cl = subclass 'Hash', 'OPTable'

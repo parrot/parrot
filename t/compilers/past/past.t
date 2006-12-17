@@ -5,7 +5,7 @@ use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 6;
 
-pir_output_is(<<'CODE', <<'OUT', 'load the libraries');
+pir_output_is( <<'CODE', <<'OUT', 'load the libraries' );
 .sub _main
     load_bytecode 'PAST.pbc'
 .end
@@ -13,18 +13,18 @@ CODE
 OUT
 
 foreach my $name (qw(Code Exp Stmts Stmt Sub)) {
-my $module = "PAST::$name";
-my $code = <<'CODE'
+    my $module = "PAST::$name";
+    my $code   = <<'CODE'
 .sub _main
     load_bytecode 'PAST.pbc'
     .local pmc node
     .local pmc node2
 CODE
-;
+        ;
 
-$code .= "    node = new '$module'\n";
-$code .= "    node2 = new '$module'\n";
-$code .= <<'CODE'
+    $code .= "    node = new '$module'\n";
+    $code .= "    node2 = new '$module'\n";
+    $code .= <<'CODE'
     node.'source'('foo')
     node.'pos'(42)
 
@@ -42,9 +42,9 @@ $code .= <<'CODE'
     .return ()
 .end
 CODE
-;
+        ;
 
-pir_output_is($code, <<"OUT", "set attributes for $module via method");
+    pir_output_is( $code, <<"OUT", "set attributes for $module via method" );
 foo
 42
 <$module> => { 

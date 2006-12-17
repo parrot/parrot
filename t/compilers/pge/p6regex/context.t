@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 20;
 use Parrot::Test::PGE;
 
-
 =head1 NAME
 
 t/p6regex/context.t - PGE return value tests
@@ -24,7 +23,6 @@ ver. 8, in the B<'Return values from matches'> section
         % prove t/p6regex/context.t
 
 =cut
-
 
 my $PRE = <<PRE;
 .sub 'main' :main
@@ -50,9 +48,8 @@ END:
 .end
 POST
 
-
 ## binary context
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'binary context (true)');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'binary context (true)' );
         rulesub = p6rule('abc')
         match = rulesub('abc')
         if match goto OK
@@ -60,7 +57,7 @@ pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'binary context (true)');
 CODE
 ok
 OUT
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'binary context (false)');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'binary context (false)' );
         rulesub = p6rule('xxx')
         match = rulesub('abc')
         unless match goto OK
@@ -68,9 +65,8 @@ CODE
 ok
 OUT
 
-
 ## numeric context
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context (1abc => 1)');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'numeric context (1abc => 1)' );
         rulesub = p6rule('1abc')
         match = rulesub('1abc')
         $I0 = match
@@ -79,7 +75,7 @@ pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context (1abc => 1)');
 CODE
 1
 OUT
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context ((1)(2)(b)(c) => 12)');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'numeric context ((1)(2)(b)(c) => 12)' );
         rulesub = p6rule('(1)(2)(b)(c)')
         match = rulesub('12bc')
         $I0 = match
@@ -88,7 +84,7 @@ pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context ((1)(2)(b)(c) => 12)');
 CODE
 12
 OUT
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context (0abc => 0)');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'numeric context (0abc => 0)' );
         rulesub = p6rule('0abc')
         match = rulesub('abc')
         $I0 = match
@@ -97,7 +93,7 @@ pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context (0abc => 0)');
 CODE
 0
 OUT
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context (xxx => 0)');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'numeric context (xxx => 0)' );
         rulesub = p6rule('xxx')
         match = rulesub('abc')
         $I0 = match
@@ -106,7 +102,7 @@ pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context (xxx => 0)');
 CODE
 0
 OUT
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context (a1bc => 0)');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'numeric context (a1bc => 0)' );
         rulesub = p6rule('a1bc')
         match = rulesub('a1bc')
         $I0 = match
@@ -115,7 +111,7 @@ pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context (a1bc => 0)');
 CODE
 0
 OUT
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numeric context (1E5)');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'numeric context (1E5)' );
         rulesub = p6rule('1E5abc')
         match = rulesub('1E5abc')
         print match
@@ -124,11 +120,10 @@ CODE
 1E5abc
 OUT
 
-
 ## string context
 ## NOTE: this behavior varies from the doc, but it is in a soon-to-be-released
 ## version of the new specification
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'string context (match => full match)');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'string context (match => full match)' );
         rulesub = p6rule('abc')
         match = rulesub('abc')
         .local string res, exp
@@ -139,7 +134,7 @@ pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'string context (match => full match)');
 CODE
 ok
 OUT
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'string context (with captures => full match)');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'string context (with captures => full match)' );
         rulesub = p6rule('(a)(b)(c)')
         match = rulesub('abc')
         .local string res, exp
@@ -150,7 +145,7 @@ pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'string context (with captures => full m
 CODE
 ok
 OUT
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'string context (false match => "")');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'string context (false match => "")' );
         rulesub = p6rule('xxx')
         match = rulesub('abc')
         .local string res, exp
@@ -161,9 +156,8 @@ CODE
 ok
 OUT
 
-
 ## as array
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'as array ([2,1,0] => "cba")');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'as array ([2,1,0] => "cba")' );
         rulesub = p6rule('(a)(b)(c)')
         match = rulesub('abc')
         .local string res
@@ -180,7 +174,7 @@ pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'as array ([2,1,0] => "cba")');
 CODE
 cba
 OUT
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'as array ([2,1,0] => "cba")');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'as array ([2,1,0] => "cba")' );
         rulesub = p6rule('(a)(b)(c)')
         match = rulesub('abc')
         .local string res
@@ -196,9 +190,8 @@ cba
 OUT
 ## TODO: more
 
-
 ## as hash
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'as hash (A => "a")');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'as hash (A => "a")' );
         rulesub = p6rule('$<A>:=(.)b$<C>:=(c)')
         match = rulesub('abc')
         .local string res
@@ -210,7 +203,7 @@ pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'as hash (A => "a")');
 CODE
 ac
 OUT
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'mixed, array & hash');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'mixed, array & hash' );
         rulesub = p6rule('$<A>:=(.)(b)$<C>:=(c)')
         match = rulesub('abc')
         .local string res
@@ -226,9 +219,10 @@ CODE
 abc
 OUT
 
-
 ## numbered captures treated as named
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'numbered as named ($2 => $/[1])', todo => 'not yet implemented');
+pir_output_is(
+    $PRE
+        . <<'CODE'. $POST, <<OUT, 'numbered as named ($2 => $/[1])', todo => 'not yet implemented' );
         rulesub = p6rule('(a)(b)(c)')
         match = rulesub('abc')
         .local string res, exp
@@ -242,9 +236,8 @@ CODE
 bb
 OUT
 
-
 ## additional methods
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'additional match methods');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'additional match methods' );
         rulesub = p6rule('abc')
         match = rulesub('abc')
         .local string from, to
@@ -257,7 +250,7 @@ pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'additional match methods');
 CODE
 0 3
 OUT
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'additional match methods');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'additional match methods' );
         rulesub = p6rule('(a)(b)(c)')
         match = rulesub('abc')
         .local string from, to
@@ -272,9 +265,8 @@ CODE
 1 2
 OUT
 
-
 ## object isa 'PGE::Match'
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'isa PGE::Match (success)');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'isa PGE::Match (success)' );
         rulesub = p6rule('(a)(b)(c)')
         match = rulesub('abc')
 
@@ -307,7 +299,7 @@ b
 ok 2
 
 OUT
-pir_output_is($PRE.<<'CODE'.$POST,<<OUT,'isa PGE::Match (failure)');
+pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'isa PGE::Match (failure)' );
         rulesub = p6rule('(a)(b)(c)')
         match = rulesub('xxx')
 
@@ -327,5 +319,4 @@ CODE
 ok 1
 
 OUT
-
 

@@ -10,7 +10,7 @@ use Parrot::Config;
 use Parrot::Test tests => 3;
 
 ##############################
-pir_output_is(<<'CODE', <<'OUT', "namespace 1");
+pir_output_is( <<'CODE', <<'OUT', "namespace 1" );
 .sub _foo
     .local int x
     x = 5
@@ -30,7 +30,7 @@ CODE
 OUT
 
 ##############################
-pir_output_is(<<'CODE', <<'OUT', "namespace 2");
+pir_output_is( <<'CODE', <<'OUT', "namespace 2" );
 .sub _foo
     .local int x
     .local int y
@@ -58,7 +58,7 @@ CODE
 OUT
 
 ##############################
-pir_output_is(<<'CODE', <<'OUT', "namespace 3");
+pir_output_is( <<'CODE', <<'OUT', "namespace 3" );
 .sub _foo
     .local int x
     .local int y

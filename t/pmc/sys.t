@@ -23,10 +23,10 @@ Tests system dependend stuff
 =cut
 
 END {
-  unlink "temp.pir";
-};
+    unlink "temp.pir";
+}
 
-pir_output_is(<<'CODE', <<OUT, "spawnw, _config");
+pir_output_is( <<'CODE', <<OUT, "spawnw, _config" );
 
 .sub _test :main
      .local pmc O
@@ -56,7 +56,6 @@ CODE
 Hello, World!
 0
 OUT
-
 
 # Local Variables:
 #   mode: cperl

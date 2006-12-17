@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 6;
 use Parrot::Config;
 
-
 =head1 NAME
 
 t/dynpmc/dynlexpad.t - test the DynLexPad PMC
@@ -24,8 +23,7 @@ Tests the C<DynLexPad> PMC.
 
 =cut
 
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib");
+pir_output_is( << 'CODE', << 'OUTPUT', "loadlib" );
 .sub main :main
     .local pmc lib
     lib = loadlib "dynlexpad"
@@ -52,7 +50,7 @@ my $loadlib = <<'EOC';
 
 EOC
 
-pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "store_lex");
+pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "store_lex" );
 # see loadlib
 .sub 'test' :main
     foo()
@@ -74,7 +72,7 @@ ok 2
 13013
 OUTPUT
 
-pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "check :outer");
+pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "check :outer" );
 .sub 'test' :main
     foo()
 .end
@@ -104,7 +102,7 @@ CODE
 13013
 OUTPUT
 
-pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "tcl-ish upvar");
+pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "tcl-ish upvar" );
 .sub 'test' :main
     foo()
 .end
@@ -149,7 +147,7 @@ CODE
 55
 OUTPUT
 
-pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "check that dynlexpad honors hll");
+pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "check that dynlexpad honors hll" );
 .sub 'test' :main
     foo()
     bar()
@@ -176,7 +174,7 @@ DynLexPad
 LexPad
 OUTPUT
 
-pir_output_is($loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - lexpad interop");
+pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - lexpad interop" );
 
 .sub 'test' :main
     foo()

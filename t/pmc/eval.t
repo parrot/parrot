@@ -22,7 +22,7 @@ Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 
 =cut
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "eval_sc");
+pasm_output_is( <<'CODE', <<'OUTPUT', "eval_sc" );
     compreg P1, "PASM"	# get compiler
     set_args "(0)", "print \"in eval\\n\"\nset_returns \"()\"\nreturncc\n"
     get_results "(0)", P0
@@ -35,8 +35,7 @@ in eval
 back again
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "call subs in evaled code ");
+pasm_output_is( <<'CODE', <<'OUTPUT', "call subs in evaled code " );
     set S5, ".pcc_sub _foo:\n"
     concat S5, "print \"foo\\n\"\n"
     concat S5, "set_returns \"()\"\n"
@@ -53,7 +52,7 @@ foo
 back
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "call 2 subs in evaled code ");
+pasm_output_is( <<'CODE', <<'OUTPUT', "call 2 subs in evaled code " );
     set S5, ".pcc_sub _foo:\n"
     concat S5, "print \"foo\\n\"\n"
     concat S5, "set_returns \"()\"\n"
@@ -80,7 +79,7 @@ bar
 fin
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub");
+pir_output_is( <<'CODE', <<'OUTPUT', "PIR compiler sub" );
 
 .sub test :main
     .local NCI compiler
@@ -117,7 +116,7 @@ ok
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "bug #31467");
+pir_output_is( <<'CODE', <<'OUTPUT', "bug #31467" );
 
   .sub main :main
      $P1 = new Hash
@@ -150,7 +149,7 @@ dynamic
 builtin
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub PASM");
+pir_output_is( <<'CODE', <<'OUTPUT', "PIR compiler sub PASM" );
 .sub main :main
   register_compiler()
 
@@ -189,7 +188,7 @@ CODE
 ok 1
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub PIR");
+pir_output_is( <<'CODE', <<'OUTPUT', "PIR compiler sub PIR" );
 .sub main :main
   register_compiler()
 
@@ -239,7 +238,7 @@ CODE
 ok 1
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "eval.get_string");
+pir_output_is( <<'CODE', <<'OUTPUT', "eval.get_string" );
 .sub main :main
 
   .local pmc f1, f2
@@ -279,7 +278,7 @@ hello from foo_1
 hello from foo_2
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "check loaded lib hash");
+pir_output_is( <<'CODE', <<'OUTPUT', "check loaded lib hash" );
 .sub main
   load_bytecode "temp.pbc"
   load_bytecode "temp2.pbc"
@@ -309,7 +308,7 @@ hello from foo_2
 2 1 1 1
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "eval.get_string - same file");
+pir_output_is( <<'CODE', <<'OUTPUT', "eval.get_string - same file" );
 .sub main :main
 
   .local pmc f1, f2
@@ -350,9 +349,9 @@ OUTPUT
 
 END {
     unlink "temp.pbc", "temp2.pbc", "temp.file";
-};
+}
 
-pir_output_is(<<'CODE', <<'OUTPUT', "eval.freeze");
+pir_output_is( <<'CODE', <<'OUTPUT', "eval.freeze" );
 .sub main :main
   .local pmc f, e
   .local pmc io
@@ -385,7 +384,7 @@ CODE
 written
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "eval.thaw");
+pir_output_is( <<'CODE', <<'OUTPUT', "eval.thaw" );
 .sub main :main
     .local pmc io, e
     .local string file
@@ -406,7 +405,7 @@ hello from foo_1
 hello from foo_1
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "eval.freeze+thaw");
+pir_output_is( <<'CODE', <<'OUTPUT', "eval.freeze+thaw" );
 .sub main :main
   .local pmc f, e
   .local pmc io
@@ -464,7 +463,7 @@ hello from foo_1
 hello from foo_1
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "get_pmc_keyed_int");
+pir_output_is( <<'CODE', <<'OUTPUT', "get_pmc_keyed_int" );
 .sub main :main
     .local string code
     .local pmc e, s, compi
@@ -490,7 +489,7 @@ parrot;foo
 parrot;bar
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "catch compile err: RT:#39892");
+pir_output_is( <<'CODE', <<'OUTPUT', "catch compile err: RT:#39892" );
 .sub main :main
      push_eh handler
      $P2 = compreg "PIR"
@@ -510,7 +509,7 @@ ok
 OUTPUT
 
 open my $TEMP, '>', "temp.pir" or die "can't open 'temp.pir': $!";
-END { unlink "temp.pir" };
+END { unlink "temp.pir" }
 print $TEMP <<PIR;
   .sub foo
      print a typo
@@ -518,7 +517,7 @@ print $TEMP <<PIR;
 PIR
 close $TEMP;
 
-pir_output_like(<<'CODE', <<'OUTPUT', "compile err in load_bytecode");
+pir_output_like( <<'CODE', <<'OUTPUT', "compile err in load_bytecode" );
 .sub main :main
      load_bytecode "temp.pir"
      print "never\n"
@@ -528,7 +527,7 @@ CODE
 /undefined identifier/
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "catch compile err in load_bytecode");
+pir_output_is( <<'CODE', <<'OUTPUT', "catch compile err in load_bytecode" );
 .sub main :main
      push_eh handler
      load_bytecode "temp.pir"

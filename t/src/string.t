@@ -8,8 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : (tests => 3);
-
+plan $^O =~ m/MSWin32/ ? ( skip_all => 'broken on win32' ) : ( tests => 3 );
 
 =head1 NAME
 
@@ -25,7 +24,7 @@ Tests C<string_make> for different charsets.
 
 =cut
 
-my $main = <<'END_C_CODE'; 
+my $main = <<'END_C_CODE';
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
@@ -54,11 +53,10 @@ main( int argc, char* argv[] )
 
 END_C_CODE
 
-
 SKIP:
 {
-   skip( "Pending Unicode", 1);
-   c_output_is($main . <<'CODE', <<'OUTPUT', 'string_make() with charset "shift_jis"');
+    skip( "Pending Unicode", 1 );
+    c_output_is( $main . <<'CODE', <<'OUTPUT', 'string_make() with charset "shift_jis"' );
 
 static opcode_t*
 the_test(Interp *interp, opcode_t *cur_op, opcode_t *start)
@@ -91,8 +89,7 @@ OUTPUT
 
 }
 
-
-c_output_is($main . <<'CODE', <<'OUTPUT',  'string_make() with charset "ascii"');
+c_output_is( $main . <<'CODE', <<'OUTPUT', 'string_make() with charset "ascii"' );
 
 static opcode_t*
 the_test(Interp *interp, opcode_t *cur_op, opcode_t *start)
@@ -127,7 +124,7 @@ character 4 = 100
 back in main()
 OUTPUT
 
-c_output_is($main . <<'CODE', <<'OUTPUT',  'string_bitwise_or()');
+c_output_is( $main . <<'CODE', <<'OUTPUT', 'string_bitwise_or()' );
 
 static opcode_t*
 the_test(Interp *interp, opcode_t *cur_op, opcode_t *start)

@@ -24,9 +24,8 @@ Once we have sparse array access in a core PMC, we can move these tests.
 
 =cut
 
-
 my $SPEEDUP = $ENV{RUNNING_MAKE_TEST} ? "gc_debug 0\n" : "";
-pasm_output_is($SPEEDUP . <<'CODE', <<'OUTPUT', "IntList: direct access");
+pasm_output_is( $SPEEDUP . <<'CODE', <<'OUTPUT', "IntList: direct access" );
     loadlib P20, 'perl_group'
        new P0, .IntList
 	set S0, ""
@@ -69,7 +68,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is($SPEEDUP . <<'CODE', <<'OUTPUT', "IntList: shift/unshift");
+pasm_output_is( $SPEEDUP . <<'CODE', <<'OUTPUT', "IntList: shift/unshift" );
     loadlib P20, 'perl_group'
         new P0, .IntList
 	set I10, 100000
@@ -116,8 +115,7 @@ ok 1
 ok 2
 OUTPUT
 
-
-pasm_output_is($SPEEDUP . <<'CODE', <<'OUTPUT', "ResizableBooleanArray: direct access");
+pasm_output_is( $SPEEDUP . <<'CODE', <<'OUTPUT', "ResizableBooleanArray: direct access" );
     loadlib P20, 'perl_group'
     new P0, .ResizableBooleanArray
     set S0, ""
@@ -162,8 +160,7 @@ CODE
 ok
 OUTPUT
 
-
-pasm_output_is($SPEEDUP . <<'CODE', <<'OUTPUT', "ResizableStringArray: direct access");
+pasm_output_is( $SPEEDUP . <<'CODE', <<'OUTPUT', "ResizableStringArray: direct access" );
     new P0, .ResizableStringArray
     set S0, ""
     set S1, "abcdefghijklmnopqrst"

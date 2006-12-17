@@ -66,7 +66,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Setting array size");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
     new P0, .FixedBooleanArray
 
     set I0,P0
@@ -86,7 +86,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)");
+pasm_output_like( <<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)" );
     new P0, .FixedBooleanArray
 
     set I0,P0
@@ -100,9 +100,10 @@ CODE
 /FixedBooleanArray: Can't resize!
 current instr\.:/
 OUTPUT
+
 #VIM's syntax highlighter needs this line
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Setting first element");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
         new P0, .FixedBooleanArray
         set P0, 1
 
@@ -131,7 +132,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Setting second element");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
         new P0, .FixedBooleanArray
         set P0, 2
 
@@ -160,8 +161,7 @@ ok 2
 ok 3
 OUTPUT
 
-
-pasm_output_like(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
+pasm_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
         new P0, .FixedBooleanArray
         set P0, 1
 
@@ -173,7 +173,7 @@ CODE
 current instr\.:/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
+pasm_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
         new P0, .FixedBooleanArray
         set P0, 1
 
@@ -184,8 +184,7 @@ CODE
 current instr\.:/
 OUTPUT
 
-
-pasm_output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
+pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
 @{[ $fp_equality_macro ]}
      new P0, .FixedBooleanArray
      set P0, 3
@@ -222,7 +221,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
+pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
 @{[ $fp_equality_macro ]}
      new P0, .FixedBooleanArray
      set P0, 1024
@@ -268,7 +267,7 @@ ok 3
 ok 4
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
@@ -291,7 +290,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "Truth");
+pasm_output_is( << 'CODE', << 'OUTPUT', "Truth" );
      new P0, .FixedBooleanArray
      unless P0, OK1
      print "not "
@@ -311,7 +310,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "PMC keys & values");
+pasm_output_is( << 'CODE', << 'OUTPUT', "PMC keys & values" );
      new P0, .FixedBooleanArray
      set P0, 2
      new P1, .Key

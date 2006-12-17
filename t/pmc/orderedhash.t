@@ -22,7 +22,7 @@ Tests the C<OrderedHash> PMC.
 
 =cut
 
-pasm_output_is(<<'CODE', <<OUT, "init");
+pasm_output_is( <<'CODE', <<OUT, "init" );
     new P0, .OrderedHash
     print "ok 1\n"
     set I0, P0
@@ -35,8 +35,7 @@ ok 1
 ok 2
 OUT
 
-
-pasm_output_is(<<'CODE', <<OUT, "set keys, get idx");
+pasm_output_is( <<'CODE', <<OUT, "set keys, get idx" );
     new P0, .OrderedHash
     new P1, .String
     set P1, "ok 1\n"
@@ -77,7 +76,7 @@ ok 1
 ok 2
 OUT
 
-pasm_output_is(<<'CODE', <<OUT, "iterate");
+pasm_output_is( <<'CODE', <<OUT, "iterate" );
     .include "iterator.pasm"
     new P0, .OrderedHash
     new P1, .String
@@ -116,7 +115,7 @@ ok 2
 ok 1
 OUT
 
-pasm_output_is(<<'CODE', <<OUT, "idx only");
+pasm_output_is( <<'CODE', <<OUT, "idx only" );
     new P0, .OrderedHash
     new P1, .String
     set P1, "ok 1\n"
@@ -135,7 +134,7 @@ ok 1
 ok 2
 OUT
 
-pasm_output_is(<<'CODE', <<OUT, "set keys, get idx - cloned");
+pasm_output_is( <<'CODE', <<OUT, "set keys, get idx - cloned" );
     new P10, .OrderedHash
     new P1, .String
     set P1, "ok 1\n"
@@ -189,7 +188,7 @@ ok 2
 ok 1
 OUT
 
-pasm_output_is(<<'CODE', <<OUT, "exists_keyed");
+pasm_output_is( <<'CODE', <<OUT, "exists_keyed" );
     new P0, .OrderedHash
     new P1, .Integer
     set P0["key"], P1
@@ -214,7 +213,7 @@ CODE
 110010
 OUT
 
-pasm_output_is(<<'CODE', <<OUT, "defined_keyed");
+pasm_output_is( <<'CODE', <<OUT, "defined_keyed" );
     new P0, .OrderedHash
     new P1, .Undef
     set P0["key"], P1
@@ -252,7 +251,7 @@ CODE
 0000001110
 OUT
 
-pasm_output_is(<<'CODE', <<OUT, "delete");
+pasm_output_is( <<'CODE', <<OUT, "delete" );
     .include "iterator.pasm"
     new P0, .OrderedHash
     new P1, .String
@@ -295,7 +294,7 @@ ok 3
 ok 3
 OUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "delete with int keys");
+pasm_output_is( <<'CODE', <<'OUTPUT', "delete with int keys" );
     new P0, .OrderedHash
     set P0["abc"], "Foo"
     set P0["def"], 12.6
@@ -321,7 +320,7 @@ CODE
 101101
 OUTPUT
 
-pasm_output_like(<<'CODE', '/[axj]/', "iterate over keys");
+pasm_output_like( <<'CODE', '/[axj]/', "iterate over keys" );
     .include "iterator.pasm"
     new P0, .OrderedHash
     new P1, .String
@@ -345,7 +344,7 @@ end_iter:
     end
 CODE
 
-pasm_output_like(<<'CODE', <<'OUT', "iterate over keys, get value");
+pasm_output_like( <<'CODE', <<'OUT', "iterate over keys, get value" );
     .include "iterator.pasm"
     new P0, .OrderedHash
     new P1, .String
@@ -374,7 +373,7 @@ ok \d
 ok \d/
 OUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash in PIR with PMC value");
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash in PIR with PMC value" );
 
 .sub _main
     .local pmc hash1
@@ -395,8 +394,7 @@ CODE
 U
 OUTPUT
 
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_integer_keyed");
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_integer_keyed" );
 
 .sub _main
     .local pmc hash1
@@ -414,7 +412,7 @@ CODE
 14
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed");
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed" );
 
 .sub _main
     .local pmc hash1
@@ -434,7 +432,7 @@ CODE
 U
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed");
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed" );
 
 .sub _main
     .local pmc hash1
@@ -452,9 +450,8 @@ CODE
 14
 OUTPUT
 
-
 # actually Parrot_OrderedHash_set_string_keyed is used, why ?
-pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed_str");
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed_str" );
 
 .sub _main
     .local pmc hash1
@@ -475,7 +472,7 @@ CODE
 15
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_number_keyed");
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_number_keyed" );
 
 .sub _main
     .local pmc hash1
@@ -496,7 +493,7 @@ CODE
 -16.16
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "OrderedHash get_integer");
+pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash get_integer" );
 
 .sub _main
     .local pmc hash1
@@ -531,8 +528,7 @@ CODE
 3
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "delete and access remaining");
+pasm_output_is( <<'CODE', <<'OUTPUT', "delete and access remaining" );
     new P0, .OrderedHash
     new P1, .String
     set P1, "A"
@@ -557,8 +553,7 @@ P0["b"]: B
 P0["b"]: B
 OUTPUT
 
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
@@ -585,7 +580,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "get_integer_keyed");
+pasm_output_is( <<'CODE', <<'OUTPUT', "get_integer_keyed" );
     new P0, .OrderedHash
     set P0["Foo"], 10
     set P0["Bar"], 20
@@ -609,7 +604,7 @@ CODE
 20
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "get_number_keyed");
+pasm_output_is( <<'CODE', <<'OUTPUT', "get_number_keyed" );
      new P0, .OrderedHash
      set N0, 12.3
      set N1, 45.1
@@ -639,7 +634,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "set/get compound key");
+pasm_output_is( <<'CODE', <<'OUTPUT', "set/get compound key" );
     new P0, .OrderedHash
     set P0["a"], "Foo\n"
     new P1, .Hash
@@ -671,7 +666,7 @@ baz
 xyzzy
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "exists compound key");
+pasm_output_is( <<'CODE', <<'OUTPUT', "exists compound key" );
     new P0, .OrderedHash
     set P0["a"], "Foo"
     new P1, .Hash
@@ -707,7 +702,7 @@ CODE
 11100
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "delete compound key");
+pasm_output_is( <<'CODE', <<'OUTPUT', "delete compound key" );
     new P0, .OrderedHash
     set P0["a"], "Foo"
     new P1, .Hash
@@ -752,7 +747,7 @@ CODE
 00
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw 1");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw 1" );
     new P0, .OrderedHash
     set P0["a"], "Foo\n"
     set P0["b"], "Bar\n"
@@ -776,7 +771,7 @@ Bar
 Bar
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "freeze/thaw 2");
+pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw 2" );
     new P0, .OrderedHash
     set P0["a"], "Foo\n"
     new P1, .Hash
@@ -808,7 +803,6 @@ bar
 xyzzy
 xyzzy
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

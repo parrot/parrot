@@ -6,7 +6,7 @@ use strict;
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Test;
 
-plan $^O =~ /MSWin32/ ? (skip_all => 'Broken on Win32') : (tests => 4);
+plan $^O =~ /MSWin32/ ? ( skip_all => 'Broken on Win32' ) : ( tests => 4 );
 
 =head1 NAME
 
@@ -203,7 +203,7 @@ do_ret:
 
 CODE
 
-pir_output_is($library . <<'CODE', <<'OUTPUT', "Single-threaded case");
+pir_output_is( $library . <<'CODE', <<'OUTPUT', "Single-threaded case" );
 .sub main :main
     .local pmc queue
 
@@ -236,8 +236,7 @@ CODE
 0123
 OUTPUT
 
-
-pir_output_is($library . <<'CODE', <<'OUTPUT', "Add in one thread, remove in the other");
+pir_output_is( $library . <<'CODE', <<'OUTPUT', "Add in one thread, remove in the other" );
 .const int MAX = 1000
 .const int SIZE = 10
 
@@ -311,7 +310,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is($library . <<'CODE', <<'OUTPUT', "Test 2 + attempt to trigger thread death bugs");
+pir_output_is( $library . <<'CODE', <<'OUTPUT', "Test 2 + attempt to trigger thread death bugs" );
 
 .sub adder
     .param pmc queue
@@ -397,7 +396,8 @@ OUTPUT
 # passed and sometimes fails depending on timing.
 SKIP: {
     skip "TODO test that fails intermittently", 1;
-pir_output_is($library . <<'CODE', <<'OUTPUT', "Test 2 + detach + attempt to trigger thread death bugs");
+    pir_output_is(
+        $library . <<'CODE', <<'OUTPUT', "Test 2 + detach + attempt to trigger thread death bugs" );
 
 .sub adder
     .param pmc queue

@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test;
 use Parrot::Config;
 
-
 =head1 NAME
 
 t/op/64bit.t - Testing integer ops on 64-bit platforms
@@ -25,17 +24,15 @@ Tests are skipped on other platforms.
 
 =cut
 
-
 ## remember to change the number of tests :-)
-if ($PConfig{intvalsize} == 8) {
-   plan tests => 1;
+if ( $PConfig{intvalsize} == 8 ) {
+    plan tests => 1;
 }
 else {
-   plan skip_all => "64bit INTVAL platforms only";
+    plan skip_all => "64bit INTVAL platforms only";
 }
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "bitops64");
+pasm_output_is( <<'CODE', <<'OUTPUT', "bitops64" );
         # check bitops for 8-byte ints
         set I0, 0xffffffffffffffff
         print I0 # -1

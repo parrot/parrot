@@ -22,7 +22,7 @@ Tests the C<Pair> PMC.
 
 =cut
 
-pasm_output_is(<<'CODE', <<'OUT', 'create');
+pasm_output_is( <<'CODE', <<'OUT', 'create' );
     new P0, .Pair
     print "ok 1\n"
     new P1, .Integer
@@ -39,7 +39,7 @@ ok 2
 42
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'methods');
+pir_output_is( <<'CODE', <<'OUT', 'methods' );
 .sub main :main
     .local pmc p, kv
     new p, .Pair
@@ -69,8 +69,8 @@ key 42 2 key 42
 OUT
 
 SKIP: {
-    skip("instantiate disabled", 1);
-pir_output_is(<<'CODE', <<'OUT', 'instantiate, assign');
+    skip( "instantiate disabled", 1 );
+    pir_output_is( <<'CODE', <<'OUT', 'instantiate, assign' );
 .sub main :main
     .local pmc cl, p, kv, k, v
     k = new .String

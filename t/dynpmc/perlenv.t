@@ -29,8 +29,7 @@ my $load_perl = <<'END_PASM';
     find_type I22, 'PerlEnv'
 END_PASM
 
-
-pir_output_is(<<"CODE", <<'OUT', 'new');
+pir_output_is( <<"CODE", <<'OUT', 'new' );
 .sub 'test' :main
 $load_perl
     new P0, I22
@@ -39,5 +38,4 @@ $load_perl
 CODE
 ok 1
 OUT
-
 

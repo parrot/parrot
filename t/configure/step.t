@@ -32,48 +32,47 @@ BEGIN { use_ok('Parrot::Configure::Step'); }
 
 Parrot::Configure::Step->import(@Parrot::Configure::Step::EXPORT_OK);
 
-can_ok(__PACKAGE__, @Parrot::Configure::Step::EXPORT_OK);
+can_ok( __PACKAGE__, @Parrot::Configure::Step::EXPORT_OK );
 
 # XXX add verbose tests with some Test::Warn like mechanism
 
 # integrate()
 
-is(integrate(undef, undef), undef, "integrate(undef, undef)");
-is(integrate(undef, 1), 1, "integrate(undef, 1)");
-is(integrate(1, undef), 1, "integrate(1, undef)");
-is(integrate(1, 2), 2, "integrate(1, 1)");
+is( integrate( undef, undef ), undef, "integrate(undef, undef)" );
+is( integrate( undef, 1 ),     1,     "integrate(undef, 1)" );
+is( integrate( 1,     undef ), 1,     "integrate(1, undef)" );
+is( integrate( 1,     2 ),     2,     "integrate(1, 1)" );
 
 # reopn STDIN to test prompt()
 
 # file_checksum(), not exported
 
 {
-    my( $tmpfile, $fname ) = tempfile(UNLINK => 1);
+    my ( $tmpfile, $fname ) = tempfile( UNLINK => 1 );
     print $tmpfile "foo" x 1000;
     $tmpfile->flush;
-    is(Parrot::Configure::Step::file_checksum("$fname"), '324000',
-        "file_checksum() returns correct checksum");
+    is( Parrot::Configure::Step::file_checksum("$fname"),
+        '324000', "file_checksum() returns correct checksum" );
 }
 
 # copy_if_diff()
 
 {
-    my( $fromfile, $fromfname ) = tempfile(UNLINK => 1);
-    my( $tofile, $tofname ) = tempfile(UNLINK => 1);
+    my ( $fromfile, $fromfname ) = tempfile( UNLINK => 1 );
+    my ( $tofile,   $tofname )   = tempfile( UNLINK => 1 );
     print $fromfile "foo" x 1000;
     $fromfile->flush;
 
-    ok(copy_if_diff("$fromfname", "$tofname"),
-        "copy_if_diff() true return status");
-    is(Parrot::Configure::Step::file_checksum("$tofname"), '324000',
-        "copy_if_diff() copied differing files");
+    ok( copy_if_diff( "$fromfname", "$tofname" ), "copy_if_diff() true return status" );
+    is( Parrot::Configure::Step::file_checksum("$tofname"),
+        '324000', "copy_if_diff() copied differing files" );
 }
 
 # move_if_diff()
 
 {
-    my( $fromfile, $fromfname ) = tempfile(UNLINK => 1);
-    my( $tofile, $tofname ) = tempfile(UNLINK => 1);
+    my ( $fromfile, $fromfname ) = tempfile( UNLINK => 1 );
+    my ( $tofile,   $tofname )   = tempfile( UNLINK => 1 );
     print $fromfile "foo" x 1000;
     $fromfile->close;
     $tofile->close;
@@ -86,15 +85,14 @@ is(integrate(1, 2), 2, "integrate(1, 1)");
     $fromfile->close();
     $tofile->close();
 
-    ok(move_if_diff("$fromfname", "$tofname"),
-        "move_if_diff() true return status");
-    ok(! -e "$fromfname", "move_if_diff() moved differing file");
+    ok( move_if_diff( "$fromfname", "$tofname" ), "move_if_diff() true return status" );
+    ok( !-e "$fromfname", "move_if_diff() moved differing file" );
 
     # redirect STDERR for the test below
     close *STDERR;
     open *STDERR, '<', $redir;
 
-    ok(-e "$tofname", "move_if_diff() moved differing file");
+    ok( -e "$tofname", "move_if_diff() moved differing file" );
 
     # restore STDERR
     close *STDERR;
@@ -123,49 +121,44 @@ is(integrate(1, 2), 2, "integrate(1, 1)");
 {
     my %tf_params = ( UNLINK => 1, );
     $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;
-    my( $tmpfile, $fname ) = tempfile(%tf_params);
+    my ( $tmpfile, $fname ) = tempfile(%tf_params);
 
     local $ENV{PATH} = dirname("$fname");
     chmod 0777, "$fname";
     my $prog = basename("$fname");
 
-    is(check_progs($prog), $prog,
-        "check_progs() returns the proper program")
+    is( check_progs($prog), $prog, "check_progs() returns the proper program" )
 }
 
 {
     my %tf_params = ( UNLINK => 1, );
     $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;
-    my( $tmpfile, $fname ) = tempfile(%tf_params);
+    my ( $tmpfile, $fname ) = tempfile(%tf_params);
 
     local $ENV{PATH} = dirname("$fname");
     chmod 0777, "$fname";
     my $prog = basename("$fname");
 
-    is(check_progs([$prog]), $prog,
-        "check_progs() returns the proper program when passed an array ref")
+    is( check_progs( [$prog] ),
+        $prog, "check_progs() returns the proper program when passed an array ref" )
 }
 
 {
     my $cmd = 'someboguscommand';
-    ok(!check_progs([$cmd]),
-        "check_progs() returns undef in scalar context on failure");
-    ok(!check_progs($cmd),
-        "check_progs() returns undef in scalar context on failure");
-    is_deeply([check_progs([$cmd])], [],
-        "check_progs() returns () in list context on failure");
-    is_deeply([check_progs($cmd)], [],
-        "check_progs() returns () in list context on failure");
+    ok( !check_progs( [$cmd] ), "check_progs() returns undef in scalar context on failure" );
+    ok( !check_progs($cmd), "check_progs() returns undef in scalar context on failure" );
+    is_deeply( [ check_progs( [$cmd] ) ],
+        [], "check_progs() returns () in list context on failure" );
+    is_deeply( [ check_progs($cmd) ], [], "check_progs() returns () in list context on failure" );
 }
 
 # _slurp(), not exported
 
 {
-    my( $tmpfile, $fname ) = tempfile(UNLINK => 1);
+    my ( $tmpfile, $fname ) = tempfile( UNLINK => 1 );
     print $tmpfile "foo" x 1000;
     $tmpfile->flush;
-    is(Parrot::Configure::Step::_slurp($fname), "foo" x 1000,
-        "_slurp() slurped the file");
+    is( Parrot::Configure::Step::_slurp($fname), "foo" x 1000, "_slurp() slurped the file" );
 }
 
 # Local Variables:

@@ -75,8 +75,7 @@ my $load_perl = <<'END_PASM';
     find_type I28, 'PerlUndef'
 END_PASM
 
-
-pir_output_is(<<'CODE', <<'OUT', 'new', todo => 'not yet working');
+pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not yet working' );
 .sub 'test' :main
     new P0, .perlscalar
     print "ok 1\n"
@@ -85,7 +84,7 @@ CODE
 ok 1
 OUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "assign Px,Py");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "assign Px,Py" );
     new P0, I24
     new P1, I25
     new P2, I27
@@ -160,7 +159,7 @@ CODE
 666:666:666:666
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "exchange");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "exchange" );
 @{[ $fp_equality_macro ]}
 	new P0, I24
         new P1, I24

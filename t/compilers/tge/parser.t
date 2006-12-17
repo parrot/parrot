@@ -8,7 +8,6 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Test::More;
 use Parrot::Test tests => 2;
 
-
 =head1 NAME
 
 t/parser.t - TGE::Parser tests
@@ -19,8 +18,7 @@ t/parser.t - TGE::Parser tests
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', "parse a basic attribute grammar");
+pir_output_is( <<'CODE', <<'OUT', "parse a basic attribute grammar" );
 
 .sub _main :main
     load_bytecode "compilers/tge/TGE.pir"
@@ -66,7 +64,7 @@ matched start rule
 parse succeeded
 OUT
 
-pir_output_like(<<'CODE', qr/Syntax error at line 4, near "transform "/, "parse failure");
+pir_output_like( <<'CODE', qr/Syntax error at line 4, near "transform "/, "parse failure" );
 
 .sub _main :main
     load_bytecode "compilers/tge/TGE.pir"

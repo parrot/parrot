@@ -24,7 +24,8 @@ Tests the C<PerlString> PMC. Checks pir method execution in a dynpmc and a subcl
 =cut
 
 # this works
-pir_output_is(<<'CODE', <<'OUTPUT', "subclass with pir method - .loadlib", todo => "PMCs don't obey HLL namespaces");
+pir_output_is(
+    <<'CODE', <<'OUTPUT', "subclass with pir method - .loadlib", todo => "PMCs don't obey HLL namespaces" );
 .loadlib  'perl_group'
 .sub main :main
   new $P0, 'PerlString'
@@ -48,7 +49,8 @@ HI from PerlString
 HI from PerlString
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "subclass with pir method - .HLL", todo => "PMCs don't obey HLL namespaces");
+pir_output_is(
+    <<'CODE', <<'OUTPUT', "subclass with pir method - .HLL", todo => "PMCs don't obey HLL namespaces" );
 .HLL 'Perl', 'perl_group'
 .sub main :main
   new $P0, 'PerlString'

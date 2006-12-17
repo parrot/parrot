@@ -23,8 +23,7 @@ Tests the Slice PMC.
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', 'new');
+pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     new P0, .Slice
     print "ok 1\n"
@@ -33,7 +32,7 @@ CODE
 ok 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'bug with slice bits', todo => 'parser');
+pir_output_is( <<'CODE', <<'OUT', 'bug with slice bits', todo => 'parser' );
 # the VT_CONSTP status gets destroyed, if this constant is
 # used somewhere else as slice index
 .const int vx = 3
@@ -56,7 +55,6 @@ pir_output_is(<<'CODE', <<'OUT', 'bug with slice bits', todo => 'parser');
 CODE
 1.000000
 OUT
-
 
 # Local Variables:
 #   mode: cperl

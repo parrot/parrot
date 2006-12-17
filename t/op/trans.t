@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 21;
 use Math::Trig qw( tan sec atan asin acos asec cosh sinh tanh sech );
 
-
 =head1 NAME
 
 t/op/trans.t - Transcendental Mathematical Ops
@@ -23,7 +22,6 @@ t/op/trans.t - Transcendental Mathematical Ops
 Tests the transcendental mathematical operations.
 
 =cut
-
 
 # This defines two macros:
 # fp_eq N, N, LABEL
@@ -761,5 +759,4 @@ CODE
 0.031250
 0.015625
 OUTPUT
-
 

@@ -66,8 +66,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-
-pasm_output_is(<<"CODE", <<OUTPUT, "basic assignment");
+pasm_output_is( <<"CODE", <<OUTPUT, "basic assignment" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 
@@ -120,8 +119,7 @@ ok 6
 ok 7
 OUTPUT
 
-
-pasm_output_is(<<"CODE", <<OUTPUT, "add number to self");
+pasm_output_is( <<"CODE", <<OUTPUT, "add number to self" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 0.001
@@ -135,7 +133,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is(<<"CODE", <<OUTPUT, "sub number from self");
+pasm_output_is( <<"CODE", <<OUTPUT, "sub number from self" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, -1000.2
@@ -149,7 +147,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is(<<"CODE", <<OUTPUT, "multiply number by self");
+pasm_output_is( <<"CODE", <<OUTPUT, "multiply number by self" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 123.4
@@ -163,7 +161,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is(<<"CODE", <<OUTPUT, "divide number by self");
+pasm_output_is( <<"CODE", <<OUTPUT, "divide number by self" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 1829354.988
@@ -177,7 +175,7 @@ CODE
 ok 1
 OUTPUT
 
-pir_output_is(<<'CODE', <<OUTPUT, "divide by zero");
+pir_output_is( <<'CODE', <<OUTPUT, "divide by zero" );
 .sub _main :main
     P0 = new Float
     set P0, "12.0"
@@ -199,8 +197,7 @@ ok
 float division by zero
 OUTPUT
 
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "Truth of a positive float");
+pir_output_is( << 'CODE', << 'OUTPUT', "Truth of a positive float" );
 
 .sub _main
     .local pmc float_1
@@ -218,7 +215,7 @@ CODE
 123.123 is true
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "Truth of a negative float");
+pir_output_is( << 'CODE', << 'OUTPUT', "Truth of a negative float" );
 
 .sub _main
     .local pmc float_1
@@ -236,7 +233,7 @@ CODE
 -123.123 is true
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "Truth of a positive integer");
+pir_output_is( << 'CODE', << 'OUTPUT', "Truth of a positive integer" );
 
 .sub _main
     .local pmc float_1
@@ -254,7 +251,7 @@ CODE
 1 is true
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "Truth of a negative integer");
+pir_output_is( << 'CODE', << 'OUTPUT', "Truth of a negative integer" );
 
 .sub _main
     .local pmc float_1
@@ -272,7 +269,7 @@ CODE
 -1 is true
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "Falseness of 0");
+pir_output_is( << 'CODE', << 'OUTPUT', "Falseness of 0" );
 
 .sub _main
     .local pmc float_1
@@ -290,7 +287,7 @@ CODE
 0 is false
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "Falseness of 0.000");
+pir_output_is( << 'CODE', << 'OUTPUT', "Falseness of 0.000" );
 
 .sub _main
     .local pmc float_1
@@ -308,7 +305,7 @@ CODE
 0 is false
 OUTPUT
 
-pasm_output_is(<< "CODE", << 'OUTPUT', "Basic integer arithmetic: addition");
+pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: addition" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 0.001
@@ -329,7 +326,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<< "CODE", << 'OUTPUT', "Basic integer arithmetic: subtraction");
+pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: subtraction" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 103.45
@@ -350,7 +347,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<< "CODE", << 'OUTPUT', "Basic integer arithmetic: multiplication");
+pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: multiplication" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 0.001
@@ -378,7 +375,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<< "CODE", << 'OUTPUT', "Basic integer arithmetic: division");
+pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: division" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 1e8
@@ -399,7 +396,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<< "CODE", << 'OUTPUT', "Basic numeric arithmetic: addition");
+pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: addition" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 0.001
@@ -420,7 +417,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<< "CODE", << 'OUTPUT', "Basic numeric arithmetic: subtraction");
+pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: subtraction" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 103.45
@@ -441,7 +438,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<< "CODE", << 'OUTPUT', "Basic numeric arithmetic: multiplication");
+pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: multiplication" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 0.001
@@ -469,7 +466,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<< "CODE", << 'OUTPUT', "Basic numeric arithmetic: division");
+pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: division" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 1e8
@@ -490,7 +487,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<< "CODE", << 'OUTPUT', "Increment & decrement");
+pasm_output_is( << "CODE", << 'OUTPUT', "Increment & decrement" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 0.5
@@ -525,7 +522,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<< "CODE", << 'OUTPUT', "Neg");
+pasm_output_is( << "CODE", << 'OUTPUT', "Neg" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 0.5
@@ -547,7 +544,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_like(<< 'CODE', << 'OUTPUT', "neg 0");
+pasm_output_like( << 'CODE', << 'OUTPUT', "neg 0" );
 	new P0, .Float
 	set P0, 0.0
 	neg P0
@@ -557,7 +554,7 @@ CODE
 /^-0/
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "Equality");
+pasm_output_is( << 'CODE', << 'OUTPUT', "Equality" );
 	new P0, .Float
 	set P0, 1e8
         new P1, .Float
@@ -612,7 +609,7 @@ ok 7
 ok 8
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
@@ -635,7 +632,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<< "CODE", << 'OUTPUT', "Abs");
+pasm_output_is( << "CODE", << 'OUTPUT', "Abs" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 1.0
@@ -666,7 +663,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: lt");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: lt" );
         new P1, .Float
         set P1, 111.1
         set N1, P1
@@ -691,7 +688,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: lt_num");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: lt_num" );
         new P1, .Float
         set P1, 1.1
         new P2, .Float
@@ -721,7 +718,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: le");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: le" );
         new P1, .Float
         set P1, 111.1
         set N1, P1
@@ -745,7 +742,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: le_num");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: le_num" );
         new P1, .Float
         set P1, 1.1
         new P2, .Float
@@ -774,7 +771,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: gt");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: gt" );
         new P1, .Float
         set P1, 111.1
         set N1, P1
@@ -799,7 +796,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: gt_num");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: gt_num" );
         new P1, .Float
         set P1, 1.1
         new P2, .Float
@@ -829,7 +826,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: ge");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: ge" );
         new P1, .Float
         set P1, 111.1
         set N1, P1
@@ -853,7 +850,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: ge_num");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: ge_num" );
         new P1, .Float
         set P1, 1.1
         new P2, .Float
@@ -882,7 +879,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: cmp_p_n");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: cmp_p_n" );
         new P1, .Float
         set P1, 123.45
         set N1, 123.45
@@ -905,7 +902,7 @@ CODE
 -1
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: isgt");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: isgt" );
         new P1, .Float
         new P2, .Float
         new P3, .Float
@@ -948,7 +945,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: isge");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: isge" );
         new P1, .Float
         new P2, .Float
         new P3, .Float
@@ -991,7 +988,7 @@ CODE
 1
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: islt");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: islt" );
         new P1, .Float
         new P2, .Float
         new P3, .Float
@@ -1034,7 +1031,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: isle");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: isle" );
         new P1, .Float
         new P2, .Float
         new P3, .Float
@@ -1077,7 +1074,7 @@ CODE
 1
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: iseq");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: iseq" );
         new P1, .Float
         new P2, .Float
         new P3, .Float
@@ -1108,7 +1105,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "comparison ops: isne");
+pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: isne" );
         new P1, .Float
         new P2, .Float
         new P3, .Float
@@ -1139,8 +1136,7 @@ CODE
 1
 OUTPUT
 
-
-pir_output_is( <<'CODE', <<OUTPUT, "new_from_string");
+pir_output_is( <<'CODE', <<OUTPUT, "new_from_string" );
 .sub main :main
     .const .Float pi = "3.1"
     print pi
@@ -1149,7 +1145,6 @@ pir_output_is( <<'CODE', <<OUTPUT, "new_from_string");
 CODE
 3.1
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

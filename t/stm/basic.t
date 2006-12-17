@@ -23,7 +23,7 @@ in easy, single-threaded cases.
 
 =cut
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "empty transactions");
+pasm_output_is( <<'CODE', <<'OUTPUT', "empty transactions" );
         stm_depth I0
         ne I0, 0, test_fail
 begin:  stm_start
@@ -50,7 +50,7 @@ CODE
 okay
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "STMVar init'd containing NULL");
+pir_output_is( <<'CODE', <<'OUTPUT', "STMVar init'd containing NULL" );
 .sub main :main
     $P1 = new .STMVar
 tx: stm_start
@@ -69,7 +69,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "STMRef init'd containing NULL");
+pir_output_is( <<'CODE', <<'OUTPUT', "STMRef init'd containing NULL" );
 .sub main :main
     $P1 = new .STMRef
 tx: stm_start
@@ -84,7 +84,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "STMVar init'd containing an Integer");
+pir_output_is( <<'CODE', <<'OUTPUT', "STMVar init'd containing an Integer" );
 .sub check
     .param string annotate
     .param pmc what
@@ -123,7 +123,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "STMRef init'd containing an Integer");
+pir_output_is( <<'CODE', <<'OUTPUT', "STMRef init'd containing an Integer" );
 .sub check
     .param string annotate
     .param pmc what
@@ -159,7 +159,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "aborting acts as expected");
+pir_output_is( <<'CODE', <<'OUTPUT', "aborting acts as expected" );
 .sub main :main
     .local string reason
     $P0 = new .Integer
@@ -190,7 +190,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "committed updates are seen afterwards");
+pir_output_is( <<'CODE', <<'OUTPUT', "committed updates are seen afterwards" );
 .sub main :main
     .local string reason
     $P0 = new .Integer
@@ -243,7 +243,7 @@ ok
 OUTPUT
 
 # XXX is this test good enough?
-pir_output_is(<<'CODE', <<'OUTPUT', "GC isn't too eager");
+pir_output_is( <<'CODE', <<'OUTPUT', "GC isn't too eager" );
 .sub main :main
     .local string reason
     $P0 = new .Integer
@@ -276,7 +276,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Push limits (write and read records)");
+pir_output_is( <<'CODE', <<'OUTPUT', "Push limits (write and read records)" );
 .const int NUM_VALS = 400
 .sub main :main
     .local pmc arr

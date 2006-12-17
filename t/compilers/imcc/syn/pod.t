@@ -11,7 +11,7 @@ use Parrot::Test tests => 3;
 
 # POD
 
-pir_output_is(<<'CODE', <<'OUT', "simple pod");
+pir_output_is( <<'CODE', <<'OUT', "simple pod" );
 .sub test :main
     print "pass\n"
     end
@@ -23,7 +23,7 @@ CODE
 pass
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "pod with decimal digits");
+pir_output_is( <<'CODE', <<'OUT', "pod with decimal digits" );
 .sub test :main
     print "pass\n"
     end
@@ -35,7 +35,7 @@ CODE
 pass
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "pod inside sub");
+pir_output_is( <<'CODE', <<'OUT', "pod inside sub" );
 .sub test :main
      print "pass\n"
      _x()

@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 25;
 use Parrot::Config;
 
-
 =head1 NAME
 
 t/op/stringu.t - Unicode String Test
@@ -23,7 +22,6 @@ t/op/stringu.t - Unicode String Test
 Tests Parrot unicode string system.
 
 =cut
-
 
 pasm_output_is( <<'CODE', <<OUTPUT, "angstrom" );
     getstdout P0
@@ -80,7 +78,7 @@ CODE
 aaaaaa\xe2\x84\xab-aaaaaa
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "MATHEMATICAL BOLD CAPITAL A");
+pasm_output_is( <<'CODE', <<OUTPUT, "MATHEMATICAL BOLD CAPITAL A" );
     getstdout P0
     push P0, "utf8"
     set S0, unicode:"aaaaaa\x{1d400}-aaaaaa"
@@ -91,7 +89,7 @@ CODE
 aaaaaa\xf0\x9d\x90\x80-aaaaaa
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, 'MATHEMATICAL BOLD CAPITAL A \U');
+pasm_output_is( <<'CODE', <<OUTPUT, 'MATHEMATICAL BOLD CAPITAL A \U' );
     getstdout P0
     push P0, "utf8"
     set S0, unicode:"aaaaaa\U0001d400-aaaaaa"
@@ -102,7 +100,7 @@ CODE
 aaaaaa\xf0\x9d\x90\x80-aaaaaa
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "two upscales");
+pasm_output_is( <<'CODE', <<OUTPUT, "two upscales" );
     getstdout P0
     push P0, "utf8"
     set S0, unicode:"aaaaaa\x{212b}-bbbbbb\x{1d400}-cccccc"
@@ -117,7 +115,7 @@ aaaaaa\xe2\x84\xab-bbbbbb\xf0\x9d\x90\x80-cccccc
 22
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "two upscales - don't downscale");
+pasm_output_is( <<'CODE', <<OUTPUT, "two upscales - don't downscale" );
     getstdout P0
     push P0, "utf8"
     set S0, unicode:"aaaaaa\x{1d400}-bbbbbb\x{212b}-cccccc"
@@ -132,7 +130,7 @@ aaaaaa\xf0\x9d\x90\x80-bbbbbb\xe2\x84\xab-cccccc
 22
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, '\cX, \ooo');
+pasm_output_is( <<'CODE', <<OUTPUT, '\cX, \ooo' );
     getstdout P0
     push P0, "utf8"
     set S0, "ok 1\cJ"
@@ -154,7 +152,7 @@ ok 4
 ok 5
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \u');
+pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \u' );
     set S0, "x\uy"
     print "never\n"
     end
@@ -162,7 +160,7 @@ CODE
 /Illegal escape sequence in/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \u123');
+pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \u123' );
     set S0, "x\u123y"
     print "never\n"
     end
@@ -170,7 +168,7 @@ CODE
 /Illegal escape sequence in/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \U123');
+pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \U123' );
     set S0, "x\U123y"
     print "never\n"
     end
@@ -178,7 +176,7 @@ CODE
 /Illegal escape sequence in/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \x');
+pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \x' );
     set S0, "x\xy"
     print "never\n"
     end
@@ -247,8 +245,8 @@ AAAAAAAAAA\xd9\xa6
 OUTPUT
 
 SKIP: {
-  skip('no ICU lib', 3) unless $PConfig{has_icu};
-pir_output_is( <<'CODE', <<OUTPUT, "downcase changes string behind scenes");
+    skip( 'no ICU lib', 3 ) unless $PConfig{has_icu};
+    pir_output_is( <<'CODE', <<OUTPUT, "downcase changes string behind scenes" );
 .sub main
     .local string str
     .local string rest
@@ -270,7 +268,7 @@ xyz
 xyz
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "downcase asciish");
+    pir_output_is( <<'CODE', <<OUTPUT, "downcase asciish" );
 .sub main
     .local string str
     .local string rest
@@ -283,8 +281,8 @@ CODE
 .xyz
 OUTPUT
 
-# escape does not produce utf8, just a raw sequence of chars
-pir_output_is( <<"CODE", <<'OUTPUT', "escape utf16");
+    # escape does not produce utf8, just a raw sequence of chars
+    pir_output_is( <<"CODE", <<'OUTPUT', "escape utf16" );
 .sub main
     .local string s, t
     .local int i
@@ -302,7 +300,7 @@ OUTPUT
 }
 
 # Tests for .CCLASS_WHITESPACE
-pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_WHITESPACE in unicode");
+pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_WHITESPACE in unicode" );
 .sub main
     .include 'cclass.pasm'
     .local string s
@@ -329,7 +327,7 @@ CODE
 OUTPUT
 
 # Tests for .CCLASS_NUMERIC
-pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_NUMERIC in unicode");
+pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_NUMERIC in unicode" );
 .sub main
     .include 'cclass.pasm'
     .local string s
@@ -356,7 +354,8 @@ CODE
 OUTPUT
 
 # Concatenate unicode: with iso-8859-1; RT #39930 if no icu
-pir_output_is( <<'CODE', <<"OUTPUT", "Concat unicode with iso-8859-1", $PConfig{has_icu} ? () : (todo => 'RT #39930'));
+pir_output_is(
+    <<'CODE', <<"OUTPUT", "Concat unicode with iso-8859-1", $PConfig{has_icu} ? () : ( todo => 'RT #39930' ) );
 .sub main
     $S0 = unicode:"A"
     $S1 = ascii:"B"
@@ -381,5 +380,4 @@ AB
 AB
 A\x00B\x00
 OUTPUT
-
 

@@ -6,7 +6,7 @@ use strict;
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Test;
 
-plan $^O =~ /MSWin32/ ? (skip_all => 'Broken on Win32') : (tests => 2);
+plan $^O =~ /MSWin32/ ? ( skip_all => 'Broken on Win32' ) : ( tests => 2 );
 
 =head1 NAME
 
@@ -24,15 +24,16 @@ implementation.
 =cut
 
 die "Cowardly refusing to overwrite existing file.\n" if -e 'STMLLQueue.pir';
-open my $llqueuelib, '>', 'STMLLQueue.pir' 
+open my $llqueuelib, '>', 'STMLLQueue.pir'
     or die "opening to write STMLLQueue.pir: $!\n";
 print $llqueuelib $_ while <DATA>;
 close $llqueuelib or warn "close: $!\n";
+
 END {
     unlink 'STMLLQueue.pir';
 }
 
-pir_output_is(<<'CODE', <<'OUTPUT', "single-threaded case");
+pir_output_is( <<'CODE', <<'OUTPUT', "single-threaded case" );
 .sub main :main
     load_bytecode 'STMLLQueue.pir'
 
@@ -55,7 +56,7 @@ CODE
 0123
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Add, remove, several threads");
+pir_output_is( <<'CODE', <<'OUTPUT', "Add, remove, several threads" );
 .sub add_thread
     .param pmc queue
     .param int start

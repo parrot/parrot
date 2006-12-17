@@ -22,7 +22,7 @@ Tests the C<load_bytecode> operation.
 
 =cut
 
-pir_output_like(<<'CODE', <<'OUTPUT', "load_bytecode on directory");
+pir_output_like( <<'CODE', <<'OUTPUT', "load_bytecode on directory" );
 .sub main :main
     load_bytecode 't'
 .end
@@ -30,7 +30,7 @@ CODE
 /t' is a directory/
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', "load_bytecode on non-existent file");
+pir_output_like( <<'CODE', <<'OUTPUT', "load_bytecode on non-existent file" );
 .sub main :main
         load_bytecode 'no_file_by_this_name'
 .end

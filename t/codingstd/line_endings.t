@@ -19,17 +19,16 @@ BEGIN {
 
 # are we using svk?
 my $use_svk = 0;
-our ($svk, $output);
+our ( $svk, $output );
 {
     eval {
         my $client = SVN::Client->new();
-        my $prop_ref = $client->propget("svn:mime-type", "MANIFEST", "WORKING", 0);
+        my $prop_ref = $client->propget( "svn:mime-type", "MANIFEST", "WORKING", 0 );
     };
     if ($@) {
         $use_svk = is_svk_working_dir();
     }
 }
-
 
 # set up how many tests to run
 plan tests => 1;
@@ -81,32 +80,31 @@ ok( !scalar(@dos_files), 'Line endings correct' )
 
 exit;
 
-
-sub source_files
-{
-    my $client = SVN::Client->new();
+sub source_files {
+    my $client   = SVN::Client->new();
     my $manifest = maniread('MANIFEST');
     my @test_files;
+
     # grab names of files to test (except binary files)
     foreach my $filename ( sort keys %$manifest ) {
+
         # try to read the svn:mime-type property of the file
         my $prop;
+
         # using svk if available
         if ($use_svk) {
             my @svk_cmd_args = ( 'svn:mime-type', $filename );
             my $ret_val = $svk->propget(@svk_cmd_args);
-            if ($ret_val != 0) {
+            if ( $ret_val != 0 ) {
                 die "Unable to run 'svk propget' command\n";
             }
             chomp $output;
             $prop = $output;
         }
+
         # or using svn
         else {
-            my $prop_ref = $client->propget("svn:mime-type", 
-                                         $filename, 
-                                         "WORKING", 
-                                         0);
+            my $prop_ref = $client->propget( "svn:mime-type", $filename, "WORKING", 0 );
             $prop = $prop_ref->{$filename};
         }
 
@@ -114,36 +112,36 @@ sub source_files
         # then the file is text (this is the assumption used by subversion)
 
         # if the mime-type property is undefined or empty, append to file list
-        if (!defined $prop || $prop eq '') {
+        if ( !defined $prop || $prop eq '' ) {
             push @test_files, $filename;
         }
         else {
+
             # if we know we have a text file, append it
             push @test_files, $filename
-                if ($prop =~ m{text});
+                if ( $prop =~ m{text} );
         }
     }
 
     return @test_files;
 }
 
-sub is_svk_working_dir
-{
+sub is_svk_working_dir {
     use SVK;
     use SVK::XD;
     use SVK::Util qw(catfile);
 
     # set up svk so that we can use it
-    my $svkpath = $ENV{SVKROOT} || catfile($ENV{HOME}, ".svk");
-    my $xd = SVK::XD->new( 
-        giantlock => catfile($svkpath, 'lock'),
-        statefile => catfile($svkpath, 'config'),
+    my $svkpath = $ENV{SVKROOT} || catfile( $ENV{HOME}, ".svk" );
+    my $xd = SVK::XD->new(
+        giantlock => catfile( $svkpath, 'lock' ),
+        statefile => catfile( $svkpath, 'config' ),
         svkpath   => $svkpath,
-        );
+    );
 
     $xd->load();
 
-    unless ($ENV{SVKNOSVNCONFIG}) {
+    unless ( $ENV{SVKNOSVNCONFIG} ) {
         SVN::Core::config_ensure(undef);
         $xd->{svnconfig} = SVN::Core::config_get_config(undef);
     }
@@ -153,7 +151,7 @@ sub is_svk_working_dir
     # we know that the MANIFEST should be there, so let's make sure we can
     # run the svk command
     my @svk_cmd_args = qw( svn:mime-type MANIFEST );
-    my $ret_val = $svk->propget(@svk_cmd_args);
+    my $ret_val      = $svk->propget(@svk_cmd_args);
 
     return !$ret_val;
 }

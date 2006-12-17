@@ -22,7 +22,7 @@ Tests mainly morphing undef to other types.
 
 =cut
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "morph to string");
+pasm_output_is( <<'CODE', <<'OUTPUT', "morph to string" );
         new P0, .String
         new P1, .Undef
         set P0, "foo"
@@ -34,8 +34,7 @@ CODE
 foofoo
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "get_bool");
+pir_output_is( <<'CODE', <<'OUTPUT', "get_bool" );
 
 .sub _main
     .local pmc pmc1
@@ -51,8 +50,7 @@ CODE
 A PMC Undef created by new is not
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "defined");
+pir_output_is( <<'CODE', <<'OUTPUT', "defined" );
 
 .sub _main
     .local pmc pmc1
@@ -70,8 +68,7 @@ CODE
 A PMC Undef is not defined.
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "get_string");
+pir_output_is( <<'CODE', <<'OUTPUT', "get_string" );
 
 .sub _main
     .local pmc pmc1
@@ -85,8 +82,7 @@ CODE
 beforeafter
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "morph to integer");
+pir_output_is( <<'CODE', <<'OUTPUT', "morph to integer" );
 
 .sub _main
     .local pmc pmc1
@@ -104,27 +100,7 @@ CODE
 -7777777
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "morph to float");
-
-.sub _main
-    .local pmc pmc1
-    pmc1 = new Undef
-    .local int int1
-    int1 = pmc1
-    .local num float1
-    float1 = -7777777e-3
-    float1 += int1
-    print float1
-    print "\n"
-    end
-.end
-CODE
--7777.777000
-OUTPUT
-
-
-pir_output_is(<<'CODE', <<'OUTPUT', "morph to float");
+pir_output_is( <<'CODE', <<'OUTPUT', "morph to float" );
 
 .sub _main
     .local pmc pmc1
@@ -142,8 +118,25 @@ CODE
 -7777.777000
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', "morph to float" );
 
-pir_output_is(<<'CODE', <<'OUTPUT', "set_integer_native");
+.sub _main
+    .local pmc pmc1
+    pmc1 = new Undef
+    .local int int1
+    int1 = pmc1
+    .local num float1
+    float1 = -7777777e-3
+    float1 += int1
+    print float1
+    print "\n"
+    end
+.end
+CODE
+-7777.777000
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "set_integer_native" );
 
 .sub _main
     .local pmc pmc1
@@ -167,8 +160,7 @@ CODE
 After assignment pmc1 is an Integer.
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "isa");
+pir_output_is( <<'CODE', <<'OUTPUT', "isa" );
 
 .sub _main
     .local pmc pmc1
@@ -220,7 +212,7 @@ A Undef PMC is not a scalar.
 A Undef PMC is not a Scalar.
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
@@ -239,7 +231,7 @@ CODE
 0
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "verify clone works.");
+pir_output_is( << 'CODE', << 'OUTPUT', "verify clone works." );
 
 .sub _main
     $P1 = new Undef
@@ -251,9 +243,6 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "verify clone works.");
 CODE
 Undef
 OUTPUT
-
-
-
 
 # Local Variables:
 #   mode: cperl

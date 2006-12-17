@@ -8,7 +8,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 5;
 
-
 =head1 NAME
 
 t/op/time.t - Time and Sleep
@@ -23,8 +22,7 @@ Tests the C<time> and C<sleep> operations.
 
 =cut
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "time_i");
+pasm_output_is( <<'CODE', <<'OUTPUT', "time_i" );
         time    I0
         time    I1
         ge      I0, 0, OK1
@@ -47,7 +45,7 @@ ok, (!= 1970) Grateful Dead not
 ok, (now>before) timelords need not apply
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "time_n");
+pasm_output_is( <<'CODE', <<'OUTPUT', "time_n" );
         time    N0
         time    N1
         ge      N0, 0.0, OK1
@@ -65,7 +63,7 @@ ok, (!= 1970) Grateful Dead not
 ok, (now>before) timelords need not apply
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "sleep");
+pasm_output_is( <<CODE, <<OUTPUT, "sleep" );
         print   "start\\n"
 
         time    I1
@@ -87,7 +85,7 @@ start
 done
 OUTPUT
 
-pasm_output_like(<<CODE, <<OUT , "sleep");
+pasm_output_like( <<CODE, <<OUT , "sleep" );
         sleep   -1
         end
 CODE
@@ -95,12 +93,12 @@ CODE
 OUT
 
 my $year;
-(undef, undef, undef, undef, undef, $year) = gmtime(time);
+( undef, undef, undef, undef, undef, $year ) = gmtime(time);
 $year += 1900;
 
 # don't run this test 1 tick before the year changes #'
 
-pasm_output_is(<<'CODE', $year, "decodelocaltime");
+pasm_output_is( <<'CODE', $year, "decodelocaltime" );
     time I0
     decodelocaltime P0, I0
     .include "tm.pasm"
@@ -108,6 +106,4 @@ pasm_output_is(<<'CODE', $year, "decodelocaltime");
     print I0
     end
 CODE
-
-
 

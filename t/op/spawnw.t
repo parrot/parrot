@@ -8,7 +8,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 7;
 
-
 =head1 NAME
 
 t/op/spawnw.t - Run OS commands and tell about the exit code
@@ -42,13 +41,12 @@ Nigel Sandever - L<nigelsandever@btconnect.com>
 
 =cut
 
-
-# perl command coded this way to avoid platform 
+# perl command coded this way to avoid platform
 # quoting issue.
 
 # test string version of spawnw
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 0");
+pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 0" );
         set     S1, 'perl -e "exit(0)"'
         set     I1, 99
         spawnw  I1, S1
@@ -61,7 +59,7 @@ CODE
 return code: 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 123");
+pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 123" );
         set     S1, 'perl -e "exit(123)"'
         set     I1, 99
         spawnw  I1, S1
@@ -74,7 +72,7 @@ CODE
 return code: 123
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 3");
+pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 3" );
         set     S1, 'perl -e "exit(3)"'
         set     I1, 99
         spawnw  I1, S1
@@ -89,7 +87,7 @@ OUTPUT
 
 # test array version of spawnw
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 0");
+pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 0" );
         new     P0, .Array
         set     P0, 3
         set     P0[0], "perl"
@@ -106,7 +104,7 @@ CODE
 return code: 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 123");
+pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 123" );
         new     P0, .Array
         set     P0, 3
         set     P0[0], "perl"
@@ -123,7 +121,7 @@ CODE
 return code: 123
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "exit code: 3");
+pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 3" );
         new     P0, .Array
         set     P0, 3
         set     P0[0], "perl"
@@ -140,7 +138,7 @@ CODE
 return code: 3
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "grow argv buffer");
+pir_output_is( <<'CODE', <<'OUTPUT', "grow argv buffer" );
 .sub test :main
         .local pmc args
 
@@ -167,6 +165,4 @@ end:
 CODE
 return code: 10
 OUTPUT
-
-
 

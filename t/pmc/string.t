@@ -65,7 +65,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-pasm_output_is(<<CODE, <<OUTPUT, "Set/get strings");
+pasm_output_is( <<CODE, <<OUTPUT, "Set/get strings" );
         new P0, .String
         set P0, "foo"
         set S0, P0
@@ -116,7 +116,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "Setting integers");
+pasm_output_is( <<CODE, <<OUTPUT, "Setting integers" );
         new P0, .String
         set P0, "1"
         set I0, P0
@@ -156,7 +156,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<"CODE", <<OUTPUT, "Setting numbers");
+pasm_output_is( <<"CODE", <<OUTPUT, "Setting numbers" );
 @{[ $fp_equality_macro ]}
         new P0, .String
         set P0, "1"
@@ -210,7 +210,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "ensure that concat ppp copies strings");
+pasm_output_is( <<CODE, <<OUTPUT, "ensure that concat ppp copies strings" );
 	new P0, .String
 	new P1, .String
 	new P2, .String
@@ -242,7 +242,7 @@ clear physics
 You can't teach an old dog new...clear physics
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "ensure that concat pps copies strings");
+pasm_output_is( <<CODE, <<OUTPUT, "ensure that concat pps copies strings" );
 	new P0, .String
 	new P1, .String
 
@@ -264,7 +264,7 @@ fnargh
 fnarghGrunties
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "Setting string references");
+pasm_output_is( <<CODE, <<OUTPUT, "Setting string references" );
 	new P0, .String
 	set S0, "C2H5OH + 10H20"
 	set P0, S0
@@ -280,7 +280,7 @@ C2H5OH
 C2H5OH
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "Assigning string copies");
+pasm_output_is( <<CODE, <<OUTPUT, "Assigning string copies" );
 	new P0, .String
 	set S0, "C2H5OH + 10H20"
 	assign P0, S0
@@ -296,7 +296,7 @@ C2H5OH
 C2H5OH + 10H20
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "repeat");
+pasm_output_is( <<'CODE', <<OUTPUT, "repeat" );
 	new P0, .String
 	set P0, "x"
 	new P1, .Integer
@@ -334,7 +334,7 @@ zzz
 
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "n_repeat");
+pasm_output_is( <<'CODE', <<OUTPUT, "n_repeat" );
 	new P0, .String
 	set P0, "x"
 	new P1, .Integer
@@ -370,7 +370,7 @@ yyyyyy
 zzz
 
 OUTPUT
-pasm_output_is(<<'CODE', <<OUTPUT, "repeat_int");
+pasm_output_is( <<'CODE', <<OUTPUT, "repeat_int" );
 	new P0, .String
 	set P0, "x"
 	set I1, 12
@@ -390,7 +390,7 @@ xxxxxxxxxxxx
 zazaza
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "n_repeat_int");
+pasm_output_is( <<'CODE', <<OUTPUT, "n_repeat_int" );
 	new P0, .String
 	set P0, "x"
 	set I1, 12
@@ -408,7 +408,7 @@ xxxxxxxxxxxx
 zazaza
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "if(String)");
+pasm_output_is( <<CODE, <<OUTPUT, "if(String)" );
         new P0, .String
 	set S0, "True"
 	set P0, S0
@@ -460,7 +460,7 @@ true
 false
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "concat");
+pasm_output_is( <<'CODE', <<OUTPUT, "concat" );
 	new P0, .String
 	new P1, .Undef
 	set P0, "foo"
@@ -500,7 +500,7 @@ bar
 str
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "n_concat");
+pasm_output_is( <<'CODE', <<OUTPUT, "n_concat" );
 	new P0, .String
 	set P0, "foo"
 	n_concat	P1, P0, P0
@@ -526,7 +526,7 @@ foofoo
 foo
 foobar
 OUTPUT
-pasm_output_is(<<'CODE', <<OUTPUT, "cmp");
+pasm_output_is( <<'CODE', <<OUTPUT, "cmp" );
 	new P1, .String
 	new P2, .String
 
@@ -555,7 +555,7 @@ CODE
 -1
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "cmp with Integer");
+pasm_output_is( <<'CODE', <<OUTPUT, "cmp with Integer" );
 	new P1, .Integer
 	new P2, .String
         set P2, "10"
@@ -602,7 +602,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "substr");
+pasm_output_is( <<'CODE', <<OUTPUT, "substr" );
         new P0, .String
         set P0, "This is a test\n"
         substr S0, P0, 0, 5
@@ -620,7 +620,7 @@ This test is a test
 This is a test
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "Out-of-bounds substr, +ve offset");
+pasm_output_like( <<'CODE', <<'OUTPUT', "Out-of-bounds substr, +ve offset" );
         new P0, .String
         set P0, "Woburn"
         substr S0, P0, 123, 22
@@ -629,7 +629,7 @@ CODE
 /^Cannot take substr outside string$/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "Out-of-bounds substr, -ve offset");
+pasm_output_like( <<'CODE', <<'OUTPUT', "Out-of-bounds substr, -ve offset" );
         new P0, .String
         set P0, "Woburn"
         substr S0, P0, -123, 22
@@ -638,7 +638,7 @@ CODE
 /^Cannot take substr outside string$/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bands NULL string");
+pasm_output_is( <<'CODE', <<OUTPUT, "bands NULL string" );
         new P1, .String
 	new P2, .String
 	new P3, .String
@@ -680,7 +680,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bands 2");
+pasm_output_is( <<'CODE', <<OUTPUT, "bands 2" );
         new P1, .String
 	new P2, .String
 	set P1, "abc"
@@ -696,7 +696,7 @@ A@
 EE
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bands 3");
+pasm_output_is( <<'CODE', <<OUTPUT, "bands 3" );
         new P1, .String
 	new P2, .String
 	new P0, .String
@@ -716,7 +716,7 @@ abc
 EE
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bors NULL string");
+pasm_output_is( <<'CODE', <<OUTPUT, "bors NULL string" );
         new P1, .String
 	new P2, .String
 	new P3, .String
@@ -802,7 +802,7 @@ ok 9
 ok 10
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bors 2");
+pasm_output_is( <<'CODE', <<OUTPUT, "bors 2" );
         new P1, .String
 	new P2, .String
 	set P1, "abc"
@@ -818,7 +818,7 @@ egc
 EE
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bors 3");
+pasm_output_is( <<'CODE', <<OUTPUT, "bors 3" );
         new P1, .String
 	new P2, .String
 	new P0, .String
@@ -838,7 +838,7 @@ abc
 EE
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bxors NULL string");
+pasm_output_is( <<'CODE', <<OUTPUT, "bxors NULL string" );
      new P1, .String
      new P2, .String
      new P3, .String
@@ -922,7 +922,7 @@ ok 9
 ok 10
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bxors 2");
+pasm_output_is( <<'CODE', <<OUTPUT, "bxors 2" );
     new P1, .String
     new P2, .String
     new P3, .String
@@ -948,7 +948,7 @@ ABCX
    X
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bxors 3");
+pasm_output_is( <<'CODE', <<OUTPUT, "bxors 3" );
     new P1, .String
     new P2, .String
     new P0, .String
@@ -980,7 +980,7 @@ abc
    Y
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "bnots NULL string");
+pasm_output_is( <<'CODE', <<OUTPUT, "bnots NULL string" );
      new P1, .String
      new P2, .String
      new P3, .String
@@ -1013,7 +1013,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "eq_str");
+pasm_output_is( <<'CODE', <<OUTPUT, "eq_str" );
         new P1, .String
         new P2, .String
         set P1, "ABC"
@@ -1048,7 +1048,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "ne_str");
+pasm_output_is( <<'CODE', <<OUTPUT, "ne_str" );
         new P1, .String
         new P2, .String
         set P1, "ABC"
@@ -1081,7 +1081,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "set const and chop");
+pasm_output_is( <<'CODE', <<OUTPUT, "set const and chop" );
    new P0, .String
    set P0, "str"
    set S0, P0
@@ -1093,8 +1093,7 @@ CODE
 str
 OUTPUT
 
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
@@ -1117,7 +1116,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "Clone");
+pasm_output_is( << 'CODE', << 'OUTPUT', "Clone" );
     new P0, .String
     set P0, "Tacitus\n"
     clone P1, P0
@@ -1128,7 +1127,7 @@ CODE
 Tacitus
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "set P[x], i");
+pasm_output_is( <<'CODE', <<OUTPUT, "set P[x], i" );
   new P0, .String
   set P0, "abcdef\n"
   set P0[2], 65
@@ -1138,7 +1137,7 @@ CODE
 abAdef
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "set P[x], s");
+pasm_output_is( <<'CODE', <<OUTPUT, "set P[x], s" );
   new P0, .String
   set P0, "abcdef\n"
   set P0[2], "AB"
@@ -1167,7 +1166,7 @@ he--o !!!!r-d
 -o !!!!r-d
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "set I0, P0 - string_to_int");
+pasm_output_is( <<'CODE', <<OUTPUT, "set I0, P0 - string_to_int" );
   new P0, .String
   set P0, "12.3E5\n"
   set I0, P0
@@ -1220,8 +1219,7 @@ CODE
 TAACGSTAACGS
 OUTPUT
 
-
-pir_output_is( <<'CODE', <<OUTPUT, "reverse P0 - reverse string");
+pir_output_is( <<'CODE', <<OUTPUT, "reverse P0 - reverse string" );
 .sub main :main
   $P0 = new String
   $P0 = "torrap"
@@ -1234,8 +1232,7 @@ CODE
 parrot
 OUTPUT
 
-
-pir_output_is( <<'CODE', <<OUTPUT, "is_integer - check integer");
+pir_output_is( <<'CODE', <<OUTPUT, "is_integer - check integer" );
 .sub main :main
   $P0 = new String
 
@@ -1280,7 +1277,7 @@ CODE
 1
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "new_from_string");
+pir_output_is( <<'CODE', <<OUTPUT, "new_from_string" );
 .sub main :main
     .const .String ok = "ok\n"
     print ok
@@ -1289,7 +1286,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "get_string returns COW string");
+pir_output_is( <<'CODE', <<'OUTPUT', "get_string returns COW string" );
 .sub main :main
   $P0 = new .String
   $P0 = "Foo"
@@ -1307,7 +1304,7 @@ Foo
 Boo
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "to_int 1");
+pir_output_is( <<'CODE', <<'OUTPUT', "to_int 1" );
 .sub 'main' :main
     .local pmc s
     s = new .String
@@ -1330,7 +1327,7 @@ CODE
 9
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "to_int 2");
+pir_output_like( <<'CODE', <<'OUTPUT', "to_int 2" );
 .sub 'main' :main
     .local pmc s
     s = new .String
@@ -1342,7 +1339,7 @@ CODE
 /invalid conversion to int - bad char 3/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "to_int 3");
+pir_output_like( <<'CODE', <<'OUTPUT', "to_int 3" );
 .sub 'main' :main
     .local pmc s
     s = new .String
@@ -1354,7 +1351,7 @@ CODE
 /invalid conversion to int - bad base 37/
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "elements gives length of string");
+pir_output_is( <<'CODE', <<'OUTPUT', "elements gives length of string" );
 .sub 'main' :main
     .local pmc s
     s = new .String

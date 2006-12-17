@@ -8,7 +8,6 @@ use lib qw( t . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 22;
 
-
 =head1 NAME
 
 t/library/data_escape.t - Data::Escape tests
@@ -32,7 +31,7 @@ my $PRE = <<"PRE";
     escape_string = find_global "$ns", 'String'
 PRE
 
-my $POST=<<'POST';
+my $POST = <<'POST';
 NOK:
     print "not "
 OK:
@@ -42,9 +41,8 @@ END:
 .end
 POST
 
-
 ## 1
-pir_output_is(<<CODE, <<'OUT', "load_bytecode");
+pir_output_is( <<CODE, <<'OUT', "load_bytecode" );
 .sub main :main
     load_bytecode "$lib"
     goto OK
@@ -59,11 +57,9 @@ CODE
 ok
 OUT
 
-
 ## find_global tests
-for my $sub ( @subs )
-{
-pir_output_is(<<CODE, <<'OUT', "find_global '$sub'");
+for my $sub (@subs) {
+    pir_output_is( <<CODE, <<'OUT', "find_global '$sub'" );
 .sub main :main
     load_bytecode "$lib"
     .local pmc sub
@@ -81,8 +77,7 @@ ok
 OUT
 } ## end find_global tests
 
-
-pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: empty string");
+pir_output_is( $PRE . <<'CODE' . $POST, <<'OUT', "escape_string: empty string" );
     .local string str
     str = ""
     str = escape_string( str, '"' )
@@ -93,8 +88,7 @@ CODE
 ok
 OUT
 
-
-pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: no escapes");
+pir_output_is( $PRE . <<'CODE' . $POST, <<'OUT', "escape_string: no escapes" );
     .local string str
 
     str = "abc 123"
@@ -106,8 +100,7 @@ CODE
 abc 123
 OUT
 
-
-pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: tab, carriage return, linefeed");
+pir_output_is( $PRE . <<'CODE' . $POST, <<'OUT', "escape_string: tab, carriage return, linefeed" );
     .local string str
 
     str = "a\tb\nc"
@@ -119,8 +112,7 @@ CODE
 a\tb\nc
 OUT
 
-
-pir_output_is($PRE . <<CODE . $POST, <<'OUT', "escape_string: other characters less than 32" );
+pir_output_is( $PRE . <<CODE . $POST, <<'OUT', "escape_string: other characters less than 32" );
     .local string str, x
 
     .local int index
@@ -145,8 +137,7 @@ CODE
 \000\001\002\003\004\005\006\007\010\t\n\013\014\015\016\017\020\021\022\023\024\025\026\027\030\031\032\033\034\035\036\037
 OUT
 
-
-pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: single quote" );
+pir_output_is( $PRE . <<'CODE' . $POST, <<'OUT', "escape_string: single quote" );
     .local string str
 
     str = "a'b'c'"
@@ -158,8 +149,7 @@ CODE
 a\'b\'c\'
 OUT
 
-
-pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: double quote" );
+pir_output_is( $PRE . <<'CODE' . $POST, <<'OUT', "escape_string: double quote" );
     .local string str
 
     str = 'a"b"c"'
@@ -171,8 +161,7 @@ CODE
 a\"b\"c\"
 OUT
 
-
-pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: single  double: escape single" );
+pir_output_is( $PRE . <<'CODE' . $POST, <<'OUT', "escape_string: single  double: escape single" );
     .local string str
 
     str = "ab\"'\"'c"
@@ -184,8 +173,7 @@ CODE
 ab"\'"\'c
 OUT
 
-
-pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: single & double: escape double" );
+pir_output_is( $PRE . <<'CODE' . $POST, <<'OUT', "escape_string: single & double: escape double" );
     .local string str
 
     str = "ab\"'\"'c"
@@ -197,8 +185,7 @@ CODE
 ab\"'\"'c
 OUT
 
-
-pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: backslash" );
+pir_output_is( $PRE . <<'CODE' . $POST, <<'OUT', "escape_string: backslash" );
     .local string str
 
     str = '\ abc \t'
@@ -210,8 +197,7 @@ CODE
 \\ abc \\t
 OUT
 
-
-pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: unprintable followed by numbers" );
+pir_output_is( $PRE . <<'CODE' . $POST, <<'OUT', "escape_string: unprintable followed by numbers" );
     .local string str
 
     str = chr 2
@@ -224,17 +210,16 @@ CODE
 \002123
 OUT
 
-
 SKIP: {
     skip 'test not written' => 1;
-pir_output_is($PRE . <<'CODE' . $POST, <<'OUT', "escape_string: non-ascii", todo => 'test not written' );
+    pir_output_is(
+        $PRE . <<'CODE' . $POST, <<'OUT', "escape_string: non-ascii", todo => 'test not written' );
 CODE
 ok
 OUT
 }
 
-
-pir_output_is($PRE . <<'CODE', <<'OUT', "escape_string: freeze a simple pmc" );
+pir_output_is( $PRE . <<'CODE', <<'OUT', "escape_string: freeze a simple pmc" );
     .local pmc original_pmc
     original_pmc = new String
     original_pmc = "ok\n"
@@ -274,12 +259,10 @@ CODE
 
 foreach my $codepoint (@codes) {
     pir_output_is(
-        (sprintf $unicode_test, $codepoint),
-        (sprintf "\\x{%i}\n", $codepoint),
+        ( sprintf $unicode_test, $codepoint ),
+        ( sprintf "\\x{%i}\n", $codepoint ),
         "escape_string: unicode: $codepoint"
     );
 }
-
-
 
 # vim: ft=imc :

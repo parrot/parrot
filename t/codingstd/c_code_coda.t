@@ -50,6 +50,7 @@ my @extra_coda;
 
 foreach my $file (@files) {
     my $buf;
+
     # if we have command line arguments, the file is the full path
     # otherwise, use the relevant Parrot:: path method
     my $path = @ARGV ? $file : $file->path;
@@ -68,11 +69,9 @@ foreach my $file (@files) {
 
     # append to the extra_coda array if coda-like text appears more than once
     my $vim_many = 0;
-    $vim_many++
-        while $buf =~ m{^ [* \t]* vim: }gmx;
+    $vim_many++ while $buf =~ m{^ [* \t]* vim: }gmx;
     my $emacs_many = 0;
-    $emacs_many++
-        while $buf =~ m{^ [* \t]* Local \s variables: }gmx;
+    $emacs_many++ while $buf =~ m{^ [* \t]* Local \s variables: }gmx;
     push @extra_coda => "$path\n"
         if $vim_many > 1 || $emacs_many > 1;
 }

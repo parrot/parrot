@@ -8,7 +8,6 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Test::More;
 use Parrot::Test tests => 2;
 
-
 =head1 NAME
 
 t/hllcompiler.t - testing the features of the HLLCompiler module
@@ -19,7 +18,7 @@ t/hllcompiler.t - testing the features of the HLLCompiler module
 
 =cut
 
-pir_output_is(<<'CODE', <<'OUT', 'some of the auxiliary methods');
+pir_output_is( <<'CODE', <<'OUT', 'some of the auxiliary methods' );
 
 .sub _main :main
     load_bytecode 'Parrot/HLLCompiler.pbc'
@@ -48,7 +47,7 @@ None::Parser
 None::Grammar
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'one complete start-to-end compiler');
+pir_output_is( <<'CODE', <<'OUT', 'one complete start-to-end compiler' );
 
 .namespace [ 'None::Compiler' ]
 

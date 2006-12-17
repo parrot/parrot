@@ -8,7 +8,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 3;
 
-
 =head1 NAME
 
 t/op/types.t - Parrot Types
@@ -24,8 +23,7 @@ F<t/pmc/pmc.t>.
 
 =cut
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "data type names");
+pasm_output_is( <<'CODE', <<'OUTPUT', "data type names" );
         # first (native) type
         set I0, -100
         typeof S0, I0
@@ -67,7 +65,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "find_type with invalid type");
+pasm_output_is( <<'CODE', <<'OUTPUT', "find_type with invalid type" );
         find_type I0, "Smurf"
         print I0
         print "\n"
@@ -76,7 +74,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "data type sizes");
+pasm_output_like( <<'CODE', <<'OUTPUT', "data type sizes" );
        find_type I0, "int"
        sizeof I1, I0
        print I1
@@ -90,6 +88,4 @@ pasm_output_like(<<'CODE', <<'OUTPUT', "data type sizes");
 CODE
 /^[48]4-1$/
 OUTPUT
-
-
 

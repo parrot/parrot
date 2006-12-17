@@ -24,13 +24,13 @@ a variety of keys and values.
 
 =cut
 
-my $PRE= <<PRE;
+my $PRE = <<PRE;
 .sub 'test' :main
     .local pmc capt
     capt = new .Capture
 PRE
 
-my $POST= <<POST;
+my $POST = <<POST;
     goto end
   nok:
     print 'not '
@@ -40,13 +40,11 @@ my $POST= <<POST;
 .end
 POST
 
-
-pir_output_is($PRE.<<'CODE'.$POST, <<'OUT', 'new');
+pir_output_is( $PRE . <<'CODE'. $POST, <<'OUT', 'new' );
 CODE
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "Basic capture tests");
+pir_output_is( <<'CODE', <<'OUTPUT', "Basic capture tests" );
 .sub main :main
     .local pmc capt
     capt = new .Capture
@@ -163,8 +161,7 @@ two
 15 fourteen 13.500000 12
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "defined, delete, exists");
+pir_output_is( <<'CODE', <<'OUTPUT', "defined, delete, exists" );
 .sub main :main
     .local pmc capt
     capt = new .Capture
@@ -246,8 +243,7 @@ CODE
 0 0
 OUTPUT
 
-
-pir_output_is($PRE.<<'CODE'.$POST, <<'OUTPUT', "get_hash, get_array");
+pir_output_is( $PRE . <<'CODE'. $POST, <<'OUTPUT', "get_hash, get_array" );
     $P0 = capt.'get_array'()
     $P1 = capt.'get_hash'()
 
@@ -261,29 +257,25 @@ ResizablePMCArray
 Hash
 OUTPUT
 
-
-pir_output_like($PRE.<<'CODE'.$POST, <<'OUT', 'get_integer not implemented');
+pir_output_like( $PRE . <<'CODE'. $POST, <<'OUT', 'get_integer not implemented' );
     I0 = capt
 CODE
 /get_integer\(\) not implemented in class 'Capture'/
 OUT
 
-
-pir_output_like($PRE.<<'CODE'.$POST, <<'OUT', 'get_string not implemented');
+pir_output_like( $PRE . <<'CODE'. $POST, <<'OUT', 'get_string not implemented' );
     S0 = capt
 CODE
 /get_string\(\) not implemented in class 'Capture'/
 OUT
 
-
-pir_output_like($PRE.<<'CODE'.$POST, <<'OUT', 'get_number not implemented');
+pir_output_like( $PRE . <<'CODE'. $POST, <<'OUT', 'get_number not implemented' );
     N0 = capt
 CODE
 /get_number\(\) not implemented in class 'Capture'/
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', '*_keyed_int delegation', todo => "Fix objects vs. vtables");
+pir_output_is( <<'CODE', <<'OUTPUT', '*_keyed_int delegation', todo => "Fix objects vs. vtables" );
 .sub main :main
     $P99 = subclass 'Capture', 'Match'
     $P1 = new 'Match'
@@ -305,8 +297,7 @@ CODE
 2
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'get_array method delegation');
+pir_output_is( <<'CODE', <<'OUTPUT', 'get_array method delegation' );
 .sub main :main
     $P0 = subclass 'Capture', 'Match'
     addattribute $P0, '$.abc'
@@ -328,9 +319,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'get_array method delegation');
 CODE
 0
 OUTPUT
-
-
-
 
 # Local Variables:
 #   mode: cperl

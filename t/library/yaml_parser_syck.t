@@ -9,7 +9,6 @@ use lib qw( t . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 1;
 
-
 =head1 NAME
 
 t/library/yaml_parser_syck.t - testing library/YAML/Parser/Syck.pir
@@ -24,12 +23,11 @@ Try to parse a YAML document.
 
 =cut
 
-
 TODO: {
 
-  local $TODO = 'Not properly implemented yet';
+    local $TODO = 'Not properly implemented yet';
 
-  pir_output_is( << 'CODE', << 'OUT', "basic parsing" );
+    pir_output_is( << 'CODE', << 'OUT', "basic parsing" );
 
 .include "library/YAML/Parser/Syck.pir"
 .include "library/dumper.pir"
@@ -157,8 +155,7 @@ elem12345678
     "_synchronous" => 1
 }
 OUT
-};
-
+}
 
 =head1 AUTHOR
 
@@ -169,6 +166,4 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 F<runtime/parrot/library/YAML/Parser/Syck.pir>
 
 =cut
-
-
 

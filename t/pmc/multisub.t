@@ -22,7 +22,7 @@ Tests the creation and invocation of Perl6 multi subs.
 
 =cut
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "create PMC");
+pasm_output_is( <<'CODE', <<'OUTPUT', "create PMC" );
     new P0, .MultiSub
     print "ok 1\n"
     elements I0, P0
@@ -33,7 +33,6 @@ CODE
 ok 1
 0
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

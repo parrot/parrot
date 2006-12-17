@@ -8,7 +8,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 6;
 
-
 =head1 NAME
 
 t/op/debuginfo.t - Debugging Info
@@ -24,7 +23,7 @@ as well as backtrace tests.
 
 =cut
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "getline, getfile");
+pasm_output_like( <<'CODE', <<'OUTPUT', "getline, getfile" );
 .pcc_sub main:
     getfile S0
     getline I0
@@ -159,6 +158,4 @@ called from Sub 'rec' pc (\d+|-1) \(.*?:(\d+|-1)\)
 \.\.\. call repeated 90 times
 called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
-
-
 

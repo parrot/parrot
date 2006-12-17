@@ -23,8 +23,7 @@ Tests the Closure PMC.
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', 'new');
+pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     new P0, .Closure
     print "ok 1\n"
@@ -33,7 +32,7 @@ CODE
 ok 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'Make sure we can sweep closures.');
+pir_output_is( <<'CODE', <<'OUTPUT', 'Make sure we can sweep closures.' );
 ## This is a regression test for a bug in which Closure:mark expected
 ## sub->outer_ctx to be initialized, regardless of whether the closure
 ## had ever been called.
@@ -52,7 +51,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'Make sure we can sweep closures.');
 CODE
 We lived.
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

@@ -22,7 +22,7 @@ Tests the C<Key> PMC.
 
 =cut
 
-pasm_output_is(<<'CODE', <<'OUT', 'traverse key chain');
+pasm_output_is( <<'CODE', <<'OUT', 'traverse key chain' );
     new P0, .Key
     set P0, "1"
     new P1, .Key
@@ -57,7 +57,7 @@ CODE
 123
 OUT
 
-pasm_output_is(<<'CODE', <<'OUT', 'extract int from string keys');
+pasm_output_is( <<'CODE', <<'OUT', 'extract int from string keys' );
 new P0, .ResizableStringArray
 push P0, "ok 1\n"
 push P0, "ok 2\n"
@@ -72,7 +72,7 @@ ok 1
 ok 2
 OUT
 
-pasm_output_is(<<'CODE', <<'OUT', 'extract string from int keys');
+pasm_output_is( <<'CODE', <<'OUT', 'extract string from int keys' );
 new P0, .Hash
 set P0['1'], "ok 1\n"
 set P0['2'], "ok 2\n"

@@ -29,24 +29,27 @@ my $PARROT   = ".$PConfig{slash}$PConfig{test_prog}";
 my $PBCMERGE = ".$PConfig{slash}pbc_merge$PConfig{exe}";
 
 # Only test if we have the PBC merge tool built.
-if (-e $PBCMERGE) {
-   plan tests => 4;
-} else {
-   plan skip_all => "PBC Merge tool not built or test disabled";
+if ( -e $PBCMERGE ) {
+    plan tests => 4;
+}
+else {
+    plan skip_all => "PBC Merge tool not built or test disabled";
 }
 
 sub pir_to_pbc {
-    my ($name, $pir) = @_;
+    my ( $name, $pir ) = @_;
 
     open my $FILE, '>', "t$PConfig{slash}tools$PConfig{slash}$name.pir";
     print $FILE $pir;
     close $FILE;
-    system("$PARROT -o t$PConfig{slash}tools$PConfig{slash}$name.pbc t$PConfig{slash}tools$PConfig{slash}$name.pir");
+    system(
+"$PARROT -o t$PConfig{slash}tools$PConfig{slash}$name.pbc t$PConfig{slash}tools$PConfig{slash}$name.pir"
+    );
 }
 
 sub pbc_merge {
     my $outname = "t$PConfig{slash}tools$PConfig{slash}" . shift() . ".pbc";
-    my $inputs = join(' ', map { "t$PConfig{slash}tools$PConfig{slash}$_.pbc" } @_);
+    my $inputs = join( ' ', map { "t$PConfig{slash}tools$PConfig{slash}$_.pbc" } @_ );
     system("$PBCMERGE -o $outname $inputs");
 }
 
@@ -67,8 +70,8 @@ PIR
     print 42
 .end
 PIR
-    pbc_merge("pbc_merge_t1", "pbc_merge_t1_1", "pbc_merge_t1_2");
-    is(run_pbc("pbc_merge_t1"), "42");
+    pbc_merge( "pbc_merge_t1", "pbc_merge_t1_1", "pbc_merge_t1_2" );
+    is( run_pbc("pbc_merge_t1"), "42" );
 }
 
 # Second test - check constant table pointers in bytecode are fixed up.
@@ -101,8 +104,8 @@ PIR
     .return(n)
 .end
 PIR
-    pbc_merge("pbc_merge_t2", "pbc_merge_t2_1", "pbc_merge_t2_2");
-    is(run_pbc("pbc_merge_t2"), "Rammstein have rocked for over 10.398571 years!");
+    pbc_merge( "pbc_merge_t2", "pbc_merge_t2_1", "pbc_merge_t2_2" );
+    is( run_pbc("pbc_merge_t2"), "Rammstein have rocked for over 10.398571 years!" );
 }
 
 # Third test - sub calls back and forth between blocks.
@@ -128,8 +131,8 @@ PIR
     .return(s)
 .end
 PIR
-    pbc_merge("pbc_merge_t3", "pbc_merge_t3_1", "pbc_merge_t3_2");
-    is(run_pbc("pbc_merge_t3"), "Stirb nicht vor mir");
+    pbc_merge( "pbc_merge_t3", "pbc_merge_t3_1", "pbc_merge_t3_2" );
+    is( run_pbc("pbc_merge_t3"), "Stirb nicht vor mir" );
 }
 
 # Fourth test - passing constant string arguments.
@@ -149,8 +152,8 @@ PIR
     print s
 .end
 PIR
-    pbc_merge("pbc_merge_t4", "pbc_merge_t4_1", "pbc_merge_t4_2");
-    is(run_pbc("pbc_merge_t4"), "spray");
+    pbc_merge( "pbc_merge_t4", "pbc_merge_t4_1", "pbc_merge_t4_2" );
+    is( run_pbc("pbc_merge_t4"), "spray" );
 }
 
 # Local Variables:

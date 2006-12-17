@@ -23,7 +23,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 
 =cut
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Setting ManagedStruct size");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting ManagedStruct size" );
     new P0,.ManagedStruct
     set I0,P0
     eq I0,0,OK_1
@@ -46,8 +46,7 @@ ok 2
 ok 3
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "element access - float, double");
+pasm_output_is( <<'CODE', <<'OUTPUT', "element access - float, double" );
     new P2, .ResizablePMCArray
     .include "datatypes.pasm"
     push P2, .DATATYPE_FLOAT
@@ -83,7 +82,7 @@ CODE
 14.300000
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "element access - char, short");
+pasm_output_like( <<'CODE', <<'OUTPUT', "element access - char, short" );
     new P2, .ResizablePMCArray
     .include "datatypes.pasm"
     push P2, .DATATYPE_CHAR
@@ -116,7 +115,7 @@ CODE
 /^ok 12 (513|258)$/
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "named element access int16");
+pir_output_is( <<'CODE', <<'OUTPUT', "named element access int16" );
 
 .include "datatypes.pasm"
 
@@ -178,7 +177,7 @@ x: 2
 y: 16
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "nested struct offsets");
+pasm_output_is( <<'CODE', <<'OUTPUT', "nested struct offsets" );
   # the nested structure
   .include "datatypes.pasm"
   new P3, .ResizablePMCArray
@@ -243,7 +242,7 @@ CODE
 8
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
@@ -261,7 +260,6 @@ CODE
 1
 0
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

@@ -22,8 +22,7 @@ Tests builtin opcode-like methods.
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', "three ways to call a method");
+pir_output_is( <<'CODE', <<'OUT', "three ways to call a method" );
 .sub main :main
     .local pmc x, y, cl, m
     x = new Float
@@ -50,7 +49,7 @@ function      0.540302
 method        0.540302
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "say");
+pir_output_is( <<'CODE', <<'OUT', "say" );
 .sub main :main
     .local pmc io
     $I0 = say "ok 1"
@@ -77,8 +76,8 @@ ok 7
 OUT
 
 SKIP: {
-    skip("bound methods - n/y", 2);
-pir_output_is(<<'CODE', <<'OUT', "bound methods");
+    skip( "bound methods - n/y", 2 );
+    pir_output_is( <<'CODE', <<'OUT', "bound methods" );
 .sub main :main
     .local pmc x, y, cl, m
     x = new Float
@@ -108,7 +107,7 @@ class method  0.540302
 bound class m 0.540302
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "ParrotIO.puts");
+    pir_output_is( <<'CODE', <<'OUT', "ParrotIO.puts" );
 .sub main :main
     .local pmc o, m, cl
     o = getstdout
@@ -129,7 +128,6 @@ ok 5
 OUT
 
 }
-
 
 # Local Variables:
 #   mode: cperl

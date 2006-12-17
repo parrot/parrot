@@ -8,7 +8,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 14;
 
-
 =head1 NAME
 
 t/op/jitn.t - JIT register allocation
@@ -24,8 +23,7 @@ registers.
 
 =cut
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 1,2,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 1,2,3 mapped" );
 set N0,0
 set N1,1
 set N2,2
@@ -43,7 +41,7 @@ CODE
 2.000000
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_n_n_i 1,2,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_i 1,2,3 mapped" );
 set N0,0
 set N1,1
 set I2,2
@@ -58,7 +56,7 @@ CODE
 1.000000
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 1,2 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 1,2 mapped" );
 set N0,0
 set N1,1
 set N2,2
@@ -82,7 +80,7 @@ CODE
 4.000000
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 1,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 1,3 mapped" );
 set N0,0
 set N1,1
 set N2,2
@@ -106,7 +104,7 @@ CODE
 1.000000
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_n_n_i 1,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_i 1,3 mapped" );
 set N0,0
 set I1,1
 set N1,1
@@ -128,7 +126,7 @@ CODE
 4.000000
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 2,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 2,3 mapped" );
 set N0,0
 set N1,1
 set N2,2
@@ -152,7 +150,7 @@ CODE
 1.000000
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_n_n_i 2,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_i 2,3 mapped" );
 set N0,0
 set N1,1
 set I1,1
@@ -177,7 +175,7 @@ CODE
 1.000000
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 1 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 1 mapped" );
 set N0,0
 set N1,1
 set N2,2
@@ -202,7 +200,7 @@ CODE
 4.000000
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 2 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 2 mapped" );
 set N0,0
 set N1,1
 set N2,2
@@ -226,7 +224,7 @@ CODE
 4.000000
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 3 mapped" );
 set N0,0
 set N1,1
 set N2,2
@@ -250,7 +248,7 @@ CODE
 4.000000
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n 0 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 0 mapped" );
 set N0,0
 set N1,1
 set N2,2
@@ -275,7 +273,7 @@ CODE
 4.000000
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_n_n_n mapped same");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n mapped same" );
 set N2, 1
 add N2, N2, N2  # reserve first reg
 add N2, N2, N2
@@ -297,7 +295,7 @@ CODE
 OUTPUT
 
 # rounding behavior
-pir_output_is(<<'CODE', <<'OUT', "set_i_n testing");
+pir_output_is( <<'CODE', <<'OUT', "set_i_n testing" );
 
 .sub _main
     .local num n
@@ -322,7 +320,7 @@ CODE
 123
 OUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "rounding due to mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "rounding due to mapped" );
     set N0, 15
     mul N0, N0, 0.1
     sub N0, 1.5
@@ -334,5 +332,4 @@ z:
 CODE
 zero
 OUTPUT
-
 

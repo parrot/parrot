@@ -8,7 +8,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 2;
 
-
 =head1 NAME
 
 t/op/00ff-dos.t - DOS File Format
@@ -23,16 +22,13 @@ Tests file formats.
 
 =cut
 
-
 my $code = qq(print "ok\\n"\r\nend\r\n);
-pasm_output_is($code, <<'OUT', "fileformat dos");
+pasm_output_is( $code, <<'OUT', "fileformat dos" );
 ok
 OUT
 
 $code = qq(print "ok\\n"\r\nend\r\n\cZ\r\n);
-pasm_output_is($code, <<'OUT', "fileformat dos w ctrl-z");
+pasm_output_is( $code, <<'OUT', "fileformat dos w ctrl-z" );
 ok
 OUT
-
-
 

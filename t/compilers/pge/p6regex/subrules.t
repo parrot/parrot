@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 8;
 use Parrot::Test::PGE;
 
-
 =head1 NAME
 
 t/p6regex/subrules.t - PGE subrules tests
@@ -25,45 +24,51 @@ ver. 7, in the B<'Named regexes'> section
 
 =cut
 
-
-p6rule_is  ("   int argc ",
+p6rule_is(
+    "   int argc ",
     [
         [ type    => 'int | double | float | char' ],
         [ ident   => '\w+' ],
         [ _MASTER => ':w<type> <ident>' ],
     ],
-    "simple subrules");
+    "simple subrules"
+);
 
-p6rule_isnt("doggy",
+p6rule_isnt(
+    "doggy",
     [
         [ type    => 'int | double | float | char' ],
         [ ident   => '\w+' ],
         [ _MASTER => ':w<type> <ident>' ],
     ],
-    "simple subrules");
+    "simple subrules"
+);
 
-p6rule_is  ("(565) 325-2935",
+p6rule_is(
+    "(565) 325-2935",
     [
-        [ digits => '\d+' ],
-        [ exch => '\(<digits>\)' ],
+        [ digits  => '\d+' ],
+        [ exch    => '\(<digits>\)' ],
         [ _MASTER => ':w<exch> <digits>-<digits>' ],
     ],
-    "nested subrules");
+    "nested subrules"
+);
 
-p6rule_isnt("0-900-04-41-59",
+p6rule_isnt(
+    "0-900-04-41-59",
     [
-        [ digits => '\d+' ],
-        [ exch => '\(<digits>\)' ],
+        [ digits  => '\d+' ],
+        [ exch    => '\(<digits>\)' ],
         [ _MASTER => ':w<exch> <digits>-<digits>' ],
     ],
-    "nested subrules");
+    "nested subrules"
+);
 
-p6rule_is("ab",
-    [
-        [ alpha => '<[aeiou]>' ],
-        [ _MASTER => '^ <alpha> <PGE::Match::alpha>' ],
-    ],
-    "named and lexical subrules");
+p6rule_is(
+    "ab",
+    [ [ alpha => '<[aeiou]>' ], [ _MASTER => '^ <alpha> <PGE::Match::alpha>' ], ],
+    "named and lexical subrules"
+);
 
 #p6rule_isnt("ba",
 #    [
@@ -72,19 +77,17 @@ p6rule_is("ab",
 #    ],
 #    "named and lexical subrules");
 
-p6rule_isnt("   ab", '^ <ws>: \ ab', "cut on subrules");
+p6rule_isnt( "   ab", '^ <ws>: \ ab', "cut on subrules" );
 
-p6rule_isnt('whence',
-    [
-        [ subrule => 'when <commit> ever' ],
-        [ _MASTER => '<subrule> | whence' ],
-    ],
-    "<commit> in nested subrule");
+p6rule_isnt(
+    'whence',
+    [ [ subrule => 'when <commit> ever' ], [ _MASTER => '<subrule> | whence' ], ],
+    "<commit> in nested subrule"
+);
 
-p6rule_is  ('"abcd"',
-        [
-           [ char => '<-[\\"]>' ],
-           [ _MASTER => '" <char>* "' ],
-        ],
-        "negated charclass in subrule");
+p6rule_is(
+    '"abcd"',
+    [ [ char => '<-[\\"]>' ], [ _MASTER => '" <char>* "' ], ],
+    "negated charclass in subrule"
+);
 

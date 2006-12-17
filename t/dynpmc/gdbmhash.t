@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test;
 use Parrot::Config;
 
-
 =head1 NAME
 
 t/dynpmc/gdbmhash.t - test the GDBMHash PMC 
@@ -24,14 +23,12 @@ Tests the C<GDBMHash> PMC.
 
 =cut
 
-
-if ($PConfig{has_gdbm}) {
+if ( $PConfig{has_gdbm} ) {
     plan tests => 13;
 }
 else {
     plan skip_all => "No gdbm library available";
 }
-
 
 # PIR fragment for setting up a GDBM Hash
 my $new_hash_1 = << 'CODE';
@@ -44,8 +41,7 @@ my $new_hash_1 = << 'CODE';
     hash_1 = new gdbmhash_type
 CODE
 
-
-pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "typeof");
+pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "typeof" );
 
     .local string type
     type = typeof hash_1
@@ -55,10 +51,9 @@ pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "typeof");
 CODE
 GDBMHash
 OUTPUT
-unlink( 'gdbm_hash_1' );
+unlink('gdbm_hash_1');
 
-
-pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "check whether interface is done" );
     .local int bool1
     does bool1, hash_1, "scalar"
     print bool1
@@ -75,10 +70,9 @@ CODE
 1
 0
 OUTPUT
-unlink( 'gdbm_hash_1' );
+unlink('gdbm_hash_1');
 
-
-pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "get_integer");
+pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "get_integer" );
     .local int hash_size
     hash_size = hash_1
     print "An unitialized GDBMHash has size "
@@ -128,10 +122,9 @@ After one assignment GDBMHash has size 1.
 After two assignments GDBMHash has size 2.
 After 15 assignments GDBMHash has size 15.
 OUTPUT
-unlink( 'gdbm_hash_1' );
+unlink('gdbm_hash_1');
 
-
-pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "get_bool");
+pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "get_bool" );
     print "An uninitialized GDBMHash is"
     if hash_1 goto HASH1_IS_1
     print " not"
@@ -158,12 +151,11 @@ An uninitialized GDBMHash is not.
 An GDBMHash for a new file is not.
 After one insert the GDBMHash is.
 OUTPUT
-unlink( 'gdbm_hash_1' );
-
+unlink('gdbm_hash_1');
 
 # The value is a STRING, with umlaut
 # The key used for insertion is a STRING.
-pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "modify an entry");
+pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "modify an entry" );
     hash_1 = "gdbm_hash_1"
 
     .local pmc    val_pmc
@@ -187,11 +179,11 @@ Wert geaendert
 Wert nocheinmal geaendert
 Wert urspruenglich
 OUTPUT
-unlink( 'gdbm_hash_1' );
+unlink('gdbm_hash_1');
 
 # The value is a STRING.
 # The key used for insertion is a STRING.
-pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "exists_keyed");
+pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "exists_keyed" );
     hash_1 = "gdbm_hash_1"
 
     hash_1["Schluessel"] = "Wert\n"
@@ -221,11 +213,11 @@ CODE
 0
 1
 OUTPUT
-unlink( 'gdbm_hash_1' );
+unlink('gdbm_hash_1');
 
 # The value is a STRING.
 # The key used for insertion is a STRING.
-pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "set STRING with STRING key");
+pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "set STRING with STRING key" );
     hash_1 = "gdbm_hash_1"
 
     hash_1["Schluessel"] = "Wert\n"
@@ -251,12 +243,11 @@ Wert
 Wert
 Wert
 OUTPUT
-unlink( 'gdbm_hash_1' );
-
+unlink('gdbm_hash_1');
 
 # The value is a STRING.
 # The key used for insertion is a PMC.
-pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "set STRING with a PMC key");
+pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "set STRING with a PMC key" );
     hash_1 = "gdbm_hash_1"
 
     .local pmc key_pmc
@@ -285,12 +276,11 @@ Wert
 Wert
 Wert
 OUTPUT
-unlink( 'gdbm_hash_1' );
-
+unlink('gdbm_hash_1');
 
 # The value is a PMC.
 # The key used for insertion is a STRING.
-pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "set PMC with STRING key");
+pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "set PMC with STRING key" );
     hash_1 = "gdbm_hash_1"
 
     .local pmc val
@@ -319,11 +309,11 @@ Wert
 Wert
 Wert
 OUTPUT
-unlink( 'gdbm_hash_1' );
+unlink('gdbm_hash_1');
 
 # The value is a PMC.
 # The key used for insertion is a PMC.
-pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "set PMC with a PMC key");
+pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "set PMC with a PMC key" );
     hash_1 = "gdbm_hash_1"
 
     .local pmc val
@@ -355,12 +345,11 @@ Wert
 Wert
 Wert
 OUTPUT
-unlink( 'gdbm_hash_1' );
-
+unlink('gdbm_hash_1');
 
 # The value is an INTVAL
 # The key used for insertion is a STRING.
-pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "set INTVAL with STRING key");
+pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "set INTVAL with STRING key" );
     hash_1 = "gdbm_hash_1"
 
     hash_1["Schluessel"] = -11012005
@@ -390,12 +379,11 @@ CODE
 -11012005
 -11012005
 OUTPUT
-unlink( 'gdbm_hash_1' );
-
+unlink('gdbm_hash_1');
 
 # The value is a FLOATVAL.
 # The key used for insertion is a PMC.
-pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "set FLOATVAL with a PMC key");
+pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "set FLOATVAL with a PMC key" );
     hash_1 = "gdbm_hash_1"
 
     .local pmc key_pmc
@@ -428,9 +416,9 @@ CODE
 -1101.2
 -1101.2
 OUTPUT
-unlink( 'gdbm_hash_1' );
+unlink('gdbm_hash_1');
 
-pir_output_is($new_hash_1 . << 'CODE', << 'OUTPUT', "delete_keyed");
+pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "delete_keyed" );
     hash_1 = "gdbm_hash_1"
 
     .local int exist_flag
@@ -458,5 +446,5 @@ CODE
 "a" exists: 1
 "a" exists: 0
 OUTPUT
-unlink( 'gdbm_hash_1' );
+unlink('gdbm_hash_1');
 

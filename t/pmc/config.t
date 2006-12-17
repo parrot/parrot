@@ -24,8 +24,7 @@ Tests the parrot config interface.
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', "get config hash");
+pir_output_is( <<'CODE', <<'OUT', "get config hash" );
 .sub main :main
     .include "iglobals.pasm"
     .local pmc config_hash, interp
@@ -39,7 +38,7 @@ CODE
 Hash
 OUT
 
-pir_output_is(<<'CODE', cwd, "prefix");
+pir_output_is( <<'CODE', cwd, "prefix" );
 .sub main :main
     .include "iglobals.pasm"
     .local pmc config_hash, interp
@@ -50,7 +49,7 @@ pir_output_is(<<'CODE', cwd, "prefix");
 .end
 CODE
 
-pir_output_is(<<'CODE', <<'OUT', "load src/pbc from library path");
+pir_output_is( <<'CODE', <<'OUT', "load src/pbc from library path" );
 .sub main :main
     load_bytecode "config.pir"
     print "ok 1\n"

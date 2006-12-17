@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 2;
 use Parrot::Config;
 
-
 =head1 NAME
 
 t/dynpmc/sub.t - test if Sub is overridable by .HLL_map
@@ -25,8 +24,7 @@ happens to be a .Sub.
 
 =cut
 
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib");
+pir_output_is( << 'CODE', << 'OUTPUT', "loadlib" );
 .sub main :main
     .local pmc lib
     lib = loadlib "subproxy"
@@ -40,7 +38,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "test type of HLL_mapped .Sub");
+pir_output_is( << 'CODE', << 'OUTPUT', "test type of HLL_mapped .Sub" );
 .sub main :main
     .const .Sub b = 'bar'
     $S0 = typeof b

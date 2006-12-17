@@ -7,7 +7,6 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Test tests => 6;
 
-
 #SKIP: {
 #  skip("-O2 disabled", 5);
 
@@ -15,7 +14,7 @@ use Parrot::Test tests => 6;
 # generated PASM code for various optimizations at level 2
 
 ##############################
-pir_2_pasm_is(<<'CODE', <<'OUT', "used once lhs");
+pir_2_pasm_is( <<'CODE', <<'OUT', "used once lhs" );
 .sub _main
 	$I1 = 1
 	$I2 = 2
@@ -31,7 +30,7 @@ _main:
 OUT
 
 ##############################
-pir_2_pasm_is(<<'CODE', <<'OUT', "constant propogation and resulting dead code");
+pir_2_pasm_is( <<'CODE', <<'OUT', "constant propogation and resulting dead code" );
 .sub _main
        set I0, 5
 loop:
@@ -54,7 +53,7 @@ loop:
 OUT
 
 ##############################
-pir_2_pasm_is(<<'CODE', <<'OUT', "don't move constant past a label");
+pir_2_pasm_is( <<'CODE', <<'OUT', "don't move constant past a label" );
 .sub _main
   set I1, 10
   set I0, 5
@@ -82,7 +81,7 @@ nxt:
 OUT
 
 ##############################
-pir_2_pasm_is(<<'CODE', <<'OUT', "constant prop and null_i");
+pir_2_pasm_is( <<'CODE', <<'OUT', "constant prop and null_i" );
 .sub _main
   null I0
   add I1, I0, 5
@@ -99,9 +98,9 @@ OUT
 
 ##############################
 SKIP: {
-skip("loop opt disabled for now", 1);
+    skip( "loop opt disabled for now", 1 );
 
-pir_2_pasm_is(<<'CODE', <<'OUT', "remove invariant from loop");
+    pir_2_pasm_is( <<'CODE', <<'OUT', "remove invariant from loop" );
 .sub _main
        set I0, 5
 loop:
@@ -134,7 +133,7 @@ OUT
 }
 
 ##############################
-pir_2_pasm_is(<<'CODE', <<'OUT', "constant prop repeated");
+pir_2_pasm_is( <<'CODE', <<'OUT', "constant prop repeated" );
 .sub _main
   .local int a
   .local int b

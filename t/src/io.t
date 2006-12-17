@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : (tests => 20);
+plan $^O =~ m/MSWin32/ ? ( skip_all => 'broken on win32' ) : ( tests => 20 );
 
 =head1 NAME
 
@@ -24,15 +24,13 @@ Tests the IO subsystem.
 
 =cut
 
+$/ = undef;    # slurp mode
 
-$/=undef; # slurp mode
+sub setup {
+    my $name    = @_ ? shift: "temp.file";
+    my $content = @_ ? shift: "This is a test\n";
 
-sub setup
-{
-    my $name = @_ ? shift : "temp.file";
-    my $content = @_ ? shift : "This is a test\n";
-
-    open(my $FILE, '>', "$name") or die "Failed to create $name";
+    open( my $FILE, '>', "$name" ) or die "Failed to create $name";
     binmode $FILE;
     print $FILE $content;
     close($FILE);
@@ -40,12 +38,11 @@ sub setup
     unlink("does_not_exist") if -e "does_not_exist";
 }
 
-sub teardown
-{
-    my $name = @_ ? shift : "temp.file";
+sub teardown {
+    my $name = @_ ? shift: "temp.file";
 
     my $delete_counter;
-    unlink($name) while( -e $name and 3 > $delete_counter++ and sleep 1);
+    unlink($name) while ( -e $name and 3 > $delete_counter++ and sleep 1 );
     die "Failed to delete $name" if -e $name;
 }
 
@@ -73,7 +70,7 @@ CODE
 
 ###############################################################################
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "hello world");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "hello world" );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -88,7 +85,7 @@ OUTPUT
 
 ###############################################################################
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "write");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "write" );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -112,14 +109,14 @@ Hello, World!
 OUTPUT
 
 open my $FILE, '<', "temp.file";
-is(<$FILE>, <<DATA, 'file content');
+is( <$FILE>, <<DATA, 'file content' );
 Hello, World!
 DATA
 close $FILE;
 
 ###############################################################################
 
-c_output_is($main . <<'CODE', <<'OUTPUT', 'read');
+c_output_is( $main . <<'CODE', <<'OUTPUT', 'read' );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -161,7 +158,7 @@ OUTPUT
 
 ###############################################################################
 
-c_output_is($main . <<'CODE', '', 'append');
+c_output_is( $main . <<'CODE', '', 'append' );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -177,7 +174,7 @@ the_test(Interp *interp,
 CODE
 
 open $FILE, '<', "temp.file";
-is(<$FILE>, <<'DATA', 'file content');
+is( <$FILE>, <<'DATA', 'file content' );
 Hello, World!
 Parrot flies.
 DATA
@@ -185,7 +182,7 @@ close $FILE;
 
 ###############################################################################
 
-c_output_is($main . <<'CODE', <<'OUTPUT', 'readline');
+c_output_is( $main . <<'CODE', <<'OUTPUT', 'readline' );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -215,7 +212,7 @@ OUTPUT
 
 ###############################################################################
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_parse_open_flags");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_parse_open_flags" );
 #include "../src/io/io_private.h"
 
 static opcode_t*
@@ -255,7 +252,7 @@ OUTPUT
 
 setup();
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_open");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_open" );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -294,9 +291,9 @@ teardown();
 
 ###############################################################################
 
-setup("temp.file", "This is a test.");
+setup( "temp.file", "This is a test." );
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_read");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_read" );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -347,9 +344,9 @@ teardown();
 
 ###############################################################################
 
-setup("temp.file", ("x" x 65533) . "yz");
+setup( "temp.file", ( "x" x 65533 ) . "yz" );
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_read larger file");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_read larger file" );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -380,9 +377,9 @@ teardown();
 
 ###############################################################################
 
-setup("temp.file", ("x" x 65536) . "yz");
+setup( "temp.file", ( "x" x 65536 ) . "yz" );
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_read larger chunk when the buffer is not-empty");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_read larger chunk when the buffer is not-empty" );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -414,9 +411,10 @@ teardown();
 
 ###############################################################################
 
-setup("temp.file", "words\n" x 10000);
+setup( "temp.file", "words\n" x 10000 );
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_tell: read larger chunk when the buffer is not-empty");
+c_output_is(
+    $main . <<'CODE', <<'OUTPUT', "PIO_tell: read larger chunk when the buffer is not-empty" );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -451,7 +449,7 @@ teardown();
 
 ###############################################################################
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_write");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_write" );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -479,7 +477,7 @@ OUTPUT
 
 setup();
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_close");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_close" );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -505,7 +503,7 @@ teardown;
 
 ###############################################################################
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_make_offset");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_make_offset" );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -535,9 +533,9 @@ OUTPUT
 
 ###############################################################################
 
-setup("temp.file", "abcdefg");
+setup( "temp.file", "abcdefg" );
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_seek");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_seek" );
 #include "../src/io/io_private.h"
 
 static opcode_t*
@@ -592,7 +590,7 @@ teardown();
 
 ###############################################################################
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_fdopen");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_fdopen" );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -627,7 +625,7 @@ OUTPUT
 
 ###############################################################################
 
-c_output_is($main . <<'CODE', <<'OUTPUT', 'stdio-layer');
+c_output_is( $main . <<'CODE', <<'OUTPUT', 'stdio-layer' );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -648,9 +646,9 @@ OUTPUT
 
 ###############################################################################
 
-setup("temp.file", "Hello World!");
+setup( "temp.file", "Hello World!" );
 
-c_output_is($main . <<'CODE', <<'OUTPUT', 'peek');
+c_output_is( $main . <<'CODE', <<'OUTPUT', 'peek' );
 static opcode_t*
 the_test(Interp *interp,
         opcode_t *cur_op, opcode_t *start)

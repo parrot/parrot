@@ -8,7 +8,6 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Test::More;
 use Parrot::Test tests => 3;
 
-
 =head1 NAME
 
 t/basic.t - testing a few basic components of TGE::Grammar and TGE::Tree
@@ -19,8 +18,7 @@ t/basic.t - testing a few basic components of TGE::Grammar and TGE::Tree
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', 'build up a basic rule in a grammar');
+pir_output_is( <<'CODE', <<'OUT', 'build up a basic rule in a grammar' );
 
 .sub _main :main
     load_bytecode 'TGE.pbc'
@@ -50,7 +48,7 @@ min
 .
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'agid hash');
+pir_output_is( <<'CODE', <<'OUT', 'agid hash' );
 .sub _main :main
     load_bytecode 'compilers/tge/TGE/Tree.pir'
     .local pmc tree
@@ -94,8 +92,7 @@ CODE
 3
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', '"Malformed string" in r11890 under Linux i386');
+pir_output_is( <<'CODE', <<'OUT', '"Malformed string" in r11890 under Linux i386' );
 
 .sub test
   load_bytecode "PAST.pbc"
@@ -105,5 +102,4 @@ pir_output_is(<<'CODE', <<'OUT', '"Malformed string" in r11890 under Linux i386'
 CODE
 1
 OUT
-
 

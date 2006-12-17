@@ -8,7 +8,6 @@ use lib qw( t . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-
 =head1 NAME
 
 t/library/File-Spec.t - test File::Spec module
@@ -23,12 +22,10 @@ Tests file specifications.
 
 =cut
 
-
 ##############################
 # File::Spec
 
-
-my $PRE= <<'PRE';
+my $PRE = <<'PRE';
 .sub 'main' :main
         load_bytecode 'library/File/Spec.pir'
 
@@ -39,7 +36,7 @@ my $PRE= <<'PRE';
         new spec, classtype
 
 PRE
-my $POST= <<'POST';
+my $POST = <<'POST';
         goto OK
 NOK:
         print "not "
@@ -50,27 +47,26 @@ END:
 .end
 POST
 
-
 ## 1
-pir_output_is(<<'CODE'.$POST, <<'OUT', "load_bytecode");
+pir_output_is( <<'CODE'. $POST, <<'OUT', "load_bytecode" );
 .sub 'main' :main
         load_bytecode 'File/Spec.pir'
 CODE
 ok
 OUT
 
-
-pir_output_is($PRE.<<'CODE'.$POST, <<'OUT', "new");
+pir_output_is( $PRE . <<'CODE'. $POST, <<'OUT', "new" );
 CODE
 ok
 OUT
 
-
-my @meths= (qw/
+my @meths = (
+    qw/
         __isa VERSION devnull tmpdir case_tolerant file_name_is_absolute catfile
         catdir path canonpath splitpath splitdir catpath abs2rel rel2abs
-/);
-pir_output_is($PRE.<<"CODE".$POST, <<'OUT', "can ($_)") for @meths;
+        /
+);
+pir_output_is( $PRE . <<"CODE". $POST, <<'OUT', "can ($_)" ) for @meths;
         .local pmc meth
         \$I0 = can spec, "$_"
         unless \$I0, NOK
@@ -78,8 +74,7 @@ CODE
 ok
 OUT
 
-
-pir_output_like($PRE.<<'CODE'.$POST, <<'OUT', "isa");
+pir_output_like( $PRE . <<'CODE'. $POST, <<'OUT', "isa" );
         .local pmc class
         class= new String
 
@@ -90,8 +85,7 @@ CODE
 /^File::Spec::.+/
 OUT
 
-
-pir_output_is($PRE.<<'CODE'.$POST, <<'OUT', "version");
+pir_output_is( $PRE . <<'CODE'. $POST, <<'OUT', "version" );
         .local pmc version
         version= spec.'VERSION'()
         print version
@@ -100,9 +94,8 @@ CODE
 0.1
 OUT
 
-
 ## testing private subs
-pir_output_is($PRE.<<'CODE'.$POST, <<"OUT", "_get_osname");
+pir_output_is( $PRE . <<'CODE'. $POST, <<"OUT", "_get_osname" );
         .local string osname
         .local pmc get_osname
         get_osname = find_global 'File::Spec', '_get_osname'
@@ -113,8 +106,7 @@ CODE
 $^O
 OUT
 
-
-pir_output_is($PRE.<<'CODE'.$POST, <<'OUT', "_get_module");
+pir_output_is( $PRE . <<'CODE'. $POST, <<'OUT', "_get_module" );
         .local string module
         .local pmc get_module
         get_module = find_global 'File::Spec', '_get_module'
@@ -129,14 +121,14 @@ Win32
 Unix
 OUT
 
-
 # remember to change the number of tests! :-)
 BEGIN {
-        if( $^O eq 'MSWin32' ) {
-                plan tests => 21;
-        } else {
-                plan skip_all => 'win32 implementation only' unless $^O =~ m/MSWin32/;
-        }
+    if ( $^O eq 'MSWin32' ) {
+        plan tests => 21;
+    }
+    else {
+        plan skip_all => 'win32 implementation only' unless $^O =~ m/MSWin32/;
+    }
 }
 
 # Local Variables:

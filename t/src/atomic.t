@@ -27,9 +27,9 @@ Tests atomic operation support.
 
 # generic tests
 
-plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : tests => 4;
+plan $^O =~ m/MSWin32/ ? ( skip_all => 'broken on win32' ) : tests => 4;
 
-c_output_is(<<'CODE', <<'OUTPUT', "PARROT_ATOMIC_PTR_GET/SET");
+c_output_is( <<'CODE', <<'OUTPUT', "PARROT_ATOMIC_PTR_GET/SET" );
 
 #include <parrot/parrot.h>
 #include <parrot/atomic.h>
@@ -75,7 +75,7 @@ ok 1
 ok 2
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "PARROT_ATOMIC_INT_GET/SET");
+c_output_is( <<'CODE', <<'OUTPUT', "PARROT_ATOMIC_INT_GET/SET" );
 
 #include <parrot/parrot.h>
 #include <parrot/atomic.h>
@@ -117,7 +117,7 @@ ok 1
 ok 2
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "PARROT_ATOMIC_PTR_CAS");
+c_output_is( <<'CODE', <<'OUTPUT', "PARROT_ATOMIC_PTR_CAS" );
 
 #include <parrot/parrot.h>
 #include <parrot/atomic.h>
@@ -177,7 +177,7 @@ ok 3
 ok 4
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "PARROT_ATOMIC_INT_(CAS|INC|DEC)");
+c_output_is( <<'CODE', <<'OUTPUT', "PARROT_ATOMIC_INT_(CAS|INC|DEC)" );
 #include <parrot/parrot.h>
 #include <parrot/atomic.h>
 #include <stdio.h>

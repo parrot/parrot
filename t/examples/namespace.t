@@ -32,20 +32,18 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =cut
 
-
 # Set up expected output for examples
 
 # cannot test the exact result, just adding one method somewhere
-# changes all. Also namespaces are hashes. While we preserve 
+# changes all. Also namespaces are hashes. While we preserve
 # insert order, we do not gurantee any specific order.
 # test the name of the 2 toplevel names,  parrot is using
-my %expected
-    = (
-    'namespace_dump.pir'        =>  << 'END_EXPECTED',
+my %expected = (
+    'namespace_dump.pir' => << 'END_EXPECTED',
 /^parrot.*
 ^__parrot_core/sm
 END_EXPECTED
-    );
+);
 
 while ( my ( $example, $expected ) = each %expected ) {
     example_output_like( "examples/namespace/$example", $expected );

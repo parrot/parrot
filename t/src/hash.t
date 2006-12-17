@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : (tests => 11);
+plan $^O =~ m/MSWin32/ ? ( skip_all => 'broken on win32' ) : ( tests => 11 );
 
 =head1 NAME
 
@@ -23,7 +23,6 @@ t/src/hash.t - Hashes
 Tests the hash.h API without reference to PMCs.
 
 =cut
-
 
 my $main = <<'CODE';
 #include <parrot/parrot.h>
@@ -46,7 +45,7 @@ int main(int argc, char* argv[])
 
 CODE
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_new_hash");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "parrot_new_hash" );
 
 static opcode_t*
 the_test(Interp *interp,
@@ -76,7 +75,7 @@ CODE
 ok
 OUTPUT
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_put");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "parrot_hash_put" );
 
 static opcode_t*
 the_test(Interp *interp,
@@ -114,7 +113,7 @@ CODE
 ok
 OUTPUT
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_get");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "parrot_hash_get" );
 
 static opcode_t*
 the_test(Interp *interp,
@@ -151,7 +150,7 @@ CODE
 42
 OUTPUT
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_get with NULL key");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "parrot_hash_get with NULL key" );
 
 static opcode_t*
 the_test(Interp *interp,
@@ -196,7 +195,7 @@ CODE
 42
 OUTPUT
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_get with empty string key");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "parrot_hash_get with empty string key" );
 
 static opcode_t*
 the_test(Interp *interp,
@@ -233,7 +232,7 @@ CODE
 42
 OUTPUT
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_get with big key");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "parrot_hash_get with big key" );
 
 #define BIGLEN 999999
 
@@ -278,7 +277,7 @@ CODE
 42
 OUTPUT
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_size");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "parrot_hash_size" );
 
 static opcode_t*
 the_test(Interp *interp,
@@ -323,7 +322,7 @@ CODE
 3
 OUTPUT
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_delete");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "parrot_hash_delete" );
 
 static opcode_t*
 the_test(Interp *interp,
@@ -373,7 +372,7 @@ CODE
 2
 OUTPUT
 
-c_output_is($main . <<'CODE', <<'OUTPUT', "parrot_hash_clone");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "parrot_hash_clone" );
 
 static opcode_t*
 the_test(Interp *interp,
@@ -458,7 +457,9 @@ my $code_loop_end = <<'CODE';
 
 CODE
 
-c_output_is($main . $code_setup . <<'CODE1' . $code_loop_top . <<'CODE2' . $code_loop_end, <<'OUTPUT', "hash iteration");
+c_output_is( $main
+        . $code_setup
+        . <<'CODE1' . $code_loop_top . <<'CODE2' . $code_loop_end, <<'OUTPUT', "hash iteration" );
 
     k    = const_string(interp, "a");
     VTABLE_set_integer_keyed_str(interp, hash, k, 10);
@@ -476,7 +477,10 @@ CODE2
 ok
 OUTPUT
 
-c_output_is($main . $code_setup . $code_loop_top . <<'CODE2' . $code_loop_end, <<'OUTPUT', "hash iteration on empty hash");
+c_output_is( $main
+        . $code_setup
+        . $code_loop_top
+        . <<'CODE2' . $code_loop_end, <<'OUTPUT', "hash iteration on empty hash" );
         PIO_eprintf(interp, "%p,%vd", k, v);
 CODE2
 

@@ -10,7 +10,6 @@ use Test::More;
 use Parrot::Test tests => 12;
 use Parrot::Config;
 
-
 =head1 NAME
 
 t/examples/streams.t - Test examples in F<examples/streams>
@@ -32,7 +31,6 @@ F<t/examples/pasm.t>
 Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =cut
-
 
 # map examples to expected output, organized by io type (file|stream)
 # NOTE: examples using file io must have 'svn:eol-style' set to 'LF'
@@ -119,7 +117,6 @@ read:[parrot]
 read:[is cool]
 EXP_SUBHELLO
     },
-
 
     file => {
         'FileLines.pir' => <<'EXP_FILELINES',
@@ -262,29 +259,28 @@ EXP_PARROTIO
 #=for comment
 #        'ParrotIO.pir t/examples/test.txt' => do{
 #            local $/ = 60;
-#            my $file = 
+#            my $file =
 #            @lines=map {} <>;
 #        },
 #=cut
 
 for my $io ( sort keys %expected ) {
-    while ( my ( $example, $expected ) = each %{$expected{$io}} ) {
-    if( $^O eq 'MSWin32' ) {
-        if( grep { $_ eq $example } qw/ParrotIO.pir FileLines.pir/ ) {
-            local $TODO = 'not testable on windows yet';
-            fail( $example );
-            next;
+    while ( my ( $example, $expected ) = each %{ $expected{$io} } ) {
+        if ( $^O eq 'MSWin32' ) {
+            if ( grep { $_ eq $example } qw/ParrotIO.pir FileLines.pir/ ) {
+                local $TODO = 'not testable on windows yet';
+                fail($example);
+                next;
+            }
         }
-    }
-       example_output_is( "examples/streams/$example", $expected );
+        example_output_is( "examples/streams/$example", $expected );
     }
 }
-
 
 TODO:
 {
     local $TODO = 'some examples not testable yet';
-    fail( 'Bytes.pir' );
-    fail( 'Replay.pir' );
-    fail( 'Writer.pir' );
-};
+    fail('Bytes.pir');
+    fail('Replay.pir');
+    fail('Writer.pir');
+}

@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 3;
 use Parrot::Test::PGE;
 
-
 =head1 NAME
 
 t/p6regex/builtins.t - PGE tests of builtin rules
@@ -25,7 +24,6 @@ B<'Nothing is illegal'> sections
     % prove t/p6regex/builtins.t
 
 =cut
-
 
 ## setup common code here for less verbose test definitions
 my $PRE = <<PRE;
@@ -53,13 +51,12 @@ END:
 .end
 POST
 
-my $str = 
-  "\t\n\r !\"#\$%&'()*+,-./:;<=>?@[\\]^`_{|}0123456789ABCDEFGHIJabcdefghij";
-
+my $str = "\t\n\r !\"#\$%&'()*+,-./:;<=>?@[\\]^`_{|}0123456789ABCDEFGHIJabcdefghij";
 
 ## <prior> -- match prior successful rule
 # L<S05/Nothing is illegal/"To match whatever the prior successful regex matched, use:" prior>
-pir_output_is  ($PRE.<<"CODE".$POST, <<OUTPUT, 'prior rule (<prior>) ', todo => 'not yet implemented');
+pir_output_is(
+    $PRE . <<"CODE". $POST, <<OUTPUT, 'prior rule (<prior>) ', todo => 'not yet implemented' );
     rulesub = p6rule('abc')
     match = rulesub($str)
 
@@ -71,7 +68,8 @@ pir_output_is  ($PRE.<<"CODE".$POST, <<OUTPUT, 'prior rule (<prior>) ', todo => 
 CODE
 ok
 OUTPUT
-pir_output_is  ($PRE.<<"CODE".$POST, <<OUTPUT, 'prior rule (<prior>) ', todo => 'not yet implemented');
+pir_output_is(
+    $PRE . <<"CODE". $POST, <<OUTPUT, 'prior rule (<prior>) ', todo => 'not yet implemented' );
     rulesub = p6rule('xxx')
     match = rulesub($str)
 
@@ -83,7 +81,8 @@ pir_output_is  ($PRE.<<"CODE".$POST, <<OUTPUT, 'prior rule (<prior>) ', todo => 
 CODE
 ok
 OUTPUT
-pir_output_is  ($PRE.<<"CODE".$POST, <<OUTPUT, 'prior rule (<prior>) ', todo => 'not yet implemented');
+pir_output_is(
+    $PRE . <<"CODE". $POST, <<OUTPUT, 'prior rule (<prior>) ', todo => 'not yet implemented' );
     rulesub = p6rule('abc')
     match = rulesub($str)
 

@@ -23,7 +23,7 @@ F<t/dynpmc/sparse_perlarray.t>.
 
 =cut
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "creation");
+pasm_output_is( <<'CODE', <<'OUTPUT', "creation" );
         new P0, .IntList
         set I0, P0
         print "Created IntList with "
@@ -36,7 +36,7 @@ OUTPUT
 
 # This test just runs way too slowly with GC_DEBUG turned on, so lets
 # turn it off for make test runs.
-pasm_output_is(<<'CODE', <<'OUTPUT', "aerobics");
+pasm_output_is( <<'CODE', <<'OUTPUT', "aerobics" );
         new P0, .IntList
         set I10, 10000
 
@@ -168,7 +168,7 @@ CODE
 I need a shower.
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "direct access 2");
+pasm_output_is( <<'CODE', <<'OUTPUT', "direct access 2" );
         new P0, .IntList
     set I10, 1100000
     set I0, 1
@@ -222,7 +222,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sparse access");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sparse access" );
         new P0, .IntList
     set I10, 110000
     set I0, 1
@@ -291,7 +291,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "pop into sparse");
+pasm_output_is( <<'CODE', <<'OUTPUT', "pop into sparse" );
         new P0, .IntList
     set I10, 100
     set I0, 0
@@ -356,7 +356,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "clone");
+pasm_output_is( <<'CODE', <<'OUTPUT', "clone" );
         new P0, .IntList
     set P0[0], 100
     set P0[5000], 200
@@ -393,7 +393,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "access via a PMC key");
+pasm_output_is( <<'CODE', <<'OUTPUT', "access via a PMC key" );
         new P0, .IntList
         new P1, .Key
         set I0, 0
@@ -439,7 +439,7 @@ ok 1
 ok 2
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
@@ -461,7 +461,6 @@ CODE
 1
 0
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

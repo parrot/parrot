@@ -10,7 +10,7 @@ use Parrot::Config;
 use Parrot::Test tests => 34;
 use vars qw($TODO);
 
-pir_output_is(<<'CODE', <<'OUT', "globalconst 1");
+pir_output_is( <<'CODE', <<'OUT', "globalconst 1" );
 
 .sub 'main' :main
     .globalconst int N = 5
@@ -29,7 +29,7 @@ CODE
 5
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "globalconst 2");
+pir_output_is( <<'CODE', <<'OUT', "globalconst 2" );
 .sub 'test' :main
     .globalconst int N = 5
     _main()
@@ -49,7 +49,7 @@ CODE
 15
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "globalconst 3");
+pir_output_is( <<'CODE', <<'OUT', "globalconst 3" );
 
 .sub 'call_sub1'
     'sub1'()
@@ -69,8 +69,7 @@ CODE
 5
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "array/hash consts");
+pir_output_is( <<'CODE', <<'OUT', "array/hash consts" );
 .sub 'main' :main
    .local Array ar
    .local pmc ha
@@ -99,8 +98,7 @@ CODE
 12
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "escaped");
+pir_output_is( <<'CODE', <<'OUT', "escaped" );
 .sub 'main' :main
    $S0 = "\""
    print $S0
@@ -111,10 +109,10 @@ pir_output_is(<<'CODE', <<'OUT', "escaped");
 CODE
 "\"\"
 OUT
+
 # fix editor highlighting "
 
-
-pir_output_is(<<'CODE', <<'OUT', "PMC const 1 - Sub");
+pir_output_is( <<'CODE', <<'OUT', "PMC const 1 - Sub" );
 .sub 'main' :main
     .const .Sub $P0 = "foo"
     print "ok 1\n"
@@ -130,8 +128,7 @@ ok 2
 ok 3
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "PMC const 2 - Sub ident");
+pir_output_is( <<'CODE', <<'OUT', "PMC const 2 - Sub ident" );
 .sub 'main' :main
     .const .Sub func = "foo"
     print "ok 1\n"
@@ -147,8 +144,7 @@ ok 2
 ok 3
 OUT
 
-
-pasm_output_is(<<'CODE', <<'OUT', "const I/N mismatch");
+pasm_output_is( <<'CODE', <<'OUT', "const I/N mismatch" );
     set I0, 2.0
     print I0
     print "\n"
@@ -162,8 +158,7 @@ CODE
 ok
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "const I/N mismatch 2");
+pir_output_is( <<'CODE', <<'OUT', "const I/N mismatch 2" );
 .sub 'main' :main
     .const int i = 2.0
     print i
@@ -181,8 +176,7 @@ ok
 ok 2
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', 'PIR heredocs: accepts double quoted terminator');
+pir_output_is( <<'CODE', <<'OUT', 'PIR heredocs: accepts double quoted terminator' );
 .sub 'main' :main
     $S0 = <<"quotage"
 I want an elephant
@@ -198,8 +192,7 @@ Oh, I want an elephat!
 Oh, woo, elephants, yeah :-O
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', 'PIR heredocs: accepts inline with concat');
+pir_output_is( <<'CODE', <<'OUT', 'PIR heredocs: accepts inline with concat' );
 .sub 'main' :main
     $S0 = ""
     $I0 = 0
@@ -219,8 +212,7 @@ ending
 ending
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: accepts terminator with any word chars");
+pir_output_is( <<'CODE', <<'OUT', "PIR heredoc: accepts terminator with any word chars" );
 .sub 'main' :main
     $S0 = <<"AnY_w0Rd_ch4rS"
 so much depends
@@ -252,8 +244,7 @@ beside the white
 chickens
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', 'PIR heredoc: single quoted terminator');
+pir_output_is( <<'CODE', <<'OUT', 'PIR heredoc: single quoted terminator' );
 .sub 'main' :main
     $S0 = <<'Jabberwocky'
 `Twas brillig, and the slithy toves
@@ -270,7 +261,7 @@ All mimsy were the borogoves,
   And the mome raths outgrabe.
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'PIR heredoc: single quoted - backslash');
+pir_output_is( <<'CODE', <<'OUT', 'PIR heredoc: single quoted - backslash' );
 .sub 'main' :main
     $S0 = <<'SQ'
 abc\tdef
@@ -281,7 +272,7 @@ CODE
 abc\tdef
 OUT
 
-pir_output_like(<<'CODE', <<'OUT', 'PIR heredoc: rejects unquoted terminator');
+pir_output_like( <<'CODE', <<'OUT', 'PIR heredoc: rejects unquoted terminator' );
 .sub 'main' :main
     $S0 = <<Jabberwocky
 "Beware the Jabberwock, my son!
@@ -295,8 +286,7 @@ CODE
 /^error:imcc:syntax error, unexpected SHIFT_LEFT.*/
 OUT
 
-
-pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: rejects inline heredoc");
+pir_output_like( <<'CODE', <<'OUT', "PIR heredoc: rejects inline heredoc" );
 .sub 'main' :main
     $S0 .= <<Jabberwocky
 He took his vorpal sword in hand:
@@ -311,8 +301,7 @@ CODE
 /^error:imcc:syntax error, unexpected SHIFT_LEFT.*/
 OUT
 
-
-pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: rejects null terminator");
+pir_output_like( <<'CODE', <<'OUT', "PIR heredoc: rejects null terminator" );
 .sub 'main' :main
     $S0 = <<
 And, as in uffish thought he stood,
@@ -326,8 +315,7 @@ CODE
 /^error:imcc:syntax error, unexpected SHIFT_LEFT.*/
 OUT
 
-
-pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: rejects terminator with spaces");
+pir_output_like( <<'CODE', <<'OUT', "PIR heredoc: rejects terminator with spaces" );
 .sub 'main' :main
     $S0 = << "terminator with spaces"
 One, two! One, two! And through and through
@@ -342,8 +330,7 @@ CODE
 /^error:imcc:syntax error, unexpected SHIFT_LEFT.*/
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: accepts terminator with non-word chars");
+pir_output_is( <<'CODE', <<'OUT', "PIR heredoc: accepts terminator with non-word chars" );
 .sub 'main' :main
     $S0 = <<"#non$word-chars."
 'And, has thou slain the Jabberwock?
@@ -361,8 +348,7 @@ O frabjous day! Callooh! Callay!'
   He chortled in his joy.
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: accepts terminator with unprintable chars");
+pir_output_is( <<'CODE', <<'OUT', "PIR heredoc: accepts terminator with unprintable chars" );
 .sub 'main' :main
     $S0 = <<"\0\1\2\3"
 `Twas brillig, and the slithy toves
@@ -379,8 +365,7 @@ All mimsy were the borogoves,
   And the mome raths outgrabe.
 OUT
 
-
-pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: rejects interpolated terminator");
+pir_output_like( <<'CODE', <<'OUT', "PIR heredoc: rejects interpolated terminator" );
 .sub 'main' :main
     $S1 = 'e_e_cummings'
     $S0 = <<$S1
@@ -403,8 +388,7 @@ CODE
 /^error:imcc:syntax error, unexpected SHIFT_LEFT.*/
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: rejects variable interpolation");
+pir_output_is( <<'CODE', <<'OUT', "PIR heredoc: rejects variable interpolation" );
 .sub 'main' :main
     $S0 = 'parrot'
     print <<"*<:-O"
@@ -421,8 +405,7 @@ Happy Birthday dear $S0,
 Happy Birthday to you!
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: allow empty lines");
+pir_output_is( <<'CODE', <<'OUT', "PIR heredoc: allow empty lines" );
 .sub 'main' :main
     $S0 = 'parrot'
     print <<"END_HERE"
@@ -435,8 +418,7 @@ CODE
 The line above is empty.
 OUT
 
-
-pir_output_like(<<'CODE', <<'OUT', "PIR heredoc: line numbers");
+pir_output_like( <<'CODE', <<'OUT', "PIR heredoc: line numbers" );
 .sub main :main
     .local string s
     .local pmc nil
@@ -453,8 +435,7 @@ CODE
 /^Null PMC.*:11\)$/s
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: double quoted strings");
+pir_output_is( <<'CODE', <<'OUT', "PIR heredoc: double quoted strings" );
 .sub main :main
   $S0 = <<"HEREDOC"
 print "hello"
@@ -466,8 +447,7 @@ CODE
 print "hello"
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: double quotes - two in a row");
+pir_output_is( <<'CODE', <<'OUT', "PIR heredoc: double quotes - two in a row" );
 .sub main :main
     print <<"QUOTES"
 ""
@@ -477,8 +457,7 @@ CODE
 ""
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: double quotes - with anything between");
+pir_output_is( <<'CODE', <<'OUT', "PIR heredoc: double quotes - with anything between" );
 .sub main :main
     print <<"QUOTES"
 "anything"
@@ -488,8 +467,8 @@ CODE
 "anything"
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: double quotes - two in a row prefaced by anything");
+pir_output_is(
+    <<'CODE', <<'OUT', "PIR heredoc: double quotes - two in a row prefaced by anything" );
 .sub main :main
     print <<"QUOTES"
 anything""
@@ -499,8 +478,7 @@ CODE
 anything""
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: double quotes - escaped with anything between");
+pir_output_is( <<'CODE', <<'OUT', "PIR heredoc: double quotes - escaped with anything between" );
 .sub main :main
     print <<"QUOTES"
 \"anything\"
@@ -510,8 +488,8 @@ CODE
 "anything"
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "PIR heredoc: escaped characters, escaped quotes, starting quotes");
+pir_output_is(
+    <<'CODE', <<'OUT', "PIR heredoc: escaped characters, escaped quotes, starting quotes" );
 .sub test :main
 	.local string test
 
@@ -538,7 +516,7 @@ w w \w
 w w \w
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "heredoc not eol 1");
+pir_output_is( <<'CODE', <<'OUT', "heredoc not eol 1" );
 .sub main :main
     .local string code
     code = ''
@@ -562,7 +540,7 @@ line 10
 line 2
 OUT
 
-pir_output_like(<<'CODE', <<'OUT', "heredoc not eol 2 - nested");
+pir_output_like( <<'CODE', <<'OUT', "heredoc not eol 2 - nested" );
 .sub main :main
     cat(<<"H1", <<"H2")
 line 1
@@ -582,7 +560,7 @@ CODE
 /nested heredoc not supported/
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', ".const in mixed opcodes");
+pir_output_is( <<'CODE', <<'OUT', ".const in mixed opcodes" );
 .sub main :main
     .const int I = 5
     .local float f
@@ -595,7 +573,7 @@ CODE
 10.000000
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "RT # 34991");
+pir_output_is( <<'CODE', <<'OUT', "RT # 34991" );
 .const int c = 12
 .sub test
     .local float a

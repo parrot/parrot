@@ -10,7 +10,7 @@ use Parrot::Config;
 use Parrot::Test tests => 1;
 
 ##############################
-pir_output_is(<<'CODE', <<'OUT', "global const");
+pir_output_is( <<'CODE', <<'OUT', "global const" );
 .sub test :main
 	.globalconst string ok = "ok\n"
 	print ok

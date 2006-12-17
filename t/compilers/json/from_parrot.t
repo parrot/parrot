@@ -24,7 +24,7 @@ Tests JSON->Parrot conversions.
 =cut
 
 # no. 1
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of an empty string');
+pir_output_is( <<'CODE', <<'OUT', 'Create JSON of an empty string' );
 
 .sub test :main
     .local string s
@@ -39,7 +39,7 @@ CODE
 OUT
 
 # no. 2
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of a non-empty string');
+pir_output_is( <<'CODE', <<'OUT', 'Create JSON of a non-empty string' );
 
 .sub test :main
     .local string s
@@ -54,7 +54,7 @@ CODE
 OUT
 
 # no. 3
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of a string with simple escapes');
+pir_output_is( <<'CODE', <<'OUT', 'Create JSON of a string with simple escapes' );
 
 .sub test :main
     .local string s
@@ -69,7 +69,7 @@ CODE
 OUT
 
 # no. 4
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of some integers');
+pir_output_is( <<'CODE', <<'OUT', 'Create JSON of some integers' );
 
 .sub test :main
     .local int i
@@ -99,7 +99,7 @@ CODE
 OUT
 
 # no. 5
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of some numbers');
+pir_output_is( <<'CODE', <<'OUT', 'Create JSON of some numbers' );
 
 .sub test :main
     .local num n
@@ -125,7 +125,7 @@ CODE
 OUT
 
 # no. 6
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of various scalars with pretty option');
+pir_output_is( <<'CODE', <<'OUT', 'Create JSON of various scalars with pretty option' );
 
 .sub test :main
     .local string s
@@ -151,7 +151,7 @@ CODE
 OUT
 
 # no. 7
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of an array');
+pir_output_is( <<'CODE', <<'OUT', 'Create JSON of an array' );
 
 .sub test :main
     .local pmc array
@@ -178,7 +178,7 @@ CODE
 OUT
 
 # no. 8
-pir_output_is(<<'CODE', <<'OUT', 'Create pretty JSON of an array');
+pir_output_is( <<'CODE', <<'OUT', 'Create pretty JSON of an array' );
 
 .sub test :main
     .local pmc array
@@ -216,7 +216,7 @@ CODE
 OUT
 
 # no. 9
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of array, keep element ordering');
+pir_output_is( <<'CODE', <<'OUT', 'Create JSON of array, keep element ordering' );
 
 .sub test :main
     .local pmc array
@@ -246,7 +246,7 @@ CODE
 OUT
 
 # no. 10
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of a mixed array');
+pir_output_is( <<'CODE', <<'OUT', 'Create JSON of a mixed array' );
 
 .sub test :main
     .local pmc array
@@ -276,7 +276,7 @@ CODE
 OUT
 
 # no. 11
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of hash');
+pir_output_is( <<'CODE', <<'OUT', 'Create JSON of hash' );
 
 .sub test :main
     .local pmc hash
@@ -301,7 +301,7 @@ CODE
 OUT
 
 # no. 12
-pir_output_is(<<'CODE', <<'OUT', 'Create non-pretty JSON of hash');
+pir_output_is( <<'CODE', <<'OUT', 'Create non-pretty JSON of hash' );
 
 .sub test :main
     .local pmc hash
@@ -321,7 +321,8 @@ CODE
 OUT
 
 # no. 13
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of nested structure including ResizablePMCArray and empties');
+pir_output_is(
+    <<'CODE', <<'OUT', 'Create JSON of nested structure including ResizablePMCArray and empties' );
 
 .sub test :main
     .local pmc street1, street2, city1, city2, country, world
@@ -372,7 +373,7 @@ CODE
 OUT
 
 # no. 14
-pir_output_is(<<'CODE', <<'OUT', 'Create non-pretty JSON of nested structure');
+pir_output_is( <<'CODE', <<'OUT', 'Create non-pretty JSON of nested structure' );
 
 .sub test :main
     .local pmc street1, street2, city1, city2, country, world
@@ -408,7 +409,7 @@ CODE
 OUT
 
 # no. 15
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of String PMCs');
+pir_output_is( <<'CODE', <<'OUT', 'Create JSON of String PMCs' );
 
 .sub test :main
     .local pmc s
@@ -436,7 +437,7 @@ CODE
 OUT
 
 # no. 16
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of Integer PMCs');
+pir_output_is( <<'CODE', <<'OUT', 'Create JSON of Integer PMCs' );
 
 .sub test :main
     .local pmc i
@@ -464,7 +465,7 @@ CODE
 OUT
 
 # no. 17
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of Boolean PMCs');
+pir_output_is( <<'CODE', <<'OUT', 'Create JSON of Boolean PMCs' );
 
 .sub test :main
     .local pmc b
@@ -492,7 +493,7 @@ true
 OUT
 
 # no. 18
-pir_output_is(<<'CODE', <<'OUT', 'Create JSON of null and .Undef');
+pir_output_is( <<'CODE', <<'OUT', 'Create JSON of null and .Undef' );
 
 .sub test :main
     .local pmc n

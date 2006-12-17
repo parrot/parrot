@@ -22,7 +22,7 @@ These are tests for the C3 MRO order
 
 =cut
 
-pir_output_is(<<'CODE', <<'OUTPUT', "print mro diamond");
+pir_output_is( <<'CODE', <<'OUTPUT', "print mro diamond" );
 #
 # A   B A   E
 #  \ /   \ /
@@ -61,7 +61,7 @@ CODE
 F C D A B E G
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "print mro 1");
+pir_output_is( <<'CODE', <<'OUTPUT', "print mro 1" );
 #
 # example take from: http://www.python.org/2.3/mro.html
 #
@@ -131,7 +131,7 @@ CODE
 A B C D E F O G
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "print mro 2");
+pir_output_is( <<'CODE', <<'OUTPUT', "print mro 2" );
 #
 # example take from: http://www.python.org/2.3/mro.html
 #
@@ -202,7 +202,7 @@ CODE
 A B E C D F O G
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "print mro 3");
+pir_output_is( <<'CODE', <<'OUTPUT', "print mro 3" );
 #
 #    C
 #   / \
@@ -240,7 +240,7 @@ CODE
 D A B C G
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "print mro 4");
+pir_output_is( <<'CODE', <<'OUTPUT', "print mro 4" );
 #
 #          Object
 #            ^
@@ -302,7 +302,7 @@ OUTPUT
 
 # ... now some tests which fail to compose the class
 
-pir_output_like(<<'CODE', <<'OUTPUT', "mro error 1");
+pir_output_like( <<'CODE', <<'OUTPUT', "mro error 1" );
 #
 # example take from: http://www.python.org/2.3/mro.html
 #

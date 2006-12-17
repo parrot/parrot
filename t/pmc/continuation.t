@@ -23,8 +23,7 @@ Tests the Continuation PMC.
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', 'new');
+pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     new P0, .Continuation
     print "ok 1\n"
@@ -33,7 +32,7 @@ CODE
 ok 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'continuations preserve bsr/ret state.');
+pir_output_is( <<'CODE', <<'OUT', 'continuations preserve bsr/ret state.' );
 ## Here is a trace of execution, keyed by labels.
 ##   L1:  bsr to rtn1
 ## rtn1:  create a continuation that directs us to L6, and (we expect) captures
@@ -78,7 +77,7 @@ Continuation called.
 done.
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'continuations call actions.');
+pir_output_is( <<'CODE', <<'OUT', 'continuations call actions.' );
 ## the test_cont_action sub creates a continuation and passes it to _test_1
 ## twice:  the first time returns normally, the second time returns via the
 ## continuation.
@@ -136,7 +135,7 @@ unwinding
 continuation called.
 OUT
 
-pir_output_like(<<'CODE', <<'OUT', 'continuation action context');
+pir_output_like( <<'CODE', <<'OUT', 'continuation action context' );
 ## this makes sure that returning via the continuation causes the action to be
 ## invoked in the right dynamic context (i.e. without the error handler).
 .sub test_cont_action :main
@@ -194,7 +193,7 @@ something happened
 current instr/
 OUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'partial unwinding');
+pir_output_is( <<'CODE', <<'OUTPUT', 'partial unwinding' );
 ## This is a regression test for a bug which unwound the stack prematurely.  If
 ## it recurs, the action pushed in main will be triggered incorrectly by the
 ## test3 RetContinuation, which must unwind the stack to pop (only!) the error

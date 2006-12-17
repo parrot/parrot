@@ -17,7 +17,7 @@ use File::Spec::Functions;
 
 my $tempdir = File::Temp::tempdir( CLEANUP => 1 );
 
-our ($MSWin32, $cygwin);
+our ( $MSWin32, $cygwin );
 $MSWin32 = 1 if $^O =~ m!MSWin32!;
 $cygwin  = 1 if $^O =~ m!cygwin!;
 
@@ -45,7 +45,7 @@ print $fh 'xpto';
 close $fh;
 
 # test is_dir
-pir_output_is(<<"CODE", <<"OUT", "Test is_dir");
+pir_output_is( <<"CODE", <<"OUT", "Test is_dir" );
 .sub main :main
         \$P1 = new .File
 
@@ -74,10 +74,9 @@ CODE
 ok 1
 ok 2
 OUT
-
 
 # test is_file
-pir_output_is(<<"CODE", <<"OUT", "Test is_file");
+pir_output_is( <<"CODE", <<"OUT", "Test is_file" );
 .sub main :main
         \$P1 = new .File
 
@@ -106,7 +105,6 @@ CODE
 ok 1
 ok 2
 OUT
-
 
 SKIP: {
     skip "Links not available under Windows", 1 if $MSWin32;
@@ -115,7 +113,7 @@ SKIP: {
     symlink $otpx, $lotpx;
 
     # test is_link
-    pir_output_is(<<"CODE", <<"OUT", "Test is_link with links to files");
+    pir_output_is( <<"CODE", <<"OUT", "Test is_link with links to files" );
 .sub main :main
         \$P1 = new .File
 
@@ -150,7 +148,7 @@ SKIP: {
     symlink $xpto, $xptol;
 
     # test is_link
-    pir_output_is(<<"CODE", <<"OUT", "Test is_link with links to directories");
+    pir_output_is( <<"CODE", <<"OUT", "Test is_link with links to directories" );
 .sub main :main
         \$P1 = new .File
 
@@ -178,8 +176,9 @@ OUT
 }
 
 my $otpxcopy = catdir( $xpto, 'otpxcopy' );
+
 # test copy
-pir_output_is(<<"CODE", <<"OUT", "Test copy for files");
+pir_output_is( <<"CODE", <<"OUT", "Test copy for files" );
 .sub main :main
        \$S1 = '$otpx'
        \$S2 = '$otpxcopy'
@@ -212,7 +211,7 @@ OUT
 SKIP: {
     skip 'file exists', 1 if $MSWin32;
 
-    pir_output_is(<<"CODE", <<"OUT", "Test rename for files");
+    pir_output_is( <<"CODE", <<"OUT", "Test rename for files" );
 .sub main :main
        \$S1 = '$otpx'
        \$S2 = '$otpxcopy'
@@ -243,8 +242,9 @@ OUT
 }
 
 my $bad_file = catfile( $xpto, 'not a file' );
+
 # test exists
-pir_output_is(<<"CODE", <<"OUT", "Test rename for files");
+pir_output_is( <<"CODE", <<"OUT", "Test rename for files" );
 .sub main :main
        \$P1 = new .File
        \$I1 = \$P1.'exists'( '$otpxcopy' )

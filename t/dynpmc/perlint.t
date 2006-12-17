@@ -10,7 +10,6 @@ use Test::More;
 use Parrot::Test tests => 76;
 use Parrot::Config;
 
-
 =head1 NAME
 
 t/dynpmc/perlint.t - Perl Integers
@@ -34,7 +33,7 @@ my $load_perl = <<'END_PASM';
     find_type I28, 'PerlUndef'
 END_PASM
 
-my $ok = '"ok 1\n"';
+my $ok                = '"ok 1\n"';
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (    J, K, L )
     save    N0
@@ -78,7 +77,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', 'new pmc');
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', 'new pmc' );
         print "starting\n"
         new P0, I24
         print "ending\n"
@@ -88,7 +87,7 @@ starting
 ending
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', 'typeof');
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', 'typeof' );
     new P0,I24
     typeof S0,P0
     eq     S0,"PerlInt",OK_1
@@ -106,7 +105,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<'OUTPUT', "type");
+pasm_output_is( $load_perl . <<"CODE", <<'OUTPUT', "type" );
     new P0,I24
 # type
     typeof I0,P0
@@ -119,7 +118,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "inheritance");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "inheritance" );
     new P0,I24
 # clone
     set P0, 10
@@ -141,7 +140,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<CODE, <<'OUTPUT', "copy");
+pasm_output_is( $load_perl . <<CODE, <<'OUTPUT', "copy" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     new P1, I24
@@ -172,7 +171,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "set/print integer");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "set/print integer" );
     new P0, I24
     set P0, 123
     print P0
@@ -182,7 +181,7 @@ CODE
 123
 OUTPUT
 
-pasm_output_is($load_perl . <<CODE, <<OUTPUT, "if (P) - Int");
+pasm_output_is( $load_perl . <<CODE, <<OUTPUT, "if (P) - Int" );
     new    P0, I24
 
     set    P0, 1
@@ -202,7 +201,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<CODE, <<OUTPUT, "unless (P) - Int");
+pasm_output_is( $load_perl . <<CODE, <<OUTPUT, "unless (P) - Int" );
     new    P0, I24
 
     set    P0, 0
@@ -222,7 +221,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "inc, PerlInt");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "inc, PerlInt" );
     new P3, I24
     set P3, 0
     inc P3
@@ -241,7 +240,7 @@ CODE
 1000
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "dec, PerlInt");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "dec, PerlInt" );
     new P3, I24
     set P3, 0
     dec P3
@@ -260,7 +259,7 @@ CODE
 -2000
 OUTPUT
 
-pasm_output_is($load_perl . <<CODE, <<OUTPUT, "mul_p_p, PerlInt");
+pasm_output_is( $load_perl . <<CODE, <<OUTPUT, "mul_p_p, PerlInt" );
 @{[ $fp_equality_macro ]}
     new P0,I24
     new P1,I24
@@ -285,7 +284,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<CODE, <<OUTPUT, "mul_p_i, PerlInt");
+pasm_output_is( $load_perl . <<CODE, <<OUTPUT, "mul_p_i, PerlInt" );
 @{[ $fp_equality_macro ]}
     new P0,I24
     set P0,8
@@ -299,7 +298,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<CODE, <<OUTPUT, "div_p_i, PerlInt");
+pasm_output_is( $load_perl . <<CODE, <<OUTPUT, "div_p_i, PerlInt" );
 @{[ $fp_equality_macro ]}
     new P0,I24
     set P0,8
@@ -313,7 +312,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<CODE, <<OUTPUT, "mod_p_i, PerlInt");
+pasm_output_is( $load_perl . <<CODE, <<OUTPUT, "mod_p_i, PerlInt" );
 @{[ $fp_equality_macro ]}
     new P0,I24
     set P0,3
@@ -327,7 +326,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<CODE, <<OUTPUT, "mod_p_p_i, PerlInt");
+pasm_output_is( $load_perl . <<CODE, <<OUTPUT, "mod_p_p_i, PerlInt" );
 @{[ $fp_equality_macro ]}
     new P0,I24
     set P0,7
@@ -342,7 +341,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "bor");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "bor" );
     new P0, I24
     set P0, 0b11110000
     bor P0, 0b00001111
@@ -386,7 +385,7 @@ CODE
 28
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "bxor");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "bxor" );
     new P0, I24
     set P0, 0b11111000
     bxor P0, 0b00011111
@@ -430,7 +429,7 @@ CODE
 172
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "band");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "band" );
     new P0, I24
     set P0, 0b10101010
     band P0, 0b10011001
@@ -474,7 +473,7 @@ CODE
 100
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "bnot");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "bnot" );
     new P0, I28
 
 # We use band in these tests to null out the high bits, and make the
@@ -497,7 +496,7 @@ CODE
 153
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "bnot");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "bnot" );
     new P0, I24
     set P0, 0b10101010
 
@@ -547,7 +546,7 @@ OUTPUT
 
 # shl/shr tests adapted from t/op/bitwise.t
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "shr (>>)");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "shr (>>)" );
     new P0, I24
     new P1, I24
     new P2, I24
@@ -594,7 +593,7 @@ CODE
 5
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "shl (<<)");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "shl (<<)" );
     new P0, I24
     new P1, I24
     new P2, I24
@@ -641,7 +640,7 @@ CODE
 80
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "inc/dec a PerlUndef");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "inc/dec a PerlUndef" );
     new P0, I28
     new P1, I28
     inc P0
@@ -658,7 +657,7 @@ CODE
 12-1-2
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "divide gives int if possible");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "divide gives int if possible" );
     new P0, I24
     new P1, I24
     new P2, I28
@@ -680,7 +679,7 @@ CODE
 1.500000
 OUTPUT
 
-pasm_output_like($load_perl . <<'CODE', <<'OUTPUT', 'division by zero, #1');
+pasm_output_like( $load_perl . <<'CODE', <<'OUTPUT', 'division by zero, #1' );
     new P0, I24
     new P1, I24
     new P2, I21
@@ -692,7 +691,7 @@ CODE
 /division by zero/
 OUTPUT
 
-pasm_output_like($load_perl . <<'CODE', <<'OUTPUT', 'division by zero, #2');
+pasm_output_like( $load_perl . <<'CODE', <<'OUTPUT', 'division by zero, #2' );
     new P0, I24
     new P1, I21
     new P2, I21
@@ -703,7 +702,7 @@ CODE
 /division by zero/
 OUTPUT
 
-pasm_output_like($load_perl . <<'CODE', <<'OUTPUT', 'division by zero, #3');
+pasm_output_like( $load_perl . <<'CODE', <<'OUTPUT', 'division by zero, #3' );
     new P0, I24
     new P1, I25
     new P2, I21
@@ -718,7 +717,7 @@ OUTPUT
 #
 # Let perl do the computation.
 #
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "add integer to self");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "add integer to self" );
     new P0, I24
     set P0, 123
     add P0, P0, P0
@@ -729,7 +728,7 @@ CODE
 246
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "sub integer from self");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "sub integer from self" );
     new P0, I24
     set P0, 456
     sub P0, P0, P0
@@ -740,7 +739,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "multiply integer by self");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "multiply integer by self" );
     new P0, I24
     set P0, 124
     mul P0, P0, P0
@@ -751,7 +750,7 @@ CODE
 15376
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "divide integer by self");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "divide integer by self" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     set P0, 23
@@ -765,7 +764,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "add integer to other");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "add integer to other" );
     new P0, I24
     new P1, I24
     set P0, 123
@@ -778,7 +777,7 @@ CODE
 444
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "subtract integer from other");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "subtract integer from other" );
     new P0, I24
     new P1, I24
     set P0, 123
@@ -791,7 +790,7 @@ CODE
 198
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "multiply integer by other");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "multiply integer by other" );
     new P0, I24
     new P1, I24
     set P0, 123
@@ -804,7 +803,7 @@ CODE
 39483
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "divide integer by other");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "divide integer by other" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     new P1, I24
@@ -822,7 +821,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "subtract native integer from PerlInt");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "subtract native integer from PerlInt" );
     new P0, I24
     new P1, I24
     set I0, 4000
@@ -843,7 +842,7 @@ CODE
 -1
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "multiply PerlInt with native integer");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "multiply PerlInt with native integer" );
     new P0, I24
     new P1, I24
     set I0, 4000
@@ -868,7 +867,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "divide PerlInt by native integer");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "divide PerlInt by native integer" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     set I0, 4000
@@ -895,7 +894,7 @@ OUTPUT
 #
 # PerlInt and FLOATVAL, tests
 #
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "add native number to integer");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "add native number to integer" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     new P1, I24
@@ -922,7 +921,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "subtract native number from integer");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "subtract native number from integer" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     new P1, I24
@@ -949,7 +948,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "multiply integer with native number");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "multiply integer with native number" );
     new P0, I24
     new P1, I24
     set N0, 4000.04
@@ -973,7 +972,7 @@ CODE
 306
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "divide integer by native number");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "divide integer by native number" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     set N0, 4000
@@ -1003,7 +1002,7 @@ OUTPUT
 #
 # PerlInt and INTVAL tests
 #
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "add native integer to PerlInt");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "add native integer to PerlInt" );
     new P0, I24
     new P1, I24
     set I0, 4000
@@ -1030,7 +1029,7 @@ OUTPUT
 #
 # Concat tests
 #
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "concatenate integer to string");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "concatenate integer to string" );
     new P0, I24
     new P1, I27
     set P0, -5
@@ -1043,7 +1042,7 @@ CODE
 -5foo
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "concatenate string to integer");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "concatenate string to integer" );
     new P0, I24
     new P1, I27
     set P0, "foo"
@@ -1059,7 +1058,7 @@ OUTPUT
 #
 # Arithmetic operators
 #
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "add integer to string integer");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "add integer to string integer" );
     new P0, I24
     new P1, I27
     set P0, 6
@@ -1072,7 +1071,7 @@ CODE
 13
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "add integer to string");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "add integer to string" );
     new P0, I24
     new P1, I27
     set P0, 6
@@ -1085,7 +1084,7 @@ CODE
 6
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "add integer to string number");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "add integer to string number" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     new P1, I27
@@ -1101,7 +1100,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "assign integer");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "assign integer" );
     new P0, I24
     assign P0, 42
     print P0
@@ -1130,7 +1129,7 @@ CODE
 1
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "p =  p % p (int % int)");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "p =  p % p (int % int)" );
     new    P0, I24
     new    P1, I24
     new    P2, I24
@@ -1154,7 +1153,7 @@ CODE
 2
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "p =  p % p (int % numeric string)");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "p =  p % p (int % numeric string)" );
     new    P0, I24
     new    P1, I27
     new    P2, I24
@@ -1169,7 +1168,7 @@ CODE
 1
 OUTPUT
 
-pasm_output_is($load_perl . <<CODE, <<OUTPUT, "(int / int) -> float");
+pasm_output_is( $load_perl . <<CODE, <<OUTPUT, "(int / int) -> float" );
 @{[ $fp_equality_macro ]}
     new    P0, I24
     new    P1, I24
@@ -1186,7 +1185,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "logical or");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "logical or" );
     new P0, I24
     new P1, I24
     new P2, I24
@@ -1209,7 +1208,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "logical or with Num/Str/Undef");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "logical or with Num/Str/Undef" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I24
@@ -1268,7 +1267,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "logical xor");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "logical xor" );
     new P0, I24
     new P1, I24
     new P2, I24
@@ -1308,7 +1307,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "logical xor with Num/Str/Undef");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "logical xor with Num/Str/Undef" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I24
@@ -1400,7 +1399,7 @@ ok 9
 ok 10
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "logical and");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "logical and" );
     new P0, I24
     new P1, I24
     new P2, I24
@@ -1423,7 +1422,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "logical and with Num/Str/Undef");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "logical and with Num/Str/Undef" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I24
@@ -1486,7 +1485,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "eq_p_p");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "eq_p_p" );
     new P0, I24
     new P1, I24
 
@@ -1576,7 +1575,7 @@ ok 9
 ok 10
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "eq_p_i");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "eq_p_i" );
     set I0, 12
 
     new P0, I24
@@ -1604,7 +1603,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "eq_p_i, array", todo => 'unimplemented');
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "eq_p_i, array", todo => 'unimplemented' );
 
     set I0, 12
     new P0, I21
@@ -1623,7 +1622,7 @@ ok 4
 ok 5
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "ne_p_p");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "ne_p_p" );
     new P0, I24
     new P1, I24
 
@@ -1683,7 +1682,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "lt_p_p");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "lt_p_p" );
     new P0, I24
     new P1, I24
 
@@ -1736,7 +1735,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "lt_p_i");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "lt_p_i" );
     new P0, I24
     set P0, 1
 
@@ -1771,7 +1770,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "le_p_p");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "le_p_p" );
     new P0, I24
     new P1, I24
 
@@ -1822,7 +1821,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "le_p_i");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "le_p_i" );
     new P0, I24
     set P0, 1
 
@@ -1865,7 +1864,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "gt_p_p");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "gt_p_p" );
     new P0, I24
     new P1, I24
 
@@ -1918,7 +1917,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "ge_p_p");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "ge_p_p" );
     new P0, I24
     new P1, I24
 
@@ -1969,7 +1968,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "neg_p_p");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "neg_p_p" );
     new P0, I24
     new P1, I24
 
@@ -2026,7 +2025,7 @@ CODE
 12.098765
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "neg_p");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "neg_p" );
     new P0, I24
     set P0, 12
     neg P0
@@ -2046,7 +2045,7 @@ CODE
 12.345678
 OUTPUT
 
-pir_output_is(<<"CODE", <<'OUTPUT', 'check whether interface is done');
+pir_output_is( <<"CODE", <<'OUTPUT', 'check whether interface is done' );
 
 .sub test :main
 $load_perl
@@ -2069,7 +2068,7 @@ CODE
 0
 OUTPUT
 
-pir_output_is(<<"CODE", <<'OUTPUT', 'Fix for a minor problem');
+pir_output_is( <<"CODE", <<'OUTPUT', 'Fix for a minor problem' );
 
 .sub 'test' :main
 $load_perl
@@ -2086,7 +2085,7 @@ CODE
 25
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUT', 'get_mro');
+pasm_output_is( $load_perl . <<'CODE', <<'OUT', 'get_mro' );
     new P0, I24
     get_mro P1, P0
     print "ok 1\n"
@@ -2109,7 +2108,7 @@ OUT
 SKIP: {
     skip 'no bigint lib' => 3 unless $PConfig{gmp};
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "sub other int");
+    pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "sub other int" );
      new P0, .BigInt
      set P0, 12345678
      new P1, I24
@@ -2149,7 +2148,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl .<<'CODE', <<'OUT', "div other int");
+    pasm_output_is( $load_perl . <<'CODE', <<'OUT', "div other int" );
      new P0, .BigInt
      set P0, "100000000000000000000"
      new P1, .BigInt
@@ -2176,25 +2175,27 @@ ok 1
 ok 2
 OUT
 
-{
-    my ($a, $b, $c, $d, $e);
-    if ($PConfig{intvalsize} == 8) {
-        $a = '9223372036854775806';     # 2**63-2
-        $b =                   '1';
-        $c = '9223372036854775807'; # still Integer
-        $d = '9223372036854775808'; # no more Integer
-        $e = '9223372036854775809'; # still no more Integer
-    } elsif ($PConfig{intvalsize} == 4) {
-        $a = '2147483646';              # 2**31-2
-        $b =          '1';
-        $c = '2147483647';              # still Integer
-        $d = '2147483648';              # no more Integer
-        $e = '2147483649';              # still no more Integer
-    } else {
-        die "\$PConfig{intvalsize} == $PConfig{intvalsize}?\n";
-    }
+    {
+        my ( $a, $b, $c, $d, $e );
+        if ( $PConfig{intvalsize} == 8 ) {
+            $a = '9223372036854775806';    # 2**63-2
+            $b = '1';
+            $c = '9223372036854775807';    # still Integer
+            $d = '9223372036854775808';    # no more Integer
+            $e = '9223372036854775809';    # still no more Integer
+        }
+        elsif ( $PConfig{intvalsize} == 4 ) {
+            $a = '2147483646';             # 2**31-2
+            $b = '1';
+            $c = '2147483647';             # still Integer
+            $d = '2147483648';             # no more Integer
+            $e = '2147483649';             # still no more Integer
+        }
+        else {
+            die "\$PConfig{intvalsize} == $PConfig{intvalsize}?\n";
+        }
 
-    pasm_output_is($load_perl . <<CODE, <<OUT, "add overflow PerlInt");
+        pasm_output_is( $load_perl . <<CODE, <<OUT, "add overflow PerlInt" );
    new P0, I24
    set P0, $a
    new P1, I24
@@ -2222,9 +2223,8 @@ $d BigInt
 $e BigInt
 ok
 OUT
-}
-} ## SKIP
-
+    }
+}    ## SKIP
 
 # Local Variables:
 #   mode: cperl

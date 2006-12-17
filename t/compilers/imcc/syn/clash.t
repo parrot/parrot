@@ -9,7 +9,7 @@ use Test::More;
 use Parrot::Config;
 use Parrot::Test tests => 15;
 
-pir_output_is(<<'CODE', <<'OUT', "if/unless");
+pir_output_is( <<'CODE', <<'OUT', "if/unless" );
 .sub test :main
 	$I0 = 0
 	if $I0 goto nok1
@@ -32,7 +32,7 @@ ok 1
 ok 2
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "if/unless");
+pir_output_is( <<'CODE', <<'OUT', "if/unless" );
 .sub test :main
 	$I0 = 0
 	$I1 = 1
@@ -60,8 +60,7 @@ ok 2
 ok 3
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "new");
+pir_output_is( <<'CODE', <<'OUT', "new" );
 .sub test :main
 	$P1 = new String
 	$P1 = "ok 1\n"
@@ -76,8 +75,7 @@ ok 1
 ok 2
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "clone");
+pir_output_is( <<'CODE', <<'OUT', "clone" );
 .sub test :main
 	$P1 = new String
 	$P1 = "ok 1\n"
@@ -94,8 +92,7 @@ ok 1
 ok 2
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "defined");
+pir_output_is( <<'CODE', <<'OUT', "defined" );
 .sub test :main
 	$P1 = new Hash
 	$I0 = defined $P1
@@ -112,8 +109,7 @@ CODE
 1
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "defined keyed");
+pir_output_is( <<'CODE', <<'OUT', "defined keyed" );
 .sub test :main
 	$P1 = new Hash
 	$P1["a"] = "ok 1\n"
@@ -136,8 +132,7 @@ CODE
 0
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "parrot op as identifier");
+pir_output_is( <<'CODE', <<'OUT', "parrot op as identifier" );
 .sub test :main
 	.local int set
 	set = 5
@@ -153,8 +148,7 @@ CODE
 6
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "parrot op as label");
+pir_output_is( <<'CODE', <<'OUT', "parrot op as label" );
 .sub test :main
 	null I0
 	goto set
@@ -175,7 +169,7 @@ CODE
 ok
 OUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', "new with a native type");
+pir_output_like( <<'CODE', <<'OUTPUT', "new with a native type" );
 .sub test :main
         $P1 = new INTVAL
 	print "never\n"
@@ -185,7 +179,7 @@ CODE
 /error:\w+:Unknown PMC type 'INTVAL'/
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "setline w comment");
+pir_output_is( <<'CODE', <<'OUTPUT', "setline w comment" );
 .sub test :main
     setline 1	# comment
     print "ok\n"
@@ -195,7 +189,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "setfile w comment");
+pir_output_is( <<'CODE', <<'OUTPUT', "setfile w comment" );
 .sub test :main
     setfile "foo"	# comment
     print "ok\n"
@@ -205,7 +199,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "eq_num => eq");
+pir_output_is( <<'CODE', <<'OUTPUT', "eq_num => eq" );
 .sub test :main
     .local int i
     .local int j
@@ -221,7 +215,7 @@ CODE
 ok 1
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "eq_num => eq mixed => eq_n_n");
+pir_output_is( <<'CODE', <<'OUTPUT', "eq_num => eq mixed => eq_n_n" );
 .sub test :main
     .local int i
     .local float j
@@ -237,7 +231,7 @@ CODE
 ok 1
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUT', "undefined ident");
+pir_output_like( <<'CODE', <<'OUT', "undefined ident" );
 .sub test :main
     print no_such
 .end
@@ -245,7 +239,7 @@ CODE
 /error.*undefined.*'no_such'/
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "label ident");
+pir_output_is( <<'CODE', <<'OUT', "label ident" );
 .sub test :main
     branch no_such
     end

@@ -7,11 +7,11 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More 'tests' => 13;
 
-BEGIN { use_ok('Parrot::PIR::Formatter') };
+BEGIN { use_ok('Parrot::PIR::Formatter') }
 
 die "Run these tests from the distribution root\n" unless -d 't/perl';
 
-reformat_ok(<<'END_PIR',<<'END_FORMATTED','.sub block');
+reformat_ok( <<'END_PIR', <<'END_FORMATTED', '.sub block' );
  .sub main :main
  $I0 = 2
  .end
@@ -21,7 +21,7 @@ END_PIR
 .end
 END_FORMATTED
 
-reformat_ok(<<'END_PIR',<<'END_FORMATTED','trailing whitespace');
+reformat_ok( <<'END_PIR', <<'END_FORMATTED', 'trailing whitespace' );
  .sub main :main        
  $I0 = 3          
  .end           
@@ -31,7 +31,7 @@ END_PIR
 .end
 END_FORMATTED
 
-reformat_ok(<<'END_PIR',<<'END_FORMATTED','remove leading/trailing blank lines.');
+reformat_ok( <<'END_PIR', <<'END_FORMATTED', 'remove leading/trailing blank lines.' );
 
 
  .sub main :main
@@ -45,7 +45,7 @@ END_PIR
 .end
 END_FORMATTED
 
-reformat_ok(<<'END_PIR',<<'END_FORMATTED','collapse multiple empty lines');
+reformat_ok( <<'END_PIR', <<'END_FORMATTED', 'collapse multiple empty lines' );
  .sub main :main
  $I0 = 5
 
@@ -59,7 +59,7 @@ END_PIR
 .end
 END_FORMATTED
 
-reformat_ok(<<'END_PIR',<<'END_FORMATTED','handle pod');
+reformat_ok( <<'END_PIR', <<'END_FORMATTED', 'handle pod' );
  .sub main :main
  $I0 = 6
 
@@ -87,7 +87,7 @@ b
 .end
 END_FORMATTED
 
-reformat_ok(<<'END_PIR',<<'END_FORMATTED','whitespace before labels');
+reformat_ok( <<'END_PIR', <<'END_FORMATTED', 'whitespace before labels' );
  .sub main :main
  $I0 = 7
  goto bork
@@ -104,7 +104,7 @@ END_PIR
 .end
 END_FORMATTED
 
-reformat_ok(<<'END_PIR',<<'END_FORMATTED','multiple .sub blocks');
+reformat_ok( <<'END_PIR', <<'END_FORMATTED', 'multiple .sub blocks' );
  .sub main :main
  $I0 = 8
  .end
@@ -122,12 +122,12 @@ END_PIR
 END_FORMATTED
 
 SKIP: {
-  skip ('not implemented', 5);
- 
-  # Once some of these tests are implemented, the un-skipped tests
-  # will need to be reworked to be sure they are still tidy.
+    skip( 'not implemented', 5 );
 
-reformat_ok(<<'END_PIR',<<'END_FORMATTED','quote sub names');
+    # Once some of these tests are implemented, the un-skipped tests
+    # will need to be reworked to be sure they are still tidy.
+
+    reformat_ok( <<'END_PIR', <<'END_FORMATTED', 'quote sub names' );
 .sub joe
  $I1 = 1
 .end
@@ -151,7 +151,7 @@ END_PIR
 .end
 END_FORMATTED
 
-reformat_ok(<<'END_PIR',<<'END_FORMATTED','quote method names');
+    reformat_ok( <<'END_PIR', <<'END_FORMATTED', 'quote method names' );
 .sub joe
  $I1 = $P1.a_method()
 .end
@@ -161,7 +161,8 @@ END_PIR
 .end
 END_FORMATTED
 
-reformat_ok(<<'END_PIR',<<'END_FORMATTED','use single quotes instead of doubles where possible');
+    reformat_ok(
+        <<'END_PIR', <<'END_FORMATTED', 'use single quotes instead of doubles where possible' );
 .sub "joe"
  $S1 = "fun"
  $S1 = "fun\n"
@@ -197,7 +198,7 @@ END_PIR
 .end
 END_FORMATTED
 
-reformat_ok(<<'END_PIR',<<'END_FORMATTED','vertically align .params');
+    reformat_ok( <<'END_PIR', <<'END_FORMATTED', 'vertically align .params' );
 .sub joe
  .param pmc bob :slurpy :unique_reg
  .param pmc   fred :unique_reg
@@ -214,7 +215,8 @@ END_PIR
 .end
 END_FORMATTED
 
-reformat_ok(<<'END_PIR',<<'END_FORMATTED','use assignment syntax for opcodes that support it.');
+    reformat_ok(
+        <<'END_PIR', <<'END_FORMATTED', 'use assignment syntax for opcodes that support it.' );
 .sub joe
  bands $S1, $S2
  bands $S1, $S2, $S3
@@ -230,18 +232,18 @@ END_FORMATTED
 }
 
 sub reformat_ok {
-  my $code = shift;
-  my $expected = shift;
-  my $test_name = shift;
+    my $code      = shift;
+    my $expected  = shift;
+    my $test_name = shift;
 
-  my $formatter = Parrot::PIR::Formatter->new();
-  $formatter->add_pir($code);
-  
-  my $output = $formatter->get_formatted();
+    my $formatter = Parrot::PIR::Formatter->new();
+    $formatter->add_pir($code);
 
-  is($output,$expected,$test_name);
+    my $output = $formatter->get_formatted();
 
-  return; #void
+    is( $output, $expected, $test_name );
+
+    return;    #void
 }
 
 __END__

@@ -23,12 +23,9 @@ Checks that the distribution and the MANIFEST file agree.
 
 =cut
 
+ok( -e $ExtUtils::Manifest::MANIFEST, 'MANIFEST exists' );
 
-ok(-e $ExtUtils::Manifest::MANIFEST, 'MANIFEST exists');
-
-
-ok(-e $ExtUtils::Manifest::MANIFEST . '.SKIP', 'MANIFEST.SKIP exists');
-
+ok( -e $ExtUtils::Manifest::MANIFEST . '.SKIP', 'MANIFEST.SKIP exists' );
 
 SKIP:
 {
@@ -37,10 +34,9 @@ SKIP:
     $ExtUtils::Manifest::Quiet = 1;
 
     my @missing = ExtUtils::Manifest::manicheck();
-    ok(!@missing, 'manicheck()')
+    ok( !@missing, 'manicheck()' )
         or diag("Missing files:\n\t@missing");
-};
-
+}
 
 # remember to change the number of tests :-)
 BEGIN { plan tests => 3; }

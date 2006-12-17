@@ -23,7 +23,7 @@ Tests the namespace manipulation.
 
 =cut
 
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global bar");
+pir_output_is( <<'CODE', <<'OUTPUT', "find_global bar" );
 .sub 'main' :main
     $P0 = find_global "bar"
     print "ok\n"
@@ -38,7 +38,7 @@ ok
 bar
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "verify NameSpace type");
+pir_output_is( <<'CODE', <<'OUTPUT', "verify NameSpace type" );
 .sub 'main' :main
     $P0 = find_global "Foo"
     typeof $S0, $P0
@@ -54,7 +54,7 @@ CODE
 NameSpace
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar");
+pir_output_is( <<'CODE', <<'OUTPUT', "find_global Foo::bar" );
 .sub 'main' :main
     $P0 = find_global "Foo", "bar"
     print "ok\n"
@@ -70,7 +70,7 @@ ok
 bar
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "get_namespace Foo::bar");
+pir_output_is( <<'CODE', <<'OUTPUT', "get_namespace Foo::bar" );
 .sub 'main' :main
     $P0 = find_global "Foo", "bar"
     print "ok\n"
@@ -87,7 +87,7 @@ ok
 Foo
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar ns");
+pir_output_is( <<'CODE', <<'OUTPUT', "find_global Foo::bar ns" );
 .sub 'main' :main
     $P1 = find_global ["Foo"], "bar"
     print "ok\n"
@@ -103,7 +103,7 @@ ok
 bar
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::bar hash");
+pir_output_is( <<'CODE', <<'OUTPUT', "find_global Foo::bar hash" );
 .sub 'main' :main
     $P0 = find_global "Foo"
     $P1 = $P0["bar"]
@@ -120,7 +120,7 @@ ok
 bar
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz");
+pir_output_is( <<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz" );
 .sub 'main' :main
     $P2 = find_global ["Foo";"Bar"], "baz"
     print "ok\n"
@@ -136,7 +136,7 @@ ok
 baz
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', "find_global Foo::bazz not found");
+pir_output_like( <<'CODE', <<'OUTPUT', "find_global Foo::bazz not found" );
 .sub 'main' :main
     $P2 = find_global ["Foo"], "bazz"
     $P2()
@@ -147,7 +147,7 @@ CODE
 OUTPUT
 
 # [this used to behave differently from the previous case.]
-pir_output_like(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::bazz not found");
+pir_output_like( <<'CODE', <<'OUTPUT', "find_global Foo::Bar::bazz not found" );
 .sub 'main' :main
     $P2 = find_global ["Foo";"Bar"], "bazz"
     $P2()
@@ -157,7 +157,7 @@ CODE
 /Null PMC access in invoke\(\)/
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash");
+pir_output_is( <<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash" );
 .sub 'main' :main
     $P0 = find_global "Foo"
     $P1 = $P0["Bar"]
@@ -175,7 +175,7 @@ ok
 baz
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash 2");
+pir_output_is( <<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz hash 2" );
 .sub 'main' :main
     $P0 = find_global "Foo"
     $P1 = $P0["Bar" ; "baz"]
@@ -192,7 +192,7 @@ ok
 baz
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz alias");
+pir_output_is( <<'CODE', <<'OUTPUT', "find_global Foo::Bar::baz alias" );
 .sub 'main' :main
     $P0 = find_global "Foo"
     $P1 = $P0["Bar"]
@@ -211,7 +211,7 @@ ok
 baz
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', "func() namespace resolution");
+pir_output_like( <<'CODE', <<'OUTPUT', "func() namespace resolution" );
 .sub 'main' :main
     print "calling foo\n"
     foo()
@@ -262,7 +262,7 @@ calling baz
 Null PMC access in invoke\(\)/
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'get namespace of :anon .sub');
+pir_output_is( <<'CODE', <<'OUTPUT', 'get namespace of :anon .sub' );
 .namespace ['lib']
 .sub main :main :anon
     $P0 = get_namespace
@@ -275,7 +275,7 @@ CODE
 parrot::lib
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::bar");
+pir_output_is( <<'CODE', <<'OUTPUT', "get namespace in Foo::bar" );
 .sub 'main' :main
     $P0 = find_global "Foo", "bar"
     print "ok\n"
@@ -297,7 +297,7 @@ bar
 Foo
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::Bar::baz");
+pir_output_is( <<'CODE', <<'OUTPUT', "get namespace in Foo::Bar::baz" );
 .sub 'main' :main
     $P0 = find_global "Foo"
     $P1 = $P0["Bar"]
@@ -324,7 +324,7 @@ baz
 parrot::Foo::Bar
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "segv in get_name");
+pir_output_is( <<'CODE', <<'OUTPUT', "segv in get_name" );
 .namespace ['pugs';'main']
 .sub 'main' :main
     $P0 = find_name "&say"
@@ -337,7 +337,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUT', "latin1 namespace, global");
+pir_output_is( <<'CODE', <<'OUT', "latin1 namespace, global" );
 .namespace [ iso-8859-1:"François" ]
 
 .sub '__init'
@@ -354,7 +354,7 @@ CODE
 latin1 namespaces are fun
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "unicode namespace, global");
+pir_output_is( <<'CODE', <<'OUT', "unicode namespace, global" );
 .namespace [ unicode:"Fran\xe7ois" ]
 
 .sub '__init'
@@ -371,7 +371,7 @@ CODE
 unicode namespaces are fun
 OUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "verify root and parrot namespaces");
+pir_output_is( <<'CODE', <<'OUTPUT', "verify root and parrot namespaces" );
 # name may change though
 .sub main :main
     # root namespace
@@ -396,7 +396,7 @@ parrot
 NameSpace
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "ns.name()");
+pir_output_is( <<'CODE', <<'OUTPUT', "ns.name()" );
 .sub main :main
     .include "interpinfo.pasm"
     $P0 = get_root_namespace
@@ -416,7 +416,7 @@ CODE
 parrot::Foo
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "get_namespace_p_p, getnamespace_p_kc");
+pir_output_is( <<'CODE', <<'OUTPUT', "get_namespace_p_p, getnamespace_p_kc" );
 .sub main :main
     .include "interpinfo.pasm"
     $P3 = new .NameSpace
@@ -450,7 +450,7 @@ parrot::Foo
 parrot::Foo
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Sub.get_namespace, get_namespace");
+pir_output_is( <<'CODE', <<'OUTPUT', "Sub.get_namespace, get_namespace" );
 .sub 'main' :main
     $P0 = find_global "Foo", "bar"
     print "ok\n"
@@ -474,7 +474,7 @@ parrot::Foo
 Foo
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "check parrot ns");
+pir_output_is( <<'CODE', <<'OUTPUT', "check parrot ns" );
 .sub 'main' :main
     $P0 = find_global ["String"], "lower"
     $S0 = $P0("OK\n")
@@ -488,8 +488,8 @@ my $temp_a = "temp_a";
 my $temp_b = "temp_b";
 
 END {
-    unlink("$temp_a.pir", "$temp_a.pbc", "$temp_b.pir", "$temp_b.pbc");
-};
+    unlink( "$temp_a.pir", "$temp_a.pbc", "$temp_b.pir", "$temp_b.pbc" );
+}
 
 open my $S, '>', "$temp_a.pir" or die "Can't write $temp_a.pir";
 print $S <<'EOF';
@@ -523,7 +523,7 @@ close $S;
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp_a.pbc $temp_a.pir");
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp_b.pbc $temp_b.pir");
 
-pir_output_is(<<'CODE', <<'OUTPUT', "HLL and load_bytecode - #38888");
+pir_output_is( <<'CODE', <<'OUTPUT', "HLL and load_bytecode - #38888" );
 .sub main :main
     load_bytecode "temp_a.pbc"
     print "ok 3\n"
@@ -534,7 +534,7 @@ ok 2
 ok 3
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "HLL and vars");
+pir_output_is( <<'CODE', <<'OUTPUT', "HLL and vars" );
 # initial storage of _tcl global variable...
 
 .HLL '_Tcl', ''
@@ -560,14 +560,14 @@ CODE
 OUTPUT
 
 {
-my $temp_a = "temp_a.pir";
+    my $temp_a = "temp_a.pir";
 
-END {
-    unlink($temp_a);
-};
+    END {
+        unlink($temp_a);
+    }
 
-open $S, '>', $temp_a or die "Can't write $temp_a";
-print $S <<'EOF';
+    open $S, '>', $temp_a or die "Can't write $temp_a";
+    print $S <<'EOF';
 .HLL 'eek', ''
 
 .sub foo :load :anon
@@ -581,9 +581,9 @@ print $S <<'EOF';
   print $P0
 .end
 EOF
-close $S;
+    close $S;
 
-pir_output_is(<<'CODE', <<'OUTPUT', ":anon subs still get default namespace");
+    pir_output_is( <<'CODE', <<'OUTPUT', ":anon subs still get default namespace" );
 .HLL 'cromulent', ''
 
 .sub what
@@ -600,17 +600,16 @@ CODE
 OUTPUT
 }
 
-
 # the test was skipped, the description says:
 # find_global should find from .HLL namespace, not current .namespace
 # but according to pdd21, {find,store}_global are relative to current
 
 SKIP:
 {
-    skip("immediate test, doesn't with -r (from .pbc)", 1)
+    skip( "immediate test, doesn't with -r (from .pbc)", 1 )
         if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/-r/ );
 
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global in current");
+    pir_output_is( <<'CODE', <<'OUTPUT', "find_global in current" );
 .HLL 'bork', ''
 .namespace
 
@@ -642,7 +641,7 @@ print $S <<'EOF';
 EOF
 close $S;
 
-pir_output_is(<<"CODE", <<'OUTPUT', "export_to");
+pir_output_is( <<"CODE", <<'OUTPUT', "export_to" );
 .HLL 'A', ''
 .sub main :main
     a_foo()
@@ -665,7 +664,7 @@ a_foo
 b_foo
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "get_parent");
+pir_output_is( <<'CODE', <<'OUTPUT', "get_parent" );
 .sub main :main
     .local pmc ns
     ns = get_hll_namespace ['Foo']
@@ -680,7 +679,7 @@ CODE
 parrot
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global [''], \"print_ok\"");
+pir_output_is( <<'CODE', <<'OUTPUT', "find_global [''], \"print_ok\"" );
 .namespace ['']
 
 .sub print_ok
@@ -699,7 +698,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global with array ('')");
+pir_output_is( <<'CODE', <<'OUTPUT', "find_global with array ('')" );
 .namespace ['']
 
 .sub print_ok
@@ -720,7 +719,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "find_global with empty array");
+pir_output_is( <<'CODE', <<'OUTPUT', "find_global with empty array" );
 .namespace
 
 .sub print_ok
@@ -740,7 +739,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Namespace.get_global() with array ('')");
+pir_output_is( <<'CODE', <<'OUTPUT', "Namespace.get_global() with array ('')" );
 .namespace ['']
 
 .sub print_ok
@@ -761,7 +760,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Namespace introspection");
+pir_output_is( <<'CODE', <<'OUTPUT', "Namespace introspection" );
 .sub main :main
     .local pmc f
     f = get_hll_global ['Foo'], 'dummy'
@@ -779,7 +778,7 @@ CODE
 parrot
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Nested namespace introspection");
+pir_output_is( <<'CODE', <<'OUTPUT', "Nested namespace introspection" );
 .sub main :main
     .local string no_symbol
 
@@ -863,7 +862,7 @@ Found sub: parrot;Foo;Bar;a_sub
 Found var: a string PMC
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'get_root_namespace');
+pir_output_is( <<'CODE', <<'OUTPUT', 'get_root_namespace' );
 .sub main :main
     .local pmc root_ns
     root_ns = get_root_namespace
@@ -877,9 +876,7 @@ CODE
 Found root namespace.
 OUTPUT
 
-
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'get_root_namespace "Foo"');
+pir_output_is( <<'CODE', <<'OUTPUT', 'get_root_namespace "Foo"' );
 .sub main :main
     .local pmc foo_ns
     foo_ns = get_root_namespace [ "foo" ]
@@ -896,8 +893,7 @@ CODE
 Found root namespace 'foo'.
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'get_root_namespace "Foo", not there');
+pir_output_is( <<'CODE', <<'OUTPUT', 'get_root_namespace "Foo", not there' );
 .sub main :main
     .local pmc foo_ns
     foo_ns = get_root_namespace [ "Foo" ]
@@ -912,7 +908,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'get_root_namespace "Foo", not there');
 CODE
 Didn't find root namespace 'Foo'.
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

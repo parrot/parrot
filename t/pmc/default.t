@@ -23,8 +23,7 @@ Tests the default PMC.
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', 'new', todo => 'not implemeted');
+pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not implemeted' );
 .sub 'test' :main
     new P0, .default
     print "ok 1\n"
@@ -32,8 +31,6 @@ pir_output_is(<<'CODE', <<'OUT', 'new', todo => 'not implemeted');
 CODE
 ok 1
 OUT
-
-
 
 # Local Variables:
 #   mode: cperl

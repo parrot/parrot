@@ -66,8 +66,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "Setting array size");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
 	new P0, .ResizableBooleanArray
 
 	set I0,P0
@@ -107,8 +106,7 @@ ok 4
 ok 5
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "Setting first element");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
         new P0, .ResizableBooleanArray
         set P0, 1
 
@@ -137,8 +135,7 @@ ok 2
 ok 3
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "Setting second element");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
         new P0, .ResizableBooleanArray
         set P0, 2
 
@@ -169,8 +166,7 @@ OUTPUT
 
 # TODO: Rewrite these properly when we have exceptions
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
         new P0, .ResizableBooleanArray
 
 	set P0[1], -7
@@ -198,8 +194,7 @@ ok 2
 ok 3
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
         new P0, .ResizableBooleanArray
         set P0, 1
 
@@ -210,8 +205,7 @@ CODE
 ok 1
 OUTPUT
 
-
-pasm_output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
+pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
 @{[ $fp_equality_macro ]}
      new P0, .ResizableBooleanArray
      new P1, .Key
@@ -247,8 +241,7 @@ ok 2
 ok 3
 OUTPUT
 
-
-pasm_output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
+pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
 @{[ $fp_equality_macro ]}
      new P0, .ResizableBooleanArray
      set P0, 1
@@ -294,8 +287,7 @@ ok 3
 ok 4
 OUTPUT
 
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 .sub _main
     .local pmc pmc1
     pmc1 = new ResizableBooleanArray
@@ -317,8 +309,7 @@ CODE
 0
 OUTPUT
 
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "push integer");
+pir_output_is( << 'CODE', << 'OUTPUT', "push integer" );
 .sub _main
     .local pmc pmc1
     pmc1 = new ResizableBooleanArray
@@ -339,8 +330,7 @@ CODE
 1
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "creation");
+pasm_output_is( <<'CODE', <<'OUTPUT', "creation" );
         new P0, .ResizableBooleanArray
         set I0, P0
         print "Created ResizableBooleanArray with "
@@ -351,8 +341,7 @@ CODE
 Created ResizableBooleanArray with 0 elements to start with.
 OUTPUT
 
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "push and pop");
+pir_output_is( << 'CODE', << 'OUTPUT', "push and pop" );
 .sub test :main
        .local int i, i_elem
        .local pmc pmc_arr
@@ -413,8 +402,7 @@ CODE
 1[63]
 OUTPUT
 
-
-pir_output_like(<< 'CODE', << 'OUTPUT', "pop bounds checking");
+pir_output_like( << 'CODE', << 'OUTPUT', "pop bounds checking" );
 .sub 'test' :main
        P0 = new .ResizableBooleanArray
        pop I0, P0
@@ -422,10 +410,10 @@ pir_output_like(<< 'CODE', << 'OUTPUT', "pop bounds checking");
 CODE
 /ResizableBooleanArray: Can't pop from an empty array!.*/
 OUTPUT
+
 #'
 
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "unshift and shift");
+pir_output_is( << 'CODE', << 'OUTPUT', "unshift and shift" );
 .sub test :main
        .local int i, i_elem
        .local pmc pmc_arr
@@ -491,8 +479,7 @@ CODE
 [63]
 OUTPUT
 
-
-pir_output_like(<< 'CODE', << 'OUTPUT', "shift bounds checking");
+pir_output_like( << 'CODE', << 'OUTPUT', "shift bounds checking" );
 .sub 'test' :main
        P0 = new .ResizableBooleanArray
        shift I0, P0
@@ -500,10 +487,10 @@ pir_output_like(<< 'CODE', << 'OUTPUT', "shift bounds checking");
 CODE
 /ResizableBooleanArray: Can't shift from an empty array!.*/
 OUTPUT
+
 #'
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "aerobics");
+pasm_output_is( <<'CODE', <<'OUTPUT', "aerobics" );
         new P0, .ResizableBooleanArray
         set I10, 10000
 
@@ -614,8 +601,7 @@ CODE
 I need a shower.
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "direct access 2");
+pasm_output_is( <<'CODE', <<'OUTPUT', "direct access 2" );
     #new P0, .IntList
     new P0, .ResizableBooleanArray
     set I10, 550000
@@ -674,8 +660,7 @@ CODE
 ok
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "sparse access");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sparse access" );
     new P0, .ResizableBooleanArray
        set I10, 110000
        set I0, 1
@@ -753,7 +738,7 @@ OUTPUT
 TODO: {
     local $TODO = "this is broken";
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "check for zeroedness");
+    pasm_output_is( <<'CODE', <<'OUTPUT', "check for zeroedness" );
     new P0, .ResizableBooleanArray
     set I0, 0
 lp1:
@@ -782,8 +767,7 @@ CODE
 ok
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "pop into sparse");
+    pasm_output_is( <<'CODE', <<'OUTPUT', "pop into sparse" );
     new P0, .ResizableBooleanArray
        set I10, 100
        set I0, 0
@@ -855,8 +839,7 @@ CODE
 ok
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "clone");
+    pasm_output_is( <<'CODE', <<'OUTPUT', "clone" );
     new P0, .ResizableBooleanArray
        set P0[0], 1
        set P0[5000], 1
@@ -893,7 +876,7 @@ CODE
 ok
 OUTPUT
 
-} # TODO
+}    # TODO
 
 # Local Variables:
 #   mode: cperl

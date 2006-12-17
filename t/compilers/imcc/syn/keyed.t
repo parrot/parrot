@@ -11,9 +11,9 @@ use Parrot::Test tests => 1;
 
 ##############################
 SKIP: {
-  skip("experimental", 1);
+    skip( "experimental", 1 );
 
-pir_output_is(<<'CODE', <<'OUTPUT', "add_keyed");
+    pir_output_is( <<'CODE', <<'OUTPUT', "add_keyed" );
 .sub test :main
     new P0, .Array
     new P1, .Array

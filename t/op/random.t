@@ -8,7 +8,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 1;
 
-
 =head1 NAME
 
 t/op/random.t - Random numbers
@@ -23,8 +22,7 @@ Tests random number generation
 
 =cut
 
-
-pasm_output_is(<<'CODE', <<OUT, "generate random int");
+pasm_output_is( <<'CODE', <<OUT, "generate random int" );
     new P0, .Random
     set I0, P0
     print "Called random just fine\n"
@@ -32,6 +30,4 @@ pasm_output_is(<<'CODE', <<OUT, "generate random int");
 CODE
 Called random just fine
 OUT
-
-
 

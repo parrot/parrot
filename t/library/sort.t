@@ -9,7 +9,6 @@ use lib qw( t . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 9;
 
-
 =head1 NAME
 
 t/library/sort.t - Sorting
@@ -24,8 +23,7 @@ Tests sorting.
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', "sorting already sorted numbers");
+pir_output_is( <<'CODE', <<'OUT', "sorting already sorted numbers" );
 
 .sub _main
     .local pmc array
@@ -72,7 +70,7 @@ CODE
 9
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "sorting unsorted numbers");
+pir_output_is( <<'CODE', <<'OUT', "sorting unsorted numbers" );
 
 .sub _main
     .local pmc array
@@ -118,7 +116,7 @@ CODE
 9
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "sorting unsorted numbers (2)");
+pir_output_is( <<'CODE', <<'OUT', "sorting unsorted numbers (2)" );
 
 .sub _main
     .local pmc array
@@ -165,7 +163,7 @@ CODE
 9
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "sorting sorted strings");
+pir_output_is( <<'CODE', <<'OUT', "sorting sorted strings" );
 
 .sub _main
     .local pmc array
@@ -208,7 +206,7 @@ golf
 hotel
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
+pir_output_is( <<'CODE', <<'OUT', "sorting unsorted strings" );
 
 .sub _main
     .local pmc array
@@ -251,7 +249,7 @@ golf
 hotel
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "sorting different types");
+pir_output_is( <<'CODE', <<'OUT', "sorting different types" );
 
 .sub _main
     .local pmc array
@@ -318,7 +316,7 @@ golf
 hotel
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "sorting letters");
+pir_output_is( <<'CODE', <<'OUT', "sorting letters" );
 
 .sub _main
     .local pmc array
@@ -353,7 +351,7 @@ x
 y
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "sorting String letters");
+pir_output_is( <<'CODE', <<'OUT', "sorting String letters" );
 
 .sub _main
     .local pmc array
@@ -399,7 +397,7 @@ x
 y
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "sorting strings");
+pir_output_is( <<'CODE', <<'OUT', "sorting strings" );
 
 .sub _main
     .local pmc array
@@ -440,6 +438,4 @@ hash2
 hello
 hello2
 OUT
-
-
 

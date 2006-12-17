@@ -31,39 +31,37 @@ use base qw(Parrot::Configure::Step::Base);
 
 use vars qw($description @args);
 
-$description    = "foo";
-@args           = qw(foo bar baz);
+$description = "foo";
+@args        = qw(foo bar baz);
 
 package main;
 
 my $testpkg = 'Test::Parrot::Configure::Step::Base';
 
-can_ok($testpkg, qw(new description args result set_result));
+can_ok( $testpkg, qw(new description args result set_result) );
 
 # class methods
-is($testpkg->description, 'foo', "->description() returns the proper value");
-is_deeply([$testpkg->args], [qw(foo bar baz)],
-    "->args() returns the proper value");
+is( $testpkg->description, 'foo', "->description() returns the proper value" );
+is_deeply( [ $testpkg->args ], [qw(foo bar baz)], "->args() returns the proper value" );
 
 # object methods
 
-isa_ok($testpkg->new, $testpkg);
+isa_ok( $testpkg->new, $testpkg );
 
 # ->description() & ->args() work as object methods too
 {
     my $teststep = $testpkg->new;
 
-    is($teststep->description, 'foo', "->description() returns the proper value");
-    is_deeply([$teststep->args], [qw(foo bar baz)],
-        "->args() returns the proper value");
+    is( $teststep->description, 'foo', "->description() returns the proper value" );
+    is_deeply( [ $teststep->args ], [qw(foo bar baz)], "->args() returns the proper value" );
 }
 
 {
     my $teststep = $testpkg->new;
 
-    is($teststep->result('baz'), undef, "->set_result() returns the class");
-    isa_ok($teststep->set_result('baz'), $testpkg);
-    is($teststep->result, 'baz', "->set_result() changed the result value");
+    is( $teststep->result('baz'), undef, "->set_result() returns the class" );
+    isa_ok( $teststep->set_result('baz'), $testpkg );
+    is( $teststep->result, 'baz', "->set_result() changed the result value" );
 }
 
 # Local Variables:

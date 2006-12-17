@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : (tests => 6);
+plan $^O =~ m/MSWin32/ ? ( skip_all => 'broken on win32' ) : ( tests => 6 );
 
 =head1 NAME
 
@@ -25,8 +25,7 @@ gathered in some API calls..
 
 =cut
 
-
-c_output_is(<<'CODE', <<'OUTPUT', "compreg/compile");
+c_output_is( <<'CODE', <<'OUTPUT', "compreg/compile" );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
@@ -106,7 +105,7 @@ main(int margc, char *margv[])
 CODE
 ok
 OUTPUT
-c_output_is(<<'CODE', <<'OUTPUT', "Parror Compile API Single call");
+c_output_is( <<'CODE', <<'OUTPUT', "Parror Compile API Single call" );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
@@ -188,7 +187,7 @@ main(int margc, char *margv[])
 CODE
 ok
 OUTPUT
-c_output_is(<<'CODE', <<'OUTPUT', "Parror Compile API Multiple Calls");
+c_output_is( <<'CODE', <<'OUTPUT', "Parror Compile API Multiple Calls" );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
@@ -280,7 +279,7 @@ CODE
 ok
 hola
 OUTPUT
-c_output_is(<<'CODE', <<'OUTPUT', "Parror Compile API Multiple 1st bad PIR");
+c_output_is( <<'CODE', <<'OUTPUT', "Parror Compile API Multiple 1st bad PIR" );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
@@ -371,7 +370,7 @@ CODE
 Pir compiler returned no prog
 hola
 OUTPUT
-c_output_is(<<'CODE', <<'OUTPUT', "Parror Compile API Multiple 2nd bad PIR");
+c_output_is( <<'CODE', <<'OUTPUT', "Parror Compile API Multiple 2nd bad PIR" );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
@@ -462,7 +461,7 @@ CODE
 hola
 Pir compiler returned no prog
 OUTPUT
-c_output_is(<<'CODE', <<'OUTPUT', "Parror Compile API Multiple bad PIR");
+c_output_is( <<'CODE', <<'OUTPUT', "Parror Compile API Multiple bad PIR" );
 
 #include <stdio.h>
 #include "parrot/parrot.h"

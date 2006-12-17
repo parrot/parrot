@@ -74,7 +74,7 @@ my $load_perl = <<'END_PASM';
     find_type I28, 'PerlUndef'
 END_PASM
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "set/get string value");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "set/get string value" );
     new P0, I27
     set P0, "bar"
     set S0, P0
@@ -122,7 +122,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "assign number");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "assign number" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     assign P0, 42.21
@@ -160,7 +160,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl . <<CODE, <<OUTPUT, "if (P) - Num");
+pasm_output_is( $load_perl . <<CODE, <<OUTPUT, "if (P) - Num" );
     new    P0, I25
 
     set    P0, 1.1
@@ -180,7 +180,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<CODE, <<OUTPUT, "unless (P) - Num");
+pasm_output_is( $load_perl . <<CODE, <<OUTPUT, "unless (P) - Num" );
     new    P0, I25
 
     set    P0, 0.0
@@ -200,7 +200,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "inc, PerlNum");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "inc, PerlNum" );
 @{[ $fp_equality_macro ]}
     new P3, I25
 
@@ -221,7 +221,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "dec, PerlNum");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "dec, PerlNum" );
 @{[ $fp_equality_macro ]}
     new P3, I25
 
@@ -242,7 +242,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<CODE, <<OUTPUT, "mul_p_p, PerlNum");
+pasm_output_is( $load_perl . <<CODE, <<OUTPUT, "mul_p_p, PerlNum" );
 @{[ $fp_equality_macro ]}
     new P0,I25
     new P1,I25
@@ -268,7 +268,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "add number to string integer");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "add number to string integer" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I27
@@ -284,7 +284,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "add number to string");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "add number to string" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I27
@@ -300,7 +300,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "add number to string number");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "add number to string number" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I27
@@ -316,7 +316,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "add number to self");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "add number to self" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     set P0, 123.123
@@ -330,7 +330,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "sub number from self");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "sub number from self" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     set P0, 456.456
@@ -344,7 +344,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "multiply number by self");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "multiply number by self" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     set P0, 124.124
@@ -358,7 +358,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "divide number by self");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "divide number by self" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     set P0, 23.23
@@ -375,7 +375,7 @@ OUTPUT
 #
 # Number vs. number
 #
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "add number to other");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "add number to other" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -391,7 +391,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "subtract number from other");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "subtract number from other" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -407,7 +407,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "multiply number by other");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "multiply number by other" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -423,7 +423,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "divide number by other");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "divide number by other" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -442,7 +442,7 @@ OUTPUT
 #
 # Number vs. integer
 #
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "add integer to number");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "add integer to number" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     new P1, I25
@@ -458,7 +458,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "subtract integer from number");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "subtract integer from number" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     new P1, I25
@@ -474,7 +474,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "multiply integer by number");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "multiply integer by number" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     new P1, I25
@@ -490,7 +490,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "divide integer by number");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "divide integer by number" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     new P1, I25
@@ -509,7 +509,7 @@ OUTPUT
 #
 # Number vs. integer
 #
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "add integer to number");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "add integer to number" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     new P1, I25
@@ -525,7 +525,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "subtract integer from number");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "subtract integer from number" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     new P1, I25
@@ -541,7 +541,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "multiply integer by number");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "multiply integer by number" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     new P1, I25
@@ -557,7 +557,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "divide integer by number");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "divide integer by number" );
 @{[ $fp_equality_macro ]}
     new P0, I24
     new P1, I25
@@ -573,7 +573,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "add number  number gives int");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "add number  number gives int" );
     new P0, I25
     new P1, I25
     set P0, 4.2
@@ -586,7 +586,7 @@ CODE
 7
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "sub number  number gives int");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "sub number  number gives int" );
     new P0, I25
     new P1, I25
     set P0, 4.2
@@ -599,7 +599,7 @@ CODE
 2
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "mul number  number gives int");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "mul number  number gives int" );
     new P0, I25
     new P1, I25
     set P0, 4.5
@@ -612,7 +612,7 @@ CODE
 9
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "divide number by number gives int");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "divide number by number gives int" );
     new P0, I25
     new P1, I25
     set P0, 4.2
@@ -625,7 +625,7 @@ CODE
 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "add PerlNum to PerlNum");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "add PerlNum to PerlNum" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -641,7 +641,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "subtract PerlNum from PerlNum");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "subtract PerlNum from PerlNum" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -668,7 +668,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<OUTPUT, "multiply PerlNum with PerlNum");
+pasm_output_is( $load_perl . <<'CODE', <<OUTPUT, "multiply PerlNum with PerlNum" );
     new P0, I25
     new P1, I25
     set P1, 4000.04
@@ -681,7 +681,7 @@ CODE
 492004.920000
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "divide PerlNum by PerlNum");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "divide PerlNum by PerlNum" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -699,7 +699,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "add INTVAL to PerlNum");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "add INTVAL to PerlNum" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -721,7 +721,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "add FLOATVAL to PerlNum");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "add FLOATVAL to PerlNum" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -742,7 +742,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "subtract INTVAL from PerlNum");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "subtract INTVAL from PerlNum" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -764,7 +764,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "subtract FLOATVAL from PerlNum");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "subtract FLOATVAL from PerlNum" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -785,7 +785,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "multiply PerlNum by INTVAL");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "multiply PerlNum by INTVAL" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -807,7 +807,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "multiply PerlNum by FLOATVAL");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "multiply PerlNum by FLOATVAL" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -828,7 +828,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "divide PerlNum by INTVAL");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "divide PerlNum by INTVAL" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -850,7 +850,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "divide PerlNum by FLOATVAL");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "divide PerlNum by FLOATVAL" );
 @{[ $fp_equality_macro ]}
     new P0, I25
     new P1, I25
@@ -871,8 +871,7 @@ ok 1
 ok 2
 OUTPUT
 
-
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "eq_p_n");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "eq_p_n" );
     new P0, I25
 
     set P0, 12.5
@@ -890,8 +889,7 @@ ok 1
 ok 2
 OUTPUT
 
-
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "ne_p_n");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "ne_p_n" );
     new P0, I25
 
     set P0, 12.5
@@ -909,7 +907,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<OUTPUT, "eq_num");
+pasm_output_is( $load_perl . <<"CODE", <<OUTPUT, "eq_num" );
     new P0, I25
     new P1, I25
 
@@ -939,7 +937,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is($load_perl . <<CODE, <<OUTPUT, "p =  fmod(p,p)");
+pasm_output_is( $load_perl . <<CODE, <<OUTPUT, "p =  fmod(p,p)" );
 @{[ $fp_equality_macro ]}
     new    P0, I25
     new    P1, I25
@@ -970,7 +968,7 @@ OUTPUT
 #
 # s. config/gen/platform/generic/math.h
 #
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', "+- zero");
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', "+- zero" );
   new P0, I25
   set P0, 0.0
   print P0
@@ -984,7 +982,7 @@ CODE
 -0.000000
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Truth of a positive float");
+pir_output_is( <<'CODE', <<'OUTPUT', "Truth of a positive float" );
 
 .sub _main
     .local pmc float_1
@@ -1002,7 +1000,7 @@ CODE
 123.123 is true
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Truth of a negative float");
+pir_output_is( <<'CODE', <<'OUTPUT', "Truth of a negative float" );
 
 .sub _main
     .local pmc float_1
@@ -1020,7 +1018,7 @@ CODE
 -123.123 is true
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Truth of a positive integer");
+pir_output_is( <<'CODE', <<'OUTPUT', "Truth of a positive integer" );
 
 .sub _main
     .local pmc float_1
@@ -1038,7 +1036,7 @@ CODE
 1 is true
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Truth of a negative integer");
+pir_output_is( <<'CODE', <<'OUTPUT', "Truth of a negative integer" );
 
 .sub _main
     .local pmc float_1
@@ -1056,7 +1054,7 @@ CODE
 -1 is true
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Falseness of 0");
+pir_output_is( <<'CODE', <<'OUTPUT', "Falseness of 0" );
 
 .sub _main
     .local pmc float_1
@@ -1074,7 +1072,7 @@ CODE
 0 is false
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Falseness of 0.000");
+pir_output_is( <<'CODE', <<'OUTPUT', "Falseness of 0.000" );
 
 .sub _main
     .local pmc float_1
@@ -1092,7 +1090,7 @@ CODE
 0 is false
 OUTPUT
 
-pir_output_is(<<"CODE", <<'OUTPUT', 'check whether interface is done');
+pir_output_is( <<"CODE", <<'OUTPUT', 'check whether interface is done' );
 
 .sub 'test' :main
 $load_perl
@@ -1120,7 +1118,7 @@ OUTPUT
 TODO: {
     no warnings 'once';
     local $TODO = "pending PerlInt's numeric tower morphing semantics";
-pir_output_is(<<"CODE", <<'OUT', "perlint should morph to num on cos()ing");
+    pir_output_is( <<"CODE", <<'OUT', "perlint should morph to num on cos()ing" );
 .sub 'test' :main
 $load_perl
     .local pmc x, y
@@ -1138,8 +1136,7 @@ perlint morph 0.540302
 OUT
 }
 
-
-pasm_output_is($load_perl . <<"CODE", <<'OUTPUT', 'add number to other');
+pasm_output_is( $load_perl . <<"CODE", <<'OUTPUT', 'add number to other' );
 @{[ $fp_equality_macro ]}
 	new P0, I25
 	new P1, .Float
@@ -1188,7 +1185,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<'OUTPUT', 'subtract number from other');
+pasm_output_is( $load_perl . <<"CODE", <<'OUTPUT', 'subtract number from other' );
 @{[ $fp_equality_macro ]}
 	new P0, I25
 	new P1, .Float
@@ -1238,7 +1235,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<'OUTPUT', 'multiply number by other');
+pasm_output_is( $load_perl . <<"CODE", <<'OUTPUT', 'multiply number by other' );
 @{[ $fp_equality_macro ]}
 	new P0, I25
 	new P1, .Float
@@ -1288,7 +1285,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl . <<"CODE", <<'OUTPUT', 'divide number by other');
+pasm_output_is( $load_perl . <<"CODE", <<'OUTPUT', 'divide number by other' );
 @{[ $fp_equality_macro ]}
 	new P0, I25
 	new P1, .Float
@@ -1338,7 +1335,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is($load_perl . <<'CODE', <<'OUTPUT', 'comparison ops: cmp_num');
+pasm_output_is( $load_perl . <<'CODE', <<'OUTPUT', 'comparison ops: cmp_num' );
         new P1, .Float
         set P1, 1.1
         new P2, .Float

@@ -23,7 +23,7 @@ Tests the CodeString class directly.
 
 =cut
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'create a CodeString object');
+pir_output_is( <<'CODE', <<'OUTPUT', 'create a CodeString object' );
 .sub main :main
     load_bytecode 'compilers/pge/PGE/CodeString.pir'
     .local pmc code
@@ -35,7 +35,7 @@ CODE
 ok 1
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'calls to unique');
+pir_output_is( <<'CODE', <<'OUTPUT', 'calls to unique' );
 .sub main :main
     load_bytecode 'compilers/pge/PGE/CodeString.pir'
     .local pmc code
@@ -53,8 +53,7 @@ ok 10
 $P12
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'basic emit');
+pir_output_is( <<'CODE', <<'OUTPUT', 'basic emit' );
 .sub main :main
     load_bytecode 'compilers/pge/PGE/CodeString.pir'
     .local pmc code
@@ -72,8 +71,7 @@ CODE
     $N0 = 0.1
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'emit with pos args');
+pir_output_is( <<'CODE', <<'OUTPUT', 'emit with pos args' );
 .sub main :main
     load_bytecode 'compilers/pge/PGE/CodeString.pir'
     .local pmc code
@@ -89,8 +87,7 @@ CODE
     $I0 = 48
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'emit with %, args');
+pir_output_is( <<'CODE', <<'OUTPUT', 'emit with %, args' );
 .sub main :main
     load_bytecode 'compilers/pge/PGE/CodeString.pir'
     .local pmc code
@@ -106,8 +103,7 @@ CODE
     say "Hello, World, of, Parrot"
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'emit with named args');
+pir_output_is( <<'CODE', <<'OUTPUT', 'emit with named args' );
 .sub main :main
     load_bytecode 'compilers/pge/PGE/CodeString.pir'
     .local pmc code
@@ -123,8 +119,7 @@ CODE
     say "%d"
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'emit with pos + named args');
+pir_output_is( <<'CODE', <<'OUTPUT', 'emit with pos + named args' );
 .sub main :main
     load_bytecode 'compilers/pge/PGE/CodeString.pir'
     .local pmc code
@@ -139,5 +134,4 @@ CODE
     say "H, W"
     say "alpha, beta, W"
 OUTPUT
-
 

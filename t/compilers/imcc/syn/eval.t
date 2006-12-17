@@ -9,12 +9,11 @@ use Test::More;
 use Parrot::Config;
 use Parrot::Test tests => 7;
 
-
 SKIP: {
-        skip("changed eval semantics - see t/pmc/eval.t", 7);
+    skip( "changed eval semantics - see t/pmc/eval.t", 7 );
 
 ##############################
-pir_output_is(<<'CODE', <<'OUT', "eval pasm");
+    pir_output_is( <<'CODE', <<'OUT', "eval pasm" );
 .sub test :main
         $S0 = 'set S1, "in eval\n"'
         concat $S0, "\n"
@@ -30,7 +29,7 @@ in eval
 back
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "eval pir");
+    pir_output_is( <<'CODE', <<'OUT', "eval pir" );
 .sub test :main
         $S1 = ".sub _foo\n"
         concat $S1, '$S1 = "42\n"'
@@ -47,7 +46,7 @@ CODE
 back
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "intersegment branch");
+    pir_output_is( <<'CODE', <<'OUT', "intersegment branch" );
 # #! perl -w
 # my $i= 5;
 # LAB:
@@ -74,7 +73,7 @@ CODE
 7
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "intersegment branch 2");
+    pir_output_is( <<'CODE', <<'OUT', "intersegment branch 2" );
 .sub test :main
     I1 = 4
     $S0 = ".sub _e\nif I1 <= 6 goto LAB\nend\n.end\n"
@@ -91,7 +90,7 @@ CODE
 7
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "intersegment branch 3");
+    pir_output_is( <<'CODE', <<'OUT', "intersegment branch 3" );
 .sub test :main
     I1 = 4
     compreg P2, "PIR"
@@ -112,7 +111,7 @@ CODE
 7
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "intersegment branch 4");
+    pir_output_is( <<'CODE', <<'OUT', "intersegment branch 4" );
 .sub test :main
     I1 = 4
     compreg P2, "PIR"
@@ -134,7 +133,7 @@ CODE
 8
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "eval - same constants");
+    pir_output_is( <<'CODE', <<'OUT', "eval - same constants" );
 .sub test :main
         print "hello"
         print "\n"

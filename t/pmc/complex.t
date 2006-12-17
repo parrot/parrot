@@ -23,8 +23,6 @@ Tests the Complex PMC.
 
 =cut
 
-
-
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
     save	N0
@@ -68,8 +66,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "String parsing");
+pasm_output_is( <<'CODE', <<'OUTPUT', "String parsing" );
     new P0, .Complex
     new P1, .String
 
@@ -160,7 +157,7 @@ CODE
 -13+2i
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "Malformed string: real part");
+pasm_output_like( <<'CODE', <<'OUTPUT', "Malformed string: real part" );
     new P0, .Complex
     set P0, "q + 3i"
     end
@@ -168,7 +165,7 @@ CODE
 /Complex: malformed string/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "Malformed string: imaginary part");
+pasm_output_like( <<'CODE', <<'OUTPUT', "Malformed string: imaginary part" );
     new P0, .Complex
     set P0, "1 + ij"
     end
@@ -176,14 +173,14 @@ CODE
 /Complex: malformed string/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "Malformed string: missing +/-");
+pasm_output_like( <<'CODE', <<'OUTPUT', "Malformed string: missing +/-" );
     new P0, .Complex
     set P0, "1 * i"
 CODE
 /Complex: malformed string/
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "add");
+pasm_output_is( <<'CODE', <<'OUTPUT', "add" );
     new P0, .Complex
     new P1, .Complex
     new P2, .Float
@@ -249,7 +246,7 @@ CODE
 0+3i
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "subtract");
+pasm_output_is( <<'CODE', <<'OUTPUT', "subtract" );
     new P0, .Complex
     new P1, .Complex
     new P2, .Float
@@ -315,7 +312,7 @@ CODE
 1024+3i
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "multiply");
+pasm_output_is( << 'CODE', << 'OUTPUT', "multiply" );
     new P0, .Complex
     new P1, .Complex
     new P2, .Float
@@ -376,7 +373,7 @@ CODE
 10+10i
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "divide");
+pasm_output_is( <<'CODE', <<'OUTPUT', "divide" );
     new P0, .Complex
     new P1, .Complex
     new P2, .Float
@@ -430,9 +427,8 @@ CODE
 4-6i
 OUTPUT
 
-
-  for my $type ("Complex", "Float", "Integer") {
-      pir_output_is(<<"CODE", <<OUTPUT, "complex divide by zero $type");
+for my $type ( "Complex", "Float", "Integer" ) {
+    pir_output_is( <<"CODE", <<OUTPUT, "complex divide by zero $type" );
 .sub _main :main
     P0 = new Complex
     set P0, "4+3.5i"
@@ -454,9 +450,9 @@ CODE
 ok
 Divide by zero
 OUTPUT
-  }
+}
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "get int/num/bool");
+pasm_output_is( <<"CODE", <<'OUTPUT', "get int/num/bool" );
 @{[ $fp_equality_macro ]}
         new P0, .Complex
         set P0, "2 - 1.5i"
@@ -490,7 +486,7 @@ true
 false
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "get keyed");
+pasm_output_is( <<"CODE", <<'OUTPUT', "get keyed" );
 @{[ $fp_equality_macro ]}
         new P0, .Complex
         new P1, .String
@@ -534,7 +530,7 @@ N0 N1 N2 OK
 1
 OUTPUT
 
-pasm_output_like(<<"CODE", <<'OUTPUT', "get keyed: invalid string key");
+pasm_output_like( <<"CODE", <<'OUTPUT', "get keyed: invalid string key" );
     new P0, .Complex
     set P0, "5 + 3.5i"
     set N0, P0["Foo"]
@@ -543,7 +539,7 @@ CODE
 /Complex: key is neither 'real' or 'imag'/
 OUTPUT
 
-pasm_output_like(<<"CODE", <<'OUTPUT', "get keyed: invalid numeric key");
+pasm_output_like( <<"CODE", <<'OUTPUT', "get keyed: invalid numeric key" );
     new P0, .Complex
     set P0, "5 + 3.5i"
     set N0, P0[2]
@@ -552,7 +548,7 @@ CODE
 /Complex: key must be 0 or 1/
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "set int/num");
+pasm_output_is( <<'CODE', <<'OUTPUT', "set int/num" );
     new P0, .Complex
 
     set P0, "3 + 4i"
@@ -571,7 +567,7 @@ CODE
 0.4+0i
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "set keyed");
+pasm_output_is( <<'CODE', <<'OUTPUT', "set keyed" );
     new P0, .Complex
     new P1, .String
     new P2, .String
@@ -601,7 +597,7 @@ CODE
 0.5+6i
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "set keyed: invalid key");
+pasm_output_like( <<'CODE', <<'OUTPUT', "set keyed: invalid key" );
     new P0, .Complex
     set P0[2], 12.5
     end
@@ -609,7 +605,7 @@ CODE
 /Complex: key must be 0 or 1/
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "is_equal");
+pasm_output_is( <<'CODE', <<'OUTPUT', "is_equal" );
     new P0, .Complex
     new P1, .Complex
 
@@ -632,7 +628,7 @@ ok1
 ok2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "abs");
+pasm_output_is( <<'CODE', <<'OUTPUT', "abs" );
     new P0, .Complex
     set P0, "4 + 3j"
     new P1, .Undef
@@ -645,7 +641,7 @@ CODE
 5
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
@@ -665,8 +661,8 @@ CODE
 OUTPUT
 
 SKIP: {
-  skip("instantiate n/y", 3);
-pasm_output_is(<< 'CODE', << 'OUTPUT', "instantiate, PASM, I");
+    skip( "instantiate n/y", 3 );
+    pasm_output_is( << 'CODE', << 'OUTPUT', "instantiate, PASM, I" );
     set I0, 1
     set I1, 2
     set I2, 0
@@ -683,7 +679,7 @@ CODE
 10+20i
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, N");
+    pir_output_is( << 'CODE', << 'OUTPUT', "instantiate, PIR, N" );
 
 .sub main
     $P0 = getclass "Complex"
@@ -696,7 +692,7 @@ CODE
 2+3i
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, P");
+    pir_output_is( << 'CODE', << 'OUTPUT', "instantiate, PIR, P" );
 
 .sub main
     $P0 = getclass "Complex"
@@ -713,7 +709,7 @@ CODE
 2+3i
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, S");
+    pir_output_is( << 'CODE', << 'OUTPUT', "instantiate, PIR, S" );
 
 .sub main
     $P0 = getclass "Complex"
@@ -727,7 +723,7 @@ CODE
 OUTPUT
 }
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "neg");
+pasm_output_is( <<"CODE", <<'OUTPUT', "neg" );
 @{[ $fp_equality_macro ]}
      new P0, .Complex
      set P0, "1.3 + 1.7i"
@@ -747,7 +743,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "clone");
+pasm_output_is( <<"CODE", <<'OUTPUT', "clone" );
 @{[ $fp_equality_macro ]}
      new P0, .Complex
      set P0, "1 - 3i"
@@ -771,7 +767,7 @@ ok 2
 ok 3
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "sub");
+pir_output_is( << 'CODE', << 'OUTPUT', "sub" );
 .sub main :main
     .local pmc d, f, c
     d = new .Undef
@@ -799,7 +795,7 @@ Complex
 Complex
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "i_sub");
+pir_output_is( << 'CODE', << 'OUTPUT', "i_sub" );
 .sub main :main
     .local pmc f, c
     f = new .Float
@@ -820,7 +816,7 @@ CODE
 -2.8-2i
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "sprintf with a complex");
+pir_output_is( << 'CODE', << 'OUTPUT', "sprintf with a complex" );
 .macro DoIt(fmt, number)
     c = .number
     $S0 = sprintf .fmt, c
@@ -839,7 +835,7 @@ CODE
 0.000+1.000i
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "pow with complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "pow with complex numbers" );
 .macro DoIt(base, power)
     c = .base
     c2 = .power
@@ -876,7 +872,7 @@ CODE
 1.000000+1.000000i
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "sqrt of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "sqrt of complex numbers" );
 .macro DoIt(val)
     c = .val
     c2 = sqrt c
@@ -900,7 +896,7 @@ CODE
 1.09868+0.45509i
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "e^(pi*i) + 1 = 0");
+pir_output_is( << 'CODE', << 'OUTPUT', "e^(pi*i) + 1 = 0" );
 .macro PrintIt(fmt, number)
     c = .number
     $S0 = sprintf .fmt, c
@@ -1024,7 +1020,7 @@ OUTPUT
 SKIP: {
     skip 'inf is not platform-independent', 1 if $^O eq 'MSWin32';
 
-    pir_output_is(<< 'CODE', << 'OUTPUT', "ln of complex numbers");
+    pir_output_is( << 'CODE', << 'OUTPUT', "ln of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.ln()
@@ -1069,7 +1065,7 @@ done
 OUTPUT
 }
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "exp of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "exp of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.exp()
@@ -1112,7 +1108,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "sqrt of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "sqrt of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.sqrt()
@@ -1155,7 +1151,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "sin of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "sin of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.sin()
@@ -1198,7 +1194,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "cos of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "cos of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.cos()
@@ -1241,7 +1237,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "tan of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "tan of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.tan()
@@ -1284,7 +1280,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "cot of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "cot of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.cot()
@@ -1326,7 +1322,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "sec of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "sec of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.sec()
@@ -1369,7 +1365,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "csc of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "csc of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.csc()
@@ -1411,7 +1407,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "asin of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "asin of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.asin()
@@ -1454,7 +1450,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "acos of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "acos of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.acos()
@@ -1497,7 +1493,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "atan of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "atan of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.atan()
@@ -1538,7 +1534,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "acot of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "acot of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.acot()
@@ -1578,7 +1574,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "asec of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "asec of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.asec()
@@ -1620,7 +1616,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "acsc of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "acsc of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.acsc()
@@ -1662,7 +1658,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "sinh of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "sinh of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.sinh()
@@ -1705,7 +1701,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "cosh of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "cosh of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.cosh()
@@ -1748,7 +1744,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "tanh of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "tanh of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.tanh()
@@ -1791,7 +1787,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "coth of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "coth of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.coth()
@@ -1833,7 +1829,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "sech of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "sech of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.sech()
@@ -1876,7 +1872,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "csch of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "csch of complex numbers" );
 .macro DoIt(val, res)
     c = .val
     c2 = c.csch()
@@ -1917,7 +1913,6 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "csch of complex numbers");
 CODE
 done
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

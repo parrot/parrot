@@ -12,7 +12,7 @@ use Parrot::Test tests => 20;
 ##############################
 # Parrot Calling Conventions
 
-pir_output_is(<<'CODE', <<'OUT', "low-level syntax");
+pir_output_is( <<'CODE', <<'OUT', "low-level syntax" );
 .sub test :main
     .const .Sub sub = "_sub"
     .const int y = 20
@@ -41,7 +41,7 @@ CODE
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "func() syntax");
+pir_output_is( <<'CODE', <<'OUT', "func() syntax" );
 .sub test :main
     .const int y = 20
     .local string z
@@ -64,8 +64,7 @@ CODE
 ok
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "quoted sub names");
+pir_output_is( <<'CODE', <<'OUT', "quoted sub names" );
 .sub main :main
     "foo"()
     print "ok\n"
@@ -85,7 +84,7 @@ new
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "_func() syntax with var - global");
+pir_output_is( <<'CODE', <<'OUT', "_func() syntax with var - global" );
 .sub test :main
     .local pmc the_sub
     the_sub = global "_sub"
@@ -106,7 +105,7 @@ CODE
 20
 OUT
 
-pir_output_is(<<'CODE', "42\n", "multiple returns");
+pir_output_is( <<'CODE', "42\n", "multiple returns" );
 .sub test :main
 .local int a, b
   (a, b) = _sub()
@@ -120,7 +119,7 @@ pir_output_is(<<'CODE', "42\n", "multiple returns");
 .end
 CODE
 
-pir_output_is(<<'CODE', <<'OUT', "tail recursive sub");
+pir_output_is( <<'CODE', <<'OUT', "tail recursive sub" );
 .sub test :main
     .local int count, product, result
     count = 5
@@ -146,7 +145,6 @@ CODE
 120
 OUT
 
-
 ####################
 # coroutine iterator
 #
@@ -168,7 +166,7 @@ OUT
 #         print "done in coroutine\n";
 #       }
 
-pir_output_is(<<'CODE', <<'OUT', "coroutine iterator");
+pir_output_is( <<'CODE', <<'OUT', "coroutine iterator" );
 .sub test :main
   .local int i
   i=5
@@ -214,7 +212,7 @@ done in coroutine
 done in main
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "coroutine iterator - throw stop");
+pir_output_is( <<'CODE', <<'OUT', "coroutine iterator - throw stop" );
 .sub test :main
   .local int i
   i=5
@@ -258,8 +256,7 @@ done in coroutine
 done in main
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', ".arg :flat");
+pir_output_is( <<'CODE', <<'OUT', ".arg :flat" );
 .sub _main
     .local pmc x, y, z, ar, ar2, s
     x = new .String
@@ -315,7 +312,7 @@ ok 5
 last
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "foo (arg :flat)");
+pir_output_is( <<'CODE', <<'OUT', "foo (arg :flat)" );
 .sub _main
     .local pmc x, y, z, ar, ar2
     x = new .String
@@ -365,7 +362,7 @@ ok 5
 last
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', ":main pragma, syntax only");
+pir_output_is( <<'CODE', <<'OUT', ":main pragma, syntax only" );
 .sub _main :main
     print "ok\n"
     end
@@ -374,10 +371,10 @@ CODE
 ok
 OUT
 
-  # The result of the code should depend on whether we run parrot with the
-  # "-o code.pbc -r -r" command line params.
-  # Strangely, the same output is written
-pir_output_like(<<'CODE', <<'OUT', "more pragmas, syntax only");
+# The result of the code should depend on whether we run parrot with the
+# "-o code.pbc -r -r" command line params.
+# Strangely, the same output is written
+pir_output_like( <<'CODE', <<'OUT', "more pragmas, syntax only" );
 .sub _main :main :load :postcomp
     print "ok\n"
     end
@@ -386,7 +383,7 @@ CODE
 /(ok\n){1,2}/
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "multi 1");
+pir_output_is( <<'CODE', <<'OUT', "multi 1" );
 .sub foo :multi()
     print "ok 1\n"
 .end
@@ -400,8 +397,7 @@ CODE
 ok 1
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', "\:main defined twice");
+pir_output_is( <<'CODE', <<'OUT', "\:main defined twice" );
 .sub foo :main
         set S0, 'not ok'
         print S0
@@ -419,7 +415,7 @@ CODE
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "\:anon subpragma, syntax only");
+pir_output_is( <<'CODE', <<'OUT', "\:anon subpragma, syntax only" );
 .sub anon :anon
     print "ok\n"
 .end
@@ -427,7 +423,7 @@ CODE
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "\:anon doesn't install symbol 1");
+pir_output_is( <<'CODE', <<'OUT', "\:anon doesn't install symbol 1" );
 .sub main :main
     .local pmc result
     result = find_global 'anon'
@@ -448,7 +444,7 @@ CODE
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "\:anon doesn't install symbol 2");
+pir_output_is( <<'CODE', <<'OUT', "\:anon doesn't install symbol 2" );
 .sub main :main
     .local pmc result
     result= find_global 'anon'
@@ -466,7 +462,7 @@ CODE
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "multiple \:anon subs with same name");
+pir_output_is( <<'CODE', <<'OUT', "multiple \:anon subs with same name" );
 .sub main :main
     .local pmc result
     result= find_global 'anon'
@@ -491,7 +487,7 @@ CODE
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "()=foo() syntax, no return values");
+pir_output_is( <<'CODE', <<'OUT', "()=foo() syntax, no return values" );
 .sub main :main
         () = foo()
 .end
@@ -502,7 +498,7 @@ CODE
 foo
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "()=foo() syntax, skip returned value");
+pir_output_is( <<'CODE', <<'OUT', "()=foo() syntax, skip returned value" );
 .sub main :main
         () = foo()
 .end

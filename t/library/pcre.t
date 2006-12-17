@@ -8,7 +8,6 @@ use lib qw( t . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 1;
 
-
 =head1 NAME
 
 t/library/pcre.t - testing library/pcre.pir
@@ -24,19 +23,16 @@ the installed PCRE library, and matches patterns successfully.
 
 =cut
 
-
 # if we keep pcre, we need a config test
-my $cmd = ($^O =~ /MSWin32/) ? "pcregrep --version" : "pcre-config --version";
-my $has_pcre = !Parrot::Test::run_command(
-    $cmd, STDERR => File::Spec->devnull,
-);
+my $cmd = ( $^O =~ /MSWin32/ ) ? "pcregrep --version" : "pcre-config --version";
+my $has_pcre = !Parrot::Test::run_command( $cmd, STDERR => File::Spec->devnull, );
 
 SKIP: {
-    skip("no pcre-config", Test::Builder->new()->expected_tests())
+    skip( "no pcre-config", Test::Builder->new()->expected_tests() )
         unless $has_pcre;
 
 ## 1
-pir_output_is( <<'CODE', <<'OUT', 'soup to nuts' );
+    pir_output_is( <<'CODE', <<'OUT', 'soup to nuts' );
 
 
 .sub main :main
@@ -113,7 +109,5 @@ ok 4
 ok 5
 OUT
 
-};
-
-
+}
 

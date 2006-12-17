@@ -40,6 +40,7 @@ my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my @fixme;
 
 foreach my $file (@files) {
+
     # if we have command line arguments, the file is the full path
     # otherwise, use the relevant Parrot:: path method
     my $path = @ARGV ? $file : $file->path;

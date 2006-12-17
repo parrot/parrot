@@ -9,7 +9,6 @@ use lib qw( lib . ../lib ../../lib );
 use Parrot::Test;
 use Test::More;
 
-
 =head1 NAME
 
 t/benchmark/benchmarks.t - test scripts in examples/benchmarks
@@ -25,11 +24,11 @@ Called by 'make benchmark_tests'.
 =cut
 
 # Expected output from scripts in 'examples/benchmarks'.
-# The expected out is needed for checking results with pir_output_is() and pir_output_like(). 
+# The expected out is needed for checking results with pir_output_is() and pir_output_like().
 my %outputs = (
-    q{addit.pir}  => qq(2.10011e+07\n),
-    q{addit.pasm} => qq(21001097.970000\n),
-    q{addit2.pir} => qq(2.10011e+07\n),
+    q{addit.pir}        => qq(2.10011e+07\n),
+    q{addit.pasm}       => qq(21001097.970000\n),
+    q{addit2.pir}       => qq(2.10011e+07\n),
     q{array_access.pir} => qr/
 1\s\*\s1000\s=\s1000\n
 100\s\*\s1000\s=\s100000\n
@@ -75,8 +74,8 @@ ResizableStringArray:\s\d+\.\d+s\n
 100\s\*\s1000\s=\s100000\n
 SArray:\s\d+\.\d+s\n
 \s+$/x,
-    q{arriter.pir} => qq(100000\n100000\n100000\n111111\n),
-    q{arriter_o1.pir} => qq(100000\n100000\n100000\n111111\n),
+    q{arriter.pir}     => qq(100000\n100000\n100000\n111111\n),
+    q{arriter_o1.pir}  => qq(100000\n100000\n100000\n111111\n),
     q{bench_newp.pasm} => qr/^\d+\.\d+\sseconds.\s\d+\.\d+\sloops\/sec\n
         A\stotal\sof\s\d+\sbytes\swere\sallocated\n
         A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
@@ -86,7 +85,7 @@ SArray:\s\d+\.\d+s\n
         There\sare\s\d+\stotal\sPMC\sstructs\n
         There\sare\s\d+\sactive\sBuffer\sstructs\n
         There\sare\s\d+\stotal\sBuffer\sstructs\n$/x,
-    q{fib.pir} => qr/^fib\(28\)\s=\s317811\s\d+\.\d+s$/x,
+    q{fib.pir}     => qr/^fib\(28\)\s=\s317811\s\d+\.\d+s$/x,
     q{freeze.pasm} => qr/^constr.time\s\d+\.\d+\n
         freeze\stime\s\d+\.\d+\n
         \s\sthaw\stime\s\d+\.\d+\n
@@ -153,19 +152,19 @@ SArray:\s\d+\.\d+s\n
         done\n
         Elapsed\stime:\s\s\d+\.\d+\n
         M\sop\/s:\s\s\s\s\s\s\s\s\d+\.\d+\n$/x,
-    q(mops_intval.pasm)      => qr/^Iterations:\s\s\s\s100000000\n
+    q(mops_intval.pasm) => qr/^Iterations:\s\s\s\s100000000\n
         Estimated\sops:\s200000000\n
         Elapsed\stime:\s\s\d+\.\d+\n
         M\sop\/s:\s\s\s\s\s\s\s\s\d+\.\d+\n$/x,
-    q{oo1.pasm} => qq(10\n),
-    q{oo2.pasm} => qq(10\n),
-    q{oo3.pasm} => qq(10\n),
-    q{oo4.pasm} => qq(500000\n),
-    q{oo5.pir} => qq(10\n),
-    q{oo6.pir} => qq(500000\n),
-    q{oofib.pir} => qr/^fib\(28\)\s=\s317811\s\d+\.\d+s$/x,
+    q{oo1.pasm}     => qq(10\n),
+    q{oo2.pasm}     => qq(10\n),
+    q{oo3.pasm}     => qq(10\n),
+    q{oo4.pasm}     => qq(500000\n),
+    q{oo5.pir}      => qq(10\n),
+    q{oo6.pir}      => qq(500000\n),
+    q{oofib.pir}    => qr/^fib\(28\)\s=\s317811\s\d+\.\d+s$/x,
     q{overload.pir} => qq(42\n),
-    q{primes.pasm} => qr/^N\sprimes\sup\sto\s10000\sis:\s1229\n
+    q{primes.pasm}  => qr/^N\sprimes\sup\sto\s10000\sis:\s1229\n
         last\sis:\s10001\n
         Elapsed\stime:\s\d+\.\d+\n$/x,
     q{primes2.pasm} => qr/^N\sprimes\scalculated\sto\s5000\sis\s670\n
@@ -175,7 +174,7 @@ SArray:\s\d+\.\d+s\n
     q{primes_i.pasm} => qr/^N\sprimes\sup\sto\s10000\sis:\s1229\n
         last\sis:\s9973\nElapsed\stime:\s\d+\.\d+\n$/x,
     q{shared_ref.pasm} => qq(),
-    q{stress.pasm} => qr/^A\stotal\sof\s\d+\sDOD\sruns\s
+    q{stress.pasm}     => qr/^A\stotal\sof\s\d+\sDOD\sruns\s
         were\smade\n$/x,
     q{stress1.pasm} => qr/^\d+\.\d+\n
         A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
@@ -206,18 +205,17 @@ SArray:\s\d+\.\d+s\n
 
 # These scripts are known to be failing.
 # Heh, currently all tests are working!
-my %todo = ( 
-           );
+my %todo = ();
 
 plan tests => scalar keys %outputs;
 
 foreach ( sort keys %outputs ) {
-    SKIP: {
-        my $bench = Parrot::Test::slurp_file( "examples/benchmarks/$_" );
+SKIP: {
+        my $bench = Parrot::Test::slurp_file("examples/benchmarks/$_");
         skip( "Could not slurp $_", 1 ) unless $bench;
 
         my @todo = $todo{$_} ? ( todo => $todo{$_} ) : ();
-        
+
         if ( ref $outputs{$_} eq 'Regexp' ) {
             example_output_like( "examples/benchmarks/$_", $outputs{$_}, @todo );
         }

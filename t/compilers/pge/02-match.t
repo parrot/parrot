@@ -23,7 +23,7 @@ Tests the Match class directly.
 
 =cut
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'concat on a Match object (rt#39135)');
+pir_output_is( <<'CODE', <<'OUTPUT', 'concat on a Match object (rt#39135)' );
 .sub main :main
     load_bytecode 'PGE.pbc'
 
@@ -45,8 +45,7 @@ world
 hello world
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'push on a Match object');
+pir_output_is( <<'CODE', <<'OUTPUT', 'push on a Match object' );
 .sub main :main
     .local pmc match, str, arr
     load_bytecode 'PGE.pbc'
@@ -65,5 +64,4 @@ CODE
 1
 foo
 OUTPUT
-
 

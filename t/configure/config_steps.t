@@ -26,9 +26,9 @@ Regressions tests for configure steps that live under the config directory.
 
 my @steps;
 sub wanted { /^.*\.pm\z/s && push @steps, $File::Find::name; }
-find({wanted => \&wanted}, 'config'); 
+find( { wanted => \&wanted }, 'config' );
 
-if ($^O !~ /win32/i) {
+if ( $^O !~ /win32/i ) {
     @steps = grep { $_ !~ /win32/i } @steps;
 }
 

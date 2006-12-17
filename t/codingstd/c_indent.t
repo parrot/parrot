@@ -32,30 +32,26 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
-
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 
-
-check_indent( @files );
-
+check_indent(@files);
 
 exit;
 
-
 sub check_indent {
-    my (@pp_indent, @c_indent);
+    my ( @pp_indent, @c_indent );
 
     foreach my $file (@_) {
         my @source;
         my $path = @ARGV ? $file : $file->path();
         open my $fh, '<', $path
             or die "Can not open '$path' for reading!\n";
-            @source = <$fh>;
+        @source = <$fh>;
 
         my @stack;
         my $line = 0;
-        my $f = undef;
+        my $f    = undef;
         foreach (@source) {
             $line++;
             next unless defined $_;
@@ -65,7 +61,7 @@ sub check_indent {
                 next if (/PARROT_IN_CORE|_GUARD/);
 
                 my $indent = "  " x (@stack);
-                if ($1 ne $indent) {
+                if ( $1 ne $indent ) {
                     push @pp_indent => "$path:$line\n"
                         . "     got: $_"
                         . "expected: #$indent$2 $3'\n";
@@ -74,24 +70,25 @@ sub check_indent {
                 next;
             }
             if (/^\s*\#(\s*)(else|elif)/) {
-                # stay where we are, but indenting should be 
+
+                # stay where we are, but indenting should be
                 # back even with the opening brace.
-                my $indent = "  " x (@stack-1);
-                if ($1 ne $indent) {
+                my $indent = "  " x ( @stack - 1 );
+                if ( $1 ne $indent ) {
                     push @pp_indent => "$path:$line\n"
                         . "     got: $_"
                         . "expected: #$indent$2 -- it's inside of "
-                        . (join ' > ', @stack) . "\n";
+                        . ( join ' > ', @stack ) . "\n";
                 }
                 next;
             }
             if (/^\s*\#(\s*)(endif)/) {
-                my $indent = "  " x (@stack-1);
-                if ($1 ne $indent) {
+                my $indent = "  " x ( @stack - 1 );
+                if ( $1 ne $indent ) {
                     push @pp_indent => "$path:$line\n"
                         . "     got: $_"
                         . "expected: #$indent$2 --  it's inside of "
-                        . (join ' > ', @stack) . "\n";
+                        . ( join ' > ', @stack ) . "\n";
                 }
                 pop @stack;
                 next;
@@ -100,11 +97,11 @@ sub check_indent {
 
             if (/^\s*\#(\s*)(.*)/) {
                 my $indent = "  " x (@stack);
-                if ($1 ne $indent) {
+                if ( $1 ne $indent ) {
                     push @pp_indent => "$path:$line\n"
-                    . "     got: $_"
-                    . "expected: #$indent$2 -- it's inside of "
-                    . (join ' > ', @stack) . "\n";
+                        . "     got: $_"
+                        . "expected: #$indent$2 -- it's inside of "
+                        . ( join ' > ', @stack ) . "\n";
                 }
             }
 
@@ -114,27 +111,32 @@ sub check_indent {
             # first line of a function, and assume that more likely than not
             # indenting is consistent within a func body.
             if (/^(\s*).*\{\s*$/) {
+
                 # note the beginning of a block, and its indent depth.
-                $f=length($1);
+                $f = length($1);
                 next;
             }
 
             if (/^\s*([\#\}])/) {
+
                 # skip the last line of the func or cpp directives.
-                $f = undef if ($1 eq "}");
+                $f = undef if ( $1 eq "}" );
                 next;
             }
 
-            if (defined($f)) {
+            if ( defined($f) ) {
+
                 # first line of a block
-                if ($f == 0) {
+                if ( $f == 0 ) {
+
                     # first line of a top-level block (first line of a function,
                     # in other words)
                     my ($indent) = /^(\s*)/;
-                    if (length($indent) != 4) {
+                    if ( length($indent) != 4 ) {
                         push @c_indent => "$path:$line\n"
                             . "apparent non-4 space indenting ("
-                            . length($indent) . " spaces)";
+                            . length($indent)
+                            . " spaces)";
                     }
                 }
                 $f = undef;
@@ -145,11 +147,12 @@ sub check_indent {
 ## L<PDD07/Code Formatting/"Preprocessor #directives must be indented two columns per nesting level, with two exceptions: neither PARROT_IN_CORE nor the outermost _GUARD #ifdefs cause the level of indenting to increase">
     ok( !scalar(@pp_indent) )
         or diag( "incorrect indenting in preprocessor directive found in "
-            . scalar @pp_indent . " files:\n@pp_indent" );
+            . scalar @pp_indent
+            . " files:\n@pp_indent" );
 
     ok( !scalar(@c_indent) )
-        or diag( "incorrect indenting in C file found in "
-            . scalar @c_indent . " files:\n@c_indent" );
+        or
+        diag( "incorrect indenting in C file found in " . scalar @c_indent . " files:\n@c_indent" );
 }
 
 # Local Variables:

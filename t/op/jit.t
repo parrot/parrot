@@ -8,7 +8,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 62;
 
-
 =head1 NAME
 
 t/op/jit.t - JIT register allocation
@@ -29,8 +28,7 @@ should just be the same.
 
 =cut
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 1,2,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1,2,3 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -44,7 +42,7 @@ CODE
 312
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 1,2 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1,2 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -64,7 +62,7 @@ CODE
 514
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 1,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1,3 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -84,7 +82,7 @@ CODE
 541
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 2,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 2,3 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -104,7 +102,7 @@ CODE
 211
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 1 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1 mapped" );
 cleari
 set I0,0
 set I1,1
@@ -125,7 +123,7 @@ CODE
 404
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 2 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 2 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -145,7 +143,7 @@ CODE
 514
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 3 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -165,7 +163,7 @@ CODE
 514
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 0 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 0 mapped" );
 cleari
 set I0,0
 set I1,1
@@ -186,7 +184,7 @@ CODE
 404
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 1,2,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1,2,3 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -200,7 +198,7 @@ CODE
 -112
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 1,2 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1,2 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -220,7 +218,7 @@ CODE
 -314
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 1,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1,3 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -240,7 +238,7 @@ CODE
 341
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 2,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 2,3 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -260,7 +258,7 @@ CODE
 011
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 1 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1 mapped" );
 cleari
 set I0,0
 set I1,1
@@ -281,7 +279,7 @@ CODE
 -404
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 2 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 2 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -301,7 +299,7 @@ CODE
 -314
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 3 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -321,7 +319,7 @@ CODE
 314
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_i_ic 0 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_ic 0 mapped" );
 cleari
 set I0,0
 set I1,1
@@ -342,7 +340,7 @@ CODE
 -214
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub_i_i_i 0 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 0 mapped" );
 cleari
 set I0,0
 set I1,1
@@ -363,7 +361,7 @@ CODE
 -404
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "mul_i_i_i 1,2,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1,2,3 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -377,7 +375,7 @@ CODE
 212
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "mul_i_i_i 1,2 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1,2 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -397,7 +395,7 @@ CODE
 414
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "mul_i_i_i 1,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1,3 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -417,7 +415,7 @@ CODE
 441
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "mul_i_i_i 2,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 2,3 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -437,7 +435,7 @@ CODE
 313
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "mul_i_i_i 1 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1 mapped" );
 cleari
 set I0,0
 set I1,1
@@ -458,7 +456,7 @@ CODE
 004
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "mul_i_i_i 2 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 2 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -478,7 +476,7 @@ CODE
 414
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "mul_i_i_i 3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 3 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -498,7 +496,7 @@ CODE
 414
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "mul_i_i_i 0 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 0 mapped" );
 cleari
 set I0,0
 set I1,1
@@ -519,7 +517,7 @@ CODE
 004
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "mul_i_i 1,2 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 1,2 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -538,7 +536,7 @@ CODE
 93
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "mul_i_i 1 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 1 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -557,7 +555,7 @@ CODE
 124
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "mul_i_i 2 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 2 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -576,7 +574,7 @@ CODE
 123
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "mul_i_i 0 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 0 mapped" );
 cleari
 set I0,0
 set I1,1
@@ -596,7 +594,7 @@ CODE
 00
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 1,2,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1,2,3 mapped" );
 set I0,0
 set I1,6
 set I2,2
@@ -610,7 +608,7 @@ CODE
 362
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 1,2 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1,2 mapped" );
 set I0,0
 set I1,8
 set I2,2
@@ -630,7 +628,7 @@ CODE
 284
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 1,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1,3 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -650,7 +648,7 @@ CODE
 441
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 2,3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 2,3 mapped" );
 set I0,0
 set I1,9
 set I2,2
@@ -670,7 +668,7 @@ CODE
 393
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 1 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1 mapped" );
 cleari
 set I0,0
 set I1,1
@@ -691,7 +689,7 @@ CODE
 004
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 2 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 2 mapped" );
 set I0,0
 set I1,8
 set I2,2
@@ -711,7 +709,7 @@ CODE
 284
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 3 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 3 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -731,7 +729,7 @@ CODE
 414
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "div_i_i_i 0 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 0 mapped" );
 cleari
 set I0,0
 set I1,1
@@ -752,7 +750,7 @@ CODE
 004
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "div_i_i 1,2 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i 1,2 mapped" );
 set I0,0
 set I1,1
 set I2,9
@@ -771,7 +769,7 @@ CODE
 19
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "div_i_i 1 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i 1 mapped" );
 set I0,0
 set I1,1
 set I2,8
@@ -790,7 +788,7 @@ CODE
 24
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "div_i_i 2 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i 2 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -809,7 +807,7 @@ CODE
 22
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "div_i_i 0 mapped");
+pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i 0 mapped" );
 set I0,0
 set I1,1
 set I2,2
@@ -830,7 +828,7 @@ CODE
 OUTPUT
 
 # tests for JIT CGP
-pasm_output_is(<<'CODE', <<'OUTPUT', "1 non jit");
+pasm_output_is( <<'CODE', <<'OUTPUT', "1 non jit" );
         set I0, 16
         print "ok 1\n"
         end
@@ -838,7 +836,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "2 non jit");
+pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit" );
         print "ok 1\n"
         print "ok 2\n"
         end
@@ -847,7 +845,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "2 non jit");
+pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit" );
         set I0, 16
         print "ok 1\n"
         print "ok 2\n"
@@ -857,7 +855,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "2 non jit, JITed branch to JIT");
+pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit, JITed branch to JIT" );
         set I0, 42
         print I0
         print "\n"
@@ -874,7 +872,7 @@ CODE
 43
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "2 non jit, non JITed branch to JIT");
+pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit, non JITed branch to JIT" );
         set I0, 42
         print I0
         print "\n"
@@ -890,7 +888,7 @@ CODE
 43
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "2 non jit, JITed branch to non JIT");
+pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit, JITed branch to non JIT" );
         set I0, 42
         print I0
         print "\n"
@@ -905,7 +903,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "2 non jit, non JITed branch to non JIT");
+pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit, non JITed branch to non JIT" );
         set I0, 42
         print I0
         print "\n"
@@ -919,7 +917,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "set_addr");
+pasm_output_is( <<'CODE', <<'OUTPUT', "set_addr" );
        set_addr I1, FOO
        jump I1
        print "Jump failed\n"
@@ -931,7 +929,7 @@ CODE
 Jump succeeded
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "jsr");
+pasm_output_is( <<'CODE', <<'OUTPUT', "jsr" );
      set_addr I1, FOO
      jsr I1
      print "and back again\n"
@@ -944,7 +942,7 @@ CODE
 There and back again
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "last is branch");
+pasm_output_is( <<'CODE', <<'OUTPUT', "last is branch" );
     print "ok 1\n"
     branch l2
 l1:
@@ -959,7 +957,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "last is branch");
+pasm_output_is( <<'CODE', <<'OUTPUT', "last is branch" );
     print "ok 1\n"
     branch l2
 l1:
@@ -976,7 +974,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "last is JIT branch");
+pasm_output_is( <<'CODE', <<'OUTPUT', "last is JIT branch" );
     null I0
     print "ok 1\n"
     branch l2
@@ -992,7 +990,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "last is JIT branch");
+pasm_output_is( <<'CODE', <<'OUTPUT', "last is JIT branch" );
     null I0
     print "ok 1\n"
     branch l2
@@ -1010,7 +1008,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "t/op/arithmetic_26: non jit seq w. branch");
+pasm_output_is( <<'CODE', <<'OUTPUT', "t/op/arithmetic_26: non jit seq w. branch" );
 new P0, .Integer
 set N0, 4000
 set P0, 123
@@ -1045,7 +1043,7 @@ OUTPUT
 
 # multiply optimization tests
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "mul power of 2");
+pasm_output_is( <<'CODE', <<'OUTPUT', "mul power of 2" );
    set I0, 5
    mul I1, I0, 0
    eq I1, 0, ok_1
@@ -1092,7 +1090,7 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "small imm");
+pasm_output_is( <<'CODE', <<'OUTPUT', "small imm" );
    set I0, 5
    mul I1, I0, 3
    eq I1, 15, ok_1
@@ -1147,7 +1145,7 @@ ok 6
 ok 7
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "div power of 2");
+pasm_output_is( <<'CODE', <<'OUTPUT', "div power of 2" );
    set I0, 1024
    div I1, I0, 2
    eq I1, 512, ok_1
@@ -1181,9 +1179,8 @@ ok 4
 OUTPUT
 
 my $code;
-for (0..4096)
-{
-        $code .= qq{   set S0, "hello"\n};
+for ( 0 .. 4096 ) {
+    $code .= qq{   set S0, "hello"\n};
 }
 $code .= <<CODE;
    print S0
@@ -1191,12 +1188,12 @@ $code .= <<CODE;
    end
 CODE
 
-pasm_output_is($code, <<OUTPUT, "large code" );
+pasm_output_is( $code, <<OUTPUT, "large code" );
 hello
 done
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "volatile clobbered by function call");
+pasm_output_is( <<'CODE', <<'OUTPUT', "volatile clobbered by function call" );
   null I3
   null I6
   null I5
@@ -1223,7 +1220,7 @@ CODE
 154
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "div bug");
+pasm_output_is( <<'CODE', <<'OUTPUT', "div bug" );
     set I1, 1
     set I2, 2
     set I3, 4
@@ -1237,7 +1234,7 @@ CODE
 2
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "shr_i_i");
+pir_output_is( <<'CODE', <<'OUTPUT', "shr_i_i" );
 # on x86 the shift count is always in %cl
 .sub main :main
     .local int i

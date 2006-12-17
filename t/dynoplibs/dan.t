@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 6;
 use Parrot::Config;
 
-
 =head1 NAME
 
 t/dynoplibs/dan.t - Test for the ops in src/dynoplibs/dan.ops
@@ -24,8 +23,7 @@ Tests the sample dynamic op library "dan".
 
 =cut
 
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "mul_i_ic_nc");
+pir_output_is( << 'CODE', << 'OUTPUT', "mul_i_ic_nc" );
 .loadlib "dan_ops"
 .sub main :main
     mul $I1, 10, 2.5
@@ -36,7 +34,7 @@ CODE
 25
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "mul_i_i_nc");
+pir_output_is( << 'CODE', << 'OUTPUT', "mul_i_i_nc" );
 .loadlib "dan_ops"
 .sub main :main
     $I2 = 10
@@ -48,7 +46,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "mul_i_ic_n");
+pir_output_is( << 'CODE', << 'OUTPUT', "mul_i_ic_n" );
 .loadlib "dan_ops"
 .sub main :main
     $N3 = 4.2
@@ -60,7 +58,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "mul_i_i_n");
+pir_output_is( << 'CODE', << 'OUTPUT', "mul_i_i_n" );
 .loadlib "dan_ops"
 .sub main :main
     $I2 = 10
@@ -73,7 +71,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "mul pir syntax");
+pir_output_is( << 'CODE', << 'OUTPUT', "mul pir syntax" );
 .loadlib "dan_ops"
 .sub main :main
     $I2 = 10
@@ -86,7 +84,7 @@ CODE
 42
 OUTPUT
 
-pasm_output_is(<< 'CODE', << 'OUTPUT', "mul pasm syntax");
+pasm_output_is( << 'CODE', << 'OUTPUT', "mul pasm syntax" );
 .loadlib "dan_ops"
     mul I0, 3, 3.9
     print I0
@@ -95,7 +93,6 @@ pasm_output_is(<< 'CODE', << 'OUTPUT', "mul pasm syntax");
 CODE
 11
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

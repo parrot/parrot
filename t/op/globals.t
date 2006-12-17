@@ -8,7 +8,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 9;
 
-
 =head1 NAME
 
 t/op/globals.t - Global Variables
@@ -25,7 +24,7 @@ LEGACY: Tests the C<store_global> and C<find_global> operations.
 
 =cut
 
-pasm_output_is(<<'CODE', '12', "set/get");
+pasm_output_is( <<'CODE', '12', "set/get" );
         new P0, .Integer
         new P1, .Integer
         set P0, 12
@@ -36,7 +35,7 @@ pasm_output_is(<<'CODE', '12', "set/get");
         end
 CODE
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "get null global");
+pasm_output_like( <<'CODE', <<'OUTPUT', "get null global" );
        null S0
        get_global P1, S0
        end
@@ -44,7 +43,7 @@ CODE
 /Tried to get null global/
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUT, "not found null");
+pasm_output_is( <<'CODE', <<OUT, "not found null" );
         get_global P1, "no_such_global"
         print "ok 1\n"
         defined I0, P1
@@ -57,7 +56,7 @@ ok 1
 ok 2
 OUT
 
-pir_output_is(<<'CODE', <<OUT, "get/set global with key");
+pir_output_is( <<'CODE', <<OUT, "get/set global with key" );
 .namespace [ "Monkey" ]
 .sub main :main
         set_it()
@@ -73,7 +72,7 @@ CODE
 Ook...BANG!
 OUT
 
-pir_output_is(<<'CODE', <<OUT, "get/set root global with key");
+pir_output_is( <<'CODE', <<OUT, "get/set root global with key" );
 .namespace [ "Monkey" ]
 .sub main :main
         set_it()
@@ -89,12 +88,11 @@ CODE
 Ook...BANG!
 OUT
 
-
 #----------------------------------------------------------------
 # LEGACY
 #----------------------------------------------------------------
 
-pasm_output_is(<<'CODE', '12', "Fetch and store");
+pasm_output_is( <<'CODE', '12', "Fetch and store" );
         new P0, .Integer
         new P1, .Integer
         set P0, 12
@@ -105,7 +103,7 @@ pasm_output_is(<<'CODE', '12', "Fetch and store");
         end
 CODE
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "Find null global");
+pasm_output_like( <<'CODE', <<'OUTPUT', "Find null global" );
        null S0
        find_global P1, S0
        end
@@ -113,7 +111,7 @@ CODE
 /Tried to get null global/
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUT, "not found null");
+pasm_output_is( <<'CODE', <<OUT, "not found null" );
         find_global P1, "no_such_global"
         print "ok 1\n"
         defined I0, P1
@@ -126,7 +124,7 @@ ok 1
 ok 2
 OUT
 
-pir_output_is(<<'CODE', <<OUT, "find/store global with key");
+pir_output_is( <<'CODE', <<OUT, "find/store global with key" );
 .sub main :main
         set_it()
         $P1 = find_global [ "Monkey" ; "Toaster" ], "Explosion"

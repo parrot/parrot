@@ -9,7 +9,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 8;
 
-
 =head1 NAME
 
 t/op/interp.t - Running the Interpreter
@@ -25,11 +24,10 @@ C<interpinfo> opcode.
 
 =cut
 
-
 SKIP: {
-    skip("we really shouldn't run just a label - use a sub", 1);
+    skip( "we really shouldn't run just a label - use a sub", 1 );
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
+    pasm_output_is( <<'CODE', <<'OUTPUT', "runinterp - new style" );
     new P0, .ParrotInterpreter
     print "calling\n"
     # set_addr/invoke ?
@@ -47,8 +45,7 @@ ending
 OUTPUT
 }
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'runinterp - works without printing');
+pir_output_is( <<'CODE', <<'OUTPUT', 'runinterp - works without printing' );
 .sub 'test' :main
     .local string actual
     .local pmc test_interp
@@ -80,8 +77,8 @@ uno
 dos
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', 'runinterp - works with printing', todo => 'something funky here');
+pir_output_is(
+    <<'CODE', <<'OUTPUT', 'runinterp - works with printing', todo => 'something funky here' );
 .sub 'test' :main
     .local string actual
     .local pmc test_interp
@@ -114,11 +111,11 @@ y uno es igual a
 dos
 OUTPUT
 
-
 # Need to disable DOD while trace is on, as there's a non-zero chance that a
 # DOD sweep would occur, causing a bonus "DOD" line in the output, which makes
 # the test fail.
-pasm_output_like(<<'CODE', <<'OUTPUT', "restart trace", todo => "lines are out of order due to buffering");
+pasm_output_like(
+    <<'CODE', <<'OUTPUT', "restart trace", todo => "lines are out of order due to buffering" );
     printerr "ok 1\n"
     sweepoff
     set I0, 1
@@ -140,7 +137,7 @@ OUTPUT
 
 # This is the behavior as of Parrot 1.4.3
 # XXX Should there be a warning?
-pasm_output_is(<<'CODE', 'nada:', 'interp - warnings');
+pasm_output_is( <<'CODE', 'nada:', 'interp - warnings' );
     new P0, .Undef
     set I0, P0
     printerr "nada:"
@@ -150,7 +147,7 @@ pasm_output_is(<<'CODE', 'nada:', 'interp - warnings');
     end
 CODE
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "getinterp");
+pasm_output_is( <<'CODE', <<'OUTPUT', "getinterp" );
     .include "interpinfo.pasm"
     getinterp P0
     print "ok 1\n"
@@ -166,7 +163,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "access argv");
+pasm_output_is( <<'CODE', <<'OUTPUT', "access argv" );
     get_params "(0)", P5
     .include "iglobals.pasm"
     getinterp P1
@@ -189,7 +186,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "check_events");
+pasm_output_is( <<'CODE', <<'OUTPUT', "check_events" );
     print "before\n"
     check_events
     print "after\n"
@@ -198,8 +195,6 @@ CODE
 before
 after
 OUTPUT
-
-
 
 # Local Variables:
 #   mode: cperl

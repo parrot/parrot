@@ -35,6 +35,7 @@ my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my @tabs;
 
 foreach my $file (@files) {
+
     # if we have command line arguments, the file is the full path
     # otherwise, use the relevant Parrot:: path method
     my $path = @ARGV ? $file : $file->path;
@@ -44,7 +45,7 @@ foreach my $file (@files) {
 
     # search each line for leading tabs
     while (<$fh>) {
-        if ($_ =~ m/^ *\t/) {
+        if ( $_ =~ m/^ *\t/ ) {
             push @tabs => "$path\n";
             last;
         }
@@ -54,8 +55,8 @@ foreach my $file (@files) {
 
 ## L<PDD07/Code Formatting/"Indentation must consist only of spaces">
 ok( !scalar(@tabs), "tabs in leading whitespace" )
-    or diag("Found tab in leading whitespace in " . scalar(@tabs)
-        . " files.  Files affected:\n@tabs");
+    or diag(
+    "Found tab in leading whitespace in " . scalar(@tabs) . " files.  Files affected:\n@tabs" );
 
 # Local Variables:
 #   mode: cperl

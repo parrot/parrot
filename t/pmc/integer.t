@@ -23,7 +23,7 @@ Tests the Integer PMC.
 
 =cut
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "basic math");
+pir_output_is( << 'CODE', << 'OUTPUT', "basic math" );
 
 .sub _main
     .local pmc int_1
@@ -62,7 +62,7 @@ CODE
 5
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "truth and definedness");
+pir_output_is( << 'CODE', << 'OUTPUT', "truth and definedness" );
 
 .sub _main
     .local pmc int_1
@@ -109,7 +109,7 @@ The Integer -999999999 is true.
 The Integer -999999999 is defined.
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "set_string_native");
+pir_output_is( <<'CODE', <<'OUTPUT', "set_string_native" );
 
 .sub _main
     .local pmc pmc1
@@ -123,7 +123,7 @@ CODE
 -123456789
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "isa");
+pir_output_is( <<'CODE', <<'OUTPUT', "isa" );
 
 .sub _main
     .local pmc pmc1
@@ -143,7 +143,7 @@ CODE
 A newly created Integer is an Integer.
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
@@ -166,7 +166,7 @@ CODE
 0
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "Comparison ops: ne");
+pir_output_is( << 'CODE', << 'OUTPUT', "Comparison ops: ne" );
 
 .sub _main
     .local pmc pmc1
@@ -192,7 +192,7 @@ ok 1
 ok 2
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "Comparison ops: gt");
+pir_output_is( << 'CODE', << 'OUTPUT', "Comparison ops: gt" );
 
 .sub _main
     .local pmc pmc1
@@ -226,7 +226,7 @@ ok 2
 ok 3
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "Comparison ops: ge");
+pir_output_is( << 'CODE', << 'OUTPUT', "Comparison ops: ge" );
 
 .sub _main
     .local pmc pmc1
@@ -258,7 +258,7 @@ ok 2
 ok 3
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "Logical ops: istrue & isfalse");
+pir_output_is( << 'CODE', << 'OUTPUT', "Logical ops: istrue & isfalse" );
 
 .sub _main
     .local pmc pmc1
@@ -288,7 +288,7 @@ CODE
 1
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "if/unless with Integer PMC");
+pasm_output_is( <<'CODE', <<'OUTPUT', "if/unless with Integer PMC" );
       new P0, .Integer
       set P0, 10
       if P0, OK1
@@ -314,7 +314,7 @@ ok 3
 ok 4
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "n_<oper>");
+pir_output_is( << 'CODE', << 'OUTPUT', "n_<oper>" );
 .sub main :main
     $P0 = new Integer
     $P1 = new Integer
@@ -353,7 +353,7 @@ CODE
 36
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "can get_as_base()");
+pir_output_is( <<'CODE', <<'OUTPUT', "can get_as_base()" );
 .sub main :main
     $P0 = new Integer
     $P0 = 42
@@ -366,7 +366,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', "get_as_base() bounds check");
+pir_output_like( <<'CODE', <<'OUTPUT', "get_as_base() bounds check" );
 .sub main :main
     $P0 = new .Integer
     $P0 = 42
@@ -381,7 +381,7 @@ CODE
 .*/
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', "get_as_base() bounds check");
+pir_output_like( <<'CODE', <<'OUTPUT', "get_as_base() bounds check" );
 .sub main :main
     $P0 = new .Integer
     $P0 = 42
@@ -396,7 +396,7 @@ CODE
 .*/
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "get_as_base(10)");
+pir_output_is( <<'CODE', <<'OUTPUT', "get_as_base(10)" );
 .sub main :main
     $P0 = new .Integer
     $P0 = 42
@@ -410,7 +410,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "get_as_base(various)");
+pir_output_is( <<'CODE', <<'OUTPUT', "get_as_base(various)" );
 .sub main :main
     $P0 = new .Integer
     $P0 = 42
@@ -469,7 +469,7 @@ CODE
 1b
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "instantiate");
+pir_output_is( << 'CODE', << 'OUTPUT', "instantiate" );
 
 .sub _main
     .local pmc cl, o
@@ -487,7 +487,7 @@ CODE
 Integer
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'instantiate derived');
+pir_output_is( <<'CODE', <<'OUTPUT', 'instantiate derived' );
 .sub _main :main
     .local pmc cl, o
     cl = getclass "Integer"
@@ -504,7 +504,7 @@ CODE
 Integer
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "instantiate w arg");
+pir_output_is( << 'CODE', << 'OUTPUT', "instantiate w arg" );
 
 .sub _main
     .local pmc cl, o

@@ -27,7 +27,7 @@ error, you probably want to put it in one of those files instead.
 
 =cut
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "pushaction");
+pasm_output_is( <<'CODE', <<'OUTPUT', "pushaction" );
     pushmark 10
     print "ok 1\n"
     .const .Sub P10 = "action"
@@ -49,7 +49,7 @@ in action I5 = 0
 ok 3
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "pushaction, sub exit");
+pir_output_is( <<'CODE', <<'OUTPUT', "pushaction, sub exit" );
 .sub main
     print "main\n"
     foo()
@@ -75,7 +75,7 @@ in action I5 = 0
 back
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "pushaction, sub exit - capture CC");
+pir_output_is( <<'CODE', <<'OUTPUT', "pushaction, sub exit - capture CC" );
 .sub main
     print "main\n"
     foo()
@@ -101,7 +101,7 @@ unwind
 back
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "pushaction, sub exit - capture CC, ret");
+pir_output_is( <<'CODE', <<'OUTPUT', "pushaction, sub exit - capture CC, ret" );
 .sub main
     print "main\n"
     foo()
@@ -128,7 +128,7 @@ unwind
 back
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "pushaction - return from main");
+pir_output_is( <<'CODE', <<'OUTPUT', "pushaction - return from main" );
 .sub main :main
     print "main\n"
     .const .Sub at_exit = "exit_handler"
@@ -147,7 +147,7 @@ main
 at_exit, flag = 0
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "pushaction - end in main");
+pir_output_is( <<'CODE', <<'OUTPUT', "pushaction - end in main" );
 .sub main :main
     print "main\n"
     .const .Sub at_exit = "exit_handler"
@@ -165,7 +165,7 @@ CODE
 main
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "pushaction as closure");
+pir_output_is( <<'CODE', <<'OUTPUT', "pushaction as closure" );
 .sub main :main
     .local pmc a
     .lex 'a', a

@@ -23,8 +23,7 @@ Tests the ParrotInterpreter PMC.
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', 'create new interpreter');
+pir_output_is( <<'CODE', <<'OUT', 'create new interpreter' );
 .sub 'test' :main
     new P0, .ParrotInterpreter
     print "ok 1\n"
@@ -33,7 +32,7 @@ CODE
 ok 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'run passed code pmc in another interpreter');
+pir_output_is( <<'CODE', <<'OUT', 'run passed code pmc in another interpreter' );
 .sub main :main
     $S0 = <<"PIR"
 .sub test :main
@@ -53,7 +52,7 @@ Hello, world
 survived
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'running passed code pmc in another interpreter');
+pir_output_is( <<'CODE', <<'OUT', 'running passed code pmc in another interpreter' );
 .sub 'main' :main
      $S0 = <<'PIR'
  .sub 'main' :main
@@ -72,7 +71,7 @@ help, i'm stuck inside an interpreter!
 nobody cares.
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'accessing PMCs from nested interp');
+pir_output_is( <<'CODE', <<'OUT', 'accessing PMCs from nested interp' );
 .sub 'main' :main
      $S0 = <<'PIR'
  .sub 'main' :main

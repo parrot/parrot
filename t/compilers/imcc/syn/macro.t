@@ -2,7 +2,6 @@
 # Copyright (C) 2001-2005, The Perl Foundation.
 # $Id$
 
-
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
@@ -130,7 +129,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<<'CODE', '32', "constant defined and used");
+pir_output_is( <<'CODE', '32', "constant defined and used" );
 .sub test :main
 .const int FOO = 32
   print FOO
@@ -138,7 +137,7 @@ pir_output_is(<<'CODE', '32', "constant defined and used");
 .end
 CODE
 
-pir_output_is(<<'CODE', 'foo', "constant defined and used");
+pir_output_is( <<'CODE', 'foo', "constant defined and used" );
 .sub test :main
 .const string FOO = "foo"
   print FOO
@@ -146,7 +145,7 @@ pir_output_is(<<'CODE', 'foo', "constant defined and used");
 .end
 CODE
 
-pasm_output_is(<<'CODE', 'foo', "constant defined, used in a macro call");
+pasm_output_is( <<'CODE', 'foo', "constant defined, used in a macro call" );
 .constant FOO S0
 .macro answer (bar)
   print .bar
@@ -162,7 +161,7 @@ print FOO <<'ENDF';
 ENDF
 close FOO;
 
-pasm_output_is(<<"CODE", <<OUTPUT, "basic include macro");
+pasm_output_is( <<"CODE", <<OUTPUT, "basic include macro" );
 .include "macro.tempfile"
   print S0
 
@@ -175,7 +174,7 @@ Betelgeuse
 Betelgeuse
 OUTPUT
 
-open FOO, ">", "macro.tempfile";   # Clobber previous
+open FOO, ">", "macro.tempfile";    # Clobber previous
 print FOO <<'ENDF';
 .macro multiply(A,B)
 	new P0, .Float
@@ -188,7 +187,7 @@ print FOO <<'ENDF';
 ENDF
 close FOO;
 
-pasm_output_is(<<"CODE", <<OUTPUT, "include a file defining a macro");
+pasm_output_is( <<"CODE", <<OUTPUT, "include a file defining a macro" );
 .include "macro.tempfile"
  .multiply(12,13)
  print P2
@@ -328,7 +327,6 @@ pir_output_like( <<'CODE', <<OUTPUT, "no params" );
 CODE
 /Macro 'M' needs 2 arguments/
 OUTPUT
-
 
 pir_output_like( <<'CODE', <<OUTPUT, "unknown macro" );
 .sub test :main

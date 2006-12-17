@@ -70,18 +70,18 @@ my @files = @ARGV ? @ARGV : source_files();
 # check all the files and keep a list of those failing
 my @lines_too_long;
 foreach my $file (@files) {
-    if (check($file)) {
+    if ( check($file) ) {
         push @lines_too_long, $file . "\n";
     }
 }
 
 ## L<PDD07/Code Formatting/"Source line width is limited to 100 characters">
 ok( !scalar(@lines_too_long), 'Line length ok' )
-    or diag( "Lines longer than coding standard limit in " .
-        scalar @lines_too_long . " files:\n@lines_too_long" );
+    or diag( "Lines longer than coding standard limit in "
+        . scalar @lines_too_long
+        . " files:\n@lines_too_long" );
 
 exit;
-
 
 sub check {
     my $file = shift;
@@ -98,7 +98,6 @@ sub check {
     return !$ok;
 }
 
-
 sub source_files {
     my @files;
     foreach my $file ( sort keys(%$manifest) ) {
@@ -113,7 +112,7 @@ sub source_files {
 
         # I could make this other way, but this way is more flexible
         next if ( $full_path =~ m{^$build_dir/languages/([^/]+)/}
-        && !$check_language{$1} );
+            && !$check_language{$1} );
 
         push @files, $full_path if $file =~ m{\.c$};
         push @files, $full_path if $file =~ m{\.pmc$};

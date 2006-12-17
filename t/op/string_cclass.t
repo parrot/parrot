@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 11;
 use Parrot::Config;
 
-
 =head1 NAME
 
 t/op/cclass.t - character class tests
@@ -24,8 +23,7 @@ Tests find_cclass find_not_cclass, is_cclass.
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', "find_cclass, ascii");
+pir_output_is( <<'CODE', <<'OUT', "find_cclass, ascii" );
 .include "cclass.pasm"
 .sub main :main
     $S0 = ascii:"test_func(1)"
@@ -57,7 +55,7 @@ CODE
 4;4;4;4;4;8;8;8;8;12;12;12;12;13;
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "find_not_cclass, ascii");
+pir_output_is( <<'CODE', <<'OUT', "find_not_cclass, ascii" );
 .include "cclass.pasm"
 .sub main :main
     $S0 = ascii:"test_func(1)"
@@ -89,7 +87,7 @@ CODE
 0;1;2;3;5;5;6;7;9;9;10;11;13;13;
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "find_cclass, iso-8859-1");
+pir_output_is( <<'CODE', <<'OUT', "find_cclass, iso-8859-1" );
 .include "cclass.pasm"
 .sub main :main
     $S0 = iso-8859-1:"test_func(1)"
@@ -121,7 +119,7 @@ CODE
 4;4;4;4;4;8;8;8;8;12;12;12;12;13;
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "find_not_cclass, iso-8859-1");
+pir_output_is( <<'CODE', <<'OUT', "find_not_cclass, iso-8859-1" );
 .include "cclass.pasm"
 .sub main :main
     $S0 = iso-8859-1:"test_func(1)"
@@ -153,7 +151,7 @@ CODE
 0;1;2;3;5;5;6;7;9;9;10;11;13;13;
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "is_cclass, ascii");
+pir_output_is( <<'CODE', <<'OUT', "is_cclass, ascii" );
 .include "cclass.pasm"
 .sub main :main
     $S1 = ascii:"ab\nC_X34.\0 \t!"
@@ -216,7 +214,7 @@ CODE
 00011100100010
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "is_cclass, iso-8859-1");
+pir_output_is( <<'CODE', <<'OUT', "is_cclass, iso-8859-1" );
 .include "cclass.pasm"
 .sub main :main
     $S1 = iso-8859-1:"ab\nC_X34.\0 \t!"
@@ -282,42 +280,44 @@ OUT
 ## setup for unicode whitespace tests
 ## see http://www.unicode.org/Public/UNIDATA/PropList.txt for White_Space list
 ## see also t/p6rules/metachars.t
-my $ws= {
-        horizontal_ascii => [qw/ \u0009 \u0020 \u00a0 /],
-        horizontal_unicode => [qw/
-                \u1680 \u180e \u2000 \u2001 \u2002 \u2003 \u2004 \u2005
-                \u2006 \u2007 \u2008 \u2009 \u200a \u202f \u205f \u3000
-        /],
-        vertical_ascii => [qw/ \u000a \u000b \u000c \u000d \u0085 /],
-        vertical_unicode => [qw/ \u2028 \u2029 /],
+my $ws = {
+    horizontal_ascii   => [qw/ \u0009 \u0020 \u00a0 /],
+    horizontal_unicode => [
+        qw/
+            \u1680 \u180e \u2000 \u2001 \u2002 \u2003 \u2004 \u2005
+            \u2006 \u2007 \u2008 \u2009 \u200a \u202f \u205f \u3000
+            /
+    ],
+    vertical_ascii   => [qw/ \u000a \u000b \u000c \u000d \u0085 /],
+    vertical_unicode => [qw/ \u2028 \u2029 /],
 };
 
-push @{ $ws->{horizontal} } =>
-        @{ $ws->{horizontal_ascii} }, @{ $ws->{horizontal_unicode} };
+push @{ $ws->{horizontal} } => @{ $ws->{horizontal_ascii} },
+    @{ $ws->{horizontal_unicode} };
 
-push @{ $ws->{vertical} } =>
-        @{ $ws->{vertical_ascii} }, @{ $ws->{vertical_unicode} };
+push @{ $ws->{vertical} } => @{ $ws->{vertical_ascii} },
+    @{ $ws->{vertical_unicode} };
 
-push @{ $ws->{whitespace_ascii} } =>
-        @{ $ws->{horizontal_ascii} }, @{ $ws->{vertical_ascii} };
+push @{ $ws->{whitespace_ascii} } => @{ $ws->{horizontal_ascii} },
+    @{ $ws->{vertical_ascii} };
 
-push @{ $ws->{whitespace_unicode} } =>
-        @{ $ws->{horizontal_unicode} }, @{ $ws->{vertical_unicode} };
+push @{ $ws->{whitespace_unicode} } => @{ $ws->{horizontal_unicode} },
+    @{ $ws->{vertical_unicode} };
 
-push @{ $ws->{whitespace} } =>
-        @{ $ws->{whitespace_ascii} }, @{ $ws->{whitespace_unicode} };
+push @{ $ws->{whitespace} } => @{ $ws->{whitespace_ascii} },
+    @{ $ws->{whitespace_unicode} };
 
 sub string {
     my $which = shift;
-    'unicode:"' . join('',  @{$ws->{$which}}) . '"';
+    'unicode:"' . join( '', @{ $ws->{$which} } ) . '"';
 }
 
 my $all_ws = string('whitespace');
 
 SKIP: {
-        skip 'unicode support unavailable' => 3
-                unless $PConfig{has_icu};
-pir_output_is(<<"CODE", <<'OUT', "unicode is_cclass whitespace");
+    skip 'unicode support unavailable' => 3
+        unless $PConfig{has_icu};
+    pir_output_is( <<"CODE", <<'OUT', "unicode is_cclass whitespace" );
 .sub main :main
 .include "cclass.pasm"
    .local int result, char, len, i
@@ -344,7 +344,7 @@ CODE
 11111111111111111111111111
 OUT
 
-pir_output_is(<<"CODE", <<'OUT', "unicode find_ccclass whitespace");
+    pir_output_is( <<"CODE", <<'OUT', "unicode find_ccclass whitespace" );
 .sub main :main
 .include "cclass.pasm"
    .local int result, char, len, i
@@ -360,7 +360,7 @@ CODE
 3
 OUT
 
-pir_output_is(<<"CODE", <<'OUT', "unicode find_not_ccclass whitespace");
+    pir_output_is( <<"CODE", <<'OUT', "unicode find_not_ccclass whitespace" );
 .sub main :main
 .include "cclass.pasm"
    .local int result, char, len, i
@@ -380,7 +380,7 @@ OUT
 }
 
 # The following should pass even if ICU is unavailable  (pmichaud, 2005-11-3)
-pir_output_is(<<"CODE", <<'OUT', "unicode 0-127 find_*_cclass whitespace");
+pir_output_is( <<"CODE", <<'OUT', "unicode 0-127 find_*_cclass whitespace" );
 .sub main :main
 .include "cclass.pasm"
    .local int result, char, len, i
@@ -400,7 +400,7 @@ CODE
 9 3 6
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "is_cclass, unicode first codepage");
+pir_output_is( <<'CODE', <<'OUT', "is_cclass, unicode first codepage" );
 .include "cclass.pasm"
 .sub main :main
     $S1 = unicode:"ab\nC_X34.\0 \t!"
@@ -462,8 +462,6 @@ CODE
 11100000001100
 00011100100010
 OUT
-
-
 
 # Local Variables:
 #   mode: cperl

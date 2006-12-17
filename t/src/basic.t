@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : (tests => 3);
+plan $^O =~ m/MSWin32/ ? ( skip_all => 'broken on win32' ) : ( tests => 3 );
 
 =head1 NAME
 
@@ -24,8 +24,7 @@ Tests C<printf> and C<internal_exception> functions.
 
 =cut
 
-
-c_output_is(<<'CODE', <<'OUTPUT', "hello world");
+c_output_is( <<'CODE', <<'OUTPUT', "hello world" );
     #include <stdio.h>
 
     int
@@ -38,7 +37,7 @@ CODE
 Hello, World!
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "direct internal_exception call");
+c_output_is( <<'CODE', <<'OUTPUT', "direct internal_exception call" );
     #include <parrot/parrot.h>
     #include <parrot/exceptions.h>
 
@@ -50,9 +49,10 @@ c_output_is(<<'CODE', <<'OUTPUT', "direct internal_exception call");
 CODE
 Blow'd Up(tm)
 OUTPUT
+
 # vor $EDITOR '
 
-c_output_is(<<'CODE', <<'OUTPUT', "Parrot_run_native");
+c_output_is( <<'CODE', <<'OUTPUT', "Parrot_run_native" );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>

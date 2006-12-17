@@ -10,7 +10,7 @@ use Parrot::Config;
 use Parrot::Test tests => 6;
 
 ##############################
-pir_output_is(<<'CODE', <<'OUT', "goto 1");
+pir_output_is( <<'CODE', <<'OUT', "goto 1" );
 .sub test :main
 	goto foo
 	end
@@ -24,7 +24,7 @@ ok 1
 OUT
 
 ##############################
-pir_output_is(<<'CODE', <<'OUT', "goto 2");
+pir_output_is( <<'CODE', <<'OUT', "goto 2" );
 .sub test :main
 	goto foo
 bar:	print "ok 2\n"
@@ -40,7 +40,7 @@ ok 2
 OUT
 
 ##############################
-pir_output_like(<<'CODE', <<'OUT', "illegal label");
+pir_output_like( <<'CODE', <<'OUT', "illegal label" );
 .sub bogus
          bsr _function
          print "never\n"
@@ -56,7 +56,7 @@ CODE
 /no label offset defined/
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "perlish func label");
+pir_output_is( <<'CODE', <<'OUT', "perlish func label" );
 .sub _main::test
 	print "ok 1\n"
 	end
@@ -66,7 +66,7 @@ CODE
 ok 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "perlish func label - .pcc_sub");
+pir_output_is( <<'CODE', <<'OUT', "perlish func label - .pcc_sub" );
 .pcc_sub _main::test
 	print "ok 1\n"
 	end
@@ -76,7 +76,7 @@ CODE
 ok 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "perlish func label");
+pir_output_is( <<'CODE', <<'OUT', "perlish func label" );
 .sub _main::test
         _main::sub()
 	print "ok 2\n"

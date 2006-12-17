@@ -9,7 +9,7 @@ use Test::More;
 use Parrot::Config;
 use Parrot::Test tests => 12;
 
-pir_output_is(<<'CODE', <<'OUT', "bsr 1");
+pir_output_is( <<'CODE', <<'OUT', "bsr 1" );
 # this tests register allocation/preserving of local bsr calls
 .sub test :main
    $I0 = 2
@@ -29,7 +29,7 @@ CODE
 OUT
 
 ##############################
-pir_output_is(<<'CODE', <<'OUT', "stack calling conventions");
+pir_output_is( <<'CODE', <<'OUT', "stack calling conventions" );
 .sub test :main
    .local int x
    x = 10
@@ -81,7 +81,7 @@ OUT
 
 ##############################
 #
-pir_output_is(<<'CODE', <<'OUT', "fact with stack calling conventions");
+pir_output_is( <<'CODE', <<'OUT', "fact with stack calling conventions" );
 .sub test :main
     .local int counter
     counter = 5
@@ -111,11 +111,10 @@ CODE
 120
 OUT
 
-
 ##############################
 # this is considered a non local bsr
 #
-pir_output_is(<<'CODE', <<'OUT', "recursive bsr with saveall");
+pir_output_is( <<'CODE', <<'OUT', "recursive bsr with saveall" );
 .sub test :main
    $I0 = 5	# count
    $I1 = 1	# product
@@ -149,7 +148,7 @@ OUT
 
 ##############################
 # tail recursion - caller saves
-pir_output_is(<<'CODE', <<'OUT', "another recursive bsr");
+pir_output_is( <<'CODE', <<'OUT', "another recursive bsr" );
 .sub test :main
    $I0 = 5	# count
    $I1 = 1	# product
@@ -180,7 +179,7 @@ OUT
 
 ##############################
 # tail recursion - caller saves
-pir_output_is(<<'CODE', <<'OUT', "tail recursive bsr 2");
+pir_output_is( <<'CODE', <<'OUT', "tail recursive bsr 2" );
 .sub test :main
    $I0 = 5	# count
    $I1 = 1	# product
@@ -207,7 +206,7 @@ OUT
 
 ##############################
 # tail recursion - caller saves
-pir_output_is(<<'CODE', <<'OUT', "tail recursive bsr - opt");
+pir_output_is( <<'CODE', <<'OUT', "tail recursive bsr - opt" );
 .sub test :main
    $I0 = 5	# count
    $I1 = 1	# product
@@ -234,7 +233,7 @@ OUT
 
 ##############################
 # tail recursion - caller saves - parrot calling convention
-pir_output_is(<<'CODE', <<'OUT', "tail recursive bsr, parrot cc");
+pir_output_is( <<'CODE', <<'OUT', "tail recursive bsr, parrot cc" );
 .sub test :main
    $I0 = _fact(1, 5)
    print $I0
@@ -262,7 +261,7 @@ OUT
 
 ##############################
 # coroutine
-pir_output_is(<<'CODE', <<'OUT', "coroutine");
+pir_output_is( <<'CODE', <<'OUT', "coroutine" );
 .sub test :main
     print "Hello"
     _routine()
@@ -283,12 +282,11 @@ CODE
 Hello perl6.
 OUT
 
-
 # This is a workaround to suppress errors from POD::Checker.
 my $head1 = '=head1';
-my $cut = '=cut';
+my $cut   = '=cut';
 
-pir_output_is(<<"CODE", <<'OUT', "pod before");
+pir_output_is( <<"CODE", <<'OUT', "pod before" );
 $head1 BLA
 
  fasel
@@ -302,7 +300,7 @@ CODE
 ok 1
 OUT
 
-pir_output_is(<<"CODE", <<'OUT', "pod before, after");
+pir_output_is( <<"CODE", <<'OUT', "pod before, after" );
 $head1 FOO
 
  fasel
@@ -320,7 +318,7 @@ CODE
 ok 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "bug #25948");
+pir_output_is( <<'CODE', <<'OUT', "bug #25948" );
 .sub main :main
         goto L1
 test:

@@ -24,7 +24,7 @@ Tests the BigInt PMC.
 
 =cut
 
-if ($PConfig{gmp}) {
+if ( $PConfig{gmp} ) {
     plan tests => 36;
 }
 else {
@@ -59,17 +59,18 @@ ok:
 .end
 EOP
 
-if ($PConfig{gmp}) {
+if ( $PConfig{gmp} ) {
+
     # argh
     my $parrot = '.' . $PConfig{slash} . 'parrot' . $PConfig{exe};
-    my $test = 'temp_gmp_vers.pir';
+    my $test   = 'temp_gmp_vers.pir';
     open my $O, '>', "$test" or die "can't open $test: $!";
     print $O $vers_check;
     close $O;
     my $warn = `$parrot $test`;
     diag $warn if $warn;
     unlink $test;
-};
+}
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -114,7 +115,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-pasm_output_is(<<'CODE', <<'OUT', "create");
+pasm_output_is( <<'CODE', <<'OUT', "create" );
    new P0, .BigInt
    print "ok\n"
    end
@@ -122,9 +123,7 @@ CODE
 ok
 OUT
 
-
-
-pasm_output_is(<<'CODE', <<'OUT', "set/get int");
+pasm_output_is( <<'CODE', <<'OUT', "set/get int" );
    new P0, .BigInt
    set P0, 999999
    set I1, P0
@@ -139,7 +138,7 @@ CODE
 999999L
 OUT
 
-pasm_output_is(<<"CODE", <<'OUT', "set int, get double");
+pasm_output_is( <<"CODE", <<'OUT', "set int, get double" );
 @{[ $fp_equality_macro ]}
      new P0, .BigInt
      set P0, 999999
@@ -173,7 +172,7 @@ ok 3
 ok 4
 OUT
 
-pasm_output_is(<<'CODE', <<'OUT', "set double, get str");
+pasm_output_is( <<'CODE', <<'OUT', "set double, get str" );
    new P0, .BigInt
    set P0, 1.23e12
    print P0
@@ -183,7 +182,7 @@ CODE
 1230000000000
 OUT
 
-pasm_output_is(<<'CODE', <<'OUT', "set str, get str");
+pasm_output_is( <<'CODE', <<'OUT', "set str, get str" );
    new P0, .BigInt
    set P0, "1230000000000"
    print P0
@@ -193,7 +192,7 @@ CODE
 1230000000000
 OUT
 
-pasm_output_is(<<'CODE', <<'OUT', "add");
+pasm_output_is( <<'CODE', <<'OUT', "add" );
    new P0, .BigInt
    set P0, 999999
    new P1, .BigInt
@@ -215,7 +214,7 @@ CODE
 22345678987654321
 OUT
 
-pasm_output_is(<<'CODE', <<'OUT', "add_int");
+pasm_output_is( <<'CODE', <<'OUT', "add_int" );
    new P0, .BigInt
    set P0, 999999
    new P2, .BigInt
@@ -234,7 +233,7 @@ CODE
 100000000000001000000
 OUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub bigint");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub bigint" );
      new P0, .BigInt
      set P0, 12345678
      new P1, .BigInt
@@ -265,7 +264,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub native int");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub native int" );
      new P0, .BigInt
      set P0, 12345678
      new P2, .BigInt
@@ -287,7 +286,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "sub other int");
+pasm_output_is( <<'CODE', <<'OUTPUT', "sub other int" );
      new P0, .BigInt
      set P0, 12345678
      new P1, .Integer
@@ -327,7 +326,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUT', "mul");
+pasm_output_is( <<'CODE', <<'OUT', "mul" );
    new P0, .BigInt
    set P0, 999999
    new P1, .BigInt
@@ -342,7 +341,7 @@ CODE
 999999000000
 OUT
 
-pasm_output_is(<<'CODE', <<'OUT', "mul_int");
+pasm_output_is( <<'CODE', <<'OUT', "mul_int" );
    new P0, .BigInt
    set P0, 999999
    new P2, .BigInt
@@ -354,7 +353,7 @@ CODE
 999999000000
 OUT
 
-pasm_output_is(<<'CODE', <<'OUT', "div bigint");
+pasm_output_is( <<'CODE', <<'OUT', "div bigint" );
      new P0, .BigInt
      set P0, "100000000000000000000"
      new P1, .BigInt
@@ -395,7 +394,7 @@ ok 3
 ok 4
 OUT
 
-pasm_output_is(<<'CODE', <<'OUT', "div native int");
+pasm_output_is( <<'CODE', <<'OUT', "div native int" );
      new P0, .BigInt
      set P0, "100000000000000000000"
      new P1, .BigInt
@@ -418,7 +417,7 @@ ok 1
 ok 2
 OUT
 
-pasm_output_is(<<'CODE', <<'OUT', "div other int");
+pasm_output_is( <<'CODE', <<'OUT', "div other int" );
      new P0, .BigInt
      set P0, "100000000000000000000"
      new P1, .BigInt
@@ -445,9 +444,9 @@ ok 1
 ok 2
 OUT
 
-for my $op ("/", "%") {
-    for my $type ("BigInt", "Integer") {
-      pir_output_is(<<"CODE", <<OUTPUT, "bigint $op by zero $type");
+for my $op ( "/", "%" ) {
+    for my $type ( "BigInt", "Integer" ) {
+        pir_output_is( <<"CODE", <<OUTPUT, "bigint $op by zero $type" );
 .sub _main :main
     P0 = new BigInt
     set P0, "1000000000000000000000"
@@ -472,26 +471,27 @@ OUTPUT
     }
 }
 
-
 {
-    my ($a, $b, $c, $d, $e);
-    if ($PConfig{intvalsize} == 8) {
+    my ( $a, $b, $c, $d, $e );
+    if ( $PConfig{intvalsize} == 8 ) {
         $a = '9223372036854775806';    # 2**63-2
-        $b =                   '1';
-        $c = '9223372036854775807'; # still Integer
-        $d = '9223372036854775808'; # no more Integer
-        $e = '9223372036854775809'; # still no more Integer
-    } elsif ($PConfig{intvalsize} == 4) {
-        $a = '2147483646';        # 2**31-2
-        $b =          '1';
-        $c = '2147483647';        # still Integer
-        $d = '2147483648';        # no more PerlInt
-        $e = '2147483649';        # still no more PerlInt
-    } else {
+        $b = '1';
+        $c = '9223372036854775807';    # still Integer
+        $d = '9223372036854775808';    # no more Integer
+        $e = '9223372036854775809';    # still no more Integer
+    }
+    elsif ( $PConfig{intvalsize} == 4 ) {
+        $a = '2147483646';             # 2**31-2
+        $b = '1';
+        $c = '2147483647';             # still Integer
+        $d = '2147483648';             # no more PerlInt
+        $e = '2147483649';             # still no more PerlInt
+    }
+    else {
         die "\$PConfig{intvalsize} == $PConfig{intvalsize}?\n";
     }
 
-    pasm_output_is(<<CODE, <<OUT, "add overflow Integer");
+    pasm_output_is( <<CODE, <<OUT, "add overflow Integer" );
    new P0, .Integer
    set P0, $a
    new P1, .Integer
@@ -520,7 +520,7 @@ $e BigInt
 ok
 OUT
 
-    pasm_output_is(<<CODE, <<OUT, "add overflow Integer");
+    pasm_output_is( <<CODE, <<OUT, "add overflow Integer" );
    new P0, .Integer
    set P0, $a
    new P1, .Integer
@@ -550,7 +550,7 @@ ok
 OUT
 }
 
-pasm_output_is(<<'CODE', <<'OUT', "abs");
+pasm_output_is( <<'CODE', <<'OUT', "abs" );
    new P0, .BigInt
    set P0, "-1230000000000"
    new P1, .Undef
@@ -569,7 +569,7 @@ CODE
 1230000000000
 OUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
@@ -588,7 +588,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "Truth");
+pasm_output_is( <<"CODE", <<'OUTPUT', "Truth" );
      new P0, .BigInt
      set P0, "123456789123456789"
      if P0, OK1
@@ -604,7 +604,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<"CODE", <<'OUTPUT', "neg");
+pasm_output_is( <<"CODE", <<'OUTPUT', "neg" );
      new P0, .BigInt
      new P1, .BigInt
      set P0, "123456789123456789"
@@ -618,7 +618,7 @@ CODE
 ok 1
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "pi() generator");
+pir_output_is( <<'CODE', <<'OUTPUT', "pi() generator" );
 .sub PI
     .local pmc k, a, b, a1, b1
     k = new Integer
@@ -737,7 +737,7 @@ CODE
 
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUT', "shl_bigint");
+pasm_output_is( <<'CODE', <<'OUT', "shl_bigint" );
    new P0, .BigInt
    set P0, "2"
    new P1, .BigInt
@@ -759,7 +759,7 @@ CODE
 102400000000000
 OUT
 
-pasm_output_is(<<'CODE', <<'OUT', "shl_int");
+pasm_output_is( <<'CODE', <<'OUT', "shl_int" );
    new P0, .BigInt
    set P0, 2
    new P1, .Integer
@@ -788,7 +788,7 @@ CODE
 102400000000000
 OUT
 
-pasm_output_is(<<'CODE', <<'OUT', "shr_bigint");
+pasm_output_is( <<'CODE', <<'OUT', "shr_bigint" );
    new P0, .BigInt
    set P0, 8
    new P1, .BigInt
@@ -810,7 +810,7 @@ CODE
 100000000000
 OUT
 
-pasm_output_is(<<'CODE', <<'OUT', "shr_int");
+pasm_output_is( <<'CODE', <<'OUT', "shr_int" );
    new P0, .BigInt
    set P0, 4
    new P1, .Integer
@@ -839,7 +839,7 @@ CODE
 100000000000
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "BUG #34949 gt");
+pir_output_is( <<'CODE', <<'OUT', "BUG #34949 gt" );
 .sub main :main
     .local pmc b
     b = new BigInt
@@ -854,7 +854,7 @@ CODE
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "BUG #34949 ge");
+pir_output_is( <<'CODE', <<'OUT', "BUG #34949 ge" );
 .sub main :main
     .local pmc b
     b = new BigInt
@@ -869,7 +869,7 @@ CODE
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "BUG #34949 ne");
+pir_output_is( <<'CODE', <<'OUT', "BUG #34949 ne" );
 .sub main :main
     .local pmc b
     b = new BigInt
@@ -884,7 +884,7 @@ CODE
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "BUG #34949 eq");
+pir_output_is( <<'CODE', <<'OUT', "BUG #34949 eq" );
 .sub main :main
     .local pmc b
     b = new BigInt
@@ -899,7 +899,7 @@ CODE
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "BUG #34949 le");
+pir_output_is( <<'CODE', <<'OUT', "BUG #34949 le" );
 .sub main :main
     .local pmc b
     b = new BigInt
@@ -914,7 +914,7 @@ CODE
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "BUG #34949 lt");
+pir_output_is( <<'CODE', <<'OUT', "BUG #34949 lt" );
 .sub main :main
     .local pmc b
     b = new BigInt

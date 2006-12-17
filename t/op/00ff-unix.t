@@ -8,7 +8,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 1;
 
-
 =head1 NAME
 
 t/op/00ff-unix.t - UNIX File format
@@ -23,12 +22,10 @@ Tests file formats.
 
 =cut
 
-
-pasm_output_is(<<'CODE', <<'OUT', "fileformat unix");
+pasm_output_is( <<'CODE', <<'OUT', "fileformat unix" );
     print "ok\n"
     end
 CODE
 ok
 OUT
-
 

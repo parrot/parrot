@@ -8,7 +8,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 57;
 
-
 =head1 NAME
 
 t/op/integer.t - Integer Registers
@@ -23,8 +22,7 @@ Tests the use of Parrot integer registers.
 
 =cut
 
-
-pasm_output_is(<<CODE, <<OUTPUT, "set_i_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "set_i_ic" );
         # XXX: Need a test for writing outside the set of available
         # registers.  Parrot doesn't check for this at the moment.
         set     I0, 0
@@ -162,7 +160,7 @@ CODE
 31
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "set_i");
+pasm_output_is( <<CODE, <<OUTPUT, "set_i" );
         set     I0, 42
         set     I1, I0
         print   I1
@@ -172,7 +170,7 @@ CODE
 42
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "add_i");
+pasm_output_is( <<CODE, <<OUTPUT, "add_i" );
         set     I0, 0x11223344
         add     I1, I0, I0
         print   I1
@@ -193,7 +191,7 @@ CODE
 1724724120
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "abs(i, i|ic|n|nc)");
+pasm_output_is( <<'CODE', <<'OUTPUT', "abs(i, i|ic|n|nc)" );
         set     I0, 1
         abs     I1, -1
         abs     I0, I0
@@ -213,7 +211,7 @@ CODE
 1
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "sub_(i|ic, i|ic)");
+pasm_output_is( <<CODE, <<OUTPUT, "sub_(i|ic, i|ic)" );
         set     I0, 0x12345678
         set     I1, 0x01234567
         sub     I2, I0, I1
@@ -234,7 +232,7 @@ CODE
 4101
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "mul_i");
+pasm_output_is( <<CODE, <<OUTPUT, "mul_i" );
         set     I0, 7
         set     I1, 29
         mul     I2, I0, I1
@@ -250,7 +248,7 @@ CODE
 203
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "div_i");
+pasm_output_is( <<CODE, <<OUTPUT, "div_i" );
         set     I0, 0x33333333
         set     I1, 0x11111111
         div     I2, I0, I1
@@ -286,7 +284,7 @@ CODE
 12410
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "mod_i");
+pasm_output_is( <<CODE, <<OUTPUT, "mod_i" );
         set     I0, 5
         set     I1, 0
         mod     I2, I0, I1
@@ -343,7 +341,7 @@ CODE
 222
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "mod - negative, zero rest (#36003)");
+pir_output_is( <<'CODE', <<'OUTPUT', "mod - negative, zero rest (#36003)" );
 .sub test :main
 
    $I1 = mod 3, 3
@@ -375,7 +373,7 @@ CODE
 -3 mod -3 = 0
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "cmod_i");
+pasm_output_is( <<CODE, <<OUTPUT, "cmod_i" );
         set     I0, 5
         set     I1, 3
         cmod    I2, I0, I1
@@ -402,7 +400,7 @@ CODE
 222
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "eq_i_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "eq_i_ic" );
         set     I0, 0x12345678
         set     I1, 0x12345678
         set     I2, 0x76543210
@@ -429,7 +427,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "eq_ic_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "eq_ic_ic" );
         set     I0, -42
 
         eq      I0, 42, ERROR
@@ -466,7 +464,7 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "ne_i_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "ne_i_ic" );
         set     I0, 0xa0b0c0d
         set     I1, 0xa0b0c0d
         set     I2, 0
@@ -493,7 +491,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "ne_ic_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "ne_ic_ic" );
         set     I0, 427034409
 
         ne      I0, 427034409, ERROR
@@ -518,7 +516,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "lt_i_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "lt_i_ic" );
         set     I0, 2147483647
         set     I1, -2147483648
         set     I2, 0
@@ -553,7 +551,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "lt_ic_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "lt_ic_ic" );
         set     I0, 2147483647
         set     I1, -2147483648
         set     I2, 0
@@ -587,7 +585,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "le_i_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "le_i_ic" );
         set     I0, 2147483647
         set     I1, -2147483648
         set     I2, 0
@@ -622,7 +620,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "le_ic_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "le_ic_ic" );
         set     I0, 2147483647
         set     I1, -2147483648
         set     I2, 0
@@ -656,7 +654,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "gt_i_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "gt_i_ic" );
         set     I0, -2147483648
         set     I1, 2147483647
         set     I2, 0
@@ -691,7 +689,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "gt_ic_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "gt_ic_ic" );
         set     I0, -2147483648
         set     I1, 2147483647
         set     I2, 0
@@ -725,7 +723,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "ge_i_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "ge_i_ic" );
         set     I0, -2147483648
         set     I1, 2147483647
         set     I2, 0
@@ -760,7 +758,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "ge_ic_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "ge_ic_ic" );
         set     I0, -2147483648
         set     I1, 2147483647
         set     I2, 0
@@ -794,7 +792,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "not_i_i");
+pasm_output_is( <<'CODE', <<OUTPUT, "not_i_i" );
         set I0, 1
         not I1, I0
         print I1
@@ -831,7 +829,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "and");
+pasm_output_is( <<'CODE', <<OUTPUT, "and" );
         set I0, 0
         set I1, 10
 
@@ -863,7 +861,7 @@ CODE
 10
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "or");
+pasm_output_is( <<'CODE', <<OUTPUT, "or" );
         set I0, 0
         set I1, 10
 
@@ -893,7 +891,7 @@ CODE
 10
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "xor");
+pasm_output_is( <<'CODE', <<OUTPUT, "xor" );
         set I0, 0
         set I1, 2
 
@@ -929,7 +927,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "inc_i");
+pasm_output_is( <<CODE, <<OUTPUT, "inc_i" );
         set     I0, 0
 
         inc     I0
@@ -949,7 +947,7 @@ CODE
 5
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "add_i_i");
+pasm_output_is( <<CODE, <<OUTPUT, "add_i_i" );
         set     I0, 0
         set     I1, 2
         set     I2, -2
@@ -967,7 +965,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "add_i_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "add_i_ic" );
         set     I0, 0
 
         add     I0, 5
@@ -983,7 +981,7 @@ CODE
 -5
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "dec_i");
+pasm_output_is( <<CODE, <<OUTPUT, "dec_i" );
         set     I0, 0
 
         dec     I0
@@ -1003,7 +1001,7 @@ CODE
 -5
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "sub_i_i");
+pasm_output_is( <<CODE, <<OUTPUT, "sub_i_i" );
         set     I0, 0
         set     I1, 3
         set     I2, -3
@@ -1021,7 +1019,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "sub_i_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "sub_i_ic" );
         set     I0, 0
 
         sub     I0, 5
@@ -1037,7 +1035,7 @@ CODE
 5
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "set_n_i");
+pasm_output_is( <<CODE, <<OUTPUT, "set_n_i" );
         set     I0, 0
         set     N0, I0
         print   N0
@@ -1059,7 +1057,7 @@ CODE
 -2147483648.000000
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "cleari");
+pasm_output_is( <<CODE, <<OUTPUT, "cleari" );
         set     I0, 0xdeadbee
         set     I1, 0xdeadbee
         set     I2, 0xdeadbee
@@ -1131,7 +1129,7 @@ CODE
 00000000000000000000000000000000
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "neg_i");
+pasm_output_is( <<CODE, <<OUTPUT, "neg_i" );
     neg I0,3
     neg I0,I0
     neg I0
@@ -1142,7 +1140,7 @@ CODE
 -3
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "mul_i_i");
+pasm_output_is( <<CODE, <<OUTPUT, "mul_i_i" );
     set I0,3
     set I1,4
     mul I0,I1
@@ -1153,7 +1151,7 @@ CODE
 12
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "fact_i_i");
+pasm_output_is( <<CODE, <<OUTPUT, "fact_i_i" );
     set I0, 3
     set I1, 11
     set I2, 0
@@ -1178,7 +1176,7 @@ CODE
 1
 OUTPUT
 
-pasm_output_is(<<CODE, <<OUTPUT, "fact_i_ic");
+pasm_output_is( <<CODE, <<OUTPUT, "fact_i_ic" );
     fact I5, 3
     print I5
     print "\\n"
@@ -1199,7 +1197,7 @@ CODE
 1
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "exchange");
+pasm_output_is( <<'CODE', <<OUTPUT, "exchange" );
     set I10, 10
     set I20, 20
     exchange I10, I20
@@ -1219,7 +1217,7 @@ CODE
 30
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "null");
+pasm_output_is( <<'CODE', <<OUTPUT, "null" );
     set I1, 1000
     print I1
     print "\n"
@@ -1234,7 +1232,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUTPUT, "div_i_i by zero");
+pasm_output_like( <<'CODE', <<OUTPUT, "div_i_i by zero" );
         set I0, 0
         set I1, 10
         div I1, I0
@@ -1243,7 +1241,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUTPUT, "div_i_ic by zero");
+pasm_output_like( <<'CODE', <<OUTPUT, "div_i_ic by zero" );
         set I1, 10
         div I1, 0
         end
@@ -1251,7 +1249,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUTPUT, "div_i_i_i by zero");
+pasm_output_like( <<'CODE', <<OUTPUT, "div_i_i_i by zero" );
         set I0, 0
         set I1, 10
         div I2, I1, I0
@@ -1260,7 +1258,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUTPUT, "div_i_ic_i by zero");
+pasm_output_like( <<'CODE', <<OUTPUT, "div_i_ic_i by zero" );
         set I0, 0
         div I2, 10, I0
         end
@@ -1268,7 +1266,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUTPUT, "div_i_i_ic by zero");
+pasm_output_like( <<'CODE', <<OUTPUT, "div_i_i_ic by zero" );
         set I1, 10
         div I2, I1, 0
         end
@@ -1276,14 +1274,14 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUTPUT, "div_i_ic_ic by zero");
+pasm_output_like( <<'CODE', <<OUTPUT, "div_i_ic_ic by zero" );
         div I2, 0, 0
         end
 CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUTPUT, "fdiv_i_i by zero");
+pasm_output_like( <<'CODE', <<OUTPUT, "fdiv_i_i by zero" );
         set I0, 0
         set I1, 10
         fdiv I1, I0
@@ -1292,7 +1290,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUTPUT, "fdiv_i_ic by zero");
+pasm_output_like( <<'CODE', <<OUTPUT, "fdiv_i_ic by zero" );
         set I1, 10
         fdiv I1, 0
         end
@@ -1300,7 +1298,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUTPUT, "fdiv_i_i_i by zero");
+pasm_output_like( <<'CODE', <<OUTPUT, "fdiv_i_i_i by zero" );
         set I0, 0
         set I1, 10
         fdiv I2, I1, I0
@@ -1309,7 +1307,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUTPUT, "fdiv_i_ic_i by zero");
+pasm_output_like( <<'CODE', <<OUTPUT, "fdiv_i_ic_i by zero" );
         set I0, 0
         fdiv I2, 10, I0
         end
@@ -1317,7 +1315,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUTPUT, "fdiv_i_i_ic by zero");
+pasm_output_like( <<'CODE', <<OUTPUT, "fdiv_i_i_ic by zero" );
         set I1, 10
         fdiv I2, I1, 0
         end
@@ -1325,7 +1323,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUTPUT, "cmod_i_i_i by zero");
+pasm_output_like( <<'CODE', <<OUTPUT, "cmod_i_i_i by zero" );
         set I0, 0
         set I1, 10
         cmod I2, I1, I0
@@ -1334,7 +1332,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUTPUT, "cmod_i_ic_i by zero");
+pasm_output_like( <<'CODE', <<OUTPUT, "cmod_i_ic_i by zero" );
         set I0, 0
         cmod I2, 10, I0
         end
@@ -1342,7 +1340,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<OUTPUT, "cmod_i_i_ic by zero");
+pasm_output_like( <<'CODE', <<OUTPUT, "cmod_i_i_ic by zero" );
         set I1, 10
         cmod I2, I1, 0
         end
@@ -1350,7 +1348,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "mod_i_i_i by zero");
+pasm_output_is( <<'CODE', <<OUTPUT, "mod_i_i_i by zero" );
         set I0, 0
         set I1, 10
         mod I2, I1, I0
@@ -1361,7 +1359,7 @@ CODE
 10
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "mod_i_ic_i by zero");
+pasm_output_is( <<'CODE', <<OUTPUT, "mod_i_ic_i by zero" );
         set I0, 0
         mod I2, 10, I0
         print I2
@@ -1371,7 +1369,7 @@ CODE
 10
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "mod_i_i_ic by zero");
+pasm_output_is( <<'CODE', <<OUTPUT, "mod_i_i_ic by zero" );
         set I1, 10
         mod I2, I1, 0
         print I2
@@ -1380,6 +1378,4 @@ pasm_output_is(<<'CODE', <<OUTPUT, "mod_i_i_ic by zero");
 CODE
 10
 OUTPUT
-
-
 

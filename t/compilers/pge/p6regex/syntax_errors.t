@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 5;
 use Parrot::Test::PGE;
 
-
 =head1 NAME
 
 t/compilers/pge/p6regex/syntax_errors.t - How PGE catches syntax errors
@@ -25,18 +24,18 @@ exceptions that get thrown.
 
 =cut
 
-p6rule_throws('{{ ',
-    qr/Missing closing braces for closure/, 'unterminated closure');
+p6rule_throws( '{{ ', qr/Missing closing braces for closure/, 'unterminated closure' );
 
-p6rule_throws('\\1',
-    qr/\\1 and \\012 illegal/, 'back references');
+p6rule_throws( '\\1', qr/\\1 and \\012 illegal/, 'back references' );
 
-p6rule_throws('\x[',
-    qr/Missing close bracket for \\x/, 'unterminated \\x[..]');
+p6rule_throws( '\x[', qr/Missing close bracket for \\x/, 'unterminated \\x[..]' );
 
-p6rule_throws('\X[',
-    qr/Missing close bracket for \\x/, 'unterminated \\X[..]');
+p6rule_throws( '\X[', qr/Missing close bracket for \\x/, 'unterminated \\X[..]' );
 
-p6rule_throws(' :i a',
-    qr/Too late for modifier/, 'whitespace before modifier', todo => 'not implemented');
+p6rule_throws(
+    ' :i a',
+    qr/Too late for modifier/,
+    'whitespace before modifier',
+    todo => 'not implemented'
+);
 

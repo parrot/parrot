@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 1; 
+use Test::More tests => 1;
 use Parrot::Distribution;
 
 =head1 NAME
@@ -36,8 +36,7 @@ my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 
 check_cppcomments(@files);
 
-sub check_cppcomments
-{
+sub check_cppcomments {
     my @files = @_;
 
     my @comments;
@@ -65,7 +64,6 @@ sub check_cppcomments
     ok( !scalar(@comments), 'C++ comments' )
         or diag( "C++ comments found in " . scalar @comments . " files:\n@comments" );
 }
-
 
 # Local Variables:
 #   mode: cperl

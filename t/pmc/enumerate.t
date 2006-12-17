@@ -23,8 +23,7 @@ Tests the Enumerate PMC.
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', 'new');
+pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     new P1, .Array
     new P0, .Enumerate, P1
@@ -33,8 +32,6 @@ pir_output_is(<<'CODE', <<'OUT', 'new');
 CODE
 ok 1
 OUT
-
-
 
 # Local Variables:
 #   mode: cperl

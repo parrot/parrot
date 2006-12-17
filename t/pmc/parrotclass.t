@@ -23,8 +23,7 @@ Tests the ParrotClass PMC.
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', 'new');
+pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     new P0, .ParrotClass
     print "ok 1\n"
@@ -32,8 +31,6 @@ pir_output_is(<<'CODE', <<'OUT', 'new');
 CODE
 ok 1
 OUT
-
-
 
 # Local Variables:
 #   mode: cperl

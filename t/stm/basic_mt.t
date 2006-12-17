@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan $^O =~ /MSWin32/ ? (skip_all => 'broken on Win32') : tests => 4;
+plan $^O =~ /MSWin32/ ? ( skip_all => 'broken on Win32' ) : tests => 4;
 
 =head1 NAME
 
@@ -25,7 +25,7 @@ multiple threads at once.
 
 =cut
 
-pir_output_is(<<'CODE', <<'OUTPUT', "wait (simple)");
+pir_output_is( <<'CODE', <<'OUTPUT', "wait (simple)" );
 .const int N = 1000
 .sub waiter
     .param pmc a
@@ -87,7 +87,7 @@ CODE
 okay
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "wait (simple, strings)");
+pir_output_is( <<'CODE', <<'OUTPUT', "wait (simple, strings)" );
 .const int N = 1000
 .sub waiter
     .param pmc a
@@ -151,12 +151,12 @@ okay
 OUTPUT
 
 # This test is designed to trigger the internal deadlock detection.
-# Occassionally both thread 1 and thread 2 should grab 
+# Occassionally both thread 1 and thread 2 should grab
 # main's 'a' and main's 'b', respectively, and then try to acquire
 # the other. Because of deadlock detection, exactly one of the two
 # threads should quickly be aborted and the other should succeed.
 # Without deadlock detection, the test will not complete quickly.
-pir_output_like(<<'CODE', <<'OUTPUT', "get deadlock");
+pir_output_like( <<'CODE', <<'OUTPUT', "get deadlock" );
 .const int N = 10000
 .sub thread_task
     .param pmc a
@@ -205,7 +205,7 @@ CODE
 /okay/
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "wait + invalidate outer transcation");
+pir_output_is( <<'CODE', <<'OUTPUT', "wait + invalidate outer transcation" );
 .const int N = 50
 .sub waiter
     .param pmc a

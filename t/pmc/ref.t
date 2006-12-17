@@ -22,7 +22,7 @@ Tests that vtable method delegation works on a C<Ref> PMC.
 
 =cut
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "new ref");
+pasm_output_is( <<'CODE', <<'OUTPUT', "new ref" );
     new P2, .Integer
     new P1, .Ref, P2
     print "ok 1\n"
@@ -31,7 +31,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "inc ref");
+pasm_output_is( <<'CODE', <<'OUTPUT', "inc ref" );
     new P2, .Integer
     new P1, .Ref, P2
     inc P1
@@ -43,7 +43,7 @@ CODE
 11
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "dec ref");
+pasm_output_is( <<'CODE', <<'OUTPUT', "dec ref" );
     new P2, .Integer
         set P2, 2
     new P1, .Ref, P2
@@ -56,7 +56,7 @@ CODE
 11
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "deref");
+pasm_output_is( <<'CODE', <<'OUTPUT', "deref" );
     new P2, .Integer
     new P1, .Ref, P2
     print "ok 1\n"
@@ -74,7 +74,7 @@ Ref
 Integer
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "setref ref");
+pasm_output_is( <<'CODE', <<'OUTPUT', "setref ref" );
     new P2, .Integer
     new P3, .Float
     set P3, 0.5
@@ -100,7 +100,7 @@ OUTPUT
 
 TODO: {
     local $TODO = 'pending new Ref semantic';
-pasm_output_is(<<'CODE', <<'OUTPUT', "assign ref");
+    pasm_output_is( <<'CODE', <<'OUTPUT', "assign ref" );
     new P2, .Integer
     new P3, .Float
         set P2, 0
@@ -125,7 +125,7 @@ CODE
 OUTPUT
 }
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "typeof SharedRef");
+pasm_output_is( <<'CODE', <<'OUTPUT', "typeof SharedRef" );
     new P2, .Integer
     new P1, .SharedRef, P2
     print "ok 1\n"
@@ -149,7 +149,7 @@ String
 hello
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "deref SharedRef");
+pasm_output_like( <<'CODE', <<'OUTPUT', "deref SharedRef" );
     new P2, .Integer
     new P1, .SharedRef, P2
     print "ok 1\n"
@@ -161,7 +161,7 @@ CODE
 deref not allowed/
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
@@ -200,7 +200,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "set/get int");
+pasm_output_is( <<'CODE', <<'OUTPUT', "set/get int" );
     new P2, .Integer
     new P1, .Ref, P2
         set P1, 10
@@ -215,7 +215,7 @@ CODE
 10
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "set/get float");
+pasm_output_is( <<'CODE', <<'OUTPUT', "set/get float" );
     new P2, .Float
     new P1, .Ref, P2
         set P1, 12.5
@@ -234,7 +234,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "push/pop");
+pasm_output_is( <<'CODE', <<'OUTPUT', "push/pop" );
     new P2, .ResizableIntegerArray
     new P1, .Ref, P2
         push P1, 200
@@ -263,7 +263,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "add ref, ref, ref");
+pasm_output_is( <<'CODE', <<'OUTPUT', "add ref, ref, ref" );
     new P2, .Integer
     new P1, .Ref, P2
         set P1, 10
@@ -275,7 +275,7 @@ CODE
 20
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "add ref, ref, int");
+pasm_output_is( <<'CODE', <<'OUTPUT', "add ref, ref, int" );
         new P3, .Integer
     new P2, .Integer
     new P1, .Ref, P2
@@ -289,7 +289,7 @@ CODE
 22
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "add ref, int, ref");
+pasm_output_is( <<'CODE', <<'OUTPUT', "add ref, int, ref" );
         new P3, .Integer
     new P2, .Integer
     new P1, .Ref, P2
@@ -303,8 +303,7 @@ CODE
 22
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "add ref, int, int");
+pasm_output_is( <<'CODE', <<'OUTPUT', "add ref, int, int" );
         new P3, .Integer
     new P2, .Integer
     new P1, .Ref, P2
@@ -317,8 +316,6 @@ pasm_output_is(<<'CODE', <<'OUTPUT', "add ref, int, int");
 CODE
 24
 OUTPUT
-
-
 
 # Local Variables:
 #   mode: cperl

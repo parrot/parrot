@@ -23,8 +23,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
+pir_output_is( <<'CODE', <<'OUTPUT', "PASM divide" );
 
 .sub 'test' :main
 
@@ -64,7 +63,7 @@ CODE
 3
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "1+1=3");
+pir_output_is( <<'CODE', <<'OUTPUT', "1+1=3" );
 
 .sub _main
 
@@ -100,7 +99,7 @@ CODE
 3
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide - override builtin");
+pir_output_is( <<'CODE', <<'OUTPUT', "PASM divide - override builtin" );
 
 .sub _main
 
@@ -132,7 +131,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "INTVAL return numeq");
+pir_output_is( <<'CODE', <<'OUTPUT', "INTVAL return numeq" );
 
 .sub _main
 
@@ -163,7 +162,7 @@ CODE
 -42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "mmdvtfind");
+pir_output_is( <<'CODE', <<'OUTPUT', "mmdvtfind" );
 
 .sub _main
 
@@ -195,7 +194,7 @@ ok 1
 ok 2
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "mmdvtfind - invoke it");
+pir_output_is( <<'CODE', <<'OUTPUT', "mmdvtfind - invoke it" );
 
 .sub _main
 
@@ -235,7 +234,7 @@ ok 2
 OUTPUT
 
 my $temp = "temp.pir";
-END { unlink $temp; };
+END { unlink $temp; }
 
 open my $S, '>', "$temp" or die "Can't write $temp";
 print $S <<'EOF';
@@ -249,7 +248,7 @@ print $S <<'EOF';
 EOF
 close $S;
 
-pir_output_is(<<'CODE', <<'OUTPUT', "PASM MMD divide - loaded sub");
+pir_output_is( <<'CODE', <<'OUTPUT', "PASM MMD divide - loaded sub" );
 
 .sub _main
 
@@ -275,7 +274,7 @@ CODE
 42
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL - new result");
+pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - new result" );
 .include "pmctypes.pasm"
 .include "datatypes.pasm"
 .include "mmd.pasm"
@@ -302,7 +301,7 @@ ok
 1
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL - existing result");
+pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - existing result" );
 .include "pmctypes.pasm"
 .include "datatypes.pasm"
 .include "mmd.pasm"
@@ -329,7 +328,7 @@ ok
 1
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL - mixed");
+pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - mixed" );
 .include "pmctypes.pasm"
 .include "datatypes.pasm"
 .include "mmd.pasm"
@@ -366,7 +365,7 @@ ok
 1
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUT', "first dynamic MMD call");
+pir_output_is( <<'CODE', <<'OUT', "first dynamic MMD call" );
 
 .sub main :main
     .local pmc F, B, f, b, m, s
@@ -405,7 +404,7 @@ calling foo(b, f)
   Bar::foo
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "MMD on argument count");
+pir_output_is( <<'CODE', <<'OUT', "MMD on argument count" );
 .sub main :main
     p("ok 1\n")
     p("-twice", "ok 2\n")
@@ -432,7 +431,7 @@ ok 2
 ok 2
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "MMD on mative types");
+pir_output_is( <<'CODE', <<'OUT', "MMD on mative types" );
 .sub main :main
     p("ok 1\n")
     p(42)
@@ -453,7 +452,7 @@ ok 1
 42
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'MMD on PMC types');
+pir_output_is( <<'CODE', <<'OUT', 'MMD on PMC types' );
 .sub 'test' :main
     .local  pmc  lib_perl_group
     lib_perl_group    = loadlib 'perl_group'
@@ -494,7 +493,7 @@ PerlSt ok 3
 String ok 4
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types quoted");
+pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types quoted" );
 .sub main :main
     .local  pmc  lib_perl_group
     lib_perl_group    = loadlib 'perl_group'
@@ -535,7 +534,7 @@ PerlSt ok 3
 String ok 4
 OUT
 
-pir_output_like(<<'CODE', <<'OUT', "MMD on PMC types, invalid");
+pir_output_like( <<'CODE', <<'OUT', "MMD on PMC types, invalid" );
 .sub main :main
     .local  pmc  lib_perl_group
     lib_perl_group    = loadlib 'perl_group'
@@ -579,7 +578,7 @@ String ok 4
 Null PMC access in invoke\(\)/
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types 3");
+pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types 3" );
 .sub main :main
     .local  pmc  lib_perl_group
     lib_perl_group    = loadlib 'perl_group'
@@ -634,7 +633,7 @@ String ok 4
 Intege 42
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types, global namespace");
+pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types, global namespace" );
 .sub main :main
     .local  pmc  lib_perl_group
     lib_perl_group    = loadlib 'perl_group'
@@ -677,7 +676,7 @@ PerlSt ok 3
 String ok 4
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types, package namespace");
+pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types, package namespace" );
 
 .namespace ["Some"]
 
@@ -723,7 +722,7 @@ PerlSt ok 3
 String ok 4
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types - Any");
+pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types - Any" );
 
 .sub main :main
     .local  pmc  lib_perl_group
@@ -782,7 +781,7 @@ Any    42
 Any    43
 OUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "__add as function - Int, Float");
+pir_output_is( <<'CODE', <<'OUTPUT', "__add as function - Int, Float" );
 .sub main :main
     .local pmc d, l, r, a
     d = new Integer
@@ -800,7 +799,7 @@ CODE
 42.42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "__add as method");
+pir_output_is( <<'CODE', <<'OUTPUT', "__add as method" );
 .sub main :main
     .local pmc d, l, r
     l = new Integer
@@ -816,7 +815,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "__add as method - inherited");
+pir_output_is( <<'CODE', <<'OUTPUT', "__add as method - inherited" );
 .sub main :main
     .local  pmc  lib_perl_group
     lib_perl_group    = loadlib 'perl_group'
@@ -838,7 +837,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "__add as method - Int, Float");
+pir_output_is( <<'CODE', <<'OUTPUT', "__add as method - Int, Float" );
 .sub main :main
     .local pmc d, l, r
     l = new Integer
@@ -854,7 +853,7 @@ CODE
 42.42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "bound __add method");
+pir_output_is( <<'CODE', <<'OUTPUT', "bound __add method" );
 .sub main :main
     .local pmc d, l, r, m
     d = new Integer
@@ -879,7 +878,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses");
+pir_output_is( <<'CODE', <<'OUTPUT', "Integer subclasses" );
 .sub main :main
     .local pmc d, l, r, cl
     cl = subclass "Integer", "AInt"
@@ -913,7 +912,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Integer subclasses, n_add");
+pir_output_is( <<'CODE', <<'OUTPUT', "Integer subclasses, n_add" );
 .sub main :main
     $P0 = subclass "Integer", "AInt"
     $P0 = new "AInt"
@@ -959,7 +958,7 @@ print $P <<'EOF';
 EOF
 close $P;
 
-pir_output_is(<<'CODE', <<'OUTPUT', "override builtin n_add");
+pir_output_is( <<'CODE', <<'OUTPUT', "override builtin n_add" );
 .sub main
     load_bytecode "temp.pir"
     $P0 = new Integer
@@ -976,7 +975,7 @@ CODE
 2
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "mmd bug reported by Jeff");
+pir_output_is( <<'CODE', <<'OUTPUT', "mmd bug reported by Jeff" );
 .namespace ['Foo']
 
 .sub bar :method, :multi(Foo, string)
@@ -1015,7 +1014,7 @@ PMC
 nothing
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "use a core func for an object");
+pir_output_is( <<'CODE', <<'OUTPUT', "use a core func for an object" );
 .sub main :main
     .local pmc d, l, r, cl
     cl = newclass "AInt"
@@ -1070,7 +1069,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "multisub vs find_name");
+pir_output_is( <<'CODE', <<'OUTPUT', "multisub vs find_name" );
 .sub main :main
     $P0 = find_name "foo"
     $S0 = classname $P0
@@ -1089,7 +1088,7 @@ CODE
 MultiSub
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "multisub w void");
+pir_output_is( <<'CODE', <<'OUTPUT', "multisub w void" );
 .sub main :main
     foo('xx')
     foo()
@@ -1108,7 +1107,7 @@ foo
 foo string
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "multisub w/o .HLL");
+pir_output_is( <<'CODE', <<'OUTPUT', "multisub w/o .HLL" );
 .sub main :main
     $P0 = new .Integer
     $P0 = 3
@@ -1135,7 +1134,7 @@ foo(Integer)
 foo(ResizablePMCArray,_)
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "multisub w/ .HLL, rt #39161");
+pir_output_is( <<'CODE', <<'OUTPUT', "multisub w/ .HLL, rt #39161" );
 .HLL 'Perl6', ''
 .sub main :main
     $P0 = new .Integer
@@ -1163,7 +1162,7 @@ foo(Integer)
 foo(ResizablePMCArray,_)
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "multisub w/ flatten");
+pir_output_is( <<'CODE', <<'OUTPUT', "multisub w/ flatten" );
 # see also 'rt #39173
 .sub main :main
     .local pmc int_pmc
@@ -1197,7 +1196,7 @@ foo(Integer)
 foo(String)
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "keyed class name and multi");
+pir_output_is( <<'CODE', <<'OUTPUT', "keyed class name and multi" );
 .sub main :main
     .local pmc class
     newclass class, [ 'Some'; 'Class' ]
@@ -1220,7 +1219,7 @@ CODE
 Type: Some;Class
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "keyed class name and multi");
+pir_output_is( <<'CODE', <<'OUTPUT', "keyed class name and multi" );
 .sub main :main
     .local pmc class
     newclass class, [ 'Some'; 'Class' ]
@@ -1246,7 +1245,7 @@ CODE
 Called multi for class
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "unicode sub names and multi (RT#39254)");
+pir_output_is( <<'CODE', <<'OUTPUT', "unicode sub names and multi (RT#39254)" );
 .sub unicode:"\u7777" :multi(string)
   .param pmc arg
   print 'String:'
@@ -1267,7 +1266,7 @@ String:what
 Int:23
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "autoboxing on multis");
+pir_output_is( <<'CODE', <<'OUTPUT', "autoboxing on multis" );
 .sub box_me_up :multi(string)
     .param string first
     .param pmc    second
@@ -1294,7 +1293,7 @@ CODE
 BMU autobox type: String
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', '_ matches native types');
+pir_output_is( <<'CODE', <<'OUTPUT', '_ matches native types' );
 .sub main :main
   .local pmc asub
   asub = get_global 'main'
@@ -1321,7 +1320,7 @@ CODE
 world :multi(_, Sub)
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'type mix with _');
+pir_output_is( <<'CODE', <<'OUTPUT', 'type mix with _' );
 .sub main :main
     $P0 = new .Integer
     $P0 = 3
@@ -1367,8 +1366,7 @@ foo(String)
 foo(_)
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', ':multi with :outer');
+pir_output_is( <<'CODE', <<'OUTPUT', ':multi with :outer' );
 .sub main :main
     new $P0, .String
     assign $P0, 'arg0'

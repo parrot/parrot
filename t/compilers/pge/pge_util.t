@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 8;
 use Parrot::Test::PGE;
 
-
 =head1 NAME
 
 t/library/pge_util.t - Parrot Grammar Engine tests of utility rules
@@ -21,10 +20,13 @@ t/library/pge_util.t - Parrot Grammar Engine tests of utility rules
 =cut
 
 my $str = "How will this\nstring choose\nto explode?\n\nTest";
-p6rule_like($str, 'expl <PGE::Util::die: kaboom>', 
-    qr/^kaboom at line 3, near "ode\?\\n\\n/, "die");
+p6rule_like(
+    $str,
+    'expl <PGE::Util::die: kaboom>',
+    qr/^kaboom at line 3, near "ode\?\\n\\n/, "die"
+);
 
-pir_output_is(<<'CODE', <<'OUT', "split /\\:+/, 'Foo::Bar::baz'");
+pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo::Bar::baz'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
@@ -47,7 +49,7 @@ Bar
 baz
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "split /\\:+/, 'Foo::'");
+pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo::'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
@@ -68,7 +70,7 @@ CODE
 Foo
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "split /\\:+/, '::Foo'");
+pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, '::Foo'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
@@ -90,7 +92,7 @@ CODE
 Foo
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "split /\\:+/, 'Foo'");
+pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
@@ -111,7 +113,7 @@ CODE
 Foo
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "split /\\:/, 'Foo::Bar'");
+pir_output_is( <<'CODE', <<'OUT', "split /\\:/, 'Foo::Bar'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
@@ -134,7 +136,7 @@ Foo
 Bar
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "split /\\:/, 'Foo::Bar::Baz', 2");
+pir_output_is( <<'CODE', <<'OUT', "split /\\:/, 'Foo::Bar::Baz', 2" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
@@ -156,7 +158,7 @@ Foo
 Bar::Baz
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "split /(a)(b)/, 'abracadabra'");
+pir_output_is( <<'CODE', <<'OUT', "split /(a)(b)/, 'abracadabra'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'

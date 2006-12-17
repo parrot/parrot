@@ -10,7 +10,7 @@ use Test::More;
 use Parrot::Config;
 use Parrot::Test tests => 32;
 
-pir_output_is(<<'CODE', <<'OUT', "+=");
+pir_output_is( <<'CODE', <<'OUT', "+=" );
 .sub test :main
     $I0 = 10
     $I0 += 20
@@ -27,7 +27,7 @@ CODE
 10
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "-=");
+pir_output_is( <<'CODE', <<'OUT', "-=" );
 .sub test :main
     $I0 = 10
     $I0 -= 20
@@ -44,7 +44,7 @@ CODE
 10
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "*=");
+pir_output_is( <<'CODE', <<'OUT', "*=" );
 .sub test :main
     $I0 = 10
     $I0 *= 20
@@ -61,7 +61,7 @@ CODE
 -400
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "/=");
+pir_output_is( <<'CODE', <<'OUT', "/=" );
 .sub test :main
     $I0 = 20
     $I0 /= 2
@@ -81,7 +81,7 @@ CODE
 40
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "%=");
+pir_output_is( <<'CODE', <<'OUT', "%=" );
 .sub test :main
     $I0 = 20
     $I0 %= 7
@@ -99,7 +99,7 @@ CODE
 0
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', ".=");
+pir_output_is( <<'CODE', <<'OUT', ".=" );
 .sub test :main
     $S0 = "ab"
     $S0 .= "cd"
@@ -116,7 +116,7 @@ abcd
 abcd
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "&=");
+pir_output_is( <<'CODE', <<'OUT', "&=" );
 .sub test :main
     $I0 =  0b1011
     $I0 &= 0b1000
@@ -133,7 +133,7 @@ CODE
 0
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "|=");
+pir_output_is( <<'CODE', <<'OUT', "|=" );
 .sub test :main
     $I0 =  0b1011
     $I0 |= 0b1000
@@ -150,7 +150,7 @@ CODE
 15
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "~=");
+pir_output_is( <<'CODE', <<'OUT', "~=" );
 .sub test :main
     $I0 =  0b1011
     $I0 ~= 0b1000
@@ -167,7 +167,7 @@ CODE
 0
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', ">>=");
+pir_output_is( <<'CODE', <<'OUT', ">>=" );
 .sub test :main
     $I0 =  0b1011
     $I0 >>= 1
@@ -179,7 +179,7 @@ CODE
 5
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', ">>>=");
+pir_output_is( <<'CODE', <<'OUT', ">>>=" );
 .sub test :main
     $I0 =  0b1011
     $I0 >>>= 1
@@ -191,7 +191,7 @@ CODE
 5
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "<<=");
+pir_output_is( <<'CODE', <<'OUT', "<<=" );
 .sub test :main
     $I0 =  0b1011
     $I0 <<= 1
@@ -203,7 +203,7 @@ CODE
 22
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "x = defined");
+pir_output_is( <<'CODE', <<'OUT', "x = defined" );
 .sub test :main
     .local pmc a
     a = new ResizablePMCArray
@@ -221,7 +221,7 @@ CODE
 110
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "x = clone");
+pir_output_is( <<'CODE', <<'OUT', "x = clone" );
 .sub test :main
     .local pmc a
     a = new Integer
@@ -236,7 +236,7 @@ CODE
 10
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "x = length");
+pir_output_is( <<'CODE', <<'OUT', "x = length" );
 .sub test :main
     .local string s
     s = "abc"
@@ -255,7 +255,7 @@ CODE
 0
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "x = sin");
+pir_output_is( <<'CODE', <<'OUT', "x = sin" );
 .sub test :main
     $N0 = sin 0
     print $N0
@@ -266,7 +266,7 @@ CODE
 0.000000
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "x = can");
+pir_output_is( <<'CODE', <<'OUT', "x = can" );
 .sub test :main
     $P0 = new ParrotIO
     $I0 = can $P0, "puts"
@@ -278,7 +278,7 @@ CODE
 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "x = isa");
+pir_output_is( <<'CODE', <<'OUT', "x = isa" );
 .sub test :main
     $P0 = new Integer
     $I0 = isa $P0, "scalar"
@@ -290,7 +290,7 @@ CODE
 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "x = add");
+pir_output_is( <<'CODE', <<'OUT', "x = add" );
 .sub test :main
     $I0 = 10
     $I1 = add $I0, 10
@@ -302,7 +302,7 @@ CODE
 20
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "x = invoke");
+pir_output_is( <<'CODE', <<'OUT', "x = invoke" );
 .sub test :main
     $P0 = find_global "_s"
     $P0 = invokecc
@@ -320,7 +320,7 @@ done
 OUT
 
 # ticket 32393
-pir_output_is(<<'CODE', '', "empty sub");
+pir_output_is( <<'CODE', '', "empty sub" );
 .sub _foo
 .end
 
@@ -328,7 +328,7 @@ pir_output_is(<<'CODE', '', "empty sub");
 .eom
 CODE
 
-pir_output_is(<<'CODE', <<'OUT', "if null X goto Y");
+pir_output_is( <<'CODE', <<'OUT', "if null X goto Y" );
 .sub main :main
     null $P0
     if null $P0 goto BLAH
@@ -340,7 +340,7 @@ CODE
 PASS
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "unless null X goto Y");
+pir_output_is( <<'CODE', <<'OUT', "unless null X goto Y" );
 .sub main :main
     null $P0
     unless null $P0 goto BLAH
@@ -353,7 +353,7 @@ CODE
 PASS
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "if null X goto Y");
+pir_output_is( <<'CODE', <<'OUT', "if null X goto Y" );
 .sub main :main
     $S0 = "hello"
     if null $S0 goto BLAH
@@ -366,7 +366,7 @@ CODE
 PASS
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'unless null X goto Y, $P0 = null');
+pir_output_is( <<'CODE', <<'OUT', 'unless null X goto Y, $P0 = null' );
 .sub main :main
     $P0 = null
     unless null $P0 goto BLAH
@@ -379,8 +379,7 @@ CODE
 PASS
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', 'X = A == B');
+pir_output_is( <<'CODE', <<'OUT', 'X = A == B' );
 .sub main :main
     $I0 = 1 == 1
     print $I0
@@ -395,7 +394,7 @@ CODE
 0
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'X = A < B');
+pir_output_is( <<'CODE', <<'OUT', 'X = A < B' );
 .sub main :main
     $I0 = 1 < 1
     print $I0
@@ -410,7 +409,7 @@ CODE
 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'X = A > B');
+pir_output_is( <<'CODE', <<'OUT', 'X = A > B' );
 .sub main :main
     $I0 = 1 > 1
     print $I0
@@ -425,7 +424,7 @@ CODE
 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'X = A >= B');
+pir_output_is( <<'CODE', <<'OUT', 'X = A >= B' );
 .sub main :main
     $I0 = 1 >= 1
     print $I0
@@ -445,8 +444,7 @@ CODE
 0
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', 'X = A <= B');
+pir_output_is( <<'CODE', <<'OUT', 'X = A <= B' );
 .sub main :main
     $I0 = 1 <= 1
     print $I0
@@ -466,8 +464,7 @@ CODE
 1
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', 'X = A != B');
+pir_output_is( <<'CODE', <<'OUT', 'X = A != B' );
 .sub main :main
     $I0 = 1 != 1
     print $I0
@@ -482,8 +479,7 @@ CODE
 1
 OUT
 
-
-pir_output_is(<<'CODE', <<'OUT', 'Test octal/hex/bin/dec numbers');
+pir_output_is( <<'CODE', <<'OUT', 'Test octal/hex/bin/dec numbers' );
 .sub main :main
     $I0 = 0077
     print $I0

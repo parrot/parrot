@@ -22,7 +22,7 @@ Tests PMC object methods.
 
 =cut
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
+pasm_output_like( <<'CODE', <<'OUTPUT', "callmethod - unknown method" );
     newclass P2, "Foo"
     set S0, "nada"
     callmethodcc P2, S0
@@ -32,7 +32,7 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "callmethod (STR) - unknown method");
+pasm_output_like( <<'CODE', <<'OUTPUT', "callmethod (STR) - unknown method" );
     newclass P2, "Foo"
     set S1, "nada"
     callmethod P2, S1, P1
@@ -42,7 +42,7 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "callmethodcc - unknown method");
+pasm_output_like( <<'CODE', <<'OUTPUT', "callmethodcc - unknown method" );
     newclass P2, "Foo"
     set S0, "nada"
     callmethodcc P2, S0
@@ -52,7 +52,7 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "callmethodcc (STR) - unknown method");
+pasm_output_like( <<'CODE', <<'OUTPUT', "callmethodcc (STR) - unknown method" );
     newclass P2, "Foo"
     set S1, "nada"
     callmethodcc P2, S1
@@ -62,7 +62,7 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "callmethod 1");
+pasm_output_is( <<'CODE', <<'OUTPUT', "callmethod 1" );
     newclass P2, "Foo"
     set S0, "meth"
 
@@ -81,7 +81,7 @@ in meth
 back
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "can class");
+pasm_output_is( <<'CODE', <<'OUTPUT', "can class" );
     newclass P2, "Foo"
     set S0, "meth"
 
@@ -101,7 +101,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "can object");
+pasm_output_is( <<'CODE', <<'OUTPUT', "can object" );
     newclass P2, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -124,7 +124,7 @@ CODE
 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "constructor");
+pasm_output_is( <<'CODE', <<'OUTPUT', "constructor" );
     newclass P1, "Foo"
     find_type I1, "Foo"
     new P3, I1
@@ -140,7 +140,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "disabling the constructor");
+pasm_output_is( <<'CODE', <<'OUTPUT', "disabling the constructor" );
     newclass P1, "Foo"
     new P0, .String
     setprop P1, "BUILD", P0
@@ -156,7 +156,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "specified constructor method does not exist");
+pasm_output_is( <<'CODE', <<'OUTPUT', "specified constructor method does not exist" );
     newclass P1, "Foo"
     new P0, .String
     set P0, "bar"
@@ -185,7 +185,7 @@ catched it
 Class BUILD method ('bar') not found
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "constructor - init attr");
+pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - init attr" );
     newclass P1, "Foo"
     addattribute P1, ".i"
     find_type I1, "Foo"
@@ -216,7 +216,7 @@ ok 2
 42
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "constructor - parents");
+pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents" );
     newclass P1, "Foo"
     subclass P2, P1, "Bar"
     subclass P3, P2, "Baz"
@@ -267,7 +267,7 @@ in sub
 done
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "methods: self");
+pir_output_is( <<'CODE', <<'OUTPUT', "methods: self" );
 
 .sub _main
     .local pmc A
@@ -325,7 +325,7 @@ A::blah
 B::foo
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "methods: self w arg");
+pir_output_is( <<'CODE', <<'OUTPUT', "methods: self w arg" );
 
 .sub _main
     .local pmc A
@@ -380,7 +380,7 @@ A::blah
 B::foo
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "methods: self w arg and ret");
+pir_output_is( <<'CODE', <<'OUTPUT', "methods: self w arg and ret" );
 
 .sub _main
     .local pmc A
@@ -440,8 +440,8 @@ B::foo
 OUTPUT
 
 SKIP: {
-  skip("currently broken", 1);
-pasm_output_is(<<'CODE', <<'OUTPUT', "exceptions and different runloops");
+    skip( "currently broken", 1 );
+    pasm_output_is( <<'CODE', <<'OUTPUT', "exceptions and different runloops" );
 _main:
     push_eh eh
 
@@ -470,7 +470,7 @@ back in main
 OUTPUT
 }
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "find_method");
+pasm_output_is( <<'CODE', <<'OUTPUT', "find_method" );
     newclass P3, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -498,7 +498,7 @@ in meth
 back
 OUTPUT
 
-pasm_output_like(<<'CODE', <<'OUTPUT', "find_method - unknown method");
+pasm_output_like( <<'CODE', <<'OUTPUT', "find_method - unknown method" );
     newclass P2, "Foo"
     set S0, "nada"
     find_method P0, P2, S0
@@ -508,7 +508,7 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "constructor - diamond parents");
+pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - diamond parents" );
 #
 # A   B A   E
 #  \ /   \ /
@@ -651,8 +651,7 @@ F init
 done
 OUTPUT
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "constructor - parents BUILD");
+pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents BUILD" );
     new P10, .String
     set P10, "_new"
     newclass P1, "Foo"
@@ -708,7 +707,7 @@ in sub
 done
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "same method name in two namespaces");
+pir_output_is( <<'CODE', <<'OUTPUT', "same method name in two namespaces" );
 
 .namespace ["A"]
 .sub foo :method
@@ -734,7 +733,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "self - CURRENT_OBJECT");
+pir_output_is( <<'CODE', <<'OUTPUT', "self - CURRENT_OBJECT" );
 
 .sub _main
     .local pmc A
@@ -760,7 +759,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys");
+pir_output_is( <<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys" );
 
 .sub _main
     newclass $P0, "Foo"
@@ -790,7 +789,7 @@ Key = foo
 Key = foo
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys - clobber");
+pir_output_is( <<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys - clobber" );
 
 .sub _main
     newclass $P0, "Foo"
@@ -825,7 +824,7 @@ Key = foo
 bar
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "method cache invalidation");
+pir_output_is( <<'CODE', <<'OUTPUT', "method cache invalidation" );
 .sub main :main
     .local pmc o, cl
     newclass cl, "Foo"
@@ -849,7 +848,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "callmethod - method name");
+pasm_output_is( <<'CODE', <<'OUTPUT', "callmethod - method name" );
     newclass P2, "Foo"
     set S0, "meth"
 
@@ -874,8 +873,8 @@ back
 OUTPUT
 
 SKIP: {
-    skip("no bound NCI method", 1);
-pir_output_is(<<'CODE', <<'OUTPUT', "bound NCI method");
+    skip( "no bound NCI method", 1 );
+    pir_output_is( <<'CODE', <<'OUTPUT', "bound NCI method" );
 .sub main :main
     .local pmc s, l, f
     s = new String
@@ -893,7 +892,7 @@ abc
 OUTPUT
 }
 
-pir_output_is(<<'CODE', <<'OUTPUT', "tailcallmeth");
+pir_output_is( <<'CODE', <<'OUTPUT', "tailcallmeth" );
 .sub main :main
     .local pmc cl, o, n
     cl = newclass "Foo"
@@ -921,8 +920,7 @@ CODE
 0
 OUTPUT
 
-
-pir_output_is(<<'CODE', <<'OUTPUT', "kind of a super");
+pir_output_is( <<'CODE', <<'OUTPUT', "kind of a super" );
 .sub main :main
     .local pmc cl, o
     cl = subclass "String", "MyString"
@@ -944,7 +942,7 @@ CODE
 foofoo
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "super 1");
+pir_output_is( <<'CODE', <<'OUTPUT', "super 1" );
 .sub main :main
     .local pmc o, cl
     cl = newclass 'Parent'
@@ -975,7 +973,7 @@ Parent foo
 Parent bar
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "delegate keyed_int");
+pir_output_is( <<'CODE', <<'OUTPUT', "delegate keyed_int" );
 .sub main :main
     .local pmc cl, o
     cl = newclass "MyClass"
@@ -1051,7 +1049,7 @@ exists_ikey
 exists_skey
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "delegate keyed_int PMC derived");
+pir_output_is( <<'CODE', <<'OUTPUT', "delegate keyed_int PMC derived" );
 .sub main :main
     .local pmc cl, o
     cl = subclass "ResizablePMCArray", "MyClass"
@@ -1089,7 +1087,7 @@ ikey
 42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "delegate keyed_int PMC derived - inherit");
+pir_output_is( <<'CODE', <<'OUTPUT', "delegate keyed_int PMC derived - inherit" );
 .sub main :main
     .local pmc cl, o
     cl = subclass "ResizablePMCArray", "MyClass"
@@ -1117,7 +1115,7 @@ ikey
 42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "addmethod op");
+pir_output_is( <<'CODE', <<'OUTPUT', "addmethod op" );
 .sub main :main
     .local pmc c
     c = newclass ['whatever']
@@ -1134,7 +1132,7 @@ CODE
 Foo!
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "inherit a PMC METHOD");
+pir_output_is( <<'CODE', <<'OUTPUT', "inherit a PMC METHOD" );
 .sub main :main
     .local pmc cl, o
     cl = subclass 'Integer', 'MyInt'

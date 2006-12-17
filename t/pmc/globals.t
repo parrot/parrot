@@ -22,7 +22,7 @@ Tests the globals fetch and store operations.
 
 =cut
 
-pir_output_is(<<'CODE', <<'OUTPUT', "get namespace");
+pir_output_is( <<'CODE', <<'OUTPUT', "get namespace" );
 .sub main
    .local pmc ns, o
    ns = find_global "Foo"
@@ -38,7 +38,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "create namespace");
+pir_output_is( <<'CODE', <<'OUTPUT', "create namespace" );
 .sub main
     .local pmc f, x
     f = find_global "f"
@@ -54,7 +54,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "get namespace - nested");
+pir_output_is( <<'CODE', <<'OUTPUT', "get namespace - nested" );
 .sub main
    .local pmc ns, o
    ns = get_hll_namespace ["Foo"; "Bar"]
@@ -71,7 +71,7 @@ ok
 OUTPUT
 
 # this is pretty much taken from PDD 21
-pir_output_is(<<'CODE', <<'OUTPUT', "get namespace - array");
+pir_output_is( <<'CODE', <<'OUTPUT', "get namespace - array" );
 .namespace ['Foo'; 'Bar']
 .sub test
   print "ok\n"
@@ -92,7 +92,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "get namespace - array");
 CODE
 ok
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

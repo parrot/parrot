@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 8;
 use Parrot::Config;
 
-
 =head1 NAME
 
 t/dynoplibs/myops.t - Test for the ops in src/dynoplibs/myops.ops
@@ -25,9 +24,9 @@ Tests the sample dynamic op library "myops".
 =cut
 
 my $is_ms_win32 = $^O =~ m!MSWin32!;
-my $is_mingw    = $is_ms_win32 && grep { $PConfig{cc} eq $_ } qw(gcc gcc.exe);
+my $is_mingw = $is_ms_win32 && grep { $PConfig{cc} eq $_ } qw(gcc gcc.exe);
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'fortytwo');
+pir_output_is( <<'CODE', <<'OUTPUT', 'fortytwo' );
 .loadlib "myops_ops"
 .sub main :main
     $I0 = fortytwo
@@ -38,7 +37,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "what_do_you_get_if_you_multiply_six_by_nine");
+pir_output_is( << 'CODE', << 'OUTPUT', "what_do_you_get_if_you_multiply_six_by_nine" );
 .loadlib "myops_ops"
 .sub main :main
     $S0 = what_do_you_get_if_you_multiply_six_by_nine
@@ -49,7 +48,7 @@ CODE
 fortytwo
 OUTPUT
 
-pir_output_like(<< 'CODE', << 'OUTPUT', "hcf");
+pir_output_like( << 'CODE', << 'OUTPUT', "hcf" );
 .loadlib "myops_ops"
 .sub main :main
     print "neither here\n"
@@ -66,10 +65,10 @@ OUTPUT
 .loadlib "myops_ops"
 q
 END_PASM
-    pasm_output_is( $quine, $quine, 'a short cheating quine');
+    pasm_output_is( $quine, $quine, 'a short cheating quine' );
 }
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "one alarm");
+pir_output_is( << 'CODE', << 'OUTPUT', "one alarm" );
 .loadlib "myops_ops"
 
 .sub main :main
@@ -100,7 +99,7 @@ OUTPUT
 SKIP: {
     skip "three alarms, infinite loop under mingw32", 1 if $is_mingw;
 
-    pir_output_is(<< 'CODE', << 'OUTPUT', "three alarm");
+    pir_output_is( << 'CODE', << 'OUTPUT', "three alarm" );
 
 .loadlib "myops_ops"
 .sub main :main
@@ -152,7 +151,7 @@ OUTPUT
 }
 
 # bxand boolean op
-pasm_output_is(<<'CODE', <<'OUTPUT', 'bxand - A AND B, but not BOTH');
+pasm_output_is( <<'CODE', <<'OUTPUT', 'bxand - A AND B, but not BOTH' );
 .loadlib "myops_ops"
 
     bxand I0, 0, 0
@@ -180,7 +179,7 @@ F
 F
 OUTPUT
 
-pasm_output_is(<<'CODE', <<OUTPUT, "conv_u2_i");
+pasm_output_is( <<'CODE', <<OUTPUT, "conv_u2_i" );
 
 .loadlib "myops_ops"
 
@@ -213,7 +212,6 @@ CODE
 65535
 OUTPUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
@@ -227,5 +225,4 @@ OUTPUT
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-
 

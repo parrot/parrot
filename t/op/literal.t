@@ -8,7 +8,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 2;
 
-
 =head1 NAME
 
 t/op/literal.t - Testing the PIR and PASM lexer
@@ -32,8 +31,7 @@ L<http://rt.perl.org/rt3/Ticket/Display.html?id=31197>
 
 =cut
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "integer literals in PASM");
+pasm_output_is( <<'CODE', <<'OUTPUT', "integer literals in PASM" );
         print 0x2A
         print "\n"
         print 0X2A
@@ -50,7 +48,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "integer literals in PIR");
+pir_output_is( <<'CODE', <<'OUTPUT', "integer literals in PIR" );
 .sub test :main
         print 0x2A
         print "\n"
@@ -67,5 +65,4 @@ CODE
 42
 42
 OUTPUT
-
 

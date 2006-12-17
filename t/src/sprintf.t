@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : (tests => 3);
+plan $^O =~ m/MSWin32/ ? ( skip_all => 'broken on win32' ) : ( tests => 3 );
 
 =head1 NAME
 
@@ -24,8 +24,7 @@ Tests the various C<Parrot_sprintf_*> functions.
 
 =cut
 
-
-c_output_like(<<'CODE', <<'OUTPUT', "xxxVAL_FMT");
+c_output_like( <<'CODE', <<'OUTPUT', "xxxVAL_FMT" );
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 int
@@ -42,7 +41,7 @@ CODE
 /x
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "hello world");
+c_output_is( <<'CODE', <<'OUTPUT', "hello world" );
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
@@ -217,7 +216,7 @@ ok
 That's all, folks!
 OUTPUT
 
-c_output_like (<<'CODE', "/[0-9a-f]*\nok\n/", "many printfs");
+c_output_like( <<'CODE', "/[0-9a-f]*\nok\n/", "many printfs" );
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"

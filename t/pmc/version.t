@@ -23,8 +23,7 @@ Tests the Version PMC.
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', 'new', todo => 'not yet working');
+pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not yet working' );
 .sub 'test' :main
     new P0, .version
     print "ok 1\n"
@@ -32,8 +31,6 @@ pir_output_is(<<'CODE', <<'OUT', 'new', todo => 'not yet working');
 CODE
 ok 1
 OUT
-
-
 
 # Local Variables:
 #   mode: cperl

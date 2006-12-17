@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Test tests => 3;
 
-pir_2_pasm_is(<<'CODE', <<'OUT', "unreachable 1");
+pir_2_pasm_is( <<'CODE', <<'OUT', "unreachable 1" );
 .sub _test
    bsr L
    print "ok\n"
@@ -29,7 +29,7 @@ L:
    ret
 OUT
 
-pir_2_pasm_is(<<'CODE', <<'OUT', "unreachable 2");
+pir_2_pasm_is( <<'CODE', <<'OUT', "unreachable 2" );
 .sub _test
   print "ok\n"
   end
@@ -44,7 +44,7 @@ _test:
   end
 OUT
 
-pir_2_pasm_is(<<'CODE', <<'OUT', "unreachable 3");
+pir_2_pasm_is( <<'CODE', <<'OUT', "unreachable 3" );
 .sub _test
   goto L
   print "ok\n"

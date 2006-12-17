@@ -23,8 +23,7 @@ Tests the ParrotObject PMC.
 
 =cut
 
-
-pir_output_like(<<'CODE', <<'OUT', 'new');
+pir_output_like( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     new P0, .ParrotObject
     print "ok 1\n"
@@ -33,9 +32,10 @@ CODE
 /Can't create new ParrotObjects - use the registered class instead
 current instr\.:/
 OUT
+
 # '
 
-pir_output_is(<<'CODE', <<'OUT', ':vtable override');
+pir_output_is( <<'CODE', <<'OUT', ':vtable override' );
 .sub main :main
    $P0 = newclass [ "Test" ]
    $P1 = new [ "Test" ]
@@ -53,9 +53,10 @@ pir_output_is(<<'CODE', <<'OUT', ':vtable override');
 CODE
 42
 OUT
+
 # '
 
-pir_output_is(<<'CODE', <<'OUT', ':vtable("...") override');
+pir_output_is( <<'CODE', <<'OUT', ':vtable("...") override' );
 .sub main :main
     $P0 = newclass [ "Test" ]
     $P1 = new [ "Test" ]
@@ -73,9 +74,10 @@ pir_output_is(<<'CODE', <<'OUT', ':vtable("...") override');
 CODE
 monkey
 OUT
+
 # '
 
-pir_output_like(<<'CODE', <<'OUT', ':vtable with bad name');
+pir_output_like( <<'CODE', <<'OUT', ':vtable with bad name' );
 .namespace [ "Test" ]
 
 .sub monkey :method :vtable("not_in_the_vtable")
@@ -85,9 +87,10 @@ pir_output_like(<<'CODE', <<'OUT', ':vtable with bad name');
 CODE
 /'not_in_the_vtable' is not a v-table method, but was used with :vtable/
 OUT
+
 # '
 
-pir_output_is(<<'CODE', <<'OUT', ':vtable and init');
+pir_output_is( <<'CODE', <<'OUT', ':vtable and init' );
 .sub main :main
    $P0 = newclass [ "Test" ]
    $P1 = new [ "Test" ]
@@ -103,9 +106,10 @@ CODE
 init
 ok
 OUT
+
 # '
 
-pir_output_is(<<'CODE', <<'OUT', ':vtable inheritance');
+pir_output_is( <<'CODE', <<'OUT', ':vtable inheritance' );
 .sub main :main
    $P0 = newclass [ "Test" ]
    $P1 = newclass [ "Test2" ]
@@ -126,10 +130,11 @@ CODE
 cloned
 ok
 OUT
+
 # '
 
 # :vtable inheritance; RT #40626
-pir_output_is(<<'CODE', <<'OUT', ':vtable inheritance from core classes');
+pir_output_is( <<'CODE', <<'OUT', ':vtable inheritance from core classes' );
 .sub main :main
     $P0 = subclass 'Hash', 'Foo'
     $P0 = subclass 'Hash', 'Bar'
@@ -160,8 +165,8 @@ CODE
 Foo::__get_string
 Bar::get_string
 OUT
-# '
 
+# '
 
 # Local Variables:
 #   mode: cperl

@@ -63,22 +63,20 @@ foreach my $file (@files) {
 }
 
 ok( !scalar(@failures), 'Generated timestamps correct' )
-    or diag( "Non GMT/UTC timestamp found in " . scalar @failures .
-        " files:\n@failures" );
+    or diag( "Non GMT/UTC timestamp found in " . scalar @failures . " files:\n@failures" );
 
 exit;
 
-
-sub source_files
-{
+sub source_files {
     my $manifest = maniread('MANIFEST.generated');
     my @test_files;
+
     # grab names of files to test (except binary files)
     foreach my $filename ( sort keys %$manifest ) {
-        next if !(-e $filename);
+        next if !( -e $filename );
 
         push @test_files, $filename
-            if ($filename =~ m/\.(c|h|pod|pl)$/);
+            if ( $filename =~ m/\.(c|h|pod|pl)$/ );
     }
 
     return @test_files;

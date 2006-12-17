@@ -29,14 +29,15 @@ Tests the C<OS> PMC.
 =cut
 
 END {
-  # Clean up environment on exit
-  rmdir "xpto"  if -d "xpto";
-  unlink "xpto" if -f "xpto";
+
+    # Clean up environment on exit
+    rmdir "xpto"  if -d "xpto";
+    unlink "xpto" if -f "xpto";
 }
 
 # test 'cwd'
 my $cwd = File::Spec->canonpath(getcwd);
-pir_output_is(<<'CODE', <<"OUT", 'Test cwd');
+pir_output_is( <<'CODE', <<"OUT", 'Test cwd' );
 .sub main :main
         $P1 = new .OS
         $S1 = $P1."cwd"()
@@ -48,13 +49,12 @@ CODE
 $cwd
 OUT
 
-
 #  TEST chdir
 chdir "src";
 my $upcwd = File::Spec->canonpath(getcwd);
 chdir '..';
 
-pir_output_is(<<'CODE', <<"OUT", 'Test chdir');
+pir_output_is( <<'CODE', <<"OUT", 'Test chdir' );
 .sub main :main
         $P1 = new .OS
 
@@ -79,14 +79,12 @@ $upcwd
 $cwd
 OUT
 
-
 # Test mkdir
 
 my $xpto = $upcwd;
 $xpto =~ s/src([\/\\]?)$/xpto$1/;
 
-
-pir_output_is(<<'CODE', <<"OUT", 'Test mkdir');
+pir_output_is( <<'CODE', <<"OUT", 'Test mkdir' );
 .sub main :main
         $P1 = new .OS
 
@@ -116,7 +114,7 @@ OUT
 # Test remove on a directory
 mkdir "xpto" unless -d "xpto";
 
-pir_output_is(<<'CODE', <<'OUT', 'Test rm call in a directory');
+pir_output_is( <<'CODE', <<'OUT', 'Test rm call in a directory' );
 .sub main :main
         $P1 = new .OS
 
@@ -131,9 +129,8 @@ CODE
 ok
 OUT
 
-ok(!-d $xpto, "Test that rm removed the directory");
-rmdir $xpto if -d $xpto; # this way next test doesn't fail if this one does
-
+ok( !-d $xpto, "Test that rm removed the directory" );
+rmdir $xpto if -d $xpto;    # this way next test doesn't fail if this one does
 
 # test stat
 
@@ -143,11 +140,12 @@ close $X;
 
 my $stat;
 
-if ($cygwin || $MSWin32) {
+if ( $cygwin || $MSWin32 ) {
+
     # Skip inode number
     my @s = stat('xpto');
-    $stat = join("\n",$s[0],@s[2..10])."\n";
-    pir_output_is(<<'CODE', $stat, 'Test OS.stat');
+    $stat = join( "\n", $s[0], @s[ 2 .. 10 ] ) . "\n";
+    pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
         $P1 = new .OS
         $S1 = "xpto"
@@ -170,9 +168,10 @@ done:
         end
 .end
 CODE
-} else {
-  $stat = join("\n",stat("xpto"))."\n";
-  pir_output_is(<<'CODE', $stat, 'Test OS.stat');
+}
+else {
+    $stat = join( "\n", stat("xpto") ) . "\n";
+    pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
         $P1 = new .OS
         $S1 = "xpto"
@@ -197,11 +196,11 @@ CODE
 SKIP: {
     skip 'broken on windows', 1 if ($MSWin32);
 
-   opendir IN, '.' ;
-   my @entries = readdir IN ;
-   closedir IN ;
-   my $entries = join(' ', @entries)."\n" ;
-   pir_output_is(<<'CODE', $entries, 'Test OS.readdir');
+    opendir IN, '.';
+    my @entries = readdir IN;
+    closedir IN;
+    my $entries = join( ' ', @entries ) . "\n";
+    pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
 .sub main :main
     $P1 = new .OS
     $P2 = $P1.readdir('.')
@@ -218,13 +217,14 @@ CODE
 my $lstat;
 
 SKIP: {
-  skip 'lstat not available on Win 32 yet', 1 if $MSWin32;
+    skip 'lstat not available on Win 32 yet', 1 if $MSWin32;
 
-  if ($cygwin) {
-    # Skip inode number
-    my @s = stat('xpto');
-    $stat = join("\n",$s[0],@s[2..12])."\n";
-    pir_output_is(<<'CODE', $stat, "Test OS.lstat");
+    if ($cygwin) {
+
+        # Skip inode number
+        my @s = stat('xpto');
+        $stat = join( "\n", $s[0], @s[ 2 .. 12 ] ) . "\n";
+        pir_output_is( <<'CODE', $stat, "Test OS.lstat" );
 .sub main :main
         $P1 = new .OS
         $S1 = "xpto"
@@ -247,9 +247,10 @@ done:
         end
 .end
 CODE
-  } else {
-    $lstat = join("\n",lstat("xpto"))."\n";
-  pir_output_is(<<'CODE', $lstat, "Test OS.lstat");
+    }
+    else {
+        $lstat = join( "\n", lstat("xpto") ) . "\n";
+        pir_output_is( <<'CODE', $lstat, "Test OS.lstat" );
 .sub main :main
         $P1 = new .OS
         $S1 = "xpto"
@@ -267,12 +268,11 @@ done:
         end
 .end
 CODE
-  }
+    }
 }
 
-
 # Test remove on a file
-pir_output_is(<<'CODE', <<"OUT", "Test rm call in a file");
+pir_output_is( <<'CODE', <<"OUT", "Test rm call in a file" );
 .sub main :main
         $P1 = new .OS
 
@@ -287,14 +287,14 @@ CODE
 ok
 OUT
 
-ok(!-f $xpto, "Test that rm removed file");
-rmdir $xpto if -f $xpto; # this way next test doesn't fail if this one does
+ok( !-f $xpto, "Test that rm removed file" );
+rmdir $xpto if -f $xpto;    # this way next test doesn't fail if this one does
 
 # Test symlink
 SKIP: {
-  skip "Symlinks not available under Windows", 2 if $MSWin32;
+    skip "Symlinks not available under Windows", 2 if $MSWin32;
 
-  pir_output_is(<<'CODE', <<"OUT", "Test symlink");
+    pir_output_is( <<'CODE', <<"OUT", "Test symlink" );
 .sub main :main
         $P1 = new .OS
 
@@ -310,16 +310,15 @@ CODE
 ok
 OUT
 
-  ok(-l "xpto", "symlink was really created");
-  unlink "xpto" if -f "xpto"
+    ok( -l "xpto", "symlink was really created" );
+    unlink "xpto" if -f "xpto";
 }
-
 
 # Test link
 SKIP: {
-  skip "Parrot link not implemented for Windows, yet", 2 if $MSWin32;
+    skip "Parrot link not implemented for Windows, yet", 2 if $MSWin32;
 
-  pir_output_is(<<'CODE', <<"OUT", "Test link");
+    pir_output_is( <<'CODE', <<"OUT", "Test link" );
 .sub main :main
         $P1 = new .OS
 
@@ -335,9 +334,9 @@ CODE
 ok
 OUT
 
-  my $nl = [ stat("MANIFEST") ] -> [ 3 ];
-  ok( $nl > 1, "hard link was really created");
-  unlink "xpto" if -f "xpto"
+    my $nl = [ stat("MANIFEST") ]->[3];
+    ok( $nl > 1, "hard link was really created" );
+    unlink "xpto" if -f "xpto";
 }
 
 # Local Variables:

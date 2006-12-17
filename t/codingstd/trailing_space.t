@@ -55,15 +55,18 @@ foreach my $file (@files) {
         $buf = <$fh>;
     }
 
-    if ($buf =~ m{.?[ \t]+$}m) {
+    if ( $buf =~ m{.?[ \t]+$}m ) {
         push @failed_files, $path;
     }
 }
 
 # check the file
 ok( !scalar(@failed_files), 'No trailing spaces or tabs' )
-    or diag( join $/ => "Trailing space or tab char found in " .
-        scalar @failed_files .  " files:", @failed_files );
+    or diag(
+    join
+        $/ => "Trailing space or tab char found in " . scalar @failed_files . " files:",
+    @failed_files
+    );
 
 # Local Variables:
 #   mode: cperl

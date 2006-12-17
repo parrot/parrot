@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 12;
 use Parrot::Test::PGE;
 
-
 =head1 NAME
 
 t/p6regex/text_brk.t - PGE::Text::bracketed tests
@@ -24,10 +23,9 @@ These tests examine the ability of PGE to match text with brackets in it.
 
 =cut
 
-
 ## First, test direct calls to PGE::Text::bracketed
 ##
-pir_output_is(<<'CODE', <<'OUT', "bracketed");
+pir_output_is( <<'CODE', <<'OUT', "bracketed" );
 .sub main :main
     .local pmc bracketed
 
@@ -86,23 +84,22 @@ OUT
 
 ## Now, test calls as subrules
 ##
-my $PTB = "^<PGE::Text::bracketed>\$"; 
-p6rule_is  ("{ nested { and } okay, () and <> pairs okay }", $PTB);
-p6rule_is  ("{ nested { and } okay, () <>, escaped \\}'s okay }", $PTB);
-p6rule_isnt("{ unmatched nested { not okay }", $PTB);
-p6rule_isnt("{ unmatched nested ( not okay }", $PTB);
+my $PTB = "^<PGE::Text::bracketed>\$";
+p6rule_is( "{ nested { and } okay, () and <> pairs okay }",      $PTB );
+p6rule_is( "{ nested { and } okay, () <>, escaped \\}'s okay }", $PTB );
+p6rule_isnt( "{ unmatched nested { not okay }", $PTB );
+p6rule_isnt( "{ unmatched nested ( not okay }", $PTB );
 
 ## parameterized with {}
 $PTB = "^<PGE::Text::bracketed: {}>";
-p6rule_is  ("{ nested { } okay, unbalanced (, <, escaped \\} okay}", $PTB);
-p6rule_isnt("{ unmatched nested { not okay }", $PTB);
-p6rule_isnt("{ unmatched nested { not okay, nor ( and < }", $PTB);
+p6rule_is( "{ nested { } okay, unbalanced (, <, escaped \\} okay}", $PTB );
+p6rule_isnt( "{ unmatched nested { not okay }",              $PTB );
+p6rule_isnt( "{ unmatched nested { not okay, nor ( and < }", $PTB );
 
 ## parameterized with {}[]" (nested and quoted)
 $PTB = '^<PGE::Text::bracketed: {}[]"`>';
-p6rule_isnt('{ unbalanced nested [ with } and ] not okay', $PTB);
-p6rule_is  ('{ balanced nested [ with ] and ( is } okay', $PTB);
-p6rule_is  ('{ a quoted "}" unbalanced right bracket} okay', $PTB);
-p6rule_is  ('{ quoted "}" unbalanced quotes (`}}}"""}}}}`)} okay', $PTB);
-
+p6rule_isnt( '{ unbalanced nested [ with } and ] not okay', $PTB );
+p6rule_is( '{ balanced nested [ with ] and ( is } okay',          $PTB );
+p6rule_is( '{ a quoted "}" unbalanced right bracket} okay',       $PTB );
+p6rule_is( '{ quoted "}" unbalanced quotes (`}}}"""}}}}`)} okay', $PTB );
 

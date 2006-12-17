@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test tests => 9;
 use Parrot::Config;
 
-
 =head1 NAME
 
 t/dynpmc/foo.t - Test for a very simple dynamic PMC
@@ -24,8 +23,7 @@ Tests the Foo PMC.
 
 =cut
 
-
-pir_output_is(<< 'CODE', << 'OUTPUT', "get_integer");
+pir_output_is( << 'CODE', << 'OUTPUT', "get_integer" );
 
 .sub main :main
     loadlib P1, "foo"
@@ -40,7 +38,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib with relative pathname, no ext");
+pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname, no ext" );
 .sub main :main
     ## load a relative pathname without the extension.  loadlib will convert the
     ## '/' characters to '\\' on windows.
@@ -58,7 +56,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib with absolute pathname, no ext");
+pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname, no ext" );
 .sub main :main
     ## get cwd in $S0.
     .include "iglobals.pasm"
@@ -83,7 +81,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib with relative pathname & ext");
+pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname & ext" );
 .sub main :main
     ## get load_ext in $S0.
     .include "iglobals.pasm"
@@ -106,7 +104,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "loadlib with absolute pathname & ext");
+pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname & ext" );
 .sub main :main
     ## get cwd in $S0, load_ext in $S1.
     .include "iglobals.pasm"
@@ -133,9 +131,10 @@ CODE
 42
 OUTPUT
 
-SKIP: { skip("No BigInt Lib configured", 1) if !$PConfig{gmp};
+SKIP: {
+    skip( "No BigInt Lib configured", 1 ) if !$PConfig{gmp};
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "inherited add");
+    pir_output_is( << 'CODE', << 'OUTPUT', "inherited add" );
 .sub _main :main
     .local pmc d, l, r
     $P0 = loadlib "foo"
@@ -160,7 +159,7 @@ OUTPUT
 
 }
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Foo subclass isa Integer");
+pir_output_is( <<'CODE', <<'OUTPUT', "Foo subclass isa Integer" );
 .sub main :main
     .local pmc F, f, d, r
     loadlib F, "foo"
@@ -177,7 +176,7 @@ CODE
 144
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', ".HLL 1");
+pir_output_is( << 'CODE', << 'OUTPUT', ".HLL 1" );
 # load our Foo test (pseudo) language
 # it defines one PMC type "Foo"
 .HLL "Fool", "foo"
@@ -191,7 +190,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', ".HLL 2");
+pir_output_is( << 'CODE', << 'OUTPUT', ".HLL 2" );
 .HLL "Fool", "foo"
 .sub main :main
     new $P1, .Foo       # load by index

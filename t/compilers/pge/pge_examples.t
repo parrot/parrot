@@ -10,7 +10,6 @@ use Test::More;
 use Parrot::Test tests => 2;
 use Parrot::Test::PGE;
 
-
 =head1 NAME
 
 t/library/pge_examples.t - Parrot Grammar Engine tests of examples
@@ -21,9 +20,8 @@ t/library/pge_examples.t - Parrot Grammar Engine tests of examples
 
 =cut
 
-
-# 1 
-pir_output_is(<<'CODE', <<'OUT', "This made Parrot m4 fail");
+# 1
+pir_output_is( <<'CODE', <<'OUT', "This made Parrot m4 fail" );
 
 .sub 'test' :main
   load_bytecode "PGE.pbc"
@@ -53,9 +51,8 @@ ok1
 ok2
 OUT
 
-
-# 2 
-pir_output_is(<<'CODE', <<'OUT', "parse FASTA");
+# 2
+pir_output_is( <<'CODE', <<'OUT', "parse FASTA" );
 
 # Grok fasta files, which usually contain DNA, RNA or protein sequences.
 # http://en.wikipedia.org/wiki/FASTA_format
@@ -119,5 +116,4 @@ IENY
 >poly_a teasing the parser with DNA
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 OUT
-
 

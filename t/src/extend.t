@@ -10,7 +10,7 @@ use Test::More;
 use Parrot::Test;
 use Parrot::Config;
 
-plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : (tests => 15);
+plan $^O =~ m/MSWin32/ ? ( skip_all => 'broken on win32' ) : ( tests => 15 );
 
 =head1 NAME
 
@@ -26,8 +26,7 @@ Tests the extension API.
 
 =cut
 
-
-c_output_is(<<'CODE', <<'OUTPUT', "set/get_intreg");
+c_output_is( <<'CODE', <<'OUTPUT', "set/get_intreg" );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -58,7 +57,7 @@ CODE
 42
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "set/get_numreg");
+c_output_is( <<'CODE', <<'OUTPUT', "set/get_numreg" );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -90,7 +89,7 @@ CODE
 2.5
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "Parrot_new_string");
+c_output_is( <<'CODE', <<'OUTPUT', "Parrot_new_string" );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -116,7 +115,7 @@ CODE
 Test
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "set/get_strreg");
+c_output_is( <<'CODE', <<'OUTPUT', "set/get_strreg" );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -146,7 +145,7 @@ CODE
 Test
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "PMC_set/get_intval");
+c_output_is( <<'CODE', <<'OUTPUT', "PMC_set/get_intval" );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -178,8 +177,7 @@ CODE
 101010
 OUTPUT
 
-
-c_output_is(<<'CODE', <<'OUTPUT', "PMC_set/get_intval_intkey");
+c_output_is( <<'CODE', <<'OUTPUT', "PMC_set/get_intval_intkey" );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
@@ -219,7 +217,7 @@ CODE
 12345
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "set/get_pmcreg");
+c_output_is( <<'CODE', <<'OUTPUT', "set/get_pmcreg" );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -255,7 +253,7 @@ CODE
 -123
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "PMC_set/get_numval");
+c_output_is( <<'CODE', <<'OUTPUT', "PMC_set/get_numval" );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -288,7 +286,7 @@ CODE
 3.1415927
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "PMC_set/get_string");
+c_output_is( <<'CODE', <<'OUTPUT', "PMC_set/get_string" );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -321,7 +319,7 @@ CODE
 Pumpking
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "PMC_set/get_cstring");
+c_output_is( <<'CODE', <<'OUTPUT', "PMC_set/get_cstring" );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -355,7 +353,7 @@ CODE
 Wibble
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "PMC_set/get_cstringn");
+c_output_is( <<'CODE', <<'OUTPUT', "PMC_set/get_cstringn" );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -394,7 +392,7 @@ Wibble
 6
 OUTPUT
 
-my $temp = 'temp';;
+my $temp = 'temp';
 open my $S, '>', "$temp.pasm" or die "Can't write $temp.pasm";
 print $S <<'EOF';
   .pcc_sub _sub1:
@@ -410,10 +408,11 @@ print $S <<'EOF';
   returncc
 EOF
 close $S;
+
 # compile to pbc
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pasm");
 
-c_output_is(<<'CODE', <<'OUTPUT', "call a parrot sub");
+c_output_is( <<'CODE', <<'OUTPUT', "call a parrot sub" );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
@@ -482,10 +481,11 @@ print $S <<'EOF';
   returncc
 EOF
 close $S;
+
 # compile to pbc
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pasm");
 
-c_output_is(<<'CODE', <<'OUTPUT', "call a parrot sub, catch exception");
+c_output_is( <<'CODE', <<'OUTPUT', "call a parrot sub, catch exception" );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
@@ -562,10 +562,11 @@ print $S <<'EOF';
 .end
 EOF
 close $S;
+
 # compile to pbc
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pir");
 
-c_output_is(<<'CODE', <<'OUTPUT', "eval code through a parrot sub - #39669");
+c_output_is( <<'CODE', <<'OUTPUT', "eval code through a parrot sub - #39669" );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
@@ -601,7 +602,7 @@ CODE
 Hello from foo!
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "compile string in a fresh interp - #39986");
+c_output_is( <<'CODE', <<'OUTPUT', "compile string in a fresh interp - #39986" );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>

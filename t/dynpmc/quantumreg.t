@@ -9,7 +9,6 @@ use Test::More;
 use Parrot::Test;
 use Parrot::Config;
 
-
 =head1 NAME
 
 t/dynpmc/quantumreg.t - test the QuantumReg PMC 
@@ -24,16 +23,14 @@ Tests the C<QuantumReg> PMC.
 
 =cut
 
-
 # There is no config probe for libquantum yet, please enable manually
 # if ( 1 ) {
-if ($PConfig{has_quantum}) {
+if ( $PConfig{has_quantum} ) {
     plan tests => 3;
 }
 else {
     plan skip_all => "No quantum library available";
 }
-
 
 # PIR fragment for setting up a GDBM Hash
 my $new_reg_1 = << 'CODE';
@@ -46,8 +43,7 @@ my $new_reg_1 = << 'CODE';
     reg_1 = new quantumreg_type
 CODE
 
-
-pir_output_is($new_reg_1 . << 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( $new_reg_1 . << 'CODE', << 'OUTPUT', "check whether interface is done" );
     unless quantumreg_type goto NOT_FOUND
     print "Found QuantumReq\n"
     goto CONTINUE
@@ -60,7 +56,7 @@ CODE
 Found QuantumReq
 OUTPUT
 
-pir_output_is($new_reg_1 . << 'CODE', << 'OUTPUT', "typeof");
+pir_output_is( $new_reg_1 . << 'CODE', << 'OUTPUT', "typeof" );
 
     .local string type
     type = typeof reg_1
@@ -71,8 +67,7 @@ CODE
 QuantumReg
 OUTPUT
 
-
-pir_output_is($new_reg_1 . << 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( $new_reg_1 . << 'CODE', << 'OUTPUT', "check whether interface is done" );
     .local int bool1
     bool1 = does reg_1, "scalar"
     print bool1

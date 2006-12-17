@@ -23,8 +23,7 @@ Tests the Exception_Handler PMC.
 
 =cut
 
-
-pir_output_is(<<'CODE', <<'OUT', 'new');
+pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     new P0, .Exception_Handler
     print "ok 1\n"
@@ -32,8 +31,6 @@ pir_output_is(<<'CODE', <<'OUT', 'new');
 CODE
 ok 1
 OUT
-
-
 
 # Local Variables:
 #   mode: cperl

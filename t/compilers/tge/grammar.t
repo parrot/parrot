@@ -25,7 +25,7 @@ tree of the specified type.
 
 =cut
 
-pir_output_is(<<'CODE', <<'OUT', 'test compiling anonymous and named grammars');
+pir_output_is( <<'CODE', <<'OUT', 'test compiling anonymous and named grammars' );
 
 .sub _main :main
     load_bytecode 'TGE.pbc'
@@ -64,7 +64,7 @@ TreeMin
 TreeMin
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar');
+pir_output_is( <<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar' );
 
 .sub _main :main
     .param pmc argv
@@ -264,11 +264,11 @@ before transform, the value of the right-most leaf is: 9
 after transform, the value of the right-most leaf is: 1
 OUT
 
-
 TODO: {
-local $TODO = "unresolved bug";
+    local $TODO = "unresolved bug";
 
-pir_output_is(<<'CODE', <<'OUT', 'two rules of the same name can apply to the same node, when called with a different dummy type');
+    pir_output_is(
+        <<'CODE', <<'OUT', 'two rules of the same name can apply to the same node, when called with a different dummy type' );
 
 .sub _main :main
     load_bytecode 'TGE.pbc'
@@ -321,6 +321,4 @@ OUT
 Allison Randal <allison@perl.org>
 
 =cut
-
-
 

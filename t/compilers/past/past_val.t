@@ -5,7 +5,7 @@ use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 2;
 
-pir_output_is(<<'CODE', <<'OUT', 'set attributes via method');
+pir_output_is( <<'CODE', <<'OUT', 'set attributes via method' );
 .sub _main
     load_bytecode 'PAST.pbc'
     .local pmc node
@@ -30,7 +30,7 @@ foo
 bar
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'dump node structure in visual format');
+pir_output_is( <<'CODE', <<'OUT', 'dump node structure in visual format' );
 .sub _main
     load_bytecode 'PAST.pbc'
     .local pmc node

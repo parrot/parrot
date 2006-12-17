@@ -22,7 +22,7 @@ Tests the C<Coroutine> PMC.
 
 =cut
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Coroutine 1");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine 1" );
 .include "interpinfo.pasm"
 .pcc_sub _main:
     .const .Sub P0 = "_coro"
@@ -49,7 +49,7 @@ back 0
 done
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example");
+pir_output_is( <<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example" );
 
 .sub __main__
     .local object return
@@ -106,7 +106,7 @@ CODE
 10 0
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in main");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in main" );
 .include "interpinfo.pasm"
 _main:
     .const .Sub P0 = "_coro"
@@ -145,7 +145,7 @@ back 1
 catch main
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro" );
 .include "interpinfo.pasm"
 _main:
     .const .Sub P0 = "_coro"
@@ -184,7 +184,7 @@ back 1
 catch coro
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro no handler");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro no handler" );
 .include "interpinfo.pasm"
 _main:
     .const .Sub P0 = "_coro"
@@ -220,7 +220,7 @@ back 1
 catch main
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "Coroutine - exception in coro rethrow");
+pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro rethrow" );
 .include "interpinfo.pasm"
 _main:
     .const .Sub P0 = "_coro"
@@ -261,8 +261,7 @@ catch coro
 catch main
 OUTPUT
 
-
-pir_output_is(<<'CODE', 'Coroutine', "Coro new - type");
+pir_output_is( <<'CODE', 'Coroutine', "Coro new - type" );
 
 .sub main :main
     .local pmc c
@@ -281,7 +280,7 @@ pir_output_is(<<'CODE', 'Coroutine', "Coro new - type");
 .end
 CODE
 
-pir_output_is(<<'CODE', '01234', "Coro new - yield");
+pir_output_is( <<'CODE', '01234', "Coro new - yield" );
 
 .sub main :main
     .local pmc c
@@ -308,7 +307,8 @@ ex:
 .end
 CODE
 
-pir_output_like(<<'CODE', <<'OUTPUT', "Call an exited coroutine", todo => 'goes one iteration too far.');
+pir_output_like(
+    <<'CODE', <<'OUTPUT', "Call an exited coroutine", todo => 'goes one iteration too far.' );
 .sub main :main
     .local pmc c
     c = global "coro"
@@ -330,7 +330,7 @@ CODE
 /\A01234Cannot resume dead coroutine/
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
@@ -349,7 +349,7 @@ CODE
 0
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "re-entering coro from another sub");
+pir_output_is( <<'CODE', <<'OUTPUT', "re-entering coro from another sub" );
 
 .sub main :main
     .local int z
@@ -392,8 +392,6 @@ yield #3
 yield #4
 yield #5
 OUTPUT
-
-
 
 # Local Variables:
 #   mode: cperl

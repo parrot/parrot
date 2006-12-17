@@ -9,7 +9,6 @@ use Parrot::Test;
 use Parrot::Op;
 use Parrot::OpLib::core;
 
-
 =head1 NAME
 
 t/op/01-parse_ops.t - Parse core opcodes
@@ -24,7 +23,6 @@ Tests that all parrot opcodes are parsed properly.
 
 =cut
 
-
 my $object_map = {
     i   => q<I0>,
     ic  => q<42>,
@@ -36,17 +34,15 @@ my $object_map = {
     n   => q<N0>,
     nc  => q<13.013>,
     p   => q<P0>,
-    pc  => undef,       ## TODO: figure out how to test this type
+    pc  => undef,                  ## TODO: figure out how to test this type
     s   => q<S0>,
     sc  => q<'foo'>,
 };
 
-
 my %cmds;
 
 ## extract the register types from each opcode
-for my $op ( @$Parrot::OpLib::core::ops )
-{
+for my $op (@$Parrot::OpLib::core::ops) {
     my @regtypes = $op->arg_types;
 
     ## for now, avoid opcodes with regtypes i don't know how to represent
@@ -59,17 +55,16 @@ for my $op ( @$Parrot::OpLib::core::ops )
     my $args = join ', ' => map $$object_map{$_}, @regtypes;
 
     ## store the test commands
-    $cmds{$basename}{$basename . ' ' . $args}++;
-    $cmds{$basename}{$op->full_name . ' ' . $args}++;
+    $cmds{$basename}{ $basename . ' ' . $args }++;
+    $cmds{$basename}{ $op->full_name . ' ' . $args }++;
 }
 
 plan tests => scalar keys %cmds;
 
-for my $cmd ( sort keys %cmds )
-{
+for my $cmd ( sort keys %cmds ) {
     pasm_output_like(
         ## retrieve the test commands, and trick imcc to parse only
-        join( $/ => 'end', sort(keys %{ $cmds{$cmd} }), '' ),
+        join( $/ => 'end', sort( keys %{ $cmds{$cmd} } ), '' ),
         qr/^(?!error:imcc:syntax error,)/,
         "parsing: $cmd",
     );

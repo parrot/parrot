@@ -8,7 +8,6 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 23;
 
-
 =head1 NAME
 
 t/op/basic.t - Basic Ops
@@ -23,54 +22,53 @@ Tests basic string and branching operations.
 
 =cut
 
-
 # It would be very embarrassing if these didnt work...
-pasm_output_is(<<'CODE', '', "noop, end");
+pasm_output_is( <<'CODE', '', "noop, end" );
         noop
         end
 CODE
 
-pasm_output_is(<<'CODE', '1', "print 1");
+pasm_output_is( <<'CODE', '1', "print 1" );
         print   1
         end
 CODE
 
-pasm_output_is(<<'CODE', 'Parrot flies', "print string");
+pasm_output_is( <<'CODE', 'Parrot flies', "print string" );
         print 'Parrot flies'
         end
 CODE
 
-pasm_output_is(<<'CODE', 'Parrot flies', "print double-quoted string");
+pasm_output_is( <<'CODE', 'Parrot flies', "print double-quoted string" );
        print "Parrot flies"
        end
 CODE
 
-pasm_output_is(<<'CODE', "Parrot\tflies", "print double-quoted string, tabs");
+pasm_output_is( <<'CODE', "Parrot\tflies", "print double-quoted string, tabs" );
        print "Parrot\tflies"
        end
 CODE
 
-pasm_output_is(<<'CODE', q('Parrot' flies), "print double-quoted string, nested single");
+pasm_output_is( <<'CODE', q('Parrot' flies), "print double-quoted string, nested single" );
        print "'Parrot' flies"
        end
 CODE
 
-pasm_output_is(<<'CODE', q("Parrot" flies), "print single-quoted string, nested double");
+pasm_output_is( <<'CODE', q("Parrot" flies), "print single-quoted string, nested double" );
        print '"Parrot" flies'
        end
 CODE
 
-pasm_output_is(<<'CODE', q(Parrot flies), "print string with embedded hex escape");
+pasm_output_is( <<'CODE', q(Parrot flies), "print string with embedded hex escape" );
        print "Parrot\x20flies"
        end
 CODE
 
-pasm_output_is(<<'CODE', q(Parrot flies), "escaped non-special");
+pasm_output_is( <<'CODE', q(Parrot flies), "escaped non-special" );
        print "Parrot fl\ies"
        end
 CODE
 
-pasm_output_is(<<'CODE', <<OUTPUT, "print string with embedded newline");
+pasm_output_is( <<'CODE', <<OUTPUT, "print string with embedded newline" );
        print "Parrot flies\n"
        end
 CODE
@@ -86,7 +84,6 @@ HERE:
         end
 CODE
 
-
 pasm_output_is( <<'CODE', '42', "branch_ic (backward)" );
         set     I4, 42
         branch  one
@@ -100,8 +97,7 @@ three:
         end
 CODE
 
-
-pasm_output_is(<<'CODE', <<'OUTPUT', "bsr_i");
+pasm_output_is( <<'CODE', <<'OUTPUT', "bsr_i" );
         print   "start\n"
 
         bsr     LAB1
@@ -117,7 +113,7 @@ lab 1
 done
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "set_addr");
+pasm_output_is( <<'CODE', <<'OUTPUT', "set_addr" );
        set_addr I1, FOO
        jump I1
        print "Jump failed\n"
@@ -129,7 +125,7 @@ CODE
 Jump succeeded
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "multiple labels");
+pasm_output_is( <<'CODE', <<'OUTPUT', "multiple labels" );
      if 0,FOO
      if 1,BAR
      print "not "
@@ -141,13 +137,13 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is(<<'CODE', 32, "Predeclared opcodes");
+pasm_output_is( <<'CODE', 32, "Predeclared opcodes" );
      set_i_ic I0,32
      print I0
      end
 CODE
 
-pir_output_is(<<'CODE', <<'OUTPUT', "pir syntax with marker - is");
+pir_output_is( <<'CODE', <<'OUTPUT', "pir syntax with marker - is" );
 
 .sub _main
      .const string OK = "ok\n"
@@ -159,7 +155,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_isnt(<<'CODE', <<'OUTPUT', "pir syntax with marker - isnt");
+pir_output_isnt( <<'CODE', <<'OUTPUT', "pir syntax with marker - isnt" );
 
 .sub _main
      .const string OK = "ok\n"
@@ -171,7 +167,7 @@ CODE
 parrot
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', "pir syntax with marker - like");
+pir_output_like( <<'CODE', <<'OUTPUT', "pir syntax with marker - like" );
 
 .sub _main
      .const string OK = "ok\n"
@@ -183,7 +179,7 @@ CODE
 /^\w\w\s+$/
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "pir syntax with function - is");
+pir_output_is( <<'CODE', <<'OUTPUT', "pir syntax with function - is" );
 .sub _main
      .const string OK = "ok\n"
      print OK
@@ -194,7 +190,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_isnt(<<'CODE', <<'OUTPUT', "pir syntax with function - isnt");
+pir_output_isnt( <<'CODE', <<'OUTPUT', "pir syntax with function - isnt" );
 .sub _main
      .const string OK = "ok\n"
      print OK
@@ -205,7 +201,7 @@ CODE
 nada niete
 OUTPUT
 
-pir_output_like(<<'CODE', <<'OUTPUT', "pir syntax with function - like");
+pir_output_like( <<'CODE', <<'OUTPUT', "pir syntax with function - like" );
 .sub _main
      .const string OK = "ok 1\n"
      print OK
@@ -222,12 +218,11 @@ my $CODE = '
     end
 .end
 
-#.namespace'; # no \n at end of file
+#.namespace';    # no \n at end of file
 
-pir_output_like( $CODE, <<'OUTPUT', "end of line handling");
+pir_output_like( $CODE, <<'OUTPUT', "end of line handling" );
 /unexpected/
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

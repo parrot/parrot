@@ -8,7 +8,6 @@ use lib qw( t . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 15;
 
-
 =head1 NAME
 
 t/library/getopt_obj.t - testing the module Getopt/Obj.pir
@@ -24,9 +23,8 @@ module F<runtime/parrot/library/Getopt/Obj.pir>.
 
 =cut
 
-
 # 1
-pir_output_is(<<'CODE', <<'OUT', "basic long options");
+pir_output_is( <<'CODE', <<'OUT', "basic long options" );
 
 .sub main :main 
         .local pmc argv
@@ -86,7 +84,7 @@ baz is 1
 OUT
 
 # 2
-pir_output_is(<<'CODE', <<'OUT', "basic short options");
+pir_output_is( <<'CODE', <<'OUT', "basic short options" );
 .sub main :main 
         .local pmc argv
         argv = new .ResizablePMCArray
@@ -134,7 +132,7 @@ c is 1
 OUT
 
 # 3
-pir_output_is(<<'CODE', <<'OUT', "simple array");
+pir_output_is( <<'CODE', <<'OUT', "simple array" );
 .sub main :main 
         .local pmc argv
         argv = new .ResizablePMCArray
@@ -168,7 +166,7 @@ CODE
 OUT
 
 # 4
-pir_output_is(<<'CODE', <<'OUT', "mixing long and short with array");
+pir_output_is( <<'CODE', <<'OUT', "mixing long and short with array" );
 .sub main :main 
         .local pmc argv
         argv = new .ResizablePMCArray
@@ -203,7 +201,7 @@ CODE
 OUT
 
 # 5
-pir_output_is(<<'CODE', <<'OUT', "hash");
+pir_output_is( <<'CODE', <<'OUT', "hash" );
 .sub main :main 
         .local pmc argv
         argv = new .ResizablePMCArray
@@ -245,7 +243,7 @@ foobar is 1
 OUT
 
 # 6
-pir_output_is(<<'CODE', <<'OUT', "bundling short options");
+pir_output_is( <<'CODE', <<'OUT', "bundling short options" );
 .sub main :main 
         .local pmc argv
         argv = new .ResizablePMCArray
@@ -287,7 +285,7 @@ c is 1
 OUT
 
 # 7
-pir_output_is(<<'CODE', <<'OUT', "ignored options");
+pir_output_is( <<'CODE', <<'OUT', "ignored options" );
 .sub main :main 
         .local pmc argv
         argv = new .ResizablePMCArray
@@ -321,7 +319,7 @@ argv[0] is --ignore
 OUT
 
 # 8
-pir_output_is(<<'CODE', <<'OUT', "double dash stop");
+pir_output_is( <<'CODE', <<'OUT', "double dash stop" );
 .sub main :main 
         .local pmc argv
         argv = new .ResizablePMCArray
@@ -364,7 +362,7 @@ argv[0] is --bar
 OUT
 
 # 9
-pir_output_is(<<'CODE', <<'OUT', "notOptStop");
+pir_output_is( <<'CODE', <<'OUT', "notOptStop" );
 .sub main :main 
         .local pmc argv
         argv = new .ResizablePMCArray
@@ -413,7 +411,7 @@ argv[1] is --bar
 OUT
 
 # 10
-pir_output_is(<<'CODE', <<'OUT', "optarg");
+pir_output_is( <<'CODE', <<'OUT', "optarg" );
 .sub main :main 
         .local pmc argv
         argv = new .ResizablePMCArray
@@ -466,7 +464,7 @@ b is bar
 OUT
 
 # 11
-pir_output_is(<<'CODE', <<'OUT', "pass through");
+pir_output_is( <<'CODE', <<'OUT', "pass through" );
 .sub main :main 
         .local pmc argv
         argv = new .ResizablePMCArray
@@ -515,7 +513,7 @@ argv[1] is bar
 OUT
 
 # 12
-pir_output_is(<<'CODE', <<'OUT', "lone dash");
+pir_output_is( <<'CODE', <<'OUT', "lone dash" );
 .sub main :main 
         .local pmc argv
         argv = new .ResizablePMCArray
@@ -557,7 +555,7 @@ argv[0] is -
 OUT
 
 # 13
-pir_output_is(<<'CODE', <<'OUT', "push interface");
+pir_output_is( <<'CODE', <<'OUT', "push interface" );
 .sub main :main 
         .local pmc argv
         argv = new .ResizablePMCArray
@@ -654,7 +652,7 @@ argv[0] is text
 OUT
 
 # 14
-pir_output_like(<<'CODE', <<'OUT', "missing spec");
+pir_output_like( <<'CODE', <<'OUT', "missing spec" );
 .sub main :main 
         .local pmc argv
         argv = new .ResizablePMCArray
@@ -677,7 +675,7 @@ CODE
 OUT
 
 # 15
-pir_output_like(<<'CODE', <<'OUT', "missing argument");
+pir_output_like( <<'CODE', <<'OUT', "missing argument" );
 .sub main :main 
         .local pmc argv
         argv = new .ResizablePMCArray
@@ -702,7 +700,6 @@ CODE
 /Missing a required argument for option 'bar'/
 OUT
 
-
 =head1 AUTHOR
 
 Joshua Isom - C<loneowl@ritalin.shout.net>
@@ -712,5 +709,4 @@ Joshua Isom - C<loneowl@ritalin.shout.net>
 F<runtime/parrot/library/Getopt/Obj.pir>
 
 =cut
-
 

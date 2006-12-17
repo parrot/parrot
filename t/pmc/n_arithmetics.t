@@ -26,7 +26,7 @@ various combinations of Parrot integer and number types.
 ###
 ### Operations on a single INTVAL
 ###
-pir_output_is(<<'CODE', <<OUTPUT, "take the negative of an Integer");
+pir_output_is( <<'CODE', <<OUTPUT, "take the negative of an Integer" );
 .sub _main :main
     P0 = new Integer
     ## negate zero.
@@ -56,7 +56,7 @@ CODE
 1234567890
 OUTPUT
 
-pir_output_is(<<'CODE', <<OUTPUT, "take the absolute value of an Integer");
+pir_output_is( <<'CODE', <<OUTPUT, "take the absolute value of an Integer" );
 .sub _main :main
     P0 = new Integer
     ## find absolute zero (so to speak).
@@ -89,7 +89,7 @@ OUTPUT
 ###
 ### first arg is Integer, second arg is Integer
 ###
-pir_output_is(<<'CODE', <<OUTPUT, "add Integer to Integer");
+pir_output_is( <<'CODE', <<OUTPUT, "add Integer to Integer" );
 .sub _main :main
     P0 = new Integer
     set P0, 4000
@@ -123,7 +123,7 @@ CODE
 4011
 OUTPUT
 
-pir_output_is(<<'CODE', <<OUTPUT, "subtract Integer from Integer");
+pir_output_is( <<'CODE', <<OUTPUT, "subtract Integer from Integer" );
 .sub _main :main
     P0 = new Integer
     set P0, 4000
@@ -157,7 +157,7 @@ CODE
 3989
 OUTPUT
 
-pir_output_is(<<'CODE', <<OUTPUT, "multiply Integer with Integer");
+pir_output_is( <<'CODE', <<OUTPUT, "multiply Integer with Integer" );
 .sub _main :main
     P0 = new Integer
     set P0, 4000
@@ -186,7 +186,7 @@ CODE
 44000
 OUTPUT
 
-pir_output_is(<<'CODE', <<OUTPUT, "divide Integer by Integer");
+pir_output_is( <<'CODE', <<OUTPUT, "divide Integer by Integer" );
 .sub _main :main
     P0 = new Integer
     set P0, 4000
@@ -218,7 +218,7 @@ OUTPUT
 ###
 ### Operations on a single NUMVAL
 ###
-pir_output_is(<<'CODE', <<OUTPUT, "negate a Float");
+pir_output_is( <<'CODE', <<OUTPUT, "negate a Float" );
 .sub _main :main
     P0 = new Float
     set P0, 0
@@ -245,7 +245,7 @@ CODE
 123.457
 OUTPUT
 
-pir_output_is(<<'CODE', <<OUTPUT, "take the absolute value of a Float");
+pir_output_is( <<'CODE', <<OUTPUT, "take the absolute value of a Float" );
 .sub _main :main
     P0 = new Integer
     set P0, 0
@@ -275,7 +275,7 @@ OUTPUT
 ###
 ### FLOATVAL and INTVAL tests
 ###
-pir_output_is(<<'CODE', <<OUTPUT, "add Integer to Float");
+pir_output_is( <<'CODE', <<OUTPUT, "add Integer to Float" );
 .sub _main :main
     P10 = new Integer
     set P10, 4000
@@ -306,7 +306,7 @@ CODE
 7876.88
 OUTPUT
 
-pir_output_is(<<'CODE', <<OUTPUT, "subtract Integer from Float");
+pir_output_is( <<'CODE', <<OUTPUT, "subtract Integer from Float" );
 .sub _main :main
     P10 = new Integer
     set P10, 4000
@@ -337,7 +337,7 @@ CODE
 -8123.12
 OUTPUT
 
-pir_output_is(<<'CODE', <<OUTPUT, "multiply Float with Integer");
+pir_output_is( <<'CODE', <<OUTPUT, "multiply Float with Integer" );
 .sub _main :main
     P10 = new Integer
     set P10, 4000
@@ -368,7 +368,7 @@ CODE
 984984
 OUTPUT
 
-pir_output_is(<<'CODE', <<OUTPUT, "divide Float by Integer");
+pir_output_is( <<'CODE', <<OUTPUT, "divide Float by Integer" );
 .sub _main :main
     P10 = new Integer
     set P10, 4000
@@ -407,7 +407,7 @@ OUTPUT
 ###
 ### FLOATVAL and FLOATVAL tests
 ###
-pir_output_is(<<'CODE', <<OUTPUT, "add Float to Float");
+pir_output_is( <<'CODE', <<OUTPUT, "add Float to Float" );
 .sub _main :main
     P0 = new Float
     set P0, 4000.246
@@ -434,7 +434,7 @@ OUTPUT
 
 ## This tests n_infix_ic_p_p_nc for n_add, n_sub, n_mul, and n_div.  Note that
 ## there is no n_infix_ic_p_nc_p op; the PMC argument always comes first.
-pir_output_is(<<'CODE', <<OUTPUT, "add/sub/mul/div of Float with constants");
+pir_output_is( <<'CODE', <<OUTPUT, "add/sub/mul/div of Float with constants" );
 .sub _main :main
     P0 = new Float
     set P0, 4000.246
@@ -460,7 +460,7 @@ CODE
 590.007
 OUTPUT
 
-pir_output_is(<<'CODE', <<OUTPUT, "subtract Float from Float");
+pir_output_is( <<'CODE', <<OUTPUT, "subtract Float from Float" );
 .sub _main :main
     P0 = new Float
     set P0, 4000.246
@@ -485,7 +485,7 @@ CODE
 -4123.37
 OUTPUT
 
-pir_output_is(<<'CODE', <<OUTPUT, "multiply Float with Float");
+pir_output_is( <<'CODE', <<OUTPUT, "multiply Float with Float" );
 .sub _main :main
     P0 = new Float
     set P0, 400.0246
@@ -510,7 +510,7 @@ CODE
 -49252.2
 OUTPUT
 
-pir_output_is(<<'CODE', <<OUTPUT, "divide Float by Float");
+pir_output_is( <<'CODE', <<OUTPUT, "divide Float by Float" );
 .sub _main :main
     P0 = new Float
     set P0, 4000.246
@@ -535,7 +535,7 @@ CODE
 -32.4898
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "verify new PMC");
+pir_output_is( <<'CODE', <<'OUTPUT', "verify new PMC" );
 .sub main :main
     P0 = new Integer
     P1 = P0
@@ -553,7 +553,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', ".pragma n_operators");
+pir_output_is( <<'CODE', <<'OUTPUT', ".pragma n_operators" );
 .pragma n_operators 1
 
 .sub main :main
@@ -573,7 +573,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', ".pragma n_operators - inplace");
+pir_output_is( <<'CODE', <<'OUTPUT', ".pragma n_operators - inplace" );
 .pragma n_operators 1
 .sub main :main
     .local pmc p
@@ -586,7 +586,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', ".pragma n_operators - inplace");
 CODE
 14
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

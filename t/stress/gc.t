@@ -24,7 +24,7 @@ use Parrot::Test tests => 1;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "arraystress");
+pasm_output_is( <<'CODE', <<'OUTPUT', "arraystress" );
     print "starting\n"
     new P0, .Integer
     print "ending\n"

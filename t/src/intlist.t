@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : (tests => 4);
+plan $^O =~ m/MSWin32/ ? ( skip_all => 'broken on win32' ) : ( tests => 4 );
 
 =head1 NAME
 
@@ -24,8 +24,7 @@ Tests the various intlist_* functions.
 
 =cut
 
-
-c_output_is(<<'CODE', <<'OUTPUT', "creation");
+c_output_is( <<'CODE', <<'OUTPUT', "creation" );
     #include <stdio.h>
     #include "parrot/parrot.h"
     #include "parrot/embed.h"
@@ -52,7 +51,7 @@ CODE
 The answer is 42.
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "list aerobics");
+c_output_is( <<'CODE', <<'OUTPUT', "list aerobics" );
     #include <stdio.h>
     #include "parrot/parrot.h"
     #include "parrot/embed.h"
@@ -129,7 +128,7 @@ CODE
 I need a shower.
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "step aerobics");
+c_output_is( <<'CODE', <<'OUTPUT', "step aerobics" );
     #include <stdio.h>
     #include "parrot/parrot.h"
     #include "parrot/embed.h"
@@ -259,7 +258,7 @@ Step 6: 257
 Done.
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "yoyo");
+c_output_is( <<'CODE', <<'OUTPUT', "yoyo" );
     #include <stdio.h>
     #include "parrot/parrot.h"
     #include "parrot/embed.h"

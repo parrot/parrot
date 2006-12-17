@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan $^O =~ m/MSWin32/ ? (skip_all => 'broken on win32') : (tests => 1);
+plan $^O =~ m/MSWin32/ ? ( skip_all => 'broken on win32' ) : ( tests => 1 );
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ Tests C<Parrot_exit()> and C<Parrot_on_exit()> functions.
 
 =cut
 
-c_output_is(<<'CODE', <<'OUTPUT', "on_exit - interpreter");
+c_output_is( <<'CODE', <<'OUTPUT', "on_exit - interpreter" );
 #include <stdio.h>
 #include <parrot/parrot.h>
 #include <parrot/embed.h>

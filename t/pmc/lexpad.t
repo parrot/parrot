@@ -23,8 +23,7 @@ Tests the LexPad PMC.
 
 =cut
 
-
-pir_output_like(<<'CODE', <<'OUT', 'new');
+pir_output_like( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     new P0, .LexPad
     print "ok 1\n"
@@ -33,8 +32,6 @@ CODE
 /don't create me like this
 current instr\.:.*/
 OUT
-
-
 
 # Local Variables:
 #   mode: cperl

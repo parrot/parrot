@@ -9,7 +9,7 @@ use Test::More;
 use Parrot::Test;
 use Parrot::Config;
 
-plan $^O =~ /MSWin32/ ? (skip_all => 'Broken on Win32') : tests => 5;
+plan $^O =~ /MSWin32/ ? ( skip_all => 'Broken on Win32' ) : tests => 5;
 
 =pod
 
@@ -25,7 +25,6 @@ modified to use it, and includes several tests designed to trigger all
 cases for choice() (which in turn requires STMLog work correctly).
 
 =cut
-
 
 my $choice_test = <<'CODE';
 .sub do_choice
@@ -80,7 +79,7 @@ need_retry:
 CODE
 
 # test 1
-pir_output_is($choice_test . <<'CODE', <<'OUTPUT', "choice (one thread)");
+pir_output_is( $choice_test . <<'CODE', <<'OUTPUT', "choice (one thread)" );
 .sub main :main
     .local pmc thread_one
     .local pmc thread_two
@@ -126,9 +125,9 @@ OUTPUT
 # test 2
 
 SKIP: {
-    skip("B0rked at least on x86_64", 2) if $PConfig{cpuarch} eq 'x86_64';
+    skip( "B0rked at least on x86_64", 2 ) if $PConfig{cpuarch} eq 'x86_64';
 
-pir_output_is($choice_test . <<'CODE', <<'OUTPUT', "choice (multiple threads)");
+    pir_output_is( $choice_test . <<'CODE', <<'OUTPUT', "choice (multiple threads)" );
 .sub _wakeup_func
     .param pmc values
     .local pmc what
@@ -217,8 +216,8 @@ CODE
 ok
 OUTPUT
 
-# test 3
-pir_output_is(<<'CODE', <<'OUTPUT', "choice doesn't clobber");
+    # test 3
+    pir_output_is( <<'CODE', <<'OUTPUT', "choice doesn't clobber" );
 .sub make_clobber
     .param pmc value
     .param pmc setting
@@ -328,7 +327,7 @@ CODE
 ok
 OUTPUT
 
-} # skip x86_64
+}    # skip x86_64
 
 my $queue_test = <<'CODE';
 # attributes:
@@ -497,7 +496,7 @@ do_ret:
 CODE
 
 # test 4
-pir_output_is($queue_test . <<'CODE', <<'OUTPUT', "queue adapted for the library");
+pir_output_is( $queue_test . <<'CODE', <<'OUTPUT', "queue adapted for the library" );
 .const int MAX = 5000
 .const int SIZE = 100
 
@@ -567,7 +566,7 @@ ok
 OUTPUT
 
 # test 5
-pir_output_is($queue_test . <<'CODE', <<'OUTPUT', "queue (non-blocking; nested)");
+pir_output_is( $queue_test . <<'CODE', <<'OUTPUT', "queue (non-blocking; nested)" );
 .const int SIZE = 20 
 
 .sub _test

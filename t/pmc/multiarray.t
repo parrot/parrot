@@ -23,7 +23,7 @@ and cloning.
 
 =cut
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "multiarray creation");
+pasm_output_is( <<'CODE', <<'OUTPUT', "multiarray creation" );
     new P1, .ResizablePMCArray
     # intial size
     set P1[0], 0
@@ -44,7 +44,7 @@ CODE
 ok
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "multiarray access 2d");
+pasm_output_is( <<'CODE', <<'OUTPUT', "multiarray access 2d" );
     new P1, .ResizablePMCArray
     # intial size
     set P1[0], 0
@@ -101,7 +101,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is(<<'CODE', <<'OUTPUT', "multiarray access 3d");
+pasm_output_is( <<'CODE', <<'OUTPUT', "multiarray access 3d" );
     new P1, .ResizablePMCArray
     # initial size
     set P1[0], 0
@@ -196,7 +196,7 @@ ok 2
 ok 3
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
@@ -219,7 +219,7 @@ CODE
 0
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', 'Verify Basic Iterator support');
+pir_output_is( << 'CODE', << 'OUTPUT', 'Verify Basic Iterator support' );
   .sub test :main
      $P1 = new 'ResizablePMCArray'
 

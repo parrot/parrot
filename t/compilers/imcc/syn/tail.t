@@ -14,7 +14,7 @@ use Parrot::Test tests => 6;
 
 $ENV{TEST_PROG_ARGS} = '-Oc';
 
-pir_output_is(<<'CODE', <<'OUT', "tail call optimization, final position");
+pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
 .sub _main :main
     $P1 = new Integer
     $P1 = 20
@@ -95,7 +95,7 @@ _floor returned 2 values, 6 and 2.
 _fib_step returned 3 values, 23, 20, and 3.
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "tail call optimization, intermediate position");
+pir_output_is( <<'CODE', <<'OUT', "tail call optimization, intermediate position" );
 
 .sub _main :main
 	$P1 = new Integer
@@ -169,7 +169,7 @@ _floor returned 2 values, 6 and 2.
 _fib_step returned 3 values, 23, 20, and 3.
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "tail call optimization, implicit final return");
+pir_output_is( <<'CODE', <<'OUT', "tail call optimization, implicit final return" );
 
 .sub _main :main
 
@@ -248,7 +248,7 @@ _floor returned 2 values, 6 and 2.
 _fib_step returned 3 values, 23, 20, and 3.
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', ":flatten in .return");
+pir_output_is( <<'CODE', <<'OUT', ":flatten in .return" );
 
 .sub _main :main
 
@@ -301,7 +301,7 @@ CODE
 _fib_step returned 3 values, 23, 20, and 3.
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "new tail call syntax");
+pir_output_is( <<'CODE', <<'OUT', "new tail call syntax" );
 .sub main :main
     $S0 = foo()
     print $S0
@@ -319,7 +319,7 @@ CODE
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', "new tail method call syntax");
+pir_output_is( <<'CODE', <<'OUT', "new tail method call syntax" );
 .sub main :main
     .local pmc cl, o, n
     cl = newclass "Foo"
