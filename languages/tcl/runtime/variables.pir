@@ -220,11 +220,13 @@ set_array:
   variable = array[key]
   if null variable goto set_new_elem
   assign variable, value
-  .return(variable)
+  $P0 = clone variable
+  .return($P0)
 
 set_new_elem:
   array[key] = value
-  .return(value)
+  $P0 = clone value
+  .return($P0)
 
 cant_set_not_array:
   $S0 =  "can't set \""
@@ -240,7 +242,8 @@ scalar:
 
 create_scalar:
   __store_var(name, value)
-  .return(value)
+  $P0 = clone value
+  .return($P0)
 
 cant_set_array:
   $S0 =  "can't set \""
