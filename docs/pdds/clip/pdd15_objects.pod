@@ -145,9 +145,23 @@ delegation.
 Perl 6: Delegation support is highly flexible, even allowing a regex to match
 method names that should be delegated to a particular object. 
 
+=head2 Prototype-based OO
+
+Prototype-based OO has no classes. All objects are cloned from existing
+objects and modified. Requires lightweight singleton creation, without a
+needing separate class for every instance object. (Self, JavaScript, and
+Io are examples of prototype-based 00.)
+
 =head1 QUESTIONS
 
 Should we have a super or next opcode?
+
+=head1 NOTES
+
+=head2 Interaction with PMCs
+
+The interaction between objects and PMCs is currently underspecified.
+
 
 =head1 ABSTRACT
 
