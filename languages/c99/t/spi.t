@@ -5,7 +5,7 @@ use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 1;
 
-language_output_is('c99', <<'CODE', <<'OUT', 'simple addition test');
+language_output_is( 'c99', <<'CODE', <<'OUT', 'simple addition test' );
 /*-------------------------------------------------------------------------
  *
  * spi.h
