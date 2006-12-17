@@ -7,7 +7,7 @@ our $VERSION = '0.02';
 
 use base 'DynaLoader';
 
-Parrot::Embed->bootstrap( $VERSION );
+Parrot::Embed->bootstrap($VERSION);
 
 1;
 
