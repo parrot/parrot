@@ -5,6 +5,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use Regex;
 use Regex::Driver;
+
 # use lib "$FindBin::Bin/../../lib";
 # use Parrot::Config;
 
@@ -12,15 +13,15 @@ use Regex::Driver;
 # Can't locate object method "new" via package "Regex::CodeGen::IMCC"
 use 5.006;
 
-use File::Spec::Functions;      # In perl core only for >= 5.6.
+use File::Spec::Functions;    # In perl core only for >= 5.6.
 
 # FIXME: This is still probably unix-only, because the parrot binary
 # will have different names
-my $PARROT_EXE = catfile(catdir($FindBin::Bin, updir(), updir()), "parrot");
+my $PARROT_EXE = catfile( catdir( $FindBin::Bin, updir(), updir() ), "parrot" );
 
 sub usage {
-    my ($msg, $status) = @_;
-    $status = 1 if ! defined $status;
+    my ( $msg, $status ) = @_;
+    $status = 1 if !defined $status;
 
     print $msg . "\n" if $msg;
 
@@ -55,11 +56,11 @@ xyz
 OUTPUT:
 Match failed
 END
-  exit $status;
+    exit $status;
 }
 
-my $DEBUG = 0;
-my $compile = 0;
+my $DEBUG    = 0;
+my $compile  = 0;
 my $tree_opt = 1;
 my $list_opt = 1;
 my $language;
@@ -70,33 +71,41 @@ my $pattern;
 foreach (@ARGV) {
     if (/^(-h|--help)$/) {
         usage(0);
-    } elsif (/^(-c|--compile)$/) {
-        $compile = 1; # Compile only
-    } elsif (/--no(-?)optimize/) {
+    }
+    elsif (/^(-c|--compile)$/) {
+        $compile = 1;    # Compile only
+    }
+    elsif (/--no(-?)optimize/) {
         $tree_opt = 0;
         $list_opt = 0;
-    } elsif (/--language=(.*)/) {
+    }
+    elsif (/--language=(.*)/) {
         $language = $1;
-    } elsif (/--expr=(.*)/) {
+    }
+    elsif (/--expr=(.*)/) {
         $pattern = $1;
-    } elsif (/--optimize=(.*)/) {
+    }
+    elsif (/--optimize=(.*)/) {
         my $opts = $1;
-        $tree_opt = ($opts =~ /t/i);
-        $list_opt = ($opts =~ /l/i);
-    } elsif (/^(-d|--debug)$/) {
+        $tree_opt = ( $opts =~ /t/i );
+        $list_opt = ( $opts =~ /l/i );
+    }
+    elsif (/^(-d|--debug)$/) {
         $DEBUG = 1;
-    } elsif (! defined $testfile) {
+    }
+    elsif ( !defined $testfile ) {
         $testfile = $_;
-    } else {
+    }
+    else {
         usage "too many args!";
     }
 }
 
 usage "not enough args: testfile required"
-  if ! defined $testfile && ! defined $pattern;
+    if !defined $testfile && !defined $pattern;
 
-if (defined $testfile) {
-    open(SPEC, '<', $testfile) or die "open $testfile: $!";
+if ( defined $testfile ) {
+    open( SPEC, '<', $testfile ) or die "open $testfile: $!";
     $pattern = <SPEC>;
     chomp($pattern);
 }
@@ -109,10 +118,10 @@ my $status = 1;
 my $testCount = 1;
 $_ = <SPEC>;
 while (1) {
-    my ($input, $output);
+    my ( $input, $output );
 
-    last if ! defined $_;
-    die "INPUT: expected" if ! /^INPUT:/;
+    last                  if !defined $_;
+    die "INPUT: expected" if !/^INPUT:/;
 
     # Gather input, look for OUTPUT:
     $input = '';
@@ -122,7 +131,7 @@ while (1) {
         $input .= $_;
     }
     chomp($input);
-    die "EOF during INPUT section" if ! defined($output);
+    die "EOF during INPUT section" if !defined($output);
 
     # Gather output
     while (<SPEC>) {
@@ -130,19 +139,19 @@ while (1) {
         $output .= $_;
     }
 
-    $status &&= process($input, $output, $testCount++);
+    $status &&= process( $input, $output, $testCount++ );
 }
 
-exit ($status ? 0 : 1);
+exit( $status ? 0 : 1 );
 
 sub generate_regular_pir {
-    my ($filename, $pattern) = @_;
-    open(PIR, ">", "$filename") or die "create $filename: $!";
+    my ( $filename, $pattern ) = @_;
+    open( PIR, ">", "$filename" ) or die "create $filename: $!";
 
-    my $ctx = { };
-    my $trees = Regex::expr_to_tree($pattern, $ctx, DEBUG => $DEBUG);
+    my $ctx = {};
+    my $trees = Regex::expr_to_tree( $pattern, $ctx, DEBUG => $DEBUG );
 
-    my $driver = Regex::Driver->new('pir', emit_main => 1);
+    my $driver = Regex::Driver->new( 'pir', emit_main => 1 );
 
     print PIR <<"END";
 # Regular expression test
@@ -154,36 +163,37 @@ END
     $driver->output_header(*PIR);
 
     for my $tree (@$trees) {
-        $driver->output_rule(*PIR, '_regex', $tree, $ctx, DEBUG => $DEBUG);
+        $driver->output_rule( *PIR, '_regex', $tree, $ctx, DEBUG => $DEBUG );
     }
 
     close PIR;
 }
 
 sub generate_pbc {
-    my ($pir, $pbc) = @_;
-    my $status = system("$PARROT_EXE", "-o", $pbc, $pir);
-    if (! defined($status) || $status) {
-        die "assemble failed with status " . ($? >> 8);
+    my ( $pir, $pbc ) = @_;
+    my $status = system( "$PARROT_EXE", "-o", $pbc, $pir );
+    if ( !defined($status) || $status ) {
+        die "assemble failed with status " . ( $? >> 8 );
     }
 }
 
 sub generate_regular {
     my $pattern = shift;
-    generate_regular_pir("test_regex.pir", $pattern);
-    generate_pbc("test_regex.pir", "test.pbc");
+    generate_regular_pir( "test_regex.pir", $pattern );
+    generate_pbc( "test_regex.pir", "test.pbc" );
 }
 
 sub process {
-    my ($input, $output, $testnum) = @_;
-    open(TEST, '<', "$PARROT_EXE test.pbc '$input' |");
+    my ( $input, $output, $testnum ) = @_;
+    open( TEST, '<', "$PARROT_EXE test.pbc '$input' |" );
 
     local $/;
     my $actual_output = <TEST>;
-    if ($actual_output eq $output) {
+    if ( $actual_output eq $output ) {
         print "ok $testnum\n";
         return 1;
-    } else {
+    }
+    else {
         print "not ok $testnum\n";
         print " == Received ==\n$actual_output\n";
         print " == Expected ==\n$output\n";

@@ -5,11 +5,12 @@ use strict;
 use warnings;
 
 sub new {
-    my ($class, $language, %options) = @_;
+    my ( $class, $language, %options ) = @_;
 
-    if ($language eq 'perl5') {
+    if ( $language eq 'perl5' ) {
         $class = 'Regex::Driver::Perl5';
-    } elsif ($language eq 'pir') {
+    }
+    elsif ( $language eq 'pir' ) {
         $class = 'Regex::Driver::PIR';
     }
 
@@ -26,14 +27,13 @@ sub output_header {
 }
 
 sub output_rule {
-    my ($self, $fh, $subname, $rule, $ctx, %options) = @_;
+    my ( $self, $fh, $subname, $rule, $ctx, %options ) = @_;
 
-    my $code = Regex::tree_to_list($rule, $ctx, 'regex_done', 'regex_done',
-                                   %options);
+    my $code = Regex::tree_to_list( $rule, $ctx, 'regex_done', 'regex_done', %options );
 
-    my @asm = Regex::list_to_pasm($code, $ctx, %options);
+    my @asm = Regex::list_to_pasm( $code, $ctx, %options );
 
-    $self->output_rule_body($fh, $subname, $rule, $ctx, \@asm);
+    $self->output_rule_body( $fh, $subname, $rule, $ctx, \@asm );
 }
 
 sub output_footer {
@@ -43,12 +43,12 @@ package Regex::Driver::Perl5;
 our @ISA = qw(Regex::Driver);
 
 sub output_header {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
     print $fh "use strict;\n";
 }
 
 sub output_rule_body {
-    my ($self, $fh, $subname, $rule, $ctx, $instructions) = @_;
+    my ( $self, $fh, $subname, $rule, $ctx, $instructions ) = @_;
 
     if ($subname) {
         print $fh <<"END";
@@ -60,7 +60,7 @@ END
 }
 
 sub output_footer {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
     return 1 unless $self->{emit_main};
 
     print $fh <<'END';
@@ -109,7 +109,7 @@ package Regex::Driver::PIR;
 our @ISA = qw(Regex::Driver);
 
 sub output_header {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
     $self->SUPER::output_header($fh);
     return 1 unless $self->{emit_main};
 
@@ -170,12 +170,12 @@ END
 }
 
 sub output_rule_body {
-    my ($self, $fh, $subname, $rule, $ctx, $instructions) = @_;
-    print $fh join("\n", @$instructions), "\n";
+    my ( $self, $fh, $subname, $rule, $ctx, $instructions ) = @_;
+    print $fh join( "\n", @$instructions ), "\n";
 }
 
 sub output_footer {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
     my $subname = $self->{subname} || '_regex';
     print $fh <<"END";
