@@ -35,10 +35,6 @@ while (@ARGV) {
         $list_policies = 1;
         shift @ARGV;    # discard
     }
-    elsif ( $arg =~ /^--(\w*::\w*)\s*=>\s*{\s*(\w*)\s*=>\s*([\w\d\/\.]*)\s*}/ ) {
-        $policies{$1} = { $2 => "$3" };
-        shift @ARGV;    # discard
-    }
     elsif ( $arg =~ /^--(.*)/ ) {
         $policies{$1} = 1;
         shift @ARGV;    # discard
