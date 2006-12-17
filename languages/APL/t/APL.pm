@@ -5,14 +5,14 @@ package t::APL;
 use warnings;
 
 BEGIN {
-  eval {
-    require Test::Base;
-    import Test::Base qw/ -Base /;
-  };
-  if ($@) {
-    eval 'use Test::More skip_all => "APL tests require Test::Base.;";';
-    exit 0;
-  }
+    eval {
+        require Test::Base;
+        import Test::Base qw/ -Base /;
+    };
+    if ($@) {
+        eval 'use Test::More skip_all => "APL tests require Test::Base.;";';
+        exit 0;
+    }
 }
 
 use Parrot::Config;
@@ -37,45 +37,48 @@ our @EXPORT = qw(run_apl_is);
 # to easily see if anything new is passing.
 
 sub run_apl_is() {
-  foreach my $block (blocks) {
-    my $apl    = $block->APL;
-    my $output;
-    if (defined($block->out)) {
-      $output = $block->out;
-      if ($output)  {
-        $output .= "\n"; # XXX a slight hack
-      }
-      else {
-        $output = "0\n"; # XXX MAJOR hack - Test::Base is borkedly converting the 0 into the empty string. Why?
-      }
-    }
-    else {
-      $output = "\n"; # this lets todo tests not bother specifying an out.
-                      # XXX also gives us a way to specify a blank output,
-                      # Since we're converting an explicit blank output to 0
-    }
-    if ($output =~ m/\n\n$/smx) {
-      chomp $output;  # XXX Keep hackin' it up!
-    }
+    foreach my $block (blocks) {
+        my $apl = $block->APL;
+        my $output;
+        if ( defined( $block->out ) ) {
+            $output = $block->out;
+            if ($output) {
+                $output .= "\n";    # XXX a slight hack
+            }
+            else {
+                $output = "0\n"
+                    ; # XXX MAJOR hack - Test::Base is borkedly converting the 0 into the empty string. Why?
+            }
+        }
+        else {
+            $output = "\n";    # this lets todo tests not bother specifying an out.
+                               # XXX also gives us a way to specify a blank output,
+                               # Since we're converting an explicit blank output to 0
+        }
+        if ( $output =~ m/\n\n$/smx ) {
+            chomp $output;     # XXX Keep hackin' it up!
+        }
 
-    my $todo   = $block->todo;
-    if (defined($todo)) {
-      if (! $todo) {
-        $todo = "not implemented";
-      }
-      if ($ENV{APLDEV}) {
-        TODO: {
-          local $TODO = $todo;
-          Parrot::Test::language_output_is('APL', $apl, $output, $block->name);
+        my $todo = $block->todo;
+        if ( defined($todo) ) {
+            if ( !$todo ) {
+                $todo = "not implemented";
+            }
+            if ( $ENV{APLDEV} ) {
+            TODO: {
+                    local $TODO = $todo;
+                    Parrot::Test::language_output_is( 'APL', $apl, $output, $block->name );
+                }
+            }
+            else {
+            SKIP: {
+                    skip( "not implemented", 1 );
+                    Parrot::Test::language_output_is( 'APL', $apl, $output, $block->name );
+                }
+            }
         }
-      } else {
-        SKIP: {
-          skip("not implemented", 1);
-          Parrot::Test::language_output_is('APL', $apl, $output, $block->name);
+        else {
+            Parrot::Test::language_output_is( 'APL', $apl, $output, $block->name );
         }
-      }
-    } else {
-      Parrot::Test::language_output_is('APL', $apl, $output, $block->name);
     }
-  }
 }

@@ -18,8 +18,8 @@ $macros{DOMAIN_ERROR} = <<'END_OF_PIR';
 END_OF_PIR
 
 my %scalar = (
-    '+' => [ 'Add', '%1 = %1 + %2' ],
-        '*' => [ 'Power', << 'END_PIR' ],
+    '+' => [ 'Add',   '%1 = %1 + %2' ],
+    '*' => [ 'Power', << 'END_PIR' ],
         # XXX This is too restrictive. Need better tests
     if %1 >= 0 goto power_ok
 %% DOMAIN_ERROR %%
@@ -32,7 +32,7 @@ power_ok:
 END_PIR
 
     '\x{d7}' => [ 'Multiply', '%1 = %1 * %2' ],
-    '\x{f7}' => [ 'Divide', '%1 = %1 / %2' ],
+    '\x{f7}' => [ 'Divide',   '%1 = %1 / %2' ],
     '\u2212' => [ 'Subtract', '%1 = %1 - %2' ],
     '\u2308' => [ 'Maximum',  <<'END_PIR' ],
     if %1 > %2 goto maximum_done
@@ -46,7 +46,6 @@ END_PIR
 minimum_done:
 END_PIR
 );
-
 
 my $template = <<'END_OF_TEMPLATE';
 
@@ -723,16 +722,16 @@ END_OF_TEMPLATE
 
 # Generate all variants for scalar dyadic ops.
 my @type_pairs = (
-  [ 'Float', 'Float' ],
-  [ 'Float', 'APLVector' ], 
-  [ 'APLVector', 'Float' ], 
-  [ 'APLVector', 'APLVector' ], 
+    [ 'Float',     'Float' ],
+    [ 'Float',     'APLVector' ],
+    [ 'APLVector', 'Float' ],
+    [ 'APLVector', 'APLVector' ],
 );
 
-foreach my $operator (keys %scalar) {
-    my ($name,$code) = @ {$scalar{$operator}};
+foreach my $operator ( keys %scalar ) {
+    my ( $name, $code ) = @{ $scalar{$operator} };
     foreach my $types (@type_pairs) {
-        my ($type1, $type2) = @$types;
+        my ( $type1, $type2 ) = @$types;
 
         $template .= <<"END_PREAMBLE";
 
@@ -743,12 +742,15 @@ foreach my $operator (keys %scalar) {
     .param pmc op2
 END_PREAMBLE
 
-        if ($type1 eq "Float" && $type2 eq "Float") {
-          # scalar to scalar..
-            $template .= interpolate($code, 'op1', 'op2');
-        } elsif ($type1 eq "APLVector" && $type2 eq "APLVector") {
-          # vector to vector
-          $template .= << 'END_PIR';
+        if ( $type1 eq "Float" && $type2 eq "Float" ) {
+
+            # scalar to scalar..
+            $template .= interpolate( $code, 'op1', 'op2' );
+        }
+        elsif ( $type1 eq "APLVector" && $type2 eq "APLVector" ) {
+
+            # vector to vector
+            $template .= << 'END_PIR';
     # Verify Shapes conform.
     $I1 = op1
     $I2 = op2
@@ -775,10 +777,10 @@ END_PREAMBLE
     %% DOMAIN_ERROR %%
   got_args:
 END_PIR
-   
-     $template .= interpolate($code, '$P1', '$P2');
 
-          $template .= << 'END_PIR';
+            $template .= interpolate( $code, '$P1', '$P2' );
+
+            $template .= << 'END_PIR';
 
     push result, $P1
     goto loop
@@ -787,20 +789,23 @@ loop_done:
     .return (result)
 END_PIR
 
-        } else {
-           # Vector to Scalar
-           my ($vector, $scalar, @order);
-           if ($type1 eq 'APLVector') {
-               $vector = "op1";
-               $scalar = "op2";
-                           @order = qw/ $P1 $P2 /;
-           } else {
-               $vector = "op2";
-               $scalar = "op1";
-                           @order = qw/ $P2 $P1 /;
-           }
+        }
+        else {
 
-           $template .= << "END_PIR";
+            # Vector to Scalar
+            my ( $vector, $scalar, @order );
+            if ( $type1 eq 'APLVector' ) {
+                $vector = "op1";
+                $scalar = "op2";
+                @order  = qw/ $P1 $P2 /;
+            }
+            else {
+                $vector = "op2";
+                $scalar = "op1";
+                @order  = qw/ $P2 $P1 /;
+            }
+
+            $template .= << "END_PIR";
     # Create a result vector
     .local pmc result 
     result = new 'APLVector'
@@ -816,12 +821,12 @@ END_PIR
   got_args:
         \$P2 = clone $scalar
 END_PIR
-   
-     $template .= interpolate($code, @order);
 
-     $template .= 'push result, ' . $order[0] . "\n";
+            $template .= interpolate( $code, @order );
 
-          $template .= << 'END_PIR';
+            $template .= 'push result, ' . $order[0] . "\n";
+
+            $template .= << 'END_PIR';
     goto loop
 loop_done:
     # return the result vector
@@ -837,7 +842,7 @@ END_POSTAMBLE
 }
 
 # Substitute all macros
-foreach my $macro (keys %macros) {
+foreach my $macro ( keys %macros ) {
     $template =~ s/%% \s+ $macro \s+ %%/$macros{$macro}/gx;
 }
 
@@ -852,7 +857,7 @@ sub interpolate {
     $code =~ s/%1/$op1/g;
     $code =~ s/%2/$op2/g;
     $code .= "\n";
-    return($code);
+    return ($code);
 }
 
 __END__ 

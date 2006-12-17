@@ -9,7 +9,7 @@ use Test::More;
 
 diag("don't forget to write tests for slices");
 
-pir_output_is(<<'CODE', <<'OUT', 'load dynamic library');
+pir_output_is( <<'CODE', <<'OUT', 'load dynamic library' );
   .sub test :main
      $P0 = loadlib 'apl_group'
      if $P0 goto ok
@@ -21,7 +21,7 @@ CODE
 ok
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'instantiate PMC');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate PMC' );
   .sub test :main
      $P0 = loadlib 'apl_group'
      if $P0 goto ok
@@ -36,7 +36,7 @@ CODE
 APLVector
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'shape, 1D');
+pir_output_is( <<'CODE', <<'OUT', 'shape, 1D' );
   .sub test :main
      $P0 = loadlib 'apl_group'
      if $P0 goto ok
@@ -62,7 +62,7 @@ size:1
 dim1:4
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'reshape 1x4 to 2x2');
+pir_output_is( <<'CODE', <<'OUT', 'reshape 1x4 to 2x2' );
   .sub test :main
      $P0 = loadlib 'apl_group'
      if $P0 goto ok
@@ -104,7 +104,7 @@ OUT
 SKIP: {
     skip "not implemented", 5;
 
-pir_output_is(<<'CODE', <<'OUT', 'index 1D');
+    pir_output_is( <<'CODE', <<'OUT', 'index 1D' );
   .sub test :main
      $P0 = loadlib 'apl_group'
      if $P0 goto ok
@@ -133,7 +133,7 @@ CODE
 4
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'index 2D');
+    pir_output_is( <<'CODE', <<'OUT', 'index 2D' );
   .sub test :main
      $P0 = loadlib 'apl_group'
      if $P0 goto ok
@@ -170,7 +170,7 @@ CODE
 4
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'reshape with fewer elements');
+    pir_output_is( <<'CODE', <<'OUT', 'reshape with fewer elements' );
   .sub test :main
      $P0 = loadlib 'apl_group'
      if $P0 goto ok
@@ -206,7 +206,7 @@ CODE
 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'reshape with more elements');
+    pir_output_is( <<'CODE', <<'OUT', 'reshape with more elements' );
   .sub test :main
      $P0 = loadlib 'apl_group'
      if $P0 goto ok
@@ -244,7 +244,7 @@ CODE
 4
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', '3-dimensional');
+    pir_output_is( <<'CODE', <<'OUT', '3-dimensional' );
   .sub test :main
      $P0 = loadlib 'apl_group'
      if $P0 goto ok
@@ -300,7 +300,7 @@ OUT
 
 }
 
-pir_output_is(<<'CODE', <<'OUT', 'Iterator: 1d');
+pir_output_is( <<'CODE', <<'OUT', 'Iterator: 1d' );
   .sub test :main
      $P0 = loadlib 'apl_group'
      if $P0 goto ok
@@ -330,7 +330,7 @@ CODE
 4
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'Iterator: 2d');
+pir_output_is( <<'CODE', <<'OUT', 'Iterator: 2d' );
   .sub test :main
      $P0 = loadlib 'apl_group'
      if $P0 goto ok
