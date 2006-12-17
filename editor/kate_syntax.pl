@@ -10,12 +10,10 @@ use warnings;
 
 my $parrot = $ARGV[0];
 
-if ($parrot eq '-h') {
-    print "kate_syntax.pl\n\n",
-        "Create Kate syntax highlighting file for Parrot IMCC.\n",
+if ( $parrot eq '-h' ) {
+    print "kate_syntax.pl\n\n", "Create Kate syntax highlighting file for Parrot IMCC.\n",
         "Supply the path to your Parrot directory as the only\n",
-        "argument. The XML file will be written to the standard\n",
-        "output.\n\n";
+        "argument. The XML file will be written to the standard\n", "output.\n\n";
     exit;
 }
 
@@ -25,21 +23,19 @@ my @imcc_oplike = qw(.sym .arg prototyped non_prototyped .class
     .endclass .param inc dec new defined addr global clone saveall
     restoreall);
 my @imcc_spdirec = qw(.pcc_call .result .return .local .const .globalconst
-    end goto if unless call branch jump jsr ret invoke invokecc throw 
+    end goto if unless call branch jump jsr ret invoke invokecc throw
     rethrow die_hard .emit .eom .sub .end .pcc_begin
     .pcc_end .pcc_sub .pcc_begin_return .pcc_end_return .pcc_begin_yield
     .pcc_end_yield .loadlib .namespace .endnamespace .macro .include);
-my @pod_start = qw(head[1-6] over back item for begin end pod);
-my $pod_start_rx = join '|', @pod_start;
-my @imcc_basic_types = qw(int float string);
+my @pod_start         = qw(head[1-6] over back item for begin end pod);
+my $pod_start_rx      = join '|', @pod_start;
+my @imcc_basic_types  = qw(int float string);
 my $parrot_pmcsh_file = "include/parrot/core_pmcs.h";
-my $date = localtime(time);
-
+my $date              = localtime(time);
 
 opendir PARROT, "$parrot" or die "Supply Parrot directory as argument!";
-my @ops_files = map { "$parrot/$_"} grep /\.ops$/, readdir PARROT;
+my @ops_files = map { "$parrot/$_" } grep /\.ops$/, readdir PARROT;
 closedir PARROT;
-
 
 print <<END;
 <?xml version="1.0" encoding="UTF-8"?>
@@ -73,7 +69,7 @@ for my $ops_file (@ops_files) {
         next unless (/^(inline\s+)?op\s+([a-zA-Z]\w*)/);
         my $op = $2;
         $op =~ s/\.//g;
-        next if ($ops{$op});
+        next if ( $ops{$op} );
         print "      <item>$op</item>\n";
         $ops{$op} = 1;
     }
@@ -81,7 +77,7 @@ for my $ops_file (@ops_files) {
 
 for my $op (@imcc_oplike) {
     $op =~ s/\.//g;
-    next if ($ops{$op});
+    next if ( $ops{$op} );
     print "      <item>$op</item>\n";
     $ops{$op} = 1;
 }
@@ -95,13 +91,13 @@ END
 my %types;
 for my $type (@imcc_basic_types) {
     $type =~ s/\./\&046;/g;
-    next if ($types{$type});
+    next if ( $types{$type} );
     print "      <item>$type</item>\n";
     $types{$type} = 1;
 }
 
-open TYPES, "<", "$parrot/$parrot_pmcsh_file" or
-  die "Can't read $parrot/$parrot_pmcsh_file!";
+open TYPES, "<", "$parrot/$parrot_pmcsh_file"
+    or die "Can't read $parrot/$parrot_pmcsh_file!";
 while (<TYPES>) {
     next unless (/^\s+enum_class_(\w+)\,/);
     my $type = $1;
