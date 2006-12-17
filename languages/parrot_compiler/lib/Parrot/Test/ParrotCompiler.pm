@@ -25,11 +25,9 @@ Yet another constructor.
 
 =cut
 
-sub new 
-{
-  return bless {};
+sub new {
+    return bless {};
 }
-
 
 =head2 gen_output
 
@@ -38,32 +36,32 @@ which gets called when language_output_is() is called in a test file.
 
 =cut
 
-sub gen_output 
-{
-  my $self = shift;
-  my ( $code, $test_no ) = @_;
-  
-  # flatten filenames (don't use directories)
-  my $code_f   = Parrot::Test::per_test( '.code', $test_no );
-  my $out_f    = Parrot::Test::per_test( '.out', $test_no );
+sub gen_output {
+    my $self = shift;
+    my ( $code, $test_no ) = @_;
 
-  my $test_prog_args = $ENV{TEST_PROG_ARGS} || '';
-  my $cmd = "$self->{parrot} languages/parrot_compiler/$test_prog_args < languages/$code_f";
+    # flatten filenames (don't use directories)
+    my $code_f = Parrot::Test::per_test( '.code', $test_no );
+    my $out_f  = Parrot::Test::per_test( '.out',  $test_no );
 
-  Parrot::Test::write_code_to_file( $code, $code_f );
+    my $test_prog_args = $ENV{TEST_PROG_ARGS} || '';
+    my $cmd = "$self->{parrot} languages/parrot_compiler/$test_prog_args < languages/$code_f";
 
-  # STDERR is written into same output file
-  my $diag = '';
-  my $parrot_exit_code = Parrot::Test::run_command( $cmd, 
-                                                    CD     => $self->{relpath},
-                                                    STDOUT => $out_f, 
-                                                    STDERR => $out_f );
-  $diag .= "'$cmd' failed with exit code $parrot_exit_code." if $parrot_exit_code;
-  $self->{builder}->diag( $diag ) if $diag;
-  
-  return Parrot::Test::slurp_file($out_f);
+    Parrot::Test::write_code_to_file( $code, $code_f );
+
+    # STDERR is written into same output file
+    my $diag             = '';
+    my $parrot_exit_code = Parrot::Test::run_command(
+        $cmd,
+        CD     => $self->{relpath},
+        STDOUT => $out_f,
+        STDERR => $out_f
+    );
+    $diag .= "'$cmd' failed with exit code $parrot_exit_code." if $parrot_exit_code;
+    $self->{builder}->diag($diag) if $diag;
+
+    return Parrot::Test::slurp_file($out_f);
 }
-
 
 =head2 output_is
 
@@ -71,18 +69,17 @@ This gets called when language_output_is() is called in a test file.
 
 =cut
 
-sub output_is 
-{
-  my $self = shift;
-  my ( $code, $expected, $desc ) = @_;
-  
-  my $test_no = $self->{builder}->current_test + 1;
+sub output_is {
+    my $self = shift;
+    my ( $code, $expected, $desc ) = @_;
 
-  my $output = $self->gen_output( $code, $test_no ); 
-  
-  my $pass = $self->{builder}->is_eq( $output, $expected, $desc );
+    my $test_no = $self->{builder}->current_test + 1;
 
-  return $pass;
+    my $output = $self->gen_output( $code, $test_no );
+
+    my $pass = $self->{builder}->is_eq( $output, $expected, $desc );
+
+    return $pass;
 }
 
 1;
