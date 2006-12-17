@@ -20,25 +20,25 @@ use Jako::Token;
 use Jako::Construct::Expression::Value::Literal;
 use Jako::Construct::Expression::Value::Identifier;
 
-sub new
-{
-  my $class = shift;
-  my ($block, $token) = @_;
+sub new {
+    my $class = shift;
+    my ( $block, $token ) = @_;
 
-  confess "Block undefined." unless defined $block;
-  confess "Token undefined." unless defined $token;
+    confess "Block undefined." unless defined $block;
+    confess "Token undefined." unless defined $token;
 
-  return Jako::Construct::Expression::Value::Identifier->new($block, $token) if $token->kind eq 'ident';
-  return Jako::Construct::Expression::Value::Literal->new($block, $token)    if $token->kind eq 'literal';
+    return Jako::Construct::Expression::Value::Identifier->new( $block, $token )
+        if $token->kind eq 'ident';
+    return Jako::Construct::Expression::Value::Literal->new( $block, $token )
+        if $token->kind eq 'literal';
 
-  return undef;
+    return undef;
 }
 
 sub block { return shift->{BLOCK}; }
 sub token { return shift->{TOKEN}; }
-sub type  { return shift->{TYPE};  }
+sub type  { return shift->{TYPE}; }
 sub value { return shift->{VALUE}; }
-
 
 #
 # compile()
@@ -46,12 +46,11 @@ sub value { return shift->{VALUE}; }
 # Essentially a no-op for values (except string literals... q.v.).
 #
 
-sub compile
-{
-  my $self = shift;
-  my ($compiler) = @_;
+sub compile {
+    my $self = shift;
+    my ($compiler) = @_;
 
-  return $self->value;
+    return $self->value;
 }
 
 1;

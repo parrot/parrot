@@ -1,3 +1,4 @@
+
 =head1 NAME
 
 Jako::Construct::Block - Abstract superclass for Jako Blocks.
@@ -17,7 +18,6 @@ content Constructs.
 
 ###############################################################################
 
-
 use strict;
 use warnings qw(all);
 
@@ -26,7 +26,6 @@ package Jako::Construct::Block;
 use base qw(Jako::Construct);
 
 use Carp;
-
 
 ###############################################################################
 
@@ -47,32 +46,31 @@ TODO: Do we really need KIND, since we have subclasses?
 
 =cut
 
-sub new
-{
-  my $class  = shift; # Required: string
-  my $block  = shift; # Optional: Jako::Construct::Block
-  my $kind   = shift; # Required: string (TODO: domain?)
-  my $type   = shift; # Optional: TODO: type?
-  my $prefix = shift; # Optional: string
+sub new {
+    my $class  = shift;    # Required: string
+    my $block  = shift;    # Optional: Jako::Construct::Block
+    my $kind   = shift;    # Required: string (TODO: domain?)
+    my $type   = shift;    # Optional: TODO: type?
+    my $prefix = shift;    # Optional: string
 
-  confess "Use Jako::Construct::Block::Bare, not Jako::Construct::Block"
-    if $class eq 'Jako::Construct::Block';
+    confess "Use Jako::Construct::Block::Bare, not Jako::Construct::Block"
+        if $class eq 'Jako::Construct::Block';
 
-  confess "Bad block!"  if defined $block and not (ref $block and $block->isa("Jako::Construct::Block"));
-  confess "Extra arguments!" if @_;
+    confess "Bad block!"
+        if defined $block and not( ref $block and $block->isa("Jako::Construct::Block") );
+    confess "Extra arguments!" if @_;
 
-  return bless {
-    BLOCK   => $block,  # Parent block
+    return bless {
+        BLOCK => $block,    # Parent block
 
-    PEER    => undef,   # Peer block (if any).
-    KIND    => $kind,   # One of file, sub, if, else, while, etc.
-    TYPE    => $type,   # Return type, if any.
-    PREFIX  => $prefix, # Prefix, if given in source code.
-    SYMBOLS => { },     # Identifiers
-    CONTENT => [ ]      # Constructs
-  }, $class;
+        PEER    => undef,   # Peer block (if any).
+        KIND    => $kind,   # One of file, sub, if, else, while, etc.
+        TYPE    => $type,   # Return type, if any.
+        PREFIX  => $prefix, # Prefix, if given in source code.
+        SYMBOLS => {},      # Identifiers
+        CONTENT => []       # Constructs
+    }, $class;
 }
-
 
 ###############################################################################
 
@@ -80,21 +78,19 @@ sub new
 # ACCESSORS:
 #
 
-sub peer      { return shift->{PEER};  }
-sub kind      { return shift->{KIND};  }
-sub type      { return shift->{TYPE};   }
+sub peer { return shift->{PEER}; }
+sub kind { return shift->{KIND}; }
+sub type { return shift->{TYPE}; }
 
-sub left      { return shift->{LEFT};  }
-sub op        { return shift->{OP};    }
-sub right     { return shift->{RIGHT}; }
+sub left  { return shift->{LEFT}; }
+sub op    { return shift->{OP}; }
+sub right { return shift->{RIGHT}; }
 
-sub prefix
-{
-  my $self = shift;
-  $self->{PREFIX} = shift if @_;
-  return $self->{PREFIX};
+sub prefix {
+    my $self = shift;
+    $self->{PREFIX} = shift if @_;
+    return $self->{PREFIX};
 }
-
 
 ###############################################################################
 
@@ -108,23 +104,23 @@ confess() and warn().
 
 =cut
 
-sub set_symbol
-{
-  my $self = shift; # Required: Jako::Construct::Block
-  my $name = shift; # Required: string (TODO: domain)
-  my $sym  = shift; # Required: TODO: type
+sub set_symbol {
+    my $self = shift;    # Required: Jako::Construct::Block
+    my $name = shift;    # Required: string (TODO: domain)
+    my $sym  = shift;    # Required: TODO: type
 
-  confess "No symbol name!"  unless defined $name;
-  confess "No symbol value!" unless defined $sym;
-  confess "Bad symbol value!" unless ref $sym and $sym->isa("Jako::Symbol");
-  confess "Extra arguments!" if @_;
+    confess "No symbol name!"   unless defined $name;
+    confess "No symbol value!"  unless defined $sym;
+    confess "Bad symbol value!" unless ref $sym and $sym->isa("Jako::Symbol");
+    confess "Extra arguments!" if @_;
 
-  die "Redefinition of symbol '$name', which was defined earlier in this block!" if $self->get_symbol($name);
+    die "Redefinition of symbol '$name', which was defined earlier in this block!"
+        if $self->get_symbol($name);
+
 #  warn "Definition of symbol '$name' shadows definition in parent block!" if $self->find_symbol($name);
 
-  $self->{SYMBOLS}{$name} = $sym;
+    $self->{SYMBOLS}{$name} = $sym;
 }
-
 
 ###############################################################################
 
@@ -141,18 +137,16 @@ die() and warn().
 
 =cut
 
-sub get_symbol
-{
-  my $self = shift; # Required: Jako::Construct::Block
-  my $name = shift; # Required: string (TODO: domain)
+sub get_symbol {
+    my $self = shift;    # Required: Jako::Construct::Block
+    my $name = shift;    # Required: string (TODO: domain)
 
-  confess "No block!"  unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
-  confess "No symbol name!"  unless defined $name;
-  confess "Extra arguments!" if @_;
+    confess "No block!" unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
+    confess "No symbol name!" unless defined $name;
+    confess "Extra arguments!" if @_;
 
-  return $self->{SYMBOLS}{$name};
+    return $self->{SYMBOLS}{$name};
 }
-
 
 ###############################################################################
 
@@ -162,16 +156,14 @@ Returns the names of the symbols defined locally in this block.
 
 =cut
 
-sub symbol_names
-{
-  my $self = shift; # Required: Jako::Construct::Block
+sub symbol_names {
+    my $self = shift;    # Required: Jako::Construct::Block
 
-  confess "No block!"  unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
-  confess "Extra arguments!" if @_;
+    confess "No block!" unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
+    confess "Extra arguments!" if @_;
 
-  return keys %{$self->{SYMBOLS}};
+    return keys %{ $self->{SYMBOLS} };
 }
-
 
 ###############################################################################
 
@@ -184,37 +176,35 @@ from the symbol tables of parent blocks.
 
 =cut
 
-sub dump_symbols
-{
-  my $self = shift; # Required: Jako::Construct::Block
+sub dump_symbols {
+    my $self = shift;    # Required: Jako::Construct::Block
 
-  confess "No block!"  unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
-  confess "Extra arguments!" if @_;
+    confess "No block!" unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
+    confess "Extra arguments!" if @_;
 
-  my $block = $self; # Start collecting symbols here
+    my $block = $self;    # Start collecting symbols here
 
-  my %table = ();
+    my %table = ();
 
-  my $level = 0;
+    my $level = 0;
 
-  while ($block) {
-    foreach my $symbol ($block->symbol_names) {
-      next if exists $table{$symbol};
-      $table{$symbol} = $level;
+    while ($block) {
+        foreach my $symbol ( $block->symbol_names ) {
+            next if exists $table{$symbol};
+            $table{$symbol} = $level;
+        }
+
+        $block = $block->block;    # Collect symbols from the parent block next
+        $level++;
     }
 
-    $block = $block->block; # Collect symbols from the parent block next
-    $level++;
-  }
+    printf STDERR "%-30s  %s\n", "SYMBOL", "LEVEL";
+    printf STDERR "%-30s  %s\n", ( "-" x 30 ), "-----";
 
-  printf STDERR "%-30s  %s\n", "SYMBOL", "LEVEL";
-  printf STDERR "%-30s  %s\n", ("-" x 30), "-----";
-
-  foreach my $symbol (sort keys %table) {
-    printf STDERR "%-30s: %d\n", $symbol, $table{$symbol};
-  }
+    foreach my $symbol ( sort keys %table ) {
+        printf STDERR "%-30s: %d\n", $symbol, $table{$symbol};
+    }
 }
-
 
 ###############################################################################
 
@@ -228,23 +218,21 @@ See also: get_symbol(), which searches only locally.
 
 =cut
 
-sub find_symbol
-{
-  my $self = shift; # Required: Jako::Construct::Block
-  my $name = shift; # Required: (TODO: domain)
+sub find_symbol {
+    my $self = shift;    # Required: Jako::Construct::Block
+    my $name = shift;    # Required: (TODO: domain)
 
-  confess "No block!"  unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
-  confess "No symbol name!"  unless defined $name;
-  confess "Extra arguments!" if @_;
+    confess "No block!" unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
+    confess "No symbol name!" unless defined $name;
+    confess "Extra arguments!" if @_;
 
-  my $sym = $self->get_symbol($name); # Return the identifier if defined here.
-  return $sym if defined $sym;
+    my $sym = $self->get_symbol($name);    # Return the identifier if defined here.
+    return $sym if defined $sym;
 
-  return undef unless defined $self->block; # Terminate recursion
+    return undef unless defined $self->block;    # Terminate recursion
 
-  return $self->block->find_symbol($name); # Recurse
+    return $self->block->find_symbol($name);     # Recurse
 }
-
 
 ###############################################################################
 
@@ -257,30 +245,28 @@ This is used to find the target blocks for loop control statements.
 
 =cut
 
-sub find_block
-{
-  my $self = shift;  # Required: Jako::Construct::Block
-  my $kind = shift;  # Required: string (TODO: domain)
-  my $label = shift; # Optional: string (TODO: domain)
+sub find_block {
+    my $self  = shift;    # Required: Jako::Construct::Block
+    my $kind  = shift;    # Required: string (TODO: domain)
+    my $label = shift;    # Optional: string (TODO: domain)
 
-  confess "No block!"  unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
-  confess "No block kind!"  unless defined $kind;
-  confess "Extra arguments!" if @_;
+    confess "No block!" unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
+    confess "No block kind!" unless defined $kind;
+    confess "Extra arguments!" if @_;
 
-  if ($self->kind eq $kind) {
-    if (defined $label) {
-      return $self if $self->prefix eq $label;
+    if ( $self->kind eq $kind ) {
+        if ( defined $label ) {
+            return $self if $self->prefix eq $label;
+        }
+        else {
+            return $self;
+        }
     }
-    else {
-      return $self;
-    }
-  }
 
-  return undef unless $self->block;
+    return undef unless $self->block;
 
-  return $self->block->find_block($kind, $label);
+    return $self->block->find_block( $kind, $label );
 }
-
 
 ###############################################################################
 
@@ -291,20 +277,18 @@ symbol, and then returns that symbol's type.
 
 =cut
 
-sub type_of_ident
-{
-  my $self = shift; # Required: Jako::Construct::Block
-  my $name = shift; # Required: string (TODO: domain)
+sub type_of_ident {
+    my $self = shift;    # Required: Jako::Construct::Block
+    my $name = shift;    # Required: string (TODO: domain)
 
-  confess "No block!"  unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
-  confess "No identifier name!"  unless defined $name;
-  confess "Extra arguments!" if @_;
+    confess "No block!" unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
+    confess "No identifier name!" unless defined $name;
+    confess "Extra arguments!" if @_;
 
-  my $found = $self->find_symbol($name);
+    my $found = $self->find_symbol($name);
 
-  return $found ? $found->type : undef;
+    return $found ? $found->type : undef;
 }
-
 
 ###############################################################################
 
@@ -315,20 +299,18 @@ symbol, and then returns that symbol's kind.
 
 =cut
 
-sub kind_of_ident
-{
-  my $self = shift; # Required: Jako::Construct::Block
-  my $name = shift; # Required: string (TODO: domain)
+sub kind_of_ident {
+    my $self = shift;    # Required: Jako::Construct::Block
+    my $name = shift;    # Required: string (TODO: domain)
 
-  confess "No block!"  unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
-  confess "No identifier name!"  unless defined $name;
-  confess "Extra arguments!" if @_;
+    confess "No block!" unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
+    confess "No identifier name!" unless defined $name;
+    confess "Extra arguments!" if @_;
 
-  my $found = $self->find_symbol($name);
+    my $found = $self->find_symbol($name);
 
-  return $found ? $found->kind : undef;
+    return $found ? $found->kind : undef;
 }
-
 
 ###############################################################################
 
@@ -339,20 +321,18 @@ symbol, and then returns that symbol's scope (global or local).
 
 =cut
 
-sub scope_of_ident
-{
-  my $self = shift; # Required: Jako::Construct::Block
-  my $name = shift; # Required: string (TODO: domain)
+sub scope_of_ident {
+    my $self = shift;    # Required: Jako::Construct::Block
+    my $name = shift;    # Required: string (TODO: domain)
 
-  confess "No block!"  unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
-  confess "No identifier name!"  unless defined $name;
-  confess "Extra arguments!" if @_;
+    confess "No block!" unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
+    confess "No identifier name!" unless defined $name;
+    confess "Extra arguments!" if @_;
 
-  my $found = $self->find_symbol($name);
+    my $found = $self->find_symbol($name);
 
-  return $found ? $found->scope : undef;
+    return $found ? $found->scope : undef;
 }
-
 
 ###############################################################################
 
@@ -363,20 +343,18 @@ symbol, and then returns that symbol's access (const or not).
 
 =cut
 
-sub access_of_ident
-{
-  my $self = shift; # Required: Jako::Construct::Block
-  my $name = shift; # Required: string (TODO: domain)
+sub access_of_ident {
+    my $self = shift;    # Required: Jako::Construct::Block
+    my $name = shift;    # Required: string (TODO: domain)
 
-  confess "No block!"  unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
-  confess "No identifier name!"  unless defined $name;
-  confess "Extra arguments!" if @_;
+    confess "No block!" unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
+    confess "No identifier name!" unless defined $name;
+    confess "Extra arguments!" if @_;
 
-  my $found = $self->find_symbol($name);
+    my $found = $self->find_symbol($name);
 
-  return $found ? $found->kind : undef;
+    return $found ? $found->kind : undef;
 }
-
 
 ###############################################################################
 
@@ -386,16 +364,14 @@ Return the content list for the Block.
 
 =cut
 
-sub content
-{
-  my $self = shift; # Required: Jako::Construct::Block
+sub content {
+    my $self = shift;    # Required: Jako::Construct::Block
 
-  confess "No block!" unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
-  confess "Extra arguments!" if @_;
+    confess "No block!" unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
+    confess "Extra arguments!" if @_;
 
-  return @{$self->{CONTENT}};
+    return @{ $self->{CONTENT} };
 }
-
 
 ###############################################################################
 
@@ -405,17 +381,15 @@ Append Constructs to the Block's content list.
 
 =cut
 
-sub push_content
-{
-  my $self = shift; # Required: Jako::Construct::Block
+sub push_content {
+    my $self = shift;    # Required: Jako::Construct::Block
 
-  confess "No block!"        unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
-  confess "No content!"      unless @_;
-  confess "Illegal content!" if grep { not $_->isa("Jako::Construct") } @_;
+    confess "No block!" unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
+    confess "No content!" unless @_;
+    confess "Illegal content!" if grep { not $_->isa("Jako::Construct") } @_;
 
-  push @{$self->{CONTENT}}, @_;
+    push @{ $self->{CONTENT} }, @_;
 }
-
 
 ###############################################################################
 
@@ -432,23 +406,23 @@ non-sub stuff into the main sub at the end of the script's compiled code.
 
 =cut
 
+sub compile {
+    my $self     = shift;    # Required: Jako::Construct::Block
+    my $compiler = shift;    # Required: Jako::Compiler
+    my $options  = shift;    # Optional: Hashref
 
-sub compile
-{
-  my $self     = shift; # Required: Jako::Construct::Block
-  my $compiler = shift; # Required: Jako::Compiler
-  my $options  = shift; # Optional: Hashref
+    confess "No block!" unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
+    confess "No compiler!"
+        unless defined $compiler
+        and ref $compiler
+        and $compiler->isa("Jako::Compiler");
+    confess "Bad options!" if defined $options and not( ref $options and ref $options eq 'HASH' );
+    confess "Extra arguments!" if @_;
 
-  confess "No block!"  unless defined $self and ref $self and $self->isa("Jako::Construct::Block");
-  confess "No compiler!" unless defined $compiler and ref $compiler and $compiler->isa("Jako::Compiler");
-  confess "Bad options!" if defined $options and not (ref $options and ref $options eq 'HASH');
-  confess "Extra arguments!" if @_;
-
-  foreach my $construct ($self->content) {
-    $construct->compile($compiler, $options);
-  }
+    foreach my $construct ( $self->content ) {
+        $construct->compile( $compiler, $options );
+    }
 }
-
 
 1;
 

@@ -17,31 +17,29 @@ use Carp;
 
 use base qw(Jako::Construct::Block::Loop);
 
-
 #
 # new()
 #
 
-sub new
-{
-  my $class = shift;
+sub new {
+    my $class = shift;
 
-  confess "Expected parent and peer blocks." unless @_ == 2;
+    confess "Expected parent and peer blocks." unless @_ == 2;
 
-  my ($block, $peer) = @_;
+    my ( $block, $peer ) = @_;
 
-  my $self = bless {
-    BLOCK     => $block,
+    my $self = bless {
+        BLOCK => $block,
 
-    KIND      => 'continue',
-    PEER      => $peer,
+        KIND => 'continue',
+        PEER => $peer,
 
-    CONTENT   => [ ]
-  }, $class;
+        CONTENT => []
+    }, $class;
 
-  $block->push_content($self);
+    $block->push_content($self);
 
-  return $self;
+    return $self;
 }
 
 sub peer { return shift->{PEER}; }

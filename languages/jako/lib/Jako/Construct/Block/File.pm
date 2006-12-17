@@ -19,83 +19,77 @@ use Jako::Compiler;
 
 use base qw(Jako::Construct::Block);
 
-
 #
 # compile()
 #
 
-sub compile
-{
-  my $self     = shift; # Required:
-  my $compiler = shift; # Required
+sub compile {
+    my $self     = shift;    # Required:
+    my $compiler = shift;    # Required
 
-#  my $namespace = "FILE"; # TODO: Don't we need to do better than this?
+    #  my $namespace = "FILE"; # TODO: Don't we need to do better than this?
 
-  return 1 unless $self->content;
+    return 1 unless $self->content;
 
-  my $inline = 0;
-  my $last_seen = 'sub';
+    my $inline    = 0;
+    my $last_seen = 'sub';
 
-  $compiler->emit(".sub ___MAIN");
-  $compiler->indent;
-  $compiler->emit("__INLINE_0()");
-  $compiler->emit("end");
-  $compiler->outdent;
-  $compiler->emit(".end");
-
-  foreach my $construct ($self->content) {
-    if (
-         $construct->isa("Jako::Construct::Block::Sub")
-      or $construct->isa("Jako::Construct::Block::Module")
-      or $construct->isa("Jako::Construct::Declaration::Sub")
-    ) {
-      if ($last_seen ne 'sub') {
-        $compiler->emit("__INLINE_" . $inline . "()"); # $inline is already the next one.
-        $compiler->emit(".return()"); # Return to the previous inline chunk.
-        $compiler->outdent;
-        $compiler->emit(".end");
-
-        $last_seen = 'sub';
-      }
-    }
-    else {
-      if ($last_seen ne 'inline') {
-        $compiler->emit(".sub __INLINE_" . $inline++);
-        $compiler->indent;
-
-        $last_seen = 'inline';
-      }
-    }
-
-    $construct->compile($compiler);
-  }
-
-  if ($last_seen ne 'inline') {
-    $compiler->emit(".sub __INLINE_" . $inline++);
+    $compiler->emit(".sub ___MAIN");
     $compiler->indent;
-  }
+    $compiler->emit("__INLINE_0()");
+    $compiler->emit("end");
+    $compiler->outdent;
+    $compiler->emit(".end");
 
-  $compiler->emit(".return()");
-  $compiler->outdent;
-  $compiler->emit(".end");
+    foreach my $construct ( $self->content ) {
+        if (   $construct->isa("Jako::Construct::Block::Sub")
+            or $construct->isa("Jako::Construct::Block::Module")
+            or $construct->isa("Jako::Construct::Declaration::Sub") )
+        {
+            if ( $last_seen ne 'sub' ) {
+                $compiler->emit( "__INLINE_" . $inline . "()" );  # $inline is already the next one.
+                $compiler->emit(".return()");    # Return to the previous inline chunk.
+                $compiler->outdent;
+                $compiler->emit(".end");
 
-  return 1;
+                $last_seen = 'sub';
+            }
+        }
+        else {
+            if ( $last_seen ne 'inline' ) {
+                $compiler->emit( ".sub __INLINE_" . $inline++ );
+                $compiler->indent;
+
+                $last_seen = 'inline';
+            }
+        }
+
+        $construct->compile($compiler);
+    }
+
+    if ( $last_seen ne 'inline' ) {
+        $compiler->emit( ".sub __INLINE_" . $inline++ );
+        $compiler->indent;
+    }
+
+    $compiler->emit(".return()");
+    $compiler->outdent;
+    $compiler->emit(".end");
+
+    return 1;
 }
-
 
 #
 # sax()
 #
 
-sub sax
-{
-  my $self = shift;
-  my ($handler) = @_;
+sub sax {
+    my $self = shift;
+    my ($handler) = @_;
 
-  $handler->start_element({ Name => 'block', Attributes => { kind => $self->kind } });
-  $_->sax($handler) foreach $self->content;
-  $handler->end_element({ Name => 'block' });
+    $handler->start_element( { Name => 'block', Attributes => { kind => $self->kind } } );
+    $_->sax($handler) foreach $self->content;
+    $handler->end_element( { Name => 'block' } );
 }
-
 
 1;

@@ -15,18 +15,17 @@ package Jako::Construct::Type::Number;
 
 use base qw(Jako::Construct::Type);
 
-sub new
-{
-  my $class = shift;
-  my ($token) = @_;
+sub new {
+    my $class = shift;
+    my ($token) = @_;
 
-  return bless {
-    TOKEN    => $token,
-    CODE     => 'N',
-    NAME     => 'num',
-    IMCC     => 'num',
-    IMCC_PMC => 'Float'
-  }, $class;
+    return bless {
+        TOKEN    => $token,
+        CODE     => 'N',
+        NAME     => 'num',
+        IMCC     => 'num',
+        IMCC_PMC => 'Float'
+    }, $class;
 }
 
 1;

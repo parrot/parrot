@@ -15,18 +15,17 @@ package Jako::Construct::Type::PMC;
 
 use base qw(Jako::Construct::Type);
 
-sub new
-{
-  my $class = shift;
-  my ($token) = @_;
+sub new {
+    my $class = shift;
+    my ($token) = @_;
 
-  return bless {
-    TOKEN    => $token,
-    CODE     => 'P',
-    NAME     => 'pmc',
-    IMCC     => 'pmc',
-    IMCC_PMC => 'PMC'
-  }, $class;
+    return bless {
+        TOKEN    => $token,
+        CODE     => 'P',
+        NAME     => 'pmc',
+        IMCC     => 'pmc',
+        IMCC_PMC => 'PMC'
+    }, $class;
 }
 
 1;

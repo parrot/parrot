@@ -15,16 +15,15 @@ package Jako::Construct::Expression::Infix;
 
 use base qw(Jako::Construct::Expression);
 
-sub new
-{
-  my $class = shift;
-  my ($left, $op, $right);
+sub new {
+    my $class = shift;
+    my ( $left, $op, $right );
 
-  return bless {
-    LEFT  => $left,
-    OP    => $op,
-    RIGHT => $right,
-  }, $class;
+    return bless {
+        LEFT  => $left,
+        OP    => $op,
+        RIGHT => $right,
+    }, $class;
 }
 
 1;

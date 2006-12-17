@@ -15,15 +15,14 @@ package Jako::Construct::Expression::Suffix;
 
 use base qw(Jako::Construct::Expression);
 
-sub new
-{
-  my $class = shift;
-  my ($left, $op);
+sub new {
+    my $class = shift;
+    my ( $left, $op );
 
-  return bless {
-    LEFT  => $left,
-    OP    => $op
-  }, $class;
+    return bless {
+        LEFT => $left,
+        OP   => $op
+    }, $class;
 }
 
 1;

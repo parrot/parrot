@@ -21,26 +21,25 @@ use base qw(Jako::Construct::Block::Conditional);
 # new()
 #
 
-sub new
-{
-  my $class = shift;
+sub new {
+    my $class = shift;
 
-  confess "Expected parent block and peer block!" unless @_ == 2;
+    confess "Expected parent block and peer block!" unless @_ == 2;
 
-  my ($block, $peer) = @_;
+    my ( $block, $peer ) = @_;
 
-  my $self = bless {
-    BLOCK     => $block,
-    PEER      => $peer,
+    my $self = bless {
+        BLOCK => $block,
+        PEER  => $peer,
 
-    KIND      => 'else',
+        KIND => 'else',
 
-    CONTENT   => [ ]
-  }, $class;
+        CONTENT => []
+    }, $class;
 
-  $block->push_content($self);
+    $block->push_content($self);
 
-  return $self;
+    return $self;
 }
 
 sub peer { return shift->{PEER}; }

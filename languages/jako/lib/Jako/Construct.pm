@@ -17,7 +17,7 @@ package Jako::Construct;
 
 use base qw(Jako::Processor);
 
-sub block  { return shift->{BLOCK};  }
+sub block { return shift->{BLOCK}; }
 
 1;
 

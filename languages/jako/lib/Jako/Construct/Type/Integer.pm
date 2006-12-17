@@ -15,18 +15,17 @@ package Jako::Construct::Type::Integer;
 
 use base qw(Jako::Construct::Type);
 
-sub new
-{
-  my $class = shift;
-  my ($token) = @_;
+sub new {
+    my $class = shift;
+    my ($token) = @_;
 
-  return bless {
-    TOKEN    => $token,
-    CODE     => 'I',
-    NAME     => 'int',
-    IMCC     => 'int',
-    IMCC_PMC => 'Integer'
-  }, $class;
+    return bless {
+        TOKEN    => $token,
+        CODE     => 'I',
+        NAME     => 'int',
+        IMCC     => 'int',
+        IMCC_PMC => 'Integer'
+    }, $class;
 }
 
 1;
