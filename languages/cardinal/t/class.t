@@ -5,7 +5,7 @@ use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 1;
 
-language_output_is('cardinal', <<'CODE', <<'OUT', 'simple conditional test');
+language_output_is( 'cardinal', <<'CODE', <<'OUT', 'simple conditional test' );
 class ClassA
   puts "Evaluating class"
 

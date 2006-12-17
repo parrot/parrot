@@ -5,7 +5,7 @@ use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 2;
 
-language_output_is('cardinal', <<'CODE', <<'OUT', 'begin block test');
+language_output_is( 'cardinal', <<'CODE', <<'OUT', 'begin block test' );
 puts "This comes after"
 BEGIN { 
   puts "Here I am"
@@ -15,7 +15,7 @@ BEGIN {
 CODE
 OUT
 
-language_output_is('cardinal', <<'CODE', <<'OUT', 'end block test');
+language_output_is( 'cardinal', <<'CODE', <<'OUT', 'end block test' );
 END { 
   puts "Here I am"
   puts "Here I am"

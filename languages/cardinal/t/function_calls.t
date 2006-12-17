@@ -5,7 +5,7 @@ use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 2;
 
-language_output_is('cardinal', <<'CODE', <<'OUT', 'simple function call');
+language_output_is( 'cardinal', <<'CODE', <<'OUT', 'simple function call' );
 def func1
   puts 'func1'
 end
@@ -14,7 +14,7 @@ func1
 CODE
 OUT
 
-language_output_is('cardinal', <<'CODE', <<'OUT', 'function call with one positional parameter');
+language_output_is( 'cardinal', <<'CODE', <<'OUT', 'function call with one positional parameter' );
 def func1( a )
   puts a
 end

@@ -5,7 +5,7 @@ use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 2;
 
-language_output_is('cardinal', <<'CODE', <<'OUT', 'simple module test');
+language_output_is( 'cardinal', <<'CODE', <<'OUT', 'simple module test' );
 module Test
   class Assertion1 < Exception; end
   class Assertion2 < Exception; end
@@ -15,7 +15,7 @@ end
 CODE
 OUT
 
-language_output_is('cardinal', <<'CODE', <<'OUT', 'simple module test');
+language_output_is( 'cardinal', <<'CODE', <<'OUT', 'simple module test' );
 module Test
   class Assertion < Exception; end
 

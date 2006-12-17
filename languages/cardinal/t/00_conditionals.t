@@ -5,7 +5,7 @@ use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 4;
 
-language_output_is('cardinal', <<'CODE', <<'OUT', 'simple conditional test');
+language_output_is( 'cardinal', <<'CODE', <<'OUT', 'simple conditional test' );
 if true
 1
 end
@@ -13,17 +13,17 @@ end
 CODE
 OUT
 
-language_output_is('cardinal', <<'CODE', <<'OUT', 'simple conditional test');
+language_output_is( 'cardinal', <<'CODE', <<'OUT', 'simple conditional test' );
 if true then puts "TRUE" end
 CODE
 OUT
 
-language_output_is('cardinal', <<'CODE', <<'OUT', 'simple conditional test');
+language_output_is( 'cardinal', <<'CODE', <<'OUT', 'simple conditional test' );
 puts("Condition is True") if true
 CODE
 OUT
 
-language_output_is('cardinal', <<'CODE', <<'OUT', 'simple conditional test');
+language_output_is( 'cardinal', <<'CODE', <<'OUT', 'simple conditional test' );
 if true
   puts("Its true")
 end
