@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 44;
 
 =head1 NAME
 
@@ -331,6 +331,110 @@ CODE
 
 file_content_is("temp.file", <<'OUTPUT', 'file contents');
 Parrot overwrites
+OUTPUT
+
+unlink("temp.file");
+
+pasm_output_is(<<'CODE', '', "PIO_flush on buffer full");
+       set I0, 0
+       set I1, 10000
+   
+       open P0, "temp.file", ">"
+
+PRINT:
+       ge I0, I1, END
+       print P0, "words\n"
+       inc I0
+       branch PRINT
+
+END:
+       close P0
+       end
+CODE
+
+file_content_is("temp.file", <<'OUTPUT' x 10000, 'buffered file contents');
+words
+OUTPUT
+
+unlink("temp.file");
+
+pasm_output_is(<<'CODE', '0', "turn off buffering");
+       open P0, "temp.file", ">"
+
+#                     PIOCTL_CMDSETBUFTYPE, PIOCTL_NONBUF 
+       pioctl I0, P0, 3, 0 
+#                     PIOCTL_CMDGETBUFTYPE, <dummy value>
+       pioctl I0, P0, 4, 0
+       print I0
+
+       print P0, "Howdy World\n"
+
+       close P0
+       end
+CODE
+
+file_content_is("temp.file", <<'OUTPUT', 'unbuffered file contents');
+Howdy World
+OUTPUT
+
+unlink("temp.file");
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'I/O buffering');
+.sub main
+    .local string filename
+    filename = "temp.file"
+    $P1 = open filename, ">"
+    .local int count, max, nltest
+    count = 0
+    max = 10000
+  LOOP:
+    if count > max goto DONE
+    $S1 = count
+    $S1 = concat $S1, " "
+    print $P1, $S1
+    inc count
+    nltest = mod count, 20
+    if nltest goto LOOP
+    print $P1, "\n"
+    goto LOOP
+  DONE:
+    print $P1, "\n"
+    close $P1
+
+  PART_2:
+    $P1 = open filename
+    $I0 = 0
+  LINE:
+    $S1 = readline $P1
+    unless $S1 goto SUCCESS
+    chopn $S1, 1
+
+  NEXT_NR:
+    $I1 = length $S1
+    if $I1 <= 1 goto LINE
+    $S2 = ""
+  SPLIT:
+    $S3 = substr $S1, 0, 1
+    $S1 = substr 0, 1, ""
+    if $S3 == " " goto GOT_NR
+    $S2 = concat $S2, $S3
+    goto SPLIT
+  GOT_NR:
+    $I1 = $S2
+    if $I0 != $I1 goto FAILED
+    inc $I0
+    goto NEXT_NR
+
+  FAILED:
+    print "Failed\n"
+    goto EXIT
+  SUCCESS:
+    print "Successful\n"
+  EXIT:
+    end
+.end
+CODE
+Successful
 OUTPUT
 
 unlink("temp.file");
