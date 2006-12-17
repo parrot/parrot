@@ -22,7 +22,7 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 5;
 use Test::More;
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'hello');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'hello' );
 extern function hello()
 {
     Console.println("Hello World!");
@@ -36,7 +36,7 @@ CODE
 Hello World!
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'use url');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'use url' );
 use url OtherScript "languages/WMLScript/t/pragmas_1.wmlsc";
 
 extern function main()
@@ -47,7 +47,7 @@ CODE
 Hello World!
 OUT
 
-language_output_like( 'WMLScript', <<'CODE', <<'OUT', 'unable to load');
+language_output_like( 'WMLScript', <<'CODE', <<'OUT', 'unable to load' );
 use url OtherScript "languages/WMLScript/t/pragmas_x.wmlsc";
 
 extern function main()
@@ -58,7 +58,7 @@ CODE
 /unable to load/
 OUT
 
-language_output_like( 'WMLScript', <<'CODE', <<'OUT', 'verification failed');
+language_output_like( 'WMLScript', <<'CODE', <<'OUT', 'verification failed' );
 use url OtherScript "languages/WMLScript/t/pragmas_1.out";
 
 extern function main()
@@ -69,7 +69,7 @@ CODE
 /verification failed/
 OUT
 
-language_output_like( 'WMLScript', <<'CODE', <<'OUT', 'external function not found');
+language_output_like( 'WMLScript', <<'CODE', <<'OUT', 'external function not found' );
 use url OtherScript "languages/WMLScript/t/pragmas_1.wmlsc";
 
 extern function main()

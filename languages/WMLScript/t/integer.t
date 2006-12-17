@@ -22,7 +22,7 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 44;
 use Test::More;
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '! 0', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '! 0', cflags => '-On' );
 extern function main()
 {
     var a = ! 0;
@@ -34,7 +34,7 @@ true
 3
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '! 1', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '! 1', cflags => '-On' );
 extern function main()
 {
     var a = ! 1;
@@ -46,7 +46,7 @@ false
 3
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '~ 1', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '~ 1', cflags => '-On' );
 extern function main()
 {
     var a = ~ 1;
@@ -58,7 +58,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '- 1', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '- 1', cflags => '-On' );
 extern function main()
 {
     var a = - 1;
@@ -70,7 +70,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '++', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '++', cflags => '-On' );
 extern function main()
 {
     var a = 12;
@@ -83,7 +83,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '--', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '--', cflags => '-On' );
 extern function main()
 {
     var a = 12;
@@ -96,7 +96,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '2 << 2', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '2 << 2', cflags => '-On' );
 extern function main()
 {
     var a = 2 << 2;
@@ -108,7 +108,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '5 << true', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '5 << true', cflags => '-On' );
 extern function main()
 {
     var a = 5 << true;
@@ -120,7 +120,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '6 >> 1', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '6 >> 1', cflags => '-On' );
 extern function main()
 {
     var a = 6 >> 1;
@@ -132,7 +132,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '6 >> "text"', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '6 >> "text"', cflags => '-On' );
 extern function main()
 {
     var a = 6 >> "text";
@@ -142,7 +142,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '12 >>> 2', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '12 >>> 2', cflags => '-On' );
 extern function main()
 {
     var a =  12 >>> 2;
@@ -154,7 +154,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '15 >>> "2"', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '15 >>> "2"', cflags => '-On' );
 extern function main()
 {
     var a =  15 >>> "2";
@@ -166,7 +166,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '6 & 2', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '6 & 2', cflags => '-On' );
 extern function main()
 {
     var a = 6 & 2;
@@ -178,7 +178,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '6 & 2.0', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '6 & 2.0', cflags => '-On' );
 extern function main()
 {
     var a = 6 & 2.0;
@@ -188,7 +188,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '6 ^ 2', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '6 ^ 2', cflags => '-On' );
 extern function main()
 {
     var a = 6 ^ 2;
@@ -200,7 +200,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '6 ^ invalid', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '6 ^ invalid', cflags => '-On' );
 extern function main()
 {
     var a = 6 ^ invalid;
@@ -210,7 +210,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '6 | 5', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '6 | 5', cflags => '-On' );
 extern function main()
 {
     var a = 6 | 5;
@@ -222,7 +222,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '7 div 2', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '7 div 2', cflags => '-On' );
 extern function main()
 {
     var a = 7 div 2;
@@ -234,7 +234,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '7 div 0', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '7 div 0', cflags => '-On' );
 extern function main()
 {
     var a = 7 div 0;
@@ -244,7 +244,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '7 % 2', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '7 % 2', cflags => '-On' );
 extern function main()
 {
     var a =  7 % 2;
@@ -256,7 +256,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '7 div 0', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '7 div 0', cflags => '-On' );
 extern function main()
 {
     var a = 7 % 0;
@@ -266,7 +266,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 * 4', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 * 4', cflags => '-On' );
 extern function main()
 {
     var a = 3 * 4;
@@ -278,7 +278,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '2 * 3.14', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '2 * 3.14', cflags => '-On' );
 extern function main()
 {
     var a = 2 * 3.14;
@@ -290,7 +290,7 @@ CODE
 1
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 * true', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 * true', cflags => '-On' );
 extern function main()
 {
     var a = 3 * true;
@@ -302,7 +302,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 * "text"', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 * "text"', cflags => '-On' );
 extern function main()
 {
     var a = 3 * "text";
@@ -312,7 +312,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 / 2', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 / 2', cflags => '-On' );
 extern function main()
 {
     var a = 3 / 2;
@@ -324,7 +324,7 @@ CODE
 1
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 / 2.0', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 / 2.0', cflags => '-On' );
 extern function main()
 {
     var a = 3 / 2.0;
@@ -336,7 +336,7 @@ CODE
 1
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 / 0', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 / 0', cflags => '-On' );
 extern function main()
 {
     var a = 3 / 0;
@@ -346,7 +346,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 / 0.0', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 / 0.0', cflags => '-On' );
 extern function main()
 {
     var a = 3 / 0.0;
@@ -356,7 +356,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 - 1', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 - 1', cflags => '-On' );
 extern function main()
 {
     var a = 3 - 1;
@@ -368,7 +368,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 - 1.4', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 - 1.4', cflags => '-On' );
 extern function main()
 {
     var a = 3 - 1.4;
@@ -380,7 +380,7 @@ CODE
 1
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 - invalid', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 - invalid', cflags => '-On' );
 extern function main()
 {
     var a = 3 - invalid;
@@ -390,7 +390,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 + 1', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 + 1', cflags => '-On' );
 extern function main()
 {
     var a = 3 + 1;
@@ -402,7 +402,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 + "text"', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 + "text"', cflags => '-On' );
 extern function main()
 {
     var a = 3 + "text";
@@ -414,7 +414,7 @@ CODE
 2
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 == 3', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 == 3', cflags => '-On' );
 extern function main()
 {
     var a = 3 == 3;
@@ -426,7 +426,7 @@ true
 3
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 == 3.0', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 == 3.0', cflags => '-On' );
 extern function main()
 {
     var a = 3 == 3.0;
@@ -438,7 +438,7 @@ true
 3
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 != true', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 != true', cflags => '-On' );
 extern function main()
 {
     var a = 3 != true;
@@ -450,7 +450,7 @@ true
 3
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 == "3"', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 == "3"', cflags => '-On' );
 extern function main()
 {
     var a = 3 == "3";
@@ -462,7 +462,7 @@ true
 3
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 != invalid', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 != invalid', cflags => '-On' );
 extern function main()
 {
     var a = 3 != invalid;
@@ -472,7 +472,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 <= 2', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 <= 2', cflags => '-On' );
 extern function main()
 {
     var a = 3 <= 2;
@@ -484,7 +484,7 @@ false
 3
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 < 2.0', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 < 2.0', cflags => '-On' );
 extern function main()
 {
     var a = 3 < 2.0;
@@ -496,7 +496,7 @@ false
 3
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '10 >= "2"', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '10 >= "2"', cflags => '-On' );
 extern function main()
 {
     var a = 10 >= "2";
@@ -508,7 +508,7 @@ false
 3
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 > false', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 > false', cflags => '-On' );
 extern function main()
 {
     var a = 3 > false;
@@ -520,7 +520,7 @@ true
 3
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 < invalid', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 < invalid', cflags => '-On' );
 extern function main()
 {
     var a = 3 < invalid;

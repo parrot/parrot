@@ -23,7 +23,7 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 8;
 use Test::More;
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'function call');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'function call' );
 function f()
 {
     Console.println("in");
@@ -41,7 +41,7 @@ in
 end
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '1 arg');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '1 arg' );
 function f(a)
 {
     Console.println(a);
@@ -55,7 +55,7 @@ CODE
 20
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 args');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', '3 args' );
 function f(a, b, c)
 {
     Console.println(a);
@@ -73,7 +73,7 @@ CODE
 30
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'no return');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'no return' );
 function f(a)
 {
     Console.println(a);
@@ -90,7 +90,7 @@ text
 true
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'return');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'return' );
 function f(a)
 {
     Console.println(a);
@@ -108,7 +108,7 @@ text
 true
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'return value');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'return value' );
 function f(a)
 {
     Console.println(a);
@@ -126,7 +126,7 @@ text
 ok
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'passing by value');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'passing by value' );
 function f(val)
 {
     val += 20;
@@ -146,7 +146,7 @@ CODE
 10
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'recursive call');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'recursive call' );
 function fact(n)
 {
     if (n == 0) {
@@ -171,5 +171,4 @@ OUT
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-
 

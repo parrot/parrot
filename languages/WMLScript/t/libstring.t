@@ -25,7 +25,7 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 24;
 use Test::More;
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.length');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.length' );
 extern function main()
 {
     var a = "ABC";
@@ -50,7 +50,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.length');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.length' );
 extern function main()
 {
     var b = String.length(3.14);
@@ -72,7 +72,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.isEmpty');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.isEmpty' );
 extern function main()
 {
     var a = "Hello";
@@ -98,7 +98,7 @@ false
 3
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.isEmpty');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.isEmpty' );
 extern function main()
 {
     var b = String.isEmpty(0);
@@ -120,7 +120,7 @@ false
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.charAt');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.charAt' );
 extern function main()
 {
     var a = "My name is Joe";
@@ -149,7 +149,7 @@ M
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.charAt');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.charAt' );
 extern function main()
 {
     var a = "string";
@@ -176,7 +176,7 @@ i
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.charAt');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.charAt' );
 extern function main()
 {
     var b = String.charAt(true, 0);
@@ -198,7 +198,7 @@ t
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.subString');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.subString' );
 extern function main()
 {
     var a = "ABCD";
@@ -223,7 +223,7 @@ CD
 2
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.subString');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.subString' );
 extern function main()
 {
     var a = "ABCD";
@@ -254,7 +254,7 @@ AB
 2
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.find');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.find' );
 extern function main()
 {
     var a = "abcde";
@@ -289,7 +289,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.replace');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.replace' );
 extern function main()
 {
     var a = "Hello Joe. What is up Joe?";
@@ -310,7 +310,7 @@ Hello Joe. What is up Joe?
 2
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.replace');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.replace' );
 extern function main()
 {
     var a = "Hello Joe. What is up Joe?";
@@ -322,7 +322,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.elements');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.elements' );
 extern function main()
 {
     var a = "My name is Joe; Age 50;";
@@ -365,7 +365,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.elements');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.elements' );
 extern function main()
 {
     var a = "My name is Joe; Age 50;";
@@ -376,7 +376,7 @@ CODE
 4
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.elementAt');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.elementAt' );
 extern function main()
 {
     var a = "My name is Joe; Age 50;";
@@ -401,7 +401,7 @@ My
 2
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.removeAt');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.removeAt' );
 extern function main()
 {
     var a = "A A; B C D";
@@ -427,7 +427,7 @@ A A
 2
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.replaceAt');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.replaceAt' );
 extern function main()
 {
     var a = "B C; E";
@@ -447,7 +447,7 @@ B C;F
 2
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.insertAt');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.insertAt' );
 extern function main()
 {
     var a = "B C; E";
@@ -479,7 +479,7 @@ B C; E;F
 2
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.squeeze');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.squeeze' );
 extern function main()
 {
     var a = "Hello";
@@ -500,7 +500,7 @@ Hello
 2
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.trim');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.trim' );
 extern function main()
 {
     var a = "Hello";
@@ -521,7 +521,7 @@ Bye   Jon .  See you!
 2
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.compare');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.compare' );
 extern function main()
 {
     var a = "Hello";
@@ -547,7 +547,7 @@ CODE
 0
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.toString');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.toString' );
 extern function main()
 {
     var a = String.toString(12);
@@ -565,7 +565,7 @@ true
 2
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.toString');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.toString' );
 extern function main()
 {
     var a = String.toString("str");
@@ -595,7 +595,7 @@ invalid
 2
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.format', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'String.format', cflags => '-On' );
 extern function main()
 {
     var a = 45;

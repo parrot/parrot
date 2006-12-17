@@ -23,7 +23,7 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 2;
 use Test::More;
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'assign', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'assign', cflags => '-On' );
 extern function main()
 {
     var a = "abc";
@@ -37,7 +37,7 @@ abc
 def
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'incr', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'incr', cflags => '-On' );
 extern function main()
 {
     var a = 10;

@@ -24,7 +24,7 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 5;
 use Test::More;
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'hello world');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'hello world' );
 extern function main()
 {
     Console.println("Hello World!");
@@ -53,7 +53,7 @@ abc
 def
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'no optim', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'no optim', cflags => '-On' );
 extern function main()
 {
     Console.println(1 + 2);
@@ -62,7 +62,7 @@ CODE
 3
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'sieve', function => 'sieve');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'sieve', function => 'sieve' );
 /*
  *  Eratosthenes Sieve prime number calculation
  */

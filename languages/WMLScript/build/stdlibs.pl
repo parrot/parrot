@@ -5,10 +5,8 @@ use warnings;
 use Getopt::Long;
 
 # Grab parameters.
-my ($cfg_file, $output_file);
-GetOptions(
-    'output=s'  => \$output_file,
-) or usage();
+my ( $cfg_file, $output_file );
+GetOptions( 'output=s' => \$output_file, ) or usage();
 $cfg_file = shift @ARGV;
 usage() if !$cfg_file || @ARGV;
 
@@ -31,6 +29,7 @@ close $fh;
 # Parse configuration file and build a data structure.
 # ####################################################
 sub parse_cfg {
+
     # Get filename and open the file.
     my ($filename) = @_;
 
@@ -41,19 +40,23 @@ sub parse_cfg {
     my $func;
 
     while (<$fh>) {
-        if      (/^#.*$/) {
-#           warn "Comment $_";
+        if (/^#.*$/) {
+
+            #           warn "Comment $_";
         }
         elsif (/^\s*$/) {
-#           warn "Empty\n";
+
+            #           warn "Empty\n";
         }
         elsif (/^\@([A-Z_a-z][0-9A-Z_a-z]*)\s+([0-9]+)\s*$/) {
-#           warn "Lib $1 $2\n";
+
+            #           warn "Lib $1 $2\n";
             $func = {};
             $lib->{$2} = [ $1, $func ];
         }
         elsif (/^([A-Z_a-z][0-9A-Z_a-z]*)\s+([0-9]+)\s+([0-9]+)\s*$/) {
-#           warn "Fct $1 $2 $3\n";
+
+            #           warn "Fct $1 $2 $3\n";
             $func->{$2} = [ $1, $3 ];
         }
         else {
@@ -65,7 +68,6 @@ sub parse_cfg {
 
     return $lib;
 }
-
 
 # Generate the code.
 # ##################
@@ -82,13 +84,13 @@ sub generate_pir {
     stdlibs = new .Hash
 PIRCODE
 
-    while (my ($num_lib, $lib) = each %{$cfg}) {
-        my ($name, $h_lib) = @{$lib};
+    while ( my ( $num_lib, $lib ) = each %{$cfg} ) {
+        my ( $name, $h_lib ) = @{$lib};
         $pir .= "\n    # $name\n";
         $pir .= "    lib = new .Hash\n";
 
-        while (my ($num_func, $func) = each %{$h_lib}) {
-            my ($name, $nb) = @{$func};
+        while ( my ( $num_func, $func ) = each %{$h_lib} ) {
+            my ( $name, $nb ) = @{$func};
             $pir .= "    lib[$num_func] = $nb\t# $name\n";
         }
 
@@ -116,7 +118,6 @@ PIRCODE
     return $pir;
 }
 
-
 # Usage message.
 # ##############
 sub usage {
@@ -126,8 +127,6 @@ Usage:
 USAGE
     exit(1);
 }
-
-
 
 # Local Variables:
 #   mode: cperl

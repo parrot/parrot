@@ -9,10 +9,10 @@ use Getopt::Long;
 use lib 'build';
 
 # Grab parameters.
-my ($rules_file, $output_file, $srm_module);
+my ( $rules_file, $output_file, $srm_module );
 GetOptions(
-    'output=s'  => \$output_file,
-    'srm=s'     => \$srm_module,
+    'output=s' => \$output_file,
+    'srm=s'    => \$srm_module,
 ) or usage();
 $rules_file = shift @ARGV;
 usage() if !$rules_file || @ARGV;
@@ -30,34 +30,34 @@ my $metavars = {};
 # Generate initial translator code and populate metafields.
 my $pir = generate_initial_pir();
 
-$pir .= generate_initial_dump($srm, \@rules, $metavars);
+$pir .= generate_initial_dump( $srm, \@rules, $metavars );
 
 # Emit translation dispatch table.
-$pir .= generate_dispatch_table($srm, \@rules, $metavars);
+$pir .= generate_dispatch_table( $srm, \@rules, $metavars );
 
 # Generate instruction translation code from rules.
 foreach (@rules) {
-    $pir .= generate_rule_dump($srm, $_, $metavars);
+    $pir .= generate_rule_dump( $srm, $_, $metavars );
 }
 
-$pir .= generate_final_dump($srm, $metavars);
+$pir .= generate_final_dump( $srm, $metavars );
 
-$pir .= generate_initial_code($srm, \@rules, $metavars);
+$pir .= generate_initial_code( $srm, \@rules, $metavars );
 
 # Emit translation dispatch table.
-$pir .= generate_dispatch_table($srm, \@rules, $metavars);
+$pir .= generate_dispatch_table( $srm, \@rules, $metavars );
 
 # Generate instruction translation code from rules.
 foreach (@rules) {
-    $pir .= generate_rule_code($srm, $_, $metavars);
+    $pir .= generate_rule_code( $srm, $_, $metavars );
 }
 
 # Generate final translator code.
-$pir .= generate_final_code($srm, $metavars);
+$pir .= generate_final_code( $srm, $metavars );
 
 # Finally, we need to insert auto-magically instantiated local variables
 # into the translator code.
-$pir = insert_automagicals($pir, $metavars);
+$pir = insert_automagicals( $pir, $metavars );
 
 # Finally, write generated PIR to output file.
 open my $fh, '>', $output_file
@@ -68,7 +68,6 @@ close $fh;
 # And display count of ops that can be translated.
 print scalar(@rules) . " instructions translated.\n";
 
-
 ##############################################################################
 # Subroutines.
 ##############################################################################
@@ -76,6 +75,7 @@ print scalar(@rules) . " instructions translated.\n";
 # Parse rules file and build a data structure.
 # ############################################
 sub parse_rules {
+
     # Get filename and open the file.
     my ($filename) = @_;
 
@@ -87,9 +87,9 @@ sub parse_rules {
     my $rule;
 
     # Read through rules file line by line.
-    my $line = 0;
+    my $line       = 0;
     my $in_heredoc = 0;
-    my ($heredoc_key, $heredoc_value, $heredoc_terminator);
+    my ( $heredoc_key, $heredoc_value, $heredoc_terminator );
     while (<$fh>) {
         chomp;
         $line++;
@@ -98,10 +98,12 @@ sub parse_rules {
         next if !$in_heredoc && /^\s*#|^\s*$/;
 
         # Is this a new rule?
-        if (!$in_heredoc && /^\s*\[([\w\.]+)\]\s*$/) {
+        if ( !$in_heredoc && /^\s*\[([\w\.]+)\]\s*$/ ) {
+
             # If we have a current rule...
             my $name = $1;
             if ($rule) {
+
                 # Validate it.
                 validate_rule($rule);
 
@@ -110,34 +112,35 @@ sub parse_rules {
             }
 
             # Create new rule structure.
-            $rule = {
-                name    => $name
-            };
+            $rule = { name => $name };
         }
 
         # Is it a value within a rule with a heredoc?
-        elsif (!$in_heredoc && $rule && /^\s*(\w+)\s*=\s*<<(\w+)\s*$/) {
+        elsif ( !$in_heredoc && $rule && /^\s*(\w+)\s*=\s*<<(\w+)\s*$/ ) {
+
             # Initialize heredoc.
-            $in_heredoc = 1;
-            $heredoc_key = $1;
-            $heredoc_value = q{};
+            $in_heredoc         = 1;
+            $heredoc_key        = $1;
+            $heredoc_value      = q{};
             $heredoc_terminator = $2;
         }
 
         # Or is it a value within a rule and not a herdoc?
-        elsif (!$in_heredoc && $rule && /^\s*(\w+)\s*=\s*(.+?)\s*$/) {
-            if (exists $rule->{$1}) {
+        elsif ( !$in_heredoc && $rule && /^\s*(\w+)\s*=\s*(.+?)\s*$/ ) {
+            if ( exists $rule->{$1} ) {
                 die "Duplicate value for $rule->{$1} in rule $rule->{name}\n";
             }
+
             # Stash key and value.
             $rule->{$1} = $2;
         }
 
         # Are we at the end of a heredoc?
-        elsif ($in_heredoc && /^$heredoc_terminator\s*$/) {
-            if (exists $rule->{$heredoc_key}) {
+        elsif ( $in_heredoc && /^$heredoc_terminator\s*$/ ) {
+            if ( exists $rule->{$heredoc_key} ) {
                 die "Duplicate value for $rule->{$heredoc_key} in rule $rule->{name}\n";
             }
+
             # Stash key/value pair away and unset heredoc flag.
             $rule->{$heredoc_key} = $heredoc_value;
             $in_heredoc = 0;
@@ -170,7 +173,6 @@ sub parse_rules {
     return @rules;
 }
 
-
 # Rule validator.
 # ###############
 sub validate_rule {
@@ -179,50 +181,54 @@ sub validate_rule {
     my $name = $rule->{name};
 
     # Iterate over keys and do validation.
-    while (my ($key, $value) = each %{$rule}) {
-        if ($key eq 'name') {
+    while ( my ( $key, $value ) = each %{$rule} ) {
+        if ( $key eq 'name' ) {
+
             # always fine
         }
-        elsif ($key eq 'code') {
-            if ($value !~ /^[0-9A-F]{2}$/) {
+        elsif ( $key eq 'code' ) {
+            if ( $value !~ /^[0-9A-F]{2}$/ ) {
                 die "Invalid value for $key in rule $name\n";
             }
         }
-        elsif ($key eq 'class') {
-            if ($value !~ /^(op|load|store|branch|calling|sc_op)$/) {
+        elsif ( $key eq 'class' ) {
+            if ( $value !~ /^(op|load|store|branch|calling|sc_op)$/ ) {
                 die "Invalid value for $key in rule $name\n";
             }
         }
-        elsif ($key eq 'push') {
-            if ($value !~ /^\d+$/) {
+        elsif ( $key eq 'push' ) {
+            if ( $value !~ /^\d+$/ ) {
                 die "Invalid value for $key in rule $name\n";
             }
         }
-        elsif ($key eq 'pop') {
-            if ($value !~ /^\d+$/) {
+        elsif ( $key eq 'pop' ) {
+            if ( $value !~ /^\d+$/ ) {
                 die "Invalid value for $key in rule $name\n";
             }
         }
-        elsif ($key eq 'inline') {
-            if ($value !~ /^[0-9A-F]{2}$/) {
+        elsif ( $key eq 'inline' ) {
+            if ( $value !~ /^[0-9A-F]{2}$/ ) {
                 die "Invalid value for $key in rule $name\n";
             }
         }
-        elsif ($key eq 'arguments') {
+        elsif ( $key eq 'arguments' ) {
             my @args = split /\s*,\s+/, $value;
             foreach my $arg (@args) {
-                if ($arg !~ /^(uint(8|16))$/) {
+                if ( $arg !~ /^(uint(8|16))$/ ) {
                     die "Invalid argument type $arg in rule $name\n";
                 }
             }
         }
-        elsif ($key eq 'instruction') {
+        elsif ( $key eq 'instruction' ) {
+
             # always fine
         }
-        elsif ($key eq 'pir') {
+        elsif ( $key eq 'pir' ) {
+
             # always fine
         }
-        elsif ($key eq 'nb_arg') {
+        elsif ( $key eq 'nb_arg' ) {
+
             # always fine
         }
         else {
@@ -231,47 +237,47 @@ sub validate_rule {
     }
 
     # Check we had mandatory fields.
-    unless (exists $rule->{code}) {
+    unless ( exists $rule->{code} ) {
         die "Mandatory entry code missing in rule $name\n";
     }
-    unless (exists $rule->{class}) {
+    unless ( exists $rule->{class} ) {
         die "Mandatory entry class missing in rule $name\n";
     }
 
-    if ($rule->{class} eq 'op') {
-        unless (exists $rule->{pir} or exists $rule->{instruction}) {
+    if ( $rule->{class} eq 'op' ) {
+        unless ( exists $rule->{pir} or exists $rule->{instruction} ) {
             die "Translation (instruction or pir) not provided in rule $name\n";
         }
     }
     else {
-        unless (exists $rule->{pir}) {
+        unless ( exists $rule->{pir} ) {
             die "Mandatory entry pir missing in rule $name\n";
         }
-        if (exists $rule->{instruction}) {
+        if ( exists $rule->{instruction} ) {
             die "instruction not allowed in rule $name\n";
         }
     }
 
-    if ($rule->{class} eq 'calling') {
+    if ( $rule->{class} eq 'calling' ) {
+
         # pop and push forbidden for calling
-        if (exists $rule->{pop} || exists $rule->{push}) {
+        if ( exists $rule->{pop} || exists $rule->{push} ) {
             die "pop and push not allowed for class 'calling' in rule $name\n";
         }
-        unless (exists $rule->{nb_arg}) {
+        unless ( exists $rule->{nb_arg} ) {
             die "nb_arg must be supplied for rule $rule->{name}\n";
         }
     }
     else {
-        if (exists $rule->{nb_arg}) {
+        if ( exists $rule->{nb_arg} ) {
             die "nb_arg not allowed in rule $name\n";
         }
     }
 
-    $rule->{pop} = 0 unless (exists $rule->{pop});
-    $rule->{push} = 0 unless (exists $rule->{push});
+    $rule->{pop}  = 0 unless ( exists $rule->{pop} );
+    $rule->{push} = 0 unless ( exists $rule->{push} );
     return;
 }
-
 
 # Generate the initialization code.
 # #################################
@@ -284,21 +290,20 @@ sub generate_initial_pir {
 PIRCODE
 }
 
-
 # Generate the translator initialization code.
 # ############################################
 sub generate_initial_code {
-    my ($srm, $rules, $mv) = @_;
+    my ( $srm, $rules, $mv ) = @_;
 
     # Set up some more metavariables.
-    $mv->{INS} = 'gen_pir';
-    $mv->{PC} = 'pc';
+    $mv->{INS}    = 'gen_pir';
+    $mv->{PC}     = 'pc';
     $mv->{NEXTPC} = 'next_pc';
     $mv->{STACK0} = 'stack_0';
     $mv->{STACK1} = 'stack_1';
-    $mv->{DEST0} = 'dest_0';
-    $mv->{DEST1} = 'dest_1';
-    $mv->{CONST} = 'h_const';
+    $mv->{DEST0}  = 'dest_0';
+    $mv->{DEST1}  = 'dest_1';
+    $mv->{CONST}  = 'h_const';
 
     # Emit the dumper.
     my $pir = <<'PIRCODE';
@@ -335,7 +340,7 @@ PIRCODE
     # SRM pre translation code.
     $pir .= "### pre_translation\n";
     my $srm_pt = $srm->pre_translation();
-    $pir .= sub_meta($srm_pt, $mv, 'pre_translation');
+    $pir .= sub_meta( $srm_pt, $mv, 'pre_translation' );
     $pir .= "### end pre_translation\n\n";
 
     $pir .= <<'PIRCODE';
@@ -354,7 +359,7 @@ PIRCODE
     # Emit pre instruction code.
     $pir .= "### pre_instruction\n";
     my $srm_instr = $srm->pre_instruction();
-    $pir .= sub_meta($srm_instr, $mv, 'pre_instruction');
+    $pir .= sub_meta( $srm_instr, $mv, 'pre_instruction' );
     $pir .= "### end pre_instruction\n\n";
 
     # Emit label generation code.
@@ -370,11 +375,10 @@ PIRCODE
     return $pir;
 }
 
-
 # Generate the dumper initialization code.
 # ########################################
 sub generate_initial_dump {
-    my ($srm, $rules, $mv) = @_;
+    my ( $srm, $rules, $mv ) = @_;
 
     # Emit the dumper.
     my $pir = <<'PIRCODE';
@@ -402,18 +406,17 @@ PIRCODE
     return $pir;
 }
 
-
 # Generate the dispatch table.
 # ############################
 sub generate_dispatch_table {
-    my ($srm, $rules, $mv) = @_;
+    my ( $srm, $rules, $mv ) = @_;
 
     my %hash;
     my @sorted_rules;
-    foreach (@{$rules}) {
-        $hash{$_->{code}} = $_;
+    foreach ( @{$rules} ) {
+        $hash{ $_->{code} } = $_;
     }
-    foreach (sort keys %hash) {
+    foreach ( sort keys %hash ) {
         push @sorted_rules, $hash{$_};
     }
 
@@ -421,7 +424,7 @@ sub generate_dispatch_table {
     # Translation code dispatch table.
 PIRCODE
 
-    $pir .= binary_dispatch_table('BDISPATCH', @sorted_rules);
+    $pir .= binary_dispatch_table( 'BDISPATCH', @sorted_rules );
 
     # Emit unknown instruction code.
     $pir .= <<'PIRCODE';
@@ -442,22 +445,22 @@ PIRCODE
     return $pir;
 }
 
-
 # Binary dispatch table builder.
 # ##############################
 sub binary_dispatch_table {
     my $prefix = shift;
-    my @rules = @_;
-    my $pir = q{};
+    my @rules  = @_;
+    my $pir    = q{};
 
     # If we have 3 or less rules, dispatch directly to the translator.
-    if (scalar(@rules) <= 3) {
+    if ( scalar(@rules) <= 3 ) {
         foreach (@rules) {
-            if (exists $_->{inline}) {
-                my $mask = sprintf("0x%2X", 0xFF ^ hex($_->{inline}));
+            if ( exists $_->{inline} ) {
+                my $mask = sprintf( "0x%2X", 0xFF ^ hex( $_->{inline} ) );
                 $pir .= "    \$I0 = cur_ic & $mask\n";
                 $pir .= "    if \$I0 == 0x$_->{code} goto ${prefix}_$_->{name}\n";
-            } else {
+            }
+            else {
                 $pir .= "    if cur_ic == 0x$_->{code} goto ${prefix}_$_->{name}\n";
             }
         }
@@ -466,10 +469,11 @@ sub binary_dispatch_table {
         $pir .= "    goto ${prefix}_NOT_FOUND\n";
     }
     else {
+
         # Otherwise, split the rules into two groups.
-        my $split_point = int(scalar(@rules) / 2);
-        my @r1 = @rules[0 .. $split_point - 1];
-        my @r2 = @rules[$split_point .. $#rules];
+        my $split_point = int( scalar(@rules) / 2 );
+        my @r1          = @rules[ 0 .. $split_point - 1 ];
+        my @r2          = @rules[ $split_point .. $#rules ];
 
         # Emit branch code.
         $pir .= "    if cur_ic >= 0x$r2[0]->{code} goto ${prefix}_$r2[0]->{code}\n";
@@ -477,20 +481,19 @@ sub binary_dispatch_table {
 
         # Recurse to make code for sub branches.
         $pir .= "${prefix}_$r1[$#r1]->{code}:\n";
-        $pir .= binary_dispatch_table($prefix, @r1);
+        $pir .= binary_dispatch_table( $prefix, @r1 );
         $pir .= "${prefix}_$r2[0]->{code}:\n";
-        $pir .= binary_dispatch_table($prefix, @r2);
+        $pir .= binary_dispatch_table( $prefix, @r2 );
     }
 
     # Return generated code.
     return $pir;
 }
 
-
 # Generate translation code relating to a rule.
 # #############################################
 sub generate_rule_code {
-    my ($srm, $rule, $mv) = @_;
+    my ( $srm, $rule, $mv ) = @_;
     my @localmv = ();
 
     # Make current instruction code meta-variable.
@@ -508,7 +511,7 @@ PIRCODE
     # ...
 
     # Emit code to read arguments for the op.
-    if (exists $rule->{inline}) {
+    if ( exists $rule->{inline} ) {
         $pir .= <<"PIRCODE";
     # inline
     inline = cur_ic & 0x$rule->{inline}
@@ -517,11 +520,11 @@ PIRCODE
         push @localmv, 'INLINE';
     }
     my @args;
-    @args = split(/,\s*/, $rule->{arguments})
-        if (exists $rule->{arguments});
+    @args = split( /,\s*/, $rule->{arguments} )
+        if ( exists $rule->{arguments} );
     my $arg_num = 1;
     foreach (@args) {
-        if ($_ eq 'uint8') {
+        if ( $_ eq 'uint8' ) {
             $pir .= <<"PIRCODE";
     # $_ arg_$arg_num
     \$S0 = substr code, next_pc, 1
@@ -530,7 +533,7 @@ PIRCODE
     arg_$arg_num = \$I0
 PIRCODE
         }
-        elsif ($_ eq 'uint16') {
+        elsif ( $_ eq 'uint16' ) {
             $pir .= <<"PIRCODE";
     # $_ arg_$arg_num
     \$S0 = substr code, next_pc, 1
@@ -546,79 +549,80 @@ PIRCODE
 
         $mv->{"ARG$arg_num"} = "arg_$arg_num";
         push @localmv, "ARG$arg_num";
-        $arg_num ++;
+        $arg_num++;
     }
 
     # Now we split based upon the class.
     # Operations (op class).
-    if ($rule->{class} eq 'op') {
+    if ( $rule->{class} eq 'op' ) {
+
         # Now call pre_op and append code that it generates.
-        my $pre_op = $srm->pre_op($rule->{pop}, $rule->{push});
+        my $pre_op = $srm->pre_op( $rule->{pop}, $rule->{push} );
         $pir .= "### pre_op\n";
-        $pir .= sub_meta($pre_op, $mv, "pre_op for rule $rule->{name}");
+        $pir .= sub_meta( $pre_op, $mv, "pre_op for rule $rule->{name}" );
         $pir .= "### end pre_op\n";
 
-        $pir .= translation_code($rule, $mv);
+        $pir .= translation_code( $rule, $mv );
 
         # Finally, call post_op and append code it generates.
-        my $post_op = $srm->post_op($rule->{pop}, $rule->{push});
+        my $post_op = $srm->post_op( $rule->{pop}, $rule->{push} );
         $pir .= "### post_op\n";
-        $pir .= sub_meta($post_op, $mv, "post_op for rule $rule->{name}");
+        $pir .= sub_meta( $post_op, $mv, "post_op for rule $rule->{name}" );
         $pir .= "### end post_op\n";
     }
 
-    if ($rule->{class} eq 'sc_op') {
+    if ( $rule->{class} eq 'sc_op' ) {
+
         # Now call pre_op and append code that it generates.
-        my $pre_op = $srm->pre_op($rule->{pop}, 2);
+        my $pre_op = $srm->pre_op( $rule->{pop}, 2 );
         $pir .= "### pre_op\n";
-        $pir .= sub_meta($pre_op, $mv, "pre_op for rule $rule->{name}");
+        $pir .= sub_meta( $pre_op, $mv, "pre_op for rule $rule->{name}" );
         $pir .= "### end pre_op\n";
 
-        my $post_op = $srm->post_op($rule->{pop}, 1);
-        $mv->{__PUSH_1__}  = "### push 1\n";
-        $mv->{__PUSH_1__} .= sub_meta($post_op, $mv, "post_op for rule $rule->{name}");
+        my $post_op = $srm->post_op( $rule->{pop}, 1 );
+        $mv->{__PUSH_1__} = "### push 1\n";
+        $mv->{__PUSH_1__} .= sub_meta( $post_op, $mv, "post_op for rule $rule->{name}" );
         $mv->{__PUSH_1__} .= "### end push 1";
         push @localmv, '__PUSH_1__';
-        $post_op = $srm->post_op($rule->{pop}, 2);
-        $mv->{__PUSH_2__}  = "### push 2\n";
-        $mv->{__PUSH_2__} .= sub_meta($post_op, $mv, "post_op for rule $rule->{name}");
+        $post_op = $srm->post_op( $rule->{pop}, 2 );
+        $mv->{__PUSH_2__} = "### push 2\n";
+        $mv->{__PUSH_2__} .= sub_meta( $post_op, $mv, "post_op for rule $rule->{name}" );
         $mv->{__PUSH_2__} .= "### end push 2";
         push @localmv, '__PUSH_2__';
 
-        $pir .= translation_code($rule, $mv);
+        $pir .= translation_code( $rule, $mv );
     }
 
-
     # Loads (load class).
-    elsif ($rule->{class} eq 'load') {
-        if ($rule->{pir} =~ /\$\{LOADREG\}/) {
+    elsif ( $rule->{class} eq 'load' ) {
+        if ( $rule->{pir} =~ /\$\{LOADREG\}/ ) {
             die "\${LOADREG} not allowed in rule $rule->{name}\n";
         }
-        elsif ($rule->{pir} !~ /\$\{DEST0\}/) {
+        elsif ( $rule->{pir} !~ /\$\{DEST0\}/ ) {
             die "pir must use \${DEST0} in rule $rule->{name}\n";
         }
 
         # Now call pre_load and append code that it generates.
         my $pre_load = $srm->pre_load();
         $pir .= "### pre_load\n";
-        $pir .= sub_meta($pre_load, $mv, "pre_load for rule $rule->{name}");
+        $pir .= sub_meta( $pre_load, $mv, "pre_load for rule $rule->{name}" );
         $pir .= "### end pre_load\n";
 
-        $pir .= translation_code($rule, $mv);
+        $pir .= translation_code( $rule, $mv );
 
         # Finally, call post_load and append code it generates.
         my $post_load = $srm->post_load();
         $pir .= "### post_load\n";
-        $pir .= sub_meta($post_load, $mv, "post_load for rule $rule->{name}");
+        $pir .= sub_meta( $post_load, $mv, "post_load for rule $rule->{name}" );
         $pir .= "### end post_load\n";
     }
 
     # Stores (store class).
-    elsif ($rule->{class} eq 'store') {
-        if ($rule->{pir} =~ /\$\{STACK0\}/) {
+    elsif ( $rule->{class} eq 'store' ) {
+        if ( $rule->{pir} =~ /\$\{STACK0\}/ ) {
             die "\${STACK0} not allowed in rule $rule->{name}\n";
         }
-        elsif ($rule->{pir} =~ /\$\{STOREREG\}/) {
+        elsif ( $rule->{pir} =~ /\$\{STOREREG\}/ ) {
             $mv->{STOREREG} = 'storereg';
             push @localmv, 'STOREREG';
         }
@@ -629,53 +633,55 @@ PIRCODE
         # Now call pre_store and append code that it generates.
         my $pre_store = $srm->pre_store();
         $pir .= "### pre_store\n";
-        $pir .= sub_meta($pre_store, $mv, "pre_store for rule $rule->{name}");
+        $pir .= sub_meta( $pre_store, $mv, "pre_store for rule $rule->{name}" );
         $pir .= "### end pre_store\n";
 
-        $pir .= translation_code($rule, $mv);
+        $pir .= translation_code( $rule, $mv );
 
         # Finally, call post_store and append code it generates.
         my $post_store = $srm->post_store();
         $pir .= "### post_store\n";
-        $pir .= sub_meta($post_store, $mv, "post_store for rule $rule->{name}");
+        $pir .= sub_meta( $post_store, $mv, "post_store for rule $rule->{name}" );
         $pir .= "### end post_store\n";
     }
 
     # Branches (branch class).
-    elsif ($rule->{class} eq 'branch') {
+    elsif ( $rule->{class} eq 'branch' ) {
+
         # Call pre_branch and append code that it generates.
-        my $pre_branch = $srm->pre_branch($rule->{pop});
+        my $pre_branch = $srm->pre_branch( $rule->{pop} );
         $pir .= "### pre_branch\n";
-        $pir .= sub_meta($pre_branch, $mv, "pre_branch for rule $rule->{name}");
+        $pir .= sub_meta( $pre_branch, $mv, "pre_branch for rule $rule->{name}" );
         $pir .= "### end pre_branch\n";
 
-        $pir .= translation_code($rule, $mv);
+        $pir .= translation_code( $rule, $mv );
 
         # Finally, call post_branch and append code it generates.
-        my $post_branch = $srm->post_branch($rule->{pop});
+        my $post_branch = $srm->post_branch( $rule->{pop} );
         $pir .= "### post_branch\n";
-        $pir .= sub_meta($post_branch, $mv, "post_branch for rule $rule->{name}");
+        $pir .= sub_meta( $post_branch, $mv, "post_branch for rule $rule->{name}" );
         $pir .= "### end post_branch\n";
     }
 
     # Calls/returns (calling class)
-    elsif ($rule->{class} eq 'calling') {
+    elsif ( $rule->{class} eq 'calling' ) {
+
         # Set meta-variable.
         $mv->{PARAMS} = 'c_params';
         push @localmv, 'PARAMS';
 
         # Now call pre_call and append code that it generates.
-        my $pre_call = $srm->pre_call($rule->{nb_arg});
+        my $pre_call = $srm->pre_call( $rule->{nb_arg} );
         $pir .= "### pre_call\n";
-        $pir .= sub_meta($pre_call, $mv, "pre_call for rule $rule->{name}");
+        $pir .= sub_meta( $pre_call, $mv, "pre_call for rule $rule->{name}" );
         $pir .= "### end pre_call\n";
 
-        $pir .= translation_code($rule, $mv);
+        $pir .= translation_code( $rule, $mv );
 
         # Finally, call post_call and append code it generates.
         my $post_call = $srm->post_call();
         $pir .= "### post_call\n";
-        $pir .= sub_meta($post_call, $mv, "post_call for rule $rule->{'name'}");
+        $pir .= sub_meta( $post_call, $mv, "post_call for rule $rule->{'name'}" );
         $pir .= "### end post_call\n";
     }
 
@@ -691,20 +697,17 @@ PIRCODE
     return $pir;
 }
 
-
 sub translation_code {
-    my ($rule, $mv) = @_;
+    my ( $rule, $mv ) = @_;
 
     # If we have PIR for the instruction, just take that. If not, we need
     # to generate it from the "to generate" instruction directive.
     my $pir = "### translation\n";
-    if ($rule->{pir}) {
-        $pir .= sub_meta($rule->{pir}, $mv,
-            "pir for rule $rule->{name}");
+    if ( $rule->{pir} ) {
+        $pir .= sub_meta( $rule->{pir}, $mv, "pir for rule $rule->{name}" );
     }
-    elsif ($rule->{instruction}) {
-        $pir .= sub_meta(ins_to_pir($rule->{instruction}), $mv,
-            "pir for rule $rule->{name}");
+    elsif ( $rule->{instruction} ) {
+        $pir .= sub_meta( ins_to_pir( $rule->{instruction} ), $mv, "pir for rule $rule->{name}" );
     }
     else {
         $pir .= "# TODO\n";
@@ -718,7 +721,7 @@ sub translation_code {
 # Instruction to PIR routine.
 # ###########################
 sub ins_to_pir {
-    my ($ins, $mv) = @_;
+    my ( $ins, $mv ) = @_;
     my $output;
 
     # Ensure we have a newline at the end.
@@ -740,11 +743,10 @@ sub ins_to_pir {
     return $ins;
 }
 
-
 # Generate dump code relating to a rule.
 # #############################################
 sub generate_rule_dump {
-    my ($srm, $rule, $mv) = @_;
+    my ( $srm, $rule, $mv ) = @_;
 
     # Emit dispatch label.
     my $pir = <<"PIRCODE";
@@ -753,18 +755,18 @@ BDISPATCH_$rule->{name}:
 PIRCODE
 
     # Emit code to read arguments for the op.
-    if (exists $rule->{inline}) {
+    if ( exists $rule->{inline} ) {
         $pir .= <<"PIRCODE";
     # inline
     inline = cur_ic & 0x$rule->{inline}
 PIRCODE
     }
     my @args;
-    @args = split(/,\s*/, $rule->{arguments})
-        if (exists $rule->{arguments});
+    @args = split( /,\s*/, $rule->{arguments} )
+        if ( exists $rule->{arguments} );
     my $arg_num = 1;
     foreach (@args) {
-        if ($_ eq 'uint8') {
+        if ( $_ eq 'uint8' ) {
             $pir .= <<"PIRCODE";
     # $_ arg_$arg_num
     \$S0 = substr code, next_pc, 1
@@ -773,7 +775,7 @@ PIRCODE
     arg_$arg_num = \$I0
 PIRCODE
         }
-        elsif ($_ eq 'uint16') {
+        elsif ( $_ eq 'uint16' ) {
             $pir .= <<"PIRCODE";
     # $_ arg_$arg_num
     \$S0 = substr code, next_pc, 1
@@ -786,13 +788,13 @@ PIRCODE
     arg_$arg_num += \$I0
 PIRCODE
         }
-        $arg_num ++;
+        $arg_num++;
     }
 
     # Emit code to dump.
     $pir .= "    print \"$rule->{name}\"\n";
 
-    if (exists $rule->{inline}) {
+    if ( exists $rule->{inline} ) {
         $pir .= <<'PIRCODE';
     print "\t"
     print inline
@@ -805,7 +807,7 @@ PIRCODE
     print "\\t"
     print arg_$arg_num
 PIRCODE
-        $arg_num ++;
+        $arg_num++;
     }
 
     $pir .= "    print \"\\n\"\n";
@@ -817,10 +819,10 @@ PIRCODE
     return $pir;
 }
 
-
 # Generate the dumper trailer code.
 # #################################
 sub generate_final_dump {
+
     # Emit complete label.
     # Emit the end of the dumper.
     my $pir = <<'PIRCODE';
@@ -833,11 +835,10 @@ PIRCODE
     return $pir;
 }
 
-
 # Generate the translator trailer code.
 # #####################################
 sub generate_final_code {
-    my ($srm, $mv) = @_;
+    my ( $srm, $mv ) = @_;
 
     # Emit complete label.
     # Emit label generation code.
@@ -868,7 +869,7 @@ PIRCODE
     # SRM post translation code
     $pir .= "\n### post_translation\n";
     my $srm_pt = $srm->post_translation();
-    $pir .= sub_meta($srm_pt, $mv, 'post_translation');
+    $pir .= sub_meta( $srm_pt, $mv, 'post_translation' );
     $pir .= "### end post_translation\n\n";
 
     # Emit the end of the translator PIR.
@@ -882,23 +883,22 @@ PIRCODE
     return $pir;
 }
 
-
 # Inserts auto-magically instantiated meta-variable locals.
 # #########################################################
 sub insert_automagicals {
-    my ($pir, $mv) = @_;
+    my ( $pir, $mv ) = @_;
 
     my %type = (
-        'I' =>  'int',
-        'N' =>  'num',
-        'S' =>  'string',
-        'P' =>  'pmc',
+        'I' => 'int',
+        'N' => 'num',
+        'S' => 'string',
+        'P' => 'pmc',
     );
 
     # Loop over keys to look for automagicals and build up declaration list.
     my $decls = q{};
-    foreach (sort keys %{$mv}) {
-        if (/^([INSP])_ARG_(\d+)$/ || /^([INSP])TEMP(\d+)$/) {
+    foreach ( sort keys %{$mv} ) {
+        if ( /^([INSP])_ARG_(\d+)$/ || /^([INSP])TEMP(\d+)$/ ) {
             $decls .= "  .local $type{$1} $mv->{$_}\n";
         }
     }
@@ -908,39 +908,37 @@ sub insert_automagicals {
     return $pir;
 }
 
-
 # Substiture meta variables.
 # ##########################
 sub sub_meta {
-    my ($pir, $mv, $code_source) = @_;
+    my ( $pir, $mv, $code_source ) = @_;
     $code_source ||= "(unknown)";
 
     # Substiture in known meta-variables.
-    for (keys %$mv) {
+    for ( keys %$mv ) {
         $pir =~ s/\${$_}/$mv->{$_}/g;
     }
 
     # We need to automagically instantiate [INSP]_ARG_\d+ and [INSP]TEMP\d+.
-    while ($pir =~ /\$\{([INS])TEMP(\d+)\}/g) {
-        my $key = $1 . 'TEMP' . $2;
+    while ( $pir =~ /\$\{([INS])TEMP(\d+)\}/g ) {
+        my $key   = $1 . 'TEMP' . $2;
         my $value = '$' . $1 . $2;
         $pir =~ s/\$\{$key\}/$value/g;
     }
-    while ($pir =~ /\$\{PTEMP(\d+)\}/g) {
-        my $key = 'PTEMP' . $1;
+    while ( $pir =~ /\$\{PTEMP(\d+)\}/g ) {
+        my $key   = 'PTEMP' . $1;
         my $value = 'P_temp_' . $1;
         $mv->{$key} = $value;
         $pir =~ s/\$\{$key\}/$value/g;
     }
 
     # If we have any unsubstituted variables, error.
-    if ($pir =~ /\$\{([^}]*)}/) {
+    if ( $pir =~ /\$\{([^}]*)}/ ) {
         warn "Unknown metavariable $1 used in $code_source\n";
     }
 
     return $pir;
 }
-
 
 # Usage message.
 # ##############
@@ -952,8 +950,6 @@ Usage:
 USAGE
     exit(1);
 }
-
-
 
 # Local Variables:
 #   mode: cperl

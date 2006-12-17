@@ -22,7 +22,7 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 3;
 use Test::More;
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'for');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'for' );
 extern function main()
 {
     var sum = 0;
@@ -40,7 +40,7 @@ CODE
 Sum: 10
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'for break');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'for break' );
 extern function main()
 {
     var sum = 0;
@@ -59,7 +59,7 @@ CODE
 Sum: 10
 OUT
 
-language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'while', cflags => '-On');
+language_output_is( 'WMLScript', <<'CODE', <<'OUT', 'while', cflags => '-On' );
 extern function main()
 {
     var sum = 0;

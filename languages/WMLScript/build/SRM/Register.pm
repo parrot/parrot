@@ -15,6 +15,7 @@ sub new {
 
 # Pre-translation hook.
 sub pre_translation {
+
     # We need a stack depth and some
     # storage for stack depths that we are
     # propogating.
@@ -26,12 +27,14 @@ PIR
 
 # Post translation hook.
 sub post_translation {
+
     # Nothing to do.
     return q{};
 }
 
 # Pre intruction (common) hook.
 sub pre_instruction {
+
     # Nothing to do.
     return q{};
 }
@@ -39,12 +42,12 @@ sub pre_instruction {
 # Pre and post stack operation (op class instructions) hooks.
 sub pre_op {
     my $self = shift;
-    my ($pops, $pushes) = @_;
+    my ( $pops, $pushes ) = @_;
     my $pir = q{};
 
     # Do code for each pop. Need to set up mv's and pop stuff off the stack
     # we're maintaining.
-    for my $pop_num (0 .. $pops-1) {
+    for my $pop_num ( 0 .. $pops - 1 ) {
         $pir .= <<"PIR";
     # Set register name.
     \${STACK$pop_num} = "\$P"
@@ -56,7 +59,7 @@ PIR
     }
 
     # Do code for each push.
-    for my $push_num (0 .. $pushes-1) {
+    for my $push_num ( 0 .. $pushes - 1 ) {
         $pir .= <<"PIR";
     # Increment stack depth.
     inc stack_depth
@@ -72,19 +75,20 @@ PIR
 }
 
 sub post_op {
+
     # Nothing to do.
     return q{};
 }
 
 # Pre and post branch operation hooks.
 sub pre_branch {
-    my $self = shift;
+    my $self   = shift;
     my ($pops) = @_;
-    my $pir = q{};
+    my $pir    = q{};
 
     # Do code for each pop. Need to set up mv's and pop stuff off the stack
     # we're maintaining.
-    for my $pop_num (0 .. $pops-1) {
+    for my $pop_num ( 0 .. $pops - 1 ) {
         $pir .= <<"PIR";
     # Set register name.
     \${STACK$pop_num} = "\$P"
@@ -100,6 +104,7 @@ PIR
 }
 
 sub post_branch {
+
     # Nothing to do.
     return q{};
 }
@@ -117,12 +122,14 @@ PIR
 }
 
 sub post_load {
+
     # Nothing to do.
     return q{};
 }
 
 # Pre and post store operation hooks.
 sub pre_store {
+
     # Nothing to do.
     return q{};
 }
@@ -177,6 +184,7 @@ PIR
 }
 
 sub post_call {
+
     # Nothing to do.
     return q{};
 }
