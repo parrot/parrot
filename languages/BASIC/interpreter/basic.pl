@@ -1,7 +1,7 @@
 #! perl
 #
 # $Id$
-# $Log: basic.pl,v 
+# $Log: basic.pl,v
 # Revision 1.11  2002/06/16 21:23:28  clint
 # Floating Point BASI
 #
@@ -27,7 +27,7 @@
 use strict;
 use warnings;
 
-open(T, ">", "merged_basic.pasm") || die;
+open( T, ">", "merged_basic.pasm" ) || die;
 
 print T <<'EOF';
 	branch MAIN

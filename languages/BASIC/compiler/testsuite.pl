@@ -7,32 +7,33 @@
 use strict;
 use warnings;
 
-$tn=0;
-while(1) {
-        {
-                local $/="";
-                $_=<DATA>;
-        }
-        if (/type / or /select/) { # /function/
-                print "Skipped\n";
-                next;
-        }
-        last unless $_;
-        last if /STOPPLEASE/;
-        @c=m/^'\s*(.*)/gm;
-        print join("\n", @c), "\n====================== $tn\n" if @c;
-        $tn++;
-        open(OF, ">", "_testsuite.bas") || die;
-        print OF $_;
-        close(OF);
-        if ( ! system("perl compile.pl _testsuite.bas")) {
-                system("perl testrun.pl > _output2");
-                open(O, '>', "_output2") || die;
-                print <O>;
-                close(O);
-                print "\n";
-        }
-        
+$tn = 0;
+while (1) {
+    {
+        local $/ = "";
+        $_ = <DATA>;
+    }
+    if ( /type / or /select/ ) {    # /function/
+        print "Skipped\n";
+        next;
+    }
+    last unless $_;
+    last if /STOPPLEASE/;
+    @c = m/^'\s*(.*)/gm;
+    print join( "\n", @c ), "\n====================== $tn\n" if @c;
+    $tn++;
+    open( OF, ">", "_testsuite.bas" ) || die;
+    print OF $_;
+    close(OF);
+
+    if ( !system("perl compile.pl _testsuite.bas") ) {
+        system("perl testrun.pl > _output2");
+        open( O, '>', "_output2" ) || die;
+        print <O>;
+        close(O);
+        print "\n";
+    }
+
 }
 
 __DATA__
