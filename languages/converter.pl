@@ -16,18 +16,18 @@ use YAML;
 use Parse::RecDescent;
 
 sub modifier {
-  my $modifier = shift;
-  return '' unless defined $modifier->[0];
-  return '(?)'  if $modifier->[0] eq '?';
-  return '(s)'  if $modifier->[0] eq '+';
-  return '(s?)' if $modifier->[0] eq '*';
+    my $modifier = shift;
+    return '' unless defined $modifier->[0];
+    return '(?)'  if $modifier->[0] eq '?';
+    return '(s)'  if $modifier->[0] eq '+';
+    return '(s?)' if $modifier->[0] eq '*';
 }
 
 sub strip_quotes {
-  my $string = shift;
-  $string =~ s/^'(.*)'$/$1/ if $string=~/^'/;
-  $string =~ s/^"(.*)"$/$1/ if $string=~/^"/;
-  $string;
+    my $string = shift;
+    $string =~ s/^'(.*)'$/$1/ if $string =~ /^'/;
+    $string =~ s/^"(.*)"$/$1/ if $string =~ /^"/;
+    $string;
 }
 
 my $grammargrammar = <<'_EOF_';
@@ -102,28 +102,28 @@ open FILE, '<', $file or die "Couldn't open '$file': $!";
 close FILE;
 
 my $in_rule = 0;
-for(@lines) {
-  chomp;
-  next if /^\s*$/;
-  next if /^\s*#/;
-  if($in_rule) {
-    if(/::=/) {
-      push @rules,$_;
+for (@lines) {
+    chomp;
+    next if /^\s*$/;
+    next if /^\s*#/;
+    if ($in_rule) {
+        if (/::=/) {
+            push @rules, $_;
+        }
+        else {
+            $rules[-1] .= "\n$_";
+        }
     }
     else {
-      $rules[-1] .= "\n$_";
+        if (/::=/) {
+            push @rules, $_;
+            $in_rule = 1;
+        }
     }
-  }
-  else {
-    if(/::=/) {
-      push @rules,$_;
-      $in_rule = 1;
-    }
-  }
 }
 
-for(@rules) {
-  print$parser->rule($_) . "\n\n";
+for (@rules) {
+    print $parser->rule($_) . "\n\n";
 }
 
 # Local Variables:
