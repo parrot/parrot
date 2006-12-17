@@ -1,3 +1,4 @@
+
 =head1 NAME
 
 Parrot::Config - Parrot Configuration Data
@@ -16,7 +17,7 @@ package Parrot::Config;
 eval 'use Parrot::Config::Generated';
 if ($@) {
     die "\nParrot::Config is unavailable until you configure parrot.\n"
-        ."Please run `perl Configure.pl`.\n\n";
+        . "Please run `perl Configure.pl`.\n\n";
 }
 
 use strict;
@@ -25,9 +26,9 @@ use Exporter;
 
 use vars qw(@ISA @EXPORT %PConfig);
 
-@ISA=qw(Exporter);
+@ISA = qw(Exporter);
 
-@EXPORT=qw(%PConfig);
+@EXPORT = qw(%PConfig);
 
 %PConfig = %Parrot::Config::Generated::PConfig;
 

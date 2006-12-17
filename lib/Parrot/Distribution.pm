@@ -41,7 +41,6 @@ use Parrot::Configure::Step qw(capture_output);
 use Parrot::Docs::Directory;
 use base qw(Parrot::Docs::Directory);
 
-
 =item C<new()>
 
 Searches up the file system tree from the current working directory
@@ -57,8 +56,7 @@ Raises an exception if the distribution root is not found.
 
 my $dist;
 
-sub new
-{
+sub new {
     my $self = shift;
 
     return $dist if defined $dist;
@@ -66,15 +64,15 @@ sub new
     my $path = '.';
 
     while ( $self = $self->SUPER::new($path) ) {
-        return $dist = $self if $self->file_exists_with_name('README') and
-            $self->file_with_name('README')->read =~ m/^This is Parrot/os;
+        return $dist = $self
+            if $self->file_exists_with_name('README')
+            and $self->file_with_name('README')->read =~ m/^This is Parrot/os;
 
         $path = $self->parent_path();
     }
 
     die "Failed to find Parrot distribution root\n";
 }
-
 
 =back
 
@@ -88,25 +86,19 @@ Returns the directories which contain C source files.
 
 =cut
 
-sub c_source_file_directories
-{
+sub c_source_file_directories {
     my $self = shift;
 
     return
-        map $self->directory_with_name($_) =>
-            map("compilers/$_" => qw<bcg/src bcg/src/pmc imcc>),
-            'config/gen/cpu/i386',
-            map("config/gen/platform/$_" =>
-                qw<aix ansi cygwin darwin generic
-                ia64 netbsd openbsd solaris win32>),
-            map("examples/$_" => qw<c compilers mops nci>),
-            'src',
-            map("src/$_" =>
-                qw<atomic charset dynoplibs dynpmc
-                encodings io ops packfile pmc stm>),
-    ;
+        map $self->directory_with_name($_) => map( "compilers/$_" => qw<bcg/src bcg/src/pmc imcc> ),
+        'config/gen/cpu/i386',
+        map( "config/gen/platform/$_" => qw<aix ansi cygwin darwin generic
+            ia64 netbsd openbsd solaris win32> ),
+        map( "examples/$_" => qw<c compilers mops nci> ), 'src',
+        map( "src/$_" => qw<atomic charset dynoplibs dynpmc
+            encodings io ops packfile pmc stm> ),
+        ;
 }
-
 
 =item C<c_source_file_with_name($name)>
 
@@ -114,24 +106,21 @@ Returns the C source file with the specified name.
 
 =cut
 
-sub c_source_file_with_name
-{
+sub c_source_file_with_name {
     my $self = shift;
     my $name = shift || return;
 
     $name .= '.c' unless $name =~ /\.[Cc]$/o;
 
-    foreach my $dir ($self->c_source_file_directories)
-    {
+    foreach my $dir ( $self->c_source_file_directories ) {
         return $dir->file_with_name($name)
             if $dir->file_exists_with_name($name);
     }
 
-    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
+    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name . "\n";
 
     return;
 }
-
 
 =item C<c_header_file_directories()>
 
@@ -141,28 +130,18 @@ Currently only F<include/parrot>.
 
 =cut
 
-sub c_header_file_directories
-{
+sub c_header_file_directories {
     my $self = shift;
 
-    return
-        map $self->directory_with_name($_) =>
-            map("compilers/$_" => qw<bcg/include imcc>),
-            'config/gen/platform',
-            map("config/gen/platform/$_" =>
-                qw<aix ansi cygwin darwin generic
-                ia64 netbsd openbsd solaris win32>),
-            'include/parrot',
-            map("include/parrot/$_" => qw<atomic oplib stm>),
-            'src',
-            map("src/$_" =>
-                qw<atomic charset dynoplibs dynpmc
-                encodings io ops packfile pmc stm>),
-            map("src/jit/$_" =>
-                qw<alpha arm hppa i386 ia64 mips ppc skeleton sun4>),
-    ;
+    return map $self->directory_with_name($_) => map( "compilers/$_" => qw<bcg/include imcc> ),
+        'config/gen/platform',
+        map( "config/gen/platform/$_" => qw<aix ansi cygwin darwin generic
+            ia64 netbsd openbsd solaris win32> ),
+        'include/parrot', map( "include/parrot/$_" => qw<atomic oplib stm> ), 'src',
+        map( "src/$_" => qw<atomic charset dynoplibs dynpmc
+            encodings io ops packfile pmc stm> ),
+        map( "src/jit/$_" => qw<alpha arm hppa i386 ia64 mips ppc skeleton sun4> ),;
 }
-
 
 =item C<c_header_file_with_name($name)>
 
@@ -170,15 +149,13 @@ Returns the C header file with the specified name.
 
 =cut
 
-sub c_header_file_with_name
-{
+sub c_header_file_with_name {
     my $self = shift;
     my $name = shift || return;
 
     $name .= '.h' unless $name =~ /\.[Hh]$/o;
 
-    foreach my $dir ($self->c_header_file_directories)
-    {
+    foreach my $dir ( $self->c_header_file_directories ) {
         return $dir->file_with_name($name)
             if $dir->file_exists_with_name($name);
     }
@@ -192,24 +169,22 @@ Returns the directories which contain PMC source files.
 
 =cut
 
-sub pmc_source_file_directories
-{
+sub pmc_source_file_directories {
     my $self = shift;
 
     my %pmc_source_dirs =
+
         # Make a hash out of the directories of those files
-        map {((File::Spec->splitpath($_))[1] => 1)}
+        map { ( ( File::Spec->splitpath($_) )[1] => 1 ) }
 
         # Only look at files ending in .pmc
-        grep {m|\.pmc$|}
+        grep { m|\.pmc$| }
 
-        keys %{ ExtUtils::Manifest::maniread(
-            File::Spec->catfile($self->path, "MANIFEST")) };
+        keys %{ ExtUtils::Manifest::maniread( File::Spec->catfile( $self->path, "MANIFEST" ) ) };
 
-    return map $self->directory_with_name($_) => grep {! m|\.svn/$|}
+    return map $self->directory_with_name($_) => grep { !m|\.svn/$| }
         keys %pmc_source_dirs;
 }
-
 
 =item C<pmc_source_file_with_name($name)>
 
@@ -217,20 +192,18 @@ Returns the PMC source file with the specified name.
 
 =cut
 
-sub pmc_source_file_with_name
-{
+sub pmc_source_file_with_name {
     my $self = shift;
     my $name = shift || return;
 
     $name .= '.pmc';
 
-    foreach my $dir ($self->pmc_source_file_directories)
-    {
+    foreach my $dir ( $self->pmc_source_file_directories ) {
         return $dir->file_with_name($name)
             if $dir->file_exists_with_name($name);
     }
 
-    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
+    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name . "\n";
 
     return;
 }
@@ -241,19 +214,12 @@ Returns the directories which contain yacc source files.
 
 =cut
 
-sub yacc_source_file_directories
-{
+sub yacc_source_file_directories {
     my $self = shift;
 
-    return
-        map $self->directory_with_name($_) =>
-            'compilers/imcc/',
-            'languages/cola/',
-            'languages/lua/doc',
-            'languages/regex/lib/Regex',
-    ;
+    return map $self->directory_with_name($_) => 'compilers/imcc/',
+        'languages/cola/', 'languages/lua/doc', 'languages/regex/lib/Regex',;
 }
-
 
 =item C<yacc_source_file_with_name($name)>
 
@@ -261,20 +227,18 @@ Returns the yacc source file with the specified name.
 
 =cut
 
-sub yacc_source_file_with_name
-{
+sub yacc_source_file_with_name {
     my $self = shift;
     my $name = shift || return;
 
     $name .= '.y';
 
-    foreach my $dir ($self->yacc_source_file_directories)
-    {
+    foreach my $dir ( $self->yacc_source_file_directories ) {
         return $dir->file_with_name($name)
             if $dir->file_exists_with_name($name);
     }
 
-    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
+    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name . "\n";
 
     return;
 }
@@ -285,17 +249,12 @@ Returns the directories which contain lex source files.
 
 =cut
 
-sub lex_source_file_directories
-{
+sub lex_source_file_directories {
     my $self = shift;
 
-    return
-        map $self->directory_with_name($_) =>
-            'compilers/imcc/',
-            'languages/cola/',
-    ;
+    return map $self->directory_with_name($_) => 'compilers/imcc/',
+        'languages/cola/',;
 }
-
 
 =item C<lex_source_file_with_name($name)>
 
@@ -303,20 +262,18 @@ Returns the lex source file with the specified name.
 
 =cut
 
-sub lex_source_file_with_name
-{
+sub lex_source_file_with_name {
     my $self = shift;
     my $name = shift || return;
 
     $name .= '.l';
 
-    foreach my $dir ($self->lex_source_file_directories)
-    {
+    foreach my $dir ( $self->lex_source_file_directories ) {
         return $dir->file_with_name($name)
             if $dir->file_exists_with_name($name);
     }
 
-    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
+    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name . "\n";
 
     return;
 }
@@ -327,20 +284,13 @@ Returns the directories which contain ops source files.
 
 =cut
 
-sub ops_source_file_directories
-{
+sub ops_source_file_directories {
     my $self = shift;
 
-    return
-        map $self->directory_with_name($_) =>
-            'src/ops/',
-            'src/dynoplibs/',
-            'languages/tcl/src/ops/',
-            'languages/WMLScript/ops/',
-            'languages/dotnet/ops/',
-    ;
+    return map $self->directory_with_name($_) => 'src/ops/',
+        'src/dynoplibs/', 'languages/tcl/src/ops/', 'languages/WMLScript/ops/',
+        'languages/dotnet/ops/',;
 }
-
 
 =item C<ops_source_file_with_name($name)>
 
@@ -348,20 +298,18 @@ Returns the ops source file with the specified name.
 
 =cut
 
-sub ops_source_file_with_name
-{
+sub ops_source_file_with_name {
     my $self = shift;
     my $name = shift || return;
 
     $name .= '.ops';
 
-    foreach my $dir ($self->ops_source_file_directories)
-    {
+    foreach my $dir ( $self->ops_source_file_directories ) {
         return $dir->file_with_name($name)
             if $dir->file_exists_with_name($name);
     }
 
-    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name ."\n";
+    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name . "\n";
 
     return;
 }
@@ -388,28 +336,21 @@ Returns the C language source files within Parrot.  Namely:
 
 =cut
 
-sub get_c_language_files
-{
+sub get_c_language_files {
     my $self = shift;
     grep( $_->{PATH} !~ m{ \b imc(parser|lexer)\.[hc] $ }x,
 
-        map( $_->files_of_type('C code'),
-            $self->c_source_file_directories ),
+        map( $_->files_of_type('C code'), $self->c_source_file_directories ),
 
-        map( $_->files_of_type('C header'),
-            $self->c_header_file_directories ),
+        map( $_->files_of_type('C header'), $self->c_header_file_directories ),
 
-        map( $_->files_of_type('PMC code'),
-            $self->pmc_source_file_directories ),
+        map( $_->files_of_type('PMC code'), $self->pmc_source_file_directories ),
 
-        map( $_->files_of_type('Yacc file'),
-            $self->yacc_source_file_directories ),
+        map( $_->files_of_type('Yacc file'), $self->yacc_source_file_directories ),
 
-        map( $_->files_of_type('Lex file'),
-            $self->lex_source_file_directories ),
+        map( $_->files_of_type('Lex file'), $self->lex_source_file_directories ),
 
-        map( $_->files_of_type('Parrot opcode file'),
-            $self->ops_source_file_directories ),
+        map( $_->files_of_type('Parrot opcode file'), $self->ops_source_file_directories ),
     );
 }
 
@@ -431,8 +372,7 @@ Returns the Perl language source files within Parrot.  Namely:
 
 =cut
 
-sub get_perl_language_files
-{
+sub get_perl_language_files {
     my $self = shift;
     my @files;
     my $manifest = ExtUtils::Manifest::maniread('MANIFEST');
@@ -454,7 +394,7 @@ Determines if the given filename is Perl source
 # Since .t files might be written in any language, we can't *just* check the
 # filename to see if something should be treated as perl.
 sub is_perl {
-    my $self = shift;
+    my $self     = shift;
     my $filename = shift;
 
     if ( !-f $filename ) {
@@ -474,7 +414,7 @@ sub is_perl {
 
     # Now let's check to see if there's a perl shebang.
 
-    open my $file_handle, '<', $filename 
+    open my $file_handle, '<', $filename
         or die "Could not open $filename for reading";
     my $line = <$file_handle>;
     close $file_handle;
@@ -492,8 +432,7 @@ Returns the Perl module file for the specified module.
 
 =cut
 
-sub file_for_perl_module
-{
+sub file_for_perl_module {
     my $self = shift;
     my $module = shift || return;
 
@@ -504,14 +443,12 @@ sub file_for_perl_module
 
     my $dir = $self->existing_directory_with_name('lib');
 
-    foreach my $name (@path)
-    {
+    foreach my $name (@path) {
         return unless $dir = $dir->existing_directory_with_name($name);
     }
 
     return $dir->existing_file_with_name($module);
 }
-
 
 =item C<docs_directory()>
 
@@ -519,13 +456,11 @@ Returns the documentation directory.
 
 =cut
 
-sub docs_directory
-{
+sub docs_directory {
     my $self = shift;
 
     return $self->existing_directory_with_name('docs');
 }
-
 
 =item C<html_docs_directory()>
 
@@ -533,13 +468,11 @@ Returns the HTML documentation directory.
 
 =cut
 
-sub html_docs_directory
-{
+sub html_docs_directory {
     my $self = shift;
 
     return $self->docs_directory->directory_with_name('html');
 }
-
 
 =item C<delete_html_docs()>
 
@@ -547,13 +480,11 @@ Deletes the HTML documentation directory.
 
 =cut
 
-sub delete_html_docs
-{
+sub delete_html_docs {
     my $self = shift;
 
     return $self->html_docs_directory->delete();
 }
-
 
 =item C<gen_manifest_skip>
 
@@ -563,41 +494,43 @@ Query the svn:ignore property and generate the lines for MANIFEST.SKIP.
 
 sub gen_manifest_skip {
 
-   # manicheck.pl is probably only useful for checked out revisions
-   # Checkout is done either with svn or svk
-   my $svn_cmd;
-   if (defined $Parrot::Revision::svn_entries
-            && $Parrot::Revision::svn_entries =~ m/\.svn/) {
-       $svn_cmd = 'svn';
-   } else {
-       $svn_cmd = 'svk';
-   }
+    # manicheck.pl is probably only useful for checked out revisions
+    # Checkout is done either with svn or svk
+    my $svn_cmd;
+    if ( defined $Parrot::Revision::svn_entries
+        && $Parrot::Revision::svn_entries =~ m/\.svn/ )
+    {
+        $svn_cmd = 'svn';
+    }
+    else {
+        $svn_cmd = 'svk';
+    }
 
-   # Find all directories in the Parrot distribution
-   my %dir_list  = map { my $dir = ( File::Spec->splitpath( $_ ) )[1];
-                         $dir =~ s!\.svn/$!!;
-                         $dir => 1
-                       } keys %{ ExtUtils::Manifest::manifind() };
-   my @skip;     # regular expressions for files to skip
-   foreach my $dir ( sort keys %dir_list ) {
-       next if $dir =~ m/\.svn/;
-       next if ( $dir && ! -d $dir );
+    # Find all directories in the Parrot distribution
+    my %dir_list = map {
+        my $dir = ( File::Spec->splitpath($_) )[1];
+        $dir =~ s!\.svn/$!!;
+        $dir => 1
+    } keys %{ ExtUtils::Manifest::manifind() };
+    my @skip;    # regular expressions for files to skip
+    foreach my $dir ( sort keys %dir_list ) {
+        next if $dir =~ m/\.svn/;
+        next if ( $dir && !-d $dir );
 
-       my $patterns = capture_output( "$svn_cmd propget svn:ignore $dir" );
-       # TODO: escape chars that are special in regular expressions
-       push @skip, qq{# generated from svn:ignore of '$dir'},
-           map {
-               my $end = $dir_list{ $dir . $_} ? '$' : '/'; # ignore file or dir
-               s/\./\\./g;                  # . is simply a dot
-               s/\*/.*/g;                   # * is any amount of chars
-               "^${dir}${_}\$",             # SVN globs are specific to a dir
-               "^${dir}${_}/",              # SVN globs are specific to a dir
-           } split( /\n/, $patterns );
+        my $patterns = capture_output("$svn_cmd propget svn:ignore $dir");
+
+        # TODO: escape chars that are special in regular expressions
+        push @skip, qq{# generated from svn:ignore of '$dir'}, map {
+            my $end = $dir_list{ $dir . $_ } ? '$' : '/';    # ignore file or dir
+            s/\./\\./g;                                      # . is simply a dot
+            s/\*/.*/g;                                       # * is any amount of chars
+            "^${dir}${_}\$",                                 # SVN globs are specific to a dir
+                "^${dir}${_}/",                              # SVN globs are specific to a dir
+        } split( /\n/, $patterns );
     }
 
     return \@skip;
 }
-
 
 =item C<generated_files>
 
@@ -608,13 +541,14 @@ values are the comments.
 
 sub generated_files {
     my $self      = shift;
-    my $generated = ExtUtils::Manifest::maniread( 'MANIFEST.generated' );
+    my $generated = ExtUtils::Manifest::maniread('MANIFEST.generated');
     my $path      = $dist->path();
 
-    return { map { File::Spec->catfile( $path, $_ ) => $generated->{ $_ } }
-        keys %$generated };
+    return {
+        map { File::Spec->catfile( $path, $_ ) => $generated->{$_} }
+            keys %$generated
+    };
 }
-
 
 =back
 

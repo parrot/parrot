@@ -1,3 +1,4 @@
+
 =head1 NAME
 
 Parrot::Test::PGE - test functions for Perl 6 Grammar Engine
@@ -62,12 +63,13 @@ will be matched against. The 'outer rule' if you will.
 =cut
 
 sub p6rule_is {
-    my ($target, $pattern) = (shift, shift);
+    my ( $target, $pattern ) = ( shift, shift );
 
     unshift @_ => 'matched';
-    unshift @_ => ( ref $pattern
-        ? Parrot::Test::PGE::_generate_subrule_pir($target, $pattern)
-        : Parrot::Test::PGE::_generate_pir_for($target, $pattern)
+    unshift @_ => (
+        ref $pattern
+        ? Parrot::Test::PGE::_generate_subrule_pir( $target, $pattern )
+        : Parrot::Test::PGE::_generate_pir_for( $target, $pattern )
     );
 
     goto &Parrot::Test::pir_output_is;
@@ -81,12 +83,13 @@ they do not match. The same pattern argument syntax above applies here.
 =cut
 
 sub p6rule_isnt {
-    my ($target, $pattern) = (shift, shift);
+    my ( $target, $pattern ) = ( shift, shift );
 
     unshift @_ => 'failed';
-    unshift @_ => ( ref $pattern
-        ? Parrot::Test::PGE::_generate_subrule_pir($target, $pattern)
-        : Parrot::Test::PGE::_generate_pir_for($target, $pattern)
+    unshift @_ => (
+        ref $pattern
+        ? Parrot::Test::PGE::_generate_subrule_pir( $target, $pattern )
+        : Parrot::Test::PGE::_generate_pir_for( $target, $pattern )
     );
 
     goto &Parrot::Test::pir_output_is;
@@ -101,9 +104,9 @@ parameter.  Note that C<$expected> is a I<Perl 5> pattern.
 =cut
 
 sub p6rule_like {
-    my ($target, $pattern) = (shift, shift);
+    my ( $target, $pattern ) = ( shift, shift );
 
-    unshift @_ => Parrot::Test::PGE::_generate_pir_for($target, $pattern, 1);
+    unshift @_ => Parrot::Test::PGE::_generate_pir_for( $target, $pattern, 1 );
 
     goto &Parrot::Test::pir_output_like;
 }
@@ -137,10 +140,10 @@ what this does.)
 =cut
 
 sub pgeglob_is {
-    my ($target, $pattern) = (shift, shift);
+    my ( $target, $pattern ) = ( shift, shift );
 
     unshift @_ => 'matched';
-    unshift @_ => Parrot::Test::PGE::_generate_glob_for($target, $pattern);
+    unshift @_ => Parrot::Test::PGE::_generate_glob_for( $target, $pattern );
 
     goto &Parrot::Test::pir_output_is;
 }
@@ -153,10 +156,10 @@ they do not match. The same pattern argument syntax above applies here.
 =cut
 
 sub pgeglob_isnt {
-    my ($target, $pattern) = (shift, shift);
+    my ( $target, $pattern ) = ( shift, shift );
 
     unshift @_ => 'failed';
-    unshift @_ => Parrot::Test::PGE::_generate_glob_for($target, $pattern);
+    unshift @_ => Parrot::Test::PGE::_generate_glob_for( $target, $pattern );
 
     goto &Parrot::Test::pir_output_is;
 }
@@ -170,13 +173,12 @@ parameter.  Note that C<$expected> is a I<Perl 5> pattern.
 =cut
 
 sub pgeglob_like {
-    my ($target, $pattern) = (shift, shift);
+    my ( $target, $pattern ) = ( shift, shift );
 
-    unshift @_ => Parrot::Test::PGE::_generate_glob_for($target, $pattern, 1);
+    unshift @_ => Parrot::Test::PGE::_generate_glob_for( $target, $pattern, 1 );
 
     goto &Parrot::Test::pir_output_like;
 }
-
 
 package Parrot::Test::PGE;
 
@@ -190,14 +192,14 @@ sub _parrot_stringify {
 }
 
 sub _generate_pir_for {
-    my($target, $pattern, $captures) = @_;
-    $target = _parrot_stringify($target);
+    my ( $target, $pattern, $captures ) = @_;
+    $target  = _parrot_stringify($target);
     $pattern = _parrot_stringify($pattern);
-    my $unicode = ($target =~ /\\u/) ? "unicode:" : "";
-    if ($captures) { 
+    my $unicode = ( $target =~ /\\u/ ) ? "unicode:" : "";
+    if ($captures) {
         $captures = qq(
             print "\\n"
-            match."dump"("mob"," ","")\n); 
+            match."dump"("mob"," ","")\n);
     }
     else {
         $captures = "";
@@ -235,7 +237,7 @@ sub _generate_pir_for {
 }
 
 sub _generate_pir_catch_for {
-    my($pattern) = @_;
+    my ($pattern) = @_;
     $pattern = _parrot_stringify($pattern);
     return qq(
         .sub _PGE_Test
@@ -268,7 +270,7 @@ sub _generate_pir_catch_for {
 }
 
 sub _generate_subrule_pir {
-    my($target, $pattern) = @_;
+    my ( $target, $pattern ) = @_;
     $target = _parrot_stringify($target);
 
     # Beginning of the pir code
@@ -286,9 +288,9 @@ sub _generate_subrule_pir {
 
             target = "$target"\n\n);
 
-    # Loop to create the subrules pir code 
+    # Loop to create the subrules pir code
     for my $ruleRow (@$pattern) {
-        my ($name, $subpat) = @$ruleRow;
+        my ( $name, $subpat ) = @$ruleRow;
         $subpat = _parrot_stringify($subpat);
 
         $pirCode .= qq(
@@ -319,8 +321,8 @@ sub _generate_subrule_pir {
 }
 
 sub _generate_glob_for {
-    my($target, $pattern, $captures) = @_;
-    $target = _parrot_stringify($target);
+    my ( $target, $pattern, $captures ) = @_;
+    $target  = _parrot_stringify($target);
     $pattern = _parrot_stringify($pattern);
     return qq(
         .sub _PGE_Test
@@ -349,6 +351,7 @@ sub _generate_glob_for {
           match_end:
         .end\n);
 }
+
 =back
 
 =head1 AUTHOR

@@ -91,21 +91,20 @@ C<$flags> is one or more (comma-separated) I<hints>.
 
 =cut
 
-sub new
-{
+sub new {
     my $class = shift;
-    my ($code, $type, $name, $args, $argdirs, $labels, $flags) = @_;
+    my ( $code, $type, $name, $args, $argdirs, $labels, $flags ) = @_;
 
     my $self = {
-        CODE => $code,
-        TYPE => $type,
-        NAME => $name,
-        ARGS => [ @$args ],
-        ARGDIRS => [ @$argdirs ],
-        LABELS  => [ @$labels ],
+        CODE    => $code,
+        TYPE    => $type,
+        NAME    => $name,
+        ARGS    => [@$args],
+        ARGDIRS => [@$argdirs],
+        LABELS  => [@$labels],
         FLAGS   => $flags,
-        BODY => '',
-        JUMP => 0,
+        BODY    => '',
+        JUMP    => 0,
     };
 
     return bless $self, $class;
@@ -123,8 +122,7 @@ Returns the op code.
 
 =cut
 
-sub code
-{
+sub code {
     my $self = shift;
 
     return $self->{CODE};
@@ -136,8 +134,7 @@ The type of the op, either 'inline' or 'function'.
 
 =cut
 
-sub type
-{
+sub type {
     my $self = shift;
 
     return $self->{TYPE};
@@ -149,8 +146,7 @@ The (short or root) name of the op.
 
 =cut
 
-sub name
-{
+sub name {
     my $self = shift;
 
     return $self->{NAME};
@@ -164,15 +160,14 @@ are appended to the name.
 
 =cut
 
-sub full_name
-{
-    my $self = shift;
-    my $name = $self->name;
+sub full_name {
+    my $self      = shift;
+    my $name      = $self->name;
     my @arg_types = $self->arg_types;
 
-    $name .=  "_" . join("_", @arg_types) if @arg_types;
+    $name .= "_" . join( "_", @arg_types ) if @arg_types;
 
-    $name = "deprecated_$name" if ($self->body =~ /DEPRECATED/);
+    $name = "deprecated_$name" if ( $self->body =~ /DEPRECATED/ );
 
     return $name;
 }
@@ -183,9 +178,8 @@ The same as C<full_name()>, but with 'C<Parrot_>' prefixed.
 
 =cut
 
-sub func_name
-{
-    my ($self, $trans) = @_;
+sub func_name {
+    my ( $self, $trans ) = @_;
 
     return $trans->prefix . $self->full_name;
 }
@@ -196,11 +190,10 @@ Returns the types of the op's arguments.
 
 =cut
 
-sub arg_types
-{
+sub arg_types {
     my $self = shift;
 
-    return @{$self->{ARGS}};
+    return @{ $self->{ARGS} };
 }
 
 =item C<arg_type($index)>
@@ -209,8 +202,7 @@ Returns the type of the op's argument at C<$index>.
 
 =cut
 
-sub arg_type
-{
+sub arg_type {
     my $self = shift;
 
     return $self->{ARGS}[shift];
@@ -222,11 +214,10 @@ Returns the directions of the op's arguments.
 
 =cut
 
-sub arg_dirs
-{
+sub arg_dirs {
     my $self = shift;
 
-    return @{$self->{ARGDIRS}};
+    return @{ $self->{ARGDIRS} };
 }
 
 =item C<labels()>
@@ -235,11 +226,10 @@ Returns the labels.
 
 =cut
 
-sub labels
-{
+sub labels {
     my $self = shift;
 
-    return @{$self->{LABELS}};
+    return @{ $self->{LABELS} };
 }
 
 =item C<flags(@flags)>
@@ -250,12 +240,10 @@ Sets/gets the op's flags.
 
 =cut
 
-sub flags
-{
+sub flags {
     my $self = shift;
 
-    if (@_)
-    {
+    if (@_) {
         $self->{FLAGS} = shift;
     }
 
@@ -268,8 +256,7 @@ Returns the direction of the op's argument at C<$index>.
 
 =cut
 
-sub arg_dir
-{
+sub arg_dir {
     my $self = shift;
 
     return $self->{ARGDIRS}[shift];
@@ -283,12 +270,10 @@ Sets/gets the op's code body.
 
 =cut
 
-sub body
-{
+sub body {
     my $self = shift;
 
-    if (@_)
-    {
+    if (@_) {
         $self->{BODY} = shift;
     }
 
@@ -305,12 +290,10 @@ may jump.
 
 =cut
 
-sub jump
-{
+sub jump {
     my $self = shift;
 
-    if (@_)
-    {
+    if (@_) {
         $self->{JUMP} = shift;
     }
 
@@ -325,24 +308,22 @@ the auto-computed return value. See the note on op types above.
 
 =cut
 
-sub full_body
-{
+sub full_body {
     my $self = shift;
     my $body = $self->body;
 
-    $body .= sprintf("  {{+=%d}};\n", $self->size) if $self->type eq 'auto';
+    $body .= sprintf( "  {{+=%d}};\n", $self->size ) if $self->type eq 'auto';
 
     return $body;
 }
 
 # Called from rewrite_body() to perform the actual substitutions.
-sub _substitute
-{
+sub _substitute {
     my $self = shift;
     local $_ = shift;
     my $trans = shift;
 
-    s/{{([a-z]+)\@([^{]*?)}}/ $trans->access_arg($1, $2, $self); /me;  # XXX ???
+    s/{{([a-z]+)\@([^{]*?)}}/ $trans->access_arg($1, $2, $self); /me;    # XXX ???
     s/{{\@([^{]*?)}}/   $trans->access_arg($self->arg_type($1 - 1), $1, $self); /me;
 
     s/{{=0,=([^{]*?)}}/   $trans->restart_address($1) . "; {{=0}}"; /me;
@@ -374,9 +355,8 @@ method >> >>> to C<VTABLE_I<method>>.
 
 =cut
 
-sub rewrite_body
-{
-    my ($self, $body, $trans) = @_;
+sub rewrite_body {
+    my ( $self, $body, $trans ) = @_;
 
     # use vtable macros
     $body =~ s!
@@ -387,9 +367,8 @@ sub rewrite_body
         )->vtable->\s*(\w+)\(
         !VTABLE_$1(!sgx;
 
-    while (1)
-    {
-        my $new_body = $self->_substitute($body, $trans);
+    while (1) {
+        my $new_body = $self->_substitute( $body, $trans );
 
         last if $body eq $new_body;
 
@@ -406,17 +385,16 @@ C<$trans> (a subclass of C<Parrot::OpTrans>).
 
 =cut
 
-sub source
-{
-    my ($self, $trans) = @_;
+sub source {
+    my ( $self, $trans ) = @_;
 
-    if ($self->flags =~ /:pic/ &&
-        !(ref($trans) eq 'Parrot::OpTrans::CGP' ||
-          ref($trans) eq 'Parrot::OpTrans::CSwitch')) {
+    if ( $self->flags =~ /:pic/
+        && !( ref($trans) eq 'Parrot::OpTrans::CGP' || ref($trans) eq 'Parrot::OpTrans::CSwitch' ) )
+    {
         return qq{PANIC("How did you do that");return 0;\n};
     }
 
-    return $self->rewrite_body($self->full_body, $trans);
+    return $self->rewrite_body( $self->full_body, $trans );
 }
 
 =item C<size()>
@@ -426,11 +404,10 @@ the op itself as one argument.
 
 =cut
 
-sub size
-{
+sub size {
     my $self = shift;
 
-    return scalar($self->arg_types + 1);
+    return scalar( $self->arg_types + 1 );
 }
 
 =back

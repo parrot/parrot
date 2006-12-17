@@ -167,8 +167,7 @@ our @EXPORT = qw( %op_body );
 #
 # Trim leading and trailing spaces.
 
-sub _trim
-{
+sub _trim {
     my $value = shift;
 
     $value =~ s/^\s+//;
@@ -184,18 +183,17 @@ the specified op files.
 
 =cut
 
-sub new
-{
-    my ($class, $files, $nolines) = @_;
+sub new {
+    my ( $class, $files, $nolines ) = @_;
 
     my $self = bless { PREAMBLE => '' }, $class;
 
-    $self->read_ops($_, $nolines) for @{$files};
+    $self->read_ops( $_, $nolines ) for @{$files};
 
     # FILE holds a space separated list of opsfile name
-    if ($self->{FILE}) {
-        $self->{FILE}=~s/, $//;
-        $self->{FILE}=~s/, $//;
+    if ( $self->{FILE} ) {
+        $self->{FILE} =~ s/, $//;
+        $self->{FILE} =~ s/, $//;
     }
 
     return $self;
@@ -213,12 +211,10 @@ Reads in the specified .ops file, gathering information about the ops.
 
 =cut
 
-sub read_ops
-{
-    my ($self, $file, $nolines) = @_;
+sub read_ops {
+    my ( $self, $file, $nolines ) = @_;
 
     my $ops_file = "src/" . $file;
-
 
     die "Parrot::OpFunc::init(): No file specified!\n" unless defined $file;
 
@@ -228,8 +224,7 @@ sub read_ops
 
     open my $OPS, '<', $file or die "Can't open $file, $!/$^E";
 
-    if ( ! ($file =~ s/\.ops$/.c/) )
-    {
+    if ( !( $file =~ s/\.ops$/.c/ ) ) {
         $file .= ".c";
     }
 
@@ -238,7 +233,7 @@ sub read_ops
     #
 
     my $count = 0;
-    my ($name, $footer);
+    my ( $name, $footer );
     my $type;
     my $body;
     my $short_name;
@@ -251,35 +246,32 @@ sub read_ops
     my $flags;
     my @labels;
 
-    while (<$OPS>)
-    {
+    while (<$OPS>) {
         $seen_pod = 1 if m|^=|;
 
-        unless ($seen_op or m|^(inline\s+)?op\s+|)
-        {
+        unless ( $seen_op or m|^(inline\s+)?op\s+| ) {
             if (m/^\s*VERSION\s*=\s*"(\d+\.\d+\.\d+)"\s*;\s*$/)
             {
-                if (exists $self->{VERSION})
-                {
+                if ( exists $self->{VERSION} ) {
+
                     #die "VERSION MULTIPLY DEFINED!";
                 }
 
                 $self->version($1);
                 $_ = '';
             }
-            elsif (m/^\s*VERSION\s*=\s*PARROT_VERSION\s*;\s*$/)
-            {
-                if (exists $self->{VERSION})
-                {
+            elsif (m/^\s*VERSION\s*=\s*PARROT_VERSION\s*;\s*$/) {
+                if ( exists $self->{VERSION} ) {
+
                     #die "VERSION MULTIPLY DEFINED!";
                 }
 
-                $self->version($PConfig{VERSION});
+                $self->version( $PConfig{VERSION} );
                 $_ = '';
             }
 
             $self->{PREAMBLE} .= $_
-                unless $seen_pod or $count; # Lines up to first op def.
+                unless $seen_pod or $count;    # Lines up to first op def.
 
             next;
         }
@@ -317,79 +309,69 @@ sub read_ops
         #   kic  Integer Key constant index (in-line)
         #
 
-        if (/^(inline\s+)?op\s+([a-zA-Z]\w*)\s*\((.*)\)\s*(\S*)?\s*{/)
-        {
-            if ($seen_op)
-            {
+        if (/^(inline\s+)?op\s+([a-zA-Z]\w*)\s*\((.*)\)\s*(\S*)?\s*{/) {
+            if ($seen_op) {
                 die "$ops_file [$.]: Cannot define an op within an op definition!\n";
             }
 
             $type       = defined($1) ? 'inline' : 'function';
             $short_name = $2;
-            $args       = _trim(lc $3);
-            $flags      = $4 ? _trim(lc $4) : "";
-            @args       = split(/\s*,\s*/, $args);
+            $args       = _trim( lc $3 );
+            $flags      = $4 ? _trim( lc $4 ) : "";
+            @args       = split( /\s*,\s*/, $args );
             @argdirs    = ();
             @labels     = ();
             $body       = '';
             $seen_op    = 1;
-            $line             = $.+1;
+            $line       = $. + 1;
 
             my @temp = ();
 
-            foreach my $arg (@args)
-            {
-                my ($use, $type) = $arg =~
-                    m/^(in|out|inout|inconst|invar|label|labelconst|labelvar)
+            foreach my $arg (@args) {
+                my ( $use, $type ) =
+                    $arg =~ m/^(in|out|inout|inconst|invar|label|labelconst|labelvar)
                     \s+
                     (INT|NUM|STR|PMC|KEY|INTKEY)$/ix;
 
-                die "Unrecognized arg format '$arg' in '$_'!" unless defined($use) and defined($type);
+                die "Unrecognized arg format '$arg' in '$_'!"
+                    unless defined($use)
+                    and defined($type);
 
-                if ($type =~ /^INTKEY$/i)
-                {
+                if ( $type =~ /^INTKEY$/i ) {
                     $type = "ki";
                 }
-                else
-                {
-                    $type = lc substr($type, 0, 1);
+                else {
+                    $type = lc substr( $type, 0, 1 );
                 }
 
                 # convert e.g. "labelvar" to "invar" and remember labels
 
-                if ($use =~ /label(\w*)/)
-                {
+                if ( $use =~ /label(\w*)/ ) {
                     push @labels, 1;
                     $use = "in$1";
                 }
-                else
-                {
+                else {
                     push @labels, 0;
                 }
 
-                if ($use eq 'in')
-                {
-                    push @temp, "$type|${type}c";
+                if ( $use eq 'in' ) {
+                    push @temp,    "$type|${type}c";
                     push @argdirs, 'i';
                 }
-                elsif ($use eq 'invar')
-                {
-                    push @temp, $type;
+                elsif ( $use eq 'invar' ) {
+                    push @temp,    $type;
                     push @argdirs, 'i';
                 }
-                elsif ($use eq 'inconst')
-                {
-                    push @temp, "${type}c";
+                elsif ( $use eq 'inconst' ) {
+                    push @temp,    "${type}c";
                     push @argdirs, 'i';
                 }
-                elsif ($use eq 'inout')
-                {
-                    push @temp, $type;
+                elsif ( $use eq 'inout' ) {
+                    push @temp,    $type;
                     push @argdirs, 'io';
                 }
-                else
-                {
-                    push @temp, $type;
+                else {
+                    push @temp,    $type;
                     push @argdirs, 'o';
                 }
             }
@@ -407,10 +389,11 @@ sub read_ops
         # one.
         #
 
-        if (/^}\s*$/)
-        {
-            $count += $self->make_op($count, $type, $short_name, $body, \@args,
-                \@argdirs, $line, $orig, \@labels, $flags, $nolines);
+        if (/^}\s*$/) {
+            $count += $self->make_op(
+                $count, $type, $short_name, $body,  \@args, \@argdirs,
+                $line,  $orig, \@labels,    $flags, $nolines
+            );
 
             $seen_op = 0;
 
@@ -421,18 +404,15 @@ sub read_ops
         # Accumulate the code into the op's body:
         #
 
-        if ($seen_op)
-        {
+        if ($seen_op) {
             $body .= $_;
         }
-        else
-        {
+        else {
             die "Parrot::OpsFile: Unrecognized line: '$_'!\n";
         }
     }
 
-    if ($seen_op)
-    {
+    if ($seen_op) {
         die "Parrot::OpsFile: File ended with incomplete op definition!\n";
     }
 
@@ -442,16 +422,13 @@ sub read_ops
 }
 
 # Extends a string containing an or expression "0" .. "A" .. "A|B" etc.
-sub or_flag
-{
-    my ($flag, $value) = @_;
+sub or_flag {
+    my ( $flag, $value ) = @_;
 
-    if ($$flag eq '0')
-    {
+    if ( $$flag eq '0' ) {
         $$flag = $value;
     }
-    else
-    {
+    else {
         $$flag .= "|$value";
     }
 }
@@ -463,24 +440,25 @@ Returns a new C<Parrot::Op> instance for the specified arguments.
 
 =cut
 
-sub make_op
-{
-    my ($self, $code, $type, $short_name, $body, $args, $argdirs,
-        $line, $file, $labels, $flags, $nolines) = @_;
-    my $counter = 0;
+sub make_op {
+    my (
+        $self,    $code, $type, $short_name, $body,  $args,
+        $argdirs, $line, $file, $labels,     $flags, $nolines
+    ) = @_;
+    my $counter  = 0;
     my $absolute = 0;
-    my $branch = 0;
-    my $pop = 0;
-    my $next = 0;
-    my $restart = 0;
+    my $branch   = 0;
+    my $pop      = 0;
+    my $next     = 0;
+    my $restart  = 0;
 
-    foreach my $variant (expand_args(@$args))
-    {
-        my (@fixedargs)=split(/,/,$variant);
-        my $op = Parrot::Op->new($code++, $type, $short_name,
-            [ @fixedargs ], [ @$argdirs ], [ @$labels ], $flags);
+    foreach my $variant ( expand_args(@$args) ) {
+        my (@fixedargs) = split( /,/, $variant );
+        my $op =
+            Parrot::Op->new( $code++, $type, $short_name, [@fixedargs], [@$argdirs], [@$labels],
+            $flags );
         my $op_size = $op->size;
-        my $jumps = "0";
+        my $jumps   = "0";
 
         #
         # Macro substitutions:
@@ -521,58 +499,58 @@ sub make_op
 
         $branch   ||= $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{+=$1}}/mg;
         $absolute ||= $body =~ s/\bgoto\s+ADDRESS\(\( (.*?) \)\)/{{=$1}}/mg;
-                      $body =~ s/\bexpr\s+OFFSET\(\( (.*?) \)\)/{{^+$1}}/mg;
-                      $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
-                      $body =~ s/\bOP_SIZE\b/{{^$op_size}}/mg;
+        $body =~ s/\bexpr\s+OFFSET\(\( (.*?) \)\)/{{^+$1}}/mg;
+        $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
+        $body =~ s/\bOP_SIZE\b/{{^$op_size}}/mg;
 
-        $branch   ||= $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{+=$1}}/mg;
-                      $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
+        $branch ||= $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{+=$1}}/mg;
+        $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
         $absolute ||= $body =~ s/\bgoto\s+ADDRESS\((.*?)\)/{{=$1}}/mg;
         $pop      ||= $body =~ s/\bgoto\s+POP\(\)/{{=*}}/mg;
-                      $body =~ s/\bexpr\s+OFFSET\((.*?)\)/{{^+$1}}/mg;
-        $next     ||= $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
-                      $body =~ s/\bexpr\s+ADDRESS\((.*?)\)/{{^$1}}/mg;
-                      $body =~ s/\bexpr\s+POP\(\)/{{^*}}/mg;
+        $body =~ s/\bexpr\s+OFFSET\((.*?)\)/{{^+$1}}/mg;
+        $next ||= $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
+        $body =~ s/\bexpr\s+ADDRESS\((.*?)\)/{{^$1}}/mg;
+        $body =~ s/\bexpr\s+POP\(\)/{{^*}}/mg;
 
-                      $body =~ s/\bHALT\(\)/{{=0}}/mg;
+        $body =~ s/\bHALT\(\)/{{=0}}/mg;
 
         $branch ||= $short_name =~ /runinterp/;
         $next   ||= $short_name =~ /runinterp/;
 
-        if ($body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg)
-        {
-            $branch = 1;
+        if ( $body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg ) {
+            $branch  = 1;
             $restart = 1;
         }
-        elsif($body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg)
-        {
+        elsif ( $body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg ) {
             $restart = 1;
-            $next = 1;
+            $next    = 1;
         }
-        elsif($short_name eq 'branch_cs' || $short_name eq 'returncc')
-        {
-            $restart = 1;  # dest may be NULL to leave run-loop
+        elsif ( $short_name eq 'branch_cs' || $short_name eq 'returncc' ) {
+            $restart = 1;    # dest may be NULL to leave run-loop
         }
-        elsif ($body =~ s/\brestart\s+ADDRESS\((.*?)\)/{{=$1}}/mg)
-        {
-            $next = 0;
+        elsif ( $body =~ s/\brestart\s+ADDRESS\((.*?)\)/{{=$1}}/mg ) {
+            $next    = 0;
             $restart = 1;
         }
 
         $body =~ s/\$(\d+)/{{\@$1}}/mg;
 
         my $file_escaped = $file;
-        $file_escaped =~ s|(\\)|$1$1|g; # escape backslashes
+        $file_escaped =~ s|(\\)|$1$1|g;    # escape backslashes
         $op->body( $nolines ? $body : qq{#line $line "$file_escaped"\n$body} );
 
         # Constants here are defined in include/parrot/op.h
-        or_flag(\$jumps, "PARROT_JUMP_RELATIVE")   if ($branch);
-        or_flag(\$jumps, "PARROT_JUMP_ADDRESS")    if ($absolute);
-        or_flag(\$jumps, "PARROT_JUMP_POP")        if ($pop);
-        or_flag(\$jumps, "PARROT_JUMP_ENEXT")      if ($next);
+        or_flag( \$jumps, "PARROT_JUMP_RELATIVE" ) if ($branch);
+        or_flag( \$jumps, "PARROT_JUMP_ADDRESS" )  if ($absolute);
+        or_flag( \$jumps, "PARROT_JUMP_POP" )      if ($pop);
+        or_flag( \$jumps, "PARROT_JUMP_ENEXT" )    if ($next);
+
         # I'm assuming the op branches to the value in the last argument.
-        or_flag(\$jumps, "PARROT_JUMP_GNEXT")      if (($jumps) && ($fixedargs[@fixedargs - 1]) && ($fixedargs[@fixedargs - 1] eq 'i'));
-        or_flag(\$jumps, "PARROT_JUMP_RESTART")     if ($restart);
+        or_flag( \$jumps, "PARROT_JUMP_GNEXT" )
+            if ( ($jumps)
+            && ( $fixedargs[ @fixedargs - 1 ] )
+            && ( $fixedargs[ @fixedargs - 1 ] eq 'i' ) );
+        or_flag( \$jumps, "PARROT_JUMP_RESTART" ) if ($restart);
 
         $op->jump($jumps);
         $self->push_op($op);
@@ -589,29 +567,24 @@ combinations.
 
 =cut
 
-sub expand_args
-{
+sub expand_args {
     my (@args) = @_;
 
-    return "" if (!scalar(@args));
+    return "" if ( !scalar(@args) );
 
     my $arg = shift(@args);
-    my @var = split(/\|/,$arg);
+    my @var = split( /\|/, $arg );
 
-    if (!scalar(@args))
-    {
+    if ( !scalar(@args) ) {
         return @var;
     }
-    else
-    {
+    else {
         my @list = expand_args(@args);
         my @results;
 
-        foreach my $l (@list)
-        {
-            foreach my $v (@var)
-            {
-                push(@results,"$v,$l");
+        foreach my $l (@list) {
+            foreach my $v (@var) {
+                push( @results, "$v,$l" );
             }
         }
 
@@ -625,11 +598,10 @@ Returns the C<Parrot::Op> instances found in the file(s).
 
 =cut
 
-sub ops
-{
+sub ops {
     my ($self) = @_;
 
-    return @{$self->{OPS}};
+    return @{ $self->{OPS} };
 }
 
 =item C<op($index)>
@@ -638,9 +610,8 @@ Returns the op at C<$index>.
 
 =cut
 
-sub op
-{
-    my ($self, $index) = @_;
+sub op {
+    my ( $self, $index ) = @_;
 
     return $self->{OPS}[$index];
 }
@@ -656,15 +627,14 @@ substitutions are made.
 
 =cut
 
-sub preamble
-{
-    my($self, $trans) = @_;
+sub preamble {
+    my ( $self, $trans ) = @_;
 
     local $_ = $self->{PREAMBLE};
 
-    if ($trans)
-    {
+    if ($trans) {
         s/goto\s+OFFSET\((.*)\)/{{+=$1}}/mg;
+
         #s/goto\s+NEXT\(\)/{{+=$op_size}}/mg;   #not supported--dependent on op size
         s/goto\s+ADDRESS\((.*)\)/{{=$1}}/mg;
         s/goto\s+POP\(\)/{{=*}}/mg;
@@ -673,7 +643,7 @@ sub preamble
         # FIXME: This ought to throw errors when attempting to rewrite $n
         # argument accesses and other things that make no sense in the
         # preamble.
-        $_ = Parrot::Op->rewrite_body($_, $trans);
+        $_ = Parrot::Op->rewrite_body( $_, $trans );
     }
 
     return $_;
@@ -689,31 +659,24 @@ Sets/gets the version number.
 
 =cut
 
-sub version
-{
+sub version {
     my $self = shift;
 
-    if (@_ == 1)
-    {
+    if ( @_ == 1 ) {
         $self->{VERSION} = shift;
     }
-    elsif (@_ == 3)
-    {
-        $self->{VERSION} = join('.', @_);
+    elsif ( @_ == 3 ) {
+        $self->{VERSION} = join( '.', @_ );
     }
-    elsif (@_ == 0)
-    {
-        if (wantarray)
-        {
-            return split(/\./, $self->{VERSION});
+    elsif ( @_ == 0 ) {
+        if (wantarray) {
+            return split( /\./, $self->{VERSION} );
         }
-        else
-        {
+        else {
             return $self->{VERSION};
         }
     }
-    else
-    {
+    else {
         die "Parrot::OpsFile::version(): Illegal argument count" . scalar(@_) . "!";
     }
 }
@@ -724,8 +687,7 @@ Returns the major version number.
 
 =cut
 
-sub major_version
-{
+sub major_version {
     my $self = shift;
 
     $self->{VERSION} =~ m/^(\d+)\./;
@@ -739,8 +701,7 @@ Returns the minor version number.
 
 =cut
 
-sub minor_version
-{
+sub minor_version {
     my $self = shift;
 
     $self->{VERSION} =~ m/^\d+\.(\d+)\./;
@@ -754,8 +715,7 @@ Returns the patch version number.
 
 =cut
 
-sub patch_version
-{
+sub patch_version {
     my $self = shift;
 
     $self->{VERSION} =~ m/^\d+\.\d+\.(\d+)/;
@@ -769,11 +729,10 @@ Adds C<$op> to the end of the op list.
 
 =cut
 
-sub push_op
-{
-    my ($self, $op) = @_;
+sub push_op {
+    my ( $self, $op ) = @_;
 
-    push @{$self->{OPS}}, $op;
+    push @{ $self->{OPS} }, $op;
 }
 
 =back

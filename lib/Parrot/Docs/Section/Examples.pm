@@ -35,20 +35,21 @@ Returns a new section.
 
 =cut
 
-sub new
-{
+sub new {
     my $self = shift;
-    
+
     return $self->SUPER::new(
-        'Examples', 'examples.html', '',
-            $self->new_group('PASM and PIR',         '', 'examples/pasm'),
-            $self->new_group('PIR',                  '', 'examples/pir'),
-            $self->new_group('Subroutines',          '', 'examples/subs'),
-            $self->new_group('IO',                   '', 'examples/io'),
-            $self->new_group('Streams',              '', 'examples/streams'),
-            $self->new_group('Benchmarking',         '', 'examples/benchmarks'),
-            $self->new_group('Speed Comparison',     '', 'examples/mops'),
-            $self->new_group('Native Call Interface','', 'examples/nci'),
+        'Examples',
+        'examples.html',
+        '',
+        $self->new_group( 'PASM and PIR',          '', 'examples/pasm' ),
+        $self->new_group( 'PIR',                   '', 'examples/pir' ),
+        $self->new_group( 'Subroutines',           '', 'examples/subs' ),
+        $self->new_group( 'IO',                    '', 'examples/io' ),
+        $self->new_group( 'Streams',               '', 'examples/streams' ),
+        $self->new_group( 'Benchmarking',          '', 'examples/benchmarks' ),
+        $self->new_group( 'Speed Comparison',      '', 'examples/mops' ),
+        $self->new_group( 'Native Call Interface', '', 'examples/nci' ),
     );
 }
 

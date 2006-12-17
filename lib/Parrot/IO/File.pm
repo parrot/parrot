@@ -36,11 +36,10 @@ directory.
 
 =cut
 
-sub tmp_file
-{
+sub tmp_file {
     my $self = shift;
-    
-    return $self->new(File::Spec->catfile(File::Spec->tmpdir, @_));
+
+    return $self->new( File::Spec->catfile( File::Spec->tmpdir, @_ ) );
 }
 
 =item C<new($path)>
@@ -49,13 +48,12 @@ Returns the instance for C<$path>.
 
 =cut
 
-sub new
-{
+sub new {
     my $self = shift;
     my $path = shift;
-    
-    return unless defined $path and ! -d $path;
-    
+
+    return unless defined $path and !-d $path;
+
     return $self->SUPER::new($path);
 }
 
@@ -71,16 +69,15 @@ This is called from C<new()> to create the path if necessary.
 
 =cut
 
-sub create_path
-{
+sub create_path {
     my $self = shift;
-    
+
     return unless $self->SUPER::create_path;
-    
+
     # Just to touch the file.
     # Make sure write() doesn't dismiss this as a noop.
     $self->write('') unless -e $self->path;
-    
+
     return -f $self->path;
 }
 
@@ -90,12 +87,11 @@ Returns the file's parent directory.
 
 =cut
 
-sub parent
-{
+sub parent {
     my $self = shift;
     my $path = shift;
-    
-    return Parrot::IO::Directory->new($self->parent_path);
+
+    return Parrot::IO::Directory->new( $self->parent_path );
 }
 
 =item C<read()>
@@ -108,15 +104,14 @@ depending on the context in which the method is called.
 
 =cut
 
-sub read
-{
+sub read {
     my $self = shift;
-    my $fh = FileHandle->new($self->path) or 
-        die 'Failed to open ' . $self->path . ": $!";
+    my $fh   = FileHandle->new( $self->path )
+        or die 'Failed to open ' . $self->path . ": $!";
     my @lines = <$fh>;
-    
+
     $fh->close;
-    
+
     return wantarray ? @lines : join '', @lines;
 }
 
@@ -126,17 +121,16 @@ Writes the specified lines to the file.
 
 =cut
 
-sub write
-{
+sub write {
     my $self = shift;
-    
+
     return unless @_;
-    
-    my $fh = FileHandle->new('>' . $self->path) or 
-        die 'Failed to open ' . $self->path . ": $!";
-    
+
+    my $fh = FileHandle->new( '>' . $self->path )
+        or die 'Failed to open ' . $self->path . ": $!";
+
     print $fh @_;
-    
+
     $fh->close;
 }
 
@@ -146,17 +140,16 @@ Writes the specified lines to the file.
 
 =cut
 
-sub append
-{
+sub append {
     my $self = shift;
-    
+
     return unless @_;
-    
-    my $fh = FileHandle->new('>>' . $self->path) or 
-        die 'Failed to open ' . $self->path . ": $!";
-    
+
+    my $fh = FileHandle->new( '>>' . $self->path )
+        or die 'Failed to open ' . $self->path . ": $!";
+
     print $fh @_;
-    
+
     $fh->close;
 }
 
@@ -166,10 +159,9 @@ This tells you whether the file is executable.
 
 =cut
 
-sub is_executable
-{
+sub is_executable {
     my $self = shift;
-    
+
     return $self->stat->mode & 0111;
 }
 
@@ -181,11 +173,10 @@ epoch.
 
 =cut
 
-sub modified_since
-{
+sub modified_since {
     my $self = shift;
     my $time = shift;
-    
+
     return $self->stat->mtime > $time;
 }
 
@@ -195,13 +186,13 @@ Returns the svn C<$Id> string.
 
 =cut
 
-sub svn_id
-{
-    my $self = shift;
+sub svn_id {
+    my $self    = shift;
     my $content = $self->read;
+
     # Break up the $Id to prevent svn messing with it.
     my ($id) = $content =~ /((?:\$)Id:[^\$]+\$)/so;
-    
+
     return $id;
 }
 
@@ -211,13 +202,13 @@ Returns whether the file has a svn C<$Id> string.
 
 =cut
 
-sub has_svn_id
-{
-    my $self = shift;
+sub has_svn_id {
+    my $self    = shift;
     my $content = $self->read;
+
     # Break up the $Id to prevent svn messing with it.
     my $has_id = $content =~ /(?:\$)Id:[^\$]+\$/so;
-    
+
     return $has_id;
 }
 
@@ -227,12 +218,11 @@ Returns the svn version number of the file.
 
 =cut
 
-sub svn_version
-{
+sub svn_version {
     my $self = shift;
-    my $id = $self->svn_id;
+    my $id   = $self->svn_id;
     my ($version) = $id =~ /,v\s+(\S+)/s;
-    
+
     return $version;
 }
 
@@ -242,8 +232,7 @@ Returns whether the file is "hidden", i.e. it's name starts with a dot.
 
 =cut
 
-sub is_hidden
-{
+sub is_hidden {
     my $self = shift;
 
     return $self->parent eq '.SVN' or $self->name =~ /^\./o;
@@ -255,28 +244,30 @@ Returns whether the file is generated.
 
 =cut
 
-sub is_generated
-{
+sub is_generated {
     my $self = shift;
-    
+
     # CFLAGS
     # libparrot.def
     # Makefile
     # myconfig
-    
+
     # include/parrot/config.h
     # include/parrot/core_pmcs.h
     # include/parrot/feature.h
     # include/parrot/platform.h
-    
+
     # runtime/parrot/include/* (all?)
 
     # lib/Parrot/Config.pm
-    
-    return 1 if $self->suffix =~ /^(?:dump|html|flag|o)$/o
-        or $self->name =~ /^(?:perl6-config|libparrot.def|CFLAGS|myconfig|(?:core_pmcs|exec_(?:cpu|dep)|fingerprint|jit_(?:cpu|emit)|nci|platform(?:_interface)?)\.[ch]|(?:charclass|feature)\.h)$/o
-        or $self->parent->name eq 'ops' and $self->suffix =~ /^(?:c|pod)$/;
-    
+
+    return 1
+        if $self->suffix =~ /^(?:dump|html|flag|o)$/o
+        or $self->name =~
+/^(?:perl6-config|libparrot.def|CFLAGS|myconfig|(?:core_pmcs|exec_(?:cpu|dep)|fingerprint|jit_(?:cpu|emit)|nci|platform(?:_interface)?)\.[ch]|(?:charclass|feature)\.h)$/o
+        or $self->parent->name eq 'ops'
+        and $self->suffix =~ /^(?:c|pod)$/;
+
     return 0;
 }
 
@@ -288,12 +279,12 @@ Raises an exception if the delete fails.
 
 =cut
 
-sub delete
-{
+sub delete {
+
     # Use $_[0] so that we can undef the instance in SUPER::delete().
-    
-    unlink($_[0]->path) or die 'Failed to unlink ' . $_[0]->path . ": $!";
-    
+
+    unlink( $_[0]->path ) or die 'Failed to unlink ' . $_[0]->path . ": $!";
+
     $_[0]->SUPER::delete;
 }
 

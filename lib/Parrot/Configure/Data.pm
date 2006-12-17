@@ -58,8 +58,7 @@ Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 
 =cut
 
-sub new
-{
+sub new {
     my $class = shift;
 
     my $self = {
@@ -85,8 +84,7 @@ Accepts a list and returns a list.
 
 =cut
 
-sub get
-{
+sub get {
     my $self = shift;
 
     my $c = $self->{c};
@@ -103,24 +101,23 @@ L<Parrot::Configure::Data> object.
 
 =cut
 
-sub set
-{
+sub set {
     my $self = shift;
 
     my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
 
     print "Setting Configuration Data:\n(\n" if $verbose;
 
-    while (my ($key, $val) = splice @_, 0, 2) {
+    while ( my ( $key, $val ) = splice @_, 0, 2 ) {
         print "\t$key => ", defined($val) ? "'$val'" : 'undef', ",\n"
             if $verbose;
         $self->{c}{$key} = $val;
 
-        foreach my $trigger ($self->gettriggers($key)) {
+        foreach my $trigger ( $self->gettriggers($key) ) {
             print "\tcalling trigger $trigger for $key\n" if $verbose;
-            my $cb = $self->gettrigger($key, $trigger);
+            my $cb = $self->gettrigger( $key, $trigger );
 
-            &$cb($key, $val);
+            &$cb( $key, $val );
         }
     }
 
@@ -139,17 +136,17 @@ returns a L<Parrot::Configure::Data> object.
 
 =cut
 
-sub add
-{
-    my $self = shift;
+sub add {
+    my $self  = shift;
     my $delim = shift;
-    
-    while (my ($key, $val) = splice @_, 0, 2) {
+
+    while ( my ( $key, $val ) = splice @_, 0, 2 ) {
         my ($old) = $self->{c}{$key};
-        if (defined $old) {
-            $self->set($key, "$old$delim$val");
-        } else {
-            $self->set($key, $val);
+        if ( defined $old ) {
+            $self->set( $key, "$old$delim$val" );
+        }
+        else {
+            $self->set( $key, $val );
         }
     }
 
@@ -164,11 +161,10 @@ Accepts no arguments and returns a list.
 
 =cut
 
-sub keys
-{
+sub keys {
     my $self = shift;
 
-    return keys %{$self->{c}};
+    return keys %{ $self->{c} };
 }
 
 =item C<slurp()>
@@ -179,17 +175,15 @@ Accepts no arguments.
 
 =cut
 
-sub slurp()
-{
-  my $self = shift;
-  my $res = eval "no strict; use Parrot::Config; \\%PConfig";
+sub slurp() {
+    my $self = shift;
+    my $res  = eval "no strict; use Parrot::Config; \\%PConfig";
 
-  if (not defined $res) {
-   die "You cannot use --step until you have completed the full configure process\n"; 
-  }
-  $self->{c} = $res;
+    if ( not defined $res ) {
+        die "You cannot use --step until you have completed the full configure process\n";
+    }
+    $self->{c} = $res;
 }
-
 
 =item C<dump()>
 
@@ -205,21 +199,23 @@ Accepts no arguments and returns a string.
 # older versions will work but obviously not sorted
 {
     my $dd_version;
-    if ($Data::Dumper::VERSION =~ /([\d.]+)/) {
+    if ( $Data::Dumper::VERSION =~ /([\d.]+)/ ) {
         $dd_version = $1;
-    } else {
+    }
+    else {
         $dd_version = $Data::Dumper::VERSION;
     }
 
-    if ($dd_version >= 2.12) {
+    if ( $dd_version >= 2.12 ) {
         *dump = sub {
             my $self = shift;
-            Data::Dumper->new([$self->{c}], ['*PConfig'])->Sortkeys(1)->Dump();
+            Data::Dumper->new( [ $self->{c} ], ['*PConfig'] )->Sortkeys(1)->Dump();
         };
-    } else {
+    }
+    else {
         *dump = sub {
             my $self = shift;
-            Data::Dumper->new([$self->{c}], ['*PConfig'])->Dump();
+            Data::Dumper->new( [ $self->{c} ], ['*PConfig'] )->Dump();
         };
     }
 }
@@ -234,11 +230,10 @@ Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 
 =cut
 
-sub clean
-{
+sub clean {
     my $self = shift;
 
-    delete $self->{c}{$_} for grep { /^TEMP_/ } CORE::keys %{$self->{c}};
+    delete $self->{c}{$_} for grep { /^TEMP_/ } CORE::keys %{ $self->{c} };
 
     return $self;
 }
@@ -255,9 +250,8 @@ L<Parrot::Configure::Data> object.
 
 =cut
 
-sub settrigger
-{
-    my ($self, $key, $trigger, $cb) = @_;
+sub settrigger {
+    my ( $self, $key, $trigger, $cb ) = @_;
 
     return unless defined $key and defined $trigger and defined $cb;
 
@@ -279,9 +273,8 @@ Accepts a key name and returns a list.
 
 =cut
 
-sub gettriggers
-{
-    my ($self, $key) = @_;
+sub gettriggers {
+    my ( $self, $key ) = @_;
 
     return unless defined $self->{triggers}{$key};
 
@@ -290,7 +283,7 @@ sub gettriggers
     print "Looking up all triggers on configuration key $key\n"
         if $verbose;
 
-    return CORE::keys %{$self->{triggers}{$key}};
+    return CORE::keys %{ $self->{triggers}{$key} };
 }
 
 =item C<gettrigger($key, $trigger)>
@@ -301,9 +294,8 @@ Accepts a key name & a trigger name and returns a C<CODE> ref.
 
 =cut
 
-sub gettrigger
-{
-    my ($self, $key, $trigger) = @_;
+sub gettrigger {
+    my ( $self, $key, $trigger ) = @_;
 
     return
         unless defined $self->{triggers}{$key}
@@ -326,9 +318,8 @@ object.
 
 =cut
 
-sub deltrigger
-{
-    my ($self, $key, $trigger) = @_;
+sub deltrigger {
+    my ( $self, $key, $trigger ) = @_;
 
     return
         unless defined $self->{triggers}{$key}

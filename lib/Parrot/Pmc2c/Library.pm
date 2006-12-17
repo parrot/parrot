@@ -43,32 +43,33 @@ C<library> key its value will be used for the library name.
 =cut
 
 sub new {
-    my ($class, $opt, $vtable_dump) = (shift, shift, shift);
+    my ( $class, $opt, $vtable_dump ) = ( shift, shift, shift );
     my %pmcs = @_;
 
-    foreach my $file (keys %pmcs) {
+    foreach my $file ( keys %pmcs ) {
         $pmcs{$file}->{vtable} = $vtable_dump;
-        $pmcs{$file} = Parrot::Pmc2c->new($pmcs{$file}, $opt);
+        $pmcs{$file} = Parrot::Pmc2c->new( $pmcs{$file}, $opt );
     }
 
-    return bless { opt         => $opt,
-                   pmcs        => \%pmcs,
-                 }, $class;
+    return bless {
+        opt  => $opt,
+        pmcs => \%pmcs,
+    }, $class;
 }
 
 sub _write_a_file($$$) {
-    my ($generator, $h_name, $c_name) = @_;
+    my ( $generator, $h_name, $c_name ) = @_;
     my $opt = $generator->{opt};
 
-    print Data::Dumper->Dump([$generator]) if $opt->{debug} > 1;
+    print Data::Dumper->Dump( [$generator] ) if $opt->{debug} > 1;
     my $cout = $generator->gen_c($c_name);
-    print $cout if $opt->{debug};
+    print $cout               if $opt->{debug};
     print "Writing $c_name\n" if $opt->{verbose};
     open my $C, '>', $c_name or die "Can't write '$c_name";
     print $C $cout;
     close $C;
     my $hout = $generator->gen_h($h_name);
-    print $hout if $opt->{debug};
+    print $hout               if $opt->{debug};
     print "Writing $h_name\n" if $opt->{verbose};
     open my $H, '>', $h_name or die "Can't write '$h_name";
     print $H $hout;
@@ -84,24 +85,25 @@ represents a named library.
 =cut
 
 sub write_all_files {
-    my $self = shift;
+    my $self    = shift;
     my $library = $self->{opt}{library};
 
     if ($library) {
         my $hout = $self->gen_h($library);
-        my $h = "$library.h";
-        my $c = "$library.c";
-        _write_a_file($self, $h, $c);
-    } else {
-        while (my @fc = each %{$self->{pmcs}}) {
-            my ($file, $generator) = @fc;
+        my $h    = "$library.h";
+        my $c    = "$library.c";
+        _write_a_file( $self, $h, $c );
+    }
+    else {
+        while ( my @fc = each %{ $self->{pmcs} } ) {
+            my ( $file, $generator ) = @fc;
             my $h;
-            ($h = $file) =~ s/\.\w+$/.h/;
+            ( $h = $file ) =~ s/\.\w+$/.h/;
             $h =~ s/(\w+)\.h$/pmc_$1.h/;
             my $c;
-            ($c = $file) =~ s/\.\w+$/.c/;
+            ( $c = $file ) =~ s/\.\w+$/.c/;
 
-            _write_a_file($generator, $h, $c);
+            _write_a_file( $generator, $h, $c );
         }
     }
 }
@@ -113,8 +115,8 @@ Writes the header file for the library.
 =cut
 
 sub gen_h {
-    my ($self) = @_;
-    my $hout = dont_edit('various files');
+    my ($self)     = @_;
+    my $hout       = dont_edit('various files');
     my $lc_libname = lc $self->{opt}{library};
 
     $hout .= <<"EOH";
@@ -136,9 +138,8 @@ sub gen_c {
     my $cout = dont_edit('various files');
 
     $cout .= $self->includes;
-    $cout .= dynext_load_code($self->{opt}{library},
-                              map { $_->{class} => $_ }
-                              values %{$self->{pmcs}} );
+    $cout .= dynext_load_code( $self->{opt}{library},
+        map { $_->{class} => $_ } values %{ $self->{pmcs} } );
     $cout .= $self->c_code_coda;
 
     return $cout;
@@ -159,7 +160,7 @@ sub includes() {
 #include "parrot/extend.h"
 #include "parrot/dynext.h"
 EOC
-    foreach my $pmc (values %{$self->{pmcs}}) {
+    foreach my $pmc ( values %{ $self->{pmcs} } ) {
         my $name = lc $pmc->{class};
         $cout .= <<"EOC";
 #include "pmc_$name.h"

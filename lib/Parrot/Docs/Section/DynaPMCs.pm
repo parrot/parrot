@@ -32,15 +32,14 @@ Returns a new section.
 
 =cut
 
-sub new
-{
-        my $self = shift;
-        
-        return $self->SUPER::new(
-                'Dynamic PMCs', 'dynapmc.html', '',
-                $self->new_group('Loading', '', 'src/dynpmc'),
-                $self->new_group('Runtime', '', 'runtime/parrot/include'),
-        );
+sub new {
+    my $self = shift;
+
+    return $self->SUPER::new(
+        'Dynamic PMCs', 'dynapmc.html', '',
+        $self->new_group( 'Loading', '', 'src/dynpmc' ),
+        $self->new_group( 'Runtime', '', 'runtime/parrot/include' ),
+    );
 }
 
 =back

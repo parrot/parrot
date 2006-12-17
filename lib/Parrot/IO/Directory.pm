@@ -38,8 +38,7 @@ default implementation returns C<Parrot::IO::Directory>.
 
 =cut
 
-sub directory_class
-{
+sub directory_class {
     return 'Parrot::IO::Directory';
 }
 
@@ -50,8 +49,7 @@ implementation returns C<Parrot::IO::File>.
 
 =cut
 
-sub file_class
-{
+sub file_class {
     return 'Parrot::IO::File';
 }
 
@@ -65,10 +63,9 @@ C<directory_class>.
 
 =cut
 
-sub directory_with_path
-{
+sub directory_with_path {
     my $self = shift;
-    
+
     return $self->directory_class->new(@_);
 }
 
@@ -80,10 +77,9 @@ The file is an instance of the class returned by C<file_class>.
 
 =cut
 
-sub file_with_path
-{
+sub file_with_path {
     my $self = shift;
-    
+
     return $self->file_class->new(@_);
 }
 
@@ -94,11 +90,10 @@ directory.
 
 =cut
 
-sub tmp_directory
-{
+sub tmp_directory {
     my $self = shift;
-    
-    return $self->directory_with_path(File::Spec->catdir(File::Spec->tmpdir, @_));
+
+    return $self->directory_with_path( File::Spec->catdir( File::Spec->tmpdir, @_ ) );
 }
 
 =item C<new($path)>
@@ -107,13 +102,12 @@ Returns the instance for specified path.
 
 =cut
 
-sub new
-{
+sub new {
     my $self = shift;
     my $path = shift;
-    
-    return unless defined $path and ! -f $path;
-    
+
+    return unless defined $path and !-f $path;
+
     return $self->SUPER::new($path);
 }
 
@@ -129,18 +123,17 @@ This is called from C<new()> to create the path if necessary.
 
 =cut
 
-sub create_path
-{
+sub create_path {
     my $self = shift;
-    
+
     return unless $self->SUPER::create_path;
-    
-    unless ( -e $self->path )
-    {
+
+    unless ( -e $self->path ) {
+
         # This dies if it fails.
-        mkpath($self->path);
+        mkpath( $self->path );
     }
-    
+
     return -d $self->path;
 }
 
@@ -154,20 +147,19 @@ Returns the specified path relative to the directory.
 
 =cut
 
-sub relative_path
-{
+sub relative_path {
     my $self = shift;
     my $path = shift || return;
-    
+
     $path = $path->path if ref $path;
-    
-    my $rel_path = File::Spec->abs2rel($path, $self->path);
+
+    my $rel_path = File::Spec->abs2rel( $path, $self->path );
 
     # some (all?) versions of File::Spec->abs2rel() prior to 3.13 return ''
     # instead of '.' to indicate the current working directory.  In order to be
     # compatible with both pre/post version 3.13 we're normalizing the current
     # working dir to be '.'.
-    return (defined $rel_path and $rel_path eq '') ? '.' : $rel_path;
+    return ( defined $rel_path and $rel_path eq '' ) ? '.' : $rel_path;
 }
 
 =item C<parent()>
@@ -177,13 +169,12 @@ C<undef>.
 
 =cut
 
-sub parent
-{
+sub parent {
     my $self = shift;
-    
+
     return unless $self->parent_path;
-    
-    return $self->directory_with_path($self->parent_path);
+
+    return $self->directory_with_path( $self->parent_path );
 }
 
 =item C<file_and_directory_names()>
@@ -193,13 +184,12 @@ directory.
 
 =cut
 
-sub file_and_directory_names()
-{
+sub file_and_directory_names() {
     my $self = shift;
-    my $dh = DirHandle->new($self->path) or 
-        die "can't opendir $self->{PATH}: $!";
-    
-    return sort grep {$_ ne '.' and $_ ne '..'} $dh->read();
+    my $dh   = DirHandle->new( $self->path )
+        or die "can't opendir $self->{PATH}: $!";
+
+    return sort grep { $_ ne '.' and $_ ne '..' } $dh->read();
 }
 
 =item C<file_and_directory_paths()>
@@ -208,13 +198,10 @@ These are the full paths of all the files and subdirectories in the directory.
 
 =cut
 
-sub file_and_directory_paths()
-{
+sub file_and_directory_paths() {
     my $self = shift;
-    
-    return map  {
-        File::Spec->catfile($self->{PATH}, $_)
-    } $self->file_and_directory_names;
+
+    return map { File::Spec->catfile( $self->{PATH}, $_ ) } $self->file_and_directory_names;
 }
 
 =item C<file_paths()>
@@ -223,11 +210,10 @@ These are the full paths of all the files in the directory.
 
 =cut
 
-sub file_paths()
-{
+sub file_paths() {
     my $self = shift;
 
-    return sort grep {-f} $self->file_and_directory_paths;
+    return sort grep { -f } $self->file_and_directory_paths;
 }
 
 =item C<directory_paths()>
@@ -236,11 +222,10 @@ These are the full paths of all the subdirectories in the directory.
 
 =cut
 
-sub directory_paths
-{
+sub directory_paths {
     my $self = shift;
 
-    return sort grep {-d} $self->file_and_directory_paths;
+    return sort grep { -d } $self->file_and_directory_paths;
 }
 
 =item C<file_exists_with_name($name)>
@@ -249,12 +234,11 @@ Returns whether a file with the specified name exists in the directory.
 
 =cut
 
-sub file_exists_with_name
-{
+sub file_exists_with_name {
     my $self = shift;
     my $name = shift;
-    
-    return -f File::Spec->catfile($self->path, $name);
+
+    return -f File::Spec->catfile( $self->path, $name );
 }
 
 =item C<directory_exists_with_name($name)>
@@ -264,12 +248,11 @@ directory.
 
 =cut
 
-sub directory_exists_with_name
-{
+sub directory_exists_with_name {
     my $self = shift;
     my $name = shift;
-    
-    return -d File::Spec->catdir($self->path, $name);
+
+    return -d File::Spec->catdir( $self->path, $name );
 }
 
 =item C<files($recursive, $ignore)>
@@ -282,23 +265,20 @@ in C<$ignore>.
 
 =cut
 
-sub files
-{
-    my $self = shift;
+sub files {
+    my $self      = shift;
     my $recursive = shift;
-    my $ignore = shift;
-    my @files = map {$self->file_with_path($_)} $self->file_paths;
-    
-    if ( $recursive )
-    {
-        foreach my $dir ($self->directories)
-        {
+    my $ignore    = shift;
+    my @files     = map { $self->file_with_path($_) } $self->file_paths;
+
+    if ($recursive) {
+        foreach my $dir ( $self->directories ) {
             next if defined $ignore and $dir->name =~ /$ignore/;
-            
-            push @files, $dir->files(1, $ignore);
+
+            push @files, $dir->files( 1, $ignore );
         }
     }
-    
+
     return @files;
 }
 
@@ -309,11 +289,10 @@ itself.
 
 =cut
 
-sub directories
-{
+sub directories {
     my $self = shift;
 
-    return map {$self->directory_with_path($_)} $self->directory_paths;
+    return map { $self->directory_with_path($_) } $self->directory_paths;
 }
 
 =item C<file_suffixes($recursive, $ignore)>
@@ -335,18 +314,16 @@ be included in this list.
 
 =cut
 
-sub file_suffixes
-{
-    my $self = shift;
+sub file_suffixes {
+    my $self      = shift;
     my $recursive = shift;
-    my $ignore = shift;
-    my %suffixes = ();
-    
-    foreach my $file ($self->files($recursive, $ignore))
-    {
-        $suffixes{$file->suffix} = 1;
+    my $ignore    = shift;
+    my %suffixes  = ();
+
+    foreach my $file ( $self->files( $recursive, $ignore ) ) {
+        $suffixes{ $file->suffix } = 1;
     }
-    
+
     return sort keys %suffixes;
 }
 
@@ -361,23 +338,21 @@ the files with no suffix.
 
 =cut
 
-sub files_with_suffix
-{
-    my $self = shift;
+sub files_with_suffix {
+    my $self   = shift;
     my $suffix = shift;
-    
+
     return unless defined $suffix;
-    
+
     my $recursive = shift;
-    my $ignore = shift;
-    my @files = ();
-    
-    foreach my $file ($self->files($recursive, $ignore))
-    {
+    my $ignore    = shift;
+    my @files     = ();
+
+    foreach my $file ( $self->files( $recursive, $ignore ) ) {
         next unless $file->has_suffix($suffix);
         push @files, $file;
     }
-    
+
     return @files;
 }
 
@@ -388,12 +363,11 @@ directory.
 
 =cut
 
-sub path_for_directory_with_name
-{
+sub path_for_directory_with_name {
     my $self = shift;
     my $name = shift || return;
-    
-    return File::Spec->catdir($self->path, $name);
+
+    return File::Spec->catdir( $self->path, $name );
 }
 
 =item C<path_for_file_with_name($name)>
@@ -402,12 +376,11 @@ Returns the path for the file with the specified name in the directory.
 
 =cut
 
-sub path_for_file_with_name
-{
+sub path_for_file_with_name {
     my $self = shift;
     my $name = shift || return;
-    
-    return File::Spec->catfile($self->path, $name);
+
+    return File::Spec->catfile( $self->path, $name );
 }
 
 =item C<directory_with_name($name)>
@@ -416,11 +389,10 @@ Returns a directory with the specified name in the directory.
 
 =cut
 
-sub directory_with_name
-{
+sub directory_with_name {
     my $self = shift;
     my $path = $self->path_for_directory_with_name(shift) || return;
-    
+
     return $self->directory_with_path($path);
 }
 
@@ -430,11 +402,10 @@ Returns a file with the specified name in the directory.
 
 =cut
 
-sub file_with_name
-{
+sub file_with_name {
     my $self = shift;
     my $path = $self->path_for_file_with_name(shift) || return;
-    
+
     return $self->file_with_path($path);
 }
 
@@ -444,13 +415,12 @@ Returns a directory with the specified name in the directory.
 
 =cut
 
-sub existing_directory_with_name
-{
+sub existing_directory_with_name {
     my $self = shift;
     my $path = $self->path_for_directory_with_name(shift) || return;
-    
+
     return unless -d $path;
-    
+
     return $self->directory_with_path($path);
 }
 
@@ -460,13 +430,12 @@ Returns a file with the specified name in the directory.
 
 =cut
 
-sub existing_file_with_name
-{
+sub existing_file_with_name {
     my $self = shift;
     my $path = $self->path_for_file_with_name(shift) || return;
-    
+
     return unless -f $path;
-    
+
     return $self->file_with_path($path);
 }
 
@@ -477,13 +446,12 @@ relative to the directory.
 
 =cut
 
-sub path_for_directory_with_relative_path
-{
+sub path_for_directory_with_relative_path {
     my $self = shift;
     my $path = shift || return;
-    my ($volume, $directories, $name) = File::Spec->splitpath($path);
-    
-    return File::Spec->catdir($self->path, $directories, $name);
+    my ( $volume, $directories, $name ) = File::Spec->splitpath($path);
+
+    return File::Spec->catdir( $self->path, $directories, $name );
 }
 
 =item C<path_for_file_with_relative_path($path)>
@@ -493,15 +461,14 @@ taken relative to the directory.
 
 =cut
 
-sub path_for_file_with_relative_path
-{
+sub path_for_file_with_relative_path {
     my $self = shift;
     my $path = shift || return;
-    my ($volume, $directories, $name) = File::Spec->splitpath($path);
-    
-    $path = File::Spec->catdir($self->path, $directories);
-    $path = File::Spec->catfile($path, $name);
-    
+    my ( $volume, $directories, $name ) = File::Spec->splitpath($path);
+
+    $path = File::Spec->catdir( $self->path, $directories );
+    $path = File::Spec->catfile( $path, $name );
+
     return $path;
 }
 
@@ -511,13 +478,12 @@ Returns whether the specified relative path is a directory.
 
 =cut
 
-sub relative_path_is_directory
-{
+sub relative_path_is_directory {
     my $self = shift;
     my $path = $self->path_for_directory_with_relative_path(shift);
-    
+
     return unless $path;
-    
+
     return -d $path;
 }
 
@@ -527,13 +493,12 @@ Returns whether the specified relative path is a file.
 
 =cut
 
-sub relative_path_is_file
-{
+sub relative_path_is_file {
     my $self = shift;
     my $path = $self->path_for_file_with_relative_path(shift);
-    
+
     return unless $path;
-    
+
     return -f $path;
 }
 
@@ -543,13 +508,12 @@ Returns a directory with the specified relative path below the directory.
 
 =cut
 
-sub directory_with_relative_path
-{
+sub directory_with_relative_path {
     my $self = shift;
     my $path = $self->path_for_directory_with_relative_path(shift);
-    
+
     return unless $path;
-    
+
     return $self->directory_with_path($path);
 }
 
@@ -559,11 +523,10 @@ Returns a file with the specified relative path below the directory.
 
 =cut
 
-sub file_with_relative_path
-{
+sub file_with_relative_path {
     my $self = shift;
     my $path = $self->path_for_file_with_relative_path(shift) || return;
-    
+
     return $self->file_with_path($path);
 }
 
@@ -576,13 +539,13 @@ Raises an exception if the delete fails.
 
 =cut
 
-sub delete
-{
+sub delete {
+
     # Use $_[0] so that we can undef the instance in SUPER::delete().
-    
+
     $_[0]->delete_contents;
-    rmdir($_[0]->path) or die 'Failed to rmdir ' . $_[0]->path . ": $!";
-    
+    rmdir( $_[0]->path ) or die 'Failed to rmdir ' . $_[0]->path . ": $!";
+
     $_[0]->SUPER::delete;
 }
 
@@ -594,17 +557,14 @@ Raises an exception if the delete fails.
 
 =cut
 
-sub delete_contents
-{
+sub delete_contents {
     my $self = shift;
 
-    foreach my $file ($self->files)
-    {
+    foreach my $file ( $self->files ) {
         $file->delete;
     }
-    
-    foreach my $dir ($self->directories)
-    {
+
+    foreach my $dir ( $self->directories ) {
         $dir->delete;
     }
 }

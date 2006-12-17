@@ -45,10 +45,9 @@ subclass's C<new()> method.
 
 =cut
 
-sub new_item
-{
+sub new_item {
     my $self = shift;
-    
+
     return Parrot::Docs::Item->new(@_);
 }
 
@@ -63,24 +62,22 @@ path otherwise an exception is raised.
 
 =cut
 
-sub new
-{
-    my $self = ref $_[0] ? ref shift : shift;
-    my $text = shift;
+sub new {
+    my $self     = ref $_[0] ? ref shift: shift;
+    my $text     = shift;
     my @contents = @_;
-    
+
     # TODO - Items should only contain paths.
-    
+
     die "No contents ($text).\n" unless @contents;
-    
+
     $self = bless {
-        TEXT => $text,
+        TEXT     => $text,
         CONTENTS => \@contents,
     }, $self;
 
     return $self;
 }
-
 
 =back
 
@@ -96,17 +93,15 @@ Accessors for the containing section/group for the item.
 
 =cut
 
-sub set_parent
-{
+sub set_parent {
     my $self = shift;
-    
+
     $self->{PARENT} = shift;
 }
 
-sub parent
-{
+sub parent {
     my $self = shift;
-    
+
     return $self->{PARENT};
 }
 
@@ -116,15 +111,12 @@ Returns the HTML navigation bar.
 
 =cut
 
-sub html_navigation
-{
-    my $self = shift;
-    my $path = shift;
+sub html_navigation {
+    my $self   = shift;
+    my $path   = shift;
     my $parent = $self->parent || return '';
-    
-    return join ' | ', 
-        grep {length} 
-            $parent->html_navigation($path), $parent->html_link($path);
+
+    return join ' | ', grep { length } $parent->html_navigation($path), $parent->html_link($path);
 }
 
 =item C<write_html($source, $target, $silent)>
@@ -146,73 +138,65 @@ Some HTML-formatted text describing the files linked to is returned.
 
 =cut
 
-sub write_html
-{
-    my $self = shift;
-    my $source = shift || die "No source\n";
-    my $target = shift || die "No target\n";
-    my $silent = shift || 0;
+sub write_html {
+    my $self       = shift;
+    my $source     = shift || die "No source\n";
+    my $target     = shift || die "No target\n";
+    my $silent     = shift || 0;
     my $index_html = '';
-    my @rel_paths = $self->contents_relative_to_source($source);
+    my @rel_paths  = $self->contents_relative_to_source($source);
     my @short_desc = ();
-    
-    foreach my $rel_path (@rel_paths)
-    {
-        my $file = $source->file_with_relative_path($rel_path);
+
+    foreach my $rel_path (@rel_paths) {
+        my $file      = $source->file_with_relative_path($rel_path);
         my $formatter = Parrot::Docs::POD2HTML->new;
-                    
-        if ( $file->contains_pod )
-        {   
+
+        if ( $file->contains_pod ) {
             print "\n", $rel_path unless $silent;
-        
-            $formatter->write_html($source, $target, $rel_path, $self);
-            
-            $index_html .= $formatter->html_link(
-                $formatter->append_html_suffix($rel_path),
-                $source->relative_path($file->path));
-        
+
+            $formatter->write_html( $source, $target, $rel_path, $self );
+
+            $index_html .= $formatter->html_link( $formatter->append_html_suffix($rel_path),
+                $source->relative_path( $file->path ) );
+
             $index_html .= "<br>\n";
-            
+
             next if $self->{TEXT};
-            
+
             my $short_desc = $file->short_description;
-            
+
             next unless $short_desc;
-            
-            next if grep {$_ eq $short_desc} @short_desc;
-            
+
+            next if grep { $_ eq $short_desc } @short_desc;
+
             push @short_desc, $short_desc;
         }
-        elsif ( $file->is_docs_link )
-        {
+        elsif ( $file->is_docs_link ) {
             print "\n", $rel_path unless $silent;
-        
+
             # Link to the actual file rather than the HTML version.
-            $index_html .= $formatter->html_link(
-                $target->relative_path($file->path), 
-                $source->relative_path($file->path));
-                    
+            $index_html .= $formatter->html_link( $target->relative_path( $file->path ),
+                $source->relative_path( $file->path ) );
+
             $index_html .= "<br>\n";
         }
     }
-    
+
     return '' unless $index_html;
-    
-    if ( ! $self->{TEXT} and @short_desc )
-    {
+
+    if ( !$self->{TEXT} and @short_desc ) {
         my $short_desc = join '. ', @short_desc;
-        
+
         $short_desc .= '.' unless $short_desc =~ /\.$/o;
-        
+
         $self->{TEXT} = $short_desc;
     }
-    
-    if ( $self->{TEXT} )
-    {
+
+    if ( $self->{TEXT} ) {
         $index_html .= "$self->{TEXT}<br>\n";
         $index_html = '<p>' . $index_html . "</p>\n";
     }
-    
+
     return $index_html;
 }
 
@@ -223,19 +207,16 @@ directory.
 
 =cut
 
-sub contents_relative_to_source
-{
-    my $self = shift;
-    my $source = shift;
+sub contents_relative_to_source {
+    my $self     = shift;
+    my $source   = shift;
     my @contents = ();
-    
-    foreach my $content (@{$self->{CONTENTS}})
-    {
-        push @contents, 
-            $self->file_paths_relative_to_source($source, $content);
-        
+
+    foreach my $content ( @{ $self->{CONTENTS} } ) {
+        push @contents, $self->file_paths_relative_to_source( $source, $content );
+
     }
-    
+
     return @contents;
 }
 
@@ -251,30 +232,25 @@ If C<$path> cannot be found then a warning is printed.
 
 =cut
 
-sub file_paths_relative_to_source
-{
-    my $self = shift;
-    my $source = shift;
-    my $rel_path = shift;
+sub file_paths_relative_to_source {
+    my $self      = shift;
+    my $source    = shift;
+    my $rel_path  = shift;
     my @rel_paths = ();
-    
-    if ( $source->relative_path_is_directory($rel_path) )
-    {
+
+    if ( $source->relative_path_is_directory($rel_path) ) {
         my $dir = $source->directory_with_relative_path($rel_path);
-        
+
         # There may be editor scratch files to ignore.
-        
-        foreach my $file ($dir->files(1, '^\.'))
-        {
-            push @rel_paths, $source->relative_path($file->path);
+
+        foreach my $file ( $dir->files( 1, '^\.' ) ) {
+            push @rel_paths, $source->relative_path( $file->path );
         }
     }
-    elsif ( $source->relative_path_is_file($rel_path) )
-    {
+    elsif ( $source->relative_path_is_file($rel_path) ) {
         push @rel_paths, $rel_path;
     }
-    else
-    {
+    else {
         warn "Failed to process $rel_path.\n";
     }
 

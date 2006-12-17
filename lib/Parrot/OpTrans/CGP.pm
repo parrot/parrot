@@ -30,8 +30,7 @@ Returns C<PARROT_CGP_CORE>.
 
 =cut
 
-sub core_type
-{
+sub core_type {
     return 'PARROT_CGP_CORE';
 }
 
@@ -41,8 +40,7 @@ The suffix is C<'_cgp'>.
 
 =cut
 
-sub suffix
-{
+sub suffix {
     return "_cgp";
 }
 
@@ -52,8 +50,7 @@ The core prefix is C<'cgp_'>.
 
 =cut
 
-sub core_prefix
-{
+sub core_prefix {
     return "cgp_";
 }
 
@@ -63,10 +60,9 @@ Returns the C C<#define> macros required by the ops.
 
 =cut
 
-sub defines
-{
-    my ($self, $pred_def);
-    $self = shift;
+sub defines {
+    my ( $self, $pred_def );
+    $self     = shift;
     $pred_def = $self->SUPER::defines();
     my $type = __PACKAGE__;
     return $pred_def . <<END;
@@ -75,6 +71,7 @@ sub defines
      (void**) (op   - CONTEXT(i->ctx)->pred_offset)
 END
 }
+
 =item C<goto_address($address)>
 
 Transforms the C<goto ADDRESS($address)> macro in an ops file into the
@@ -82,23 +79,20 @@ relevant C code.
 
 =cut
 
-sub goto_address
-{
-    my ($self, $addr) = @_;
+sub goto_address {
+    my ( $self, $addr ) = @_;
 
     #print STDERR "pbcc: map_ret_abs($addr)\n";
 
-    if ($addr eq '0')
-    {
-        return "return (0);"
+    if ( $addr eq '0' ) {
+        return "return (0);";
     }
-    else
-    {
+    else {
         return "if ($addr == 0)
           return 0;
    _reg_base = (char*)interp->ctx.bp.regs_i;
    goto **(cur_opcode = opcode_to_prederef(interp, $addr))";
-  }
+    }
 }
 
 =item C<goto_offset($offset)>
@@ -108,9 +102,8 @@ relevant C code.
 
 =cut
 
-sub goto_offset
-{
-    my ($self, $offset) = @_;
+sub goto_offset {
+    my ( $self, $offset ) = @_;
 
     return "goto **(cur_opcode += $offset)";
 }
@@ -122,16 +115,14 @@ code.
 
 =cut
 
-sub goto_pop
-{
+sub goto_pop {
     my ($self) = @_;
 
     return "goto **(cur_opcode = opcode_to_prederef(interp,
         (opcode_t*)pop_dest(interp)))";
 }
 
-sub run_core_func_start
-{
+sub run_core_func_start {
     my $type = __PACKAGE__;
     return <<END_C;
 /* run_core_func_start - $0 -> $type */

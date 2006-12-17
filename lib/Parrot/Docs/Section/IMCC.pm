@@ -32,16 +32,17 @@ Returns a new section.
 
 =cut
 
-sub new
-{
-        my $self = shift;
-        
-        return $self->SUPER::new(
-                'IMCC', 'imcc.html', '', 
-                $self->new_group('Documentation', '', 'docs/imcc'),
-                $self->new_group('Examples', '', 'examples/pir'),
-                $self->new_group('Tests', '', 't/compilers/imcc'),
-        );
+sub new {
+    my $self = shift;
+
+    return $self->SUPER::new(
+        'IMCC',
+        'imcc.html',
+        '',
+        $self->new_group( 'Documentation', '', 'docs/imcc' ),
+        $self->new_group( 'Examples',      '', 'examples/pir' ),
+        $self->new_group( 'Tests',         '', 't/compilers/imcc' ),
+    );
 }
 
 =back

@@ -32,19 +32,19 @@ Returns a new section.
 
 =cut
 
-sub new
-{
-        my $self = shift;
-        
-        return $self->SUPER::new(
-                'Big Number Arithmetic', 'bignum.html', '',
-                $self->new_group('Decimal Arithmetic', '',
-                        $self->new_item('', 'src/bignum.c', 'src/bignum.h'),
-                ),
-                $self->new_group('Testing', '',
-                        $self->new_item('', 't/pmc/bignum.t' ),
-                ),
-        );
+sub new {
+    my $self = shift;
+
+    return $self->SUPER::new(
+        'Big Number Arithmetic',
+        'bignum.html',
+        '',
+        $self->new_group(
+            'Decimal Arithmetic',
+            '', $self->new_item( '', 'src/bignum.c', 'src/bignum.h' ),
+        ),
+        $self->new_group( 'Testing', '', $self->new_item( '', 't/pmc/bignum.t' ), ),
+    );
 }
 
 =back

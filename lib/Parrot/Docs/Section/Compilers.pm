@@ -34,26 +34,24 @@ Returns a new section.
 
 =cut
 
-sub new
-{
+sub new {
     my $self = shift;
-    
+
     return $self->SUPER::new(
-        'Compilers', 'compilers.html', '',
-        $self->new_group( 'IMCC', 'the Intermediate Code Compiler for Parrot',
-            'compilers/imcc' ),
-        $self->new_group( 'PGE', 'the Parrot Grammar Engine',
-            'compilers/pge' ),
-        $self->new_group( 'TGE', 'the Tree Grammar Engine',
-            'compilers/tge' ),
-        $self->new_group( 'PAST', 'the Parrot/Punie Abstract Syntax Tree',
-            'compilers/past' ),
-        $self->new_group( 'Partridge (PAST-pm)', 'the Parrot/Punie Abstract Syntax Tree (new implementation)',
-            'compilers/past-pm' ),
-        $self->new_group( 'BCG', 'Byte Code Generation',
-            'compilers/bcg' ),
-        $self->new_group( 'JSON', 'JavaScript Object Notation',
-            'compilers/json' ),
+        'Compilers',
+        'compilers.html',
+        '',
+        $self->new_group( 'IMCC', 'the Intermediate Code Compiler for Parrot', 'compilers/imcc' ),
+        $self->new_group( 'PGE',  'the Parrot Grammar Engine',                 'compilers/pge' ),
+        $self->new_group( 'TGE',  'the Tree Grammar Engine',                   'compilers/tge' ),
+        $self->new_group( 'PAST', 'the Parrot/Punie Abstract Syntax Tree',     'compilers/past' ),
+        $self->new_group(
+            'Partridge (PAST-pm)',
+            'the Parrot/Punie Abstract Syntax Tree (new implementation)',
+            'compilers/past-pm'
+        ),
+        $self->new_group( 'BCG',  'Byte Code Generation',       'compilers/bcg' ),
+        $self->new_group( 'JSON', 'JavaScript Object Notation', 'compilers/json' ),
     );
 }
 

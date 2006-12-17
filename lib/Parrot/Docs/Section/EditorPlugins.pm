@@ -32,14 +32,11 @@ Returns a new section.
 
 =cut
 
-sub new
-{
-        my $self = shift;
-        
-        return $self->SUPER::new(
-                'Editor Plugins', 'editor.html', '',
-                $self->new_item('', 'editor')
-        );
+sub new {
+    my $self = shift;
+
+    return $self->SUPER::new( 'Editor Plugins', 'editor.html', '',
+        $self->new_item( '', 'editor' ) );
 }
 
 =back

@@ -39,10 +39,9 @@ Returns the root section.
 
 =cut
 
-sub root_section
-{
+sub root_section {
     require Parrot::Docs::Section::Parrot;
-    
+
     return Parrot::Docs::Section::Parrot->new;
 }
 
@@ -54,10 +53,9 @@ Use this when creating subsections within a subclass's C<new()> method.
 
 =cut
 
-sub new_section
-{
+sub new_section {
     my $self = shift;
-    
+
     return Parrot::Docs::Section->new(@_);
 }
 
@@ -72,17 +70,16 @@ C<@contents> is one or more sections, groups and/or items.
 
 =cut
 
-sub new
-{
-    my $self = ref $_[0] ? ref shift : shift;
-    my $name = shift;
+sub new {
+    my $self       = ref $_[0] ? ref shift: shift;
+    my $name       = shift;
     my $index_path = shift || 'index.html';
-    my $text = shift;
-    my @contents = @_;
-    
-    $self = $self->SUPER::new($name, $text, @contents);
+    my $text       = shift;
+    my @contents   = @_;
+
+    $self = $self->SUPER::new( $name, $text, @contents );
     $self->{INDEX_PATH} = $index_path;
-    
+
     return $self;
 }
 
@@ -98,10 +95,9 @@ Returns whether the section is the root section.
 
 =cut
 
-sub is_root_section
-{
+sub is_root_section {
     my $self = shift;
-    
+
     return $self->isa('Parrot::Docs::Section::Parrot');
 }
 
@@ -111,20 +107,17 @@ Returns the HTML link for the section.
 
 =cut
 
-sub html_link
-{
+sub html_link {
     my $self = shift;
     my $path = shift;
-    
-    if ( $path )
-    {
-        $path = join('/', $path, $self->{INDEX_PATH});
+
+    if ($path) {
+        $path = join( '/', $path, $self->{INDEX_PATH} );
     }
-    else
-    {
+    else {
         $path = $self->{INDEX_PATH};
     }
-    
+
     return '<a href="' . $path . '">' . $self->name . '</a>';
 }
 
@@ -136,36 +129,33 @@ An HTML link to the section's index is returned.
 
 =cut
 
-sub write_html
-{
-    my $self = shift;
-    my $source = shift || die "No source\n";
-    my $target = shift || die "No target\n";
-    my $silent = shift || 0;
-    my $index_html = $self->write_contents_html($source, $target, $silent);
-    
+sub write_html {
+    my $self       = shift;
+    my $source     = shift || die "No source\n";
+    my $target     = shift || die "No target\n";
+    my $silent     = shift || 0;
+    my $index_html = $self->write_contents_html( $source, $target, $silent );
+
     print "\n", $self->{INDEX_PATH} unless $silent;
-    
+
     return '' unless $index_html;
-    
-    if ( $self->{TEXT} )
-    {
+
+    if ( $self->{TEXT} ) {
         $index_html = "<p>$self->{TEXT}</p>\n\n" . $index_html;
     }
-    elsif ( $index_html !~ /<DIV CLASS="pod">[^<]*<[Hh]/o )
-    {
+    elsif ( $index_html !~ /<DIV CLASS="pod">[^<]*<[Hh]/o ) {
+
         # If there is no heading or text then we have to bump it down a bit.
         $index_html = "<BR>\n" . $index_html;
     }
 
-    my $index = $target->file_with_name($self->{INDEX_PATH});
-    
+    my $index = $target->file_with_name( $self->{INDEX_PATH} );
+
     $index->write(
-        Parrot::Docs::HTMLPage->header(
-            $self->name, $self->html_navigation, '../resources'));
+        Parrot::Docs::HTMLPage->header( $self->name, $self->html_navigation, '../resources' ) );
     $index->append($index_html);
-    $index->append(Parrot::Docs::HTMLPage->footer('', '../resources'));
-    
+    $index->append( Parrot::Docs::HTMLPage->footer( '', '../resources' ) );
+
     return $self->html_link . "<br>\n";
 }
 

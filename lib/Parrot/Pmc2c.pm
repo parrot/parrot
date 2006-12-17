@@ -77,11 +77,11 @@ This method is imported by subclasses.
 =cut
 
 sub gen_ret {
-    my ($method, $body) = @_;
+    my ( $method, $body ) = @_;
 
     my $ret;
     if ($body) {
-        $ret = $method->{type} eq 'void' ? "$body;" : "return $body;" ;
+        $ret = $method->{type} eq 'void' ? "$body;" : "return $body;";
     }
     else {
         $ret = $method->{type} eq 'void' ? "" : "return ($method->{type})0;";
@@ -97,16 +97,17 @@ C<new()>, and C<$class> is C<Parrot::Pmc2c>.
 
 =cut
 
-my %special_class_name = map {($_,1)}
-    qw( STMRef Ref default Null delegate SharedRef deleg_pmc );
+my %special_class_name =
+    map { ( $_, 1 ) } qw( STMRef Ref default Null delegate SharedRef deleg_pmc );
 
 sub class_name {
-    my ($self, $class) = @_;
+    my ( $self, $class ) = @_;
 
     my $classname = $self->{class};
-    my $nclass = $class;
+    my $nclass    = $class;
+
     # bless object into different classes inheriting from Parrot::Pmc2c
-    if ($special_class_name{$classname}) {
+    if ( $special_class_name{$classname} ) {
         $nclass .= "::" . $classname;
     }
     else {
@@ -127,7 +128,7 @@ This function is exported.
 =cut
 
 sub dynext_load_code {
-    my ($libname, %classes ) = @_;
+    my ( $libname, %classes ) = @_;
 
     my $lc_libname = lc $libname;
     my $cout;
@@ -147,7 +148,7 @@ Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_INTERP interp)
     Parrot_STRING whoami;
     Parrot_PMC pmc;
 EOC
-    while (my ($class, $info) = each %classes) {
+    while ( my ( $class, $info ) = each %classes ) {
         next if $info->{flags}->{noinit};
         $cout .= <<"EOC";
     Parrot_Int type${class};
@@ -168,7 +169,7 @@ EOC
      * for all PMCs we want to register:
      */
 EOC
-    while (my ($class, $info) = each %classes) {
+    while ( my ( $class, $info ) = each %classes ) {
         my $lhs = $info->{flags}->{noinit} ? "" : "type$class = ";
         $cout .= <<"EOC";
     whoami = const_string(interp, "$class");
@@ -180,7 +181,7 @@ EOC
     /* do class_init code */
     for (pass = 0; pass <= 1; ++pass) {
 EOC
-    while (my ($class, $info) = each %classes) {
+    while ( my ( $class, $info ) = each %classes ) {
         next if $info->{flags}->{noinit};
         $cout .= <<"EOC";
         Parrot_${class}_class_init(interp, type$class, pass);
@@ -219,7 +220,7 @@ sub new {
 
     my $class = ref($this) || $this;
     $self->{opt} = shift;
-    $class = class_name($self, $class);
+    $class = class_name( $self, $class );
     bless $self, $class;
     $self->init($class);
     $self;
@@ -238,12 +239,13 @@ Returns true if the vtable method C<$method> writes our value.
 =cut
 
 sub does_write {
-    my ($self, $method) = @_;
+    my ( $self, $method ) = @_;
 
     my $attrs;
-    if ($self->{has_method}{$method}) {
-        $attrs = $self->{methods}[$self->{has_method}{$method}]->{attrs};
-    } elsif ($self->{super}{$method}) {
+    if ( $self->{has_method}{$method} ) {
+        $attrs = $self->{methods}[ $self->{has_method}{$method} ]->{attrs};
+    }
+    elsif ( $self->{super}{$method} ) {
         $attrs = $self->{super_attrs}{$method};
     }
 
@@ -261,12 +263,12 @@ if C<$self->{opt}{nolines}> is true.
 =cut
 
 sub line_directive {
-    my ($self, $line, $file) = @_;
+    my ( $self, $line, $file ) = @_;
 
     return '' if $self->{opt}{nolines};
-    if (defined $file) {
+    if ( defined $file ) {
         my $file_escaped = $file;
-        $file_escaped =~ s|(\\)|$1$1|g; # escape backslashes
+        $file_escaped =~ s|(\\)|$1$1|g;    # escape backslashes
         return qq{#line $line "$file_escaped"\n};
     }
     return qq{#line $line\n};
@@ -280,13 +282,13 @@ compiler's line number to the next physical line in the output.
 =cut
 
 sub line_directive_here {
-    my ($self, $output, $file) = @_;
+    my ( $self, $output, $file ) = @_;
 
     # Compilers count lines from 1, and on the 1st line there are no preceding
     # newlines, so *this* line is (number of newlines plus one).
     # But that's the number for *this* line (the #line directive) and we're
     # about to set the number for the next line. So + 1 again.
-    return $self->line_directive(1 + 1 + count_newlines($output), $file);
+    return $self->line_directive( 1 + 1 + count_newlines($output), $file );
 }
 
 =item C<get_vtable_section()>
@@ -302,8 +304,8 @@ sub get_vtable_section {
 
     #  make a hash of all method names containing vtable section
     my $vt = $self->{vtable};
-    foreach my $entry (@{ $vt->{methods} } ) {
-        $self->{all}{$entry->{meth}} = $entry->{section};
+    foreach my $entry ( @{ $vt->{methods} } ) {
+        $self->{all}{ $entry->{meth} } = $entry->{section};
     }
 }
 
@@ -318,8 +320,8 @@ sub get_vtable_attrs {
     my $self = shift;
 
     my $vt = $self->{vtable};
-    foreach my $entry (@{ $vt->{methods} }) {
-        $self->{attrs}{$entry->{meth}} = $entry->{attr};
+    foreach my $entry ( @{ $vt->{methods} } ) {
+        $self->{attrs}{ $entry->{meth} } = $entry->{attr};
     }
 }
 
@@ -330,52 +332,63 @@ Create a variant for Const or RO.
 =cut
 
 sub make_constlike {
-    my ($self, $class, $type, $prefix)= @_;
+    my ( $self, $class, $type, $prefix ) = @_;
 
     $prefix = "$type" unless defined $prefix;
 
     my $const = bless {}, ref($self) . "::$type";
     {
+
         # autogenerate for exotic types
         # (XXX is this appropriate or do we want them to each
         # be explicitly cleared to have the variant?)
         no strict 'refs';
-        if (!@{ref($const) . '::ISA'}) {
-            @{ref($const) . '::ISA'} = "Parrot::Pmc2c::Standard::\u$type";
+        if ( !@{ ref($const) . '::ISA' } ) {
+            @{ ref($const) . '::ISA' } = "Parrot::Pmc2c::Standard::\u$type";
         }
     }
     my @methods = @{ $self->{methods} };
+
     # copy super
     $const->{super} = { %{ $self->{super} } };
     my $i;
+
     # FIXME support getting implementations from central superclass instead
     # (e.g. some ro_fail pseudoclass that generates an exception)
-    foreach my $entry (@{ $self->{vtable}{methods} }) {
+    foreach my $entry ( @{ $self->{vtable}{methods} } ) {
         my $meth = $entry->{meth};
-        if ($self->does_write($meth)) {
+        if ( $self->does_write($meth) ) {
             $const->{has_method}{$meth} = $i++;
-            push @{ $const->{methods} }, {
-                meth => $meth,
-                type => $entry->{type},
+            push @{ $const->{methods} },
+                {
+                meth       => $meth,
+                type       => $entry->{type},
                 parameters => $entry->{parameters},
-                loc => 'vtable',
-            };
-        } else {
-            if ($self->implements($meth)) {
+                loc        => 'vtable',
+                };
+        }
+        else {
+            if ( $self->implements($meth) ) {
                 $const->{super}{$meth} = $self->{class};
-            } else {
+            }
+            else {
                 $const->{super}{$meth} = $self->{super}{$meth};
             }
         }
     }
+
     # copy parent(s), prepend self as parrent
     $const->{parents} = [ $self->{class}, @{ $self->{parents} } ];
+
     # copy flags, set is_const
     $const->{flags} = { %{ $self->{flags} } };
+
     # set classname
     $const->{class} = $prefix . $self->{class};
+
     # and alias vtable
     $const->{vtable} = $self->{vtable};
+
     # set parentname
     $const->{parentname} = $self->{class};
     return $const;
@@ -389,11 +402,12 @@ C<init()> to to create the read-only set methods.
 =cut
 
 sub make_const {
-    my ($self, $class) = @_;
-    my $const = $self->make_constlike($class, 'Const');
+    my ( $self, $class ) = @_;
+    my $const = $self->make_constlike( $class, 'Const' );
     $self->{const} = $const;
     $const->{flags}->{is_const} = 1;
     delete $const->{flags}{const_too};
+
     # set const in does
     $const->{flags}{does}{const} = 1;
 }
@@ -406,8 +420,8 @@ to create the read-only set methods and vtable variant.
 =cut
 
 sub make_ro {
-    my ($self, $class) = @_;
-    my $ro = $self->make_constlike($class, 'RO', '');
+    my ( $self, $class ) = @_;
+    my $ro = $self->make_constlike( $class, 'RO', '' );
     $self->{flags}{has_ro} = 1;
     $self->{ro} = $ro;
     delete $ro->{flags}->{has_ro};
@@ -422,39 +436,42 @@ Initializes the instance. C<$class> is its class.
 =cut
 
 sub init {
-    my ($self, $class) = @_;
+    my ( $self, $class ) = @_;
 
     $self->get_vtable_section();
     $self->get_vtable_attrs();
     $self->make_const($class) if $self->{flags}{const_too};
-    $self->{flags}{no_ro} = 1 if $self->{flags}{abstract}
-                              or $self->{flags}{singleton}
-                              or $self->{flags}{const_too};
-    if (!$self->{flags}{no_ro}) {
+    $self->{flags}{no_ro} = 1
+        if $self->{flags}{abstract}
+        or $self->{flags}{singleton}
+        or $self->{flags}{const_too};
+    if ( !$self->{flags}{no_ro} ) {
         $self->make_ro;
     }
 
-    if ($self->{flags}{singleton}) {
+    if ( $self->{flags}{singleton} ) {
+
         # Since singletons are shared between interpreters, we need
         # to make special effort to use the right namespace for
         # method lookups. Note that this trick won't work if the
         # singleton inherits from something else (because the
         # MRO will still be shared).
-        unless ($self->implements('namespace') or
-                    $self->{super}{'namespace'} ne 'default') {
-            push @{$self->{methods}}, {
-                meth => 'namespace',
+        unless ( $self->implements('namespace')
+            or $self->{super}{'namespace'} ne 'default' )
+        {
+            push @{ $self->{methods} }, {
+                meth       => 'namespace',
                 parameters => '',
-                body => '{
+                body       => '{
         return INTERP->vtables[SELF->vtable->base_type]->_namespace;
 }',
-                'loc' => 'vtable',
+                'loc'  => 'vtable',
                 'mmds' => [],
                 'type' => 'PMC*',
                 'line' => 1,
-                attrs => {},
+                attrs  => {},
             };
-            $self->{has_method}{namespace} = $#{$self->{methods}};
+            $self->{has_method}{namespace} = $#{ $self->{methods} };
         }
     }
 }
@@ -467,29 +484,31 @@ indicates whether the code is for a header or implementation file.
 =cut
 
 sub decl {
-    my ($self, $classname, $method, $for_header) = @_;
+    my ( $self, $classname, $method, $for_header ) = @_;
 
-    my $ret = $method->{type};
-    my $meth= $method->{meth};
-    my $args= $method->{parameters};
+    my $ret     = $method->{type};
+    my $meth    = $method->{meth};
+    my $args    = $method->{parameters};
     my $variant = $self->{variant} || "";
     $args = ", $args" if $args =~ /\S/;
-    my ($export, $extern, $newl, $semi, $interp, $pmc);
+    my ( $export, $extern, $newl, $semi, $interp, $pmc );
     if ($for_header) {
-        $export = $self->{flags}->{dynpmc} ? 'PARROT_DYNEXT_EXPORT ' :
-                                             'PARROT_API ';
+        $export =
+            $self->{flags}->{dynpmc}
+            ? 'PARROT_DYNEXT_EXPORT '
+            : 'PARROT_API ';
         $extern = "extern ";
-        $newl = " ";
-        $semi = ";";
+        $newl   = " ";
+        $semi   = ";";
         $interp = $pmc = "";
     }
     else {
         $export = "";
         $extern = "";
-        $newl = "\n";
-        $semi = "";
+        $newl   = "\n";
+        $semi   = "";
         $interp = 'interp';
-        $pmc = ' pmc';
+        $pmc    = ' pmc';
     }
     return <<"EOC";
 $export$extern$ret${newl}Parrot_${classname}${variant}_$meth(Interp *$interp, PMC*$pmc$args)$semi
@@ -512,13 +531,13 @@ sub includes {
 #include "parrot/extend.h"
 #include "parrot/dynext.h"
 EOC
-    foreach my $parents ($self->{class}, @{ $self->{parents} } ) {
-    my $name = lc $parents;
-    $cout .= <<"EOC";
+    foreach my $parents ( $self->{class}, @{ $self->{parents} } ) {
+        my $name = lc $parents;
+        $cout .= <<"EOC";
 #include "pmc_$name.h"
 EOC
     }
-    if (!$self->{flags}{dynpmc}) {
+    if ( !$self->{flags}{dynpmc} ) {
         my $name = lc $self->{class};
         $cout .= <<"EOC";
 #include "$name.str"
@@ -526,7 +545,6 @@ EOC
     }
     "$cout\n";
 }
-
 
 =item C<full_arguments($args)>
 
@@ -537,9 +555,10 @@ Prepends C<INTERP, SELF> to C<$args>.
 sub full_arguments {
     my $args = shift;
 
-    if ($args =~ m/\S/) {
+    if ( $args =~ m/\S/ ) {
         return "INTERP, SELF, $args";
-    } else {
+    }
+    else {
         return "INTERP, SELF";
     }
 }
@@ -552,38 +571,40 @@ Determines the prototype (argument signature) for a method body
 =cut
 
 my %calltype = (
-  "char"     => "c",
-  "short"    => "s",
-  "char"     => "c",
-  "short"    => "s",
-  "int"      => "i",
-  "INTVAL"   => "I",
-  "float"    => "f",
-  "FLOATVAL" => "N",
-  "double"   => "d",
-  "STRING*"  => "S",
-  "char*"    => "t",
-  "PMC*"     => "P",
-  "short*"   => "2",
-  "int*"     => "3",
-  "long*"    => "4",
-  "void"     => "v",
-  "void*"    => "b",
-  "void**"   => "B",
-  #"BIGNUM*" => "???" # XXX
+    "char"     => "c",
+    "short"    => "s",
+    "char"     => "c",
+    "short"    => "s",
+    "int"      => "i",
+    "INTVAL"   => "I",
+    "float"    => "f",
+    "FLOATVAL" => "N",
+    "double"   => "d",
+    "STRING*"  => "S",
+    "char*"    => "t",
+    "PMC*"     => "P",
+    "short*"   => "2",
+    "int*"     => "3",
+    "long*"    => "4",
+    "void"     => "v",
+    "void*"    => "b",
+    "void**"   => "B",
+
+    #"BIGNUM*" => "???" # XXX
 );
 
 sub proto {
-    my ($type, $parameters) = @_;
+    my ( $type, $parameters ) = @_;
 
     # reduce to a comma separated set of types
     $parameters =~ s/\w+(,|$)/,/g;
     $parameters =~ s/ //g;
 
     # type method(interp, self, parameters...)
-    my $ret = $calltype{$type or "void"};
+    my $ret = $calltype{ $type or "void" };
     $ret .= "JO";
-    $ret .= join('', map {$calltype{$_} or "?"} split(/,/, $parameters));
+    $ret .= join( '', map { $calltype{$_} or "?" } split( /,/, $parameters ) );
+
     # TODO
     # scan src/call_list.txt if the generated signature is available
     # TODO report errors for "?"
@@ -600,9 +621,10 @@ nci method bodies (see F<tools/build/pmc2c.pl>).
 =cut
 
 sub rewrite_nci_method {
-    my ($class, $method) = @_;
+    my ( $class, $method ) = @_;
 
     local $_ = $_[2];
+
     # Rewrite SELF -> pmc, INTERP -> interp
     s/\bSELF\b/pmc/g;
     s/\bINTERP\b/interp/g;
@@ -618,13 +640,13 @@ vtable method bodies (see F<tools/build/pmc2c.pl>).
 =cut
 
 sub rewrite_vtable_method {
-    my ($class, $method, $super, $super_table) = @_;
+    my ( $class, $method, $super, $super_table ) = @_;
     local $_ = $_[4];
 
     # Rewrite method body
     my $supertype = "enum_class_$super";
     die "$class defines unknown vtable method '$method'\n"
-      unless defined $super_table->{$method};
+        unless defined $super_table->{$method};
     my $supermethod = "Parrot_" . $super_table->{$method} . "_$method";
 
     # Rewrite DYNSUPER(args)
@@ -685,68 +707,66 @@ generating.
 
 =cut
 
-sub body
-{
-    my ($self, $method, $line, $out_name) = @_;
+sub body {
+    my ( $self, $method, $line, $out_name ) = @_;
 
-    my $cout = "";
+    my $cout      = "";
     my $classname = $self->{class};
-    my $meth = $method->{meth};
-    my $body = $method->{body};
+    my $meth      = $method->{meth};
+    my $body      = $method->{body};
     $body =~ s/^\t/        /mg;
     $body =~ s/^[ ]{4}//mg;
     my $super = $self->{super}{$meth};
 
     my $total_body;
-    if ($method->{loc} eq 'vtable') {
-        $total_body = rewrite_vtable_method($classname, $meth, $super,
-                       $self->{super}, $body);
+    if ( $method->{loc} eq 'vtable' ) {
+        $total_body = rewrite_vtable_method( $classname, $meth, $super, $self->{super}, $body );
     }
     else {
-        $total_body = rewrite_nci_method($classname, $meth, $body);
+        $total_body = rewrite_nci_method( $classname, $meth, $body );
     }
 
     # now split into MMD if necessary:
-    my $additional_bodies= '';
+    my $additional_bodies = '';
     $total_body = substr $total_body, 1, -1;
     my $standard_body = $total_body;
-    my $header_decls = '';
-    while ($total_body =~ s/\bMMD_(\w+):\s*//) {
+    my $header_decls  = '';
+    while ( $total_body =~ s/\bMMD_(\w+):\s*// ) {
         my $right_type = $1;
-        my $body_part = extract_bracketed($total_body, '{');
+        my $body_part = extract_bracketed( $total_body, '{' );
         die "Empty MMD body near '$total_body'"
-            if (!$body_part);
-        $body_part = substr($body_part, 1, -1);
+            if ( !$body_part );
+        $body_part = substr( $body_part, 1, -1 );
         $body_part =~ s/\n(\s*)$//s;
-        if ($right_type eq 'DEFAULT') {
-            $standard_body = $body_part
+        if ( $right_type eq 'DEFAULT' ) {
+            $standard_body = $body_part;
         }
         else {
-            my $sub_meth_decl = $self->decl($classname, $method);
-            my $sub_meth_decl_h = $self->decl($classname, $method, 1);
+            my $sub_meth_decl = $self->decl( $classname, $method );
+            my $sub_meth_decl_h = $self->decl( $classname, $method, 1 );
             $sub_meth_decl =~ /(\w+)\(/;
             my $sub_meth_name = $1;
-            my $sub_meth =  $sub_meth_decl;   # no "static ." ...
-            $sub_meth =~ s/\(/_$right_type(/;
+            my $sub_meth      = $sub_meth_decl;    # no "static ." ...
+            $sub_meth        =~ s/\(/_$right_type(/;
             $sub_meth_decl_h =~ s/\(/_$right_type(/;
             $self->{hdecls} .= <<EOH;
 $sub_meth_decl_h
 EOH
             $additional_bodies .= $sub_meth;
             $additional_bodies .= "{$body_part\n}";
-            push @{ $self->{mmd_variants}{$meth} },
-                [ $right_type, $sub_meth_name ];
+            push @{ $self->{mmd_variants}{$meth} }, [ $right_type, $sub_meth_name ];
         }
 
     }
     ## $cout .= $header_decls;
-    $cout .= $self->decl($classname, $method, 0);
+    $cout .= $self->decl( $classname, $method, 0 );
+
     # This is the part that comes from the PMC file.
-    $cout .= $self->line_directive($method->{line}, $self->{file});
+    $cout .= $self->line_directive( $method->{line}, $self->{file} );
     $cout .= "{$standard_body\n}\n";
+
     # We are back to generated code immediately here
-    $cout .= $self->line_directive(2 + $line + count_newlines($cout),
-                   $out_name);
+    $cout .= $self->line_directive( 2 + $line + count_newlines($cout), $out_name );
     $cout .= $additional_bodies;
     $cout .= "\n\n";
 
@@ -763,25 +783,25 @@ generating.
 =cut
 
 sub methods {
-    my ($self, $line, $out_name) = @_;
+    my ( $self, $line, $out_name ) = @_;
 
     my $cout = "";
 
     # vtable methods
-    foreach my $method (@{ $self->{vtable}{methods}} ) {
+    foreach my $method ( @{ $self->{vtable}{methods} } ) {
         my $meth = $method->{meth};
         next if $meth eq 'class_init';
-        if ($self->implements($meth)) {
-            my $ret = $self->body($method, $line, $out_name);
+        if ( $self->implements($meth) ) {
+            my $ret = $self->body( $method, $line, $out_name );
             $line += count_newlines($ret);
             $cout .= $ret;
         }
     }
 
     # nci methods
-    foreach my $method (@{ $self->{methods}} ) {
+    foreach my $method ( @{ $self->{methods} } ) {
         next unless $method->{loc} eq 'nci';
-        my $ret = $self->body($method, $line, $out_name);
+        my $ret = $self->body( $method, $line, $out_name );
         $line += count_newlines($ret);
         $cout .= $ret;
     }
@@ -800,7 +820,7 @@ sub lib_load_code {
     my $self = shift;
 
     my $classname = $self->{class};
-    return dynext_load_code($classname, $classname => {});
+    return dynext_load_code( $classname, $classname => {} );
 }
 
 =item C<pmc_is_dynpmc>
@@ -810,31 +830,34 @@ Determines if a given PMC type is dynamically loaded or not.
 =cut
 
 sub pmc_is_dynpmc {
+
     # surely core PMCs aren't dynamic
-    return exists($pmc_types{$_[1]}) ? 0 : 1;
+    return exists( $pmc_types{ $_[1] } ) ? 0 : 1;
 }
 
 # XXX quick hack - to get MMD variants
 sub get_super_mmds {
-    my ($self, $meth, $right, $func) = @_;
+    my ( $self, $meth, $right, $func ) = @_;
     ## use Data::Dumper;
     ## printf "******* $meth_name **********\n";
     ## print Dumper($self);
     ## exit 0;
-    my (@mmds, $found);
-    for my $super_mmd (@{ $self->{super_mmd} }) {
-        my ($super, $variants);
+    my ( @mmds, $found );
+    for my $super_mmd ( @{ $self->{super_mmd} } ) {
+        my ( $super, $variants );
         $found = 0;
-        @mmds = ();
-        while (($super, $variants) = each %{ $super_mmd }) {
-            if ($super eq 'meth' && $variants eq $meth) {
+        @mmds  = ();
+        while ( ( $super, $variants ) = each %{$super_mmd} ) {
+            if ( $super eq 'meth' && $variants eq $meth ) {
                 $found = 1;
             }
-            elsif (ref($variants) eq 'ARRAY') {
-                for my $class (@{ $variants }) {
+            elsif ( ref($variants) eq 'ARRAY' ) {
+                for my $class ( @{$variants} ) {
                     next if $class eq 'DEFAULT';
-                    my $r = $class eq 'DEFAULT' ? 'enum_type_PMC' :
-                    "enum_class_$class";
+                    my $r =
+                        $class eq 'DEFAULT'
+                        ? 'enum_type_PMC'
+                        : "enum_class_$class";
                     my $super_name = "Parrot_${super}_$meth";
                     $super_name .= "_$class" if $class ne 'DEFAULT';
                     push @mmds, [ $func, 0, $r, $super_name ];
@@ -861,49 +884,53 @@ in the MMD table that will need to be resolved at runtime.
 =cut
 
 sub find_mmd_methods {
-    my $self = shift;
+    my $self      = shift;
     my $classname = $self->{class};
-    my (@mmds, @init_mmds, %init_mmds);
-    foreach my $method (@{ $self->{vtable}{methods}} ) {
+    my ( @mmds, @init_mmds, %init_mmds );
+    foreach my $method ( @{ $self->{vtable}{methods} } ) {
         my $meth = $method->{meth};
         my $meth_name;
-        if (!$self->implements($meth)) {
+        if ( !$self->implements($meth) ) {
             my $class = $self->{super}{$meth};
-            next if $class =~ /^[A-Z]/
-                or $class eq 'default' or $class eq 'delegate';
+            next
+                if $class =~ /^[A-Z]/
+                or $class eq 'default'
+                or $class eq 'delegate';
             $meth_name = "Parrot_${class}_$meth";
-        } else {
+        }
+        else {
             $meth_name = "Parrot_${classname}_$meth";
         }
         next unless $method->{mmd} =~ /MMD_/;
-        my ($func, $left, $right);
+        my ( $func, $left, $right );
         $func = $method->{mmd};
+
         # dynamic PMCs need the runtime type
         # which is passed in entry to class_init
-        $left = 0;  # set to 'entry' below in initialization loop.
+        $left  = 0;                 # set to 'entry' below in initialization loop.
         $right = 'enum_type_PMC';
-        $right = 'enum_type_INTVAL'   if ($func =~ s/_INT$//);
-        $right = 'enum_type_FLOATVAL' if ($func =~ s/_FLOAT$//);
-        $right = 'enum_type_STRING'   if ($func =~ s/_STR$//);
-        if (exists $self->{super}{$meth}) {
-            push @mmds, $self->get_super_mmds($meth, $right, $func);
+        $right = 'enum_type_INTVAL' if ( $func =~ s/_INT$// );
+        $right = 'enum_type_FLOATVAL' if ( $func =~ s/_FLOAT$// );
+        $right = 'enum_type_STRING' if ( $func =~ s/_STR$// );
+        if ( exists $self->{super}{$meth} ) {
+            push @mmds, $self->get_super_mmds( $meth, $right, $func );
         }
         push @mmds, [ $func, $left, $right, $meth_name ];
-        foreach my $variant (@{ $self->{mmd_variants}{$meth} }) {
-            if ($self->pmc_is_dynpmc($variant->[0])) {
+        foreach my $variant ( @{ $self->{mmd_variants}{$meth} } ) {
+            if ( $self->pmc_is_dynpmc( $variant->[0] ) ) {
                 $right = 0;
-                push @init_mmds, [$#mmds + 1, $variant->[0]];
-                $init_mmds{$variant->[0]} = 1;
+                push @init_mmds, [ $#mmds + 1, $variant->[0] ];
+                $init_mmds{ $variant->[0] } = 1;
             }
             else {
                 $right = "enum_class_$variant->[0]";
             }
-            $meth_name = $variant->[1] . '_' .$variant->[0];
-            push @mmds, [ $func, $left, $right, $meth_name];
+            $meth_name = $variant->[1] . '_' . $variant->[0];
+            push @mmds, [ $func, $left, $right, $meth_name ];
         }
-        $self->{mmds} = @mmds; # XXX?
+        $self->{mmds} = @mmds;    # XXX?
     }
-    return (\@mmds, \@init_mmds, [ keys %init_mmds ]);
+    return ( \@mmds, \@init_mmds, [ keys %init_mmds ] );
 }
 
 =item C<find_vtable_methods()>
@@ -914,25 +941,26 @@ they appear in the vtable.
 =cut
 
 sub find_vtable_methods {
-    my $self = shift;
+    my $self      = shift;
     my $classname = $self->{class};
-    my $variant = $self->{variant} || "";
-    my (@meths, @mmds, @init_mmds, %init_mmds);
-    foreach my $method (@{ $self->{vtable}{methods}} ) {
+    my $variant   = $self->{variant} || "";
+    my ( @meths, @mmds, @init_mmds, %init_mmds );
+    foreach my $method ( @{ $self->{vtable}{methods} } ) {
         my $meth = $method->{meth};
         my $meth_name;
-        if ($self->implements($meth)) {
+        if ( $self->implements($meth) ) {
             $meth_name = "Parrot_${classname}${variant}_$meth";
         }
-        elsif (exists $self->{super}{$meth}) {
+        elsif ( exists $self->{super}{$meth} ) {
             my $class = $self->{super}{$meth};
             $meth_name = "Parrot_${class}_$meth";
         }
         else {
             $meth_name = "Parrot_default_$meth";
         }
+
         # normal vtable method}
-        unless ($method->{mmd} =~ /MMD_/) {
+        unless ( $method->{mmd} =~ /MMD_/ ) {
             push @meths, $meth_name;
         }
     }
@@ -946,7 +974,7 @@ C<$name> with the functions for this class.
 =cut
 
 sub vtable_decl {
-    my ($self, $name) = @_;
+    my ( $self, $name ) = @_;
 
     my $methods = $self->find_vtable_methods();
 
@@ -955,27 +983,28 @@ sub vtable_decl {
 
     # TODO gen C line comment
     my $classname = $self->{class};
-    my $vtbl_flag =  $self->{flags}{const_too} ?
-        'VTABLE_HAS_CONST_TOO' : $self->{flags}{is_const} ?
-      'VTABLE_IS_CONST_FLAG' : 0;
-    if (exists $self->{flags}{need_ext}) {
+    my $vtbl_flag =
+          $self->{flags}{const_too} ? 'VTABLE_HAS_CONST_TOO'
+        : $self->{flags}{is_const}  ? 'VTABLE_IS_CONST_FLAG'
+        :                             0;
+    if ( exists $self->{flags}{need_ext} ) {
         $vtbl_flag .= '|VTABLE_PMC_NEEDS_EXT';
     }
-    if (exists $self->{flags}{singleton}) {
+    if ( exists $self->{flags}{singleton} ) {
         $vtbl_flag .= '|VTABLE_PMC_IS_SINGLETON';
     }
-    if (exists $self->{flags}{is_shared}) {
+    if ( exists $self->{flags}{is_shared} ) {
         $vtbl_flag .= '|VTABLE_IS_SHARED_FLAG';
     }
-    if (exists $self->{flags}{is_ro}) {
+    if ( exists $self->{flags}{is_ro} ) {
         $vtbl_flag .= '|VTABLE_IS_READONLY_FLAG';
     }
-    if (exists $self->{flags}{has_ro}) {
+    if ( exists $self->{flags}{has_ro} ) {
         $vtbl_flag .= '|VTABLE_HAS_READONLY_FLAG';
     }
 
     my $enum_name = $self->{flags}{dynpmc} ? -1 : "enum_class_$classname";
-    my $methlist = join(",\n        ", @$methods);
+    my $methlist = join( ",\n        ", @$methods );
     $cout .= <<ENDOFCODE;
     const struct _vtable $name = {
         NULL, /* namespace */
@@ -1005,26 +1034,29 @@ sub init_func {
 
     my $cout = "";
     return "" if exists $self->{flags}{noinit};
-    my ($mmds, $init_mmds, $dyn_mmds) = $self->find_mmd_methods();
+    my ( $mmds, $init_mmds, $dyn_mmds ) = $self->find_mmd_methods();
     my $vtable_decl = $self->vtable_decl('temp_base_vtable');
 
     my $classname = $self->{class};
 
-    my $mmd_list = join(",\n        ", map {
-        "{ $_->[0], $_->[1], $_->[2],
-                    (funcptr_t) $_->[3] }" } @$mmds);
-    my $isa = join(" ", $classname, @{ $self->{parents} });
+    my $mmd_list = join(
+        ",\n        ",
+        map {
+            "{ $_->[0], $_->[1], $_->[2],
+                    (funcptr_t) $_->[3] }"
+            } @$mmds
+    );
+    my $isa = join( " ", $classname, @{ $self->{parents} } );
     $isa =~ s/\s?default$//;
-    my $does = join(" ", keys(%{ $self->{flags}{does} }));
-    my $n = exists $self->{has_method}{class_init} ?
-                   $self->{has_method}{class_init} : -1;
+    my $does = join( " ", keys( %{ $self->{flags}{does} } ) );
+    my $n = exists $self->{has_method}{class_init} ? $self->{has_method}{class_init} : -1;
     my $class_init_code = $n >= 0 ? $self->{methods}[$n]{body} : "";
     $class_init_code =~ s/INTERP/interp/g;
     my $enum_name = $self->{flags}{dynpmc} ? -1 : "enum_class_$classname";
 
     my %extra_vt;
 
-    if ($self->{ro}) {
+    if ( $self->{ro} ) {
         $extra_vt{ro} = $self->{ro};
     }
 
@@ -1035,12 +1067,12 @@ Parrot_${classname}_class_init(Parrot_Interp interp, int entry, int pass)
 $vtable_decl
 EOC
 
-    for my $k (keys %extra_vt) {
+    for my $k ( keys %extra_vt ) {
         $cout .= $extra_vt{$k}->vtable_decl("temp_${k}_vtable");
     }
 
-    my $const = ($self->{flags}{dynpmc}) ? " " : " const ";
-    if (scalar @$mmds) {
+    my $const = ( $self->{flags}{dynpmc} ) ? " " : " const ";
+    if ( scalar @$mmds ) {
         $cout .= <<"EOC";
 
    $const MMD_init _temp_mmd_init[] = {
@@ -1062,7 +1094,7 @@ EOC
         struct _vtable *vt_clone =
             Parrot_clone_vtable(interp, &temp_base_vtable);
 EOC
-    for my $k (keys %extra_vt) {
+    for my $k ( keys %extra_vt ) {
         $cout .= <<"EOC";
         struct _vtable *vt_${k}_clone =
             Parrot_clone_vtable(interp, &temp_${k}_vtable);
@@ -1070,7 +1102,7 @@ EOC
     }
 
     # init vtable slot
-    if ($self->{flags}{dynpmc}) {
+    if ( $self->{flags}{dynpmc} ) {
         $cout .= <<"EOC";
         vt_clone->base_type = entry;
         vt_clone->whoami = string_make(interp,
@@ -1091,7 +1123,7 @@ EOC
         vt_clone->does_str = CONST_STRING(interp, "$does");
 EOC
     }
-    for my $k (keys %extra_vt) {
+    for my $k ( keys %extra_vt ) {
         $cout .= <<"EOC";
         vt_${k}_clone->base_type = entry;
         vt_${k}_clone->whoami = vt_clone->whoami;
@@ -1100,7 +1132,7 @@ EOC
 EOC
     }
 
-    if ($extra_vt{ro}) {
+    if ( $extra_vt{ro} ) {
         $cout .= <<"EOC";
         vt_clone->ro_variant_vtable = vt_ro_clone;
         vt_ro_clone->ro_variant_vtable = vt_clone;
@@ -1115,12 +1147,12 @@ EOC
     else { /* pass */
 EOC
 
-   # To make use of the .HLL directive, register any mapping...
-    if ($self->{flags}{hll} && $self->{flags}{maps}) {
+    # To make use of the .HLL directive, register any mapping...
+    if ( $self->{flags}{hll} && $self->{flags}{maps} ) {
 
-      my $hll  = (keys %{$self->{flags}{hll}})[0];
-      my $maps = (keys %{$self->{flags}{maps}})[0];
-      $cout .= <<"EOC";
+        my $hll  = ( keys %{ $self->{flags}{hll} } )[0];
+        my $maps = ( keys %{ $self->{flags}{maps} } )[0];
+        $cout .= <<"EOC";
 
         {
             /* Register this PMC as a HLL mapping */
@@ -1139,16 +1171,17 @@ EOC
         /* setup MRO and _namespace */
         Parrot_create_mro(interp, entry);
 EOC
+
     # declare each nci method for this class
-    foreach my $method (@{ $self->{methods} }) {
+    foreach my $method ( @{ $self->{methods} } ) {
         next unless $method->{loc} eq 'nci';
-        my $proto = proto($method->{type}, $method->{parameters});
+        my $proto = proto( $method->{type}, $method->{parameters} );
         $cout .= <<"EOC";
         enter_nci_method(interp, entry,
                 F2DPTR(Parrot_${classname}_$method->{meth}),
                 "$method->{meth}", "$proto");
 EOC
-        if ($method->{attrs}{write}) {
+        if ( $method->{attrs}{write} ) {
             $cout .= <<"EOC";
         Parrot_mark_method_writes(interp, entry, "$method->{meth}");
 EOC
@@ -1172,9 +1205,10 @@ EOC
             int my_enum_class_$dynpmc = pmc_type(interp, string_from_const_cstring(interp, "$dynpmc", 0));
 EOC
     }
+
     # init MMD "right" slots with the dynpmc types
     foreach my $entry (@$init_mmds) {
-        if ($entry->[1] eq $classname) {
+        if ( $entry->[1] eq $classname ) {
             $cout .= <<"EOC";
             _temp_mmd_init[$entry->[0]].right = entry;
 EOC
@@ -1185,6 +1219,7 @@ EOC
 EOC
         }
     }
+
     # just to be safe
     foreach my $dynpmc (@$dyn_mmds) {
         next if $dynpmc eq $classname;
@@ -1192,7 +1227,7 @@ EOC
             assert(my_enum_class_$dynpmc != enum_class_default);
 EOC
     }
-    if (scalar @$mmds) {
+    if ( scalar @$mmds ) {
         $cout .= <<"EOC";
 #define N_MMD_INIT (sizeof(_temp_mmd_init)/sizeof(_temp_mmd_init[0]))
             Parrot_mmd_register_table(interp, entry,
@@ -1205,7 +1240,7 @@ EOC
     } /* pass */
 } /* Parrot_${classname}_class_init */
 EOC
-    if ($self->{flags}{dynpmc}) {
+    if ( $self->{flags}{dynpmc} ) {
         $cout .= $self->lib_load_code();
     }
     $cout;
@@ -1219,24 +1254,22 @@ of the output file we are generating.
 =cut
 
 sub gen_c {
-    my ($self, $out_name) = @_;
+    my ( $self, $out_name ) = @_;
 
-    my $cout = dont_edit($self->{file});
-    if ($self->{flags}{dynpmc}) {
+    my $cout = dont_edit( $self->{file} );
+    if ( $self->{flags}{dynpmc} ) {
         $cout .= "#define PARROT_IN_EXTENSION\n";
     }
-    $cout .= $self->line_directive(1, $self->{file})
-    . $self->{pre};
-    $cout .= $self->line_directive_here($cout, $out_name)
-    . $self->includes;
+    $cout .= $self->line_directive( 1, $self->{file} ) . $self->{pre};
+    $cout .= $self->line_directive_here( $cout, $out_name ) . $self->includes;
     my $l = count_newlines($cout);
-    $cout .= $self->methods($l, $out_name);
-    if ($self->{ro}) {
-        $cout .= $self->{ro}->methods($l, $out_name);
+    $cout .= $self->methods( $l, $out_name );
+    if ( $self->{ro} ) {
+        $cout .= $self->{ro}->methods( $l, $out_name );
     }
     $cout .= $self->init_func;
-    if ($self->{const}) {
-        $cout .= $self->{const}->methods($l, $out_name);
+    if ( $self->{const} ) {
+        $cout .= $self->{const}->methods( $l, $out_name );
         $cout .= $self->{const}->init_func;
     }
     $cout .= $self->{post};
@@ -1257,18 +1290,20 @@ sub hdecls {
 
     my $hout;
     my $classname = $self->{class};
+
     # generat decls for all methods in this file
-    foreach my $meth (@{ $self->{vtable}{methods} } ) {
-        if ($self->implements($meth->{meth})) {
-            $hout .= $self->decl($classname, $meth, 1);
+    foreach my $meth ( @{ $self->{vtable}{methods} } ) {
+        if ( $self->implements( $meth->{meth} ) ) {
+            $hout .= $self->decl( $classname, $meth, 1 );
         }
     }
-    foreach my $method (@{ $self->{methods}} ) {
+    foreach my $method ( @{ $self->{methods} } ) {
         next unless $method->{loc} eq 'nci';
-        $hout .= $self->decl($classname, $method, 1);
+        $hout .= $self->decl( $classname, $method, 1 );
     }
+
     # class init decl
-    if ($self->{flags}->{dynpmc}) {
+    if ( $self->{flags}->{dynpmc} ) {
         $hout .= 'PARROT_DYNEXT_EXPORT ';
     }
     $hout .= <<"EOC";
@@ -1286,9 +1321,9 @@ of the output file we are generating.
 =cut
 
 sub gen_h {
-    my ($self, $out_name) = @_;
+    my ( $self, $out_name ) = @_;
 
-    my $hout = dont_edit($self->{file});
+    my $hout = dont_edit( $self->{file} );
     my $name = uc $self->{class};
     $hout .= <<"EOH";
 
@@ -1297,15 +1332,15 @@ sub gen_h {
 
 EOH
 
-    if ($self->{flags}{dynpmc}) {
+    if ( $self->{flags}{dynpmc} ) {
         $hout .= "#define PARROT_IN_EXTENSION\n";
     }
 
     $hout .= $self->hdecls();
-    if ($self->{const}) {
+    if ( $self->{const} ) {
         $hout .= $self->{const}->hdecls();
     }
-    if ($self->{ro}) {
+    if ( $self->{ro} ) {
         $hout .= $self->{ro}->hdecls();
     }
     $hout .= <<"EOH";
@@ -1316,7 +1351,6 @@ EOH
     $hout .= $self->c_code_coda();
     $hout;
 }
-
 
 =item C<c_code_coda()>
 
@@ -1336,22 +1370,19 @@ sub c_code_coda {
 EOC
 }
 
-
 =item C<implements($method)>
 
 True if this class generates code for the method C<$method>.
 
 =cut
 
-sub implements
-{
-    my ($self, $meth) = @_;
+sub implements {
+    my ( $self, $meth ) = @_;
 
     return 0 unless exists $self->{has_method}{$meth};
     my $n = $self->{has_method}{$meth};
     return $self->{methods}[$n]{'loc'} ne 'nci';
 }
-
 
 =item C<implements_vtable($method)>
 
@@ -1359,9 +1390,8 @@ True if this class generates code for VTABLE method C<$method>.
 
 =cut
 
-sub implements_vtable
-{
-    my ($self, $meth) = @_;
+sub implements_vtable {
+    my ( $self, $meth ) = @_;
     return 1 if exists $self->{has_method}{$meth};
     my $n = $self->{vtable}{has_method}{$meth};
     return $self->{vtable}{methods}[$n]{mmd} =~ /MMD/ ? 0 : 1;
@@ -1390,13 +1420,12 @@ generating.
 
 =cut
 
-sub body
-{
-    my ($self, $method, $line, $out_name) = @_;
+sub body {
+    my ( $self, $method, $line, $out_name ) = @_;
 
     my $meth = $method->{meth};
-    my $n = $self->{has_method}{$meth};
-    return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
+    my $n    = $self->{has_method}{$meth};
+    return $self->SUPER::body( $self->{methods}[$n], $line, $out_name );
 }
 
 =back
@@ -1421,20 +1450,19 @@ generating.
 
 =cut
 
-sub body
-{
-    my ($self, $method, $line, $out_name) = @_;
+sub body {
+    my ( $self, $method, $line, $out_name ) = @_;
 
     my $meth = $method->{meth};
 
-    my $decl = $self->decl($self->{class}, $method, 0);
-    my $classname = $self->{class};
+    my $decl       = $self->decl( $self->{class}, $method, 0 );
+    my $classname  = $self->{class};
     my $parentname = $self->{parentname};
-    my $ret = gen_ret($method);
-    my $cout = <<"EOC";
+    my $ret        = gen_ret($method);
+    my $cout       = <<"EOC";
 $decl {
 EOC
-    if ($meth eq 'morph') {
+    if ( $meth eq 'morph' ) {
         $cout .= <<EOC;
     if (1 || Parrot_is_const_pmc(interp, pmc))
         internal_exception(WRITE_TO_CONSTCLASS, "$meth() in $classname");
@@ -1477,7 +1505,7 @@ case of C<find_method> and for all read-only methods.
 =cut
 
 sub implements {
-    my ($self, $method) = @_;
+    my ( $self, $method ) = @_;
     return 1 if $method eq 'find_method';
     return $self->SUPER::implements($method);
 }
@@ -1490,20 +1518,18 @@ generating.
 
 =cut
 
-sub body
-{
-    my ($self, $method, $line, $out_name) = @_;
+sub body {
+    my ( $self, $method, $line, $out_name ) = @_;
 
-    my $meth = $method->{meth};
-    my $decl = $self->decl($self->{class}, $method, 0);
-    my $classname = $self->{class};
+    my $meth       = $method->{meth};
+    my $decl       = $self->decl( $self->{class}, $method, 0 );
+    my $classname  = $self->{class};
     my $parentname = $self->{parentname};
-    my $ret = gen_ret($method);
+    my $ret        = gen_ret($method);
     my $cout;
 
-    if ($meth eq 'find_method') {
-        my $real_findmethod = 'Parrot_'
-            . $self->{super}{find_method} . '_find_method';
+    if ( $meth eq 'find_method' ) {
+        my $real_findmethod = 'Parrot_' . $self->{super}{find_method} . '_find_method';
         $cout = <<"EOC";
 $decl {
     PMC *const method = $real_findmethod(interp, pmc, method_name);
@@ -1513,7 +1539,8 @@ $decl {
         return method;
 }
 EOC
-    } else {
+    }
+    else {
         $cout = <<"EOC";
 $decl {
     internal_exception(WRITE_TO_CONSTCLASS,
@@ -1545,9 +1572,8 @@ Always true for vtables.
 
 =cut
 
-sub implements
-{
-    my ($self, $meth) = @_;
+sub implements {
+    my ( $self, $meth ) = @_;
     return $self->implements_vtable($meth);
 }
 
@@ -1569,8 +1595,7 @@ through this reference. Default version returns an empty string.
 
 =cut
 
-sub postderef
-{
+sub postderef {
     return '';
 }
 
@@ -1581,9 +1606,8 @@ delegated methods. Defualt is PMC_pmc_val(pmc)
 
 =cut
 
-sub raw_deref
-{
-    my($self, $method) = @_;
+sub raw_deref {
+    my ( $self, $method ) = @_;
     return 'PMC_pmc_val(pmc)';
 }
 
@@ -1598,43 +1622,45 @@ the thing referred to.
 
 =cut
 
-sub body
-{
-    my ($self, $method, $line, $out_name) = @_;
+sub body {
+    my ( $self, $method, $line, $out_name ) = @_;
 
     my $meth = $method->{meth};
+
     # existing methods get emitted
-    if ($self->SUPER::implements($meth)) {
+    if ( $self->SUPER::implements($meth) ) {
         my $n = $self->{has_method}{$meth};
-        return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
+        return $self->SUPER::body( $self->{methods}[$n], $line, $out_name );
     }
-    my $is_mmd = $method->{mmd} ne "-1";
+    my $is_mmd     = $method->{mmd} ne "-1";
     my $parameters = $method->{parameters};
-    my $n=0;
-    my @args = grep {$n++ & 1 ? $_ : 0} split / /, $parameters;
-    my $arg = '';
-    $arg = ", ". join(' ', @args) if @args;
+    my $n          = 0;
+    my @args       = grep { $n++ & 1 ? $_ : 0 } split / /, $parameters;
+    my $arg        = '';
+    $arg = ", " . join( ' ', @args ) if @args;
     $parameters = ", $parameters" if $parameters;
     my $body;
-    my $pre = $self->prederef($method);
-    my $post = $self->postderef($method);
-    my $deref = $self->raw_deref($method);
-    my $ret_def = '';
+    my $pre        = $self->prederef($method);
+    my $post       = $self->postderef($method);
+    my $deref      = $self->raw_deref($method);
+    my $ret_def    = '';
     my $ret_assign = '';
-    my $ret = '';
-    if ($method->{type} ne 'void') {
-        $ret_def = $method->{type} . ' ret_val;';
+    my $ret        = '';
+
+    if ( $method->{type} ne 'void' ) {
+        $ret_def    = $method->{type} . ' ret_val;';
         $ret_assign = 'ret_val = ';
-        $ret = gen_ret($method, 'ret_val');
+        $ret        = gen_ret( $method, 'ret_val' );
     }
     $body = <<EOC;
     $pre
     $ret_assign VTABLE_$meth(interp, $deref$arg);
     $post
 EOC
-    my $decl = $self->decl($self->{class}, $method, 0);
+    my $decl = $self->decl( $self->{class}, $method, 0 );
+
     # I think that these will be out by one - NWC
-    my $l = $self->line_directive($line, "\L$self->{class}.c");
+    my $l = $self->line_directive( $line, "\L$self->{class}.c" );
     return <<EOC;
 $l
 $decl {
@@ -1660,7 +1686,7 @@ use base 'Parrot::Pmc2c::Ref';
 =cut
 
 sub prederef {
-    my ($self, $method) = @_;
+    my ( $self, $method ) = @_;
     my $name = $method->{meth};
     my $code = '';
     $code .= <<'EOC';
@@ -1671,11 +1697,12 @@ sub prederef {
 
     handle = PMC_struct_val(pmc);
 EOC
-    if ($self->does_write($name)) { # XXX is this good enough?
+    if ( $self->does_write($name) ) {    # XXX is this good enough?
         $code .= <<'EOC';
     real_pmc = Parrot_STM_begin_update(interp, handle);
 EOC
-    } else {
+    }
+    else {
         $code .= <<'EOC';
     real_pmc = Parrot_STM_read(interp, handle);
 EOC
@@ -1705,8 +1732,8 @@ implementation of $method.
 =cut
 
 sub prederef {
-    my ($self, $method) = @_;
-    return 'LOCK_PMC(interp, pmc);'
+    my ( $self, $method ) = @_;
+    return 'LOCK_PMC(interp, pmc);';
 }
 
 =item C<postderef($method)>
@@ -1716,8 +1743,8 @@ Returns the unlocking code.
 =cut
 
 sub postderef {
-    my ($self, $method) = @_;
-    return 'UNLOCK_PMC(interp, pmc);'
+    my ( $self, $method ) = @_;
+    return 'UNLOCK_PMC(interp, pmc);';
 }
 
 =back
@@ -1738,8 +1765,7 @@ Always true.
 
 =cut
 
-sub implements
-{
+sub implements {
     return 1;
 }
 
@@ -1754,24 +1780,26 @@ methods.
 
 =cut
 
-sub body
-{
-    my ($self, $method, $line, $out_name) = @_;
+sub body {
+    my ( $self, $method, $line, $out_name ) = @_;
 
     my $meth = $method->{meth};
+
     # existing methods get emitted
-    if ($self->SUPER::implements($meth)) {
+    if ( $self->SUPER::implements($meth) ) {
         my $n = $self->{has_method}{$meth};
-        return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
+        return $self->SUPER::body( $self->{methods}[$n], $line, $out_name );
     }
-    my $decl = $self->decl($self->{class}, $method, 0);
+    my $decl = $self->decl( $self->{class}, $method, 0 );
     my $ret = "";
-    if ($method->{type} ne 'void') {
+    if ( $method->{type} ne 'void' ) {
+
         # This cheats, assuming that all return types can be cast from zero.
         $ret = "return ($method->{type})0;";
     }
+
     # I think that these will be out by one - NWC
-    my $l = $self->line_directive($line, "default.c");
+    my $l = $self->line_directive( $line, "default.c" );
     my $cout = <<EOC;
 $l
 ${decl}\{
@@ -1804,10 +1832,9 @@ True for vtable methods.
 
 =cut
 
-sub implements
-{
+sub implements {
 
-    my ($self, $meth) = @_;
+    my ( $self, $meth ) = @_;
     $self->implements_vtable($meth);
 }
 
@@ -1821,20 +1848,21 @@ The C<Null> PMC throws an execption for all methods.
 
 =cut
 
-sub body
-{
-    my ($self, $method, $line, $out_name) = @_;
+sub body {
+    my ( $self, $method, $line, $out_name ) = @_;
 
     my $meth = $method->{meth};
+
     # existing methods get emitted
-    if ($self->SUPER::implements($meth)) {
+    if ( $self->SUPER::implements($meth) ) {
         my $n = $self->{has_method}{$meth};
-        return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
+        return $self->SUPER::body( $self->{methods}[$n], $line, $out_name );
     }
-    my $decl = $self->decl($self->{class}, $method, 0);
+    my $decl = $self->decl( $self->{class}, $method, 0 );
     my $ret = gen_ret($method);
+
     # I think that these will be out by one - NWC
-    my $l = $self->line_directive($line, "null.c");
+    my $l = $self->line_directive( $line, "null.c" );
     my $output = <<EOC;
 $l
 ${decl} {
@@ -1863,9 +1891,8 @@ True for vtables.
 
 =cut
 
-sub implements
-{
-    my ($self, $meth) = @_;
+sub implements {
+    my ( $self, $meth ) = @_;
     $self->implements_vtable($meth);
 }
 
@@ -1875,14 +1902,13 @@ Used in C<signature()> to normalize argument types.
 
 =cut
 
-sub trans
-{
-    my ($self, $type) = @_;
+sub trans {
+    my ( $self, $type ) = @_;
 
     my $char = substr $type, 0, 1;
-    return $1 if ($char =~ /([ISP])/);
-    return 'N' if ($char eq 'F');
-    return 'v' if ($type eq 'void');
+    return $1 if ( $char =~ /([ISP])/ );
+    return 'N' if ( $char eq 'F' );
+    return 'v' if ( $type eq 'void' );
     return '?';
 }
 
@@ -1892,12 +1918,11 @@ Returns the method signature for C<$params>.
 
 =cut
 
-sub signature
-{
-    my ($self, $params) = @_;
+sub signature {
+    my ( $self, $params ) = @_;
 
-    my $n=1;
-    my @types = grep {$n++ & 1 ? $_ : 0} split / /, $params;
+    my $n = 1;
+    my @types = grep { $n++ & 1 ? $_ : 0 } split / /, $params;
     @types = map { $self->trans($_) } @types;
     return join '', @types;
 }
@@ -1908,9 +1933,8 @@ Generate the C code for a C<return> statement.
 
 =cut
 
-sub gen_ret
-{
-    my ($self, $type) = @_;
+sub gen_ret {
+    my ( $self, $type ) = @_;
 
     #return "ret_val = *($1*) " if ($type =~ /((?:INT|FLOAT)VAL)/);
     return "ret_val = ($type) ";
@@ -1926,42 +1950,44 @@ The C<delegate> PMC redirects all methods to bytecode.
 
 =cut
 
-sub body
-{
-    my ($self, $method, $line, $out_name) = @_;
+sub body {
+    my ( $self, $method, $line, $out_name ) = @_;
 
     my $meth = $method->{meth};
+
     # existing methods get emitted
-    if ($self->SUPER::implements($meth)) {
+    if ( $self->SUPER::implements($meth) ) {
         my $n = $self->{has_method}{$meth};
-        return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
+        return $self->SUPER::body( $self->{methods}[$n], $line, $out_name );
     }
-    my $decl = $self->decl($self->{class}, $method, 0);
+    my $decl       = $self->decl( $self->{class}, $method, 0 );
     my $parameters = $method->{parameters};
-    my $n=0;
-    my @args = grep {$n++ & 1 ? $_ : 0} split / /, $parameters;
-    my $arg = '';
-    $arg = ", ". join(' ', @args) if @args;
+    my $n          = 0;
+    my @args       = grep { $n++ & 1 ? $_ : 0 } split / /, $parameters;
+    my $arg        = '';
+    $arg = ", " . join( ' ', @args ) if @args;
     my $sig = $self->signature($parameters);
-    $sig = $self->trans($method->{type}) . $sig;
-    my $ret = '';
-    my $ret_def = '';
+    $sig = $self->trans( $method->{type} ) . $sig;
+    my $ret      = '';
+    my $ret_def  = '';
     my $func_ret = '(void) ';
     my $ret_type = '';
-    if ($method->{type} ne 'void') {
+
+    if ( $method->{type} ne 'void' ) {
         my $type = $method->{type};
-        $ret_def = "$type ret_val;";
-        $func_ret = $self->gen_ret($method->{type});
-        $ret = "return ret_val;";
-        if ($type !~ /\*/) {
+        $ret_def  = "$type ret_val;";
+        $func_ret = $self->gen_ret( $method->{type} );
+        $ret      = "return ret_val;";
+        if ( $type !~ /\*/ ) {
             $ret_type = "_ret" . lc substr $type, 0, 1;
             $ret_type = "_reti" if $ret_type eq '_retu';
         }
     }
-    my $umeth = uc $meth;
+    my $umeth         = uc $meth;
     my $delegate_meth = "PARROT_VTABLE_${umeth}_METHNAME";
+
     # I think that these will be out by one - NWC
-    my $l = $self->line_directive($line, "delegate.c");
+    my $l = $self->line_directive( $line, "delegate.c" );
     my $cout = <<EOC;
 $l
 ${decl} {
@@ -1994,9 +2020,8 @@ Always true for vtables.
 
 =cut
 
-sub implements
-{
-    my ($self, $meth) = @_;
+sub implements {
+    my ( $self, $meth ) = @_;
     $self->implements_vtable($meth);
 }
 
@@ -2011,27 +2036,28 @@ the PMC in the first attribute slot.
 
 =cut
 
-sub body
-{
-    my ($self, $method, $line, $out_name) = @_;
+sub body {
+    my ( $self, $method, $line, $out_name ) = @_;
 
     my $meth = $method->{meth};
+
     # existing methods get emitted
-    if ($self->SUPER::implements($meth)) {
+    if ( $self->SUPER::implements($meth) ) {
         my $n = $self->{has_method}{$meth};
-        return $self->SUPER::body($self->{methods}[$n], $line, $out_name);
+        return $self->SUPER::body( $self->{methods}[$n], $line, $out_name );
     }
     my $parameters = $method->{parameters};
-    my $n=0;
-    my @args = grep {$n++ & 1 ? $_ : 0} split / /, $parameters;
-    my $arg = '';
-    $arg = ", ". join(' ', @args) if @args;
+    my $n          = 0;
+    my @args       = grep { $n++ & 1 ? $_ : 0 } split / /, $parameters;
+    my $arg        = '';
+    $arg = ", " . join( ' ', @args ) if @args;
     $parameters = ", $parameters" if $parameters;
     my $body = "VTABLE_$meth(interp, attr$arg)";
-    my $ret = gen_ret($method, $body);
-    my $decl = $self->decl($self->{class}, $method, 0);
+    my $ret  = gen_ret( $method, $body );
+    my $decl = $self->decl( $self->{class}, $method, 0 );
+
     # I think that these will be out by one - NWC
-    my $l = $self->line_directive($line, "ref.c");
+    my $l = $self->line_directive( $line, "ref.c" );
     return <<EOC;
 $l
 $decl {

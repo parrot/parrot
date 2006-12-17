@@ -32,8 +32,7 @@ Returns the C C<#define> macros required by the ops.
 
 =cut
 
-sub defines
-{
+sub defines {
     my $type = __PACKAGE__;
     return <<END;
 /* defines - $0 -> $type */
@@ -51,10 +50,9 @@ The ops array type is C<void *>.
 
 =cut
 
-sub opsarraytype
-{
-    return 'void *'
-};
+sub opsarraytype {
+    return 'void *';
+}
 
 =item expr_address($addr)
 
@@ -67,30 +65,30 @@ Create various address parts.
 =cut
 
 sub expr_address {
-    my ($self, $addr) = @_;
+    my ( $self, $addr ) = @_;
     return "opcode_to_prederef(interp, $addr)";
 }
+
 sub expr_offset {
-    my ($self, $offset) = @_;
+    my ( $self, $offset ) = @_;
     return "CUR_OPCODE + $offset";
 }
+
 sub expr_pop {
     my ($self) = @_;
     return "opcode_to_prederef(interp, pop_dest(interp))";
 }
 
-sub run_core_func_decl
-{
-    my ($self, $core) = @_;
+sub run_core_func_decl {
+    my ( $self, $core ) = @_;
 
-    my $type = __PACKAGE__;
+    my $type   = __PACKAGE__;
     my $prefix = $self->core_prefix;
     return <<END;
 /* run_core_func_decl - $0 -> $type */
 void ** $prefix$core(void **cur_op, Parrot_Interp interp)
 END
 }
-
 
 =item C<access_arg($type, $num, $op)>
 
@@ -99,32 +97,31 @@ C<Parrot::OpTrans>) and value. C<$op> is an instance of C<Parrot::Op>.
 
 =cut
 
-sub access_arg
-{
-    my ($self, $type, $num, $op) = @_;
+sub access_arg {
+    my ( $self, $type, $num, $op ) = @_;
 
     my %arg_maps = (
         'op' => "cur_opcode[%ld]",
 
         'i'  => "(*(INTVAL *)OP_AS_OFFS(%ld))",
-        'ki'  => "(*(INTVAL *)OP_AS_OFFS(%ld))",
+        'ki' => "(*(INTVAL *)OP_AS_OFFS(%ld))",
         'n'  => "(*(FLOATVAL *)OP_AS_OFFS(%ld))",
         'p'  => "(*(PMC **)OP_AS_OFFS(%ld))",
         's'  => "(*(STRING **)OP_AS_OFFS(%ld))",
         'k'  => "(*(PMC **)OP_AS_OFFS(%ld))",
 
-        'ic' => "((INTVAL)cur_opcode[%ld])",
+        'ic'  => "((INTVAL)cur_opcode[%ld])",
         'kic' => "((INTVAL)cur_opcode[%ld])",
-        'nc' => "(*(FLOATVAL *)cur_opcode[%ld])",
-        'sc' => "((STRING *)cur_opcode[%ld])",
-        'pc' => "((PMC *)cur_opcode[%ld])",
-        'kc' => "((PMC *)cur_opcode[%ld])",
+        'nc'  => "(*(FLOATVAL *)cur_opcode[%ld])",
+        'sc'  => "((STRING *)cur_opcode[%ld])",
+        'pc'  => "((PMC *)cur_opcode[%ld])",
+        'kc'  => "((PMC *)cur_opcode[%ld])",
     );
 
     die "Unrecognized type '$type' for num '$num' in opcode @{[$op->full_name]}"
         unless exists $arg_maps{$type};
 
-    return sprintf($arg_maps{$type}, $num);
+    return sprintf( $arg_maps{$type}, $num );
 }
 
 =back

@@ -47,9 +47,9 @@ use Class::Struct;
 
 struct(
     'Parrot::Configure::Task' => {
-        step    => '$',
-        params  => '@',
-        object  => 'Parrot::Configure::Step',
+        step   => '$',
+        params => '@',
+        object => 'Parrot::Configure::Step',
     },
 );
 
@@ -67,8 +67,7 @@ Accepts no arguments and returns a L<Parrot::Configure> object.
 
 =cut
 
-sub new
-{
+sub new {
     my $class = shift;
 
     my $self = {
@@ -97,8 +96,7 @@ Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 
 =cut
 
-sub data
-{
+sub data {
     my $self = shift;
 
     return $self->{data};
@@ -113,8 +111,7 @@ Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 
 =cut
 
-sub options
-{
+sub options {
     my $self = shift;
 
     return $self->{options};
@@ -131,11 +128,10 @@ scalar context.
 
 =cut
 
-sub steps
-{
+sub steps {
     my $self = shift;
 
-    return wantarray ? @{$self->{steps}} : $self->{steps};
+    return wantarray ? @{ $self->{steps} } : $self->{steps};
 }
 
 =item * C<add_step()>
@@ -148,12 +144,10 @@ Accepts a list and returns a L<Parrot::Configure> object.
 
 =cut
 
-sub add_step
-{
-    my ($self, $step, @params) = @_;
+sub add_step {
+    my ( $self, $step, @params ) = @_;
 
-    push @{$self->{steps}},
-        Parrot::Configure::Task->new(step => $step, params => \@params);
+    push @{ $self->{steps} }, Parrot::Configure::Task->new( step => $step, params => \@params );
 
     return $self;
 }
@@ -166,9 +160,8 @@ Accepts a list and returns a L<Parrot::Configure> object.
 
 =cut
 
-sub add_steps
-{
-    my ($self, @new_steps) = @_;
+sub add_steps {
+    my ( $self, @new_steps ) = @_;
 
     foreach my $step (@new_steps) {
         $self->add_step($step);
@@ -188,17 +181,15 @@ Accepts no arguments and returns a L<Parrot::Configure> object.
 
 =cut
 
-sub runsteps
-{
+sub runsteps {
     my $self = shift;
 
-    my ($verbose, $verbose_step, $ask) =
-        $self->options->get(qw(verbose verbose-step ask));
+    my ( $verbose, $verbose_step, $ask ) = $self->options->get(qw(verbose verbose-step ask));
 
-    my $n = 0; # step number
-    foreach my $task ($self->steps) {
+    my $n = 0;    # step number
+    foreach my $task ( $self->steps ) {
         $n++;
-        $self->_runstep($task, $verbose, $verbose_step, $ask, $n);
+        $self->_runstep( $task, $verbose, $verbose_step, $ask, $n );
     }
     return $self;
 }
@@ -214,32 +205,27 @@ Accepts no arguments and returns a L<Parrot::Configure> object.
 
 =cut
 
-
-sub runstep
-{
-    my $self = shift;
+sub runstep {
+    my $self     = shift;
     my $taskname = shift;
 
-    my ($verbose, $verbose_step, $ask) =
-    $self->options->get(qw(verbose verbose-step ask));
+    my ( $verbose, $verbose_step, $ask ) = $self->options->get(qw(verbose verbose-step ask));
 
-    for my $task ($self->steps()) {
+    for my $task ( $self->steps() ) {
         if ( $task->{"Parrot::Configure::Task::step"} eq $taskname ) {
-            $self->_runstep($task, $verbose, $verbose_step, $ask, 1);
+            $self->_runstep( $task, $verbose, $verbose_step, $ask, 1 );
         }
     }
 }
 
-sub _runstep
-{
+sub _runstep {
     my $self = shift;
     my $task = shift;
 
-    my ($verbose, $verbose_step, $ask, $n) = @_;
+    my ( $verbose, $verbose_step, $ask, $n ) = @_;
 
     my $step_name   = $task->step;
-    my @step_params = @{$task->params};
-
+    my @step_params = @{ $task->params };
 
     eval "use $step_name;";
     die $@ if $@;
@@ -252,30 +238,32 @@ sub _runstep
     $description = "" unless defined $description;
 
     # set per step verbosity
-    if (defined $verbose_step) {
+    if ( defined $verbose_step ) {
 
         # by step number
-        if ($verbose_step =~ /^\d+$/ && $n == $verbose_step) {
-            $self->options->set(verbose => 2);
+        if ( $verbose_step =~ /^\d+$/ && $n == $verbose_step ) {
+            $self->options->set( verbose => 2 );
         }
 
         # by description
-        elsif ($description =~ /$verbose_step/) {
-            $self->options->set(verbose => 2);
+        elsif ( $description =~ /$verbose_step/ ) {
+            $self->options->set( verbose => 2 );
         }
     }
 
     # XXX cc_build uses this verbose setting, why?
-    $self->data->set(verbose => $verbose) if $n > 2;
+    $self->data->set( verbose => $verbose ) if $n > 2;
 
     print "\n", $description, '...';
     print "\n" if $verbose && $verbose == 2;
 
-    my $ret; # step return value
+    my $ret;    # step return value
     eval {
-        if (@step_params) {
-            $ret = $step->runstep($self, @step_params);
-        } else {
+        if (@step_params)
+        {
+            $ret = $step->runstep( $self, @step_params );
+        }
+        else {
             $ret = $step->runstep($self);
         }
     };
@@ -286,6 +274,7 @@ sub _runstep
 
     # did the step return itself?
     eval { $ret->can('result'); };
+
     # if not, report the result and return
     if ($@) {
         my $result = $step->result || 'no result returned';
@@ -296,11 +285,11 @@ sub _runstep
     my $result = $step->result || 'done';
 
     print "..." if $verbose && $verbose == 2;
-    print "." x (71 - length($description) - length($result));
+    print "." x ( 71 - length($description) - length($result) );
     print "$result." unless $step =~ m{^inter/} && $ask;
 
     # reset verbose value for the next step
-    $self->options->set(verbose => $verbose);
+    $self->options->set( verbose => $verbose );
 }
 
 =back

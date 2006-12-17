@@ -43,9 +43,8 @@ Returns a new instance.
 
 =cut
 
-sub new
-{
-    return bless { }, shift;
+sub new {
+    return bless {}, shift;
 }
 
 =back
@@ -62,8 +61,7 @@ Used by C<Parrot::Op>'s C<func_name()> to individuate op function names.
 
 =cut
 
-sub prefix
-{
+sub prefix {
     return 'Parrot_';
 }
 
@@ -74,8 +72,7 @@ variable names. This default implementation returns an empty string.
 
 =cut
 
-sub suffix
-{
+sub suffix {
     return '';
 }
 
@@ -91,10 +88,9 @@ do its clever tricks.
 
 =cut
 
-sub opsarraytype
-{
-    return 'opcode_t'
-};
+sub opsarraytype {
+    return 'opcode_t';
+}
 
 =item C<core_type()>
 
@@ -105,8 +101,7 @@ F<include/parrot/interpreter.h> for a list of the core types.
 
 =cut
 
-sub core_type
-{
+sub core_type {
     my $self = shift;
 
     die ref($self) . " doesn't have core_type()";
@@ -183,9 +178,8 @@ value of an C<expr_I<X>> method (implemented in subclass).
 
 =cut
 
-sub gen_goto
-{
-    my ($self, $where_str) = @_;
+sub gen_goto {
+    my ( $self, $where_str ) = @_;
 
     return "return $where_str";
 }
@@ -207,11 +201,10 @@ relevant C code.
 
 =cut
 
-sub goto_address
-{
+sub goto_address {
     my $self = shift;
 
-    return $self->gen_goto($self->expr_address(@_));
+    return $self->gen_goto( $self->expr_address(@_) );
 }
 
 =item C<goto_offset($offset)>
@@ -221,11 +214,10 @@ relevant C code.
 
 =cut
 
-sub goto_offset
-{
+sub goto_offset {
     my $self = shift;
 
-    return $self->gen_goto($self->expr_offset(@_));
+    return $self->gen_goto( $self->expr_offset(@_) );
 }
 
 =item C<goto_pop()>
@@ -235,11 +227,10 @@ relevant C code.
 
 =cut
 
-sub goto_pop
-{
+sub goto_pop {
     my ($self) = @_;
 
-    return $self->gen_goto($self->expr_pop(@_));
+    return $self->gen_goto( $self->expr_pop(@_) );
 }
 
 =item C<expr_offset($offset)>
@@ -275,5 +266,4 @@ Called by C<goto_address()>.
 =cut
 
 1;
-
 

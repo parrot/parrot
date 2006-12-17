@@ -31,9 +31,8 @@ and returns it.
 # XXX this could be in BEGIN block
 my ( $parrot_version, @parrot_version );
 
-sub parrot_version
-{
-    if (defined $parrot_version) {
+sub parrot_version {
+    if ( defined $parrot_version ) {
         return wantarray ? @parrot_version : $parrot_version;
     }
 
@@ -44,25 +43,26 @@ sub parrot_version
 
     chomp $parrot_version;
     $parrot_version =~ s/\s+//g;
-    @parrot_version = split(/\./, $parrot_version);
+    @parrot_version = split( /\./, $parrot_version );
 
     if ( scalar(@parrot_version) < 3 ) {
-        die "Too few components to VERSION file contents: '$parrot_version' (should be 3 or 4)!"
+        die "Too few components to VERSION file contents: '$parrot_version' (should be 3 or 4)!";
     }
 
     if ( scalar(@parrot_version) > 4 ) {
-        die "Too many components to VERSION file contents: '$parrot_version' (should be 3 or 4)!"
+        die "Too many components to VERSION file contents: '$parrot_version' (should be 3 or 4)!";
     }
 
     foreach (@parrot_version) {
         die "Illegal version component: '$_' in VERSION file!" unless m/^[1-9]*\w*$/;
     }
 
-    if (@parrot_version == 4) {
+    if ( @parrot_version == 4 ) {
+
         #    $parrot_version[2] = $parrot_version[2] . "_" . $parrot_version[3];
         $#parrot_version = 3;
     }
-    $parrot_version = join('.', @parrot_version);
+    $parrot_version = join( '.', @parrot_version );
 
     return wantarray ? @parrot_version : $parrot_version;
 }

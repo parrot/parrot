@@ -54,31 +54,20 @@ Returns a new section.
 
 =cut
 
-sub new
-{
+sub new {
     my $self = shift;
 
     return $self->SUPER::new(
-        'Contents', 
-        'index.html', 
-        'What\'s in the Parrot distribution?',
-        Parrot::Docs::Section::Info->new,
-        Parrot::Docs::Section::Docs->new,
-        Parrot::Docs::Section::Examples->new,
-        Parrot::Docs::Section::PMCs->new,
-        Parrot::Docs::Section::DynaPMCs->new,
-        Parrot::Docs::Section::C->new,
-        Parrot::Docs::Section::Ops->new,
-        Parrot::Docs::Section::IMCC->new,
-        Parrot::Docs::Section::Perl->new,
-        Parrot::Docs::Section::Libs->new,
-        Parrot::Docs::Section::Tools->new,
-        Parrot::Docs::Section::BigNum->new,
-        Parrot::Docs::Section::Compilers->new,
-        Parrot::Docs::Section::Languages->new,
-        Parrot::Docs::Section::Config->new,
-        Parrot::Docs::Section::Tests->new,
-        Parrot::Docs::Section::EditorPlugins->new,
+        'Contents',                            'index.html',
+        'What\'s in the Parrot distribution?', Parrot::Docs::Section::Info->new,
+        Parrot::Docs::Section::Docs->new,      Parrot::Docs::Section::Examples->new,
+        Parrot::Docs::Section::PMCs->new,      Parrot::Docs::Section::DynaPMCs->new,
+        Parrot::Docs::Section::C->new,         Parrot::Docs::Section::Ops->new,
+        Parrot::Docs::Section::IMCC->new,      Parrot::Docs::Section::Perl->new,
+        Parrot::Docs::Section::Libs->new,      Parrot::Docs::Section::Tools->new,
+        Parrot::Docs::Section::BigNum->new,    Parrot::Docs::Section::Compilers->new,
+        Parrot::Docs::Section::Languages->new, Parrot::Docs::Section::Config->new,
+        Parrot::Docs::Section::Tests->new,     Parrot::Docs::Section::EditorPlugins->new,
     );
 }
 
@@ -100,16 +89,15 @@ once by the root section, it is not passed to subsections.
 
 =cut
 
-sub write_docs
-{
-    my $self = shift;
+sub write_docs {
+    my $self   = shift;
     my $silent = shift || 0;
     my $delete = shift || 0;
-    my $dist = Parrot::Distribution->new;
+    my $dist   = Parrot::Distribution->new;
 
     $dist->delete_html_docs if $delete;
 
-    $self->write_html($dist, $dist->html_docs_directory, $silent);
+    $self->write_html( $dist, $dist->html_docs_directory, $silent );
 }
 
 =back

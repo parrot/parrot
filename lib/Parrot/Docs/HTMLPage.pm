@@ -33,14 +33,14 @@ F<docs/resources>, the image and CSS file directory.
 
 =cut
 
-sub header
-{
+sub header {
     my $self = shift;
+
     # Default values to keep warnings quiet in tests.
-    my $title = shift || 'Untitled';
+    my $title      = shift || 'Untitled';
     my $navigation = shift || '';
-    my $resources = shift || '';
-    
+    my $resources  = shift || '';
+
     <<"HEADER";
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
     "http://www.w3.org/TR/REC-html40/loose.dtd">
@@ -78,12 +78,11 @@ F<docs/resources>, the image and CSS file directory.
 
 =cut
 
-sub footer
-{
-    my $self = shift;
+sub footer {
+    my $self       = shift;
     my $navigation = shift || '';
-    my $resources = shift || '';
-    
+    my $resources  = shift || '';
+
     <<"FOOTER";
         </DIV>
         <P>
@@ -113,5 +112,4 @@ FOOTER
 =cut
 
 1;
-
 

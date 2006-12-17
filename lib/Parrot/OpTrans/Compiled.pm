@@ -17,7 +17,6 @@ run loop.
 
 =cut
 
-
 package Parrot::OpTrans::Compiled;
 
 use strict;
@@ -31,8 +30,7 @@ Returns the C C<#define> macros required by the ops.
 
 =cut
 
-sub defines
-{
+sub defines {
     return <<END;
 #define REL_PC (cur_opcode - start_code)
 #define IREG(i) REG_INT(i)
@@ -51,16 +49,13 @@ Sets/gets the current position in Parrot code.
 
 =cut
 
-sub pc
-{
+sub pc {
     my $self = shift;
 
-    if (@_)
-    {
+    if (@_) {
         $self->{PC} = shift;
     }
-    else
-    {
+    else {
         return $self->{PC};
     }
 }
@@ -73,16 +68,13 @@ Sets/gets the transform's arguments.
 
 =cut
 
-sub args
-{
+sub args {
     my $self = shift;
 
-    if (@_)
-    {
-        $self->{ARGS} = [ @_ ];
+    if (@_) {
+        $self->{ARGS} = [@_];
     }
-    else
-    {
+    else {
         return $self->{ARGS};
     }
 }
@@ -93,8 +85,7 @@ Returns the argument at index C<$index>.
 
 =cut
 
-sub arg
-{
+sub arg {
     my $self = shift;
 
     return $self->{ARGS}[shift];
@@ -107,9 +98,8 @@ relevant C code.
 
 =cut
 
-sub goto_address
-{
-    my ($self, $addr) = @_;
+sub goto_address {
+    my ( $self, $addr ) = @_;
 
     #print STDERR "pbcc: map_ret_abs($addr)\n";
 
@@ -125,11 +115,10 @@ interpretation is global across all runops cores.
 
 =cut
 
-sub expr_offset
-{
-    my ($self, $offset) = @_;
+sub expr_offset {
+    my ( $self, $offset ) = @_;
 
-    return sprintf("start_code + %d + %s", $self->pc, $offset);
+    return sprintf( "start_code + %d + %s", $self->pc, $offset );
 }
 
 =item C<goto_offset($offset)>
@@ -139,17 +128,15 @@ relevant C code.
 
 =cut
 
-sub goto_offset
-{
-    my ($self, $offset) = @_;
+sub goto_offset {
+    my ( $self, $offset ) = @_;
 
-    if ($offset =~ /^-?\d+$/)
-    {
-        return sprintf("goto PC_%d", $self->pc + $offset);
+    if ( $offset =~ /^-?\d+$/ ) {
+        return sprintf( "goto PC_%d", $self->pc + $offset );
     }
-    else
-    {
-        return sprintf("cur_opcode = &&PC_%d; cur_opcode += %s; goto switch_label", $self->pc, $offset);
+    else {
+        return sprintf( "cur_opcode = &&PC_%d; cur_opcode += %s; goto switch_label",
+            $self->pc, $offset );
     }
 
     #print STDERR "pbcc: map_ret_rel($offset)\n";
@@ -162,8 +149,7 @@ code.
 
 =cut
 
-sub goto_pop
-{
+sub goto_pop {
     my ($self) = @_;
 
     return "cur_opcode = pop_dest(interp);\ngoto switch_label";
@@ -177,11 +163,11 @@ my %arg_maps = (
     'k'  => "PREG(%ld)",
     'ki' => "IREG(%ld)",
 
-    'ic' => "%ld",
-    'nc' => "CONST(%ld)->u.number",
-    'pc' => "CONST(%ld)->u.key",
-    'sc' => "CONST(%ld)->u.string",
-    'kc' => "CONST(%ld)->u.key",
+    'ic'  => "%ld",
+    'nc'  => "CONST(%ld)->u.number",
+    'pc'  => "CONST(%ld)->u.key",
+    'sc'  => "CONST(%ld)->u.string",
+    'kc'  => "CONST(%ld)->u.key",
     'kic' => "%ld",
 );
 
@@ -192,13 +178,12 @@ C<Parrot::OpTrans>) and value. C<$op> is an instance of C<Parrot::Op>.
 
 =cut
 
-sub access_arg
-{
-    my ($self, $type, $num, $op) = @_;
+sub access_arg {
+    my ( $self, $type, $num, $op ) = @_;
 
     #print STDERR "pbcc: map_arg($type, $num)\n";
 
-    return sprintf($arg_maps{$type}, $self->arg($num - 1));
+    return sprintf( $arg_maps{$type}, $self->arg( $num - 1 ) );
 }
 
 =item C<restart_address($address)>
@@ -207,9 +192,8 @@ Returns the C code for C<restart ADDRESS($address)>.
 
 =cut
 
-sub restart_address
-{
-    my ($self, $addr) = @_;
+sub restart_address {
+    my ( $self, $addr ) = @_;
 
     die "pbc2c.pl: Cannot handle RESUME ops!";
 }
@@ -220,9 +204,8 @@ Returns the C code for C<restart OFFSET($offset)>.
 
 =cut
 
-sub restart_offset
-{
-    my ($self, $offset) = @_;
+sub restart_offset {
+    my ( $self, $offset ) = @_;
 
     die "pbc2c.pl: Cannot handle RESUME ops!";
 }

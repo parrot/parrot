@@ -21,12 +21,12 @@ sub new {
 }
 
 sub output_is {
-    my ($self, $code, $output, $desc) = @_;
-  
+    my ( $self, $code, $output, $desc ) = @_;
+
     my $count = $self->{builder}->current_test + 1;
 
-    my $lang_f    = Parrot::Test::per_test('.p1',$count);
-    my $out_f     = Parrot::Test::per_test('.out',$count);
+    my $lang_f = Parrot::Test::per_test( '.p1',  $count );
+    my $out_f  = Parrot::Test::per_test( '.out', $count );
     my $parrotdir = dirname $self->{parrot};
 
     my $args = $ENV{TEST_PROG_ARGS} || '';
@@ -37,20 +37,24 @@ sub output_is {
 
     my $cmd;
     my $exit_code = 0;
-    my $pass = 0;
+    my $pass      = 0;
 
     $cmd = "$self->{parrot} $args languages/punie/punie.pbc $lang_f";
 
-    $exit_code = Parrot::Test::run_command($cmd, CD => $self->{relpath},
-                                           STDOUT => $out_f, STDERR => $out_f );
+    $exit_code = Parrot::Test::run_command(
+        $cmd,
+        CD     => $self->{relpath},
+        STDOUT => $out_f,
+        STDERR => $out_f
+    );
     unless ($pass) {
         my $file = Parrot::Test::slurp_file($out_f);
-        $pass =$self->{builder}->is_eq( Parrot::Test::slurp_file($out_f), $output, $desc );
+        $pass = $self->{builder}->is_eq( Parrot::Test::slurp_file($out_f), $output, $desc );
         $self->{builder}->diag("'$cmd' failed with exit code $exit_code")
-        if $exit_code and not $pass;
+            if $exit_code and not $pass;
     }
 
-    unless($ENV{POSTMORTEM}) {
+    unless ( $ENV{POSTMORTEM} ) {
         unlink $lang_f;
         unlink $out_f;
     }

@@ -28,9 +28,10 @@ sub add_pir {
     my @code = @_;
 
     foreach my $chunk (@code) {
-        if ($chunk eq "\n") {
+        if ( $chunk eq "\n" ) {
             push @{ $self->{raw_pir} }, "\n";
-        } else {
+        }
+        else {
             push @{ $self->{raw_pir} }, split /\n/, $chunk;
         }
     }
@@ -113,9 +114,10 @@ sub get_formatted {
             }
         }
     }
+
     # Badly formatted pir might end in the middle of a verbatim chunk.
     if ($verbatim) {
-      die "POD unclosed at end of file\n";
+        die "POD unclosed at end of file\n";
     }
 
     # Remove leading and final blank lines.
@@ -149,9 +151,10 @@ sub get_formatted {
         }
         else {
             if ($seen_blank) {
-              $result .= "\n";
-              $seen_blank = 0;
+                $result .= "\n";
+                $seen_blank = 0;
             }
+
             # verbatim hunk.
             $result .= $code;
         }

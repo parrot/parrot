@@ -31,8 +31,7 @@ The suffix is C<'_cg'>.
 
 =cut
 
-sub suffix
-{
+sub suffix {
     return "_cg";
 }
 
@@ -42,8 +41,7 @@ The core prefix is C<'cg_'>.
 
 =cut
 
-sub core_prefix
-{
+sub core_prefix {
     return "cg_";
 }
 
@@ -53,8 +51,7 @@ The core type is C<PARROT_CGOTO_CORE>.
 
 =cut
 
-sub core_type
-{
+sub core_type {
     return 'PARROT_CGOTO_CORE';
 }
 
@@ -64,8 +61,7 @@ Returns the C C<#define> macros required by the ops.
 
 =cut
 
-sub defines
-{
+sub defines {
     return <<END;
 #undef CONST
 #define REL_PC     ((size_t)(cur_opcode - interp->code->base.data))
@@ -86,16 +82,13 @@ Sets/gets the current position in Parrot code.
 
 =cut
 
-sub pc
-{
+sub pc {
     my $self = shift;
 
-    if (@_)
-    {
+    if (@_) {
         $self->{PC} = shift;
     }
-    else
-    {
+    else {
         return $self->{PC};
     }
 }
@@ -108,16 +101,13 @@ Sets/gets the transform's arguments.
 
 =cut
 
-sub args
-{
+sub args {
     my $self = shift;
 
-    if (@_)
-    {
-        $self->{ARGS} = [ @_ ];
+    if (@_) {
+        $self->{ARGS} = [@_];
     }
-    else
-    {
+    else {
         return $self->{ARGS};
     }
 }
@@ -128,8 +118,7 @@ Returns the argument at C<$index>.
 
 =cut
 
-sub arg
-{
+sub arg {
     my $self = shift;
 
     return $self->{ARGS}[shift];
@@ -142,19 +131,16 @@ relevant C code.
 
 =cut
 
-sub goto_address
-{
-    my ($self, $addr) = @_;
+sub goto_address {
+    my ( $self, $addr ) = @_;
 
     #print STDERR "pbcc: map_ret_abs($addr)\n";
 
-    if ($addr eq '0')
-    {
-        return "return (0);"
+    if ( $addr eq '0' ) {
+        return "return (0);";
     }
-    else
-    {
-            return "if ((opcode_t *) $addr == 0)
+    else {
+        return "if ((opcode_t *) $addr == 0)
           return 0;
     goto *ops_addr[*(cur_opcode = (opcode_t *)$addr)]";
     }
@@ -167,9 +153,8 @@ relevant C code.
 
 =cut
 
-sub expr_offset
-{
-    my ($self, $offset) = @_;
+sub expr_offset {
+    my ( $self, $offset ) = @_;
 
     return "cur_opcode + $offset";
 }
@@ -181,9 +166,8 @@ relevant C code.
 
 =cut
 
-sub goto_offset
-{
-    my ($self, $offset) = @_;
+sub goto_offset {
+    my ( $self, $offset ) = @_;
 
     return "goto *ops_addr[*(cur_opcode += $offset)]";
 }
@@ -195,11 +179,11 @@ code.
 
 =cut
 
-sub goto_pop
-{
+sub goto_pop {
     my ($self) = @_;
 
-    return "opcode_t* pop_addr = (opcode_t*)pop_dest(interp);\ncur_opcode = pop_addr;goto *ops_addr[*(pop_addr)]";
+    return
+"opcode_t* pop_addr = (opcode_t*)pop_dest(interp);\ncur_opcode = pop_addr;goto *ops_addr[*(pop_addr)]";
 }
 
 my %arg_maps = (
@@ -212,11 +196,11 @@ my %arg_maps = (
     'k'  => "PREG(%ld)",
     'ki' => "IREG(%ld)",
 
-    'ic' => "cur_opcode[%ld]",
-    'nc' => "CONST(%ld)->u.number",
-    'pc' => "CONST(%ld)->u.key",
-    'sc' => "CONST(%ld)->u.string",
-    'kc' => "CONST(%ld)->u.key",
+    'ic'  => "cur_opcode[%ld]",
+    'nc'  => "CONST(%ld)->u.number",
+    'pc'  => "CONST(%ld)->u.key",
+    'sc'  => "CONST(%ld)->u.string",
+    'kc'  => "CONST(%ld)->u.key",
     'kic' => "cur_opcode[%ld]"
 );
 
@@ -227,15 +211,14 @@ C<Parrot::OpTrans>) and value. C<$op> is an instance of C<Parrot::Op>.
 
 =cut
 
-sub access_arg
-{
-    my ($self, $type, $num, $op) = @_;
+sub access_arg {
+    my ( $self, $type, $num, $op ) = @_;
 
     #print STDERR "pbcc: map_arg($type, $num)\n";
 
     die "Unrecognized type '$type' for num '$num'" unless exists $arg_maps{$type};
 
-    return sprintf($arg_maps{$type}, $num );
+    return sprintf( $arg_maps{$type}, $num );
 }
 
 =item C<restart_address($address)>
@@ -244,9 +227,8 @@ Returns the C code for C<restart ADDRESS($address)>.
 
 =cut
 
-sub restart_address
-{
-    my ($self, $addr) = @_;
+sub restart_address {
+    my ( $self, $addr ) = @_;
 
     return "interp->resume_offset = $addr; interp->resume_flag = 1";
 }
@@ -257,9 +239,8 @@ Returns the C code for C<restart OFFSET($offset)>.
 
 =cut
 
-sub restart_offset
-{
-    my ($self, $offset) = @_;
+sub restart_offset {
+    my ( $self, $offset ) = @_;
 
     return "interp->resume_offset = REL_PC + $offset; interp->resume_flag = 1";
 }
@@ -270,13 +251,10 @@ Returns the C code for the run core function declaration.
 
 =cut
 
-sub run_core_func_decl
-{
-    my ($self, $core) = @_;
+sub run_core_func_decl {
+    my ( $self, $core ) = @_;
 
-    return "opcode_t * " .
-        $self->core_prefix .
-        "$core(opcode_t *cur_op, Parrot_Interp interp)";
+    return "opcode_t * " . $self->core_prefix . "$core(opcode_t *cur_op, Parrot_Interp interp)";
 }
 
 =item C<ops_addr_decl($base_suffix)>
@@ -285,9 +263,8 @@ Returns the C code for the ops address declaration.
 
 =cut
 
-sub ops_addr_decl
-{
-    my ($self, $bs) = @_;
+sub ops_addr_decl {
+    my ( $self, $bs ) = @_;
 
     return "static void *const* ${bs}ops_addr;\n\n";
 }
@@ -298,8 +275,7 @@ Returns the C code prior to the run core function.
 
 =cut
 
-sub run_core_func_start
-{
+sub run_core_func_start {
     return <<END_C;
 #if defined(__GNUC__) && defined(I386) /* && defined(NO_DYNOPS) */
     register opcode_t *cur_opcode asm ("esi") = cur_op;
@@ -317,9 +293,8 @@ Returns the run core C code for section after the address table.
 
 =cut
 
-sub run_core_after_addr_table
-{
-    my ($self, $bs) = @_;
+sub run_core_after_addr_table {
+    my ( $self, $bs ) = @_;
     my $t = $self->opsarraytype;
     return <<END_C;
 
@@ -338,9 +313,8 @@ Returns the C code following the run core function.
 
 =cut
 
-sub run_core_finish
-{
-    my ($self, $base) = @_;
+sub run_core_finish {
+    my ( $self, $base ) = @_;
 
     return "\n} /* " . $self->core_prefix . "$base */\n\n";
 }
@@ -351,11 +325,10 @@ Returns the C code for the init function.
 
 =cut
 
-sub init_func_init1
-{
-    my ($self, $base) = @_;
+sub init_func_init1 {
+    my ( $self, $base ) = @_;
     my $cg_func = $self->core_prefix . $base;
-    my $bs = $base . $self->suffix . '_';
+    my $bs      = $base . $self->suffix . '_';
 
     return <<END_C;
         if (!${bs}op_lib.op_func_table)
@@ -370,9 +343,8 @@ initialization function.
 
 =cut
 
-sub init_set_dispatch
-{
-    my ($self, $bs) = @_;
+sub init_set_dispatch {
+    my ( $self, $bs ) = @_;
 
     return <<END_C;
         ${bs}ops_addr = (void**) init;

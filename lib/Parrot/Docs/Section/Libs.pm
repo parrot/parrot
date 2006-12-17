@@ -32,15 +32,14 @@ Returns a new section.
 
 =cut
 
-sub new
-{
-        my $self = shift;
-        
-        return $self->SUPER::new(
-                'Libraries', 'libs.html', '',
-                $self->new_group('Parrot Core Libraries', '', 'runtime/parrot/library'),
-                $self->new_group('Dynamic Libraries', '', 'src/dynoplibs'),
-        );
+sub new {
+    my $self = shift;
+
+    return $self->SUPER::new(
+        'Libraries', 'libs.html', '',
+        $self->new_group( 'Parrot Core Libraries', '', 'runtime/parrot/library' ),
+        $self->new_group( 'Dynamic Libraries',     '', 'src/dynoplibs' ),
+    );
 }
 
 =back
