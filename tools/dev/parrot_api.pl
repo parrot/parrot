@@ -175,8 +175,8 @@ my %DataR;
 my %Undef;
 my %API;
 
-if ( open( NM, '<', "perl tools/dev/nm.pl -BDo '$Obj' |" ) ) {
-    while (<NM>) {
+if ( open( my $NM, "perl tools/dev/nm.pl -BDo '$Obj' |" ) ) {
+    while (<$NM>) {
         my ( $o, $s, $v ) = split;
         $API{$s} = $o;
         if ( $v eq 'T' ) {
@@ -197,7 +197,7 @@ if ( open( NM, '<', "perl tools/dev/nm.pl -BDo '$Obj' |" ) ) {
             $Undef{$s} = $o;
         }
     }
-    close(NM);
+    close($NM);
 }
 else {
     die "$0: nm.pl -Bgo '$Obj': $!\n";

@@ -298,11 +298,11 @@ for my $f (@ARGV) {
         warn "$ME: No such file: $f\n";
         next;
     }
-    if ( open( NM, '<', "$nm_cmd $nm_opt $f |" ) ) {
+    if ( open( my $NM, "$nm_cmd $nm_opt $f |" ) ) {
         my $o = "?";
         $o = $f if $f =~ /\.o$/;
         my $file;
-        while (<NM>) {
+        while (<$NM>) {
             chomp;
             if ( m/^(.+\.o):$/ || m/\[(.+\.o)\]:$/ || m/\((.+\.o)\):$/ ) {
                 $o = $1;
@@ -435,7 +435,7 @@ for my $f (@ARGV) {
                 }
             }
         }
-        close(NM);
+        close($NM);
     }
     else {
         warn "$ME: '$nm_cmd $nm_opt $f' failed: $!\n";
