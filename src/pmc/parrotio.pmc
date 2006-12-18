@@ -176,7 +176,7 @@ SYNOPSIS
 
         if (!io)
             return NULL;
-#ifdef PARROT_HAS_READLINE
+#if 0
         if (io->flags & PIO_F_READLINE) {
             char *r;
 
@@ -199,7 +199,7 @@ SYNOPSIS
                 PIO_setlinebuf(interp, SELF);
             res = PIO_reads(interp, SELF, 0);
             if (!res)
-                return res;
+                return PMCNULL;
             /* readline should better return the string w/o NL */
             len = string_length(INTERP, res);
             while (len && (((char*)res->strstart)[len-1] == '\n'
@@ -208,7 +208,8 @@ SYNOPSIS
                 --res->strlen;
                 --res->bufused;
             }
-            return res;
+            PMC_str_val(pmc_res) = res;
+            return pmc_res;
         }
     }
 
