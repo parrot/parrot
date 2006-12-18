@@ -8,7 +8,7 @@ pmc/luaboolean.pmc - Lua Boolean
 
 =head1 DESCRIPTION
 
-C<LuaBoolean> extends C<LuaBase> to provide a class with the behaviour of
+C<LuaBoolean> extends C<LuaAny> to provide a class with the behaviour of
 the Lua C<Boolean> type.
 
 The value is stored as an Integer.
@@ -29,7 +29,7 @@ static STRING *luaboolean_name;
 static INTVAL dynpmc_LuaBoolean;
 
 pmclass LuaBoolean
-    extends LuaBase
+    extends LuaAny
     does scalar
     does boolean
     does integer
@@ -41,7 +41,7 @@ pmclass LuaBoolean
 */
     void class_init() {
         if (pass) {
-            Parrot_LuaBase_super_init(INTERP, NULL);
+            Parrot_LuaAny_super_init(INTERP, NULL);
             false_string = const_string(INTERP, "false");
             true_string = const_string(INTERP, "true");
             luaboolean_name = const_string(INTERP, "boolean");

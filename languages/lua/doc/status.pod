@@ -122,7 +122,7 @@ This type is I<the> data structure of the language.
 
 =back
 
-F<languages/lua/pmc/luabase.pmc> provides an abstract base class for all 
+F<languages/lua/pmc/luaany.pmc> provides an abstract base class for all 
 Lua types.
 
 F<languages/lua/type/base_lua.pir> provides an abstract base class for 

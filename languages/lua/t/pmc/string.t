@@ -30,7 +30,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
     .local pmc pmc1
     pmc1 = new $I0
     .local int bool1
-    bool1 = isa pmc1, 'LuaBase'
+    bool1 = isa pmc1, 'LuaAny'
     print bool1
     print "\n"
     bool1 = isa pmc1, 'LuaString'

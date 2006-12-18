@@ -8,7 +8,7 @@ pmc/luanumber.pmc - Lua Number
 
 =head1 DESCRIPTION
 
-C<LuaNumber> extends C<LuaBase> to provide a class with the behaviour of
+C<LuaNumber> extends C<LuaAny> to provide a class with the behaviour of
 the Lua C<Number> type.
 
 =head2 Overloaded Methods
@@ -60,7 +60,7 @@ find_meth(Interp* interp, PMC *obj, const char *name) {
 
 
 pmclass LuaNumber
-    extends LuaBase
+    extends LuaAny
     does scalar
     does float
     dynpmc
@@ -71,7 +71,7 @@ pmclass LuaNumber
 */
     void class_init () {
         if (pass) {
-            Parrot_LuaBase_super_init(INTERP, NULL);
+            Parrot_LuaAny_super_init(INTERP, NULL);
             luanumber_name = const_string(INTERP, "number");
             dynpmc_LuaBoolean = pmc_type(INTERP,
               const_string(INTERP, "LuaBoolean"));

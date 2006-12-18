@@ -7,7 +7,7 @@ lib/base.pir - Lua abstract base class
 
 =head1 DESCRIPTION
 
-C<base_lua> extends C<LuaBase> to provide an abstract base class for some 
+C<base_lua> extends C<LuaAny> to provide an abstract base class for some 
 Lua types implemented in PIR.
 
 =head2 Functions
@@ -19,7 +19,7 @@ Lua types implemented in PIR.
 .HLL '', 'lua_group'
 
 .sub 'init_base' :load :anon
-    $P0 = subclass 'LuaBase', 'base_lua'
+    $P0 = subclass 'LuaAny', 'base_lua'
 .end
 
 .namespace [ 'base_lua' ]

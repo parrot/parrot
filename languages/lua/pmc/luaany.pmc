@@ -4,11 +4,11 @@ $Id$
 
 =head1 NAME
 
-pmc/luabase.pmc - Lua abstract base class
+pmc/luaany.pmc - Lua abstract base class
 
 =head1 DESCRIPTION
 
-C<LuaBase> provides an abstract base class for some Lua types.
+C<LuaAny> provides an abstract base class for some Lua types.
 
 =head2 Methods
 
@@ -54,7 +54,7 @@ find_meth(Interp* interp, PMC *obj, const char *name) {
 }
 
 
-pmclass LuaBase
+pmclass LuaAny
     abstract
     dynpmc
     group lua_group {

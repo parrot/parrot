@@ -8,7 +8,7 @@ pmc/luanil.pmc - Lua Nil
 
 =head1 DESCRIPTION
 
-C<LuaNil> extends C<LuaBase> to provide a class with the behaviour of
+C<LuaNil> extends C<LuaAny> to provide a class with the behaviour of
 the Lua C<Nil> type.
 
 =for rational
@@ -34,7 +34,7 @@ static STRING *string_representation;
 static INTVAL dynpmc_LuaBoolean;
 
 pmclass LuaNil
-    extends LuaBase
+    extends LuaAny
     does scalar
     dynpmc
     group lua_group
@@ -45,7 +45,7 @@ pmclass LuaNil
 */
     void class_init() {
         if (pass) {
-            Parrot_LuaBase_super_init(INTERP, NULL);
+            Parrot_LuaAny_super_init(INTERP, NULL);
             string_representation = const_string(INTERP, "nil");
             dynpmc_LuaBoolean = pmc_type(INTERP,
               const_string(INTERP, "LuaBoolean"));

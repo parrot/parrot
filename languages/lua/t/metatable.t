@@ -500,7 +500,7 @@ true
 OUT
 
 TODO: {
-    local $TODO = 'fix me (luabase.pmc:invoke)';
+    local $TODO = 'fix me (luaany.pmc:invoke)';
 
     language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __call' );
 Cplx = {}

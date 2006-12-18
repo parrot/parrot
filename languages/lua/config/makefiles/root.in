@@ -15,7 +15,7 @@ PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
 
 PMCS = \
  lua \
- luabase \
+ luaany \
  luaboolean \
  luaclosure \
  luafunction \
@@ -25,7 +25,7 @@ PMCS = \
 
 PMC_FILES = \
  $(PMCDIR)/lua.pmc \
- $(PMCDIR)/luabase.pmc \
+ $(PMCDIR)/luaany.pmc \
  $(PMCDIR)/luaboolean.pmc \
  $(PMCDIR)/luaclosure.pmc \
  $(PMCDIR)/luafunction.pmc \
