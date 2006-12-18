@@ -20,7 +20,7 @@ Tests C<LuaFunction> PMC
 use strict;
 use warnings;
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
@@ -49,6 +49,30 @@ CODE
 1
 0
 1
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'check interface' );
+.sub _main
+    loadlib P1, 'lua_group'
+    find_type $I0, 'LuaFunction'
+    .local pmc pmc1
+    pmc1 = new $I0
+    .local int bool1
+    bool1 = does pmc1, 'scalar'
+    print bool1
+    print "\n"
+    bool1 = does pmc1, 'sub'
+    print bool1
+    print "\n"
+    bool1 = does pmc1, 'no_interface'
+    print bool1
+    print "\n"
+    end
+.end
+CODE
+1
+1
+0
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );

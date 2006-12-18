@@ -30,6 +30,8 @@ static INTVAL dynpmc_LuaBoolean;
 pmclass LuaFunction
     extends Sub
     extends LuaBase
+    does scalar
+    does sub
     dynpmc
     group lua_group
     hll Lua maps Sub {

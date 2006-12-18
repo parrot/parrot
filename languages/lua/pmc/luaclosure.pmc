@@ -29,6 +29,8 @@ static INTVAL dynpmc_LuaBoolean;
 pmclass LuaClosure
     extends Closure
     extends LuaBase
+    does scalar
+    does sub
     dynpmc
     group lua_group
     hll Lua maps Closure {
