@@ -20,7 +20,7 @@ Tests C<LuaBoolean> PMC
 use strict;
 use warnings;
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 8;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
@@ -123,26 +123,6 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
     print bool1
     print "\n"
     end
-.end
-CODE
-true
-1
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL (autoboxing)' );
-.HLL 'Lua', 'lua_group'
-.sub _main
-    .local pmc pmc1
-    pmc1 = test()
-    print pmc1
-    print "\n"
-    .local int bool1
-    bool1 = isa pmc1, 'LuaBoolean'
-    print bool1
-    print "\n"
-.end
-.sub test
-    .return (1)
 .end
 CODE
 true
