@@ -168,7 +168,7 @@ END
     if (
         my $size = eval {
             open( my $TEST, ">", "test.c" ) or die "Can't open test.c: $!";
-            print $TEST <<'END';
+            print {$TEST} <<'END';
 #include <stdio.h>
 
 int main() {
