@@ -656,6 +656,12 @@ help :
 	@echo "                      WARNING: Installing Parrot may interfere with"
 	@echo "                               developing Parrot on the same machine."
 	@echo "                               This flaw will be fixed eventually."
+	@echo "  reallyinstall:     Install under '$(PREFIX)' on Unix systems"
+	@echo "               NOTE: This actually does the install.  Since"
+	@echo "                     there are currently issues with the Parrot"
+	@echo "                     install system, this make target is used"
+	@echo "                     to go ahead with the install anyway."
+
 	@echo ""
 	@echo "Documentation:"
 	@echo "  help:              Print this help message."
@@ -1672,9 +1678,10 @@ install:
 	@echo "  Installing Parrot may interfere with developing Parrot"
 	@echo "  on the same machine.  This is a temporary flaw in the"
 	@echo "  Parrot build system."
-	@echo "  To use the make install target, remove the following line"
-	@echo "  in the Makefile that says: \$$(PERL) -e \"exit(1)\"."
+	@echo "  To use the make install target, type: make reallyinstall"
 	$(PERL) -e "exit(1)"
+
+reallyinstall:
 	make installable
 	$(PERL) tools/dev/install_files.pl \
     --buildprefix=$(BUILDPREFIX) \
