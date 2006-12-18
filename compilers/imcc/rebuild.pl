@@ -41,20 +41,20 @@ my ( $command, $input, @outputs ) = @ARGV;
 my $checksum;
 {
     local $/;
-    open( INPUT, '<', $input ) or die "open $input: $!";
-    $checksum = unpack( "%32C*", <INPUT> );
-    close INPUT;
+    open( my $INPUT, '<', $input ) or die "open $input: $!";
+    $checksum = unpack( "%32C*", <$INPUT> );
+    close $INPUT;
 }
 
 my $up_to_date = 1;
 foreach my $output (@outputs) {
-    if ( !open( OUTPUT, '<', $output ) ) {
+    if ( !open( my $OUTPUT, '<', $output ) ) {
         print "$output does not exist; remaking\n" if $Verbose;
         $up_to_date = 0;
         last;
     }
-    my $checksum_line = (<OUTPUT>)[-1];
-    close OUTPUT;
+    my $checksum_line = (<$OUTPUT>)[-1];
+    close $OUTPUT;
     if ( $checksum_line !~ m!^/\* CHECKSUM: ([-\d+]+) \*/$! ) {
         print "$output does not have a checksum line; remaking\n" if $Verbose;
         $up_to_date = 0;
@@ -77,9 +77,9 @@ exit 1               if ( !defined $status );
 exit( $status >> 8 ) if $status != 0;
 
 foreach my $output (@outputs) {
-    open( OUTPUT, ">>", "$output" ) or die "open $output for append: $!";
-    print OUTPUT "/* CHECKSUM: $checksum */\n";
-    close OUTPUT;
+    open( my $OUTPUT, ">>", "$output" ) or die "open $output for append: $!";
+    print $OUTPUT "/* CHECKSUM: $checksum */\n";
+    close $OUTPUT;
 }
 
 exit 0;

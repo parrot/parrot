@@ -15,6 +15,7 @@ Creates 50 arrays with 10000 elements each.
 
 =cut
 
+use strict;
 use warnings;
 
 my @arr;

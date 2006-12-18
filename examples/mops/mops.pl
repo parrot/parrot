@@ -2,8 +2,6 @@
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
 
-use warnings;
-
 =head1 NAME
 
 examples/mops/mops.c - Calculate M ops/s
@@ -35,6 +33,11 @@ Prints out:
 =back
 
 =cut
+
+use strict;
+use warnings;
+
+use vars qw( $I1 $I2 $I3 $I4 $I5 $N1 $N2 $N5 );
 
 sub time_hires { time() }
 

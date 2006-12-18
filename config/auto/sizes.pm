@@ -167,8 +167,8 @@ END
     #get HUGEFLOATVAL
     if (
         my $size = eval {
-            open( TEST, ">", "test.c" ) or die "Can't open test.c: $!";
-            print TEST <<'END';
+            open( my $TEST, ">", "test.c" ) or die "Can't open test.c: $!";
+            print $TEST <<'END';
 #include <stdio.h>
 
 int main() {
@@ -177,7 +177,7 @@ int main() {
     return 0;
 }
 END
-            close TEST;
+            close $TEST;
 
             cc_build();
             cc_run();

@@ -17,6 +17,7 @@ of primes and the last one found.
 
 =cut
 
+use strict;
 use warnings;
 
 my $i1 = 1;

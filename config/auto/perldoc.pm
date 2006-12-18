@@ -38,10 +38,10 @@ sub runstep {
             $self->set_result('yes, old version');
         }
         else {
-            if ( open FH, "<", "c99da7c4.tmp" ) {
+            if ( open my $FH, "<", "c99da7c4.tmp" ) {
                 local $/;
-                $a = <FH>;
-                close FH;
+                $a = <$FH>;
+                close $FH;
                 $version = 2;
                 $self->set_result('yes');
             }

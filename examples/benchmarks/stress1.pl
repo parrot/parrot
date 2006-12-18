@@ -2,8 +2,6 @@
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
 
-use warnings;
-
 =head1 NAME
 
 examples/benchmarks/stress1.pl - GC stress-testing
@@ -17,6 +15,9 @@ examples/benchmarks/stress1.pl - GC stress-testing
 Creates 500 arrays with 20000 elements each.
 
 =cut
+
+use strict;
+use warnings;
 
 foreach ( 1 .. 10 ) {
     my @arr;

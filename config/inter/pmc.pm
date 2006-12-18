@@ -33,10 +33,10 @@ sub pmc_parent {
     return $PMC_PARENTS{$pmc} if defined $PMC_PARENTS{$pmc};
 
     local $/;
-    open( PMC, "<", "src/pmc/$pmc.pmc" )
+    open( my $PMC, "<", "src/pmc/$pmc.pmc" )
         or die "open src/pmc/$pmc.pmc failed: $!";
-    local $_ = <PMC>;
-    close PMC;
+    local $_ = <$PMC>;
+    close $PMC;
 
     # Throw out everything but the pmclass declaration
     s/^.*?pmclass//s;
@@ -58,15 +58,15 @@ sub pmc_parents {
 }
 
 sub get_pmc_order {
-    open IN, '<', 'src/pmc/pmc.num' or die "Can't read src/pmc/pmc.num";
+    open my $IN, '<', 'src/pmc/pmc.num' or die "Can't read src/pmc/pmc.num";
     my %order;
-    while (<IN>) {
+    while (<$IN>) {
         next if (/^#/);
         if (/(\w+\.\w+)\s+(\d+)/) {
             $order{$1} = $2;
         }
     }
-    close IN;
+    close $IN;
 
     return \%order;
 }
@@ -172,21 +172,21 @@ END
 PMC: foreach my $pmc_file ( split( /\s+/, $pmc_list ) ) {
         next if ( $pmc_file =~ /^const/ );
         my $name;
-        open PMC, "<", "src/pmc/$pmc_file"
+        open my $PMC, "<", "src/pmc/$pmc_file"
             or die "open src/pmc/$pmc_file: $!";
         my $const;
-        while (<PMC>) {
+        while (<$PMC>) {
             if (/^pmclass (\w+)(.*)/) {
                 $name = $1;
                 my $decl = $2;
-                $decl .= <PMC> until ( $decl =~ s/\{.*// );
+                $decl .= <$PMC> until ( $decl =~ s/\{.*// );
                 $const = 1 if $decl =~ /\bconst_too\b/;
                 next PMC if $decl =~ /\babstract\b/;
                 next PMC if $decl =~ /\bextension\b/;
                 last;
             }
         }
-        close PMC;
+        close $PMC;
         die "No pmclass declaration found in $pmc_file"
             if !defined $name;
 

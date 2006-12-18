@@ -40,20 +40,20 @@ sub cflags {
         comment_type                     => '#'
     );
 
-    open( CFLAGS, ">>", "CFLAGS" ) or die "open >> CFLAGS: $!";
+    open( my $CFLAGS, ">>", "CFLAGS" ) or die "open >> CFLAGS: $!";
 
     # Why is this here?  I'd think this information belongs
     # in the CFLAGS.in file. -- A.D.  March 12, 2004
     if ( $conf->data->get('cpuarch') =~ /sun4|sparc64/ ) {
 
         # CFLAGS entries must be left-aligned.
-        print CFLAGS <<"EOF";
+        print $CFLAGS <<"EOF";
 src/jit_cpu.c -{-Wcast-align}        # lots of noise!
 src/nci.c     -{-Wstrict-prototypes} # lots of noise!
 EOF
     }
 
-    close CFLAGS;
+    close $CFLAGS;
 }
 
 sub makefiles {
@@ -106,7 +106,7 @@ sub makefiles {
 
         $conf->data->set( pod => undef );
 
-        open MAKEFILE, ">>", "docs/Makefile"
+        open my $MAKEFILE, ">>", "docs/Makefile"
             or die "open >> docs/Makefile: $!";
 
         my $slash       = $conf->data->get('slash');
@@ -115,15 +115,15 @@ sub makefiles {
         foreach my $ops (@ops) {
             my $pod = $ops;
             $pod =~ s/\.ops$/.pod/;
-            print MAKEFILE "ops$slash$pod: ..${slash}src${slash}ops${slash}$ops\n";
+            print $MAKEFILE "ops$slash$pod: ..${slash}src${slash}ops${slash}$ops\n";
             if ( $new_perldoc == 1 ) {
-                print MAKEFILE
+                print $MAKEFILE
                     "\tperldoc -ud ops${slash}$pod ..${slash}src${slash}ops${slash}$ops\n";
-                print MAKEFILE "\t\$(CHMOD) 0644 ops${slash}$pod\n\n";
+                print $MAKEFILE "\t\$(CHMOD) 0644 ops${slash}$pod\n\n";
             }
             else {
-                print MAKEFILE "\tperldoc -u ..${slash}ops${slash}$ops > ops${slash}$pod\n";
-                print MAKEFILE "\t\$(CHMOD) 0644 ..${slash}ops${slash}$pod\n\n";
+                print $MAKEFILE "\tperldoc -u ..${slash}ops${slash}$ops > ops${slash}$pod\n";
+                print $MAKEFILE "\t\$(CHMOD) 0644 ..${slash}ops${slash}$pod\n\n";
             }
         }
 

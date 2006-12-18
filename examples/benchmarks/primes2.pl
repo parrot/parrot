@@ -1,5 +1,6 @@
 #! perl
 
+use strict;
 use warnings;
 
 my $i   = 0;

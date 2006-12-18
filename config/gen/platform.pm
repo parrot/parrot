@@ -70,10 +70,10 @@ CODA
         threads.h
         /;
 
-    open PLATFORM_H, ">", "include/parrot/platform.h"
+    open my $PLATFORM_H, ">", "include/parrot/platform.h"
         or die "Can't open include/parrot/platform.h: $!";
 
-    print PLATFORM_H <<"END_HERE";
+    print $PLATFORM_H <<"END_HERE";
 #if !defined(PARROT_PLATFORM_H_GUARD)
 #define PARROT_PLATFORM_H_GUARD
 
@@ -96,23 +96,23 @@ END_HERE
         if ( -e $header_file ) {
             local $/ = undef;
             print("\t$header_file\n") if defined $verbose && $verbose == 2;
-            open IN_H, "<", "$header_file"
+            open my $IN_H, "<", "$header_file"
                 or die "Can't open $header_file: $!";
 
             # slurp in the header file
-            my $in_h = <IN_H>;
+            my $in_h = <$IN_H>;
 
             # remove the (in this case) superfluous coda
             $in_h =~ s{\Q$coda\E\n*\z}{}xgs;
 
-            print PLATFORM_H <<"END_HERE";
+            print $PLATFORM_H <<"END_HERE";
 /*
 ** $header_file:
 */
 #line 1 "$header_file"
 END_HERE
-            print PLATFORM_H $in_h, "\n\n";
-            close IN_H;
+            print $PLATFORM_H $in_h, "\n\n";
+            close $IN_H;
         }
 
         # just fall through if file is missing; means neither this platform nor
@@ -128,15 +128,15 @@ END_HERE
         if ( -e $_ ) {
             local $/ = undef;
             print("\t$_\n") if defined $verbose && $verbose == 2;
-            open IN_H, "<", "$_" or die "Can't open $_: $!";
-            print PLATFORM_H <<"END_HERE";
+            open my $IN_H, "<", "$_" or die "Can't open $_: $!";
+            print $PLATFORM_H <<"END_HERE";
 /*
 ** $_
 */
 #line 1 "$_"
 END_HERE
-            print PLATFORM_H <IN_H>, "\n\n";
-            close IN_H;
+            print $PLATFORM_H <$IN_H>, "\n\n";
+            close $IN_H;
         }
         else {
             warn("Header file '$_' listed in TEMP_generated but not found\n");
@@ -144,13 +144,13 @@ END_HERE
     }
 
     # Add the C-coda
-    print PLATFORM_H <<"END_HERE";
+    print $PLATFORM_H <<"END_HERE";
 #endif
 
 $coda
 END_HERE
 
-    close PLATFORM_H;
+    close $PLATFORM_H;
 
     # implementation files are merged into platform.c
     my @impls = qw/
@@ -167,10 +167,10 @@ END_HERE
         misc.c
         /;
 
-    open PLATFORM_C, ">", "src/platform.c"
+    open my $PLATFORM_C, ">", "src/platform.c"
         or die "Can't open src/platform.c: $!";
 
-    print PLATFORM_C <<"END_HERE";
+    print $PLATFORM_C <<"END_HERE";
 /*
 ** platform.c [$platform version]
 **
@@ -183,26 +183,26 @@ END_HERE
     # We need to put things from begin.c before the parrot.h include.
     if ( -e "config/gen/platform/$platform/begin.c" ) {
         local $/ = undef;
-        open IN_C, "<", "config/gen/platform/$platform/begin.c" or die "Can't open begin.c: $!";
+        open my $IN_C, "<", "config/gen/platform/$platform/begin.c" or die "Can't open begin.c: $!";
 
         # slurp in the C file
-        my $in_c = <IN_C>;
+        my $in_c = <$IN_C>;
 
         # remove the (in this case) superfluous coda
         $in_c =~ s{\Q$coda\E\n*\z}{}xgs;
 
-        print PLATFORM_C <<"END_HERE";
+        print $PLATFORM_C <<"END_HERE";
 /*
 ** begin.c
 */
 #line 1 "config/gen/platform/$platform/begin.c"
 END_HERE
-        print PLATFORM_C $in_c, "\n\n";
-        close IN_C;
+        print $PLATFORM_C $in_c, "\n\n";
+        close $IN_C;
     }
 
     # Copy the rest.
-    print PLATFORM_C <<'END_HERE';
+    print $PLATFORM_C <<'END_HERE';
 #include "parrot/parrot.h"
 
 END_HERE
@@ -216,22 +216,22 @@ END_HERE
         if ( -e $impl_file ) {
             local $/ = undef;
             print("\t$impl_file\n") if defined $verbose && $verbose == 2;
-            open IN_C, "<", "$impl_file" or die "Can't open $impl_file: $!";
+            open my $IN_C, "<", "$impl_file" or die "Can't open $impl_file: $!";
 
             # slurp in the C file
-            my $in_c = <IN_C>;
+            my $in_c = <$IN_C>;
 
             # remove the (in this case) superfluous coda
             $in_c =~ s{\Q$coda\E\n*\z}{}xgs;
 
-            print PLATFORM_C <<"END_HERE";
+            print $PLATFORM_C <<"END_HERE";
 /*
 ** $impl_file:
 */
 #line 1 "$impl_file"
 END_HERE
-            print PLATFORM_C $in_c, "\n\n";
-            close IN_C;
+            print $PLATFORM_C $in_c, "\n\n";
+            close $IN_C;
         }
     }
 
@@ -241,25 +241,25 @@ END_HERE
         if ( -e $_ ) {
             local $/ = undef;
             print("\t$_\n") if defined $verbose && $verbose == 2;
-            open IN_C, "<", "$_" or die "Can't open $_: $!";
-            print PLATFORM_C <<"END_HERE";
+            open my $IN_C, "<", "$_" or die "Can't open $_: $!";
+            print $PLATFORM_C <<"END_HERE";
 /*
 ** $_:
 */
 #line 1 "$_"
 END_HERE
-            print PLATFORM_C <IN_C>, "\n\n";
-            close IN_C;
+            print $PLATFORM_C <$IN_C>, "\n\n";
+            close $IN_C;
         }
     }
 
     # append the C code coda to the generated file
-    print PLATFORM_C <<"END_HERE";
+    print $PLATFORM_C <<"END_HERE";
 
 $coda
 END_HERE
 
-    close PLATFORM_C;
+    close $PLATFORM_C;
 
     if ( $conf->data->get('platform_asm') ) {
         my $asm_file = "config/gen/platform/$platform/asm.s";

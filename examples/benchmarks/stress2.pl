@@ -15,6 +15,7 @@ Creates 200 arrays of 10000 elements each.
 
 =cut
 
+use strict;
 use warnings;
 
 foreach ( 1 .. 20 ) {

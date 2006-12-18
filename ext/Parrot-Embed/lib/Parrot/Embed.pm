@@ -45,3 +45,12 @@ Copyright (c) 2006 The Perl Foundation / chromatic, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Parrot itself.
+
+=cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
