@@ -227,9 +227,10 @@ sub process_list {
             ];
         }
 
-        $branches{$branch} =
-            [ map { { catname => $_, smokes => $branches{$branch}{$_}, } }
-                sort { lc $a cmp lc $b } keys %{ $branches{$branch} } ];
+        $branches{$branch} = [
+            map { { catname => $_, smokes => $branches{$branch}{$_}, } }
+                sort { lc $a cmp lc $b } keys %{ $branches{$branch} }
+        ];
     }
 
     $tmpl->param(
