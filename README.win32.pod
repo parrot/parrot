@@ -39,7 +39,14 @@ Note: Parrot will not build using nmake v1.5 from the MS web site.  Download
 one of the above toolkits to obtain a later version, either v7 or v8.
 
 MinGW works with its GNU "make" (v 3.80) port and its name is
-'mingw32-make.exe'.
+'mingw32-make.exe'.  If you also have the Minimal SYStem (MSYS) installed, 
+you will need to remove the Msys/bin folder from your PATH environment
+variable before calling "perl Configure.pl" and mingw32-make.  Perl detects
+and calls /bin/sh.exe, if found, whenever shelling a new process.  sh.exe 
+causes problems for mingw32-make.exe because of its inability to handle 
+Windows pathnames with backslashes.  You must run "perl Configure.pl" and
+mingw32-make from a dosbox; running those commands from an MSYS shell window
+will experience the same backslash path problems.
 
 =item Command Shell
 
