@@ -31,7 +31,10 @@ troublesome (if not possible?).
 #include "parrot/parrot.h"
 
 static STRING *string_representation;
-static INTVAL dynpmc_LuaBoolean;
+INTVAL dynpmc_LuaBoolean;
+INTVAL dynpmc_LuaNil;
+INTVAL dynpmc_LuaNumber;
+INTVAL dynpmc_LuaString;
 
 pmclass LuaNil
     extends LuaAny
@@ -45,10 +48,15 @@ pmclass LuaNil
 */
     void class_init() {
         if (pass) {
-            Parrot_LuaAny_super_init(INTERP, NULL);
             string_representation = const_string(INTERP, "nil");
             dynpmc_LuaBoolean = pmc_type(INTERP,
               const_string(INTERP, "LuaBoolean"));
+            dynpmc_LuaNil = pmc_type(INTERP,
+              const_string(INTERP, "LuaNil"));
+            dynpmc_LuaNumber = pmc_type(INTERP,
+              const_string(INTERP, "LuaNumber"));
+            dynpmc_LuaString = pmc_type(INTERP,
+              const_string(INTERP, "LuaString"));
         }
     }
 
@@ -142,7 +150,7 @@ Return always C<false>.
 
 */
     INTVAL get_bool () {
-        return 0;
+        return (INTVAL)0;
     }
 
 /*
@@ -155,7 +163,7 @@ Return always C<false>.
 
 */
     INTVAL defined() {
-        return 0;
+        return (INTVAL)0;
     }
 
 /*

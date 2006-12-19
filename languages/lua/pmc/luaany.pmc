@@ -20,11 +20,13 @@ C<LuaAny> provides an abstract base class for some Lua types.
 
 #include "parrot/parrot.h"
 
-static INTVAL dynpmc_LuaBoolean;
-static INTVAL dynpmc_LuaNil;
-static INTVAL dynpmc_LuaString;
+extern INTVAL dynpmc_LuaBoolean;
+extern INTVAL dynpmc_LuaNil;
+extern INTVAL dynpmc_LuaString;
 
-static PMC *
+extern PMC * find_meth(Interp* interp, PMC *obj, const char *name);
+
+PMC *
 find_meth(Interp* interp, PMC *obj, const char *name) {
     PMC *meta = NULL;
 
@@ -68,7 +70,7 @@ Returns C<true>.
 
 */
     INTVAL get_bool () {
-        return 1;
+        return (INTVAL)1;
     }
 
 /*
@@ -180,7 +182,7 @@ Always returns true.
 
 */
     INTVAL defined () {
-        return 1;
+        return (INTVAL)1;
     }
 
 /*
@@ -566,15 +568,6 @@ Common implementation (use C<__tostring> or C<get_string>).
             PMC_str_val(retval) = VTABLE_get_string(INTERP, SELF);
         }
         return retval;
-    }
-
-    METHOD void super_init () {
-            dynpmc_LuaBoolean = pmc_type(INTERP,
-              const_string(INTERP, "LuaBoolean"));
-            dynpmc_LuaNil = pmc_type(INTERP,
-              const_string(INTERP, "LuaNil"));
-            dynpmc_LuaString = pmc_type(INTERP,
-              const_string(INTERP, "LuaString"));
     }
 
 }
