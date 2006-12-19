@@ -108,6 +108,8 @@ array set skipped_tests {
   namespace-old-2.7    explode
   parse-9.2            stacktrace
   parse-10.14          stacktrace
+  scan-14.1            {Inf support}
+  scan-14.2            {Inf support}
   set-2.1              stacktrace
   set-4.1              stacktrace
   string-13.6          {Cannot repeat with negative arg}
