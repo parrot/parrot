@@ -83,7 +83,7 @@ lookup of the cache has to be done in the opcode itself.
 #  include "parrot/oplib/core_ops_cgp.h"
 #endif
 
-#if HAS_JIT
+#ifdef HAS_JIT
 #include "parrot/exec.h"
 #include "jit.h"
 #endif
@@ -484,7 +484,6 @@ static int
 is_pic_func(Interp *interp, void **pc, Parrot_MIC *mic, int core_type)
 {
     PMC *sub, *sig_args, *sig_results;
-    char *base;
     parrot_context_t *ctx;
     opcode_t *op, n;
     int flags;
@@ -507,7 +506,6 @@ is_pic_func(Interp *interp, void **pc, Parrot_MIC *mic, int core_type)
      * pc is at set_args
      */
 
-    base = (char*)interp->ctx.bp.regs_i;
     ctx = CONTEXT(interp->ctx);
     sig_args = (PMC*)(pc[1]);
     ASSERT_SIG_PMC(sig_args);
@@ -543,7 +541,6 @@ void
 parrot_PIC_prederef(Interp *interp, opcode_t op, void **pc_pred, int core)
 {
     op_func_t * const prederef_op_func = interp->op_lib->op_func_table;
-    char * const _reg_base = (char*)interp->ctx.bp.regs_i;
     opcode_t * const cur_opcode = (opcode_t*)pc_pred;
     Parrot_MIC *mic = NULL;
 

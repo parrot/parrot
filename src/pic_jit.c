@@ -38,7 +38,7 @@ TODO:
 #  include "parrot/oplib/core_ops_cgp.h"
 #endif
 
-#if HAS_JIT
+#ifdef HAS_JIT
 #include "parrot/exec.h"
 #include "jit.h"
 
@@ -261,7 +261,6 @@ parrot_pic_is_safe_to_jit(Interp *interp, PMC *sub,
 {
 
     opcode_t *base, *start, *end;
-    STRING * const name = VTABLE_get_string(interp, sub);
 
     *flags = 0;
 
