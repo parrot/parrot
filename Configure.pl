@@ -86,6 +86,10 @@ This option is experimental. See F<config/init/defaults.pm> for more.
 
 Turn on profiled compile (gcc only for now)
 
+=item C<--cage>
+
+[CAGE] compile includes many additional warnings
+
 =item C<--optimize>
 
 Add perl5's $Config{optimize} to the compiler flags.
@@ -285,11 +289,12 @@ $OUTPUT_AUTOFLUSH = 1;
 
 # Handle options
 
-my @valid_opts = qw(ask bindir cc ccflags ccwarn cgoto cxx datadir debugging define exec-prefix
-    execcapable floatval gc help icu-config icudatadir icuheaders icushared
-    includedir infodir inline intval jitcapable ld ldflags lex libdir libexecdir
-    libs link linkflags localstatedir m maintainer mandir miniparrot nomanicheck
-    oldincludedir opcode ops optimize parrot_is_shared pmc prefix profile sbindir
+my @valid_opts = qw(ask bindir cage cc ccflags ccwarn cgoto cxx datadir 
+    debugging define exec-prefix execcapable floatval gc help icu-config 
+    icudatadir icuheaders icushared includedir infodir inline intval 
+    jitcapable ld ldflags lex libdir libexecdir libs link linkflags 
+    localstatedir m maintainer mandir miniparrot nomanicheck oldincludedir 
+    opcode ops optimize parrot_is_shared pmc prefix profile sbindir 
     sharedstatedir step sysconfdir verbose verbose-step=N version without-gdbm
     without-gmp without-icu yacc);
 
@@ -341,6 +346,7 @@ Compile Options:
    --parrot_is_shared   Link parrot dynamically
    --m=32               Build 32bit executable on 64-bit architecture.
    --profile            Turn on profiled compile (gcc only for now)
+   --cage               [CAGE] compile includes many additional warnings
 
    --cc=(compiler)      Use the given compiler
    --ccflags=(flags)    Use the given compiler flags
