@@ -72,10 +72,10 @@ sub check_parens {
                    )
                 }{}gsx;
 
-        if ( $buf =~ m{ ( (?:$keywords) (?: \( | \ \s+ \( ) ) }x ) {
+        if ( $buf =~ m{ ( (?<!\w) (?:$keywords) (?: \( | \ \s+ \( ) ) }x ) {
             push @keyword_paren => "$path: $1\n";
         }
-        if ( $buf =~ m{ ( ( (?!$keywords) \b \S+ \b ) \s+ \( ) }x ) {
+        if ( $buf =~ m{ ( (?<!\w) (?!(?:$keywords)\W) \w+ \s+ \( ) }x ) {
             push @non_keyword_paren => "$path: $1\n";
         }
         if ( $buf =~ m{ ( \( \s+ | \s+ \) ) }x ) {
