@@ -131,18 +131,106 @@ sub runstep {
             # us -Wpadded may prove interesting, or even noisy.
             # -Wunreachable-code might be useful in a non debugging version
         );
-        $warns = "";
-        while ( my ( $vers, $opt ) = splice @opt_and_vers, 0, 2 ) {
-            last if $vers > $gccversion;
-            next unless $opt;    # Ignore blank lines
+        my @cage_opt_and_vers = (
+            0 =>
+            " -std=c89 -Wall -Wextra -Wundef -Wbad-function-cast -Wmissing-declarations -Wredundant-decls -Wnested-externs -Wlong-long"
+            . " -Wfloat-equal -Wpadded -Wunreachable-code"
 
-            if ( $opt =~ /-mno-accumulate-outgoing-args/ ) {
-                use Config;
-                if ( $Config{archname} !~ /86/ ) {
-                    $opt =~ s/-mno-accumulate-outgoing-args//;
+            #. "-fsyntax-only "
+            #. "-pedantic -pedantic-errors "
+            #. " -w "
+            #. " -Werror "
+            . " -Wextra -Wall -Waggregate-return -Wcast-align  -Wcast-qual  -Wchar-subscripts "
+            . " -Wcomment -Wconversion  -Wno-deprecated-declarations -Wdisabled-optimization  -Wno-div-by-zero  -Wno-endif-labels "
+            . " -Werror-implicit-function-declaration -Wfloat-equal -Wformat  -Wformat=2 -Wno-format-extra-args -Wformat-nonliteral "
+            . " -Wformat-security  -Wformat-y2k -Wimplicit  -Wimplicit-function-declaration  -Wimplicit-int -Wimport  -Wno-import  -Winit-self "
+            . " -Winline -Winvalid-pch -Wlarger-than-4096 -Wlong-long -Wmain  -Wmissing-braces  "
+            . " -Wmissing-format-attribute  -Wmissing-noreturn -Wno-multichar  -Wnonnull  -Wpacked "
+            . " -Wpadded -Wparentheses  -Wpointer-arith  -Wredundant-decls -Wreturn-type  -Wsequence-point  -Wshadow -Wsign-compare "
+            . " -Wstrict-aliasing -Wstrict-aliasing=2 -Wswitch  -Wswitch-default -Wswitch-enum -Wsystem-headers  -Wtrigraphs  -Wundef "
+
+            #. " -Wuninitialized "
+            #     requires -O
+            . " -Wunknown-pragmas  -Wunreachable-code -Wunused  -Wunused-function  -Wunused-label  -Wunused-parameter -Wunused-value "
+            . " -Wunused-variable  -Wwrite-strings "
+            #."-Wmost (APPLE ONLY)" 
+
+            #C-only Warning Options
+            . " -Wbad-function-cast  -Wmissing-declarations -Wmissing-prototypes -Wnested-externs  -Wold-style-definition -Wstrict-prototypes "
+            #. " -Wtraditional "
+            . " -Wdeclaration-after-statement ",
+
+            #"-Wall -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wwrite-strings -Waggregate-return -Winline -W -Wno-unused",
+
+            # these don't work on gcc 3.4.5, but were included in tewk's
+            # patch in #39802
+            #. "-Wfatal-errors "
+            #. "-Wmissing-field-initializers "
+            #. "-Wmissing-include-dirs "
+            #. "-Wvariadic-macros "
+            #. "-Wno-discard-qual "
+            #. "-Wno-pointer-sign "
+
+            # others; ones we might like marked with ?
+            # ? -Wundef for undefined idenfiers in #if
+            # ? -Wbad-function-cast
+            #   Warn whenever a function call is cast to a non-matching type
+            # ? -Wmissing-declarations
+            #   Warn if a global function is defined without a previous
+            #   declaration -Wmissing-noreturn
+            # ? -Wredundant-decls
+            #    Warn if anything is declared more than once in the same scope,
+            # ? -Wnested-externs
+            #    Warn if an `extern' declaration is encountered within an
+            #    function.  -Wlong-long
+            # Ha. this is the default! with -pedantic.
+            # -Wno-long-long for the nicest bit of C99
+            #
+            # -Wcast-align is now removed: it gives too many false positives
+            #    e.g. when accessing registers - this is all aligned
+     
+            2.7  => "",
+            2.8  => "",
+            #2.8  => "-Wsign-compare",
+            2.95 => "",
+
+            # 2.95 does align functions per default -malign-functions=4
+            #      where the argument is used as a power of 2
+            # 3.x  does not align functions per default, its turned on with
+            #      -O2 and -O3
+            #      -falign-functions=16 is the real alignment, no exponent
+            3.0 => "",
+            #3.0 => "-Wformat-nonliteral -Wformat-security -Wpacked "
+            #    . "-Wdisabled-optimization -mno-accumulate-outgoing-args "
+            #    . "-Wno-shadow -falign-functions=16 ",
+            4.0 => "",
+            4.1 => "",
+            4.2 => "",
+
+            # -Wsequence-point is part of -Wall
+            # -Wfloat-equal may not be what we want
+            # We shouldn't be using __packed__, but I doubt -Wpacked will harm
+            # us -Wpadded may prove interesting, or even noisy.
+            # -Wunreachable-code might be useful in a non debugging version
+        );
+
+        $warns = "";
+        my @warning_options = (\@opt_and_vers);
+        push @warning_options, \@cage_opt_and_vers if $conf->options->get('cage');
+
+        foreach my $curr_opt_and_vers (@warning_options) {
+            while ( my ( $vers, $opt ) = splice @$curr_opt_and_vers, 0, 2 ) {
+                last if $vers > $gccversion;
+                next unless $opt;    # Ignore blank lines
+
+                if ( $opt =~ /-mno-accumulate-outgoing-args/ ) {
+                    use Config;
+                    if ( $Config{archname} !~ /86/ ) {
+                        $opt =~ s/-mno-accumulate-outgoing-args//;
+                    }
                 }
+                $warns .= " $opt";
             }
-            $warns .= " $opt";
         }
 
         # if the user overwrites the warnings remove it from $warns
