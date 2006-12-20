@@ -3,6 +3,7 @@
 # Setup some commands
 LN_S     = @lns@
 PERL     = @perl@
+MV       = $(PERL) -MExtUtils::Command -e mv
 RM_F     = @rm_f@
 RM_RF    = @rm_rf@
 PARROT   = ../../parrot@exe@
@@ -141,9 +142,9 @@ help:
 	@echo ""
 
 gen_tests:
-	@mv Parrot_gen Parrot
+	@$(MV) Parrot_gen Parrot
 	-@t/harness > /dev/null 2>&1
-	@mv Parrot Parrot_gen
+	@$(MV) Parrot Parrot_gen
 
 test: all
 	$(PERL) -Isrc -I../../src t/harness
