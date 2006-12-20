@@ -319,53 +319,48 @@ handle_numchars:
   goto next
 
 handle_decimal:
-  match = decimal(input, 'pos'=>input_pos, 'grammar'=>'TclExpr::Grammar')
-  unless match goto bad_match
-  $I0 = match.'to'()
-  $I1 = match.'from'()
-  $I2 = $I0 - $I1
-  input_pos += $I2     
-  $S0 = match
-  $P0 = __integer($S0)
-  bsr set_val
-  goto next
+  rule = decimal
+  goto do_integer
 
 handle_octal:
   rule = get_root_global ['parrot'; 'TclExpr::Grammar'], 'octal'
-  match = rule(input, 'pos'=>input_pos, 'grammar'=>'TclExpr::Grammar')
-  unless match goto bad_match
-  $I0 = match.'to'()
-  $I1 = match.'from'()
-  $I2 = $I0 - $I1
-  input_pos += $I2     
-  $S0 = match
-  $P0 = __integer($S0)
-  bsr set_val
-  goto next
+  goto do_integer
 
 handle_hex:
-  rule = get_root_global ['parrot'; 'TclExpr::Grammar'], 'hex'
+  rule = get_root_global ['parrot'; 'TclExpr::Grammar'], 'raw_hex'
   match = rule(input, 'pos'=>input_pos, 'grammar'=>'TclExpr::Grammar')
   unless match goto bad_match
   $I0 = match.'to'()
   $I1 = match.'from'()
   $I2 = $I0 - $I1
-  input_pos += $I2     
   $S0 = match
-  $P0 = __integer($S0)
-  bsr set_val
+  if width == 0 goto hex_width
+  if width >= $I2 goto hex_width
+  $S0 = substr $S0, 0, width
+  $I2 = width
+
+hex_width:
+  input_pos += $I2 
+  $P0 = __integer($S0, 'rawhex'=>1)
+  bsr set_val 
   goto next
 
 handle_integer:
   rule = get_root_global ['parrot'; 'TclExpr::Grammar'], 'integer'
+do_integer:
   match = rule(input, 'pos'=>input_pos, 'grammar'=>'TclExpr::Grammar')
   unless match goto bad_match
   $I0 = match.'to'()
   $I1 = match.'from'()
   $I2 = $I0 - $I1
-  input_pos += $I2     
   $S0 = match
-  $P1 = get_root_global [ '_tcl' ], '__integer'
+  if width == 0 goto integer_width
+  if width >= $I2 goto integer_width
+  $S0 = substr $S0, 0, width
+  $I2 = width
+
+integer_width:
+  input_pos += $I2 
   $P0 = __integer($S0)
   bsr set_val 
   goto next
@@ -392,6 +387,12 @@ done_float:
 handle_string:
   $I1 = find_cclass .CCLASS_WHITESPACE, input, input_pos, input_len
   $I2 = $I1 - input_pos
+  if width == 0 goto string_width
+  if width >= $I2 goto string_width
+  $I2 = width
+  $I1 = input_pos + width 
+ 
+string_width: 
   $S1 = substr input, input_pos, $I2
   input_pos = $I1
   $P0 = new .TclString

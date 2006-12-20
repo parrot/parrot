@@ -141,7 +141,15 @@ Given a PMC, get an integer from it.
 
 .sub __integer :multi(_)
   .param pmc value
-  
+  .param pmc rawhex :named ('rawhex') :optional 
+  .param int has_rawhex               :opt_flag
+
+  unless has_rawhex goto normal
+  $S0 = value
+  $S0 =  "0x" . $S0
+  value = $S0
+
+normal: 
   .local pmc integer
 
   push_eh not_integer_eh

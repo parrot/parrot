@@ -94,7 +94,8 @@ token decimal { [<[1..9]><[0..9]>*] }
 
 token binary  { 0<[bB]> ( <[01]>+ ) }
 token octal   { 0 [ <[0..7]> | <[89]><[0..9]>* <invalid_octal> ]* }
-token hex     { 0<[xX]> ( <[0..9A..Fa..f]>) + }
+token raw_hex  { <[0..9A..Fa..f]> + }
+token hex     { 0<[xX]> <raw_hex> }
 token integer { (<[+\-]>)? [ <decimal> | <binary> | <hex> | <octal> ] }
 
 token nullary_function { rand }
@@ -107,6 +108,7 @@ token unary_function {
 
 token binary_function { atan2 | fmod | hypot | pow }
 
+# XXX This should actually be a PIR rule so we can add more rules.
 token mathfunc {
   [ <binary_function> | <unary_function> | <nullary_function> 
   | ( <[a..zA..Z]>\w* )  \(  <unknown_math_function>  ]
