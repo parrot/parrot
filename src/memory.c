@@ -80,7 +80,7 @@ mem_sys_allocate_zeroed(size_t size)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
-    if (!ptr)
+    if (!ptr && size)
         PANIC("Out of mem");
     return ptr;
 }
@@ -93,7 +93,7 @@ mem__internal_allocate_zeroed(size_t size, const char *file, int line)
     fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n",
             size, ptr, file, line);
 #endif
-    if (!ptr)
+    if (!ptr && size)
         PANIC("Out of mem");
     return ptr;
 }

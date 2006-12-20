@@ -670,7 +670,7 @@ build_call_func(Interp *interp, PMC *pmc_nci,
     iglobals = interp->iglobals;
 
     if (PMC_IS_NULL(iglobals))
-        PANIC("iglobals isnÄt created yet");
+        PANIC("iglobals isn't created yet");
     HashPointer = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_NCI_FUNCS);
 
