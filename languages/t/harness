@@ -111,6 +111,7 @@ my @unified_testable_languages
               punie
               regex
               scheme
+              tcl
               unlambda
               urm
               WMLScript
