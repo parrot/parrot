@@ -39,7 +39,7 @@ find_meth(Interp* interp, PMC *obj, const char *name) {
         meta = VTABLE_getprop(interp, obj,
                               const_string(interp, "__metatable"));
         if (meta != NULL && meta->pmc_ext != NULL
-         && dynpmc_LuaTable != meta->vtable->base_type) { 
+         && dynpmc_LuaTable != meta->vtable->base_type) {
             return meta;
         }
     }

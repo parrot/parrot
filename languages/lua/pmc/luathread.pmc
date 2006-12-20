@@ -65,11 +65,11 @@ Defaults iteration mode to iterate from start.
 
 */
     void init_pmc (PMC* sub) {
-        INTVAL type = pmc_type(INTERP, 
+        INTVAL type = pmc_type(INTERP,
                           const_string(INTERP, "Parrot::Coroutine"));
         if (type)
             PMC_pmc_val(SELF) = pmc_new_init(INTERP, type, sub);
-        else 
+        else
             real_exception(INTERP, NULL, E_Exception,
                            "Parrot::Coroutine not found");
     }

@@ -423,7 +423,7 @@ MMD_DEFAULT: {
 */
     METHOD PMC* get_metatable() {
         PMC* retval = VTABLE_getprop(INTERP, SELF, lua_metatable);
-        if (retval != NULL && retval->vtable->base_type == dynpmc_LuaTable) 
+        if (retval != NULL && retval->vtable->base_type == dynpmc_LuaTable)
             return retval;
         else
             return pmc_new(INTERP, dynpmc_LuaNil);
