@@ -1,0 +1,557 @@
+/*
+Copyright (C) 2005-2006, The Perl Foundation.
+$Id: luatable.pmc 15169 2006-11-07 17:08:36Z fperrad $
+
+=head1 NAME
+
+pmc/luatable.pmc - Lua Table
+
+=head1 DESCRIPTION
+
+C<LuaTable> extends C<LuaBase> to provide a class with the behaviour of
+the Lua C<Table> type.
+
+TRIVIAL IMPLEMENTATION : C<Table> is just a Parrot C<Hash>, like in Lua 4.0.
+Now, Lua 5.0 uses a hybrid data structure with a Hash part and an Array part.
+
+=head2 Overloaded Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+static STRING *luatable_name;
+static STRING *lua_metatable;
+extern INTVAL dynpmc_LuaBoolean;
+extern INTVAL dynpmc_LuaNil;
+extern INTVAL dynpmc_LuaNumber;
+extern INTVAL dynpmc_LuaString;
+extern INTVAL dynpmc_LuaTable;
+
+extern PMC * find_meth(Interp* interp, PMC *obj, const char *name);
+
+
+static STRING* make_hash_key(Interp* interp, PMC* key)
+{
+    if (key == NULL) {
+        real_exception(interp, NULL, E_KeyError,
+                "LuaTable: Cannot use NULL key");
+        return NULL;
+    }
+
+    return string_concat(interp,
+            VTABLE_name(interp, key),
+            VTABLE_get_string(interp, key), 0);
+}
+
+static void _set(Interp* interp, PMC *obj, PMC* key, PMC* value)
+{
+    Hash* hash = PMC_struct_val(obj);
+    STRING* keystr = make_hash_key(interp, key);
+    if (dynpmc_LuaNil == value->vtable->base_type) {
+        parrot_hash_delete(interp, hash, keystr);
+    }
+    else {
+        PMC *newcopy = VTABLE_clone(interp, value);
+        parrot_hash_put(interp, hash, keystr, newcopy);
+    }
+}
+
+static PMC* _get(Interp* interp, PMC *obj, PMC* key)
+{
+    Hash* hash = PMC_struct_val(obj);
+    STRING* keystr = make_hash_key(interp, key);
+    return parrot_hash_get(interp, hash, keystr);
+}
+
+static INTVAL _has(Interp* interp, PMC *obj, PMC* key)
+{
+    Hash* hash = PMC_struct_val(obj);
+    STRING* keystr = make_hash_key(interp, key);
+    return parrot_hash_exists(interp, hash, keystr);
+}
+
+
+pmclass LuaTable
+    extends LuaAny
+    does hash
+    dynpmc
+    group lua_group
+    hll Lua {
+
+/* Class initialization. Caches constant strings & PMC that will be used later.
+*/
+    void class_init() {
+        if (pass) {
+            luatable_name = const_string(INTERP, "table");
+            lua_metatable = const_string(INTERP, "__metatable");
+        }
+    }
+
+/*
+
+=item C<void init()>
+
+Initializes the instance.
+
+=cut
+
+*/
+    void init () {
+        PMC_struct_val(SELF) = NULL;
+        PObj_custom_mark_destroy_SETALL(SELF);
+        parrot_new_pmc_hash(INTERP, SELF);
+    }
+
+/*
+
+=item C<void morph(INTVAL type)>
+
+Morphs the scalar to the specified type.
+
+=cut
+
+*/
+    void morph (INTVAL type) {
+        if (SELF->vtable->base_type == type)
+            return;
+        pmc_reuse(INTERP, SELF, type, 0);
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the hash as live.
+
+=cut
+
+*/
+    void mark () {
+        if (PMC_struct_val(SELF))
+            parrot_mark_hash(INTERP, PMC_struct_val(SELF));
+    }
+
+/*
+
+=item C<void destroy()>
+
+Free hash structure.
+
+=cut
+
+*/
+    void destroy () {
+        if (PMC_struct_val(SELF)) {
+            parrot_hash_destroy(INTERP, PMC_struct_val(SELF));
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
+
+/*
+
+=item C<STRING* name()>
+
+Return the string "table".
+
+=cut
+
+*/
+    STRING* name () {
+        return luatable_name;
+    }
+
+/*
+
+=item C<PMC* clone()>
+
+PMCs are always handled by-reference in Parrot. So, copying register contents
+only copies the reference to the PMC. For LuaString, LuaNumber, LuaBoolean,
+this is not correct, as Lua has by-value semantics for these types. In order
+to be able to handle register "move" instructions, this should be implemented
+using clone(). However, LuaTable and LuaFunction do have by-reference
+semantics. As you don't know the type during compile-time of an object, just
+always use clone() to copy register contents. LuaTable and LuaFunction should
+therefore only clone the reference to themselves, not make a deep copy.
+
+=cut
+
+*/
+    PMC* clone() {
+        return SELF;
+    }
+
+/*
+
+=item C<STRING* get_string()>
+
+=cut
+
+*/
+    STRING* get_string () {
+        return Parrot_sprintf_c(INTERP, "table: %08X", SELF);
+    }
+
+/*
+
+=item C<PMC* get_pmc_keyed (PMC* key)>
+
+C<table> accessor.
+
+A copy of the value is retrieved, otherwise, this could happen:
+
+    temp = table[key]
+    temp = <some other value>
+    temp2 = table[key]
+    # temp2 is now <some other value> due to the by-reference semantics of PMCs
+
+=cut
+
+*/
+    PMC* get_pmc_keyed (PMC* key) {
+        PMC* value = _get(INTERP, SELF, key);
+        if (value == NULL) {
+            PMC* meth = find_meth(INTERP, SELF, "__index");
+            if (meth != NULL) {
+                if (dynpmc_LuaTable == meth->vtable->base_type) {
+                    return VTABLE_get_pmc_keyed(INTERP, meth, key);
+                }
+                else {
+                    value = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                     SELF, key);
+                }
+            }
+        }
+        if (value == NULL) {
+            return pmc_new(INTERP, dynpmc_LuaNil);
+        }
+        else {
+            return VTABLE_clone(INTERP, value);
+        }
+    }
+
+/*
+
+=item C<void set_pmc_keyed (PMC* key, PMC* value)>
+
+C<table> mutator.
+
+A copy of the value is stored, otherwise, this could happen:
+
+    table[key] = value
+    value = <some other value>
+    temp = table[key]
+    # temp is now <some other value> due to the by-reference semantics of PMCs
+
+=cut
+
+*/
+    void set_pmc_keyed (PMC* key, PMC* value) {
+        if (dynpmc_LuaNil == key->vtable->base_type) {
+            real_exception(INTERP, NULL, 1, "table index is nil");
+        }
+        if (!_has(INTERP, SELF, key)) {
+            PMC* meth = find_meth(INTERP, SELF, "__newindex");
+            if (meth != NULL) {
+                if (dynpmc_LuaTable == meth->vtable->base_type) {
+                    VTABLE_set_pmc_keyed(INTERP, meth, key, value);
+                }
+                else {
+                    Parrot_runops_fromc_args(INTERP, meth, "vPPP",
+                                             SELF, key, value);
+                }
+                return;
+            }
+        }
+        _set(INTERP, SELF, key, value);
+    }
+
+/*
+
+=item C<INTVAL elements()>
+
+Returns the number of elements in the hash.
+
+=cut
+
+*/
+    INTVAL elements () {
+        return parrot_hash_size(INTERP, PMC_struct_val(SELF));
+    }
+
+/*
+
+=item C<void* invoke(void* next)>
+
+=cut
+
+*/
+    void* invoke(void* next) {
+        PMC* meth = find_meth(INTERP, SELF, "__call");
+        if (meth != NULL) {
+            /* fix me */
+            PMC* retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
+            if (NULL == retval) {
+                retval = pmc_new(INTERP, dynpmc_LuaNil);
+            }
+            return retval;
+        }
+        return SUPER(next);
+    }
+
+/*
+
+=back
+
+=head2 non-Vtable Methods
+
+=over 4
+
+=item C<INTVAL is_equal (PMC* value)>
+
+The C<==> operation. Compares reference (not in depth).
+
+=cut
+
+*/
+    INTVAL is_equal (PMC* value) {
+MMD_LuaTable: {
+            PMC* meth = find_meth(INTERP, SELF, "__eq");
+            if (meth != NULL) {
+                PMC* retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                       SELF, value);
+                if (NULL == retval) {
+                    return (INTVAL)0;
+                }
+                return VTABLE_get_bool(INTERP, retval);
+            }
+            if (SELF == value)
+                return (INTVAL)1;
+            else
+                return (INTVAL)0;
+        }
+MMD_DEFAULT: {
+            return (INTVAL)0;
+        }
+    }
+
+/*
+
+=item C<INTVAL cmp (PMC *value)>
+
+=cut
+
+*/
+    INTVAL cmp (PMC* value) {
+MMD_LuaTable: {
+#if 0
+            PMC* meth = find_meth(INTERP, SELF, "__cmp");
+            if (meth != NULL) {
+                PMC* retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                       SELF, value);
+                if (retval != NULL) {
+                    return (INTVAL)VTABLE_get_number(INTERP, retval);
+                }
+            }
+#else
+            PMC* _lt = find_meth(INTERP, SELF, "__lt");
+            if (_lt != NULL) {
+                PMC* retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
+                                                       SELF, value);
+                INTVAL r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval)
+                                            : (INTVAL)0;
+                if (r) {
+                    return (INTVAL)-1;
+                }
+                else {
+                    PMC* _le = find_meth(INTERP, SELF, "__le");
+                    if (_le != NULL) {
+                        retval = Parrot_runops_fromc_args(INTERP, _le, "PPP",
+                                                          SELF, value);
+                        r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval)
+                                             : (INTVAL)0;
+                        if (r) {
+                            return (INTVAL)0;
+                        }
+                        else {
+                            return (INTVAL)1;
+                        }
+                    }
+                    else {
+                        retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
+                                                          value, SELF);
+                        r = (retval != NULL) ? VTABLE_get_bool(INTERP, retval)
+                                             : (INTVAL)0;
+                        if (r) {
+                            return (INTVAL)1;
+                        }
+                        else {
+                            return (INTVAL)0;
+                        }
+                    }
+                }
+            }
+#endif
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to compare two table values");
+            return (INTVAL)0;
+        }
+MMD_DEFAULT: {
+            real_exception(INTERP, NULL, ILL_INHERIT,
+                    "attempt to compare table with %s",
+                    string_to_cstring(INTERP, VTABLE_name(INTERP, value)));
+            return (INTVAL)0;
+        }
+    }
+
+/*
+
+=back
+
+=head2 Specific Methods
+
+=over 4
+
+=item C<PMC *get_metatable()>
+
+=cut
+
+*/
+    METHOD PMC* get_metatable() {
+        PMC* retval = VTABLE_getprop(INTERP, SELF, lua_metatable);
+        if (retval != NULL && retval->vtable->base_type == dynpmc_LuaTable) 
+            return retval;
+        else
+            return pmc_new(INTERP, dynpmc_LuaNil);
+    }
+
+/*
+
+=item C<PMC* len()>
+
+=cut
+
+*/
+    METHOD PMC* len () {
+        PMC* retval;
+        PMC* meth = find_meth(INTERP, SELF, "__index");
+        if (meth != NULL) {
+            retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
+            if (NULL == retval) {
+                retval = pmc_new(INTERP, dynpmc_LuaNil);
+            }
+        }
+        else {
+            INTVAL idx = 1;
+            PMC* key = pmc_new(INTERP, dynpmc_LuaNumber);
+            retval = pmc_new(INTERP, dynpmc_LuaNumber);
+            VTABLE_set_integer_native(INTERP, key, idx);
+            while (_has(INTERP, SELF, key)) {
+                idx ++;
+                VTABLE_set_integer_native(INTERP, key, idx);
+            }
+            VTABLE_set_integer_native(INTERP, retval, idx - 1);
+        }
+        return retval;
+    }
+
+/*
+
+=item C<PMC* next(PMC* index)>
+
+=cut
+
+*/
+    METHOD PMC* next (PMC* index) {
+        return pmc_new(INTERP, dynpmc_LuaNil); /* TODO */
+    }
+
+/*
+
+=item C<PMC* rawequal (PMC* value)>
+
+=cut
+
+*/
+    METHOD PMC* rawequal (PMC* value) {
+        PMC* retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        if (SELF->vtable->base_type == value->vtable->base_type
+         && SELF == value)
+            PMC_int_val(retval) = 1;
+        else
+            PMC_int_val(retval) = 0;
+        return retval;
+    }
+
+/*
+
+=item C<PMC* rawget (PMC* key)>
+
+=cut
+
+*/
+    METHOD PMC* rawget (PMC* key) {
+        PMC* value = _get(INTERP, SELF, key);
+        if (value == NULL) {
+            return pmc_new(INTERP, dynpmc_LuaNil);
+        }
+        else {
+            return VTABLE_clone(INTERP, value);
+        }
+    }
+
+/*
+
+=item C<void rawset (PMC* key, PMC* value)>
+
+=cut
+
+*/
+    METHOD void rawset (PMC* key, PMC* value) {
+        if (dynpmc_LuaNil == key->vtable->base_type) {
+            real_exception(INTERP, NULL, 1, "table index is nil");
+        }
+        _set(INTERP, SELF, key, value);
+    }
+
+/*
+
+=item C<void set_metatable(PMC *meta)>
+
+=cut
+
+*/
+    METHOD void set_metatable(PMC *meta) {
+        if (dynpmc_LuaNil == meta->vtable->base_type) {
+            VTABLE_delprop(INTERP, SELF, lua_metatable);
+        }
+        else {
+            VTABLE_setprop(INTERP, SELF, lua_metatable, meta);
+        }
+    }
+
+}
+/*
+
+=back
+
+=head1 AUTHORS
+
+Francois Perrad
+
+Klaas-Jan Stol
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

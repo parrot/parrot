@@ -31,7 +31,6 @@ See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
 
 .sub 'init_debug' :load :anon
 
-    load_bytecode 'languages/lua/type/table.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Debug\n"
@@ -41,7 +40,7 @@ See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
     $P1 = new .LuaString
 
     .local pmc _debug
-    _debug = new [ 'table' ]
+    _debug = new .LuaTable
     $P1 = 'debug'
     _lua__GLOBAL[$P1] = _debug
 

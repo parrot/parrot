@@ -213,7 +213,7 @@ sub BuildTable {
     push @opcodes1, new NewOp(
         $parser,
         'result' => $result,
-        'arg1'   => "[ 'table' ]",
+        'arg1'   => ".LuaTable",
     );
     my $num_key;
     while ( my $field = shift @{$fields} ) {

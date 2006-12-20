@@ -50,7 +50,6 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 
 .sub 'init_math' :load :anon
 
-    load_bytecode 'languages/lua/type/table.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Math\n"
@@ -60,7 +59,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $P1 = new .LuaString
 
     .local pmc _math
-    _math = new [ 'table' ]
+    _math = new .LuaTable
     $P1 = 'math'
     _lua__GLOBAL[$P1] = _math
 

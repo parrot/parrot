@@ -23,6 +23,7 @@ C<LuaAny> provides an abstract base class for some Lua types.
 extern INTVAL dynpmc_LuaBoolean;
 extern INTVAL dynpmc_LuaNil;
 extern INTVAL dynpmc_LuaString;
+extern INTVAL dynpmc_LuaTable;
 
 extern PMC * find_meth(Interp* interp, PMC *obj, const char *name);
 
@@ -34,16 +35,15 @@ find_meth(Interp* interp, PMC *obj, const char *name) {
         meta = Parrot_find_global_cur(interp,
                                       const_string(interp, "mt_string"));
     }
-    else if (VTABLE_isa(interp, obj, const_string(interp, "base_lua"))) {
+    else {
         meta = VTABLE_getprop(interp, obj,
                               const_string(interp, "__metatable"));
         if (meta != NULL && meta->pmc_ext != NULL
-         && !VTABLE_isa(interp, meta, const_string(interp, "table"))) {
-            meta->vtable->isa(interp, meta, const_string(interp, "table"));
+         && dynpmc_LuaTable != meta->vtable->base_type) { 
             return meta;
         }
     }
-    if (meta != NULL && meta->pmc_ext != NULL) {
+    if (meta != NULL && dynpmc_LuaTable == meta->vtable->base_type) {
         PMC *method;
         PMC *key = pmc_new(interp, dynpmc_LuaString);
         PMC_str_val(key) = const_string(interp, name);
@@ -59,7 +59,8 @@ find_meth(Interp* interp, PMC *obj, const char *name) {
 pmclass LuaAny
     abstract
     dynpmc
-    group lua_group {
+    group lua_group
+    hll Lua {
 /*
 
 =item C<INTVAL get_bool()>

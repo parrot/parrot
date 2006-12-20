@@ -26,7 +26,6 @@ See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
 
 .sub 'init_table' :load :anon
 
-    load_bytecode 'languages/lua/type/table.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua Table\n"
@@ -36,7 +35,7 @@ See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
     $P1 = new .LuaString
 
     .local pmc _table
-    _table = new [ 'table' ]
+    _table = new .LuaTable
     $P1 = 'table'
     _lua__GLOBAL[$P1] = _table
 

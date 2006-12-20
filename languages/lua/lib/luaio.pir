@@ -36,8 +36,6 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
 .sub 'init_io' :load :anon
 
-    load_bytecode 'languages/lua/type/table.pbc'
-    load_bytecode 'languages/lua/type/userdata.pir'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua I/O\n"
@@ -47,7 +45,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     $P1 = new .LuaString
 
     .local pmc _io
-    _io = new [ 'table' ]
+    _io = new .LuaTable
     $P1 = 'io'
     _lua__GLOBAL[$P1] = _io
 
@@ -100,7 +98,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     #
 
     .local pmc _file
-    _file = new [ 'table' ]
+    _file = new .LuaTable
 
     .const .Sub _file_close = '_io_close'
     $P1 = 'close'
@@ -135,7 +133,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 #    _file[$P1] = _file__tostring
 
     .local pmc _lua_mt_file
-    _lua_mt_file = new [ 'table' ]
+    _lua_mt_file = new .LuaTable
     $P1 = '__index'
     _lua_mt_file[$P1] = _file
 
@@ -160,7 +158,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
     $P1 = 'stdin'
     $P2 = getstdin
-    $P0 = new [ 'userdata' ]
+    $P0 = new .LuaUserdata
     setattribute $P0, 'data', $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
@@ -169,7 +167,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
     $P1 = 'stdout'
     $P2 = getstdout
-    $P0 = new [ 'userdata' ]
+    $P0 = new .LuaUserdata
     setattribute $P0, 'data', $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
@@ -178,7 +176,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
     $P1 = 'stderr'
     $P2 = getstderr
-    $P0 = new [ 'userdata' ]
+    $P0 = new .LuaUserdata
     setattribute $P0, 'data', $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
@@ -241,7 +239,7 @@ L0:
     _lua__REGISTRY = global '_REGISTRY'
     .const .LuaString key = 'file'
     mt = _lua__REGISTRY[key]
-    file = new [ 'userdata' ]
+    file = new .LuaUserdata
     file.'set_metatable'(mt)
     .return (file)
 .end
@@ -311,7 +309,7 @@ L2:
     .local pmc mt
     .local pmc mt_file
     .local pmc ret
-    $I0 = isa file, 'userdata'
+    $I0 = isa file, 'LuaUserdata'
     $S0 = typeof file
     unless $I0 goto L1
     mt = file.'get_metatable'()

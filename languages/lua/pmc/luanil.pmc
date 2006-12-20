@@ -35,6 +35,7 @@ INTVAL dynpmc_LuaBoolean;
 INTVAL dynpmc_LuaNil;
 INTVAL dynpmc_LuaNumber;
 INTVAL dynpmc_LuaString;
+INTVAL dynpmc_LuaTable;
 
 pmclass LuaNil
     extends LuaAny
@@ -57,6 +58,8 @@ pmclass LuaNil
               const_string(INTERP, "LuaNumber"));
             dynpmc_LuaString = pmc_type(INTERP,
               const_string(INTERP, "LuaString"));
+            dynpmc_LuaTable = pmc_type(INTERP,
+              const_string(INTERP, "LuaTable"));
         }
     }
 

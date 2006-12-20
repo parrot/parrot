@@ -8,7 +8,6 @@ TGE      = $(PARROT) ../../compilers/tge/tgc.pir
 PMCBUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl
 LIBPATH  = lib
 PMCDIR   = pmc
-TYPEPATH = type
 O        = @o@
 LOAD_EXT = @load_ext@
 PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
@@ -21,7 +20,10 @@ PMCS = \
  luafunction \
  luanil \
  luanumber \
- luastring
+ luastring \
+ luatable \
+ luathread \
+ luauserdata
 
 PMC_FILES = \
  $(PMCDIR)/lua.pmc \
@@ -31,13 +33,10 @@ PMC_FILES = \
  $(PMCDIR)/luafunction.pmc \
  $(PMCDIR)/luanil.pmc \
  $(PMCDIR)/luanumber.pmc \
- $(PMCDIR)/luastring.pmc
-
-TYPE_PBCS = \
- $(TYPEPATH)/base_lua.pbc \
- $(TYPEPATH)/table.pbc \
- $(TYPEPATH)/thread.pbc \
- $(TYPEPATH)/userdata.pbc
+ $(PMCDIR)/luastring.pmc \
+ $(PMCDIR)/luatable.pmc \
+ $(PMCDIR)/luathread.pmc \
+ $(PMCDIR)/luauserdata.pmc
 
 LIB_PBCS = \
  $(LIBPATH)/luaaux.pbc \
@@ -63,7 +62,6 @@ GEN_PBC = \
 
 all: \
  pmc/lua_group$(LOAD_EXT) \
- $(TYPE_PBCS) \
  $(LIB_PBCS) \
  $(GEN_PBC) \
  Lua/parser.pm
@@ -93,18 +91,6 @@ pmc/lua_group$(LOAD_EXT) : $(PMC_FILES)
 	@cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
-
-$(TYPEPATH)/base_lua.pbc: $(TYPEPATH)/base_lua.pir
-	$(PARROT) --output=$(TYPEPATH)/base_lua.pbc $(TYPEPATH)/base_lua.pir
-
-$(TYPEPATH)/table.pbc: $(TYPEPATH)/table.pir
-	$(PARROT) --output=$(TYPEPATH)/table.pbc $(TYPEPATH)/table.pir
-
-$(TYPEPATH)/thread.pbc: $(TYPEPATH)/thread.pir
-	$(PARROT) --output=$(TYPEPATH)/thread.pbc $(TYPEPATH)/thread.pir
-
-$(TYPEPATH)/userdata.pbc: $(TYPEPATH)/userdata.pir
-	$(PARROT) --output=$(TYPEPATH)/userdata.pbc $(TYPEPATH)/userdata.pir
 
 $(LIBPATH)/luaaux.pbc: $(LIBPATH)/luaaux.pir
 	$(PARROT) --output=$(LIBPATH)/luaaux.pbc $(LIBPATH)/luaaux.pir
@@ -163,7 +149,6 @@ test:
 
 TEST_CLEANERS = \
  "t/pmc/*.pir" \
- "t/type/*.pir" \
  "t/*.pir" \
  "t/*.lua" \
  "t/*.orig_out" \
@@ -180,7 +165,6 @@ BUILD_CLEANERS = \
  "$(PMCDIR)/*.h" \
  "$(PMCDIR)/*$(LOAD_EXT)" \
  "$(PMCDIR)/*$(O)" \
- "$(TYPEPATH)/*.pbc" \
  "$(LIBPATH)/*.pbc"
 
 clean:

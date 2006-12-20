@@ -22,9 +22,8 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
 
 .sub 'init_coroutine' :load :anon
 
-    load_bytecode 'languages/lua/type/table.pbc'
-    load_bytecode 'languages/lua/type/thread.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
+    load_bytecode 'Parrot/Coroutine.pbc'
 
 #    print "init Lua Coroutine\n"
 
@@ -33,7 +32,7 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
     $P1 = new .LuaString
 
     .local pmc _coroutine
-    _coroutine = new [ 'table' ]
+    _coroutine = new .LuaTable
     $P1 = 'coroutine'
     _lua__GLOBAL[$P1] = _coroutine
 
@@ -81,8 +80,7 @@ Returns this new coroutine, an object with type C<"thread">.
     if $I0 goto L1
     argerror('Lua function expected')
 L1:
-    ret = new 'thread'
-    ret.'init_pmc'(f)
+    ret = new .LuaThread, f
     .return (ret)
 .end
 
@@ -111,8 +109,16 @@ C<resume> returns B<false> plus the error message.
     new status, .LuaBoolean
     checktype(co, 'thread')
     push co_stack, co
+    $P0 = getattribute co, 'co'
+    $P1 = getattribute $P0, 'state'
+    if $P1 goto L1
+    status = 0
+    .const .LuaString msg = "cannot resume dead coroutine"
+    $P0 = pop co_stack
+    .return (status, msg)
+L1:
     push_eh _handler
-    (ret :slurpy) = co.'resume'(argv :flat)
+    (ret :slurpy) = $P0.'resume'(argv :flat)
     status = 1
     .return (status, ret :flat)
 _handler:
@@ -213,7 +219,8 @@ Any arguments to C<yield> are passed as extra results to C<resume>.
     .local pmc co_stack
     co_stack = global '_COROUTINE_STACK'
     co = pop co_stack 
-    (ret :slurpy) = co.'yield'(argv :flat)
+    $P0 = getattribute co, 'co'
+    (ret :slurpy) = $P0.'yield'(argv :flat)
     .return (ret :flat)
 .end
 

@@ -32,7 +32,6 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
 
 .sub 'init_string' :load :anon
 
-    load_bytecode 'languages/lua/type/table.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
 
 #    print "init Lua String\n"
@@ -42,7 +41,7 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
     $P1 = new .LuaString
 
     .local pmc _string
-    _string = new [ 'table' ]
+    _string = new .LuaTable
     $P1 = 'string'
     _lua__GLOBAL[$P1] = _string
 
@@ -104,7 +103,7 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
 
 
     .local pmc _lua_mt_string
-    _lua_mt_string = new [ 'table' ]
+    _lua_mt_string = new .LuaTable
     global 'mt_string' = _lua_mt_string
     $P1 = '__index'
     _lua_mt_string[$P1] = _string
