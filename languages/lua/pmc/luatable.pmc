@@ -56,8 +56,10 @@ static void _set(Interp* interp, PMC *obj, PMC* key, PMC* value)
         parrot_hash_delete(interp, hash, keystr);
     }
     else {
-        PMC *newcopy = VTABLE_clone(interp, value);
-        parrot_hash_put(interp, hash, keystr, newcopy);
+        PMC* pair = pmc_new(interp, enum_class_Pair);
+        PMC_struct_val(pair) = VTABLE_clone(interp, key);
+        PMC_pmc_val(pair) = VTABLE_clone(interp, value);
+        parrot_hash_put(interp, hash, keystr, pair);
     }
 }
 
@@ -65,7 +67,11 @@ static PMC* _get(Interp* interp, PMC *obj, PMC* key)
 {
     Hash* hash = PMC_struct_val(obj);
     STRING* keystr = make_hash_key(interp, key);
-    return parrot_hash_get(interp, hash, keystr);
+    PMC* pair = parrot_hash_get(interp, hash, keystr);
+    if (pair != NULL)
+        return PMC_pmc_val(pair);
+    else
+        return NULL;
 }
 
 static INTVAL _has(Interp* interp, PMC *obj, PMC* key)
