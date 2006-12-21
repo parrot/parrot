@@ -1,4 +1,4 @@
-// $ANTLR 3.0b4 grammar/antlr_3/antlr_past2pir_past.g 2006-08-24 23:24:16
+// $ANTLR 3.0b5 grammar/antlr_3/antlr_past2pir_past.g 2006-12-21 20:39:41
 
   import java.util.regex.*;
 
@@ -8,7 +8,7 @@ import org.antlr.runtime.tree.*;import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
 
-public class AntlrPast2PirPast extends TreeParser {
+public class antlr_past2pir_pastTreeParser extends TreeParser {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ARRAY", "FUNCTION", "PRINT", "PROGRAM", "STMTS", "VAR", "NEWLINE", "STRING", "LETTER", "INTEGER", "NUMBER", "MINUS", "PLUS", "MUL_OP", "ASSIGN_OP", "REL_OP", "INCR", "DECR", "Define", "Break", "Quit", "Length", "Return", "For", "If", "While", "Sqrt", "Scale", "Ibase", "Obase", "Auto", "ML_COMMENT", "WS", "';'", "'('", "')'", "'{'", "'}'", "'['", "']'", "','"
     };
@@ -47,7 +47,7 @@ public class AntlrPast2PirPast extends TreeParser {
     public static final int For=27;
     public static final int Return=26;
 
-        public AntlrPast2PirPast(TreeNodeStream input) {
+        public antlr_past2pir_pastTreeParser(TreeNodeStream input) {
             super(input);
         }
         
@@ -210,7 +210,7 @@ public class AntlrPast2PirPast extends TreeParser {
             recover(input,re);
         }
         finally {
-        }
+       }
         return ;
     }
     // $ANTLR end gen_pir_past
@@ -609,7 +609,7 @@ public class AntlrPast2PirPast extends TreeParser {
             recover(input,re);
         }
         finally {
-        }
+       }
         return ;
     }
     // $ANTLR end node

@@ -4,12 +4,12 @@
 // Transform ANTLR PAST to PIR that sets up a PAST data structure
 // let the Parrot Compiler Tools handle the execution.
 
-tree grammar AntlrPast2PirPast;
+tree grammar antlr_past2pir_past;
 
 options
 {
   ASTLabelType = CommonTree;
-  tokenVocab   = BcParser;      // Token file is found because of '-lib' option
+  tokenVocab   = bc;      // Token file is found because of '-lib' option
 }
 
 

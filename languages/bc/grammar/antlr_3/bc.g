@@ -8,7 +8,7 @@
 
 // The starting rule is 'program'
 
-grammar BcParser;
+grammar bc;
 
 options 
 {
@@ -73,7 +73,7 @@ Auto       : 'auto';
 ML_COMMENT
   : '/*' ( options {greedy=false;} : . )* '*/'
     {
-      channel = 99;       // send into nirwana 
+      $channel = HIDDEN;       // send into nirwana 
     }
   ;
 
@@ -81,7 +81,7 @@ ML_COMMENT
 WS
   : ( ' ' | '\t' )+
     {
-      channel = 99;       // send into nirwana 
+      $channel = HIDDEN;       // send into nirwana 
     }
   ;    
 

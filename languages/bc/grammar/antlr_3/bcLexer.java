@@ -1,11 +1,11 @@
-// $ANTLR 3.0b4 grammar/antlr_3/bc.g 2006-08-24 23:24:14
+// $ANTLR 3.0b5 grammar/antlr_3/bc.g 2006-12-21 20:39:40
 
 import org.antlr.runtime.*;
 import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
 
-public class BcParserLexer extends Lexer {
+public class bcLexer extends Lexer {
     public static final int MINUS=15;
     public static final int INCR=20;
     public static final int ARRAY=4;
@@ -49,8 +49,8 @@ public class BcParserLexer extends Lexer {
     public static final int Tokens=45;
     public static final int For=27;
     public static final int Return=26;
-    public BcParserLexer() {;} 
-    public BcParserLexer(CharStream input) {
+    public bcLexer() {;} 
+    public bcLexer(CharStream input) {
         super(input);
     }
     public String getGrammarFileName() { return "grammar/antlr_3/bc.g"; }
@@ -59,11 +59,11 @@ public class BcParserLexer extends Lexer {
     public void mT37() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = T37;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
+            int _type = T37;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
             // grammar/antlr_3/bc.g:3:7: ( ';' )
             // grammar/antlr_3/bc.g:3:7: ';'
             {
@@ -74,7 +74,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -88,11 +88,11 @@ public class BcParserLexer extends Lexer {
     public void mT38() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = T38;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
+            int _type = T38;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
             // grammar/antlr_3/bc.g:4:7: ( '(' )
             // grammar/antlr_3/bc.g:4:7: '('
             {
@@ -103,7 +103,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -117,11 +117,11 @@ public class BcParserLexer extends Lexer {
     public void mT39() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = T39;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
+            int _type = T39;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
             // grammar/antlr_3/bc.g:5:7: ( ')' )
             // grammar/antlr_3/bc.g:5:7: ')'
             {
@@ -132,7 +132,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -146,11 +146,11 @@ public class BcParserLexer extends Lexer {
     public void mT40() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = T40;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
+            int _type = T40;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
             // grammar/antlr_3/bc.g:6:7: ( '{' )
             // grammar/antlr_3/bc.g:6:7: '{'
             {
@@ -161,7 +161,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -175,11 +175,11 @@ public class BcParserLexer extends Lexer {
     public void mT41() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = T41;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
+            int _type = T41;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
             // grammar/antlr_3/bc.g:7:7: ( '}' )
             // grammar/antlr_3/bc.g:7:7: '}'
             {
@@ -190,7 +190,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -204,11 +204,11 @@ public class BcParserLexer extends Lexer {
     public void mT42() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = T42;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
+            int _type = T42;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
             // grammar/antlr_3/bc.g:8:7: ( '[' )
             // grammar/antlr_3/bc.g:8:7: '['
             {
@@ -219,7 +219,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -233,11 +233,11 @@ public class BcParserLexer extends Lexer {
     public void mT43() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = T43;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
+            int _type = T43;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
             // grammar/antlr_3/bc.g:9:7: ( ']' )
             // grammar/antlr_3/bc.g:9:7: ']'
             {
@@ -248,7 +248,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -262,11 +262,11 @@ public class BcParserLexer extends Lexer {
     public void mT44() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = T44;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
+            int _type = T44;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
             // grammar/antlr_3/bc.g:10:7: ( ',' )
             // grammar/antlr_3/bc.g:10:7: ','
             {
@@ -277,7 +277,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -291,15 +291,15 @@ public class BcParserLexer extends Lexer {
     public void mNEWLINE() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = NEWLINE;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:32:11: ( ( '\\r' )? ( '\\n' )+ )
-            // grammar/antlr_3/bc.g:32:11: ( '\\r' )? ( '\\n' )+
+            int _type = NEWLINE;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:31:11: ( ( '\\r' )? ( '\\n' )+ )
+            // grammar/antlr_3/bc.g:31:11: ( '\\r' )? ( '\\n' )+
             {
-            // grammar/antlr_3/bc.g:32:11: ( '\\r' )?
+            // grammar/antlr_3/bc.g:31:11: ( '\\r' )?
             int alt1=2;
             int LA1_0 = input.LA(1);
             if ( (LA1_0=='\r') ) {
@@ -307,7 +307,7 @@ public class BcParserLexer extends Lexer {
             }
             switch (alt1) {
                 case 1 :
-                    // grammar/antlr_3/bc.g:32:12: '\\r'
+                    // grammar/antlr_3/bc.g:31:12: '\\r'
                     {
                     match('\r'); 
 
@@ -316,7 +316,7 @@ public class BcParserLexer extends Lexer {
 
             }
 
-            // grammar/antlr_3/bc.g:32:19: ( '\\n' )+
+            // grammar/antlr_3/bc.g:31:19: ( '\\n' )+
             int cnt2=0;
             loop2:
             do {
@@ -329,7 +329,7 @@ public class BcParserLexer extends Lexer {
 
                 switch (alt2) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:32:19: '\\n'
+            	    // grammar/antlr_3/bc.g:31:19: '\\n'
             	    {
             	    match('\n'); 
 
@@ -351,7 +351,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -365,16 +365,16 @@ public class BcParserLexer extends Lexer {
     public void mSTRING() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = STRING;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:35:10: ( '\\\"' (~ '\\\"' )* '\\\"' )
-            // grammar/antlr_3/bc.g:35:10: '\\\"' (~ '\\\"' )* '\\\"'
+            int _type = STRING;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:34:10: ( '\\\"' (~ '\\\"' )* '\\\"' )
+            // grammar/antlr_3/bc.g:34:10: '\\\"' (~ '\\\"' )* '\\\"'
             {
             match('\"'); 
-            // grammar/antlr_3/bc.g:35:15: (~ '\\\"' )*
+            // grammar/antlr_3/bc.g:34:15: (~ '\\\"' )*
             loop3:
             do {
                 int alt3=2;
@@ -386,7 +386,7 @@ public class BcParserLexer extends Lexer {
 
                 switch (alt3) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:35:17: ~ '\\\"'
+            	    // grammar/antlr_3/bc.g:34:17: ~ '\\\"'
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
@@ -414,7 +414,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -428,13 +428,13 @@ public class BcParserLexer extends Lexer {
     public void mLETTER() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = LETTER;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:37:10: ( 'a' .. 'z' )
-            // grammar/antlr_3/bc.g:37:10: 'a' .. 'z'
+            int _type = LETTER;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:36:10: ( 'a' .. 'z' )
+            // grammar/antlr_3/bc.g:36:10: 'a' .. 'z'
             {
             matchRange('a','z'); 
 
@@ -443,7 +443,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -457,10 +457,10 @@ public class BcParserLexer extends Lexer {
     public void mINTEGER() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // grammar/antlr_3/bc.g:40:11: ( ( ('0'..'9'|'A'..'F'))+ )
-            // grammar/antlr_3/bc.g:40:11: ( ('0'..'9'|'A'..'F'))+
+            // grammar/antlr_3/bc.g:39:11: ( ( ('0'..'9'|'A'..'F'))+ )
+            // grammar/antlr_3/bc.g:39:11: ( ('0'..'9'|'A'..'F'))+
             {
-            // grammar/antlr_3/bc.g:40:11: ( ('0'..'9'|'A'..'F'))+
+            // grammar/antlr_3/bc.g:39:11: ( ('0'..'9'|'A'..'F'))+
             int cnt4=0;
             loop4:
             do {
@@ -473,7 +473,7 @@ public class BcParserLexer extends Lexer {
 
                 switch (alt4) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:40:12: ('0'..'9'|'A'..'F')
+            	    // grammar/antlr_3/bc.g:39:12: ('0'..'9'|'A'..'F')
             	    {
             	    if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='F') ) {
             	        input.consume();
@@ -512,12 +512,12 @@ public class BcParserLexer extends Lexer {
     public void mNUMBER() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = NUMBER;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:43:7: ( INTEGER ( '.' INTEGER )? | '.' INTEGER )
+            int _type = NUMBER;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:42:7: ( INTEGER ( '.' INTEGER )? | '.' INTEGER )
             int alt6=2;
             int LA6_0 = input.LA(1);
             if ( ((LA6_0>='0' && LA6_0<='9')||(LA6_0>='A' && LA6_0<='F')) ) {
@@ -528,16 +528,16 @@ public class BcParserLexer extends Lexer {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("42:1: NUMBER : ( INTEGER ( '.' INTEGER )? | '.' INTEGER );", 6, 0, input);
+                    new NoViableAltException("41:1: NUMBER : ( INTEGER ( '.' INTEGER )? | '.' INTEGER );", 6, 0, input);
 
                 throw nvae;
             }
             switch (alt6) {
                 case 1 :
-                    // grammar/antlr_3/bc.g:43:7: INTEGER ( '.' INTEGER )?
+                    // grammar/antlr_3/bc.g:42:7: INTEGER ( '.' INTEGER )?
                     {
                     mINTEGER(); 
-                    // grammar/antlr_3/bc.g:43:15: ( '.' INTEGER )?
+                    // grammar/antlr_3/bc.g:42:15: ( '.' INTEGER )?
                     int alt5=2;
                     int LA5_0 = input.LA(1);
                     if ( (LA5_0=='.') ) {
@@ -545,7 +545,7 @@ public class BcParserLexer extends Lexer {
                     }
                     switch (alt5) {
                         case 1 :
-                            // grammar/antlr_3/bc.g:43:16: '.' INTEGER
+                            // grammar/antlr_3/bc.g:42:16: '.' INTEGER
                             {
                             match('.'); 
                             mINTEGER(); 
@@ -559,7 +559,7 @@ public class BcParserLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // grammar/antlr_3/bc.g:44:7: '.' INTEGER
+                    // grammar/antlr_3/bc.g:43:7: '.' INTEGER
                     {
                     match('.'); 
                     mINTEGER(); 
@@ -571,7 +571,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -585,13 +585,13 @@ public class BcParserLexer extends Lexer {
     public void mMINUS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = MINUS;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:47:14: ( '-' )
-            // grammar/antlr_3/bc.g:47:14: '-'
+            int _type = MINUS;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:46:14: ( '-' )
+            // grammar/antlr_3/bc.g:46:14: '-'
             {
             match('-'); 
 
@@ -600,7 +600,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -614,13 +614,13 @@ public class BcParserLexer extends Lexer {
     public void mPLUS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = PLUS;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:48:14: ( '+' )
-            // grammar/antlr_3/bc.g:48:14: '+'
+            int _type = PLUS;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:47:14: ( '+' )
+            // grammar/antlr_3/bc.g:47:14: '+'
             {
             match('+'); 
 
@@ -629,7 +629,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -643,13 +643,13 @@ public class BcParserLexer extends Lexer {
     public void mMUL_OP() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = MUL_OP;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:50:12: ( ('*'|'/'|'%'))
-            // grammar/antlr_3/bc.g:50:14: ('*'|'/'|'%')
+            int _type = MUL_OP;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:49:12: ( ('*'|'/'|'%'))
+            // grammar/antlr_3/bc.g:49:14: ('*'|'/'|'%')
             {
             if ( input.LA(1)=='%'||input.LA(1)=='*'||input.LA(1)=='/' ) {
                 input.consume();
@@ -667,7 +667,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -681,12 +681,12 @@ public class BcParserLexer extends Lexer {
     public void mASSIGN_OP() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = ASSIGN_OP;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:51:14: ( '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' )
+            int _type = ASSIGN_OP;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:50:14: ( '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' )
             int alt7=7;
             switch ( input.LA(1) ) {
             case '=':
@@ -712,21 +712,21 @@ public class BcParserLexer extends Lexer {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("51:1: ASSIGN_OP : ( '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' );", 7, 0, input);
+                    new NoViableAltException("50:1: ASSIGN_OP : ( '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' );", 7, 0, input);
 
                 throw nvae;
             }
 
             switch (alt7) {
                 case 1 :
-                    // grammar/antlr_3/bc.g:51:14: '='
+                    // grammar/antlr_3/bc.g:50:14: '='
                     {
                     match('='); 
 
                     }
                     break;
                 case 2 :
-                    // grammar/antlr_3/bc.g:51:21: '+='
+                    // grammar/antlr_3/bc.g:50:21: '+='
                     {
                     match("+="); 
 
@@ -734,7 +734,7 @@ public class BcParserLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // grammar/antlr_3/bc.g:51:28: '-='
+                    // grammar/antlr_3/bc.g:50:28: '-='
                     {
                     match("-="); 
 
@@ -742,7 +742,7 @@ public class BcParserLexer extends Lexer {
                     }
                     break;
                 case 4 :
-                    // grammar/antlr_3/bc.g:51:35: '*='
+                    // grammar/antlr_3/bc.g:50:35: '*='
                     {
                     match("*="); 
 
@@ -750,7 +750,7 @@ public class BcParserLexer extends Lexer {
                     }
                     break;
                 case 5 :
-                    // grammar/antlr_3/bc.g:51:42: '/='
+                    // grammar/antlr_3/bc.g:50:42: '/='
                     {
                     match("/="); 
 
@@ -758,7 +758,7 @@ public class BcParserLexer extends Lexer {
                     }
                     break;
                 case 6 :
-                    // grammar/antlr_3/bc.g:51:49: '%='
+                    // grammar/antlr_3/bc.g:50:49: '%='
                     {
                     match("%="); 
 
@@ -766,7 +766,7 @@ public class BcParserLexer extends Lexer {
                     }
                     break;
                 case 7 :
-                    // grammar/antlr_3/bc.g:51:56: '^='
+                    // grammar/antlr_3/bc.g:50:56: '^='
                     {
                     match("^="); 
 
@@ -778,7 +778,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -792,12 +792,12 @@ public class BcParserLexer extends Lexer {
     public void mREL_OP() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = REL_OP;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:52:14: ( '==' | '<=' | '>=' | '!=' | '<' | '>' )
+            int _type = REL_OP;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:51:14: ( '==' | '<=' | '>=' | '!=' | '<' | '>' )
             int alt8=6;
             switch ( input.LA(1) ) {
             case '=':
@@ -824,14 +824,14 @@ public class BcParserLexer extends Lexer {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("52:1: REL_OP : ( '==' | '<=' | '>=' | '!=' | '<' | '>' );", 8, 0, input);
+                    new NoViableAltException("51:1: REL_OP : ( '==' | '<=' | '>=' | '!=' | '<' | '>' );", 8, 0, input);
 
                 throw nvae;
             }
 
             switch (alt8) {
                 case 1 :
-                    // grammar/antlr_3/bc.g:52:14: '=='
+                    // grammar/antlr_3/bc.g:51:14: '=='
                     {
                     match("=="); 
 
@@ -839,7 +839,7 @@ public class BcParserLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // grammar/antlr_3/bc.g:52:21: '<='
+                    // grammar/antlr_3/bc.g:51:21: '<='
                     {
                     match("<="); 
 
@@ -847,7 +847,7 @@ public class BcParserLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // grammar/antlr_3/bc.g:52:28: '>='
+                    // grammar/antlr_3/bc.g:51:28: '>='
                     {
                     match(">="); 
 
@@ -855,7 +855,7 @@ public class BcParserLexer extends Lexer {
                     }
                     break;
                 case 4 :
-                    // grammar/antlr_3/bc.g:52:35: '!='
+                    // grammar/antlr_3/bc.g:51:35: '!='
                     {
                     match("!="); 
 
@@ -863,14 +863,14 @@ public class BcParserLexer extends Lexer {
                     }
                     break;
                 case 5 :
-                    // grammar/antlr_3/bc.g:52:42: '<'
+                    // grammar/antlr_3/bc.g:51:42: '<'
                     {
                     match('<'); 
 
                     }
                     break;
                 case 6 :
-                    // grammar/antlr_3/bc.g:52:49: '>'
+                    // grammar/antlr_3/bc.g:51:49: '>'
                     {
                     match('>'); 
 
@@ -881,7 +881,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -895,13 +895,13 @@ public class BcParserLexer extends Lexer {
     public void mINCR() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = INCR;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:53:14: ( '++' )
-            // grammar/antlr_3/bc.g:53:14: '++'
+            int _type = INCR;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:52:14: ( '++' )
+            // grammar/antlr_3/bc.g:52:14: '++'
             {
             match("++"); 
 
@@ -911,7 +911,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -925,13 +925,13 @@ public class BcParserLexer extends Lexer {
     public void mDECR() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = DECR;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:54:14: ( '--' )
-            // grammar/antlr_3/bc.g:54:14: '--'
+            int _type = DECR;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:53:14: ( '--' )
+            // grammar/antlr_3/bc.g:53:14: '--'
             {
             match("--"); 
 
@@ -941,7 +941,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -955,13 +955,13 @@ public class BcParserLexer extends Lexer {
     public void mDefine() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = Define;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:56:14: ( 'define' )
-            // grammar/antlr_3/bc.g:56:14: 'define'
+            int _type = Define;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:55:14: ( 'define' )
+            // grammar/antlr_3/bc.g:55:14: 'define'
             {
             match("define"); 
 
@@ -971,7 +971,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -985,13 +985,13 @@ public class BcParserLexer extends Lexer {
     public void mBreak() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = Break;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:57:14: ( 'break' )
-            // grammar/antlr_3/bc.g:57:14: 'break'
+            int _type = Break;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:56:14: ( 'break' )
+            // grammar/antlr_3/bc.g:56:14: 'break'
             {
             match("break"); 
 
@@ -1001,7 +1001,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -1015,13 +1015,13 @@ public class BcParserLexer extends Lexer {
     public void mQuit() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = Quit;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:60:14: ( 'quit' )
-            // grammar/antlr_3/bc.g:60:14: 'quit'
+            int _type = Quit;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:59:14: ( 'quit' )
+            // grammar/antlr_3/bc.g:59:14: 'quit'
             {
             match("quit"); 
 
@@ -1031,7 +1031,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -1045,13 +1045,13 @@ public class BcParserLexer extends Lexer {
     public void mLength() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = Length;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:62:14: ( 'length' )
-            // grammar/antlr_3/bc.g:62:14: 'length'
+            int _type = Length;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:61:14: ( 'length' )
+            // grammar/antlr_3/bc.g:61:14: 'length'
             {
             match("length"); 
 
@@ -1061,7 +1061,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -1075,13 +1075,13 @@ public class BcParserLexer extends Lexer {
     public void mReturn() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = Return;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:63:14: ( 'return' )
-            // grammar/antlr_3/bc.g:63:14: 'return'
+            int _type = Return;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:62:14: ( 'return' )
+            // grammar/antlr_3/bc.g:62:14: 'return'
             {
             match("return"); 
 
@@ -1091,7 +1091,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -1105,13 +1105,13 @@ public class BcParserLexer extends Lexer {
     public void mFor() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = For;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:64:14: ( 'for' )
-            // grammar/antlr_3/bc.g:64:14: 'for'
+            int _type = For;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:63:14: ( 'for' )
+            // grammar/antlr_3/bc.g:63:14: 'for'
             {
             match("for"); 
 
@@ -1121,7 +1121,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -1135,13 +1135,13 @@ public class BcParserLexer extends Lexer {
     public void mIf() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = If;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:65:14: ( 'if' )
-            // grammar/antlr_3/bc.g:65:14: 'if'
+            int _type = If;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:64:14: ( 'if' )
+            // grammar/antlr_3/bc.g:64:14: 'if'
             {
             match("if"); 
 
@@ -1151,7 +1151,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -1165,13 +1165,13 @@ public class BcParserLexer extends Lexer {
     public void mWhile() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = While;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:66:14: ( 'while' )
-            // grammar/antlr_3/bc.g:66:14: 'while'
+            int _type = While;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:65:14: ( 'while' )
+            // grammar/antlr_3/bc.g:65:14: 'while'
             {
             match("while"); 
 
@@ -1181,7 +1181,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -1195,13 +1195,13 @@ public class BcParserLexer extends Lexer {
     public void mSqrt() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = Sqrt;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:67:14: ( 'sqrt' )
-            // grammar/antlr_3/bc.g:67:14: 'sqrt'
+            int _type = Sqrt;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:66:14: ( 'sqrt' )
+            // grammar/antlr_3/bc.g:66:14: 'sqrt'
             {
             match("sqrt"); 
 
@@ -1211,7 +1211,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -1225,13 +1225,13 @@ public class BcParserLexer extends Lexer {
     public void mScale() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = Scale;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:68:14: ( 'scale' )
-            // grammar/antlr_3/bc.g:68:14: 'scale'
+            int _type = Scale;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:67:14: ( 'scale' )
+            // grammar/antlr_3/bc.g:67:14: 'scale'
             {
             match("scale"); 
 
@@ -1241,7 +1241,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -1255,13 +1255,13 @@ public class BcParserLexer extends Lexer {
     public void mIbase() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = Ibase;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:69:14: ( 'ibase' )
-            // grammar/antlr_3/bc.g:69:14: 'ibase'
+            int _type = Ibase;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:68:14: ( 'ibase' )
+            // grammar/antlr_3/bc.g:68:14: 'ibase'
             {
             match("ibase"); 
 
@@ -1271,7 +1271,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -1285,13 +1285,13 @@ public class BcParserLexer extends Lexer {
     public void mObase() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = Obase;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:70:14: ( 'obase' )
-            // grammar/antlr_3/bc.g:70:14: 'obase'
+            int _type = Obase;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:69:14: ( 'obase' )
+            // grammar/antlr_3/bc.g:69:14: 'obase'
             {
             match("obase"); 
 
@@ -1301,7 +1301,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -1315,13 +1315,13 @@ public class BcParserLexer extends Lexer {
     public void mAuto() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = Auto;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:71:14: ( 'auto' )
-            // grammar/antlr_3/bc.g:71:14: 'auto'
+            int _type = Auto;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:70:14: ( 'auto' )
+            // grammar/antlr_3/bc.g:70:14: 'auto'
             {
             match("auto"); 
 
@@ -1331,7 +1331,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -1345,17 +1345,17 @@ public class BcParserLexer extends Lexer {
     public void mML_COMMENT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = ML_COMMENT;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:75:5: ( '/*' ( options {greedy=false; } : . )* '*/' )
-            // grammar/antlr_3/bc.g:75:5: '/*' ( options {greedy=false; } : . )* '*/'
+            int _type = ML_COMMENT;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:74:5: ( '/*' ( options {greedy=false; } : . )* '*/' )
+            // grammar/antlr_3/bc.g:74:5: '/*' ( options {greedy=false; } : . )* '*/'
             {
             match("/*"); 
 
-            // grammar/antlr_3/bc.g:75:10: ( options {greedy=false; } : . )*
+            // grammar/antlr_3/bc.g:74:10: ( options {greedy=false; } : . )*
             loop9:
             do {
                 int alt9=2;
@@ -1378,7 +1378,7 @@ public class BcParserLexer extends Lexer {
 
                 switch (alt9) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:75:38: .
+            	    // grammar/antlr_3/bc.g:74:38: .
             	    {
             	    matchAny(); 
 
@@ -1393,7 +1393,7 @@ public class BcParserLexer extends Lexer {
             match("*/"); 
 
 
-                  channel = 99;       // send into nirwana 
+                  _channel = HIDDEN;       // send into nirwana 
                 
 
             }
@@ -1401,7 +1401,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }
@@ -1415,15 +1415,15 @@ public class BcParserLexer extends Lexer {
     public void mWS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int type = WS;
-            int start = getCharIndex();
-            int line = getLine();
-            int charPosition = getCharPositionInLine();
-            int channel = Token.DEFAULT_CHANNEL;
-            // grammar/antlr_3/bc.g:83:5: ( ( (' '|'\\t'))+ )
-            // grammar/antlr_3/bc.g:83:5: ( (' '|'\\t'))+
+            int _type = WS;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // grammar/antlr_3/bc.g:82:5: ( ( (' '|'\\t'))+ )
+            // grammar/antlr_3/bc.g:82:5: ( (' '|'\\t'))+
             {
-            // grammar/antlr_3/bc.g:83:5: ( (' '|'\\t'))+
+            // grammar/antlr_3/bc.g:82:5: ( (' '|'\\t'))+
             int cnt10=0;
             loop10:
             do {
@@ -1436,7 +1436,7 @@ public class BcParserLexer extends Lexer {
 
                 switch (alt10) {
             	case 1 :
-            	    // grammar/antlr_3/bc.g:83:7: (' '|'\\t')
+            	    // grammar/antlr_3/bc.g:82:7: (' '|'\\t')
             	    {
             	    if ( input.LA(1)=='\t'||input.LA(1)==' ' ) {
             	        input.consume();
@@ -1462,7 +1462,7 @@ public class BcParserLexer extends Lexer {
             } while (true);
 
 
-                  channel = 99;       // send into nirwana 
+                  _channel = HIDDEN;       // send into nirwana 
                 
 
             }
@@ -1470,7 +1470,7 @@ public class BcParserLexer extends Lexer {
 
 
                     if ( token==null && ruleNestingLevel==1 ) {
-                        emit(type,line,charPosition,channel,start,getCharIndex()-1);
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
                         }

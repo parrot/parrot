@@ -1,4 +1,4 @@
-// $ANTLR 3.0b4 grammar/antlr_3/bc.g 2006-08-24 23:24:13
+// $ANTLR 3.0b5 grammar/antlr_3/bc.g 2006-12-21 20:39:39
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import org.antlr.runtime.tree.*;
 
-public class BcParser extends Parser {
+public class bcParser extends Parser {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ARRAY", "FUNCTION", "PRINT", "PROGRAM", "STMTS", "VAR", "NEWLINE", "STRING", "LETTER", "INTEGER", "NUMBER", "MINUS", "PLUS", "MUL_OP", "ASSIGN_OP", "REL_OP", "INCR", "DECR", "Define", "Break", "Quit", "Length", "Return", "For", "If", "While", "Sqrt", "Scale", "Ibase", "Obase", "Auto", "ML_COMMENT", "WS", "';'", "'('", "')'", "'{'", "'}'", "'['", "']'", "','"
     };
@@ -47,7 +47,7 @@ public class BcParser extends Parser {
     public static final int For=27;
     public static final int Return=26;
 
-        public BcParser(TokenStream input) {
+        public bcParser(TokenStream input) {
             super(input);
         }
         
@@ -645,7 +645,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end program
@@ -729,7 +729,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end input_item
@@ -854,7 +854,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end semicolon_list
@@ -971,7 +971,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end statement_list
@@ -1246,7 +1246,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end statement
@@ -1408,7 +1408,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end function
@@ -1455,7 +1455,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end parameter_list
@@ -1523,7 +1523,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end auto_define_list
@@ -1679,7 +1679,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end define_list
@@ -1799,7 +1799,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end argument_list
@@ -1880,7 +1880,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end relational_expression
@@ -1947,7 +1947,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end return_expression
@@ -1994,7 +1994,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end expression
@@ -2058,7 +2058,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end named_expression
@@ -2210,7 +2210,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end adding_expression
@@ -2298,7 +2298,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end multiplying_expression
@@ -2546,7 +2546,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end unary_expression
@@ -2669,7 +2669,7 @@ public class BcParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-        }
+       }
         return retval;
     }
     // $ANTLR end postfix_expression

@@ -17,19 +17,19 @@ public class Bc
 
     // lexing
     CharStream input = new ANTLRFileStream(bcFn);
-    BcParserLexer lex = new BcParserLexer(input);
+    bcLexer lex = new bcLexer(input);
     CommonTokenStream tokens = new CommonTokenStream(lex);
     // System.out.println("tokens="+tokens);
 
     // Parsing, generating PAST in ANTLR
-    BcParser parser = new BcParser(tokens);
-    BcParser.program_return antlrPast = parser.program();
+    bcParser parser = new bcParser(tokens);
+    bcParser.program_return antlrPast = parser.program();
     // System.out.println("tree: "+((Tree)antlrPast.tree).toStringTree());
     
     // Printing out PIR, that sets up PAST in PIR
     System.setOut( new PrintStream( new FileOutputStream( pirFn ) ) );
     CommonTreeNodeStream nodes = new CommonTreeNodeStream((Tree)antlrPast.tree);
-    AntlrPast2PirPast treeParser = new AntlrPast2PirPast(nodes);
+    antlr_past2pir_pastTreeParser treeParser = new antlr_past2pir_pastTreeParser(nodes);
     treeParser.gen_pir_past();
   }
 }
