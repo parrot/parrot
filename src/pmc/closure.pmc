@@ -201,7 +201,7 @@ Destroys the closure.  This is necessary in order to reclaim the context.
 #if CTX_LEAK_DEBUG
         if (Interp_debug_TEST(INTERP, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
             fprintf(stderr, "[destroy closure %p, context %p, refs=%d]\n",
-                    SELF, sub->outer_ctx,
+                    (void *)SELF, (void *)sub->outer_ctx,
                     (sub->outer_ctx ? sub->outer_ctx->ref_count : 0));
         }
 #endif

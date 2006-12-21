@@ -388,7 +388,7 @@ Parrot_free_context(Interp *interp, parrot_context_t *ctxp, int re_use)
             parrot_sub_t doomed = PMC_sub(ctxp->current_sub);
 
             fprintf(stderr, "[free  ctx %p of sub '%s']\n",
-                    ctxp,
+                    (void *)ctxp,
                     (doomed->name == (void*)0xdeadbeef
                      ? "???"
                      : (char*)doomed->name->strstart));

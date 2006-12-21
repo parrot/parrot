@@ -358,7 +358,7 @@ Parrot_really_destroy(Interp *interp, int exit_code, void *arg)
         while (Parrot_STM_transaction_depth(interp) > 0) {
             /* XXX */
             fprintf(stderr, "interpreter %p had pending transaction on exit\n",
-                    interp);
+                    (void *) interp);
             Parrot_STM_abort(interp);
         }
 #if STM_PROFILE

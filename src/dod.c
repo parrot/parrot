@@ -165,7 +165,7 @@ pobject_lives(Interp *interp, PObj *obj)
             PMC * const p = (PMC*)obj;
             if (p->pmc_ext && PMC_metadata(p)) {
                 fprintf(stderr, "GC: error obj %p (%s) has properties\n",
-                        p, (char*)p->vtable->whoami->strstart);
+                        (void *)p, (char*)p->vtable->whoami->strstart);
             }
         }
     }

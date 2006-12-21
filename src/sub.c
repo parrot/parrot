@@ -485,7 +485,7 @@ parrot_new_closure(Interp *interp, PMC *sub_pmc)
 #if CTX_LEAK_DEBUG
     if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
         fprintf(stderr, "[alloc closure  %p, outer_ctx %p, ref_count=%d]\n",
-                clos_pmc, ctx, (int) ctx->ref_count);
+                (void *)clos_pmc, (void *)ctx, (int) ctx->ref_count);
     }
 #endif
     return clos_pmc;

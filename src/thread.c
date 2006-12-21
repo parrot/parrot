@@ -1459,7 +1459,7 @@ pt_DOD_stop_mark(Parrot_Interp interp)
     interp->thread_data->state &= ~THREAD_STATE_SUSPENDED_GC;
     while (remove_queued_suspend_gc(interp)) {
         /* XXX FIXME make this message never trigger */
-        fprintf(stderr, "%p: extraneous suspend_gc event\n", interp);
+        fprintf(stderr, "%p: extraneous suspend_gc event\n", (void *)interp);
     }
     TRACE_THREAD("%p: unlock", interp);
     UNLOCK(interpreter_array_mutex);
