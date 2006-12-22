@@ -4,13 +4,18 @@
 
 =head1 NAME
 
-plumhead.pir - A wingless implementation of PHP
+plumhead.pir - implementations of PHP
 
 =head1 DESCRIPTION
+
+Driver for three variants of PHP on Parrot.
 
 Take XML from phc and transform it with XSLT to PIR setting up PAST.
 Run the PAST with the help of TGE.
 
+Parse PHP with Java Parser and TreeParser, generated from ANTLR3 grammars.
+
+Parser PHP with the Parrot compiler tools.
 =cut
 
 .const string VERSION="0.0.1"
@@ -21,39 +26,88 @@ Run the PAST with the help of TGE.
     .param pmc argv
     # _dumper( argv )
 
-    .local string rest, php_source_fn
+    .local string rest
     .local pmc    opt
     ( opt, rest ) = parse_options(argv)
 
+    .local string php_source_fn 
     php_source_fn = opt['f']
-    if php_source_fn goto got_php_source_fn
+    if php_source_fn goto GOT_PHP_SOURCE_FN
         php_source_fn = rest
-got_php_source_fn:
+GOT_PHP_SOURCE_FN:
 
     .local string cmd, err_msg
     .local int ret
     
+    .local string variant
+    variant = opt['variant']
+
+    if variant == 'antlr3' goto VARIANT_ANTLR3
+
+VARIANT_PHC:
     err_msg = 'Creating XML-AST with phc failed'
     cmd = 'phc --dump-ast-xml '
     concat cmd, php_source_fn
     concat cmd, '> plumhead_phc_ast.xml'
     ret = spawnw cmd
-    if ret goto error
+    if ret goto ERROR
 
     err_msg = 'Creating XML-PAST with xsltproc failed'
     cmd = 'xsltproc languages/plumhead/phc_xml_to_past_xml.xsl plumhead_phc_ast.xml > plumhead_past.xml'
     ret = spawnw cmd
-    if ret goto error
+    if ret goto ERROR
 
     err_msg = 'Creating PIR with xsltproc failed'
     cmd = 'xsltproc languages/plumhead/past_xml_to_past_pir.xsl  plumhead_past.xml  > plumhead_past.pir'
     ret = spawnw cmd
-    if ret goto error
+    if ret goto ERROR
+    goto EXECUTE_PAST_PIR
 
+VARIANT_PARTRIDGE:
+    # TODO: really use ANTLR3
+    err_msg = 'Creating XML-AST with phc failed'
+    cmd = 'phc --dump-ast-xml '
+    concat cmd, php_source_fn
+    concat cmd, '> plumhead_phc_ast.xml'
+    ret = spawnw cmd
+    if ret goto ERROR
+
+    err_msg = 'Creating XML-PAST with xsltproc failed'
+    cmd = 'xsltproc languages/plumhead/phc_xml_to_past_xml.xsl plumhead_phc_ast.xml > plumhead_past.xml'
+    ret = spawnw cmd
+    if ret goto ERROR
+
+    err_msg = 'Creating PIR with xsltproc failed'
+    cmd = 'xsltproc languages/plumhead/past_xml_to_past_pir.xsl  plumhead_past.xml  > plumhead_past.pir'
+    ret = spawnw cmd
+    if ret goto ERROR
+    goto EXECUTE_PAST_PIR
+
+VARIANT_ANTLR3:
+    # TODO: really use ANTLR3
+    err_msg = 'Creating XML-AST with phc failed'
+    cmd = 'phc --dump-ast-xml '
+    concat cmd, php_source_fn
+    concat cmd, '> plumhead_phc_ast.xml'
+    ret = spawnw cmd
+    if ret goto ERROR
+
+    err_msg = 'Creating XML-PAST with xsltproc failed'
+    cmd = 'xsltproc languages/plumhead/phc_xml_to_past_xml.xsl plumhead_phc_ast.xml > plumhead_past.xml'
+    ret = spawnw cmd
+    if ret goto ERROR
+
+    err_msg = 'Creating PIR with xsltproc failed'
+    cmd = 'xsltproc languages/plumhead/past_xml_to_past_pir.xsl  plumhead_past.xml  > plumhead_past.pir'
+    ret = spawnw cmd
+    if ret goto ERROR
+    goto EXECUTE_PAST_PIR
+
+EXECUTE_PAST_PIR:
     err_msg = 'Executing plumhead_past.pir with parrot failed'
     cmd = './parrot plumhead_past.pir'
     ret = spawnw cmd
-    if ret goto error
+    if ret goto ERROR
 
     # Clean up temporary files
     #.local pmc os
@@ -64,7 +118,7 @@ got_php_source_fn:
 
     exit 0
 
-error:
+ERROR:
     printerr err_msg
     printerr "\n"
     # Clean up temporary files
@@ -99,6 +153,7 @@ error:
     push getopts, 'r=s'
     push getopts, 'f=s'
     push getopts, 'C'
+    push getopts, 'variant=s'
 
     .local pmc opt
     opt = getopts."get_options"(argv)

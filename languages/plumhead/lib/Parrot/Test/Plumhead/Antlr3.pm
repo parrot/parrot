@@ -22,7 +22,7 @@ sub get_test_prog {
 
     my $lang_fn = Parrot::Test::per_test( '.php', $count );
 
-    return "./parrot languages/plumhead/plumhead.pbc --variant antlr3 languages/${lang_fn}";
+    return "./parrot languages/plumhead/plumhead.pbc --variant=antlr3 languages/${lang_fn}";
 }
 
 # never skip the reference implementation
@@ -30,7 +30,7 @@ sub skip_why {
     my $self = shift;
     my ($options) = @_;
 
-    return 'antlr3 variant not implemented yet';
+    return;
 }
 
 1;

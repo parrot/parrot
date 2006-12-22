@@ -20,7 +20,7 @@ help:
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
 	@echo "  test-php:          Run the test suite for the reference implementation."
-	@echo "  test-phc-to-past:  Run the test suite for the Phc2Past variant."
+	@echo "  test-phc:          Run the test suite for the Phc variant."
 	@echo "  test-antlr3:       Run the test suite for the Antlr3 variant."
 	@echo "  test-partridge:    Run the test suite."
 	@echo ""
@@ -31,7 +31,25 @@ help:
 	@echo ""
 	@echo "Misc:"
 	@echo "  help:              Print this help message."
+	@echo "Only for maintainer:"
+	@echo "  maintain:          Generate runtime files with ANTLR 3"
 	@echo ""
+
+maintain: maintain-antlr3
+
+maintain-antlr3: src/antlr_3/Plumhead.g src/antlr_3/GenPastPir.g
+	@echo 'Be sure to set CLASSPATH first, see docs/antlr_3.pod'
+	java org.antlr.Tool src/antlr_3/Plumhead.g
+	java org.antlr.Tool -lib src/antlr_3 src/antlr_3/GenPastPir.g
+
+
+build: build-common build-antlr3
+
+build-common: plumheadlib.pbc plumhead.pbc
+
+build-antlr3:
+	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr_3.pod'
+	javac src/antlr_3/*.java 
 
 plumhead.pbc: src/plumhead.pir
 	$(PARROT) -o plumhead.pbc src/plumhead.pir
@@ -39,21 +57,19 @@ plumhead.pbc: src/plumhead.pir
 plumheadlib.pbc: src/builtins.pir
 	$(PARROT) -o plumheadlib.pbc src/builtins.pir
 
-test: all test-php test-phc-to-past test-antlr3 test-partridge
+test: all test-php test-phc test-antlr3 test-partridge
 
 test-php:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-php
 
-test-phc-to-past:
-	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-phc-to-past
+test-phc:
+	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-phc
 
 test-antlr3:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-antlr3
 
 test-partridge:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-partridge
-
-build: plumheadlib.pbc plumhead.pbc
 
 clean: clean-test
 	$(RM_F) plumheadlib.pbc plumhead.pbc

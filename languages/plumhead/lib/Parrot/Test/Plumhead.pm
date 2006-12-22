@@ -11,7 +11,7 @@ use File::Basename;
 
 use Parrot::Test;
 use Parrot::Test::Plumhead::PHP;
-use Parrot::Test::Plumhead::Phc2Past;
+use Parrot::Test::Plumhead::Phc;
 use Parrot::Test::Plumhead::Antlr3;
 use Parrot::Test::Plumhead::Partridge;
 

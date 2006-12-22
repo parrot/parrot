@@ -12,7 +12,7 @@ languages/plumhead/t/harness - A harness for Plumhead
 
   cd languages && perl -I../lib plumhead/t/harness --with-php
 
-  cd languages && perl -I../lib plumhead/t/harness --with-phc-to-past
+  cd languages && perl -I../lib plumhead/t/harness --with-phc
 
   cd languages && perl -I../lib plumhead/t/harness --with-antlr3
 
@@ -57,8 +57,8 @@ if ( grep { m/^--files$/ } @ARGV ) {
     my $with_php = ( grep { m/^--with-php$/ } @ARGV ) ? 1 : 0;
     @ARGV = grep { ! m/^--with-php$/ } @ARGV;
 
-    my $with_phc_to_past = ( grep { m/^--with-phc-to-past$/ } @ARGV ) ? 1 : 0;
-    @ARGV = grep { ! m/^--with-phc-to-past$/ } @ARGV;
+    my $with_phc = ( grep { m/^--with-phc$/ } @ARGV ) ? 1 : 0;
+    @ARGV = grep { ! m/^--with-phc$/ } @ARGV;
 
     my $with_antlr3 = ( grep { m/^--with-antlr3$/ } @ARGV ) ? 1 : 0;
     @ARGV = grep { ! m/^--with-antlr3$/ } @ARGV;
@@ -86,8 +86,8 @@ if ( grep { m/^--files$/ } @ARGV ) {
     if ( $with_php ) {
        $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::PHP';
     }
-    elsif ( $with_phc_to_past ) {
-       $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::Phc2Past';
+    elsif ( $with_phc ) {
+       $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::Phc';
     }
     elsif ( $with_antlr3 ) {
        $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::Antlr3';
