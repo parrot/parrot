@@ -465,8 +465,7 @@ depth_set:
   .local pmc ns_name
   ns_name = split(colons, name)
   $I0 = elements ns_name
-  if $I0 == 0 goto empty
-  if $I0 == 1  goto relative
+  if $I0 == 0 goto relative
   $S0 = ns_name[0]
   if $S0 != "" goto relative
   
@@ -474,8 +473,6 @@ absolute:
   $P1 = shift ns_name
   goto return
 
-empty:
-  push ns_name, ""
 relative:
   .local pmc interp
   interp = getinterp

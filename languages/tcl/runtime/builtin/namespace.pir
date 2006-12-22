@@ -75,7 +75,6 @@ no_args:
   .local pmc ns, __namespace
   __namespace = get_root_global ['_tcl'], '__namespace'
   ns  = __namespace('')
-  $P0 = pop ns
   $S0 = join "::", ns
   $S0 = "::" . $S0
   .return($S0)
@@ -407,7 +406,6 @@ get_parent:
   .local pmc ns, __namespace
   __namespace = get_root_global ['_tcl'], '__namespace'
   ns  = __namespace(name)
-  $S0 = pop ns
   if $S0 != "" goto no_pop
   # for when someone calls [namespace current] from ::
   push_eh current_in_root

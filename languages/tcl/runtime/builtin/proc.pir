@@ -42,10 +42,11 @@ Create a PIR sub on the fly for this user defined proc.
   if full_name == "" goto create
   
   ns   = __namespace(full_name, 1)
+  $I0  = elements ns
+  if $I0 == 0 goto create
   name = pop ns
-  
-  $I0 = elements ns
-  if $I0 == 0 goto root
+
+  if $I0 == 1 goto root
   $P0 = get_hll_namespace ns
   if null $P0 goto unknown_namespace
   
