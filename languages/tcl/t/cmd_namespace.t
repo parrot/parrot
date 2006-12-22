@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 39;
 use Test::More;
 use vars qw($TODO);
 
@@ -141,6 +141,17 @@ OUT
 language_output_is('tcl', <<'TCL', <<'OUT', 'namespace eval {} ...');
   namespace eval {} {set foo ok}
   puts $foo
+TCL
+ok
+OUT
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'namespace eval + proc + upvar');
+proc test {one two} {
+    namespace eval {} [list upvar 0 $one $two]
+}
+set foo ok
+test foo bar
+puts $bar
 TCL
 ok
 OUT

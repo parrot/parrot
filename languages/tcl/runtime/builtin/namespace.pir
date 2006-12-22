@@ -227,7 +227,12 @@ bad_args:
   .local int argc
   argc = elements argv
   if argc < 2 goto bad_args
-  
+
+  .local pmc call_chain, temp_call_chain
+  call_chain      = get_root_global ['_tcl'], 'call_chain'
+  temp_call_chain = new .ResizablePMCArray
+  set_root_global ['_tcl'], 'call_chain', temp_call_chain
+
   .local pmc ns, __namespace
   __namespace = get_root_global ['_tcl'], '__namespace'
   
@@ -269,8 +274,17 @@ END_PIR
   
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
-  $P0 = pir_compiler(code)
-  .return $P0()
+  push_eh restore_call_chain
+    $P0 = pir_compiler(code)
+    $P0 = $P0()
+  clear_eh
+  set_root_global ['_tcl'], 'call_chain', call_chain
+  .return($P0)
+
+restore_call_chain:
+  .catch()
+  set_root_global ['_tcl'], 'call_chain', call_chain
+  .rethrow()
 
 bad_args:
   tcl_error 'wrong # args: should be "namespace eval name arg ?arg...?"'
