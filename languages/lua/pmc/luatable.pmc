@@ -259,6 +259,7 @@ A copy of the value is stored, otherwise, this could happen:
     void set_pmc_keyed (PMC* key, PMC* value) {
         if (dynpmc_LuaNil == key->vtable->base_type) {
             real_exception(INTERP, NULL, 1, "table index is nil");
+            return;
         }
         if (!_has(INTERP, SELF, key)) {
             PMC* meth = find_meth(INTERP, SELF, "__newindex");
@@ -473,7 +474,47 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* next (PMC* index) {
-        return pmc_new(INTERP, dynpmc_LuaNil); /* TODO */
+        Hash *hash = PMC_struct_val(SELF);
+        PMC *pair = NULL;
+        PMC *key;
+        STRING *keystr;
+        if (index == NULL || index->vtable->base_type == dynpmc_LuaNil) {
+            key = key_new(INTERP);
+            PMC_int_val(key) = 0;
+            keystr = parrot_hash_get_idx(INTERP, hash, key);
+            if (keystr != NULL)
+                pair = parrot_hash_get(INTERP, hash, keystr);
+        }
+        else {
+            STRING *s;
+            keystr = make_hash_key(interp, index);
+            if (!parrot_hash_exists(interp, hash, keystr)) {
+                real_exception(INTERP, NULL, 1, "invalid key to 'next'");
+                return NULL;
+            }
+            key = key_new(INTERP);
+            PMC_int_val(key) = 0;
+            do {
+                s = parrot_hash_get_idx(INTERP, hash, key);
+            } while (s != NULL && string_compare(INTERP, keystr, s) != 0);
+            if (PMC_int_val(key) != -1) {
+                s = parrot_hash_get_idx(INTERP, hash, key);
+                pair = parrot_hash_get(INTERP, hash, s);
+            }
+        }
+        if (pair == NULL) {
+            return pmc_new(INTERP, dynpmc_LuaNil);
+        }
+        else {
+            PMC *retval, *key, *value;
+            retval = pmc_new(INTERP, enum_class_Array);
+            VTABLE_set_integer_native(INTERP, retval, 2);
+            key = VTABLE_clone(INTERP, (PMC*)(PMC_struct_val(pair)));
+            VTABLE_set_pmc_keyed_int(INTERP, retval, 0, key);
+            value = VTABLE_clone(INTERP, PMC_pmc_val(pair));
+            VTABLE_set_pmc_keyed_int(INTERP, retval, 1, value);
+            return retval;
+        }
     }
 
 /*
@@ -520,6 +561,7 @@ MMD_DEFAULT: {
     METHOD void rawset (PMC* key, PMC* value) {
         if (dynpmc_LuaNil == key->vtable->base_type) {
             real_exception(INTERP, NULL, 1, "table index is nil");
+            return;
         }
         _set(INTERP, SELF, key, value);
     }

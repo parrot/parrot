@@ -462,14 +462,12 @@ existing fields. In particular, you may clear existing fields.
 .sub '_lua_next' :anon
     .param pmc table :optional
     .param pmc index :optional
-    .local pmc idx
-    .local pmc value
     checktype(table, 'table')
-    (idx, value) = table.'next'(index)
-    unless idx goto L1
-    .return (idx, value)
+    $P0 = table.'next'(index)
+    unless $P0 goto L1
+    .return ($P0 :flat)
 L1:
-    .return (idx)	# nil
+    .return ($P0)   # nil
 .end
 
 

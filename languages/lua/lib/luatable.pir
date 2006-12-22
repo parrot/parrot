@@ -151,8 +151,10 @@ B<DEPRECATED>
     checktype(f, 'function')
     new idx, .LuaNil
 L1:
-    (idx, value) = table.'next'(idx)
-    unless idx goto L2
+    $P0 = table.'next'(idx)
+    unless $P0 goto L2
+    idx = $P0[0]
+    value = $P0[1]
     (ret) = f(idx, value)
     $I0 = defined ret
     unless $I0 goto L1
@@ -275,15 +277,15 @@ does a linear traversal of the whole table.)
 .sub '_table_maxn' :anon
     .param pmc table :optional
     .local pmc idx
-    .local pmc value
     .local pmc max
     checktype(table, 'table')
     new max, .LuaNumber
     max = 0
     new idx, .LuaNil
 L1:
-    (idx, value) = table.'next'(idx)
-    unless idx goto L2
+    $P0 = table.'next'(idx)
+    unless $P0 goto L2
+    idx = $P0[0]
     $I0 = isa idx, 'LuaNumber'
     unless $I0 goto L1
     unless idx > max goto L1
