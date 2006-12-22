@@ -37,10 +37,10 @@ help:
 
 maintain: maintain-antlr3
 
-maintain-antlr3: src/antlr_3/Plumhead.g src/antlr_3/GenPastPir.g
-	@echo 'Be sure to set CLASSPATH first, see docs/antlr_3.pod'
-	java org.antlr.Tool src/antlr_3/Plumhead.g
-	java org.antlr.Tool -lib src/antlr_3 src/antlr_3/GenPastPir.g
+maintain-antlr3: src/antlr3/Plumhead.g src/antlr3/GenPastPir.g
+	@echo 'Be sure to set CLASSPATH first, see docs/antlr3.pod'
+	java org.antlr.Tool src/antlr3/Plumhead.g
+	java org.antlr.Tool -lib src/antlr3 src/antlr3/GenPastPir.g
 
 
 build: build-common build-antlr3
@@ -48,8 +48,8 @@ build: build-common build-antlr3
 build-common: plumheadlib.pbc plumhead.pbc
 
 build-antlr3:
-	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr_3.pod'
-	javac src/antlr_3/*.java 
+	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr3.pod'
+	javac src/antlr3/*.java 
 
 plumhead.pbc: src/plumhead.pir
 	$(PARROT) -o plumhead.pbc src/plumhead.pir

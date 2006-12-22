@@ -18,7 +18,7 @@ Plumhead.java needs to find the needed classes. This works for me:
   export PARROT_HOME=/home/bernhard/devel/Parrot/repos/parrot
   export CLASSPATH=$ANTLR_HOME/lib/antlr-2.7.7.jar:$ANTLR_HOME/lib/antlr-3.0b5.jar:\
 $ANTLR_HOME/lib/stringtemplate-3.0.jar:\
-$PARROT_HOME/languages/plumhead/src/antlr_3:\
+$PARROT_HOME/languages/plumhead/src/antlr3:\
 $PARROT_HOME/languages/plumhead 
 
 And see the targets maintain-antlr3, build-antlr3, test-antlr3 in plumhead/Makefile.
