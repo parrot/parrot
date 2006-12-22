@@ -31,6 +31,7 @@ troublesome (if not possible?).
 #include "parrot/parrot.h"
 
 static STRING *string_representation;
+STRING *lua_metatable;
 INTVAL dynpmc_LuaBoolean;
 INTVAL dynpmc_LuaNil;
 INTVAL dynpmc_LuaNumber;
@@ -60,6 +61,7 @@ pmclass LuaNil
               const_string(INTERP, "LuaString"));
             dynpmc_LuaTable = pmc_type(INTERP,
               const_string(INTERP, "LuaTable"));
+            lua_metatable = const_string(INTERP, "__metatable");
         }
     }
 

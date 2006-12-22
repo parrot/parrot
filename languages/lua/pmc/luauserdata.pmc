@@ -22,7 +22,7 @@ the Lua C<Userdata> type.
 #include "parrot/parrot.h"
 
 static STRING *luauserdata_name;
-static STRING *lua_metatable;
+extern STRING *lua_metatable;
 extern INTVAL dynpmc_LuaBoolean;
 extern INTVAL dynpmc_LuaNil;
 extern INTVAL dynpmc_LuaString;
@@ -43,7 +43,6 @@ pmclass LuaUserdata
     void class_init() {
         if (pass) {
             luauserdata_name = const_string(INTERP, "userdata");
-            lua_metatable = const_string(INTERP, "__metatable");
         }
     }
 

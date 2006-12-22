@@ -25,7 +25,7 @@ Now, Lua 5.0 uses a hybrid data structure with a Hash part and an Array part.
 #include "parrot/parrot.h"
 
 static STRING *luatable_name;
-static STRING *lua_metatable;
+extern STRING *lua_metatable;
 extern INTVAL dynpmc_LuaBoolean;
 extern INTVAL dynpmc_LuaNil;
 extern INTVAL dynpmc_LuaNumber;
@@ -94,7 +94,6 @@ pmclass LuaTable
     void class_init() {
         if (pass) {
             luatable_name = const_string(INTERP, "table");
-            lua_metatable = const_string(INTERP, "__metatable");
         }
     }
 

@@ -20,6 +20,7 @@ C<LuaAny> provides an abstract base class for some Lua types.
 
 #include "parrot/parrot.h"
 
+extern STRING *lua_metatable;
 extern INTVAL dynpmc_LuaBoolean;
 extern INTVAL dynpmc_LuaNil;
 extern INTVAL dynpmc_LuaString;
@@ -36,8 +37,7 @@ find_meth(Interp* interp, PMC *obj, const char *name) {
                                       const_string(interp, "mt_string"));
     }
     else {
-        meta = VTABLE_getprop(interp, obj,
-                              const_string(interp, "__metatable"));
+        meta = VTABLE_getprop(interp, obj, lua_metatable);
         if (meta != NULL && meta->pmc_ext != NULL
          && dynpmc_LuaTable != meta->vtable->base_type) {
             return meta;
