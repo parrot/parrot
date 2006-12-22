@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 11
+plan 12
 
 eval_is {
  set a 2
@@ -74,3 +74,11 @@ eval_is {
   upvar -1 a b
 } {bad level "-1"} \
   {no negative level}
+
+eval_is {
+  namespace eval test {
+    set x ok
+    upvar 0 x y
+  }
+  set test::y
+} ok {upvar + namespace eval}

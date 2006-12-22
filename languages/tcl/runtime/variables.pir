@@ -98,6 +98,7 @@ other than the default, and multiple interpreters.
 
 .sub __make
   .param string name
+  .param int    depth :named('depth') :optional
 
   .local pmc variable
 
@@ -122,11 +123,11 @@ array:
   inc char
   key = substr name, char, len
  
-  variable = __find_var(var)
+  variable = __find_var(var, 'depth' => depth)
   unless null variable goto check_is_hash
 
   variable = new .TclArray
-  variable = __store_var(var, variable)
+  variable = __store_var(var, variable, 'depth' => depth)
   
 check_is_hash:
   $I0 = does variable, 'hash'
@@ -148,13 +149,13 @@ cant_read_not_array:
   tcl_error $S0
 
 scalar:
-  variable = __find_var(name)
+  variable = __find_var(name, 'depth' => depth)
   if null variable goto make_variable  
   .return(variable)
 
 make_variable:
     variable = new .Undef
-    variable = __store_var(name, variable)
+    variable = __store_var(name, variable, 'depth' => depth)
     .return(variable)
 .end
 
@@ -263,6 +264,7 @@ Gets the actual variable from memory and returns it.
 .sub __find_var
   .param string name
   .param int    isglobal :named('global') :optional
+  .param int    depth    :named('depth')  :optional
 
   .local pmc value, ns
   ns = new .ResizableStringArray
@@ -298,7 +300,8 @@ args_check:
   .return(value)
 
 global_var:
-  ns = __namespace(name, 2)
+  depth += 2
+  ns = __namespace(name, depth)
   name = pop ns
   name = '$' . name
 
@@ -330,6 +333,7 @@ Sets the actual variable from memory.
   .param string name
   .param pmc    value
   .param int    isglobal :named('global') :optional
+  .param int    depth    :named('depth')  :optional
 
   .local pmc value, ns
   ns = new .ResizableStringArray
@@ -362,7 +366,8 @@ lexical_is_null:
   .return(value)
 
 global_var:
-  ns = __namespace(name, 2)
+  depth += 2
+  ns = __namespace(name, depth)
   name = pop ns
   name = '$' . name
 

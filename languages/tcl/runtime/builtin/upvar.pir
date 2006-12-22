@@ -49,7 +49,7 @@ loop:
   new_var = argv[counter]
   
   if new_call_level == 0 goto store_var
-  $P0 = __find_var(new_var)
+  $P0 = __find_var(new_var, 'depth'=>1)
   if null $P0 goto store_var
   $S0 = 'variable "'
   $S0 .= new_var
@@ -68,7 +68,7 @@ save_chain_loop:
   goto save_chain_loop
 save_chain_end:
 
-  $P1 = __make(old_var)
+  $P1 = __make(old_var, 'depth'=>1)
 
   # restore the old level
   $I0 = 0
@@ -83,15 +83,23 @@ restore_chain_end:
   # because we don't want to use assign here (we want to provide a new
   # alias, not use an existing one), do this work by hand
 
-  $S0 = '$' . new_var
   if call_level goto lexical
 
-  set_hll_global $S0, $P1
+  .local pmc ns
+  .local string name
+  ns   = __namespace(new_var, 1)
+  name = pop ns
+  name = '$' . name
+
+  unshift ns, 'tcl'
+  ns = get_root_namespace ns
+  ns[name] = $P1
   inc counter
   goto loop
 
 lexical:
   $P0 = call_chain[-1]
+  $S0 = '$' . new_var
   $P0[$S0] = $P1
   inc counter
   goto loop
