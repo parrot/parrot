@@ -16,7 +16,7 @@ Create a PIR sub on the fly for this user defined proc.
   if argc != 3 goto error
 
   .local string full_name
-  .local pmc name, args, body
+  .local pmc args, body
   full_name = argv[0]
   args      = argv[1]
   body      = argv[2]
@@ -33,9 +33,14 @@ Create a PIR sub on the fly for this user defined proc.
   args_code = new 'PGE::CodeString'
   defaults  = new 'PGE::CodeString'
   namespace = ""
+
+  .local pmc ns
+  .local string name
+  ns   = new .ResizablePMCArray
+  name = ""
+
   if full_name == "" goto create
   
-  .local pmc ns
   ns   = __namespace(full_name, 1)
   name = pop ns
   
@@ -216,8 +221,12 @@ END_PIR
   (parsed_body, body_reg) = __script(body, 'pir_only'=>1)
 
   # Save the code for the proc for [info body]
-  $P1 = get_root_global ['_tcl'], 'proc_body'
-  $P1[full_name] = body
+  $P1 = get_hll_global ns, 'proc_body'
+  unless null $P1 goto save_body
+  $P1 = new .Hash
+  set_hll_global ns, 'proc_body', $P1
+save_body:
+  $P1[name] = body
 
   code .= parsed_body
   

@@ -179,9 +179,6 @@ env_loop_done:
   # (Presuming we don't do this from the .pmc definitions.)
 
   $P1 = new .TclArray
-  store_global 'proc_body', $P1
-
-  $P1 = new .TclArray
   store_global 'proc_args', $P1
 
   $P1 = new .TclDict

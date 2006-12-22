@@ -97,13 +97,22 @@ bad_args:
   argc = elements argv
   if argc != 1 goto bad_args
 
-  .local pmc retval
-
   .local string procname
   procname = argv[0]
-  $P1 = get_root_global ['_tcl'], 'proc_body'
-  $P2 = $P1[procname]
-  if_null $P2, no_body
+
+  .local pmc __namespace
+  __namespace = get_root_global ['_tcl'], '__namespace'
+
+  .local pmc    ns
+  .local string name
+  ns   = __namespace(procname)
+  name = pop ns
+
+  unshift ns, 'tcl'
+  $P1 = get_root_global ns, 'proc_body'
+  if null $P1 goto no_body
+  $P2 = $P1[name]
+  if null $P2 goto no_body
   .return($P2)
 
 no_body:
