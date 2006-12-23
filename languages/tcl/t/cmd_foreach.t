@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 15
+plan 16
 
 eval_is {foreach} \
   {wrong # args: should be "foreach varList list ?varList list ...? command"} \
@@ -93,3 +93,11 @@ is [
     set x
 ] {a = 1;b = 2;c = ;} \
   {multiple index variables}
+
+eval_is {
+  namespace eval lib {
+    set val {}
+    proc a {} {error ok}
+    foreach n 1 a
+  }
+} ok {namespace resolution in body}

@@ -13,6 +13,10 @@
   $I0 = argc % 2
   if $I0 != 1 goto bad_args
 
+  .local pmc ns
+  $P0 = getinterp
+  ns  = $P0['namespace'; 1]
+
   .local pmc __list, __script, __set
   __list   = get_root_global ['_tcl'], '__list'
   __script = get_root_global ['_tcl'], '__script'
@@ -22,7 +26,7 @@
   varLists = new .TclList
   lists    = new .TclList
   command  = pop argv
-  command  = __script(command)
+  command  = __script(command, 'ns'=>ns)
 
   .local int iterations
   iterations = 0
