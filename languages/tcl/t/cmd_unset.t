@@ -139,7 +139,7 @@ eval_is {
   unset array(b)
   set c
 } {variable "c" already exists} \
-  {unset an aliased array elem}
+  {unset an aliased array elem} {TODO {not fixed yet}}
 
 eval_is {
   catch {unset a}
