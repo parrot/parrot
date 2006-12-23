@@ -82,6 +82,8 @@ no_args:
   .local pmc __index
   __index = get_root_global ['_tcl'], '__index'
   $I0 = __index($S3,$S2)
+  if $I0 >0 goto first_do
+  $I0 = 0 # XXX should this be done in __index?
 
 first_do:
   .local int index_1
