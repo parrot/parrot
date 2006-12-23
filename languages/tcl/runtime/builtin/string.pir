@@ -443,7 +443,7 @@ match_continue:
 bad_option:
   $S1 = 'bad option "'
   $S1 .= $S0
-  $S1 = '": must be -nocase'
+  $S1 .= '": must be -nocase'
   tcl_error $S1
 
 bad_match:
