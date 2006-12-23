@@ -203,9 +203,6 @@ not_argument:
 
 no_default:
   push_eh error_on_set
-    print "ABOUT TO SET $"
-    print varname
-    print " to the empty string\n"
     __set(varname, '') 
   clear_eh
   .return (0)
