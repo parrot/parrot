@@ -408,7 +408,15 @@ bad_range:
   if argc < 2 goto bad_match
   if argc > 3 goto bad_match
   $S0 = shift argv
-  if $S0 != '-nocase' goto bad_option
+  if $S0 == '-nocase' goto set_nocase
+  if $S0 == '-nocas' goto set_nocase
+  if $S0 == '-noca' goto set_nocase
+  if $S0 == '-noc' goto set_nocase
+  if $S0 == '-no' goto set_nocase
+  if $S0 == '-n' goto set_nocase
+  goto bad_option
+
+set_nocase:
   nocase = 1
 
 match_next:
