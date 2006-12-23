@@ -121,8 +121,8 @@ Parrot_STRING Parrot_new_string(Parrot_INTERP, char *, int, const char * const, 
 
 Parrot_Language Parrot_find_language(Parrot_INTERP, char*);
 
-void Parrot_register_pmc(Parrot_INTERP, Parrot_PMC);
-void Parrot_unregister_pmc(Parrot_INTERP, Parrot_PMC);
+PARROT_API void Parrot_register_pmc(Parrot_INTERP, Parrot_PMC);
+PARROT_API void Parrot_unregister_pmc(Parrot_INTERP, Parrot_PMC);
 Parrot_PMC Parrot_get_dod_registry(Parrot_INTERP);
 
 
