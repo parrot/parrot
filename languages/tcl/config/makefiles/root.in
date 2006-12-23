@@ -178,7 +178,6 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/lsearch.t \
   t_tcl/lset.t \
   t_tcl/lsetComp.t \
-  t_tcl/misc.t \
   t_tcl/namespace_old.t \
   t_tcl/package.t \
   t_tcl/parse.t \
@@ -207,7 +206,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/while_old.t \
   t_tcl/while.t
 
-# These tests parse, or fail (or skip) every test.
+# These tests parse, or fail (or skip) every (or nearly every) test.
 FAILING_TCL_TESTS = \
   t_tcl/assocd.t \
   t_tcl/case.t \
@@ -227,6 +226,7 @@ FAILING_TCL_TESTS = \
   t_tcl/load.t \
   t_tcl/macOSXFCmd.t \
   t_tcl/main.t \
+  t_tcl/misc.t \
   t_tcl/notify.t \
   t_tcl/obj.t \
   t_tcl/parseExpr.t \

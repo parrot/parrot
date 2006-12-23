@@ -80,6 +80,7 @@ array set skipped_tests {
   dict-17.13           stacktrace
   dict-21.8            {lassign}
   error-1.3            stacktrace
+  error-1.8            {uplevel bug}
   error-2.3            stacktrace
   error-2.6            stacktrace
   error-4.2            stacktrace
@@ -104,12 +105,15 @@ array set skipped_tests {
   namespace-old-2.5    explode
   namespace-old-2.6    explode
   namespace-old-2.7    explode
+  namespace-old-4.4    explode
+  namespace-old-7.7    explode
   parse-9.2            stacktrace
   parse-10.14          stacktrace
   scan-14.1            {Inf support}
   scan-14.2            {Inf support}
   set-2.1              stacktrace
   set-4.1              stacktrace
+  string 5.14          {binary}
   string-13.6          {Cannot repeat with negative arg}
   string-13.8          {Cannot repeat with negative arg}
   string-14.11         {Can only replace inside string or index after end of string}
@@ -117,6 +121,8 @@ array set skipped_tests {
   string-18.9          {Cannot take substr outside string}
   string-20.4          {Cannot take substr outside string}
   string-20.5          {Cannot take substr outside string}
+  stringComp-5.14      {binary}
+  stringComp-9.7       {binary}
   switch-4.1           stacktrace
   var-6.3              {Cannot get character of empty string}
   var-7.12             {Cannot take substr outside string}
@@ -307,6 +313,7 @@ array set skipped_tests {
 array set abort_after {
   basic-47.1           {need interp before these can work}
   cmdMZ-5.7            {invalid command name "cleanupTests"}
+  cmdMZ-return-2.17    {foreach handling borked?}
   uplevel-5.2          {invalid command name "set"}
   utf-1.4              {Invalid character for UTF-8 encoding}
   env-1.3              {can't read "env(test)" no such element in array}
