@@ -51,8 +51,6 @@ array set skipped_tests {
   cmdAH-2.6            {file}
   cmdAH-2.6.1          {file}
   cmdAH-2.6.2          {file}
-  cmdIL-4.26           {scan}
-  cmdIL-4.27           {scan}
   cmdMZ-2.10           stacktrace
   cmdMZ-3.5            stacktrace
   cmdMZ-5.7            stacktrace
