@@ -218,6 +218,8 @@ has_argc:
     unless null $P0 goto nullary
     $P0  = node['binary_function']
     unless null $P0 goto binary
+    $P0  = node['nary_function']
+    unless null $P0 goto nary
  
   # never get here
 
@@ -247,6 +249,20 @@ has_argc:
     $P1 = args[1]
     $P2 = tree.'get'('expression', $P1)
     past.'add_child'($P2)
+    goto arguments
+
+  nary:
+    if argc < 1 goto too_few
+    function_name = node['nary_function']
+
+    .local pmc iter
+    iter = new .Iterator, args
+  nary_loop:
+    unless iter goto arguments
+    $P0 = shift iter
+    $P0 = tree.'get'('expression', $P0)
+    past.'add_child'($P0)
+    goto nary_loop
 
   arguments:
     past['mathfunc'] = function_name

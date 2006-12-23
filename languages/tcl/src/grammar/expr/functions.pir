@@ -313,9 +313,35 @@ is_string:
 .end
 
 .sub '&max'
+    .param pmc args :slurpy
+
+    .local pmc iter, max
+    iter = new .Iterator, args
+    max  = shift iter
+loop:
+    unless iter goto done
+    $P0 = shift iter
+    unless $P0 > max goto loop
+    max = $P0
+    goto loop
+done:
+    .return(max)
 .end
 
 .sub '&min'
+    .param pmc args :slurpy
+
+    .local pmc iter, min
+    iter = new .Iterator, args
+    min  = shift iter
+loop:
+    unless iter goto done
+    $P0 = shift iter
+    unless $P0 < min goto loop
+    min = $P0
+    goto loop
+done:
+    .return(min)
 .end
 
 .sub '&round'

@@ -108,9 +108,11 @@ token unary_function {
 
 token binary_function { atan2 | fmod | hypot | pow }
 
+token nary_function { max | min }
+
 # XXX This should actually be a PIR rule so we can add more rules.
 token mathfunc {
-  [ <binary_function> | <unary_function> | <nullary_function> 
+  [ <nary_function> | <binary_function> | <unary_function> | <nullary_function> 
   | ( <[a..zA..Z]>\w* )  \(  <unknown_math_function>  ]
         \( [<expression> [, <expression>]*]? \)
 }

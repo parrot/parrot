@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 247
+plan 249
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -198,6 +198,8 @@ is [expr hypot(-3,4)]   5.0
 is [expr int(4.6)]      4
 is [expr log(32)]       3.4657359027997265 {} $TODO
 is [expr log10(32)]     1.505149978319906
+is [expr max(1,4,2)]    4
+is [expr min(1,4,2)]    1
 is [expr pow(2,10)]  1024.0
 is [expr round(4.5)]    5
 is [expr round(5.5)]    6
