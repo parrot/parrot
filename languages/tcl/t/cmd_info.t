@@ -85,7 +85,7 @@ eval_is {info functions a b} \
   {info functions too many args}
 
 is [lsort [info functions]] \
-  {abs acos asin atan atan2 bool ceil cos cosh double exp floor fmod hypot int log log10 pow rand round sin sinh sqrt srand tan tanh wide} \
+  {abs acos asin atan atan2 bool ceil cos cosh double entier exp floor fmod hypot int log log10 max min pow rand round sin sinh sqrt srand tan tanh wide} \
   {info functions basic}
 
 is [info functions s??t] {sqrt} {info functions pattern}

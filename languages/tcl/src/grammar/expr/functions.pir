@@ -204,6 +204,9 @@ is_string:
     tcl_error "argument to math function didn't have numeric value"
 .end
 
+.sub '&entier'
+.end
+
 .sub '&exp'
     .param pmc a
     
@@ -307,6 +310,12 @@ is_string:
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
     tcl_error $S0
+.end
+
+.sub '&max'
+.end
+
+.sub '&min'
 .end
 
 .sub '&round'
