@@ -113,7 +113,7 @@ array set skipped_tests {
   scan-14.2            {Inf support}
   set-2.1              stacktrace
   set-4.1              stacktrace
-  string 5.14          {binary}
+  string-5.14          {binary}
   string-13.6          {Cannot repeat with negative arg}
   string-13.8          {Cannot repeat with negative arg}
   string-14.11         {Can only replace inside string or index after end of string}
