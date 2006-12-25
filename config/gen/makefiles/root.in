@@ -1682,7 +1682,7 @@ install:
 	$(PERL) -e "exit(1)"
 
 reallyinstall:
-	make installable
+	$(MAKE) installable
 	$(PERL) tools/dev/install_files.pl \
     --buildprefix=$(BUILDPREFIX) \
     --prefix=$(PREFIX) \
