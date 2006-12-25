@@ -134,3 +134,10 @@ sub is_value { return shift->is( 'ident', 'literal' ); }
 
 1;
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

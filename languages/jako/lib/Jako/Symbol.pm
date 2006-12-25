@@ -98,3 +98,10 @@ sub is_module { my $self = shift; return $self->kind eq 'module'; }
 
 1;
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
