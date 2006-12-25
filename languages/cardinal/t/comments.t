@@ -21,3 +21,10 @@ language_output_is( 'cardinal', <<'CODE', <<'OUT', 'end of line comment' );
 puts 'Hello' # end of line comments
 CODE
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

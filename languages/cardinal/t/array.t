@@ -113,3 +113,10 @@ my_ary=[1,2,3]
 puts (my_array.at(-1))
 CODE
 OUT 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -51,3 +51,10 @@ language_output_is( 'cardinal', <<'CODE', <<'OUT', 'float division test' );
 puts(4.2/2.1)
 CODE
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

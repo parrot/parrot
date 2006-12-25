@@ -23,3 +23,10 @@ language_output_is( 'cardinal', <<'CODE', <<'OUT', 'simple conditional test' );
 puts("NOK") unless true
 CODE
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
