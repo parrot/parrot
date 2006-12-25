@@ -64,6 +64,7 @@ if ( !keys %policies ) {
         'Subroutines::ProhibitExplicitReturnUndef'        => 1,
         'Subroutines::ProhibitSubroutinePrototypes'       => 1,
         'CodeLayout::UseParrotCoda'                       => 1,
+        'CodeLayout::ProhibitDuplicateCoda'               => 1,
         'CodeLayout::ProhibitHardTabs'                    => { allow_leading_tabs => 0 },
         'CodeLayout::RequireTidyCode'                     => { perltidyrc => $perl_tidy_conf },
 
