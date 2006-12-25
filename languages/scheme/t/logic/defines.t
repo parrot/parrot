@@ -104,3 +104,10 @@ output_is( <<'CODE', '120', 'fakultaet' );
       (* n (fak (- n 1)))))
 (write (fak 5))
 CODE
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

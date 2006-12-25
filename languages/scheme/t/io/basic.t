@@ -14,3 +14,10 @@ CODE
 output_is( <<'CODE', '01', "basic write" );
 (write 0 1)
 CODE
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

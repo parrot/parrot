@@ -137,3 +137,10 @@ output_is( <<'CODE', '(list 1 2 3 (4 5))', 'complex quasiquote' );
 (write
   `(list ,@(list 1 2) ,(+ 1 2) ,(list 4 5)))
 CODE
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

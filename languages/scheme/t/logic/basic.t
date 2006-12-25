@@ -48,3 +48,10 @@ output_is( <<'CODE', 0, 'basic or - Fail' );
 (write (or 0 0))
 CODE
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

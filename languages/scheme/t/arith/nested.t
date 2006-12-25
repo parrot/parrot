@@ -58,3 +58,10 @@ CODE
 output_is( <<'CODE', 2, 'abs (- 3 5)' );
 (write (abs (- 3 5)))
 CODE
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

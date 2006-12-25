@@ -114,3 +114,10 @@ CODE
 output_is( <<'CODE', 7, 'abs -7' );
 (write (abs -7))
 CODE
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
