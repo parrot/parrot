@@ -15,14 +15,14 @@ function pointers, addresses, or opnumbers of the C<prederef__>
 opcode. This opcode then calls the C<do_prederef()> function, which then
 fills in the real function, address or op number.
 
-Since the C<prederef__> opcode returns the same C<pc_prederef> it was
+Because the C<prederef__> opcode returns the same C<pc_prederef> it was
 passed, the runops loop will re-execute the same location, which will
 then have the pointer to the real C<prederef> opfunc and C<prederef>
 args.
 
 Pointer arithmetic is used to determine the index into the bytecode
 corresponding to the currect opcode. The bytecode and prederef arrays
-have the same number of elements since there is a one-to-one mapping.
+have the same number of elements because there is a one-to-one mapping.
 
 =head2 Functions
 
@@ -230,7 +230,7 @@ turn_ev_check(Parrot_Interp interp, int on)>
 
 Turn on or off event checking for prederefed cores.
 
-Fills in the C<event_checker> opcode, or restores original op in all
+Fills in the C<event_checker> opcode, or restores original ops in all
 branch locations of the opcode stream.
 
 Note that when C<on> is true, this is being called from the event
@@ -406,7 +406,7 @@ init_prederef(Interp *interp, int which)
 stop_prederef(Interp *interp)>
 
 Restore the interpreter's op function tables to their initial state.
-Also the event function pointers are re-created. This is only necessary
+Also recreate the event function pointers. This is only necessary
 for run-core changes, but we don't know the old run core.
 
 =cut
@@ -671,9 +671,9 @@ runops_switch(Interp *interp, opcode_t *pc)
 =item C<void
 runops_int(Interp *interp, size_t offset)>
 
-Run parrot operations of loaded code segment until an end opcode is
-reached run core is selected depending on the C<Interp_flags> when a
-C<restart> opcode is encountered a different core my be selected and
+Run Parrot operations of loaded code segment until an end opcode is
+reached.  Run core is selected depending on the C<Interp_flags>.  When a
+C<restart> opcode is encountered, a different core may be selected and
 evaluation of opcode continues.
 
 =cut
