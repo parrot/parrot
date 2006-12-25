@@ -14,11 +14,10 @@ use Test::More;
 use Parrot::Distribution;
 
 BEGIN {
-    eval { require Test::Perl::Critic; };
+    eval { require Perl::Critic; };
     if ($@) {
-        plan skip_all => 'Test::Perl::Critic not installed';
+        plan skip_all => 'Perl::Critic not installed';
     }
-    Test::Perl::Critic->import( -verbose => 2 );
 }
 
 my $perl_tidy_conf = 'tools/util/perltidy.conf';
@@ -43,9 +42,6 @@ while (@ARGV) {
         last;
     }
 }
-
-# By default, don't complain about anything.
-my $config = Perl::Critic::Config->new( -exclude => [qr/.*/] );
 
 # Add in the few cases we should care about.
 # For a list of available policies, perldoc Perl::Critic
@@ -79,6 +75,7 @@ if ( !keys %policies ) {
     if ( !$@ ) {
         diag "Using $perl_tidy_conf for Perl::Tidy settings";
     }
+
 }
 
 if ($list_policies) {
@@ -88,6 +85,7 @@ if ($list_policies) {
     exit;
 }
 
+# get the files to check
 my $DIST = Parrot::Distribution->new();
 if ( !@ARGV ) {
     @files = $DIST->get_perl_language_files();
@@ -118,36 +116,47 @@ else {
     }
 }
 
-if ( scalar @files ) {
-    plan tests => scalar @files;
+# the number of tests is the number of policies
+if ( keys %policies ) {
+    plan tests => scalar keys %policies;
 }
 else {
     exit;
 }
 
+# loop over each policy, such that each policy is a test, and report the
+# names of the files failing the given policy
 foreach my $policy ( keys %policies ) {
+    # By default, don't complain about anything.
+    my $config = Perl::Critic::Config->new( -exclude => [qr/.*/] );
+
     $config->add_policy(
         -policy => $policy,
         ref $policies{$policy} ? ( -config => $policies{$policy} ) : (),
     ) or die;
-}
 
-Test::Perl::Critic->import(
+    my $critic = Perl::Critic->new( 
+        -config => $config,
+        -top => 1);
 
-    #    -format => '[%p] %m at %l,%c',
-    -verbose => 2,
-    -config  => $config,
-    -top     => 1,
-);
+    # check each file for the givne policy
+    my @failed_files;
+    foreach my $file ( sort @files ) {
+        if ( !-r $file ) {
+            diag "skipping invalid file: $file\n";
+            next;
+        }
 
-foreach my $file ( sort @files ) {
-    if ( !-r $file ) {
-        diag "skipping invalid file: $file\n";
-        next;
+        my @violations = $critic->critique($file);
+        push @failed_files => "$file\n"
+            if scalar @violations;
     }
 
-    Test::Perl::Critic::critic_ok($file);
+    ok( !scalar(@failed_files), $policy )
+        or diag( "Policy: $policy failed in " . scalar @failed_files . " files:\n@failed_files" );
+
 }
+
 
 __END__
 
