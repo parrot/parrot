@@ -1,5 +1,4 @@
 #!perl
-# vim:ft=perl:
 
 use strict;
 use warnings;
@@ -52,3 +51,10 @@ my $cmd = "$parrot $Z3_Compiler $Z3_Test";
 
 # From Parrot::Test. CD => dir to run command in, STDOUT => file to redir
 &run_command($cmd);    #, CD => $compiler_dir);
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
