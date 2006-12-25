@@ -157,4 +157,9 @@ __PACKAGE__->_generate_functions();
 
 $_ ^= ~{ AUTHOR => 'particle' };
 
-# vim: expandtab sw=4
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

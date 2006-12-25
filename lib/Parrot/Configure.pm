@@ -310,6 +310,11 @@ L<Parrot::Configure::Step>, L<Parrot::Configure::Step::Base>
 
 =cut
 
-# vim: expandtab shiftwidth=4
-
 1;
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

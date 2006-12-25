@@ -33,3 +33,10 @@ use vars qw(@ISA @EXPORT %PConfig);
 %PConfig = %Parrot::Config::Generated::PConfig;
 
 1;
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
