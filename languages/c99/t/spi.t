@@ -141,3 +141,10 @@ extern void AtEOSubXact_SPI(bool isCommit, SubTransactionId mySubid);
 #endif   /* SPI_H */
 CODE
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
