@@ -1,4 +1,4 @@
-# $Id#
+# $Id$
 package Perl::Critic::Policy::CodeLayout::UseParrotCoda;
 
 use strict;
@@ -6,6 +6,18 @@ use warnings;
 use Perl::Critic::Utils;
 use Perl::Critic::Violation;
 use base 'Perl::Critic::Policy';
+
+=head1 NAME
+
+Perl::Critic::Policy::CodeLayout::UseParrotCoda
+
+=head1 DESCRIPTION
+
+The pumpking has declared that all parrot source code must include a series of
+comments at the end of the source.  After much discussion C<__END__> and
+C<__DATA__> blocks are excempt from this policy.
+
+=cut
 
 our $VERSION = '0.1';
 $VERSION = eval $VERSION;    ## no critic
@@ -40,19 +52,16 @@ sub violates {
 
     my $last_node = $doc->last_element;
 
-    # need to treat __END__ blocks carefully
-    if ( $last_node->isa('PPI::Statement::End') ) {
-        # look for a =cut, any amount of whitespace, and then the coda
-        return if ($last_node =~ m{=cut\s*\Q$CODA\E\n*\z});
-        return $self->violation( $desc, $expl, $last_node );
+    # __END__ and __DATA__ blocks are excepted from having the coda
+    if ( $last_node->isa('PPI::Statement::End') 
+            or $last_node->isa('PPI::Statement::Data') ) {
+        return;
     }
     else {
         for ($last_node = $doc->last_element;
              $last_node && @coda_lines;
              $last_node = $last_node->previous_sibling) {
 
-            # Skip (optional) __DATA__ block...
-            next if ( $last_node->isa('PPI::Statement::Data') );
             next if ( $last_node->isa('PPI::Token::Whitespace') );
             last if ( !$last_node->isa('PPI::Token::Comment') );
 
@@ -72,20 +81,6 @@ sub violates {
 
 # How meta! We ourselves must have this coda to be a valid perl file in the
 # parrot repository...
-
-__END__
-
-=head1 NAME
-
-Perl::Critic::Policy::CodeLayout::UseParrotCoda
-
-=head1 DESCRIPTION
-
-The pumpking has declared that all parrot source code must include a series of
-comments at the end of the source. These comments may be followed by optional
-whitespace and a C<__DATA__> block.
-
-=cut
 
 # Local Variables:
 #   mode: cperl
