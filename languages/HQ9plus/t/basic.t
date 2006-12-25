@@ -537,3 +537,10 @@ language_output_is( 'HQ9plus', $code, $hello . $code . $song_text, "code: $code"
 
 $code = 'QQQQ';
 language_output_is( 'HQ9plus', $code, $code x length($code), "code: $code" );
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
