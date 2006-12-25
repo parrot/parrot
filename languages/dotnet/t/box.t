@@ -75,3 +75,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'box_2' );
 PIR
 22
 OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

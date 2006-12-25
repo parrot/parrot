@@ -34,9 +34,9 @@ print $done .  ( ' ' x ( 10 - length($done) ) );
 print $total . ( ' ' x ( 10 - length($total) ) );
 print "$percent%\n"
 
-    # Local Variables:
-    # mode: cperl
-    # cperl-indent-level: 4
-    # fill-column: 100
-    # End:
-    # vim: expandtab shiftwidth=4:
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

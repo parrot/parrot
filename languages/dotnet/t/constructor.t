@@ -94,3 +94,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'cc_args' );
 PIR
 12.450000
 OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

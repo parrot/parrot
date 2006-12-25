@@ -150,3 +150,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'test_obj_2' );
 PIR
 50
 OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

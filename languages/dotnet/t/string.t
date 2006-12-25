@@ -72,3 +72,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'ret_string_with_quotes_s' );
 PIR
 I said, 'Hello world!'
 OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

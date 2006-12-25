@@ -505,3 +505,10 @@ sub post_call {
 sub pop_all {
     return "stack_depth = -1\nlazy_moves = new ResizablePMCArray\n";
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
