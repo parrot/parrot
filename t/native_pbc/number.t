@@ -92,3 +92,10 @@ pbc_output_is( undef, $output, "i386 double float 32 bit opcode_t" );
 # pbc_output_is(undef, <<OUTPUT, "PPC double float 32 bit BE opcode_t");
 # pbc_output_is(undef, <<OUTPUT, "little-endian 64-bit tru64");
 # pbc_output_is(undef, <<OUTPUT, "big-endian 64-bit irix");
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -965,3 +965,10 @@ OUTPUT
 # pir_output_is(<<'CODE', <<'OUTPUT', "dumping IntegerArray PMC");
 # pir_output_is(<<'CODE', <<'OUTPUT', "dumping FloatValArray PMC");
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

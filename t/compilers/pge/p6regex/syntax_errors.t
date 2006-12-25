@@ -39,3 +39,10 @@ p6rule_throws(
     todo => 'not implemented'
 );
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -76,3 +76,10 @@ TODO:
     local $TODO = 'ncurses_life.pir not testable yet';
     fail('ncurses_life.pir');
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

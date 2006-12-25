@@ -827,3 +827,10 @@ CODE
 \u2001\u2002\u2003\u2004\x{e01ef}\u0114
 OUTPUT
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

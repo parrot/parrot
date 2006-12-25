@@ -67,3 +67,10 @@ foreach ( 1 .. 17 ) {
     my @todo = $todo{$_} ? ( todo => $todo{$_} ) : ();
     example_output_is( $pasm_fn, "Just another Parrot Hacker\n", @todo );
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

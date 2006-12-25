@@ -381,3 +381,10 @@ AB
 A\x00B\x00
 OUTPUT
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

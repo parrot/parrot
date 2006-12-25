@@ -103,3 +103,10 @@ p6rule_is( '{ balanced nested [ with ] and ( is } okay',          $PTB );
 p6rule_is( '{ a quoted "}" unbalanced right bracket} okay',       $PTB );
 p6rule_is( '{ quoted "}" unbalanced quotes (`}}}"""}}}}`)} okay', $PTB );
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

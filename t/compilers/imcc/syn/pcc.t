@@ -509,3 +509,10 @@ pir_output_is( <<'CODE', <<'OUT', "()=foo() syntax, skip returned value" );
 CODE
 foo
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -61,3 +61,10 @@ pbc_output_is( undef, '270544960', "i386 32 bit opcode_t, 32 bit intval" );
 # pasm_output_is(undef, '270544960', "PPC BE 32 bit opcode_t, 32 bit intval");
 # pasm_output_is(undef, '270544960', "little-endian 64-bit tru64");
 # pasm_output_is(undef, '270544960', "big-endian 64-bit irix");
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

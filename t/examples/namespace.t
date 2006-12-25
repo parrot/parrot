@@ -49,3 +49,10 @@ while ( my ( $example, $expected ) = each %expected ) {
     example_output_like( "examples/namespace/$example", $expected );
 }
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

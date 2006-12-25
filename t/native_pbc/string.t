@@ -54,3 +54,10 @@ END_OUTPUT
     pbc_output_is( undef, $output, "i386 32 bit opcode_t, 32 bit intval" );
 
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

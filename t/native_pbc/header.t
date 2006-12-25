@@ -62,3 +62,10 @@ END
     ok( $h{floattype} < 2, "floattype" );
     is( $h{padding}, pack "x8", "NULL padding" );
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

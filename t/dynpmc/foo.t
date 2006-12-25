@@ -201,3 +201,10 @@ pir_output_is( << 'CODE', << 'OUTPUT', ".HLL 2" );
 CODE
 42
 OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

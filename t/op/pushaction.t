@@ -192,3 +192,10 @@ main
 at_exit, flag = 0
 a = 42
 OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

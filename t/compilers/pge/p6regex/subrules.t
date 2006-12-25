@@ -91,3 +91,10 @@ p6rule_is(
     "negated charclass in subrule"
 );
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

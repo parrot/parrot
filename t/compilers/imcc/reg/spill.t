@@ -709,3 +709,10 @@ $code = repeat(
 pir_output_is( $code, <<'OUT', "overflow pmcs 60 spill" );
 all params ok
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

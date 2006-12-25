@@ -37,3 +37,10 @@ pir_output_like( <<'CODE', <<'OUTPUT', "load_bytecode on non-existent file" );
 CODE
 /Couldn't find file 'no_file_by_this_name'/
 OUTPUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

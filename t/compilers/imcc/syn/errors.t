@@ -59,3 +59,10 @@ pir_output_like( <<'CODE', <<'OUT', '#line nnn "file"', 'todo' => 'RT #40806' );
 CODE
 /in file 'xyz.pir' line 55/
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

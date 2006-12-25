@@ -16,3 +16,10 @@ use Parrot::Test tests => 1;
 pasm_output_like( "print \"Hi\\n\"", <<'OUT', "No new line at end of file" );
 /^error:imcc:syntax error, unexpected EOM, expecting '\\n'/
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -176,3 +176,10 @@ CODE
     $output .= "\n";
     pir_output_is( $pir, $output, $msg, %opt );
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

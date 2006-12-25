@@ -1230,3 +1230,10 @@ pasm_output_is( <<'CODE', <<OUTPUT, "mod_n_n_nc by zero" );
 CODE
 OUTPUT
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
