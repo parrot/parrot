@@ -289,12 +289,12 @@ $OUTPUT_AUTOFLUSH = 1;
 
 # Handle options
 
-my @valid_opts = qw(ask bindir cage cc ccflags ccwarn cgoto cxx datadir 
-    debugging define exec-prefix execcapable floatval gc help icu-config 
-    icudatadir icuheaders icushared includedir infodir inline intval 
-    jitcapable ld ldflags lex libdir libexecdir libs link linkflags 
-    localstatedir m maintainer mandir miniparrot nomanicheck oldincludedir 
-    opcode ops optimize parrot_is_shared pmc prefix profile sbindir 
+my @valid_opts = qw(ask bindir cage cc ccflags ccwarn cgoto cxx datadir
+    debugging define exec-prefix execcapable floatval gc help icu-config
+    icudatadir icuheaders icushared includedir infodir inline intval
+    jitcapable ld ldflags lex libdir libexecdir libs link linkflags
+    localstatedir m maintainer mandir miniparrot nomanicheck oldincludedir
+    opcode ops optimize parrot_is_shared pmc prefix profile sbindir
     sharedstatedir step sysconfdir verbose verbose-step=N version without-gdbm
     without-gmp without-icu yacc);
 
