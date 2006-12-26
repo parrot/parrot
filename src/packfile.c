@@ -2187,7 +2187,7 @@ pf_debug_dump (Parrot_Interp interp, struct PackFile_Segment *self)
 
     default_dump_header(interp, self);
 
-    PIO_printf(interp, "mappings => [\n");
+    PIO_printf(interp, "\n  mappings => [\n");
     for (i = 0; i < debug->num_mappings; i++) {
         PIO_printf(interp, "    #%d\n    [\n", i);
         PIO_printf(interp, "        OFFSET => %d,\n",
@@ -2211,7 +2211,7 @@ pf_debug_dump (Parrot_Interp interp, struct PackFile_Segment *self)
         }
         PIO_printf(interp, "    ],\n");
     }
-    PIO_printf(interp, "]\n");
+    PIO_printf(interp, "  ]\n");
 
     j = self->data ? 0: self->file_offset + 4;
     if (j % 8)

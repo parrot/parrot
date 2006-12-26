@@ -327,6 +327,10 @@ E: vanderlay@home.nl
 N: Lars Balker Rasmussen
 D: FreeBSD and other build fixes
 
+N: Lee Duhem
+D: Debug patch
+E: lee.duhem@gmail.com
+
 N: Leon Brocard
 
 N: Leopold Toetsch
