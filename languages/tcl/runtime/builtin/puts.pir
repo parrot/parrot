@@ -26,12 +26,18 @@ three_arg:
   if $S1 != '-nonewline' goto bad_option
 
   $S2 = argv[1]
-  io = __channel($S2)
-
+  io  = __channel($S2)
   $S3 = argv[2]
   $S3 = trans_encoding $S3, utf8
+
+  $I0 = find_type 'TCPStream'
+  $I1 = typeof io
+  if $I0 == $I1 goto three_arg_stream
   print io, $S3
   goto done
+
+three_arg_stream:
+  io.'print'($S3)
 
 two_arg:
   # The last arg is the string to print.

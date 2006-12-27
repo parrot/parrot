@@ -24,10 +24,15 @@ read a line from a channel
   .local pmc io
   io = __channel(channelID)
 
-  .local string line
-  line = readline io
+  $I0 = find_type 'TCPStream'
+  $I1 = typeof io
+  if $I0 == $I1 goto stream
 
-  .return (line)
+  $S0 = readline io
+  .return($S0)
+
+stream:
+  .return io.'readline'()
 
 bad_args:
   tcl_error 'wrong # args: should be "gets channelId ?varName?"'

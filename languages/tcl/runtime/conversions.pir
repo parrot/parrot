@@ -251,9 +251,17 @@ Given a string, return the appropriate channel.
 
   .local pmc io_obj
   io_obj = channels[channelID]
-  if_null io_obj, bad_channel
-  $I0 = typeof io_obj 
-  if $I0 != .ParrotIO goto bad_channel # Should never happen?
+  if null io_obj goto bad_channel
+
+  $I0 = typeof io_obj
+  if $I0 == .ParrotIO goto done
+  $I1 = find_type 'TCPStream'
+  if $I0 == $I1 goto done
+
+  # should never happen
+  goto bad_channel
+
+done:
   .return (io_obj)
 
 bad_channel:
