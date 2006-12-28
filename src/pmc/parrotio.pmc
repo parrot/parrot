@@ -19,6 +19,7 @@ These are the vtable functions for Parrot IO.
 */
 
 #include "parrot/parrot.h"
+#include <assert.h>
 
 /* This class is actually part of the io subsystem */
 #include "../src/io/io_private.h"
@@ -170,7 +171,7 @@ SYNOPSIS
 
     METHOD PMC* readline(STRING* prompt) {
         ParrotIO *io = PMC_data(SELF);
-        PMC *pmc_res;
+        PMC *pmc_res = NULL;
         STRING *res = NULL;
         UINTVAL len;
 
