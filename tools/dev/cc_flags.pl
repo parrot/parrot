@@ -112,7 +112,17 @@ if ($cfile) {
     }
 
     # print "@ARGV\n";
-    print "$cfile\n";
+
+    # Visual C++ already prints the source file name...
+    if ($ARGV[0] =~ /cl(?:\.exe)?/i) {
+        # ...but only the file name, so we print the path
+        # to the directory first
+        if ($cfile =~ /(.*[\/\\])/) {
+            print $1;
+        }
+    } else {
+        print "$cfile\n";
+    }
 }
 exit system(@ARGV) / 256;
 
