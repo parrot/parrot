@@ -58,7 +58,7 @@ struct dotnet_assemblyref {
     Parrot_UInt2 version_minor;
     Parrot_UInt2 version_build;
     Parrot_UInt2 version_revision;
-    
+
     /* Info about the assembly and its author. */
     Parrot_UInt4 flags;
     Parrot_UInt4 public_key;
