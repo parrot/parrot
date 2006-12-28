@@ -578,7 +578,7 @@ static void
 jit_emit_bc(Parrot_jit_info_t *jit_info, branch_t cond, opcode_t disp) {
     opcode_t opcode = jit_info->op_i + disp;
     int offset;
-    if(opcode <= jit_info->op_i) {
+    if (opcode <= jit_info->op_i) {
         offset = jit_info->arena.op_map[opcode].offset -
             (jit_info->native_ptr - jit_info->arena.start);
         if (jit_info->optimizer->cur_section->branch_target ==
@@ -608,7 +608,7 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
     opcode_t opcode = jit_info->op_i + disp;
     int offset;
 
-    if(opcode <= jit_info->op_i) {
+    if (opcode <= jit_info->op_i) {
         offset = jit_info->arena.op_map[opcode].offset -
             (jit_info->native_ptr - jit_info->arena.start);
         if (jit_info->optimizer->cur_section->branch_target ==
@@ -1081,7 +1081,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     jit_emit_mflr(jit_info->native_ptr, r0);
     jit_emit_stmw(jit_info->native_ptr, r13, -PPC_JIT_GP_REGISTER_SAVE_SPACE, r1);
 
-    for( i = 1; i <= 18; ++i )
+    for ( i = 1; i <= 18; ++i )
     {
         jit_emit_stfd(jit_info->native_ptr, (i + 13), (-PPC_JIT_GP_REGISTER_SAVE_SPACE - i*8), r1);
     }
@@ -1165,8 +1165,8 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 
     fixup = jit_info->arena.fixups;
 
-    while(fixup){
-        switch(fixup->type){
+    while (fixup){
+        switch (fixup->type){
             case JIT_PPC_CALL:
                 fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup);
                 d = ((long)fixup->param.fptr - (long)fixup_ptr);

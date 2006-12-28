@@ -711,17 +711,17 @@ char intval_map_sub[] =
     { r0, r1, r2, r3, r4, r5 };
 
 static void
-hppa_sync_cache (void *_start, void *_end)
+hppa_sync_cache(void *_start, void *_end)
 {
     char *start = (char*)(((int)_start) &~(CACHELINESIZE));
     char *end = (char *)((((int)_end)+CACHELINESIZE) &~(CACHELINESIZE));
     char *_sync;
 
     for (_sync = start; _sync < end; _sync += CACHELINESIZE) {
-        __asm__ __volatile__ ("fdc %r0(%0)":: "r" ((long)_sync));
+        __asm__ __volatile__("fdc %r0(%0)":: "r" ((long)_sync));
     }
 
-    __asm__ __volatile__ ("sync");
+    __asm__ __volatile__("sync");
 }
 
 static const jit_arch_info arch_info = {

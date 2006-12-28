@@ -393,7 +393,7 @@ Parrot_jit_bytejump(Parrot_jit_info_t *jit_info,
     jit_emit_load_code_start(jit_info->native_ptr, XSR2);
 
     /* Calculates the offset into op_map shadow array
-     * assuming sizeof(opcode_t) == sizeof(opmap array entry) */
+     * assuming sizeof (opcode_t) == sizeof (opmap array entry) */
     emitm_sub_r(jit_info->native_ptr, reg_num, XSR1, XSR1);
 
     /* Load the address of the native code from op_map */
@@ -415,7 +415,7 @@ static void Parrot_jit_branch(Parrot_jit_info_t *jit_info, int branch, int cond,
     opcode_t opcode;
 
     opcode = jit_info->op_i + disp;
-    if(opcode <= jit_info->op_i){
+    if (opcode <= jit_info->op_i){
         offset = jit_info->arena.op_map[opcode].offset -
                     (jit_info->native_ptr - jit_info->arena.start);
 
@@ -424,7 +424,7 @@ static void Parrot_jit_branch(Parrot_jit_info_t *jit_info, int branch, int cond,
                 offset +=
                     jit_info->optimizer->cur_section->branch_target->load_size;
 
-        if((offset > emitm_branch_max) || (offset < emitm_branch_min))
+        if ((offset > emitm_branch_max) || (offset < emitm_branch_min))
             internal_exception(JIT_ERROR,
                            "Branches beyond 8 Megabytes not yet supported\n");
         offset /= 4;
@@ -465,9 +465,9 @@ static void jit_emit_load_i(Parrot_jit_info_t *jit_info,
     op_type = interp->op_info_table[*jit_info->cur_op].types[param - 1];
     val = jit_info->cur_op[param];
 
-    switch(op_type){
+    switch (op_type){
         case PARROT_ARG_IC:
-            if((val < emitm_simm13_min) || (val > emitm_simm13_max)){
+            if ((val < emitm_simm13_min) || (val > emitm_simm13_max)){
                 emitm_sethi(jit_info->native_ptr, emitm_hi22(val), hwreg);
                 emitm_or_i(jit_info->native_ptr, hwreg, emitm_lo10(val),
                            hwreg);
@@ -529,7 +529,7 @@ static void jit_emit_store_i(Parrot_jit_info_t *jit_info,
     op_type = interp->op_info_table[*jit_info->cur_op].types[param - 1];
     val = jit_info->cur_op[param];
 
-    switch(op_type){
+    switch (op_type){
         case PARROT_ARG_I:
             val = (int)&REG_INT(val);
             emitm_st_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
@@ -571,7 +571,7 @@ static void jit_emit_load_n(Parrot_jit_info_t *jit_info,
     op_type = interp->op_info_table[*jit_info->cur_op].types[param - 1];
     val = jit_info->cur_op[param];
 
-    switch(op_type){
+    switch (op_type){
         case PARROT_ARG_IC:
             /* Load integer into floating point registers - should use
                constant pool */
@@ -619,7 +619,7 @@ static void jit_emit_store_n(Parrot_jit_info_t *jit_info,
     op_type = interp->op_info_table[*jit_info->cur_op].types[param - 1];
     val = jit_info->cur_op[param];
 
-    switch(op_type){
+    switch (op_type){
         case PARROT_ARG_I:
             val = (int)&REG_INT(val);
             emitm_stf_i(jit_info->native_ptr, hwreg, Parrot_jit_regbase,
@@ -649,8 +649,8 @@ void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 
     fixup = jit_info->arena.fixups;
 
-    while(fixup){
-        switch(fixup->type){
+    while (fixup){
+        switch (fixup->type){
         /* This fixes-up a branch to a known opcode offset */
             case JIT_BRANCH:
                 fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup);
@@ -693,7 +693,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     ireg0_offset  = ireg0_address - (int)interp;
 
     /* All parrot registers will be addressed relative to I0 */
-    if((ireg0_offset < emitm_simm13_min) || (ireg0_offset > emitm_simm13_max)){
+    if ((ireg0_offset < emitm_simm13_min) || (ireg0_offset > emitm_simm13_max)){
         /* Store the address of I0 if its offset doesnt fit in the immediate */
         emitm_sethi(jit_info->native_ptr, emitm_hi22(ireg0_address), Parrot_jit_regbase);
         emitm_or_i(jit_info->native_ptr, Parrot_jit_regbase, emitm_lo10(ireg0_address),
@@ -850,7 +850,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     size_t offset;
 
     offset  = offsetof(struct _vtable, init);
-    offset += nvtable * sizeof(void *);
+    offset += nvtable * sizeof (void *);
 
     for (idx = 1; idx <= n; idx++) {
         i  = args[idx - 1];
@@ -935,7 +935,7 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
     opcode_t op_type = interp->op_info_table[*jit_info->cur_op].types[0];
     long     val     = jit_info->cur_op[1];
 
-    switch(op_type){
+    switch (op_type){
         case PARROT_ARG_I:
             emitm_st_i(jit_info->native_ptr, emitm_o(0), Parrot_jit_regbase,
                        Parrot_jit_regoff((int)&REG_INT(val), interp));

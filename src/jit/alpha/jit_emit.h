@@ -253,7 +253,7 @@ emit_load_intval_cpool(Parrot_jit_info_t *jit_info,
     char *new_arena;
 
     /* If there is not space in the current pool */
-    if ((char *)(jit_info->constant_pool->slot_ptr + sizeof(INTVAL)) >=
+    if ((char *)(jit_info->constant_pool->slot_ptr + sizeof (INTVAL)) >=
         jit_info->arena.start)
     {
         /* Check if the arena is big enough for a move or needs a realloc */
@@ -286,7 +286,7 @@ emit_load_intval_cpool(Parrot_jit_info_t *jit_info,
         emit_ldq_b(jit_info->native_ptr, dest,
             jit_info->constant_pool->cur_used, REG15_s6);
     }
-    jit_info->constant_pool->cur_used += sizeof(INTVAL);
+    jit_info->constant_pool->cur_used += sizeof (INTVAL);
     *(jit_info->constant_pool->slot_ptr++) = constant;
 }
 
@@ -388,8 +388,8 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 
     fixup = jit_info->arena.fixups;
 
-    while(fixup){
-        switch(fixup->type){
+    while (fixup){
+        switch (fixup->type){
             case JIT_ALPHABRANCH:
                 fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup);
                 d = (jit_info->arena.op_map[fixup->param.opcode].offset -
@@ -523,7 +523,7 @@ Parrot_jit_init_arenas(Parrot_jit_info_t *jit_info)
     jit_info->native_ptr = jit_info->arena.start =
         mem_sys_allocate((size_t)jit_info->arena.size * 2);
     jit_info->constant_pool = (Parrot_jit_constant_pool_t *)
-        mem_sys_allocate((size_t)sizeof(Parrot_jit_constant_pool_t));
+        mem_sys_allocate((size_t)sizeof (Parrot_jit_constant_pool_t));
     jit_info->constant_pool->slot_ptr = (INTVAL *)jit_info->arena.start;
     jit_info->arena.start = jit_info->native_ptr += CONSTANT_POOL_SIZE;
     jit_info->constant_pool->cur_used = -0x7ff8;

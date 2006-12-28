@@ -343,7 +343,7 @@ emit_ldrstr(char *pc,
 }
 
 static char *
-emit_ldrstr_offset (char *pc,
+emit_ldrstr_offset(char *pc,
                     arm_cond_t cond,
                     int l_s,
                     int pre,
@@ -489,7 +489,7 @@ struct constant {
 */
 
 static void
-constant_neg (int value,  struct constant *result)
+constant_neg(int value,  struct constant *result)
 {
     result->rotation = 0;
     while (1) {
@@ -510,7 +510,7 @@ constant_neg (int value,  struct constant *result)
         /* There is no rotate op in C, and to do it with 2 shifts and an or
            would mean casting to unsigned to prevent sign extensions, and it's
            exactly 1 arm instruction I need, so it's clearer like this:  */
-        __asm__ (
+        __asm__(
             "mov     %0, %1, ror #30\n"
             : "=r" (value)
             : "r" (value));
@@ -522,7 +522,7 @@ constant_neg (int value,  struct constant *result)
 
 
 static void
-constant_not (int value,  struct constant *result)
+constant_not(int value,  struct constant *result)
 {
     result->rotation = 0;
     while (1) {
@@ -543,7 +543,7 @@ constant_not (int value,  struct constant *result)
         /* There is no rotate op in C, and to do it with 2 shifts and an or
            would mean casting to unsigned to prevent sign extensions, and it's
            exactly 1 arm instruction I need, so it's clearer like this:  */
-        __asm__ (
+        __asm__(
             "mov     %0, %1, ror #30\n"
             : "=r" (value)
             : "r" (value));
@@ -555,28 +555,28 @@ constant_not (int value,  struct constant *result)
 
 /* eg add r0, r3, r7  */
 #  define emit_arith_reg(pc, cond, op, status, rd, rn, rm) \
-      emit_arith (pc, cond, op, status, rd, rn, 0, rm)
+      emit_arith(pc, cond, op, status, rd, rn, 0, rm)
 
 /* eg sub r0, r3, r7 lsr #3 */
 #  define emit_arith_reg_shift_const(pc, cond, op, status, rd, rn, rm, shift, by) \
-      emit_arith (pc, cond, op, status, rd, rn, 0, ((by) << 7) | shift | 0 | (rm))
+      emit_arith(pc, cond, op, status, rd, rn, 0, ((by) << 7) | shift | 0 | (rm))
 
 /* eg orrs r1, r2, r1 rrx */
 #  define emit_arith_reg_rrx(pc, cond, op, status, rd, rn, rm) \
-      emit_arith (pc, cond, op, status, rd, rn, 0, shift_ROR | 0 | (rm))
+      emit_arith(pc, cond, op, status, rd, rn, 0, shift_ROR | 0 | (rm))
 
 /* I believe these take 2 cycles (due to having to access a 4th register.  */
 #  define emit_arith_reg_shift_reg(pc, cond, op, status, rd, rn, rm, shift, rs) \
-      emit_arith (pc, cond, op, status, rd, rn, 0, ((rs) << 8) | shift | 0x10 | (rm))
+      emit_arith(pc, cond, op, status, rd, rn, 0, ((rs) << 8) | shift | 0x10 | (rm))
 
 #  define emit_arith_immediate(pc, cond, op, status, rd, rn, val, rotate) \
-      emit_arith (pc, cond, op, status, rd, rn, 2, ((rotate) << 8) | (val))
+      emit_arith(pc, cond, op, status, rd, rn, 2, ((rotate) << 8) | (val))
 
 /* I'll use mov r0, r0 as my NOP for now.  */
-#  define emit_nop(pc) emit_mov (pc, r0, r0)
+#  define emit_nop(pc) emit_mov(pc, r0, r0)
 
 /* MOV ignores rn  */
-#  define emit_mov(pc, dest, src) emit_arith_reg (pc, cond_AL, MOV, 0, dest, 0, src)
+#  define emit_mov(pc, dest, src) emit_arith_reg(pc, cond_AL, MOV, 0, dest, 0, src)
 
 static char *
 emit_word(char *pc, unsigned int word)
@@ -593,7 +593,7 @@ static void emit_jump_to_op(Parrot_jit_info_t *jit_info, arm_cond_t cond,
 {
     opcode_t opcode = jit_info->op_i + disp;
     int offset = 0;
-    if(opcode <= jit_info->op_i) {
+    if (opcode <= jit_info->op_i) {
         offset = jit_info->arena.op_map[opcode].offset -
             (jit_info->native_ptr - jit_info->arena.start);
     }
@@ -608,7 +608,7 @@ static void emit_jump_to_op(Parrot_jit_info_t *jit_info, arm_cond_t cond,
 }
 
 static char *
-emit_load_constant_from_pool (char *pc,
+emit_load_constant_from_pool(char *pc,
                               Interp *interp,
                               arm_cond_t cond,
                               int value,
@@ -621,7 +621,7 @@ emit_load_constant_from_pool (char *pc,
        .L2 next
     */
 
-    pc = emit_ldrstr_offset (pc, cond,
+    pc = emit_ldrstr_offset(pc, cond,
                              is_load, is_pre,
                              0, 0,
                              hwreg,
@@ -629,12 +629,12 @@ emit_load_constant_from_pool (char *pc,
     /* Must always jump round our inlined constant, if if we don't load it
        (due to condition codes) */
     pc = emit_b(pc, cond_AL, 0);
-    pc = emit_word (pc, value);
+    pc = emit_word(pc, value);
     return pc;
 }
 
 static char *
-emit_load_constant (char *pc,
+emit_load_constant(char *pc,
                     Interp *interp,
                     arm_cond_t cond,
                     int value,
@@ -642,7 +642,7 @@ emit_load_constant (char *pc,
 {
     struct constant immediate;
 
-    constant_not (value, &immediate);
+    constant_not(value, &immediate);
 
     if (immediate.state == fits_as_is) {
         pc = emit_arith_immediate(pc, cond, MOV, 0, hwreg, 0,
@@ -653,7 +653,7 @@ emit_load_constant (char *pc,
                                    immediate.value, immediate.rotation);
     }
     else {
-        pc = emit_load_constant_from_pool (pc, interp, cond, value, hwreg);
+        pc = emit_load_constant_from_pool(pc, interp, cond, value, hwreg);
     }
     return pc;
 }
@@ -670,7 +670,7 @@ Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
     int val = jit_info->cur_op[param];
     int offset;
 
-    switch(op_type){
+    switch (op_type){
         case PARROT_ARG_I:
             offset = ((char *)&interp->int_reg.registers[val])
                 - (char *)interp;
@@ -679,7 +679,7 @@ Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
                                    "integer load register %d generates offset %d, larger than 4095\n",
                            val, offset);
             }
-            jit_info->native_ptr = emit_ldrstr_offset (jit_info->native_ptr,
+            jit_info->native_ptr = emit_ldrstr_offset(jit_info->native_ptr,
                                                        cond,
                                                        is_load,
                                                        is_pre,
@@ -689,7 +689,7 @@ Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
                                                        offset);
             break;
         case PARROT_ARG_IC:
-            jit_info->native_ptr = emit_load_constant (jit_info->native_ptr,
+            jit_info->native_ptr = emit_load_constant(jit_info->native_ptr,
                                                        interp,
                                                        cond,
                                                        val,
@@ -714,7 +714,7 @@ Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
     int val = jit_info->cur_op[param];
     int offset;
 
-    switch(op_type){
+    switch (op_type){
         case PARROT_ARG_I:
             offset = ((char *)&interp->int_reg.registers[val])
                 - (char *)interp;
@@ -723,7 +723,7 @@ Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
                                    "integer store register %d generates offset %d, larger than 4095\n",
                            val, offset);
             }
-            jit_info->native_ptr = emit_ldrstr_offset (jit_info->native_ptr,
+            jit_info->native_ptr = emit_ldrstr_offset(jit_info->native_ptr,
                                                        cond,
                                                        is_store,
                                                        is_pre,
@@ -742,7 +742,7 @@ Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
 }
 
 static void
-Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
+Parrot_jit_arith_const_alternate(Parrot_jit_info_t *jit_info,
                                   Interp *interp,
                                   arm_cond_t cond,
                                   enum constant_state alternate_on,
@@ -753,7 +753,7 @@ Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
 
     Parrot_jit_int_load(jit_info, interp, cond, src, r0);
 
-    constant_neg (const_val, &val);
+    constant_neg(const_val, &val);
 
     if (val.state == fits_as_is || val.state == alternate_on) {
         /* We can use an immediate constant.  */
@@ -762,7 +762,7 @@ Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
            If -value fits, then we sub, r0, r0, #-value
         */
         jit_info->native_ptr
-            = emit_arith_immediate (jit_info->native_ptr, cond,
+            = emit_arith_immediate(jit_info->native_ptr, cond,
                                     val.state == fits_as_is
                                     ? normal : alternative,
                                     0, r0, r0, val.value, val.rotation);
@@ -770,24 +770,24 @@ Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
     else {
         /* Else we load it into a reg the slow way. */
         jit_info->native_ptr
-            = emit_load_constant_from_pool (jit_info->native_ptr, interp,
+            = emit_load_constant_from_pool(jit_info->native_ptr, interp,
                                             cond, const_val, r1);
         jit_info->native_ptr
-            = emit_arith_reg (jit_info->native_ptr, cond, normal, 0,
+            = emit_arith_reg(jit_info->native_ptr, cond, normal, 0,
                               r0, r0, r1);
     }
     Parrot_jit_int_store(jit_info, interp, cond, dest, r0);
 }
 
 #  define Parrot_jit_arith_const_neg(ji, i, cond, plus, minus, dest, src, const_val) \
-      Parrot_jit_arith_const_alternate (ji, i, cond, fits_as_neg, \
+      Parrot_jit_arith_const_alternate(ji, i, cond, fits_as_neg, \
                       plus, minus, dest, src, const_val)
 
 #  define Parrot_jit_arith_const_not(ji, i, cond, plus, minus, dest, src, const_val) \
-      Parrot_jit_arith_const_alternate (ji, i, cond, fits_as_not, \
+      Parrot_jit_arith_const_alternate(ji, i, cond, fits_as_not, \
                       plus, minus, dest, src, const_val)
 #  define Parrot_jit_arith_const(ji, i, cond, plus, dest, src, const_val) \
-      Parrot_jit_arith_const_alternate (ji, i, cond, fits_as_is, \
+      Parrot_jit_arith_const_alternate(ji, i, cond, fits_as_is, \
                       plus, plus, dest, src, const_val)
 
 
@@ -803,7 +803,7 @@ Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
    registers, and v4 can do some things conditionally)
 */
 static void
-Parrot_jit_jumpif_const (Parrot_jit_info_t *jit_info,
+Parrot_jit_jumpif_const(Parrot_jit_info_t *jit_info,
                          Interp *interp,
                          int src, int const_val, int where_to,
                          arm_cond_t when)
@@ -812,24 +812,24 @@ Parrot_jit_jumpif_const (Parrot_jit_info_t *jit_info,
 
     Parrot_jit_int_load(jit_info, interp, cond_AL, src, r0);
 
-    constant_neg (const_val, &val);
+    constant_neg(const_val, &val);
 
     if (val.state == fits_as_is || val.state == fits_as_neg) {
         /* We can use an immediate constant.  */
         jit_info->native_ptr
-            = emit_arith_immediate (jit_info->native_ptr, cond_AL,
+            = emit_arith_immediate(jit_info->native_ptr, cond_AL,
                                     val.state == fits_as_is ? CMP : CMN, 0,
                                     0, r0, val.value, val.rotation);
     }
     else {
         /* Else we load it into a reg the slow way. */
         jit_info->native_ptr
-            = emit_load_constant_from_pool (jit_info->native_ptr, interp,
+            = emit_load_constant_from_pool(jit_info->native_ptr, interp,
                                             cond_AL, const_val, r1);
         jit_info->native_ptr
-            = emit_arith_reg (jit_info->native_ptr, cond_AL, CMP, 0, 0, r0, r1);
+            = emit_arith_reg(jit_info->native_ptr, cond_AL, CMP, 0, 0, r0, r1);
     }
-    emit_jump_to_op (jit_info, when, where_to);
+    emit_jump_to_op(jit_info, when, where_to);
 }
 
 static void
@@ -839,18 +839,18 @@ Parrot_jump_to_op_in_reg(Parrot_jit_info_t *jit_info,
 {
     /* This is effectively the pseudo-opcode ldr - ie load relative to PC.
        So offset includes pipeline.  */
-    jit_info->native_ptr = emit_ldrstr_offset (jit_info->native_ptr, cond_AL,
+    jit_info->native_ptr = emit_ldrstr_offset(jit_info->native_ptr, cond_AL,
                                                is_load, is_pre, 0, 0,
                                                REG14_lr, REG15_pc, 0);
     /* ldr pc, [r14, r0]  */
     /* lazy. this is offset type 0, 0x000 which is r0 with zero shift  */
-    jit_info->native_ptr = emit_ldrstr (jit_info->native_ptr, cond_AL,
+    jit_info->native_ptr = emit_ldrstr(jit_info->native_ptr, cond_AL,
                                         is_load, dir_Up, is_pre, 0, reg,
                                         REG15_pc, REG14_lr, 2, 0);
     /* and this "instruction" is never reached, so we can use it to store
        the constant that we load into r14  */
     jit_info->native_ptr
-        = emit_word (jit_info->native_ptr,
+        = emit_word(jit_info->native_ptr,
                      ((int) jit_info->arena.op_map) -
                      ((int) interp->code->base.code));
 }
@@ -863,8 +863,8 @@ void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 {
     Parrot_jit_fixup_t *fixup = jit_info->arena.fixups;
 
-    while(fixup){
-        switch(fixup->type){
+    while (fixup){
+        switch (fixup->type){
             case JIT_ARMBRANCH:
             {
                 char *fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup);
@@ -896,8 +896,8 @@ void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  Interp *interp)
 {
-    jit_info->native_ptr = emit_mov (jit_info->native_ptr, REG12_ip, REG13_sp);
-    jit_info->native_ptr = emit_ldmstm (jit_info->native_ptr,
+    jit_info->native_ptr = emit_mov(jit_info->native_ptr, REG12_ip, REG13_sp);
+    jit_info->native_ptr = emit_ldmstm(jit_info->native_ptr,
                                         cond_AL, is_store, dir_FD,
                                         is_writeback,
                                         REG13_sp,
@@ -905,10 +905,10 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                                         | reg2mask(REG12_ip)
                                         | reg2mask(REG14_lr)
                                         | reg2mask(REG15_pc));
-    jit_info->native_ptr = emit_arith_immediate (jit_info->native_ptr, cond_AL,
+    jit_info->native_ptr = emit_arith_immediate(jit_info->native_ptr, cond_AL,
                                                  SUB, 0, REG11_fp, REG12_ip,
                                                  4, 0);
-    jit_info->native_ptr = emit_mov (jit_info->native_ptr, 4, 0);
+    jit_info->native_ptr = emit_mov(jit_info->native_ptr, 4, 0);
     /* TODO emit restart code s. i386
      *
      * emit get r0 from stack
@@ -951,29 +951,29 @@ void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      Interp *interp)
 {
-    jit_info->native_ptr = emit_mov (jit_info->native_ptr, r1, r4);
+    jit_info->native_ptr = emit_mov(jit_info->native_ptr, r1, r4);
 #    ifndef ARM_K_BUG
-    jit_info->native_ptr = emit_mov (jit_info->native_ptr, REG14_lr, REG15_pc);
-    jit_info->native_ptr = emit_ldmstm (jit_info->native_ptr,
+    jit_info->native_ptr = emit_mov(jit_info->native_ptr, REG14_lr, REG15_pc);
+    jit_info->native_ptr = emit_ldmstm(jit_info->native_ptr,
                                         cond_AL, is_load, dir_IA,
                                         is_writeback,
                                         REG14_lr,
                                         reg2mask(0) | reg2mask(REG15_pc));
 #    else
-    jit_info->native_ptr = emit_arith_immediate (jit_info->native_ptr, cond_AL,
+    jit_info->native_ptr = emit_arith_immediate(jit_info->native_ptr, cond_AL,
                                                  ADD, 0, REG14_lr, REG15_pc,
                                                  4, 0);
-    jit_info->native_ptr = emit_ldmstm (jit_info->native_ptr,
+    jit_info->native_ptr = emit_ldmstm(jit_info->native_ptr,
                                         cond_AL, is_load, dir_IA,
                                         is_writeback,
                                         REG14_lr,
                                         reg2mask(0) | reg2mask(REG12_ip));
-    jit_info->native_ptr = emit_mov (jit_info->native_ptr, REG15_pc, REG12_ip);
+    jit_info->native_ptr = emit_mov(jit_info->native_ptr, REG15_pc, REG12_ip);
 #    endif /* ARM_K_BUG */
     jit_info->native_ptr
-        = emit_word (jit_info->native_ptr, (int) jit_info->cur_op);
+        = emit_word(jit_info->native_ptr, (int) jit_info->cur_op);
     jit_info->native_ptr
-        = emit_word (jit_info->native_ptr,
+        = emit_word(jit_info->native_ptr,
                      (int) interp->op_func_table[*(jit_info->cur_op)]);
 }
 
@@ -1036,7 +1036,7 @@ char intval_map[INT_REGISTERS_TO_MAP] =
     { r0, r1, r2, r3, r4, r5, r6, r7, r8, r12 };
 
 static void
-arm_sync_d_i_cache (void *start, void *end)
+arm_sync_d_i_cache(void *start, void *end)
 {
     /* Strictly this is only needed for StrongARM and later (not sure about
      * ARM8) because earlier cores don't have separate D and I caches.
@@ -1068,7 +1068,7 @@ arm_sync_d_i_cache (void *start, void *end)
        me.  */
     /* I'm actually passing in exclusive end address, so subtract 1 from
        it inside the assembler.  */
-    __asm__ __volatile__ (
+    __asm__ __volatile__(
         "mov     r0, %1\n"
         "sub     r1, %2, #1\n"
         "mov     r2, #0\n"

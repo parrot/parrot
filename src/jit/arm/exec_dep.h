@@ -28,36 +28,36 @@ void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
                      Interp *interp)
 {
-    jit_info->native_ptr = emit_mov (jit_info->native_ptr, r1, r4);
+    jit_info->native_ptr = emit_mov(jit_info->native_ptr, r1, r4);
 #    ifndef ARM_K_BUG
-    jit_info->native_ptr = emit_mov (jit_info->native_ptr, REG14_lr, REG15_pc);
-    jit_info->native_ptr = emit_ldmstm (jit_info->native_ptr,
+    jit_info->native_ptr = emit_mov(jit_info->native_ptr, REG14_lr, REG15_pc);
+    jit_info->native_ptr = emit_ldmstm(jit_info->native_ptr,
                                         cond_AL, is_load, dir_IA,
                                         is_writeback,
                                         REG14_lr,
                                         reg2mask(0) | reg2mask(REG15_pc));
 #    else
-    jit_info->native_ptr = emit_arith_immediate (jit_info->native_ptr, cond_AL,
+    jit_info->native_ptr = emit_arith_immediate(jit_info->native_ptr, cond_AL,
                                                  ADD, 0, REG14_lr, REG15_pc,
                                                  4, 0);
-    jit_info->native_ptr = emit_ldmstm (jit_info->native_ptr,
+    jit_info->native_ptr = emit_ldmstm(jit_info->native_ptr,
                                         cond_AL, is_load, dir_IA,
                                         is_writeback,
                                         REG14_lr,
                                         reg2mask(0) | reg2mask(REG12_ip));
-    jit_info->native_ptr = emit_mov (jit_info->native_ptr, REG15_pc, REG12_ip);
+    jit_info->native_ptr = emit_mov(jit_info->native_ptr, REG15_pc, REG12_ip);
 #    endif /* ARM_K_BUG */
     Parrot_exec_add_text_rellocation(jit_info->objfile,
         jit_info->native_ptr, RTYPE_DATA, "program_code", 0);
     jit_info->native_ptr
-        = emit_word (jit_info->native_ptr, ((int)jit_info->cur_op) -
+        = emit_word(jit_info->native_ptr, ((int)jit_info->cur_op) -
             ((int)interp->code->base.data) +
                 (jit_info->objfile->bytecode_header_size));
     Parrot_exec_add_text_rellocation(jit_info->objfile,
         jit_info->native_ptr, RTYPE_FUNC,
             interp->op_info_table[*jit_info->cur_op].func_name, 0);
     jit_info->native_ptr
-        = emit_word (jit_info->native_ptr, 0);
+        = emit_word(jit_info->native_ptr, 0);
 }
 
 #  endif /* JIT_CGP */

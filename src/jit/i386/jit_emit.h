@@ -151,7 +151,7 @@ emit_disp8_32(char *pc, int disp)
     extern PARROT_API char **Parrot_exec_rel_addr;
     extern PARROT_API int Parrot_exec_rel_count;
 
-    if(emit_is8bit(disp)) {
+    if (emit_is8bit(disp)) {
         *(pc++) = (char)disp;
         return pc;
     }
@@ -259,16 +259,16 @@ emit_shift_i_r(char *pc, int opcode, int imm, int reg)
         opcode = emit_b001;     /* -rol => 32 + ror */
         imm = -imm;
     }
-    if(imm == 0)
+    if (imm == 0)
     {
         /* noop */
     }
-    else if(imm == 1)
+    else if (imm == 1)
     {
         *(pc++) = (char) 0xd1;
         *(pc++) = (char) emit_alu_X_r(opcode,  reg);
     }
-    else if(imm > 1 && imm < 33)
+    else if (imm > 1 && imm < 33)
     {
         *(pc++) = (char) 0xc1;
         *(pc++) = (char) emit_alu_X_r(opcode,  reg);
@@ -1076,7 +1076,7 @@ static unsigned char *lastpc;
        lastpc[1] = 0xD0+sti+1; \
      else \
        emitm_fl_3(pc, emit_b001, emit_b000, sti); \
-  } while(0)
+  } while (0)
 
 /* 0xDA, 0xDB ops */
 /* FCMOV*, FCOMI PPRO */
@@ -2218,20 +2218,20 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
     emitm_movl_m_r(jit_info->native_ptr, emit_EBX, emit_EBX, 0, 1,
             offsetof(Interp, ctx.bp));
 
-    /* This jumps to the address in op_map[EDX + sizeof(void *) * INDEX] */
+    /* This jumps to the address in op_map[EDX + sizeof (void *) * INDEX] */
     emitm_jumpm(jit_info->native_ptr, emit_EDX, emit_EAX,
-            sizeof(*jit_info->arena.op_map) / 4, 0);
+            sizeof (*jit_info->arena.op_map) / 4, 0);
 }
 
 #  define jit_emit_stack_frame_enter(pc) do { \
     emitm_pushl_r(pc, emit_EBP); \
     jit_emit_mov_rr_i(pc, emit_EBP, emit_ESP); \
-} while(0)
+} while (0)
 
 #  define jit_emit_stack_frame_leave(pc) do { \
     jit_emit_mov_rr_i(pc, emit_ESP, emit_EBP); \
     emitm_popl_r(pc, emit_EBP); \
-} while(0)
+} while (0)
 
 
 
@@ -2264,7 +2264,7 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
 #    undef Parrot_jit_vtable_newp_ic_op
 
 #    define CONST(i) (int *)(jit_info->cur_op[i] * \
-       sizeof(struct PackFile_Constant) + \
+       sizeof (struct PackFile_Constant) + \
        offsetof(struct PackFile_Constant, u))
 
 #    define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, \
@@ -2451,7 +2451,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
 
     /* get the offset of the first vtable func */
     offset = offsetof(struct _vtable, init);
-    offset += nvtable * sizeof(void *);
+    offset += nvtable * sizeof (void *);
     op = *jit_info->cur_op;
     if (op == PARROT_OP_set_i_p_ki) {
         L4 = jit_set_i_p_ki(jit_info, interp, offset);
@@ -2584,7 +2584,7 @@ store:
         emitm_callm(jit_info->native_ptr, emit_EAX, emit_None, emit_None, offset);
     }
     emitm_addb_i_r(jit_info->native_ptr,
-            st + sizeof(void *) * (n + 1), emit_ESP);
+            st + sizeof (void *) * (n + 1), emit_ESP);
     /* L4: */
     if (L4)
         L4[1] = jit_info->native_ptr - L4 - 2;
@@ -2956,7 +2956,7 @@ jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp *interp, int skip)
     used_i = CONTEXT(interp->ctx)->n_regs_used[REGNO_INT];
     used_n = CONTEXT(interp->ctx)->n_regs_used[REGNO_NUM];
     jit_emit_sub_ri_i(jit_info->native_ptr, emit_ESP,
-            (used_i * sizeof(INTVAL) + used_n * sizeof(FLOATVAL)));
+            (used_i * sizeof (INTVAL) + used_n * sizeof (FLOATVAL)));
     reg_info = &jit_info->arch_info->regs[jit_info->code_type];
     for (i = 0; i < used_i; ++i) {
         /* XXX need 2 skip vars */
@@ -2964,15 +2964,15 @@ jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp *interp, int skip)
             continue;
         emitm_movl_r_m(NATIVECODE, reg_info->map_I[i], emit_ESP,
                             emit_None, 1,
-                            (used_n * sizeof(FLOATVAL) +
-                             i      * sizeof(INTVAL))
+                            (used_n * sizeof (FLOATVAL) +
+                             i      * sizeof (INTVAL))
                             );
     }
     for (i = 0; i < used_n; ++i) {
         if (reg_info->map_F[i] == skip)
             continue;
         emitm_fld(NATIVECODE, reg_info->map_F[i]);
-        jit_emit_fstore_mb_n(NATIVECODE, emit_ESP, (i * sizeof(FLOATVAL)));
+        jit_emit_fstore_mb_n(NATIVECODE, emit_ESP, (i * sizeof (FLOATVAL)));
     }
     return used_n;
 }
@@ -2994,19 +2994,19 @@ jit_restore_regs_call(Parrot_jit_info_t *jit_info, Interp *interp,
             continue;
         emitm_movl_m_r(NATIVECODE, reg_info->map_I[i], emit_ESP,
                             emit_None, 1,
-                            (used_n * sizeof(FLOATVAL) +
-                             i      * sizeof(INTVAL))
+                            (used_n * sizeof (FLOATVAL) +
+                             i      * sizeof (INTVAL))
                             );
     }
     for (i = 0; i < used_n; ++i) {
         if (reg_info->map_F[i] == skip)
             continue;
-        jit_emit_fload_mb_n(NATIVECODE, emit_ESP, (i * sizeof(FLOATVAL)));
+        jit_emit_fload_mb_n(NATIVECODE, emit_ESP, (i * sizeof (FLOATVAL)));
         emitm_fstp(NATIVECODE, (1+reg_info->map_F[i]));
     }
 
     jit_emit_add_ri_i(jit_info->native_ptr, emit_ESP,
-            (used_i * sizeof(INTVAL) + used_n * sizeof(FLOATVAL)));
+            (used_i * sizeof (INTVAL) + used_n * sizeof (FLOATVAL)));
 }
 
 static void
@@ -3132,8 +3132,8 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp *interp,
                         if (reg_info->map_I[j] == MAP(2+i)) {
                             emitm_movl_m_r(NATIVECODE, params_map, emit_ESP,
                                     emit_None, 1,
-                                    (used_n * sizeof(FLOATVAL) +
-                                     j  * sizeof(INTVAL))
+                                    (used_n * sizeof (FLOATVAL) +
+                                     j  * sizeof (INTVAL))
                                     );
                             break;
                         }
@@ -3155,7 +3155,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp *interp,
                     int j;
                     for (j = 0; j < reg_info->n_mapped_F; ++j) {
                         if (reg_info->map_F[j] == MAP(2+i)) {
-                            jit_emit_fload_mb_n(NATIVECODE, emit_ESP, (j * sizeof(FLOATVAL)));
+                            jit_emit_fload_mb_n(NATIVECODE, emit_ESP, (j * sizeof (FLOATVAL)));
                             emitm_fstp(NATIVECODE, (1+params_map));
                             break;
                         }

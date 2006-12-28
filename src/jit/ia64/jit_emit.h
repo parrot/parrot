@@ -547,7 +547,7 @@ jit_emit_bc(Parrot_jit_info_t *jit_info, opcode_t disp)
 {
     opcode_t opcode = jit_info->op_i + disp;
     int offset;
-    if(opcode <= jit_info->op_i) {
+    if (opcode <= jit_info->op_i) {
         offset = jit_info->arena.op_map[opcode].offset -
             (jit_info->native_ptr - jit_info->arena.start);
         if (jit_info->optimizer->cur_section->branch_target ==
@@ -622,8 +622,8 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 
     fixup = jit_info->arena.fixups;
 
-    while(fixup){
-        switch(fixup->type){
+    while (fixup){
+        switch (fixup->type){
             case JIT_IA64_CALL:
                 fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup);
                 d = (((long)fixup->param.fptr - (long)fixup_ptr)) >> 4;
