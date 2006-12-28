@@ -207,7 +207,7 @@ static void list_append(Interp *interp, List *list, void *item,
         int type, UINTVAL idx);
 
 #define chunk_list_size(list) \
-                (PObj_buflen(&list->chunk_list) / sizeof(List_chunk *))
+                (PObj_buflen(&list->chunk_list) / sizeof (List_chunk *))
 
 /* hide the ugly cast somehow: */
 #define chunk_list_ptr(list, idx) \
@@ -231,7 +231,7 @@ allocate_chunk(Interp *interp, List *list, UINTVAL items, UINTVAL size)
 
     Parrot_block_DOD(interp);
     /*Parrot_block_GC(interp); - why */
-    chunk = (List_chunk *)new_bufferlike_header(interp, sizeof(*chunk));
+    chunk = (List_chunk *)new_bufferlike_header(interp, sizeof (*chunk));
     chunk->items = items;
     chunk->n_chunks = 0;
     chunk->n_items  = 0;
@@ -405,7 +405,7 @@ rebuild_other(Interp *interp, List *list)
             /* DONE don't make chunks bigger then MAX_ITEMS, no - make then
              * but: if bigger, split them in a next pass
              * TODO test the logic that solves the above problem */
-            if(prev->items + chunk->items > MAX_ITEMS) {
+            if (prev->items + chunk->items > MAX_ITEMS) {
                 Parrot_reallocate(interp, (Buffer *)prev,
                         MAX_ITEMS * list->item_size);
                 if (list->container) {
@@ -515,7 +515,7 @@ rebuild_chunk_list(Interp *interp, List *list)
         if (len < 4)
             len = 4;
         Parrot_reallocate(interp, (Buffer *)list,
-                len * sizeof(List_chunk *));
+                len * sizeof (List_chunk *));
         if (list->container) {
             DOD_WRITE_BARRIER(interp, list->container, 0, list);
         }
@@ -1174,30 +1174,30 @@ list_new(Interp *interp, INTVAL type)
 {
     List *list;
 
-    list = (List *)new_bufferlike_header(interp, sizeof(*list));
+    list = (List *)new_bufferlike_header(interp, sizeof (*list));
     list->item_type = type;
     switch (type) {
     case enum_type_sized:       /* gets overridden below */
     case enum_type_char:
-        list->item_size = sizeof(char);
+        list->item_size = sizeof (char);
         break;
     case enum_type_short:
-        list->item_size = sizeof(short);
+        list->item_size = sizeof (short);
         break;
     case enum_type_int:
-        list->item_size = sizeof(int);
+        list->item_size = sizeof (int);
         break;
     case enum_type_INTVAL:
-        list->item_size = sizeof(INTVAL);
+        list->item_size = sizeof (INTVAL);
         break;
     case enum_type_FLOATVAL:
-        list->item_size = sizeof(FLOATVAL);
+        list->item_size = sizeof (FLOATVAL);
         break;
     case enum_type_PMC:
-        list->item_size = sizeof(PMC *);
+        list->item_size = sizeof (PMC *);
         break;
     case enum_type_STRING:
-        list->item_size = sizeof(STRING *);
+        list->item_size = sizeof (STRING *);
         break;
     default:
         internal_exception(1, "Unknown list type\n");
@@ -1343,7 +1343,7 @@ list_clone(Interp *interp, List *other)
     Parrot_block_GC(interp);
 
     l = list_new(interp, other->item_type);
-    mem_sys_memcopy(l, other, sizeof(List));
+    mem_sys_memcopy(l, other, sizeof (List));
     PObj_buflen(&l->chunk_list) = 0;
     PObj_bufstart(&l->chunk_list) = 0;
 
@@ -1452,7 +1452,7 @@ list_visit(Interp *interp, List *list, void *pinfo)
     PMC **pos;
 
     n = list_length(interp, list);
-    assert (list->item_type == enum_type_PMC);
+    assert(list->item_type == enum_type_PMC);
     /* TODO intlist ... */
     for (idx = 0, chunk = list->first; chunk; chunk = chunk->next) {
         /* TODO deleted elements */

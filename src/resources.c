@@ -59,7 +59,7 @@ alloc_new_block(Interp *interp,
 #endif
 
     /* Allocate a new block. Header info's on the front */
-    new_block = mem_internal_allocate_zeroed(sizeof(struct Memory_Block) +
+    new_block = mem_internal_allocate_zeroed(sizeof (struct Memory_Block) +
             alloc_size);
     if (!new_block) {
         fprintf(stderr, "out of mem allocsize = %d\n", (int)alloc_size);
@@ -70,7 +70,7 @@ alloc_new_block(Interp *interp,
     new_block->free = alloc_size;
     new_block->size = alloc_size;
     SET_NULL(new_block->next);
-    new_block->start = (char *)new_block + sizeof(struct Memory_Block);
+    new_block->start = (char *)new_block + sizeof (struct Memory_Block);
     new_block->top = new_block->start;
 
     /* Note that we've allocated it */
@@ -105,7 +105,7 @@ for details.
 - remember alignment in a buffer header bit
   use this in compaction code
 - reduce alignment to a reasonable value i.e. MALLOC_ALIGNMENT
-  aka 2*sizeof(size_t) or just 8 (TODO make a config hint)
+  aka 2*sizeof (size_t) or just 8 (TODO make a config hint)
 
 Buffer memory layout:
 
@@ -453,7 +453,7 @@ static size_t
 aligned_size(Buffer *buffer, size_t len)
 {
     if (PObj_is_COWable_TEST(buffer))
-        len += sizeof(void*);
+        len += sizeof (void*);
     if (PObj_aligned_TEST(buffer)) {
         len = (len + BUFFER_ALIGN_1) & BUFFER_ALIGN_MASK;
     }
@@ -467,7 +467,7 @@ static void*
 aligned_mem(Buffer *buffer, char *mem)
 {
     if (PObj_is_COWable_TEST(buffer))
-        mem += sizeof(void*);
+        mem += sizeof (void*);
     if (PObj_aligned_TEST(buffer)) {
         mem = (char*)(((unsigned long)(mem + BUFFER_ALIGN_1)) &
                 BUFFER_ALIGN_MASK);
@@ -481,7 +481,7 @@ aligned_mem(Buffer *buffer, char *mem)
 static size_t
 aligned_string_size(STRING *buffer, size_t len)
 {
-    len += sizeof(void*);
+    len += sizeof (void*);
     len = (len + WORD_ALIGN_1) & WORD_ALIGN_MASK;
     return len;
 }
@@ -572,7 +572,7 @@ Parrot_reallocate(Interp *interp, Buffer *buffer, size_t tosize)
     }
     PObj_bufstart(buffer) = mem;
     if (PObj_is_COWable_TEST(buffer))
-        new_size -= sizeof(void*);
+        new_size -= sizeof (void*);
     PObj_buflen(buffer) = new_size;
 }
 
@@ -619,7 +619,7 @@ Parrot_reallocate_string(Interp *interp, STRING *str, size_t tosize)
             old_size) {
         pool->top_block->free -= needed;
         pool->top_block->top  += needed;
-        PObj_buflen(str) = new_size - sizeof(void*);
+        PObj_buflen(str) = new_size - sizeof (void*);
         return;
     }
     assert(str->bufused <= tosize);
@@ -632,12 +632,12 @@ Parrot_reallocate_string(Interp *interp, STRING *str, size_t tosize)
     pool->possibly_reclaimable += PObj_buflen(str);
 
     mem = mem_allocate(interp, new_size, pool);
-    mem += sizeof(void*);
+    mem += sizeof (void*);
 
     /* copy mem from strstart, *not* bufstart */
     oldmem = str->strstart;
     str->strstart = PObj_bufstart(str) = mem;
-    PObj_buflen(str) = new_size - sizeof(void*);
+    PObj_buflen(str) = new_size - sizeof (void*);
 
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
      * those bugs, this can be removed which would make things cheaper */
@@ -693,7 +693,7 @@ Parrot_allocate_aligned(Interp *interp, Buffer *buffer, size_t size)
     mem = aligned_mem(buffer, mem);
     PObj_bufstart(buffer) = mem;
     if (PObj_is_COWable_TEST(buffer))
-        new_size -= sizeof(void*);
+        new_size -= sizeof (void*);
     PObj_buflen(buffer) = new_size;
 }
 
@@ -726,9 +726,9 @@ Parrot_allocate_string(Interp *interp, STRING *str, size_t size)
             : interp->arena_base->memory_pool;
     new_size = aligned_string_size(str, size);
     mem = mem_allocate(interp, new_size, pool);
-    mem += sizeof(void*);
+    mem += sizeof (void*);
     PObj_bufstart(str) =  str->strstart = mem;
-    PObj_buflen(str) = new_size - sizeof(void*);
+    PObj_buflen(str) = new_size - sizeof (void*);
 }
 
 /*
@@ -746,7 +746,7 @@ static struct Memory_Pool *
 new_memory_pool(size_t min_block, compact_f compact)
 {
     struct Memory_Pool * const pool =
-        mem_internal_allocate(sizeof(struct Memory_Pool));
+        mem_internal_allocate(sizeof (struct Memory_Pool));
 
     if (pool) {
         pool->top_block = NULL;

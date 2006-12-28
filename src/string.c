@@ -104,7 +104,7 @@ Copies the string header from the first Parrot string to the second.
 static void
 copy_string_header(String *dest /*NN*/, const String *src /*NN*/)
 {
-    memcpy(dest, src, sizeof(String));
+    memcpy(dest, src, sizeof (String));
 }
 
 /*
@@ -253,9 +253,9 @@ string_init(Parrot_Interp interp)
             interp->parent_interpreter->const_cstring_table;
         return;
     }
-    interp->const_cstring_table = mem_sys_allocate(sizeof(STRING*) *
-        sizeof(parrot_cstrings)/sizeof(parrot_cstrings[0]));
-    for (i = 0; i < sizeof(parrot_cstrings)/sizeof(parrot_cstrings[0]); ++i) {
+    interp->const_cstring_table = mem_sys_allocate(sizeof (STRING*) *
+        sizeof (parrot_cstrings)/sizeof (parrot_cstrings[0]));
+    for (i = 0; i < sizeof (parrot_cstrings)/sizeof (parrot_cstrings[0]); ++i) {
         interp->const_cstring_table[i] =
             const_string(interp, parrot_cstrings[i].string);
         /* TODO construct string here and valid hashval */
@@ -339,7 +339,7 @@ Returs NULL, if no compatible string representation can be found.
 */
 
 CHARSET *
-string_rep_compatible (Interp *interp,
+string_rep_compatible(Interp *interp,
                        STRING *a /*NN*/,
                        const STRING *b /*NN*/,
                        ENCODING **e /*NN*/)
@@ -1101,11 +1101,11 @@ string_replace(Interp *interp, STRING *src,
      */
     diff = (end_byte - start_byte) - rep->bufused;
 
-    if(diff >= 0
+    if (diff >= 0
             || ((INTVAL)src->bufused - (INTVAL)PObj_buflen(src)) <= diff) {
         Parrot_unmake_COW(interp, src);
 
-        if(diff != 0) {
+        if (diff != 0) {
             mem_sys_memmove((char*)src->strstart + start_byte + rep->bufused,
                     (char*)src->strstart + end_byte,
                     src->bufused - end_byte);
@@ -1114,7 +1114,7 @@ string_replace(Interp *interp, STRING *src,
 
         mem_sys_memcopy((char*)src->strstart + start_byte,
                 rep->strstart, rep->bufused);
-        if(diff != 0)
+        if (diff != 0)
             (void)string_compute_strlen(interp, src);
     }
     /*
@@ -1237,7 +1237,7 @@ otherwise.
 INTVAL
 string_equal(Interp *interp, STRING *s1, STRING *s2)
 {
-    if ( (s1 == s2) || (!s1 && !s2) ) {
+    if ((s1 == s2) || (!s1 && !s2)) {
         return 0;
     }
     else if (!s2) {
@@ -1299,7 +1299,7 @@ do { \
  \
     for ( ; len ; ++curr1, ++curr2, ++dp, --len) \
         *dp = *curr1 & *curr2; \
-} while(0)
+} while (0)
 
 /*
 
@@ -1400,7 +1400,7 @@ do { \
             *dp = *curr2; \
         } \
     } \
-} while(0)
+} while (0)
 
 /*
 
@@ -1550,7 +1550,7 @@ do { \
         for ( ; length ; --length, ++dp, ++curr) \
             *dp = 0xFF & ~ *curr; \
     } \
-} while(0)
+} while (0)
 
 /*
 
@@ -1895,7 +1895,7 @@ string_to_num(Interp *interp, const STRING *s)
 
         exponent = fake_exponent + exponent * exp_sign;
 
-        if(exponent < 0) {
+        if (exponent < 0) {
             exponent = -exponent;
             exp_sign=-1;
         }
@@ -1911,13 +1911,13 @@ string_to_num(Interp *interp, const STRING *s)
             exponent >>= 1;
         }
 
-        if(exp_sign < 0)
+        if (exp_sign < 0)
             f /= exp_val;
         else
             f *= exp_val;
 
 
-        if(sign < 0)
+        if (sign < 0)
             f = -f;
     }
 

@@ -89,7 +89,7 @@ Stack_Chunk_t *cst_new_stack_chunk(Parrot_Interp interp,
     Stack_Chunk_t * const new_chunk = pool->get_free_object(interp, pool);
 
     PObj_bufstart(new_chunk) = NULL;
-    PObj_buflen  (new_chunk) = 0;
+    PObj_buflen(new_chunk) = 0;
 
     new_chunk->size = chunk->size;
     new_chunk->name = chunk->name;

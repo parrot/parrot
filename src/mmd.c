@@ -540,11 +540,11 @@ mmd_add_function(Interp *interp,
         if (interp->binop_mmd_funcs) {
             interp->binop_mmd_funcs =
                 mem_sys_realloc(interp->binop_mmd_funcs,
-                                (func_nr + 1) * sizeof(MMD_table));
+                                (func_nr + 1) * sizeof (MMD_table));
         }
         else {
             interp->binop_mmd_funcs =
-                mem_sys_allocate((func_nr + 1) * sizeof(MMD_table));
+                mem_sys_allocate((func_nr + 1) * sizeof (MMD_table));
         }
 
         for (i = interp->n_binop_mmd_funcs; i <= func_nr; ++i)  {
@@ -594,7 +594,7 @@ mmd_expand_x(Interp *interp, INTVAL func_nr, INTVAL new_x)
 
     /* First, fill in the whole new table with the default function
        pointer. We only really need to do the new part, but... */
-    new_table = mem_sys_allocate(sizeof(funcptr_t) * y * new_x);
+    new_table = mem_sys_allocate(sizeof (funcptr_t) * y * new_x);
     for (i = 0; i < y * new_x; i++) {
         new_table[i] = NULL;
     }
@@ -604,10 +604,10 @@ mmd_expand_x(Interp *interp, INTVAL func_nr, INTVAL new_x)
        lengths */
     src_ptr = (char*) table->mmd_funcs;
     dest_ptr = (char*) new_table;
-    old_dp = sizeof(funcptr_t) * x;
-    new_dp = sizeof(funcptr_t) * new_x;
+    old_dp = sizeof (funcptr_t) * x;
+    new_dp = sizeof (funcptr_t) * new_x;
     for (i = 0; i < y; i++) {
-        memcpy(dest_ptr, src_ptr, sizeof(funcptr_t) * x);
+        memcpy(dest_ptr, src_ptr, sizeof (funcptr_t) * x);
         src_ptr  += old_dp;
         dest_ptr += new_dp;
     }
@@ -644,7 +644,7 @@ mmd_expand_y(Interp *interp, INTVAL func_nr, INTVAL new_y)
 
     /* First, fill in the whole new table with the default function
        pointer. We only really need to do the new part, but... */
-    new_table = mem_sys_allocate(sizeof(funcptr_t) * x * new_y);
+    new_table = mem_sys_allocate(sizeof (funcptr_t) * x * new_y);
     for (i = 0; i < x * new_y; i++) {
         new_table[i] = NULL;
     }
@@ -652,7 +652,7 @@ mmd_expand_y(Interp *interp, INTVAL func_nr, INTVAL new_y)
     /* Then copy the old table over, if it existed in the first place. */
     if (table->mmd_funcs) {
         memcpy(new_table, table->mmd_funcs,
-               sizeof(funcptr_t) * x * y);
+               sizeof (funcptr_t) * x * y);
         mem_sys_free(table->mmd_funcs);
     }
     table->y = new_y;
@@ -1580,7 +1580,7 @@ mmd_create_builtin_multi_meth_2(Interp *interp, PMC *ns,
     STRING *meth_name, *_sub;
     PMC *method, *multi, *class, *multi_sig;
 
-    assert (type != enum_class_Null && type != enum_class_delegate &&
+    assert(type != enum_class_Null && type != enum_class_delegate &&
             type != enum_class_Ref  && type != enum_class_SharedRef &&
             type != enum_class_deleg_pmc && type != enum_class_ParrotClass &&
             type != enum_class_ParrotObject);

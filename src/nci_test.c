@@ -513,7 +513,7 @@ nci_i33(int *double_me, int *triple_me) {
     *double_me *= 2;
     *triple_me *= 3;
 
-    return( *double_me + *triple_me );
+    return ( *double_me + *triple_me );
 }
 
 void

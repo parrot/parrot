@@ -158,10 +158,10 @@ gc_ms_get_free_object(Interp *interp,
 
     /* if we don't have any objects */
     if (!pool->free_list)
-        (*pool->more_objects) (interp, pool);
+        (*pool->more_objects)(interp, pool);
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
-    PObj_flags_SETTO( (PObj*) ptr, 0);
+    PObj_flags_SETTO((PObj*) ptr, 0);
     --pool->num_free_objects;
     return ptr;
 }
@@ -204,7 +204,7 @@ Parrot_add_to_free_list(Interp *interp,
          * free_list
          */
         PObj_buflen((PObj*)object) = 0;
-        pool->add_free_object (interp, pool, object);
+        pool->add_free_object(interp, pool, object);
         object = (void *)((char *)object + pool->object_size);
     }
     pool->num_free_objects += end - start;
@@ -258,7 +258,7 @@ gc_ms_alloc_objects(Interp *interp, struct Small_Object_Pool *pool)
     UINTVAL start, end;
 
     /* Setup memory for the new objects */
-    new_arena = mem_internal_allocate(sizeof(struct Small_Object_Arena));
+    new_arena = mem_internal_allocate(sizeof (struct Small_Object_Arena));
     if (!new_arena)
         PANIC("Out of arena memory");
     size = pool->object_size * pool->objects_per_alloc;
@@ -310,7 +310,7 @@ new_small_object_pool(Interp *interp,
         size_t object_size, size_t objects_per_alloc)
 {
     struct Small_Object_Pool * const pool =
-        mem_internal_allocate_zeroed(sizeof(struct Small_Object_Pool));
+        mem_internal_allocate_zeroed(sizeof (struct Small_Object_Pool));
 
     SET_NULL(pool->last_Arena);
     SET_NULL(pool->free_list);

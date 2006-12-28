@@ -61,7 +61,7 @@ Dump the constant table.
 */
 
 static void
-const_dump (Interp *interp, struct PackFile_Segment *segp)
+const_dump(Interp *interp, struct PackFile_Segment *segp)
 {
     PIO_printf(interp, "%s => [\n", segp->name);
     PackFile_ConstTable_dump(interp,
@@ -79,7 +79,7 @@ Dump the fixup table.
 */
 
 static void
-fixup_dump (Interp *interp, struct PackFile_Segment *segp)
+fixup_dump(Interp *interp, struct PackFile_Segment *segp)
 {
     PIO_printf(interp, "%s => [\n", segp->name);
     PackFile_Fixup_dump(interp,
@@ -97,7 +97,7 @@ Disassemble and dump.
 */
 
 static void
-disas_dump (Interp *interp, struct PackFile_Segment *self)
+disas_dump(Interp *interp, struct PackFile_Segment *self)
 {
     opcode_t *pc;
     size_t i, n;
@@ -136,10 +136,10 @@ PackFile_header_dump(Interp *interp, struct PackFile *pf)
     PIO_printf(interp, "HEADER => [\n");
     PIO_printf(interp, "\twordsize  = %d", pf->header->wordsize);
     PIO_printf(interp, "\t(interpreter's wordsize    = %d)\n",
-            sizeof(opcode_t));
+            sizeof (opcode_t));
     PIO_printf(interp, "\tint_size  = %d", pf->header->intvalsize);
     PIO_printf(interp, "\t(interpreter's INTVAL size = %d)\n",
-            sizeof(INTVAL));
+            sizeof (INTVAL));
     PIO_printf(interp, "\tbyteorder = %d", pf->header->byteorder);
     PIO_printf(interp, "\t(interpreter's byteorder   = %d)\n",
             PARROT_BIGENDIAN);
@@ -254,7 +254,7 @@ main(int argc, char **argv)
         FILE *fp;
 
         size = PackFile_pack_size(interp,
-                interp->code->base.pf) * sizeof(opcode_t);
+                interp->code->base.pf) * sizeof (opcode_t);
         pack = (opcode_t*) mem_sys_allocate(size);
         if (!pack) {
             printf("out of mem\n");

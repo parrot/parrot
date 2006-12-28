@@ -85,7 +85,7 @@
        Note that size_t is allowed to be 4 bytes even if pointers are 8.
        You can adjust this by defining INTERNAL_SIZE_T
 
-  Alignment:                              2 * sizeof(size_t) (default)
+  Alignment:                              2 * sizeof (size_t) (default)
        (i.e., 8 byte alignment with 4byte size_t). This suffices for
        nearly all current machines and C compilers. However, you can
        define MALLOC_ALIGNMENT to be wider than this if necessary.
@@ -110,7 +110,7 @@
        allocated than were requested in malloc) is less than or equal
        to the minimum size, except for requests >= mmap_threshold that
        are serviced via mmap(), where the worst case wastage is 2 *
-       sizeof(size_t) bytes plus the remainder from a system page (the
+       sizeof (size_t) bytes plus the remainder from a system page (the
        minimal mmap unit); typically 4096 or 8192 bytes.
 
   Maximum allocated size:  4-byte size_t: 2^32 minus about two pages
@@ -190,7 +190,7 @@
     Changing default word sizes:
 
     INTERNAL_SIZE_T            size_t
-    MALLOC_ALIGNMENT           2 * sizeof(INTERNAL_SIZE_T)
+    MALLOC_ALIGNMENT           2 * sizeof (INTERNAL_SIZE_T)
     PTR_UINT                   unsigned long
     CHUNK_SIZE_T               unsigned long
 
@@ -421,7 +421,7 @@ extern "C" {
 #endif
 
 /* The corresponding word size */
-#define SIZE_SZ                (sizeof(INTERNAL_SIZE_T))
+#define SIZE_SZ                (sizeof (INTERNAL_SIZE_T))
 
 
 
@@ -1092,7 +1092,7 @@ struct mallinfo public_mALLINFo();
     struct Node** pool;
     int n = read_number_of_nodes_needed();
     if (n <= 0) return 0;
-    pool = (struct Node**)(independent_calloc(n, sizeof(struct Node), 0);
+    pool = (struct Node**)(independent_calloc(n, sizeof (struct Node), 0);
     if (pool == 0) die();
     / / organize into a linked list...
     struct Node* first = pool[0];
@@ -1149,7 +1149,7 @@ Void_t** public_iCALLOc();
 
   void send_message(char* msg) {
     int msglen = strlen(msg);
-    size_t sizes[3] = { sizeof(struct Head), msglen, sizeof(struct Foot) };
+    size_t sizes[3] = { sizeof (struct Head), msglen, sizeof (struct Foot) };
     void* chunks[3];
     if (independent_comalloc(3, sizes, chunks) == 0)
       die();
@@ -1757,39 +1757,39 @@ int public_mALLOPt(int p, int v) {
 #  define MALLOC_ZERO(charp, nbytes)                                            \
 do {                                                                          \
   INTERNAL_SIZE_T* mzp = (INTERNAL_SIZE_T*)(charp);                           \
-  CHUNK_SIZE_T  mctmp = (nbytes)/sizeof(INTERNAL_SIZE_T);                     \
+  CHUNK_SIZE_T  mctmp = (nbytes)/sizeof (INTERNAL_SIZE_T);                     \
   long mcn;                                                                   \
   if (mctmp < 8) mcn = 0; else { mcn = (mctmp-1)/8; mctmp %= 8; }             \
   switch (mctmp) {                                                            \
-    case 0: for(;;) { *mzp++ = 0;                                             \
+    case 0: for (;;) { *mzp++ = 0;                                             \
     case 7:           *mzp++ = 0;                                             \
     case 6:           *mzp++ = 0;                                             \
     case 5:           *mzp++ = 0;                                             \
     case 4:           *mzp++ = 0;                                             \
     case 3:           *mzp++ = 0;                                             \
     case 2:           *mzp++ = 0;                                             \
-    case 1:           *mzp++ = 0; if(mcn <= 0) break; mcn--; }                \
+    case 1:           *mzp++ = 0; if (mcn <= 0) break; mcn--; }                \
   }                                                                           \
-} while(0)
+} while (0)
 
 #  define MALLOC_COPY(dest,src,nbytes)                                          \
 do {                                                                          \
   INTERNAL_SIZE_T* mcsrc = (INTERNAL_SIZE_T*) src;                            \
   INTERNAL_SIZE_T* mcdst = (INTERNAL_SIZE_T*) dest;                           \
-  CHUNK_SIZE_T  mctmp = (nbytes)/sizeof(INTERNAL_SIZE_T);                     \
+  CHUNK_SIZE_T  mctmp = (nbytes)/sizeof (INTERNAL_SIZE_T);                     \
   long mcn;                                                                   \
   if (mctmp < 8) mcn = 0; else { mcn = (mctmp-1)/8; mctmp %= 8; }             \
   switch (mctmp) {                                                            \
-    case 0: for(;;) { *mcdst++ = *mcsrc++;                                    \
+    case 0: for (;;) { *mcdst++ = *mcsrc++;                                    \
     case 7:           *mcdst++ = *mcsrc++;                                    \
     case 6:           *mcdst++ = *mcsrc++;                                    \
     case 5:           *mcdst++ = *mcsrc++;                                    \
     case 4:           *mcdst++ = *mcsrc++;                                    \
     case 3:           *mcdst++ = *mcsrc++;                                    \
     case 2:           *mcdst++ = *mcsrc++;                                    \
-    case 1:           *mcdst++ = *mcsrc++; if(mcn <= 0) break; mcn--; }       \
+    case 1:           *mcdst++ = *mcsrc++; if (mcn <= 0) break; mcn--; }       \
   }                                                                           \
-} while(0)
+} while (0)
 
 #endif
 
@@ -1956,7 +1956,7 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 #define mem2chunk(mem) ((mchunkptr)((char*)(mem) - 2*SIZE_SZ))
 
 /* The smallest possible chunk */
-#define MIN_CHUNK_SIZE        (sizeof(struct malloc_chunk))
+#define MIN_CHUNK_SIZE        (sizeof (struct malloc_chunk))
 
 /* The smallest size we can malloc is an aligned minimal chunk */
 
@@ -2125,7 +2125,7 @@ typedef struct malloc_chunk* mbinptr;
 #define bin_at(m, i) ((mbinptr)((char*)&((m)->bins[(i)<<1]) - (SIZE_SZ<<1)))
 
 /* analog of ++bin */
-#define next_bin(b)  ((mbinptr)((char*)(b) + (sizeof(mchunkptr)<<1)))
+#define next_bin(b)  ((mbinptr)((char*)(b) + (sizeof (mchunkptr)<<1)))
 
 /* Reminders about list directionality within bins */
 #define first(b)     ((b)->fd)
@@ -2754,7 +2754,7 @@ static void do_check_malloc_state()
     int max_fast_bin;
 
     /* internal size_t must be no wider than pointer type */
-    assert(sizeof(INTERNAL_SIZE_T) <= sizeof(char*));
+    assert(sizeof (INTERNAL_SIZE_T) <= sizeof (char*));
 
     /* alignment is a power of 2 */
     assert((MALLOC_ALIGNMENT & (MALLOC_ALIGNMENT-1)) == 0);
@@ -4089,7 +4089,7 @@ Void_t* rEALLOc(oldmem, bytes) Void_t* oldmem; size_t bytes;
           copysize = oldsize - SIZE_SZ;
           s = (INTERNAL_SIZE_T*)(oldmem);
           d = (INTERNAL_SIZE_T*)(newmem);
-          ncopies = copysize / sizeof(INTERNAL_SIZE_T);
+          ncopies = copysize / sizeof (INTERNAL_SIZE_T);
           assert(ncopies >= 3);
 
           if (ncopies > 9)
@@ -4342,7 +4342,7 @@ Void_t* cALLOc(n_elements, elem_size) size_t n_elements; size_t elem_size;
 
       d = (INTERNAL_SIZE_T*)mem;
       clearsize = chunksize(p) - SIZE_SZ;
-      nclears = clearsize / sizeof(INTERNAL_SIZE_T);
+      nclears = clearsize / sizeof (INTERNAL_SIZE_T);
       assert(nclears >= 3);
 
       if (nclears > 9)
@@ -4478,7 +4478,7 @@ static Void_t** iALLOc(n_elements, sizes, opts, chunks) size_t n_elements;
     if (n_elements == 0)
       return (Void_t**) mALLOc(0);
     marray = 0;
-    array_size = request2size(n_elements * (sizeof(Void_t*)));
+    array_size = request2size(n_elements * (sizeof (Void_t*)));
   }
 
   /* compute total element size */
@@ -4758,7 +4758,7 @@ int mALLOPt(param_number, value) int param_number; int value;
   /* Ensure initialization/consolidation */
   malloc_consolidate(av);
 
-  switch(param_number) {
+  switch (param_number) {
   case M_MXFAST:
     if (value >= 0 && value <= MAX_FAST_SIZE) {
       set_max_fast(av, value);

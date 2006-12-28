@@ -373,7 +373,7 @@ push_opcode_integer(Parrot_Interp interp, IMAGE_IO *io, INTVAL v)>
 
 Pushes the integer C<v> onto the end of the C<*io> "stream".
 
-XXX assumes sizeof(opcode_t) == sizeof(INTVAL).
+XXX assumes sizeof (opcode_t) == sizeof (INTVAL).
 
 =cut
 
@@ -382,8 +382,8 @@ XXX assumes sizeof(opcode_t) == sizeof(INTVAL).
 static void
 push_opcode_integer(Parrot_Interp interp, IMAGE_IO *io, INTVAL v)
 {
-    assert(sizeof(opcode_t) == sizeof(INTVAL));
-    op_append(interp, io->image, (opcode_t)v, sizeof(opcode_t));
+    assert(sizeof (opcode_t) == sizeof (INTVAL));
+    op_append(interp, io->image, (opcode_t)v, sizeof (opcode_t));
 }
 
 /*
@@ -400,7 +400,7 @@ Pushes the number C<v> onto the end of the C<*io> "stream".
 static void
 push_opcode_number(Parrot_Interp interp, IMAGE_IO *io, FLOATVAL v)
 {
-    const size_t len = PF_size_number() * sizeof(opcode_t);
+    const size_t len = PF_size_number() * sizeof (opcode_t);
     STRING * const s = io->image;
     const size_t used = s->bufused;
 
@@ -424,7 +424,7 @@ Pushes the string C<*v> onto the end of the C<*io> "stream".
 static void
 push_opcode_string(Parrot_Interp interp, IMAGE_IO *io, STRING* v)
 {
-    const size_t len = PF_size_string(v) * sizeof(opcode_t);
+    const size_t len = PF_size_string(v) * sizeof (opcode_t);
     STRING * const s = io->image;
     const size_t used = s->bufused;
 
@@ -448,7 +448,7 @@ Pushes the PMC C<*v> onto the end of the C<*io> "stream".
 static void
 push_opcode_pmc(Parrot_Interp interp, IMAGE_IO *io, PMC* v)
 {
-    op_append(interp, io->image, (opcode_t)v, sizeof(opcode_t));
+    op_append(interp, io->image, (opcode_t)v, sizeof (opcode_t));
 }
 
 /*
@@ -599,7 +599,7 @@ cleanup_next_for_GC_pool(Parrot_Interp interp,
                 if (p->pmc_ext)
                     PMC_next_for_GC(p) = NULL;
             }
-            p = (PMC *)((char *)p + sizeof(PMC));
+            p = (PMC *)((char *)p + sizeof (PMC));
         }
     }
 }
@@ -671,7 +671,7 @@ ft_init(Parrot_Interp interp, visit_info *info)
     STRING *s = info->image;
     struct PackFile *pf;
 
-    info->image_io = mem_sys_allocate(sizeof(IMAGE_IO));
+    info->image_io = mem_sys_allocate(sizeof (IMAGE_IO));
     info->image_io->image = s = info->image;
 #if FREEZE_ASCII
     info->image_io->vtable = &ascii_funcs;

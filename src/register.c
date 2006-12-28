@@ -122,7 +122,7 @@ create_initial_context(Interp *interp)
 #define INITIAL_FREE_SLOTS 8
     interp->ctx_mem.n_free_slots = INITIAL_FREE_SLOTS;
     interp->ctx_mem.free_list =
-        mem_sys_allocate(INITIAL_FREE_SLOTS * sizeof(void *));
+        mem_sys_allocate(INITIAL_FREE_SLOTS * sizeof (void *));
     for (i = 0; i < INITIAL_FREE_SLOTS; ++i)
         interp->ctx_mem.free_list[i] = NULL;
     /*
@@ -180,7 +180,7 @@ parrot_gc_context(Interp *interp)
     if (!interp->ctx_mem.threshold)
         return;
     LVALUE_CAST(char *, ctx.bp) = interp->ctx_mem.threshold -
-        sizeof(struct parrot_regs_t);
+        sizeof (struct parrot_regs_t);
     /* TODO */
 #endif
 }
@@ -315,12 +315,12 @@ Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used)
      * TODO (OPT) if we allocate a new context due to a self-recursive call
      *      create a spezialized version that just uses caller's size
      */
-    const size_t size_n = sizeof(FLOATVAL) * n_regs_used[REGNO_NUM];
+    const size_t size_n = sizeof (FLOATVAL) * n_regs_used[REGNO_NUM];
     const size_t size_nip = size_n +
-        sizeof(INTVAL) *   n_regs_used[REGNO_INT] +
-        sizeof(PMC*) *     n_regs_used[REGNO_PMC];
+        sizeof (INTVAL) *   n_regs_used[REGNO_INT] +
+        sizeof (PMC*) *     n_regs_used[REGNO_PMC];
     size_t reg_alloc = size_nip +
-        sizeof(STRING*) *  n_regs_used[REGNO_STR];
+        sizeof (STRING*) *  n_regs_used[REGNO_STR];
 
     const int slot = (reg_alloc + 7) >> 3;
     reg_alloc = slot << 3;
@@ -330,7 +330,7 @@ Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used)
         int i;
 
         interp->ctx_mem.free_list = mem_sys_realloc(
-                interp->ctx_mem.free_list, n * sizeof(void*));
+                interp->ctx_mem.free_list, n * sizeof (void*));
         for (i = interp->ctx_mem.n_free_slots; i < n; ++i)
             interp->ctx_mem.free_list[i] = NULL;
         interp->ctx_mem.n_free_slots = n;
@@ -447,7 +447,7 @@ setup_register_stacks(Interp *interp)
 {
     CONTEXT(interp->ctx)->reg_stack =
         register_new_stack(interp,
-            "Regs_", sizeof(save_regs_t));
+            "Regs_", sizeof (save_regs_t));
 
 }
 
@@ -497,7 +497,7 @@ Parrot_pop_regs(Interp *interp)
     /* deal with allocated memory, GC handles the chunk itself */
     mem_sys_free(PObj_bufstart(chunk));
     PObj_bufstart(chunk) = NULL;
-    PObj_buflen  (chunk) = 0;
+    PObj_buflen(chunk) = 0;
     PObj_sysmem_CLEAR(chunk);
 }
 

@@ -164,14 +164,14 @@ BIGNUM* BN_new(PINTD_ INTVAL length);
 BN_CONTEXT* BN_create_context(PINTD_ INTVAL precision);
 void BN_grow(PINTD_ BIGNUM *in, INTVAL length);
 void BN_destroy(PINTD_ BIGNUM *bn);
-void bn_fatal_error (PINTD_ char* mesg);
+void bn_fatal_error(PINTD_ char* mesg);
 INTVAL BN_set_digit(PINTD_ BIGNUM* bn, INTVAL pos, INTVAL value);
 INTVAL BN_get_digit(PINTD_ BIGNUM* bn, INTVAL pos);
 BIGNUM* BN_copy(PINTD_ BIGNUM*, BIGNUM*);
 BIGNUM* BN_new_from_int(PINTD_ INTVAL value);
 INTVAL BN_to_scientific_string(PINTD_ BIGNUM* bn, char **dest);
 INTVAL BN_to_engineering_string(PINTD_ BIGNUM*bn, char **dest);
-void BN_round (PINTD_ BIGNUM *victim, BN_CONTEXT *context);
+void BN_round(PINTD_ BIGNUM *victim, BN_CONTEXT *context);
 void BN_round_as_integer(PINTD_ BIGNUM *, BN_CONTEXT* );
 void BN_EXCEPT(PINTD_ BN_EXCEPTIONS, char*);
 void BN_add(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
@@ -180,20 +180,20 @@ BN_subtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context
 void BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context);
 void BN_minus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context);
 void
-BN_compare (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
+BN_compare(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
 void
-BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
+BN_multiply(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
 void
-BN_divide (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
+BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
 void
-BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
+BN_divide_integer(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
 void
-BN_remainder (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
+BN_remainder(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context);
 void BN_rescale(PINTD_ BIGNUM* result, BIGNUM* bignum, BIGNUM* expn, BN_CONTEXT* context);
 INTVAL BN_to_int(PINTD_ BIGNUM* bignum, BN_CONTEXT* context);
 void BN_power(PINTD_ BIGNUM* result, BIGNUM* bignum,
               BIGNUM* expn, BN_CONTEXT* context);
-INTVAL BN_comp (PINTD_ BIGNUM *one, BIGNUM *two, BN_CONTEXT*);
+INTVAL BN_comp(PINTD_ BIGNUM *one, BIGNUM *two, BN_CONTEXT*);
 INTVAL BN_is_zero(PINTD_ BIGNUM* test, BN_CONTEXT *);
 int BN_set_qNAN(PINTD_ BIGNUM* bn);
 int BN_set_sNAN(PINTD_ BIGNUM* bn);

@@ -1269,11 +1269,11 @@ pt_add_to_interpreters(Parrot_Interp interp, Parrot_Interp new_interp)
         assert(!interpreter_array);
         assert(n_interpreters == 0);
 
-        interpreter_array = mem_sys_allocate(sizeof(Interp*));
+        interpreter_array = mem_sys_allocate(sizeof (Interp*));
         interpreter_array[0] = interp;
         n_interpreters = 1;
 
-        shared_gc_info = mem_sys_allocate_zeroed(sizeof(*shared_gc_info));
+        shared_gc_info = mem_sys_allocate_zeroed(sizeof (*shared_gc_info));
         COND_INIT(shared_gc_info->gc_cond);
         PARROT_ATOMIC_INT_INIT(shared_gc_info->gc_block_level);
         PARROT_ATOMIC_INT_SET(shared_gc_info->gc_block_level, 0);
@@ -1281,7 +1281,7 @@ pt_add_to_interpreters(Parrot_Interp interp, Parrot_Interp new_interp)
         /* XXX try to defer this until later */
         assert(interp == interpreter_array[0]);
         interp->thread_data =
-            mem_sys_allocate_zeroed(sizeof(Thread_data));
+            mem_sys_allocate_zeroed(sizeof (Thread_data));
         INTERPRETER_LOCK_INIT(interp);
         interp->thread_data->tid = 0;
 
@@ -1289,7 +1289,7 @@ pt_add_to_interpreters(Parrot_Interp interp, Parrot_Interp new_interp)
     }
 
 
-    new_interp->thread_data = mem_sys_allocate_zeroed(sizeof(Thread_data));
+    new_interp->thread_data = mem_sys_allocate_zeroed(sizeof (Thread_data));
     INTERPRETER_LOCK_INIT(new_interp);
     running_threads++;
     if (Interp_debug_TEST(interp, PARROT_THREAD_DEBUG_FLAG))
@@ -1309,7 +1309,7 @@ pt_add_to_interpreters(Parrot_Interp interp, Parrot_Interp new_interp)
      * need to resize
      */
     interpreter_array = mem_sys_realloc(interpreter_array,
-            (n_interpreters + 1) * sizeof(Interp*));
+            (n_interpreters + 1) * sizeof (Interp*));
     interpreter_array[n_interpreters] = new_interp;
     new_interp->thread_data->tid = n_interpreters;
     new_interp->thread_data->state = THREAD_STATE_NOT_STARTED;

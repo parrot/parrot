@@ -475,7 +475,7 @@ Parrot_make_la(Interp *interp, PMC *array) {
        to actually have an array, even if the inbound array is
        completely empty
     */
-    long * const out_array = mem_sys_allocate((sizeof(long)) * (arraylen + 1));
+    long * const out_array = mem_sys_allocate((sizeof (long)) * (arraylen + 1));
     out_array[arraylen] = 0;
     /*    printf("Long array has %i elements\n", arraylen);*/
     for (cur = 0; cur < arraylen; cur++) {
@@ -526,7 +526,7 @@ Parrot_make_cpa(Interp *interp, PMC *array) {
        to actually have an array, even if the inbound array is
        completely empty
     */
-    char ** const out_array = mem_sys_allocate((sizeof(char *))
+    char ** const out_array = mem_sys_allocate((sizeof (char *))
                                                * (arraylen + 1));
     out_array[arraylen] = 0;
 
@@ -850,9 +850,9 @@ Parrot_register_move(Interp *interp, int n_regs,
 
     /* allocate space for data structures */
     /* NOTA: data structures could be kept allocated somewhere waiting to get reused...*/
-    c.nb_succ = nb_succ = (int*)mem_sys_allocate_zeroed(sizeof(int) * n_regs);
-    c.backup = backup = (int*)mem_sys_allocate(sizeof(int) * n_regs);
-    c.reg_to_index = reg_to_index = (int*)mem_sys_allocate(sizeof(int) * max_reg);
+    c.nb_succ = nb_succ = (int*)mem_sys_allocate_zeroed(sizeof (int) * n_regs);
+    c.backup = backup = (int*)mem_sys_allocate(sizeof (int) * n_regs);
+    c.reg_to_index = reg_to_index = (int*)mem_sys_allocate(sizeof (int) * max_reg);
 
     /* init backup array */
     for (i = 0; i < n_regs; i++)

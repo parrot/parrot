@@ -94,7 +94,7 @@ new_sub(Interp *interp)
 {
     /* Using system memory until I figure out GC issues */
     struct Parrot_sub * const newsub =
-        mem_sys_allocate_zeroed(sizeof(struct Parrot_sub));
+        mem_sys_allocate_zeroed(sizeof (struct Parrot_sub));
     newsub->seg = interp->code;
     return newsub;
 }
@@ -136,7 +136,7 @@ struct Parrot_cont *
 new_continuation(Interp *interp, struct Parrot_cont *to)
 {
     struct Parrot_cont * const cc =
-        mem_sys_allocate(sizeof(struct Parrot_cont));
+        mem_sys_allocate(sizeof (struct Parrot_cont));
     struct Parrot_Context * const to_ctx =
         to ? to->to_ctx : CONTEXT(interp->ctx);
 
@@ -172,7 +172,7 @@ struct Parrot_cont *
 new_ret_continuation(Interp *interp)
 {
     struct Parrot_cont * const cc =
-        mem_sys_allocate(sizeof(struct Parrot_cont));
+        mem_sys_allocate(sizeof (struct Parrot_cont));
     cc->to_ctx = CONTEXT(interp->ctx);
     cc->from_ctx = NULL;    /* filled in during a call */
     cc->dynamic_state = NULL;
@@ -200,7 +200,7 @@ struct Parrot_coro *
 new_coroutine(Interp *interp)
 {
     struct Parrot_coro * const co =
-        mem_sys_allocate_zeroed(sizeof(struct Parrot_coro));
+        mem_sys_allocate_zeroed(sizeof (struct Parrot_coro));
 
     co->seg = interp->code;
     co->ctx = NULL;

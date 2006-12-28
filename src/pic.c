@@ -134,10 +134,10 @@ parrot_PIC_alloc_store(Interp *interp,
      */
 #define POLYMORPHIC 0.05
 
-    poly = (size_t)(n * POLYMORPHIC) * sizeof(Parrot_PIC);
+    poly = (size_t)(n * POLYMORPHIC) * sizeof (Parrot_PIC);
     if (!poly)
-        poly = 2 * sizeof(Parrot_PIC);
-    size = n * sizeof(Parrot_MIC) + poly + sizeof(Parrot_PIC_store);
+        poly = 2 * sizeof (Parrot_PIC);
+    size = n * sizeof (Parrot_MIC) + poly + sizeof (Parrot_PIC_store);
 
     store = mem_sys_allocate_zeroed(size);
     SET_NULL_P(store->prev, Parrot_PIC_store*);
@@ -145,7 +145,7 @@ parrot_PIC_alloc_store(Interp *interp,
 
     store->pic    = (Parrot_PIC*)((char *)store + size);
     store->usable = poly;
-    store->mic    = (Parrot_MIC*)((char*)store + sizeof(Parrot_PIC_store));
+    store->mic    = (Parrot_MIC*)((char*)store + sizeof (Parrot_PIC_store));
     store->n_mics = n;
 }
 
@@ -209,17 +209,17 @@ parrot_PIC_alloc_pic(Interp *interp)
     Parrot_PIC_store *store = interp->code->pic_store;
     Parrot_PIC_store *new_store;
 
-    if (store->usable < sizeof(Parrot_PIC)) {
+    if (store->usable < sizeof (Parrot_PIC)) {
         size_t size =
-            (size_t)(store->n_mics * POLYMORPHIC) * sizeof(Parrot_PIC);
+            (size_t)(store->n_mics * POLYMORPHIC) * sizeof (Parrot_PIC);
         if (size == 0)
-            size = 2 * sizeof(Parrot_PIC);
-        new_store = mem_sys_allocate_zeroed(size + sizeof(Parrot_PIC_store));
+            size = 2 * sizeof (Parrot_PIC);
+        new_store = mem_sys_allocate_zeroed(size + sizeof (Parrot_PIC_store));
         new_store->prev = store;
         interp->code->pic_store = new_store;
 
         new_store->pic    = (Parrot_PIC*)((char *)new_store + size +
-            sizeof(Parrot_PIC_store));
+            sizeof (Parrot_PIC_store));
         new_store->usable = size;
         /*
          * the addon store has only poly-morphic slots
@@ -229,7 +229,7 @@ parrot_PIC_alloc_pic(Interp *interp)
         new_store->n_mics = store->n_mics;
         store = new_store;
     }
-    store->usable -= sizeof(Parrot_PIC);
+    store->usable -= sizeof (Parrot_PIC);
     return --store->pic;
 }
 

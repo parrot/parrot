@@ -42,7 +42,7 @@ Returns C<num> converted to a Parrot C<STRING>.
 
 Note that C<base> must be defined, a default of 10 is not assumed. The
 caller has to verify that C<< base >= 2 && base <= 36 >>
-The buffer C<tc> must be at least C<sizeof(UHUGEINTVAL)*8 + 1> chars big.
+The buffer C<tc> must be at least C<sizeof (UHUGEINTVAL)*8 + 1> chars big.
 
 If C<minus> is true then C<-> is prepended to the string representation.
 
@@ -55,7 +55,7 @@ uint_to_str(Interp *interp,
             char *tc, UHUGEINTVAL num, char base, int minus)
 {
     /* the buffer must be at least as long as this */
-    char *p = tc + sizeof(UHUGEINTVAL)*8 + 1;
+    char *p = tc + sizeof (UHUGEINTVAL)*8 + 1;
     const char * const tail = p;
 
     assert(base >= 2 && base <= 36);
@@ -676,8 +676,7 @@ do_sprintf:
                         case 'f':
                         case 'g':
                         case 'G':
-                            thefloat = obj->getfloat
-                                (interp, info.type, obj);
+                            thefloat = obj->getfloat(interp, info.type, obj);
                             /* turn -0.0 into 0.0 */
                             /* WTF if( thefloat == 0.0 ) { thefloat = 0.0; } */
                             gen_sprintf_call(interp, tc, &info, ch);
@@ -762,8 +761,7 @@ do_sprintf:
 
                         case 's':
                           CASE_s:
-                            string = obj->getstring
-                                (interp, info.type, obj);
+                            string = obj->getstring(interp, info.type, obj);
 
                             ts = handle_flags(interp, &info, string,
                                     0, NULL);

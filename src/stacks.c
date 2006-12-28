@@ -38,7 +38,7 @@ Stack_Chunk_t *
 new_stack(Interp *interp, const char *name /*NN*/)
 {
 
-    return register_new_stack(interp, name, sizeof(Stack_Entry_t));
+    return register_new_stack(interp, name, sizeof (Stack_Entry_t));
 }
 
 

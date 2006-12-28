@@ -30,7 +30,7 @@ contiguous region of memory.
 #define TRACE_PACKFILE_PMC 0
 
 /* XXX This should be in an external file */
-extern struct PackFile_Directory *directory_new (Interp*, struct PackFile *pf);
+extern struct PackFile_Directory *directory_new(Interp*, struct PackFile *pf);
 
 /*
 
@@ -49,7 +49,7 @@ PackFile_pack_size(Interp *interp, struct PackFile *self)
     opcode_t size;
     struct PackFile_Directory * const dir = &self->directory;
 
-    size = PACKFILE_HEADER_BYTES / sizeof(opcode_t);
+    size = PACKFILE_HEADER_BYTES / sizeof (opcode_t);
 
     size += 4; /* magic + opcode type + directory type + pad */
 
@@ -92,7 +92,7 @@ PackFile_pack(Interp *interp, struct PackFile *self, opcode_t *cursor)
 
     /* Pack the header */
     mem_sys_memcopy(cursor, self->header, PACKFILE_HEADER_BYTES);
-    cursor += PACKFILE_HEADER_BYTES / sizeof(opcode_t);
+    cursor += PACKFILE_HEADER_BYTES / sizeof (opcode_t);
     *cursor++ = PARROT_MAGIC;           /* Pack the magic */
     *cursor++ = OPCODE_TYPE_PERL;       /* Pack opcode type */
     *cursor++ = PF_DIR_FORMAT;          /* dir format */
@@ -102,7 +102,7 @@ PackFile_pack(Interp *interp, struct PackFile *self, opcode_t *cursor)
     seg = (struct PackFile_Segment *) dir;
     /* dir size */
     size = seg->op_count;
-    ret = PackFile_Segment_pack (interp, seg, cursor);
+    ret = PackFile_Segment_pack(interp, seg, cursor);
     if ((size_t)(ret - cursor) != size) {
         fprintf(stderr, "PackFile_pack segment '%s' used size %d "
                 "but reported %d\n", seg->name, (int)(ret-cursor), (int)size);

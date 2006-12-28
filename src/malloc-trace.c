@@ -44,12 +44,12 @@ open_log_file()
 #ifdef __linux__
     sprintf(name, "/proc/%d/cmdline", pid);
     fd2 = open(name, O_RDONLY);
-    if(fd2>=0 && (count = read(fd2, cmdline, 127)) > 0) {
+    if (fd2>=0 && (count = read(fd2, cmdline, 127)) > 0) {
         close(fd2);
         cmdline[count] = 0;
-        for(s=cmdline; *s++;); s--;
-        while(--s>cmdline && *s!='/');
-        if(*s == '/') s++;
+        for (s=cmdline; *s++;); s--;
+        while (--s>cmdline && *s!='/');
+        if (*s == '/') s++;
         sprintf(name, LOG_NAME ".%.12s.%d", s, pid);
     }
         else {
@@ -59,9 +59,9 @@ open_log_file()
     sprintf(name, LOG_NAME ".%d", pid);
 #endif
     fd = open(name, O_WRONLY|O_CREAT, 0600);
-    if(fd >= 0) {
-        write(fd, &version, sizeof(version));
-        write(fd, &initial_brk, sizeof(initial_brk));
+    if (fd >= 0) {
+        write(fd, &version, sizeof (version));
+        write(fd, &initial_brk, sizeof (initial_brk));
     }
     tracing = 1;
 }
@@ -78,14 +78,14 @@ malloc_trace_destructor(void)
     buffer[buffer_i].ptr = (void *)t.tv_usec;
     buffer[buffer_i].ptr2 = NULL;
     buffer_i++;
-    if(fd < 0) open_log_file();
-    if(getpid() != pid) { /* Oops, must have forked... */
-        if(fd >= 0) close(fd);
+    if (fd < 0) open_log_file();
+    if (getpid() != pid) { /* Oops, must have forked... */
+        if (fd >= 0) close(fd);
         return;
     }
-    if(fd >= 0) write(fd, buffer, buffer_i*sizeof(ACTION));
+    if (fd >= 0) write(fd, buffer, buffer_i*sizeof (ACTION));
     write(2, "<end malloc trace>\n", 19);
-    if(fd >= 0) close(fd);
+    if (fd >= 0) close(fd);
 }
 
 #ifdef __linux__
@@ -107,11 +107,11 @@ malloc_record(int code, size_t size, void *ptr, void *ptr2)
     static long count = 0;
     struct timeval t;
 
-    if(!tracing) return;
+    if (!tracing) return;
 #ifdef __linux__
-    if(count == 0) signal(SIGSEGV, (void (*)(int))malloc_segv_handler);
+    if (count == 0) signal(SIGSEGV, (void (*)(int))malloc_segv_handler);
 #endif
-    if((count++ % TIMESTAMP_FREQ) == 0) {
+    if ((count++ % TIMESTAMP_FREQ) == 0) {
         gettimeofday(&t, NULL);
         buffer[buffer_i].code = CODE_TIMESTAMP;
         buffer[buffer_i].size = t.tv_sec;
@@ -123,13 +123,13 @@ malloc_record(int code, size_t size, void *ptr, void *ptr2)
     buffer[buffer_i].size = size;
     buffer[buffer_i].ptr = ptr;
     buffer[buffer_i].ptr2 = ptr2;
-    if(++buffer_i >= ACTION_BUF_SIZE) {
-        if(fd < 0) open_log_file();
-        if(getpid() != pid) { /* Oops, must have forked... */
+    if (++buffer_i >= ACTION_BUF_SIZE) {
+        if (fd < 0) open_log_file();
+        if (getpid() != pid) { /* Oops, must have forked... */
             tracing = 0;
             return;
         }
-        if(fd >= 0) write(fd, buffer, buffer_i*sizeof(ACTION));
+        if (fd >= 0) write(fd, buffer, buffer_i*sizeof (ACTION));
         buffer_i = 0;
     }
 }
@@ -139,7 +139,7 @@ void* malloc(size_t bytes)
 {
     void *ptr;
 
-    if(initial_brk == 0) { /* Must be the first time. */
+    if (initial_brk == 0) { /* Must be the first time. */
         initial_brk = sbrk(0);
         atexit(malloc_trace_destructor);
     }
@@ -173,7 +173,7 @@ void* memalign(size_t alignment, size_t bytes)
 {
     void *ptr;
 
-    if(initial_brk == 0) { /* Must be the first time. */
+    if (initial_brk == 0) { /* Must be the first time. */
         initial_brk = sbrk(0);
         atexit(malloc_trace_destructor);
     }
@@ -188,7 +188,7 @@ void* calloc(size_t n, size_t elem_size)
 {
     void *ptr;
 
-    if(initial_brk == 0) { /* Must be the first time. */
+    if (initial_brk == 0) { /* Must be the first time. */
         initial_brk = sbrk(0);
         atexit(malloc_trace_destructor);
     }

@@ -130,14 +130,14 @@ Parrot_reallocate(Interp *interp, void *from, size_t size)
     void *p;
 
     if (!PObj_bufstart(buffer)) {
-        p = 1 + (INTVAL *)xcalloc(1, sizeof(INTVAL) + size);
+        p = 1 + (INTVAL *)xcalloc(1, sizeof (INTVAL) + size);
     }
     else {
         if (!size) {    /* realloc(3) does free, if size == 0 here */
             return PObj_bufstart(buffer);    /* do nothing */
         }
         p = 1 + (INTVAL *)xrealloc((INTVAL *)PObj_bufstart(buffer) - 1,
-                                   sizeof(INTVAL) + size);
+                                   sizeof (INTVAL) + size);
         if (size > oldlen)
             memset(p + oldlen, 0, size - oldlen);
     }
@@ -162,7 +162,7 @@ void *
 Parrot_allocate(Interp *interp, void *buffer, size_t size)
 {
     Buffer * const b = buffer;
-    void * const p = xmalloc(sizeof(INTVAL) + size);
+    void * const p = xmalloc(sizeof (INTVAL) + size);
 
     *(INTVAL *)p = 0;
     PObj_bufstart(b) = 1 + (INTVAL *)p;
@@ -187,7 +187,7 @@ Parrot_allocate_zeroed(Interp *interp, void *buffer, size_t size)
 {
     Buffer * const b = buffer;
 
-    PObj_bufstart(b) = 1 + (INTVAL *)xcalloc(1, sizeof(INTVAL) + size);
+    PObj_bufstart(b) = 1 + (INTVAL *)xcalloc(1, sizeof (INTVAL) + size);
     PObj_buflen(b) = size;
     return b;
 }
@@ -212,11 +212,11 @@ Parrot_reallocate_string(Interp *interp, STRING *str, size_t size)
     else if (size) {
         const size_t pad = STRING_ALIGNMENT - 1;
         void *p;
-        size = ((size + pad + sizeof(INTVAL)) & ~pad);
+        size = ((size + pad + sizeof (INTVAL)) & ~pad);
         p = xrealloc((char *)((INTVAL*)PObj_bufstart(str) - 1), size);
-        PObj_bufstart(str) = str->strstart = (char *)p + sizeof(INTVAL);
+        PObj_bufstart(str) = str->strstart = (char *)p + sizeof (INTVAL);
         /* usable size at bufstart */
-        PObj_buflen(str) = size - sizeof(INTVAL);
+        PObj_buflen(str) = size - sizeof (INTVAL);
     }
     return str->strstart;
 }
@@ -239,11 +239,11 @@ Parrot_allocate_string(Interp *interp, STRING *str, size_t size)
     void *p;
     const size_t pad = STRING_ALIGNMENT - 1;
 
-    size = ((size + pad + sizeof(INTVAL)) & ~pad);
+    size = ((size + pad + sizeof (INTVAL)) & ~pad);
     p = xcalloc(1, size);
     *(INTVAL*)p = 0;
-    PObj_bufstart(str) = str->strstart = (char *)p + sizeof(INTVAL);
-    PObj_buflen(str) = size - sizeof(INTVAL);
+    PObj_bufstart(str) = str->strstart = (char *)p + sizeof (INTVAL);
+    PObj_buflen(str) = size - sizeof (INTVAL);
     return str;
 }
 

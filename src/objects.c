@@ -267,7 +267,7 @@ create_deleg_pmc_vtable(Interp *interp, PMC *class,
     VTABLE * const ro_object_vtable = object_vtable->ro_variant_vtable;
     VTABLE * const delegate_vtable  = interp->vtables[enum_class_delegate];
 
-    memset(&meth_str, 0, sizeof(meth_str));
+    memset(&meth_str, 0, sizeof (meth_str));
     meth_str.encoding = Parrot_fixed_8_encoding_ptr;
     meth_str.charset = Parrot_default_charset_ptr;
     for (i = 0; (meth = Parrot_vtable_slot_names[i]); ++i) {
@@ -1159,7 +1159,7 @@ void
 init_object_cache(Interp *interp)
 {
     Caches * const mc = interp->caches =
-        mem_sys_allocate_zeroed(sizeof(*mc));
+        mem_sys_allocate_zeroed(sizeof (*mc));
     SET_NULL(mc->idx);
 }
 
@@ -1261,17 +1261,17 @@ Parrot_find_method_with_cache(Interp *interp, PMC *class,
     bits = (((UINTVAL) method_name->strstart ) >> 2) & TBL_SIZE_MASK;
     if (type >= mc->mc_size) {
         if (mc->idx) {
-            mc->idx = mem_sys_realloc(mc->idx, sizeof(UINTVAL*) * (type + 1));
+            mc->idx = mem_sys_realloc(mc->idx, sizeof (UINTVAL*) * (type + 1));
         }
         else {
-            mc->idx = mem_sys_allocate(sizeof(UINTVAL*) * (type + 1));
+            mc->idx = mem_sys_allocate(sizeof (UINTVAL*) * (type + 1));
         }
         for (i = mc->mc_size; i <= type; ++i)
             mc->idx[i] = NULL;
         mc->mc_size = type + 1;
     }
     if (!mc->idx[type]) {
-        mc->idx[type] = mem_sys_allocate(sizeof(Meth_cache_entry*) * TBL_SIZE);
+        mc->idx[type] = mem_sys_allocate(sizeof (Meth_cache_entry*) * TBL_SIZE);
         for (i = 0; i < TBL_SIZE; ++i)
             mc->idx[type][i] = NULL;
     }
@@ -1284,7 +1284,7 @@ Parrot_find_method_with_cache(Interp *interp, PMC *class,
     if (!e) {
         PMC * const found = find_method_direct(interp, class, method_name);
         /* when here no or no correct entry was at [bits] */
-        e = mem_sys_allocate(sizeof(Meth_cache_entry));
+        e = mem_sys_allocate(sizeof (Meth_cache_entry));
         if (old)
             old->next = e;
         else

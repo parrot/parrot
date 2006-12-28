@@ -139,7 +139,7 @@ main(int argc, char *argv[])
 
     /*Parrot_set_config_hash();  TODO link with cfg */
     debugger = Parrot_new(NULL);
-    pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof(PDB_t));
+    pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof (PDB_t));
     /* attach pdb structure */
     debugger->pdb = pdb;
 
@@ -152,7 +152,7 @@ main(int argc, char *argv[])
     imcc_init(interp);
     IMCC_ast_init(interp);
 
-    do_yylex_init ( interp, &yyscanner );
+    do_yylex_init( interp, &yyscanner );
 
     if (argc < 2) {
         fprintf(stderr, "Usage: pdb programfile [program-options]\n");
@@ -161,7 +161,7 @@ main(int argc, char *argv[])
 
     filename = argv[1];
     ext = strrchr(filename, '.');
-    if (ext && strcmp (ext, ".pbc") == 0) {
+    if (ext && strcmp(ext, ".pbc") == 0) {
 
         pf = Parrot_readbc(interp, filename);
 
@@ -184,7 +184,7 @@ main(int argc, char *argv[])
                     filename);
         }
         pasm_file = 0;
-        if (ext && strcmp (ext, ".pasm") == 0)
+        if (ext && strcmp(ext, ".pasm") == 0)
             pasm_file = 1;
         emit_open(interp, 1, NULL);
         IMCC_INFO(interp)->state->pasm_file = pasm_file;

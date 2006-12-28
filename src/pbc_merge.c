@@ -142,8 +142,8 @@ pbc_merge_loadpbc(Interp *interp, char *fullname)
 
     /* Now that we have the bytecode, let's unpack it. */
     pf = PackFile_new(interp, is_mapped);
-    if (!PackFile_unpack
-        (interp, pf, (opcode_t *)program_code, program_size)) {
+    if (!PackFile_unpack(interp,
+                pf, (opcode_t *)program_code, program_size)) {
         PIO_eprintf(interp, "PBC Merge: Can't unpack packfile %s.\n",
                 fullname);
         Parrot_exit(interp, 1);
@@ -197,7 +197,7 @@ pbc_merge_bytecode(Interp *interp, struct pbc_merge_input **inputs,
 
         /* Re-allocate the current buffer. */
         bc = mem_sys_realloc(bc,
-            (cursor + in_seg->base.size) * sizeof(opcode_t));
+            (cursor + in_seg->base.size) * sizeof (opcode_t));
         if (bc == NULL)
         {
             PIO_eprintf(interp, "PBC Merge: Cannot reallocate memory\n");
@@ -206,7 +206,7 @@ pbc_merge_bytecode(Interp *interp, struct pbc_merge_input **inputs,
 
         /* Copy data and store cursor. */
         memcpy(bc + cursor, in_seg->base.data,
-            in_seg->base.size * sizeof(opcode_t));
+            in_seg->base.size * sizeof (opcode_t));
         inputs[i]->code_start = cursor;
 
         /* Update cursor. */
@@ -271,7 +271,7 @@ pbc_merge_constants(Interp *interp, struct pbc_merge_input **inputs,
         if (in_seg->const_count > 0)
         {
             constants = mem_sys_realloc(constants,
-                (cursor + in_seg->const_count) * sizeof(Parrot_Pointer));
+                (cursor + in_seg->const_count) * sizeof (Parrot_Pointer));
             if (constants == NULL)
             {
                 PIO_eprintf(interp, "PBC Merge: Out of memory");
@@ -285,7 +285,7 @@ pbc_merge_constants(Interp *interp, struct pbc_merge_input **inputs,
             /* Get the entry and allocate space for copy. */
             struct PackFile_Constant *cur_entry = in_seg->constants[j];
             struct PackFile_Constant *copy = mem_sys_allocate(
-                sizeof(struct PackFile_Constant));
+                sizeof (struct PackFile_Constant));
             if (copy == NULL)
             {
                 PIO_eprintf(interp, "PBC Merge: Out of memory");
@@ -293,7 +293,7 @@ pbc_merge_constants(Interp *interp, struct pbc_merge_input **inputs,
             }
 
             /* Copy. */
-            memcpy(copy, cur_entry, sizeof(struct PackFile_Constant));
+            memcpy(copy, cur_entry, sizeof (struct PackFile_Constant));
 
             /* If it's a sub PMC, need to deal with offsets. */
             if (copy->type == PFC_PMC)
@@ -372,7 +372,7 @@ pbc_merge_fixups(Interp *interp, struct pbc_merge_input **inputs,
         if (in_seg->fixup_count > 0)
         {
             fixups = mem_sys_realloc(fixups,
-                (cursor + in_seg->fixup_count) * sizeof(Parrot_Pointer));
+                (cursor + in_seg->fixup_count) * sizeof (Parrot_Pointer));
             if (fixups == NULL)
             {
                 PIO_eprintf(interp, "PBC Merge: Out of memory");
@@ -387,7 +387,7 @@ pbc_merge_fixups(Interp *interp, struct pbc_merge_input **inputs,
             /* Get the entry and allocate space for copies. */
             struct PackFile_FixupEntry *cur_entry = in_seg->fixups[j];
             struct PackFile_FixupEntry *copy = mem_sys_allocate(
-                sizeof(struct PackFile_FixupEntry));
+                sizeof (struct PackFile_FixupEntry));
             char *name_copy = mem_sys_allocate(strlen(cur_entry->name) + 1);
             if (copy == NULL || name_copy == NULL)
             {
@@ -446,7 +446,7 @@ pbc_merge_debugs(Interp *interp, struct pbc_merge_input **inputs,
     struct PackFile_Debug *debug_seg;
     opcode_t *lines = mem_sys_allocate(1);
     struct PackFile_DebugMapping **mappings =
-        mem_sys_allocate(sizeof(Parrot_Pointer));
+        mem_sys_allocate(sizeof (Parrot_Pointer));
     opcode_t num_mappings = 0;
     opcode_t num_lines = 0;
     int i, j;
@@ -460,25 +460,25 @@ pbc_merge_debugs(Interp *interp, struct pbc_merge_input **inputs,
 
         /* Concatenate line numbers. */
         lines = mem_sys_realloc(lines,
-                (num_lines + in_seg->base.size) * sizeof(opcode_t));
+                (num_lines + in_seg->base.size) * sizeof (opcode_t));
         if (lines == NULL)
         {
             PIO_eprintf(interp, "PBC Merge: Cannot reallocate memory\n");
             Parrot_exit(interp, 1);
         }
         memcpy(lines + num_lines, in_seg->base.data,
-            in_seg->base.size * sizeof(opcode_t));
+            in_seg->base.size * sizeof (opcode_t));
 
         /* Concatenate mappings. */
         mappings = mem_sys_realloc(mappings,
                    (num_mappings + in_seg->num_mappings) *
-                   sizeof(Parrot_Pointer));
+                   sizeof (Parrot_Pointer));
         for (j = 0; j < in_seg->num_mappings; j++)
         {
             struct PackFile_DebugMapping *mapping = mem_sys_allocate(
-                sizeof(struct PackFile_DebugMapping));
+                sizeof (struct PackFile_DebugMapping));
             memcpy(mapping, in_seg->mappings[j],
-                sizeof(struct PackFile_DebugMapping));
+                sizeof (struct PackFile_DebugMapping));
             mapping->offset += num_lines;
             if (mapping->mapping_type == PF_DEBUGMAPPINGTYPE_FILENAME)
                 mapping->u.filename += inputs[i]->const_start;
@@ -531,7 +531,7 @@ pbc_merge_pic_index(Interp *interp, struct pbc_merge_input **inputs,
     }
     pic_index = PackFile_Segment_new_seg(interp,
               &pf->directory, PF_UNKNOWN_SEG, "PIC_idx_MERGED", 1);
-    pic_index->data = mem_sys_allocate_zeroed(size * sizeof(opcode_t));
+    pic_index->data = mem_sys_allocate_zeroed(size * sizeof (opcode_t));
     pic_index->size = size;
     for (i = 0, size = 0; i < num_inputs; i++) {
         in_seg = inputs[i]->pf->cur_cs->pic_index;
@@ -694,7 +694,7 @@ pbc_merge_write(Interp *interp, struct PackFile *pf, const char *filename)
     FILE *fp;
 
     /* Get size of packfile we'll write. */
-    size = PackFile_pack_size(interp, pf) * sizeof(opcode_t);
+    size = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
 
     /* Allocate memory. */
     pack = (opcode_t*) mem_sys_allocate(size);
@@ -774,11 +774,11 @@ main(int argc, char **argv)
 
     /* Load each packfile that we are to merge and set up an input
        structure for each of them. */
-    input_files = mem_sys_allocate(argc * sizeof(Parrot_Pointer));
+    input_files = mem_sys_allocate(argc * sizeof (Parrot_Pointer));
     for (i = 0; i < argc; i++)
     {
         /* Allocate a struct. */
-        input_files[i] = mem_sys_allocate(sizeof(struct pbc_merge_input));
+        input_files[i] = mem_sys_allocate(sizeof (struct pbc_merge_input));
 
         /* Set filename */
         input_files[i]->filename = *argv;
