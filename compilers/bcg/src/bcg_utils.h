@@ -13,3 +13,10 @@ void bcg_hash_put(BCG_info * bcg_info, bcg_hash * hash, char *key,
 void *bcg_hash_get(BCG_info * bcg_info, bcg_hash * hash, char *key);
 
 #endif /* PARROT_BCG_UTILS_H */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
