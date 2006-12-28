@@ -1039,8 +1039,8 @@ static void
 arm_sync_d_i_cache (void *start, void *end)
 {
     /* Strictly this is only needed for StrongARM and later (not sure about
-     * ARM8) because earlier cores don't have separate D and I caches.  
-     * However there aren't that many ARM7 or earlier devices around that 
+     * ARM8) because earlier cores don't have separate D and I caches.
+     * However there aren't that many ARM7 or earlier devices around that
      * we'll be running on.  */
 #      ifdef __linux
 #        ifdef __GNUC__
