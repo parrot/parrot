@@ -98,9 +98,9 @@ static void \
 run(Interp *interpreter, opcode_t *pc) \
 { \
     while (pc) { \
-	printf("PC %2d %s\n", pc - interpreter->code->byte_code, \
-		interpreter->op_info[*pc]); \
-	pc = interpreter->op_func[*pc](pc, interpreter); \
+        printf("PC %2d %s\n", pc - interpreter->code->byte_code, \
+                interpreter->op_info[*pc]); \
+        pc = interpreter->op_func[*pc](pc, interpreter); \
     } \
 }
 #  else
@@ -109,7 +109,7 @@ static void \
 run(Interp *interpreter, opcode_t *pc) \
 { \
     while (pc) { \
-	pc = interpreter->op_func[*pc](pc, interpreter); \
+        pc = interpreter->op_func[*pc](pc, interpreter); \
     } \
 }
 #  endif
@@ -135,8 +135,8 @@ run(Interp *interpreter, opcode_t *pc)
 #    ifdef TRACE
 #       define DISPATCH  \
     for (;;) { \
-	printf("PC %2d %s\n", pc - interpreter->code->byte_code, \
-		interpreter->op_info[*pc]); \
+        printf("PC %2d %s\n", pc - interpreter->code->byte_code, \
+                interpreter->op_info[*pc]); \
         switch(*pc) {
 #    else
 #       define DISPATCH \
@@ -148,8 +148,8 @@ run(Interp *interpreter, opcode_t *pc)
 #    define NEXT            continue;
 #    define DONE            return;
 #    define ENDDISPATCH     default : printf("illegal instruction"); \
-				  exit(1);                           \
-			}}
+                                  exit(1);                           \
+                        }}
 # else  /* CGOTO */
 
 static void
@@ -259,24 +259,24 @@ main(int argc, char *argv[]) {
      * the mops main loop
      */
     opcode_t mops[] =
-    	{ OP_set_i_ic, 4, 100000000, 	/* set I4, n */
-	  OP_print_i, 4, 	/* print I4 */
-	  OP_print_sc, 0, 	/* print "\n" */
-          OP_set_i_ic, 5, 1, 	/* set I5, 1 */
-	  OP_sub_i_i_i, 4, 4, 5,	/* L1: sub I4, I4, I5 */
-	  OP_if_i_ic, 4, -4,	/* if I4, L1 */
-	  OP_print_sc, 1, 	/* print "done\n" */
-	  OP_end 		/* end */
-	};
+        { OP_set_i_ic, 4, 100000000,    /* set I4, n */
+          OP_print_i, 4,        /* print I4 */
+          OP_print_sc, 0,       /* print "\n" */
+          OP_set_i_ic, 5, 1,    /* set I5, 1 */
+          OP_sub_i_i_i, 4, 4, 5,        /* L1: sub I4, I4, I5 */
+          OP_if_i_ic, 4, -4,    /* if I4, L1 */
+          OP_print_sc, 1,       /* print "done\n" */
+          OP_end                /* end */
+        };
     opcode_t usage[] =
-    	{
-          OP_set_i_ic, 0, 2, 	/* set I0, 2 */
-	  OP_if_i_ic, 0, 6,	/* if I0, L1 */
-	  OP_print_sc, 2,	/* print "error\n" */
-	  OP_end, 		/* end */
-	  OP_print_sc, 3,	/* L1: print "usage...\n" */
-	  OP_end 		/* end */
-	};
+        {
+          OP_set_i_ic, 0, 2,    /* set I0, 2 */
+          OP_if_i_ic, 0, 6,     /* if I0, L1 */
+          OP_print_sc, 2,       /* print "error\n" */
+          OP_end,               /* end */
+          OP_print_sc, 3,       /* L1: print "usage...\n" */
+          OP_end                /* end */
+        };
     Interp *interpreter = malloc(sizeof(Interp));
 
     prog = usage;
