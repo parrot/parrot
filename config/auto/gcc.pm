@@ -162,15 +162,6 @@ sub runstep {
 
             #"-Wall -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wwrite-strings -Waggregate-return -Winline -W -Wno-unused",
 
-            # these don't work on gcc 3.4.5, but were included in tewk's
-            # patch in #39802
-            #. "-Wfatal-errors "
-            #. "-Wmissing-field-initializers "
-            #. "-Wmissing-include-dirs "
-            #. "-Wvariadic-macros "
-            #. "-Wno-discard-qual "
-            #. "-Wno-pointer-sign "
-
             # others; ones we might like marked with ?
             # ? -Wundef for undefined idenfiers in #if
             # ? -Wbad-function-cast
@@ -203,7 +194,12 @@ sub runstep {
             #3.0 => "-Wformat-nonliteral -Wformat-security -Wpacked "
             #    . "-Wdisabled-optimization -mno-accumulate-outgoing-args "
             #    . "-Wno-shadow -falign-functions=16 ",
-            4.0 => "",
+            4.0 => "-Wfatal-errors "
+                 . "-Wmissing-field-initializers "
+                 . "-Wmissing-include-dirs "
+                 . "-Wvariadic-macros "
+                 . "-Wno-discard-qual "
+                 . "-Wno-pointer-sign ",
             4.1 => "",
             4.2 => "",
 
