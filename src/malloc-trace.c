@@ -10,8 +10,8 @@
 #include <string.h>
 #include <sys/time.h>
 #ifdef __linux__
-#include <signal.h>
-#include <asm/signal.h>
+#  include <signal.h>
+#  include <asm/signal.h>
 #endif
 
 #include "malloc-trace.h"

@@ -27,7 +27,7 @@ the low-level synchornization.
 #if STM_DEBUG
 #  define STM_TRACE(x...) PIO_fprintf(interp, PIO_STDERR(interp), x); \
                                    PIO_fprintf(interp, PIO_STDERR(interp), "\n")
-#undef fprintf
+#  undef fprintf
 #  define STM_TRACE_SAFE(x...) fprintf(stderr, x); fprintf(stderr, "\n");
 #else
 static void STM_TRACE(const char *x, ...) {

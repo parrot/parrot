@@ -156,11 +156,11 @@ typedef unsigned short _rand_buf[3];
  * X(n+1) = ( aX(n) + c ) mod 2^48
  *
  */
-#define A_lo  0xE66D
-#define A_mid 0xDEEC
-#define A_hi  0x5
-#define C     0xB
-#define SEED_LO 0x330E
+#  define A_lo  0xE66D
+#  define A_mid 0xDEEC
+#  define A_hi  0x5
+#  define C     0xB
+#  define SEED_LO 0x330E
 
 static _rand_buf a = { A_lo, A_mid, A_hi };
 static _rand_buf last_rand;
@@ -330,10 +330,10 @@ _srand48(long seed)
      */
 }
 
-#undef A_lo
-#undef A_mid
-#undef A_hi
-#undef C
+#  undef A_lo
+#  undef A_mid
+#  undef A_hi
+#  undef C
 
 #else
 

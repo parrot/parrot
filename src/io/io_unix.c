@@ -240,7 +240,7 @@ PIO_unix_open(theINTERP, ParrotIOLayer *layer,
 }
 
 
-#if PARROT_ASYNC_DEVEL
+#  if PARROT_ASYNC_DEVEL
 
 /*
 
@@ -263,7 +263,7 @@ static INTVAL
 PIO_unix_async(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL b)
 {
     int rflags;
-#if defined(linux)
+#    if defined(linux)
     if((rflags = fcntl(io->fd, F_GETFL, 0)) >= 0) {
         if(b)
             rflags |= O_ASYNC;
@@ -271,13 +271,13 @@ PIO_unix_async(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL b)
             rflags &= ~O_ASYNC;
         return fcntl(io->fd, F_SETFL, rflags);
     }
-#else
+#    else
     internal_exception(PIO_NOT_IMPLEMENTED, "Async support not available");
-#endif
+#    endif
     return -1;
 }
 
-#endif
+#  endif
 
 /*
 
@@ -302,13 +302,13 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 
     oflags = flags_to_unix(flags);
 
-#if 0
+#  if 0
     /* XXX the fcntl fails (-1, errno=0) with
      * ./parrot -tf - < foo.pir
      */
 
     /* FIXME - Check file handle flags, validity */
-#  ifdef PARROT_HAS_HEADER_FCNTL
+#    ifdef PARROT_HAS_HEADER_FCNTL
     {
         INTVAL rflags;
         /* Get descriptor flags */
@@ -322,8 +322,8 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
             return NULL;
         }
     }
+#    endif
 #  endif
-#endif
 
     if (PIO_unix_isatty(fd))
         flags |= PIO_F_CONSOLE;
@@ -648,12 +648,12 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
      * else bind is failing erratically
      */
     memset(&sa, 0, sizeof(sa));
-#ifdef PARROT_DEF_INET_ATON
+#  ifdef PARROT_DEF_INET_ATON
     if (inet_aton(s, &sa.sin_addr) != 0) {
-#else
+#  else
     /* positive retval is success */
     if (inet_pton(family, s, &sa.sin_addr) > 0) {
-#endif
+#  endif
         /* Success converting numeric IP */
     }
     else {
@@ -680,7 +680,7 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 }
 
 
-#if PARROT_NET_DEVEL
+#  if PARROT_NET_DEVEL
 
 /*
 
@@ -880,13 +880,13 @@ AGAIN:
         switch(errno) {
             case EINTR:
                 goto AGAIN;
-#ifdef EWOULDBLOCK
+#    ifdef EWOULDBLOCK
             case EWOULDBLOCK:
                 goto AGAIN;
-#else
+#    else
             case EAGAIN:
                 goto AGAIN;
-#endif
+#    endif
             case EPIPE:
                 /* XXX why close it here and not below */
                 close(io->fd);
@@ -929,13 +929,13 @@ AGAIN:
         switch (errno) {
             case EINTR:
                 goto AGAIN;
-#ifdef EWOULDBLOCK
+#    ifdef EWOULDBLOCK
             case EWOULDBLOCK:
                 goto AGAIN;
-#else
+#    else
             case EGAIN:
                 goto AGAIN;
-#endif
+#  endif
             case ECONNRESET:
                 /* XXX why close it on err return result is -1 anyway */
                 close(io->fd);
@@ -1003,7 +1003,7 @@ AGAIN:
     }
 }
 
-#endif
+#  endif
 /*
 
 =item C<static ParrotIO *
@@ -1026,7 +1026,7 @@ PIO_unix_pipe(theINTERP, ParrotIOLayer *l, const char *cmd, int flags)
      * pipe(), fork() should be defined, if this header is present
      *        if that's not true, we need a test
      */
-#ifdef PARROT_HAS_HEADER_UNISTD
+#  ifdef PARROT_HAS_HEADER_UNISTD
     ParrotIO *io;
     int pid, err, fds[2];
 
@@ -1099,9 +1099,9 @@ PIO_unix_pipe(theINTERP, ParrotIOLayer *l, const char *cmd, int flags)
     }
 
     perror("fork");
-#else
+#  else
     internal_exception(UNIMPLEMENTED, "pipe() unimplemented");
-#endif
+#  endif
     return NULL;
 }
 
@@ -1135,7 +1135,7 @@ const ParrotIOLayerAPI pio_unix_layer_api = {
     PIO_null_getcount,
     PIO_null_fill,
     PIO_null_eof,
-#if PARROT_NET_DEVEL
+#  if PARROT_NET_DEVEL
     PIO_unix_poll,
     PIO_unix_socket,
     PIO_unix_connect,
@@ -1144,7 +1144,7 @@ const ParrotIOLayerAPI pio_unix_layer_api = {
     PIO_unix_bind,
     PIO_unix_listen,
     PIO_unix_accept
-#else
+#  else
     0, /* no poll */
     0, /* no socket */
     0, /* no connect */
@@ -1153,7 +1153,7 @@ const ParrotIOLayerAPI pio_unix_layer_api = {
     0, /* no bind */
     0, /* no listen */
     0  /* no accept */
-#endif
+#  endif
 };
 
 

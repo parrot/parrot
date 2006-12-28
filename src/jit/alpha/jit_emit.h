@@ -34,7 +34,7 @@
  */
 
 #if !defined(PARROT_ALPHA_JIT_EMIT_H_GUARD)
-#define PARROT_ALPHA_JIT_EMIT_H_GUARD
+#  define PARROT_ALPHA_JIT_EMIT_H_GUARD
 
 typedef enum {
     REG0_v0,
@@ -84,26 +84,26 @@ typedef enum {
     BNE = 61
 } branch_t;
 
-#define CONSTANT_POOL_SIZE 0xfff0
+#  define CONSTANT_POOL_SIZE 0xfff0
 
-#if JIT_EMIT
+#  if JIT_EMIT
 
 /* All instruction formats are 32 bits long with a 6-bit major opcode field in
    bits <31:26> of the instruction. */
 
 enum { JIT_ALPHABRANCH, JIT_ALPHABSR };
 
-#define emit_nop(pc) { \
-    *(pc++) = 0x1f; \
-    *(pc++) = 0x04; \
-    *(pc++) = 0xff; \
-    *(pc++) = 0x47; }
+#    define emit_nop(pc) { \
+      *(pc++) = 0x1f; \
+      *(pc++) = 0x04; \
+      *(pc++) = 0xff; \
+      *(pc++) = 0x47; }
 
-#define jit_emit_mov_rr(pc, src, Ra)  { \
-    *(pc++) = Ra; \
-    *(pc++) = 0x04; \
-    *(pc++) = 0xe0 + src; \
-    *(pc++) = 0x47; }
+#    define jit_emit_mov_rr(pc, src, Ra)  { \
+      *(pc++) = Ra; \
+      *(pc++) = 0x04; \
+      *(pc++) = 0xe0 + src; \
+      *(pc++) = 0x47; }
 
 /* Memory instruction format
  *
@@ -121,18 +121,18 @@ enum { JIT_ALPHABRANCH, JIT_ALPHABSR };
  *
  */
 
-#define emit_mem(pc, opcode, Ra, Rb, disp) \
-  *(pc++) = (char)disp; \
-  *(pc++) = (char)((disp) >> 8); \
-  *(pc++) = (char)(Rb | (char)(Ra << 5)); \
-  *(pc++) = opcode << 2 | Ra >> 3
+#    define emit_mem(pc, opcode, Ra, Rb, disp) \
+      *(pc++) = (char)disp; \
+      *(pc++) = (char)((disp) >> 8); \
+      *(pc++) = (char)(Rb | (char)(Ra << 5)); \
+      *(pc++) = opcode << 2 | Ra >> 3
 
-#define base_reg REG9_s0
+#    define base_reg REG9_s0
 
 /* Scratch registers. */
 
-#define ISR1 REG0_v0
-#define ISR2 REG8_t7
+#    define ISR1 REG0_v0
+#    define ISR2 REG8_t7
 
 /* Load / Store a Parrot register.
  *
@@ -141,30 +141,30 @@ enum { JIT_ALPHABRANCH, JIT_ALPHABSR };
  *
  */
 
-#define emit_l_s_r(pc, opcode, Ra, Rb, Parrot_reg) \
-  emit_mem(pc, opcode, Ra, Rb, \
-    (((char *)Parrot_reg) - (char *)&REG_INT(0)))
+#    define emit_l_s_r(pc, opcode, Ra, Rb, Parrot_reg) \
+      emit_mem(pc, opcode, Ra, Rb, \
+        (((char *)Parrot_reg) - (char *)&REG_INT(0)))
 
-#define emit_ldq_b(pc, Ra, addr, Rb) \
-  emit_mem(pc, LDQ, Ra, Rb, addr)
+#    define emit_ldq_b(pc, Ra, addr, Rb) \
+      emit_mem(pc, LDQ, Ra, Rb, addr)
 
-#define emit_lda_b(pc, Ra, addr, Rb) \
-  emit_mem(pc, LDA, Ra, Rb, addr)
+#    define emit_lda_b(pc, Ra, addr, Rb) \
+      emit_mem(pc, LDA, Ra, Rb, addr)
 
-#define jit_emit_mov_rm_i(pc, Ra, addr) \
-  emit_l_s_r(pc, LDQ, Ra, base_reg, addr)
+#    define jit_emit_mov_rm_i(pc, Ra, addr) \
+      emit_l_s_r(pc, LDQ, Ra, base_reg, addr)
 
-#define emit_lda(pc, Ra, addr) \
-  emit_l_s_r(pc, LDA, Ra, base_reg, addr)
+#    define emit_lda(pc, Ra, addr) \
+      emit_l_s_r(pc, LDA, Ra, base_reg, addr)
 
-#define emit_ldah(pc, Ra, addr, Rb) \
-  emit_mem(pc, LDH, Ra, Rb, addr)
+#    define emit_ldah(pc, Ra, addr, Rb) \
+      emit_mem(pc, LDH, Ra, Rb, addr)
 
-#define emit_stq_b(pc, Ra, addr, Rb) \
-  emit_mem(pc, STQ, Ra, Rb, addr)
+#    define emit_stq_b(pc, Ra, addr, Rb) \
+      emit_mem(pc, STQ, Ra, Rb, addr)
 
-#define jit_emit_mov_mr_i(pc, addr, Ra) \
-  emit_l_s_r(pc, STQ, Ra, base_reg, addr)
+#    define jit_emit_mov_mr_i(pc, addr, Ra) \
+      emit_l_s_r(pc, STQ, Ra, base_reg, addr)
 
 /* Branch instruction format
  *
@@ -180,11 +180,11 @@ enum { JIT_ALPHABRANCH, JIT_ALPHABSR };
  *
  */
 
-#define emit_branch(pc, opcode, Ra) \
-  *(pc++) = 0; \
-  *(pc++) = 0; \
-  *(pc++) = Ra << 5; \
-  *(pc++) = opcode << 2 | Ra >> 3
+#    define emit_branch(pc, opcode, Ra) \
+      *(pc++) = 0; \
+      *(pc++) = 0; \
+      *(pc++) = Ra << 5; \
+      *(pc++) = opcode << 2 | Ra >> 3
 
 /* Operate instruction format
  *
@@ -205,11 +205,11 @@ enum { JIT_ALPHABRANCH, JIT_ALPHABSR };
  *
  */
 
-#define emit_operate1(pc, opcode, Ra, Rb, function, Rc) \
-  *(pc++) = Rc | (char)(function << 5); \
-  *(pc++) = (char)(function >> 5); \
-  *(pc++) = Rb | (char)Ra << 5; \
-  *(pc++) = opcode << 2 | Ra >> 3
+#    define emit_operate1(pc, opcode, Ra, Rb, function, Rc) \
+      *(pc++) = Rc | (char)(function << 5); \
+      *(pc++) = (char)(function >> 5); \
+      *(pc++) = Rb | (char)Ra << 5; \
+      *(pc++) = opcode << 2 | Ra >> 3
 
 /* Addq (Operate instruction)
  *
@@ -218,8 +218,8 @@ enum { JIT_ALPHABRANCH, JIT_ALPHABSR };
  *
  */
 
-#define jit_emit_add_rrr(pc, Ra, Rb, Rc) \
-  emit_operate1(pc, 16, Ra, Rb, 128, Rc)
+#    define jit_emit_add_rrr(pc, Ra, Rb, Rc) \
+      emit_operate1(pc, 16, Ra, Rb, 128, Rc)
 
 /* Subq (Operate instruction)
  *
@@ -228,8 +228,8 @@ enum { JIT_ALPHABRANCH, JIT_ALPHABSR };
  *
  */
 
-#define jit_emit_sub_rrr(pc, Ra, Rb, Rc) \
-  emit_operate1(pc, 16, Ra, Rb, 161, Rc)
+#    define jit_emit_sub_rrr(pc, Ra, Rb, Rc) \
+      emit_operate1(pc, 16, Ra, Rb, 161, Rc)
 
 /* Mulq (Operate instruction)
  *
@@ -238,13 +238,13 @@ enum { JIT_ALPHABRANCH, JIT_ALPHABSR };
  *
  */
 
-#define emit_mulq(pc, Ra, Rb, Rc) \
-  emit_operate1(pc, 19, Ra, Rb, 128, Rc)
+#    define emit_mulq(pc, Ra, Rb, Rc) \
+      emit_operate1(pc, 19, Ra, Rb, 128, Rc)
 
 /* Load a constant */
 
-#define jit_emit_mov_ri_i(pc, target, constant) \
-  pc = emit_l_c(jit_info, interp, target, (long)constant)
+#    define jit_emit_mov_ri_i(pc, target, constant) \
+      pc = emit_l_c(jit_info, interp, target, (long)constant)
 
 static void
 emit_load_intval_cpool(Parrot_jit_info_t *jit_info,
@@ -356,8 +356,8 @@ emit_b(Parrot_jit_info_t *jit_info, branch_t opcode, alpha_register_t reg,
     return pc;
 }
 
-#define emit_bne(pc, reg, disp) \
-  pc = emit_b(jit_info, BNE, reg, disp)
+#    define emit_bne(pc, reg, disp) \
+      pc = emit_b(jit_info, BNE, reg, disp)
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
@@ -439,18 +439,18 @@ emit_bsr(Parrot_jit_info_t *jit_info,
 }
 
 /* TODO: re-write this properly */
-#define emit_jsr(pc) { \
-    *(pc++) = 0; \
-    *(pc++) = 0x40; \
-    *(pc++) = 0xe0; \
-    *(pc++) = 0x6b; \
+#    define emit_jsr(pc) { \
+        *(pc++) = 0; \
+        *(pc++) = 0x40; \
+        *(pc++) = 0xe0; \
+        *(pc++) = 0x6b; \
 }
 
-#define emit_ret(pc) { \
-    *(pc++) = 1; \
-    *(pc++) = 0x80; \
-    *(pc++) = 0xfa; \
-    *(pc++) = 0x6b; \
+#    define emit_ret(pc) { \
+        *(pc++) = 1; \
+        *(pc++) = 0x80; \
+        *(pc++) = 0xfa; \
+        *(pc++) = 0x6b; \
 }
 
 void
@@ -504,12 +504,12 @@ Parrot_jit_emit_mov_rm_n(Interp *interp, int reg, char *mem)
 {
 }
 
-#else
+#  else
 
-#  define REQUIRES_CONSTANT_POOL 1
-#  define INT_REGISTERS_TO_MAP 21
+#    define REQUIRES_CONSTANT_POOL 1
+#    define INT_REGISTERS_TO_MAP 21
 
-#ifndef JIT_IMCC
+#    ifndef JIT_IMCC
 
 char intval_map[INT_REGISTERS_TO_MAP] =
     { REG1_t0, REG2_t1, REG3_t2, REG4_t3, REG5_t4, REG6_t5, REG7_t6, REG12_s3,
@@ -544,8 +544,8 @@ Parrot_jit_extend_arena(Parrot_jit_info_t *jit_info)
     jit_info->arena.start = new_arena;
 }
 
-#endif /* JITIMCC */
-#endif /* JIT_EMIT */
+#    endif /* JITIMCC */
+#  endif /* JIT_EMIT */
 #endif /* PARROT_ALPHA_JIT_EMIT_H_GUARD */
 
 

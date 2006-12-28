@@ -7,7 +7,7 @@
 **/
 
 #if !defined(PARROT_SUN4_JIT_EMIT_H_GUARD)
-#define PARROT_SUN4_JIT_EMIT_H_GUARD
+#  define PARROT_SUN4_JIT_EMIT_H_GUARD
 
 /*
  * SPARC JIT overview:
@@ -889,7 +889,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                            REG_OFFS_NUM(pi) + 4, emitm_o(++rdx));
                 break;
             case PARROT_ARG_NC:
-#                define NC_addr &interp->code->const_table->constants[pi]->u.number
+#    define NC_addr &interp->code->const_table->constants[pi]->u.number
                 emitm_sethi(jit_info->native_ptr, emitm_hi22(NC_addr), XSR1);
                 emitm_or_i(jit_info->native_ptr, XSR1, emitm_lo10(NC_addr), XSR1);
 
@@ -897,7 +897,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 emitm_ld_i(jit_info->native_ptr, XSR1, 4, emitm_o(++rdx));
                 break;
             case PARROT_ARG_SC:
-#                define SC_addr &interp->code->const_table->constants[pi]->u.string
+#    define SC_addr &interp->code->const_table->constants[pi]->u.string
                 emitm_sethi(jit_info->native_ptr, emitm_hi22(SC_addr), XSR1);
                 emitm_or_i(jit_info->native_ptr, XSR1, emitm_lo10(SC_addr), XSR1);
 
@@ -905,7 +905,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
               break;
             case PARROT_ARG_KC:
             case PARROT_ARG_PC:
-#                define KC_addr &interp->code->const_table->constants[pi]->u.key
+#    define KC_addr &interp->code->const_table->constants[pi]->u.key
                 emitm_sethi(jit_info->native_ptr, emitm_hi22(KC_addr), XSR1);
                 emitm_or_i(jit_info->native_ptr, XSR1, emitm_lo10(KC_addr), XSR1);
 

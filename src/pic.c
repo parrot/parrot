@@ -84,8 +84,8 @@ lookup of the cache has to be done in the opcode itself.
 #endif
 
 #ifdef HAS_JIT
-#include "parrot/exec.h"
-#include "jit.h"
+#  include "parrot/exec.h"
+#  include "jit.h"
 #endif
 
 #define PIC_TEST 1

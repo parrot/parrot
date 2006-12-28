@@ -91,7 +91,7 @@ Create initial interpreter context.
 */
 
 #if CHUNKED_CTX_MEM
-#error "Non-working code removed."
+#  error "Non-working code removed."
 #endif
 
 void

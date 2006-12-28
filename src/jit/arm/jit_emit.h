@@ -7,13 +7,13 @@
  */
 
 #if !defined(PARROT_ARM_JIT_EMIT_H_GUARD)
-#define PARROT_ARM_JIT_EMIT_H_GUARD
+#  define PARROT_ARM_JIT_EMIT_H_GUARD
 
-#ifdef ARM
-#  ifdef __linux
-#    include <asm/unistd.h>
-#  endif
-#endif /* ARM */
+#  ifdef ARM
+#    ifdef __linux
+#      include <asm/unistd.h>
+#    endif
+#  endif /* ARM */
 
 /*  Registers
  *
@@ -76,7 +76,7 @@ typedef enum {
     REG15_pc = 15
 } arm_register_t;
 
-#if JIT_EMIT
+#  if JIT_EMIT
 
 typedef enum {
     cond_EQ = 0x00,
@@ -128,9 +128,9 @@ typedef enum {
 /* note MVN is move    NOT      (ie logical NOT, 1s complement), whereas
         CMN is compare NEGATIVE (ie arithmetic NEGATION, 2s complement)  */
 
-#define arith_sets_S 0x10
+#  define arith_sets_S 0x10
 
-#define INTERP_STRUCT_ADDR_REG r4
+#  define INTERP_STRUCT_ADDR_REG r4
 
 /* B / BL
  *
@@ -178,14 +178,14 @@ emit_branch(char *pc,
     return pc;
 }
 
-#define emit_b(pc, cond, imm) \
-  emit_branch(pc, cond, 0, imm)
+#  define emit_b(pc, cond, imm) \
+    emit_branch(pc, cond, 0, imm)
 
-#define emit_bl(pc, cond, imm) \
-  emit_branch(pc, cond, 1, imm)
+#  define emit_bl(pc, cond, imm) \
+    emit_branch(pc, cond, 1, imm)
 
 
-#define reg2mask(reg) (1<<(reg))
+#  define reg2mask(reg) (1<<(reg))
 
 typedef enum {
     is_store      = 0x00,
@@ -256,8 +256,8 @@ emit_ldmstm_x(char *pc,
 
 /* Is is going to be rare to non existent that anyone needs to use the ^
    syntax on LDM or STM, so make it easy to generate the normal form:  */
-#define emit_ldmstm(pc, cond, l_s, direction, writeback, base, regmask) \
-    emit_ldmstm_x(pc, cond, l_s, direction, 0, writeback, base, regmask)
+#  define emit_ldmstm(pc, cond, l_s, direction, writeback, base, regmask) \
+      emit_ldmstm_x(pc, cond, l_s, direction, 0, writeback, base, regmask)
 
 /* Load / Store
  *
@@ -554,29 +554,29 @@ constant_not (int value,  struct constant *result)
 }
 
 /* eg add r0, r3, r7  */
-#define emit_arith_reg(pc, cond, op, status, rd, rn, rm) \
-    emit_arith (pc, cond, op, status, rd, rn, 0, rm)
+#  define emit_arith_reg(pc, cond, op, status, rd, rn, rm) \
+      emit_arith (pc, cond, op, status, rd, rn, 0, rm)
 
 /* eg sub r0, r3, r7 lsr #3 */
-#define emit_arith_reg_shift_const(pc, cond, op, status, rd, rn, rm, shift, by) \
-    emit_arith (pc, cond, op, status, rd, rn, 0, ((by) << 7) | shift | 0 | (rm))
+#  define emit_arith_reg_shift_const(pc, cond, op, status, rd, rn, rm, shift, by) \
+      emit_arith (pc, cond, op, status, rd, rn, 0, ((by) << 7) | shift | 0 | (rm))
 
 /* eg orrs r1, r2, r1 rrx */
-#define emit_arith_reg_rrx(pc, cond, op, status, rd, rn, rm) \
-    emit_arith (pc, cond, op, status, rd, rn, 0, shift_ROR | 0 | (rm))
+#  define emit_arith_reg_rrx(pc, cond, op, status, rd, rn, rm) \
+      emit_arith (pc, cond, op, status, rd, rn, 0, shift_ROR | 0 | (rm))
 
 /* I believe these take 2 cycles (due to having to access a 4th register.  */
-#define emit_arith_reg_shift_reg(pc, cond, op, status, rd, rn, rm, shift, rs) \
-    emit_arith (pc, cond, op, status, rd, rn, 0, ((rs) << 8) | shift | 0x10 | (rm))
+#  define emit_arith_reg_shift_reg(pc, cond, op, status, rd, rn, rm, shift, rs) \
+      emit_arith (pc, cond, op, status, rd, rn, 0, ((rs) << 8) | shift | 0x10 | (rm))
 
-#define emit_arith_immediate(pc, cond, op, status, rd, rn, val, rotate) \
-    emit_arith (pc, cond, op, status, rd, rn, 2, ((rotate) << 8) | (val))
+#  define emit_arith_immediate(pc, cond, op, status, rd, rn, val, rotate) \
+      emit_arith (pc, cond, op, status, rd, rn, 2, ((rotate) << 8) | (val))
 
 /* I'll use mov r0, r0 as my NOP for now.  */
-#define emit_nop(pc) emit_mov (pc, r0, r0)
+#  define emit_nop(pc) emit_mov (pc, r0, r0)
 
 /* MOV ignores rn  */
-#define emit_mov(pc, dest, src) emit_arith_reg (pc, cond_AL, MOV, 0, dest, 0, src)
+#  define emit_mov(pc, dest, src) emit_arith_reg (pc, cond_AL, MOV, 0, dest, 0, src)
 
 static char *
 emit_word(char *pc, unsigned int word)
@@ -779,15 +779,15 @@ Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
     Parrot_jit_int_store(jit_info, interp, cond, dest, r0);
 }
 
-#define Parrot_jit_arith_const_neg(ji, i, cond, plus, minus, dest, src, const_val) \
-    Parrot_jit_arith_const_alternate (ji, i, cond, fits_as_neg, \
+#  define Parrot_jit_arith_const_neg(ji, i, cond, plus, minus, dest, src, const_val) \
+      Parrot_jit_arith_const_alternate (ji, i, cond, fits_as_neg, \
                       plus, minus, dest, src, const_val)
 
-#define Parrot_jit_arith_const_not(ji, i, cond, plus, minus, dest, src, const_val) \
-    Parrot_jit_arith_const_alternate (ji, i, cond, fits_as_not, \
+#  define Parrot_jit_arith_const_not(ji, i, cond, plus, minus, dest, src, const_val) \
+      Parrot_jit_arith_const_alternate (ji, i, cond, fits_as_not, \
                       plus, minus, dest, src, const_val)
-#define Parrot_jit_arith_const(ji, i, cond, plus, dest, src, const_val) \
-    Parrot_jit_arith_const_alternate (ji, i, cond, fits_as_is, \
+#  define Parrot_jit_arith_const(ji, i, cond, plus, dest, src, const_val) \
+      Parrot_jit_arith_const_alternate (ji, i, cond, fits_as_is, \
                       plus, plus, dest, src, const_val)
 
 
@@ -855,8 +855,8 @@ Parrot_jump_to_op_in_reg(Parrot_jit_info_t *jit_info,
                      ((int) interp->code->base.code));
 }
 
-#endif /* JIT_EMIT */
-#if JIT_EMIT == 2
+#  endif /* JIT_EMIT */
+#  if JIT_EMIT == 2
 
 void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                         Interp *interp)
@@ -952,14 +952,14 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      Interp *interp)
 {
     jit_info->native_ptr = emit_mov (jit_info->native_ptr, r1, r4);
-#ifndef ARM_K_BUG
+#    ifndef ARM_K_BUG
     jit_info->native_ptr = emit_mov (jit_info->native_ptr, REG14_lr, REG15_pc);
     jit_info->native_ptr = emit_ldmstm (jit_info->native_ptr,
                                         cond_AL, is_load, dir_IA,
                                         is_writeback,
                                         REG14_lr,
                                         reg2mask(0) | reg2mask(REG15_pc));
-#else
+#    else
     jit_info->native_ptr = emit_arith_immediate (jit_info->native_ptr, cond_AL,
                                                  ADD, 0, REG14_lr, REG15_pc,
                                                  4, 0);
@@ -969,7 +969,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                                         REG14_lr,
                                         reg2mask(0) | reg2mask(REG12_ip));
     jit_info->native_ptr = emit_mov (jit_info->native_ptr, REG15_pc, REG12_ip);
-#endif /* ARM_K_BUG */
+#    endif /* ARM_K_BUG */
     jit_info->native_ptr
         = emit_word (jit_info->native_ptr, (int) jit_info->cur_op);
     jit_info->native_ptr
@@ -1011,11 +1011,11 @@ Parrot_jit_emit_mov_rm_n(Interp *interp, int reg, char *mem)
 {
 }
 
-#endif /* JIT_EMIT == 2 */
-#if JIT_EMIT == 0
+#  endif /* JIT_EMIT == 2 */
+#  if JIT_EMIT == 0
 
-#  define REQUIRES_CONSTANT_POOL 0
-#  define INT_REGISTERS_TO_MAP 10
+#    define REQUIRES_CONSTANT_POOL 0
+#    define INT_REGISTERS_TO_MAP 10
 
 /* XXX NOTE before actually mapping things
 
@@ -1030,19 +1030,20 @@ Parrot_jit_emit_mov_rm_n(Interp *interp, int reg, char *mem)
    NWC
 */
 
-#ifndef JIT_IMCC
+#    ifndef JIT_IMCC
 
 char intval_map[INT_REGISTERS_TO_MAP] =
     { r0, r1, r2, r3, r4, r5, r6, r7, r8, r12 };
 
 static void
-arm_sync_d_i_cache (void *start, void *end) {
-/* Strictly this is only needed for StrongARM and later (not sure about ARM8)
-   because earlier cores don't have separate D and I caches.
-   However there aren't that many ARM7 or earlier devices around that we'll be
-   running on.  */
-#ifdef __linux
-#ifdef __GNUC__
+arm_sync_d_i_cache (void *start, void *end)
+{
+    /* Strictly this is only needed for StrongARM and later (not sure about
+     * ARM8) because earlier cores don't have separate D and I caches.  
+     * However there aren't that many ARM7 or earlier devices around that 
+     * we'll be running on.  */
+#      ifdef __linux
+#        ifdef __GNUC__
     int result;
     /* swi call based on code snippet from Russell King.  Description
        verbatim:  */
@@ -1082,17 +1083,17 @@ arm_sync_d_i_cache (void *start, void *end) {
                            "Synchronising I and D caches failed with errno=%d\n",
                            -result);
     }
-#else
-#error "ARM needs to sync D and I caches, and I don't know how to embed assmbler on this C compiler"
-#endif
-#else
+#        else
+#          error "ARM needs to sync D and I caches, and I don't know how to embed assmbler on this C compiler"
+#        endif
+#      else
 /* Not strictly true - on RISC OS it's OS_SynchroniseCodeAreas  */
-#error "ARM needs to sync D and I caches, and I don't know how to on this OS"
-#endif
+#        error "ARM needs to sync D and I caches, and I don't know how to on this OS"
+#      endif
 }
 
-#endif
-#endif /* JIT_EMIT == 0 */
+#    endif
+#  endif /* JIT_EMIT == 0 */
 #endif /* PARROT_ARM_JIT_EMIT_H_GUARD */
 
 

@@ -25,11 +25,11 @@ Threads are created by creating new C<ParrotInterpreter> objects.
 #define THREAD_DEBUG 0
 
 #if THREAD_DEBUG
-#define TRACE_THREAD(x...) \
-    do { \
-        fprintf(stderr, x); \
-        fprintf(stderr, "\n"); \
-    } while (0);
+#  define TRACE_THREAD(x...) \
+     do { \
+         fprintf(stderr, x); \
+         fprintf(stderr, "\n"); \
+     } while (0);
 #else
 static void TRACE_THREAD(const char *x, ...) {}
 #endif

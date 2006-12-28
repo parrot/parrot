@@ -137,10 +137,10 @@ static INTVAL
 PIO_win32_init(theINTERP, ParrotIOLayer *layer)
 {
     HANDLE h;
-#if PARROT_NET_DEVEL
+#  if PARROT_NET_DEVEL
     struct WSAData sockinfo;
     int ret;
-#endif
+#  endif
 
     if ((h = GetStdHandle(STD_INPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
         PIO_STDIN(interp) = new_io_pmc(interp,
@@ -163,7 +163,7 @@ PIO_win32_init(theINTERP, ParrotIOLayer *layer)
     else {
         return -3;
     }
-#if PARROT_NET_DEVEL
+#  if PARROT_NET_DEVEL
     /* Start Winsock
      * no idea where or whether destroy it
      */
@@ -173,7 +173,7 @@ PIO_win32_init(theINTERP, ParrotIOLayer *layer)
                   WSAGetLastError());
         return -4;
     }
-#endif
+#  endif
     return 0;
 }
 
@@ -559,7 +559,7 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 
 /****************************************************************************/
 
-#if PARROT_NET_DEVEL
+#  if PARROT_NET_DEVEL
 
 /*
 
@@ -658,13 +658,13 @@ AGAIN:
         switch (errno) {
             case EINTR:
                 goto AGAIN;
-#ifdef EWOULDBLOCK
+#    ifdef EWOULDBLOCK
             case EWOULDBLOCK:
                 goto AGAIN;
-#else
+#    else
             case EAGAIN:
                 goto AGAIN;
-#endif
+#    endif
             case EPIPE:
                 _close((SOCKET)io->fd);
                 return -1;
@@ -709,9 +709,9 @@ AGAIN:
         if (!*s) {
             PANIC("PIO_recv: Failed to allocate string");
         }
-#if PIO_TRACE
+#    if PIO_TRACE
         PIO_eprintf(interp, "PIO_win32_recv: %d bytes\n", bytesread);
-#endif
+#    endif
         return bytesread;
     }
     else {
@@ -722,15 +722,15 @@ AGAIN:
                 goto AGAIN;
             case WSAECONNRESET:
                 _close((SOCKET)io->fd);
-#if PIO_TRACE
+#    if PIO_TRACE
                 PIO_eprintf(interp, "recv: Connection reset by peer\n");
-#endif
+#    endif
                 return -1;
             default:
                 _close((SOCKET)io->fd);
-#if PIO_TRACE
+#    if PIO_TRACE
                 PIO_eprintf(interp, "recv: errno = %d\n", err);
-#endif
+#    endif
                 return -1;
         }
     }
@@ -838,7 +838,7 @@ PIO_win32_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return newio;
 }
 
-#endif
+#  endif
 
 
 /******************************************************************************/
@@ -869,7 +869,7 @@ const ParrotIOLayerAPI pio_win32_layer_api = {
     PIO_null_getcount,
     PIO_null_fill,
     PIO_null_eof,
-#if PARROT_NET_DEVEL
+#  if PARROT_NET_DEVEL
     0,
     PIO_win32_socket,
     PIO_win32_connect,
@@ -878,7 +878,7 @@ const ParrotIOLayerAPI pio_win32_layer_api = {
     PIO_win32_bind,
     PIO_win32_listen,
     PIO_win32_accept
-#else
+#  else
     0, /* no poll */
     0, /* no socket */
     0, /* no connect */
@@ -887,7 +887,7 @@ const ParrotIOLayerAPI pio_win32_layer_api = {
     0, /* no bind */
     0, /* no listen */
     0, /* no accept */
-#endif
+#  endif
 };
 
 #endif /* PIO_OS_WIN32 */

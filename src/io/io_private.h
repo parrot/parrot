@@ -35,13 +35,13 @@ Some ideas from AT&T SFIO.
 /* XXX: Parrot config is currently not probing for all headers so
  * I'm sticking here rather than parrot.h
  */
-#ifdef UNIX
-#include <sys/socket.h>
-#endif
+#  ifdef UNIX
+#    include <sys/socket.h>
+#  endif
 
-#ifdef WIN32
-#include <winsock.h>
-#endif
+#  ifdef WIN32
+#    include <winsock.h>
+#  endif
 
 #endif /* PARROT_NET_DEVEL */
 

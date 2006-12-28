@@ -224,9 +224,9 @@ PIO_destroy(theINTERP, PMC *pmc)
      * XXX can't munmap now
      */
     if (io->b.startb && (io->b.flags & PIO_BF_MMAP)) {
-#ifdef PARROT_HAS_HEADER_SYSMMAN
+#  ifdef PARROT_HAS_HEADER_SYSMMAN
         munmap((void*)io->b.startb, io->b.size);
-#endif
+#  endif
         io->b.startb = io->b.endb = NULL;
         io->b.size = 0;
     }

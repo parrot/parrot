@@ -235,7 +235,7 @@ fetch_op_le_4(unsigned char *b)
 #if PARROT_BIGENDIAN
 #  if OPCODE_T_SIZE == 8
     return u.o >> 32;
-#    else
+#  else
     return (opcode_t) fetch_iv_be((INTVAL)u.o);
 #  endif
 #else

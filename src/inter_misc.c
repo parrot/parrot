@@ -205,9 +205,9 @@ interpinfo(Interp *interp, INTVAL what)
     switch (what) {
         case TOTAL_MEM_ALLOC:
 #ifdef GC_IS_MALLOC
-#if 0
+#  if 0
             interp->memory_allocated = mallinfo().uordblks;
-#endif
+#  endif
 #endif
             ret = arena_base->memory_allocated;
             break;

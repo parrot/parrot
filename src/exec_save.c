@@ -140,13 +140,13 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 
 #ifdef EXEC_ELF
 
-# if PARROT_EXEC_OS_OPENBSD
-#  define R_386_32 1
-#  define R_386_PC32 2
-#  include <elf_abi.h>
-# else
-#  include <elf.h>
-# endif
+#  if PARROT_EXEC_OS_OPENBSD
+#    define R_386_32 1
+#    define R_386_PC32 2
+#    include <elf_abi.h>
+#  else
+#    include <elf.h>
+#  endif
 
 /* Add a section to the file
  *
@@ -575,11 +575,11 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 #ifdef EXEC_COFF
 
 /* File offsets */
-#define TEXT_CODE  0x14 + (3 * 0x28)
-#define DATA_CODE  TEXT_CODE + obj->text.size
-#define TEXT_RELOC DATA_CODE + obj->data.size
-#define DATA_RELOC TEXT_RELOC + (obj->text_rellocation_count * 0xA)
-#define SYMTAB     DATA_RELOC + (obj->data_rellocation_count * 0xA)
+#  define TEXT_CODE  0x14 + (3 * 0x28)
+#  define DATA_CODE  TEXT_CODE + obj->text.size
+#  define TEXT_RELOC DATA_CODE + obj->data.size
+#  define DATA_RELOC TEXT_RELOC + (obj->text_rellocation_count * 0xA)
+#  define SYMTAB     DATA_RELOC + (obj->data_rellocation_count * 0xA)
 
 void
 Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)

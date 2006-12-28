@@ -20,11 +20,11 @@ files and directories.
 */
 
 #ifdef WIN32
-#include <direct.h>
+#  include <direct.h>
 #endif
 
 #ifndef WIN32
-#include <dirent.h>
+#  include <dirent.h>
 #endif
 
 #include "parrot/parrot.h"
@@ -72,11 +72,11 @@ Returns the current working directory.
 #ifdef WIN32
         cwd = _getcwd(NULL, 0);
 #else
-#ifdef PATH_MAX
+#  ifdef PATH_MAX
         cwd = getcwd(NULL, PATH_MAX+1);
-#else
+#  else
         cwd = getcwd(NULL, 0);
-#endif
+#  endif
 #endif
         if (cwd) {
             STRING *scwd;

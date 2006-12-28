@@ -41,7 +41,7 @@ void Parrot_default_thaw(Interp* , PMC* pmc, visit_info *info);
  * define this to 1 for testing
  */
 #ifndef FREEZE_ASCII
-#define FREEZE_ASCII 0
+#  define FREEZE_ASCII 0
 #endif
 
 /*

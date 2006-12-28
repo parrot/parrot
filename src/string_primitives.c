@@ -21,12 +21,12 @@ API.
 
 #include "parrot/parrot.h"
 #if PARROT_HAS_ICU
-#include <unicode/ucnv.h>
-#include <unicode/utypes.h>
-#include <unicode/uchar.h>
-#include <unicode/ustring.h>
+#  include <unicode/ucnv.h>
+#  include <unicode/utypes.h>
+#  include <unicode/uchar.h>
+#  include <unicode/ustring.h>
 #else
-#include <ctype.h>
+#  include <ctype.h>
 #endif
 #include <assert.h>
 

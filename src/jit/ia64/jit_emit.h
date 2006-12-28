@@ -738,7 +738,7 @@ Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg,char *mem)
 #  define INT_REGISTERS_TO_MAP 22
 
 #  ifndef JIT_IMCC
-#  define CACHELINESIZE 32
+#    define CACHELINESIZE 32
 
 char intval_map[INT_REGISTERS_TO_MAP] =
     { 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,

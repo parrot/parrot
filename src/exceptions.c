@@ -72,10 +72,10 @@ internal_exception(int exitcode, const char *format, ...)
 /* Panic handler */
 
 #ifndef dumpcore
-#define dumpcore() \
-  fprintf(stderr, "Sorry, coredump is not yet implemented " \
-          "for this platform.\n\n"); \
-          exit(1);
+#  define dumpcore() \
+     fprintf(stderr, "Sorry, coredump is not yet implemented " \
+             "for this platform.\n\n"); \
+             exit(1);
 #endif
 
 /*

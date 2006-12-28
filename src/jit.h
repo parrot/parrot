@@ -199,11 +199,11 @@ typedef struct {
     int                             flags;
     const struct jit_arch_info_t    *arch_info;
     int                              n_args;
-#  if EXEC_CAPABLE
+#if EXEC_CAPABLE
     Parrot_exec_objfile_t           *objfile;
-#  else
+#else
     void                            *objfile;
-#  endif /* EXEC_CAPABLE */
+#endif /* EXEC_CAPABLE */
 } Parrot_jit_info_t;
 
 #define Parrot_jit_fixup_target(jit_info, fixup) \

@@ -32,27 +32,27 @@ http://sources.redhat.com/gdb/current/onlinedocs/stabs_toc.html.
 #ifdef __IBMC__
 
 /* following from /usr/include/dbxstclass.h */
-#define C_GSYM        "0x80" /* global variable */
-#define C_LSYM        "0x81" /* stack variable */
-#define C_PSYM        "0x82" /* parameter */
-#define C_RSYM        "0x83" /* register variable */
-#define C_RPSYM       "0x84"
-#define C_STSYM       "0x85" /* variable in data section */
-#define C_TCSYM       "0x86"
-#define C_BCOMM       "0x87"
-#define C_ECOML       "0x88"
-#define C_ECOMM       "0x89"
-#define C_DECL        "0x8c" /* type declaration */
-#define C_ENTRY       "0x8d"
-#define C_FUN         "0x8e"
-#define C_BSTAT       "0x8f"
-#define C_ESTAT       "0x90"
+#  define C_GSYM        "0x80" /* global variable */
+#  define C_LSYM        "0x81" /* stack variable */
+#  define C_PSYM        "0x82" /* parameter */
+#  define C_RSYM        "0x83" /* register variable */
+#  define C_RPSYM       "0x84"
+#  define C_STSYM       "0x85" /* variable in data section */
+#  define C_TCSYM       "0x86"
+#  define C_BCOMM       "0x87"
+#  define C_ECOML       "0x88"
+#  define C_ECOMM       "0x89"
+#  define C_DECL        "0x8c" /* type declaration */
+#  define C_ENTRY       "0x8d"
+#  define C_FUN         "0x8e"
+#  define C_BSTAT       "0x8f"
+#  define C_ESTAT       "0x90"
 
 void Parrot_jit_debug(Interp *interp);
 
-#  define BIT_SIZE(t) ((int)(sizeof (t)*8))
-#  define BYTE_SIZE(t) ((int)sizeof (t))
-#  define BIT_OFFSET(str, field) ((int)(offsetof(str, field) * 8))
+#    define BIT_SIZE(t) ((int)(sizeof (t)*8))
+#    define BYTE_SIZE(t) ((int)sizeof (t))
+#    define BIT_OFFSET(str, field) ((int)(offsetof(str, field) * 8))
 
 typedef struct {
     const char *name;
@@ -146,10 +146,10 @@ write_types(FILE *stabs, Interp *interp)
             i + 1, BIT_OFFSET(PMC, obj), BIT_SIZE(pobj_t));
     fprintf(stabs, "vtable:*%d,%d,%d;",
             i + 3, BIT_OFFSET(PMC, vtable), BIT_SIZE(void*));
-#if ! PMC_DATA_IN_EXT
+#  if ! PMC_DATA_IN_EXT
     fprintf(stabs, "data:14,%d,%d;",
             BIT_OFFSET(PMC, data), BIT_SIZE(void*));
-#endif
+#  endif
     fprintf(stabs, "pmc_ext:*%d,%d,%d;",
             i, BIT_OFFSET(PMC, pmc_ext), BIT_SIZE(void*));
     fprintf(stabs, ";\"");

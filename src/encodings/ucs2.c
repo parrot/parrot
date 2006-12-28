@@ -24,7 +24,7 @@ UCS-2 encoding with the help of the ICU library.
 #include "ucs2.h"
 
 #if PARROT_HAS_ICU
-#include <unicode/ustring.h>
+#  include <unicode/ustring.h>
 #endif
 
 #define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl ucs2")

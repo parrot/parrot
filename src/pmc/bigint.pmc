@@ -29,12 +29,12 @@ C<BigInt> provides arbitrary precision integer mathematic functions.
  */
 
 #ifdef PARROT_HAS_GMP
-#include <gmp.h>
+#  include <gmp.h>
 typedef struct {
     mpz_t b;
 } BIGINT;
 
-#define BN(x) ((BIGINT*)PMC_struct_val(x))->b
+#  define BN(x) ((BIGINT*)PMC_struct_val(x))->b
 
 static void
 bigint_init(Interp *interp, PMC *self) {

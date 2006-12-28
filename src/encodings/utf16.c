@@ -24,8 +24,8 @@ UTF-16 encoding with the help of the ICU library.
 #include "utf16.h"
 
 #if PARROT_HAS_ICU
-#include <unicode/utf16.h>
-#include <unicode/ustring.h>
+#  include <unicode/utf16.h>
+#  include <unicode/ustring.h>
 #endif
 
 #define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl utf16")

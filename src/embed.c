@@ -36,10 +36,10 @@ to get destroyed.
 */
 
 #ifdef JIT_CAPABLE
-#if EXEC_CAPABLE
-#  include "parrot/exec.h"
-#endif /* EXEC_CAPABLE */
-#include "jit.h"
+#  if EXEC_CAPABLE
+#    include "parrot/exec.h"
+#  endif /* EXEC_CAPABLE */
+#  include "jit.h"
 #endif
 Parrot_Interp
 Parrot_new(Parrot_Interp parent)

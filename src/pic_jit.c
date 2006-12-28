@@ -39,10 +39,10 @@ TODO:
 #endif
 
 #ifdef HAS_JIT
-#include "parrot/exec.h"
-#include "jit.h"
+#  include "parrot/exec.h"
+#  include "jit.h"
 
-#if PIC_TEST
+#  if PIC_TEST
 /*
  * just for testing the whole scheme ...
 
@@ -73,7 +73,7 @@ pic_test_func(Interp *interp, INTVAL *sig_bits, void **args)
     *result = i + j;
     return args[3];
 }
-#endif
+#  endif
 
 static int
 jit_can_compile_sub(Interp *interp, PMC *sub)
@@ -259,7 +259,6 @@ int
 parrot_pic_is_safe_to_jit(Interp *interp, PMC *sub,
         PMC *sig_args, PMC *sig_results, int *flags)
 {
-
     opcode_t *base, *start, *end;
 
     *flags = 0;
@@ -301,11 +300,11 @@ parrot_pic_is_safe_to_jit(Interp *interp, PMC *sub,
 funcptr_t
 parrot_pic_JIT_sub(Interp *interp, PMC *sub, int flags)
 {
-#if PIC_TEST
+#  if PIC_TEST
     UNUSED(interp);
     UNUSED(sub);
     return (funcptr_t) pic_test_func;
-#else
+#  else
     /*
      * create JIT code - just a test
      */
@@ -321,7 +320,7 @@ parrot_pic_JIT_sub(Interp *interp, PMC *sub, int flags)
     if (!jit_info)
         return NULLfunc;
     return (funcptr_t) jit_info->arena.start;
-#endif
+#  endif
 }
 
 #else   /* HAS_JIT */

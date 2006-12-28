@@ -24,11 +24,11 @@ This file implements the charset functions for unicode data
 #endif
 
 #if PARROT_HAS_ICU
-#include <unicode/ucnv.h>
-#include <unicode/utypes.h>
-#include <unicode/uchar.h>
-#include <unicode/ustring.h>
-#include <unicode/unorm.h>
+#  include <unicode/ucnv.h>
+#  include <unicode/utypes.h>
+#  include <unicode/uchar.h>
+#  include <unicode/ustring.h>
+#  include <unicode/unorm.h>
 #endif
 #define EXCEPTION(err, str) \
     real_exception(interp, NULL, err, str)

@@ -162,14 +162,14 @@ A chained list of headers used e.g. for the IGP list.
  * call code to verify chain of pointers after each change
  * this is very expensive, but should be used during development
  */
-#define GC_GMS_DEBUG 0
+#  define GC_GMS_DEBUG 0
 
 typedef struct {
     UINTVAL current_gen_no;             /* the nursery generation number */
 } Gc_gms_private;
 
-#define UNITS_PER_ALLOC_GROWTH_FACTOR 1.75
-#define POOL_MAX_BYTES 65536*128
+#  define UNITS_PER_ALLOC_GROWTH_FACTOR 1.75
+#  define POOL_MAX_BYTES 65536*128
 
 /*
  * static forward defs
@@ -181,10 +181,10 @@ static void gc_gms_alloc_objects(Interp *, struct Small_Object_Pool *);
 static void gc_gms_more_objects(Interp *, struct Small_Object_Pool *);
 static void gc_gms_init_gen(Interp *, struct Small_Object_Pool *);
 static void parrot_gc_gms_run(Interp *, int flags);
-#if GC_GMS_DEBUG
+#  if GC_GMS_DEBUG
 static void gms_debug_verify(Interp *, struct Small_Object_Pool *pool,
         const char *action);
-#endif
+#  endif
 /*
 
 =back
@@ -373,9 +373,9 @@ gc_gms_chain_objects(Interp *interp,
         p = (void*) ((char *)p - real_size);
         p->next = next;
         next->prev = p;
-#ifndef NDEBUG
+#  ifndef NDEBUG
         p->gen = (void *)0xdeadbeef;
-#endif
+#  endif
         next = p;
     }
     assert(p == new_arena->start_objects);
@@ -604,9 +604,9 @@ gc_gms_promote(Interp *interp, Gc_gms_hdr *h, UINTVAL gen_no)
     h->next = next;
     prev->next = h;
     next->prev = h;
-#if GC_GMS_DEBUG
+#  if GC_GMS_DEBUG
     gms_debug_verify(interp, pool, "promote");
-#endif
+#  endif
 }
 
 static void
@@ -918,9 +918,9 @@ gc_gms_setto_gray(Interp *interp, Gc_gms_hdr *h, int priority)
     }
     assert(h != pool->white);
     /* verify all these pointer moves */
-#if GC_GMS_DEBUG
+#  if GC_GMS_DEBUG
     gms_debug_verify(interp, pool, "to_gray");
-#endif
+#  endif
 }
 
 /*
@@ -981,9 +981,9 @@ gc_gms_setto_black(Interp *interp, Gc_gms_hdr *h, int priority)
     }
     assert(h != pool->white);
     assert(h != pool->gray);
-#if GC_GMS_DEBUG
+#  if GC_GMS_DEBUG
     gms_debug_verify(interp, pool, "to_black");
-#endif
+#  endif
 }
 
 /*
@@ -1036,9 +1036,9 @@ init_mark_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
         void *arg)
 {
     pool->gray = pool->black = pool->black_fin = pool->white;
-#if GC_GMS_DEBUG
+#  if GC_GMS_DEBUG
     gms_debug_verify(interp, pool, "init_mark");
-#endif
+#  endif
     return 0;
 }
 
@@ -1223,7 +1223,7 @@ sweep_cb_buf(Interp *interp, struct Small_Object_Pool *pool,
             PObj_buflen(obj) = 0;
         }
         else {
-#ifdef GC_IS_MALLOC
+#  ifdef GC_IS_MALLOC
             /* free allocated space at (int*)bufstart - 1,
              * but not if it is used COW or external
              */
@@ -1238,7 +1238,7 @@ sweep_cb_buf(Interp *interp, struct Small_Object_Pool *pool,
                 else
                     free((INTVAL*)PObj_bufstart(obj) - 1);
             }
-#else
+#  else
             /*
              * XXX Jarkko did report that on irix pool->mem_pool
              *     was NULL, which really shouldn't happen
@@ -1253,7 +1253,7 @@ sweep_cb_buf(Interp *interp, struct Small_Object_Pool *pool,
                  pool->mem_pool)->possibly_reclaimable +=
                     PObj_buflen(obj);
             }
-#endif
+#  endif
             PObj_buflen(obj) = 0;
         }
     }
@@ -1353,7 +1353,7 @@ parrot_gc_gms_run(Interp *interp, int flags)
     --arena_base->DOD_block_level;
 }
 
-#if GC_GMS_DEBUG
+#  if GC_GMS_DEBUG
 static void
 gms_debug_verify(Interp *interp, struct Small_Object_Pool *pool,
         const char *action)
@@ -1393,7 +1393,7 @@ gms_debug_verify(Interp *interp, struct Small_Object_Pool *pool,
 }
 
 
-#endif  /* GC_GMS_DEBUG */
+#  endif  /* GC_GMS_DEBUG */
 
 #endif  /* PARROT_GC_GMS */
 
