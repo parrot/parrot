@@ -11,7 +11,7 @@ get_thread(Parrot_Interp interp) {
     txlog = Parrot_STM_tx_log_get(interp);
     if (!txlog->waitlist_data) {
         txlog->waitlist_data =
-            mem_sys_allocate_zeroed(sizeof(*txlog->waitlist_data));
+            mem_sys_allocate_zeroed(sizeof (*txlog->waitlist_data));
         MUTEX_INIT(txlog->waitlist_data->signal_mutex);
         txlog->waitlist_data->signal_cond = &interp->thread_data->interp_cond;
 #if WAITLIST_DEBUG
@@ -36,14 +36,14 @@ alloc_entry(Parrot_Interp interp) {
     thr = get_thread(interp);
 
     if (!thr->entries) {
-        thr->entries = mem_sys_allocate_zeroed(sizeof(*thr->entries) * 4);
+        thr->entries = mem_sys_allocate_zeroed(sizeof (*thr->entries) * 4);
         thr->entry_count = 4;
     }
 
     if (thr->used_entries >= thr->entry_count) {
         size_t i;
         thr->entries = mem_sys_realloc(thr->entries,
-            sizeof(*thr->entries) * thr->entry_count * 2);
+            sizeof (*thr->entries) * thr->entry_count * 2);
         for (i = thr->entry_count; i < thr->entry_count * 2; ++i) {
             thr->entries[i] = NULL;
         }
@@ -52,11 +52,11 @@ alloc_entry(Parrot_Interp interp) {
 
     i = thr->used_entries++;
     if (!thr->entries[i])
-        thr->entries[i] = mem_sys_allocate_zeroed(sizeof(**thr->entries));
+        thr->entries[i] = mem_sys_allocate_zeroed(sizeof (**thr->entries));
 
     assert(thr->entries[i]->head == NULL);
     assert(thr->entries[i]->next == NULL);
-    memset(thr->entries[i], 0, sizeof(*thr->entries[i]));
+    memset(thr->entries[i], 0, sizeof (*thr->entries[i]));
     thr->entries[i]->thread = thr;
 
     return thr->entries[i];
