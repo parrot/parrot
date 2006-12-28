@@ -326,12 +326,12 @@ sub find_op_number {
     }
     elsif ($experimental) {
         my $n = $ParrotOps::optable{$opname} = ++$ParrotOps::max_op_num;
-        warn "$opname\t$n\texperimental, not in ops.num\n"
+        warn sprintf("%-25s %-10s experimental, not in ops.num\n", $opname, $n)
             if -e "DEVELOPING";
         return $n;
     }
     else {
-        warn "$opname\t\tSKIPPED: not in ops.num nor ops.skip\n"
+        warn sprintf("%-25s %-10s SKIPPED: not in ops.num nor ops.skip\n", $opname, "")
             if -e "DEVELOPING";
         return -1;
     }
