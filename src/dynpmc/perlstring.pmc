@@ -43,7 +43,7 @@ See t/pmc/perlstring_13    set P0, "1.23e2" ; set I0, P0
 =cut
 
 */
-    INTVAL get_integer () {
+    INTVAL get_integer() {
         double f = DYNSELF.get_number();
         return (INTVAL)f;
     }
@@ -82,7 +82,7 @@ Morphs the string to a C<PerlInt> and sets its value to C<value>.
 
 */
 
-    void set_integer_native (INTVAL value) {
+    void set_integer_native(INTVAL value) {
         INTVAL dynpmc_PerlInt;
 
         dynpmc_PerlInt = pmc_type(interp,
@@ -101,7 +101,7 @@ Morphs the string to a C<PerlNum> and sets its value to C<value>.
 
 */
 
-    void set_number_native (FLOATVAL value) {
+    void set_number_native(FLOATVAL value) {
         INTVAL dynpmc_PerlNum;
 
         dynpmc_PerlNum = pmc_type(interp,
@@ -120,7 +120,7 @@ Morphs the C<PerlString> to the specified type.
 
 */
 
-    void morph (INTVAL type) {
+    void morph(INTVAL type) {
         perlscalar.SELF.morph(type);
     }
 
@@ -137,12 +137,12 @@ Perl 5 like string increment/decrement.
 
 */
 
-    void increment () {
+    void increment() {
         STRING* s = PMC_str_val(SELF);
         PMC_str_val(SELF) = string_increment(INTERP, s);
     }
 
-    void decrement () {
+    void decrement() {
         INTVAL i = VTABLE_get_integer(INTERP, SELF);
         VTABLE_set_integer_native(INTERP, SELF, i - 1);
     }

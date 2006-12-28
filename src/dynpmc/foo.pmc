@@ -11,7 +11,7 @@ pmclass Foo dynpmc does scalar extends Integer {
         return 42;
     }
 
-    PMC* subtract (PMC* value, PMC* dest) {
+    PMC* subtract(PMC* value, PMC* dest) {
 MMD_Integer: {
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);

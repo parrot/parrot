@@ -95,7 +95,7 @@ So we do a bit of cheating here, and load it during class initialization.
         }
     }
 
-    void init () {
+    void init() {
         PMC_struct_val(SELF) = NULL;
     }
 
@@ -117,7 +117,7 @@ Open a or create a new dbm file.
 
 */
 
-    void set_string_native (STRING* value) {
+    void set_string_native(STRING* value) {
         char *c_db_name = string_to_cstring(INTERP, value);
         GDBM_FILE dbf = gdbm_open(c_db_name, 0, GDBM_NEWDB, 0666, 0);
 
@@ -139,16 +139,16 @@ XXX: This can be optimized by keeping track of number of elements
 
     INTVAL get_integer() {
         GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
-        if ( ! dbf ) {
+        if (! dbf) {
             return 0;
         }
         else {
             INTVAL cnt = 0;
             datum key, nextkey;
-            for ( key = gdbm_firstkey( dbf ); key.dptr; key = nextkey ) {
+            for (key = gdbm_firstkey(dbf); key.dptr; key = nextkey) {
                 cnt++;
-                nextkey = gdbm_nextkey( dbf, key );
-                free( key.dptr );
+                nextkey = gdbm_nextkey(dbf, key);
+                free(key.dptr);
             }
 
             return cnt;
@@ -167,12 +167,12 @@ Returns true if the hash size is not zero.
 
     INTVAL get_bool() {
         GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
-        if ( ! dbf ) {
+        if (! dbf) {
             return 0;
         }
         else {
-            datum key = gdbm_firstkey ( dbf );
-            if ( key.dptr ) {
+            datum key = gdbm_firstkey(dbf);
+            if (key.dptr) {
                 return 1;
             }
             else {
@@ -189,7 +189,7 @@ Returns true if the hash size is not zero.
 
 */
 
-    void set_string_keyed (PMC* key, STRING* value) {
+    void set_string_keyed(PMC* key, STRING* value) {
         STRING* keystr;
         GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
         datum key_gdbm, val_gdbm;
@@ -203,7 +203,7 @@ Returns true if the hash size is not zero.
         val_gdbm.dsize = value->strlen;
         val_gdbm.dptr  = value->strstart;
 
-        gdbm_store( dbf, key_gdbm, val_gdbm, GDBM_REPLACE );
+        gdbm_store(dbf, key_gdbm, val_gdbm, GDBM_REPLACE);
 
         return;
     }
@@ -218,7 +218,7 @@ Returns the string value for the element at C<*key>.
 
 */
 
-    STRING* get_string_keyed (PMC* key) {
+    STRING* get_string_keyed(PMC* key) {
         STRING* keystr, *val;
         GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
         datum key_gdbm, val_gdbm;
@@ -229,10 +229,10 @@ Returns the string value for the element at C<*key>.
 
         key_gdbm.dsize = keystr->strlen;
         key_gdbm.dptr  = keystr->strstart;
-        val_gdbm = gdbm_fetch (dbf, key_gdbm);
+        val_gdbm = gdbm_fetch(dbf, key_gdbm);
 
         val = string_from_cstring(INTERP, val_gdbm.dptr, val_gdbm.dsize);
-        free( val_gdbm.dptr );
+        free(val_gdbm.dptr);
 
         return val;
     }
@@ -265,7 +265,7 @@ Returns the PMC value for the element at C<*key>.
 
 */
 
-    PMC* get_pmc_keyed (PMC* key) {
+    PMC* get_pmc_keyed(PMC* key) {
         STRING * ret_string = DYNSELF.get_string_keyed(key);
         PMC *ret_pmc = pmc_new(INTERP, enum_class_String);
 
@@ -289,7 +289,7 @@ Convert C<value> to a string and set the string for the C<key>.
 
         temp = pmc_new(INTERP, enum_class_String);
         VTABLE_set_integer_native(INTERP, temp, value);
-        DYNSELF.set_pmc_keyed( key, temp);
+        DYNSELF.set_pmc_keyed(key, temp);
     }
 
 
@@ -308,7 +308,7 @@ Convert C<value> to a string and set the string for the C<key>.
 
         temp = pmc_new(INTERP, enum_class_String);
         VTABLE_set_number_native(INTERP, temp, value);
-        DYNSELF.set_pmc_keyed( key, temp);
+        DYNSELF.set_pmc_keyed(key, temp);
     }
 
 /*
@@ -358,7 +358,7 @@ Deletes the element associated with C<*key>.
         key_gdbm.dsize = keystr->strlen;
         key_gdbm.dptr  = keystr->strstart;
 
-        if ( gdbm_exists(dbf, key_gdbm) ) {
+        if (gdbm_exists(dbf, key_gdbm)) {
            gdbm_delete(dbf, key_gdbm);
         }
 

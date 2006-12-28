@@ -41,7 +41,7 @@ Morphs the scalar to the specified type.
 
 */
 
-    void morph (INTVAL type) {
+    void morph(INTVAL type) {
         if (SELF->vtable->base_type == type)
             return;
 

@@ -41,7 +41,7 @@ Returns the number as a Parrot string.
 
 */
 
-    STRING* get_string () {
+    STRING* get_string() {
 #if 0
         double d = (double) PMC_num_val(SELF);
         const char *sign = "-";
@@ -67,7 +67,7 @@ Returns the number as a Parrot string.
 
 */
 
-    void set_integer_native (INTVAL value) {
+    void set_integer_native(INTVAL value) {
         INTVAL dynpmc_PerlInt;
 
         dynpmc_PerlInt = pmc_type(interp,
@@ -88,7 +88,7 @@ Note that if C<value> is an integer the number morphs to a C<PerlInt>.
 
 */
 
-    void set_number_native (FLOATVAL value) {
+    void set_number_native(FLOATVAL value) {
         INTVAL vali = (INTVAL) value;
 
         PMC_num_val(SELF) = value;
@@ -109,7 +109,7 @@ Note that this method morphs the number into a C<PerlString>.
 
 */
 
-    void set_string_native (STRING * value) {
+    void set_string_native(STRING * value) {
         INTVAL dynpmc_PerlString;
 
         dynpmc_PerlString = pmc_type(interp,
@@ -128,7 +128,7 @@ Morphs the scalar to the specified type.
 
 */
 
-    void morph (INTVAL type) {
+    void morph(INTVAL type) {
         perlscalar.SELF.morph(type);
     }
 }

@@ -65,7 +65,7 @@ Returns the result of C<get_string_keyed(key)> as a C<PerlString>.
 
 */
 
-    PMC* get_pmc_keyed (PMC* key) {
+    PMC* get_pmc_keyed(PMC* key) {
         INTVAL   dynpmc_PerlString;
         PMC     *ret;
         STRING  *string;
@@ -90,7 +90,7 @@ converted to a Parrot string.
 
 */
 
-    void set_pmc_keyed (PMC* key, PMC* value) {
+    void set_pmc_keyed(PMC* key, PMC* value) {
         DYNSELF.set_string_keyed(key, VTABLE_get_string(INTERP, value));
     }
 }

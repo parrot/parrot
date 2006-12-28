@@ -57,10 +57,10 @@ matchrange_locate_keyed_int(Interp* interp, PMC* self, STRING *key)
     STRING *start = string_from_cstring(interp, "start", 5);
     STRING *end;
 
-    if(0 == string_equal(interp, key, start))
+    if (0 == string_equal(interp, key, start))
         return &RANGE_START(self);
     end = string_from_cstring(interp, "end", 3);
-    if(0 == string_equal(interp, key, end))
+    if (0 == string_equal(interp, key, end))
         return &RANGE_END(self);
     internal_exception(KEY_NOT_FOUND,
         "MatchRange: key is neither 'start' nor 'end'");
@@ -97,16 +97,16 @@ because it will be used frequently here.
 
 Initializes the matchrange with [-2,-2].
 
-=item C<void init_pmc (PMC* initializer)>
+=item C<void init_pmc(PMC* initializer)>
 
 Initializes the matchrange number with the specified values.
 (not implemented)
 
-=item C<void destroy ()>
+=item C<void destroy()>
 
 Cleans up.
 
-=item C<PMC* clone ()>
+=item C<PMC* clone()>
 
 Creates an identical copy of the matchrange number.
 
@@ -114,25 +114,25 @@ Creates an identical copy of the matchrange number.
 
 */
 
-    void init () {
+    void init() {
         RANGE_START(SELF) = RANGE_END(SELF) = -2;
     }
 
-    void init_pmc (PMC* initializer) {
+    void init_pmc(PMC* initializer) {
         /* XXX not implemented */
         DYNSELF.init();
     }
 
-    void destroy () {
+    void destroy() {
     }
 
-    void morph (INTVAL type) {
+    void morph(INTVAL type) {
         if (SELF->vtable->base_type == type)
             return;
         SUPER(type);
     }
 
-    PMC* clone () {
+    PMC* clone() {
         PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_active_destroy_SET(dest);
         RANGE_START(dest) = RANGE_START(SELF);
@@ -142,7 +142,7 @@ Creates an identical copy of the matchrange number.
 
 /*
 
-=item C<INTVAL get_bool ()>
+=item C<INTVAL get_bool()>
 
 Returns true if the match range is defined.
 
@@ -150,23 +150,23 @@ Returns true if the match range is defined.
 
 */
 
-    INTVAL get_bool () {
+    INTVAL get_bool() {
         return (INTVAL)(RANGE_START(SELF) != -2 && RANGE_END(SELF) != -2);
     }
 
 /*
 
-=item C<INTVAL get_integer_keyed (PMC* key)>
+=item C<INTVAL get_integer_keyed(PMC* key)>
 
-=item C<INTVAL get_integer_keyed_str (STRING* key)>
+=item C<INTVAL get_integer_keyed_str(STRING* key)>
 
-=item C<FLOATVAL get_number_keyed (PMC* key)>
+=item C<FLOATVAL get_number_keyed(PMC* key)>
 
-=item C<FLOATVAL get_number_keyed_str (STRING* key)>
+=item C<FLOATVAL get_number_keyed_str(STRING* key)>
 
-=item C<PMC* get_pmc_keyed (PMC* key)>
+=item C<PMC* get_pmc_keyed(PMC* key)>
 
-=item C<PMC* get_pmc_keyed_str (STRING* key)>
+=item C<PMC* get_pmc_keyed_str(STRING* key)>
 
 Returns the requested number (real part for C<real> and imaginary for C<imag>).
 
@@ -174,7 +174,7 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
 
 */
 
-    INTVAL get_integer_keyed (PMC* key) {
+    INTVAL get_integer_keyed(PMC* key) {
         if (key_type(INTERP, key) == KEY_integer_FLAG) {
             return SELF.get_integer_keyed_int(PMC_int_val(key));
         }
@@ -184,28 +184,28 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
         }
     }
 
-    INTVAL get_integer_keyed_str (STRING* key) {
+    INTVAL get_integer_keyed_str(STRING* key) {
         return (INTVAL)(DYNSELF.get_number_keyed_str(key));
     }
 
-    FLOATVAL get_number_keyed (PMC* key) {
+    FLOATVAL get_number_keyed(PMC* key) {
         STRING* s = VTABLE_get_string(INTERP, key);
         return DYNSELF.get_number_keyed_str(s);
     }
 
-    FLOATVAL get_number_keyed_str (STRING* key) {
+    FLOATVAL get_number_keyed_str(STRING* key) {
         INTVAL *num = matchrange_locate_keyed_int(INTERP, SELF, key);
-        if(num)
+        if (num)
             return *num;
         return 0.0;
     }
 
-    PMC* get_pmc_keyed (PMC* key) {
+    PMC* get_pmc_keyed(PMC* key) {
         STRING* s = VTABLE_get_string(INTERP, key);
         return DYNSELF.get_pmc_keyed_str(s);
     }
 
-    PMC* get_pmc_keyed_str (STRING* key) {
+    PMC* get_pmc_keyed_str(STRING* key) {
         PMC *ret;
         FLOATVAL val;
 
@@ -256,7 +256,7 @@ Set start or end depending on key
     }
 /*
 
-=item C<void set_pmc (PMC* value)>
+=item C<void set_pmc(PMC* value)>
 
 if C<value> is a MatchRange PMC then the set the range indices to the
 same values; otherwise throw an exception. This really only makes
@@ -267,8 +267,8 @@ for the same input string, but I won't worry about that for now.
 
 */
 
-    void set_pmc (PMC* value) {
-        if(value->vtable->base_type == MatchRange_type_id) {
+    void set_pmc(PMC* value) {
+        if (value->vtable->base_type == MatchRange_type_id) {
             RANGE_START(SELF) = RANGE_START(value);
             RANGE_END(SELF) = RANGE_END(value);
         }
@@ -279,21 +279,21 @@ for the same input string, but I won't worry about that for now.
 
 /*
 
-=item C<void set_integer_keyed (PMC* key, INTVAL value)>
+=item C<void set_integer_keyed(PMC* key, INTVAL value)>
 
-=item C<void set_integer_keyed_str (STRING* key, INTVAL value)>
+=item C<void set_integer_keyed_str(STRING* key, INTVAL value)>
 
-=item C<void set_number_keyed (PMC* key, FLOATVAL value)>
+=item C<void set_number_keyed(PMC* key, FLOATVAL value)>
 
-=item C<void set_number_keyed_str (STRING* key, FLOATVAL value)>
+=item C<void set_number_keyed_str(STRING* key, FLOATVAL value)>
 
-=item C<void set_number_keyed_int (INTVAL key, FLOATVAL value)>
+=item C<void set_number_keyed_int(INTVAL key, FLOATVAL value)>
 
-=item C<void set_pmc_keyed (PMC* key, PMC* value)>
+=item C<void set_pmc_keyed(PMC* key, PMC* value)>
 
-=item C<void set_pmc_keyed_str (STRING* key, PMC* value)>
+=item C<void set_pmc_keyed_str(STRING* key, PMC* value)>
 
-Sets the requested number (start offset for C<start> and end offset for
+Sets the requested number(start offset for C<start> and end offset for
 C<end>) to C<value>. For the keyed_int variants, 0 means RANGE_START,
 1 means RANGE_END.
 
@@ -301,7 +301,7 @@ C<end>) to C<value>. For the keyed_int variants, 0 means RANGE_START,
 
 */
 
-    void set_integer_keyed (PMC* key, INTVAL value) {
+    void set_integer_keyed(PMC* key, INTVAL value) {
         if (key_type(INTERP, key) == KEY_integer_FLAG) {
             SELF.set_integer_keyed_int(PMC_int_val(key), value);
         }
@@ -311,41 +311,41 @@ C<end>) to C<value>. For the keyed_int variants, 0 means RANGE_START,
         }
     }
 
-    void set_integer_keyed_str (STRING* key, INTVAL value) {
+    void set_integer_keyed_str(STRING* key, INTVAL value) {
         INTVAL *num = matchrange_locate_keyed_int(INTERP, SELF, key);
-        if(num)
+        if (num)
             *num = value;
     }
 
-    void set_number_keyed (PMC* key, FLOATVAL value) {
+    void set_number_keyed(PMC* key, FLOATVAL value) {
         DYNSELF.set_integer_keyed(key, (INTVAL) value);
     }
 
-    void set_number_keyed_str (STRING* key, FLOATVAL value) {
+    void set_number_keyed_str(STRING* key, FLOATVAL value) {
         DYNSELF.set_integer_keyed_str(key, (INTVAL) value);
     }
 
-    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+    void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         DYNSELF.set_integer_keyed_int(key, (INTVAL) value);
     }
 
-    void set_pmc_keyed (PMC* key, PMC* value) {
+    void set_pmc_keyed(PMC* key, PMC* value) {
         INTVAL f = VTABLE_get_integer(INTERP, value);
         DYNSELF.set_integer_keyed(key, f);
     }
 
-    void set_pmc_keyed_str (STRING* key, PMC* value) {
+    void set_pmc_keyed_str(STRING* key, PMC* value) {
         INTVAL f = VTABLE_get_integer(INTERP, value);
         DYNSELF.set_integer_keyed_str(key, f);
     }
 
 /*
 
-=item C<PMC* add (PMC* value, PMC* dest)>
+=item C<PMC* add(PMC* value, PMC* dest)>
 
-=item C<PMC* add_int (INTVAL value, PMC* dest)>
+=item C<PMC* add_int(INTVAL value, PMC* dest)>
 
-=item C<PMC* add_float (FLOATVAL value, PMC* dest)>
+=item C<PMC* add_float(FLOATVAL value, PMC* dest)>
 
 Adds C<value> to the ending offset of the match range, placing the
 result in C<dest>.
@@ -354,12 +354,12 @@ result in C<dest>.
 
 */
 
-    PMC* add (PMC* value, PMC* dest) {
+    PMC* add(PMC* value, PMC* dest) {
         INTVAL v = VTABLE_get_integer(INTERP, dest);
         return SELF.add_int(v, dest);
     }
 
-    PMC* add_int (INTVAL value, PMC* dest) {
+    PMC* add_int(INTVAL value, PMC* dest) {
         if (dest)
             VTABLE_morph(INTERP, dest, MatchRange_type_id);
         else
@@ -376,17 +376,17 @@ result in C<dest>.
         return dest;
     }
 
-    PMC* add_float (FLOATVAL value, PMC* dest) {
+    PMC* add_float(FLOATVAL value, PMC* dest) {
         return SELF.add_int((INTVAL) value, dest);
     }
 
 /*
 
-=item C<PMC* subtract (PMC* value, PMC* dest)>
+=item C<PMC* subtract(PMC* value, PMC* dest)>
 
-=item C<PMC* subtract_int (INTVAL value, PMC* dest)>
+=item C<PMC* subtract_int(INTVAL value, PMC* dest)>
 
-=item C<PMC* subtract_float (FLOATVAL value, PMC* dest)>
+=item C<PMC* subtract_float(FLOATVAL value, PMC* dest)>
 
 Subtracts C<value> from the ending offset of the match range, placing
 the result in C<dest>.
@@ -395,12 +395,12 @@ the result in C<dest>.
 
 */
 
-    PMC* subtract (PMC* value, PMC* dest) {
+    PMC* subtract(PMC* value, PMC* dest) {
         INTVAL v = VTABLE_get_integer(INTERP, dest);
         return SELF.subtract_int(v, dest);
     }
 
-    PMC* subtract_int (INTVAL value, PMC* dest) {
+    PMC* subtract_int(INTVAL value, PMC* dest) {
         if (dest)
             VTABLE_morph(INTERP, dest, MatchRange_type_id);
         else
@@ -411,13 +411,13 @@ the result in C<dest>.
         return dest;
     }
 
-    PMC* subtract_float (FLOATVAL value, PMC* dest) {
+    PMC* subtract_float(FLOATVAL value, PMC* dest) {
         return SELF.subtract_int((INTVAL) value, dest);
     }
 
 /*
 
-=item C<INTVAL is_equal (PMC* value)>
+=item C<INTVAL is_equal(PMC* value)>
 
 Compares the matchrange number with C<value> and returs true if they
 are equal.
@@ -426,12 +426,11 @@ are equal.
 
 */
 
-    INTVAL is_equal (PMC* value) {
-        if(value->vtable->base_type == MatchRange_type_id)
+    INTVAL is_equal(PMC* value) {
+        if (value->vtable->base_type == MatchRange_type_id)
             return (INTVAL)(
                     RANGE_START(SELF) == RANGE_START(value) &&
-                    RANGE_END(SELF) == RANGE_END(value)
-                );
+                    RANGE_END(SELF) == RANGE_END(value));
         return (INTVAL)0;
     }
 }

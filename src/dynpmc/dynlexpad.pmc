@@ -87,7 +87,7 @@ Return the LexInfo PMC, if any or a Null PMC.
             VTABLE_set_pointer(INTERP, std_pad, ctx);
     }
 
-    void destroy () {
+    void destroy() {
         if (PMC_struct_val(SELF)) {
             parrot_hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
@@ -103,7 +103,7 @@ Marks the lexpad hash as live.
 
 */
 
-    void mark () {
+    void mark() {
         PMC *std_pad = PMC_pmc_val(SELF);
         if (std_pad)
             pobject_lives(INTERP, (PObj *)std_pad);
@@ -111,7 +111,7 @@ Marks the lexpad hash as live.
             parrot_mark_hash(INTERP, PMC_struct_val(SELF));
     }
 
-    PMC* get_pmc_keyed_str (STRING* name) {
+    PMC* get_pmc_keyed_str(STRING* name) {
         HashBucket *b = parrot_hash_get_bucket(INTERP,
             (Hash*) PMC_struct_val(SELF), name);
         if (!b) {
@@ -143,7 +143,7 @@ Marks the lexpad hash as live.
         return SELF.get_pmc_keyed_str(s);
     }
 
-    void set_pmc_keyed_str (STRING* name, PMC* value) {
+    void set_pmc_keyed_str(STRING* name, PMC* value) {
         PMC *std_pad = PMC_pmc_val(SELF);
         if (std_pad && VTABLE_exists_keyed_str(INTERP, std_pad, name)) {
             VTABLE_set_pmc_keyed_str(INTERP, std_pad, name, value);

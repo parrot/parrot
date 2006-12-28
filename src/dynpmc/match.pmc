@@ -112,7 +112,7 @@ needs to be done once.
 
 */
 
-    STRING* get_string_keyed_str (STRING* key) {
+    STRING* get_string_keyed_str(STRING* key) {
         PMC* value;
         Hash* hash = (Hash*) PMC_struct_val(SELF);
         HashBucket *b = parrot_hash_get_bucket(INTERP, hash, key);
@@ -134,7 +134,7 @@ Returns the string value for the element at C<*key>.
 
 */
 
-    STRING* get_string_keyed (PMC* key) {
+    STRING* get_string_keyed(PMC* key) {
         PMC* valpmc;
         STRING* keystr;
         HashBucket *b;
@@ -165,7 +165,7 @@ Returns the string value for the element at C<*key>.
         return VTABLE_get_string_keyed(INTERP, valpmc, nextkey);
     }
 
-    INTVAL get_integer_keyed (PMC* key) {
+    INTVAL get_integer_keyed(PMC* key) {
         PMC* valpmc;
         STRING* keystr;
         Hash *hash = PMC_struct_val(SELF);
