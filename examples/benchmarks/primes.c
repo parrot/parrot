@@ -53,7 +53,7 @@ main(int argc, char *argv[])
   if (I1 <= I2) {goto REDO;}
   printf("%d\n", I6);
   printf("last is: %d\n", I7);
-  
+
   return 0;
 }
 
@@ -61,11 +61,11 @@ main(int argc, char *argv[])
 
 =head1 SEE ALSO
 
-F<examples/benchmarks/primes.c>, 
+F<examples/benchmarks/primes.c>,
 F<examples/benchmarks/primes.pasm>,
-F<examples/benchmarks/primes.pl>, 
+F<examples/benchmarks/primes.pl>,
 F<examples/benchmarks/primes2_p.pasm>,
-F<examples/benchmarks/primes2.c>, 
+F<examples/benchmarks/primes2.c>,
 F<examples/benchmarks/primes2.pasm>,
 F<examples/benchmarks/primes2.py>.
 
