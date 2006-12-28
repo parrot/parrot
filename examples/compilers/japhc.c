@@ -93,10 +93,10 @@ add_const_str(Parrot_Interp interpreter,
     k = ++consts->const_count;
     if (consts->constants == NULL)
         consts->constants = mem_sys_allocate(
-                k * sizeof(struct PackFile_Constant *));
+                k * sizeof (struct PackFile_Constant *));
     else
         consts->constants = mem_sys_realloc(consts->constants,
-                k * sizeof(struct PackFile_Constant *));
+                k * sizeof (struct PackFile_Constant *));
 
     /* Allocate a new constant */
     consts->constants[--k] = PackFile_Constant_new(interpreter);
@@ -131,7 +131,7 @@ japh_compiler(Parrot_Interp interpreter, const char *program)
     /*
      * alloc byte code mem
      */
-    cur_cs->base.data = mem_sys_allocate(CODE_SIZE * sizeof(opcode_t));
+    cur_cs->base.data = mem_sys_allocate(CODE_SIZE * sizeof (opcode_t));
     cur_cs->base.size = CODE_SIZE;
     consts = cur_cs->const_table;
     /*
