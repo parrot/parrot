@@ -78,26 +78,26 @@ struct _data_types {
 const struct _data_types data_types[] = {
     { "INTVAL",   INTVAL_SIZE },          /* parrot types */
     { "FLOATVAL", NUMVAL_SIZE },
-    { "STRING", sizeof(void *) },
-    { "PMC",    sizeof(void *) },           /* actual PMCs have positive class numbers */
-    { "BIGINT", sizeof(void *) },
-    { "BIGNUM", sizeof(void *) },          /* might be different */
-    { "DPOINTER",sizeof(void *) },
+    { "STRING", sizeof (void *) },
+    { "PMC",    sizeof (void *) },           /* actual PMCs have positive class numbers */
+    { "BIGINT", sizeof (void *) },
+    { "BIGNUM", sizeof (void *) },          /* might be different */
+    { "DPOINTER",sizeof (void *) },
 
-    { "char",   sizeof(char) },          /* native integer types */
-    { "short",  sizeof(short) },
-    { "int",    sizeof(int)   },
-    { "long",   sizeof(long)  },
+    { "char",   sizeof (char) },          /* native integer types */
+    { "short",  sizeof (short) },
+    { "int",    sizeof (int)   },
+    { "long",   sizeof (long)  },
     { "longlong", 0 },          /* TODO */
 
-    { "uchar",  sizeof(char) },            /* native unsigned types */
-    { "ushort", sizeof(short)},
-    { "uint",   sizeof(int)  },
-    { "ulong",  sizeof(long) },
+    { "uchar",  sizeof (char) },            /* native unsigned types */
+    { "ushort", sizeof (short)},
+    { "uint",   sizeof (int)  },
+    { "ulong",  sizeof (long) },
     { "ulonglong", 0 },         /* TODO */
 
-    { "float",  sizeof(float) },          /* native float types */
-    { "double", sizeof(double) },
+    { "float",  sizeof (float) },          /* native float types */
+    { "double", sizeof (double) },
     { "longdouble", 0 },        /* TODO */
 
     { "int1",   0 },            /*  = bit */
@@ -112,11 +112,11 @@ const struct _data_types data_types[] = {
     { "uint32", 4 },
     { "uint64", 8 },
 
-    { "ptr", sizeof(void*) },
-    { "cstr", sizeof(char *) },
-    { "struct_ptr", sizeof(void*) },
+    { "ptr", sizeof (void*) },
+    { "cstr", sizeof (char *) },
+    { "struct_ptr", sizeof (void*) },
     { "struct", 0 },
-    { "func_ptr", sizeof(void (*)(void)) },
+    { "func_ptr", sizeof (void (*)(void)) },
 
     { "sized", 0 },
 

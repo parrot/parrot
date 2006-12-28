@@ -58,7 +58,7 @@ PARROT_API void Parrot_register_move(Interp *interp, int n_regs,
  */
 void *IMCC_compile_file_s(Parrot_Interp interp, const char *s,
         STRING **error_message);
-void * IMCC_compile_file (Parrot_Interp interp, const char *s);
+void * IMCC_compile_file(Parrot_Interp interp, const char *s);
 PMC * IMCC_compile_pir_s(Parrot_Interp interp, const char *s,
         STRING **error_message);
 PMC * IMCC_compile_pasm_s(Parrot_Interp interp, const char *s,

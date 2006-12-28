@@ -112,10 +112,10 @@ typedef struct _Thread_data {
 } Thread_data;
 
 #define LOCK_INTERPRETER(interp) \
-    if ( (interp)->thread_data ) \
+    if ((interp)->thread_data) \
         LOCK((interp)->thread_data->interp_lock)
 #define UNLOCK_INTERPRETER(interp) \
-    if ( (interp)->thread_data ) \
+    if ((interp)->thread_data) \
         UNLOCK((interp)->thread_data->interp_lock)
 
 #define INTERPRETER_LOCK_INIT(interp) \

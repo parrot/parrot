@@ -71,7 +71,7 @@
 #endif
 #define PIO_LINEBUFSIZE 256     /* Default linebuffer size */
 #define PIO_GRAIN 2048          /* Smallest size for a block buffer */
-#define PIO_BUFSIZE     (PIO_GRAIN * 2)
+#define PIO_BUFSIZE (PIO_GRAIN * 2)
 
 #define PIO_NR_OPEN 256         /* Size of an "IO handle table" */
 

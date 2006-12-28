@@ -13,10 +13,10 @@
 #if !defined(PARROT_GLOBAL_H_GUARD)
 #define PARROT_GLOBAL_H_GUARD
 
-PARROT_API PMC *Parrot_get_namespace_keyed(     Interp *, PMC *base_ns, PMC *pmc_key);
-PARROT_API PMC *Parrot_get_namespace_keyed_str( Interp *, PMC *base_ns, STRING *str_key);
+PARROT_API PMC *Parrot_get_namespace_keyed(Interp *, PMC *base_ns, PMC *pmc_key);
+PARROT_API PMC *Parrot_get_namespace_keyed_str(Interp *, PMC *base_ns, STRING *str_key);
 
-PARROT_API PMC *Parrot_make_namespace_keyed(    Interp *, PMC *base_ns, PMC *pmc_key);
+PARROT_API PMC *Parrot_make_namespace_keyed(Interp *, PMC *base_ns, PMC *pmc_key);
 PARROT_API PMC *Parrot_make_namespace_keyed_str(Interp *, PMC *base_ns, STRING *str_key);
 
 /*

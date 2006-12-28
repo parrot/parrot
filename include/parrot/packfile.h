@@ -27,7 +27,7 @@
 
 /*
 ** Bytes that we don't have to reorder
-*  PACKFILE_HEADER_BYTES must be an integer times sizeof(opcode_t).
+*  PACKFILE_HEADER_BYTES must be an integer times sizeof (opcode_t).
 */
 #define PACKFILE_HEADER_BYTES 16
 
@@ -263,16 +263,16 @@ void do_sub_pragmas(Interp *, struct PackFile_ByteCode *, int, PMC *eval_pmc);
  * directory functions
  */
 
-PARROT_API INTVAL PackFile_add_segment (Interp *, struct PackFile_Directory *,
+PARROT_API INTVAL PackFile_add_segment(Interp *, struct PackFile_Directory *,
         struct PackFile_Segment *);
 
-PARROT_API struct PackFile_Segment * PackFile_find_segment (Interp *,
+PARROT_API struct PackFile_Segment * PackFile_find_segment(Interp *,
         struct PackFile_Directory *, const char *name, int recurse);
 
 PARROT_API struct PackFile_Segment *
-PackFile_remove_segment_by_name (Interp *, struct PackFile_Directory *, const char *);
+PackFile_remove_segment_by_name(Interp *, struct PackFile_Directory *, const char *);
 
-PARROT_API INTVAL PackFile_map_segments (Interp *, struct PackFile_Directory *dir,
+PARROT_API INTVAL PackFile_map_segments(Interp *, struct PackFile_Directory *dir,
                               PackFile_map_segments_func_t callback,
                               void* usr_data);
 
@@ -293,14 +293,14 @@ PARROT_API opcode_t * PackFile_Segment_pack(Interp *, struct PackFile_Segment *,
 PARROT_API opcode_t * PackFile_Segment_unpack(Interp *interp,
         struct PackFile_Segment * self, opcode_t *cursor);
 PARROT_API void PackFile_Segment_dump(Interp *, struct PackFile_Segment *);
-void default_dump_header (Interp *, struct PackFile_Segment *);
+void default_dump_header(Interp *, struct PackFile_Segment *);
 
 PARROT_API struct PackFile_Segment *PackFile_Segment_new(Interp *, struct PackFile *pf, const char*,
         int);
 
 /* fingerprint functions */
-PARROT_API int PackFile_check_fingerprint (void *cursor);
-PARROT_API size_t PackFile_write_fingerprint (void *cursor);
+PARROT_API int PackFile_check_fingerprint(void *cursor);
+PARROT_API size_t PackFile_write_fingerprint(void *cursor);
 
 /*
 ** PackFile_FixupTable Functions:
@@ -405,8 +405,8 @@ size_t   PF_size_cstring(const char *);
 
 opcode_t* PF_store_opcode(opcode_t *, opcode_t);
 opcode_t* PF_store_integer(opcode_t *, INTVAL);
-opcode_t* PF_store_number (opcode_t *, FLOATVAL *);
-opcode_t* PF_store_string (opcode_t *, STRING *);
+opcode_t* PF_store_number(opcode_t *, FLOATVAL *);
+opcode_t* PF_store_string(opcode_t *, STRING *);
 opcode_t* PF_store_cstring(opcode_t *, const char *);
 
 void PackFile_assign_transforms(struct PackFile *pf);

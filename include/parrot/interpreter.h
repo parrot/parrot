@@ -241,7 +241,7 @@ typedef struct Parrot_Context {
     size_t pred_offset;
 } parrot_context_t;
 
-#define ALIGNED_CTX_SIZE ( ((sizeof(struct Parrot_Context) + NUMVAL_SIZE - 1) \
+#define ALIGNED_CTX_SIZE (((sizeof (struct Parrot_Context) + NUMVAL_SIZE - 1) \
         / NUMVAL_SIZE) * NUMVAL_SIZE )
 
 struct _Thread_data;    /* in thread.h */

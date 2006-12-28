@@ -136,7 +136,7 @@ PARROT_API STRING* Parrot_string_trans_charset(Interp *, STRING *src,
 PARROT_API STRING* Parrot_string_trans_encoding(Interp *, STRING *src,
         INTVAL encoding_nr, STRING *dest);
 
-PARROT_API CHARSET* string_rep_compatible (Interp *, STRING *a, const STRING *b,
+PARROT_API CHARSET* string_rep_compatible(Interp *, STRING *a, const STRING *b,
         ENCODING**);
 PARROT_API STRING* string_join(Interp *, STRING *j, PMC *ar);
 PARROT_API PMC* string_split(Interp *, STRING *del, STRING *s);

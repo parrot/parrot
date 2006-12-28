@@ -312,7 +312,7 @@ typedef enum PObj_enum {
 #define PObj_special_SET(flag, o) do { \
     PObj_flag_SET(flag, o); \
     DOD_flag_SET(is_special_PMC, o); \
-} while(0)
+} while (0)
 
 #define PObj_special_CLEAR(flag, o) do { \
     PObj_flag_CLEAR(flag, o); \
@@ -321,8 +321,7 @@ typedef enum PObj_enum {
                  PObj_custom_mark_FLAG | \
                  PObj_data_is_PMC_array_FLAG  | \
                  PObj_is_PMC_EXT_FLAG | \
-                 PObj_needs_early_DOD_FLAG \
-                 ))) \
+                 PObj_needs_early_DOD_FLAG))) \
         DOD_flag_SET(is_special_PMC, o); \
     else \
         DOD_flag_CLEAR(is_special_PMC, o); \
@@ -334,7 +333,7 @@ typedef enum PObj_enum {
 #define PObj_data_is_PMC_array_SET(o) do { \
     PObj_special_SET(data_is_PMC_array, o); \
     PObj_flag_SET(active_destroy, o); \
-    } while(0)
+    } while (0)
 
 #define PObj_data_is_PMC_array_CLEAR(o) do {\
     PObj_special_CLEAR(data_is_PMC_array, o); \
@@ -404,7 +403,7 @@ typedef enum PObj_enum {
 #define PObj_custom_mark_destroy_SETALL(o) do { \
         PObj_custom_mark_SET(o); \
         PObj_active_destroy_SET(o); \
-} while(0)
+} while (0)
 
 #endif /* PARROT_POBJ_H_GUARD */
 

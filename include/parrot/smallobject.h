@@ -38,8 +38,8 @@ typedef struct _gc_gms_hdr {
     void *gc_dummy_align;       /* see above */
 } Gc_gms_hdr;
 
-#define PObj_to_GMSH(o) ( ((Gc_gms_hdr*)o)-1 )
-#define GMSH_to_PObj(p) ( (PObj*) (p+1) )
+#define PObj_to_GMSH(o) (((Gc_gms_hdr*)o)-1)
+#define GMSH_to_PObj(p) ((PObj*) (p+1))
 
 /* the structure uses 2 ptrs itself */
 #define GC_GMS_STORE_SIZE (64-2)
@@ -121,7 +121,7 @@ struct Small_Object_Pool {
  */
 
 #if PARROT_GC_GMS
-#  define GC_HEADER_SIZE (sizeof(Gc_gms_hdr))
+#  define GC_HEADER_SIZE (sizeof (Gc_gms_hdr))
 #  define PObj_to_ARENA(o) PObj_to_GMSH(o)
 #  define ARENA_to_PObj(p) GMSH_to_PObj((Gc_gms_hdr*)(p))
 #else

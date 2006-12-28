@@ -79,12 +79,12 @@ PARROT_API int Parrot_is_vtable_name(Interp *, const char *name);
         PObj_active_destroy_SET(x); \
     } while (0)
 #define set_attrib_array_size(o, y) do { \
-    PMC_data(o) = mem_sys_allocate_zeroed((sizeof(PMC *)*(y))); \
+    PMC_data(o) = mem_sys_allocate_zeroed((sizeof (PMC *)*(y))); \
     PMC_int_val(o) = y; \
 } while (0)
 
 #define resize_attrib_array(o, y) do { \
-    PMC_data(o) = mem_sys_realloc(PMC_data(o), (sizeof(PMC *)*(y))); \
+    PMC_data(o) = mem_sys_realloc(PMC_data(o), (sizeof (PMC *)*(y))); \
     PMC_int_val(o) = y; \
 } while (0)
 

@@ -42,16 +42,16 @@
 #define REGNO_PMC 3
 
 #  define __CTX interp->ctx.state
-#  define _SIZEOF_INTS    (sizeof(INTVAL) * __CTX->n_regs_used[REGNO_INT])
-#  define _SIZEOF_NUMS    (sizeof(FLOATVAL) * __CTX->n_regs_used[REGNO_NUM])
-#  define _SIZEOF_PMCS    (sizeof(PMC*) * __CTX->n_regs_used[REGNO_PMC])
-#  define _SIZEOF_STRS    (sizeof(STRING*) * __CTX->n_regs_used[REGNO_STR])
+#  define _SIZEOF_INTS    (sizeof (INTVAL) * __CTX->n_regs_used[REGNO_INT])
+#  define _SIZEOF_NUMS    (sizeof (FLOATVAL) * __CTX->n_regs_used[REGNO_NUM])
+#  define _SIZEOF_PMCS    (sizeof (PMC*) * __CTX->n_regs_used[REGNO_PMC])
+#  define _SIZEOF_STRS    (sizeof (STRING*) * __CTX->n_regs_used[REGNO_STR])
 
-#  define REG_OFFS_NUM(x) (sizeof(FLOATVAL) * (-1L - (x)))
-#  define REG_OFFS_INT(x) (sizeof(INTVAL) * (x))
-#  define REG_OFFS_PMC(x) (_SIZEOF_INTS + sizeof(PMC*) * \
+#  define REG_OFFS_NUM(x) (sizeof (FLOATVAL) * (-1L - (x)))
+#  define REG_OFFS_INT(x) (sizeof (INTVAL) * (x))
+#  define REG_OFFS_PMC(x) (_SIZEOF_INTS + sizeof (PMC*) * \
         (__CTX->n_regs_used[REGNO_PMC] - 1L - (x)))
-#  define REG_OFFS_STR(x) (sizeof(STRING*) * (x) + _SIZEOF_INTS + _SIZEOF_PMCS )
+#  define REG_OFFS_STR(x) (sizeof (STRING*) * (x) + _SIZEOF_INTS + _SIZEOF_PMCS)
 
 
 /*
