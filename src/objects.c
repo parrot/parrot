@@ -1585,7 +1585,7 @@ Parrot_class_offset(Interp *interp, PMC *object, STRING *class) {
     INTVAL offset, i, n, attr_count;
 
     if (!PObj_is_object_TEST(object))
-        internal_exception(1, "Not an object");
+        real_exception(interp, NULL, 1, "Not an object");
     class_pmc = GET_CLASS((SLOTTYPE *)PMC_data(object), object);
     /* unroll common case - object is this class */
     attribs = get_attrib_num(PMC_data(class_pmc), PCD_CLASS_ATTRIBUTES);
