@@ -104,7 +104,7 @@ e_pbc_open(Interp *interp, void *param)
         /* register cleanup code */
         Parrot_on_exit(interp, imcc_globals_destroy, NULL);
     }
-    cs = mem_sys_allocate_zeroed(sizeof(struct cs_t));
+    cs = mem_sys_allocate_zeroed(sizeof (struct cs_t));
     cs->prev = globals.cs;
     /* free previous cached key constants if any */
     if (globals.cs) {
@@ -180,7 +180,7 @@ make_jit_info(Interp *interp, IMC_Unit * unit)
     globals.cs->subs->n_basic_blocks = unit->n_basic_blocks;
     /* offset of block start and end, 4 * registers_used */
     globals.cs->jit_info->data = realloc(globals.cs->jit_info->data,
-            size * sizeof(opcode_t) * 6);
+            size * sizeof (opcode_t) * 6);
     globals.cs->jit_info->size = size * 6;
     return globals.cs->jit_info->data + old * 6;
 }
@@ -190,7 +190,7 @@ make_jit_info(Interp *interp, IMC_Unit * unit)
 static void
 make_new_sub(IMC_Unit * unit)
 {
-    struct subs *s = mem_sys_allocate_zeroed(sizeof(struct subs));
+    struct subs *s = mem_sys_allocate_zeroed(sizeof (struct subs));
 
     s->prev = globals.cs->subs;
     s->next = NULL;
@@ -820,7 +820,7 @@ add_const_key(Interp *interp, opcode_t key[],
 
     if ( (r = _get_sym(&globals.cs->key_consts, s_key)) != 0)
         return r->color;
-    pfc = malloc(sizeof(struct PackFile_Constant));
+    pfc = malloc(sizeof (struct PackFile_Constant));
     rc = PackFile_Constant_unpack_key(interp,
             interp->code->const_table, pfc, key);
     if (!rc)
@@ -1222,7 +1222,7 @@ e_pbc_emit(Interp *interp, void *param, IMC_Unit * unit, Instruction * ins)
                 code_size, oldsize);
         constant_folding(interp, unit);
         store_sub_size(code_size, ins_size);
-        bytes = (oldsize + code_size) * sizeof(opcode_t);
+        bytes = (oldsize + code_size) * sizeof (opcode_t);
         /*
          * allocate code and pic_index
          *
@@ -1270,7 +1270,7 @@ e_pbc_emit(Interp *interp, void *param, IMC_Unit * unit, Instruction * ins)
             /* need a dummy to hold register usage */
             SymReg *r = mk_sub_label(interp, str_dup("(null)"));
             r->type = VT_PCC_SUB;
-            r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
+            r->pcc_sub = calloc(1, sizeof (struct pcc_sub_t));
             add_const_pmc_sub(interp, r, oldsize,
                     oldsize+code_size);
         }

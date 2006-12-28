@@ -66,7 +66,7 @@ pcc_get_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
     char buf[1024], s[16];
     SymReg **regs, *arg;
 
-    regs = mem_sys_allocate((n + 1) * sizeof(SymReg *));
+    regs = mem_sys_allocate((n + 1) * sizeof (SymReg *));
     strcpy(buf, "\"(");
     for (i = 0; i < n; i++) {
         arg = args[i];
@@ -120,9 +120,9 @@ unshift_self(Interp *interp, SymReg *sub, SymReg *obj)
 
     UNUSED(interp);
     sub->pcc_sub->args = realloc(sub->pcc_sub->args,
-            (n + 1) * sizeof(SymReg *));
+            (n + 1) * sizeof (SymReg *));
     sub->pcc_sub->arg_flags = realloc(sub->pcc_sub->arg_flags,
-            (n + 1) * sizeof(int));
+            (n + 1) * sizeof (int));
     for (i = n; i; --i) {
         sub->pcc_sub->args[i] = sub->pcc_sub->args[i - 1];
         sub->pcc_sub->arg_flags[i] = sub->pcc_sub->arg_flags[i - 1];

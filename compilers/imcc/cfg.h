@@ -44,12 +44,12 @@ typedef struct _loop_info {
 /* Functions: */
 struct _IMC_Unit;
 
-void find_basic_blocks (Parrot_Interp, struct _IMC_Unit *, int first);
+void find_basic_blocks(Parrot_Interp, struct _IMC_Unit *, int first);
 void build_cfg(Parrot_Interp, struct _IMC_Unit *);
 
 void compute_dominators(Parrot_Interp, struct _IMC_Unit *);
 void compute_dominance_frontiers(Parrot_Interp, struct _IMC_Unit *);
-int natural_preheader (struct _IMC_Unit *, Loop_info*);
+int natural_preheader(struct _IMC_Unit *, Loop_info*);
 void find_loops(Parrot_Interp, struct _IMC_Unit *);
 void search_predecessors_not_in(Basic_block*, Set*);
 

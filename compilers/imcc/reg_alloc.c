@@ -32,9 +32,9 @@ static int interferes(Interp *, IMC_Unit *, SymReg * r0, SymReg * r1);
 static void map_colors(IMC_Unit *, int x, unsigned int * graph,
                        char colors[], int typ, int);
 static int try_allocate(Parrot_Interp, IMC_Unit *);
-static void allocate_lexicals (Parrot_Interp, IMC_Unit *);
-static void vanilla_reg_alloc (Parrot_Interp, IMC_Unit *);
-static void allocate_non_volatile (Parrot_Interp, IMC_Unit *);
+static void allocate_lexicals(Parrot_Interp, IMC_Unit *);
+static void vanilla_reg_alloc(Parrot_Interp, IMC_Unit *);
+static void allocate_non_volatile(Parrot_Interp, IMC_Unit *);
 #if 0
 static int neighbours(int node);
 #endif
@@ -43,8 +43,8 @@ static unsigned int* ig_get_word(int i, int j, int N, unsigned int* graph,
                                  int* bit_ofs)
 {
     unsigned int bit = i * N + j;
-    *bit_ofs = bit % sizeof(*graph);
-    return &graph[bit / sizeof(*graph)];
+    *bit_ofs = bit % sizeof (*graph);
+    return &graph[bit / sizeof (*graph)];
 }
 
 static void ig_set(int i, int j, int N, unsigned int* graph)
@@ -65,11 +65,11 @@ int ig_test(int i, int j, int N, unsigned int* graph)
 static unsigned int* ig_allocate(int N)
 {
     /* size is N*N bits, but we want don't want to allocate a partial
-     * word, so round up to the nearest multiple of sizeof(int).
+     * word, so round up to the nearest multiple of sizeof (int).
      */
     int need_bits = N * N;
-    int num_words = (need_bits + sizeof(int) - 1) / sizeof(int);
-    return (unsigned int*) mem_sys_allocate_zeroed(num_words * sizeof(int));
+    int num_words = (need_bits + sizeof (int) - 1) / sizeof (int);
+    return (unsigned int*) mem_sys_allocate_zeroed(num_words * sizeof (int));
 }
 
 /* imc_reg_alloc is the main loop of the allocation algorithm. It operates
@@ -149,7 +149,7 @@ imc_reg_alloc(Interp *interp, IMC_Unit * unit)
 
     rebuild_reglist(interp, unit);
     if (IMCC_INFO(interp)->allocator == IMCC_VANILLA_ALLOCATOR)
-        vanilla_reg_alloc (interp, unit);
+        vanilla_reg_alloc(interp, unit);
     else
         graph_coloring_reg_alloc(interp, unit);
 
@@ -239,7 +239,7 @@ imc_stat_init(IMC_Unit * unit)
         unit->first_avail[j] = 0;
     }
 
-    memset(&(unit->ostat), 0, sizeof(struct imcc_ostat));
+    memset(&(unit->ostat), 0, sizeof (struct imcc_ostat));
 }
 
 /* and final */
@@ -301,7 +301,7 @@ reg_sort_f(const void *a, const void *b)
 static void
 sort_reglist(IMC_Unit *unit)
 {
-    qsort(unit->reglist, unit->n_symbols, sizeof(SymReg*), reg_sort_f);
+    qsort(unit->reglist, unit->n_symbols, sizeof (SymReg*), reg_sort_f);
 }
 
 /*
@@ -332,7 +332,7 @@ build_reglist(Parrot_Interp interp, IMC_Unit * unit)
     count = unit->hash.entries;
     if (count == 0)
         return;
-    unit->reglist = mem_sys_allocate(count * sizeof(SymReg*));
+    unit->reglist = mem_sys_allocate(count * sizeof (SymReg*));
 
     for (i = count = 0; i < hsh->size; i++) {
         for (r = hsh->data[i]; r; r = r->next) {

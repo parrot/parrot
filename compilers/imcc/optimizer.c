@@ -160,7 +160,7 @@ get_neg_op(char *op, int *n)
     { "ge", "lt", 3 },
     };
     unsigned int i;
-    for (i = 0; i < sizeof(br_pairs)/sizeof(br_pairs[0]); i++) {
+    for (i = 0; i < sizeof (br_pairs)/sizeof (br_pairs[0]); i++) {
         *n= br_pairs[i].n;
         if (strcmp(op, br_pairs[i].op) == 0)
             return br_pairs[i].nop;
@@ -192,7 +192,7 @@ if_branch(Interp *interp, IMC_Unit * unit)
     if (!last->next)
         return changed;
     IMCC_info(interp, 2, "\tif_branch\n");
-    for (ins = last->next; ins; ) {
+    for (ins = last->next; ins;) {
         if ((last->type & ITBRANCH) &&          /* if ...L1 */
                 (ins->type & IF_goto) &&        /* branch L2*/
                 !strcmp(ins->op, "branch") &&
@@ -264,7 +264,7 @@ strength_reduce(Interp *interp, IMC_Unit * unit)
          * div Nx, Nx, Ny => sub Nx, Ny
          * fdiv Nx, Nx, Ny => sub Nx, Ny
          */
-        if ( ( (ins->opnum == PARROT_OP_sub_i_i_i ||
+        if (((ins->opnum == PARROT_OP_sub_i_i_i ||
                 ins->opnum == PARROT_OP_sub_i_i_ic ||
                 ins->opnum == PARROT_OP_sub_i_ic_i ||
                 ins->opnum == PARROT_OP_div_i_i_i ||
@@ -283,7 +283,7 @@ strength_reduce(Interp *interp, IMC_Unit * unit)
                 ins->opnum == PARROT_OP_fdiv_n_n_nc ||
                 ins->opnum == PARROT_OP_fdiv_n_nc_n) &&
              ins->r[0] == ins->r[1])
-          || ( (ins->opnum == PARROT_OP_add_i_i_i ||
+          || ((ins->opnum == PARROT_OP_add_i_i_i ||
                 ins->opnum == PARROT_OP_add_i_i_ic ||
                 ins->opnum == PARROT_OP_add_i_ic_i ||
                 ins->opnum == PARROT_OP_mul_i_i_i ||
@@ -297,7 +297,7 @@ strength_reduce(Interp *interp, IMC_Unit * unit)
                 ins->opnum == PARROT_OP_mul_n_nc_n) &&
              (ins->r[0] == ins->r[1] || ins->r[0] == ins->r[2]))) {
             IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
-            if(ins->r[0] == ins->r[1]) {
+            if (ins->r[0] == ins->r[1]) {
                 ins->r[1] = ins->r[2];
             }
             tmp = INS(interp, unit, ins->op, "", ins->r, 2, 0, 0);
@@ -318,20 +318,20 @@ strength_reduce(Interp *interp, IMC_Unit * unit)
          * div Nx, 1     => delete
          * fdiv Nx, 1    => delete
          */
-        if ( ( (ins->opnum == PARROT_OP_add_i_ic ||
+        if (((ins->opnum == PARROT_OP_add_i_ic ||
                 ins->opnum == PARROT_OP_sub_i_ic) &&
                       IMCC_int_from_reg(interp, ins->r[1]) == 0)
-          || ( (ins->opnum == PARROT_OP_mul_i_ic ||
+          || ((ins->opnum == PARROT_OP_mul_i_ic ||
                 ins->opnum == PARROT_OP_div_i_ic ||
                 ins->opnum == PARROT_OP_fdiv_i_ic) &&
                       IMCC_int_from_reg(interp, ins->r[1]) == 1)
-          || ( (ins->opnum == PARROT_OP_add_n_nc ||
+          || ((ins->opnum == PARROT_OP_add_n_nc ||
                 ins->opnum == PARROT_OP_sub_n_nc) &&
                       atof(ins->r[1]->name) == 0.0)
-          || ( (ins->opnum == PARROT_OP_mul_n_nc ||
+          || ((ins->opnum == PARROT_OP_mul_n_nc ||
                 ins->opnum == PARROT_OP_div_n_nc ||
                 ins->opnum == PARROT_OP_fdiv_n_nc) &&
-                      atof(ins->r[1]->name) == 1.0) ) {
+                      atof(ins->r[1]->name) == 1.0)) {
             IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
             ins = delete_ins(unit, ins, 1);
             if (ins)
@@ -348,10 +348,10 @@ strength_reduce(Interp *interp, IMC_Unit * unit)
          * sub Ix, 1     => dec Ix
          * sub Nx, 1     => dec Nx
          */
-        if ( ( (ins->opnum == PARROT_OP_add_i_ic ||
+        if (((ins->opnum == PARROT_OP_add_i_ic ||
                 ins->opnum == PARROT_OP_sub_i_ic) &&
                       IMCC_int_from_reg(interp, ins->r[1]) == 1)
-          || ( (ins->opnum == PARROT_OP_add_n_nc ||
+          || ((ins->opnum == PARROT_OP_add_n_nc ||
                 ins->opnum == PARROT_OP_sub_n_nc) &&
                       atof(ins->r[1]->name) == 1.0)) {
             IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
@@ -383,27 +383,27 @@ strength_reduce(Interp *interp, IMC_Unit * unit)
          * div Nx, Ny, 1 => set Nx, Ny
          * fdiv Nx, Ny, 1 => set Nx, Ny
          */
-        if ( ( (ins->opnum == PARROT_OP_add_i_i_ic ||
+        if (((ins->opnum == PARROT_OP_add_i_i_ic ||
                 ins->opnum == PARROT_OP_sub_i_i_ic) &&
                       IMCC_int_from_reg(interp, ins->r[2]) == 0)
-          || (  ins->opnum == PARROT_OP_add_i_ic_i &&
+          || (ins->opnum == PARROT_OP_add_i_ic_i &&
                       IMCC_int_from_reg(interp, ins->r[1]) == 0)
-          || ( (ins->opnum == PARROT_OP_mul_i_i_ic ||
+          || ((ins->opnum == PARROT_OP_mul_i_i_ic ||
                 ins->opnum == PARROT_OP_div_i_i_ic ||
                 ins->opnum == PARROT_OP_fdiv_i_i_ic) &&
                       IMCC_int_from_reg(interp, ins->r[2]) == 1)
-          || (  ins->opnum == PARROT_OP_mul_i_ic_i &&
+          || (ins->opnum == PARROT_OP_mul_i_ic_i &&
                       IMCC_int_from_reg(interp, ins->r[1]) == 1)
-          || ( (ins->opnum == PARROT_OP_add_n_n_nc ||
+          || ((ins->opnum == PARROT_OP_add_n_n_nc ||
                 ins->opnum == PARROT_OP_sub_n_n_nc) &&
                       atof(ins->r[2]->name) == 0.0)
-          || (  ins->opnum == PARROT_OP_add_n_nc_n &&
+          || (ins->opnum == PARROT_OP_add_n_nc_n &&
                       atof(ins->r[1]->name) == 0.0)
-          || ( (ins->opnum == PARROT_OP_mul_n_n_nc ||
+          || ((ins->opnum == PARROT_OP_mul_n_n_nc ||
                 ins->opnum == PARROT_OP_div_n_n_nc ||
                 ins->opnum == PARROT_OP_fdiv_n_n_nc) &&
                       atof(ins->r[2]->name) == 1.0)
-          || (  ins->opnum == PARROT_OP_mul_n_nc_n &&
+          || (ins->opnum == PARROT_OP_mul_n_nc_n &&
                       atof(ins->r[1]->name) == 1.0)) {
             IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
             if (ins->r[1]->type == VTCONST) {
@@ -425,14 +425,14 @@ strength_reduce(Interp *interp, IMC_Unit * unit)
          * mul Ix, 0, Iy => set Ix, 0
          * mul Ix, 0     => set Ix, 0
          */
-        if ( (ins->opnum == PARROT_OP_mul_i_i_ic &&
+        if ((ins->opnum == PARROT_OP_mul_i_i_ic &&
                       IMCC_int_from_reg(interp, ins->r[2]) == 0)
-          || ( (ins->opnum == PARROT_OP_mul_i_ic_i ||
+          || ((ins->opnum == PARROT_OP_mul_i_ic_i ||
                 ins->opnum == PARROT_OP_mul_i_ic) &&
                       IMCC_int_from_reg(interp, ins->r[1]) == 0)
           || (ins->opnum == PARROT_OP_mul_n_n_nc &&
                       atof(ins->r[2]->name) == 0.0)
-          || ( (ins->opnum == PARROT_OP_mul_n_nc_n ||
+          || ((ins->opnum == PARROT_OP_mul_n_nc_n ||
                 ins->opnum == PARROT_OP_mul_n_nc) &&
                       atof(ins->r[1]->name) == 0.0)) {
             IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
@@ -451,7 +451,7 @@ strength_reduce(Interp *interp, IMC_Unit * unit)
          * set Ix, 0     => null Ix
          * set Nx, 0     => null Nx
          */
-        if ( (ins->opnum == PARROT_OP_set_i_ic &&
+        if ((ins->opnum == PARROT_OP_set_i_ic &&
                       IMCC_int_from_reg(interp, ins->r[1]) == 0)
           || (ins->opnum == PARROT_OP_set_n_nc &&
                       atof(ins->r[1]->name) == 0.0 &&
@@ -584,7 +584,7 @@ IMCC_subst_constants_umix(Interp *interp, IMC_Unit * unit, char *name,
     char b[128];
 
     tmp = NULL;
-    for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
+    for (i = 0; i < sizeof (ops)/sizeof (ops[0]); i++) {
         if (n == 3 &&
                 r[0]->set == 'N' &&
                 r[1]->type == VTCONST &&
@@ -729,7 +729,7 @@ IMCC_subst_constants(Interp *interp, IMC_Unit * unit, char *name,
 
     tmp = NULL;
     found = 0;
-    for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
+    for (i = 0; i < sizeof (ops)/sizeof (ops[0]); i++) {
         if (n == 4 &&
                 r[1]->type & (VTCONST|VT_CONSTP) &&
                 r[2]->type & (VTCONST|VT_CONSTP) &&
@@ -744,7 +744,7 @@ IMCC_subst_constants(Interp *interp, IMC_Unit * unit, char *name,
             break;
         }
     }
-    for (i = 0; !found && i < sizeof(ops2)/sizeof(ops2[0]); i++) {
+    for (i = 0; !found && i < sizeof (ops2)/sizeof (ops2[0]); i++) {
         /*
          * abs_i_ic ...
          */
@@ -758,7 +758,7 @@ IMCC_subst_constants(Interp *interp, IMC_Unit * unit, char *name,
             break;
         }
     }
-    for (i = 0; !found && i < sizeof(ops3)/sizeof(ops3[0]); i++) {
+    for (i = 0; !found && i < sizeof (ops3)/sizeof (ops3[0]); i++) {
         /*
          * eq_xc_xc_labelc ...
          */
@@ -773,7 +773,7 @@ IMCC_subst_constants(Interp *interp, IMC_Unit * unit, char *name,
             break;
         }
     }
-    for (i = 0; !found && i < sizeof(ops4)/sizeof(ops4[0]); i++) {
+    for (i = 0; !found && i < sizeof (ops4)/sizeof (ops4[0]); i++) {
         /*
          * if_xc_labelc, unless
          */
@@ -1054,7 +1054,7 @@ branch_cond_loop(Interp *interp, IMC_Unit * unit)
     /* reset statistic globals */
 
     for (ins = unit->instructions; ins; ins = ins->next) {
-        if ((ins->type & IF_goto) && !strcmp(ins->op, "branch") ) {
+        if ((ins->type & IF_goto) && !strcmp(ins->op, "branch")) {
             /* get `end` label */
             end = ins->next;
             /* get `start` label */
@@ -1196,7 +1196,7 @@ dead_code_remove(Interp *interp, IMC_Unit * unit)
             int bbi = bb->index;
             IMCC_debug(interp, DEBUG_OPT1,
                        "found dead block %d\n", bb->index);
-            for (ins = bb->start; ins && ins->bbindex == bbi; ) {
+            for (ins = bb->start; ins && ins->bbindex == bbi;) {
                 IMCC_debug(interp, DEBUG_OPT1,
                         "\tins deleted (dead block) %I\n", ins);
                 ins = delete_ins(unit, ins, 1);
@@ -1391,7 +1391,7 @@ is_invariant(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 {
     int ok = 0;
     int what = 0;
-    if (! strcmp(ins->op, "new") ) {
+    if (! strcmp(ins->op, "new")) {
         ok = 1;
         what = CHK_INV_NEW;
     }

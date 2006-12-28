@@ -389,7 +389,7 @@ INS(Interp *interp, IMC_Unit * unit, char *name,
         !strcmp(name, "set_returns")) {
         return var_arg_ins(interp, unit, name, r, n, emit);
     }
-    if ( (op = is_infix(name, n, r)) >= 0) {
+    if ((op = is_infix(name, n, r)) >= 0) {
         /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
         name = to_infix(interp, name, r, &n, op);
     }
@@ -575,7 +575,7 @@ extern void* yy_scan_string(const char *);
 
 
 int
-do_yylex_init (Interp* interp, yyscan_t* yyscanner)
+do_yylex_init(Interp* interp, yyscan_t* yyscanner)
 {
     int retval;
     retval = yylex_init(yyscanner);
@@ -602,7 +602,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
     INTVAL regs_used[4] = {3,3,3,3};
     void *yyscanner;
 
-    do_yylex_init ( interp, &yyscanner );
+    do_yylex_init( interp, &yyscanner );
 
     /*
      * we create not yet anchored PMCs - e.g. Subs: turn off DOD
@@ -610,7 +610,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
     Parrot_block_DOD(interp);
     if (IMCC_INFO(interp)->last_unit) {
         /* got a reentrant compile */
-        imc_info = mem_sys_allocate_zeroed(sizeof(imc_info_t));
+        imc_info = mem_sys_allocate_zeroed(sizeof (imc_info_t));
         imc_info->ghash = IMCC_INFO(interp)->ghash;
         imc_info->prev = IMCC_INFO(interp);
         IMCC_INFO(interp) = imc_info;
@@ -684,7 +684,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
         imc_cleanup(interp);
     Parrot_unblock_DOD(interp);
 
-    yylex_destroy ( yyscanner );
+    yylex_destroy( yyscanner );
     return sub;
 }
 
@@ -704,7 +704,7 @@ imcc_compile_pasm(Parrot_Interp interp, const char *s)
  * function can go away in future.
  */
 PMC *
-imcc_compile_pir (Parrot_Interp interp, const char *s)
+imcc_compile_pir(Parrot_Interp interp, const char *s)
 {
     STRING *error_message;
     return imcc_compile(interp, s, 0, &error_message);
@@ -756,7 +756,7 @@ imcc_compile_pir_ex(Parrot_Interp interp, const char *s)
  * Compile a file by filename (can be either PASM or IMCC code)
  */
 static void *
-imcc_compile_file (Parrot_Interp interp, const char *fullname,
+imcc_compile_file(Parrot_Interp interp, const char *fullname,
                    STRING **error_message)
 {
     struct PackFile_ByteCode *cs_save = interp->code, *cs=NULL;
@@ -771,7 +771,7 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
 
     if (IMCC_INFO(interp)->last_unit) {
         /* got a reentrant compile */
-        imc_info = mem_sys_allocate_zeroed(sizeof(imc_info_t));
+        imc_info = mem_sys_allocate_zeroed(sizeof (imc_info_t));
         imc_info->ghash = IMCC_INFO(interp)->ghash;
         imc_info->prev = IMCC_INFO(interp);
         IMCC_INFO(interp) = imc_info;
@@ -808,25 +808,25 @@ imcc_compile_file (Parrot_Interp interp, const char *fullname,
     Parrot_block_DOD(interp);
     Parrot_push_context(interp, regs_used);
 
-    if (ext && strcmp (ext, ".pasm") == 0) {
+    if (ext && strcmp(ext, ".pasm") == 0) {
         void *yyscanner;
-        do_yylex_init ( interp, &yyscanner );
+        do_yylex_init( interp, &yyscanner );
 
 
         IMCC_INFO(interp)->state->pasm_file = 1;
         /* see imcc.l */
         compile_file(interp, fp, yyscanner);
 
-        yylex_destroy ( yyscanner );
+        yylex_destroy( yyscanner );
     }
     else {
         void *yyscanner;
-        do_yylex_init ( interp, &yyscanner );
+        do_yylex_init( interp, &yyscanner );
 
         IMCC_INFO(interp)->state->pasm_file = 0;
         compile_file(interp, fp, yyscanner);
 
-        yylex_destroy ( yyscanner );
+        yylex_destroy( yyscanner );
     }
     Parrot_unblock_DOD(interp);
     Parrot_pop_context(interp);
@@ -1028,7 +1028,7 @@ try_rev_cmp(Parrot_Interp interp, IMC_Unit * unit, char *name,
 
     UNUSED(interp);
     UNUSED(unit);
-    for (i = 0; i < sizeof(br_pairs)/sizeof(br_pairs[0]); i++) {
+    for (i = 0; i < sizeof (br_pairs)/sizeof (br_pairs[0]); i++) {
         if (strcmp(name, br_pairs[i].op) == 0) {
             to_swap =  br_pairs[i].to_swap;
             if (r[to_swap + 1]->set == 'P')
@@ -1264,7 +1264,7 @@ str_cat(const char * s1, const char * s2)
 void
 imcc_init(Parrot_Interp interp)
 {
-    IMCC_INFO(interp) = mem_sys_allocate_zeroed(sizeof(imc_info_t));
+    IMCC_INFO(interp) = mem_sys_allocate_zeroed(sizeof (imc_info_t));
     /* register PASM and PIR compilers to parrot core */
     register_compilers(interp);
 }

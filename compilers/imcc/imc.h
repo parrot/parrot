@@ -51,7 +51,7 @@
 #include "unit.h"
 #include "debug.h"
 
-#define IMCC_TRY(a,e)     do{ e=0; switch(setjmp(a)){ case 0:
+#define IMCC_TRY(a,e)     do{ e=0; switch (setjmp(a)){ case 0:
 #define IMCC_CATCH(x)     break; case x:
 #define IMCC_END_TRY      } }while(0)
 

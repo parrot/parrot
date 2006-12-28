@@ -49,8 +49,7 @@ help_debug(void)
     "    1000    PBC\n"
     "    2000    PBC constants\n"
     "    4000    PBC fixups\n"
-    "\n"
-    );
+    "\n");
     printf(
     "--parrot-debug -D [Flags] ...\n"
     "    0001    memory statistics\n"
@@ -65,8 +64,7 @@ help_debug(void)
     "--trace -t [Flags] ...\n"
     "    0001    opcodes\n"
     "    0002    find_method\n"
-    "    0004    function calls\n"
-    );
+    "    0004    function calls\n");
 }
 
 static void
@@ -123,11 +121,11 @@ imcc_version(Interp *interp)
     printf(" built for " PARROT_ARCHNAME ".\n");
     rev = Parrot_revision();
     if (PARROT_REVISION != rev) {
-        printf( "Warning: runtime has revision %d!\n", rev );
+        printf( "Warning: runtime has revision %d!\n", rev);
     }
     rev = Parrot_config_revision();
     if (PARROT_REVISION != rev) {
-        printf( "Warning: used Configure.pl revision %d!\n", rev );
+        printf( "Warning: used Configure.pl revision %d!\n", rev);
     }
     printf("Copyright (C) 2001-2006, The Perl Foundation.\n\
 \n\
@@ -190,7 +188,7 @@ static int
 is_all_hex_digitis(const char *s)
 {
     for (; *s; s++)
-        if (!isxdigit(*s) )
+        if (!isxdigit(*s))
             return 0;
     return 1;
 }
@@ -310,8 +308,8 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
 
             case 'O':
                 if (opt.opt_arg) {
-                    strncpy(optimizer_opt, opt.opt_arg, sizeof(optimizer_opt));
-                    optimizer_opt[sizeof(optimizer_opt)-1] = '\0';
+                    strncpy(optimizer_opt, opt.opt_arg, sizeof (optimizer_opt));
+                    optimizer_opt[sizeof (optimizer_opt)-1] = '\0';
                 }
                 else {
                     strcpy(optimizer_opt, "1");
@@ -375,7 +373,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
         exit(EX_USAGE);
     }
     /* reached the end of the option list and consumed all of argv */
-    if (*argc == opt.opt_index ) {
+    if (*argc == opt.opt_index) {
         if (interp->output_file) {
             fprintf(stderr, "Missing program name or argument for -o\n");
         }
@@ -399,10 +397,10 @@ do_pre_process(Parrot_Interp interp)
     YYSTYPE val;
     void *yyscanner;
 
-    do_yylex_init ( interp, &yyscanner );
+    do_yylex_init( interp, &yyscanner);
 
     IMCC_push_parser_state(interp);
-    while ( (c = yylex(&val, yyscanner, interp)) ) {
+    while ((c = yylex(&val, yyscanner, interp))) {
         switch (c) {
             case EMIT:          printf(".emit\n"); break;
             case EOM:           printf(".eom\n"); break;
@@ -513,7 +511,7 @@ main(int argc, char * argv[])
 
     interp = Parrot_new(NULL);
 
-    do_yylex_init ( interp, &yyscanner );
+    do_yylex_init( interp, &yyscanner);
 
     Parrot_block_DOD(interp);
     Parrot_block_GC(interp);
@@ -540,7 +538,7 @@ main(int argc, char * argv[])
        PASM or a Parrot abstract syntax tree (PAST) file. If it isn't
        any of these, then we assume that it is PIR. */
     if (!sourcefile || !*sourcefile) {
-        IMCC_fatal_standalone(interp, 1, "main: No source file specified.\n" );
+        IMCC_fatal_standalone(interp, 1, "main: No source file specified.\n");
     }
     else if (!strcmp(sourcefile, "-")) {
         imc_yyin_set(stdin, yyscanner);
@@ -548,7 +546,7 @@ main(int argc, char * argv[])
     else {
         char *ext;
         ext = strrchr(sourcefile, '.');
-        if (ext && strcmp (ext, ".pbc") == 0) {
+        if (ext && strcmp(ext, ".pbc") == 0) {
             load_pbc = 1;
             write_pbc = 0;
         }
@@ -558,7 +556,7 @@ main(int argc, char * argv[])
                     "Error reading source file %s.\n",
                         sourcefile);
             }
-            if (ext && strcmp (ext, ".pasm") == 0) {
+            if (ext && strcmp(ext, ".pasm") == 0) {
                 pasm_file = 1;
             }
         }
@@ -575,10 +573,10 @@ main(int argc, char * argv[])
     if (interp->output_file) {
         char *ext;
         ext = strrchr(interp->output_file, '.');
-        if (ext && strcmp (ext, ".pbc") == 0) {
+        if (ext && strcmp(ext, ".pbc") == 0) {
             write_pbc = 1;
         }
-        else if (ext && strcmp (ext, PARROT_OBJ_EXT) == 0) {
+        else if (ext && strcmp(ext, PARROT_OBJ_EXT) == 0) {
 #if EXEC_CAPABLE
             load_pbc = 1;
             write_pbc = 0;
@@ -672,17 +670,17 @@ main(int argc, char * argv[])
         IMCC_info(interp, 1, "Writing %s\n", output_file);
 
         size = PackFile_pack_size(interp, interp->code->base.pf) *
-            sizeof(opcode_t);
+            sizeof (opcode_t);
         IMCC_info(interp, 1, "packed code %d bytes\n", size);
         packed = (opcode_t*) mem_sys_allocate(size);
         PackFile_pack(interp, interp->code->base.pf, packed);
-        if (strcmp (output_file, "-") == 0)
+        if (strcmp(output_file, "-") == 0)
             fp = stdout;
         else if ((fp = fopen(output_file, "wb")) == 0)
             IMCC_fatal_standalone(interp, E_IOError,
                 "Couldn't open %s\n", output_file);
 
-        if ((1 != fwrite(packed, size, 1, fp)) )
+        if ((1 != fwrite(packed, size, 1, fp)))
             IMCC_fatal_standalone(interp, E_IOError,
                 "Couldn't write %s\n", output_file);
         fclose(fp);

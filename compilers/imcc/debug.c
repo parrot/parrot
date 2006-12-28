@@ -80,7 +80,7 @@ IMCC_info(Parrot_Interp interp, int level, const char *fmt, ...)
 {
     va_list ap;
 
-    if(level > IMCC_INFO(interp)->verbose)
+    if (level > IMCC_INFO(interp)->verbose)
         return;
 
     va_start(ap, fmt);
@@ -222,11 +222,11 @@ dump_symreg(IMC_Unit * unit)
     fprintf(stderr, "name\tfirst\tlast\t1.blk\t-blk\tset col     \t"
             "used\tlhs_use\tregp\tus flgs\n"
             "----------------------------------------------\n");
-    for(i = 0; i < unit->n_symbols; i++) {
+    for (i = 0; i < unit->n_symbols; i++) {
         SymReg * r = reglist[i];
-        if(!(r->type & VTREGISTER))
+        if (!(r->type & VTREGISTER))
             continue;
-        if(!r->first_ins)
+        if (!r->first_ins)
             continue;
         fprintf(stderr, "%s %c\t%d\t%d\t%d\t%d\t%c   %2d %2d\t%d\t%d\t%s\t%x\n",
                 r->name,
@@ -251,7 +251,7 @@ dump_liveness_status(IMC_Unit * unit)
     SymReg** reglist = unit->reglist;
 
     fprintf(stderr, "\nSymbols:\n--------------------------------------\n");
-    for(i = 0; i < unit->n_symbols; i++) {
+    for (i = 0; i < unit->n_symbols; i++) {
         SymReg * r = reglist[i];
         if (r->type & VTREGISTER )
             dump_liveness_status_var(unit, r);
@@ -292,7 +292,7 @@ dump_liveness_status_var(IMC_Unit * unit, SymReg* r)
         else
             fprintf(stderr, "  ");
 
-    if(l->first_ins) {
+    if (l->first_ins) {
             fprintf(stderr, "[%d,%d]\t", l->first_ins->index,
                     l->last_ins->index);
     }
@@ -341,9 +341,9 @@ dump_dominators(IMC_Unit * unit)
     fprintf(stderr, "\nDumping the Dominators Tree:"
             "\n-------------------------------\n");
     for (i=0; i < unit->n_basic_blocks; i++) {
-    fprintf (stderr, "%2d <- (%2d)", i, unit->idoms[i]);
+    fprintf(stderr, "%2d <- (%2d)", i, unit->idoms[i]);
 
-    for(j=0; j < unit->n_basic_blocks; j++) {
+    for (j=0; j < unit->n_basic_blocks; j++) {
         if (set_contains(unit->dominators[i], j)) {
             fprintf(stderr, " %2d", j);
         }
@@ -363,9 +363,9 @@ dump_dominance_frontiers(IMC_Unit * unit)
     fprintf(stderr, "\nDumping the Dominance Frontiers:"
             "\n-------------------------------\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
-        fprintf (stderr, "%2d <-", i);
+        fprintf(stderr, "%2d <-", i);
 
-        for(j = 0; j < unit->n_basic_blocks; j++) {
+        for (j = 0; j < unit->n_basic_blocks; j++) {
             if (set_contains(unit->dominance_frontiers[i], j)) {
                 fprintf(stderr, " %2d", j);
             }

@@ -41,7 +41,7 @@ static void build_reglist(Parrot_Interp, IMC_Unit * unit, int);
 static void compute_du_chain(IMC_Unit * unit);
 static void compute_one_du_chain(SymReg * r, IMC_Unit * unit);
 static int interferes(Interp*, IMC_Unit *, SymReg * r0, SymReg * r1);
-static void compute_spilling_costs (Parrot_Interp, IMC_Unit *);
+static void compute_spilling_costs(Parrot_Interp, IMC_Unit *);
 
 /***************** New graph algorithm stuff *********************/
 typedef struct {
@@ -67,7 +67,7 @@ static int spill_registers(Interp *, IMC_Unit *, graph*);
 
 /*providing input of 0 forces the below dynamic function to kick in.*/
 #ifndef BITS_PER_INT
-#define BITS_PER_INT (sizeof(int)*8)
+#define BITS_PER_INT (sizeof (int)*8)
 #endif
 #define Bits_per_int() ((BITS_PER_INT) ? BITS_PER_INT : bits_per_int())
 /*#define VALIDATE_COLORING*/
@@ -117,12 +117,12 @@ int ig_test(int i, int j, int N, unsigned int* edgebits)
 static unsigned int* ig_allocate(int N)
 {
     /* size is N*N bits, but we want don't want to allocate a partial
-     * word, so round up to the nearest multiple of sizeof(int).
+     * word, so round up to the nearest multiple of sizeof (int).
      */
     int need_bits = N * N;
     int sizeofint = Bits_per_int();
     int num_words = (need_bits + sizeofint - 1) / sizeofint;
-    return (unsigned int*) mem_sys_allocate_zeroed(num_words * sizeof(int));
+    return (unsigned int*) mem_sys_allocate_zeroed(num_words * sizeof (int));
 }
 
 /* imc_reg_alloc is the main loop of the allocation algorithm. It operates
@@ -149,7 +149,7 @@ imc_reg_alloc(Interp *interp, IMC_Unit * unit)
 #if IMC_TRACE
     fprintf(stderr, "reg_alloc.c: imc_reg_alloc\n");
     if (unit->instructions->r[1] && unit->instructions->r[1]->pcc_sub) {
-        fprintf(stderr, "img_reg_alloc: pcc_sub (nargs = %d)\n",
+        fprintf(stderr, "img_reg_alloc: pcc_sub(nargs = %d)\n",
             unit->instructions->r[1]->pcc_sub->nargs);
     }
 #endif
@@ -221,7 +221,7 @@ imc_reg_alloc(Interp *interp, IMC_Unit * unit)
             SymReg* r = unit->reglist[x];
             for (y = 0; y < unit->n_symbols; y++) {
                 if (ig_test(x, y, unit->n_symbols, unit->interference_graph)) {
-                    if(r->color!=-1 && r->color == unit->reglist[y]->color)
+                    if (r->color!=-1 && r->color == unit->reglist[y]->color)
                         fprintf(stderr,"node %d = %s(%c) is colored %d and "
                                 "neighbor %d = %s(%c) is colored %d\n",
                                 x,r->name,r->set,r->color,
@@ -316,7 +316,7 @@ static void
 imc_stat_init(IMC_Unit * unit) {
     imcsets[0] = imcsets[1] = imcsets[2] = imcsets[3] = 0;
     make_stat(unit, imcsets, 0);
-    memset(&ostat, 0, sizeof(ostat));
+    memset(&ostat, 0, sizeof (ostat));
 }
 
 /* and final */
@@ -372,7 +372,7 @@ reg_sort_f(const void *a, const void *b)
 static void
 sort_reglist(IMC_Unit *unit)
 {
-    qsort(unit->reglist, unit->n_symbols, sizeof(SymReg*), reg_sort_f);
+    qsort(unit->reglist, unit->n_symbols, sizeof (SymReg*), reg_sort_f);
 }
 
 
@@ -404,7 +404,7 @@ build_reglist(Parrot_Interp interp, IMC_Unit * unit, int first)
     if (count >= HASH_SIZE)
         IMCC_warning(interp, "build_reglist",
                      "probably too small HASH_SIZE (%d symbols)\n", count);
-    unit->reglist = mem_sys_allocate_zeroed(count*sizeof(SymReg*));
+    unit->reglist = mem_sys_allocate_zeroed(count*sizeof (SymReg*));
 
     for (i = count = 0; i < HASH_SIZE; i++) {
         SymReg * r = unit->hash[i];
@@ -559,7 +559,7 @@ compute_one_du_chain(SymReg * r, IMC_Unit * unit)
  * of times the symbol appears, weighted by X*loop_depth */
 
 static void
-compute_spilling_costs (Parrot_Interp interp, IMC_Unit * unit)
+compute_spilling_costs(Parrot_Interp interp, IMC_Unit * unit)
 {
     int depth, i, j, k, max_depth;
     SymReg *r;
@@ -748,7 +748,7 @@ update_life(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
     /* add this sym to reglist, if not there */
     if (add) {
         unit->reglist = realloc(unit->reglist, (unit->n_symbols + 1) *
-                sizeof(SymReg *));
+                sizeof (SymReg *));
         unit->reglist[unit->n_symbols++] = r;
     }
 
@@ -771,7 +771,7 @@ update_life(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
     /* now set life_info */
     free_life_info(unit, r);
     r->life_info =
-        mem_sys_allocate_zeroed(unit->n_basic_blocks*sizeof(Life_range*));
+        mem_sys_allocate_zeroed(unit->n_basic_blocks*sizeof (Life_range*));
     for (i=0; i < unit->n_basic_blocks; i++)
         make_life_range(r, i);
     l = r->life_info[ins->bbindex];
@@ -827,10 +827,10 @@ spill(Interp *interp, IMC_Unit * unit, int spilled)
         needs_store = 0;
         needs_fetch = 0;
 
-        if (instruction_reads (ins, old_sym) && !(ins->flags & ITSPILL))
+        if (instruction_reads(ins, old_sym) && !(ins->flags & ITSPILL))
             needs_fetch = 1;
 
-        if (instruction_writes (ins, old_sym) && !(ins->flags & ITSPILL))
+        if (instruction_writes(ins, old_sym) && !(ins->flags & ITSPILL))
             needs_store = 1;
         if (dl)
             ins->index += dl;
@@ -941,7 +941,7 @@ spill_registers(Parrot_Interp interp, IMC_Unit* unit, graph* G)
  * of times the symbol appears, weighted by X*loop_depth */
 #if 0
 static void
-compute_spill_benefit (Parrot_Interp interp, IMC_Unit * unit, graph* G)
+compute_spill_benefit(Parrot_Interp interp, IMC_Unit * unit, graph* G)
 {
     int depth, i, j, k, max_depth;
     SymReg *r;
@@ -1100,7 +1100,7 @@ ig_init_graph(Interp* interp, IMC_Unit* unit, graph* G) {
     G->k = 0;
     G->n = num_nodes;
     G->E = unit->interference_graph;
-    G->V = (node*)mem_sys_allocate_zeroed(G->n * sizeof(node));
+    G->V = (node*)mem_sys_allocate_zeroed(G->n * sizeof (node));
     if (!G->V)
         IMCC_fatal(interp, 1,"ig_init_graph",
                 "cannot allocate memory for coloring registers");
@@ -1116,7 +1116,7 @@ ig_init_graph(Interp* interp, IMC_Unit* unit, graph* G) {
                 G->V[x].deg++;    /* another neighbor of x is recorded */
         assert(G->V[x].deg>=0 && G->V[x].deg<G->n);
     }
-    qsort(G->V, G->n, sizeof(node), degree_comparator);
+    qsort(G->V, G->n, sizeof (node), degree_comparator);
 #ifndef NDEBUG
     if (IMCC_INFO(interp)->debug & DEBUG_REG)
     {
@@ -1167,7 +1167,7 @@ ig_precolor(Interp* interp, IMC_Unit* unit, graph* G)
         if (unit->reglist[x]->usage & U_SPILL) {
             int c=1+MAX_COLOR/2, k=0;  /* precolor spilled symbols */
             assert(!u->col);
-            while(k < G->n) {
+            while (k < G->n) {
                 for (k = 0; k < G->n; k++)
                     if (ig_test(x, G->V[k].id, G->n, G->E))
                         if (c == G->V[k].col) {c++; break;}
@@ -1182,7 +1182,7 @@ ig_precolor(Interp* interp, IMC_Unit* unit, graph* G)
         assert(0<=u->col && u->col<=MAX_COLOR); /*uncolored is okay*/
         if (u->col>G->k)
             G->k = u->col;
-        if(u->col)
+        if (u->col)
             IMCC_debug(interp, DEBUG_REG, "PRECOL node %d %s, col=%d\n",
                     x, unit->reglist[x]->name, G->V[j].col);
     }

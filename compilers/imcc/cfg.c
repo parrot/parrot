@@ -57,7 +57,7 @@ check_invoke_type(Interp *interp, IMC_Unit * unit, Instruction *ins)
 }
 
 void
-find_basic_blocks (Parrot_Interp interp, IMC_Unit * unit, int first)
+find_basic_blocks(Parrot_Interp interp, IMC_Unit * unit, int first)
 {
     Basic_block *bb;
     Instruction *ins;
@@ -187,7 +187,7 @@ build_cfg(Parrot_Interp interp, IMC_Unit * unit)
         bb = unit->bb_list[i];
 
         /* if the block can fall-through */
-        if (i > 0 && ! (last->end->type & IF_goto) )
+        if (i > 0 && ! (last->end->type & IF_goto))
             bb_add_edge(unit, last, bb);
         /* check first ins, if label try to find a set_addr op */
         if (bb->start->type & ITLABEL) {
@@ -357,7 +357,7 @@ bb_add_edge(IMC_Unit * unit, Basic_block *from, Basic_block *to)
        on the predecessors of 'from', it won't be on the successors
        of 'to'. */
 
-    e = mem_sys_allocate(sizeof(Edge));
+    e = mem_sys_allocate(sizeof (Edge));
 
     e->succ_next = from->succ_list;
     e->from = from;
@@ -422,7 +422,7 @@ static void
 free_edge(IMC_Unit * unit)
 {
     Edge *e, *next;
-    for (e = unit->edge_list; e; ) {
+    for (e = unit->edge_list; e;) {
         next = e->next;
         free(e);
         e = next;
@@ -463,7 +463,7 @@ analyse_life_symbol(Parrot_Interp interp, IMC_Unit * unit, SymReg* r)
     if (r->life_info)
         free_life_info(unit, r);
     r->life_info = mem_sys_allocate_zeroed(unit->n_basic_blocks *
-            sizeof(Life_range*));
+            sizeof (Life_range*));
 
     /* First we make a pass to each block to gather the information
      * that can be obtained locally */
@@ -502,7 +502,7 @@ analyse_life_symbol(Parrot_Interp interp, IMC_Unit * unit, SymReg* r)
             r->life_info[i]->flags |= LF_lv_in;
 
             /* propagate this info to every predecessor */
-            propagate_need (unit->bb_list[i], r, i);
+            propagate_need(unit->bb_list[i], r, i);
         }
     }
 }
@@ -573,7 +573,7 @@ analyse_life_block(Parrot_Interp interp, Basic_block* bb, SymReg* r)
              * the first read of this instruction, like if a write
              * had happened at special, so that the reg doesn't pop into
              * life */
-            if (! (l->flags & LF_def) ) {
+            if (! (l->flags & LF_def)) {
                 if (special) {
                     l->first_ins = special;
                     l->flags |= LF_def;
@@ -637,7 +637,7 @@ propagate_need(Basic_block *bb, SymReg* r, int i)
             l->flags |= LF_lv_out;
             l->last_ins = pred->end;
 
-            if (! (l->flags & LF_def) ) {
+            if (! (l->flags & LF_def)) {
                 l->flags |= LF_lv_in;
                 l->first_ins = pred->start;
                 l->last_ins  = pred->end;
@@ -677,7 +677,7 @@ propagate_need(Basic_block *bb, SymReg* r, int i)
  */
 
 void
-compute_dominators (Parrot_Interp interp, IMC_Unit * unit)
+compute_dominators(Parrot_Interp interp, IMC_Unit * unit)
 {
 #define USE_BFS 0
 
@@ -694,8 +694,8 @@ compute_dominators (Parrot_Interp interp, IMC_Unit * unit)
 
     n = unit->n_basic_blocks;
     IMCC_info(interp, 2, "compute_dominators\n");
-    dominators = unit->dominators = malloc(sizeof(Set*) * n);
-    unit->idoms = malloc(sizeof(int) * n);
+    dominators = unit->dominators = malloc(sizeof (Set*) * n);
+    unit->idoms = malloc(sizeof (int) * n);
 
     dominators[0] = set_make(n);
     set_add(dominators[0], 0);
@@ -710,8 +710,8 @@ compute_dominators (Parrot_Interp interp, IMC_Unit * unit)
     }
 
 #if USE_BFS
-    q = calloc(n, sizeof(int));
-    visited = set_make (n);
+    q = calloc(n, sizeof (int));
+    visited = set_make(n);
     set_add(visited, 0);
     len=1;
     cur=0;
@@ -737,7 +737,7 @@ compute_dominators (Parrot_Interp interp, IMC_Unit * unit)
 
         /* TODO: This 'for' should be a breadth-first search for speed */
         for (i = 1; i < n; i++) {
-            Set *s = set_copy (dominators[i]);
+            Set *s = set_copy(dominators[i]);
 
             for (edge=unit->bb_list[i]->pred_list;
                     edge; edge=edge->pred_next) {
@@ -747,9 +747,9 @@ compute_dominators (Parrot_Interp interp, IMC_Unit * unit)
 
             set_add(s, i);
 
-            if (! set_equal(dominators[i], s) ) {
+            if (! set_equal(dominators[i], s)) {
                 change = 1;
-                set_free (dominators[i]);
+                set_free(dominators[i]);
                 dominators[i] = s;
             }
             else
@@ -794,7 +794,7 @@ compute_dominators (Parrot_Interp interp, IMC_Unit * unit)
  * "A Simple, Fast Dominance Algorithm", Cooper et al. (2001)
  */
 void
-compute_dominance_frontiers (Parrot_Interp interp, IMC_Unit * unit)
+compute_dominance_frontiers(Parrot_Interp interp, IMC_Unit * unit)
 {
     int i, n, b, runner;
     Edge *edge;
@@ -802,7 +802,7 @@ compute_dominance_frontiers (Parrot_Interp interp, IMC_Unit * unit)
 
     n = unit->n_basic_blocks;
     IMCC_info(interp, 2, "compute_dominance_frontiers\n");
-    dominance_frontiers = unit->dominance_frontiers = malloc(sizeof(Set*) * n);
+    dominance_frontiers = unit->dominance_frontiers = malloc(sizeof (Set*) * n);
 
     dominance_frontiers[0] = set_make(n);
     for (i = 1; i < n; i++) {
@@ -844,7 +844,7 @@ free_dominators(IMC_Unit * unit)
     if (!unit->dominators)
         return;
     for (i=0; i < unit->n_basic_blocks; i++) {
-        set_free (unit->dominators[i]);
+        set_free(unit->dominators[i]);
     }
     free(unit->dominators);
     unit->dominators = 0;
@@ -859,7 +859,7 @@ free_dominance_frontiers(IMC_Unit * unit)
     if (!unit->dominance_frontiers)
         return;
     for (i=0; i < unit->n_basic_blocks; i++) {
-        set_free (unit->dominance_frontiers[i]);
+        set_free(unit->dominance_frontiers[i]);
     }
     free(unit->dominance_frontiers);
     unit->dominance_frontiers = 0;
@@ -932,7 +932,7 @@ sort_loops(Parrot_Interp interp, IMC_Unit * unit)
  */
 
 void
-find_loops (Parrot_Interp interp, IMC_Unit * unit)
+find_loops(Parrot_Interp interp, IMC_Unit * unit)
 {
     int i, succ_index;
     Set* dom;
@@ -946,7 +946,7 @@ find_loops (Parrot_Interp interp, IMC_Unit * unit)
                 edge != NULL; edge=edge->succ_next) {
             succ_index = edge->to->index;
 
-            if (set_contains(dom, succ_index) ) {
+            if (set_contains(dom, succ_index)) {
                 mark_loop(interp, unit, edge);
             }
         }
@@ -964,7 +964,7 @@ find_loops (Parrot_Interp interp, IMC_Unit * unit)
  * always transfers control directly to the header.
  */
 int
-natural_preheader (IMC_Unit * unit, Loop_info* loop_info)
+natural_preheader(IMC_Unit * unit, Loop_info* loop_info)
 {
     int preheader = -1;
     Edge* edge;
@@ -991,7 +991,7 @@ natural_preheader (IMC_Unit * unit, Loop_info* loop_info)
 /* Increases the loop_depth of all the nodes in a loop */
 
 static void
-mark_loop (Parrot_Interp interp, IMC_Unit * unit, Edge* e)
+mark_loop(Parrot_Interp interp, IMC_Unit * unit, Edge* e)
 {
     Set* loop;
     Set* exits;
@@ -1013,7 +1013,7 @@ mark_loop (Parrot_Interp interp, IMC_Unit * unit, Edge* e)
         }
 
     IMCC_debug(interp, DEBUG_CFG, "loop from %d to %d, entered from %d\n",
-            footer->index, header->index, enter ? enter->index : -1 );
+            footer->index, header->index, enter ? enter->index : -1);
     if (i != 1) {
         if (i==0) {
             if (header->index)
@@ -1034,7 +1034,7 @@ mark_loop (Parrot_Interp interp, IMC_Unit * unit, Edge* e)
 
     if (header != footer) {
         header->loop_depth++;
-        search_predecessors_not_in (footer, loop);
+        search_predecessors_not_in(footer, loop);
     }
 
     exits = set_make(unit->n_basic_blocks);
@@ -1056,11 +1056,11 @@ mark_loop (Parrot_Interp interp, IMC_Unit * unit, Edge* e)
     loop_info = unit->loop_info;
     if (!loop_info)
         loop_info = unit->loop_info = mem_sys_allocate(
-                (n_loops+1)*sizeof(Loop_info *));
+                (n_loops+1)*sizeof (Loop_info *));
     else
         loop_info = unit->loop_info = mem_sys_realloc(loop_info,
-                (n_loops+1)*sizeof(Loop_info *));
-    loop_info[n_loops] = mem_sys_allocate(sizeof(Loop_info));
+                (n_loops+1)*sizeof (Loop_info *));
+    loop_info[n_loops] = mem_sys_allocate(sizeof (Loop_info));
     loop_info[n_loops]->loop = loop;
     loop_info[n_loops]->exits = exits;
     loop_info[n_loops]->depth = footer->loop_depth;
@@ -1094,10 +1094,10 @@ search_predecessors_not_in(Basic_block *node, Set* s)
    for (edge = node->pred_list; edge != NULL; edge = edge->pred_next) {
         pred = edge->from;
 
-        if (! set_contains(s, pred->index) ) {
+        if (! set_contains(s, pred->index)) {
            set_add(s, pred->index);
            pred->loop_depth++;
-           search_predecessors_not_in (pred, s);
+           search_predecessors_not_in(pred, s);
         }
    }
 
@@ -1111,7 +1111,7 @@ init_basic_blocks(IMC_Unit * unit)
         clear_basic_blocks(unit);
     unit->bb_list =
         calloc(unit->bb_list_size = 256,
-            sizeof(Basic_block*) );
+            sizeof (Basic_block*));
     unit->n_basic_blocks = 0;
     unit->edge_list = 0;
 }
@@ -1142,7 +1142,7 @@ make_basic_block(Interp *interp, IMC_Unit * unit, Instruction* ins)
         PANIC("make_basic_block: called with NULL argument\n");
     }
 
-    bb = mem_sys_allocate(sizeof(Basic_block));
+    bb = mem_sys_allocate(sizeof (Basic_block));
 
     bb->start = ins;
     bb->end = ins;
@@ -1156,7 +1156,7 @@ make_basic_block(Interp *interp, IMC_Unit * unit, Instruction* ins)
         unit->bb_list_size *= 2;
         unit->bb_list =
             mem_sys_realloc(unit->bb_list,
-                unit->bb_list_size*sizeof(Basic_block*) );
+                unit->bb_list_size*sizeof (Basic_block*));
     }
     unit->bb_list[n] = bb;
     unit->n_basic_blocks++;
@@ -1169,7 +1169,7 @@ make_life_range(SymReg *r, int idx)
 {
    Life_range *l;
 
-   l = mem_sys_allocate_zeroed(sizeof(Life_range));
+   l = mem_sys_allocate_zeroed(sizeof (Life_range));
    r->life_info[idx] = l;
    return l;
 }

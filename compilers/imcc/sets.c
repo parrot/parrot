@@ -8,16 +8,16 @@
 } while (0)
 
 Set*
-set_make (int length)
+set_make(int length)
 {
-    Set *s = mem_sys_allocate(sizeof(Set));
+    Set *s = mem_sys_allocate(sizeof (Set));
     s->length = length;
     s->bmp = mem_sys_allocate_zeroed(length/8 + 1);
     return s;
 }
 
 Set*
-set_make_full (int length)
+set_make_full(int length)
 {
     Set *s = set_make(length);
     int i;
@@ -34,7 +34,7 @@ set_make_full (int length)
 }
 
 void
-set_free (Set *s)
+set_free(Set *s)
 {
     mem_sys_free(s->bmp);
     mem_sys_free(s);
@@ -47,7 +47,7 @@ set_clear(Set *s)
 }
 
 Set*
-set_copy (Set *s1)
+set_copy(Set *s1)
 {
     Set *s = set_make(s1->length);
 
@@ -57,7 +57,7 @@ set_copy (Set *s1)
 
 
 int
-set_equal (Set *s1, Set *s2)
+set_equal(Set *s1, Set *s2)
 {
     int mask;
     int bytes = s1->length/8;

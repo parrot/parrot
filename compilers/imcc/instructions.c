@@ -62,8 +62,8 @@ _mk_instruction(const char *op, const char * fmt, int n,
 
     reg_space = 0;
     if (n > 1)
-        reg_space = sizeof(SymReg *) * (n - 1);
-    ins = calloc(sizeof(Instruction) + reg_space, 1);
+        reg_space = sizeof (SymReg *) * (n - 1);
+    ins = calloc(sizeof (Instruction) + reg_space, 1);
     if (ins == NULL) {
         fprintf(stderr, "Memory error at mk_instruction\n");
         abort();
@@ -104,12 +104,12 @@ imcc_init_tables(Interp *interp)
     };
     /* init opnums */
     if (!r_special[0]) {
-        for (i = 0; i < sizeof(reads)/sizeof(reads[0]); i++) {
+        for (i = 0; i < sizeof (reads)/sizeof (reads[0]); i++) {
             int n = interp->op_lib->op_code(reads[i], 1);
             assert(n);
             r_special[i] = n;
         }
-        for (i = 0; i < sizeof(writes)/sizeof(writes[0]); i++) {
+        for (i = 0; i < sizeof (writes)/sizeof (writes[0]); i++) {
             int n = interp->op_lib->op_code(writes[i], 1);
             assert(n);
             w_special[i] = n;
@@ -133,7 +133,7 @@ ins_reads2(Instruction *ins, int t)
     if (!p)
         return 0;
     idx = p - types;
-    for (i = 1; i < sizeof(r_special)/sizeof(int); i += 4) {
+    for (i = 1; i < sizeof (r_special)/sizeof (int); i += 4) {
         if (ins->opnum == r_special[i + idx])
             return 1;
     }
@@ -156,7 +156,7 @@ ins_writes2(Instruction *ins, int t)
     if (!p)
         return 0;
     idx = p - types;
-    for (i = 1; i < sizeof(w_special)/sizeof(int); i += 4) {
+    for (i = 1; i < sizeof (w_special)/sizeof (int); i += 4) {
         if (ins->opnum == w_special[i + idx])
             return 1;
     }
@@ -439,7 +439,7 @@ emitb(Interp * interp, IMC_Unit * unit, Instruction * i)
 
     if (!unit || !i)
         return 0;
-    if(!unit->instructions)
+    if (!unit->instructions)
         unit->last_ins = unit->instructions = i;
     else {
         unit->last_ins->next = i;
