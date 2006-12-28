@@ -62,7 +62,7 @@ enum TYPES {
     TYPE_REFERENCE,
     TYPE_ARRAY,
     TYPE_METHOD,
-    TYPE_CLASS  
+    TYPE_CLASS
 };
 
 #define MOD_PUBLIC    (1)
@@ -92,7 +92,7 @@ typedef struct _Symbol {
      */
     struct _Symbol  *next,
                     *tnext;
-                    
+
     char            *name;
     int             scope;
     int             flags;
@@ -139,12 +139,12 @@ struct _AST {
      * arg2 = _else_ branch
      */
     union {
-	/*
-	struct _EXPR {
-	    struct _AST *arg1;
-	    struct _AST *arg2;
-	} Expr;
-	*/
+        /*
+        struct _EXPR {
+            struct _AST *arg1;
+            struct _AST *arg2;
+        } Expr;
+        */
         struct _CLASS {
             struct _AST *body;
         } Class;
@@ -176,7 +176,7 @@ struct _SymbolTable {
 typedef struct _Rank {
     Node    *next,
             *tnext;
-    int     dim;    
+    int     dim;
 } Rank;
 
 struct _Type {
@@ -199,7 +199,7 @@ typedef struct _Array {
     Type    *type;              /* The type of element */
     Rank    *rank;
     int     dim;                /* Total dim, can be derived from evaluating rank list */
-    int     **bounds;           /* N x 2 dimensional array of bounds where N = dimensions */        
+    int     **bounds;           /* N x 2 dimensional array of bounds where N = dimensions */
 } __Array;
 
 

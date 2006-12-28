@@ -26,14 +26,14 @@ SymbolTable     *const_str;
  * each push_namespace should start with scope 0, and
  * pop_namespace should restore scope of last namespace.
  */
-int		scope_stack[1024];
+int             scope_stack[1024];
 int             last_scope = 0;
 int             scope = 0;
 int             method_block = 0;
 int             primary_block = 0;
 AST             *primary_block_stack[256];
 
- 
+
 /* Routines for managing symbols, attributes and AST tree */
 
 void assert(void * p) {
@@ -48,7 +48,7 @@ unsigned int hash_str(const char * str) {
     const char * s;
     for(s=str; *s; s++)
         key = key * 65599 + *s;
-    return key;    
+    return key;
 }
 
 void init_symbol_tables() {
@@ -105,7 +105,7 @@ Symbol * new_type_symbol(const char * name) {
 }
 
 Symbol * mk_namespace_symbol(Symbol * identifier) {
-    Symbol * s = identifier;    
+    Symbol * s = identifier;
     s->kind = NAMESPACE;
     s->table = new_symbol_table();
     return s;
@@ -298,12 +298,12 @@ Symbol * pop_namespace() {
     ns = tpop_sym(&namespace_stack);
     scope = scope_stack[--last_scope];
     if(last_scope < 0) {
-    	fprintf(stderr, "Internal error: scope unbalanced, popped scope 0\n");
-	abort();
+        fprintf(stderr, "Internal error: scope unbalanced, popped scope 0\n");
+        abort();
     }
     current_namespace = namespace_stack;
     current_symbol_table = current_namespace->table;
-    return ns;    
+    return ns;
 }
 
 /* "push" onto opposite end of stack */
@@ -323,31 +323,31 @@ void unshift_ast(AST ** list, AST * p) {
 
 AST * new_statement(int stmnttype, AST * left, AST * right) {
     AST * p = new_ast(KIND_STATEMENT, stmnttype, left, right);
-    return p;    
+    return p;
 }
 
 AST * new_expr(int exprtype, AST * left, AST * right) {
     AST * p = new_ast(KIND_EXPR, exprtype, left, right);
-    return p;    
+    return p;
 }
 
 /* Specific type of expression (A b C) where b is an operator */
 AST * new_op_expr(AST * left, int op, AST * right) {
     AST * p = new_ast(KIND_EXPR, ASTT_OP, left, right);
     p->op = op;
-    return p;    
+    return p;
 }
 
 AST * new_logical_expr(AST * left, int op, AST * right) {
     AST * p = new_ast(KIND_EXPR, ASTT_LOGICAL, left, right);
     p->op = op;
-    return p;    
+    return p;
 }
 
 AST * new_if(AST * condition, AST * then_part, AST * else_part) {
     AST * p = new_statement(ASTT_IF, then_part, else_part);
     p->Attr.Conditional.condition = condition;
-    return p;     
+    return p;
 }
 
 /*
@@ -356,14 +356,14 @@ AST * new_if(AST * condition, AST * then_part, AST * else_part) {
 AST * new_conditional(AST * condition, AST * then_part, AST * else_part) {
     AST * p = new_ast(KIND_EXPR, ASTT_CONDITIONAL_EXPR, then_part, else_part);
     p->Attr.Conditional.condition = condition;
-    return p;     
+    return p;
 }
 
 AST * new_while(AST * condition, AST * block) {
     AST * p = new_statement(ASTT_WHILE, NULL, NULL);
     p->Attr.Loop.condition = condition;
     p->Attr.Loop.body = block;
-    return p;     
+    return p;
 }
 
 AST * new_for(AST * init, AST * condition, AST * iteration, AST * block) {
@@ -372,7 +372,7 @@ AST * new_for(AST * init, AST * condition, AST * iteration, AST * block) {
     p->Attr.Loop.condition = condition;
     p->Attr.Loop.iteration = iteration;
     p->Attr.Loop.body = block;
-    return p;     
+    return p;
 }
 
 /*
@@ -384,24 +384,24 @@ Symbol * split(const char * pattern, const char * s) {
     const char * p;
     int len;
     if(!strstr(s, pattern))
-	return new_symbol(s);
+        return new_symbol(s);
     p = s;
 AGAIN:
     for(len = 0; p[len] && p[len] != c; len++)
         ;
     if(len) {
         Symbol * n = new_symbol("");
-	n->name = malloc(len+1);
-	strncpy(n->name, p, len);
-	n->name[len] = '\0';
+        n->name = malloc(len+1);
+        strncpy(n->name, p, len);
+        n->name[len] = '\0';
         tunshift_sym(&l, n);
     }
     if(!len || !p[len])
         return l;
     else {
         len++;
-	p += len;
-	goto AGAIN;
+        p += len;
+        goto AGAIN;
     }
 }
 
@@ -413,7 +413,7 @@ Symbol * lookup_symbol(const char * name) {
     Symbol * list = split(".", name);
     Symbol * s;
 #if DEBUG
-    fprintf(stderr, "lookup_symbol: %s split to (%s,...)\n", name, list->name); 
+    fprintf(stderr, "lookup_symbol: %s split to (%s,...)\n", name, list->name);
 #endif
     for(ns = current_namespace; ns; ) {
 #if DEBUG
@@ -423,21 +423,21 @@ Symbol * lookup_symbol(const char * name) {
 #if DEBUG
             fprintf(stderr, "lookup_symbol: found [%s] in namespace[%s]\n", list->name, ns->name);
 #endif
-	    if(s->kind == IDENTIFIER) {
+            if(s->kind == IDENTIFIER) {
                 ns = s->type->sym;
-	    }
-	    else {
-	        ns = s;
-	    }
-	    list = list->tnext;
+            }
+            else {
+                ns = s;
+            }
+            list = list->tnext;
             if(!list || !s)
-	        return s;
-	}
-	else {
+                return s;
+        }
+        else {
             ns = ns->tnext;
-	}
+        }
     }
-    
+
     return NULL;
 }
 
@@ -589,11 +589,11 @@ void dump_namespace(Symbol * ns) {
         printf("#<class %s>\n", ns->name);
         if(ns->table)
             dump_symbol_table(ns->table);
-        printf("#</class>\n");    
+        printf("#</class>\n");
     } else if(ns->kind == NAMESPACE) {
         printf("#<namespace %s>\n", ns->name);
         dump_symbol_table(ns->table);
-        printf("#</namespace>\n");    
+        printf("#</namespace>\n");
     }
 }
 
@@ -661,7 +661,7 @@ Symbol * check_id_decl(SymbolTable * table, const char * name) {
 
 int push_scope() {
     scope++;
-    return scope;    
+    return scope;
 }
 
 /*
@@ -680,7 +680,7 @@ Symbol * pop_scope() {
 #endif
             t = tab->table[i];
             tab->table[i] = tab->table[i]->next;
-            t->tnext = p;    
+            t->tnext = p;
             t->next = NULL;
             p = t;
         }
@@ -733,18 +733,18 @@ void discard_scope() {
  * brain expansion pack.
  */
 void push_primary_block(AST * p) {
-    primary_block_stack[primary_block++] = p;    
+    primary_block_stack[primary_block++] = p;
 }
 
 AST * pop_primary_block() {
     if(primary_block > 0)
-        return primary_block_stack[--primary_block];    
+        return primary_block_stack[--primary_block];
     return NULL;
 }
 
 AST * get_cur_primary_block() {
     if(primary_block > 0)
-        return primary_block_stack[primary_block-1];    
+        return primary_block_stack[primary_block-1];
     return NULL;
 }
 

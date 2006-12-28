@@ -23,8 +23,8 @@
 void build_ast(AST * tree) {
     if(!tree) return;
     switch(tree->asttype) {
-    	case ASTT_CLASS_DECL:
-    	    build_class_decl(tree);
+        case ASTT_CLASS_DECL:
+            build_class_decl(tree);
             break;
         default:
             fprintf(stderr, "build_ast: Invalid asttype [%d]\n", tree->asttype);
@@ -41,7 +41,7 @@ void build_class_decl(AST * c) {
 #endif
     push_namespace(c->sym);
     if(c->Attr.Class.body)
-	    build_class_body(c->Attr.Class.body);
+            build_class_body(c->Attr.Class.body);
     pop_namespace();
 }
 
@@ -52,10 +52,10 @@ void build_class_body(AST * b) {
         switch(b->asttype) {
             case ASTT_CONSTANT_DECL:
                 build_field_decl(b);
-        	    break;
+                    break;
             case ASTT_FIELD_DECL:
                 build_field_decl(b);
-        	    break;
+                    break;
             case ASTT_METHOD_DECL:
 #if DEBUG
                 fprintf(stderr, "Pass 2: Method [%s]\n", b->sym->name);
@@ -69,7 +69,7 @@ void build_class_body(AST * b) {
                 fprintf(stderr, "build_class_body: Invalid asttype [%d]\n", b->asttype);
                 abort();
         }
-	    b = b->next;
+            b = b->next;
     }
 }
 
@@ -114,7 +114,7 @@ void build_method_decl(AST * m) {
             fprintf(stderr, "\tPopped locals:\n");
             while(s) {
                 fprintf(stderr, "\t[%s]\n", s->name);
-                s = s->tnext;          
+                s = s->tnext;
             }
         }
     }
@@ -165,7 +165,7 @@ void build_conditional(AST * c) {
     build_expr(c->arg2);
     if(c->arg1->type != c->arg2->type) {
         fprintf(stderr, "Error: expression types not equivalent in ternary expression\n");
-	exit(0);
+        exit(0);
     }
     c->typename = c->arg1->typename;
     c->type = c->arg1->type;
@@ -223,21 +223,21 @@ void build_expr(AST * e) {
             e->typename = e->sym->typename;
             return;
 
-    	case ASTT_IDENTIFIER:
+        case ASTT_IDENTIFIER:
             resolve_identifier(&e->sym);
             e->type = e->sym->type;
             e->typename = e->sym->typename;
             return;
 
-    	case ASTT_METHOD_CALL:
+        case ASTT_METHOD_CALL:
             build_method_call(e);
             break;
 
-    	case ASTT_NEW_OBJECT:
+        case ASTT_NEW_OBJECT:
             build_new_expr(e);
             break;
 
-    	case ASTT_ASSIGN:
+        case ASTT_ASSIGN:
             build_expr(e->arg1);
             build_expr(e->arg2);
             break;
@@ -273,7 +273,7 @@ void build_expr(AST * e) {
             fprintf(stderr, "build_expr: Invalid expr asttype [%d]\n", e->asttype);
             abort();
     }
-    
+
     if(e->arg1) {
         e->type = e->arg1->type;
         e->typename = e->arg1->typename;
@@ -297,17 +297,17 @@ void build_statement_list(AST * s) {
             break;
         case ASTT_CONSTANT_DECL:
             build_var_decl(s);
-    	    break;
+            break;
         case ASTT_FIELD_DECL:
             build_var_decl(s);
-    	    break;
+            break;
         case ASTT_WHILE:
         case ASTT_FOR:
             build_loop(s);
             break;
         case ASTT_BREAK:
         case ASTT_CONTINUE:
-	    break;
+            break;
         case ASTT_RETURN:
             build_return(s);
             break;

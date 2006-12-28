@@ -35,8 +35,8 @@ Type        *t_object,
 void init_builtin_types() {
     t_object    = store_type("object", 4);
     t_void      = store_type("void", 4);
-    t_string    = store_type("string", 4);    
-    t_bool      = store_type("bool", 1);    
+    t_string    = store_type("string", 4);
+    t_bool      = store_type("bool", 1);
     t_sbyte     = store_type("sbyte", 1);
     t_byte      = store_type("byte", 1);
     t_char      = store_type("char", 2);
@@ -60,7 +60,7 @@ Type * store_type(const char * name, int size) {
     s->kind = TYPE;
     t->size = size;
     t->kind = TYPE_SCALAR;
-/* 
+/*
     t->typeid = 0;
     t->parentid = 0;
     t->flags = 0;
@@ -84,17 +84,17 @@ Type * lookup_type(const char * name) {
             }
 #if DEBUG
             fprintf(stderr, "Found symbol [%s] in namespace [%s]\n",
-			name, ns->name);
+                        name, ns->name);
 #endif
-	    return s->type;
+            return s->type;
         }
-	else {
+        else {
 #if DEBUG
             fprintf(stderr, "Symbol [%s] not found in namespace [%s]\n",
-			name, ns->name);
+                        name, ns->name);
 #endif
-	}
-    }    
+        }
+    }
     return NULL;
 }
 
@@ -118,7 +118,7 @@ Rank * new_rank(int dim) {
     Rank * ret = malloc(sizeof(*ret));
     ret->next = NULL;
     ret->tnext = NULL;
-    ret->dim = dim;    
+    ret->dim = dim;
     return ret;
 }
 
@@ -134,7 +134,7 @@ Type * new_array_type(Symbol * typename, Symbol * sig) {
         Rank * r;
         for(ret->dim = 0, r = rank; r; r = (Rank *)r->tnext) {
             ret->dim += r->dim;
-        } 
+        }
     }
     ret->bounds = (int **)malloc(sizeof(int) * ret->dim * 2);
 */
@@ -193,13 +193,13 @@ void resolve_identifier(Symbol ** ps) {
         if(s->type) {
             /* Just in case typename is fully qualified or aliased */
             s->typename = t->typename;
-    		/* Not sure if this is the cleanest way..
-    		 * If symbol is an identifier, it may be a class,
-    		 * so each class instance has a pointer to the class
-    		 * namespace.
-    		 */
-    		s->table = t->table;
-    		fprintf(stderr, "%s is type [%s]\n", s->name, s->typename->name);
+                /* Not sure if this is the cleanest way..
+                 * If symbol is an identifier, it may be a class,
+                 * so each class instance has a pointer to the class
+                 * namespace.
+                 */
+                s->table = t->table;
+                fprintf(stderr, "%s is type [%s]\n", s->name, s->typename->name);
         }
         else {
             fprintf(stderr, "Error: identifier [%s] has unknown type [%s].\n",
@@ -208,9 +208,9 @@ void resolve_identifier(Symbol ** ps) {
         }
     }
 
-	if(s->type) {
-	    s->table = s->type->sym->table;
-	}
+        if(s->type) {
+            s->table = s->type->sym->table;
+        }
 }
 
 

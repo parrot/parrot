@@ -133,7 +133,7 @@ void gen_statement(AST * p) {
              * During code generation we skip them, only generating
              * the initializer expressions for each, if they exist.
              */
-	        gen_var_decl(p);
+                gen_var_decl(p);
             break;
         case ASTT_IF:
             gen_if(p);
@@ -180,7 +180,7 @@ void gen_statement(AST * p) {
                 if(!eval_expr(p->arg1))
                     gen_expr(p->arg1, NULL, cur_method->sym->type);
 
-	       	printf("\t# return value\n\t.return(%s)\n",
+                printf("\t# return value\n\t.return(%s)\n",
                         NAME(p->arg1->targ) );
             }
             /* Simple optimization that works most of the time.
@@ -320,7 +320,7 @@ void gen_assign(AST * ast) {
             printf("\t(%s)%s = %s\n", p->targ->typename->name, p->targ->name,
                                     p->arg2->targ->name);
 #endif
-	    printf("\t%s = %s\n", p->targ->name, p->arg2->targ->name);
+            printf("\t%s = %s\n", p->targ->name, p->arg2->targ->name);
 #if DEBUG
             printf("#  return from gen_assign\n");
 #endif
@@ -376,7 +376,7 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
         printf("\t(%s)%s = new %s\n", p->typename->name, p->targ->name,
                         p->typename->name);
 #endif
-     	printf("\t%s = new %s\n", p->targ->name, p->typename->name);
+        printf("\t%s = new %s\n", p->targ->name, p->typename->name);
         return;
     }
 
