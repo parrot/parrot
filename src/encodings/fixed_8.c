@@ -221,7 +221,7 @@ Parrot_encoding_fixed_8_init(Interp *interp)
         iter_init
 
     };
-    memcpy(return_encoding, &base_encoding, sizeof(ENCODING));
+    memcpy(return_encoding, &base_encoding, sizeof (ENCODING));
     Parrot_register_encoding(interp, "fixed_8", return_encoding);
     return return_encoding;
 }

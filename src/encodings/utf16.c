@@ -86,10 +86,10 @@ to_encoding(Interp *interp, STRING *src, STRING *dest)
 #if PARROT_HAS_ICU
     if (in_place) {
         /* need intermediate memory */
-        p = mem_sys_allocate(src_len * sizeof(UChar));
+        p = mem_sys_allocate(src_len * sizeof (UChar));
     }
     else {
-        Parrot_reallocate_string(interp, dest, sizeof(UChar) * src_len);
+        Parrot_reallocate_string(interp, dest, sizeof (UChar) * src_len);
         p = dest->strstart;
     }
     if (src->charset == Parrot_iso_8859_1_charset_ptr ||
@@ -107,11 +107,11 @@ to_encoding(Interp *interp, STRING *src, STRING *dest)
              * have to resize - required len in UChars is in dest_len
              */
             if (in_place)
-                p = mem_sys_realloc(p, dest_len * sizeof(UChar));
+                p = mem_sys_realloc(p, dest_len * sizeof (UChar));
             else {
-                result->bufused = dest_len * sizeof(UChar);
+                result->bufused = dest_len * sizeof (UChar);
                 Parrot_reallocate_string(interp, dest,
-                                         sizeof(UChar) * dest_len);
+                                         sizeof (UChar) * dest_len);
                 p = dest->strstart;
             }
             u_strFromUTF8(p, dest_len,
@@ -119,7 +119,7 @@ to_encoding(Interp *interp, STRING *src, STRING *dest)
             assert(U_SUCCESS(err));
         }
     }
-    result->bufused = dest_len * sizeof(UChar);
+    result->bufused = dest_len * sizeof (UChar);
     if (in_place) {
         Parrot_reallocate_string(interp, src, src->bufused);
         memcpy(src->strstart, p, src->bufused);
@@ -292,13 +292,13 @@ utf16_decode_and_advance(Interp *interp, String_iter *i)
 {
     UChar *s = (UChar*) i->str->strstart;
     UINTVAL c, pos;
-    pos = i->bytepos / sizeof(UChar);
+    pos = i->bytepos / sizeof (UChar);
     /* TODO either make sure that we don't go past end or use SAFE
      *      iter versions
      */
     U16_NEXT_UNSAFE(s, pos, c);
     i->charpos++;
-    i->bytepos = pos * sizeof(UChar);
+    i->bytepos = pos * sizeof (UChar);
     return c;
 }
 
@@ -307,10 +307,10 @@ utf16_encode_and_advance(Interp *interp, String_iter *i, UINTVAL c)
 {
     UChar *s = (UChar*) i->str->strstart;
     UINTVAL pos;
-    pos = i->bytepos / sizeof(UChar);
+    pos = i->bytepos / sizeof (UChar);
     U16_APPEND_UNSAFE(s, pos, c);
     i->charpos++;
-    i->bytepos = pos * sizeof(UChar);
+    i->bytepos = pos * sizeof (UChar);
 }
 
 static void
@@ -321,7 +321,7 @@ utf16_set_position(Interp *interp, String_iter *i, UINTVAL n)
     pos = 0;
     U16_FWD_N_UNSAFE(s, pos, n);
     i->charpos = n;
-    i->bytepos = pos * sizeof(UChar);
+    i->bytepos = pos * sizeof (UChar);
 }
 
 #endif
@@ -364,7 +364,7 @@ Parrot_encoding_utf16_init(Interp *interp)
         bytes,
         iter_init
     };
-    memcpy(return_encoding, &base_encoding, sizeof(ENCODING));
+    memcpy(return_encoding, &base_encoding, sizeof (ENCODING));
     Parrot_register_encoding(interp, "utf16", return_encoding);
     return return_encoding;
 }

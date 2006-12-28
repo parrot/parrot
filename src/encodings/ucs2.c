@@ -94,8 +94,8 @@ get_codepoints(Interp *interp, STRING *src,
 {
     STRING *return_string = Parrot_make_COW_reference(interp, src);
 #if PARROT_HAS_ICU
-    return_string->strstart = (char*)src->strstart + offset * sizeof(UChar);
-    return_string->bufused = count * sizeof(UChar);
+    return_string->strstart = (char*)src->strstart + offset * sizeof (UChar);
+    return_string->bufused = count * sizeof (UChar);
 #else
     {
         String_iter iter;
@@ -167,7 +167,7 @@ static UINTVAL
 codepoints(Interp *interp, STRING *src)
 {
 #if PARROT_HAS_ICU
-    return src->bufused / sizeof(UChar);
+    return src->bufused / sizeof (UChar);
 #else
     real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
@@ -187,13 +187,13 @@ ucs2_decode_and_advance(Interp *interp, String_iter *i)
 {
     UChar *s = (UChar*) i->str->strstart, c;
     size_t pos;
-    pos = i->bytepos / sizeof(UChar);
+    pos = i->bytepos / sizeof (UChar);
     /* TODO either make sure that we don't go past end or use SAFE
      *      iter versions
      */
     c = s[pos++];
     i->charpos++;
-    i->bytepos = pos * sizeof(UChar);
+    i->bytepos = pos * sizeof (UChar);
     return c;
 }
 
@@ -202,17 +202,17 @@ ucs2_encode_and_advance(Interp *interp, String_iter *i, UINTVAL c)
 {
     UChar *s = (UChar*) i->str->strstart;
     UINTVAL pos;
-    pos = i->bytepos / sizeof(UChar);
+    pos = i->bytepos / sizeof (UChar);
     s[pos++] = (UChar)c;
     i->charpos++;
-    i->bytepos = pos * sizeof(UChar);
+    i->bytepos = pos * sizeof (UChar);
 }
 
 static void
 ucs2_set_position(Interp *interp, String_iter *i, UINTVAL n)
 {
     i->charpos = n;
-    i->bytepos = n * sizeof(UChar);
+    i->bytepos = n * sizeof (UChar);
 }
 
 #endif
@@ -255,7 +255,7 @@ Parrot_encoding_ucs2_init(Interp *interp)
         bytes,
         iter_init
     };
-    memcpy(return_encoding, &base_encoding, sizeof(ENCODING));
+    memcpy(return_encoding, &base_encoding, sizeof (ENCODING));
     Parrot_register_encoding(interp, "ucs2", return_encoding);
     return return_encoding;
 }

@@ -560,7 +560,7 @@ Parrot_encoding_utf8_init(Interp *interp)
         bytes,
         iter_init
     };
-    memcpy(return_encoding, &base_encoding, sizeof(ENCODING));
+    memcpy(return_encoding, &base_encoding, sizeof (ENCODING));
     Parrot_register_encoding(interp, "utf8", return_encoding);
     return return_encoding;
 }
