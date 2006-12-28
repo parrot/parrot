@@ -39,7 +39,7 @@ will be copied to the new instance.
 ParrotIOLayer *
 PIO_base_new_layer(ParrotIOLayer *proto)
 {
-    ParrotIOLayer * const new_layer = mem_sys_allocate(sizeof(ParrotIOLayer));
+    ParrotIOLayer * const new_layer = mem_sys_allocate(sizeof (ParrotIOLayer));
 
     /*
      * XXX use managed memory here ?

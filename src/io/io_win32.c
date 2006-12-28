@@ -85,7 +85,7 @@ flags_to_win32(INTVAL flags, DWORD * fdwAccess,
     static DWORD dwDefaultShareMode;
     if (!dwDefaultShareMode) {
         OSVERSIONINFO osvi;
-        osvi.dwOSVersionInfoSize = sizeof(osvi);
+        osvi.dwOSVersionInfoSize = sizeof (osvi);
         GetVersionEx(&osvi);
         if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
             dwDefaultShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
@@ -547,13 +547,13 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
         fprintf(stderr, "gethostbyname failure [%s]\n", s);
         return NULL;
     }
-    memcpy((char*)&sa.sin_addr, he->h_addr, sizeof(sa.sin_addr));
+    memcpy((char*)&sa.sin_addr, he->h_addr, sizeof (sa.sin_addr));
 
     string_cstring_free(s);
 
     sa.sin_port = htons(port);
 
-    return string_make(interp, &sa, sizeof(struct sockaddr), "binary", 0);
+    return string_make(interp, &sa, sizeof (struct sockaddr), "binary", 0);
 }
 
 
@@ -604,7 +604,7 @@ PIO_win32_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
 {
     if (r) {
         struct sockaddr_in sa;
-        memcpy(&sa, PObj_bufstart(r), sizeof(struct sockaddr));
+        memcpy(&sa, PObj_bufstart(r), sizeof (struct sockaddr));
         io->remote.sin_addr.s_addr = sa.sin_addr.s_addr;
         io->remote.sin_port = sa.sin_port;
     }
@@ -612,7 +612,7 @@ PIO_win32_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
     /*    PIO_eprintf(interp, "connect: fd = %d port = %d\n",
      *    io->fd, ntohs(io->remote.sin_port));*/
     if ((connect((SOCKET)io->fd, (struct sockaddr*)&io->remote,
-                   sizeof(struct sockaddr))) != 0) {
+                   sizeof (struct sockaddr))) != 0) {
         PIO_eprintf(interp, "PIO_win32_connect: errno = %d\n",
                     WSAGetLastError());
         return -1;
@@ -636,7 +636,7 @@ static INTVAL
 PIO_win32_send(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING *s)
 {
     int error, bytes, byteswrote, maxwrite;
-    bytes = sizeof(s);
+    bytes = sizeof (s);
     byteswrote = 0;
     maxwrite = 2048;
 AGAIN:
@@ -755,13 +755,13 @@ PIO_win32_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
     if (!l)
         return -1;
 
-    memcpy(&sa, PObj_bufstart(l), sizeof(struct sockaddr));
+    memcpy(&sa, PObj_bufstart(l), sizeof (struct sockaddr));
     io->local.sin_addr.s_addr = sa.sin_addr.s_addr;
     io->local.sin_port = sa.sin_port;
     io->local.sin_family = AF_INET;
 
     if ((bind((SOCKET)io->fd, (struct sockaddr *)&io->local,
-              sizeof(struct sockaddr))) == -1) {
+              sizeof (struct sockaddr))) == -1) {
         PIO_eprintf(interp, "PIO_win32_bind: errno = %d\n",
                     WSAGetLastError());
         return -1;

@@ -647,7 +647,7 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
      * due to a bug in OS/X, we've to zero the struct
      * else bind is failing erratically
      */
-    memset(&sa, 0, sizeof(sa));
+    memset(&sa, 0, sizeof (sa));
 #  ifdef PARROT_DEF_INET_ATON
     if (inet_aton(s, &sa.sin_addr) != 0) {
 #  else
@@ -668,14 +668,14 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
             fprintf(stderr, "gethostbyname failure [%s]\n", s);
             return NULL;
         }
-        memcpy((char*)&sa.sin_addr, he->h_addr, sizeof(sa.sin_addr));
+        memcpy((char*)&sa.sin_addr, he->h_addr, sizeof (sa.sin_addr));
     }
     string_cstring_free(s);
 
     sa.sin_family = family;
     sa.sin_port = htons(port);
 
-    return string_make(interp, &sa, sizeof(struct sockaddr_in),
+    return string_make(interp, &sa, sizeof (struct sockaddr_in),
             "binary", 0);
 }
 
@@ -704,8 +704,8 @@ PIO_unix_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)
     if ((sock = socket(fam, type, proto)) >= 0) {
         io = PIO_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
         io->fd = sock;
-        memset(&io->local, 0, sizeof(struct sockaddr_in));
-        memset(&io->remote, 0, sizeof(struct sockaddr_in));
+        memset(&io->local, 0, sizeof (struct sockaddr_in));
+        memset(&io->remote, 0, sizeof (struct sockaddr_in));
         io->remote.sin_family = fam;
         return io;
     }
@@ -730,11 +730,11 @@ PIO_unix_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
     UNUSED(interp);
 
     if (r) {
-        memcpy(&io->remote, PObj_bufstart(r), sizeof(struct sockaddr_in));
+        memcpy(&io->remote, PObj_bufstart(r), sizeof (struct sockaddr_in));
     }
 AGAIN:
     if ((connect(io->fd, (struct sockaddr*)&io->remote,
-                    sizeof(struct sockaddr_in))) != 0) {
+                    sizeof (struct sockaddr_in))) != 0) {
         switch(errno) {
             case EINTR:
                 goto AGAIN;
@@ -769,10 +769,10 @@ PIO_unix_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
     if (!l)
         return -1;
 
-    memcpy(&io->local, PObj_bufstart(l), sizeof(struct sockaddr_in));
+    memcpy(&io->local, PObj_bufstart(l), sizeof (struct sockaddr_in));
 
     if ((bind(io->fd, (struct sockaddr *)&io->local,
-                    sizeof(struct sockaddr_in))) == -1) {
+                    sizeof (struct sockaddr_in))) == -1) {
         return -1;
     }
 
@@ -823,7 +823,7 @@ PIO_unix_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     UNUSED(layer);
     newio = PIO_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
 
-    addrlen = sizeof(struct sockaddr_in);
+    addrlen = sizeof (struct sockaddr_in);
     if ((newsock = accept(io->fd, (struct sockaddr *)&newio->remote,
                           &addrlen)) == -1)
     {

@@ -138,7 +138,7 @@ Called from C<PIO_init()>.
 ParrotIOTable
 alloc_pio_array(int numhandles)
 {
-    const size_t size = numhandles * sizeof(ParrotIO *);
+    const size_t size = numhandles * sizeof (ParrotIO *);
     return (ParrotIOTable)mem_sys_allocate_zeroed(size);
 }
 
@@ -179,7 +179,7 @@ Currently C<iotype> is unused.
 ParrotIO *
 PIO_new(theINTERP, INTVAL iotype, INTVAL flags, INTVAL mode)
 {
-    ParrotIO * const new_io = (ParrotIO *)mem_sys_allocate(sizeof(ParrotIO));
+    ParrotIO * const new_io = (ParrotIO *)mem_sys_allocate(sizeof (ParrotIO));
     UNUSED(iotype);
 
     new_io->fpos = new_io->lpos = piooffsetzero;
@@ -293,7 +293,7 @@ PIO_init(theINTERP)
     }
 
 
-    interp->piodata = mem_sys_allocate(sizeof(ParrotIOData));
+    interp->piodata = mem_sys_allocate(sizeof (ParrotIOData));
     if (interp->piodata == NULL)
         internal_exception(PIO_ERROR, "PIO alloc piodata failure.");
     interp->piodata->default_stack = NULL;
@@ -410,7 +410,7 @@ PIO_init_stacks(theINTERP)
     if (!pio_registered_layers) {
         n = 5;  /* 2 default layers for now + utf8, mmap, string */
         pio_registered_layers = mem_sys_allocate(
-                sizeof(ParrotIOLayer *) * (n + 1));
+                sizeof (ParrotIOLayer *) * (n + 1));
         fill = 1;
     }
 
