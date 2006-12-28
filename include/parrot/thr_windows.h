@@ -11,7 +11,7 @@
  */
 
 #if !defined(PARROT_THR_WINDOWS_H_GUARD)
-#define PARROT_THR_WINDOWS_H_GUARD
+#  define PARROT_THR_WINDOWS_H_GUARD
 
 #  undef CONST
 #  include <windows.h>

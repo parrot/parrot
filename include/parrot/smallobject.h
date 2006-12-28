@@ -1,7 +1,7 @@
 #if !defined(PARROT_SMALLOBJECT_H_GUARD)
-#define PARROT_SMALLOBJECT_H_GUARD
+#  define PARROT_SMALLOBJECT_H_GUARD
 
-#include "parrot/parrot.h"
+#  include "parrot/parrot.h"
 
 struct Small_Object_Arena {
     size_t used;

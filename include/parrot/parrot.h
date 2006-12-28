@@ -53,7 +53,7 @@
 #endif /* PARROT_HAS_HEADER_SYSTYPES */
 
 #ifdef PARROT_HAS_HEADER_SYSSOCKET
-#include <sys/socket.h>
+#  include <sys/socket.h>
 #endif /* PARROT_HAS_HEADER_SYSSOCKET */
 
 #ifdef PARROT_HAS_HEADER_NETINETIN
@@ -186,9 +186,9 @@ typedef struct parrot_interp_t Interp;
  */
 
 #ifdef __GCC__
-#define LVALUE_CAST(type, val) ((type)(val))
+#  define LVALUE_CAST(type, val) ((type)(val))
 #else
-#define LVALUE_CAST(type, val) (*((type *)&(val)))
+#  define LVALUE_CAST(type, val) (*((type *)&(val)))
 #endif /* __GCC__ */
 
 /*
@@ -204,8 +204,8 @@ typedef struct parrot_interp_t Interp;
 /* some SGI compilers have an offsetof()
  * definition that doesn't work for us. */
 #if defined(__sgi) && defined(_COMPILER_VERSION) && (_COMPILER_VERSION >= 400)
-#undef offsetof
-#define offsetof(s, m) (size_t)(&(((s *)0)->m))
+#  undef offsetof
+#  define offsetof(s, m) (size_t)(&(((s *)0)->m))
 #endif
 
 /* work around warning:

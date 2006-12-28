@@ -13,15 +13,15 @@
  */
 
 #if !defined(ATOMIC_GCC_PCC_H_GAURD)
-#define ATOMIC_GCC_PCC_H_GAURD
+#  define ATOMIC_GCC_PCC_H_GAURD
 
 typedef struct {
     void * volatile val;
 } Parrot_atomic_pointer;
 
-#define PARROT_ATOMIC_PTR_GET(result, a) result = (void *) (a).val
+#  define PARROT_ATOMIC_PTR_GET(result, a) result = (void *) (a).val
 
-#define PARROT_ATOMIC_PTR_SET(a, b) (a).val = (void *) (b)
+#  define PARROT_ATOMIC_PTR_SET(a, b) (a).val = (void *) (b)
 
 inline static void *parrot_ppc_cmpset(void * volatile *ptr,
                                       void *expect, void *update)
@@ -67,7 +67,7 @@ inline static long parrot_ppc_add(volatile long *val, long what)
     return tmp;
 }
 
-#define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
+#  define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
     do { \
         if (parrot_ppc_cmpset(&(a).val, expect, update) == expect) { \
             result = 1; \
@@ -77,23 +77,23 @@ inline static long parrot_ppc_add(volatile long *val, long what)
         } \
     } while (0)
 
-#define PARROT_ATOMIC_PTR_INIT(a)
+#  define PARROT_ATOMIC_PTR_INIT(a)
 
-#define PARROT_ATOMIC_PTR_DESTROY(a)
+#  define PARROT_ATOMIC_PTR_DESTROY(a)
 
 typedef struct {
     volatile long val;
 } Parrot_atomic_integer;
 
-#define PARROT_ATOMIC_INT_INIT(a)
+#  define PARROT_ATOMIC_INT_INIT(a)
 
-#define PARROT_ATOMIC_INT_DESTROY(a)
+#  define PARROT_ATOMIC_INT_DESTROY(a)
 
-#define PARROT_ATOMIC_INT_GET(result, a) (result = (a).val)
+#  define PARROT_ATOMIC_INT_GET(result, a) (result = (a).val)
 
-#define PARROT_ATOMIC_INT_SET(a, b) ((a).val = b)
+#  define PARROT_ATOMIC_INT_SET(a, b) ((a).val = b)
 
-#define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
+#  define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
     do { \
         if (parrot_ppc_cmpset( \
                 (void * volatile *) &(a).val, (void *) expect, \
@@ -105,12 +105,12 @@ typedef struct {
         } \
     } while (0)
 
-#define PARROT_ATOMIC_INT_INC(result, a) \
+#  define PARROT_ATOMIC_INT_INC(result, a) \
     do { \
         result = parrot_ppc_add(&(a).val, 1); \
     } while (0)
 
-#define PARROT_ATOMIC_INT_DEC(result, a) \
+#  define PARROT_ATOMIC_INT_DEC(result, a) \
     do { \
         result = parrot_ppc_add(&(a).val, -1); \
     } while (0)

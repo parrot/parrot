@@ -11,58 +11,58 @@
  */
 
 #if !defined(PARROT_THREAD_H_GUARD)
-#define PARROT_THREAD_H_GUARD
+#  define PARROT_THREAD_H_GUARD
 
-#include "parrot/parrot.h"
+#  include "parrot/parrot.h"
 
 #  define PARROT_HAS_THREADS 1
 
-#ifndef PARROT_SYNC_PRIMITIVES_DEFINED
+#  ifndef PARROT_SYNC_PRIMITIVES_DEFINED
 
-#  undef  PARROT_HAS_THREADS
-#  define PARROT_HAS_THREADS 0
+#    undef  PARROT_HAS_THREADS
+#    define PARROT_HAS_THREADS 0
 
-#  define LOCK(m)
-#  define UNLOCK(m)
-#  define COND_WAIT(c, m)
-#  define COND_TIMED_WAIT(c, m, t)
-#  define COND_SIGNAL(c)
-#  define COND_BROADCAST(c)
+#    define LOCK(m)
+#    define UNLOCK(m)
+#    define COND_WAIT(c, m)
+#    define COND_TIMED_WAIT(c, m, t)
+#    define COND_SIGNAL(c)
+#    define COND_BROADCAST(c)
 
-#  define MUTEX_INIT(m)
-#  define MUTEX_DESTROY(m)
+#    define MUTEX_INIT(m)
+#    define MUTEX_DESTROY(m)
 
-#  define COND_INIT(c)
-#  define COND_DESTROY(c)
+#    define COND_INIT(c)
+#    define COND_DESTROY(c)
 
-#  define THREAD_CREATE_DETACHED(t, func, arg)
-#  define THREAD_CREATE_JOINABLE(t, func, arg)
+#    define THREAD_CREATE_DETACHED(t, func, arg)
+#    define THREAD_CREATE_JOINABLE(t, func, arg)
 
-#  define JOIN(t, ret)
-#  define DETACH(t)
+#    define JOIN(t, ret)
+#    define DETACH(t)
 
-#  define CLEANUP_PUSH(f, a)
-#  define CLEANUP_POP(a)
+#    define CLEANUP_PUSH(f, a)
+#    define CLEANUP_POP(a)
 
-#  define Parrot_mutex int
-#  define Parrot_cond int
-#  define Parrot_thread int
+#    define Parrot_mutex int
+#    define Parrot_cond int
+#    define Parrot_thread int
 
 typedef void (*Cleanup_Handler)(void *);
 
-#  ifndef _STRUCT_TIMESPEC
-#  define _STRUCT_TIMESPEC
+#    ifndef _STRUCT_TIMESPEC
+#      define _STRUCT_TIMESPEC
 struct timespec {
     time_t tv_sec;
     long tv_nsec;
 };
-#  endif /* _STRUCT_TIMESPEC */
+#    endif /* _STRUCT_TIMESPEC */
 
-#endif /* PARROT_SYNC_PRIMITIVES_DEFINED */
+#  endif /* PARROT_SYNC_PRIMITIVES_DEFINED */
 
-#ifndef YIELD
-#  define YIELD
-#endif /* YIELD */
+#  ifndef YIELD
+#    define YIELD
+#  endif /* YIELD */
 
 typedef enum {
     THREAD_STATE_JOINABLE,              /* default */
@@ -111,19 +111,19 @@ typedef struct _Thread_data {
     Hash             *const_tables;
 } Thread_data;
 
-#define LOCK_INTERPRETER(interp) \
+#  define LOCK_INTERPRETER(interp) \
     if ((interp)->thread_data) \
         LOCK((interp)->thread_data->interp_lock)
-#define UNLOCK_INTERPRETER(interp) \
+#  define UNLOCK_INTERPRETER(interp) \
     if ((interp)->thread_data) \
         UNLOCK((interp)->thread_data->interp_lock)
 
-#define INTERPRETER_LOCK_INIT(interp) \
+#  define INTERPRETER_LOCK_INIT(interp) \
         do { \
             MUTEX_INIT((interp)->thread_data->interp_lock); \
             COND_INIT((interp)->thread_data->interp_cond); \
         } while (0)
-#define INTERPRETER_LOCK_DESTROY(interp) \
+#  define INTERPRETER_LOCK_DESTROY(interp) \
         do { \
             MUTEX_DESTROY((interp)->thread_data->interp_lock); \
             COND_DESTROY((interp)->thread_data->interp_cond); \

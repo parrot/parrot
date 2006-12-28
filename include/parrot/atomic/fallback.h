@@ -12,7 +12,7 @@
  */
 
 #if !defined(PARROT_ATOMIC_FALLBACK_H_GAURD)
-#define PARROT_ATOMIC_FALLBACK_H_GAURD
+#  define PARROT_ATOMIC_FALLBACK_H_GAURD
 
 typedef struct {
     void *val;
@@ -25,49 +25,49 @@ typedef struct {
 } Parrot_atomic_integer;
 
 
-#define PARROT_ATOMIC_PTR_GET(result, a) \
+#  define PARROT_ATOMIC_PTR_GET(result, a) \
     do { \
         LOCK((a).lock); \
         result = (a).val; \
         UNLOCK((a).lock); \
     } while (0)
 
-#define PARROT_ATOMIC_INT_GET(result, a) \
+#  define PARROT_ATOMIC_INT_GET(result, a) \
     do { \
         LOCK((a).lock); \
         result = (a).val; \
         UNLOCK((a).lock); \
     } while (0)
 
-#define PARROT_ATOMIC_PTR_SET(a,b) \
+#  define PARROT_ATOMIC_PTR_SET(a,b) \
     do { \
         LOCK((a).lock); \
         (a).val = b; \
         UNLOCK((a).lock); \
     } while (0)
 
-#define PARROT_ATOMIC_INT_SET(a,b) \
+#  define PARROT_ATOMIC_INT_SET(a,b) \
     do { \
         LOCK((a).lock); \
         (a).val = b; \
         UNLOCK((a).lock); \
     } while (0)
 
-#define PARROT_ATOMIC_INT_INC(result, a) \
+#  define PARROT_ATOMIC_INT_INC(result, a) \
     do { \
         LOCK((a).lock); \
         result = ++(a).val; \
         UNLOCK((a).lock); \
     } while (0)
 
-#define PARROT_ATOMIC_INT_DEC(result, a) \
+#  define PARROT_ATOMIC_INT_DEC(result, a) \
     do { \
         LOCK((a).lock); \
         result = --(a).val; \
         UNLOCK((a).lock); \
     } while (0)
 
-#define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
+#  define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
     do { \
         LOCK((a).lock); \
         if ((a).val == expect) { \
@@ -81,7 +81,7 @@ typedef struct {
         UNLOCK((a).lock); \
     } while (0)
 
-#define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
+#  define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
     do { \
         LOCK((a).lock); \
         if ((a).val == expect) { \
@@ -95,22 +95,22 @@ typedef struct {
         UNLOCK((a).lock); \
     } while (0)
 
-#define PARROT_ATOMIC_PTR_INIT(a) \
+#  define PARROT_ATOMIC_PTR_INIT(a) \
     do { \
         MUTEX_INIT((a).lock); \
     } while (0)
 
-#define PARROT_ATOMIC_PTR_DESTROY(a) \
+#  define PARROT_ATOMIC_PTR_DESTROY(a) \
     do { \
         MUTEX_DESTROY((a).lock); \
     } while (0)
 
-#define PARROT_ATOMIC_INT_INIT(a) \
+#  define PARROT_ATOMIC_INT_INIT(a) \
     do { \
         MUTEX_INIT((a).lock); \
     } while (0)
 
-#define PARROT_ATOMIC_INT_DESTROY(a) \
+#  define PARROT_ATOMIC_INT_DESTROY(a) \
     do { \
         MUTEX_DESTROY((a).lock); \
     } while (0)
