@@ -70,7 +70,7 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interpreter, PMC *cmdargs)
         STRING *s;
         char *cmd;
 
-        argv = (char **)mem_sys_allocate((len+1)*sizeof(char *));
+        argv = (char **)mem_sys_allocate((len+1)*sizeof (char *));
         for (i = 0; i < len; ++i) {
             s = VTABLE_get_string_keyed_int(interpreter, cmdargs, i);
             argv[i] = string_to_cstring(interpreter, s);

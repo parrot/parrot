@@ -33,7 +33,7 @@ Parrot_floatval_time(void)
     GetSystemTime(&sysTime);
     SystemTimeToFileTime(&sysTime, &fileTime);
     /* Documented as the way to get a 64 bit from a FILETIME. */
-    memcpy(&i, &fileTime, sizeof(LARGE_INTEGER));
+    memcpy(&i, &fileTime, sizeof (LARGE_INTEGER));
 
     return (FLOATVAL)i.QuadPart / 10000000.0;   /*1e7 */
 }

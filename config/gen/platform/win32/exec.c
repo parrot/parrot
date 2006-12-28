@@ -18,12 +18,12 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
     strcat( cmd, cmdin );
     string_cstring_free( cmdin );
 
-    memset( &si, 0, sizeof(si) );
-    si.cb = sizeof(si);
-    memset( &pi, 0, sizeof(pi) );
+    memset( &si, 0, sizeof (si) );
+    si.cb = sizeof (si);
+    memset( &pi, 0, sizeof (pi) );
 
     /* Start the child process. */
-    if(
+    if (
         !CreateProcess( shell, cmd,
         NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi )
     ) {
@@ -32,14 +32,14 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
 
     WaitForSingleObject( pi.hProcess, INFINITE );
 
-    if( !GetExitCodeProcess( pi.hProcess, &status ) ) {
+    if ( !GetExitCodeProcess( pi.hProcess, &status ) ) {
         /* XXX njs Should call GetLastError for failure message? */
         Parrot_warn( interpreter, PARROT_WARNINGS_PLATFORM_FLAG,
             "Process completed: Failed to get exit code.");
     }
     CloseHandle( pi.hProcess );
     CloseHandle( pi.hThread );
-    if( free_it ) free( shell );
+    if ( free_it ) free( shell );
     mem_sys_free( cmd );
 
     /* Return exit code left shifted by 8 for POSIX emulation. */
@@ -79,10 +79,10 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interpreter, PMC *cmdargs)
     }
 
     /* Start the child process. */
-    memset(&si, 0, sizeof(si));
-    si.cb = sizeof(si);
-    memset(&pi, 0, sizeof(pi));
-    if(
+    memset(&si, 0, sizeof (si));
+    si.cb = sizeof (si);
+    memset(&pi, 0, sizeof (pi));
+    if (
         !CreateProcess(NULL, cmdline,
         NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)
     )
@@ -113,7 +113,7 @@ Parrot_Exec_OS_Command(Parrot_Interp interpreter, STRING *command)
     int status;
     char *in = string_to_cstring(interpreter, command);
     char *cmd = NULL;
-    char **argv = mem_sys_allocate_zeroed(2 * sizeof(int));
+    char **argv = mem_sys_allocate_zeroed(2 * sizeof (int));
 
     /* Grab string, extract command and parameters. */
     char *curPos = in;
@@ -159,7 +159,7 @@ Parrot_Exec_OS_Command(Parrot_Interp interpreter, STRING *command)
             {
                 /* Allocate space for another pointer in **argv. */
                 argc++;
-                argv = mem_sys_realloc(argv, (argc + 1) * sizeof(int));
+                argv = mem_sys_realloc(argv, (argc + 1) * sizeof (int));
                 *(argv + (argc - 1)) = tmp;
                 *(argv + argc) = NULL;
             }
