@@ -16,9 +16,34 @@ $Revision$
 
 =head1 DEFINITIONS
 
-Concurrency
+I<Concurrency> is a parallel execution of units of code (on
+multiprocessor machines), or a flexible ordering of units of code (on
+single processor machines). For certain problem spaces, concurrency
+offers significant speed gains by parceling out processor-intensive
+activity or by ensuring that a wait for input or system resources
+doesn't hold up the entire application.
+
+A I<Task> is a unit of code that can be executed in parallel.
 
 =head1 DESCRIPTION
+
+=over 4
+
+=item - Parrot supports multiple concurrency models, including POSIX
+threads, event-based programming, and asynchronous I/O.
+
+=item - To reduce conflicts between concurrency models, Parrot provides
+a single central concurrency scheduler for each interpreter instance.
+Each concurrency model defines a Task PMC that supports a standard
+minimal interface. The scheduler can interact with tasks from various
+models without direct access to the details of each model.
+
+=item - On multiprocessor systems, the scheduler is responsible for
+allocating tasks to processors, or for delegating that allocation to the
+underlying OS.
+
+
+=back
 
 =head1 DEFINITIONS
 
