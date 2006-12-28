@@ -62,21 +62,31 @@ check later if the operation succeded) are enough of a fringe case that
 they don't need opcodes. They can access the functionality via methods
 on ParrotIO objects.
 
-Asynchronous operations don't use Parrot threads, they use a
-light-weight concurrency model for asynchronous operations. The
-asynchronous I/O implementation will use the composition model to
+The asynchronous I/O implementation will use the composition model to
 allow some platforms to take advantage of their built-in asynchronous
-operations instead of using Parrot's concurrency implementation.
+operations, layered behind Parrot's asynchronous I/O interface.
 
-[Type up review of options for the I/O concurrency model.]
+Asynchronous operations use a lightweight concurrency model. At the user
+level, Parrot follows the callback function model of asynchronous I/O.
+At the interpreter level, each asynchronous operation registers a task
+with the interpreter's concurrency scheduler. The registered task could
+represent a simple Parrot asynchronous I/O operation, a platform-native
+asynchronous I/O call, or even synchronous code in a full Parrot thread
+(rare but possibly useful for prototyping new features, or for mock
+objects in testing).
 
 Communication between the calling code and the asynchronous operation
-thread will be handled by a shared status object. The operation thread
-will update the status object whenever the status changes, and the
-calling code can check the status object at any time. The status object
-contains a reference to the returned result of an asynchronous I/O call.
+task is handled by a shared status object. The operation task updates
+the status object whenever the status changes, and the calling code can
+check the status object at any time.  The status object contains a
+reference to the returned result of an asynchronous I/O call.
 
+The lightweight tasks typically used by the asynchronous I/O system
+capture no state other than the arguments passed to the I/O call, and
+share no variables with the calling code other than the status object.
 
+[See http://en.wikipedia.org/wiki/Asynchronous_I/O, for a relatively
+comprehensive list of asynchronous I/O implementation options.]
 
 =head2 I/O PMC API
 
