@@ -14,7 +14,7 @@
 #define C_DEBUG 0
 
 #if C_DEBUG
-#include <stdio.h>
+#  include <stdio.h>
 #  define cdebug(x) fprintf x
 #else
 #  define cdebug(x)
