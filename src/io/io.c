@@ -212,7 +212,7 @@ PIO_destroy(theINTERP, PMC *pmc)
     ParrotIO * const io = PMC_data0(pmc);
     UNUSED(interp);
 
-    if(!io)
+    if (!io)
         return;
     if (io->b.startb && (io->b.flags & PIO_BF_MALLOC)) {
         mem_sys_free(io->b.startb);
@@ -579,7 +579,7 @@ PIO_peek(theINTERP, PMC *pmc, STRING **buffer)
 {
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data0(pmc);
-    if(!io)
+    if (!io)
         return -1;
     return PIO_peek_down(interp, l, io, buffer);
 }
@@ -610,33 +610,33 @@ PIO_pioctl(theINTERP, PMC *pmc, INTVAL cmd, INTVAL arg)
 
     ParrotIO * const io = PMC_data0(pmc);
     ParrotIOBuf * b;
-    if(!io) return -1;
+    if (!io) return -1;
     b = &io->b;
 
-    switch(cmd) {
+    switch (cmd) {
        case PIOCTL_CMDSETRECSEP: io->recsep = arg;
 
        case PIOCTL_CMDGETRECSEP: return io->recsep;
 
        case PIOCTL_CMDSETBUFTYPE:
-            if(arg == PIOCTL_NONBUF)
+            if (arg == PIOCTL_NONBUF)
                return PIO_setbuf(interp, pmc, 0);
-            else if(arg == PIOCTL_LINEBUF)
+            else if (arg == PIOCTL_LINEBUF)
                return PIO_setlinebuf(interp, pmc);
-            else if(arg == PIOCTL_BLKBUF)
+            else if (arg == PIOCTL_BLKBUF)
                return PIO_setbuf(interp, pmc, PIO_UNBOUND);
             else return -1;
 
        case PIOCTL_CMDGETBUFTYPE:
-            if(io->flags & PIO_F_LINEBUF) return PIOCTL_LINEBUF;
-            if(io->flags & PIO_F_BLKBUF) return PIOCTL_BLKBUF;
+            if (io->flags & PIO_F_LINEBUF) return PIOCTL_LINEBUF;
+            if (io->flags & PIO_F_BLKBUF) return PIOCTL_BLKBUF;
             return PIOCTL_NONBUF;
 
        case PIOCTL_CMDSETBUFSIZE:
             return PIO_setbuf(interp, pmc, arg);
 
        case PIOCTL_CMDGETBUFSIZE:
-             if(b) return b->size;
+             if (b) return b->size;
              else return -1;
        default: return -1;
     }
@@ -661,7 +661,7 @@ PIO_setbuf(theINTERP, PMC *pmc, size_t bufsize)
 {
     ParrotIOLayer * const layer = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data0(pmc);
-    if(!io)
+    if (!io)
         return -1;
     PIO_flush(interp, pmc);
     return PIO_setbuf_down(interp, layer, io, bufsize);
@@ -684,7 +684,7 @@ PIO_setlinebuf(theINTERP, PMC *pmc)
 {
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data0(pmc);
-    if(!io)
+    if (!io)
         return -1;
 
     return PIO_setlinebuf_down(interp, l, io);
@@ -782,7 +782,7 @@ PIO_close(theINTERP, PMC *pmc)
     INTVAL res;
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data0(pmc);
-    if(!io)
+    if (!io)
         return -1;
     PIO_flush(interp, pmc); /* XXX boe: is this neccessary here? */
     res =  PIO_close_down(interp, l, io);
@@ -807,7 +807,7 @@ PIO_flush(theINTERP, PMC *pmc)
 {
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data0(pmc);
-    if(!io)
+    if (!io)
         return;
 
     PIO_flush_down(interp, l, io);
@@ -886,7 +886,7 @@ PIO_write(theINTERP, PMC *pmc, const void *buffer, size_t len)
     ParrotIO * const io = PMC_data0(pmc);
     DECL_CONST_CAST;
 
-    if(!io)
+    if (!io)
         return -1;
 
     if (io->flags & PIO_F_WRITE) {
@@ -920,7 +920,7 @@ PIO_seek(theINTERP, PMC *pmc, PIOOFF_T offset, INTVAL w)
 {
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data0(pmc);
-    if(!io)
+    if (!io)
         return -1;
 
     return PIO_seek_down(interp, l, io, offset, w);
@@ -942,7 +942,7 @@ PIO_tell(theINTERP, PMC *pmc)
 {
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data0(pmc);
-    if(!io)
+    if (!io)
         return -1;
 
     return PIO_tell_down(interp, l, io);
@@ -1066,7 +1066,7 @@ PIO_printf(theINTERP, const char *s, ...) {
 
     va_start(args, s);
 
-    if(interp) {
+    if (interp) {
         STRING * const str = Parrot_vsprintf_c(interp, s, args);
         ret=PIO_putps(interp, PIO_STDOUT(interp), str);
     }
@@ -1100,7 +1100,7 @@ PIO_eprintf(theINTERP, const char *s, ...) {
 
     va_start(args, s);
 
-    if(interp) {
+    if (interp) {
         STRING * const str = Parrot_vsprintf_c(interp, s, args);
 
         ret=PIO_putps(interp, PIO_STDERR(interp), str);
@@ -1373,7 +1373,7 @@ PIO_recv(theINTERP, PMC *pmc, STRING **buf)
 {
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data(pmc);
-    if(!io)
+    if (!io)
         return -1;
 
     return PIO_recv_down(interp, l, io, buf);
@@ -1396,7 +1396,7 @@ PIO_send(theINTERP, PMC *pmc, STRING *buf)
 {
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data(pmc);
-    if(!io)
+    if (!io)
         return -1;
 
     return PIO_send_down(interp, l, io, buf);
@@ -1418,7 +1418,7 @@ PIO_connect(theINTERP, PMC *pmc, STRING *address)
 {
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data(pmc);
-    if(!io)
+    if (!io)
         return -1;
 
     return PIO_connect_down(interp, l, io, address);
@@ -1441,7 +1441,7 @@ PIO_bind(theINTERP, PMC *pmc, STRING *address)
 {
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data(pmc);
-    if(!io)
+    if (!io)
         return -1;
 
     return PIO_bind_down(interp, l, io, address);
@@ -1463,7 +1463,7 @@ PIO_listen(theINTERP, PMC *pmc, INTVAL backlog)
 {
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data(pmc);
-    if(!io)
+    if (!io)
         return -1;
 
     return PIO_listen_down(interp, l, io, backlog);
@@ -1489,7 +1489,7 @@ PIO_accept(theINTERP, PMC *pmc)
     ParrotIO * const io = PMC_data(pmc);
 
     /* XXX - return NULL or -1 -- c (02 July 2006) */
-    if(!io)
+    if (!io)
         return NULL;
 
     io2 = PIO_accept_down(interp, l, io);

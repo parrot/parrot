@@ -167,9 +167,9 @@ PIO_win32_init(theINTERP, ParrotIOLayer *layer)
     /* Start Winsock
      * no idea where or whether destroy it
      */
-    ret = WSAStartup (2, &sockinfo);
+    ret = WSAStartup(2, &sockinfo);
     if (ret != 0) {
-        fprintf ( stderr, "WSAStartup failed!!\n ErrorCode=%i\n\n",
+        fprintf( stderr, "WSAStartup failed!!\n ErrorCode=%i\n\n",
                   WSAGetLastError());
         return -4;
     }
@@ -535,7 +535,7 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     int family = AF_INET;
 
     char * s = string_to_cstring(interp, addr);
-    sa.sin_addr.s_addr = inet_addr (s);
+    sa.sin_addr.s_addr = inet_addr(s);
     /* Maybe it is a hostname, try to lookup */
     /* XXX Check PIO option before doing a name lookup,
      * it may have been toggled off.

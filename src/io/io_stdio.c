@@ -389,7 +389,7 @@ PIO_stdio_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
     UNUSED(interp);
     UNUSED(layer);
 
-    return(fwrite(buffer, 1, len, (FILE*)io->fd));
+    return (fwrite(buffer, 1, len, (FILE*)io->fd));
 }
 
 /*
@@ -442,7 +442,7 @@ PIO_stdio_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     UNUSED(interp);
     UNUSED(layer);
 
-    return(ftell((FILE*)io->fd));
+    return (ftell((FILE*)io->fd));
 }
 
 const ParrotIOLayerAPI pio_stdio_layer_api = {

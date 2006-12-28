@@ -264,8 +264,8 @@ PIO_unix_async(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL b)
 {
     int rflags;
 #    if defined(linux)
-    if((rflags = fcntl(io->fd, F_GETFL, 0)) >= 0) {
-        if(b)
+    if ((rflags = fcntl(io->fd, F_GETFL, 0)) >= 0) {
+        if (b)
             rflags |= O_ASYNC;
         else
             rflags &= ~O_ASYNC;
@@ -663,7 +663,7 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
          */
         struct hostent *he = gethostbyname(s);
         /* XXX FIXME - Handle error condition better */
-        if(!he) {
+        if (!he) {
             string_cstring_free(s);
             fprintf(stderr, "gethostbyname failure [%s]\n", s);
             return NULL;
@@ -735,7 +735,7 @@ PIO_unix_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
 AGAIN:
     if ((connect(io->fd, (struct sockaddr*)&io->remote,
                     sizeof (struct sockaddr_in))) != 0) {
-        switch(errno) {
+        switch (errno) {
             case EINTR:
                 goto AGAIN;
             case EINPROGRESS:
@@ -877,7 +877,7 @@ AGAIN:
         goto AGAIN;
     }
     else {
-        switch(errno) {
+        switch (errno) {
             case EINTR:
                 goto AGAIN;
 #    ifdef EWOULDBLOCK
@@ -985,18 +985,18 @@ PIO_unix_poll(theINTERP, ParrotIOLayer *l, ParrotIO *io, int which,
     t.tv_usec = usec;
     FD_ZERO(&r); FD_ZERO(&w); FD_ZERO(&e);
     /* These should be defined in header */
-    if(which & 1) FD_SET(io->fd, &r);
-    if(which & 2) FD_SET(io->fd, &w);
-    if(which & 4) FD_SET(io->fd, &e);
+    if (which & 1) FD_SET(io->fd, &r);
+    if (which & 2) FD_SET(io->fd, &w);
+    if (which & 4) FD_SET(io->fd, &e);
 AGAIN:
-    if((select(io->fd+1, &r, &w, &e, &t)) >= 0) {
+    if ((select(io->fd+1, &r, &w, &e, &t)) >= 0) {
         n = (FD_ISSET(io->fd, &r) ? 1 : 0);
         n |= (FD_ISSET(io->fd, &w) ? 2 : 0);
         n |= (FD_ISSET(io->fd, &e) ? 4 : 0);
         return n;
     }
     else {
-        switch(errno) {
+        switch (errno) {
             case EINTR:        goto AGAIN;
             default:           return -1;
         }

@@ -268,7 +268,7 @@ PIO_buf_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     ParrotIOLayer * const l = PIO_DOWNLAYER(layer);
     PIO_buf_flush(interp, layer, io);
 
-    return PIO_close_down (interp, l, io);
+    return PIO_close_down(interp, l, io);
 }
 
 /*
