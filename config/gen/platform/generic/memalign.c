@@ -3,7 +3,7 @@
  */
 
 #if defined(PARROT_HAS_POSIX_MEMALIGN)
-#include <stdlib.h>
+#  include <stdlib.h>
 
 void *
 Parrot_memalign(size_t align, size_t size)
@@ -15,11 +15,11 @@ Parrot_memalign(size_t align, size_t size)
 
 #elif defined(PARROT_HAS_MEMALIGN)
 
-#if defined(PARROT_HAS_HEADER_MALLOC)
-#include <malloc.h>
-#else
-#include <stdlib.h>
-#endif
+#  if defined(PARROT_HAS_HEADER_MALLOC)
+#    include <malloc.h>
+#  else
+#    include <stdlib.h>
+#  endif
 
 void *
 Parrot_memalign(size_t align, size_t size)

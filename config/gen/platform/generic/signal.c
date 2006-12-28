@@ -3,7 +3,7 @@
  */
 
 #ifdef PARROT_HAS_HEADER_SIGNAL
-#include <signal.h>
+#  include <signal.h>
 /*
  * for now use signal based functions
  */

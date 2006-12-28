@@ -9,11 +9,11 @@ INTVAL
 Parrot_intval_time(void)
 {
 #if _MSC_VER >= 1400
-#if INTVAL_SIZE <= 4
+#  if INTVAL_SIZE <= 4
     return _time32(NULL);
-#else
+#  else
     return _time64(NULL);
-#endif
+#  endif
 #else
     return time(NULL);
 #endif

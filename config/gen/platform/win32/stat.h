@@ -7,7 +7,7 @@
 #endif
 
 #ifndef S_IFBLK
-# define S_IFBLK 0060000
+#  define S_IFBLK 0060000
 #endif
 
 #ifndef S_ISBLK
