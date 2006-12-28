@@ -10,7 +10,7 @@ bcg_unit_create(BCG_info * bcg_info, char *name, char *pragma)
 {
     bcg_unit *unit;
 
-    unit = (bcg_unit *) mem_sys_allocate_zeroed(sizeof(bcg_unit));
+    unit = (bcg_unit *) mem_sys_allocate_zeroed(sizeof (bcg_unit));
     unit->name = name;
     unit->pragma = get_pargma_type(bcg_info, pragma);
     mem_sys_free(pragma);

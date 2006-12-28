@@ -43,7 +43,7 @@ This method creates a BCG_info PMC instance
 =cut
 
 */
-    void init ()
+    void init()
     {
         BCG_info *bcg_info;
 
@@ -61,7 +61,7 @@ This method destroys BCG_info PMC instance.
 =cut
 
 */
-    void destroy ()
+    void destroy()
     {
         if (PMC_struct_val(SELF)) {
             BCG_destroy( (BCG_info*) PMC_struct_val(SELF));

@@ -10,7 +10,7 @@ bcg_op_arg_create(BCG_info * bcg_info, char *name, bcg_op_arg_type type,
     bcg_op_arg *op_arg;
 
     UNUSED(bcg_info);
-    op_arg = (bcg_op_arg *) mem_sys_allocate_zeroed(sizeof(bcg_op_arg));
+    op_arg = (bcg_op_arg *) mem_sys_allocate_zeroed(sizeof (bcg_op_arg));
     op_arg->name = name;
     op_arg->is_constant = type;
     op_arg->data_type = data_type;
@@ -32,7 +32,7 @@ bcg_op_create(BCG_info * bcg_info, char *name, bcg_op_type op_type)
     bcg_op *op;
 
     UNUSED(bcg_info);
-    op = (bcg_op *) mem_sys_allocate_zeroed(sizeof(bcg_op));
+    op = (bcg_op *) mem_sys_allocate_zeroed(sizeof (bcg_op));
     op->name = name;
     op->op_arg_count = 0;
     op->type = op_type;
@@ -61,12 +61,12 @@ bcg_op_add_arg(BCG_info * bcg_info, bcg_op * op, bcg_op_arg * op_arg)
 
     if (op->op_arg_count == 1) {
         op->op_args =
-            (bcg_op_arg **) mem_sys_allocate_zeroed(sizeof(bcg_op_arg *));
+            (bcg_op_arg **) mem_sys_allocate_zeroed(sizeof (bcg_op_arg *));
     }
     else {
         op->op_args =
             (bcg_op_arg **) mem_sys_realloc(op->op_args,
-                                            sizeof(bcg_op_arg *) *
+                                            sizeof (bcg_op_arg *) *
                                             (op->op_arg_count));
     }
     op->op_args[op->op_arg_count - 1] = op_arg;
@@ -92,7 +92,7 @@ bcg_op_resolve_full_name(BCG_info * bcg_info, bcg_op * op)
         }
     }
 
-    full_name = (char *)mem_sys_allocate_zeroed(sizeof(char) * strlen(buffer));
+    full_name = (char *)mem_sys_allocate_zeroed(sizeof (char) * strlen(buffer));
     strcpy(full_name, buffer);
     op->full_name = full_name;
 }

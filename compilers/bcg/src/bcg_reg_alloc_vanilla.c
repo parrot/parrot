@@ -9,7 +9,7 @@ reg_alloc_vanilla(BCG_info * bcg_info, bcg_unit * unit)
     bcg_op *op;
     int *reg_count;
 
-    reg_count = (int *)mem_sys_allocate_zeroed(sizeof(int) * 4);
+    reg_count = (int *)mem_sys_allocate_zeroed(sizeof (int) * 4);
     op = unit->first_op;
 
     while (op) {

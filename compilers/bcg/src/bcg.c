@@ -48,7 +48,7 @@ BCG_create(void)
 {
     BCG_info *bcg_info;
 
-    bcg_info = (BCG_info *) mem_sys_allocate_zeroed(sizeof(BCG_info));
+    bcg_info = (BCG_info *) mem_sys_allocate_zeroed(sizeof (BCG_info));
     bcg_info->private_info = bcg_info_private_create(bcg_info);
     BCG_INFO_PRIV(bcg_info)->state = 0;
     set_state(bcg_info, BCG_STATE_INIT);
@@ -253,7 +253,7 @@ bcg_info_private_create(BCG_info * bcg_info)
 
     UNUSED(bcg_info);
     bcg_info_priv = (bcg_info_private *)
-        mem_sys_allocate_zeroed(sizeof(bcg_info_private));
+        mem_sys_allocate_zeroed(sizeof (bcg_info_private));
     return bcg_info_priv;
 }
 
