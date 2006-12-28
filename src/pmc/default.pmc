@@ -231,7 +231,7 @@ Compares C<*method> and C<*what>.
 */
 
 static INTVAL
-does_isa (Interp* interp, STRING *method, STRING *what)
+does_isa(Interp* interp, STRING *method, STRING *what)
 {
     INTVAL len, pos = 0;
 
@@ -253,7 +253,7 @@ does_isa (Interp* interp, STRING *method, STRING *what)
             continue;
         }
         return 1;
-    } while(1);
+    } while (1);
     return 0;
 }
 
@@ -275,7 +275,7 @@ Does nothing.
 
 */
 
-    void init () {
+    void init() {
     }
 
 /*
@@ -288,7 +288,7 @@ With a null C<initializer>, calls C<init()>, else throws an exception.
 
 */
 
-    void init_pmc (PMC* initializer) {
+    void init_pmc(PMC* initializer) {
         if (PMC_IS_NULL(initializer))
             DYNSELF.init();
         else
@@ -325,7 +325,7 @@ Panics with a "no custom mark routine defined" error message.
 
 */
 
-    void mark () {
+    void mark() {
         PANIC("custom_mark flag set but no custom mark routine defined");
     }
 
@@ -429,7 +429,7 @@ Returns the PMC's type.
 
 */
 
-    INTVAL type () {
+    INTVAL type() {
         return SELF->vtable->base_type;
     }
 
@@ -444,7 +444,7 @@ C<type_keyed()> with it.
 
 */
 
-    INTVAL type_keyed_int (INTVAL key) {
+    INTVAL type_keyed_int(INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.type_keyed(r_key);
     }
@@ -459,7 +459,7 @@ Returns the name of the PMC.
 
 */
 
-    STRING* name () {
+    STRING* name() {
         return SELF->vtable->whoami;
     }
 
@@ -508,7 +508,7 @@ C<get_integer_keyed()> with it.
 
 */
 
-    INTVAL get_integer_keyed_int (INTVAL key) {
+    INTVAL get_integer_keyed_int(INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_integer_keyed(r_key);
     }
@@ -524,7 +524,7 @@ C<get_number_keyed()> with it.
 
 */
 
-    FLOATVAL get_number_keyed_int (INTVAL key) {
+    FLOATVAL get_number_keyed_int(INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_number_keyed(r_key);
     }
@@ -541,7 +541,7 @@ C<get_string_keyed()> with it.
 
 */
 
-    STRING* get_string_keyed_int (INTVAL key) {
+    STRING* get_string_keyed_int(INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_string_keyed(r_key);
     }
@@ -557,7 +557,7 @@ C<get_bool_keyed()> with it.
 
 */
 
-    INTVAL get_bool_keyed_int (INTVAL key) {
+    INTVAL get_bool_keyed_int(INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_bool_keyed(r_key);
     }
@@ -573,7 +573,7 @@ C<elements_keyed()> with it.
 
 */
 
-    INTVAL elements_keyed_int (INTVAL key) {
+    INTVAL elements_keyed_int(INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.elements_keyed(r_key);
     }
@@ -590,7 +590,7 @@ C<get_pmc_keyed()> with it.
 
 */
 
-    PMC* get_pmc_keyed_int (INTVAL key) {
+    PMC* get_pmc_keyed_int(INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_pmc_keyed(r_key);
     }
@@ -605,7 +605,7 @@ Returns the address of the PMC.
 
 */
 
-    void* get_pointer () {
+    void* get_pointer() {
         return SELF;
     }
 
@@ -619,15 +619,15 @@ Returns whether the PMC is numerically equal to C<value>.
 
 */
 
-    INTVAL is_same (PMC* value) {
+    INTVAL is_same(PMC* value) {
         return SELF == value;
     }
 
 /*
 
-=item C<void assign_pmc (PMC* value)>
+=item C<void assign_pmc(PMC* value)>
 
-=item C<void assign_string_native (PMC* value)>
+=item C<void assign_string_native(PMC* value)>
 
 Defaults fall back to C<set_pmc> and C<set_string_native>.
 
@@ -635,7 +635,7 @@ Defaults fall back to C<set_pmc> and C<set_string_native>.
 
 */
 
-    void assign_pmc (PMC* value) {
+    void assign_pmc(PMC* value) {
         STRING *undef = string_from_const_cstring(INTERP, "Undef", 5);
 
         if (VTABLE_isa(INTERP, value, undef))
@@ -644,13 +644,13 @@ Defaults fall back to C<set_pmc> and C<set_string_native>.
             DYNSELF.set_pmc(value);
     }
 
-    void assign_string_native (STRING* value) {
+    void assign_string_native(STRING* value) {
         DYNSELF.set_string_native(value);
     }
 
 /*
 
-=item C<void morph (INTVAL type)>
+=item C<void morph(INTVAL type)>
 
 Changes the PMC to a PMC of a new type
 
@@ -658,13 +658,13 @@ Changes the PMC to a PMC of a new type
 
 */
 
-    void morph (INTVAL type) {
+    void morph(INTVAL type) {
         pmc_reuse(INTERP, SELF, type, 0);
     }
 
 /*
 
-=item C<void set_integer_keyed_int (INTVAL key, INTVAL value)>
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
 
 Converts C<key> to a PMC key and calls C<set_integer_keyed()> with it
 and C<value>.
@@ -673,14 +673,14 @@ and C<value>.
 
 */
 
-    void set_integer_keyed_int (INTVAL key, INTVAL value) {
+    void set_integer_keyed_int(INTVAL key, INTVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_integer_keyed(r_key, value);
     }
 
 /*
 
-=item C<void set_number_keyed_int (INTVAL key, FLOATVAL value)>
+=item C<void set_number_keyed_int(INTVAL key, FLOATVAL value)>
 
 Converts C<key> to a PMC key and calls C<set_number_keyed()> with it
 and C<value>.
@@ -689,7 +689,7 @@ and C<value>.
 
 */
 
-    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+    void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_number_keyed(r_key, value);
     }
@@ -706,7 +706,7 @@ and C<value>.
 
 */
 
-    void set_string_keyed_int (INTVAL key, STRING* string) {
+    void set_string_keyed_int(INTVAL key, STRING* string) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_string_keyed(r_key, string);
     }
@@ -722,7 +722,7 @@ and C<value>.
 
 */
 
-    void set_bool_keyed_int (INTVAL key, INTVAL value) {
+    void set_bool_keyed_int(INTVAL key, INTVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_bool_keyed(r_key, value);
     }
@@ -738,7 +738,7 @@ and C<value>.
 
 */
 
-    void set_pmc_keyed_int (INTVAL key, PMC* value) {
+    void set_pmc_keyed_int(INTVAL key, PMC* value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_pmc_keyed(r_key, value);
     }
@@ -753,7 +753,7 @@ Returns whether the PMC is equal to C<*value>.
 
 */
 
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
         return (SELF->vtable == value->vtable
             && PMC_struct_val(SELF) == PMC_struct_val(value)
             && PMC_data(SELF) == PMC_data(value));
@@ -769,7 +769,7 @@ Returns whether the PMC is numerically equal to C<*value>.
 
 */
 
-    INTVAL is_equal_num (PMC* value) {
+    INTVAL is_equal_num(PMC* value) {
         return (VTABLE_get_number(INTERP, SELF) ==
                 VTABLE_get_number(INTERP, value));
     }
@@ -784,7 +784,7 @@ Returns whether the PMC is numerically equal to C<*value>.
 
 */
 
-    INTVAL is_equal_str (PMC* value) {
+    INTVAL is_equal_str(PMC* value) {
         return (0 == string_equal(INTERP, VTABLE_get_string(INTERP, SELF),
                                        VTABLE_get_string(INTERP, value)));
     }
@@ -802,7 +802,7 @@ C<exists_keyed()> with it.
 
 */
 
-    INTVAL exists_keyed_int (INTVAL key) {
+    INTVAL exists_keyed_int(INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.exists_keyed(r_key);
     }
@@ -817,7 +817,7 @@ Returns true.
 
 */
 
-    INTVAL defined () {
+    INTVAL defined() {
         return 1;
     }
 
@@ -833,7 +833,7 @@ C<defined_keyed()> with it.
 
 */
 
-    INTVAL defined_keyed_int (INTVAL key) {
+    INTVAL defined_keyed_int(INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.defined_keyed(r_key);
     }
@@ -864,7 +864,7 @@ C<nextkey_keyed()> with it.
 
 */
 
-    PMC* nextkey_keyed_int (INTVAL key, INTVAL w) {
+    PMC* nextkey_keyed_int(INTVAL key, INTVAL w) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.nextkey_keyed(r_key, w);
     }
@@ -879,7 +879,7 @@ Returns whether the PMC "can" perform C<*method>.
 
 */
 
-    INTVAL can (STRING* method) {
+    INTVAL can(STRING* method) {
         return VTABLE_find_method(INTERP, SELF, method) != NULL;
     }
 
@@ -907,7 +907,7 @@ Returns whether the PMC "isa" C<*class>.
 
 */
 
-    INTVAL isa (STRING* class) {
+    INTVAL isa(STRING* class) {
         /* TODO FIXME - walk mro */
         return does_isa(INTERP, class, SELF->vtable->isa_str);
     }

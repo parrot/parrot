@@ -23,17 +23,17 @@ is initialized.
 
 pmclass STMLog {
 
-    void init () {
+    void init() {
         PMC_struct_val(SELF) = Parrot_STM_extract(INTERP);
         PObj_active_destroy_SET(SELF);
         PObj_custom_mark_SET(SELF);
     }
 
-    void destroy () {
+    void destroy() {
         Parrot_STM_destroy_extracted(INTERP, PMC_struct_val(SELF));
     }
 
-    void mark () {
+    void mark() {
         Parrot_STM_mark_extracted(INTERP, PMC_struct_val(SELF));
     }
 

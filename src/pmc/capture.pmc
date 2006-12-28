@@ -50,8 +50,8 @@ Free structures.
 
 */
 
-    void init () {
-        PMC_data(SELF) = mem_sys_allocate(sizeof(Capture_data));
+    void init() {
+        PMC_data(SELF) = mem_sys_allocate(sizeof (Capture_data));
         CAPTURE_array(SELF) = NULL;
         CAPTURE_hash(SELF) = NULL;
         PMC_int_val(SELF) = CAPTURE_DATA_SIZE;
@@ -59,7 +59,7 @@ Free structures.
         PObj_data_is_PMC_array_SET(SELF);
     }
 
-    void destroy () {
+    void destroy() {
         if (PMC_data(SELF)) {
             mem_sys_free(PMC_data(SELF));
             PMC_data(SELF) = NULL;

@@ -189,11 +189,11 @@ useful defaults and don't throw exceptions.
 
 */
 
-    void init () {
+    void init() {
         noarg_noreturn(INTERP, SELF, SELF, PARROT_VTABLE_INIT_METHNAME, 0);
     }
 
-    void init_pmc (PMC* class) {
+    void init_pmc(PMC* class) {
         noarg_noreturn(INTERP, SELF, class, PARROT_VTABLE_INIT_METHNAME, 0);
     }
 

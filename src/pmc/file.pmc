@@ -203,7 +203,7 @@ free to change or give me hints on how to change it. -- ambs
             if (target) {
                 char buf[CHUNK_SIZE];
                 int bytes_read, bytes_written;
-                while(!feof(source)) {
+                while (!feof(source)) {
                     bytes_read = fread(buf, 1, CHUNK_SIZE, source);
                     if (bytes_read) {
                         bytes_written = fwrite(buf, 1, bytes_read, target);

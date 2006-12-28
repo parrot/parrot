@@ -79,11 +79,11 @@ pmclass Undef extends default no_ro {
     return 0;
   }
 
-  void share () {
+  void share() {
     /* see src/pmc/integer.pmc */
   }
 
-  PMC* share_ro () {
+  PMC* share_ro() {
     if (PObj_is_PMC_shared_TEST(SELF)) {
         return SELF;
     }

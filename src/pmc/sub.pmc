@@ -69,7 +69,7 @@ Initializes the subroutine.
      *   PMC_struct_val ... Parrot_sub structure
      *   PMC_pmc_val    ... unused / bound object in Bound_Meth PMC
      */
-    void init () {
+    void init() {
         PMC_struct_val(SELF) = new_sub(INTERP);
         PMC_pmc_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -90,7 +90,7 @@ Destroys the subroutine.
 
 */
 
-    void destroy () {
+    void destroy() {
         struct Parrot_sub * const sub = PMC_sub(SELF);
         if (!sub)
             return;
@@ -119,7 +119,7 @@ Sets the name of the subroutine.
 
 */
 
-    STRING* get_string () {
+    STRING* get_string() {
         return Parrot_full_sub_name(INTERP, SELF);
     }
 
@@ -140,7 +140,7 @@ Sets the pointer to the actual subroutine.
 
 */
 
-    void set_pointer (void* value) {
+    void set_pointer(void* value) {
         real_exception(INTERP, NULL, E_NotImplementedError,
                 "Don't set the address of a sub\n"
                 "use .Sub constants instead");
@@ -156,7 +156,7 @@ Returns the address of the actual subroutine.
 
 */
 
-    void* get_pointer () {
+    void* get_pointer() {
         struct Parrot_sub * const sub = PMC_sub(SELF);
         return sub->seg->base.data + sub->start_offs;
     }
@@ -173,7 +173,7 @@ now.> -DRS
 
 */
 
-    INTVAL get_integer_keyed (PMC* key) {
+    INTVAL get_integer_keyed(PMC* key) {
         return (INTVAL) ((PMC_sub(SELF))->seg->base.data);
     }
 
@@ -189,12 +189,12 @@ Returns True.
 
 */
 
-    INTVAL defined () {
+    INTVAL defined() {
         struct Parrot_sub * const sub = PMC_sub(SELF);
         return 1;
     }
 
-    INTVAL get_bool () {
+    INTVAL get_bool() {
         struct Parrot_sub * const sub = PMC_sub(SELF);
         return 1;
     }
@@ -209,7 +209,7 @@ Invokes the subroutine.
 
 */
 
-    void* invoke (void* next) {
+    void* invoke(void* next) {
         struct Parrot_sub * sub = PMC_sub(SELF);
         parrot_context_t *caller_ctx;
         struct Parrot_Context *context;
@@ -249,7 +249,7 @@ Invokes the subroutine.
             ccont = new_ret_continuation_pmc(interp, next);
         }
 
-        assert (!PMC_IS_NULL(ccont));
+        assert(!PMC_IS_NULL(ccont));
         /*
          * plain subroutine call
          * create new context, place it in interpreter
@@ -333,18 +333,18 @@ Creates and returns a clone of the subroutine.
 
 */
 
-    PMC* clone () {
+    PMC* clone() {
         struct Parrot_sub * sub;
         PMC* const ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         /*
          * we have to mark it ourselves
          */
         PObj_custom_mark_destroy_SETALL(ret);
-        sub = mem_sys_allocate(sizeof(struct Parrot_sub));
+        sub = mem_sys_allocate(sizeof (struct Parrot_sub));
         /* first set the sub struct, string_copy may cause GC */
         PMC_struct_val(ret) = sub;
         PMC_pmc_val(ret) = NULL;
-        memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_sub));
+        memcpy(sub, PMC_sub(SELF), sizeof (struct Parrot_sub));
         sub->name = string_copy(INTERP, sub->name);
         return ret;
     }
@@ -359,7 +359,7 @@ Marks the sub as live.
 
 */
 
-    void mark () {
+    void mark() {
         struct Parrot_sub * const sub = PMC_sub(SELF);
         if (!sub)
             return;
@@ -383,7 +383,7 @@ Returns whether the two subroutines are equal.
 
 */
 
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
         return SELF->vtable == value->vtable &&
             (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs &&
             (PMC_sub(SELF))->seg == (PMC_sub(value))->seg;

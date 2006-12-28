@@ -48,7 +48,7 @@ the next one.
         return ok;
     }
 
-    PMC* shift_pmc () {
+    PMC* shift_pmc() {
         PMC *key = PMC_struct_val(SELF);
         PMC *iter = PMC_pmc_val(SELF);
         PMC *item, *tupl, *val;

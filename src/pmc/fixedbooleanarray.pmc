@@ -78,7 +78,7 @@ Initializes the array.
 
 */
 
-    void init () {
+    void init() {
         booleanarray_init(INTERP, SELF);
         PObj_active_destroy_SET(SELF);
     }
@@ -109,7 +109,7 @@ Destroys the array.
 
 */
 
-    void destroy () {
+    void destroy() {
         booleanarray_clear(INTERP, SELF);
     }
 
@@ -123,7 +123,7 @@ Creates and returns a copy of the array.
 
 */
 
-    PMC* clone () {
+    PMC* clone() {
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
         booleanarray_clone(INTERP, SELF, dest);
         PObj_active_destroy_SET(dest);
@@ -140,7 +140,7 @@ fixed sized array).
 =cut
 
 */
-    INTVAL get_bool () {
+    INTVAL get_bool() {
         return SELF.elements() ? 1 : 0;
     }
 
@@ -152,7 +152,7 @@ fixed sized array).
 
 */
 
-    INTVAL elements () {
+    INTVAL elements() {
         return PMC_int_val(SELF);
     }
 
@@ -166,7 +166,7 @@ Returns the number of elements in the array.
 
 */
 
-    INTVAL get_integer () {
+    INTVAL get_integer() {
         return SELF.elements();
     }
 
@@ -181,7 +181,7 @@ Returns the integer value of the element at index C<key>.
 
 */
 
-    INTVAL get_integer_keyed_int (INTVAL key) {
+    INTVAL get_integer_keyed_int(INTVAL key) {
         Parrot_UInt1 *sd = PMC_data(SELF);
 
         if (key < 0 || key >= PMC_int_val(SELF))
@@ -201,7 +201,7 @@ Returns the integer value of the element at index C<*key>.
 
 */
 
-    INTVAL get_integer_keyed (PMC* key) {
+    INTVAL get_integer_keyed(PMC* key) {
         /* simple int keys only */
         INTVAL k = key_integer(INTERP, key);
         return SELF.get_integer_keyed_int(k);
@@ -218,13 +218,13 @@ Returns the floating-point value of the element at index C<key>.
 
 */
 
-    FLOATVAL get_number_keyed_int (INTVAL key) {
+    FLOATVAL get_number_keyed_int(INTVAL key) {
         return (FLOATVAL)DYNSELF.get_integer_keyed_int(key);
     }
 
 /*
 
-=item C<FLOATVAL get_number_keyed (PMC* key)>
+=item C<FLOATVAL get_number_keyed(PMC* key)>
 
 Returns the floating-point value of the element at index C<*key>.
 
@@ -232,7 +232,7 @@ Returns the floating-point value of the element at index C<*key>.
 
 */
 
-    FLOATVAL get_number_keyed (PMC* key) {
+    FLOATVAL get_number_keyed(PMC* key) {
         INTVAL k = key_integer(INTERP, key);
         return DYNSELF.get_number_keyed_int(k);
     }
@@ -247,7 +247,7 @@ Returns the Parrot string value of the element at index C<key>.
 
 */
 
-    STRING* get_string_keyed_int (INTVAL key) {
+    STRING* get_string_keyed_int(INTVAL key) {
         PMC *val = DYNSELF.get_pmc_keyed_int(key);
         return VTABLE_get_string(INTERP, val);
     }
@@ -278,7 +278,7 @@ Returns the PMC value of the element at index C<key>.
 
 */
 
-    PMC* get_pmc_keyed_int (INTVAL key) {
+    PMC* get_pmc_keyed_int(INTVAL key) {
         PMC *ret = pmc_new(INTERP, enum_class_Boolean);
         INTVAL val = DYNSELF.get_integer_keyed_int(key);
         VTABLE_set_integer_native(INTERP, ret, val);
@@ -310,7 +310,7 @@ Resizes the array to C<size> elements.
 
 */
 
-    void set_integer_native (INTVAL size) {
+    void set_integer_native(INTVAL size) {
         if (PMC_int_val(SELF) || size < 1)
             real_exception(INTERP, NULL, E_IndexError,
                     "FixedBooleanArray: Can't resize!");
@@ -331,7 +331,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    void set_integer_keyed_int (INTVAL key, INTVAL value) {
+    void set_integer_keyed_int(INTVAL key, INTVAL value) {
         Parrot_UInt1 *sd = PMC_data(SELF);
 
         if (key < 0 || key >= PMC_int_val(SELF))
@@ -356,7 +356,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    void set_integer_keyed (PMC *key, INTVAL value) {
+    void set_integer_keyed(PMC *key, INTVAL value) {
         INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_integer_keyed_int(k, value);
     }
@@ -372,7 +372,7 @@ C<value>.
 
 */
 
-    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+    void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         DYNSELF.set_integer_keyed_int(key, ( value ? 1 : 0 ));
     }
 
@@ -402,7 +402,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
 */
 
-    void set_string_keyed_int (INTVAL key, STRING* value) {
+    void set_string_keyed_int(INTVAL key, STRING* value) {
         INTVAL tempInt;
         PMC *tempPMC;
 
@@ -438,7 +438,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
 */
 
-    void set_pmc_keyed_int (INTVAL key, PMC* src) {
+    void set_pmc_keyed_int(INTVAL key, PMC* src) {
         INTVAL tempInt;
 
         tempInt = VTABLE_get_integer(INTERP, src);
@@ -464,7 +464,7 @@ C<value>.
 
 /*
 
-=item C<void push_integer (INTVAL value)>
+=item C<void push_integer(INTVAL value)>
 
 Extends the array by adding an element of value C<value> to the end of
 the array.
@@ -473,7 +473,7 @@ the array.
 
 */
 
-    void push_integer (INTVAL value) {
+    void push_integer(INTVAL value) {
         INTVAL nextix = DYNSELF.elements();
         DYNSELF.set_integer_keyed_int(nextix, value);
     }

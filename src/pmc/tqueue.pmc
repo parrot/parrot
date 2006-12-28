@@ -45,7 +45,7 @@ Initializes the queue.
 
 */
 
-    void init () {
+    void init() {
         PMC_int_val(SELF) = 0;
         PMC_data(SELF) = queue_init(0);
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -76,7 +76,7 @@ Marks all the threads in the queue as live.
 
 */
 
-    void mark () {
+    void mark() {
         QUEUE *queue = PMC_data(SELF);
         QUEUE_ENTRY *entry;
 
@@ -101,7 +101,7 @@ Destroys the queue.
 
 */
 
-    void destroy () {
+    void destroy() {
         if (PMC_data(SELF)) {
             QUEUE *queue = PMC_data(SELF);
 #if 0
@@ -131,7 +131,7 @@ Returns whether there are any threads in the queue.
 
 */
 
-    INTVAL defined () {
+    INTVAL defined() {
         return SELF.get_integer() != 0;
     }
 
@@ -143,7 +143,7 @@ Returns whether there are any threads in the queue.
 
 */
 
-    INTVAL get_integer () {
+    INTVAL get_integer() {
         INTVAL items;
         QUEUE *queue = PMC_data(SELF);
 
@@ -161,7 +161,7 @@ Returns the number of threads in the queue.
 
 */
 
-    INTVAL elements () {
+    INTVAL elements() {
         return SELF.get_integer();
     }
 
@@ -176,7 +176,7 @@ Adds the thread C<*item> to the end of the queue.
 */
 
     void push_pmc(PMC *item) {
-        QUEUE_ENTRY* entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
+        QUEUE_ENTRY* entry = mem_sys_allocate(sizeof (QUEUE_ENTRY));
         QUEUE *queue = PMC_data(SELF);
 
         /*

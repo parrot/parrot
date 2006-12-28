@@ -59,7 +59,7 @@ Initializes the continuation.
 
 */
 
-    void init () {
+    void init() {
         PMC_struct_val(SELF) = new_continuation(INTERP, NULL);
         PMC_pmc_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -83,7 +83,7 @@ Marks the continuation as live.
 
 */
 
-    void mark () {
+    void mark() {
         struct Parrot_cont * cc = PMC_cont(SELF);
         if (cc->to_ctx)
             mark_context(INTERP, cc->to_ctx);
@@ -101,7 +101,7 @@ Destroys the continuation.
 
 */
 
-    void destroy () {
+    void destroy() {
         struct Parrot_cont * cc = PMC_cont(SELF);
         if (cc) {
 #if CTX_LEAK_DEBUG
@@ -154,7 +154,7 @@ Assign context.
         struct Parrot_cont *cc_self = PMC_cont(SELF);
         struct Parrot_cont *cc_src  = PMC_cont(src);
 
-        memcpy(cc_self, cc_src, sizeof(struct Parrot_cont));
+        memcpy(cc_self, cc_src, sizeof (struct Parrot_cont));
         PMC_pmc_val(SELF) = PMC_pmc_val(src);
     }
 /*
@@ -168,7 +168,7 @@ dynamic state, and the descriptor address for any returned values.
 
 */
 
-    void set_pointer (void* value) {
+    void set_pointer(void* value) {
         opcode_t *pos = value;
         struct Parrot_cont * cc = PMC_cont(SELF);
 
@@ -192,7 +192,7 @@ Returns the pointer to the return instruction.
 
 */
 
-    void* get_pointer () {
+    void* get_pointer() {
         return PMC_cont(SELF)->address;
     }
 /*
@@ -207,11 +207,11 @@ Returns whether the subroutine is defined.
 
 */
 
-    INTVAL defined () {
+    INTVAL defined() {
         return PMC_cont(SELF)->address != NULL;
     }
 
-    INTVAL get_bool () {
+    INTVAL get_bool() {
         return PMC_cont(SELF)->address != NULL;
     }
 
@@ -226,7 +226,7 @@ destination to continue execution.
 
 */
 
-    void* invoke (void* next) {
+    void* invoke(void* next) {
         struct Parrot_cont * cc = PMC_cont(SELF);
         Stack_Chunk_t *stack_target = cc->dynamic_state;
         Stack_Chunk_t *corresponding_target;

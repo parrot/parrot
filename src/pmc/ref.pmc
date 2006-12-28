@@ -35,7 +35,7 @@ Sets the referenced PMC to C<PMCNULL>.
 
 */
 
-    void init () {
+    void init() {
         SELF.init_pmc(PMCNULL);
     }
 
@@ -54,7 +54,7 @@ Sets the referenced PMC to C<initializer>.
 
 */
 
-    void init_pmc (PMC* initializer) {
+    void init_pmc(PMC* initializer) {
         PMC_pmc_val(SELF) = initializer; /* the referred PMC itself */
         PObj_custom_mark_SET(SELF);
         if (initializer) {
@@ -104,7 +104,7 @@ Marks the referenced PMC as live.
 
 */
 
-    void mark () {
+    void mark() {
         pobject_lives(INTERP, (PObj *) PMC_pmc_val(SELF));
     }
 

@@ -34,7 +34,7 @@ swap(void **x, void **y)
     *y = t;
 }
 
-typedef INTVAL (*sort_func_t)(Interp *, void*, void*);
+typedef INTVAL(*sort_func_t)(Interp *, void*, void*);
 
 static INTVAL
 COMPARE(Interp *interp, void *a, void *b, PMC *cmp)
@@ -121,7 +121,7 @@ Initializes the array.
 
 */
 
-    void init () {
+    void init() {
         PMC_int_val(SELF) = 0;
         PMC_data(SELF) = NULL;
         PObj_active_destroy_SET(SELF);
@@ -153,7 +153,7 @@ Destroys the array.
 
 */
 
-    void destroy () {
+    void destroy() {
         if (PMC_data(SELF)) {
             mem_sys_free(PMC_data(SELF));
             PMC_data(SELF) = NULL;
@@ -171,13 +171,13 @@ Creates and returns a copy of the array.
 
 */
 
-    PMC* clone () {
+    PMC* clone() {
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
         INTVAL size = PMC_int_val(SELF);
         if (size) {
             PMC_int_val(dest) = size;
-            PMC_data(dest) = mem_sys_allocate(size * sizeof(PMC*));
-            mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), size*sizeof(PMC*));
+            PMC_data(dest) = mem_sys_allocate(size * sizeof (PMC*));
+            mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), size*sizeof (PMC*));
             PObj_data_is_PMC_array_SET(dest);
         }
         return dest;
@@ -193,7 +193,7 @@ fixed sized array).
 =cut
 
 */
-    INTVAL get_bool () {
+    INTVAL get_bool() {
         INTVAL size = DYNSELF.elements();
         return (INTVAL)(size != 0);
     }
@@ -206,7 +206,7 @@ fixed sized array).
 
 */
 
-    INTVAL elements () {
+    INTVAL elements() {
         return PMC_int_val(SELF);
     }
 
@@ -220,7 +220,7 @@ Returns the number of elements in the array.
 
 */
 
-    INTVAL get_integer () {
+    INTVAL get_integer() {
         return DYNSELF.elements();
     }
 
@@ -239,11 +239,11 @@ TODO implement freeze/thaw and use that instead.
 
 */
 
-    STRING* get_string () {
+    STRING* get_string() {
         return string_from_int(INTERP, DYNSELF.elements());
     }
 
-    STRING* get_repr () {
+    STRING* get_repr() {
         STRING *res;
         INTVAL j, n;
         PMC *val;
@@ -277,7 +277,7 @@ Returns the integer value of the element at index C<key>.
 
 */
 
-    INTVAL get_integer_keyed_int (INTVAL key) {
+    INTVAL get_integer_keyed_int(INTVAL key) {
         PMC *tempPMC = DYNSELF.get_pmc_keyed_int(key);
         return VTABLE_get_integer(INTERP, tempPMC);
     }
@@ -292,7 +292,7 @@ Returns the integer value of the element at index C<*key>.
 
 */
 
-    INTVAL get_integer_keyed (PMC* key) {
+    INTVAL get_integer_keyed(PMC* key) {
         PMC *tempPMC;
 
         tempPMC = DYNSELF.get_pmc_keyed(key);
@@ -310,14 +310,14 @@ Returns the floating-point value of the element at index C<key>.
 
 */
 
-    FLOATVAL get_number_keyed_int (INTVAL key) {
+    FLOATVAL get_number_keyed_int(INTVAL key) {
         PMC *tempPMC = DYNSELF.get_pmc_keyed_int(key);
         return VTABLE_get_number(INTERP, tempPMC);
     }
 
 /*
 
-=item C<FLOATVAL get_number_keyed (PMC* key)>
+=item C<FLOATVAL get_number_keyed(PMC* key)>
 
 Returns the floating-point value of the element at index C<*key>.
 
@@ -325,7 +325,7 @@ Returns the floating-point value of the element at index C<*key>.
 
 */
 
-    FLOATVAL get_number_keyed (PMC* key) {
+    FLOATVAL get_number_keyed(PMC* key) {
         PMC *tempPMC;
 
         tempPMC = DYNSELF.get_pmc_keyed(key);
@@ -342,7 +342,7 @@ Returns the Parrot string value of the element at index C<key>.
 
 */
 
-    STRING* get_string_keyed_int (INTVAL key) {
+    STRING* get_string_keyed_int(INTVAL key) {
         PMC *tempPMC = DYNSELF.get_pmc_keyed_int(key);
         return VTABLE_get_string(INTERP, tempPMC);
     }
@@ -375,7 +375,7 @@ Returns the PMC value of the element at index C<key>.
 
 */
 
-    PMC* get_pmc_keyed_int (INTVAL key) {
+    PMC* get_pmc_keyed_int(INTVAL key) {
         PMC **data;
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
@@ -418,7 +418,7 @@ Resizes the array to C<size> elements.
 
 */
 
-    void set_integer_native (INTVAL size) {
+    void set_integer_native(INTVAL size) {
         int i;
         PMC **data;
 
@@ -428,8 +428,8 @@ Resizes the array to C<size> elements.
         if (!size)
             return;
         PMC_int_val(SELF) = size;
-        data = (PMC**)mem_sys_allocate(size * sizeof(PMC*));
-        for(i = 0; i < size; i++)
+        data = (PMC**)mem_sys_allocate(size * sizeof (PMC*));
+        for (i = 0; i < size; i++)
             data[i] = PMCNULL;
         PMC_data(SELF) = data;
     }
@@ -448,8 +448,8 @@ Resizes the array to C<size> elements.
         if (PMC_data(SELF))
             mem_sys_free(PMC_data(SELF));
         size = PMC_int_val(SELF) = PMC_int_val(value);
-        PMC_data(SELF) = mem_sys_allocate(size * sizeof(PMC*));
-        mem_sys_memcopy(PMC_data(SELF), PMC_data(value), size*sizeof(PMC*));
+        PMC_data(SELF) = mem_sys_allocate(size * sizeof (PMC*));
+        mem_sys_memcopy(PMC_data(SELF), PMC_data(value), size*sizeof (PMC*));
         PMC_int_val2(SELF) = size;
         PObj_data_is_PMC_array_SET(SELF);
     }
@@ -463,7 +463,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    void set_integer_keyed_int (INTVAL key, INTVAL value) {
+    void set_integer_keyed_int(INTVAL key, INTVAL value) {
         PMC *val;
 
         val = pmc_new(INTERP,
@@ -483,7 +483,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    void set_integer_keyed (PMC *key, INTVAL value) {
+    void set_integer_keyed(PMC *key, INTVAL value) {
         PMC *val;
 
         val = pmc_new(INTERP,
@@ -505,7 +505,7 @@ C<value>.
 
 */
 
-    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+    void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         PMC *val;
 
         val = pmc_new(INTERP,
@@ -557,7 +557,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
 */
 
-    void set_string_keyed_int (INTVAL key, STRING* value) {
+    void set_string_keyed_int(INTVAL key, STRING* value) {
         PMC *val;
 
         val = pmc_new(INTERP,
@@ -599,7 +599,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
 */
 
-    void set_pmc_keyed_int (INTVAL key, PMC* src) {
+    void set_pmc_keyed_int(INTVAL key, PMC* src) {
         PMC **data;
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
@@ -643,7 +643,7 @@ Sets the PMC at index C<key> to C<value>.
 
 /*
 
-=item C<INTVAL is_equal (PMC* value)>
+=item C<INTVAL is_equal(PMC* value)>
 
 The C<==> operation. Compares two array to hold equal elements.
 
@@ -651,7 +651,7 @@ The C<==> operation. Compares two array to hold equal elements.
 
 */
 
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
         INTVAL j, n;
 
         if (value->vtable->base_type != enum_class_FixedPMCArray)
@@ -673,13 +673,13 @@ The C<==> operation. Compares two array to hold equal elements.
 
 /*
 
-=item C<PMC* slice (PMC *key, INTVAL f)>
+=item C<PMC* slice(PMC *key, INTVAL f)>
 
 Return a new iterator for the slice PMC C<key> if f == 0.
 
 Return a new pythonic array slice if f == 1.
 
-=item C<PMC* get_iter ()>
+=item C<PMC* get_iter()>
 
 Return a new iterator for SELF.
 
@@ -687,7 +687,7 @@ Return a new iterator for SELF.
 
 */
 
-    PMC* slice (PMC* key, INTVAL f) {
+    PMC* slice(PMC* key, INTVAL f) {
         switch (f) {
             case 0:
                 {
@@ -701,7 +701,7 @@ Return a new iterator for SELF.
         return NULL;
     }
 
-    PMC* get_iter () {
+    PMC* get_iter() {
         PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
         PMC *key =  pmc_new(INTERP, enum_class_Key);
         PMC_struct_val(iter) = key;
@@ -723,7 +723,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
 =cut
 
 */
-    INTVAL exists_keyed_int (INTVAL key) {
+    INTVAL exists_keyed_int(INTVAL key) {
         PMC **data;
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
@@ -733,7 +733,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
         return !PMC_IS_NULL(data[key]);
     }
 
-    INTVAL exists_keyed (PMC* key) {
+    INTVAL exists_keyed(PMC* key) {
         INTVAL ix = key_integer(INTERP, key);
         return SELF.exists_keyed_int(ix);
     }
@@ -794,11 +794,11 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 
 */
 
-    INTVAL defined_keyed_int (INTVAL key) {
+    INTVAL defined_keyed_int(INTVAL key) {
         PMC* val;
 
         val = DYNSELF.get_pmc_keyed_int(key);
-        if(PMC_IS_NULL(val))
+        if (PMC_IS_NULL(val))
             return 0;
 
         return VTABLE_defined(INTERP, val);

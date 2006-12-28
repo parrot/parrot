@@ -35,7 +35,7 @@ Returns the floating-point value of the element at index C<key>.
 
 */
 
-    FLOATVAL get_number_keyed_int (INTVAL key) {
+    FLOATVAL get_number_keyed_int(INTVAL key) {
         FLOATVAL *data;
         if (key < 0)
             real_exception(interp, NULL, E_IndexError,
@@ -58,12 +58,12 @@ C<value>.
 
 */
 
-    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+    void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         FLOATVAL *data;
         if (key < 0)
             real_exception(interp, NULL, E_IndexError,
                     "ResizableFloatArray: index out of bounds!");
-        if(key >= PMC_int_val(SELF))
+        if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
         data = (FLOATVAL *)PMC_data(SELF);
@@ -87,12 +87,12 @@ equal to three quarters of the old size).
 
 */
 
-    void set_integer_native (INTVAL size) {
+    void set_integer_native(INTVAL size) {
         if (size < 0)
             real_exception(interp, NULL, E_IndexError,
                     "ResizableFloatArray: Can't resize to negative value!");
 
-        if(!PMC_data(SELF)) {
+        if (!PMC_data(SELF)) {
             /* empty - used fixed routine */
             if (size < 8) {
                 SUPER(8);
@@ -120,7 +120,7 @@ equal to three quarters of the old size).
                 cur &= ~0xfff;
             }
             PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF),
-                    cur * sizeof(FLOATVAL));
+                    cur * sizeof (FLOATVAL));
             PMC_int_val2(SELF) = cur;
             PMC_int_val(SELF) = size;
         }
@@ -136,7 +136,7 @@ Creates and returns a copy of the array.
 
 */
 
-    PMC* clone () {
+    PMC* clone() {
         PMC *copy = SUPER();
         /* copy trimmed extra space */
         PMC_int_val2(copy) = PMC_int_val(SELF);
@@ -153,7 +153,7 @@ Adds C<value> to the end of the array.
 
 */
 
-    void push_float (FLOATVAL value) {
+    void push_float(FLOATVAL value) {
         INTVAL nextix = DYNSELF.elements();
         DYNSELF.set_number_keyed_int(nextix, value);
     }
@@ -205,7 +205,7 @@ Removes and returns an item from the start of the array.
         data = (FLOATVAL *)PMC_data(SELF);
         value = data[0];
         PMC_int_val(SELF) = --size;
-        mem_sys_memmove(data, data + 1, size * sizeof(FLOATVAL));
+        mem_sys_memmove(data, data + 1, size * sizeof (FLOATVAL));
         return value;
     }
 
@@ -226,7 +226,7 @@ Add and integer to the start of the array.
         size = PMC_int_val(SELF);
         DYNSELF.set_integer_native(size + 1);
         data = (FLOATVAL *)PMC_data(SELF);
-        mem_sys_memmove(data + 1, data, size * sizeof(FLOATVAL));
+        mem_sys_memmove(data + 1, data, size * sizeof (FLOATVAL));
         data[0] = value;
     }
 

@@ -177,7 +177,7 @@ Class initialization.
 
 */
 
-    void class_init () {
+    void class_init() {
         int typ = enum_class_ParrotInterpreter;
 
         if (pass) {
@@ -205,7 +205,7 @@ Initializes the interpreter.
 
 */
 
-    void init () {
+    void init() {
         /*
          * init/init_pmc may be called internally (from thread creation in
          * ParrotThread::init_pmc() or stand-alone
@@ -231,7 +231,7 @@ C<parent> and uses that thread.
 
 */
 
-    void init_pmc (PMC *parent) {
+    void init_pmc(PMC *parent) {
         Parrot_Interp p = PMC_data(parent);
         if (!PMC_data(SELF)) {
             create_interp(SELF, p);
@@ -249,7 +249,7 @@ Sets C<struct_val> to C<*value>.
 
 */
 
-    void set_pointer (void* value) {
+    void set_pointer(void* value) {
         PMC_struct_val(SELF) = value;
     }
 
@@ -263,7 +263,7 @@ Returns C<struct_val>.
 
 */
 
-    void* get_pointer () {
+    void* get_pointer() {
         return PMC_struct_val(SELF);
     }
 
@@ -277,7 +277,7 @@ Returns the thread id of the interpreter.
 
 */
 
-    INTVAL get_integer () {
+    INTVAL get_integer() {
         Parrot_Interp i = PMC_data(SELF);
         return (INTVAL)i->thread_data->tid;
     }
@@ -292,7 +292,7 @@ Runs the interpreter's byte code.
 
 */
 
-    void* invoke (void* next) {
+    void* invoke(void* next) {
         Interp * new_interp =
             (Interp *)PMC_data(SELF);
         /*

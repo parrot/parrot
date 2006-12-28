@@ -38,7 +38,7 @@ we can relax that a bit.
 pmclass SharedRef does ref need_ext is_shared extends Ref {
 
 
-    void init () {
+    void init() {
         SUPER();
     }
 
@@ -86,7 +86,7 @@ We do already sharing - so just ignore.
 
 */
 
-    void share () {
+    void share() {
     }
 
 /*
@@ -99,7 +99,7 @@ Marks the reference as live.
 
 */
 
-    void mark () {
+    void mark() {
         SUPER();
     }
 
@@ -122,7 +122,7 @@ Catch dereferencing. This would unshare the referred PMC.
         PObj_active_destroy_SET(SELF);
     }
 
-    PMC* get_pmc () {
+    PMC* get_pmc() {
         real_exception(INTERP, NULL, E_ReferenceError,
                 "deref not allowed");
         return NULL;

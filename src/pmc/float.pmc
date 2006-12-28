@@ -95,7 +95,7 @@ Evaluates the number as a boolean, i.e. it's true if it's not zero.
 
 */
 
-    INTVAL get_bool () {
+    INTVAL get_bool() {
         return (INTVAL)(PMC_num_val(SELF) != 0.0);
     }
 
@@ -115,7 +115,7 @@ Returns a Parrot string representation of the number.
         return string_from_num(INTERP, PMC_num_val(SELF));
     }
 
-    STRING* get_repr () {
+    STRING* get_repr() {
         double d = (double) PMC_num_val(SELF);
         const char * const sign = signbit(PMC_num_val(SELF)) ? "-" : "";
         d = fabs(d);
@@ -132,12 +132,12 @@ Returns a Parrot string representation of the number.
 
 */
 
-    void set_integer_native (INTVAL value) {
+    void set_integer_native(INTVAL value) {
         DYNSELF.morph(enum_class_Integer);
         DYNSELF.set_integer_native(value);
     }
 
-    void set_bool (INTVAL value) {
+    void set_bool(INTVAL value) {
         DYNSELF.morph(enum_class_Boolean);
         DYNSELF.set_bool(value);
     }
@@ -166,7 +166,7 @@ Sets the value of the number to the value of C<*value>.
 
 */
 
-    void set_number_same (PMC* value) {
+    void set_number_same(PMC* value) {
         PMC_num_val(SELF) = PMC_num_val(value);
     }
 
@@ -182,7 +182,7 @@ Note that this method morphs the number into a C<String>.
 
 */
 
-    void set_string_native (STRING * value) {
+    void set_string_native(STRING * value) {
         DYNSELF.morph(enum_class_String);
         DYNSELF.set_string_native(value);
     }
@@ -210,7 +210,7 @@ Morphs the scalar to the specified type.
 
 */
 
-    void morph (INTVAL type) {
+    void morph(INTVAL type) {
         pmc_reuse(INTERP, SELF, type, 0);
     }
 
@@ -228,7 +228,7 @@ Set C<dest> to the negated value of C<SELF>.
 
 */
 
-    PMC* neg (PMC * dest) {
+    PMC* neg(PMC * dest) {
         const FLOATVAL a = - DYNSELF.get_number();
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
@@ -251,7 +251,7 @@ The C<==> operation.
 
 */
 
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
 MMD_Float: {
         return (INTVAL)(PMC_num_val(SELF) == PMC_num_val(value));
         }
@@ -260,7 +260,7 @@ MMD_DEFAULT: {
         }
     }
 
-    INTVAL is_equal_num (PMC* value) {
+    INTVAL is_equal_num(PMC* value) {
 MMD_Float: {
         return (INTVAL)(PMC_num_val(SELF) == PMC_num_val(value));
         }
@@ -323,7 +323,7 @@ Increments the number.
 
 */
 
-    void increment () {
+    void increment() {
         PMC_num_val(SELF) ++;
     }
 
@@ -337,7 +337,7 @@ Decrements the number.
 
 */
 
-    void decrement () {
+    void decrement() {
         PMC_num_val(SELF) --;
     }
 /*

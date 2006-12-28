@@ -48,19 +48,19 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
     else
 
 #define ENDTRY \
-    } while(0); \
+    } while (0); \
     do { \
         Parrot_exception *e = INTERP->exceptions; \
         INTERP->exceptions = e->prev; \
         INTERP->exc_free_list = e; \
-    } while(0)
+    } while (0)
 
 
 #define THROW(e)  \
     do { \
         exceptions->err = e; \
         longjmp(exceptions->dest, 1); \
-    } while(0)
+    } while (0)
 
 static void
 print_sub_name(Interp* interp, PMC* sub)
@@ -100,20 +100,20 @@ Clone the couroutine.
 
 */
 
-    void init () {
+    void init() {
         PMC_struct_val(SELF) = new_coroutine(INTERP);
         PMC_pmc_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
-    PMC* clone () {
+    PMC* clone() {
         struct Parrot_coro * sub;
         PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_destroy_SETALL(ret);
-        sub = mem_sys_allocate(sizeof(struct Parrot_coro));
+        sub = mem_sys_allocate(sizeof (struct Parrot_coro));
         PMC_struct_val(ret) = sub;
         PMC_pmc_val(ret) = NULL;
-        memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_coro));
+        memcpy(sub, PMC_sub(SELF), sizeof (struct Parrot_coro));
         sub->name = string_copy(INTERP, sub->name);
         return ret;
     }
@@ -128,7 +128,7 @@ Swaps the "context".
 
 */
 
-    void* invoke (void* next) {
+    void* invoke(void* next) {
         struct Parrot_coro * co = PMC_coro(SELF);
         parrot_context_t *caller_ctx;
         struct PackFile_ByteCode *wanted_seg;
@@ -243,7 +243,7 @@ Marks the coroutine as live.
 
 */
 
-    void mark () {
+    void mark() {
         struct Parrot_coro *c = PMC_coro(SELF);
         if (c && c->ctx)
             mark_context(INTERP, c->ctx);

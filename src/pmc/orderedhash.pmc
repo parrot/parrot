@@ -58,7 +58,7 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
 
 */
 
-    PMC* get_pmc_keyed_int (INTVAL idx) {
+    PMC* get_pmc_keyed_int(INTVAL idx) {
         Hash *h = PMC_struct_val(SELF);
         INTVAL n;
         HashBucket *b;
@@ -78,7 +78,7 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
         return PMCNULL;
     }
 
-    PMC* get_pmc_keyed (PMC* key) {
+    PMC* get_pmc_keyed(PMC* key) {
         PMC *item, *next;
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_hash_iterator_FLAGS:
@@ -106,7 +106,7 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
 
 */
 
-    STRING* get_string_keyed_int (INTVAL idx) {
+    STRING* get_string_keyed_int(INTVAL idx) {
         Hash *h = PMC_struct_val(SELF);
         INTVAL n;
         HashBucket *b;
@@ -126,7 +126,7 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
         return NULL;
     }
 
-    STRING* get_string_keyed (PMC* key) {
+    STRING* get_string_keyed(PMC* key) {
         PMC *item, *next;
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_hash_iterator_FLAGS:
@@ -156,7 +156,7 @@ Returns the integer value associated with C<key>.
 */
 
 
-    INTVAL get_integer_keyed_int (INTVAL idx) {
+    INTVAL get_integer_keyed_int(INTVAL idx) {
         Hash *h = PMC_struct_val(SELF);
         INTVAL n;
         HashBucket *b;
@@ -176,7 +176,7 @@ Returns the integer value associated with C<key>.
         return 0;
     }
 
-    INTVAL get_integer_keyed (PMC* key) {
+    INTVAL get_integer_keyed(PMC* key) {
         PMC *item, *next;
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_hash_iterator_FLAGS:
@@ -206,7 +206,7 @@ Returns the floating-point value for the element at C<key>.
 
 */
 
-    FLOATVAL get_number_keyed_int (INTVAL idx) {
+    FLOATVAL get_number_keyed_int(INTVAL idx) {
         Hash *h = PMC_struct_val(SELF);
         INTVAL n;
         HashBucket *b;
@@ -226,7 +226,7 @@ Returns the floating-point value for the element at C<key>.
         return 0.0;
     }
 
-    FLOATVAL get_number_keyed (PMC* key) {
+    FLOATVAL get_number_keyed(PMC* key) {
         PMC *item, *next;
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_hash_iterator_FLAGS:
@@ -259,7 +259,7 @@ The created key = "\1idx".
 
 */
 
-    void set_pmc_keyed_int (INTVAL idx, PMC* val) {
+    void set_pmc_keyed_int(INTVAL idx, PMC* val) {
         STRING *key, *fmt;
         Hash *h = PMC_struct_val(SELF);
         INTVAL n;
@@ -285,21 +285,21 @@ The created key = "\1idx".
         }
     }
 
-    void set_integer_keyed_int (INTVAL idx, INTVAL value) {
+    void set_integer_keyed_int(INTVAL idx, INTVAL value) {
         PMC *v = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_Integer));
         VTABLE_set_integer_native(INTERP, v, value);
         SELF.set_pmc_keyed_int(idx, v);
     }
 
-    void set_number_keyed_int (INTVAL idx, FLOATVAL value) {
+    void set_number_keyed_int(INTVAL idx, FLOATVAL value) {
         PMC *v = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_Float));
         VTABLE_set_number_native(INTERP, v, value);
         SELF.set_pmc_keyed_int(idx, v);
     }
 
-    void set_string_keyed_int (INTVAL idx, STRING* value) {
+    void set_string_keyed_int(INTVAL idx, STRING* value) {
         PMC *v = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_String));
         VTABLE_set_string_native(INTERP, v, value);

@@ -36,7 +36,7 @@ Sets the referenced PMC to C<PMCNULL>.
 
 */
 
-    void init () {
+    void init() {
         SELF.init_pmc(PMCNULL);
     }
 
@@ -50,7 +50,7 @@ Sets the referenced PMC to C<initializer>.
 
 */
 
-    void init_pmc (PMC* initializer) {
+    void init_pmc(PMC* initializer) {
         PMC_struct_val(SELF) = Parrot_STM_alloc(INTERP, initializer);
         PObj_custom_mark_SET(SELF);
     }
@@ -64,7 +64,7 @@ Marks the referenced PMC as live.
 
 */
 
-    void mark () {
+    void mark() {
         Parrot_STM_mark_pmc_handle(INTERP, PMC_struct_val(SELF));
     }
 
@@ -107,11 +107,11 @@ Returns the name of the PMC, not the name of the referenced PMC.
         return !PMC_IS_NULL(value);
     }
 
-    void visit (visit_info *info) {
+    void visit(visit_info *info) {
         /* so it's not delegated */
     }
 
-    void freeze (visit_info *info) {
+    void freeze(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
         SUPER(info);
@@ -119,7 +119,7 @@ Returns the name of the PMC, not the name of the referenced PMC.
         Parrot_freeze_STM_PMC_handle(INTERP, io, PMC_struct_val(SELF));
     }
 
-    void thaw (visit_info *info) {
+    void thaw(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
         SUPER(info);
@@ -128,7 +128,7 @@ Returns the name of the PMC, not the name of the referenced PMC.
             Parrot_thaw_STM_PMC_handle(INTERP, io);
     }
 
-    void thawfinish (visit_info *info) {
+    void thawfinish(visit_info *info) {
         /* so it's not delegated */
     }
 

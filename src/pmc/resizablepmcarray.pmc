@@ -35,7 +35,7 @@ Resizes the array to C<size> elements.
 
 */
 
-    void set_integer_native (INTVAL size) {
+    void set_integer_native(INTVAL size) {
 
         if (size < 0)
             real_exception(INTERP, NULL, E_IndexError,
@@ -69,7 +69,7 @@ Resizes the array to C<size> elements.
                 cur &= ~0xfff;
             }
             PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF),
-                    cur * sizeof(PMC*));
+                    cur * sizeof (PMC*));
             for (; i < cur; i++)
                 ((PMC**)PMC_data(SELF))[i] = PMCNULL;
             PMC_int_val2(SELF) = cur;
@@ -97,7 +97,7 @@ TODO: Check whether there is already an element that can be shifted
 
 */
 
-    FLOATVAL shift_float () {
+    FLOATVAL shift_float() {
         INTVAL size= PMC_int_val(SELF);
         PMC* data;
         PMC** item;
@@ -113,13 +113,13 @@ TODO: Check whether there is already an element that can be shifted
         PMC_int_val(SELF)= --size;
 
         item= (PMC**)PMC_data(SELF);
-        mem_sys_memmove(item, item + 1, size * sizeof(PMC*));
+        mem_sys_memmove(item, item + 1, size * sizeof (PMC*));
         item[size]= PMCNULL;
 
         return value;
     }
 
-    INTVAL shift_integer () {
+    INTVAL shift_integer() {
         INTVAL size= PMC_int_val(SELF);
         PMC* data;
         PMC** item;
@@ -135,13 +135,13 @@ TODO: Check whether there is already an element that can be shifted
         PMC_int_val(SELF)= --size;
 
         item= (PMC**)PMC_data(SELF);
-        mem_sys_memmove(item, item + 1, size * sizeof(PMC*));
+        mem_sys_memmove(item, item + 1, size * sizeof (PMC*));
         item[size]= PMCNULL;
 
         return value;
     }
 
-    PMC* shift_pmc () {
+    PMC* shift_pmc() {
         INTVAL size= PMC_int_val(SELF);
         PMC* data;
         PMC** item;
@@ -155,13 +155,13 @@ TODO: Check whether there is already an element that can be shifted
         PMC_int_val(SELF)= --size;
 
         item= (PMC**)PMC_data(SELF);
-        mem_sys_memmove(item, item + 1, size * sizeof(PMC*));
+        mem_sys_memmove(item, item + 1, size * sizeof (PMC*));
         item[size]= PMCNULL;
 
         return data;
     }
 
-    STRING* shift_string () {
+    STRING* shift_string() {
         INTVAL size= PMC_int_val(SELF);
         PMC* data;
         PMC** item;
@@ -177,7 +177,7 @@ TODO: Check whether there is already an element that can be shifted
         PMC_int_val(SELF)= --size;
 
         item= (PMC**)PMC_data(SELF);
-        mem_sys_memmove(item, item + 1, size * sizeof(PMC*));
+        mem_sys_memmove(item, item + 1, size * sizeof (PMC*));
         item[size]= PMCNULL;
 
         return value;
@@ -194,7 +194,7 @@ Returns the PMC value of the element at index C<key>.
 
 */
 
-    PMC* get_pmc_keyed_int (INTVAL key) {
+    PMC* get_pmc_keyed_int(INTVAL key) {
         PMC **data;
 
         if (key < 0)
@@ -224,7 +224,7 @@ If key is a slice, do a splice as set that item.
 
 */
 
-    void set_pmc_keyed_int (INTVAL key, PMC* src) {
+    void set_pmc_keyed_int(INTVAL key, PMC* src) {
         PMC **data;
 
         /*
@@ -242,11 +242,11 @@ If key is a slice, do a splice as set that item.
         data[key] = src;
     }
 
-    void set_pmc_keyed (PMC* key, PMC* src) {
+    void set_pmc_keyed(PMC* key, PMC* src) {
         SUPER(key, src);
     }
 
-    void delete_keyed (PMC* key) {
+    void delete_keyed(PMC* key) {
         PMC **data;
         INTVAL idx = key_integer(INTERP, key);
         INTVAL i;
@@ -268,7 +268,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
 =cut
 
 */
-    INTVAL exists_keyed_int (INTVAL key) {
+    INTVAL exists_keyed_int(INTVAL key) {
         PMC **data;
 
         if (key < 0)
@@ -280,7 +280,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
         return !PMC_IS_NULL(data[key]);
     }
 
-    INTVAL exists_keyed (PMC* key) {
+    INTVAL exists_keyed(PMC* key) {
         INTVAL ix = key_integer(INTERP, key);
         return SELF.exists_keyed_int(ix);
     }
@@ -295,7 +295,7 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 
 */
 
-    INTVAL defined_keyed_int (INTVAL key) {
+    INTVAL defined_keyed_int(INTVAL key) {
         PMC* val;
 
         if (key < 0)
@@ -303,7 +303,7 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
         if (key < 0 || key >= PMC_int_val(SELF))
             return 0;
         val = DYNSELF.get_pmc_keyed_int(key);
-        if(PMC_IS_NULL(val))
+        if (PMC_IS_NULL(val))
             return 0;
 
         return VTABLE_defined(INTERP, val);
@@ -455,13 +455,13 @@ Removes and returns the last element in the array.
 
 /*
 
-=item C<void unshift_float (FLOATVAL value)>
+=item C<void unshift_float(FLOATVAL value)>
 
-=item C<void unshift_integer (INTVAL value)>
+=item C<void unshift_integer(INTVAL value)>
 
-=item C<void unshift_pmc (PMC* value)>
+=item C<void unshift_pmc(PMC* value)>
 
-=item C<void unshift_string (STRING* value)>
+=item C<void unshift_string(STRING* value)>
 
 Extends the array by adding an element of value C<*value> to the begin of
 the array.
@@ -556,7 +556,7 @@ Creates and returns a copy of the array.
 
 */
 
-    PMC* clone () {
+    PMC* clone() {
         PMC *copy = SUPER();
         /* copy trimmed extra space */
         PMC_int_val2(copy) = PMC_int_val(SELF);
@@ -565,7 +565,7 @@ Creates and returns a copy of the array.
 
 /*
 
-=item C<INTVAL is_equal (PMC* value)>
+=item C<INTVAL is_equal(PMC* value)>
 
 The C<==> operation. Compares two array to hold equal elements.
 
@@ -573,7 +573,7 @@ The C<==> operation. Compares two array to hold equal elements.
 
 */
 
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
         INTVAL j, n;
 
         if (value->vtable->base_type != enum_class_ResizablePMCArray)

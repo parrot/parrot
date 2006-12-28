@@ -46,7 +46,7 @@ Returns the integer value of the element at index C<key>.
 
 */
 
-    INTVAL get_integer_keyed_int (INTVAL key) {
+    INTVAL get_integer_keyed_int(INTVAL key) {
         /* Try to make negative index into a real index */
         if (key < 0) {
             key = SELF.elements() + key;
@@ -76,7 +76,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    void set_integer_keyed_int (INTVAL key, INTVAL value) {
+    void set_integer_keyed_int(INTVAL key, INTVAL value) {
         /* Try to make negative index into a real index */
         if (key < 0) {
             key = SELF.elements() + key;
@@ -90,7 +90,7 @@ Sets the integer value of the element at index C<key> to C<value>.
         /* Adjust key for the current head position */
         key += PMC_int_val2(SELF);
 
-        if(key >= PMC_int_val(SELF))
+        if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
         SUPER(key, value);
@@ -106,7 +106,7 @@ Resizes the array to C<size> elements.
 
 */
 
-    void set_integer_native (INTVAL size) {
+    void set_integer_native(INTVAL size) {
         INTVAL newASize;
         const INTVAL currSize = PMC_int_val(SELF) - PMC_int_val2(SELF);
 
@@ -143,7 +143,7 @@ Extends the array by adding an element of value C<value> to the end.
 
 */
 
-    void push_integer (INTVAL value) {
+    void push_integer(INTVAL value) {
         const INTVAL size = PMC_int_val(SELF) - PMC_int_val2(SELF);
         DYNSELF.set_integer_native(size + 1);
         DYNSELF.set_integer_keyed_int(size, value);
@@ -159,7 +159,7 @@ Removes and returns the last element.
 
 */
 
-    INTVAL pop_integer () {
+    INTVAL pop_integer() {
         INTVAL size, value;
 
         if (DYNSELF.elements() < 1)
@@ -184,7 +184,7 @@ beginning.
 
 */
 
-    void unshift_integer (INTVAL value) {
+    void unshift_integer(INTVAL value) {
         /* If int_val2 is smaller than 0, size this thing up */
         if (PMC_int_val2(SELF) <= 0) {
             Parrot_UInt1 * const sdOld = PMC_data(SELF);
@@ -218,7 +218,7 @@ Removes and returns the first element.
 
 */
 
-    INTVAL shift_integer () {
+    INTVAL shift_integer() {
         INTVAL value;
 
         if (DYNSELF.elements() < 1)
@@ -257,7 +257,7 @@ Removes and returns the first element.
 
 */
 
-    INTVAL elements () {
+    INTVAL elements() {
         return PMC_int_val(SELF) - PMC_int_val2(SELF);
     }
 
@@ -271,7 +271,7 @@ Returns the number of elements in the array.
 
 */
 
-    INTVAL get_integer () {
+    INTVAL get_integer() {
         return SELF.elements();
     }
 

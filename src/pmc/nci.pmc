@@ -96,7 +96,7 @@ Creates and returns a clone of the NCI.
 
 */
 
-    PMC* clone () {
+    PMC* clone() {
         PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_struct_val(ret) = PMC_struct_val(SELF);
         PMC_pmc_val(ret) = NULL;
@@ -119,7 +119,7 @@ Returns whether the NCI is defined.
 
 */
 
-    INTVAL defined () {
+    INTVAL defined() {
         return PMC_data(SELF) != NULL;
     }
 
@@ -135,8 +135,8 @@ shifted down.
 
 */
 
-    void* invoke (void * next) {
-        typedef INTVAL (*nci_sub_t)(Interp * , PMC * );
+    void* invoke(void * next) {
+        typedef INTVAL(*nci_sub_t)(Interp * , PMC * );
         nci_sub_t func = (nci_sub_t)D2FPTR(PMC_data(SELF));
         PMC *cont;
 
@@ -170,8 +170,8 @@ Returns the function pointer as an integer.
 
 */
 
-    INTVAL get_integer () {
-        return((INTVAL)PMC_data(SELF));
+    INTVAL get_integer() {
+        return ((INTVAL)PMC_data(SELF));
     }
 
 /*
@@ -184,8 +184,8 @@ Returns the boolean value of the pointer.
 
 */
 
-    INTVAL get_bool () {
-        return(0 != (INTVAL)PMC_data(SELF));
+    INTVAL get_bool() {
+        return (0 != (INTVAL)PMC_data(SELF));
     }
 
 }

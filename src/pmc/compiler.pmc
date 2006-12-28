@@ -34,7 +34,7 @@ C<Eval> PMC with a new PackFile attached.
 
 */
 
-    void* invoke (void * code_ptr) {
+    void* invoke(void * code_ptr) {
         return SUPER(code_ptr);
     }
 }

@@ -247,13 +247,13 @@ Return the class of this object.
 
 =item C<PMC *get_pmc_keyed_int(INTVAL key)>
 
-=item C<void set_integer_keyed_int (INTVAL key, INTVAL value)>
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
 
-=item C<void set_number_keyed_int (INTVAL key, FLOATVAL value)>
+=item C<void set_number_keyed_int(INTVAL key, FLOATVAL value)>
 
-=item C<void set_string_keyed_int (INTVAL key, STRING* value)>
+=item C<void set_string_keyed_int(INTVAL key, STRING* value)>
 
-=item C<void set_pmc_keyed_int (INTVAL key, PMC* value)>
+=item C<void set_pmc_keyed_int(INTVAL key, PMC* value)>
 
 =item C<void delete_keyed_int(INTVAL key)>
 
@@ -272,7 +272,7 @@ it's just SUPER aka the default implementation.
 
 */
 
-    INTVAL get_integer_keyed_int (INTVAL key) {
+    INTVAL get_integer_keyed_int(INTVAL key) {
         STRING *meth = CONST_STRING(interp, "__get_integer_keyed_int");
         STRING *meth_v = CONST_STRING(interp, "get_integer_keyed_int");
         PMC *sub = find_vtable_meth(interp, pmc, meth_v);
@@ -296,7 +296,7 @@ it's just SUPER aka the default implementation.
         }
     }
 
-    FLOATVAL get_number_keyed_int (INTVAL key) {
+    FLOATVAL get_number_keyed_int(INTVAL key) {
         STRING *meth = CONST_STRING(interp, "__get_number_keyed_int");
         STRING *meth_v = CONST_STRING(interp, "get_number_keyed_int");
         PMC *sub = find_vtable_meth(interp, pmc, meth_v);
@@ -320,7 +320,7 @@ it's just SUPER aka the default implementation.
         }
     }
 
-    STRING* get_string_keyed_int (INTVAL key) {
+    STRING* get_string_keyed_int(INTVAL key) {
         STRING *meth = CONST_STRING(interp, "__get_string_keyed_int");
         STRING *meth_v = CONST_STRING(interp, "get_string_keyed_int");
         PMC *sub = find_vtable_meth(interp, pmc, meth_v);
@@ -344,7 +344,7 @@ it's just SUPER aka the default implementation.
         }
     }
 
-    PMC* get_pmc_keyed_int (INTVAL key) {
+    PMC* get_pmc_keyed_int(INTVAL key) {
         STRING *meth = CONST_STRING(interp, "__get_pmc_keyed_int");
         STRING *meth_v = CONST_STRING(interp, "get_pmc_keyed_int");
         PMC *sub = find_vtable_meth(interp, pmc, meth_v);
@@ -368,7 +368,7 @@ it's just SUPER aka the default implementation.
         }
     }
 
-    void set_integer_keyed_int (INTVAL key, INTVAL value) {
+    void set_integer_keyed_int(INTVAL key, INTVAL value) {
         STRING *meth = CONST_STRING(interp, "__set_integer_keyed_int");
         STRING *meth_v = CONST_STRING(interp, "set_integer_keyed_int");
         PMC *sub = find_vtable_meth(interp, pmc, meth_v);
@@ -392,7 +392,7 @@ it's just SUPER aka the default implementation.
         }
     }
 
-    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+    void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         STRING *meth = CONST_STRING(interp, "__set_number_keyed_int");
         STRING *meth_v = CONST_STRING(interp, "set_number_keyed_int");
         PMC *sub = find_vtable_meth(interp, pmc, meth_v);
@@ -416,7 +416,7 @@ it's just SUPER aka the default implementation.
         }
     }
 
-    void set_string_keyed_int (INTVAL key, STRING* value) {
+    void set_string_keyed_int(INTVAL key, STRING* value) {
         STRING *meth = CONST_STRING(interp, "__set_string_keyed_int");
         STRING *meth_v = CONST_STRING(interp, "set_string_keyed_int");
         PMC *sub = find_vtable_meth(interp, pmc, meth_v);
@@ -440,7 +440,7 @@ it's just SUPER aka the default implementation.
         }
     }
 
-    void set_pmc_keyed_int (INTVAL key, PMC* value) {
+    void set_pmc_keyed_int(INTVAL key, PMC* value) {
         STRING *meth = CONST_STRING(interp, "__set_pmc_keyed_int");
         STRING *meth_v = CONST_STRING(interp, "set_pmc_keyed_int");
         PMC *sub = find_vtable_meth(interp, pmc, meth_v);
@@ -464,7 +464,7 @@ it's just SUPER aka the default implementation.
         }
     }
 
-    void delete_keyed_int (INTVAL key) {
+    void delete_keyed_int(INTVAL key) {
         STRING *meth = CONST_STRING(interp, "__delete_keyed_int");
         STRING *meth_v = CONST_STRING(interp, "delete_keyed_int");
         PMC *sub = find_vtable_meth(interp, pmc, meth_v);
@@ -488,7 +488,7 @@ it's just SUPER aka the default implementation.
         }
     }
 
-    INTVAL defined_keyed_int (INTVAL key) {
+    INTVAL defined_keyed_int(INTVAL key) {
         STRING *meth = CONST_STRING(interp, "__defined_keyed_int");
         STRING *meth_v = CONST_STRING(interp, "defined_keyed_int");
         PMC *sub = find_vtable_meth(interp, pmc, meth_v);
@@ -512,7 +512,7 @@ it's just SUPER aka the default implementation.
         }
     }
 
-    INTVAL exists_keyed_int (INTVAL key) {
+    INTVAL exists_keyed_int(INTVAL key) {
         STRING *meth = CONST_STRING(interp, "__exists_keyed_int");
         STRING *meth_v = CONST_STRING(interp, "exists_keyed_int");
         PMC *sub = find_vtable_meth(interp, pmc, meth_v);
@@ -536,7 +536,7 @@ it's just SUPER aka the default implementation.
         }
     }
 
-    PMC* share_ro () {
+    PMC* share_ro() {
         PMC *ret;
         PMC *true;
         PMC **data;

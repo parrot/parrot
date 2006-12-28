@@ -184,7 +184,7 @@ big negative keys.
 
 */
 
-    PMC* get_pmc_keyed_int (INTVAL key) {
+    PMC* get_pmc_keyed_int(INTVAL key) {
         if (key <= -PMC_int_val(SELF))
             return PMCNULL;
         return SUPER(key);
@@ -269,19 +269,19 @@ These methods are silently ignored.
 =cut
 
 */
-    PMC* shift_pmc () {
+    PMC* shift_pmc() {
         /* fprintf(stderr, "don't do that then\n"); XXX */
         return NULL;
     }
-    FLOATVAL shift_float () {
+    FLOATVAL shift_float() {
         (void) SELF.shift_pmc();
         return 0.0;
     }
-    INTVAL shift_integer () {
+    INTVAL shift_integer() {
         (void) SELF.shift_pmc();
         return 0;
     }
-    STRING* shift_string () {
+    STRING* shift_string() {
         (void) SELF.shift_pmc();
         return NULL;
     }

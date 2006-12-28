@@ -27,7 +27,7 @@ pmclass Boolean extends Integer does boolean does scalar {
 
 /*
 
-=item C<class_init ()>
+=item C<class_init()>
 
 Define 2 pythonic globals C<True>, C<False>.
 
@@ -75,41 +75,41 @@ C<bool> object according to the passed PMC value.
     }
 /*
 
-=item C<STRING* get_string ()>
+=item C<STRING* get_string()>
 
 Return "1" or "0".
 
 =cut
 
 */
-    STRING* get_string () {
+    STRING* get_string() {
         return SUPER();
     }
 
 
 /*
 
-=item C<void set_integer_native (INTVAL value)>
+=item C<void set_integer_native(INTVAL value)>
 
-=item C<void set_bool (INTVAL value)>
+=item C<void set_bool(INTVAL value)>
 
-=item C<void set_pmc (PMC* value)>
+=item C<void set_pmc(PMC* value)>
 
 =cut
 
 */
-    void set_integer_native (INTVAL value) {
+    void set_integer_native(INTVAL value) {
         PMC_int_val(SELF) = (value != 0);
     }
 
 
-    void set_bool (INTVAL value) {
+    void set_bool(INTVAL value) {
         PMC_int_val(SELF) = (value != 0);
     }
 
 /*
 
-=item C<void set_number_native (FLOATVAL value)>
+=item C<void set_number_native(FLOATVAL value)>
 
 Sets the value to C<value> evaluated in a boolean context.
 
@@ -117,13 +117,13 @@ Sets the value to C<value> evaluated in a boolean context.
 
 */
 
-    void set_number_native (FLOATVAL value) {
+    void set_number_native(FLOATVAL value) {
         PMC_int_val(SELF) = (value!=0);
     }
 
 /*
 
-=item C<void set_string_native (STRING* value)>
+=item C<void set_string_native(STRING* value)>
 
 Sets the value to C<*value> evaluated in a boolean context.
 
@@ -131,7 +131,7 @@ Sets the value to C<*value> evaluated in a boolean context.
 
 */
 
-    void set_string_native (STRING* value) {
+    void set_string_native(STRING* value) {
         PMC_int_val(SELF) = string_bool(INTERP, value);
     }
 }

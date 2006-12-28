@@ -95,11 +95,11 @@ Returns the number of elements in the LexInfo hash.
 
 */
 
-    METHOD void declare_lex_preg (STRING* name, INTVAL preg) {
+    METHOD void declare_lex_preg(STRING* name, INTVAL preg) {
         parrot_hash_put(INTERP, PMC_struct_val(SELF), name, (void*)preg);
     }
 
-    INTVAL elements () {
+    INTVAL elements() {
         return parrot_hash_size(INTERP, PMC_struct_val(SELF));
     }
 

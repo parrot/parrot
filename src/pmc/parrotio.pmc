@@ -180,7 +180,7 @@ SYNOPSIS
         if (io->flags & PIO_F_READLINE) {
             char *r;
 
-            r = readline (prompt ? prompt->strstart : NULL);
+            r = readline(prompt ? prompt->strstart : NULL);
             if (r) {
                 if (*r)
                     add_history(r);
@@ -296,7 +296,7 @@ XXX TBD
 
 */
 
-    void class_init () {
+    void class_init() {
 
         if (pass) {
             enter_nci_method(INTERP, enum_class_ParrotIO,
@@ -322,7 +322,7 @@ Initializes the IO PMC.
 
 */
 
-    void init () {
+    void init() {
         PObj_active_destroy_SET(SELF);
     }
 
@@ -336,7 +336,7 @@ Destroys the IO PMC, flushing and closing as necessary.
 
 */
 
-    void destroy () {
+    void destroy() {
         ParrotIO *io = PMC_data(SELF);
         if (io) {
             /* shared filehandles will only get flushed */
@@ -362,7 +362,7 @@ IO layers, we might copy C<data> and C<struct_val>.
 
 */
 
-    PMC* clone () {
+    PMC* clone() {
         PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_data(dest) = PMC_data(SELF);
         PMC_struct_val(dest) = PMC_struct_val(SELF);
@@ -420,11 +420,11 @@ non-existent layers, returns an empty string.
     }
 /*
 
-=item C<void push_string (STRING* value)>
+=item C<void push_string(STRING* value)>
 
 Pushes the layer name C<value> onto the PIO's layer stack.
 
-=item C<STRING* pop_string ()>
+=item C<STRING* pop_string()>
 
 Pops a layer off the PIO's layer stack and returns its name.
 
@@ -432,11 +432,11 @@ Pops a layer off the PIO's layer stack and returns its name.
 
 */
 
-    void push_string (STRING* value) {
+    void push_string(STRING* value) {
         PIO_push_layer_str(INTERP, SELF, value);
     }
 
-    STRING* pop_string () {
+    STRING* pop_string() {
         return PIO_pop_layer_str(INTERP, SELF);
     }
 

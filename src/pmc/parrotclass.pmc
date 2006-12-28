@@ -65,7 +65,7 @@ argument is not a PMC* but the C<classname> STRING.
 
 */
 
-    void init () {
+    void init() {
         /* No attributes to start with */
         PMC_int_val(SELF) = CLASS_ATTRIB_COUNT(SELF) = 0;
         /* But we are a class, really */
@@ -77,7 +77,7 @@ argument is not a PMC* but the C<classname> STRING.
         PObj_active_destroy_SET(SELF);
     }
 
-    void init_pmc (PMC* name) {
+    void init_pmc(PMC* name) {
         SELF.init();
         Parrot_new_class(INTERP, SELF, name);
     }

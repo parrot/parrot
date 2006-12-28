@@ -662,7 +662,7 @@ The offset.
 
 */
 
-    void init_pmc (PMC* value) {
+    void init_pmc(PMC* value) {
         SELF.set_pmc(value);
     }
 
@@ -676,7 +676,7 @@ Sets C<*value> (see C<init_pmc()> and calculates the offsets.
 
 */
 
-    void set_pmc (PMC* value) {
+    void set_pmc(PMC* value) {
         PMC_pmc_val(SELF) = value;
         calc_offsets(INTERP, SELF, value, 0);
         PObj_custom_mark_SET(SELF);
@@ -707,7 +707,7 @@ Returns whether the two C<struct>s are equivalent.
 
 */
 
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
         return (SELF->vtable == value->vtable &&
             PMC_data(SELF) == PMC_data(value));
     }
@@ -722,7 +722,7 @@ Returns whether the C<struct> is defined.
 
 */
 
-    INTVAL defined () {
+    INTVAL defined() {
         return PMC_data(SELF) != NULL;
     }
 
@@ -796,7 +796,7 @@ Returns the floating-point value at index C<ix>.
 
 */
 
-    FLOATVAL get_number_keyed_int (INTVAL key) {
+    FLOATVAL get_number_keyed_int(INTVAL key) {
         int type;
         char *p = char_offset_int(INTERP, pmc, key, &type);
         return ret_float(p, type);
@@ -812,7 +812,7 @@ Returns the floating-point value associated with C<*key>.
 
 */
 
-    FLOATVAL get_number_keyed (PMC* key) {
+    FLOATVAL get_number_keyed(PMC* key) {
         int type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
         return ret_float(p, type);
@@ -828,7 +828,7 @@ Returns the Parrot string value at index C<ix>.
 
 */
 
-    STRING* get_string_keyed_int (INTVAL key) {
+    STRING* get_string_keyed_int(INTVAL key) {
         int type;
         char *p = char_offset_int(INTERP, pmc, key, &type);
         return ret_string(INTERP, p, type);
@@ -844,7 +844,7 @@ Returns the Parrot string value associated with C<*key>.
 
 */
 
-    STRING* get_string_keyed (PMC* key) {
+    STRING* get_string_keyed(PMC* key) {
         int type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
         return ret_string(INTERP, p, type);
@@ -860,7 +860,7 @@ Returns the PMC value at index C<ix>.
 
 */
 
-    PMC* get_pmc_keyed_int (INTVAL key) {
+    PMC* get_pmc_keyed_int(INTVAL key) {
         int type;
         char *p = char_offset_int(INTERP, pmc, key, &type);
         return ret_pmc(INTERP, pmc, p, type, key);
@@ -876,7 +876,7 @@ Returns the PMC value associated with C<*key>.
 
 */
 
-    PMC* get_pmc_keyed (PMC* key) {
+    PMC* get_pmc_keyed(PMC* key) {
         int type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
         return ret_pmc(INTERP, pmc, p, type,
@@ -921,7 +921,7 @@ Sets the value of the element at index C<ix> to C<value>.
 
 */
 
-    void set_integer_keyed_int (INTVAL ix, INTVAL value) {
+    void set_integer_keyed_int(INTVAL ix, INTVAL value) {
         int type;
         char *p = char_offset_int(INTERP, pmc, ix, &type);
         set_int(p, type, value);
@@ -939,7 +939,7 @@ May cause segfaults if value is out of bounds.
 
 */
 
-    void set_integer_keyed (PMC* key, INTVAL value) {
+    void set_integer_keyed(PMC* key, INTVAL value) {
         int type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
         set_int(p, type, value);
@@ -955,7 +955,7 @@ Sets the value of the element at index C<ix> to C<value>.
 
 */
 
-    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+    void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         int type;
         char *p = char_offset_int(INTERP, pmc, key, &type);
         set_float(p, type, value);
@@ -971,7 +971,7 @@ Sets the value of the element associated with key C<*key> to C<value>.
 
 */
 
-    void set_number_keyed (PMC *key, FLOATVAL value) {
+    void set_number_keyed(PMC *key, FLOATVAL value) {
         int type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
         set_float(p, type, value);
@@ -987,7 +987,7 @@ Sets the value of the element at index C<key> to C<*value>.
 
 */
 
-    void set_string_keyed_int (INTVAL key, STRING* value) {
+    void set_string_keyed_int(INTVAL key, STRING* value) {
         int type;
         char *p = char_offset_int(INTERP, pmc, key, &type);
         set_string(p, type, value);
@@ -1003,7 +1003,7 @@ Sets the value of the element associated with key C<*key> to C<*value>.
 
 */
 
-    void set_string_keyed (PMC *key, STRING* value) {
+    void set_string_keyed(PMC *key, STRING* value) {
         int type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
         set_string(p, type, value);

@@ -121,7 +121,7 @@ Initializes the thread.
 
 */
 
-    void init () {
+    void init() {
         /*
          * protect interpreter creation and list handling
          */
@@ -145,7 +145,7 @@ Create a new thread by cloning the passed interpreter.
 
 */
 
-    void init_pmc (PMC *parent) {
+    void init_pmc(PMC *parent) {
         LOCK(interpreter_array_mutex);
         SUPER(parent);
         pt_add_to_interpreters(PMC_data(parent), PMC_data(SELF));

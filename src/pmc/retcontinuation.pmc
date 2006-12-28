@@ -37,7 +37,7 @@ Initializes the continuation.
 
 */
 
-    void init () {
+    void init() {
         PMC_struct_val(SELF) = new_ret_continuation(INTERP);
         PMC_pmc_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -48,7 +48,7 @@ Initializes the continuation.
      *     have to set ref_count initially to 1
      */
 
-    void destroy () {
+    void destroy() {
         struct Parrot_cont * cc = PMC_cont(SELF);
         if (cc) {
             mem_sys_free(cc);
@@ -82,7 +82,7 @@ Transfers control to the calling context, and frees the current context.
 
 */
 
-    void* invoke (void* next) {
+    void* invoke(void* next) {
         struct Parrot_cont * cc = PMC_cont(SELF);
         parrot_context_t *from_ctx = cc->from_ctx;
         struct PackFile_ByteCode * const seg = cc->seg;

@@ -190,7 +190,7 @@ a NameSpace or a var, the NameSpace is returned.
         real_exception(INTERP, NULL, E_NameError, "Invalid namespace key");
     }
 
-    PMC* get_pmc_keyed_str (STRING* key) {
+    PMC* get_pmc_keyed_str(STRING* key) {
         PMC *ns = parrot_hash_get(INTERP, (Hash*) PMC_struct_val(SELF), key);
         if (!ns)
             return PMCNULL;
@@ -241,7 +241,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
 
 */
 
-    void* get_pointer_keyed_str (STRING* key) {
+    void* get_pointer_keyed_str(STRING* key) {
         PMC *ns = parrot_hash_get(INTERP, (Hash*) PMC_struct_val(SELF), key);
         if (!ns)
             return PMCNULL;

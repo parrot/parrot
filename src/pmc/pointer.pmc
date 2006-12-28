@@ -34,7 +34,7 @@ Initializes the pointer.
 
 */
 
-    void init () {
+    void init() {
         PObj_custom_mark_SET(SELF);
     }
 
@@ -48,7 +48,7 @@ Does nothing.
 
 */
 
-    void morph (INTVAL type) {
+    void morph(INTVAL type) {
     }
 
 /*
@@ -61,7 +61,7 @@ Marks the pointer as live.
 
 */
 
-    void mark () {
+    void mark() {
         void (*mark_function)(Interp*, void*) =
             (void (*)(Interp*, void*))
             D2FPTR(PMC_struct_val(SELF));
@@ -82,7 +82,7 @@ Creates and returns a clone of the pointer.
 
 */
 
-    PMC* clone () {
+    PMC* clone() {
         PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         PMC_data(dest) = PMC_data(SELF);
@@ -99,7 +99,7 @@ Returns the pointer value as an integer.
 
 */
 
-    INTVAL get_integer () {
+    INTVAL get_integer() {
         return (INTVAL)PMC_data(SELF);
     }
 
@@ -113,7 +113,7 @@ Returns the pointer value as a floating-point number.
 
 */
 
-    FLOATVAL get_number () {
+    FLOATVAL get_number() {
         return (FLOATVAL)(INTVAL)PMC_data(SELF);
     }
 
@@ -127,7 +127,7 @@ Returns the pointer value as a Parrot string.
 
 */
 
-    STRING* get_string () {
+    STRING* get_string() {
         STRING* ret;
         char *target=mem_sys_allocate(64);
 
@@ -151,7 +151,7 @@ Returns whether the pointer is not C<NULL>.
 
 */
 
-    INTVAL get_bool () {
+    INTVAL get_bool() {
         return (INTVAL)(PMC_data(SELF) != NULL);
     }
 
@@ -165,7 +165,7 @@ Returns whether the pointer has the same value as C<*pmc2>.
 
 */
 
-    INTVAL is_same (PMC* pmc2) {
+    INTVAL is_same(PMC* pmc2) {
         return (INTVAL)(SELF->vtable == pmc2->vtable &&
         PMC_data(SELF) == PMC_data(pmc2));
     }

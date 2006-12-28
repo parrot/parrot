@@ -39,7 +39,7 @@ Overrides the default to do nothing.
 
 */
 
-    void init () {
+    void init() {
     }
 
     void* get_pointer() {

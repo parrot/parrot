@@ -17,11 +17,11 @@ This class has been superseded by C<NCI>.
 #include "parrot/parrot.h"
 
 pmclass CSub {
-    void init () {
+    void init() {
         PMC_struct_val(SELF) = PMC_pmc_val(SELF) = NULL;
     }
 
-    PMC* clone () {
+    PMC* clone() {
         PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_struct_val(dest) = PMC_struct_val(SELF);
         return dest;
@@ -35,16 +35,16 @@ pmclass CSub {
         PMC_struct_val(SELF) = p;
     }
 
-    INTVAL is_same (PMC* value) {
+    INTVAL is_same(PMC* value) {
         return SELF == value;
     }
 
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
         return (SELF->vtable == value->vtable
                 && PMC_struct_val(SELF) == PMC_struct_val(value));
     }
 
-    INTVAL defined () {
+    INTVAL defined() {
         return PMC_struct_val(SELF) != NULL;
     }
 }

@@ -60,7 +60,7 @@ the Thread ID specified in C<tid>.
 
 */
 
-    void init_pmc (PMC* tid) {
+    void init_pmc(PMC* tid) {
         PMC_int_val(SELF) = VTABLE_get_integer(INTERP, tid);
     }
 

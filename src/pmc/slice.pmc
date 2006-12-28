@@ -185,17 +185,17 @@ next_range:
 
 pmclass Slice need_ext extends Key {
 
-    void init () {
+    void init() {
         PMC_struct_val(SELF) = NULL;
         PMC_pmc_val(SELF) = NULL;
     }
 
-    void mark () {
+    void mark() {
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj*) PMC_pmc_val(SELF));
     }
 
-    void init_pmc (PMC* key) {
+    void init_pmc(PMC* key) {
         SELF.init();
         /* that's actually the KEY_number_FLAG - but I can't hardly
          * imagine that we get keyed by FLOATVAL slices on
@@ -206,7 +206,7 @@ pmclass Slice need_ext extends Key {
         set_slice_start(INTERP, SELF, key, SELF);
     }
 
-    void destroy () {
+    void destroy() {
         parrot_range_t *r = PMC_struct_val(SELF), *n;
         /* iteration ended - all is freed */
         if ((INTVAL) r == -1)
@@ -281,7 +281,7 @@ This is used for implementing Pythons xrange()
         return iter;
     }
 
-    INTVAL elements () {
+    INTVAL elements() {
         parrot_range_t *r = PMC_struct_val(SELF);
         /* only start .. end supported so:
          * TODO check flags somewhere
@@ -308,7 +308,7 @@ This is used for implementing Pythons xrange()
     }
 /*
 
-=item C<PMC* nextkey_keyed (PMC* agg, INTVAL what)>
+=item C<PMC* nextkey_keyed(PMC* agg, INTVAL what)>
 
 Prepare slice PMC SELF for iteration over the passed aggregate or
 advance to next position in the range, depending on what.
@@ -316,7 +316,7 @@ advance to next position in the range, depending on what.
 =cut
 
 */
-    PMC* nextkey_keyed (PMC* agg, INTVAL what) {
+    PMC* nextkey_keyed(PMC* agg, INTVAL what) {
         PMC *ret = SELF;
 
         switch (what) {

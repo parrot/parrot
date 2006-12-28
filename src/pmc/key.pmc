@@ -41,7 +41,7 @@ Initializes the key.
 
 */
 
-    void init () {
+    void init() {
         PObj_custom_mark_SET(SELF);
     }
 
@@ -103,7 +103,7 @@ Marks the key as live.
 
 */
 
-    void mark () {
+    void mark() {
         key_mark(INTERP, SELF);
     }
 
@@ -117,7 +117,7 @@ Returns the integer value of the key.
 
 */
 
-    INTVAL get_integer () {
+    INTVAL get_integer() {
         return key_integer(INTERP, SELF);
     }
 
@@ -131,7 +131,7 @@ Returns the floating-point number value of the key.
 
 */
 
-    FLOATVAL get_number () {
+    FLOATVAL get_number() {
         return key_number(INTERP, SELF);
     }
 
@@ -145,7 +145,7 @@ Returns the Parrot string value of the key.
 
 */
 
-    STRING* get_string () {
+    STRING* get_string() {
         return key_string(INTERP, SELF);
     }
 
@@ -159,7 +159,7 @@ Returns the PMC value of the key.
 
 */
 
-    PMC* get_pmc () {
+    PMC* get_pmc() {
         return key_pmc(INTERP, SELF);
     }
 
@@ -171,7 +171,7 @@ Returns the PMC value of the key.
 
 */
 
-    void set_integer_native (INTVAL value) {
+    void set_integer_native(INTVAL value) {
         key_set_integer(INTERP, SELF, value);
     }
 
@@ -185,7 +185,7 @@ Sets the value of the key to C<value>.
 
 */
 
-    void set_number_native (FLOATVAL value) {
+    void set_number_native(FLOATVAL value) {
         key_set_number(INTERP, SELF, value);
     }
 
@@ -198,7 +198,7 @@ Sets the value of the key to C<value>.
 
 */
 
-    void set_string_native (STRING* value) {
+    void set_string_native(STRING* value) {
         key_set_string(INTERP, SELF, value);
     }
 
@@ -212,7 +212,7 @@ Sets the value of the key to C<*value>.
 
 */
 
-    void set_pmc (PMC* value) {
+    void set_pmc(PMC* value) {
         key_set_pmc(INTERP, SELF, value);
     }
 
@@ -226,7 +226,7 @@ Appends C<*value> to the key.
 
 */
 
-    void push_pmc (PMC * value) {
+    void push_pmc(PMC * value) {
         if (value->vtable->base_type != enum_class_Key)
             real_exception(interp, NULL, INVALID_OPERATION,
                 "Can only push another Key onto a Key PMC.");
@@ -266,7 +266,7 @@ Returns the key itself.
 
 */
 
-    PMC* get_pmc_keyed (PMC* key) {
+    PMC* get_pmc_keyed(PMC* key) {
         return key;
     }
 
@@ -281,7 +281,7 @@ PMC_int_val(-1) means end of iteration.
 
 */
 
-    PMC* nextkey_keyed (PMC* agg, INTVAL what) {
+    PMC* nextkey_keyed(PMC* agg, INTVAL what) {
         INTVAL n = VTABLE_elements(INTERP, agg);
         PMC *ret = SELF;
         STRING *_hash;

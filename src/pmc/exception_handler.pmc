@@ -69,20 +69,20 @@ Initializes the exception handler.
      * have to convert all RetContinuations to real Continuations
      */
 
-    void destroy () {
+    void destroy() {
         struct Parrot_cont * cc = PMC_cont(SELF);
         if (cc) {
             mem_sys_free(cc);
             PMC_struct_val(SELF) = NULL;
         }
     }
-    PMC* clone  () {
+    PMC* clone() {
         PMC *result = SUPER();
         PObj_custom_mark_CLEAR(result);
         return result;
     }
 
-    void* invoke (void* ex) {
+    void* invoke(void* ex) {
         struct Parrot_cont * cc = PMC_cont(SELF);
         PMC *exception = ex;
         parrot_context_t *ex_ctx;

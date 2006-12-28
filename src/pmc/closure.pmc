@@ -33,7 +33,7 @@ Initializes the closure.
 
 */
 
-    void init () {
+    void init() {
         PMC_struct_val(SELF) = new_closure(INTERP);
         PMC_pmc_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -54,7 +54,7 @@ Marks the closure as live.
 
 */
 
-    void mark () {
+    void mark() {
         struct Parrot_sub * sub = PMC_sub(SELF);
         SUPER();
         if (sub->outer_sub)
@@ -78,13 +78,13 @@ Invokes the closure.
 
 */
 
-    void set_pointer (void* value) {
+    void set_pointer(void* value) {
         struct Parrot_sub * sub = PMC_sub(SELF);
         opcode_t *addr = value;
         sub->start_offs = addr -  sub->seg->base.data;
     }
 
-    void* invoke (void* next) {
+    void* invoke(void* next) {
         struct Parrot_sub * sub = PMC_sub(SELF);
         PMC *cont, *outer_sub;
 
@@ -196,7 +196,7 @@ Destroys the closure.  This is necessary in order to reclaim the context.
 
 */
 
-    void destroy () {
+    void destroy() {
         struct Parrot_sub * sub = PMC_sub(SELF);
 #if CTX_LEAK_DEBUG
         if (Interp_debug_TEST(INTERP, PARROT_CTX_DESTROY_DEBUG_FLAG)) {

@@ -228,7 +228,7 @@ for writing to disc and later loading via C<load_bytecode>.
         if (seg->pic_index)
             PackFile_add_segment(INTERP, &pf->directory,
                     (struct PackFile_Segment *)seg->pic_index);
-        size = PackFile_pack_size(INTERP, pf) * sizeof(opcode_t);
+        size = PackFile_pack_size(INTERP, pf) * sizeof (opcode_t);
         /*
          * work around packfile bug:
          * as far as I have checked it the story is:
@@ -272,7 +272,7 @@ Returns the Sub PMC of the element at index C<key> or PMCNULL.
 
 */
 
-    PMC* get_pmc_keyed_int (INTVAL key) {
+    PMC* get_pmc_keyed_int(INTVAL key) {
         return get_sub(INTERP, SELF, key);
     }
 
