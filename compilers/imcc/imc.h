@@ -30,13 +30,13 @@
 
 #define IMCC_MAX_FIX_REGS PARROT_MAX_ARGS
 #if IMCC_MAX_FIX_REGS > 16
-#error: flags wont fit
+#  error: flags wont fit
 #endif
 
 #ifdef MAIN
-#define EXTERN
+#  define EXTERN
 #else
-#define EXTERN extern
+#  define EXTERN extern
 #endif
 
 /* IMCC reserves this character for internally generated labels

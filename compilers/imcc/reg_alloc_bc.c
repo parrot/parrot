@@ -28,8 +28,8 @@
 #define SPILL_STRESS 0
 
 #if SPILL_STRESS
-# undef MAX_COLOR
-# define MAX_COLOR 6
+#  undef MAX_COLOR
+#  define MAX_COLOR 6
 #endif
 
 
@@ -67,7 +67,7 @@ static int spill_registers(Interp *, IMC_Unit *, graph*);
 
 /*providing input of 0 forces the below dynamic function to kick in.*/
 #ifndef BITS_PER_INT
-#define BITS_PER_INT (sizeof (int)*8)
+#  define BITS_PER_INT (sizeof(int)*8)
 #endif
 #define Bits_per_int() ((BITS_PER_INT) ? BITS_PER_INT : bits_per_int())
 /*#define VALIDATE_COLORING*/

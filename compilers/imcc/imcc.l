@@ -600,7 +600,7 @@ SP              [ ]
 %%
 
 #ifdef yywrap
-#undef yywrap
+#  undef yywrap
 #endif
 
 int yywrap (void* yyscanner) {

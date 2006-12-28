@@ -1407,8 +1407,8 @@ is_invariant(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     return 0;
 }
 
-#define MOVE_INS_1_BL
-#ifdef MOVE_INS_1_BL
+#  define MOVE_INS_1_BL
+#  ifdef MOVE_INS_1_BL
 static Basic_block *
 find_outer(IMC_Unit * unit, Basic_block * blk)
 {
@@ -1424,7 +1424,7 @@ find_outer(IMC_Unit * unit, Basic_block * blk)
                 return unit->bb_list[loop_info[i]->preheader];
     return 0;
 }
-#endif
+#  endif
 
 /* move the instruction ins before loop in bb */
 static int
@@ -1436,12 +1436,12 @@ move_ins_out(Interp *interp, IMC_Unit * unit,
 
     /* check loop_info, where this loop started
      * actually, this moves instruction to block 0 */
-#ifdef MOVE_INS_1_BL
+#  ifdef MOVE_INS_1_BL
     pred = find_outer(unit, bb);
-#else
+#  else
     UNUSED(bb);
     pred = unit->bb_list[0];
-#endif
+#  endif
     if (!pred) {
         IMCC_debug(interp, DEBUG_OPT2, "outer loop not found (CFG?)\n");
         return 0;

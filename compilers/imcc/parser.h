@@ -8,9 +8,9 @@
 #define PARROT_IMCC_PARSER_H_GUARD
 
 #ifdef PARSER_MAIN
-#define EXTERN
+#  define EXTERN
 #else
-#define EXTERN extern
+#  define EXTERN extern
 #endif
 
 typedef struct _IdList {
@@ -31,7 +31,7 @@ PARROT_API EXTERN int yydebug;
 
 /* An opaque pointer. */
 #ifndef YY_TYPEDEF_YY_SCANNER_T
-#define YY_TYPEDEF_YY_SCANNER_T
+#  define YY_TYPEDEF_YY_SCANNER_T
 typedef void* yyscan_t;
 #endif
 
