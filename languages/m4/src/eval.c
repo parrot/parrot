@@ -35,7 +35,7 @@ typedef int eval_t;
 /* This file contains the functions to evaluate integer expressions for
    the "eval" macro.  It is a little, fairly self-contained module, with
    its own scanner, and a recursive descent parser.  The only entry point
-   is evaluate().  
+   is evaluate().
 */
 
 
@@ -126,57 +126,57 @@ static eval_token eval_lex( eval_t *val )
       int base, digit;
 
       if (*eval_text == '0')
-	{
-	  eval_text++;
-	  switch (*eval_text)
-	    {
-	    case 'x':
-	    case 'X':
-	      base = 16;
-	      eval_text++;
-	      break;
+        {
+          eval_text++;
+          switch (*eval_text)
+            {
+            case 'x':
+            case 'X':
+              base = 16;
+              eval_text++;
+              break;
 
-	    case 'b':
-	    case 'B':
-	      base = 2;
-	      eval_text++;
-	      break;
+            case 'b':
+            case 'B':
+              base = 2;
+              eval_text++;
+              break;
 
-	    case 'r':
-	    case 'R':
-	      base = 0;
-	      eval_text++;
-	      while (isdigit (*eval_text) && base <= 36)
-		base = 10 * base + *eval_text++ - '0';
-	      if (base == 0 || base > 36 || *eval_text != ':')
-		return M4_ERROR;
-	      eval_text++;
-	      break;
+            case 'r':
+            case 'R':
+              base = 0;
+              eval_text++;
+              while (isdigit (*eval_text) && base <= 36)
+                base = 10 * base + *eval_text++ - '0';
+              if (base == 0 || base > 36 || *eval_text != ':')
+                return M4_ERROR;
+              eval_text++;
+              break;
 
-	    default:
-	      base = 8;
-	    }
-	}
+            default:
+              base = 8;
+            }
+        }
       else
-	base = 10;
+        base = 10;
 
       (*val) = 0;
       for (; *eval_text; eval_text++)
-	{
-	  if (isdigit (*eval_text))
-	    digit = *eval_text - '0';
-	  else if (islower (*eval_text))
-	    digit = *eval_text - 'a' + 10;
-	  else if (isupper (*eval_text))
-	    digit = *eval_text - 'A' + 10;
-	  else
-	    break;
+        {
+          if (isdigit (*eval_text))
+            digit = *eval_text - '0';
+          else if (islower (*eval_text))
+            digit = *eval_text - 'a' + 10;
+          else if (isupper (*eval_text))
+            digit = *eval_text - 'A' + 10;
+          else
+            break;
 
-	  if (digit >= base)
-	    break;
+          if (digit >= base)
+            break;
 
-	  (*val) = (*val) * base + digit;
-	}
+          (*val) = (*val) * base + digit;
+        }
       return M4_NUMBER;
     }
 
@@ -188,74 +188,74 @@ static eval_token eval_lex( eval_t *val )
       return M4_MINUS;
     case '*':
       if (*eval_text == '*')
-	{
-	  eval_text++;
-	  return M4_EXPONENT;
-	}
+        {
+          eval_text++;
+          return M4_EXPONENT;
+        }
       else
-	return M4_TIMES;
+        return M4_TIMES;
     case '/':
       return M4_DIVIDE;
     case '%':
       return M4_MODULO;
     case '=':
       if (*eval_text == '=')
-	eval_text++;
+        eval_text++;
       return M4_EQ;
     case '!':
       if (*eval_text == '=')
-	{
-	  eval_text++;
-	  return M4_NOTEQ;
-	}
+        {
+          eval_text++;
+          return M4_NOTEQ;
+        }
       else
-	return M4_LNOT;
+        return M4_LNOT;
     case '>':
       if (*eval_text == '=')
-	{
-	  eval_text++;
-	  return M4_GTEQ;
-	}
+        {
+          eval_text++;
+          return M4_GTEQ;
+        }
       else if (*eval_text == '>')
-	{
-	  eval_text++;
-	  return M4_RSHIFT;
-	}
+        {
+          eval_text++;
+          return M4_RSHIFT;
+        }
       else
-	return M4_GT;
+        return M4_GT;
     case '<':
       if (*eval_text == '=')
-	{
-	  eval_text++;
-	  return M4_LSEQ;
-	}
+        {
+          eval_text++;
+          return M4_LSEQ;
+        }
       else if (*eval_text == '<')
-	{
-	  eval_text++;
-	  return M4_LSHIFT;
-	}
+        {
+          eval_text++;
+          return M4_LSHIFT;
+        }
       else
-	return M4_LS;
+        return M4_LS;
     case '^':
       return M4_XOR;
     case '~':
       return M4_NOT;
     case '&':
       if (*eval_text == '&')
-	{
-	  eval_text++;
-	  return M4_LAND;
-	}
+        {
+          eval_text++;
+          return M4_LAND;
+        }
       else
-	return M4_AND;
+        return M4_AND;
     case '|':
       if (*eval_text == '|')
-	{
-	  eval_text++;
-	  return M4_LOR;
-	}
+        {
+          eval_text++;
+          return M4_LOR;
+        }
       else
-	return M4_OR;
+        return M4_OR;
     case '(':
       return M4_LEFTP;
     case ')':
@@ -266,7 +266,7 @@ static eval_token eval_lex( eval_t *val )
 }
 
 /*---------------------------------------.
-| Main entry point, called from "eval".	 |
+| Main entry point, called from "eval".  |
 `---------------------------------------*/
 
 boolean_for_m4
@@ -289,7 +289,7 @@ evaluate (const char *expr, eval_t *val)
 
     case M4_MISSING_RIGHT:
       fprintf( stderr, "Bad expression in eval (missing right parenthesis): %s",
-		expr);
+                expr);
       break;
 
     case M4_SYNTAX_ERROR:
@@ -337,10 +337,10 @@ logical_or_term (eval_token et, eval_t *v1)
     {
       et = eval_lex (&v2);
       if (et == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if ((er = logical_and_term (et, &v2)) != M4_NO_ERROR)
-	return er;
+        return er;
 
       *v1 = *v1 || v2;
     }
@@ -364,10 +364,10 @@ logical_and_term (eval_token et, eval_t *v1)
     {
       et = eval_lex (&v2);
       if (et == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if ((er = or_term (et, &v2)) != M4_NO_ERROR)
-	return er;
+        return er;
 
       *v1 = *v1 && v2;
     }
@@ -391,10 +391,10 @@ or_term (eval_token et, eval_t *v1)
     {
       et = eval_lex (&v2);
       if (et == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if ((er = xor_term (et, &v2)) != M4_NO_ERROR)
-	return er;
+        return er;
 
       *v1 = *v1 | v2;
     }
@@ -418,10 +418,10 @@ xor_term (eval_token et, eval_t *v1)
     {
       et = eval_lex (&v2);
       if (et == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if ((er = and_term (et, &v2)) != M4_NO_ERROR)
-	return er;
+        return er;
 
       *v1 = *v1 ^ v2;
     }
@@ -445,10 +445,10 @@ and_term (eval_token et, eval_t *v1)
     {
       et = eval_lex (&v2);
       if (et == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if ((er = not_term (et, &v2)) != M4_NO_ERROR)
-	return er;
+        return er;
 
       *v1 = *v1 & v2;
     }
@@ -468,10 +468,10 @@ not_term (eval_token et, eval_t *v1)
     {
       et = eval_lex (v1);
       if (et == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if ((er = not_term (et, v1)) != M4_NO_ERROR)
-	return er;
+        return er;
       *v1 = ~*v1;
     }
   else
@@ -490,10 +490,10 @@ logical_not_term (eval_token et, eval_t *v1)
     {
       et = eval_lex (v1);
       if (et == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if ((er = logical_not_term (et, v1)) != M4_NO_ERROR)
-	return er;
+        return er;
       *v1 = !*v1;
     }
   else
@@ -514,47 +514,47 @@ cmp_term (eval_token et, eval_t *v1)
     return er;
 
   while ((op = eval_lex (&v2)) == M4_EQ || op == M4_NOTEQ
-	 || op == M4_GT || op == M4_GTEQ
-	 || op == M4_LS || op == M4_LSEQ)
+         || op == M4_GT || op == M4_GTEQ
+         || op == M4_LS || op == M4_LSEQ)
     {
 
       et = eval_lex (&v2);
       if (et == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if ((er = shift_term (et, &v2)) != M4_NO_ERROR)
-	return er;
+        return er;
 
       switch (op)
-	{
-	case M4_EQ:
-	  *v1 = *v1 == v2;
-	  break;
+        {
+        case M4_EQ:
+          *v1 = *v1 == v2;
+          break;
 
-	case M4_NOTEQ:
-	  *v1 = *v1 != v2;
-	  break;
+        case M4_NOTEQ:
+          *v1 = *v1 != v2;
+          break;
 
-	case M4_GT:
-	  *v1 = *v1 > v2;
-	  break;
+        case M4_GT:
+          *v1 = *v1 > v2;
+          break;
 
-	case M4_GTEQ:
-	  *v1 = *v1 >= v2;
-	  break;
+        case M4_GTEQ:
+          *v1 = *v1 >= v2;
+          break;
 
-	case M4_LS:
-	  *v1 = *v1 < v2;
-	  break;
+        case M4_LS:
+          *v1 = *v1 < v2;
+          break;
 
-	case M4_LSEQ:
-	  *v1 = *v1 <= v2;
-	  break;
+        case M4_LSEQ:
+          *v1 = *v1 <= v2;
+          break;
 
-	default:
-	  fprintf( stderr, "INTERNAL ERROR: Bad comparison operator in cmp_term ()");
-	  abort ();
-	}
+        default:
+          fprintf( stderr, "INTERNAL ERROR: Bad comparison operator in cmp_term ()");
+          abort ();
+        }
     }
   if (op == M4_ERROR)
     return M4_UNKNOWN_INPUT;
@@ -578,25 +578,25 @@ shift_term (eval_token et, eval_t *v1)
 
       et = eval_lex (&v2);
       if (et == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if ((er = add_term (et, &v2)) != M4_NO_ERROR)
-	return er;
+        return er;
 
       switch (op)
-	{
-	case M4_LSHIFT:
-	  *v1 = *v1 << v2;
-	  break;
+        {
+        case M4_LSHIFT:
+          *v1 = *v1 << v2;
+          break;
 
-	case M4_RSHIFT:
-	  *v1 = *v1 >> v2;
-	  break;
+        case M4_RSHIFT:
+          *v1 = *v1 >> v2;
+          break;
 
-	default:
-	  fprintf( stderr, "INTERNAL ERROR: Bad shift operator in shift_term ()");
-	  abort ();
-	}
+        default:
+          fprintf( stderr, "INTERNAL ERROR: Bad shift operator in shift_term ()");
+          abort ();
+        }
     }
   if (op == M4_ERROR)
     return M4_UNKNOWN_INPUT;
@@ -619,15 +619,15 @@ add_term (eval_token et, eval_t *v1)
     {
       et = eval_lex (&v2);
       if (et == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if ((er = mult_term (et, &v2)) != M4_NO_ERROR)
-	return er;
+        return er;
 
       if (op == M4_PLUS)
-	*v1 = *v1 + v2;
+        *v1 = *v1 + v2;
       else
-	*v1 = *v1 - v2;
+        *v1 = *v1 - v2;
     }
   if (op == M4_ERROR)
     return M4_UNKNOWN_INPUT;
@@ -650,35 +650,35 @@ mult_term (eval_token et, eval_t *v1)
     {
       et = eval_lex (&v2);
       if (et == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if ((er = exp_term (et, &v2)) != M4_NO_ERROR)
-	return er;
+        return er;
 
       switch (op)
-	{
-	case M4_TIMES:
-	  *v1 = *v1 * v2;
-	  break;
+        {
+        case M4_TIMES:
+          *v1 = *v1 * v2;
+          break;
 
-	case M4_DIVIDE:
-	  if (v2 == 0)
-	    return M4_DIVIDE_ZERO;
-	  else
-	    *v1 = *v1 / v2;
-	  break;
+        case M4_DIVIDE:
+          if (v2 == 0)
+            return M4_DIVIDE_ZERO;
+          else
+            *v1 = *v1 / v2;
+          break;
 
-	case M4_MODULO:
-	  if (v2 == 0)
-	    return M4_MODULO_ZERO;
-	  else
-	    *v1 = *v1 % v2;
-	  break;
+        case M4_MODULO:
+          if (v2 == 0)
+            return M4_MODULO_ZERO;
+          else
+            *v1 = *v1 % v2;
+          break;
 
-	default:
-	  fprintf( stderr, "INTERNAL ERROR: Bad operator in mult_term ()");
-	  abort ();
-	}
+        default:
+          fprintf( stderr, "INTERNAL ERROR: Bad operator in mult_term ()");
+          abort ();
+        }
     }
   if (op == M4_ERROR)
     return M4_UNKNOWN_INPUT;
@@ -702,14 +702,14 @@ exp_term (eval_token et, eval_t *v1)
     {
       et = eval_lex (&v2);
       if (et == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if ((er = exp_term (et, &v2)) != M4_NO_ERROR)
-	return er;
+        return er;
 
       result = 1;
       while (v2-- > 0)
-	result *= *v1;
+        result *= *v1;
       *v1 = result;
     }
   if (et == M4_ERROR)
@@ -729,13 +729,13 @@ unary_term (eval_token et, eval_t *v1)
     {
       et2 = eval_lex (v1);
       if (et2 == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if ((er = simple_term (et2, v1)) != M4_NO_ERROR)
-	return er;
+        return er;
 
       if (et == M4_MINUS)
-	*v1 = -*v1;
+        *v1 = -*v1;
     }
   else
     if ((er = simple_term (et, v1)) != M4_NO_ERROR)
@@ -755,17 +755,17 @@ simple_term (eval_token et, eval_t *v1)
     case M4_LEFTP:
       et = eval_lex (v1);
       if (et == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if ((er = logical_or_term (et, v1)) != M4_NO_ERROR)
-	return er;
+        return er;
 
       et = eval_lex (&v2);
       if (et == M4_ERROR)
-	return M4_UNKNOWN_INPUT;
+        return M4_UNKNOWN_INPUT;
 
       if (et != M4_RIGHTP)
-	return M4_MISSING_RIGHT;
+        return M4_MISSING_RIGHT;
 
       break;
 
@@ -819,7 +819,7 @@ unescape(char *string)
 /*
  * This one is called from PIR using NCI with the signature 'it'.
  */
-int 
+int
 m4_evaluate( void *program )
 {
     eval_t value;                        /* will be returned to caller */
