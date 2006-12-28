@@ -42,7 +42,7 @@ op debug_init() :base_debug {
     PDB_t *pdb;
 
     if (!(interp->pdb)) {
-        pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof(PDB_t));
+        pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof (PDB_t));
 
         interp->pdb = pdb;
         pdb->cur_opcode = interp->code->base.data;

@@ -1024,16 +1024,16 @@ inline op gcd(out INT, in INT, in INT) :advanced_math {
  INTVAL a = $2 < 0 ? -$2 : $2;
  INTVAL b = $3 < 0 ? -$3 : $3;
 
- if(a==0) { $1=b; goto NEXT(); }
- if(b==0) { $1=a; goto NEXT(); }
+ if (a==0) { $1=b; goto NEXT(); }
+ if (b==0) { $1=a; goto NEXT(); }
 
- while( !((a | b) & 1) ) {
+ while ( !((a | b) & 1) ) {
    a>>=1;
    b>>=1;
    p++;
  }
 
- while(a>0) {
+ while (a>0) {
    if      (!(a & 1)) a>>=1;
    else if (!(b & 1)) b>>=1;
    else if (a<b)      b = (b-a)>>1;
@@ -1060,15 +1060,15 @@ inline op lcm(out INT, in INT, in INT) :advanced_math {
  INTVAL b = $3 < 0 ? -$3 : $3;
  INTVAL saved_var1 = a, saved_var2 = b;
 
- if(a==0 || b==0) { $1=0; goto NEXT(); }
+ if (a==0 || b==0) { $1=0; goto NEXT(); }
 
- while( !((a | b) & 1) ) {
+ while ( !((a | b) & 1) ) {
    a>>=1;
    b>>=1;
    p++;
  }
 
- while(a>0) {
+ while (a>0) {
    if      (!(a & 1)) a>>=1;
    else if (!(b & 1)) b>>=1;
    else if (a<b)      b = (b-a)>>1;
@@ -1096,7 +1096,7 @@ inline op fact(out INT, in INT) :advanced_math {
    * in this situation. */
   INTVAL i = $2;
   UINTVAL q = 1;
-  while(i>0) {
+  while (i>0) {
     q = q*i;
     i--;
   }
@@ -1109,7 +1109,7 @@ inline op fact(out NUM, in INT) :advanced_math {
    * in this situation. */
   INTVAL i = $2;
   FLOATVAL q = 1;
-  while(i>0) {
+  while (i>0) {
     q = q*i;
     i--;
   }
