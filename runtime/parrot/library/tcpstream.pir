@@ -127,7 +127,7 @@ Closes the socket.
     close sock
 .end
 
-=item C<void connect(string host, int port)
+=item C<void connect(string host, int port)>
 
 Connects to a host/port.
 
