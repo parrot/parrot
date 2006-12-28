@@ -257,7 +257,7 @@ Parrot_dod_trace_root(Interp *interp, int trace_stack)
         /*
          * XXX dynpmc groups have empty slots for abstract objects
          */
-        if ( (vtable = interp->vtables[i])) {
+        if ((vtable = interp->vtables[i])) {
 #if 0
             if (vtable->class)
                 pobject_lives(interp, (PObj *)vtable->class);
@@ -687,7 +687,7 @@ static size_t
 find_common_mask(size_t val1, size_t val2)
 {
     int i;
-    const int bound = sizeof(size_t) * 8;
+    const int bound = sizeof (size_t) * 8;
 
     /* Shifting a value by its size (in bits) or larger is undefined behaviour.
        So need an explicit check to return 0 if there is no prefix, rather than
@@ -750,8 +750,7 @@ trace_mem_block(Interp *interp,
 
     for (cur_var_ptr = hi_var_ptr;
             (ptrdiff_t)cur_var_ptr < (ptrdiff_t)lo_var_ptr;
-            cur_var_ptr = (size_t)((ptrdiff_t)cur_var_ptr + sizeof(void *))
-            ) {
+            cur_var_ptr = (size_t)((ptrdiff_t)cur_var_ptr + sizeof (void *))) {
         const size_t ptr = *(size_t *)cur_var_ptr;
 
         /* Do a quick approximate range check by bit-masking */

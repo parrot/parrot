@@ -208,14 +208,14 @@ do_prederef(void **pc_prederef, Parrot_Interp interp, int type)
             size_t nb = interp->code->base.size / 16;
             if (nb < 8)
                 nb = (size_t)8;
-            pi->branches = mem_sys_allocate( sizeof(Prederef_branch) * nb);
+            pi->branches = mem_sys_allocate( sizeof (Prederef_branch) * nb);
             pi->n_allocated = nb;
             pi->n_branches = 0;
         }
         else if (pi->n_branches >= pi->n_allocated) {
             pi->n_allocated = (size_t) (pi->n_allocated * 1.5);
             pi->branches = mem_sys_realloc( pi->branches,
-                    sizeof(Prederef_branch) * pi->n_allocated);
+                    sizeof (Prederef_branch) * pi->n_allocated);
         }
         pi->branches[pi->n_branches].offs = offset;
         pi->branches[pi->n_branches].op = *pc_prederef;
@@ -363,10 +363,10 @@ init_prederef(Interp *interp, int which)
    -- Need to verify this, it may have been a bug elsewhere. If it works now,
    we can remove the mem_sys_allocate_zeroed line below. */
 #if 0
-        void **temp = (void **)mem_sys_allocate_zeroed(N * sizeof(void *));
+        void **temp = (void **)mem_sys_allocate_zeroed(N * sizeof (void *));
 #else
         void **temp = (void **)Parrot_memalign_if_possible(256,
-                N * sizeof(void *));
+                N * sizeof (void *));
 #endif
         /*
          * calc and remember pred_offset
@@ -719,10 +719,10 @@ runops_int(Interp *interp, size_t offset)
                     core = runops_profile_core;
                     if (interp->profile == NULL) {
                         interp->profile = (RunProfile *)
-                            mem_sys_allocate_zeroed(sizeof(RunProfile));
+                            mem_sys_allocate_zeroed(sizeof (RunProfile));
                         interp->profile->data = (ProfData *)
                             mem_sys_allocate_zeroed((interp->op_count +
-                                        PARROT_PROF_EXTRA) * sizeof(ProfData));
+                                        PARROT_PROF_EXTRA) * sizeof (ProfData));
                     }
                 }
                 break;
@@ -815,7 +815,7 @@ Parrot_setup_event_func_ptrs(Parrot_Interp interp)
         return;
     /* function or CG core - prepare func_table */
     if (!interp->evc_func_table) {
-        interp->evc_func_table = mem_sys_allocate(sizeof(void *) * n);
+        interp->evc_func_table = mem_sys_allocate(sizeof (void *) * n);
         for (i = 0; i < n; ++i)
             interp->evc_func_table[i] = (op_func_t)
                 D2FPTR(((void**)lib->op_func_table)[CORE_OPS_check_events__]);
@@ -875,10 +875,10 @@ dynop_register(Parrot_Interp interp, PMC* lib_pmc)
 
     if (!interp->all_op_libs)
         interp->all_op_libs = mem_sys_allocate(
-                sizeof(op_lib_t *) * (interp->n_libs + 1));
+                sizeof (op_lib_t *) * (interp->n_libs + 1));
     else
         interp->all_op_libs = mem_sys_realloc(interp->all_op_libs,
-                sizeof(op_lib_t *) * (interp->n_libs + 1));
+                sizeof (op_lib_t *) * (interp->n_libs + 1));
 
     init_func = get_op_lib_init(0, 0, lib_pmc);
     lib = init_func(1);
@@ -989,10 +989,10 @@ dynop_register_xx(Parrot_Interp interp, PMC* lib_pmc,
 
     if (cg_lib->flags & OP_FUNC_IS_ALLOCATED) {
         ops_addr = mem_sys_realloc(cg_lib->op_func_table,
-                n_tot * sizeof(void *));
+                n_tot * sizeof (void *));
     }
     else {
-        ops_addr = mem_sys_allocate(n_tot * sizeof(void *));
+        ops_addr = mem_sys_allocate(n_tot * sizeof (void *));
         cg_lib->flags = OP_FUNC_IS_ALLOCATED;
         for (i = 0; i < n_old; ++i)
             ops_addr[i] = ((void **)cg_lib->op_func_table)[i];

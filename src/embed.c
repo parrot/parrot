@@ -390,8 +390,7 @@ again:
 
     pf = PackFile_new(interp, is_mapped);
 
-    if (!PackFile_unpack
-        (interp, pf, (opcode_t *)program_code, program_size)) {
+    if (!PackFile_unpack(interp, pf, (opcode_t *)program_code, program_size)) {
         PIO_eprintf(interp, "Parrot VM: Can't unpack packfile %s.\n",
                 fullname);
         return NULL;
@@ -608,7 +607,7 @@ print_profile(Interp *interp, int status, void *p)
         }
         qsort(profile->data, interp->op_count +
                 PARROT_PROF_EXTRA,
-                sizeof(ProfData), prof_sort_f);
+                sizeof (ProfData), prof_sort_f);
         for (j = 0; j < interp->op_count + PARROT_PROF_EXTRA; j++) {
             UINTVAL n = profile->data[j].numcalls;
             FLOATVAL t = profile->data[j].time;
@@ -865,7 +864,7 @@ Parrot_disassemble(Interp *interp)
     PDB_line_t *line;
     char *c;
 
-    pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof(PDB_t));
+    pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof (PDB_t));
 
     interp->pdb = pdb;
     pdb->cur_opcode = interp->code->base.data;

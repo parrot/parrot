@@ -129,7 +129,7 @@ make_branch_list(Interp *interp,
     /* Allocate space for the branch list */
     optimizer->branch_list = (opcode_t **)
         mem_sys_allocate_zeroed(
-                (size_t)(code_end - code_start) * sizeof(opcode_t *));
+                (size_t)(code_end - code_start) * sizeof (opcode_t *));
 
     /* If the opcode jumps we may:
      *
@@ -445,7 +445,7 @@ make_sections(Interp *interp,
 
     /* Allocate the first section */
     cur_section = optimizer->sections = (Parrot_jit_optimizer_section_t *)
-        mem_sys_allocate_zeroed(sizeof(Parrot_jit_optimizer_section_t));
+        mem_sys_allocate_zeroed(sizeof (Parrot_jit_optimizer_section_t));
     cur_section->begin = code_start;
     prev_section = cur_section;
 
@@ -511,7 +511,7 @@ make_sections(Interp *interp,
                 /* Allocate a new section */
                 t_section = (Parrot_jit_optimizer_section_t *)
                     mem_sys_allocate_zeroed(
-                            sizeof(Parrot_jit_optimizer_section_t));
+                            sizeof (Parrot_jit_optimizer_section_t));
                 /* Add it to the double linked list */
                 cur_section->next = t_section;
                 t_section->prev = cur_section;
@@ -885,7 +885,7 @@ debug_sections(Interp *interp,
             char instr[256];
             opcode_t op = *cur_op;
             op_info = &interp->op_info_table[op];
-            PDB_disassemble_op(interp, instr, sizeof(instr),
+            PDB_disassemble_op(interp, instr, sizeof (instr),
                     op_info, cur_op, NULL, code_start, 0);
             PIO_eprintf(interp, "\t\tOP%vu: ext %3d\t%s\n",
                     cur_op - code_start, op_jit[*cur_op].extcall, instr);
@@ -904,7 +904,7 @@ debug_sections(Interp *interp,
         PIO_eprintf(interp, "\tend:\t%#p\t(%Ou)\n",
                 cur_section->end, *cur_section->end);
 
-        for (j = 0; j < sizeof(types_to_list)/sizeof(int); j++) {
+        for (j = 0; j < sizeof (types_to_list)/sizeof (int); j++) {
             char t;
             typ = types_to_list[j];
             t = types[typ];
@@ -959,7 +959,7 @@ optimize_jit(Interp *interp,
     /* Allocate space for the optimizer */
     jit_info->optimizer =
         optimizer = (Parrot_jit_optimizer_t *)
-            mem_sys_allocate_zeroed(sizeof(Parrot_jit_optimizer_t));
+            mem_sys_allocate_zeroed(sizeof (Parrot_jit_optimizer_t));
 
     /* Look, which opcodes might branch */
     make_branch_list(interp, optimizer, code_start, code_end);
@@ -1017,7 +1017,7 @@ optimize_imcc_jit(Interp *interp,
     /* Allocate space for the optimizer */
     jit_info->optimizer =
         optimizer = (Parrot_jit_optimizer_t *)
-            mem_sys_allocate_zeroed(sizeof(Parrot_jit_optimizer_t));
+            mem_sys_allocate_zeroed(sizeof (Parrot_jit_optimizer_t));
     /*
      * TODO: pass the whole map_branch in the PBC
      *       this would save two runs through all the opcode
@@ -1031,7 +1031,7 @@ optimize_imcc_jit(Interp *interp,
     cur_op = code_start;
     for (prev = NULL, i = 0; i < size/6; i++, prev = section) {
         section = (Parrot_jit_optimizer_section_t *)
-            mem_sys_allocate_zeroed(sizeof(Parrot_jit_optimizer_section_t));
+            mem_sys_allocate_zeroed(sizeof (Parrot_jit_optimizer_section_t));
         if (prev)
             prev->next = section;
         else
@@ -1375,7 +1375,7 @@ parrot_build_asm(Interp *interp,
     int needs_fs;       /* fetch/store */
 
     jit_info = interp->code->jit_info =
-            mem_sys_allocate(sizeof(Parrot_jit_info_t));
+            mem_sys_allocate(sizeof (Parrot_jit_info_t));
 
     jit_info->flags     = jit_type & JIT_CODE_RECURSIVE;
     jit_type &= ~ JIT_CODE_RECURSIVE;
@@ -1440,7 +1440,7 @@ parrot_build_asm(Interp *interp,
     jit_info->arena.map_size = (code_end - code_start) + 1;
     jit_info->arena.op_map =
         (Parrot_jit_opmap_t *)mem_sys_allocate_zeroed(
-            jit_info->arena.map_size * sizeof(* (jit_info->arena.op_map)));
+            jit_info->arena.map_size * sizeof (* (jit_info->arena.op_map)));
 
 #if REQUIRES_CONSTANT_POOL
     Parrot_jit_init_arenas(jit_info);
@@ -1728,7 +1728,7 @@ Parrot_jit_newfixup(Parrot_jit_info_t *jit_info)
 {
     Parrot_jit_fixup_t *fixup;
 
-    fixup = mem_sys_allocate_zeroed(sizeof(*fixup));
+    fixup = mem_sys_allocate_zeroed(sizeof (*fixup));
 
     /* Insert fixup at the head of the list */
     fixup->next = jit_info->arena.fixups;

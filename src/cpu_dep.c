@@ -84,7 +84,7 @@ trace_system_areas(Interp *interp)
     Parrot_jump_buff env;
 
     /* Zero the Parrot_jump_buff, otherwise you will trace stale objects */
-    memset(&env, 0, sizeof(env));
+    memset(&env, 0, sizeof (env));
 
     /* this should put registers in env, which then get marked in
      * trace_system_stack below

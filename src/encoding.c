@@ -65,7 +65,7 @@ parrot_deinit_encodings(Interp *interp)
 ENCODING *
 Parrot_new_encoding(Interp *interp)
 {
-    return mem_sys_allocate(sizeof(ENCODING));
+    return mem_sys_allocate(sizeof (ENCODING));
 }
 
 ENCODING *
@@ -175,10 +175,10 @@ register_encoding(Interp *interp, const char *encodingname,
      * loading of encodings from inside threads
      */
     if (!n)
-        all_encodings->enc = mem_sys_allocate(sizeof(One_encoding));
+        all_encodings->enc = mem_sys_allocate(sizeof (One_encoding));
     else
         all_encodings->enc = mem_sys_realloc(all_encodings->enc, (n + 1) *
-                sizeof(One_encoding));
+                sizeof (One_encoding));
     all_encodings->n_encodings++;
     all_encodings->enc[n].encoding = encoding;
     all_encodings->enc[n].name = const_string(interp, encodingname);
@@ -191,7 +191,7 @@ Parrot_register_encoding(Interp *interp, const char *encodingname,
         ENCODING *encoding)
 {
     if (!all_encodings) {
-        all_encodings = mem_sys_allocate(sizeof(All_encodings));
+        all_encodings = mem_sys_allocate(sizeof (All_encodings));
         all_encodings->n_encodings = 0;
         all_encodings->enc = NULL;
     }

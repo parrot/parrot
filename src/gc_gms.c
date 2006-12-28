@@ -238,7 +238,7 @@ gc_gms_pool_init(Interp *interp, struct Small_Object_Pool *pool)
     gc_gms_init_gen(interp, pool);
     pool->white = pool->white_fin = pool->free_list = &pool->marker;
 
-    pool->object_size += sizeof(Gc_gms_hdr);
+    pool->object_size += sizeof (Gc_gms_hdr);
 }
 
 void
@@ -248,7 +248,7 @@ Parrot_gc_gms_init(Interp* interp)
     struct Small_Object_Pool *pool;
 
     arena_base = interp->arena_base;
-    arena_base->gc_private = mem_sys_allocate_zeroed(sizeof(Gc_gms_private));
+    arena_base->gc_private = mem_sys_allocate_zeroed(sizeof (Gc_gms_private));
 
     /*
      * set function hooks according to pdd09
@@ -394,7 +394,7 @@ gc_gms_alloc_objects(Interp *interp,
 
 
     real_size = pool->object_size;
-    new_arena = mem_internal_allocate(sizeof(struct Small_Object_Arena));
+    new_arena = mem_internal_allocate(sizeof (struct Small_Object_Arena));
     size = real_size * pool->objects_per_alloc;
     new_arena->start_objects = mem_internal_allocate(size);
     /* insert arena in list */
@@ -500,7 +500,7 @@ gc_gms_create_gen(Interp *interp,
 {
     Gc_gms_gen *gen;
 
-    gen = mem_sys_allocate(sizeof(*gen));
+    gen = mem_sys_allocate(sizeof (*gen));
     gen->gen_no = gen_no;
     gen->pool = pool;
     gen->timely_destruct_obj_sofar = 0;
@@ -616,7 +616,7 @@ gc_gms_store_hdr_list(Interp *interp, Gc_gms_hdr_list *l, Gc_gms_hdr *h)
 
     /* if it's not created or if it's full allocate new store */
     if (!s || s->ptr == &s->store[GC_GMS_STORE_SIZE]) {
-        s = mem_sys_allocate(sizeof(Gc_gms_hdr_store));
+        s = mem_sys_allocate(sizeof (Gc_gms_hdr_store));
         s->ptr = &s->store[0];
         s->next = NULL;
         /* chain new store to old one */

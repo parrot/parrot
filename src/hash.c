@@ -33,8 +33,8 @@ don't apply.
 #define INITIAL_BUCKETS 16
 
 #define N_BUCKETS(n) ((n) - (n)/4)
-#define HASH_ALLOC_SIZE(n) ( N_BUCKETS(n) * sizeof(HashBucket) + \
-                             (n) * sizeof(HashBucket *))
+#define HASH_ALLOC_SIZE(n) (N_BUCKETS(n) * sizeof (HashBucket) + \
+                             (n) * sizeof (HashBucket *))
 
 
 /*
@@ -433,7 +433,7 @@ expand_hash(Interp *interp, Hash *hash)
     /* things can have moved by this offset */
     offset = (char*)new_mem - (char*)old_mem;
     /* relocate the bucket index */
-    mem_sys_memmove(new_bi, old_bi, old_size * sizeof(HashBucket*));
+    mem_sys_memmove(new_bi, old_bi, old_size * sizeof (HashBucket*));
 
     /* update hash data */
     hash->bi = new_bi;
@@ -441,7 +441,7 @@ expand_hash(Interp *interp, Hash *hash)
     hash->mask = new_size - 1;
 
     /* clear freshly allocated bucket index */
-    memset(new_bi + old_size, 0, sizeof(HashBucket*) * old_size);
+    memset(new_bi + old_size, 0, sizeof (HashBucket*) * old_size);
     /*
      * reloc pointers - this part would be also needed, if we
      * allocate hash memory from GC movable memory, and then
@@ -634,7 +634,7 @@ parrot_new_hash_x(Interp *interp, Hash **hptr,
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash)
 {
-    Hash *hash = mem_sys_allocate(sizeof(Hash));
+    Hash *hash = mem_sys_allocate(sizeof (Hash));
     hash->container = NULL;
     *hptr = hash;
     init_hash(interp, hash, val_type, hkey_type,
@@ -647,7 +647,7 @@ parrot_new_pmc_hash_x(Interp *interp, PMC *container,
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash)
 {
-    Hash *hash = mem_sys_allocate(sizeof(Hash));
+    Hash *hash = mem_sys_allocate(sizeof (Hash));
     PMC_struct_val(container) = hash;
     hash->container = container;
     init_hash(interp, hash, val_type, hkey_type,

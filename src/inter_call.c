@@ -660,7 +660,7 @@ init_named(Interp *interp, struct call_state *st)
         else
             n_named++;
     }
-    if (n_named >= (int)(sizeof(UINTVAL) * 8))
+    if (n_named >= (int)(sizeof (UINTVAL) * 8))
         real_exception(interp, NULL, E_ValueError,
                 "Too many named arguments");
     st->named_done = 0;
@@ -929,7 +929,7 @@ process_args(Interp *interp, struct call_state *st,
         }
 
         state = st->dest.mode & CALL_STATE_MASK;
-        switch(state) {
+        switch (state) {
             case CALL_STATE_NAMED_NAMED:
             case CALL_STATE_NAMED_NAMED_OPT:
                 if (!locate_named_named(interp, st))
@@ -952,7 +952,7 @@ process_args(Interp *interp, struct call_state *st,
             st->dest.sig |= PARROT_ARG_PMC;
         }
 
-        switch(state) {
+        switch (state) {
             case CALL_STATE_POS_POS:
                 st->dest.mode |= CALL_STATE_NEXT_ARG;
                 /* fall through */

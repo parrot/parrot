@@ -62,7 +62,7 @@ Parrot_make_cb(Parrot_Interp interp, PMC* sub, PMC* user_data,
     /* only ASCII signatures are supported */
     sig_str = cb_signature->strstart;
 
-    if (strlen (sig_str) != 3) {
+    if (strlen(sig_str) != 3) {
         internal_exception(1, "unhandled signature '%s' in make_cb",
               cb_signature->strstart);
     }

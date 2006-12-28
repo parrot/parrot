@@ -35,7 +35,7 @@ static unsigned int parrot_config_size_stored = 0;
 /*
 
 =item C<void
-Parrot_set_config_hash_internal (const unsigned char* parrot_config,
+Parrot_set_config_hash_internal(const unsigned char* parrot_config,
                                  unsigned int parrot_config_size)>
 
 Called by Parrot_set_config_hash with the serialised hash which
@@ -46,7 +46,7 @@ will be used in subsequently created Interpreters
 */
 
 void
-Parrot_set_config_hash_internal (const unsigned char* parrot_config,
+Parrot_set_config_hash_internal(const unsigned char* parrot_config,
                                  unsigned int parrot_config_size)
 {
     parrot_config_stored      = parrot_config;
@@ -55,7 +55,7 @@ Parrot_set_config_hash_internal (const unsigned char* parrot_config,
 
 /*
 
-=item C<void parrot_set_config_hash_interpreter (Interp* interp)>
+=item C<void parrot_set_config_hash_interpreter(Interp* interp)>
 
 
 Used internally to associate the config hash with an Interpreter
@@ -66,7 +66,7 @@ using the last registered config data.
 */
 
 static void
-parrot_set_config_hash_interpreter (Interp* interp)
+parrot_set_config_hash_interpreter(Interp* interp)
 {
     PMC *iglobals = interp->iglobals;
 

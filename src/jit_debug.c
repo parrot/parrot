@@ -81,8 +81,8 @@ http://sources.redhat.com/gdb/current/onlinedocs/stabs_toc.html.
 #ifdef __GNUC__
 void Parrot_jit_debug(Interp* interp);
 
-#  define BIT_SIZE(t) ((int)(sizeof(t)*8))
-#  define BYTE_SIZE(t) ((int)sizeof(t))
+#  define BIT_SIZE(t) ((int)(sizeof (t)*8))
+#  define BYTE_SIZE(t) ((int)sizeof (t))
 #  define BIT_OFFSET(str, field) ((int)(offsetof(str, field) * 8))
 
 typedef struct {
@@ -135,14 +135,14 @@ write_types(FILE *stabs, Interp *interp)
     for (i = 0; base_types[i].name; ++i) {
         if (! base_types[i].spec)
             continue;
-        fprintf (stabs, ".stabs \"%s:t(0,%d)=", base_types[i].name, i);
+        fprintf(stabs, ".stabs \"%s:t(0,%d)=", base_types[i].name, i);
         if (base_types[i].spec [0] == ';') {
-            fprintf (stabs, "r(0,%d)%s\"", i, base_types[i].spec);
+            fprintf(stabs, "r(0,%d)%s\"", i, base_types[i].spec);
         }
         else {
-            fprintf (stabs, "%s\"", base_types[i].spec);
+            fprintf(stabs, "%s\"", base_types[i].spec);
         }
-        fprintf (stabs, "," N_LSYM ",0,0,0\n");
+        fprintf(stabs, "," N_LSYM ",0,0,0\n");
     }
     fprintf(stabs, ".stabs \"STRING:t(0,%d)=*(0,%d)\""
                 "," N_LSYM ",0,0,0\n", i, i+1);
@@ -191,7 +191,7 @@ write_types(FILE *stabs, Interp *interp)
                 "u:(0,%d),%d,%d;"
                 "flags:(0,12),%d,%d;"
                 ";\""
-                "," N_LSYM ",0,0,0\n", i + 1, (int)(sizeof(pobj_t)),
+                "," N_LSYM ",0,0,0\n", i + 1, (int)(sizeof (pobj_t)),
                 i + 2, BIT_OFFSET(pobj_t, u), BIT_SIZE(UnionVal),
                 BIT_OFFSET(pobj_t, flags), BIT_SIZE(Parrot_UInt)
                 );
@@ -297,9 +297,9 @@ Parrot_jit_debug_stabs(Interp *interp)
         /* chop pasm/pir */
 
         ext = strrchr(src, '.');
-        if (ext && strcmp (ext, ".pasm") == 0)
+        if (ext && strcmp(ext, ".pasm") == 0)
             file = string_chopn(interp, file, 4, 1);
-        else if (ext && strcmp (ext, ".pir") == 0)
+        else if (ext && strcmp(ext, ".pir") == 0)
             file = string_chopn(interp, file, 3, 1);
         else if (!ext) /* EVAL_n */
             file = string_append(interp, file,

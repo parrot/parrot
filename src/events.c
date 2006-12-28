@@ -112,7 +112,7 @@ typedef struct {
 } io_thread_msg;
 
 
-#define MSG_SIZE (sizeof(io_thread_msg))
+#define MSG_SIZE (sizeof (io_thread_msg))
 
 /*
 
@@ -335,7 +335,7 @@ Create queue entry and insert event into task queue.
 void
 Parrot_schedule_event(Parrot_Interp interp, parrot_event* ev)
 {
-    QUEUE_ENTRY* entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
+    QUEUE_ENTRY* entry = mem_sys_allocate(sizeof (QUEUE_ENTRY));
     entry->next = NULL;
     ev->interp = interp;
     entry->data = ev;
@@ -364,10 +364,10 @@ Parrot_schedule_event(Parrot_Interp interp, parrot_event* ev)
 static void
 schedule_signal_event(int signum)
 {
-    parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
+    parrot_event* ev = mem_sys_allocate(sizeof (parrot_event));
     QUEUE_ENTRY *entry;
 
-    entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
+    entry = mem_sys_allocate(sizeof (QUEUE_ENTRY));
     entry->next = NULL;
     entry->type = QUEUE_ENTRY_TYPE_EVENT;
     ev->type = EVENT_TYPE_SIGNAL;
@@ -396,7 +396,7 @@ void
 Parrot_new_timer_event(Parrot_Interp interp, PMC* timer, FLOATVAL diff,
         FLOATVAL interval, int repeat, PMC* sub, parrot_event_type_enum typ)
 {
-    parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
+    parrot_event* ev = mem_sys_allocate(sizeof (parrot_event));
     FLOATVAL now = Parrot_floatval_time();
     ev->type = typ;
     ev->u.timer_event.timer = timer;
@@ -423,8 +423,8 @@ Prepare and schedule a callback event.
 void
 Parrot_new_cb_event(Parrot_Interp interp, PMC* cbi, void* ext)
 {
-    parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
-    QUEUE_ENTRY* entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
+    parrot_event* ev = mem_sys_allocate(sizeof (parrot_event));
+    QUEUE_ENTRY* entry = mem_sys_allocate(sizeof (QUEUE_ENTRY));
     entry->next = NULL;
     entry->data = ev;
     ev->interp = interp;
@@ -480,7 +480,7 @@ event arrives.
 void
 Parrot_new_terminate_event(Parrot_Interp interp)
 {
-    parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
+    parrot_event* ev = mem_sys_allocate(sizeof (parrot_event));
     ev->type = EVENT_TYPE_TERMINATE;
     Parrot_schedule_event(interp, ev);
 }
@@ -499,9 +499,9 @@ variable for GC to finish when the event arrives.
 void
 Parrot_new_suspend_for_gc_event(Parrot_Interp interp) {
     QUEUE_ENTRY *qe;
-    parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
+    parrot_event* ev = mem_sys_allocate(sizeof (parrot_event));
     ev->type = EVENT_TYPE_SUSPEND_FOR_GC;
-    qe = mem_sys_allocate(sizeof(QUEUE_ENTRY));
+    qe = mem_sys_allocate(sizeof (QUEUE_ENTRY));
     qe->next = NULL;
     qe->data = ev;
     qe->type = QUEUE_ENTRY_TYPE_EVENT;
@@ -524,7 +524,7 @@ Schedule event-loop terminate event. This shuts down the event thread.
 void
 Parrot_kill_event_loop(void)
 {
-    parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
+    parrot_event* ev = mem_sys_allocate(sizeof (parrot_event));
     ev->type = EVENT_TYPE_EVENT_TERMINATE;
     Parrot_schedule_event(NULL, ev);
 }
@@ -605,7 +605,7 @@ Parrot_schedule_broadcast_qentry(QUEUE_ENTRY* entry)
              * For now just send to all.
              *
              */
-            switch(event->u.signal) {
+            switch (event->u.signal) {
                 case SIGHUP:
                 case SIGINT:
                     if (n_interpreters) {
@@ -667,12 +667,12 @@ static void
 store_io_event(pending_io_events *ios, parrot_event *ev)
 {
     if (!ios->alloced) {
-        ios->events = mem_sys_allocate(16 * sizeof(ev));
+        ios->events = mem_sys_allocate(16 * sizeof (ev));
         ios->alloced = 16;
     }
     else if (ios->n == ios->alloced - 1) {
         ios->alloced <<= 1;
-        ios->events = mem_sys_realloc(ios->events, (ios->alloced * sizeof(ev)));
+        ios->events = mem_sys_realloc(ios->events, (ios->alloced * sizeof (ev)));
     }
     ios->events[ios->n++] = ev;
 }
@@ -847,7 +847,7 @@ Parrot_event_add_io_event(Interp* interp,
     parrot_event *event;
     io_thread_msg buf;
 
-    event = mem_sys_allocate(sizeof(parrot_event));
+    event = mem_sys_allocate(sizeof (parrot_event));
     event->type        = EVENT_TYPE_IO;
     event->interp      = interp;
     /*
@@ -891,11 +891,11 @@ dup_entry(QUEUE_ENTRY* entry)
     parrot_event *event;
     QUEUE_ENTRY *new_entry;
 
-    new_entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
+    new_entry = mem_sys_allocate(sizeof (QUEUE_ENTRY));
     new_entry->next = NULL;
     new_entry->type = entry->type;
-    event = new_entry->data = mem_sys_allocate(sizeof(parrot_event));
-    mem_sys_memcopy(event, entry->data, sizeof(parrot_event));
+    event = new_entry->data = mem_sys_allocate(sizeof (parrot_event));
+    mem_sys_memcopy(event, entry->data, sizeof (parrot_event));
     return new_entry;
 }
 

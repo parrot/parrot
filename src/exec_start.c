@@ -76,7 +76,7 @@ main(int argc, char * argv[])
     pf = PackFile_new(interp, 0);
 
     if (!PackFile_unpack(interp, pf, (opcode_t *)(&program_code),
-        sizeof(&program_code)))
+        sizeof (&program_code)))
     {
         printf( "Can't unpack.\n" );
         return 1;

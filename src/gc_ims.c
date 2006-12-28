@@ -481,7 +481,7 @@ gc_ims_alloc_objects(Interp *interp,
 
     pool->objects_per_alloc = ALLOCATION_BLOCK_SIZE / pool->object_size;
     /* Setup memory for the new objects */
-    new_arena = mem_sys_allocate(sizeof(struct Small_Object_Arena));
+    new_arena = mem_sys_allocate(sizeof (struct Small_Object_Arena));
     size = ALLOCATION_BLOCK_SIZE;
     new_arena->start_objects = mem_sys_allocate(size);
 
@@ -530,7 +530,7 @@ Parrot_gc_ims_init(Interp* interp)
     struct Arenas *arena_base;
 
     arena_base = interp->arena_base;
-    arena_base->gc_private = mem_sys_allocate_zeroed(sizeof(Gc_ims_private));
+    arena_base->gc_private = mem_sys_allocate_zeroed(sizeof (Gc_ims_private));
     /*
      * set function hooks according to pdd09
      */

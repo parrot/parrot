@@ -332,11 +332,11 @@ sysinfo_i(Parrot_Interp interp, INTVAL info_wanted)
 {
     switch (info_wanted) {
     case PARROT_INTSIZE:
-        return sizeof(INTVAL);
+        return sizeof (INTVAL);
     case PARROT_FLOATSIZE:
-        return sizeof(FLOATVAL);
+        return sizeof (FLOATVAL);
     case PARROT_POINTERSIZE:
-        return sizeof(void *);
+        return sizeof (void *);
     default:
         return -1;
     }

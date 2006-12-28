@@ -37,9 +37,9 @@ static const char* GDB_P(Interp *interp, const char *s);
  * Moves the pointer to the next argument in the user input.
  */
 #define na(c) { \
-    while(*c && !isspace((int) *c)) \
+    while (*c && !isspace((int) *c)) \
         c++; \
-    while(*c && isspace((int) *c)) \
+    while (*c && isspace((int) *c)) \
         c++; }
 
 /*
@@ -537,7 +537,7 @@ PDB_cond(Interp *interp, const char *command)
     }
 
     /* Allocate new condition */
-    condition = (PDB_condition_t *)mem_sys_allocate(sizeof(PDB_condition_t));
+    condition = (PDB_condition_t *)mem_sys_allocate(sizeof (PDB_condition_t));
 
     switch (*command) {
         case 'i':
@@ -661,18 +661,18 @@ WRONG_REG:      PIO_eprintf(interp, "Register types don't agree\n");
             mem_sys_free(condition);
             return NULL;
         }
-        condition->value = (void *)mem_sys_allocate(sizeof(int));
+        condition->value = (void *)mem_sys_allocate(sizeof (int));
         *(int *)condition->value = reg_number;
     }
     /* If the first argument was an integer */
     else if (condition->type & PDB_cond_int) {
         /* This must be either an integer constant or register */
-        condition->value = (void *)mem_sys_allocate(sizeof(INTVAL));
+        condition->value = (void *)mem_sys_allocate(sizeof (INTVAL));
         *(INTVAL *)condition->value = (INTVAL)atoi(command);
         condition->type |= PDB_cond_const;
     }
     else if (condition->type & PDB_cond_num) {
-        condition->value = (void *)mem_sys_allocate(sizeof(FLOATVAL));
+        condition->value = (void *)mem_sys_allocate(sizeof (FLOATVAL));
         *(FLOATVAL *)condition->value = (FLOATVAL)atof(command);
         condition->type |= PDB_cond_const;
     }
@@ -779,7 +779,7 @@ PDB_set_break(Interp *interp, const char *command)
         line = line->next;
 
     /* Allocate the new break point */
-    newbreak = (PDB_breakpoint_t *)mem_sys_allocate(sizeof(PDB_breakpoint_t));
+    newbreak = (PDB_breakpoint_t *)mem_sys_allocate(sizeof (PDB_breakpoint_t));
 
     na(command);
     condition = NULL;
@@ -1451,7 +1451,7 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
         case PARROT_ARG_NC:
             /* Convert the float to a string */
             f = interp->code->const_table->constants[op[j]]->u.number;
-            Parrot_snprintf(interp, buf, sizeof(buf), FLOATVAL_FMT, f);
+            Parrot_snprintf(interp, buf, sizeof (buf), FLOATVAL_FMT, f);
             strcpy(&dest[size], buf);
             size += strlen(buf);
             break;
@@ -1473,7 +1473,7 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
             dest[size++] = '"';
             break;
         case PARROT_ARG_PC:
-            Parrot_snprintf(interp, buf, sizeof(buf),
+            Parrot_snprintf(interp, buf, sizeof (buf),
                             "PMC_CONST(%d)", op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
@@ -1481,7 +1481,7 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
 
         case PARROT_ARG_K:
             dest[size-1] = '[';
-            Parrot_snprintf(interp, buf, sizeof(buf),
+            Parrot_snprintf(interp, buf, sizeof (buf),
                             "P" INTVAL_FMT, op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
@@ -1495,13 +1495,13 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
                 case 0:
                     break;
                 case KEY_integer_FLAG:
-                    Parrot_snprintf(interp, buf, sizeof(buf),
+                    Parrot_snprintf(interp, buf, sizeof (buf),
                                     INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_number_FLAG:
-                    Parrot_snprintf(interp, buf, sizeof(buf),
+                    Parrot_snprintf(interp, buf, sizeof (buf),
                                     FLOATVAL_FMT, PMC_num_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
@@ -1518,25 +1518,25 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
                     dest[size++] = '"';
                     break;
                 case KEY_integer_FLAG|KEY_register_FLAG:
-                    Parrot_snprintf(interp, buf, sizeof(buf),
+                    Parrot_snprintf(interp, buf, sizeof (buf),
                                     "I" INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_number_FLAG|KEY_register_FLAG:
-                    Parrot_snprintf(interp, buf, sizeof(buf),
+                    Parrot_snprintf(interp, buf, sizeof (buf),
                                     "N" INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_string_FLAG|KEY_register_FLAG:
-                    Parrot_snprintf(interp, buf, sizeof(buf),
+                    Parrot_snprintf(interp, buf, sizeof (buf),
                                     "S" INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_pmc_FLAG|KEY_register_FLAG:
-                    Parrot_snprintf(interp, buf, sizeof(buf),
+                    Parrot_snprintf(interp, buf, sizeof (buf),
                                     "P" INTVAL_FMT, PMC_int_val(k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
@@ -1552,7 +1552,7 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
             break;
         case PARROT_ARG_KI:
             dest[size - 1] = '[';
-            Parrot_snprintf(interp, buf, sizeof(buf),
+            Parrot_snprintf(interp, buf, sizeof (buf),
                             "I" INTVAL_FMT, op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
@@ -1560,7 +1560,7 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
             break;
         case PARROT_ARG_KIC:
             dest[size - 1] = '[';
-            Parrot_snprintf(interp, buf, sizeof(buf),
+            Parrot_snprintf(interp, buf, sizeof (buf),
                             INTVAL_FMT, op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
@@ -1602,8 +1602,8 @@ PDB_disassemble(Interp *interp, const char *command)
     size_t space;  /* How much space do we have? */
     size_t size, alloced, n;
 
-    pfile = (PDB_file_t *)mem_sys_allocate(sizeof(PDB_file_t));
-    pline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
+    pfile = (PDB_file_t *)mem_sys_allocate(sizeof (PDB_file_t));
+    pline = (PDB_line_t *)mem_sys_allocate(sizeof (PDB_line_t));
 
     /* If we already got a source, free it */
     if (pdb->file)
@@ -1639,7 +1639,7 @@ PDB_disassemble(Interp *interp, const char *command)
         ADD_OP_VAR_PART(interp, interp->code, pc, n);
         pc += n;
         /* Prepare for next line */
-        newline = (PDB_line_t *)mem_sys_allocate(sizeof(PDB_line_t));
+        newline = (PDB_line_t *)mem_sys_allocate(sizeof (PDB_line_t));
         newline->number = pline->number + 1;
         newline->label  = NULL;
         newline->next   = NULL;
@@ -1695,7 +1695,7 @@ PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset)
     }
     /* Allocate a new label */
     label = file->label;
-    new = (PDB_label_t *)mem_sys_allocate(sizeof(PDB_label_t));
+    new = (PDB_label_t *)mem_sys_allocate(sizeof (PDB_label_t));
     new->opcode = cur_opcode + offset;
     new->next   = NULL;
     if (label) {
@@ -1800,8 +1800,8 @@ PDB_load_source(Interp *interp, const char *command)
         return;
     }
 
-    pfile = (PDB_file_t *)mem_sys_allocate_zeroed(sizeof(PDB_file_t));
-    pline = (PDB_line_t *)mem_sys_allocate_zeroed(sizeof(PDB_line_t));
+    pfile = (PDB_file_t *)mem_sys_allocate_zeroed(sizeof (PDB_file_t));
+    pline = (PDB_line_t *)mem_sys_allocate_zeroed(sizeof (PDB_line_t));
 
     pfile->source = (char *)mem_sys_allocate(1024);
     pfile->line = pline;
@@ -1829,7 +1829,7 @@ PDB_load_source(Interp *interp, const char *command)
                 pc += n;
             }
             newline =
-                    (PDB_line_t *)mem_sys_allocate_zeroed(sizeof(PDB_line_t));
+                    (PDB_line_t *)mem_sys_allocate_zeroed(sizeof (PDB_line_t));
             newline->number = pline->number + 1;
             pline->next = newline;
             pline = newline;
@@ -2042,11 +2042,11 @@ PDB_extend_const_table(Interp *interp)
     if (interp->code->const_table->constants) {
         interp->code->const_table->constants =
             mem_sys_realloc(interp->code->const_table->constants,
-                            k * sizeof(struct PackFile_Constant *));
+                            k * sizeof (struct PackFile_Constant *));
     }
     else {
         interp->code->const_table->constants =
-            mem_sys_allocate(k * sizeof(struct PackFile_Constant *));
+            mem_sys_allocate(k * sizeof (struct PackFile_Constant *));
     }
 
     /* Allocate a new constant */
@@ -2479,7 +2479,7 @@ GDB_B(Interp *interp, char *s) {
 
         if (!gdb_bps) {
             nr = 0;
-            newbreak = mem_sys_allocate(sizeof(PDB_breakpoint_t));
+            newbreak = mem_sys_allocate(sizeof (PDB_breakpoint_t));
             newbreak->prev = NULL;
             newbreak->next = NULL;
             gdb_bps = newbreak;
@@ -2493,7 +2493,7 @@ GDB_B(Interp *interp, char *s) {
                     break;
             }
             ++nr;
-            newbreak = mem_sys_allocate(sizeof(PDB_breakpoint_t));
+            newbreak = mem_sys_allocate(sizeof (PDB_breakpoint_t));
             newbreak->prev = bp;
             newbreak->next = NULL;
             bp->next = newbreak;

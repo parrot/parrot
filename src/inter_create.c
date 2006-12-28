@@ -102,7 +102,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
         interp = &interpre;
     else
 #endif
-        interp = mem_sys_allocate_zeroed(sizeof(Interp));
+        interp = mem_sys_allocate_zeroed(sizeof (Interp));
 
     /*
      * the last interpreter (w/o) parent has to cleanup globals

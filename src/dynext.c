@@ -123,7 +123,7 @@ static STRING * get_path(Interp *interp, STRING *lib, void **handle,
     PMC * const share_ext = VTABLE_get_pmc_keyed_int(interp, lib_paths,
                                                      PARROT_LIB_DYN_EXTS);
 
-    if ( lib == NULL) {
+    if (lib == NULL) {
         *handle = Parrot_dlopen(NULL);
         if (*handle) {
             return string_from_const_cstring(interp, "", 0);
@@ -272,7 +272,7 @@ static PMC *run_init_lib(Interp *interp, void *handle,
      */
     Parrot_block_DOD(interp);
     /* get load_func */
-    if ( lib_name != NULL) {
+    if (lib_name != NULL) {
         load_func_name = Parrot_sprintf_c(interp, "Parrot_lib_%Ss_load",
                                           lib_name);
         cload_func_name = string_to_cstring(interp, load_func_name);
@@ -374,9 +374,9 @@ Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc) {
             INTVAL i;
             if (d->all_op_libs)
                 d->all_op_libs = mem_sys_realloc(d->all_op_libs,
-                    sizeof(op_lib_t *) * s->n_libs);
+                    sizeof (op_lib_t *) * s->n_libs);
             else
-                d->all_op_libs = mem_sys_allocate(sizeof(op_lib_t *) *
+                d->all_op_libs = mem_sys_allocate(sizeof (op_lib_t *) *
                     s->n_libs);
             for (i = d->n_libs; i < s->n_libs; ++i)
                 d->all_op_libs[i] = s->all_op_libs[i];
@@ -406,7 +406,7 @@ Parrot_load_lib(Interp *interp, STRING *lib, PMC *initializer)
      *
      * LOCK()
      */
-    if ( lib == NULL) {
+    if (lib == NULL) {
         wo_ext   = string_from_const_cstring(interp, "", 0);
         lib_name = NULL;
     }

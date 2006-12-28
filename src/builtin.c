@@ -32,7 +32,7 @@ typedef struct _builtin {
     STRING *namespace;          /* same */
 } Builtins;
 
-#define N_BUILTINS (int)(sizeof(builtins) / sizeof(builtins[0]))
+#define N_BUILTINS (int)(sizeof (builtins) / sizeof (builtins[0]))
 static Builtins builtins[] = {
     /*
      * Please keep this list sorted

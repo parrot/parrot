@@ -56,9 +56,9 @@ get_free_buffer(Interp *interp,
     PObj_bufstart(buffer) = NULL;
     PObj_buflen(buffer) = 0;
 
-    if (pool->object_size  - GC_HEADER_SIZE > sizeof(PObj))
+    if (pool->object_size  - GC_HEADER_SIZE > sizeof (PObj))
         memset(buffer + 1, 0,
-                pool->object_size - sizeof(PObj) - GC_HEADER_SIZE);
+                pool->object_size - sizeof (PObj) - GC_HEADER_SIZE);
     return buffer;
 }
 
@@ -84,7 +84,7 @@ new_pmc_pool(Interp *interp)
 {
     int num_headers = PMC_HEADERS_PER_ALLOC;
     struct Small_Object_Pool *pmc_pool =
-        new_small_object_pool(interp, sizeof(PMC), num_headers);
+        new_small_object_pool(interp, sizeof (PMC), num_headers);
 
     pmc_pool->mem_pool = NULL;
     (interp->arena_base->init_pool)(interp, pmc_pool);
@@ -110,7 +110,7 @@ new_bufferlike_pool(Interp *interp,
 {
     int num_headers = BUFFER_HEADERS_PER_ALLOC;
     size_t buffer_size =
-            (actual_buffer_size + sizeof(void *) - 1) & ~(sizeof(void *) - 1);
+            (actual_buffer_size + sizeof (void *) - 1) & ~(sizeof (void *) - 1);
     struct Small_Object_Pool *pool =
             new_small_object_pool(interp, buffer_size, num_headers);
 
@@ -133,7 +133,7 @@ Non-constant strings and plain Buffers are in the sized header pools.
 struct Small_Object_Pool *
 new_buffer_pool(Interp *interp)
 {
-    return make_bufferlike_pool(interp, sizeof(Buffer));
+    return make_bufferlike_pool(interp, sizeof (Buffer));
 }
 
 /*
@@ -152,11 +152,11 @@ new_string_pool(Interp *interp, INTVAL constant)
 {
     struct Small_Object_Pool *pool;
     if (constant) {
-        pool = new_bufferlike_pool(interp, sizeof(STRING));
+        pool = new_bufferlike_pool(interp, sizeof (STRING));
         pool->mem_pool = interp->arena_base->constant_string_pool;
     }
     else
-        pool = make_bufferlike_pool(interp, sizeof(STRING));
+        pool = make_bufferlike_pool(interp, sizeof (STRING));
     pool->objects_per_alloc = STRING_HEADERS_PER_ALLOC;
     return pool;
 }
@@ -180,14 +180,14 @@ make_bufferlike_pool(Interp *interp, size_t buffer_size)
     struct Small_Object_Pool **sized_pools =
             interp->arena_base->sized_header_pools;
 
-    idx = (buffer_size - sizeof(Buffer)) / sizeof(void *);
+    idx = (buffer_size - sizeof (Buffer)) / sizeof (void *);
 
     /* Expand the array of sized resource pools, if necessary */
     if (num_old <= idx) {
         UINTVAL num_new = idx + 1;
         sized_pools = mem_internal_realloc(sized_pools,
-                                           num_new * sizeof(void *));
-        memset(sized_pools + num_old, 0, sizeof(void *) * (num_new - num_old));
+                                           num_new * sizeof (void *));
+        memset(sized_pools + num_old, 0, sizeof (void *) * (num_new - num_old));
 
         interp->arena_base->sized_header_pools = sized_pools;
         interp->arena_base->num_sized = num_new;
@@ -217,7 +217,7 @@ get_bufferlike_pool(Interp *interp, size_t buffer_size)
     struct Small_Object_Pool **sized_pools =
             interp->arena_base->sized_header_pools;
 
-    return sized_pools[ (buffer_size - sizeof(Buffer)) / sizeof(void *) ];
+    return sized_pools[ (buffer_size - sizeof (Buffer)) / sizeof (void *) ];
 }
 
 /*
@@ -285,7 +285,7 @@ new_pmc_ext(Interp *interp)
         (*pool->more_objects) (interp, pool);
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
-    memset(ptr, 0, sizeof(PMC_EXT));
+    memset(ptr, 0, sizeof (PMC_EXT));
     return ptr;
 }
 
@@ -333,7 +333,7 @@ add_pmc_sync(Interp *interp, PMC *pmc)
     if (!PObj_is_PMC_EXT_TEST(pmc)) {
         add_pmc_ext(interp, pmc);
     }
-    PMC_sync(pmc) = mem_internal_allocate(sizeof(*PMC_sync(pmc)));
+    PMC_sync(pmc) = mem_internal_allocate(sizeof (*PMC_sync(pmc)));
     PMC_sync(pmc)->owner = interp;
     MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
 }
@@ -577,7 +577,7 @@ Parrot_initialize_header_pools(Interp *interp)
 
     /* pmc extension buffer */
     arena_base->pmc_ext_pool =
-        new_small_object_pool(interp, sizeof(struct PMC_EXT), 1024);
+        new_small_object_pool(interp, sizeof (struct PMC_EXT), 1024);
     /*
      * pmc_ext isn't a managed item. If a PMC has a pmc_ext structure
      * it is returned to the pool instantly - the structure is never
@@ -825,8 +825,8 @@ Parrot_merge_header_pools(Interp *dest_interp, Interp *source_interp) {
 
         if (i >= dest_arena->num_sized ||
             !dest_arena->sized_header_pools[i]) {
-            make_bufferlike_pool(dest_interp, i * sizeof(void *)
-                + sizeof(Buffer));
+            make_bufferlike_pool(dest_interp, i * sizeof (void *)
+                + sizeof (Buffer));
             assert(dest_arena->sized_header_pools[i]);
         }
 

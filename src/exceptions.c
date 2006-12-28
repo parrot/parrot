@@ -585,7 +585,7 @@ new_internal_exception(Interp *interp)
         interp->exc_free_list = the_exception->prev;
     }
     else
-        the_exception = mem_sys_allocate(sizeof(*the_exception));
+        the_exception = mem_sys_allocate(sizeof (*the_exception));
     the_exception->prev = interp->exceptions;
     the_exception->resume = NULL;
     the_exception->msg = NULL;
@@ -730,7 +730,7 @@ Parrot_init_exceptions(Interp *interp) {
     int i;
 
     interp->exception_list = mem_sys_allocate(
-            sizeof(PMC*) * (E_LAST_PYTHON_E + 1));
+            sizeof (PMC*) * (E_LAST_PYTHON_E + 1));
     for (i = 0; i <= E_LAST_PYTHON_E; ++i) {
         PMC * const ex = pmc_new(interp, enum_class_Exception);
         interp->exception_list[i] = ex;
