@@ -86,7 +86,7 @@ compose(Interp *interp, STRING *src)
        UErrorCode *status);
        */
     dest_len = src_len = src->strlen;
-    dest = string_make_direct(interp, NULL, src_len * sizeof(UChar),
+    dest = string_make_direct(interp, NULL, src_len * sizeof (UChar),
             src->encoding, src->charset, 0);
     err = U_ZERO_ERROR;
     dest_len = unorm_normalize(src->strstart, src_len,
@@ -95,7 +95,7 @@ compose(Interp *interp, STRING *src)
                                  * version */
             dest->strstart, dest_len,
             &err);
-    dest->bufused = dest_len * sizeof(UChar);
+    dest->bufused = dest_len * sizeof (UChar);
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
         Parrot_reallocate_string(interp, dest, dest->bufused);
@@ -106,7 +106,7 @@ compose(Interp *interp, STRING *src)
                 dest->strstart, dest_len,
                 &err);
         assert(U_SUCCESS(err));
-        dest->bufused = dest_len * sizeof(UChar);
+        dest->bufused = dest_len * sizeof (UChar);
     }
     dest->strlen = dest_len;
     return dest;
@@ -148,8 +148,8 @@ upcase(Interp *interp, STRING *src)
     err = U_ZERO_ERROR;
     /* use all available space - see below XXX */
     /* TODO downcase, titlecase too */
-    dest_len = PObj_buflen(src) / sizeof(UChar);
-    src_len = src->bufused / sizeof(UChar);
+    dest_len = PObj_buflen(src) / sizeof (UChar);
+    src_len = src->bufused / sizeof (UChar);
     /*
      * XXX troubles:
      *   t/op/string_cs_45  upcase unicode:"\u01f0"
@@ -171,7 +171,7 @@ upcase(Interp *interp, STRING *src)
             NULL,       /* locale = default */
             &err);
     if (needed > dest_len) {
-        Parrot_reallocate_string(interp, src, needed * sizeof(UChar));
+        Parrot_reallocate_string(interp, src, needed * sizeof (UChar));
         dest_len = needed;
     }
     err = U_ZERO_ERROR;
@@ -180,7 +180,7 @@ upcase(Interp *interp, STRING *src)
             NULL,       /* locale = default */
             &err);
     assert(U_SUCCESS(err));
-    src->bufused = dest_len * sizeof(UChar);
+    src->bufused = dest_len * sizeof (UChar);
     /* downgrade if possible */
     if (dest_len == (int)src->strlen)
         src->encoding = Parrot_ucs2_encoding_ptr;
@@ -219,12 +219,12 @@ u_strToLower(UChar *dest, int32_t destCapacity,
              UErrorCode *pErrorCode);
      */
     err = U_ZERO_ERROR;
-    src_len = src->bufused / sizeof(UChar);
+    src_len = src->bufused / sizeof (UChar);
     dest_len = u_strToLower(src->strstart, src_len,
             src->strstart, src_len,
             NULL,       /* locale = default */
             &err);
-    src->bufused = dest_len * sizeof(UChar);
+    src->bufused = dest_len * sizeof (UChar);
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
         Parrot_reallocate_string(interp, src, src->bufused);
@@ -266,13 +266,13 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
              UErrorCode *pErrorCode);
      */
     err = U_ZERO_ERROR;
-    src_len = src->bufused / sizeof(UChar);
+    src_len = src->bufused / sizeof (UChar);
     dest_len = u_strToTitle(src->strstart, src_len,
             src->strstart, src_len,
             NULL,       /* default titleiter */
             NULL,       /* locale = default */
             &err);
-    src->bufused = dest_len * sizeof(UChar);
+    src->bufused = dest_len * sizeof (UChar);
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
         Parrot_reallocate_string(interp, src, src->bufused);
@@ -558,7 +558,7 @@ Parrot_charset_unicode_init(Interp *interp)
         NULL
     };
 
-    memcpy(return_set, &base_set, sizeof(CHARSET));
+    memcpy(return_set, &base_set, sizeof (CHARSET));
     /*
      * for now use utf8
      * TODO replace it with a fixed uint_16 or uint_32 encoding

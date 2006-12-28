@@ -270,8 +270,8 @@ is_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
     if (offset >= source_string->strlen) return 0;
     codepoint = ENCODING_GET_CODEPOINT(interp, source_string, offset);
 
-    if (codepoint >= sizeof(Parrot_ascii_typetable) /
-                     sizeof(Parrot_ascii_typetable[0])) {
+    if (codepoint >= sizeof (Parrot_ascii_typetable) /
+                     sizeof (Parrot_ascii_typetable[0])) {
         return 0;
     }
     return (Parrot_iso_8859_1_typetable[codepoint] & flags) ? 1 : 0;
@@ -356,7 +356,7 @@ Parrot_charset_iso_8859_1_init(Interp *interp)
         NULL
     };
 
-    memcpy(return_set, &base_set, sizeof(CHARSET));
+    memcpy(return_set, &base_set, sizeof (CHARSET));
     return_set->preferred_encoding = Parrot_fixed_8_encoding_ptr;
     Parrot_register_charset(interp, "iso-8859-1", return_set);
     return return_set;
