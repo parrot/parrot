@@ -16,3 +16,10 @@ void bcg_throw_exception(BCG_info * bcg_info, const int code,
 #endif /* WIN32 */
 
 #endif /* PARROT_BCG_LOGGER_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

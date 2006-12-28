@@ -94,3 +94,10 @@ bcg_unit *bcg_info_current_unit(BCG_info * bcg_info);
 bcg_op *bcg_info_current_op(BCG_info * bcg_info);
 
 #endif /* PARROT_BCG_PRIVATE_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

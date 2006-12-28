@@ -267,3 +267,10 @@ struct dotnet_uint64
 {
     UHUGEINTVAL x;
 };
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -9,3 +9,10 @@ extern PMC *pugs_bool_false;
 #endif
 
 #endif
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

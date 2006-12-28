@@ -1002,3 +1002,10 @@ void emit_unary_expr(Symbol * res, Symbol * arg1, char * op) {
 #endif
 }
 
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

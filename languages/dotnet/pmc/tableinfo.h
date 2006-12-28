@@ -200,3 +200,10 @@
 
 #define Table_TypeSpec_RL(ass)          (ass->blobs_ptr_size)
 
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

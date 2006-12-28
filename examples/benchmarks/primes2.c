@@ -73,3 +73,10 @@ F<examples/benchmarks/primes2.py>.
 =cut
 
 */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -394,3 +394,10 @@ int                 op_inverse(int);
 extern long         line;
 
 #endif
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
