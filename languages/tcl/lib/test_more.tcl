@@ -174,7 +174,26 @@ proc makeDirectory      {args} {return 0}
 proc removeDirectory    {args} {return 0}
 proc testobj            {args} {return 0}
 proc testsetplatform    {args} {return 0}
-proc testevalex         {args} {return 0}
+proc testevalex         {cmd} {
+  # there's got to be a more idiomatic way to do this.
+  # (Well, once we have {expand}, sure!)
+
+  set i [llength $cmd]
+  if {$i==1} {
+    uplevel [lindex $cmd 0]
+  } elseif {$i==3} {
+    uplevel [lindex $cmd 0] [lindex $cmd 1] [lindex $cmd 2]
+  } elseif {$i==4} {
+    uplevel [lindex $cmd 0] [lindex $cmd 1] [lindex $cmd 2] [lindex $cmd 3]
+  } elseif {$i==5} {
+    uplevel [lindex $cmd 0] [lindex $cmd 1] [lindex $cmd 2] [lindex $cmd 3] [lindex $cmd 4]
+  } elseif {$i==7} {
+    uplevel [lindex $cmd 0] [lindex $cmd 1] [lindex $cmd 2] [lindex $cmd 3] [lindex $cmd 4] [lindex $cmd 5] [lindex $cmd 6]
+  } else {
+    error "testevalex hack: $i"
+  }
+}
+
 namespace eval tcltest  {
     set verbose 0
     proc temporaryDirectory {args} {return 0}

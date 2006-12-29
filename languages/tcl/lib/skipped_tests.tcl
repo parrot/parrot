@@ -101,6 +101,9 @@ array set skipped_tests {
   incr-old-2.4         stacktrace
   incr-old-2.5         stacktrace
   lindex-3.7           {expr wide()}
+  lset-1.3             {trace}
+  lset-5.1             {trace}
+  lset-5.2             {trace}
   misc-1.2             stacktrace
   namespace-old-2.5    explode
   namespace-old-2.6    explode
