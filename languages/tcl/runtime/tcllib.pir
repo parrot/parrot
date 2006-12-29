@@ -178,6 +178,9 @@ env_loop_done:
   # Eventually, we'll need to register MMD for the various Tcl PMCs
   # (Presuming we don't do this from the .pmc definitions.)
 
+  $P1 = new .ResizablePMCArray
+  store_global 'events', $P1
+
   $P1 = new .TclArray
   store_global 'proc_args', $P1
 

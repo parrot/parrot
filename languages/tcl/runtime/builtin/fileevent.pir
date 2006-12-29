@@ -10,8 +10,9 @@
     if argc < 2 goto badargs
     if argc > 3 goto badargs
 
-    .local pmc __channel
+    .local pmc __channel, __script
     __channel = get_root_global ['_tcl'], '__channel'
+    __script  = get_root_global ['_tcl'], '__script'
 
     .local pmc channel, script
     .local string event
@@ -26,6 +27,23 @@
 
 readable:
     channel = __channel(channel)
+
+    if argc == 2 goto readable_2
+
+    .local pmc script
+    script = args[2]
+    script = __script(script)
+
+    .local pmc events
+    events = get_root_global ['_tcl'], 'events'
+    $P0    = new .ResizablePMCArray
+    push events, $P0
+    push $P0, channel
+    push $P0, script
+
+    .return('')
+
+readable_2:
     .return('')
 
 writable:
