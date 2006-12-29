@@ -327,12 +327,13 @@ bad_args:
   .local string varname
   varname = argv[0]
 
-  .local pmc find_var, found_var
-  find_var  = get_root_global ['_tcl'], '__find_var'
-  found_var = find_var(varname)
-  if null found_var goto not_found
-
+  .local pmc __read, found_var
+  __read  = get_root_global ['_tcl'], '__read'
+  push_eh not_found
+    found_var = __read(varname)
+  clear_eh
   .return (1)
+
 not_found:
   .return (0)
 

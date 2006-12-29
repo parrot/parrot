@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 43
+plan 44
 
 eval_is {info} \
   {wrong # args: should be "info option ?arg arg ...?"} \
@@ -101,6 +101,10 @@ eval_is {info exists a b c} \
 is [set a 1; info exists a] 1 {info exists true}
 catch {unset a}
 is [info exists a] 0 {info exists false}
+
+catch {unset a}
+set a(3) 4
+is [info exists a(3)] 1 {info exists array}
 
 eval_is {info tclversion v} \
   {wrong # args: should be "info tclversion"} \
