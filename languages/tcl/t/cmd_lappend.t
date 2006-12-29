@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 6
+plan 7
 
 eval_is {
   set a [list a b]
@@ -40,3 +40,8 @@ eval_is {
   lappend l a
   set l
 } {a a a} {avoid segfaulting parrot}
+
+eval_is {
+  set x \"
+  lappend x 1
+} {unmatched open quote in list} {invalid list structure}

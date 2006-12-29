@@ -70,6 +70,7 @@ quote:
   inc pos
   $I1 = pos
 quote_loop:
+  if $I1 >= len goto missing_quote
   $I0 = ord str, $I1
   if $I0 == 92 goto quote_backslash
   if $I0 == 34 goto found_quote
@@ -105,6 +106,9 @@ elem_in_quotes_followed:
   $S0 = 'list element in quotes followed by "' . $S0
   $S0 = $S0 . '" instead of space'
   tcl_error $S0
+
+missing_quote:
+  tcl_error "unmatched open quote in list" 
 
 list:
   .local int depth
