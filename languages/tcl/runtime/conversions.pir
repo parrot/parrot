@@ -156,6 +156,7 @@ normal:
   $I0 = typeof integer
   if $I0 != .TclInt goto not_integer
 
+  morph value, .Undef
   assign value, integer
 
   .return(value)
