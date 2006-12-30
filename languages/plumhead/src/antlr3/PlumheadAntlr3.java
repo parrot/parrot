@@ -7,7 +7,7 @@ import java.io.PrintStream;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
 
-public class driver 
+public class PlumheadAntlr3 
 {
   public static void main(String[] args) throws Exception 
   {

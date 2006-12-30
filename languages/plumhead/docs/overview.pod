@@ -16,11 +16,11 @@ strategies of PHP on Parrot.
 
 =over
 
-=item php - the reference implementation PHP 5.2.0
+=item php       - the reference implementation PHP 5.2.0
 
-=item phc2past  - XSLT munges output from phc, started
+=item phc       - XSLT munges output from phc, started
 
-=item antlr3    - ANTLR3, planned
+=item antlr3    - ANTLR3, converted from languages/bc, planned
 
 =item partridge - Parrot compiler toolchain, planned
 
@@ -28,15 +28,21 @@ strategies of PHP on Parrot.
 
 =head1 Status
 
-36 out of 2692 tests in the PHP 5.2.0 test suite pass.
-
-=head1 Implementation
-
-Take XML output from PHC. XSLT creates PIR that sets up PAST.
+36 out of 2692 tests in the PHP 5.2.0 test suite pass for the phc variant.
 
 =head1 Dependencies
 
-xsltproc and ghc need to be in PATH.
+=over
+
+=item phc
+
+xsltproc and phc need to be in PATH.
+
+=item antlr3
+
+java.
+
+=back
 
 =head1 Author
 

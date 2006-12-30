@@ -16,6 +16,7 @@ Run the PAST with the help of TGE.
 Parse PHP with Java Parser and TreeParser, generated from ANTLR3 grammars.
 
 Parser PHP with the Parrot compiler tools.
+
 =cut
 
 .const string VERSION="0.0.1"
@@ -84,24 +85,12 @@ VARIANT_PARTRIDGE:
     goto EXECUTE_PAST_PIR
 
 VARIANT_ANTLR3:
-    # TODO: really use ANTLR3
-    err_msg = 'Creating XML-AST with phc failed'
-    cmd = 'phc --dump-ast-xml '
+    err_msg = 'Generating PAST from PHP source failed'
+    cmd = 'java PlumheadAntlr3 '
     concat cmd, php_source_fn
-    concat cmd, '> plumhead_phc_ast.xml'
+    concat cmd, ' plumhead_past.pir'
     ret = spawnw cmd
     if ret goto ERROR
-
-    err_msg = 'Creating XML-PAST with xsltproc failed'
-    cmd = 'xsltproc languages/plumhead/phc_xml_to_past_xml.xsl plumhead_phc_ast.xml > plumhead_past.xml'
-    ret = spawnw cmd
-    if ret goto ERROR
-
-    err_msg = 'Creating PIR with xsltproc failed'
-    cmd = 'xsltproc languages/plumhead/past_xml_to_past_pir.xsl  plumhead_past.xml  > plumhead_past.pir'
-    ret = spawnw cmd
-    if ret goto ERROR
-    goto EXECUTE_PAST_PIR
 
 EXECUTE_PAST_PIR:
     err_msg = 'Executing plumhead_past.pir with parrot failed'
