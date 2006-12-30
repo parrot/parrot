@@ -232,6 +232,11 @@ D: Binary GCD / LCM
 N: Ion Alexandru Morega
 D: string.pmc, complex.pmc
 
+N: James E Keenan (Jim)
+D: Testing of build tools
+W: http://thenceforward.net/parrot/
+S:  Brooklyn, NY, USA
+
 N: Jarkko Hietaniemi
 D: packfile and Tru64 fixes
 D: lot of general hints and patches to improve portability

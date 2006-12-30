@@ -2083,6 +2083,7 @@ lib/Parrot/OpsFile.pm                                       [devel]
 lib/Parrot/PIR/Formatter.pm                                 [devel]
 lib/Parrot/Pmc2c.pm                                         [devel]
 lib/Parrot/Pmc2c/Library.pm                                 [devel]
+lib/Parrot/Pmc2c/Utils.pm                                   [devel]
 lib/Parrot/Revision.pm                                      [devel]
 lib/Parrot/Test.pm                                          [devel]
 lib/Parrot/Test/APL.pm                                      [devel]
@@ -2779,6 +2780,14 @@ t/stm/runtime.t                                             []
 t/stress/gc.t                                               []
 t/tools/pbc_merge.t                                         []
 t/tools/pmc2c.t                                             []
+t/tools/pmc2cutils/00-qualify.t
+t/tools/pmc2cutils/01-pmc2cutils.t
+t/tools/pmc2cutils/02-find_file.t
+t/tools/pmc2cutils/03-dump_vtable.t
+t/tools/pmc2cutils/04-dump_pmc.t
+t/tools/pmc2cutils/05-gen_c.t
+t/tools/pmc2cutils/06-print_tree.t
+t/tools/pmc2cutils/07-open_file.t
 t/tools/smartlinks.t                                        []
 tools/build/addopstags.pl                                   []
 tools/build/c2str.pl                                        []

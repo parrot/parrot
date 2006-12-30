@@ -631,7 +631,6 @@ PMC2CV = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable
 vtable.dump : vtable.tbl
 	$(PMC2CV)
 
-
 # This is a listing of all targets, that are meant to be called by users
 help :
 	@echo ""
@@ -681,6 +680,7 @@ help :
 	@echo "  benchmark_tests:   Run all benchmarks."
 	@echo "  manitest:          Check for new and missing files."
 	@echo "  doc_tests:         Check POD syntax of all file containing POD."
+	@echo "  buildtools_tests:  Test build tool pmc2c.pl."
 	@echo ""
 	@echo "Smoke Testing:"
 	@echo "  smoke:             Run the test suite and send smoke.html to "
@@ -1355,6 +1355,16 @@ SRC_TEST_FILES = \
     t/src/*.t
 TOOLS_TEST_FILES = \
     t/tools/*.t
+PMC2CUTILS_DIR = t/tools/pmc2cutils
+BUILDTOOLS_TEST_FILES = \
+        $(PMC2CUTILS_DIR)/00-qualify.t \
+        $(PMC2CUTILS_DIR)/01-pmc2cutils.t \
+        $(PMC2CUTILS_DIR)/02-find_file.t \
+        $(PMC2CUTILS_DIR)/03-dump_vtable.t \
+        $(PMC2CUTILS_DIR)/04-dump_pmc.t \
+        $(PMC2CUTILS_DIR)/05-gen_c.t \
+        $(PMC2CUTILS_DIR)/06-print_tree.t \
+        $(PMC2CUTILS_DIR)/07-open_file.t
 
 # Common prep for all test targets.
 # We probably need a complete build before running the tests.
@@ -1444,6 +1454,9 @@ perl_tests :
 # Test pdd07_codingstd
 codingstd_tests :
 	$(PERL) t/harness $(CODINGSTD_TEST_FILES)
+
+buildtools_tests : 
+	$(PERL) t/harness $(BUILDTOOLS_TEST_FILES)
 
 # obsolete 
 testbench : 

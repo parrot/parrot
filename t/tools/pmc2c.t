@@ -18,7 +18,7 @@ the output.
 
 We never actually check the *full* output of the conversion.
 We simply check several smaller components to avoid a test file
-that is far too unweildy.
+that is far too unwieldy.
 
 =cut
 
