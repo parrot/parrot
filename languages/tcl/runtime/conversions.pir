@@ -27,9 +27,7 @@ use __stringToList.
 
 =head2 _Tcl::__dict
 
-Given a PMC, get a list from it. If the PMC is a TclDict
-this is as simple as returning the dictionary. If it's a string,
-use __stringToDict.
+Given a PMC, get a TclDict from it, converting as needed.
 
 =cut
 
@@ -50,7 +48,7 @@ use __stringToDict.
 
 .sub __dict :multi(_)
   .param pmc value
-  
+
   $P0 = __stringToDict(value)
   morph value, .Undef
   assign value, $P0

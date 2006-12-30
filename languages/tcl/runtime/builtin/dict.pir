@@ -105,7 +105,10 @@ loop:
   argc = elements argv
   unless argc goto loop_done
   $S1 = shift argv
-  value .= $S1
+  $S2 = value
+  $S2 .= $S1
+  morph value, .Undef
+  assign value, $S2
   goto loop
 loop_done:
 
