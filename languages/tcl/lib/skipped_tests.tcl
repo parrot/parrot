@@ -329,4 +329,5 @@ array set abort_after {
   basic-49.2           {can't delete "run" command doesn't exist}
   filename-11.13       {invalid command name "cd"}
   namespace-old-10.8   explode
+  parse-18.30          {skip all tests after this one anyway}
 }
