@@ -160,6 +160,7 @@ new_array:
   set(array_name,the_array) # create an empty named array...
 
 set_loop:
+  if loop >= count goto done
   key = elems[loop]
   inc loop
   val = elems[loop]
@@ -177,8 +178,9 @@ set_loop:
   subvar .= ')'
   set(subvar, val) 
 
-  if loop < count goto set_loop
+  goto set_loop
 
+done:
   .return ('')
 
 bad_args:

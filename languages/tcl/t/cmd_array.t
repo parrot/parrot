@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 49
+plan 50
 
 eval_is {array}\
   {wrong # args: should be "array option arrayName ?arg ...?"}\
@@ -112,6 +112,12 @@ eval_is {
   array set a {1 2 3 4}
 } {can't set "a(1)": variable isn't array}\
   {array set not array}
+
+eval_is {
+  catch {unset a}
+  array set a {}
+  array get a
+} {} {array set with empty list}
 
 eval_is {
   catch {unset a}
