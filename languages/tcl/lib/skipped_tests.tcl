@@ -54,6 +54,7 @@ array set skipped_tests {
   cmdMZ-2.10           stacktrace
   cmdMZ-3.5            stacktrace
   cmdMZ-5.7            stacktrace
+  compile-6.3          explode
   basic-1.1            {interp}
   basic-10.1           {interp}
   dict-2.3             {lsearch -exact}
