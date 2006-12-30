@@ -262,7 +262,9 @@ DYING_TCL_TESTS = \
   t_tcl/info.t \
   t_tcl/io.t \
   t_tcl/iogt.t \
+  t_tcl/mathop.t \
   t_tcl/msgcat.t \
+  t_tcl/macOSXLoad.t \
   t_tcl/namespace.t \
   t_tcl/opt.t \
   t_tcl/pkgMkIndex.t \
