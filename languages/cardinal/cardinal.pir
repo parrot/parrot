@@ -163,7 +163,7 @@ compiler, see:
     goto stmt_loop
 
   file_arg:
-    filename = args[1]
+    filename = args[0]
     source = _get_source(filename)
     goto compile_it
 
