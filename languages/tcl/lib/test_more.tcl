@@ -132,7 +132,14 @@ proc test {num description args} {
     global abort_after
     set full_desc "$num $description"
 
-    if {! [catch {set reason $skipped_tests($num)}]} {
+    set should_skip [dict filter $skipped_tests script {K V} {
+        set val [lsearch -exact $V $num]
+        expr {$val != -1}
+    }]
+
+    set reason [dict keys $should_skip]
+
+    if {[string length $reason]} {
         pass $full_desc [list SKIP $reason]
     } elseif {[llength $args] == 2} {
         eval_is [lindex $args 0] [lindex $args 1] $full_desc

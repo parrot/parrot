@@ -1,337 +1,125 @@
-        # RT#40716: Some of these tests cause pathological harness
-        # failures. skip them.  Put the skip here instead of in the test
-        # file to keep all our hacks in one basket.
+# skipped_tests - these are all the tests that the partcl implementation
+# cannot pass. Some of the tests cause harness failures (see RT#40716),
+# others simply require some functionality that we haven't implemented yet.
+#
+# stored as a dictionary, with the reason as a key, and the list of tests
+# that require the feature (or cause the listed error) as values.
 
-        # Other tests are parsable, and generally work, but require a
-        # feature that hasn't been implemented, making passing them
-        # impossible
+set skipped_tests [dict create \
+  {[binary]} {
+    string-5.14 stringComp-5.14 stringComp-9.7
+  } {[trace]} {
+    append-7.1 append-7.2 append-7.3 append-7.4 append-7.5
+    appendComp-7.1 appendComp-7.2 appendComp-7.3 appendComp-7.4 appendComp-7.5
+    appendComp-7.6 appendComp-7.7 appendComp-7.8 appendComp-7.9
+    if-10.6
+    lset-1.3 lset-5.1 lset-5.2
+  } {stacktrace support} {
+    apply-2.2 apply-2.3 apply-2.4 apply-2.5 apply-5.1
+    basic-46.1
+    cmdMZ-2.10 cmdMZ-3.5 cmdMZ-5.7
+    dict-14.12 dict-17.13
+    error-1.3 error-2.3 error-2.6 error-4.2 error-4.3 error-4.4
+    eval-2.5
+    iocmd-12.6
+    if-5.3 if-6.4
+    incr-2.30 incr-2.31
+    incr-old-2.4 incr-old-2.5
+    misc-1.2
+    parse-9.2 parse-10.14
+    set-2.1 set-4.1
+    switch-4.1
+    while-4.3
+    while-old-4.6
+  } {[interp]} {
+    basic-11.1 basic-12.1 basic-12.2 basic-13.1 basic-13.2 basic-24.1
+    basic-1.1 basic-10.1 basic-36.1          
+  } {{expand}} {
+    basic-14.1 basic-14.2 basic-15.1 basic-18.1 basic-18.3 basic-18.4
+    basic-18.6 basic-20.1 basic-22.1 basic-24.2 basic-36.1          
+  } {[file]} {
+    cmdAH-2.2 cmdAH-2.3 cmdAH-2.4 cmdAH-2.5 cmdAH-2.6 cmdAH-2.6.1 cmdAH-2.6.2
+  } BOOM {
+    compile-6.3
+    format-3.1 format-3.2
+    lindex-4.5
+    namespace-old-2.5 namespace-old-2.6 namespace-old-2.7 namespace-old-4.4
+    namespace-old-7.7
+  } {[expr wide()]} {
+    dict-11.1 dict-11.2 dict-11.3 dict-11.4 dict-11.5 dict-11.6 dict-11.7
+    lindex-3.7
+  } {nested dictionaries} {
+    dict-3.5 dict-3.6 dict-3.7 dict-3.8 dict-3.9 dict-3.10 dict-9.3 dict-9.4
+    dict-9.5 dict-15.3 dict-15.5 dict-16.4
+  } {Cannot take substr outside string} {
+    string-18.7 string-18.9 string-20.4 string-20.5
+    var-7.12 var-12.1
+  } {Cannot get character past end of string} {
+    format-8.17 format-8.18
+  } {Cannot repeat with negative arg} {
+    string-13.6 string-13.8
+  } {Cannot get character of empty string} {
+    var-6.3
+  } {[lsearch -exact]} {
+    dict-2.3
+  } {[lsearch -regexp]} {
+    for-3.6
+  } {[lassign]} {
+    dict-21.8
+  } {uplevel bug} {
+    error-1.8
+  } {Inf support} {
+    scan-14.1 scan-14.2
+  } {Can only replace inside string or index after end of string} {
+    string-14.11
+  } {[testupvar]} {
+    var-3.3 var-3.4 var-3.4
+  } {[testgetvarfullname]} {
+    var-4.1 var-4.2 var-4.3
+  } {[testsetnoerr]} {
+    var-9.1 var-9.2 var-9.3 var-9.4 var-9.5 var-9.6 var-9.7 var-9.8 var-9.9
+    var-9.1 var-9.11 var-9.12
+  } {ICU} {
+    binary-22.3 binary-22.4 binary-22.5 binary-22.11 binary-23.3 binary-23.4
+    binary-23.11 binary-24.2 binary-24.3 binary-24.4 binary-24.6 binary-24.10
+    binary-25.2 binary-25.3 binary-25.4 binary-25.6 binary-25.10 binary-26.2
+    binary-26.3 binary-26.4 binary-26.5 binary-26.6 binary-26.7 binary-26.10
+    binary-27.2 binary-27.3 binary-27.4 binary-27.5 binary-27.6 binary-27.9
+    binary-28.2 binary-28.3 binary-28.4 binary-28.5 binary-28.6 binary-28.9
+    binary-29.2 binary-29.3 binary-29.4 binary-29.5 binary-29.6 binary-29.9
+    binary-30.2 binary-30.3 binary-30.4 binary-30.5 binary-30.6 binary-30.9
+    binary-31.2 binary-31.3 binary-31.4 binary-31.5 binary-31.6 binary-31.7
+    binary-31.8 binary-31.9 binary-31.10 binary-31.11 binary-31.13 binary-31.14
+    binary-31.15 binary-32.2 binary-32.3 binary-32.4 binary-32.5 binary-32.6
+    binary-32.7 binary-32.8 binary-32.9 binary-32.10 binary-32.11 binary-32.13
+    binary-32.14 binary-32.15 binary-39.1 binary-39.2 binary-39.3 binary-39.4
+    binary-39.5 binary-41.5 binary-41.6 binary-41.7 binary-41.8 binary-46.5
+    binary-54.2 binary-54.3 binary-54.4 binary-54.5 binary-54.6 binary-54.9
+    binary-55.2 binary-55.3 binary-55.4 binary-55.5 binary-55.6 binary-55.9
+    binary-56.2 binary-56.3 binary-56.4 binary-56.5 binary-56.6 binary-56.9
+    binary-57.2 binary-57.3 binary-57.4 binary-57.5 binary-57.6 binary-57.9
+    binary-58.2 binary-58.3 binary-58.4 binary-58.5 binary-58.6 binary-58.7
+    binary-58.8 binary-58.9 binary-58.10 binary-58.11 binary-58.13 binary-58.14
+    binary-58.15 binary-59.2 binary-59.3 binary-59.4 binary-59.5 binary-59.6
+    binary-59.7 binary-59.8 binary-59.9 binary-59.10 binary-59.11 binary-59.13
+    binary-59.14 binary-59.15 cmdIL-4.24 cmdIL-4.25 expr-8.13 parseOld-7.12
+    scan-7.6 scan-7.7
+    subst-3.2
+    string-2.12 string-2.31 string-3.4 string-6.19 string-6.83 string-6.84
+    string-6.85 string-6.88 string-6.109 string-8.3 string-10.13 string-11.33
+    string-12.20 string-15.10 string-16.10 string-17.6 string-17.7 string-18.11
+    string-21.10 string-21.11 string-21.12 string-21.13 string-22.11
+    stringComp-2.12 stringComp-2.31 stringComp-3.4
+    stringComp-8.3 stringComp-11.33
+    util-4.6 util-5.7 util-5.18 util-5.42 util-5.43 util-8.3
+  } ]
 
-array set skipped_tests {
-  append-7.1           {trace}
-  append-7.2           {trace}
-  append-7.3           {trace}
-  append-7.4           {trace}
-  append-7.5           {trace}
-  apply-2.2            stacktrace
-  apply-2.3            stacktrace
-  apply-2.4            stacktrace
-  apply-2.5            stacktrace
-  apply-5.1            stacktrace
-  appendComp-7.1       {trace}
-  appendComp-7.2       {trace}
-  appendComp-7.3       {trace}
-  appendComp-7.4       {trace}
-  appendComp-7.5       {trace}
-  appendComp-7.6       {trace}
-  appendComp-7.7       {trace}
-  appendComp-7.8       {trace}
-  appendComp-7.9       {trace}
-  basic-46.1           stacktrace
-  basic-11.1           {interp}
-  basic-12.1           {interp}
-  basic-12.2           {interp}
-  basic-13.1           {interp}
-  basic-13.2           {interp}
-  basic-14.1           {expand}
-  basic-14.2           {expand}
-  basic-15.1           {expand}
-  basic-18.1           {expand}
-  basic-18.3           {expand}
-  basic-18.4           {expand}
-  basic-18.6           {expand}
-  basic-20.1           {expand}
-  basic-22.1           {expand}
-  basic-24.1           {interp}
-  basic-24.2           {expand}
-  basic-36.1           {expand, interp}
-  cmdAH-2.2            {file}
-  cmdAH-2.3            {file}
-  cmdAH-2.4            {file}
-  cmdAH-2.5            {file}
-  cmdAH-2.6            {file}
-  cmdAH-2.6.1          {file}
-  cmdAH-2.6.2          {file}
-  cmdMZ-2.10           stacktrace
-  cmdMZ-3.5            stacktrace
-  cmdMZ-5.7            stacktrace
-  compile-6.3          explode
-  basic-1.1            {interp}
-  basic-10.1           {interp}
-  dict-2.3             {lsearch -exact}
-  dict-3.5             {nested lists}
-  dict-3.6             {nested lists}
-  dict-3.7             {nested lists}
-  dict-3.8             {nested lists}
-  dict-3.9             {nested lists}
-  dict-3.10            {nested lists}
-  dict-9.3             {nested lists}
-  dict-9.4             {nested lists}
-  dict-9.5             {nested lists}
-  dict-11.1            {expr wide()}
-  dict-11.2            {expr wide()}
-  dict-11.3            {expr wide()}
-  dict-11.4            {expr wide()}
-  dict-11.5            {expr wide()}
-  dict-11.6            {expr wide()}
-  dict-11.7            {expr wide()}
-  dict-15.3            {nested lists}
-  dict-15.5            {nested lists}
-  dict-16.4            {nested lists}
-  dict-14.12           stacktrace
-  dict-17.13           stacktrace
-  dict-21.8            {lassign}
-  error-1.3            stacktrace
-  error-1.8            {uplevel bug}
-  error-2.3            stacktrace
-  error-2.6            stacktrace
-  error-4.2            stacktrace
-  error-4.3            stacktrace
-  error-4.4            stacktrace
-  eval-2.5             stacktrace
-  for-3.6              {[lsearch -regexp]}
-  format-3.1           segfault
-  format-3.2           segfault
-  format-8.17          {Cannot get character past end of string}
-  format-8.18          {Cannot get character past end of string} 
-  iocmd-12.6           stacktrace
-  if-5.3               stacktrace
-  if-6.4               stacktrace
-  if-10.6              {trace}
-  incr-2.30            stacktrace 
-  incr-2.31            stacktrace 
-  incr-old-2.4         stacktrace
-  incr-old-2.5         stacktrace
-  lindex-3.7           {expr wide()}
-  lindex-4.5           explode
-  lset-1.3             {trace}
-  lset-5.1             {trace}
-  lset-5.2             {trace}
-  misc-1.2             stacktrace
-  namespace-old-2.5    explode
-  namespace-old-2.6    explode
-  namespace-old-2.7    explode
-  namespace-old-4.4    explode
-  namespace-old-7.7    explode
-  parse-9.2            stacktrace
-  parse-10.14          stacktrace
-  scan-14.1            {Inf support}
-  scan-14.2            {Inf support}
-  set-2.1              stacktrace
-  set-4.1              stacktrace
-  string-5.14          {binary}
-  string-13.6          {Cannot repeat with negative arg}
-  string-13.8          {Cannot repeat with negative arg}
-  string-14.11         {Can only replace inside string or index after end of string}
-  string-18.7          {Cannot take substr outside string}
-  string-18.9          {Cannot take substr outside string}
-  string-20.4          {Cannot take substr outside string}
-  string-20.5          {Cannot take substr outside string}
-  stringComp-5.14      {binary}
-  stringComp-9.7       {binary}
-  switch-4.1           stacktrace
-  var-3.3              {testupvar}
-  var-3.4              {testupvar}
-  var-3.4              {testupvar}
-  var-4.1              {testgetvarfullname}
-  var-4.2              {testgetvarfullname}
-  var-4.3              {testgetvarfullname}
-  var-6.3              {Cannot get character of empty string}
-  var-7.12             {Cannot take substr outside string}
-  var-9.1              {testsetnoerr}
-  var-9.2              {testsetnoerr}
-  var-9.3              {testsetnoerr}
-  var-9.4              {testsetnoerr}
-  var-9.5              {testsetnoerr}
-  var-9.6              {testsetnoerr}
-  var-9.7              {testsetnoerr}
-  var-9.8              {testsetnoerr}
-  var-9.9              {testsetnoerr}
-  var-9.10             {testsetnoerr}
-  var-9.11             {testsetnoerr}
-  var-9.12             {testsetnoerr}
-  var-12.1             {Cannot take substr outside string}
-  while-4.3            stacktrace
-  while-old-4.6        stacktrace
-  binary-22.3          {no ICU lib loaded}
-  binary-22.4          {no ICU lib loaded}
-  binary-22.5          {no ICU lib loaded}
-  binary-22.11         {no ICU lib loaded}
-  binary-23.3          {no ICU lib loaded}
-  binary-23.4          {no ICU lib loaded}
-  binary-23.11         {no ICU lib loaded}
-  binary-24.2          {no ICU lib loaded}
-  binary-24.3          {no ICU lib loaded}
-  binary-24.4          {no ICU lib loaded}
-  binary-24.6          {no ICU lib loaded}
-  binary-24.10         {no ICU lib loaded}
-  binary-25.2          {no ICU lib loaded}
-  binary-25.3          {no ICU lib loaded}
-  binary-25.4          {no ICU lib loaded}
-  binary-25.6          {no ICU lib loaded}
-  binary-25.10         {no ICU lib loaded}
-  binary-26.2          {no ICU lib loaded}
-  binary-26.3          {no ICU lib loaded}
-  binary-26.4          {no ICU lib loaded}
-  binary-26.5          {no ICU lib loaded}
-  binary-26.6          {no ICU lib loaded}
-  binary-26.7          {no ICU lib loaded}
-  binary-26.10         {no ICU lib loaded}
-  binary-27.2          {no ICU lib loaded}
-  binary-27.3          {no ICU lib loaded}
-  binary-27.4          {no ICU lib loaded}
-  binary-27.5          {no ICU lib loaded}
-  binary-27.6          {no ICU lib loaded}
-  binary-27.9          {no ICU lib loaded}
-  binary-28.2          {no ICU lib loaded}
-  binary-28.3          {no ICU lib loaded}
-  binary-28.4          {no ICU lib loaded}
-  binary-28.5          {no ICU lib loaded}
-  binary-28.6          {no ICU lib loaded}
-  binary-28.9          {no ICU lib loaded}
-  binary-29.2          {no ICU lib loaded}
-  binary-29.3          {no ICU lib loaded}
-  binary-29.4          {no ICU lib loaded}
-  binary-29.5          {no ICU lib loaded}
-  binary-29.6          {no ICU lib loaded}
-  binary-29.9          {no ICU lib loaded}
-  binary-30.2          {no ICU lib loaded}
-  binary-30.3          {no ICU lib loaded}
-  binary-30.4          {no ICU lib loaded}
-  binary-30.5          {no ICU lib loaded}
-  binary-30.6          {no ICU lib loaded}
-  binary-30.9          {no ICU lib loaded}
-  binary-31.2          {no ICU lib loaded}
-  binary-31.3          {no ICU lib loaded}
-  binary-31.4          {no ICU lib loaded}
-  binary-31.5          {no ICU lib loaded}
-  binary-31.6          {no ICU lib loaded}
-  binary-31.7          {no ICU lib loaded}
-  binary-31.8          {no ICU lib loaded}
-  binary-31.9          {no ICU lib loaded}
-  binary-31.10         {no ICU lib loaded}
-  binary-31.11         {no ICU lib loaded}
-  binary-31.13         {no ICU lib loaded}
-  binary-31.14         {no ICU lib loaded}
-  binary-31.15         {no ICU lib loaded}
-  binary-32.2          {no ICU lib loaded}
-  binary-32.3          {no ICU lib loaded}
-  binary-32.4          {no ICU lib loaded}
-  binary-32.5          {no ICU lib loaded}
-  binary-32.6          {no ICU lib loaded}
-  binary-32.7          {no ICU lib loaded}
-  binary-32.8          {no ICU lib loaded}
-  binary-32.9          {no ICU lib loaded}
-  binary-32.10         {no ICU lib loaded}
-  binary-32.11         {no ICU lib loaded}
-  binary-32.13         {no ICU lib loaded}
-  binary-32.14         {no ICU lib loaded}
-  binary-32.15         {no ICU lib loaded}
-  binary-39.1          {no ICU lib loaded}
-  binary-39.2          {no ICU lib loaded}
-  binary-39.3          {no ICU lib loaded}
-  binary-39.4          {no ICU lib loaded}
-  binary-39.5          {no ICU lib loaded}
-  binary-41.5          {no ICU lib loaded}
-  binary-41.6          {no ICU lib loaded}
-  binary-41.7          {no ICU lib loaded}
-  binary-41.8          {no ICU lib loaded}
-  binary-46.5          {no ICU lib loaded}
-  binary-54.2          {no ICU lib loaded}
-  binary-54.3          {no ICU lib loaded}
-  binary-54.4          {no ICU lib loaded}
-  binary-54.5          {no ICU lib loaded}
-  binary-54.6          {no ICU lib loaded}
-  binary-54.9          {no ICU lib loaded}
-  binary-55.2          {no ICU lib loaded}
-  binary-55.3          {no ICU lib loaded}
-  binary-55.4          {no ICU lib loaded}
-  binary-55.5          {no ICU lib loaded}
-  binary-55.6          {no ICU lib loaded}
-  binary-55.9          {no ICU lib loaded}
-  binary-56.2          {no ICU lib loaded}
-  binary-56.3          {no ICU lib loaded}
-  binary-56.4          {no ICU lib loaded}
-  binary-56.5          {no ICU lib loaded}
-  binary-56.6          {no ICU lib loaded}
-  binary-56.9          {no ICU lib loaded}
-  binary-57.2          {no ICU lib loaded}
-  binary-57.3          {no ICU lib loaded}
-  binary-57.4          {no ICU lib loaded}
-  binary-57.5          {no ICU lib loaded}
-  binary-57.6          {no ICU lib loaded}
-  binary-57.9          {no ICU lib loaded}
-  binary-58.2          {no ICU lib loaded}
-  binary-58.3          {no ICU lib loaded}
-  binary-58.4          {no ICU lib loaded}
-  binary-58.5          {no ICU lib loaded}
-  binary-58.6          {no ICU lib loaded}
-  binary-58.7          {no ICU lib loaded}
-  binary-58.8          {no ICU lib loaded}
-  binary-58.9          {no ICU lib loaded}
-  binary-58.10         {no ICU lib loaded}
-  binary-58.11         {no ICU lib loaded}
-  binary-58.13         {no ICU lib loaded}
-  binary-58.14         {no ICU lib loaded}
-  binary-58.15         {no ICU lib loaded}
-  binary-59.2          {no ICU lib loaded}
-  binary-59.3          {no ICU lib loaded}
-  binary-59.4          {no ICU lib loaded}
-  binary-59.5          {no ICU lib loaded}
-  binary-59.6          {no ICU lib loaded}
-  binary-59.7          {no ICU lib loaded}
-  binary-59.8          {no ICU lib loaded}
-  binary-59.9          {no ICU lib loaded}
-  binary-59.10         {no ICU lib loaded}
-  binary-59.11         {no ICU lib loaded}
-  binary-59.13         {no ICU lib loaded}
-  binary-59.14         {no ICU lib loaded}
-  binary-59.15         {no ICU lib loaded}
-  cmdIL-4.24           {no ICU lib loaded}
-  cmdIL-4.25           {no ICU lib loaded}
-  expr-8.13            {no ICU lib loaded}
-  parseOld-7.12        {no ICU lib loaded}
-  scan-7.6             {no ICU lib loaded}
-  scan-7.7             {no ICU lib loaded}
-  subst-3.2            {no ICU lib loaded}
-  string-2.12          {no ICU lib loaded}
-  string-2.31          {no ICU lib loaded}
-  string-3.4           {no ICU lib loaded}
-  string-6.19          {no ICU lib loaded}
-  string-6.83          {no ICU lib loaded}
-  string-6.84          {no ICU lib loaded}
-  string-6.85          {no ICU lib loaded}
-  string-6.88          {no ICU lib loaded}
-  string-6.109         {no ICU lib loaded}
-  string-8.3           {no ICU lib loaded}
-  string-10.13         {no ICU lib loaded}
-  string-11.33         {no ICU lib loaded}
-  string-12.20         {no ICU lib loaded}
-  string-15.10         {no ICU lib loaded}
-  string-16.10         {no ICU lib loaded}
-  string-17.6          {no ICU lib loaded}
-  string-17.7          {no ICU lib loaded}
-  string-18.11         {no ICU lib loaded}
-  string-21.10         {no ICU lib loaded}
-  string-21.11         {no ICU lib loaded}
-  string-21.12         {no ICU lib loaded}
-  string-21.13         {no ICU lib loaded}
-  string-22.11         {no ICU lib loaded}
-  stringComp-2.12      {no ICU lib loaded}
-  stringComp-2.31      {no ICU lib loaded}
-  stringComp-3.4       {no ICU lib loaded}
-  stringComp-8.3       {no ICU lib loaded}
-  stringComp-11.33     {no ICU lib loaded}
-  util-4.6             {no ICU lib loaded}
-  util-5.7             {no ICU lib loaded}
-  util-5.18            {no ICU lib loaded}
-  util-5.42            {no ICU lib loaded}
-  util-5.43            {no ICU lib loaded}
-  util-8.3             {no ICU lib loaded}
-}
-
-# Tests after which there is non-test code which causes an error. Another
-# hack which allows us to count passing tests that would otherwise be dropped
-# on the floor.
+# Tests after which there is code (in or out of a test) which causes either
+# a fatal harness error, or after which all tests fail/skip. Allows us to
+# count passing tests that would otherwise be lost by the harness, as well
+# as speed up processing by ignoring chunks of failing tests.
+#
+# stored as an array of test name -> reason pairs.
 
 array set abort_after {
   basic-47.1           {need interp before these can work}
