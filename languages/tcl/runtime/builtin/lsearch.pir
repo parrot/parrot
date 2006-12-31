@@ -12,6 +12,10 @@
   __list = get_root_global [ '_tcl' ] , '__list'
 
   option  = shift argv #ignore, assume -exact
+  if option == '-exact' goto got_option
+  unshift argv, option
+
+got_option:
   list    = shift argv
   list = __list(list)
   element = shift argv
