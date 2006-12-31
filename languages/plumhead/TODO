@@ -3,9 +3,8 @@
 TODO:
   - unified testing
   - Implementation with PGE, make it the default implementation
-  - Implementation with ANTLR3, C# backend ?
+  - Implementation of 'antlr3' variant, Java backend
   - Support for floating point numbers
-  - Call 'php' from plumhead.pir, make testing more simple
   - Support for the superglobals  _POST and _GET
   - Implement var_dump()
   - Subclass OrderedHash for PlumheadArray

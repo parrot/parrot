@@ -1,9 +1,11 @@
 # $Id$
 
-# Setup some commands
+# Setup some commands and pathes
 PARROT   = ../../parrot@exe@
 PERL     = @perl@
 RM_F     = @rm_f@
+PGE_DIR  = ../../compilers/pge
+TGE_DIR  = ../../compilers/tge
 
 # default
 all: build
@@ -43,19 +45,30 @@ maintain-antlr3: src/antlr3/Plumhead.g src/antlr3/GenPastPir.g
 	java org.antlr.Tool -lib src/antlr3 src/antlr3/GenPastPir.g
 
 
-build: build-common build-antlr3
+build: build-common build-phc build-antlr3 build-partridge
 
 build-common: plumheadlib.pbc plumhead.pbc
+
+build-phc:
+	# nothing to do
 
 build-antlr3:
 	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr3.pod'
 	javac src/antlr3/*.java 
 
-plumhead.pbc: src/plumhead.pir
-	$(PARROT) -o plumhead.pbc src/plumhead.pir
+build-partridge: src/partridge/Plumhead_gen.pir src/partridge/PASTGrammar_gen.pir
+
+src/partridge/Plumhead_gen.pir:
+	$(PARROT) $(PGE_DIR)/pgc.pir --output=src/partridge/Plumhead_gen.pir src/partridge/Plumhead.pg
+
+src/partridge/PASTGrammar_gen.pir:
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/partridge/PASTGrammar_gen.pir src/partridge/PASTGrammar.tg
 
 plumheadlib.pbc: src/builtins.pir
 	$(PARROT) -o plumheadlib.pbc src/builtins.pir
+
+plumhead.pbc: src/plumhead.pir
+	$(PARROT) -o plumhead.pbc src/plumhead.pir
 
 test: all test-php test-phc test-antlr3 test-partridge
 
@@ -71,8 +84,16 @@ test-antlr3:
 test-partridge:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-partridge
 
-clean: clean-test
+clean: clean-common clean-partridge clean-antlr3 clean-test
+
+clean-common:
 	$(RM_F) plumheadlib.pbc plumhead.pbc
+
+clean-partridge:
+	$(RM_F) src/partridge/Plumhead_gen.pir src/partridge/PASTGrammar_gen.pir
+
+clean-antlr3:
+	$(RM_F) src/antlr3/*.class
 
 # Leave the generated test files in place
 clean-test:
