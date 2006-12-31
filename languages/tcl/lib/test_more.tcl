@@ -181,35 +181,7 @@ proc makeDirectory      {args} {return 0}
 proc removeDirectory    {args} {return 0}
 proc testobj            {args} {return 0}
 proc testsetplatform    {args} {return 0}
-proc testevalex         {cmd} {
-  # there's got to be a more idiomatic way to do this.
-  # (Well, once we have {expand}, sure!)
-
-  set i [llength $cmd]
-  if {$i==1} {
-    uplevel [lindex $cmd 0]
-  } elseif {$i==2} {
-    uplevel [lindex $cmd 0] [lindex $cmd 1]
-  } elseif {$i==3} {
-    uplevel [lindex $cmd 0] [lindex $cmd 1] [lindex $cmd 2]
-  } elseif {$i==4} {
-    uplevel [lindex $cmd 0] [lindex $cmd 1] [lindex $cmd 2] [lindex $cmd 3]
-  } elseif {$i==5} {
-    uplevel [lindex $cmd 0] [lindex $cmd 1] [lindex $cmd 2] [lindex $cmd 3] [lindex $cmd 4]
-  } elseif {$i==6} {
-    uplevel [lindex $cmd 0] [lindex $cmd 1] [lindex $cmd 2] [lindex $cmd 3] [lindex $cmd 4] [lindex $cmd 5]
-  } elseif {$i==7} {
-    uplevel [lindex $cmd 0] [lindex $cmd 1] [lindex $cmd 2] [lindex $cmd 3] [lindex $cmd 4] [lindex $cmd 5] [lindex $cmd 6]
-  } elseif {$i==8} {
-    uplevel [lindex $cmd 0] [lindex $cmd 1] [lindex $cmd 2] [lindex $cmd 3] [lindex $cmd 4] [lindex $cmd 5] [lindex $cmd 6] [lindex $cmd 7]
-  } elseif {$i==27} {
-    uplevel [lindex $cmd 0] [lindex $cmd 1] [lindex $cmd 2] [lindex $cmd 3] [lindex $cmd 4] [lindex $cmd 5] [lindex $cmd 6] [lindex $cmd 7] [lindex $cmd 8] [lindex $cmd 9] [lindex $cmd 10] [lindex $cmd 11] [lindex $cmd 12] [lindex $cmd 13] [lindex $cmd 14] [lindex $cmd 15] [lindex $cmd 16] [lindex $cmd 17] [lindex $cmd 18] [lindex $cmd 19] [lindex $cmd 20] [lindex $cmd 21] [lindex $cmd 22] [lindex $cmd 23] [lindex $cmd 24] [lindex $cmd 25] [lindex $cmd 26]
-  } elseif {$i==28} {
-    uplevel [lindex $cmd 0] [lindex $cmd 1] [lindex $cmd 2] [lindex $cmd 3] [lindex $cmd 4] [lindex $cmd 5] [lindex $cmd 6] [lindex $cmd 7] [lindex $cmd 8] [lindex $cmd 9] [lindex $cmd 10] [lindex $cmd 11] [lindex $cmd 12] [lindex $cmd 13] [lindex $cmd 14] [lindex $cmd 15] [lindex $cmd 16] [lindex $cmd 17] [lindex $cmd 18] [lindex $cmd 19] [lindex $cmd 20] [lindex $cmd 21] [lindex $cmd 22] [lindex $cmd 23] [lindex $cmd 24] [lindex $cmd 25] [lindex $cmd 26] [lindex $cmd 27]
-  } else {
-    error "testevalex hack: $i"
-  }
-}
+proc testevalex         {cmd}  { uplevel {expand}$cmd }
 
 namespace eval tcltest  {
     set verbose 0
