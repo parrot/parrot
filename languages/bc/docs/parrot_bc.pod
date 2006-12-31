@@ -27,7 +27,7 @@ TGE takes over.
 
 =head2 Parrot bc with ANTLR 3
 
-Under development.
+Development has stalled as well. Current devel takes place in 'languages/plumhead'.
 
 Generate PIR that sets up a PAST data structure, that will be transformed to POST
 which will be transformed to PIR, which will be  executed by Parrot.
