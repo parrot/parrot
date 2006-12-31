@@ -34,7 +34,7 @@ gen_pir_past
         + "                                                                  \n"
         + ".sub 'php_init' :load :init                                       \n"
         + "                                                                  \n"
-        + "  load_bytecode 'languages/plumhead/plumheadlib.pbc'              \n"
+        + "  load_bytecode 'languages/plumhead/src/common/plumheadlib.pbc'   \n"
         + "  load_bytecode 'PAST-pm.pbc'                                     \n"
         + "  load_bytecode 'MIME/Base64.pbc'                                 \n"
         + "  load_bytecode 'dumper.pbc'                                      \n"

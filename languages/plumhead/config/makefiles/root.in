@@ -47,7 +47,7 @@ maintain-antlr3: src/antlr3/Plumhead.g src/antlr3/GenPastPir.g
 
 build: build-common build-phc build-antlr3 build-partridge
 
-build-common: plumheadlib.pbc plumhead.pbc
+build-common: src/common/plumheadlib.pbc plumhead.pbc
 
 build-phc:
 	# nothing to do
@@ -64,11 +64,11 @@ src/partridge/Plumhead_gen.pir:
 src/partridge/PASTGrammar_gen.pir:
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/partridge/PASTGrammar_gen.pir src/partridge/PASTGrammar.tg
 
-plumheadlib.pbc: src/builtins.pir
-	$(PARROT) -o plumheadlib.pbc src/builtins.pir
+src/common/plumheadlib.pbc: src/common/builtins.pir
+	$(PARROT) -o src/common/plumheadlib.pbc src/common/builtins.pir
 
-plumhead.pbc: src/plumhead.pir
-	$(PARROT) -o plumhead.pbc src/plumhead.pir
+plumhead.pbc: src/common/plumhead.pir
+	$(PARROT) -o plumhead.pbc src/common/plumhead.pir
 
 test: all test-php test-phc test-antlr3 test-partridge
 
@@ -87,7 +87,7 @@ test-partridge:
 clean: clean-common clean-partridge clean-antlr3 clean-test
 
 clean-common:
-	$(RM_F) plumheadlib.pbc plumhead.pbc
+	$(RM_F) src/common/plumheadlib.pbc plumhead.pbc
 
 clean-partridge:
 	$(RM_F) src/partridge/Plumhead_gen.pir src/partridge/PASTGrammar_gen.pir

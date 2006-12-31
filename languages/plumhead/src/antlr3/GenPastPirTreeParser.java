@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/GenPastPir.g 2006-12-30 20:12:36
+// $ANTLR 3.0b5 src/antlr3/GenPastPir.g 2006-12-31 13:05:01
 
   import java.util.regex.*;
 
@@ -79,7 +79,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     + "                                                                  \n"
                     + ".sub 'php_init' :load :init                                       \n"
                     + "                                                                  \n"
-                    + "  load_bytecode 'languages/plumhead/plumheadlib.pbc'              \n"
+                    + "  load_bytecode 'languages/plumhead/src/common/plumheadlib.pbc'   \n"
                     + "  load_bytecode 'PAST-pm.pbc'                                     \n"
                     + "  load_bytecode 'MIME/Base64.pbc'                                 \n"
                     + "  load_bytecode 'dumper.pbc'                                      \n"

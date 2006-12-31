@@ -125,7 +125,7 @@ a Patrick Michaud PAST and runs the PAST.
 
 .sub 'php_init' :load :init
 
-  load_bytecode 'languages/plumhead/plumheadlib.pbc'
+  load_bytecode 'languages/plumhead/src/common/plumheadlib.pbc'
   load_bytecode 'PAST-pm.pbc'                                        
   load_bytecode 'MIME/Base64.pbc'              
   load_bytecode 'dumper.pbc'
