@@ -369,6 +369,9 @@ bad_args:
 iterate:
   .local pmc call_chain, lexpad
   call_chain = get_root_global ['_tcl'], 'call_chain'
+  $I1 = elements call_chain
+  if $I1 == 0 goto get_globals 
+
   lexpad     = call_chain[-1]
 
   .local pmc    iter, retval
@@ -387,6 +390,9 @@ end:
 
 bad_args:
   tcl_error 'wrong # args: should be "info vars ?pattern?"'
+
+get_globals:
+  .return 'globals'(argv)
 .end
 
 .sub 'level'

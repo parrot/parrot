@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 44
+plan 45
 
 eval_is {info} \
   {wrong # args: should be "info option ?arg arg ...?"} \
@@ -141,6 +141,15 @@ eval_is {
   }
   test 3 4
 } {a args b c d} {info vars - with special args}
+
+eval_is {
+  set a:b 2
+  proc a {} {
+    set q 2
+    return [info vars]
+  }
+  list [a] [info vars *:*]
+} {q a:b} {scope of info vars in proc and global}
 
 eval_is {info level a b} \
   {wrong # args: should be "info level ?number?"} \
