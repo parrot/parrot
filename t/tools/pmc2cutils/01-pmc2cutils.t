@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: pmc2c.t 14964 2006-10-18 18:20:48Z particle $
+# $Id$
 # 01-pmc2cutils.t
 
 BEGIN {
@@ -17,7 +17,7 @@ BEGIN {
 }
 use strict;
 use warnings;
-use Test::More tests => 28;
+use Test::More tests => 27;
 
 use_ok( 'Parrot::Pmc2c::Utils' );
 
@@ -45,7 +45,6 @@ can_ok($self, q{parse_pmc});
 can_ok($self, q{gen_parent_list});
 can_ok($self, q{find_and_parse_pmc});
 can_ok($self, q{gen_super_meths});
-can_ok($self, q{add_defaulted});
 can_ok($self, q{dump_is_newer});
 can_ok($self, q{dump_pmc});
 

@@ -544,8 +544,6 @@ sub gen_parent_list {
         my @parents =
             sort { $parent_hash{$a} <=> $parent_hash{$b} } keys %parent_hash;
         for my $parent (@parents) {
-#            next if exists $class->{has_parent}{$parent};
-
             $all->{$parent} = $self->read_dump(lc("$parent.pmc"))
                 if not $all->{$parent};
 

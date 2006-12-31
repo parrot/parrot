@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: pmc2c.t 14964 2006-10-18 18:20:48Z particle $
+# $Id$
 # 04-dump_pmc.t
 
 BEGIN {
@@ -17,7 +17,7 @@ BEGIN {
 }
 use strict;
 use warnings;
-use Test::More tests => 107;
+use Test::More tests => 119;
 use File::Basename;
 use File::Copy;
 use FindBin;
@@ -117,6 +117,60 @@ my @include_orig = (
     ok($self->dump_pmc(), "dump_pmc succeeded");
     ok(-f qq{$temppmcdir/default.dump},
         "default.dump created as expected");
+    ok(-f qq{$temppmcdir/array.dump},
+        "array.dump created as expected");
+
+    ok(chdir $cwd, "changed back to original directory");
+}
+
+# Two separate invocations of constructor:  first with default.pmc;
+# next with a different .pmc.  This mimics 'make' when it builds default.dump
+# and then *.dump with two separate invocations of pmc2c.pl.
+{
+    my $tdir = tempdir( CLEANUP => 1);
+    ok(chdir $tdir, 'changed to temp directory for testing');
+    my $pmcdir = q{src/pmc};
+    ok((mkdir qq{$tdir/src}), "created src/ under tempdir");
+    my $temppmcdir = qq{$tdir/src/pmc};
+    ok((mkdir $temppmcdir), "created src/pmc/ under tempdir");
+
+    my @pmcfiles = (
+        "$main::topdir/src/pmc/default.pmc",
+        "$main::topdir/src/pmc/array.pmc",
+    );
+    my $pmcfilecount = scalar(@pmcfiles);
+    my $copycount;
+    foreach my $pmcfile (@pmcfiles) {
+        my $basename = basename($pmcfile);
+        my $rv = copy ($pmcfile, qq{$temppmcdir/$basename});
+        $copycount++ if $rv;
+    }
+    is($copycount, $pmcfilecount,
+        "all src/pmc/*.pmc files copied to tempdir");
+    my @include = ($tdir, $temppmcdir, @include_orig);
+
+    @args = ( qq{$temppmcdir/default.pmc} );
+    $self = Parrot::Pmc2c::Utils->new( {
+        include => \@include,
+        opt     => \%opt,
+        args    => [ @args ],
+    } );
+    isa_ok($self, q{Parrot::Pmc2c::Utils});
+    $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
+    ok(-e $dump_file, "dump_vtable created vtable.dump");
+
+    ok($self->dump_pmc(), "dump_pmc succeeded");
+    ok(-f qq{$temppmcdir/default.dump},
+        "default.dump created as expected");
+
+    @args = ( qq{$temppmcdir/array.pmc} );
+    $self = Parrot::Pmc2c::Utils->new( {
+        include => \@include,
+        opt     => \%opt,
+        args    => [ @args ],
+    } );
+    isa_ok($self, q{Parrot::Pmc2c::Utils});
+    ok($self->dump_pmc(), "dump_pmc succeeded");
     ok(-f qq{$temppmcdir/array.dump},
         "array.dump created as expected");
 
@@ -530,7 +584,7 @@ my @include_orig = (
 
 pass("Completed all tests in $0");
 
-################### DOCUMENTATION ###################
+################## DOCUMENTATION ###################
 
 =head1 NAME
 
