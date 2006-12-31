@@ -1,294 +1,134 @@
 #!perl
 
-use strict;
-use warnings;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
+# the following lines re-execute this as a tcl script
+# the \ at the end of these lines makes them a comment in tcl \
+use lib qw(languages/tcl/lib tcl/lib lib ../lib ../../lib); # \
+use Tcl::Test; #\
+__DATA__
 
-use Parrot::Test tests => 39;
-use Test::More;
-use vars qw($TODO);
+source lib/test_more.tcl
+plan 38
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace: no args" );
-   namespace
-TCL
-wrong # args: should be "namespace subcommand ?arg ...?"
-OUT
+eval_is {namespace} \
+  {wrong # args: should be "namespace subcommand ?arg ...?"} \
+  {namespace: no args}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace: bad subcommand" );
-   namespace asdf
-TCL
-bad option "asdf": must be children, code, current, delete, eval, exists, export, forget, import, inscope, origin, parent, qualifiers, tail, or which
-OUT
+eval_is {namespace asdf} \
+  {bad option "asdf": must be children, code, current, delete, ensemble, eval, exists, export, forget, import, inscope, origin, parent, path, qualifiers, tail, unknown, upvar, or which} \
+  {namespace: bad subcommand}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace qualifiers: no args" );
-   namespace qualifiers
-TCL
-wrong # args: should be "namespace qualifiers string"
-OUT
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace qualifiers: too many args" );
-   namespace qualifiers string string
-TCL
-wrong # args: should be "namespace qualifiers string"
-OUT
+eval_is {namespace children a b c} \
+  {wrong # args: should be "namespace children ?name? ?pattern?"} \
+  {namespace children: too many args}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace qualifiers: simple" );
-   puts [namespace qualifiers ::a::b::c]
-TCL
-::a::b
-OUT
+eval_is {namespace children what?} \
+  {unknown namespace "what?" in namespace children command} \
+  {namespace children: unknown namespace}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace qualifiers: extra colons" );
-   puts [namespace qualifiers :::a:::b::c]
-TCL
-:::a:::b
-OUT
+is [namespace children]        {::tcltest ::tcl} {namespace children: no args}
+is [namespace children ::]     {::tcltest ::tcl} {namespace children: ::}
+is [namespace children :: *c*] {::tcltest ::tcl} {namespace children: matched pattern}
+is [namespace children :: a]   {}    {namespace children: unmatched pattern}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace tail: no args" );
-   namespace tail
-TCL
-wrong # args: should be "namespace tail string"
-OUT
+namespace eval bob {}
+namespace eval Bob {}
+namespace eval audreyt { namespace eval Matt {} }
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace qualifiers: too many args" );
-   namespace tail string string
-TCL
-wrong # args: should be "namespace tail string"
-OUT
+is [namespace children ::] {::audreyt ::Bob ::bob ::tcltest ::tcl} {namespace children: ordering}
+is [namespace children ::audreyt] ::audreyt::Matt  {namespace chlidren: nested}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace tail: simple" );
-   puts [namespace tail ::a::b::c]
-TCL
-c
-OUT
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace tail: extra colons" );
-   puts [namespace tail :::a:::b::c]
-TCL
-c
-OUT
+eval_is {namespace qualifiers} \
+  {wrong # args: should be "namespace qualifiers string"} \
+  {namespace qualifiers: no args}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace exists: no args" );
-   namespace exists
-TCL
-wrong # args: should be "namespace exists name"
-OUT
+eval_is {namespace qualifiers string string} \
+  {wrong # args: should be "namespace qualifiers string"} \
+  {namespace qualifiers: too many args}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace exists: too many args" );
-   namespace exists a a
-TCL
-wrong # args: should be "namespace exists name"
-OUT
+is [namespace qualifiers ::a::b::c]   ::a::b   {namespace qualifiers: simple}
+is [namespace qualifiers :::a:::b::c] :::a:::b {namespace qualifiers: extra colons}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace exists: failure" );
-   puts [namespace exists a]
-TCL
-0
-OUT
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace exists: global implicit" );
-   puts [namespace exists {}]
-TCL
-1
-OUT
+eval_is {namespace tail} \
+  {wrong # args: should be "namespace tail string"} \
+  {namespace tail: no args}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "namespace exists: global explicit" );
-   puts [namespace exists ::]
-TCL
-1
-OUT
+eval_is {namespace tail string string} \
+  {wrong # args: should be "namespace tail string"} \
+  {namespace tail: too many args}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace eval - bad args" );
-  namespace eval foo
-TCL
-wrong # args: should be "namespace eval name arg ?arg...?"
-OUT
+is [namespace tail ::a::b::c]   c {namespace tail: simple}
+is [namespace tail :::a:::b::c] c {namespace tail: extra colons}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace eval foo {}" );
-  namespace eval foo {}
-  puts [namespace exists foo]
-TCL
-1
-OUT
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace eval foo {}" );
-  namespace eval foo { proc bar {} {puts ok} }
-  foo::bar
-TCL
-ok
-OUT
+eval_is {namespace exists} \
+  {wrong # args: should be "namespace exists name"} \
+  {namespace exists: no args}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace eval foo { namespace eval bar {} }" );
-  namespace eval foo {
+eval_is {namespace exists a a} \
+  {wrong # args: should be "namespace exists name"} \
+  {namespace exists: too many args}
+
+is [namespace exists a]  0 {namespace exists: failure}
+is [namespace exists {}] 1 {namespace exists: global implicit}
+is [namespace exists ::] 1 {namespace exists: global explicit}
+
+
+eval_is {namespace eval foo} \
+  {wrong # args: should be "namespace eval name arg ?arg...?"} \
+  {namespace eval: too few args}
+
+namespace eval foo {
+    proc bar {} {return ok}
     namespace eval bar {
-      proc baz {} {puts ok}
+        proc baz {} {return ok}
     }
-  }
-  foo::bar::baz
-TCL
-ok
-OUT
+}
+is [namespace exists foo] 1 {namespace eval foo: namespace exists}
+is [foo::bar]      ok       {namespace eval foo: proc}
+is [foo::bar::baz] ok       {namespace eval foo: namespace eval bar: proc}
 
-language_output_is( 'tcl', <<'TCL', <<'OUT', 'namespace eval - return value' );
-puts [namespace eval foo {
-    set a ok
-    set a
-}]
-TCL
-ok
-OUT
+is [namespace eval foo {set a ok; set a}] ok {namespace eval: return value}
+is [namespace eval {}  {set a ok; set a}] ok {namespace eval: implicit global}
 
-language_output_is('tcl', <<'TCL', <<'OUT', 'namespace eval {} ...');
-  namespace eval {} {set foo ok}
-  puts $foo
-TCL
-ok
-OUT
-
-language_output_is('tcl', <<'TCL', <<'OUT', 'namespace eval + proc + upvar');
-proc test {one two} {
+proc alias {one two} {
     namespace eval {} [list upvar 0 $one $two]
 }
-set foo ok
-test foo bar
-puts $bar
-TCL
-ok
-OUT
+set   foo ok
+alias foo bar
+is [set bar] ok {namespace eval + proc + upvar}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace delete foo bar" );
-  namespace eval foo {}
-  namespace eval bar {}
-  puts [namespace exists foo]
-  puts [namespace exists bar]
-  namespace delete foo bar
-  puts [namespace exists foo]
-  puts [namespace exists bar]
-TCL
-1
-1
-0
-0
-OUT
+namespace delete foo
+is [namespace exists foo] 0 {namespace delete}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace current - too many args" );
-namespace current foo
-TCL
-wrong # args: should be "namespace current"
-OUT
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace current - global" );
-  puts [namespace current]
-TCL
-::
-OUT
+eval_is {namespace current foo} \
+  {wrong # args: should be "namespace current"} \
+  {namespace current: too many args}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace current - ::foo" );
-  namespace eval foo { proc test {} {puts [namespace current]} }
-  foo::test
-TCL
-::foo
-OUT
+is [namespace current]                      ::    {namespace current: global}
+is [namespace eval foo {namespace current}] ::foo {namespace current: ::foo}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace parent ::" );
-  puts [namespace parent ""]
-TCL
 
-OUT
+eval_is {namespace parent foo bar} \
+  {wrong # args: should be "namespace parent ?name?"} \
+  {namespace parent: too many args}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace parent ::foo" );
-  namespace eval foo {}
-  puts [namespace parent foo]
-TCL
-::
-OUT
+is [namespace parent ""]                   {} {namespace parent: ::}
+is [namespace parent foo]                  :: {namespace parent: ::foo (explicit)}
+is [namespace eval foo {namespace parent}] :: {namespace parent: ::foo (implicit)}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace parent - ::foo" );
-namespace eval foo {puts [namespace parent]}
-TCL
-::
-OUT
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace parent - too many args" );
-  namespace parent foo bar
-TCL
-wrong # args: should be "namespace parent ?name?"
-OUT
+# we can't do this test until all the file commands work
+# ([file delete] in particular)
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace children - too many args" );
-  namespace children a b c
-TCL
-wrong # args: should be "namespace children ?name? ?pattern?"
-OUT
+#set file [open tmp.tcl w]
+#puts  $file {proc okay {} {return okay}}
+#close $file
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace children, no args" );
-  puts [namespace children]
-TCL
-::tcl
-OUT
+#namespace eval foo { source tmp.tcl }
+#is [foo::okay] okay {namespace + source}
 
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace children, ::" );
-  puts [namespace children ::]
-TCL
-::tcl
-OUT
-
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace children after eval, ordering" );
-  namespace eval Bob {}
-  namespace eval audreyt {}
-  puts [namespace children ::]
-TCL
-::audreyt ::Bob ::tcl
-OUT
-
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace children, multiple levels " );
-  namespace eval audreyt { namespace eval Bob {} }
-  puts [namespace children]
-  puts [namespace children ::audreyt]
-TCL
-::audreyt ::tcl
-::audreyt::Bob
-OUT
-
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace children, bad namespace" );
-  namespace children what?
-TCL
-unknown namespace "what?" in namespace children command
-OUT
-
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace children, pattern" );
-  puts [namespace children :: *t*]
-TCL
-::tcl
-OUT
-
-language_output_is( "tcl", <<'TCL', <<'OUT', "namespace children, missed pattern" );
-  puts [namespace children :: a]
-TCL
-
-OUT
-
-# prolly not portable, patches welcome.
-my $source_filename = 'tmp.tcl';
-open( my $tmpfile, '>', $source_filename ) or die $!;
-print {$tmpfile} <<'EOF';
- proc okay {} { puts okay }
-EOF
-close $tmpfile;
-
-language_output_is( "tcl", <<TCL, <<OUT, "source inside namespace" );
-namespace eval bork { source tmp.tcl }
-okay
-TCL
-invalid command name "okay"
-OUT
-
-# clean up temp file.
-unlink($source_filename);
-
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
-# vim: expandtab shiftwidth=4:
+#file delete tmp.tcl

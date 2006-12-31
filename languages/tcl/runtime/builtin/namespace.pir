@@ -29,17 +29,21 @@ real top level namespace.
   options[1] = 'code'
   options[2] = 'current'
   options[3] = 'delete'
-  options[4] = 'eval'
-  options[5] = 'exists'
-  options[6] = 'export'
-  options[7] = 'forget'
-  options[8] = 'import'
-  options[9] = 'inscope'
-  options[10] = 'origin'
-  options[11] = 'parent'
-  options[12] = 'qualifiers'
-  options[13] = 'tail'
-  options[14] = 'which'
+  options[4] = 'ensemble'
+  options[5] = 'eval'
+  options[6] = 'exists'
+  options[7] = 'export'
+  options[8] = 'forget'
+  options[9] = 'import'
+  options[10] = 'inscope'
+  options[11] = 'origin'
+  options[12] = 'parent'
+  options[13] = 'path'
+  options[14] = 'qualifiers'
+  options[15] = 'tail'
+  options[16] = 'unknown'
+  options[17] = 'upvar'
+  options[18] = 'which'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
@@ -359,7 +363,7 @@ is_namespace:
   goto loop
 end:
 
-  $P0 = find_name 'lc_cmp'
+  $P0 = find_name 'children_cmp'
   list.sort($P0)
   .return(list)
 
@@ -373,15 +377,43 @@ unknown_namespace:
   tcl_error $S0
 .end
 
-.sub 'lc_cmp'
+.sub 'children_cmp'
     .param string a
     .param string b
 
     a = downcase a
     b = downcase b
 
-    $I0 = cmp a, b
-    .return($I0)
+    .local int len_a, len_b, pos
+    len_a = length a
+    len_b = length b
+    pos   = 0
+
+loop:
+    if pos >= len_a goto exhausted_a
+    if pos >= len_b goto a_first
+
+    $I0 = ord a, pos
+    $I1 = ord b, pos
+
+    if $I0 < $I1 goto a_first
+    if $I1 < $I0 goto b_first
+
+    inc pos
+    goto loop
+
+exhausted_a:
+    if len_a == len_b goto same
+    goto b_first
+
+same:
+    .return(0)
+
+a_first:
+    .return(-1)
+
+b_first:
+    .return(1)
 .end
 
 .sub 'code'
