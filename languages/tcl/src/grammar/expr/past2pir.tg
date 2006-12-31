@@ -196,7 +196,8 @@ transform pir (PAST::MathFunc) {
 }
 
 transform pir (PAST::StaticCommand) {
-    .local pmc args, children, iter, pir, reg
+    .local pmc args, children, iter, pir
+    .local string reg
     
     pir  = new 'PGE::CodeString'
     args = new .ResizablePMCArray
@@ -207,8 +208,10 @@ transform pir (PAST::StaticCommand) {
     $P0  = shift iter
     name = $P0['value']
 
-    .local int pastvar
-    pastvar = find_type 'PAST::Var'
+    .local int has_expand, pastexpand, pastvar
+    has_expand = 0
+    pastexpand = find_type 'PAST::Expand'
+    pastvar    = find_type 'PAST::Var'
 
   iter_loop: 
     unless iter goto iter_done
@@ -218,8 +221,12 @@ transform pir (PAST::StaticCommand) {
     push args, reg
     pir .= $P0
     $I0 = typeof $P1
+    if $I0 == pastexpand  goto iter_expand
     unless $I0 == pastvar goto iter_loop
     pir.emit("    %0 = clone %0", reg)
+    goto iter_loop
+  iter_expand:
+    has_expand = 1
     goto iter_loop
   iter_done:
     .local string retval
@@ -232,6 +239,7 @@ transform pir (PAST::StaticCommand) {
 
     $P0 = shift children
     $S0 = $P0['value']
+    if has_expand goto dynamic
     $P1 = get_root_global ['_tcl'; 'builtins'], $S0
     if null $P1 goto dynamic
 
@@ -384,6 +392,45 @@ transform pir (PAST::DynamicCommand) {
 %4:
 END_PIR
     node['ret'] = retval
+    .return(pir)
+}
+
+transform pir (PAST::Expand) {
+    .local pmc pir, value
+    pir   = new 'PGE::CodeString'
+    value = node['value']
+
+    $S0 = tree.get('pir', value)
+    pir .= $S0
+
+    $S0 = value['ret']
+    $S1 = pir.'unique'('$P')
+    $S2 = pir.'unique'('loop_')
+    $S3 = pir.'unique'('end_')
+    pir.emit(<<'END_PIR', $S0, $S1, $S2, $S3)
+  .include 'cclass.pasm'
+  %1  = new .ResizableStringArray
+  $S0 = %0
+  $I0 = length $S0
+  $I1 = 0
+  $I2 = 0
+%2:
+  if $I1 >= $I0 goto %3
+  $I3 = $I0 - $I2
+  $I1 = find_not_cclass .CCLASS_WHITESPACE, $S0, $I2, $I3
+  if $I1 >= $I0 goto %3
+  $I3 = $I0 - $I1
+  $I2 = find_cclass .CCLASS_WHITESPACE, $S0, $I1, $I3
+  if $I1 > $I0 goto %3
+  $I3 = $I2 - $I1
+  $S1 = substr $S0, $I1, $I3
+  push %1, $S1
+  goto %2
+%3:
+END_PIR
+
+    $S1 .= ' :flat'
+    node['ret'] = $S1
     .return(pir)
 }
 

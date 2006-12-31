@@ -29,6 +29,8 @@ transform dispatch (TclExpr::Grammar) {
 
     # Ask the child node for its past.
 dispatch:
+    $P0 = node['expand']
+    unless null $P0 goto expand
     $P0 = node['backslash_substitution']
     unless null $P0 goto constant
     $P0 = node['empty']
@@ -78,6 +80,9 @@ empty:
     $P0['value'] = ''
     $P0['class'] = 'TclString'
     .return($P0)
+
+expand:
+    .return tree.get('past', node, 'expand')
 
 chunks:
     .return tree.get('past', $P0, 'array')
@@ -170,6 +175,17 @@ transform past (operator) {
     .return tree.get('logical_and', node, 'PAST::Op')
   is_or:
     .return tree.get('logical_or', node, 'PAST::Op')
+}
+
+transform past (expand) {
+    .local pmc past
+    past = new 'PAST::Expand'
+
+    delete node['expand']
+    $P0 = tree.'get'('dispatch', node, 'TclExpr::Grammar')
+    past['value'] = $P0
+
+    .return(past)
 }
 
 transform past (program) {
@@ -546,12 +562,12 @@ transform past (command) {
     words = node['word']
     if null words goto empty
 
-    iter = new .Iterator, words
-    $P0 = shift iter
-    $P0 = tree.'get'('dispatch', $P0, 'TclExpr::Grammar')
+    .local pmc command
+    command = shift words
+    command = tree.'get'('dispatch', command, 'TclExpr::Grammar')
 
     $I0 = find_type 'PAST::Val'
-    $I1 = typeof $P0
+    $I1 = typeof command
     if $I0 == $I1 goto static
 
     $I0 = find_type 'PAST::DynamicCommand'
@@ -562,15 +578,16 @@ static:
 create_node:
     past = new $I0
     past.set_node(node)
-    past.'add_child'($P0)
-    
-loop:
-    unless iter goto end
+    past.'add_child'(command)
+
+    iter = new .Iterator, words
+loop2:
+    unless iter goto end2
     $P0 = shift iter
     $P1 = tree.'get'('dispatch', $P0, 'TclExpr::Grammar')
     past.'add_child'($P1)
-    goto loop
-end:
+    goto loop2
+end2:
     .return(past)
 
 empty:
