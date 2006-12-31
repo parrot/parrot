@@ -164,6 +164,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/if.t \
   t_tcl/incr_old.t \
   t_tcl/incr.t \
+  t_tcl/info.t \
   t_tcl/ioCmd.t \
   t_tcl/join.t \
   t_tcl/lindex.t \
@@ -259,7 +260,6 @@ DYING_TCL_TESTS = \
   t_tcl/fileSystem.t \
   t_tcl/http.t \
   t_tcl/httpold.t \
-  t_tcl/info.t \
   t_tcl/io.t \
   t_tcl/iogt.t \
   t_tcl/mathop.t \
