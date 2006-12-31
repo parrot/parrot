@@ -54,18 +54,18 @@ VARIANT_PHC:
     if ret goto ERROR
 
     err_msg = 'Creating XML-PAST with xsltproc failed'
-    cmd = 'xsltproc languages/plumhead/phc_xml_to_past_xml.xsl plumhead_phc_ast.xml > plumhead_past.xml'
+    cmd = 'xsltproc languages/plumhead/src/phc/phc_xml_to_past_xml.xsl plumhead_phc_ast.xml > plumhead_past.xml'
     ret = spawnw cmd
     if ret goto ERROR
 
     err_msg = 'Creating PIR with xsltproc failed'
-    cmd = 'xsltproc languages/plumhead/past_xml_to_past_pir.xsl  plumhead_past.xml  > plumhead_past.pir'
+    cmd = 'xsltproc languages/plumhead/src/phc/past_xml_to_past_pir.xsl  plumhead_past.xml  > plumhead_past.pir'
     ret = spawnw cmd
     if ret goto ERROR
     goto EXECUTE_PAST_PIR
 
 VARIANT_PARTRIDGE:
-    # TODO: really use ANTLR3
+    # TODO: really use partridge
     err_msg = 'Creating XML-AST with phc failed'
     cmd = 'phc --dump-ast-xml '
     concat cmd, php_source_fn
@@ -74,12 +74,12 @@ VARIANT_PARTRIDGE:
     if ret goto ERROR
 
     err_msg = 'Creating XML-PAST with xsltproc failed'
-    cmd = 'xsltproc languages/plumhead/phc_xml_to_past_xml.xsl plumhead_phc_ast.xml > plumhead_past.xml'
+    cmd = 'xsltproc languages/plumhead/src/phc/phc_xml_to_past_xml.xsl plumhead_phc_ast.xml > plumhead_past.xml'
     ret = spawnw cmd
     if ret goto ERROR
 
     err_msg = 'Creating PIR with xsltproc failed'
-    cmd = 'xsltproc languages/plumhead/past_xml_to_past_pir.xsl  plumhead_past.xml  > plumhead_past.pir'
+    cmd = 'xsltproc languages/plumhead/src/common/past_xml_to_past_pir.xsl  plumhead_past.xml  > plumhead_past.pir'
     ret = spawnw cmd
     if ret goto ERROR
     goto EXECUTE_PAST_PIR
