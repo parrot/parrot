@@ -129,8 +129,26 @@ array set skipped_tests {
   stringComp-5.14      {binary}
   stringComp-9.7       {binary}
   switch-4.1           stacktrace
+  var-3.3              {testupvar}
+  var-3.4              {testupvar}
+  var-3.4              {testupvar}
+  var-4.1              {testgetvarfullname}
+  var-4.2              {testgetvarfullname}
+  var-4.3              {testgetvarfullname}
   var-6.3              {Cannot get character of empty string}
   var-7.12             {Cannot take substr outside string}
+  var-9.1              {testsetnoerr}
+  var-9.2              {testsetnoerr}
+  var-9.3              {testsetnoerr}
+  var-9.4              {testsetnoerr}
+  var-9.5              {testsetnoerr}
+  var-9.6              {testsetnoerr}
+  var-9.7              {testsetnoerr}
+  var-9.8              {testsetnoerr}
+  var-9.9              {testsetnoerr}
+  var-9.10             {testsetnoerr}
+  var-9.11             {testsetnoerr}
+  var-9.12             {testsetnoerr}
   var-12.1             {Cannot take substr outside string}
   while-4.3            stacktrace
   while-old-4.6        stacktrace
@@ -332,4 +350,5 @@ array set abort_after {
   filename-11.13       {invalid command name "cd"}
   namespace-old-10.8   explode
   parse-18.30          {skip all tests after this one anyway}
+  info-32.0            {needs actual {expand} support after this point}
 }
