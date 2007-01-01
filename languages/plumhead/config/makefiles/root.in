@@ -45,7 +45,7 @@ maintain-antlr3: src/antlr3/Plumhead.g src/antlr3/GenPastPir.g
 	java org.antlr.Tool -lib src/antlr3 src/antlr3/GenPastPir.g
 
 
-build: build-common build-phc build-antlr3 build-partridge
+build: build-phc build-antlr3 build-partridge build-common 
 
 build-common: src/common/plumheadlib.pbc plumhead.pbc
 
@@ -56,13 +56,13 @@ build-antlr3:
 	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr3.pod'
 	javac src/antlr3/*.java 
 
-build-partridge: src/partridge/Plumhead_gen.pir src/partridge/PASTGrammar_gen.pir
+build-partridge: src/partridge/Plumhead_gen.pir src/partridge/PlumheadPAST_gen.pir
 
 src/partridge/Plumhead_gen.pir: src/partridge/Plumhead.pg
 	$(PARROT) $(PGE_DIR)/pgc.pir --output=src/partridge/Plumhead_gen.pir src/partridge/Plumhead.pg
 
-src/partridge/PASTGrammar_gen.pir: src/partridge/Plumhead.pg
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/partridge/PASTGrammar_gen.pir src/partridge/PASTGrammar.tg
+src/partridge/PlumheadPAST_gen.pir: src/partridge/PlumheadPAST.tg
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/partridge/PlumheadPAST_gen.pir src/partridge/PlumheadPAST.tg
 
 src/common/plumheadlib.pbc: src/common/builtins.pir
 	$(PARROT) -o src/common/plumheadlib.pbc src/common/builtins.pir
@@ -90,7 +90,7 @@ clean-common:
 	$(RM_F) src/common/plumheadlib.pbc plumhead.pbc
 
 clean-partridge:
-	$(RM_F) src/partridge/Plumhead_gen.pir src/partridge/PASTGrammar_gen.pir
+	$(RM_F) src/partridge/Plumhead_gen.pir src/partridge/PlumheadPAST_gen.pir
 
 clean-antlr3:
 	$(RM_F) src/antlr3/*.class

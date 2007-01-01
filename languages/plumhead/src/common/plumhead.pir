@@ -186,7 +186,7 @@ n_deb:
 .namespace [ 'Plumhead::Grammar' ]
 .include 'src/partridge/Plumhead_gen.pir'
 
-.include 'src/partridge/PASTGrammar_gen.pir'
+.include 'src/partridge/PlumheadPAST_gen.pir'
 
 =head1 SEE ALSO
 
