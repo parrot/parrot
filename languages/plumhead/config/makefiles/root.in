@@ -67,7 +67,7 @@ src/partridge/PlumheadPAST_gen.pir: src/partridge/PlumheadPAST.tg
 src/common/plumheadlib.pbc: src/common/builtins.pir
 	$(PARROT) -o src/common/plumheadlib.pbc src/common/builtins.pir
 
-plumhead.pbc: src/common/plumhead.pir
+plumhead.pbc: src/common/plumhead.pir src/partridge/Plumhead_gen.pir src/partridge/PlumheadPAST_gen.pir
 	$(PARROT) -o plumhead.pbc src/common/plumhead.pir
 
 test: all test-php test-phc test-antlr3 test-partridge

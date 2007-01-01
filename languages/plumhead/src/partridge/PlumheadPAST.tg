@@ -1,14 +1,57 @@
+# $Id$
+
 grammar Plumhead::PAST::Grammar is TGE::Grammar;
+
+# Generate PAST from Plumhead parse tree
+# derived from languages/abc/src/PASTGrammar.tg
 
 transform past (ROOT) :language('PIR') {
     node = node['program']
     .local pmc past
     past = new 'PAST::Block'
     past.'init'('node'=>node, 'name'=>'anon')
-    .local pmc cnode, cpast
-    cnode = node['statement_list']
-    cpast = tree.'get'('past', cnode, 'Plumhead::Grammar::statement_list')
-    past.'push'(cpast)
+    
+
+  # start of generic node
+  .local pmc past_node_id2244469                                                  
+  past_node_id2244469 = new 'PAST::Stmts'
+  
+  
+
+  # start of generic node
+  .local pmc past_node_id2244476                                                  
+  past_node_id2244476 = new 'PAST::Op'
+  
+      past_node_id2244476.'attr'( 'name', 'echo', 1 )                              
+    
+    
+
+  # start of past:Val
+  .local pmc past_node_id2244480
+  past_node_id2244480 = new 'PAST::Val'                             
+  
+      past_node_id2244480.'attr'( 'name', "Hello, World!\n", 1 )                              
+    
+  past_node_id2244480.'attr'( 'ctype', 's~', 1 )                              
+
+  past_node_id2244480.'attr'( 'vtype', '.String', 1 )                              
+
+  past_node_id2244476.'push'( past_node_id2244480 )      
+  # end of past:Val
+
+
+  
+  past_node_id2244469.'push'( past_node_id2244476 )      
+  null past_node_id2244476
+  # end of generic node
+
+
+
+  past.'push'( past_node_id2244469 )      
+  null past_node_id2244469
+  # end of generic node
+
+
     .return (past)
 }
 

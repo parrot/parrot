@@ -1,3 +1,5 @@
+# $Id$
+
 grammar Plumhead::Grammar;
 
 # a PHP grammar
@@ -40,7 +42,8 @@ rule statement {
     | <expression>
 }
 rule statement_list { <statement>? [ ; <statement>? ]* }
-rule program { ^ <statement_list> [ $ | <die: parse error> ] }
+#rule program { ^ <statement_list> [ $ | <die: parse error> ] }
+rule program { php }
 
 rule pseudo_statement { limits | quit | warranty }
 

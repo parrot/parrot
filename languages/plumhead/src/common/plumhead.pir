@@ -32,6 +32,11 @@ Parser PHP with the Parrot compiler tools.
     load_bytecode 'PGE/Util.pbc'
     load_bytecode 'Parrot/HLLCompiler.pbc'
     load_bytecode 'PAST-pm.pbc'
+    load_bytecode 'languages/plumhead/src/common/plumheadlib.pbc'
+
+    # import PGE::Util::die into Plumhead::Grammar
+    $P0 = get_hll_global ['PGE::Util'], 'die'
+    set_hll_global ['Plumhead::Grammar'], 'die', $P0
 
     $P0 = new [ 'HLLCompiler' ]
     $P0.'language'('Plumhead')
