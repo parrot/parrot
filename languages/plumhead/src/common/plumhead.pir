@@ -19,9 +19,21 @@ Parser PHP with the Parrot compiler tools.
 
 =cut
 
-.const string VERSION="0.0.1"
+.namespace [ 'Plumhead' ]
+
+.const string VERSION = "0.0.1"
 
 .include "library/dumper.pir"
+
+.sub '__onload' :load :init
+    load_bytecode 'Getopt/Obj.pbc'
+    load_bytecode 'PGE.pbc'
+    load_bytecode 'PGE/Text.pbc'
+    load_bytecode 'PGE/Util.pbc'
+    load_bytecode 'Parrot/HLLCompiler.pbc'
+    load_bytecode 'PAST-pm.pbc'
+
+.end
 
 .sub plumhead :main
     .param pmc argv
@@ -125,8 +137,6 @@ ERROR:
 # get commandline options
 .sub parse_options
     .param pmc argv
-
-    load_bytecode "Getopt/Obj.pbc"
 
     .local string prog
     prog = shift argv
