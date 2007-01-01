@@ -58,10 +58,10 @@ build-antlr3:
 
 build-partridge: src/partridge/Plumhead_gen.pir src/partridge/PASTGrammar_gen.pir
 
-src/partridge/Plumhead_gen.pir:
+src/partridge/Plumhead_gen.pir: src/partridge/Plumhead.pg
 	$(PARROT) $(PGE_DIR)/pgc.pir --output=src/partridge/Plumhead_gen.pir src/partridge/Plumhead.pg
 
-src/partridge/PASTGrammar_gen.pir:
+src/partridge/PASTGrammar_gen.pir: src/partridge/Plumhead.pg
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/partridge/PASTGrammar_gen.pir src/partridge/PASTGrammar.tg
 
 src/common/plumheadlib.pbc: src/common/builtins.pir
