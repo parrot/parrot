@@ -1,4 +1,4 @@
-grammar ABC::PAST::Grammar is TGE::Grammar;
+grammar Plumhead::PAST::Grammar is TGE::Grammar;
 
 transform past (ROOT) :language('PIR') {
     node = node['program']
@@ -7,34 +7,34 @@ transform past (ROOT) :language('PIR') {
     past.'init'('node'=>node, 'name'=>'anon')
     .local pmc cnode, cpast
     cnode = node['statement_list']
-    cpast = tree.'get'('past', cnode, 'ABC::Grammar::statement_list')
+    cpast = tree.'get'('past', cnode, 'Plumhead::Grammar::statement_list')
     past.'push'(cpast)
     .return (past)
 }
 
 
-transform past (ABC::Grammar::statement) :language('PIR') {
+transform past (Plumhead::Grammar::statement) :language('PIR') {
   if_statement:
     $P0 = node['if_statement']
     if null $P0 goto while_statement
-    .return tree.'get'('past', $P0, 'ABC::Grammar::if_statement')
+    .return tree.'get'('past', $P0, 'Plumhead::Grammar::if_statement')
   while_statement:
     $P0 = node['while_statement']
     if null $P0 goto compound_statement
-    .return tree.'get'('past', $P0, 'ABC::Grammar::while_statement')
+    .return tree.'get'('past', $P0, 'Plumhead::Grammar::while_statement')
   compound_statement:
     $P0 = node['compound_statement']
     if null $P0 goto for_statement
     $P0 = $P0['statement_list']
-    .return tree.'get'('past', $P0, 'ABC::Grammar::statement_list')
+    .return tree.'get'('past', $P0, 'Plumhead::Grammar::statement_list')
   for_statement:
     $P0 = node['for_statement']
     if null $P0 goto expression
-    .return tree.'get'('past', $P0, 'ABC::Grammar::for_statement')
+    .return tree.'get'('past', $P0, 'Plumhead::Grammar::for_statement')
   expression:
     $P0 = node['expression']
     .local pmc past
-    past = tree.'get'('past', $P0, 'ABC::Grammar::expression')
+    past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
     ##   if the statement isn't an assignment, we assign to last and
     ##   print the resulting number
     $I0 = isa past, 'PAST::Op'
@@ -50,7 +50,7 @@ transform past (ABC::Grammar::statement) :language('PIR') {
 }
 
 
-transform past (ABC::Grammar::if_statement) :language('PIR') {
+transform past (Plumhead::Grammar::if_statement) :language('PIR') {
     .local pmc exprnode, thennode, elsenode
     exprnode = node['expression']
     $P0 = node['statement']
@@ -61,20 +61,20 @@ transform past (ABC::Grammar::if_statement) :language('PIR') {
     past = new 'PAST::Op'
     past.'init'('node'=>node, 'pasttype'=>'if')
     .local pmc exprpast, thenpast, elsepast
-    exprpast = tree.'get'('past', exprnode, 'ABC::Grammar::expression')
+    exprpast = tree.'get'('past', exprnode, 'Plumhead::Grammar::expression')
     past.'push'(exprpast)
-    thenpast = tree.'get'('past', thennode, 'ABC::Grammar::statement')
+    thenpast = tree.'get'('past', thennode, 'Plumhead::Grammar::statement')
     past.'push'(thenpast)
     $I0 = defined elsenode
     if $I0 == 0 goto done_else
-    elsepast = tree.'get'('past', elsenode, 'ABC::Grammar::statement')
+    elsepast = tree.'get'('past', elsenode, 'Plumhead::Grammar::statement')
     past.'push'(elsepast)
   done_else:
     .return (past)
 }
 
 
-transform past (ABC::Grammar::while_statement) :language('PIR') {
+transform past (Plumhead::Grammar::while_statement) :language('PIR') {
     .local pmc exprnode, stmtnode
     exprnode = node['expression']
     stmtnode = node['statement']
@@ -82,9 +82,9 @@ transform past (ABC::Grammar::while_statement) :language('PIR') {
     .local pmc past, exprpast, stmtpast
     past = new 'PAST::Op'
     past.'init'('node'=>node, 'pasttype'=>'while')
-    exprpast = tree.'get'('past', exprnode, 'ABC::Grammar::expression')
+    exprpast = tree.'get'('past', exprnode, 'Plumhead::Grammar::expression')
     past.'push'(exprpast)
-    stmtpast = tree.'get'('past', stmtnode, 'ABC::Grammar::statement')
+    stmtpast = tree.'get'('past', stmtnode, 'Plumhead::Grammar::statement')
     past.'push'(stmtpast)
     .return (past)
 }
@@ -92,7 +92,7 @@ transform past (ABC::Grammar::while_statement) :language('PIR') {
 # the for statement is build using the while pasttype
 # according to the rule:
 # for ( A ; B ; C ) { D } => A; while ( B ) { D; C; }
-transform past (ABC::Grammar::for_statement) :language('PIR') {
+transform past (Plumhead::Grammar::for_statement) :language('PIR') {
     .local pmc expr1node, expr2node, expr3node, stmtnode
     $P0 = node['expression']
     expr1node = $P0[0]
@@ -105,22 +105,22 @@ transform past (ABC::Grammar::for_statement) :language('PIR') {
     # build node for stmt+iterator
     bpast = new 'PAST::Stmts'
     bpast.'init'('node'=>node)
-    stmtpast = tree.'get'('past', stmtnode, 'ABC::Grammar::statement')
+    stmtpast = tree.'get'('past', stmtnode, 'Plumhead::Grammar::statement')
     bpast.'push'(stmtpast)
-    expr3past = tree.'get'('past', expr3node, 'ABC::Grammar::expression')
+    expr3past = tree.'get'('past', expr3node, 'Plumhead::Grammar::expression')
     bpast.'push'(expr3past)
 
     # build node for looping
     wpast = new 'PAST::Op'
     wpast.'init'('node'=>node, 'pasttype'=>'while')
-    expr2past = tree.'get'('past', expr2node, 'ABC::Grammar::expression')
+    expr2past = tree.'get'('past', expr2node, 'Plumhead::Grammar::expression')
     wpast.'push'(expr2past)
     wpast.'push'(bpast)
 
     # build node for 'for' statement
     past = new 'PAST::Stmts'
     past.'init'('node'=>node)
-    expr1past = tree.'get'('past', expr1node, 'ABC::Grammar::expression')
+    expr1past = tree.'get'('past', expr1node, 'Plumhead::Grammar::expression')
     past.'push'(expr1past)
     past.'push'(wpast)
 
@@ -128,7 +128,7 @@ transform past (ABC::Grammar::for_statement) :language('PIR') {
 }
 
 
-transform past (ABC::Grammar::statement_list) :language('PIR') {
+transform past (Plumhead::Grammar::statement_list) :language('PIR') {
     .local pmc past
     past = new 'PAST::Stmts'
     past.'init'('node'=>node)
@@ -141,7 +141,7 @@ transform past (ABC::Grammar::statement_list) :language('PIR') {
     unless iter goto iter_end
     .local pmc cnode, cpast
     cnode = shift iter
-    cpast = tree.'get'('past', cnode, 'ABC::Grammar::statement')
+    cpast = tree.'get'('past', cnode, 'Plumhead::Grammar::statement')
     past.'push'(cpast)
     goto iter_loop
   iter_end:
@@ -149,13 +149,13 @@ transform past (ABC::Grammar::statement_list) :language('PIR') {
 }
 
 
-transform past (ABC::Grammar::expression) :language('PIR') {
+transform past (Plumhead::Grammar::expression) :language('PIR') {
     $P0 = node['expr']
-    .return tree.'get'('past', $P0, 'ABC::Grammar::expr')
+    .return tree.'get'('past', $P0, 'Plumhead::Grammar::expr')
 }
 
 
-transform past (ABC::Grammar::expr) :language('PIR') {
+transform past (Plumhead::Grammar::expr) :language('PIR') {
     .local string type
     type = node['type']
     if type == 'term:' goto past_term
@@ -163,7 +163,7 @@ transform past (ABC::Grammar::expr) :language('PIR') {
     .local pmc optable, optok
     .local string pasttype, pirop, returns
     .local int islvalue
-    optable = get_hll_global [ 'ABC::Grammar' ], '$optable'
+    optable = get_hll_global [ 'Plumhead::Grammar' ], '$optable'
     optok = optable[type]
     pasttype = optok['past']
     pirop = optok['pirop']
@@ -182,7 +182,7 @@ transform past (ABC::Grammar::expr) :language('PIR') {
   iter_loop:
     .local pmc cnode, cpast
     cnode = shift iter
-    cpast = tree.'get'('past', cnode, 'ABC::Grammar::expr')
+    cpast = tree.'get'('past', cnode, 'Plumhead::Grammar::expr')
     if null cpast goto iter_loop
     past.'push'(cpast)
     if iter goto iter_loop
@@ -190,11 +190,11 @@ transform past (ABC::Grammar::expr) :language('PIR') {
     .return (past)
 
   past_term:
-    .return tree.'get'('past_term', node, 'ABC::Grammar::expr')
+    .return tree.'get'('past_term', node, 'Plumhead::Grammar::expr')
 }
 
 
-transform past_term (ABC::Grammar::expr) :language('PIR') {
+transform past_term (Plumhead::Grammar::expr) :language('PIR') {
     .local pmc past
     $P0 = node['array']
     unless null $P0 goto term_array
@@ -232,7 +232,7 @@ transform past_term (ABC::Grammar::expr) :language('PIR') {
     islvalue = node['islvalue']
     .local pmc exprnode, exprpast, basepast
     exprnode = node['expression'; 0]
-    exprpast = tree.'get'('past', exprnode, 'ABC::Grammar::expression')
+    exprpast = tree.'get'('past', exprnode, 'Plumhead::Grammar::expression')
     basepast = exprpast.'new'('PAST::Var', 'node'=>node, 'name'=>name)
     past = exprpast.'new'('PAST::Var', basepast, exprpast, 'node'=>node, 'scope'=>'keyed', 'viviself'=>'.Integer', 'islvalue'=>islvalue)
     unless islvalue goto term_array_end
@@ -245,7 +245,7 @@ transform past_term (ABC::Grammar::expr) :language('PIR') {
     .local pmc exprnode, exprpast
     name = node['ident']
     exprnode = node['expression'; 0]
-    exprpast = tree.'get'('past', exprnode, 'ABC::Grammar::expression')
+    exprpast = tree.'get'('past', exprnode, 'Plumhead::Grammar::expression')
     past = exprpast.'new'('PAST::Op', exprpast, 'node'=>node, 'name'=>name, 'pasttype'=>'call')
     .return (past)
 }

@@ -1,6 +1,7 @@
-grammar ABC::Grammar;
+grammar Plumhead::Grammar;
 
-## an example 'bc' grammar
+# a PHP grammar
+# derived from on languages/abc/abc.pg
 
 token apply { <program> }
 

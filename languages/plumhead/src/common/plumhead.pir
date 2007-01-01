@@ -33,6 +33,11 @@ Parser PHP with the Parrot compiler tools.
     load_bytecode 'Parrot/HLLCompiler.pbc'
     load_bytecode 'PAST-pm.pbc'
 
+    $P0 = new [ 'HLLCompiler' ]
+    $P0.'language'('Plumhead')
+    $P0.'parsegrammar'('Plumhead::Grammar')
+    $P0.'astgrammar'('Plumhead::PAST::Grammar')
+
 .end
 
 .sub plumhead :main
@@ -55,7 +60,8 @@ GOT_PHP_SOURCE_FN:
     .local string variant
     variant = opt['variant']
 
-    if variant == 'antlr3' goto VARIANT_ANTLR3
+    if variant == 'antlr3'    goto VARIANT_ANTLR3
+    if variant == 'partridge' goto VARIANT_PARTRIDGE
 
 VARIANT_PHC:
     err_msg = 'Creating XML-AST with phc failed'
@@ -77,24 +83,9 @@ VARIANT_PHC:
     goto EXECUTE_PAST_PIR
 
 VARIANT_PARTRIDGE:
-    # TODO: really use partridge
-    err_msg = 'Creating XML-AST with phc failed'
-    cmd = 'phc --dump-ast-xml '
-    concat cmd, php_source_fn
-    concat cmd, '> plumhead_phc_ast.xml'
-    ret = spawnw cmd
-    if ret goto ERROR
-
-    err_msg = 'Creating XML-PAST with xsltproc failed'
-    cmd = 'xsltproc languages/plumhead/src/phc/phc_xml_to_past_xml.xsl plumhead_phc_ast.xml > plumhead_past.xml'
-    ret = spawnw cmd
-    if ret goto ERROR
-
-    err_msg = 'Creating PIR with xsltproc failed'
-    cmd = 'xsltproc languages/plumhead/src/common/past_xml_to_past_pir.xsl  plumhead_past.xml  > plumhead_past.pir'
-    ret = spawnw cmd
-    if ret goto ERROR
-    goto EXECUTE_PAST_PIR
+    err_msg = 'Compiling and executing with partridge failed'
+    $P0 = compreg 'Plumhead'
+    .return $P0.'evalfiles'(php_source_fn)
 
 VARIANT_ANTLR3:
     err_msg = 'Generating PAST from PHP source failed'
@@ -191,6 +182,11 @@ n_deb:
 
     .return (opt, rest )
 .end
+
+.namespace [ 'Plumhead::Grammar' ]
+.include 'src/partridge/Plumhead_gen.pir'
+
+.include 'src/partridge/PASTGrammar_gen.pir'
 
 =head1 SEE ALSO
 
