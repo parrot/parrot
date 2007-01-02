@@ -60,6 +60,25 @@ set skipped_tests [dict create \
   } {[testsetnoerr]} {
     var-9.1 var-9.2 var-9.3 var-9.4 var-9.5 var-9.6 var-9.7 var-9.8 var-9.9
     var-9.1 var-9.11 var-9.12
+  } {[testdoubleobj]} {
+    execute-3.2 execute-3.8 execute-3.14 execute-3.20 execute-3.26 execute-3.32
+    execute-3.38 execute-3.44 execute-3.50 execute-3.56 execute-3.63 
+    execute-3.64 execute-3.73
+  } {[testintobj]} {
+    execute-3.1 execute-3.3 execute-3.7 execute-3.9 execute-3.13 execute-3.15
+    execute-3.19 execute-3.21 execute-3.25 execute-3.27 execute-3.31 
+    execute-3.33 execute-3.37 execute-3.39 execute-3.43 execute-3.45
+    execute-3.49 execute-3.51 execute-3.55 execute-3.57 execute-3.61
+    execute-3.62 execute-3.65 execute-3.66 execute-3.72 execute-3.74
+  } {[teststringobj]} {
+    execute-3.4 execute-3.5 execute-3.6 execute-3.10 execute-3.11 execute-3.12
+    execute-3.16 execute-3.17 execute-3.18 execute-3.22 execute-3.23
+    execute-3.24 execute-3.28 execute-3.29 execute-3.30 execute-3.34
+    execute-3.35 execute-3.36 execute-3.40 execute-3.41 execute-3.42
+    execute-3.46 execute-3.47 execute-3.48 execute-3.52 execute-3.53
+    execute-3.54 execute-3.58 execute-3.59 execute-3.60 execute-3.67
+    execute-3.68 execute-3.69 execute-3.70 execute-3.71 execute-3.75
+    execute-3.76 execute-3.77
   } {ICU} {
     binary-22.3 binary-22.4 binary-22.5 binary-22.11 binary-23.3 binary-23.4
     binary-23.11 binary-24.2 binary-24.3 binary-24.4 binary-24.6 binary-24.10
