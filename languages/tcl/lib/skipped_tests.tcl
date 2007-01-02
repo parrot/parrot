@@ -49,6 +49,8 @@ set skipped_tests [dict create \
     var-6.3 var-7.12 var-12.1
   } {Cannot get character past end of string} {
     format-8.17 format-8.18
+  } {Cannot take substr outside string} {
+    namespace-14.9 namespace-14.12
   } {[lsearch -regexp]} {
     for-3.6
   } {Inf support} {
@@ -135,5 +137,6 @@ array set abort_after {
   utf-1.4              {Invalid character for UTF-8 encoding}
   parse-8.12           {avoid infinite loop}
   source-7.6           {invalid command name "cleanupTests"}
+  namespace-52.11      {invoke() not implemented in class 'TclList'}
   namespace-old-10.8   explode
 }

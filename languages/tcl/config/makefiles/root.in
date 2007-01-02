@@ -178,6 +178,7 @@ RUNNABLE_TCL_TESTS = \
   t_tcl/lsearch.t \
   t_tcl/lset.t \
   t_tcl/lsetComp.t \
+  t_tcl/namespace.t \
   t_tcl/namespace_old.t \
   t_tcl/package.t \
   t_tcl/parse.t \
@@ -265,7 +266,6 @@ DYING_TCL_TESTS = \
   t_tcl/mathop.t \
   t_tcl/msgcat.t \
   t_tcl/macOSXLoad.t \
-  t_tcl/namespace.t \
   t_tcl/opt.t \
   t_tcl/pkgMkIndex.t \
   t_tcl/reg.t \
