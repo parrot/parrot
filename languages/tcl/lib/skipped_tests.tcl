@@ -110,7 +110,6 @@ array set abort_after {
   env-1.3              {can't read "env(test)" no such element in array}
   event-4.2            {invalid command name "update"}
   filename-11.13       {invalid command name "cd"}
-  info-32.0            {invalid command name "proc bar {} {info frame 0}"}
   iocmd-12.8           {invalid command name "close"}
   ioUtil-2.8           {invalid command name "cd"}
   uplevel-5.2          {invalid command name "set"}
