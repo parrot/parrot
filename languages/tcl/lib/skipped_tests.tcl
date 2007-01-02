@@ -46,17 +46,13 @@ set skipped_tests [dict create \
     dict-3.5 dict-3.6 dict-3.7 dict-3.8 dict-3.9 dict-3.10 dict-9.3 dict-9.4
     dict-9.5 dict-15.3 dict-15.5 dict-16.4
   } {support for the variable named ""}
-    var-7.12 var-12.1
+    var-6.3 var-7.12 var-12.1
   } {Cannot get character past end of string} {
     format-8.17 format-8.18
-  } {Cannot get character of empty string} {
-    var-6.3
   } {[lsearch -regexp]} {
     for-3.6
   } {Inf support} {
     scan-14.1 scan-14.2
-  } {Can only replace inside string or index after end of string} {
-    string-14.11
   } {[testupvar]} {
     var-3.3 var-3.4 var-3.4
   } {[testgetvarfullname]} {

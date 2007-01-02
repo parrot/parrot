@@ -821,6 +821,9 @@ bad_args:
   $S2 = argv[1]
   low = __index($S2, $S1)
 
+  $I1 = length $S2
+  if low > $I1 goto replace_done
+
   $S3 = argv[2]
   high = __index($S3, $S1)
 
