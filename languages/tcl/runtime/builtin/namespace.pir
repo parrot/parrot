@@ -295,6 +295,7 @@ bad_args:
 .end
 
 .sub 'export'
+  .return ('')
 .end
 
 .sub 'children'
@@ -417,21 +418,27 @@ b_first:
 .end
 
 .sub 'code'
+  .return ('')
 .end
 
 .sub 'export'
+  .return ('')
 .end
 
 .sub 'forget'
+  .return ('')
 .end
 
 .sub 'import'
+  .return ('')
 .end
 
 .sub 'inscope'
+  .return ('')
 .end
 
 .sub 'origin'
+  .return ('')
 .end
 
 .sub 'parent'

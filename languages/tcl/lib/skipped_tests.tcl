@@ -26,6 +26,8 @@ set skipped_tests [dict create \
     incr-2.30 incr-2.31
     incr-old-2.4 incr-old-2.5
     misc-1.2
+    namespace-8.5 namespace-8.6 namespace-25.6 namespace-25.7 namespace-25.8
+    namespace-47.2 namespace-47.4 namespace-47.6
     parse-9.2 parse-10.14
     set-2.1 set-4.1
     switch-4.1
@@ -34,14 +36,40 @@ set skipped_tests [dict create \
   } {[interp]} {
     basic-11.1 basic-12.1 basic-12.2 basic-13.1 basic-13.2 basic-24.1
     basic-1.1 basic-10.1 basic-36.1          
+    namespace-8.7
   } {[file]} {
     cmdAH-2.2 cmdAH-2.3 cmdAH-2.4 cmdAH-2.5 cmdAH-2.6 cmdAH-2.6.1 cmdAH-2.6.2
   } BOOM {
     format-3.1 format-3.2
-    namespace-old-2.5 namespace-old-2.6 namespace-old-2.7 namespace-old-4.4 namespace-old-7.7
+    namespace-old-2.5 namespace-old-2.6 namespace-old-2.7 namespace-old-4.4
+    namespace-old-7.7
   } {[expr wide()]} {
     dict-11.1 dict-11.2 dict-11.3 dict-11.4 dict-11.5 dict-11.6 dict-11.7
     lindex-3.7
+  } {[namespace code]} {
+    namespace-22.1 
+    namespace-22.2 
+    namespace-22.3 
+    namespace-22.4 
+    namespace-22.5 
+    namespace-22.6 
+  } {[namespace delete]} {
+    namespace-14.1
+  } {[namespace export]} {
+    namespace-11.1 namespace-26.6
+  } {[namespace inscope]} {
+    namespace-29.1 namespace-29.2 namespace-29.3 namespace-29.4 namespace-29.5
+    namespace-29.6
+  } {[namespace import]} {
+    namespace-8.1 namespace-8.4 namespace-9.1 namespace-9.2 namespace-9.3
+    namespace-9.4 namespace-9.5 namespace-9.6 namespace-9.7 namespace-11.2
+    namespace-11.3 namespace-12.1 namespace-26.4 namespace-26.5 namespace-26.7
+    namespace-28.2 namespace-28.3
+  } {[namespace origin]} {
+    namespace-30.1 namespace-30.2 namespace-30.3 namespace-30.4 namespace-30.5
+  } {[namespace forget]} {
+    namespace-10.1 namespace-10.2 namespace-10.3 namespace-13.1 namespace-27.1
+    namespace-27.2 namespace-27.3
   } {nested dictionaries} {
     dict-3.5 dict-3.6 dict-3.7 dict-3.8 dict-3.9 dict-3.10 dict-9.3 dict-9.4
     dict-9.5 dict-15.3 dict-15.5 dict-16.4
@@ -137,6 +165,4 @@ array set abort_after {
   utf-1.4              {Invalid character for UTF-8 encoding}
   parse-8.12           {avoid infinite loop}
   source-7.6           {invalid command name "cleanupTests"}
-  namespace-52.11      {invoke() not implemented in class 'TclList'}
-  namespace-old-10.8   explode
 }
