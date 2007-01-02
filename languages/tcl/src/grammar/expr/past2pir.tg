@@ -407,30 +407,14 @@ transform pir (PAST::Expand) {
     $S1 = pir.'unique'('$P')
     $S2 = pir.'unique'('loop_')
     $S3 = pir.'unique'('end_')
-    pir.emit(<<'END_PIR', $S0, $S1, $S2, $S3)
-  .include 'cclass.pasm'
-  %1  = new .ResizableStringArray
-  $S0 = %0
-  $I0 = length $S0
-  $I1 = 0
-  $I2 = 0
-%2:
-  if $I1 >= $I0 goto %3
-  $I3 = $I0 - $I2
-  $I1 = find_not_cclass .CCLASS_WHITESPACE, $S0, $I2, $I3
-  if $I1 >= $I0 goto %3
-  $I3 = $I0 - $I1
-  $I2 = find_cclass .CCLASS_WHITESPACE, $S0, $I1, $I3
-  if $I1 > $I0 goto %3
-  $I3 = $I2 - $I1
-  $S1 = substr $S0, $I1, $I3
-  push %1, $S1
-  goto %2
-%3:
+    pir.emit(<<'END_PIR', $S0)
+  .local pmc __list
+  __list = get_root_global ['_tcl'], '__list'
+  %0 = __list(%0)
 END_PIR
 
-    $S1 .= ' :flat'
-    node['ret'] = $S1
+    $S0 .= ' :flat'
+    node['ret'] = $S0
     .return(pir)
 }
 
