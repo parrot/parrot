@@ -15,7 +15,7 @@ an abstract syntax tree.
       .local pmc astbuilder
       astbuilder = grammar.apply(match)
       .local pmc ast
-      ast = astbuilder.get('result')
+      ast = astbuilder.get('past')
 
       end
   .end
@@ -27,40 +27,50 @@ an abstract syntax tree.
 
 grammar ASTGrammar is TGE::Grammar;
 
-transform result (ROOT) :language('PIR') {
+transform past (ROOT) :language('PIR') {
     # Ask the child node for its result
     .local pmc child
+    .local pmc result
+    result = new 'PAST::Block'
+    result.'init'('node'=>node, 'name'=>'anon')
+
     $I0 = defined node["lineseq"]
     unless $I0 goto err_no_tree
     $P0 = node["lineseq"]
-    child = tree.get('result', $P0, 'PunieGrammar::lineseq')
+    child = tree.get('past', $P0, 'PunieGrammar::lineseq')
 
-    .return (child)
+    result.'push'(child)
+    .return (result)
 
   err_no_tree:
     print "The top-level node doesn't contain an 'lineseq' match.\n"
     end
 }
 
-transform result (PunieGrammar::block) :language('PIR') {
+transform past (PunieGrammar::block) :language('PIR') {
     # Ask the child node for its result
     .local pmc child
+    .local pmc result
+    result = new 'PAST::Block'
+    result.'init'('node'=>node, 'blocktype' => "immediate")
+
     $I0 = defined node["lineseq"]
     unless $I0 goto err_no_tree
     $P0 = node["lineseq"]
-    child = tree.get('result', $P0, 'PunieGrammar::lineseq')
+    child = tree.get('past', $P0, 'PunieGrammar::lineseq')
 
-    .return (child)
+    result.'push'(child)
+    .return (result)
 
   err_no_tree:
     print "The block node doesn't contain a 'lineseq' match.\n"
     end
 }
 
-transform result (PunieGrammar::lineseq) :language('PIR') {
+transform past (PunieGrammar::lineseq) :language('PIR') {
     .local pmc result
     result = new 'PAST::Stmts'
-    result.'clone'(node)
+    result.'init'('node'=>node)
 
     # Ask the child node for its result
     .local pmc child
@@ -74,8 +84,8 @@ transform result (PunieGrammar::lineseq) :language('PIR') {
   iter_loop:
     unless iter, iter_end         # while (entries) ...
       shift $P2, iter
-      $P3 = tree.get('result', $P2, 'PunieGrammar::line')
-      result.'add_child'($P3)
+      $P3 = tree.get('past', $P2, 'PunieGrammar::line')
+      result.'push'($P3)
       goto iter_loop
   iter_end:
 
@@ -85,10 +95,9 @@ transform result (PunieGrammar::lineseq) :language('PIR') {
     end
 }
 
-transform result (PunieGrammar::line) :language('PIR') {
+transform past (PunieGrammar::line) :language('PIR') {
     .local pmc result
-    result = new 'PAST::Stmt'
-    result.'clone'(node)
+    result = new .ResizablePMCArray
 
     .local pmc iter
     iter = new Iterator, node    # setup iterator for node
@@ -98,19 +107,24 @@ transform result (PunieGrammar::line) :language('PIR') {
       shift $S1, iter           # get the key of the iterator
       $P2 = iter[$S1]
       $S1 = concat 'PunieGrammar::', $S1
-      $P3 = tree.get('result', $P2, $S1)
+      $P3 = tree.get('past', $P2, $S1)
       if null $P3 goto iter_loop
-      result.'add_child'($P3)
+      push result, $P3
       goto iter_loop
   iter_end:
+    $I0 = elements result
+    if $I0 != 1 goto err_too_many
+    $P4 = result[0]
 
-    .return (result)
+    .return ($P4)
+  err_too_many:
+    print "A 'line' node can only have one child.\n"
+    end
 }
 
-transform result (PunieGrammar::expr) :language('PIR') {
+transform past (PunieGrammar::expr) :language('PIR') {
     .local pmc result
-    result = new 'PAST::Exp'
-    result.'clone'(node)
+    result = new .ResizablePMCArray
 
     $P1 = node.get_hash()
     $P0 = new Iterator, $P1    # setup iterator for node
@@ -120,21 +134,26 @@ transform result (PunieGrammar::expr) :language('PIR') {
       shift $S2, $P0             # get key for next entry
       $P2 = $P0[$S2]      # get entry at current key
       $S2 = concat 'PunieGrammar::', $S2
-      $P3 = tree.get('result', $P2, $S2)
+      $P3 = tree.get('past', $P2, $S2)
       if null $P3 goto iter_loop
-      result.'add_child'($P3)
+      push result, $P3
       goto iter_loop
   iter_end:
+    $I0 = elements result
+    if $I0 != 1 goto err_too_many
+    $P4 = result[0]
 
-    .return (result)
+    .return ($P4)
+  err_too_many:
+    print "An 'expr' node can only have one child.\n"
+    end
 }
 
-transform result (PunieGrammar::gprint) :language('PIR') {
+transform past (PunieGrammar::gprint) :language('PIR') {
     .local pmc result
     result = new 'PAST::Op'
-    result.'clone'(node)
     $S1 = node[0]
-    result.'op'($S1)
+    result.'name'($S1)
 
     $P1 = node.get_hash()
     $P0 = new Iterator, $P1    # setup iterator for node
@@ -144,21 +163,28 @@ transform result (PunieGrammar::gprint) :language('PIR') {
       shift $S2, $P0             # get key for next entry
       $P2 = $P0[$S2]      # get entry at current key
       $S2 = concat 'PunieGrammar::', $S2
-      $P3 = tree.get('result', $P2, $S2)
+      $P3 = tree.get('past', $P2, $S2)
       if null $P3 goto iter_loop
-      result.'add_child'($P3)
+      $S0 = $P3.'name'()
+      if $S0 == 'infix:,' goto flatten_comma
+      result.'init'($P3, 'node'=>node)
+      goto iter_loop
+    flatten_comma:
+      $P4 = $P3.'get_array'()
+      result.'init'($P4 :flat, 'node'=>node)
       goto iter_loop
   iter_end:
 
     .return (result)
 }
 
-transform result (PunieGrammar::cond) :language('PIR') {
+transform past (PunieGrammar::cond) :language('PIR') {
     .local pmc result
     result = new 'PAST::Op'
-    result.'clone'(node)
+    result.'init'('node'=>node)
     $S1 = node[0]
-    result.'op'($S1)
+    result.'name'($S1)
+    result.'pasttype'($S1)
 
     $P1 = node.get_hash()
     .local pmc iter
@@ -169,24 +195,30 @@ transform result (PunieGrammar::cond) :language('PIR') {
       shift $S2, iter             # get key for next entry
       $P2 = iter[$S2]      # get entry at current key
       $S2 = concat 'PunieGrammar::', $S2
-      $P3 = tree.get('result', $P2, $S2)
+      $P3 = tree.get('past', $P2, $S2)
       if null $P3 goto iter_loop
-      result.'add_child'($P3)
+      result.'push'($P3)
       goto iter_loop
   iter_end:
 
     .return (result)
 }
 
-transform result (PunieGrammar::else) :language('PIR') {
-    .local pmc onechild
+transform past (PunieGrammar::else) :language('PIR') {
+    .local pmc result, onechild
     onechild = node[0]
     unless onechild goto no_child
-    .local pmc result
+    .local string opname
+    opname = onechild[0]
+
+    unless opname == 'else' goto is_else_if
+    $P1 = onechild['block']
+    result = tree.get('past', $P1, 'PunieGrammar::block')
+    goto transform_complete
+
+  is_else_if:
     result = new 'PAST::Op'
-    result.'clone'(onechild)
-    $S1 = onechild[0]
-    result.'op'($S1)
+    result.'init'('node'=>onechild, 'name'=>opname, 'pasttype'=>'if')
 
     $P1 = onechild.get_hash()
     .local pmc iter
@@ -197,125 +229,87 @@ transform result (PunieGrammar::else) :language('PIR') {
       shift $S2, iter             # get key for next entry
       $P2 = iter[$S2]      # get entry at current key
       $S2 = concat 'PunieGrammar::', $S2
-      $P3 = tree.get('result', $P2, $S2)
+      $P3 = tree.get('past', $P2, $S2)
       if null $P3 goto iter_loop
-      result.'add_child'($P3)
+      result.'push'($P3)
       goto iter_loop
   iter_end:
 
+  transform_complete:
     .return (result)
   no_child:
     .return ()
 }
 
-transform result (PunieGrammar::label) :language('PIR') {
+transform past (PunieGrammar::label) :language('PIR') {
     .return ()
 }
 
-transform result (PunieGrammar::cexpr) :language('PIR') {
+transform past (PunieGrammar::oexpr) :language('PIR') {
     .local pmc result
-    $I0 = defined node["oexpr"]
-    unless $I0 goto err_no_oexpr
-    $P1 = node["oexpr"]
-    result = new 'PAST::Op'
-    result.'clone'(node)
-    result.'op'('O_COMMA')
+    result = new .ResizablePMCArray
 
-    $P0 = new Iterator, $P1    # setup iterator for node
-    set $P0, 0 # reset iterator, begin at start
+    $P1 = node.get_hash()
+    .local pmc iter
+    iter = new Iterator, $P1    # setup iterator for node
+    set iter, 0
   iter_loop:
-    unless $P0, iter_end         # while (entries) ...
-      shift $P2, $P0             # get next entry
-      $P3 = tree.get('result', $P2, 'PunieGrammar::oexpr')
+    unless iter, iter_end         # while (entries) ...
+      shift $S1, iter             # get key for next entry
+      $P2 = iter[$S1]      # get entry at current key
+      $P3 = tree.get('past', $P2, $S1)
       if null $P3 goto iter_loop
-      result.'add_child'($P3)
+      push result, $P3
       goto iter_loop
   iter_end:
+    $I0 = elements result
+    if $I0 != 1 goto err_too_many
+    $P4 = result[0]
 
-    # If there's only one child node, it's a single element, not a list,
-    # so just return the single element. Otherwise, we have a comma
-    # separated list, so build a comma op node.
-    .local pmc children
-    children = result.'children'()
-    $I0 = elements children
-    unless $I0 > 1 goto no_comma
-    .return (result)
-  no_comma:
-    result = shift children # there's only one result
-    .return (result)
-  err_no_oexpr:
-    print "The cexpr node doesn't contain a 'oexpr' match.\n"
+    .return ($P4)
+  err_too_many:
+    print "An 'oexpr' node can only have one child.\n"
     end
 }
 
-transform result (PunieGrammar::oexpr) :language('PIR') {
-    .local pmc result
-    result = new 'PAST::Exp'
-    result.'clone'(node)
-
-    .local pmc iter
-    $P1 = node.get_hash()
-    iter = new Iterator, $P1    # setup iterator for node
-    iter = 0
-  iter_loop:
-    unless iter, iter_end         # while (entries) ...
-      shift $S1, iter           # get the key of the iterator
-      $P2 = iter[$S1]
-      $P3 = tree.get('result', $P2, $S1)
-      if null $P3 goto iter_loop
-      result.'add_child'($P3)
-      goto iter_loop
-  iter_end:
-
-    .return (result)
-}
-
-
-transform result (PunieGrammar::variable) :language('PIR') {
+transform past (PunieGrammar::variable) :language('PIR') {
     .local pmc result
     result = new 'PAST::Var'
-    result.'clone'(node)
+    result.'init'('node'=>node, 'viviself'=>'.Undef')
     .local string sigil
     .local string name
     sigil = node['sigil']
     $S1 = node['word']
     name = sigil . $S1
 
-    result.'varname'(name)
+    result.'name'(name)
     result.'scope'('global')
 
-    unless sigil == '$' goto not_scalar
-      result.'vartype'('scalar')
+#    unless sigil == '$' goto not_scalar
+#      result.'vartype'('scalar')
   not_scalar:
 
     .return (result)
 }
 
-transform result (PunieGrammar::number) :language('PIR') {
+transform past (PunieGrammar::number) :language('PIR') {
     .local pmc result
     result = new 'PAST::Val'
-    result.'clone'(node)
-    $S2 = node 
-    result.'value'($S2)
-    result.'valtype'('num')
-
+    result.'init'('node'=>node, 'vtype'=>'.Float', 'name'=>node, 'ctype'=>'n+')
     .return (result)
 }
 
-transform result (PunieGrammar::integer) :language('PIR') {
+transform past (PunieGrammar::integer) :language('PIR') {
     .local pmc result
     result = new 'PAST::Val'
-    result.'clone'(node)
-    $S2 = node 
-    result.'value'($S2)
-    result.'valtype'('int')
+    result.'init'('node'=>node, 'vtype'=>'.Integer', 'name'=>node, 'ctype'=>'i+')
     .return (result)
 }
 
-transform result (PunieGrammar::stringdouble) :language('PIR') {
+transform past (PunieGrammar::stringdouble) :language('PIR') {
     .local pmc result
     result = new 'PAST::Val'
-    result.'clone'(node)
+
 
     .local string value
     # Check if this is a string match
@@ -324,20 +318,19 @@ transform result (PunieGrammar::stringdouble) :language('PIR') {
     value = node
     goto no_bracketed_value
   bracketed_value:
-    $P1 = node["PGE::Text::bracketed"]
-    $P2 = $P1[0]
-    value = $P2
+    value = node["PGE::Text::bracketed"]
   no_bracketed_value:
 
-    result.'value'(value)
-    result.'valtype'('strqq')
+    # NOTE: Will have to come back and handle interpolation properly.
+    # Currently have no way to distinguish between single quoted and
+    # double quoted strings.
+    result.'init'('node'=>node, 'vtype'=>'.String', 'name'=>value)
     .return (result)
 }
 
-transform result (PunieGrammar::stringsingle) :language('PIR') {
+transform past (PunieGrammar::stringsingle) :language('PIR') {
     .local pmc result
     result = new 'PAST::Val'
-    result.'clone'(node)
 
     .local string value
     # Check if this is a string match
@@ -346,13 +339,10 @@ transform result (PunieGrammar::stringsingle) :language('PIR') {
     value = node
     goto no_bracketed_value
   bracketed_value:
-    $P1 = node["PGE::Text::bracketed"]
-    $P2 = $P1[0]
-    value = $P2
+    value = node["PGE::Text::bracketed"]
   no_bracketed_value:
 
-    result.'value'(value)
-    result.'valtype'('strq')
+    result.'init'('node'=>node, 'vtype'=>'.String', 'name'=>value)
     .return (result)
 }
 
@@ -362,7 +352,7 @@ transform result (PunieGrammar::stringsingle) :language('PIR') {
 # node, instead of storing the node as the value of a hash key that
 # is their type.
 
-transform result (expr) :language('PIR') {
+transform past (expr) :language('PIR') {
     .local string type
     type = node["type"]
     unless node goto error_no_node
@@ -381,20 +371,31 @@ transform result (expr) :language('PIR') {
 transform op (expr) :language('PIR') {
     .local pmc result
     result = new 'PAST::Op'
-    result.'clone'(node)
-    $S1 = node["type"]
-    result.'op'($S1)
+    .local string type
+    type = node["type"]
 
-    $P1 = node.get_array()
+    # XXX Slurped up directly from Perl 6 implementation, refactor later
+    .local pmc optable, optok
+    .local string pasttype, pirop
+    .local int islvalue
+    optable = get_hll_global [ 'PunieGrammar' ], '$optable'
+    optok = optable[type]  
+    pasttype = optok['past']
+    pirop = optok['pirop'] 
+    islvalue = optok['lvalue']
+
+    result.'init'('node'=>node, 'name'=>type, 'pasttype'=>pasttype, 'pirop'=>pirop, 'islvalue'=>islvalue)
+
+    $P1 = node.'get_array'()
     .local pmc iter
     iter = new Iterator, $P1    # setup iterator for node
     set iter, 0 # reset iterator, begin at start
   iter_loop:
     unless iter, iter_end         # while (entries) ...
       shift $P2, iter            # get entry
-      $P3 = tree.get('result', $P2, 'expr')
+      $P3 = tree.get('past', $P2, 'expr')
       if null $P3 goto iter_loop
-      result.'add_child'($P3)
+      result.'push'($P3)
       goto iter_loop
   iter_end:
 
@@ -415,7 +416,7 @@ transform term (expr) :language('PIR') {
       if $S2 == 'type' goto iter_loop 
       $P2 = $P0[$S2]      # get entry at current key
       $S2 = concat 'PunieGrammar::', $S2
-      $P3 = tree.get('result', $P2, $S2)
+      $P3 = tree.get('past', $P2, $S2)
       if null $P3 goto iter_loop
       push children, $P3
       goto iter_loop

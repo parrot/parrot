@@ -1,4 +1,4 @@
-.sub '=='
+.sub 'infix:=='
     .param pmc a
     .param pmc b
     $I1 = a
@@ -9,7 +9,7 @@
     .return($P1)
 .end
 
-.sub '!='
+.sub 'infix:!='
     .param pmc a
     .param pmc b
     $I1 = a
@@ -20,7 +20,7 @@
     .return($P1)
 .end
 
-.sub '<'
+.sub 'infix:<'
     .param pmc a
     .param pmc b
     $I1 = a
@@ -31,7 +31,7 @@
     .return($P1)
 .end
 
-.sub '>'
+.sub 'infix:>'
     .param pmc a
     .param pmc b
     $I1 = a
@@ -42,7 +42,7 @@
     .return($P1)
 .end
 
-.sub '<='
+.sub 'infix:<='
     .param pmc a
     .param pmc b
     $I1 = a
@@ -53,7 +53,7 @@
     .return($P1)
 .end
 
-.sub '>='
+.sub 'infix:>='
     .param pmc a
     .param pmc b
     $I1 = a
@@ -64,7 +64,7 @@
     .return($P1)
 .end
 
-.sub 'eq'
+.sub 'infix:eq'
     .param pmc a
     .param pmc b
     $S1 = a
@@ -75,7 +75,7 @@
     .return($P1)
 .end
 
-.sub 'ne'
+.sub 'infix:ne'
     .param pmc a
     .param pmc b
     $S1 = a
@@ -86,7 +86,7 @@
     .return($P1)
 .end
 
-.sub 'lt'
+.sub 'infix:lt'
     .param pmc a
     .param pmc b
     $S1 = a
@@ -97,7 +97,7 @@
     .return($P1)
 .end
 
-.sub 'gt'
+.sub 'infix:gt'
     .param pmc a
     .param pmc b
     $S1 = a
@@ -108,7 +108,7 @@
     .return($P1)
 .end
 
-.sub 'le'
+.sub 'infix:le'
     .param pmc a
     .param pmc b
     $S1 = a
@@ -119,7 +119,7 @@
     .return($P1)
 .end
 
-.sub 'ge'
+.sub 'infix:ge'
     .param pmc a
     .param pmc b
     $S1 = a
@@ -128,4 +128,18 @@
     $P1 = new Integer
     $P1 = $I1
     .return($P1)
+.end
+
+.sub 'print'
+    .param pmc list            :slurpy
+    .local pmc iter
+
+    iter = new .Iterator, list
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    print $P0
+    goto iter_loop
+  iter_end:
+    .return (1)
 .end

@@ -18,7 +18,7 @@ language_output_is( 'punie', <<'EOC', '42', 'printing a number with multiple dig
 print 42;
 EOC
 
-language_output_is( 'punie', <<'EOC', '64.999000', 'printing a number with decimal point' );
+language_output_is( 'punie', <<'EOC', '64.999', 'printing a number with decimal point' );
 print 64.999;
 EOC
 
