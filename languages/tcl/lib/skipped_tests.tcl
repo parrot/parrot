@@ -129,12 +129,12 @@ array set abort_after {
   env-1.3              {can't read "env(test)" no such element in array}
   event-4.2            {invalid command name "update"}
   filename-11.13       {invalid command name "cd"}
-  info-32.0            {needs actual {expand} support after this point}
+  info-32.0            {invalid command name "proc bar {} {info frame 0}"}
   iocmd-12.8           {invalid command name "close"}
   ioUtil-2.8           {invalid command name "cd"}
   uplevel-5.2          {invalid command name "set"}
   utf-1.4              {Invalid character for UTF-8 encoding}
-  parse-18.30          {skip all tests after this one anyway}
+  parse-8.12           {avoid infinite loop}
   source-7.6           {invalid command name "cleanupTests"}
   namespace-old-10.8   explode
 }
