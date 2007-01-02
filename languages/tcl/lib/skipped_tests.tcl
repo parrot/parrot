@@ -34,17 +34,11 @@ set skipped_tests [dict create \
   } {[interp]} {
     basic-11.1 basic-12.1 basic-12.2 basic-13.1 basic-13.2 basic-24.1
     basic-1.1 basic-10.1 basic-36.1          
-  } {{expand}} {
-    basic-14.1 basic-14.2 basic-15.1 basic-18.1 basic-18.3 basic-18.4
-    basic-18.6 basic-20.1 basic-22.1 basic-24.2 basic-36.1          
   } {[file]} {
     cmdAH-2.2 cmdAH-2.3 cmdAH-2.4 cmdAH-2.5 cmdAH-2.6 cmdAH-2.6.1 cmdAH-2.6.2
   } BOOM {
-    compile-6.3
     format-3.1 format-3.2
-    lindex-4.5
-    namespace-old-2.5 namespace-old-2.6 namespace-old-2.7 namespace-old-4.4
-    namespace-old-7.7
+    namespace-old-2.6 namespace-old-4.4 namespace-old-7.7
   } {[expr wide()]} {
     dict-11.1 dict-11.2 dict-11.3 dict-11.4 dict-11.5 dict-11.6 dict-11.7
     lindex-3.7
@@ -60,14 +54,8 @@ set skipped_tests [dict create \
     string-13.6 string-13.8
   } {Cannot get character of empty string} {
     var-6.3
-  } {[lsearch -exact]} {
-    dict-2.3
   } {[lsearch -regexp]} {
     for-3.6
-  } {[lassign]} {
-    dict-21.8
-  } {uplevel bug} {
-    error-1.8
   } {Inf support} {
     scan-14.1 scan-14.2
   } {Can only replace inside string or index after end of string} {
