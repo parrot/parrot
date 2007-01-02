@@ -14,7 +14,7 @@ eval_is {info} \
   {info no subcommand}
 
 eval_is {info bork} \
-  {bad option "bork": must be args, body, cmdcount, commands, complete, default, exists, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars} \
+  {bad option "bork": must be args, body, cmdcount, commands, complete, default, exists, frame, functions, globals, hostname, level, library, loaded, locals, nameofexecutable, patchlevel, procs, script, sharedlibextension, tclversion, or vars} \
   {info bad subcommand}
 
 eval_is {info args} \
@@ -85,7 +85,7 @@ eval_is {info functions a b} \
   {info functions too many args}
 
 is [lsort [info functions]] \
-  {abs acos asin atan atan2 bool ceil cos cosh double entier exp floor fmod hypot int log log10 max min pow rand round sin sinh sqrt srand tan tanh wide} \
+  {abs acos asin atan atan2 bool ceil cos cosh double entier exp floor fmod hypot int isqrt log log10 max min pow rand round sin sinh sqrt srand tan tanh wide} \
   {info functions basic}
 
 is [info functions s??t] {sqrt} {info functions pattern}

@@ -254,6 +254,9 @@ is_string:
     tcl_error "argument to math function didn't have numeric value"
 .end
 
+.sub '&isqrt'
+.end
+
 .sub '&log'
     .param pmc a
     

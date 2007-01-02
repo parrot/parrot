@@ -26,6 +26,7 @@
   push options, 'complete'
   push options, 'default'
   push options, 'exists'
+  push options, 'frame'
   push options, 'functions'
   push options, 'globals'
   push options, 'hostname'
