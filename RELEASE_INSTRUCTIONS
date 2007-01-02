@@ -78,7 +78,8 @@ To prepare a release:
 
     9.  Compose and send out the announcements -- parrot-porters,
         perl6-language, perl6-announce, perl5-porters, use Perl, PerlMonks,
-        comp.lang.perl.misc, etc.
+        comp.lang.perl.misc, etc. Don't forget to include the next
+        scheduled release date.
 
     9a. Submit the use Perl announcement story to Slashdot, Newsforge, etc.
 
