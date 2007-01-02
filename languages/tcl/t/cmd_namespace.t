@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 38
+plan 39
 
 eval_is {namespace} \
   {wrong # args: should be "namespace subcommand ?arg ...?"} \
@@ -35,8 +35,11 @@ namespace eval bob {}
 namespace eval Bob {}
 namespace eval audreyt { namespace eval Matt {} }
 
-is [namespace children ::] {::audreyt ::Bob ::bob ::tcltest ::tcl} {namespace children: ordering}
+is [namespace children ::] {::audreyt ::Bob ::bob ::tcltest ::tcl} \
+  {namespace children: ordering}
 is [namespace children ::audreyt] ::audreyt::Matt  {namespace chlidren: nested}
+is [namespace eval ::audreyt {namespace children}] ::audreyt::Matt \
+  {namespace children in namespace eval}
 
 
 eval_is {namespace qualifiers} \

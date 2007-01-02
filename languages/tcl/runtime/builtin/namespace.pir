@@ -319,31 +319,22 @@ iterate:
   .local pmc list
   list = new .TclList
   
-  .local pmc __namespace, ns
-  ns = get_root_global 'tcl'
-  if argc == 0 goto namespace_end
+  .local pmc __namespace, ns, ns_name
+  .local string name
   __namespace = get_root_global ['_tcl'], '__namespace'
-  
-  .local pmc ns_name
-  $S0 = argv[0]
-  $S0 .= ":: "
-  ns_name  = __namespace($S0)
-  $S1      = pop ns_name
+  name = ""
+  if argc == 0 goto getname
 
-  $I0 = 0
-  $I1 = elements ns_name
-namespace_loop:
-  if $I0 == $I1 goto namespace_end
-  $S0 = ns_name[$I0]
-  ns  = ns[$S0]
-  inc $I0
-  goto namespace_loop
-namespace_end:
-  
+  name = argv[0]
+getname:
+  ns_name  = __namespace(name, 1)
+
+  unshift ns_name, 'tcl'
+  ns = get_root_namespace ns_name
   if null ns goto unknown_namespace
+
   .local pmc iter
   iter = new .Iterator, ns
-
 loop:
   unless iter goto end
   $S0 = shift iter
