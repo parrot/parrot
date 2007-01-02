@@ -123,20 +123,18 @@ set skipped_tests [dict create \
 
 array set abort_after {
   basic-47.1           {need interp before these can work}
+  cmdAH-31.13          {invalid command name "cd"}
   cmdMZ-5.7            {invalid command name "cleanupTests"}
   cmdMZ-return-2.17    {foreach handling borked?}
-  uplevel-5.2          {invalid command name "set"}
-  utf-1.4              {Invalid character for UTF-8 encoding}
   env-1.3              {can't read "env(test)" no such element in array}
   event-4.2            {invalid command name "update"}
-  parse-19.4           {invalid command name "cleanupTests"}
-  source-7.6           {invalid command name "cleanupTests"}
-  cmdAH-31.13          {invalid command name "cd"}
-  ioUtil-2.8           {invalid command name "cd"}
-  iocmd-12.8           {invalid command name "close"}
-  basic-49.2           {can't delete "run" command doesn't exist}
   filename-11.13       {invalid command name "cd"}
-  namespace-old-10.8   explode
-  parse-18.30          {skip all tests after this one anyway}
   info-32.0            {needs actual {expand} support after this point}
+  iocmd-12.8           {invalid command name "close"}
+  ioUtil-2.8           {invalid command name "cd"}
+  uplevel-5.2          {invalid command name "set"}
+  utf-1.4              {Invalid character for UTF-8 encoding}
+  parse-18.30          {skip all tests after this one anyway}
+  source-7.6           {invalid command name "cleanupTests"}
+  namespace-old-10.8   explode
 }
