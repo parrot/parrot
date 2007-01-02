@@ -866,6 +866,8 @@ bad_args:
 
 trimleft_do:
   .local string char
+  $I1 = length $S1
+  unless $I1 goto trimleft_done
 
   char = substr $S1, 0, 1
   $I1 = index $S2, char
@@ -903,6 +905,8 @@ bad_args:
 
 trimright_do:
   .local string char
+  $I1 = length $S1
+  unless $I1 goto trimright_done
 
   char = substr $S1, -1, 1
   $I1 = index $S2, char
@@ -942,6 +946,9 @@ bad_args:
 trim_do1:
   .local string char
 
+  $I1 = length $S1
+  unless $I1 goto trim_do2
+
   char = substr $S1, -1, 1
   $I1 = index $S2, char
 
@@ -950,6 +957,9 @@ trim_do1:
   goto trim_do1
 
 trim_do2:       
+  $I1 = length $S1
+  unless $I1 goto trim_done
+
   char = substr $S1, 0, 1
   $I1 = index $S2, char
 
