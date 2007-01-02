@@ -38,7 +38,7 @@ set skipped_tests [dict create \
     cmdAH-2.2 cmdAH-2.3 cmdAH-2.4 cmdAH-2.5 cmdAH-2.6 cmdAH-2.6.1 cmdAH-2.6.2
   } BOOM {
     format-3.1 format-3.2
-    namespace-old-2.6 namespace-old-4.4 namespace-old-7.7
+    namespace-old-2.5 namespace-old-2.6 namespace-old-2.7 namespace-old-4.4 namespace-old-7.7
   } {[expr wide()]} {
     dict-11.1 dict-11.2 dict-11.3 dict-11.4 dict-11.5 dict-11.6 dict-11.7
     lindex-3.7
