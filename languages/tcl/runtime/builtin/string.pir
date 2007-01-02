@@ -469,8 +469,12 @@ bad_match:
   the_repeat = __integer(the_repeat)
 
   $I0 = the_repeat
+  if $I0 <= 0 goto nothing
   $S0 = repeat the_string, $I0
   .return($S0)
+
+nothing:
+  .return('')
 
 bad_repeat:
   tcl_error 'wrong # args: should be "string repeat string count"'

@@ -45,12 +45,10 @@ set skipped_tests [dict create \
   } {nested dictionaries} {
     dict-3.5 dict-3.6 dict-3.7 dict-3.8 dict-3.9 dict-3.10 dict-9.3 dict-9.4
     dict-9.5 dict-15.3 dict-15.5 dict-16.4
-  } {Cannot take substr outside string} {
+  } {support for the variable named ""}
     var-7.12 var-12.1
   } {Cannot get character past end of string} {
     format-8.17 format-8.18
-  } {Cannot repeat with negative arg} {
-    string-13.6 string-13.8
   } {Cannot get character of empty string} {
     var-6.3
   } {[lsearch -regexp]} {
