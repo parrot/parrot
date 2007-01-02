@@ -150,7 +150,6 @@ main(int argc, char *argv[])
     Parrot_block_DOD(interp);
     Parrot_block_GC(interp);
     imcc_init(interp);
-    IMCC_ast_init(interp);
 
     do_yylex_init( interp, &yyscanner );
 
