@@ -73,7 +73,10 @@ token backslash_substitution {
        ]
 }
 
-token expand { \{expand\}<!before:\s> }
+token expand {
+      \{expand\}<!before:\s>
+    | \{\*\}<!before:\s>
+}
 
 # Actual [expr] items
 
