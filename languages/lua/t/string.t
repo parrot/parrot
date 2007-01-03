@@ -15,6 +15,10 @@ t/string.t - Lua String Library
 Tests Lua String Library
 (implemented in F<languages/lua/lib/luastring.pir>).
 
+See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
+
+See "Programming in Lua", section 20 "The String Library".
+
 =cut
 
 use strict;
@@ -22,7 +26,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 13;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.byte' );
@@ -62,6 +66,30 @@ print(string.char())
 CODE
 ABC
 
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.format' );
+print(string.format("pi = %.4f", math.pi))
+d = 5; m = 11; y = 1990
+print(string.format("%02d/%02d/%04d", d, m, y))
+tag, title = "h1", "a title"
+print(string.format("<%s>%s</%s>", tag, title, tag))
+CODE
+pi = 3.1416
+05/11/1990
+<h1>a title</h1>
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (too many arg)' );
+print(string.format("%s %s", 1, 2, 3))
+CODE
+1 2
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (bad arg)' );
+print(string.format("%d", 'toto'))
+CODE
+/bad argument #(\d+|\?) to 'format'/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.len' );

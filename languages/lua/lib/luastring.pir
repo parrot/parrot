@@ -286,16 +286,22 @@ and C<x> all expect a number as argument, whereas C<q> and C<s> expect a string.
 
 This function does not accept string values containing embedded zeros.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE.
 
 =cut
 
 .sub '_string_format' :anon
     .param pmc formatstring :optional
     .param pmc argv :slurpy
+    .local pmc ret
     $S0 = checkstring(formatstring)
-    $I0 = length $S0
-    not_implemented()
+    push_eh _handler
+    $S1 = sprintf $S0, argv 
+    new ret, .LuaString
+    set ret, $S1
+    .return (ret)
+_handler:
+    error("bad argument #? to 'format'")
 .end
 
 
