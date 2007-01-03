@@ -233,10 +233,49 @@ Accessor (get and set) for the I/O stream's buffer size attribute.
 
 =item get_fd
 
-  $I0 = $P1.'get_fd'()
+  $I0 = $P1.get_fd()
 
 Retrieves the UNIX integer file descriptor of a stream object. No
 asynchronous version.
+
+=back
+
+=head2 Status Object PMC API
+
+=over 4
+
+=item get_integer (vtable)
+
+  $I0 = $P1
+
+Returns an integer status for the status object, 1 for successful
+completion, -1 for an error, and 0 while still running. [Discuss: This
+is largely to preserve current expectations of -1 for an error. If we
+move away from that, is there a better representation?]
+
+=item get_bool (vtable)
+
+  if $P1 goto ...
+
+Returns a boolean status for the status object, C<true> for successful
+completion or successful work in progress, C<false> for an error.
+
+=item error
+
+  $P0 = $P1.error()
+
+Retrieves the error object from the status object, if the execution of
+the asynchronous operation terminated with an error. The error object is
+derived from Exception, and can be thrown from the callback. If there
+was no error, or the asynchronous operation is still running, returns a
+null PMC.
+
+=item return
+
+  $P0 = $P1.return()
+
+Retrieves the return value of the asynchronous operation from the status
+object.
 
 =back
 
@@ -251,8 +290,8 @@ values from the operation are stored within the status object.
 
 The listing below says little about whether the opcodes return error
 information. For now assume that they can either return a status object,
-or return nothing. Error handling is discussed more thoroughly in the
-implementation section.
+or return nothing. Error handling is discussed more thoroughly below in 
+L<Error Handling>.
 
 =head2 I/O Stream Opcodes
 
@@ -265,21 +304,25 @@ implementation section.
   $P0 = open $S1
   $P0 = open $S1, $S2
 
-Opens a stream object based on a file path in $S1 in read/write mode. The
-optional string argument $S2 specifies the mode of the stream (read, write,
-append, read/write, etc.), and returns a stream object. Currently the
-mode of the stream is set with a string argument similar to Perl 5
-syntax, but a language-agnostic mode string is preferable, using 'r' for
-read, 'w' for write, 'a' for append, and 'p' for pipe.
+Opens a stream object based on a file path in $S1 and returns it.  The
+stream object defaults to read/write mode. The optional string argument
+$S2 specifies the mode of the stream (read, write, append, read/write,
+etc.).  Currently the mode of the stream is set with a string argument
+similar to Perl 5 syntax, but a language-agnostic mode string is
+preferable, using 'r' for read, 'w' for write, 'a' for append, and 'p'
+for pipe.
 
 The asynchronous version takes a PMC callback as an additional final
 argument. When the open operation is complete, it invokes the callback
 with two arguments: a status object and the opened stream object.
 
-=item *
+=item close
 
-C<close> closes a stream object. It takes a single string object
-argument and returns a status object.
+  close $P0
+  close $P0, $P1
+
+Closes a stream object. It takes a single string object argument and
+returns a status object.
 
 The asynchronous version takes an additional final PMC callback
 argument. When the close operation is complete, it invokes the callback,
@@ -310,9 +353,22 @@ specify the mode.
 
 =over 4
 
-=item *
+=item print
 
-C<print> writes an integer, float, string, or PMC value to a stream.  It
+  print $I0
+  print $N0
+  print $S0
+  print $P0
+  print $P0, $I1
+  print $P0, $N1
+  print $P0, $S1
+  print $P0, $P1
+  print $P0, $I1, $P2
+  print $P0, $N1, $P2
+  print $P0, $S1, $P2
+  print $P0, $P1, $P2
+
+Writes an integer, float, string, or PMC value to a stream.  It
 writes to standard output by default, but optionally takes a PMC
 argument to select another stream to write to.
 
@@ -320,10 +376,14 @@ The asynchronous version takes an additional final PMC callback
 argument. When the print operation is complete, it invokes the callback,
 passing it a status object.
 
-=item *
+=item printerr
 
-C<printerr> writes an integer, float, string, or PMC value to standard
-error.
+  printerr $I0
+  printerr $N0
+  printerr $S0
+  printerr $P0
+
+Writes an integer, float, string, or PMC value to standard error.
 
 There is no asynchronous variant of C<printerr>. [It's just a shortcut.
 If they want an asynchronous version, they can use C<print>.]
@@ -334,21 +394,28 @@ If they want an asynchronous version, they can use C<print>.]
 
 =over 4
 
-=item *
+=item read
 
-C<read> retrieves a specified number of bytes from a stream into a
-string. [Note this is bytes, not codepoints.] By default it reads from
-standard input, but it also takes an alternate stream object source as
-an optional argument.
+  $S0 = read $I1
+  $S0 = read $P1, $I2
+  $P0 = read $P1, $I2, $P3
+
+Retrieves a specified number of bytes, $I2, from a stream, $P2, into a
+string, $S0. [Note this is bytes, not codepoints.] By default it reads
+from standard input, but it also takes an alternate stream object source
+as an optional argument.
 
 The asynchronous version takes an additional final PMC callback
 argument, and only returns a status object. When the read operation is
 complete, it invokes the callback, passing it a status object and a
 string of bytes.
 
-=item *
+=item readline
 
-C<readline> retrieves a single line from a stream into a string. Calling
+  $S0 = readline $P1
+  $P0 = readline $P1, $P2
+
+Retrieves a single line from a stream into a string. Calling
 C<readline> flags the stream as operating in line-buffer mode (see
 C<pioctl> below).
 
@@ -357,7 +424,10 @@ argument, and only returns a status object. When the readline operation
 is complete, it invokes the callback, passing it a status object and a
 string of bytes.
 
-=item *
+=item peek
+
+  $S0 = peek
+  $S0 = peek $P1
 
 ['peek', 'seek', 'tell', and 'poll' are all candidates for moving from
 opcodes to ParrotIO object methods.]
@@ -376,36 +446,46 @@ to be a synchronous one.]
 
 =over 4
 
-=item *
+=item seek
 
-C<seek> sets the current file position of a stream object to an integer
-byte offset from an integer starting position (0 for the start of the
-file, 1 for the current position, and 2 for the end of the file). It
-also has a 64-bit variant that sets the byte offset by two integer
-arguments (one for the first 32 bits of the 64-bit offset, and one for
-the second 32 bits). [The two-register emulation for 64-bit integers may
-be deprecated in the future.]
+  seek $P0, $I1, $I2
+  seek $P0, $I1, $I2, $I3
+  seek $P0, $I1, $I2, $P3
+  seek $P0, $I1, $I2, $I3, $P4
+
+Sets the current file position of a stream object, $P0, to an integer
+byte offset, $I1, from an integer starting position, $I2, (0 for the
+start of the file, 1 for the current position, and 2 for the end of the
+file). It also has a 64-bit variant that sets the byte offset by two
+integer arguments, $I1 and $I2, (one for the first 32 bits of the 64-bit
+offset, and one for the second 32 bits). [The two-register emulation for
+64-bit integers may be deprecated in the future.]
 
 The asynchronous version takes an additional final PMC callback
 argument. When the seek operation is complete, it invokes the callback,
 passing it a status object and the stream object it was called on.
 
-=item *
+=item tell
 
-C<tell> retrieves the current file position of a stream object.  It also
-has a 64-bit variant that returns the byte offset as two integers (one
-for the first 32 bits of the 64-bit offset, and one for the second 32
-bits). [The two-register emulation for 64-bit integers may be deprecated
-in the future.]
+  $I0 = tell $P1
+  ($I0, $I1) = tell $P2
+
+Retrieves the current file position of a stream object.  It also has a
+64-bit variant that returns the byte offset as two integers (one for the
+first 32 bits of the 64-bit offset, and one for the second 32 bits).
+[The two-register emulation for 64-bit integers may be deprecated in the
+future.]
 
 No asynchronous version.
 
-=item *
+=item poll
 
-C<poll> polls a stream or socket object for particular types of events
-(an integer flag) at a frequency set by seconds and microseconds (the
-final two integer arguments). [At least, that's what the documentation
-in src/io/io.c says. In actual fact, the final two arguments seem to be
+  $I0 = $P1, $I2, $I3, $I4
+
+Polls a stream or socket object for particular types of events (an
+integer flag) at a frequency set by seconds and microseconds (the final
+two integer arguments). [At least, that's what the documentation in
+src/io/io.c says. In actual fact, the final two arguments seem to be
 setting the timeout, exactly the same as the corresponding argument to
 the system version of C<poll>.]
 
