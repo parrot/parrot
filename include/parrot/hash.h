@@ -72,7 +72,6 @@ typedef struct _hash {
 } Hash;
 
 PARROT_API void parrot_new_hash(Interp *interp, Hash **hptr);
-PARROT_API void parrot_hash_destroy(Interp *interp, Hash *h);
 PARROT_API void parrot_new_pmc_hash(Interp *interp, PMC *container);
 void parrot_new_hash_x(Interp *, Hash**, PARROT_DATA_TYPES,
         Hash_key_type, hash_comp_fn, hash_hash_key_fn);
