@@ -86,21 +86,6 @@ Marks the userdata as live.
 
 /*
 
-=item C<PMC* get_pmc_keyed (PMC* key)>
-
-=cut
-
-*/
-    PMC* get_pmc_keyed (PMC* key) {
-        PMC *meth = find_meth(INTERP, SELF, "__index");
-        if (meth != NULL) {
-            return VTABLE_get_pmc_keyed(INTERP, meth, key);
-        }
-        return pmc_new(INTERP, dynpmc_LuaNil);
-    }
-
-/*
-
 =item C<STRING* name()>
 
 Return the string "userdata".

@@ -27,6 +27,8 @@ Now, Lua 5.0 uses a hybrid data structure with a Hash part and an Array part.
 static STRING *luatable_name;
 extern STRING *lua_metatable;
 extern INTVAL dynpmc_LuaBoolean;
+extern INTVAL dynpmc_LuaClosure;
+extern INTVAL dynpmc_LuaFunction;
 extern INTVAL dynpmc_LuaNil;
 extern INTVAL dynpmc_LuaNumber;
 extern INTVAL dynpmc_LuaString;
@@ -68,10 +70,13 @@ static PMC* _get(Interp* interp, PMC *obj, PMC* key)
     Hash* hash = PMC_struct_val(obj);
     STRING* keystr = make_hash_key(interp, key);
     PMC* pair = parrot_hash_get(interp, hash, keystr);
-    if (pair != NULL)
-        return PMC_pmc_val(pair);
-    else
+    if (pair != NULL) {
+        PMC* value = PMC_pmc_val(pair);
+        return VTABLE_clone(interp, value);
+    }
+    else {
         return NULL;
+    }
 }
 
 static INTVAL _has(Interp* interp, PMC *obj, PMC* key)
@@ -222,21 +227,20 @@ A copy of the value is retrieved, otherwise, this could happen:
         if (value == NULL) {
             PMC* meth = find_meth(INTERP, SELF, "__index");
             if (meth != NULL) {
-                if (dynpmc_LuaTable == meth->vtable->base_type) {
-                    return VTABLE_get_pmc_keyed(INTERP, meth, key);
-                }
-                else {
+                if (dynpmc_LuaClosure == meth->vtable->base_type
+                 || dynpmc_LuaFunction == meth->vtable->base_type) {
                     value = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                      SELF, key);
+                }
+                else {
+                    return VTABLE_get_pmc_keyed(INTERP, meth, key);
                 }
             }
         }
         if (value == NULL) {
             return pmc_new(INTERP, dynpmc_LuaNil);
         }
-        else {
-            return VTABLE_clone(INTERP, value);
-        }
+        return value;
     }
 
 /*
@@ -256,22 +260,23 @@ A copy of the value is stored, otherwise, this could happen:
 
 */
     void set_pmc_keyed (PMC* key, PMC* value) {
-        if (dynpmc_LuaNil == key->vtable->base_type) {
-            real_exception(INTERP, NULL, 1, "table index is nil");
-            return;
-        }
         if (!_has(INTERP, SELF, key)) {
             PMC* meth = find_meth(INTERP, SELF, "__newindex");
             if (meth != NULL) {
-                if (dynpmc_LuaTable == meth->vtable->base_type) {
-                    VTABLE_set_pmc_keyed(INTERP, meth, key, value);
-                }
-                else {
+                if (dynpmc_LuaClosure == meth->vtable->base_type
+                 || dynpmc_LuaFunction == meth->vtable->base_type) {
                     Parrot_runops_fromc_args(INTERP, meth, "vPPP",
                                              SELF, key, value);
                 }
+                else {
+                    VTABLE_set_pmc_keyed(INTERP, meth, key, value);
+                }
                 return;
             }
+        }
+        if (dynpmc_LuaNil == key->vtable->base_type) {
+            real_exception(INTERP, NULL, 1, "table index is nil");
+            return;
         }
         _set(INTERP, SELF, key, value);
     }
@@ -287,26 +292,6 @@ Returns the number of elements in the hash.
 */
     INTVAL elements () {
         return parrot_hash_size(INTERP, PMC_struct_val(SELF));
-    }
-
-/*
-
-=item C<void* invoke(void* next)>
-
-=cut
-
-*/
-    void* invoke(void* next) {
-        PMC* meth = find_meth(INTERP, SELF, "__call");
-        if (meth != NULL) {
-            /* fix me */
-            PMC* retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
-            if (NULL == retval) {
-                retval = pmc_new(INTERP, dynpmc_LuaNil);
-            }
-            return retval;
-        }
-        return SUPER(next);
     }
 
 /*
@@ -443,25 +428,15 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* len () {
-        PMC* retval;
-        PMC* meth = find_meth(INTERP, SELF, "__index");
-        if (meth != NULL) {
-            retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
-            if (NULL == retval) {
-                retval = pmc_new(INTERP, dynpmc_LuaNil);
-            }
-        }
-        else {
-            INTVAL idx = 1;
-            PMC* key = pmc_new(INTERP, dynpmc_LuaNumber);
-            retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        PMC* retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        PMC* key = pmc_new(INTERP, dynpmc_LuaNumber);
+        INTVAL idx = 1;
+        VTABLE_set_integer_native(INTERP, key, idx);
+        while (_has(INTERP, SELF, key)) {
+            idx ++;
             VTABLE_set_integer_native(INTERP, key, idx);
-            while (_has(INTERP, SELF, key)) {
-                idx ++;
-                VTABLE_set_integer_native(INTERP, key, idx);
-            }
-            VTABLE_set_integer_native(INTERP, retval, idx - 1);
         }
+        VTABLE_set_integer_native(INTERP, retval, idx - 1);
         return retval;
     }
 
@@ -545,9 +520,7 @@ MMD_DEFAULT: {
         if (value == NULL) {
             return pmc_new(INTERP, dynpmc_LuaNil);
         }
-        else {
-            return VTABLE_clone(INTERP, value);
-        }
+        return value;
     }
 
 /*

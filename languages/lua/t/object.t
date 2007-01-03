@@ -167,7 +167,7 @@ OUT
 language_output_is( 'lua', <<'CODE', <<'OUT', 'multiple inheritance' );
 -- look up for 'k' in list of tables 'plist'
 local function search (k, plist)
-    for i=1, table.getn(plist) do
+    for i=1, #plist do
         local v = plist[i][k]  -- try 'i'-th superclass
         if v then return v end
     end
@@ -180,7 +180,9 @@ function createClass (...)
     -- class will search for each method in the list of its
     -- parents ('arg' is the list of parents)
     setmetatable(c, {__index = function (t, k)
-        return search(k, arg)
+        -- return search(k, arg)
+        local r = search(k, arg)
+        return r
     end})
 
     -- prepare 'c' to be the metatable of its instance

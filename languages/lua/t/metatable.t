@@ -12,7 +12,7 @@ t/metatable.t - Lua tables
 
 =head1 DESCRIPTION
 
-See "Lua 5.0 Reference Manual", section 2.8 "Metatables".
+See "Lua 5.1 Reference Manual", section 2.8 "Metatables".
 
 See "Programming in Lua", section 13 "Metatables and Metamethods".
 
@@ -23,7 +23,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 29;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'metatable' );
@@ -502,7 +502,40 @@ OUT
 TODO: {
     local $TODO = 'fix me (luaany.pmc:invoke)';
 
-    language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __call' );
+    language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __call (without args)' );
+Cplx = {}
+Cplx.mt = {}
+
+function Cplx.new (re, im)
+    local c = {}
+    setmetatable(c, Cplx.mt)
+    c.re = tonumber(re)
+    if im == nil then
+        c.im = 0.0
+    else
+        c.im = tonumber(im)
+    end
+    return c
+end
+
+function Cplx.mt.__tostring (c)
+    return "(" .. c.re .. "," .. c.im .. ")"
+end
+
+function Cplx.mt.__call (obj)
+    print("Cplx.__call " .. tostring(obj))
+    return true
+end
+
+c1 = Cplx.new(2, 0)
+r = c1()
+print(r)
+CODE
+Cplx.__call (2,0)
+true
+OUT
+
+    language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __call (with args)' );
 Cplx = {}
 Cplx.mt = {}
 

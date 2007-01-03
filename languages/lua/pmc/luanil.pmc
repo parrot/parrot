@@ -33,6 +33,8 @@ troublesome (if not possible?).
 static STRING *string_representation;
 STRING *lua_metatable;
 INTVAL dynpmc_LuaBoolean;
+INTVAL dynpmc_LuaClosure;
+INTVAL dynpmc_LuaFunction;
 INTVAL dynpmc_LuaNil;
 INTVAL dynpmc_LuaNumber;
 INTVAL dynpmc_LuaString;
@@ -53,6 +55,10 @@ pmclass LuaNil
             string_representation = const_string(INTERP, "nil");
             dynpmc_LuaBoolean = pmc_type(INTERP,
               const_string(INTERP, "LuaBoolean"));
+            dynpmc_LuaClosure = pmc_type(INTERP,
+              const_string(INTERP, "LuaClosure"));
+            dynpmc_LuaFunction = pmc_type(INTERP,
+              const_string(INTERP, "LuaFunction"));
             dynpmc_LuaNil = pmc_type(INTERP,
               const_string(INTERP, "LuaNil"));
             dynpmc_LuaNumber = pmc_type(INTERP,

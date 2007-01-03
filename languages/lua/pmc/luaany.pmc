@@ -22,6 +22,8 @@ C<LuaAny> provides an abstract base class for some Lua types.
 
 extern STRING *lua_metatable;
 extern INTVAL dynpmc_LuaBoolean;
+extern INTVAL dynpmc_LuaClosure;
+extern INTVAL dynpmc_LuaFunction;
 extern INTVAL dynpmc_LuaNil;
 extern INTVAL dynpmc_LuaString;
 extern INTVAL dynpmc_LuaTable;
@@ -97,6 +99,21 @@ Throws an exception.
 
 */
     PMC* get_pmc_keyed (PMC* key) {
+        PMC *meth = find_meth(INTERP, SELF, "__index");
+        if (meth != NULL) {
+            if (dynpmc_LuaClosure == meth->vtable->base_type
+             || dynpmc_LuaFunction == meth->vtable->base_type) {
+                PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                       SELF, key);
+                if (NULL == retval) {
+                    return pmc_new(INTERP, dynpmc_LuaNil);
+                }
+                return retval;
+            }
+            else {
+                return VTABLE_get_pmc_keyed(INTERP, meth, key);
+            }
+        }
         real_exception(INTERP, NULL, ILL_INHERIT,
                 "attempt to index a %s value",
                 string_to_cstring(INTERP, DYNSELF.name()));
@@ -113,6 +130,18 @@ Throws an exception.
 
 */
     void set_pmc_keyed (PMC* key, PMC* value) {
+        PMC* meth = find_meth(INTERP, SELF, "__newindex");
+        if (meth != NULL) {
+            if (dynpmc_LuaClosure == meth->vtable->base_type
+             || dynpmc_LuaFunction == meth->vtable->base_type) {
+                Parrot_runops_fromc_args(INTERP, meth, "vPPP",
+                                         SELF, key, value);
+            }
+            else {
+                VTABLE_set_pmc_keyed(INTERP, meth, key, value);
+            }
+            return;
+        }
         real_exception(INTERP, NULL, ILL_INHERIT,
                 "attempt to index a %s value",
                 string_to_cstring(INTERP, DYNSELF.name()));
@@ -514,8 +543,6 @@ Throws an exception.
 
 */
     METHOD PMC* len () {
-        PMC *retval;
-
         PMC *meth = find_meth(INTERP, SELF, "__len");
         if (meth != NULL) {
             PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
