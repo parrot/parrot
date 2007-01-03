@@ -93,7 +93,7 @@ token term {
 
 ## used by term
 
-rule boolean { (:i true | false ) <?wb> }
+rule boolean { (:i true | false | yes | no | on | off ) <?wb> }
 
 rule nested { \( <expression> \) }
 

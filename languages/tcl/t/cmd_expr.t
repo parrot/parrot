@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 260
+plan 264
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -22,6 +22,10 @@ eval_is {expr 3e2.0} \
  {can only e with an integer exponent}
 is [expr TrUe]  TrUe  {true}
 is [expr FaLsE] FaLsE {false}
+is [expr On]    On    {on}
+is [expr OfF]   OfF   {off}
+is [expr YeS]   YeS   {yes}
+is [expr No]    No    {no}
 eval_is {expr trues}  \
  {syntax error in expression "trues": the word "trues" requires a preceding $ if it's a variable or function arguments if it's a function} \
  {trues}
