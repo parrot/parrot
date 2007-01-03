@@ -221,7 +221,6 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     interp->resume_offset = dest -interp->code->base.data;
     /* and go */
     Parrot_runcode(interp, argc, argv);
-    return NULL;
 }
 
 static opcode_t *
