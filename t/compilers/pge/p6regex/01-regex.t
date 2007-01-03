@@ -94,9 +94,6 @@ Description of the test.
     .local int has_icu    # flag indicating presense of icu
                has_icu = config['has_icu']
 
-    .local pmc p6rule     # the perl6 regex compiler
-               p6rule = compreg 'PGE::P6Regex'
-
     .local pmc file_iterator # iterate over list of files..
                file_iterator = new 'Iterator', test_files
 
@@ -169,8 +166,8 @@ Description of the test.
     target = ''
 
   got_target:
-    target = backslash_escape (target)
-    result = backslash_escape (result)
+    target = 'backslash_escape'( target )
+    result = 'backslash_escape'( result )
 
     # Should this test be skipped?
     $I0 = exists skip_tests[test_name]
@@ -183,13 +180,7 @@ Description of the test.
 
   not_skip:
     push_eh thrown
-      rule =  p6rule(pattern)
-      unless_null rule, match_it
-      $P1 = new 'Exception'
-      $P1[0] = 'rule error'
-      throw $P1
-    match_it:
-      match = rule(target)
+    match = 'match_p6regex'( pattern, target )
     clear_eh
 
     if match goto matched
@@ -451,6 +442,29 @@ Description of the test.
     desc = concat $S0, desc
 
     .return (desc)
+.end
+
+
+.sub 'match_p6regex'
+    .param string pattern
+    .param string target
+
+    .local pmc match
+
+    .local pmc p6rule     # the perl6 regex compiler
+               p6rule = compreg 'PGE::P6Regex'
+
+    .local pmc rule
+               rule = p6rule(pattern)
+
+    unless_null rule, match_it
+    $P1 = new 'Exception'
+    $P1[0] = 'rule error'
+    throw $P1
+  match_it:
+    match = rule(target)
+
+    .return (match)
 .end
 
 
