@@ -26,6 +26,11 @@ tokens
   VAR;
 } 
 
+// tokens
+SEA        : (~'<')+;
+START_CODE : '<';
+
+
 // Windows and Unix style newlines
 NEWLINE : ('\r')? '\n'+ ;
 
@@ -53,7 +58,6 @@ DECR       : '--' ;
 // TODO: handle these 
 Define     : 'define';
 Break      : 'break';
-START_PHP  : '<?php';
 END_PHP    : '?>';
 
 // quit at the end of program is required, make testing easier
@@ -89,7 +93,7 @@ WS
 // TODO: Interactive mode when there is no 'quit'
 // There are 26 named var, currently all of them are initialized to 0
 program 
-  : START_PHP
+  : SEA? START_CODE SEA -> ^( START_CODE )
   ;
 
 input_item 

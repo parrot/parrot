@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2006-12-31 13:05:00
+// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-03 20:11:10
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -6,114 +6,58 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class PlumheadLexer extends Lexer {
-    public static final int MINUS=17;
-    public static final int INCR=22;
+    public static final int MINUS=19;
+    public static final int INCR=24;
     public static final int ARRAY=6;
-    public static final int If=30;
-    public static final int NUMBER=16;
-    public static final int DECR=23;
-    public static final int Break=25;
-    public static final int MUL_OP=19;
-    public static final int Define=24;
+    public static final int START_CODE=13;
+    public static final int If=32;
+    public static final int NUMBER=18;
+    public static final int DECR=25;
+    public static final int Break=27;
+    public static final int MUL_OP=21;
+    public static final int SEA=12;
+    public static final int Define=26;
     public static final int T45=45;
     public static final int PROGRAM=9;
     public static final int STMTS=10;
-    public static final int NEWLINE=12;
-    public static final int ASSIGN_OP=20;
-    public static final int INTEGER=15;
-    public static final int Obase=35;
+    public static final int NEWLINE=14;
+    public static final int ASSIGN_OP=22;
+    public static final int INTEGER=17;
+    public static final int Obase=37;
     public static final int FUNCTION=7;
-    public static final int REL_OP=21;
+    public static final int REL_OP=23;
     public static final int T46=46;
-    public static final int ML_COMMENT=37;
-    public static final int PLUS=18;
-    public static final int Length=27;
+    public static final int ML_COMMENT=39;
+    public static final int PLUS=20;
+    public static final int Length=29;
     public static final int T41=41;
-    public static final int T39=39;
     public static final int T44=44;
-    public static final int LETTER=14;
-    public static final int WS=38;
-    public static final int STRING=13;
-    public static final int Sqrt=32;
+    public static final int LETTER=16;
+    public static final int WS=40;
+    public static final int STRING=15;
+    public static final int Sqrt=34;
     public static final int T43=43;
-    public static final int Ibase=34;
+    public static final int Ibase=36;
     public static final int START_PHP=4;
     public static final int T42=42;
-    public static final int Scale=33;
-    public static final int T40=40;
-    public static final int Auto=36;
-    public static final int Quit=26;
+    public static final int Scale=35;
+    public static final int Auto=38;
+    public static final int Quit=28;
     public static final int VAR=11;
     public static final int PRINT=8;
+    public static final int T48=48;
     public static final int END_PHP=5;
     public static final int EOF=-1;
-    public static final int While=31;
-    public static final int Tokens=47;
-    public static final int For=29;
-    public static final int Return=28;
+    public static final int While=33;
+    public static final int T47=47;
+    public static final int Tokens=49;
+    public static final int For=31;
+    public static final int Return=30;
     public PlumheadLexer() {;} 
     public PlumheadLexer(CharStream input) {
         super(input);
     }
     public String getGrammarFileName() { return "src/antlr3/Plumhead.g"; }
-
-    // $ANTLR start T39
-    public void mT39() throws RecognitionException {
-        try {
-            ruleNestingLevel++;
-            int _type = T39;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:3:7: ( ';' )
-            // src/antlr3/Plumhead.g:3:7: ';'
-            {
-            match(';'); 
-
-            }
-
-
-
-                    if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
-                    }
-
-                        }
-        finally {
-            ruleNestingLevel--;
-        }
-    }
-    // $ANTLR end T39
-
-    // $ANTLR start T40
-    public void mT40() throws RecognitionException {
-        try {
-            ruleNestingLevel++;
-            int _type = T40;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:4:7: ( '(' )
-            // src/antlr3/Plumhead.g:4:7: '('
-            {
-            match('('); 
-
-            }
-
-
-
-                    if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
-                    }
-
-                        }
-        finally {
-            ruleNestingLevel--;
-        }
-    }
-    // $ANTLR end T40
 
     // $ANTLR start T41
     public void mT41() throws RecognitionException {
@@ -124,10 +68,10 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:5:7: ( ')' )
-            // src/antlr3/Plumhead.g:5:7: ')'
+            // src/antlr3/Plumhead.g:3:7: ( ';' )
+            // src/antlr3/Plumhead.g:3:7: ';'
             {
-            match(')'); 
+            match(';'); 
 
             }
 
@@ -153,10 +97,10 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:6:7: ( '{' )
-            // src/antlr3/Plumhead.g:6:7: '{'
+            // src/antlr3/Plumhead.g:4:7: ( '(' )
+            // src/antlr3/Plumhead.g:4:7: '('
             {
-            match('{'); 
+            match('('); 
 
             }
 
@@ -182,10 +126,10 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:7:7: ( '}' )
-            // src/antlr3/Plumhead.g:7:7: '}'
+            // src/antlr3/Plumhead.g:5:7: ( ')' )
+            // src/antlr3/Plumhead.g:5:7: ')'
             {
-            match('}'); 
+            match(')'); 
 
             }
 
@@ -211,10 +155,10 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:8:7: ( '[' )
-            // src/antlr3/Plumhead.g:8:7: '['
+            // src/antlr3/Plumhead.g:6:7: ( '{' )
+            // src/antlr3/Plumhead.g:6:7: '{'
             {
-            match('['); 
+            match('{'); 
 
             }
 
@@ -240,10 +184,10 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:9:7: ( ']' )
-            // src/antlr3/Plumhead.g:9:7: ']'
+            // src/antlr3/Plumhead.g:7:7: ( '}' )
+            // src/antlr3/Plumhead.g:7:7: '}'
             {
-            match(']'); 
+            match('}'); 
 
             }
 
@@ -269,6 +213,64 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:8:7: ( '[' )
+            // src/antlr3/Plumhead.g:8:7: '['
+            {
+            match('['); 
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end T46
+
+    // $ANTLR start T47
+    public void mT47() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = T47;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:9:7: ( ']' )
+            // src/antlr3/Plumhead.g:9:7: ']'
+            {
+            match(']'); 
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end T47
+
+    // $ANTLR start T48
+    public void mT48() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = T48;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
             // src/antlr3/Plumhead.g:10:7: ( ',' )
             // src/antlr3/Plumhead.g:10:7: ','
             {
@@ -287,7 +289,102 @@ public class PlumheadLexer extends Lexer {
             ruleNestingLevel--;
         }
     }
-    // $ANTLR end T46
+    // $ANTLR end T48
+
+    // $ANTLR start SEA
+    public void mSEA() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = SEA;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:30:14: ( (~ '<' )+ )
+            // src/antlr3/Plumhead.g:30:14: (~ '<' )+
+            {
+            // src/antlr3/Plumhead.g:30:14: (~ '<' )+
+            int cnt1=0;
+            loop1:
+            do {
+                int alt1=2;
+                int LA1_0 = input.LA(1);
+                if ( ((LA1_0>='\u0000' && LA1_0<=';')||(LA1_0>='=' && LA1_0<='\uFFFE')) ) {
+                    alt1=1;
+                }
+
+
+                switch (alt1) {
+            	case 1 :
+            	    // src/antlr3/Plumhead.g:30:15: ~ '<'
+            	    {
+            	    if ( (input.LA(1)>='\u0000' && input.LA(1)<=';')||(input.LA(1)>='=' && input.LA(1)<='\uFFFE') ) {
+            	        input.consume();
+
+            	    }
+            	    else {
+            	        MismatchedSetException mse =
+            	            new MismatchedSetException(null,input);
+            	        recover(mse);    throw mse;
+            	    }
+
+
+            	    }
+            	    break;
+
+            	default :
+            	    if ( cnt1 >= 1 ) break loop1;
+                        EarlyExitException eee =
+                            new EarlyExitException(1, input);
+                        throw eee;
+                }
+                cnt1++;
+            } while (true);
+
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end SEA
+
+    // $ANTLR start START_CODE
+    public void mSTART_CODE() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = START_CODE;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:31:14: ( '<' )
+            // src/antlr3/Plumhead.g:31:14: '<'
+            {
+            match('<'); 
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end START_CODE
 
     // $ANTLR start NEWLINE
     public void mNEWLINE() throws RecognitionException {
@@ -298,18 +395,18 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:30:11: ( ( '\\r' )? ( '\\n' )+ )
-            // src/antlr3/Plumhead.g:30:11: ( '\\r' )? ( '\\n' )+
+            // src/antlr3/Plumhead.g:35:11: ( ( '\\r' )? ( '\\n' )+ )
+            // src/antlr3/Plumhead.g:35:11: ( '\\r' )? ( '\\n' )+
             {
-            // src/antlr3/Plumhead.g:30:11: ( '\\r' )?
-            int alt1=2;
-            int LA1_0 = input.LA(1);
-            if ( (LA1_0=='\r') ) {
-                alt1=1;
+            // src/antlr3/Plumhead.g:35:11: ( '\\r' )?
+            int alt2=2;
+            int LA2_0 = input.LA(1);
+            if ( (LA2_0=='\r') ) {
+                alt2=1;
             }
-            switch (alt1) {
+            switch (alt2) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:30:12: '\\r'
+                    // src/antlr3/Plumhead.g:35:12: '\\r'
                     {
                     match('\r'); 
 
@@ -318,20 +415,20 @@ public class PlumheadLexer extends Lexer {
 
             }
 
-            // src/antlr3/Plumhead.g:30:19: ( '\\n' )+
-            int cnt2=0;
-            loop2:
+            // src/antlr3/Plumhead.g:35:19: ( '\\n' )+
+            int cnt3=0;
+            loop3:
             do {
-                int alt2=2;
-                int LA2_0 = input.LA(1);
-                if ( (LA2_0=='\n') ) {
-                    alt2=1;
+                int alt3=2;
+                int LA3_0 = input.LA(1);
+                if ( (LA3_0=='\n') ) {
+                    alt3=1;
                 }
 
 
-                switch (alt2) {
+                switch (alt3) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:30:19: '\\n'
+            	    // src/antlr3/Plumhead.g:35:19: '\\n'
             	    {
             	    match('\n'); 
 
@@ -339,12 +436,12 @@ public class PlumheadLexer extends Lexer {
             	    break;
 
             	default :
-            	    if ( cnt2 >= 1 ) break loop2;
+            	    if ( cnt3 >= 1 ) break loop3;
                         EarlyExitException eee =
-                            new EarlyExitException(2, input);
+                            new EarlyExitException(3, input);
                         throw eee;
                 }
-                cnt2++;
+                cnt3++;
             } while (true);
 
 
@@ -372,23 +469,23 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:33:10: ( '\\\"' (~ '\\\"' )* '\\\"' )
-            // src/antlr3/Plumhead.g:33:10: '\\\"' (~ '\\\"' )* '\\\"'
+            // src/antlr3/Plumhead.g:38:10: ( '\\\"' (~ '\\\"' )* '\\\"' )
+            // src/antlr3/Plumhead.g:38:10: '\\\"' (~ '\\\"' )* '\\\"'
             {
             match('\"'); 
-            // src/antlr3/Plumhead.g:33:15: (~ '\\\"' )*
-            loop3:
+            // src/antlr3/Plumhead.g:38:15: (~ '\\\"' )*
+            loop4:
             do {
-                int alt3=2;
-                int LA3_0 = input.LA(1);
-                if ( ((LA3_0>='\u0000' && LA3_0<='!')||(LA3_0>='#' && LA3_0<='\uFFFE')) ) {
-                    alt3=1;
+                int alt4=2;
+                int LA4_0 = input.LA(1);
+                if ( ((LA4_0>='\u0000' && LA4_0<='!')||(LA4_0>='#' && LA4_0<='\uFFFE')) ) {
+                    alt4=1;
                 }
 
 
-                switch (alt3) {
+                switch (alt4) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:33:17: ~ '\\\"'
+            	    // src/antlr3/Plumhead.g:38:17: ~ '\\\"'
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
@@ -405,7 +502,7 @@ public class PlumheadLexer extends Lexer {
             	    break;
 
             	default :
-            	    break loop3;
+            	    break loop4;
                 }
             } while (true);
 
@@ -435,8 +532,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:35:10: ( 'a' .. 'z' )
-            // src/antlr3/Plumhead.g:35:10: 'a' .. 'z'
+            // src/antlr3/Plumhead.g:40:10: ( 'a' .. 'z' )
+            // src/antlr3/Plumhead.g:40:10: 'a' .. 'z'
             {
             matchRange('a','z'); 
 
@@ -459,23 +556,23 @@ public class PlumheadLexer extends Lexer {
     public void mINTEGER() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // src/antlr3/Plumhead.g:38:11: ( ( ('0'..'9'|'A'..'F'))+ )
-            // src/antlr3/Plumhead.g:38:11: ( ('0'..'9'|'A'..'F'))+
+            // src/antlr3/Plumhead.g:43:11: ( ( ('0'..'9'|'A'..'F'))+ )
+            // src/antlr3/Plumhead.g:43:11: ( ('0'..'9'|'A'..'F'))+
             {
-            // src/antlr3/Plumhead.g:38:11: ( ('0'..'9'|'A'..'F'))+
-            int cnt4=0;
-            loop4:
+            // src/antlr3/Plumhead.g:43:11: ( ('0'..'9'|'A'..'F'))+
+            int cnt5=0;
+            loop5:
             do {
-                int alt4=2;
-                int LA4_0 = input.LA(1);
-                if ( ((LA4_0>='0' && LA4_0<='9')||(LA4_0>='A' && LA4_0<='F')) ) {
-                    alt4=1;
+                int alt5=2;
+                int LA5_0 = input.LA(1);
+                if ( ((LA5_0>='0' && LA5_0<='9')||(LA5_0>='A' && LA5_0<='F')) ) {
+                    alt5=1;
                 }
 
 
-                switch (alt4) {
+                switch (alt5) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:38:12: ('0'..'9'|'A'..'F')
+            	    // src/antlr3/Plumhead.g:43:12: ('0'..'9'|'A'..'F')
             	    {
             	    if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='F') ) {
             	        input.consume();
@@ -492,12 +589,12 @@ public class PlumheadLexer extends Lexer {
             	    break;
 
             	default :
-            	    if ( cnt4 >= 1 ) break loop4;
+            	    if ( cnt5 >= 1 ) break loop5;
                         EarlyExitException eee =
-                            new EarlyExitException(4, input);
+                            new EarlyExitException(5, input);
                         throw eee;
                 }
-                cnt4++;
+                cnt5++;
             } while (true);
 
 
@@ -519,35 +616,35 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:41:7: ( INTEGER ( '.' INTEGER )? | '.' INTEGER )
-            int alt6=2;
-            int LA6_0 = input.LA(1);
-            if ( ((LA6_0>='0' && LA6_0<='9')||(LA6_0>='A' && LA6_0<='F')) ) {
-                alt6=1;
+            // src/antlr3/Plumhead.g:46:7: ( INTEGER ( '.' INTEGER )? | '.' INTEGER )
+            int alt7=2;
+            int LA7_0 = input.LA(1);
+            if ( ((LA7_0>='0' && LA7_0<='9')||(LA7_0>='A' && LA7_0<='F')) ) {
+                alt7=1;
             }
-            else if ( (LA6_0=='.') ) {
-                alt6=2;
+            else if ( (LA7_0=='.') ) {
+                alt7=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("40:1: NUMBER : ( INTEGER ( '.' INTEGER )? | '.' INTEGER );", 6, 0, input);
+                    new NoViableAltException("45:1: NUMBER : ( INTEGER ( '.' INTEGER )? | '.' INTEGER );", 7, 0, input);
 
                 throw nvae;
             }
-            switch (alt6) {
+            switch (alt7) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:41:7: INTEGER ( '.' INTEGER )?
+                    // src/antlr3/Plumhead.g:46:7: INTEGER ( '.' INTEGER )?
                     {
                     mINTEGER(); 
-                    // src/antlr3/Plumhead.g:41:15: ( '.' INTEGER )?
-                    int alt5=2;
-                    int LA5_0 = input.LA(1);
-                    if ( (LA5_0=='.') ) {
-                        alt5=1;
+                    // src/antlr3/Plumhead.g:46:15: ( '.' INTEGER )?
+                    int alt6=2;
+                    int LA6_0 = input.LA(1);
+                    if ( (LA6_0=='.') ) {
+                        alt6=1;
                     }
-                    switch (alt5) {
+                    switch (alt6) {
                         case 1 :
-                            // src/antlr3/Plumhead.g:41:16: '.' INTEGER
+                            // src/antlr3/Plumhead.g:46:16: '.' INTEGER
                             {
                             match('.'); 
                             mINTEGER(); 
@@ -561,7 +658,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // src/antlr3/Plumhead.g:42:7: '.' INTEGER
+                    // src/antlr3/Plumhead.g:47:7: '.' INTEGER
                     {
                     match('.'); 
                     mINTEGER(); 
@@ -592,8 +689,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:45:14: ( '-' )
-            // src/antlr3/Plumhead.g:45:14: '-'
+            // src/antlr3/Plumhead.g:50:14: ( '-' )
+            // src/antlr3/Plumhead.g:50:14: '-'
             {
             match('-'); 
 
@@ -621,8 +718,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:46:14: ( '+' )
-            // src/antlr3/Plumhead.g:46:14: '+'
+            // src/antlr3/Plumhead.g:51:14: ( '+' )
+            // src/antlr3/Plumhead.g:51:14: '+'
             {
             match('+'); 
 
@@ -650,8 +747,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:48:12: ( ('*'|'/'|'%'))
-            // src/antlr3/Plumhead.g:48:14: ('*'|'/'|'%')
+            // src/antlr3/Plumhead.g:53:12: ( ('*'|'/'|'%'))
+            // src/antlr3/Plumhead.g:53:14: ('*'|'/'|'%')
             {
             if ( input.LA(1)=='%'||input.LA(1)=='*'||input.LA(1)=='/' ) {
                 input.consume();
@@ -688,47 +785,47 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:49:14: ( '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' )
-            int alt7=7;
+            // src/antlr3/Plumhead.g:54:14: ( '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' )
+            int alt8=7;
             switch ( input.LA(1) ) {
             case '=':
-                alt7=1;
+                alt8=1;
                 break;
             case '+':
-                alt7=2;
+                alt8=2;
                 break;
             case '-':
-                alt7=3;
+                alt8=3;
                 break;
             case '*':
-                alt7=4;
+                alt8=4;
                 break;
             case '/':
-                alt7=5;
+                alt8=5;
                 break;
             case '%':
-                alt7=6;
+                alt8=6;
                 break;
             case '^':
-                alt7=7;
+                alt8=7;
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("49:1: ASSIGN_OP : ( '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' );", 7, 0, input);
+                    new NoViableAltException("54:1: ASSIGN_OP : ( '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=' );", 8, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt7) {
+            switch (alt8) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:49:14: '='
+                    // src/antlr3/Plumhead.g:54:14: '='
                     {
                     match('='); 
 
                     }
                     break;
                 case 2 :
-                    // src/antlr3/Plumhead.g:49:21: '+='
+                    // src/antlr3/Plumhead.g:54:21: '+='
                     {
                     match("+="); 
 
@@ -736,7 +833,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // src/antlr3/Plumhead.g:49:28: '-='
+                    // src/antlr3/Plumhead.g:54:28: '-='
                     {
                     match("-="); 
 
@@ -744,7 +841,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 4 :
-                    // src/antlr3/Plumhead.g:49:35: '*='
+                    // src/antlr3/Plumhead.g:54:35: '*='
                     {
                     match("*="); 
 
@@ -752,7 +849,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 5 :
-                    // src/antlr3/Plumhead.g:49:42: '/='
+                    // src/antlr3/Plumhead.g:54:42: '/='
                     {
                     match("/="); 
 
@@ -760,7 +857,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 6 :
-                    // src/antlr3/Plumhead.g:49:49: '%='
+                    // src/antlr3/Plumhead.g:54:49: '%='
                     {
                     match("%="); 
 
@@ -768,7 +865,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 7 :
-                    // src/antlr3/Plumhead.g:49:56: '^='
+                    // src/antlr3/Plumhead.g:54:56: '^='
                     {
                     match("^="); 
 
@@ -799,41 +896,41 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:50:14: ( '==' | '<=' | '>=' | '!=' | '<' | '>' )
-            int alt8=6;
+            // src/antlr3/Plumhead.g:55:14: ( '==' | '<=' | '>=' | '!=' | '<' | '>' )
+            int alt9=6;
             switch ( input.LA(1) ) {
             case '=':
-                alt8=1;
+                alt9=1;
                 break;
             case '<':
-                int LA8_2 = input.LA(2);
-                if ( (LA8_2=='=') ) {
-                    alt8=2;
+                int LA9_2 = input.LA(2);
+                if ( (LA9_2=='=') ) {
+                    alt9=2;
                 }
                 else {
-                    alt8=5;}
+                    alt9=5;}
                 break;
             case '>':
-                int LA8_3 = input.LA(2);
-                if ( (LA8_3=='=') ) {
-                    alt8=3;
+                int LA9_3 = input.LA(2);
+                if ( (LA9_3=='=') ) {
+                    alt9=3;
                 }
                 else {
-                    alt8=6;}
+                    alt9=6;}
                 break;
             case '!':
-                alt8=4;
+                alt9=4;
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("50:1: REL_OP : ( '==' | '<=' | '>=' | '!=' | '<' | '>' );", 8, 0, input);
+                    new NoViableAltException("55:1: REL_OP : ( '==' | '<=' | '>=' | '!=' | '<' | '>' );", 9, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt8) {
+            switch (alt9) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:50:14: '=='
+                    // src/antlr3/Plumhead.g:55:14: '=='
                     {
                     match("=="); 
 
@@ -841,7 +938,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // src/antlr3/Plumhead.g:50:21: '<='
+                    // src/antlr3/Plumhead.g:55:21: '<='
                     {
                     match("<="); 
 
@@ -849,7 +946,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // src/antlr3/Plumhead.g:50:28: '>='
+                    // src/antlr3/Plumhead.g:55:28: '>='
                     {
                     match(">="); 
 
@@ -857,7 +954,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 4 :
-                    // src/antlr3/Plumhead.g:50:35: '!='
+                    // src/antlr3/Plumhead.g:55:35: '!='
                     {
                     match("!="); 
 
@@ -865,14 +962,14 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 5 :
-                    // src/antlr3/Plumhead.g:50:42: '<'
+                    // src/antlr3/Plumhead.g:55:42: '<'
                     {
                     match('<'); 
 
                     }
                     break;
                 case 6 :
-                    // src/antlr3/Plumhead.g:50:49: '>'
+                    // src/antlr3/Plumhead.g:55:49: '>'
                     {
                     match('>'); 
 
@@ -902,8 +999,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:51:14: ( '++' )
-            // src/antlr3/Plumhead.g:51:14: '++'
+            // src/antlr3/Plumhead.g:56:14: ( '++' )
+            // src/antlr3/Plumhead.g:56:14: '++'
             {
             match("++"); 
 
@@ -932,8 +1029,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:52:14: ( '--' )
-            // src/antlr3/Plumhead.g:52:14: '--'
+            // src/antlr3/Plumhead.g:57:14: ( '--' )
+            // src/antlr3/Plumhead.g:57:14: '--'
             {
             match("--"); 
 
@@ -962,8 +1059,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:54:14: ( 'define' )
-            // src/antlr3/Plumhead.g:54:14: 'define'
+            // src/antlr3/Plumhead.g:59:14: ( 'define' )
+            // src/antlr3/Plumhead.g:59:14: 'define'
             {
             match("define"); 
 
@@ -992,8 +1089,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:55:14: ( 'break' )
-            // src/antlr3/Plumhead.g:55:14: 'break'
+            // src/antlr3/Plumhead.g:60:14: ( 'break' )
+            // src/antlr3/Plumhead.g:60:14: 'break'
             {
             match("break"); 
 
@@ -1013,36 +1110,6 @@ public class PlumheadLexer extends Lexer {
     }
     // $ANTLR end Break
 
-    // $ANTLR start START_PHP
-    public void mSTART_PHP() throws RecognitionException {
-        try {
-            ruleNestingLevel++;
-            int _type = START_PHP;
-            int _start = getCharIndex();
-            int _line = getLine();
-            int _charPosition = getCharPositionInLine();
-            int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:56:14: ( '<?php' )
-            // src/antlr3/Plumhead.g:56:14: '<?php'
-            {
-            match("<?php"); 
-
-
-            }
-
-
-
-                    if ( token==null && ruleNestingLevel==1 ) {
-                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
-                    }
-
-                        }
-        finally {
-            ruleNestingLevel--;
-        }
-    }
-    // $ANTLR end START_PHP
-
     // $ANTLR start END_PHP
     public void mEND_PHP() throws RecognitionException {
         try {
@@ -1052,8 +1119,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:57:14: ( '?>' )
-            // src/antlr3/Plumhead.g:57:14: '?>'
+            // src/antlr3/Plumhead.g:61:14: ( '?>' )
+            // src/antlr3/Plumhead.g:61:14: '?>'
             {
             match("?>"); 
 
@@ -1082,8 +1149,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:60:14: ( 'quit' )
-            // src/antlr3/Plumhead.g:60:14: 'quit'
+            // src/antlr3/Plumhead.g:64:14: ( 'quit' )
+            // src/antlr3/Plumhead.g:64:14: 'quit'
             {
             match("quit"); 
 
@@ -1112,8 +1179,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:62:14: ( 'length' )
-            // src/antlr3/Plumhead.g:62:14: 'length'
+            // src/antlr3/Plumhead.g:66:14: ( 'length' )
+            // src/antlr3/Plumhead.g:66:14: 'length'
             {
             match("length"); 
 
@@ -1142,8 +1209,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:63:14: ( 'return' )
-            // src/antlr3/Plumhead.g:63:14: 'return'
+            // src/antlr3/Plumhead.g:67:14: ( 'return' )
+            // src/antlr3/Plumhead.g:67:14: 'return'
             {
             match("return"); 
 
@@ -1172,8 +1239,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:64:14: ( 'for' )
-            // src/antlr3/Plumhead.g:64:14: 'for'
+            // src/antlr3/Plumhead.g:68:14: ( 'for' )
+            // src/antlr3/Plumhead.g:68:14: 'for'
             {
             match("for"); 
 
@@ -1202,8 +1269,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:65:14: ( 'if' )
-            // src/antlr3/Plumhead.g:65:14: 'if'
+            // src/antlr3/Plumhead.g:69:14: ( 'if' )
+            // src/antlr3/Plumhead.g:69:14: 'if'
             {
             match("if"); 
 
@@ -1232,8 +1299,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:66:14: ( 'while' )
-            // src/antlr3/Plumhead.g:66:14: 'while'
+            // src/antlr3/Plumhead.g:70:14: ( 'while' )
+            // src/antlr3/Plumhead.g:70:14: 'while'
             {
             match("while"); 
 
@@ -1262,8 +1329,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:67:14: ( 'sqrt' )
-            // src/antlr3/Plumhead.g:67:14: 'sqrt'
+            // src/antlr3/Plumhead.g:71:14: ( 'sqrt' )
+            // src/antlr3/Plumhead.g:71:14: 'sqrt'
             {
             match("sqrt"); 
 
@@ -1292,8 +1359,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:68:14: ( 'scale' )
-            // src/antlr3/Plumhead.g:68:14: 'scale'
+            // src/antlr3/Plumhead.g:72:14: ( 'scale' )
+            // src/antlr3/Plumhead.g:72:14: 'scale'
             {
             match("scale"); 
 
@@ -1322,8 +1389,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:69:14: ( 'ibase' )
-            // src/antlr3/Plumhead.g:69:14: 'ibase'
+            // src/antlr3/Plumhead.g:73:14: ( 'ibase' )
+            // src/antlr3/Plumhead.g:73:14: 'ibase'
             {
             match("ibase"); 
 
@@ -1352,8 +1419,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:70:14: ( 'obase' )
-            // src/antlr3/Plumhead.g:70:14: 'obase'
+            // src/antlr3/Plumhead.g:74:14: ( 'obase' )
+            // src/antlr3/Plumhead.g:74:14: 'obase'
             {
             match("obase"); 
 
@@ -1382,8 +1449,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:71:14: ( 'auto' )
-            // src/antlr3/Plumhead.g:71:14: 'auto'
+            // src/antlr3/Plumhead.g:75:14: ( 'auto' )
+            // src/antlr3/Plumhead.g:75:14: 'auto'
             {
             match("auto"); 
 
@@ -1412,35 +1479,35 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:75:5: ( '/*' ( options {greedy=false; } : . )* '*/' )
-            // src/antlr3/Plumhead.g:75:5: '/*' ( options {greedy=false; } : . )* '*/'
+            // src/antlr3/Plumhead.g:79:5: ( '/*' ( options {greedy=false; } : . )* '*/' )
+            // src/antlr3/Plumhead.g:79:5: '/*' ( options {greedy=false; } : . )* '*/'
             {
             match("/*"); 
 
-            // src/antlr3/Plumhead.g:75:10: ( options {greedy=false; } : . )*
-            loop9:
+            // src/antlr3/Plumhead.g:79:10: ( options {greedy=false; } : . )*
+            loop10:
             do {
-                int alt9=2;
-                int LA9_0 = input.LA(1);
-                if ( (LA9_0=='*') ) {
-                    int LA9_1 = input.LA(2);
-                    if ( (LA9_1=='/') ) {
-                        alt9=2;
+                int alt10=2;
+                int LA10_0 = input.LA(1);
+                if ( (LA10_0=='*') ) {
+                    int LA10_1 = input.LA(2);
+                    if ( (LA10_1=='/') ) {
+                        alt10=2;
                     }
-                    else if ( ((LA9_1>='\u0000' && LA9_1<='.')||(LA9_1>='0' && LA9_1<='\uFFFE')) ) {
-                        alt9=1;
+                    else if ( ((LA10_1>='\u0000' && LA10_1<='.')||(LA10_1>='0' && LA10_1<='\uFFFE')) ) {
+                        alt10=1;
                     }
 
 
                 }
-                else if ( ((LA9_0>='\u0000' && LA9_0<=')')||(LA9_0>='+' && LA9_0<='\uFFFE')) ) {
-                    alt9=1;
+                else if ( ((LA10_0>='\u0000' && LA10_0<=')')||(LA10_0>='+' && LA10_0<='\uFFFE')) ) {
+                    alt10=1;
                 }
 
 
-                switch (alt9) {
+                switch (alt10) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:75:38: .
+            	    // src/antlr3/Plumhead.g:79:38: .
             	    {
             	    matchAny(); 
 
@@ -1448,7 +1515,7 @@ public class PlumheadLexer extends Lexer {
             	    break;
 
             	default :
-            	    break loop9;
+            	    break loop10;
                 }
             } while (true);
 
@@ -1482,23 +1549,23 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:83:5: ( ( (' '|'\\t'))+ )
-            // src/antlr3/Plumhead.g:83:5: ( (' '|'\\t'))+
+            // src/antlr3/Plumhead.g:87:5: ( ( (' '|'\\t'))+ )
+            // src/antlr3/Plumhead.g:87:5: ( (' '|'\\t'))+
             {
-            // src/antlr3/Plumhead.g:83:5: ( (' '|'\\t'))+
-            int cnt10=0;
-            loop10:
+            // src/antlr3/Plumhead.g:87:5: ( (' '|'\\t'))+
+            int cnt11=0;
+            loop11:
             do {
-                int alt10=2;
-                int LA10_0 = input.LA(1);
-                if ( (LA10_0=='\t'||LA10_0==' ') ) {
-                    alt10=1;
+                int alt11=2;
+                int LA11_0 = input.LA(1);
+                if ( (LA11_0=='\t'||LA11_0==' ') ) {
+                    alt11=1;
                 }
 
 
-                switch (alt10) {
+                switch (alt11) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:83:7: (' '|'\\t')
+            	    // src/antlr3/Plumhead.g:87:7: (' '|'\\t')
             	    {
             	    if ( input.LA(1)=='\t'||input.LA(1)==' ' ) {
             	        input.consume();
@@ -1515,12 +1582,12 @@ public class PlumheadLexer extends Lexer {
             	    break;
 
             	default :
-            	    if ( cnt10 >= 1 ) break loop10;
+            	    if ( cnt11 >= 1 ) break loop11;
                         EarlyExitException eee =
-                            new EarlyExitException(10, input);
+                            new EarlyExitException(11, input);
                         throw eee;
                 }
-                cnt10++;
+                cnt11++;
             } while (true);
 
 
@@ -1543,509 +1610,264 @@ public class PlumheadLexer extends Lexer {
     // $ANTLR end WS
 
     public void mTokens() throws RecognitionException {
-        // src/antlr3/Plumhead.g:1:10: ( T39 | T40 | T41 | T42 | T43 | T44 | T45 | T46 | NEWLINE | STRING | LETTER | NUMBER | MINUS | PLUS | MUL_OP | ASSIGN_OP | REL_OP | INCR | DECR | Define | Break | START_PHP | END_PHP | Quit | Length | Return | For | If | While | Sqrt | Scale | Ibase | Obase | Auto | ML_COMMENT | WS )
-        int alt11=36;
-        switch ( input.LA(1) ) {
-        case ';':
-            alt11=1;
-            break;
-        case '(':
-            alt11=2;
-            break;
-        case ')':
-            alt11=3;
-            break;
-        case '{':
-            alt11=4;
-            break;
-        case '}':
-            alt11=5;
-            break;
-        case '[':
-            alt11=6;
-            break;
-        case ']':
-            alt11=7;
-            break;
-        case ',':
-            alt11=8;
-            break;
-        case '\n':
-        case '\r':
-            alt11=9;
-            break;
-        case '\"':
-            alt11=10;
-            break;
-        case 'd':
-            int LA11_11 = input.LA(2);
-            if ( (LA11_11=='e') ) {
-                alt11=20;
-            }
-            else {
-                alt11=11;}
-            break;
-        case '.':
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        case 'A':
-        case 'B':
-        case 'C':
-        case 'D':
-        case 'E':
-        case 'F':
-            alt11=12;
-            break;
-        case '-':
-            switch ( input.LA(2) ) {
-            case '=':
-                alt11=16;
-                break;
-            case '-':
-                alt11=19;
-                break;
-            default:
-                alt11=13;}
-
-            break;
-        case '+':
-            switch ( input.LA(2) ) {
-            case '=':
-                alt11=16;
-                break;
-            case '+':
-                alt11=18;
-                break;
-            default:
-                alt11=14;}
-
-            break;
-        case '*':
-            int LA11_15 = input.LA(2);
-            if ( (LA11_15=='=') ) {
-                alt11=16;
-            }
-            else {
-                alt11=15;}
-            break;
-        case '=':
-            int LA11_16 = input.LA(2);
-            if ( (LA11_16=='=') ) {
-                alt11=17;
-            }
-            else {
-                alt11=16;}
-            break;
-        case '/':
-            switch ( input.LA(2) ) {
-            case '=':
-                alt11=16;
-                break;
-            case '*':
-                alt11=35;
-                break;
-            default:
-                alt11=15;}
-
-            break;
-        case '%':
-            int LA11_18 = input.LA(2);
-            if ( (LA11_18=='=') ) {
-                alt11=16;
-            }
-            else {
-                alt11=15;}
-            break;
-        case '^':
-            alt11=16;
-            break;
-        case '<':
-            int LA11_20 = input.LA(2);
-            if ( (LA11_20=='?') ) {
-                alt11=22;
-            }
-            else {
-                alt11=17;}
-            break;
-        case '!':
-        case '>':
-            alt11=17;
-            break;
-        case 'b':
-            int LA11_22 = input.LA(2);
-            if ( (LA11_22=='r') ) {
-                alt11=21;
-            }
-            else {
-                alt11=11;}
-            break;
-        case 'q':
-            int LA11_23 = input.LA(2);
-            if ( (LA11_23=='u') ) {
-                alt11=24;
-            }
-            else {
-                alt11=11;}
-            break;
-        case '?':
-            alt11=23;
-            break;
-        case 'l':
-            int LA11_25 = input.LA(2);
-            if ( (LA11_25=='e') ) {
-                alt11=25;
-            }
-            else {
-                alt11=11;}
-            break;
-        case 'r':
-            int LA11_26 = input.LA(2);
-            if ( (LA11_26=='e') ) {
-                alt11=26;
-            }
-            else {
-                alt11=11;}
-            break;
-        case 'f':
-            int LA11_27 = input.LA(2);
-            if ( (LA11_27=='o') ) {
-                alt11=27;
-            }
-            else {
-                alt11=11;}
-            break;
-        case 'i':
-            switch ( input.LA(2) ) {
-            case 'f':
-                alt11=28;
-                break;
-            case 'b':
-                alt11=32;
-                break;
-            default:
-                alt11=11;}
-
-            break;
-        case 'w':
-            int LA11_29 = input.LA(2);
-            if ( (LA11_29=='h') ) {
-                alt11=29;
-            }
-            else {
-                alt11=11;}
-            break;
-        case 's':
-            switch ( input.LA(2) ) {
-            case 'c':
-                alt11=31;
-                break;
-            case 'q':
-                alt11=30;
-                break;
-            default:
-                alt11=11;}
-
-            break;
-        case 'o':
-            int LA11_31 = input.LA(2);
-            if ( (LA11_31=='b') ) {
-                alt11=33;
-            }
-            else {
-                alt11=11;}
-            break;
-        case 'a':
-            int LA11_32 = input.LA(2);
-            if ( (LA11_32=='u') ) {
-                alt11=34;
-            }
-            else {
-                alt11=11;}
-            break;
-        case 'c':
-        case 'e':
-        case 'g':
-        case 'h':
-        case 'j':
-        case 'k':
-        case 'm':
-        case 'n':
-        case 'p':
-        case 't':
-        case 'u':
-        case 'v':
-        case 'x':
-        case 'y':
-        case 'z':
-            alt11=11;
-            break;
-        case '\t':
-        case ' ':
-            alt11=36;
-            break;
-        default:
-            NoViableAltException nvae =
-                new NoViableAltException("1:1: Tokens : ( T39 | T40 | T41 | T42 | T43 | T44 | T45 | T46 | NEWLINE | STRING | LETTER | NUMBER | MINUS | PLUS | MUL_OP | ASSIGN_OP | REL_OP | INCR | DECR | Define | Break | START_PHP | END_PHP | Quit | Length | Return | For | If | While | Sqrt | Scale | Ibase | Obase | Auto | ML_COMMENT | WS );", 11, 0, input);
-
-            throw nvae;
-        }
-
-        switch (alt11) {
+        // src/antlr3/Plumhead.g:1:10: ( T41 | T42 | T43 | T44 | T45 | T46 | T47 | T48 | SEA | START_CODE | NEWLINE | STRING | LETTER | NUMBER | MINUS | PLUS | MUL_OP | ASSIGN_OP | REL_OP | INCR | DECR | Define | Break | END_PHP | Quit | Length | Return | For | If | While | Sqrt | Scale | Ibase | Obase | Auto | ML_COMMENT | WS )
+        int alt12=37;
+        alt12 = dfa12.predict(input);
+        switch (alt12) {
             case 1 :
-                // src/antlr3/Plumhead.g:1:10: T39
-                {
-                mT39(); 
-
-                }
-                break;
-            case 2 :
-                // src/antlr3/Plumhead.g:1:14: T40
-                {
-                mT40(); 
-
-                }
-                break;
-            case 3 :
-                // src/antlr3/Plumhead.g:1:18: T41
+                // src/antlr3/Plumhead.g:1:10: T41
                 {
                 mT41(); 
 
                 }
                 break;
-            case 4 :
-                // src/antlr3/Plumhead.g:1:22: T42
+            case 2 :
+                // src/antlr3/Plumhead.g:1:14: T42
                 {
                 mT42(); 
 
                 }
                 break;
-            case 5 :
-                // src/antlr3/Plumhead.g:1:26: T43
+            case 3 :
+                // src/antlr3/Plumhead.g:1:18: T43
                 {
                 mT43(); 
 
                 }
                 break;
-            case 6 :
-                // src/antlr3/Plumhead.g:1:30: T44
+            case 4 :
+                // src/antlr3/Plumhead.g:1:22: T44
                 {
                 mT44(); 
 
                 }
                 break;
-            case 7 :
-                // src/antlr3/Plumhead.g:1:34: T45
+            case 5 :
+                // src/antlr3/Plumhead.g:1:26: T45
                 {
                 mT45(); 
 
                 }
                 break;
-            case 8 :
-                // src/antlr3/Plumhead.g:1:38: T46
+            case 6 :
+                // src/antlr3/Plumhead.g:1:30: T46
                 {
                 mT46(); 
 
                 }
                 break;
+            case 7 :
+                // src/antlr3/Plumhead.g:1:34: T47
+                {
+                mT47(); 
+
+                }
+                break;
+            case 8 :
+                // src/antlr3/Plumhead.g:1:38: T48
+                {
+                mT48(); 
+
+                }
+                break;
             case 9 :
-                // src/antlr3/Plumhead.g:1:42: NEWLINE
+                // src/antlr3/Plumhead.g:1:42: SEA
+                {
+                mSEA(); 
+
+                }
+                break;
+            case 10 :
+                // src/antlr3/Plumhead.g:1:46: START_CODE
+                {
+                mSTART_CODE(); 
+
+                }
+                break;
+            case 11 :
+                // src/antlr3/Plumhead.g:1:57: NEWLINE
                 {
                 mNEWLINE(); 
 
                 }
                 break;
-            case 10 :
-                // src/antlr3/Plumhead.g:1:50: STRING
+            case 12 :
+                // src/antlr3/Plumhead.g:1:65: STRING
                 {
                 mSTRING(); 
 
                 }
                 break;
-            case 11 :
-                // src/antlr3/Plumhead.g:1:57: LETTER
+            case 13 :
+                // src/antlr3/Plumhead.g:1:72: LETTER
                 {
                 mLETTER(); 
 
                 }
                 break;
-            case 12 :
-                // src/antlr3/Plumhead.g:1:64: NUMBER
+            case 14 :
+                // src/antlr3/Plumhead.g:1:79: NUMBER
                 {
                 mNUMBER(); 
 
                 }
                 break;
-            case 13 :
-                // src/antlr3/Plumhead.g:1:71: MINUS
+            case 15 :
+                // src/antlr3/Plumhead.g:1:86: MINUS
                 {
                 mMINUS(); 
 
                 }
                 break;
-            case 14 :
-                // src/antlr3/Plumhead.g:1:77: PLUS
+            case 16 :
+                // src/antlr3/Plumhead.g:1:92: PLUS
                 {
                 mPLUS(); 
 
                 }
                 break;
-            case 15 :
-                // src/antlr3/Plumhead.g:1:82: MUL_OP
+            case 17 :
+                // src/antlr3/Plumhead.g:1:97: MUL_OP
                 {
                 mMUL_OP(); 
 
                 }
                 break;
-            case 16 :
-                // src/antlr3/Plumhead.g:1:89: ASSIGN_OP
+            case 18 :
+                // src/antlr3/Plumhead.g:1:104: ASSIGN_OP
                 {
                 mASSIGN_OP(); 
 
                 }
                 break;
-            case 17 :
-                // src/antlr3/Plumhead.g:1:99: REL_OP
+            case 19 :
+                // src/antlr3/Plumhead.g:1:114: REL_OP
                 {
                 mREL_OP(); 
 
                 }
                 break;
-            case 18 :
-                // src/antlr3/Plumhead.g:1:106: INCR
+            case 20 :
+                // src/antlr3/Plumhead.g:1:121: INCR
                 {
                 mINCR(); 
 
                 }
                 break;
-            case 19 :
-                // src/antlr3/Plumhead.g:1:111: DECR
+            case 21 :
+                // src/antlr3/Plumhead.g:1:126: DECR
                 {
                 mDECR(); 
 
                 }
                 break;
-            case 20 :
-                // src/antlr3/Plumhead.g:1:116: Define
+            case 22 :
+                // src/antlr3/Plumhead.g:1:131: Define
                 {
                 mDefine(); 
 
                 }
                 break;
-            case 21 :
-                // src/antlr3/Plumhead.g:1:123: Break
+            case 23 :
+                // src/antlr3/Plumhead.g:1:138: Break
                 {
                 mBreak(); 
 
                 }
                 break;
-            case 22 :
-                // src/antlr3/Plumhead.g:1:129: START_PHP
-                {
-                mSTART_PHP(); 
-
-                }
-                break;
-            case 23 :
-                // src/antlr3/Plumhead.g:1:139: END_PHP
+            case 24 :
+                // src/antlr3/Plumhead.g:1:144: END_PHP
                 {
                 mEND_PHP(); 
 
                 }
                 break;
-            case 24 :
-                // src/antlr3/Plumhead.g:1:147: Quit
+            case 25 :
+                // src/antlr3/Plumhead.g:1:152: Quit
                 {
                 mQuit(); 
 
                 }
                 break;
-            case 25 :
-                // src/antlr3/Plumhead.g:1:152: Length
+            case 26 :
+                // src/antlr3/Plumhead.g:1:157: Length
                 {
                 mLength(); 
 
                 }
                 break;
-            case 26 :
-                // src/antlr3/Plumhead.g:1:159: Return
+            case 27 :
+                // src/antlr3/Plumhead.g:1:164: Return
                 {
                 mReturn(); 
 
                 }
                 break;
-            case 27 :
-                // src/antlr3/Plumhead.g:1:166: For
+            case 28 :
+                // src/antlr3/Plumhead.g:1:171: For
                 {
                 mFor(); 
 
                 }
                 break;
-            case 28 :
-                // src/antlr3/Plumhead.g:1:170: If
+            case 29 :
+                // src/antlr3/Plumhead.g:1:175: If
                 {
                 mIf(); 
 
                 }
                 break;
-            case 29 :
-                // src/antlr3/Plumhead.g:1:173: While
+            case 30 :
+                // src/antlr3/Plumhead.g:1:178: While
                 {
                 mWhile(); 
 
                 }
                 break;
-            case 30 :
-                // src/antlr3/Plumhead.g:1:179: Sqrt
+            case 31 :
+                // src/antlr3/Plumhead.g:1:184: Sqrt
                 {
                 mSqrt(); 
 
                 }
                 break;
-            case 31 :
-                // src/antlr3/Plumhead.g:1:184: Scale
+            case 32 :
+                // src/antlr3/Plumhead.g:1:189: Scale
                 {
                 mScale(); 
 
                 }
                 break;
-            case 32 :
-                // src/antlr3/Plumhead.g:1:190: Ibase
+            case 33 :
+                // src/antlr3/Plumhead.g:1:195: Ibase
                 {
                 mIbase(); 
 
                 }
                 break;
-            case 33 :
-                // src/antlr3/Plumhead.g:1:196: Obase
+            case 34 :
+                // src/antlr3/Plumhead.g:1:201: Obase
                 {
                 mObase(); 
 
                 }
                 break;
-            case 34 :
-                // src/antlr3/Plumhead.g:1:202: Auto
+            case 35 :
+                // src/antlr3/Plumhead.g:1:207: Auto
                 {
                 mAuto(); 
 
                 }
                 break;
-            case 35 :
-                // src/antlr3/Plumhead.g:1:207: ML_COMMENT
+            case 36 :
+                // src/antlr3/Plumhead.g:1:212: ML_COMMENT
                 {
                 mML_COMMENT(); 
 
                 }
                 break;
-            case 36 :
-                // src/antlr3/Plumhead.g:1:218: WS
+            case 37 :
+                // src/antlr3/Plumhead.g:1:223: WS
                 {
                 mWS(); 
 
@@ -2057,6 +1879,183 @@ public class PlumheadLexer extends Lexer {
     }
 
 
+    protected DFA12 dfa12 = new DFA12(this);
+    public static final String DFA12_eotS =
+        "\1\uffff\1\47\1\50\1\51\1\52\1\53\1\54\1\55\1\56\1\46\1\60\32\46"+
+        "\14\uffff\1\46\2\uffff\3\46\7\uffff\1\46\5\uffff\6\46\1\uffff\11"+
+        "\46\1\uffff\4\46\1\uffff\11\46\1\uffff\5\46\1\uffff\1\46\1\uffff"+
+        "\1\46\1\uffff\2\46\7\uffff";
+    public static final String DFA12_eofS =
+        "\167\uffff";
+    public static final String DFA12_minS =
+        "\11\0\1\12\1\75\1\12\1\0\1\145\1\56\1\60\1\55\1\53\3\75\1\52\3\75"+
+        "\1\76\1\162\1\165\1\11\2\145\1\157\1\142\1\150\1\143\1\142\1\165"+
+        "\14\uffff\1\0\2\uffff\1\146\2\60\7\uffff\1\0\5\uffff\1\145\1\151"+
+        "\1\156\1\164\1\162\1\141\1\uffff\1\151\1\141\1\162\1\141\1\164\1"+
+        "\151\1\60\2\0\1\uffff\1\141\1\164\1\147\1\165\1\uffff\1\163\2\154"+
+        "\1\164\1\163\1\157\1\156\1\0\1\153\1\uffff\1\164\1\162\3\145\1\uffff"+
+        "\1\145\1\uffff\1\145\1\uffff\1\150\1\156\7\uffff";
+    public static final String DFA12_maxS =
+        "\11\ufffe\1\12\1\75\1\12\1\ufffe\1\145\2\106\11\75\1\76\1\162\1"+
+        "\165\1\40\2\145\1\157\1\146\1\150\1\161\1\142\1\165\14\uffff\1\ufffe"+
+        "\2\uffff\1\146\2\106\7\uffff\1\ufffe\5\uffff\1\145\1\151\1\156\1"+
+        "\164\1\162\1\141\1\uffff\1\151\1\141\1\162\1\141\1\164\1\151\1\106"+
+        "\2\ufffe\1\uffff\1\141\1\164\1\147\1\165\1\uffff\1\163\2\154\1\164"+
+        "\1\163\1\157\1\156\1\ufffe\1\153\1\uffff\1\164\1\162\3\145\1\uffff"+
+        "\1\145\1\uffff\1\145\1\uffff\1\150\1\156\7\uffff";
+    public static final String DFA12_acceptS =
+        "\45\uffff\2\11\1\1\1\2\1\3\1\4\1\5\1\6\1\7\1\10\1\23\1\12\1\uffff"+
+        "\1\11\1\14\3\uffff\7\11\1\uffff\5\11\6\uffff\1\11\11\uffff\1\44"+
+        "\4\uffff\1\11\11\uffff\1\11\5\uffff\1\11\1\uffff\1\11\1\uffff\1"+
+        "\11\2\uffff\7\11";
+    public static final String DFA12_specialS =
+        "\167\uffff}>";
+    public static final String[] DFA12_transition = {
+        "\11\46\1\34\1\13\2\46\1\11\22\46\1\34\1\30\1\14\2\46\1\26\2\46\1"+
+        "\2\1\3\1\22\1\21\1\10\1\20\1\17\1\25\12\16\1\46\1\1\1\12\1\23\1"+
+        "\27\1\31\1\46\6\16\24\46\1\6\1\46\1\7\1\24\2\46\1\44\1\32\1\45\1"+
+        "\15\1\45\1\37\2\45\1\40\2\45\1\35\2\45\1\43\1\45\1\33\1\36\1\42"+
+        "\3\45\1\41\3\45\1\4\1\46\1\5\uff81\46",
+        "\74\46\1\uffff\uffc2\46",
+        "\74\46\1\uffff\uffc2\46",
+        "\74\46\1\uffff\uffc2\46",
+        "\74\46\1\uffff\uffc2\46",
+        "\74\46\1\uffff\uffc2\46",
+        "\74\46\1\uffff\uffc2\46",
+        "\74\46\1\uffff\uffc2\46",
+        "\74\46\1\uffff\uffc2\46",
+        "\1\13",
+        "\1\57",
+        "\1\13",
+        "\42\61\1\62\31\61\1\63\uffc2\61",
+        "\1\64",
+        "\1\65\1\uffff\12\16\7\uffff\6\16",
+        "\12\66\7\uffff\6\66",
+        "\1\67\17\uffff\1\70",
+        "\1\72\21\uffff\1\71",
+        "\1\73",
+        "\1\74",
+        "\1\75",
+        "\1\76\22\uffff\1\77",
+        "\1\100",
+        "\1\101",
+        "\1\102",
+        "\1\103",
+        "\1\104",
+        "\1\105",
+        "\1\34\26\uffff\1\34",
+        "\1\106",
+        "\1\107",
+        "\1\110",
+        "\1\111\3\uffff\1\112",
+        "\1\113",
+        "\1\114\15\uffff\1\115",
+        "\1\116",
+        "\1\117",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "\42\61\1\62\31\61\1\63\uffc2\61",
+        "",
+        "",
+        "\1\120",
+        "\12\121\7\uffff\6\121",
+        "\12\66\7\uffff\6\66",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "\52\123\1\122\21\123\1\124\uffc2\123",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "\1\125",
+        "\1\126",
+        "\1\127",
+        "\1\130",
+        "\1\131",
+        "\1\132",
+        "",
+        "\1\133",
+        "\1\134",
+        "\1\135",
+        "\1\136",
+        "\1\137",
+        "\1\140",
+        "\12\121\7\uffff\6\121",
+        "\52\123\1\122\4\123\1\141\14\123\1\124\uffc2\123",
+        "\52\123\1\122\21\123\1\124\uffc2\123",
+        "",
+        "\1\142",
+        "\1\143",
+        "\1\144",
+        "\1\145",
+        "",
+        "\1\146",
+        "\1\147",
+        "\1\150",
+        "\1\151",
+        "\1\152",
+        "\1\153",
+        "\1\154",
+        "\52\123\1\122\21\123\1\124\uffc2\123",
+        "\1\155",
+        "",
+        "\1\156",
+        "\1\157",
+        "\1\160",
+        "\1\161",
+        "\1\162",
+        "",
+        "\1\163",
+        "",
+        "\1\164",
+        "",
+        "\1\165",
+        "\1\166",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+    };
+
+    class DFA12 extends DFA {
+        public DFA12(BaseRecognizer recognizer) {
+            this.recognizer = recognizer;
+            this.decisionNumber = 12;
+            this.eot = DFA.unpackEncodedString(DFA12_eotS);
+            this.eof = DFA.unpackEncodedString(DFA12_eofS);
+            this.min = DFA.unpackEncodedStringToUnsignedChars(DFA12_minS);
+            this.max = DFA.unpackEncodedStringToUnsignedChars(DFA12_maxS);
+            this.accept = DFA.unpackEncodedString(DFA12_acceptS);
+            this.special = DFA.unpackEncodedString(DFA12_specialS);
+            int numStates = DFA12_transition.length;
+            this.transition = new short[numStates][];
+            for (int i=0; i<numStates; i++) {
+                transition[i] = DFA.unpackEncodedString(DFA12_transition[i]);
+            }
+        }
+        public String getDescription() {
+            return "1:1: Tokens : ( T41 | T42 | T43 | T44 | T45 | T46 | T47 | T48 | SEA | START_CODE | NEWLINE | STRING | LETTER | NUMBER | MINUS | PLUS | MUL_OP | ASSIGN_OP | REL_OP | INCR | DECR | Define | Break | END_PHP | Quit | Length | Return | For | If | While | Sqrt | Scale | Ibase | Obase | Auto | ML_COMMENT | WS );";
+        }
+    }
  
 
 }

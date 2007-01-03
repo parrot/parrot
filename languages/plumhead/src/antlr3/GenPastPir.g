@@ -136,7 +136,7 @@ gen_pir_past
         + "                                                                  \n"
       );
     }
-    START_PHP
+    START_CODE
   ;
 
 node[String reg_mother]
