@@ -89,6 +89,7 @@ sub new {
     return bless( $allargsref, $class );
 }
 
+
 =head3 C<get_included_paths()>
 
     @included = $self->get_included_paths()
@@ -97,7 +98,7 @@ B<Purpose:>  Accessor to C<include> key inside Parrot::Pmc2c::Utils object.
 
 B<Arguments:>  None.
 
-B<Return Values:>  List referenced by the value of the C<include> key in 
+B<Return Values:>  List referenced by the value of the C<include> key in
 the hash passed by reference to C<Parrot::Pmc2c::Utils->new()>.
 
 B<Comment:>  Used internally in C<find_file()>.
@@ -109,16 +110,17 @@ sub get_included_paths {
     return @{$self->{include}};
 }
 
+
 =head3 C<find_file()>
 
     $path = $self->find_file($file, $die_unless_found_flag);
 
 B<Purpose:>  Return the full path to C<$file>.  (Search in the directories
 listed in the C<include> key in the hash passed by reference to the
-constructor).  Optionally, die with an error message if that file cannot 
+constructor).  Optionally, die with an error message if that file cannot
 be found.
 
-B<Arguments:>  Two arguments.  Required:  string holding name of the file 
+B<Arguments:>  Two arguments.  Required:  string holding name of the file
 sought.  Optional:  a flag variable which, if set to a true value, will cause
 program to die if file is not located.
 
@@ -149,11 +151,12 @@ sub find_file {
     return;
 }
 
+
 =head3 C<dump_vtable()>
 
     $self->dump_vtable("$FindBin::Bin/../../vtable.tbl");
 
-B<Purpose:>  Create a F<.dump> file for the default vtable (from which 
+B<Purpose:>  Create a F<.dump> file for the default vtable (from which
 all PMCs inherit).
 
 B<Arguments:>  Scalar holding filename of vtable.
@@ -164,9 +167,9 @@ B<Comments:>  In earlier version of F<pmc2c.pl>, this subroutine returned
 C<undef> upon success.  This was changed to more Perl-ish C<1>.
 
 If the caller of this subroutine has C<chdir>-ed to a tempdir before this
-subroutine is called -- as ought to be the case during testing of build 
+subroutine is called -- as ought to be the case during testing of build
 tools -- then F<vtable.dump> will be created within that tempdir.
-Otherwise, F<vtable.dump> is created in the caller's working directory.  
+Otherwise, F<vtable.dump> is created in the caller's working directory.
 When the caller is F<make>, that directory is the top-level Parrot directory.
 
 =cut
@@ -209,6 +212,7 @@ sub dump_vtable {
     return $dump;
 }
 
+
 =head3 C<print_tree()>
 
     $self->print_tree( {
@@ -225,12 +229,12 @@ B<Arguments:>  Reference to hash holding key-value pairs.
 
 =item * depth
 
-Number holding the display depth.  Used for the recursive 
+Number holding the display depth.  Used for the recursive
 definition of this function.  Defaults to C<0> if not specified.
 
 =item * files
 
-Optional.  Reference to an array holding a list of files.  If not supplied, the 
+Optional.  Reference to an array holding a list of files.  If not supplied, the
 value of the C<args> key in C<Parrot::Pmc2c::Utils::new()> will be used.
 (This is used for the recursive call.)
 
@@ -288,12 +292,13 @@ sub print_tree {
     return 1;
 }
 
+
 =head3 C<read_dump()>
 
   $self->read_dump('filename');
 
 B<Purpose:>  A F<.dump> file is the result of a call to C<dump_pmc()> and
-consists of a print-out of a hash reference Data::Dumper-style.  
+consists of a print-out of a hash reference Data::Dumper-style.
 C<read_dump()> reads in the F<.dump> file, recreates the data structure and
 returns a new hash reference holding the data structure.
 
@@ -304,9 +309,9 @@ corresponding F<foo.dump> file.
 
 B<Return Values:>  Reference to hash holding recreated data structure.
 
-B<Comment:>  If the appropriate F<.dump> file cannot be located, program 
+B<Comment:>  If the appropriate F<.dump> file cannot be located, program
 will die with error message (see C<find_file()> above).
-Called internally by C<print_tree()>, C<gen_c()>, C<gen_parent_list()>, 
+Called internally by C<print_tree()>, C<gen_c()>, C<gen_parent_list()>,
 C<dump_pmc()>.
 
 =cut
@@ -327,6 +332,7 @@ sub read_dump {
     return $class;
 }
 
+
 =head3 C<gen_c()>
 
     $return_value = $self->gen_c();
@@ -339,8 +345,8 @@ B<Arguments:>  None.
 B<Return Values:>  Returns C<1> upon success.
 
 B<Comment:>  Internally calls C<Parrot::Pmc2c::Library::new()> and
-C<write_all_files()>.  In earlier version of F<pmc2c.pl>, this 
-subroutine returned C<undef> upon success.  This was changed to more 
+C<write_all_files()>.  In earlier version of F<pmc2c.pl>, this
+subroutine returned C<undef> upon success.  This was changed to more
 Perl-ish C<1>.
 
 =cut
@@ -358,6 +364,7 @@ sub gen_c {
     return 1;
 }
 
+
 =head3 C<dump_pmc()>
 
     $return_value = $self->dump_pmc();
@@ -365,7 +372,7 @@ sub gen_c {
 B<Purpose:>  Create a F<.dump> file for each file listed in the constructor's
 C<arg> key (which can be found in the directories listed in the C<include> key).
 
-A C<'*.pmc'> glob may also be passed to emulate a proper shell in the presence 
+A C<'*.pmc'> glob may also be passed to emulate a proper shell in the presence
 of a dumb one.
 
     $self = Parrot::Pmc2c::Utils->new( {
@@ -445,7 +452,7 @@ sub dump_pmc {
                 $dumpfile = $existing;
             }
         }
-        
+
         $all = $self->gen_parent_list($name, $all);
 
         my $class = gen_super_meths($name, $all, $vt);
@@ -457,6 +464,7 @@ sub dump_pmc {
     } # end foreach loop
     return 1;
 }
+
 
 =head2 Non-Public Methods
 
@@ -472,7 +480,7 @@ intended to be publicly callable.
 B<Purpose:>  Returns the class structure from C<$file> for a F<.dump> file.
 
 B<Arguments:>  String holding a file name.  The file is one of those provided
-by the C<arg> key of the constructor. 
+by the C<arg> key of the constructor.
 
 B<Return Values:>  C<find_and_parse_pmc()> internally calls C<parse_pmc> and directly
 returns the latter's list of two return values:  a string holding a classname
@@ -497,6 +505,7 @@ sub find_and_parse_pmc {
     my ($classname, $attributesref)  = parse_pmc($contents, $opt);
     return ($classname, $attributesref);
 }
+
 
 =head3 C<gen_parent_list()>
 
@@ -531,7 +540,7 @@ sub gen_parent_list {
     my ($self, $name, $all) = @_;
     my $class = $all->{$name};
 
-    # An interesting construction:  note below that in the course of processing 
+    # An interesting construction:  note below that in the course of processing
     # @todo, new elements can be pushed on to it.  So it's not necessarily
     # exhausted when $n is shifted off it.
     my @todo  = ($name);
@@ -554,6 +563,7 @@ sub gen_parent_list {
     }
     return $all;
 }
+
 
 =head2 Subroutines
 
@@ -598,7 +608,7 @@ sub open_file {
 
     my $action =
         ($direction eq "<")  ? "Reading"    :
-        ($direction eq ">>") ? "Appending"  : 
+        ($direction eq ">>") ? "Appending"  :
                                "Writing";
 
     print "$action $filename\n" if $verbose;
@@ -606,11 +616,12 @@ sub open_file {
     return $fh;
 }
 
+
 =head3 C<parse_pmc()>
 
     ($classname, $attributesref)  = parse_pmc($contents, $opt);
 
-B<Purpose:>  Parse PMC code and return the class name and a hash ref of 
+B<Purpose:>  Parse PMC code and return the class name and a hash ref of
 attributes.
 
 B<Arguments:>  List of two arguments:
@@ -619,7 +630,7 @@ B<Arguments:>  List of two arguments:
 
 =item *
 
-Code reference holding results of parsing PMC code found in file provided 
+Code reference holding results of parsing PMC code found in file provided
 as argument to C<find_and_parse_pmc()>.
 
 =item *
@@ -734,13 +745,14 @@ sub parse_pmc {
     };
 }
 
+
 =head3 C<parse_flags()>
 
     ($pre, $classname, $flags_ref)   = parse_flags(\$code);
 
 B<Purpose:>  Extract a class signature from the code ref.
 
-B<Argument:>  De-reference the code ref which was the first argument 
+B<Argument:>  De-reference the code ref which was the first argument
 provided to C<parse_pmc()>.
 
 B<Return Values:>  List of three elements:
@@ -749,7 +761,7 @@ B<Return Values:>  List of three elements:
 
 =item *
 
-the code found before the class signature; 
+the code found before the class signature;
 
 =item *
 
@@ -757,7 +769,7 @@ the name of the class; and
 
 =item *
 
-a hash ref containing the flags associated with the class (such as 
+a hash ref containing the flags associated with the class (such as
 C<extends> and C<does>).
 
 =back
@@ -800,14 +812,15 @@ sub parse_flags {
     return $pre, $classname, \%flags;
 }
 
+
 =head3 C<extract_balanced()>
 
     ($classblock, $post) = extract_balanced($code);
 
-B<Purpose:>  Remove a balanced C<{}> construct from the beginning of C<$code>.  
+B<Purpose:>  Remove a balanced C<{}> construct from the beginning of C<$code>.
 Return it and the remaining code.
 
-B<Argument:>  The code ref which was the first argument provided to 
+B<Argument:>  The code ref which was the first argument provided to
 C<parse_pmc()>.
 
 B<Return Values:>  List of two elements:
@@ -863,6 +876,7 @@ sub extract_balanced {
     return;
 }
 
+
 =head3 C<parse_method_attrs()>
 
     $attrs = parse_method_attrs($method_attributes);
@@ -871,7 +885,7 @@ B<Purpose:>  Parse a list of method attributes and return a hash ref of them.
 
 B<Arguments:>  String captured from regular expression.
 
-B<Return Values:>  Reference to hash of attribute values. 
+B<Return Values:>  Reference to hash of attribute values.
 
 B<Comments:>  Called within C<parse_pmc()>.
 
@@ -884,6 +898,7 @@ sub parse_method_attrs {
     return \%result;
 }
 
+
 =head3 C<dump_is_newer()>
 
     dump_is_newer($existing);
@@ -891,7 +906,7 @@ sub parse_method_attrs {
 B<Purpose:>  Determines whether the dump of a file is newer than the PMC file.
 (If it's not, then the PMC file has changed and the dump has not been updated.)
 
-B<Arguments:>  String holding filename. 
+B<Arguments:>  String holding filename.
 
 B<Return Values:>  Returns true if timestamp of existing is more recent than
 that of PMC.
@@ -912,6 +927,7 @@ sub dump_is_newer {
     $dump_dt = (stat $dumpfile)[9];
     return $dump_dt > $pmc_dt;
 }
+
 
 =head3 C<gen_super_meths()>
 
@@ -992,6 +1008,7 @@ sub gen_super_meths {
     return $class;
 }
 
+
 =head3 C<inherit_attrs()>
 
     $class = inherit_attrs($class, $meth);
@@ -1002,9 +1019,9 @@ B<Arguments:>  List of two arguments:
 
 =over 4
 
-=item *  
+=item *
 
-Reference to hash holding the data structure being built up within 
+Reference to hash holding the data structure being built up within
 C<dump_pmc()>.
 
 =item *
@@ -1036,6 +1053,7 @@ sub inherit_attrs {
     }
     return $class;
 }
+
 
 =head1 AUTHOR
 
