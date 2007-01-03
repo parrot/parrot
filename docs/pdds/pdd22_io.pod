@@ -260,6 +260,13 @@ move away from that, is there a better representation?]
 Returns a boolean status for the status object, C<true> for successful
 completion or successful work in progress, C<false> for an error.
 
+=item return
+
+  $P0 = $P1.return()
+
+Retrieves the return value of the asynchronous operation from the status
+object.
+
 =item error
 
   $P0 = $P1.error()
@@ -270,11 +277,11 @@ derived from Exception, and can be thrown from the callback. If there
 was no error, or the asynchronous operation is still running, returns a
 null PMC.
 
-=item return
+=item throw
 
-  $P0 = $P1.return()
+  $P0 = $P1.throw()
 
-Retrieves the return value of the asynchronous operation from the status
+Throw an exception from the status object if it contains an error
 object.
 
 =back
