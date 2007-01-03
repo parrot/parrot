@@ -16,6 +16,21 @@ package pirVisitor;
 .HLL 'Lua', 'lua_group'
 
 .sub '__start' :main
+  .param pmc args
+  $S0 = shift args
+  $I0 = args
+  $P0 = new .Array
+  set $P0, $I0
+  $I1 = 0
+L1:
+  unless $I1 < $I0 goto L2
+  $S0 = shift args
+  $P1 = new .LuaString
+  set $P1, $S0
+  $P0[$I1] = $P1
+  inc $I1
+  goto L1
+L2:
 #  print "start Lua\n"
 
   load_bytecode 'languages/lua/lib/luabasic.pbc'
@@ -27,7 +42,7 @@ package pirVisitor;
   load_bytecode 'languages/lua/lib/luaio.pbc'
   load_bytecode 'languages/lua/lib/luaos.pbc'
   load_bytecode 'languages/lua/lib/luadebug.pbc'
-  _main()
+  _main($P0 :flat)
 .end
 
 };

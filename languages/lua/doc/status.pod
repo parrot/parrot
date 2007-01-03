@@ -80,12 +80,6 @@ in F<languages/lua/t/closure.t> :
 
 C<y> variable is not different.
 
-=head2 TODO
-
-Handle arguments from command line.
-
-Try to use Parse::RecDescent (the original Lua uses a LL parser).
-
 =head1 Lua Types
 
 There are eight basic types in Lua, each of them is implemented by a PMC.
@@ -141,7 +135,7 @@ Weak table, weak reference.
 
 =head2 IMPROVEMENT
 
-C<table> with a mixed array and hash.
+C<table> with a mixed array and hash (and with an efficient C<next> method).
 
 =head1 Lua Standard Libraries
 

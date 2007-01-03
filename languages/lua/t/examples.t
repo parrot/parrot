@@ -21,7 +21,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'hello world' );
@@ -39,7 +39,7 @@ OUT
 language_output_like( 'lua', <<'CODE', <<'OUT', 'version' );
 print(_VERSION)
 CODE
-/Lua 5\.[01]/
+/Lua 5\.1/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'factorial (recursive)' );
@@ -68,6 +68,15 @@ end
 print(factorial(7))
 CODE
 5040
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'with args', params => "abc def"  );
+local arg = {...}
+print(#arg)
+print(...)
+CODE
+2
+abc	def
 OUT
 
 # Local Variables:

@@ -1279,6 +1279,12 @@ sub BuildMain {
             'prolog' => 1,
             'result' => $main,
         );
+        push @opcodes, new ParamDir(
+            $parser,
+            'prolog' => 1,
+            'result' => new defn( 'vararg', 'local', 'pmc' ),
+            'pragma' => ':slurpy',
+        );
         push @opcodes, @{$stat};
         push @opcodes, new EndDir($parser);
         foreach my $op (@opcodes) {

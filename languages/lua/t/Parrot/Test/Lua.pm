@@ -48,6 +48,8 @@ foreach my $func ( keys %language_test_map ) {
 
         my $count = $self->{builder}->current_test + 1;
 
+        my $params = $options{params} || q{};
+
         # flatten filenames (don't use directories)
         my $lua_test = $ENV{PARROT_LUA_TEST_PROG} || q{};
         my $lang_fn = Parrot::Test::per_test( '.lua', $count );
@@ -57,7 +59,7 @@ foreach my $func ( keys %language_test_map ) {
         my $test_prog_args = $ENV{TEST_PROG_ARGS} || q{};
         my @test_prog;
         if ( $lua_test eq 'lua' ) {
-            @test_prog = ( "$ENV{PARROT_LUA_TEST_PROG} ${test_prog_args} languages/${lang_fn}", );
+            @test_prog = ( "$ENV{PARROT_LUA_TEST_PROG} ${test_prog_args} languages/${lang_fn} $params", );
         }
         elsif ( $lua_test eq 'monkey' ) {
             @test_prog = (
@@ -75,10 +77,10 @@ foreach my $func ( keys %language_test_map ) {
         else {
             @test_prog = (
                 "perl -Ilanguages/lua languages/lua/luac.pl languages/${lang_fn}",
-                "$self->{parrot} --no-gc languages/${pir_fn}",
+                "$self->{parrot} --no-gc languages/${pir_fn} $params",
 
-                #                "$self->{parrot} languages/lua/test_lex.pir languages/${lang_fn}",
-                #                "$self->{parrot} languages/lua/luac.pir languages/${lang_fn}",
+                # "$self->{parrot} languages/lua/test_lex.pir languages/${lang_fn}",
+                # "$self->{parrot} languages/lua/luac.pir languages/${lang_fn}",
             );
         }
 
