@@ -52,6 +52,8 @@ Description of the test.
 
 =cut
 
+.const string TESTS = 'no_plan'
+
 .sub main :main
     load_bytecode 'Test/Builder.pir'
     load_bytecode 'PGE.pbc'
@@ -74,6 +76,7 @@ Description of the test.
     .local pmc test_files # values are test file names to run.
                test_files = new 'ResizablePMCArray'
 
+    # populate the list of test files
     push test_files, 'rx_metachars'
     push test_files, 'rx_backtrack'
     push test_files, 'rx_charclass'
@@ -114,91 +117,15 @@ Description of the test.
     .local string result      # expected result of this test. (y/n/...)
     .local string description # user-facing description of the test.
 
+    todo_tests = 'set_todo_info'()
+    skip_tests = 'set_skip_info'()
+
     # how many tests to run?
     # XXX: this should be summed automatically from test_files data
     #      until then, it's set to no plan
-    test.'plan'('no_plan')
+    test.'plan'(TESTS)
 
-    # set todo information
-    .local pmc todo_info
-    .local string test_file
 
-    test_file = 'rx_metachars'
-    bsr reset_todo_info
-    todo_info[78]  = 1
-    todo_info[79]  = 1
-    todo_info[81]  = 1
-    todo_info[91]  = 1
-    todo_info[92]  = 1
-    todo_info[94]  = 1
-    todo_info[95]  = 1
-    todo_info[96]  = 1
-    todo_info[101] = 1
-    todo_info[103] = 1
-    todo_info[105] = 1
-    todo_info[113] = 1
-    todo_info[114] = 1
-    todo_info[115] = 1
-    todo_info[116] = 1
-    todo_info[119] = 1
-    todo_info[120] = 1
-    todo_info[121] = 1
-    todo_tests[test_file] = todo_info
-
-    test_file = 'rx_charclass'
-    bsr reset_todo_info
-    todo_info[17] = 1
-    todo_tests[test_file] = todo_info
-
-    test_file = 'rx_subrules'
-    bsr reset_todo_info
-    todo_info[29] = 1
-    todo_info[30] = 1
-    todo_info[31] = 1
-    todo_info[40] = 1
-    todo_tests[test_file] = todo_info
-
-    test_file = 'rx_captures'
-    bsr reset_todo_info
-    todo_info[14] = 1
-    todo_info[15] = 1
-    todo_info[16] = 1
-    todo_info[38] = 1
-    todo_info[39] = 1
-    todo_info[40] = 1
-    todo_tests[test_file] = todo_info
-
-    test_file = 'rx_modifiers'
-    bsr reset_todo_info
-    todo_info[86] = 1
-    todo_info[91] = 1
-    todo_info[96] = 1
-    todo_info[97] = 1
-    todo_tests[test_file] = todo_info
-
-    branch set_skip
-
-  reset_todo_info:
-    todo_info = new .Hash
-    ret
-
-  set_skip:
-    # set skip information
-    .local pmc skip_info
-
-    if has_icu goto done_icu
-
-    test_file = 'rx_metachars'
-    bsr reset_skip_info
-    # skip_info[121] = 'no ICU'
-    # skip_tests[test_file] = skip_info
-    branch done_icu
-
-  reset_skip_info:
-    skip_info = new .Hash
-    ret
-
-  done_icu:
   outer_loop:
     unless file_iterator goto end_outer_loop
     .local string test_name
@@ -374,6 +301,120 @@ Description of the test.
 
 .end
 
+
+# set todo information
+.sub 'set_todo_info'
+    .local pmc todo_tests # keys indicate test file; values test number
+               todo_tests = new 'Hash'
+
+    .local pmc todo_info
+               todo_info = new 'Hash'
+
+    .local string test_file
+
+    test_file = 'rx_metachars'
+    bsr reset_todo_info
+    todo_info[78]  = 1
+    todo_info[79]  = 1
+    todo_info[81]  = 1
+    todo_info[91]  = 1
+    todo_info[92]  = 1
+    todo_info[94]  = 1
+    todo_info[95]  = 1
+    todo_info[96]  = 1
+    todo_info[101] = 1
+    todo_info[103] = 1
+    todo_info[105] = 1
+    todo_info[113] = 1
+    todo_info[114] = 1
+    todo_info[115] = 1
+    todo_info[116] = 1
+    todo_info[119] = 1
+    todo_info[120] = 1
+    todo_info[121] = 1
+    todo_tests[test_file] = todo_info
+
+    test_file = 'rx_charclass'
+    bsr reset_todo_info
+    todo_info[17] = 1
+    todo_tests[test_file] = todo_info
+
+    test_file = 'rx_subrules'
+    bsr reset_todo_info
+    todo_info[29] = 1
+    todo_info[30] = 1
+    todo_info[31] = 1
+    todo_info[40] = 1
+    todo_tests[test_file] = todo_info
+
+    test_file = 'rx_captures'
+    bsr reset_todo_info
+    todo_info[14] = 1
+    todo_info[15] = 1
+    todo_info[16] = 1
+    todo_info[38] = 1
+    todo_info[39] = 1
+    todo_info[40] = 1
+    todo_tests[test_file] = todo_info
+
+    test_file = 'rx_modifiers'
+    bsr reset_todo_info
+    todo_info[86] = 1
+    todo_info[91] = 1
+    todo_info[96] = 1
+    todo_info[97] = 1
+    todo_tests[test_file] = todo_info
+    .return (todo_tests)
+
+  reset_todo_info:
+    todo_info = new .Hash
+    ret
+
+  set_todo_loop:
+    if $I0 > $I1 goto end_loop
+    todo_info[$I0] = 1
+    $I0 += 1
+    goto set_todo_loop
+  end_loop:
+    ret
+.end
+
+
+# set skip information
+.sub 'set_skip_info'
+    .local pmc skip_tests # keys indicate test file; values test number
+               skip_tests = new 'Hash'
+
+    .local pmc skip_info
+               skip_info = new 'Hash'
+
+    .local string test_file
+
+    # test_file = 'rx_metachars'
+    # bsr reset_skip_info
+    # skip_info[121] = 'no ICU'
+    # skip_tests[test_file] = skip_info
+
+    .return (skip_tests)
+
+  reset_skip_info:
+    skip_info = new .Hash
+    ret
+
+  set_skip_loop:
+    if $I0 > $I1 goto end_loop
+    if $S0 != '' goto set_skip_info
+    $S0 = 'unknown reason'
+  set_skip_info:
+    skip_info[$I0] = $S0
+    $I0 += 1
+    goto set_skip_loop
+  end_loop:
+    $S0 = ''
+    ret
+.end
+
+
 # given a 2 digit string, convert to appropriate chr() value.
 .sub hex_chr
     .param string hex
@@ -391,6 +432,7 @@ Description of the test.
 
     .return ($S2)
 .end
+
 
 # given a single digit hex value, return it's int value.
 .sub hex_val
@@ -417,6 +459,7 @@ bad_digit:
   $P1[0] = 'invalid hex digit'
   throw $P1
 .end
+
 
 .sub backslash_escape
     .param string target
