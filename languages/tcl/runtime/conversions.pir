@@ -533,7 +533,8 @@ throw an exception.
     push_eh error
       value = __number(value)
     clear_eh
-    .return(value)
+    if value goto true
+    goto false
 
 error:
     $S0 = value

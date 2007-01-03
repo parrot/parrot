@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 249
+plan 254
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -173,6 +173,12 @@ foreach operator $logic_ops_list {
     {expected boolean value but got ""} \
     "string $operator" 
 }
+
+is [expr bool(4)]       1 {bool - true}
+is [expr bool("yes")]   1 {bool - yes}
+is [expr bool(0)]       0 {bool - false}
+is [expr bool("no")]    0 {bool - no}
+eval_is {expr bool("foo")} {expected boolean value but got "foo"} {bool - bad value}
 
 set TODO {TODO "correct precision"}
 

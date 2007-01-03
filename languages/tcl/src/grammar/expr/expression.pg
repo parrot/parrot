@@ -114,9 +114,9 @@ token integer { (<[+\-]>)? [ <decimal> | <binary> | <hex> | <octal> ] }
 token nullary_function { rand }
 
 token unary_function { 
- abs    | acos   | asin      | atan   | ceil   | cosh?  | double | exp    |
- floor  | int    | log[10]?  | round  | sinh?  | sqrt   | srand  | tanh?  |
- wide
+ abs    | acos   | asin      | atan   | bool   | ceil   | cosh?  | double |
+ exp    | floor  | int    | log[10]?  | round  | sinh?  | sqrt   | srand  |
+ tanh?  | wide
 }
 
 token binary_function { atan2 | fmod | hypot | pow }

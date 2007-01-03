@@ -113,6 +113,12 @@ is_string:
 .end
 
 .sub '&bool'
+    .param pmc a
+
+    .local pmc __boolean
+    __boolean = get_root_global ['_tcl'], '__boolean'
+
+    .return __boolean(a)
 .end
 
 .sub '&ceil'
