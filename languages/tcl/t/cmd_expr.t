@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 264
+plan 265
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -87,6 +87,7 @@ eval_is {expr {1 ? 14 : [expr {}]}} 14 \
 # numification
 is [expr {"foo"}] foo {non-numeric string}
 is [expr {"0001234"}] 668 {string octal}
+is [expr {"0o1234"}]  668 {string 0o octal}
 set j 0001234
 is [expr {$j}] 668 {variable octal}
 

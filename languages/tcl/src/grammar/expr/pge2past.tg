@@ -430,16 +430,13 @@ transform past (integer) {
     .return(past)
  
   octal: 
-     $S0 = node
+     $S0 = $P0[0]
+     say $S0
 
-    .local int octal_value
-    .local int octal_digit
-    .local int octal_counter
-    .local int octal_length
-    octal_length = length $S0
-    octal_counter = 1 #skip the first 0
-    dec octal_counter
-    octal_value = 0
+    .local int octal_value, octal_digit, octal_counter, octal_length
+    octal_length  = length $S0
+    octal_counter = 0
+    octal_value   = 0
     # at this point, string should consist only of digits 0-7
   octal_loop:
     if octal_counter == octal_length goto octal_done # skip first 0
