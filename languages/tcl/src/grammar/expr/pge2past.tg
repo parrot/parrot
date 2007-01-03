@@ -431,7 +431,6 @@ transform past (integer) {
  
   octal: 
      $S0 = $P0[0]
-     say $S0
 
     .local int octal_value, octal_digit, octal_counter, octal_length
     octal_length  = length $S0
