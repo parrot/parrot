@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 254
+plan 260
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -53,6 +53,7 @@ is [expr {!!"2"}]  1 {double unary !}
 # simple unary ops  - octal
 
 # simple binary ops - integer
+is [expr 2 ** 3]   8 {pow}
 is [expr 2 * 3]    6 {mul}
 is [expr 6 / 2]    3 {times}
 is [expr 3 % 2]    1 {remainder}
@@ -88,6 +89,8 @@ is [expr {$j}] 668 {variable octal}
 # simple binary ops - stringified integers
 # RT#40620: any eval_is's in this section are written that way because the 
 # test errors wrongly.
+is [expr {2 ** "3"}]   8 {pow "}
+is [expr {"2" ** 3}]   8 {pow "}
 is [expr {2 * "3"}]    6 {mul "}
 is [expr {"2" * 3}]    6 {mul "}
 is [expr {6 / "2"}]    3 {times "}
@@ -153,7 +156,7 @@ foreach operator $ops_list {
 }
 
 # invalid (string) operands for some binary ops
-set ops_list [list * / % + - << >> & | ^]
+set ops_list [list ** * / % + - << >> & | ^]
 foreach operator $ops_list {
   eval_is "expr {\"a\" $operator \"b\"}" \
     "can't use non-numeric string as operand of \"$operator\"" \

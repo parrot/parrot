@@ -148,7 +148,31 @@ empty_string:
     .return($P0)
 .end
 
-.sub 'infix:*'  
+.sub 'infix:**'
+    .param pmc a
+    .param pmc b
+
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      a = __number(a)
+      b = __number(b)
+      $P0 = new 'TclFloat'
+      $P0 = pow a, b
+    clear_eh
+    .return ($P0)
+
+is_string:
+    if a == '' goto empty_string
+    if b == '' goto empty_string
+    tcl_error "can't use non-numeric string as operand of \"**\""
+
+empty_string:
+    tcl_error "can't use empty string as operand of \"**\""
+.end
+
+.sub 'infix:*'
     .param pmc a
     .param pmc b
 
