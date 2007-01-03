@@ -12,7 +12,7 @@ t/coroutine.t - Lua coroutines
 
 =head1 DESCRIPTION
 
-See "Lua 5.0 Reference Manual", section 2.10 "Coroutines".
+See "Lua 5.1 Reference Manual", section 2.11 "Coroutines".
 
 See "Programming in Lua", section 9 "Coroutines".
 

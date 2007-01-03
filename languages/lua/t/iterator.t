@@ -27,7 +27,7 @@ use Test::More;
 language_output_is( 'lua', <<'CODE', <<'OUT', 'list_iter' );
 function list_iter (t)
     local i = 0
-    local n = table.getn(t)
+    local n = #t
     return function ()
                i = i + 1
                if i <= n then

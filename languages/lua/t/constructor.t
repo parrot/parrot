@@ -12,7 +12,7 @@ t/constructor.t - Lua Table Constructors
 
 =head1 DESCRIPTION
 
-See "Lua 5.0 Reference Manual", section 2.5.6 "Table Constructors".
+See "Lua 5.1 Reference Manual", section 2.5.7 "Table Constructors".
 
 See "Programming in Lua", section 3.6 "Table Constructors".
 

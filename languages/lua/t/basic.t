@@ -15,6 +15,8 @@ t/basic.t - Lua Basic Library
 Tests Lua Basic Library
 (implemented in F<languages/lua/lib/luabasic.pir>).
 
+See "Lua 5.1 Reference Manual", section 5.1 "Basic Functions".
+
 =cut
 
 use strict;

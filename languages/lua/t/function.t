@@ -12,7 +12,7 @@ t/function.t - Lua functions
 
 =head1 DESCRIPTION
 
-See "Lua 5.0 Reference Manual", section 2.5.8 "Function Definitions".
+See "Lua 5.1 Reference Manual", section 2.5.9 "Function Definitions".
 
 See "Programming in Lua", section 5 "Functions".
 
@@ -113,8 +113,7 @@ OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'call by ref' );
 function f (t)
-    local n = table.getn(t)
-    t[n+1] = "end"
+    t[#t+1] = "end"
     return t
 end
 

@@ -12,7 +12,7 @@ t/fornum.t - Lua for statement
 
 =head1 DESCRIPTION
 
-See "Lua 5.0 Reference Manual", section 2.4.4 "Control Structures".
+See "Lua 5.1 Reference Manual", section 2.4.5 "For Statement".
 
 See "Programming in Lua", section 4.3 "Control Structures".
 

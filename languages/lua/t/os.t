@@ -15,6 +15,10 @@ t/os.t - Lua Operating System Library
 Tests Lua Operating System Library
 (implemented in F<languages/lua/lib/luaos.pir>).
 
+See "Lua 5.1 Reference Manual", section 5.8 "Operating System Facilities".
+
+See "Programming in Lua", section 22 "The Operating System Library".
+
 =cut
 
 use strict;

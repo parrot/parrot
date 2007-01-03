@@ -12,7 +12,7 @@ t/repeat.t - Lua repeat statement
 
 =head1 DESCRIPTION
 
-See "Lua 5.0 Reference Manual", section 2.4.4 "Control Structures".
+See "Lua 5.1 Reference Manual", section 2.4.4 "Control Structures".
 
 See "Programming in Lua", section 4.3 "Control Structures".
 

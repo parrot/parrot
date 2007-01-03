@@ -12,7 +12,7 @@ t/scope.t - Lua scope
 
 =head1 DESCRIPTION
 
-See "Lua 5.0 Reference Manual", section 2.6 "Visibility Rules".
+See "Lua 5.1 Reference Manual", section 2.6 "Visibility Rules".
 
 See "Programming in Lua", section 4.2 "Local Variables and Blocks".
 

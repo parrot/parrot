@@ -12,7 +12,7 @@ t/expr.t - Lua expression
 
 =head1 DESCRIPTION
 
-See "Lua 5.0 Reference Manual", section 2.5 "Expressions".
+See "Lua 5.1 Reference Manual", section 2.5 "Expressions".
 
 See "Programming in Lua", section 3 "Expressions".
 
@@ -23,8 +23,15 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 use Test::More;
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'modulo' );
+x = math.pi
+print(x - x%0.01)
+CODE
+3.14
+OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'relational op (by reference)' );
 a = {}; a.x = 1; a.y = 0;
