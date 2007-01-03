@@ -157,44 +157,13 @@ Description of the test.
     inc test_number
     inc local_test_number
 
-    # NOTE: there can be multiple tabs between entries, so skip until
-    # we have something.
-    $P1 = split "\t", test_line
-    $I0 = elements $P1 # length of array
-    .local int tab_number
-    tab_number = 0
-  get_pattern:
-    if tab_number >= $I0 goto bad_line
-    pattern     = $P1[tab_number]
-    inc tab_number
-    if pattern == '' goto get_pattern
-  get_target:
-    if tab_number >= $I0 goto bad_line
-    target      = $P1[tab_number]
-    inc tab_number
-    if target == '' goto get_target
-  get_result:
-    if tab_number >= $I0 goto bad_line
-    result      = $P1[tab_number]
-    inc tab_number
-    if result == '' goto get_result
-  get_description:
-    if tab_number >= $I0 goto bad_line
-    description = $P1[tab_number]
-    inc tab_number
-    if description == '' goto get_description
-
-    # chop (description)
-    substr description, -1, 1, ''
+  parse_data:
+    push_eh eh_bad_line
+    ( pattern, target, result, description ) = parse_data( test_line )
+    clear_eh
 
     # prepend test filename and line number to description
-    $S0  = '['
-    $S0 .= test_name
-    $S0 .= ':'
-    $S1 = local_test_number
-    $S0 .= $S1
-    $S0 .= '] '
-    description = concat $S0, description
+    description = 'build_test_desc'( description, test_name, local_test_number )
 
     if target != "''" goto got_target
     target = ''
@@ -298,7 +267,10 @@ Description of the test.
     $S0 = "Test not formatted properly!"
     test.'ok'(0, $S0)
     goto loop
-
+  eh_bad_line:
+    $S0 = "Test not formatted properly!"
+    test.'ok'(0, $S0)
+    goto loop
 .end
 
 
@@ -412,6 +384,73 @@ Description of the test.
   end_loop:
     $S0 = ''
     ret
+.end
+
+
+.sub 'parse_data'
+    .param string test_line   # the data record
+
+    .local pmc rule           # the rule
+    .local pmc match          # the match
+    .local string pattern     # the regexp
+    .local string target      # this string to match against the regex
+    .local string result      # expected result of this test. (y/n/...)
+    .local string description # user-facing description of the test.
+
+    # NOTE: there can be multiple tabs between entries, so skip until
+    # we have something.
+    # remove the trailing newline from record
+    chopn test_line, 1
+
+    $P1 = split "\t", test_line
+    $I0 = elements $P1 # length of array
+    .local int tab_number
+               tab_number = 0
+  get_pattern:
+    if tab_number >= $I0 goto bad_line
+    pattern     = $P1[tab_number]
+    inc tab_number
+    if pattern == '' goto get_pattern
+  get_target:
+    if tab_number >= $I0 goto bad_line
+    target      = $P1[tab_number]
+    inc tab_number
+    if target == '' goto get_target
+  get_result:
+    if tab_number >= $I0 goto bad_line
+    result      = $P1[tab_number]
+    inc tab_number
+    if result == '' goto get_result
+  get_description:
+    if tab_number >= $I0 goto bad_line
+    description = $P1[tab_number]
+    inc tab_number
+    if description == '' goto get_description
+
+  return:
+    .return ( pattern, target, result, description )
+
+  bad_line:
+      $P1 = new 'Exception'
+      $P1[0] = 'invalid data format'
+      throw $P1
+.end
+
+
+.sub 'build_test_desc'
+    .param string desc
+    .param string test_name
+    .param string local_test_number
+
+    $S0  = '['
+    $S0 .= test_name
+    $S0 .= ':'
+    $S0 .= local_test_number
+    $S0 .= '] '
+
+    desc = concat $S0, desc
+
+    .return (desc)
 .end
 
 
