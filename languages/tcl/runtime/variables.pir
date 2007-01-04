@@ -269,7 +269,11 @@ Gets the actual variable from memory and returns it.
   .local pmc value, ns
   ns = new .ResizableStringArray
 
+  .local int absolute
+  absolute = 0
+
   $I0 = index name, '::'
+  if $I0 == 0  goto absolute_global
   if $I0 != -1 goto global_var
   if isglobal  goto global_var
 
@@ -282,7 +286,7 @@ Gets the actual variable from memory and returns it.
   name = '$' . name
 
   .local pmc lexpad, variable
-  push_eh notfound
+  push_eh lexical_notfound
     lexpad     = call_chain[-1]
     value      = lexpad[name]
   clear_eh
@@ -299,23 +303,47 @@ args_check:
   value = lexpad['args']
   .return(value)
 
+absolute_global:
+  absolute = 1
 global_var:
   depth += 2
   ns = __namespace(name, depth)
-  name = pop ns
-  name = '$' . name
+  $S0 = pop ns
+  $S0 = '$' . $S0
 
   unshift ns, 'tcl'
   ns = get_root_namespace ns
   if null ns goto notfound
 
-  value = ns[name]
+  value = ns[$S0]
+  if null value goto notfound
+  $I0 = isa value, 'Undef'
+  if $I0 goto notfound
+  goto found
+
+root_global_var:
+  absolute = 1
+  .local pmc colons, split
+  colons = get_root_global ['_tcl'], 'colons'
+  split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
+
+  ns  = split(colons, name)
+  $S0 = pop ns
+  $S0 = '$' . $S0
+
+  unshift ns, 'tcl'
+  ns = get_root_namespace ns
+  if null ns goto notfound
+
+  value = ns[$S0]
   if null value goto found
   $I0 = isa value, 'Undef'
   if $I0 goto notfound
   goto found
 
 notfound:
+  unless absolute goto root_global_var
+lexical_notfound:
   null value
 found:
   .return(value)

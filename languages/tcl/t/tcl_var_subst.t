@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 20
+plan 22
 
 eval_is {
   catch {unset a}
@@ -134,3 +134,13 @@ eval_is {
   set x foo
   $x\::bar
 } ok {namespace variable with escaped colon}
+
+
+namespace eval foo {
+    variable y 7
+}
+set x 5
+namespace eval test {
+    is [set foo::y] 7 {foo::y relative}
+    is [set x]      5 {x relative}
+}
