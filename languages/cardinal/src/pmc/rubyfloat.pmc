@@ -17,7 +17,6 @@
 
 pmclass RubyFloat
         extends Float
-        extends RubyObject
         does float
         dynpmc
         group ruby_group

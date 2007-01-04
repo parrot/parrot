@@ -13,7 +13,6 @@
 
 pmclass RubyInteger
         extends Integer
-        extends RubyObject
         does integer
         dynpmc
         group ruby_group

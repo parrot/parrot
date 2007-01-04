@@ -31,7 +31,6 @@ This is the Hash PMC for the Ruby implementation.
 
 pmclass RubyHash
         extends Hash
-        extends RubyObject
         does hash
         need_ext
         dynpmc

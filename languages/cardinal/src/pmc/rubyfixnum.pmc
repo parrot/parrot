@@ -13,7 +13,6 @@
 
 pmclass RubyFixnum
         extends Integer
-        extends RubyObject
         does integer
         dynpmc
         group ruby_group
@@ -23,7 +22,6 @@ pmclass RubyFixnum
     METHOD PMC* interpret() {
         return SELF;
     }
-
 }
 
 

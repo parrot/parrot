@@ -1,4 +1,5 @@
-.HLL 'Ruby', 'ruby_group'
+.HLL 'parrot', ''
+#.HLL 'Ruby', 'ruby_group'
 
 .namespace [ 'RubyClass' ]
 
@@ -15,7 +16,30 @@
 .end
 
 .sub 'new' :method
-    .param pmc args :slurpy
-    $P0 = new 'RubyObject'
+  .param pmc args :slurpy
+    $I0 = typeof self
+    $P0 = new $I0
+    print "13\n"
+    $P0.'initialize'()
+    print "14\n"
     .return ($P0)
 .end
+
+#cardinal specific
+.sub '_store_instance_var' :method
+  .param string name
+  .param pmc value
+  print self
+  print " "
+  print name
+  print " "
+  print value
+  print "\n"
+  $I0 = classoffset self, name
+  unless $I0 > 0 goto exists
+  addattribute self, name
+exists:
+  setattribute self, name, value
+  .return ()
+.end
+  

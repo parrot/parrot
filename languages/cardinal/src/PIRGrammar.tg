@@ -67,6 +67,8 @@ transform pir (Cardinal::POST::Var) :language('PIR') {
     if scope == 'lexical' goto generate_lexical
     if scope == 'parameter' goto generate_parameter
     if scope == 'global' goto generate_global
+    if scope == 'instance' goto generate_instance
+    if scope == 'class' goto generate_class
     goto generate_find
 
   generate_parameter:
@@ -89,6 +91,15 @@ transform pir (Cardinal::POST::Var) :language('PIR') {
   generate_find:
     if islvalue goto end
     code.'emit'("    %0 = find_name '%1'", value, name)
+    goto end
+  generate_instance:
+    if islvalue goto end
+    code.'emit'("    %0 = getattribute self, '%1'", value, name)
+    goto end
+  generate_class:
+    if islvalue goto end
+    code.'emit'("    %0 = self.'_get_class_var'('%1')", value, name)
+    goto end
   end:
     .return (code)
 }
@@ -131,11 +142,19 @@ transform pir (Cardinal::POST::Assign) :language('PIR') {
     if scope == 'outerpackage' goto store_package
     if scope == 'package' goto store_package
     if scope == 'global' goto store_package
+    if scope == 'instance' goto store_instance
+    if scope == 'class' goto store_class
   store_lexical:
     code.'emit'("    store_lex '%0', %1", name, rvalue)
     .return (code)
   store_package:
     code.'emit'("    set_hll_global '%0', %1", name, rvalue)
+    .return (code)
+  store_instance:
+    code.'emit'("    self.'_store_instance_var'('%0', %1) ", name, rvalue)
+    .return (code)
+  store_class:
+    code.'emit'("    self.'_store_class_var'('%0', %1)", name, rvalue)
     .return (code)
 }
 

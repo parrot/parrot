@@ -13,7 +13,6 @@
 
 pmclass RubyBignum
         extends BigInt
-        extends RubyObject
         dynpmc
         group ruby_group
         hll Ruby
@@ -22,7 +21,6 @@ pmclass RubyBignum
     METHOD PMC* interpret() {
         return SELF;
     }
-
 }
 
 

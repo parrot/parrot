@@ -49,7 +49,7 @@ Commands
 EOF
 }
 
-sub trace { $TRACE_ARGS = "-t 5"; execute(); }
+sub trace { $TRACE_ARGS = "-t 4"; execute(); }
 sub debug { $DEBUG_FLAGS = "-d"; execute(); }
 sub debug2 { $DEBUG_FLAGS = "-a -o -i -s -e"; execute(); }
 
