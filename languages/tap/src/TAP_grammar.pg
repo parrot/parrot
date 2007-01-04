@@ -19,7 +19,7 @@ token description { <after \h> <-[#\n]>+ }
 token directive   { <after \h> <'# '> [:i todo | skip ] \N* }
 token comment     { <'#'> \N* \n }
 
-=for comment
+=pod
 
 ## Ovid's TAP grammar, original
 digit              ::= [:digit:]
