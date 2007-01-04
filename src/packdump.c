@@ -131,8 +131,17 @@ PackFile_Constant_dump(Interp *interp,
                                 null
                             );
                     break;
+                case enum_class_FixedIntegerArray:
+                    PIO_printf(interp,
+                            "\tclass => %Ss,\n"
+                            "\trepr => '%Ss'\n",
+                            pmc->vtable->whoami,
+                            VTABLE_get_repr(interp, pmc)
+                            );
+                    break;
                 default:
                     PIO_printf(interp, "\tunknown PMC\n");
+                    PIO_printf(interp, "\tclass => %Ss,\n", pmc->vtable->whoami);
             }
         }
         PIO_printf(interp, "    } ],\n");
