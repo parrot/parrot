@@ -1,0 +1,21 @@
+# Copyright (C) 2003-2006, The Perl Foundation.
+# $Id$
+README for directory t/tools/pmc2cutils/
+
+This directory contains test code for Parrot::Pmc2c::Utils, a Perl5
+module whose publicly callable methods and other subroutines supply
+functionality for Parrot build tool 'pmc2c.pl'.
+
+Since 'pmc2c.pl' is invoked many times during 'make', tests of its
+functionality can give meaningful results only if you run them
+when your file system beneath the top-level Parrot directory is in
+a 'pre-make' state, i.e., you have run 'perl Configure.pl' but
+have *not* yet run 'make'.  These tests should pass if run at
+that point in the build process, but some will necessarily fail
+if 'make' has already been executed.  Hence, they should not be
+included in the set of tests run by 'make test'.
+
+In short, these are tests of Parrot::Pmc2c::Utils but are *not*
+tests of Parrot itself.
+
+
