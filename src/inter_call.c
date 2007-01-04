@@ -266,7 +266,6 @@ fetch_arg_pmc_op(Interp *interp, struct call_state *st)
                         "argument doesn't array");
             }
         }
-flatten:
         make_flattened(interp, st, p_arg);
         return;
     }
