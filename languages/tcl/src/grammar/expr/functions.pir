@@ -211,6 +211,25 @@ is_string:
 .end
 
 .sub '&entier'
+    .param pmc n
+
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      n = __number(n)
+    clear_eh
+
+    .local pmc ret
+    ret = new .TclInt
+    assign ret, n
+    .return(ret)
+
+is_string:
+    $S0 = n
+    $S0 = 'expected number but got "' . $S0
+    $S0 .= '"'
+    tcl_error $S0
 .end
 
 .sub '&exp'

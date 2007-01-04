@@ -34,8 +34,7 @@ empty_string:
 
 .sub 'prefix:+' :multi(pmc)
     .param pmc a
-    $N0 = a
-    .return ($N0)
+    .return(a)
 .end
 
 # unary minus
@@ -80,9 +79,15 @@ empty_string:
       a = __number(a)
     clear_eh
 
+    $I0 = typeof a
+    if $I0 == .TclFloat goto cant_use_float
+
     $I0 = a
     $I0 = bnot $I0
     .return($I0)
+
+cant_use_float:
+    tcl_error "can't use floating-point value as operand of \"~\""
 
 is_string:
     if a == '' goto empty_string
@@ -90,6 +95,10 @@ is_string:
 
 empty_string:
     tcl_error "can't use empty string as operand of \"~\""
+.end
+
+.sub 'prefix:~' :multi(Float)
+    tcl_error "can't use floating-point value as operand of \"~\""
 .end
 
 .sub 'prefix:~' :multi(pmc)
@@ -158,9 +167,10 @@ empty_string:
     push_eh is_string
       a = __number(a)
       b = __number(b)
-      $P0 = new 'TclFloat'
-      $P0 = pow a, b
     clear_eh
+
+    $P0 = new 'TclFloat'
+    $P0 = pow a, b
     .return ($P0)
 
 is_string:
@@ -206,10 +216,16 @@ empty_string:
     push_eh is_string
       a = __number(a)
       b = __number(b)
-      $P0 = new 'TclFloat'
-      $P0 = div a, b
     clear_eh
+
+    if b == 0 goto divide_by_zero
+
+    $P0 = new 'TclFloat'
+    $P0 = div a, b
     .return($P0)
+
+divide_by_zero:
+    tcl_error 'divide by zero'
 
 is_string:
     if a == '' goto empty_string

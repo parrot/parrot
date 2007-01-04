@@ -25,7 +25,11 @@
   expr = join ' ', argv
 
 loop_done:
-  $P1 = __expr(expr)
+  .local pmc ns
+  $P0 = getinterp
+  ns  = $P0['namespace'; 1]
+
+  $P1 = __expr(expr, 'ns'=>ns)
   $P2 = $P1()
   .return ($P2)
 

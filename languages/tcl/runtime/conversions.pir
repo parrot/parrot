@@ -520,12 +520,22 @@ throw an exception.
     if lc == '1' goto true
     if lc == '0' goto false
     if lc == 'true'  goto true
+    if lc == 'tru'   goto true
+    if lc == 'tr'    goto true
+    if lc == 't'     goto true
     if lc == 'false' goto false
-    if lc == 'yes' goto true
-    if lc == 'no'  goto false
-    if lc == 'on'  goto true
-    if lc == 'off' goto false
-
+    if lc == 'fals'  goto false
+    if lc == 'fal'   goto false
+    if lc == 'fa'    goto false
+    if lc == 'f'     goto false
+    if lc == 'yes'   goto true
+    if lc == 'ye'    goto true
+    if lc == 'y'     goto true
+    if lc == 'no'    goto false
+    if lc == 'n'     goto false
+    if lc == 'on'    goto true
+    if lc == 'off'   goto false
+    if lc == 'of'    goto false
 
     .local pmc __number
     __number = get_hll_global '__number'

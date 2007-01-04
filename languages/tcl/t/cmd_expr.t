@@ -7,7 +7,11 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 265
+plan 285
+
+# namespace
+namespace eval test { variable x 5 }
+is [namespace eval test {expr {$x}}] 5 {correct namespace}
 
 # simple scalars
 is [expr 42]     42   {int}
@@ -20,12 +24,27 @@ eval_is {expr 2e17}  2e+17 {scientific in, scientific out}
 eval_is {expr 3e2.0} \
  {syntax error in expression "3e2.0": extra tokens at end of expression} \
  {can only e with an integer exponent}
-is [expr TrUe]  TrUe  {true}
-is [expr FaLsE] FaLsE {false}
-is [expr On]    On    {on}
-is [expr OfF]   OfF   {off}
-is [expr YeS]   YeS   {yes}
-is [expr No]    No    {no}
+
+# booleans
+is [expr TrUe]    TrUe  {true}
+is [expr !!TrUe]  1  {true}
+is [expr !!TrU]   1  {tru}
+is [expr !!Tr]    1  {tr}
+is [expr !!T]     1  {t}
+is [expr !!FaLsE] 0  {false}
+is [expr !!FaLs]  0  {fals}
+is [expr !!FaL]   0  {fal}
+is [expr !!Fa]    0  {fa}
+is [expr !!F]     0  {f}
+is [expr !!On]    1  {on}
+is [expr !!OfF]   0  {off}
+is [expr !!Of]    0  {of}
+is [expr !!YeS]   1  {yes}
+is [expr !!Ye]    1  {ye}
+is [expr !!Y]     1  {y}
+is [expr !!No]    0  {no}
+is [expr !!N]     0  {n}
+
 eval_is {expr trues}  \
  {syntax error in expression "trues": the word "trues" requires a preceding $ if it's a variable or function arguments if it's a function} \
  {trues}
@@ -40,12 +59,13 @@ eval_is {expr 0b101010} 42 {binary}
 eval_is {expr {}} {syntax error in expression "": premature end of expression}
 
 # simple unary ops.
-is [expr -2]   -2 {unary -}
-is [expr +2]    2 {unary +}
-is [expr ~0]   -1 {unary ~}
-is [expr !2]    0 {unary !}
-is [expr !true] 0 {unary ! - boolean}
-is [expr !!2]   1 {double unary !}
+is [expr -2]   -2   {unary -}
+is [expr +2]    2   {unary +}
+is [expr +2.0]  2.0 {unary + (float)}
+is [expr ~0]   -1   {unary ~}
+is [expr !2]    0   {unary !}
+is [expr !true] 0   {unary ! - boolean}
+is [expr !!2]   1   {double unary !}
 
 # simple unary ops - stringified args
 is [expr {-"2"}]  -2 {unary -}
@@ -187,6 +207,7 @@ is [expr bool("yes")]   1 {bool - yes}
 is [expr bool(0)]       0 {bool - false}
 is [expr bool("no")]    0 {bool - no}
 eval_is {expr bool("foo")} {expected boolean value but got "foo"} {bool - bad value}
+eval_is {expr entier("foo")} {expected number but got "foo"} {entier - bad value}
 
 set TODO {TODO "correct precision"}
 
@@ -204,6 +225,8 @@ is [expr ceil(-1.6)]   -1.0
 is [expr cos(0)]        1.0
 is [expr cosh(1)]       1.5430806348152437 {} $TODO
 is [expr double(5)]     5.0
+is [expr entier(3)]     3
+is [expr entier(3.5)]   3
 is [expr exp(1)]        2.718281828459045
 is [expr fmod(3,2)]     1.0
 is [expr fmod(-4, -1)] -0.0 {} $TODO
@@ -238,6 +261,7 @@ is [expr ceil("-1.6")]   -1.0
 is [expr cos("0")]        1.0
 is [expr cosh("1")]       1.5430806348152437 {} $TODO
 is [expr double("5")]     5.0
+is [expr entier("3.4")]   3
 is [expr exp("1")]        2.718281828459045
 is [expr fmod("3",2)]     1.0
 is [expr fmod(3,"2")]     1.0
@@ -268,6 +292,8 @@ foreach function $function_list {
     {expected floating-point number but got "a"} \
     "string $function"
 }
+eval_is {expr {~2.0}} {can't use floating-point value as operand of "~"} \
+  {can't use floating-point value as operand of "~"}
 
 # test namespaces with operators
 is [namespace eval lib {if {+2} {}}] {} {[expr] in a namespace}
@@ -287,6 +313,8 @@ eval_is {expr sin(inf)} \
 eval_is {expr inf/0} Inf {infinity trumps div by 0} $TODO
 eval_is {expr 0/inf} 0.0 {div by infinity} $TODO
 eval_is {expr 0 < inf} 1 {infinite comparison} $TODO
+
+eval_is {expr 3/0} {divide by zero} {divide by zero}
 
 
 # not a number tests.

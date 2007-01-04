@@ -93,7 +93,15 @@ token term {
 
 ## used by term
 
-rule boolean { (:i true | false | yes | no | on | off ) <?wb> }
+rule boolean {
+    (:i true  | tru  | tr  | t
+      | false | fals | fal | fa | f
+      | yes   | ye   | y
+      | no    | n
+      | on
+      | off   | of )
+    <?wb>
+}
 
 rule nested { \( <expression> \) }
 
@@ -114,9 +122,9 @@ token integer { (<[+\-]>)? [ <binary> | <hex> | <octal> | <decimal>] }
 token nullary_function { rand }
 
 token unary_function { 
- abs    | acos   | asin      | atan   | bool   | ceil   | cosh?  | double |
- exp    | floor  | int    | log[10]?  | round  | sinh?  | sqrt   | srand  |
- tanh?  | wide
+ abs    | acos   | asin  | atan   | bool      | ceil   | cosh?  | double |
+ entier | exp    | floor | int    | log[10]?  | round  | sinh?  | sqrt   |
+ srand  | tanh?  | wide
 }
 
 token binary_function { atan2 | fmod | hypot | pow }

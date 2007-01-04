@@ -10,6 +10,7 @@ parse.pir - Parsing support subroutines for [expr]
     .param pmc adverbs :named :slurpy
 
     $S0 = mob
+    $S0 = '0' . $S0
     $S0 = 'expected integer but got "' . $S0
     $S0 = $S0 . '" (looks like invalid octal number)'
     
