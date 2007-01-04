@@ -23,9 +23,7 @@ sub runstep {
         $libs .= ' -lpthread';
     }
     my $ld_share_flags = $conf->data->get('ld_share_flags');
-    if ( $ld_share_flags !~ /-fPIC/ ) {
-        $ld_share_flags .= ' -fPIC';
-    }
+    my $cc_shared = $conf->data->get( 'cc_shared' );
 
     if ( $cc =~ /icc/ ) {
 
@@ -37,9 +35,27 @@ sub runstep {
 
         # suppress sprintf warnings that don't apply
         $cflags .= ' -wd269';
-    }
-    else {
-
+        if ( $ld_share_flags !~ /-fPIC/ ) {
+            $ld_share_flags .= ' -fPIC';
+        }
+        if ($cc_shared !~ /-fPIC/ ) {
+            $cc_shared .= ' -fPIC';
+        }
+    } elsif ( $cc =~ /suncc/ ) {
+        $link = 'sunCC';
+        if ( $ld_share_flags !~ /-KPIC/ ) {
+            $ld_share_flags = '-KPIC';
+        }
+        if ($cc_shared !~ /-KPIC/ ) {
+            $cc_shared = '-KPIC';
+        }
+    } else {
+        if ( $ld_share_flags !~ /-fPIC/ ) {
+            $ld_share_flags .= ' -fPIC';
+        }
+        if ($cc_shared !~ /-fPIC/ ) {
+            $cc_shared .= ' -fPIC';
+        }
         # --export-dynamic, s. info gcc, ld
         $linkflags .= ' -Wl,-E';
     }
@@ -60,6 +76,7 @@ sub runstep {
         i_lib_pthread  => 1,                 # XXX fake a header entry
         linkflags      => $linkflags,
         link           => $link,
+        cc_shared      => $cc_shared,
         rpath          => '-Wl,-rpath=',
 
         has_dynamic_linking    => 1,
