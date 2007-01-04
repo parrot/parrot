@@ -4,7 +4,7 @@ Parrot::Coroutine - A pure PIR implementation of coroutines
 
 =head1 VERSION
 
- $Id:$
+ $Id$
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,7 @@ END:
 
 =head2 METHODS
 
-=head3 B<__init(sub)>
+=head3 B<__init_pmc(sub)>
 
 This method is normally called via the C<new> op:
 
@@ -120,7 +120,7 @@ Given a sub, it initializes a new C<Parrot::Coroutine> object.
 
 =cut
 
-.sub __init :method
+.sub __init_pmc :method
 	.param pmc sub
 
 	## [should complain if sub is not a sub or closure.  -- rgr, 8-Oct-06.]

@@ -1949,14 +1949,13 @@ pir_output_is( <<'CODE', <<'OUTPUT', "init with and w/o arg" );
 .end
 
 .namespace ["Foo"]
-.sub __init :method
-    .param pmc args :optional
-    if null args goto set_default
+.sub __init_pmc :method
+    .param pmc args
     $P0 = args['a']
     setattribute self, 'a', $P0
-    .return ()
-
-set_default:    
+    .return()
+.end
+.sub __init :method
     $P0 = new .String
     $P0 = "ok 1\n"
     setattribute self, 'a', $P0

@@ -49,7 +49,7 @@ STDERR by default.
 
 =cut
 
-.sub __init :method
+.sub __init_pmc :method
 	.param pmc args
 
 	.local pmc output

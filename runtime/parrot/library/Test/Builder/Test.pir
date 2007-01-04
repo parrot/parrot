@@ -129,7 +129,7 @@ Returns the TAP-compatible string representation of this test.
 
 .namespace [ 'Test::Builder::Test::Base' ]
 
-.sub __init :method
+.sub __init_pmc :method
 	.param pmc args
 
 	.local int offset
@@ -266,7 +266,7 @@ Returns the TAP-compatible string representation of this test.
 
 .namespace [ 'Test::Builder::Test::WithReason' ]
 
-.sub __init :method
+.sub __init_pmc :method
 	.param pmc args
 
 	.local int offset

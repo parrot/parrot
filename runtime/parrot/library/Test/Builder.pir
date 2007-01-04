@@ -94,7 +94,18 @@ the same state.
 .end
 
 .sub __init :method
-	.param pmc args :optional
+	.local pmc args
+	.local pmc output
+	.local pmc testplan
+	.local pmc results
+
+    null args
+	(output, testplan, results) = self.'_assign_default_args'( args )
+	self.'_assign_args'( output, testplan, results )
+.end
+
+.sub __init_pmc :method
+    .param pmc args
 	.local pmc output
 	.local pmc testplan
 	.local pmc results

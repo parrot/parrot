@@ -791,9 +791,16 @@ do_initcall(Interp *interp, PMC* class, PMC *object, PMC *init)
             STRING *vtable_ns_name = string_from_const_cstring(interp,
                 "\0VTABLE\0", 8);
             STRING *meth_str_v;
-            /* use __init as fallback constructor method, if it exists */
-            meth_str = CONST_STRING(interp, "__init");
-            meth_str_v = CONST_STRING(interp, "init");
+            /* use __init or __init_pmc (depending on if an argument was passed)
+             * as fallback constructor method, if it exists */
+            if (init) {
+                meth_str   = CONST_STRING(interp, "__init_pmc");
+                meth_str_v = CONST_STRING(interp, "init_pmc");
+            }
+            else {
+                meth_str   = CONST_STRING(interp, "__init");
+                meth_str_v = CONST_STRING(interp, "init");
+            }
             ns = VTABLE_namespace(interp, parent_class);
             vtable_ns = Parrot_get_namespace_keyed_str(interp, ns,
                 vtable_ns_name);
