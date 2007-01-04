@@ -464,9 +464,9 @@ my @steps = qw(
     init::defaults
     init::install
     init::miniparrot
+    inter::progs
     init::hints
     init::headers
-    inter::progs
     inter::make
     inter::lex
     inter::yacc
