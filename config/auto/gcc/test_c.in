@@ -8,7 +8,7 @@ int
 main(int argc, char **argv)
 {
     puts("(");
-#ifdef __GNUC__
+#if defined(__GNUC__) && ! defined(__INTEL_COMPILER)
     printf("__GNUC__ => %d,\n", __GNUC__);
 #  ifdef __GNUC_MINOR__
     printf("__GNUC_MINOR__ =>%d,\n", __GNUC_MINOR__);
