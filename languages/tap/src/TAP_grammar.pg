@@ -38,6 +38,6 @@ description ::= (character - (digit '#')) {character - '#'}
 directive   ::= '#' ( 'TODO' | 'SKIP' ) ' ' {character}
 comment     ::= '#' {character}
 
-=end
+=cut
 
 ## vim: expandtab sw=4
