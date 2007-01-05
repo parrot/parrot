@@ -284,8 +284,6 @@ interpinfo_p(Interp *interp, INTVAL what)
             }
         case CURRENT_OBJECT:
             return CONTEXT(interp->ctx)->current_object;
-        case NAMESPACE_ROOT:
-            return interp->root_namespace;
         case CURRENT_LEXPAD:
             return CONTEXT(interp->ctx)->lex_pad;
         default:        /* or a warning only? */

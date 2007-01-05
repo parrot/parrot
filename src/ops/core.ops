@@ -860,7 +860,7 @@ The valid constants for each return value are:
 
 =item B<interpinfo>(out PMC, in INT)
 
-.CURRENT_SUB, .CURRENT_CONT, .CURRENT_OBJECT, .NAMESPACE_ROOT, .CURRENT_LEXPAD
+.CURRENT_SUB, .CURRENT_CONT, .CURRENT_OBJECT, .CURRENT_LEXPAD
 
 =item B<interpinfo>(out STR, in INT)
 
