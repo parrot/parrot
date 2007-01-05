@@ -135,7 +135,7 @@ get_mmd_dispatch_type(Interp *interp, INTVAL func_nr, INTVAL left_type,
             func = D2FPTR(PMC_struct_val(method));
             *is_pmc = 0;
             mmd_register(interp, func_nr, left_type, r,
-                    (void (*)())PMC_struct_val(method));
+                    (funcptr_t)PMC_struct_val(method));
         }
         else {
             *is_pmc = 1;
