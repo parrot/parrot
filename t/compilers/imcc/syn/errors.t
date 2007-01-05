@@ -57,7 +57,7 @@ pir_output_like( <<'CODE', <<'OUT', '#line nnn "file"', 'todo' => 'RT #40806' );
     say 3
 .end
 CODE
-/in file 'xyz.pir' line 55/
+/in file 'xyz.pir' line 57/
 OUT
 
 # Local Variables:
