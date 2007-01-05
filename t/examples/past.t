@@ -34,34 +34,20 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 # Set up expected output for examples
 
-## XXX below tests neds 2 trailing spaces to succed
-#      this is really bad
+# A stub for future PAST-pm example
 my %expected = (
-    '01-sub.pir' => << 'END_EXPECTED',
-
-.sub "foo"
-    new $P10, .Integer
-    assign $P10, 4
-    clone $P10, $P10
-    set_global "$a", $P10
-    get_global $P11, "$a"
-    new $P12, .Integer
-    assign $P12, 1
-    new $P13, .Undef
-    add $P13, $P11, $P12
-    clone $P13, $P13
-    set_global "$b", $P13
-    get_global $P14, "$b"
-    $P15 = "say"($P14)
-    .return ($P15)
-.end
-5
-END_EXPECTED
 );
 
 while ( my ( $example, $expected ) = each %expected ) {
     example_output_is( "examples/past/$example", $expected );
 }
+
+# 01-sub.pir prints PIR source code and the result 5
+# Test with a regex, in order to avoid trailing whitespace
+# and insignificant changes in generated PIR.
+example_output_like( "examples/past/01-sub.pir", <<'OUTPUT' );
+/ \A \s* \.sub .* foo.* 5 \s* \z/xms
+OUTPUT
 
 # Local Variables:
 #   mode: cperl
