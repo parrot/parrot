@@ -76,7 +76,7 @@ gen_pir_past
         + "                                                                  \n"
       );
     }
-    ^( CODE_START node["past_stmts"]* )
+    ^( PROGRAM node["past_stmts"]* )
     {
       System.out.println( 
           "                                                                  \n"
@@ -114,6 +114,10 @@ gen_pir_past
 node[String reg_mother]
   : ^( ECHO STRING )
     {
+      String without_anno = $STRING.text;
+      without_anno = without_anno.replace( "start_sea", "\"" );
+      without_anno = without_anno.replace( "end_sea", "\"" );
+      without_anno = without_anno.replace( "\n", "\\n" );
       System.out.println( 
           "  # start of generic node                                         \n"
         + "  .local pmc past_node_id2244476                                  \n"
@@ -127,10 +131,7 @@ node[String reg_mother]
         + "  .local pmc past_node_id2244480                                  \n"
         + "  past_node_id2244480 = new 'PAST::Val'                           \n"
         + "                                                                  \n"
-        + "      .local string decoded                                       \n"
-        + "      decoded = " + $STRING.text + "                              \n"
-        + "      past_node_id2244480.'attr'( 'name', decoded, 1 )            \n"
-        + "      null decoded                                                \n"
+        + "      past_node_id2244480.'attr'( 'name', " + without_anno + ", 1 )       \n"
         + "  past_node_id2244480.'attr'( 'ctype', 's~', 1 )                  \n"
         + "                                                                  \n"
         + "                                                                  \n"

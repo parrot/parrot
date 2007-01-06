@@ -13,6 +13,10 @@ options
   ASTLabelType = CommonTree;
 }
 
+tokens 
+{
+  PROGRAM;
+}
 // virtual tokens
 
 // real tokens
@@ -24,15 +28,15 @@ STRING     : '\"' ( ~'\"' )*  '\"' ;
 ECHO       : 'echo' ;
 
 program 
-  : sea code sea WS? -> code
+  : s1=sea code s2=sea WS? -> ^( PROGRAM $s1 code $s2 )
   ;
 
 sea
-  : SEA
+  : SEA -> ^( ECHO STRING[$SEA] )
   ;
 
 code
-  : CODE_START statements WS? CODE_END -> ^( CODE_START statements )
+  : CODE_START statements WS? CODE_END WS? -> statements
   ;
 
 statements
