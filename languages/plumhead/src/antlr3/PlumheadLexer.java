@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-06 14:04:04
+// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-06 17:04:42
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -6,17 +6,49 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class PlumheadLexer extends Lexer {
-    public static final int START_CODE=4;
+    public static final int T10=10;
+    public static final int CODE_START=5;
+    public static final int ECHO=9;
     public static final int EOF=-1;
-    public static final int PHP_CODE=6;
-    public static final int Tokens=8;
-    public static final int SEA=5;
-    public static final int NEWLINE=7;
+    public static final int WS=7;
+    public static final int STRING=8;
+    public static final int Tokens=11;
+    public static final int SEA=4;
+    public static final int CODE_END=6;
     public PlumheadLexer() {;} 
     public PlumheadLexer(CharStream input) {
         super(input);
     }
     public String getGrammarFileName() { return "src/antlr3/Plumhead.g"; }
+
+    // $ANTLR start T10
+    public void mT10() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = T10;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:3:7: ( ';' )
+            // src/antlr3/Plumhead.g:3:7: ';'
+            {
+            match(';'); 
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end T10
 
     // $ANTLR start SEA
     public void mSEA() throws RecognitionException {
@@ -27,12 +59,12 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:22:14: ( 'start_sea' ( options {greedy=false; } : . )* 'end_sea' )
-            // src/antlr3/Plumhead.g:22:14: 'start_sea' ( options {greedy=false; } : . )* 'end_sea'
+            // src/antlr3/Plumhead.g:19:14: ( 'start_sea' ( options {greedy=false; } : . )* 'end_sea' )
+            // src/antlr3/Plumhead.g:19:14: 'start_sea' ( options {greedy=false; } : . )* 'end_sea'
             {
             match("start_sea"); 
 
-            // src/antlr3/Plumhead.g:22:26: ( options {greedy=false; } : . )*
+            // src/antlr3/Plumhead.g:19:26: ( options {greedy=false; } : . )*
             loop1:
             do {
                 int alt1=2;
@@ -49,11 +81,11 @@ public class PlumheadLexer extends Lexer {
                                     int LA1_6 = input.LA(6);
                                     if ( (LA1_6=='e') ) {
                                         int LA1_7 = input.LA(7);
-                                        if ( (LA1_7=='a') ) {
-                                            alt1=2;
-                                        }
-                                        else if ( ((LA1_7>='\u0000' && LA1_7<='`')||(LA1_7>='b' && LA1_7<='\uFFFE')) ) {
+                                        if ( ((LA1_7>='\u0000' && LA1_7<='`')||(LA1_7>='b' && LA1_7<='\uFFFE')) ) {
                                             alt1=1;
+                                        }
+                                        else if ( (LA1_7=='a') ) {
+                                            alt1=2;
                                         }
 
 
@@ -95,7 +127,7 @@ public class PlumheadLexer extends Lexer {
 
                 switch (alt1) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:22:54: .
+            	    // src/antlr3/Plumhead.g:19:54: .
             	    {
             	    matchAny(); 
 
@@ -125,55 +157,48 @@ public class PlumheadLexer extends Lexer {
     }
     // $ANTLR end SEA
 
-    // $ANTLR start PHP_CODE
-    public void mPHP_CODE() throws RecognitionException {
+    // $ANTLR start CODE_START
+    public void mCODE_START() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = PHP_CODE;
+            int _type = CODE_START;
             int _start = getCharIndex();
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:23:14: ( '<?php' ( options {greedy=false; } : . )* '?>' )
-            // src/antlr3/Plumhead.g:23:14: '<?php' ( options {greedy=false; } : . )* '?>'
+            // src/antlr3/Plumhead.g:20:14: ( '<?php' )
+            // src/antlr3/Plumhead.g:20:14: '<?php'
             {
             match("<?php"); 
 
-            // src/antlr3/Plumhead.g:23:22: ( options {greedy=false; } : . )*
-            loop2:
-            do {
-                int alt2=2;
-                int LA2_0 = input.LA(1);
-                if ( (LA2_0=='?') ) {
-                    int LA2_1 = input.LA(2);
-                    if ( (LA2_1=='>') ) {
-                        alt2=2;
-                    }
-                    else if ( ((LA2_1>='\u0000' && LA2_1<='=')||(LA2_1>='?' && LA2_1<='\uFFFE')) ) {
-                        alt2=1;
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
                     }
 
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end CODE_START
 
-                }
-                else if ( ((LA2_0>='\u0000' && LA2_0<='>')||(LA2_0>='@' && LA2_0<='\uFFFE')) ) {
-                    alt2=1;
-                }
-
-
-                switch (alt2) {
-            	case 1 :
-            	    // src/antlr3/Plumhead.g:23:50: .
-            	    {
-            	    matchAny(); 
-
-            	    }
-            	    break;
-
-            	default :
-            	    break loop2;
-                }
-            } while (true);
-
+    // $ANTLR start CODE_END
+    public void mCODE_END() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = CODE_END;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:21:14: ( '?>' )
+            // src/antlr3/Plumhead.g:21:14: '?>'
+            {
             match("?>"); 
 
 
@@ -190,21 +215,58 @@ public class PlumheadLexer extends Lexer {
             ruleNestingLevel--;
         }
     }
-    // $ANTLR end PHP_CODE
+    // $ANTLR end CODE_END
 
-    // $ANTLR start NEWLINE
-    public void mNEWLINE() throws RecognitionException {
+    // $ANTLR start WS
+    public void mWS() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = NEWLINE;
+            int _type = WS;
             int _start = getCharIndex();
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:24:14: ( '\\n' )
-            // src/antlr3/Plumhead.g:24:14: '\\n'
+            // src/antlr3/Plumhead.g:22:14: ( ( (' '|'\\t'|'\\r'|'\\n'))+ )
+            // src/antlr3/Plumhead.g:22:14: ( (' '|'\\t'|'\\r'|'\\n'))+
             {
-            match('\n'); 
+            // src/antlr3/Plumhead.g:22:14: ( (' '|'\\t'|'\\r'|'\\n'))+
+            int cnt2=0;
+            loop2:
+            do {
+                int alt2=2;
+                int LA2_0 = input.LA(1);
+                if ( ((LA2_0>='\t' && LA2_0<='\n')||LA2_0=='\r'||LA2_0==' ') ) {
+                    alt2=1;
+                }
+
+
+                switch (alt2) {
+            	case 1 :
+            	    // src/antlr3/Plumhead.g:22:16: (' '|'\\t'|'\\r'|'\\n')
+            	    {
+            	    if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
+            	        input.consume();
+
+            	    }
+            	    else {
+            	        MismatchedSetException mse =
+            	            new MismatchedSetException(null,input);
+            	        recover(mse);    throw mse;
+            	    }
+
+
+            	    }
+            	    break;
+
+            	default :
+            	    if ( cnt2 >= 1 ) break loop2;
+                        EarlyExitException eee =
+                            new EarlyExitException(2, input);
+                        throw eee;
+                }
+                cnt2++;
+            } while (true);
+
 
             }
 
@@ -219,47 +281,183 @@ public class PlumheadLexer extends Lexer {
             ruleNestingLevel--;
         }
     }
-    // $ANTLR end NEWLINE
+    // $ANTLR end WS
+
+    // $ANTLR start STRING
+    public void mSTRING() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = STRING;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:23:14: ( '\\\"' (~ '\\\"' )* '\\\"' )
+            // src/antlr3/Plumhead.g:23:14: '\\\"' (~ '\\\"' )* '\\\"'
+            {
+            match('\"'); 
+            // src/antlr3/Plumhead.g:23:19: (~ '\\\"' )*
+            loop3:
+            do {
+                int alt3=2;
+                int LA3_0 = input.LA(1);
+                if ( ((LA3_0>='\u0000' && LA3_0<='!')||(LA3_0>='#' && LA3_0<='\uFFFE')) ) {
+                    alt3=1;
+                }
+
+
+                switch (alt3) {
+            	case 1 :
+            	    // src/antlr3/Plumhead.g:23:21: ~ '\\\"'
+            	    {
+            	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='\uFFFE') ) {
+            	        input.consume();
+
+            	    }
+            	    else {
+            	        MismatchedSetException mse =
+            	            new MismatchedSetException(null,input);
+            	        recover(mse);    throw mse;
+            	    }
+
+
+            	    }
+            	    break;
+
+            	default :
+            	    break loop3;
+                }
+            } while (true);
+
+            match('\"'); 
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end STRING
+
+    // $ANTLR start ECHO
+    public void mECHO() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = ECHO;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:24:14: ( 'echo' )
+            // src/antlr3/Plumhead.g:24:14: 'echo'
+            {
+            match("echo"); 
+
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end ECHO
 
     public void mTokens() throws RecognitionException {
-        // src/antlr3/Plumhead.g:1:10: ( SEA | PHP_CODE | NEWLINE )
-        int alt3=3;
+        // src/antlr3/Plumhead.g:1:10: ( T10 | SEA | CODE_START | CODE_END | WS | STRING | ECHO )
+        int alt4=7;
         switch ( input.LA(1) ) {
+        case ';':
+            alt4=1;
+            break;
         case 's':
-            alt3=1;
+            alt4=2;
             break;
         case '<':
-            alt3=2;
+            alt4=3;
             break;
+        case '?':
+            alt4=4;
+            break;
+        case '\t':
         case '\n':
-            alt3=3;
+        case '\r':
+        case ' ':
+            alt4=5;
+            break;
+        case '\"':
+            alt4=6;
+            break;
+        case 'e':
+            alt4=7;
             break;
         default:
             NoViableAltException nvae =
-                new NoViableAltException("1:1: Tokens : ( SEA | PHP_CODE | NEWLINE );", 3, 0, input);
+                new NoViableAltException("1:1: Tokens : ( T10 | SEA | CODE_START | CODE_END | WS | STRING | ECHO );", 4, 0, input);
 
             throw nvae;
         }
 
-        switch (alt3) {
+        switch (alt4) {
             case 1 :
-                // src/antlr3/Plumhead.g:1:10: SEA
+                // src/antlr3/Plumhead.g:1:10: T10
+                {
+                mT10(); 
+
+                }
+                break;
+            case 2 :
+                // src/antlr3/Plumhead.g:1:14: SEA
                 {
                 mSEA(); 
 
                 }
                 break;
-            case 2 :
-                // src/antlr3/Plumhead.g:1:14: PHP_CODE
+            case 3 :
+                // src/antlr3/Plumhead.g:1:18: CODE_START
                 {
-                mPHP_CODE(); 
+                mCODE_START(); 
 
                 }
                 break;
-            case 3 :
-                // src/antlr3/Plumhead.g:1:23: NEWLINE
+            case 4 :
+                // src/antlr3/Plumhead.g:1:29: CODE_END
                 {
-                mNEWLINE(); 
+                mCODE_END(); 
+
+                }
+                break;
+            case 5 :
+                // src/antlr3/Plumhead.g:1:38: WS
+                {
+                mWS(); 
+
+                }
+                break;
+            case 6 :
+                // src/antlr3/Plumhead.g:1:41: STRING
+                {
+                mSTRING(); 
+
+                }
+                break;
+            case 7 :
+                // src/antlr3/Plumhead.g:1:48: ECHO
+                {
+                mECHO(); 
 
                 }
                 break;

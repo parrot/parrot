@@ -1,4 +1,4 @@
-// Copyright (C) 2006, The Perl Foundation.
+// Copyright (C) 2006-2007, The Perl Foundation.
 // $Id$ 
  
 // Plumhead with ANTLR3
@@ -13,16 +13,32 @@ options
   ASTLabelType = CommonTree;
 }
 
-tokens 
-{
-  START_CODE;
-} 
+// virtual tokens
 
-// tokens
+// real tokens
 SEA        : 'start_sea' ( options {greedy=false;} : . )* 'end_sea' ;
-PHP_CODE   : '<?php' ( options {greedy=false;} : . )* '?>' ;
-NEWLINE    : '\n' ;
+CODE_START : '<?php' ;
+CODE_END   : '?>' ;
+WS         : ( ' ' | '\t' | '\r' | '\n' )+ ;    
+STRING     : '\"' ( ~'\"' )*  '\"' ;
+ECHO       : 'echo' ;
 
 program 
-  : SEA PHP_CODE SEA NEWLINE -> ^( START_CODE )
+  : sea code sea WS? -> code
+  ;
+
+sea
+  : SEA
+  ;
+
+code
+  : CODE_START statements WS? CODE_END -> ^( CODE_START statements )
+  ;
+
+statements
+  : ( statement )+
+  ;
+
+statement
+  : WS? ECHO WS? STRING WS? ';' -> ^( ECHO STRING )
   ;

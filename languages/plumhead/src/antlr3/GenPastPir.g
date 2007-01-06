@@ -1,8 +1,9 @@
-// Copyright (C) 2006, The Perl Foundation.
+// Copyright (C) 2006-2007, The Perl Foundation.
 // $Id$
 
 // Transform ANTLR PAST to PIR that sets up a PAST data structure
 // let the Parrot Compiler Tools handle the execution.
+// Jumpstarted by languages/bc/grammar/antlr_3/antlr_past2pir_past.g 
 
 tree grammar GenPastPir;
 
@@ -49,8 +50,7 @@ gen_pir_past
         + ".sub plumhead :main                                               \n"
         + "                                                                  \n"
         + "    # look for subs in other namespaces                           \n"
-        + "    .local pmc decode_base64_sub, parse_get_sub, parse_post_sub   \n"
-        + "    decode_base64_sub = get_global [ 'MIME'; 'Base64' ], 'decode_base64'    \n"
+        + "    .local pmc parse_get_sub, parse_post_sub   \n"
         + "    parse_get_sub  = get_global [ 'CGI'; 'QueryHash' ], 'parse_get'         \n"
         + "    parse_post_sub = get_global [ 'CGI'; 'QueryHash' ], 'parse_post'        \n"
         + "                                                                  \n"
@@ -71,45 +71,18 @@ gen_pir_past
         + "                                                                  \n"
         + "                                                                  \n"
         + "  # start of generic node                                         \n"
-        + "  .local pmc past_node_id2244469                                  \n"
-        + "  past_node_id2244469 = new 'PAST::Stmts'                         \n"
+        + "  .local pmc past_stmts                                           \n"
+        + "  past_stmts = new 'PAST::Stmts'                                  \n"
         + "                                                                  \n"
+      );
+    }
+    ^( CODE_START node["past_stmts"]* )
+    {
+      System.out.println( 
+          "                                                                  \n"
         + "                                                                  \n"
-        + "                                                                  \n"
-        + "  # start of generic node                                         \n"
-        + "  .local pmc past_node_id2244476                                  \n"
-        + "  past_node_id2244476 = new 'PAST::Op'                            \n"
-        + "                                                                  \n"
-        + "      past_node_id2244476.'attr'( 'name', 'echo', 1 )             \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
-        + "  # start of past:Val                                             \n"
-        + "  .local pmc past_node_id2244480                                  \n"
-        + "  past_node_id2244480 = new 'PAST::Val'                           \n"
-        + "                                                                  \n"
-        + "      .local string decoded                                       \n"
-        + "      decoded = decode_base64_sub( 'SGVsbG8sIFdvcmxkIQo=' )       \n"
-        + "      past_node_id2244480.'attr'( 'name', decoded, 1 )            \n"
-        + "      null decoded                                                \n"
-        + "                                                                  \n"
-        + "  past_node_id2244480.'attr'( 'ctype', 's~', 1 )                  \n"
-        + "                                                                  \n"
-        + "  past_node_id2244480.'attr'( 'vtype', '.String', 1 )             \n"
-        + "                                                                  \n"
-        + "  past_node_id2244476.'push'( past_node_id2244480 )               \n"
-        + "  # end of past:Val                                               \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
-        + "  past_node_id2244469.'push'( past_node_id2244476 )               \n"
-        + "  null past_node_id2244476                                        \n"
-        + "  # end of generic node                                           \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
-        + "  past_node_id2244466.'push'( past_node_id2244469 )               \n"
-        + "  null past_node_id2244469                                        \n"
+        + "  past_node_id2244466.'push'( past_stmts )               \n"
+        + "  null past_stmts                                        \n"
         + "  # end of generic node                                           \n"
         + "                                                                  \n"
         + "                                                                  \n"
@@ -136,22 +109,46 @@ gen_pir_past
         + "                                                                  \n"
       );
     }
-    START_CODE
   ;
 
 node[String reg_mother]
-  : {
-      System.out.print( 
-          "                                                                  \n"
-        + "  # entering 'PRINT node'                                         \n"
-        + "    reg_expression_stmt = new 'PAST::Stmt'                        \n"
-        + "      reg_expression_topexp = new 'PAST::Exp'                     \n"
-        + "        reg_print_op = new 'PAST::Op'                             \n"
-        + "        reg_print_op.'op'( 'print' )                              \n"
-        + "          reg_expression_exp = new 'PAST::Exp'                    \n"
+  : ^( ECHO STRING )
+    {
+      System.out.println( 
+          "  # start of generic node                                         \n"
+        + "  .local pmc past_node_id2244476                                  \n"
+        + "  past_node_id2244476 = new 'PAST::Op'                            \n"
+        + "                                                                  \n"
+        + "      past_node_id2244476.'attr'( 'name', 'echo', 1 )             \n"
+        + "                                                                  \n"
+        + "                                                                  \n"
+        + "                                                                  \n"
+        + "  # start of past:Val                                             \n"
+        + "  .local pmc past_node_id2244480                                  \n"
+        + "  past_node_id2244480 = new 'PAST::Val'                           \n"
+        + "                                                                  \n"
+        + "      .local string decoded                                       \n"
+        + "      decoded = " + $STRING.text + "                              \n"
+        + "      past_node_id2244480.'attr'( 'name', decoded, 1 )            \n"
+        + "      null decoded                                                \n"
+        + "  past_node_id2244480.'attr'( 'ctype', 's~', 1 )                  \n"
+        + "                                                                  \n"
+        + "                                                                  \n"
+        + "  past_node_id2244480.'attr'( 'vtype', '.String', 1 )             \n"
+        + "                                                                  \n"
+        + "  past_node_id2244476.'push'( past_node_id2244480 )               \n"
+        + "  # end of past:Val                                               \n"
+        + "                                                                  \n"
+        + "                                                                  \n"
+        + "                                                                  \n"
+        + "  " + $node.reg_mother + ".'push'( past_node_id2244476 )                        \n"
+        + "  null past_node_id2244476                                        \n"
+        + "  # end of generic node                                           \n"
+        + "                                                                  \n"
+        + "                                                                  \n"
       );
     }
-    ^( PRINT node["reg_expression_exp"] )
+  | ^( PRINT node["reg_expression_exp"] )
     { 
       System.out.print( 
           "                                                                   \n"

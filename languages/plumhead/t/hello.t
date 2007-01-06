@@ -6,7 +6,7 @@ plumhead/t/hello.t - tests for Plumhead
 
 =head1 DESCRIPTION
 
-Hello World test.
+A couple of 'Hello World' tests.
 
 =cut
 
@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 # core Perl modules
-use Test::More     tests => 5;
+use Test::More     tests => 6;
 
 # Parrot modules
 use Parrot::Test;
@@ -36,6 +36,15 @@ END_EXPECTED
 language_output_is( 'Plumhead', <<'END_CODE', 'Hello World', 'only alphanumic' );
 <?php echo "Hello World"; ?>
 END_CODE
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'two echo statements' );
+<?php
+echo "Hello, ";
+echo "World!\n";
+?>
+END_CODE
+Hello, World!
+END_EXPECTED
 
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello with some HTML' );
