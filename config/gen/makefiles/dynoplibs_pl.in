@@ -100,46 +100,45 @@ our $NOW = time();
 
 ################### MAIN PROGRAM ################
 
-my ($mode, @oplibs) = @ARGV;
+my ($mode, $oplib, @other) = @ARGV;
 
 if ($mode eq 'generate') {
     # Convert X.ops -> ops_X.c, ops_X_cgp.c, ops_X_cg.c and ops_X_switch.c
     my $core;
-    generate_c($_) foreach (@oplibs);
+    generate_c($oplib);
 } 
 elsif ($mode eq 'compile') {
     # Convert X.c -> X.o for all X.c
     my $core_suffix;
     foreach $core_suffix (values %cores) {
-        compile($_ . "_ops$core_suffix") foreach (@oplibs);
+        compile($oplib . "_ops$core_suffix");
     }
 } 
 elsif ($mode eq 'linklibs') {
     # Convert X.o -> X.so
     my $core_suffix;
     foreach $core_suffix (values %cores) {
-        partial_link({}, $_ . "_ops$core_suffix") foreach (@oplibs);
+        partial_link({}, $oplib . "_ops$core_suffix");
      }
 } 
 elsif ($mode eq 'copy') {
     # Copy *.so -> destination, where destination is the first
     # argument, given as --destination=DIRECTORY
-    shift(@oplibs) =~ /--destination=(.*)/
+    $oplib =~ /--destination=(.*)/
       or die "copy command requires destination";
     my $dest = $1;
+    $oplib   = shift @other;
 
     my $core_suffix;
     foreach $core_suffix (values %cores) {
-        foreach (@oplibs) {
-            my $src = $_ . "_ops$core_suffix$LOAD_EXT";
-            copy($src, $dest)
-                or die "Copy $src failed ($?)\n";
+        my $src = $oplib . "_ops$core_suffix$LOAD_EXT";
+        copy($src, $dest)
+            or die "Copy $src failed ($?)\n";
 
-            # Execute permissions on libraries is especially important on
-            # some platforms
-            if ($^O eq 'hpux' or $^O eq 'cygwin') {
-                chmod 0755, "$dest@slash@$src";
-            }
+        # Execute permissions on libraries is especially important on
+        # some platforms
+        if ($^O eq 'hpux' or $^O eq 'cygwin') {
+            chmod 0755, "$dest@slash@$src";
         }
     }
 }
@@ -204,8 +203,8 @@ sub compile {
 sub partial_link {
     my ($libs, $stem) = @_;
 
-    if (needs_build("$stem$LOAD_EXT", "$stem$O")) {
-        return run(partial_link_cmd("$stem$LOAD_EXT", $libs, [ "$stem$O" ]))
+    if (needs_build("$stem$LOAD_EXT", "$stem$O", @other)) {
+        return run(partial_link_cmd("$stem$LOAD_EXT", $libs, [ "$stem$O", @other ]))
           or die "partial link $stem$LOAD_EXT failed ($?)\n";
     }
     else {
