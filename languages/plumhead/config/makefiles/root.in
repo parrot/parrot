@@ -97,3 +97,4 @@ clean-antlr3:
 
 # Leave the generated test files in place
 clean-test:
+	$(RM_F) t/*.php t/*.pir t/*.out 
