@@ -766,7 +766,8 @@ void gen_boolean(AST * p, const char * true_label, const char * false_label, int
             if(p->targ->type == t_string) {
                 printf("\tif %s %s \"\" goto %s\n", NAME(p->targ),
                             op_name(op_inv), inverse_label);
-            } else {
+            }
+            else {
                 printf("\tif %s %s 0 goto %s\n", NAME(p->targ),
                             op_name(op_inv), inverse_label);
             }
@@ -800,7 +801,8 @@ void gen_boolean(AST * p, const char * true_label, const char * false_label, int
             if(invert) {
                 op_inv = op_inverse(p->op);
                 inverse_label = false_label;
-            } else {
+            }
+            else {
                 op_inv = p->op;
                 inverse_label = true_label;
             }
@@ -847,15 +849,16 @@ char * op_name(int operator) {
     static char buf[512];
     static char * ptr = buf;
 
-    if(operator == 0) {
+    if (operator == 0) {
         printf("op_name: non-existent operator (0)\n");
         return "noop";
     }
     /* isascii(operator) */
-    if(((operator) & ~0x7f) == 0) {
-        if(ptr-buf < 256) {
+    if (((operator) & ~0x7f) == 0) {
+        if (ptr-buf < 256) {
             ptr += 4;
-        } else {
+        }
+        else {
             ptr = buf;
         }
         *ptr = operator;
