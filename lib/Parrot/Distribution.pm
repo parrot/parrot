@@ -89,15 +89,18 @@ Returns the directories which contain C source files.
 sub c_source_file_directories {
     my $self = shift;
 
-    return
-        map $self->directory_with_name($_) => map( "compilers/$_" => qw<bcg/src bcg/src/pmc imcc> ),
-        'config/gen/cpu/i386',
-        map( "config/gen/platform/$_" => qw<aix ansi cygwin darwin generic
-            ia64 netbsd openbsd solaris win32> ),
-        map( "examples/$_" => qw<c compilers mops nci> ), 'src',
-        map( "src/$_" => qw<atomic charset dynoplibs dynpmc
-            encodings io ops packfile pmc stm> ),
-        ;
+    my %c_source_dirs =
+
+        # Make a hash out of the directories of those files
+        map { ( ( File::Spec->splitpath($_) )[1] => 1 ) }
+
+        # Only look at files ending in .c
+        grep { m|\.c$| }
+
+        keys %{ ExtUtils::Manifest::maniread( File::Spec->catfile( $self->path, "MANIFEST" ) ) };
+
+    return map $self->directory_with_name($_) => grep { !m|\.svn/$| }
+        sort keys %c_source_dirs;
 }
 
 =item C<c_source_file_with_name($name)>
@@ -122,25 +125,48 @@ sub c_source_file_with_name {
     return;
 }
 
+=item C<c_source_files()>
+
+Returns a sorted list of the C source files listed within the MANIFEST of
+Parrot.  Returns a list of Parrot::IO::File objects.
+
+=cut
+
+sub c_source_files {
+    my $self = shift;
+
+    my @manifest_files = keys %{ ExtUtils::Manifest::maniread( 
+            File::Spec->catfile( $self->path, "MANIFEST" ) ) };
+
+    my @c_files = sort grep m{\.[cC]$}o, @manifest_files;
+
+    return map ($self->file_with_name($_), @c_files);
+}
+
 =item C<c_header_file_directories()>
 
 Returns the directories which contain C header files.
 
-Currently only F<include/parrot>.
-
 =cut
+
+# XXX returns what exactly???  The docs need updating here to help with
+# debugging and further development
 
 sub c_header_file_directories {
     my $self = shift;
 
-    return map $self->directory_with_name($_) => map( "compilers/$_" => qw<bcg/include imcc> ),
-        'config/gen/platform',
-        map( "config/gen/platform/$_" => qw<aix ansi cygwin darwin generic
-            ia64 netbsd openbsd solaris win32> ),
-        'include/parrot', map( "include/parrot/$_" => qw<atomic oplib stm> ), 'src',
-        map( "src/$_" => qw<atomic charset dynoplibs dynpmc
-            encodings io ops packfile pmc stm> ),
-        map( "src/jit/$_" => qw<alpha arm hppa i386 ia64 mips ppc skeleton sun4> ),;
+    my %c_header_dirs = 
+    
+        # Make a hash out of the directories of those files
+        map { ( ( File::Spec->splitpath($_) )[1] => 1 ) }
+
+        # Only look at files ending in .h
+        grep { m|\.h$| }
+
+        keys %{ ExtUtils::Manifest::maniread( File::Spec->catfile( $self->path, "MANIFEST" ) ) };
+
+    return map $self->directory_with_name($_) => grep { !m|\.svn/$| }
+        sort keys %c_header_dirs;
 }
 
 =item C<c_header_file_with_name($name)>
@@ -160,7 +186,27 @@ sub c_header_file_with_name {
             if $dir->file_exists_with_name($name);
     }
 
+    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name . "\n";
+
     return;
+}
+
+=item C<c_header_files()>
+
+Returns a sorted list of the C header files listed within the MANIFEST of
+Parrot.  Returns a list of Parrot::IO::File objects.
+
+=cut
+
+sub c_header_files {
+    my $self = shift;
+
+    my @manifest_files = keys %{ ExtUtils::Manifest::maniread( 
+            File::Spec->catfile( $self->path, "MANIFEST" ) ) };
+
+    my @h_files = sort grep m{\.[hH]$}o, @manifest_files;
+
+    return map ($self->file_with_name($_), @h_files);
 }
 
 =item C<pmc_source_file_directories()>
@@ -183,7 +229,7 @@ sub pmc_source_file_directories {
         keys %{ ExtUtils::Manifest::maniread( File::Spec->catfile( $self->path, "MANIFEST" ) ) };
 
     return map $self->directory_with_name($_) => grep { !m|\.svn/$| }
-        keys %pmc_source_dirs;
+        sort keys %pmc_source_dirs;
 }
 
 =item C<pmc_source_file_with_name($name)>
@@ -208,6 +254,24 @@ sub pmc_source_file_with_name {
     return;
 }
 
+=item C<pmc_source_files()>
+
+Returns a sorted list of the PMC files listed within the MANIFEST of
+Parrot.  Returns a list of Parrot::IO::File objects.
+
+=cut
+
+sub pmc_source_files {
+    my $self = shift;
+
+    my @manifest_files = keys %{ ExtUtils::Manifest::maniread( 
+            File::Spec->catfile( $self->path, "MANIFEST" ) ) };
+
+    my @pmc_files = sort grep m{\.pmc$}o, @manifest_files;
+
+    return map ($self->file_with_name($_), @pmc_files);
+}
+
 =item C<yacc_source_file_directories()>
 
 Returns the directories which contain yacc source files.
@@ -217,8 +281,12 @@ Returns the directories which contain yacc source files.
 sub yacc_source_file_directories {
     my $self = shift;
 
-    return map $self->directory_with_name($_) => 'compilers/imcc/',
-        'languages/cola/', 'languages/lua/doc', 'languages/regex/lib/Regex',;
+    return map $self->directory_with_name($_) => 
+        'compilers/imcc/',
+        'languages/cola/', 
+        'languages/lua/doc', 
+        'languages/regex/lib/Regex',
+        ;
 }
 
 =item C<yacc_source_file_with_name($name)>
@@ -243,6 +311,24 @@ sub yacc_source_file_with_name {
     return;
 }
 
+=item C<yacc_source_files()>
+
+Returns a sorted list of the yacc files listed within the MANIFEST of
+Parrot.  Returns a list of Parrot::IO::File objects.
+
+=cut
+
+sub yacc_source_files {
+    my $self = shift;
+
+    my @manifest_files = keys %{ ExtUtils::Manifest::maniread( 
+            File::Spec->catfile( $self->path, "MANIFEST" ) ) };
+
+    my @yacc_files = sort grep m{\.y$}o, @manifest_files;
+
+    return map ($self->file_with_name($_), @yacc_files);
+}
+
 =item C<lex_source_file_directories()>
 
 Returns the directories which contain lex source files.
@@ -252,8 +338,10 @@ Returns the directories which contain lex source files.
 sub lex_source_file_directories {
     my $self = shift;
 
-    return map $self->directory_with_name($_) => 'compilers/imcc/',
-        'languages/cola/',;
+    return map $self->directory_with_name($_) => 
+        'compilers/imcc/', 
+        'languages/cola/',
+        ;
 }
 
 =item C<lex_source_file_with_name($name)>
@@ -278,6 +366,24 @@ sub lex_source_file_with_name {
     return;
 }
 
+=item C<lex_source_files()>
+
+Returns a sorted list of the lex files listed within the MANIFEST of
+Parrot.  Returns a list of Parrot::IO::File objects.
+
+=cut
+
+sub lex_source_files {
+    my $self = shift;
+
+    my @manifest_files = keys %{ ExtUtils::Manifest::maniread( 
+            File::Spec->catfile( $self->path, "MANIFEST" ) ) };
+
+    my @lex_files = sort grep m{\.l$}o, @manifest_files;
+
+    return map ($self->file_with_name($_), @lex_files);
+}
+
 =item C<ops_source_file_directories()>
 
 Returns the directories which contain ops source files.
@@ -287,9 +393,13 @@ Returns the directories which contain ops source files.
 sub ops_source_file_directories {
     my $self = shift;
 
-    return map $self->directory_with_name($_) => 'src/ops/',
-        'src/dynoplibs/', 'languages/tcl/src/ops/', 'languages/WMLScript/ops/',
-        'languages/dotnet/ops/',;
+    return map $self->directory_with_name($_) => 
+        'src/ops/',
+        'src/dynoplibs/', 
+        'languages/tcl/src/ops/', 
+        'languages/WMLScript/ops/',
+        'languages/dotnet/ops/',
+        ;
 }
 
 =item C<ops_source_file_with_name($name)>
@@ -314,6 +424,24 @@ sub ops_source_file_with_name {
     return;
 }
 
+=item C<ops_source_files()>
+
+Returns a sorted list of the ops files listed within the MANIFEST of
+Parrot.  Returns a list of Parrot::IO::File objects.
+
+=cut
+
+sub ops_source_files {
+    my $self = shift;
+
+    my @manifest_files = keys %{ ExtUtils::Manifest::maniread( 
+            File::Spec->catfile( $self->path, "MANIFEST" ) ) };
+
+    my @ops_files = sort grep m{\.ops$}o, @manifest_files;
+
+    return map ($self->file_with_name($_), @ops_files);
+}
+
 =item C<get_c_language_files()>
 
 Returns the C language source files within Parrot.  Namely:
@@ -332,26 +460,45 @@ Returns the C language source files within Parrot.  Namely:
 
 =item ops files C<*.ops>
 
+returns a Parrot::Docs::File object
+
 =back
 
 =cut
 
 sub get_c_language_files {
     my $self = shift;
-    grep( $_->{PATH} !~ m{ \b imc(parser|lexer)\.[hc] $ }x,
 
-        map( $_->files_of_type('C code'), $self->c_source_file_directories ),
-
-        map( $_->files_of_type('C header'), $self->c_header_file_directories ),
-
-        map( $_->files_of_type('PMC code'), $self->pmc_source_file_directories ),
-
-        map( $_->files_of_type('Yacc file'), $self->yacc_source_file_directories ),
-
+    my @c_language_files = (
+        $self->c_source_files,
+        $self->c_header_files,
+        $self->pmc_source_files,
+        $self->yacc_source_files,
+        #$self->lex_source_files,
         map( $_->files_of_type('Lex file'), $self->lex_source_file_directories ),
-
-        map( $_->files_of_type('Parrot opcode file'), $self->ops_source_file_directories ),
+        $self->ops_source_files,
     );
+
+    return grep $_->path !~ m{ \b (cola|imc)(parser|lexer)\.[hc] $ }x, 
+        @c_language_files;
+
+    # XXX: lex_source_files() collects lisp files as well...  how to fix ???
+
+    #grep( $_->{PATH} !~ m{ \b imc(parser|lexer)\.[hc] $ }x,
+
+    #map( $_->files_of_type('C code'), $self->c_source_file_directories ),
+
+    #map( $_->files_of_type('C header'), $self->c_header_file_directories ),
+
+    #map( $_->files_of_type('PMC code'), $self->pmc_source_file_directories ),
+
+    #map( $_->files_of_type('Yacc file'), $self->yacc_source_file_directories ),
+
+    #map( $_->files_of_type('Lex file'), $self->lex_source_file_directories ),
+
+    #map( $_->files_of_type('Parrot opcode file'), $self->ops_source_file_directories ),
+    #);
+
 }
 
 =item C<get_perl_language_files()>
