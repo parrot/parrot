@@ -45,21 +45,36 @@ inline op tcl_binary_scan(out PMC, in STR, in STR) {
 
     while (formatpos < formatlen)
     {
-        INTVAL d, len;
+        char *c;
+        double *d;
+        INTVAL len;
         PMC *pmcval;
         switch (format[formatpos++])
         {
+            case 'c':
+                if (binstrpos + 1 > binstrlen)
+                {
+                    formatpos = formatlen;
+                    break;
+                }
+                c = binstr + binstrpos;
+                pmcval = pmc_new(interp, enum_class_Integer);
+                VTABLE_set_integer_native(interp, pmcval, (int)(char)*c);
+                VTABLE_push_pmc(interp, $1, pmcval);
+                binstrpos += 1;
+                break;
             case 'd':
-                len = sizeof(int)/sizeof(char);
+                len = sizeof(double)/sizeof(char);
                 if (binstrpos + len > binstrlen)
                 {
                     formatpos = formatlen;
                     break;
                 }
-                d = *(binstr + binstrpos);
-                pmcval = pmc_new(interp, enum_class_Integer);
-                VTABLE_set_integer_native(interp, pmcval, d);
+                d = (double *)(binstr + binstrpos);
+                pmcval = pmc_new(interp, enum_class_Float);
+                VTABLE_set_number_native(interp, pmcval, *d);
                 VTABLE_push_pmc(interp, $1, pmcval);
+                binstrpos += len;
                 break;
             default:
                 break;
@@ -84,12 +99,18 @@ inline op tcl_binary_format(out STR, in STR, in PMC) {
 
     while (pos < formatlen)
     {
-        INTVAL d, len;
+        char c;
+        double d;
+        INTVAL len;
         switch (format[pos++])
         {
+            case 'c':
+                c  = (char)VTABLE_get_integer_keyed_int(interp, $3, value++);
+                $1 = string_concat(interp, $1, string_from_cstring(interp, &c, 1), 1);
+                break;
             case 'd':
                 d   = VTABLE_get_integer_keyed_int(interp, $3, value++);
-                len = sizeof(int)/sizeof(char);
+                len = sizeof(double)/sizeof(char);
                 $1  = string_concat(interp, $1, string_from_cstring(interp, &d, len), len);
                 break;
             default:
