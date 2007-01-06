@@ -362,37 +362,43 @@ bad_length:
 .sub 'range'
   .param pmc argv
 
-  .local int index_1
-
   .local int argc
   argc = elements argv
   if argc != 3 goto bad_range
-  $S1 = argv[0]
-  $S2 = argv[1]
-  $S3 = argv[2]
 
-  $I0 = length $S1
-  dec $I0
+  .local string teh_string, first_s, last_s, result
+  teh_string = shift argv
+  result = '' # default result
+  first_s = shift argv
+  last_s  = shift argv
+
+  .local int last_index
+  last_index = length teh_string
+  dec last_index
 
   .local pmc __index
   __index = get_root_global ['_tcl'], '__index'
 
-  index_1 = __index($S2,$S1)
+  .local int first_i, last_i
+  first_i = __index(first_s, teh_string)
+  last_i  = __index(last_s, teh_string)
 
-  $I2 = __index($S3,$S1)
+  if first_i > last_i goto done
 
-range_do:
-###  if index_1 > $I2 goto done   RT#40768: no such label
-  if index_1 >= 0  goto range_top
-  index_1 = 0
+  if first_i >= 0  goto range_top
+  first_i = 0
 range_top:
-  if $I2 <= $I0 goto range_doo
-  $I2 = $I0
-range_doo:
-  $I3 = $I2 - index_1
-  inc $I3
-  $S9 = substr $S1, index_1, $I3
-  .return($S9)
+  if last_i <= last_index goto range_do
+  last_i = last_index
+range_do:
+  .local int repl_len
+  repl_len = last_i - first_i
+  inc repl_len
+
+  result = substr teh_string, first_i, repl_len
+
+done:
+  .return(result)
 
 bad_range:
   tcl_error 'wrong # args: should be "string range string first last"'

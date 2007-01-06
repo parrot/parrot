@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 126
+plan 127
 
 # arg checking
 eval_is {string} \
@@ -105,6 +105,7 @@ eval_is {string range a b c d} \
 is [string range abcde 0 end] abcde {range, total}
 is [string range abcde 1 end-1] bcd {range, partial}
 is [string range abcde end-20 20] abcde {range, overextended}
+is [string range abcde end-1 1] {} {range, reversed}
 
 # [string match]
 
