@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-06 20:10:28
+// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-06 21:24:02
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -10,9 +10,10 @@ import org.antlr.runtime.tree.*;
 
 public class PlumheadParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "SEA", "CODE_START", "CODE_END", "WS", "STRING", "ECHO", "';'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "SEA", "CODE_START", "CODE_END", "WS", "STRING", "ECHO", "INTEGER", "';'"
     };
     public static final int CODE_START=6;
+    public static final int INTEGER=11;
     public static final int ECHO=10;
     public static final int WS=8;
     public static final int EOF=-1;
@@ -44,7 +45,7 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start program
-    // src/antlr3/Plumhead.g:30:1: program : s1= sea code s2= sea ( WS )? -> ^( PROGRAM $s1 code $s2) ;
+    // src/antlr3/Plumhead.g:31:1: program : s1= sea code s2= sea ( WS )? -> ^( PROGRAM $s1 code $s2) ;
     public program_return program() throws RecognitionException {   
         program_return retval = new program_return();
         retval.start = input.LT(1);
@@ -64,25 +65,25 @@ public class PlumheadParser extends Parser {
         CommonTree WS2_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:31:5: (s1= sea code s2= sea ( WS )? -> ^( PROGRAM $s1 code $s2) )
-            // src/antlr3/Plumhead.g:31:5: s1= sea code s2= sea ( WS )?
+            // src/antlr3/Plumhead.g:32:5: (s1= sea code s2= sea ( WS )? -> ^( PROGRAM $s1 code $s2) )
+            // src/antlr3/Plumhead.g:32:5: s1= sea code s2= sea ( WS )?
             {
-            pushFollow(FOLLOW_sea_in_program190);
+            pushFollow(FOLLOW_sea_in_program208);
             s1=sea();
             _fsp--;
 
             list_sea.add(s1.tree);
-            pushFollow(FOLLOW_code_in_program192);
+            pushFollow(FOLLOW_code_in_program210);
             code1=code();
             _fsp--;
 
             list_code.add(code1.tree);
-            pushFollow(FOLLOW_sea_in_program196);
+            pushFollow(FOLLOW_sea_in_program214);
             s2=sea();
             _fsp--;
 
             list_sea.add(s2.tree);
-            // src/antlr3/Plumhead.g:31:24: ( WS )?
+            // src/antlr3/Plumhead.g:32:24: ( WS )?
             int alt1=2;
             int LA1_0 = input.LA(1);
             if ( (LA1_0==WS) ) {
@@ -90,10 +91,10 @@ public class PlumheadParser extends Parser {
             }
             switch (alt1) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:31:24: WS
+                    // src/antlr3/Plumhead.g:32:24: WS
                     {
                     WS2=(Token)input.LT(1);
-                    match(input,WS,FOLLOW_WS_in_program198); 
+                    match(input,WS,FOLLOW_WS_in_program216); 
                     list_WS.add(WS2);
 
 
@@ -107,9 +108,9 @@ public class PlumheadParser extends Parser {
             int i_0 = 0;
             retval.tree = root_0;
             root_0 = (CommonTree)adaptor.nil();
-            // 31:28: -> ^( PROGRAM $s1 code $s2)
+            // 32:28: -> ^( PROGRAM $s1 code $s2)
             {
-                // src/antlr3/Plumhead.g:31:31: ^( PROGRAM $s1 code $s2)
+                // src/antlr3/Plumhead.g:32:31: ^( PROGRAM $s1 code $s2)
                 {
                 CommonTree root_1 = (CommonTree)adaptor.nil();
                 root_1 = (CommonTree)adaptor.becomeRoot(adaptor.create(PROGRAM, "PROGRAM"), root_1);
@@ -149,7 +150,7 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start sea
-    // src/antlr3/Plumhead.g:34:1: sea : SEA -> ^( ECHO STRING[$SEA] ) ;
+    // src/antlr3/Plumhead.g:35:1: sea : SEA -> ^( ECHO STRING[$SEA] ) ;
     public sea_return sea() throws RecognitionException {   
         sea_return retval = new sea_return();
         retval.start = input.LT(1);
@@ -161,11 +162,11 @@ public class PlumheadParser extends Parser {
         CommonTree SEA3_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:35:5: ( SEA -> ^( ECHO STRING[$SEA] ) )
-            // src/antlr3/Plumhead.g:35:5: SEA
+            // src/antlr3/Plumhead.g:36:5: ( SEA -> ^( ECHO STRING[$SEA] ) )
+            // src/antlr3/Plumhead.g:36:5: SEA
             {
             SEA3=(Token)input.LT(1);
-            match(input,SEA,FOLLOW_SEA_in_sea228); 
+            match(input,SEA,FOLLOW_SEA_in_sea246); 
             list_SEA.add(SEA3);
 
 
@@ -173,9 +174,9 @@ public class PlumheadParser extends Parser {
             int i_0 = 0;
             retval.tree = root_0;
             root_0 = (CommonTree)adaptor.nil();
-            // 35:9: -> ^( ECHO STRING[$SEA] )
+            // 36:9: -> ^( ECHO STRING[$SEA] )
             {
-                // src/antlr3/Plumhead.g:35:12: ^( ECHO STRING[$SEA] )
+                // src/antlr3/Plumhead.g:36:12: ^( ECHO STRING[$SEA] )
                 {
                 CommonTree root_1 = (CommonTree)adaptor.nil();
                 root_1 = (CommonTree)adaptor.becomeRoot(adaptor.create(ECHO, "ECHO"), root_1);
@@ -213,7 +214,7 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start code
-    // src/antlr3/Plumhead.g:38:1: code : CODE_START statements ( WS )? CODE_END ( WS )? -> statements ;
+    // src/antlr3/Plumhead.g:39:1: code : CODE_START statements ( WS )? CODE_END ( WS )? -> statements ;
     public code_return code() throws RecognitionException {   
         code_return retval = new code_return();
         retval.start = input.LT(1);
@@ -236,19 +237,19 @@ public class PlumheadParser extends Parser {
         CommonTree WS8_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:39:5: ( CODE_START statements ( WS )? CODE_END ( WS )? -> statements )
-            // src/antlr3/Plumhead.g:39:5: CODE_START statements ( WS )? CODE_END ( WS )?
+            // src/antlr3/Plumhead.g:40:5: ( CODE_START statements ( WS )? CODE_END ( WS )? -> statements )
+            // src/antlr3/Plumhead.g:40:5: CODE_START statements ( WS )? CODE_END ( WS )?
             {
             CODE_START4=(Token)input.LT(1);
-            match(input,CODE_START,FOLLOW_CODE_START_in_code252); 
+            match(input,CODE_START,FOLLOW_CODE_START_in_code270); 
             list_CODE_START.add(CODE_START4);
 
-            pushFollow(FOLLOW_statements_in_code254);
+            pushFollow(FOLLOW_statements_in_code272);
             statements5=statements();
             _fsp--;
 
             list_statements.add(statements5.tree);
-            // src/antlr3/Plumhead.g:39:27: ( WS )?
+            // src/antlr3/Plumhead.g:40:27: ( WS )?
             int alt2=2;
             int LA2_0 = input.LA(1);
             if ( (LA2_0==WS) ) {
@@ -256,10 +257,10 @@ public class PlumheadParser extends Parser {
             }
             switch (alt2) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:39:27: WS
+                    // src/antlr3/Plumhead.g:40:27: WS
                     {
                     WS6=(Token)input.LT(1);
-                    match(input,WS,FOLLOW_WS_in_code256); 
+                    match(input,WS,FOLLOW_WS_in_code274); 
                     list_WS.add(WS6);
 
 
@@ -269,10 +270,10 @@ public class PlumheadParser extends Parser {
             }
 
             CODE_END7=(Token)input.LT(1);
-            match(input,CODE_END,FOLLOW_CODE_END_in_code259); 
+            match(input,CODE_END,FOLLOW_CODE_END_in_code277); 
             list_CODE_END.add(CODE_END7);
 
-            // src/antlr3/Plumhead.g:39:40: ( WS )?
+            // src/antlr3/Plumhead.g:40:40: ( WS )?
             int alt3=2;
             int LA3_0 = input.LA(1);
             if ( (LA3_0==WS) ) {
@@ -280,10 +281,10 @@ public class PlumheadParser extends Parser {
             }
             switch (alt3) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:39:40: WS
+                    // src/antlr3/Plumhead.g:40:40: WS
                     {
                     WS8=(Token)input.LT(1);
-                    match(input,WS,FOLLOW_WS_in_code261); 
+                    match(input,WS,FOLLOW_WS_in_code279); 
                     list_WS.add(WS8);
 
 
@@ -297,7 +298,7 @@ public class PlumheadParser extends Parser {
             int i_0 = 0;
             retval.tree = root_0;
             root_0 = (CommonTree)adaptor.nil();
-            // 39:44: -> statements
+            // 40:44: -> statements
             {
                 adaptor.addChild(root_0, list_statements.get(i_0));
 
@@ -329,7 +330,7 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start statements
-    // src/antlr3/Plumhead.g:42:1: statements : ( statement )+ ;
+    // src/antlr3/Plumhead.g:43:1: statements : ( statement )+ ;
     public statements_return statements() throws RecognitionException {   
         statements_return retval = new statements_return();
         retval.start = input.LT(1);
@@ -341,12 +342,12 @@ public class PlumheadParser extends Parser {
 
 
         try {
-            // src/antlr3/Plumhead.g:43:5: ( ( statement )+ )
-            // src/antlr3/Plumhead.g:43:5: ( statement )+
+            // src/antlr3/Plumhead.g:44:5: ( ( statement )+ )
+            // src/antlr3/Plumhead.g:44:5: ( statement )+
             {
             root_0 = (CommonTree)adaptor.nil();
 
-            // src/antlr3/Plumhead.g:43:5: ( statement )+
+            // src/antlr3/Plumhead.g:44:5: ( statement )+
             int cnt4=0;
             loop4:
             do {
@@ -367,11 +368,11 @@ public class PlumheadParser extends Parser {
 
                 switch (alt4) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:43:7: statement
+            	    // src/antlr3/Plumhead.g:44:7: statement
             	    {
             	    CommonTree root_1 = (CommonTree)adaptor.nil();
 
-            	    pushFollow(FOLLOW_statement_in_statements281);
+            	    pushFollow(FOLLOW_statement_in_statements299);
             	    statement9=statement();
             	    _fsp--;
 
@@ -416,7 +417,7 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start statement
-    // src/antlr3/Plumhead.g:46:1: statement : ( WS )? ECHO ( WS )? STRING ( WS )? ';' -> ^( ECHO STRING ) ;
+    // src/antlr3/Plumhead.g:47:1: statement : ( WS )? ECHO ( WS )? expression ( WS )? ';' -> ^( ECHO expression ) ;
     public statement_return statement() throws RecognitionException {   
         statement_return retval = new statement_return();
         retval.start = input.LT(1);
@@ -426,25 +427,25 @@ public class PlumheadParser extends Parser {
         Token WS10=null;
         Token ECHO11=null;
         Token WS12=null;
-        Token STRING13=null;
         Token WS14=null;
         Token char_literal15=null;
+        expression_return expression13 = null;
+
+        List list_expression=new ArrayList();
         List list_ECHO=new ArrayList();
-        List list_11=new ArrayList();
         List list_WS=new ArrayList();
-        List list_STRING=new ArrayList();
+        List list_12=new ArrayList();
         CommonTree WS10_tree=null;
         CommonTree ECHO11_tree=null;
         CommonTree WS12_tree=null;
-        CommonTree STRING13_tree=null;
         CommonTree WS14_tree=null;
         CommonTree char_literal15_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:47:5: ( ( WS )? ECHO ( WS )? STRING ( WS )? ';' -> ^( ECHO STRING ) )
-            // src/antlr3/Plumhead.g:47:5: ( WS )? ECHO ( WS )? STRING ( WS )? ';'
+            // src/antlr3/Plumhead.g:48:5: ( ( WS )? ECHO ( WS )? expression ( WS )? ';' -> ^( ECHO expression ) )
+            // src/antlr3/Plumhead.g:48:5: ( WS )? ECHO ( WS )? expression ( WS )? ';'
             {
-            // src/antlr3/Plumhead.g:47:5: ( WS )?
+            // src/antlr3/Plumhead.g:48:5: ( WS )?
             int alt5=2;
             int LA5_0 = input.LA(1);
             if ( (LA5_0==WS) ) {
@@ -452,10 +453,10 @@ public class PlumheadParser extends Parser {
             }
             switch (alt5) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:47:5: WS
+                    // src/antlr3/Plumhead.g:48:5: WS
                     {
                     WS10=(Token)input.LT(1);
-                    match(input,WS,FOLLOW_WS_in_statement297); 
+                    match(input,WS,FOLLOW_WS_in_statement315); 
                     list_WS.add(WS10);
 
 
@@ -465,10 +466,10 @@ public class PlumheadParser extends Parser {
             }
 
             ECHO11=(Token)input.LT(1);
-            match(input,ECHO,FOLLOW_ECHO_in_statement300); 
+            match(input,ECHO,FOLLOW_ECHO_in_statement318); 
             list_ECHO.add(ECHO11);
 
-            // src/antlr3/Plumhead.g:47:14: ( WS )?
+            // src/antlr3/Plumhead.g:48:14: ( WS )?
             int alt6=2;
             int LA6_0 = input.LA(1);
             if ( (LA6_0==WS) ) {
@@ -476,10 +477,10 @@ public class PlumheadParser extends Parser {
             }
             switch (alt6) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:47:14: WS
+                    // src/antlr3/Plumhead.g:48:14: WS
                     {
                     WS12=(Token)input.LT(1);
-                    match(input,WS,FOLLOW_WS_in_statement302); 
+                    match(input,WS,FOLLOW_WS_in_statement320); 
                     list_WS.add(WS12);
 
 
@@ -488,11 +489,12 @@ public class PlumheadParser extends Parser {
 
             }
 
-            STRING13=(Token)input.LT(1);
-            match(input,STRING,FOLLOW_STRING_in_statement305); 
-            list_STRING.add(STRING13);
+            pushFollow(FOLLOW_expression_in_statement323);
+            expression13=expression();
+            _fsp--;
 
-            // src/antlr3/Plumhead.g:47:25: ( WS )?
+            list_expression.add(expression13.tree);
+            // src/antlr3/Plumhead.g:48:29: ( WS )?
             int alt7=2;
             int LA7_0 = input.LA(1);
             if ( (LA7_0==WS) ) {
@@ -500,10 +502,10 @@ public class PlumheadParser extends Parser {
             }
             switch (alt7) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:47:25: WS
+                    // src/antlr3/Plumhead.g:48:29: WS
                     {
                     WS14=(Token)input.LT(1);
-                    match(input,WS,FOLLOW_WS_in_statement307); 
+                    match(input,WS,FOLLOW_WS_in_statement325); 
                     list_WS.add(WS14);
 
 
@@ -513,22 +515,22 @@ public class PlumheadParser extends Parser {
             }
 
             char_literal15=(Token)input.LT(1);
-            match(input,11,FOLLOW_11_in_statement310); 
-            list_11.add(char_literal15);
+            match(input,12,FOLLOW_12_in_statement328); 
+            list_12.add(char_literal15);
 
 
             // AST REWRITE
             int i_0 = 0;
             retval.tree = root_0;
             root_0 = (CommonTree)adaptor.nil();
-            // 47:33: -> ^( ECHO STRING )
+            // 48:37: -> ^( ECHO expression )
             {
-                // src/antlr3/Plumhead.g:47:36: ^( ECHO STRING )
+                // src/antlr3/Plumhead.g:48:40: ^( ECHO expression )
                 {
                 CommonTree root_1 = (CommonTree)adaptor.nil();
                 root_1 = (CommonTree)adaptor.becomeRoot((Token)list_ECHO.get(i_0), root_1);
 
-                adaptor.addChild(root_1, (Token)list_STRING.get(i_0));
+                adaptor.addChild(root_1, list_expression.get(i_0));
 
                 adaptor.addChild(root_0, root_1);
                 }
@@ -555,25 +557,80 @@ public class PlumheadParser extends Parser {
     }
     // $ANTLR end statement
 
+    public static class expression_return extends ParserRuleReturnScope {
+        CommonTree tree;
+        public Object getTree() { return tree; }
+    };
+
+    // $ANTLR start expression
+    // src/antlr3/Plumhead.g:51:1: expression : (STRING|INTEGER);
+    public expression_return expression() throws RecognitionException {   
+        expression_return retval = new expression_return();
+        retval.start = input.LT(1);
+
+        CommonTree root_0 = null;
+
+        Token set16=null;
+
+        CommonTree set16_tree=null;
+
+        try {
+            // src/antlr3/Plumhead.g:52:3: ( (STRING|INTEGER))
+            // src/antlr3/Plumhead.g:52:5: (STRING|INTEGER)
+            {
+            root_0 = (CommonTree)adaptor.nil();
+
+            set16=(Token)input.LT(1);
+            if ( input.LA(1)==STRING||input.LA(1)==INTEGER ) {
+                adaptor.addChild(root_0, adaptor.create(set16));
+                input.consume();
+                errorRecovery=false;
+            }
+            else {
+                MismatchedSetException mse =
+                    new MismatchedSetException(null,input);
+                recoverFromMismatchedSet(input,mse,FOLLOW_set_in_expression351);    throw mse;
+            }
+
+
+            }
+
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+        }
+        finally {
+            retval.stop = input.LT(-1);
+
+                retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
+                adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
+
+       }
+        return retval;
+    }
+    // $ANTLR end expression
+
 
  
 
-    public static final BitSet FOLLOW_sea_in_program190 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_code_in_program192 = new BitSet(new long[]{0x0000000000000020L});
-    public static final BitSet FOLLOW_sea_in_program196 = new BitSet(new long[]{0x0000000000000102L});
-    public static final BitSet FOLLOW_WS_in_program198 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SEA_in_sea228 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CODE_START_in_code252 = new BitSet(new long[]{0x0000000000000500L});
-    public static final BitSet FOLLOW_statements_in_code254 = new BitSet(new long[]{0x0000000000000180L});
-    public static final BitSet FOLLOW_WS_in_code256 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_CODE_END_in_code259 = new BitSet(new long[]{0x0000000000000102L});
-    public static final BitSet FOLLOW_WS_in_code261 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_statement_in_statements281 = new BitSet(new long[]{0x0000000000000502L});
-    public static final BitSet FOLLOW_WS_in_statement297 = new BitSet(new long[]{0x0000000000000400L});
-    public static final BitSet FOLLOW_ECHO_in_statement300 = new BitSet(new long[]{0x0000000000000300L});
-    public static final BitSet FOLLOW_WS_in_statement302 = new BitSet(new long[]{0x0000000000000200L});
-    public static final BitSet FOLLOW_STRING_in_statement305 = new BitSet(new long[]{0x0000000000000900L});
-    public static final BitSet FOLLOW_WS_in_statement307 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_11_in_statement310 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_sea_in_program208 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_code_in_program210 = new BitSet(new long[]{0x0000000000000020L});
+    public static final BitSet FOLLOW_sea_in_program214 = new BitSet(new long[]{0x0000000000000102L});
+    public static final BitSet FOLLOW_WS_in_program216 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SEA_in_sea246 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CODE_START_in_code270 = new BitSet(new long[]{0x0000000000000500L});
+    public static final BitSet FOLLOW_statements_in_code272 = new BitSet(new long[]{0x0000000000000180L});
+    public static final BitSet FOLLOW_WS_in_code274 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_CODE_END_in_code277 = new BitSet(new long[]{0x0000000000000102L});
+    public static final BitSet FOLLOW_WS_in_code279 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_statement_in_statements299 = new BitSet(new long[]{0x0000000000000502L});
+    public static final BitSet FOLLOW_WS_in_statement315 = new BitSet(new long[]{0x0000000000000400L});
+    public static final BitSet FOLLOW_ECHO_in_statement318 = new BitSet(new long[]{0x0000000000000B00L});
+    public static final BitSet FOLLOW_WS_in_statement320 = new BitSet(new long[]{0x0000000000000A00L});
+    public static final BitSet FOLLOW_expression_in_statement323 = new BitSet(new long[]{0x0000000000001100L});
+    public static final BitSet FOLLOW_WS_in_statement325 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_12_in_statement328 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_set_in_expression351 = new BitSet(new long[]{0x0000000000000002L});
 
 }

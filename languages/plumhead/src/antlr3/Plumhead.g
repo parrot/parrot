@@ -26,6 +26,7 @@ CODE_END   : '?>' ;
 WS         : ( ' ' | '\t' | '\r' | '\n' )+ ;    
 STRING     : '\"' ( ~'\"' )*  '\"' ;
 ECHO       : 'echo' ;
+INTEGER    : ( '0'..'9' )+ ;
 
 program 
   : s1=sea code s2=sea WS? -> ^( PROGRAM $s1 code $s2 )
@@ -44,5 +45,10 @@ statements
   ;
 
 statement
-  : WS? ECHO WS? STRING WS? ';' -> ^( ECHO STRING )
+  : WS? ECHO WS? expression WS? ';' -> ^( ECHO expression )
+  ;
+
+expression
+  : STRING
+  | INTEGER
   ;

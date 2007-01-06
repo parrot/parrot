@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-06 20:10:29
+// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-06 21:24:03
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -7,12 +7,13 @@ import java.util.ArrayList;
 
 public class PlumheadLexer extends Lexer {
     public static final int CODE_START=6;
+    public static final int INTEGER=11;
     public static final int ECHO=10;
-    public static final int T11=11;
     public static final int EOF=-1;
     public static final int WS=8;
     public static final int STRING=9;
-    public static final int Tokens=12;
+    public static final int T12=12;
+    public static final int Tokens=13;
     public static final int SEA=5;
     public static final int CODE_END=7;
     public static final int PROGRAM=4;
@@ -22,11 +23,11 @@ public class PlumheadLexer extends Lexer {
     }
     public String getGrammarFileName() { return "src/antlr3/Plumhead.g"; }
 
-    // $ANTLR start T11
-    public void mT11() throws RecognitionException {
+    // $ANTLR start T12
+    public void mT12() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T11;
+            int _type = T12;
             int _start = getCharIndex();
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
@@ -49,7 +50,7 @@ public class PlumheadLexer extends Lexer {
             ruleNestingLevel--;
         }
     }
-    // $ANTLR end T11
+    // $ANTLR end T12
 
     // $ANTLR start SEA
     public void mSEA() throws RecognitionException {
@@ -377,46 +378,115 @@ public class PlumheadLexer extends Lexer {
     }
     // $ANTLR end ECHO
 
+    // $ANTLR start INTEGER
+    public void mINTEGER() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = INTEGER;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:29:14: ( ( '0' .. '9' )+ )
+            // src/antlr3/Plumhead.g:29:14: ( '0' .. '9' )+
+            {
+            // src/antlr3/Plumhead.g:29:14: ( '0' .. '9' )+
+            int cnt4=0;
+            loop4:
+            do {
+                int alt4=2;
+                int LA4_0 = input.LA(1);
+                if ( ((LA4_0>='0' && LA4_0<='9')) ) {
+                    alt4=1;
+                }
+
+
+                switch (alt4) {
+            	case 1 :
+            	    // src/antlr3/Plumhead.g:29:16: '0' .. '9'
+            	    {
+            	    matchRange('0','9'); 
+
+            	    }
+            	    break;
+
+            	default :
+            	    if ( cnt4 >= 1 ) break loop4;
+                        EarlyExitException eee =
+                            new EarlyExitException(4, input);
+                        throw eee;
+                }
+                cnt4++;
+            } while (true);
+
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end INTEGER
+
     public void mTokens() throws RecognitionException {
-        // src/antlr3/Plumhead.g:1:10: ( T11 | SEA | CODE_START | CODE_END | WS | STRING | ECHO )
-        int alt4=7;
+        // src/antlr3/Plumhead.g:1:10: ( T12 | SEA | CODE_START | CODE_END | WS | STRING | ECHO | INTEGER )
+        int alt5=8;
         switch ( input.LA(1) ) {
         case ';':
-            alt4=1;
+            alt5=1;
             break;
         case 's':
-            alt4=2;
+            alt5=2;
             break;
         case '<':
-            alt4=3;
+            alt5=3;
             break;
         case '?':
-            alt4=4;
+            alt5=4;
             break;
         case '\t':
         case '\n':
         case '\r':
         case ' ':
-            alt4=5;
+            alt5=5;
             break;
         case '\"':
-            alt4=6;
+            alt5=6;
             break;
         case 'e':
-            alt4=7;
+            alt5=7;
+            break;
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+            alt5=8;
             break;
         default:
             NoViableAltException nvae =
-                new NoViableAltException("1:1: Tokens : ( T11 | SEA | CODE_START | CODE_END | WS | STRING | ECHO );", 4, 0, input);
+                new NoViableAltException("1:1: Tokens : ( T12 | SEA | CODE_START | CODE_END | WS | STRING | ECHO | INTEGER );", 5, 0, input);
 
             throw nvae;
         }
 
-        switch (alt4) {
+        switch (alt5) {
             case 1 :
-                // src/antlr3/Plumhead.g:1:10: T11
+                // src/antlr3/Plumhead.g:1:10: T12
                 {
-                mT11(); 
+                mT12(); 
 
                 }
                 break;
@@ -459,6 +529,13 @@ public class PlumheadLexer extends Lexer {
                 // src/antlr3/Plumhead.g:1:48: ECHO
                 {
                 mECHO(); 
+
+                }
+                break;
+            case 8 :
+                // src/antlr3/Plumhead.g:1:53: INTEGER
+                {
+                mINTEGER(); 
 
                 }
                 break;

@@ -43,10 +43,6 @@ gen_pir_past
         + "                                                                  \n"
         + ".end                                                              \n"
         + "                                                                  \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
         + ".sub plumhead :main                                               \n"
         + "                                                                  \n"
         + "    # look for subs in other namespaces                           \n"
@@ -68,11 +64,11 @@ gen_pir_past
         + "    past_node_id2244466  = new 'PAST::Block'                      \n"
         + "    past_node_id2244466.init('name' => 'plumhead_main')           \n"
         + "                                                                  \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
         + "  # start of generic node                                         \n"
         + "  .local pmc past_stmts                                           \n"
         + "  past_stmts = new 'PAST::Stmts'                                  \n"
+        + "                                                                  \n"
+        + "  .sym pmc past_temp                                              \n"
         + "                                                                  \n"
       );
     }
@@ -112,52 +108,55 @@ gen_pir_past
   ;
 
 node[String reg_mother]
-  : ^( ECHO STRING )
+  : {
+      System.out.println( 
+          "  # start of ECHO node                                            \n"
+        + "  .local pmc past_echo                                            \n"
+        + "  past_echo = new 'PAST::Op'                                      \n"
+        + "      past_echo.'attr'( 'name', 'echo', 1 )                       \n"
+      );
+    }
+    ^( ECHO node["past_echo"] )
+    {
+      System.out.println( 
+          "                                                                  \n"
+        + "  " + $node.reg_mother + ".'push'( past_echo )                    \n"
+        + "  null past_echo                                                  \n"
+        + "  # end of ECHO node                                              \n"
+      );
+    }
+  | STRING
     {
       String without_anno = $STRING.text;
       without_anno = without_anno.replace( "start_sea", "\"" );
       without_anno = without_anno.replace( "end_sea", "\"" );
       without_anno = without_anno.replace( "\n", "\\n" );
       System.out.println( 
-          "  # start of generic node                                         \n"
-        + "  .local pmc past_node_id2244476                                  \n"
-        + "  past_node_id2244476 = new 'PAST::Op'                            \n"
-        + "                                                                  \n"
-        + "      past_node_id2244476.'attr'( 'name', 'echo', 1 )             \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
-        + "  # start of past:Val                                             \n"
-        + "  .local pmc past_node_id2244480                                  \n"
-        + "  past_node_id2244480 = new 'PAST::Val'                           \n"
-        + "                                                                  \n"
-        + "      past_node_id2244480.'attr'( 'name', " + without_anno + ", 1 )       \n"
-        + "  past_node_id2244480.'attr'( 'ctype', 's~', 1 )                  \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
-        + "  past_node_id2244480.'attr'( 'vtype', '.String', 1 )             \n"
-        + "                                                                  \n"
-        + "  past_node_id2244476.'push'( past_node_id2244480 )               \n"
-        + "  # end of past:Val                                               \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
-        + "  " + $node.reg_mother + ".'push'( past_node_id2244476 )                        \n"
-        + "  null past_node_id2244476                                        \n"
-        + "  # end of generic node                                           \n"
-        + "                                                                  \n"
+          "                                                                  \n"
+        + "  # start of STRING                                               \n"
+        + "  past_temp = new 'PAST::Val'                                     \n"
+        + "      past_temp.'attr'( 'name', " + without_anno + ", 1 )         \n"
+        + "      past_temp.'attr'( 'ctype', 's~', 1 )                        \n"
+        + "      past_temp.'attr'( 'vtype', '.String', 1 )                   \n"
+        + "  " + $node.reg_mother + ".'push'( past_temp )                    \n"
+        + "  null past_temp                                                  \n"
+        + "  # end of STRING                                                 \n"
         + "                                                                  \n"
       );
     }
-  | ^( PRINT node["reg_expression_exp"] )
-    { 
-      System.out.print( 
-          "                                                                   \n"
-        + "      reg_print_op.'add_child'( reg_expression_exp )               \n"
-        + "      reg_expression_topexp.'add_child'( reg_print_op      )       \n"
-        + "    reg_expression_stmt.'add_child'( reg_expression_topexp )       \n"
-        + "  " + $node.reg_mother + ".'add_child'( reg_expression_stmt )      \n"
-        + "  # leaving 'PRINT node'                                           \n"
+  | INTEGER
+    {
+      System.out.println( 
+          "                                                                  \n"
+        + "  # start of INTEGER                                              \n"
+        + "  past_temp = new 'PAST::Val'                                     \n"
+        + "      past_temp.'attr'( 'name', '" + $INTEGER.text + "', 1 )      \n"
+        + "      past_temp.'attr'( 'ctype', 'i+', 1 )                        \n"
+        + "      past_temp.'attr'( 'vtype', '.Integer', 1 )                  \n"
+        + "  " + $node.reg_mother + ".'push'( past_temp )                    \n"
+        + "  null past_temp                                                  \n"
+        + "  # end of INTEGER                                                \n"
+        + "                                                                  \n"
       );
     }
   | ^( FUNCTION LETTER )
@@ -196,11 +195,11 @@ node[String reg_mother]
       System.out.print(     
           "                                                                  \n"
         + "# entering 'NUMBER'                                               \n"
-        + "reg_temp = new 'PAST::Val'                                        \n"
-        + "reg_temp.value( " + $NUMBER.text + " )                            \n"
-        + "reg_temp.valtype( 'num' )                                         \n"
-        + $node.reg_mother + ".'add_child'( reg_temp )                       \n"
-        + "null reg_temp                                                     \n"
+        + "past_temp = new 'PAST::Val'                                        \n"
+        + "past_temp.value( " + $NUMBER.text + " )                            \n"
+        + "past_temp.valtype( 'num' )                                         \n"
+        + $node.reg_mother + ".'add_child'( past_temp )                       \n"
+        + "null past_temp                                                     \n"
         + "# leaving 'NUMBER'                                                \n"
       );
     }
@@ -218,11 +217,11 @@ node[String reg_mother]
     {
       System.out.print( 
           "      " + reg + ".'op'( 'infix:" + $infix.text + "' )              \n"
-        + "    reg_temp = new 'PAST::Exp'                                     \n"
-        + "    reg_temp.'add_child'( " + reg + " )                            \n"
+        + "    past_temp = new 'PAST::Exp'                                     \n"
+        + "    past_temp.'add_child'( " + reg + " )                            \n"
         + "      null " + reg + "                                             \n"
-        + "  " + $node.reg_mother + ".'add_child'( reg_temp )                 \n"
-        + "    null reg_temp                                                  \n"
+        + "  " + $node.reg_mother + ".'add_child'( past_temp )                 \n"
+        + "    null past_temp                                                  \n"
         + "    # leaving '( PLUS | MINUS | MUL | DIV ) node node'             \n"
       );
     }
@@ -231,12 +230,12 @@ node[String reg_mother]
       System.out.print( 
           "                                                                   \n"
         + " # entering '( VAR LETTER )                                        \n"
-        + "    reg_temp = new 'PAST::Var'                                     \n"
-        + "    reg_temp.'varname'( '" + $LETTER.text + "' )                   \n"
-        + "    reg_temp.'vartype'( 'scalar' )                                 \n"
-        + "    reg_temp.'scope'( 'global' )                                   \n"
-        + "  " + $node.reg_mother + ".'add_child'( reg_temp )                 \n"
-        + "    null reg_temp                                                  \n"
+        + "    past_temp = new 'PAST::Var'                                     \n"
+        + "    past_temp.'varname'( '" + $LETTER.text + "' )                   \n"
+        + "    past_temp.'vartype'( 'scalar' )                                 \n"
+        + "    past_temp.'scope'( 'global' )                                   \n"
+        + "  " + $node.reg_mother + ".'add_child'( past_temp )                 \n"
+        + "    null past_temp                                                  \n"
         + "  # leaving '(VAR LETTER)'                                         \n"
       );
     }
@@ -245,28 +244,12 @@ node[String reg_mother]
       System.out.print(     
           "                                                                   \n"
         + "# entering 'NEWLINE'                                               \n"
-        + "            reg_temp = new 'PAST::Val'                             \n"
-        + "            reg_temp.value( '\\n' )                                \n"
-        + "            reg_temp.valtype( 'strqq' )                            \n"
-        + "          " + $node.reg_mother + ".'add_child'( reg_temp )         \n"
-        + "          null reg_temp                                            \n"
+        + "            past_temp = new 'PAST::Val'                            \n"
+        + "            past_temp.value( '\\n' )                               \n"
+        + "            past_temp.valtype( 'strqq' )                           \n"
+        + "          " + $node.reg_mother + ".'add_child'( past_temp )        \n"
+        + "          null past_temp                                           \n"
         + "# leaving 'NEWLINE'                                                \n"
-      );
-    }
-  | STRING
-    {
-      // In bc backslash has on special meaning, so s!/!//!
-      // Write newlines as '\n', in to not break PIR. s!\n!\\n!
-      String escaped = $STRING.text.replaceAll( "\\\\", "\\\\\\\\\\\\\\\\" ).replaceAll( "\\n", "\\\\\\\\n" );
-      System.out.print(     
-          "                                                                   \n"
-        + "# entering 'STRING'                                                \n"
-        + "            reg_temp = new 'PAST::Val'                             \n"
-        + "            reg_temp.value( " + escaped + " )                      \n"
-        + "            reg_temp.valtype( 'strqq' )                            \n"
-        + "          " + $node.reg_mother + ".'add_child'( reg_temp )         \n"
-        + "          null reg_temp                                            \n"
-        + "# leaving 'STRING'                                                 \n"
       );
     }
   | {

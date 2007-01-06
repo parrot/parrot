@@ -99,6 +99,7 @@ my @tests = (
 );
 @tests = (
     [ '1', [ 1 ], 'positive 1', ],
+    [ '22', [ 22 ], 'positive 22', ],
 );
 
 plan( tests => scalar(@tests) );
