@@ -469,7 +469,7 @@ returns a Parrot::Docs::File object
 sub get_c_language_files {
     my $self = shift;
 
-    my @c_language_files = (
+    return (
         $self->c_source_files,
         $self->c_header_files,
         $self->pmc_source_files,
@@ -478,9 +478,6 @@ sub get_c_language_files {
         map( $_->files_of_type('Lex file'), $self->lex_source_file_directories ),
         $self->ops_source_files,
     );
-
-    return grep $_->path !~ m{ \b (cola|imc)(parser|lexer)\.[hc] $ }x, 
-        @c_language_files;
 
     # XXX: lex_source_files() collects lisp files as well...  how to fix ???
 
