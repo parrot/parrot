@@ -16,8 +16,6 @@ LOAD_EXT  = @load_ext@
 PGE_DIR  = ../../compilers/pge
 TGE_DIR  = ../../compilers/tge
 
-OPSLIBS   = tcl
-
 # can't use $(wildcard) and friends for PMCS, as these have to be in 
 # dependency order; with no duplicates. 
 PMCS = \
@@ -110,11 +108,20 @@ pmcs:
 	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(DESTDIR)" $(PMCS)
 
-ops:
-	@cd $(OPSDIR) && $(OPSBUILD) generate $(OPSLIBS)
-	@cd $(OPSDIR) && $(OPSBUILD) compile $(OPSLIBS)
-	@cd $(OPSDIR) && $(OPSBUILD) linklibs $(OPSLIBS)
-	@cd $(OPSDIR) && $(OPSBUILD) copy "--destination=$(DESTDIR)" $(OPSLIBS)
+# THIS WAS COPIED FROM THE ROOT MAKEFILE
+# Passing an empty argument in @ARGV to cc_flags.pl to indicate where extra -Is
+# (etc) should go. Otherwise it will insert them after the first space, which
+# makes life go horribly wrong if $(CC) contains spaces but can't have -I
+# arguments (etc) injected in the middle.
+# There is probably a better way to do this, but I can't work it out right now.
+.c$(O) :   
+	@$(PERL) ../../tools/dev/cc_flags.pl ../../CFLAGS $(CC) "" $(CFLAGS) -I@build_dir@@slash@include @cc_o_out@$@ -c $<
+
+ops: src/binary.o
+	@cd $(OPSDIR) && $(OPSBUILD) generate tcl
+	@cd $(OPSDIR) && $(OPSBUILD) compile  tcl
+	@cd $(OPSDIR) && $(OPSBUILD) linklibs tcl ../binary.o
+	@cd $(OPSDIR) && $(OPSBUILD) copy "--destination=$(DESTDIR)" tcl
 
 runtime/builtins.pir: $(GENERATED_INLINES) $(DEPS) tools/gen_builtins.pl
 	$(PERL) tools/gen_builtins.pl > runtime/builtins.pir
@@ -306,6 +313,7 @@ src/grammar/expr/pge2past.pir \
 $(GENERATED_INLINES) \
 "$(OPSDIR)/*.c" \
 "$(OPSDIR)/*.h" \
+"src/*$(O)" \
 "$(OPSDIR)/*$(O)" \
 "$(OPSDIR)/*.bundle" \
 "$(TCL_LIB)/*.pir"
