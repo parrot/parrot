@@ -61,6 +61,8 @@ PARROT_API PMC *key_append(Interp *interp, PMC *key1, PMC *key2);
 
 PARROT_API void key_mark(Interp *interp, PMC *key);
 
+PARROT_API STRING *key_set_to_string(Interp *interpreter, PMC *key);
+
 #endif /* PARROT_KEY_H_GUARD */
 
 /*

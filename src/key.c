@@ -481,6 +481,60 @@ key_mark(Interp *interp, PMC *key)
 
 /*
 
+=item C<STRING *
+key_set_to_string(Interp *interpreter, PMC *key)>
+
+=cut
+
+*/
+
+STRING *
+key_set_to_string(Interp *interp, PMC *key)
+{
+    PMC *reg;
+    STRING *semicolon = string_from_cstring(interp, " ; ", 3);
+    STRING *quote = string_from_cstring(interp, "'", 1);
+    STRING *value = string_from_cstring(interp, "[ ", 2);
+
+    for (; key; key = PMC_data(key)) {
+        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+            case KEY_integer_FLAG:
+                string_append(interp, value, string_from_int(interp, PMC_int_val(key)));
+                break;
+            case KEY_string_FLAG:
+                string_append(interp, value, quote);
+                string_append(interp, value, PMC_str_val(key));
+                string_append(interp, value, quote);
+                break;
+            case KEY_pmc_FLAG:
+                string_append(interp, value, VTABLE_get_string(interp, key));
+                break;
+            case KEY_integer_FLAG | KEY_register_FLAG:
+                string_append(interp, value, string_from_int(interp, REG_INT(PMC_int_val(key))));
+                break;
+            case KEY_string_FLAG | KEY_register_FLAG:
+                string_append(interp, value, quote);
+                string_append(interp, value, REG_STR(PMC_int_val(key)));
+                string_append(interp, value, quote);
+                break;
+            case KEY_pmc_FLAG | KEY_register_FLAG:
+                reg = REG_PMC(PMC_int_val(key));
+                string_append(interp, value, VTABLE_get_string(interp, reg));
+                break;
+            default:
+                string_append(interp, value, string_from_cstring(interp, "Key type unknown", 0));
+                break;
+        }
+
+        if (PMC_data(key))
+            string_append(interp, value, semicolon);
+    }
+    string_append(interp, value, string_from_cstring(interp, " ]", 2));
+    return value;
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

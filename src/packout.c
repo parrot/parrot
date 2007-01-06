@@ -151,8 +151,6 @@ C<PackFile_ConstTable_pack()>
 
 */
 
-static struct PackFile_ConstTable *ct;
-
 opcode_t *
 PackFile_ConstTable_pack(Interp *interp,
         struct PackFile_Segment *seg, opcode_t *cursor)
@@ -160,14 +158,10 @@ PackFile_ConstTable_pack(Interp *interp,
     struct PackFile_ConstTable * const self = (struct PackFile_ConstTable *)seg;
     opcode_t i;
 
-    /* remember const_table for find_in_const */
-    ct = self;
-
     *cursor++ = self->const_count;
 
     for (i = 0; i < self->const_count; i++) {
-        cursor = PackFile_Constant_pack(interp,
-                                        self->constants[i], cursor);
+        cursor = PackFile_Constant_pack(interp, self, self->constants[i], cursor);
     }
 
     return cursor;
@@ -185,8 +179,8 @@ constant is in constant table, so we have to search for it.
 
 */
 
-static int
-find_in_const(Interp *interp, PMC *key, int type)
+int
+PackFile_find_in_const(Interp *interp, struct PackFile_ConstTable *ct, PMC *key, int type)
 {
     int i;
     for (i = 0; i < ct->const_count; i++)
@@ -204,8 +198,8 @@ find_in_const(Interp *interp, PMC *key, int type)
 /*
 
 =item C<opcode_t *
-PackFile_Constant_pack(Interp*, struct PackFile_Constant *self,
-                       opcode_t *cursor)>
+PackFile_Constant_pack(Interp*, struct PackFile_ConstTable * const_table, 
+                       struct PackFile_Constant *self, opcode_t *cursor)>
 
 Pack a PackFile Constant into a contiguous region of memory.
 
@@ -223,7 +217,7 @@ The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 */
 
 opcode_t *
-PackFile_Constant_pack(Interp* interp,
+PackFile_Constant_pack(Interp* interp, struct PackFile_ConstTable * const_table, 
         struct PackFile_Constant *self, opcode_t *cursor)
 {
     struct PMC *key;
@@ -278,12 +272,12 @@ PackFile_Constant_pack(Interp* interp,
                 case KEY_number_FLAG:
                     *cursor++ = PARROT_ARG_NC | slice_bits;
                     /* Argh */
-                    *cursor++ = find_in_const(interp, key, PFC_NUMBER);
+                    *cursor++ = PackFile_find_in_const(interp, const_table, key, PFC_NUMBER);
                     break;
                 case KEY_string_FLAG:
                     *cursor++ = PARROT_ARG_SC | slice_bits;
                     /* Argh */
-                    *cursor++ = find_in_const(interp, key, PFC_STRING);
+                    *cursor++ = PackFile_find_in_const(interp, const_table, key, PFC_STRING);
                     break;
 
                 case KEY_integer_FLAG | KEY_register_FLAG:

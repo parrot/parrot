@@ -254,7 +254,8 @@ typedef enum {
     PBC_LOADED = 2,
     PBC_PBC    = 4,
     PBC_IMMEDIATE = 8,
-    PBC_POSTCOMP  = 16
+    PBC_POSTCOMP  = 16,
+    PBC_INIT  = 32
 } pbc_action_enum_t;
 
 PARROT_API void PackFile_fixup_subs(Interp *, pbc_action_enum_t, PMC *eval_pmc);
@@ -375,7 +376,7 @@ PARROT_API struct PackFile_Constant *PackFile_Constant_new(Interp *);
 
 PARROT_API size_t PackFile_Constant_pack_size(Interp *, struct PackFile_Constant * self);
 
-PARROT_API opcode_t * PackFile_Constant_pack(Interp *, struct PackFile_Constant *, opcode_t *);
+PARROT_API opcode_t * PackFile_Constant_pack(Interp *, struct PackFile_ConstTable *ct, struct PackFile_Constant *, opcode_t *);
 
 PARROT_API void PackFile_Constant_destroy(Interp *, struct PackFile_Constant * self);
 
@@ -387,6 +388,9 @@ PARROT_API opcode_t * PackFile_Constant_unpack_key(Interp *interp,
 
 PARROT_API opcode_t * PackFile_Constant_unpack_pmc(Interp *interp,
         struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
+
+PARROT_API int PackFile_find_in_const(Interp *interpreter, struct PackFile_ConstTable *ct,
+        PMC *key, int type);
 
 /*
  * pf_items low level Parrot items fetch routines
