@@ -20,7 +20,7 @@ is [expr 4.0]     4.0 {float stays float}
 is [expr 3e2]   300.0 {scientific}
 is [expr 3e0]     3.0 {scientific with 0 exponent}
 is [expr 2.3e2] 230.0 {scientific with float base}
-eval_is {expr 2e17}  2e+17 {scientific in, scientific out}
+is [expr 2e17]  2e+17 {scientific in, scientific out}
 eval_is {expr 3e2.0} \
  {syntax error in expression "3e2.0": extra tokens at end of expression} \
  {can only e with an integer exponent}
@@ -51,10 +51,9 @@ eval_is {expr trues}  \
 eval_is {expr falses} \
  {syntax error in expression "falses": the word "falses" requires a preceding $ if it's a variable or function arguments if it's a function} \
  {falses}
-eval_is {expr 0b1001}    9 {binary}
-eval_is {expr 0b10}      2 {binary}
-eval_is {expr 0b101010} 42 {binary}
-
+is [expr 0b1001]    9 {binary}
+is [expr 0b10]      2 {binary}
+is [expr 0b101010] 42 {binary}
 
 eval_is {expr {}} {syntax error in expression "": premature end of expression}
 
@@ -95,13 +94,13 @@ is [expr {"$j"}]      7 {variables in quotes}
 is [expr {"#$j"}]    #7 {variables in quotes after literal}
 is [expr {"$"}]       $ {dollar-sign in quotes}
 is [expr {"[set j]"}] 7 {commands in quotes}
-eval_is {
+is [
   set foo a
   set hash(abar) 5
   expr {$hash(${foo}bar)}
-} 5 {variables - complex arary index}
+] 5 {variables - complex array index}
 
-eval_is {expr {1 ? 14 : [expr {}]}} 14 \
+is [expr {1 ? 14 : [expr {}]}] 14 \
   {make sure expr errors happen at runtime}
 
 # numification
@@ -112,31 +111,28 @@ set j 0001234
 is [expr {$j}] 668 {variable octal}
 
 # simple binary ops - stringified integers
-# RT#40620: any eval_is's in this section are written that way because the 
-# test errors wrongly.
 is [expr {2 ** "3"}]   8 {pow "}
 is [expr {"2" ** 3}]   8 {pow "}
 is [expr {2 * "3"}]    6 {mul "}
 is [expr {"2" * 3}]    6 {mul "}
 is [expr {6 / "2"}]    3 {times "}
 is [expr {"6" / 2}]    3 {times "}
-# eval because it fails.
-eval_is {expr {3 % "2"}} 1 {remainder "} 
-eval_is {expr {"3" % 2}} 1 {remainder "} 
+is [expr {3 % "2"}]    1 {remainder "} 
+is [expr {"3" % 2}]    1 {remainder "} 
 is [expr {2 + "3"}]    5 {plus "}
 is [expr {"2" + 3}]    5 {plus "}
 is [expr {2 - "3"}]   -1 {minus "}
 is [expr {"2" - 3}]   -1 {minus "}
-eval_is {expr {16 << "2"}} 64 {left shift "}
-eval_is {expr {"16" << 2}} 64 {left shift "}
-eval_is {expr {16 >> "2"}}  4 {right shift "}
-eval_is {expr {"16" >> 2}}  4 {right shift "}
-eval_is {expr {5 & "6"}}    4 {& "}
-eval_is {expr {"5" & 6}}    4 {& "}
-eval_is {expr {5 | "6"}}    7 {| "}
-eval_is {expr {"5" | 6}}    7 {| "}
-eval_is {expr {5 ^ "6"}}    3 {^ "}
-eval_is {expr {"5" ^ 6}}    3 {^ "}
+is [expr {16 << "2"}] 64 {left shift "}
+is [expr {"16" << 2}] 64 {left shift "}
+is [expr {16 >> "2"}]  4 {right shift "}
+is [expr {"16" >> 2}]  4 {right shift "}
+is [expr {5 & "6"}]    4 {& "}
+is [expr {"5" & 6}]    4 {& "}
+is [expr {5 | "6"}]    7 {| "}
+is [expr {"5" | 6}]    7 {| "}
+is [expr {5 ^ "6"}]    3 {^ "}
+is [expr {"5" ^ 6}]    3 {^ "}
 
 # comparison ops.
 is [expr 10<9] 0 {lt, numeric, not alpha}
@@ -345,26 +341,26 @@ foreach operator $ops_list {
 
 
 # variable expansions..
-eval_is {
+is [
   set q(1) 2
   expr {$q(1)}
-} 2 {array variables}
-eval_is {
+] 2 {array variables}
+is [
   set under_score0 3
   expr {$under_score0}
-} 3 {_, 0 in varnames}
+] 3 {_, 0 in varnames}
 
 #command expansions
 is [expr {[]}] {} {empty command}
-eval_is {
+is [
   expr {[list a] eq [list a]}
-} 1 {command expansion inside, list types.}
-eval_is {
+] 1 {command expansion inside, list types.}
+is [
   expr {[set a a] eq [set b a]}
-} 1 {command expansion inside, string types}
+] 1 {command expansion inside, string types}
 
 
-# TD-    add tet   for ::tcl::mathfunc 
+# XXX  add tests for ::tcl::mathfunc 
 
 # tcl_precision
 is [set tcl_precision 3; expr 1/3.] 0.333 { precision 3}
