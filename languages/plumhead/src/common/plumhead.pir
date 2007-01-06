@@ -93,7 +93,7 @@ VARIANT_PARTRIDGE:
     .return $P0.'evalfiles'(php_source_fn)
 
 VARIANT_ANTLR3:
-    err_msg = 'Generating PAST from PHP source failed'
+    err_msg = 'Generating PAST from annotated PHP source failed'
     cmd = 'java PlumheadAntlr3 '
     concat cmd, php_source_fn
     concat cmd, ' plumhead_past.pir'
