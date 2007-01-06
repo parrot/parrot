@@ -231,7 +231,8 @@ PackFile_Constant_dump(Interp *interp, struct PackFile_ConstTable *ct,
                             default:
                                 namespace_description = sub->namespace->vtable->whoami;
                         }
-                    } else {
+                    }
+                    else {
                         namespace_description = null;
                     }
                     PIO_printf(interp,

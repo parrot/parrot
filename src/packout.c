@@ -198,7 +198,7 @@ PackFile_find_in_const(Interp *interp, struct PackFile_ConstTable *ct, PMC *key,
 /*
 
 =item C<opcode_t *
-PackFile_Constant_pack(Interp*, struct PackFile_ConstTable * const_table, 
+PackFile_Constant_pack(Interp*, struct PackFile_ConstTable * const_table,
                        struct PackFile_Constant *self, opcode_t *cursor)>
 
 Pack a PackFile Constant into a contiguous region of memory.
@@ -217,7 +217,7 @@ The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 */
 
 opcode_t *
-PackFile_Constant_pack(Interp* interp, struct PackFile_ConstTable * const_table, 
+PackFile_Constant_pack(Interp* interp, struct PackFile_ConstTable * const_table,
         struct PackFile_Constant *self, opcode_t *cursor)
 {
     struct PMC *key;
