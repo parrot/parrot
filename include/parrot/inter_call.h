@@ -51,6 +51,27 @@ enum call_state_mode {
 
 };
 
+#define CALL_STATE_x_ISSET(o, x) (o & CALL_STATE_ ## x)
+#define CALL_STATE_x_SET(o, x) (o |= CALL_STATE_ ## x)
+#define CALL_STATE_x_UNSET(o, x) (o &= ~CALL_STATE_ ## x)
+
+#define CALL_STATE_MASK_MASK(o)       (CALL_STATE_X_ISSET(o, MASK))
+#define CALL_STATE_SIG_ISSET(o)       (CALL_STATE_X_ISSET(o, SIG))
+#define CALL_STATE_OP_ISSET(o)        (CALL_STATE_X_ISSET(o, OP))
+#define CALL_S_D_MASK_MASK(o)         (o & CALL_S_D_MASK)
+#define CALL_STATE_FLATTEN_ISSET(o)   (CALL_STATE_X_ISSET(o, FLATTEN))
+#define CALL_STATE_NEXT_ARG_ISSET(o)  (CALL_STATE_X_ISSET(o, NEXT_ARG))
+
+#define CALL_STATE_SIG_SET(o)       (CALL_STATE_X_SET(o, SIG))
+#define CALL_STATE_OP_SET(o)        (CALL_STATE_X_SET(o, OP))
+#define CALL_STATE_FLATTEN_SET(o)   (CALL_STATE_X_SET(o, FLATTEN))
+#define CALL_STATE_NEXT_ARG_SET(o)  (CALL_STATE_X_SET(o, NEXT_ARG))
+
+#define CALL_STATE_SIG_UNSET(o)       (CALL_STATE_X_UNSET(o, SIG))
+#define CALL_STATE_OP_UNSET(o)        (CALL_STATE_X_UNSET(o, OP))
+#define CALL_STATE_FLATTEN_UNSET(o)   (CALL_STATE_X_UNSET(o, FLATTEN))
+#define CALL_STATE_NEXT_ARG_UNSET(o)  (CALL_STATE_X_UNSET(o, NEXT_ARG))
+
 struct call_state_item {
     int mode;       /* from_sig, from_set_ops, flatten ...*/
     union {
@@ -107,9 +128,11 @@ opcode_t *
 parrot_pass_args_to_result(Interp *interp, const char *sig,
         opcode_t *dest, parrot_context_t * old_ctxp, va_list ap);
 
-FLOATVAL set_retval_f(Interp*, int sig_ret, parrot_context_t *ctx);
 void* set_retval(Interp*, int sig_ret, parrot_context_t *ctx);
 INTVAL set_retval_i(Interp*, int sig_ret, parrot_context_t *ctx);
+FLOATVAL set_retval_f(Interp*, int sig_ret, parrot_context_t *ctx);
+STRING* set_retval_s(Interp*, int sig_ret, parrot_context_t *ctx);
+PMC* set_retval_p(Interp*, int sig_ret, parrot_context_t *ctx);
 
 #define ASSERT_SIG_PMC(sig) \
     assert(PObj_is_PMC_TEST(sig) && \
