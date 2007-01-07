@@ -171,8 +171,15 @@ node[String reg_mother]
     }
     ^( infix=( PLUS | MINUS | MUL_OP | REL_OP ) node[reg] node[reg] )
     {
+      // Todo. This is not nice, handl pirops in Plumhead.g
+      String pirop = $infix.text;
+      if ( pirop.equals( "+" ) )
+      {
+        pirop = "n_add";
+      }
+      
       System.out.print( 
-          "  " + reg + ".'attr'( 'pirop', '" + $infix.text + "' , 1 )    \n"
+          "  " + reg + ".'attr'( 'pirop', '" + pirop + "' , 1 )               \n"
         + "  " + $node.reg_mother + ".'push'( " + reg + " )                   \n"
         + "      null " + reg + "                                             \n"
         + "    # leaving ( PLUS | MINUS | MUL | DIV )                         \n"

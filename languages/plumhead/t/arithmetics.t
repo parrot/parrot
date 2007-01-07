@@ -57,14 +57,12 @@ my @tests = (
     [ '1', [ 1 ], 'positive 1', ],
     [ '22', [ 22 ], 'positive 22', ],
     [ '333', [ 333 ], 'positive 333', ],
+    [ '12345678', [ 12345678 ], 'large positive int',  ],
     [ '-1', [ -1 ], 'negative 1', ],
     [ '-22', [ -22 ], 'negative 22', ],
     [ '-333', [ -333 ], 'negative 333', ],
-    [ '1 + 1', [ 2 ], 'one plus one', ],
-    [ '0', [ 0 ], 'zero',  ],
-    [ '2', [ 2 ], 'positive int',  ],
-    [ '12345678', [ 12345678 ], 'another positive int',  ],
     [ '-12345678', [ -12345678 ], 'another negative int',  ],
+    [ '1 + 1', [ 2 ], 'one plus one', ],
     [ '1 + 2', '3', 'two summands', ],
     [ '1 + 2 + 3', '6', 'three summands', ],
     [ '1 + 0 + 3', '4', 'three summands including 0', ],
@@ -104,7 +102,7 @@ my @tests = (
 );
 
 # Not all tests are working yet
-$#tests = 6;
+$#tests = 13;
 
 plan( tests => scalar(@tests) );
 run_tests(\@tests);

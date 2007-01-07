@@ -23,7 +23,12 @@ tokens
 SEA        : 'start_sea' ( options {greedy=false;} : . )* 'end_sea' ;
 CODE_START : '<?php' ;
 CODE_END   : '?>' ;
-WS         : ( ' ' | '\t' | '\r' | '\n' )+ ;    
+WS
+  : ( ' ' | '\t' | '\r' | '\n' )+
+    {
+      $channel = HIDDEN;       // send into nirwana 
+    }
+  ;
 STRING     : '\"' ( ~'\"' )*  '\"' ;
 ECHO       : 'echo' ;
 INTEGER    : ( '0'..'9' )+ ;
@@ -34,7 +39,7 @@ REL_OP     : '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
 
 
 program 
-  : s1=sea code s2=sea WS? -> ^( PROGRAM $s1 code $s2 )
+  : s1=sea code s2=sea -> ^( PROGRAM $s1 code $s2 )
   ;
 
 sea
@@ -42,7 +47,7 @@ sea
   ;
 
 code
-  : CODE_START statements WS? CODE_END WS? -> statements
+  : CODE_START statements CODE_END -> statements
   ;
 
 statements
@@ -50,12 +55,20 @@ statements
   ;
 
 statement
-  : WS? ECHO WS? expression WS? ';' -> ^( ECHO expression )
+  : ECHO expression ';' -> ^( ECHO expression )
   ;
 
 expression
   : STRING
-  | unary_expression
+  | adding_expression
+  ;
+
+adding_expression
+  : multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression )* 
+  ;
+
+multiplying_expression
+  : unary_expression
   ;
 
 unary_expression

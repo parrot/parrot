@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/GenPastPir.g 2007-01-07 14:13:15
+// $ANTLR 3.0b5 src/antlr3/GenPastPir.g 2007-01-07 15:27:01
 
   import java.util.regex.*;
 
@@ -356,8 +356,15 @@ public class GenPastPirTreeParser extends TreeParser {
 
                     match(input, Token.UP, null); 
 
+                          // Todo. This is not nice, handl pirops in Plumhead.g
+                          String pirop = infix.getText();
+                          if ( pirop.equals( "+" ) )
+                          {
+                            pirop = "n_add";
+                          }
+                          
                           System.out.print( 
-                              "  " + reg + ".'attr'( 'pirop', '" + infix.getText() + "' , 1 )    \n"
+                              "  " + reg + ".'attr'( 'pirop', '" + pirop + "' , 1 )               \n"
                             + "  " + reg_mother + ".'push'( " + reg + " )                   \n"
                             + "      null " + reg + "                                             \n"
                             + "    # leaving ( PLUS | MINUS | MUL | DIV )                         \n"
@@ -367,7 +374,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 5 :
-                    // src/antlr3/GenPastPir.g:181:5: ^( FUNCTION LETTER )
+                    // src/antlr3/GenPastPir.g:188:5: ^( FUNCTION LETTER )
                     {
                     match(input,FUNCTION,FOLLOW_FUNCTION_in_node198); 
 
@@ -382,7 +389,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 6 :
-                    // src/antlr3/GenPastPir.g:185:5: ^( ASSIGN_OP ^( VAR LETTER ) node[\"reg_assign_lhs\"] )
+                    // src/antlr3/GenPastPir.g:192:5: ^( ASSIGN_OP ^( VAR LETTER ) node[\"reg_assign_lhs\"] )
                     {
 
                           System.out.print( 
@@ -430,7 +437,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 7 :
-                    // src/antlr3/GenPastPir.g:212:5: NUMBER
+                    // src/antlr3/GenPastPir.g:219:5: NUMBER
                     {
                     NUMBER4=(CommonTree)input.LT(1);
                     match(input,NUMBER,FOLLOW_NUMBER_in_node245); 
@@ -450,7 +457,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 8 :
-                    // src/antlr3/GenPastPir.g:225:5: ^( VAR LETTER )
+                    // src/antlr3/GenPastPir.g:232:5: ^( VAR LETTER )
                     {
                     match(input,VAR,FOLLOW_VAR_in_node259); 
 
@@ -476,7 +483,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 9 :
-                    // src/antlr3/GenPastPir.g:239:5: NEWLINE
+                    // src/antlr3/GenPastPir.g:246:5: NEWLINE
                     {
                     match(input,NEWLINE,FOLLOW_NEWLINE_in_node275); 
                      
@@ -495,7 +502,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 10 :
-                    // src/antlr3/GenPastPir.g:252:5: ^( If node[\"reg_if_op\"] node[\"reg_if_op\"] )
+                    // src/antlr3/GenPastPir.g:259:5: ^( If node[\"reg_if_op\"] node[\"reg_if_op\"] )
                     {
 
                           reg_num++;
@@ -534,7 +541,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 11 :
-                    // src/antlr3/GenPastPir.g:273:5: ^( STMTS ( node[reg_stmts] )* )
+                    // src/antlr3/GenPastPir.g:280:5: ^( STMTS ( node[reg_stmts] )* )
                     {
 
                           reg_num++;
@@ -548,7 +555,7 @@ public class GenPastPirTreeParser extends TreeParser {
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // src/antlr3/GenPastPir.g:281:14: ( node[reg_stmts] )*
+                        // src/antlr3/GenPastPir.g:288:14: ( node[reg_stmts] )*
                         loop2:
                         do {
                             int alt2=2;
@@ -560,7 +567,7 @@ public class GenPastPirTreeParser extends TreeParser {
 
                             switch (alt2) {
                         	case 1 :
-                        	    // src/antlr3/GenPastPir.g:281:14: node[reg_stmts]
+                        	    // src/antlr3/GenPastPir.g:288:14: node[reg_stmts]
                         	    {
                         	    pushFollow(FOLLOW_node_in_node325);
                         	    node(reg_stmts);

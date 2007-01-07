@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-07 14:13:14
+// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-07 15:26:59
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -232,10 +232,10 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:26:14: ( ( (' '|'\\t'|'\\r'|'\\n'))+ )
-            // src/antlr3/Plumhead.g:26:14: ( (' '|'\\t'|'\\r'|'\\n'))+
+            // src/antlr3/Plumhead.g:27:5: ( ( (' '|'\\t'|'\\r'|'\\n'))+ )
+            // src/antlr3/Plumhead.g:27:5: ( (' '|'\\t'|'\\r'|'\\n'))+
             {
-            // src/antlr3/Plumhead.g:26:14: ( (' '|'\\t'|'\\r'|'\\n'))+
+            // src/antlr3/Plumhead.g:27:5: ( (' '|'\\t'|'\\r'|'\\n'))+
             int cnt2=0;
             loop2:
             do {
@@ -248,7 +248,7 @@ public class PlumheadLexer extends Lexer {
 
                 switch (alt2) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:26:16: (' '|'\\t'|'\\r'|'\\n')
+            	    // src/antlr3/Plumhead.g:27:7: (' '|'\\t'|'\\r'|'\\n')
             	    {
             	    if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
             	        input.consume();
@@ -274,6 +274,9 @@ public class PlumheadLexer extends Lexer {
             } while (true);
 
 
+                  _channel = HIDDEN;       // send into nirwana 
+                
+
             }
 
 
@@ -298,11 +301,11 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:27:14: ( '\\\"' (~ '\\\"' )* '\\\"' )
-            // src/antlr3/Plumhead.g:27:14: '\\\"' (~ '\\\"' )* '\\\"'
+            // src/antlr3/Plumhead.g:32:14: ( '\\\"' (~ '\\\"' )* '\\\"' )
+            // src/antlr3/Plumhead.g:32:14: '\\\"' (~ '\\\"' )* '\\\"'
             {
             match('\"'); 
-            // src/antlr3/Plumhead.g:27:19: (~ '\\\"' )*
+            // src/antlr3/Plumhead.g:32:19: (~ '\\\"' )*
             loop3:
             do {
                 int alt3=2;
@@ -314,7 +317,7 @@ public class PlumheadLexer extends Lexer {
 
                 switch (alt3) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:27:21: ~ '\\\"'
+            	    // src/antlr3/Plumhead.g:32:21: ~ '\\\"'
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
@@ -361,8 +364,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:28:14: ( 'echo' )
-            // src/antlr3/Plumhead.g:28:14: 'echo'
+            // src/antlr3/Plumhead.g:33:14: ( 'echo' )
+            // src/antlr3/Plumhead.g:33:14: 'echo'
             {
             match("echo"); 
 
@@ -391,10 +394,10 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:29:14: ( ( '0' .. '9' )+ )
-            // src/antlr3/Plumhead.g:29:14: ( '0' .. '9' )+
+            // src/antlr3/Plumhead.g:34:14: ( ( '0' .. '9' )+ )
+            // src/antlr3/Plumhead.g:34:14: ( '0' .. '9' )+
             {
-            // src/antlr3/Plumhead.g:29:14: ( '0' .. '9' )+
+            // src/antlr3/Plumhead.g:34:14: ( '0' .. '9' )+
             int cnt4=0;
             loop4:
             do {
@@ -407,7 +410,7 @@ public class PlumheadLexer extends Lexer {
 
                 switch (alt4) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:29:16: '0' .. '9'
+            	    // src/antlr3/Plumhead.g:34:16: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -448,8 +451,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:30:14: ( '-' )
-            // src/antlr3/Plumhead.g:30:14: '-'
+            // src/antlr3/Plumhead.g:35:14: ( '-' )
+            // src/antlr3/Plumhead.g:35:14: '-'
             {
             match('-'); 
 
@@ -477,8 +480,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:31:14: ( '+' )
-            // src/antlr3/Plumhead.g:31:14: '+'
+            // src/antlr3/Plumhead.g:36:14: ( '+' )
+            // src/antlr3/Plumhead.g:36:14: '+'
             {
             match('+'); 
 
@@ -506,8 +509,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:32:12: ( ('*'|'/'|'%'))
-            // src/antlr3/Plumhead.g:32:14: ('*'|'/'|'%')
+            // src/antlr3/Plumhead.g:37:12: ( ('*'|'/'|'%'))
+            // src/antlr3/Plumhead.g:37:14: ('*'|'/'|'%')
             {
             if ( input.LA(1)=='%'||input.LA(1)=='*'||input.LA(1)=='/' ) {
                 input.consume();
@@ -544,7 +547,7 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:33:14: ( '==' | '<=' | '>=' | '!=' | '<' | '>' )
+            // src/antlr3/Plumhead.g:38:14: ( '==' | '<=' | '>=' | '!=' | '<' | '>' )
             int alt5=6;
             switch ( input.LA(1) ) {
             case '=':
@@ -571,14 +574,14 @@ public class PlumheadLexer extends Lexer {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("33:1: REL_OP : ( '==' | '<=' | '>=' | '!=' | '<' | '>' );", 5, 0, input);
+                    new NoViableAltException("38:1: REL_OP : ( '==' | '<=' | '>=' | '!=' | '<' | '>' );", 5, 0, input);
 
                 throw nvae;
             }
 
             switch (alt5) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:33:14: '=='
+                    // src/antlr3/Plumhead.g:38:14: '=='
                     {
                     match("=="); 
 
@@ -586,7 +589,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // src/antlr3/Plumhead.g:33:21: '<='
+                    // src/antlr3/Plumhead.g:38:21: '<='
                     {
                     match("<="); 
 
@@ -594,7 +597,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // src/antlr3/Plumhead.g:33:28: '>='
+                    // src/antlr3/Plumhead.g:38:28: '>='
                     {
                     match(">="); 
 
@@ -602,7 +605,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 4 :
-                    // src/antlr3/Plumhead.g:33:35: '!='
+                    // src/antlr3/Plumhead.g:38:35: '!='
                     {
                     match("!="); 
 
@@ -610,14 +613,14 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 5 :
-                    // src/antlr3/Plumhead.g:33:42: '<'
+                    // src/antlr3/Plumhead.g:38:42: '<'
                     {
                     match('<'); 
 
                     }
                     break;
                 case 6 :
-                    // src/antlr3/Plumhead.g:33:49: '>'
+                    // src/antlr3/Plumhead.g:38:49: '>'
                     {
                     match('>'); 
 
