@@ -4,6 +4,10 @@
 #include "binary.h"
 #include <stdio.h>
 
+static int class_TclFloat = 0;
+static int class_TclInt   = 0;
+static int class_TclList  = 0;
+
 static PMC *
 binary_scan_field(Interp *interp, char field, char *binstr, int *_pos, int length)
 {
@@ -18,7 +22,7 @@ binary_scan_field(Interp *interp, char field, char *binstr, int *_pos, int lengt
             if (pos >= length)
                 break;
             c     = (char *)(binstr + pos);
-            value = pmc_new(interp, enum_class_Integer);
+            value = pmc_new(interp, class_TclInt);
             VTABLE_set_integer_native(interp, value, (INTVAL)*c);
             pos += 1;
             break;
@@ -27,13 +31,25 @@ binary_scan_field(Interp *interp, char field, char *binstr, int *_pos, int lengt
             if (pos + len > length)
                 break;
             d     = (double *)(binstr + pos);
-            value = pmc_new(interp, enum_class_Float);
+            value = pmc_new(interp, class_TclFloat);
             VTABLE_set_number_native(interp, value, *d);
             pos += len;
             break;
     }
     (*_pos) = pos;
     return value;
+}
+
+static PMC *
+binary_scan_slurpy(Interp *interp, char field, char *binstr, int *_pos, int length)
+{
+    PMC *elem;
+    PMC *values = pmc_new(interp, class_TclList);
+
+    while ((elem = binary_scan_field(interp, field, binstr, _pos, length)) != PMCNULL)
+        VTABLE_push_pmc(interp, values, elem);
+
+    return values;
 }
 
 PMC *ParTcl_binary_scan(Interp *interp, STRING *BINSTR, STRING *FORMAT)
@@ -45,12 +61,29 @@ PMC *ParTcl_binary_scan(Interp *interp, STRING *BINSTR, STRING *FORMAT)
     INTVAL formatlen = string_length(interp, FORMAT);
     INTVAL formatpos = 0;
     INTVAL value     = 0;
-    PMC *values      = pmc_new(interp, enum_class_ResizablePMCArray);
-    
+    PMC *values;
+
+    if (!class_TclFloat)
+    {
+        class_TclFloat = pmc_type(interp, string_from_const_cstring(interp, "TclFloat", 0));
+        class_TclInt   = pmc_type(interp, string_from_const_cstring(interp, "TclInt", 0));
+        class_TclList  = pmc_type(interp, string_from_const_cstring(interp, "TclList", 0));
+    }
+
+    values = pmc_new(interp, class_TclList);
     while (formatpos < formatlen)
     {
-        PMC *value = binary_scan_field(interp, format[formatpos++],
-                                       binstr, &binstrpos, binstrlen);
+        char field = format[formatpos++];
+        PMC *value;
+
+        if (formatpos < formatlen && format[formatpos] == '*')
+        {
+            formatpos++;
+            value = binary_scan_slurpy(interp, field, binstr, &binstrpos, binstrlen);
+        }
+        else
+            value = binary_scan_field(interp, field, binstr, &binstrpos, binstrlen);
+
         VTABLE_push_pmc(interp, values, value);
     }
 
@@ -66,10 +99,12 @@ binary_format_field(Interp *interp, char field, STRING *binstr, PMC *value)
 
     switch (field)
     {
+        /* a char */
         case 'c':
             c      = (char)VTABLE_get_integer(interp, value);
             binstr = string_concat(interp, binstr, string_from_cstring(interp, &c, 1), 1);
             break;
+        /* a double */
         case 'd':
             d      = (double)VTABLE_get_number(interp, value);
             len    = sizeof(double)/sizeof(char);
