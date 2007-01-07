@@ -66,6 +66,8 @@ installable_pdump.exe                             [main]bin
 languages/cola/lexer.c                            [cola]
 languages/cola/parser.c                           [cola]
 languages/cola/parser.h                           [cola]
+languages/lua/Lua/parser.pm                       [lua]
+languages/regex/lib/Regex/Grammar.pm              [regex]
 libparrot.dll                                     [main]bin
 parrot.pc                                         [main]pkgconfig
 pbc_info                                          [main]bin
