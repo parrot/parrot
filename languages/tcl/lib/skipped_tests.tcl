@@ -45,13 +45,13 @@ set skipped_tests [dict create \
     namespace-old-7.7
   } {[expr wide()]} {
     dict-11.1 dict-11.2 dict-11.3 dict-11.4 dict-11.5 dict-11.6 dict-11.7
+    expr-old-34.13 expr-old-34.14
     lindex-3.7
+  } {[expr s?rand()]} {
+    expr-old-32.51 expr-old-32.52 expr-old-32.53 expr-old-32.48 expr-old-32.49
+    expr-old-32.50 expr-old-32.45
   } {[namespace code]} {
-    namespace-22.1 
-    namespace-22.2 
-    namespace-22.3 
-    namespace-22.4 
-    namespace-22.5 
+    namespace-22.1 namespace-22.2 namespace-22.3 namespace-22.4 namespace-22.5 
     namespace-22.6 
   } {[namespace delete]} {
     namespace-14.1
@@ -82,7 +82,29 @@ set skipped_tests [dict create \
   } {[lsearch -regexp]} {
     for-3.6
   } {Inf support} {
-    scan-14.1 scan-14.2
+    expr-11.13b expr-22.2 expr-22.4 expr-22.6 expr-22.8 expr-30.3 expr-30.4
+    expr-41.1
+    expr-old-26.10b expr-old-34.11 expr-old-34.12b expr-old-34.11
+    expr-old-34.10
+    scan-14.1 scan-14.2 
+  } {NaN support} {
+    expr-22.1 expr-22.3  expr-22.5 expr-22.7 expr-22.9
+    expr-old-36.7
+  } {[testexprstring]} {
+    expr-old-38.2
+  } {[testexprlong]} {
+    expr-old-37.1 expr-old-37.2 expr-old-37.3 expr-old-37.4 expr-old-37.5
+    expr-old-37.6 expr-old-37.8 expr-old-37.9 expr-old-37.11 expr-old-37.12
+    expr-old-37.14 expr-old-37.15
+  } {[testexprdouble]} {
+    expr-old-37.17 expr-old-37.18 expr-old-37.19 expr-old-37.20 expr-old-37.21
+    expr-old-37.22 expr-old-37.22 expr-old-37.23 expr-old-37.24 expr-old-37.25
+  } {[testexprdoubleobj]} {
+    expr-39.17 expr-39.19 expr-39.20 expr-39.21 expr-39.22 expr-39.23
+    expr-39.24 expr-39.25 
+  } {[testexprlongobj]} {
+    expr-39.1 expr-39.2 expr-39.3 expr-39.4 expr-39.5 expr-39.6 expr-39.8
+    expr-39.9 expr-39.11 expr-39.12 expr-39.14 expr-39.15
   } {[testupvar]} {
     var-3.3 var-3.4 var-3.4
   } {[testgetvarfullname]} {
@@ -109,6 +131,11 @@ set skipped_tests [dict create \
     execute-3.54 execute-3.58 execute-3.59 execute-3.60 execute-3.67
     execute-3.68 execute-3.69 execute-3.70 execute-3.71 execute-3.75
     execute-3.76 execute-3.77
+  } {bigint} {
+    expr-23.36 expr-23.37 expr-23.38 expr-23.39 expr-23.41 expr-23.42
+    expr-23.43 expr-23.44 expr-23.47 expr-23.48 expr-24.10
+    expr-old-32.39 expr-old-32.40 expr-old-36.11 expr-old-36.14 expr-old-34.15
+    expr-old-34.16
   } {ICU} {
     binary-22.3 binary-22.4 binary-22.5 binary-22.11 binary-23.3 binary-23.4
     binary-23.11 binary-24.2 binary-24.3 binary-24.4 binary-24.6 binary-24.10
