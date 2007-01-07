@@ -122,7 +122,7 @@ STRING *ParTcl_binary_format(Interp *interp, STRING *FORMAT, PMC *values)
     INTVAL pos        = 0;
     INTVAL valueidx   = 0;
     STRING *binstr    = string_make_empty(interp, enum_stringrep_one, 128);
-    
+
     while (pos < formatlen)
     {
         PMC *value = VTABLE_get_pmc_keyed_int(interp, values, valueidx++);
