@@ -521,8 +521,7 @@ my @steps = qw(
 
 my $conf = Parrot::Configure->new;
 {
-
-    # XXX $Parrot::Configure::Step::conf is a temporty hack
+    # RT#41201 $Parrot::Configure::Step::conf is a temporary hack
     no warnings qw(once);
     $Parrot::Configure::Step::conf = $conf;
 }
