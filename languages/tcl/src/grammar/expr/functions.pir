@@ -257,6 +257,40 @@ is_string:
 .end
 
 .sub '&floor' 
+    .param pmc a
+
+    .local pmc result
+
+    .local pmc __number
+    __number = get_root_global ['_tcl'], '__number'
+
+    push_eh is_string
+      result = __number(a)
+    clear_eh
+
+    if result >= 0 goto positive
+      
+negative: 
+    $I0 = result
+    dec $I0
+    $N0 = $I0
+    $P0 = new .TclFloat
+    $P0 = $N0
+    .return ($P0) 
+
+positive: 
+    $I0 = result
+    $N0 = $I0
+    $P0 = new .TclFloat
+    $P0 = $N0
+    .return ($P0)
+
+is_string:
+    $S0 = 'expected floating-point number but got "'
+    $S1 = a
+    $S0 .= $S1
+    $S0 .= '"'
+    tcl_error $S0
 .end
 
 .sub '&int'

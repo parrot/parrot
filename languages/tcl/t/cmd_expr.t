@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 286
+plan 291
 
 # namespace
 namespace eval test { variable x 5 }
@@ -225,6 +225,9 @@ is [expr double(5)]     5.0
 is [expr entier(3)]     3
 is [expr entier(3.5)]   3
 is [expr exp(1)]        2.718281828459045
+is [expr floor(0.1)]    0.0
+is [expr floor(0.0)]    0.0
+is [expr floor(-0.1)]   -1.0
 is [expr fmod(3,2)]     1.0
 is [expr fmod(-4, -1)] -0.0 {} $TODO
 is [expr hypot(3,4)]    5.0
@@ -283,7 +286,7 @@ eval_is {expr exp(exp(50))} Inf Inf {TODO unimplemented}
 
 # unary math functions, invalid string ops.
 set function_list \
-  [list acos asin atan cos cosh exp log log10 sin sinh sqrt tan tanh]
+  [list acos asin atan cos cosh exp floor log log10 sin sinh sqrt tan tanh]
 foreach function $function_list {
   eval_is "expr ${function}(\"a\")" \
     {expected floating-point number but got "a"} \
