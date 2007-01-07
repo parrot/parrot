@@ -173,10 +173,11 @@ node[String reg_mother]
     {
       // Todo. This is not nice, handl pirops in Plumhead.g
       String pirop = $infix.text;
-      if ( pirop.equals( "+" ) )
-      {
-        pirop = "n_add";
-      }
+      if      ( pirop.equals( "+" ) )  { pirop = "n_add"; }
+      else if ( pirop.equals( "-" ) )  { pirop = "n_sub"; }
+      else if ( pirop.equals( "*" ) )  { pirop = "n_mul"; }
+      else if ( pirop.equals( "/" ) )  { pirop = "n_div"; }
+      else if ( pirop.equals( "\%" ) ) { pirop = "n_mod"; }
       
       System.out.print( 
           "  " + reg + ".'attr'( 'pirop', '" + pirop + "' , 1 )               \n"

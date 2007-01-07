@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-07 15:26:59
+// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-07 17:47:28
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -7,20 +7,22 @@ import java.util.ArrayList;
 
 public class PlumheadLexer extends Lexer {
     public static final int CODE_START=6;
-    public static final int INTEGER=11;
     public static final int MINUS=12;
-    public static final int ECHO=10;
     public static final int WS=8;
-    public static final int EOF=-1;
     public static final int STRING=9;
-    public static final int Tokens=17;
-    public static final int REL_OP=15;
     public static final int MUL_OP=14;
-    public static final int T16=16;
-    public static final int PLUS=13;
     public static final int SEA=5;
     public static final int CODE_END=7;
     public static final int PROGRAM=4;
+    public static final int INTEGER=11;
+    public static final int ECHO=10;
+    public static final int T18=18;
+    public static final int EOF=-1;
+    public static final int T17=17;
+    public static final int Tokens=19;
+    public static final int REL_OP=15;
+    public static final int PLUS=13;
+    public static final int T16=16;
     public PlumheadLexer() {;} 
     public PlumheadLexer(CharStream input) {
         super(input);
@@ -56,6 +58,64 @@ public class PlumheadLexer extends Lexer {
     }
     // $ANTLR end T16
 
+    // $ANTLR start T17
+    public void mT17() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = T17;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:4:7: ( '(' )
+            // src/antlr3/Plumhead.g:4:7: '('
+            {
+            match('('); 
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end T17
+
+    // $ANTLR start T18
+    public void mT18() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = T18;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:5:7: ( ')' )
+            // src/antlr3/Plumhead.g:5:7: ')'
+            {
+            match(')'); 
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end T18
+
     // $ANTLR start SEA
     public void mSEA() throws RecognitionException {
         try {
@@ -87,11 +147,11 @@ public class PlumheadLexer extends Lexer {
                                     int LA1_6 = input.LA(6);
                                     if ( (LA1_6=='e') ) {
                                         int LA1_7 = input.LA(7);
-                                        if ( ((LA1_7>='\u0000' && LA1_7<='`')||(LA1_7>='b' && LA1_7<='\uFFFE')) ) {
-                                            alt1=1;
-                                        }
-                                        else if ( (LA1_7=='a') ) {
+                                        if ( (LA1_7=='a') ) {
                                             alt1=2;
+                                        }
+                                        else if ( ((LA1_7>='\u0000' && LA1_7<='`')||(LA1_7>='b' && LA1_7<='\uFFFE')) ) {
+                                            alt1=1;
                                         }
 
 
@@ -642,37 +702,43 @@ public class PlumheadLexer extends Lexer {
     // $ANTLR end REL_OP
 
     public void mTokens() throws RecognitionException {
-        // src/antlr3/Plumhead.g:1:10: ( T16 | SEA | CODE_START | CODE_END | WS | STRING | ECHO | INTEGER | MINUS | PLUS | MUL_OP | REL_OP )
-        int alt6=12;
+        // src/antlr3/Plumhead.g:1:10: ( T16 | T17 | T18 | SEA | CODE_START | CODE_END | WS | STRING | ECHO | INTEGER | MINUS | PLUS | MUL_OP | REL_OP )
+        int alt6=14;
         switch ( input.LA(1) ) {
         case ';':
             alt6=1;
             break;
-        case 's':
+        case '(':
             alt6=2;
             break;
+        case ')':
+            alt6=3;
+            break;
+        case 's':
+            alt6=4;
+            break;
         case '<':
-            int LA6_3 = input.LA(2);
-            if ( (LA6_3=='?') ) {
-                alt6=3;
+            int LA6_5 = input.LA(2);
+            if ( (LA6_5=='?') ) {
+                alt6=5;
             }
             else {
-                alt6=12;}
+                alt6=14;}
             break;
         case '?':
-            alt6=4;
+            alt6=6;
             break;
         case '\t':
         case '\n':
         case '\r':
         case ' ':
-            alt6=5;
+            alt6=7;
             break;
         case '\"':
-            alt6=6;
+            alt6=8;
             break;
         case 'e':
-            alt6=7;
+            alt6=9;
             break;
         case '0':
         case '1':
@@ -684,27 +750,27 @@ public class PlumheadLexer extends Lexer {
         case '7':
         case '8':
         case '9':
-            alt6=8;
+            alt6=10;
             break;
         case '-':
-            alt6=9;
+            alt6=11;
             break;
         case '+':
-            alt6=10;
+            alt6=12;
             break;
         case '%':
         case '*':
         case '/':
-            alt6=11;
+            alt6=13;
             break;
         case '!':
         case '=':
         case '>':
-            alt6=12;
+            alt6=14;
             break;
         default:
             NoViableAltException nvae =
-                new NoViableAltException("1:1: Tokens : ( T16 | SEA | CODE_START | CODE_END | WS | STRING | ECHO | INTEGER | MINUS | PLUS | MUL_OP | REL_OP );", 6, 0, input);
+                new NoViableAltException("1:1: Tokens : ( T16 | T17 | T18 | SEA | CODE_START | CODE_END | WS | STRING | ECHO | INTEGER | MINUS | PLUS | MUL_OP | REL_OP );", 6, 0, input);
 
             throw nvae;
         }
@@ -718,77 +784,91 @@ public class PlumheadLexer extends Lexer {
                 }
                 break;
             case 2 :
-                // src/antlr3/Plumhead.g:1:14: SEA
+                // src/antlr3/Plumhead.g:1:14: T17
+                {
+                mT17(); 
+
+                }
+                break;
+            case 3 :
+                // src/antlr3/Plumhead.g:1:18: T18
+                {
+                mT18(); 
+
+                }
+                break;
+            case 4 :
+                // src/antlr3/Plumhead.g:1:22: SEA
                 {
                 mSEA(); 
 
                 }
                 break;
-            case 3 :
-                // src/antlr3/Plumhead.g:1:18: CODE_START
+            case 5 :
+                // src/antlr3/Plumhead.g:1:26: CODE_START
                 {
                 mCODE_START(); 
 
                 }
                 break;
-            case 4 :
-                // src/antlr3/Plumhead.g:1:29: CODE_END
+            case 6 :
+                // src/antlr3/Plumhead.g:1:37: CODE_END
                 {
                 mCODE_END(); 
 
                 }
                 break;
-            case 5 :
-                // src/antlr3/Plumhead.g:1:38: WS
+            case 7 :
+                // src/antlr3/Plumhead.g:1:46: WS
                 {
                 mWS(); 
 
                 }
                 break;
-            case 6 :
-                // src/antlr3/Plumhead.g:1:41: STRING
+            case 8 :
+                // src/antlr3/Plumhead.g:1:49: STRING
                 {
                 mSTRING(); 
 
                 }
                 break;
-            case 7 :
-                // src/antlr3/Plumhead.g:1:48: ECHO
+            case 9 :
+                // src/antlr3/Plumhead.g:1:56: ECHO
                 {
                 mECHO(); 
 
                 }
                 break;
-            case 8 :
-                // src/antlr3/Plumhead.g:1:53: INTEGER
+            case 10 :
+                // src/antlr3/Plumhead.g:1:61: INTEGER
                 {
                 mINTEGER(); 
 
                 }
                 break;
-            case 9 :
-                // src/antlr3/Plumhead.g:1:61: MINUS
+            case 11 :
+                // src/antlr3/Plumhead.g:1:69: MINUS
                 {
                 mMINUS(); 
 
                 }
                 break;
-            case 10 :
-                // src/antlr3/Plumhead.g:1:67: PLUS
+            case 12 :
+                // src/antlr3/Plumhead.g:1:75: PLUS
                 {
                 mPLUS(); 
 
                 }
                 break;
-            case 11 :
-                // src/antlr3/Plumhead.g:1:72: MUL_OP
+            case 13 :
+                // src/antlr3/Plumhead.g:1:80: MUL_OP
                 {
                 mMUL_OP(); 
 
                 }
                 break;
-            case 12 :
-                // src/antlr3/Plumhead.g:1:79: REL_OP
+            case 14 :
+                // src/antlr3/Plumhead.g:1:87: REL_OP
                 {
                 mREL_OP(); 
 

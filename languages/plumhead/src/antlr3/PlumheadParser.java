@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-07 15:26:58
+// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-07 17:47:27
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -10,7 +10,7 @@ import org.antlr.runtime.tree.*;
 
 public class PlumheadParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "SEA", "CODE_START", "CODE_END", "WS", "STRING", "ECHO", "INTEGER", "MINUS", "PLUS", "MUL_OP", "REL_OP", "';'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "SEA", "CODE_START", "CODE_END", "WS", "STRING", "ECHO", "INTEGER", "MINUS", "PLUS", "MUL_OP", "REL_OP", "';'", "'('", "')'"
     };
     public static final int CODE_START=6;
     public static final int INTEGER=11;
@@ -444,7 +444,7 @@ public class PlumheadParser extends Parser {
             if ( (LA2_0==STRING) ) {
                 alt2=1;
             }
-            else if ( ((LA2_0>=INTEGER && LA2_0<=MINUS)) ) {
+            else if ( ((LA2_0>=INTEGER && LA2_0<=MINUS)||LA2_0==17) ) {
                 alt2=2;
             }
             else {
@@ -638,20 +638,24 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start multiplying_expression
-    // src/antlr3/Plumhead.g:70:1: multiplying_expression : unary_expression ;
+    // src/antlr3/Plumhead.g:70:1: multiplying_expression : unary_expression ( MUL_OP^^ unary_expression )* ;
     public multiplying_expression_return multiplying_expression() throws RecognitionException {   
         multiplying_expression_return retval = new multiplying_expression_return();
         retval.start = input.LT(1);
 
         CommonTree root_0 = null;
 
+        Token MUL_OP17=null;
         unary_expression_return unary_expression16 = null;
 
+        unary_expression_return unary_expression18 = null;
 
+
+        CommonTree MUL_OP17_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:71:5: ( unary_expression )
-            // src/antlr3/Plumhead.g:71:5: unary_expression
+            // src/antlr3/Plumhead.g:71:5: ( unary_expression ( MUL_OP^^ unary_expression )* )
+            // src/antlr3/Plumhead.g:71:5: unary_expression ( MUL_OP^^ unary_expression )*
             {
             root_0 = (CommonTree)adaptor.nil();
 
@@ -660,6 +664,43 @@ public class PlumheadParser extends Parser {
             _fsp--;
 
             adaptor.addChild(root_0, unary_expression16.tree);
+            // src/antlr3/Plumhead.g:71:22: ( MUL_OP^^ unary_expression )*
+            loop5:
+            do {
+                int alt5=2;
+                int LA5_0 = input.LA(1);
+                if ( (LA5_0==MUL_OP) ) {
+                    alt5=1;
+                }
+
+
+                switch (alt5) {
+            	case 1 :
+            	    // src/antlr3/Plumhead.g:71:24: MUL_OP^^ unary_expression
+            	    {
+            	    CommonTree root_1 = (CommonTree)adaptor.nil();
+
+            	    MUL_OP17=(Token)input.LT(1);
+            	    match(input,MUL_OP,FOLLOW_MUL_OP_in_multiplying_expression470); 
+            	    MUL_OP17_tree = (CommonTree)adaptor.create(MUL_OP17);
+            	    root_0 = (CommonTree)adaptor.becomeRoot(MUL_OP17_tree, root_0);
+
+            	    pushFollow(FOLLOW_unary_expression_in_multiplying_expression473);
+            	    unary_expression18=unary_expression();
+            	    _fsp--;
+
+            	    adaptor.addChild(root_1, unary_expression18.tree);
+
+            	    adaptor.addChild(root_0, root_1);
+
+            	    }
+            	    break;
+
+            	default :
+            	    break loop5;
+                }
+            } while (true);
+
 
             }
 
@@ -692,57 +733,57 @@ public class PlumheadParser extends Parser {
 
         CommonTree root_0 = null;
 
-        Token MINUS18=null;
-        postfix_expression_return postfix_expression17 = null;
-
+        Token MINUS20=null;
         postfix_expression_return postfix_expression19 = null;
+
+        postfix_expression_return postfix_expression21 = null;
 
         List list_postfix_expression=new ArrayList();
         List list_MINUS=new ArrayList();
-        CommonTree MINUS18_tree=null;
+        CommonTree MINUS20_tree=null;
 
         try {
             // src/antlr3/Plumhead.g:75:5: ( postfix_expression | MINUS postfix_expression -> ^( MUL_OP[\"n_mul\"] INTEGER[\"-1\"] postfix_expression ) )
-            int alt5=2;
-            int LA5_0 = input.LA(1);
-            if ( (LA5_0==INTEGER) ) {
-                alt5=1;
+            int alt6=2;
+            int LA6_0 = input.LA(1);
+            if ( (LA6_0==INTEGER||LA6_0==17) ) {
+                alt6=1;
             }
-            else if ( (LA5_0==MINUS) ) {
-                alt5=2;
+            else if ( (LA6_0==MINUS) ) {
+                alt6=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("74:1: unary_expression : ( postfix_expression | MINUS postfix_expression -> ^( MUL_OP[\"n_mul\"] INTEGER[\"-1\"] postfix_expression ) );", 5, 0, input);
+                    new NoViableAltException("74:1: unary_expression : ( postfix_expression | MINUS postfix_expression -> ^( MUL_OP[\"n_mul\"] INTEGER[\"-1\"] postfix_expression ) );", 6, 0, input);
 
                 throw nvae;
             }
-            switch (alt5) {
+            switch (alt6) {
                 case 1 :
                     // src/antlr3/Plumhead.g:75:5: postfix_expression
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
-                    pushFollow(FOLLOW_postfix_expression_in_unary_expression479);
-                    postfix_expression17=postfix_expression();
+                    pushFollow(FOLLOW_postfix_expression_in_unary_expression489);
+                    postfix_expression19=postfix_expression();
                     _fsp--;
 
-                    adaptor.addChild(root_0, postfix_expression17.tree);
+                    adaptor.addChild(root_0, postfix_expression19.tree);
 
                     }
                     break;
                 case 2 :
                     // src/antlr3/Plumhead.g:76:5: MINUS postfix_expression
                     {
-                    MINUS18=(Token)input.LT(1);
-                    match(input,MINUS,FOLLOW_MINUS_in_unary_expression485); 
-                    list_MINUS.add(MINUS18);
+                    MINUS20=(Token)input.LT(1);
+                    match(input,MINUS,FOLLOW_MINUS_in_unary_expression495); 
+                    list_MINUS.add(MINUS20);
 
-                    pushFollow(FOLLOW_postfix_expression_in_unary_expression487);
-                    postfix_expression19=postfix_expression();
+                    pushFollow(FOLLOW_postfix_expression_in_unary_expression497);
+                    postfix_expression21=postfix_expression();
                     _fsp--;
 
-                    list_postfix_expression.add(postfix_expression19.tree);
+                    list_postfix_expression.add(postfix_expression21.tree);
 
                     // AST REWRITE
                     int i_0 = 0;
@@ -791,31 +832,88 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start postfix_expression
-    // src/antlr3/Plumhead.g:79:1: postfix_expression : INTEGER ;
+    // src/antlr3/Plumhead.g:79:1: postfix_expression : ( INTEGER | '(' expression ')' -> expression );
     public postfix_expression_return postfix_expression() throws RecognitionException {   
         postfix_expression_return retval = new postfix_expression_return();
         retval.start = input.LT(1);
 
         CommonTree root_0 = null;
 
-        Token INTEGER20=null;
+        Token INTEGER22=null;
+        Token char_literal23=null;
+        Token char_literal25=null;
+        expression_return expression24 = null;
 
-        CommonTree INTEGER20_tree=null;
+        List list_expression=new ArrayList();
+        List list_18=new ArrayList();
+        List list_17=new ArrayList();
+        CommonTree INTEGER22_tree=null;
+        CommonTree char_literal23_tree=null;
+        CommonTree char_literal25_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:80:5: ( INTEGER )
-            // src/antlr3/Plumhead.g:80:5: INTEGER
-            {
-            root_0 = (CommonTree)adaptor.nil();
+            // src/antlr3/Plumhead.g:80:5: ( INTEGER | '(' expression ')' -> expression )
+            int alt7=2;
+            int LA7_0 = input.LA(1);
+            if ( (LA7_0==INTEGER) ) {
+                alt7=1;
+            }
+            else if ( (LA7_0==17) ) {
+                alt7=2;
+            }
+            else {
+                NoViableAltException nvae =
+                    new NoViableAltException("79:1: postfix_expression : ( INTEGER | '(' expression ')' -> expression );", 7, 0, input);
 
-            INTEGER20=(Token)input.LT(1);
-            match(input,INTEGER,FOLLOW_INTEGER_in_postfix_expression514); 
-            INTEGER20_tree = (CommonTree)adaptor.create(INTEGER20);
-            adaptor.addChild(root_0, INTEGER20_tree);
+                throw nvae;
+            }
+            switch (alt7) {
+                case 1 :
+                    // src/antlr3/Plumhead.g:80:5: INTEGER
+                    {
+                    root_0 = (CommonTree)adaptor.nil();
 
+                    INTEGER22=(Token)input.LT(1);
+                    match(input,INTEGER,FOLLOW_INTEGER_in_postfix_expression524); 
+                    INTEGER22_tree = (CommonTree)adaptor.create(INTEGER22);
+                    adaptor.addChild(root_0, INTEGER22_tree);
+
+
+                    }
+                    break;
+                case 2 :
+                    // src/antlr3/Plumhead.g:81:5: '(' expression ')'
+                    {
+                    char_literal23=(Token)input.LT(1);
+                    match(input,17,FOLLOW_17_in_postfix_expression530); 
+                    list_17.add(char_literal23);
+
+                    pushFollow(FOLLOW_expression_in_postfix_expression532);
+                    expression24=expression();
+                    _fsp--;
+
+                    list_expression.add(expression24.tree);
+                    char_literal25=(Token)input.LT(1);
+                    match(input,18,FOLLOW_18_in_postfix_expression534); 
+                    list_18.add(char_literal25);
+
+
+                    // AST REWRITE
+                    int i_0 = 0;
+                    retval.tree = root_0;
+                    root_0 = (CommonTree)adaptor.nil();
+                    // 81:24: -> expression
+                    {
+                        adaptor.addChild(root_0, list_expression.get(i_0));
+
+                    }
+
+
+
+                    }
+                    break;
 
             }
-
         }
         catch (RecognitionException re) {
             reportError(re);
@@ -843,19 +941,24 @@ public class PlumheadParser extends Parser {
     public static final BitSet FOLLOW_statements_in_code350 = new BitSet(new long[]{0x0000000000000080L});
     public static final BitSet FOLLOW_CODE_END_in_code352 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_statement_in_statements371 = new BitSet(new long[]{0x0000000000000402L});
-    public static final BitSet FOLLOW_ECHO_in_statement387 = new BitSet(new long[]{0x0000000000001A00L});
+    public static final BitSet FOLLOW_ECHO_in_statement387 = new BitSet(new long[]{0x0000000000021A00L});
     public static final BitSet FOLLOW_expression_in_statement389 = new BitSet(new long[]{0x0000000000010000L});
     public static final BitSet FOLLOW_16_in_statement391 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_STRING_in_expression414 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_adding_expression_in_expression420 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_multiplying_expression_in_adding_expression433 = new BitSet(new long[]{0x0000000000003002L});
-    public static final BitSet FOLLOW_PLUS_in_adding_expression439 = new BitSet(new long[]{0x0000000000001800L});
-    public static final BitSet FOLLOW_MINUS_in_adding_expression444 = new BitSet(new long[]{0x0000000000001800L});
+    public static final BitSet FOLLOW_PLUS_in_adding_expression439 = new BitSet(new long[]{0x0000000000021800L});
+    public static final BitSet FOLLOW_MINUS_in_adding_expression444 = new BitSet(new long[]{0x0000000000021800L});
     public static final BitSet FOLLOW_multiplying_expression_in_adding_expression449 = new BitSet(new long[]{0x0000000000003002L});
-    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression466 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_postfix_expression_in_unary_expression479 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MINUS_in_unary_expression485 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_postfix_expression_in_unary_expression487 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_INTEGER_in_postfix_expression514 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression466 = new BitSet(new long[]{0x0000000000004002L});
+    public static final BitSet FOLLOW_MUL_OP_in_multiplying_expression470 = new BitSet(new long[]{0x0000000000021800L});
+    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression473 = new BitSet(new long[]{0x0000000000004002L});
+    public static final BitSet FOLLOW_postfix_expression_in_unary_expression489 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MINUS_in_unary_expression495 = new BitSet(new long[]{0x0000000000020800L});
+    public static final BitSet FOLLOW_postfix_expression_in_unary_expression497 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_INTEGER_in_postfix_expression524 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_17_in_postfix_expression530 = new BitSet(new long[]{0x0000000000021A00L});
+    public static final BitSet FOLLOW_expression_in_postfix_expression532 = new BitSet(new long[]{0x0000000000040000L});
+    public static final BitSet FOLLOW_18_in_postfix_expression534 = new BitSet(new long[]{0x0000000000000002L});
 
 }

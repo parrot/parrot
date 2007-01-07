@@ -68,7 +68,7 @@ adding_expression
   ;
 
 multiplying_expression
-  : unary_expression
+  : unary_expression ( MUL_OP^^ unary_expression )*
   ;
 
 unary_expression
@@ -78,4 +78,5 @@ unary_expression
 
 postfix_expression
   : INTEGER
+  | '(' expression ')' -> expression
   ;
