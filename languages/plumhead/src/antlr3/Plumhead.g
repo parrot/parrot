@@ -27,6 +27,11 @@ WS         : ( ' ' | '\t' | '\r' | '\n' )+ ;
 STRING     : '\"' ( ~'\"' )*  '\"' ;
 ECHO       : 'echo' ;
 INTEGER    : ( '0'..'9' )+ ;
+MINUS      : '-' ;
+PLUS       : '+' ;
+MUL_OP     : '*'  | '/'  | '%' ;
+REL_OP     : '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
+
 
 program 
   : s1=sea code s2=sea WS? -> ^( PROGRAM $s1 code $s2 )
@@ -50,5 +55,14 @@ statement
 
 expression
   : STRING
-  | INTEGER
+  | unary_expression
+  ;
+
+unary_expression
+  : postfix_expression
+  | MINUS postfix_expression -> ^( MUL_OP["n_mul"] INTEGER["-1"] postfix_expression )
+  ;
+
+postfix_expression
+  : INTEGER
   ;

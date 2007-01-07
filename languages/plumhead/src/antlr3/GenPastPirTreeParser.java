@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/GenPastPir.g 2007-01-06 21:24:04
+// $ANTLR 3.0b5 src/antlr3/GenPastPir.g 2007-01-07 14:13:15
 
   import java.util.regex.*;
 
@@ -10,29 +10,29 @@ import java.util.ArrayList;
 
 public class GenPastPirTreeParser extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "SEA", "CODE_START", "CODE_END", "WS", "STRING", "ECHO", "INTEGER", "';'", "FUNCTION", "LETTER", "ASSIGN_OP", "VAR", "NUMBER", "PLUS", "MINUS", "MUL_OP", "REL_OP", "NEWLINE", "If", "STMTS"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "SEA", "CODE_START", "CODE_END", "WS", "STRING", "ECHO", "INTEGER", "MINUS", "PLUS", "MUL_OP", "REL_OP", "';'", "FUNCTION", "LETTER", "ASSIGN_OP", "VAR", "NUMBER", "NEWLINE", "If", "STMTS"
     };
     public static final int CODE_START=6;
-    public static final int LETTER=14;
-    public static final int MINUS=19;
+    public static final int MINUS=12;
+    public static final int LETTER=18;
     public static final int If=23;
+    public static final int NUMBER=21;
     public static final int WS=8;
-    public static final int NUMBER=17;
     public static final int STRING=9;
-    public static final int MUL_OP=20;
+    public static final int MUL_OP=14;
     public static final int SEA=5;
     public static final int CODE_END=7;
     public static final int STMTS=24;
     public static final int PROGRAM=4;
     public static final int NEWLINE=22;
-    public static final int VAR=16;
+    public static final int VAR=20;
     public static final int INTEGER=11;
-    public static final int ASSIGN_OP=15;
+    public static final int ASSIGN_OP=19;
     public static final int ECHO=10;
-    public static final int FUNCTION=13;
+    public static final int FUNCTION=17;
     public static final int EOF=-1;
-    public static final int REL_OP=21;
-    public static final int PLUS=18;
+    public static final int REL_OP=15;
+    public static final int PLUS=13;
 
         public GenPastPirTreeParser(TreeNodeStream input) {
             super(input);
@@ -44,7 +44,7 @@ public class GenPastPirTreeParser extends TreeParser {
 
 
       // used for generating unique register names
-      public static int reg_num = 100;
+      public static int reg_num = 200;
 
 
 
@@ -110,7 +110,7 @@ public class GenPastPirTreeParser extends TreeParser {
                 do {
                     int alt1=2;
                     int LA1_0 = input.LA(1);
-                    if ( ((LA1_0>=STRING && LA1_0<=INTEGER)||LA1_0==FUNCTION||(LA1_0>=ASSIGN_OP && LA1_0<=STMTS)) ) {
+                    if ( ((LA1_0>=STRING && LA1_0<=REL_OP)||LA1_0==FUNCTION||(LA1_0>=ASSIGN_OP && LA1_0<=STMTS)) ) {
                         alt1=1;
                     }
 
@@ -183,7 +183,7 @@ public class GenPastPirTreeParser extends TreeParser {
 
 
     // $ANTLR start node
-    // src/antlr3/GenPastPir.g:110:1: node[String reg_mother] : ( ^( ECHO node["past_echo"] ) | STRING | INTEGER | ^( FUNCTION LETTER ) | ^( ASSIGN_OP ^( VAR LETTER ) node["reg_assign_lhs"] ) | NUMBER | ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] ) | ^( VAR LETTER ) | NEWLINE | ^( If node["reg_if_op"] node["reg_if_op"] ) | ^( STMTS ( node[reg_stmts] )* ) );
+    // src/antlr3/GenPastPir.g:110:1: node[String reg_mother] : ( ^( ECHO node["past_echo"] ) | STRING | INTEGER | ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] ) | ^( FUNCTION LETTER ) | ^( ASSIGN_OP ^( VAR LETTER ) node["reg_assign_lhs"] ) | NUMBER | ^( VAR LETTER ) | NEWLINE | ^( If node["reg_if_op"] node["reg_if_op"] ) | ^( STMTS ( node[reg_stmts] )* ) );
     public void node(String reg_mother) throws RecognitionException {   
         CommonTree infix=null;
         CommonTree STRING1=null;
@@ -193,7 +193,7 @@ public class GenPastPirTreeParser extends TreeParser {
         CommonTree LETTER5=null;
 
         try {
-            // src/antlr3/GenPastPir.g:111:5: ( ^( ECHO node[\"past_echo\"] ) | STRING | INTEGER | ^( FUNCTION LETTER ) | ^( ASSIGN_OP ^( VAR LETTER ) node[\"reg_assign_lhs\"] ) | NUMBER | ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] ) | ^( VAR LETTER ) | NEWLINE | ^( If node[\"reg_if_op\"] node[\"reg_if_op\"] ) | ^( STMTS ( node[reg_stmts] )* ) )
+            // src/antlr3/GenPastPir.g:111:5: ( ^( ECHO node[\"past_echo\"] ) | STRING | INTEGER | ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] ) | ^( FUNCTION LETTER ) | ^( ASSIGN_OP ^( VAR LETTER ) node[\"reg_assign_lhs\"] ) | NUMBER | ^( VAR LETTER ) | NEWLINE | ^( If node[\"reg_if_op\"] node[\"reg_if_op\"] ) | ^( STMTS ( node[reg_stmts] )* ) )
             int alt3=11;
             switch ( input.LA(1) ) {
             case ECHO:
@@ -205,19 +205,19 @@ public class GenPastPirTreeParser extends TreeParser {
             case INTEGER:
                 alt3=3;
                 break;
-            case FUNCTION:
-                alt3=4;
-                break;
-            case ASSIGN_OP:
-                alt3=5;
-                break;
-            case NUMBER:
-                alt3=6;
-                break;
-            case PLUS:
             case MINUS:
+            case PLUS:
             case MUL_OP:
             case REL_OP:
+                alt3=4;
+                break;
+            case FUNCTION:
+                alt3=5;
+                break;
+            case ASSIGN_OP:
+                alt3=6;
+                break;
+            case NUMBER:
                 alt3=7;
                 break;
             case VAR:
@@ -234,7 +234,7 @@ public class GenPastPirTreeParser extends TreeParser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("110:1: node[String reg_mother] : ( ^( ECHO node[\"past_echo\"] ) | STRING | INTEGER | ^( FUNCTION LETTER ) | ^( ASSIGN_OP ^( VAR LETTER ) node[\"reg_assign_lhs\"] ) | NUMBER | ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] ) | ^( VAR LETTER ) | NEWLINE | ^( If node[\"reg_if_op\"] node[\"reg_if_op\"] ) | ^( STMTS ( node[reg_stmts] )* ) );", 3, 0, input);
+                    new NoViableAltException("110:1: node[String reg_mother] : ( ^( ECHO node[\"past_echo\"] ) | STRING | INTEGER | ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] ) | ^( FUNCTION LETTER ) | ^( ASSIGN_OP ^( VAR LETTER ) node[\"reg_assign_lhs\"] ) | NUMBER | ^( VAR LETTER ) | NEWLINE | ^( If node[\"reg_if_op\"] node[\"reg_if_op\"] ) | ^( STMTS ( node[reg_stmts] )* ) );", 3, 0, input);
 
                 throw nvae;
             }
@@ -320,12 +320,59 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 4 :
-                    // src/antlr3/GenPastPir.g:162:5: ^( FUNCTION LETTER )
+                    // src/antlr3/GenPastPir.g:162:5: ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] )
                     {
-                    match(input,FUNCTION,FOLLOW_FUNCTION_in_node152); 
+
+                          reg_num++;
+                          String reg = "reg_" + reg_num;
+                          System.out.print( 
+                              "                                                                   \n"
+                            + "    # entering PLUS | MINUS | MUL_OP | REL_OP                      \n"
+                            + "      .sym pmc " + reg + "                                         \n"
+                            + "      " + reg + " = new 'PAST::Op'                                 \n"
+                          );
+                        
+                    infix=(CommonTree)input.LT(1);
+                    if ( (input.LA(1)>=MINUS && input.LA(1)<=REL_OP) ) {
+                        input.consume();
+                        errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse =
+                            new MismatchedSetException(null,input);
+                        recoverFromMismatchedSet(input,mse,FOLLOW_set_in_node162);    throw mse;
+                    }
+
 
                     match(input, Token.DOWN, null); 
-                    match(input,LETTER,FOLLOW_LETTER_in_node154); 
+                    pushFollow(FOLLOW_node_in_node178);
+                    node(reg);
+                    _fsp--;
+
+                    pushFollow(FOLLOW_node_in_node181);
+                    node(reg);
+                    _fsp--;
+
+
+                    match(input, Token.UP, null); 
+
+                          System.out.print( 
+                              "  " + reg + ".'attr'( 'pirop', '" + infix.getText() + "' , 1 )    \n"
+                            + "  " + reg_mother + ".'push'( " + reg + " )                   \n"
+                            + "      null " + reg + "                                             \n"
+                            + "    # leaving ( PLUS | MINUS | MUL | DIV )                         \n"
+                          );
+                        
+
+                    }
+                    break;
+                case 5 :
+                    // src/antlr3/GenPastPir.g:181:5: ^( FUNCTION LETTER )
+                    {
+                    match(input,FUNCTION,FOLLOW_FUNCTION_in_node198); 
+
+                    match(input, Token.DOWN, null); 
+                    match(input,LETTER,FOLLOW_LETTER_in_node200); 
 
                     match(input, Token.UP, null); 
 
@@ -334,8 +381,8 @@ public class GenPastPirTreeParser extends TreeParser {
 
                     }
                     break;
-                case 5 :
-                    // src/antlr3/GenPastPir.g:166:5: ^( ASSIGN_OP ^( VAR LETTER ) node[\"reg_assign_lhs\"] )
+                case 6 :
+                    // src/antlr3/GenPastPir.g:185:5: ^( ASSIGN_OP ^( VAR LETTER ) node[\"reg_assign_lhs\"] )
                     {
 
                           System.out.print( 
@@ -344,17 +391,17 @@ public class GenPastPirTreeParser extends TreeParser {
                             + "    reg_assign_lhs = new 'PAST::Exp'                               \n"
                           );
                         
-                    match(input,ASSIGN_OP,FOLLOW_ASSIGN_OP_in_node176); 
+                    match(input,ASSIGN_OP,FOLLOW_ASSIGN_OP_in_node222); 
 
                     match(input, Token.DOWN, null); 
-                    match(input,VAR,FOLLOW_VAR_in_node179); 
+                    match(input,VAR,FOLLOW_VAR_in_node225); 
 
                     match(input, Token.DOWN, null); 
                     LETTER3=(CommonTree)input.LT(1);
-                    match(input,LETTER,FOLLOW_LETTER_in_node181); 
+                    match(input,LETTER,FOLLOW_LETTER_in_node227); 
 
                     match(input, Token.UP, null); 
-                    pushFollow(FOLLOW_node_in_node184);
+                    pushFollow(FOLLOW_node_in_node230);
                     node("reg_assign_lhs");
                     _fsp--;
 
@@ -382,11 +429,11 @@ public class GenPastPirTreeParser extends TreeParser {
 
                     }
                     break;
-                case 6 :
-                    // src/antlr3/GenPastPir.g:193:5: NUMBER
+                case 7 :
+                    // src/antlr3/GenPastPir.g:212:5: NUMBER
                     {
                     NUMBER4=(CommonTree)input.LT(1);
-                    match(input,NUMBER,FOLLOW_NUMBER_in_node199); 
+                    match(input,NUMBER,FOLLOW_NUMBER_in_node245); 
 
                           System.out.print(     
                               "                                                                  \n"
@@ -402,58 +449,8 @@ public class GenPastPirTreeParser extends TreeParser {
 
                     }
                     break;
-                case 7 :
-                    // src/antlr3/GenPastPir.g:206:5: ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] )
-                    {
-
-                          reg_num++;
-                          String reg = "reg_" + reg_num;
-                          System.out.print( 
-                              "                                                                   \n"
-                            + "    # entering '( PLUS | MINUS | MUL_OP | REL_OP ) node node'               \n"
-                            + "      .sym pmc " + reg + "                                         \n"
-                            + "      " + reg + " = new 'PAST::Op'                                 \n"
-                          );
-                        
-                    infix=(CommonTree)input.LT(1);
-                    if ( (input.LA(1)>=PLUS && input.LA(1)<=REL_OP) ) {
-                        input.consume();
-                        errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse =
-                            new MismatchedSetException(null,input);
-                        recoverFromMismatchedSet(input,mse,FOLLOW_set_in_node223);    throw mse;
-                    }
-
-
-                    match(input, Token.DOWN, null); 
-                    pushFollow(FOLLOW_node_in_node239);
-                    node(reg);
-                    _fsp--;
-
-                    pushFollow(FOLLOW_node_in_node242);
-                    node(reg);
-                    _fsp--;
-
-
-                    match(input, Token.UP, null); 
-
-                          System.out.print( 
-                              "      " + reg + ".'op'( 'infix:" + infix.getText() + "' )              \n"
-                            + "    past_temp = new 'PAST::Exp'                                     \n"
-                            + "    past_temp.'add_child'( " + reg + " )                            \n"
-                            + "      null " + reg + "                                             \n"
-                            + "  " + reg_mother + ".'add_child'( past_temp )                 \n"
-                            + "    null past_temp                                                  \n"
-                            + "    # leaving '( PLUS | MINUS | MUL | DIV ) node node'             \n"
-                          );
-                        
-
-                    }
-                    break;
                 case 8 :
-                    // src/antlr3/GenPastPir.g:228:5: ^( VAR LETTER )
+                    // src/antlr3/GenPastPir.g:225:5: ^( VAR LETTER )
                     {
                     match(input,VAR,FOLLOW_VAR_in_node259); 
 
@@ -479,7 +476,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 9 :
-                    // src/antlr3/GenPastPir.g:242:5: NEWLINE
+                    // src/antlr3/GenPastPir.g:239:5: NEWLINE
                     {
                     match(input,NEWLINE,FOLLOW_NEWLINE_in_node275); 
                      
@@ -498,7 +495,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 10 :
-                    // src/antlr3/GenPastPir.g:255:5: ^( If node[\"reg_if_op\"] node[\"reg_if_op\"] )
+                    // src/antlr3/GenPastPir.g:252:5: ^( If node[\"reg_if_op\"] node[\"reg_if_op\"] )
                     {
 
                           reg_num++;
@@ -537,7 +534,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 11 :
-                    // src/antlr3/GenPastPir.g:276:5: ^( STMTS ( node[reg_stmts] )* )
+                    // src/antlr3/GenPastPir.g:273:5: ^( STMTS ( node[reg_stmts] )* )
                     {
 
                           reg_num++;
@@ -551,19 +548,19 @@ public class GenPastPirTreeParser extends TreeParser {
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // src/antlr3/GenPastPir.g:284:14: ( node[reg_stmts] )*
+                        // src/antlr3/GenPastPir.g:281:14: ( node[reg_stmts] )*
                         loop2:
                         do {
                             int alt2=2;
                             int LA2_0 = input.LA(1);
-                            if ( ((LA2_0>=STRING && LA2_0<=INTEGER)||LA2_0==FUNCTION||(LA2_0>=ASSIGN_OP && LA2_0<=STMTS)) ) {
+                            if ( ((LA2_0>=STRING && LA2_0<=REL_OP)||LA2_0==FUNCTION||(LA2_0>=ASSIGN_OP && LA2_0<=STMTS)) ) {
                                 alt2=1;
                             }
 
 
                             switch (alt2) {
                         	case 1 :
-                        	    // src/antlr3/GenPastPir.g:284:14: node[reg_stmts]
+                        	    // src/antlr3/GenPastPir.g:281:14: node[reg_stmts]
                         	    {
                         	    pushFollow(FOLLOW_node_in_node325);
                         	    node(reg_stmts);
@@ -608,28 +605,28 @@ public class GenPastPirTreeParser extends TreeParser {
  
 
     public static final BitSet FOLLOW_PROGRAM_in_gen_pir_past75 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_gen_pir_past77 = new BitSet(new long[]{0x0000000001FFAE08L});
+    public static final BitSet FOLLOW_node_in_gen_pir_past77 = new BitSet(new long[]{0x0000000001FAFE08L});
     public static final BitSet FOLLOW_ECHO_in_node109 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_node_in_node111 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_STRING_in_node126 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_INTEGER_in_node138 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FUNCTION_in_node152 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_LETTER_in_node154 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ASSIGN_OP_in_node176 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_VAR_in_node179 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_LETTER_in_node181 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_node_in_node184 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_NUMBER_in_node199 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_set_in_node223 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node239 = new BitSet(new long[]{0x0000000001FFAE00L});
-    public static final BitSet FOLLOW_node_in_node242 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_set_in_node162 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_node_in_node178 = new BitSet(new long[]{0x0000000001FAFE00L});
+    public static final BitSet FOLLOW_node_in_node181 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_FUNCTION_in_node198 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_LETTER_in_node200 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ASSIGN_OP_in_node222 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_VAR_in_node225 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_LETTER_in_node227 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_node_in_node230 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_NUMBER_in_node245 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_VAR_in_node259 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_LETTER_in_node261 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_NEWLINE_in_node275 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_If_in_node295 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node297 = new BitSet(new long[]{0x0000000001FFAE00L});
+    public static final BitSet FOLLOW_node_in_node297 = new BitSet(new long[]{0x0000000001FAFE00L});
     public static final BitSet FOLLOW_node_in_node300 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_STMTS_in_node323 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node325 = new BitSet(new long[]{0x0000000001FFAE08L});
+    public static final BitSet FOLLOW_node_in_node325 = new BitSet(new long[]{0x0000000001FAFE08L});
 
 }

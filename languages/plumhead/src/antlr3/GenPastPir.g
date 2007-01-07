@@ -22,7 +22,7 @@ options
 @members
 {
   // used for generating unique register names
-  public static int reg_num = 100;
+  public static int reg_num = 200;
 }
 
 gen_pir_past 
@@ -159,6 +159,25 @@ node[String reg_mother]
         + "                                                                  \n"
       );
     }
+  | {
+      reg_num++;
+      String reg = "reg_" + reg_num;
+      System.out.print( 
+          "                                                                   \n"
+        + "    # entering PLUS | MINUS | MUL_OP | REL_OP                      \n"
+        + "      .sym pmc " + reg + "                                         \n"
+        + "      " + reg + " = new 'PAST::Op'                                 \n"
+      );
+    }
+    ^( infix=( PLUS | MINUS | MUL_OP | REL_OP ) node[reg] node[reg] )
+    {
+      System.out.print( 
+          "  " + reg + ".'attr'( 'pirop', '" + $infix.text + "' , 1 )    \n"
+        + "  " + $node.reg_mother + ".'push'( " + reg + " )                   \n"
+        + "      null " + reg + "                                             \n"
+        + "    # leaving ( PLUS | MINUS | MUL | DIV )                         \n"
+      );
+    }
   | ^( FUNCTION LETTER )
     {
       // do nothing for now
@@ -201,28 +220,6 @@ node[String reg_mother]
         + $node.reg_mother + ".'add_child'( past_temp )                       \n"
         + "null past_temp                                                     \n"
         + "# leaving 'NUMBER'                                                \n"
-      );
-    }
-  | {
-      reg_num++;
-      String reg = "reg_" + reg_num;
-      System.out.print( 
-          "                                                                   \n"
-        + "    # entering '( PLUS | MINUS | MUL_OP | REL_OP ) node node'               \n"
-        + "      .sym pmc " + reg + "                                         \n"
-        + "      " + reg + " = new 'PAST::Op'                                 \n"
-      );
-    }
-    ^( infix=( PLUS | MINUS | MUL_OP | REL_OP ) node[reg] node[reg] )
-    {
-      System.out.print( 
-          "      " + reg + ".'op'( 'infix:" + $infix.text + "' )              \n"
-        + "    past_temp = new 'PAST::Exp'                                     \n"
-        + "    past_temp.'add_child'( " + reg + " )                            \n"
-        + "      null " + reg + "                                             \n"
-        + "  " + $node.reg_mother + ".'add_child'( past_temp )                 \n"
-        + "    null past_temp                                                  \n"
-        + "    # leaving '( PLUS | MINUS | MUL | DIV ) node node'             \n"
       );
     }
   | ^( VAR LETTER )

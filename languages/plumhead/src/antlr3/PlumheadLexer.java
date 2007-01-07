@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-06 21:24:03
+// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-07 14:13:14
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -8,12 +8,16 @@ import java.util.ArrayList;
 public class PlumheadLexer extends Lexer {
     public static final int CODE_START=6;
     public static final int INTEGER=11;
+    public static final int MINUS=12;
     public static final int ECHO=10;
-    public static final int EOF=-1;
     public static final int WS=8;
+    public static final int EOF=-1;
     public static final int STRING=9;
-    public static final int T12=12;
-    public static final int Tokens=13;
+    public static final int Tokens=17;
+    public static final int REL_OP=15;
+    public static final int MUL_OP=14;
+    public static final int T16=16;
+    public static final int PLUS=13;
     public static final int SEA=5;
     public static final int CODE_END=7;
     public static final int PROGRAM=4;
@@ -23,11 +27,11 @@ public class PlumheadLexer extends Lexer {
     }
     public String getGrammarFileName() { return "src/antlr3/Plumhead.g"; }
 
-    // $ANTLR start T12
-    public void mT12() throws RecognitionException {
+    // $ANTLR start T16
+    public void mT16() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T12;
+            int _type = T16;
             int _start = getCharIndex();
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
@@ -50,7 +54,7 @@ public class PlumheadLexer extends Lexer {
             ruleNestingLevel--;
         }
     }
-    // $ANTLR end T12
+    // $ANTLR end T16
 
     // $ANTLR start SEA
     public void mSEA() throws RecognitionException {
@@ -435,33 +439,237 @@ public class PlumheadLexer extends Lexer {
     }
     // $ANTLR end INTEGER
 
+    // $ANTLR start MINUS
+    public void mMINUS() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = MINUS;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:30:14: ( '-' )
+            // src/antlr3/Plumhead.g:30:14: '-'
+            {
+            match('-'); 
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end MINUS
+
+    // $ANTLR start PLUS
+    public void mPLUS() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = PLUS;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:31:14: ( '+' )
+            // src/antlr3/Plumhead.g:31:14: '+'
+            {
+            match('+'); 
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end PLUS
+
+    // $ANTLR start MUL_OP
+    public void mMUL_OP() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = MUL_OP;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:32:12: ( ('*'|'/'|'%'))
+            // src/antlr3/Plumhead.g:32:14: ('*'|'/'|'%')
+            {
+            if ( input.LA(1)=='%'||input.LA(1)=='*'||input.LA(1)=='/' ) {
+                input.consume();
+
+            }
+            else {
+                MismatchedSetException mse =
+                    new MismatchedSetException(null,input);
+                recover(mse);    throw mse;
+            }
+
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end MUL_OP
+
+    // $ANTLR start REL_OP
+    public void mREL_OP() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = REL_OP;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:33:14: ( '==' | '<=' | '>=' | '!=' | '<' | '>' )
+            int alt5=6;
+            switch ( input.LA(1) ) {
+            case '=':
+                alt5=1;
+                break;
+            case '<':
+                int LA5_2 = input.LA(2);
+                if ( (LA5_2=='=') ) {
+                    alt5=2;
+                }
+                else {
+                    alt5=5;}
+                break;
+            case '>':
+                int LA5_3 = input.LA(2);
+                if ( (LA5_3=='=') ) {
+                    alt5=3;
+                }
+                else {
+                    alt5=6;}
+                break;
+            case '!':
+                alt5=4;
+                break;
+            default:
+                NoViableAltException nvae =
+                    new NoViableAltException("33:1: REL_OP : ( '==' | '<=' | '>=' | '!=' | '<' | '>' );", 5, 0, input);
+
+                throw nvae;
+            }
+
+            switch (alt5) {
+                case 1 :
+                    // src/antlr3/Plumhead.g:33:14: '=='
+                    {
+                    match("=="); 
+
+
+                    }
+                    break;
+                case 2 :
+                    // src/antlr3/Plumhead.g:33:21: '<='
+                    {
+                    match("<="); 
+
+
+                    }
+                    break;
+                case 3 :
+                    // src/antlr3/Plumhead.g:33:28: '>='
+                    {
+                    match(">="); 
+
+
+                    }
+                    break;
+                case 4 :
+                    // src/antlr3/Plumhead.g:33:35: '!='
+                    {
+                    match("!="); 
+
+
+                    }
+                    break;
+                case 5 :
+                    // src/antlr3/Plumhead.g:33:42: '<'
+                    {
+                    match('<'); 
+
+                    }
+                    break;
+                case 6 :
+                    // src/antlr3/Plumhead.g:33:49: '>'
+                    {
+                    match('>'); 
+
+                    }
+                    break;
+
+            }
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end REL_OP
+
     public void mTokens() throws RecognitionException {
-        // src/antlr3/Plumhead.g:1:10: ( T12 | SEA | CODE_START | CODE_END | WS | STRING | ECHO | INTEGER )
-        int alt5=8;
+        // src/antlr3/Plumhead.g:1:10: ( T16 | SEA | CODE_START | CODE_END | WS | STRING | ECHO | INTEGER | MINUS | PLUS | MUL_OP | REL_OP )
+        int alt6=12;
         switch ( input.LA(1) ) {
         case ';':
-            alt5=1;
+            alt6=1;
             break;
         case 's':
-            alt5=2;
+            alt6=2;
             break;
         case '<':
-            alt5=3;
+            int LA6_3 = input.LA(2);
+            if ( (LA6_3=='?') ) {
+                alt6=3;
+            }
+            else {
+                alt6=12;}
             break;
         case '?':
-            alt5=4;
+            alt6=4;
             break;
         case '\t':
         case '\n':
         case '\r':
         case ' ':
-            alt5=5;
+            alt6=5;
             break;
         case '\"':
-            alt5=6;
+            alt6=6;
             break;
         case 'e':
-            alt5=7;
+            alt6=7;
             break;
         case '0':
         case '1':
@@ -473,20 +681,36 @@ public class PlumheadLexer extends Lexer {
         case '7':
         case '8':
         case '9':
-            alt5=8;
+            alt6=8;
+            break;
+        case '-':
+            alt6=9;
+            break;
+        case '+':
+            alt6=10;
+            break;
+        case '%':
+        case '*':
+        case '/':
+            alt6=11;
+            break;
+        case '!':
+        case '=':
+        case '>':
+            alt6=12;
             break;
         default:
             NoViableAltException nvae =
-                new NoViableAltException("1:1: Tokens : ( T12 | SEA | CODE_START | CODE_END | WS | STRING | ECHO | INTEGER );", 5, 0, input);
+                new NoViableAltException("1:1: Tokens : ( T16 | SEA | CODE_START | CODE_END | WS | STRING | ECHO | INTEGER | MINUS | PLUS | MUL_OP | REL_OP );", 6, 0, input);
 
             throw nvae;
         }
 
-        switch (alt5) {
+        switch (alt6) {
             case 1 :
-                // src/antlr3/Plumhead.g:1:10: T12
+                // src/antlr3/Plumhead.g:1:10: T16
                 {
-                mT12(); 
+                mT16(); 
 
                 }
                 break;
@@ -536,6 +760,34 @@ public class PlumheadLexer extends Lexer {
                 // src/antlr3/Plumhead.g:1:53: INTEGER
                 {
                 mINTEGER(); 
+
+                }
+                break;
+            case 9 :
+                // src/antlr3/Plumhead.g:1:61: MINUS
+                {
+                mMINUS(); 
+
+                }
+                break;
+            case 10 :
+                // src/antlr3/Plumhead.g:1:67: PLUS
+                {
+                mPLUS(); 
+
+                }
+                break;
+            case 11 :
+                // src/antlr3/Plumhead.g:1:72: MUL_OP
+                {
+                mMUL_OP(); 
+
+                }
+                break;
+            case 12 :
+                // src/antlr3/Plumhead.g:1:79: REL_OP
+                {
+                mREL_OP(); 
 
                 }
                 break;

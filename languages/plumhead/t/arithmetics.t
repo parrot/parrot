@@ -53,8 +53,13 @@ END_CODE
 }
 
 my @tests = (
+    [ '0', [ 0 ], 'positive 0', ],
     [ '1', [ 1 ], 'positive 1', ],
+    [ '22', [ 22 ], 'positive 22', ],
+    [ '333', [ 333 ], 'positive 333', ],
     [ '-1', [ -1 ], 'negative 1', ],
+    [ '-22', [ -22 ], 'negative 22', ],
+    [ '-333', [ -333 ], 'negative 333', ],
     [ '1 + 1', [ 2 ], 'one plus one', ],
     [ '0', [ 0 ], 'zero',  ],
     [ '2', [ 2 ], 'positive int',  ],
@@ -97,10 +102,9 @@ my @tests = (
     [ '1 & 3', '1', 'bitwise and', ],
     [ '1 | 2', '3', 'bitwise or', ],
 );
-@tests = (
-    [ '1', [ 1 ], 'positive 1', ],
-    [ '22', [ 22 ], 'positive 22', ],
-);
+
+# Not all tests are working yet
+$#tests = 6;
 
 plan( tests => scalar(@tests) );
 run_tests(\@tests);
