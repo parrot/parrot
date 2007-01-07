@@ -144,19 +144,18 @@ node[String reg_mother]
         + "                                                                  \n"
       );
     }
-  | INTEGER
+  | NUMBER
     {
       System.out.println( 
           "                                                                  \n"
-        + "  # start of INTEGER                                              \n"
+        + "  # start of NUMBER                                               \n"
         + "  past_temp = new 'PAST::Val'                                     \n"
-        + "      past_temp.'attr'( 'name', '" + $INTEGER.text + "', 1 )      \n"
-        + "      past_temp.'attr'( 'ctype', 'i+', 1 )                        \n"
-        + "      past_temp.'attr'( 'vtype', '.Integer', 1 )                  \n"
+        + "      past_temp.'attr'( 'name', '" + $NUMBER.text + "', 1 )       \n"
+        + "      past_temp.'attr'( 'ctype', 'n+', 1 )                        \n"
+        + "      past_temp.'attr'( 'vtype', '.Float', 1 )                    \n"
         + "  " + $node.reg_mother + ".'push'( past_temp )                    \n"
         + "  null past_temp                                                  \n"
-        + "  # end of INTEGER                                                \n"
-        + "                                                                  \n"
+        + "  # end of NUMBER                                                 \n"
       );
     }
   | {
@@ -217,19 +216,6 @@ node[String reg_mother]
         + "    # leaving  'ASSIGN_OP named_expression NUMBER'                 \n"
       );
     }
-  | NUMBER
-    {
-      System.out.print(     
-          "                                                                  \n"
-        + "# entering 'NUMBER'                                               \n"
-        + "past_temp = new 'PAST::Val'                                        \n"
-        + "past_temp.value( " + $NUMBER.text + " )                            \n"
-        + "past_temp.valtype( 'num' )                                         \n"
-        + $node.reg_mother + ".'add_child'( past_temp )                       \n"
-        + "null past_temp                                                     \n"
-        + "# leaving 'NUMBER'                                                \n"
-      );
-    }
   | ^( VAR LETTER )
     {
       System.out.print( 
@@ -242,19 +228,6 @@ node[String reg_mother]
         + "  " + $node.reg_mother + ".'add_child'( past_temp )                 \n"
         + "    null past_temp                                                  \n"
         + "  # leaving '(VAR LETTER)'                                         \n"
-      );
-    }
-  | NEWLINE
-    { 
-      System.out.print(     
-          "                                                                   \n"
-        + "# entering 'NEWLINE'                                               \n"
-        + "            past_temp = new 'PAST::Val'                            \n"
-        + "            past_temp.value( '\\n' )                               \n"
-        + "            past_temp.valtype( 'strqq' )                           \n"
-        + "          " + $node.reg_mother + ".'add_child'( past_temp )        \n"
-        + "          null past_temp                                           \n"
-        + "# leaving 'NEWLINE'                                                \n"
       );
     }
   | {

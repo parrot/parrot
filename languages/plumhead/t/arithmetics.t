@@ -104,10 +104,5 @@ my @tests = (
     [ '1 | 2', '3', 'bitwise or', ],
 );
 
-# Not all tests are working yet
-$#tests = 40;
-
-# @tests = ( [ '2 / 2', '1', ], );
-
 plan( tests => scalar(@tests) );
 run_tests(\@tests);
