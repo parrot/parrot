@@ -77,11 +77,9 @@ gen_pir_past
       System.out.println( 
           "                                                                  \n"
         + "                                                                  \n"
-        + "  past_node_id2244466.'push'( past_stmts )               \n"
-        + "  null past_stmts                                        \n"
+        + "  past_node_id2244466.'push'( past_stmts )                        \n"
+        + "  null past_stmts                                                 \n"
         + "  # end of generic node                                           \n"
-        + "                                                                  \n"
-        + "                                                                  \n"
         + "                                                                  \n"
         + "    # '_dumper'(past_node_id2244466, 'past')                      \n"
         + "    # '_dumper'(superglobal_POST , 'superglobal_POST')            \n"
@@ -185,6 +183,13 @@ node[String reg_mother]
         + "    # leaving ( PLUS | MINUS | MUL | DIV )                         \n"
       );
     }
+  ;
+
+
+
+
+/* probably obsolete
+
   | ^( FUNCTION LETTER )
     {
       // do nothing for now
@@ -267,4 +272,5 @@ node[String reg_mother]
         + "  # leaving 'STMTS node*'                                          \n"
       );
     }
-  ;
+
+*/

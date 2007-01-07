@@ -13,11 +13,11 @@ options
   ASTLabelType = CommonTree;
 }
 
+// virtual tokens
 tokens 
 {
   PROGRAM;
 }
-// virtual tokens
 
 // real tokens
 SEA        : 'start_sea' ( options {greedy=false;} : . )* 'end_sea' ;
@@ -45,6 +45,8 @@ PLUS       : '+' ;
 MUL_OP     : '*'  | '/'  | '%' ;
 REL_OP     : '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
 
+
+// productions
 
 program 
   : s1=sea code s2=sea -> ^( PROGRAM $s1 code $s2 )
