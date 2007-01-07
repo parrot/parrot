@@ -2,222 +2,94 @@
 .namespace
 
 .sub '&binary'
-  .param pmc argv :slurpy
+    .param pmc argv :slurpy
 
-  .local pmc retval
+    .local pmc retval
 
-  $I0 = argv
-  unless $I0 goto no_args
+    $I0 = elements argv
+    unless $I0 goto no_args
 
-  .local string subcommand_name
-  subcommand_name = shift argv
+    .local string subcommand_name
+    subcommand_name = shift argv
 
-  .local pmc options
-  options = new .ResizablePMCArray
-  push options, 'format'
-  push options, 'scan'
+    .local pmc options
+    options = new .ResizablePMCArray
+    push options, 'format'
+    push options, 'scan'
 
-  .local pmc select_option
-  select_option  = get_root_global ['_tcl'], 'select_option'
-  .local string canonical_subcommand
-  canonical_subcommand = select_option(options, subcommand_name)
+    .local pmc select_option
+    select_option  = get_root_global ['_tcl'], 'select_option'
+    .local string canonical_subcommand
+    canonical_subcommand = select_option(options, subcommand_name)
 
-  .local pmc subcommand_proc
-  null subcommand_proc
+    .local pmc subcommand_proc
+    null subcommand_proc
 
-  subcommand_proc = get_root_global ['_tcl'; 'helpers'; 'binary'], canonical_subcommand
-  if_null subcommand_proc, bad_args
-  .return subcommand_proc(argv)
+    subcommand_proc = get_root_global ['_tcl'; 'helpers'; 'binary'], canonical_subcommand
+    if_null subcommand_proc, bad_args
+    .return subcommand_proc(argv)
 
 bad_args:
   .return ('') # once all commands are implemented, remove this...
 
 no_args:
-  tcl_error 'wrong # args: should be "binary option ?arg arg ...?"'
-
+    tcl_error 'wrong # args: should be "binary option ?arg arg ...?"'
 .end
 
 .HLL '_Tcl',''
 .namespace [ 'helpers'; 'binary' ]
 
-.macro getBinaryArg ()
-  if argvIndex == argc goto out_of_args
-  argString = argv[argvIndex]
-  inc argvIndex
-.endm
-
 .sub 'format'
-  .param pmc argv
+    .param pmc argv
 
-  .local int argc
-  .local pmc retval
+    .local int argc
+    .local pmc retval
 
-  argc = argv
-  unless argc goto bad_args
+    argc = elements argv
+    unless argc goto bad_args
 
-  .local pmc binary_types
-  binary_types = get_root_global ['_tcl'], 'binary_types'
+    .local string formatString, binStr
+    formatString = shift argv
+    binStr       = tcl_binary_format formatString, argv
 
-  .local string outputString,formatString
-  outputString = binary:""
-  formatString = shift argv
-
-  # Loop over the chunks of the format string and generate the
-  # appropriate types. format strings consist of repeated chunks of
-  # type count? whitespace*
-  .local int pos,formatString_len,argvIndex,argc,count,digit,tempCount
-  .local string formatChar,argString
-  pos = 0
-  argvIndex = 0
-  argc = argv
-  # a count of -1 indicates that '*' was specified.
-  # a count of -2 indicates that no count was specified.
-  count = -2
-  formatString_len = length formatString
-
-format_loop:
-  if pos == formatString_len goto end_format_loop
-  formatChar = substr formatString,pos,1
-
-  $I1 = exists binary_types[formatChar]
-  unless $I1 goto bad_field_specifier 
-  
-  .local int num_pos
-  num_pos = pos + 1
- 
-  $S0 = substr formatString, num_pos, 1
-  if $S0 != '*' goto get_int_count
-  count = -1
-  pos = num_pos
-  goto got_count
-
-get_int_count:
-  tempCount = 0
-  ## countString = 0
-count_loop:
-  if num_pos == formatString_len goto count_loop_done 
-  digit = ord formatString, num_pos
-  if digit < 48 goto count_loop_done
-  if digit > 57 goto count_loop_done
-  digit -= 48 # ascii
-  tempCount = tempCount * 10
-  tempCount += digit 
-  inc num_pos
-  if num_pos == formatString_len goto count_loop_done
-  ## digitString = substr formatString,pos,1
-  if num_pos == formatString_len goto count_loop_done
-  goto count_loop
-count_loop_done:
-  $I0 = num_pos - 1  
-  if $I0 == pos goto got_default_count
-
-  pos = num_pos 
-  count = tempCount
-  goto got_count
-
-got_default_count:
-  inc pos
-
-got_count:
-
-which_format:
-
-  if formatChar == 'a' goto format_a
-  if formatChar == 'A' goto format_A
-  if formatChar == 'x' goto format_x
-
-  .return (0)  # RT#40762 Implement the rest of the [binary] format chars.
-
-format_a:
-  .getBinaryArg()
-  if count == -1 goto format_a_star
-  if count >= 0 goto format_a_counted
-  count = 1
-
-format_a_counted:
-  $I0 = length argString
-  if $I0 < count goto format_a_padding
-  $S0 = substr argString, 0, count
-  outputString .= $S0
-  goto format_done
-
-format_a_padding:
-  outputString .= argString
-  count = count - $I0
-  $S0 = repeat binary:"\0", count
-  outputString .= $S0
-  goto format_done
-
-format_a_star:
-  outputString .= argString  
-  goto format_done
-
-format_A:
-  .getBinaryArg()
-  if count == -1 goto format_A_star
-  if count >= 0 goto format_A_counted
-  count = 1
-
-format_A_counted:
-  $I0 = length argString
-  if $I0 < count goto format_A_padding
-  $S0 = substr argString, 0, count
-  outputString .= $S0
-  goto format_done
-
-format_A_padding:
-  outputString .= argString
-  count = count - $I0
-  $S0 = repeat ' ', count
-  outputString .= $S0
-  goto format_done
-
-format_A_star:
-  outputString .= argString  
-  goto format_done
-
-format_x:
-  outputString .= binary:"\0"
-
-  # done with formats.
-format_done:
-
-  goto format_loop
-end_format_loop:
-
-  .return(outputString)
+    .return(binStr)
 
 bad_args:
-  tcl_error 'wrong # args: should be "binary format formatString ?arg arg ...?"'
-bad_field_specifier:
-  $S0 = 'bad field specifier "'
-  $S0 .= formatChar
-  $S0 .= '"'
-  tcl_error $S0
-out_of_args:
-  tcl_error 'not enough arguments for all format specifiers'
-
+    tcl_error 'wrong # args: should be "binary format formatString ?arg arg ...?"'
 .end
 
 .sub 'scan'
-  .param pmc argv
+    .param pmc argv
 
-  .local int argc
-  .local pmc retval
+    .local int argc
+    argc = elements argv
+    unless argc >= 2 goto bad_args
 
-  argc = argv
-  unless argc > 2 goto bad_args
- 
-  .local string varname 
-  varname = argv[2]
-  
-  .local pmc set
-  set = get_root_global ['_tcl'], '__set'
-  set(varname, '')
+    .local string value, formatString
+    value        = shift argv
+    formatString = shift argv
 
-  .return (0) # RT#40763: Hack to avoid parsing errors for tcl tests.
+    .local pmc ret
+    ret = tcl_binary_scan value, formatString
+
+    .local pmc __set, variables, values
+    __set = get_root_global ['_tcl'], '__set'
+    variables = new .Iterator, argv
+    values    = new .Iterator, ret
+loop:
+    unless variables goto end
+    unless values    goto end
+
+    .local pmc var, value
+    var   = shift variables
+    value = shift values
+    __set(var, value)
+
+    goto loop
+end:
+
+    .return('')
 
 bad_args:
-  tcl_error 'wrong # args: should be "binary scan value formatString ?varName varName ...?"'
-
+    tcl_error 'wrong # args: should be "binary scan value formatString ?varName varName ...?"'
 .end
