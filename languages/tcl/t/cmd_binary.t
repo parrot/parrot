@@ -7,7 +7,15 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 1
+plan 5
 
 eval_is {binary} {wrong # args: should be "binary option ?arg arg ...?"} \
   {binary: no args}
+
+eval_is {binary foo} {bad option "foo": must be format or scan} \
+  {binary: bad subcommand}
+
+binary scan [binary format dccc -1.3 6 7 8] dcc* d c c*
+is $d    -1.3  {binary: reversible d}
+is $c       6  {binary: reversible c}
+is ${c*} {7 8} {binary: scan [format cc] c*}
