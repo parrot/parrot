@@ -131,3 +131,10 @@ STRING *ParTcl_binary_format(Interp *interp, STRING *FORMAT, PMC *values)
 
     return binstr;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
