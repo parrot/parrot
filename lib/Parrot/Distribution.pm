@@ -469,7 +469,7 @@ returns a Parrot::Docs::File object
 sub get_c_language_files {
     my $self = shift;
 
-    my @c_language_files = (
+    my @files = (
         $self->c_source_files,
         $self->c_header_files,
         $self->pmc_source_files,
@@ -479,26 +479,43 @@ sub get_c_language_files {
         $self->ops_source_files,
     );
 
-    return grep $_->path !~ m{ \b (imc)?(parser|lexer)\.[hc] $ }x,
-        @c_language_files;
+    my @c_language_files = ();
+    foreach my $file ( @files ) {
+        next if $self->is_c_exemption($file);
+        push @c_language_files, $file;
+    }
+
+    return @c_language_files;
 
     # XXX: lex_source_files() collects lisp files as well...  how to fix ???
+}
 
-    #grep( $_->{PATH} !~ m{ \b imc(parser|lexer)\.[hc] $ }x,
+=item C<is_c_exemption()>
 
-    #map( $_->files_of_type('C code'), $self->c_source_file_directories ),
+Determines if the given filename is an exemption to being in the C source.  
+This is to exclude automatically generated C-language files Parrot might have.
 
-    #map( $_->files_of_type('C header'), $self->c_header_file_directories ),
+=cut
 
-    #map( $_->files_of_type('PMC code'), $self->pmc_source_file_directories ),
+sub is_c_exemption {
+    my $self = shift;
+    my $file = shift;
 
-    #map( $_->files_of_type('Yacc file'), $self->yacc_source_file_directories ),
+    my @exemptions = qw(
+        compilers/imcc/imclexer.c
+        compilers/imcc/imcparser.c
+        compilers/imcc/imcparser.h
+        languages/cola/lexer.c
+        languages/cola/parser.c
+        languages/cola/parser.h
+        );
 
-    #map( $_->files_of_type('Lex file'), $self->lex_source_file_directories ),
+    # XXX this is inefficient isn't it?
+    foreach my $exemption ( @exemptions ) {
+        return 1 if $file->path =~ $exemption;
+    }
 
-    #map( $_->files_of_type('Parrot opcode file'), $self->ops_source_file_directories ),
-    #);
-
+    return 0;
 }
 
 =item C<get_perl_language_files()>
