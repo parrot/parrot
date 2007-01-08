@@ -525,11 +525,45 @@ sub get_perl_language_files {
     my $manifest = ExtUtils::Manifest::maniread('MANIFEST');
 
     foreach my $file ( keys(%$manifest) ) {
+        next if $self->is_perl_exemption($file);
         next unless $self->is_perl($file);
         push @files, $file;
     }
 
     return @files;
+}
+
+=item C<is_perl_exemption()>
+
+Determines if the given filename is an exemption to being in the Perl
+source.  This is to exclude automatically generated Perl-language files, and
+any external modules Parrot might have.
+
+=cut
+
+sub is_perl_exemption {
+    my $self = shift;
+    my $file = shift;
+
+    my @exemptions = qw(
+        languages/lua/Lua/parser.pm
+        languages/regex/lib/Regex/Grammar.pm
+        lib/Class/*
+        lib/Digest/*
+        lib/File/*
+        lib/Parse/*
+        lib/Pod/*
+        lib/SmartLink.pm
+        lib/Test/*
+        lib/Text/*
+        );
+
+    # XXX this is inefficient isn't it?
+    foreach my $exemption ( @exemptions ) {
+        return 1 if $file =~ $exemption;
+    }
+
+    return 0;
 }
 
 =item C<is_perl()>
