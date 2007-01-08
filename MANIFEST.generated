@@ -63,6 +63,8 @@ installable_pdump                                 [main]bin
 installable_pdump.exe                             [main]bin
 languages/lua/Lua/parser.pm                       [lua]
 languages/regex/lib/Regex/Grammar.pm              [regex]
+languages/lua/Lua/parser.pm                       [lua]
+languages/regex/lib/Regex/Grammar.pm              [regex]
 libparrot.dll                                     [main]bin
 parrot.pc                                         [main]pkgconfig
 pbc_info                                          [main]bin
