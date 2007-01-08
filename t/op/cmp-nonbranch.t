@@ -1198,7 +1198,7 @@ Tests all non-branching conditional operators.
 
     .local string exp, res
     .local string desc
-    .SET_DESC('isnull')
+    .SET_DESC('cmp')
 
   init:
     set I0, 10
@@ -1257,3 +1257,9 @@ EXP
     is(exp, res, desc)
 .end
 
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
