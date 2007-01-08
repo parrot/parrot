@@ -90,6 +90,14 @@ applies to a child of the current node (generally inherited attributes).
     load_bytecode 'compilers/tge/TGE/Grammar.pbc'
     load_bytecode 'compilers/tge/TGE/Compiler.pbc'
 
+    # import <die> rule from PGE::Util
+    $P0 = get_hll_global ['PGE::Util'], 'die'
+    set_hll_global ['TGE::Parser'], 'die', $P0
+
+    # import <line_number> method from PGE::Util
+    $P0 = get_hll_global ['PGE::Util'], 'line_number'
+    set_hll_global ['TGE::Parser'], 'line_number', $P0
+
     .return ()
 .end
 

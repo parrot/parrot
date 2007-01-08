@@ -57,4 +57,4 @@ regex pod_comment {
          [\n|$]
 }
 
-token syntax_error { <?PGE::Util::die Syntax error> }
+token syntax_error { <?die: Syntax error> }
