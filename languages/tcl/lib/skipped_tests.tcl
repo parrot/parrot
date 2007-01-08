@@ -7,7 +7,8 @@
 
 set skipped_tests [dict create \
   {[binary]} {
-    string-5.14 stringComp-5.14 stringComp-9.7
+    string-5.14 string-5.15
+    stringComp-5.14 stringComp-5.15 stringComp-9.7
   } {[trace]} {
     append-7.1 append-7.2 append-7.3 append-7.4 append-7.5
     appendComp-7.1 appendComp-7.2 appendComp-7.3 appendComp-7.4 appendComp-7.5
@@ -192,4 +193,5 @@ array set abort_after {
   utf-1.4              {Invalid character for UTF-8 encoding}
   parse-8.12           {avoid infinite loop}
   source-7.6           {invalid command name "cleanupTests"}
+  expr-22.81           {some GC bug?}
 }
