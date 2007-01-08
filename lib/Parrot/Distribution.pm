@@ -502,6 +502,8 @@ sub is_c_exemption {
     my $file = shift;
 
     my @exemptions = qw(
+        config/gen/cpu/i386/memcpy_mmx.c
+        config/gen/cpu/i386/memcpy_sse.c
         compilers/imcc/imclexer.c
         compilers/imcc/imcparser.c
         compilers/imcc/imcparser.h
