@@ -39,8 +39,6 @@ C<--no-gc>.
 All your Lua code must be in a single source file (users libraries are not
 supported).
 
-Currently, the generated code takes no argument in the command line.
-
 =head1 SEE ALSO
 
 F<languages/lua/doc/status.pod>
