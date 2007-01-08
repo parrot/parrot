@@ -67,7 +67,7 @@ co = coroutine.create(function ()
 
 print(co)
 CODE
-/thread: [0-9A-Fa-f]{8}/
+/thread: (0[Xx])?[0-9A-Fa-f]+/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );

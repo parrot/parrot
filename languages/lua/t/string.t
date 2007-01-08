@@ -50,7 +50,7 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'metatable' );
 print(getmetatable("ABC"))
 CODE
-/table: [0-9A-Fa-f]{8}/
+/table: (0[Xx])?[0-9A-Fa-f]+/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'method s:byte' );

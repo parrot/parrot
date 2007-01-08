@@ -32,19 +32,19 @@ use Test::More;
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'io.stdin' );
 print(io.stdin)
 CODE
-/^file \([0-9A-Fa-f]{8}\)/
+/^file \((0[Xx])?[0-9A-Fa-f]+\)/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'io.stdout' );
 print(io.stdout)
 CODE
-/^file \([0-9A-Fa-f]{8}\)/
+/^file \((0[Xx])?[0-9A-Fa-f]+\)/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'io.stderr' );
 print(io.stderr)
 CODE
-/^file \([0-9A-Fa-f]{8}\)/
+/^file \((0[Xx])?[0-9A-Fa-f]+\)/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.close' );
@@ -78,7 +78,7 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'io.open' );
 f = io.open("file.txt")
 print(f)
 CODE
-/^file \([0-9A-Fa-f]{8}\)/
+/^file \((0[Xx])?[0-9A-Fa-f]+\)/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.open / close' );
@@ -123,7 +123,7 @@ f = io.stdin
 print(io.input("file.txt"))
 assert(f == io.input(f))
 CODE
-/^file \([0-9A-Fa-f]{8}\)/
+/^file \((0[Xx])?[0-9A-Fa-f]+\)/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'io.output' );
@@ -133,7 +133,7 @@ f = io.stdout
 print(io.output("output.new"))
 assert(f == io.output(f))
 CODE
-/^file \([0-9A-Fa-f]{8}\)/
+/^file \((0[Xx])?[0-9A-Fa-f]+\)/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.write' );
