@@ -241,6 +241,16 @@ typedef struct Parrot_Context {
     size_t pred_offset;
 } parrot_context_t;
 
+#define SAVE_OFF_REGS(orig, next, save) \
+        save.bp = orig.bp;\
+        save.bp_ps = orig.bp_ps;\
+        orig.bp = next.bp;\
+        orig.bp_ps = next.bp_ps;
+
+#define RESTORE_REGS(orig, save) \
+        orig.bp = save.bp;\
+        orig.bp_ps = save.bp_ps;
+
 #define ALIGNED_CTX_SIZE (((sizeof (struct Parrot_Context) + NUMVAL_SIZE - 1) \
         / NUMVAL_SIZE) * NUMVAL_SIZE )
 

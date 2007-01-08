@@ -150,6 +150,24 @@ Parrot_init_arg_sig(Interp *interp, parrot_context_t *ctx,
 static void
 make_flattened(Interp *interp, struct call_state *st, PMC *p_arg)
 {
+    if (PARROT_ARG_NAME_ISSET(st->src.sig)) {
+        /* src ought to be an hash */
+        if (!VTABLE_does(interp, p_arg, CONST_STRING(interp, "hash"))) {
+            real_exception(interp, NULL, E_ValueError, "argument doesn't hash");
+        }
+
+        /* create key needed to iterate the hash */
+        st->key = pmc_new(interp, enum_class_Key);
+        PMC_int_val(st->key) = 0;
+        PMC_data(st->key)    = (void*)INITBucketIndex;
+    }
+    else {
+        /* src ought to be an array */
+        if (!VTABLE_does(interp, p_arg, CONST_STRING(interp, "array"))) {
+            real_exception(interp, NULL, E_ValueError, "argument doesn't array");
+        }
+    }
+
     st->src.mode |= CALL_STATE_FLATTEN;
     st->src.slurp = p_arg;
     st->src.slurp_i = 0;
@@ -159,86 +177,6 @@ make_flattened(Interp *interp, struct call_state *st, PMC *p_arg)
     Parrot_fetch_arg(interp, st);
 }
 
-static void
-fetch_arg_pmc_op(Interp *interp, struct call_state *st)
-{
-    INTVAL idx;
-    PMC *p_arg;
-    STRING *_array, *_hash;
-
-    idx = st->src.u.op.pc[st->src.i];
-    if ((st->src.sig & PARROT_ARG_CONSTANT))
-        p_arg = st->src.ctx->constants[idx]->u.key;
-    else
-        p_arg = CTX_REG_PMC(st->src.ctx, idx);
-
-    if (st->src.sig & PARROT_ARG_FLATTEN) {
-        if (st->src.sig & PARROT_ARG_NAME) {
-            /* src ought to be an hash */
-            if (!VTABLE_does(interp, p_arg, CONST_STRING(interp, "hash"))) {
-                real_exception(interp, NULL, E_ValueError, "argument doesn't hash");
-            }
-
-            /* create key needed to iterate the hash */
-            st->key = pmc_new(interp, enum_class_Key);
-            PMC_int_val(st->key) = 0;
-            PMC_data(st->key)    = (void*)INITBucketIndex;
-        }
-        else {
-            /* src ought to be an array */
-            if (!VTABLE_does(interp, p_arg, CONST_STRING(interp, "array"))) {
-                real_exception(interp, NULL, E_ValueError, "argument doesn't array");
-            }
-        }
-
-        make_flattened(interp, st, p_arg);
-        return;
-    }
-
-    UVal_pmc(st->val) = p_arg;
-    st->src.mode |= CALL_STATE_NEXT_ARG;
-}
-
-static void
-fetch_arg_int_sig(Interp *interp, struct call_state *st)
-{
-    va_list *ap = (va_list*)(st->src.u.sig.ap);
-    UVal_int(st->val) = va_arg(*ap, INTVAL);
-    st->src.mode |= CALL_STATE_NEXT_ARG;
-}
-
-static void
-fetch_arg_num_sig(Interp *interp, struct call_state *st)
-{
-    va_list *ap = (va_list*)(st->src.u.sig.ap);
-    UVal_num(st->val) = va_arg(*ap, FLOATVAL);
-    st->src.mode |= CALL_STATE_NEXT_ARG;
-}
-
-static void
-fetch_arg_str_sig(Interp *interp, struct call_state *st)
-{
-    va_list *ap = (va_list*)(st->src.u.sig.ap);
-    UVal_str(st->val) = va_arg(*ap, STRING*);
-    st->src.mode |= CALL_STATE_NEXT_ARG;
-}
-
-static void
-fetch_arg_pmc_sig(Interp *interp, struct call_state *st)
-{
-    if (st->src.u.sig.sig[st->src.i] == 'O')
-        UVal_pmc(st->val) = CONTEXT(interp->ctx)->current_object;
-    else {
-        va_list *ap = (va_list*)(st->src.u.sig.ap);
-        UVal_pmc(st->val) = va_arg(*ap, PMC*);
-    }
-    if (st->src.sig & PARROT_ARG_FLATTEN) {
-        make_flattened(interp, st, UVal_pmc(st->val));
-    }
-    else {
-        st->src.mode |= CALL_STATE_NEXT_ARG;
-    }
-}
 
 static void
 next_arg_sig(Interp *interp, struct call_state_item *st)
@@ -283,30 +221,41 @@ next_arg(Interp *interp, struct call_state_item *st)
 static void
 fetch_arg_sig(Interp *interp, struct call_state *st)
 {
-    if (st->dest.mode & CALL_STATE_NEXT_ARG) {
+    va_list *ap;
+
+    if (st->dest.mode & CALL_STATE_NEXT_ARG)
         next_arg(interp, &st->dest);
-    }
-    if (!st->src.n) {
+
+    if (!st->src.n)
         return;
-    }
+
     if (st->src.mode & CALL_STATE_NEXT_ARG) {
         if (!next_arg(interp, &st->src))
             return;
     }
+
+    ap = (va_list*)(st->src.u.sig.ap);
     switch (st->src.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:
-            fetch_arg_int_sig(interp, st);
+            UVal_int(st->val) = va_arg(*ap, INTVAL);
             break;
         case PARROT_ARG_STRING:
-            fetch_arg_str_sig(interp, st);
+            UVal_str(st->val) = va_arg(*ap, STRING*);
             break;
         case PARROT_ARG_FLOATVAL:
-            fetch_arg_num_sig(interp, st);
+            UVal_num(st->val) = va_arg(*ap, FLOATVAL);
             break;
         case PARROT_ARG_PMC:
-            fetch_arg_pmc_sig(interp, st);
+            if (st->src.u.sig.sig[st->src.i] == 'O')
+                UVal_pmc(st->val) = CONTEXT(interp->ctx)->current_object;
+            else
+                UVal_pmc(st->val) = va_arg(*ap, PMC*);
+
+            if (st->src.sig & PARROT_ARG_FLATTEN)
+                return make_flattened(interp, st, UVal_pmc(st->val));
             break;
     }
+    st->src.mode |= CALL_STATE_NEXT_ARG;
 }
 
 
@@ -318,29 +267,25 @@ fetch_arg_op(Interp *interp, struct call_state *st)
 
     switch (PARROT_ARG_TYPE_MASK_MASK(st->src.sig)) {
         case PARROT_ARG_INTVAL:
-            if (!constant)
-                idx = CTX_REG_INT(st->src.ctx, idx);
-            UVal_int(st->val) = idx;
-            st->src.mode |= CALL_STATE_NEXT_ARG;
+            UVal_int(st->val) = constant ? idx : CTX_REG_INT(st->src.ctx, idx);
             break;
         case PARROT_ARG_STRING:
-            if (constant)
-                UVal_str(st->val) = st->src.ctx->constants[idx]->u.string;
-            else
-                UVal_str(st->val) = CTX_REG_STR(st->src.ctx, idx);
-            st->src.mode |= CALL_STATE_NEXT_ARG;
+            UVal_str(st->val) = constant ? st->src.ctx->constants[idx]->u.string
+                : CTX_REG_STR(st->src.ctx, idx);
             break;
         case PARROT_ARG_FLOATVAL:
-            if (constant)
-                UVal_num(st->val) = st->src.ctx->constants[idx]->u.number;
-            else
-                UVal_num(st->val) = CTX_REG_NUM(st->src.ctx, idx);
-            st->src.mode |= CALL_STATE_NEXT_ARG;
+            UVal_num(st->val) = constant ? st->src.ctx->constants[idx]->u.number
+                : CTX_REG_NUM(st->src.ctx, idx);
             break;
         case PARROT_ARG_PMC:
-            fetch_arg_pmc_op(interp, st);
+            UVal_pmc(st->val) = constant ? st->src.ctx->constants[idx]->u.key
+                : CTX_REG_PMC(st->src.ctx, idx);
+
+            if (st->src.sig & PARROT_ARG_FLATTEN)
+                return make_flattened(interp, st, UVal_pmc(st->val));
             break;
     }
+    st->src.mode |= CALL_STATE_NEXT_ARG;
 }
 
 
@@ -522,35 +467,20 @@ convert_arg_from_pmc(Interp *interp, struct call_state *st)
 static void
 clone_key_arg(Interp *interp, struct call_state *st)
 {
-    PMC *p_arg = UVal_pmc(st->val);
+    PMC *key = UVal_pmc(st->val);
 
-    if (p_arg && p_arg->vtable->base_type == enum_class_Key) {
-        PMC *key;
-        INTVAL any_registers;
-
-        for (any_registers = 0, key = p_arg; key; ) {
+    if (key && key->vtable->base_type == enum_class_Key) {
+        for (; key; key=key_next(interp, key)) {
+            /* register keys have to be cloned */
             if (PObj_get_FLAGS(key) & KEY_register_FLAG) {
-                any_registers = 1;
-                break;
+                parrot_context_t temp_ctx;
+
+                /* clone sets key values according to refered register items */
+                SAVE_OFF_REGS(interp->ctx, (*(st->src.ctx)), temp_ctx)
+                UVal_pmc(st->val) = VTABLE_clone(interp, key);
+                RESTORE_REGS(interp->ctx, temp_ctx)
+                return;
             }
-            key = key_next(interp, key);
-        }
-
-        if (any_registers) {
-            parrot_context_t new_ctx;
-
-            new_ctx.bp = interp->ctx.bp;
-            new_ctx.bp_ps = interp->ctx.bp_ps;
-            /* need old = src context
-             * clone sets key values according to refered register items
-             */
-            interp->ctx.bp = st->src.ctx->bp;
-            interp->ctx.bp_ps = st->src.ctx->bp_ps;
-            p_arg = VTABLE_clone(interp, p_arg);
-            interp->ctx.bp = new_ctx.bp;
-            interp->ctx.bp_ps = new_ctx.bp_ps;
-
-            UVal_pmc(st->val) = p_arg;
         }
     }
 }
@@ -991,30 +921,17 @@ process_args(Interp *interp, struct call_state *st, const char *action, int err_
 void
 Parrot_convert_arg(Interp *interp, struct call_state *st)
 {
-    /* if END OF SRC or DEST ARGS, no need to convert */
-    /*
-    if (st->src.i >= st->src.n) {
-        return;
-    }
-    if (st->dest.i >= st->dest.n) {
-        return;
-    }
-    */
-    /*
-    if ((st->src.i >= st->src.n) || (st->dest.i >= st->dest.n)) {
-        return;
-    }
-    */
 #define END_OF_ARGS(x) (x.i >= x.n )
+    /* if END OF SRC or DEST ARGS, no need to convert */
     if ((END_OF_ARGS(st->src) || END_OF_ARGS(st->dest)))
         return;
 
-    if ((st->src.sig & PARROT_ARG_TYPE_MASK) == PARROT_ARG_PMC) {
+    /* register key args have to be cloned */
+    if ((st->src.sig & PARROT_ARG_TYPE_MASK) == PARROT_ARG_PMC)
         clone_key_arg(interp, st);
-    }
 
     /* if types are already equivalent, no need to convert */
-    if ((st->dest.sig & PARROT_ARG_TYPE_MASK) == (st->src.sig & PARROT_ARG_TYPE_MASK))
+    if (PARROT_ARG_TYPE(st->dest.sig) == PARROT_ARG_TYPE(st->src.sig))
         return;
 
     /* convert */
@@ -1150,8 +1067,6 @@ opcode_t *
 parrot_pass_args_fromc(Interp *interp, const char *sig,
         opcode_t *dest, parrot_context_t * old_ctxp, va_list ap)
 {
-    struct call_state st;
-
     if (dest[0] != PARROT_OP_get_params_pc) {
         /*
          * main is now started with runops_args_fromc too
@@ -1159,16 +1074,10 @@ parrot_pass_args_fromc(Interp *interp, const char *sig,
          * XXX we could check, if we are running main
          */
         return dest;
-        real_exception(interp, NULL, E_ValueError,
-                "no get_params in sub");
+        real_exception(interp, NULL, E_ValueError, "no get_params in sub");
     }
 
-    Parrot_init_arg_op(interp, CONTEXT(interp->ctx), dest, &st.dest);
-    Parrot_init_arg_sig(interp, old_ctxp, sig, PARROT_VA_TO_VAPTR(ap), &st.src);
-
-    init_call_stats(&st);
-    process_args(interp, &st, "params", 1);
-    return dest + st.dest.n + 2;
+    return parrot_pass_args_to_result(interp, sig, dest, old_ctxp, ap);
 }
 
 opcode_t *
