@@ -61,6 +61,7 @@ if ( !keys %policies ) {
         'Subroutines::ProhibitSubroutinePrototypes'       => 1,
         'CodeLayout::UseParrotCoda'                       => 1,
         'CodeLayout::ProhibitDuplicateCoda'               => 1,
+        'CodeLayout::ProhibitTrailingWhitespace'          => 1,
         'CodeLayout::ProhibitHardTabs'                    => { allow_leading_tabs => 0 },
         'CodeLayout::RequireTidyCode'                     => { perltidyrc => $perl_tidy_conf },
 
@@ -139,7 +140,7 @@ foreach my $policy ( keys %policies ) {
         -config => $config,
         -top => 1);
 
-    # check each file for the givne policy
+    # check each file for the given policy
     my @failed_files;
     foreach my $file ( sort @files ) {
         if ( !-r $file ) {
@@ -156,7 +157,6 @@ foreach my $policy ( keys %policies ) {
         or diag( "Policy: $policy failed in " . scalar @failed_files . " files:\n@failed_files" );
 
 }
-
 
 __END__
 
