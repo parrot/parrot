@@ -60,6 +60,9 @@ installable_pdb                                   [main]bin
 installable_pdb.exe                               [main]bin
 installable_pdump                                 [main]bin
 installable_pdump.exe                             [main]bin
+languages/cola/lexer.c                            [cola]
+languages/cola/parser.c                           [cola]
+languages/cola/parser.h                           [cola]
 libparrot.dll                                     [main]bin
 parrot.pc                                         [main]pkgconfig
 pbc_info                                          [main]bin
