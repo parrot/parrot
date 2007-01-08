@@ -145,6 +145,7 @@ L1:
     .local pmc pio
     .local string content
     pio = getclass 'ParrotIO'
+    push_eh _handler
     content = pio.'slurp'(filename)
     if content goto L1
     $S0 = err
@@ -154,6 +155,7 @@ L1:
     print $S0
     print ")\n"
 L1:
+_handler:
     .return (content)
 .end
 
