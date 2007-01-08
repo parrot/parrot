@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 
 use strict;
 use warnings;
@@ -30,8 +30,8 @@ The exact expression that is passed to the abc compiler as source code.
 
 =item B<expected>
 
-The expected result for the compiled source. Note that you can use (and
-probably sould) C<\n> in the expected result to represent newlines.
+The expected result for the compiled source. Note that you can (and
+probably should) use C<\n> in the expected result to represent newlines.
 
 =item B<description>
 
@@ -44,8 +44,8 @@ able to capture the result of the compilation to write this file in PIR.
 The skip and todo tests are defined in the test source file itself, so
 that later when the harness is changed we don't have to bother to convert
 the skip/todo tests list. So, you can simply set a test to be todo or
-skipped by adding the C<SKIP> or C<TODO> keywords in the begging of the
-test descriptio. For example:
+skipped by adding the C<SKIP> or C<TODO> keywords in the begin of the
+test description. For example:
 
 1+2+3           6       SKIP no add operation yet
 1-2-3           6       TODO no minus operation yet
@@ -63,23 +63,24 @@ $ prove languages/abc/t/01-tests.t
 my $abcdir = "$PConfig{'build_dir'}/languages/abc";
 
 # files to load tests from
-my @files = qw( abc_basic abc_special_variables abc_statement abc_functions );
+my @files = qw(
+    abc_basic
+    abc_special_variables
+    abc_statement
+    abc_functions
+);
 
 # for each test file given calculate full path
-my @test_files;
-foreach (@files) {
-    push @test_files, "$abcdir/t/$_";
-}
+my @test_files = map { "$abcdir/t/$_" } @files;
 
 # calculate total number of tests
 my $numtests = 0;
 foreach my $f (@test_files) {
-    open F, $f;
+    open my( $TEST_FILE ), $f;
 
     # for each line in the given files if it's not a comment line
     # or an empty line, the it's a test
-    while (<F>) { $numtests++ unless ( ( $_ =~ m/^#/ ) or ( $_ =~ m/^\s*$/ ) ); }
-    close F;
+    while (<$TEST_FILE>) { $numtests++ unless ( ( $_ =~ m/^#/ ) or ( $_ =~ m/^\s*$/ ) ); }
 }
 
 # set plan
@@ -87,8 +88,8 @@ plan tests => $numtests;
 
 # main loop
 foreach my $file (@test_files) {
-    open TEST, "<$file" or die "can't open file";
-    while (<TEST>) {
+    open my $TEST_FILE, "<$file" or die "can't open file";
+    while (<$TEST_FILE>) {
         chomp;
         s/\r//g;
 

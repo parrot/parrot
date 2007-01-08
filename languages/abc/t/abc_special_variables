@@ -1,3 +1,6 @@
 # last special variale
 last		0\n	empty last
 1; last		1\n1\n	not empty last
+
+# todo:
+# ibase, obase, and last.

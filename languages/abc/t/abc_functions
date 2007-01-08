@@ -17,3 +17,6 @@ scale(1.123)		3\n		scale function
 sqrt(0)			0\n		sqrt function
 sqrt(1)			1\n		sqrt function
 sqrt(4)			2\n		sqrt function
+
+# user defined functions
+define thrice (n) { return (3*n); } thrice(3); 			9\n		TODO thrice function
