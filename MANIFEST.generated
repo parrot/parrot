@@ -7,6 +7,7 @@ blib/lib/libparrot.a                              [main]lib
 blib/lib/libparrot.dylib                          [main]lib
 blib/lib/libparrot.so                             [main]lib
 blib/lib/libparrot.so.0.4.7                       [main]lib
+compilers/imcc/imclexer.c                         [main]
 config/gen/cpu/i386/memcpy_mmx.c                  [main]
 config/gen/cpu/i386/memcpy_sse.c                  [main]
 config/gen/platform/ansi/dl.c                     [main]
