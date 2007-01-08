@@ -15,7 +15,7 @@ Perl::Critic::Policy::CodeLayout::UseParrotCoda
 
 The pumpking has declared that all parrot source code must include a series of
 comments at the end of the source.  After much discussion C<__END__> and
-C<__DATA__> blocks are excempt from this policy.
+C<__DATA__> blocks are exempt from this policy.
 
 =cut
 
