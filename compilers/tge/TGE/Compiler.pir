@@ -238,11 +238,14 @@ err_no_rule:
 .sub action_value :method
     .param pmc tree
     .param pmc node
-    .local pmc value
-    value = new .String
+    .local pmc value, infile
+    .local int lineno
+    value = new 'PGE::CodeString'
+    infile = get_global '$!infile'
     $P2 = node[0]
-    $S1 = $P2
-    value = $S1
+    (lineno) = $P2.'line_number'()
+    value.'emit'('#line %0 "%1"', lineno, infile)
+    value .= $P2
     .return (value)
 .end
 
@@ -268,9 +271,12 @@ Compile a grammar from a source string.
 
 .sub 'precompile' :method
     .param string source
+    .param pmc infile
     .local pmc rule_data
     .local string outstring
     .local string header_string
+
+    set_global '$!infile', infile
 
     # Unnamed grammars are class 'AnonGrammar'
     .local string grammarname
