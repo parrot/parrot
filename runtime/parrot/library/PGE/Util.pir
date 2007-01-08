@@ -19,11 +19,11 @@ parsing tasks using PGE.
     .local pmc base
     $P0 = subclass 'PGE::Grammar', 'PGE::Util'
     .return ()
-.end 
+.end
 
 =over 4
 
-=item C<die(PMC match, [, message [, ...]] )>
+=item die(match, [, message [, ...]] )
 
 Throws an exception at the current point in the match.  If message
 doesn't end with a newline, also produces the line number and offset
@@ -35,7 +35,7 @@ of the match.
     .param pmc mob                                 # match object
     .param pmc list            :slurpy             # message arguments
 
-    .local pmc iter                                
+    .local pmc iter
     .local string message
     message = ''
     iter = new .Iterator, list
@@ -90,8 +90,46 @@ of the match.
     mpos = -3
     .return (mob)
 .end
-   
-=item C<split(PMC regex, STR string [, INT count]>
+
+
+=item line_number(match [, pos])
+
+Return the line number and offset of the of the line corresponding to
+offset C<pos> in the string targeted by C<match>.  If C<pos> isn't
+supplied, then use the C<from> value of C<match> as the offset.
+For this function the line number for the first line in the
+string is treated as '0'.
+
+=cut
+
+.sub 'line_number'
+    .param pmc match
+    .param int pos             :optional
+    .param int has_pos         :opt_flag
+
+    if has_pos goto have_pos
+    pos = match.'from'()
+  have_pos:
+
+    # count newlines to the current position of the parse
+    .local int pos, npos, lines
+    .local string target
+    $P99 = getattribute match, '$.target'
+    target = $P99
+    npos = 0
+    lines = 0
+  newline_loop:
+    $I0 = find_cclass .CCLASS_NEWLINE, target, npos, pos
+    if $I0 >= pos goto newline_done
+    npos = $I0 + 1
+    inc lines
+    goto newline_loop
+  newline_done:
+    .return (lines, npos)
+.end
+
+
+=item split(regex, string [, count])
 
 Split the string where the regex matches, returning an array. Optionally limit
 the number of splits.
@@ -105,19 +143,19 @@ the number of splits.
     .param string str
     .param int    count     :optional
     .param int    has_count :opt_flag
-    
+
     .local pmc result, match
     .local int pos, n
-    
+
     result = new .ResizablePMCArray
     pos    = 0
     n      = 1
-    
+
 split_loop:
     match = regex(str, 'continue'=>pos)
     ##  if regex not found in target, we're done
     unless match goto split_end
-    
+
     ##  save substring up to current match
     $I0 = match.from()
     $I0 -= pos
@@ -138,7 +176,7 @@ capture_loop:
     inc $I1
     goto capture_loop
 capture_end:
-    
+
     ##  are we counting matches?
     unless has_count goto split_loop
     ##  check if we've already split enough
