@@ -7,9 +7,6 @@ blib/lib/libparrot.a                              [main]lib
 blib/lib/libparrot.dylib                          [main]lib
 blib/lib/libparrot.so                             [main]lib
 blib/lib/libparrot.so.0.4.7                       [main]lib
-compilers/imcc/imclexer.c                         []
-compilers/imcc/imcparser.c                        []
-compilers/imcc/imcparser.h                        []
 config/gen/cpu/i386/memcpy_mmx.c                  [main]
 config/gen/cpu/i386/memcpy_sse.c                  [main]
 config/gen/platform/ansi/dl.c                     [main]
@@ -63,11 +60,6 @@ installable_pdb                                   [main]bin
 installable_pdb.exe                               [main]bin
 installable_pdump                                 [main]bin
 installable_pdump.exe                             [main]bin
-languages/cola/lexer.c                            [cola]
-languages/cola/parser.c                           [cola]
-languages/cola/parser.h                           [cola]
-languages/lua/Lua/parser.pm                       [lua]
-languages/regex/lib/Regex/Grammar.pm              [regex]
 libparrot.dll                                     [main]bin
 parrot.pc                                         [main]pkgconfig
 pbc_info                                          [main]bin
