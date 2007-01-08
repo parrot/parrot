@@ -35,12 +35,18 @@ L<docs/pdds/pdd07_codingstd.pod>
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 
+#foreach my $file ( @files ) {
+#    print $file->path(), "\n";
+#}
+#exit;
+
 check_indent(@files);
 
 exit;
 
 sub check_indent {
     my ( @pp_indent, @c_indent );
+    my ( %pp_failed, %c_failed );
 
     foreach my $file (@_) {
         my @source;
@@ -65,6 +71,7 @@ sub check_indent {
                     push @pp_indent => "$path:$line\n"
                         . "     got: $_"
                         . "expected: #$indent$2 $3'\n";
+                    $pp_failed{"$path\n"} = 1;
                 }
                 push @stack, "#$2 $3";
                 next;
@@ -79,6 +86,7 @@ sub check_indent {
                         . "     got: $_"
                         . "expected: #$indent$2 -- it's inside of "
                         . ( join ' > ', @stack ) . "\n";
+                    $pp_failed{"$path\n"} = 1;
                 }
                 next;
             }
@@ -89,6 +97,7 @@ sub check_indent {
                         . "     got: $_"
                         . "expected: #$indent$2 --  it's inside of "
                         . ( join ' > ', @stack ) . "\n";
+                    $pp_failed{"$path\n"} = 1;
                 }
                 pop @stack;
                 next;
@@ -102,6 +111,7 @@ sub check_indent {
                         . "     got: $_"
                         . "expected: #$indent$2 -- it's inside of "
                         . ( join ' > ', @stack ) . "\n";
+                    $pp_failed{"$path\n"} = 1;
                 }
             }
 
@@ -137,6 +147,7 @@ sub check_indent {
                             . "apparent non-4 space indenting ("
                             . length($indent)
                             . " spaces)";
+                        $c_failed{"$path\n"} = 1;;
                     }
                 }
                 $f = undef;
@@ -144,15 +155,25 @@ sub check_indent {
         }
     }
 
+    # get the lists of files failing the test
+    my @c_failed_files = keys %c_failed;
+    my @pp_failed_files = keys %pp_failed;
+
 ## L<PDD07/Code Formatting/"Preprocessor #directives must be indented two columns per nesting level, with two exceptions: neither PARROT_IN_CORE nor the outermost _GUARD #ifdefs cause the level of indenting to increase">
     ok( !scalar(@pp_indent) )
-        or diag( "incorrect indenting in preprocessor directive found in "
+        or diag( "incorrect indenting in preprocessor directive found "
             . scalar @pp_indent
+            . " occurrences in "
+            . scalar @pp_failed_files
             . " files:\n@pp_indent" );
 
     ok( !scalar(@c_indent) )
         or
-        diag( "incorrect indenting in C file found in " . scalar @c_indent . " files:\n@c_indent" );
+        diag( "incorrect indenting in C file found " 
+            . scalar @c_indent 
+            . " occurrences in "
+            . scalar @c_failed_files
+            . " files:\n@c_indent" );
 }
 
 # Local Variables:
