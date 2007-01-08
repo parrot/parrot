@@ -87,6 +87,9 @@ PMC *ParTcl_binary_scan(Interp *interp, STRING *BINSTR, STRING *FORMAT)
         VTABLE_push_pmc(interp, values, value);
     }
 
+    string_cstring_free(binstr);
+    string_cstring_free(format);
+
     return values;
 }
 
@@ -128,6 +131,8 @@ STRING *ParTcl_binary_format(Interp *interp, STRING *FORMAT, PMC *values)
         PMC *value = VTABLE_get_pmc_keyed_int(interp, values, valueidx++);
         binstr = binary_format_field(interp, format[pos++], binstr, value);
     }
+
+    string_cstring_free(format);
 
     return binstr;
 }
