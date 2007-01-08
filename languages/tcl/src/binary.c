@@ -13,6 +13,9 @@ binary_scan_field(Interp *interp, char field, char *binstr, int *_pos, int lengt
 {
     char *c;
     double *d;
+    float *f;
+    int *n;
+
     int len;
     PMC *value = PMCNULL;
     int pos = *_pos;
@@ -33,6 +36,24 @@ binary_scan_field(Interp *interp, char field, char *binstr, int *_pos, int lengt
             d     = (double *)(binstr + pos);
             value = pmc_new(interp, class_TclFloat);
             VTABLE_set_number_native(interp, value, *d);
+            pos += len;
+            break;
+        case 'f':
+            len = sizeof(float)/sizeof(char);
+            if (pos + len > length)
+                break;
+            f     = (float *)(binstr + pos);
+            value = pmc_new(interp, class_TclFloat);
+            VTABLE_set_number_native(interp, value, *f);
+            pos += len;
+            break;
+        case 'n':
+            len = sizeof(int)/sizeof(char);
+            if (pos + len > length)
+                break;
+            n     = (int *)(binstr + pos);
+            value = pmc_new(interp, class_TclInt);
+            VTABLE_set_integer_native(interp, value, *n);
             pos += len;
             break;
     }
@@ -98,6 +119,9 @@ binary_format_field(Interp *interp, char field, STRING *binstr, PMC *value)
 {
     char c;
     double d;
+    float f;
+    int n;
+
     INTVAL len;
 
     switch (field)
@@ -112,6 +136,18 @@ binary_format_field(Interp *interp, char field, STRING *binstr, PMC *value)
             d      = (double)VTABLE_get_number(interp, value);
             len    = sizeof(double)/sizeof(char);
             binstr = string_concat(interp, binstr, string_from_cstring(interp, &d, len), len);
+            break;
+        /* a float */
+        case 'f':
+            f      = (float)VTABLE_get_number(interp, value);
+            len    = sizeof(float)/sizeof(char);
+            binstr = string_concat(interp, binstr, string_from_cstring(interp, &f, len), len);
+            break;
+        /* a native integer */
+        case 'n':
+            n      = (int)VTABLE_get_integer(interp, value);
+            len    = sizeof(int)/sizeof(char);
+            binstr = string_concat(interp, binstr, string_from_cstring(interp, &n, len), len);
             break;
     }
 
