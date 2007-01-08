@@ -134,13 +134,16 @@ to any options and return the resulting parse tree.
 .sub 'parse' :method
     .param pmc source
     .param pmc adverbs         :slurpy :named
-    .local pmc parsegrammar_name, apply
+    .local pmc parsegrammar_name, top
 
     parsegrammar_name = self.'parsegrammar'()
     unless parsegrammar_name goto err_no_parsegrammar
-    apply = get_hll_global parsegrammar_name, 'apply'
+    top = get_hll_global parsegrammar_name, 'TOP'
+    unless null top goto have_top                      # FIXME: deprecated
+    top = get_hll_global parsegrammar_name, 'apply'    # FIXME: deprecated
+  have_top:                                            # FIXME: deprecated
     .local pmc match
-    match = apply(source, 'grammar' => parsegrammar_name)
+    match = top(source, 'grammar' => parsegrammar_name)
     unless match goto err_failedparse
     .return (match)
 
