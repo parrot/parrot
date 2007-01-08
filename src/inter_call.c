@@ -309,6 +309,7 @@ fetch_arg_sig(Interp *interp, struct call_state *st)
     }
 }
 
+
 static void
 fetch_arg_op(Interp *interp, struct call_state *st)
 {
@@ -370,8 +371,7 @@ Parrot_fetch_arg(Interp *interp, struct call_state *st)
      */
 
     if ((st->dest.mode & CALL_STATE_NAMED_x) && !(st->src.sig & PARROT_ARG_NAME))
-        real_exception(interp, NULL, E_ValueError,
-                "positional inside named args");
+        real_exception(interp, NULL, E_ValueError, "positional inside named args");
 #endif
 
     if (st->src.mode & CALL_STATE_FLATTEN) {
@@ -397,6 +397,7 @@ Parrot_fetch_arg(Interp *interp, struct call_state *st)
         /* advance src - get next arg */
         return Parrot_fetch_arg(interp, st);
     }
+
     if ((st->src.sig & PARROT_ARG_NAME) && !(st->src.sig & PARROT_ARG_FLATTEN)) {
         fetch_arg_op(interp, st);
         st->name = UVal_str(st->val);
@@ -882,8 +883,7 @@ process_args(Interp *interp, struct call_state *st, const char *action, int err_
             case CALL_STATE_NAMED_NAMED_OPT:
                 if (!locate_named_named(interp, st))
                     real_exception(interp, NULL, E_ValueError,
-                            "too many named arguments - '%Ss' not expected",
-                            st->name);
+                            "too many named arguments - '%Ss' not expected", st->name);
                 if (st->dest.mode & CALL_STATE_SLURP)
                     state |= CALL_STATE_SLURP;
                 break;
@@ -1203,7 +1203,6 @@ set_retval_util(Parrot_Interp interp, const char *sig, parrot_context_t *ctx, st
     }
     return 0;
 }
-
 
 /*
  * handle void, and pointer (PMC*, STRING*) return values
