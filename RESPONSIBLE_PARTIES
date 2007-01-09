@@ -6,7 +6,7 @@ SVN commit access, just those who have an area they've taken responsibility
 for.
 
 High-level architecture         Allison Randal
-Low-level arch; releases        Chip Salzenberg
+Low-level arch                  Chip Salzenberg
 JIT x86                         Leopold Toetsch
 JIT ppc                         Leopold Toetsch
 JIT (others)                    ? <volunteer?>
