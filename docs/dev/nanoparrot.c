@@ -118,7 +118,8 @@ run(Interp *interpreter, opcode_t *pc) \
 #  define ENDDISPATCH
 #  define CASE(function) \
 static opcode_t * \
-function (opcode_t *pc, Interp *interpreter) {
+function (opcode_t *pc, Interp *interpreter) \
+{ \
 
 #  define NEXT return pc; }
 #  define DONE            return 0; }
@@ -127,19 +128,19 @@ function (opcode_t *pc, Interp *interpreter) {
 
 #  define ENDRUN  }
 
-#if defined(SWITCH_CORE)
+#  if defined(SWITCH_CORE)
 
 static void
 run(Interp *interpreter, opcode_t *pc)
 {
 #    ifdef TRACE
-#       define DISPATCH  \
+#      define DISPATCH  \
     for (;;) { \
         printf("PC %2d %s\n", pc - interpreter->code->byte_code, \
                 interpreter->op_info[*pc]); \
         switch(*pc) {
 #    else
-#       define DISPATCH \
+#      define DISPATCH \
     for (;;) { \
         switch(*pc) {
 #    endif
@@ -150,7 +151,7 @@ run(Interp *interpreter, opcode_t *pc)
 #    define ENDDISPATCH     default : printf("illegal instruction"); \
                                   exit(1);                           \
                         }}
-# else  /* CGOTO */
+#  else  /* CGOTO */
 
 static void
 run(Interp *interpreter, opcode_t *pc)
@@ -207,7 +208,7 @@ ENDRUN
 #  define DEF_OP(op) \
     interpreter->op_func[OP_ ## op] = op; \
     interpreter->op_info[OP_ ## op] = #op
-#  else
+#else
 #  define DEF_OP(op) \
     interpreter->op_info[OP_ ## op] = #op
 #endif
