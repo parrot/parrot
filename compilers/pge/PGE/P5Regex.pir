@@ -106,8 +106,22 @@
     .param pmc mob
     .param int pos
     .param string message
-    print message
-    exit 1
+    $P0 = getattribute mob, '$.pos'
+    $P0 = pos
+    $P0 = new .Exception
+    $S0 = 'p5regex parse error: '
+    $S0 .= message
+    $S0 .= ' at offset '
+    $S1 = pos
+    $S0 .= $S1
+    $S0 .= ", found '"
+    $P1 = getattribute mob, '$.target'
+    $S1 = $P1
+    $S1 = substr $S1, pos, 1
+    $S0 .= $S1
+    $S0 .= "'"
+    $P0['_message'] = $S0
+    throw $P0
     .return ()
 .end
 
