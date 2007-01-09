@@ -6,9 +6,10 @@ rule block { \s* \{ <lineseq> \} \s* }
 
 rule lineseq { <line>* }
 
-token line    { 
+token line { 
     <label>
     [ <cond> 
+    | <subroutine>
     | <expr>;
     ] \s* 
 }
@@ -16,6 +17,8 @@ token line    {
 rule label { [<word>\:]? }
 
 token word { \w[\w|\d]* }
+
+rule subroutine { sub <word> <block> }
 
 rule else {
     (else) <block>
@@ -42,6 +45,7 @@ regex term {
     | <stringdouble>
     | <stringsingle>
     | do <block>
+    | <subcall>
 }
 rule variable { <sigil> <word> }
 token sigil { <[$@%]> }
@@ -49,6 +53,7 @@ token integer { \d+ }
 token number { \d+\.\d+ }
 regex stringdouble { <PGE::Text::bracketed: "> }
 regex stringsingle { <PGE::Text::bracketed: '> }
+rule subcall { do <word> \( <expr>? \) }
 
 token ws {
     [ \s+

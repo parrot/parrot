@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 use Test::More;
 
 language_output_is( 'punie', <<'CODE', <<'OUT', 'a do block' );
@@ -16,6 +16,16 @@ CODE
 ok 7
 ok 8
 ok 9
+OUT
+
+language_output_is( 'punie', <<'CODE', <<'OUT', 'sub call with no arguments' );
+sub foobar {
+    print "ok 10\n";
+}
+
+do foobar();
+CODE
+ok 10
 OUT
 
 TODO: {

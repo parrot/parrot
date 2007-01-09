@@ -346,6 +346,44 @@ transform past (PunieGrammar::stringsingle) :language('PIR') {
     .return (result)
 }
 
+transform past (PunieGrammar::subroutine) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Block'
+
+    .local string name
+    name = node['word']
+
+    result.'init'('node'=>node, 'name'=> name, 'blocktype'=>'sub')
+
+    .local pmc child
+    $P1 = node['block'; 'lineseq']
+    child = tree.'get'('past', $P1, 'PunieGrammar::lineseq')
+    result.'push'(child)
+
+    .return(result)
+}
+
+transform past (PunieGrammar::subcall) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Op'
+    $S1 = node['word']
+    result.'name'($S1)
+
+    $P1 = node['expr']
+    if null $P1 goto return_result
+    $P2 = tree.get('past', $P1, 'PunieGrammar::expr')
+    $S0 = $P2.'name'()
+    if $S0 == 'infix:,' goto flatten_comma
+    result.'init'($P2, 'node'=>node)
+    goto return_result
+  flatten_comma:
+    $P3 = $P2.'get_array'()
+    result.'init'($P3 :flat, 'node'=>node)
+  return_result:
+
+    .return (result)
+}
+
 # The following rules are for the results of the operator precedence
 # parser. These operate very differently than the standard grammar
 # rules, because they give the node type in a "type" hash key inside the
