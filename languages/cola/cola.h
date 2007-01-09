@@ -9,11 +9,11 @@
  */
 
 #ifndef _COLA_H
-#define _COLA_H
+#  define _COLA_H
 
-#define COLA_VERSION "0.0.11.1"
+#  define COLA_VERSION "0.0.11.1"
 
-#define DEBUG 0
+#  define DEBUG 0
 
 void abort(void);
 void exit(int status);
@@ -65,11 +65,11 @@ enum TYPES {
     TYPE_CLASS
 };
 
-#define MOD_PUBLIC    (1)
-#define MOD_PRIVATE   (1<<1)
-#define MOD_PROTECTED (1<<2)
-#define MOD_STATIC    (1<<3)
-#define MOD_VIRTUAL   (1<<4)
+#  define MOD_PUBLIC    (1)
+#  define MOD_PRIVATE   (1<<1)
+#  define MOD_PROTECTED (1<<2)
+#  define MOD_STATIC    (1<<3)
+#  define MOD_VIRTUAL   (1<<4)
 
 
 
@@ -164,7 +164,7 @@ struct _AST {
     } Attr;
 };
 
-#define HASH_SIZE 109
+#  define HASH_SIZE 109
 
 struct _SymbolTable {
     long            count;
@@ -385,11 +385,11 @@ char                *make_label();
 char                *op_name(int);
 int                 op_inverse(int);
 
-#define NAME(x) (x->literal == NULL ? x->name : x->literal->name)
-#define IS_LVAL(x)  (x->is_lval)
-#define IS_RVAL(x)  (!x->is_lval)
-#define SWITCH_OR_LOOP() (primary_block > 0 ? 1 : 0)
-#define eval_expr(x) ((x->asttype == ASTT_LITERAL || x->asttype == ASTT_IDENTIFIER) ? (x->targ = x->sym, 1) : 0)
+#  define NAME(x) (x->literal == NULL ? x->name : x->literal->name)
+#  define IS_LVAL(x)  (x->is_lval)
+#  define IS_RVAL(x)  (!x->is_lval)
+#  define SWITCH_OR_LOOP() (primary_block > 0 ? 1 : 0)
+#  define eval_expr(x) ((x->asttype == ASTT_LITERAL || x->asttype == ASTT_IDENTIFIER) ? (x->targ = x->sym, 1) : 0)
 
 extern long         line;
 
