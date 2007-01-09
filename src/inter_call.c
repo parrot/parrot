@@ -974,7 +974,7 @@ Parrot_convert_arg(Interp *interp, struct call_state *st)
 
 =item C<opcode_t * parrot_pass_args(Interp *,
                     parrot_context_t *src_ctx, parrot_context_t *dest_ctx,
-                    opcode_t *src_index, optcode_t *dest_index, const char *action)>
+                    opcode_t *src_index, optcode_t *dest_index, int param_or_result)>
 
 
 Main argument passing routine.
@@ -994,11 +994,11 @@ the latter handles return values and yields.
 
 void
 parrot_pass_args(Interp *interp, parrot_context_t *src_ctx, parrot_context_t *dest_ctx,
-        opcode_t *src_indexes, opcode_t *dest_indexes, int mode)
+        opcode_t *src_indexes, opcode_t *dest_indexes, int param_or_result)
 {
     struct call_state st;
     int err_check = 1;
-    const char *action = mode ? "results" : "params";
+    const char *action = param_or_result ? "results" : "params";
     st.dest.n = 0;      /* XXX */
 
     if (!dest_indexes)
@@ -1007,7 +1007,7 @@ parrot_pass_args(Interp *interp, parrot_context_t *src_ctx, parrot_context_t *de
     Parrot_init_arg_op(interp, dest_ctx, dest_indexes, &st.dest);
     Parrot_init_arg_op(interp, src_ctx, src_indexes, &st.src);
 
-    if (mode == 1) {
+    if (param_or_result == PARROT_PASS_RESULTS) {
         if (!PARROT_ERRORS_test(interp, PARROT_ERRORS_RESULT_COUNT_FLAG))
             err_check = 0;
     }

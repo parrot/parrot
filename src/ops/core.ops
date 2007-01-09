@@ -538,7 +538,7 @@ op get_params(inconst PMC) {
     interp->current_args = NULL;
     interp->current_params = NULL;
 
-    parrot_pass_args(interp, caller_ctx, ctx, src_indexes, dst_indexes, 0);
+    parrot_pass_args(interp, caller_ctx, ctx, src_indexes, dst_indexes, PARROT_PASS_PARAMS);
     if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
         PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
         --ctx->recursion_depth;
@@ -579,7 +579,7 @@ op set_returns(inconst PMC) {
         /* does this need to be here */
         interp->current_args = NULL;
 
-        parrot_pass_args(interp, ctx, caller_ctx, src_indexes, dest_indexes, 1);
+        parrot_pass_args(interp, ctx, caller_ctx, src_indexes, dest_indexes, PARROT_PASS_RESULTS);
     }
     argc = SIG_ELEMS(signature);
     goto OFFSET(argc + 2);

@@ -370,7 +370,8 @@ destination to continue execution.
             dest_indexes = to_ctx->current_results;
 
             Parrot_block_DOD(INTERP);
-            parrot_pass_args(INTERP, from_ctx, to_ctx, src_indexes, dest_indexes, 0);
+            parrot_pass_args(INTERP, from_ctx, to_ctx, src_indexes, dest_indexes,
+                    PARROT_PASS_PARAMS);
             Parrot_unblock_DOD(INTERP);
         }
 
