@@ -1,7 +1,7 @@
 #ifndef PARROT_BCG_UTILS_H
-#define PARROT_BCG_UTILS_H
+#  define PARROT_BCG_UTILS_H
 
-#include "bcg.h"
+#  include "bcg.h"
 
 /* Function for CString based hash tables. */
 typedef Hash bcg_hash;
