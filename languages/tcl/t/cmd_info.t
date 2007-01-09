@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 45
+plan 46
 
 eval_is {info} \
   {wrong # args: should be "info option ?arg arg ...?"} \
@@ -167,7 +167,11 @@ eval_is {info level a} {expected integer but got "a"} {info level - not integer}
 eval_is {
   proc test {{optional ""}} { info level 0 }
   list [test] [test foo]
-} {test {test foo}} {info level 0}
+} {test {test foo}} {info level 0 - proc}
+
+eval_is {namespace eval test {info level 0}} \
+  {namespace eval test {info level 0}} \
+  {info level 0 - namespace eval}
 
 # [info defaults] tests...
 proc defaults1 {a {b c} d} {}

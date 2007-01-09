@@ -237,6 +237,14 @@ bad_args:
   temp_call_chain = new .ResizablePMCArray
   set_root_global ['_tcl'], 'call_chain', temp_call_chain
 
+  .local pmc info_level
+  info_level = get_root_global ['_tcl'], 'info_level'
+  $P0 = new .TclList
+  assign $P0, argv
+  unshift $P0, 'eval'
+  unshift $P0, 'namespace'
+  unshift info_level, $P0
+
   .local pmc ns, __namespace
   __namespace = get_root_global ['_tcl'], '__namespace'
   

@@ -176,6 +176,9 @@ env_loop_done:
   # (Presuming we don't do this from the .pmc definitions.)
 
   $P1 = new .ResizablePMCArray
+  store_global 'info_level', $P1
+
+  $P1 = new .ResizablePMCArray
   store_global 'events', $P1
 
   $P1 = new .TclArray

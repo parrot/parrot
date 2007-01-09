@@ -88,6 +88,13 @@ create:
   call_chain = get_root_global ['_tcl'], 'call_chain'
   lexpad = new .Hash
   push call_chain, lexpad
+
+  .local pmc info_level
+  info_level = get_root_global ['_tcl'], 'info_level'
+  $P0 = new .TclList
+  assign $P0, args
+  unshift $P0, '%1'
+  unshift info_level, $P0
 END_PIR
 
   .local string args_usage, args_info

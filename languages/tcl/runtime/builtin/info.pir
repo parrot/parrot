@@ -421,8 +421,15 @@ find_level:
   .local pmc level
   level = shift argv
   level = __integer(level)
+  if level >= 0 goto find_info_level
   level = __call_level(level)
   .return(level)
+
+find_info_level:
+  .local pmc info_level
+  info_level = get_root_global ['_tcl'], 'info_level'
+  $P0 = info_level[level]
+  .return($P0)
 .end
 
 .sub 'globals'
