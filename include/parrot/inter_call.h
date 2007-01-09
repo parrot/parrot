@@ -120,12 +120,11 @@ PARROT_API int Parrot_fetch_arg_nci(Interp *, struct call_state *st);
 PARROT_API void Parrot_convert_arg(Interp *, struct call_state *st);
 PARROT_API int Parrot_store_arg(Interp *, struct call_state *st);
 
-opcode_t * parrot_pass_args(Interp *, parrot_context_t *src_ctx,
-        parrot_context_t *dest_ctx, int what);
+void parrot_pass_args(Interp *, parrot_context_t *src_ctx, parrot_context_t *dest_ctx,
+        opcode_t *src_indexes, opcode_t *dest_indexes, int mode);
 opcode_t * parrot_pass_args_fromc(Interp *, const char *sig,
         opcode_t *dest, parrot_context_t * ctx, va_list ap);
-opcode_t *
-parrot_pass_args_to_result(Interp *interp, const char *sig,
+opcode_t * parrot_pass_args_to_result(Interp *interp, const char *sig,
         opcode_t *dest, parrot_context_t * old_ctxp, va_list ap);
 
 void* set_retval(Interp*, int sig_ret, parrot_context_t *ctx);

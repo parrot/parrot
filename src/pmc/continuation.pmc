@@ -357,6 +357,7 @@ destination to continue execution.
             to_ctx->current_results = cc->current_results;
         }
         if (to_ctx->current_results && INTERP->current_args) {
+            opcode_t *src_indexes, *dest_indexes;
             /*
              * the register pointer is already switched back
              * to the caller, therefore the registers of the
@@ -364,11 +365,12 @@ destination to continue execution.
              * inside argument passing a DOD run is triggered
              * therefore we have to block DOD
              */
+            src_indexes = interp->current_args;
+            interp->current_args = NULL;
+            dest_indexes = to_ctx->current_results;
+
             Parrot_block_DOD(INTERP);
-            parrot_pass_args(INTERP,
-                    from_ctx,
-                    to_ctx,
-                    PARROT_OP_set_args_pc);
+            parrot_pass_args(INTERP, from_ctx, to_ctx, src_indexes, dest_indexes, 0);
             Parrot_unblock_DOD(INTERP);
         }
 

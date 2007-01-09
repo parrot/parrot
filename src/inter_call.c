@@ -746,6 +746,17 @@ check_named(Interp *interp, struct call_state *st, const char *action)
 }
 
 static void
+init_call_stats(struct call_state *st)
+{
+    st->n_actual_args = st->src.n;  /* initial guess, adjusted for :flat args */
+    st->optionals = 0;
+    st->params = st->dest.n;
+    st->name = NULL;
+    st->key = NULL;
+    st->first_named = -1;
+}
+
+static void
 process_args(Interp *interp, struct call_state *st, const char *action, int err_check)
 {
     int state, opt_flag;
@@ -755,6 +766,8 @@ process_args(Interp *interp, struct call_state *st, const char *action, int err_
         st->dest.mode |= CALL_STATE_END_x;
     if (!st->dest.n)
         st->dest.mode |= CALL_STATE_x_END;
+
+    init_call_stats(st);
 
     do {
         Parrot_fetch_arg(interp, st);
@@ -956,22 +969,13 @@ Parrot_convert_arg(Interp *interp, struct call_state *st)
     }
 }
 
-static void
-init_call_stats(struct call_state *st)
-{
-    st->n_actual_args = st->src.n;  /* initial guess, adjusted for :flat args */
-    st->optionals = 0;
-    st->params = st->dest.n;
-    st->name = NULL;
-    st->key = NULL;
-    st->first_named = -1;
-}
 
 /*
 
 =item C<opcode_t * parrot_pass_args(Interp *,
-                                    struct PackFile_ByteCode *dst_seg
-                                    parrot_context_t *src_ctx, int what)>
+                    parrot_context_t *src_ctx, parrot_context_t *dest_ctx,
+                    opcode_t *src_index, optcode_t *dest_index, const char *action)>
+
 
 Main argument passing routine.
 
@@ -988,61 +992,22 @@ the latter handles return values and yields.
 
 */
 
-
-opcode_t *
-parrot_pass_args(Interp *interp,  parrot_context_t *src_ctx,
-        parrot_context_t *dest_ctx, int mode)
+void
+parrot_pass_args(Interp *interp, parrot_context_t *src_ctx, parrot_context_t *dest_ctx,
+        opcode_t *src_indexes, opcode_t *dest_indexes, int mode)
 {
-    const char *action;
     struct call_state st;
-    int err_check;
-    opcode_t *src_pc, *dst_pc;
-
+    int err_check = 1;
+    const char *action = mode ? "results" : "params";
     st.dest.n = 0;      /* XXX */
 
-    switch(mode)
-    {
-        case PARROT_OP_get_params_pc:
-            dst_pc = interp->current_params;
-            src_pc = interp->current_args;
-            /* the args and params are now 'used.' */
-            interp->current_args = NULL;
-            interp->current_params = NULL;
-            action = "params";
-            break;
-        case PARROT_OP_get_results_pc:
-            dst_pc = dest_ctx->current_results;
-            src_pc = interp->current_returns;
-            interp->current_returns = NULL;
-            interp->current_args = NULL;
-            action = "results";
-            break;
-        case PARROT_OP_set_args_pc:
-            dst_pc = dest_ctx->current_results;
-            src_pc = interp->current_args;
-            interp->current_args = NULL;
-            action = "params";
-            break;
-        default:
-            assert(0);
-            break;
-    }
+    if (!dest_indexes)
+        return;
 
-    interp->current_args = NULL;
-    interp->current_params = NULL;
-    interp->current_returns = NULL;
+    Parrot_init_arg_op(interp, dest_ctx, dest_indexes, &st.dest);
+    Parrot_init_arg_op(interp, src_ctx, src_indexes, &st.src);
 
-    if (!dst_pc) {
-        /* XXX error checking */
-        return NULL;
-    }
-
-    Parrot_init_arg_op(interp, dest_ctx, dst_pc, &st.dest);
-    Parrot_init_arg_op(interp, src_ctx, src_pc, &st.src);
-    init_call_stats(&st);
-
-    err_check = 1;
-    if (mode == PARROT_OP_get_results_pc) {
+    if (mode == 1) {
         if (!PARROT_ERRORS_test(interp, PARROT_ERRORS_RESULT_COUNT_FLAG))
             err_check = 0;
     }
@@ -1051,9 +1016,6 @@ parrot_pass_args(Interp *interp,  parrot_context_t *src_ctx,
             err_check = 0;
     }
     process_args(interp, &st, action, err_check);
-
-    /* skip the get_params opcode - all done here */
-    return dst_pc + st.dest.n + 2;
 }
 
 /*
@@ -1093,7 +1055,6 @@ parrot_pass_args_to_result(Interp *interp, const char *sig,
     Parrot_init_arg_op(interp, CONTEXT(interp->ctx), dest, &st.dest);
     Parrot_init_arg_sig(interp, old_ctxp, sig, PARROT_VA_TO_VAPTR(ap), &st.src);
 
-    init_call_stats(&st);
     process_args(interp, &st, "params", 1);
     return dest + st.dest.n + 2;
 }

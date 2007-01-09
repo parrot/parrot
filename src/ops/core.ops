@@ -521,16 +521,24 @@ op get_results(inconst PMC) {
 op get_params(inconst PMC) {
     opcode_t * const this = CUR_OPCODE;
     parrot_context_t *caller_ctx, *ctx;
-    PMC *ccont;
-    opcode_t *pc;
+    PMC * ccont;
+    PMC * const signature = $1;
+    INTVAL argc;
+    opcode_t *src_indexes, *dst_indexes;
 
     interp->current_params = this;
     ctx = CONTEXT(interp->ctx);
     ccont = ctx->current_cont;
 
     caller_ctx = ctx->caller_ctx;
-    pc = parrot_pass_args(interp, caller_ctx, ctx,
-            PARROT_OP_get_params_pc);
+
+    src_indexes = interp->current_args;
+    dst_indexes = interp->current_params;
+    /* the args and params are now 'used.' */
+    interp->current_args = NULL;
+    interp->current_params = NULL;
+
+    parrot_pass_args(interp, caller_ctx, ctx, src_indexes, dst_indexes, 0);
     if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
         PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
         --ctx->recursion_depth;
@@ -540,7 +548,8 @@ op get_params(inconst PMC) {
         Parrot_free_context(interp, caller_ctx, 0);
         interp->current_args = NULL;
     }
-    goto ADDRESS(pc);
+    argc = SIG_ELEMS(signature);
+    goto OFFSET(argc + 2);
 }
 
 op set_returns(inconst PMC) {
@@ -549,6 +558,7 @@ op set_returns(inconst PMC) {
     PMC *ccont;
     PMC *signature = $1;
     INTVAL argc;
+    opcode_t *src_indexes, *dest_indexes;
 
     interp->current_returns = this;
     ctx = CONTEXT(interp->ctx);
@@ -562,7 +572,14 @@ op set_returns(inconst PMC) {
                PDB_backtrace can't deal with a missing to_ctx either. */
             internal_exception(1, "No caller_ctx for continuation %p.", ccont);
         }
-        parrot_pass_args(interp, ctx, caller_ctx, PARROT_OP_get_results_pc);
+
+        src_indexes = interp->current_returns;
+        dest_indexes = caller_ctx->current_results;
+        interp->current_returns = NULL;
+        /* does this need to be here */
+        interp->current_args = NULL;
+
+        parrot_pass_args(interp, ctx, caller_ctx, src_indexes, dest_indexes, 1);
     }
     argc = SIG_ELEMS(signature);
     goto OFFSET(argc + 2);
