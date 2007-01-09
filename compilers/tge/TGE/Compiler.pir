@@ -244,7 +244,7 @@ err_no_rule:
     infile = get_global '$!infile'
     $P2 = node[0]
     (lineno) = $P2.'line_number'()
-    value.'emit'('#line %0 "%1"', lineno, infile)
+    value.'emit'('#line %0 %1', lineno, infile)
     value .= $P2
     .return (value)
 .end
@@ -271,12 +271,22 @@ Compile a grammar from a source string.
 
 .sub 'precompile' :method
     .param string source
-    .param pmc infile
+    .param string infile          :optional
+    .param int has_infile      :opt_flag
     .local pmc rule_data
     .local string outstring
     .local string header_string
 
-    set_global '$!infile', infile
+    if has_infile goto quote_infile
+    infile = ''
+    goto have_infile
+  quote_infile:
+    infile = concat '"', infile
+    concat infile, '"'
+  have_infile:
+    $P0 = new .String
+    $P0 = infile
+    set_global '$!infile', $P0
 
     # Unnamed grammars are class 'AnonGrammar'
     .local string grammarname
