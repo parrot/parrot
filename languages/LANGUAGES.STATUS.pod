@@ -129,23 +129,18 @@ C<languages/BASIC/interpreter>
 
 =item Author
 
-Bernhard Schmalhofer
+Patrick Michaud
 
 =item Description
 
-Based on ANTLR and Python. ANTLR is needed only for maintainance, for
-generation of Python runtime files. A new implementation with Java
-code generated with ANTLR 3 has been investigated as well.
+Basic calculator. See http://en.wikipedia.org/wiki/Bc_%28Unix%29
+Implemented with the Parrot compiler tools PGE and TGE.
 
 =item Status
 
-Very simple arithmetic expressions are working. Some test failures.
-Part of languages smoke testing.
-
-'languages/bc' is no longer activly developed. Bernhard is moving
-his ANTLR 3 experiments over to 'languages/plumhead'. When that is done,
-'languages/bc' will be removed. A shiny new PGE/TGE based implementation
-of bc can be found in 'languages/abc'.
+Almost complete. 
+A former implementation in languages/bc has been
+removed in revision 16528.
 
 =item Last verified with parrot version
 
@@ -153,7 +148,7 @@ of bc can be found in 'languages/abc'.
 
 =item Location
 
-C<languages/bc>
+C<languages/abc>
 
 =back
 
