@@ -251,8 +251,10 @@ fetch_arg_sig(Interp *interp, struct call_state *st)
             else
                 UVal_pmc(st->val) = va_arg(*ap, PMC*);
 
-            if (st->src.sig & PARROT_ARG_FLATTEN)
-                return make_flattened(interp, st, UVal_pmc(st->val));
+            if (st->src.sig & PARROT_ARG_FLATTEN) {
+                make_flattened(interp, st, UVal_pmc(st->val));
+                return;
+            }
             break;
     }
     st->src.mode |= CALL_STATE_NEXT_ARG;
@@ -281,8 +283,10 @@ fetch_arg_op(Interp *interp, struct call_state *st)
             UVal_pmc(st->val) = constant ? st->src.ctx->constants[idx]->u.key
                 : CTX_REG_PMC(st->src.ctx, idx);
 
-            if (st->src.sig & PARROT_ARG_FLATTEN)
-                return make_flattened(interp, st, UVal_pmc(st->val));
+            if (st->src.sig & PARROT_ARG_FLATTEN) {
+                make_flattened(interp, st, UVal_pmc(st->val));
+                return;
+            }
             break;
     }
     st->src.mode |= CALL_STATE_NEXT_ARG;
