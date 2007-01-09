@@ -9,11 +9,11 @@
 #if !defined(PARROT_ARM_JIT_EMIT_H_GUARD)
 #  define PARROT_ARM_JIT_EMIT_H_GUARD
 
-#  ifdef ARM
-#    ifdef __linux
-#      include <asm/unistd.h>
-#    endif
-#  endif /* ARM */
+#ifdef ARM
+#  ifdef __linux
+#    include <asm/unistd.h>
+#  endif
+#endif /* ARM */
 
 /*  Registers
  *
@@ -76,7 +76,7 @@ typedef enum {
     REG15_pc = 15
 } arm_register_t;
 
-#  if JIT_EMIT
+#if JIT_EMIT
 
 typedef enum {
     cond_EQ = 0x00,
@@ -855,8 +855,8 @@ Parrot_jump_to_op_in_reg(Parrot_jit_info_t *jit_info,
                      ((int) interp->code->base.code));
 }
 
-#  endif /* JIT_EMIT */
-#  if JIT_EMIT == 2
+#endif /* JIT_EMIT */
+#if JIT_EMIT == 2
 
 void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                         Interp *interp)
@@ -925,7 +925,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
            <where ever> ; address of function.
     .L2:                      ; next instruction - return point from func.
 
-    # here I'm going to do
+    here I'm going to do
 
     mov     r1, r4 ; current interpreter is arg 1
     adr     r14,  .L1
@@ -952,14 +952,14 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      Interp *interp)
 {
     jit_info->native_ptr = emit_mov(jit_info->native_ptr, r1, r4);
-#    ifndef ARM_K_BUG
+#  ifndef ARM_K_BUG
     jit_info->native_ptr = emit_mov(jit_info->native_ptr, REG14_lr, REG15_pc);
     jit_info->native_ptr = emit_ldmstm(jit_info->native_ptr,
                                         cond_AL, is_load, dir_IA,
                                         is_writeback,
                                         REG14_lr,
                                         reg2mask(0) | reg2mask(REG15_pc));
-#    else
+#  else
     jit_info->native_ptr = emit_arith_immediate(jit_info->native_ptr, cond_AL,
                                                  ADD, 0, REG14_lr, REG15_pc,
                                                  4, 0);
@@ -969,7 +969,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                                         REG14_lr,
                                         reg2mask(0) | reg2mask(REG12_ip));
     jit_info->native_ptr = emit_mov(jit_info->native_ptr, REG15_pc, REG12_ip);
-#    endif /* ARM_K_BUG */
+#  endif /* ARM_K_BUG */
     jit_info->native_ptr
         = emit_word(jit_info->native_ptr, (int) jit_info->cur_op);
     jit_info->native_ptr
@@ -1011,11 +1011,11 @@ Parrot_jit_emit_mov_rm_n(Interp *interp, int reg, char *mem)
 {
 }
 
-#  endif /* JIT_EMIT == 2 */
-#  if JIT_EMIT == 0
+#endif /* JIT_EMIT == 2 */
+#if JIT_EMIT == 0
 
-#    define REQUIRES_CONSTANT_POOL 0
-#    define INT_REGISTERS_TO_MAP 10
+#  define REQUIRES_CONSTANT_POOL 0
+#  define INT_REGISTERS_TO_MAP 10
 
 /* XXX NOTE before actually mapping things
 
@@ -1030,7 +1030,7 @@ Parrot_jit_emit_mov_rm_n(Interp *interp, int reg, char *mem)
    NWC
 */
 
-#    ifndef JIT_IMCC
+#  ifndef JIT_IMCC
 
 char intval_map[INT_REGISTERS_TO_MAP] =
     { r0, r1, r2, r3, r4, r5, r6, r7, r8, r12 };
@@ -1042,8 +1042,8 @@ arm_sync_d_i_cache(void *start, void *end)
      * ARM8) because earlier cores don't have separate D and I caches.
      * However there aren't that many ARM7 or earlier devices around that
      * we'll be running on.  */
-#      ifdef __linux
-#        ifdef __GNUC__
+#    ifdef __linux
+#      ifdef __GNUC__
     int result;
     /* swi call based on code snippet from Russell King.  Description
        verbatim:  */
@@ -1083,17 +1083,17 @@ arm_sync_d_i_cache(void *start, void *end)
                            "Synchronising I and D caches failed with errno=%d\n",
                            -result);
     }
-#        else
-#          error "ARM needs to sync D and I caches, and I don't know how to embed assmbler on this C compiler"
-#        endif
 #      else
-/* Not strictly true - on RISC OS it's OS_SynchroniseCodeAreas  */
-#        error "ARM needs to sync D and I caches, and I don't know how to on this OS"
+#        error "ARM needs to sync D and I caches, and I don't know how to embed assmbler on this C compiler"
 #      endif
+#    else
+/* Not strictly true - on RISC OS it's OS_SynchroniseCodeAreas  */
+#      error "ARM needs to sync D and I caches, and I don't know how to on this OS"
+#    endif
 }
 
-#    endif
-#  endif /* JIT_EMIT == 0 */
+#  endif
+#endif /* JIT_EMIT == 0 */
 #endif /* PARROT_ARM_JIT_EMIT_H_GUARD */
 
 

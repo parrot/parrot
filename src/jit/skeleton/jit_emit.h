@@ -75,7 +75,7 @@ typedef enum {
  * exec_cpu.c or jit_cpu.c
  */
 
-#  if JIT_EMIT
+#if JIT_EMIT
 
 /*
  * the arch might have different branch types:
@@ -87,27 +87,27 @@ enum { JIT_ARCH_CALL, JIT_ARCH_BRANCH, JIT_ARCH_UBRANCH };
  * emit code for a register move, pc is the location to emit the
  * asm code
  */
-#    define jit_emit_mov_rr(pc, dst, src) ...
+#  define jit_emit_mov_rr(pc, dst, src) ...
 
-#    define jit_emit_add_rrr(pc, D, A, B) ...
+#  define jit_emit_add_rrr(pc, D, A, B) ...
 
 /*
  * load register from memory offset, relative to the register base pointer
  * this is used to load hardware cpu registers from parrot registers
  */
-#    define jit_emit_mov_rm_i(pc, reg, offs) \
+#  define jit_emit_mov_rm_i(pc, reg, offs) \
       jit_emit_lwz(pc, reg, offs, BP)     /* e.g. PPC */
 
 /* load floating point register from Parrot register */
-#    define jit_emit_mov_rm_n(pc, reg, offs) \
+#  define jit_emit_mov_rm_n(pc, reg, offs) \
       jit_emit_lfd(pc, reg, offs, BP)     /* e.g. PPC */
 
 /* Store a CPU register back to a Parrot register. */
 
-#    define jit_emit_mov_mr_i(pc, offs, reg) \
+#  define jit_emit_mov_mr_i(pc, offs, reg) \
       jit_emit_stw(pc, reg, offs, BP)
 
-#    define jit_emit_mov_mr_n(pc, offs, reg) \
+#  define jit_emit_mov_mr_n(pc, offs, reg) \
       jit_emit_stfd(pc, reg,  offs, BP)
 
 /*
@@ -125,7 +125,7 @@ jit_emit_bc(Parrot_jit_info_t *jit_info, branch_t cond, opcode_t disp)
  * Load a 32-bit immediate value.
  */
 
-#    define jit_emit_mov_ri_i(pc, D, imm)   ...
+#  define jit_emit_mov_ri_i(pc, D, imm)   ...
 
 /*
  * define some helper macros for code generation
@@ -137,7 +137,7 @@ jit_emit_bc(Parrot_jit_info_t *jit_info, branch_t cond, opcode_t disp)
  * to the cached CODE_START register 'add_disp' in jit/ppc
  */
 
-#    define add_disp(pc, D, disp) \
+#  define add_disp(pc, D, disp) \
       jit_emit_mov_ri_i(pc, ISR1, disp); \
       jit_emit_add_rrr(pc, D, CODE_START, ISR1)
 
@@ -145,27 +145,27 @@ jit_emit_bc(Parrot_jit_info_t *jit_info, branch_t cond, opcode_t disp)
  * emit code that gets interp->code->jit_info->arena->op_map
  * and sets the OP_MAP register
  */
-#    define jit_emit_load_op_map(pc) ...
+#  define jit_emit_load_op_map(pc) ...
 
 /*
  * emit code that gets interp->code->base.data
  * and sets the CODE_START register
  */
-#    define jit_emit_load_code_start(pc)  ...
+#  define jit_emit_load_code_start(pc)  ...
 
 /*
  * emit code that branches to the next code piece
  */
-#    define jit_emit_branch_to_opcode(pc, D)  ...
+#  define jit_emit_branch_to_opcode(pc, D)  ...
 
 /*
  * emit code that calls a Parrot opcode function
  */
-#    define jit_emit_call_func(pc, addr)  ...
+#  define jit_emit_call_func(pc, addr)  ...
 
-#  endif /* JIT_EMIT */
+#endif /* JIT_EMIT */
 
-#  if JIT_EMIT == 2
+#if JIT_EMIT == 2
 
 /*
  * emit code that calls a core.ops function from src/core_ops.c,
@@ -205,7 +205,7 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
  */
 static void Parrot_end_jit(Parrot_jit_info_t *, Interp * );
 
-#    undef Parrot_jit_restart_op
+#  undef Parrot_jit_restart_op
 /*
  * emit code that might leave the JIT runcore
  * see  ppc or i386
@@ -216,9 +216,9 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
 {
 }
 
-#  endif /* JIT_EMIT == 2 */
+#endif /* JIT_EMIT == 2 */
 
-#  if JIT_EMIT == 0
+#if JIT_EMIT == 0
 
 /*
  * emit stack frame according to ABI
@@ -269,8 +269,8 @@ jit_mov_rm_n_offs(...) {}
  * jit core
  */
 
-#    define INT_REGISTERS_TO_MAP 14
-#    define FLOAT_REGISTERS_TO_MAP 2
+#  define INT_REGISTERS_TO_MAP 14
+#  define FLOAT_REGISTERS_TO_MAP 2
 
 /*
  * enumerate these mapped registers
@@ -356,7 +356,7 @@ Parrot_jit_init(Interp *interp)
 }
 
 
-#  endif /* JIT_EMIT == 0 */
+#endif /* JIT_EMIT == 0 */
 #endif /* PARROT_PPC_JIT_EMIT_H_GUARD */
 
 

@@ -14,7 +14,7 @@
 #ifndef PARROT_PPC_EXEC_DEP_H_GUARD
 #  define PARROT_PPC_EXEC_DEP_H_GUARD
 
-#  ifdef JIT_CGP
+#ifdef JIT_CGP
 
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
@@ -22,7 +22,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 {
 }
 
-#  else /* JIT_CGP */
+#else /* JIT_CGP */
 
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
@@ -38,7 +38,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
     _emit_bx(jit_info->native_ptr, 1, 0);
 }
 
-#  endif /* JIT_CGP */
+#endif /* JIT_CGP */
 
 void
 Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
@@ -66,9 +66,9 @@ offset_fixup(Parrot_exec_objfile_t *obj)
     int i,j;
 
     for (i = 0; i < obj->data_count; i++) {
-#  ifdef EXEC_MACH_O
+#ifdef EXEC_MACH_O
         obj->symbol_table[i].value = obj->text.size;
-#  endif
+#endif
         for (j = 0; j < i; j++)
             obj->symbol_table[i].value += obj->data_size[j];
     }

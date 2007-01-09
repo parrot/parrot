@@ -178,10 +178,10 @@ write_types(FILE *stabs, Interp *interp)
             i + 1, BIT_OFFSET(PMC, obj), BIT_SIZE(pobj_t));
     fprintf(stabs, "vtable:*(0,%d),%d,%d;",
             i + 3, BIT_OFFSET(PMC, vtable), BIT_SIZE(void*));
-#if ! PMC_DATA_IN_EXT
+#  if ! PMC_DATA_IN_EXT
     fprintf(stabs, "data:(0,14),%d,%d;",
             BIT_OFFSET(PMC, data), BIT_SIZE(void*));
-#endif
+#  endif
     fprintf(stabs, "pmc_ext:*(0,%d),%d,%d;",
             i, BIT_OFFSET(PMC, pmc_ext), BIT_SIZE(void*));
     fprintf(stabs, ";\"");

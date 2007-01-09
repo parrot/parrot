@@ -935,7 +935,7 @@ AGAIN:
 #    else
             case EGAIN:
                 goto AGAIN;
-#  endif
+#    endif
             case ECONNRESET:
                 /* XXX why close it on err return result is -1 anyway */
                 close(io->fd);

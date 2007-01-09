@@ -590,7 +590,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
 #endif /* JIT_EMIT */
 #if JIT_EMIT == 0
 
-#define FLOAT_REGISTERS_TO_MAP 4
+#  define FLOAT_REGISTERS_TO_MAP 4
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,

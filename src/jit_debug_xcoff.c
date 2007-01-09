@@ -50,9 +50,9 @@ http://sources.redhat.com/gdb/current/onlinedocs/stabs_toc.html.
 
 void Parrot_jit_debug(Interp *interp);
 
-#    define BIT_SIZE(t) ((int)(sizeof (t)*8))
-#    define BYTE_SIZE(t) ((int)sizeof (t))
-#    define BIT_OFFSET(str, field) ((int)(offsetof(str, field) * 8))
+#  define BIT_SIZE(t) ((int)(sizeof (t)*8))
+#  define BYTE_SIZE(t) ((int)sizeof (t))
+#  define BIT_OFFSET(str, field) ((int)(offsetof(str, field) * 8))
 
 typedef struct {
     const char *name;
