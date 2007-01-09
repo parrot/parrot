@@ -31,7 +31,7 @@ set skipped_tests [dict create \
     namespace-47.2 namespace-47.4 namespace-47.6
     parse-9.2 parse-10.14
     set-2.1 set-4.1
-    switch-4.1
+    switch-4.1 switch-4.5
     while-4.3
     while-old-4.6
   } {[interp]} {
@@ -48,6 +48,9 @@ set skipped_tests [dict create \
     dict-11.1 dict-11.2 dict-11.3 dict-11.4 dict-11.5 dict-11.6 dict-11.7
     expr-old-34.13 expr-old-34.14
     lindex-3.7
+  } {[expr isqrt()]} {
+    expr-47.1 expr-47.2 expr-47.4 expr-47.5 expr-47.6 expr-47.7 expr-47.8
+    expr-47.9 expr-47.10 expr-47.11 expr-47.12
   } {[expr s?rand()]} {
     expr-old-32.51 expr-old-32.52 expr-old-32.53 expr-old-32.48 expr-old-32.49
     expr-old-32.50 expr-old-32.45
@@ -83,13 +86,15 @@ set skipped_tests [dict create \
   } {[lsearch -regexp]} {
     for-3.6
   } {Inf support} {
+    compExpr-old-11.13a
     expr-11.13b expr-22.2 expr-22.4 expr-22.6 expr-22.8 expr-30.3 expr-30.4
-    expr-41.1
+    expr-41.1 expr-45.7
     expr-old-26.10b expr-old-34.11 expr-old-34.12b expr-old-34.11
     expr-old-34.10
     scan-14.1 scan-14.2 
   } {NaN support} {
-    expr-22.1 expr-22.3  expr-22.5 expr-22.7 expr-22.9
+    expr-22.1 expr-22.3  expr-22.5 expr-22.7 expr-22.9 expr-45.8 expr-45.9
+    expr-47.3
     expr-old-36.7
   } {[testexprstring]} {
     expr-old-38.2
@@ -106,6 +111,29 @@ set skipped_tests [dict create \
   } {[testexprlongobj]} {
     expr-39.1 expr-39.2 expr-39.3 expr-39.4 expr-39.5 expr-39.6 expr-39.8
     expr-39.9 expr-39.11 expr-39.12 expr-39.14 expr-39.15
+  } {[testevalobjv]} {
+    parse-8.1 parse-8.5 parse-8.9
+  } {[testparser]} {
+    parse-1.1 parse-1.2 parse-1.3 parse-1.4 parse-1.5 parse-1.6 parse-1.7
+    parse-1.8 parse-2.1 parse-2.2 parse-2.3 parse-2.4 parse-2.5 parse-3.1
+    parse-3.2 parse-3.3 parse-3.4 parse-3.5 parse-3.6 parse-3.7 parse-4.1
+    parse-4.2 parse-4.3 parse-4.4 parse-4.5 parse-4.6 parse-5.1 parse-5.2
+    parse-5.3 parse-5.4 parse-5.5 parse-5.6 parse-5.7 parse-5.8 parse-5.9
+    parse-5.10 parse-5.11 parse-5.13 parse-5.16 parse-5.18 parse-5.20
+    parse-5.22 parse-5.23 parse-5.24 parse-5.25 parse-5.26 parse-5.27
+    parse-6.1 parse-6.2 parse-6.3 parse-6.4 parse-6.5 parse-6.6 parse-6.7
+    parse-6.11 parse-6.12 parse-6.13 parse-6.14 parse-6.15 parse-6.16
+    parse-6.17 parse-6.18 parse-7.1 parse-12.6 parse-12.7 parse-12.8
+    parse-12.11 parse-12.12 parse-12.13 parse-12.14 parse-12.18 parse-12.20
+    parse-12.21 parse-12.22 parse-12.23 parse-12.25 parse-14.1 parse-14.2
+    parse-14.3 parse-14.4 parse-14.5 parse-14.6 parse-14.7 parse-14.8
+    parse-14.9 parse-14.10 parse-14.11 parse-14.12 parse-15.1 parse-15.2
+    parse-15.3 parse-15.4
+  } {[testparsevar]} {
+    parse-13.1 parse-13.2 parse-13.3 parse-13.4 parse-13.5
+  } {[testparsevarname]} {
+    parse-12.1 parse-12.2 parse-12.3 parse-12.4 parse-12.5 parse-12.9
+    parse-12.10 parse-12.15 parse-12.16 parse-12.17 parse-12.19 parse-12.24
   } {[testupvar]} {
     var-3.3 var-3.4 var-3.4
   } {[testgetvarfullname]} {
@@ -132,6 +160,13 @@ set skipped_tests [dict create \
     execute-3.54 execute-3.58 execute-3.59 execute-3.60 execute-3.67
     execute-3.68 execute-3.69 execute-3.70 execute-3.71 execute-3.75
     execute-3.76 execute-3.77
+  } {mathfunc} {
+    compExpr-5.3 compExpr-5.4
+    compExpr-old-15.7 compExpr-old-15.8 compExpr-old-15.9 compExpr-old-15.10
+    compExpr-old-15.11
+    expr-15.7 expr-15.8 expr-15.9 expr-15.10 expr-15.11 expr-15.12 expr=15.13
+    expr=15.14 expr-15.15 expr-15.16
+    expr-old-32.43 expr-old-32.44
   } {bigint} {
     expr-23.36 expr-23.37 expr-23.38 expr-23.39 expr-23.41 expr-23.42
     expr-23.43 expr-23.44 expr-23.47 expr-23.48 expr-24.10
@@ -183,15 +218,13 @@ array set abort_after {
   basic-47.1           {need interp before these can work}
   cmdAH-31.13          {invalid command name "cd"}
   cmdMZ-5.7            {invalid command name "cleanupTests"}
-  cmdMZ-return-2.17    {foreach handling borked?}
   env-1.3              {can't read "env(test)" no such element in array}
   event-4.2            {invalid command name "update"}
   filename-11.13       {invalid command name "cd"}
   iocmd-12.8           {invalid command name "close"}
   ioUtil-2.8           {invalid command name "cd"}
+  parse-19.4           {invalid command name "cleanupTests"}
   uplevel-5.2          {invalid command name "set"}
   utf-1.4              {Invalid character for UTF-8 encoding}
-  parse-8.12           {avoid infinite loop}
   source-7.6           {invalid command name "cleanupTests"}
-  expr-22.81           {some GC bug?}
 }

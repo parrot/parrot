@@ -247,6 +247,7 @@ FAILING_TCL_TESTS = \
   t_tcl/stack.t \
   t_tcl/thread.t \
   t_tcl/tm.t \
+  t_tcl/trace.t \
   t_tcl/unixFCmd.t \
   t_tcl/unixFile.t \
   t_tcl/unixNotfy.t \
@@ -280,7 +281,6 @@ DYING_TCL_TESTS = \
   t_tcl/stringObj.t \
   t_tcl/tcltest.t \
   t_tcl/timer.t \
-  t_tcl/trace.t \
   t_tcl/unixInit.t \
   t_tcl/winFile.t
 
