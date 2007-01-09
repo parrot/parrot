@@ -29,7 +29,7 @@ sub runstep {
     genfile( 'config/gen/makefiles/languages.in' => 'languages/Makefile' );
 
     my @languages = qw{
-        APL amber abc bc befunge bf cardinal c99 cola ecmascript forth HQ9plus
+        APL amber abc befunge bf cardinal c99 cola ecmascript forth HQ9plus
         jako lisp lua m4 ook parrot_compiler perl6 pheme plumhead pugs punie
         regex scheme tap urm WMLScript Zcode
     };
