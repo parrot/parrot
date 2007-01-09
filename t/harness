@@ -158,6 +158,7 @@ push @default_tests, 't/distro/manifest.t';
 # append them to the list of default tests
 my @coding_std_tests = map { "t/codingstd/$_" } qw(
     c_code_coda.t 
+    c_indent.t
     cppcomments.t 
     cuddled_else.t 
     line_endings.t
