@@ -27,11 +27,11 @@ Parrot_signbit(double x)
        int i[2];
    } u;
    u.d = x;
-#if PARROT_BIGENDIAN
+#  if PARROT_BIGENDIAN
    return u.i[0] < 0;
-#else
+#  else
    return u.i[1] < 0;
-#endif
+#  endif
 }
 #endif
 
