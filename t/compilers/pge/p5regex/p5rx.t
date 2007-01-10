@@ -52,9 +52,7 @@ Column 6, if present, contains a description of what is being tested.
 
 =cut
 
-#.const int TESTS = 960
-.const int TESTS = 138
-.const int START_TEST = 138
+.const int TESTS = 960
 
 .sub main :main
    load_bytecode 'Test/Builder.pir'
@@ -109,10 +107,8 @@ Column 6, if present, contains a description of what is being tested.
    # how many tests to run?
    # XXX: this should be summed automatically from test_files data
    #      until then, we use the constant above
-#   test.'plan'(TESTS)
-    test.'plan'('no_plan') ## TODO
+   test.'plan'(TESTS)
 
-trace 4
  outer_loop:
    unless file_iterator goto end_outer_loop
    .local string test_name
@@ -135,7 +131,6 @@ trace 4
    # read in the file one line at a time...
    $I0 = file_handle.'eof'()
    if $I0 goto end_loop
-if local_test_number >= TESTS goto end_loop  ## TODO
 
    test_line = readline file_handle
 
@@ -144,13 +139,22 @@ if local_test_number >= TESTS goto end_loop  ## TODO
    if $I0 == -1 goto loop
    inc test_number
    inc local_test_number
-if local_test_number <  START_TEST goto loop ## TODO
 
  parse_data:
    push_eh eh_bad_line
      ( pattern, target, result, testvar, expected, description ) = 'parse_data'( test_line )
    clear_eh
 
+   # build the test description
+   #   start with the pattern
+   $S0 = concat '/', pattern
+   $S0 .= '/ '
+   #  add the test description, if it exists
+   $I0 = length description
+   unless $I0 goto no_desc
+   description = concat '-- ', description
+ no_desc:
+   description = concat $S0, description
    # prepend test filename and line number to description
    description = 'build_test_desc'( description, test_name, local_test_number )
 
@@ -495,16 +499,16 @@ if local_test_number <  START_TEST goto loop ## TODO
 
 # set skip information
 .sub 'set_skip_info'
-   .local pmc skip_tests # keys indicate test file; values are just defined
-              skip_tests = new 'Hash'
+    .local pmc skip_tests # keys indicate test file; values are just defined
+               skip_tests = new 'Hash'
 
-   .local pmc skip_info
-              skip_info = new 'Hash'
+    .local pmc skip_info
+               skip_info = new 'Hash'
 
-   .local string test_file
+    .local string test_file
 
-   test_file = 're_tests'
-   bsr reset_skip_info
+    test_file = 're_tests'
+    bsr reset_skip_info
 
     $S0 = 'trailing modifiers'
     $I0 = 264
@@ -636,9 +640,12 @@ if local_test_number <  START_TEST goto loop ## TODO
     $S0 = '[perl #18019]'
     skip_info[926] = $S0
 
-   skip_tests[test_file] = skip_info
+    $S0 = 'parser bug'
+    skip_info[138] = $S0
 
-   .return (skip_tests)
+    skip_tests[test_file] = skip_info
+
+    .return (skip_tests)
 
  reset_skip_info:
    skip_info = new .Hash
@@ -708,8 +715,7 @@ if local_test_number <  START_TEST goto loop ## TODO
    inc tab_number
    if result == '' goto get_expected
 
-  # XXX Whoa. apparently there might sometimes be a description?
-  description = 'no description'
+  description = ''
 
  return:
    .return ( pattern, target, result, testvar, expected, description )
