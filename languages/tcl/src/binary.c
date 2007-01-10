@@ -142,7 +142,7 @@ binary_scan_string_field(Interp *interp, char field,
 
 /* binary_scan_string_slurpy
  *
- * Scan the binary string for all remaining matches of the field. Returns the 
+ * Scan the binary string for all remaining matches of the field. Returns the
  * new value of the STRING value passed in.
  */
 static STRING *
