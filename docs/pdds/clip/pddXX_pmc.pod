@@ -1,5 +1,5 @@
 # Copyright (C) 2001-2006, The Perl Foundation.
-# $Id:$
+# $Id$
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ Proposal
 
 =head1 VERSION
 
-$Revision:$
+$Revision$
 
 =head1 ABSTRACT
 
@@ -248,6 +248,26 @@ forseeable due to these changes.
 Parrot core needs very little changes to be able to deal with
 differently sized PMCs. All the GC infrastructure is already there for
 C<Buffer_like> objects, which are managed in sized header pools.
+
+TBD is:
+
+=over
+
+=item * Change PObj/PMC structs
+
+Rearrange PObj/Buffer/PMC struct items in such away that item #1 is
+vtable, #2 is flags, rest is per PObj. The easierst way to achieve
+this ist to waste one word and give Buffers and empty vtable.
+
+=item * Adjust GC
+
+Then remove the Buffer/PMC discerns from GC code, just treat them
+alike, but honor the PObj_is_PMC_FLAG.
+
+=back
+
+This should be all to be able to build and GC PMCs of arbitrary albeit
+fixed size.
 
 Changing PMCs to the new scheme can be done as needed and isn't
 mandatory.
