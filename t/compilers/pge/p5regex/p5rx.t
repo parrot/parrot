@@ -30,8 +30,8 @@ Column 2 contains the string to be matched.
 
 Column 3 contains the expected result:
     y    expect a match
-    n    expect no match 
-    c    expect an error 
+    n    expect no match
+    c    expect an error
     B    test exposes a known bug in Perl, should be skipped
     b    test exposes a known bug in Perl, should be skipped if noamp
 
@@ -266,201 +266,200 @@ if local_test_number >= TESTS goto end_loop ## TODO
     test_file = 're_tests'
     bsr reset_todo_info
 
-    # TODO: unknown
+    $S0 = 'unknown'
+    todo_info[99] = $S0
+    todo_info[100] = $S0
+    todo_info[142] = $S0
+    todo_info[172] = $S0
+    todo_info[184] = $S0
+    todo_info[223] = $S0
+    todo_info[232] = $S0
+    todo_info[233] = $S0
+    todo_info[234] = $S0
+    todo_info[236] = $S0
+    todo_info[241] = $S0
+    todo_info[243] = $S0
+    todo_info[244] = $S0
+    todo_info[246] = $S0
+    todo_info[247] = $S0
+    todo_info[253] = $S0
+    todo_info[254] = $S0
+    todo_info[256] = $S0
+    todo_info[257] = $S0
+    todo_info[260] = $S0
+    todo_info[261] = $S0
+    todo_info[381] = $S0
+    todo_info[382] = $S0
+    todo_info[396] = $S0
+    todo_info[397] = $S0
+    todo_info[398] = $S0
+    todo_info[419] = $S0
+    todo_info[422] = $S0
+    todo_info[428] = $S0
+    todo_info[429] = $S0
+    todo_info[432] = $S0
+    todo_info[435] = $S0
+    todo_info[439] = $S0
+    todo_info[440] = $S0
+    todo_info[444] = $S0
+    todo_info[445] = $S0
+    todo_info[446] = $S0
+    todo_info[447] = $S0
+    todo_info[448] = $S0
+    todo_info[449] = $S0
+    todo_info[452] = $S0
+    todo_info[453] = $S0
+    todo_info[454] = $S0
+    todo_info[455] = $S0
+    todo_info[485] = $S0
+    todo_info[495] = $S0
+    todo_info[498] = $S0
+    todo_info[500] = $S0
+    todo_info[501] = $S0
+    todo_info[503] = $S0
+    todo_info[504] = $S0
+    todo_info[505] = $S0
+    todo_info[506] = $S0
+    todo_info[507] = $S0
+    todo_info[508] = $S0
+    todo_info[509] = $S0
+    todo_info[510] = $S0
+    todo_info[511] = $S0
+    todo_info[512] = $S0
+    todo_info[515] = $S0
+    todo_info[522] = $S0
+    todo_info[523] = $S0
+    todo_info[524] = $S0
+    todo_info[527] = $S0
+    todo_info[528] = $S0
+    todo_info[536] = $S0
+    todo_info[540] = $S0
+    todo_info[541] = $S0
+    todo_info[543] = $S0
+    todo_info[544] = $S0
+    todo_info[545] = $S0
+    todo_info[548] = $S0
+    todo_info[549] = $S0
+    todo_info[553] = $S0
+    todo_info[554] = $S0
+    todo_info[595] = $S0
+    todo_info[596] = $S0
+    todo_info[600] = $S0
+    todo_info[601] = $S0
+    todo_info[602] = $S0
+    todo_info[603] = $S0
+    todo_info[604] = $S0
+    todo_info[605] = $S0
+    todo_info[606] = $S0
+    todo_info[607] = $S0
+    todo_info[621] = $S0
+    todo_info[623] = $S0
+    todo_info[624] = $S0
+    todo_info[625] = $S0
+    todo_info[639] = $S0
+    todo_info[641] = $S0
+    todo_info[642] = $S0
+    todo_info[643] = $S0
+    todo_info[693] = $S0
+    todo_info[695] = $S0
+    todo_info[696] = $S0
+    todo_info[697] = $S0
+    todo_info[747] = $S0
+    todo_info[749] = $S0
+    todo_info[750] = $S0
+    todo_info[751] = $S0
+    todo_info[801] = $S0
+    todo_info[832] = $S0
+    todo_info[833] = $S0
+    todo_info[840] = $S0
+    todo_info[859] = $S0
+    todo_info[860] = $S0
+    todo_info[861] = $S0
+    todo_info[862] = $S0
+    todo_info[863] = $S0
+    todo_info[865] = $S0
+    todo_info[866] = $S0
+    todo_info[871] = $S0
+    todo_info[874] = $S0
+    todo_info[875] = $S0
+    todo_info[876] = $S0
+    todo_info[882] = $S0
+    todo_info[887] = $S0
+    todo_info[888] = $S0
+    todo_info[890] = $S0
+    todo_info[891] = $S0
+    todo_info[893] = $S0
+    todo_info[894] = $S0
+    todo_info[895] = $S0
+    todo_info[896] = $S0
+    todo_info[897] = $S0
+    todo_info[898] = $S0
+    todo_info[899] = $S0
+    todo_info[900] = $S0
 
-    todo_info[99] = 1
-    todo_info[100] = 1
-    todo_info[142] = 1
-    todo_info[172] = 1
-    todo_info[184] = 1
-    todo_info[223] = 1
-    todo_info[232] = 1
-    todo_info[233] = 1
-    todo_info[234] = 1
-    todo_info[236] = 1
-    todo_info[241] = 1
-    todo_info[243] = 1
-    todo_info[244] = 1
-    todo_info[246] = 1
-    todo_info[247] = 1
-    todo_info[253] = 1
-    todo_info[254] = 1
-    todo_info[256] = 1
-    todo_info[257] = 1
-    todo_info[260] = 1
-    todo_info[261] = 1
-    todo_info[381] = 1
-    todo_info[382] = 1
-    todo_info[396] = 1
-    todo_info[397] = 1
-    todo_info[398] = 1
-    todo_info[419] = 1
-    todo_info[422] = 1
-    todo_info[428] = 1
-    todo_info[429] = 1
-    todo_info[432] = 1
-    todo_info[435] = 1
-    todo_info[439] = 1
-    todo_info[440] = 1
-    todo_info[444] = 1
-    todo_info[445] = 1
-    todo_info[446] = 1
-    todo_info[447] = 1
-    todo_info[448] = 1
-    todo_info[449] = 1
-    todo_info[452] = 1
-    todo_info[453] = 1
-    todo_info[454] = 1
-    todo_info[455] = 1
-    todo_info[485] = 1
-    todo_info[495] = 1
-    todo_info[498] = 1
-    todo_info[500] = 1
-    todo_info[501] = 1
-    todo_info[503] = 1
-    todo_info[504] = 1
-    todo_info[505] = 1
-    todo_info[506] = 1
-    todo_info[507] = 1
-    todo_info[508] = 1
-    todo_info[509] = 1
-    todo_info[510] = 1
-    todo_info[511] = 1
-    todo_info[512] = 1
-    todo_info[515] = 1
-    todo_info[522] = 1
-    todo_info[523] = 1
-    todo_info[524] = 1
-    todo_info[527] = 1
-    todo_info[528] = 1
-    todo_info[536] = 1
-    todo_info[540] = 1
-    todo_info[541] = 1
-    todo_info[543] = 1
-    todo_info[544] = 1
-    todo_info[545] = 1
-    todo_info[548] = 1
-    todo_info[549] = 1
-    todo_info[553] = 1
-    todo_info[554] = 1
-    todo_info[595] = 1
-    todo_info[596] = 1
-    todo_info[600] = 1
-    todo_info[601] = 1
-    todo_info[602] = 1
-    todo_info[603] = 1
-    todo_info[604] = 1
-    todo_info[605] = 1
-    todo_info[606] = 1
-    todo_info[607] = 1
-    todo_info[621] = 1
-    todo_info[623] = 1
-    todo_info[624] = 1
-    todo_info[625] = 1
-    todo_info[639] = 1
-    todo_info[641] = 1
-    todo_info[642] = 1
-    todo_info[643] = 1
-    todo_info[693] = 1
-    todo_info[695] = 1
-    todo_info[696] = 1
-    todo_info[697] = 1
-    todo_info[747] = 1
-    todo_info[749] = 1
-    todo_info[750] = 1
-    todo_info[751] = 1
-    todo_info[801] = 1
-    todo_info[832] = 1
-    todo_info[833] = 1
-    todo_info[840] = 1
-    todo_info[859] = 1
-    todo_info[860] = 1
-    todo_info[861] = 1
-    todo_info[862] = 1
-    todo_info[863] = 1
-    todo_info[865] = 1
-    todo_info[866] = 1
-    todo_info[871] = 1
-    todo_info[874] = 1
-    todo_info[875] = 1
-    todo_info[876] = 1
-    todo_info[882] = 1
-    todo_info[887] = 1
-    todo_info[888] = 1
-    todo_info[890] = 1
-    todo_info[891] = 1
-    todo_info[893] = 1
-    todo_info[894] = 1
-    todo_info[895] = 1
-    todo_info[896] = 1
-    todo_info[897] = 1
-    todo_info[898] = 1
-    todo_info[899] = 1
-    todo_info[900] = 1
+    $S0 = 'reuse captured group'
+    todo_info[928] = $S0
+    todo_info[929] = $S0
+    todo_info[930] = $S0
+    todo_info[931] = $S0
+    todo_info[932] = $S0
+    todo_info[933] = $S0
+    todo_info[934] = $S0
+    todo_info[935] = $S0
+    todo_info[936] = $S0
+    todo_info[937] = $S0
+    todo_info[938] = $S0
+    todo_info[939] = $S0
+    todo_info[940] = $S0
+    todo_info[941] = $S0
+    todo_info[942] = $S0
 
-    # TODO: reuse captured group
-    todo_info[928] = 1
-    todo_info[929] = 1
-    todo_info[930] = 1
-    todo_info[931] = 1
-    todo_info[932] = 1
-    todo_info[933] = 1
-    todo_info[934] = 1
-    todo_info[935] = 1
-    todo_info[936] = 1
-    todo_info[937] = 1
-    todo_info[938] = 1
-    todo_info[939] = 1
-    todo_info[940] = 1
-    todo_info[941] = 1
-    todo_info[942] = 1
+    $S0 = 'non-greedy/lookbehind'
+    todo_info[915] = $S0
+    todo_info[916] = $S0
+    todo_info[918] = $S0
+    todo_info[919] = $S0
+    todo_info[920] = $S0
+    todo_info[921] = $S0
+    todo_info[922] = $S0
 
-    # TODO: non-greedy/lookbehind
-    todo_info[915] = 1
-    todo_info[916] = 1
-    todo_info[918] = 1
-    todo_info[919] = 1
-    todo_info[920] = 1
-    todo_info[921] = 1
-    todo_info[922] = 1
+    $S0 = 'greediness/lookbehind'
+    todo_info[901] = $S0
+    todo_info[902] = $S0
+    todo_info[902] = $S0
+    todo_info[903] = $S0
+    todo_info[904] = $S0
+    todo_info[905] = $S0
 
-    # TODO: greediness/lookbehind
-    todo_info[901] = 1
-    todo_info[902] = 1
-    todo_info[902] = 1
-    todo_info[903] = 1
-    todo_info[904] = 1
-    todo_info[905] = 1
+    $S0 = 'non-greedy/zero-width assertion'
+    todo_info[907] = $S0
+    todo_info[908] = $S0
+    todo_info[909] = $S0
+    todo_info[910] = $S0
+    todo_info[912] = $S0
+    todo_info[913] = $S0
+    todo_info[914] = $S0
+    todo_info[960] = $S0
 
-    # TODO: non-greedy/zero-width assertion
-    todo_info[907] = 1
-    todo_info[908] = 1
-    todo_info[909] = 1
-    todo_info[910] = 1
-    todo_info[912] = 1
-    todo_info[913] = 1
-    todo_info[914] = 1
-    todo_info[960] = 1
+    $S0 = '\d in character class'
+    todo_info[825] = $S0
+    todo_info[826] = $S0
+    todo_info[827] = $S0
 
-    # TODO: \d in character class
-    todo_info[825] = 1
-    todo_info[826] = 1
-    todo_info[827] = 1
+    $S0 = '[ID 20010803.016]'
+    todo_info[884] = $S0
 
-    # TODO: [ID 20010803.016]
-    todo_info[884] = 1
+    $S0 = '[perl #34195]'
+    todo_info[959] = $S0
 
-    # TODO: [perl #34195]
-    todo_info[959] = 1
+    $S0 = 'undef [perl #16773]'
+    todo_info[925] = $S0
 
-    # TODO: undef [perl #16773]
-    todo_info[925] = 1
+    $S0 = 'unmatched bracket'
+    todo_info[923] = $S0
 
-    # TODO: unmatched bracket
-    todo_info[923] = 1
-
-    # TODO: 16 tests for [perl #23171]
-    todo_info[927] = 1
+    $S0 = '16 tests for [perl #23171]'
+    todo_info[927] = $S0
 
     todo_tests[test_file] = todo_info
 
@@ -493,387 +492,135 @@ if local_test_number >= TESTS goto end_loop ## TODO
    test_file = 're_tests'
    bsr reset_skip_info
 
-   # TODO: trailing modifiers
-    skip_info[264] = 1
-    skip_info[265] = 1
-    skip_info[266] = 1
-    skip_info[267] = 1
-    skip_info[268] = 1
-    skip_info[269] = 1
-    skip_info[270] = 1
-    skip_info[271] = 1
-    skip_info[272] = 1
-    skip_info[273] = 1
-    skip_info[274] = 1
-    skip_info[275] = 1
-    skip_info[276] = 1
-    skip_info[277] = 1
-    skip_info[278] = 1
-    skip_info[279] = 1
-    skip_info[280] = 1
-    skip_info[281] = 1
-    skip_info[282] = 1
-    skip_info[283] = 1
-    skip_info[284] = 1
-    skip_info[285] = 1
-    skip_info[286] = 1
-    skip_info[287] = 1
-    skip_info[288] = 1
-    skip_info[289] = 1
-    skip_info[290] = 1
-    skip_info[291] = 1
-    skip_info[292] = 1
-    skip_info[293] = 1
-    skip_info[294] = 1
-    skip_info[295] = 1
-    skip_info[296] = 1
-    skip_info[297] = 1
-    skip_info[298] = 1
-    skip_info[299] = 1
-    skip_info[300] = 1
-    skip_info[301] = 1
-    skip_info[302] = 1
-    skip_info[303] = 1
-    skip_info[304] = 1
-    skip_info[305] = 1
-    skip_info[306] = 1
-    skip_info[307] = 1
-    skip_info[308] = 1
-    skip_info[309] = 1
-    skip_info[310] = 1
-    skip_info[311] = 1
-    skip_info[312] = 1
-    skip_info[313] = 1
-    skip_info[314] = 1
-    skip_info[315] = 1
-    skip_info[316] = 1
-    skip_info[317] = 1
-    skip_info[318] = 1
-    skip_info[319] = 1
-    skip_info[320] = 1
-    skip_info[321] = 1
-    skip_info[322] = 1
-    skip_info[323] = 1
-    skip_info[324] = 1
-    skip_info[325] = 1
-    skip_info[326] = 1
-    skip_info[327] = 1
-    skip_info[328] = 1
-    skip_info[329] = 1
-    skip_info[330] = 1
-    skip_info[331] = 1
-    skip_info[332] = 1
-    skip_info[333] = 1
-    skip_info[334] = 1
-    skip_info[335] = 1
-    skip_info[336] = 1
-    skip_info[337] = 1
-    skip_info[338] = 1
-    skip_info[339] = 1
-    skip_info[340] = 1
-    skip_info[341] = 1
-    skip_info[342] = 1
-    skip_info[343] = 1
-    skip_info[344] = 1
-    skip_info[345] = 1
-    skip_info[346] = 1
-    skip_info[347] = 1
-    skip_info[348] = 1
-    skip_info[349] = 1
-    skip_info[350] = 1
-    skip_info[351] = 1
-    skip_info[352] = 1
-    skip_info[353] = 1
-    skip_info[354] = 1
-    skip_info[355] = 1
-    skip_info[356] = 1
-    skip_info[357] = 1
-    skip_info[358] = 1
-    skip_info[359] = 1
-    skip_info[360] = 1
-    skip_info[361] = 1
-    skip_info[362] = 1
-    skip_info[363] = 1
-    skip_info[364] = 1
-    skip_info[365] = 1
-    skip_info[366] = 1
-    skip_info[367] = 1
-    skip_info[368] = 1
-    skip_info[369] = 1
-    skip_info[370] = 1
-    skip_info[371] = 1
-    skip_info[372] = 1
-    skip_info[373] = 1
-    skip_info[374] = 1
-    skip_info[375] = 1
-    skip_info[376] = 1
-    skip_info[377] = 1
-    skip_info[378] = 1
-    skip_info[379] = 1
-    skip_info[380] = 1
-    skip_info[381] = 1
-    skip_info[382] = 1
-    skip_info[383] = 1
-    skip_info[384] = 1
-    skip_info[385] = 1
-    skip_info[386] = 1
-    skip_info[387] = 1
-    skip_info[388] = 1
-    skip_info[389] = 1
-    skip_info[390] = 1
-    skip_info[391] = 1
-    skip_info[392] = 1
-    skip_info[393] = 1
-    skip_info[394] = 1
-    skip_info[395] = 1
-    skip_info[458] = 1
-    skip_info[459] = 1
-    skip_info[460] = 1
-    skip_info[461] = 1
-    skip_info[462] = 1
-    skip_info[463] = 1
-    skip_info[464] = 1
-    skip_info[465] = 1
-    skip_info[466] = 1
-    skip_info[467] = 1
-    skip_info[468] = 1
-    skip_info[469] = 1
-    skip_info[470] = 1
-    skip_info[471] = 1
-    skip_info[472] = 1
-    skip_info[473] = 1
-    skip_info[474] = 1
-    skip_info[475] = 1
-    skip_info[476] = 1
-    skip_info[477] = 1
-    skip_info[478] = 1
-    skip_info[479] = 1
-    skip_info[480] = 1
-    skip_info[483] = 1
-    skip_info[484] = 1
-    skip_info[496] = 1
-    skip_info[609] = 1
-    skip_info[610] = 1
-    skip_info[611] = 1
-    skip_info[612] = 1
-    skip_info[613] = 1
-    skip_info[614] = 1
-    skip_info[615] = 1
-    skip_info[616] = 1
-    skip_info[617] = 1
-    skip_info[627] = 1
-    skip_info[628] = 1
-    skip_info[629] = 1
-    skip_info[630] = 1
-    skip_info[631] = 1
-    skip_info[632] = 1
-    skip_info[633] = 1
-    skip_info[634] = 1
-    skip_info[635] = 1
-    skip_info[645] = 1
-    skip_info[646] = 1
-    skip_info[647] = 1
-    skip_info[648] = 1
-    skip_info[649] = 1
-    skip_info[650] = 1
-    skip_info[651] = 1
-    skip_info[652] = 1
-    skip_info[653] = 1
-    skip_info[663] = 1
-    skip_info[664] = 1
-    skip_info[665] = 1
-    skip_info[666] = 1
-    skip_info[667] = 1
-    skip_info[668] = 1
-    skip_info[669] = 1
-    skip_info[670] = 1
-    skip_info[671] = 1
-    skip_info[681] = 1
-    skip_info[682] = 1
-    skip_info[683] = 1
-    skip_info[684] = 1
-    skip_info[685] = 1
-    skip_info[686] = 1
-    skip_info[687] = 1
-    skip_info[688] = 1
-    skip_info[689] = 1
-    skip_info[699] = 1
-    skip_info[700] = 1
-    skip_info[701] = 1
-    skip_info[702] = 1
-    skip_info[703] = 1
-    skip_info[704] = 1
-    skip_info[705] = 1
-    skip_info[706] = 1
-    skip_info[707] = 1
-    skip_info[717] = 1
-    skip_info[718] = 1
-    skip_info[719] = 1
-    skip_info[720] = 1
-    skip_info[721] = 1
-    skip_info[722] = 1
-    skip_info[723] = 1
-    skip_info[724] = 1
-    skip_info[725] = 1
-    skip_info[735] = 1
-    skip_info[736] = 1
-    skip_info[737] = 1
-    skip_info[738] = 1
-    skip_info[739] = 1
-    skip_info[740] = 1
-    skip_info[741] = 1
-    skip_info[742] = 1
-    skip_info[743] = 1
-    skip_info[753] = 1
-    skip_info[754] = 1
-    skip_info[755] = 1
-    skip_info[756] = 1
-    skip_info[757] = 1
-    skip_info[758] = 1
-    skip_info[759] = 1
-    skip_info[760] = 1
-    skip_info[761] = 1
-    skip_info[771] = 1
-    skip_info[772] = 1
-    skip_info[773] = 1
-    skip_info[774] = 1
-    skip_info[775] = 1
-    skip_info[776] = 1
-    skip_info[777] = 1
-    skip_info[778] = 1
-    skip_info[779] = 1
-    skip_info[789] = 1
-    skip_info[790] = 1
-    skip_info[791] = 1
-    skip_info[792] = 1
-    skip_info[793] = 1
-    skip_info[794] = 1
-    skip_info[795] = 1
-    skip_info[796] = 1
-    skip_info[797] = 1
-    skip_info[802] = 1
-    skip_info[803] = 1
-    skip_info[805] = 1
-    skip_info[834] = 1
-    skip_info[835] = 1
-    skip_info[836] = 1
-    skip_info[838] = 1
-    skip_info[859] = 1
-    skip_info[862] = 1
-    skip_info[877] = 1
-    skip_info[886] = 1
+    $S0 = 'trailing modifiers'
+    $I0 = 264
+    $I1 = 395
+    bsr set_range
+    $I0 = 458
+    $I1 = 480
+    bsr set_range
+    skip_info[483] = $S0
+    skip_info[484] = $S0
+    skip_info[496] = $S0
+    $I0 = 609
+    $I1 = 617
+    bsr set_range
+    $I0 = 627
+    $I1 = 635
+    bsr set_range
+    $I0 = 645
+    $I1 = 653
+    bsr set_range
+    $I0 = 663
+    $I1 = 671
+    bsr set_range
+    $I0 = 681
+    $I1 = 689
+    bsr set_range
+    $I0 = 699
+    $I1 = 707
+    bsr set_range
+    $I0 = 717
+    $I1 = 725
+    bsr set_range
+    $I0 = 735
+    $I1 = 743
+    bsr set_range
+    $I0 = 753
+    $I1 = 761
+    bsr set_range
+    $I0 = 771
+    $I1 = 779
+    bsr set_range
+    $I0 = 789
+    $I1 = 797
+    bsr set_range
+    skip_info[802] = $S0
+    skip_info[803] = $S0
+    skip_info[805] = $S0
+    skip_info[834] = $S0
+    skip_info[835] = $S0
+    skip_info[836] = $S0
+    skip_info[838] = $S0
+    skip_info[859] = $S0
+    skip_info[862] = $S0
+    skip_info[877] = $S0
+    skip_info[886] = $S0
 
-    # TODO: bug or error
-    skip_info[143] = 1
-    skip_info[144] = 1
-    skip_info[148] = 1
-    skip_info[149] = 1
-    skip_info[155] = 1
-    skip_info[167] = 1
-    skip_info[248] = 1
-    skip_info[249] = 1
-    skip_info[252] = 1
-    skip_info[308] = 1
-    skip_info[309] = 1
-    skip_info[310] = 1
-    skip_info[322] = 1
-    skip_info[323] = 1
-    skip_info[325] = 1
-    skip_info[330] = 1
-    skip_info[331] = 1
-    skip_info[336] = 1
-    skip_info[347] = 1
-    skip_info[408] = 1
-    skip_info[436] = 1
-    skip_info[487] = 1
-    skip_info[488] = 1
-    skip_info[489] = 1
-    skip_info[490] = 1
-    skip_info[492] = 1
-    skip_info[531] = 1
-    skip_info[532] = 1
-    skip_info[563] = 1
-    skip_info[564] = 1
-    skip_info[566] = 1
-    skip_info[593] = 1
-    skip_info[594] = 1
-    skip_info[598] = 1
-    skip_info[599] = 1
-    skip_info[944] = 1
-    skip_info[945] = 1
+    $S0 = 'bug or error'
+    skip_info[143] = $S0
+    skip_info[144] = $S0
+    skip_info[148] = $S0
+    skip_info[149] = $S0
+    skip_info[155] = $S0
+    skip_info[167] = $S0
+    skip_info[248] = $S0
+    skip_info[249] = $S0
+    skip_info[252] = $S0
+    skip_info[308] = $S0
+    skip_info[309] = $S0
+    skip_info[310] = $S0
+    skip_info[322] = $S0
+    skip_info[323] = $S0
+    skip_info[325] = $S0
+    skip_info[330] = $S0
+    skip_info[331] = $S0
+    skip_info[336] = $S0
+    skip_info[347] = $S0
+    skip_info[408] = $S0
+    skip_info[436] = $S0
+    skip_info[487] = $S0
+    skip_info[488] = $S0
+    skip_info[489] = $S0
+    skip_info[490] = $S0
+    skip_info[492] = $S0
+    skip_info[531] = $S0
+    skip_info[532] = $S0
+    skip_info[563] = $S0
+    skip_info[564] = $S0
+    skip_info[566] = $S0
+    skip_info[593] = $S0
+    skip_info[594] = $S0
+    skip_info[598] = $S0
+    skip_info[599] = $S0
+    skip_info[944] = $S0
+    skip_info[945] = $S0
 
-    # TODO: broken col 4?
-    skip_info[139] = 1
+    $s 0 = 'broken col 4?'
+    skip_info[139] = $S0
 
-    # TODO: kills a parrot
-    skip_info[491] = 1
-    skip_info[493] = 1
-    skip_info[556] = 1
-    skip_info[557] = 1
-    skip_info[568] = 1
-    skip_info[569] = 1
-    skip_info[570] = 1
-    skip_info[571] = 1
-    skip_info[572] = 1
-    skip_info[573] = 1
-    skip_info[574] = 1
-    skip_info[575] = 1
-    skip_info[576] = 1
-    skip_info[577] = 1
-    skip_info[578] = 1
-    skip_info[579] = 1
-    skip_info[580] = 1
-    skip_info[581] = 1
-    skip_info[582] = 1
-    skip_info[583] = 1
-    skip_info[584] = 1
-    skip_info[585] = 1
-    skip_info[586] = 1
-    skip_info[587] = 1
-    skip_info[588] = 1
-    skip_info[589] = 1
-    skip_info[590] = 1
-    skip_info[591] = 1
-    skip_info[592] = 1
-    skip_info[800] = 1
-    skip_info[828] = 1
-    skip_info[829] = 1
-    skip_info[830] = 1
-    skip_info[957] = 1
-    skip_info[958] = 1
+    $S0 = 'kills a parrot'
+    skip_info[491] = $S0
+    skip_info[493] = $S0
+    skip_info[556] = $S0
+    skip_info[557] = $S0
+    $I0 = 568
+    $I0 = 592
+    bsr set_range
+    skip_info[800] = $S0
+    skip_info[828] = $S0
+    skip_info[829] = $S0
+    skip_info[830] = $S0
+    skip_info[957] = $S0
+    skip_info[958] = $S0
 
-    # TODO: hangs a parrot
-    skip_info[806] = 1
-    skip_info[807] = 1
-    skip_info[808] = 1
-    skip_info[809] = 1
-    skip_info[810] = 1
-    skip_info[811] = 1
-    skip_info[812] = 1
-    skip_info[813] = 1
-    skip_info[814] = 1
-    skip_info[815] = 1
-    skip_info[816] = 1
-    skip_info[817] = 1
-    skip_info[818] = 1
-    skip_info[819] = 1
-    skip_info[820] = 1
-    skip_info[821] = 1
-    skip_info[822] = 1
-    skip_info[823] = 1
-    skip_info[924] = 1
+    $S0 = 'hangs a parrot'
+    $I0 = 806
+    $I1 = 823
+    bsr set_range
+    skip_info[924] = $S0
 
-    # TODO: unknown
-    skip_info[502] = 1
-    skip_info[597] = 1
-    skip_info[944] = 1
-    skip_info[945] = 1
+    $S0 = 'unknown reason'
+    skip_info[502] = $S0
+    skip_info[597] = $S0
+    skip_info[944] = $S0
+    skip_info[945] = $S0
 
-    # TODO: [ID 20010811.006]
-    skip_info[879] = 1
- 
-    # TODO: [perl #18019]
-    skip_info[926] = 1
+    $S0 = '[ID 20010811.006]'
+    skip_info[879] = $S0
+
+    $S0 = '[perl #18019]'
+    skip_info[926] = $S0
 
    skip_tests[test_file] = skip_info
 
@@ -883,14 +630,14 @@ if local_test_number >= TESTS goto end_loop ## TODO
    skip_info = new .Hash
    ret
 
- set_skip_loop: # for developer testing. not used normally
-   if $I0 > $I1 goto end_loop
-   if $S0 != '' goto set_skip_info
+ set_range:                         # for setting a range of tests
+   if $I0 > $I1 goto end_loop       # put range min in $I0, max in $I1
+   if $S0 != '' goto set_skip_info  # put skip reason in $S0
    $S0 = 'unknown reason'
  set_skip_info:
    skip_info[$I0] = $S0
    $I0 += 1
-   goto set_skip_loop
+   goto set_range
  end_loop:
    $S0 = ''
    ret
@@ -946,12 +693,12 @@ if local_test_number >= TESTS goto end_loop ## TODO
    expected    = $P1[tab_number]
    inc tab_number
    if result == '' goto get_expected
-   
+
   # XXX Whoa. apparently there might sometimes be a description?
   description = 'no description'
 
  return:
-   .return ( pattern, target, result, testvar, expected, description ) 
+   .return ( pattern, target, result, testvar, expected, description )
 
  bad_line:
      $P1 = new 'Exception'
