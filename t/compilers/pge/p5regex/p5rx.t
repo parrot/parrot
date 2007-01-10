@@ -52,7 +52,9 @@ Column 6, if present, contains a description of what is being tested.
 
 =cut
 
-.const int TESTS = 960
+#.const int TESTS = 960
+.const int TESTS = 138
+.const int START_TEST = 138
 
 .sub main :main
    load_bytecode 'Test/Builder.pir'
@@ -107,9 +109,10 @@ Column 6, if present, contains a description of what is being tested.
    # how many tests to run?
    # XXX: this should be summed automatically from test_files data
    #      until then, we use the constant above
-   test.'plan'(TESTS)
+#   test.'plan'(TESTS)
+    test.'plan'('no_plan') ## TODO
 
-
+trace 4
  outer_loop:
    unless file_iterator goto end_outer_loop
    .local string test_name
@@ -132,7 +135,7 @@ Column 6, if present, contains a description of what is being tested.
    # read in the file one line at a time...
    $I0 = file_handle.'eof'()
    if $I0 goto end_loop
-if local_test_number >= TESTS goto end_loop ## TODO
+if local_test_number >= TESTS goto end_loop  ## TODO
 
    test_line = readline file_handle
 
@@ -141,6 +144,7 @@ if local_test_number >= TESTS goto end_loop ## TODO
    if $I0 == -1 goto loop
    inc test_number
    inc local_test_number
+if local_test_number <  START_TEST goto loop ## TODO
 
  parse_data:
    push_eh eh_bad_line
@@ -163,6 +167,11 @@ if local_test_number >= TESTS goto end_loop ## TODO
    $P0 = skip_tests[test_name]
    $I0 = exists $P0[local_test_number]
    unless $I0 goto not_skip
+   # extract reason from skip data
+   $S0 = $P0[local_test_number]
+   if $S0 == '1' goto set_skip
+   description = 'build_test_desc'( $S0, test_name, local_test_number )
+ set_skip:
    test.'skip'(1, description)
    goto loop
 
@@ -207,6 +216,11 @@ if local_test_number >= TESTS goto end_loop ## TODO
    $P0 = todo_tests[test_name]
    $I0 = exists $P0[local_test_number]
    unless $I0 goto not_todo
+   # extract reason from todo data
+   $S0 = $P0[local_test_number]
+   if $S0 == '1' goto set_todo
+   description = 'build_test_desc'( $S0, test_name, local_test_number )
+ set_todo:
    test.'todo'(ok,description)
    goto loop
  not_todo:
@@ -266,7 +280,7 @@ if local_test_number >= TESTS goto end_loop ## TODO
     test_file = 're_tests'
     bsr reset_todo_info
 
-    $S0 = 'unknown'
+    $S0 = 'unknown reason'
     todo_info[99] = $S0
     todo_info[100] = $S0
     todo_info[142] = $S0
