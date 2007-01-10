@@ -121,8 +121,11 @@ string is treated as '0'.
   newline_loop:
     $I0 = find_cclass .CCLASS_NEWLINE, target, npos, pos
     if $I0 >= pos goto newline_done
+    $S0 = substr target, $I0, 2
     npos = $I0 + 1
     inc lines
+    if $S0 != "\r\n" goto newline_loop
+    inc npos
     goto newline_loop
   newline_done:
     .return (lines, npos)
