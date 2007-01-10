@@ -55,231 +55,223 @@ Column 6, if present, contains a description of what is being tested.
 .const int TESTS = 960
 
 .sub main :main
-   load_bytecode 'Test/Builder.pir'
-   load_bytecode 'PGE.pbc'
-   load_bytecode 'PGE/Dumper.pbc'
-   .include 'iglobals.pasm'
+    load_bytecode 'Test/Builder.pir'
+    load_bytecode 'PGE.pbc'
+    load_bytecode 'PGE/Dumper.pbc'
+    .include 'iglobals.pasm'
 
-   # Variable declarations, initializations
-   .local pmc test       # the test harness object.
-              test = new 'Test::Builder'
+    # Variable declarations, initializations
+    .local pmc test       # the test harness object.
+               test = new 'Test::Builder'
 
-   .local pmc todo_tests # keys indicate test file; values test number.
-              todo_tests = new 'Hash'
+    .local pmc todo_tests # keys indicate test file; values test number.
+               todo_tests = new 'Hash'
 
-   .local pmc skip_tests # keys indicate tests ID; values reasons.
-              skip_tests = new 'Hash'
+    .local pmc skip_tests # keys indicate tests ID; values reasons.
+               skip_tests = new 'Hash'
 
-   .local string test_dir # the directory containing tests
-                 test_dir = 't/compilers/pge/p5regex/'
+    .local string test_dir # the directory containing tests
+                  test_dir = 't/compilers/pge/p5regex/'
 
-   .local pmc test_files # values are test file names to run.
-              test_files = new 'ResizablePMCArray'
+    .local pmc test_files # values are test file names to run.
+               test_files = new 'ResizablePMCArray'
 
-   # populate the list of test files
-   push test_files, 're_tests'
+    # populate the list of test files
+    push test_files, 're_tests'
 
-   .local pmc file_iterator # iterate over list of files..
-              file_iterator = new 'Iterator', test_files
+    .local pmc file_iterator # iterate over list of files..
+               file_iterator = new 'Iterator', test_files
 
-   .local int test_number   # the number of the test we're running
-              test_number = 0
+    .local int test_number   # the number of the test we're running
+               test_number = 0
 
-   # these vars are in the loops below
-   .local pmc file_handle   # currently open file.
-   .local string test_file  # name of the current test file
-   .local string test_line  # one line of one test file, a single test
-   .local int ok            # is this a passing test?
+    # these vars are in the loops below
+    .local pmc file_handle   # currently open file.
+    .local string test_file  # name of the current test file
+    .local string test_line  # one line of one test file, a single test
+    .local int ok            # is this a passing test?
 
-   # for any given test:
-   .local pmc regex          # the regex
-   .local pmc match          # the match
-   .local string pattern     # the regex
-   .local string target      # this string to match against the regex
-   .local string result      # expected result of this test. (y/n/...)
-   .local string testvar     # the value to test against expected results
-   .local string expected    # the expected result of the match, or the error
-   .local string description # user-facing description of the test.
+    # for any given test:
+    .local pmc regex          # the regex
+    .local pmc match          # the match
+    .local string pattern     # the regex
+    .local string target      # this string to match against the regex
+    .local string result      # expected result of this test. (y/n/...)
+    .local string testvar     # the value to test against expected results
+    .local string expected    # the expected result of the match, or the error
+    .local string description # user-facing description of the test.
 
-   todo_tests = 'set_todo_info'()
-   skip_tests = 'set_skip_info'()
+    todo_tests = 'set_todo_info'()
+    skip_tests = 'set_skip_info'()
 
-   # how many tests to run?
-   # XXX: this should be summed automatically from test_files data
-   #      until then, we use the constant above
-   test.'plan'(TESTS)
+    # how many tests to run?
+    # XXX: this should be summed automatically from test_files data
+    #      until then, we use the constant above
+    test.'plan'(TESTS)
 
- outer_loop:
-   unless file_iterator goto end_outer_loop
-   .local string test_name
-                 test_name = shift file_iterator
-   # local test number in test file
-   .local int local_test_number
-              local_test_number = 0
+  outer_loop:
+    unless file_iterator goto end_outer_loop
+    .local string test_name
+                  test_name = shift file_iterator
+    # local test number in test file
+    .local int local_test_number
+               local_test_number = 0
 
-   # append the test directory and filename
-   test_file = test_dir . test_name
+    # append the test directory and filename
+    test_file = test_dir . test_name
 
-   # Open the test file
-   file_handle = open test_file, '<'
-   $S0 = typeof file_handle
-   if $S0 == 'Undef' goto bad_file
+    # Open the test file
+    file_handle = open test_file, '<'
+    $S0 = typeof file_handle
+    if $S0 == 'Undef' goto bad_file
 
-   # loop over the file, one at a time.
+    # loop over the file, one at a time.
 
- loop:
-   # read in the file one line at a time...
-   $I0 = file_handle.'eof'()
-   if $I0 goto end_loop
+  loop:
+    # read in the file one line at a time...
+    $I0 = file_handle.'eof'()
+    if $I0 goto end_loop
 
-   test_line = readline file_handle
+    test_line = readline file_handle
 
-   # skip lines without tabs
-   $I0 = index test_line, "\t"
-   if $I0 == -1 goto loop
-   inc test_number
-   inc local_test_number
+    # skip lines without tabs
+    $I0 = index test_line, "\t"
+    if $I0 == -1 goto loop
+    inc test_number
+    inc local_test_number
 
- parse_data:
-   push_eh eh_bad_line
+  parse_data:
+    push_eh eh_bad_line
      ( pattern, target, result, testvar, expected, description ) = 'parse_data'( test_line )
-   clear_eh
+    clear_eh
 
-   # build the test description
-   #   start with the pattern
-   $S0 = concat '/', pattern
-   $S0 .= '/ '
-   #  add the test description, if it exists
-   $I0 = length description
-   unless $I0 goto no_desc
-   description = concat '-- ', description
- no_desc:
-   description = concat $S0, description
-   # prepend test filename and line number to description
-   description = 'build_test_desc'( description, test_name, local_test_number )
+    # build the test description
+    #   start with the pattern
+    $S0 = concat '/', pattern
+    $S0 .= '/ '
+    #  add the test description, if it exists
+    $I0 = length description
+    unless $I0 goto no_desc
+    description = concat '-- ', description
+  no_desc:
+    description = concat $S0, description
+    # prepend test filename and line number to description
+    description = 'build_test_desc'( description, test_name, local_test_number )
 
-   if target != "''" goto got_target
-   target = ''
+    if target != "''" goto got_target
+    target = ''
 
- got_target:
-   target = 'backslash_escape'( target )
-   result = 'backslash_escape'( result )
+  got_target:
+    target = 'backslash_escape'( target )
+    result = 'backslash_escape'( result )
 
-   # Should this test be skipped?
-   $I0 = exists skip_tests[test_name]
-   unless $I0 goto not_skip
-   $P0 = skip_tests[test_name]
-   $I0 = exists $P0[local_test_number]
-   unless $I0 goto not_skip
-   # extract reason from skip data
-   $S0 = $P0[local_test_number]
-   if $S0 == '1' goto set_skip
-   description = 'build_test_desc'( $S0, test_name, local_test_number )
- set_skip:
-   test.'skip'(1, description)
-   goto loop
+    # Should this test be skipped?
+    $I0 = exists skip_tests[test_name]
+    unless $I0 goto not_skip
+    $P0 = skip_tests[test_name]
+    $I0 = exists $P0[local_test_number]
+    unless $I0 goto not_skip
+    # extract reason from skip data
+    $S0 = $P0[local_test_number]
+    if $S0 == '1' goto set_skip
+    description = 'build_test_desc'( $S0, test_name, local_test_number )
+  set_skip:
+    test.'skip'(1, description)
+    goto loop
 
- not_skip:
-   push_eh thrown
-   match = 'match_p5regex'( pattern, target )
-   clear_eh
+  not_skip:
+    push_eh thrown
+    match = 'match_p5regex'( pattern, target )
+    clear_eh
 
-   if match goto matched
+    if match goto matched
 
-   if result == 'n' goto is_ok
-   if result == 'y' goto is_nok
-   goto check_dump
+    if result == 'n' goto is_ok
+    if result == 'y' goto is_nok
+    goto check_dump
 
- matched:
-   if result == 'y' goto is_ok
-   if result == 'n' goto is_nok
-   # goto check_dump
+  matched:
+    if result == 'y' goto is_ok
+    if result == 'n' goto is_nok
 
- check_dump:
-   $S1 = match.'dump_str'('mob', ' ', '')
+  check_dump:
+    $S1 = match.'dump_str'('mob', ' ', '')
 
-   # remove /'s
-#    $S0 = substr result, 0, 1
-#    if $S0 != "/" goto bad_line
-#    substr result, 0, 1, ''
-#    substr result, -1, 1, ''
+    $I0 = index $S1, result
+    if $I0 == -1 goto is_nok
 
-   $I0 = index $S1, result
-   if $I0 == -1 goto is_nok
-   # goto is_ok
+  is_ok:
+    ok = 1
+    goto emit_test
+  is_nok:
+    ok = 0
 
- is_ok:
-   ok = 1
-   goto emit_test
- is_nok:
-   ok = 0
+  emit_test:
+    $I0 = exists todo_tests[test_name]
+    unless $I0 goto not_todo
+    $P0 = todo_tests[test_name]
+    $I0 = exists $P0[local_test_number]
+    unless $I0 goto not_todo
+    # extract reason from todo data
+    $S0 = $P0[local_test_number]
+    if $S0 == '1' goto set_todo
+    description = 'build_test_desc'( $S0, test_name, local_test_number )
+  set_todo:
+    test.'todo'(ok,description)
+    goto loop
+  not_todo:
+    test.'ok'(ok,description)
 
- emit_test:
-   $I0 = exists todo_tests[test_name]
-   unless $I0 goto not_todo
-   $P0 = todo_tests[test_name]
-   $I0 = exists $P0[local_test_number]
-   unless $I0 goto not_todo
-   # extract reason from todo data
-   $S0 = $P0[local_test_number]
-   if $S0 == '1' goto set_todo
-   description = 'build_test_desc'( $S0, test_name, local_test_number )
- set_todo:
-   test.'todo'(ok,description)
-   goto loop
- not_todo:
-   test.'ok'(ok,description)
+    goto loop
+  end_loop:
+    close file_handle
+    goto outer_loop
+  end_outer_loop:
 
-   goto loop
- end_loop:
-   close file_handle
-   goto outer_loop
- end_outer_loop:
+    test.'finish'()
+    end
 
-   test.'finish'()
-   end
+  bad_file:
+    print "Unable to open '"
+    print test_file
+    print "'\n"
 
- bad_file:
-   print "Unable to open '"
-   print test_file
-   print "'\n"
-
- thrown:
-   .sym pmc exception
-   .sym string message
-   get_results '(0,0)', exception, message
-   # remove /'s
-   $S0 = substr result, 0, 1
-   if $S0 != '/' goto bad_error
-   substr result, 0, 1, ''
-   substr result, -1, 1, ''
-   $I0 = index message, result
-   if $I0 == -1 goto bad_error
-   ok = 1
-   goto emit_test
- bad_error:
-   ok = 0
-   goto emit_test
- bad_line:
-   $S0 = 'Test not formatted properly!'
-   test.'ok'(0, $S0)
-   goto loop
- eh_bad_line:
-   $S0 = 'Test not formatted properly!'
-   test.'ok'(0, $S0)
-   goto loop
+  thrown:
+    .sym pmc exception
+    .sym string message
+    get_results '(0,0)', exception, message
+    # remove /'s
+    $S0 = substr result, 0, 1
+    if $S0 != '/' goto bad_error
+    substr result, 0, 1, ''
+    substr result, -1, 1, ''
+    $I0 = index message, result
+    if $I0 == -1 goto bad_error
+    ok = 1
+    goto emit_test
+  bad_error:
+    ok = 0
+    goto emit_test
+  bad_line:
+    $S0 = 'Test not formatted properly!'
+    test.'ok'(0, $S0)
+    goto loop
+  eh_bad_line:
+    $S0 = 'Test not formatted properly!'
+    test.'ok'(0, $S0)
+    goto loop
 .end
 
 
 # set todo information
 .sub 'set_todo_info'
-   .local pmc todo_tests # keys indicate test file; values are just defined
-              todo_tests = new 'Hash'
+    .local pmc todo_tests # keys indicate test file; values are just defined
+               todo_tests = new 'Hash'
 
-   .local pmc todo_info
-              todo_info = new 'Hash'
+    .local pmc todo_info
+               todo_info = new 'Hash'
 
-   .local string test_file
+    .local string test_file
 
     test_file = 're_tests'
     bsr reset_todo_info
@@ -481,19 +473,19 @@ Column 6, if present, contains a description of what is being tested.
 
     todo_tests[test_file] = todo_info
 
-   .return (todo_tests)
+    .return (todo_tests)
 
- reset_todo_info:
-   todo_info = new .Hash
-   ret
+  reset_todo_info:
+    todo_info = new .Hash
+    ret
 
- set_todo_loop: # for developer testing. not used normally
-   if $I0 > $I1 goto end_loop
-   todo_info[$I0] = 1
-   $I0 += 1
-   goto set_todo_loop
- end_loop:
-   ret
+  set_todo_loop: # for developer testing. not used normally
+    if $I0 > $I1 goto end_loop
+    todo_info[$I0] = 1
+    $I0 += 1
+    goto set_todo_loop
+  end_loop:
+    ret
 .end
 
 
@@ -647,80 +639,80 @@ Column 6, if present, contains a description of what is being tested.
 
     .return (skip_tests)
 
- reset_skip_info:
-   skip_info = new .Hash
-   ret
+  reset_skip_info:
+    skip_info = new .Hash
+    ret
 
- set_range:                         # for setting a range of tests
-   if $I0 > $I1 goto end_loop       # put range min in $I0, max in $I1
-   if $S0 != '' goto set_skip_info  # put skip reason in $S0
-   $S0 = 'unknown reason'
- set_skip_info:
-   skip_info[$I0] = $S0
-   $I0 += 1
-   goto set_range
- end_loop:
-   $S0 = ''
-   ret
+  set_range:                         # for setting a range of tests
+    if $I0 > $I1 goto end_loop       # put range min in $I0, max in $I1
+    if $S0 != '' goto set_skip_info  # put skip reason in $S0
+    $S0 = 'unknown reason'
+  set_skip_info:
+    skip_info[$I0] = $S0
+    $I0 += 1
+    goto set_range
+  end_loop:
+    $S0 = ''
+    ret
 .end
 
 
 .sub 'parse_data'
-   .param string test_line   # the data record
+    .param string test_line   # the data record
 
-   .local pmc regex          # the regex matching object
-   .local pmc match          # the match
-   .local string pattern     # the regex
-   .local string target      # this string to match against the regex
-   .local string result      # expected result of this test. (y/n/...)
-   .local string testvar     # the value to test against expected results
-   .local string expected    # the expected result of the match, or the error
-   .local string description # user-facing description of the test.
+    .local pmc regex          # the regex matching object
+    .local pmc match          # the match
+    .local string pattern     # the regex
+    .local string target      # this string to match against the regex
+    .local string result      # expected result of this test. (y/n/...)
+    .local string testvar     # the value to test against expected results
+    .local string expected    # the expected result of the match, or the error
+    .local string description # user-facing description of the test.
 
-   # NOTE: there can be multiple tabs between entries, so skip until
-   # we have something.
-   # remove the trailing newline from record
-   chopn test_line, 1
+    # NOTE: there can be multiple tabs between entries, so skip until
+    # we have something.
+    # remove the trailing newline from record
+    chopn test_line, 1
 
-   $P1 = split "\t", test_line
-   $I0 = elements $P1 # length of array
-   .local int tab_number
+    $P1 = split "\t", test_line
+    $I0 = elements $P1        # length of array
+    .local int tab_number
               tab_number = 0
- get_pattern:
-   if tab_number >= $I0 goto bad_line
-   pattern     = $P1[tab_number]
-   inc tab_number
-   if pattern == '' goto get_pattern
-   # XXX strip containing 's
-   # XXX set modifier and return it.
+  get_pattern:
+    if tab_number >= $I0 goto bad_line
+    pattern        = $P1[tab_number]
+    inc tab_number
+    if pattern == '' goto get_pattern
+    # XXX strip containing 's
+    # XXX set modifier and return it.
 
- get_target:
-   if tab_number >= $I0 goto bad_line
-   target      = $P1[tab_number]
-   inc tab_number
-   if target == '' goto get_target
- get_result:
-   if tab_number >= $I0 goto bad_line
-   result      = $P1[tab_number]
-   inc tab_number
-   if result == '' goto get_result
- get_testvar:
-   if tab_number >= $I0 goto bad_line
-   testvar     = $P1[tab_number]
-   inc tab_number
-   if result == '' goto get_testvar
- get_expected:
-   if tab_number >= $I0 goto bad_line
-   expected    = $P1[tab_number]
-   inc tab_number
-   if result == '' goto get_expected
+  get_target:
+    if tab_number >= $I0 goto bad_line
+    target         = $P1[tab_number]
+    inc tab_number
+    if target == ''  goto get_target
+  get_result:
+    if tab_number >= $I0 goto bad_line
+    result         = $P1[tab_number]
+    inc tab_number
+    if result == ''  goto get_result
+  get_testvar:
+    if tab_number >= $I0 goto bad_line
+    testvar        = $P1[tab_number]
+    inc tab_number
+    if result == ''  goto get_testvar
+  get_expected:
+    if tab_number >= $I0 goto bad_line
+    expected       = $P1[tab_number]
+    inc tab_number
+    if result == ''  goto get_expected
 
   description = ''
 
- return:
-   .return ( pattern, target, result, testvar, expected, description )
+  return:
+    .return ( pattern, target, result, testvar, expected, description )
 
- bad_line:
+  bad_line:
      $P1 = new 'Exception'
      $P1[0] = 'invalid data format'
      throw $P1
@@ -728,139 +720,139 @@ Column 6, if present, contains a description of what is being tested.
 
 
 .sub 'build_test_desc'
-   .param string desc
-   .param string test_name
-   .param string local_test_number
+    .param string desc
+    .param string test_name
+    .param string local_test_number
 
-   $S0  = '['
-   $S0 .= test_name
-   $S0 .= ':'
-   $S0 .= local_test_number
-   $S0 .= '] '
-   $S0 .= desc
+    $S0  = '['
+    $S0 .= test_name
+    $S0 .= ':'
+    $S0 .= local_test_number
+    $S0 .= '] '
+    $S0 .= desc
 
-   .return ($S0)
+    .return ($S0)
 .end
 
 
 .sub 'match_p5regex'
-   .param string pattern
-   .param string target
+    .param string pattern
+    .param string target
 
-   .local pmc match
+    .local pmc match
 
-   .local pmc p5regex     # the perl5 regex compiler
-              p5regex = compreg 'PGE::P5Regex'
+    .local pmc p5regex     # the perl5 regex compiler
+               p5regex = compreg 'PGE::P5Regex'
 
-   .local pmc regex
-              regex = p5regex(pattern)
+    .local pmc regex
+               regex = p5regex(pattern)
 
-   unless_null regex, match_it
-   $P1 = new 'Exception'
-   $P1[0] = 'regex error'
-   throw $P1
- match_it:
-   match = regex(target)
+    unless_null regex, match_it
+    $P1 = new 'Exception'
+    $P1[0] = 'regex error'
+    throw $P1
+  match_it:
+    match = regex(target)
 
-   .return (match)
+    .return (match)
 .end
 
 
 # given a 2 digit string, convert to appropriate chr() value.
 .sub hex_chr
-   .param string hex
+    .param string hex
 
-   $S0 = substr hex, 0, 1
-   $S1 = substr hex, 1, 1
+    $S0 = substr hex, 0, 1
+    $S1 = substr hex, 1, 1
 
-   $I0 = hex_val($S0)
-   $I1 = hex_val($S1)
+    $I0 = hex_val($S0)
+    $I1 = hex_val($S1)
 
-   $I0 *=16
-   $I0 += $I1
+    $I0 *=16
+    $I0 += $I1
 
-   $S2 = chr $I0
+    $S2 = chr $I0
 
-   .return ($S2)
+    .return ($S2)
 .end
 
 
 # given a single digit hex value, return it's int value.
 .sub hex_val
- .param string digit
+    .param string digit
 
- $I0 = ord digit
- if $I0 < 48 goto bad_digit
- if $I0 > 57 goto non_numeric
- $I0 -=48
- .return ($I0)
-non_numeric:
- if $I0 < 65 goto bad_digit
- if $I0 > 70 goto not_capital
- $I0 -= 55 # A is ascii 65, so reset to zero, add 10 for hex..
- .return ($I0)
-not_capital:
- if $I0 < 97 goto  bad_digit
- if $I0 > 102 goto bad_digit
- $I0 -= 87 # a is ascii 97, so reset to zero, add 10 for hex..
- .return ($I0)
+    $I0 = ord digit
+    if $I0 < 48 goto bad_digit
+    if $I0 > 57 goto non_numeric
+    $I0 -=48
+    .return ($I0)
+  non_numeric:
+    if $I0 < 65 goto bad_digit
+    if $I0 > 70 goto not_capital
+    $I0 -= 55 # A is ascii 65, so reset to zero, add 10 for hex..
+    .return ($I0)
+  not_capital:
+    if $I0 < 97 goto  bad_digit
+    if $I0 > 102 goto bad_digit
+    $I0 -= 87 # a is ascii 97, so reset to zero, add 10 for hex..
+    .return ($I0)
 
-bad_digit:
- $P1 = new 'Exception'
- $P1[0] = 'invalid hex digit'
- throw $P1
+  bad_digit:
+    $P1 = new 'Exception'
+    $P1[0] = 'invalid hex digit'
+    throw $P1
 .end
 
 
 .sub backslash_escape
-   .param string target
+    .param string target
 
-   .local int x_pos         # position in string of last \x escape..
-              x_pos = 0
+    .local int x_pos         # position in string of last \x escape..
+               x_pos = 0
 
- target1:
-   $I0 = index target, '\n'
-   if $I0 == -1 goto target2
-   substr target, $I0, 2, "\n"
-   goto target1
- target2:
-   $I0 = index target, '\r'
-   if $I0 == -1 goto target3
-   substr target, $I0, 2, "\r"
-   goto target2
- target3:
-   $I0 = index target, '\e'
-   if $I0 == -1 goto target4
-   substr target, $I0, 2, "\e"
-   goto target3
- target4:
-   $I0 = index target, '\t'
-   if $I0 == -1 goto target5
-   substr target, $I0, 2, "\t"
-   goto target4
- target5:
-   $I0 = index target, '\f'
-   if $I0 == -1 goto target6
-   substr target, $I0, 2, "\f"
-   goto target5
- target6:
-   # handle \xHH, hex escape.
+  target1:
+    $I0 = index target, '\n'
+    if $I0 == -1 goto target2
+    substr target, $I0, 2, "\n"
+    goto target1
+  target2:
+    $I0 = index target, '\r'
+    if $I0 == -1 goto target3
+    substr target, $I0, 2, "\r"
+    goto target2
+  target3:
+    $I0 = index target, '\e'
+    if $I0 == -1 goto target4
+    substr target, $I0, 2, "\e"
+    goto target3
+  target4:
+    $I0 = index target, '\t'
+    if $I0 == -1 goto target5
+    substr target, $I0, 2, "\t"
+    goto target4
+  target5:
+    $I0 = index target, '\f'
+    if $I0 == -1 goto target6
+    substr target, $I0, 2, "\f"
+    goto target5
+  target6:
+    # handle \xHH, hex escape.
 
-   $I0 = index target, '\x', x_pos
-   if $I0 == -1 goto target7
+    $I0 = index target, '\x', x_pos
+    if $I0 == -1 goto target7
 
-   $I1 = length target
-   $I2 = $I0 + 2
+    $I1 = length target
+    $I2 = $I0 + 2
 
-   if $I2 > $I1 goto target7
-   $S0 = substr target, $I2, 2
-   $S1 = hex_chr($S0)
-   substr target, $I0, 4, $S1
+    if $I2 > $I1 goto target7
+    $S0 = substr target, $I2, 2
+    $S1 = hex_chr($S0)
+    substr target, $I0, 4, $S1
 
-   inc x_pos
-   goto target6
- target7:
-   .return (target)
+    inc x_pos
+    goto target6
+  target7:
+    .return (target)
 .end
 
 =head1 BUGS AND LIMITATIONS
