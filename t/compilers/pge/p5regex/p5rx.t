@@ -17,7 +17,7 @@ If set to a number, that test will be run alone and unconditionally--even
 if it's designated as SKIP or TODO by the harness. This is quite helpful
 in debugging tests that cause parrot to spiral out of control. {{ XXX }}
 
-B<NOTE:> Don't add new tests to C<re_tests>. That file is strictly for 
+B<NOTE:> Don't add new tests to C<re_tests>. That file is strictly for
 Perl 5's tests.
 
 The Perl 5 equivalent file provides the following description of the test
@@ -586,7 +586,7 @@ if local_test_number >= TESTS goto end_loop ## TODO
     skip_info[944] = $S0
     skip_info[945] = $S0
 
-    $s 0 = 'broken col 4?'
+    $S0 = 'broken col 4?'
     skip_info[139] = $S0
 
     $S0 = 'kills a parrot'
