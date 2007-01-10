@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 12
+plan 13
 
 eval_is {binary} {wrong # args: should be "binary option ?arg arg ...?"} \
   {binary: no args}
@@ -29,6 +29,9 @@ is $f -1.2999999523162842  {binary: reversible f}
 
 binary scan [binary format n 9] n n
 is $n 9 {binary: reversible n}
+
+binary scan {foo bar} aa* first rest
+is [list $first $rest] {f {oo bar}} {binary: scan aa*}
 
 set TODO {TODO unimplemented}
 
