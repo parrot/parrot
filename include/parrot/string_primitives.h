@@ -31,24 +31,6 @@ string_unescape_one(Interp *interp, UINTVAL *offset, STRING *string);
 UINTVAL
 Parrot_char_digit_value(Interp *interp, UINTVAL character);
 
-/* Character properties */
-INTVAL Parrot_char_is_alnum(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_alpha(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_ascii(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_blank(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_cntrl(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_digit(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_graph(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_lower(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_print(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_punct(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_space(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_UWhiteSpace(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_Whitespace(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_upper(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_JavaSpaceChar(Interp *interp, UINTVAL character);
-INTVAL Parrot_char_is_xdigit(Interp *interp, UINTVAL character);
-
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_PRIMITIVES_H_GUARD */
 

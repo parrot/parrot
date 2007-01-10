@@ -9,17 +9,6 @@ http://xrl.us/jc4u
  /me giggles
  -- Chip Salzenberg
 
-=head1 Deprecated APIs
-
-=over 4
-
-=item *
-
-All Parrot_char_is_* functions from src/string_primitives.c will
-be removed. Please use Parrot_string_is_cclass() instead.
-
-=back
-
 =head1 Deprecated methods
 
 =over 4
