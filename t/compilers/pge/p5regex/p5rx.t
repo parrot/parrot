@@ -221,6 +221,21 @@ Column 6, if present, contains a description of what is being tested.
     goto loop
   not_todo:
     test.'ok'(ok,description)
+    if ok goto loop
+    $S0 = concat 'pattern: /', pattern
+    $S1 = concat '/, target: "', target
+    $S0 .= $S1
+    $S1 = concat '", result: "', result
+    $S0 .= $S1
+    $S1 = concat '", testvar: "', testvar
+    $S0 .= $S1
+    $S1 = concat '", expected: "', expected
+    $S0 .= $S1
+    $S2 = match
+    $S1 = concat '", got: "', $S2
+    $S0 .= $S1
+    $S0 .= '"'
+    test.'diag'($S0)
 
     goto loop
   end_loop:
