@@ -9,6 +9,11 @@ static int class_TclInt    = 0;
 static int class_TclList   = 0;
 static int class_TclString = 0;
 
+/* binary_scan_number_field
+ *
+ * Scan and remove a number from a binary string. Return a PMC representing
+ * that value.
+ */
 static PMC *
 binary_scan_number_field(Interp *interp, char field, char *binstr, int *_pos, int length)
 {
@@ -22,6 +27,7 @@ binary_scan_number_field(Interp *interp, char field, char *binstr, int *_pos, in
     int pos = *_pos;
     switch (field)
     {
+        /* a char */
         case 'c':
             if (pos >= length)
                 break;
@@ -30,6 +36,7 @@ binary_scan_number_field(Interp *interp, char field, char *binstr, int *_pos, in
             VTABLE_set_integer_native(interp, value, (INTVAL)*c);
             pos += 1;
             break;
+        /* a double */
         case 'd':
             len = sizeof(double)/sizeof(char);
             if (pos + len > length)
@@ -39,6 +46,7 @@ binary_scan_number_field(Interp *interp, char field, char *binstr, int *_pos, in
             VTABLE_set_number_native(interp, value, *d);
             pos += len;
             break;
+        /* a float */
         case 'f':
             len = sizeof(float)/sizeof(char);
             if (pos + len > length)
@@ -48,6 +56,7 @@ binary_scan_number_field(Interp *interp, char field, char *binstr, int *_pos, in
             VTABLE_set_number_native(interp, value, *f);
             pos += len;
             break;
+        /* a native int */
         case 'n':
             len = sizeof(int)/sizeof(char);
             if (pos + len > length)
@@ -62,6 +71,11 @@ binary_scan_number_field(Interp *interp, char field, char *binstr, int *_pos, in
     return value;
 }
 
+/* binary_scan_number_slurpy
+ *
+ * Scan the binary string for all remaining occurences of a number of the type
+ * of the field. Returns a TclList PMC of the number PMCs.
+ */
 static PMC *
 binary_scan_number_slurpy(Interp *interp, char field, char *binstr, int *_pos, int length)
 {
@@ -74,6 +88,11 @@ binary_scan_number_slurpy(Interp *interp, char field, char *binstr, int *_pos, i
     return values;
 }
 
+/* binary_scan_number
+ *
+ * Scan the binary string for a number field. There may be a width following
+ * the field specifier.
+ */
 static PMC *
 binary_scan_number(Interp *interp, char field,
                    char *format, int *formatpos, int formatlen,
@@ -92,6 +111,11 @@ binary_scan_number(Interp *interp, char field,
     return value;
 }
 
+/* binary_scan_string_field
+ *
+ * Scan the binary string for a string field. Returns the value of the extracted
+ * string (concatenated to its previous value).
+ */
 static STRING *
 binary_scan_string_field(Interp *interp, char field,
                          char *binstr, int *_pos, int length, STRING *value)
@@ -116,6 +140,11 @@ binary_scan_string_field(Interp *interp, char field,
     return value;
 }
 
+/* binary_scan_string_slurpy
+ *
+ * Scan the binary string for all remaining matches of the field. Returns the 
+ * new value of the STRING value passed in.
+ */
 static STRING *
 binary_scan_string_slurpy(Interp *interp, char field,
                           char *binstr, int *_pos, int length, STRING *value)
@@ -128,6 +157,11 @@ binary_scan_string_slurpy(Interp *interp, char field,
     return value;
 }
 
+/* binary_scan_string
+ *
+ * Scan the binary string for a string field. Returns a TclString PMC with the
+ * value(s) extracted.
+ */
 static PMC *
 binary_scan_string(Interp *interp, char field,
                    char *format, int *formatpos, int formatlen,
@@ -148,6 +182,16 @@ binary_scan_string(Interp *interp, char field,
     return pmcval;
 }
 
+/* ParTcl_binary_scan
+ *
+ * Scan a binary string according to a format string and return a TclList of
+ * the extracted values.
+ *
+ * Assumes, in order to prevent entering another PIR runloop, that the format
+ * has been checked to contain valid fields.
+ *
+ * String and number field code has been separated in an effort to reduce code.
+ */
 PMC *ParTcl_binary_scan(Interp *interp, STRING *BINSTR, STRING *FORMAT)
 {
     char *binstr  = string_to_cstring(interp, BINSTR);
@@ -158,6 +202,7 @@ PMC *ParTcl_binary_scan(Interp *interp, STRING *BINSTR, STRING *FORMAT)
     int formatpos = 0;
     PMC *values;
 
+    /* make sure we've found the type numbers for the PMCs we want to create */
     if (!class_TclFloat)
     {
         class_TclFloat  = pmc_type(interp, string_from_const_cstring(interp, "TclFloat", 0));
@@ -172,6 +217,7 @@ PMC *ParTcl_binary_scan(Interp *interp, STRING *BINSTR, STRING *FORMAT)
         char field = format[formatpos++];
         PMC *value;
 
+        /* figure out if this is a number or a string field */
         switch (field)
         {
             case 'c':
@@ -193,6 +239,7 @@ PMC *ParTcl_binary_scan(Interp *interp, STRING *BINSTR, STRING *FORMAT)
         VTABLE_push_pmc(interp, values, value);
     }
 
+    /* don't forget to free the strings we allocated */
     string_cstring_free(binstr);
     string_cstring_free(format);
 
