@@ -57,4 +57,14 @@ Will have to be:
     print $S0
     substr $P0, 1, 2, "x"
 
+=item Perl PMCs
+
+The dynamic PMCS PerlString, PerlUndef, etc. were originally created with an
+eye towards being used in Perl6 development, and as the first set of full
+featured PMCs. However, Perl6 development is not going to be using them, and
+the core PMCs (String, Undef, Integer ...) have replaced them for usage.
+
+These PMCs will be moved to languages/perl5 after the next release. At some
+point after that they may be removed the repository altogether.
+
 =back
