@@ -33,8 +33,6 @@ is $n 9 {binary: reversible n}
 binary scan {foo bar} aa* first rest
 is [list $first $rest] {f {oo bar}} {binary: scan aa*}
 
-set TODO {TODO unimplemented}
-
 binary scan [binary format A6A foo bar] A* string
 eval_is {set string} {foo   b} {binary: format A6A, scan A*} $TODO
 

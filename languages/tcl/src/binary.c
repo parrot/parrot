@@ -9,6 +9,26 @@ static int class_TclInt    = 0;
 static int class_TclList   = 0;
 static int class_TclString = 0;
 
+/* extract_int
+ *
+ * Extract an integer from the string at the position given. Return the integer
+ * and update the position. Returns 1 if no digit is found or if the int is
+ * zero.
+ */
+static int
+extract_int(char *str, int *pos, int length)
+{
+    int n = 0;
+
+    while (*pos < length && isdigit(str[*pos]))
+        n = 10*n + (str[(*pos)++] - '0');
+
+    if (!n)
+        n = 1;
+
+    return n;
+}
+
 /* binary_scan_number_field
  *
  * Scan and remove a number from a binary string. Return a PMC representing
@@ -118,25 +138,33 @@ binary_scan_number(Interp *interp, char field,
  */
 static STRING *
 binary_scan_string_field(Interp *interp, char field,
-                         char *binstr, int *_pos, int length, STRING *value)
+                         char *binstr, int *_binstrpos, int binstrlen,
+                         STRING *value, int length)
 {
-    int pos = *_pos;
+    int binstrpos = *_binstrpos;
 
     char *c;
     switch (field)
     {
         case 'a':
-            if (pos + 1 > length)
+            if (binstrpos + length > binstrlen)
                 return NULL;
-            c     = binstr + pos;
-            value = string_concat(interp, value, string_from_cstring(interp, c, 1), 1);
-            pos++;
+            c     = binstr + binstrpos;
+            value = string_concat(interp, value, string_from_cstring(interp, c, length), 0);
+            binstrpos += length;
+            break;
+        case 'A':
+            if (binstrpos + length > binstrlen)
+                return NULL;
+            c     = binstr + binstrpos;
+            value = string_concat(interp, value, string_from_cstring(interp, c, length), 0);
+            binstrpos += length;
             break;
         default:
             return NULL;
     }
 
-    *_pos = pos;
+    *_binstrpos = binstrpos;
     return value;
 }
 
@@ -147,12 +175,12 @@ binary_scan_string_field(Interp *interp, char field,
  */
 static STRING *
 binary_scan_string_slurpy(Interp *interp, char field,
-                          char *binstr, int *_pos, int length, STRING *value)
+                          char *binstr, int *_binstrpos, int binstrlen, STRING *value)
 {
-    STRING *retval;
-
-    while (retval = binary_scan_string_field(interp, field, binstr, _pos, length, value))
-        value = retval;
+    int length = string_length(interp, value);
+    value      = binary_scan_string_field(interp, field,
+                                          binstr, _binstrpos, binstrlen,
+                                          value, length);
 
     return value;
 }
@@ -176,7 +204,12 @@ binary_scan_string(Interp *interp, char field,
         value = binary_scan_string_slurpy(interp, field, binstr, binstrpos, binstrlen, value);
     }
     else
-        value = binary_scan_string_field(interp, field, binstr, binstrpos, binstrlen, value);
+    {
+        int n = extract_int(format, formatpos, formatlen);
+        value = binary_scan_string_field(interp, field,
+                                         binstr, binstrpos, binstrlen,
+                                         value, n);
+    }
 
     VTABLE_set_string_native(interp, pmcval, value);
     return pmcval;
@@ -261,25 +294,25 @@ binary_format_number_field(Interp *interp, char field, STRING *binstr, PMC *valu
         /* a char */
         case 'c':
             c      = (char)VTABLE_get_integer(interp, value);
-            binstr = string_concat(interp, binstr, string_from_cstring(interp, &c, 1), 1);
+            binstr = string_concat(interp, binstr, string_from_cstring(interp, &c, 1), 0);
             break;
         /* a double */
         case 'd':
             d      = (double)VTABLE_get_number(interp, value);
             len    = sizeof(double)/sizeof(char);
-            binstr = string_concat(interp, binstr, string_from_cstring(interp, &d, len), len);
+            binstr = string_concat(interp, binstr, string_from_cstring(interp, &d, len), 0);
             break;
         /* a float */
         case 'f':
             f      = (float)VTABLE_get_number(interp, value);
             len    = sizeof(float)/sizeof(char);
-            binstr = string_concat(interp, binstr, string_from_cstring(interp, &f, len), len);
+            binstr = string_concat(interp, binstr, string_from_cstring(interp, &f, len), 0);
             break;
         /* a native integer */
         case 'n':
             n      = (int)VTABLE_get_integer(interp, value);
             len    = sizeof(int)/sizeof(char);
-            binstr = string_concat(interp, binstr, string_from_cstring(interp, &n, len), len);
+            binstr = string_concat(interp, binstr, string_from_cstring(interp, &n, len), 0);
             break;
     }
 
@@ -296,12 +329,28 @@ binary_format_number(Interp *interp, char field, STRING *binstr, PMC *value,
 }
 
 static STRING *
-binary_format_string_field(Interp *interp, char field, STRING *binstr, STRING *strval)
+binary_format_string_field(Interp *interp, char field, STRING *binstr,
+                           STRING *strval, int length)
 {
+    int strlen = string_length(interp, strval);
+
     switch (field)
     {
         case 'a':
-            binstr = string_concat(interp, binstr, strval, 1);
+            if (strlen > length)
+                strval = string_chopn(interp, strval, strlen - length, 1);
+            binstr = string_concat(interp, binstr, strval, 0);
+            /* pad with nulls if necessary */
+            while (length-- > strlen)
+                binstr = string_concat(interp, binstr, string_from_cstring(interp, "", 1), 0);
+            break;
+        case 'A':
+            if (strlen > length)
+                strval = string_chopn(interp, strval, strlen - length, 1);
+            binstr = string_concat(interp, binstr, strval, 0);
+            /* pad with spaces if necessary */
+            while (length-- > strlen)
+                binstr = string_concat(interp, binstr, string_from_cstring(interp, " ", 1), 0);
             break;
     }
 
@@ -314,7 +363,17 @@ binary_format_string(Interp *interp, char field, STRING *binstr, PMC *value,
 {
     STRING *strval = VTABLE_get_string(interp, value);
 
-    binstr = binary_format_string_field(interp, field, binstr, strval);
+    if ((*formatpos) < formatlen && format[*formatpos] == '*')
+    {
+        int len = string_length(interp, strval);
+        binstr  = binary_format_string_field(interp, field, binstr, strval, len);
+        (*formatpos)++;
+    }
+    else
+    {
+        int len = extract_int(format, formatpos, formatlen);
+        binstr  = binary_format_string_field(interp, field, binstr, strval, len);
+    }
 
     return binstr;
 }
