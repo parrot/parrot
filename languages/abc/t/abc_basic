@@ -148,3 +148,6 @@ a;a=1;1;--a;a           0\n1\n0\n0\n    decrement test
 0||0		0\n	0 or 0
 1&&0||0&&1	0\n	and/or precedence
 1||0&&0||1	1\n	and/or precedence
+
+# Strings
+"basic calculator"   "basic calculator"    TODO string
