@@ -22,7 +22,7 @@ PGE::P6Regex is now a registered compiler, and should be used like so:
 
 This syntax is also true for PGE::Glob and PGE::P5Regex
 
-=item NameSpace PMC
+=item NameSpace PMC [#41235]
 
 The name() method will change to get_name(), in accord with PDD 21, in the next release.
 
@@ -35,7 +35,7 @@ gradually change the old.
 
 =over 4
 
-=item Class name IDs
+=item PMC Class name IDs [#41237]
 
 ... will require a dot in front
 
@@ -57,7 +57,7 @@ Will have to be:
     print $S0
     substr $P0, 1, 2, "x"
 
-=item Perl PMCs
+=item Perl PMCs [#41238]
 
 The dynamic PMCS PerlString, PerlUndef, etc. were originally created with an
 eye towards being used in Perl6 development, and as the first set of full
