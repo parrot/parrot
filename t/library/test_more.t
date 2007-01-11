@@ -31,7 +31,7 @@
 	.IMPORT( 'Test::Builder::Tester', 'test_pass' )
 	.IMPORT( 'Test::Builder::Tester', 'test_test' )
 
-	plan( 42 )
+	plan( 43 )
 	test_ok()
 	test_is()
 	test_like()

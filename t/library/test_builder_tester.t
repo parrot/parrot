@@ -50,13 +50,13 @@
 	test_diag( 'lines' )
 	test_test( 'failing test with diagnostics' )
 
-	test_out( 'not ok 5 #skip just one skip' )
+	test_out( 'ok 5 #skip just one skip' )
 	test.skip( 1, 'just one skip' )
 	test_test( 'single skip' )
 
-	test_out( 'not ok 6 #skip three skips' )
-	test_out( 'not ok 7 #skip three skips' )
-	test_out( 'not ok 8 #skip three skips' )
+	test_out( 'ok 6 #skip three skips' )
+	test_out( 'ok 7 #skip three skips' )
+	test_out( 'ok 8 #skip three skips' )
 	test.skip( 3, 'three skips' )
 	test_test( 'multiple skips' )
 
