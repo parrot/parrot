@@ -40,12 +40,12 @@
 # multiplication
 2*2                     4\n             multiplication with two operands
 2*2*2                   8\n             multiplication with three operands
-2*0			0\n             multiplication with zero
+2*0                     0\n             multiplication with zero
 
 # division
 2/2                     1\n             division with two operands
 2/2/2                   0.5\n           division with three operands
-0/2			0\n		division with zero (not by zero)
+0/2                     0\n             division with zero (not by zero)
 
 # modulus
 2%2                     0\n             modulus with remainder zero
@@ -99,55 +99,55 @@ a;a=1;a;++a;a           0\n1\n2\n2\n    increment test
 a;a=1;1;--a;a           0\n1\n0\n0\n    decrement test
 
 # pow
-1^1		1\n	simple pow
-2^2		4\n	another simple pow
-2^2^2		16\n	two pows
-2^2+1		5\n	pow precedence
-2^(2+1)		8\n	pow precedence
+1^1                     1\n             simple pow
+2^2                     4\n             another simple pow
+2^2^2                   16\n            two pows
+2^2+1                   5\n             pow precedence
+2^(2+1)                 8\n             pow precedence
 
 # strictly less
-1<1		0\n	false less
-1<2		1\n	true less
-2<1		0\n	false less
-1+1<2+2		1\n	precedence with plus
+1<1                     0\n             false less
+1<2                     1\n             true less
+2<1                     0\n             false less
+1+1<2+2                 1\n             precedence with plus
 
 # less than or equal
-1<=1		1\n	true less or equal
-1<=2		1\n	true less or equal
-2<=1		0\n	false less or equal
-1+1<=1+1	1\n	precedence with plus
+1<=1                    1\n             true less or equal
+1<=2                    1\n             true less or equal
+2<=1                    0\n             false less or equal
+1+1<=1+1                1\n             precedence with plus
 
 # strictly greater
-1>1		0\n	false greater
-1>2		0\n	false greater
-2>1		1\n	true greater
-2+2>1+1		1\n	precedence with plus
+1>1                     0\n             false greater
+1>2                     0\n             false greater
+2>1                     1\n             true greater
+2+2>1+1                 1\n             precedence with plus
 
 # greater than or equal
-1>=1		1\n	true greater or equal
-1>=2		0\n	false greater or equal
-2>=1		1\n	true greater or equal
-1+1<=1+1	1\n	precedence with plus
+1>=1                    1\n             true greater or equal
+1>=2                    0\n             false greater or equal
+2>=1                    1\n             true greater or equal
+1+1<=1+1                \n              precedence with plus
 
 # equal and not equal
-1==1		1\n	true equal
-1==0		0\n	false equal
-1!=1		0\n	false not equal
-1!=0		1\n	true not equal
+1==1                    1\n             true equal
+1==0                    0\n             false equal
+1!=1                    0\n             false not equal
+1!=0                    1\n             true not equal
 
 # boolean operators
-!1		0\n	not 1
-!0		1\n	not 0
-1&&1		1\n	1 and 1
-1&&0		0\n	1 and 0
-0&&1		0\n	0 and 1
-0&&0		0\n	0 and 0
-1||1		1\n	1 or 1
-1||0		1\n	1 or 0
-0||1		1\n	0 or 1
-0||0		0\n	0 or 0
-1&&0||0&&1	0\n	and/or precedence
-1||0&&0||1	1\n	and/or precedence
+!1                      0\n             not 1
+!0                      1\n             not 0
+1&&1                    1\n             1 and 1
+1&&0                    0\n             1 and 0
+0&&1                    0\n             0 and 1
+0&&0                    0\n             0 and 0
+1||1                    1\n             1 or 1
+1||0                    1\n             1 or 0
+0||1                    1\n             0 or 1
+0||0                    0\n             0 or 0
+1&&0||0&&1              \n              and/or precedence
+1||0&&0||1              \n              and/or precedence
 
 # Strings
 "basic calculator"   "basic calculator"    TODO string
