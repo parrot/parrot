@@ -91,6 +91,10 @@ clean: testclean
     $(PMCDIR)/*.h \
     $(PMCDIR)/*.c \
     $(PMCDIR)/*.dump \
+    $(PMCDIR)/*.pdb \
+    $(PMCDIR)/*.lib \
+    $(PMCDIR)/*.exp \
+    $(PMCDIR)/*.ilk \
     $(PMCDIR)/*$(O) \
     $(PMCDIR)/*$(LOAD_EXT)
 
