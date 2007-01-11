@@ -247,7 +247,7 @@ PMC *ParTcl_binary_scan(Interp *interp, STRING *BINSTR, STRING *FORMAT)
 }
 
 static STRING *
-binary_format_field(Interp *interp, char field, STRING *binstr, PMC *value)
+binary_format_number_field(Interp *interp, char field, STRING *binstr, PMC *value)
 {
     char c;
     double d;
@@ -286,18 +286,68 @@ binary_format_field(Interp *interp, char field, STRING *binstr, PMC *value)
     return binstr;
 }
 
+STRING *
+binary_format_number(Interp *interp, char field, STRING *binstr, PMC *value,
+                     char *format, int *formatpos, int formatlen)
+{
+    binstr = binary_format_number_field(interp, field, binstr, value);
+
+    return binstr;
+}
+
+static STRING *
+binary_format_string_field(Interp *interp, char field, STRING *binstr, STRING *strval)
+{
+    switch (field)
+    {
+        case 'a':
+            binstr = string_concat(interp, binstr, strval, 1);
+            break;
+    }
+
+    return binstr;
+}
+
+STRING *
+binary_format_string(Interp *interp, char field, STRING *binstr, PMC *value,
+                     char *format, int *formatpos, int formatlen)
+{
+    STRING *strval = VTABLE_get_string(interp, value);
+
+    binstr = binary_format_string_field(interp, field, binstr, strval);
+
+    return binstr;
+}
+
 STRING *ParTcl_binary_format(Interp *interp, STRING *FORMAT, PMC *values)
 {
-    char *format      = string_to_cstring(interp, FORMAT);
-    INTVAL formatlen  = string_length(interp, FORMAT);
-    INTVAL pos        = 0;
-    INTVAL valueidx   = 0;
-    STRING *binstr    = string_make_empty(interp, enum_stringrep_one, 128);
+    char *format   = string_to_cstring(interp, FORMAT);
+    int formatlen  = string_length(interp, FORMAT);
+    int formatpos  = 0;
+    int valueidx   = 0;
+    STRING *binstr = string_make_empty(interp, enum_stringrep_one, 128);
 
-    while (pos < formatlen)
+    while (formatpos < formatlen)
     {
+        char field = format[formatpos++];
         PMC *value = VTABLE_get_pmc_keyed_int(interp, values, valueidx++);
-        binstr = binary_format_field(interp, format[pos++], binstr, value);
+
+        /* figure out if this is a number or a string field */
+        switch (field)
+        {
+            case 'c':
+            case 'd':
+            case 'f':
+            case 'n':
+                binstr = binary_format_number(interp, field, binstr, value,
+                                              format, &formatpos, formatlen);
+                break;
+            case 'a':
+            case 'A':
+                binstr = binary_format_string(interp, field, binstr, value,
+                                              format, &formatpos, formatlen);
+                break;
+        }
     }
 
     string_cstring_free(format);
