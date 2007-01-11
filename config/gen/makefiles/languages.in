@@ -15,7 +15,6 @@ LANGUAGES = \
     WMLScript \
     Zcode \
     abc \
-    bc \
     befunge \
     bf \
     c99 \
@@ -87,7 +86,6 @@ clean: \
     WMLScript.clean \
     Zcode.clean \
     abc.clean \
-    bc.clean \
     befunge.clean \
     bf.clean \
     c99.clean \
@@ -158,14 +156,6 @@ abc.test:
 	- $(MAKE) abc test
 abc.clean:
 	- $(MAKE) abc clean
-
-bc : bc.dummy
-bc.dummy:
-	- $(MAKE) bc
-bc.test:
-	- $(MAKE) bc test
-bc.clean:
-	- $(MAKE) bc clean
 
 befunge : befunge.dummy
 befunge.dummy:
