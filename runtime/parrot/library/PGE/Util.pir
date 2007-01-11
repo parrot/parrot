@@ -64,7 +64,9 @@ of the match.
   newline_loop:
     $I0 = find_cclass .CCLASS_NEWLINE, target, npos, pos
     if $I0 >= pos goto add_position
+    $S0 = substr target, $I0, 2
     npos = $I0 + 1
+    if $S0 != "\r\n" goto newline_loop
     inc lines
     goto newline_loop
   add_position:
@@ -90,6 +92,74 @@ of the match.
     mpos = -3
     .return (mob)
 .end
+
+
+=item warn(match, [, message [, ...]] )
+
+Emits the list of messages to stderr.
+
+=cut
+
+.sub 'warn'
+    .param pmc mob                                 # match object
+    .param pmc list            :slurpy             # message arguments
+
+    .local pmc iter
+    .local string message
+    message = ''
+    iter = new .Iterator, list
+  iter_loop:
+    unless iter goto iter_end
+    $S0 = shift iter
+    message .= $S0
+    goto iter_loop
+  iter_end:
+
+    # get a copy of the match object
+    .local pmc newfrom, mfrom, mpos
+    .local string target
+    newfrom = find_global 'PGE::Match', 'newfrom'
+    (mob, target, mfrom, mpos) = newfrom(mob, 0)
+    $I0 = length message
+    dec $I0
+    $I0 = is_cclass .CCLASS_NEWLINE, message, $I0
+    if $I0 goto emit_message
+
+    # count newlines to the current position of the parse
+    .local int pos, npos, lines
+    pos = mfrom
+    npos = 0
+    lines = 1
+
+  newline_loop:
+    $I0 = find_cclass .CCLASS_NEWLINE, target, npos, pos
+    if $I0 >= pos goto add_position
+    $S0 = substr target, $I0, 2
+    npos = $I0 + 1
+    if $S0 != "\r\n" goto newline_loop
+    inc lines
+    goto newline_loop
+  add_position:
+    message .= ' at line '
+    $S0 = lines
+    message .= $S0
+    message .= ', near "'
+    $I0 = length target
+    $I0 -= pos
+    if $I0 < 10 goto add_position_1
+    $I0 = 10
+  add_position_1:
+    $S0 = substr target, pos, $I0
+    $S0 = escape $S0
+    message .= $S0
+    message .= "\"\n"
+  emit_message:
+    printerr message
+
+    assign mpos, mfrom
+    .return (mob)
+.end
+
 
 
 =item line_number(match [, pos])
