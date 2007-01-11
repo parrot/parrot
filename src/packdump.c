@@ -110,8 +110,8 @@ PackFile_Constant_dump(Interp *interp, struct PackFile_ConstTable *ct,
         PIO_printf(interp, " %ld items\n", i);
         /* and now type / value per component */
         for (key = self->u.key; key; key = PMC_data(key)) {
-            PIO_printf(interp, "       {\n");
             opcode_t type = PObj_get_FLAGS(key);
+            PIO_printf(interp, "       {\n");
             slice_bits = 0;
             if ((type & (KEY_start_slice_FLAG|KEY_inf_slice_FLAG)) ==
                 (KEY_start_slice_FLAG|KEY_inf_slice_FLAG))
@@ -202,7 +202,6 @@ PackFile_Constant_dump(Interp *interp, struct PackFile_ConstTable *ct,
                 case enum_class_ResizablePMCArray:
                 case enum_class_ResizableStringArray:
                     {
-                    int i;
                     int n = VTABLE_get_integer(interp, pmc);
                     STRING* out_buffer = VTABLE_get_repr(interp, pmc);
                     PIO_printf(interp,
