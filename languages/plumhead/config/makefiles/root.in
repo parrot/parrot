@@ -45,7 +45,7 @@ maintain-antlr3: src/antlr3/Plumhead.g src/antlr3/GenPastPir.g
 	java org.antlr.Tool -lib src/antlr3 src/antlr3/GenPastPir.g
 
 
-build: build-phc build-antlr3 build-partridge build-common 
+build: build-phc build-antlr3 build-common 
 
 build-common: src/common/plumheadlib.pbc plumhead.pbc
 
@@ -55,8 +55,6 @@ build-phc:
 build-antlr3:
 	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr3.pod'
 	javac src/antlr3/*.java 
-
-build-partridge: src/partridge/Plumhead_gen.pir src/partridge/PlumheadPAST_gen.pir
 
 src/partridge/Plumhead_gen.pir: src/partridge/Plumhead.pg
 	$(PARROT) $(PGE_DIR)/pgc.pir --output=src/partridge/Plumhead_gen.pir src/partridge/Plumhead.pg

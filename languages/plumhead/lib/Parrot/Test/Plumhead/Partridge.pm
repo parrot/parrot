@@ -22,7 +22,8 @@ sub get_test_prog {
 
     my $lang_fn = Parrot::Test::per_test( '.php', $count );
 
-    return "./parrot languages/plumhead/plumhead.pbc --variant=partridge languages/${lang_fn}";
+    my $do_anno = q{s/^/§/; s/<\?php[ |\n]/§<?php /; s/(\?>\s*)/${1}§/; $_ .= q{§};};
+    return "perl -p -i -0777 -e '$do_anno' languages/${lang_fn} && ./parrot languages/plumhead/plumhead.pbc --variant=partridge languages/${lang_fn}";
 }
 
 # never skip the reference implementation
