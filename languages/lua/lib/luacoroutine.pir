@@ -104,35 +104,43 @@ C<resume> returns B<false> plus the error message.
     .param pmc argv :slurpy
     .local pmc ret
     .local pmc status
+    checktype(co, 'thread')
+    ($I0, ret :slurpy) = auxresume(co, argv :flat)
+    new status, .LuaBoolean
+    status = $I0
+    unless $I0 goto L1
+    .return (status, ret :flat)
+L1:
+    .local pmc msg
+    $S0 = ret[0]
+    new msg, .LuaString
+    msg = $S0
+    .return (status, msg)
+.end
+
+.sub 'auxresume' :anon
+    .param pmc co :optional
+    .param pmc argv :slurpy
+    .local pmc ret
     .local pmc co_stack
     co_stack = global '_COROUTINE_STACK'
-    new status, .LuaBoolean
-    checktype(co, 'thread')
     push co_stack, co
     $P0 = getattribute co, 'co'
     $P1 = getattribute $P0, 'state'
     if $P1 goto L1
-    status = 0
-    .const .LuaString msg = "cannot resume dead coroutine"
     $P0 = pop co_stack
-    .return (status, msg)
+    .return (0, "cannot resume dead coroutine")
 L1:
     push_eh _handler
     (ret :slurpy) = $P0.'resume'(argv :flat)
-    status = 1
-    .return (status, ret :flat)
+    .return (1, ret :flat)
 _handler:
     .local pmc e
     .local string s
-    .local pmc msg
     .get_results (e, s)
-    status = 0
-    new msg, .LuaString
-    msg = s
     $P0 = pop co_stack
-    .return (status, msg)
+    .return (0, s)
 .end
-
 
 =item C<coroutine.running ()>
 
@@ -150,8 +158,8 @@ Returns the running coroutine, or B<nil> when called by the main thread.
     goto L2
 L1:
     ret = pop co_stack
-    push co_stack, ret 
-L2:    
+    push co_stack, ret
+L2:
     .return (ret)
 .end
 
@@ -193,15 +201,31 @@ arguments passed to the function behave as the extra arguments to C<resume>.
 Returns the same values returned by C<resume>, except the first boolean. In
 case of error, propagates the error.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
-.sub '_coroutine_wrap' :anon
+.sub '_coroutine_wrap' :anon :lex
     .param pmc f :optional
+    .param pmc argv :slurpy
     .local pmc ret
-    ret = _coroutine_wrap(f)
-    not_implemented()
+    .local pmc co
+    .lex 'var_co', co
+    co = _coroutine_create(f)
+    .const .Sub auxwrap = 'auxwrap'
+    ret = newclosure auxwrap
+    .return (ret)
+.end
+
+.sub 'auxwrap' :anon :lex :outer(_coroutine_wrap)
+    .param pmc argv :slurpy
+    .local pmc co
+    .local pmc ret
+    co = find_lex 'var_co'
+    ($I0, ret :slurpy) = auxresume(co, argv :flat)
+    unless $I0 goto L1
+    .return (ret :flat)
+L1:
+    $S0 = ret[0]
+    error($S0)
 .end
 
 =item C<coroutine.yield ([val1, ..., valn])>
@@ -218,7 +242,7 @@ Any arguments to C<yield> are passed as extra results to C<resume>.
     .local pmc co
     .local pmc co_stack
     co_stack = global '_COROUTINE_STACK'
-    co = pop co_stack 
+    co = pop co_stack
     $P0 = getattribute co, 'co'
     (ret :slurpy) = $P0.'yield'(argv :flat)
     .return (ret :flat)
