@@ -25,6 +25,7 @@
 	.IMPORT( 'Test::More', 'like' )
 	.IMPORT( 'Test::More', 'is_deeply' )
 	.IMPORT( 'Test::Builder::Tester', 'plan' )
+	.IMPORT( 'Test::Builder::Tester', 'test_out' )
 	.IMPORT( 'Test::Builder::Tester', 'test_diag' )
 	.IMPORT( 'Test::Builder::Tester', 'test_fail' )
 	.IMPORT( 'Test::Builder::Tester', 'test_pass' )
@@ -36,6 +37,7 @@
 	test_like()
 	test_is_deeply()
 	test_diagnostics()
+    test_skip()
 
 	test.'finish'()
 .end
@@ -328,4 +330,15 @@
 	diag( 'rum tum tugger')
 	test_diag( "foo bar baz\nrum tum tugger" )
 	test_test( 'multi line diagnostics' )
+.end
+
+.sub test_skip
+
+    .local pmc test
+    test = new 'Test::Builder'
+
+	test_out( 'ok 43 #skip skipping' )
+	test_out( 'ok 44 #skip skipping' )
+    test.'skip'( 2, 'skipping' )
+	test_test( 'skip test should pass' )
 .end

@@ -319,7 +319,7 @@ Returns the TAP-compatible string representation of this test.
 
 	number        = self.'number'()
 	reason        = self.'reason'()
-	report        = 'not ok '
+	report        = 'ok '
 	number_string = number
 	reason_string = reason
 
