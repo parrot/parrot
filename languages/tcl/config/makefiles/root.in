@@ -117,10 +117,10 @@ pmcs:
 .c$(O) :   
 	@$(PERL) ../../tools/dev/cc_flags.pl ../../CFLAGS $(CC) "" $(CFLAGS) -I@build_dir@@slash@include @cc_o_out@$@ -c $<
 
-ops: src/binary.o
+ops: src/binary$(O)
 	@cd $(OPSDIR) && $(OPSBUILD) generate tcl
 	@cd $(OPSDIR) && $(OPSBUILD) compile  tcl
-	@cd $(OPSDIR) && $(OPSBUILD) linklibs tcl ../binary.o
+	@cd $(OPSDIR) && $(OPSBUILD) linklibs tcl ../binary$(O)
 	@cd $(OPSDIR) && $(OPSBUILD) copy "--destination=$(DESTDIR)" tcl
 
 runtime/builtins.pir: $(GENERATED_INLINES) $(DEPS) tools/gen_builtins.pl
