@@ -56,20 +56,13 @@ of the match.
     $I0 = is_cclass .CCLASS_NEWLINE, message, $I0
     if $I0 goto throw_message
 
-    # count newlines to the current position of the parse
-    .local int pos, npos, lines
+    .local int pos, lines
+    .local pmc line_number
     pos = mfrom
-    npos = 0
-    lines = 1
-  newline_loop:
-    $I0 = find_cclass .CCLASS_NEWLINE, target, npos, pos
-    if $I0 >= pos goto add_position
-    $S0 = substr target, $I0, 2
-    npos = $I0 + 1
-    if $S0 != "\r\n" goto newline_loop
+    #  FIXME: use 'line_number' method instead?
+    line_number = get_hll_global ['PGE::Util'], 'line_number'
+    (lines) = mob.line_number(pos)
     inc lines
-    goto newline_loop
-  add_position:
     message .= ' at line '
     $S0 = lines
     message .= $S0
@@ -125,34 +118,17 @@ Emits the list of messages to stderr.
     $I0 = is_cclass .CCLASS_NEWLINE, message, $I0
     if $I0 goto emit_message
 
-    # count newlines to the current position of the parse
-    .local int pos, npos, lines
+    .local int pos, lines
+    .local pmc line_number
     pos = mfrom
-    npos = 0
-    lines = 1
-
-  newline_loop:
-    $I0 = find_cclass .CCLASS_NEWLINE, target, npos, pos
-    if $I0 >= pos goto add_position
-    $S0 = substr target, $I0, 2
-    npos = $I0 + 1
-    if $S0 != "\r\n" goto newline_loop
+    #  FIXME: use 'line_number' method instead?
+    line_number = get_hll_global ['PGE::Util'], 'line_number'
+    (lines) = mob.line_number(pos)
     inc lines
-    goto newline_loop
-  add_position:
     message .= ' at line '
     $S0 = lines
     message .= $S0
-    message .= ', near "'
-    $I0 = length target
-    $I0 -= pos
-    if $I0 < 10 goto add_position_1
-    $I0 = 10
-  add_position_1:
-    $S0 = substr target, pos, $I0
-    $S0 = escape $S0
-    message .= $S0
-    message .= "\"\n"
+    message .= "\n"
   emit_message:
     printerr message
 
