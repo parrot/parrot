@@ -168,6 +168,8 @@ empty_string:
       a = __number(a)
       b = __number(b)
     clear_eh
+   
+    if a == 0 goto zero
 
     $P0 = new 'TclFloat'
     $P0 = pow a, b
@@ -180,6 +182,16 @@ is_string:
 
 empty_string:
     tcl_error "can't use empty string as operand of \"**\""
+
+zero:
+    if b < 0 goto zero_with_neg
+    if b == 0 goto zero_with_zero
+    .return(0)
+
+zero_with_zero:
+    .return(1)
+zero_with_neg:
+     tcl_error 'exponentiation of zero by negative power'
 .end
 
 .sub 'infix:*'
