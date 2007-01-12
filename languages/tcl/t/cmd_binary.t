@@ -37,9 +37,9 @@ binary scan [binary format A6A foo bar] A* string
 eval_is {set string} {foo   b} {binary: format A6A, scan A*}
 
 binary scan [binary format A* {foo bar}] A7 string
-eval_is {set string} {foo bar} {binary: format A*, scan A7}
+is $string {foo bar} {binary: format A*, scan A7}
 
 binary scan [binary format a4a foo bar] a3ca string1 c string2
-eval_is {set string1} foo {binary: format a4a, scan a3ca}
-eval_is {set c}       0   {binary: format a4a, scan a3ca}
-eval_is {set string2} b   {binary: format a4a, scan a3ca}
+is $string1 foo {binary: format a4a, scan a3ca}
+is $c       0   {binary: format a4a, scan a3ca}
+is $string2 b   {binary: format a4a, scan a3ca}
