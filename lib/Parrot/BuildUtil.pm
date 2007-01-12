@@ -23,7 +23,7 @@ use warnings;
 =item C<parrot_version()>
 
 Determine the current version number for Parrot from the VERSION file
-and returns it.
+and return it.
 
 =cut
 
