@@ -177,7 +177,7 @@ SYNOPSIS
 
         if (!io)
             return NULL;
-#if 0
+#ifdef PARROT_HAS_READLINE
         if (io->flags & PIO_F_READLINE) {
             char *r;
 
