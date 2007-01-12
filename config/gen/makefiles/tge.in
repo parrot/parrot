@@ -18,22 +18,22 @@ $(PARROT_LIBRARY)/TGE.pbc: TGE.pbc
 	$(CP) TGE.pbc $(PARROT_LIBRARY)
 
 TGE.pbc: TGE.pir TGE/Rule.pbc TGE/Parser.pbc TGE/Grammar.pbc TGE/Compiler.pbc TGE/Tree.pbc
-	$(PARROT) -o TGE.pbc --output-pbc TGE.pir 
+	$(PARROT) -o TGE.pbc --output-pbc TGE.pir
 
 TGE/Rule.pbc: TGE/Rule.pir
-	$(PARROT) -o TGE/Rule.pbc --output-pbc TGE/Rule.pir 
+	$(PARROT) -o TGE/Rule.pbc --output-pbc TGE/Rule.pir
 
 TGE/Tree.pbc: TGE/Tree.pir
-	$(PARROT) -o TGE/Tree.pbc --output-pbc TGE/Tree.pir 
+	$(PARROT) -o TGE/Tree.pbc --output-pbc TGE/Tree.pir
 
 TGE/Grammar.pbc: TGE/Grammar.pir
-	$(PARROT) -o TGE/Grammar.pbc --output-pbc TGE/Grammar.pir 
+	$(PARROT) -o TGE/Grammar.pbc --output-pbc TGE/Grammar.pir
 
 TGE/Compiler.pbc: TGE/Compiler.pir
-	$(PARROT) -o TGE/Compiler.pbc --output-pbc TGE/Compiler.pir 
+	$(PARROT) -o TGE/Compiler.pbc --output-pbc TGE/Compiler.pir
 
 TGE/Parser.pbc: TGE/Parser.pir
-	$(PARROT) -o TGE/Parser.pbc --output-pbc TGE/Parser.pir 
+	$(PARROT) -o TGE/Parser.pbc --output-pbc TGE/Parser.pir
 
 TGE/Parser.pir: TGE/Parser.pg
 	$(PARROT) $(PGE_DIR)/pgc.pir --output=TGE//Parser.pir TGE//Parser.pg
@@ -72,7 +72,7 @@ clean: testclean
 	TGE/Tree.pbc \
 	TGE/Grammar.pbc \
 	TGE/Compiler.pbc \
-	$(PARROT_LIBRARY)/TGE.pbc \
+	$(PARROT_LIBRARY)/TGE.pbc
 
 realclean: clean
 	$(RM_RF) Makefile
