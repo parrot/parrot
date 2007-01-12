@@ -46,6 +46,9 @@ set skipped_tests [dict create \
     namespace-old-7.7
   } {[expr wide()]} {
     dict-11.1 dict-11.2 dict-11.3 dict-11.4 dict-11.5 dict-11.6 dict-11.7
+    expr-23.24 expr-23.25 expr-23.26 expr-23.27 expr-23.28 expr-23.29
+    expr-23.30 expr-23.31 expr-23.32 expr-23.33 expr-24.3 expr-24.4 expr-24.7
+    expr-24.8 expr-31.10 expr-31.14
     expr-old-34.13 expr-old-34.14
     lindex-3.7
   } {[expr isqrt()]} {
