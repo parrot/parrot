@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 23;
 use Parrot::Test::PGE;
 
 =head1 NAME
@@ -39,6 +39,26 @@ p6rule_throws(
     todo => 'not implemented'
 );
 
+p6rule_throws( '* abc',   qr/Quantifier follows nothing/, 'bare * at start');
+p6rule_throws( '  * abc', qr/Quantifier follows nothing/, 'bare * after ws');
+p6rule_throws( '[*|-]',   qr/Quantifier follows nothing/, 'bare * after [');
+p6rule_throws( '[ *|-]',  qr/Quantifier follows nothing/, 'bare * after [+sp');
+p6rule_throws( '[-|*]',   qr/Quantifier follows nothing/, 'bare * after |');
+p6rule_throws( '[-| *]',  qr/Quantifier follows nothing/, 'bare * after |+sp');
+
+p6rule_throws( '+ abc',   qr/Quantifier follows nothing/, 'bare + at start');
+p6rule_throws( '  + abc', qr/Quantifier follows nothing/, 'bare + after ws');
+p6rule_throws( '[+|-]',   qr/Quantifier follows nothing/, 'bare + after [');
+p6rule_throws( '[ +|-]',  qr/Quantifier follows nothing/, 'bare + after [+sp');
+p6rule_throws( '[-|+]',   qr/Quantifier follows nothing/, 'bare + after |');
+p6rule_throws( '[-| +]',  qr/Quantifier follows nothing/, 'bare + after |+sp');
+
+p6rule_throws( '? abc',   qr/Quantifier follows nothing/, 'bare ? at start');
+p6rule_throws( '  ? abc', qr/Quantifier follows nothing/, 'bare ? after ws');
+p6rule_throws( '[?|-]',   qr/Quantifier follows nothing/, 'bare ? after [');
+p6rule_throws( '[ ?|-]',  qr/Quantifier follows nothing/, 'bare ? after [?sp');
+p6rule_throws( '[-|?]',   qr/Quantifier follows nothing/, 'bare ? after |');
+p6rule_throws( '[-| ?]',  qr/Quantifier follows nothing/, 'bare ? after |?sp');
 
 # Local Variables:
 #   mode: cperl

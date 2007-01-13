@@ -223,7 +223,10 @@ needed for compiling regexes.
     optable.newtok('postfix:?',  'equiv'=>'postfix:*', 'parsed'=>$P0)
     optable.newtok('postfix::',  'equiv'=>'postfix:*', 'parsed'=>$P0)
     optable.newtok('postfix:**', 'equiv'=>'postfix:*', 'parsed'=>$P0)
-
+    $P0 = get_global 'parse_quant_error'
+    optable.newtok('term:*', 'equiv'=>'term:', 'parsed'=>$P0)
+    optable.newtok('term:+', 'equiv'=>'term:', 'parsed'=>$P0)
+    optable.newtok('term:?', 'equiv'=>'term:', 'parsed'=>$P0)
 
     optable.newtok('infix:',   'looser'=>'postfix:*', 'assoc'=>'list', 'nows'=>1, 'match'=>'PGE::Exp::Concat')
     optable.newtok('infix:&',  'looser'=>'infix:', 'nows'=>1, 'match'=>'PGE::Exp::Conj')
@@ -549,6 +552,20 @@ combinations.
 
   err_closure:
     parse_error(mob, pos, "Error in closure quantifier")
+.end
+
+
+=item parse_quant_error(mob)
+
+Throw an exception for quantifiers in term position.
+
+=cut
+
+.sub 'parse_quant_error'
+    .param pmc mob
+    .local int pos
+    pos = mob.'to'()
+    parse_error(mob, pos, "Quantifier follows nothing in regex")
 .end
 
 
