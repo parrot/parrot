@@ -6,9 +6,9 @@ use Module::Build;
 use File::Spec::Functions qw( rel2abs catdir catfile updir path );
 
 diag( cwd() );
-diag( my $in_parrot_tree    = in_parrot_tree() );
-diag( my ($cflags, $lflags) = get_compiler_flags( $in_parrot_tree ) );
-diag( my $parrot            = get_parrot_path( $in_parrot_tree ) );
+diag( my $in_parrot_tree           = in_parrot_tree() );
+diag( my ($cflags, $lflags, $libp) = get_compiler_flags( $in_parrot_tree ) );
+diag( my $parrot                   = get_parrot_path( $in_parrot_tree ) );
 
 my $class = Module::Build->subclass(
 	code => <<"END_HERE",
@@ -24,6 +24,16 @@ my $class = Module::Build->subclass(
 
 		\$self->SUPER::ACTION_build( \@_ );
 	}
+
+    sub ACTION_test
+    {
+        my \$self = shift;
+        \$ENV{LD_LIBRARY_PATH} = join( ':',
+            split( /:/, \$ENV{LD_LIBRARY_PATH} ), '$libp' )
+            if $in_parrot_tree;
+        
+        \$self->SUPER::ACTION_test( \@_ );
+    }
 
 END_HERE
 );
@@ -93,7 +103,7 @@ sub get_flags_from_parrot_src
 	$vars{Cflags} .= ' -I' . catdir( ($updir) x 2, 'include' );
 	$vars{Libs}   .= " -L$libp";
 
-	return @vars{qw( Cflags Libs )};
+	return @vars{qw( Cflags Libs )}, $libp;
 }
 
 sub get_parrot_path
