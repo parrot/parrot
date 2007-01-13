@@ -115,8 +115,8 @@ elsif ($mode eq 'compile') {
     }
 } 
 elsif ($mode eq 'linklibs') {
-    my @objs = grep { /\.o$/} @oplibs;
-    @oplibs  = grep {!/\.o$/} @oplibs;
+    my @objs = grep { /$O$/} @oplibs;
+    @oplibs  = grep {!/$O$/} @oplibs;
 
     # Convert X.o -> X.so
     my $core_suffix;
