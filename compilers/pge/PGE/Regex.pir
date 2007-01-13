@@ -67,7 +67,7 @@ Match a null string (always returns true on first match).
     .param pmc mob
     .local pmc target, mfrom, mpos
     $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob, 0)
+    (mob, target, mfrom, mpos) = $P0(mob)
     assign mpos, mfrom
     .return (mob)    
 .end
