@@ -286,6 +286,39 @@ object.
 
 =back
 
+=head2 I/O Iterator PMC API
+
+[Implementation NOTE: this may either be the default Iterator object
+applied to a ParrotIO object, a separate Iterator object for I/O
+objects, or an Iterator role applied to I/O objects.]
+
+=over 4
+
+=item new
+
+    new $P0, .Iterator, $P1
+
+Create a new iterator object $P0 from I/O object $P1.
+
+=item shift
+
+      shift $S0, $P1
+
+Retrieve the next line/block $S0 from the I/O iterator $P1. The amount
+of data retrieved in each iteration is determined by the I/O object's
+C<buffer_type> setting: unbuffered, line-buffered, or fully-buffered.
+
+=item get_bool (vtable)
+
+  unless $P0 goto iter_end
+
+Returns a boolean value for the iterator, C<true> if there is more data
+to pull from the I/O object, C<false> if the iterator has reached the
+end of the data. [NOTE: this means that an iterator always checks for
+the next line/block of data when it retrieves the current one.]
+
+=back
+
 =head2 I/O Opcodes
 
 The signatures for the asynchronous operations are nearly identical to
