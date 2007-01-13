@@ -137,8 +137,15 @@ a;a=1;1;--a;a           0\n1\n0\n0\n    decrement test
 
 # boolean operators
 !1                      0\n             not 1
+!-1                     0\n             not negative 1
 !0                      1\n             not 0
+!0                      1\n             not 0
+!!1                     1\n             not not 1
+!!9                     1\n             not not 9
+!!-1                    1\n             not not negative 1
+!!0                     0\n             not not 0
 1&&1                    1\n             1 and 1
+9&&-1                   1\n             and with other true integers
 1&&0                    0\n             1 and 0
 0&&1                    0\n             0 and 1
 0&&0                    0\n             0 and 0
@@ -150,4 +157,4 @@ a;a=1;1;--a;a           0\n1\n0\n0\n    decrement test
 1||0&&0||1              1\n             and/or precedence test 2
 
 # Strings
-"basic calculator"   "basic calculator"    TODO string
+"basic calculator"      basic calculator   TODO string
