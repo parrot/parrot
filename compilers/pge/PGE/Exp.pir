@@ -1096,7 +1096,7 @@ tree as a PIR code object that can be compiled.
           rep = $I0 - pos
           %Mif rep < %m goto fail
           %Nif rep <= %n goto %L_1
-          %Nrep = max
+          %Nrep = %n
         %L_1:
         CODE
 

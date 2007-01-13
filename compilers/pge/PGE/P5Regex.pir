@@ -67,17 +67,17 @@
     $P0 = get_hll_global ["PGE::P5Regex"], "parse_lit"
     optable.newtok('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
 
-    optable.newtok('term:\\b', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
-    optable.newtok('term:\\B', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.newtok('term:\b', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.newtok('term:\B', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
     optable.newtok('term:^',   'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
     optable.newtok('term:$',   'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
 
-    optable.newtok('term:\\d', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
-    optable.newtok('term:\\D', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
-    optable.newtok('term:\\s', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
-    optable.newtok('term:\\S', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
-    optable.newtok('term:\\w', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
-    optable.newtok('term:\\W', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok('term:\d', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok('term:\D', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok('term:\s', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok('term:\S', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok('term:\w', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
+    optable.newtok('term:\W', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CCShortcut')
 
     optable.newtok('circumfix:( )',   'equiv'=>'term:', 'nows'=>1, 'nullterm'=>1, 'match'=>'PGE::Exp::CGroup')
     optable.newtok('circumfix:(?: )', 'equiv'=>'term:', 'nows'=>1, 'nullterm'=>1, 'match'=>'PGE::Exp::Group')
