@@ -113,7 +113,6 @@ needs to be done once.
 */
 
     STRING* get_string_keyed_str(STRING* key) {
-        PMC* value;
         Hash* hash = (Hash*) PMC_struct_val(SELF);
         HashBucket *b = parrot_hash_get_bucket(INTERP, hash, key);
         if (b == NULL) {
