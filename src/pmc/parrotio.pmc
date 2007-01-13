@@ -187,7 +187,7 @@ SYNOPSIS
                     add_history(r);
                 res = string_from_cstring(INTERP, r, 0);
                 free(r);
-                pmc_res = pmc_new(INTERP,enum_class_String);
+                pmc_res = pmc_new(INTERP, enum_class_String);
                 PMC_str_val(pmc_res) = res;
                 return pmc_res;
             }
@@ -209,6 +209,7 @@ SYNOPSIS
                 --res->strlen;
                 --res->bufused;
             }
+            pmc_res = pmc_new(INTERP, enum_class_String);
             PMC_str_val(pmc_res) = res;
             return pmc_res;
         }
