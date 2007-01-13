@@ -29,3 +29,5 @@ for(i=0;i<2;i++){i}	0\n1\n		simple for with compound statement
 while(i<5)i++;		0\n1\n2\n3\n4\n   simple while
 while(i<5){i++;}	0\n1\n2\n3\n4\n   simple while with compound
 
+# compound statement
+{ 1+2; 1*2; 1%2 }       3\n2\n1\n         compound statement
