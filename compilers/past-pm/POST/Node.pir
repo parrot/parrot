@@ -36,6 +36,7 @@ for compiling programs in Parrot.
     pirtable['concat'] = '%tP~'
     pirtable['abs'] = '%t'
     pirtable['say'] = '%v'
+    pirtable['print'] = '%v'
     pirtable['set'] = '%rP'
     pirtable['call'] = '%rPPPPPPPPPPPPPPPP'                # FIXME:
     pirtable['callmethod'] = '%rPPPPPPPPPPPPPPPP'          # FIXME:
