@@ -13,6 +13,12 @@ OPSDIR    = src/ops
 CLASSDIR  = src/class
 LOAD_EXT  = @load_ext@
 
+CC_INC     = @cc_inc@
+CC_SHARED  = @cc_shared@
+CFLAGS     = $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ $(CC_SHARED)
+CC         = @cc@
+
+
 PGE_DIR  = ../../compilers/pge
 TGE_DIR  = ../../compilers/tge
 
