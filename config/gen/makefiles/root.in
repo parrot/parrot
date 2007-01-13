@@ -1343,6 +1343,7 @@ RUNCORE_TEST_FILES = \
     t/native_pbc/*.t \
     t/dynpmc/*.t \
     t/dynoplibs/*.t \
+    t/compilers/json/*.t \
     t/compilers/past/*.t \
     t/compilers/pge/*.t \
     t/compilers/pge/p5regexp/*.t \
