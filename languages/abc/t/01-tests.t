@@ -108,6 +108,9 @@ foreach my $file (@test_files) {
             next;
         }
 
+        $expr =~ s/"/\\"/g;           # Escape the '"', as $expr will be 
+                                      # enclosed by '"' in the generated PIR
+
         $expect =~ s/^'(.*)'$/$1/;    # remove surrounding quotes (for '')
         $expect =~ s/\\n/\n/g;        # treat \n as newline
 
