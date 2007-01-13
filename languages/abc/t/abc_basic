@@ -127,7 +127,7 @@ a;a=1;1;--a;a           0\n1\n0\n0\n    decrement test
 1>=1                    1\n             true greater or equal
 1>=2                    0\n             false greater or equal
 2>=1                    1\n             true greater or equal
-1+1<=1+1                \n              precedence with plus
+1+1<=1+1                1\n              precedence with plus
 
 # equal and not equal
 1==1                    1\n             true equal
@@ -146,8 +146,8 @@ a;a=1;1;--a;a           0\n1\n0\n0\n    decrement test
 1||0                    1\n             1 or 0
 0||1                    1\n             0 or 1
 0||0                    0\n             0 or 0
-1&&0||0&&1              \n              and/or precedence
-1||0&&0||1              \n              and/or precedence
+1&&0||0&&1              0\n             and/or precedence test 1
+1||0&&0||1              1\n             and/or precedence test 2
 
 # Strings
 "basic calculator"   "basic calculator"    TODO string
