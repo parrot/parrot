@@ -414,8 +414,9 @@ D: Win32 build fix
 N: Nigelsandever
 D: Win32 patches
 
-N: Nuno Carvalho
-D: Help with PGE debugging
+N: Nuno 'smash' Carvalho
+D: PGE/perl6/abc debugging and testing
+E: mestre.smash@gmail.com
 
 N: OOLLEY kj
 D: Miscellaneous cleanup and PDD07-conformance
