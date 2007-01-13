@@ -33,6 +33,7 @@ transform past (ABC::Grammar::statement) :language('PIR') {
     .return tree.'get'('past', $P0, 'ABC::Grammar::for_statement')
   expression:
     $P0 = node['expression']
+    if null $P0 goto handle_string
     .local pmc past
     past = tree.'get'('past', $P0, 'ABC::Grammar::expression')
     ##   if the statement isn't an assignment, we assign to last and
@@ -45,6 +46,16 @@ transform past (ABC::Grammar::statement) :language('PIR') {
     $P0 = past.'new'('PAST::Var', 'name'=>'last', 'islvalue'=>1)
     past = past.'new'('PAST::Op', $P0, past, 'pasttype'=>'assign', 'islvalue'=>1)
     past = past.'new'('PAST::Op', past, 'name'=>'saynum')
+    goto end
+  handle_string:
+    $P0 = node['string']
+    .local string val
+    val = $P0
+    .local pmc vpast
+    vpast = new 'PAST::Val'
+    vpast.init( 'name' => val, 'vtype' => '.Undef' )
+    past = new 'PAST::Op'
+    past.'init'(vpast, 'node'=> $P0, 'pirop'=>'print')
   end:
     .return (past)
 }
