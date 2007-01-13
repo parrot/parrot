@@ -84,6 +84,8 @@ set skipped_tests [dict create \
     var-6.3 var-7.12 var-12.1
   } {Cannot get character past end of string} {
     format-8.17 format-8.18
+  } {Cannot get character of empty string} {
+    regexp-6.9 regexp-15.6 regexp-21.7
   } {Cannot take substr outside string} {
     namespace-14.9 namespace-14.12
   } {[lsearch -regexp]} {

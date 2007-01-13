@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 13
+plan 14
 
 proc regexp_is {pattern string reason} {
     eval_is "regexp {$pattern} {$string}" 1 $reason 
@@ -25,21 +25,25 @@ eval_is {regexp -bork a b} \
   {bad switch "-bork": must be -all, -about, -indices, -inline, -expanded, -line, -linestop, -lineanchor, -nocase, -start, or --} \
   {bad switch}
 
-catch unset t1
+catch {unset t1}
 regexp a+b baaabd t1
 is $t1 aaab matchVar
 
-catch unset t1 t2
+catch {unset t1 t2}
 regexp a+b baaabd t1 t2
 is [list $t1 $t2] {aaab {}} {submatch var but no actual sub match}
 
-catch unset t1
+catch {unset t1}
 regexp a(.*)a abbba t1
 is $t1 {abbba} {submatch with no sub var}
 
-catch unset t1 t2
+catch {unset t1 t2}
 regexp a(.*)a abbba t1 t2
 is [list $t1 $t2] {abbba bbb} {submatch with var}
+
+catch {unset t1 t2}
+regexp -indices aa(b+)aa aabbbbbbbbaa t1 t2
+is [list $t1 $t2] {{0 11} {2 9}} -indices
 
 # http://www.tcl.tk/man/tcl8.5/TclCmd/re_syntax.htm
 
