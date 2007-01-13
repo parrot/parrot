@@ -1350,8 +1350,7 @@ RUNCORE_TEST_FILES = \
     t/compilers/pge/p6rules/*.t \
     t/compilers/tge/*.t \
     t/library/*.t \
-    t/examples/*.t \
-    t/compilers/json/*.t
+    t/examples/*.t
 SRC_TEST_FILES = \
     t/src/*.t
 TOOLS_TEST_FILES = \
