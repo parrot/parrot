@@ -19,6 +19,14 @@
     target = adverbs['target']
     target = downcase target
 
+    if source goto have_source
+    #  FIXME: if we have a null pattern, we're just short-circuiting
+    #  to the <null> subrule, which means that 'target'=>'parse'
+    #  doesn't work.
+    $P0 = get_hll_global ['PGE::Match'], 'null'
+    .return ($P0)
+
+  have_source:
     .local pmc match
     $P0 = get_global "p5regex"
     match = $P0(source)
