@@ -1,27 +1,34 @@
 #!perl
 
-use strict;
-use warnings;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
+# the following lines re-execute this as a tcl script
+# the \ at the end of these lines makes them a comment in tcl \
+use lib qw(languages/tcl/lib tcl/lib lib ../lib ../../lib); # \
+use Tcl::Test; #\
+__DATA__
 
-use Parrot::Test tests => 7;
-use Test::More;
+source lib/test_more.tcl
+plan 7
 
-language_output_is( "tcl", <<TCL, <<'OUT', "regexp no args" );
-regexp
-TCL
-wrong # args: should be "regexp ?switches? exp string ?matchVar? ?subMatchVar subMatchVar ...?"
-OUT
+proc regexp_is {pattern string reason} {
+    eval_is "regexp {$pattern} {$string}" 1 $reason 
+}
+
+proc regexp_isnt {pattern string reason} {
+    eval_is "regexp {$pattern} {$string}" 0 $reason 
+}
+
+eval_is {regexp} \
+  {wrong # args: should be "regexp ?switches? exp string ?matchVar? ?subMatchVar subMatchVar ...?"} {no args}
 
 # http://www.tcl.tk/man/tcl8.5/TclCmd/re_syntax.htm
 
-regexp_is( "asdf", "asdf", "literal, t" );
-regexp_isnt( "asdf", "fdsa", "literal, f" );
+regexp_is   asdf asdf "literal, t"
+regexp_isnt asdf fdsa "literal, f"
 
-regexp_is( "a*", "bbb",   "*, true" );
-regexp_is( "a*", "bab",   "*, true" );
-regexp_is( "a*", "baab",  "*, true" );
-regexp_is( "a*", "baaab", "*, true" );
+regexp_is a* bbb   "*, true"
+regexp_is a* bab   "*, true"
+regexp_is a* baab  "*, true"
+regexp_is a* baaab "*, true"
 
 # +
 
@@ -224,33 +231,6 @@ regexp_is( "a*", "baaab", "*, true" );
 # -start
 
 # --
-
-# Helper
-
-sub regexp_is {
-    regexp_check( @_, 1 );
-    return;
-}
-
-sub regexp_isnt {
-    regexp_check( @_, 0 );
-    return;
-}
-
-sub regexp_check {
-
-    my ( $pattern, $string, $reason, $flag ) = @_;
-
-    language_output_is( "tcl", <<"TCL", <<"OUT", $reason );
-  
-puts [regexp {$pattern} {$string}]
-
-TCL
-$flag
-OUT
-
-    return;
-}
 
 # Local Variables:
 #   mode: cperl
