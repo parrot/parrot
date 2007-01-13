@@ -252,15 +252,15 @@ Column 6, if present, contains a description of what is being tested.
     print "'\n"
 
   thrown:
-    .sym pmc exception
-    .sym string message
+    .local pmc exception
+    .local string message
     get_results '(0,0)', exception, message
     # remove /'s
-    $S0 = substr result, 0, 1
-    if $S0 != '/' goto bad_error
-    substr result, 0, 1, ''
-    substr result, -1, 1, ''
-    $I0 = index message, result
+    # $S0 = substr result, 0, 1
+    # if $S0 != '/' goto bad_error
+    # substr result, 0, 1, ''
+    # substr result, -1, 1, ''
+    $I0 = index message, expected
     if $I0 == -1 goto bad_error
     ok = 1
     goto emit_test
@@ -291,6 +291,20 @@ Column 6, if present, contains a description of what is being tested.
     test_file = 're_tests'
     bsr reset_todo_info
 
+    $S0 = 'character class in enumeration'
+    todo_info[116] = $S0
+    todo_info[117] = $S0
+    todo_info[118] = $S0
+    todo_info[119] = $S0
+    todo_info[120] = $S0
+    todo_info[121] = $S0
+    todo_info[122] = $S0
+    todo_info[123] = $S0
+    todo_info[124] = $S0
+    todo_info[125] = $S0
+    todo_info[126] = $S0
+    todo_info[127] = $S0
+
     $S0 = 'unknown reason'
     todo_info[99] = $S0
     todo_info[100] = $S0
@@ -301,6 +315,7 @@ Column 6, if present, contains a description of what is being tested.
 #    todo_info[232] = $S0
 #    todo_info[233] = $S0
     todo_info[234] = $S0
+    todo_info[235] = $S0
     todo_info[236] = $S0
 #    todo_info[241] = $S0
 #    todo_info[243] = $S0
@@ -323,6 +338,7 @@ Column 6, if present, contains a description of what is being tested.
 #    todo_info[428] = $S0
     todo_info[429] = $S0
     todo_info[432] = $S0
+    todo_info[434] = $S0
     todo_info[435] = $S0
     todo_info[439] = $S0
 #    todo_info[440] = $S0
@@ -352,12 +368,15 @@ Column 6, if present, contains a description of what is being tested.
     todo_info[511] = $S0
     todo_info[512] = $S0
     todo_info[515] = $S0
+    todo_info[521] = $S0
     todo_info[522] = $S0
     todo_info[523] = $S0
     todo_info[524] = $S0
     todo_info[527] = $S0
     todo_info[528] = $S0
+    todo_info[535] = $S0
     todo_info[536] = $S0
+    todo_info[539] = $S0
     todo_info[540] = $S0
     todo_info[541] = $S0
     todo_info[543] = $S0
@@ -367,6 +386,7 @@ Column 6, if present, contains a description of what is being tested.
     todo_info[549] = $S0
     todo_info[553] = $S0
     todo_info[554] = $S0
+    todo_info[559] = $S0
     todo_info[595] = $S0
     todo_info[596] = $S0
     todo_info[600] = $S0
@@ -397,6 +417,7 @@ Column 6, if present, contains a description of what is being tested.
     todo_info[832] = $S0
     todo_info[833] = $S0
 #    todo_info[840] = $S0
+    todo_info[858] = $S0
     todo_info[859] = $S0
 #    todo_info[860] = $S0
 #    todo_info[861] = $S0
@@ -408,6 +429,7 @@ Column 6, if present, contains a description of what is being tested.
 #    todo_info[874] = $S0
 #    todo_info[875] = $S0
 #    todo_info[876] = $S0
+    todo_info[881] = $S0
 #    todo_info[882] = $S0
     todo_info[887] = $S0
     todo_info[888] = $S0
@@ -689,37 +711,25 @@ Column 6, if present, contains a description of what is being tested.
     chopn test_line, 1
 
     $P1 = split "\t", test_line
-    $I0 = elements $P1        # length of array
-    .local int tab_number
-              tab_number = 0
-  get_pattern:
-    if tab_number >= $I0 goto bad_line
-    pattern        = $P1[tab_number]
-    inc tab_number
-    if pattern == '' goto get_pattern
-    # XXX strip containing 's
-    # XXX set modifier and return it.
 
+  get_pattern:
+    unless $P1 goto bad_line
+    pattern = shift $P1
+    if pattern == '' goto get_pattern
   get_target:
-    if tab_number >= $I0 goto bad_line
-    target         = $P1[tab_number]
-    inc tab_number
-    if target == ''  goto get_target
+    unless $P1 goto bad_line
+    target = shift $P1
   get_result:
-    if tab_number >= $I0 goto bad_line
-    result         = $P1[tab_number]
-    inc tab_number
-    if result == ''  goto get_result
+    unless $P1 goto bad_line
+    result = shift $P1
+    if result == '' goto get_result
   get_testvar:
-    if tab_number >= $I0 goto bad_line
-    testvar        = $P1[tab_number]
-    inc tab_number
-    if result == ''  goto get_testvar
+    unless $P1 goto bad_line
+    testvar = shift $P1
+    if testvar == '' goto get_testvar
   get_expected:
-    if tab_number >= $I0 goto bad_line
-    expected       = $P1[tab_number]
-    inc tab_number
-    if result == ''  goto get_expected
+    unless $P1 goto bad_line
+    expected = shift $P1
 
   description = ''
 
