@@ -28,7 +28,7 @@
   target     = shift argv
   subSpec    = shift argv
  
-  .local pmc tclARE # RT#40760: for now, just use P5 regexen
+  .local pmc tclARE # RT#40774: for now, just use P5 regexen
   tclARE = compreg 'PGE::P5Regex'
 
   .local pmc rule,match 
