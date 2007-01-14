@@ -174,7 +174,6 @@ struct PackFile_ByteCode {
     void *jit_info;             /* JITs data */
     Parrot_PIC_store * pic_store;      /* PIC storage */
     struct PackFile_Segment   * pic_index; /* segment of indices into store */
-    struct PackFile_ByteCode  * prev;   /* was executed previous */
     struct PackFile_Debug     * debugs;
     struct PackFile_ConstTable *const_table;
     struct PackFile_FixupTable *fixups;
@@ -335,8 +334,6 @@ PARROT_API struct PackFile_FixupEntry * PackFile_find_fixup_entry(Interp *,
 PARROT_API struct PackFile_ByteCode * Parrot_switch_to_cs(Interp *,
     struct PackFile_ByteCode *, int really);
 PARROT_API void Parrot_switch_to_cs_by_nr(Interp *, opcode_t seg);
-PARROT_API void Parrot_pop_cs(Interp *);
-
 PARROT_API void Parrot_destroy_constants(Interp *);
 
 /*

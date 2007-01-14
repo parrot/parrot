@@ -1936,7 +1936,6 @@ byte_code_new(Interp* interp, struct PackFile *pf,
     byte_code->prederef.branches = NULL;
     byte_code->prederef.n_allocated = 0;
     byte_code->jit_info = NULL;
-    byte_code->prev = NULL;
     byte_code->debugs = NULL;
     byte_code->const_table = NULL;
     byte_code->fixups = NULL;
@@ -2479,32 +2478,9 @@ Parrot_switch_to_cs(Interp *interp,
             /* new_cs->const_table->constants; */
     CONTEXT(interp->ctx)->pred_offset =
         new_cs->base.data - (opcode_t*) new_cs->prederef.code;
-    new_cs->prev = cur_cs;
     if (really)
         prepare_for_run(interp);
     return cur_cs;
-}
-
-/*
-
-=item C<void
-Parrot_pop_cs(Interp *interp)>
-
-Remove current byte code segment from directory and switch to previous.
-
-=cut
-
-*/
-
-void
-Parrot_pop_cs(Interp *interp)
-{
-    struct PackFile_ByteCode * const cur_cs = interp->code;
-
-    interp->code = cur_cs->prev;
-    PackFile_remove_segment_by_name(interp,
-            cur_cs->base.dir, cur_cs->base.name);
-    /* FIXME delete returned segment */
 }
 
 /*
@@ -2982,12 +2958,6 @@ PackFile_find_fixup_entry(Interp *interp, enum_fixup_t type,
     struct PackFile_Directory *dir = interp->code->base.dir;
     struct PackFile_FixupEntry *ep, e;
     int found;
-
-    /*
-     * XXX when in eval, the dir is in cur_cs->prev
-     */
-    if (interp->code->prev)
-        dir = interp->code->prev->base.dir;
 
     e.type = type;
     e.name = name;
