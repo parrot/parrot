@@ -652,7 +652,7 @@ main(int argc, char * argv[])
         }
         IMCC_END_TRY;
 
-        imc_cleanup(interp);
+        imc_cleanup(interp, yyscanner);
 
         fclose(imc_yyin_get(yyscanner));
 

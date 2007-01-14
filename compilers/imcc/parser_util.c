@@ -681,7 +681,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
         IMCC_INFO(interp)->cur_namespace = imc_info->cur_namespace;
     }
     else
-        imc_cleanup(interp);
+        imc_cleanup(interp, yyscanner);
     Parrot_unblock_DOD(interp);
 
     yylex_destroy( yyscanner );
@@ -831,7 +831,7 @@ imcc_compile_file(Parrot_Interp interp, const char *fullname,
     Parrot_unblock_DOD(interp);
     Parrot_pop_context(interp);
 
-    imc_cleanup(interp);
+    imc_cleanup(interp, NULL);
     fclose(fp);
 
     if (!IMCC_INFO(interp)->error_code) {

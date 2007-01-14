@@ -64,11 +64,12 @@ imc_compile_unit(Interp *interp, IMC_Unit * unit) {
  * ready for a new compiler invocation goes here.
  */
 void
-imc_cleanup(Interp *interp)
+imc_cleanup(Interp *interp, void *yyscanner)
 {
-     clear_globals(interp);
-     mem_sys_free(IMCC_INFO(interp)->ghash.data);
-     IMCC_INFO(interp)->ghash.data = NULL;
+    IMCC_pop_parser_state(interp, yyscanner);
+    clear_globals(interp);
+    mem_sys_free(IMCC_INFO(interp)->ghash.data);
+    IMCC_INFO(interp)->ghash.data = NULL;
 }
 
 

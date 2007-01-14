@@ -65,7 +65,7 @@
  */
 PARROT_API void imc_compile_all_units(Interp *);
 PARROT_API void imc_compile_unit(Interp *, IMC_Unit * unit);
-PARROT_API void imc_cleanup(Interp *);
+PARROT_API void imc_cleanup(Interp *, void *yyscanner);
 PARROT_API void imc_pragma(char * str);
 PARROT_API FILE* imc_yyin_set(FILE*, void*);
 PARROT_API FILE* imc_yyin_get(void*);
