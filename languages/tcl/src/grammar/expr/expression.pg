@@ -78,6 +78,9 @@ token expand {
     | \{\*\}<!before:\s>
 }
 
+# this is so we can use <variable_substitution> in [subst]
+token variable { <variable_substitution> }
+
 # Actual [expr] items
 
 token term {

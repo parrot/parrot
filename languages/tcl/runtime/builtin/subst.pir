@@ -4,58 +4,123 @@
 # RT#40779: this is only a stub.
 
 .sub '&subst'
-  .param pmc argv :slurpy
- 
+    .param pmc argv :slurpy
 
-  .local pmc options
-  options = new .ResizablePMCArray
-  options[0] = 'nobackslashes'
-  options[1] = 'nocommands'
-  options[2] = 'novariables'
+    .local pmc options
+    options = new .ResizablePMCArray
+    options[0] = 'nobackslashes'
+    options[1] = 'nocommands'
+    options[2] = 'novariables'
 
-  .local pmc select_switches, switches
-  select_switches  = get_root_global ['_tcl'], 'select_switches'
+    .local pmc select_switches, switches
+    select_switches  = get_root_global ['_tcl'], 'select_switches'
 
-  switches = select_switches(options, argv)
+    switches = select_switches(options, argv)
 
-  .local int argc
-  argc = elements argv 
-  if argc != 1 goto badargs
+    .local int argc
+    argc = elements argv 
+    if argc == 0 goto badargs
+    if argc > 1  goto badswitch
 
-  .local string original_string
-  original_string = argv[0]
+    .local string str, newstr
+    str = argv[0]
 
-  # There are 3 switches, 2^3 = 8 combinations.
-  # combine them into a bitmask..
-  $I1 = exists switches['nobackslashes']
-  $I2 = exists switches['nocommands']
-  $I3 = exists switches['novariables']
-  $I1 *= 4
-  $I2 *= 2
-  $I1 += $I2
-  $I1 += $I3
-  
-  if $I1 == 0 goto no_diff
-  if $I1 == 1 goto var_only
-  if $I1 == 2 goto cmd_only
-  if $I1 == 3 goto cmd_and_var
-  if $I1 == 4 goto back_only
-  if $I1 == 5 goto back_and_var
-  if $I1 == 6 goto back_and_cmd
+    .local int nobackslashes, nocommands, novariables
+    nobackslashes = exists switches['nobackslashes']
+    nocommands    = exists switches['nocommands']
+    novariables   = exists switches['novariables']
 
-  # $I1 == 7
-all_three:
-back_only:
-cmd_only:
-var_only:
-back_and_cmd:
-back_and_var:
-cmd_and_var:
+    .local int pos, len
+    pos = 0
+    len = length str
+    .local pmc parse, match, astgrammar, pirgrammar
+    astgrammar = new 'TclExpr::PAST::Grammar'
+    pirgrammar = new 'TclExpr::PIR::Grammar'
 
-no_diff:
-  .return (original_string)
+    .local pmc __namespace, ns
+    .local string namespace
+    __namespace = get_root_global ['_tcl'], '__namespace'
+    ns          = __namespace('', 2)
+    namespace   = ''
+    $I0 = elements ns
+    if $I0 == 0 goto loop
+
+    namespace = join "'; '", ns
+    namespace = "['" . namespace
+    namespace .= "']"
+loop:
+    if pos >= len goto done
+    $S0 = substr str, pos, 1
+    if $S0 == '[' goto command
+    if $S0 == '$' goto variable
+    if $S0 == '\' goto backslash
+next:
+    inc pos
+    goto loop
+
+command:
+    if nocommands goto next
+    # ...
+    goto next
+
+variable:
+    if novariables goto next
+    parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'variable'
+    match = parse(str, 'pos'=>pos, 'grammar'=>'TclExpr::Grammar')
+
+    .local pmc astbuilder, ast
+    astbuilder = astgrammar.'apply'(match)
+    ast        = astbuilder.'get'('past')
+
+    .local pmc pirbuilder
+    .local string code
+    pirbuilder = pirgrammar.'apply'(ast)
+    code       = pirbuilder.'get'('result')
+
+    .local string ret
+    ret = ast['ret']
+
+    .local pmc pir
+    pir = new 'PGE::CodeString'
+
+    pir.emit(".HLL 'Tcl', ''")
+    pir.emit(".loadlib 'tcl_ops'")
+    pir.emit(".namespace %0", namespace)
+    pir.emit(".include 'languages/tcl/src/returncodes.pir'")
+    pir.emit(".sub '_anon' :anon")
+    pir .= code
+    pir.emit("  .return(%0)", ret)
+    pir.emit(".end")
+    $S0 = pir
+
+    $P1    = compreg 'PIR'
+    $P1    = $P1(pir)
+    newstr = $P1()
+
+    $I0 = match.'to'()
+    $I1 = $I0 - pos
+    substr str, pos, $I1, newstr
+
+    pos = $I0
+    $I0 = length newstr
+    $I0 -= $I1
+    pos += $I0
+    goto next
+
+backslash:
+    if nobackslashes goto next
+    # ...
+    goto next
+
+done:
+  .return (str)
 
 badargs:
     tcl_error 'wrong # args: should be "subst ?-nobackslashes? ?-nocommands? ?-novariables? string"'
 
+badswitch:
+    $S0 = argv[0]
+    $S0 = 'bad switch "' . $S0
+    $S0 .= '": must be -nobackslashes, -nocommands, or -novariables'
+    tcl_error $S0
 .end
