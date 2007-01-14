@@ -105,6 +105,7 @@ variable:
     $I0 = length newstr
     $I0 -= $I1
     pos += $I0
+    len += $I0
     goto next
 
 backslash:
