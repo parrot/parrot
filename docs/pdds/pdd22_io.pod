@@ -85,7 +85,7 @@ The lightweight tasks typically used by the asynchronous I/O system
 capture no state other than the arguments passed to the I/O call, and
 share no variables with the calling code other than the status object.
 
-[See http://en.wikipedia.org/wiki/Asynchronous_I/O, for a relatively
+[See L<http://en.wikipedia.org/wiki/Asynchronous_I/O>, for a relatively
 comprehensive list of asynchronous I/O implementation options.]
 
 =head2 I/O PMC API
@@ -120,21 +120,8 @@ via the C<open> opcode.]
 Opens a stream on an existing I/O stream object. With no arguments, it
 can be used to reopen a previously opened I/O stream. $S1 is a file path
 and $S2 is an optional mode for the stream (read, write, read/write,
-etc), using the same format as the C<open> opcode.
-
-I'm very tempted by named parameters for 'open':
-
-  path   - The path to the file
-  read   - A flag for read mode
-  write  - A flag for write mode (both read and write means read/write), create a new file if it doesn't exist
-  append - Start writing at the end of the file, or create a new file if it doesn't exist
-  pipe   - A flag for pipe mode
-
-  $P0.open('path'=>'/tmp/file')             # Default is read-only
-  $P0.open('path'=>'/tmp/file', 'write'=>1) # write-only
-
-It would make for some rather verbose C<open> operations, though
-certainly more readable, and probably just as easy to generate.
+etc), using the same format as the C<open> opcode: 'r' for read, 'w' for
+write, 'a' for append, and 'p' for pipe.
 
 =item close
 
@@ -173,12 +160,18 @@ passing it a status object.
 
 Retrieves a specified number of bytes $I2, from a stream $P1 into a
 string $S0. By default it reads in bytes, but the ParrotIO object can be
-configured to read in code points instead.
+configured to read in code points instead, by applying a C<utf8> or
+similar role to the object [the syntax for applying a role to an object
+has yet to be defined in PDD 15].
 
 The asynchronous version takes an additional final PMC callback argument
 $P3, and only returns a status object $P0. When the read operation is
-complete, it invokes the callback, passing it a status object and a
-string of bytes.
+complete, it invokes the callback, passing it a status object. The
+status object contains the return value: a string that may be in bytes
+or codepoints depending on the read mode of the I/O object. [The
+callback doesn't need to know the read mode of the original operation,
+as the information about the character encoding of the return value is
+contained in the string.]
 
 =item readline
 
@@ -187,7 +180,8 @@ string of bytes.
 
 Retrieves a single line from a stream $P1 into a string $S1. Calling
 C<readline> flags the stream as operating in line-buffer mode (see the
-C<buffer_type> method below).
+C<buffer_type> method below). The C<readline> operation respects the
+read mode of the I/O object the same as C<read> does.
 
 The asynchronous version takes an additional final PMC callback argument
 $P2, and only returns a status object $P0. When the readline operation
@@ -213,15 +207,15 @@ attribute is returned as an integer value of one of the following
 constants, or a string value of 'unbuffered', 'line-buffered', or
 'full-buffered'.
 
-  0    PIOCTL_NONBUF
+  0    PIO_NONBUF
            Unbuffered I/O. Bytes are sent as soon as possible.
-  1    PIOCTL_LINEBUF
-	   Line buffered I/O. Bytes are sent when a newline is
+  1    PIO_LINEBUF
+           Line buffered I/O. Bytes are sent when a record separator is
            encountered.
-  2    PIOCTL_FULLBUF
-	   Fully buffered I/O. Bytes are sent when the buffer is full.
-	   [Note, the constant was called "BLKBUF" because bytes are
-	   sent as a block, but line buffering also sends them as a
+  2    PIO_FULLBUF
+           Fully buffered I/O. Bytes are sent when the buffer is full.
+           [Note, the constant was called "BLKBUF" because bytes are
+           sent as a block, but line buffering also sends them as a
            block, so changed to "FULLBUF".]
 
 =item buffer_size
@@ -229,14 +223,24 @@ constants, or a string value of 'unbuffered', 'line-buffered', or
   $I0 = $P1.buffer_size()
   $P0.buffer_size($I1)
 
-Accessor (get and set) for the I/O stream's buffer size attribute.
+Accessor (get and set) for the I/O stream's buffer size attribute. The
+size is specified in bytes, though the buffer may hold a varying number
+of characters when dealing with an encoding of multi-byte codepoints.
+The role that implements the handling of a particular character set must
+provide the logic that marks the buffer as "full" when it can't hold the
+next codepoint even if there are empty bytes in the buffer.
 
 =item get_fd
 
   $I0 = $P1.get_fd()
 
-Retrieves the UNIX integer file descriptor of a stream object. No
-asynchronous version.
+For stream objects that are simple wrappers around a Unix filehandle,
+C<get_fd> retrieves the Unix integer file descriptor of the object.
+This method doesn't exist on stream objects that aren't Unix
+filehandles, so check C<does> for the appropriate role, or C<can> for
+the method before calling it.
+
+No asynchronous version.
 
 =back
 
@@ -258,14 +262,15 @@ move away from that, is there a better representation?]
   if $P1 goto ...
 
 Returns a boolean status for the status object, C<true> for successful
-completion or successful work in progress, C<false> for an error.
+completion or while still running, C<false> for an error.
 
 =item return
 
   $P0 = $P1.return()
 
 Retrieves the return value of the asynchronous operation from the status
-object.
+object. Returns a NULL PMC while still running, or if the operation had
+no return value.
 
 =item error
 
@@ -279,10 +284,10 @@ null PMC.
 
 =item throw
 
-  $P0 = $P1.throw()
+  $P0.throw()
 
 Throw an exception from the status object if it contains an error
-object.
+object, otherwise do nothing.
 
 =back
 
@@ -330,7 +335,7 @@ values from the operation are stored within the status object.
 
 The listing below says little about whether the opcodes return error
 information. For now assume that they can either return a status object,
-or return nothing. Error handling is discussed more thoroughly below in 
+or return nothing. Error handling is discussed more thoroughly below in
 L<Error Handling>.
 
 =head2 I/O Stream Opcodes
@@ -343,6 +348,8 @@ L<Error Handling>.
 
   $P0 = open $S1
   $P0 = open $S1, $S2
+  $P0 = open $P1
+  $P0 = open $P1, $S2
 
 Opens a stream object based on a file path in $S1 and returns it.  The
 stream object defaults to read/write mode. The optional string argument
