@@ -7,8 +7,8 @@
 
 set skipped_tests [dict create \
   {[binary]} {
-    string-5.14 string-5.15
-    stringComp-5.14 stringComp-5.15 stringComp-9.7
+    string-5.14 string-5.15 string-5.16 string-12.21
+    stringComp-5.14 stringComp-5.15 stringComp-5.16 stringComp-9.7
   } {[trace]} {
     append-7.1 append-7.2 append-7.3 append-7.4 append-7.5
     appendComp-7.1 appendComp-7.2 appendComp-7.3 appendComp-7.4 appendComp-7.5
@@ -18,7 +18,7 @@ set skipped_tests [dict create \
   } {stacktrace support} {
     apply-2.2 apply-2.3 apply-2.4 apply-2.5 apply-5.1
     basic-46.1
-    cmdMZ-2.10 cmdMZ-3.5 cmdMZ-5.7
+    cmdMZ-return-2.10 cmdMZ-3.5 cmdMZ-5.7
     dict-14.12 dict-17.13
     error-1.3 error-2.3 error-2.6 error-4.2 error-4.3 error-4.4
     eval-2.5
@@ -28,8 +28,11 @@ set skipped_tests [dict create \
     incr-old-2.4 incr-old-2.5
     misc-1.2
     namespace-8.5 namespace-8.6 namespace-25.6 namespace-25.7 namespace-25.8
-    namespace-47.2 namespace-47.4 namespace-47.6
-    parse-9.2 parse-10.14
+    namespace-47.2 namespace-47.4 namespace-47.6 namespace-46.5
+    parse-9.1 parse-9.2 parse-10.14
+    parseOld-10.14
+    proc-old-5.13 proc-old-5.16 proc-old-7.2  proc-old-7.11 proc-old-7.12 
+    proc-old-7.13 proc-old-7.14
     set-2.1 set-4.1
     switch-4.1 switch-4.5
     while-4.3
@@ -86,10 +89,20 @@ set skipped_tests [dict create \
     format-8.17 format-8.18
   } {Cannot get character of empty string} {
     regexp-6.9 regexp-15.6 regexp-21.7
+    regexpComp-6.9 regexpComp-15.6 regexpComp-21.7
   } {Cannot take substr outside string} {
     namespace-14.9 namespace-14.12
   } {[lsearch -regexp]} {
     for-3.6
+  } {[read]} {
+    iocmd-4.1 iocmd-4.2 iocmd-4.3 iocmd-4.4 iocmd-4.5 iocmd-4.6 iocmd-4.7
+    iocmd-4.8 iocmd-4.9 iocmd-4.10 iocmd-4.11 iocmd-4.12
+  } {[seek]} {
+    iocmd-5.1 iocmd-5.2 iocmd-5.3 iocmd-5.4 iocmd-12.4
+  } {[tell]} {
+    iocmd-6.1 iocmd-6.2 iocmd-6.3 
+  } {[fblocked]} {
+    iocmd-10.1 iocmd-10.2 iocmd-10.3 iocmd-10.4 iocmd-10.5
   } {Inf support} {
     compExpr-old-11.13a
     expr-11.13b expr-22.2 expr-22.4 expr-22.6 expr-22.8 expr-30.3 expr-30.4
@@ -101,6 +114,28 @@ set skipped_tests [dict create \
     expr-22.1 expr-22.3  expr-22.5 expr-22.7 expr-22.9 expr-45.8 expr-45.9
     expr-47.3
     expr-old-36.7
+  } {[testgetint]} {
+    get-1.1 get-1.2 get-1.3 get-1.4 get-1.5 get-1.6 get-1.7 get-1.8 get-1.9
+    get-1.10 get-1.11 get-1.12 get-1.13 get-1.14
+  } {[testtranslatefilename]} {
+    filename-10.1 filename-10.2 filename-10.3 filename-10.3.1 filename-10.6
+    filename-10.7 filename-10.8 filename-10.9 filename-10.10 filename-10.17
+    filename-10.18 filename-10.19 filename-10.20 filename-10.21 filename-10.22
+    filename-10.23 filename-10.24 
+  } {[testwordend]} {
+    parseOld-14.1 parseOld-14.2 parseOld-14.3 parseOld-14.4 parseOld-14.5 
+    parseOld-14.6 parseOld-14.7 parseOld-14.8 parseOld-14.9 parseOld-14.10
+    parseOld-14.11 parseOld-14.12 parseOld-14.13 parseOld-14.14 
+    parseOld-14.15 parseOld-14.16 parseOld-14.17 parseOld-14.18 
+    parseOld-14.19 parseOld-14.20 parseOld-14.21
+  } {[testdel]} {
+    rename-4.1 rename-4.2 rename-4.3 rename-4.4 rename-4.5 
+  } {[testchmod]} {
+    cmdAH-18.3
+  } {[testcmdtoken]} {
+    basic-20.1 basic-20.2 basic-20.3
+  } {[testcreatecommand]} {
+    basic-14.1 basic-14.2
   } {[testexprstring]} {
     expr-old-38.2
   } {[testexprlong]} {
@@ -140,7 +175,8 @@ set skipped_tests [dict create \
     parse-12.1 parse-12.2 parse-12.3 parse-12.4 parse-12.5 parse-12.9
     parse-12.10 parse-12.15 parse-12.16 parse-12.17 parse-12.19 parse-12.24
   } {[testupvar]} {
-    var-3.3 var-3.4 var-3.4
+    upvar-9.1 upvar-9.2 upvar-9.3 upvar-9.4 upvar-9.5 upvar-9.6 upvar-9.7 
+    var-3.3 var-3.4 var-3.4 
   } {[testgetvarfullname]} {
     var-4.1 var-4.2 var-4.3
   } {[testsetnoerr]} {
@@ -156,6 +192,8 @@ set skipped_tests [dict create \
     execute-3.33 execute-3.37 execute-3.39 execute-3.43 execute-3.45
     execute-3.49 execute-3.51 execute-3.55 execute-3.57 execute-3.61
     execute-3.62 execute-3.65 execute-3.66 execute-3.72 execute-3.74
+  } {[testdstring]} {
+    util-8.2 util-8.4 util-8.5 util-8.6
   } {[teststringobj]} {
     execute-3.4 execute-3.5 execute-3.6 execute-3.10 execute-3.11 execute-3.12
     execute-3.16 execute-3.17 execute-3.18 execute-3.22 execute-3.23
