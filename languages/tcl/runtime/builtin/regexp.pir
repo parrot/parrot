@@ -25,8 +25,6 @@
   select_switches  = get_root_global ['_tcl'], 'select_switches'
   switches = select_switches(options, argv, 1, 1)
 
-  .local pmc select_switches
-
   .local pmc exp, a_string
   
    exp      = shift argv
