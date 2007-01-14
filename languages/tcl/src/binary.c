@@ -267,6 +267,9 @@ PMC *ParTcl_binary_scan(Interp *interp, STRING *BINSTR, STRING *FORMAT)
                                            format, &formatpos, formatlen,
                                            binstr, &binstrpos, binstrlen);
                 break;
+            default:
+                value = NULL;
+                break;
         }
 
         VTABLE_push_pmc(interp, values, value);
