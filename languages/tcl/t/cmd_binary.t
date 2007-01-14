@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 13
+plan 14
 
 eval_is {binary} {wrong # args: should be "binary option ?arg arg ...?"} \
   {binary: no args}
@@ -43,3 +43,6 @@ binary scan [binary format a4a foo bar] a3ca string1 c string2
 is $string1 foo {binary: format a4a, scan a3ca}
 is $c       0   {binary: format a4a, scan a3ca}
 is $string2 b   {binary: format a4a, scan a3ca}
+
+# segfault misc.
+is [proc a {} { binary scan \x80 d joe } ; a] {} {BOOM?}
