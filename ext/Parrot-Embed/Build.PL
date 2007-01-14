@@ -51,7 +51,7 @@ my $builder = $class->new(
 		'ExtUtils::CBuilder' => 0,
 	},
 	add_to_cleanup       => [ 'Parrot-Embed-*' ],
-    include_dirs         => $incp,
+    include_dirs         => [ $incp ],
 	extra_compiler_flags => $cflags,
 	extra_linker_flags   => $lflags,
 );
@@ -110,7 +110,12 @@ sub get_flags_from_parrot_src
 	}
 
 	$vars{Cflags} .= ' -I' . catdir( ($updir) x 2, 'include' );
-	$vars{Libs}   .= " -L$libp";
+    if ($^O =~ /Win32/) {
+    	$vars{Libs}   .= ' ..\..\libparrot.lib';
+    }
+    else {
+    	$vars{Libs}   .= " -L$libp";
+    }
 
 	return @vars{qw( Cflags Libs )};
 }
@@ -120,7 +125,7 @@ sub get_paths
     my $updir    = updir();
     my @lib_dir  = $^O =~ /Win32/ ? () : qw( blib lib );
     my $lib_path = rel2abs( catdir( ($updir) x 2, @lib_dir ) );
-    my $inc_path = rel2abs( catdir( ($updir) x 2, qw( include parrot ) ) );
+    my $inc_path = rel2abs( catdir( ($updir) x 2, qw( include ) ) );
     
     return( $lib_path, $inc_path );
 }
