@@ -60,7 +60,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.5
+0.4.7
 
 =item Location
 
@@ -254,7 +254,7 @@ Generates PIR for basic Ruby programs
 
 =item Last verified with parrot version
 
-0.4.6
+0.4.7: Failed 7/18 test scripts. 27/69 subtests failed.
 
 =item Location
 
@@ -447,7 +447,7 @@ Works and is mostly complete.
 
 =item Last verified with parrot version
 
-0.4.5
+0.4.7
 
 =item Location
 
@@ -489,7 +489,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.5
+0.4.7
 
 =item Location
 
@@ -614,7 +614,7 @@ Development is stalled. Takers are welcome.
 
 =item Last verified with parrot version
 
-0.4.5
+0.4.7
 
 =item Location
 
@@ -786,7 +786,7 @@ Part of languages smoke testing.
 
 =item Last verified with Parrot version
 
-0.4.5
+0.4.7 : Failed 5/27 test scripts. 5/189 subtests failed.
 
 =item Location
 
@@ -817,7 +817,7 @@ builtins.
 
 =item Last verified with Parrot version
 
-0.4.3
+0.4.3 : Failed 4/14 test scripts. 12/51 subtests failed.
 
 =item Location
 
@@ -936,7 +936,7 @@ and logic ops.
 
 =item Last verified with parrot version
 
-0.4.5
+0.4.7
 
 =item Location
 
@@ -1079,7 +1079,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.5
+0.4.7
 
 =item Location
 
@@ -1102,15 +1102,9 @@ A from scratch implementation of a Tcl 8.5 compiler in parrot.
 
 =item Status
 
-Passes over 15% of tcl's (lightly converted) test suite, using a
-Test::More like harness. (Don't run enough of tcl yet to simply
+Passes over 23.5% of tcl's (lightly converted) test suite, using a
+Test::More like harness. (Doesn't run enough of tcl yet to simply
 use tcltest.tcl)
-
-Part of languages smoke testing: running tests this way shows
-failures: to get a better picture:
-
- cd languages/tcl
- make test
 
 =item Last verified with parrot version
 
@@ -1199,7 +1193,7 @@ expected to change soon.
 
 =item Last verified with parrot version
 
-0.4.5
+0.4.7
 
 =item Location
 
