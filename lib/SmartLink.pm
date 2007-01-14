@@ -1,7 +1,6 @@
 package SmartLink;
 use Moose;
 use Moose::Util::TypeConstraints;
-use Text::Balanced qw/extract_multiple extract_quotelike/;
 
 ## links are like
 # L<doc> or L<doc/section> or L<doc/section/keyphrases>
