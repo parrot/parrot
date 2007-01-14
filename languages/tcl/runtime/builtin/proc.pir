@@ -194,20 +194,12 @@ emit_args:
   code .= args_code
   
   # Convert the remaining elements returned by foldup into a TclList
-  # RT#40751: This code lifted from Tcl::&list - eventually factor this out.
   code.emit(<<"END_PIR")
-  unless args goto NO_SLURPY_ARGS
   .local pmc arg_list
   arg_list = new .TclList
-SLURPY_LOOP:
-  unless args goto DONE
-  $P0 = shift args
-  push arg_list, $P0
-  goto SLURPY_LOOP
+  unless args goto NO_SLURPY_ARGS
+  assign arg_list, args
 NO_SLURPY_ARGS:
-  arg_list=new .TclString
-  arg_list=''
-DONE:
   lexpad['args'] = arg_list
 END_PIR
 
