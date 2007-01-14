@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 44;
 
 =head1 NAME
 
@@ -402,6 +402,62 @@ calling foo(f, b)
   Foo::foo
 calling foo(b, f)
   Bar::foo
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', "MMD second arg int/float dispatch");
+.sub foo :multi(_, Integer)
+	.param pmc first
+	.param pmc second
+	print "(_, Int) method:  "
+	print first
+	print ', '
+	print second
+	print "\n"
+.end
+.sub foo :multi(_, Float)
+	.param pmc first
+	.param pmc second
+	print "(_, Float) method:  "
+	print first
+	print ', '
+	print second
+	print "\n"
+.end
+.sub main :main
+	$P0 = new .Float
+	$P0 = 9.5
+	foo(1, $P0)
+	$P1 = new .Integer
+	$P1 = 3
+	foo(1, $P1)
+.end
+CODE
+(_, Float) method:  1, 9.5
+(_, Int) method:  1, 3
+OUT
+
+pir_output_like( <<'CODE', <<'OUT', "MMD single method, dispatch failure");
+## Compare this to the previous example.
+.sub foo :multi(_, Float)
+	.param pmc first
+	.param pmc second
+	print "(_, Float) method:  "
+	print first
+	print ', '
+	print second
+	print "\n"
+.end
+.sub main :main
+	$P0 = new .Float
+	$P0 = 9.5
+	foo(1, $P0)
+	$P1 = new .Integer
+	$P1 = 3
+	foo(1, $P1)
+.end
+CODE
+/\A\(_, Float\) method:  1, 9\.5
+Null PMC access/
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "MMD on argument count" );

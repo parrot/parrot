@@ -896,8 +896,6 @@ PMC *Parrot_mmd_sort_candidate_list(Interp *interp, PMC *candidates)
     n = VTABLE_elements(interp, candidates);
     if (!n)
         return PMCNULL;
-    if (n == 1)
-        return candidates;
 
     arg_tuple  = mmd_arg_tuple_func(interp);
     candidates = VTABLE_clone(interp, candidates);
