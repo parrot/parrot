@@ -1,10 +1,10 @@
 #define PERL_NO_GET_CONTEXT
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/extend.h"
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
 
 #define get_interp( i ) (INT2PTR(Interpreter_struct*, SvIV( SvRV( (SV*)i ) )))->interp
 

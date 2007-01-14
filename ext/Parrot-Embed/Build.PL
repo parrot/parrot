@@ -5,11 +5,10 @@ use Cwd;
 use Module::Build;
 use File::Spec::Functions qw( rel2abs catdir catfile updir path );
 
-diag( cwd() );
 diag( my $in_parrot_tree    = in_parrot_tree() );
 diag( my $dl_env_var        = get_dl_env_var() );
-diag( my ($cflags, $lflags) = get_compiler_flags( $in_parrot_tree ) );
 diag( my ($libp, $incp)     = get_paths() );
+diag( my ($cflags, $lflags) = get_compiler_flags( $in_parrot_tree ) );
 diag( my $parrot            = get_parrot_path( $in_parrot_tree ) );
 
 my $class = Module::Build->subclass(
@@ -33,7 +32,7 @@ my $class = Module::Build->subclass(
         \$ENV{$dl_env_var} = join( ':',
             split( /:/, ( \$ENV{$dl_env_var} || '' ) ), '$libp' )
             if $in_parrot_tree;
-        
+
         \$self->SUPER::ACTION_test( \@_ );
     }
 
@@ -109,13 +108,8 @@ sub get_flags_from_parrot_src
 		$vars{$var}       =  $value;
 	}
 
-	$vars{Cflags} .= ' -I' . catdir( ($updir) x 2, 'include' );
-    if ($^O =~ /Win32/) {
-    	$vars{Libs}   .= ' ..\..\libparrot.lib';
-    }
-    else {
-    	$vars{Libs}   .= " -L$libp";
-    }
+    $vars{Cflags} .= ' -I' . catdir( ($updir) x 2, 'include' );
+    $vars{Libs}   .= $^O =~ /Win32/ ? ' ..\..\libparrot.lib' : " -L$libp";
 
 	return @vars{qw( Cflags Libs )};
 }
@@ -125,8 +119,8 @@ sub get_paths
     my $updir    = updir();
     my @lib_dir  = $^O =~ /Win32/ ? () : qw( blib lib );
     my $lib_path = rel2abs( catdir( ($updir) x 2, @lib_dir ) );
-    my $inc_path = rel2abs( catdir( ($updir) x 2, qw( include ) ) );
-    
+    my $inc_path = rel2abs( catdir( ($updir) x 2, 'include' ) );
+
     return( $lib_path, $inc_path );
 }
 
