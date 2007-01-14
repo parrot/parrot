@@ -1269,6 +1269,13 @@ imcc_init(Parrot_Interp interp)
     register_compilers(interp);
 }
 
+void
+imcc_destroy(Parrot_Interp interp)
+{
+    mem_sys_free(IMCC_INFO(interp));
+    IMCC_INFO(interp) = NULL;
+}
+
 
 /*
  * Local variables:

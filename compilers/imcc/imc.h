@@ -90,8 +90,8 @@ void free_reglist(IMC_Unit *);
  * parser_util.c
  */
 PARROT_API void imcc_init(Parrot_Interp interp);
-int check_op(Interp *, char * fullname, char *op, SymReg *r[],
-  int narg, int keyvec);
+PARROT_API void imcc_destroy(Parrot_Interp interp);
+int check_op(Interp *, char * fullname, char *op, SymReg *r[], int narg, int keyvec);
 int is_op(Interp *, char *);
 char *str_dup(const char *);
 char *str_cat(const char *, const char *);

@@ -335,6 +335,9 @@ Parrot_really_destroy(Interp *interp, int exit_code, void *arg)
      *      many constant PMCs we'll create
      */
 
+    /* destory IMCC compiler */
+    imcc_destroy(interp);
+
     /* Now the PIOData gets also cleared */
     PIO_finish(interp);
 

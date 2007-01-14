@@ -516,7 +516,6 @@ main(int argc, char * argv[])
     Parrot_block_DOD(interp);
     Parrot_block_GC(interp);
 
-    imcc_init(interp);
     IMCC_INFO(interp)->allocator = IMCC_VANILLA_ALLOCATOR;
     sourcefile = parseflags(interp, &argc, &argv);
     output_file = interp->output_file;
@@ -725,7 +724,6 @@ main(int argc, char * argv[])
     /* Clean-up after ourselves */
     Parrot_destroy(interp);
     yylex_destroy(yyscanner);
-    mem_sys_free(IMCC_INFO(interp));
     Parrot_exit(interp, 0);
 
     return 0;
