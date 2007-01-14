@@ -92,7 +92,7 @@ set skipped_tests [dict create \
     regexpComp-6.9 regexpComp-15.6 regexpComp-21.7
   } {Cannot take substr outside string} {
     namespace-14.9 namespace-14.12
-  } {[lsearch -regexp]} {
+  } {[regexp -nocase]} {
     for-3.6
   } {[read]} {
     iocmd-4.1 iocmd-4.2 iocmd-4.3 iocmd-4.4 iocmd-4.5 iocmd-4.6 iocmd-4.7
