@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 5;
 use Parrot::Config;
 use Test::More;
 
@@ -40,34 +40,3 @@ TCL
 1
 OUT
 }
-
-# RT#40629: - many of the classes are NOT tested here, and we rely
-# on the cvs tests from tcl for that.
-
-my %doubles = qw(
-    2.1    1
-    7.0    1
-    7      1
-    1e1    1
-    .1     1
-    no     0
-    .      0
-    +2.    1
-    -2.    1
-);
-
-foreach my $double ( keys %doubles ) {
-    language_output_is( "tcl", <<"TCL", <<"OUT", "string is double: $double" );
-    puts [string is double $double]
-TCL
-$doubles{$double}
-OUT
-
-}
-
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
-# vim: expandtab shiftwidth=4:

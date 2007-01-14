@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 127
+plan 136
 
 # arg checking
 eval_is {string} \
@@ -280,3 +280,15 @@ eval_is {string wordend} \
   {wrong # args: should be "string wordend string index"} \
   {wordend too few args}
 
+# [string is]
+# # RT#40629: - many of the classes are NOT tested here, and we rely
+# on the cvs tests from tcl for that.
+is [string is double 2.1] 1 {string is double}
+is [string is double 7.0] 1 {string is double}
+is [string is double 7]   1 {string is double}
+is [string is double 1e1] 1 {string is double}
+is [string is double .1]  1 {string is double}
+is [string is double no]  0 {string is double}
+is [string is double .]   0 {string is double}
+is [string is double +2.] 1 {string is double}
+is [string is double -2.] 1 {string is double}

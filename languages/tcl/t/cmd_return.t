@@ -1,43 +1,32 @@
 #!perl
 
-use strict;
-use warnings;
-use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
+# the following lines re-execute this as a tcl script
+# the \ at the end of these lines makes them a comment in tcl \
+use lib qw(languages/tcl/lib tcl/lib lib ../lib ../../lib); # \
+use Tcl::Test; #\
+__DATA__
 
-use Parrot::Test tests => 3;
-use Test::More;
+source lib/test_more.tcl
+plan 3
 
-language_output_is( "tcl", <<'TCL', <<OUT, "simple return with value" );
+eval_is {
  proc joe {} {
    set a 10
    return $a
    set a 20
  }
- puts [joe]
-TCL
-10
-OUT
+ joe
+} 10 {simple return with value}
 
-language_output_is( "tcl", <<'TCL', <<OUT, "simple return with no value" );
+eval_is {
  proc joe {} {
    return
- }
- puts [joe]
-TCL
+ }  
+ joe
+} {} {simple return with no value}
 
-OUT
-
-language_output_is( 'tcl', <<'TCL', <<'OUT', '-code error' );
+eval_is {
   proc joe {} { return -code error "bad args" }
   joe
   puts foo
-TCL
-bad args
-OUT
-
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
-# vim: expandtab shiftwidth=4:
+} {bad args} {-code error}
