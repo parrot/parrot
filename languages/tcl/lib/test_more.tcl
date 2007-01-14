@@ -35,8 +35,8 @@ proc is {value expected {description ""} {special {}}}  {
     set type ""
   
     if {[llength $special] == 2} {
-        set type [string tolower [lindex $special 0]]
-        if {$type eq "todo"} {
+        set type [string toupper [lindex $special 0]]
+        if {$type eq "TODO"} {
             global env
             set normal [array get env PARTCL_DEVTEST]
             if {$normal ne {}} {
@@ -44,7 +44,8 @@ proc is {value expected {description ""} {special {}}}  {
                 set special ""
             }
         }
-        set description " - $description # $special"
+        set special_reason [concat {expand}[lindex $special 1]]
+        set description " - $description # $type $special_reason"
     } else {
         if  {$description ne ""} {
             set description " - $description"
