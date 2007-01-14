@@ -194,6 +194,9 @@ tag 'all' is allowed for todo tests that should fail on any system
   sprintf_ok:
 
     if expected == actual goto is_ok
+    description .= ' actual: >'
+    description .= actual
+    description .= '<'
     goto is_nok
 
     # remove /'s
