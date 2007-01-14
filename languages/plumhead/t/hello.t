@@ -18,10 +18,16 @@ use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 # core Perl modules
-use Test::More     tests => 6;
+use Test::More     tests => 7;
 
 # Parrot modules
 use Parrot::Test;
+
+
+language_output_is( 'Plumhead', <<'END_CODE', 'Hello, World!', 'hello' );
+Hello, World!<?php
+?>
+END_CODE
 
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );

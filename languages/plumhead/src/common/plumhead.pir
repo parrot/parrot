@@ -28,6 +28,7 @@ Parser PHP with the Parrot compiler tools.
 .sub '__onload' :load :init
     load_bytecode 'Getopt/Obj.pbc'
     load_bytecode 'PGE.pbc'
+    load_bytecode 'PGE/Dumper.pbc'
     load_bytecode 'PGE/Text.pbc'
     load_bytecode 'PGE/Util.pbc'
     load_bytecode 'Parrot/HLLCompiler.pbc'
@@ -90,7 +91,9 @@ VARIANT_PHC:
 VARIANT_PARTRIDGE:
     err_msg = 'Compiling and executing with partridge failed'
     $P0 = compreg 'Plumhead'
-    .return $P0.'evalfiles'(php_source_fn)
+
+    #.return $P0.'evalfiles'(php_source_fn, 'target' => 'past' )
+    .return $P0.'evalfiles'( php_source_fn )
 
 VARIANT_ANTLR3:
     err_msg = 'Generating PAST from annotated PHP source failed'
