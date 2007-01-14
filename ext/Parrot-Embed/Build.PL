@@ -6,9 +6,11 @@ use Module::Build;
 use File::Spec::Functions qw( rel2abs catdir catfile updir path );
 
 diag( cwd() );
-diag( my $in_parrot_tree           = in_parrot_tree() );
-diag( my ($cflags, $lflags, $libp) = get_compiler_flags( $in_parrot_tree ) );
-diag( my $parrot                   = get_parrot_path( $in_parrot_tree ) );
+diag( my $in_parrot_tree    = in_parrot_tree() );
+diag( my $dl_env_var        = get_dl_env_var() );
+diag( my ($cflags, $lflags) = get_compiler_flags( $in_parrot_tree ) );
+diag( my ($libp, $incp)     = get_paths() );
+diag( my $parrot            = get_parrot_path( $in_parrot_tree ) );
 
 my $class = Module::Build->subclass(
 	code => <<"END_HERE",
@@ -28,8 +30,8 @@ my $class = Module::Build->subclass(
     sub ACTION_test
     {
         my \$self = shift;
-        \$ENV{LD_LIBRARY_PATH} = join( ':',
-            split( /:/, \$ENV{LD_LIBRARY_PATH} ), '$libp' )
+        \$ENV{$dl_env_var} = join( ':',
+            split( /:/, ( \$ENV{$dl_env_var} || '' ) ), '$libp' )
             if $in_parrot_tree;
         
         \$self->SUPER::ACTION_test( \@_ );
@@ -48,7 +50,8 @@ my $builder = $class->new(
 		'Test::More'         => 0,
 		'ExtUtils::CBuilder' => 0,
 	},
-	add_to_cleanup      => [ 'Parrot-Embed-*' ],
+	add_to_cleanup       => [ 'Parrot-Embed-*' ],
+    include_dirs         => $incp,
 	extra_compiler_flags => $cflags,
 	extra_linker_flags   => $lflags,
 );
@@ -59,6 +62,13 @@ sub in_parrot_tree
 {
 	my $cwd     = cwd();
 	return $cwd =~ /\bext\b.Parrot/;
+}
+
+sub get_dl_env_var
+{
+    return 'DYLD_LIBRARY_PATH' if $^O =~ /darwin/;
+    return 'PATH'              if $^O =~ /Win32/;
+    return 'LD_LIBRARY_PATH';
 }
 
 sub get_compiler_flags
@@ -98,12 +108,21 @@ sub get_flags_from_parrot_src
 		$value            =~ s/\${(\w+)}/$vars{$1}/g;
 		$vars{$var}       =  $value;
 	}
-	my $libp       = rel2abs( catdir( ($updir) x 2, qw( blib lib ) ) );
 
 	$vars{Cflags} .= ' -I' . catdir( ($updir) x 2, 'include' );
 	$vars{Libs}   .= " -L$libp";
 
-	return @vars{qw( Cflags Libs )}, $libp;
+	return @vars{qw( Cflags Libs )};
+}
+
+sub get_paths
+{
+    my $updir    = updir();
+    my @lib_dir  = $^O =~ /Win32/ ? () : qw( blib lib );
+    my $lib_path = rel2abs( catdir( ($updir) x 2, @lib_dir ) );
+    my $inc_path = rel2abs( catdir( ($updir) x 2, qw( include parrot ) ) );
+    
+    return( $lib_path, $inc_path );
 }
 
 sub get_parrot_path
