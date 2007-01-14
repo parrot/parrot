@@ -329,13 +329,13 @@ Parrot_really_destroy(Interp *interp, int exit_code, void *arg)
 
     /*
      * that doesn't get rid of constant PMCs like these in vtable->data
-     * so if such a PMC needs destroy, we got a memory leak, like for
+     * so if such a PMC needs destroying, we get a memory leak, like for
      * the SharedRef PMC
      * TODO sweep constants too or special treatment - depends on how
      *      many constant PMCs we'll create
      */
 
-    /* destory IMCC compiler */
+    /* destroy IMCC compiler */
     imcc_destroy(interp);
 
     /* Now the PIOData gets also cleared */
@@ -430,6 +430,8 @@ Parrot_really_destroy(Interp *interp, int exit_code, void *arg)
     /* strings, charsets, encodings - only once */
     string_deinit(interp);
     if (!interp->parent_interpreter) {
+        if (interp->thread_data)
+            mem_sys_free(interp->thread_data);
         MUTEX_DESTROY(interpreter_array_mutex);
         mem_sys_free(interp);
         /*
