@@ -1,5 +1,25 @@
 # $Id$
 
+New in 0.4.8
+
+- Compilers:
+   + HLLCompiler: added tracing options, modified api
+- PAST:
+   + added global and lexical variable support
+   + added looping constructs, arrays, hashes
+- Languages:
+   + Updated PHP ("Plumhead"), Tcl ("ParTcl"),
+     forth, perl6, lua, abc, APL, WMLScript
+   + ParTcl is passing > 23.5% of Tcl cvs-latest test suite
+- Design:
+   + PDD01 "Overview" - updated
+- Test Suite:
+   + Converted Perl 5 Regex tests to PIR, with notable speedup
+   + Added tests for opcodes, compilers, languages, and coding standards
+- Misc:
+   + many bugfixes, enhancements, and coding standard updates
+   + extended support for non-core platforms
+
 New in 0.4.7
 
 - New languages: PHP ("Plumhead"), Forth
