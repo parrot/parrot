@@ -20,13 +20,15 @@ tests sources, executes all the tests.
 
 The test source is a plain text file divided in three columns. The 
 columns are separated by three white spaces C<\s{3,}> or at least one
-tab C<\t+>. The three collumns are:
+tab C<\t+>. The three columns are:
 
 =over 4
 
 =item B<expression>
 
 The exact expression that is passed to the abc compiler as source code.
+This input is pasted as a double quotes delimted string into PIR code.
+This means that you can use \n to indicate newlines. 
 
 =item B<expected>
 

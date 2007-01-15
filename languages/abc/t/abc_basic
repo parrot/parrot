@@ -81,6 +81,9 @@
 1+1*1;2+2*2             2\n6\n          additive and mul expression with semicolons
 3-3/3;4+4%4; 5-5+5      2\n4\n5\n       minus, mul, plus, mod expression
 
+# newlines
+1\n1+1\n1+1+1           1\n2\n3         newlines 
+
 # named expressions
 a                       0\n             uninitialized a
 a;b;c                   0\n0\n0\n       more uninitialized vars
