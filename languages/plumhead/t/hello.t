@@ -29,6 +29,14 @@ Hello, World!<?php
 ?>
 END_CODE
 
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
+Hello, World!
+<?php
+?>
+END_CODE
+Hello, World!
+END_EXPECTED
+
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
 <?php

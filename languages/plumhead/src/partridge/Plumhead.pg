@@ -7,6 +7,6 @@ grammar Plumhead::Grammar;
 
 token TOP     { <program> }
 
-token sea     { \" <-["]>* \" }
+token sea     { <-["]>* }
 
-rule  program { ^ <sea> \< \? php }
+rule  program { ^ \" <sea> \" \< \? php }

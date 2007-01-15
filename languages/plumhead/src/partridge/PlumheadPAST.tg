@@ -38,6 +38,9 @@ transform past (ABC::Grammar::sea) :language('PIR') {
     past_val = new 'PAST::Val'                             
     .local string val
     val = node
+    .local pmc code_string
+    code_string = new 'PGE::CodeString'
+    ( val ) = code_string.'escape'( val )
     past_val.'init'( 'name' => val, 'vtype' => '.Undef' )                              
     .local pmc past                                                  
     past = new 'PAST::Op'
