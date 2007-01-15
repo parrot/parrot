@@ -78,8 +78,10 @@ token expand {
     | \{\*\}<!before:\s>
 }
 
-# this is so we can use <variable_substitution> in [subst]
-token variable { <variable_substitution> }
+# this is so we can use these rules in [subst]
+token subst_backslash { <backslash_substitution> }
+token subst_command   { <command_substitution> }
+token subst_variable  { <variable_substitution> }
 
 # Actual [expr] items
 

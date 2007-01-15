@@ -60,12 +60,20 @@ next:
 
 command:
     if nocommands goto next
-    # ...
-    goto next
+    parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'subst_command'
+    goto subst
 
 variable:
     if novariables goto next
-    parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'variable'
+    parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'subst_variable'
+    goto subst
+
+backslash:
+    if nobackslashes goto next
+    parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'subst_backslash'
+    goto subst
+
+subst:
     match = parse(str, 'pos'=>pos, 'grammar'=>'TclExpr::Grammar')
 
     .local pmc astbuilder, ast
@@ -106,11 +114,6 @@ variable:
     $I0 -= $I1
     pos += $I0
     len += $I0
-    goto next
-
-backslash:
-    if nobackslashes goto next
-    # ...
     goto next
 
 done:
