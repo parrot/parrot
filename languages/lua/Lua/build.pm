@@ -1017,9 +1017,10 @@ sub BuildForList {
     }
     my $state = new_tmp( $parser, 'pmc' );
     push @opcodes1, new LocalDir( $parser, 'result' => $state, );
-    if (    scalar( @{$exprs} ) == 0
-        and scalar( @{ $expr->[1] } ) != 0
-        and $expr->[1]->[-1]->isa('CallOp') )
+    if (   !defined( $expr )
+        or (    scalar( @{$exprs} ) == 0
+            and scalar( @{ $expr->[1] } ) != 0
+            and $expr->[1]->[-1]->isa('CallOp') ) )
     {
         push @opcodes1, new AssignOp(
             $parser,
@@ -1039,9 +1040,10 @@ sub BuildForList {
     }
     my $var = new_tmp( $parser, 'pmc' );
     push @opcodes1, new LocalDir( $parser, 'result' => $var, );
-    if (    scalar( @{$exprs} ) == 0
-        and scalar( @{ $expr->[1] } ) != 0
-        and $expr->[1]->[-1]->isa('CallOp') )
+    if (   !defined( $expr )
+        or (    scalar( @{$exprs} ) == 0
+            and scalar( @{ $expr->[1] } ) != 0
+            and $expr->[1]->[-1]->isa('CallOp') ) )
     {
         push @opcodes1, new AssignOp(
             $parser,
@@ -1059,7 +1061,8 @@ sub BuildForList {
         );
         $expr = shift @{$exprs};
     }
-    if (    scalar( @{$exprs} ) == 0
+    if (    defined( $expr )
+        and scalar( @{$exprs} ) == 0
         and scalar( @{ $expr->[1] } ) != 0
         and $expr->[1]->[-1]->isa('CallOp') )
     {
