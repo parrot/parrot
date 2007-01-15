@@ -190,7 +190,7 @@ main(int argc, char *argv[])
         yyparse(yyscanner, (void *) interp);
         imc_compile_all_units(interp);
 
-        imc_cleanup(interp);
+        imc_cleanup(interp, &yyscanner );
 
         fclose(imc_yyin_get(yyscanner));
         PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
