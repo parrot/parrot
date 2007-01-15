@@ -163,3 +163,4 @@ a;a=1;1;--a;a           0\n1\n0\n0\n    decrement test
 "basic calculator"      basic calculator   string
 "123456789"             123456789          string with digits only
 "abc 123456789"         abc 123456789      string with digits and letters
+"first\nsecond"         first\nsecond      string with a newline

@@ -51,6 +51,9 @@ transform past (ABC::Grammar::statement) :language('PIR') {
     $P0 = node['string']
     .local string val
     val = $P0
+    .local pmc code
+    code = new 'PGE::CodeString'
+    ( val ) = code.'escape'( val )
     .local pmc vpast
     vpast = new 'PAST::Val'
     vpast.init( 'name' => val, 'vtype' => '.Undef' )

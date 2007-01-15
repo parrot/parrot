@@ -16,7 +16,7 @@ token term {
 
 ## Standalone strings do not handle backslashed caracters.
 ## However, when a string is passed to 'print', special chars are handled.
-token string { \" <-["]>* \" }
+token string { <-["]>* }
 
 ## 'print' is a GNU extension to bc
 ## backslashed characters are ignored for now
@@ -35,7 +35,7 @@ rule statement {
     | <while_statement>
     | <for_statement>
     | <compound_statement>
-    | <string>
+    | \" <string> \"
     | break
     | continue
     | halt

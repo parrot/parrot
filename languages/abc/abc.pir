@@ -27,6 +27,7 @@ and registers the "compile" subroutine as the "ABC" compiler.
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Text.pbc'
     load_bytecode 'PGE/Util.pbc'
+    load_bytecode 'PGE/Dumper.pbc'
     load_bytecode 'Parrot/HLLCompiler.pbc'
     load_bytecode 'PAST-pm.pbc'
 
