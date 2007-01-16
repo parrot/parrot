@@ -25,15 +25,21 @@
   select_switches  = get_root_global ['_tcl'], 'select_switches'
   switches = select_switches(options, argv, 1, 1)
 
-  .local pmc exp, a_string
-  
+  .local string exp, a_string, original_string
    exp      = shift argv
    a_string = shift argv
+   original_string = a_string
 
    .local pmc tclARE, rule, match
 
    # RT#40774: use tcl-regexps
    tclARE = compreg 'PGE::P5Regex'
+   $I0 = exists switches['nocase']
+   unless $I0 goto ready
+   exp      = downcase exp
+   a_string = downcase a_string
+
+ready:
    rule = tclARE(exp)
    match = rule(a_string)
 
@@ -50,8 +56,13 @@
 
    $I0 = exists switches['indices']
    if $I0 goto matches_ind
-   
-   matchStr = match 
+  
+   # Do this in case there was a -nocase
+   $I0 = match.'from'()
+   $I1 = match.'to'()
+   $I1 -= $I0
+   matchStr = substr original_string, $I0, $I1
+ 
    __set(matchVar, matchStr)
 
    matches = match.'get_array'()
@@ -68,7 +79,10 @@ subMatches:
    unless $I0 goto set_it
    $P0 = shift matches
    if_null $P0, set_it
-   subMatchStr = $P0
+   $I0 = $P0.'from'()
+   $I1 = $P0.'to'()
+   $I1 -= $I0
+   subMatchStr = substr original_string, $I0, $I1
  
 set_it:
    __set(subMatchVar,subMatchStr) 

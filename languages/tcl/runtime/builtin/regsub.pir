@@ -8,7 +8,7 @@
   argc = elements argv 
   if argc < 3 goto badargs
 
-  .local string expression, target, subSpec
+  .local string expression, target, subSpec, original_target
  
   .local pmc options
   options = new .ResizablePMCArray
@@ -26,11 +26,17 @@
 
   expression = shift argv
   target     = shift argv
+  original_target = target
   subSpec    = shift argv
  
   .local pmc tclARE # RT#40774: for now, just use P5 regexen
   tclARE = compreg 'PGE::P5Regex'
+  $I0 = exists switches['nocase']
+  unless $I0 goto ready
+  expression = downcase expression
+  target = downcase target
 
+ready:
   .local pmc rule,match 
   rule = tclARE(expression)
   match = rule(target)
@@ -67,7 +73,10 @@ emit_escaped_char:
   goto emit_char
 
 emit_0:
-  $S0 = match
+  $I0 = match.'from'()
+  $I1 = match.'to'()
+  $I1 -= $I0
+  $S0 = substr original_target, $I0, $I1
   replStr .= $S0
   inc pos 
   goto loop
@@ -82,15 +91,18 @@ handle_bs:
   if char >  57 goto emit_escaped_char
   # handle \1 - \9
   char -= 49 # we're now an int from 0 to 8 (\1 -> 0, etc.)
-  $S0 = matches[char]
+  $P0 = matches[char]
+  $I0 = $P0.'from'()
+  $I1 = $P0.'to'()
+  $I1 -= $I0
+  $S0 = substr original_target, $I0, $I1
   replStr .= $S0
   inc pos
   goto loop
 
 loop_done:
 
- 
-  substr target, from, match_len, replStr
+  substr original_target, from, match_len, replStr
 
   argc = elements argv
   unless argc goto return_it
@@ -98,13 +110,13 @@ loop_done:
   __set = get_root_global [ '_tcl' ], '__set'
   .local string varName
   varName = shift argv
-  __set (varName, target)
+  __set (varName, original_target)
   
   .return(1)  # XXX fix this when we support multiple replacements
 
 return_it:
 match_failed:
-  .return (target)
+  .return (original_target)
 
 badargs:
   tcl_error 'wrong # args: should be "regsub ?switches? exp string subSpec ?varName?"'
