@@ -11,7 +11,7 @@ New in 0.4.8
 - Languages:
    + Updated PHP ("Plumhead"), Tcl ("ParTcl"),
      forth, perl6, lua, abc, APL, WMLScript, punie
-   + ParTcl is passing > 23.5% of Tcl cvs-latest test suite
+   + ParTcl is passing > 24.9% of Tcl cvs-latest test suite
 - Design:
    + PDD01 "Overview" - updated
    + PDD22 "I/O" - rewritten and approved
