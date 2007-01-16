@@ -656,6 +656,7 @@ bad_args:
   push options, 'false'
   push options, 'graph'
   push options, 'integer'
+  push options, 'list'
   push options, 'lower'
   push options, 'print'
   push options, 'punct'
@@ -681,6 +682,7 @@ bad_args:
   if class == 'false' goto false_check
   if class == 'graph' goto graph_check
   if class == 'integer' goto integer_check
+  if class == 'list' goto list_check
   if class == 'lower' goto lower_check
   if class == 'print' goto print_check
   if class == 'punct' goto punct_check
@@ -751,6 +753,12 @@ integer_check:
   $I0 = typeof $P2
   if $I0 == .TclInt goto yep
   goto nope
+list_check:
+  $P1 = get_root_global ['_tcl'], '__list'
+  push_eh nope
+    $P1(the_string)
+  clear_eh
+  goto yep
 lower_check:
   the_cclass = .CCLASS_LOWERCASE
   goto cclass_check
