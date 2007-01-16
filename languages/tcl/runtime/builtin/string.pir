@@ -828,18 +828,21 @@ bad_args:
   argc = argv
   if argc > 4 goto bad_args
   if argc < 3 goto bad_args
-  
-  $S1 = argv[0]
+
+  .local string low_s, high_s, the_string
+  .local int string_len
+ 
+  the_string = argv[0]
+  string_len = length the_string
   $S4 = ''
          
-  $S2 = argv[1]
-  low = __index($S2, $S1)
+  low_s = argv[1]
+  low = __index(low_s, the_string)
 
-  $I1 = length $S2
-  if low > $I1 goto replace_done
+  if low >= string_len goto replace_done
 
-  $S3 = argv[2]
-  high = __index($S3, $S1)
+  high_s = argv[2]
+  high = __index(high_s, the_string)
 
   if high < low goto replace_done
 
@@ -847,7 +850,7 @@ bad_args:
   low = 0
 
 low_ok:
-  len = length $S1
+  len = length the_string
   if high <= len goto high_ok
   high = len
 
@@ -858,10 +861,10 @@ high_ok:
 replace_do:
   len = high - low
   len += 1
-  substr $S1, low, len, $S4         
+  substr the_string, low, len, $S4         
 
 replace_done:   
-  .return($S1)
+  .return(the_string)
 
 bad_args:
   tcl_error 'wrong # args: should be "string replace string first last ?string?"'
