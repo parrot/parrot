@@ -35,7 +35,7 @@ To prepare a release:
 
         f.  Run "perl t/harness t/distro/*.t", and either fix what those tests
             complain about, or fix them so they don't complain.
-   
+
         g.  Update PBC_COMPAT, perhaps by collapsing intra-release entries
             into a single entry naming the release.
 
@@ -61,7 +61,7 @@ To prepare a release:
 
     6.  Make sure everything works:
 
-          $ perl Configure.pl 
+          $ perl Configure.pl
           $ make world
           $ make fulltest
 
