@@ -1,4 +1,4 @@
-#!./parrot
+#!./parrot -G
 # Copyright (C) 2006, The Perl Foundation.
 
 =head1 NAME
