@@ -131,6 +131,9 @@ env_loop_done:
   $S1 = config['osname']
   $P1['os'] = $S1
 
+  $S1 = config['cpuarch'] # XXX first approximation
+  $P1['machine'] = $S1
+ 
   # Set default precision.
   $P1 = new 'TclInt'
   $P1 = 0
