@@ -11,6 +11,8 @@ set skipped_tests [dict create \
     stringComp-5.14 stringComp-5.15 stringComp-5.16 stringComp-9.7
   } {[exec]} {
     subst-5.8 subst-5.9 subst-5.10
+  } {[subst]} {
+    parse-18.9 parse-18.12
   } {[trace]} {
     append-7.1 append-7.2 append-7.3 append-7.4 append-7.5
     appendComp-7.1 appendComp-7.2 appendComp-7.3 appendComp-7.4 appendComp-7.5
