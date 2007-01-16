@@ -9,6 +9,8 @@ set skipped_tests [dict create \
   {[binary]} {
     string-5.14 string-5.15 string-5.16 string-12.21
     stringComp-5.14 stringComp-5.15 stringComp-5.16 stringComp-9.7
+  } {[exec]} {
+    subst-5.8 subst-5.9 subst-5.10
   } {[trace]} {
     append-7.1 append-7.2 append-7.3 append-7.4 append-7.5
     appendComp-7.1 appendComp-7.2 appendComp-7.3 appendComp-7.4 appendComp-7.5
@@ -37,6 +39,8 @@ set skipped_tests [dict create \
     switch-4.1 switch-4.5
     while-4.3
     while-old-4.6
+  } {RT# 39768} {
+    subst-5.7
   } {[interp]} {
     basic-11.1 basic-12.1 basic-12.2 basic-13.1 basic-13.2 basic-24.1
     basic-1.1 basic-10.1 basic-36.1          
@@ -193,7 +197,7 @@ set skipped_tests [dict create \
     execute-3.49 execute-3.51 execute-3.55 execute-3.57 execute-3.61
     execute-3.62 execute-3.65 execute-3.66 execute-3.72 execute-3.74
   } {[testdstring]} {
-    util-8.2 util-8.4 util-8.5 util-8.6
+    util-8.2 util-8.3 util-8.4 util-8.5 util-8.6
   } {[teststringobj]} {
     execute-3.4 execute-3.5 execute-3.6 execute-3.10 execute-3.11 execute-3.12
     execute-3.16 execute-3.17 execute-3.18 execute-3.22 execute-3.23
@@ -215,39 +219,8 @@ set skipped_tests [dict create \
     expr-23.43 expr-23.44 expr-23.47 expr-23.48 expr-24.10
     expr-old-32.39 expr-old-32.40 expr-old-36.11 expr-old-36.14 expr-old-34.15
     expr-old-34.16
-  } {ICU} {
-    binary-22.3 binary-22.4 binary-22.5 binary-22.11 binary-23.3 binary-23.4
-    binary-23.11 binary-24.2 binary-24.3 binary-24.4 binary-24.6 binary-24.10
-    binary-25.2 binary-25.3 binary-25.4 binary-25.6 binary-25.10 binary-26.2
-    binary-26.3 binary-26.4 binary-26.5 binary-26.6 binary-26.7 binary-26.10
-    binary-27.2 binary-27.3 binary-27.4 binary-27.5 binary-27.6 binary-27.9
-    binary-28.2 binary-28.3 binary-28.4 binary-28.5 binary-28.6 binary-28.9
-    binary-29.2 binary-29.3 binary-29.4 binary-29.5 binary-29.6 binary-29.9
-    binary-30.2 binary-30.3 binary-30.4 binary-30.5 binary-30.6 binary-30.9
-    binary-31.2 binary-31.3 binary-31.4 binary-31.5 binary-31.6 binary-31.7
-    binary-31.8 binary-31.9 binary-31.10 binary-31.11 binary-31.13 binary-31.14
-    binary-31.15 binary-32.2 binary-32.3 binary-32.4 binary-32.5 binary-32.6
-    binary-32.7 binary-32.8 binary-32.9 binary-32.10 binary-32.11 binary-32.13
-    binary-32.14 binary-32.15 binary-39.1 binary-39.2 binary-39.3 binary-39.4
-    binary-39.5 binary-41.5 binary-41.6 binary-41.7 binary-41.8 binary-46.5
-    binary-54.2 binary-54.3 binary-54.4 binary-54.5 binary-54.6 binary-54.9
-    binary-55.2 binary-55.3 binary-55.4 binary-55.5 binary-55.6 binary-55.9
-    binary-56.2 binary-56.3 binary-56.4 binary-56.5 binary-56.6 binary-56.9
-    binary-57.2 binary-57.3 binary-57.4 binary-57.5 binary-57.6 binary-57.9
-    binary-58.2 binary-58.3 binary-58.4 binary-58.5 binary-58.6 binary-58.7
-    binary-58.8 binary-58.9 binary-58.10 binary-58.11 binary-58.13 binary-58.14
-    binary-58.15 binary-59.2 binary-59.3 binary-59.4 binary-59.5 binary-59.6
-    binary-59.7 binary-59.8 binary-59.9 binary-59.10 binary-59.11 binary-59.13
-    binary-59.14 binary-59.15 cmdIL-4.24 cmdIL-4.25 expr-8.13 parseOld-7.12
-    scan-7.6 scan-7.7
-    subst-3.2
-    string-2.12 string-2.31 string-3.4 string-6.19 string-6.83 string-6.84
-    string-6.85 string-6.88 string-6.109 string-8.3 string-10.13 string-11.33
-    string-12.20 string-15.10 string-16.10 string-17.6 string-17.7 string-18.11
-    string-21.10 string-21.11 string-21.12 string-21.13 string-22.11
-    stringComp-2.12 stringComp-2.31 stringComp-3.4
-    stringComp-8.3 stringComp-11.33
-    util-4.6 util-5.7 util-5.18 util-5.42 util-5.43 util-8.3
+  } {[bytestring]} {
+    parseOld-7.12 parseOld-7.13 parseOld-7.14 
   } ]
 
 # Tests after which there is code (in or out of a test) which causes either
