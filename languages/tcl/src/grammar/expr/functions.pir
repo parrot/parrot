@@ -49,7 +49,10 @@ is_string:
     push_eh is_string
       a = __number(a)
     clear_eh
-    
+   
+    if a < -1 goto domain_error
+    if a >  1 goto domain_error
+ 
     .local pmc ret
     ret = new "TclFloat"
     $N0 = a
@@ -62,6 +65,14 @@ is_string:
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
     tcl_error $S0
+
+domain_error:
+    $P0 = new .TclList
+    $P0[0] = 'ARITH'
+    $P0[1] = 'DOMAIN'
+    $S0 = 'domain error: argument not in valid range'
+    $P0[2] = $S0
+    tcl_error $S0, $P0
 .end
 
 .sub '&asin'
@@ -73,6 +84,9 @@ is_string:
     push_eh is_string
       a = __number(a)
     clear_eh
+
+    if a < -1 goto domain_error
+    if a >  1 goto domain_error
     
     .local pmc ret
     ret = new "TclFloat"
@@ -86,6 +100,14 @@ is_string:
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
     tcl_error $S0
+
+domain_error:
+    $P0 = new .TclList
+    $P0[0] = 'ARITH'
+    $P0[1] = 'DOMAIN'
+    $S0 = 'domain error: argument not in valid range'
+    $P0[2] = $S0
+    tcl_error $S0, $P0
 .end
 
 .sub '&atan'
@@ -336,7 +358,12 @@ is_string:
     .return (ret)
 
 domain_error:
-    tcl_error 'domain error: argument not in valid range'
+    $P0 = new .TclList
+    $P0[0] = 'ARITH'
+    $P0[1] = 'DOMAIN'
+    $S0 = 'domain error: argument not in valid range'
+    $P0[2] = $S0
+    tcl_error $S0, $P0
 
 is_string:
     $S0 = a
@@ -365,7 +392,12 @@ is_string:
     .return (ret)
 
 domain_error:
-    tcl_error 'domain error: argument not in valid range'
+    $P0 = new .TclList
+    $P0[0] = 'ARITH'
+    $P0[1] = 'DOMAIN'
+    $S0 = 'domain error: argument not in valid range'
+    $P0[2] = $S0
+    tcl_error $S0, $P0
 
 is_string:
     $S0 = a
@@ -499,7 +531,12 @@ is_string:
     .return (ret)
 
 domain_error:
-    tcl_error 'domain error: argument not in valid range'
+    $P0 = new .TclList
+    $P0[0] = 'ARITH'
+    $P0[1] = 'DOMAIN'
+    $S0 = 'domain error: argument not in valid range'
+    $P0[2] = $S0
+    tcl_error $S0, $P0
 
 is_string:
     $S0 = a
@@ -630,7 +667,12 @@ is_string:
     .return (ret)
 
  domain_error:
-    tcl_error 'domain error: argument not in valid range'
+    $P0 = new .TclList
+    $P0[0] = 'ARITH'
+    $P0[1] = 'DOMAIN'
+    $S0 = 'domain error: argument not in valid range'
+    $P0[2] = $S0
+    tcl_error $S0, $P0
 
 is_string:
     tcl_error "argument to math function didn't have numeric value"
