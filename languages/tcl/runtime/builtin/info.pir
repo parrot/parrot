@@ -358,6 +358,38 @@ bad_args:
 
 .end
 
+.sub 'patchlevel'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+
+  if argc != 0 goto bad_args
+
+  $P1 = get_root_global ['tcl'], '$tcl_patchLevel'
+  .return($P1)
+
+bad_args:
+  tcl_error 'wrong # args: should be "info patchlevel"'
+
+.end
+
+.sub 'library'
+  .param pmc argv
+
+  .local int argc
+  argc = elements argv
+
+  if argc != 0 goto bad_args
+
+  $P1 = get_root_global ['tcl'], '$tcl_library'
+  .return($P1)
+
+bad_args:
+  tcl_error 'wrong # args: should be "info library"'
+
+.end
+
 .sub 'vars'
   .param pmc argv
 

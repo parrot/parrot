@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 46
+plan 50
 
 eval_is {info} \
   {wrong # args: should be "info option ?arg arg ...?"} \
@@ -110,7 +110,19 @@ eval_is {info tclversion v} \
   {wrong # args: should be "info tclversion"} \
   {info tclversion too many args}
 
-is [expr [info tclversion] == [set tcl_version]] 1 {info tclversion}
+is [expr {[info tclversion]} eq {[set tcl_version]}] 1 {info tclversion}
+
+eval_is {info patchlevel v} \
+  {wrong # args: should be "info patchlevel"} \
+  {info patchlevel too many args}
+
+is [expr {[info patchlevel]} eq {[set tcl_patchLevel]}] 1 {info patchlevel}
+
+eval_is {info library v} \
+  {wrong # args: should be "info library"} \
+  {info library too many args}
+
+is [expr {[info library]} eq {[set tcl_library]}] 1 {info library}
 
 eval_is {info commands a b} \
   {wrong # args: should be "info commands ?pattern?"} \
