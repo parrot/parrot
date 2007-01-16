@@ -54,9 +54,10 @@ sub get_version {
 }
 
 sub update_fp {
+    my (@args) = @_;
     my $fp = get_fp;
     my ( $major, $minor ) = get_version;
-    for my $f (@ARGV) {
+    for my $f (@args) {
         open F, "+<", "$f" or die "Can't open $f: $!";
         seek F, 2, 0;    # pos 2: major, minor
         print F pack "cc", $major, $minor;
@@ -86,8 +87,10 @@ sub main {
     my ( $result, $upd_fp );
     $result = GetOptions( "update-fingerprint" => \$upd_fp, );
 
+    my (@args) = $^O eq 'MSWin32' ? <@ARGV> : @ARGV;
+
     $upd_fp and do {
-        update_fp;
+        update_fp(@args);
         exit;
     };
 
