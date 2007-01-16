@@ -4,21 +4,25 @@ New in 0.4.8
 
 - Compilers:
    + HLLCompiler: added tracing options, modified api
+   + PGE & TGE bugfixes and updates
 - PAST:
    + added global and lexical variable support
    + added looping constructs, arrays, hashes
 - Languages:
    + Updated PHP ("Plumhead"), Tcl ("ParTcl"),
-     forth, perl6, lua, abc, APL, WMLScript
+     forth, perl6, lua, abc, APL, WMLScript, punie
    + ParTcl is passing > 23.5% of Tcl cvs-latest test suite
 - Design:
    + PDD01 "Overview" - updated
+   + PDD22 "I/O" - rewritten and approved
 - Test Suite:
    + Converted Perl 5 Regex tests to PIR, with notable speedup
    + Added tests for opcodes, compilers, languages, and coding standards
+- Build:
+   + Major improvements in test coverage for 'pmc2c.pl'
 - Misc:
    + many bugfixes, enhancements, and coding standard updates
-   + extended support for non-core platforms
+   + extended support for non-core platforms including Cygwin, Tru64
 
 New in 0.4.7
 
