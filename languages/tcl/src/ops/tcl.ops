@@ -72,7 +72,7 @@ Generate a TCL_ERROR with $1 as the value, and set $errorCode to $2
 
 =item B<tcl_error>(in INT, in PMC)
 
-Generate a $1 with $2 as the value. 
+Generate a $1 with $2 as the value.
 
 =cut
 
