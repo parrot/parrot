@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -34,9 +34,9 @@ This is the B<highest> priority.
 
 =back
 
-=head1 CURRENT RELEASE (0.4.7)
+=head1 CURRENT RELEASE (0.4.8)
 
-Parrot 0.4.7 was released on November 14th, 2006. For a list of new and fixed
+Parrot 0.4.8 was released on January 16th, 2007. For a list of new and fixed
 feature see L<NEWS>.
 
 =head1 OVERVIEW

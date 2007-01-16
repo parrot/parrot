@@ -14,7 +14,7 @@ Parrot history in brief...
 
 =head1 THE KEEPERS OF THE PUMPKIN
 
-Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg.
+Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg, Jerry Gay.
 
 =head2 PUMPKIN?
 
@@ -85,4 +85,5 @@ the strings?).
  Chip    0.4.6          2006-Aug-08     n/a
          0.4.7          2006-Nov-14     "Caique"
 
+ Jerry   0.4.8          2007-Jan-16     "Eponymous"
 =cut
