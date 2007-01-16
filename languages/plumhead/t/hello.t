@@ -18,23 +18,44 @@ use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 # core Perl modules
-use Test::More     tests => 7;
+use Test::More     tests => 10;
 
 # Parrot modules
 use Parrot::Test;
 
 
-language_output_is( 'Plumhead', <<'END_CODE', 'Hello, World!', 'hello' );
+language_output_is( 'Plumhead', <<'END_CODE', 'Hello, World!', 'sea without newline' );
 Hello, World!<?php
 ?>
 END_CODE
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'sea with one newline' );
 Hello, World!
 <?php
 ?>
 END_CODE
 Hello, World!
+END_EXPECTED
+
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'sea with two newlines' );
+Hello,
+World!
+<?php
+?>
+END_CODE
+Hello,
+World!
+END_EXPECTED
+
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'sea without following PHP code' );
+Hello,
+World!
+END_CODE
+Hello,
+World!
 END_EXPECTED
 
 

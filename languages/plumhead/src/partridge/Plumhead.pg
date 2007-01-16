@@ -5,8 +5,24 @@ grammar Plumhead::Grammar;
 # a PHP grammar
 # derived from on languages/abc/abc.pg
 
-token TOP     { <program> }
+token TOP         { <program> }
 
-token sea     { <-["]>* }
+token sea         { <-["]>* }
 
-rule  program { ^ \" <sea> \" \< \? php }
+token string      { " <-["]>* " }
+
+token start_code  { \< \? p h p }
+
+token end_code    { \? \> }
+
+token echo        { echo }
+
+token ws          { \s* }
+
+rule  statement   { <echo> }
+
+rule  program     { ^\"<sea>\"<code>? }
+
+rule  code        { <start_code> <statement>? <end_code> }
+
+rule statement    { <echo> <string> ; }
