@@ -165,9 +165,6 @@ b a c
 a b c
 OUT
 
-TODO: {
-    local $TODO = 'need coroutine.wrap';
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'permutations with wrap' );
 function permgen (a, n)
     n = n or #a         -- default for 'n' is size of 'a'
@@ -230,7 +227,6 @@ CODE
 21
 34
 OUT
-}
 
 # Local Variables:
 #   mode: cperl
