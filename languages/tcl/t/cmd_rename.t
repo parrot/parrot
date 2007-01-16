@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 language_output_is( "tcl", <<'TCL', <<OUT, "rename" );
@@ -69,6 +69,29 @@ language_output_is( "tcl", <<'TCL', <<'OUT', "rename inlined sub" );
  puts $a
 TCL
 2
+OUT
+
+language_output_is( "tcl", <<'TCL', <<'OUT', "rename in a namespace" );
+proc puts2 {args} {puts {expand}$args}
+
+namespace eval joe {
+    proc puts2 {args} {puts "HELLO WORLD"}
+}
+
+namespace eval joe {
+    puts2 "HI THERE"
+    rename puts2 {}
+}
+
+puts2 "HI THERE"
+
+namespace eval joe {
+    puts "HI THERE"
+}
+TCL
+HELLO WORLD
+HI THERE
+HI THERE
 OUT
 
 # Local Variables:

@@ -19,10 +19,13 @@
   $P0 = get_root_global ['_tcl'], 'epoch'
   inc $P0
 
-  .local pmc sub, args, builtin
+  .local pmc sub, args, builtin, ns
+
+  $P1 = getinterp
+  ns = $P1['namespace'; 1]
 
   $S0 = '&' . oldName
-  sub = get_root_global ['tcl'], $S0
+  sub = ns[$S0]
   if null sub goto doesnt_exist
 
   # if the newName is '', just delete the sub
@@ -31,10 +34,8 @@
   if newName != '' goto delete_sub
   delete_only = 1
 
-
 delete_sub:
-  $P0 = get_root_namespace ['tcl']
-  delete $P0[$S0]
+  delete ns[$S0]
   
   if delete_only goto delete_builtin
 
@@ -42,7 +43,7 @@ add_sub:
   # Create the new sub
   $S0 = '&' . newName
   # first check to make sure it doesn't already exist
-  $P0 = get_root_global ['tcl'], $S0
+  $P0 = ns[$S0]
   if null $P0 goto set_new_sub
 
   $S0 = "can't rename to \""
@@ -51,8 +52,7 @@ add_sub:
   tcl_error $S0
 
 set_new_sub:
-  set_root_global ['tcl'], $S0, sub
-
+  ns[$S0] = sub
 
 delete_builtin:
   builtin = get_root_global ['_tcl'; 'builtins'], oldName
