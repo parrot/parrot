@@ -429,7 +429,7 @@ NOT YET IMPLEMENTED (see file:lines).
 =cut
 
 .sub '_io_lines' :anon
-    .param pmc filename
+    .param pmc filename :optional
     .local pmc file
     .local pmc f
     .local pmc ret

@@ -234,14 +234,15 @@ sets C<arg>/100 as the new value for the I<step multiplier> of the collector.
 
 =back
 
-NOT YET IMPLEMENTED.
+DUMMY IMPLEMENTATION.
 
 =cut
 
 .sub '_lua_collectgarbage' :anon
     .param pmc opt :optional
+    .param pmc arg :optional
     $S0 = checkstring(opt)
-    not_implemented()
+#    not_implemented()
 .end
 
 
