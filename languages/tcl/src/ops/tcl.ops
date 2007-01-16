@@ -64,10 +64,15 @@ isn't a TCL_OK)
 
 =item B<tcl_error>(in STR)
 
+Generate a TCL_ERROR with $1 as the value.
+
+=item B<tcl_error>(in STR, in PMC)
+
+Generate a TCL_ERROR with $1 as the value, and set $errorCode to $2
+
 =item B<tcl_error>(in INT, in PMC)
 
-Generate an exception condition for tcl. If no error code is specified,
-default to TCL_ERROR.
+Generate a $1 with $2 as the value. 
 
 =cut
 
@@ -93,6 +98,30 @@ inline op tcl_error(in STR) {
 
   VTABLE_set_string_keyed_int(interp, exception, 0, $1);
   VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_ERROR);
+  ret = expr NEXT();
+  dest = (opcode_t *)
+      throw_exception(interp, exception, ret);
+  goto ADDRESS(dest);
+}
+
+inline op tcl_error(in STR, in PMC) {
+  opcode_t * ret;
+  opcode_t * dest;
+  INTVAL TCL_ERROR = 1;
+  PMC* errorCode, *ns;
+  PMC* const root_ns = interp->root_namespace;
+  PMC* exception = pmc_new(interp, enum_class_Exception);
+  PMC* tcl_key = pmc_new(interp, enum_class_Key);
+
+  VTABLE_set_string_native(interp, tcl_key, string_from_const_cstring(interp,"tcl",0));
+  ns = Parrot_get_namespace_keyed(interp, root_ns, tcl_key);
+
+  errorCode = Parrot_find_global_n(interp, ns, string_from_const_cstring(interp,"$errorCode",0));
+  VTABLE_assign_pmc(interp, errorCode, $2);
+
+  VTABLE_set_string_keyed_int(interp, exception, 0, $1);
+  VTABLE_set_integer_keyed_int(interp, exception, 9, TCL_ERROR);
+
   ret = expr NEXT();
   dest = (opcode_t *)
       throw_exception(interp, exception, ret);
