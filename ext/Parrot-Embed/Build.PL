@@ -10,6 +10,7 @@ diag( my $dl_env_var        = get_dl_env_var() );
 diag( my ($libp, $incp)     = get_paths() );
 diag( my ($cflags, $lflags) = get_compiler_flags( $in_parrot_tree ) );
 diag( my $parrot            = get_parrot_path( $in_parrot_tree ) );
+diag( my $path_sep          = get_path_separator() );
 
 my $class = Module::Build->subclass(
 	code => <<"END_HERE",
@@ -29,8 +30,8 @@ my $class = Module::Build->subclass(
     sub ACTION_test
     {
         my \$self = shift;
-        \$ENV{$dl_env_var} = join( ':',
-            split( /:/, ( \$ENV{$dl_env_var} || '' ) ), '$libp' )
+        \$ENV{$dl_env_var} = join( '$path_sep',
+            split( /$path_sep/, ( \$ENV{$dl_env_var} || '' ) ), '$libp' )
             if $in_parrot_tree;
 
         \$self->SUPER::ACTION_test( \@_ );
@@ -68,6 +69,12 @@ sub get_dl_env_var
     return 'DYLD_LIBRARY_PATH' if $^O =~ /darwin/;
     return 'PATH'              if $^O =~ /Win32/;
     return 'LD_LIBRARY_PATH';
+}
+
+sub get_path_separator
+{
+    return ';' if $^O =~ /Win32/;
+    return ':';
 }
 
 sub get_compiler_flags
