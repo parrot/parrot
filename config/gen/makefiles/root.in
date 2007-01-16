@@ -1511,6 +1511,7 @@ prog-clean :
     $(O_FILES) \
     $(PARROT) \
     $(MINIPARROT) \
+    $(LIBPARROT) \
     $(INSTALLABLEPARROT) \
     $(INSTALLABLEDIS) \
     $(INSTALLABLEPDUMP) \
