@@ -311,6 +311,10 @@ runtime/builtins.pir \
 #CONDITIONED_LINE(ld_parrot_exe_def):"$(PMCDIR)/*.def" \
 "$(PMCDIR)/*.c" \
 "$(PMCDIR)/*$(O)" \
+"$(PMCDIR)/*.exp" \
+"$(PMCDIR)/*.ilk" \
+"$(PMCDIR)/*.lib" \
+"$(PMCDIR)/*.pdb" \
 "t/*.pir" \
 "t/*.tcl" \
 src/grammar/expr/expression.pir \
@@ -322,6 +326,10 @@ $(GENERATED_INLINES) \
 "src/*$(O)" \
 "$(OPSDIR)/*$(O)" \
 "$(OPSDIR)/*.bundle" \
+"$(OPSDIR)/*.exp" \
+"$(OPSDIR)/*.ilk" \
+"$(OPSDIR)/*.lib" \
+"$(OPSDIR)/*.pdb"
 "$(TCL_LIB)/*.pir"
 
 # that last line should be cleaned up for x-platform.
