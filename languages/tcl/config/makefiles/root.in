@@ -329,7 +329,7 @@ $(GENERATED_INLINES) \
 "$(OPSDIR)/*.exp" \
 "$(OPSDIR)/*.ilk" \
 "$(OPSDIR)/*.lib" \
-"$(OPSDIR)/*.pdb"
+"$(OPSDIR)/*.pdb" \
 "$(TCL_LIB)/*.pir"
 
 # that last line should be cleaned up for x-platform.

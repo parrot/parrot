@@ -1108,7 +1108,8 @@ use tcltest.tcl)
 
 =item Last verified with parrot version
 
-0.4.7
+0.4.7 (There's a bug in 0.4.8's makefile: if you want to play with a recent
+tcl, you'll want svn-latest.)
 
 =item Location
 
