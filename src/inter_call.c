@@ -764,8 +764,9 @@ check_named(Interp *interp, struct call_state *st, const char *action)
                 continue;
             }
             else {
+                STRING *param;
                 idx = st->dest.u.op.pc[last_name_pos];
-                STRING *param = PARROT_ARG_CONSTANT_ISSET(sig)
+                param = PARROT_ARG_CONSTANT_ISSET(sig)
                     ? st->dest.ctx->constants[idx]->u.string
                     : CTX_REG_STR(st->dest.ctx, idx);
                 real_exception(interp, NULL, E_ValueError,
