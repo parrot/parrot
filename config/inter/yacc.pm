@@ -89,7 +89,8 @@ sub runstep {
 
         # someday we might need to check $3 also.
         my ( $prog_major, $prog_minor, $prog_patch ) = ( $1, $2, $3 );
-        my $prog_version = "$1.$2$3";
+        my $prog_version = "$1.$2";
+        $prog_version .= $3 if $3;
 
         # is there a version requirement?
         my $req = $conf->options->get('bison_required');
