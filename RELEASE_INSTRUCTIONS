@@ -88,7 +88,7 @@ To prepare a release:
     9b. Modify the topic on #parrot.
 
           /topic #parrot Parrot 0.4.8 Released | Homepage: \
-            http://parrotcode.com/ | Bug Tracker: http://rt.perl.org/rt3/ \
+            http://parrotcode.org/ | Bug Tracker: http://rt.perl.org/rt3/ \
             | Wiki: http://rakudo.org/parrot/index.cgi?parrot
 
     9c. Update the next planned release date on the wiki
