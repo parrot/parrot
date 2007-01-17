@@ -48,20 +48,20 @@ typedef enum {
 /* &gen_from_enum(call_bits.pasm) */
 typedef enum {
     /* 4 low bits are argument types */
-    PARROT_ARG_INTVAL           = 0x000,
-    PARROT_ARG_STRING           = 0x001,
-    PARROT_ARG_PMC              = 0x002,
-    PARROT_ARG_FLOATVAL         = 0x003,
+    PARROT_ARG_INTVAL           = 0x000,  /* 0 */
+    PARROT_ARG_STRING           = 0x001,  /* 1 */
+    PARROT_ARG_PMC              = 0x002,  /* 2 */
+    PARROT_ARG_FLOATVAL         = 0x003,  /* 3 */
     PARROT_ARG_TYPE_MASK        = 0x00f,
     /* argument meaning and conversion bits */
-    PARROT_ARG_CONSTANT         = 0x010,
+    PARROT_ARG_CONSTANT         = 0x010,  /* 16 */
     /* bits a user has to define */
     PARROT_ARG_FLATTEN          = 0x020,       /* .flatten_arg */
     PARROT_ARG_SLURPY_ARRAY     = PARROT_ARG_FLATTEN,  /* i.e. foldup  */
     /* unused - 0x040 */
-    PARROT_ARG_OPTIONAL         = 0x080,
-    PARROT_ARG_OPT_FLAG         = 0x100, /* prev optional was set */
-    PARROT_ARG_NAME             = 0x200  /* this String is an arg name */
+    PARROT_ARG_OPTIONAL         = 0x080, /* 128 */
+    PARROT_ARG_OPT_FLAG         = 0x100, /* 256 prev optional was set */
+    PARROT_ARG_NAME             = 0x200  /* 512 this String is an arg name */
     /* more to come soon */
 
 } Call_bits_enum_t;

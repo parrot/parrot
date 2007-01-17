@@ -106,11 +106,22 @@ struct call_state {
     PMC *key;           /* to iterate a flattening hash */
 };
 
+typedef enum arg_pass_t {
+    PARROT_PASS_PARAMS          = 0x00,
+    PARROT_PASS_RESULTS         = 0x01,
+} arg_pass_t;
+
+PARROT_API int Parrot_init_arg_indexes_and_sig_pmc(Interp *interp, parrot_context_t *ctx,
+        opcode_t *indexes, PMC* sig_pmc, struct call_state_item *st);
+
 PARROT_API int Parrot_init_arg_sig(Interp *, parrot_context_t *ctx,
         const char *sig, void *ap, struct call_state_item *st);
 
 PARROT_API int Parrot_init_arg_op(Interp *, parrot_context_t *ctx,
         opcode_t *pc, struct call_state_item *st);
+
+PARROT_API void Parrot_process_args(Interp *interp, struct call_state *st,
+        arg_pass_t param_or_result);
 
 PARROT_API int Parrot_init_arg_nci(Interp *, struct call_state *st, const char *sig);
 PARROT_API int Parrot_init_ret_nci(Interp *, struct call_state *st, const char *sig);
@@ -120,15 +131,10 @@ PARROT_API int Parrot_fetch_arg_nci(Interp *, struct call_state *st);
 PARROT_API void Parrot_convert_arg(Interp *, struct call_state *st);
 PARROT_API int Parrot_store_arg(Interp *, struct call_state *st);
 
-#define PARROT_PASS_PARAMS 0
-#define PARROT_PASS_RESULTS 1
-
 void parrot_pass_args(Interp *, parrot_context_t *src_ctx, parrot_context_t *dest_ctx,
-        opcode_t *src_indexes, opcode_t *dest_indexes, int param_or_result);
+        opcode_t *src_indexes, opcode_t *dest_indexes, arg_pass_t param_or_result);
 opcode_t * parrot_pass_args_fromc(Interp *, const char *sig,
         opcode_t *dest, parrot_context_t * ctx, va_list ap);
-opcode_t * parrot_pass_args_to_result(Interp *interp, const char *sig,
-        opcode_t *dest, parrot_context_t * old_ctxp, va_list ap);
 
 void* set_retval(Interp*, int sig_ret, parrot_context_t *ctx);
 INTVAL set_retval_i(Interp*, int sig_ret, parrot_context_t *ctx);

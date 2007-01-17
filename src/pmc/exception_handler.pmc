@@ -30,7 +30,7 @@ pass_exception_args(Interp *interp, const char *sig,
     va_list ap;
     void *next;
     va_start(ap, old_ctx);
-    next = parrot_pass_args_to_result(interp, sig, dest, old_ctx, ap);
+    next = parrot_pass_args_fromc(interp, sig, dest, old_ctx, ap);
     va_end(ap);
     return next;
 }

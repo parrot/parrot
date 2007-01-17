@@ -346,6 +346,9 @@ I      JOIP@
 # other ParrotThread
 P      JO
 
+# src/pmc/nci.pmc
+v JOb
+
 # --- start mysqlclient library ---
 # Created from mysql.h using the following manual method:
 # Edited copy of mysql.h using vi by doing g/, *$/j (repeat) then g/\* *$/j (repeat)

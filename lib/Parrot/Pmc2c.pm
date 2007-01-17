@@ -207,7 +207,7 @@ Returns C<$self> as a new instance.
 
 C<$self> is a hash reference C<eval>-ed from a F<*.dump> file generated
 by F<tools/build/pmc2c.pl> from a F<*.pmc> file. It is C<bless>-ed either into
-C<Parrot::Pmc2c::::Standard>, or into one of the other I<special> PMCs:
+C<Parrot::Pmc2c::Standard>, or into one of the other I<special> PMCs:
 F<default>, C<delegate>, C<Null>, C<Ref> or C<SharedRef>.
 
 C<$opt> is a hash reference.
@@ -761,9 +761,19 @@ EOH
     ## $cout .= $header_decls;
     $cout .= $self->decl( $classname, $method, 0 );
 
-    # This is the part that comes from the PMC file.
-    $cout .= $self->line_directive( $method->{line}, $self->{file} );
-    $cout .= "{$standard_body\n}\n";
+    if ( exists $method->{pre_block} ) {
+        $cout .= $method->{pre_block};
+        # This is the part that comes from the PMC file.
+        $cout .= $self->line_directive( $method->{line}, $self->{file} );
+        $cout .= $standard_body;
+        $cout .= $method->{post_block};
+        $cout .= "\n}\n";
+    }
+    else {
+        # This is the part that comes from the PMC file.
+        $cout .= $self->line_directive( $method->{line}, $self->{file} );
+        $cout .= "{$standard_body\n}\n";
+    }
 
     # We are back to generated code immediately here
     $cout .= $self->line_directive( 2 + $line + count_newlines($cout), $out_name );
@@ -1176,11 +1186,19 @@ EOC
     foreach my $method ( @{ $self->{methods} } ) {
         next unless $method->{loc} eq 'nci';
         my $proto = proto( $method->{type}, $method->{parameters} );
-        $cout .= <<"EOC";
+        if ( exists $method->{pre_block} ) {
+            $cout .= <<"EOC";
+        register_raw_nci_method_in_ns(interp, entry,
+            F2DPTR(Parrot_${classname}_$method->{meth}), "$method->{meth}");
+EOC
+        }
+        else {
+            $cout .= <<"EOC";
         enter_nci_method(interp, entry,
                 F2DPTR(Parrot_${classname}_$method->{meth}),
                 "$method->{meth}", "$proto");
 EOC
+        }
         if ( $method->{attrs}{write} ) {
             $cout .= <<"EOC";
         Parrot_mark_method_writes(interp, entry, "$method->{meth}");

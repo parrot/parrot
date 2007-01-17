@@ -21,6 +21,7 @@ Various functions that call the run loop.
 
 #include <assert.h>
 #include "parrot/parrot.h"
+#include "parrot/oplib/ops.h"
 
 /*
 
@@ -183,10 +184,18 @@ runops_args(Parrot_Interp interp, PMC *sub, PMC *obj,
         strcpy(new_sig + 1, sig + 1);
         sig_p = new_sig;
     }
-    if (*sig_p) {
-        dest = parrot_pass_args_fromc(interp, sig_p, dest,
-                old_ctx, ap);
+
+    if (*sig_p && dest[0] == PARROT_OP_get_params_pc) {
+        dest = parrot_pass_args_fromc(interp, sig_p, dest, old_ctx, ap);
     }
+    /*
+     * main is now started with runops_args_fromc too
+     * PASM subs usually don't have get_params
+     * XXX we could check, if we are running main
+     else {
+     real_exception(interp, NULL, E_ValueError, "no get_params in sub");
+     }
+     */
 
     ctx = CONTEXT(interp->ctx);
     offset = dest - interp->code->base.data;

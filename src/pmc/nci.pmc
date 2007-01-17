@@ -23,7 +23,6 @@ The caller has to preserve registers if needed.
 */
 
 #include "parrot/parrot.h"
-
 pmclass NCI need_ext {
 
 /*
@@ -42,6 +41,21 @@ Return the MMD signature PMC, if any or a Null PMC.
 
 /*
 
+=item C<METHOD PMC* set_raw_nci_ptr(void *func)>
+
+Sets the specified function pointer and raw flag.
+
+=cut
+
+*/
+
+    METHOD void make_raw_nci(void *func) {
+        PMC_struct_val(SELF) = func;
+        PObj_flag_SET(private2, SELF);
+    }
+
+/*
+
 =item C<void init()>
 
 Initializes the NCI with a C<NULL> function pointer.
@@ -53,6 +67,7 @@ Initializes the NCI with a C<NULL> function pointer.
     void init() {
         PMC_struct_val(SELF) = NULL;
         PMC_pmc_val(SELF) = NULL;
+        PObj_flag_CLEAR(private2, SELF);
     }
 
 /*
@@ -137,7 +152,8 @@ shifted down.
 
     void* invoke(void * next) {
         typedef INTVAL(*nci_sub_t)(Interp * , PMC * );
-        nci_sub_t func = (nci_sub_t)D2FPTR(PMC_data(SELF));
+        nci_sub_t func = PObj_flag_TEST(private2, SELF) ? PMC_struct_val(SELF)
+            : (nci_sub_t)D2FPTR(PMC_data(SELF));
         PMC *cont;
 
         if (!func)
