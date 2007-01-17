@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -132,7 +132,7 @@ Like above with an extra encoding attached to the string. For eample:
 
   set S0, utf8:unicode:"«"
 
-The encoding and charset gets attaced to the string, no further processing
+The encoding and charset gets attached to the string, no further processing
 is done, specifically escape sequences are not honored.
 
 =item numeric constants
@@ -190,11 +190,12 @@ E.g. with this code snippet ...
 
 ... all subroutines for language I<Foo> would use a dynamic lexpad pmc.
 
-=item .sub <identifier>
+=item .sub <identifier> [:<flag> ...]
 
 =item .end
 
-Define a I<compilation unit> with the label B<identifier:>.
+Define a I<compilation unit> with the label B<identifier:>. See
+L<PIR Calling Conventions|imcc/calling_conventions> for available flags.
 
 =item .emit
 
@@ -237,7 +238,11 @@ directive. For example, given this preamble:
 
 =item .const <type> <identifier> = <const>
 
-Define a named constant of style I<type> and value I<const>.
+=item .globalconst <type> <identifier> = <const>
+
+Define a named constant of style I<type> and value I<const> restricted
+to one sub or globally. If I<type> denotes a PMC type, I<const> must be
+a string constant.
 
 =item .namespace <identifier>
 
@@ -320,11 +325,52 @@ C<:slurpy>, C<:optional>, and C<:opt_count>.
 
 =back
 
-=head2 Parameter Passing Flags
+=head2 Shorthand directives for PCC call and return
+
+=over 4
+
+=item ([<var> [:<flag> ...], ...]) = <var>([arg [:<flag> ...], ...])
+
+=item <var> = <var>([arg [:<flag> ...], ...])
+
+=item <var>([arg [:<flag> ...], ...])
+
+=item <var>."_method"([arg [:<flag> ...], ...])
+
+=item <var>._method([arg [:<flag> ...], ...])
+
+Function or method call. These notations are shorthand for a longer
+PCC function call with B<.pcc_*> directives. I<var> can denote a
+global subroutine, a local B<identifier> or a B<reg>.
+
+=item .return ([<var> [:<flag> ...], ...])
+
+Return from the current compilation unit with zero or more values. 
+
+The surrounded parentheses are mandatory. Besides making sequence
+break more conspicuous, this is necessary to distinguish this syntax
+from other uses of the B<.return> directive that will be probably
+deprecated.
+
+=item .return <var>(args)
+
+=item .return <var>."somemethod"(args)
+
+=item .return <var>.somemethod(args)
+
+Tail call: call a function or method and return from the sub with the
+function or method call return values.
+
+Internally, the call stack doesn't increase because of a tail call, so
+you can write recursive functions and not have stack overflows.
+
+=back
+
+=head2 Parameter Passing and Getting Flags
 
 See L<PDD03|pdds/pdd03_calling_conventions.pod> for a description of
-the meaning of the flag bits bits C<SLURPY>, C<OPTIONAL>, C<OPT_FLAG>,
-and C<FLAT>, which correspond to the claling convention flags
+the meaning of the flag bits C<SLURPY>, C<OPTIONAL>, C<OPT_FLAG>,
+and C<FLAT>, which correspond to the calling convention flags
 C<:slurpy>, C<:optional>, C<:opt_flag>, and C<:flat>.
 
 [TODO - once these flag bits are solidified by long-term use, then we
@@ -346,6 +392,12 @@ B<branch> <identifier>.
 =item unless <var> goto <identifier>
 
 Translate to B<if x, identifier> or B<unless ..>.
+
+=item if null <var> goto <identifier>
+
+=item unless null <var> goto <identifier>
+
+Translate to B<if_null x, identifier> or B<unless_null ..>.
 
 =item if <var> <relop> <var> goto <identifier>
 
@@ -419,6 +471,10 @@ B<clone var, var>
 =item <var> = addr <var>
 
 B<set_addr var, var>
+
+=item <var> = null
+
+B<null <var>>
 
 =back
 
