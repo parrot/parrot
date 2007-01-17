@@ -69,8 +69,8 @@ To prepare a release:
         number.
 
           $ export SVNPARROT=https://svn.perl.org/parrot
-          $ svn copy -m"tagged release a.b.c \
-            "$SVNPARROT/trunk $SVNPARROT/tags/RELEASE_a_b_c
+          $ svn copy -m"tagged release a.b.c" \
+            $SVNPARROT/trunk $SVNPARROT/tags/RELEASE_a_b_c
 
         See also below [1]
 
@@ -84,6 +84,16 @@ To prepare a release:
     9a. Submit the use Perl announcement story to Slashdot, Newsforge, etc.
 
         Don't forget to set a Reply-To: or Followup-To: header.
+
+    9b. Modify the topic on #parrot.
+
+          /topic #parrot Parrot 0.4.8 Released | Homepage: \
+            http://parrotcode.com/ | Bug Tracker: http://rt.perl.org/rt3/ \
+            | Wiki: http://rakudo.org/parrot/index.cgi?parrot
+
+    9c. Update the next planned release date on the wiki
+
+    9d. Close any open release-related tickets in RT
 
     10. You're done!  Help yourself to a beer, cola or other celebratory
         drink.
