@@ -22,10 +22,6 @@ PGE::P6Regex is now a registered compiler, and should be used like so:
 
 This syntax is also true for PGE::Glob and PGE::P5Regex
 
-=item NameSpace PMC [#41235]
-
-The name() method will change to get_name(), in accord with PDD 21, in the next release.
-
 =back
 
 =head1 FUTURE changes

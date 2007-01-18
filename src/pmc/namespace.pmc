@@ -305,18 +305,18 @@ Return the name of this namespace part.
 
 /*
 
-=item C<METHOD PMC* name()>
+=item C<METHOD PMC* get_name()>
 
 Returns the name of the namespace as an array of strings.
 
-  $P2 = $P3.'name'()
+  $P2 = $P3.'get_name'()
   $S0 = join '::', $P2            # '::Foo::Bar'
 
 =cut
 
 */
 
-    METHOD PMC* name() {
+    METHOD PMC* get_name() {
         PMC *ar, *ns;
 
         ar = pmc_new(INTERP, enum_class_ResizableStringArray);
@@ -376,7 +376,7 @@ Return the Sub PMC with the given name.
         if (VTABLE_isa(INTERP, sub, s_sub))
             return sub;
 
-                return PMCNULL;
+        return PMCNULL;
     }
 
 /*

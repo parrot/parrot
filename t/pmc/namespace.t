@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 40;
 use Parrot::Config;
 
 =head1 NAME
@@ -266,7 +266,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get namespace of :anon .sub' );
 .namespace ['lib']
 .sub main :main :anon
     $P0 = get_namespace
-    $P0 = $P0.'name'()
+    $P0 = $P0.'get_name'()
     $S0 = join "::", $P0
     say $S0
     end
@@ -313,7 +313,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "get namespace in Foo::Bar::baz" );
     .include "pmctypes.pasm"
     $P0 = interpinfo .INTERPINFO_CURRENT_SUB
     $P1 = $P0."get_namespace"()
-    $P2 = $P1.'name'()
+    $P2 = $P1.'get_name'()
     $S0 = join '::', $P2
     print $S0
     print "\n"
@@ -403,7 +403,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "ns.name()" );
     $P1 = $P0["parrot"]
     $P3 = new .NameSpace
     $P1["Foo"] = $P3
-    $P2 = $P3.'name'()
+    $P2 = $P3.'get_name'()
     $I2 = elements $P2
     print $I2
     print "\n"
@@ -426,7 +426,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "get_namespace_p_p, getnamespace_p_kc" );
     $P4 = 1
     $P4[0] = 'Foo'
     $P0 = get_hll_namespace $P4
-    $P2 = $P0.'name'()
+    $P2 = $P0.'get_name'()
     $I2 = elements $P2
     print $I2
     print "\n"
@@ -435,7 +435,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "get_namespace_p_p, getnamespace_p_kc" );
     print "\n"
     # fetch w key
     $P2 = get_hll_namespace ["Foo"]
-    $P2 = $P2.'name'()
+    $P2 = $P2.'get_name'()
     $I2 = elements $P2
     print $I2
     print "\n"
@@ -455,7 +455,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Sub.get_namespace, get_namespace" );
     $P0 = find_global "Foo", "bar"
     print "ok\n"
     $P1 = $P0."get_namespace"()
-    $P2 = $P1.name()
+    $P2 = $P1.'get_name'()
     $S0 = join '::', $P2
     print $S0
     print "\n"
@@ -907,6 +907,96 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_root_namespace "Foo", not there' );
 .namespace [ "NotFoo" ]
 CODE
 Didn't find root namespace 'Foo'.
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'get_name()' );
+
+.sub create_nested_key
+    .param string name
+    .param pmc other_names :slurpy
+
+    .local pmc key
+    key = new .Key
+    key = name
+
+    .local int elem
+    elem = other_names
+
+    if elem goto nested
+    .return( key )
+
+  nested:
+    .local pmc tail
+    tail = create_nested_key(other_names :flat)
+    push key, tail
+
+    .return( key )
+.end
+
+.sub main :main
+    .local pmc key
+    key = create_nested_key( 'SingleName' )
+    print_namespace( key )
+
+    key = create_nested_key( 'Nested', 'Name', 'Space' )
+    print_namespace( key )
+
+    key = get_namespace
+
+    .local pmc ns
+    ns = key.'get_name'()
+
+    .local string ns_name
+    ns_name = join ';', ns
+    print ns_name
+    print "\n"
+.end
+
+.sub 'print_namespace'
+    .param pmc key
+
+    .local pmc get_ns
+    get_ns = find_global key, 'get_namespace'
+
+    .local pmc ns
+    ns = get_ns()
+
+    .local pmc name_array
+    name_array = ns.'get_name'()
+
+    .local string name
+    name = join ';', name_array
+
+    print name
+    print "\n"
+.end
+
+.sub get_namespace
+    .local pmc ns
+    ns = get_namespace
+    .return( ns )
+.end
+
+.namespace [ 'SingleName' ]
+
+.sub get_namespace
+    .local pmc ns
+    ns = get_namespace
+    .return( ns )
+.end
+
+.namespace [ 'Nested'; 'Name'; 'Space' ]
+
+.sub get_namespace
+    .local pmc ns
+    ns = get_namespace
+    .return( ns )
+.end
+
+CODE
+parrot;SingleName
+parrot;Nested;Name;Space
+parrot
 OUTPUT
 
 # Local Variables:

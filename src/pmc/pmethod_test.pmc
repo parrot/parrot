@@ -65,7 +65,7 @@ Marks the hash as live.
     {
         STRING* kevin = string_from_cstring(interp, "KEVIN", 0);
         PIO_printf(interp, "test_method2\n");
-        PIO_printf(interp, "%d, %d, %Ss %Ss\n", a1, a1o, VTABLE_name(interp, slurpy_pos), VTABLE_get_repr(interp,slurpy_pos));
+        PIO_printf(interp, "%d, %d, %Ss %Ss\n", a1, a1o, VTABLE_get_name(interp, slurpy_pos), VTABLE_get_repr(interp,slurpy_pos));
 
         preturn(int 1000, STRING* kevin);
     }
