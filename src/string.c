@@ -27,7 +27,7 @@ strings.
 #include <assert.h>
 
 /*
- * this extra size is in the hope, that some concat ops might
+ * this extra size is in the hope that some concat ops might
  * follow in a sequence.
  *
  * compiling 3180 chars of a bf programs with bfc gives:
@@ -561,7 +561,7 @@ The currently recognised values are:
     'binary'
     'unicode'
 
-The encoding is implicitly guessed; C<unicode> impliies the C<utf-8>
+The encoding is implicitly guessed; C<unicode> implies the C<utf-8>
 encoding, and the other three assume C<fixed-8> encoding.
 
 If C<charset> is unspecified the default charset 'ascii' will be
@@ -844,7 +844,7 @@ string_max_bytes(Interp *interp, STRING *s, INTVAL nchars)
 /*
 
 FUNCDOC:
-Concatenates two Parrot string. If necessary, converts the second
+Concatenates two Parrot strings. If necessary, converts the second
 string's encoding and/or type to match those of the first string. If
 either string is C<NULL>, then a copy of the non-C<NULL> string is
 returned. If both strings are C<NULL>, then a new zero-length string is
@@ -1147,7 +1147,7 @@ FUNCDOC:
 
 Chops off the last C<n> characters of the specified Parrot string. If
 C<n> is negative, cuts the string after C<+n> characters.
-If C<in_place> is true, the string is chopped in places, else a copy
+If C<in_place> is true, the string is chopped in place, else a copy
 of the string is chopped and returned.
 
 */
@@ -1406,7 +1406,7 @@ do { \
 
 FUNCDOC:
 
-Performs a bitwise C<OR> on two Parrot string, performing type and
+Performs a bitwise C<OR> on two Parrot strings, performing type and
 encoding conversions if necessary. If the third string is not C<NULL>
 then it is reused, otherwise a new Parrot string is created.
 
@@ -1874,7 +1874,7 @@ string_to_cstring(Interp *interp, STRING * s)
 FUNCDOC:
 Free a string created by C<string_to_cstring()>.
 
-TODO - Hopefully this can be a go away at some point, as it's got all
+TODO - Hopefully this can go away at some point, as it's got all
 sorts of leak potential otherwise.
 
 */
@@ -2337,7 +2337,7 @@ string_increment(Interp *interp, const STRING *s)
 /*
 
 FUNCDOC:
-Return a C string from a Parrot string.  Both sides are treated
+Returns a C string from a Parrot string.  Both sides are treated
 as constants -- i.e. do not resize the result.
 
 */
@@ -2353,7 +2353,7 @@ Parrot_string_cstring(Interp *interp, const STRING *str /*NN*/)
 /*
 
 FUNCDOC:
-Return 1 if the codepoint of string C<s> at given offset is in the given
+Returns 1 if the codepoint of string C<s> at given offset is in the given
 character class C<flags>. See also F<include/parrot/cclass.h> for possible
 character classes. Returns 0 otherwise, or if the string is empty or NULL.
 
@@ -2389,8 +2389,8 @@ Parrot_string_find_not_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
 /*
 
 FUNCDOC:
-If C<dest> == NULL convert  C<src> to the given charset or encoding inplace,
-else return a copy of C<src> with the charset/encoding in dest.
+If C<dest> == NULL, converts C<src> to the given charset or encoding inplace,
+else returns a copy of C<src> with the charset/encoding in dest.
 
 */
 
@@ -2433,8 +2433,8 @@ Parrot_string_trans_charset(Interp *interp, STRING *src,
 /*
 
 FUNCDOC:
-If C<dest> == NULL convert  C<src> to the given charset or encoding inplace,
-else return a copy of C<src> with the charset/encoding in dest.
+If C<dest> == NULL, converts C<src> to the given charset or encoding inplace,
+else returns a copy of C<src> with the charset/encoding in dest.
 
 */
 
