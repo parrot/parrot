@@ -61,7 +61,7 @@ typedef HANDLE Parrot_thread;
        now = Parrot_floatval_time(); \
        sec = (time_t)now; \
        nsec = (LONG)((now - sec)*1000.0f)*1000000L; \
-       if (t->tv_sec > sec || t->tv_sec == sec && t->tv_nsec > nsec) \
+       if (t->tv_sec > sec || (t->tv_sec == sec && t->tv_nsec > nsec)) \
        { \
          ++(c).m_lWaiters; \
          UNLOCK(m); \

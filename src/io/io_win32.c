@@ -533,6 +533,7 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     struct hostent *he;
     /* Hard coded to IPv4 for now */
     int family = AF_INET;
+    UNUSED(family);
 
     char * s = string_to_cstring(interp, addr);
     sa.sin_addr.s_addr = inet_addr(s);
@@ -578,6 +579,7 @@ PIO_win32_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)
 {
     int sock;
     ParrotIO * io;
+    UNUSED(layer);
     if ((sock = socket(fam, type, proto)) >= 0) {
         io = PIO_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
         io->fd = (PIOHANDLE) sock;
@@ -602,6 +604,7 @@ Connects C<*io>'s socket to address C<*r>.
 static INTVAL
 PIO_win32_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
 {
+    UNUSED(layer);
     if (r) {
         struct sockaddr_in sa;
         memcpy(&sa, PObj_bufstart(r), sizeof (struct sockaddr));
@@ -636,6 +639,8 @@ static INTVAL
 PIO_win32_send(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING *s)
 {
     int error, bytes, byteswrote, maxwrite;
+    UNUSED(interp);
+    UNUSED(layer);
     bytes = sizeof (s);
     byteswrote = 0;
     maxwrite = 2048;
@@ -692,6 +697,7 @@ PIO_win32_recv(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING **s)
     int err;
     unsigned int bytesread = 0;
     char buf[2048+1];
+    UNUSED(layer);
 
 AGAIN:
     error = recv((SOCKET)io->fd, buf, 2048, 0);
@@ -751,6 +757,7 @@ static INTVAL
 PIO_win32_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
 {
     struct sockaddr_in sa;
+    UNUSED(layer);
 
     if (!l)
         return -1;
@@ -785,9 +792,11 @@ C<SEQ> sockets.
 static INTVAL
 PIO_win32_listen(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL backlog)
 {
+    UNUSED(interp);
+    UNUSED(layer);
     if ((listen((SOCKET)io->fd, backlog)) == -1) {
         fprintf(stderr, "listen: errno= ret=%d fd = %d port = %d\n",
-             errno, io->fd, ntohs(io->local.sin_port));
+             errno, (int)io->fd, ntohs(io->local.sin_port));
         return -1;
     }
     return 0;
@@ -811,6 +820,7 @@ PIO_win32_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     int newsize;
     int err_code;
     ParrotIO *newio;
+    UNUSED(layer);
     newio = PIO_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
     newsize = sizeof (struct sockaddr);
 
