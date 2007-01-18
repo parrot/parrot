@@ -19,31 +19,37 @@ tokens
   PROGRAM;
 }
 
+@lexer::members
+{
+  public static boolean codeMode = false;
+}
+
 // real tokens
-SEA        : 'start_sea' ( options {greedy=false;} : . )* 'end_sea' ;
-CODE_START : '<?php' ;
-CODE_END   : '?>' ;
+SEA        :  { !codeMode }?=> (~'<')+ ;
+CODE_START :  '<?php' { codeMode = true; } ;
+CODE_END   :  { codeMode }?=> '?>' { codeMode = false; } ;
 WS
-  : ( ' ' | '\t' | '\r' | '\n' )+
+  : { codeMode }?=> 
+    ( ' ' | '\t' | '\r' | '\n' )+
     {
       $channel = HIDDEN;       // send into nirwana 
     }
   ;
-STRING     : '\"' ( ~'\"' )*  '\"' ;
-ECHO       : 'echo' ;
+STRING     : { codeMode }?=> '\"' ( ~'\"' )*  '\"' ;
+ECHO       : { codeMode }?=> 'echo' ;
 
 fragment
-INTEGER : ('0'..'9' )+ ;
+INTEGER : { codeMode }?=> ('0'..'9' )+ ;
 
 NUMBER
-    : INTEGER ('.' INTEGER)?
+    :{ codeMode }?=>  INTEGER ('.' INTEGER)?
     | '.' INTEGER
     ;
 
-MINUS      : '-' ;
-PLUS       : '+' ;
-MUL_OP     : '*'  | '/'  | '%' ;
-REL_OP     : '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
+MINUS      :{ codeMode }?=>  '-' ;
+PLUS       :{ codeMode }?=>  '+' ;
+MUL_OP     :{ codeMode }?=>  '*'  | '/'  | '%' ;
+REL_OP     :{ codeMode }?=>  '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
 
 
 // productions

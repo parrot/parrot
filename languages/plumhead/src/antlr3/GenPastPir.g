@@ -39,6 +39,7 @@ gen_pir_past
         + "  load_bytecode 'PAST-pm.pbc'                                     \n"
         + "  load_bytecode 'MIME/Base64.pbc'                                 \n"
         + "  load_bytecode 'dumper.pbc'                                      \n"
+        + "  load_bytecode 'PGE.pbc'                                         \n"
         + "  load_bytecode 'CGI/QueryHash.pbc'                               \n"
         + "                                                                  \n"
         + ".end                                                              \n"
@@ -126,16 +127,17 @@ node[String reg_mother]
   | STRING
     {
       String without_anno = $STRING.text;
-      without_anno = without_anno.replace( "start_sea", "\"" );
-      without_anno = without_anno.replace( "end_sea", "\"" );
       without_anno = without_anno.replace( "\n", "\\n" );
       System.out.println( 
           "                                                                  \n"
         + "  # start of STRING                                               \n"
+        + "  .local string val                                               \n"
+        + "     val = \"" + without_anno + "\"                               \n"
         + "  past_temp = new 'PAST::Val'                                     \n"
-        + "      past_temp.'attr'( 'name', " + without_anno + ", 1 )         \n"
-        + "      past_temp.'attr'( 'ctype', 's~', 1 )                        \n"
-        + "      past_temp.'attr'( 'vtype', '.String', 1 )                   \n"
+        + "  .local pmc code_string                                          \n"
+        + "  code_string = new 'PGE::CodeString'                             \n"
+        + "  ( val ) = code_string.'escape'( val )                           \n"
+        + "      past_temp.'init'( 'name' => val, 'vtype' => '.Undef' )      \n"
         + "  " + $node.reg_mother + ".'push'( past_temp )                    \n"
         + "  null past_temp                                                  \n"
         + "  # end of STRING                                                 \n"

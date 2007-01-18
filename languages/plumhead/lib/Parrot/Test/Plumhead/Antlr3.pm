@@ -22,10 +22,7 @@ sub get_test_prog {
 
     my $lang_fn = Parrot::Test::per_test( '.php', $count );
 
-    # still confused about ANTLR3 non-greedy matching,
-    # As a workaround, preprocesses the PHP source with Perl5
-    my $do_anno = q{s/^/start_sea/; s/<\?php[ |\n]/end_sea<?php /; s/(\?>\s*)/${1}start_sea/; $_ .= 'end_sea';};
-    return "perl -p -i -0777 -e '$do_anno' languages/${lang_fn} && ./parrot languages/plumhead/plumhead.pbc --variant=antlr3 languages/${lang_fn}";
+    return qq{./parrot languages/plumhead/plumhead.pbc --variant=antlr3 languages/${lang_fn}};
 }
 
 # never skip the reference implementation

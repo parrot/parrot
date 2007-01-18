@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/GenPastPir.g 2007-01-07 18:14:31
+// $ANTLR 3.0b5 src/antlr3/GenPastPir.g 2007-01-18 23:22:33
 
   import java.util.regex.*;
 
@@ -61,6 +61,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     + "  load_bytecode 'PAST-pm.pbc'                                     \n"
                     + "  load_bytecode 'MIME/Base64.pbc'                                 \n"
                     + "  load_bytecode 'dumper.pbc'                                      \n"
+                    + "  load_bytecode 'PGE.pbc'                                         \n"
                     + "  load_bytecode 'CGI/QueryHash.pbc'                               \n"
                     + "                                                                  \n"
                     + ".end                                                              \n"
@@ -98,7 +99,7 @@ public class GenPastPirTreeParser extends TreeParser {
 
             if ( input.LA(1)==Token.DOWN ) {
                 match(input, Token.DOWN, null); 
-                // src/antlr3/GenPastPir.g:75:16: ( node[\"past_stmts\"] )*
+                // src/antlr3/GenPastPir.g:76:16: ( node[\"past_stmts\"] )*
                 loop1:
                 do {
                     int alt1=2;
@@ -110,7 +111,7 @@ public class GenPastPirTreeParser extends TreeParser {
 
                     switch (alt1) {
                 	case 1 :
-                	    // src/antlr3/GenPastPir.g:75:16: node[\"past_stmts\"]
+                	    // src/antlr3/GenPastPir.g:76:16: node[\"past_stmts\"]
                 	    {
                 	    pushFollow(FOLLOW_node_in_gen_pir_past77);
                 	    node("past_stmts");
@@ -174,14 +175,14 @@ public class GenPastPirTreeParser extends TreeParser {
 
 
     // $ANTLR start node
-    // src/antlr3/GenPastPir.g:108:1: node[String reg_mother] : ( ^( ECHO node["past_echo"] ) | STRING | NUMBER | ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] ) );
+    // src/antlr3/GenPastPir.g:109:1: node[String reg_mother] : ( ^( ECHO node["past_echo"] ) | STRING | NUMBER | ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] ) );
     public void node(String reg_mother) throws RecognitionException {   
         CommonTree infix=null;
         CommonTree STRING1=null;
         CommonTree NUMBER2=null;
 
         try {
-            // src/antlr3/GenPastPir.g:109:5: ( ^( ECHO node[\"past_echo\"] ) | STRING | NUMBER | ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] ) )
+            // src/antlr3/GenPastPir.g:110:5: ( ^( ECHO node[\"past_echo\"] ) | STRING | NUMBER | ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] ) )
             int alt2=4;
             switch ( input.LA(1) ) {
             case ECHO:
@@ -201,14 +202,14 @@ public class GenPastPirTreeParser extends TreeParser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("108:1: node[String reg_mother] : ( ^( ECHO node[\"past_echo\"] ) | STRING | NUMBER | ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] ) );", 2, 0, input);
+                    new NoViableAltException("109:1: node[String reg_mother] : ( ^( ECHO node[\"past_echo\"] ) | STRING | NUMBER | ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] ) );", 2, 0, input);
 
                 throw nvae;
             }
 
             switch (alt2) {
                 case 1 :
-                    // src/antlr3/GenPastPir.g:109:5: ^( ECHO node[\"past_echo\"] )
+                    // src/antlr3/GenPastPir.g:110:5: ^( ECHO node[\"past_echo\"] )
                     {
 
                           System.out.println( 
@@ -239,22 +240,23 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // src/antlr3/GenPastPir.g:126:5: STRING
+                    // src/antlr3/GenPastPir.g:127:5: STRING
                     {
                     STRING1=(CommonTree)input.LT(1);
                     match(input,STRING,FOLLOW_STRING_in_node126); 
 
                           String without_anno = STRING1.getText();
-                          without_anno = without_anno.replace( "start_sea", "\"" );
-                          without_anno = without_anno.replace( "end_sea", "\"" );
                           without_anno = without_anno.replace( "\n", "\\n" );
                           System.out.println( 
                               "                                                                  \n"
                             + "  # start of STRING                                               \n"
+                            + "  .local string val                                               \n"
+                            + "     val = \"" + without_anno + "\"                               \n"
                             + "  past_temp = new 'PAST::Val'                                     \n"
-                            + "      past_temp.'attr'( 'name', " + without_anno + ", 1 )         \n"
-                            + "      past_temp.'attr'( 'ctype', 's~', 1 )                        \n"
-                            + "      past_temp.'attr'( 'vtype', '.String', 1 )                   \n"
+                            + "  .local pmc code_string                                          \n"
+                            + "  code_string = new 'PGE::CodeString'                             \n"
+                            + "  ( val ) = code_string.'escape'( val )                           \n"
+                            + "      past_temp.'init'( 'name' => val, 'vtype' => '.Undef' )      \n"
                             + "  " + reg_mother + ".'push'( past_temp )                    \n"
                             + "  null past_temp                                                  \n"
                             + "  # end of STRING                                                 \n"
@@ -265,7 +267,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // src/antlr3/GenPastPir.g:145:5: NUMBER
+                    // src/antlr3/GenPastPir.g:147:5: NUMBER
                     {
                     NUMBER2=(CommonTree)input.LT(1);
                     match(input,NUMBER,FOLLOW_NUMBER_in_node138); 
@@ -286,7 +288,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 4 :
-                    // src/antlr3/GenPastPir.g:159:5: ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] )
+                    // src/antlr3/GenPastPir.g:161:5: ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] )
                     {
 
                           reg_num++;
