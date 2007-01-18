@@ -531,11 +531,11 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 {
     struct sockaddr_in sa;
     struct hostent *he;
+    char * s = string_to_cstring(interp, addr);
     /* Hard coded to IPv4 for now */
     int family = AF_INET;
     UNUSED(family);
 
-    char * s = string_to_cstring(interp, addr);
     sa.sin_addr.s_addr = inet_addr(s);
     /* Maybe it is a hostname, try to lookup */
     /* XXX Check PIO option before doing a name lookup,
