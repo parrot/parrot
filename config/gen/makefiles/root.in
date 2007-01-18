@@ -979,7 +979,7 @@ $(SRC_DIR)/library$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/jit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/jit_emit.h
 
-$(SRC_DIR)/jit_debug$(O) : $(GENERAL_H_FILES) 
+$(SRC_DIR)/jit_debug$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/jit_debug_xcoff$(O) : $(GENERAL_H_FILES)
 
@@ -1026,7 +1026,7 @@ $(SRC_DIR)/sub$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/string$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/string_private_cstring.h
 
-$(SRC_DIR)/string_primitives$(O) : $(GENERAL_H_FILES) 
+$(SRC_DIR)/string_primitives$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/longopt$(O) : $(GENERAL_H_FILES)
 
@@ -1138,20 +1138,20 @@ $(SRC_DIR)/pbc_merge$(O) : $(SRC_DIR)/pbc_merge.c $(GENERAL_H_FILES)
 
 $(OPS_DIR)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops.c
 
-# core_ops depends upon config.h so that it gets updated along with 
+# core_ops depends upon config.h so that it gets updated along with
 # updates to config.h's version numbers
 
 # .h files are built along with .c
-$(INC_DIR)/oplib/core_ops.h: $(OPS_DIR)/core_ops.c 
+$(INC_DIR)/oplib/core_ops.h: $(OPS_DIR)/core_ops.c
 
 $(OPS_DIR)/core_ops.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/C.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --core
 
 $(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c
 
-$(INC_DIR)/oplib/core_ops_switch.h : $(OPS_DIR)/core_ops_switch.c 
+$(INC_DIR)/oplib/core_ops_switch.h : $(OPS_DIR)/core_ops_switch.c
 
-$(OPS_DIR)/core_ops_switch.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CSwitch.pm lib/Parrot/OpTrans/CPrederef.pm 
+$(OPS_DIR)/core_ops_switch.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CSwitch.pm lib/Parrot/OpTrans/CPrederef.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --core
 
 @TEMP_cg_c@
@@ -1455,11 +1455,11 @@ perl_tests :
 codingstd_tests :
 	$(PERL) t/harness $(CODINGSTD_TEST_FILES)
 
-buildtools_tests : 
+buildtools_tests :
 	$(PERL) t/harness $(BUILDTOOLS_TEST_FILES)
 
-# obsolete 
-testbench : 
+# obsolete
+testbench :
 	@echo "Please use the target benchmark_tests."
 
 # benchmark tests
@@ -1537,7 +1537,7 @@ prog-clean :
     "$(SRC_DIR)/*.str" "src/pmc/*.str" \
     "src/pmc/*.c" "src/pmc/*.h" "src/pmc/*.dump" \
     vtable.dump "*.def" "*.lib" "*.exp"
-                
+
 archclean: dynoplibs-clean dynpmc-clean dynext-clean
 	$(RM_F) \
     $(O_FILES) \
@@ -1603,11 +1603,11 @@ test-clean :
     "t/compilers/*/*/*.pbc" \
     "t/compilers/*/*/*_pbcexe*" \
     "t/compilers/*/*/*.pir" \
-    "t/compilers/*/*/*.stabs.s" 
+    "t/compilers/*/*/*.stabs.s"
 	$(RM_F) \
     "t/examples/*.pbc" \
     "t/examples/*_pbcexe*" \
-    "t/examples/*.past" 
+    "t/examples/*.past"
 	$(RM_F) \
     "t/*/*.o" \
     "t/*/*.out" \
@@ -1620,7 +1620,7 @@ test-clean :
     "t/op/*.pbc" \
     "t/pmc/*.pbc" \
     "t/stress/*.pbc" \
-    "t/tools/*.pbc" 
+    "t/tools/*.pbc"
 	$(RM_F) \
     "t/src/*.c"
 
@@ -1695,8 +1695,7 @@ install:
 	@echo "  To use the make install target, type: make reallyinstall"
 	$(PERL) -e "exit(1)"
 
-reallyinstall:
-	$(MAKE) installable
+reallyinstall: installable
 	$(PERL) tools/dev/install_files.pl \
     --buildprefix=$(BUILDPREFIX) \
     --prefix=$(PREFIX) \
@@ -1729,8 +1728,8 @@ rpms : release
 	sudo cp parrot.spec /usr/src/*/SPECS
 	cd /usr/src/*/SPECS @make_and@ sudo rpm -ba parrot.spec
 
-win32-inno-installer : world install
-	$(PERL) tools/dev/mk_inno.pl --version=$(VERSION) --prefix=$(PREFIX) --icudir=@icu_dir@ 
+win32-inno-installer : world installable
+	$(PERL) tools/dev/mk_inno.pl --version=$(VERSION) --prefix=$(PREFIX) --icudir=@icu_dir@
 	$(INNO_SETUP) parrot.iss
 
 ###############################################################################
