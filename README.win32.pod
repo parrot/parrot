@@ -39,11 +39,11 @@ Note: Parrot will not build using nmake v1.5 from the MS web site.  Download
 one of the above toolkits to obtain a later version, either v7 or v8.
 
 MinGW works with its GNU "make" (v 3.80) port and its name is
-'mingw32-make.exe'.  If you also have the Minimal SYStem (MSYS) installed, 
+'mingw32-make.exe'.  If you also have the Minimal SYStem (MSYS) installed,
 you will need to remove the Msys/bin folder from your PATH environment
 variable before calling "perl Configure.pl" and mingw32-make.  Perl detects
-and calls /bin/sh.exe, if found, whenever shelling a new process.  sh.exe 
-causes problems for mingw32-make.exe because of its inability to handle 
+and calls /bin/sh.exe, if found, whenever shelling a new process.  sh.exe
+causes problems for mingw32-make.exe because of its inability to handle
 Windows pathnames with backslashes.  You must run "perl Configure.pl" and
 mingw32-make from a dosbox; running those commands from an MSYS shell window
 will experience the same backslash path problems.
@@ -60,7 +60,7 @@ build Parrot without it, by not installing it or asking Parrot to
 ignore it (C<--without-icu>).
 
 If you want to use ICU, download it from
-L<http://www-306.ibm.com/software/globalization/icu/downloads.jsp>.
+L<http://icu.sourceforge.net/download/>.
 
 If you want to use precompiled binaries, do the following.
 Download the package matching your compiler, unpack it (say, into
@@ -68,7 +68,7 @@ C:\usr\lib), add the F<bin> directory to C<PATH>, and tell
 Configure.pl to use it.
 
     mkdir C:\usr\lib
-    unzip icu-3.4.1-Win32-msvc7.1.zip -d C:\usr\lib
+    unzip icu4c-3_6-Win32-msvc7_1.zip -d C:\usr\lib
     mkdir C:\usr\lib\data
     set PATH=%PATH%;C:\usr\lib\icu\bin
     cd <parrot directory>
@@ -118,7 +118,7 @@ L<http://www.python.org/>
 
 Inno Setup is a I<free> installer for Windows programs.
 
-The latest release of Inno Setup at the time of writing is 5.1.6.
+The latest release of Inno Setup at the time of writing is 5.1.9.
 
 The HomePage is on L<http://www.jrsoftware.org/>.
 
@@ -237,6 +237,6 @@ This document borrows heavily from Perl's README.win32.
 
 GCC/mingw32 support was added in 0.1.2 (François Perrad).
 
-Last updated: 17 August 2006
+Last updated: 18 January 2007
 
 =cut
