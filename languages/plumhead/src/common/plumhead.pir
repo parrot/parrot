@@ -92,6 +92,7 @@ VARIANT_PARTRIDGE:
     err_msg = 'Compiling and executing with partridge failed'
     $P0 = compreg 'Plumhead'
 
+    #.return $P0.'evalfiles'(php_source_fn, 'target' => 'parse' )
     #.return $P0.'evalfiles'(php_source_fn, 'target' => 'past' )
     .return $P0.'evalfiles'( php_source_fn )
 

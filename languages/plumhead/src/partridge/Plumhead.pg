@@ -7,7 +7,7 @@ grammar Plumhead::Grammar;
 
 token TOP         { <program> }
 
-token sea         { <-["]>* }
+regex sea         { .* <before: \<> }
 
 token string      { " <-["]>* " }
 
@@ -21,7 +21,7 @@ token ws          { \s* }
 
 rule  statement   { <echo> }
 
-rule  program     { ^\"<sea>\"<code>? }
+rule  program     { ^<sea><code>? }
 
 rule  code        { <start_code> <statement>? <end_code> }
 
