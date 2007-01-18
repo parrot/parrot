@@ -9,7 +9,6 @@ diag( my $in_parrot_tree    = in_parrot_tree() );
 diag( my $dl_env_var        = get_dl_env_var() );
 diag( my ($libp, $incp)     = get_paths() );
 diag( my ($cflags, $lflags) = get_compiler_flags( $in_parrot_tree ) );
-diag( my ($cflags, $lflags) = get_compiler_flags( $in_parrot_tree ) );
 diag( my $parrot            = get_parrot_path( $in_parrot_tree ) );
 diag( my $path_sep          = get_path_separator() );
 
