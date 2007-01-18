@@ -19,7 +19,7 @@ src/pmc/pmethod_test.pmc - PMETHOD_Test PMC
 
 #include "parrot/parrot.h"
 #include <assert.h>
-#include <pmc_fixedintegerarray.h>
+#include "pmc_fixedintegerarray.h"
 
 
 /* Albeit the Hash PMC doesn't use PMC_data, it needs the next_for_GC pointer
