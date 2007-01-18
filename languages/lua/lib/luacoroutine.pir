@@ -208,7 +208,7 @@ case of error, propagates the error.
     .param pmc argv :slurpy
     .local pmc ret
     .local pmc co
-    .lex 'var_co', co
+    .lex 'upvar_co', co
     co = _coroutine_create(f)
     .const .Sub auxwrap = 'auxwrap'
     ret = newclosure auxwrap
@@ -219,7 +219,7 @@ case of error, propagates the error.
     .param pmc argv :slurpy
     .local pmc co
     .local pmc ret
-    co = find_lex 'var_co'
+    co = find_lex 'upvar_co'
     ($I0, ret :slurpy) = auxresume(co, argv :flat)
     unless $I0 goto L1
     .return (ret :flat)

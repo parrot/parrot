@@ -26,7 +26,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 32;
 use Test::More;
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'io.stdin' );
@@ -136,6 +136,32 @@ CODE
 /^file \((0[Xx])?[0-9A-Fa-f]+\)/
 OUTPUT
 
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.read', params => "< file.txt"  );
+print(io.read("*l"))
+print(io.read("*l"))
+print(io.type(io.stdin))
+CODE
+file with text
+nil
+file
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.lines filename' );
+for line in io.lines("file.txt") do
+    print(line)
+end
+CODE
+file with text
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.lines', params => "< file.txt"  );
+for line in io.lines() do
+    print(line)
+end
+CODE
+file with text
+OUTPUT
+
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.write' );
 io.write()
 io.write("text", 12, "\n")
@@ -221,6 +247,20 @@ CODE
 
 file 	with 	text
 
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:lines' );
+f = io.open("file.txt")
+for line in f:lines() do
+    print(line)
+end
+print(io.type(f))
+f:close()
+print(io.type(f))
+CODE
+file with text
+file
+closed file
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'file:seek closed' );

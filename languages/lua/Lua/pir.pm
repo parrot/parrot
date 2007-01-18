@@ -39,7 +39,7 @@ L2:
   load_bytecode 'languages/lua/lib/luastring.pbc'
   load_bytecode 'languages/lua/lib/luatable.pbc'
   load_bytecode 'languages/lua/lib/luamath.pbc'
-  load_bytecode 'languages/lua/lib/luaio.pbc'
+  load_bytecode 'languages/lua/lib/luaio.pir'
   load_bytecode 'languages/lua/lib/luaos.pbc'
   load_bytecode 'languages/lua/lib/luadebug.pbc'
   _main($P0 :flat)

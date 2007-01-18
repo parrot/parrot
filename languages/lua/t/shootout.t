@@ -34,15 +34,10 @@ my @dir = ( 'lua', 't', 'shootout' );
 #       Hashtable update and k-nucleotide strings
 #
 
-TODO:
-{
-    local $TODO = 'file.lines is not implemented';
-
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'knucleotide.lua-2.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'knucleotide-output.txt' ));
 $in = File::Spec->catfile( 'languages', @dir, 'knucleotide-input.txt' );
 language_output_is( 'lua', $code, $out, 'k-nucleotide', params => "< $in" );
-}
 
 #
 #   partial-sums
@@ -178,15 +173,10 @@ language_output_is( 'lua', $code, $out, 'chameneos', params => '100' );
 #       Read DAN sequences - write their reverse-complement
 #
 
-TODO:
-{
-    local $TODO = 'file.lines is not implemented';
-
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'revcomp.lua-3.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'revcomp-output.txt' ));
 $in = File::Spec->catfile( 'languages', @dir, 'revcomp-input.txt' );
 language_output_is( 'lua', $code, $out, 'reverse-complement', params => "< $in" );
-}
 
 #
 #   binary-trees
@@ -211,15 +201,10 @@ language_output_is( 'lua', $code, $out, 'fannkuch', params => '7' );
 #       Read lines, parse and sum integers
 #
 
-TODO:
-{
-    local $TODO = 'file.lines is not implemented';
-
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'sumcol.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'sumcol-output.txt' ));
 $in = File::Spec->catfile( 'languages', @dir, 'sumcol-input.txt' );
 language_output_is( 'lua', $code, $out, 'sum-file', params => "< $in" );
-}
 
 #
 #   startup

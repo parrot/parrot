@@ -304,7 +304,7 @@ L2:
 .end
 
 
-.sub 'tofile' :anon
+.sub 'topfile' :anon
     .param pmc file
     .local pmc mt
     .local pmc mt_file
@@ -319,14 +319,58 @@ L2:
     mt_file = _lua__REGISTRY[key]
     unless mt == mt_file goto L1
     ret = getattribute file, 'data'
-    if_null ret, L2
     .return (ret)
-L2:
-    error("attempt to use a closed file")
 L1:
     tag_error($S0, 'file')
 .end
 
+.sub 'tofile' :anon
+    .param pmc file
+    .local pmc f
+    f = topfile(file)
+    if_null f, L1
+    .return (f)
+L1:
+    error("attempt to use a closed file")
+.end
+
+.sub 'aux_close' :anon
+    .param pmc file
+    .local pmc f
+    f = topfile(file)
+    close f
+    null f
+    setattribute file, 'data', f
+    .return (1)
+.end
+
+.sub 'aux_lines' :anon :lex
+    .param pmc file
+    .param pmc toclose
+    .local pmc ret
+    .lex 'upvar_file', file
+    .lex 'upvar_toclose', toclose
+    .const .Sub readline = 'readline'
+    ret = newclosure readline
+    .return (ret)
+.end
+
+.sub 'readline' :anon :lex :outer(aux_lines)
+    .local pmc file
+    .local pmc f
+    .local pmc ret
+    file = find_lex 'upvar_file'
+    f = getattribute file, 'data'
+    ret = read_line(f)
+    $I0 = isa ret, 'LuaNil'
+    unless $I0 goto L1
+    .local pmc toclose
+    toclose = find_lex 'upvar_toclose'
+    unless toclose goto L1
+    aux_close(file)
+L1:
+    .return (ret)
+.end
 
 =item C<io.close ([file])>
 
@@ -341,13 +385,10 @@ file.
     unless_null file, L1
     file = getiofile(1)
 L1:
-    .local pmc f
-    f = tofile(file)
-    close f
-    null f
-    setattribute file, 'data', f
+    tofile(file)
+    $I0 = aux_close(file)
     new ret, .LuaBoolean
-    ret = 1
+    ret = $I0
     .return (ret)
 .end
 
@@ -424,8 +465,6 @@ The call C<io.lines()> (without a file name) is equivalent to
 C<io.input():lines()>, that is, it iterates over the lines of the default
 input file. In this case it does not close the file when the loop ends.
 
-NOT YET IMPLEMENTED (see file:lines).
-
 =cut
 
 .sub '_io_lines' :anon
@@ -433,10 +472,10 @@ NOT YET IMPLEMENTED (see file:lines).
     .local pmc file
     .local pmc f
     .local pmc ret
-    .const .LuaString key = 'lines'
     unless_null filename, L1
     file = getiofile(0)
-    goto L3
+    ret = _file_lines(file)
+    .return (ret)
 L1:
     $S1 = checkstring(filename)
     f = open $S1, '<'
@@ -445,9 +484,7 @@ L1:
 L2:
     file = newfile()
     setattribute file, 'data', f
-L3:
-    $P0 = file[key]
-    ret = $P0(file)
+    ret = aux_lines(file, 1)
     .return (ret)
 .end
 
@@ -671,8 +708,7 @@ Saves any written data to C<file>.
 
 =cut
 
-.sub '_file_flush' :anon
-    .param pmc self
+.sub '_file_flush' :method :anon
     .local pmc f
     .local pmc ret
     f = tofile(self)
@@ -693,12 +729,13 @@ from the file. Therefore, the construction
 will iterate over all lines of the file. (Unlike C<io.lines>, this function
 does not close the file when the loop ends.)
 
-NOT YET IMPLEMENTED.
-
 =cut
 
-.sub '_file_lines' :anon
-    not_implemented()
+.sub '_file_lines' :method :anon
+    .local pmc ret
+    tofile(self)
+    ret = aux_lines(self, 0)
+    .return (ret)
 .end
 
 
@@ -741,8 +778,7 @@ STILL INCOMPLETE.
 
 =cut
 
-.sub '_file_read' :anon
-    .param pmc self
+.sub '_file_read' :method :anon
     .param pmc formats :slurpy
     .local pmc ret
     .local pmc f
@@ -833,8 +869,7 @@ position to the end of the file, and returns its size.
 
 =cut
 
-.sub '_file_seek' :anon
-    .param pmc self
+.sub '_file_seek' :method :anon
     .param pmc whence :optional
     .param pmc offset :optional
     .local pmc options
@@ -887,8 +922,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_file_setvbuf' :anon
-    .param pmc self
+.sub '_file_setvbuf' :method :anon
     .param pmc mode :optional
     .param pmc size :optional
     .local pmc options
@@ -917,8 +951,7 @@ or C<string.format> before write.
 
 =cut
 
-.sub '_file_write' :anon
-    .param pmc self
+.sub '_file_write' :method :anon
     .param pmc argv :slurpy
     .local pmc ret
     .local int argc
@@ -948,21 +981,20 @@ L2:
 .end
 
 
-.sub '_file__tostring' :anon
-    .param pmc self
+.sub '_file__tostring' :method :anon
     .local pmc f
     .local pmc ret
+    f = topfile(self)
     new ret, .LuaString
-    f = getattribute self, 'data'
-    unless f goto L1
+    if f goto L1
+    $S0 = "file (closed)"
+    goto L2
+L1:
     $S0 = "file ("
     $S1 = self
     $S1 = substr $S1, 10, 8
     concat $S0, $S1
     concat $S0, ")"
-    goto L2
-L1:
-    $S0 = "file (closed)"
 L2:
     ret = $S0
     .return (ret)
