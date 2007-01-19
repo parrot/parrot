@@ -311,7 +311,7 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     namespace = ''
     unless has_ns goto build_pir
 
-    $P0 = ns.name()
+    $P0 = ns.'get_name'()
     $S0 = shift $P0
     $I0 = elements $P0
     if $I0 == 0 goto build_pir
@@ -401,7 +401,7 @@ Given a chunk of tcl code, return a subroutine.
     namespace = ''
     unless has_ns goto build_pir
 
-    $P0 = ns.name()
+    $P0 = ns.'get_name'()
     $S0 = shift $P0
     $I0 = elements $P0
     if $I0 == 0 goto build_pir
