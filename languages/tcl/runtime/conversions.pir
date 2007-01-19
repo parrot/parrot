@@ -487,7 +487,7 @@ relative_loop:
   inc depth
   $P0 = interp["sub"; depth]
   $P0 = $P0.'get_namespace'()
-  $P0 = $P0.'name'()
+  $P0 = $P0.'get_name'()
   $S0 = $P0[0]
   if $S0 == '_tcl' goto relative_loop
   

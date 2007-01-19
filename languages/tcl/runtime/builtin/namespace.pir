@@ -349,7 +349,7 @@ loop:
   $P0 = ns[$S0]
   $I0 = isa $P0, "NameSpace"
   unless $I0 goto loop
-  $P0 = $P0.'name'()
+  $P0 = $P0.'get_name'()
   $S0 = shift $P0 # get rid of 'tcl'
   $S0 = join "::", $P0
   $S0 = "::" . $S0
