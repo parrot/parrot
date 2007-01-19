@@ -240,7 +240,6 @@ array set abort_after {
   iocmd-12.8           {invalid command name "close"}
   ioUtil-2.8           {invalid command name "cd"}
   parse-19.4           {invalid command name "cleanupTests"}
-  uplevel-5.2          {invalid command name "set"}
   utf-1.4              {Invalid character for UTF-8 encoding}
   source-7.6           {invalid command name "cleanupTests"}
 }

@@ -87,6 +87,57 @@ of the match.
 .end
 
 
+=item warn(match, [, message [, ...]] )
+
+Emits the list of messages to stderr.
+
+=cut
+
+.sub 'warn'
+    .param pmc mob                                 # match object
+    .param pmc list            :slurpy             # message arguments
+
+    .local pmc iter
+    .local string message
+    message = ''
+    iter = new .Iterator, list
+  iter_loop:
+    unless iter goto iter_end
+    $S0 = shift iter
+    message .= $S0
+    goto iter_loop
+  iter_end:
+
+    # get a copy of the match object
+    .local pmc newfrom, mfrom, mpos
+    .local string target
+    newfrom = find_global 'PGE::Match', 'newfrom'
+    (mob, target, mfrom, mpos) = newfrom(mob, 0)
+    $I0 = length message
+    dec $I0
+    $I0 = is_cclass .CCLASS_NEWLINE, message, $I0
+    if $I0 goto emit_message
+
+    .local int pos, lines
+    .local pmc line_number
+    pos = mfrom
+    #  FIXME: use 'line_number' method instead?
+    line_number = get_hll_global ['PGE::Util'], 'line_number'
+    (lines) = mob.line_number(pos)
+    inc lines
+    message .= ' at line '
+    $S0 = lines
+    message .= $S0
+    message .= "\n"
+  emit_message:
+    printerr message
+
+    assign mpos, mfrom
+    .return (mob)
+.end
+
+
+
 =item line_number(match [, pos])
 
 Return the line number and offset of the of the line corresponding to
@@ -116,8 +167,11 @@ string is treated as '0'.
   newline_loop:
     $I0 = find_cclass .CCLASS_NEWLINE, target, npos, pos
     if $I0 >= pos goto newline_done
+    $S0 = substr target, $I0, 2
     npos = $I0 + 1
     inc lines
+    if $S0 != "\r\n" goto newline_loop
+    inc npos
     goto newline_loop
   newline_done:
     .return (lines, npos)

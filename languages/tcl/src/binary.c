@@ -66,6 +66,7 @@ binary_scan_number_field(Interp *interp, char field, char *binstr, int *_pos, in
             VTABLE_set_number_native(interp, value, *d);
             pos += len;
             break;
+        /* a float */
         case 'f':
             len = sizeof(float)/sizeof(char);
             if (pos + len > length)
@@ -75,6 +76,7 @@ binary_scan_number_field(Interp *interp, char field, char *binstr, int *_pos, in
             VTABLE_set_number_native(interp, value, *f);
             pos += len;
             break;
+        /* a native int */
         case 'n':
             len = sizeof(int)/sizeof(char);
             if (pos + len > length)
@@ -307,13 +309,13 @@ binary_format_number_field(Interp *interp, char field, STRING *binstr, PMC *valu
         case 'f':
             f      = (float)VTABLE_get_number(interp, value);
             len    = sizeof(float)/sizeof(char);
-            binstr = string_concat(interp, binstr, string_from_cstring(interp, &f, len), len);
+            binstr = string_concat(interp, binstr, string_from_cstring(interp, &f, len), 0);
             break;
         /* a native integer */
         case 'n':
             n      = (int)VTABLE_get_integer(interp, value);
             len    = sizeof(int)/sizeof(char);
-            binstr = string_concat(interp, binstr, string_from_cstring(interp, &n, len), len);
+            binstr = string_concat(interp, binstr, string_from_cstring(interp, &n, len), 0);
             break;
     }
 
