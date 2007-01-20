@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 41;
 use Parrot::Config;
 
 =head1 NAME
@@ -909,8 +909,7 @@ CODE
 Didn't find root namespace 'Foo'.
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'get_name()' );
-
+my $create_nested_key =<<'CREATE_NESTED_KEY';
 .sub create_nested_key
     .param string name
     .param pmc other_names :slurpy
@@ -932,6 +931,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_name()' );
 
     .return( key )
 .end
+CREATE_NESTED_KEY
+
+pir_output_is( <<"CODE", <<'OUTPUT', 'get_name()' );
+$create_nested_key
 
 .sub main :main
     .local pmc key
@@ -949,7 +952,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_name()' );
     .local string ns_name
     ns_name = join ';', ns
     print ns_name
-    print "\n"
+    print "\\n"
 .end
 
 .sub 'print_namespace'
@@ -968,7 +971,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_name()' );
     name = join ';', name_array
 
     print name
-    print "\n"
+    print "\\n"
 .end
 
 .sub get_namespace
@@ -996,6 +999,53 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_name()' );
 CODE
 parrot;SingleName
 parrot;Nested;Name;Space
+parrot
+OUTPUT
+
+pir_output_is( <<"CODE", <<'OUTPUT', 'add_namespace()' );
+$create_nested_key
+
+.sub main :main
+    .local pmc root_ns
+    root_ns = get_namespace
+
+    .local pmc child_ns
+    child_ns = new .NameSpace
+    root_ns.'add_namespace'( 'Nested', child_ns )
+
+    .local pmc grandchild_ns
+    grandchild_ns = new .NameSpace
+    child_ns.'add_namespace'( 'Grandkid', grandchild_ns )
+
+    .local pmc great_grandchild_ns
+    great_grandchild_ns = new .NameSpace
+    grandchild_ns.'add_namespace'( 'Greatgrandkid', great_grandchild_ns )
+
+    .local pmc parent
+    parent = great_grandchild_ns.'get_parent'()
+    print_ns_name( parent )
+
+    parent = parent.'get_parent'()
+    print_ns_name( parent )
+
+    parent = parent.'get_parent'()
+    print_ns_name( parent )
+.end
+
+.sub print_ns_name
+    .param pmc namespace
+
+    .local pmc ns
+    ns = namespace.'get_name'()
+
+    .local string ns_name
+    ns_name = join ';', ns
+    print ns_name
+    print "\\n"
+.end
+CODE
+parrot;Nested;Grandkid
+parrot;Nested
 parrot
 OUTPUT
 

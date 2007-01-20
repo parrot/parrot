@@ -525,12 +525,12 @@ a Perl5 namespace.
 
 =head3 Sigils
 
-Perl6 may wish to be able to access the namespace as a hash with sigils.  That
+Perl 6 may wish to be able to access the namespace as a hash with sigils.  That
 is certainly possible, even with subroutines and methods.  It's not important
 that a HLL use the typed namespace API, it is only important that it provides
 it for others to use.
 
-So Perl6 may implement get_keyed and set_keyed VTABLE slots that allow the
+So Perl 6 may implement get_keyed and set_keyed VTABLE slots that allow the
 namespace PMC to be used as a hash.  The C<find_sub> method would, in this
 case, append a "&" sigil to the front of the sub/method name and search
 in the internal hash.
