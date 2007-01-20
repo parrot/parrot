@@ -261,16 +261,8 @@ CODE
 OUTPUT
 test_test $desc;
 
-## vim: expandtab sw=4
 ## remember to change the number of tests :-)
 BEGIN { plan tests => 42; }
-
-# Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
-#   fill-column: 100
-# End:
-# vim: expandtab shiftwidth=4:
 
 # Local Variables:
 #   mode: cperl
