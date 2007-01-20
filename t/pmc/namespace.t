@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 44;
 use Parrot::Config;
 
 =head1 NAME
@@ -1153,6 +1153,79 @@ $create_nested_key
 CODE
 Foo: Foo
 Bar: Bar
+OUTPUT
+
+pir_output_is( <<"CODE", <<'OUTPUT', 'del_namespace()' );
+$create_nested_key
+
+.sub 'main' :main
+    .local pmc root_ns
+    root_ns = get_namespace
+
+    .local pmc key
+    key      = create_nested_key( 'Parent' )
+
+    .local pmc child_ns
+    child_ns = root_ns.'find_namespace'( key )
+
+    key      = create_nested_key( 'Child' )
+
+    .local pmc grandchild_ns
+    grandchild_ns = child_ns.'find_namespace'( key )
+
+    child_ns.'del_namespace'( 'Child' ) 
+
+    key      = create_nested_key( 'Child' )
+
+    .local pmc grandchild_ns
+    grandchild_ns = child_ns.'find_namespace'( key )
+    if_null grandchild_ns, CHECK_SIBLING
+    print "Grandchild still exists\\n"
+
+  CHECK_SIBLING:
+    key      = create_nested_key( 'Sibling' )
+    grandchild_ns = child_ns.'find_namespace'( key )
+    if_null grandchild_ns, DELETE_PARENT
+    print "Sibling not deleted\\n"
+
+  DELETE_PARENT:
+    key      = create_nested_key( 'Parent' )
+    root_ns.'del_namespace'( 'Parent' )
+    child_ns = root_ns.'find_namespace'( key )
+    if_null child_ns, CHECK_UNCLE
+    print "Child still exists\\n"
+
+  CHECK_UNCLE:
+    key      = create_nested_key( 'FunUncle' )
+    grandchild_ns = root_ns.'find_namespace'( key )
+    if_null grandchild_ns, DELETE_PARENT
+    print "Fun uncle stuck around\\n"
+
+  ALL_DONE:
+.end
+
+.namespace [ 'FunUncle' ]
+
+.sub dummy
+.end
+
+.namespace [ 'Parent' ]
+
+.sub dummy
+.end
+
+.namespace [ 'Parent'; 'Child' ]
+
+.sub dummy
+.end
+
+.namespace [ 'Parent'; 'Sibling' ]
+
+.sub dummy
+.end
+CODE
+Sibling not deleted
+Fun uncle stuck around
 OUTPUT
 # Local Variables:
 #   mode: cperl

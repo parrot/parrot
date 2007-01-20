@@ -481,8 +481,8 @@ should map roughly to this PIR:
     set_global "$x", $P0
   .end
 
-In this case, the C<main> sub would be tied to Perl5 by the C<.HLL> directive,
-so a Perl5 namespace would be created.
+In this case, the C<main> sub would be tied to Perl 5 by the C<.HLL> directive,
+so a Perl 5 namespace would be created.
 
 =head3 Run-time Creation
 
@@ -516,8 +516,8 @@ subroutine that calls the store function.
   .end
 
 In this case, C<set_global> should see that it was called from "main",
-which is in a Perl5 namespace, so it will create the "Foo" namespace as
-a Perl5 namespace.
+which is in a Perl 5 namespace, so it will create the "Foo" namespace as
+a Perl 5 namespace.
 
 =head1 LANGUAGE NOTES
 
@@ -583,7 +583,7 @@ PIR:
 
 =head3 Cross-language Exportation
 
-Perl5:
+Perl 5:
 
   #!/usr/bin/perl
   use tcl:Some::Module 'w*';   # XXX - ':' after HLL may change in Perl 6
