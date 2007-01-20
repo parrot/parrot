@@ -318,6 +318,21 @@ Stores the given namespace under this namespace, with the given name.
 
 /*
 
+/*
+
+=item C<METHOD void PMC* add_sub(STRING *name, PMC *sub)>
+
+Stores the given sub under this namespace, with the given name.
+
+*/
+
+    METHOD void add_sub(STRING *name, PMC *sub) {
+        VTABLE_set_pmc_keyed_str(INTERP, SELF, name, sub);
+        return;
+    }
+
+/*
+
 =item C<METHOD PMC* get_name()>
 
 Returns the name of the namespace as an array of strings.

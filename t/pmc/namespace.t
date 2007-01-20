@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 42;
 use Parrot::Config;
 
 =head1 NAME
@@ -1046,6 +1046,61 @@ $create_nested_key
 CODE
 parrot;Nested;Grandkid
 parrot;Nested
+parrot
+OUTPUT
+
+pir_output_is( <<"CODE", <<'OUTPUT', 'add_sub()' );
+$create_nested_key
+
+.sub 'main' :main
+    .local pmc report_ns
+    report_ns = find_global 'report_namespace'
+
+    .local pmc key
+    key = create_nested_key( 'Parent' )
+
+    .local pmc parent_ns
+    parent_ns = get_namespace key
+    parent_ns.'add_sub'( 'report_ns', report_ns )
+
+    key = create_nested_key( 'Parent', 'Child' )
+
+    .local pmc child_ns
+    child_ns = get_namespace key
+    child_ns.'add_sub'( 'report_ns', report_ns )
+
+    .local pmc report_namespace
+    report_namespace = find_global [ 'Parent' ], 'report_ns'
+    report_namespace()
+
+    report_namespace = find_global [ 'Parent'; 'Child' ], 'report_ns'
+    report_namespace()
+.end
+
+.sub 'report_namespace'
+    .local pmc namespace
+    namespace = get_namespace
+
+    .local pmc ns
+    ns = namespace.'get_name'()
+
+    .local string ns_name
+    ns_name = join ';', ns
+    print ns_name
+    print "\\n"
+.end
+
+.namespace [ 'Parent' ]
+
+.sub dummy
+.end
+
+.namespace [ 'Parent'; 'Child' ]
+
+.sub dummy
+.end
+CODE
+parrot
 parrot
 OUTPUT
 
