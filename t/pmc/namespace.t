@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 45;
 use Parrot::Config;
 
 =head1 NAME
@@ -1226,6 +1226,63 @@ $create_nested_key
 CODE
 Sibling not deleted
 Fun uncle stuck around
+OUTPUT
+
+pir_output_is( <<"CODE", <<'OUTPUT', 'del_sub()' );
+.sub 'main' :main
+    .local pmc root_ns
+    root_ns = get_namespace
+
+    .local pmc parent_ns
+    parent_ns = root_ns.'find_namespace'( 'Parent' )
+    parent_ns.'del_sub'( 'dummy' )
+
+    .local pmc my_sub   
+    my_sub = find_global [ 'Parent' ], 'dummy'
+    if_null my_sub, PARENT_NO_DUMMY
+    print "Parent did not delete dummy\\n"
+
+  PARENT_NO_DUMMY:
+    my_sub = find_global [ 'Parent' ], 'no_dummy'
+    my_sub()
+
+    .local pmc child_ns
+    child_ns = parent_ns.'find_namespace'( 'Child' )
+    child_ns.'del_sub'( 'dummy' )
+
+    .local pmc my_sub   
+    my_sub = find_global [ 'Parent'; 'Child' ], 'dummy'
+    if_null my_sub, CHILD_NO_DUMMY
+    print "Child did not delete dummy\\n"
+    my_sub()
+
+  CHILD_NO_DUMMY:
+    my_sub = find_global [ 'Parent'; 'Child' ], 'no_dummy'
+    my_sub()
+.end
+
+.namespace [ 'Parent' ]
+
+.sub dummy
+.end
+
+.sub no_dummy
+    print "Parent is no dummy\\n"
+.end
+
+.namespace [ 'Parent'; 'Child' ]
+
+.sub dummy
+    print "Dummy sub!\\n"
+.end
+
+.sub no_dummy
+    print "Child is no dummy\\n"
+.end
+
+CODE
+Parent is no dummy
+Child is no dummy
 OUTPUT
 # Local Variables:
 #   mode: cperl
