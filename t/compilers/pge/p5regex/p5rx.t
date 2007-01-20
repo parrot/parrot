@@ -293,22 +293,13 @@ Column 6, if present, contains a description of what is being tested.
 
     $S0 = 'character class in enumeration'
     todo_info[116] = $S0
-    todo_info[117] = $S0
-    todo_info[118] = $S0
     todo_info[119] = $S0
     todo_info[120] = $S0
-    todo_info[121] = $S0
-    todo_info[122] = $S0
     todo_info[123] = $S0
     todo_info[124] = $S0
-    todo_info[125] = $S0
-    todo_info[126] = $S0
     todo_info[127] = $S0
 
     $S0 = 'unknown reason'
-    todo_info[99] = $S0
-    todo_info[100] = $S0
-    todo_info[142] = $S0
 #    todo_info[172] = $S0
 #    todo_info[184] = $S0
 #    todo_info[223] = $S0
@@ -352,7 +343,6 @@ Column 6, if present, contains a description of what is being tested.
     todo_info[453] = $S0
     todo_info[454] = $S0
     todo_info[455] = $S0
-    todo_info[485] = $S0
     todo_info[495] = $S0
     todo_info[498] = $S0
     todo_info[500] = $S0
@@ -379,13 +369,8 @@ Column 6, if present, contains a description of what is being tested.
     todo_info[539] = $S0
     todo_info[540] = $S0
     todo_info[541] = $S0
-    todo_info[543] = $S0
     todo_info[544] = $S0
     todo_info[545] = $S0
-    todo_info[548] = $S0
-    todo_info[549] = $S0
-    todo_info[553] = $S0
-    todo_info[554] = $S0
     todo_info[559] = $S0
     todo_info[595] = $S0
     todo_info[596] = $S0
@@ -414,8 +399,6 @@ Column 6, if present, contains a description of what is being tested.
     todo_info[750] = $S0
     todo_info[751] = $S0
     todo_info[801] = $S0
-    todo_info[832] = $S0
-    todo_info[833] = $S0
 #    todo_info[840] = $S0
     todo_info[858] = $S0
     todo_info[859] = $S0
@@ -425,7 +408,6 @@ Column 6, if present, contains a description of what is being tested.
 #    todo_info[863] = $S0
     todo_info[865] = $S0
     todo_info[866] = $S0
-    todo_info[871] = $S0
 #    todo_info[874] = $S0
 #    todo_info[875] = $S0
 #    todo_info[876] = $S0
