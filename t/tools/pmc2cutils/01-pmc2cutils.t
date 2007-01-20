@@ -11,7 +11,7 @@ BEGIN {
     if (defined $topdir) {
         print "\nOK:  Parrot top directory located\n";
     } else {
-        die "Unable to locate top-level Parrot directory";
+        $topdir = realpath($Bin) . "/../../..";
     }
     unshift @INC, qq{$topdir/lib};
 }
@@ -30,7 +30,6 @@ $self = Parrot::Pmc2c::Utils->new( {
     args    => [ @args ],
 } );
 isa_ok($self, q{Parrot::Pmc2c::Utils});
-can_ok($self, q{get_included_paths});
 can_ok($self, q{find_file});
 can_ok($self, q{dump_vtable});
 can_ok($self, q{open_file});
