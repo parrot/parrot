@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 43;
 use Parrot::Config;
 
 =head1 NAME
@@ -1104,6 +1104,56 @@ parrot
 parrot
 OUTPUT
 
+pir_output_is( <<"CODE", <<'OUTPUT', 'add_var()' );
+$create_nested_key
+
+.sub 'main' :main
+    .local pmc foo
+    foo = new .String
+    foo = 'Foo'
+
+    .local pmc bar
+    bar = new .String
+    bar = 'Bar'
+
+    .local pmc key
+    key = create_nested_key( 'Parent' )
+
+    .local pmc parent_ns
+    parent_ns = get_namespace key
+    parent_ns.'add_var'( 'foo', foo )
+
+    key = create_nested_key( 'Parent', 'Child' )
+
+    .local pmc child_ns
+    child_ns = get_namespace key
+    child_ns.'add_var'( 'bar', bar )
+
+    .local pmc my_var
+    my_var = find_global [ 'Parent' ], 'foo'
+    print "Foo: "
+    print my_var
+    print "\\n"
+
+    my_var = find_global [ 'Parent'; 'Child' ], 'bar'
+    print "Bar: "
+    print my_var
+    print "\\n"
+.end
+
+.namespace [ 'Parent' ]
+
+.sub dummy
+.end
+
+.namespace [ 'Parent'; 'Child' ]
+
+.sub dummy
+.end
+CODE
+Foo: Foo
+Bar: Bar
+OUTPUT
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
