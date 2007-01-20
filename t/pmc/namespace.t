@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 46;
 use Parrot::Config;
 
 =head1 NAME
@@ -1283,6 +1283,57 @@ pir_output_is( <<"CODE", <<'OUTPUT', 'del_sub()' );
 CODE
 Parent is no dummy
 Child is no dummy
+OUTPUT
+
+pir_output_is( <<"CODE", <<'OUTPUT', 'del_var()' );
+.sub 'main' :main
+    .local pmc foo
+    foo = new .String
+    foo = 'Foo'
+
+    .local pmc bar
+    bar = new .String
+    bar = 'Bar'
+
+    store_global [ 'Parent' ],          'Foo', foo
+    store_global [ 'Parent'; 'Child' ], 'Bar', bar
+
+    .local pmc root_ns
+    root_ns = get_namespace
+
+    .local pmc parent_ns
+    parent_ns = root_ns.'find_namespace'( 'Parent' )
+    parent_ns.'del_var'( 'Foo' )
+
+    .local pmc child_ns
+    child_ns = parent_ns.'find_namespace'( 'Child' )
+    child_ns.'del_var'( 'Bar' )
+
+    .local pmc my_var
+    my_var = find_global [ 'Parent' ], 'Foo'
+    if_null my_var, TEST_CHILD_VAR
+    print "Parent Foo exists: "
+    print my_var
+    print "\\n"
+
+  TEST_CHILD_VAR:
+    my_var = find_global [ 'Parent'; 'Child' ], 'Bar'
+    if_null my_var, ALL_DONE
+    print "Child Bar exists: "
+    print my_var
+    print "\\n"
+
+  ALL_DONE:
+.end
+
+.namespace [ 'Parent' ]
+
+.sub dummy
+.end
+
+.namespace [ 'Parent'; 'Child' ]
+
+CODE
 OUTPUT
 # Local Variables:
 #   mode: cperl

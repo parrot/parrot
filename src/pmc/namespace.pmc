@@ -473,6 +473,20 @@ Deletes the contained Sub PMC with the given name.
 
 /*
 
+=item C<METHOD PMC* del_var(STRING* name)>
+
+Deletes the contained variable-like PMC with the given name.
+
+=cut
+
+*/
+
+    METHOD void del_var(STRING* name) {
+        parrot_hash_delete(INTERP, (Hash*) PMC_struct_val(SELF), name);
+    }
+
+/*
+
 =item C<METHOD PMC* get_sym(STRING* name)>
 
 Return the symbol (var or sub) with the given name. This can be used
