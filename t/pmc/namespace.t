@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 49;
+use Parrot::Test tests => 50;
 use Parrot::Config;
 
 =head1 NAME
@@ -1408,6 +1408,32 @@ pir_output_is( <<"CODE", <<'OUTPUT', 'del_sub()' );
 CODE
 Parent is no dummy
 Child is no dummy
+OUTPUT
+
+pir_output_like( <<'CODE', <<'OUTPUT', 'del_sub() with error' );
+.sub main :main
+    .local pmc not_a_ns
+    not_a_ns = new .Array
+
+    store_global 'Not_A_Sub', not_a_ns
+
+    .local pmc root_ns
+    root_ns = get_namespace
+
+    push_eh _invalid_sub
+    root_ns.'del_sub'( 'Not_A_Sub' )
+
+_invalid_sub:
+    .local pmc exception
+    .local string message
+    .get_results( exception, message )
+
+    print message
+    print "\n"
+    .return()
+.end
+CODE
+/Invalid type \d+ for 'Not_A_Sub' in del_sub\(\)/
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'del_var()' );
