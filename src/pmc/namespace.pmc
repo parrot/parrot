@@ -458,14 +458,28 @@ Return the PMC with the given name.
 
 =item C<METHOD PMC* del_namespace(STRING* name)>
 
-Deletes the contained NameSpace PMC with the given name.
+Deletes the contained NameSpace PMC with the given name.  Throws an invalid
+type exception if the item to delete is not a NameSpace PMC or subclass and
+does not delete the PMC.
 
 =cut
 
 */
 
     METHOD void del_namespace(STRING* name) {
-        parrot_hash_delete(INTERP, (Hash*) PMC_struct_val(SELF), name);
+        Hash   *hash = (Hash *) PMC_struct_val(SELF);
+        PMC    *ns   = parrot_hash_get(INTERP, hash, name);
+        STRING *s_ns = CONST_STRING(INTERP, "NameSpace");
+
+        if (ns == PMCNULL)
+            return;
+
+        if (!VTABLE_isa(INTERP, ns, s_ns))
+            real_exception(INTERP, NULL, E_TypeError,
+                "Invalid type %d for '%s' in del_namespace()",
+                ns->vtable->base_type, string_to_cstring(INTERP, name));
+
+        parrot_hash_delete(INTERP, hash, name);
     }
 
 /*

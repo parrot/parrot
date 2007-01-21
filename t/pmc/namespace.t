@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 48;
+use Parrot::Test tests => 49;
 use Parrot::Config;
 
 =head1 NAME
@@ -1315,6 +1315,42 @@ $create_nested_key
 CODE
 Sibling not deleted
 Fun uncle stuck around
+OUTPUT
+
+pir_output_like( <<'CODE', <<'OUTPUT', 'del_namespace() with error' );
+.sub dummy
+.end
+
+.sub main :main
+    .local pmc not_a_ns
+    not_a_ns = new .Array
+
+    store_global 'Not_A_NS', not_a_ns
+
+    .local pmc root_ns
+    root_ns = get_namespace
+    delete_namespace( root_ns, 'dummy' )
+    delete_namespace( root_ns, 'Not_A_NS' )
+.end
+
+.sub delete_namespace
+    .param pmc    root_ns
+    .param string name
+    push_eh _invalid_ns
+    root_ns.'del_namespace'( name )
+
+_invalid_ns:
+    .local pmc exception
+    .local string message
+    .get_results( exception, message )
+
+    print message
+    print "\n"
+    .return()
+.end
+CODE
+/Invalid type \d+ for 'dummy' in del_namespace\(\)
+Invalid type \d+ for 'Not_A_NS' in del_namespace\(\)/
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'del_sub()' );
