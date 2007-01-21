@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 48;
 use Parrot::Config;
 
 =head1 NAME
@@ -1134,6 +1134,63 @@ $create_nested_key
 CODE
 parrot
 parrot
+OUTPUT
+
+pir_output_like( <<'CODE', <<'OUTPUT', 'add_sub() with error' );
+.sub main :main
+    .local pmc s_child
+    s_child = subclass 'Sub', 'SubChild'
+
+    .local pmc e_child
+    e_child = subclass 'Closure', 'ClosureChild'
+
+    .local pmc child
+    child = new 'SubChild'
+
+    .local pmc root_ns
+    root_ns = get_namespace
+
+    root_ns.'add_sub'( 'child', child )
+    print "Added sub child\n"
+
+    child = new 'Closure'
+    root_ns.'add_sub'( 'closure', child )
+    print "Added closure\n"
+
+    child = new 'Coroutine'
+    root_ns.'add_sub'( 'coroutine', child )
+    print "Added coroutine\n"
+
+    child = new 'Eval'
+    root_ns.'add_sub'( 'eval', child )
+    print "Added eval\n"
+
+    child = new 'ClosureChild'
+    root_ns.'add_sub'( 'closure_child', child )
+    print "Added closure child\n"
+
+    .local pmc not_a_sub
+    not_a_sub = new .Integer
+
+    push_eh _invalid_sub
+    root_ns.'add_sub'( 'Nested', not_a_sub )
+    end
+
+_invalid_sub:
+    .local pmc exception
+    .local string message
+    .get_results( exception, message )
+
+    print message
+    print "\n"
+.end
+CODE
+/Added sub child
+Added closure
+Added coroutine
+Added eval
+Added closure child
+Invalid type \d+ in add_sub\(\)/
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'add_var()' );

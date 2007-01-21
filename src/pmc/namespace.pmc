@@ -307,7 +307,8 @@ Return the name of this namespace part.
 
 =item C<METHOD void PMC* add_namespace(STRING *name, PMC *namespace)>
 
-Stores the given namespace under this namespace, with the given name.
+Stores the given namespace under this namespace, with the given name.  Throws
+an invalid type exception if C<namespace> is not a NameSpace PMC or subclass.
 
 */
 
@@ -328,11 +329,17 @@ Stores the given namespace under this namespace, with the given name.
 
 =item C<METHOD void PMC* add_sub(STRING *name, PMC *sub)>
 
-Stores the given sub under this namespace, with the given name.
+Stores the given sub under this namespace, with the given name.  Throws an
+invalid type exception if C<sub> is not a Sub PMC or subclass.
 
 */
 
     METHOD void add_sub(STRING *name, PMC *sub) {
+        STRING *s_sub = CONST_STRING(INTERP, "Sub");
+        if (!VTABLE_isa(INTERP, sub, s_sub))
+            real_exception(INTERP, NULL, E_TypeError,
+                "Invalid type %d in add_sub()", sub->vtable->base_type);
+
         VTABLE_set_pmc_keyed_str(INTERP, SELF, name, sub);
         return;
     }
