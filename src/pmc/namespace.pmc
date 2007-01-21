@@ -312,6 +312,12 @@ Stores the given namespace under this namespace, with the given name.
 */
 
     METHOD void add_namespace(STRING *name, PMC *namespace) {
+        STRING *s_ns = CONST_STRING(INTERP, "NameSpace");
+        if (!VTABLE_isa(INTERP, namespace, s_ns))
+            real_exception(INTERP, NULL, E_TypeError,
+                "Invalid type %d in add_namespace()",
+                namespace->vtable->base_type);
+
         VTABLE_set_pmc_keyed_str(INTERP, SELF, name, namespace);
         return;
     }

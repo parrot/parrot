@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 47;
 use Parrot::Config;
 
 =head1 NAME
@@ -1047,6 +1047,38 @@ CODE
 parrot;Nested;Grandkid
 parrot;Nested
 parrot
+OUTPUT
+
+pir_output_like( <<'CODE', <<'OUTPUT', 'add_namespace() with error' );
+.sub main :main
+    .local pmc ns_child
+    ns_child = subclass 'NameSpace', 'NSChild'
+
+    .local pmc child
+    child = new 'NSChild'
+
+    .local pmc root_ns
+    root_ns = get_namespace
+
+    root_ns.'add_namespace'( 'Really nested', child )
+
+    .local pmc not_a_ns
+    not_a_ns = new .Integer
+
+    push_eh _invalid_ns
+    root_ns.'add_namespace'( 'Nested', not_a_ns )
+    end
+
+_invalid_ns:
+    .local pmc exception
+    .local string message
+    .get_results( exception, message )
+
+    print message
+    print "\n"
+.end
+CODE
+/Invalid type \d+ in add_namespace\(\)/
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'add_sub()' );
