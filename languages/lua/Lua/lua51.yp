@@ -157,26 +157,28 @@ stat
         {
             BuildForList( $_[0], $_[2], $_[4], $_[7] );
         }
-|   FUNCTION
+|   FUNCTION    funcname
         {
+            my $var = BuildVariable( $_[0], $_[2] );
             PushScopeF( $_[0] );
             PushScope( $_[0] );
+            return $var;
         }
-                funcname    funcbody
+                            funcbody
         {
-            my $var = BuildVariable( $_[0], $_[3] );
-            BuildAssigns( $_[0], [$var], [ $_[4] ] );
+            BuildAssigns( $_[0], [ $_[3] ], [ $_[4] ] );
         }
-|   LOCAL   FUNCTION
+|   LOCAL   FUNCTION    NAME
         {
-            PushScopeF( $_[0] );
-            PushScope( $_[0] );
-        }
-                        NAME    funcbody
-        {
-            my $var = BuildLocalVariable( $_[0], $_[4] );
+            my $var = BuildLocalVariable( $_[0], $_[3] );
             Insert( $_[0], $var );
-            BuildAssigns( $_[0], [$var], [ $_[5] ] );
+            PushScopeF( $_[0] );
+            PushScope( $_[0] );
+            return $var;
+        }
+                                funcbody
+        {
+            BuildAssigns( $_[0], [ $_[4] ], [ $_[5] ] );
         }
 |   LOCAL   namelist    '=' explist1
         {
@@ -671,9 +673,9 @@ sub Generate {
         my $curr;
         foreach my $op ( @{$fct} ) {
             if ( ref($op) eq 'SubDir' ) {
-                $curr = $op->{result}->{symbol}; 
+                $curr = $op->{result}->{symbol};
                 if ( exists $outer{$curr} ) {
-                    $op->{outer} = $outer{$curr}; 
+                    $op->{outer} = $outer{$curr};
                 }
                 elsif ( $curr ne '_main' ) {
                     warn "INTERNAL ERROR: no outer for '$curr'\n";

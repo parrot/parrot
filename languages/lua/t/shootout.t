@@ -34,10 +34,15 @@ my @dir = ( 'lua', 't', 'shootout' );
 #       Hashtable update and k-nucleotide strings
 #
 
+TODO:
+{
+    local $TODO = 'table.sort is not implemented';
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'knucleotide.lua-2.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'knucleotide-output.txt' ));
 $in = File::Spec->catfile( 'languages', @dir, 'knucleotide-input.txt' );
 language_output_is( 'lua', $code, $out, 'k-nucleotide', params => "< $in" );
+}
 
 #
 #   partial-sums
@@ -114,9 +119,14 @@ language_output_is( 'lua', $code, $out, 'nsieve-bits' );
 #       Naive recursive-algorithms: ack fib tak
 #
 
+SKIP:
+{
+    skip('low memory', 1) unless (exists $ENV{PARROT_LUA_TEST_PROG});
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'recursive.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'recursive-output.txt' ));
 language_output_is( 'lua', $code, $out, 'recursive', params => '3' );
+}
 
 #
 # mandelbrot
@@ -141,9 +151,9 @@ language_output_is( 'lua', $code, $out, 'n-body', params => '1000' );
 #       Send messages between linked threads
 #
 
-TODO:
+SKIP:
 {
-    local $TODO = 'coroutine.wrap is not working';
+    skip('maximum recursion depth exceeded', 1) unless (exists $ENV{PARROT_LUA_TEST_PROG});
 
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'message.lua-2.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'message-output.txt' ));
@@ -183,9 +193,14 @@ language_output_is( 'lua', $code, $out, 'reverse-complement', params => "< $in" 
 #       Allocate and deallocate many many binary trees
 #
 
+SKIP:
+{
+    skip('low memory', 1) unless (exists $ENV{PARROT_LUA_TEST_PROG});
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'binarytrees.lua-3.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'binarytrees-output.txt' ));
 language_output_is( 'lua', $code, $out, 'binary-trees', params => '10' );
+}
 
 #
 #   fannkuch
