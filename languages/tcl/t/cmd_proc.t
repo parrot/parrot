@@ -90,7 +90,7 @@ eval_is {
   proc test {} { incr a }
   set a [test]
   rename incr {}
-  rename incr_old incr 
+  rename incr_old incr
   set a
 } {a} {using a renamed builtin}
 

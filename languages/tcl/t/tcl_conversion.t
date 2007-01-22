@@ -9,13 +9,13 @@ __DATA__
 source lib/test_more.tcl
 plan 12
 
-is [llength {a 
-  "a b"   
+is [llength {a
+  "a b"
   		b {b c}		  c {c d}
   }] 6 {{} conversion to list" }
 
-is [llength "a 
-  \"a b\"   
+is [llength "a
+  \"a b\"
   		b {b c}		  c {c d}
   "] 6 {"\ conversion to list}
 

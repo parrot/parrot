@@ -23,7 +23,7 @@ eval_is {
   list $a $b
 } {x y} {singleton with one leftover}
 
-eval_is { 
+eval_is {
   set b [lassign {x y z} a]
   list $a $b
 } {x {y z}} {singleton with two leftovers}

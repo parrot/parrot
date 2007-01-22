@@ -21,7 +21,7 @@ eval_is {
 eval_is {
  proc joe {} {
    return
- }  
+ }
  joe
 } {} {simple return with no value}
 

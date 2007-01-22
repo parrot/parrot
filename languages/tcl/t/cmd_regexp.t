@@ -10,11 +10,11 @@ source lib/test_more.tcl
 plan 14
 
 proc regexp_is {pattern string reason} {
-    eval_is "regexp {$pattern} {$string}" 1 $reason 
+    eval_is "regexp {$pattern} {$string}" 1 $reason
 }
 
 proc regexp_isnt {pattern string reason} {
-    eval_is "regexp {$pattern} {$string}" 0 $reason 
+    eval_is "regexp {$pattern} {$string}" 0 $reason
 }
 
 set usage {wrong # args: should be "regexp ?switches? exp string ?matchVar? ?subMatchVar subMatchVar ...?"}

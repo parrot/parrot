@@ -112,7 +112,7 @@ eval_is {
 } 1 {implied exact, no match, no default}
 
 eval_is {
-  set q 1  
+  set q 1
   switch ab {
     b  { set q 2 }
     ab { set q 3 }
@@ -186,7 +186,7 @@ eval_is {switch -glob a {a 1 b}} \
   {extra switch pattern with no body} \
   {-glob, pattern with no body}
 
-# RT#40619: Need -regexp tests 
+# RT#40619: Need -regexp tests
 
 eval_is {switch -regexp a {a 1 b}} \
   {extra switch pattern with no body} \

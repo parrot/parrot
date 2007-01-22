@@ -23,7 +23,7 @@ of optimizations. By making the inlined versions more declarative, this
 lets us do this work B<once> instead of many times, which B<should> make it
 easier to inline more builtins accurately.
 
-Currently supports the following types of arguments: 
+Currently supports the following types of arguments:
 variable name, integer, channel, list, string, script, and expressions.
 
 =cut
@@ -140,7 +140,7 @@ sub inlined_header {
     my ( $cmd, @args ) = @_;
 
     my $code = <<"END_PIR";
-    
+
 .sub '$cmd'
   .param string retval
   .param pmc    raw_argv
@@ -166,10 +166,10 @@ sub header {
     my ( $cmd, @args ) = @_;
 
     my $code = <<"END_PIR";
-        
+
 .sub '&$cmd'
   .param pmc argv :slurpy
-        
+
   .local int argc
   argc = elements argv
 END_PIR
@@ -544,7 +544,7 @@ sub num_args {
 
 =head1 TODO
 
-Doesn't support subcommands. 
+Doesn't support subcommands.
 
 =cut
 

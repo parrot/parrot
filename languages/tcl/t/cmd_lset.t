@@ -70,4 +70,4 @@ eval_is {
   set a b
   lset a 3.2 b
 } {bad index "3.2": must be integer?[+-]integer? or end?[+-]integer?} \
-  {float index} 
+  {float index}

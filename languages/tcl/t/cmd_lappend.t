@@ -11,7 +11,7 @@ plan 7
 
 eval_is {
   set a [list a b]
-  lappend a 
+  lappend a
   set a
 } {a b} {append nothing}
 

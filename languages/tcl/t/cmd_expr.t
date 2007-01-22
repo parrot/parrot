@@ -122,8 +122,8 @@ is [expr {2 * "3"}]    6 {mul "}
 is [expr {"2" * 3}]    6 {mul "}
 is [expr {6 / "2"}]    3 {times "}
 is [expr {"6" / 2}]    3 {times "}
-is [expr {3 % "2"}]    1 {remainder "} 
-is [expr {"3" % 2}]    1 {remainder "} 
+is [expr {3 % "2"}]    1 {remainder "}
+is [expr {"3" % 2}]    1 {remainder "}
 is [expr {2 + "3"}]    5 {plus "}
 is [expr {"2" + 3}]    5 {plus "}
 is [expr {2 - "3"}]   -1 {minus "}
@@ -175,10 +175,10 @@ set ops_list [list - + ~ !]
 foreach operator $ops_list {
   eval_is "expr {${operator}\"a\"}" \
     "can't use non-numeric string as operand of \"$operator\"" \
-    "string unary $operator" 
+    "string unary $operator"
   eval_is "expr {${operator}\"\"}" \
     "can't use empty string as operand of \"$operator\"" \
-    "string unary $operator" 
+    "string unary $operator"
 }
 
 # invalid (string) operands for some binary ops
@@ -186,10 +186,10 @@ set ops_list [list ** * / % + - << >> & | ^]
 foreach operator $ops_list {
   eval_is "expr {\"a\" $operator \"b\"}" \
     "can't use non-numeric string as operand of \"$operator\"" \
-    "string $operator" 
+    "string $operator"
   eval_is "expr {\"\" $operator \"\"}" \
     "can't use empty string as operand of \"$operator\"" \
-    "string $operator" 
+    "string $operator"
 }
 
 # invalid (string) operands for logical ops
@@ -197,10 +197,10 @@ set logic_ops_list [list && ||]
 foreach operator $logic_ops_list {
   eval_is "expr {\"a\" $operator \"b\"}" \
     {expected boolean value but got "a"} \
-    "string $operator" 
+    "string $operator"
   eval_is "expr {\"\" $operator \"\"}" \
     {expected boolean value but got ""} \
-    "string $operator" 
+    "string $operator"
 }
 
 is [expr bool(4)]       1 {bool - true}
@@ -368,7 +368,7 @@ is [
 ] 1 {command expansion inside, string types}
 
 
-# XXX  add tests for ::tcl::mathfunc 
+# XXX  add tests for ::tcl::mathfunc
 
 # tcl_precision
 is [set tcl_precision 3; expr 1/3.] 0.333 { precision 3}

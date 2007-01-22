@@ -191,7 +191,7 @@ eval_is {
   info default
 } {wrong # args: should be "info default procname arg varname"} {no args}
 eval_is {
-  info default a 
+  info default a
 } {wrong # args: should be "info default procname arg varname"} {1 args}
 eval_is {
   info default a b
