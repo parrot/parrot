@@ -726,7 +726,7 @@ L1:
     error("cannot change a protected metatable")
 L3:
     table.'set_metatable'(metatable)
-    .return ()
+    .return (table)
 .end
 
 

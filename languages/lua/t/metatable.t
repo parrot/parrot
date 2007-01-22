@@ -30,7 +30,7 @@ language_output_is( 'lua', <<'CODE', <<'OUT', 'metatable' );
 t = {}
 print(getmetatable(t))
 t1 = {}
-setmetatable(t, t1)
+assert(setmetatable(t, t1) == t)
 assert(getmetatable(t) == t1)
 CODE
 nil
