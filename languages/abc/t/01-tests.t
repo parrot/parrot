@@ -14,11 +14,11 @@ languages/abc/t/01-tests.t - test harness for Parrot abc
 
 =head1 DESCRIPTION
 
-This file is the current implementation for the abc test harness. The 
+This file is the current implementation for the abc test harness. The
 tests are actually in simple text files, this harness given this list of
 tests sources, executes all the tests.
 
-The test source is a plain text file divided in three columns. The 
+The test source is a plain text file divided in three columns. The
 columns are separated by three white spaces C<\s{3,}> or at least one
 tab C<\t+>. The three columns are:
 
@@ -28,7 +28,7 @@ tab C<\t+>. The three columns are:
 
 The exact expression that is passed to the abc compiler as source code.
 This input is pasted as a double quotes delimted string into PIR code.
-This means that you can use \n to indicate newlines. 
+This means that you can use \n to indicate newlines.
 
 =item B<expected>
 
@@ -41,7 +41,7 @@ This should be a string describing the test that is being made.
 
 =back
 
-Since this is supposed to be a temporary harness. We're expecting to be 
+Since this is supposed to be a temporary harness. We're expecting to be
 able to capture the result of the compilation to write this file in PIR.
 The skip and todo tests are defined in the test source file itself, so
 that later when the harness is changed we don't have to bother to convert
@@ -52,7 +52,7 @@ test description. For example:
 1+2+3           6       SKIP no add operation yet
 1-2-3           6       TODO no minus operation yet
 
-B<NOTE:> to add more source test files remember to update the C<@files> 
+B<NOTE:> to add more source test files remember to update the C<@files>
 array in this file.
 
 =head1 SYNOPSIS
@@ -110,7 +110,7 @@ foreach my $file (@test_files) {
             next;
         }
 
-        $expr =~ s/"/\\"/g;           # Escape the '"', as $expr will be 
+        $expr =~ s/"/\\"/g;           # Escape the '"', as $expr will be
                                       # enclosed by '"' in the generated PIR
 
         $expect =~ s/^'(.*)'$/$1/;    # remove surrounding quotes (for '')
