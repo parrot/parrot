@@ -1,4 +1,4 @@
-#!perl 
+#!perl
 
 use strict;
 use warnings;
@@ -17,12 +17,12 @@ namespace Testing
     {
         public static int x;
         public static int y;
-	    
+
         public static void set_x()
     	{
 	    	x = 5;
     	}
-    
+
 	    public static void set_y(int y)
     	{
 	    	Test.y = y;

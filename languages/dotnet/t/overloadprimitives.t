@@ -1,4 +1,4 @@
-#!perl 
+#!perl
 
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use Test::More tests => 9;
 #
 die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
-{   
+{
     public class Test
     {
         public int m(int x)

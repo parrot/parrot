@@ -1,4 +1,4 @@
-#!perl 
+#!perl
 
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ namespace Testing
     	{
 	    	this.x = x;
     	}
-    
+
 	    public void set_y(int y)
     	{
 	    	this.y = y;

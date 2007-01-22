@@ -1,4 +1,4 @@
-#!perl 
+#!perl
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ namespace Testing
         public int x;
         public int y;
     }
-    
+
     public class Test
     {
         public int box_1()

@@ -1,4 +1,4 @@
-#!perl 
+#!perl
 
 use strict;
 use warnings;
@@ -45,7 +45,7 @@ namespace Testing
                 x[i] = new test_elem();
                 x[i].value = i + 1;
             }
-        
+
             int total = 0;
             for (int i = 0; i < x.Length; i++)
                 total += x[i].value;

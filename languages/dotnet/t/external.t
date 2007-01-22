@@ -1,4 +1,4 @@
-#!perl 
+#!perl
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ namespace Testing
 {
     using System;
     using ExportsStuff;
-    
+
     class Test
     {
         public Monkey create_monkey()
@@ -40,7 +40,7 @@ namespace Testing
             x.age = 8;
             return x;
         }
-    
+
         public int monkey_age_doubled(Monkey m)
         {
             return m.age * 2;

@@ -1,4 +1,4 @@
-#!perl 
+#!perl
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ namespace Testing
     public class test_item_2
     {
     }
-    
+
     public class Test
     {
         public int m(int x)

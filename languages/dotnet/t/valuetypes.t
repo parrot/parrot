@@ -1,4 +1,4 @@
-#!perl 
+#!perl
 
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ namespace Testing
             x++;
         }
     }
-    
+
     public class Test
     {
         public value_type double_it(value_type t)

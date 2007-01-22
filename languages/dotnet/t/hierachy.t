@@ -1,4 +1,4 @@
-#!perl 
+#!perl
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ namespace Testing
     }
 
     class C1 : C3, I2
-    {   
+    {
     }
 
     interface I1

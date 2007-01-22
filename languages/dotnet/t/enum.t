@@ -1,4 +1,4 @@
-#!perl 
+#!perl
 
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ die unless compile_cs( "t.dll", <<'CSHARP');
 namespace Testing
 {
     using System;
-    
+
     public enum emotion {
         Delighted,
         Devestated,
@@ -23,7 +23,7 @@ namespace Testing
         Happy,
         Hurt
     }
-    
+
     public class Test
     {
         public int value()
@@ -68,7 +68,7 @@ namespace Testing
         }
 
         public int arg_test(emotion em)
-        { 
+        {
             return em == emotion.Happy ? 1 : 0;
         }
 

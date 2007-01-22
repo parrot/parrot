@@ -1,4 +1,4 @@
-#!perl 
+#!perl
 
 use strict;
 use warnings;
@@ -18,12 +18,12 @@ namespace Testing
         {
             return 1;
         }
-        
+
         public int one_arg(int x)
         {
             return x;
         }
-        
+
         public int three_args(int x1, int x2, int x3)
         {
             return x1 + x2 + x3;
