@@ -1,4 +1,5 @@
 package Regex::State;
+use strict;
 use warnings;
 
 sub new {

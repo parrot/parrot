@@ -1,5 +1,6 @@
 package Regex::Ops;
 
+use strict;
 use warnings;
 use vars qw(%MARKERS);
 
