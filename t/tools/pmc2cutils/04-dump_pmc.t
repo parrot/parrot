@@ -3,6 +3,8 @@
 # $Id$
 # 04-dump_pmc.t
 
+use warnings;
+
 BEGIN {
     use FindBin qw($Bin);
     use Cwd qw(cwd realpath);
@@ -16,7 +18,6 @@ BEGIN {
     unshift @INC, qq{$topdir/lib};
 }
 use strict;
-use warnings;
 use Test::More tests => 119;
 use File::Basename;
 use File::Copy;

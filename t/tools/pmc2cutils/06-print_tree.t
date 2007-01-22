@@ -3,6 +3,8 @@
 # $Id: pmc2c.t 14964 2006-10-18 18:20:48Z particle $
 # 06-print_tree.t
 
+use warnings;
+
 BEGIN {
     use FindBin qw($Bin);
     use Cwd qw(cwd realpath);
@@ -16,7 +18,6 @@ BEGIN {
     unshift @INC, qq{$topdir/lib};
 }
 use strict;
-use warnings;
 use Test::More tests => 55;
 use File::Basename;
 use File::Copy;

@@ -3,6 +3,8 @@
 # $Id$
 # 01-pmc2cutils.t
 
+use warnings;
+
 BEGIN {
     use FindBin qw($Bin);
     use Cwd qw(cwd realpath);
@@ -16,7 +18,6 @@ BEGIN {
     unshift @INC, qq{$topdir/lib};
 }
 use strict;
-use warnings;
 use Test::More tests => 27;
 
 use_ok( 'Parrot::Pmc2c::Utils' );
