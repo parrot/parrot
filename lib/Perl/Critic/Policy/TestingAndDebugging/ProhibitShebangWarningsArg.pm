@@ -35,7 +35,7 @@ sub violates {
             if ($element =~ m/-[^w]*w/s) {
                 my $sev = $self->get_severity();
                 return Perl::Critic::Violation
-                    ->new( $desc, $expl, $element, $sev ); 
+                    ->new( $desc, $expl, $element, $sev );
             }
             else {
                 last;  # shebang line ok; skip to the end of the elements

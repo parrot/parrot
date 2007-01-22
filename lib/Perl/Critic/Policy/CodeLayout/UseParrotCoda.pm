@@ -53,7 +53,7 @@ sub violates {
     my $last_node = $doc->last_element;
 
     # __END__ and __DATA__ blocks are excepted from having the coda
-    if ( $last_node->isa('PPI::Statement::End') 
+    if ( $last_node->isa('PPI::Statement::End')
             or $last_node->isa('PPI::Statement::Data') ) {
         return;
     }

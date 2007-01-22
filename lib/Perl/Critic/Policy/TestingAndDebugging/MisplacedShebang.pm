@@ -35,7 +35,7 @@ sub violates {
             if ($element->location()->[0] != 1) {
                 my $sev = $self->get_severity();
                 return Perl::Critic::Violation
-                    ->new( $desc, $expl, $element, $sev ); 
+                    ->new( $desc, $expl, $element, $sev );
             }
         }
     }

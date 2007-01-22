@@ -36,10 +36,10 @@ sub violates {
     # search all comment nodes which match 'vim:' or 'Local Variables:'
     my $vim_count = 0;
     my $emacs_count = 0;
-    for (my $node = $doc->first_element; 
-        $node; 
+    for (my $node = $doc->first_element;
+        $node;
         $node = $node->next_sibling) {
-        
+
         if ( $node->isa('PPI::Token::Comment') ) {
             $vim_count += grep /vim:/, $node;
             $emacs_count += grep /Local Variables:/, $node;

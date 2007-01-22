@@ -41,7 +41,7 @@ sub violates {
                               }xms) {
                 my $sev = $self->get_severity();
                 return Perl::Critic::Violation
-                    ->new( $desc, $expl, $element, $sev ); 
+                    ->new( $desc, $expl, $element, $sev );
             }
             else {
                 return;  # shebang line ok, return
@@ -63,7 +63,7 @@ Perl::Critic::Policy::TestingAndDebugging::RequirePortableShebang
 
 =head1 DESCRIPTION
 
-Make sure the perl shebang line isn't platform-specific i.e. uses something 
+Make sure the perl shebang line isn't platform-specific i.e. uses something
 like C<#!/usr/bin/perl> instead of the cross-platform C<#! perl>.
 
 =cut
