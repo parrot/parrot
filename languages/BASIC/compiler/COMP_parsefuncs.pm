@@ -1,6 +1,7 @@
 # Aux. functions needed by the parser.  (For cleanliness)
 #
 
+use strict;
 use warnings;
 
 use vars qw( %usertypes );
