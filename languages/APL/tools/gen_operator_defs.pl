@@ -220,7 +220,7 @@ END_PIR
   print_2D:
     .local int row_size, pos, newline
     row_size = shape[1]
-    pos = 1 
+    pos = 1
     iter = new .Iterator, arg
     value_type = 'String'
     unless iter goto loop_end_2d
@@ -251,11 +251,11 @@ END_PIR
     result .= "\n"
 
   continue_2d:
-    inc pos 
+    inc pos
     goto loop_2d
   loop_end_2d:
    .return(result)
- 
+
   print_value:
     if value >= 0.0 goto print_value_1
     result .= unicode:"\u207b"
@@ -340,21 +340,21 @@ nothing:
     .param pmc op2
     $I1 = op1
     $I2 = op2
-    $I3 = $I2 - $I1   
+    $I3 = $I2 - $I1
 
     $N1 = fact $I1
     $N2 = fact $I2
     $N3 = fact $I3
 
-    $N2 /= $N3 
-    $N2 /= $N1 
+    $N2 /= $N3
+    $N2 /= $N1
     .return($N2)
 .end
 
 .sub unicode:"dyadic:\u2373" :multi(APLVector, APLVector) # index of
     .param pmc op1
     .param pmc op2
- 
+
     .local pmc iter_one, iter_two
     .local pmc item_one, item_two
     .local int pos_one
@@ -369,12 +369,12 @@ nothing:
     iter_two = new .Iterator, op2
 loop_two:
     unless iter_two goto loop_two_end
-    item_two = shift iter_two 
+    item_two = shift iter_two
     iter_one = new .Iterator, op1
     pos_one = 0 # parrot's 0 == APL's 1
 loop_one:
     unless iter_one goto loop_one_end
-    item_one = shift iter_one 
+    item_one = shift iter_one
     inc pos_one
     if item_one != item_two goto loop_one
     push result, pos_one
@@ -384,7 +384,7 @@ loop_one_end:
     # if we get this far, there was no match.
     push result, not_found
 
-    goto loop_two 
+    goto loop_two
 loop_two_end:
 
     .return (result)
@@ -396,7 +396,7 @@ loop_two_end:
 
     .local pmc result
     result = new 'APLVector'
- 
+
     .local int pos
     pos = 0
     .local float value_at
@@ -533,7 +533,7 @@ neg_seven: # arctanh(x) = .5 * (ln (1+x) - ln (1 -x))
     .return($N2)
 zero_LHS:
     if op2 < 0 goto neg_RHS
-    .return(op2) 
+    .return(op2)
 neg_RHS:
     %% DOMAIN_ERROR %%
 .end
@@ -577,7 +577,7 @@ done:
 outer_loop:
     unless iter1 goto outer_done
     $P1 = shift iter1
- 
+
     iter2 = new .Iterator, op2
 inner_loop:
     unless iter2 goto inner_done
@@ -603,7 +603,7 @@ outer_done:
     .param int op1
     .param pmc op2
 
-    .local pmc result 
+    .local pmc result
     result = new 'APLVector'
 
     .local pmc iter
@@ -625,7 +625,7 @@ neg_loop:
 pos_loop:
     if op1 == 0 goto done
     unless iter goto done
-    
+
     $P1 = shift iter
     push result, $P1
 
@@ -701,7 +701,7 @@ done:
     $I0 = 0
     $I1 = length $S0
   loop:
-    if $I0 >= $I1 goto loop_end 
+    if $I0 >= $I1 goto loop_end
     $S1 = substr $S0, $I0, 1
     push result, $S1
     inc $I0
@@ -758,13 +758,13 @@ END_PREAMBLE
     %% DOMAIN_ERROR %%
   good:
     # Create a result vector
-    .local pmc result 
+    .local pmc result
     result = new 'APLVector'
     # Loop through each vector, doing the ops.
     .local pmc iter1, iter2
     iter1 = new .Iterator, op1
     iter2 = new .Iterator, op2
-  loop:    
+  loop:
     unless iter1 goto loop_done
     $P1 = shift iter1
     $P2 = shift iter2
@@ -807,12 +807,12 @@ END_PIR
 
             $template .= << "END_PIR";
     # Create a result vector
-    .local pmc result 
+    .local pmc result
     result = new 'APLVector'
     # Loop through each vector, doing the ops.
     .local pmc iter1
     iter1 = new .Iterator, $vector
-  loop:    
+  loop:
     unless iter1 goto loop_done
     \$P1 = shift iter1
     \$S1 = typeof \$P1
@@ -860,7 +860,7 @@ sub interpolate {
     return ($code);
 }
 
-__END__ 
+__END__
 
 =head1 NAME
 

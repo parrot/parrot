@@ -56,7 +56,7 @@ __DATA__
 --- out: DREIW SI LPA
 
 === rotate
---- APL: 1⊖6 7 8 9 
+--- APL: 1⊖6 7 8 9
 --- out: 7 8 9 6
 
 === rotate multiple positions

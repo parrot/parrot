@@ -19,11 +19,11 @@ __DATA__
 --- out: 5.14
 
 === plus vector, float
---- APL: 1 2 3 4+3.14 
+--- APL: 1 2 3 4+3.14
 --- out: 4.14 5.14 6.14 7.14
 
 === plus float, vector
---- APL: 3.14+1 2 3 4 
+--- APL: 3.14+1 2 3 4
 --- out: 4.14 5.14 6.14 7.14
 
 === plus vector
@@ -43,11 +43,11 @@ __DATA__
 --- out: ⁻1.14
 
 === minus vector, float
---- APL: 1 2 3 4−3.14 
+--- APL: 1 2 3 4−3.14
 --- out: ⁻2.14 ⁻1.14 ⁻0.14 0.86
 
 === minus float, vector
---- APL: 3.14−1 2 3 4 
+--- APL: 3.14−1 2 3 4
 --- out: 2.14 1.14 0.14 ⁻0.86
 
 === minus vector
@@ -67,7 +67,7 @@ __DATA__
 --- out: 6.28
 
 === times vector, float
---- APL: 1 2 3 4×3.14 
+--- APL: 1 2 3 4×3.14
 --- out: 3.14 6.28 9.42 12.56
 
 === times float, vector
@@ -204,7 +204,7 @@ __DATA__
 
 === circular 0
 --- APL: 0○.75
---- out: 0.661438 
+--- out: 0.661438
 
 === circular 1
 --- APL: 1○.75
@@ -272,7 +272,7 @@ __DATA__
 
 === and 2
 --- APL: 1∧0
---- out: 0 
+--- out: 0
 
 === and 3
 --- APL: 1∧1
@@ -304,7 +304,7 @@ __DATA__
 
 === nand 2
 --- APL: 1⍲0
---- out: 1 
+--- out: 1
 
 === nand 3
 --- APL: 1⍲1
@@ -320,7 +320,7 @@ __DATA__
 
 === nor 2
 --- APL: 1⍱0
---- out: 0 
+--- out: 0
 
 === nor 3
 --- APL: 1⍱1
