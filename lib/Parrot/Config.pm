@@ -14,6 +14,7 @@ values loaded from F<lib/Parrot/Config/Generated.pm>.
 
 package Parrot::Config;
 
+use strict;
 use warnings;
 
 eval 'use Parrot::Config::Generated';
@@ -22,7 +23,6 @@ if ($@) {
         . "Please run `perl Configure.pl`.\n\n";
 }
 
-use strict;
 use Exporter;
 
 use vars qw(@ISA @EXPORT %PConfig);
