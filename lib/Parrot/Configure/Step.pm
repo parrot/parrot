@@ -160,8 +160,8 @@ sub move_if_diff {
 =item C<genfile($source, $target, %options)>
 
 Takes the specified source file, replacing entries like C<@FOO@> with
-C<FOO>'s value from the configuration system's data, and writes the results 
-to specified target file. 
+C<FOO>'s value from the configuration system's data, and writes the results
+to specified target file.
 
 Respects the following options when manipulating files (Note: most of the
 replacement syntax assumes the source text is on a single line.)
@@ -197,9 +197,9 @@ be overwritten with a new copy).
 
 =item feature_file
 
-When feature_file is set to a true value, a lines beginning with C<#perl> 
+When feature_file is set to a true value, a lines beginning with C<#perl>
 forces the remaining lines of the file to be evaluated as perl code. Before
-this evaluation occurs, any substitution of @@ values is performed on the 
+this evaluation occurs, any substitution of @@ values is performed on the
 original text.
 
 =item replace_slashes
@@ -218,8 +218,8 @@ into their full equivalents. For example:
 Will be replaced *at config time* with the list of files that match this
 pattern. Note! Be very careful when determining whether or not to disable
 this expansion during config time and letting gmake evaluate these: the
-config system itself may change state of the filesystem, causing the 
-directives to expand differently depending on when they're run. Another 
+config system itself may change state of the filesystem, causing the
+directives to expand differently depending on when they're run. Another
 potential issue to consider there is that most makefiles, while generated
 from the root directory, are *run* from a subdirectory. So relative path names
 become an issue.
@@ -227,7 +227,7 @@ become an issue.
 The gmake replacements are done repeatedly on a single line, so nested
 syntax works ok.
 
-=over 4 
+=over 4
 
 =item addprefix
 
@@ -343,7 +343,7 @@ sub genfile {
             if (
                 $line =~ s{\$ \( basename \s+ ([^)]+) \)}{
                 join (' ',
-                    map { 
+                    map {
                         my @split = File::Spec->splitpath($_);
                         $split[2] =~ s/\.[^.]*$//;
                         File::Spec->catpath(@split);
@@ -359,7 +359,7 @@ sub genfile {
                 $line =~ s{\$ \( addprefix \s+ ([^,]+) \s* , \s* ([^)]+) \)}{
                 my ($prefix,$list) = ($1, $2);
                 join (' ',
-                    map { $_ = $prefix . $_, $_ } 
+                    map { $_ = $prefix . $_, $_ }
                         split(' ', $list)
                 )
             }egx

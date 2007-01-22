@@ -46,10 +46,10 @@ sub new_group {
 
 =item C<new($name, $text, @contents)>
 
-Returns a new group. 
+Returns a new group.
 
 C<$name> and C<$text> are required, though the text can be an empty
-string. C<@contents> is one or more C<Parrot::Docs::Item> instances, or 
+string. C<@contents> is one or more C<Parrot::Docs::Item> instances, or
 relative paths.
 
 =cut

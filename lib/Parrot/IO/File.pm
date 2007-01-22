@@ -83,7 +83,7 @@ sub create_path {
 
 =item C<parent($path)>
 
-Returns the file's parent directory.    
+Returns the file's parent directory.
 
 =cut
 

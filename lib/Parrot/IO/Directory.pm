@@ -55,7 +55,7 @@ sub file_class {
 
 =item C<directory_with_path($path)>
 
-Returns the directory with the specified path. 
+Returns the directory with the specified path.
 
 The directory is an instance of the class returned by
 C<directory_class>.
@@ -71,7 +71,7 @@ sub directory_with_path {
 
 =item C<file_with_path($path)>
 
-Returns the file with the specified path. 
+Returns the file with the specified path.
 
 The file is an instance of the class returned by C<file_class>.
 
@@ -143,7 +143,7 @@ sub create_path {
 
 =item C<relative_path($path)>
 
-Returns the specified path relative to the directory.    
+Returns the specified path relative to the directory.
 
 =cut
 

@@ -47,7 +47,7 @@ sub root_section {
 
 =item C<new_section($name, $text, @items)>
 
-Returns a new section. 
+Returns a new section.
 
 Use this when creating subsections within a subclass's C<new()> method.
 

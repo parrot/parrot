@@ -191,7 +191,7 @@ Returns C<$obj> as a new instance.
 
 =item C<$obj->add_pir($code, $code, ...)>
 
-Add more pir to be processed. 
+Add more pir to be processed.
 
 =item C<$code = $obj->get_formatted()>
 

@@ -208,7 +208,7 @@ files, and F<*.dump> files are assumed not to contain POD and therefore
 not checked.
 
 Note that the results are cached and the POD will only be rechecked
-if the file has been modified since it was checked. 
+if the file has been modified since it was checked.
 
 =cut
 

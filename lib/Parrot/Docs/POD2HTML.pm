@@ -34,7 +34,7 @@ our $VERSION = '1.0';
 
 use Parrot::Docs::HTMLPage;
 
-=item C<do_beginning()> 
+=item C<do_beginning()>
 
 Reimplements the C<Pod::Simple::HTML> method to add a header to the start
 of the document.
@@ -486,7 +486,7 @@ sub resolve_pod_page_link {
 
 Returns the path to the Perl module's HTML file relative to the current
 documentation page. Currently only F<lib/Parrot> modules are linkable.
-Returns C<undef> if the current documentation file is the file for the 
+Returns C<undef> if the current documentation file is the file for the
 module.
 
 =cut

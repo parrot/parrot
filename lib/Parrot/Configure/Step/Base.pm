@@ -8,7 +8,7 @@
 Parrot::Configure::Step::Base - Configuration Step Base Class
 
 =head1 SYNOPSIS
-    
+
     use base qw(Parrot::Configure::Step::Base);
 
 =head1 DESCRIPTION

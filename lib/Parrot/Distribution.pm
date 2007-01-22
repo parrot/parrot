@@ -135,7 +135,7 @@ Parrot.  Returns a list of Parrot::IO::File objects.
 sub c_source_files {
     my $self = shift;
 
-    my @manifest_files = keys %{ ExtUtils::Manifest::maniread( 
+    my @manifest_files = keys %{ ExtUtils::Manifest::maniread(
             File::Spec->catfile( $self->path, "MANIFEST" ) ) };
 
     my @c_files = sort grep m{\.[cC]$}o, @manifest_files;
@@ -155,8 +155,8 @@ Returns the directories which contain C header files.
 sub c_header_file_directories {
     my $self = shift;
 
-    my %c_header_dirs = 
-    
+    my %c_header_dirs =
+
         # Make a hash out of the directories of those files
         map { ( ( File::Spec->splitpath($_) )[1] => 1 ) }
 
@@ -201,7 +201,7 @@ Parrot.  Returns a list of Parrot::IO::File objects.
 sub c_header_files {
     my $self = shift;
 
-    my @manifest_files = keys %{ ExtUtils::Manifest::maniread( 
+    my @manifest_files = keys %{ ExtUtils::Manifest::maniread(
             File::Spec->catfile( $self->path, "MANIFEST" ) ) };
 
     my @h_files = sort grep m{\.[hH]$}o, @manifest_files;
@@ -264,7 +264,7 @@ Parrot.  Returns a list of Parrot::IO::File objects.
 sub pmc_source_files {
     my $self = shift;
 
-    my @manifest_files = keys %{ ExtUtils::Manifest::maniread( 
+    my @manifest_files = keys %{ ExtUtils::Manifest::maniread(
             File::Spec->catfile( $self->path, "MANIFEST" ) ) };
 
     my @pmc_files = sort grep m{\.pmc$}o, @manifest_files;
@@ -281,10 +281,10 @@ Returns the directories which contain yacc source files.
 sub yacc_source_file_directories {
     my $self = shift;
 
-    return map $self->directory_with_name($_) => 
+    return map $self->directory_with_name($_) =>
         'compilers/imcc/',
-        'languages/cola/', 
-        'languages/lua/doc', 
+        'languages/cola/',
+        'languages/lua/doc',
         'languages/regex/lib/Regex',
         ;
 }
@@ -321,7 +321,7 @@ Parrot.  Returns a list of Parrot::IO::File objects.
 sub yacc_source_files {
     my $self = shift;
 
-    my @manifest_files = keys %{ ExtUtils::Manifest::maniread( 
+    my @manifest_files = keys %{ ExtUtils::Manifest::maniread(
             File::Spec->catfile( $self->path, "MANIFEST" ) ) };
 
     my @yacc_files = sort grep m{\.y$}o, @manifest_files;
@@ -338,8 +338,8 @@ Returns the directories which contain lex source files.
 sub lex_source_file_directories {
     my $self = shift;
 
-    return map $self->directory_with_name($_) => 
-        'compilers/imcc/', 
+    return map $self->directory_with_name($_) =>
+        'compilers/imcc/',
         'languages/cola/',
         ;
 }
@@ -376,7 +376,7 @@ Parrot.  Returns a list of Parrot::IO::File objects.
 sub lex_source_files {
     my $self = shift;
 
-    my @manifest_files = keys %{ ExtUtils::Manifest::maniread( 
+    my @manifest_files = keys %{ ExtUtils::Manifest::maniread(
             File::Spec->catfile( $self->path, "MANIFEST" ) ) };
 
     my @lex_files = sort grep m{\.l$}o, @manifest_files;
@@ -393,10 +393,10 @@ Returns the directories which contain ops source files.
 sub ops_source_file_directories {
     my $self = shift;
 
-    return map $self->directory_with_name($_) => 
+    return map $self->directory_with_name($_) =>
         'src/ops/',
-        'src/dynoplibs/', 
-        'languages/tcl/src/ops/', 
+        'src/dynoplibs/',
+        'languages/tcl/src/ops/',
         'languages/WMLScript/ops/',
         'languages/dotnet/ops/',
         ;
@@ -434,7 +434,7 @@ Parrot.  Returns a list of Parrot::IO::File objects.
 sub ops_source_files {
     my $self = shift;
 
-    my @manifest_files = keys %{ ExtUtils::Manifest::maniread( 
+    my @manifest_files = keys %{ ExtUtils::Manifest::maniread(
             File::Spec->catfile( $self->path, "MANIFEST" ) ) };
 
     my @ops_files = sort grep m{\.ops$}o, @manifest_files;
@@ -492,7 +492,7 @@ sub get_c_language_files {
 
 =item C<is_c_exemption()>
 
-Determines if the given filename is an exemption to being in the C source.  
+Determines if the given filename is an exemption to being in the C source.
 This is to exclude automatically generated C-language files Parrot might have.
 
 =cut
