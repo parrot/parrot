@@ -228,11 +228,15 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__call");
         if (meth != NULL) {
             /* fix me */
+#if 1
             PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
             if (NULL == retval) {
                 retval = pmc_new(INTERP, dynpmc_LuaNil);
             }
-            return retval;
+#else
+            next = VTABLE_invoke(INTERP, meth, next);
+#endif
+            return next;
         }
         real_exception(INTERP, NULL, ILL_INHERIT,
                 "attempt to call a %s value",
