@@ -10,7 +10,7 @@ tools/dev/parrot_coverage.pl - Run coverage tests and report
 
     % mkdir parrot_coverage
     % perl tools/dev/parrot_coverage.pl recompile
-    % perl tools/dev/parrot_coverage.pl 
+    % perl tools/dev/parrot_coverage.pl
 
 =head1 DESCRIPTION
 

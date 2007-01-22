@@ -20,8 +20,8 @@ indentation.
 You will need to have C<C::Scan> installed to run this. Use the CPAN
 shell:
 
-    perl -MCPAN -e shell 
-    cpan> install C::Scan 
+    perl -MCPAN -e shell
+    cpan> install C::Scan
     ...
 
 =cut

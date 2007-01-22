@@ -2,7 +2,7 @@
 
 =head1 ncidef2asm.pl
 
-Take an NCI library definition file and turn it into a 
+Take an NCI library definition file and turn it into a
 
 =head1 Sections
 

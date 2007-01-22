@@ -53,8 +53,8 @@ Here is an example parrotbench.conf:
     time      = 1
 
     [regexes]
-    include   = ^gc 
-    include   = ^oo 
+    include   = ^gc
+    include   = ^oo
     exclude   = header
     exclude   = waves
 

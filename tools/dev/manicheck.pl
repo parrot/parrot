@@ -20,7 +20,7 @@ number of I<missing>, I<expected> and I<extra> files, and
 then any extra files are listed.
 
 Files that match the patterns in MANIFEST.SKIP are not reported as extra
-files. 
+files.
 
 =cut
 
