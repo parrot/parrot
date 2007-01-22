@@ -1288,6 +1288,11 @@ sub BuildMain {
             'result' => new defn( 'vararg', 'local', 'pmc' ),
             'pragma' => ':slurpy',
         );
+        my $arg = BuildVariable($parser, [ 'arg' ]);
+        my $vararg = [ BuildCallVararg($parser) ];
+        my $val = BuildTable($parser, [ $vararg ]);
+        my $ass = BuildAssigns($parser, [ $arg ], [ $val ]);
+        push @opcodes, @{$ass};
         push @opcodes, @{$stat};
         push @opcodes, new EndDir($parser);
         foreach my $op (@opcodes) {

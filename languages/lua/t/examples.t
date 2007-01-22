@@ -21,7 +21,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'hello world' );
@@ -56,6 +56,20 @@ CODE
 5040
 OUT
 
+language_output_is( 'lua', <<'CODE', <<'OUT', 'factorial (recursive)' );
+local function factorial (n)
+    if n == 0 then
+        return 1
+    else
+        return n * factorial(n-1)
+    end
+end
+
+print(factorial(7))
+CODE
+5040
+OUT
+
 language_output_is( 'lua', <<'CODE', <<'OUT', 'factorial (loop)' );
 function factorial (n)
     local a = 1
@@ -71,7 +85,6 @@ CODE
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'with args', params => "abc def"  );
-local arg = {...}
 print(#arg)
 print(...)
 CODE
