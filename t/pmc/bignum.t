@@ -24,7 +24,7 @@ This is very broken.
 
 ==head1 SEE ALSO
 
-F<docs/docs/pdds/clip/pdd14_bignum.pod>,
+F<docs/docs/pdds/draft/pdd14_bignum.pod>,
 L<https://rt.perl.org/rt3/Ticket/Display.html?id=36330>
 
 =cut
