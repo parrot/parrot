@@ -48,13 +48,13 @@ sub runtime_init {
     push @{ $code{$seg}->{code} }, <<INIT;
         #
         # Program Begins Here
-        # I must not fear. Fear is the mind-killer. Fear is the little-death 
+        # I must not fear. Fear is the mind-killer. Fear is the little-death
         #  that brings total obliteration. I will face my fear. I will permit
         #  it to pass over me and through me. And when it has gone past I will
         #  turn the inner eye to see its path. Where the fear has gone there
         #  will be nothing. Only I will remain.
         #                      Bene Gesserit Litany Against Fear
-        # Compiler version @{[VERSION]}@{[ grep $_=sprintf("\n\t#%22s %s\t", 
+        # Compiler version @{[VERSION]}@{[ grep $_=sprintf("\n\t#%22s %s\t",
              $_, scalar localtime((stat("$_"))[9])),
              sort { -M $a <=> -M $b } glob("COMP_*")]}
         #
@@ -146,7 +146,7 @@ PARSE_NOFEED:
 
     # General purpose keyword dispatch.
     if (
-        $syms[CURR] =~ /^(  
+        $syms[CURR] =~ /^(
                 while | wend | dim | type | exit | function | for | next |
                 do | loop | goto | gosub | return  | sub | call | select | case |
                 read | restore | input | open | close | on | randomize | stop | swap |

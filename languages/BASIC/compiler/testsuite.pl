@@ -288,7 +288,7 @@ print t(3)
 
 1740 print "Branched"
         end
-' Logical Operators 
+' Logical Operators
 print "      AND   OR    XOR   EQV   IMP   a & ! b"
 for i = 0 to 1
 for j = 0 to 1
@@ -551,7 +551,7 @@ for i = 1 to max
         for j = 0 to a(i)
                 print "*";
         next j
-        print 
+        print
 next i
 
 ' Trig
@@ -583,7 +583,7 @@ print " World"
 
 ' Expect 21 and "Correct"
 print 1+int(20)
-if t = 6 then 
+if t = 6 then
         print "Hi"
 elseif t=1 then
         print "Wrong"
@@ -677,10 +677,10 @@ t=0
 g=0
 if t then
         print "Wrong"
-else 
+else
         if g then
                 print "Wrong again"
-        else 
+        else
                 print "Correct"
         end if
 end if
@@ -693,7 +693,7 @@ if t then
         print "Mistake"
 elseif g then
         print "Also a mistake"
-else 
+else
         print "Correct"
 end if
 
@@ -730,7 +730,7 @@ if t then print "Wrong" else print "Correct"
 t=0
 if t then
         print "Wrong"
-else 
+else
         print "Correct"
 end if
 
@@ -738,7 +738,7 @@ end if
 t=1
 if t then
         print "Correct"
-else 
+else
         print "Wrong"
 end if
 
@@ -759,7 +759,7 @@ if t then
         print "Mistake"
 elseif g then
         print "Also a mistake"
-else 
+else
         print "Correct now 24"
         print factorial(4)
 end if
@@ -1275,7 +1275,7 @@ for i=1 to 5
         read h
         print h,
 next i
-print 
+print
 data 56, -78, 12.3, "Foo", lol, +#^
 20 data 10,20,30,40,50
 
@@ -1332,7 +1332,7 @@ for i = 1 to max
         for j = 0 to a(i)
                 print "*";
         next j
-        print 
+        print
 next i
 
 ' Square roots and sgn
@@ -1416,7 +1416,7 @@ LOOPY:
         if bump < 1 then
                 if bump = 0 then
                         print "Second"
-                else 
+                else
                         print "Third"
                 end if
         end if
