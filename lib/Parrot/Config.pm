@@ -14,6 +14,8 @@ values loaded from F<lib/Parrot/Config/Generated.pm>.
 
 package Parrot::Config;
 
+use warnings;
+
 eval 'use Parrot::Config::Generated';
 if ($@) {
     die "\nParrot::Config is unavailable until you configure parrot.\n"
@@ -21,7 +23,6 @@ if ($@) {
 }
 
 use strict;
-use warnings;
 use Exporter;
 
 use vars qw(@ISA @EXPORT %PConfig);
