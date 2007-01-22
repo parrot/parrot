@@ -262,8 +262,8 @@ sub run_command {
     local *OLDERR if $err;
 
     # Save the old filehandles; we must not let them get closed.
-    open OLDOUT, ">&", "STDOUT" or die "Can't save     stdout" if $out;
-    open OLDERR, ">&", "STDERR" or die "Can't save     stderr" if $err;
+    open OLDOUT, ">&STDOUT" or die "Can't save     stdout" if $out;
+    open OLDERR, ">&STDERR" or die "Can't save     stderr" if $err;
 
     open STDOUT, ">", "$out" or die "Can't redirect stdout to $out" if $out;
     open STDERR, ">$err" or die "Can't redirect stderr to $err" if $err;
@@ -295,8 +295,8 @@ sub run_command {
     close STDOUT or die "Can't close    stdout" if $out;
     close STDERR or die "Can't close    stderr" if $err;
 
-    open STDOUT, ">&", "OLDOUT" or die "Can't restore  stdout" if $out;
-    open STDERR, ">&", "OLDERR" or die "Can't restore  stderr" if $err;
+    open STDOUT, ">&OLDOUT" or die "Can't restore  stdout" if $out;
+    open STDERR, ">&OLDERR" or die "Can't restore  stderr" if $err;
 
     return (
           ( $exit_code < 0 )    ? $exit_code
