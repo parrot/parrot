@@ -153,7 +153,7 @@ sub runstep {
             #     requires -O
             . " -Wunknown-pragmas  -Wunreachable-code -Wunused  -Wunused-function  -Wunused-label  -Wunused-parameter -Wunused-value "
             . " -Wunused-variable  -Wwrite-strings "
-            #."-Wmost (APPLE ONLY)" 
+            #."-Wmost (APPLE ONLY)"
 
             #C-only Warning Options
             . " -Wbad-function-cast  -Wmissing-declarations -Wmissing-prototypes -Wnested-externs  -Wold-style-definition -Wstrict-prototypes "
@@ -179,7 +179,7 @@ sub runstep {
             #
             # -Wcast-align is now removed: it gives too many false positives
             #    e.g. when accessing registers - this is all aligned
-     
+
             2.7  => "",
             2.8  => "",
             #2.8  => "-Wsign-compare",
