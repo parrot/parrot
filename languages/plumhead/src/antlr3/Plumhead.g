@@ -17,6 +17,7 @@ options
 tokens 
 {
   PROGRAM;
+  NOQUOTE_STRING;
 }
 
 @lexer::members
@@ -26,8 +27,8 @@ tokens
 
 // real tokens
 SEA        :  { !codeMode }?=> (~'<')+ ;
-CODE_START :  '<?php' { codeMode = true; } ;
-CODE_END   :  { codeMode }?=> '?>' { codeMode = false; } ;
+CODE_START :  '<?php'              { codeMode = true; } ;
+CODE_END   :  { codeMode }?=> '?>' '\n'? { codeMode = false; } ;
 WS
   : { codeMode }?=> 
     ( ' ' | '\t' | '\r' | '\n' )+
@@ -35,7 +36,7 @@ WS
       $channel = HIDDEN;       // send into nirwana 
     }
   ;
-STRING     : { codeMode }?=> '\"' ( ~'\"' )*  '\"' ;
+DOUBLEQUOTE_STRING     : { codeMode }?=> '\"' ( ~'\"' )*  '\"' ;
 ECHO       : { codeMode }?=> 'echo' ;
 
 fragment
@@ -55,11 +56,15 @@ REL_OP     :{ codeMode }?=>  '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
 // productions
 
 program 
-  : s1=sea code s2=sea -> ^( PROGRAM $s1 code $s2 )
+  : sea_or_code -> ^( PROGRAM sea_or_code )
+  ;
+
+sea_or_code
+  : ( sea | code )+ 
   ;
 
 sea
-  : SEA -> ^( ECHO STRING[$SEA] )
+  : SEA -> ^( ECHO NOQUOTE_STRING[$SEA] )
   ;
 
 code
@@ -67,7 +72,7 @@ code
   ;
 
 statements
-  : ( statement )+
+  : ( statement )*
   ;
 
 statement
@@ -75,7 +80,7 @@ statement
   ;
 
 expression
-  : STRING
+  : DOUBLEQUOTE_STRING
   | adding_expression
   ;
 

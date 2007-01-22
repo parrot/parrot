@@ -124,13 +124,13 @@ node[String reg_mother]
         + "  # end of ECHO node                                              \n"
       );
     }
-  | STRING
+  | NOQUOTE_STRING
     {
-      String without_anno = $STRING.text;
+      String without_anno = $NOQUOTE_STRING.text;
       without_anno = without_anno.replace( "\n", "\\n" );
       System.out.println( 
           "                                                                  \n"
-        + "  # start of STRING                                               \n"
+        + "  # start of NOQUOTE_STRING                                               \n"
         + "  .local string val                                               \n"
         + "     val = \"" + without_anno + "\"                               \n"
         + "  past_temp = new 'PAST::Val'                                     \n"
@@ -140,7 +140,27 @@ node[String reg_mother]
         + "      past_temp.'init'( 'name' => val, 'vtype' => '.Undef' )      \n"
         + "  " + $node.reg_mother + ".'push'( past_temp )                    \n"
         + "  null past_temp                                                  \n"
-        + "  # end of STRING                                                 \n"
+        + "  # end of NOQUOTE_STRING                                                 \n"
+        + "                                                                  \n"
+      );
+    }
+  | DOUBLEQUOTE_STRING
+    {
+      String without_anno = $DOUBLEQUOTE_STRING.text;
+      without_anno = without_anno.replace( "\n", "\\n" );
+      System.out.println( 
+          "                                                                  \n"
+        + "  # start of DOUBLEQUOTE_STRING                                               \n"
+        + "  .local string val                                               \n"
+        + "     val = " + without_anno + "                               \n"
+        + "  past_temp = new 'PAST::Val'                                     \n"
+        + "  .local pmc code_string                                          \n"
+        + "  code_string = new 'PGE::CodeString'                             \n"
+        + "  ( val ) = code_string.'escape'( val )                           \n"
+        + "      past_temp.'init'( 'name' => val, 'vtype' => '.Undef' )      \n"
+        + "  " + $node.reg_mother + ".'push'( past_temp )                    \n"
+        + "  null past_temp                                                  \n"
+        + "  # end of DOUBLEQUOTE_STRING                                                 \n"
         + "                                                                  \n"
       );
     }
