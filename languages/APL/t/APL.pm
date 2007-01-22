@@ -2,6 +2,7 @@ package t::APL;
 
 # Fail a little more gracefully for those without Test::Base installed.
 
+use strict;
 use warnings;
 
 BEGIN {
