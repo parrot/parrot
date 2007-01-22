@@ -2,6 +2,7 @@
 # Copyright (C) 2005-2006, The Perl Foundation.
 # $Id$
 
+use strict;
 use warnings;
 use t::pmc;
 
