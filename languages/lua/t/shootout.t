@@ -230,3 +230,9 @@ $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'hello.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'hello-output.txt' ));
 language_output_is( 'lua', $code, $out, 'startup' );
 
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
