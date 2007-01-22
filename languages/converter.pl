@@ -6,7 +6,7 @@ converter.pl - convert BNF grammar to a Parse::RecDescent grammar
 
 =head1 DESCRIPTION
 
-An early attempt at Python support for Parrot. 
+An early attempt at Python support for Parrot.
 
 =cut
 
@@ -33,7 +33,7 @@ sub strip_quotes {
 my $grammargrammar = <<'_EOF_';
 
 rule		: /\w+/ '::=' production
-#		{[@item[1,3]]} 
+#		{[@item[1,3]]}
 		{ "$item[1] : $item[3]" }
 
 production	: terminal production
