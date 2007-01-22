@@ -1445,3 +1445,9 @@ F<tools/build/pmc2c.pl>, Parrot::Pmc2c, Parrot::Pmc2c::Library.
 
 1;
 
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
