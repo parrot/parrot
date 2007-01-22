@@ -4,6 +4,7 @@
 
 # A workaround for run-tests.php
 
+use strict;
 use warnings;
 
 exec './parrot', 'languages/plumhead/plumhead.pbc', @ARGV;
