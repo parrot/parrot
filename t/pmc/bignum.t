@@ -17,7 +17,7 @@ from: http://www2.hursley.ibm.com/decimal/dectest.html
 This was started by Alex Gogh, who went to work in Antarctica, http://the.earth.li/~alex/halley/.
 The script was supposed to test bignum.c, which should become the basis for a
 BigNum PMC.
- 
+
 =head1 TODO
 
 This is very broken.

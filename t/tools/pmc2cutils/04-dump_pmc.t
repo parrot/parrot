@@ -33,7 +33,7 @@ my $rv;
 my $cwd = cwd();
 
 my @include_orig = (
-    qq{$main::topdir}, 
+    qq{$main::topdir},
     qq{$main::topdir/src/pmc},
 );
 
@@ -385,7 +385,7 @@ my @include_orig = (
     ok(chdir $cwd, "changed back to original directory");
 }
 
-# @args globs 'src/pmc/*.pmc' 
+# @args globs 'src/pmc/*.pmc'
 {
     my $tdir = tempdir( CLEANUP => 1);
     ok(chdir $tdir, 'changed to temp directory for testing');
@@ -409,7 +409,7 @@ my @include_orig = (
         "all src/pmc/*.pmc files copied to tempdir");
     my @include = ($tdir, $temppmcdir, @include_orig);
 
-    @args = ( 'src/pmc/*.pmc' );  
+    @args = ( 'src/pmc/*.pmc' );
     $self = Parrot::Pmc2c::Utils->new( {
         include => \@include,
         opt     => \%opt,
@@ -596,16 +596,16 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable methods of 
-F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality 
-of the F<pmc2c.pl> utility.  That functionality has largely been extracted 
+The files in this directory test the publicly callable methods of
+F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality
+of the F<pmc2c.pl> utility.  That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
 F<04-dump_pmc.t> tests the C<Parrot::Pmc2c::Utils::dump_pmc()> method.
 F<make> calls this method when it calls in C<tools/build/pmc2c.pl --dump>.
 
-So as not to pollute the Parrot build directories with files created 
-during the testing process, all functions which create or modify 
+So as not to pollute the Parrot build directories with files created
+during the testing process, all functions which create or modify
 files should be called within a temporary directory.
 
 =head1 AUTHOR
@@ -634,16 +634,16 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable methods of 
-F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality 
-of the F<pmc2c.pl> utility.  That functionality has largely been extracted 
+The files in this directory test the publicly callable methods of
+F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality
+of the F<pmc2c.pl> utility.  That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
 F<04-dump_pmc.t> tests the C<Parrot::Pmc2c::Utils::dump_pmc()> method.
 F<make> calls this method when it calls in C<tools/build/pmc2c.pl --dump>.
 
-So as not to pollute the Parrot build directories with files created 
-during the testing process, all functions which create or modify 
+So as not to pollute the Parrot build directories with files created
+during the testing process, all functions which create or modify
 files should be called within a temporary directory.
 
 =head1 AUTHOR

@@ -45,9 +45,9 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable methods of 
-F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality 
-of the F<pmc2c.pl> utility.  That functionality has largely been extracted 
+The files in this directory test the publicly callable methods of
+F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality
+of the F<pmc2c.pl> utility.  That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
 Since F<pmc2c.pl> is invoked during C<make>, tests of its functionality can

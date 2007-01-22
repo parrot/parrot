@@ -33,7 +33,7 @@ my $rv;
 my $cwd = cwd();
 
 my @include_orig = (
-    qq{$main::topdir}, 
+    qq{$main::topdir},
     qq{$main::topdir/src/pmc},
 );
 
@@ -317,16 +317,16 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable methods of 
-F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality 
-of the F<pmc2c.pl> utility.  That functionality has largely been extracted 
+The files in this directory test the publicly callable methods of
+F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality
+of the F<pmc2c.pl> utility.  That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
 F<05-gen_c.t> tests the C<Parrot::Pmc2c::Utils::gen_c()> method.
 F<make> calls this method when it calls in C<tools/build/pmc2c.pl --c>.
 
-So as not to pollute the Parrot build directories with files created 
-during the testing process, all functions which create or modify 
+So as not to pollute the Parrot build directories with files created
+during the testing process, all functions which create or modify
 files should be called within a temporary directory.
 
 =head1 AUTHOR

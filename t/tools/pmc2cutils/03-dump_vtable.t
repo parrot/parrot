@@ -43,7 +43,7 @@ my $cwd;
     ok(-e $dump_file, "dump_vtable created vtable.dump");
 
     is(dirname($dump_file), realpath($tdir1),
-        "vtable.dump created in expected directory"); 
+        "vtable.dump created in expected directory");
 
     ok(chdir $cwd, "changed back to original directory");
 }
@@ -88,22 +88,22 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable methods of 
-F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality 
-of the F<pmc2c.pl> utility.  That functionality has largely been extracted 
+The files in this directory test the publicly callable methods of
+F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality
+of the F<pmc2c.pl> utility.  That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
 F<03-dump_vtable.t> tests the C<Parrot::Pmc2c::Utils::dump_vtable()> method.
 F<make> calls this method when it calls in C<tools/build/pmc2c.pl --vtable>.
 
 When all of F<pmc2c.pl>'s functionality was contained within that program,
-C<dump_vtable()> was a subroutine named C<dump_default()>.  That name was 
+C<dump_vtable()> was a subroutine named C<dump_default()>.  That name was
 confusing, because it suggested that what was being 'dumped' was
 F<src/pmc/default.pmc> -- which was not the case.  The file which this method
 takes as an argument is F<vtable.tbl>; hence, the method's renaming.
 
-So as not to pollute the Parrot build directories with files created 
-during the testing process, all functions which create or modify 
+So as not to pollute the Parrot build directories with files created
+during the testing process, all functions which create or modify
 files should be called within a temporary directory.
 
 =head1 AUTHOR

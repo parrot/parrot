@@ -25,7 +25,7 @@ So only the exit code can be tested.
 
 The returned value is actually returned from the 'waitpid' system call.
 In order to get the exit code from the spawned process, it needs to be right
-shifted by 8 bit. 
+shifted by 8 bit.
 
 =head1 TODO
 

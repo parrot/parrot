@@ -39,7 +39,7 @@ my $fh;
 {
     my $tdir = tempdir( CLEANUP => 1);
     ok(chdir $tdir, 'changed to temp directory for testing');
-    
+
     ok(create_test_file($file), "test file created");
 
     $direction = '<';
@@ -47,31 +47,31 @@ my $fh;
         $direction, $file, $verbose),
         "file opened for reading");
     close $fh or die "Unable to close handle to test file";
-    
+
     $direction = '>';
     ok($fh = Parrot::Pmc2c::Utils::open_file(
         $direction, $file, $verbose),
         "file opened for writing");
     close $fh or die "Unable to close handle to test file";
-    
+
     $direction = '>>';
     ok($fh = Parrot::Pmc2c::Utils::open_file(
         $direction, $file, $verbose),
         "file opened for appending");
     close $fh or die "Unable to close handle to test file";
-    
+
     ok(chdir $cwd, "changed back to original directory");
 }
 
 {
     my $tdir = tempdir( CLEANUP => 1);
     ok(chdir $tdir, 'changed to temp directory for testing');
-    
+
     ok(create_test_file($file), "test file created");
 
     $verbose = 1;
     my ($currfh, $msg, $msgfh);
-    
+
     $direction = '<';
     {
         $currfh = select($msgfh);
@@ -83,7 +83,7 @@ my $fh;
         select($currfh);
     }
     like($msg, qr/^Reading/, "verbose option reports Reading");
-    
+
     $direction = '>';
     {
         $currfh = select($msgfh);
@@ -95,7 +95,7 @@ my $fh;
         select($currfh);
     }
     like($msg, qr/^Writing/, "verbose option reports Writing");
-    
+
     $direction = '>>';
     {
         $currfh = select($msgfh);
@@ -107,7 +107,7 @@ my $fh;
         select($currfh);
     }
     like($msg, qr/^Appending/, "verbose option reports Appending");
-    
+
     ok(chdir $cwd, "changed back to original directory");
 }
 
@@ -115,7 +115,7 @@ my $fh;
 {
     my $tdir = tempdir( CLEANUP => 1);
     ok(chdir $tdir, 'changed to temp directory for testing');
-    
+
     my ($currfh, $msg, $msgfh);
 
     $direction = '<';
@@ -130,7 +130,7 @@ my $fh;
         "correctly failed to read nonexistent file");
     like($msg, qr/^Reading sample.txt/,
         "correct message upon trying to read nonexistent file");
-    
+
     ok(chdir $cwd, "changed back to original directory");
 }
 
@@ -155,17 +155,17 @@ sub create_test_file {
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable methods of 
-F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality 
-of the F<pmc2c.pl> utility.  That functionality has largely been extracted 
+The files in this directory test the publicly callable methods of
+F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality
+of the F<pmc2c.pl> utility.  That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
 F<07-open_file.t> tests the C<Parrot::Pmc2c::Utils::open_file()> subroutine.
 This subroutine is I<not> called F<make> but is called by  methods which are
 called by F<make>.
 
-So as not to pollute the Parrot build directories with files created 
-during the testing process, all functions which create or modify 
+So as not to pollute the Parrot build directories with files created
+during the testing process, all functions which create or modify
 files should be called within a temporary directory.
 
 =head1 AUTHOR

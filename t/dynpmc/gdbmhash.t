@@ -11,7 +11,7 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/dynpmc/gdbmhash.t - test the GDBMHash PMC 
+t/dynpmc/gdbmhash.t - test the GDBMHash PMC
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,7 @@ else {
 my $new_hash_1 = << 'CODE';
 .sub test :main
     .local pmc gdbmhash_lib
-    gdbmhash_lib = loadlib "gdbmhash" 
+    gdbmhash_lib = loadlib "gdbmhash"
     .local int gdbmhash_type
     gdbmhash_type = find_type "GDBMHash"
     .local pmc hash_1
@@ -423,7 +423,7 @@ pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "delete_keyed" );
 
     .local int exist_flag
     .local int hash_size
-    
+
     exist_flag = exists hash_1["a"]
     print '"a" exists: '
     print exist_flag

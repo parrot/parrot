@@ -169,8 +169,8 @@ sub check_indent {
 
     ok( !scalar(@c_indent) )
         or
-        diag( "incorrect indenting in C file found " 
-            . scalar @c_indent 
+        diag( "incorrect indenting in C file found "
+            . scalar @c_indent
             . " occurrences in "
             . scalar @c_failed_files
             . " files:\n@c_indent" );

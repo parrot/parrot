@@ -136,7 +136,7 @@ foreach my $policy ( keys %policies ) {
         ref $policies{$policy} ? ( -config => $policies{$policy} ) : (),
     ) or die;
 
-    my $critic = Perl::Critic->new( 
+    my $critic = Perl::Critic->new(
         -config => $config,
         -top => 1);
 

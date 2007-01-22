@@ -15,7 +15,7 @@ plan $^O =~ /MSWin32/ ? ( skip_all => 'broken on Win32' ) : tests => 4;
 t/stm/basic_mt.t -- Multithreaded tests of STM ops and PMCs.
 
 =head1 SYNOPSIS
-    
+
     % prove t/stm/basic_mt.t
 
 =head1 DESCRIPTION
@@ -47,7 +47,7 @@ invalid:
 .sub incr
     .param pmc a
     .local int i
-    
+
     i = 0
 loop:
     stm_start
@@ -96,7 +96,7 @@ tx:
     stm_start
     $I0 = elements a
     if $I0 < N goto retry
-    a = "done" 
+    a = "done"
     stm_commit tx
     print "okay\n"
     .return ()
@@ -110,7 +110,7 @@ invalid:
 .sub incr
     .param pmc a
     .local int i
-    
+
     i = 0
 loop:
     stm_start
@@ -129,7 +129,7 @@ loop:
 
     .local pmc a
 
-    a = new String 
+    a = new String
     a = ""
     a = new STMRef, a
 
@@ -164,7 +164,7 @@ pir_output_like( <<'CODE', <<'OUTPUT', "get deadlock" );
     .local int i
 
     i = 0
-    
+
 loop:
     stm_start
     a = i
@@ -190,7 +190,7 @@ loop:
     b = new STMRef, b
 
     _task = global "thread_task"
-    
+
     t1 = new ParrotThread
     t2 = new ParrotThread
     t1.'run_clone'(_task, a, b)
@@ -223,7 +223,7 @@ retry:
     # is if stm_wait jumps to 'invalid'.
     stm_start
     stm_wait invalid
-    goto retry 
+    goto retry
 invalid:
     stm_abort
     goto tx
@@ -232,7 +232,7 @@ invalid:
 .sub incr
     .param pmc a
     .local int i
-    
+
     i = 0
 loop:
     stm_start

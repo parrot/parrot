@@ -14,7 +14,7 @@ t/stm/llqueue.t -- Linked-List Queue STM tests
 
 =head1 SYNOPSIS
 
-    % prove t/stm/llqueue.t 
+    % prove t/stm/llqueue.t
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "single-threaded case" );
     queue.'add_head'(1)
     queue.'add_head'(2)
     queue.'add_head'(3)
-    .local int i 
+    .local int i
     i = 0
 loop:
     $I0 = queue.'remove_tail'()
@@ -107,7 +107,7 @@ loop:
 
     .local int i
     .local int max
-    max = ADD_THREADS 
+    max = ADD_THREADS
     i = 0
 adders_loop:
     $P0 = new ParrotThread
@@ -128,7 +128,7 @@ removers_loop:
     push threads, $P0
     inc i
     if i < max goto removers_loop
-   
+
     .local int sum
     sum = 0
     max = threads
@@ -161,9 +161,9 @@ __DATA__
 
 .sub __init :method
     $P1 = new Undef
-    
+
     setattribute self, 'value', $P1
-    
+
     $P1 = new Undef
     $P2 = new STMVar, $P1
 
@@ -224,7 +224,7 @@ __DATA__
 .sub __onload :load
     .local pmc class
     load_bytecode 'STM.pbc'
-    class = newclass 'STMLLQueue' 
+    class = newclass 'STMLLQueue'
     addattribute class, 'head'
     addattribute class, 'tail'
 .end
@@ -272,7 +272,7 @@ got_head:
 .sub _remove_tail :method
     .local pmc tail_node
     .local pmc tail_tail_node
-    
+
     $P1 = getattribute self, 'tail'
     tail_node = $P1.'get_read'()
 
@@ -280,7 +280,7 @@ got_head:
     if $I0 == 0 goto no_tail
 
     tail_tail_node = tail_node.'get_prev'()
-    
+
     $P1.'set'(tail_tail_node)
     $I0 = defined tail_tail_node
     if $I0 == 1 goto skip_head

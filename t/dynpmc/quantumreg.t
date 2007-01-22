@@ -11,7 +11,7 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/dynpmc/quantumreg.t - test the QuantumReg PMC 
+t/dynpmc/quantumreg.t - test the QuantumReg PMC
 
 =head1 SYNOPSIS
 
@@ -36,7 +36,7 @@ else {
 my $new_reg_1 = << 'CODE';
 .sub 'test' :main
     .local pmc quantumreg_lib
-    quantumreg_lib = loadlib "quantumreg" 
+    quantumreg_lib = loadlib "quantumreg"
     .local int quantumreg_type
     quantumreg_type = find_type "QuantumReg"
     .local pmc reg_1

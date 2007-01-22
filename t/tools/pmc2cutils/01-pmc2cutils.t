@@ -129,9 +129,9 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable methods of 
-F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality 
-of the F<pmc2c.pl> utility.  That functionality has largely been extracted 
+The files in this directory test the publicly callable methods of
+F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality
+of the F<pmc2c.pl> utility.  That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
 F<01-pmc2cutils.t> consists solely of:
@@ -140,8 +140,8 @@ F<01-pmc2cutils.t> consists solely of:
 
 =item 1
 
-calls to C<Test::More::isa_ok()> and C<can_ok()> on the 
-constructor and publicly available methods of Parrot::Pmc2c::Utils; and 
+calls to C<Test::More::isa_ok()> and C<can_ok()> on the
+constructor and publicly available methods of Parrot::Pmc2c::Utils; and
 
 =item 2
 

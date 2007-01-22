@@ -53,7 +53,7 @@ ok(! defined $path,
 eval { $path = $self->find_file($file, 1); };
 like($@, qr/^cannot find file '$file' in path/,
     "program correctly died when 'die_unless_found' flag is set");
-    
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
@@ -68,12 +68,12 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable methods of 
-F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality 
-of the F<pmc2c.pl> utility.  That functionality has largely been extracted 
+The files in this directory test the publicly callable methods of
+F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality
+of the F<pmc2c.pl> utility.  That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
-F<02-find_file.t> tests C<Parrot::Pmc2c::Utils::find_file()>, which is 
+F<02-find_file.t> tests C<Parrot::Pmc2c::Utils::find_file()>, which is
 called within other Parrot::Pmc2c::Util methods.  The tests assume a certain
 file structure in the Parrot tarball; they may no longer be valid if that
 structure changes in the future.
