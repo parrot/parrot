@@ -3,6 +3,7 @@
 # $Id: pmc2c.t 14964 2006-10-18 18:20:48Z particle $
 # 03-dump_vtable.t
 
+use strict;
 use warnings;
 
 BEGIN {
@@ -17,7 +18,6 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use strict;
 use Test::More tests => 12;
 use_ok( 'Parrot::Pmc2c::Utils' );
 use_ok( 'File::Basename' );

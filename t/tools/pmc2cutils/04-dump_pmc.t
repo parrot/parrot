@@ -3,6 +3,7 @@
 # $Id$
 # 04-dump_pmc.t
 
+use strict;
 use warnings;
 
 BEGIN {
@@ -17,7 +18,6 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use strict;
 use Test::More tests => 119;
 use File::Basename;
 use File::Copy;

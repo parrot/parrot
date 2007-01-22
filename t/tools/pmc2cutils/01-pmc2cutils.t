@@ -3,6 +3,7 @@
 # $Id$
 # 01-pmc2cutils.t
 
+use strict;
 use warnings;
 
 BEGIN {
@@ -17,7 +18,6 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use strict;
 use Test::More tests => 27;
 
 use_ok( 'Parrot::Pmc2c::Utils' );

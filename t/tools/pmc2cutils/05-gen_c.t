@@ -3,6 +3,7 @@
 # $Id: pmc2c.t 14964 2006-10-18 18:20:48Z particle $
 # 05-gen_c.t
 
+use strict;
 use warnings;
 
 BEGIN {
@@ -17,7 +18,6 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use strict;
 use Test::More tests => 57;
 use File::Basename;
 use File::Copy;
