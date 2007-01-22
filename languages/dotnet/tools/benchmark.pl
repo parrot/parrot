@@ -1,3 +1,4 @@
+use strict;
 use warnings;
 use Time::HiRes qw(time);
 
