@@ -26,7 +26,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.byte' );
@@ -66,6 +66,31 @@ print(string.char())
 CODE
 ABC
 
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.find (mode plain)' );
+s = "hello world"
+i, j = string.find(s, "hello")
+print(i, j)
+print(string.find(s, "hello", 1, true))
+print(string.find(s, "hello", 1))
+print(string.sub(s, i, j))
+print(string.find(s, "world"))
+i, j = string.find(s, "l")
+print(i, j)
+print(string.find(s, "lll"))
+print(string.find(s, "hello", 2, true))
+print(string.find(s, "world", 2, true))
+CODE
+1	5
+1	5
+1	5
+hello
+7	11
+3	3
+nil
+nil
+7	11
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.format' );

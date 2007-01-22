@@ -122,6 +122,73 @@ L0:
 .end
 
 
+.sub 'str_find_aux' :anon
+    .param int find
+    .param pmc s :optional
+    .param pmc pattern :optional
+    .param pmc init :optional
+    .param pmc plain :optional
+    $S1 = checkstring(s)
+    $I1 = length $S1
+    $S2 = checkstring(pattern)
+    $I2 = length $S2
+    $I3 = optint(init, 1)
+    $I3 = posrelat($I3, $I1)
+    dec $I3
+    unless $I3 < 0 goto L1
+    $I3 = 0
+    goto L2
+L1:
+    unless $I3 > $I1 goto L2
+    $I3 = $I1
+L2:
+    unless find goto L3
+    if_null plain, L4
+    $I0 = istrue plain
+    if $I0 goto L5
+L4:
+    .const string specials = "^$*+?.([%-"
+    $P0 = split '', specials
+L6:
+    $I0 = $P0
+    unless $I0 > 0 goto L3
+    $S0 = shift $P0
+    $I0 = index $S2, $S0
+    unless $I0 >= 0 goto L5
+    goto L6
+L5:
+    .local int idx
+    $S1 = substr $S1, $I3
+    idx = index $S1, $S2
+    if idx < 0 goto L7
+    .local pmc start
+    .local pmc end
+    new start, .LuaNumber
+    $I0 = $I3 + idx
+    inc $I0
+    start = $I0
+    new end, .LuaNumber
+    $I0 = $I3 + idx
+    $I0 += $I2
+    end = $I0
+    .return (start, end)
+L3:
+    .local int anchor
+    .local string s1
+    anchor = 0
+    $I0 = index $S2, '^'
+    unless $I0 == 0 goto L8
+    anchor = 1
+    $S2 = substr $S2, 1
+L8:
+    s1 = substr $S1, $I3
+    not_implemented()
+L7:
+    .local pmc ret
+    new ret, .LuaNil
+    .return (ret)
+.end
+
 =item C<string.byte (s [, i [, j]])>
 
 Returns the internal numerical codes of the characters C<s[i]>, C<s[i+1]>,...,
@@ -244,21 +311,15 @@ that if C<plain> is given, then C<init> must be given as well.
 If the pattern has captures, then in a successful match the captured values
 are also returned, after the two indices.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE (see str_find_aux).
 
 =cut
 
 .sub '_string_find' :anon
-    .param pmc s :optional
-    .param pmc pattern :optional
-    .param pmc init :optional
-    .param pmc plain :optional
-    $S0 = checkstring(s)
-    $I0 = length $S0
-    $S1 = checkstring(pattern)
-    $I1 = length $S1
-    $I2 = optint(init, 1)
-    not_implemented()
+    .param pmc argv :slurpy
+    .local pmc ret
+    (ret :slurpy) = str_find_aux(1, argv :flat)
+    .return (ret :flat)
 .end
 
 
@@ -296,7 +357,7 @@ STILL INCOMPLETE.
     .local pmc ret
     $S0 = checkstring(formatstring)
     push_eh _handler
-    $S1 = sprintf $S0, argv 
+    $S1 = sprintf $S0, argv
     new ret, .LuaString
     set ret, $S1
     .return (ret)
@@ -316,7 +377,7 @@ call.
 As an example, the following loop
 
     s = "hello world from Lua"
-    for w in string.gfind(s, "%a+") do
+    for w in string.gmatch(s, "%a+") do
         print(w)
     end
 
@@ -326,22 +387,35 @@ table:
 
     t = {}
     s = "from=world, to=Lua"
-    for k, v in string.gfind(s, "(%w+)=(%w+)") do
+    for k, v in string.gmatch(s, "(%w+)=(%w+)") do
         t[k] = v
     end
 
-NOT YET IMPLEMENTED.
+NOT YET IMPLEMENTED (see gmatch_aux).
 
 =cut
 
-.sub '_string_gmatch' :anon
+.sub '_string_gmatch' :anon :lex
     .param pmc s :optional
     .param pmc pattern :optional
-    $S0 = checkstring(s)
-    $S1 = checkstring(pattern)
-    not_implemented()
+    .local pmc ret
+    checkstring(s)
+    checkstring(pattern)
+    .lex 'upvar_s', s
+    .lex 'upvar_pattern', pattern
+    .const .Sub gmatch_aux = 'gmatch_aux'
+    ret = newclosure gmatch_aux
+    .return (ret)
 .end
 
+.sub 'gmatch_aux' :anon :lex :outer(_string_gmatch)
+    .local pmc s
+    .local pmc pattern
+    .local pmc ret
+    s = find_lex 'upvar_s'
+    pattern = find_lex 'upvar_pattern'
+    not_implemented()
+.end
 
 =item C<string.gsub (s, pat, repl [, n])>
 
@@ -427,20 +501,15 @@ returns B<nil>. If C<pattern> specifies no captures, then the whole match is
 returned. A third, optional numerical argument C<init> specifies where to
 start the search; its default value is 1 and may be negative.
 
-NOT YET IMPLEMENTED.
+NOT YET IMPLEMENTED (see str_find_aux).
 
 =cut
 
 .sub '_string_match' :anon
-    .param pmc s :optional
-    .param pmc pattern :optional
-    .param pmc init :optional
-    $S0 = checkstring(s)
-    $I0 = length $S0
-    $S1 = checkstring(pattern)
-    $I1 = length $S1
-    $I2 = optint(init, 1)
-    not_implemented()
+    .param pmc argv :slurpy
+    .local pmc ret
+    (ret :slurpy) = str_find_aux(0, argv :flat)
+    .return (ret :flat)
 .end
 
 
