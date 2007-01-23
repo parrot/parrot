@@ -1,0 +1,72 @@
+# Copyright (C) 2007, The Perl Foundation.
+# $Id$
+
+=head1 NAME
+
+docs/stability.pod -- Parrot Component/Interface Stability Classification
+
+=head1 DESCRIPTION
+
+This document classifies Parrot components and interfaces based on their
+stability. Stability is a measure of likeliness that a component or interface
+will change in a subsequent version. Components include command-line tools,
+and documents (eg. PDDs.) Interfaces include API/ABIs, modules, libraries,
+environment variables, and implementations (eg. source and headers.)
+
+Stability classifications must be included in component or interface
+documentation. For an example, see the L<STABILITY> section of this doc.
+
+=head2 Stability Classifications
+
+There are five categories of stability, as described below:
+
+=over 4
+
+=item Private
+
+This component or interface is only for use within Parrot; it shouldn't be
+exposed or used externally.  It may be modified or removed at any time.
+
+=item Unstable
+
+Externally visible, but under active development. Use at your own risk.
+
+=item Evolving
+
+Externally visible, but under development. Changes must include documentation
+(and tests where appropriate,) and must be reviewed by the Project Team before
+committing to trunk. Backward compatibility is maintained when possible.
+
+=item Stable
+
+Externally visible and unlikely to change between minor releases. Changes must
+include docs and tests, must be reviewed and approved by the Project Team, and
+cannot be applied without a deprecation cycle for any affected component or
+interface.
+
+=item Deprecated
+
+This component or interface is no longer supported; it will be removed after
+the completion of its deprecation cycle (usually one release.)
+
+=back
+
+=head1 TODO
+
+=over 4
+
+=item Determine where and how stability should be documented for each
+component/interface
+
+=back
+
+=head1 STABILITY
+
+Evolving. This proposal has been reviewed and accepted by the Project Team,
+but some details remain to be filled in.
+
+=head1 AUTHOR
+
+jerry gay a.k.a. particle
+
+=cut
