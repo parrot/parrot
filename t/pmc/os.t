@@ -214,10 +214,8 @@ CODE
 
 # test rename
 SKIP: {
-    skip 'not implemented on windows yet', 1 if ($MSWin32);
-
-    `touch ____some_test_file` ;
-
+    open FILE, "> ____some_test_file";
+    close FILE;
     pir_output_is( <<'CODE', <<"OUT", 'Test OS.rename' );
 .sub main :main
     $P1 = new .OS
