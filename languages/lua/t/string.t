@@ -161,9 +161,11 @@ OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.sub' );
 print(string.sub("abcde", 1, 2))
+print(string.sub("abcde", 3, 4))
 print(string.sub("abcde", -2))
 CODE
 ab
+cd
 de
 OUTPUT
 

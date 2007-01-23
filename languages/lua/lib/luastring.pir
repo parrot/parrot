@@ -595,6 +595,7 @@ L0:
 L1:
     unless $I1 <= $I2 goto L2
     dec $I1
+    $I2 -= $I1
     $S1 = substr $S0, $I1, $I2
     goto L3
 L2:
