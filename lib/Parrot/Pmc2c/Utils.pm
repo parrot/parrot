@@ -1095,9 +1095,9 @@ END
     /* END PMEHTOD BODY */
     $method_returns
 
-    //if (PMC_cont(ccont)->address) {
+    /* if (PMC_cont(ccont)->address) { */
     {
-        //parrot_context_t * const caller_ctx = PMC_cont(ccont)->to_ctx;
+        /* parrot_context_t * const caller_ctx = PMC_cont(ccont)->to_ctx; */
         if (! caller_ctx) {
             /* there is no point calling real_exception here, because
                PDB_backtrace can't deal with a missing to_ctx either. */
