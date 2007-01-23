@@ -186,7 +186,8 @@ rebuild_attrib_stuff(Interp *interp, PMC *class)
                 VTABLE_set_integer_keyed_str(interp, attr_offset_hash,
                         attr_name, cur_offset);
                 VTABLE_set_integer_keyed_str(interp, attr_offset_hash,
-                        full_name, cur_offset++);
+                        full_name, cur_offset);
+                cur_offset++;
             }
         }
     }
