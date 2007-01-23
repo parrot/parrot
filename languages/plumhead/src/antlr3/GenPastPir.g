@@ -112,7 +112,7 @@ node[String reg_mother]
           "  # start of ECHO node                                            \n"
         + "  .local pmc past_echo                                            \n"
         + "  past_echo = new 'PAST::Op'                                      \n"
-        + "      past_echo.'attr'( 'name', 'echo', 1 )                       \n"
+        + "  past_echo.'attr'( 'name', 'echo', 1 )                           \n"
       );
     }
     ^( ECHO node["past_echo"] )
@@ -120,46 +120,43 @@ node[String reg_mother]
       System.out.println( 
           "                                                                  \n"
         + "  " + $node.reg_mother + ".'push'( past_echo )                    \n"
-        + "  null past_echo                                                  \n"
         + "  # end of ECHO node                                              \n"
       );
     }
   | NOQUOTE_STRING
     {
-      String without_anno = $NOQUOTE_STRING.text;
-      without_anno = without_anno.replace( "\n", "\\n" );
+      String noquote = $NOQUOTE_STRING.text;
+      noquote = noquote.replace( "\n", "\\n" );
       System.out.println( 
           "                                                                  \n"
-        + "  # start of NOQUOTE_STRING                                               \n"
+        + "  # start of NOQUOTE_STRING                                       \n"
         + "  .local string val                                               \n"
-        + "     val = \"" + without_anno + "\"                               \n"
+        + "  val = \"" + noquote + "\"                                       \n"
         + "  past_temp = new 'PAST::Val'                                     \n"
         + "  .local pmc code_string                                          \n"
         + "  code_string = new 'PGE::CodeString'                             \n"
         + "  ( val ) = code_string.'escape'( val )                           \n"
         + "      past_temp.'init'( 'name' => val, 'vtype' => '.Undef' )      \n"
         + "  " + $node.reg_mother + ".'push'( past_temp )                    \n"
-        + "  null past_temp                                                  \n"
-        + "  # end of NOQUOTE_STRING                                                 \n"
+        + "  # end of NOQUOTE_STRING                                         \n"
         + "                                                                  \n"
       );
     }
   | DOUBLEQUOTE_STRING
     {
-      String without_anno = $DOUBLEQUOTE_STRING.text;
-      without_anno = without_anno.replace( "\n", "\\n" );
+      String doublequote = $DOUBLEQUOTE_STRING.text;
+      doublequote = doublequote.replace( "\n", "\\n" );
       System.out.println( 
           "                                                                  \n"
-        + "  # start of DOUBLEQUOTE_STRING                                               \n"
+        + "  # start of DOUBLEQUOTE_STRING                                   \n"
         + "  .local string val                                               \n"
-        + "     val = " + without_anno + "                               \n"
+        + "  val = " + doublequote + "                                      \n"
         + "  past_temp = new 'PAST::Val'                                     \n"
         + "  .local pmc code_string                                          \n"
         + "  code_string = new 'PGE::CodeString'                             \n"
         + "  ( val ) = code_string.'escape'( val )                           \n"
         + "      past_temp.'init'( 'name' => val, 'vtype' => '.Undef' )      \n"
         + "  " + $node.reg_mother + ".'push'( past_temp )                    \n"
-        + "  null past_temp                                                  \n"
         + "  # end of DOUBLEQUOTE_STRING                                                 \n"
         + "                                                                  \n"
       );
@@ -206,93 +203,3 @@ node[String reg_mother]
       );
     }
   ;
-
-
-
-
-/* probably obsolete
-
-  | ^( FUNCTION LETTER )
-    {
-      // do nothing for now
-    }
-  | {
-      System.out.print( 
-          "                                                                   \n"
-        + "  # entering 'assign'                                              \n"
-        + "    reg_assign_lhs = new 'PAST::Exp'                               \n"
-      );
-    }
-    ^( ASSIGN_OP ^(VAR LETTER) node["reg_assign_lhs"] )
-    {
-      // TODO: strip String
-      System.out.print(     
-          "                                                                   \n"
-        + "    # entering 'ASSIGN_OP ^(VAR LETTER) node'                      \n"
-        + "      .sym pmc past_op                                             \n"
-        + "      past_op = new 'PAST::Op'                                     \n"
-        + "      past_op.'op'( 'infix:=' )                                    \n"
-        + "        .sym pmc past_var                                          \n"
-        + "        past_var = new 'PAST::Var'                                 \n"
-        + "        past_var.'varname'( '" + $LETTER.text + "' )               \n"
-        + "        past_var.'vartype'( 'scalar' )                             \n"
-        + "        past_var.'scope'( 'global' )                               \n"
-        + "      past_op.'add_child'( past_var )                              \n"
-        + "      past_op.'add_child'( reg_assign_lhs )                        \n"
-        + "    " + $node.reg_mother + ".'add_child'( past_op )                \n"
-        + "    # leaving  'ASSIGN_OP named_expression NUMBER'                 \n"
-      );
-    }
-  | ^( VAR LETTER )
-    {
-      System.out.print( 
-          "                                                                   \n"
-        + " # entering '( VAR LETTER )                                        \n"
-        + "    past_temp = new 'PAST::Var'                                     \n"
-        + "    past_temp.'varname'( '" + $LETTER.text + "' )                   \n"
-        + "    past_temp.'vartype'( 'scalar' )                                 \n"
-        + "    past_temp.'scope'( 'global' )                                   \n"
-        + "  " + $node.reg_mother + ".'add_child'( past_temp )                 \n"
-        + "    null past_temp                                                  \n"
-        + "  # leaving '(VAR LETTER)'                                         \n"
-      );
-    }
-  | {
-      reg_num++;
-      String reg_exp   = "reg_expression_" + reg_num;
-      System.out.print( 
-          "  # entering 'If node node                                         \n"
-        + "      reg_if_op = new 'PAST::Op'                                   \n"
-        + "      reg_if_op.'op'( 'if' )                                       \n"
-        + "        .sym pmc " + reg_exp + "                                   \n"
-        + "        " + reg_exp + " = new 'PAST::Exp'                          \n"
-        + "                                                                   \n"
-      );
-    }
-    ^( If node["reg_if_op"] node["reg_if_op"] )
-    {
-       // Create a node for If
-      System.out.print( 
-          "  # entering 'STMTS node*'                                         \n"
-        + "  " + $node.reg_mother + ".'add_child'( reg_if_op )                \n"
-        + "  # leaving 'If node node                                          \n"
-      );
-    }
-  | {
-      reg_num++;
-      String reg_stmts = "reg_stmts_" + reg_num;
-      System.out.print( 
-          "        .sym pmc " + reg_stmts + "                                 \n"
-        + "        " + reg_stmts + " = new 'PAST::Stmts'                      \n"
-      );
-    }
-    ^( STMTS node[reg_stmts]* )
-    {
-       // Create a node for If
-      System.out.print( 
-          "  " + $node.reg_mother + ".'add_child'( " + reg_stmts + " )        \n"
-        + "  # leaving 'STMTS node*'                                          \n"
-      );
-    }
-
-*/

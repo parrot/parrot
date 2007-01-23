@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/GenPastPir.g 2007-01-22 21:34:24
+// $ANTLR 3.0b5 src/antlr3/GenPastPir.g 2007-01-23 20:13:42
 
   import java.util.regex.*;
 
@@ -221,7 +221,7 @@ public class GenPastPirTreeParser extends TreeParser {
                               "  # start of ECHO node                                            \n"
                             + "  .local pmc past_echo                                            \n"
                             + "  past_echo = new 'PAST::Op'                                      \n"
-                            + "      past_echo.'attr'( 'name', 'echo', 1 )                       \n"
+                            + "  past_echo.'attr'( 'name', 'echo', 1 )                           \n"
                           );
                         
                     match(input,ECHO,FOLLOW_ECHO_in_node109); 
@@ -237,7 +237,6 @@ public class GenPastPirTreeParser extends TreeParser {
                           System.out.println( 
                               "                                                                  \n"
                             + "  " + reg_mother + ".'push'( past_echo )                    \n"
-                            + "  null past_echo                                                  \n"
                             + "  # end of ECHO node                                              \n"
                           );
                         
@@ -245,26 +244,25 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // src/antlr3/GenPastPir.g:127:5: NOQUOTE_STRING
+                    // src/antlr3/GenPastPir.g:126:5: NOQUOTE_STRING
                     {
                     NOQUOTE_STRING1=(CommonTree)input.LT(1);
                     match(input,NOQUOTE_STRING,FOLLOW_NOQUOTE_STRING_in_node126); 
 
-                          String without_anno = NOQUOTE_STRING1.getText();
-                          without_anno = without_anno.replace( "\n", "\\n" );
+                          String noquote = NOQUOTE_STRING1.getText();
+                          noquote = noquote.replace( "\n", "\\n" );
                           System.out.println( 
                               "                                                                  \n"
-                            + "  # start of NOQUOTE_STRING                                               \n"
+                            + "  # start of NOQUOTE_STRING                                       \n"
                             + "  .local string val                                               \n"
-                            + "     val = \"" + without_anno + "\"                               \n"
+                            + "  val = \"" + noquote + "\"                                       \n"
                             + "  past_temp = new 'PAST::Val'                                     \n"
                             + "  .local pmc code_string                                          \n"
                             + "  code_string = new 'PGE::CodeString'                             \n"
                             + "  ( val ) = code_string.'escape'( val )                           \n"
                             + "      past_temp.'init'( 'name' => val, 'vtype' => '.Undef' )      \n"
                             + "  " + reg_mother + ".'push'( past_temp )                    \n"
-                            + "  null past_temp                                                  \n"
-                            + "  # end of NOQUOTE_STRING                                                 \n"
+                            + "  # end of NOQUOTE_STRING                                         \n"
                             + "                                                                  \n"
                           );
                         
@@ -272,25 +270,24 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // src/antlr3/GenPastPir.g:147:5: DOUBLEQUOTE_STRING
+                    // src/antlr3/GenPastPir.g:145:5: DOUBLEQUOTE_STRING
                     {
                     DOUBLEQUOTE_STRING2=(CommonTree)input.LT(1);
                     match(input,DOUBLEQUOTE_STRING,FOLLOW_DOUBLEQUOTE_STRING_in_node138); 
 
-                          String without_anno = DOUBLEQUOTE_STRING2.getText();
-                          without_anno = without_anno.replace( "\n", "\\n" );
+                          String doublequote = DOUBLEQUOTE_STRING2.getText();
+                          doublequote = doublequote.replace( "\n", "\\n" );
                           System.out.println( 
                               "                                                                  \n"
-                            + "  # start of DOUBLEQUOTE_STRING                                               \n"
+                            + "  # start of DOUBLEQUOTE_STRING                                   \n"
                             + "  .local string val                                               \n"
-                            + "     val = " + without_anno + "                               \n"
+                            + "  val = " + doublequote + "                                      \n"
                             + "  past_temp = new 'PAST::Val'                                     \n"
                             + "  .local pmc code_string                                          \n"
                             + "  code_string = new 'PGE::CodeString'                             \n"
                             + "  ( val ) = code_string.'escape'( val )                           \n"
                             + "      past_temp.'init'( 'name' => val, 'vtype' => '.Undef' )      \n"
                             + "  " + reg_mother + ".'push'( past_temp )                    \n"
-                            + "  null past_temp                                                  \n"
                             + "  # end of DOUBLEQUOTE_STRING                                                 \n"
                             + "                                                                  \n"
                           );
@@ -299,7 +296,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 4 :
-                    // src/antlr3/GenPastPir.g:167:5: NUMBER
+                    // src/antlr3/GenPastPir.g:164:5: NUMBER
                     {
                     NUMBER3=(CommonTree)input.LT(1);
                     match(input,NUMBER,FOLLOW_NUMBER_in_node150); 
@@ -320,7 +317,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 5 :
-                    // src/antlr3/GenPastPir.g:181:5: ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] )
+                    // src/antlr3/GenPastPir.g:178:5: ^(infix= (PLUS|MINUS|MUL_OP|REL_OP) node[reg] node[reg] )
                     {
 
                           reg_num++;
