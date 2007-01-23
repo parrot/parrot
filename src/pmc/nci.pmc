@@ -152,8 +152,9 @@ shifted down.
 
     void* invoke(void * next) {
         typedef INTVAL(*nci_sub_t)(Interp * , PMC * );
-        nci_sub_t func = PObj_flag_TEST(private2, SELF) ? PMC_struct_val(SELF)
-            : (nci_sub_t)D2FPTR(PMC_data(SELF));
+        nci_sub_t func = PObj_flag_TEST(private2, SELF)
+            ? (nci_sub_t) PMC_struct_val(SELF)
+            : (nci_sub_t) D2FPTR(PMC_data(SELF));
         PMC *cont;
 
         if (!func)
