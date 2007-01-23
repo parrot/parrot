@@ -485,7 +485,31 @@ reads entries from a directory.
         return NULL;
 #endif
     }
+/*
+=item C<rename(STRING* oldpath, STRING* newpath)>
 
+This method is a wrapper for rename(2). On error a SystemError exception is
+thrown.
+
+=cut
+*/
+    METHOD void rename(STRING* oldpath, STRING* newpath) {
+#ifndef WIN32
+        char *coldpath = string_to_cstring(interp, oldpath) ;
+        char *cnewpath = string_to_cstring(interp, newpath) ;
+        int ret ;
+
+        ret = rename(coldpath, cnewpath) ;
+        if (ret < 0)
+        {
+            char *errmsg = strerror(errno) ;
+            real_exception(interp, NULL, E_SystemError, errmsg) ;
+        }
+#else
+        real_exception(interp, NULL, E_NotImplementedError,
+                "Win32 is not POSIX. Need win32 developer!");
+#endif
+    }
 
 }
 /*

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -194,7 +194,7 @@ CODE
 
 # test readdir
 SKIP: {
-    skip 'broken on windows', 1 if ($MSWin32);
+    skip 'not implemented on windows yet', 1 if ($MSWin32);
 
     opendir IN, '.';
     my @entries = readdir IN;
@@ -210,6 +210,26 @@ SKIP: {
     print "\n"
 .end
 CODE
+}
+
+# test rename
+SKIP: {
+    skip 'not implemented on windows yet', 1 if ($MSWin32);
+
+    `touch ____some_test_file` ;
+
+    pir_output_is( <<'CODE', <<"OUT", 'Test OS.rename' );
+.sub main :main
+    $P1 = new .OS
+    $P1.rename('____some_test_file', '___some_other_file')
+    $I0 = stat '___some_other_file', 0
+    print $I0
+    print "\n"
+    $P1.rm('___some_other_file')
+.end
+CODE
+1
+OUT
 }
 
 # test lstat
