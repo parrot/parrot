@@ -107,6 +107,10 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $P1 = 'fmod'
     _math[$P1] = _math_fmod
 
+    # LUA_COMPAT_MOD
+    $P1 = 'mod'
+    _math[$P1] = _math_fmod
+
     .const .Sub _math_frexp = '_math_frexp'
     $P1 = 'frexp'
     _math[$P1] = _math_frexp
