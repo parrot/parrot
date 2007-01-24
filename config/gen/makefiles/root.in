@@ -679,7 +679,7 @@ help :
 	@echo "  testexex:          Testing the exex runcore."
 	@echo "  benchmark_tests:   Run all benchmarks."
 	@echo "  manitest:          Check for new and missing files."
-	@echo "  doc_tests:         Check POD syntax of all file containing POD."
+	@echo "  doc_tests:         Check POD syntax of all files containing POD."
 	@echo "  buildtools_tests:  Test build tool pmc2c.pl."
 	@echo ""
 	@echo "Smoke Testing:"
