@@ -19,12 +19,10 @@ files and directories.
 
 */
 
-#ifdef WIN32
+#ifdef _MSC_VER
 #  include <direct.h>
 #  include <io.h>
-#endif
-
-#ifndef WIN32
+#else
 #  include <dirent.h>
 #endif
 
@@ -70,7 +68,7 @@ Returns the current working directory.
 
     METHOD STRING* cwd() {
         char * cwd;
-#ifdef WIN32
+#ifdef _MSC_VER
         cwd = _getcwd(NULL, 0);
 #else
 #  ifdef PATH_MAX
@@ -105,7 +103,7 @@ Changes the current working directory to the one specified by C<path>.
     METHOD void chdir(STRING *path) {
         int error;
         char *cpath = string_to_cstring(interp, path);
-#ifdef WIN32
+#ifdef _MSC_VER
         error = _chdir(cpath);
 #else
         error = chdir(cpath);
@@ -138,7 +136,7 @@ C<path>.
         }
 
         if (S_ISDIR(info.st_mode)) {
-#ifdef WIN32
+#ifdef _MSC_VER
             error = _rmdir(cpath);
 #else
             error = rmdir(cpath);
@@ -455,7 +453,7 @@ reads entries from a directory.
 
 */
     METHOD PMC* readdir(STRING* path) {
-#ifndef WIN32
+#ifndef _MSC_VER
         DIR *dir ;
         struct dirent *dirent;
         PMC *array;
