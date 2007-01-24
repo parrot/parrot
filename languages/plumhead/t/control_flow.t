@@ -13,14 +13,54 @@ Test control flow.
 # pragmata
 use strict;
 use warnings;
-use 5.006_001;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 use Parrot::Config (); 
 use Parrot::Test;
-use Test::More     tests => 5;
+use Test::More     tests => 8;
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'if' );
+<?php
+if (1)
+{
+  echo "Hi\n";
+}
+?>
+END_CODE
+Hi
+END_EXPECTED
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'if/else taking if-branch' );
+<?php
+if (1)
+{
+  echo "if block\n";
+}
+else
+{
+  echo "else block\n";
+}
+?>
+END_CODE
+if block
+END_EXPECTED
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'i/else taking else-branchf' );
+<?php
+if (0)
+{
+  echo "if block\n";
+}
+else
+{
+  echo "else block\n";
+}
+?>
+END_CODE
+else block
+END_EXPECTED
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED' . q{  }, 'positive int' );
 <?php

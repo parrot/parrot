@@ -18,6 +18,7 @@ tokens
 {
   PROGRAM;
   NOQUOTE_STRING;
+  STMTS;
 }
 
 @lexer::members
@@ -52,6 +53,7 @@ PLUS       :{ codeMode }?=>  '+' ;
 MUL_OP     :{ codeMode }?=>  '*'  | '/'  | '%' ;
 REL_OP     :{ codeMode }?=>  '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
 
+IF         :{ codeMode }?=>  'if' ;
 
 // productions
 
@@ -71,12 +73,20 @@ code
   : CODE_START statements CODE_END -> statements
   ;
 
+relational_expression 
+  : expression ( REL_OP^^ expression )?
+  ;
+
 statements
   : ( statement )*
   ;
 
 statement
-  : ECHO expression ';' -> ^( ECHO expression )
+  : ECHO^^ expression ';'! 
+  | IF '(' relational_expression ')' '{' s1=statement '}'
+    ( 'else' '{' s2=statement '}' -> ^( IF relational_expression ^( STMTS $s1 ) ^( STMTS $s2 ) )
+    |                             -> ^( IF relational_expression ^( STMTS $s1 ) )
+    ) 
   ;
 
 expression

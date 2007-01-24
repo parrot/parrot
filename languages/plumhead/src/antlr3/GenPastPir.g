@@ -61,15 +61,15 @@ gen_pir_past
         + "    set_global '_POST', superglobal_POST                          \n"
         + "                                                                  \n"
         + "    # The root node of PAST.                                      \n"
-        + "    .local pmc past_node_id2244466                                \n"
-        + "    past_node_id2244466  = new 'PAST::Block'                      \n"
-        + "    past_node_id2244466.init('name' => 'plumhead_main')           \n"
+        + "    .local pmc past_root                                          \n"
+        + "    past_root  = new 'PAST::Block'                                \n"
+        + "    past_root.init('name' => 'plumhead_main')                     \n"
         + "                                                                  \n"
-        + "  # start of generic node                                         \n"
-        + "  .local pmc past_stmts                                           \n"
-        + "  past_stmts = new 'PAST::Stmts'                                  \n"
+        + "    .local pmc past_stmts                                         \n"
+        + "    past_stmts = new 'PAST::Stmts'                                \n"
         + "                                                                  \n"
-        + "  .sym pmc past_temp                                              \n"
+        + "    .sym pmc past_temp                                            \n"
+        + "    .sym pmc past_if_op                                           \n"
         + "                                                                  \n"
       );
     }
@@ -78,29 +78,26 @@ gen_pir_past
       System.out.println( 
           "                                                                  \n"
         + "                                                                  \n"
-        + "  past_node_id2244466.'push'( past_stmts )                        \n"
-        + "  null past_stmts                                                 \n"
-        + "  # end of generic node                                           \n"
+        + "  past_root.'push'( past_stmts )                                  \n"
         + "                                                                  \n"
-        + "    # '_dumper'(past_node_id2244466, 'past')                      \n"
+        + "    # '_dumper'(past_root, 'past')                                \n"
         + "    # '_dumper'(superglobal_POST , 'superglobal_POST')            \n"
         + "    # '_dumper'(superglobal_GET , 'superglobal_GET')              \n"
         + "                                                                  \n"
         + "    # .local pmc post                                             \n"
-        + "    # post = past_node_id2244466.'compile'( 'target' => 'post' )  \n"
+        + "    # post = past_root.'compile'( 'target' => 'post' )            \n"
         + "    # '_dumper'(post, 'post')                                     \n"
         + "                                                                  \n"
         + "    # .local pmc pir                                              \n"
-        + "    # pir = past_node_id2244466.'compile'( 'target' => 'pir' )    \n"
+        + "    # pir = past_root.'compile'( 'target' => 'pir' )              \n"
         + "    # print pir                                                   \n"
         + "                                                                  \n"
         + "    .local pmc eval_past                                          \n"
-        + "    eval_past = past_node_id2244466.'compile'( )                  \n"
+        + "    eval_past = past_root.'compile'( )                            \n"
         + "    eval_past()                                                   \n"
         + "    # '_dumper'(eval, 'eval')                                     \n"
         + "                                                                  \n"
         + ".end                                                              \n"
-        + "                                                                  \n"
         + "                                                                  \n"
       );
     }
@@ -109,7 +106,8 @@ gen_pir_past
 node[String reg_mother]
   : {
       System.out.println( 
-          "  # start of ECHO node                                            \n"
+          "                                                                  \n"
+        + "  # start of ECHO node                                            \n"
         + "  .local pmc past_echo                                            \n"
         + "  past_echo = new 'PAST::Op'                                      \n"
         + "  past_echo.'attr'( 'name', 'echo', 1 )                           \n"
@@ -171,7 +169,6 @@ node[String reg_mother]
         + "      past_temp.'attr'( 'ctype', 'n+', 1 )                        \n"
         + "      past_temp.'attr'( 'vtype', '.Float', 1 )                    \n"
         + "  " + $node.reg_mother + ".'push'( past_temp )                    \n"
-        + "  null past_temp                                                  \n"
         + "  # end of NUMBER                                                 \n"
       );
     }
@@ -198,8 +195,45 @@ node[String reg_mother]
       System.out.print( 
           "  " + reg + ".'attr'( 'pirop', '" + pirop + "' , 1 )               \n"
         + "  " + $node.reg_mother + ".'push'( " + reg + " )                   \n"
-        + "      null " + reg + "                                             \n"
         + "    # leaving ( PLUS | MINUS | MUL | DIV )                         \n"
+      );
+    }
+  | {
+      reg_num++;
+      String reg_exp   = "reg_expression_" + reg_num;
+      System.out.print( 
+          "                                                                   \n"
+        + "  # entering IF                                                    \n"
+        + "      past_if_op = new 'PAST::Op'                                  \n"
+        + "      past_if_op.'attr'( 'pasttype', 'if' , 1 )                    \n"
+        + "        .sym pmc " + reg_exp + "                                   \n"
+        + "        " + reg_exp + " = new 'PAST::Block'                        \n"
+        + "                                                                   \n"
+      );
+    }
+    ^( IF node["past_if_op"] node["past_if_op"] node["past_if_op"]? )
+    {
+      System.out.print( 
+          "                                                                   \n"
+        + "  " + $node.reg_mother + ".'push'( past_if_op )                     \n"
+        + "  # leaving IF                                                     \n"
+      );
+    }
+  | {
+      reg_num++;
+      String reg_stmts = "reg_stmts_" + reg_num;
+      System.out.print( 
+          "                                                                   \n"
+        + "    # entering STMTS                                               \n"
+        + "        .sym pmc " + reg_stmts + "                                 \n"
+        + "        " + reg_stmts + " = new 'PAST::Stmts'                      \n"
+      );
+    }
+    ^( STMTS node[reg_stmts]* )
+    {
+      System.out.print( 
+          "  " + $node.reg_mother + ".'push'( " + reg_stmts + " )             \n"
+        + "  # leaving 'STMTS node*'                                          \n"
       );
     }
   ;
