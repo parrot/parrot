@@ -506,6 +506,8 @@ main(int argc, char * argv[])
     const char *output_file;
     Interp *interp;
     void *yyscanner;
+    STRING *executable_name;
+    PMC *executable_name_pmc;
 
     Parrot_set_config_hash();
 
@@ -517,6 +519,16 @@ main(int argc, char * argv[])
     Parrot_block_GC(interp);
 
     IMCC_INFO(interp)->allocator = IMCC_VANILLA_ALLOCATOR;
+
+    /* We parse the arguments, but first store away the name of the Parrot
+       executable, since parsing destroys that and we want to make it
+       available. */
+    executable_name = string_from_cstring(interp, argv[0], 0);
+    executable_name_pmc = pmc_new(interp, enum_class_String);
+    VTABLE_set_string_native(interp, executable_name_pmc, executable_name);
+    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,
+        executable_name_pmc);
+
     sourcefile = parseflags(interp, &argc, &argv);
     output_file = interp->output_file;
 

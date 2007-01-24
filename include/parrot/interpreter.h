@@ -374,6 +374,8 @@ struct parrot_interp_t {
     /* 5:   PMC *Dyn_libs        Array of dynamically loaded ParrotLibrary  */
     /* 6:   PMC *Config_Hash             Hash of config settings  */
     /* 7:   PMC *Lib_Paths               LoL of search paths  */
+    /* 8:   PMC *PBC_Libs                Hash of load_bytecode cde */
+    /* 9:   PMC *Executable              String PMC with name from argv[0]. */
 
     PMC* DOD_registry;                        /* registered PMCs added to the root set */
 
@@ -439,6 +441,7 @@ typedef enum {
     IGLOBALS_CONFIG_HASH,
     IGLOBALS_LIB_PATHS,         /* LoL of search paths and dynamic ext */
     IGLOBALS_PBC_LIBS,          /* Hash of load_bytecode cde */
+    IGLOBALS_EXECUTABLE,        /* How Parrot was invoked (from argv[0]) */
 
     IGLOBALS_SIZE
 } iglobals_enum;

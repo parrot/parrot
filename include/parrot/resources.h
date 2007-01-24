@@ -140,7 +140,8 @@ typedef enum {
     CURRENT_LEXPAD,
 
     /* interpinfo_s constants */
-    CURRENT_METHOD
+    CURRENT_METHOD,
+    EXECUTABLE_FULLNAME
 } Interpinfo_enum;
 
 /* &end_gen */
