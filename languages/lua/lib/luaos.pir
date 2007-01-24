@@ -266,7 +266,7 @@ fails, it returns B<nil>, plus a string describing the error.
     $S0 = checkstring(oldname)
     $S2 = $S0
     $S1 = checkstring(newname)
-    new $P0, .File
+    new $P0, .OS
     push_eh _handler
     $P0.'rename'($S0, $S1)
     new ret, .LuaBoolean
