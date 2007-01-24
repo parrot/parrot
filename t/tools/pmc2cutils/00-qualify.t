@@ -1,11 +1,11 @@
 #! perl
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: pmc2c.t 14964 2006-10-18 18:20:48Z particle $
+# $Id$
 # 00-qualify.t
 
 use strict;
 use warnings;
-use Test::More tests =>  8;
+use Test::More tests =>  9;
 use FindBin;
 use lib (
     "$FindBin::Bin/../..",
@@ -31,6 +31,27 @@ is(scalar(keys %sfx), 2, "only 2 file suffixes in src/pmc");;
 ok($sfx{'num'}, ".num suffix correctly located");
 ok($sfx{'pmc'}, ".pmc suffix correctly located");
 
+my $message = <<END_OF_MESSAGE;
+
+
+The files in this directory test the publicly callable methods of 
+Parrot::Pmc2c::Utils.  By doing so, they test the functionality 
+of the pmc2c.pl utility.
+
+Since pmc2c.pl is invoked many times during 'make', tests of its 
+functionality can give meaningful results only if you run them 
+when your file system under the top-level Parrot directory is in 
+a 'pre-make' state, i.e., you have run 'perl Configure.pl' but 
+have *not* yet run 'make'.  These tests should pass if run at 
+that point in the build process, but some will necessarily fail 
+if 'make' has already been executed.  Hence, they should not be 
+included in the set of tests run by 'make test'.
+
+In short, these are tests of Parrot::Pmc2c::Utils but are *not* 
+tests of Parrot itself.
+
+END_OF_MESSAGE
+pass($message);
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
