@@ -141,7 +141,8 @@ typedef enum {
 
     /* interpinfo_s constants */
     CURRENT_METHOD,
-    EXECUTABLE_FULLNAME
+    EXECUTABLE_FULLNAME,
+    EXECUTABLE_BASENAME,
 } Interpinfo_enum;
 
 /* &end_gen */

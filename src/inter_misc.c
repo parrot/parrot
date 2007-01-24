@@ -304,6 +304,10 @@ interpinfo_p(Interp *interp, INTVAL what)
 STRING*
 interpinfo_s(Interp *interp, INTVAL what)
 {
+    STRING *fullname, *basename;
+    char *fullname_c;
+    int pos;
+
     switch (what) {
         case CURRENT_METHOD:
             return CONTEXT(interp->ctx)->current_method;
@@ -311,6 +315,21 @@ interpinfo_s(Interp *interp, INTVAL what)
             return VTABLE_get_string(interp,
                 VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                     IGLOBALS_EXECUTABLE));
+        case EXECUTABLE_BASENAME:
+            /* Need to strip back to what follows the final / or \. */
+            fullname = VTABLE_get_string(interp,
+                VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+                    IGLOBALS_EXECUTABLE));
+            fullname_c = string_to_cstring(interp, fullname);
+            pos = strlen(fullname_c) - 1;
+            while (pos > 0 && fullname_c[pos] != '/' && fullname_c[pos] != '\\')
+                pos--;
+            if (pos > 0)
+                pos++;
+            basename = string_from_cstring(interp, fullname_c + pos, 0);
+            mem_sys_free(fullname_c);
+            return basename;
+
         default:        /* or a warning only? */
             internal_exception(UNIMPLEMENTED,
                     "illegal argument in interpinfo");
