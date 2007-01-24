@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 36;
 
 =head1 NAME
 
@@ -1144,6 +1144,30 @@ pir_output_is( <<'CODE', <<'OUTPUT', "inherit a PMC METHOD" );
 .end
 CODE
 a
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "init calls" );
+.sub main :main
+    .local pmc cl, o
+    cl = newclass 'MyClass'
+    o = new 'MyClass'
+    o = new 'MyClass', $P0
+.end
+
+.namespace ['MyClass']
+
+.sub init :method :vtable
+    .param pmc initializer :optional
+    print "init was called\n"
+.end
+
+.sub init_pmc :method :vtable
+    .param pmc initializer 
+    print "WTF!\n"
+.end
+CODE
+init was called
+init was called
 OUTPUT
 
 # Local Variables:
