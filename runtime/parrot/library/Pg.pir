@@ -98,7 +98,7 @@ Object initializer. Takes a C<PGconn> structure.
 
 =cut
 
-.sub __init :method
+.sub __init_pmc :method
     .param pmc con
     setattribute self, 'con', con
 .end
@@ -301,7 +301,7 @@ Object initializer. Takes a C<PGresult> structure.
 
 =cut
 
-.sub __init :method
+.sub __init_pmc :method
     .param pmc res
     setattribute self, 'res', res
     need_finalize self
