@@ -520,7 +520,13 @@ bad_args:
 # RT#40741: stub
 .sub 'nameofexecutable'
   .param pmc argv
-  .return('parrot tcl.pbc')
+  .local int argc
+  argc = argv
+  if argc goto bad_args
+  $P1 = get_root_global ['_tcl'], 'nameofexecutable'
+  .return($P1)
+bad_args:
+  tcl_error 'wrong # args: should be "info nameofexecutable"'
 .end
 
 # RT#40742: stub

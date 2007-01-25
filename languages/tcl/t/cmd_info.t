@@ -7,7 +7,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 50
+plan 52
 
 eval_is {info} \
   {wrong # args: should be "info option ?arg arg ...?"} \
@@ -213,3 +213,8 @@ eval_is {
   catch {unset x}
   list [info default defaults1 a x] $x
 } {0 {}} {something without a default}
+
+like [info nameofexecutable] parrot {basic exec name}
+eval_is {info nameofexecutable 1} \
+  {wrong # args: should be "info nameofexecutable"} {too many args}
+

@@ -113,6 +113,10 @@ env_loop_done:
   tcl_library = $S0
   set_root_global ['tcl'], '$tcl_library', tcl_library
 
+  # get the name of the executable
+  $P1 = interp[.IGLOBALS_EXECUTABLE]
+  set_root_global [ '_tcl' ], 'nameofexecutable', $P1
+
   # set tcl_platform
   $P1 = new 'TclArray'
   $P1['platform'] = 'parrot'
