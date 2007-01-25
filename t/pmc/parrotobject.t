@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 =head1 NAME
 
@@ -164,6 +164,32 @@ pir_output_is( <<'CODE', <<'OUT', ':vtable inheritance from core classes' );
 CODE
 Foo::__get_string
 Bar::get_string
+OUT
+
+
+# assign opcode in inherited classes
+pir_output_is( <<'CODE', <<'OUT', 'assign opcode in inherited classes', 'todo' => 'assign opcode inheritance' );
+.sub main :main
+    $P1 = new .ResizablePMCArray
+    push $P1, 3
+    $P2 = new .ResizablePMCArray
+    assign $P2, $P1
+    $I0 = elements $P2
+    print $I0
+    print "\n"
+
+    $P99 = subclass 'ResizablePMCArray', 'Perl6List'
+    $P1 = new 'Perl6List'
+    push $P1, 3
+    $P2 = new 'Perl6List'
+    assign $P2, $P1
+    $I0 = elements $P2
+    print $I0
+    print "\n"
+.end
+CODE
+1
+1
 OUT
 
 # '
