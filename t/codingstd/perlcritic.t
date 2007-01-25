@@ -89,7 +89,7 @@ if ($list_policies) {
 # get the files to check
 my $DIST = Parrot::Distribution->new();
 if ( !@ARGV ) {
-    @files = $DIST->get_perl_language_files();
+    @files = map { $_->path } $DIST->get_perl_language_files();
 }
 else {
 

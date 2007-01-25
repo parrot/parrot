@@ -194,7 +194,7 @@ BEGIN {
                 ],
             },
             yacc => { file_exts => ['y'] },
-#            perl => { file_exts => ['pl', 'pm', 'in', 't'] },
+            perl => { file_exts => ['pl', 'pm', 'in', 't'] },
         },
         header => {
             c    => { file_exts => ['h'] },
@@ -378,16 +378,18 @@ Returns the Perl language source files within Parrot.  Namely:
 
 sub get_perl_language_files {
     my $self = shift;
-    my @files;
-    my $manifest = ExtUtils::Manifest::maniread('MANIFEST');
 
-    foreach my $file ( keys(%$manifest) ) {
+    my @files = (
+        $self->perl_source_files,
+    );
+
+    my @perl_language_files = ();
+    foreach my $file ( @files ) {
         next if $self->is_perl_exemption($file);
-        next unless $self->is_perl($file);
-        push @files, $file;
+        push @perl_language_files, $file;
     }
 
-    return @files;
+    return @perl_language_files;
 }
 
 
@@ -412,7 +414,7 @@ any external modules Parrot might have.
         } unless @exemptions;
 
         $file->path =~ /\Q$_\E$/ && return 1
-            for @exemptions;
+            for <@exemptions>;
         return;
     }
 }
