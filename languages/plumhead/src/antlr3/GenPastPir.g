@@ -140,6 +140,25 @@ node[String reg_mother]
         + "                                                                  \n"
       );
     }
+  | SINGLEQUOTE_STRING
+    {
+      String singlequote = $SINGLEQUOTE_STRING.text;
+      singlequote = singlequote.replace( "\n", "\\n" );
+      System.out.println( 
+          "                                                                  \n"
+        + "  # start of SINGLEQUOTE_STRING                                   \n"
+        + "  .local string val                                               \n"
+        + "  val = " + singlequote + "                                      \n"
+        + "  past_temp = new 'PAST::Val'                                     \n"
+        + "  .local pmc code_string                                          \n"
+        + "  code_string = new 'PGE::CodeString'                             \n"
+        + "  ( val ) = code_string.'escape'( val )                           \n"
+        + "      past_temp.'init'( 'name' => val, 'vtype' => '.Undef' )      \n"
+        + "  " + $node.reg_mother + ".'push'( past_temp )                    \n"
+        + "  # end of SINGLEQUOTE_STRING                                                 \n"
+        + "                                                                  \n"
+      );
+    }
   | DOUBLEQUOTE_STRING
     {
       String doublequote = $DOUBLEQUOTE_STRING.text;

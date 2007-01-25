@@ -66,19 +66,19 @@ language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED' . q{  }, 'positiv
 <?php
 if (1) {
   ?>
-    <strong>Condition is true.</strong>
+    Condition is true.
   <?php
 }
 ?>
 END_CODE
-    <strong>Condition is true.</strong>
+    Condition is true.
 END_EXPECTED
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'zero' );
 <?php
 if (0) {
   ?>
-    <strong>'Condition is true' does not apply.</strong>
+    'Condition is true' does not apply.
   <?php
 }
 ?>

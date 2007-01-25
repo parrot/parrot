@@ -37,8 +37,9 @@ WS
       $channel = HIDDEN;       // send into nirwana 
     }
   ;
-DOUBLEQUOTE_STRING     : { codeMode }?=> '\"' ( ~'\"' )*  '\"' ;
-ECHO       : { codeMode }?=> 'echo' ;
+DOUBLEQUOTE_STRING  : { codeMode }?=> '\"' ( ~'\"' )*  '\"' ;
+SINGLEQUOTE_STRING  : { codeMode }?=> '\'' ( ~'\'' )*  '\'' ;
+ECHO                : { codeMode }?=> 'echo' ;
 
 fragment
 INTEGER : { codeMode }?=> ('0'..'9' )+ ;
@@ -87,10 +88,12 @@ statement
     ( 'else' '{' s2=statement '}' -> ^( IF relational_expression ^( STMTS $s1 ) ^( STMTS $s2 ) )
     |                             -> ^( IF relational_expression ^( STMTS $s1 ) )
     ) 
+  | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] )
   ;
 
 expression
   : DOUBLEQUOTE_STRING
+  | SINGLEQUOTE_STRING
   | adding_expression
   ;
 
