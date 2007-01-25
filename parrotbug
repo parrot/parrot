@@ -428,6 +428,7 @@ EOT
           . "Please be more verbose.\n";
         print "Subject: ";
         $subject = <STDIN>;
+        $subject = q{} unless defined $subject;
         chomp $subject;
         die "Aborting.\n" if $err++ == 5;
     } while ( trivial_subject($subject) );
