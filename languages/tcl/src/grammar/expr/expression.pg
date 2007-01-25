@@ -8,7 +8,7 @@ grammar TclExpr::Grammar;
 token ws { \h* }
 
 token program {
-   | <[;\n\r\t\ ]>* <command> [ <?ws> <[\n;]> <?ws> <command>? ]*
+   | <[;\n\r\t\ ]>* <command> [ <?ws> <[\r\n;]> <?ws> <command>? ]*
    | $<empty>:=[^\s*$]
 }
 
@@ -42,7 +42,7 @@ token braced_word {
 
 token command_substitution {
     \[ \]
-  | \[ <[;\n\r\t\ ]>* <subcommand> [ <?ws> <[\n;]> <?ws> <subcommand>? ]* \]
+  | \[ <[;\n\r\t\ ]>* <subcommand> [ <?ws> <[\r\n;]> <?ws> <subcommand>? ]* \]
   | \[ <error: missing close-bracket>
 }
 
