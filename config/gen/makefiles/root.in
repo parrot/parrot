@@ -676,7 +676,7 @@ help :
 	@echo "  src_tests:         Run test in C-file."
 	@echo "  perl_tests:        Test the Perl modules in the distribution."
 	@echo "  codingstd_tests:   Test pdd07_codingstd."
-	@echo "  testexex:          Testing the exex runcore."
+	@echo "  testexec:          Testing the exec runcore."
 	@echo "  benchmark_tests:   Run all benchmarks."
 	@echo "  manitest:          Check for new and missing files."
 	@echo "  doc_tests:         Check POD syntax of all files containing POD."
