@@ -41,6 +41,7 @@ use Parrot::Configure::Step qw(capture_output);
 use Parrot::Docs::Directory;
 use base qw(Parrot::Docs::Directory);
 
+
 =item C<new()>
 
 Searches up the file system tree from the current working directory
@@ -54,25 +55,80 @@ Raises an exception if the distribution root is not found.
 
 =cut
 
+## i'm a singleton
 my $dist;
 
+
 sub new {
-    my $self = shift;
+    my( $class ) = @_;
 
     return $dist if defined $dist;
+    my $self = bless {}, $class;
+    return $self->_initialize;
+}
 
+
+sub _initialize {
+    my( $self ) = @_;
+
+    my $file = 'README';
     my $path = '.';
 
     while ( $self = $self->SUPER::new($path) ) {
-        return $dist = $self
-            if $self->file_exists_with_name('README')
-            and $self->file_with_name('README')->read =~ m/^This is Parrot/os;
+        if (
+            $self->file_exists_with_name($file)
+            and $self->file_with_name($file)->read =~ m/^This is Parrot/os
+        ) {
+            $dist = $self;
+            last;
+        }
 
         $path = $self->parent_path();
     }
 
-    die "Failed to find Parrot distribution root\n";
+    # non-object call syntax since $self is undefined
+    _croak( undef, "Failed to find Parrot distribution root\n" )
+        unless $self;
+
+    if( defined $dist ) {
+        $self->_manifest_files( [
+            sort keys %{ ExtUtils::Manifest::maniread(
+                File::Spec->catfile( $self->path, "MANIFEST" )
+            ) },
+        ] );
+    }
+
+    return $self;
 }
+
+
+sub _croak {
+    my( $self, @message ) = @_;
+    require Carp;
+    Carp::croak(@message);
+}
+
+
+BEGIN {
+    my @getter_setters = qw{ _manifest_files };
+
+    for my $method ( @getter_setters ) {
+        no strict 'refs';
+
+        *$method = sub {
+            my $self = shift;
+            unless (@_) {
+                $self->{$method} ||= [];
+                return wantarray
+                    ? @{ $self->{$method} }
+                    : $self->{$method};
+            }
+            $self->{$method} = shift;
+            return $self;
+        };
+    }
+}
+
 
 =back
 
@@ -82,365 +138,149 @@ sub new {
 
 =item C<c_source_file_directories()>
 
-Returns the directories which contain C source files.
-
-=cut
-
-sub c_source_file_directories {
-    my $self = shift;
-
-    my %c_source_dirs =
-
-        # Make a hash out of the directories of those files
-        map { ( ( File::Spec->splitpath($_) )[1] => 1 ) }
-
-        # Only look at files ending in .c
-        grep { m|\.c$| }
-
-        keys %{ ExtUtils::Manifest::maniread( File::Spec->catfile( $self->path, "MANIFEST" ) ) };
-
-    return map $self->directory_with_name($_) => grep { !m|\.svn/$| }
-        sort keys %c_source_dirs;
-}
-
-=item C<c_source_file_with_name($name)>
-
-Returns the C source file with the specified name.
-
-=cut
-
-sub c_source_file_with_name {
-    my $self = shift;
-    my $name = shift || return;
-
-    $name .= '.c' unless $name =~ /\.[Cc]$/o;
-
-    foreach my $dir ( $self->c_source_file_directories ) {
-        return $dir->file_with_name($name)
-            if $dir->file_exists_with_name($name);
-    }
-
-    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name . "\n";
-
-    return;
-}
-
-=item C<c_source_files()>
-
-Returns a sorted list of the C source files listed within the MANIFEST of
-Parrot.  Returns a list of Parrot::IO::File objects.
-
-=cut
-
-sub c_source_files {
-    my $self = shift;
-
-    my @manifest_files = keys %{ ExtUtils::Manifest::maniread(
-            File::Spec->catfile( $self->path, "MANIFEST" ) ) };
-
-    my @c_files = sort grep m{\.[cC]$}o, @manifest_files;
-
-    return map ($self->file_with_name($_), @c_files);
-}
-
 =item C<c_header_file_directories()>
-
-Returns the directories which contain C header files.
-
-=cut
-
-# XXX returns what exactly???  The docs need updating here to help with
-# debugging and further development
-
-sub c_header_file_directories {
-    my $self = shift;
-
-    my %c_header_dirs =
-
-        # Make a hash out of the directories of those files
-        map { ( ( File::Spec->splitpath($_) )[1] => 1 ) }
-
-        # Only look at files ending in .h
-        grep { m|\.h$| }
-
-        keys %{ ExtUtils::Manifest::maniread( File::Spec->catfile( $self->path, "MANIFEST" ) ) };
-
-    return map $self->directory_with_name($_) => grep { !m|\.svn/$| }
-        sort keys %c_header_dirs;
-}
-
-=item C<c_header_file_with_name($name)>
-
-Returns the C header file with the specified name.
-
-=cut
-
-sub c_header_file_with_name {
-    my $self = shift;
-    my $name = shift || return;
-
-    $name .= '.h' unless $name =~ /\.[Hh]$/o;
-
-    foreach my $dir ( $self->c_header_file_directories ) {
-        return $dir->file_with_name($name)
-            if $dir->file_exists_with_name($name);
-    }
-
-    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name . "\n";
-
-    return;
-}
-
-=item C<c_header_files()>
-
-Returns a sorted list of the C header files listed within the MANIFEST of
-Parrot.  Returns a list of Parrot::IO::File objects.
-
-=cut
-
-sub c_header_files {
-    my $self = shift;
-
-    my @manifest_files = keys %{ ExtUtils::Manifest::maniread(
-            File::Spec->catfile( $self->path, "MANIFEST" ) ) };
-
-    my @h_files = sort grep m{\.[hH]$}o, @manifest_files;
-
-    return map ($self->file_with_name($_), @h_files);
-}
 
 =item C<pmc_source_file_directories()>
 
-Returns the directories which contain PMC source files.
-
-=cut
-
-sub pmc_source_file_directories {
-    my $self = shift;
-
-    my %pmc_source_dirs =
-
-        # Make a hash out of the directories of those files
-        map { ( ( File::Spec->splitpath($_) )[1] => 1 ) }
-
-        # Only look at files ending in .pmc
-        grep { m|\.pmc$| }
-
-        keys %{ ExtUtils::Manifest::maniread( File::Spec->catfile( $self->path, "MANIFEST" ) ) };
-
-    return map $self->directory_with_name($_) => grep { !m|\.svn/$| }
-        sort keys %pmc_source_dirs;
-}
-
-=item C<pmc_source_file_with_name($name)>
-
-Returns the PMC source file with the specified name.
-
-=cut
-
-sub pmc_source_file_with_name {
-    my $self = shift;
-    my $name = shift || return;
-
-    $name .= '.pmc';
-
-    foreach my $dir ( $self->pmc_source_file_directories ) {
-        return $dir->file_with_name($name)
-            if $dir->file_exists_with_name($name);
-    }
-
-    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name . "\n";
-
-    return;
-}
-
-=item C<pmc_source_files()>
-
-Returns a sorted list of the PMC files listed within the MANIFEST of
-Parrot.  Returns a list of Parrot::IO::File objects.
-
-=cut
-
-sub pmc_source_files {
-    my $self = shift;
-
-    my @manifest_files = keys %{ ExtUtils::Manifest::maniread(
-            File::Spec->catfile( $self->path, "MANIFEST" ) ) };
-
-    my @pmc_files = sort grep m{\.pmc$}o, @manifest_files;
-
-    return map ($self->file_with_name($_), @pmc_files);
-}
-
 =item C<yacc_source_file_directories()>
-
-Returns the directories which contain yacc source files.
-
-=cut
-
-sub yacc_source_file_directories {
-    my $self = shift;
-
-    return map $self->directory_with_name($_) =>
-        'compilers/imcc/',
-        'languages/cola/',
-        'languages/lua/doc',
-        'languages/regex/lib/Regex',
-        ;
-}
-
-=item C<yacc_source_file_with_name($name)>
-
-Returns the yacc source file with the specified name.
-
-=cut
-
-sub yacc_source_file_with_name {
-    my $self = shift;
-    my $name = shift || return;
-
-    $name .= '.y';
-
-    foreach my $dir ( $self->yacc_source_file_directories ) {
-        return $dir->file_with_name($name)
-            if $dir->file_exists_with_name($name);
-    }
-
-    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name . "\n";
-
-    return;
-}
-
-=item C<yacc_source_files()>
-
-Returns a sorted list of the yacc files listed within the MANIFEST of
-Parrot.  Returns a list of Parrot::IO::File objects.
-
-=cut
-
-sub yacc_source_files {
-    my $self = shift;
-
-    my @manifest_files = keys %{ ExtUtils::Manifest::maniread(
-            File::Spec->catfile( $self->path, "MANIFEST" ) ) };
-
-    my @yacc_files = sort grep m{\.y$}o, @manifest_files;
-
-    return map ($self->file_with_name($_), @yacc_files);
-}
 
 =item C<lex_source_file_directories()>
 
-Returns the directories which contain lex source files.
+=item C<ops_source_file_directories()>
 
-=cut
+Returns the directories which contain source files of the appropriate filetype.
 
-sub lex_source_file_directories {
-    my $self = shift;
+=item C<c_source_file_with_name($name)>
 
-    return map $self->directory_with_name($_) =>
-        'compilers/imcc/',
-        'languages/cola/',
-        ;
-}
+=item C<c_header_file_with_name($name)>
+
+=item C<pmc_source_file_with_name($name)>
+
+=item C<yacc_source_file_with_name($name)>
 
 =item C<lex_source_file_with_name($name)>
 
-Returns the lex source file with the specified name.
+=item C<ops_source_file_with_name($name)>
 
-=cut
+Returns the source file with the specified name and of the appropriate filetype.
 
-sub lex_source_file_with_name {
-    my $self = shift;
-    my $name = shift || return;
+=item C<c_source_files()>
 
-    $name .= '.l';
+=item C<c_header_files()>
 
-    foreach my $dir ( $self->lex_source_file_directories ) {
-        return $dir->file_with_name($name)
-            if $dir->file_exists_with_name($name);
-    }
+=item C<pmc_source_files()>
 
-    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name . "\n";
-
-    return;
-}
+=item C<yacc_source_files()>
 
 =item C<lex_source_files()>
 
-Returns a sorted list of the lex files listed within the MANIFEST of
-Parrot.  Returns a list of Parrot::IO::File objects.
-
-=cut
-
-sub lex_source_files {
-    my $self = shift;
-
-    my @manifest_files = keys %{ ExtUtils::Manifest::maniread(
-            File::Spec->catfile( $self->path, "MANIFEST" ) ) };
-
-    my @lex_files = sort grep m{\.l$}o, @manifest_files;
-
-    return map ($self->file_with_name($_), @lex_files);
-}
-
-=item C<ops_source_file_directories()>
-
-Returns the directories which contain ops source files.
-
-=cut
-
-sub ops_source_file_directories {
-    my $self = shift;
-
-    return map $self->directory_with_name($_) =>
-        'src/ops/',
-        'src/dynoplibs/',
-        'languages/tcl/src/ops/',
-        'languages/WMLScript/ops/',
-        'languages/dotnet/ops/',
-        ;
-}
-
-=item C<ops_source_file_with_name($name)>
-
-Returns the ops source file with the specified name.
-
-=cut
-
-sub ops_source_file_with_name {
-    my $self = shift;
-    my $name = shift || return;
-
-    $name .= '.ops';
-
-    foreach my $dir ( $self->ops_source_file_directories ) {
-        return $dir->file_with_name($name)
-            if $dir->file_exists_with_name($name);
-    }
-
-    print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found:' . $name . "\n";
-
-    return;
-}
-
 =item C<ops_source_files()>
 
-Returns a sorted list of the ops files listed within the MANIFEST of
-Parrot.  Returns a list of Parrot::IO::File objects.
+Returns a sorted list of the source files listed within the MANIFEST of
+Parrot.  Returns a list of Parrot::IO::File objects of the appropriate filetype.
 
 =cut
 
-sub ops_source_files {
-    my $self = shift;
+BEGIN {
+    my %file_class = (
+        source => {
+            c    => { file_exts => ['c'] },
+            pmc  => { file_exts => ['pmc'] },
+            ops  => { file_exts => ['ops'] },
+            lex  => {
+                file_exts => ['l'],
+                except_dirs => [
+                    qw{ languages/lisp examples/library }
+                ],
+            },
+            yacc => { file_exts => ['y'] },
+#            perl => { file_exts => ['pl', 'pm', 'in', 't'] },
+        },
+        header => {
+            c    => { file_exts => ['h'] },
+        },
+    );
 
-    my @manifest_files = keys %{ ExtUtils::Manifest::maniread(
-            File::Spec->catfile( $self->path, "MANIFEST" ) ) };
+    my @ignore_dirs = qw{ .svn };
 
-    my @ops_files = sort grep m{\.ops$}o, @manifest_files;
 
-    return map ($self->file_with_name($_), @ops_files);
+    for my $class ( keys %file_class ) {
+        for my $type ( keys %{ $file_class{$class} } ) {
+            no strict 'refs';
+
+            my @exts       = @{ $file_class{$class}{$type}{file_exts} };
+            my @exceptions = defined $file_class{$class}{$type}{except_dirs}
+                ? @{ $file_class{$class}{$type}{except_dirs} }
+                : ();
+            my $method     = join '_' => $type, $class;
+            my $filter_ext = join '|' => map { "\\.${_}\$" } @exts;
+            my $filter_dir = join '|' =>
+                map { qr{\b$_\b} }
+                map { quotemeta($_) }
+                @ignore_dirs,
+                @exceptions;
+
+            next unless $method;
+
+            *{ $method . '_file_directories' } = sub {
+                my $self = shift;
+
+                # Look through the manifest
+                # for files ending in the proper extension(s)
+                # and make a hash out of the directories
+                my %dirs =
+                    map { ( ( File::Spec->splitpath($_) )[1] => 1 ) }
+                    grep { m|(?i)(?:$filter_ext)| }
+                    $self->_manifest_files;
+
+                # Filter out ignored directories
+                # and return the results
+                return
+                    sort
+                    map { $self->directory_with_name($_) }
+                    grep { !m|(?:$filter_dir)| }
+                    keys %dirs;
+            };
+
+
+            *{ $method . '_file_with_name' } = sub {
+                my( $self, $name ) = @_;
+                return unless length $name;
+
+                if ( 1 == @exts ) {
+                    my $ext = $exts[0];
+                    $name .= ".$ext"
+                       if $name !~ qr/(?i)\.$ext$/;
+                }
+
+                my $meth = $method . '_file_directories';
+                for my $dir ( $self->$meth ) {
+                    return $dir->file_with_name($name)
+                        if $dir->file_exists_with_name($name);
+                }
+
+                print 'WARNING: ' . __FILE__ . ':' . __LINE__
+                    . ' File not found: ' . $name . "\n";
+                return;
+            };
+
+
+            *{ $method . '_files' } = sub {
+                my( $self ) = @_;
+
+                # Look through the manifest
+                # for files ending in the proper extension(s)
+                # and return a sorted list of filenames
+                return
+                    sort
+                    map { $self->file_with_name($_) }
+                    grep { m|(?i)(?:$filter_ext)| }
+                    $self->_manifest_files;
+            };
+        }
+    }
 }
+
 
 =item C<get_c_language_files()>
 
@@ -452,7 +292,7 @@ Returns the C language source files within Parrot.  Namely:
 
 =item C header files C<*.h>
 
-=item (f)lex files C<*.lex>
+=item (f)lex files C<*.l>
 
 =item yacc/bison files C<*.y>
 
@@ -490,6 +330,7 @@ sub get_c_language_files {
     # XXX: lex_source_files() collects lisp files as well...  how to fix ???
 }
 
+
 =item C<is_c_exemption()>
 
 Determines if the given filename is an exemption to being in the C source.
@@ -497,28 +338,25 @@ This is to exclude automatically generated C-language files Parrot might have.
 
 =cut
 
-sub is_c_exemption {
-    my $self = shift;
-    my $file = shift;
+{
+    my @exemptions;
 
-    my @exemptions = qw(
-        config/gen/cpu/i386/memcpy_mmx.c
-        config/gen/cpu/i386/memcpy_sse.c
-        compilers/imcc/imclexer.c
-        compilers/imcc/imcparser.c
-        compilers/imcc/imcparser.h
-        languages/cola/lexer.c
-        languages/cola/parser.c
-        languages/cola/parser.h
-        );
+    sub is_c_exemption {
+        my( $self, $file ) = @_;
 
-    # XXX this is inefficient isn't it?
-    foreach my $exemption ( @exemptions ) {
-        return 1 if $file->path =~ $exemption;
+        push @exemptions => map { File::Spec->canonpath($_) } qw{
+            config/gen/cpu/i386/memcpy_mmx.c config/gen/cpu/i386/memcpy_sse.c
+            compilers/imcc/imclexer.c        compilers/imcc/imcparser.c
+            compilers/imcc/imcparser.h       languages/cola/lexer.c
+            languages/cola/parser.c          languages/cola/parser.h
+        } unless @exemptions;
+
+        $file->path =~ /\Q$_\E$/ && return 1
+            for @exemptions;
+        return;
     }
-
-    return 0;
 }
+
 
 =item C<get_perl_language_files()>
 
@@ -552,6 +390,7 @@ sub get_perl_language_files {
     return @files;
 }
 
+
 =item C<is_perl_exemption()>
 
 Determines if the given filename is an exemption to being in the Perl
@@ -560,30 +399,24 @@ any external modules Parrot might have.
 
 =cut
 
-sub is_perl_exemption {
-    my $self = shift;
-    my $file = shift;
+{
+    my @exemptions;
 
-    my @exemptions = qw(
-        languages/lua/Lua/parser.pm
-        languages/regex/lib/Regex/Grammar.pm
-        lib/Class/*
-        lib/Digest/*
-        lib/File/*
-        lib/Parse/*
-        lib/Pod/*
-        lib/SmartLink.pm
-        lib/Test/*
-        lib/Text/*
-        );
+    sub is_perl_exemption {
+        my( $self, $file ) = @_;
 
-    # XXX this is inefficient isn't it?
-    foreach my $exemption ( @exemptions ) {
-        return 1 if $file =~ $exemption;
+        push @exemptions => map { File::Spec->canonpath($_) } qw{
+            languages/lua/Lua/parser.pm  languages/regex/lib/Regex/Grammar.pm
+            lib/Class/* lib/Digest/*     lib/File/*     lib/Parse/*
+            lib/Pod/*   lib/SmartLink.pm lib/Test/*     lib/Text/*
+        } unless @exemptions;
+
+        $file->path =~ /\Q$_\E$/ && return 1
+            for @exemptions;
+        return;
     }
-
-    return 0;
 }
+
 
 =item C<is_perl()>
 
@@ -615,7 +448,7 @@ sub is_perl {
     # Now let's check to see if there's a perl shebang.
 
     open my $file_handle, '<', $filename
-        or die "Could not open $filename for reading";
+        or $self->_croak( "Could not open $filename for reading" );
     my $line = <$file_handle>;
     close $file_handle;
 
@@ -625,6 +458,7 @@ sub is_perl {
 
     return 0;
 }
+
 
 =item C<file_for_perl_module($module)>
 
@@ -650,6 +484,7 @@ sub file_for_perl_module {
     return $dir->existing_file_with_name($module);
 }
 
+
 =item C<docs_directory()>
 
 Returns the documentation directory.
@@ -661,6 +496,7 @@ sub docs_directory {
 
     return $self->existing_directory_with_name('docs');
 }
+
 
 =item C<html_docs_directory()>
 
@@ -674,6 +510,7 @@ sub html_docs_directory {
     return $self->docs_directory->directory_with_name('html');
 }
 
+
 =item C<delete_html_docs()>
 
 Deletes the HTML documentation directory.
@@ -685,6 +522,7 @@ sub delete_html_docs {
 
     return $self->html_docs_directory->delete();
 }
+
 
 =item C<gen_manifest_skip>
 
@@ -731,6 +569,7 @@ sub gen_manifest_skip {
 
     return \@skip;
 }
+
 
 =item C<generated_files>
 
