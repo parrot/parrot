@@ -196,12 +196,12 @@ node[String reg_mother]
       String reg = "reg_" + reg_num;
       System.out.print( 
           "                                                                   \n"
-        + "    # entering PLUS | MINUS | MUL_OP | REL_OP                      \n"
+        + "    # entering PLUS | MINUS | MUL_OP                               \n"
         + "      .sym pmc " + reg + "                                         \n"
         + "      " + reg + " = new 'PAST::Op'                                 \n"
       );
     }
-    ^( infix=( PLUS | MINUS | MUL_OP | REL_OP ) node[reg] node[reg] )
+    ^( infix=( PLUS | MINUS | MUL_OP ) node[reg] node[reg] )
     {
       // Todo. This is not nice, handl pirops in Plumhead.g
       String pirop = $infix.text;
@@ -214,7 +214,28 @@ node[String reg_mother]
       System.out.print( 
           "  " + reg + ".'attr'( 'pirop', '" + pirop + "' , 1 )               \n"
         + "  " + $node.reg_mother + ".'push'( " + reg + " )                   \n"
-        + "    # leaving ( PLUS | MINUS | MUL | DIV )                         \n"
+        + "    # leaving PLUS | MINUS | MUL_OP                                \n"
+      );
+    }
+  | {
+      reg_num++;
+      String reg = "reg_" + reg_num;
+      System.out.print( 
+          "                                                                   \n"
+        + "    # entering REL_OP                                              \n"
+        + "      .sym pmc " + reg + "                                         \n"
+        + "      " + reg + " = new 'PAST::Op'                                 \n"
+      );
+    }
+    ^( REL_OP node[reg] node[reg] )
+    {
+      // Todo. This is not nice, handl pirops in Plumhead.g
+      String relop = "infix:" + $REL_OP.text;
+      
+      System.out.print( 
+          "  " + reg + ".'attr'( 'name', '" + relop + "' , 1 )               \n"
+        + "  " + $node.reg_mother + ".'push'( " + reg + " )                   \n"
+        + "    # leaving REL_OL                                               \n"
       );
     }
   | {
