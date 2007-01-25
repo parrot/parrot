@@ -155,7 +155,9 @@ backslash_loop:
   inc $I0
   $I2 = $I0
   $I1 = ord contents, $I2
-  if $I1 != 10 goto backslash_loop # \n
+  if $I1 == 10 goto space # \n
+  if $I1 == 13 goto space # \r
+  goto backslash_loop
 space:
   inc $I2
   if $I0 >= len goto execute_code
