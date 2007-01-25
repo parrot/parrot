@@ -43,7 +43,7 @@ PIO_string_register_layer(void)
 }
 
 static size_t
-PIO_string_read(theINTERP, ParrotIOLayer *l, ParrotIO *io, STRING **buf)
+PIO_string_read(Interp *interp, ParrotIOLayer *l, ParrotIO *io, STRING **buf)
 {
     UNUSED(io);
     UNUSED(interp);
@@ -58,7 +58,7 @@ PIO_string_read(theINTERP, ParrotIOLayer *l, ParrotIO *io, STRING **buf)
 }
 
 static size_t
-PIO_string_write(theINTERP, ParrotIOLayer *l, ParrotIO *io, STRING *s)
+PIO_string_write(Interp *interp, ParrotIOLayer *l, ParrotIO *io, STRING *s)
 {
     STRING * old_string;
 

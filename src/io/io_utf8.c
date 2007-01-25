@@ -45,7 +45,7 @@ PIO_utf8_register_layer(void)
 }
 
 static size_t
-PIO_utf8_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+PIO_utf8_read(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
               STRING **buf)
 {
     size_t len;
@@ -89,7 +89,7 @@ ok:
 }
 
 static size_t
-PIO_utf8_write(theINTERP, ParrotIOLayer *l, ParrotIO *io, STRING *s)
+PIO_utf8_write(Interp *interp, ParrotIOLayer *l, ParrotIO *io, STRING *s)
 {
     STRING *dest;
 

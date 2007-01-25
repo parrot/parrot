@@ -83,12 +83,12 @@ PIO_base_delete_layer(ParrotIOLayer *layer)
 /*
 
 =item C<INTVAL
-PIO_push_layer(theINTERP,  PMC *pmc, ParrotIOLayer *layer)>
+PIO_push_layer(Interp *interp,  PMC *pmc, ParrotIOLayer *layer)>
 
 Push a layer onto an IO object (C<*pmc>) or the default stack.
 
 =item C<void
-PIO_push_layer_str(theINTERP, PMC *pmc, STRING *layer_name)>
+PIO_push_layer_str(Interp *interp, PMC *pmc, STRING *layer_name)>
 
 Push a layer onto an IO object (C<*pmc>).
 
@@ -97,7 +97,7 @@ Push a layer onto an IO object (C<*pmc>).
 */
 
 INTVAL
-PIO_push_layer(theINTERP,  PMC *pmc, ParrotIOLayer *layer)
+PIO_push_layer(Interp *interp,  PMC *pmc, ParrotIOLayer *layer)
 {
 
     if (layer == NULL)
@@ -188,12 +188,12 @@ PIO_push_layer_str(Interp *interp, PMC *pmc, STRING *ls)
 /*
 
 =item C<ParrotIOLayer *
-PIO_pop_layer(theINTERP, PMC *pmc)>
+PIO_pop_layer(Interp *interp, PMC *pmc)>
 
 Pop a layer from an IO object (C<*pmc>) or the default stack.
 
 =item C<STRING *
-PIO_pop_layer_str(theINTERP, PMC *pmc)>
+PIO_pop_layer_str(Interp *interp, PMC *pmc)>
 
 Pop a layer from an IO object (C<*pmc>) and return the name of the
 popped layer. The layer gets freed.
@@ -203,7 +203,7 @@ popped layer. The layer gets freed.
 */
 
 ParrotIOLayer *
-PIO_pop_layer(theINTERP, PMC *pmc)
+PIO_pop_layer(Interp *interp, PMC *pmc)
 {
     ParrotIO * const io = PMC_data(pmc);
 

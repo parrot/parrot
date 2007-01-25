@@ -45,7 +45,7 @@ PIO_mmap_register_layer(void)
 /*
 
 =item C<static ParrotIO *
-PIO_mmap_open(theINTERP, ParrotIOLayer *layer,
+PIO_mmap_open(Interp *interp, ParrotIOLayer *layer,
                const char *path, INTVAL flags)>
 
 The buffer layer's C<Open> function.
@@ -55,7 +55,7 @@ The buffer layer's C<Open> function.
 */
 
 static ParrotIO *
-PIO_mmap_open(theINTERP, ParrotIOLayer *layer,
+PIO_mmap_open(Interp *interp, ParrotIOLayer *layer,
                const char *path, INTVAL flags)
 {
     ParrotIO *io;
@@ -94,7 +94,7 @@ PIO_mmap_open(theINTERP, ParrotIOLayer *layer,
 /*
 
 =item C<static size_t
-PIO_mmap_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+PIO_mmap_read(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
               STRING ** buf)>
 
 Calls C<read()> to return up to C<len> bytes in the memory starting at
@@ -105,7 +105,7 @@ C<buffer>.
 */
 
 static size_t
-PIO_mmap_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+PIO_mmap_read(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
               STRING **buf)
 {
     STRING *s;
@@ -132,7 +132,7 @@ PIO_mmap_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 /*
 
 =item C<static INTVAL
-PIO_mmap_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)>
+PIO_mmap_close(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)>
 
 Closes C<*io>'s file descriptor.
 
@@ -141,7 +141,7 @@ Closes C<*io>'s file descriptor.
 */
 
 static INTVAL
-PIO_mmap_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
+PIO_mmap_close(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)
 {
     INTVAL ret = -1;
 
