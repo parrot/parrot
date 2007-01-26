@@ -317,9 +317,7 @@ STILL INCOMPLETE (see str_find_aux).
 
 .sub '_string_find' :anon
     .param pmc argv :slurpy
-    .local pmc ret
-    (ret :slurpy) = str_find_aux(1, argv :flat)
-    .return (ret :flat)
+    .return str_find_aux(1, argv :flat)
 .end
 
 
@@ -507,9 +505,7 @@ NOT YET IMPLEMENTED (see str_find_aux).
 
 .sub '_string_match' :anon
     .param pmc argv :slurpy
-    .local pmc ret
-    (ret :slurpy) = str_find_aux(0, argv :flat)
-    .return (ret :flat)
+    .return str_find_aux(0, argv :flat)
 .end
 
 

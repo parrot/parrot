@@ -401,12 +401,10 @@ Equivalent to C<file:flush> over the default output file.
 
 .sub '_io_flush' :anon
     .local pmc file
-    .local pmc ret
     .const .LuaString key = 'flush'
     file = getiofile(1)
     $P0 = file[key]
-    ret = $P0(file)
-    .return (ret)
+    .return $P0(file)
 .end
 
 
@@ -424,7 +422,6 @@ error code.
 
 .sub '_io_input' :anon
     .param pmc file :optional
-    .local pmc ret
     .local pmc f
     if_null file, L1
     unless file goto L1
@@ -435,17 +432,16 @@ error code.
     unless_null f, L3
     argerror(file)
 L3:
-    ret = newfile()
-    setattribute ret, 'data', f
-    setiofile(0, ret)
+    $P0 = newfile()
+    setattribute $P0, 'data', f
+    setiofile(0, $P0)
     goto L1
 L2:
     tofile(file)
     setiofile(0, file)
     goto L1
 L1:
-    ret = getiofile(0)
-    .return (ret)
+    .return getiofile(0)
 .end
 
 
@@ -471,11 +467,9 @@ input file. In this case it does not close the file when the loop ends.
     .param pmc filename :optional
     .local pmc file
     .local pmc f
-    .local pmc ret
     unless_null filename, L1
     file = getiofile(0)
-    ret = _file_lines(file)
-    .return (ret)
+    .return _file_lines(file)
 L1:
     $S1 = checkstring(filename)
     f = open $S1, '<'
@@ -484,8 +478,7 @@ L1:
 L2:
     file = newfile()
     setattribute file, 'data', f
-    ret = aux_lines(file, 1)
-    .return (ret)
+    .return aux_lines(file, 1)
 .end
 
 
@@ -565,7 +558,6 @@ Similar to C<io.input>, but operates over the default output file.
 
 .sub '_io_output' :anon
     .param pmc file :optional
-    .local pmc ret
     .local pmc f
     if_null file, L1
     unless file goto L1
@@ -576,16 +568,15 @@ Similar to C<io.input>, but operates over the default output file.
     unless_null f, L3
     argerror(file)
 L3:
-    ret = newfile()
-    setattribute ret, 'data', f
-    setiofile(1, ret)
+    $P0 = newfile()
+    setattribute $P0, 'data', f
+    setiofile(1, $P0)
     goto L1
 L2:
     tofile(file)
     setiofile(1, file)
 L1:
-    ret = getiofile(1)
-    .return (ret)
+    .return getiofile(1)
 .end
 
 
@@ -617,12 +608,10 @@ STILL INCOMPLETE (see file:read).
 .sub '_io_read' :anon
     .param pmc argv :slurpy
     .local pmc file
-    .local pmc ret
     .const .LuaString key = 'read'
     file = getiofile(0)
     $P0 = file[key]
-    ret = $P0(file, argv :flat)
-    .return (ret)
+    .return $P0(file, argv :flat)
 .end
 
 
@@ -685,12 +674,10 @@ Equivalent to C<io.output():write>.
 .sub '_io_write' :anon
     .param pmc argv :slurpy
     .local pmc file
-    .local pmc ret
     .const .LuaString key = 'write'
     file = getiofile(1)
     $P0 = file[key]
-    ret = $P0(file, argv :flat)
-    .return (ret)
+    .return $P0(file, argv :flat)
 .end
 
 
@@ -732,10 +719,8 @@ does not close the file when the loop ends.)
 =cut
 
 .sub '_file_lines' :method :anon
-    .local pmc ret
     tofile(self)
-    ret = aux_lines(self, 0)
-    .return (ret)
+    .return aux_lines(self, 0)
 .end
 
 
@@ -785,8 +770,7 @@ STILL INCOMPLETE.
     tofile(self)
     f = getattribute self, 'data'
     if formats, L1
-    ret = read_line(f)
-    .return (ret)
+    .return read_line(f)
 L1:
     .local int narg
     .local int i
