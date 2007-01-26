@@ -328,6 +328,7 @@ be B<nil>).
 .sub '_debug_setmetatable' :anon
     .param pmc table :optional
     .param pmc metatable :optional
+    .local pmc ret
     checktype(table, 'table')
     if_null metatable, L0
     $S0 = typeof metatable
@@ -337,7 +338,9 @@ L0:
     argerror("nil or table expected")
 L1:
     table.'set_metatable'(metatable)
-    .return ()
+    new ret, .LuaBoolean
+    ret = 1
+    .return (ret)
 .end
 
 

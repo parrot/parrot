@@ -594,7 +594,7 @@ C<table> must be a table; C<index> is any value different from B<nil>.
     .local pmc ret
     checktype(table, 'table')
     checkany(index)
-     ret = table.'rawget'(index)
+    ret = table.'rawget'(index)
     .return (ret)
 .end
 

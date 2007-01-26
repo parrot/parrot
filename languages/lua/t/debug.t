@@ -42,7 +42,7 @@ OUT
 language_output_is( 'lua', <<'CODE', <<'OUT', 'setmetatable' );
 t = {}
 t1 = {}
-debug.setmetatable(t, t1)
+assert(debug.setmetatable(t, t1) == true)
 assert(getmetatable(t) == t1)
 print "ok"
 CODE
