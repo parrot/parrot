@@ -351,6 +351,34 @@ Creates and returns a clone of the subroutine.
 
 /*
 
+=item C<void assign_pmc(PMC* other)>
+
+Set SELF to the data in other.
+
+=cut
+
+*/
+
+    void set_pmc(PMC* other) {
+        DYNSELF.assign_pmc(other);
+    }
+
+    void assign_pmc(PMC* other) {
+        /* only handle the case where the other PMC is a Sub */
+        if (other->vtable->base_type == enum_class_Sub) {
+            /* copy the sub struct */
+            memcpy(PMC_sub(SELF), PMC_sub(other), sizeof (struct Parrot_sub));
+            /* copy the name so it's a different string in memory */
+            PMC_sub(SELF)->name = string_copy(INTERP, PMC_sub(SELF)->name);
+        }
+        else {
+            real_exception(INTERP, NULL, E_TypeError,
+                           "Can't assign a non-Sub type to a Sub");
+        }
+    }
+
+/*
+
 =item C<void mark()>
 
 Marks the sub as live.
