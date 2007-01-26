@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: pmc2c.t 14964 2006-10-18 18:20:48Z particle $
+# $Id$
 # 06-print_tree.t
 
 use strict;
@@ -10,7 +10,7 @@ BEGIN {
     use FindBin qw($Bin);
     use Cwd qw(cwd realpath);
     realpath($Bin) =~ m{^(.*\/parrot)\/[^/]*\/[^/]*\/[^/]*$};
-    $topdir = $1;
+    our $topdir = $1;
     if (defined $topdir) {
         print "\nOK:  Parrot top directory located\n";
     } else {

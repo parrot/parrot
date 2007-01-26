@@ -10,7 +10,7 @@ BEGIN {
     use FindBin qw($Bin);
     use Cwd qw(cwd realpath);
     realpath($Bin) =~ m{^(.*\/parrot)\/[^/]*\/[^/]*\/[^/]*$};
-    $topdir = $1;
+    our $topdir = $1;
     if (defined $topdir) {
         print "\nOK:  Parrot top directory located\n";
     } else {
