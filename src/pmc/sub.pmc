@@ -364,8 +364,8 @@ Set SELF to the data in other.
     }
 
     void assign_pmc(PMC* other) {
-        /* only handle the case where the other PMC is a Sub */
-        if (other->vtable->base_type == enum_class_Sub) {
+        /* only handle the case where the other PMC is the same type */
+        if (other->vtable->base_type == SELF->vtable->base_type) {
             /* copy the sub struct */
             memcpy(PMC_sub(SELF), PMC_sub(other), sizeof (struct Parrot_sub));
             /* copy the name so it's a different string in memory */

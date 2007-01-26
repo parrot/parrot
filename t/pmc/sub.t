@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 59;
+use Parrot::Test tests => 60;
 use Parrot::Config;
 
 =head1 NAME
@@ -1335,6 +1335,24 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'assign');
 CODE
 ok
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'assign w/:outer');
+.sub main :main
+    $P0 = get_global 'ok'
+
+    $P1 = new .Undef
+    assign $P1, $P0
+
+    $P1()
+.end
+
+.sub ok :outer('main')
+    say "ok"
+.end
+CODE
+ok
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl
