@@ -95,7 +95,6 @@ gen_pir_past
         + "    .local pmc eval_past                                          \n"
         + "    eval_past = past_root.'compile'( )                            \n"
         + "    eval_past()                                                   \n"
-        + "    # '_dumper'(eval, 'eval')                                     \n"
         + "                                                                  \n"
         + ".end                                                              \n"
         + "                                                                  \n"
@@ -277,6 +276,36 @@ node[String reg_mother]
       System.out.print( 
           "  " + $node.reg_mother + ".'push'( " + reg_stmts + " )             \n"
         + "  # leaving 'STMTS node*'                                          \n"
+      );
+    }
+  | {
+      reg_num++;
+      String reg_assign = "reg_assign_" + reg_num;
+      System.out.print( 
+          "                                                                   \n"
+        + "    # entering ASSIGN_OP                                           \n"
+        + "    .sym pmc " + reg_assign + "                                    \n"
+        + "    " + reg_assign + " = new 'PAST::Op'                            \n"
+      );
+    }
+    ^( ASSIGN_OP node[reg_assign] node[reg_assign] )
+    {
+      System.out.print( 
+          "  " + reg_assign + ".'attr'( 'name', 'infix:=' , 1 )               \n"
+        + "  " + reg_assign + ".'attr'( 'pasttype', 'assign' , 1 )            \n"
+        + "  " + $node.reg_mother + ".'push'( " + reg_assign + " )            \n"
+        + "  # leaving ASSIGN_OP                                              \n"
+      );
+    }
+  | SCALAR
+    {
+      System.out.println( 
+          "                                                                  \n"
+        + "  # entering SCALAR                                               \n"
+        + "  past_temp = new 'PAST::Var'                                     \n"
+        + "      past_temp.'init'( 'name' => '" + $SCALAR.text + "', 'viviself' => '.Undef', 'islvalue' => 1 )      \n"
+        + "  " + $node.reg_mother + ".'push'( past_temp )                    \n"
+        + "  # end of NUMBER                                                 \n"
       );
     }
   ;

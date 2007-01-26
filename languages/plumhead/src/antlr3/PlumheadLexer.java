@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-26 19:34:11
+// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-26 21:49:20
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -7,30 +7,34 @@ import java.util.ArrayList;
 
 public class PlumheadLexer extends Lexer {
     public static final int CODE_START=8;
-    public static final int MINUS=16;
-    public static final int T22=22;
-    public static final int NUMBER=15;
+    public static final int MINUS=19;
+    public static final int T29=29;
+    public static final int ARRAY=16;
+    public static final int IDENT=14;
     public static final int WS=10;
-    public static final int T23=23;
+    public static final int NUMBER=18;
+    public static final int T28=28;
     public static final int SINGLEQUOTE_STRING=12;
-    public static final int MUL_OP=18;
+    public static final int MUL_OP=21;
     public static final int SEA=7;
     public static final int CODE_END=9;
     public static final int STMTS=6;
     public static final int PROGRAM=4;
-    public static final int T25=25;
-    public static final int INTEGER=14;
+    public static final int ASSIGN_OP=22;
+    public static final int INTEGER=17;
     public static final int DOUBLEQUOTE_STRING=11;
     public static final int ECHO=13;
-    public static final int ELSE=21;
+    public static final int ELSE=25;
     public static final int T26=26;
-    public static final int IF=20;
+    public static final int IF=24;
     public static final int EOF=-1;
-    public static final int Tokens=27;
-    public static final int REL_OP=19;
-    public static final int PLUS=17;
+    public static final int Tokens=31;
+    public static final int REL_OP=23;
+    public static final int PLUS=20;
+    public static final int T27=27;
     public static final int NOQUOTE_STRING=5;
-    public static final int T24=24;
+    public static final int T30=30;
+    public static final int SCALAR=15;
 
       public static boolean codeMode = false;
 
@@ -40,11 +44,11 @@ public class PlumheadLexer extends Lexer {
     }
     public String getGrammarFileName() { return "src/antlr3/Plumhead.g"; }
 
-    // $ANTLR start T22
-    public void mT22() throws RecognitionException {
+    // $ANTLR start T26
+    public void mT26() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T22;
+            int _type = T26;
             int _start = getCharIndex();
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
@@ -67,13 +71,13 @@ public class PlumheadLexer extends Lexer {
             ruleNestingLevel--;
         }
     }
-    // $ANTLR end T22
+    // $ANTLR end T26
 
-    // $ANTLR start T23
-    public void mT23() throws RecognitionException {
+    // $ANTLR start T27
+    public void mT27() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T23;
+            int _type = T27;
             int _start = getCharIndex();
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
@@ -96,13 +100,13 @@ public class PlumheadLexer extends Lexer {
             ruleNestingLevel--;
         }
     }
-    // $ANTLR end T23
+    // $ANTLR end T27
 
-    // $ANTLR start T24
-    public void mT24() throws RecognitionException {
+    // $ANTLR start T28
+    public void mT28() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T24;
+            int _type = T28;
             int _start = getCharIndex();
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
@@ -125,13 +129,13 @@ public class PlumheadLexer extends Lexer {
             ruleNestingLevel--;
         }
     }
-    // $ANTLR end T24
+    // $ANTLR end T28
 
-    // $ANTLR start T25
-    public void mT25() throws RecognitionException {
+    // $ANTLR start T29
+    public void mT29() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T25;
+            int _type = T29;
             int _start = getCharIndex();
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
@@ -154,13 +158,13 @@ public class PlumheadLexer extends Lexer {
             ruleNestingLevel--;
         }
     }
-    // $ANTLR end T25
+    // $ANTLR end T29
 
-    // $ANTLR start T26
-    public void mT26() throws RecognitionException {
+    // $ANTLR start T30
+    public void mT30() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = T26;
+            int _type = T30;
             int _start = getCharIndex();
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
@@ -183,7 +187,7 @@ public class PlumheadLexer extends Lexer {
             ruleNestingLevel--;
         }
     }
-    // $ANTLR end T26
+    // $ANTLR end T30
 
     // $ANTLR start SEA
     public void mSEA() throws RecognitionException {
@@ -573,30 +577,159 @@ public class PlumheadLexer extends Lexer {
     }
     // $ANTLR end ECHO
 
-    // $ANTLR start INTEGER
-    public void mINTEGER() throws RecognitionException {
+    // $ANTLR start IDENT
+    public void mIDENT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // src/antlr3/Plumhead.g:45:11: ({...}? => ( '0' .. '9' )+ )
-            // src/antlr3/Plumhead.g:45:11: {...}? => ( '0' .. '9' )+
+            // src/antlr3/Plumhead.g:46:11: ({...}? => ('a'..'z'|'A'..'Z') ( ('a'..'z'|'A'..'Z'))* )
+            // src/antlr3/Plumhead.g:46:11: {...}? => ('a'..'z'|'A'..'Z') ( ('a'..'z'|'A'..'Z'))*
             {
             if ( !( codeMode ) ) {
-                throw new FailedPredicateException(input, "INTEGER", " codeMode ");
+                throw new FailedPredicateException(input, "IDENT", " codeMode ");
             }
-            // src/antlr3/Plumhead.g:45:27: ( '0' .. '9' )+
-            int cnt6=0;
+            if ( (input.LA(1)>='A' && input.LA(1)<='Z')||(input.LA(1)>='a' && input.LA(1)<='z') ) {
+                input.consume();
+
+            }
+            else {
+                MismatchedSetException mse =
+                    new MismatchedSetException(null,input);
+                recover(mse);    throw mse;
+            }
+
+            // src/antlr3/Plumhead.g:46:50: ( ('a'..'z'|'A'..'Z'))*
             loop6:
             do {
                 int alt6=2;
                 int LA6_0 = input.LA(1);
-                if ( ((LA6_0>='0' && LA6_0<='9')) ) {
+                if ( ((LA6_0>='A' && LA6_0<='Z')||(LA6_0>='a' && LA6_0<='z')) ) {
                     alt6=1;
                 }
 
 
                 switch (alt6) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:45:28: '0' .. '9'
+            	    // src/antlr3/Plumhead.g:46:52: ('a'..'z'|'A'..'Z')
+            	    {
+            	    if ( (input.LA(1)>='A' && input.LA(1)<='Z')||(input.LA(1)>='a' && input.LA(1)<='z') ) {
+            	        input.consume();
+
+            	    }
+            	    else {
+            	        MismatchedSetException mse =
+            	            new MismatchedSetException(null,input);
+            	        recover(mse);    throw mse;
+            	    }
+
+
+            	    }
+            	    break;
+
+            	default :
+            	    break loop6;
+                }
+            } while (true);
+
+
+            }
+
+        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end IDENT
+
+    // $ANTLR start SCALAR
+    public void mSCALAR() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = SCALAR;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:48:11: ({...}? => '$' IDENT )
+            // src/antlr3/Plumhead.g:48:11: {...}? => '$' IDENT
+            {
+            if ( !( codeMode ) ) {
+                throw new FailedPredicateException(input, "SCALAR", " codeMode ");
+            }
+            match('$'); 
+            mIDENT(); 
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end SCALAR
+
+    // $ANTLR start ARRAY
+    public void mARRAY() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = ARRAY;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:49:11: ({...}? => '@' IDENT )
+            // src/antlr3/Plumhead.g:49:11: {...}? => '@' IDENT
+            {
+            if ( !( codeMode ) ) {
+                throw new FailedPredicateException(input, "ARRAY", " codeMode ");
+            }
+            match('@'); 
+            mIDENT(); 
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end ARRAY
+
+    // $ANTLR start INTEGER
+    public void mINTEGER() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            // src/antlr3/Plumhead.g:52:11: ({...}? => ( '0' .. '9' )+ )
+            // src/antlr3/Plumhead.g:52:11: {...}? => ( '0' .. '9' )+
+            {
+            if ( !( codeMode ) ) {
+                throw new FailedPredicateException(input, "INTEGER", " codeMode ");
+            }
+            // src/antlr3/Plumhead.g:52:27: ( '0' .. '9' )+
+            int cnt7=0;
+            loop7:
+            do {
+                int alt7=2;
+                int LA7_0 = input.LA(1);
+                if ( ((LA7_0>='0' && LA7_0<='9')) ) {
+                    alt7=1;
+                }
+
+
+                switch (alt7) {
+            	case 1 :
+            	    // src/antlr3/Plumhead.g:52:28: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -604,12 +737,12 @@ public class PlumheadLexer extends Lexer {
             	    break;
 
             	default :
-            	    if ( cnt6 >= 1 ) break loop6;
+            	    if ( cnt7 >= 1 ) break loop7;
                         EarlyExitException eee =
-                            new EarlyExitException(6, input);
+                            new EarlyExitException(7, input);
                         throw eee;
                 }
-                cnt6++;
+                cnt7++;
             } while (true);
 
 
@@ -631,38 +764,38 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:48:6: ({...}? => INTEGER ( '.' INTEGER )? | '.' INTEGER )
-            int alt8=2;
-            int LA8_0 = input.LA(1);
-            if ( ((LA8_0>='0' && LA8_0<='9')) && ( codeMode )) {
-                alt8=1;
+            // src/antlr3/Plumhead.g:55:6: ({...}? => INTEGER ( '.' INTEGER )? | '.' INTEGER )
+            int alt9=2;
+            int LA9_0 = input.LA(1);
+            if ( ((LA9_0>='0' && LA9_0<='9')) && ( codeMode )) {
+                alt9=1;
             }
-            else if ( (LA8_0=='.') ) {
-                alt8=2;
+            else if ( (LA9_0=='.') ) {
+                alt9=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("47:1: NUMBER : ({...}? => INTEGER ( '.' INTEGER )? | '.' INTEGER );", 8, 0, input);
+                    new NoViableAltException("54:1: NUMBER : ({...}? => INTEGER ( '.' INTEGER )? | '.' INTEGER );", 9, 0, input);
 
                 throw nvae;
             }
-            switch (alt8) {
+            switch (alt9) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:48:6: {...}? => INTEGER ( '.' INTEGER )?
+                    // src/antlr3/Plumhead.g:55:6: {...}? => INTEGER ( '.' INTEGER )?
                     {
                     if ( !( codeMode ) ) {
                         throw new FailedPredicateException(input, "NUMBER", " codeMode ");
                     }
                     mINTEGER(); 
-                    // src/antlr3/Plumhead.g:48:31: ( '.' INTEGER )?
-                    int alt7=2;
-                    int LA7_0 = input.LA(1);
-                    if ( (LA7_0=='.') ) {
-                        alt7=1;
+                    // src/antlr3/Plumhead.g:55:31: ( '.' INTEGER )?
+                    int alt8=2;
+                    int LA8_0 = input.LA(1);
+                    if ( (LA8_0=='.') ) {
+                        alt8=1;
                     }
-                    switch (alt7) {
+                    switch (alt8) {
                         case 1 :
-                            // src/antlr3/Plumhead.g:48:32: '.' INTEGER
+                            // src/antlr3/Plumhead.g:55:32: '.' INTEGER
                             {
                             match('.'); 
                             mINTEGER(); 
@@ -676,7 +809,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // src/antlr3/Plumhead.g:49:7: '.' INTEGER
+                    // src/antlr3/Plumhead.g:56:7: '.' INTEGER
                     {
                     match('.'); 
                     mINTEGER(); 
@@ -707,8 +840,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:52:13: ({...}? => '-' )
-            // src/antlr3/Plumhead.g:52:13: {...}? => '-'
+            // src/antlr3/Plumhead.g:59:13: ({...}? => '-' )
+            // src/antlr3/Plumhead.g:59:13: {...}? => '-'
             {
             if ( !( codeMode ) ) {
                 throw new FailedPredicateException(input, "MINUS", " codeMode ");
@@ -739,8 +872,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:53:13: ({...}? => '+' )
-            // src/antlr3/Plumhead.g:53:13: {...}? => '+'
+            // src/antlr3/Plumhead.g:60:13: ({...}? => '+' )
+            // src/antlr3/Plumhead.g:60:13: {...}? => '+'
             {
             if ( !( codeMode ) ) {
                 throw new FailedPredicateException(input, "PLUS", " codeMode ");
@@ -771,27 +904,27 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:54:13: ({...}? => '*' | '/' | '%' )
-            int alt9=3;
-            int LA9_0 = input.LA(1);
-            if ( (LA9_0=='*') && ( codeMode )) {
-                alt9=1;
+            // src/antlr3/Plumhead.g:61:13: ({...}? => '*' | '/' | '%' )
+            int alt10=3;
+            int LA10_0 = input.LA(1);
+            if ( (LA10_0=='*') && ( codeMode )) {
+                alt10=1;
             }
-            else if ( (LA9_0=='/') ) {
-                alt9=2;
+            else if ( (LA10_0=='/') ) {
+                alt10=2;
             }
-            else if ( (LA9_0=='%') ) {
-                alt9=3;
+            else if ( (LA10_0=='%') ) {
+                alt10=3;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("54:1: MUL_OP : ({...}? => '*' | '/' | '%' );", 9, 0, input);
+                    new NoViableAltException("61:1: MUL_OP : ({...}? => '*' | '/' | '%' );", 10, 0, input);
 
                 throw nvae;
             }
-            switch (alt9) {
+            switch (alt10) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:54:13: {...}? => '*'
+                    // src/antlr3/Plumhead.g:61:13: {...}? => '*'
                     {
                     if ( !( codeMode ) ) {
                         throw new FailedPredicateException(input, "MUL_OP", " codeMode ");
@@ -801,14 +934,14 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // src/antlr3/Plumhead.g:54:37: '/'
+                    // src/antlr3/Plumhead.g:61:37: '/'
                     {
                     match('/'); 
 
                     }
                     break;
                 case 3 :
-                    // src/antlr3/Plumhead.g:54:44: '%'
+                    // src/antlr3/Plumhead.g:61:44: '%'
                     {
                     match('%'); 
 
@@ -829,6 +962,38 @@ public class PlumheadLexer extends Lexer {
     }
     // $ANTLR end MUL_OP
 
+    // $ANTLR start ASSIGN_OP
+    public void mASSIGN_OP() throws RecognitionException {
+        try {
+            ruleNestingLevel++;
+            int _type = ASSIGN_OP;
+            int _start = getCharIndex();
+            int _line = getLine();
+            int _charPosition = getCharPositionInLine();
+            int _channel = Token.DEFAULT_CHANNEL;
+            // src/antlr3/Plumhead.g:62:13: ({...}? => '=' )
+            // src/antlr3/Plumhead.g:62:13: {...}? => '='
+            {
+            if ( !( codeMode ) ) {
+                throw new FailedPredicateException(input, "ASSIGN_OP", " codeMode ");
+            }
+            match('='); 
+
+            }
+
+
+
+                    if ( token==null && ruleNestingLevel==1 ) {
+                        emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+                    }
+
+                        }
+        finally {
+            ruleNestingLevel--;
+        }
+    }
+    // $ANTLR end ASSIGN_OP
+
     // $ANTLR start REL_OP
     public void mREL_OP() throws RecognitionException {
         try {
@@ -838,40 +1003,40 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:55:13: ({...}? => '==' | '<=' | '>=' | '!=' | '<' | '>' )
-            int alt10=6;
-            int LA10_0 = input.LA(1);
-            if ( (LA10_0=='=') && ( codeMode )) {
-                alt10=1;
+            // src/antlr3/Plumhead.g:63:13: ({...}? => '==' | '<=' | '>=' | '!=' | '<' | '>' )
+            int alt11=6;
+            int LA11_0 = input.LA(1);
+            if ( (LA11_0=='=') && ( codeMode )) {
+                alt11=1;
             }
-            else if ( (LA10_0=='<') ) {
-                int LA10_2 = input.LA(2);
-                if ( (LA10_2=='=') ) {
-                    alt10=2;
+            else if ( (LA11_0=='<') ) {
+                int LA11_2 = input.LA(2);
+                if ( (LA11_2=='=') ) {
+                    alt11=2;
                 }
                 else {
-                    alt10=5;}
+                    alt11=5;}
             }
-            else if ( (LA10_0=='>') ) {
-                int LA10_3 = input.LA(2);
-                if ( (LA10_3=='=') ) {
-                    alt10=3;
+            else if ( (LA11_0=='>') ) {
+                int LA11_3 = input.LA(2);
+                if ( (LA11_3=='=') ) {
+                    alt11=3;
                 }
                 else {
-                    alt10=6;}
+                    alt11=6;}
             }
-            else if ( (LA10_0=='!') ) {
-                alt10=4;
+            else if ( (LA11_0=='!') ) {
+                alt11=4;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("55:1: REL_OP : ({...}? => '==' | '<=' | '>=' | '!=' | '<' | '>' );", 10, 0, input);
+                    new NoViableAltException("63:1: REL_OP : ({...}? => '==' | '<=' | '>=' | '!=' | '<' | '>' );", 11, 0, input);
 
                 throw nvae;
             }
-            switch (alt10) {
+            switch (alt11) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:55:13: {...}? => '=='
+                    // src/antlr3/Plumhead.g:63:13: {...}? => '=='
                     {
                     if ( !( codeMode ) ) {
                         throw new FailedPredicateException(input, "REL_OP", " codeMode ");
@@ -882,7 +1047,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // src/antlr3/Plumhead.g:55:37: '<='
+                    // src/antlr3/Plumhead.g:63:37: '<='
                     {
                     match("<="); 
 
@@ -890,7 +1055,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // src/antlr3/Plumhead.g:55:44: '>='
+                    // src/antlr3/Plumhead.g:63:44: '>='
                     {
                     match(">="); 
 
@@ -898,7 +1063,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 4 :
-                    // src/antlr3/Plumhead.g:55:51: '!='
+                    // src/antlr3/Plumhead.g:63:51: '!='
                     {
                     match("!="); 
 
@@ -906,14 +1071,14 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 5 :
-                    // src/antlr3/Plumhead.g:55:58: '<'
+                    // src/antlr3/Plumhead.g:63:58: '<'
                     {
                     match('<'); 
 
                     }
                     break;
                 case 6 :
-                    // src/antlr3/Plumhead.g:55:65: '>'
+                    // src/antlr3/Plumhead.g:63:65: '>'
                     {
                     match('>'); 
 
@@ -943,8 +1108,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:57:13: ({...}? => 'if' )
-            // src/antlr3/Plumhead.g:57:13: {...}? => 'if'
+            // src/antlr3/Plumhead.g:65:13: ({...}? => 'if' )
+            // src/antlr3/Plumhead.g:65:13: {...}? => 'if'
             {
             if ( !( codeMode ) ) {
                 throw new FailedPredicateException(input, "IF", " codeMode ");
@@ -976,8 +1141,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:58:13: ({...}? => 'else' )
-            // src/antlr3/Plumhead.g:58:13: {...}? => 'else'
+            // src/antlr3/Plumhead.g:66:13: ({...}? => 'else' )
+            // src/antlr3/Plumhead.g:66:13: {...}? => 'else'
             {
             if ( !( codeMode ) ) {
                 throw new FailedPredicateException(input, "ELSE", " codeMode ");
@@ -1001,42 +1166,42 @@ public class PlumheadLexer extends Lexer {
     // $ANTLR end ELSE
 
     public void mTokens() throws RecognitionException {
-        // src/antlr3/Plumhead.g:1:10: ( T22 | T23 | T24 | T25 | T26 | SEA | CODE_START | CODE_END | WS | DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | ECHO | NUMBER | MINUS | PLUS | MUL_OP | REL_OP | IF | ELSE )
-        int alt11=19;
-        alt11 = dfa11.predict(input);
-        switch (alt11) {
+        // src/antlr3/Plumhead.g:1:10: ( T26 | T27 | T28 | T29 | T30 | SEA | CODE_START | CODE_END | WS | DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | ECHO | SCALAR | ARRAY | NUMBER | MINUS | PLUS | MUL_OP | ASSIGN_OP | REL_OP | IF | ELSE )
+        int alt12=22;
+        alt12 = dfa12.predict(input);
+        switch (alt12) {
             case 1 :
-                // src/antlr3/Plumhead.g:1:10: T22
+                // src/antlr3/Plumhead.g:1:10: T26
                 {
-                mT22(); 
+                mT26(); 
 
                 }
                 break;
             case 2 :
-                // src/antlr3/Plumhead.g:1:14: T23
+                // src/antlr3/Plumhead.g:1:14: T27
                 {
-                mT23(); 
+                mT27(); 
 
                 }
                 break;
             case 3 :
-                // src/antlr3/Plumhead.g:1:18: T24
+                // src/antlr3/Plumhead.g:1:18: T28
                 {
-                mT24(); 
+                mT28(); 
 
                 }
                 break;
             case 4 :
-                // src/antlr3/Plumhead.g:1:22: T25
+                // src/antlr3/Plumhead.g:1:22: T29
                 {
-                mT25(); 
+                mT29(); 
 
                 }
                 break;
             case 5 :
-                // src/antlr3/Plumhead.g:1:26: T26
+                // src/antlr3/Plumhead.g:1:26: T30
                 {
-                mT26(); 
+                mT30(); 
 
                 }
                 break;
@@ -1090,49 +1255,70 @@ public class PlumheadLexer extends Lexer {
                 }
                 break;
             case 13 :
-                // src/antlr3/Plumhead.g:1:100: NUMBER
+                // src/antlr3/Plumhead.g:1:100: SCALAR
+                {
+                mSCALAR(); 
+
+                }
+                break;
+            case 14 :
+                // src/antlr3/Plumhead.g:1:107: ARRAY
+                {
+                mARRAY(); 
+
+                }
+                break;
+            case 15 :
+                // src/antlr3/Plumhead.g:1:113: NUMBER
                 {
                 mNUMBER(); 
 
                 }
                 break;
-            case 14 :
-                // src/antlr3/Plumhead.g:1:107: MINUS
+            case 16 :
+                // src/antlr3/Plumhead.g:1:120: MINUS
                 {
                 mMINUS(); 
 
                 }
                 break;
-            case 15 :
-                // src/antlr3/Plumhead.g:1:113: PLUS
+            case 17 :
+                // src/antlr3/Plumhead.g:1:126: PLUS
                 {
                 mPLUS(); 
 
                 }
                 break;
-            case 16 :
-                // src/antlr3/Plumhead.g:1:118: MUL_OP
+            case 18 :
+                // src/antlr3/Plumhead.g:1:131: MUL_OP
                 {
                 mMUL_OP(); 
 
                 }
                 break;
-            case 17 :
-                // src/antlr3/Plumhead.g:1:125: REL_OP
+            case 19 :
+                // src/antlr3/Plumhead.g:1:138: ASSIGN_OP
+                {
+                mASSIGN_OP(); 
+
+                }
+                break;
+            case 20 :
+                // src/antlr3/Plumhead.g:1:148: REL_OP
                 {
                 mREL_OP(); 
 
                 }
                 break;
-            case 18 :
-                // src/antlr3/Plumhead.g:1:132: IF
+            case 21 :
+                // src/antlr3/Plumhead.g:1:155: IF
                 {
                 mIF(); 
 
                 }
                 break;
-            case 19 :
-                // src/antlr3/Plumhead.g:1:135: ELSE
+            case 22 :
+                // src/antlr3/Plumhead.g:1:158: ELSE
                 {
                 mELSE(); 
 
@@ -1144,118 +1330,133 @@ public class PlumheadLexer extends Lexer {
     }
 
 
-    protected DFA11 dfa11 = new DFA11(this);
-    public static final String DFA11_eotS =
-        "\1\uffff\1\30\1\31\1\32\1\33\1\34\1\27\1\37\1\40\3\27\1\51\1\27"+
-        "\1\54\1\55\1\56\2\57\1\27\1\62\2\27\6\uffff\1\73\3\uffff\1\27\1"+
-        "\75\1\uffff\1\27\1\76\1\uffff\2\27\1\uffff\1\27\1\103\4\uffff\1"+
-        "\110\1\62\1\uffff\1\62\1\111\5\uffff\1\73\4\uffff\2\27\1\uffff\1"+
-        "\51\10\uffff\1\117\1\120\6\uffff";
-    public static final String DFA11_eofS =
-        "\123\uffff";
-    public static final String DFA11_minS =
-        "\6\0\1\76\1\77\3\0\1\143\1\0\1\60\5\0\1\75\1\0\1\75\1\146\1\uffff"+
-        "\6\0\2\uffff\3\0\1\uffff\2\0\1\uffff\1\150\1\163\1\0\1\60\12\0\5"+
-        "\uffff\2\0\1\uffff\2\0\1\157\1\145\1\uffff\2\0\4\uffff\2\0\1\uffff"+
-        "\2\0\2\uffff\2\0\2\uffff";
-    public static final String DFA11_maxS =
-        "\6\ufffe\1\76\1\77\3\ufffe\1\154\1\ufffe\1\71\5\ufffe\1\75\1\ufffe"+
-        "\1\75\1\146\1\uffff\5\0\1\ufffe\2\uffff\1\0\2\ufffe\1\uffff\2\ufffe"+
-        "\1\uffff\1\150\1\163\1\0\1\71\1\ufffe\4\0\2\ufffe\1\0\2\ufffe\5"+
-        "\uffff\1\ufffe\1\0\1\uffff\2\0\1\157\1\145\1\uffff\1\ufffe\1\0\4"+
-        "\uffff\2\0\1\uffff\2\ufffe\2\uffff\2\0\2\uffff";
-    public static final String DFA11_acceptS =
-        "\27\uffff\1\6\6\uffff\1\7\1\21\3\uffff\1\12\2\uffff\1\13\16\uffff"+
-        "\1\1\1\2\1\3\1\4\1\5\2\uffff\1\11\4\uffff\1\15\2\uffff\1\16\1\17"+
-        "\2\20\2\uffff\1\10\2\uffff\1\15\1\22\2\uffff\1\14\1\23";
-    public static final String DFA11_specialS =
-        "\1\72\1\74\1\7\1\33\1\52\1\1\1\40\1\uffff\1\17\1\41\1\4\1\34\1\73"+
-        "\1\46\1\65\1\23\1\53\1\12\1\2\1\0\1\27\1\60\1\11\1\uffff\1\22\1"+
-        "\3\1\43\1\51\1\35\1\13\2\uffff\1\56\1\54\1\6\1\uffff\1\57\1\5\1"+
-        "\uffff\1\36\1\64\1\45\1\21\1\15\1\42\1\10\1\67\1\70\1\14\1\66\1"+
-        "\26\1\55\1\50\5\uffff\1\62\1\30\1\uffff\1\24\1\71\1\37\1\61\1\uffff"+
-        "\1\16\1\44\4\uffff\1\25\1\63\1\uffff\1\31\1\47\2\uffff\1\20\1\32"+
-        "\2\uffff}>";
-    public static final String[] DFA11_transition = {
-        "\11\27\2\10\2\27\1\10\22\27\1\10\1\25\1\11\2\27\1\22\1\27\1\12\1"+
-        "\2\1\3\1\20\1\17\1\27\1\16\1\15\1\21\12\14\1\27\1\1\1\7\1\23\1\24"+
-        "\1\6\45\27\1\13\3\27\1\26\21\27\1\4\1\27\1\5\uff81\27",
-        "\74\27\1\uffff\uffc2\27",
-        "\74\27\1\uffff\uffc2\27",
-        "\74\27\1\uffff\uffc2\27",
-        "\74\27\1\uffff\uffc2\27",
-        "\74\27\1\uffff\uffc2\27",
-        "\1\35",
-        "\1\36",
-        "\11\27\2\10\2\27\1\10\22\27\1\10\33\27\1\uffff\uffc2\27",
-        "\42\41\1\42\31\41\1\43\uffc2\41",
-        "\47\44\1\45\24\44\1\46\uffc2\44",
-        "\1\47\10\uffff\1\50",
-        "\56\27\1\52\1\27\12\14\2\27\1\uffff\uffc2\27",
-        "\12\53",
-        "\74\27\1\uffff\uffc2\27",
-        "\74\27\1\uffff\uffc2\27",
-        "\74\27\1\uffff\uffc2\27",
-        "\74\27\1\uffff\uffc2\27",
-        "\74\27\1\uffff\uffc2\27",
-        "\1\60",
-        "\74\27\1\uffff\1\61\uffc1\27",
-        "\1\63",
-        "\1\64",
+    protected DFA12 dfa12 = new DFA12(this);
+    public static final String DFA12_eotS =
+        "\1\uffff\1\32\1\33\1\34\1\35\1\36\1\31\1\41\1\42\5\31\1\55\1\31"+
+        "\1\60\1\61\1\62\2\63\1\65\1\67\2\31\6\uffff\1\100\3\uffff\1\31\1"+
+        "\102\1\uffff\1\31\1\103\1\uffff\2\31\1\106\1\110\1\uffff\1\31\1"+
+        "\114\4\uffff\1\121\1\uffff\1\67\1\uffff\1\67\1\123\5\uffff\1\100"+
+        "\4\uffff\2\31\1\uffff\1\106\1\uffff\1\110\1\uffff\1\55\11\uffff"+
+        "\1\133\1\134\10\uffff";
+    public static final String DFA12_eofS =
+        "\137\uffff";
+    public static final String DFA12_minS =
+        "\6\0\1\76\1\77\3\0\1\143\2\101\1\0\1\60\7\0\1\75\1\146\1\uffff\6"+
+        "\0\2\uffff\3\0\1\uffff\2\0\1\uffff\1\150\1\163\3\0\1\60\13\0\5\uffff"+
+        "\2\0\1\uffff\2\0\1\157\1\145\4\0\1\uffff\2\0\4\uffff\1\0\1\uffff"+
+        "\1\0\1\uffff\2\0\4\uffff\2\0\2\uffff";
+    public static final String DFA12_maxS =
+        "\6\ufffe\1\76\1\77\3\ufffe\1\154\2\172\1\ufffe\1\71\7\ufffe\1\75"+
+        "\1\146\1\uffff\5\0\1\ufffe\2\uffff\1\0\2\ufffe\1\uffff\2\ufffe\1"+
+        "\uffff\1\150\1\163\2\ufffe\1\0\1\71\1\ufffe\4\0\1\ufffe\1\0\1\ufffe"+
+        "\1\0\2\ufffe\5\uffff\1\ufffe\1\0\1\uffff\2\0\1\157\1\145\1\0\1\ufffe"+
+        "\1\0\1\ufffe\1\uffff\1\ufffe\1\0\4\uffff\1\0\1\uffff\1\0\1\uffff"+
+        "\2\ufffe\4\uffff\2\0\2\uffff";
+    public static final String DFA12_acceptS =
+        "\31\uffff\1\6\6\uffff\1\7\1\24\3\uffff\1\12\2\uffff\1\13\21\uffff"+
+        "\1\1\1\2\1\3\1\4\1\5\2\uffff\1\11\10\uffff\1\17\2\uffff\1\20\1\21"+
+        "\2\22\1\uffff\1\23\1\uffff\1\10\2\uffff\1\15\1\16\1\17\1\25\2\uffff"+
+        "\1\14\1\26";
+    public static final String DFA12_specialS =
+        "\1\105\1\55\1\15\1\16\1\50\1\72\1\75\1\uffff\1\60\1\25\1\23\1\12"+
+        "\1\77\1\70\1\35\1\34\1\13\1\64\1\10\1\17\1\33\1\11\1\22\1\74\1\31"+
+        "\1\uffff\1\61\1\30\1\45\1\102\1\41\1\1\2\uffff\1\6\1\14\1\20\1\uffff"+
+        "\1\42\1\100\1\uffff\1\65\1\66\1\62\1\0\1\27\1\4\1\53\1\3\1\73\1"+
+        "\37\1\36\1\21\1\52\1\24\1\44\1\47\1\71\5\uffff\1\57\1\46\1\uffff"+
+        "\1\67\1\2\1\54\1\63\1\76\1\51\1\103\1\40\1\uffff\1\56\1\26\4\uffff"+
+        "\1\43\1\uffff\1\104\1\uffff\1\101\1\5\4\uffff\1\32\1\7\2\uffff}>";
+    public static final String[] DFA12_transition = {
+        "\11\31\2\10\2\31\1\10\22\31\1\10\1\27\1\11\1\31\1\14\1\24\1\31\1"+
+        "\12\1\2\1\3\1\22\1\21\1\31\1\20\1\17\1\23\12\16\1\31\1\1\1\7\1\25"+
+        "\1\26\1\6\1\15\44\31\1\13\3\31\1\30\21\31\1\4\1\31\1\5\uff81\31",
+        "\74\31\1\uffff\uffc2\31",
+        "\74\31\1\uffff\uffc2\31",
+        "\74\31\1\uffff\uffc2\31",
+        "\74\31\1\uffff\uffc2\31",
+        "\74\31\1\uffff\uffc2\31",
+        "\1\37",
+        "\1\40",
+        "\11\31\2\10\2\31\1\10\22\31\1\10\33\31\1\uffff\uffc2\31",
+        "\42\43\1\44\31\43\1\45\uffc2\43",
+        "\47\46\1\47\24\46\1\50\uffc2\46",
+        "\1\51\10\uffff\1\52",
+        "\32\53\6\uffff\32\53",
+        "\32\54\6\uffff\32\54",
+        "\56\31\1\56\1\31\12\16\2\31\1\uffff\uffc2\31",
+        "\12\57",
+        "\74\31\1\uffff\uffc2\31",
+        "\74\31\1\uffff\uffc2\31",
+        "\74\31\1\uffff\uffc2\31",
+        "\74\31\1\uffff\uffc2\31",
+        "\74\31\1\uffff\uffc2\31",
+        "\74\31\1\uffff\1\64\uffc1\31",
+        "\74\31\1\uffff\1\66\uffc1\31",
+        "\1\70",
+        "\1\71",
         "",
         "\1\uffff",
         "\1\uffff",
         "\1\uffff",
         "\1\uffff",
         "\1\uffff",
-        "\12\27\1\72\61\27\1\uffff\uffc2\27",
+        "\12\31\1\77\61\31\1\uffff\uffc2\31",
         "",
         "",
         "\1\uffff",
-        "\42\41\1\42\31\41\1\43\uffc2\41",
-        "\74\27\1\uffff\uffc2\27",
+        "\42\43\1\44\31\43\1\45\uffc2\43",
+        "\74\31\1\uffff\uffc2\31",
         "",
-        "\47\44\1\45\24\44\1\46\uffc2\44",
-        "\74\27\1\uffff\uffc2\27",
+        "\47\46\1\47\24\46\1\50\uffc2\46",
+        "\74\31\1\uffff\uffc2\31",
         "",
-        "\1\77",
-        "\1\100",
+        "\1\104",
+        "\1\105",
+        "\74\31\1\uffff\4\31\32\107\6\31\32\107\uff84\31",
+        "\74\31\1\uffff\4\31\32\111\6\31\32\111\uff84\31",
         "\1\uffff",
-        "\12\102",
-        "\60\27\12\53\2\27\1\uffff\uffc2\27",
-        "\1\uffff",
-        "\1\uffff",
-        "\1\uffff",
-        "\1\uffff",
-        "\74\27\1\uffff\uffc2\27",
-        "\74\27\1\uffff\uffc2\27",
-        "\1\uffff",
-        "\74\27\1\uffff\uffc2\27",
-        "\74\27\1\uffff\uffc2\27",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "\74\27\1\uffff\uffc2\27",
-        "\1\uffff",
-        "",
+        "\12\113",
+        "\60\31\12\57\2\31\1\uffff\uffc2\31",
         "\1\uffff",
         "\1\uffff",
-        "\1\113",
-        "\1\114",
-        "",
-        "\60\27\12\102\2\27\1\uffff\uffc2\27",
         "\1\uffff",
+        "\1\uffff",
+        "\74\31\1\uffff\uffc2\31",
+        "\1\uffff",
+        "\74\31\1\uffff\uffc2\31",
+        "\1\uffff",
+        "\74\31\1\uffff\uffc2\31",
+        "\74\31\1\uffff\uffc2\31",
         "",
         "",
         "",
+        "",
+        "",
+        "\74\31\1\uffff\uffc2\31",
+        "\1\uffff",
         "",
         "\1\uffff",
         "\1\uffff",
+        "\1\125",
+        "\1\126",
+        "\1\uffff",
+        "\74\31\1\uffff\4\31\32\107\6\31\32\107\uff84\31",
+        "\1\uffff",
+        "\74\31\1\uffff\4\31\32\111\6\31\32\111\uff84\31",
         "",
-        "\74\27\1\uffff\uffc2\27",
-        "\74\27\1\uffff\uffc2\27",
+        "\60\31\12\113\2\31\1\uffff\uffc2\31",
+        "\1\uffff",
+        "",
+        "",
+        "",
+        "",
+        "\1\uffff",
+        "",
+        "\1\uffff",
+        "",
+        "\74\31\1\uffff\uffc2\31",
+        "\74\31\1\uffff\uffc2\31",
+        "",
+        "",
         "",
         "",
         "\1\uffff",
@@ -1264,654 +1465,749 @@ public class PlumheadLexer extends Lexer {
         ""
     };
 
-    class DFA11 extends DFA {
-        public DFA11(BaseRecognizer recognizer) {
+    class DFA12 extends DFA {
+        public DFA12(BaseRecognizer recognizer) {
             this.recognizer = recognizer;
-            this.decisionNumber = 11;
-            this.eot = DFA.unpackEncodedString(DFA11_eotS);
-            this.eof = DFA.unpackEncodedString(DFA11_eofS);
-            this.min = DFA.unpackEncodedStringToUnsignedChars(DFA11_minS);
-            this.max = DFA.unpackEncodedStringToUnsignedChars(DFA11_maxS);
-            this.accept = DFA.unpackEncodedString(DFA11_acceptS);
-            this.special = DFA.unpackEncodedString(DFA11_specialS);
-            int numStates = DFA11_transition.length;
+            this.decisionNumber = 12;
+            this.eot = DFA.unpackEncodedString(DFA12_eotS);
+            this.eof = DFA.unpackEncodedString(DFA12_eofS);
+            this.min = DFA.unpackEncodedStringToUnsignedChars(DFA12_minS);
+            this.max = DFA.unpackEncodedStringToUnsignedChars(DFA12_maxS);
+            this.accept = DFA.unpackEncodedString(DFA12_acceptS);
+            this.special = DFA.unpackEncodedString(DFA12_specialS);
+            int numStates = DFA12_transition.length;
             this.transition = new short[numStates][];
             for (int i=0; i<numStates; i++) {
-                transition[i] = DFA.unpackEncodedString(DFA11_transition[i]);
+                transition[i] = DFA.unpackEncodedString(DFA12_transition[i]);
             }
         }
         public String getDescription() {
-            return "1:1: Tokens : ( T22 | T23 | T24 | T25 | T26 | SEA | CODE_START | CODE_END | WS | DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | ECHO | NUMBER | MINUS | PLUS | MUL_OP | REL_OP | IF | ELSE );";
+            return "1:1: Tokens : ( T26 | T27 | T28 | T29 | T30 | SEA | CODE_START | CODE_END | WS | DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | ECHO | SCALAR | ARRAY | NUMBER | MINUS | PLUS | MUL_OP | ASSIGN_OP | REL_OP | IF | ELSE );";
         }
         public int specialStateTransition(int s) throws NoViableAltException {
         	int _s = s;
             switch ( s ) {
                     case 0 : 
-                        int LA11_19 = input.LA(1);
+                        int LA12_44 = input.LA(1);
                         s = -1;
-                        if ( (LA11_19=='=') && (( codeMode || !codeMode ))) {s = 48;}
+                        if ( ((LA12_44>='A' && LA12_44<='Z')||(LA12_44>='a' && LA12_44<='z')) && (( codeMode || !codeMode ))) {s = 73;}
 
-                        else s = 23;
+                        else if ( ((LA12_44>='\u0000' && LA12_44<=';')||(LA12_44>='=' && LA12_44<='@')||(LA12_44>='[' && LA12_44<='`')||(LA12_44>='{' && LA12_44<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 72;
 
                         if ( s>=0 ) return s;
                         break;
                     case 1 : 
-                        int LA11_5 = input.LA(1);
+                        int LA12_31 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_5>='\u0000' && LA11_5<=';')||(LA11_5>='=' && LA11_5<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( (LA12_31=='\n') && (( codeMode || !codeMode ))) {s = 63;}
 
-                        else s = 28;
+                        else if ( ((LA12_31>='\u0000' && LA12_31<='\t')||(LA12_31>='\u000B' && LA12_31<=';')||(LA12_31>='=' && LA12_31<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 64;
 
                         if ( s>=0 ) return s;
                         break;
                     case 2 : 
-                        int LA11_18 = input.LA(1);
+                        input.rewind();
                         s = -1;
-                        if ( ((LA11_18>='\u0000' && LA11_18<=';')||(LA11_18>='=' && LA11_18<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( ( !codeMode ) ) {s = 25;}
 
-                        else s = 47;
+                        else if ( ( codeMode ) ) {s = 40;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 3 : 
                         input.rewind();
                         s = -1;
-                        if ( (!( !codeMode )) ) {s = 54;}
+                        if ( ( !codeMode ) ) {s = 25;}
 
-                        else if ( ( !codeMode ) ) {s = 23;}
+                        else if ( ( codeMode ) ) {s = 77;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 4 : 
-                        int LA11_10 = input.LA(1);
+                        int LA12_46 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_10>='\u0000' && LA11_10<='&')||(LA11_10>='(' && LA11_10<=';')||(LA11_10>='=' && LA11_10<='\uFFFE')) && (( codeMode || !codeMode ))) {s = 36;}
-
-                        else if ( (LA11_10=='\'') && (( codeMode || !codeMode ))) {s = 37;}
-
-                        else if ( (LA11_10=='<') && ( codeMode )) {s = 38;}
-
-                        else s = 23;
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 5 : 
-                        int LA11_37 = input.LA(1);
-                        s = -1;
-                        if ( ((LA11_37>='\u0000' && LA11_37<=';')||(LA11_37>='=' && LA11_37<='\uFFFE')) && ( !codeMode )) {s = 23;}
-
-                        else s = 62;
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 6 : 
-                        int LA11_34 = input.LA(1);
-                        s = -1;
-                        if ( ((LA11_34>='\u0000' && LA11_34<=';')||(LA11_34>='=' && LA11_34<='\uFFFE')) && ( !codeMode )) {s = 23;}
-
-                        else s = 61;
-
-                        if ( s>=0 ) return s;
-                        break;
-                    case 7 : 
-                        int LA11_2 = input.LA(1);
-                        s = -1;
-                        if ( ((LA11_2>='\u0000' && LA11_2<=';')||(LA11_2>='=' && LA11_2<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( ((LA12_46>='0' && LA12_46<='9')) && (( codeMode || !codeMode ))) {s = 75;}
 
                         else s = 25;
 
                         if ( s>=0 ) return s;
                         break;
-                    case 8 : 
+                    case 5 : 
+                        int LA12_86 = input.LA(1);
+                        s = -1;
+                        if ( ((LA12_86>='\u0000' && LA12_86<=';')||(LA12_86>='=' && LA12_86<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 92;
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 6 : 
                         input.rewind();
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( ( !codeMode ) ) {s = 25;}
 
-                        else if ( ( codeMode ) ) {s = 69;}
+                        else if ( ( codeMode ) ) {s = 65;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 7 : 
+                        input.rewind();
+                        s = -1;
+                        if ( ( !codeMode ) ) {s = 25;}
+
+                        else if ( ( codeMode ) ) {s = 94;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 8 : 
+                        int LA12_18 = input.LA(1);
+                        s = -1;
+                        if ( ((LA12_18>='\u0000' && LA12_18<=';')||(LA12_18>='=' && LA12_18<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 50;
 
                         if ( s>=0 ) return s;
                         break;
                     case 9 : 
-                        int LA11_22 = input.LA(1);
+                        int LA12_21 = input.LA(1);
                         s = -1;
-                        if ( (LA11_22=='f') && (( codeMode || !codeMode ))) {s = 52;}
+                        if ( (LA12_21=='=') && (( codeMode || !codeMode ))) {s = 52;}
 
-                        else s = 23;
+                        else if ( ((LA12_21>='\u0000' && LA12_21<=';')||(LA12_21>='>' && LA12_21<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 53;
 
                         if ( s>=0 ) return s;
                         break;
                     case 10 : 
-                        int LA11_17 = input.LA(1);
+                        int LA12_11 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_17>='\u0000' && LA11_17<=';')||(LA11_17>='=' && LA11_17<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( (LA12_11=='c') && (( codeMode || !codeMode ))) {s = 41;}
 
-                        else s = 47;
+                        else if ( (LA12_11=='l') && (( codeMode || !codeMode ))) {s = 42;}
+
+                        else s = 25;
 
                         if ( s>=0 ) return s;
                         break;
                     case 11 : 
-                        int LA11_29 = input.LA(1);
+                        int LA12_16 = input.LA(1);
                         s = -1;
-                        if ( (LA11_29=='\n') && (( codeMode || !codeMode ))) {s = 58;}
+                        if ( ((LA12_16>='\u0000' && LA12_16<=';')||(LA12_16>='=' && LA12_16<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else if ( ((LA11_29>='\u0000' && LA11_29<='\t')||(LA11_29>='\u000B' && LA11_29<=';')||(LA11_29>='=' && LA11_29<='\uFFFE')) && ( !codeMode )) {s = 23;}
-
-                        else s = 59;
+                        else s = 48;
 
                         if ( s>=0 ) return s;
                         break;
                     case 12 : 
-                        int LA11_48 = input.LA(1);
+                        int LA12_35 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_48>='\u0000' && LA11_48<=';')||(LA11_48>='=' && LA11_48<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( (LA12_35=='\"') && (( codeMode || !codeMode ))) {s = 36;}
 
-                        else s = 72;
+                        else if ( ((LA12_35>='\u0000' && LA12_35<='!')||(LA12_35>='#' && LA12_35<=';')||(LA12_35>='=' && LA12_35<='\uFFFE')) && (( codeMode || !codeMode ))) {s = 35;}
+
+                        else if ( (LA12_35=='<') && ( codeMode )) {s = 37;}
+
+                        else s = 25;
 
                         if ( s>=0 ) return s;
                         break;
                     case 13 : 
-                        int LA11_43 = input.LA(1);
+                        int LA12_2 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_43>='0' && LA11_43<='9')) ) {s = 43;}
+                        if ( ((LA12_2>='\u0000' && LA12_2<=';')||(LA12_2>='=' && LA12_2<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else if ( ((LA11_43>='\u0000' && LA11_43<='/')||(LA11_43>=':' && LA11_43<=';')||(LA11_43>='=' && LA11_43<='\uFFFE')) && ( !codeMode )) {s = 23;}
-
-                        else s = 67;
+                        else s = 27;
 
                         if ( s>=0 ) return s;
                         break;
                     case 14 : 
-                        int LA11_66 = input.LA(1);
+                        int LA12_3 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_66>='0' && LA11_66<='9')) && (( codeMode || !codeMode ))) {s = 66;}
+                        if ( ((LA12_3>='\u0000' && LA12_3<=';')||(LA12_3>='=' && LA12_3<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else if ( ((LA11_66>='\u0000' && LA11_66<='/')||(LA11_66>=':' && LA11_66<=';')||(LA11_66>='=' && LA11_66<='\uFFFE')) && ( !codeMode )) {s = 23;}
-
-                        else s = 41;
+                        else s = 28;
 
                         if ( s>=0 ) return s;
                         break;
                     case 15 : 
-                        int LA11_8 = input.LA(1);
+                        int LA12_19 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_8>='\t' && LA11_8<='\n')||LA11_8=='\r'||LA11_8==' ') && (( codeMode || !codeMode ))) {s = 8;}
+                        if ( ((LA12_19>='\u0000' && LA12_19<=';')||(LA12_19>='=' && LA12_19<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else if ( ((LA11_8>='\u0000' && LA11_8<='\b')||(LA11_8>='\u000B' && LA11_8<='\f')||(LA11_8>='\u000E' && LA11_8<='\u001F')||(LA11_8>='!' && LA11_8<=';')||(LA11_8>='=' && LA11_8<='\uFFFE')) && ( !codeMode )) {s = 23;}
-
-                        else s = 32;
+                        else s = 51;
 
                         if ( s>=0 ) return s;
                         break;
                     case 16 : 
-                        input.rewind();
+                        int LA12_36 = input.LA(1);
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( ((LA12_36>='\u0000' && LA12_36<=';')||(LA12_36>='=' && LA12_36<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else if ( ( codeMode ) ) {s = 81;}
+                        else s = 66;
 
                         if ( s>=0 ) return s;
                         break;
                     case 17 : 
-                        int LA11_42 = input.LA(1);
+                        int LA12_52 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_42>='0' && LA11_42<='9')) && (( codeMode || !codeMode ))) {s = 66;}
+                        if ( ((LA12_52>='\u0000' && LA12_52<=';')||(LA12_52>='=' && LA12_52<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else s = 23;
+                        else s = 81;
 
                         if ( s>=0 ) return s;
                         break;
                     case 18 : 
-                        input.rewind();
+                        int LA12_22 = input.LA(1);
                         s = -1;
-                        if ( (!( !codeMode )) ) {s = 53;}
+                        if ( (LA12_22=='=') ) {s = 54;}
 
-                        else if ( ( !codeMode ) ) {s = 23;}
+                        else if ( ((LA12_22>='\u0000' && LA12_22<=';')||(LA12_22>='>' && LA12_22<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 55;
 
                         if ( s>=0 ) return s;
                         break;
                     case 19 : 
-                        int LA11_15 = input.LA(1);
+                        int LA12_10 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_15>='\u0000' && LA11_15<=';')||(LA11_15>='=' && LA11_15<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( ((LA12_10>='\u0000' && LA12_10<='&')||(LA12_10>='(' && LA12_10<=';')||(LA12_10>='=' && LA12_10<='\uFFFE')) && (( codeMode || !codeMode ))) {s = 38;}
 
-                        else s = 45;
+                        else if ( (LA12_10=='\'') && (( codeMode || !codeMode ))) {s = 39;}
+
+                        else if ( (LA12_10=='<') && ( codeMode )) {s = 40;}
+
+                        else s = 25;
 
                         if ( s>=0 ) return s;
                         break;
                     case 20 : 
-                        input.rewind();
+                        int LA12_54 = input.LA(1);
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( ((LA12_54>='\u0000' && LA12_54<=';')||(LA12_54>='=' && LA12_54<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else if ( ( codeMode ) ) {s = 35;}
+                        else s = 55;
 
                         if ( s>=0 ) return s;
                         break;
                     case 21 : 
-                        input.rewind();
+                        int LA12_9 = input.LA(1);
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( ((LA12_9>='\u0000' && LA12_9<='!')||(LA12_9>='#' && LA12_9<=';')||(LA12_9>='=' && LA12_9<='\uFFFE')) && (( codeMode || !codeMode ))) {s = 35;}
 
-                        else if ( ( codeMode ) ) {s = 31;}
+                        else if ( (LA12_9=='\"') && (( codeMode || !codeMode ))) {s = 36;}
+
+                        else if ( (LA12_9=='<') && ( codeMode )) {s = 37;}
+
+                        else s = 25;
 
                         if ( s>=0 ) return s;
                         break;
                     case 22 : 
                         input.rewind();
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( ( !codeMode ) ) {s = 25;}
 
-                        else if ( (true) ) {s = 31;}
+                        else if ( (true) ) {s = 89;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 23 : 
-                        int LA11_20 = input.LA(1);
+                        input.rewind();
                         s = -1;
-                        if ( (LA11_20=='=') ) {s = 49;}
+                        if ( ( !codeMode ) ) {s = 25;}
 
-                        else if ( ((LA11_20>='\u0000' && LA11_20<=';')||(LA11_20>='>' && LA11_20<='\uFFFE')) && ( !codeMode )) {s = 23;}
-
-                        else s = 50;
+                        else if ( ( codeMode ) ) {s = 74;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 24 : 
                         input.rewind();
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( (!( !codeMode )) ) {s = 59;}
 
-                        else if ( ( codeMode ) ) {s = 74;}
+                        else if ( ( !codeMode ) ) {s = 25;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 25 : 
-                        int LA11_75 = input.LA(1);
+                        int LA12_24 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_75>='\u0000' && LA11_75<=';')||(LA11_75>='=' && LA11_75<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( (LA12_24=='f') && (( codeMode || !codeMode ))) {s = 57;}
 
-                        else s = 79;
+                        else s = 25;
 
                         if ( s>=0 ) return s;
                         break;
                     case 26 : 
                         input.rewind();
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( ( !codeMode ) ) {s = 25;}
 
-                        else if ( ( codeMode ) ) {s = 82;}
+                        else if ( ( codeMode ) ) {s = 93;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 27 : 
-                        int LA11_3 = input.LA(1);
+                        int LA12_20 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_3>='\u0000' && LA11_3<=';')||(LA11_3>='=' && LA11_3<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( ((LA12_20>='\u0000' && LA12_20<=';')||(LA12_20>='=' && LA12_20<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else s = 26;
+                        else s = 51;
 
                         if ( s>=0 ) return s;
                         break;
                     case 28 : 
-                        int LA11_11 = input.LA(1);
+                        int LA12_15 = input.LA(1);
                         s = -1;
-                        if ( (LA11_11=='c') && (( codeMode || !codeMode ))) {s = 39;}
+                        if ( ((LA12_15>='0' && LA12_15<='9')) ) {s = 47;}
 
-                        else if ( (LA11_11=='l') && (( codeMode || !codeMode ))) {s = 40;}
-
-                        else s = 23;
+                        else s = 25;
 
                         if ( s>=0 ) return s;
                         break;
                     case 29 : 
-                        input.rewind();
+                        int LA12_14 = input.LA(1);
                         s = -1;
-                        if ( (!( !codeMode )) ) {s = 57;}
+                        if ( (LA12_14=='.') && (( codeMode || !codeMode ))) {s = 46;}
 
-                        else if ( ( !codeMode ) ) {s = 23;}
+                        else if ( ((LA12_14>='0' && LA12_14<='9')) && (( codeMode || !codeMode ))) {s = 14;}
+
+                        else if ( ((LA12_14>='\u0000' && LA12_14<='-')||LA12_14=='/'||(LA12_14>=':' && LA12_14<=';')||(LA12_14>='=' && LA12_14<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 45;
 
                         if ( s>=0 ) return s;
                         break;
                     case 30 : 
-                        int LA11_39 = input.LA(1);
+                        input.rewind();
                         s = -1;
-                        if ( (LA11_39=='h') && (( codeMode || !codeMode ))) {s = 63;}
+                        if ( ( !codeMode ) ) {s = 25;}
 
-                        else s = 23;
+                        else if ( (true) ) {s = 80;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 31 : 
-                        int LA11_63 = input.LA(1);
+                        input.rewind();
                         s = -1;
-                        if ( (LA11_63=='o') && (( codeMode || !codeMode ))) {s = 75;}
+                        if ( ( !codeMode ) ) {s = 25;}
 
-                        else s = 23;
+                        else if ( ( codeMode ) ) {s = 79;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 32 : 
-                        int LA11_6 = input.LA(1);
+                        int LA12_73 = input.LA(1);
                         s = -1;
-                        if ( (LA11_6=='>') && (( codeMode || !codeMode ))) {s = 29;}
+                        if ( ((LA12_73>='A' && LA12_73<='Z')||(LA12_73>='a' && LA12_73<='z')) && (( codeMode || !codeMode ))) {s = 73;}
 
-                        else s = 23;
+                        else if ( ((LA12_73>='\u0000' && LA12_73<=';')||(LA12_73>='=' && LA12_73<='@')||(LA12_73>='[' && LA12_73<='`')||(LA12_73>='{' && LA12_73<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 72;
 
                         if ( s>=0 ) return s;
                         break;
                     case 33 : 
-                        int LA11_9 = input.LA(1);
+                        input.rewind();
                         s = -1;
-                        if ( ((LA11_9>='\u0000' && LA11_9<='!')||(LA11_9>='#' && LA11_9<=';')||(LA11_9>='=' && LA11_9<='\uFFFE')) && (( codeMode || !codeMode ))) {s = 33;}
+                        if ( (!( !codeMode )) ) {s = 62;}
 
-                        else if ( (LA11_9=='\"') && (( codeMode || !codeMode ))) {s = 34;}
-
-                        else if ( (LA11_9=='<') && ( codeMode )) {s = 35;}
-
-                        else s = 23;
+                        else if ( ( !codeMode ) ) {s = 25;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 34 : 
-                        input.rewind();
+                        int LA12_38 = input.LA(1);
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( (LA12_38=='\'') && (( codeMode || !codeMode ))) {s = 39;}
 
-                        else if ( ( codeMode ) ) {s = 68;}
+                        else if ( ((LA12_38>='\u0000' && LA12_38<='&')||(LA12_38>='(' && LA12_38<=';')||(LA12_38>='=' && LA12_38<='\uFFFE')) && (( codeMode || !codeMode ))) {s = 38;}
+
+                        else if ( (LA12_38=='<') && ( codeMode )) {s = 40;}
+
+                        else s = 25;
 
                         if ( s>=0 ) return s;
                         break;
                     case 35 : 
                         input.rewind();
                         s = -1;
-                        if ( (!( !codeMode )) ) {s = 55;}
+                        if ( ( !codeMode ) ) {s = 25;}
 
-                        else if ( ( !codeMode ) ) {s = 23;}
+                        else if ( ( codeMode ) ) {s = 33;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 36 : 
                         input.rewind();
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( ( !codeMode ) ) {s = 25;}
 
-                        else if ( (true) ) {s = 77;}
+                        else if ( (true) ) {s = 33;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 37 : 
                         input.rewind();
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( (!( !codeMode )) ) {s = 60;}
 
-                        else if ( ( codeMode ) ) {s = 65;}
+                        else if ( ( !codeMode ) ) {s = 25;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 38 : 
-                        int LA11_13 = input.LA(1);
+                        input.rewind();
                         s = -1;
-                        if ( ((LA11_13>='0' && LA11_13<='9')) ) {s = 43;}
+                        if ( ( !codeMode ) ) {s = 25;}
 
-                        else s = 23;
+                        else if ( ( codeMode ) ) {s = 84;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 39 : 
-                        int LA11_76 = input.LA(1);
+                        int LA12_56 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_76>='\u0000' && LA11_76<=';')||(LA11_76>='=' && LA11_76<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( ((LA12_56>='\u0000' && LA12_56<=';')||(LA12_56>='=' && LA12_56<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else s = 80;
+                        else s = 55;
 
                         if ( s>=0 ) return s;
                         break;
                     case 40 : 
-                        int LA11_52 = input.LA(1);
+                        int LA12_4 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_52>='\u0000' && LA11_52<=';')||(LA11_52>='=' && LA11_52<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( ((LA12_4>='\u0000' && LA12_4<=';')||(LA12_4>='=' && LA12_4<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else s = 73;
+                        else s = 29;
 
                         if ( s>=0 ) return s;
                         break;
                     case 41 : 
-                        input.rewind();
+                        int LA12_71 = input.LA(1);
                         s = -1;
-                        if ( (!( !codeMode )) ) {s = 56;}
+                        if ( ((LA12_71>='A' && LA12_71<='Z')||(LA12_71>='a' && LA12_71<='z')) && (( codeMode || !codeMode ))) {s = 71;}
 
-                        else if ( ( !codeMode ) ) {s = 23;}
+                        else if ( ((LA12_71>='\u0000' && LA12_71<=';')||(LA12_71>='=' && LA12_71<='@')||(LA12_71>='[' && LA12_71<='`')||(LA12_71>='{' && LA12_71<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 70;
 
                         if ( s>=0 ) return s;
                         break;
                     case 42 : 
-                        int LA11_4 = input.LA(1);
+                        input.rewind();
                         s = -1;
-                        if ( ((LA11_4>='\u0000' && LA11_4<=';')||(LA11_4>='=' && LA11_4<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( ( !codeMode ) ) {s = 25;}
 
-                        else s = 27;
+                        else if ( ( codeMode ) ) {s = 82;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 43 : 
-                        int LA11_16 = input.LA(1);
+                        int LA12_47 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_16>='\u0000' && LA11_16<=';')||(LA11_16>='=' && LA11_16<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( ((LA12_47>='0' && LA12_47<='9')) ) {s = 47;}
 
-                        else s = 46;
+                        else if ( ((LA12_47>='\u0000' && LA12_47<='/')||(LA12_47>=':' && LA12_47<=';')||(LA12_47>='=' && LA12_47<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 76;
 
                         if ( s>=0 ) return s;
                         break;
                     case 44 : 
-                        int LA11_33 = input.LA(1);
+                        int LA12_68 = input.LA(1);
                         s = -1;
-                        if ( (LA11_33=='\"') && (( codeMode || !codeMode ))) {s = 34;}
+                        if ( (LA12_68=='o') && (( codeMode || !codeMode ))) {s = 85;}
 
-                        else if ( ((LA11_33>='\u0000' && LA11_33<='!')||(LA11_33>='#' && LA11_33<=';')||(LA11_33>='=' && LA11_33<='\uFFFE')) && (( codeMode || !codeMode ))) {s = 33;}
-
-                        else if ( (LA11_33=='<') && ( codeMode )) {s = 35;}
-
-                        else s = 23;
+                        else s = 25;
 
                         if ( s>=0 ) return s;
                         break;
                     case 45 : 
-                        int LA11_51 = input.LA(1);
+                        int LA12_1 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_51>='\u0000' && LA11_51<=';')||(LA11_51>='=' && LA11_51<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( ((LA12_1>='\u0000' && LA12_1<=';')||(LA12_1>='=' && LA12_1<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else s = 50;
+                        else s = 26;
 
                         if ( s>=0 ) return s;
                         break;
                     case 46 : 
-                        input.rewind();
+                        int LA12_75 = input.LA(1);
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( ((LA12_75>='0' && LA12_75<='9')) && (( codeMode || !codeMode ))) {s = 75;}
 
-                        else if ( ( codeMode ) ) {s = 60;}
+                        else if ( ((LA12_75>='\u0000' && LA12_75<='/')||(LA12_75>=':' && LA12_75<=';')||(LA12_75>='=' && LA12_75<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 45;
 
                         if ( s>=0 ) return s;
                         break;
                     case 47 : 
-                        int LA11_36 = input.LA(1);
+                        int LA12_63 = input.LA(1);
                         s = -1;
-                        if ( (LA11_36=='\'') && (( codeMode || !codeMode ))) {s = 37;}
+                        if ( ((LA12_63>='\u0000' && LA12_63<=';')||(LA12_63>='=' && LA12_63<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else if ( ((LA11_36>='\u0000' && LA11_36<='&')||(LA11_36>='(' && LA11_36<=';')||(LA11_36>='=' && LA11_36<='\uFFFE')) && (( codeMode || !codeMode ))) {s = 36;}
-
-                        else if ( (LA11_36=='<') && ( codeMode )) {s = 38;}
-
-                        else s = 23;
+                        else s = 64;
 
                         if ( s>=0 ) return s;
                         break;
                     case 48 : 
-                        int LA11_21 = input.LA(1);
+                        int LA12_8 = input.LA(1);
                         s = -1;
-                        if ( (LA11_21=='=') ) {s = 51;}
+                        if ( ((LA12_8>='\t' && LA12_8<='\n')||LA12_8=='\r'||LA12_8==' ') && (( codeMode || !codeMode ))) {s = 8;}
 
-                        else s = 23;
+                        else if ( ((LA12_8>='\u0000' && LA12_8<='\b')||(LA12_8>='\u000B' && LA12_8<='\f')||(LA12_8>='\u000E' && LA12_8<='\u001F')||(LA12_8>='!' && LA12_8<=';')||(LA12_8>='=' && LA12_8<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 34;
 
                         if ( s>=0 ) return s;
                         break;
                     case 49 : 
-                        int LA11_64 = input.LA(1);
+                        input.rewind();
                         s = -1;
-                        if ( (LA11_64=='e') && (( codeMode || !codeMode ))) {s = 76;}
+                        if ( (!( !codeMode )) ) {s = 58;}
 
-                        else s = 23;
+                        else if ( ( !codeMode ) ) {s = 25;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 50 : 
-                        int LA11_58 = input.LA(1);
+                        int LA12_43 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_58>='\u0000' && LA11_58<=';')||(LA11_58>='=' && LA11_58<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( ((LA12_43>='A' && LA12_43<='Z')||(LA12_43>='a' && LA12_43<='z')) && (( codeMode || !codeMode ))) {s = 71;}
 
-                        else s = 59;
+                        else if ( ((LA12_43>='\u0000' && LA12_43<=';')||(LA12_43>='=' && LA12_43<='@')||(LA12_43>='[' && LA12_43<='`')||(LA12_43>='{' && LA12_43<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 70;
 
                         if ( s>=0 ) return s;
                         break;
                     case 51 : 
-                        input.rewind();
+                        int LA12_69 = input.LA(1);
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( (LA12_69=='e') && (( codeMode || !codeMode ))) {s = 86;}
 
-                        else if ( ( codeMode ) ) {s = 78;}
+                        else s = 25;
 
                         if ( s>=0 ) return s;
                         break;
                     case 52 : 
-                        int LA11_40 = input.LA(1);
+                        int LA12_17 = input.LA(1);
                         s = -1;
-                        if ( (LA11_40=='s') && (( codeMode || !codeMode ))) {s = 64;}
+                        if ( ((LA12_17>='\u0000' && LA12_17<=';')||(LA12_17>='=' && LA12_17<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else s = 23;
+                        else s = 49;
 
                         if ( s>=0 ) return s;
                         break;
                     case 53 : 
-                        int LA11_14 = input.LA(1);
+                        int LA12_41 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_14>='\u0000' && LA11_14<=';')||(LA11_14>='=' && LA11_14<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( (LA12_41=='h') && (( codeMode || !codeMode ))) {s = 68;}
 
-                        else s = 44;
+                        else s = 25;
 
                         if ( s>=0 ) return s;
                         break;
                     case 54 : 
-                        int LA11_49 = input.LA(1);
+                        int LA12_42 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_49>='\u0000' && LA11_49<=';')||(LA11_49>='=' && LA11_49<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( (LA12_42=='s') && (( codeMode || !codeMode ))) {s = 69;}
 
-                        else s = 50;
+                        else s = 25;
 
                         if ( s>=0 ) return s;
                         break;
                     case 55 : 
                         input.rewind();
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( ( !codeMode ) ) {s = 25;}
 
-                        else if ( ( codeMode ) ) {s = 70;}
+                        else if ( ( codeMode ) ) {s = 37;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 56 : 
-                        input.rewind();
+                        int LA12_13 = input.LA(1);
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( ((LA12_13>='A' && LA12_13<='Z')||(LA12_13>='a' && LA12_13<='z')) && (( codeMode || !codeMode ))) {s = 44;}
 
-                        else if ( (true) ) {s = 71;}
+                        else s = 25;
 
                         if ( s>=0 ) return s;
                         break;
                     case 57 : 
-                        input.rewind();
+                        int LA12_57 = input.LA(1);
                         s = -1;
-                        if ( ( !codeMode ) ) {s = 23;}
+                        if ( ((LA12_57>='\u0000' && LA12_57<=';')||(LA12_57>='=' && LA12_57<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else if ( ( codeMode ) ) {s = 38;}
+                        else s = 83;
 
                         if ( s>=0 ) return s;
                         break;
                     case 58 : 
-                        int LA11_0 = input.LA(1);
+                        int LA12_5 = input.LA(1);
                         s = -1;
-                        if ( (LA11_0==';') ) {s = 1;}
+                        if ( ((LA12_5>='\u0000' && LA12_5<=';')||(LA12_5>='=' && LA12_5<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
-                        else if ( (LA11_0=='(') ) {s = 2;}
-
-                        else if ( (LA11_0==')') ) {s = 3;}
-
-                        else if ( (LA11_0=='{') ) {s = 4;}
-
-                        else if ( (LA11_0=='}') ) {s = 5;}
-
-                        else if ( (LA11_0=='?') && (( codeMode || !codeMode ))) {s = 6;}
-
-                        else if ( (LA11_0=='<') ) {s = 7;}
-
-                        else if ( ((LA11_0>='\t' && LA11_0<='\n')||LA11_0=='\r'||LA11_0==' ') && (( codeMode || !codeMode ))) {s = 8;}
-
-                        else if ( (LA11_0=='\"') && (( codeMode || !codeMode ))) {s = 9;}
-
-                        else if ( (LA11_0=='\'') && (( codeMode || !codeMode ))) {s = 10;}
-
-                        else if ( (LA11_0=='e') && (( codeMode || !codeMode ))) {s = 11;}
-
-                        else if ( ((LA11_0>='0' && LA11_0<='9')) && (( codeMode || !codeMode ))) {s = 12;}
-
-                        else if ( (LA11_0=='.') ) {s = 13;}
-
-                        else if ( (LA11_0=='-') && (( codeMode || !codeMode ))) {s = 14;}
-
-                        else if ( (LA11_0=='+') && (( codeMode || !codeMode ))) {s = 15;}
-
-                        else if ( (LA11_0=='*') && (( codeMode || !codeMode ))) {s = 16;}
-
-                        else if ( (LA11_0=='/') ) {s = 17;}
-
-                        else if ( (LA11_0=='%') ) {s = 18;}
-
-                        else if ( (LA11_0=='=') && (( codeMode || !codeMode ))) {s = 19;}
-
-                        else if ( (LA11_0=='>') ) {s = 20;}
-
-                        else if ( (LA11_0=='!') ) {s = 21;}
-
-                        else if ( (LA11_0=='i') && (( codeMode || !codeMode ))) {s = 22;}
-
-                        else if ( ((LA11_0>='\u0000' && LA11_0<='\b')||(LA11_0>='\u000B' && LA11_0<='\f')||(LA11_0>='\u000E' && LA11_0<='\u001F')||(LA11_0>='#' && LA11_0<='$')||LA11_0=='&'||LA11_0==','||LA11_0==':'||(LA11_0>='@' && LA11_0<='d')||(LA11_0>='f' && LA11_0<='h')||(LA11_0>='j' && LA11_0<='z')||LA11_0=='|'||(LA11_0>='~' && LA11_0<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        else s = 30;
 
                         if ( s>=0 ) return s;
                         break;
                     case 59 : 
-                        int LA11_12 = input.LA(1);
+                        input.rewind();
                         s = -1;
-                        if ( (LA11_12=='.') && (( codeMode || !codeMode ))) {s = 42;}
+                        if ( ( !codeMode ) ) {s = 25;}
 
-                        else if ( ((LA11_12>='0' && LA11_12<='9')) && (( codeMode || !codeMode ))) {s = 12;}
-
-                        else if ( ((LA11_12>='\u0000' && LA11_12<='-')||LA11_12=='/'||(LA11_12>=':' && LA11_12<=';')||(LA11_12>='=' && LA11_12<='\uFFFE')) && ( !codeMode )) {s = 23;}
-
-                        else s = 41;
+                        else if ( ( codeMode ) ) {s = 78;}
 
                         if ( s>=0 ) return s;
                         break;
                     case 60 : 
-                        int LA11_1 = input.LA(1);
+                        int LA12_23 = input.LA(1);
                         s = -1;
-                        if ( ((LA11_1>='\u0000' && LA11_1<=';')||(LA11_1>='=' && LA11_1<='\uFFFE')) && ( !codeMode )) {s = 23;}
+                        if ( (LA12_23=='=') ) {s = 56;}
 
-                        else s = 24;
+                        else s = 25;
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 61 : 
+                        int LA12_6 = input.LA(1);
+                        s = -1;
+                        if ( (LA12_6=='>') && (( codeMode || !codeMode ))) {s = 31;}
+
+                        else s = 25;
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 62 : 
+                        input.rewind();
+                        s = -1;
+                        if ( ( !codeMode ) ) {s = 25;}
+
+                        else if ( ( codeMode ) ) {s = 87;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 63 : 
+                        int LA12_12 = input.LA(1);
+                        s = -1;
+                        if ( ((LA12_12>='A' && LA12_12<='Z')||(LA12_12>='a' && LA12_12<='z')) && (( codeMode || !codeMode ))) {s = 43;}
+
+                        else s = 25;
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 64 : 
+                        int LA12_39 = input.LA(1);
+                        s = -1;
+                        if ( ((LA12_39>='\u0000' && LA12_39<=';')||(LA12_39>='=' && LA12_39<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 67;
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 65 : 
+                        int LA12_85 = input.LA(1);
+                        s = -1;
+                        if ( ((LA12_85>='\u0000' && LA12_85<=';')||(LA12_85>='=' && LA12_85<='\uFFFE')) && ( !codeMode )) {s = 25;}
+
+                        else s = 91;
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 66 : 
+                        input.rewind();
+                        s = -1;
+                        if ( (!( !codeMode )) ) {s = 61;}
+
+                        else if ( ( !codeMode ) ) {s = 25;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 67 : 
+                        input.rewind();
+                        s = -1;
+                        if ( ( !codeMode ) ) {s = 25;}
+
+                        else if ( ( codeMode ) ) {s = 88;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 68 : 
+                        input.rewind();
+                        s = -1;
+                        if ( ( !codeMode ) ) {s = 25;}
+
+                        else if ( ( codeMode ) ) {s = 90;}
+
+                        if ( s>=0 ) return s;
+                        break;
+                    case 69 : 
+                        int LA12_0 = input.LA(1);
+                        s = -1;
+                        if ( (LA12_0==';') ) {s = 1;}
+
+                        else if ( (LA12_0=='(') ) {s = 2;}
+
+                        else if ( (LA12_0==')') ) {s = 3;}
+
+                        else if ( (LA12_0=='{') ) {s = 4;}
+
+                        else if ( (LA12_0=='}') ) {s = 5;}
+
+                        else if ( (LA12_0=='?') && (( codeMode || !codeMode ))) {s = 6;}
+
+                        else if ( (LA12_0=='<') ) {s = 7;}
+
+                        else if ( ((LA12_0>='\t' && LA12_0<='\n')||LA12_0=='\r'||LA12_0==' ') && (( codeMode || !codeMode ))) {s = 8;}
+
+                        else if ( (LA12_0=='\"') && (( codeMode || !codeMode ))) {s = 9;}
+
+                        else if ( (LA12_0=='\'') && (( codeMode || !codeMode ))) {s = 10;}
+
+                        else if ( (LA12_0=='e') && (( codeMode || !codeMode ))) {s = 11;}
+
+                        else if ( (LA12_0=='$') && (( codeMode || !codeMode ))) {s = 12;}
+
+                        else if ( (LA12_0=='@') && (( codeMode || !codeMode ))) {s = 13;}
+
+                        else if ( ((LA12_0>='0' && LA12_0<='9')) && (( codeMode || !codeMode ))) {s = 14;}
+
+                        else if ( (LA12_0=='.') ) {s = 15;}
+
+                        else if ( (LA12_0=='-') && (( codeMode || !codeMode ))) {s = 16;}
+
+                        else if ( (LA12_0=='+') && (( codeMode || !codeMode ))) {s = 17;}
+
+                        else if ( (LA12_0=='*') && (( codeMode || !codeMode ))) {s = 18;}
+
+                        else if ( (LA12_0=='/') ) {s = 19;}
+
+                        else if ( (LA12_0=='%') ) {s = 20;}
+
+                        else if ( (LA12_0=='=') && (( codeMode || !codeMode ))) {s = 21;}
+
+                        else if ( (LA12_0=='>') ) {s = 22;}
+
+                        else if ( (LA12_0=='!') ) {s = 23;}
+
+                        else if ( (LA12_0=='i') && (( codeMode || !codeMode ))) {s = 24;}
+
+                        else if ( ((LA12_0>='\u0000' && LA12_0<='\b')||(LA12_0>='\u000B' && LA12_0<='\f')||(LA12_0>='\u000E' && LA12_0<='\u001F')||LA12_0=='#'||LA12_0=='&'||LA12_0==','||LA12_0==':'||(LA12_0>='A' && LA12_0<='d')||(LA12_0>='f' && LA12_0<='h')||(LA12_0>='j' && LA12_0<='z')||LA12_0=='|'||(LA12_0>='~' && LA12_0<='\uFFFE')) && ( !codeMode )) {s = 25;}
 
                         if ( s>=0 ) return s;
                         break;
             }
             NoViableAltException nvae =
-                new NoViableAltException(getDescription(), 11, _s, input);
+                new NoViableAltException(getDescription(), 12, _s, input);
             error(nvae);
             throw nvae;
         }

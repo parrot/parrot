@@ -41,6 +41,13 @@ DOUBLEQUOTE_STRING  : { codeMode }?=> '\"' ( ~'\"' )*  '\"' ;
 SINGLEQUOTE_STRING  : { codeMode }?=> '\'' ( ~'\'' )*  '\'' ;
 ECHO                : { codeMode }?=> 'echo' ;
 
+
+fragment
+IDENT   : { codeMode }?=> ( 'a'..'z' | 'A'..'Z' )( 'a'..'z' | 'A'..'Z' )*;
+
+SCALAR  : { codeMode }?=> '$' IDENT ;
+ARRAY   : { codeMode }?=> '@' IDENT ;
+
 fragment
 INTEGER : { codeMode }?=> ('0'..'9' )+ ;
 
@@ -52,10 +59,12 @@ NUMBER
 MINUS      :{ codeMode }?=>  '-' ;
 PLUS       :{ codeMode }?=>  '+' ;
 MUL_OP     :{ codeMode }?=>  '*'  | '/'  | '%' ;
+ASSIGN_OP  :{ codeMode }?=>  '=' ;
 REL_OP     :{ codeMode }?=>  '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
 
 IF         :{ codeMode }?=>  'if' ;
 ELSE       :{ codeMode }?=>  'else' ;
+
 
 // productions
 
@@ -90,12 +99,14 @@ statement
     |                           -> ^( IF relational_expression ^( STMTS $s1 ) )
     ) 
   | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] )
+  | SCALAR ASSIGN_OP^^ expression ';'!
   ;
 
 expression
   : DOUBLEQUOTE_STRING
   | SINGLEQUOTE_STRING
   | adding_expression
+  | SCALAR
   ;
 
 adding_expression
