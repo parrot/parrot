@@ -203,7 +203,7 @@ node[String reg_mother]
     }
     ^( infix=( PLUS | MINUS | MUL_OP ) node[reg] node[reg] )
     {
-      // Todo. This is not nice, handl pirops in Plumhead.g
+      // Todo. This is not nice, handle pirops in Plumhead.g
       String pirop = $infix.text;
       if      ( pirop.equals( "+" ) )  { pirop = "n_add"; }
       else if ( pirop.equals( "-" ) )  { pirop = "n_sub"; }
@@ -229,13 +229,16 @@ node[String reg_mother]
     }
     ^( REL_OP node[reg] node[reg] )
     {
-      // Todo. This is not nice, handl pirops in Plumhead.g
-      String relop = "infix:" + $REL_OP.text;
+      // Todo. This is not nice, handle pirops in Plumhead.g
+      String name = $REL_OP.text;
+      if      ( name.equals( "==" ) )  { name = "eq"; }
+      else if ( name.equals( "!=" ) )  { name = "ne"; }
+      name = "infix:" + name;
       
       System.out.print( 
-          "  " + reg + ".'attr'( 'name', '" + relop + "' , 1 )               \n"
-        + "  " + $node.reg_mother + ".'push'( " + reg + " )                   \n"
-        + "    # leaving REL_OL                                               \n"
+          "  " + reg + ".'attr'( 'name', '" + name + "' , 1 )               \n"
+        + "  " + $node.reg_mother + ".'push'( " + reg + " )                 \n"
+        + "    # leaving REL_OL                                              \n"
       );
     }
   | {

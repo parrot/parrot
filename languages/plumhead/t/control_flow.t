@@ -19,13 +19,36 @@ use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 use Parrot::Config (); 
 use Parrot::Test;
-use Test::More     tests => 8;
+use Test::More     tests => 10;
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'if' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'if, one statement in block' );
 <?php
 if (1)
 {
   echo "Hi\n";
+}
+?>
+END_CODE
+Hi
+END_EXPECTED
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'if, no statements in block' );
+<?php
+if (1)
+{
+}
+echo "Hi\n";
+?>
+END_CODE
+Hi
+END_EXPECTED
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'if, two statements in block' );
+<?php
+if (1)
+{
+  echo "Hi";
+  echo "\n";
 }
 ?>
 END_CODE

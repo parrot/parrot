@@ -41,6 +41,7 @@ language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '== for unequal 
 <?php
 if ( 'asdf' == 'jklö' )
 {
+  echo "wrong turn\n";
 }
 else
 {

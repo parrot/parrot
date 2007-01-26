@@ -55,6 +55,7 @@ MUL_OP     :{ codeMode }?=>  '*'  | '/'  | '%' ;
 REL_OP     :{ codeMode }?=>  '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
 
 IF         :{ codeMode }?=>  'if' ;
+ELSE       :{ codeMode }?=>  'else' ;
 
 // productions
 
@@ -84,9 +85,9 @@ statements
 
 statement
   : ECHO^^ expression ';'! 
-  | IF '(' relational_expression ')' '{' s1=statement '}'
-    ( 'else' '{' s2=statement '}' -> ^( IF relational_expression ^( STMTS $s1 ) ^( STMTS $s2 ) )
-    |                             -> ^( IF relational_expression ^( STMTS $s1 ) )
+  | IF '(' relational_expression ')' '{' s1=statements '}'
+    ( ELSE '{' s2=statements '}' -> ^( IF relational_expression ^( STMTS $s1 ) ^( STMTS $s2 ) )
+    |                           -> ^( IF relational_expression ^( STMTS $s1 ) )
     ) 
   | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] )
   ;

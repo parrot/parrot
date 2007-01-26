@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/GenPastPir.g 2007-01-25 22:04:06
+// $ANTLR 3.0b5 src/antlr3/GenPastPir.g 2007-01-26 19:34:14
 
   import java.util.regex.*;
 
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class GenPastPirTreeParser extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "NOQUOTE_STRING", "STMTS", "SEA", "CODE_START", "CODE_END", "WS", "DOUBLEQUOTE_STRING", "SINGLEQUOTE_STRING", "ECHO", "INTEGER", "NUMBER", "MINUS", "PLUS", "MUL_OP", "REL_OP", "IF", "';'", "'('", "')'", "'{'", "'}'", "'else'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "NOQUOTE_STRING", "STMTS", "SEA", "CODE_START", "CODE_END", "WS", "DOUBLEQUOTE_STRING", "SINGLEQUOTE_STRING", "ECHO", "INTEGER", "NUMBER", "MINUS", "PLUS", "MUL_OP", "REL_OP", "IF", "ELSE", "';'", "'('", "')'", "'{'", "'}'"
     };
     public static final int CODE_START=8;
     public static final int MINUS=16;
@@ -25,6 +25,7 @@ public class GenPastPirTreeParser extends TreeParser {
     public static final int INTEGER=14;
     public static final int DOUBLEQUOTE_STRING=11;
     public static final int ECHO=13;
+    public static final int ELSE=21;
     public static final int IF=20;
     public static final int EOF=-1;
     public static final int REL_OP=19;
@@ -392,7 +393,7 @@ public class GenPastPirTreeParser extends TreeParser {
 
                     match(input, Token.UP, null); 
 
-                          // Todo. This is not nice, handl pirops in Plumhead.g
+                          // Todo. This is not nice, handle pirops in Plumhead.g
                           String pirop = infix.getText();
                           if      ( pirop.equals( "+" ) )  { pirop = "n_add"; }
                           else if ( pirop.equals( "-" ) )  { pirop = "n_sub"; }
@@ -437,20 +438,23 @@ public class GenPastPirTreeParser extends TreeParser {
 
                     match(input, Token.UP, null); 
 
-                          // Todo. This is not nice, handl pirops in Plumhead.g
-                          String relop = "infix:" + REL_OP5.getText();
+                          // Todo. This is not nice, handle pirops in Plumhead.g
+                          String name = REL_OP5.getText();
+                          if      ( name.equals( "==" ) )  { name = "eq"; }
+                          else if ( name.equals( "!=" ) )  { name = "ne"; }
+                          name = "infix:" + name;
                           
                           System.out.print( 
-                              "  " + reg + ".'attr'( 'name', '" + relop + "' , 1 )               \n"
-                            + "  " + reg_mother + ".'push'( " + reg + " )                   \n"
-                            + "    # leaving REL_OL                                               \n"
+                              "  " + reg + ".'attr'( 'name', '" + name + "' , 1 )               \n"
+                            + "  " + reg_mother + ".'push'( " + reg + " )                 \n"
+                            + "    # leaving REL_OL                                              \n"
                           );
                         
 
                     }
                     break;
                 case 8 :
-                    // src/antlr3/GenPastPir.g:241:5: ^( IF node[\"past_if_op\"] node[\"past_if_op\"] ( node[\"past_if_op\"] )? )
+                    // src/antlr3/GenPastPir.g:244:5: ^( IF node[\"past_if_op\"] node[\"past_if_op\"] ( node[\"past_if_op\"] )? )
                     {
 
                           reg_num++;
@@ -476,7 +480,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     node("past_if_op");
                     _fsp--;
 
-                    // src/antlr3/GenPastPir.g:254:49: ( node[\"past_if_op\"] )?
+                    // src/antlr3/GenPastPir.g:257:49: ( node[\"past_if_op\"] )?
                     int alt2=2;
                     int LA2_0 = input.LA(1);
                     if ( ((LA2_0>=NOQUOTE_STRING && LA2_0<=STMTS)||(LA2_0>=DOUBLEQUOTE_STRING && LA2_0<=ECHO)||(LA2_0>=NUMBER && LA2_0<=IF)) ) {
@@ -484,7 +488,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     switch (alt2) {
                         case 1 :
-                            // src/antlr3/GenPastPir.g:254:49: node[\"past_if_op\"]
+                            // src/antlr3/GenPastPir.g:257:49: node[\"past_if_op\"]
                             {
                             pushFollow(FOLLOW_node_in_node260);
                             node("past_if_op");
@@ -509,7 +513,7 @@ public class GenPastPirTreeParser extends TreeParser {
                     }
                     break;
                 case 9 :
-                    // src/antlr3/GenPastPir.g:262:5: ^( STMTS ( node[reg_stmts] )* )
+                    // src/antlr3/GenPastPir.g:265:5: ^( STMTS ( node[reg_stmts] )* )
                     {
 
                           reg_num++;
@@ -525,7 +529,7 @@ public class GenPastPirTreeParser extends TreeParser {
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // src/antlr3/GenPastPir.g:272:14: ( node[reg_stmts] )*
+                        // src/antlr3/GenPastPir.g:275:14: ( node[reg_stmts] )*
                         loop3:
                         do {
                             int alt3=2;
@@ -537,7 +541,7 @@ public class GenPastPirTreeParser extends TreeParser {
 
                             switch (alt3) {
                         	case 1 :
-                        	    // src/antlr3/GenPastPir.g:272:14: node[reg_stmts]
+                        	    // src/antlr3/GenPastPir.g:275:14: node[reg_stmts]
                         	    {
                         	    pushFollow(FOLLOW_node_in_node286);
                         	    node(reg_stmts);
