@@ -713,6 +713,7 @@ sub parse_pmc {
 
         if ($flag and $flag =~ /PMETHOD/) {
             rewrite_pmethod($method_hash);
+            $flags_ref->{pmethod_present} = 1;
         }
 
 
@@ -883,10 +884,10 @@ sub gen_arg_accessor {
   }
 }
 
-=head3 C<rewrite_pmethod($class, $method, $body)>
+=head3 C<rewrite_pmethod_returns($class, $method, $body)>
 
-Rewrites the method body performing the various macro substitutions for
-pmethod bodies (see F<tools/build/pmc2c.pl>).
+Rewrites the method body returns performing the various macro substitutions for
+pmethod returns.
 
 =cut
 
@@ -1028,7 +1029,7 @@ sub find_max_regs {
 
 =head3 C<rewrite_pmethod()>
 
-    rewrite_pmethod($method_hash);
+    rewrite_pmethod($pmc2c_instance);
 
 =cut
 

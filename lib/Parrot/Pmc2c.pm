@@ -525,23 +525,20 @@ superclasses.
 sub includes {
     my $self = shift;
 
-    my $cout = "";
-    $cout .= <<"EOC";
+    my $cout .= <<"EOC";
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
 #include "parrot/dynext.h"
 EOC
+
+    $cout .= qq{#include "pmc_fixedintegerarray.h"\n} if ($self->{flags}->{pmethod_present});
     foreach my $parents ( $self->{class}, @{ $self->{parents} } ) {
         my $name = lc $parents;
-        $cout .= <<"EOC";
-#include "pmc_$name.h"
-EOC
+        $cout .= qq{#include "pmc_$name.h"\n};
     }
     if ( !$self->{flags}{dynpmc} ) {
         my $name = lc $self->{class};
-        $cout .= <<"EOC";
-#include "$name.str"
-EOC
+        $cout .= qq{#include "$name.str"\n};
     }
     "$cout\n";
 }
