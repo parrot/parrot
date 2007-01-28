@@ -1136,6 +1136,23 @@ sub BuildBreak {
 
 sub BuildReturn {
     my ( $parser, $exprs ) = @_;
+    if ( scalar @{$exprs} == 1 ) {
+        my $expr = $exprs->[0];
+        if ( scalar $expr->[1] ) {
+            my @opcodes = @{ $expr->[1] };
+            if ( scalar @opcodes and $opcodes[-1]->isa('CallOp') ) {
+                my $call = pop @opcodes;
+                my $ass = pop @opcodes;
+                my $loc = pop @opcodes;
+                push @opcodes, new TailCallDir(
+                    $parser,
+                    'arg1'   => $call->{arg1},
+                    'arg2'   => $call->{arg2},
+                );
+                return \@opcodes;
+            }
+        }
+    }
     my @opcodes = ();
     my @returns = ();
     for my $expr ( @{$exprs} ) {

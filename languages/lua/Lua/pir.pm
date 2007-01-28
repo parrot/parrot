@@ -243,6 +243,24 @@ L2:
         return;
     }
 
+    sub visitTailCallDir {
+        my $self = shift;
+        my ($op) = @_;
+        my $FH   = $self->{fh};
+        print {$FH} "  .return $op->{arg1}->{symbol}(";
+        my $first = 1;
+        foreach ( @{ $op->{arg2} } ) {
+            print {$FH} ", " unless ($first);
+            print {$FH} "$_->{symbol}";
+            if ( exists $_->{pragma} and $_->{pragma} eq 'multi' ) {
+                print {$FH} " :flat";
+            }
+            $first = 0;
+        }
+        print {$FH} ")\n";
+        return;
+    }
+
     sub visitBranchIfOp {
         my $self = shift;
         my ($op) = @_;
