@@ -81,9 +81,11 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
     .local pmc cnode, cnode2, cpast
     cnode = shift iter
     if null cnode goto iter_loop
-    $P1 = cnode['string']
+    $P1 = cnode['expression']
     if null $P1 goto iter_loop
-    cpast = tree.'get'('past', $P1, 'Plumhead::Grammar::string')
+    $P2 = $P1['DOUBLEQUOTE_STRING']
+    if null $P2 goto iter_loop
+    cpast = tree.'get'('past', $P2, 'Plumhead::Grammar::DOUBLEQUOTE_STRING')
     if null cpast goto iter_loop
     past.'push'(cpast)
     goto iter_loop
@@ -95,7 +97,7 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
 }
 
 
-transform past (Plumhead::Grammar::string) :language('PIR') {
+transform past (Plumhead::Grammar::DOUBLEQUOTE_STRING) :language('PIR') {
 
     .local pmc past_val
     past_val = new 'PAST::Val'                             

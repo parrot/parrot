@@ -9,7 +9,9 @@ token TOP         { <program> }
 
 regex sea         { .* <before: \<> }
 
-token string      { " <-["]>* " }
+token DOUBLEQUOTE_STRING      { ' <-[']>* ' }
+
+token SINGLEQUOTE_STRING      { ' <-[']>* ' }
 
 token start_code  { \< \? p h p }
 
@@ -25,4 +27,8 @@ rule  program     { ^<sea><code>? }
 
 rule  code        { <start_code> <statement>? <end_code> }
 
-rule statement    { <echo> <string> ; }
+rule statement    { <echo> <expression> ; }
+
+token expression  {   DOUBLEQUOTE_STRING
+                    | SINGLEQUOTE_STRING
+                  }

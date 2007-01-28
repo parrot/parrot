@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 # core Perl modules
-use Test::More     tests => 11;
+use Test::More     tests => 12;
 
 # Parrot modules
 use Parrot::Test;
@@ -62,6 +62,15 @@ END_EXPECTED
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
 <?php
 echo "Hello, World!\n";
+?>
+END_CODE
+Hello, World!
+END_EXPECTED
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
+<?php
+echo 'Hello, World!';
+echo "\n";
 ?>
 END_CODE
 Hello, World!
