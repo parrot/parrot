@@ -401,6 +401,7 @@ docs/resources/favicon.ico                                  [main]doc
 docs/resources/parrot.small.png                             [main]doc
 docs/resources/perl.css                                     [main]doc
 docs/resources/up.gif                                       [main]doc
+docs/roles_responsibilities.pod                             [main]doc
 docs/running.pod                                            [main]doc
 docs/stability.pod                                          [main]doc
 docs/stm/atomic.pod                                         [main]doc
