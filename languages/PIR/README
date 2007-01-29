@@ -1,0 +1,212 @@
+This is the README file for a PIR implementation in PGE.
+
+INTRODUCTION
+------------
+
+A good test-case for the compiler tool suite of Parrot is
+to compile its own assembler. This project aims to bring
+a full PIR implementation using the Parrot compiler tools.
+
+Initially, I started this project for 2 reasons:
+	
+	1. learn about PGE and other compiler tools in Parrot
+	2. allow me to add high-level constructs to write code
+			for Parrot faster. Currently, these high-level constructs
+			are not implemented.
+
+					
+
+STATUS
+------
+
+Currently, only work is done on the parser. Only when
+the parser is completed should work be done on the further
+transformations (using TGE in the Parrot compiler tools).
+When the parser is changed, the generated parse tree will
+probably be different as well, so any work on the later
+transformation phases should be redone, which is a pain.
+
+The following is an overview of what is parsed (mostly) correctly:
+	
+	* most PIR constructs
+	* recognizes (almost) all Parrot instructions
+		(but doesn't handle their arguments yet)
+
+
+These are known issues with high priority which I have not been
+able to solve till now:
+	
+	* implement Heredoc parsing	
+	* implement macro parsing (macro parameters are 'used' in
+		the macro body using a dot-prefix. This is not working yet)  
+	* print line where syntax error occurred (ask PGE?)
+
+And some small issues:
+
+	* identifiers may not match reserved words (instructions), this
+		/is/ possible in IMCC, although I'm not sure if that is desirable
+		as it may introduce subtle bugs.
+	* flags and syntax for PIR-style function calling incomplete
+	* check and fix all combinations
+	* check for sane syntax error messages, and fix if necessary.
+
+	
+The grammar files are split up into several .pg files. This makes
+the edit-compile-test cycle faster.
+	
+	
+Instead of .include-ing the generated files in the main file
+(pirc.pir), the generated .pir files are compiled to bytecode
+(.pbc) and loaded in pirc.pir. This prevends compiling all the
+included files when compiling pirc.pir (which would really be
+s l o w).
+
+
+
+INSTRUCTIONS
+------------
+
+Type
+
+	$ make
+	
+Easy huh? Please note that compiling may take a while.
+The compiler is called 'pirc.pbc'
+
+There should be an extensive test set, but currently,
+I have no 'make test' working. Help with setting up
+a 'make test' target would be greatly appreciated.
+
+Currently, you can do:
+
+  $ make test
+  
+which will run a little perl script that runs all files in the
+examples directory.
+
+The 'examples' directory contains a number of test files
+that are working. Running these can be done by typing:
+
+	$ ../../parrot pirc.pbc examples/hello.pir 
+	
+	
+
+ACKNOWLEDGEMENTS
+----------------
+
+I stole the Makefile from Punie. The compiler driver (main file)
+is assembled from code from Punie, ABC and Pheme (although I changed
+a lot, so some things taken might be gone already).
+
+
+
+AUTHOR
+------
+
+Klaas-Jan Stol <kjstol@gmail.com>
+This is the README file for a PIR implementation in PGE.
+
+INTRODUCTION
+------------
+
+A good test-case for the compiler tool suite of Parrot is
+to compile its own assembler. This project aims to bring
+a full PIR implementation using the Parrot compiler tools.
+
+Initially, I started this project for 2 reasons:
+	
+	1. learn about PGE and other compiler tools in Parrot
+	2. allow me to add high-level constructs to write code
+			for Parrot faster. Currently, these high-level constructs
+			are not implemented.
+
+					
+
+STATUS
+------
+
+Currently, only work is done on the parser. Only when
+the parser is completed should work be done on the further
+transformations (using TGE in the Parrot compiler tools).
+When the parser is changed, the generated parse tree will
+probably be different as well, so any work on the later
+transformation phases should be redone, which is a pain.
+
+The following is an overview of what is parsed (mostly) correctly:
+	
+	* most PIR constructs
+	* recognizes (almost) all Parrot instructions
+		(but doesn't handle their arguments yet)
+
+
+These are known issues with high priority which I have not been
+able to solve till now:
+	
+	* implement Heredoc parsing	
+	* implement macro parsing (macro parameters are 'used' in
+		the macro body using a dot-prefix. This is not working yet)  
+	* print line where syntax error occurred (ask PGE?)
+
+And some small issues:
+
+	* identifiers may not match reserved words (instructions), this
+		/is/ possible in IMCC, although I'm not sure if that is desirable
+		as it may introduce subtle bugs.
+	* flags and syntax for PIR-style function calling incomplete
+	* check and fix all combinations
+	* check for sane syntax error messages, and fix if necessary.
+
+	
+The grammar files are split up into several .pg files. This makes
+the edit-compile-test cycle faster.
+	
+	
+Instead of .include-ing the generated files in the main file
+(pirc.pir), the generated .pir files are compiled to bytecode
+(.pbc) and loaded in pirc.pir. This prevends compiling all the
+included files when compiling pirc.pir (which would really be
+s l o w).
+
+
+
+INSTRUCTIONS
+------------
+
+Type
+
+	$ make
+	
+Easy huh? Please note that compiling may take a while.
+The compiler is called 'pirc.pbc'
+
+There should be an extensive test set, but currently,
+I have no 'make test' working. Help with setting up
+a 'make test' target would be greatly appreciated.
+
+Currently, you can do:
+
+  $ make test
+  
+which will run a little perl script that runs all files in the
+examples directory.
+
+The 'examples' directory contains a number of test files
+that are working. Running these can be done by typing:
+
+	$ ../../parrot pirc.pbc examples/hello.pir 
+	
+	
+
+ACKNOWLEDGEMENTS
+----------------
+
+I stole the Makefile from Punie. The compiler driver (main file)
+is assembled from code from Punie, ABC and Pheme (although I changed
+a lot, so some things taken might be gone already).
+
+
+
+AUTHOR
+------
+
+Klaas-Jan Stol <kjstol@gmail.com>

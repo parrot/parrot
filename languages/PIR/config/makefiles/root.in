@@ -1,0 +1,113 @@
+
+
+# Setup some commands
+LN_S     = @lns@
+PERL     = @perl@
+RM_F     = @rm_f@
+PARROT   = ../../parrot@exe@
+PGE_DIR  = ../../compilers/pge
+TGE_DIR  = ../../compilers/tge
+CP       = @cp@
+
+# the default target
+all: pir.pbc
+
+### split up grammar file for faster compiling:
+
+# PASM Grammar file
+lib/pasm_grammar_gen.pir: lib/pasm.pg
+  $(PARROT) $(PGE_DIR)/pgc.pir --output=lib/pasm_grammar_gen.pir lib/pasm.pg
+
+lib/pasm_grammar_gen.pbc: lib/pasm.pg lib/pasm_grammar_gen.pir
+  $(PARROT) -o lib/pasm_grammar_gen.pbc --output-pbc lib/pasm_grammar_gen.pir
+
+
+
+
+
+
+# PASM arguments file
+lib/pasm_args_gen.pir: lib/pasm_args.pg
+  $(PARROT) $(PGE_DIR)/pgc.pir --output=lib/pasm_args_gen.pir lib/pasm_args.pg
+
+lib/pasm_args_gen.pbc: lib/pasm_args.pg lib/pasm_args_gen.pir
+  $(PARROT) -o lib/pasm_args_gen.pbc --output-pbc lib/pasm_args_gen.pir
+
+
+# PASM instructions file
+lib/pasm_instr_gen.pir: lib/pasm_instr.pg
+  $(PARROT) $(PGE_DIR)/pgc.pir --output=lib/pasm_instr_gen.pir lib/pasm_instr.pg
+
+lib/pasm_instr_gen.pbc: lib/pasm_instr_gen.pir
+  $(PARROT) -o lib/pasm_instr_gen.pbc --output-pbc lib/pasm_instr_gen.pir
+
+lib/pasm_io_gen.pir: lib/pasm_io.pg
+  $(PARROT) $(PGE_DIR)/pgc.pir --output=lib/pasm_io_gen.pir lib/pasm_io.pg
+
+lib/pasm_io_gen.pbc: lib/pasm_io_gen.pir
+  $(PARROT) -o lib/pasm_io_gen.pbc --output-pbc lib/pasm_io_gen.pir
+
+lib/pasm_pmc_gen.pir: lib/pasm_pmc.pg
+  $(PARROT) $(PGE_DIR)/pgc.pir --output=lib/pasm_pmc_gen.pir lib/pasm_pmc.pg
+
+lib/pasm_pmc_gen.pbc: lib/pasm_pmc_gen.pir
+  $(PARROT) -o lib/pasm_pmc_gen.pbc --output-pbc lib/pasm_pmc_gen.pir
+
+
+lib/pasm_core_gen.pir: lib/pasm_core.pg
+  $(PARROT) $(PGE_DIR)/pgc.pir --output=lib/pasm_core_gen.pir lib/pasm_core.pg
+
+lib/pasm_core_gen.pbc: lib/pasm_core_gen.pir
+  $(PARROT) -o lib/pasm_core_gen.pbc --output-pbc lib/pasm_core_gen.pir
+
+# PIR Grammar file
+lib/pir_grammar_gen.pir: lib/pir.pg
+  $(PARROT) $(PGE_DIR)/pgc.pir --output=lib/pir_grammar_gen.pir lib/pir.pg
+
+lib/pir_grammar_gen.pbc: lib/pir_grammar_gen.pir
+  $(PARROT) -o lib/pir_grammar_gen.pbc --output-pbc lib/pir_grammar_gen.pir
+
+
+# PIR Grammar extensions file
+lib/pir_extensions_gen.pir: lib/pir_extensions.pg
+  $(PARROT) $(PGE_DIR)/pgc.pir --output=lib/pir_extensions_gen.pir lib/pir_extensions.pg
+
+lib/pir_extensions_gen.pbc: lib/pir_extensions.pg lib/pir_extensions_gen.pir
+  $(PARROT) -o lib/pir_extensions_gen.pbc --output-pbc lib/pir_extensions_gen.pir
+
+# Main file
+pir.pbc: pirc.pir lib/pir_grammar_gen.pbc lib/pasm_grammar_gen.pbc lib/pasm_args_gen.pbc lib/pasm_instr_gen.pbc lib/pasm_io_gen.pbc lib/pasm_pmc_gen.pbc lib/pasm_core_gen.pbc lib/ASTGrammar.pbc
+  $(PARROT) -o pir.pbc --output-pbc pirc.pir
+
+
+lib/ASTGrammar.pbc: lib/ASTGrammar.tg
+  $(PARROT) $(TGE_DIR)/tgc.pir --output=lib/ASTGrammar.pir lib/ASTGrammar.tg
+  $(PARROT) -o lib/ASTGrammar.pbc --output-pbc lib/ASTGrammar.pir
+
+
+test: all
+  $(PERL) runtests.pl
+
+
+clean:
+  $(RM_F) pir.pbc \
+  lib\pir_grammar_gen.pir \
+  lib\pasm_ops_grammar_gen.pir \
+  lib\pasm_args_gen.pir \
+  lib\pasm_instr_gen.pir \
+  lib\pasm_ops_grammar_gen.pbc \
+  lib\pasm_args_gen.pbc \
+  lib\pasm_instr_gen.pbc \
+  lib\pasm_grammar_gen.pir \
+  lib\pasm_grammar_gen.pbc \
+  lib\pir_grammar_gen.pbc \
+  lib\pasm_io_gen.pir \
+  lib\pasm_io_gen.pbc \
+  lib\pasm_pmc_gen.pir \
+  lib\pasm_pmc_gen.pbc \
+  lib\pasm_core_gen.pir \
+  lib\pasm_core_gen.pbc \
+  lib\ASTGrammar.pir \
+  lib\ASTGrammar.pbc
+
+

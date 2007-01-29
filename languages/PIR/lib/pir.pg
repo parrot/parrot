@@ -1,0 +1,1654 @@
+grammar PIRGrammar;
+
+# TO DO:
+# 1. fix Heredocs parsing
+# 2. fix macro parsing
+# 3. Test and fix things
+
+token TOP {
+  ^ <program> [ $ | <syntax_error: end of file expected> ]
+}
+
+rule program {
+  <?nl>*
+  <compilation_unit>
+  [ <?nl> <compilation_unit> ]*
+  [ <?nl> | <warning: no newline at end of file> ]
+}
+
+rule compilation_unit {   
+    <global_def>
+  | <sub_def>
+  | <const_def>
+  | <macro_def>
+  | <pragma>
+  | <emit>
+}
+
+
+## Sub defs, sub pragmas, sub body and parameters
+##
+
+rule sub_def {
+  <'.sub'>
+  [ <sub_id> | <syntax_error: sub identifier (id or string constant) expected> ]
+  <sub_pragmas>?
+  [ <?nl> | <syntax_error: newline expected> ]
+  <body>
+}
+
+rule sub_id {
+  [ <id> | <string_constant> ]
+}
+
+## The comma to separate the sub pragmas is optional.
+##
+rule sub_pragmas {
+  <sub_pragma>
+  [
+    [ <','> ]?
+    <sub_pragma>
+  ]*
+}
+
+rule sub_pragma {
+    <':load'>
+  | <':init'>
+  | <':immediate'>
+  | <':main'>
+  | <':anon'>
+  | <':lex'>
+  | <wrap_pragma>
+  | <vtable_pragma>
+  | <multi_pragma>
+  | <outer_pragma>
+}
+
+### This one is not sure yet
+rule wrap_pragma {
+  <':wrap'> <parenthesized_string>  
+}
+
+rule vtable_pragma {
+  <':vtable'> <parenthesized_string>?
+}
+
+rule parenthesized_string {
+  <'('>
+  [ <string_constant> | <syntax_error: string constant expected> ]
+  [ <')'>             | <syntax_error: ')' expected> ]
+}
+
+rule multi_pragma {
+  <':multi'>
+  [ <'('>    | <syntax_error: '(' expected after ':multi' flag> ]
+  <multi_types>?
+  [ <')'>    | <syntax_error: ')' expected to close ':multi' flag> ]
+}
+
+rule outer_pragma {
+  <':outer'>
+  [ <'('>    | <syntax_error: '(' expected after ':outer' flag> ]
+  [ <string_constant>
+  | <id>
+  | <syntax_error: identifier for outer sub expected>
+  ]
+  [ <')'>    | <syntax_error: ')' expected to close ':outer' flag> ]
+}
+
+rule multi_types {
+  <multi_type> [ <','> <multi_type> ]*
+}
+
+rule multi_type {
+    <type>
+  | <'_'>
+  | <keylist>
+  | <id>
+  | <string_constant>
+}
+
+rule body {
+  <param_decl>*
+  <pir_instr>*
+  [ <'.end'> | <syntax_error: '.end' expected to close method/sub body> ]
+}
+
+rule param_decl {
+  <'.param'>
+  [ [ <type> <id> ]
+  | <reg>
+  | <syntax_error: parameter type or register expected>
+  ]
+  <get_flags>?
+  [ <?nl>   | <syntax_error: newline expected after parameter declaration> ]
+}
+
+
+
+
+#
+# PIR instructions
+#
+
+
+rule pir_instr {
+  [ <label> <instr>?
+  | <instr>
+  ] 
+  [ <?nl> | <syntax_error: newline expected after instruction> ]
+}
+
+# this is a token, because no spaces are allowed between
+# the id and the colon.
+token label {
+  <id> <':'>
+}
+
+rule instr {
+    <local_decl>
+  | <lexical_decl>
+  | <const_def>
+  | <conditional_stat>
+  | <assignment_stat>
+  | <open_namespace>
+  | <close_namespace>
+  | <return_stat>
+  | <sub_invocation>
+  | <macro_invocation>
+  | <jump_stat>
+  | <pasm_instr>      
+  | <source_info>
+}
+
+rule macro_invocation {
+  <macro_id> <parenthesized_args>?
+}
+
+
+## Locals and Lexicals
+## 
+
+rule local_decl {
+  [ <'.local'> | <'.sym'> ]
+  [ <type> | <syntax_error: type for local symbol expected> ]
+  <local_id_list>
+}
+
+rule local_id_list {
+  <local_id> [ <','> <local_id> ]*
+}
+
+rule local_id {
+  <id> <local_flag>?
+}
+
+## Maybe more future flags for local symbols
+##
+rule local_flag {  
+  <':unique_reg'>
+}
+
+rule lexical_decl {
+  <'.lex'>
+  [ <string_constant> | <syntax_error: string constant expected> ]
+  [ <','>             | <syntax_error: ',' expected> ]
+  [ <reg>             | <syntax_error: register expected> ]
+}
+
+
+## Global definition
+##
+rule global_def {
+  <'.global'> [ <id> | <syntax_error: identifier expected> ]
+}
+
+## Const definitions, a check is done for the constant type and
+## the type of the constant value.
+##
+rule const_def {
+  <'.const'>
+  [ [ int <const_assign>
+      [ <int_constant>    | <syntax_error: integer constant expected> ]
+    ]
+  | [ num <const_assign>
+      [ <float_constant>  | <syntax_error: floating point constant expected> ]
+    ]
+  | [ pmc <const_assign>
+      [ <string_constant> | <syntax_error: string constant expected> ]
+    ]
+  | [ string <const_assign>
+      [ <string_constant> | <syntax_error: string constant expected> ]
+    ]
+  | <syntax_error: type expected for constant>
+  ]
+}
+
+rule const_assign {
+  [ <id>  | <syntax_error: constant identifier expected> ]
+  [ <'='> | <syntax_error: '=' expected after constant identifier> ]
+}
+
+
+## Conditional statements and expressions
+##
+
+rule conditional_stat {
+  [ <'if'> | <'unless'> ]
+  [ <'null'> <target>
+  | <simple_expr> [ <relational_operator> <simple_expr> ]?
+  ]
+  [ <'goto'> | <syntax_error: 'goto' expected> ]
+  [ <id> | <pasm_instr> | <syntax_error: label identifier expected> ]
+}
+
+
+## Jump statements
+##
+rule jump_stat {
+  <'goto'> [ <id> | <syntax_error: label expected after 'goto'> ]
+}
+
+
+
+## Expressions, adjusted from abc.pg
+##
+
+rule relational_operator {
+    <'=='>
+  | <'!='>
+  | <'<='>
+  | <'<'>
+  | <'>='>
+  | <'>'>
+}
+
+rule binary_operator {
+    <'+'>
+  | <'-'>
+  | <'/'>
+  | <'**'>
+  | <'*'>
+  | <'%'>
+  | <'<<'>  
+  | <'>>>'>
+  | <'>>'>  
+  | <'&&'>
+  | <'!!'>
+  | <'~~'>
+  | <'!'>
+  | <'&'>
+  | <'~'>
+  | <'.'>
+}
+
+rule unary_operator {
+    <'!'>  
+  | <'-'>
+  | <'~'>
+}
+
+
+rule expression {
+    [ <simple_expr> [ <binary_operator> <simple_expression> ]? ]
+  | [ <unary_operator> <simple_expr> ]
+}
+
+
+rule simple_expr {
+    <float_constant>
+  | <int_constant>
+  | <string_constant>
+  | <target>
+}
+
+
+rule keylist {
+  <'['>
+  <simple_expr> [ <','> <simple_expr> ]*
+  [ <']'> | <syntax_error: ']' expected> ]
+}
+
+
+
+
+## Assignments and misc. operations with a '=' sign
+##
+rule assignment_stat {
+    <target> <'='> <short_sub_call>
+  | <target> <'='> <target> <keylist>
+  | <target> <'='> <expression>
+  | <target> <'='> <pasm_op_1> <simple_expr>
+  | <target> <'='> <pasm_op_2> <simple_expr> \, <simple_expr>
+  | <target> <'='> <'new'> [ <int_constant> | <string_constant> | <macro_id> ]
+  | <target> <'='> <'new'> <keylist>
+  | <target> <'='> <'find_type'> [ <string_constant> | <string_reg> | <id> ]
+  | <target> <'='> <heredoc_string>
+  | <target> <'='> <'global'> <string_constant> # deprecated?  
+  | <target> <keylist> <'='> <simple_expr>  
+  | <'global'> <string_constant> <'='> <target> # deprecated?
+  | <result_var_list> [ <'='> | <syntax_error: '=' expected> ] <short_sub_call>
+}
+
+## Rewrite of assignment_stat
+##
+##rule assignment_stat {
+##  <target> <'='> <rhs>
+##| <target> <op_assign> <simple_expr>
+##| <target> <keylist> <'='> <simple_expr>
+##| <'global'> <string_constant> <'='> <target> # deprecated?
+##| <result_var_list> [ <'='> | <syntax_error: '=' expected> ] <short_sub_call>
+##}
+##
+##rule rhs {
+##  <short_sub_call>
+##| <expression>
+##| <pasm_op_1> <target>
+##| <pasm_op_2> <target> <','> <target>
+##| <'new'> [ <int_constant> | <string_constant> | <macro_id> ]
+##| <'find_type'> [ <string_constant> | <string_reg> | <id> ]
+##| <heredoc_string>
+##| <global'> <string_constant> # deprecated?
+##}
+
+# pasm ops that take 1 argument
+#
+rule pasm_op_1 {
+    clone
+  | compreg
+  | defined
+  | assign
+  | addr
+  | istrue
+  | isfalse
+  | isnull
+  #| others
+}
+
+# pasm ops that take 2 arguments
+#
+rule pasm_op_2 {
+    issame
+  | isntsame
+}
+
+rule heredoc_string {
+  <'<<'>
+  [ <string_constant> | <syntax_error: heredoc label identifier expected> ]
+  [ <?nl> | <syntax_error: newline expected after heredoc label> ]
+  <heredoc_string>
+  [ <heredoc_label> | <syntax_error: heredoc label expected> ]
+}
+
+token heredoc_label {
+  [ ^^ | <syntax_error: no whitespace allowed in front of a heredoc label> ]
+  <id>
+  [ $$ | <syntax_error: no whitespace allowed after a heredoc> ]
+}
+
+# fix this:
+rule heredoc_string {
+  [ \N | \n ]*
+}
+
+
+
+## Sub/method invocation
+##
+rule long_sub_call {
+  <'.pcc_begin'>
+  [ <?nl>  | <syntax_error: newline after '.pcc_begin' expected> ]
+  <arguments>
+  [ <'.pcc_call'> 
+  | <'.nci_call'> 
+  | <syntax_error: '.pcc_call' or '.nci_call' expected> 
+  ]
+  [ <target> | <syntax_error: id or register expected that holds the sub object> ]
+  [ <?nl>    | <syntax_error: newline after '.pcc_call sub' expected> ]
+  <result_values>
+  [ <'.pcc_end'>  | <syntax_error: '.pcc_end' expected> ]  
+}
+
+rule short_sub_call {
+  [ <target>\. ]?                  # optional object
+  [ <target> | <string_constant> ] # method or sub name/id
+  <parenthesized_args>             # sub args
+}
+
+rule sub_invocation {
+  [ <long_sub_call> | <short_sub_call> ]
+}
+
+rule result_var_list {
+  <'('>
+  <result_var>
+  [
+    <','> [ <result_var> | <syntax_error: target to store result expected after ','> ]
+  ]*
+  [ <')'> | <syntax_error: ')' expected to close result target list> ]
+}
+
+rule result_var {
+  <target> <get_flags>?
+}
+
+rule parenthesized_args {
+  <'('>
+  [
+    <arg>
+    [ <','>
+      [ <arg> | <syntax_error: argument expected after ','> ]
+    ]*
+  ]?
+  [ <')'> | <syntax_error: ')' expected to close argument list> ]
+}
+
+rule arg {
+  [ <float_constant>
+  | <int_constant>
+  | <string_constant>
+    [ <'=>'> 
+      [ <target> | <syntax_error: target for named argument expected> ]
+    ]?
+  | <target>
+  ] <set_flags>?
+}
+
+
+
+## Argument passing
+##
+rule arguments {
+  [ <'.arg'>
+    [ <simple_expr> | <syntax_error: argument expression expected> ]
+    <set_flags>?
+    [ <?nl> | <syntax_error: newline expected after .arg statement> ]
+  ]*
+}
+
+
+
+## Receiving return values
+##
+rule result_values {
+  [ <'.result'>
+    [ <target> | <syntax_error: target expected to hold the result> ]
+    <get_flags>?
+    [ <?nl>  | <syntax_error: newline expected after .result statement> ]
+  ]*
+}
+
+## flags for setting arguments and return values
+##
+rule set_flags {
+  [ <':flat'>
+  | <named_flag>
+  ]+
+}
+
+## flags for getting parameters and result values
+##
+rule get_flags {
+  [ <':slurpy'>
+  | <':optional'>
+  | <':opt_flag'>
+  | <named_flag>
+  ]+
+}
+
+rule named_flag {
+  <':named'> <parenthesized_string>?
+}
+
+
+## Returning values
+##
+rule return_stat {  
+    <long_return_stat>
+  | <short_return_stat>
+  | <long_yield_stat> 
+  | <short_yield_stat>
+  | <tail_call>
+}
+
+rule long_return_stat {
+  <'.pcc_begin_return'>
+  [ <?nl> | <syntax_error: newline expected after '.pcc_begin_return'> ]
+  [ <return_directive> ]*
+  [ <'.pcc_end_return'> | <syntax_error: '.pcc_end_return' expected> ]
+}
+
+rule short_return_stat {
+  <'.return'> <parenthesized_args> 
+}
+
+rule long_yield_stat {
+  <'.pcc_begin_yield'>
+  [ <?nl> | <syntax_error: newline expected after '.pcc_begin_yield'> ]
+  [ <return_directive> ]*
+  [ <'.pcc_end_yield'> | <syntax_error: '.pcc_end_yield' expected> ]
+}
+
+rule return_directive {
+  <'.return'>
+  [ <simple_expr> | <syntax_error: simple expression expected> ]
+  <set_flags>?
+  [ <?nl> | <syntax_error: newline expected after return directive> ]
+}
+
+rule short_yield_stat {
+  <'.yield'> <parenthesized_args> 
+}
+
+rule tail_call {
+  <'.return'> <short_sub_call>
+}
+
+
+
+## Namespaces
+##
+rule open_namespace {
+  <'.namespace'> [ <id> | <syntax_error: namespace identifier expected> ]
+}
+
+rule close_namespace {
+  <'.endnamespace'> [ <id> | <syntax_error: namespace identifier expected> ]
+}
+
+#
+# Emit
+#
+rule emit {
+  <'.emit'>
+  [ <?nl>        | <syntax_error: newline expected> ]
+  <pir_instr>*
+  [ <'.eom'>     | <syntax_error: '.eom' expected> ]
+}
+
+#
+# Macro
+#
+rule macro_def {
+  <'.macro'>
+  [ <id> | <syntax_error: macro identifier expected> ]
+  <macro_parameters>?
+  [ <?nl> | <syntax_error: newline expected after macro parameter list> ]
+  <macro_body>
+
+}
+
+rule macro_parameters {
+  <'('>
+  <id_list>?
+  [ <')'>   | <syntax_error: ')' expected> ]
+}
+
+#### TODO: FIX
+regex macro_body {
+  .*?
+  <'.endm'> \h* \n
+}
+
+
+#
+# Pragmas
+#
+rule pragma {
+    <include>
+  | <new_operators>
+  | <loadlib>
+  | <namespace>
+  | <hll_specifier>
+  | <hll_mapping>
+  | <source_info>
+}
+
+rule include {
+  <'.include'> [ <string_constant> | <syntax_error: string constant expected> ]
+}
+
+rule new_operators {
+  <'.pragma'> <'n_operators'> [ <int_constant> | <syntax_error: integer constant expected> ]
+}
+
+rule loadlib {
+  <'.loadlib'> [ <string_constant> | <syntax_error: library name expected> ]
+}
+
+rule namespace {
+  <'.namespace'> 
+  [ <'['>             | <syntax_error: '[' expected> ]
+  [ <namespace_id>    | <syntax_error: namespace identifier expected> ]
+  [ <']'>             | <syntax_error: ']' expected> ]
+}
+
+rule hll_specifier {
+  <'.HLL'>
+  [ <string_constant> | <syntax_error: HLL name expected> ]
+  [ <','>             | <syntax_error: ',' expected> ]
+  [ <string_constant> | <syntax_error: HLL type library expected> ]
+}
+
+rule hll_mapping {
+  <'.HLL_map'>
+  [ <int_constant>    | <syntax_error: Parrot Core type expected> ]
+  [ <','>             | <syntax_error: ',' expected> ]
+  [ <int_constant>    | <syntax_error: HLL type expected> ]
+}
+
+rule namespace_id {
+  <string_constant>
+  [ <';'>
+    [ <string_constant> | <syntax_error: string constant expected> ]
+  ]*
+}
+
+rule source_info {
+  <'.line'> <int_constant> [ \, <string_constant> ]?
+}
+
+
+
+rule id_list {
+  <id>
+  [
+    <','>
+    [ <id> | <syntax_error: identifier expected> ]
+  ]*
+}
+
+
+#
+# Tokens
+#
+
+token int_constant {
+    [-]? \d+
+  | <binary_constant>
+  | <hex_constant>
+}
+
+# FIXTHIS
+regex hex_constant {
+  \d+
+}
+
+# FIXTHIS
+regex binary_constant {
+  \d+
+}
+
+token float_constant {
+  [-]? \d+\.\d+
+}
+
+
+rule string_constant {
+  <charset_specifier>? 
+  [ <stringdouble> | <stringsingle> ]
+}
+
+
+rule charset_specifier {
+  [ <'ascii:'> | <'binary:'> | <'unicode:'> | <'iso-8859-1:'> ]  
+}
+
+regex stringdouble { <PGE::Text::bracketed: "> }
+regex stringsingle { <PGE::Text::bracketed: '> }
+
+## TODO: add other built-in types
+rule type {
+  [ <'int'> 
+  | <'num'> 
+  | <'pmc'> 
+  | <'string'>   
+  | <'Array'> 
+  | <'Hash'> 
+  ]
+}
+
+token target {
+  [ <id> | <reg> ]
+}
+
+token id {
+  <!keyword> \w+
+}
+
+token macro_id {
+  <!keyword> \.\w+
+}
+
+token reg {
+  [ <int_reg> | <num_reg> | <pmc_reg> | <string_reg> ]
+}
+
+token int_reg {
+    I\d<[\d]>?  # match I0 to I99
+  | \$I\d+      # match $I0 to infinity
+}
+
+token string_reg {
+    S\d<[\d]>?
+  | \$S\d+
+}
+
+token pmc_reg {
+    P\d<[\d]>?
+  | \$P\d+
+}
+
+token num_reg {
+    N\d<[\d]>?
+  | \$N\d+
+}
+
+## whitespace is any space character but not a newline char,
+## a comment, or a pod comment 
+##
+token ws {
+  [ [ \s & \N ]+  
+  | \# \N*
+  | ^^ <?pod_comment>
+  ]*
+}
+
+
+
+
+
+# match the set of a newline and possible indention space 1 or more times
+# this is necessary to be able to skip fully white lines (with some spaces/tabs in it).
+# However, therefore it is also necessary to put the comments skipping here as well.
+
+
+token nl {
+  [ \n <?ws> ]+
+}
+
+## taken from perl6.pg
+##
+regex pod_comment {
+    ^^ = [ [ cut \h*: | end [\h\N*]? ]
+         | for [ \h\N+: ] \n [ \N+\n ]*:
+         | \w\N*: \n .*? \n = [ cut \h*: | end [\h\N*:]? ]
+         ]
+         [\n|$]
+}
+
+# PIR directives, PASM instructions and
+# the Parrot datatypes (int, string, num, pmc)
+# are keywords, and must not be used as
+# identifiers.
+#
+token keyword {
+    <pir_directive>
+  | <pasm_instruction> # pasm instructions may be identifiers in IMCC
+  | <type>  
+}
+
+# TODO: put this in <%pir_directive>
+# PIR directives
+#
+token pir_directive {
+    <'.arg'>    
+  | <'.const'>
+  | <'.emit'>
+  | <'.end'>
+  | <'.endnamespace'>
+  | <'.eom'>  
+  | <'.get_results'>
+  | <'.global'>
+  | <'.HLL_map'>
+  | <'.HLL'>
+  | <'.immediate'>
+  | <'.include'>
+  | <'.lex'>
+  | <'.line'>
+  | <'.loadlib'>
+  | <'.local'>
+  | <'.namespace'>
+  | <'.nci_call'>
+  | <'.param'>
+  | <'.pcc_begin_return'>
+  | <'.pcc_begin_yield'>
+  | <'.pcc_begin'>
+  | <'.pcc_call'>
+  | <'.pcc_end_return'>
+  | <'.pcc_end_yield'>
+  | <'.pcc_end'>  
+  | <'.pragma'>
+  | <'.return'>
+  | <'.sub'>
+  | <'.sym'>  
+  | <'.result'>  
+  | <'.yield'>
+}
+grammar PIRGrammar;
+
+# TO DO:
+# 1. fix Heredocs parsing
+# 2. fix macro parsing
+# 3. Test and fix things
+
+token TOP {
+  ^ <program> [ $ | <syntax_error: end of file expected> ]
+}
+
+rule program {
+  <?nl>*
+  <compilation_unit>
+  [ <?nl> <compilation_unit> ]*
+  [ <?nl> | <warning: no newline at end of file> ]
+}
+
+rule compilation_unit {   
+    <global_def>
+  | <sub_def>
+  | <const_def>
+  | <macro_def>
+  | <pragma>
+  | <emit>
+}
+
+
+## Sub defs, sub pragmas, sub body and parameters
+##
+
+rule sub_def {
+  <'.sub'>
+  [ <sub_id> | <syntax_error: sub identifier (id or string constant) expected> ]
+  <sub_pragmas>?
+  [ <?nl> | <syntax_error: newline expected> ]
+  <body>
+}
+
+rule sub_id {
+  [ <id> | <string_constant> ]
+}
+
+## The comma to separate the sub pragmas is optional.
+##
+rule sub_pragmas {
+  <sub_pragma>
+  [
+    [ <','> ]?
+    <sub_pragma>
+  ]*
+}
+
+rule sub_pragma {
+    <':load'>
+  | <':init'>
+  | <':immediate'>
+  | <':main'>
+  | <':anon'>
+  | <':lex'>
+  | <wrap_pragma>
+  | <vtable_pragma>
+  | <multi_pragma>
+  | <outer_pragma>
+}
+
+### This one is not sure yet
+rule wrap_pragma {
+  <':wrap'> <parenthesized_string>  
+}
+
+rule vtable_pragma {
+  <':vtable'> <parenthesized_string>?
+}
+
+rule parenthesized_string {
+  <'('>
+  [ <string_constant> | <syntax_error: string constant expected> ]
+  [ <')'>             | <syntax_error: ')' expected> ]
+}
+
+rule multi_pragma {
+  <':multi'>
+  [ <'('>    | <syntax_error: '(' expected after ':multi' flag> ]
+  <multi_types>?
+  [ <')'>    | <syntax_error: ')' expected to close ':multi' flag> ]
+}
+
+rule outer_pragma {
+  <':outer'>
+  [ <'('>    | <syntax_error: '(' expected after ':outer' flag> ]
+  [ <string_constant>
+  | <id>
+  | <syntax_error: identifier for outer sub expected>
+  ]
+  [ <')'>    | <syntax_error: ')' expected to close ':outer' flag> ]
+}
+
+rule multi_types {
+  <multi_type> [ <','> <multi_type> ]*
+}
+
+rule multi_type {
+    <type>
+  | <'_'>
+  | <keylist>
+  | <id>
+  | <string_constant>
+}
+
+rule body {
+  <param_decl>*
+  <pir_instr>*
+  [ <'.end'> | <syntax_error: '.end' expected to close method/sub body> ]
+}
+
+rule param_decl {
+  <'.param'>
+  [ [ <type> <id> ]
+  | <reg>
+  | <syntax_error: parameter type or register expected>
+  ]
+  <get_flags>?
+  [ <?nl>   | <syntax_error: newline expected after parameter declaration> ]
+}
+
+
+
+
+#
+# PIR instructions
+#
+
+
+rule pir_instr {
+  [ <label> <instr>?
+  | <instr>
+  ] 
+  [ <?nl> | <syntax_error: newline expected after instruction> ]
+}
+
+# this is a token, because no spaces are allowed between
+# the id and the colon.
+token label {
+  <id> <':'>
+}
+
+rule instr {
+    <local_decl>
+  | <lexical_decl>
+  | <const_def>
+  | <conditional_stat>
+  | <assignment_stat>
+  | <open_namespace>
+  | <close_namespace>
+  | <return_stat>
+  | <sub_invocation>
+  | <macro_invocation>
+  | <jump_stat>
+  | <pasm_instr>      
+  | <source_info>
+}
+
+rule macro_invocation {
+  <macro_id> <parenthesized_args>?
+}
+
+
+## Locals and Lexicals
+## 
+
+rule local_decl {
+  [ <'.local'> | <'.sym'> ]
+  [ <type> | <syntax_error: type for local symbol expected> ]
+  <local_id_list>
+}
+
+rule local_id_list {
+  <local_id> [ <','> <local_id> ]*
+}
+
+rule local_id {
+  <id> <local_flag>?
+}
+
+## Maybe more future flags for local symbols
+##
+rule local_flag {  
+  <':unique_reg'>
+}
+
+rule lexical_decl {
+  <'.lex'>
+  [ <string_constant> | <syntax_error: string constant expected> ]
+  [ <','>             | <syntax_error: ',' expected> ]
+  [ <reg>             | <syntax_error: register expected> ]
+}
+
+
+## Global definition
+##
+rule global_def {
+  <'.global'> [ <id> | <syntax_error: identifier expected> ]
+}
+
+## Const definitions, a check is done for the constant type and
+## the type of the constant value.
+##
+rule const_def {
+  <'.const'>
+  [ [ int <const_assign>
+      [ <int_constant>    | <syntax_error: integer constant expected> ]
+    ]
+  | [ num <const_assign>
+      [ <float_constant>  | <syntax_error: floating point constant expected> ]
+    ]
+  | [ pmc <const_assign>
+      [ <string_constant> | <syntax_error: string constant expected> ]
+    ]
+  | [ string <const_assign>
+      [ <string_constant> | <syntax_error: string constant expected> ]
+    ]
+  | <syntax_error: type expected for constant>
+  ]
+}
+
+rule const_assign {
+  [ <id>  | <syntax_error: constant identifier expected> ]
+  [ <'='> | <syntax_error: '=' expected after constant identifier> ]
+}
+
+
+## Conditional statements and expressions
+##
+
+rule conditional_stat {
+  [ <'if'> | <'unless'> ]
+  [ <'null'> <target>
+  | <simple_expr> [ <relational_operator> <simple_expr> ]?
+  ]
+  [ <'goto'> | <syntax_error: 'goto' expected> ]
+  [ <id> | <pasm_instr> | <syntax_error: label identifier expected> ]
+}
+
+
+## Jump statements
+##
+rule jump_stat {
+  <'goto'> [ <id> | <syntax_error: label expected after 'goto'> ]
+}
+
+
+
+## Expressions, adjusted from abc.pg
+##
+
+rule relational_operator {
+    <'=='>
+  | <'!='>
+  | <'<='>
+  | <'<'>
+  | <'>='>
+  | <'>'>
+}
+
+rule binary_operator {
+    <'+'>
+  | <'-'>
+  | <'/'>
+  | <'**'>
+  | <'*'>
+  | <'%'>
+  | <'<<'>  
+  | <'>>>'>
+  | <'>>'>  
+  | <'&&'>
+  | <'!!'>
+  | <'~~'>
+  | <'!'>
+  | <'&'>
+  | <'~'>
+  | <'.'>
+}
+
+rule unary_operator {
+    <'!'>  
+  | <'-'>
+  | <'~'>
+}
+
+
+rule expression {
+    [ <simple_expr> [ <binary_operator> <simple_expression> ]? ]
+  | [ <unary_operator> <simple_expr> ]
+}
+
+
+rule simple_expr {
+    <float_constant>
+  | <int_constant>
+  | <string_constant>
+  | <target>
+}
+
+
+rule keylist {
+  <'['>
+  <simple_expr> [ <','> <simple_expr> ]*
+  [ <']'> | <syntax_error: ']' expected> ]
+}
+
+
+
+
+## Assignments and misc. operations with a '=' sign
+##
+rule assignment_stat {
+    <target> <'='> <short_sub_call>
+  | <target> <'='> <target> <keylist>
+  | <target> <'='> <expression>
+  | <target> <'='> <pasm_op_1> <simple_expr>
+  | <target> <'='> <pasm_op_2> <simple_expr> \, <simple_expr>
+  | <target> <'='> <'new'> [ <int_constant> | <string_constant> | <macro_id> ]
+  | <target> <'='> <'new'> <keylist>
+  | <target> <'='> <'find_type'> [ <string_constant> | <string_reg> | <id> ]
+  | <target> <'='> <heredoc_string>
+  | <target> <'='> <'global'> <string_constant> # deprecated?  
+  | <target> <keylist> <'='> <simple_expr>  
+  | <'global'> <string_constant> <'='> <target> # deprecated?
+  | <result_var_list> [ <'='> | <syntax_error: '=' expected> ] <short_sub_call>
+}
+
+## Rewrite of assignment_stat
+##
+##rule assignment_stat {
+##  <target> <'='> <rhs>
+##| <target> <op_assign> <simple_expr>
+##| <target> <keylist> <'='> <simple_expr>
+##| <'global'> <string_constant> <'='> <target> # deprecated?
+##| <result_var_list> [ <'='> | <syntax_error: '=' expected> ] <short_sub_call>
+##}
+##
+##rule rhs {
+##  <short_sub_call>
+##| <expression>
+##| <pasm_op_1> <target>
+##| <pasm_op_2> <target> <','> <target>
+##| <'new'> [ <int_constant> | <string_constant> | <macro_id> ]
+##| <'find_type'> [ <string_constant> | <string_reg> | <id> ]
+##| <heredoc_string>
+##| <global'> <string_constant> # deprecated?
+##}
+
+# pasm ops that take 1 argument
+#
+rule pasm_op_1 {
+    clone
+  | compreg
+  | defined
+  | assign
+  | addr
+  | istrue
+  | isfalse
+  | isnull
+  #| others
+}
+
+# pasm ops that take 2 arguments
+#
+rule pasm_op_2 {
+    issame
+  | isntsame
+}
+
+rule heredoc_string {
+  <'<<'>
+  [ <string_constant> | <syntax_error: heredoc label identifier expected> ]
+  [ <?nl> | <syntax_error: newline expected after heredoc label> ]
+  <heredoc_string>
+  [ <heredoc_label> | <syntax_error: heredoc label expected> ]
+}
+
+token heredoc_label {
+  [ ^^ | <syntax_error: no whitespace allowed in front of a heredoc label> ]
+  <id>
+  [ $$ | <syntax_error: no whitespace allowed after a heredoc> ]
+}
+
+# fix this:
+rule heredoc_string {
+  [ \N | \n ]*
+}
+
+
+
+## Sub/method invocation
+##
+rule long_sub_call {
+  <'.pcc_begin'>
+  [ <?nl>  | <syntax_error: newline after '.pcc_begin' expected> ]
+  <arguments>
+  [ <'.pcc_call'> 
+  | <'.nci_call'> 
+  | <syntax_error: '.pcc_call' or '.nci_call' expected> 
+  ]
+  [ <target> | <syntax_error: id or register expected that holds the sub object> ]
+  [ <?nl>    | <syntax_error: newline after '.pcc_call sub' expected> ]
+  <result_values>
+  [ <'.pcc_end'>  | <syntax_error: '.pcc_end' expected> ]  
+}
+
+rule short_sub_call {
+  [ <target>\. ]?                  # optional object
+  [ <target> | <string_constant> ] # method or sub name/id
+  <parenthesized_args>             # sub args
+}
+
+rule sub_invocation {
+  [ <long_sub_call> | <short_sub_call> ]
+}
+
+rule result_var_list {
+  <'('>
+  <result_var>
+  [
+    <','> [ <result_var> | <syntax_error: target to store result expected after ','> ]
+  ]*
+  [ <')'> | <syntax_error: ')' expected to close result target list> ]
+}
+
+rule result_var {
+  <target> <get_flags>?
+}
+
+rule parenthesized_args {
+  <'('>
+  [
+    <arg>
+    [ <','>
+      [ <arg> | <syntax_error: argument expected after ','> ]
+    ]*
+  ]?
+  [ <')'> | <syntax_error: ')' expected to close argument list> ]
+}
+
+rule arg {
+  [ <float_constant>
+  | <int_constant>
+  | <string_constant>
+    [ <'=>'> 
+      [ <target> | <syntax_error: target for named argument expected> ]
+    ]?
+  | <target>
+  ] <set_flags>?
+}
+
+
+
+## Argument passing
+##
+rule arguments {
+  [ <'.arg'>
+    [ <simple_expr> | <syntax_error: argument expression expected> ]
+    <set_flags>?
+    [ <?nl> | <syntax_error: newline expected after .arg statement> ]
+  ]*
+}
+
+
+
+## Receiving return values
+##
+rule result_values {
+  [ <'.result'>
+    [ <target> | <syntax_error: target expected to hold the result> ]
+    <get_flags>?
+    [ <?nl>  | <syntax_error: newline expected after .result statement> ]
+  ]*
+}
+
+## flags for setting arguments and return values
+##
+rule set_flags {
+  [ <':flat'>
+  | <named_flag>
+  ]+
+}
+
+## flags for getting parameters and result values
+##
+rule get_flags {
+  [ <':slurpy'>
+  | <':optional'>
+  | <':opt_flag'>
+  | <named_flag>
+  ]+
+}
+
+rule named_flag {
+  <':named'> <parenthesized_string>?
+}
+
+
+## Returning values
+##
+rule return_stat {  
+    <long_return_stat>
+  | <short_return_stat>
+  | <long_yield_stat> 
+  | <short_yield_stat>
+  | <tail_call>
+}
+
+rule long_return_stat {
+  <'.pcc_begin_return'>
+  [ <?nl> | <syntax_error: newline expected after '.pcc_begin_return'> ]
+  [ <return_directive> ]*
+  [ <'.pcc_end_return'> | <syntax_error: '.pcc_end_return' expected> ]
+}
+
+rule short_return_stat {
+  <'.return'> <parenthesized_args> 
+}
+
+rule long_yield_stat {
+  <'.pcc_begin_yield'>
+  [ <?nl> | <syntax_error: newline expected after '.pcc_begin_yield'> ]
+  [ <return_directive> ]*
+  [ <'.pcc_end_yield'> | <syntax_error: '.pcc_end_yield' expected> ]
+}
+
+rule return_directive {
+  <'.return'>
+  [ <simple_expr> | <syntax_error: simple expression expected> ]
+  <set_flags>?
+  [ <?nl> | <syntax_error: newline expected after return directive> ]
+}
+
+rule short_yield_stat {
+  <'.yield'> <parenthesized_args> 
+}
+
+rule tail_call {
+  <'.return'> <short_sub_call>
+}
+
+
+
+## Namespaces
+##
+rule open_namespace {
+  <'.namespace'> [ <id> | <syntax_error: namespace identifier expected> ]
+}
+
+rule close_namespace {
+  <'.endnamespace'> [ <id> | <syntax_error: namespace identifier expected> ]
+}
+
+#
+# Emit
+#
+rule emit {
+  <'.emit'>
+  [ <?nl>        | <syntax_error: newline expected> ]
+  <pir_instr>*
+  [ <'.eom'>     | <syntax_error: '.eom' expected> ]
+}
+
+#
+# Macro
+#
+rule macro_def {
+  <'.macro'>
+  [ <id> | <syntax_error: macro identifier expected> ]
+  <macro_parameters>?
+  [ <?nl> | <syntax_error: newline expected after macro parameter list> ]
+  <macro_body>
+
+}
+
+rule macro_parameters {
+  <'('>
+  <id_list>?
+  [ <')'>   | <syntax_error: ')' expected> ]
+}
+
+#### TODO: FIX
+regex macro_body {
+  .*?
+  <'.endm'> \h* \n
+}
+
+
+#
+# Pragmas
+#
+rule pragma {
+    <include>
+  | <new_operators>
+  | <loadlib>
+  | <namespace>
+  | <hll_specifier>
+  | <hll_mapping>
+  | <source_info>
+}
+
+rule include {
+  <'.include'> [ <string_constant> | <syntax_error: string constant expected> ]
+}
+
+rule new_operators {
+  <'.pragma'> <'n_operators'> [ <int_constant> | <syntax_error: integer constant expected> ]
+}
+
+rule loadlib {
+  <'.loadlib'> [ <string_constant> | <syntax_error: library name expected> ]
+}
+
+rule namespace {
+  <'.namespace'> 
+  [ <'['>             | <syntax_error: '[' expected> ]
+  [ <namespace_id>    | <syntax_error: namespace identifier expected> ]
+  [ <']'>             | <syntax_error: ']' expected> ]
+}
+
+rule hll_specifier {
+  <'.HLL'>
+  [ <string_constant> | <syntax_error: HLL name expected> ]
+  [ <','>             | <syntax_error: ',' expected> ]
+  [ <string_constant> | <syntax_error: HLL type library expected> ]
+}
+
+rule hll_mapping {
+  <'.HLL_map'>
+  [ <int_constant>    | <syntax_error: Parrot Core type expected> ]
+  [ <','>             | <syntax_error: ',' expected> ]
+  [ <int_constant>    | <syntax_error: HLL type expected> ]
+}
+
+rule namespace_id {
+  <string_constant>
+  [ <';'>
+    [ <string_constant> | <syntax_error: string constant expected> ]
+  ]*
+}
+
+rule source_info {
+  <'.line'> <int_constant> [ \, <string_constant> ]?
+}
+
+
+
+rule id_list {
+  <id>
+  [
+    <','>
+    [ <id> | <syntax_error: identifier expected> ]
+  ]*
+}
+
+
+#
+# Tokens
+#
+
+token int_constant {
+    [-]? \d+
+  | <binary_constant>
+  | <hex_constant>
+}
+
+# FIXTHIS
+regex hex_constant {
+  \d+
+}
+
+# FIXTHIS
+regex binary_constant {
+  \d+
+}
+
+token float_constant {
+  [-]? \d+\.\d+
+}
+
+
+rule string_constant {
+  <charset_specifier>? 
+  [ <stringdouble> | <stringsingle> ]
+}
+
+
+rule charset_specifier {
+  [ <'ascii:'> | <'binary:'> | <'unicode:'> | <'iso-8859-1:'> ]  
+}
+
+regex stringdouble { <PGE::Text::bracketed: "> }
+regex stringsingle { <PGE::Text::bracketed: '> }
+
+## TODO: add other built-in types
+rule type {
+  [ <'int'> 
+  | <'num'> 
+  | <'pmc'> 
+  | <'string'>   
+  | <'Array'> 
+  | <'Hash'> 
+  ]
+}
+
+token target {
+  [ <id> | <reg> ]
+}
+
+token id {
+  <!keyword> \w+
+}
+
+token macro_id {
+  <!keyword> \.\w+
+}
+
+token reg {
+  [ <int_reg> | <num_reg> | <pmc_reg> | <string_reg> ]
+}
+
+token int_reg {
+    I\d<[\d]>?  # match I0 to I99
+  | \$I\d+      # match $I0 to infinity
+}
+
+token string_reg {
+    S\d<[\d]>?
+  | \$S\d+
+}
+
+token pmc_reg {
+    P\d<[\d]>?
+  | \$P\d+
+}
+
+token num_reg {
+    N\d<[\d]>?
+  | \$N\d+
+}
+
+## whitespace is any space character but not a newline char,
+## a comment, or a pod comment 
+##
+token ws {
+  [ [ \s & \N ]+  
+  | \# \N*
+  | ^^ <?pod_comment>
+  ]*
+}
+
+
+
+
+
+# match the set of a newline and possible indention space 1 or more times
+# this is necessary to be able to skip fully white lines (with some spaces/tabs in it).
+# However, therefore it is also necessary to put the comments skipping here as well.
+
+
+token nl {
+  [ \n <?ws> ]+
+}
+
+## taken from perl6.pg
+##
+regex pod_comment {
+    ^^ = [ [ cut \h*: | end [\h\N*]? ]
+         | for [ \h\N+: ] \n [ \N+\n ]*:
+         | \w\N*: \n .*? \n = [ cut \h*: | end [\h\N*:]? ]
+         ]
+         [\n|$]
+}
+
+# PIR directives, PASM instructions and
+# the Parrot datatypes (int, string, num, pmc)
+# are keywords, and must not be used as
+# identifiers.
+#
+token keyword {
+    <pir_directive>
+  | <pasm_instruction> # pasm instructions may be identifiers in IMCC
+  | <type>  
+}
+
+# TODO: put this in <%pir_directive>
+# PIR directives
+#
+token pir_directive {
+    <'.arg'>    
+  | <'.const'>
+  | <'.emit'>
+  | <'.end'>
+  | <'.endnamespace'>
+  | <'.eom'>  
+  | <'.get_results'>
+  | <'.global'>
+  | <'.HLL_map'>
+  | <'.HLL'>
+  | <'.immediate'>
+  | <'.include'>
+  | <'.lex'>
+  | <'.line'>
+  | <'.loadlib'>
+  | <'.local'>
+  | <'.namespace'>
+  | <'.nci_call'>
+  | <'.param'>
+  | <'.pcc_begin_return'>
+  | <'.pcc_begin_yield'>
+  | <'.pcc_begin'>
+  | <'.pcc_call'>
+  | <'.pcc_end_return'>
+  | <'.pcc_end_yield'>
+  | <'.pcc_end'>  
+  | <'.pragma'>
+  | <'.return'>
+  | <'.sub'>
+  | <'.sym'>  
+  | <'.result'>  
+  | <'.yield'>
+}

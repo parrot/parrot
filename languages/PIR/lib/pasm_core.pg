@@ -1,0 +1,154 @@
+grammar PIRGrammar;
+  
+  
+rule core_op {
+  #
+  # basic
+  #
+  end
+| noop
+| reserved        <int_constant> 
+| load_bytecode   <arg_string>
+  #
+  # control flow
+  #
+| branch          <arg_int>
+| branch_cs       <arg_string>
+| bsr             <arg_int>
+| ret
+| jsr <arg_int>
+| enternative
+  # conditional branch
+| if              <var> \, <arg_int>
+| unless          <var> \, <arg_int>
+  # subroutine ops
+| invokecc        <arg_pmc_var> 
+| invoke          <arg_pmc_var> \, <arg_pmc_var>
+| yield
+| tailcall        <arg_pmc_var>
+| returncc
+| newclosure      <arg_pmc_var> \, <arg_pmc_var>
+  # function args ops
+| set_args        <arg_set_args>
+| get_results     <arg_get_results> 
+| get_params      <arg_get_params>
+| set_returns     <arg_set_returns>
+| result_info     <arg_hack>
+  # address manipulation  
+| set_addr        <arg_hack> #<var> \, <int_constant>
+| get_addr        <arg_hack> #<var> \, <var> 
+  # exception handling
+| push_eh             <arg_hack> #<id>
+| clear_eh            <arg_hack> #
+| throw               <arg_hack> #<var>
+| rethrow             <arg_hack> #<var>
+| die                 <arg_hack> #<int_constant> \, <int_constant>
+| exit                <arg_hack> #<int_constant> 
+| pushmark            <arg_hack> #<int_constant>
+| popmark             <arg_hack> #<int_constant>
+| pushaction          <arg_hack> #<var>
+  # interpreter ops
+| debug               <arg_hack> #<int_constant>
+| bounds              <arg_hack> #<int_constant>
+| profile             <arg_hack> #<int_constant>
+| trace               <arg_hack> #<int_constant>
+| gc_debug            <arg_hack> #<int_constant>
+| interpinfo          <arg_hack> #<var> \, <int_constant>
+| warningson          <arg_hack> #<int_constant>
+| warningsoff         <arg_hack> #<int_constant>
+| errorson            <arg_hack> #<int_constant>
+| errorsoff           <arg_hack> #<int_constant>
+| runinterp           <arg_hack> #<var> \, <int_constant>
+| getinterp           <arg_hack> #<var> 
+  # DOD/GC            
+| sweep               <arg_hack> #<int_constant>
+| collect             
+| sweepoff            
+| sweepon             
+| collectoff          
+| collecton           
+| needs_destroy       <arg_hack> #<var>
+  # NCI               
+| loadlib             <arg_hack> #<var> \, <var>
+| dlfunc              <arg_hack> #<var> \, <var> \, <var> \, <var>
+| dlvar               <arg_hack> #<var> \, <var> \, <var>
+| compreg             <arg_hack> #<var> \, <var>
+| new_callback        <arg_hack> #<var> \, <var> \, <var> \, <var>
+}
+grammar PIRGrammar;
+  
+  
+rule core_op {
+  #
+  # basic
+  #
+  end
+| noop
+| reserved        <int_constant> 
+| load_bytecode   <arg_string>
+  #
+  # control flow
+  #
+| branch          <arg_int>
+| branch_cs       <arg_string>
+| bsr             <arg_int>
+| ret
+| jsr <arg_int>
+| enternative
+  # conditional branch
+| if              <var> \, <arg_int>
+| unless          <var> \, <arg_int>
+  # subroutine ops
+| invokecc        <arg_pmc_var> 
+| invoke          <arg_pmc_var> \, <arg_pmc_var>
+| yield
+| tailcall        <arg_pmc_var>
+| returncc
+| newclosure      <arg_pmc_var> \, <arg_pmc_var>
+  # function args ops
+| set_args        <arg_set_args>
+| get_results     <arg_get_results> 
+| get_params      <arg_get_params>
+| set_returns     <arg_set_returns>
+| result_info     <arg_hack>
+  # address manipulation  
+| set_addr        <arg_hack> #<var> \, <int_constant>
+| get_addr        <arg_hack> #<var> \, <var> 
+  # exception handling
+| push_eh             <arg_hack> #<id>
+| clear_eh            <arg_hack> #
+| throw               <arg_hack> #<var>
+| rethrow             <arg_hack> #<var>
+| die                 <arg_hack> #<int_constant> \, <int_constant>
+| exit                <arg_hack> #<int_constant> 
+| pushmark            <arg_hack> #<int_constant>
+| popmark             <arg_hack> #<int_constant>
+| pushaction          <arg_hack> #<var>
+  # interpreter ops
+| debug               <arg_hack> #<int_constant>
+| bounds              <arg_hack> #<int_constant>
+| profile             <arg_hack> #<int_constant>
+| trace               <arg_hack> #<int_constant>
+| gc_debug            <arg_hack> #<int_constant>
+| interpinfo          <arg_hack> #<var> \, <int_constant>
+| warningson          <arg_hack> #<int_constant>
+| warningsoff         <arg_hack> #<int_constant>
+| errorson            <arg_hack> #<int_constant>
+| errorsoff           <arg_hack> #<int_constant>
+| runinterp           <arg_hack> #<var> \, <int_constant>
+| getinterp           <arg_hack> #<var> 
+  # DOD/GC            
+| sweep               <arg_hack> #<int_constant>
+| collect             
+| sweepoff            
+| sweepon             
+| collectoff          
+| collecton           
+| needs_destroy       <arg_hack> #<var>
+  # NCI               
+| loadlib             <arg_hack> #<var> \, <var>
+| dlfunc              <arg_hack> #<var> \, <var> \, <var> \, <var>
+| dlvar               <arg_hack> #<var> \, <var> \, <var>
+| compreg             <arg_hack> #<var> \, <var>
+| new_callback        <arg_hack> #<var> \, <var> \, <var> \, <var>
+}

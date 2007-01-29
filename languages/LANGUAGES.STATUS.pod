@@ -854,6 +854,35 @@ http://www.akbkhome.com/blog.php/View/44/Latest_in_Vapourware_PintCompiler__dbdo
 =back
 
 
+=head2 PIR
+
+=over 4
+
+=item Author
+
+Klaas-Jan Stol
+
+=item Description
+
+A PIR compiler using Parrot compiler tools.
+
+=item Status
+
+Initial implementation. Not complete.
+Only Parser currently (using PGE).
+
+=item Last verified with parrot version
+
+0.4.8
+
+=item location
+
+languages/PIR
+
+=back
+
+
+
 =head2 Plumhead
 
 =over 4
@@ -1289,4 +1318,5 @@ Infocom's Z-machine. See also http://en.wikipedia.org/wiki/Z-machine.
 C<languges/Zcode>
 
 =back
+
 
