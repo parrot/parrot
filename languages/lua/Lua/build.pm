@@ -1140,7 +1140,10 @@ sub BuildReturn {
         my $expr = $exprs->[0];
         if ( scalar $expr->[1] ) {
             my @opcodes = @{ $expr->[1] };
-            if ( scalar @opcodes and $opcodes[-1]->isa('CallOp') ) {
+            if (    scalar @opcodes
+                and $opcodes[-1]->isa('CallOp')
+                and !exists $opcodes[-1]->{result}->[0]->{pragma} )
+            {
                 my $call = pop @opcodes;
                 my $ass = pop @opcodes;
                 my $loc = pop @opcodes;

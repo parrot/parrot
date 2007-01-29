@@ -21,7 +21,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'object' );
@@ -164,6 +164,10 @@ CODE
 -100
 OUT
 
+TODO:
+{
+    local $TODO = 'pb with tail call ?';
+
 language_output_is( 'lua', <<'CODE', <<'OUT', 'multiple inheritance' );
 -- look up for 'k' in list of tables 'plist'
 local function search (k, plist)
@@ -180,9 +184,69 @@ function createClass (...)
     -- class will search for each method in the list of its
     -- parents ('arg' is the list of parents)
     setmetatable(c, {__index = function (t, k)
+        return search(k, arg)
+    end})
+
+    -- prepare 'c' to be the metatable of its instance
+    c.__index = c
+
+    -- define a new constructor for this new class
+    function c:new (o)
+        o = o or {}
+        setmetatable(o, c)
+        return o
+    end
+
+    -- return new class
+    return c
+end
+
+Account = {balance = 0}
+function Account:deposit (v)
+    self.balance = self.balance + v
+end
+function Account:withdraw (v)
+    self.balance = self.balance - v
+end
+
+Named = {}
+function Named:getname ()
+    return self.name
+end
+function Named:setname (n)
+    self.name = n
+end
+
+NamedAccount = createClass(Account, Named)
+
+account = NamedAccount:new{name = "Paul"}
+print(account:getname())
+account:deposit(100.00)
+print(account.balance)
+CODE
+Paul
+100
+OUT
+}
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'multiple inheritance (patched)' );
+-- look up for 'k' in list of tables 'plist'
+local function search (k, plist)
+    for i=1, #plist do
+        local v = plist[i][k]  -- try 'i'-th superclass
+        if v then return v end
+    end
+end
+
+function createClass (...)
+    local c = {}  -- new class
+    local arg = {...}
+
+    -- class will search for each method in the list of its
+    -- parents ('arg' is the list of parents)
+    setmetatable(c, {__index = function (t, k)
         -- return search(k, arg)
-        local r = search(k, arg)
-        return r
+        return (search(k, arg))
     end})
 
     -- prepare 'c' to be the metatable of its instance

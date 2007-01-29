@@ -23,7 +23,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 14;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'add' );
@@ -218,6 +218,40 @@ CODE
 1
 0
 end	0
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'no tail call' );
+local function foo (n)
+    print(n)
+    if n > 0 then
+        return (foo(n -1))
+    end
+    return 'end', 0
+end
+
+print(foo(3))
+CODE
+3
+2
+1
+0
+end
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'no tail call' );
+local function foo (n)
+    print(n)
+    if n > 0 then
+        foo(n -1)
+    end
+end
+
+foo(3)
+CODE
+3
+2
+1
+0
 OUT
 
 # Local Variables:
