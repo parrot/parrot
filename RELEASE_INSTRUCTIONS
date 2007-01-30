@@ -76,6 +76,10 @@ To prepare a release:
 
     8.  Upload to CPAN.
 
+        NOTE: you may get a failure message from the CPAN Indexer about
+        the content of META.yml. Don't worry, the tarball still uploaded okay.
+        You can fix META.yml after the release.
+
     9.  Compose and send out the announcements -- parrot-porters,
         perl6-language, perl6-announce, perl5-porters, use Perl, PerlMonks,
         comp.lang.perl.misc, etc. Don't forget to include the next
