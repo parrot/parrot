@@ -37,24 +37,33 @@ pmcs:
 # makes life go horribly wrong if $(CC) contains spaces but can't have -I
 # arguments (etc) injected in the middle.
 # There is probably a better way to do this, but I can't work it out right now.
-.c$(O) :   
+.c$(O) :
 	@$(PERL) ../../tools/dev/cc_flags.pl ../../CFLAGS $(CC) "" $(CFLAGS) -I@build_dir@@slash@include @cc_o_out@$@ -c $<
 
 test:	pmcs
 	prove -r t
 
-CLEANERS = \
-"$(OPSDIR)/*.c" \
-"$(OPSDIR)/*.h" \
-"$(OPSDIR)/*$(O)" \
-"$(OPSDIR)/*.bundle" \
-"$(OPSDIR)/*.exp" \
-"$(OPSDIR)/*.ilk" \
-"$(OPSDIR)/*.lib" \
-"$(OPSDIR)/*.pdb"
+TEST_CLEANERS = \
+ "t\\*.pasm" \
+ "t\\*.pir"
+
+testclean:
+	$(RM_F) $(TEST_CLEANERS)
+
+BUILD_CLEANERS = \
+ "$(PMCDIR)/*.c" \
+ "$(PMCDIR)/*.h" \
+ "$(PMCDIR)/*.dump" \
+ "$(PMCDIR)/*$(LOAD_EXT)" \
+ "$(PMCDIR)/*$(O)" \
+ "$(PMCDIR)/*.bundle" \
+ "$(PMCDIR)/*.exp" \
+ "$(PMCDIR)/*.ilk" \
+ "$(PMCDIR)/*.lib" \
+ "$(PMCDIR)/*.pdb"
 
 clean:
-	$(RM_F) $(CLEANERS)
+	$(RM_F) $(BUILD_CLEANERS) $(TEST_CLEANERS)
 
 distclean: clean
 	$(RM_F) Makefile
