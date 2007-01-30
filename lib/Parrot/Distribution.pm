@@ -91,7 +91,7 @@ sub _initialize {
         unless $self;
 
     if( defined $dist ) {
-        $self->_manifest_files( [
+        $self->_dist_files( [
             sort keys %{ ExtUtils::Manifest::maniread(
                 File::Spec->catfile( $self->path, "MANIFEST" )
             ) },
@@ -110,7 +110,7 @@ sub _croak {
 
 
 BEGIN {
-    my @getter_setters = qw{ _manifest_files };
+    my @getter_setters = qw{ _dist_files };
 
     for my $method ( @getter_setters ) {
         no strict 'refs';
@@ -225,13 +225,13 @@ BEGIN {
             *{ $method . '_file_directories' } = sub {
                 my $self = shift;
 
-                # Look through the manifest
+                # Look through the list of distribution files
                 # for files ending in the proper extension(s)
                 # and make a hash out of the directories
                 my %dirs =
                     map { ( ( File::Spec->splitpath($_) )[1] => 1 ) }
                     grep { m|(?i)(?:$filter_ext)| }
-                    $self->_manifest_files;
+                    $self->_dist_files;
 
                 # Filter out ignored directories
                 # and return the results
@@ -268,14 +268,14 @@ BEGIN {
             *{ $method . '_files' } = sub {
                 my( $self ) = @_;
 
-                # Look through the manifest
+                # Look through the list of distribution files
                 # for files ending in the proper extension(s)
                 # and return a sorted list of filenames
                 return
                     sort
                     map { $self->file_with_name($_) }
                     grep { m|(?i)(?:$filter_ext)| }
-                    $self->_manifest_files;
+                    $self->_dist_files;
             };
         }
     }
