@@ -11,12 +11,12 @@ use Parrot::Test tests => 1;
 
 =head1 NAME
 
-t/dynpmc/perlenv.t - test the PerlEnv PMC
+t/perlenv.t - test the PerlEnv PMC
 
 
 =head1 SYNOPSIS
 
-    % prove t/dynpmc/perlenv.t
+    % prove t/perlenv.t
 
 =head1 DESCRIPTION
 

@@ -11,11 +11,11 @@ use Parrot::Test tests => 4;
 
 =head1 NAME
 
-t/dynpmc/sparse_perlarray.t - testing sparse arrays using the PerlArray PMC
+t/sparse_perlarray.t - testing sparse arrays using the PerlArray PMC
 
 =head1 SYNOPSIS
 
-    % prove t/dynpmc/sparse_perlarray.t
+    % prove t/sparse_perlarray.t
 
 =head1 DESCRIPTION
 

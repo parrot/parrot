@@ -30,8 +30,8 @@ sub runstep {
 
     my @languages = qw{
         APL amber abc befunge bf cardinal c99 cola ecmascript forth HQ9plus
-        jako lisp lua m4 ook parrot_compiler perl6 pheme PIR plumhead pugs punie
-        regex scheme tap urm WMLScript Zcode
+        jako lisp lua m4 ook parrot_compiler perl5 perl6 pheme PIR plumhead
+        pugs punie regex scheme tap urm WMLScript Zcode
     };
 
     foreach my $language (@languages) {

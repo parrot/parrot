@@ -29,6 +29,7 @@ LANGUAGES = \
     m4 \
     ook \
     parrot_compiler \
+    perl5 \
     perl6 \
     pheme \
     PIR \

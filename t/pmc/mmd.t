@@ -23,7 +23,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUTPUT', "PASM divide" );
+pir_output_is( <<'CODE', <<'OUTPUT', "PASM divide", todo=>'RT #41374');
 
 .sub 'test' :main
 
@@ -508,7 +508,7 @@ ok 1
 42
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'MMD on PMC types' );
+pir_output_is( <<'CODE', <<'OUT', 'MMD on PMC types', todo=>'RT #41374' );
 .sub 'test' :main
     .local  pmc  lib_perl_group
     lib_perl_group    = loadlib 'perl_group'
@@ -549,7 +549,7 @@ PerlSt ok 3
 String ok 4
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types quoted" );
+pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types quoted", todo=>'RT #41374' );
 .sub main :main
     .local  pmc  lib_perl_group
     lib_perl_group    = loadlib 'perl_group'
@@ -590,7 +590,7 @@ PerlSt ok 3
 String ok 4
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', "MMD on PMC types, invalid" );
+pir_output_like( <<'CODE', <<'OUT', "MMD on PMC types, invalid", todo=>'RT #41374' );
 .sub main :main
     .local  pmc  lib_perl_group
     lib_perl_group    = loadlib 'perl_group'
@@ -634,7 +634,7 @@ String ok 4
 Null PMC access in invoke\(\)/
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types 3" );
+pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types 3", todo=>'RT #41374' );
 .sub main :main
     .local  pmc  lib_perl_group
     lib_perl_group    = loadlib 'perl_group'
@@ -689,7 +689,7 @@ String ok 4
 Intege 42
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types, global namespace" );
+pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types, global namespace", todo=>'RT #41374' );
 .sub main :main
     .local  pmc  lib_perl_group
     lib_perl_group    = loadlib 'perl_group'
@@ -732,7 +732,7 @@ PerlSt ok 3
 String ok 4
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types, package namespace" );
+pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types, package namespace", todo=>'RT #41374' );
 
 .namespace ["Some"]
 
@@ -778,7 +778,7 @@ PerlSt ok 3
 String ok 4
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types - Any" );
+pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types - Any", todo=>'RT #41374' );
 
 .sub main :main
     .local  pmc  lib_perl_group
@@ -871,7 +871,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "__add as method - inherited" );
+pir_output_is( <<'CODE', <<'OUTPUT', "__add as method - inherited", todo=>'RT #41374' );
 .sub main :main
     .local  pmc  lib_perl_group
     lib_perl_group    = loadlib 'perl_group'

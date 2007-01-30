@@ -11,11 +11,11 @@ use Parrot::Test tests => 13;
 
 =head1 NAME
 
-t/dynpmc/perlundef.t - testing the PerlUndef PMC
+t/perlundef.t - testing the PerlUndef PMC
 
 =head1 SYNOPSIS
 
-    % prove t/dynpmc/perlundef.t
+    % prove t/perlundef.t
 
 =head1 DESCRIPTION
 

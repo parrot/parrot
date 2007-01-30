@@ -763,6 +763,20 @@ C<languages/parrot_compiler>
 
 =back
 
+=head2 Perl 5
+
+=over 4
+
+=item Description
+
+Primarily a repository for some perl5-specific functionality that was
+heavily used in early parrot development. This code is not slated for use
+with the Perl 6 implementation, and core parrot PMCs exist that provide
+much of the functionality here.
+
+This directory may be removed in a future release.
+
+=back
 
 =head2 Perl 6 parser/compiler
 

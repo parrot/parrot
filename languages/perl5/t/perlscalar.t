@@ -11,11 +11,11 @@ use Parrot::Test tests => 3;
 
 =head1 NAME
 
-t/dynpmc/perlscalar.t - test Perl non-container PMCs
+t/perlscalar.t - test Perl non-container PMCs
 
 =head1 SYNOPSIS
 
-    % prove t/dynpmc/perlscalar.t
+    % prove t/perlscalar.t
 
 =head1 DESCRIPTION
 

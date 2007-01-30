@@ -26,11 +26,11 @@ C<Continuation> PMCs.
 =cut
 
 my $temp      = "temp.pasm";
-my $load_perl = <<'END_PASM';
+my $load_types = <<'END_PASM';
     loadlib P20, 'perl_group'
-    find_type I24, 'PerlInt'
-    find_type I25, 'PerlNum'
-    find_type I28, 'PerlUndef'
+    find_type I24, 'Integer'
+    find_type I25, 'Float'
+    find_type I28, 'Undef'
 END_PASM
 
 END {
@@ -756,7 +756,7 @@ OUTPUT
 
 # This is the behavior of Parrot 0.4.3
 # XXX Should there be a warning ?
-pir_output_is( <<'CODE', '', 'warn on in main' );
+pir_output_is( <<'CODE', '', 'warn on in main');
 .sub _main :main
 .include "warnings.pasm"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
@@ -786,7 +786,7 @@ OUTPUT
 # XXX This is the behavior of Parrot 0.4.3
 # It looks like core PMCs never emit warning.
 # Look in perlundef.t for a more sane test of 'warningson' in subs
-pir_output_is( <<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2" );
+pir_output_is( <<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
 .sub _main :main
 .include "warnings.pasm"
     _f1()
@@ -1115,14 +1115,14 @@ CODE
 2301
 OUTPUT
 
-pir_output_like( <<"CODE", <<'OUTPUT', 'warn on in main' );
+pir_output_like( <<"CODE", <<'OUTPUT', 'warn on in main', todo => "XXX core undef doesn't warn here. Should it?");
 .sub 'test' :main
 .include "warnings.pasm"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
     _f1()
 .end
 .sub _f1
-$load_perl
+$load_types
 
     P0 = new I28
     print P0
@@ -1133,7 +1133,7 @@ OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'warn on in sub' );
 .sub 'test' :main
-$load_perl
+$load_types
 .include "warnings.pasm"
     _f1()
     P0 = new I28
@@ -1147,9 +1147,9 @@ CODE
 ok
 OUTPUT
 
-pir_output_like( <<"CODE", <<'OUTPUT', 'warn on in sub, turn off in f2' );
+pir_output_like( <<"CODE", <<'OUTPUT', 'warn on in sub, turn off in f2', todo=> "XXX core undef doesn't warn here. Should it?");
 .sub 'test' :main
-$load_perl
+$load_types
 .include "warnings.pasm"
     _f1()
     P0 = new I28
@@ -1158,7 +1158,7 @@ $load_perl
     print "ok\\n"
 .end
 .sub _f1
-$load_perl
+$load_types
     warningson .PARROT_WARNINGS_UNDEF_FLAG
     _f2()
     P0 = new I28

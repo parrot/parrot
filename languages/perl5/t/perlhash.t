@@ -11,11 +11,11 @@ use Parrot::Test tests => 38;
 
 =head1 NAME
 
-t/dynpmc/perlhash.t - testing the PerlHash PMC
+t/perlhash.t - testing the PerlHash PMC
 
 =head1 SYNOPSIS
 
-    % prove t/dynpmc/perlhash.t
+    % prove t/perlhash.t
 
 =head1 DESCRIPTION
 

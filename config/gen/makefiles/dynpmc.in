@@ -19,36 +19,7 @@ PMCS = \
 #CONDITIONED_LINE(has_gdbm):gdbmhash \
   match \
   matchrange \
-  perlarray perlhash perlnum perlstring perlenv perlint perlscalar perlundef \
   subproxy 
-
-DISABLED_PMCS = \
-  pybuiltin \
-  pyclass \
-  pyobject \
-  pyboolean \
-  pycomplex \
-  pydict \
-  pyexception \
-  pyfloat \
-  pyfunc \
-  pyboundmeth \
-  pyboundcall \
-  pynci \
-  pystaticmeth \
-  pygen \
-  pyint \
-  pylist \
-  pylong \
-  pymodule \
-  pynone \
-  pytype \
-  pyslice \
-  pystring \
-  pytuple \
-  pyproxytype \
-  pyproxyclass \
-  pyiter
 
 BUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl
 

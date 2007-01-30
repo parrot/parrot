@@ -12,11 +12,11 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/dynpmc/perlint.t - Perl Integers
+t/perlint.t - Perl Integers
 
 =head1 SYNOPSIS
 
-    % prove t/dynpmc/perlint.t
+    % prove t/perlint.t
 
 =head1 DESCRIPTION
 
