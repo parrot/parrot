@@ -86,7 +86,7 @@ lib/ASTGrammar.pbc: lib/ASTGrammar.tg
 
 
 test: all
-	$(PERL) runtests.pl
+	$(PERL) -Ilib -I../../lib t/harness
 
 
 clean:

@@ -86,13 +86,13 @@
     # for faster edit-compile-test cycles.
     # Compiling the file pasm_grammar takes ages
     # due to the large number of instructions.
-    load_bytecode 'lib/pir_grammar_gen.pbc'
-    load_bytecode 'lib/pasm_grammar_gen.pbc'
-    load_bytecode 'lib/pasm_args_gen.pbc'
-    load_bytecode 'lib/pasm_instr_gen.pbc'
-    load_bytecode 'lib/pasm_io_gen.pbc'
-    load_bytecode 'lib/pasm_pmc_gen.pbc'
-    load_bytecode 'lib/pasm_core_gen.pbc'
+    load_bytecode 'languages/PIR/lib/pir_grammar_gen.pbc'
+    load_bytecode 'languages/PIR/lib/pasm_grammar_gen.pbc'
+    load_bytecode 'languages/PIR/lib/pasm_args_gen.pbc'
+    load_bytecode 'languages/PIR/lib/pasm_instr_gen.pbc'
+    load_bytecode 'languages/PIR/lib/pasm_io_gen.pbc'
+    load_bytecode 'languages/PIR/lib/pasm_pmc_gen.pbc'
+    load_bytecode 'languages/PIR/lib/pasm_core_gen.pbc'
 .end
 
 
@@ -150,13 +150,13 @@ no_line_nr_method:
 
 =head1 LICENSE
 
-Copyright (C) 2005-2007, The Perl Foundation.
+Copyright (C) 2007, The Perl Foundation.
 
 This is free software; you may redistribute it and/or modify
 it under the same terms as Parrot.
 
 =head1 AUTHOR
 
-Klaas-Jan Stol <klaasjan@topavond.nl>
+Klaas-Jan Stol <parrotcode@gmail.com>
 
 =cut
