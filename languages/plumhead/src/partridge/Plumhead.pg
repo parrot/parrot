@@ -9,26 +9,29 @@ token TOP         { <program> }
 
 regex sea         { .* <before: \<> }
 
-token DOUBLEQUOTE_STRING      { ' <-[']>* ' }
+token DOUBLEQUOTE_STRING      { " <-["]>* " }
 
 token SINGLEQUOTE_STRING      { ' <-[']>* ' }
+
+token NUMBER                  { 1 }
 
 token start_code  { \< \? p h p }
 
 token end_code    { \? \> }
 
-token echo        { echo }
+token echo        { e c h o }
 
 token ws          { \s* }
 
 rule  statement   { <echo> }
 
-rule  program     { ^<sea><code>? }
+token program     { ^ <sea> <code> }
 
-rule  code        { <start_code> <statement>? <end_code> }
+rule  code        { <start_code> <statement>* <end_code> }
 
 rule statement    { <echo> <expression> ; }
 
-token expression  {   DOUBLEQUOTE_STRING
-                    | SINGLEQUOTE_STRING
-                  }
+token expression  { <DOUBLEQUOTE_STRING> | <adding_expression> }
+
+rule adding_expression { <NUMBER> }
+
