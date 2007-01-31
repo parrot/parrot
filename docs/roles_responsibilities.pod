@@ -5,12 +5,12 @@
 
 This document describes the roles and responsibilities of parties involved in
 the Parrot project. Roles are divided into three categories (Project Team,
-Committers, Contributors,) and may be further subdivided.
+Committers, Contributors) and may be further subdivided.
 
 =head1 Project Team
 
 Members of the Project Team set the overall direction of the project, track
-project progress, oversee the project source (and access to that source,) and
+project progress, oversee the project source (and access to that source), and
 develop and maintain the project. The Project Team consists of positions
 selected on the basis of available volunteers, and a general evaluation of
 suitable skills by existing Project Team members.
