@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2005-2006, The Perl Foundation.
-$Id: luathread.pmc 14874 2006-10-09 22:03:46Z bernhard $
+$Id$
 
 =head1 NAME
 

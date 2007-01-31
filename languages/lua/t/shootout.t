@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: shootout.t $
+# $Id$
 
 =head1 NAME
 

@@ -1,4 +1,4 @@
-# $Id: Punie.pm 16245 2006-12-25 22:15:39Z paultcochrane $
+# $Id$
 
 package Parrot::Test::PIR_PGE;
 

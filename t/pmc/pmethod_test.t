@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: pmethod_test.t 16171 2006-12-17 19:06:36Z paultcochrane $
+# $Id$
 
 use strict;
 use warnings;

@@ -1,4 +1,4 @@
-# $Id: /parrot/local/lib/Perl/Critic/Policy/CodeLayout/UseParrotCoda.pm 24928 2007-01-08T15:18:49.395523Z cochrane  $
+# $Id$
 package Perl::Critic::Policy::CodeLayout::ProhibitTrailingWhitespace;
 
 use strict;

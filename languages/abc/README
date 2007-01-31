@@ -1,5 +1,5 @@
 # Copyright (C) 2005-2006, The Perl Foundation.
-# $Id: README 13645 2006-07-30 10:51:38Z bernhard $
+# $Id$
 
 This is an implementation of the basic calculator
 using the Parrot compiler tools.
