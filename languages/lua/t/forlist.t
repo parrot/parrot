@@ -12,7 +12,8 @@ t/forlist.t - Lua for statement
 
 =head1 DESCRIPTION
 
-See "Lua 5.1 Reference Manual", section 2.4.5 "For Statement".
+See "Lua 5.1 Reference Manual", section 2.4.5 "For Statement",
+L<http://www.lua.org/manual/5.1/manual.html#2.4.5>.
 
 See "Programming in Lua", section 4.3 "Control Structures".
 

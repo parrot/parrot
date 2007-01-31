@@ -15,7 +15,8 @@ t/table.t - Lua Table Library
 Tests Lua Table Library
 (implemented in F<languages/lua/lib/luatable.pir>).
 
-See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
+See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation",
+L<http://www.lua.org/manual/5.1/manual.html#5.5>.
 
 See "Programming in Lua", section 19 "The Table Library".
 

@@ -12,7 +12,8 @@ t/closure.t - Lua closures
 
 =head1 DESCRIPTION
 
-See "Lua 5.1 Reference Manual", section 2.6 "Visibility Rules".
+See "Lua 5.1 Reference Manual", section 2.6 "Visibility Rules",
+L<http://www.lua.org/manual/5.1/manual.html#2.6>.
 
 See "Programming in Lua", section 6.1 "Closures".
 

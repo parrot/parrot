@@ -12,7 +12,8 @@ t/lexico.t - Lua lexicography
 
 =head1 DESCRIPTION
 
-See "Lua 5.1 Reference Manual", section 2.1 "Lexical Conventions".
+See "Lua 5.1 Reference Manual", section 2.1 "Lexical Conventions",
+L<http://www.lua.org/manual/5.1/manual.html#2.1>.
 
 =cut
 

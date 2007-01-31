@@ -12,7 +12,8 @@ t/assign.t - Lua assignment
 
 =head1 DESCRIPTION
 
-See "Lua 5.1 Reference Manual", section 2.4.3 "Assignment".
+See "Lua 5.1 Reference Manual", section 2.4.3 "Assignment",
+L<http://www.lua.org/manual/5.1/manual.html#2.4.3>.
 
 See "Programming in Lua", section 4.1 "Assignment".
 

@@ -12,7 +12,8 @@ t/expr.t - Lua expression
 
 =head1 DESCRIPTION
 
-See "Lua 5.1 Reference Manual", section 2.5 "Expressions".
+See "Lua 5.1 Reference Manual", section 2.5 "Expressions",
+L<http://www.lua.org/manual/5.1/manual.html#2.5>.
 
 See "Programming in Lua", section 3 "Expressions".
 

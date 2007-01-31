@@ -12,7 +12,8 @@ t/metatable.t - Lua tables
 
 =head1 DESCRIPTION
 
-See "Lua 5.1 Reference Manual", section 2.8 "Metatables".
+See "Lua 5.1 Reference Manual", section 2.8 "Metatables",
+L<http://www.lua.org/manual/5.1/manual.html#2.8>.
 
 See "Programming in Lua", section 13 "Metatables and Metamethods".
 

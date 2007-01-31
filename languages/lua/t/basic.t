@@ -15,7 +15,8 @@ t/basic.t - Lua Basic Library
 Tests Lua Basic Library
 (implemented in F<languages/lua/lib/luabasic.pir>).
 
-See "Lua 5.1 Reference Manual", section 5.1 "Basic Functions".
+See "Lua 5.1 Reference Manual", section 5.1 "Basic Functions",
+L<http://www.lua.org/manual/5.1/manual.html#5.1>.
 
 =cut
 

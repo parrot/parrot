@@ -4,13 +4,15 @@ $Id$
 
 =head1 NAME
 
-classes/luaclosure.pmc - Lua Closure
+pmc/luaclosure.pmc - Lua Closure
 
 =head1 DESCRIPTION
 
 C<LuaClosure> extends C<Parrot Closure> and C<LuaAny> to provide a class
 with the behaviour of the Lua C<Function> type.
 C<LuaClosure> is used by function written in Lua.
+
+See also: F<languages/lua/pmc/luafunction.pmc>
 
 =head2 Overloaded Methods
 

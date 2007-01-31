@@ -15,7 +15,8 @@ t/debug.t - Lua Debug Library
 Tests Lua Debug Library
 (implemented in F<languages/lua/lib/luadebug.pir>).
 
-See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
+See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library",
+L<http://www.lua.org/manual/5.1/manual.html#5.9>.
 
 See "Programming in Lua", section 23 "The Debug Library".
 

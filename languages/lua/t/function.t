@@ -12,7 +12,8 @@ t/function.t - Lua functions
 
 =head1 DESCRIPTION
 
-See "Lua 5.1 Reference Manual", section 2.5.9 "Function Definitions".
+See "Lua 5.1 Reference Manual", section 2.5.9 "Function Definitions",
+L<http://www.lua.org/manual/5.1/manual.html#2.5.9>.
 
 See "Programming in Lua", section 5 "Functions".
 

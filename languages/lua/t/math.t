@@ -16,7 +16,8 @@ t/math.t - Lua Mathematic Library
 Tests Lua Mathematic Library
 (implemented in F<languages/lua/lib/luamath.pir>).
 
-See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
+See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions",
+L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 See "Programming in Lua", section 18 "The Mathematical Library".
 

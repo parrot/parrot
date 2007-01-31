@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/luafunction.pmc - Lua Function
+pmc/luafunction.pmc - Lua Function
 
 =head1 DESCRIPTION
 
@@ -12,6 +12,8 @@ C<LuaFunction> extends C<Parrot Sub> and C<LuaAny> to provide a class
 with the behaviour of the Lua C<Function> type.
 C<LuaFunction> is used by standard libraries
 written in PIR.
+
+See also: F<languages/lua/pmc/luaclosure.pmc>
 
 =head2 Overloaded Methods
 

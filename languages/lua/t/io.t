@@ -15,7 +15,8 @@ t/io.t - Lua Input/Output Library
 Tests Lua Input/Output Library
 (implemented in F<languages/lua/lib/luaio.pir>).
 
-See "Lua 5.1 Reference Manual", section 5.7 "Input and Output Facilities".
+See "Lua 5.1 Reference Manual", section 5.7 "Input and Output Facilities",
+L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
 See "Programming in Lua", section 21 "The I/O Library".
 

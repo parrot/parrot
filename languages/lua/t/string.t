@@ -15,7 +15,8 @@ t/string.t - Lua String Library
 Tests Lua String Library
 (implemented in F<languages/lua/lib/luastring.pir>).
 
-See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
+See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation",
+L<http://www.lua.org/manual/5.1/manual.html#5.4>.
 
 See "Programming in Lua", section 20 "The String Library".
 
