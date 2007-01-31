@@ -121,7 +121,14 @@ Opens a stream on an existing I/O stream object. With no arguments, it
 can be used to reopen a previously opened I/O stream. $S1 is a file path
 and $S2 is an optional mode for the stream (read, write, read/write,
 etc), using the same format as the C<open> opcode: 'r' for read, 'w' for
-write, 'a' for append, and 'p' for pipe.
+write, 'a' for append, and 'p' for pipe. When the mode is set to write
+or append, a file is created without warning if none exists. When the
+mode is read (without write), a nonexistent file is an error.
+
+The asynchronous version takes a PMC callback as an additional final
+argument. When the open operation is complete, it invokes the callback
+with a single argument: a status object containing the opened stream
+object.
 
 =item close
 
@@ -162,7 +169,9 @@ Retrieves a specified number of bytes $I2, from a stream $P1 into a
 string $S0. By default it reads in bytes, but the ParrotIO object can be
 configured to read in code points instead, by applying a C<utf8> or
 similar role to the object [the syntax for applying a role to an object
-has yet to be defined in PDD 15].
+has yet to be defined in PDD 15]. If there are fewer bytes remaining in
+the stream than specified in the read request, it returns the remaining
+bytes (with no error).
 
 The asynchronous version takes an additional final PMC callback argument
 $P3, and only returns a status object $P0. When the read operation is
@@ -181,7 +190,8 @@ contained in the string.]
 Retrieves a single line from a stream $P1 into a string $S1. Calling
 C<readline> flags the stream as operating in line-buffer mode (see the
 C<buffer_type> method below). The C<readline> operation respects the
-read mode of the I/O object the same as C<read> does.
+read mode of the I/O object the same as C<read> does. Newlines are not
+removed from the end of the string.
 
 The asynchronous version takes an additional final PMC callback argument
 $P2, and only returns a status object $P0. When the readline operation
@@ -194,6 +204,8 @@ string of bytes.
   $P0.record_separator($S1)
 
 Accessor (get and set) for the I/O stream's record separator attribute.
+The default value is a newline (CR, LF, CRLF, etc. depending on the
+platform).
 
 =item buffer_type
 
@@ -224,11 +236,21 @@ constants, or a string value of 'unbuffered', 'line-buffered', or
   $P0.buffer_size($I1)
 
 Accessor (get and set) for the I/O stream's buffer size attribute. The
-size is specified in bytes, though the buffer may hold a varying number
-of characters when dealing with an encoding of multi-byte codepoints.
-The role that implements the handling of a particular character set must
-provide the logic that marks the buffer as "full" when it can't hold the
-next codepoint even if there are empty bytes in the buffer.
+size is specified in bytes (positive integer value), though the buffer
+may hold a varying number of characters when dealing with an encoding of
+multi-byte codepoints.  The role that implements the handling of a
+particular character set must provide the logic that marks the buffer as
+"full" when it can't hold the next codepoint even if there are empty
+bytes in the buffer.
+
+The buffer size can be set no matter what buffering mode is in use, but
+it's only relevant when in line buffering or full buffering mode (and
+line buffering mode will rarely reach the maximum buffer size).
+
+It is recommended to only change the buffer size before starting IO
+operations, or after flushing the buffer. If the new size is larger than
+the existing data in the buffer, a size change is non-disruptive, but if
+the new size is smaller, it will truncate the buffer with a warning.
 
 =item get_fd
 
@@ -241,6 +263,8 @@ filehandles, so check C<does> for the appropriate role, or C<can> for
 the method before calling it.
 
 No asynchronous version.
+
+{{ NOTE: use a config probe (behind does or can) to determine support }}
 
 =back
 
@@ -361,7 +385,8 @@ for pipe.
 
 The asynchronous version takes a PMC callback as an additional final
 argument. When the open operation is complete, it invokes the callback
-with two arguments: a status object and the opened stream object.
+with a single argument: a status object containing the opened stream
+object.
 
 =item close
 
