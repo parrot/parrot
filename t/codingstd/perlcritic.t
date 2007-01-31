@@ -22,7 +22,7 @@ BEGIN {
 
 my $perl_tidy_conf = 'tools/util/perltidy.conf';
 
-my ( @files, %policies, $list_policies );
+my ( @files, %policies, $list_policies, $list_files );
 
 while (@ARGV) {
     my $arg = $ARGV[0];
@@ -34,6 +34,10 @@ while (@ARGV) {
         $list_policies = 1;
         shift @ARGV;    # discard
     }
+    elsif ( $arg eq '--listfiles' ) {
+        $list_files = 1;
+        shift @ARGV;    #discard
+    }
     elsif ( $arg =~ /^--(.*)/ ) {
         $policies{$1} = 1;
         shift @ARGV;    # discard
@@ -41,6 +45,45 @@ while (@ARGV) {
     else {
         last;
     }
+}
+
+# get the files to check
+my $DIST = Parrot::Distribution->new();
+if ( !@ARGV ) {
+    @files = map { $_->path } $DIST->get_perl_language_files();
+}
+else {
+
+    # does the first
+
+    # if we're passed a directory, find all the matching files
+    # under that directory.
+
+    # use $_ for the check below, as File::Find chdirs on us.
+    foreach my $file (@ARGV) {
+        ( -d $file )
+            ? find(
+            sub {
+                if ( -d $_ and $_ eq '.svn' ) {
+                    $File::Find::prune = 1;
+                    return;
+                }
+                if ( is_perl($_) ) {
+                    push @files, $File::Find::name;
+                }
+            },
+            $file
+            )
+            : push @files, $file;
+    }
+}
+
+if ( $list_files ) {
+    print "Files to be tested by perlcritic:\n";
+    for my $file ( @files ) {
+        print $file, "\n";
+    }
+    exit;
 }
 
 # Add in the few cases we should care about.
@@ -84,37 +127,6 @@ if ($list_policies) {
     $Data::Dumper::Indent = 1;
     warn Dumper( \%policies );
     exit;
-}
-
-# get the files to check
-my $DIST = Parrot::Distribution->new();
-if ( !@ARGV ) {
-    @files = map { $_->path } $DIST->get_perl_language_files();
-}
-else {
-
-    # does the first
-
-    # if we're passed a directory, find all the matching files
-    # under that directory.
-
-    # use $_ for the check below, as File::Find chdirs on us.
-    foreach my $file (@ARGV) {
-        ( -d $file )
-            ? find(
-            sub {
-                if ( -d $_ and $_ eq '.svn' ) {
-                    $File::Find::prune = 1;
-                    return;
-                }
-                if ( is_perl($_) ) {
-                    push @files, $File::Find::name;
-                }
-            },
-            $file
-            )
-            : push @files, $file;
-    }
 }
 
 # the number of tests is the number of policies
