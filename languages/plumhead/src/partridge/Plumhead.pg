@@ -7,31 +7,32 @@ grammar Plumhead::Grammar;
 
 token TOP         { <program> }
 
-regex sea         { .* <before: \<> }
-
+regex SEA                     { .* <before: \<> }
+token CODE_START              { \< \? p h p }
+token CODE_END                { \? \> }
 token DOUBLEQUOTE_STRING      { " <-["]>* " }
-
 token SINGLEQUOTE_STRING      { ' <-[']>* ' }
+token ECHO                    { e c h o }
 
-token NUMBER                  { 1 }
+token NUMBER                  { \d+ }
 
-token start_code  { \< \? p h p }
+token MINUS                   { \- }
+token PLUS                    { \+ }
+token MUL_OP                  { \* | / | % }
 
-token end_code    { \? \> }
+token program     { ^ <SEA> <code> }
 
-token echo        { e c h o }
+rule  code        { <CODE_START> <statement>* <CODE_END> }
 
-token ws          { \s* }
-
-rule  statement   { <echo> }
-
-token program     { ^ <sea> <code> }
-
-rule  code        { <start_code> <statement>* <end_code> }
-
-rule statement    { <echo> <expression> ; }
+rule statement    { <ECHO> <expression> ; }
 
 token expression  { <DOUBLEQUOTE_STRING> | <adding_expression> }
 
-rule adding_expression { <NUMBER> }
+rule adding_expression { <multiplying_expression> ( <PLUS> <multiplying_expression> )* }
+
+rule multiplying_expression  { <unary_expression> ( <MUL_OP> <unary_expression> )* }
+
+rule unary_expression { <MINUS>? <postfix_expression> }
+
+rule postfix_expression { <NUMBER> }
 

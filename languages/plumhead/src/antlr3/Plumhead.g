@@ -41,7 +41,6 @@ DOUBLEQUOTE_STRING  : { codeMode }?=> '\"' ( ~'\"' )*  '\"' ;
 SINGLEQUOTE_STRING  : { codeMode }?=> '\'' ( ~'\'' )*  '\'' ;
 ECHO                : { codeMode }?=> 'echo' ;
 
-
 fragment
 IDENT   : { codeMode }?=> ( 'a'..'z' | 'A'..'Z' )( 'a'..'z' | 'A'..'Z' )*;
 
