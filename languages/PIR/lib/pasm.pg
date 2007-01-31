@@ -41,20 +41,20 @@ rule pasm_instr {
 
 
 rule bitwise_op {
-    band                <var> \, <simple_expr> [ \, <simple_expr> ]?
-  | bands               <var> \, <simple_expr> [ \, <simple_expr> ]?
-  | bnot                <var> [ \, <simple_expr> ]?
-  | n_bnot              <var> \, <simple_expr>
-  | bnots               <var> [ \, <simple_expr> ]?
-  | n_bnots             <var> \, <simple_expr>
-  | bor                 <var> \, <simple_expr> [ \, <simple_expr> ]?
-  | bors                <var> \, <simple_expr> [ \, <simple_expr> ]?
-  | shl                 <var> \, <simple_expr> [ \, <simple_expr> ]?
-  | shr                 <var> \, <simple_expr> [ \, <simple_expr> ]?
-  | lsr                 <var> \, <simple_expr> [ \, <simple_expr> ]?
-  | rot                 <var> \, <simple_expr>  \, <simple_expr> \, <simple_expr>
-  | bxor                <var> \, <simple_expr> [ \, <simple_expr> ]?
-  | bxors               <var> \, <simple_expr> [ \, <simple_expr> ]?
+    band                <target> \, <simple_expr> [ \, <simple_expr> ]?
+  | bands               <target> \, <simple_expr> [ \, <simple_expr> ]?
+  | bnot                <target> [ \, <simple_expr> ]?
+  | n_bnot              <target> \, <simple_expr>
+  | bnots               <target> [ \, <simple_expr> ]?
+  | n_bnots             <target> \, <simple_expr>
+  | bor                 <target> \, <simple_expr> [ \, <simple_expr> ]?
+  | bors                <target> \, <simple_expr> [ \, <simple_expr> ]?
+  | shl                 <target> \, <simple_expr> [ \, <simple_expr> ]?
+  | shr                 <target> \, <simple_expr> [ \, <simple_expr> ]?
+  | lsr                 <target> \, <simple_expr> [ \, <simple_expr> ]?
+  | rot                 <target> \, <simple_expr>  \, <simple_expr> \, <simple_expr>
+  | bxor                <target> \, <simple_expr> [ \, <simple_expr> ]?
+  | bxors               <target> \, <simple_expr> [ \, <simple_expr> ]?
 }
 
 rule comparison_op {
@@ -82,16 +82,16 @@ rule comparison_op {
   | ge_str              <arg_exp_exp_lab>
   | ge_num              <arg_exp_exp_lab>
   | ge_addr             <arg_exp_exp_lab>
-  | if_null             <var> \, <id>
-  | unless_null         <var> \, <id>
+  | if_null             <target> \, <id>
+  | unless_null         <target> \, <id>
   | cmp                 <isXX_args>
   | cmp_str             <isXX_args>
   | cmp_num             <isXX_args>
   | issame              <isXX_args>
   | isntsame            <isXX_args>
-  | istrue              [ <int_reg> | <id> ] \, <var>
-  | isfalse             [ <int_reg> | <id> ] \, <var>
-  | isnull              [ <int_reg> | <id> ] \, <var>
+  | istrue              [ <int_reg> | <id> ] \, <target>
+  | isfalse             [ <int_reg> | <id> ] \, <target>
+  | isnull              [ <int_reg> | <id> ] \, <target>
   | isge                <isXX_args>
   | isgt                <isXX_args>
   | isle                <isXX_args>
@@ -99,27 +99,27 @@ rule comparison_op {
   | iseq                <isXX_args>
   | isne                <isXX_args>
   | and                 [ <int_reg> | <id> ] \, <simple_expr> \, <simple_expr>
-  | not                 <var> [ \, <var> ]?
-  | n_not               <var> \, <var>
+  | not                 <target> [ \, <target> ]?
+  | n_not               <target> \, <target>
   | or                  [ <int_reg> | <id> ] \,<simple_expr> \, <simple_expr>
   | xor                 [ <int_reg> | <id> ] \, <simple_expr> \, <simple_expr>
 }
 
 rule debug_op {
     debug_init
-  | debug_load          <var>
+  | debug_load          <target>
   | debug_break
   | debug_print
   | backtrace
-  | getline             <var>
-  | getfile             <var>
+  | getline             <target>
+  | getfile             <target>
 }
 
 
 rule loading_op {
     clone
   | exchange
-  | set                 <var> \, <simple_expr>
+  | set                 <target> \, <simple_expr>
   | assign              <arg_hack> #
   | setref              <arg_hack> #
   | deref               <arg_hack> #
@@ -178,7 +178,7 @@ rule var_op {
 #
 # define "argument" rules, so that not each instruction has to
 # define it's specific number and types of args.
-# for instance: args_v_i_s for matching a <var> argument,
+# for instance: args_v_i_s for matching a <target> argument,
 # <int_constant> argument and a <string_constant> argument
 #
 

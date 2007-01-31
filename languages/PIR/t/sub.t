@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 21;
 use Test::More;
 
 language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'basic sub' );
@@ -171,6 +171,20 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'parameter flags' );
 	.param pmc args3 :optional
 	.param int arg3  :opt_flag
 .end
+CODE
+"parse" => PMC 'PIRGrammar' { ... }
+Parse successful!
+OUT
+
+
+language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'wrap flag -- new!' );
+
+# This test makes sure pir.pbc is running, not IMCC, as :wrap is still unimplemented and undecided.
+.sub x :wrap('y')
+
+.end
+
+
 CODE
 "parse" => PMC 'PIRGrammar' { ... }
 Parse successful!

@@ -110,7 +110,7 @@ rule multi_type {
 
 rule body {
   <param_decl>*
-  <pir_instr>*
+  <labeled_pir_instr>*
   [ <'.end'> | <syntax_error: '.end' expected to close method/sub body> ]
 }
 
@@ -132,11 +132,23 @@ rule param_decl {
 #
 
 
-rule pir_instr {
+rule labeled_pir_instr {
   [ <label> <instr>?
   | <instr>
   ] 
   [ <?nl> | <syntax_error: newline expected after instruction> ]
+}
+
+rule labeled_pasm_instr {
+	[ <label> <pasm_instr>?
+  | <pasm_instr>
+  ] 
+  [ <?nl> | <syntax_error: newline expected after instruction> ]
+}
+
+rule instr {
+	[ <pir_instr> | <pasm_instr> ]
+	
 }
 
 # this is a token, because no spaces are allowed between
@@ -145,7 +157,7 @@ token label {
   <id> <':'>
 }
 
-rule instr {
+rule pir_instr {
     <local_decl>
   | <lexical_decl>
   | <const_def>
@@ -156,8 +168,7 @@ rule instr {
   | <return_stat>
   | <sub_invocation>
   | <macro_invocation>
-  | <jump_stat>
-  | <pasm_instr>      
+  | <jump_stat>  
   | <source_info>
 }
 
@@ -193,7 +204,7 @@ rule lexical_decl {
   <'.lex'>
   [ <string_constant> | <syntax_error: string constant expected> ]
   [ <','>             | <syntax_error: ',' expected> ]
-  [ <reg>             | <syntax_error: register expected> ]
+  [ <target>          | <syntax_error: register expected> ]
 }
 
 
@@ -274,12 +285,27 @@ rule binary_operator {
   | <'>>>'>
   | <'>>'>  
   | <'&&'>
-  | <'!!'>
+  | <'||'>
   | <'~~'>
-  | <'!'>
+  | <'|'>
   | <'&'>
   | <'~'>
   | <'.'>
+}
+
+rule assign_operator {
+		<'+='>
+	| <'-='>
+	| <'/='>
+	| <'%='>
+	| <'*='>
+	| <'.='>
+	| <'&='>
+	| <'|='>
+	| <'~='>
+	| <'<<='>
+	| <'>>='>
+	| <'>>>='>
 }
 
 rule unary_operator {
@@ -290,7 +316,7 @@ rule unary_operator {
 
 
 rule expression {
-    [ <simple_expr> [ <binary_operator> <simple_expression> ]? ]
+    [ <simple_expr> [ <binary_operator> <simple_expr> ]? ]
   | [ <unary_operator> <simple_expr> ]
 }
 
@@ -325,6 +351,7 @@ rule assignment_stat {
   | <target> <'='> <'find_type'> [ <string_constant> | <string_reg> | <id> ]
   | <target> <'='> <heredoc_string>
   | <target> <'='> <'global'> <string_constant> # deprecated?  
+  | <target> <assign_operator> <simple_expr>
   | <target> <keylist> <'='> <simple_expr>  
   | <'global'> <string_constant> <'='> <target> # deprecated?
   | <result_var_list> [ <'='> | <syntax_error: '=' expected> ] <short_sub_call>
@@ -399,14 +426,20 @@ rule long_sub_call {
   <'.pcc_begin'>
   [ <?nl>  | <syntax_error: newline after '.pcc_begin' expected> ]
   <arguments>
-  [ <'.pcc_call'> 
-  | <'.nci_call'> 
-  | <syntax_error: '.pcc_call' or '.nci_call' expected> 
+  [ [ <'.pcc_call'> | <'.nci_call'> ]
+  | [ <invocant> <'.meth_call'> ]
   ]
   [ <target> | <syntax_error: id or register expected that holds the sub object> ]
   [ <?nl>    | <syntax_error: newline after '.pcc_call sub' expected> ]
+ 	[ <local_decl> <?nl> ]*
   <result_values>
   [ <'.pcc_end'>  | <syntax_error: '.pcc_end' expected> ]  
+}
+
+rule invocant {
+	<'.invocant'> 
+	<target> 
+	<?nl>   	  	 
 }
 
 rule short_sub_call {
@@ -562,7 +595,7 @@ rule close_namespace {
 rule emit {
   <'.emit'>
   [ <?nl>        | <syntax_error: newline expected> ]
-  <pir_instr>*
+  <labeled_pasm_instr>*
   [ <'.eom'>     | <syntax_error: '.eom' expected> ]
 }
 
@@ -599,8 +632,8 @@ rule pragma {
   | <new_operators>
   | <loadlib>
   | <namespace>
-  | <hll_specifier>
   | <hll_mapping>
+  | <hll_specifier>  
   | <source_info>
 }
 
@@ -618,9 +651,10 @@ rule loadlib {
 
 rule namespace {
   <'.namespace'> 
-  [ <'['>             | <syntax_error: '[' expected> ]
-  [ <namespace_id>    | <syntax_error: namespace identifier expected> ]
-  [ <']'>             | <syntax_error: ']' expected> ]
+  [ <'['>        
+  	[ <namespace_id>    | <syntax_error: namespace identifier expected> ]
+  	[ <']'>             | <syntax_error: ']' expected> ]
+  ]?
 }
 
 rule hll_specifier {
@@ -804,10 +838,12 @@ token pir_directive {
   | <'.HLL'>
   | <'.immediate'>
   | <'.include'>
+  | <'.invocant'>
   | <'.lex'>
   | <'.line'>
   | <'.loadlib'>
   | <'.local'>
+  | <'.meth_call'>
   | <'.namespace'>
   | <'.nci_call'>
   | <'.param'>
