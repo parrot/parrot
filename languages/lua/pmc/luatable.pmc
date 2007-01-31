@@ -37,7 +37,7 @@ extern INTVAL dynpmc_LuaTable;
 extern PMC * find_meth(Interp* interp, PMC *obj, const char *name);
 
 
-static STRING* make_hash_key(Interp* interp, PMC* key)
+static STRING* _make_key(Interp* interp, PMC* key)
 {
     if (key == NULL) {
         real_exception(interp, NULL, E_KeyError,
@@ -53,7 +53,7 @@ static STRING* make_hash_key(Interp* interp, PMC* key)
 static void _set(Interp* interp, PMC *obj, PMC* key, PMC* value)
 {
     Hash* hash = PMC_struct_val(obj);
-    STRING* keystr = make_hash_key(interp, key);
+    STRING* keystr = _make_key(interp, key);
     if (dynpmc_LuaNil == value->vtable->base_type) {
         parrot_hash_delete(interp, hash, keystr);
     }
@@ -68,7 +68,7 @@ static void _set(Interp* interp, PMC *obj, PMC* key, PMC* value)
 static PMC* _get(Interp* interp, PMC *obj, PMC* key)
 {
     Hash* hash = PMC_struct_val(obj);
-    STRING* keystr = make_hash_key(interp, key);
+    STRING* keystr = _make_key(interp, key);
     PMC* pair = parrot_hash_get(interp, hash, keystr);
     if (pair != NULL) {
         PMC* value = PMC_pmc_val(pair);
@@ -82,7 +82,7 @@ static PMC* _get(Interp* interp, PMC *obj, PMC* key)
 static INTVAL _has(Interp* interp, PMC *obj, PMC* key)
 {
     Hash* hash = PMC_struct_val(obj);
-    STRING* keystr = make_hash_key(interp, key);
+    STRING* keystr = _make_key(interp, key);
     return parrot_hash_exists(interp, hash, keystr);
 }
 
@@ -428,7 +428,6 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* len () {
-        PMC* retval = pmc_new(INTERP, dynpmc_LuaNumber);
         PMC* key = pmc_new(INTERP, dynpmc_LuaNumber);
         INTVAL idx = 1;
         VTABLE_set_integer_native(INTERP, key, idx);
@@ -436,8 +435,8 @@ MMD_DEFAULT: {
             idx ++;
             VTABLE_set_integer_native(INTERP, key, idx);
         }
-        VTABLE_set_integer_native(INTERP, retval, idx - 1);
-        return retval;
+        VTABLE_set_integer_native(INTERP, key, idx - 1);
+        return key;
     }
 
 /*
@@ -461,7 +460,7 @@ MMD_DEFAULT: {
         }
         else {
             STRING *s;
-            keystr = make_hash_key(interp, index);
+            keystr = _make_key(interp, index);
             if (!parrot_hash_exists(interp, hash, keystr)) {
                 real_exception(INTERP, NULL, 1, "invalid key to 'next'");
                 return NULL;
@@ -500,11 +499,7 @@ MMD_DEFAULT: {
 */
     METHOD PMC* rawequal (PMC* value) {
         PMC* retval = pmc_new(INTERP, dynpmc_LuaBoolean);
-        if (SELF->vtable->base_type == value->vtable->base_type
-         && SELF == value)
-            PMC_int_val(retval) = 1;
-        else
-            PMC_int_val(retval) = 0;
+        PMC_int_val(retval) = (SELF == value) ? 1 : 0;
         return retval;
     }
 
