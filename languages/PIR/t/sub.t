@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 use Test::More;
 
 language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'basic sub' );
@@ -158,6 +158,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'parameters' );
 	.param int iarg
 	.param string sarg
 	.param num narg
+	.param object oargs
 .end
 CODE
 "parse" => PMC 'PIRGrammar' { ... }
@@ -170,6 +171,15 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'parameter flags' );
 	.param pmc args2 :named
 	.param pmc args3 :optional
 	.param int arg3  :opt_flag
+.end
+CODE
+"parse" => PMC 'PIRGrammar' { ... }
+Parse successful!
+OUT
+
+language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'pcc_sub' );
+.pcc_sub x
+
 .end
 CODE
 "parse" => PMC 'PIRGrammar' { ... }
@@ -189,3 +199,4 @@ CODE
 "parse" => PMC 'PIRGrammar' { ... }
 Parse successful!
 OUT
+

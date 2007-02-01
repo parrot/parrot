@@ -30,7 +30,7 @@ rule compilation_unit {
 ##
 
 rule sub_def {
-  <'.sub'>
+  [ <'.sub'> | <'.pcc_sub'> ]
   [ <sub_id> | <syntax_error: sub identifier (id or string constant) expected> ]
   <sub_pragmas>?
   [ <?nl> | <syntax_error: newline expected> ]
@@ -331,11 +331,14 @@ rule simple_expr {
 
 rule keylist {
   <'['>
-  <simple_expr> [ <','> <simple_expr> ]*
+  <key> [ [ <','> | <';'> ] <key> ]*
   [ <']'> | <syntax_error: ']' expected> ]
 }
 
-
+rule key {
+		[ <simple_expr> [ <'..'> [ <simple_expr> ]? ]? ]
+	|	[ <'..'> <simple_expr> ]
+}
 
 
 ## Assignments and misc. operations with a '=' sign
@@ -443,7 +446,9 @@ rule invocant {
 }
 
 rule short_sub_call {
-  [ <target>\. ]?                  # optional object
+  [ [ <target>\. ]                  
+  | [ <target> <'->'> ]
+  ]?															 # optional invocant
   [ <target> | <string_constant> ] # method or sub name/id
   <parenthesized_args>             # sub args
 }
@@ -736,6 +741,7 @@ rule type {
   [ <'int'> 
   | <'num'> 
   | <'pmc'> 
+  | <'object'>
   | <'string'>   
   | <'Array'> 
   | <'Hash'> 
@@ -854,6 +860,7 @@ token pir_directive {
   | <'.pcc_end_return'>
   | <'.pcc_end_yield'>
   | <'.pcc_end'>  
+  | <'.pcc_sub'>
   | <'.pragma'>
   | <'.return'>
   | <'.sub'>
