@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Cwd;
+use Config;
 use Module::Build;
 use File::Spec::Functions qw( rel2abs catdir catfile updir path );
 
@@ -66,6 +67,7 @@ sub in_parrot_tree
 
 sub get_dl_env_var
 {
+    return $Config{ldlibpthname};
     return 'DYLD_LIBRARY_PATH' if $^O =~ /darwin/;
     return 'PATH'              if $^O =~ /Win32/;
     return 'LD_LIBRARY_PATH';
