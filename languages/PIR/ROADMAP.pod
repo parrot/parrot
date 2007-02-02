@@ -1,6 +1,10 @@
+# $Id$
 
+=head1 Title 
 
-=name Roadmap for languages/PIR
+Roadmap for languages/PIR
+
+=head1 Intro
 
 This document describes a roadmap for languages/PIR, the PIR
 implementation using the Parrot Compiler Tools: PGE and TGE.
@@ -10,8 +14,6 @@ of Parrot Intermediate Representation (PIR) used by Parrot.
 
 Neither does this document describe a TODO list; you can find
 that list in the, you guess it, TODO file.
-
-
 
 =head1 What's the goal of languages/PIR?
 
