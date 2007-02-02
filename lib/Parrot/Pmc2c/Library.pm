@@ -26,7 +26,8 @@ package Parrot::Pmc2c::Library;
 use strict;
 use warnings;
 
-use Parrot::Pmc2c qw(dynext_load_code dont_edit);
+use Parrot::Pmc2c;
+use Parrot::Pmc2c::UtilFunctions qw( dont_edit dynext_load_code c_code_coda );
 
 =item C<new($opt, $vtable_dump, %pmcs)>
 
@@ -166,26 +167,6 @@ EOC
 #include "pmc_$name.h"
 EOC
     }
-    "$cout\n";
-}
-
-=item C<c_code_coda()>
-
-Returns the Parrot C code coda
-
-=cut
-
-sub c_code_coda() {
-    my $self = shift;
-    my $cout = "";
-    $cout .= <<"EOC";
-/*
- * Local variables:
- *   c-file-style: "parrot"
- * End:
- * vim: expandtab shiftwidth=4:
- */
-EOC
     "$cout\n";
 }
 

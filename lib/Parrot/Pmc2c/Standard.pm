@@ -1,0 +1,28 @@
+=head2 Parrot::Pmc2c::Standard Instance Methods
+
+Standard behavior.
+
+=over 4
+
+=cut
+
+package Parrot::Pmc2c::Standard;
+use base 'Parrot::Pmc2c';
+
+=item C<body($method, $line, $out_name)>
+
+Returns the C code for the method body. C<$line> is used to accumulate
+the number of lines, C<$out_name> is the name of the output file we are
+generating.
+
+=cut
+
+sub body {
+    my ( $self, $method, $line, $out_name ) = @_;
+
+    my $meth = $method->{meth};
+    my $n    = $self->{has_method}{$meth};
+    return $self->SUPER::body( $self->{methods}[$n], $line, $out_name );
+}
+
+1;

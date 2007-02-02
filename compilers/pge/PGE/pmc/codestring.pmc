@@ -155,10 +155,10 @@ A newline is automatically added to the end of the fmt.
             position = string_str_index(interp, format, PERCENT, position);
         }
 
-        string_append(interp, PMC_str_val(SELF), format);
-        if (!string_equal(interp, string_substr(interp, format, -1, 0, NULL, 0), NEWLINE)) {
+        if (!string_equal(interp, string_substr(interp, format, -1, 1, NULL, 0), NEWLINE)) {
             string_append(interp,  PMC_str_val(SELF), NEWLINE);
         }
+        string_append(interp, PMC_str_val(SELF), format);
     }
 
 /*
