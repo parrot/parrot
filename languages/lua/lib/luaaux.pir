@@ -71,22 +71,19 @@ L3:
 
 .sub 'checknumber'
     .param pmc arg
-    .local float val
     $S0 = "no value"
     if_null arg, L0
     $S0 = typeof arg
     $I0 = isa arg, 'LuaNumber'
     unless $I0 goto L1
-    val = arg
-    .return (val)
+    .return (arg)
 L1:
     $I0 = isa arg, 'LuaString'
     unless $I0 goto L0
     $P0 = arg.'tonumber'()
     $I0 = isa $P0, 'LuaNumber'
     unless $I0 goto L0
-    val = $P0
-    .return (val)
+    .return ($P0)
 L0:
     tag_error($S0, "number")
 .end
@@ -170,18 +167,6 @@ L0:
     ex = new .Exception
     ex['_message'] =  message
     throw ex
-.end
-
-
-=item C<getn (table)>
-
-=cut
-
-.sub 'getn'
-    .param pmc table
-    $P0 = table.'len'()
-    $I0 = $P0
-    .return ($I0)
 .end
 
 

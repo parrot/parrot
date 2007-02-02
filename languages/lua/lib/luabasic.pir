@@ -260,7 +260,7 @@ NOT YET IMPLEMENTED.
 
 .sub '_lua_dofile' :anon
     .param pmc filename :optional
-    $S0 = optstring(filename, "")
+    $S0 = optstring(filename, '')
     not_implemented()
 .end
 
@@ -361,18 +361,16 @@ See C<next> for the caveats of modifying the table during its traversal.
     ipairs = _G.'rawget'(key_ipairs)
     .local pmc zero
     new zero, .LuaNumber
-    zero = 0.0
+    set zero, 0.0
     .return (ipairs, t, zero)
 L0:
-    $N0 = checknumber(i)
-    inc $N0
+    $P0 = checknumber(i)
+    $P1 = clone $P0
+    inc $P1
     .local pmc ret
-    .local pmc n
-    new n, .LuaNumber
-    n = $N0
-    ret = t.'rawget'(n)
+    ret = t.'rawget'($P1)
     unless ret goto L1
-    .return (n, ret)
+    .return ($P1, ret)
 L1:
     .return ()
 .end
@@ -829,7 +827,7 @@ length operator.
     .local int e
     .local int n
     checktype(list, 'table')
-    $I0 = getn(list)
+    $I0 = list.'len'()
     $I1 = optint(i, 1)
     e = optint(j, $I0)
     n = e - $I1

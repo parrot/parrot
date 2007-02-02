@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 16;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function concat' );
@@ -183,6 +183,106 @@ a = {}
 table.setn(a, 10000)
 CODE
 /'setn' is obsolete/
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function sort' );
+lines = {
+    luaH_set = 10,
+    luaH_get = 24,
+    luaH_present = 48,
+}
+
+a = {}
+for n in pairs(lines) do a[#a + 1] = n end
+table.sort(a)
+for i,n in ipairs(a) do print(n) end
+CODE
+luaH_get
+luaH_present
+luaH_set
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function sort' );
+lines = {
+    luaH_set = 10,
+    luaH_get = 24,
+    luaH_present = 48,
+}
+
+function pairsByKeys (t, f)
+    local a = {}
+    for n in pairs(t) do a[#a + 1] = n end
+    table.sort(a, f)
+    local i = 0     -- iterator variable
+    return function ()  -- iterator function
+        i = i + 1
+        return a[i], t[a[i]]
+    end
+end
+
+for name, line in pairsByKeys(lines) do
+    print(name, line)
+end
+CODE
+luaH_get	24
+luaH_present	48
+luaH_set	10
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function sort (all permutations)' );
+function permgen (a, n)
+    n = n or #a
+    if n <= 1 then
+        coroutine.yield(a)
+    else
+        for i=1,n do
+            a[n], a[i] = a[i], a[n]
+            permgen(a, n - 1)
+            a[n], a[i] = a[i], a[n]
+        end
+    end
+end
+
+function permutations (a)
+    local co = coroutine.create(function () permgen(a) end)
+    return function ()
+               local code, res = coroutine.resume(co)
+               return res
+           end
+end
+
+local t = {}
+for _, v in ipairs{'a', 'b', 'c', 'd', 'e', 'f', 'g'} do
+    table.insert(t, v)
+    local ref = table.concat(t, ' ')
+    print(ref)
+    local n = 0
+    for p in permutations(t) do
+        local c = {}
+        for i, v in ipairs(p) do
+            c[i] = v
+        end
+        table.sort(c)
+        assert(ref == table.concat(c, ' '), table.concat(p, ' '))
+        n = n + 1
+    end
+    print(n)
+end
+CODE
+a
+1
+a b
+2
+a b c
+6
+a b c d
+24
+a b c d e
+120
+a b c d e f
+720
+a b c d e f g
+5040
 OUTPUT
 
 # Local Variables:

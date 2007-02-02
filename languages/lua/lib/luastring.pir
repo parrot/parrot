@@ -151,12 +151,13 @@ L4:
     $P0 = split '', specials
 L6:
     $I0 = $P0
-    unless $I0 > 0 goto L3
+    unless $I0 goto L5
     $S0 = shift $P0
     $I0 = index $S2, $S0
-    unless $I0 >= 0 goto L5
+    if $I0 >= 0 goto L3
     goto L6
 L5:
+    # do a plain search
     .local int idx
     $S1 = substr $S1, $I3
     idx = index $S1, $S2
@@ -166,11 +167,11 @@ L5:
     new start, .LuaNumber
     $I0 = $I3 + idx
     inc $I0
-    start = $I0
+    set start, $I0
     new end, .LuaNumber
     $I0 = $I3 + idx
     $I0 += $I2
-    end = $I0
+    set end, $I0
     .return (start, end)
 L3:
     .local int anchor
@@ -184,6 +185,7 @@ L8:
     s1 = substr $S1, $I3
     not_implemented()
 L7:
+    # not found
     .local pmc ret
     new ret, .LuaNil
     .return (ret)
@@ -234,7 +236,7 @@ L3:
     dec $I0
     $I1 = ord $S0, $I0
     new $P0, .LuaNumber
-    $P0 = $I1
+    set $P0, $I1
     ret[i] = $P0
     inc i
     goto L3
@@ -275,7 +277,7 @@ L1:
     goto L1
 L2:
     new ret, .LuaString
-    ret = b
+    set ret, b
     .return (ret)
 .end
 
@@ -467,7 +469,7 @@ Embedded zeros are counted, so C<"a\000b\000c"> has length 5.
     $S0 = checkstring(s)
     $I0 = length $S0
     new ret, .LuaNumber
-    ret = $I0
+    set ret, $I0
     .return (ret)
 .end
 
@@ -486,7 +488,7 @@ of what is an uppercase letter depends on the current locale.
     $S0 = checkstring(s)
     downcase $S0
     new ret, .LuaString
-    ret = $S0
+    set ret, $S0
     .return (ret)
 .end
 
@@ -526,7 +528,7 @@ Returns a string that is the concatenation of C<n> copies of the string C<s>.
 L0:
     $S1 = repeat $S0, $I0
     new ret, .LuaString
-    ret = $S1
+    set ret, $S1
     .return (ret)
 .end
 
@@ -557,7 +559,7 @@ L1:
 L2:
     $S1 = join '', $P0
     new ret, .LuaString
-    ret = $S1
+    set ret, $S1
     .return (ret)
 .end
 
@@ -598,7 +600,7 @@ L2:
     $S1 = ''
 L3:
     new ret, .LuaString
-    ret = $S1
+    set ret, $S1
     .return (ret)
 .end
 
@@ -617,7 +619,7 @@ of what is a lowercase letter depends on the current locale.
     $S0 = checkstring(s)
     upcase $S0
     new ret, .LuaString
-    ret = $S0
+    set ret, $S0
     .return (ret)
 .end
 

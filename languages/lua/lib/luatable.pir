@@ -100,7 +100,7 @@ Returns C<table[i]..sep..table[i+1] ... sep..table[j]>. The default value for
     $S0 = optstring(sep, '')
     checktype(table, 'table')
     $I0 = optint(i, 1)
-    $I1 = getn(table)
+    $I1 = table.'len'()
     last = optint(j, $I1)
     $S1 = ''
     new idx, .LuaNumber
@@ -186,7 +186,7 @@ B<DEPRECATED>
     .local int n
     checktype(table, 'table')
     checktype(f, 'function')
-    n = getn(table)
+    n = table.'len'()
     i = 0
     new index, .LuaNumber
 L1:
@@ -239,7 +239,7 @@ inserts C<x> at the end of table C<t>.
     .local int pos
     new index, .LuaNumber
     checktype(table, 'table')
-    e = getn(table)
+    e = table.'len'()
     inc e
     unless_null arg3, L1
     pos = e
@@ -262,7 +262,7 @@ L4:
     goto L4
 L2:
     index = pos
-    table[index] = value
+    table.'rawset'(index, value)
 .end
 
 
@@ -314,7 +314,7 @@ table C<t>.
     .local int e
     .local int ipos
     checktype(table, 'table')
-    e = getn(table)
+    e = table.'len'()
     ipos = optint(pos, e)
     unless e <= 0 goto L1
     new ret, .LuaNil
@@ -367,8 +367,6 @@ operator C<<> is used instead.
 The sort algorithm is I<not> stable; that is, elements considered equal by
 the given order may have their relative positions changed by the sort.
 
-NOT YET IMPLEMENTED (see auxsort).
-
 =cut
 
 .sub '_table_sort' :anon
@@ -376,31 +374,149 @@ NOT YET IMPLEMENTED (see auxsort).
     .param pmc comp :optional
     .local int n
     checktype(table, 'table')
-    n = getn(table)
+    n = table.'len'()
     if_null comp, L1
-    if comp goto L1
+    $I0 = isa comp, 'LuaNil'
+    if $I0 goto L1
     checktype(comp, 'function')
-    goto L2
 L1:
-    .const .Sub lessthan = 'lessthan'
-    comp = lessthan
-L2:
-    auxsort(table, comp, n)
+    auxsort(table, comp, 1, n)
 .end
 
 .sub 'auxsort' :anon
     .param pmc table
     .param pmc comp
+    .param int l
     .param int u
-    not_implemented()
+    .local pmc index
+    .local int i
+    .local int j
+    .local int tmp
+    new index, .LuaNumber
+L1:
+    unless l < u goto L2
+    # sort elements a[l], a[(l+u)/2] and a[u]
+    set index, l
+    $P1 = table.'rawget'(index)
+    set index, u
+    $P2 = table.'rawget'(index)
+    $I0 = sort_comp(comp, $P2, $P1) # a[u] < a[l]?
+    unless $I0 goto L3
+    # swap a[l] - a[u]
+    set index, l
+    table.'rawset'(index, $P2)
+    set index, u
+    table.'rawset'(index, $P1)
+L3:
+    tmp = u - l
+    if tmp == 1 goto L2 # break: only 2 elements
+    i = l + u
+    i /= 2
+    set index, i
+    $P1 = table.'rawget'(index)
+    set index, l
+    $P2 = table.'rawget'(index)
+    $I0 = sort_comp(comp, $P1, $P2) # a[i]<a[l]?
+    unless $I0 goto L4
+    set index, i
+    table.'rawset'(index, $P2)
+    set index, l
+    table.'rawset'(index, $P1)
+    goto L5
+L4:
+    set index, u
+    $P2 = table.'rawget'(index)
+    $I0 = sort_comp(comp, $P2, $P1) # a[u]<a[i]?
+    unless $I0 goto L5
+    set index, i
+    table.'rawset'(index, $P2)
+    set index, u
+    table.'rawset'(index, $P1)
+L5:
+    tmp = u - l
+    if tmp == 2 goto L2 # break: only 3 elements
+    set index, i
+    $P1 = table.'rawget'(index)    # Pivot
+    tmp = u - 1
+    set index, tmp
+    $P2 = table.'rawget'(index)
+    set index, i
+    table.'rawset'(index, $P2)
+    set index, tmp
+    table.'rawset'(index, $P1)
+    # a[l] <= P == a[u-1] <= a[u], only need to sort from l+1 to u-2 */
+    i = l
+    j = u - 1
+L6: # invariant: a[l..i] <= P <= a[j..u]
+    # repeat ++i until a[i] >= P
+    inc i
+    set index, i
+    $P2 = table.'rawget'(index)
+    $I0 = sort_comp(comp, $P2, $P1)
+    unless $I0 goto L7
+    unless i > u goto L6
+    error("invalid order function for sorting")
+    goto L6
+L7:
+    # repeat --j until a[j] <= P
+    dec j
+    set index, j
+    $P3 = table.'rawget'(index)
+    $I0 = sort_comp(comp, $P1, $P3)
+    unless $I0 goto L8
+    unless j < l goto L7
+    error("invalid order function for sorting")
+    goto L7
+L8:
+    if j < i goto L9
+    set index, i
+    table.'rawset'(index, $P3)
+    set index, j
+    table.'rawset'(index, $P2)
+    goto L6
+L9:
+    tmp = u - 1
+    set index, tmp
+    $P1 = table.'rawget'(index)
+    set index, i
+    $P2 = table.'rawget'(index)
+    # swap pivot (a[u-1]) with a[i]
+    set index, tmp
+    table.'rawset'(index, $P2)
+    set index, i
+    table.'rawset'(index, $P1)
+    # a[l..i-1] <= a[i] == P <= a[i+1..u]
+    # adjust so that smaller half is in [j..i] and larger one in [l..u]
+    tmp += l
+    unless i < tmp goto L10
+    j = l
+    i = i - 1
+    l = i + 2
+    goto L11
+L10:
+    j = i + 1
+    i = u
+    u = j - 2
+L11:
+    # call recursively the smaller one
+    auxsort(table, comp, j, i)
+    # repeat the routine for the larger one
+    goto L1
+L2:
 .end
 
-.sub 'lessthan' :anon
-    .param pmc l
-    .param pmc r
-    .local int ret
-    ret = cmp l, r
-    .return (ret)
+.sub sort_comp
+    .param pmc comp
+    .param pmc a
+    .param pmc b
+    if_null comp, L1
+    unless comp goto L1
+    $P0 = comp(a, b)
+    $I0 = istrue $P0
+    .return ($I0)
+L1:
+    $I0 = islt a, b
+    .return ($I0)
 .end
 
 =back

@@ -34,15 +34,10 @@ my @dir = ( 'lua', 't', 'shootout' );
 #       Hashtable update and k-nucleotide strings
 #
 
-TODO:
-{
-    local $TODO = 'table.sort is not implemented';
-
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'knucleotide.lua-2.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'knucleotide-output.txt' ));
 $in = File::Spec->catfile( 'languages', @dir, 'knucleotide-input.txt' );
 language_output_is( 'lua', $code, $out, 'k-nucleotide', params => "< $in" );
-}
 
 #
 #   partial-sums
