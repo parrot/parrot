@@ -35,7 +35,7 @@ sub run_tests {
         $php_code = <<"END_CODE";
 <?php
 echo $php_code;
-echo "\n";
+echo "\\n";
 ?>
 END_CODE
 

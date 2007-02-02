@@ -95,14 +95,48 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
     .local pmc past
 
     $P0 = node['DOUBLEQUOTE_STRING']
-    if null $P0 goto handled_doublequote
+    if null $P0 goto no_DOUBLEQUOTE_STRING
     past = tree.'get'('past', $P0, 'Plumhead::Grammar::DOUBLEQUOTE_STRING')
-    handled_doublequote:
+    goto handled_expression
+    no_DOUBLEQUOTE_STRING:
 
     $P0 = node['SINGLEQUOTE_STRING']
-    if null $P0 goto handled_singlequote
+    if null $P0 goto no_SINGLEQUOTE_STRING
     past = tree.'get'('past', $P0, 'Plumhead::Grammar::SINGLEQUOTE_STRING')
-    handled_singlequote:
+    goto handled_expression
+    no_SINGLEQUOTE_STRING:
+
+    $P0 = node['NUMBER']
+    if null $P0 goto no_NUMBER
+    past = tree.'get'('past', $P0, 'Plumhead::Grammar::NUMBER')
+    goto handled_expression
+    no_NUMBER:
+
+    $P0 = node['adding_expression']
+    if null $P0 goto no_adding_expression
+    past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+    goto handled_expression
+    no_adding_expression:
+
+    $P0 = node['multiplying_expression']
+    if null $P0 goto no_multiplying_expression
+    past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+    goto handled_expression
+    no_multiplying_expression:
+
+    $P0 = node['unary_expression']
+    if null $P0 goto no_unary_expression
+    past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+    goto handled_expression
+    no_unary_expression:
+
+    $P0 = node['postfix_expression']
+    if null $P0 goto no_postfix_expression
+    past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+    goto handled_expression
+    no_postfix_expression:
+
+    handled_expression:
 
     .return (past)
 }
@@ -137,6 +171,21 @@ transform past (Plumhead::Grammar::SINGLEQUOTE_STRING) :language('PIR') {
     .local pmc past                                                  
     past = new 'PAST::Op'
     past.'init'( past_val, 'node'=> node, 'pirop' => 'print' )  
+
+    .return (past)
+}
+
+transform past (Plumhead::Grammar::NUMBER) :language('PIR') {
+
+    .local pmc past_val
+    past_val = new 'PAST::Val'                             
+    .local string val
+    val = node
+    past_val.'init'( 'name' => val, 'vtype' => '.Float', 'ctype' => 'n+' )                              
+
+    .local pmc past                                                  
+    past = new 'PAST::Op'
+    past.'init'( past_val, 'node'=> node, 'name' => 'print' )  
 
     .return (past)
 }
