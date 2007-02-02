@@ -7,7 +7,7 @@ grammar Plumhead::Grammar;
 
 token TOP         { <program> }
 
-regex SEA                     { .* <before: \<> }
+regex SEA                     { .* <?before: \<> }
 token CODE_START              { \< \? p h p }
 token CODE_END                { \? \> }
 token DOUBLEQUOTE_STRING      { " <-["]>* " }
@@ -22,11 +22,11 @@ token MUL_OP                  { \* | / | % }
 
 token program     { ^ <SEA> <code> }
 
-rule  code        { <CODE_START> <statement>* <CODE_END> }
+rule  code        { <?CODE_START> <statement>* <?CODE_END> }
 
 rule statement    { <ECHO> <expression> ; }
 
-token expression  { <DOUBLEQUOTE_STRING> | <adding_expression> }
+token expression  { <DOUBLEQUOTE_STRING> | <SINGLEQUOTE_STRING> | <adding_expression> }
 
 rule adding_expression { <multiplying_expression> ( <PLUS> <multiplying_expression> )* }
 
