@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 29;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function assert' );
@@ -214,7 +214,7 @@ OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function rawset' );
 t = {}
-rawset(t, "a", "letter a")
+assert(rawset(t, "a", "letter a") == t)
 print(t.a)
 CODE
 letter a
@@ -365,6 +365,17 @@ r = xpcall(assert, nil)
 print(r)
 CODE
 false
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function xpcall (backtrace)' );
+function backtrace ()
+    return 'not a back trace'
+end
+
+r, m = xpcall(assert, backtrace)
+print(r, m)
+CODE
+false	not a back trace
 OUTPUT
 
 # Local Variables:

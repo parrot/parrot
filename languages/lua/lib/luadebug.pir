@@ -37,67 +37,67 @@ See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = global '_G'
-    $P1 = new .LuaString
+    new $P1, .LuaString
 
     .local pmc _debug
-    _debug = new .LuaTable
-    $P1 = 'debug'
+    new _debug, .LuaTable
+    set $P1, 'debug'
     _lua__GLOBAL[$P1] = _debug
 
     .const .Sub _debug_debug = '_debug_debug'
-    $P1 = 'debug'
+    set $P1, 'debug'
     _debug[$P1] = _debug_debug
 
     .const .Sub _debug_getfenv = '_debug_getfenv'
-    $P1 = 'getfenv'
+    set $P1, 'getfenv'
     _debug[$P1] = _debug_getfenv
 
     .const .Sub _debug_gethook = '_debug_gethook'
-    $P1 = 'gethook'
+    set $P1, 'gethook'
     _debug[$P1] = _debug_gethook
 
     .const .Sub _debug_getinfo = '_debug_getinfo'
-    $P1 = 'getinfo'
+    set $P1, 'getinfo'
     _debug[$P1] = _debug_getinfo
 
     .const .Sub _debug_getlocal = '_debug_getlocal'
-    $P1 = 'getlocal'
+    set $P1, 'getlocal'
     _debug[$P1] = _debug_getlocal
 
     .const .Sub _debug_getmetatable = '_debug_getmetatable'
-    $P1 = 'getmetatable'
+    set $P1, 'getmetatable'
     _debug[$P1] = _debug_getmetatable
 
     .const .Sub _debug_getregistry = '_debug_getregistry'
-    $P1 = 'getregistry'
+    set $P1, 'getregistry'
     _debug[$P1] = _debug_getregistry
 
     .const .Sub _debug_getupvalue = '_debug_getupvalue'
-    $P1 = 'getupvalue'
+    set $P1, 'getupvalue'
     _debug[$P1] = _debug_getupvalue
 
     .const .Sub _debug_setfenv = '_debug_setfenv'
-    $P1 = 'setfenv'
+    set $P1, 'setfenv'
     _debug[$P1] = _debug_setfenv
 
     .const .Sub _debug_sethook = '_debug_sethook'
-    $P1 = 'sethook'
+    set $P1, 'sethook'
     _debug[$P1] = _debug_sethook
 
     .const .Sub _debug_setlocal = '_debug_setlocal'
-    $P1 = 'setlocal'
+    set $P1, 'setlocal'
     _debug[$P1] = _debug_setlocal
 
     .const .Sub _debug_setmetatable = '_debug_setmetatable'
-    $P1 = 'setmetatable'
+    set $P1, 'setmetatable'
     _debug[$P1] = _debug_setmetatable
 
     .const .Sub _debug_setupvalue = '_debug_setupvalue'
-    $P1 = 'setupvalue'
+    set $P1, 'setupvalue'
     _debug[$P1] = _debug_setupvalue
 
     .const .Sub _debug_traceback = '_debug_traceback'
-    $P1 = 'traceback'
+    set $P1, 'traceback'
     _debug[$P1] = _debug_traceback
 
 .end
@@ -339,7 +339,7 @@ L0:
 L1:
     table.'set_metatable'(metatable)
     new ret, .LuaBoolean
-    ret = 1
+    set ret, 1
     .return (ret)
 .end
 

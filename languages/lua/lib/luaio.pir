@@ -42,55 +42,55 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = global '_G'
-    $P1 = new .LuaString
+    new $P1, .LuaString
 
     .local pmc _io
-    _io = new .LuaTable
-    $P1 = 'io'
+    new _io, .LuaTable
+    set $P1, 'io'
     _lua__GLOBAL[$P1] = _io
 
     .const .Sub _io_close = '_io_close'
-    $P1 = 'close'
+    set $P1, 'close'
     _io[$P1] = _io_close
 
     .const .Sub _io_flush = '_io_flush'
-    $P1 = 'flush'
+    set $P1, 'flush'
     _io[$P1] = _io_flush
 
     .const .Sub _io_input = '_io_input'
-    $P1 = 'input'
+    set $P1, 'input'
     _io[$P1] = _io_input
 
     .const .Sub _io_lines = '_io_lines'
-    $P1 = 'lines'
+    set $P1, 'lines'
     _io[$P1] = _io_lines
 
     .const .Sub _io_open = '_io_open'
-    $P1 = 'open'
+    set $P1, 'open'
     _io[$P1] = _io_open
 
     .const .Sub _io_output = '_io_output'
-    $P1 = 'output'
+    set $P1, 'output'
     _io[$P1] = _io_output
 
     .const .Sub _io_popen = '_io_popen'
-    $P1 = 'popen'
+    set $P1, 'popen'
     _io[$P1] = _io_popen
 
     .const .Sub _io_read = '_io_read'
-    $P1 = 'read'
+    set $P1, 'read'
     _io[$P1] = _io_read
 
     .const .Sub _io_tmpfile = '_io_tmpfile'
-    $P1 = 'tmpfile'
+    set $P1, 'tmpfile'
     _io[$P1] = _io_tmpfile
 
     .const .Sub _io_type = '_io_type'
-    $P1 = 'type'
+    set $P1, 'type'
     _io[$P1] = _io_type
 
     .const .Sub _io_write = '_io_write'
-    $P1 = 'write'
+    set $P1, 'write'
     _io[$P1] = _io_write
 
     #
@@ -98,53 +98,53 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     #
 
     .local pmc _file
-    _file = new .LuaTable
+    new _file, .LuaTable
 
     .const .Sub _file_close = '_io_close'
-    $P1 = 'close'
+    set $P1, 'close'
     _file[$P1] = _file_close
 
     .const .Sub _file_flush = '_file_flush'
-    $P1 = 'flush'
+    set $P1, 'flush'
     _file[$P1] = _file_flush
 
     .const .Sub _file_lines = '_file_lines'
-    $P1 = 'lines'
+    set $P1, 'lines'
     _file[$P1] = _file_lines
 
     .const .Sub _file_read = '_file_read'
-    $P1 = 'read'
+    set $P1, 'read'
     _file[$P1] = _file_read
 
     .const .Sub _file_seek = '_file_seek'
-    $P1 = 'seek'
+    set $P1, 'seek'
     _file[$P1] = _file_seek
 
     .const .Sub _file_setvbuf = '_file_setvbuf'
-    $P1 = 'setvbuf'
+    set $P1, 'setvbuf'
     _file[$P1] = _file_setvbuf
 
     .const .Sub _file_write = '_file_write'
-    $P1 = 'write'
+    set $P1, 'write'
     _file[$P1] = _file_write
 
 #    .const .Sub _file__tostring = '_file__tostring'
-#    $P1 = '__tostring'
+#    set $P1, '__tostring'
 #    _file[$P1] = _file__tostring
 
     .local pmc _lua_mt_file
-    _lua_mt_file = new .LuaTable
-    $P1 = '__index'
+    new _lua_mt_file, .LuaTable
+    set $P1, '__index'
     _lua_mt_file[$P1] = _file
 
     .const .Sub _file__tostring = '_file__tostring'
-    $P1 = '__tostring'
+    set $P1, '__tostring'
     _lua_mt_file[$P1] = _file__tostring
 
 
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = global '_REGISTRY'
-    $P1 = 'file'
+    set $P1, 'file'
     _lua__REGISTRY[$P1] = _lua_mt_file
 
 
@@ -154,33 +154,33 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
     .local pmc _lua__ENVIRON
     _lua__ENVIRON = global '_ENVIRON'
-    $P3 = new .LuaNumber
+    new $P3, .LuaNumber
 
-    $P1 = 'stdin'
+    set $P1, 'stdin'
     $P2 = getstdin
-    $P0 = new .LuaUserdata
+    new $P0, .LuaUserdata
     setattribute $P0, 'data', $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
-    $P3 = 0
+    set $P3, 0
     _lua__ENVIRON[$P3] = $P0
 
-    $P1 = 'stdout'
+    set $P1, 'stdout'
     $P2 = getstdout
-    $P0 = new .LuaUserdata
+    new $P0, .LuaUserdata
     setattribute $P0, 'data', $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
-    $P3 = 1
+    set $P3, 1
     _lua__ENVIRON[$P3] = $P0
 
-    $P1 = 'stderr'
+    set $P1, 'stderr'
     $P2 = getstderr
-    $P0 = new .LuaUserdata
+    new $P0, .LuaUserdata
     setattribute $P0, 'data', $P2
     $P0.'set_metatable'(_lua_mt_file)
     _io[$P1] = $P0
-    $P3 = 2
+    set $P3, 2
     _lua__ENVIRON[$P3] = $P0
 
 .end
@@ -193,7 +193,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     .local pmc file
     _lua__ENVIRON = global '_ENVIRON'
     new io, .LuaNumber
-    io = findex
+    set io, findex
     file = _lua__ENVIRON[io]
     .return (file)
 .end
@@ -239,7 +239,7 @@ L0:
     _lua__REGISTRY = global '_REGISTRY'
     .const .LuaString key = 'file'
     mt = _lua__REGISTRY[key]
-    file = new .LuaUserdata
+    new file, .LuaUserdata
     file.'set_metatable'(mt)
     .return (file)
 .end
@@ -255,7 +255,7 @@ L0:
     goto L2
 L1:
     new ret, .LuaString
-    ret = $S0
+    set ret, $S0
 L2:
     .return (ret)
 .end
@@ -271,7 +271,7 @@ L2:
 L1:
     chopn $S0, 1
     new ret, .LuaString
-    ret = $S0
+    set ret, $S0
 L2:
     .return (ret)
 .end
@@ -284,7 +284,7 @@ L2:
     .local pmc io
     _lua__ENVIRON = global '_ENVIRON'
     new io, .LuaNumber
-    io = findex
+    set io, findex
     _lua__ENVIRON[io] = file
 .end
 
@@ -298,7 +298,7 @@ L2:
     goto L2
 L1:
     new ret, .LuaString
-    ret = ''
+    set ret, ''
 L2:
     .return (ret)
 .end
@@ -388,7 +388,7 @@ L1:
     tofile(file)
     $I0 = aux_close(file)
     new ret, .LuaBoolean
-    ret = $I0
+    set ret, $I0
     .return (ret)
 .end
 
@@ -545,7 +545,7 @@ L1:
     $S0 = err
     concat $S1, ': '
     concat $S1, $S0
-    msg = $S1
+    set msg, $S1
     .return (ret, msg)
 .end
 
@@ -656,10 +656,10 @@ L1:
     ret = new .LuaString
     f = getattribute obj, 'data'
     unless_null f, L2
-    ret = "closed file"
+    set ret, 'closed file'
     goto L3
 L2:
-    ret = 'file'
+    set ret, 'file'
 L3:
     .return (ret)
 .end
@@ -701,7 +701,7 @@ Saves any written data to C<file>.
     f = tofile(self)
     f.'flush'()
     new ret, .LuaBoolean
-    ret = 1
+    set ret, 1
     .return (ret)
 .end
 
@@ -777,7 +777,7 @@ L1:
     .local pmc format
     narg = formats
     new ret, .Array
-    ret = narg
+    set ret, narg
     i = 0
 L2:
     unless i < narg goto L3
@@ -861,7 +861,7 @@ position to the end of the file, and returns its size.
     .local pmc ret
     tofile(self)
     new options, .Array
-    options = 3
+    set options, 3
     options[0] = 'set'
     options[1] = 'cur'
     options[2] = 'end'
@@ -870,9 +870,9 @@ position to the end of the file, and returns its size.
     $I2 = optint(offset, 0)
     f = getattribute self, 'data'
     seek f, $I2, $I1
-    $I3 = tell f
+    $I0 = tell f
     new ret, .LuaNumber
-    ret = $I3
+    set ret, $I0
     .return (ret)
 .end
 
@@ -914,7 +914,7 @@ NOT YET IMPLEMENTED.
     .local pmc ret
     tofile(self)
     new options, .Array
-    options = 3
+    set options, 3
     options[0] = 'no'
     options[1] = 'full'
     options[2] = 'line'
@@ -960,7 +960,7 @@ L4:
     goto L1
 L2:
     new ret, .LuaBoolean
-    ret = 1
+    set ret, 1
     .return (ret)
 .end
 
@@ -980,7 +980,7 @@ L1:
     concat $S0, $S1
     concat $S0, ")"
 L2:
-    ret = $S0
+    set ret, $S0
     .return (ret)
 .end
 

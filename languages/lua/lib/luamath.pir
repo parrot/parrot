@@ -56,126 +56,126 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = global '_G'
-    $P1 = new .LuaString
+    new $P1, .LuaString
 
     .local pmc _math
-    _math = new .LuaTable
-    $P1 = 'math'
+    new _math, .LuaTable
+    set $P1, 'math'
     _lua__GLOBAL[$P1] = _math
 
     .const .Sub _math_abs = '_math_abs'
-    $P1 = 'abs'
+    set $P1, 'abs'
     _math[$P1] = _math_abs
 
     .const .Sub _math_acos = '_math_acos'
-    $P1 = 'acos'
+    set $P1, 'acos'
     _math[$P1] = _math_acos
 
     .const .Sub _math_asin = '_math_asin'
-    $P1 = 'asin'
+    set $P1, 'asin'
     _math[$P1] = _math_asin
 
     .const .Sub _math_atan = '_math_atan'
-    $P1 = 'atan'
+    set $P1, 'atan'
     _math[$P1] = _math_atan
 
     .const .Sub _math_atan2 = '_math_atan2'
-    $P1 = 'atan2'
+    set $P1, 'atan2'
     _math[$P1] = _math_atan2
 
     .const .Sub _math_ceil = '_math_ceil'
-    $P1 = 'ceil'
+    set $P1, 'ceil'
     _math[$P1] = _math_ceil
 
     .const .Sub _math_cos = '_math_cos'
-    $P1 = 'cos'
+    set $P1, 'cos'
     _math[$P1] = _math_cos
 
     .const .Sub _math_deg = '_math_deg'
-    $P1 = 'deg'
+    set $P1, 'deg'
     _math[$P1] = _math_deg
 
     .const .Sub _math_exp = '_math_exp'
-    $P1 = 'exp'
+    set $P1, 'exp'
     _math[$P1] = _math_exp
 
     .const .Sub _math_floor = '_math_floor'
-    $P1 = 'floor'
+    set $P1, 'floor'
     _math[$P1] = _math_floor
 
     .const .Sub _math_fmod = '_math_fmod'
-    $P1 = 'fmod'
+    set $P1, 'fmod'
     _math[$P1] = _math_fmod
 
     # LUA_COMPAT_MOD
-    $P1 = 'mod'
+    set $P1, 'mod'
     _math[$P1] = _math_fmod
 
     .const .Sub _math_frexp = '_math_frexp'
-    $P1 = 'frexp'
+    set $P1, 'frexp'
     _math[$P1] = _math_frexp
 
     .const .Sub _math_ldexp = '_math_ldexp'
-    $P1 = 'ldexp'
+    set $P1, 'ldexp'
     _math[$P1] = _math_ldexp
 
     .const .Sub _math_log = '_math_log'
-    $P1 = 'log'
+    set $P1, 'log'
     _math[$P1] = _math_log
 
     .const .Sub _math_log10 = '_math_log10'
-    $P1 = 'log10'
+    set $P1, 'log10'
     _math[$P1] = _math_log10
 
     .const .Sub _math_max = '_math_max'
-    $P1 = 'max'
+    set $P1, 'max'
     _math[$P1] = _math_max
 
     .const .Sub _math_min = '_math_min'
-    $P1 = 'min'
+    set $P1, 'min'
     _math[$P1] = _math_min
 
     .const .Sub _math_modf = '_math_modf'
-    $P1 = 'modf'
+    set $P1, 'modf'
     _math[$P1] = _math_modf
 
     .const .Sub _math_pow = '_math_pow'
-    $P1 = 'pow'
+    set $P1, 'pow'
     _math[$P1] = _math_pow
 
     .const .Sub _math_rad = '_math_rad'
-    $P1 = 'rad'
+    set $P1, 'rad'
     _math[$P1] = _math_rad
 
     .const .Sub _math_random = '_math_random'
-    $P1 = 'random'
+    set $P1, 'random'
     _math[$P1] = _math_random
 
     .const .Sub _math_randomseed = '_math_randomseed'
-    $P1 = 'randomseed'
+    set $P1, 'randomseed'
     _math[$P1] = _math_randomseed
 
     .const .Sub _math_sin = '_math_sin'
-    $P1 = 'sin'
+    set $P1, 'sin'
     _math[$P1] = _math_sin
 
     .const .Sub _math_sqrt = '_math_sqrt'
-    $P1 = 'sqrt'
+    set $P1, 'sqrt'
     _math[$P1] = _math_sqrt
 
     .const .Sub _math_tan = '_math_tan'
-    $P1 = 'tan'
+    set $P1, 'tan'
     _math[$P1] = _math_tan
 
-    $P0 = new .LuaNumber
-    $P0 = 3.14159265358979323846
+    new $P0, .LuaNumber
+    set $P0, 3.14159265358979323846
     $P1 = 'pi'
     _math[$P1] = $P0
 
-    $P0 = new .LuaNumber
-    $P0 = 1.0
-    $P2 = new .LuaNumber
-    $P2 = 0.0
+    new $P0, .LuaNumber
+    set $P0, 1.0
+    new $P2, .LuaNumber
+    set $P2, 0.0
     div $P0, $P2
     $P1 = 'huge'
     _math[$P1] = $P0
@@ -189,7 +189,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $N0 = checknumber(x)
     $N1 = abs $N0
     new ret, .LuaNumber
-    ret = $N1
+    set ret, $N1
     .return (ret)
 .end
 
@@ -200,7 +200,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $N0 = checknumber(x)
     $N1 = acos $N0
     new ret, .LuaNumber
-    ret = $N1
+    set ret, $N1
     .return (ret)
 .end
 
@@ -211,7 +211,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $N0 = checknumber(x)
     $N1 = asin $N0
     new ret, .LuaNumber
-    ret = $N1
+    set ret, $N1
     .return (ret)
 .end
 
@@ -222,7 +222,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $N0 = checknumber(x)
     $N1 = atan $N0
     new ret, .LuaNumber
-    ret = $N1
+    set ret, $N1
     .return (ret)
 .end
 
@@ -235,7 +235,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $N1 = checknumber(x)
     $N2 = atan $N0, $N1
     new ret, .LuaNumber
-    ret = $N2
+    set ret, $N2
     .return (ret)
 .end
 
@@ -246,7 +246,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $N0 = checknumber(x)
     $N1 = ceil $N0
     new ret, .LuaNumber
-    ret = $N1
+    set ret, $N1
     .return (ret)
 .end
 
@@ -257,7 +257,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $N0 = checknumber(x)
     $N1 = cos $N0
     new ret, .LuaNumber
-    ret = $N1
+    set ret, $N1
     .return (ret)
 .end
 
@@ -269,7 +269,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $N1 = 3.14159265358979323846 / 180.0
     $N2 = $N0 / $N1
     new ret, .LuaNumber
-    ret = $N2
+    set ret, $N2
     .return (ret)
 .end
 
@@ -280,7 +280,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $N0 = checknumber(x)
     $N1 = exp $N0
     new ret, .LuaNumber
-    ret = $N1
+    set ret, $N1
     .return (ret)
 .end
 
@@ -291,7 +291,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $N0 = checknumber(x)
     $N1 = floor $N0
     new ret, .LuaNumber
-    ret = $N1
+    set ret, $N1
     .return (ret)
 .end
 
@@ -304,7 +304,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $N1 = checknumber(y)
     $N2 = cmod $N0, $N1
     new ret, .LuaNumber
-    ret = $N2
+    set ret, $N2
     .return (ret)
 .end
 
@@ -337,7 +337,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $N0 = checknumber(x)
     $N1 = ln $N0
     new ret, .LuaNumber
-    ret = $N1
+    set ret, $N1
     .return (ret)
 .end
 
@@ -348,7 +348,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     $N0 = checknumber(x)
     $N1 = log10 $N0
     new ret, .LuaNumber
-    ret = $N1
+    set ret, $N1
     .return (ret)
 .end
 
@@ -357,30 +357,26 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     .param pmc argv :slurpy
     .local int argc
     .local int i
-    .local float dmax
-    .local float d
-    .local pmc curr
-    .local pmc ret
+    .local pmc dmax
     argc = argv
     unless argc == 0 goto L0
     tag_error("no value", 'number')
 L0:
-    curr = argv[0]
-    dmax = checknumber(curr)
+    $P0 = argv[0]
+    dmax = checknumber($P0)
     i = 1
 L1:
     if i >= argc goto L3
-    curr = argv[i]
-    d = checknumber(curr)
-    if dmax > d goto L2
-    dmax = d
+    $P0 = argv[i]
+    $P1 = checknumber($P0)
+    if dmax > $P1 goto L2
+    dmax = $P1
 L2:
     inc i
     goto L1
 L3:
-    new ret, .LuaNumber
-    ret = dmax
-    .return (ret)
+    $P0 = clone dmax
+    .return ($P0)
 .end
 
 
@@ -388,30 +384,26 @@ L3:
     .param pmc argv :slurpy
     .local int argc
     .local int i
-    .local float dmin
-    .local float d
-    .local pmc curr
-    .local pmc ret
+    .local pmc dmin
     argc = argv
     unless argc == 0 goto L0
     tag_error("no value", 'number')
 L0:
-    curr = argv[0]
-    dmin = checknumber(curr)
+    $P0 = argv[0]
+    dmin = checknumber($P0)
     i = 1
 L1:
     if i >= argc goto L3
-    curr = argv[i]
-    d = checknumber(curr)
-    if dmin < d goto L2
-    dmin = d
+    $P0 = argv[i]
+    $P1 = checknumber($P0)
+    if dmin < $P1 goto L2
+    dmin = $P1
 L2:
     inc i
     goto L1
 L3:
-    new ret, .LuaNumber
-    ret = dmin
-    .return (ret)
+    $P0 = clone dmin
+    .return ($P0)
 .end
 
 
@@ -433,7 +425,7 @@ L3:
     $N1 = checknumber(y)
     $N2 = pow $N0, $N1
     new ret, .LuaNumber
-    ret = $N2
+    set ret, $N2
     .return (ret)
 .end
 
@@ -445,7 +437,7 @@ L3:
     $N1 = 3.14159265358979323846 / 180.0
     $N2 = $N0 * $N1
     new ret, .LuaNumber
-    ret = $N2
+    set ret, $N2
     .return (ret)
 .end
 
@@ -461,7 +453,7 @@ L3:
     $N0 = $P0
     new ret, .LuaNumber
     unless_null arg1, L1
-    ret = $N0
+    set ret, $N0
     goto L2
 L1:
     unless_null arg2, L3
@@ -470,7 +462,7 @@ L1:
     mul $N0, u
     $I0 = floor $N0
     inc $I0
-    ret = $I0
+    set ret, $I0
     goto L2
 L3:
     if extra goto L5
@@ -482,7 +474,7 @@ L3:
     mul $N0, $I0
     $I0 = floor $N0
     add $I0, l
-    ret = $I0
+    set ret, $I0
     goto L2
 L4:
     argerror("interval is empty")
@@ -497,7 +489,7 @@ L2:
     .param pmc seed :optional
     $I0 = checknumber(seed)
     new $P0, .Random
-    $P0 = $I0
+    set $P0, $I0
 .end
 
 
@@ -507,7 +499,7 @@ L2:
     $N0 = checknumber(x)
     $N1 = sin $N0
     new ret, .LuaNumber
-    ret = $N1
+    set ret, $N1
     .return (ret)
 .end
 
@@ -518,7 +510,7 @@ L2:
     $N0 = checknumber(x)
     $N1 = sqrt $N0
     new ret, .LuaNumber
-    ret = $N1
+    set ret, $N1
     .return (ret)
 .end
 
@@ -529,7 +521,7 @@ L2:
     $N0 = checknumber(x)
     $N1 = tan $N0
     new ret, .LuaNumber
-    ret = $N1
+    set ret, $N1
     .return (ret)
 .end
 

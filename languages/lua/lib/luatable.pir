@@ -32,47 +32,47 @@ See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = global '_G'
-    $P1 = new .LuaString
+    new $P1, .LuaString
 
     .local pmc _table
-    _table = new .LuaTable
-    $P1 = 'table'
+    new _table, .LuaTable
+    set $P1, 'table'
     _lua__GLOBAL[$P1] = _table
 
     .const .Sub _table_concat = '_table_concat'
-    $P1 = 'concat'
+    set $P1, 'concat'
     _table[$P1] = _table_concat
 
     .const .Sub _table_foreach = '_table_foreach'
-    $P1 = 'foreach'
+    set $P1, 'foreach'
     _table[$P1] = _table_foreach
 
     .const .Sub _table_foreachi = '_table_foreachi'
-    $P1 = 'foreachi'
+    set $P1, 'foreachi'
     _table[$P1] = _table_foreachi
 
     .const .Sub _table_getn = '_table_getn'
-    $P1 = 'getn'
+    set $P1, 'getn'
     _table[$P1] = _table_getn
 
     .const .Sub _table_insert = '_table_insert'
-    $P1 = 'insert'
+    set $P1, 'insert'
     _table[$P1] = _table_insert
 
     .const .Sub _table_maxn = '_table_maxn'
-    $P1 = 'maxn'
+    set $P1, 'maxn'
     _table[$P1] = _table_maxn
 
     .const .Sub _table_remove = '_table_remove'
-    $P1 = 'remove'
+    set $P1, 'remove'
     _table[$P1] = _table_remove
 
     .const .Sub _table_setn = '_table_setn'
-    $P1 = 'setn'
+    set $P1, 'setn'
     _table[$P1] = _table_setn
 
     .const .Sub _table_sort = '_table_sort'
-    $P1 = 'sort'
+    set $P1, 'sort'
     _table[$P1] = _table_sort
 
 .end
@@ -95,36 +95,36 @@ Returns C<table[i]..sep..table[i+1] ... sep..table[j]>. The default value for
     .param pmc j :optional
     .local pmc idx
     .local pmc value
-    .local pmc ret
+    .local string ret
     .local int last
-    $S0 = optstring(sep, '')
+    $S2 = optstring(sep, '')
     checktype(table, 'table')
-    $I0 = optint(i, 1)
-    $I1 = table.'len'()
-    last = optint(j, $I1)
-    $S1 = ''
+    $I3 = optint(i, 1)
+    $I0 = table.'len'()
+    last = optint(j, $I0)
+    ret = ''
     new idx, .LuaNumber
-L2:
-    unless $I0 <= last goto L3
-    idx = $I0
+L1:
+    unless $I3 <= last goto L2
+    set idx, $I3
     value = table.'rawget'(idx)
-    $I2 = isa value, 'LuaString'
-    if $I2 goto L4
-    $I2 = isa value, 'LuaNumber'
-    if $I2 goto L4
+    $I0 = isa value, 'LuaString'
+    if $I0 goto L3
+    $I0 = isa value, 'LuaNumber'
+    if $I0 goto L3
     argerror("table contains non-strings")
-L4:
-    $S2 = value
-    concat $S1, $S2
-    unless $I0 != last goto L5
-    concat $S1, $S0
-L5:
-    add $I0, 1
-    goto L2
 L3:
-    new ret, .LuaString
-    ret = $S1
-    .return (ret)
+    $S0 = value
+    concat ret, $S0
+    unless $I3 != last goto L4
+    concat ret, $S2
+L4:
+    inc $I3
+    goto L1
+L2:
+    new $P0, .LuaString
+    set $P0, ret
+    .return ($P0)
 .end
 
 
@@ -179,7 +179,7 @@ B<DEPRECATED>
 .sub '_table_foreachi' :anon
     .param pmc table :optional
     .param pmc f :optional
-    .local pmc index
+    .local pmc idx
     .local pmc value
     .local pmc ret
     .local int i
@@ -188,13 +188,13 @@ B<DEPRECATED>
     checktype(f, 'function')
     n = table.'len'()
     i = 0
-    new index, .LuaNumber
+    new idx, .LuaNumber
 L1:
-    add i, 1
+    inc i
     unless i <= n goto L2
-    index = i
-    value = table.'rawget'(index)
-    (ret) = f(index, value)
+    set idx, i
+    value = table.'rawget'(idx)
+    (ret) = f(idx, value)
     $I0 = defined ret
     unless $I0 goto L1
     .return (ret)
@@ -234,10 +234,10 @@ inserts C<x> at the end of table C<t>.
     .param pmc arg2 :optional
     .param pmc arg3 :optional
     .local pmc value
-    .local pmc index
+    .local pmc idx
     .local int e
     .local int pos
-    new index, .LuaNumber
+    new idx, .LuaNumber
     checktype(table, 'table')
     e = table.'len'()
     inc e
@@ -254,15 +254,14 @@ L3:
 L4:
     dec e
     unless e >= pos goto L2
-    index = e
-    $P0 = table.'rawget'(index)
-    $I0 = e + 1
-    index = $I0
-    table.'rawset'(index, $P0)
+    set idx, e
+    $P0 = table.'rawget'(idx)
+    inc idx
+    table.'rawset'(idx, $P0)
     goto L4
 L2:
-    index = pos
-    table.'rawset'(index, value)
+    set idx, pos
+    table.'rawset'(idx, value)
 .end
 
 
@@ -280,7 +279,7 @@ does a linear traversal of the whole table.)
     .local pmc max
     checktype(table, 'table')
     new max, .LuaNumber
-    max = 0
+    set max, 0
     new idx, .LuaNil
 L1:
     $P0 = table.'next'(idx)
@@ -309,7 +308,7 @@ table C<t>.
 .sub '_table_remove' :anon
     .param pmc table :optional
     .param pmc pos :optional
-    .local pmc index
+    .local pmc idx
     .local pmc ret
     .local int e
     .local int ipos
@@ -317,29 +316,28 @@ table C<t>.
     e = table.'len'()
     ipos = optint(pos, e)
     unless e <= 0 goto L1
+    # table is `empty'
     new ret, .LuaNil
     .return (ret)
 L1:
-    $I1 = e - 1
-    new index, .LuaNumber
-    index = ipos
-    ret = table.'rawget'(index)
+    new idx, .LuaNumber
+    set idx, ipos
+    ret = table.'rawget'(idx)
 L2:
     unless ipos < e goto L3
     $I2 = ipos + 1
-    index = $I2
-    $P0 = table.'rawget'(index)
-    index = ipos
-    table.'rawset'(index, $P0)
+    set idx, $I2
+    $P0 = table.'rawget'(idx)
+    set idx, ipos
+    table.'rawset'(idx, $P0)
     ipos = $I2
     goto L2
 L3:
     new $P0, .LuaNil
-    index = e
-    table.'rawset'(index, $P0)
+    set idx, e
+    table.'rawset'(idx, $P0)
     .return (ret)
 .end
-
 
 =item C<table.setn (table, n)>
 
@@ -388,70 +386,64 @@ L1:
     .param pmc comp
     .param int l
     .param int u
-    .local pmc index
+    .local pmc idx1
+    .local pmc idx2
     .local int i
     .local int j
     .local int tmp
-    new index, .LuaNumber
+    new idx1, .LuaNumber
+    new idx2, .LuaNumber
 L1:
     unless l < u goto L2
     # sort elements a[l], a[(l+u)/2] and a[u]
-    set index, l
-    $P1 = table.'rawget'(index)
-    set index, u
-    $P2 = table.'rawget'(index)
+    set idx1, l
+    set idx2, u
+    $P1 = table.'rawget'(idx1)
+    $P2 = table.'rawget'(idx2)
     $I0 = sort_comp(comp, $P2, $P1) # a[u] < a[l]?
     unless $I0 goto L3
     # swap a[l] - a[u]
-    set index, l
-    table.'rawset'(index, $P2)
-    set index, u
-    table.'rawset'(index, $P1)
+    table.'rawset'(idx1, $P2)
+    table.'rawset'(idx2, $P1)
 L3:
     tmp = u - l
     if tmp == 1 goto L2 # break: only 2 elements
     i = l + u
     i /= 2
-    set index, i
-    $P1 = table.'rawget'(index)
-    set index, l
-    $P2 = table.'rawget'(index)
+    set idx1, i
+    set idx2, l
+    $P1 = table.'rawget'(idx1)
+    $P2 = table.'rawget'(idx2)
     $I0 = sort_comp(comp, $P1, $P2) # a[i]<a[l]?
     unless $I0 goto L4
-    set index, i
-    table.'rawset'(index, $P2)
-    set index, l
-    table.'rawset'(index, $P1)
+    table.'rawset'(idx1, $P2)
+    table.'rawset'(idx2, $P1)
     goto L5
 L4:
-    set index, u
-    $P2 = table.'rawget'(index)
+    set idx2, u
+    $P2 = table.'rawget'(idx2)
     $I0 = sort_comp(comp, $P2, $P1) # a[u]<a[i]?
     unless $I0 goto L5
-    set index, i
-    table.'rawset'(index, $P2)
-    set index, u
-    table.'rawset'(index, $P1)
+    table.'rawset'(idx1, $P2)
+    table.'rawset'(idx2, $P1)
 L5:
     tmp = u - l
     if tmp == 2 goto L2 # break: only 3 elements
-    set index, i
-    $P1 = table.'rawget'(index)    # Pivot
+    set idx1, i
+    $P1 = table.'rawget'(idx1)    # Pivot
     tmp = u - 1
-    set index, tmp
-    $P2 = table.'rawget'(index)
-    set index, i
-    table.'rawset'(index, $P2)
-    set index, tmp
-    table.'rawset'(index, $P1)
+    set idx2, tmp
+    $P2 = table.'rawget'(idx2)
+    table.'rawset'(idx1, $P2)
+    table.'rawset'(idx2, $P1)
     # a[l] <= P == a[u-1] <= a[u], only need to sort from l+1 to u-2 */
     i = l
     j = u - 1
 L6: # invariant: a[l..i] <= P <= a[j..u]
     # repeat ++i until a[i] >= P
     inc i
-    set index, i
-    $P2 = table.'rawget'(index)
+    set idx2, i
+    $P2 = table.'rawget'(idx2)
     $I0 = sort_comp(comp, $P2, $P1)
     unless $I0 goto L7
     unless i > u goto L6
@@ -460,8 +452,8 @@ L6: # invariant: a[l..i] <= P <= a[j..u]
 L7:
     # repeat --j until a[j] <= P
     dec j
-    set index, j
-    $P3 = table.'rawget'(index)
+    set idx1, j
+    $P3 = table.'rawget'(idx1)
     $I0 = sort_comp(comp, $P1, $P3)
     unless $I0 goto L8
     unless j < l goto L7
@@ -469,22 +461,18 @@ L7:
     goto L7
 L8:
     if j < i goto L9
-    set index, i
-    table.'rawset'(index, $P3)
-    set index, j
-    table.'rawset'(index, $P2)
+    table.'rawset'(idx2, $P3)
+    table.'rawset'(idx1, $P2)
     goto L6
 L9:
     tmp = u - 1
-    set index, tmp
-    $P1 = table.'rawget'(index)
-    set index, i
-    $P2 = table.'rawget'(index)
+    set idx1, tmp
+    set idx2, i
+    $P1 = table.'rawget'(idx1)
+    $P2 = table.'rawget'(idx2)
     # swap pivot (a[u-1]) with a[i]
-    set index, tmp
-    table.'rawset'(index, $P2)
-    set index, i
-    table.'rawset'(index, $P1)
+    table.'rawset'(idx1, $P2)
+    table.'rawset'(idx2, $P1)
     # a[l..i-1] <= a[i] == P <= a[i+1..u]
     # adjust so that smaller half is in [j..i] and larger one in [l..u]
     tmp += l

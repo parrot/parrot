@@ -38,74 +38,74 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = global '_G'
-    $P1 = new .LuaString
+    new $P1, .LuaString
 
     .local pmc _string
-    _string = new .LuaTable
-    $P1 = 'string'
+    new _string, .LuaTable
+    set $P1, 'string'
     _lua__GLOBAL[$P1] = _string
 
     .const .Sub _string_byte = '_string_byte'
-    $P1 = 'byte'
+    set $P1, 'byte'
     _string[$P1] = _string_byte
 
     .const .Sub _string_char = '_string_char'
-    $P1 = 'char'
+    set $P1, 'char'
     _string[$P1] = _string_char
 
     .const .Sub _string_dump = '_string_dump'
-    $P1 = 'dump'
+    set $P1, 'dump'
     _string[$P1] = _string_dump
 
     .const .Sub _string_find = '_string_find'
-    $P1 = 'find'
+    set $P1, 'find'
     _string[$P1] = _string_find
 
     .const .Sub _string_format = '_string_format'
-    $P1 = 'format'
+    set $P1, 'format'
     _string[$P1] = _string_format
 
     .const .Sub _string_gmatch = '_string_gmatch'
-    $P1 = 'gmatch'
+    set $P1, 'gmatch'
     _string[$P1] = _string_gmatch
 
     .const .Sub _string_gsub = '_string_gsub'
-    $P1 = 'gsub'
+    set $P1, 'gsub'
     _string[$P1] = _string_gsub
 
     .const .Sub _string_len = '_string_len'
-    $P1 = 'len'
+    set $P1, 'len'
     _string[$P1] = _string_len
 
     .const .Sub _string_lower = '_string_lower'
-    $P1 = 'lower'
+    set $P1, 'lower'
     _string[$P1] = _string_lower
 
     .const .Sub _string_match = '_string_match'
-    $P1 = 'match'
+    set $P1, 'match'
     _string[$P1] = _string_match
 
     .const .Sub _string_rep = '_string_rep'
-    $P1 = 'rep'
+    set $P1, 'rep'
     _string[$P1] = _string_rep
 
     .const .Sub _string_reverse = '_string_reverse'
-    $P1 = 'reverse'
+    set $P1, 'reverse'
     _string[$P1] = _string_reverse
 
     .const .Sub _string_sub = '_string_sub'
-    $P1 = 'sub'
+    set $P1, 'sub'
     _string[$P1] = _string_sub
 
     .const .Sub _string_upper = '_string_upper'
-    $P1 = 'upper'
+    set $P1, 'upper'
     _string[$P1] = _string_upper
 
 
     .local pmc _lua_mt_string
-    _lua_mt_string = new .LuaTable
+    new _lua_mt_string, .LuaTable
     global 'mt_string' = _lua_mt_string
-    $P1 = '__index'
+    set $P1, '__index'
     _lua_mt_string[$P1] = _string
 
 .end

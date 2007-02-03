@@ -27,55 +27,55 @@ See "Lua 5.1 Reference Manual", section 5.8 "Operating System Facilities".
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = global '_G'
-    $P1 = new .LuaString
+    new $P1, .LuaString
 
     .local pmc _os
-    _os = new .LuaTable
-    $P1 = 'os'
+    new _os, .LuaTable
+    set $P1, 'os'
     _lua__GLOBAL[$P1] = _os
 
     .const .Sub _os_clock = '_os_clock'
-    $P1 = 'clock'
+    set $P1, 'clock'
     _os[$P1] = _os_clock
 
     .const .Sub _os_date = '_os_date'
-    $P1 = 'date'
+    set $P1, 'date'
     _os[$P1] = _os_date
 
     .const .Sub _os_difftime = '_os_difftime'
-    $P1 = 'difftime'
+    set $P1, 'difftime'
     _os[$P1] = _os_difftime
 
     .const .Sub _os_execute = '_os_execute'
-    $P1 = 'execute'
+    set $P1, 'execute'
     _os[$P1] = _os_execute
 
     .const .Sub _os_exit = '_os_exit'
-    $P1 = 'exit'
+    set $P1, 'exit'
     _os[$P1] = _os_exit
 
     .const .Sub _os_getenv = '_os_getenv'
-    $P1 = 'getenv'
+    set $P1, 'getenv'
     _os[$P1] = _os_getenv
 
     .const .Sub _os_remove = '_os_remove'
-    $P1 = 'remove'
+    set $P1, 'remove'
     _os[$P1] = _os_remove
 
     .const .Sub _os_rename = '_os_rename'
-    $P1 = 'rename'
+    set $P1, 'rename'
     _os[$P1] = _os_rename
 
     .const .Sub _os_setlocale = '_os_setlocale'
-    $P1 = 'setlocale'
+    set $P1, 'setlocale'
     _os[$P1] = _os_setlocale
 
     .const .Sub _os_time = '_os_time'
-    $P1 = 'time'
+    set $P1, 'time'
     _os[$P1] = _os_time
 
     .const .Sub _os_tmpname = '_os_tmpname'
-    $P1 = 'tmpname'
+    set $P1, 'tmpname'
     _os[$P1] = _os_tmpname
 
 .end
@@ -213,7 +213,7 @@ if the variable is not defined.
     .return (ret)
 L0:
     new ret, .LuaString
-    ret = $S1
+    set ret, $S1
     .return (ret)
 .end
 
@@ -235,7 +235,7 @@ describing the error.
     push_eh _handler
     $P0.'rm'($S0)
     new ret, .LuaBoolean
-    ret = 1
+    set ret, 1
     .return (ret)
 _handler:
     .local pmc nil
@@ -247,7 +247,7 @@ _handler:
     concat $S1, s
     new nil, .LuaNil
     new msg, .LuaString
-    msg = $S1
+    set msg, $S1
     .return (nil, msg)
 .end
 
@@ -270,7 +270,7 @@ fails, it returns B<nil>, plus a string describing the error.
     push_eh _handler
     $P0.'rename'($S0, $S1)
     new ret, .LuaBoolean
-    ret = 1
+    set ret, 1
     .return (ret)
 _handler:
     .local pmc nil
@@ -282,7 +282,7 @@ _handler:
     concat $S2, s
     new nil, .LuaNil
     new msg, .LuaString
-    msg = $S2
+    set msg, $S2
     .return (nil, msg)
 .end
 
@@ -333,7 +333,7 @@ STILL INCOMPLETE.
 L0:
     $I0 = time
     new ret, .LuaNumber
-    ret = $I0
+    set ret, $I0
     .return (ret)
 L1:
     checktype(table, 'table')

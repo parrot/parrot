@@ -29,38 +29,38 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = global '_G'
-    $P1 = new .LuaString
+    new $P1, .LuaString
 
     .local pmc _coroutine
-    _coroutine = new .LuaTable
-    $P1 = 'coroutine'
+    new _coroutine, .LuaTable
+    set $P1, 'coroutine'
     _lua__GLOBAL[$P1] = _coroutine
 
     .const .Sub _coroutine_create = '_coroutine_create'
-    $P1 = 'create'
+    set $P1, 'create'
     _coroutine[$P1] = _coroutine_create
 
     .const .Sub _coroutine_resume = '_coroutine_resume'
-    $P1 = 'resume'
+    set $P1, 'resume'
     _coroutine[$P1] = _coroutine_resume
 
     .const .Sub _coroutine_running = '_coroutine_running'
-    $P1 = 'running'
+    set $P1, 'running'
     _coroutine[$P1] = _coroutine_running
 
     .const .Sub _coroutine_status = '_coroutine_status'
-    $P1 = 'status'
+    set $P1, 'status'
     _coroutine[$P1] = _coroutine_status
 
     .const .Sub _coroutine_wrap = '_coroutine_wrap'
-    $P1 = 'wrap'
+    set $P1, 'wrap'
     _coroutine[$P1] = _coroutine_wrap
 
     .const .Sub _coroutine_yield = '_coroutine_yield'
-    $P1 = 'yield'
+    set $P1, 'yield'
     _coroutine[$P1] = _coroutine_yield
 
-    $P0 = new .ResizablePMCArray
+    new $P0, .ResizablePMCArray
     global '_COROUTINE_STACK' = $P0
 
 .end
@@ -107,14 +107,14 @@ C<resume> returns B<false> plus the error message.
     checktype(co, 'thread')
     ($I0, ret :slurpy) = auxresume(co, argv :flat)
     new status, .LuaBoolean
-    status = $I0
+    set status, $I0
     unless $I0 goto L1
     .return (status, ret :flat)
 L1:
     .local pmc msg
     $S0 = ret[0]
     new msg, .LuaString
-    msg = $S0
+    set msg, $S0
     .return (status, msg)
 .end
 
@@ -185,10 +185,10 @@ STILL INCOMPLETE.
     $P0 = getattribute co, 'co'
     $P1 = getattribute $P0, 'state'
     if $P1 goto L1
-    ret = 'dead'
+    set ret, 'dead'
     goto L2
 L1:
-    ret = 'suspended'
+    set ret, 'suspended'
 L2:
     .return (ret)
 .end

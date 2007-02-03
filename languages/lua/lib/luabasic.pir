@@ -36,7 +36,7 @@ See "Lua 5.1 Reference Manual", section 5.1 "Basic Functions".
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = new .LuaTable
     global '_G' = _lua__GLOBAL
-    $P1 = new .LuaString
+    new $P1, .LuaString
 
 =item C<_G>
 
@@ -47,7 +47,7 @@ environments.)
 
 =cut
 
-    $P1 = '_G'
+    set $P1, '_G'
     _lua__GLOBAL[$P1] = _lua__GLOBAL
 
 =item C<_VERSION>
@@ -57,9 +57,9 @@ interpreter version. The current contents of this variable is C<"Lua 5.1">.
 
 =cut
 
-    $P0 = new .LuaString
-    $P0 = "Lua 5.1 (on Parrot)"
-    $P1 = '_VERSION'
+    new $P0, .LuaString
+    set $P0, "Lua 5.1 (on Parrot)"
+    set $P1, '_VERSION'
     _lua__GLOBAL[$P1] = $P0
 
 =back
@@ -71,103 +71,103 @@ interpreter version. The current contents of this variable is C<"Lua 5.1">.
 =cut
 
     .const .Sub _lua_assert = '_lua_assert'
-    $P1 = 'assert'
+    set $P1, 'assert'
     _lua__GLOBAL[$P1] = _lua_assert
 
     .const .Sub _lua_collectgarbage = '_lua_collectgarbage'
-    $P1 = 'collectgarbage'
+    set $P1, 'collectgarbage'
     _lua__GLOBAL[$P1] = _lua_collectgarbage
 
     .const .Sub _lua_dofile = '_lua_dofile'
-    $P1 = 'dofile'
+    set $P1, 'dofile'
     _lua__GLOBAL[$P1] = _lua_dofile
 
     .const .Sub _lua_error = '_lua_error'
-    $P1 = 'error'
+    set $P1, 'error'
     _lua__GLOBAL[$P1] = _lua_error
 
     .const .Sub _lua_getfenv = '_lua_getfenv'
-    $P1 = 'getfenv'
+    set $P1, 'getfenv'
     _lua__GLOBAL[$P1] = _lua_getfenv
 
     .const .Sub _lua_getmetatable = '_lua_getmetatable'
-    $P1 = 'getmetatable'
+    set $P1, 'getmetatable'
     _lua__GLOBAL[$P1] = _lua_getmetatable
 
     .const .Sub _lua_ipairs = '_lua_ipairs'
-    $P1 = 'ipairs'
+    set $P1, 'ipairs'
     _lua__GLOBAL[$P1] = _lua_ipairs
 
     .const .Sub _lua_load = '_lua_load'
-    $P1 = 'load'
+    set $P1, 'load'
     _lua__GLOBAL[$P1] = _lua_load
 
     .const .Sub _lua_loadfile = '_lua_loadfile'
-    $P1 = 'loadfile'
+    set $P1, 'loadfile'
     _lua__GLOBAL[$P1] = _lua_loadfile
 
     .const .Sub _lua_loadstring = '_lua_loadstring'
-    $P1 = 'loadstring'
+    set $P1, 'loadstring'
     _lua__GLOBAL[$P1] = _lua_loadstring
 
     .const .Sub _lua_next = '_lua_next'
-    $P1 = 'next'
+    set $P1, 'next'
     _lua__GLOBAL[$P1] = _lua_next
 
     .const .Sub _lua_pairs = '_lua_pairs'
-    $P1 = 'pairs'
+    set $P1, 'pairs'
     _lua__GLOBAL[$P1] = _lua_pairs
 
     .const .Sub _lua_pcall = '_lua_pcall'
-    $P1 = 'pcall'
+    set $P1, 'pcall'
     _lua__GLOBAL[$P1] = _lua_pcall
 
     .const .Sub _lua_print = '_lua_print'
-    $P1 = 'print'
+    set $P1, 'print'
     _lua__GLOBAL[$P1] = _lua_print
 
     .const .Sub _lua_rawequal = '_lua_rawequal'
-    $P1 = 'rawequal'
+    set $P1, 'rawequal'
     _lua__GLOBAL[$P1] = _lua_rawequal
 
     .const .Sub _lua_rawget = '_lua_rawget'
-    $P1 = 'rawget'
+    set $P1, 'rawget'
     _lua__GLOBAL[$P1] = _lua_rawget
 
     .const .Sub _lua_rawset = '_lua_rawset'
-    $P1 = 'rawset'
+    set $P1, 'rawset'
     _lua__GLOBAL[$P1] = _lua_rawset
 
     .const .Sub _lua_select = '_lua_select'
-    $P1 = 'select'
+    set $P1, 'select'
     _lua__GLOBAL[$P1] = _lua_select
 
     .const .Sub _lua_setfenv = '_lua_setfenv'
-    $P1 = 'setfenv'
+    set $P1, 'setfenv'
     _lua__GLOBAL[$P1] = _lua_setfenv
 
     .const .Sub _lua_setmetatable = '_lua_setmetatable'
-    $P1 = 'setmetatable'
+    set $P1, 'setmetatable'
     _lua__GLOBAL[$P1] = _lua_setmetatable
 
     .const .Sub _lua_tonumber = '_lua_tonumber'
-    $P1 = 'tonumber'
+    set $P1, 'tonumber'
     _lua__GLOBAL[$P1] = _lua_tonumber
 
     .const .Sub _lua_tostring = '_lua_tostring'
-    $P1 = 'tostring'
+    set $P1, 'tostring'
     _lua__GLOBAL[$P1] = _lua_tostring
 
     .const .Sub _lua_type = '_lua_type'
-    $P1 = 'type'
+    set $P1, 'type'
     _lua__GLOBAL[$P1] = _lua_type
 
     .const .Sub _lua_unpack = '_lua_unpack'
-    $P1 = 'unpack'
+    set $P1, 'unpack'
     _lua__GLOBAL[$P1] = _lua_unpack
 
     .const .Sub _lua_xpcall = '_lua_xpcall'
-    $P1 = 'xpcall'
+    set $P1, 'xpcall'
     _lua__GLOBAL[$P1] = _lua_xpcall
 
 .end
@@ -186,10 +186,10 @@ message; when absent, it defaults to "assertion failed!"
     .param pmc message :optional
     checkany(v)
     $I0 = istrue v
-    if $I0 goto L0
+    if $I0 goto L1
     $S0 = optstring(message, "assertion failed!")
     error($S0)
-L0:
+L1:
     .return (v, message)
 .end
 
@@ -353,7 +353,7 @@ See C<next> for the caveats of modifying the table during its traversal.
     .param pmc t :optional
     .param pmc i :optional
     checktype(t, 'table')
-    unless_null i, L0
+    unless_null i, L1
     .local pmc _G
     _G = global '_G'
     .const .LuaString key_ipairs = 'ipairs'
@@ -363,15 +363,15 @@ See C<next> for the caveats of modifying the table during its traversal.
     new zero, .LuaNumber
     set zero, 0.0
     .return (ipairs, t, zero)
-L0:
+L1:
     $P0 = checknumber(i)
     $P1 = clone $P0
     inc $P1
     .local pmc ret
     ret = t.'rawget'($P1)
-    unless ret goto L1
+    unless ret goto L2
     .return ($P1, ret)
-L1:
+L2:
     .return ()
 .end
 
@@ -460,9 +460,9 @@ existing fields. In particular, you may clear existing fields.
 
 .sub '_lua_next' :anon
     .param pmc table :optional
-    .param pmc index :optional
+    .param pmc idx :optional
     checktype(table, 'table')
-    $P0 = table.'next'(index)
+    $P0 = table.'next'(idx)
     unless $P0 goto L1
     .return ($P0 :flat)
 L1:
@@ -517,16 +517,16 @@ In case of any error, C<pcall> returns B<false> plus the error message.
     checkany(f)
     push_eh _handler
     (ret :slurpy) = f(argv :flat)
-    status = 1
+    set status, 1
     .return (status, ret :flat)
 _handler:
     .local pmc e
     .local string s
     .local pmc msg
     .get_results (e, s)
-    status = 0
+    set status, 0
     new msg, .LuaString
-    msg = s
+    set msg, s
     .return (status, msg)
 .end
 
@@ -588,11 +588,11 @@ C<table> must be a table; C<index> is any value different from B<nil>.
 
 .sub '_lua_rawget' :anon
     .param pmc table :optional
-    .param pmc index :optional
+    .param pmc idx :optional
     .local pmc ret
     checktype(table, 'table')
-    checkany(index)
-    ret = table.'rawget'(index)
+    checkany(idx)
+    ret = table.'rawget'(idx)
     .return (ret)
 .end
 
@@ -603,17 +603,19 @@ Sets the real value of C<table[index]> to value, without invoking any
 metamethod. C<table> must be a table, C<index> is any value different from
 B<nil>, and C<value> is any Lua value.
 
+This function returns C<table>.
+
 =cut
 
 .sub '_lua_rawset' :anon
     .param pmc table :optional
-    .param pmc index :optional
+    .param pmc idx :optional
     .param pmc value :optional
     checktype(table, 'table')
-    checkany(index)
+    checkany(idx)
     checkany(value)
-    table.'rawset'(index, value)
-    .return ()
+    table.'rawset'(idx, value)
+    .return (table)
 .end
 
 
@@ -626,13 +628,13 @@ total number of extra arguments it received.
 =cut
 
 .sub '_lua_select' :anon
-    .param pmc index :optional
+    .param pmc idx :optional
     .param pmc argv :slurpy
     .local pmc ret
-    unless index goto L1
-    $I0 = isa index, 'LuaString'
+    unless idx goto L1
+    $I0 = isa idx, 'LuaString'
     unless $I0 goto L1
-    $S0 = index
+    $S0 = idx
     unless $S0 == '#' goto L1
     $I1 = argv
     new ret, .LuaNumber
@@ -640,7 +642,7 @@ total number of extra arguments it received.
     .return (ret)
 L1:
     .local int i
-    i = checknumber(index)
+    i = checknumber(idx)
     .local int n
     n = argv
     inc n
@@ -699,7 +701,7 @@ other types from Lua.) If metatable is B<nil>, removes the metatable of the
 given table. If the original metatable has a C<"__metatable"> field, raises
 an error.
 
-This function returns table.
+This function returns C<table>.
 
 =cut
 
@@ -800,7 +802,7 @@ C<"userdata">.
     checkany(v)
     $S0 = typeof v
     new ret, .LuaString
-    ret = $S0
+    set ret, $S0
     .return (ret)
 .end
 
@@ -835,7 +837,7 @@ length operator.
     new ret, .Array
     set ret, n
     new index, .LuaNumber
-    index = $I1
+    set index, $I1
     idx = 0
 L0:
     unless idx < n goto L1
@@ -874,14 +876,14 @@ error, C<xpcall> returns false plus the result from C<err>.
     checkany(err)
     push_eh _handler
     (ret :slurpy) = f()
-    status = 1
+    set status, 1
     .return (status, ret :flat)
 _handler:
     .local pmc e
     .local pmc msg
-    status = 0
+    set status, 0
     $S0 = typeof err
-    unless $S0 == 'Sub' goto L0
+    unless $S0 == 'function' goto L0
     .get_results (e)
     (ret :slurpy) = err(e)
     .return (status, ret :flat)
