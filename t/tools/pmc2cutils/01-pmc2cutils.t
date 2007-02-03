@@ -18,7 +18,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 27;
+use Test::More tests => 26;
 
 use_ok( 'Parrot::Pmc2c::Utils' );
 
@@ -31,7 +31,6 @@ $self = Parrot::Pmc2c::Utils->new( {
     args    => [ @args ],
 } );
 isa_ok($self, q{Parrot::Pmc2c::Utils});
-can_ok($self, q{get_included_paths});
 can_ok($self, q{find_file});
 can_ok($self, q{dump_vtable});
 can_ok($self, q{open_file});
