@@ -1,3 +1,9 @@
+=head1 Parrot::Pmc2c::default Instance Methods
+
+=over 4
+
+=cut
+
 package Parrot::Pmc2c::default;
 use base 'Parrot::Pmc2c';
 import Parrot::Pmc2c qw( gen_ret );
@@ -20,6 +26,8 @@ generating.
 
 Overrides the default implementation to throw an execption for unknown
 methods.
+
+=back
 
 =cut
 

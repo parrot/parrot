@@ -1,4 +1,4 @@
-=head2 Parrot::Pmc2c::Ref Instance Methods
+=head1 Parrot::Pmc2c::Ref Instance Methods
 
 =over 4
 
@@ -115,6 +115,7 @@ EOC
 }
 
 1;
+
 =back
 
 =cut

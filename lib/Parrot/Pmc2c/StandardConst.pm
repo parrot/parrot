@@ -1,4 +1,4 @@
-=head2 Parrot::Pmc2c::Standard::Const Instance Methods
+=head1 Parrot::Pmc2c::Standard::Const Instance Methods
 
 Returns the C code for the method body.
 
@@ -15,6 +15,8 @@ use Parrot::Pmc2c::UtilFunctions qw( gen_ret );
 Returns the C code for the method body. C<$line> is used to accumulate
 the number of lines, C<$out_name> is the name of the output file we are
 generating.
+
+=back
 
 =cut
 

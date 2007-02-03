@@ -1,4 +1,4 @@
-=head2 Parrot::Pmc2c::Null Instance Methods
+=head1 Parrot::Pmc2c::Null Instance Methods
 
 =over 4
 
@@ -27,6 +27,8 @@ the number of lines, C<$out_name> is the name of the output file we are
 generating.
 
 The C<Null> PMC throws an execption for all methods.
+
+=back
 
 =cut
 

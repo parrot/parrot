@@ -2,6 +2,8 @@ package Parrot::Pmc2c::deleg_pmc;
 use base 'Parrot::Pmc2c';
 use Parrot::Pmc2c::UtilFunctions qw( gen_ret );
 
+=over 4
+
 =item C<implements($method)>
 
 Always true for vtables.
@@ -21,6 +23,8 @@ generating.
 
 Overrides the default implementation to direct all unknown methods to
 the PMC in the first attribute slot.
+
+=back
 
 =cut
 

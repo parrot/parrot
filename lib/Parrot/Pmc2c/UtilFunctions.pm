@@ -4,6 +4,8 @@ use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw( count_newlines gen_ret dont_edit dynext_load_code c_code_coda );
 
+=over 4
+
 =item C<count_newlines($string)>
 
 Returns the number of newlines (C<\n>) in C<$string>.
@@ -142,6 +144,8 @@ EOC
 =item C<c_code_coda()>
 
 Returns the Parrot C code coda
+
+=back
 
 =cut
 

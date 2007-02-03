@@ -1,9 +1,7 @@
 package Parrot::Pmc2c::STMRef;
 use base 'Parrot::Pmc2c::Ref';
 
-=head2 Parrot::Pmc2c::STMRef Instance Methods
-
-=over 4
+=head1 Parrot::Pmc2c::STMRef Instance Methods
 
 =cut
 

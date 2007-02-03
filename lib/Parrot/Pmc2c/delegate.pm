@@ -1,4 +1,4 @@
-=head2 Parrot::Pmc2c::delegate Instance Methods
+=head1 Parrot::Pmc2c::delegate Instance Methods
 
 =over 4
 
@@ -69,6 +69,8 @@ the number of lines, C<$out_name> is the name of the output file we are
 generating.
 
 The C<delegate> PMC redirects all methods to bytecode.
+
+=back
 
 =cut
 

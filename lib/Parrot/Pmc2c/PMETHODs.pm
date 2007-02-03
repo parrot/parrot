@@ -149,7 +149,7 @@ sub gen_arg_flags {
   $flag |= PARROT_ARG_FLATTEN if exists $param->{attrs}->{flatten};
   $flag |= PARROT_ARG_SLURPY_ARRAY if exists $param->{attrs}->{slurpy};
   $flag |= PARROT_ARG_NAME if exists $param->{attrs}->{name};
-
+  $flag |= PARROT_ARG_NAME if exists $param->{attrs}->{named};
   if (exists $param->{attrs}->{opt_flag}) {
     return PARROT_ARG_INTVAL | PARROT_ARG_OPT_FLAG;
   }
@@ -244,7 +244,7 @@ sub parse_pmethod_args_add_obj {
   my $linear_args = parse_pmethod_args($_[0]);
   my $arg = {
     type => get_arg_type('PMC'),
-    name => 'self',
+    name => 'pmc',
     attrs => parse_arg_attrs(':object')
   };
   unshift @$linear_args, $arg;

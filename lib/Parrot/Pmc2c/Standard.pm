@@ -1,4 +1,4 @@
-=head2 Parrot::Pmc2c::Standard Instance Methods
+=head1 Parrot::Pmc2c::Standard Instance Methods
 
 Standard behavior.
 
@@ -14,6 +14,8 @@ use base 'Parrot::Pmc2c';
 Returns the C code for the method body. C<$line> is used to accumulate
 the number of lines, C<$out_name> is the name of the output file we are
 generating.
+
+=back
 
 =cut
 

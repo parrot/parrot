@@ -1,6 +1,4 @@
-=back
-
-=head2 Parrot::Pmc2c::SharedRef Instance Methods
+=head1 Parrot::Pmc2c::SharedRef Instance Methods
 
 =over 4
 
@@ -33,10 +31,6 @@ sub postderef {
 }
 
 =back
-
-=head2 Parrot::Pmc2c::default Instance Methods
-
-=over 4
 
 =cut
 

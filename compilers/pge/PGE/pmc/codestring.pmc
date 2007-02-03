@@ -152,7 +152,6 @@ A newline is automatically added to the end of the fmt.
         }
 
         PMC_str_val(SELF) = string_append(interp, PMC_str_val(SELF), format);
-
         if (string_equal(interp, string_substr(interp, format, -1, 1, NULL, 0), NEWLINE)) {
             PMC_str_val(SELF) = string_append(interp, PMC_str_val(SELF), NEWLINE);
         }

@@ -17,7 +17,7 @@ PMCDIR   = PGE/pmc
 PARROT_LIBRARY    = ../../runtime/parrot/library
 
 # the default target
-all: $(PARROT_LIBRARY)/PGE.pbc $(PMCDIR)/pge_group$(LOAD_EXT)
+all: $(PMCDIR)/pge_group$(LOAD_EXT) $(PARROT_LIBRARY)/PGE.pbc 
 
 PMCS = \
 	codestring
