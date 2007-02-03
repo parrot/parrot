@@ -113,17 +113,18 @@ via the C<open> opcode.]
 
 =item open
 
-  $P0.open()
-  $P0.open($S1)
-  $P0.open($S1, $S2)
+  $P0 = $P1.open()
+  $P0 = $P1.open($S2)
+  $P0 = $P1.open($S2, $S2)
 
-Opens a stream on an existing I/O stream object. With no arguments, it
-can be used to reopen a previously opened I/O stream. $S1 is a file path
-and $S2 is an optional mode for the stream (read, write, read/write,
-etc), using the same format as the C<open> opcode: 'r' for read, 'w' for
-write, 'a' for append, and 'p' for pipe. When the mode is set to write
-or append, a file is created without warning if none exists. When the
-mode is read (without write), a nonexistent file is an error.
+Opens a stream on an existing I/O stream object, and returns a status
+object. With no arguments, it can be used to reopen a previously opened
+I/O stream. $S2 is a file path and $S3 is an optional mode for the
+stream (read, write, read/write, etc), using the same format as the
+C<open> opcode: 'r' for read, 'w' for write, 'a' for append, and 'p' for
+pipe. When the mode is set to write or append, a file is created without
+warning if none exists. When the mode is read (without write), a
+nonexistent file is an error.
 
 The asynchronous version takes a PMC callback as an additional final
 argument. When the open operation is complete, it invokes the callback
@@ -132,10 +133,11 @@ object.
 
 =item close
 
-  $P0.close()
-  $P0.close($P1)
+  $P0 = $P1.close()
+  $P0 = $P1.close($P2)
 
-Closes an I/O stream, but leaves destruction of the I/O object to the GC.
+Closes an I/O stream, but leaves destruction of the I/O object to the
+GC. The C<close> method returns a PMC status object.
 
 The asynchronous version takes an additional final PMC callback argument
 $P1. When the close operation is complete, it invokes the callback,
