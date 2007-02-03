@@ -22,6 +22,7 @@ help:
 	@echo "                     with support for variant 'Plumhead partridge'."
 	@echo "                     This is the default."
 	@echo "  build              Same as 'all'."
+	@echo "  build-all          Build all three variants"
 	@echo "  build-partridge    Same as 'build', which is same as 'all'."
 	@echo "  build-phc          Build support for variant 'Plumhead phc'."
 	@echo "                     Current this has nothing to do."
@@ -59,6 +60,8 @@ maintain-antlr3: src/antlr3/Plumhead.g src/antlr3/GenPastPir.g
 
 
 build:           build-partridge
+
+build-all:       build-partridge build-phc build-antlr3
 
 build-common:    src/common/plumheadlib.pbc plumhead.pbc
 
