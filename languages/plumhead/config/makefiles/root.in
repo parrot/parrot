@@ -1,9 +1,11 @@
 # $Id$
 
-# Setup some commands and pathes
+# Set up some commands
 PARROT   = ../../parrot@exe@
 PERL     = @perl@
 RM_F     = @rm_f@
+
+# Set up some pathes
 PGE_DIR  = ../../compilers/pge
 TGE_DIR  = ../../compilers/tge
 
@@ -16,25 +18,36 @@ help:
 	@echo "Following targets are available for the user:"
 	@echo ""
 	@echo "Building:"
-	@echo "  all:               Build plumhead.pbc."
+	@echo "  all:               Build plumhead.pbc
+	@echo "                     with support for variant 'Plumhead partridge'."
 	@echo "                     This is the default."
+	@echo "  build              Same as 'all'."
+	@echo "  build-partridge    Same as 'build', which is same as 'all'."
+	@echo "  build-phc          Build support for variant 'Plumhead phc'."
+	@echo "                     Current this has nothing to do."
+	@echo "  build-antlr3       Build support for variant 'Plumhead antlr3'."
+	@echo "                     Needs javac and a proper CLASSPATH."
 	@echo ""
 	@echo "Testing:"
-	@echo "  test:              Run the test suite."
+	@echo "  test:              Run the test suite for 'Plumhead partridge'."
+	@echo "  test-all:          Run the test suite for the reference and all variants."
 	@echo "  test-php:          Run the test suite for the reference implementation."
-	@echo "  test-phc:          Run the test suite for the Phc variant."
-	@echo "  test-antlr3:       Run the test suite for the Antlr3 variant."
-	@echo "  test-partridge:    Run the test suite."
+	@echo "  test-phc:          Run the test suite for 'Plumhead phc'."
+	@echo "  test-antlr3:       Run the test suite for 'Plumhead antlr3'."
+	@echo "  test-partridge:    Run the test suite for 'Plumhead partridge'."
 	@echo ""
 	@echo "Cleaning:"
-	@echo "  clean:             makes clean-test."
-	@echo "  distclean:         makes clean-test."
+	@echo "  clean:             Clean up."
+	@echo "  distclean:         Clean up."
 	@echo "  clean-test:        Clean up temporary files from testing."
 	@echo ""
 	@echo "Misc:"
 	@echo "  help:              Print this help message."
+	@echo ""
 	@echo "Only for maintainer:"
-	@echo "  maintain:          Generate runtime files with ANTLR 3"
+	@echo "  maintain:          Maintainance for 'Plumhead antlr3'"
+	@echo "                     The other variants need no maintainance."
+	@echo "  maintain-antlr3:   Generate Java runtime files with ANTLR 3"
 	@echo ""
 
 maintain: maintain-antlr3
@@ -45,14 +58,16 @@ maintain-antlr3: src/antlr3/Plumhead.g src/antlr3/GenPastPir.g
 	java org.antlr.Tool -lib src/antlr3 src/antlr3/GenPastPir.g
 
 
-build: build-phc build-antlr3 build-common 
+build:           build-partridge
 
-build-common: src/common/plumheadlib.pbc plumhead.pbc
+build-common:    src/common/plumheadlib.pbc plumhead.pbc
 
-build-phc:
+build-partridge: build-common
+
+build-phc:       build-common
 	# nothing to do
 
-build-antlr3:
+build-antlr3:    build-common
 	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr3.pod'
 	javac src/antlr3/*.java 
 
@@ -68,7 +83,9 @@ src/common/plumheadlib.pbc: src/common/builtins.pir
 plumhead.pbc: src/common/plumhead.pir src/partridge/Plumhead_gen.pir src/partridge/PlumheadPAST_gen.pir
 	$(PARROT) -o plumhead.pbc src/common/plumhead.pir
 
-test: all test-php test-phc test-antlr3 test-partridge
+test:     all test-partridge
+
+test-all: all test-php test-phc test-antlr3 test-partridge
 
 test-php:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-php
@@ -93,6 +110,5 @@ clean-partridge:
 clean-antlr3:
 	$(RM_F) src/antlr3/*.class
 
-# Leave the generated test files in place
 clean-test:
 	$(RM_F) t/*.php t/*.pir t/*.out 
