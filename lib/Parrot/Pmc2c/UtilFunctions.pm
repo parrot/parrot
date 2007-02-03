@@ -109,6 +109,7 @@ EOC
     /*
      * TODO stuff some info into this PMCs props
      *
+     */
 
     /*
      * for all PMCs we want to register:
