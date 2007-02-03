@@ -4,20 +4,37 @@
 
 =head1 NAME
 
-plumhead.pir - implementations of PHP
+plumhead.pir - three variants of PHP on Parrot
 
 =head1 DESCRIPTION
 
 Driver for three variants of PHP on Parrot.
 
-Take XML from phc and transform it with XSLT to PIR setting up PAST.
-Run the PAST with the help of TGE.
+=head1 Variants
+
+=head2 Plumhead partridge
+
+Parser PHP with the Parrot compiler tools. This is the default variant.
+
+=head2 Plumhead phc
+
+Take XML from phc and transform it with XSLT to PIR setting up PAST-pm.
+Run the PAST-pm with the help of TGE.
+
+=head2 Plumhead antlr3
 
 Parse PHP with Java Parser and TreeParser, generated from ANTLR3 grammars.
 
-Parser PHP with the Parrot compiler tools.
+=head1 SEE ALSO
+
+F<languages/plumhead/docs>
+
+=head1 AUTHOR
+
+Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 
 =cut
+
 
 .namespace [ 'Plumhead' ]
 
@@ -68,6 +85,16 @@ GOT_PHP_SOURCE_FN:
 
     if variant == 'antlr3'    goto VARIANT_ANTLR3
     if variant == 'partridge' goto VARIANT_PARTRIDGE
+    if variant == 'phc'       goto VARIANT_PHC
+
+VARIANT_PARTRIDGE:
+    err_msg = 'Compiling and executing with partridge failed'
+    $P0 = compreg 'Plumhead'
+
+    #.return $P0.'evalfiles'(php_source_fn, 'target' => 'parse' )
+    #.return $P0.'evalfiles'(php_source_fn, 'target' => 'past' )
+    .return $P0.'evalfiles'( php_source_fn )
+    end
 
 VARIANT_PHC:
     err_msg = 'Creating XML-AST with phc failed'
@@ -88,14 +115,6 @@ VARIANT_PHC:
     if ret goto ERROR
     goto EXECUTE_PAST_PIR
 
-VARIANT_PARTRIDGE:
-    err_msg = 'Compiling and executing with partridge failed'
-    $P0 = compreg 'Plumhead'
-
-    #.return $P0.'evalfiles'(php_source_fn, 'target' => 'parse' )
-    #.return $P0.'evalfiles'(php_source_fn, 'target' => 'past' )
-    .return $P0.'evalfiles'( php_source_fn )
-
 VARIANT_ANTLR3:
     err_msg = 'Generating PAST from annotated PHP source failed'
     cmd = 'java PlumheadAntlr3 '
@@ -103,6 +122,7 @@ VARIANT_ANTLR3:
     concat cmd, ' plumhead_past.pir'
     ret = spawnw cmd
     if ret goto ERROR
+    goto EXECUTE_PAST_PIR
 
 EXECUTE_PAST_PIR:
     err_msg = 'Executing plumhead_past.pir with parrot failed'
@@ -129,6 +149,7 @@ ERROR:
     #os."rm"('plumhead_past.xml')
     #os."rm"('plumhead_past.pir')
 
+FINISH:
    exit ret
 
 .end
@@ -159,11 +180,11 @@ ERROR:
 
     $I0 = defined opt['version']
     unless $I0 goto n_ver
-	print prog
-	print " "
-	print VERSION
-	print "\n"
-	end
+        print prog
+        print " "
+        print VERSION
+        print "\n"
+        end
 n_ver:
     $I0 = defined opt['help']
     unless $I0 goto n_help
@@ -179,7 +200,7 @@ help:
 n_help:
     $I0 = defined opt['debug']
     unless $I0 goto n_deb
-	print "debugging on\n"
+        print "debugging on\n"
 n_deb:
 
     .local int argc
@@ -196,13 +217,5 @@ n_deb:
 .include 'src/partridge/Plumhead_gen.pir'
 
 .include 'src/partridge/PlumheadPAST_gen.pir'
-
-=head1 SEE ALSO
-
-=head1 AUTHOR
-
-Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
-
-=cut
 
 # vim: ft=imc sw=4:
