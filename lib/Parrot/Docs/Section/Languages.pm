@@ -45,7 +45,6 @@ sub new {
         $self->new_section( 'amber',       'amber.html',      '', 'languages/amber' ),
         $self->new_section( 'APL',         'apl.html',        '', 'languages/APL' ),
         $self->new_section( 'BASIC',       'basic.html',      '', 'languages/BASIC' ),
-        $self->new_section( 'bc',          'bc.html',         '', 'languages/bc' ),
         $self->new_section( 'Befunge',     'befunge.html',    '', 'languages/befunge' ),
         $self->new_section( 'BF',          'bf.html',         '', 'languages/bf' ),
         $self->new_section( 'C99',         'c99.html',        '', 'languages/c99' ),
