@@ -1,0 +1,579 @@
+=head1 NAME
+
+PIR.pod - The Grammar of languages/PIR
+
+=head1 DESCRIPTION
+
+This document provides a more readable grammar of languages/PIR. The actual input
+for PGE is a bit more complex. This grammar for humans does not contain error
+handling and some other issues unimportant for the PIR reference.
+
+
+=head1 STATUS
+
+For a bugs and issues, see the section KNOWN ISSUES AND BUGS.
+
+The grammar includes some constructs that *are* in the IMCC parser,
+but are not implemented. An example of this is the ".global" directive.
+
+
+=head1 VERSION
+
+Version: Saturday Feb. 3rd 2007.
+(not a version number yet, as many improvements are to be expected at this point).
+
+
+=head1 LEXICAL CONVENTIONS
+
+
+=head2 PIR Directives
+
+PIR has a number of directives. All directives start with a dot. Macro identifiers
+(when using a macro, on expansion) also start with a dot (see below). Therefore,
+it is important not to use any of the PIR directives as a macro identifier. The
+PIR directives are:
+
+  .arg            .invocant          .pcc_call
+  .const          .lex               .pcc_end_return
+  .emit           .line              .pcc_end_yield
+  .end            .loadlib           .pcc_end
+  .endnamespace   .local             .pcc_sub
+  .eom            .meth_call         .pragma
+  .get_results    .namespace         .return
+  .global         .nci_call          .result
+  .HLL_map        .param             .sub
+  .HLL            .pcc_begin_return  .sym
+  .immediate      .pcc_begin_yield   .yield
+  .include        .pcc_begin
+
+
+=head2 Registers
+
+PIR has two types of registers: real registers and virtual or temporary registers.
+Real registers are actual registers in the Parrot VM, and are written like:
+
+  [S|N|I|P]n, where n is a number between 0 to, but not including, 100.
+
+Virtual, or temporary registers are written like:
+
+  $[S|N|I|P]n, where n is a positive integer.
+
+
+
+
+=head2 Constants
+
+An integer constant is a string of one or more digits.
+Examples: 0, 42.
+
+A floatin-point constant is a string of one or more digits, followed by a dot
+and one or more digits. Examples: 1.1, 42.567.
+
+A string constant is a single or double quoted series of characters.
+Examples: 'hello world', "Parrot".
+
+TODO: PMC constants.
+
+=head2 Identifiers
+
+An identifier starts with a character from [_a-zA-Z], followed by
+a character from [_a-zA-Z0-9].
+
+Examples: x, x1, _foo.
+
+
+=head2 Labels
+
+A label is an identifier with a colon attached to it.
+
+Examples: LABEL:
+
+
+=head2 Macro identifiers
+
+A macro identifier is an identifier prefixed with an dot. A macro
+identifier is used when I<expanding> the macro (on usage), not in
+the macro definition.
+
+Examples:  .Macro
+
+
+
+=head1 GRAMMAR RULES
+
+A PIR program consists of one or more compilation units. A compilation unit
+is a global, sub, constant or macro definition, or a pragma or emit block.
+PIR is a line oriented language, which means that each statement ends in a
+newline (indicated as "nl"). Moreover, compilation units are always separated
+by a newline.
+
+  program:
+    compilation_unit [ nl compilation_unit ]*
+
+  compilation_unit:
+      global_def
+    | sub_def
+    | const_def
+    | macro_def
+    | pragma
+    | emit
+
+  sub_def:
+    [ ".sub" | ".pcc_sub" ] sub_id sub_pragmas nl body
+
+  sub_id:
+    identifier | string_constant
+
+NOTE: the subpragmas may or may not be separated by a comma.
+
+  sub_pragmas:
+    sub_pragma [ ","? sub_pragma ]*
+
+
+  sub_pragma:
+      ":load"
+    | ":init"
+    | ":immediate"
+    | ":main"
+    | ":anon"
+    | ":lex"
+    | wrap_pragma
+    | vtable_pragma
+    | multi_pragma
+    | outer_pragma
+
+  wrap_pragma:
+    ":wrap" parenthesized_string
+
+  vtable_pragma:
+    ":vtable" parenthesized_string?
+
+  parenthesized_string:
+    "(" string_constant ")"
+
+  multi_pragma:
+    ":multi" "(" multi_types? ")"
+
+  outer_pragma:
+    ":outer" "(" sub_id ")"
+
+  multi_tyes:
+    multi_type [ "," multi_type ]*
+
+  multi_type:
+      type
+    | "_"
+    | keylist
+    | identifier
+    | string_constant
+
+  body:
+    param_decl*
+    labeled_pir_instr*
+    ".end"
+
+  param_decl:
+    ".param"  [ [ type identifier ] | reg ] get_flags? nl
+
+  labeled_pir_instr:
+    label? instr nl
+
+  labeled_pasm_instr:
+    label? pasm_instr nl
+
+  instr:
+    pir_instr | pasm_instr
+
+NOTE: the rule 'pasm_instr' is not included in this reference grammar. pasm_instr
+defines the syntax for pure PASM instructions.
+
+  pir_instr:
+      local_decl
+    | lexical_decl
+    | const_def
+    | conditional_stat
+    | assignment_stat
+    | open_namespace
+    | close_namespace
+    | return_stat
+    | sub_invocation
+    | macro_invocation
+    | jump_stat
+    | source_info
+
+  macro_invocation:
+    macro_id parenthesized_args?
+
+  local_decl:
+    [ ".local" | ".sym" ] type local_id_list
+
+  local_id_list:
+    local_id [ "," local_id ]*
+
+  local_id:
+    identifier ":unique_reg"?
+
+  lexical_decl:
+    ".lex" string_constant "," target
+
+
+  global_def:
+    ".global" identifier
+
+  const_def:
+    ".const" type identifier "=" constant_expr
+
+
+  conditional_stat:
+      [ "if" | "unless" ]
+    [ [ "null" target "goto" identifier ]
+    | [ simple_expr [ relational_op simple_expr ]? ]
+    ] "goto" identifier
+
+  jump_stat:
+    "goto" identifier
+
+  relational_op:
+      "=="
+    | "!="
+    | "<="
+    | "<"
+    | <"="
+    | <""
+
+  binary_op:
+      "+"
+    | "-"
+    | "/"
+    | "**"
+    | "*"
+    | "%"
+    | "<<"
+    | <">>"
+    | <">"
+    | "&&"
+    | "||"
+    | "~~"
+    | "|"
+    | "&"
+    | "~"
+    | "."
+
+
+  assign_op:
+      "+="
+    | "-="
+    | "/="
+    | "%="
+    | "*="
+    | ".="
+    | "&="
+    | "|="
+    | "~="
+    | "<<="
+    | <">="
+    | <">>="
+
+  unary_op:
+      "!"
+    | "-"
+    | "~"
+
+  expression:
+      simple_expr
+    | simple_expr binary_op simple_expr
+    | unary_op simple_expr
+
+  simple_expr:
+      float_constant
+    | int_constant
+    | string_constant
+    | target
+
+
+  keylist:
+    "[" keys "]"
+
+  keys:
+    key [ sep key ]*
+
+  sep:
+    "," | ";"
+
+  key:
+      simple_expr
+    | simple_expr ".."
+    | ".." simple_expr
+    | simple_expr ".." simple_expr
+
+
+  assignment_stat:
+      target "=" short_sub_call
+    | target "=" target keylist
+    | target "=" expression
+    | target "=" "new" [ int_constant | string_constant | macro_id ]
+    | target "=" "new" keylist
+    | target "=" "find_type" [ string_constant | string_reg | id ]
+    | target "=" heredoc
+    | target "=" "global" <string_constant
+    | target assign_op simple_expr
+    | target keylist "=" simple_expr
+    | "global" string_constant "=" target
+    | result_var_list "=" short_sub_call
+
+
+
+NOTE: the heredoc rules are not complete or tested. Some work is required here.
+
+  heredoc:
+    "<<" string_constant nl
+    heredoc_string
+    heredoc_label
+
+  heredoc_label:
+    ^^ identifier
+
+  heredoc_string:
+    [ \N | \n ]*
+
+
+  long_sub_call:
+    ".pcc_begin" nl
+    arguments
+    [ method_call | non_method_call] target nl
+    [ local_decl nl ]*
+    result_values
+    ".pcc_end"
+
+
+  non_method_call:
+    ".pcc_call" | ".nci_call"
+
+  method_call:
+    ".invocant" target nl
+    ".meth_call"
+
+  short_sub_call:
+    invocant? [ target | string_constant ] parenthesized_args
+
+  invocant:
+    [ target"." | target "->" ]
+
+  sub_invocation:
+    long_sub_call | short_sub_call
+
+  result_var_list:
+    "(" result_vars ")"
+
+  result_vars:
+    result_var [ "," result_var ]*
+
+  result_var:
+    target get_flags?
+
+
+  parenthesized_args:
+    "(" args ")"
+
+  args:
+    arg [ "," arg ]
+
+  arg:
+    [ float_constant
+    | int_constant
+    | string_constant [ "=>" target ]?
+    | target
+    ]
+    set_flags?
+
+
+  arguments:
+    [ ".arg" simple_expr set_flags? nl ]*
+
+  result_values:
+    [ ".result" target get_flags? nl ]*
+
+  set_flags:
+    [ ":flat"
+    | named_flag
+    ]+
+
+  get_flags:
+    [ ":slurpy"
+    | ":optional"
+    | ":opt_flag"
+    | named_flag
+    ]+
+
+
+  named_flag:
+    ":named" parenthesized_string?
+
+  return_stat:
+      long_return_stat
+    | short_return_stat
+    | long_yield_stat
+    | short_yield_stat
+    | tail_call
+
+
+  long_return_stat:
+    ".pcc_begin_return" nl
+    return_directive*
+    ".pcc_end_return"
+
+  short_return_stat:
+    ".return" parenthesized_args
+
+  long_yield_stat:
+    ".pcc_begin_yield" nl
+    return_directive*
+    ".pcc_end_yield"
+
+  return_directive:
+    ".return" simple_expr set_flags? nl
+
+  short_yield_stat:
+    ".yield" parenthesized_args
+
+  tail_call:
+    ".return" short_sub_call
+
+  open_namespace:
+    ".namespace" identifier
+
+  close_namespace:
+    ".endnamespace" identifier
+
+
+NOTE: an emit block only allows PASM instructions,
+not PIR instructions.
+
+
+  emit:
+    ".emit" nl
+    labeled_pasm_instr*
+    ".eom"
+
+NOTE: the macro definition is not complete, and untested.
+This should be fixed. For now, all characters up to but not
+including ".endm" are 'matched'.
+
+
+  macro_def:
+    ".macro" identifier macro_parameters? nl
+    macro_body
+
+  macro_parameters:
+    "(" id_list? ")"
+
+  macro_body:
+    .*?
+    ".endm" nl
+
+  pragma:
+      include
+    | new_operators
+    | loadlib
+    | namespace
+    | hll_mapping
+    | hll_specifier
+    | source_info
+
+
+  include:
+    ".include" string_constant
+
+  new_operators:
+    ".pragma" "n_operators" int_constant
+
+  loadlib:
+    ".loadlib" string_constant
+
+  namespace:
+    ".namespace" [ "[" namespace_id "]" ]?
+
+  hll_specifier:
+    ".HLL" string_constant "," string_constant
+
+  hll_mapping:
+    ".HLL_map" int_constant "," int_constant
+
+  namespace_id:
+    string_constant [ ";" string_constant ]*
+
+
+NOTE: currently, the line directive is implemented in IMCC as #line.
+See the PROPOSALS document for more information on this.
+
+  source_info:
+    ".line" int_constant [ "," string_constant ]?
+
+  id_list:
+    identifier [ "," identifier ]*
+
+  string_constant:
+    charset_specifier?  quoted_string
+
+  charset_specifier:
+      "ascii:"
+    | "binary:"
+    | "unicode:"
+    | "iso-8859-1:"
+
+
+  type:
+      "int"
+    | "num"
+    | "pmc"
+    | "object"
+    | "string"
+    | "Array"
+    | "Hash"
+
+  target:
+    identifier | register
+
+
+
+=head1 AUTHOR
+
+
+Klaas-Jan Stol [parrotcode@gmail.com]
+
+
+=head1 KNOWN ISSUES AND BUGS
+
+Some work should be done on:
+
+=over 4
+
+=item *
+
+Macro parsing
+
+=item *
+
+Heredoc parsing
+
+=item *
+
+The rule 'type' does currently not include custom types (user defined).
+Probably it needs an alternative "identifier". Not sure yet at this point.
+
+=item *
+
+Clean up grammar, remove never-used features.
+
+=item *
+
+Test. A lot.
+
+Bugs or improvements may be sent to the author, and of course greatly
+appreciated. Moreover, if you find any missing constructs that are in
+IMCC, indications of these would be appreciated as well.
+
+=back
+
+=cut
+

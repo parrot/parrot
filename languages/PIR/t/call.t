@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'long sub invocation' );
@@ -167,3 +167,29 @@ CODE
 "parse" => PMC 'PIRGrammar' { ... }
 Parse successful!
 OUT
+
+
+language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'short sub call with flags' );
+
+# the sub body is taken from PDD03
+.sub main :main
+	.local pmc x, y
+	foo(x :flat)
+	foo(x, 'y' => y)
+	foo(x, y :named('y'))
+	foo(x :flat :named)
+	foo(a, b, c :flat, 'x' => 3, 'y' => 4, z :flat :named('z'))
+	
+	x = foo()                       # single result
+  (i, j :optional, ar :slurpy, value :named('key') ) = foo()
+.end
+
+.sub foo
+	.return (i, ar :flat, value :named('key') )
+.end
+
+CODE
+"parse" => PMC 'PIRGrammar' { ... }
+Parse successful!
+OUT
+

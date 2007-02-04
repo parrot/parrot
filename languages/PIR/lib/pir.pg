@@ -33,7 +33,7 @@ rule sub_def {
   [ <'.sub'> | <'.pcc_sub'> ]
   [ <sub_id> | <syntax_error: sub identifier (id or string constant) expected> ]
   <sub_pragmas>?
-  [ <?nl> | <syntax_error: newline expected> ]
+  [ <?nl>    | <syntax_error: newline expected> ]
   <body>
 }
 
@@ -140,15 +140,15 @@ rule labeled_pir_instr {
 }
 
 rule labeled_pasm_instr {
-	[ <label> <pasm_instr>?
+  [ <label> <pasm_instr>?
   | <pasm_instr>
   ] 
   [ <?nl> | <syntax_error: newline expected after instruction> ]
 }
 
 rule instr {
-	[ <pir_instr> | <pasm_instr> ]
-	
+  [ <pir_instr> | <pasm_instr> ]
+  
 }
 
 # this is a token, because no spaces are allowed between
@@ -294,18 +294,18 @@ rule binary_operator {
 }
 
 rule assign_operator {
-		<'+='>
-	| <'-='>
-	| <'/='>
-	| <'%='>
-	| <'*='>
-	| <'.='>
-	| <'&='>
-	| <'|='>
-	| <'~='>
-	| <'<<='>
-	| <'>>='>
-	| <'>>>='>
+    <'+='>
+  | <'-='>
+  | <'/='>
+  | <'%='>
+  | <'*='>
+  | <'.='>
+  | <'&='>
+  | <'|='>
+  | <'~='>
+  | <'<<='>
+  | <'>>='>
+  | <'>>>='>
 }
 
 rule unary_operator {
@@ -336,8 +336,8 @@ rule keylist {
 }
 
 rule key {
-		[ <simple_expr> [ <'..'> [ <simple_expr> ]? ]? ]
-	|	[ <'..'> <simple_expr> ]
+    [ <simple_expr> [ <'..'> [ <simple_expr> ]? ]? ]
+  | [ <'..'> <simple_expr> ]
 }
 
 
@@ -352,7 +352,7 @@ rule assignment_stat {
   | <target> <'='> <'new'> [ <int_constant> | <string_constant> | <macro_id> ]
   | <target> <'='> <'new'> <keylist>
   | <target> <'='> <'find_type'> [ <string_constant> | <string_reg> | <id> ]
-  | <target> <'='> <heredoc_string>
+  | <target> <'='> <heredoc>
   | <target> <'='> <'global'> <string_constant> # deprecated?  
   | <target> <assign_operator> <simple_expr>
   | <target> <keylist> <'='> <simple_expr>  
@@ -402,7 +402,7 @@ rule pasm_op_2 {
   | isntsame
 }
 
-rule heredoc_string {
+rule heredoc {
   <'<<'>
   [ <string_constant> | <syntax_error: heredoc label identifier expected> ]
   [ <?nl> | <syntax_error: newline expected after heredoc label> ]
@@ -434,21 +434,21 @@ rule long_sub_call {
   ]
   [ <target> | <syntax_error: id or register expected that holds the sub object> ]
   [ <?nl>    | <syntax_error: newline after '.pcc_call sub' expected> ]
- 	[ <local_decl> <?nl> ]*
+  [ <local_decl> <?nl> ]*
   <result_values>
   [ <'.pcc_end'>  | <syntax_error: '.pcc_end' expected> ]  
 }
 
 rule invocant {
-	<'.invocant'> 
-	<target> 
-	<?nl>   	  	 
+  <'.invocant'> 
+  <target> 
+  <?nl>          
 }
 
 rule short_sub_call {
   [ [ <target>\. ]                  
   | [ <target> <'->'> ]
-  ]?															 # optional invocant
+  ]?                               # optional invocant
   [ <target> | <string_constant> ] # method or sub name/id
   <parenthesized_args>             # sub args
 }
@@ -609,7 +609,7 @@ rule emit {
 #
 rule macro_def {
   <'.macro'>
-  [ <id> | <syntax_error: macro identifier expected> ]
+  [ <id>  | <syntax_error: macro identifier expected> ]
   <macro_parameters>?
   [ <?nl> | <syntax_error: newline expected after macro parameter list> ]
   <macro_body>
@@ -657,8 +657,8 @@ rule loadlib {
 rule namespace {
   <'.namespace'> 
   [ <'['>        
-  	[ <namespace_id>    | <syntax_error: namespace identifier expected> ]
-  	[ <']'>             | <syntax_error: ']' expected> ]
+    [ <namespace_id>    | <syntax_error: namespace identifier expected> ]
+    [ <']'>             | <syntax_error: ']' expected> ]
   ]?
 }
 

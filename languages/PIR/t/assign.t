@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 
 language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple assignments' );
@@ -85,3 +85,17 @@ CODE
 "parse" => PMC 'PIRGrammar' { ... }
 Parse successful!
 OUT
+
+language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'string charset modifiers' );
+.sub main			
+	.local string s
+	s = ascii:"Hello World"
+	s = binary:"Hello WOrld"
+	s = unicode:"Hello world"
+	s = iso-8859-1:"Hello world"		 
+.end
+CODE
+"parse" => PMC 'PIRGrammar' { ... }
+Parse successful!
+OUT
+
