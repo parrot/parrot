@@ -68,22 +68,24 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
 
     $P0 = node['statement']
     if null $P0 goto handled_statement
-    .local pmc iter
-    iter = new .Iterator, $P0
-  iter_loop:
-    unless iter goto iter_end
-    .local pmc cnode, cpast
-    cnode = shift iter
-    if null cnode goto iter_loop
-    $P1 = cnode['ECHO']
-    if null $P1 goto iter_loop
-    $P2 = cnode['expression']
-    if null $P2 goto iter_loop
-    cpast = tree.'get'('past', $P2, 'Plumhead::Grammar::expression')
-    if null cpast goto iter_loop
-    past.'push'(cpast)
-    goto iter_loop
-  iter_end:
+        .local pmc iter
+        iter = new .Iterator, $P0
+        iter_loop:
+            unless iter goto iter_end
+            .local pmc cnode, cpast, cpast2
+            cnode = shift iter
+            if null cnode goto iter_loop
+                 $P1 = cnode['ECHO']
+                 if null $P1 goto iter_loop
+                     $P2 = cnode['expression']
+                     if null $P2 goto iter_loop
+                         cpast = tree.'get'('past', $P2, 'Plumhead::Grammar::expression')
+                         if null cpast goto iter_loop
+                         cpast2 = new 'PAST::Op'
+                         cpast2.'init'( cpast, 'node'=> node, 'name' => 'print' )  
+                         past.'push'(cpast2)
+                         goto iter_loop
+         iter_end:
 
     handled_statement:
 
@@ -126,8 +128,19 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     $P0 = node['unary_expression']
     if null $P0 goto no_unary_expression
-    past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
-    goto handled_expression
+        $P1 = $P0['postfix_expression']
+        if null $P1 goto handled_expression
+            $P2 = $P0['MINUS']
+            if null $P2 goto no_minus
+                past = new 'PAST::Op'
+                past.init( 'node' => $P1, 'name' => 'prefix:-' )
+                .local pmc cpast
+                cpast = tree.'get'('past', $P1, 'Plumhead::Grammar::expression')
+                past.push( cpast )
+                goto handled_expression
+            no_minus:
+            past = tree.'get'('past', $P1, 'Plumhead::Grammar::expression')
+            goto handled_expression
     no_unary_expression:
 
     $P0 = node['postfix_expression']
@@ -144,16 +157,12 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
 transform past (Plumhead::Grammar::DOUBLEQUOTE_STRING) :language('PIR') {
 
-    .local pmc past_val
-    past_val = new 'PAST::Val'                             
+    .local pmc past
+    past= new 'PAST::Val'                             
     .local string val
     val = node
     .local pmc code_string
-    past_val.'init'( 'name' => val, 'vtype' => '.Undef' )                              
-
-    .local pmc past                                                  
-    past = new 'PAST::Op'
-    past.'init'( past_val, 'node'=> node, 'pirop' => 'print' )  
+    past.'init'( 'name' => val, 'vtype' => '.Undef' )                              
 
     .return (past)
 }
@@ -161,32 +170,23 @@ transform past (Plumhead::Grammar::DOUBLEQUOTE_STRING) :language('PIR') {
 
 transform past (Plumhead::Grammar::SINGLEQUOTE_STRING) :language('PIR') {
 
-    .local pmc past_val
-    past_val = new 'PAST::Val'                             
+    .local pmc past
+    past = new 'PAST::Val'                             
     .local string val
     val = node
     .local pmc code_string
-    past_val.'init'( 'name' => val, 'vtype' => '.Undef' )                              
-
-    .local pmc past                                                  
-    past = new 'PAST::Op'
-    past.'init'( past_val, 'node'=> node, 'pirop' => 'print' )  
+    past.'init'( 'name' => val, 'vtype' => '.Undef' )                              
 
     .return (past)
 }
 
 transform past (Plumhead::Grammar::NUMBER) :language('PIR') {
 
-    .local pmc past_val
-    past_val = new 'PAST::Val'                             
+    .local pmc past
+    past = new 'PAST::Val'                             
     .local string val
     val = node
-    past_val.'init'( 'name' => val, 'vtype' => '.Float', 'ctype' => 'n+' )                              
-
-    .local pmc past                                                  
-    past = new 'PAST::Op'
-    past.'init'( past_val, 'node'=> node, 'name' => 'print' )  
-
+    past.'init'( 'name' => val, 'vtype' => '.Float', 'ctype' => 'n+' )                              
     .return (past)
 }
 
