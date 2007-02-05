@@ -121,4 +121,8 @@ This document is 'Evolving.' It should 'Stable' before the next release.
 
 Jerry Gay a.k.a. particle
 
+=head1 SEE ALSO
+
+F<RESPONSIBILE_PARTIES>
+
 =cut

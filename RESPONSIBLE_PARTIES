@@ -17,4 +17,5 @@ Debian packaging                Florian Ragwitz
 Test suite                      Jerry Gay
 Bytecode format and loader      Jonathan Worthington
 
-See also languages/LANGUAGES.STATUS.pod for language authors/maintainers.
+See also docs/roles_responsibilities.pod for role definitions,
+and languages/LANGUAGES.STATUS.pod for language authors/maintainers.
