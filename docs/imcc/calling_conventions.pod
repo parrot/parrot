@@ -132,7 +132,7 @@ name to be reused.
 
 Engage in multiple dispatch with the listed types.
 
-=item :immediate
+=item :immediate or :postcomp
 
 This subroutine is executed immediately after being compiled. (Analagous to
 C<BEGIN> in perl5.)
@@ -151,6 +151,10 @@ method but is callable as a normal method), use B<:vtable :anon>. To give the
 v-table method a different name, use B<:vtable("...")>. For example, to have
 the method B<ToString> also be the v-table method B<get_string>), use
 B<:vtable("get_string")>.
+
+=item :outer(subname)
+
+The marked C<.sub> is lexically nested within the sub known by B<subname>.
 
 =back
 
