@@ -2,9 +2,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>PIR.pod	- The Grammar of languages/PIR</title>
+<title>PIR.pod - The Grammar of languages/PIR</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body style="background-color: white">
@@ -26,6 +26,7 @@
 		<li><a href="#constants">Constants</a></li>
 		<li><a href="#identifiers">Identifiers</a></li>
 		<li><a href="#labels">Labels</a></li>
+		<li><a href="#macro_identifiers">Macro identifiers</a></li>
 	</ul>
 
 	<li><a href="#grammar_rules">GRAMMAR RULES</a></li>
@@ -38,7 +39,7 @@
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
-<p>PIR.pod	- The Grammar of languages/PIR</p>
+<p>PIR.pod - The Grammar of languages/PIR</p>
 <p>
 </p>
 <hr />
@@ -52,7 +53,7 @@ handling and some other issues unimportant for the PIR reference.</p>
 <h1><a name="status">STATUS</a></h1>
 <p>For a bugs and issues, see the section KNOWN ISSUES AND BUGS.</p>
 <p>The grammar includes some constructs that *are* in the IMCC parser,
-but are not implemented. An example of this is the &quot;.global&quot; directive.</p>
+but are not implemented. An example of this is the ``.global'' directive.</p>
 <p>
 </p>
 <hr />
@@ -71,30 +72,26 @@ but are not implemented. An example of this is the &quot;.global&quot; directive
 it is important not to use any of the PIR directives as a macro identifier. The
 PIR directives are:</p>
 <pre>
-  .arg            .invocant          .pcc_call         
-  .const          .lex               .pcc_end_return   
-  .emit           .line              .pcc_end_yield         
-  .end            .loadlib           .pcc_end               
-  .endnamespace   .local             .pcc_sub               
-  .eom            .meth_call         .pragma                
-  .get_results    .namespace         .return                
-  .global         .nci_call          .result                   
-  .HLL_map        .param             .sub                
-  .HLL            .pcc_begin_return  .sym                
-  .immediate      .pcc_begin_yield   .yield                 
+  .arg            .invocant          .pcc_call
+  .const          .lex               .pcc_end_return
+  .emit           .line              .pcc_end_yield
+  .end            .loadlib           .pcc_end
+  .endnamespace   .local             .pcc_sub
+  .eom            .meth_call         .pragma
+  .get_results    .namespace         .return
+  .global         .nci_call          .result
+  .HLL_map        .param             .sub
+  .HLL            .pcc_begin_return  .sym
+  .immediate      .pcc_begin_yield   .yield
   .include        .pcc_begin</pre>
 <p>
 </p>
 <h2><a name="registers">Registers</a></h2>
 <p>PIR has two types of registers: real registers and virtual or temporary registers.
-Real registers are actual registers in the Parrot VM, and are written like:
-</p>
+Real registers are actual registers in the Parrot VM, and are written like:</p>
 <pre>
-
   [S|N|I|P]n, where n is a number between 0 to, but not including, 100.</pre>
-<pre>
-
-Virtual, or temporary registers are written like:</pre>
+<p>Virtual, or temporary registers are written like:</p>
 <pre>
   $[S|N|I|P]n, where n is a positive integer.</pre>
 <p>
@@ -104,8 +101,8 @@ Virtual, or temporary registers are written like:</pre>
 Examples: 0, 42.</p>
 <p>A floatin-point constant is a string of one or more digits, followed by a dot
 and one or more digits. Examples: 1.1, 42.567.</p>
-<p>A string constant is a single or double quoted series of characters. 
-Examples: 'hello world', &quot;Parrot&quot;.</p>
+<p>A string constant is a single or double quoted series of characters.
+Examples: 'hello world', ``Parrot''.</p>
 <p>TODO: PMC constants.</p>
 <p>
 </p>
@@ -118,13 +115,12 @@ a character from [_a-zA-Z0-9].</p>
 <h2><a name="labels">Labels</a></h2>
 <p>A label is an identifier with a colon attached to it.</p>
 <p>Examples: LABEL:</p>
-<pre>
-  
-=head2 Macro identifiers
-  
-A macro identifier is an identifier prefixed with an dot. A macro
-identifier is used when I&lt;expanding&gt; the macro (on usage), not in
-the macro definition.</pre>
+<p>
+</p>
+<h2><a name="macro_identifiers">Macro identifiers</a></h2>
+<p>A macro identifier is an identifier prefixed with an dot. A macro
+identifier is used when <em>expanding</em> the macro (on usage), not in
+the macro definition.</p>
 <p>Examples:  .Macro</p>
 <p>
 </p>
@@ -132,34 +128,31 @@ the macro definition.</pre>
 <h1><a name="grammar_rules">GRAMMAR RULES</a></h1>
 <p>A PIR program consists of one or more compilation units. A compilation unit
 is a global, sub, constant or macro definition, or a pragma or emit block.
-PIR is a line oriented language, which means that each statement ends in a 
-newline (indicated as &quot;nl&quot;). Moreover, compilation units are always separated 
+PIR is a line oriented language, which means that each statement ends in a
+newline (indicated as ``nl''). Moreover, compilation units are always separated
 by a newline.</p>
 <pre>
-  program:  
-    compilation_unit [ nl compilation_unit ]*
-  
+  program:
+    compilation_unit [ nl compilation_unit ]*</pre>
+<pre>
   compilation_unit:
       global_def
     | sub_def
     | const_def
     | macro_def
     | pragma
-    | emit
-  
+    | emit</pre>
+<pre>
   sub_def:
-    [ &quot;.sub&quot; | &quot;.pcc_sub&quot; ] sub_id sub_pragmas nl body
-  
+    [ &quot;.sub&quot; | &quot;.pcc_sub&quot; ] sub_id sub_pragmas nl body</pre>
+<pre>
   sub_id:
     identifier | string_constant</pre>
-<p>NOTE: the subpragmas may or may not be separated by a comma.
-</p>
+<p>NOTE: the subpragmas may or may not be separated by a comma.</p>
 <pre>
-
   sub_pragmas:
     sub_pragma [ &quot;,&quot;? sub_pragma ]*</pre>
 <pre>
-
   sub_pragma:
       &quot;:load&quot;
     | &quot;:init&quot;
@@ -172,31 +165,24 @@ by a newline.</p>
     | multi_pragma
     | outer_pragma</pre>
 <pre>
-
   wrap_pragma:
     &quot;:wrap&quot; parenthesized_string</pre>
 <pre>
-
   vtable_pragma:
     &quot;:vtable&quot; parenthesized_string?</pre>
 <pre>
-
   parenthesized_string:
     &quot;(&quot; string_constant &quot;)&quot;</pre>
 <pre>
-
   multi_pragma:
     &quot;:multi&quot; &quot;(&quot; multi_types? &quot;)&quot;</pre>
 <pre>
-
   outer_pragma:
     &quot;:outer&quot; &quot;(&quot; sub_id &quot;)&quot;</pre>
 <pre>
-
   multi_tyes:
     multi_type [ &quot;,&quot; multi_type ]*</pre>
 <pre>
-
   multi_type:
       type
     | &quot;_&quot;
@@ -204,32 +190,25 @@ by a newline.</p>
     | identifier
     | string_constant</pre>
 <pre>
-
   body:
     param_decl*
     labeled_pir_instr*
     &quot;.end&quot;</pre>
 <pre>
-
   param_decl:
     &quot;.param&quot;  [ [ type identifier ] | reg ] get_flags? nl</pre>
 <pre>
-
   labeled_pir_instr:
     label? instr nl</pre>
 <pre>
-
   labeled_pasm_instr:
     label? pasm_instr nl</pre>
 <pre>
-
   instr:
     pir_instr | pasm_instr</pre>
-<p><table cellspacing="0" cellpadding="0"><tr><td>NOTE: the rule 'pasm_instr' is not included in this reference grammar. pasm_instr
-<tr><td>defines the syntax for pure PASM instructions.  <td>
-</table></p>
+<p>NOTE: the rule 'pasm_instr' is not included in this reference grammar. pasm_instr
+defines the syntax for pure PASM instructions.</p>
 <pre>
-
   pir_instr:
       local_decl
     | lexical_decl
@@ -241,62 +220,47 @@ by a newline.</p>
     | return_stat
     | sub_invocation
     | macro_invocation
-    | jump_stat 
+    | jump_stat
     | source_info</pre>
 <pre>
-
   macro_invocation:
     macro_id parenthesized_args?</pre>
 <pre>
-
   local_decl:
     [ &quot;.local&quot; | &quot;.sym&quot; ] type local_id_list</pre>
 <pre>
-
   local_id_list:
     local_id [ &quot;,&quot; local_id ]*</pre>
 <pre>
-
   local_id:
     identifier &quot;:unique_reg&quot;?</pre>
 <pre>
-
   lexical_decl:
     &quot;.lex&quot; string_constant &quot;,&quot; target</pre>
 <pre>
-
   global_def:
     &quot;.global&quot; identifier</pre>
 <pre>
-
   const_def:
-    &quot;.const&quot; type identifier &quot;=&quot; constant_expr
-</pre>
+    &quot;.const&quot; type identifier &quot;=&quot; constant_expr</pre>
 <pre>
-
   conditional_stat:
-      [ &quot;if&quot; | &quot;unless&quot; ] 
+      [ &quot;if&quot; | &quot;unless&quot; ]
     [ [ &quot;null&quot; target &quot;goto&quot; identifier ]
     | [ simple_expr [ relational_op simple_expr ]? ]
-    ] &quot;goto&quot; identifier      
-</pre>
+    ] &quot;goto&quot; identifier</pre>
 <pre>
-
   jump_stat:
-    &quot;goto&quot; identifier
-</pre>
+    &quot;goto&quot; identifier</pre>
 <pre>
-
   relational_op:
       &quot;==&quot;
     | &quot;!=&quot;
     | &quot;&lt;=&quot;
     | &quot;&lt;&quot;
     | &lt;&quot;=&quot;
-    | &lt;&quot;&quot;
-</pre>
+    | &lt;&quot;&quot;</pre>
 <pre>
-
   binary_op:
       &quot;+&quot;
     | &quot;-&quot;
@@ -304,19 +268,17 @@ by a newline.</p>
     | &quot;**&quot;
     | &quot;*&quot;
     | &quot;%&quot;
-    | &quot;&lt;&lt;&quot;  
+    | &quot;&lt;&lt;&quot;
     | &lt;&quot;&gt;&gt;&quot;
-    | &lt;&quot;&gt;&quot;  
+    | &lt;&quot;&gt;&quot;
     | &quot;&amp;&amp;&quot;
     | &quot;||&quot;
     | &quot;~~&quot;
     | &quot;|&quot;
     | &quot;&amp;&quot;
     | &quot;~&quot;
-    | &quot;.&quot;
-</pre>
+    | &quot;.&quot;</pre>
 <pre>
-
   assign_op:
       &quot;+=&quot;
     | &quot;-=&quot;
@@ -329,55 +291,39 @@ by a newline.</p>
     | &quot;~=&quot;
     | &quot;&lt;&lt;=&quot;
     | &lt;&quot;&gt;=&quot;
-    | &lt;&quot;&gt;&gt;=&quot;
-</pre>
+    | &lt;&quot;&gt;&gt;=&quot;</pre>
 <pre>
-
   unary_op:
-      &quot;!&quot;  
+      &quot;!&quot;
     | &quot;-&quot;
-    | &quot;~&quot;
-</pre>
+    | &quot;~&quot;</pre>
 <pre>
-
   expression:
-      simple_expr 
+      simple_expr
     | simple_expr binary_op simple_expr
-    | unary_op simple_expr
-</pre>
+    | unary_op simple_expr</pre>
 <pre>
-
   simple_expr:
       float_constant
     | int_constant
     | string_constant
-    | target
-</pre>
+    | target</pre>
 <pre>
-
   keylist:
-    &quot;[&quot; keys &quot;]&quot; 
-</pre>
+    &quot;[&quot; keys &quot;]&quot;</pre>
 <pre>
-
   keys:
-    key [ sep key ]*
-</pre>
+    key [ sep key ]*</pre>
 <pre>
-
-  <span class="variable">sep</span><span class="operator">:</span>
-    <span class="string">","</span> <span class="operator">|</span> <span class="string">";"</span>
-</pre>
+  sep:
+    &quot;,&quot; | &quot;;&quot;</pre>
 <pre>
-
   key:
-      simple_expr 
-    | simple_expr &quot;..&quot; 
+      simple_expr
+    | simple_expr &quot;..&quot;
     | &quot;..&quot; simple_expr
-    | simple_expr &quot;..&quot; simple_expr
-</pre>
+    | simple_expr &quot;..&quot; simple_expr</pre>
 <pre>
-
   assignment_stat:
       target &quot;=&quot; short_sub_call
     | target &quot;=&quot; target keylist
@@ -390,163 +336,144 @@ by a newline.</p>
     | target assign_op simple_expr
     | target keylist &quot;=&quot; simple_expr
     | &quot;global&quot; string_constant &quot;=&quot; target
-    | result_var_list &quot;=&quot; short_sub_call
-</pre>
-<pre>
-
-NOTE: the heredoc rules are not complete or tested. Some work is required here.</pre>
+    | result_var_list &quot;=&quot; short_sub_call</pre>
+<p>NOTE: the heredoc rules are not complete or tested. Some work is required here.</p>
 <pre>
   heredoc:
     &quot;&lt;&lt;&quot; string_constant nl
     heredoc_string
-    heredoc_label
-    
+    heredoc_label</pre>
+<pre>
   heredoc_label:
-    ^^ identifier 
-    
+    ^^ identifier</pre>
+<pre>
   heredoc_string:
-    [ \N | \n ]*
-  
-  
+    [ \N | \n ]*</pre>
+<pre>
   long_sub_call:
     &quot;.pcc_begin&quot; nl
     arguments
     [ method_call | non_method_call] target nl
     [ local_decl nl ]*
     result_values
-    &quot;.pcc_end&quot; 
-  
-  
+    &quot;.pcc_end&quot;</pre>
+<pre>
   non_method_call:
-    &quot;.pcc_call&quot; | &quot;.nci_call&quot;
-  
+    &quot;.pcc_call&quot; | &quot;.nci_call&quot;</pre>
+<pre>
   method_call:
     &quot;.invocant&quot; target nl
-    &quot;.meth_call&quot;
-        
+    &quot;.meth_call&quot;</pre>
+<pre>
   short_sub_call:
-    invocant? [ target | string_constant ] parenthesized_args
-  
+    invocant? [ target | string_constant ] parenthesized_args</pre>
+<pre>
   invocant:
-    [ target&quot;.&quot; | target &quot;-&gt;&quot; ]
-  
+    [ target&quot;.&quot; | target &quot;-&gt;&quot; ]</pre>
+<pre>
   sub_invocation:
-    long_sub_call | short_sub_call
-  
+    long_sub_call | short_sub_call</pre>
+<pre>
   result_var_list:
-    &quot;(&quot; result_vars &quot;)&quot;
-    
+    &quot;(&quot; result_vars &quot;)&quot;</pre>
+<pre>
   result_vars:
-    result_var [ &quot;,&quot; result_var ]*  
-  
+    result_var [ &quot;,&quot; result_var ]*</pre>
+<pre>
   result_var:
-    target get_flags?
-  
-  
+    target get_flags?</pre>
+<pre>
   parenthesized_args:
-    &quot;(&quot; args &quot;)&quot;
-    
+    &quot;(&quot; args &quot;)&quot;</pre>
+<pre>
   args:
-    arg [ &quot;,&quot; arg ]  
-    
+    arg [ &quot;,&quot; arg ]</pre>
+<pre>
   arg:
     [ float_constant
     | int_constant
     | string_constant [ &quot;=&gt;&quot; target ]?
     | target
-    ] 
-    set_flags?
-  
-  
+    ]
+    set_flags?</pre>
+<pre>
   arguments:
-    [ &quot;.arg&quot; simple_expr set_flags? nl ]*    
-  
+    [ &quot;.arg&quot; simple_expr set_flags? nl ]*</pre>
+<pre>
   result_values:
-    [ &quot;.result&quot; target get_flags? nl ]*
-      
+    [ &quot;.result&quot; target get_flags? nl ]*</pre>
+<pre>
   set_flags:
     [ &quot;:flat&quot;
     | named_flag
-    ]+
-  
+    ]+</pre>
+<pre>
   get_flags:
     [ &quot;:slurpy&quot;
     | &quot;:optional&quot;
     | &quot;:opt_flag&quot;
     | named_flag
-    ]+
-  
-  
+    ]+</pre>
+<pre>
   named_flag:
-    &quot;:named&quot; parenthesized_string?
-  
+    &quot;:named&quot; parenthesized_string?</pre>
+<pre>
   return_stat:
       long_return_stat
     | short_return_stat
-    | long_yield_stat 
+    | long_yield_stat
     | short_yield_stat
-    | tail_call
-  
-  
-  long_return_stat:
-    &quot;.pcc_begin_return&quot; nl  
-    return_directive*
-    &quot;.pcc_end_return&quot;
-  
-  short_return_stat:
-    &quot;.return&quot; parenthesized_args
-  
-  long_yield_stat:
-    &quot;.pcc_begin_yield&quot; nl  
-    return_directive*
-    &quot;.pcc_end_yield&quot;
-  
-  return_directive:
-    &quot;.return&quot; simple_expr set_flags? nl
-  
-  short_yield_stat:
-    &quot;.yield&quot; parenthesized_args
-  
-  tail_call:
-    &quot;.return&quot; short_sub_call
-  
-  open_namespace:
-    &quot;.namespace&quot; identifier
-  
-  close_namespace:
-    &quot;.endnamespace&quot; identifier
-
-</pre>
-<p>NOTE: an emit block only allows PASM instructions,
-not PIR instructions.
-
-</p>
+    | tail_call</pre>
 <pre>
-  
+  long_return_stat:
+    &quot;.pcc_begin_return&quot; nl
+    return_directive*
+    &quot;.pcc_end_return&quot;</pre>
+<pre>
+  short_return_stat:
+    &quot;.return&quot; parenthesized_args</pre>
+<pre>
+  long_yield_stat:
+    &quot;.pcc_begin_yield&quot; nl
+    return_directive*
+    &quot;.pcc_end_yield&quot;</pre>
+<pre>
+  return_directive:
+    &quot;.return&quot; simple_expr set_flags? nl</pre>
+<pre>
+  short_yield_stat:
+    &quot;.yield&quot; parenthesized_args</pre>
+<pre>
+  tail_call:
+    &quot;.return&quot; short_sub_call</pre>
+<pre>
+  open_namespace:
+    &quot;.namespace&quot; identifier</pre>
+<pre>
+  close_namespace:
+    &quot;.endnamespace&quot; identifier</pre>
+<p>NOTE: an emit block only allows PASM instructions,
+not PIR instructions.</p>
+<pre>
   emit:
-    &quot;.emit&quot; nl  
+    &quot;.emit&quot; nl
     labeled_pasm_instr*
-    &quot;.eom&quot; 
-
-</pre>
+    &quot;.eom&quot;</pre>
 <p>NOTE: the macro definition is not complete, and untested.
 This should be fixed. For now, all characters up to but not
-including &quot;.endm&quot; are 'matched'.
-
-</p>
+including ``.endm'' are 'matched'.</p>
 <pre>
-  
-  <span class="variable">macro_def</span><span class="operator">:</span>
-    <span class="string">".macro"</span> <span class="variable">identifier</span> <span class="variable">macro_parameters</span><span class="operator">?</span> <span class="variable">nl</span>
-    <span class="variable">macro_body</span>
-  
-  <span class="variable">macro_parameters</span><span class="operator">:</span>
-    <span class="string">"("</span> <span class="variable">id_list</span><span class="operator">?</span> <span class="string">")"</span>  
-  
-  <span class="variable">macro_body</span><span class="operator">:</span>
-    <span class="operator">.*</span><span class="regex">?
-    ".endm" nl
-  
+  macro_def:
+    &quot;.macro&quot; identifier macro_parameters? nl
+    macro_body</pre>
+<pre>
+  macro_parameters:
+    &quot;(&quot; id_list? &quot;)&quot;</pre>
+<pre>
+  macro_body:
+    .*?
+    &quot;.endm&quot; nl</pre>
+<pre>
   pragma:
       include
     | new_operators
@@ -554,106 +481,86 @@ including &quot;.endm&quot; are 'matched'.
     | namespace
     | hll_mapping
     | hll_specifier
-    | source_info
-  
-  
+    | source_info</pre>
+<pre>
   include:
-    ".include" string_constant
-  
+    &quot;.include&quot; string_constant</pre>
+<pre>
   new_operators:
-    ".pragma" "n_operators" int_constant  
-  
+    &quot;.pragma&quot; &quot;n_operators&quot; int_constant</pre>
+<pre>
   loadlib:
-    ".loadlib" string_constant
-  
+    &quot;.loadlib&quot; string_constant</pre>
+<pre>
   namespace:
-    ".namespace" [ "[" namespace_id "]" ]?</span> 
-    
-  <span class="variable">hll_specifier</span><span class="operator">:</span>
-    <span class="string">".HLL"</span> <span class="variable">string_constant</span> <span class="string">","</span> <span class="variable">string_constant</span>
-    
-  <span class="variable">hll_mapping</span><span class="operator">:</span>
-    <span class="string">".HLL_map"</span> <span class="variable">int_constant</span> <span class="string">","</span> <span class="variable">int_constant</span>
-  
-  <span class="variable">namespace_id</span><span class="operator">:</span>
-    <span class="variable">string_constant</span> <span class="operator">[</span> <span class="string">";"</span> <span class="variable">string_constant</span> <span class="operator">]</span><span class="operator">*</span>
-    
-  <span class="variable">source_info</span><span class="operator">:</span>
-    <span class="string">".line"</span> <span class="variable">int_constant</span> <span class="operator">[</span> <span class="string">","</span> <span class="variable">string_constant</span> <span class="operator">]</span><span class="operator">?</span>
-  
-  <span class="variable">id_list</span><span class="operator">:</span>
-    <span class="variable">identifier</span> <span class="operator">[</span> <span class="string">","</span> <span class="variable">identifier</span> <span class="operator">]</span><span class="operator">*</span>
-   
-  <span class="variable">string_constant</span><span class="operator">:</span>
-    <span class="variable">charset_specifier</span><span class="operator">?</span>  <span class="variable">quoted_string</span> 
-  
-  <span class="variable">charset_specifier</span><span class="operator">:</span>
-      <span class="string">"ascii:"</span> 
-    <span class="operator">|</span> <span class="string">"binary:"</span> 
-    <span class="operator">|</span> <span class="string">"unicode:"</span> 
-    <span class="operator">|</span> <span class="string">"iso-8859-1:"</span> 
-  
-  
-  <span class="variable">type</span><span class="operator">:</span>
-      <span class="string">"int"</span> 
-    <span class="operator">|</span> <span class="string">"num"</span> 
-    <span class="operator">|</span> <span class="string">"pmc"</span> 
-    <span class="operator">|</span> <span class="string">"object"</span>
-    <span class="operator">|</span> <span class="string">"string"</span>   
-    <span class="operator">|</span> <span class="string">"Array"</span> 
-    <span class="operator">|</span> <span class="string">"Hash"</span> 
-    
-  <span class="variable">target</span><span class="operator">:</span>
-    <span class="variable">identifier</span> <span class="operator">|</span> <span class="variable">register</span>
-    
-    
-</pre>
+    &quot;.namespace&quot; [ &quot;[&quot; namespace_id &quot;]&quot; ]?</pre>
+<pre>
+  hll_specifier:
+    &quot;.HLL&quot; string_constant &quot;,&quot; string_constant</pre>
+<pre>
+  hll_mapping:
+    &quot;.HLL_map&quot; int_constant &quot;,&quot; int_constant</pre>
+<pre>
+  namespace_id:
+    string_constant [ &quot;;&quot; string_constant ]*</pre>
+<p>NOTE: currently, the line directive is implemented in IMCC as #line.
+See the PROPOSALS document for more information on this.</p>
+<pre>
+  source_info:
+    &quot;.line&quot; int_constant [ &quot;,&quot; string_constant ]?</pre>
+<pre>
+  id_list:
+    identifier [ &quot;,&quot; identifier ]*</pre>
+<pre>
+  string_constant:
+    charset_specifier?  quoted_string</pre>
+<pre>
+  charset_specifier:
+      &quot;ascii:&quot;
+    | &quot;binary:&quot;
+    | &quot;unicode:&quot;
+    | &quot;iso-8859-1:&quot;</pre>
+<pre>
+  type:
+      &quot;int&quot;
+    | &quot;num&quot;
+    | &quot;pmc&quot;
+    | &quot;object&quot;
+    | &quot;string&quot;
+    | &quot;Array&quot;
+    | &quot;Hash&quot;</pre>
+<pre>
+  target:
+    identifier | register</pre>
 <p>
 </p>
 <hr />
 <h1><a name="author">AUTHOR</a></h1>
-<p>Klaas-Jan Stol <a href="mailto:[parrotcode@gmail.com]">[parrotcode@gmail.com]</a>
-  
-
-</p>
+<p>Klaas-Jan Stol <a href="mailto:[parrotcode@gmail.com]">[parrotcode@gmail.com]</a></p>
 <p>
 </p>
 <hr />
 <h1><a name="known_issues_and_bugs">KNOWN ISSUES AND BUGS</a></h1>
-<p>Some work should be done on:
-
-</p>
+<p>Some work should be done on:</p>
 <ul>
 <li>
-<p>Macro parsing
-
-</p>
+<p>Macro parsing</p>
 </li>
 <li>
-<p>Heredoc parsing
-
-</p>
+<p>Heredoc parsing</p>
 </li>
 <li>
 <p>The rule 'type' does currently not include custom types (user defined).
-Probably it needs an alternative &quot;identifier&quot;. Not sure yet at this point.
-
-</p>
+Probably it needs an alternative ``identifier''. Not sure yet at this point.</p>
 </li>
 <li>
-<p>Clean up grammar, remove never-used features.
-
-</p>
+<p>Clean up grammar, remove never-used features.</p>
 </li>
 <li>
-<p>Test. A lot.
-
-</p>
+<p>Test. A lot.</p>
 <p>Bugs or improvements may be sent to the author, and of course greatly
 appreciated. Moreover, if you find any missing constructs that are in
-IMCC, indications of these would be appreciated as well.
-
-</p>
+IMCC, indications of these would be appreciated as well.</p>
 </li>
 </ul>
 
