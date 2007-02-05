@@ -48,11 +48,11 @@ enum {
 
 #define FPA_is_ns_ext PObj_private0_FLAG
 
-pmclass NameSpace extends Hash need_ext no_ro {
+pmclass NameSpace extends Hash does hash need_ext no_ro {
 
 /*
 
-=item C<voit init()>
+=item C<void init()>
 
 Initialize a C<NameSpace> PMC by calling C<Hash.init> and clearing
 other fields.

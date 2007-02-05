@@ -6,12 +6,12 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 50;
+use Parrot::Test tests => 52;
 use Parrot::Config;
 
 =head1 NAME
 
-t/pmc/namespace.t - Namespaces
+t/pmc/namespace.t - test the NameSpace PMC as described in PDD21.
 
 =head1 SYNOPSIS
 
@@ -19,9 +19,34 @@ t/pmc/namespace.t - Namespaces
 
 =head1 DESCRIPTION
 
-Tests the namespace manipulation.
+Test the NameSpace PMC as described in PDD21.
 
 =cut
+
+
+pir_output_is( <<'CODE', <<'OUT', 'new' );
+.sub 'test' :main
+    new $P0, .NameSpace
+    say 'ok 1 - $P0 = new .NameSpace'
+.end
+CODE
+ok 1 - $P0 = new .NameSpace
+OUT
+
+
+pir_output_is( <<'CODE', <<'OUT', 'NameSpace does "hash"' );
+.sub 'test' :main
+    new $P0, .NameSpace
+    $I0 = does $P0, 'hash'
+    if $I0 goto ok_1
+    print 'not '
+  ok_1:
+    say 'ok 1 - NameSpace does "hash"'
+.end
+CODE
+ok 1 - NameSpace does "hash"
+OUT
+
 
 pir_output_is( <<'CODE', <<'OUTPUT', "find_global bar" );
 .sub 'main' :main
