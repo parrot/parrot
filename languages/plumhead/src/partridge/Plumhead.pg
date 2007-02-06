@@ -28,7 +28,9 @@ rule statement    { <ECHO> <expression> ; }
 
 token expression  { <DOUBLEQUOTE_STRING> | <SINGLEQUOTE_STRING> | <adding_expression> }
 
-rule adding_expression { <multiplying_expression> ( <PLUS> <multiplying_expression> )* }
+rule adding_expression { <multiplying_expression> <summand>? }
+
+rule summand           { <?PLUS> <adding_expression> }
 
 rule multiplying_expression  { <unary_expression> ( <MUL_OP> <unary_expression> )* }
 

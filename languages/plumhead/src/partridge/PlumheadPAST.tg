@@ -116,7 +116,18 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     $P0 = node['adding_expression']
     if null $P0 goto no_adding_expression
-    past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+	.local pmc mult, past_mult, summand, summand_0, past_summand_0
+        summand = $P0['summand']
+        if null summand goto no_summand
+            mult = $P0['multiplying_expression']
+	    past_mult = tree.'get'('past', mult, 'Plumhead::Grammar::expression')
+	    summand_0 = summand[0]
+	    past_summand_0 = tree.'get'('past', summand_0, 'Plumhead::Grammar::expression')
+            past = new 'PAST::Op'
+	    past.init( past_mult, past_summand_0, 'name' => 'infix:+',  'pirop' => 'n_add' )
+            goto handled_expression
+	no_summand:
+        past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
     goto handled_expression
     no_adding_expression:
 
