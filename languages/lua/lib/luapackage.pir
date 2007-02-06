@@ -53,6 +53,9 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     set $P1, 'loadlib'
     _package[$P1] = _package_loadlib
 
+    # LUA_COMPAT_LOADLIB
+    _lua__GLOBAL[$P1] = _package_loadlib
+
     new $P0, .LuaString
     set $P1, 'path'
     _package[$P1] = $P0

@@ -69,6 +69,10 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
     set $P1, 'gmatch'
     _string[$P1] = _string_gmatch
 
+    # LUA_COMPAT_GFIND
+    set $P1, 'gfind'
+    _string[$P1] = _string_gmatch
+
     .const .Sub _string_gsub = '_string_gsub'
     set $P1, 'gsub'
     _string[$P1] = _string_gsub

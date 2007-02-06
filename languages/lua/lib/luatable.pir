@@ -51,6 +51,7 @@ See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
     set $P1, 'foreachi'
     _table[$P1] = _table_foreachi
 
+    # LUA_COMPAT_GETN
     .const .Sub _table_getn = '_table_getn'
     set $P1, 'getn'
     _table[$P1] = _table_getn
