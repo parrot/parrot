@@ -160,7 +160,7 @@ but with a syntax matching ParrotObjects.
 
 Access to array elements automatically does bounds checking.
 
-=head2 Possible future extemsios
+=head2 Possible future extensions
 
   cs = subclass 'CStruct', 'todo'
   addattribute(s) foo_cs, <<'DEF'
@@ -200,7 +200,7 @@ low-level bindings in a HLL independant way and should still be able to
 communicate all information "upstairs" to the HLL users.
 
 But it's not HLL usage only, parrot itself is already suffering from
-lack of abstraction at PMC level.
+a lack of abstraction at the PMC level.
 
 =head2 Inheritance
 
@@ -218,7 +218,7 @@ read the code. It's really not a problem of the implementation (which is
 totally fine) it's just the lack of usability of parrot (when it comes
 to native structures (or PMCs)).
 
-All these experiments to use a C structures or a PMC as base class are
+All these experiments to use a C structure or a PMC as base class are
 ending with a C<has> relationship instead of the natural C<isa>.
 Any useful OO-ish abstraction is lost and is leading to clumsy code,
 and - no - implementing interfaces/traits/mixins can't help here, as
@@ -270,7 +270,7 @@ This is the (hypothetical) description of a C<Complex> PMC class. An
 equivalent syntax can be translated by the PMC compiler to achieve the
 same result.
 
-This definition of the attributes of that PMC provides automagically
+This definition of the attributes of that PMC automagically provides
 access to all the information stored in the PMC. All such access is
 currently hand-crafted in the F<complex.pmc>.  Not only that this
 accessor code could be abandoned (and unified with common syntax),
