@@ -122,9 +122,16 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
             mult = $P0['multiplying_expression']
 	    past_mult = tree.'get'('past', mult, 'Plumhead::Grammar::expression')
 	    summand_0 = summand[0]
+            .local string add_op, pirop
+            pirop = 'n_add'
+            add_op = summand_0['ADD_OP']
+            if add_op != '-' goto not_minus
+                pirop = 'n_sub'
+            not_minus:
+            add_op = 'infix:' . add_op 
 	    past_summand_0 = tree.'get'('past', summand_0, 'Plumhead::Grammar::expression')
             past = new 'PAST::Op'
-	    past.init( past_mult, past_summand_0, 'name' => 'infix:+',  'pirop' => 'n_add' )
+	    past.init( past_mult, past_summand_0, 'name' => add_op, 'pirop' => pirop )
             goto handled_expression
 	no_summand:
         past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
@@ -141,7 +148,7 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
     if null $P0 goto no_unary_expression
         $P1 = $P0['postfix_expression']
         if null $P1 goto handled_expression
-            $P2 = $P0['MINUS']
+            $P2 = $P0['UNARY_MINUS']
             if null $P2 goto no_minus
                 past = new 'PAST::Op'
                 past.init( 'node' => $P1, 'name' => 'prefix:-' )

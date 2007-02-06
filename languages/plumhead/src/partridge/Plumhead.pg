@@ -16,8 +16,9 @@ token ECHO                    { e c h o }
 
 token NUMBER                  { \d+ }
 
-token MINUS                   { \- }
-token PLUS                    { \+ }
+token UNARY_MINUS             { \- }
+token UNARY_PLUS              { \+ }
+token ADD_OP                  { \+ | \- }
 token MUL_OP                  { \* | / | % }
 
 token program     { ^ <SEA> <code> }
@@ -30,11 +31,11 @@ token expression  { <DOUBLEQUOTE_STRING> | <SINGLEQUOTE_STRING> | <adding_expres
 
 rule adding_expression { <multiplying_expression> <summand>? }
 
-rule summand           { <?PLUS> <adding_expression> }
+rule summand           { <ADD_OP> <adding_expression> }
 
 rule multiplying_expression  { <unary_expression> ( <MUL_OP> <unary_expression> )* }
 
-rule unary_expression { <MINUS>? <postfix_expression> }
+rule unary_expression { <UNARY_MINUS>? <postfix_expression> }
 
 rule postfix_expression { <NUMBER> }
 
