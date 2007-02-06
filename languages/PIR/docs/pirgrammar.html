@@ -30,6 +30,145 @@
 	</ul>
 
 	<li><a href="#grammar_rules">GRAMMAR RULES</a></li>
+	<ul>
+
+		<li><a href="#compilation_units">Compilation Units</a></li>
+		<li><a href="#subroutine_definitions">Subroutine definitions</a></li>
+		<ul>
+
+			<li><a href="#examples_subroutine">Examples subroutine</a></li>
+		</ul>
+
+		<li><a href="#pir_instructions">PIR instructions</a></li>
+		<li><a href="#local_declarations">Local declarations</a></li>
+		<ul>
+
+			<li><a href="#examples_local_declarations">Examples local declarations</a></li>
+		</ul>
+
+		<li><a href="#lexical_declarations">Lexical declarations</a></li>
+		<ul>
+
+			<li><a href="#example_lexical_declarations">Example lexical declarations</a></li>
+		</ul>
+
+		<li><a href="#global_definitions">Global definitions</a></li>
+		<ul>
+
+			<li><a href="#example_global_declarations">Example global declarations</a></li>
+		</ul>
+
+		<li><a href="#constant_definitions">Constant definitions</a></li>
+		<ul>
+
+			<li><a href="#example_constant_definitions">Example constant definitions</a></li>
+		</ul>
+
+		<li><a href="#conditional_statements">Conditional statements</a></li>
+		<ul>
+
+			<li><a href="#examples_conditional_statements">Examples conditional statements</a></li>
+		</ul>
+
+		<li><a href="#branching_statements">Branching statements</a></li>
+		<ul>
+
+			<li><a href="#examples_branching_statements">Examples branching statements</a></li>
+		</ul>
+
+		<li><a href="#operators">Operators</a></li>
+		<li><a href="#expressions">Expressions</a></li>
+		<ul>
+
+			<li><a href="#example_expressions">Example expressions</a></li>
+		</ul>
+
+		<li><a href="#assignments">Assignments</a></li>
+		<ul>
+
+			<li><a href="#examples_assignment_statements">Examples assignment statements</a></li>
+		</ul>
+
+		<li><a href="#heredoc">Heredoc</a></li>
+		<ul>
+
+			<li><a href="#example_heredoc">Example Heredoc</a></li>
+		</ul>
+
+		<li><a href="#invoking_subroutines_and_methods">Invoking subroutines and methods</a></li>
+		<ul>
+
+			<li><a href="#example_long_subroutine_call">Example long subroutine call</a></li>
+		</ul>
+
+		<li><a href="#short_subroutine_invocation">Short subroutine invocation</a></li>
+		<ul>
+
+			<li><a href="#example_short_subroutine_call">Example short subroutine call</a></li>
+		</ul>
+
+		<li><a href="#return_values_from_subroutines">Return values from subroutines</a></li>
+		<ul>
+
+			<li><a href="#example_long_return_statement">Example long return statement</a></li>
+		</ul>
+
+		<li><a href="#short_return_statement">Short return statement</a></li>
+		<ul>
+
+			<li><a href="#example_short_return_statement">Example short return statement</a></li>
+		</ul>
+
+		<li><a href="#long_yield_statements">Long yield statements</a></li>
+		<ul>
+
+			<li><a href="#example_long_yield_statement">Example long yield statement</a></li>
+		</ul>
+
+		<li><a href="#short_yield_statements">Short yield statements</a></li>
+		<ul>
+
+			<li><a href="#example_short_yield_statement">Example short yield statement</a></li>
+		</ul>
+
+		<li><a href="#tail_calls">Tail calls</a></li>
+		<ul>
+
+			<li><a href="#example_tail_call">Example tail call</a></li>
+		</ul>
+
+		<li><a href="#symbol_namespaces">Symbol namespaces</a></li>
+		<ul>
+
+			<li><a href="#example_open_close_namespaces">Example open/close namespaces</a></li>
+		</ul>
+
+		<li><a href="#emit_blocks">Emit blocks</a></li>
+		<ul>
+
+			<li><a href="#example_emit_block">Example Emit block</a></li>
+		</ul>
+
+		<li><a href="#macros">Macros</a></li>
+		<ul>
+
+			<li><a href="#example_macros">Example Macros</a></li>
+		</ul>
+
+		<li><a href="#pir_pragmas">PIR Pragmas</a></li>
+		<ul>
+
+			<li><a href="#examples_pragmas">Examples pragmas</a></li>
+		</ul>
+
+		<li><a href="#tokens__types_and_targets">Tokens, types and targets</a></li>
+		<ul>
+
+			<li><a href="#notes_on_tokens__types_and_targets">Notes on Tokens, types and targets</a></li>
+		</ul>
+
+	</ul>
+
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#known_issues_and_bugs">KNOWN ISSUES AND BUGS</a></li>
 </ul>
@@ -44,9 +183,9 @@
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
-<p>This document provides a more readable grammar of languages/PIR. The actual input
-for PGE is a bit more complex. This grammar for humans does not contain error
-handling and some other issues unimportant for the PIR reference.</p>
+<p>This document provides a more readable grammar of languages/PIR. The actual specification
+for PIR is a bit more complex. This grammar for humans does not contain error
+handling and some other issues unimportant for this PIR reference.</p>
 <p>
 </p>
 <hr />
@@ -58,7 +197,7 @@ but are not implemented. An example of this is the ``.global'' directive.</p>
 </p>
 <hr />
 <h1><a name="version">VERSION</a></h1>
-<p>Version: Saturday Feb. 3rd 2007.
+<p>Version: Sunday Feb. 4th 2007.
 (not a version number yet, as many improvements are to be expected at this point).</p>
 <p>
 </p>
@@ -94,6 +233,9 @@ Real registers are actual registers in the Parrot VM, and are written like:</p>
 <p>Virtual, or temporary registers are written like:</p>
 <pre>
   $[S|N|I|P]n, where n is a positive integer.</pre>
+<p>Virtual registers can be thought of local variable identifiers that don't need a declaration.
+This prevents you from writing <code>.local</code> directives if you're in a hurry. Of course, it would
+make the code more self-documenting if <code>.local</code>s would be used.</p>
 <p>
 </p>
 <h2><a name="constants">Constants</a></h2>
@@ -126,11 +268,15 @@ the macro definition.</p>
 </p>
 <hr />
 <h1><a name="grammar_rules">GRAMMAR RULES</a></h1>
+<p>
+</p>
+<h2><a name="compilation_units">Compilation Units</a></h2>
 <p>A PIR program consists of one or more compilation units. A compilation unit
 is a global, sub, constant or macro definition, or a pragma or emit block.
 PIR is a line oriented language, which means that each statement ends in a
 newline (indicated as ``nl''). Moreover, compilation units are always separated
-by a newline.</p>
+by a newline. Each of the different compilation units are discussed in this
+document.</p>
 <pre>
   program:
     compilation_unit [ nl compilation_unit ]*</pre>
@@ -142,13 +288,15 @@ by a newline.</p>
     | macro_def
     | pragma
     | emit</pre>
+<p>
+</p>
+<h2><a name="subroutine_definitions">Subroutine definitions</a></h2>
 <pre>
   sub_def:
     [ &quot;.sub&quot; | &quot;.pcc_sub&quot; ] sub_id sub_pragmas nl body</pre>
 <pre>
   sub_id:
     identifier | string_constant</pre>
-<p>NOTE: the subpragmas may or may not be separated by a comma.</p>
 <pre>
   sub_pragmas:
     sub_pragma [ &quot;,&quot;? sub_pragma ]*</pre>
@@ -196,7 +344,119 @@ by a newline.</p>
     &quot;.end&quot;</pre>
 <pre>
   param_decl:
-    &quot;.param&quot;  [ [ type identifier ] | reg ] get_flags? nl</pre>
+    &quot;.param&quot;  [ [ type identifier ] | register ] get_flags? nl</pre>
+<pre>
+  get_flags:
+    [ &quot;:slurpy&quot;
+    | &quot;:optional&quot;
+    | &quot;:opt_flag&quot;
+    | named_flag
+    ]+</pre>
+<pre>
+  named_flag:
+    &quot;:named&quot; parenthesized_string?</pre>
+<p>
+</p>
+<h3><a name="examples_subroutine">Examples subroutine</a></h3>
+<p>The simplest example for a subroutine definition looks like:</p>
+<pre>
+        .sub foo
+        # PIR instructions go here
+        .end</pre>
+<p>The body of the subroutine can contain PIR instructions. The subroutine can be given
+one or more flags, indicating the sub should behave in a special way. Below is a list of these
+flags and their meaning:</p>
+<p>TODO: complete this</p>
+<ul>
+<li>
+<pre>
+ :load</pre>
+<p>Indicates the sub being defined</p>
+<li>
+<pre>
+ :init</pre>
+<p>Indicates the sub being defined</p>
+<li>
+<pre>
+ :immediate</pre>
+<p>Indicates the sub being defined</p>
+<li>
+<pre>
+ :main</pre>
+<p>Indicates that the sub being defined is the entry point of the program. It can be compared to the main function in C.</p>
+<li>
+<pre>
+ :method</pre>
+<p>Indicates the sub being defined is an instance method. The method belongs to the class whose namespace is
+currently active. (so, to define a method for a class 'Foo', the 'Foo' namespace should be currently active).</p>
+<li>
+<pre>
+ :vtable or vtable('x')</pre>
+<p>Indicates the sub being defined replaces a vtable entry. This flag can only be used when defining a method.</p>
+<li>
+<pre>
+ :multi(int, string, num, _, pmc)</pre>
+<p>Indicates the sub being defined</p>
+<li>
+<pre>
+ :outer('bar')</pre>
+<p>Indicates the sub being defined is lexically nested within the subroutine 'bar'.</p>
+<li>
+<pre>
+ :anon</pre>
+<p>Indicates the sub being defined is anonymous; no symbol entry is stored into the global symbol table</p>
+<li>
+<pre>
+ :lex</pre>
+<p>Indicates the sub being defined needs to store lexical variables. This flag is not necessary if any lexical
+declarations are done (see below), the PIR compiler will figure this out by itself.</p>
+<li>
+<pre>
+ :wrap('bar')</pre>
+<p>This flag is not (yet?) implemented in IMCC. It would indicate that this sub is <em>wrapping</em> the sub ``bar''. That means
+that when ``bar'' is invoked, this sub is called <em>before</em> and <em>after</em>. It is undecided yet whether this flag will
+be implemented. If so, its syntax may change.</p>
+</ul>
+<p>The sub flags are listed after the sub name. They may be separated by a comma, but this is
+not necessary. The subroutine name can also be a string instead of a bareword, as is shown in this
+example:</p>
+<pre>
+        .sub 'foo' :load, :init :anon
+        # PIR body
+        .end</pre>
+<p>Parameter definitions have the following syntax:</p>
+<pre>
+        .sub main
+          .param int argc
+          .param pmc argv
+          .param num nParam
+          .param string sParam
+          .param $P0
+          # body
+        .end</pre>
+<p>Parameter definitions may take flags as well. These flags are listed here:</p>
+<ul>
+<li>
+<pre>
+ :slurpy</pre>
+<li>
+<pre>
+ :named('x')</pre>
+<li>
+<pre>
+ :optional</pre>
+<p>Indicates the parameter being defined is optional.</p>
+<li>
+<pre>
+ :opt_flag</pre>
+<p>This flag can be given to a parameter defined <em>after</em> an optional parameter. During runtime,
+the parameter is automatically given a value, and is <em>not</em> passed by the caller. The value
+of this parameter indicates whether the previous (optional) parameter was present.</p>
+</ul>
+<p>The correct order of the parameters depends on the flag they have.</p>
+<p>
+</p>
+<h2><a name="pir_instructions">PIR instructions</a></h2>
 <pre>
   labeled_pir_instr:
     label? instr nl</pre>
@@ -222,9 +482,9 @@ defines the syntax for pure PASM instructions.</p>
     | macro_invocation
     | jump_stat
     | source_info</pre>
-<pre>
-  macro_invocation:
-    macro_id parenthesized_args?</pre>
+<p>
+</p>
+<h2><a name="local_declarations">Local declarations</a></h2>
 <pre>
   local_decl:
     [ &quot;.local&quot; | &quot;.sym&quot; ] type local_id_list</pre>
@@ -234,24 +494,105 @@ defines the syntax for pure PASM instructions.</p>
 <pre>
   local_id:
     identifier &quot;:unique_reg&quot;?</pre>
+<p>
+</p>
+<h3><a name="examples_local_declarations">Examples local declarations</a></h3>
+<p>Local temporary variables can be declared by the directives <code>.local</code> or <code>.sym</code>. There is no
+difference between these directives, except within macro definitions. (See Macros).</p>
+<pre>
+        .local int i
+        .local num a, b, c
+        .sym string s1, s2
+        .sym pmc obj</pre>
+<p>The <code>:unique_reg</code> flag indicates ... TODO.</p>
+<p>
+</p>
+<h2><a name="lexical_declarations">Lexical declarations</a></h2>
 <pre>
   lexical_decl:
     &quot;.lex&quot; string_constant &quot;,&quot; target</pre>
+<p>
+</p>
+<h3><a name="example_lexical_declarations">Example lexical declarations</a></h3>
+<p>The declaration</p>
+<pre>
+        .lex 'i', $P0</pre>
+<p>indicates that the value in $P0 is stored as a lexical variable, named by 'i'. Instead of a register,
+one can also specify a local variable, like so:</p>
+<pre>
+        .local pmc p
+        .lex 'i', p</pre>
+<p>
+</p>
+<h2><a name="global_definitions">Global definitions</a></h2>
 <pre>
   global_def:
     &quot;.global&quot; identifier</pre>
+<p>
+</p>
+<h3><a name="example_global_declarations">Example global declarations</a></h3>
+<p>This syntax is defined in the parser of IMCC, but its functionality is not implemented. The goal is
+to allow for global definitions outside of subroutines. That way, the variable can be accessed by
+all subroutines without doing a global lookup. It is unclear whether this feature will be implemented.</p>
+<p>An example is:</p>
+<pre>
+        .global my_global_var</pre>
+<p>
+</p>
+<h2><a name="constant_definitions">Constant definitions</a></h2>
 <pre>
   const_def:
     &quot;.const&quot; type identifier &quot;=&quot; constant_expr</pre>
+<p>
+</p>
+<h3><a name="example_constant_definitions">Example constant definitions</a></h3>
+<pre>
+        .const int answer = 42</pre>
+<p>defines an integer constant by name 'answer', giving it a value of 42.</p>
+<p>
+</p>
+<h2><a name="conditional_statements">Conditional statements</a></h2>
 <pre>
   conditional_stat:
       [ &quot;if&quot; | &quot;unless&quot; ]
     [ [ &quot;null&quot; target &quot;goto&quot; identifier ]
     | [ simple_expr [ relational_op simple_expr ]? ]
     ] &quot;goto&quot; identifier</pre>
+<p>
+</p>
+<h3><a name="examples_conditional_statements">Examples conditional statements</a></h3>
+<p>The syntax for <code>if</code> and <code>unless</code> statements is the same, except for the keyword itself.
+Therefore the examples will use either.</p>
+<pre>
+        if null $P0 goto L1</pre>
+<p>Checks whether $P0 is <code>null</code>, if it is, flow of control jumps to label L1</p>
+<pre>
+        unless $P0 goto L2
+        unless x   goto L2
+        unless 1.1 goto L2</pre>
+<p>Unless $P0, x or 1.1 are 'true', flow of control jumps to L2. When the argument is a PMC (like
+the first example), true-ness depends on the PMC itself. For instance, in some languages, the number
+0 is defined as 'true', in others it is considered 'false' (like C).</p>
+<pre>
+        if x &lt; y goto L1
+        if y != z  goto L1</pre>
+<p>are examples that check for the logical expression after <code>if</code>. Any of the <em>relational</em> operators may
+be used here.</p>
+<p>
+</p>
+<h2><a name="branching_statements">Branching statements</a></h2>
 <pre>
   jump_stat:
     &quot;goto&quot; identifier</pre>
+<p>
+</p>
+<h3><a name="examples_branching_statements">Examples branching statements</a></h3>
+<pre>
+        goto MyLabel</pre>
+<p>The program will continue running at label 'MyLabel:'.</p>
+<p>
+</p>
+<h2><a name="operators">Operators</a></h2>
 <pre>
   relational_op:
       &quot;==&quot;
@@ -297,6 +638,9 @@ defines the syntax for pure PASM instructions.</p>
       &quot;!&quot;
     | &quot;-&quot;
     | &quot;~&quot;</pre>
+<p>
+</p>
+<h2><a name="expressions">Expressions</a></h2>
 <pre>
   expression:
       simple_expr
@@ -308,6 +652,37 @@ defines the syntax for pure PASM instructions.</p>
     | int_constant
     | string_constant
     | target</pre>
+<p>
+</p>
+<h3><a name="example_expressions">Example expressions</a></h3>
+<pre>
+        42
+        42 + x
+        1.1 / 0.1
+        &quot;hello&quot; . &quot;world&quot;
+        str1 . str2
+        -100
+        ~obj
+        !isSomething</pre>
+<p>Arithmetic operators are only allowed on floating-point numbers and integer values (or variables of that type).
+Likewise, string concatenation (``.'') is only allowed on strings. These checks are <strong>not</strong> done by the PIR parser.</p>
+<p>
+</p>
+<h2><a name="assignments">Assignments</a></h2>
+<pre>
+  assignment_stat:
+      target &quot;=&quot; short_sub_call
+    | target &quot;=&quot; target keylist
+    | target &quot;=&quot; expression
+    | target &quot;=&quot; &quot;new&quot; [ int_constant | string_constant | macro_id ]
+    | target &quot;=&quot; &quot;new&quot; keylist
+    | target &quot;=&quot; &quot;find_type&quot; [ string_constant | string_reg | id ]
+    | target &quot;=&quot; heredoc
+    | target &quot;=&quot; &quot;global&quot; &lt;string_constant
+    | target assign_op simple_expr
+    | target keylist &quot;=&quot; simple_expr
+    | &quot;global&quot; string_constant &quot;=&quot; target
+    | result_var_list &quot;=&quot; short_sub_call</pre>
 <pre>
   keylist:
     &quot;[&quot; keys &quot;]&quot;</pre>
@@ -323,20 +698,28 @@ defines the syntax for pure PASM instructions.</p>
     | simple_expr &quot;..&quot;
     | &quot;..&quot; simple_expr
     | simple_expr &quot;..&quot; simple_expr</pre>
+<p>
+</p>
+<h3><a name="examples_assignment_statements">Examples assignment statements</a></h3>
 <pre>
-  assignment_stat:
-      target &quot;=&quot; short_sub_call
-    | target &quot;=&quot; target keylist
-    | target &quot;=&quot; expression
-    | target &quot;=&quot; &quot;new&quot; [ int_constant | string_constant | macro_id ]
-    | target &quot;=&quot; &quot;new&quot; keylist
-    | target &quot;=&quot; &quot;find_type&quot; [ string_constant | string_reg | id ]
-    | target &quot;=&quot; heredoc
-    | target &quot;=&quot; &quot;global&quot; &lt;string_constant
-    | target assign_op simple_expr
-    | target keylist &quot;=&quot; simple_expr
-    | &quot;global&quot; string_constant &quot;=&quot; target
-    | result_var_list &quot;=&quot; short_sub_call</pre>
+        $P0 = foo()
+        $I0 = $P0[1]
+        $I0 = $P0[12.34]
+        $I0 = $P0[&quot;Hello&quot;]
+        $P0 = new 42 # but this is really not very clear, better use identifiers</pre>
+<pre>
+        $S0 = &lt;&lt;'HELLO'
+        ...
+        HELLO</pre>
+<pre>
+        $P0 = global &quot;X&quot;
+        global &quot;X&quot; = $P0</pre>
+<pre>
+        .local int a, b, c
+        (a, b, c) = foo()</pre>
+<p>
+</p>
+<h2><a name="heredoc">Heredoc</a></h2>
 <p>NOTE: the heredoc rules are not complete or tested. Some work is required here.</p>
 <pre>
   heredoc:
@@ -349,6 +732,32 @@ defines the syntax for pure PASM instructions.</p>
 <pre>
   heredoc_string:
     [ \N | \n ]*</pre>
+<p>
+</p>
+<h3><a name="example_heredoc">Example Heredoc</a></h3>
+<pre>
+        .local string str
+        str = &lt;&lt;'ENDOFSTRING'
+          this text
+               is stored in the
+                     variable
+            named 'str'. Whitespace and newlines
+          are                  stored as well.
+        ENDOFSTRING</pre>
+<p>Note that the Heredoc identifier should be at the beginning of the line, no
+whitespace in front of it is allowed. Printing <code>str</code> would print:</p>
+<pre>
+    this text
+               is stored in the
+                     variable
+            named 'str'. Whitespace and newlines
+          are                  stored as well.</pre>
+<p>
+</p>
+<h2><a name="invoking_subroutines_and_methods">Invoking subroutines and methods</a></h2>
+<pre>
+  sub_invocation:
+    long_sub_call | short_sub_call</pre>
 <pre>
   long_sub_call:
     &quot;.pcc_begin&quot; nl
@@ -364,24 +773,6 @@ defines the syntax for pure PASM instructions.</p>
   method_call:
     &quot;.invocant&quot; target nl
     &quot;.meth_call&quot;</pre>
-<pre>
-  short_sub_call:
-    invocant? [ target | string_constant ] parenthesized_args</pre>
-<pre>
-  invocant:
-    [ target&quot;.&quot; | target &quot;-&gt;&quot; ]</pre>
-<pre>
-  sub_invocation:
-    long_sub_call | short_sub_call</pre>
-<pre>
-  result_var_list:
-    &quot;(&quot; result_vars &quot;)&quot;</pre>
-<pre>
-  result_vars:
-    result_var [ &quot;,&quot; result_var ]*</pre>
-<pre>
-  result_var:
-    target get_flags?</pre>
 <pre>
   parenthesized_args:
     &quot;(&quot; args &quot;)&quot;</pre>
@@ -407,16 +798,72 @@ defines the syntax for pure PASM instructions.</p>
     [ &quot;:flat&quot;
     | named_flag
     ]+</pre>
+<p>
+</p>
+<h3><a name="example_long_subroutine_call">Example long subroutine call</a></h3>
+<p>The long subroutine call syntax is very suitable to be generated by a language compiler
+targeting Parrot. Its syntax is rather verbose, but easy to read. The minimal invocation
+looks like this:</p>
 <pre>
-  get_flags:
-    [ &quot;:slurpy&quot;
-    | &quot;:optional&quot;
-    | &quot;:opt_flag&quot;
-    | named_flag
-    ]+</pre>
+        .pcc_begin
+        .pcc_call $P0
+        .pcc_end</pre>
+<p>Invoking instance methods is a simple variation:</p>
 <pre>
-  named_flag:
-    &quot;:named&quot; parenthesized_string?</pre>
+        .pcc_begin
+        .invocant $P0
+        .meth_call $P1
+        .pcc_end</pre>
+<p>Passing parameters and retrieving return values is done like this:</p>
+<pre>
+        .pcc_begin
+        .arg 42
+        .pcc_call $P0
+        .local int res
+        .result res
+        .pcc_end</pre>
+<p>Parameters can take flags:</p>
+<p>The Native Calling Interface (NCI) allows for calling C routines, in order to talk to the world
+outside of Parrot. Its syntax is a slight variation:</p>
+<pre>
+        .pcc_begin
+        .nci_call $P0
+        .pcc_end</pre>
+<p>
+</p>
+<h2><a name="short_subroutine_invocation">Short subroutine invocation</a></h2>
+<pre>
+  short_sub_call:
+    invocant? [ target | string_constant ] parenthesized_args</pre>
+<pre>
+  invocant:
+    [ target&quot;.&quot; | target &quot;-&gt;&quot; ]</pre>
+<p>
+</p>
+<h3><a name="example_short_subroutine_call">Example short subroutine call</a></h3>
+<p>The short subroutine call syntax is useful when manually writing PIR code.
+Its simplest form is:</p>
+<pre>
+        foo()</pre>
+<p>Or a method call:</p>
+<pre>
+        obj.'toString'() # call the method 'toString'
+        obj.x() # call the method whose name is stored in C&lt;x&gt;</pre>
+<p>IMCC also allows the ``-&gt;'' instead of a dot, to make it readable for C++ programmers:</p>
+<pre>
+        obj-&gt;'toString'()</pre>
+<p>
+</p>
+<h2><a name="return_values_from_subroutines">Return values from subroutines</a></h2>
+<pre>
+  result_var_list:
+    &quot;(&quot; result_vars &quot;)&quot;</pre>
+<pre>
+  result_vars:
+    result_var [ &quot;,&quot; result_var ]*</pre>
+<pre>
+  result_var:
+    target get_flags?</pre>
 <pre>
   return_stat:
       long_return_stat
@@ -430,38 +877,125 @@ defines the syntax for pure PASM instructions.</p>
     return_directive*
     &quot;.pcc_end_return&quot;</pre>
 <pre>
+  return_directive:
+    &quot;.return&quot; simple_expr set_flags? nl</pre>
+<p>
+</p>
+<h3><a name="example_long_return_statement">Example long return statement</a></h3>
+<pre>
+        .pcc_begin_return
+        .return 42
+        .return $P0 :flat
+        .pcc_end_return</pre>
+<p>
+</p>
+<h2><a name="short_return_statement">Short return statement</a></h2>
+<pre>
   short_return_stat:
     &quot;.return&quot; parenthesized_args</pre>
+<p>
+</p>
+<h3><a name="example_short_return_statement">Example short return statement</a></h3>
+<pre>
+        .return(myVar, &quot;hello&quot;, 2.76, 3.14);</pre>
+<p>
+</p>
+<h2><a name="long_yield_statements">Long yield statements</a></h2>
 <pre>
   long_yield_stat:
     &quot;.pcc_begin_yield&quot; nl
     return_directive*
     &quot;.pcc_end_yield&quot;</pre>
+<p>
+</p>
+<h3><a name="example_long_yield_statement">Example long yield statement</a></h3>
 <pre>
-  return_directive:
-    &quot;.return&quot; simple_expr set_flags? nl</pre>
+        .sub foo
+          .pcc_begin_yield
+          .return 42
+          .pcc_end_yield</pre>
+<pre>
+          # and later in the sub, one could return another value:</pre>
+<pre>
+          .pcc_begin_yield
+          .return 43
+          .pcc_end_yield
+        .end</pre>
+<pre>
+        # when invoking twice:
+        foo() # returns 42
+        foo() # returns 43</pre>
+<p>
+</p>
+<h2><a name="short_yield_statements">Short yield statements</a></h2>
 <pre>
   short_yield_stat:
     &quot;.yield&quot; parenthesized_args</pre>
+<p>
+</p>
+<h3><a name="example_short_yield_statement">Example short yield statement</a></h3>
+<pre>
+        .yield(&quot;hello&quot;, 42)</pre>
+<p>
+</p>
+<h2><a name="tail_calls">Tail calls</a></h2>
 <pre>
   tail_call:
     &quot;.return&quot; short_sub_call</pre>
+<p>
+</p>
+<h3><a name="example_tail_call">Example tail call</a></h3>
+<pre>
+        .return foo()</pre>
+<p>Returns the return values from <code>foo</code>. This is implemented by a tail call, which is more efficient than:</p>
+<pre>
+        .local pmc results = foo()
+        .return(results)</pre>
+<p>
+</p>
+<h2><a name="symbol_namespaces">Symbol namespaces</a></h2>
 <pre>
   open_namespace:
     &quot;.namespace&quot; identifier</pre>
 <pre>
   close_namespace:
     &quot;.endnamespace&quot; identifier</pre>
-<p>NOTE: an emit block only allows PASM instructions,
-not PIR instructions.</p>
+<p>
+</p>
+<h3><a name="example_open_close_namespaces">Example open/close namespaces</a></h3>
+<pre>
+        .sub main
+          .local int x
+          x = 42
+          say x
+          .namespace NESTED
+          .local int x
+          x = 43
+          say x
+          .endnamespace NESTED
+          say x
+        .end</pre>
+<p>Will print:</p>
+<pre>
+        42
+        43
+        42</pre>
+<p>
+</p>
+<h2><a name="emit_blocks">Emit blocks</a></h2>
 <pre>
   emit:
     &quot;.emit&quot; nl
     labeled_pasm_instr*
     &quot;.eom&quot;</pre>
-<p>NOTE: the macro definition is not complete, and untested.
-This should be fixed. For now, all characters up to but not
-including ``.endm'' are 'matched'.</p>
+<p>
+</p>
+<h3><a name="example_emit_block">Example Emit block</a></h3>
+<p>An emit block only allows PASM instructions,
+not PIR instructions.</p>
+<p>
+</p>
+<h2><a name="macros">Macros</a></h2>
 <pre>
   macro_def:
     &quot;.macro&quot; identifier macro_parameters? nl
@@ -473,6 +1007,18 @@ including ``.endm'' are 'matched'.</p>
   macro_body:
     .*?
     &quot;.endm&quot; nl</pre>
+<pre>
+  macro_invocation:
+    macro_id parenthesized_args?</pre>
+<p>
+</p>
+<h3><a name="example_macros">Example Macros</a></h3>
+<p>NOTE: the macro definition is not complete, and untested.
+This should be fixed. For now, all characters up to but not
+including ``.endm'' are 'matched'.</p>
+<p>
+</p>
+<h2><a name="pir_pragmas">PIR Pragmas</a></h2>
 <pre>
   pragma:
       include
@@ -503,14 +1049,67 @@ including ``.endm'' are 'matched'.</p>
 <pre>
   namespace_id:
     string_constant [ &quot;;&quot; string_constant ]*</pre>
-<p>NOTE: currently, the line directive is implemented in IMCC as #line.
-See the PROPOSALS document for more information on this.</p>
 <pre>
   source_info:
     &quot;.line&quot; int_constant [ &quot;,&quot; string_constant ]?</pre>
 <pre>
   id_list:
     identifier [ &quot;,&quot; identifier ]*</pre>
+<p>
+</p>
+<h3><a name="examples_pragmas">Examples pragmas</a></h3>
+<pre>
+        .include &quot;myLib.pir&quot;</pre>
+<p>includes the source from the file ``myLib.pir'' at the point of this directive.</p>
+<pre>
+        .pragma n_operators 1</pre>
+<p>makes Parrot automatically create new PMCs when using arithmetic operators, like:</p>
+<pre>
+        $P1 = new .Integer
+        $P2 = new .Integer
+        $P1 = 42
+        $P2 = 43
+        $P0 = $P1 * $P2
+        # now, $P0 is automatically assigned a newly created PMC.</pre>
+<pre>
+        .line 100
+        .line 100, &quot;myfile.pir&quot;</pre>
+<p>NOTE: currently, the line directive is implemented in IMCC as #line.
+See the PROPOSALS document for more information on this.</p>
+<pre>
+        .namespace ['Foo'] # namespace Foo
+        .namespace ['Object';'Foo'] # nested namespace
+        
+        .namespace # no [ id ] means the root namespace is activated</pre>
+<p>opens the namespace 'Foo'. When doing Object Oriented programming, this would indicate
+that sub or method definitions belong to the class 'Foo'. Of course, you can also define
+namespaces without doing OO-programming.</p>
+<p>Please note that this <code>.namespace</code> directive is <em>different</em> from the <code>.namespace</code> directive
+that is used within subroutines.</p>
+<pre>
+        .HLL &quot;Lua&quot;, &quot;lua_group&quot;
+        
+is an example of specifying the High Level Language (HLL) for which the PIR is being generated.
+It is a shortcut for setting the namespace to 'Lua', and for loading the PMCs in the lua_group library.</pre>
+<pre>
+        .HLL_map .Integer, .LuaNumber
+        
+is a way of telling Parrot, that whenever an Integer is created somewhere in the system (C code), instead
+a LuaNumber object is created.</pre>
+<pre>
+        .loadlib &quot;myLib&quot;
+        
+is a shortcut for telling Parrot that the library &quot;myLib&quot; should be loaded when running the program. In fact,
+it is a shortcut for:</pre>
+<pre>
+        .sub _load :load :anon
+                loadlib &quot;myLib&quot;
+        .end
+        
+TODO: check flags and syntax for this.</pre>
+<p>
+</p>
+<h2><a name="tokens__types_and_targets">Tokens, types and targets</a></h2>
 <pre>
   string_constant:
     charset_specifier?  quoted_string</pre>
@@ -532,6 +1131,21 @@ See the PROPOSALS document for more information on this.</p>
 <pre>
   target:
     identifier | register</pre>
+<p>
+</p>
+<h3><a name="notes_on_tokens__types_and_targets">Notes on Tokens, types and targets</a></h3>
+<p>A string constant can be written like:</p>
+<pre>
+        &quot;Hello world&quot;</pre>
+<p>but if desirable, the character set can be specified:</p>
+<pre>
+        unicode:&quot;Hello world&quot;</pre>
+<p>TODO: is it ``unicode''? or is it UTF8 or something?</p>
+<p>IMCC currently allows identifiers to be used as types. During the parse, the identifier
+is checked whether it is a defined class. The built-in types int, num, pmc and string are
+always available.</p>
+<p>A <code>target</code> is something that can be assigned to, it is an L-value (but of course may be read just like
+an R-value). It is either an identifier or a register.</p>
 <p>
 </p>
 <hr />
