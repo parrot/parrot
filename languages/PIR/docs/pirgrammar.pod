@@ -13,15 +13,13 @@ handling and some other issues unimportant for this PIR reference.
 
 For a bugs and issues, see the section KNOWN ISSUES AND BUGS.
 
-The grammar includes some constructs that *are* in the IMCC parser,
-but are not implemented. An example of this is the ".global" directive.
+The grammar includes some constructs that B<are> in the IMCC parser,
+but are not implemented. An example of this is the C<.global> directive.
 
 
 =head1 VERSION
 
-Version: Sunday Feb. 4th 2007.
-(not a version number yet, as many improvements are to be expected at this point).
-
+0.1
 
 =head1 LEXICAL CONVENTIONS
 
@@ -49,45 +47,45 @@ PIR directives are:
 
 =head2 Registers
 
-PIR has two types of registers: real registers and virtual or temporary registers.
+PIR has two types of registers: real registers and symbolic or temporary registers.
 Real registers are actual registers in the Parrot VM, and are written like:
 
   [S|N|I|P]n, where n is a number between 0 to, but not including, 100.
 
-Virtual, or temporary registers are written like:
+Symbolic, or temporary registers are written like:
 
   $[S|N|I|P]n, where n is a positive integer.
 
-Virtual registers can be thought of local variable identifiers that don't need a declaration.
+Symbolic registers can be thought of local variable identifiers that don't need a declaration.
 This prevents you from writing C<.local> directives if you're in a hurry. Of course, it would
 make the code more self-documenting if C<.local>s would be used.
 
 =head2 Constants
 
 An integer constant is a string of one or more digits.
-Examples: 0, 42.
+Examples: C<0>, C<42>.
 
 A floatin-point constant is a string of one or more digits, followed by a dot
-and one or more digits. Examples: 1.1, 42.567.
+and one or more digits. Examples: C<1.1>, C<42.567>
 
 A string constant is a single or double quoted series of characters.
-Examples: 'hello world', "Parrot".
+Examples: C<'hello world'>, C<"Parrot">.
 
 TODO: PMC constants.
 
 =head2 Identifiers
 
 An identifier starts with a character from [_a-zA-Z], followed by
-a character from [_a-zA-Z0-9].
+zero or more characters from [_a-zA-Z0-9].
 
-Examples: x, x1, _foo.
+Examples: C<x>, C<x1>, C<_foo>
 
 
 =head2 Labels
 
 A label is an identifier with a colon attached to it.
 
-Examples: LABEL:
+Examples: C<LABEL:>
 
 
 =head2 Macro identifiers
@@ -96,7 +94,7 @@ A macro identifier is an identifier prefixed with an dot. A macro
 identifier is used when I<expanding> the macro (on usage), not in
 the macro definition.
 
-Examples:  .Macro
+Examples:  C<.myMacro>
 
 
 
@@ -140,6 +138,7 @@ document.
       ":load"
     | ":init"
     | ":immediate"
+    | ":postcomp"
     | ":main"
     | ":anon"
     | ":lex"
@@ -203,27 +202,37 @@ The body of the subroutine can contain PIR instructions. The subroutine can be g
 one or more flags, indicating the sub should behave in a special way. Below is a list of these
 flags and their meaning:
 
-TODO: complete this
-
 =over 4
 
 =item *
 
  :load
 
-Indicates the sub being defined
+Run this subroutine during the B<load_library> opcode.
+B<:load> is ignored, if another subroutine in that file is marked with
+B<:main>. If multiple subs have the B<:load> pragma, the subs are
+run in source code order.
 
 =item *
 
  :init
 
-Indicates the sub being defined
+Run the subroutine when the program is run directly (that is, not loaded as a
+module). This is different from B<:load>, which runs a subroutine when a
+library is being loaded. To get both behaviours, use B<:init :load>.
+
+=item *
+
+ :postcomp
+
+Same as C<:immediate>.
 
 =item *
 
  :immediate
 
-Indicates the sub being defined
+This subroutine is executed immediately after being compiled. (Analagous to
+C<BEGIN> in perl5.)
 
 =item *
 
@@ -237,6 +246,7 @@ Indicates that the sub being defined is the entry point of the program. It can b
 
 Indicates the sub being defined is an instance method. The method belongs to the class whose namespace is
 currently active. (so, to define a method for a class 'Foo', the 'Foo' namespace should be currently active).
+In the method body, the object PMC can be referred to with C<self>.
 
 =item *
 
@@ -246,9 +256,9 @@ Indicates the sub being defined replaces a vtable entry. This flag can only be u
 
 =item *
 
- :multi(int, string, num, _, pmc)
+ :multi(type [, type]*)
 
-Indicates the sub being defined
+Engage in multiple dispatch with the listed types.
 
 =item *
 
@@ -260,14 +270,17 @@ Indicates the sub being defined is lexically nested within the subroutine 'bar'.
 
  :anon
 
-Indicates the sub being defined is anonymous; no symbol entry is stored into the global symbol table
+Do not install this subroutine in the namespace. Allows the subroutine
+name to be reused.
 
 =item *
 
  :lex
 
 Indicates the sub being defined needs to store lexical variables. This flag is not necessary if any lexical
-declarations are done (see below), the PIR compiler will figure this out by itself.
+declarations are done (see below), the PIR compiler will figure this out by itself. The C<:lex> attribute
+is necessary to tell Parrot the subroutine will store or find lexicals.
+
 
 =item *
 
@@ -290,15 +303,16 @@ example:
 Parameter definitions have the following syntax:
 
 	.sub main
-	  .param int argc
-	  .param pmc argv
+	  .param int argc :optional
+	  .param int has_argc :optional
 	  .param num nParam
-	  .param string sParam
-	  .param $P0
+	  .param pmc argv :slurpy	  
+	  .param string sParam :named('foo')
+	  .param $P0 :named('bar')
 	  # body
 	.end
 
-Parameter definitions may take flags as well. These flags are listed here:
+As shown, parameter definitions may take flags as well. These flags are listed here:
 
 =over 4
 
@@ -306,9 +320,14 @@ Parameter definitions may take flags as well. These flags are listed here:
 
  :slurpy
 
+The parameter should be of type C<pmc> and acts like a container that C<slurps> up all remaining arguments.
+Details can be found in PDD03 - Parrot Calling Conventions. 
+
 =item *
 
  :named('x')
+
+The parameter is known in the called sub by name C<'x'>.
 
 =item *
 
@@ -380,7 +399,10 @@ difference between these directives, except within macro definitions. (See Macro
 	.sym string s1, s2
 	.sym pmc obj
 
-The C<:unique_reg> flag indicates ... TODO.
+The optional C<:unique_reg> modifier will force the register allocator to associate the identifier
+with a unique register for the duration of the compilation unit.
+
+	.local int j :unique_reg
 
 =head2 Lexical declarations
 
@@ -393,8 +415,40 @@ The declaration
 
 	.lex 'i', $P0
 
-indicates that the value in $P0 is stored as a lexical variable, named by 'i'. Instead of a register,
-one can also specify a local variable, like so:
+indicates that the value in $P0 is stored as a lexical variable, named by 'i'.
+Once the above lexical declaration is written, and given the following statement:
+
+	$P1 = new .Integer
+
+then the following two statements have an identical effect:
+
+=over 4
+
+=item *
+
+  $P0 = $P1
+
+=item *
+
+  store_lex "$a", $P1
+
+=back
+
+Likewise, these two statements also have an identical effect:
+
+=over 4
+
+=item *
+
+  $P1 = $P0
+
+=item *
+
+  $P1 = find_lex "$a"
+
+=back
+
+Instead of a register, one can also specify a local variable, like so:
 
 	.local pmc p
 	.lex 'i', p
@@ -425,6 +479,9 @@ An example is:
 	.const int answer = 42
 
 defines an integer constant by name 'answer', giving it a value of 42.
+Note that the constant type and the value type should match, i.e. you cannot 
+assign a floating point number to an integer constant. The PIR parser will
+check for this.
 
 =head2 Conditional statements
 
@@ -557,11 +614,14 @@ Likewise, string concatenation (".") is only allowed on strings. These checks ar
     | target "=" "new" keylist
     | target "=" "find_type" [ string_constant | string_reg | id ]
     | target "=" heredoc
-    | target "=" "global" <string_constant
+    | target "=" "global" string_constant
     | target assign_op simple_expr
     | target keylist "=" simple_expr
     | "global" string_constant "=" target
     | result_var_list "=" short_sub_call
+
+NOTE: the definition of assignment statements is B<not> complete yet. 
+As languages/PIR evolves, this will be completed.
 
   keylist:
     "[" keys "]"
@@ -578,9 +638,21 @@ Likewise, string concatenation (".") is only allowed on strings. These checks ar
     | ".." simple_expr
     | simple_expr ".." simple_expr
 
+  result_var_list:
+    "(" result_vars ")"
+
+  result_vars:
+    result_var [ "," result_var ]*
+
+  result_var:
+    target get_flags?
+
+
 
 =head3 Examples assignment statements
 
+	$I1 = 1 + 2
+	$I1 += 1
 	$P0 = foo()
 	$I0 = $P0[1]
 	$I0 = $P0[12.34]
@@ -745,14 +817,6 @@ IMCC also allows the "->" instead of a dot, to make it readable for C++ programm
 
 =head2 Return values from subroutines
 
-  result_var_list:
-    "(" result_vars ")"
-
-  result_vars:
-    result_var [ "," result_var ]*
-
-  result_var:
-    target get_flags?
 
   return_stat:
       long_return_stat
@@ -965,7 +1029,7 @@ See the PROPOSALS document for more information on this.
 
 	.namespace ['Foo'] # namespace Foo
 	.namespace ['Object';'Foo'] # nested namespace
-	
+
 	.namespace # no [ id ] means the root namespace is activated
 
 opens the namespace 'Foo'. When doing Object Oriented programming, this would indicate
@@ -976,24 +1040,24 @@ Please note that this C<.namespace> directive is I<different> from the C<.namesp
 that is used within subroutines.
 
 	.HLL "Lua", "lua_group"
-	
+
 is an example of specifying the High Level Language (HLL) for which the PIR is being generated.
 It is a shortcut for setting the namespace to 'Lua', and for loading the PMCs in the lua_group library.
 
 	.HLL_map .Integer, .LuaNumber
-	
+
 is a way of telling Parrot, that whenever an Integer is created somewhere in the system (C code), instead
 a LuaNumber object is created.
 
 	.loadlib "myLib"
-	
+
 is a shortcut for telling Parrot that the library "myLib" should be loaded when running the program. In fact,
 it is a shortcut for:
 
 	.sub _load :load :anon
-		loadlib "myLib"
+	  loadlib "myLib"
 	.end
-	
+
 TODO: check flags and syntax for this.
 
 =head2 Tokens, types and targets
@@ -1028,8 +1092,6 @@ A string constant can be written like:
 but if desirable, the character set can be specified:
 
 	unicode:"Hello world"
-
-TODO: is it "unicode"? or is it UTF8 or something?
 
 IMCC currently allows identifiers to be used as types. During the parse, the identifier
 is checked whether it is a defined class. The built-in types int, num, pmc and string are
@@ -1070,9 +1132,43 @@ Clean up grammar, remove never-used features.
 
 Test. A lot.
 
-Bugs or improvements may be sent to the author, and of course greatly
+Bugs or improvements may be sent to the author, and are of course greatly
 appreciated. Moreover, if you find any missing constructs that are in
 IMCC, indications of these would be appreciated as well.
+
+=back
+
+=head1 REFERENCES
+
+=over 4
+
+=item *
+
+languages/PIR/lib/pir.pg - The actual PIR grammar implementation
+
+=item *
+
+PDD03 - Parrot Calling Conventions
+
+=item *
+
+PDD20 - Lexically scoped variables in Parrot
+
+=item *
+
+docs/imcc/calling_conventions.pod - definition of sub flags (:init etc)
+
+=back
+
+=head1 CHANGES
+
+0.1
+
+=over 4
+
+=item *
+
+Initial version having a version number.
 
 =back
 

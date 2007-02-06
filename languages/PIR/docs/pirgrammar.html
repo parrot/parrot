@@ -4,7 +4,7 @@
 <head>
 <title>PIR.pod - The Grammar of languages/PIR</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
+<link rev="made" href="mailto:" />
 </head>
 
 <body style="background-color: white">
@@ -171,6 +171,8 @@
 
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#known_issues_and_bugs">KNOWN ISSUES AND BUGS</a></li>
+	<li><a href="#references">REFERENCES</a></li>
+	<li><a href="#changes">CHANGES</a></li>
 </ul>
 <!-- INDEX END -->
 
@@ -191,14 +193,13 @@ handling and some other issues unimportant for this PIR reference.</p>
 <hr />
 <h1><a name="status">STATUS</a></h1>
 <p>For a bugs and issues, see the section KNOWN ISSUES AND BUGS.</p>
-<p>The grammar includes some constructs that *are* in the IMCC parser,
-but are not implemented. An example of this is the ``.global'' directive.</p>
+<p>The grammar includes some constructs that <strong>are</strong> in the IMCC parser,
+but are not implemented. An example of this is the <code>.global</code> directive.</p>
 <p>
 </p>
 <hr />
 <h1><a name="version">VERSION</a></h1>
-<p>Version: Sunday Feb. 4th 2007.
-(not a version number yet, as many improvements are to be expected at this point).</p>
+<p>0.1</p>
 <p>
 </p>
 <hr />
@@ -226,44 +227,44 @@ PIR directives are:</p>
 <p>
 </p>
 <h2><a name="registers">Registers</a></h2>
-<p>PIR has two types of registers: real registers and virtual or temporary registers.
+<p>PIR has two types of registers: real registers and symbolic or temporary registers.
 Real registers are actual registers in the Parrot VM, and are written like:</p>
 <pre>
   [S|N|I|P]n, where n is a number between 0 to, but not including, 100.</pre>
-<p>Virtual, or temporary registers are written like:</p>
+<p>Symbolic, or temporary registers are written like:</p>
 <pre>
   $[S|N|I|P]n, where n is a positive integer.</pre>
-<p>Virtual registers can be thought of local variable identifiers that don't need a declaration.
+<p>Symbolic registers can be thought of local variable identifiers that don't need a declaration.
 This prevents you from writing <code>.local</code> directives if you're in a hurry. Of course, it would
 make the code more self-documenting if <code>.local</code>s would be used.</p>
 <p>
 </p>
 <h2><a name="constants">Constants</a></h2>
 <p>An integer constant is a string of one or more digits.
-Examples: 0, 42.</p>
+Examples: <code>0</code>, <code>42</code>.</p>
 <p>A floatin-point constant is a string of one or more digits, followed by a dot
-and one or more digits. Examples: 1.1, 42.567.</p>
+and one or more digits. Examples: <code>1.1</code>, <code>42.567</code></p>
 <p>A string constant is a single or double quoted series of characters.
-Examples: 'hello world', ``Parrot''.</p>
+Examples: <code>'hello world'</code>, <code>&quot;Parrot&quot;</code>.</p>
 <p>TODO: PMC constants.</p>
 <p>
 </p>
 <h2><a name="identifiers">Identifiers</a></h2>
 <p>An identifier starts with a character from [_a-zA-Z], followed by
-a character from [_a-zA-Z0-9].</p>
-<p>Examples: x, x1, _foo.</p>
+zero or more characters from [_a-zA-Z0-9].</p>
+<p>Examples: <code>x</code>, <code>x1</code>, <code>_foo</code></p>
 <p>
 </p>
 <h2><a name="labels">Labels</a></h2>
 <p>A label is an identifier with a colon attached to it.</p>
-<p>Examples: LABEL:</p>
+<p>Examples: <code>LABEL:</code></p>
 <p>
 </p>
 <h2><a name="macro_identifiers">Macro identifiers</a></h2>
 <p>A macro identifier is an identifier prefixed with an dot. A macro
 identifier is used when <em>expanding</em> the macro (on usage), not in
 the macro definition.</p>
-<p>Examples:  .Macro</p>
+<p>Examples:  <code>.myMacro</code></p>
 <p>
 </p>
 <hr />
@@ -274,7 +275,7 @@ the macro definition.</p>
 <p>A PIR program consists of one or more compilation units. A compilation unit
 is a global, sub, constant or macro definition, or a pragma or emit block.
 PIR is a line oriented language, which means that each statement ends in a
-newline (indicated as ``nl''). Moreover, compilation units are always separated
+newline (indicated as &quot;nl&quot;). Moreover, compilation units are always separated
 by a newline. Each of the different compilation units are discussed in this
 document.</p>
 <pre>
@@ -305,6 +306,7 @@ document.</p>
       &quot;:load&quot;
     | &quot;:init&quot;
     | &quot;:immediate&quot;
+    | &quot;:postcomp&quot;
     | &quot;:main&quot;
     | &quot;:anon&quot;
     | &quot;:lex&quot;
@@ -366,20 +368,29 @@ document.</p>
 <p>The body of the subroutine can contain PIR instructions. The subroutine can be given
 one or more flags, indicating the sub should behave in a special way. Below is a list of these
 flags and their meaning:</p>
-<p>TODO: complete this</p>
 <ul>
 <li>
 <pre>
  :load</pre>
-<p>Indicates the sub being defined</p>
+<p>Run this subroutine during the <strong>load_library</strong> opcode.
+<strong>:load</strong> is ignored, if another subroutine in that file is marked with
+<strong>:main</strong>. If multiple subs have the <strong>:load</strong> pragma, the subs are
+run in source code order.</p>
 <li>
 <pre>
  :init</pre>
-<p>Indicates the sub being defined</p>
+<p>Run the subroutine when the program is run directly (that is, not loaded as a
+module). This is different from <strong>:load</strong>, which runs a subroutine when a
+library is being loaded. To get both behaviours, use <strong>:init :load</strong>.</p>
+<li>
+<pre>
+ :postcomp</pre>
+<p>Same as <code>:immediate</code>.</p>
 <li>
 <pre>
  :immediate</pre>
-<p>Indicates the sub being defined</p>
+<p>This subroutine is executed immediately after being compiled. (Analagous to
+<code>BEGIN</code> in perl5.)</p>
 <li>
 <pre>
  :main</pre>
@@ -388,15 +399,16 @@ flags and their meaning:</p>
 <pre>
  :method</pre>
 <p>Indicates the sub being defined is an instance method. The method belongs to the class whose namespace is
-currently active. (so, to define a method for a class 'Foo', the 'Foo' namespace should be currently active).</p>
+currently active. (so, to define a method for a class 'Foo', the 'Foo' namespace should be currently active).
+In the method body, the object PMC can be referred to with <code>self</code>.</p>
 <li>
 <pre>
  :vtable or vtable('x')</pre>
 <p>Indicates the sub being defined replaces a vtable entry. This flag can only be used when defining a method.</p>
 <li>
 <pre>
- :multi(int, string, num, _, pmc)</pre>
-<p>Indicates the sub being defined</p>
+ :multi(type [, type]*)</pre>
+<p>Engage in multiple dispatch with the listed types.</p>
 <li>
 <pre>
  :outer('bar')</pre>
@@ -404,17 +416,19 @@ currently active. (so, to define a method for a class 'Foo', the 'Foo' namespace
 <li>
 <pre>
  :anon</pre>
-<p>Indicates the sub being defined is anonymous; no symbol entry is stored into the global symbol table</p>
+<p>Do not install this subroutine in the namespace. Allows the subroutine
+name to be reused.</p>
 <li>
 <pre>
  :lex</pre>
 <p>Indicates the sub being defined needs to store lexical variables. This flag is not necessary if any lexical
-declarations are done (see below), the PIR compiler will figure this out by itself.</p>
+declarations are done (see below), the PIR compiler will figure this out by itself. The <code>:lex</code> attribute
+is necessary to tell Parrot the subroutine will store or find lexicals.</p>
 <li>
 <pre>
  :wrap('bar')</pre>
-<p>This flag is not (yet?) implemented in IMCC. It would indicate that this sub is <em>wrapping</em> the sub ``bar''. That means
-that when ``bar'' is invoked, this sub is called <em>before</em> and <em>after</em>. It is undecided yet whether this flag will
+<p>This flag is not (yet?) implemented in IMCC. It would indicate that this sub is <em>wrapping</em> the sub &quot;bar&quot;. That means
+that when &quot;bar&quot; is invoked, this sub is called <em>before</em> and <em>after</em>. It is undecided yet whether this flag will
 be implemented. If so, its syntax may change.</p>
 </ul>
 <p>The sub flags are listed after the sub name. They may be separated by a comma, but this is
@@ -427,21 +441,25 @@ example:</p>
 <p>Parameter definitions have the following syntax:</p>
 <pre>
         .sub main
-          .param int argc
-          .param pmc argv
+          .param int argc :optional
+          .param int has_argc :optional
           .param num nParam
-          .param string sParam
-          .param $P0
+          .param pmc argv :slurpy         
+          .param string sParam :named('foo')
+          .param $P0 :named('bar')
           # body
         .end</pre>
-<p>Parameter definitions may take flags as well. These flags are listed here:</p>
+<p>As shown, parameter definitions may take flags as well. These flags are listed here:</p>
 <ul>
 <li>
 <pre>
  :slurpy</pre>
+<p>The parameter should be of type <code>pmc</code> and acts like a container that <code>slurps</code> up all remaining arguments.
+Details can be found in PDD03 - Parrot Calling Conventions.</p>
 <li>
 <pre>
  :named('x')</pre>
+<p>The parameter is known in the called sub by name <code>'x'</code>.</p>
 <li>
 <pre>
  :optional</pre>
@@ -504,7 +522,10 @@ difference between these directives, except within macro definitions. (See Macro
         .local num a, b, c
         .sym string s1, s2
         .sym pmc obj</pre>
-<p>The <code>:unique_reg</code> flag indicates ... TODO.</p>
+<p>The optional <code>:unique_reg</code> modifier will force the register allocator to associate the identifier
+with a unique register for the duration of the compilation unit.</p>
+<pre>
+        .local int j :unique_reg</pre>
 <p>
 </p>
 <h2><a name="lexical_declarations">Lexical declarations</a></h2>
@@ -517,8 +538,29 @@ difference between these directives, except within macro definitions. (See Macro
 <p>The declaration</p>
 <pre>
         .lex 'i', $P0</pre>
-<p>indicates that the value in $P0 is stored as a lexical variable, named by 'i'. Instead of a register,
-one can also specify a local variable, like so:</p>
+<p>indicates that the value in $P0 is stored as a lexical variable, named by 'i'.
+Once the above lexical declaration is written, and given the following statement:</p>
+<pre>
+        $P1 = new .Integer</pre>
+<p>then the following two statements have an identical effect:</p>
+<ul>
+<li>
+<pre>
+  $P0 = $P1</pre>
+<li>
+<pre>
+  store_lex &quot;$a&quot;, $P1</pre>
+</ul>
+<p>Likewise, these two statements also have an identical effect:</p>
+<ul>
+<li>
+<pre>
+  $P1 = $P0</pre>
+<li>
+<pre>
+  $P1 = find_lex &quot;$a&quot;</pre>
+</ul>
+<p>Instead of a register, one can also specify a local variable, like so:</p>
 <pre>
         .local pmc p
         .lex 'i', p</pre>
@@ -548,7 +590,10 @@ all subroutines without doing a global lookup. It is unclear whether this featur
 <h3><a name="example_constant_definitions">Example constant definitions</a></h3>
 <pre>
         .const int answer = 42</pre>
-<p>defines an integer constant by name 'answer', giving it a value of 42.</p>
+<p>defines an integer constant by name 'answer', giving it a value of 42.
+Note that the constant type and the value type should match, i.e. you cannot 
+assign a floating point number to an integer constant. The PIR parser will
+check for this.</p>
 <p>
 </p>
 <h2><a name="conditional_statements">Conditional statements</a></h2>
@@ -665,7 +710,7 @@ be used here.</p>
         ~obj
         !isSomething</pre>
 <p>Arithmetic operators are only allowed on floating-point numbers and integer values (or variables of that type).
-Likewise, string concatenation (``.'') is only allowed on strings. These checks are <strong>not</strong> done by the PIR parser.</p>
+Likewise, string concatenation (&quot;.&quot;) is only allowed on strings. These checks are <strong>not</strong> done by the PIR parser.</p>
 <p>
 </p>
 <h2><a name="assignments">Assignments</a></h2>
@@ -678,11 +723,13 @@ Likewise, string concatenation (``.'') is only allowed on strings. These checks 
     | target &quot;=&quot; &quot;new&quot; keylist
     | target &quot;=&quot; &quot;find_type&quot; [ string_constant | string_reg | id ]
     | target &quot;=&quot; heredoc
-    | target &quot;=&quot; &quot;global&quot; &lt;string_constant
+    | target &quot;=&quot; &quot;global&quot; string_constant
     | target assign_op simple_expr
     | target keylist &quot;=&quot; simple_expr
     | &quot;global&quot; string_constant &quot;=&quot; target
     | result_var_list &quot;=&quot; short_sub_call</pre>
+<p>NOTE: the definition of assignment statements is <strong>not</strong> complete yet. 
+As languages/PIR evolves, this will be completed.</p>
 <pre>
   keylist:
     &quot;[&quot; keys &quot;]&quot;</pre>
@@ -690,18 +737,30 @@ Likewise, string concatenation (``.'') is only allowed on strings. These checks 
   keys:
     key [ sep key ]*</pre>
 <pre>
-  sep:
-    &quot;,&quot; | &quot;;&quot;</pre>
+  <span class="variable">sep</span><span class="operator">:</span>
+    <span class="string">","</span> <span class="operator">|</span> <span class="string">";"</span>
+</pre>
 <pre>
   key:
       simple_expr
     | simple_expr &quot;..&quot;
     | &quot;..&quot; simple_expr
     | simple_expr &quot;..&quot; simple_expr</pre>
+<pre>
+  result_var_list:
+    &quot;(&quot; result_vars &quot;)&quot;</pre>
+<pre>
+  result_vars:
+    result_var [ &quot;,&quot; result_var ]*</pre>
+<pre>
+  result_var:
+    target get_flags?</pre>
 <p>
 </p>
 <h3><a name="examples_assignment_statements">Examples assignment statements</a></h3>
 <pre>
+        $I1 = 1 + 2
+        $I1 += 1
         $P0 = foo()
         $I0 = $P0[1]
         $I0 = $P0[12.34]
@@ -849,21 +908,12 @@ Its simplest form is:</p>
 <pre>
         obj.'toString'() # call the method 'toString'
         obj.x() # call the method whose name is stored in C&lt;x&gt;</pre>
-<p>IMCC also allows the ``-&gt;'' instead of a dot, to make it readable for C++ programmers:</p>
+<p>IMCC also allows the &quot;-&gt;&quot; instead of a dot, to make it readable for C++ programmers:</p>
 <pre>
         obj-&gt;'toString'()</pre>
 <p>
 </p>
 <h2><a name="return_values_from_subroutines">Return values from subroutines</a></h2>
-<pre>
-  result_var_list:
-    &quot;(&quot; result_vars &quot;)&quot;</pre>
-<pre>
-  result_vars:
-    result_var [ &quot;,&quot; result_var ]*</pre>
-<pre>
-  result_var:
-    target get_flags?</pre>
 <pre>
   return_stat:
       long_return_stat
@@ -897,7 +947,8 @@ Its simplest form is:</p>
 </p>
 <h3><a name="example_short_return_statement">Example short return statement</a></h3>
 <pre>
-        .return(myVar, &quot;hello&quot;, 2.76, 3.14);</pre>
+        <span class="operator">.</span><span class="keyword">return</span><span class="operator">(</span><span class="variable">myVar</span><span class="operator">,</span> <span class="string">"hello"</span><span class="operator">,</span> <span class="number">2.76</span><span class="operator">,</span> <span class="number">3.14</span><span class="operator">);</span>
+</pre>
 <p>
 </p>
 <h2><a name="long_yield_statements">Long yield statements</a></h2>
@@ -915,7 +966,8 @@ Its simplest form is:</p>
           .return 42
           .pcc_end_yield</pre>
 <pre>
-          # and later in the sub, one could return another value:</pre>
+          <span class="comment"># and later in the sub, one could return another value:</span>
+</pre>
 <pre>
           .pcc_begin_yield
           .return 43
@@ -1015,7 +1067,7 @@ not PIR instructions.</p>
 <h3><a name="example_macros">Example Macros</a></h3>
 <p>NOTE: the macro definition is not complete, and untested.
 This should be fixed. For now, all characters up to but not
-including ``.endm'' are 'matched'.</p>
+including &quot;.endm&quot; are 'matched'.</p>
 <p>
 </p>
 <h2><a name="pir_pragmas">PIR Pragmas</a></h2>
@@ -1047,8 +1099,9 @@ including ``.endm'' are 'matched'.</p>
   hll_mapping:
     &quot;.HLL_map&quot; int_constant &quot;,&quot; int_constant</pre>
 <pre>
-  namespace_id:
-    string_constant [ &quot;;&quot; string_constant ]*</pre>
+  <span class="variable">namespace_id</span><span class="operator">:</span>
+    <span class="variable">string_constant</span> <span class="operator">[</span> <span class="string">";"</span> <span class="variable">string_constant</span> <span class="operator">]</span><span class="operator">*</span>
+</pre>
 <pre>
   source_info:
     &quot;.line&quot; int_constant [ &quot;,&quot; string_constant ]?</pre>
@@ -1060,7 +1113,7 @@ including ``.endm'' are 'matched'.</p>
 <h3><a name="examples_pragmas">Examples pragmas</a></h3>
 <pre>
         .include &quot;myLib.pir&quot;</pre>
-<p>includes the source from the file ``myLib.pir'' at the point of this directive.</p>
+<p>includes the source from the file &quot;myLib.pir&quot; at the point of this directive.</p>
 <pre>
         .pragma n_operators 1</pre>
 <p>makes Parrot automatically create new PMCs when using arithmetic operators, like:</p>
@@ -1077,9 +1130,10 @@ including ``.endm'' are 'matched'.</p>
 <p>NOTE: currently, the line directive is implemented in IMCC as #line.
 See the PROPOSALS document for more information on this.</p>
 <pre>
-        .namespace ['Foo'] # namespace Foo
-        .namespace ['Object';'Foo'] # nested namespace
-        
+        <span class="operator">.</span><span class="variable">namespace</span> <span class="operator">[</span><span class="string">'Foo'</span><span class="operator">]</span> <span class="comment"># namespace Foo</span>
+        <span class="operator">.</span><span class="variable">namespace</span> <span class="operator">[</span><span class="string">'Object'</span><span class="operator">;</span><span class="string">'Foo'</span><span class="operator">]</span> <span class="comment"># nested namespace</span>
+</pre>
+<pre>
         .namespace # no [ id ] means the root namespace is activated</pre>
 <p>opens the namespace 'Foo'. When doing Object Oriented programming, this would indicate
 that sub or method definitions belong to the class 'Foo'. Of course, you can also define
@@ -1087,26 +1141,22 @@ namespaces without doing OO-programming.</p>
 <p>Please note that this <code>.namespace</code> directive is <em>different</em> from the <code>.namespace</code> directive
 that is used within subroutines.</p>
 <pre>
-        .HLL &quot;Lua&quot;, &quot;lua_group&quot;
-        
-is an example of specifying the High Level Language (HLL) for which the PIR is being generated.
-It is a shortcut for setting the namespace to 'Lua', and for loading the PMCs in the lua_group library.</pre>
+        .HLL &quot;Lua&quot;, &quot;lua_group&quot;</pre>
+<p>is an example of specifying the High Level Language (HLL) for which the PIR is being generated.
+It is a shortcut for setting the namespace to 'Lua', and for loading the PMCs in the lua_group library.</p>
 <pre>
-        .HLL_map .Integer, .LuaNumber
-        
-is a way of telling Parrot, that whenever an Integer is created somewhere in the system (C code), instead
-a LuaNumber object is created.</pre>
+        .HLL_map .Integer, .LuaNumber</pre>
+<p>is a way of telling Parrot, that whenever an Integer is created somewhere in the system (C code), instead
+a LuaNumber object is created.</p>
 <pre>
-        .loadlib &quot;myLib&quot;
-        
-is a shortcut for telling Parrot that the library &quot;myLib&quot; should be loaded when running the program. In fact,
-it is a shortcut for:</pre>
+        .loadlib &quot;myLib&quot;</pre>
+<p>is a shortcut for telling Parrot that the library &quot;myLib&quot; should be loaded when running the program. In fact,
+it is a shortcut for:</p>
 <pre>
         .sub _load :load :anon
-                loadlib &quot;myLib&quot;
-        .end
-        
-TODO: check flags and syntax for this.</pre>
+          loadlib &quot;myLib&quot;
+        .end</pre>
+<p>TODO: check flags and syntax for this.</p>
 <p>
 </p>
 <h2><a name="tokens__types_and_targets">Tokens, types and targets</a></h2>
@@ -1140,7 +1190,6 @@ TODO: check flags and syntax for this.</pre>
 <p>but if desirable, the character set can be specified:</p>
 <pre>
         unicode:&quot;Hello world&quot;</pre>
-<p>TODO: is it ``unicode''? or is it UTF8 or something?</p>
 <p>IMCC currently allows identifiers to be used as types. During the parse, the identifier
 is checked whether it is a defined class. The built-in types int, num, pmc and string are
 always available.</p>
@@ -1165,16 +1214,44 @@ an R-value). It is either an identifier or a register.</p>
 </li>
 <li>
 <p>The rule 'type' does currently not include custom types (user defined).
-Probably it needs an alternative ``identifier''. Not sure yet at this point.</p>
+Probably it needs an alternative &quot;identifier&quot;. Not sure yet at this point.</p>
 </li>
 <li>
 <p>Clean up grammar, remove never-used features.</p>
 </li>
 <li>
 <p>Test. A lot.</p>
-<p>Bugs or improvements may be sent to the author, and of course greatly
+<p>Bugs or improvements may be sent to the author, and are of course greatly
 appreciated. Moreover, if you find any missing constructs that are in
 IMCC, indications of these would be appreciated as well.</p>
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="references">REFERENCES</a></h1>
+<ul>
+<li>
+<p>languages/PIR/lib/pir.pg - The actual PIR grammar implementation</p>
+</li>
+<li>
+<p>PDD03 - Parrot Calling Conventions</p>
+</li>
+<li>
+<p>PDD20 - Lexically scoped variables in Parrot</p>
+</li>
+<li>
+<p>docs/imcc/calling_conventions.pod - definition of sub flags (:init etc)</p>
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="changes">CHANGES</a></h1>
+<p>0.1</p>
+<ul>
+<li>
+<p>Initial version having a version number.</p>
 </li>
 </ul>
 
