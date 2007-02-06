@@ -9,6 +9,17 @@ Class - Core structure of a class
 Classes are instances of the C<Class> PMC. Currently implemented in PIR,
 but ultimately implemented as low-level .pmc.
 
+=head1 SYNOPSIS
+
+    .local pmc class, init_args, obj
+    init_args = new Hash
+    init_args['name'] = 'MyClass'
+    class = new 'Class', init_args
+#   class = newclass 'MyClass'
+
+    class.add_attribute('myattribute')
+    obj = class.'new'( 'myattribute' => "Foo" )
+
 =head2 find_class
 
 This subroutine prototypes the C<find_class> opcode. It looks up a class
@@ -33,21 +44,13 @@ by name and returns a class object.
   .local pmc class
   class = newclass "Class"
   addattribute class, "name"
+  addattribute class, "namespace"
   addattribute class, "_parrotclass"
   addattribute class, "attributes"
   addattribute class, "methods"
   addattribute class, "superclasses"
 .end
 
-=head2 new
-
-    .local pmc class, init_args
-    init_args = new Hash
-    init_args['name'] = 'MyClass'
-    class = new 'Class', init_args
-#   class = newclass 'MyClass'
-
-=cut
 
 .sub init :vtable :method
   $P0 = new Hash
@@ -77,6 +80,14 @@ iter_end:
 
 .include "compilers/smop/_accessor.pir"
 
+=head2 name
+
+The accessor for the name attribute. With no argument, it simply returns
+the current value for name. When passed an argument, it sets the name of
+the class, and also sets the association with a namespace.
+
+=cut
+
 .sub name :method
   .param pmc name :optional
   .param int got_name :opt_flag
@@ -88,20 +99,21 @@ iter_end:
   store_global name, "class_object", self # namespace entry for class object
   $P1 = newclass name
   setattribute self, "_parrotclass", $P1 # dummy old-style class object within
-  #$P0 = get_namespace [name]
-  #$P1 = get_namespace
-  #.local pmc initpmc
-  #initpmc = get_global "_init_pmc"
-  #print "but... but... "
-  #say name
-  #print "and "
-  #say initpmc
-  #store_global name, "_init_pmc", initpmc
-  #$P0.add_sub("init_pmc", init)
+  $P1 = get_namespace
+  setattribute self, "namespace", $P1 # class entry for namespace object
 get_only:
 
   .return(rv)
 .end
+
+=head2 new
+
+    obj = class.'new'( 'myattrib' => "Foo" )
+
+Create a new instance object from the class object. It takes an optional
+slurpy, named list of attributes and values to initialize the object.
+
+=cut
 
 .sub 'new' :method
   .param pmc args :slurpy :named
@@ -116,6 +128,14 @@ get_only:
   .return(obj)
 .end
 
+=head2 attributes
+
+An accessor for the attributes attribute of the class. It returns the a
+Hash of all attributes, with a key of the attribute name, and a value of
+the Attribute object. The accessor is set by a hash of attributes, with
+a key name and a value type.
+
+=cut
 
 .sub attributes :method
   .param pmc attribs :optional
@@ -129,7 +149,8 @@ get_only:
 iter_loop:
   unless iter goto iter_end
   $S1 = shift iter # NOTE: convert to hash to add attribute types
-  self.add_attribute($S1)
+  $P1 = iter[$S1]
+  self.add_attribute($S1, $P1)
   goto iter_loop
 iter_end:
 
@@ -138,13 +159,26 @@ skip_set:
   .return(rv)
 .end
 
+=head2 add_attribute
+
+Adds a single attribute to the class. It takes a simple string name, and
+a simple string value for type.
+
+=cut
+
 .sub 'add_attribute' :method
   .param string attribute_name
-  .param pmc init_args :slurpy :named
+  .param string attribute_type :optional
+  .param int got_type :opt_flag
+
   .local pmc new_attribute, attributes
-  new_attribute = new 'Attribute', init_args
+  new_attribute = new 'Attribute'
   new_attribute.'name'(attribute_name)
   new_attribute.'class'(self)
+
+  unless got_type goto no_type
+  new_attribute.'type'(attribute_type)
+no_type:
 
   # store the attribute in the class
   attributes = getattribute self, 'attributes'

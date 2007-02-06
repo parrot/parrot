@@ -40,7 +40,19 @@ contains them.
   .return(rv)
 .end
 
+.sub type :method
+  .param pmc type :optional
+  .param int got_type :opt_flag
+  .local pmc rv
+  rv = self._accessor( "type", type, got_type )
+  .return(rv)
+.end
 .sub init :vtable :method
   $P0 = new String
   setattribute self, "name", $P0
+.end
+
+.sub init_pmc :vtable :method
+  .param pmc init_args
+  self.init()
 .end
