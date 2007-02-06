@@ -83,6 +83,8 @@ the beautifully non-existent Fooby language:
 This will produce a skeleton C file (to be preprocessed by the
 F<tools/build/pmc2c.pl> program) with stubs for all the methods you need to
 fill in. The function C<init> allows you to set up anything you need to set up.
+Comment out the C<namespace> method from the automatically generated set
+of methods (otherwise, the compile will fail).
 
 Now you'll have to do something a little different depending on whether you're
 writing a built-in class or an extension class. If you're writing a built-in
@@ -104,7 +106,8 @@ Add src/pmc/YOURCLASS.pmc to the MANIFEST
 
 =item 2.
 
-Rerun F<Configure.pl> to add your new PMC to the set of built-in PMCs.
+Run C<make realclean>, and rerun F<Configure.pl> to add your new PMC to
+the set of built-in PMCs.
 
 =back
 
