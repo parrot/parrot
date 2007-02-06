@@ -15,20 +15,18 @@
     .IMPORT( 'Test::More', 'ok',   _ )
     .IMPORT( 'Test::More', 'is',   _ )
 
-    plan( 10 )
+    plan( 12 )
 
-    .local pmc class, init_args, init_attribs
-    init_args = new Hash
+    .local pmc class, class_class, init_attribs
     init_attribs = new Hash
     init_attribs['ear'] = 'Str'
     init_attribs['tail'] = 'Str'
-    init_args['name'] = 'Dog'
-    init_args['attributes'] = init_attribs
-
-    class = new 'Class', init_args # equiv to newclass 'Dog'
+  
+    class_class = find_class("Class")
+    class = class_class.'new'( 'name' => "Dog", 'attributes' => init_attribs )
 
     $P1 = class.name()
-    is($P1, "Dog", "created a new Class")
+    is($P1, "Dog", "created a new Class via MetaClass")
     $P1 = class.name()
     is($P1, "Dog", "Class accessor doesn't destroy value")
 
@@ -74,6 +72,19 @@ NEXTTAIL:
 SKIP:	
     fail("SKIP - no attribute")
 NEXT:	
+
+    .local pmc init_args
+    init_args = new Hash
+    init_args['name'] = 'Sheep'
+    class = new "Class", init_args
+    $P0 = find_class("Sheep")
+    $I0 = defined $P0
+    ok($I0, "can construct classes with 'new \"Class\"' still")
+
+    $P0 = new "Sheep"
+    $I0 = defined $P0
+    ok($I0, "'new \"Class\"' makes working classes")
+    
 
 .end
 

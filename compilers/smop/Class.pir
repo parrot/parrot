@@ -42,13 +42,38 @@ by name and returns a class object.
 
 .sub onload :load
   .local pmc class
+  load_bytecode "compilers/smop/Attribute.pir"
   class = newclass "Class"
-  addattribute class, "name"
-  addattribute class, "namespace"
-  addattribute class, "_parrotclass"
-  addattribute class, "attributes"
-  addattribute class, "methods"
-  addattribute class, "superclasses"
+
+  .local pmc atts, attribs
+  atts = split ", ", "name, namespace, _parrotclass, attributes, methods, superclasses"
+  attribs = new ResizablePMCArray
+  .local pmc iter, new_attribute
+  iter = new Iterator, atts
+  iter = 0
+iter_loop:
+  unless iter goto iter_end
+  $S1 = shift iter
+  addattribute class, $S1
+  new_attribute = new 'Attribute'
+  new_attribute.'name'($S1)
+  new_attribute.'class'(class)
+  push attribs, new_attribute
+  goto iter_loop
+iter_end:
+  
+  # we sidestep the MetaModel bootstrap problem by building the
+  # MetaClass manually
+  $P0 = new String
+  $P0 = "Class"
+  .local pmc class_mc
+  class_mc = new "Class"
+  setattribute class_mc, "name", $P0
+  setattribute class_mc, "_parrotclass", class
+  class_mc.init()
+  setattribute class_mc, "attributes", attribs
+  store_global "class_object", class_mc
+
 .end
 
 
