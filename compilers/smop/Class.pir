@@ -214,3 +214,44 @@ no_type:
   delegclass = getattribute self, '_parrotclass'
   addattribute delegclass, attribute_name
 .end
+
+.sub add_superclass :method
+  .param string superclass
+  .local pmc newsuper
+  newsuper = find_class(superclass)
+
+  $P0 = getattribute self, '_parrotclass'
+  $P1 = getattribute newsuper, '_parrotclass'
+  # FIXME - remove this debug output
+  print "# addparent "
+  $S0 = classname $P0
+  $S1 = classname $P1
+  print $S0
+  print ", "
+  say $S1
+  addparent $P0, $P1
+.end
+
+.sub superclasses :method
+  .param pmc supers :optional
+  .param int got_supers :opt_flag
+  .local pmc rv
+  rv = self._accessor( "superclasses", supers, got_supers )
+  unless got_supers goto out
+
+  .local pmc iter
+  iter = new Iterator, supers
+  iter = 0
+iter_loop:
+  unless iter goto iter_end
+  $S1 = shift iter
+  ##print "iter, item = "
+  #say $S1
+  self.add_superclass($S1)
+  goto iter_loop
+iter_end:
+
+out:
+  .return(rv)
+.end
+
