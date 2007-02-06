@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -310,6 +310,12 @@ See L<running.pod> on how to tell parrot which run core should be used.
 
 =for TODO
   Add a list of available run cores, or provide pointer to documentation.
+
+=head2 SMOP
+
+Simple Meta Object Protocol
+
+A prototype object model written in PIR.
 
 =head2 TGE
 
