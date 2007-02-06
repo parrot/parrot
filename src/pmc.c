@@ -174,8 +174,10 @@ get_new_pmc_header(Interp *interp, INTVAL base_type, UINTVAL flags)
 
     if (!vtable) {
         /* This is usually because you either didn't call init_world early
-         * enough or you added a new PMC class without adding
-         * Parrot_(classname)_class_init to init_world. */
+         * enough, you added a new PMC class without adding
+         * Parrot_(classname)_class_init to init_world, or you forgot
+         * to run 'make realclean' after adding a new PMC class.
+         */
         PANIC("Null vtable used");
     }
 
