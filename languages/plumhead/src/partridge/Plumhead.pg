@@ -29,11 +29,15 @@ rule statement    { <ECHO> <expression> ; }
 
 token expression  { <DOUBLEQUOTE_STRING> | <SINGLEQUOTE_STRING> | <adding_expression> }
 
+# TODO: this gets precedence wrong
 rule adding_expression { <multiplying_expression> <summand>? }
 
 rule summand           { <ADD_OP> <adding_expression> }
 
-rule multiplying_expression  { <unary_expression> ( <MUL_OP> <unary_expression> )* }
+# TODO: this gets precedence wrong
+rule multiplying_expression  { <unary_expression> <multiplicand>? }
+
+rule multiplicand      { <MUL_OP> <multiplying_expression> }
 
 rule unary_expression { <UNARY_MINUS>? <postfix_expression> }
 

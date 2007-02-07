@@ -116,12 +116,12 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     $P0 = node['adding_expression']
     if null $P0 goto no_adding_expression
-	.local pmc mult, past_mult, summand, summand_0, past_summand_0
+        .local pmc mult, past_mult, summand, summand_0, past_summand_0
         summand = $P0['summand']
         if null summand goto no_summand
             mult = $P0['multiplying_expression']
-	    past_mult = tree.'get'('past', mult, 'Plumhead::Grammar::expression')
-	    summand_0 = summand[0]
+            past_mult = tree.'get'('past', mult, 'Plumhead::Grammar::expression')
+            summand_0 = summand[0]
             .local string add_op, pirop
             pirop = 'n_add'
             add_op = summand_0['ADD_OP']
@@ -129,18 +129,36 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
                 pirop = 'n_sub'
             not_minus:
             add_op = 'infix:' . add_op 
-	    past_summand_0 = tree.'get'('past', summand_0, 'Plumhead::Grammar::expression')
+            past_summand_0 = tree.'get'('past', summand_0, 'Plumhead::Grammar::expression')
             past = new 'PAST::Op'
-	    past.init( past_mult, past_summand_0, 'name' => add_op, 'pirop' => pirop )
+            past.init( past_mult, past_summand_0, 'name' => add_op, 'pirop' => pirop )
             goto handled_expression
-	no_summand:
+        no_summand:
         past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
     goto handled_expression
     no_adding_expression:
 
     $P0 = node['multiplying_expression']
     if null $P0 goto no_multiplying_expression
-    past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+        .local pmc unary, past_unary, multiplicand, multiplicand_0, past_multiplicand_0
+        multiplicand = $P0['multiplicand']
+        if null multiplicand goto no_multiplicand
+            unary = $P0['unary_expression']
+            past_unary = tree.'get'('past', unary, 'Plumhead::Grammar::expression')
+            multiplicand_0 = multiplicand[0]
+            .local string mul_op, pirop
+            pirop = 'n_mul'
+            mul_op = multiplicand_0['MUL_OP']
+            if mul_op != '/' goto not_div
+                pirop = 'n_div'
+            not_div:
+            mul_op = 'infix:' . mul_op 
+            past_multiplicand_0 = tree.'get'('past', multiplicand_0, 'Plumhead::Grammar::expression')
+            past = new 'PAST::Op'
+            past.init( past_unary, past_multiplicand_0, 'name' => mul_op, 'pirop' => pirop )
+            goto handled_expression
+        no_multiplicand:
+        past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
     goto handled_expression
     no_multiplying_expression:
 
