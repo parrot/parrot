@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-28 15:56:47
+// $ANTLR 3.0b6 src/antlr3/Plumhead.g 2007-02-07 23:18:49
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -59,8 +59,8 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start program
-    // src/antlr3/Plumhead.g:71:1: program : sea_or_code -> ^( PROGRAM sea_or_code ) ;
-    public program_return program() throws RecognitionException {   
+    // src/antlr3/Plumhead.g:70:1: program : sea_or_code -> ^( PROGRAM sea_or_code ) ;
+    public program_return program() throws RecognitionException {
         program_return retval = new program_return();
         retval.start = input.LT(1);
 
@@ -71,22 +71,22 @@ public class PlumheadParser extends Parser {
         List list_sea_or_code=new ArrayList();
 
         try {
-            // src/antlr3/Plumhead.g:72:5: ( sea_or_code -> ^( PROGRAM sea_or_code ) )
-            // src/antlr3/Plumhead.g:72:5: sea_or_code
+            // src/antlr3/Plumhead.g:71:5: ( sea_or_code -> ^( PROGRAM sea_or_code ) )
+            // src/antlr3/Plumhead.g:71:5: sea_or_code
             {
-            pushFollow(FOLLOW_sea_or_code_in_program539);
+            pushFollow(FOLLOW_sea_or_code_in_program538);
             sea_or_code1=sea_or_code();
             _fsp--;
 
-            list_sea_or_code.add(sea_or_code1.tree);
+            list_sea_or_code.add(sea_or_code1.getTree());
 
             // AST REWRITE
             int i_0 = 0;
             retval.tree = root_0;
             root_0 = (CommonTree)adaptor.nil();
-            // 72:17: -> ^( PROGRAM sea_or_code )
+            // 71:17: -> ^( PROGRAM sea_or_code )
             {
-                // src/antlr3/Plumhead.g:72:20: ^( PROGRAM sea_or_code )
+                // src/antlr3/Plumhead.g:71:20: ^( PROGRAM sea_or_code )
                 {
                 CommonTree root_1 = (CommonTree)adaptor.nil();
                 root_1 = (CommonTree)adaptor.becomeRoot(adaptor.create(PROGRAM, "PROGRAM"), root_1);
@@ -113,7 +113,7 @@ public class PlumheadParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-       }
+        }
         return retval;
     }
     // $ANTLR end program
@@ -124,8 +124,8 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start sea_or_code
-    // src/antlr3/Plumhead.g:75:1: sea_or_code : ( sea | code )+ ;
-    public sea_or_code_return sea_or_code() throws RecognitionException {   
+    // src/antlr3/Plumhead.g:74:1: sea_or_code : ( sea | code )+ ;
+    public sea_or_code_return sea_or_code() throws RecognitionException {
         sea_or_code_return retval = new sea_or_code_return();
         retval.start = input.LT(1);
 
@@ -138,12 +138,12 @@ public class PlumheadParser extends Parser {
 
 
         try {
-            // src/antlr3/Plumhead.g:76:5: ( ( sea | code )+ )
-            // src/antlr3/Plumhead.g:76:5: ( sea | code )+
+            // src/antlr3/Plumhead.g:75:5: ( ( sea | code )+ )
+            // src/antlr3/Plumhead.g:75:5: ( sea | code )+
             {
             root_0 = (CommonTree)adaptor.nil();
 
-            // src/antlr3/Plumhead.g:76:5: ( sea | code )+
+            // src/antlr3/Plumhead.g:75:5: ( sea | code )+
             int cnt1=0;
             loop1:
             do {
@@ -159,32 +159,24 @@ public class PlumheadParser extends Parser {
 
                 switch (alt1) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:76:7: sea
+            	    // src/antlr3/Plumhead.g:75:7: sea
             	    {
-            	    CommonTree root_1 = (CommonTree)adaptor.nil();
-
-            	    pushFollow(FOLLOW_sea_in_sea_or_code564);
+            	    pushFollow(FOLLOW_sea_in_sea_or_code563);
             	    sea2=sea();
             	    _fsp--;
 
-            	    adaptor.addChild(root_1, sea2.tree);
-
-            	    adaptor.addChild(root_0, root_1);
+            	    adaptor.addChild(root_0, sea2.getTree());
 
             	    }
             	    break;
             	case 2 :
-            	    // src/antlr3/Plumhead.g:76:13: code
+            	    // src/antlr3/Plumhead.g:75:13: code
             	    {
-            	    CommonTree root_1 = (CommonTree)adaptor.nil();
-
-            	    pushFollow(FOLLOW_code_in_sea_or_code568);
+            	    pushFollow(FOLLOW_code_in_sea_or_code567);
             	    code3=code();
             	    _fsp--;
 
-            	    adaptor.addChild(root_1, code3.tree);
-
-            	    adaptor.addChild(root_0, root_1);
+            	    adaptor.addChild(root_0, code3.getTree());
 
             	    }
             	    break;
@@ -212,7 +204,7 @@ public class PlumheadParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-       }
+        }
         return retval;
     }
     // $ANTLR end sea_or_code
@@ -223,8 +215,8 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start sea
-    // src/antlr3/Plumhead.g:79:1: sea : SEA -> ^( ECHO NOQUOTE_STRING[$SEA] ) ;
-    public sea_return sea() throws RecognitionException {   
+    // src/antlr3/Plumhead.g:78:1: sea : SEA -> ^( ECHO NOQUOTE_STRING[$SEA] ) ;
+    public sea_return sea() throws RecognitionException {
         sea_return retval = new sea_return();
         retval.start = input.LT(1);
 
@@ -235,11 +227,11 @@ public class PlumheadParser extends Parser {
         CommonTree SEA4_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:80:5: ( SEA -> ^( ECHO NOQUOTE_STRING[$SEA] ) )
-            // src/antlr3/Plumhead.g:80:5: SEA
+            // src/antlr3/Plumhead.g:79:5: ( SEA -> ^( ECHO NOQUOTE_STRING[$SEA] ) )
+            // src/antlr3/Plumhead.g:79:5: SEA
             {
             SEA4=(Token)input.LT(1);
-            match(input,SEA,FOLLOW_SEA_in_sea585); 
+            match(input,SEA,FOLLOW_SEA_in_sea584); 
             list_SEA.add(SEA4);
 
 
@@ -247,9 +239,9 @@ public class PlumheadParser extends Parser {
             int i_0 = 0;
             retval.tree = root_0;
             root_0 = (CommonTree)adaptor.nil();
-            // 80:9: -> ^( ECHO NOQUOTE_STRING[$SEA] )
+            // 79:9: -> ^( ECHO NOQUOTE_STRING[$SEA] )
             {
-                // src/antlr3/Plumhead.g:80:12: ^( ECHO NOQUOTE_STRING[$SEA] )
+                // src/antlr3/Plumhead.g:79:12: ^( ECHO NOQUOTE_STRING[$SEA] )
                 {
                 CommonTree root_1 = (CommonTree)adaptor.nil();
                 root_1 = (CommonTree)adaptor.becomeRoot(adaptor.create(ECHO, "ECHO"), root_1);
@@ -276,7 +268,7 @@ public class PlumheadParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-       }
+        }
         return retval;
     }
     // $ANTLR end sea
@@ -287,8 +279,8 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start code
-    // src/antlr3/Plumhead.g:83:1: code : CODE_START statements CODE_END -> statements ;
-    public code_return code() throws RecognitionException {   
+    // src/antlr3/Plumhead.g:82:1: code : CODE_START statements CODE_END -> statements ;
+    public code_return code() throws RecognitionException {
         code_return retval = new code_return();
         retval.start = input.LT(1);
 
@@ -305,20 +297,20 @@ public class PlumheadParser extends Parser {
         CommonTree CODE_END7_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:84:5: ( CODE_START statements CODE_END -> statements )
-            // src/antlr3/Plumhead.g:84:5: CODE_START statements CODE_END
+            // src/antlr3/Plumhead.g:83:5: ( CODE_START statements CODE_END -> statements )
+            // src/antlr3/Plumhead.g:83:5: CODE_START statements CODE_END
             {
             CODE_START5=(Token)input.LT(1);
-            match(input,CODE_START,FOLLOW_CODE_START_in_code609); 
+            match(input,CODE_START,FOLLOW_CODE_START_in_code608); 
             list_CODE_START.add(CODE_START5);
 
-            pushFollow(FOLLOW_statements_in_code611);
+            pushFollow(FOLLOW_statements_in_code610);
             statements6=statements();
             _fsp--;
 
-            list_statements.add(statements6.tree);
+            list_statements.add(statements6.getTree());
             CODE_END7=(Token)input.LT(1);
-            match(input,CODE_END,FOLLOW_CODE_END_in_code613); 
+            match(input,CODE_END,FOLLOW_CODE_END_in_code612); 
             list_CODE_END.add(CODE_END7);
 
 
@@ -326,7 +318,7 @@ public class PlumheadParser extends Parser {
             int i_0 = 0;
             retval.tree = root_0;
             root_0 = (CommonTree)adaptor.nil();
-            // 84:36: -> statements
+            // 83:36: -> statements
             {
                 adaptor.addChild(root_0, list_statements.get(i_0));
 
@@ -347,7 +339,7 @@ public class PlumheadParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-       }
+        }
         return retval;
     }
     // $ANTLR end code
@@ -358,8 +350,8 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start relational_expression
-    // src/antlr3/Plumhead.g:87:1: relational_expression : expression ( REL_OP^^ expression )? ;
-    public relational_expression_return relational_expression() throws RecognitionException {   
+    // src/antlr3/Plumhead.g:86:1: relational_expression : expression ( REL_OP^ expression )? ;
+    public relational_expression_return relational_expression() throws RecognitionException {
         relational_expression_return retval = new relational_expression_return();
         retval.start = input.LT(1);
 
@@ -374,17 +366,17 @@ public class PlumheadParser extends Parser {
         CommonTree REL_OP9_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:88:5: ( expression ( REL_OP^^ expression )? )
-            // src/antlr3/Plumhead.g:88:5: expression ( REL_OP^^ expression )?
+            // src/antlr3/Plumhead.g:87:5: ( expression ( REL_OP^ expression )? )
+            // src/antlr3/Plumhead.g:87:5: expression ( REL_OP^ expression )?
             {
             root_0 = (CommonTree)adaptor.nil();
 
-            pushFollow(FOLLOW_expression_in_relational_expression631);
+            pushFollow(FOLLOW_expression_in_relational_expression630);
             expression8=expression();
             _fsp--;
 
-            adaptor.addChild(root_0, expression8.tree);
-            // src/antlr3/Plumhead.g:88:16: ( REL_OP^^ expression )?
+            adaptor.addChild(root_0, expression8.getTree());
+            // src/antlr3/Plumhead.g:87:16: ( REL_OP^ expression )?
             int alt2=2;
             int LA2_0 = input.LA(1);
             if ( (LA2_0==REL_OP) ) {
@@ -392,22 +384,18 @@ public class PlumheadParser extends Parser {
             }
             switch (alt2) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:88:18: REL_OP^^ expression
+                    // src/antlr3/Plumhead.g:87:18: REL_OP^ expression
                     {
-                    CommonTree root_1 = (CommonTree)adaptor.nil();
-
                     REL_OP9=(Token)input.LT(1);
-                    match(input,REL_OP,FOLLOW_REL_OP_in_relational_expression635); 
+                    match(input,REL_OP,FOLLOW_REL_OP_in_relational_expression634); 
                     REL_OP9_tree = (CommonTree)adaptor.create(REL_OP9);
                     root_0 = (CommonTree)adaptor.becomeRoot(REL_OP9_tree, root_0);
 
-                    pushFollow(FOLLOW_expression_in_relational_expression638);
+                    pushFollow(FOLLOW_expression_in_relational_expression637);
                     expression10=expression();
                     _fsp--;
 
-                    adaptor.addChild(root_1, expression10.tree);
-
-                    adaptor.addChild(root_0, root_1);
+                    adaptor.addChild(root_0, expression10.getTree());
 
                     }
                     break;
@@ -428,7 +416,7 @@ public class PlumheadParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-       }
+        }
         return retval;
     }
     // $ANTLR end relational_expression
@@ -439,8 +427,8 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start statements
-    // src/antlr3/Plumhead.g:91:1: statements : ( statement )* ;
-    public statements_return statements() throws RecognitionException {   
+    // src/antlr3/Plumhead.g:90:1: statements : ( statement )* ;
+    public statements_return statements() throws RecognitionException {
         statements_return retval = new statements_return();
         retval.start = input.LT(1);
 
@@ -451,12 +439,12 @@ public class PlumheadParser extends Parser {
 
 
         try {
-            // src/antlr3/Plumhead.g:92:5: ( ( statement )* )
-            // src/antlr3/Plumhead.g:92:5: ( statement )*
+            // src/antlr3/Plumhead.g:91:5: ( ( statement )* )
+            // src/antlr3/Plumhead.g:91:5: ( statement )*
             {
             root_0 = (CommonTree)adaptor.nil();
 
-            // src/antlr3/Plumhead.g:92:5: ( statement )*
+            // src/antlr3/Plumhead.g:91:5: ( statement )*
             loop3:
             do {
                 int alt3=2;
@@ -481,17 +469,13 @@ public class PlumheadParser extends Parser {
 
                 switch (alt3) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:92:7: statement
+            	    // src/antlr3/Plumhead.g:91:7: statement
             	    {
-            	    CommonTree root_1 = (CommonTree)adaptor.nil();
-
-            	    pushFollow(FOLLOW_statement_in_statements656);
+            	    pushFollow(FOLLOW_statement_in_statements655);
             	    statement11=statement();
             	    _fsp--;
 
-            	    adaptor.addChild(root_1, statement11.tree);
-
-            	    adaptor.addChild(root_0, root_1);
+            	    adaptor.addChild(root_0, statement11.getTree());
 
             	    }
             	    break;
@@ -515,7 +499,7 @@ public class PlumheadParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-       }
+        }
         return retval;
     }
     // $ANTLR end statements
@@ -526,8 +510,8 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start statement
-    // src/antlr3/Plumhead.g:95:1: statement : ( ECHO^^ expression ';'! | IF '(' relational_expression ')' '{' s1= statements '}' ( ELSE '{' s2= statements '}' -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) ) | -> ^( IF relational_expression ^( STMTS $s1) ) ) | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] ) | SCALAR ASSIGN_OP^^ expression ';'! );
-    public statement_return statement() throws RecognitionException {   
+    // src/antlr3/Plumhead.g:94:1: statement : ( ECHO^ expression ';'! | IF '(' relational_expression ')' '{' s1= statements '}' ( ELSE '{' s2= statements '}' -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) ) | -> ^( IF relational_expression ^( STMTS $s1) ) ) | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] ) | SCALAR ASSIGN_OP^ expression ';'! );
+    public statement_return statement() throws RecognitionException {
         statement_return retval = new statement_return();
         retval.start = input.LT(1);
 
@@ -588,7 +572,7 @@ public class PlumheadParser extends Parser {
         CommonTree char_literal30_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:96:5: ( ECHO^^ expression ';'! | IF '(' relational_expression ')' '{' s1= statements '}' ( ELSE '{' s2= statements '}' -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) ) | -> ^( IF relational_expression ^( STMTS $s1) ) ) | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] ) | SCALAR ASSIGN_OP^^ expression ';'! )
+            // src/antlr3/Plumhead.g:95:5: ( ECHO^ expression ';'! | IF '(' relational_expression ')' '{' s1= statements '}' ( ELSE '{' s2= statements '}' -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) ) | -> ^( IF relational_expression ^( STMTS $s1) ) ) | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] ) | SCALAR ASSIGN_OP^ expression ';'! )
             int alt5=4;
             switch ( input.LA(1) ) {
             case ECHO:
@@ -605,66 +589,66 @@ public class PlumheadParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("95:1: statement : ( ECHO^^ expression ';'! | IF '(' relational_expression ')' '{' s1= statements '}' ( ELSE '{' s2= statements '}' -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) ) | -> ^( IF relational_expression ^( STMTS $s1) ) ) | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] ) | SCALAR ASSIGN_OP^^ expression ';'! );", 5, 0, input);
+                    new NoViableAltException("94:1: statement : ( ECHO^ expression ';'! | IF '(' relational_expression ')' '{' s1= statements '}' ( ELSE '{' s2= statements '}' -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) ) | -> ^( IF relational_expression ^( STMTS $s1) ) ) | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] ) | SCALAR ASSIGN_OP^ expression ';'! );", 5, 0, input);
 
                 throw nvae;
             }
 
             switch (alt5) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:96:5: ECHO^^ expression ';'!
+                    // src/antlr3/Plumhead.g:95:5: ECHO^ expression ';'!
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
                     ECHO12=(Token)input.LT(1);
-                    match(input,ECHO,FOLLOW_ECHO_in_statement672); 
+                    match(input,ECHO,FOLLOW_ECHO_in_statement671); 
                     ECHO12_tree = (CommonTree)adaptor.create(ECHO12);
                     root_0 = (CommonTree)adaptor.becomeRoot(ECHO12_tree, root_0);
 
-                    pushFollow(FOLLOW_expression_in_statement675);
+                    pushFollow(FOLLOW_expression_in_statement674);
                     expression13=expression();
                     _fsp--;
 
-                    adaptor.addChild(root_0, expression13.tree);
+                    adaptor.addChild(root_0, expression13.getTree());
                     char_literal14=(Token)input.LT(1);
-                    match(input,26,FOLLOW_26_in_statement677); 
+                    match(input,26,FOLLOW_26_in_statement676); 
 
                     }
                     break;
                 case 2 :
-                    // src/antlr3/Plumhead.g:97:5: IF '(' relational_expression ')' '{' s1= statements '}' ( ELSE '{' s2= statements '}' -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) ) | -> ^( IF relational_expression ^( STMTS $s1) ) )
+                    // src/antlr3/Plumhead.g:96:5: IF '(' relational_expression ')' '{' s1= statements '}' ( ELSE '{' s2= statements '}' -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) ) | -> ^( IF relational_expression ^( STMTS $s1) ) )
                     {
                     IF15=(Token)input.LT(1);
-                    match(input,IF,FOLLOW_IF_in_statement685); 
+                    match(input,IF,FOLLOW_IF_in_statement684); 
                     list_IF.add(IF15);
 
                     char_literal16=(Token)input.LT(1);
-                    match(input,27,FOLLOW_27_in_statement687); 
+                    match(input,27,FOLLOW_27_in_statement686); 
                     list_27.add(char_literal16);
 
-                    pushFollow(FOLLOW_relational_expression_in_statement689);
+                    pushFollow(FOLLOW_relational_expression_in_statement688);
                     relational_expression17=relational_expression();
                     _fsp--;
 
-                    list_relational_expression.add(relational_expression17.tree);
+                    list_relational_expression.add(relational_expression17.getTree());
                     char_literal18=(Token)input.LT(1);
-                    match(input,28,FOLLOW_28_in_statement691); 
+                    match(input,28,FOLLOW_28_in_statement690); 
                     list_28.add(char_literal18);
 
                     char_literal19=(Token)input.LT(1);
-                    match(input,29,FOLLOW_29_in_statement693); 
+                    match(input,29,FOLLOW_29_in_statement692); 
                     list_29.add(char_literal19);
 
-                    pushFollow(FOLLOW_statements_in_statement697);
+                    pushFollow(FOLLOW_statements_in_statement696);
                     s1=statements();
                     _fsp--;
 
-                    list_statements.add(s1.tree);
+                    list_statements.add(s1.getTree());
                     char_literal20=(Token)input.LT(1);
-                    match(input,30,FOLLOW_30_in_statement699); 
+                    match(input,30,FOLLOW_30_in_statement698); 
                     list_30.add(char_literal20);
 
-                    // src/antlr3/Plumhead.g:98:5: ( ELSE '{' s2= statements '}' -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) ) | -> ^( IF relational_expression ^( STMTS $s1) ) )
+                    // src/antlr3/Plumhead.g:97:5: ( ELSE '{' s2= statements '}' -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) ) | -> ^( IF relational_expression ^( STMTS $s1) ) )
                     int alt4=2;
                     int LA4_0 = input.LA(1);
                     if ( (LA4_0==ELSE) ) {
@@ -675,29 +659,29 @@ public class PlumheadParser extends Parser {
                     }
                     else {
                         NoViableAltException nvae =
-                            new NoViableAltException("98:5: ( ELSE '{' s2= statements '}' -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) ) | -> ^( IF relational_expression ^( STMTS $s1) ) )", 4, 0, input);
+                            new NoViableAltException("97:5: ( ELSE '{' s2= statements '}' -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) ) | -> ^( IF relational_expression ^( STMTS $s1) ) )", 4, 0, input);
 
                         throw nvae;
                     }
                     switch (alt4) {
                         case 1 :
-                            // src/antlr3/Plumhead.g:98:7: ELSE '{' s2= statements '}'
+                            // src/antlr3/Plumhead.g:97:7: ELSE '{' s2= statements '}'
                             {
                             ELSE21=(Token)input.LT(1);
-                            match(input,ELSE,FOLLOW_ELSE_in_statement707); 
+                            match(input,ELSE,FOLLOW_ELSE_in_statement706); 
                             list_ELSE.add(ELSE21);
 
                             char_literal22=(Token)input.LT(1);
-                            match(input,29,FOLLOW_29_in_statement709); 
+                            match(input,29,FOLLOW_29_in_statement708); 
                             list_29.add(char_literal22);
 
-                            pushFollow(FOLLOW_statements_in_statement713);
+                            pushFollow(FOLLOW_statements_in_statement712);
                             s2=statements();
                             _fsp--;
 
-                            list_statements.add(s2.tree);
+                            list_statements.add(s2.getTree());
                             char_literal23=(Token)input.LT(1);
-                            match(input,30,FOLLOW_30_in_statement715); 
+                            match(input,30,FOLLOW_30_in_statement714); 
                             list_30.add(char_literal23);
 
 
@@ -705,15 +689,15 @@ public class PlumheadParser extends Parser {
                             int i_0 = 0;
                             retval.tree = root_0;
                             root_0 = (CommonTree)adaptor.nil();
-                            // 98:34: -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) )
+                            // 97:34: -> ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) )
                             {
-                                // src/antlr3/Plumhead.g:98:37: ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) )
+                                // src/antlr3/Plumhead.g:97:37: ^( IF relational_expression ^( STMTS $s1) ^( STMTS $s2) )
                                 {
                                 CommonTree root_1 = (CommonTree)adaptor.nil();
                                 root_1 = (CommonTree)adaptor.becomeRoot((Token)list_IF.get(i_0), root_1);
 
                                 adaptor.addChild(root_1, list_relational_expression.get(i_0));
-                                // src/antlr3/Plumhead.g:98:65: ^( STMTS $s1)
+                                // src/antlr3/Plumhead.g:97:65: ^( STMTS $s1)
                                 {
                                 CommonTree root_2 = (CommonTree)adaptor.nil();
                                 root_2 = (CommonTree)adaptor.becomeRoot(adaptor.create(STMTS, "STMTS"), root_2);
@@ -722,7 +706,7 @@ public class PlumheadParser extends Parser {
 
                                 adaptor.addChild(root_1, root_2);
                                 }
-                                // src/antlr3/Plumhead.g:98:80: ^( STMTS $s2)
+                                // src/antlr3/Plumhead.g:97:80: ^( STMTS $s2)
                                 {
                                 CommonTree root_2 = (CommonTree)adaptor.nil();
                                 root_2 = (CommonTree)adaptor.becomeRoot(adaptor.create(STMTS, "STMTS"), root_2);
@@ -742,22 +726,22 @@ public class PlumheadParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // src/antlr3/Plumhead.g:99:33: 
+                            // src/antlr3/Plumhead.g:98:33: 
                             {
 
                             // AST REWRITE
                             int i_0 = 0;
                             retval.tree = root_0;
                             root_0 = (CommonTree)adaptor.nil();
-                            // 99:33: -> ^( IF relational_expression ^( STMTS $s1) )
+                            // 98:33: -> ^( IF relational_expression ^( STMTS $s1) )
                             {
-                                // src/antlr3/Plumhead.g:99:36: ^( IF relational_expression ^( STMTS $s1) )
+                                // src/antlr3/Plumhead.g:98:36: ^( IF relational_expression ^( STMTS $s1) )
                                 {
                                 CommonTree root_1 = (CommonTree)adaptor.nil();
                                 root_1 = (CommonTree)adaptor.becomeRoot((Token)list_IF.get(i_0), root_1);
 
                                 adaptor.addChild(root_1, list_relational_expression.get(i_0));
-                                // src/antlr3/Plumhead.g:99:64: ^( STMTS $s1)
+                                // src/antlr3/Plumhead.g:98:64: ^( STMTS $s1)
                                 {
                                 CommonTree root_2 = (CommonTree)adaptor.nil();
                                 root_2 = (CommonTree)adaptor.becomeRoot(adaptor.create(STMTS, "STMTS"), root_2);
@@ -783,18 +767,18 @@ public class PlumheadParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // src/antlr3/Plumhead.g:101:5: CODE_END SEA CODE_START
+                    // src/antlr3/Plumhead.g:100:5: CODE_END SEA CODE_START
                     {
                     CODE_END24=(Token)input.LT(1);
-                    match(input,CODE_END,FOLLOW_CODE_END_in_statement807); 
+                    match(input,CODE_END,FOLLOW_CODE_END_in_statement806); 
                     list_CODE_END.add(CODE_END24);
 
                     SEA25=(Token)input.LT(1);
-                    match(input,SEA,FOLLOW_SEA_in_statement809); 
+                    match(input,SEA,FOLLOW_SEA_in_statement808); 
                     list_SEA.add(SEA25);
 
                     CODE_START26=(Token)input.LT(1);
-                    match(input,CODE_START,FOLLOW_CODE_START_in_statement811); 
+                    match(input,CODE_START,FOLLOW_CODE_START_in_statement810); 
                     list_CODE_START.add(CODE_START26);
 
 
@@ -802,9 +786,9 @@ public class PlumheadParser extends Parser {
                     int i_0 = 0;
                     retval.tree = root_0;
                     root_0 = (CommonTree)adaptor.nil();
-                    // 101:29: -> ^( ECHO NOQUOTE_STRING[$SEA] )
+                    // 100:29: -> ^( ECHO NOQUOTE_STRING[$SEA] )
                     {
-                        // src/antlr3/Plumhead.g:101:32: ^( ECHO NOQUOTE_STRING[$SEA] )
+                        // src/antlr3/Plumhead.g:100:32: ^( ECHO NOQUOTE_STRING[$SEA] )
                         {
                         CommonTree root_1 = (CommonTree)adaptor.nil();
                         root_1 = (CommonTree)adaptor.becomeRoot(adaptor.create(ECHO, "ECHO"), root_1);
@@ -821,27 +805,27 @@ public class PlumheadParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // src/antlr3/Plumhead.g:102:5: SCALAR ASSIGN_OP^^ expression ';'!
+                    // src/antlr3/Plumhead.g:101:5: SCALAR ASSIGN_OP^ expression ';'!
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
                     SCALAR27=(Token)input.LT(1);
-                    match(input,SCALAR,FOLLOW_SCALAR_in_statement828); 
+                    match(input,SCALAR,FOLLOW_SCALAR_in_statement827); 
                     SCALAR27_tree = (CommonTree)adaptor.create(SCALAR27);
                     adaptor.addChild(root_0, SCALAR27_tree);
 
                     ASSIGN_OP28=(Token)input.LT(1);
-                    match(input,ASSIGN_OP,FOLLOW_ASSIGN_OP_in_statement830); 
+                    match(input,ASSIGN_OP,FOLLOW_ASSIGN_OP_in_statement829); 
                     ASSIGN_OP28_tree = (CommonTree)adaptor.create(ASSIGN_OP28);
                     root_0 = (CommonTree)adaptor.becomeRoot(ASSIGN_OP28_tree, root_0);
 
-                    pushFollow(FOLLOW_expression_in_statement833);
+                    pushFollow(FOLLOW_expression_in_statement832);
                     expression29=expression();
                     _fsp--;
 
-                    adaptor.addChild(root_0, expression29.tree);
+                    adaptor.addChild(root_0, expression29.getTree());
                     char_literal30=(Token)input.LT(1);
-                    match(input,26,FOLLOW_26_in_statement835); 
+                    match(input,26,FOLLOW_26_in_statement834); 
 
                     }
                     break;
@@ -858,7 +842,7 @@ public class PlumheadParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-       }
+        }
         return retval;
     }
     // $ANTLR end statement
@@ -869,8 +853,8 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start expression
-    // src/antlr3/Plumhead.g:105:1: expression : ( DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | adding_expression | SCALAR );
-    public expression_return expression() throws RecognitionException {   
+    // src/antlr3/Plumhead.g:104:1: expression : ( DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | adding_expression | SCALAR );
+    public expression_return expression() throws RecognitionException {
         expression_return retval = new expression_return();
         retval.start = input.LT(1);
 
@@ -887,7 +871,7 @@ public class PlumheadParser extends Parser {
         CommonTree SCALAR34_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:106:5: ( DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | adding_expression | SCALAR )
+            // src/antlr3/Plumhead.g:105:5: ( DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | adding_expression | SCALAR )
             int alt6=4;
             switch ( input.LA(1) ) {
             case DOUBLEQUOTE_STRING:
@@ -906,19 +890,19 @@ public class PlumheadParser extends Parser {
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("105:1: expression : ( DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | adding_expression | SCALAR );", 6, 0, input);
+                    new NoViableAltException("104:1: expression : ( DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | adding_expression | SCALAR );", 6, 0, input);
 
                 throw nvae;
             }
 
             switch (alt6) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:106:5: DOUBLEQUOTE_STRING
+                    // src/antlr3/Plumhead.g:105:5: DOUBLEQUOTE_STRING
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
                     DOUBLEQUOTE_STRING31=(Token)input.LT(1);
-                    match(input,DOUBLEQUOTE_STRING,FOLLOW_DOUBLEQUOTE_STRING_in_expression849); 
+                    match(input,DOUBLEQUOTE_STRING,FOLLOW_DOUBLEQUOTE_STRING_in_expression848); 
                     DOUBLEQUOTE_STRING31_tree = (CommonTree)adaptor.create(DOUBLEQUOTE_STRING31);
                     adaptor.addChild(root_0, DOUBLEQUOTE_STRING31_tree);
 
@@ -926,12 +910,12 @@ public class PlumheadParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // src/antlr3/Plumhead.g:107:5: SINGLEQUOTE_STRING
+                    // src/antlr3/Plumhead.g:106:5: SINGLEQUOTE_STRING
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
                     SINGLEQUOTE_STRING32=(Token)input.LT(1);
-                    match(input,SINGLEQUOTE_STRING,FOLLOW_SINGLEQUOTE_STRING_in_expression855); 
+                    match(input,SINGLEQUOTE_STRING,FOLLOW_SINGLEQUOTE_STRING_in_expression854); 
                     SINGLEQUOTE_STRING32_tree = (CommonTree)adaptor.create(SINGLEQUOTE_STRING32);
                     adaptor.addChild(root_0, SINGLEQUOTE_STRING32_tree);
 
@@ -939,25 +923,25 @@ public class PlumheadParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // src/antlr3/Plumhead.g:108:5: adding_expression
+                    // src/antlr3/Plumhead.g:107:5: adding_expression
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
-                    pushFollow(FOLLOW_adding_expression_in_expression861);
+                    pushFollow(FOLLOW_adding_expression_in_expression860);
                     adding_expression33=adding_expression();
                     _fsp--;
 
-                    adaptor.addChild(root_0, adding_expression33.tree);
+                    adaptor.addChild(root_0, adding_expression33.getTree());
 
                     }
                     break;
                 case 4 :
-                    // src/antlr3/Plumhead.g:109:5: SCALAR
+                    // src/antlr3/Plumhead.g:108:5: SCALAR
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
                     SCALAR34=(Token)input.LT(1);
-                    match(input,SCALAR,FOLLOW_SCALAR_in_expression867); 
+                    match(input,SCALAR,FOLLOW_SCALAR_in_expression866); 
                     SCALAR34_tree = (CommonTree)adaptor.create(SCALAR34);
                     adaptor.addChild(root_0, SCALAR34_tree);
 
@@ -977,7 +961,7 @@ public class PlumheadParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-       }
+        }
         return retval;
     }
     // $ANTLR end expression
@@ -988,8 +972,8 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start adding_expression
-    // src/antlr3/Plumhead.g:112:1: adding_expression : multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression )* ;
-    public adding_expression_return adding_expression() throws RecognitionException {   
+    // src/antlr3/Plumhead.g:111:1: adding_expression : multiplying_expression ( ( PLUS^ | MINUS^ ) multiplying_expression )* ;
+    public adding_expression_return adding_expression() throws RecognitionException {
         adding_expression_return retval = new adding_expression_return();
         retval.start = input.LT(1);
 
@@ -1006,17 +990,17 @@ public class PlumheadParser extends Parser {
         CommonTree MINUS37_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:113:5: ( multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression )* )
-            // src/antlr3/Plumhead.g:113:5: multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression )*
+            // src/antlr3/Plumhead.g:112:5: ( multiplying_expression ( ( PLUS^ | MINUS^ ) multiplying_expression )* )
+            // src/antlr3/Plumhead.g:112:5: multiplying_expression ( ( PLUS^ | MINUS^ ) multiplying_expression )*
             {
             root_0 = (CommonTree)adaptor.nil();
 
-            pushFollow(FOLLOW_multiplying_expression_in_adding_expression880);
+            pushFollow(FOLLOW_multiplying_expression_in_adding_expression879);
             multiplying_expression35=multiplying_expression();
             _fsp--;
 
-            adaptor.addChild(root_0, multiplying_expression35.tree);
-            // src/antlr3/Plumhead.g:113:28: ( ( PLUS^^ | MINUS^^ ) multiplying_expression )*
+            adaptor.addChild(root_0, multiplying_expression35.getTree());
+            // src/antlr3/Plumhead.g:112:28: ( ( PLUS^ | MINUS^ ) multiplying_expression )*
             loop8:
             do {
                 int alt8=2;
@@ -1028,11 +1012,9 @@ public class PlumheadParser extends Parser {
 
                 switch (alt8) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:113:30: ( PLUS^^ | MINUS^^ ) multiplying_expression
+            	    // src/antlr3/Plumhead.g:112:30: ( PLUS^ | MINUS^ ) multiplying_expression
             	    {
-            	    CommonTree root_1 = (CommonTree)adaptor.nil();
-
-            	    // src/antlr3/Plumhead.g:113:30: ( PLUS^^ | MINUS^^ )
+            	    // src/antlr3/Plumhead.g:112:30: ( PLUS^ | MINUS^ )
             	    int alt7=2;
             	    int LA7_0 = input.LA(1);
             	    if ( (LA7_0==PLUS) ) {
@@ -1043,51 +1025,41 @@ public class PlumheadParser extends Parser {
             	    }
             	    else {
             	        NoViableAltException nvae =
-            	            new NoViableAltException("113:30: ( PLUS^^ | MINUS^^ )", 7, 0, input);
+            	            new NoViableAltException("112:30: ( PLUS^ | MINUS^ )", 7, 0, input);
 
             	        throw nvae;
             	    }
             	    switch (alt7) {
             	        case 1 :
-            	            // src/antlr3/Plumhead.g:113:32: PLUS^^
+            	            // src/antlr3/Plumhead.g:112:32: PLUS^
             	            {
-            	            CommonTree root_2 = (CommonTree)adaptor.nil();
-
             	            PLUS36=(Token)input.LT(1);
-            	            match(input,PLUS,FOLLOW_PLUS_in_adding_expression886); 
+            	            match(input,PLUS,FOLLOW_PLUS_in_adding_expression885); 
             	            PLUS36_tree = (CommonTree)adaptor.create(PLUS36);
             	            root_0 = (CommonTree)adaptor.becomeRoot(PLUS36_tree, root_0);
 
 
-            	            adaptor.addChild(root_1, root_2);
-
             	            }
             	            break;
             	        case 2 :
-            	            // src/antlr3/Plumhead.g:113:41: MINUS^^
+            	            // src/antlr3/Plumhead.g:112:40: MINUS^
             	            {
-            	            CommonTree root_2 = (CommonTree)adaptor.nil();
-
             	            MINUS37=(Token)input.LT(1);
-            	            match(input,MINUS,FOLLOW_MINUS_in_adding_expression891); 
+            	            match(input,MINUS,FOLLOW_MINUS_in_adding_expression890); 
             	            MINUS37_tree = (CommonTree)adaptor.create(MINUS37);
             	            root_0 = (CommonTree)adaptor.becomeRoot(MINUS37_tree, root_0);
 
-
-            	            adaptor.addChild(root_1, root_2);
 
             	            }
             	            break;
 
             	    }
 
-            	    pushFollow(FOLLOW_multiplying_expression_in_adding_expression896);
+            	    pushFollow(FOLLOW_multiplying_expression_in_adding_expression895);
             	    multiplying_expression38=multiplying_expression();
             	    _fsp--;
 
-            	    adaptor.addChild(root_1, multiplying_expression38.tree);
-
-            	    adaptor.addChild(root_0, root_1);
+            	    adaptor.addChild(root_0, multiplying_expression38.getTree());
 
             	    }
             	    break;
@@ -1111,7 +1083,7 @@ public class PlumheadParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-       }
+        }
         return retval;
     }
     // $ANTLR end adding_expression
@@ -1122,8 +1094,8 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start multiplying_expression
-    // src/antlr3/Plumhead.g:116:1: multiplying_expression : unary_expression ( MUL_OP^^ unary_expression )* ;
-    public multiplying_expression_return multiplying_expression() throws RecognitionException {   
+    // src/antlr3/Plumhead.g:115:1: multiplying_expression : unary_expression ( MUL_OP^ unary_expression )* ;
+    public multiplying_expression_return multiplying_expression() throws RecognitionException {
         multiplying_expression_return retval = new multiplying_expression_return();
         retval.start = input.LT(1);
 
@@ -1138,17 +1110,17 @@ public class PlumheadParser extends Parser {
         CommonTree MUL_OP40_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:117:5: ( unary_expression ( MUL_OP^^ unary_expression )* )
-            // src/antlr3/Plumhead.g:117:5: unary_expression ( MUL_OP^^ unary_expression )*
+            // src/antlr3/Plumhead.g:116:5: ( unary_expression ( MUL_OP^ unary_expression )* )
+            // src/antlr3/Plumhead.g:116:5: unary_expression ( MUL_OP^ unary_expression )*
             {
             root_0 = (CommonTree)adaptor.nil();
 
-            pushFollow(FOLLOW_unary_expression_in_multiplying_expression913);
+            pushFollow(FOLLOW_unary_expression_in_multiplying_expression912);
             unary_expression39=unary_expression();
             _fsp--;
 
-            adaptor.addChild(root_0, unary_expression39.tree);
-            // src/antlr3/Plumhead.g:117:22: ( MUL_OP^^ unary_expression )*
+            adaptor.addChild(root_0, unary_expression39.getTree());
+            // src/antlr3/Plumhead.g:116:22: ( MUL_OP^ unary_expression )*
             loop9:
             do {
                 int alt9=2;
@@ -1160,22 +1132,18 @@ public class PlumheadParser extends Parser {
 
                 switch (alt9) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:117:24: MUL_OP^^ unary_expression
+            	    // src/antlr3/Plumhead.g:116:24: MUL_OP^ unary_expression
             	    {
-            	    CommonTree root_1 = (CommonTree)adaptor.nil();
-
             	    MUL_OP40=(Token)input.LT(1);
-            	    match(input,MUL_OP,FOLLOW_MUL_OP_in_multiplying_expression917); 
+            	    match(input,MUL_OP,FOLLOW_MUL_OP_in_multiplying_expression916); 
             	    MUL_OP40_tree = (CommonTree)adaptor.create(MUL_OP40);
             	    root_0 = (CommonTree)adaptor.becomeRoot(MUL_OP40_tree, root_0);
 
-            	    pushFollow(FOLLOW_unary_expression_in_multiplying_expression920);
+            	    pushFollow(FOLLOW_unary_expression_in_multiplying_expression919);
             	    unary_expression41=unary_expression();
             	    _fsp--;
 
-            	    adaptor.addChild(root_1, unary_expression41.tree);
-
-            	    adaptor.addChild(root_0, root_1);
+            	    adaptor.addChild(root_0, unary_expression41.getTree());
 
             	    }
             	    break;
@@ -1199,7 +1167,7 @@ public class PlumheadParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-       }
+        }
         return retval;
     }
     // $ANTLR end multiplying_expression
@@ -1210,8 +1178,8 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start unary_expression
-    // src/antlr3/Plumhead.g:120:1: unary_expression : ( postfix_expression | MINUS postfix_expression -> ^( MUL_OP["n_mul"] NUMBER["-1"] postfix_expression ) );
-    public unary_expression_return unary_expression() throws RecognitionException {   
+    // src/antlr3/Plumhead.g:119:1: unary_expression : ( postfix_expression | MINUS postfix_expression -> ^( MUL_OP[\"n_mul\"] NUMBER[\"-1\"] postfix_expression ) );
+    public unary_expression_return unary_expression() throws RecognitionException {
         unary_expression_return retval = new unary_expression_return();
         retval.start = input.LT(1);
 
@@ -1227,7 +1195,7 @@ public class PlumheadParser extends Parser {
         CommonTree MINUS43_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:121:5: ( postfix_expression | MINUS postfix_expression -> ^( MUL_OP[\"n_mul\"] NUMBER[\"-1\"] postfix_expression ) )
+            // src/antlr3/Plumhead.g:120:5: ( postfix_expression | MINUS postfix_expression -> ^( MUL_OP[\"n_mul\"] NUMBER[\"-1\"] postfix_expression ) )
             int alt10=2;
             int LA10_0 = input.LA(1);
             if ( (LA10_0==NUMBER||LA10_0==27) ) {
@@ -1238,44 +1206,44 @@ public class PlumheadParser extends Parser {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("120:1: unary_expression : ( postfix_expression | MINUS postfix_expression -> ^( MUL_OP[\"n_mul\"] NUMBER[\"-1\"] postfix_expression ) );", 10, 0, input);
+                    new NoViableAltException("119:1: unary_expression : ( postfix_expression | MINUS postfix_expression -> ^( MUL_OP[\"n_mul\"] NUMBER[\"-1\"] postfix_expression ) );", 10, 0, input);
 
                 throw nvae;
             }
             switch (alt10) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:121:5: postfix_expression
+                    // src/antlr3/Plumhead.g:120:5: postfix_expression
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
-                    pushFollow(FOLLOW_postfix_expression_in_unary_expression936);
+                    pushFollow(FOLLOW_postfix_expression_in_unary_expression935);
                     postfix_expression42=postfix_expression();
                     _fsp--;
 
-                    adaptor.addChild(root_0, postfix_expression42.tree);
+                    adaptor.addChild(root_0, postfix_expression42.getTree());
 
                     }
                     break;
                 case 2 :
-                    // src/antlr3/Plumhead.g:122:5: MINUS postfix_expression
+                    // src/antlr3/Plumhead.g:121:5: MINUS postfix_expression
                     {
                     MINUS43=(Token)input.LT(1);
-                    match(input,MINUS,FOLLOW_MINUS_in_unary_expression942); 
+                    match(input,MINUS,FOLLOW_MINUS_in_unary_expression941); 
                     list_MINUS.add(MINUS43);
 
-                    pushFollow(FOLLOW_postfix_expression_in_unary_expression944);
+                    pushFollow(FOLLOW_postfix_expression_in_unary_expression943);
                     postfix_expression44=postfix_expression();
                     _fsp--;
 
-                    list_postfix_expression.add(postfix_expression44.tree);
+                    list_postfix_expression.add(postfix_expression44.getTree());
 
                     // AST REWRITE
                     int i_0 = 0;
                     retval.tree = root_0;
                     root_0 = (CommonTree)adaptor.nil();
-                    // 122:30: -> ^( MUL_OP[\"n_mul\"] NUMBER[\"-1\"] postfix_expression )
+                    // 121:30: -> ^( MUL_OP[\"n_mul\"] NUMBER[\"-1\"] postfix_expression )
                     {
-                        // src/antlr3/Plumhead.g:122:33: ^( MUL_OP[\"n_mul\"] NUMBER[\"-1\"] postfix_expression )
+                        // src/antlr3/Plumhead.g:121:33: ^( MUL_OP[\"n_mul\"] NUMBER[\"-1\"] postfix_expression )
                         {
                         CommonTree root_1 = (CommonTree)adaptor.nil();
                         root_1 = (CommonTree)adaptor.becomeRoot(adaptor.create(MUL_OP, "n_mul"), root_1);
@@ -1305,7 +1273,7 @@ public class PlumheadParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-       }
+        }
         return retval;
     }
     // $ANTLR end unary_expression
@@ -1316,8 +1284,8 @@ public class PlumheadParser extends Parser {
     };
 
     // $ANTLR start postfix_expression
-    // src/antlr3/Plumhead.g:125:1: postfix_expression : ( NUMBER | '(' expression ')' -> expression );
-    public postfix_expression_return postfix_expression() throws RecognitionException {   
+    // src/antlr3/Plumhead.g:124:1: postfix_expression : ( NUMBER | '(' expression ')' -> expression );
+    public postfix_expression_return postfix_expression() throws RecognitionException {
         postfix_expression_return retval = new postfix_expression_return();
         retval.start = input.LT(1);
 
@@ -1336,7 +1304,7 @@ public class PlumheadParser extends Parser {
         CommonTree char_literal48_tree=null;
 
         try {
-            // src/antlr3/Plumhead.g:126:5: ( NUMBER | '(' expression ')' -> expression )
+            // src/antlr3/Plumhead.g:125:5: ( NUMBER | '(' expression ')' -> expression )
             int alt11=2;
             int LA11_0 = input.LA(1);
             if ( (LA11_0==NUMBER) ) {
@@ -1347,18 +1315,18 @@ public class PlumheadParser extends Parser {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("125:1: postfix_expression : ( NUMBER | '(' expression ')' -> expression );", 11, 0, input);
+                    new NoViableAltException("124:1: postfix_expression : ( NUMBER | '(' expression ')' -> expression );", 11, 0, input);
 
                 throw nvae;
             }
             switch (alt11) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:126:5: NUMBER
+                    // src/antlr3/Plumhead.g:125:5: NUMBER
                     {
                     root_0 = (CommonTree)adaptor.nil();
 
                     NUMBER45=(Token)input.LT(1);
-                    match(input,NUMBER,FOLLOW_NUMBER_in_postfix_expression971); 
+                    match(input,NUMBER,FOLLOW_NUMBER_in_postfix_expression970); 
                     NUMBER45_tree = (CommonTree)adaptor.create(NUMBER45);
                     adaptor.addChild(root_0, NUMBER45_tree);
 
@@ -1366,19 +1334,19 @@ public class PlumheadParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // src/antlr3/Plumhead.g:127:5: '(' expression ')'
+                    // src/antlr3/Plumhead.g:126:5: '(' expression ')'
                     {
                     char_literal46=(Token)input.LT(1);
-                    match(input,27,FOLLOW_27_in_postfix_expression977); 
+                    match(input,27,FOLLOW_27_in_postfix_expression976); 
                     list_27.add(char_literal46);
 
-                    pushFollow(FOLLOW_expression_in_postfix_expression979);
+                    pushFollow(FOLLOW_expression_in_postfix_expression978);
                     expression47=expression();
                     _fsp--;
 
-                    list_expression.add(expression47.tree);
+                    list_expression.add(expression47.getTree());
                     char_literal48=(Token)input.LT(1);
-                    match(input,28,FOLLOW_28_in_postfix_expression981); 
+                    match(input,28,FOLLOW_28_in_postfix_expression980); 
                     list_28.add(char_literal48);
 
 
@@ -1386,7 +1354,7 @@ public class PlumheadParser extends Parser {
                     int i_0 = 0;
                     retval.tree = root_0;
                     root_0 = (CommonTree)adaptor.nil();
-                    // 127:24: -> expression
+                    // 126:24: -> expression
                     {
                         adaptor.addChild(root_0, list_expression.get(i_0));
 
@@ -1409,7 +1377,7 @@ public class PlumheadParser extends Parser {
                 retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
                 adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 
-       }
+        }
         return retval;
     }
     // $ANTLR end postfix_expression
@@ -1417,55 +1385,55 @@ public class PlumheadParser extends Parser {
 
  
 
-    public static final BitSet FOLLOW_sea_or_code_in_program539 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_sea_in_sea_or_code564 = new BitSet(new long[]{0x0000000000000182L});
-    public static final BitSet FOLLOW_code_in_sea_or_code568 = new BitSet(new long[]{0x0000000000000182L});
-    public static final BitSet FOLLOW_SEA_in_sea585 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CODE_START_in_code609 = new BitSet(new long[]{0x000000000100A200L});
-    public static final BitSet FOLLOW_statements_in_code611 = new BitSet(new long[]{0x0000000000000200L});
-    public static final BitSet FOLLOW_CODE_END_in_code613 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_relational_expression631 = new BitSet(new long[]{0x0000000000800002L});
-    public static final BitSet FOLLOW_REL_OP_in_relational_expression635 = new BitSet(new long[]{0x00000000080C9800L});
-    public static final BitSet FOLLOW_expression_in_relational_expression638 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_statement_in_statements656 = new BitSet(new long[]{0x000000000100A202L});
-    public static final BitSet FOLLOW_ECHO_in_statement672 = new BitSet(new long[]{0x00000000080C9800L});
-    public static final BitSet FOLLOW_expression_in_statement675 = new BitSet(new long[]{0x0000000004000000L});
-    public static final BitSet FOLLOW_26_in_statement677 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IF_in_statement685 = new BitSet(new long[]{0x0000000008000000L});
-    public static final BitSet FOLLOW_27_in_statement687 = new BitSet(new long[]{0x00000000080C9800L});
-    public static final BitSet FOLLOW_relational_expression_in_statement689 = new BitSet(new long[]{0x0000000010000000L});
-    public static final BitSet FOLLOW_28_in_statement691 = new BitSet(new long[]{0x0000000020000000L});
-    public static final BitSet FOLLOW_29_in_statement693 = new BitSet(new long[]{0x000000004100A200L});
-    public static final BitSet FOLLOW_statements_in_statement697 = new BitSet(new long[]{0x0000000040000000L});
-    public static final BitSet FOLLOW_30_in_statement699 = new BitSet(new long[]{0x0000000002000002L});
-    public static final BitSet FOLLOW_ELSE_in_statement707 = new BitSet(new long[]{0x0000000020000000L});
-    public static final BitSet FOLLOW_29_in_statement709 = new BitSet(new long[]{0x000000004100A200L});
-    public static final BitSet FOLLOW_statements_in_statement713 = new BitSet(new long[]{0x0000000040000000L});
-    public static final BitSet FOLLOW_30_in_statement715 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CODE_END_in_statement807 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_SEA_in_statement809 = new BitSet(new long[]{0x0000000000000100L});
-    public static final BitSet FOLLOW_CODE_START_in_statement811 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SCALAR_in_statement828 = new BitSet(new long[]{0x0000000000400000L});
-    public static final BitSet FOLLOW_ASSIGN_OP_in_statement830 = new BitSet(new long[]{0x00000000080C9800L});
-    public static final BitSet FOLLOW_expression_in_statement833 = new BitSet(new long[]{0x0000000004000000L});
-    public static final BitSet FOLLOW_26_in_statement835 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DOUBLEQUOTE_STRING_in_expression849 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SINGLEQUOTE_STRING_in_expression855 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_adding_expression_in_expression861 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_SCALAR_in_expression867 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_multiplying_expression_in_adding_expression880 = new BitSet(new long[]{0x0000000000180002L});
-    public static final BitSet FOLLOW_PLUS_in_adding_expression886 = new BitSet(new long[]{0x00000000080C0000L});
-    public static final BitSet FOLLOW_MINUS_in_adding_expression891 = new BitSet(new long[]{0x00000000080C0000L});
-    public static final BitSet FOLLOW_multiplying_expression_in_adding_expression896 = new BitSet(new long[]{0x0000000000180002L});
-    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression913 = new BitSet(new long[]{0x0000000000200002L});
-    public static final BitSet FOLLOW_MUL_OP_in_multiplying_expression917 = new BitSet(new long[]{0x00000000080C0000L});
-    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression920 = new BitSet(new long[]{0x0000000000200002L});
-    public static final BitSet FOLLOW_postfix_expression_in_unary_expression936 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MINUS_in_unary_expression942 = new BitSet(new long[]{0x0000000008040000L});
-    public static final BitSet FOLLOW_postfix_expression_in_unary_expression944 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NUMBER_in_postfix_expression971 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_27_in_postfix_expression977 = new BitSet(new long[]{0x00000000080C9800L});
-    public static final BitSet FOLLOW_expression_in_postfix_expression979 = new BitSet(new long[]{0x0000000010000000L});
-    public static final BitSet FOLLOW_28_in_postfix_expression981 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_sea_or_code_in_program538 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_sea_in_sea_or_code563 = new BitSet(new long[]{0x0000000000000182L});
+    public static final BitSet FOLLOW_code_in_sea_or_code567 = new BitSet(new long[]{0x0000000000000182L});
+    public static final BitSet FOLLOW_SEA_in_sea584 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CODE_START_in_code608 = new BitSet(new long[]{0x000000000100A200L});
+    public static final BitSet FOLLOW_statements_in_code610 = new BitSet(new long[]{0x0000000000000200L});
+    public static final BitSet FOLLOW_CODE_END_in_code612 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_relational_expression630 = new BitSet(new long[]{0x0000000000800002L});
+    public static final BitSet FOLLOW_REL_OP_in_relational_expression634 = new BitSet(new long[]{0x00000000080C9800L});
+    public static final BitSet FOLLOW_expression_in_relational_expression637 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_statement_in_statements655 = new BitSet(new long[]{0x000000000100A202L});
+    public static final BitSet FOLLOW_ECHO_in_statement671 = new BitSet(new long[]{0x00000000080C9800L});
+    public static final BitSet FOLLOW_expression_in_statement674 = new BitSet(new long[]{0x0000000004000000L});
+    public static final BitSet FOLLOW_26_in_statement676 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IF_in_statement684 = new BitSet(new long[]{0x0000000008000000L});
+    public static final BitSet FOLLOW_27_in_statement686 = new BitSet(new long[]{0x00000000080C9800L});
+    public static final BitSet FOLLOW_relational_expression_in_statement688 = new BitSet(new long[]{0x0000000010000000L});
+    public static final BitSet FOLLOW_28_in_statement690 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_29_in_statement692 = new BitSet(new long[]{0x000000004100A200L});
+    public static final BitSet FOLLOW_statements_in_statement696 = new BitSet(new long[]{0x0000000040000000L});
+    public static final BitSet FOLLOW_30_in_statement698 = new BitSet(new long[]{0x0000000002000002L});
+    public static final BitSet FOLLOW_ELSE_in_statement706 = new BitSet(new long[]{0x0000000020000000L});
+    public static final BitSet FOLLOW_29_in_statement708 = new BitSet(new long[]{0x000000004100A200L});
+    public static final BitSet FOLLOW_statements_in_statement712 = new BitSet(new long[]{0x0000000040000000L});
+    public static final BitSet FOLLOW_30_in_statement714 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CODE_END_in_statement806 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_SEA_in_statement808 = new BitSet(new long[]{0x0000000000000100L});
+    public static final BitSet FOLLOW_CODE_START_in_statement810 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SCALAR_in_statement827 = new BitSet(new long[]{0x0000000000400000L});
+    public static final BitSet FOLLOW_ASSIGN_OP_in_statement829 = new BitSet(new long[]{0x00000000080C9800L});
+    public static final BitSet FOLLOW_expression_in_statement832 = new BitSet(new long[]{0x0000000004000000L});
+    public static final BitSet FOLLOW_26_in_statement834 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DOUBLEQUOTE_STRING_in_expression848 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SINGLEQUOTE_STRING_in_expression854 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_adding_expression_in_expression860 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_SCALAR_in_expression866 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_multiplying_expression_in_adding_expression879 = new BitSet(new long[]{0x0000000000180002L});
+    public static final BitSet FOLLOW_PLUS_in_adding_expression885 = new BitSet(new long[]{0x00000000080C0000L});
+    public static final BitSet FOLLOW_MINUS_in_adding_expression890 = new BitSet(new long[]{0x00000000080C0000L});
+    public static final BitSet FOLLOW_multiplying_expression_in_adding_expression895 = new BitSet(new long[]{0x0000000000180002L});
+    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression912 = new BitSet(new long[]{0x0000000000200002L});
+    public static final BitSet FOLLOW_MUL_OP_in_multiplying_expression916 = new BitSet(new long[]{0x00000000080C0000L});
+    public static final BitSet FOLLOW_unary_expression_in_multiplying_expression919 = new BitSet(new long[]{0x0000000000200002L});
+    public static final BitSet FOLLOW_postfix_expression_in_unary_expression935 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MINUS_in_unary_expression941 = new BitSet(new long[]{0x0000000008040000L});
+    public static final BitSet FOLLOW_postfix_expression_in_unary_expression943 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NUMBER_in_postfix_expression970 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_27_in_postfix_expression976 = new BitSet(new long[]{0x00000000080C9800L});
+    public static final BitSet FOLLOW_expression_in_postfix_expression978 = new BitSet(new long[]{0x0000000010000000L});
+    public static final BitSet FOLLOW_28_in_postfix_expression980 = new BitSet(new long[]{0x0000000000000002L});
 
 }

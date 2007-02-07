@@ -84,7 +84,7 @@ code
   ;
 
 relational_expression 
-  : expression ( REL_OP^^ expression )?
+  : expression ( REL_OP^ expression )?
   ;
 
 statements
@@ -92,13 +92,13 @@ statements
   ;
 
 statement
-  : ECHO^^ expression ';'! 
+  : ECHO^ expression ';'! 
   | IF '(' relational_expression ')' '{' s1=statements '}'
     ( ELSE '{' s2=statements '}' -> ^( IF relational_expression ^( STMTS $s1 ) ^( STMTS $s2 ) )
     |                           -> ^( IF relational_expression ^( STMTS $s1 ) )
     ) 
   | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] )
-  | SCALAR ASSIGN_OP^^ expression ';'!
+  | SCALAR ASSIGN_OP^ expression ';'!
   ;
 
 expression
@@ -109,11 +109,11 @@ expression
   ;
 
 adding_expression
-  : multiplying_expression ( ( PLUS^^ | MINUS^^ ) multiplying_expression )* 
+  : multiplying_expression ( ( PLUS^ | MINUS^ ) multiplying_expression )* 
   ;
 
 multiplying_expression
-  : unary_expression ( MUL_OP^^ unary_expression )*
+  : unary_expression ( MUL_OP^ unary_expression )*
   ;
 
 unary_expression

@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 src/antlr3/Plumhead.g 2007-01-28 15:56:48
+// $ANTLR 3.0b6 src/antlr3/Plumhead.g 2007-02-07 23:18:50
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -581,8 +581,8 @@ public class PlumheadLexer extends Lexer {
     public void mIDENT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // src/antlr3/Plumhead.g:46:11: ({...}? => ('a'..'z'|'A'..'Z') ( ('a'..'z'|'A'..'Z'))* )
-            // src/antlr3/Plumhead.g:46:11: {...}? => ('a'..'z'|'A'..'Z') ( ('a'..'z'|'A'..'Z'))*
+            // src/antlr3/Plumhead.g:45:11: ({...}? => ('a'..'z'|'A'..'Z') ( ('a'..'z'|'A'..'Z'))* )
+            // src/antlr3/Plumhead.g:45:11: {...}? => ('a'..'z'|'A'..'Z') ( ('a'..'z'|'A'..'Z'))*
             {
             if ( !( codeMode ) ) {
                 throw new FailedPredicateException(input, "IDENT", " codeMode ");
@@ -597,7 +597,7 @@ public class PlumheadLexer extends Lexer {
                 recover(mse);    throw mse;
             }
 
-            // src/antlr3/Plumhead.g:46:50: ( ('a'..'z'|'A'..'Z'))*
+            // src/antlr3/Plumhead.g:45:50: ( ('a'..'z'|'A'..'Z'))*
             loop6:
             do {
                 int alt6=2;
@@ -609,7 +609,7 @@ public class PlumheadLexer extends Lexer {
 
                 switch (alt6) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:46:52: ('a'..'z'|'A'..'Z')
+            	    // src/antlr3/Plumhead.g:45:52: ('a'..'z'|'A'..'Z')
             	    {
             	    if ( (input.LA(1)>='A' && input.LA(1)<='Z')||(input.LA(1)>='a' && input.LA(1)<='z') ) {
             	        input.consume();
@@ -649,8 +649,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:48:11: ({...}? => '$' IDENT )
-            // src/antlr3/Plumhead.g:48:11: {...}? => '$' IDENT
+            // src/antlr3/Plumhead.g:47:11: ({...}? => '$' IDENT )
+            // src/antlr3/Plumhead.g:47:11: {...}? => '$' IDENT
             {
             if ( !( codeMode ) ) {
                 throw new FailedPredicateException(input, "SCALAR", " codeMode ");
@@ -682,8 +682,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:49:11: ({...}? => '@' IDENT )
-            // src/antlr3/Plumhead.g:49:11: {...}? => '@' IDENT
+            // src/antlr3/Plumhead.g:48:11: ({...}? => '@' IDENT )
+            // src/antlr3/Plumhead.g:48:11: {...}? => '@' IDENT
             {
             if ( !( codeMode ) ) {
                 throw new FailedPredicateException(input, "ARRAY", " codeMode ");
@@ -710,13 +710,13 @@ public class PlumheadLexer extends Lexer {
     public void mINTEGER() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // src/antlr3/Plumhead.g:52:11: ({...}? => ( '0' .. '9' )+ )
-            // src/antlr3/Plumhead.g:52:11: {...}? => ( '0' .. '9' )+
+            // src/antlr3/Plumhead.g:51:11: ({...}? => ( '0' .. '9' )+ )
+            // src/antlr3/Plumhead.g:51:11: {...}? => ( '0' .. '9' )+
             {
             if ( !( codeMode ) ) {
                 throw new FailedPredicateException(input, "INTEGER", " codeMode ");
             }
-            // src/antlr3/Plumhead.g:52:27: ( '0' .. '9' )+
+            // src/antlr3/Plumhead.g:51:27: ( '0' .. '9' )+
             int cnt7=0;
             loop7:
             do {
@@ -729,7 +729,7 @@ public class PlumheadLexer extends Lexer {
 
                 switch (alt7) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:52:28: '0' .. '9'
+            	    // src/antlr3/Plumhead.g:51:28: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -764,7 +764,7 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:55:6: ({...}? => INTEGER ( '.' INTEGER )? | '.' INTEGER )
+            // src/antlr3/Plumhead.g:54:6: ({...}? => INTEGER ( '.' INTEGER )? | '.' INTEGER )
             int alt9=2;
             int LA9_0 = input.LA(1);
             if ( ((LA9_0>='0' && LA9_0<='9')) && ( codeMode )) {
@@ -775,19 +775,19 @@ public class PlumheadLexer extends Lexer {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("54:1: NUMBER : ({...}? => INTEGER ( '.' INTEGER )? | '.' INTEGER );", 9, 0, input);
+                    new NoViableAltException("53:1: NUMBER : ({...}? => INTEGER ( '.' INTEGER )? | '.' INTEGER );", 9, 0, input);
 
                 throw nvae;
             }
             switch (alt9) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:55:6: {...}? => INTEGER ( '.' INTEGER )?
+                    // src/antlr3/Plumhead.g:54:6: {...}? => INTEGER ( '.' INTEGER )?
                     {
                     if ( !( codeMode ) ) {
                         throw new FailedPredicateException(input, "NUMBER", " codeMode ");
                     }
                     mINTEGER(); 
-                    // src/antlr3/Plumhead.g:55:31: ( '.' INTEGER )?
+                    // src/antlr3/Plumhead.g:54:31: ( '.' INTEGER )?
                     int alt8=2;
                     int LA8_0 = input.LA(1);
                     if ( (LA8_0=='.') ) {
@@ -795,7 +795,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     switch (alt8) {
                         case 1 :
-                            // src/antlr3/Plumhead.g:55:32: '.' INTEGER
+                            // src/antlr3/Plumhead.g:54:32: '.' INTEGER
                             {
                             match('.'); 
                             mINTEGER(); 
@@ -809,7 +809,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // src/antlr3/Plumhead.g:56:7: '.' INTEGER
+                    // src/antlr3/Plumhead.g:55:7: '.' INTEGER
                     {
                     match('.'); 
                     mINTEGER(); 
@@ -840,8 +840,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:59:13: ({...}? => '-' )
-            // src/antlr3/Plumhead.g:59:13: {...}? => '-'
+            // src/antlr3/Plumhead.g:58:13: ({...}? => '-' )
+            // src/antlr3/Plumhead.g:58:13: {...}? => '-'
             {
             if ( !( codeMode ) ) {
                 throw new FailedPredicateException(input, "MINUS", " codeMode ");
@@ -872,8 +872,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:60:13: ({...}? => '+' )
-            // src/antlr3/Plumhead.g:60:13: {...}? => '+'
+            // src/antlr3/Plumhead.g:59:13: ({...}? => '+' )
+            // src/antlr3/Plumhead.g:59:13: {...}? => '+'
             {
             if ( !( codeMode ) ) {
                 throw new FailedPredicateException(input, "PLUS", " codeMode ");
@@ -904,7 +904,7 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:61:13: ({...}? => '*' | '/' | '%' )
+            // src/antlr3/Plumhead.g:60:13: ({...}? => '*' | '/' | '%' )
             int alt10=3;
             int LA10_0 = input.LA(1);
             if ( (LA10_0=='*') && ( codeMode )) {
@@ -918,13 +918,13 @@ public class PlumheadLexer extends Lexer {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("61:1: MUL_OP : ({...}? => '*' | '/' | '%' );", 10, 0, input);
+                    new NoViableAltException("60:1: MUL_OP : ({...}? => '*' | '/' | '%' );", 10, 0, input);
 
                 throw nvae;
             }
             switch (alt10) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:61:13: {...}? => '*'
+                    // src/antlr3/Plumhead.g:60:13: {...}? => '*'
                     {
                     if ( !( codeMode ) ) {
                         throw new FailedPredicateException(input, "MUL_OP", " codeMode ");
@@ -934,14 +934,14 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // src/antlr3/Plumhead.g:61:37: '/'
+                    // src/antlr3/Plumhead.g:60:37: '/'
                     {
                     match('/'); 
 
                     }
                     break;
                 case 3 :
-                    // src/antlr3/Plumhead.g:61:44: '%'
+                    // src/antlr3/Plumhead.g:60:44: '%'
                     {
                     match('%'); 
 
@@ -971,8 +971,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:62:13: ({...}? => '=' )
-            // src/antlr3/Plumhead.g:62:13: {...}? => '='
+            // src/antlr3/Plumhead.g:61:13: ({...}? => '=' )
+            // src/antlr3/Plumhead.g:61:13: {...}? => '='
             {
             if ( !( codeMode ) ) {
                 throw new FailedPredicateException(input, "ASSIGN_OP", " codeMode ");
@@ -1003,7 +1003,7 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:63:13: ({...}? => '==' | '<=' | '>=' | '!=' | '<' | '>' )
+            // src/antlr3/Plumhead.g:62:13: ({...}? => '==' | '<=' | '>=' | '!=' | '<' | '>' )
             int alt11=6;
             int LA11_0 = input.LA(1);
             if ( (LA11_0=='=') && ( codeMode )) {
@@ -1030,13 +1030,13 @@ public class PlumheadLexer extends Lexer {
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("63:1: REL_OP : ({...}? => '==' | '<=' | '>=' | '!=' | '<' | '>' );", 11, 0, input);
+                    new NoViableAltException("62:1: REL_OP : ({...}? => '==' | '<=' | '>=' | '!=' | '<' | '>' );", 11, 0, input);
 
                 throw nvae;
             }
             switch (alt11) {
                 case 1 :
-                    // src/antlr3/Plumhead.g:63:13: {...}? => '=='
+                    // src/antlr3/Plumhead.g:62:13: {...}? => '=='
                     {
                     if ( !( codeMode ) ) {
                         throw new FailedPredicateException(input, "REL_OP", " codeMode ");
@@ -1047,7 +1047,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // src/antlr3/Plumhead.g:63:37: '<='
+                    // src/antlr3/Plumhead.g:62:37: '<='
                     {
                     match("<="); 
 
@@ -1055,7 +1055,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // src/antlr3/Plumhead.g:63:44: '>='
+                    // src/antlr3/Plumhead.g:62:44: '>='
                     {
                     match(">="); 
 
@@ -1063,7 +1063,7 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 4 :
-                    // src/antlr3/Plumhead.g:63:51: '!='
+                    // src/antlr3/Plumhead.g:62:51: '!='
                     {
                     match("!="); 
 
@@ -1071,14 +1071,14 @@ public class PlumheadLexer extends Lexer {
                     }
                     break;
                 case 5 :
-                    // src/antlr3/Plumhead.g:63:58: '<'
+                    // src/antlr3/Plumhead.g:62:58: '<'
                     {
                     match('<'); 
 
                     }
                     break;
                 case 6 :
-                    // src/antlr3/Plumhead.g:63:65: '>'
+                    // src/antlr3/Plumhead.g:62:65: '>'
                     {
                     match('>'); 
 
@@ -1108,8 +1108,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:65:13: ({...}? => 'if' )
-            // src/antlr3/Plumhead.g:65:13: {...}? => 'if'
+            // src/antlr3/Plumhead.g:64:13: ({...}? => 'if' )
+            // src/antlr3/Plumhead.g:64:13: {...}? => 'if'
             {
             if ( !( codeMode ) ) {
                 throw new FailedPredicateException(input, "IF", " codeMode ");
@@ -1141,8 +1141,8 @@ public class PlumheadLexer extends Lexer {
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
             int _channel = Token.DEFAULT_CHANNEL;
-            // src/antlr3/Plumhead.g:66:13: ({...}? => 'else' )
-            // src/antlr3/Plumhead.g:66:13: {...}? => 'else'
+            // src/antlr3/Plumhead.g:65:13: ({...}? => 'else' )
+            // src/antlr3/Plumhead.g:65:13: {...}? => 'else'
             {
             if ( !( codeMode ) ) {
                 throw new FailedPredicateException(input, "ELSE", " codeMode ");
