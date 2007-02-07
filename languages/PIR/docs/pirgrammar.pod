@@ -19,7 +19,7 @@ but are not implemented. An example of this is the C<.global> directive.
 
 =head1 VERSION
 
-0.1
+0.1.1
 
 =head1 LEXICAL CONVENTIONS
 
@@ -306,7 +306,7 @@ Parameter definitions have the following syntax:
 	  .param int argc :optional
 	  .param int has_argc :optional
 	  .param num nParam
-	  .param pmc argv :slurpy	  
+	  .param pmc argv :slurpy
 	  .param string sParam :named('foo')
 	  .param $P0 :named('bar')
 	  # body
@@ -321,7 +321,7 @@ As shown, parameter definitions may take flags as well. These flags are listed h
  :slurpy
 
 The parameter should be of type C<pmc> and acts like a container that C<slurps> up all remaining arguments.
-Details can be found in PDD03 - Parrot Calling Conventions. 
+Details can be found in PDD03 - Parrot Calling Conventions.
 
 =item *
 
@@ -430,7 +430,7 @@ then the following two statements have an identical effect:
 
 =item *
 
-  store_lex "$a", $P1
+  store_lex "i", $P1
 
 =back
 
@@ -444,7 +444,7 @@ Likewise, these two statements also have an identical effect:
 
 =item *
 
-  $P1 = find_lex "$a"
+  $P1 = find_lex "i"
 
 =back
 
@@ -479,7 +479,7 @@ An example is:
 	.const int answer = 42
 
 defines an integer constant by name 'answer', giving it a value of 42.
-Note that the constant type and the value type should match, i.e. you cannot 
+Note that the constant type and the value type should match, i.e. you cannot
 assign a floating point number to an integer constant. The PIR parser will
 check for this.
 
@@ -620,7 +620,7 @@ Likewise, string concatenation (".") is only allowed on strings. These checks ar
     | "global" string_constant "=" target
     | result_var_list "=" short_sub_call
 
-NOTE: the definition of assignment statements is B<not> complete yet. 
+NOTE: the definition of assignment statements is B<not> complete yet.
 As languages/PIR evolves, this will be completed.
 
   keylist:
@@ -770,7 +770,7 @@ Invoking instance methods is a simple variation:
 	.meth_call $P1
 	.pcc_end
 
-Passing parameters and retrieving return values is done like this:
+Passing arguments and retrieving return values is done like this:
 
 	.pcc_begin
 	.arg 42
@@ -779,10 +779,40 @@ Passing parameters and retrieving return values is done like this:
 	.result res
 	.pcc_end
 
-Parameters can take flags:
+Arguments can take flags as well. The following argument flags are defined:
+
+=over 4
+
+=item *
+
+ :flat
+
+Flatten the (aggregate) argument. This argument can only be of type C<pmc>.
+
+=item *
+
+ :named('x')
+
+Pass the denoted argument into the named parameter that is denoted by 'x', like so:
+
+ .param <type> <identifier> :named('x')
+
+=back
+
+	.local pmc arr
+	arr = new .Array
+	arr = 2
+	arr[0] = 42
+	arr[1] = 43
+	.pcc_begin
+	.arg arr :flat
+	.arg $I0 :named('intArg')
+	.pcc_call foo
+	.pcc_end
+
 
 The Native Calling Interface (NCI) allows for calling C routines, in order to talk to the world
-outside of Parrot. Its syntax is a slight variation:
+outside of Parrot. Its syntax is a slight variation; it uses C<.nci_call> instead of C<.pcc_call>.
 
 	.pcc_begin
 	.nci_call $P0
@@ -808,12 +838,23 @@ Its simplest form is:
 Or a method call:
 
 	obj.'toString'() # call the method 'toString'
-	obj.x() # call the method whose name is stored in C<x>
+	obj.x() # call the method whose name is stored in 'x'.
 
 IMCC also allows the "->" instead of a dot, to make it readable for C++ programmers:
 
 	obj->'toString'()
 
+And of course, using the short version, passing arguments can be done as well, including all flags that were defined
+for the long version. The same example from the 'long subroutine invocation' is now shown in its short version:
+
+	.local pmc arr
+	arr = new .Array
+	arr = 2
+	arr[0] = 42
+	arr[1] = 43
+	foo(arr :flat, $I0 :named('intArg'))
+
+Please note that the short subroutine call does B<not> allow for C<NCI> calls.
 
 =head2 Return values from subroutines
 
@@ -835,10 +876,16 @@ IMCC also allows the "->" instead of a dot, to make it readable for C++ programm
 
 =head3 Example long return statement
 
+Returning values from a subroutine is in fact similar to passing arguments I<to>
+a subroutine. Therefore, the same flags can be used:
+
 	.pcc_begin_return
-	.return 42
+	.return 42 :named('answer')
 	.return $P0 :flat
 	.pcc_end_return
+
+In this example, the value C<42> is passed into the return value that takes the named return value known by C<'answer'>.
+The aggregate value in C<$P0> is flattened, and each of its values is passed as a return value.
 
 =head2 Short return statement
 
@@ -849,6 +896,9 @@ IMCC also allows the "->" instead of a dot, to make it readable for C++ programm
 
 	.return(myVar, "hello", 2.76, 3.14);
 
+Just as the return values in the C<long return statement> could take flags, the C<short return statement> may as well:
+
+	.return(42 :named('answer'), $P0 :flat)
 
 =head2 Long yield statements
 
@@ -858,6 +908,10 @@ IMCC also allows the "->" instead of a dot, to make it readable for C++ programm
     ".pcc_end_yield"
 
 =head3 Example long yield statement
+
+A C<yield> statement works the same as a normal return value, except that the point where the subroutine
+was left is stored somewhere, so that the subroutine can be resumed from that point as soon as the subroutine
+is invoked again. Returning values is identical to I<normal> return statements.
 
 	.sub foo
 	  .pcc_begin_yield
@@ -883,6 +937,8 @@ IMCC also allows the "->" instead of a dot, to make it readable for C++ programm
 
 =head3 Example short yield statement
 
+Again, the short version is identical to the short version of the return statement as well.
+
 	.yield("hello", 42)
 
 =head2 Tail calls
@@ -899,6 +955,9 @@ Returns the return values from C<foo>. This is implemented by a tail call, which
 	.local pmc results = foo()
 	.return(results)
 
+The call to C<foo> can be considered a normal function call with respect to parameters: it can take the exact
+same format using argument flags.
+
 =head2 Symbol namespaces
 
   open_namespace:
@@ -906,7 +965,6 @@ Returns the return values from C<foo>. This is implemented by a tail call, which
 
   close_namespace:
     ".endnamespace" identifier
-
 
 =head3 Example open/close namespaces
 
@@ -928,6 +986,9 @@ Will print:
 	43
 	42
 
+Please note that it is B<not> necessary to I<pair> these statements; it is acceptable to open a C<.namespace> without closing it.
+The scope of the C<.namespace> is limited to the subroutine.
+
 =head2 Emit blocks
 
   emit:
@@ -940,6 +1001,14 @@ Will print:
 An emit block only allows PASM instructions,
 not PIR instructions.
 
+	.emit
+	   set I0, 10
+	   new P0, .Integer
+	   ret
+	 _foo:
+	   print "This is PASM subroutine "foo"
+	   ret
+	 .eom
 
 =head2 Macros
 
@@ -1161,6 +1230,24 @@ docs/imcc/calling_conventions.pod - definition of sub flags (:init etc)
 =back
 
 =head1 CHANGES
+
+0.1.1
+
+=over 4
+
+=item *
+
+Switch to x.y.z version number; many fixes will follow.
+
+=item *
+
+Added more examples.
+
+=item *
+
+Fixed some errors.
+
+=back
 
 0.1
 

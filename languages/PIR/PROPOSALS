@@ -43,17 +43,12 @@ extend PIR with non-features.
 	 consistent. An optional comma is kinda strange; either demand it,
 	 or not.
 	 
-3. PIR vs PASM registers
-		
-	 Since the new calling conventions/register allocation scheme (don't
-	 know when exactly), subs have as many registers as they need; no 
-	 spilling is needed anymore (IIUC). Therefore, the difference between
-	 PIR and PASM registers is not necessary anymore.
+3. :postcomp and :immediate
 	 
-	 Proposal: stick to 1 category of registers, either PIR or PASM.
-	 My preference is to stick with PIR registers, to make a difference
-	 with .local's or .sym's (which may not start with a '$').
+	 According to the documentation, both flags indicate the same
+	 behaviour. This is both unnecessary and unclear to new users.
 	 
+	 Proposal: deprecate one of these flags and remove it afterwards.
 	 
 4. Macro parameter list.
 
@@ -104,6 +99,24 @@ extend PIR with non-features.
 	 which line is being parsed/assembled. It'd be more consistent with respect to
 	 other PIR directives ('.include' etc.). The current spelling seems rather arbitrary.
 
+8. Parameter and argument flags
+
+	 :named without a parameter does not seem to work - ever.
+	 
+	 Proposal: require :named to take a parenthesized identifier.
+	 
+9. .lex + .local
+
+	 When declaring a .lexical like:
+	 
+	 .lex "a", b
+	 
+	 one also needs the declaration:
+	 
+	 .local pmc b
+	 
+	 Proposal: remove the need for .local declaration. Parsing the .lex declaration
+	 expands to including the .local declaration.
 
 
 NEW FEATURE PROPOSALS GO HERE:	 

@@ -199,7 +199,7 @@ but are not implemented. An example of this is the <code>.global</code> directiv
 </p>
 <hr />
 <h1><a name="version">VERSION</a></h1>
-<p>0.1</p>
+<p>0.1.1</p>
 <p>
 </p>
 <hr />
@@ -444,7 +444,7 @@ example:</p>
           .param int argc :optional
           .param int has_argc :optional
           .param num nParam
-          .param pmc argv :slurpy         
+          .param pmc argv :slurpy
           .param string sParam :named('foo')
           .param $P0 :named('bar')
           # body
@@ -549,7 +549,7 @@ Once the above lexical declaration is written, and given the following statement
   $P0 = $P1</pre>
 <li>
 <pre>
-  store_lex &quot;$a&quot;, $P1</pre>
+  store_lex &quot;i&quot;, $P1</pre>
 </ul>
 <p>Likewise, these two statements also have an identical effect:</p>
 <ul>
@@ -558,7 +558,7 @@ Once the above lexical declaration is written, and given the following statement
   $P1 = $P0</pre>
 <li>
 <pre>
-  $P1 = find_lex &quot;$a&quot;</pre>
+  $P1 = find_lex &quot;i&quot;</pre>
 </ul>
 <p>Instead of a register, one can also specify a local variable, like so:</p>
 <pre>
@@ -591,7 +591,7 @@ all subroutines without doing a global lookup. It is unclear whether this featur
 <pre>
         .const int answer = 42</pre>
 <p>defines an integer constant by name 'answer', giving it a value of 42.
-Note that the constant type and the value type should match, i.e. you cannot 
+Note that the constant type and the value type should match, i.e. you cannot
 assign a floating point number to an integer constant. The PIR parser will
 check for this.</p>
 <p>
@@ -728,7 +728,7 @@ Likewise, string concatenation (&quot;.&quot;) is only allowed on strings. These
     | target keylist &quot;=&quot; simple_expr
     | &quot;global&quot; string_constant &quot;=&quot; target
     | result_var_list &quot;=&quot; short_sub_call</pre>
-<p>NOTE: the definition of assignment statements is <strong>not</strong> complete yet. 
+<p>NOTE: the definition of assignment statements is <strong>not</strong> complete yet.
 As languages/PIR evolves, this will be completed.</p>
 <pre>
   keylist:
@@ -873,7 +873,7 @@ looks like this:</p>
         .invocant $P0
         .meth_call $P1
         .pcc_end</pre>
-<p>Passing parameters and retrieving return values is done like this:</p>
+<p>Passing arguments and retrieving return values is done like this:</p>
 <pre>
         .pcc_begin
         .arg 42
@@ -881,9 +881,32 @@ looks like this:</p>
         .local int res
         .result res
         .pcc_end</pre>
-<p>Parameters can take flags:</p>
+<p>Arguments can take flags as well. The following argument flags are defined:</p>
+<ul>
+<li>
+<pre>
+ :flat</pre>
+<p>Flatten the (aggregate) argument. This argument can only be of type <code>pmc</code>.</p>
+<li>
+<pre>
+ :named('x')</pre>
+<p>Pass the denoted argument into the named parameter that is denoted by 'x', like so:</p>
+<pre>
+ .param &lt;type&gt; &lt;identifier&gt; :named('x')</pre>
+</ul>
+<pre>
+        .local pmc arr
+        arr = new .Array
+        arr = 2
+        arr[0] = 42
+        arr[1] = 43
+        .pcc_begin
+        .arg arr :flat
+        .arg $I0 :named('intArg')
+        .pcc_call foo
+        .pcc_end</pre>
 <p>The Native Calling Interface (NCI) allows for calling C routines, in order to talk to the world
-outside of Parrot. Its syntax is a slight variation:</p>
+outside of Parrot. Its syntax is a slight variation; it uses <code>.nci_call</code> instead of <code>.pcc_call</code>.</p>
 <pre>
         .pcc_begin
         .nci_call $P0
@@ -907,10 +930,20 @@ Its simplest form is:</p>
 <p>Or a method call:</p>
 <pre>
         obj.'toString'() # call the method 'toString'
-        obj.x() # call the method whose name is stored in C&lt;x&gt;</pre>
+        obj.x() # call the method whose name is stored in 'x'.</pre>
 <p>IMCC also allows the &quot;-&gt;&quot; instead of a dot, to make it readable for C++ programmers:</p>
 <pre>
         obj-&gt;'toString'()</pre>
+<p>And of course, using the short version, passing arguments can be done as well, including all flags that were defined
+for the long version. The same example from the 'long subroutine invocation' is now shown in its short version:</p>
+<pre>
+        .local pmc arr
+        arr = new .Array
+        arr = 2
+        arr[0] = 42
+        arr[1] = 43
+        foo(arr :flat, $I0 :named('intArg'))</pre>
+<p>Please note that the short subroutine call does <strong>not</strong> allow for <code>NCI</code> calls.</p>
 <p>
 </p>
 <h2><a name="return_values_from_subroutines">Return values from subroutines</a></h2>
@@ -932,11 +965,15 @@ Its simplest form is:</p>
 <p>
 </p>
 <h3><a name="example_long_return_statement">Example long return statement</a></h3>
+<p>Returning values from a subroutine is in fact similar to passing arguments <em>to</em>
+a subroutine. Therefore, the same flags can be used:</p>
 <pre>
         .pcc_begin_return
-        .return 42
+        .return 42 :named('answer')
         .return $P0 :flat
         .pcc_end_return</pre>
+<p>In this example, the value <code>42</code> is passed into the return value that takes the named return value known by <code>'answer'</code>.
+The aggregate value in <code>$P0</code> is flattened, and each of its values is passed as a return value.</p>
 <p>
 </p>
 <h2><a name="short_return_statement">Short return statement</a></h2>
@@ -949,6 +986,9 @@ Its simplest form is:</p>
 <pre>
         <span class="operator">.</span><span class="keyword">return</span><span class="operator">(</span><span class="variable">myVar</span><span class="operator">,</span> <span class="string">"hello"</span><span class="operator">,</span> <span class="number">2.76</span><span class="operator">,</span> <span class="number">3.14</span><span class="operator">);</span>
 </pre>
+<p>Just as the return values in the <code>long return statement</code> could take flags, the <code>short return statement</code> may as well:</p>
+<pre>
+        .return(42 :named('answer'), $P0 :flat)</pre>
 <p>
 </p>
 <h2><a name="long_yield_statements">Long yield statements</a></h2>
@@ -960,6 +1000,9 @@ Its simplest form is:</p>
 <p>
 </p>
 <h3><a name="example_long_yield_statement">Example long yield statement</a></h3>
+<p>A <code>yield</code> statement works the same as a normal return value, except that the point where the subroutine
+was left is stored somewhere, so that the subroutine can be resumed from that point as soon as the subroutine
+is invoked again. Returning values is identical to <em>normal</em> return statements.</p>
 <pre>
         .sub foo
           .pcc_begin_yield
@@ -986,6 +1029,7 @@ Its simplest form is:</p>
 <p>
 </p>
 <h3><a name="example_short_yield_statement">Example short yield statement</a></h3>
+<p>Again, the short version is identical to the short version of the return statement as well.</p>
 <pre>
         .yield(&quot;hello&quot;, 42)</pre>
 <p>
@@ -1003,6 +1047,8 @@ Its simplest form is:</p>
 <pre>
         .local pmc results = foo()
         .return(results)</pre>
+<p>The call to <code>foo</code> can be considered a normal function call with respect to parameters: it can take the exact
+same format using argument flags.</p>
 <p>
 </p>
 <h2><a name="symbol_namespaces">Symbol namespaces</a></h2>
@@ -1032,6 +1078,8 @@ Its simplest form is:</p>
         42
         43
         42</pre>
+<p>Please note that it is <strong>not</strong> necessary to <em>pair</em> these statements; it is acceptable to open a <code>.namespace</code> without closing it.
+The scope of the <code>.namespace</code> is limited to the subroutine.</p>
 <p>
 </p>
 <h2><a name="emit_blocks">Emit blocks</a></h2>
@@ -1045,6 +1093,15 @@ Its simplest form is:</p>
 <h3><a name="example_emit_block">Example Emit block</a></h3>
 <p>An emit block only allows PASM instructions,
 not PIR instructions.</p>
+<pre>
+        .emit
+           set I0, 10
+           new P0, .Integer
+           ret
+         _foo:
+           print &quot;This is PASM subroutine &quot;foo&quot;
+           ret
+         .eom</pre>
 <p>
 </p>
 <h2><a name="macros">Macros</a></h2>
@@ -1248,6 +1305,18 @@ IMCC, indications of these would be appreciated as well.</p>
 </p>
 <hr />
 <h1><a name="changes">CHANGES</a></h1>
+<p>0.1.1</p>
+<ul>
+<li>
+<p>Switch to x.y.z version number; many fixes will follow.</p>
+</li>
+<li>
+<p>Added more examples.</p>
+</li>
+<li>
+<p>Fixed some errors.</p>
+</li>
+</ul>
 <p>0.1</p>
 <ul>
 <li>
