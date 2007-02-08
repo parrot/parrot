@@ -55,7 +55,6 @@ DEPS = \
 $(C_BUILTIN)/auto_execok.pir \
 $(C_BUILTIN)/auto_load.pir \
 $(C_BUILTIN)/cd.pir \
-$(C_BUILTIN)/close.pir \
 $(C_BUILTIN)/exec.pir \
 $(C_BUILTIN)/expr.pir \
 $(C_BUILTIN)/fconfigure.pir \
