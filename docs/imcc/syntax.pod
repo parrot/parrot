@@ -128,7 +128,7 @@ Inside double-quoted strings the following escape sequences are processed.
 
 =item encoding:charset:"string constant"
 
-Like above with an extra encoding attached to the string. For eample:
+Like above with an extra encoding attached to the string. For example:
 
   set S0, utf8:unicode:"«"
 
@@ -137,7 +137,7 @@ is done, specifically escape sequences are not honored.
 
 =item numeric constants
 
-B<0x> and B<0b> denote hex and binary constants.
+B<0x> and B<0b> denote hex and binary constants respectively.
 
 =back
 
@@ -434,6 +434,26 @@ B<&>, B<|> and B<~> are binary B<band>, B<bor> and B<bxor>.
 
 This generates either a keyed B<set> operation or B<substr var, var,
 var, 1> for string arguments and an integer key.
+
+=item <var> = <var> [ <key> ]
+
+where C<key> is:
+
+ <var1> .. <var2>
+
+returns a slice defined starting at C<var1> and ending at C<var2>.
+
+ .. <var2>
+
+returns a slice starting at the first element, and ending at C<var2>.
+
+ <var1> ..
+
+returns a slice starting at C<var1> to the end of the array.
+
+see src/pmc/slice.pmc
+and t/pmc/slice.t.
+
 
 =item <var> [ <var> ] = <var>
 
