@@ -96,6 +96,12 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     .local pmc past
 
+    $P0 = node['expression']
+    if null $P0 goto no_expression_1
+    past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+    goto handled_expression
+    no_expression_1:
+
     $P0 = node['DOUBLEQUOTE_STRING']
     if null $P0 goto no_DOUBLEQUOTE_STRING
     past = tree.'get'('past', $P0, 'Plumhead::Grammar::DOUBLEQUOTE_STRING')
@@ -116,11 +122,10 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     $P0 = node['adding_expression']
     if null $P0 goto no_adding_expression
-        .local pmc mult, past_mult, summand, summand_0, past_summand_0
+        .local pmc past_mult, summand, summand_0, past_summand_0
         summand = $P0['summand']
         if null summand goto no_summand
-            mult = $P0['multiplying_expression']
-            past_mult = tree.'get'('past', mult, 'Plumhead::Grammar::expression')
+            past_mult = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
             summand_0 = summand[0]
             .local string add_op, pirop
             pirop = 'n_add'
@@ -140,11 +145,10 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     $P0 = node['multiplying_expression']
     if null $P0 goto no_multiplying_expression
-        .local pmc unary, past_unary, multiplicand, multiplicand_0, past_multiplicand_0
+        .local pmc past_unary, multiplicand, multiplicand_0, past_multiplicand_0
         multiplicand = $P0['multiplicand']
         if null multiplicand goto no_multiplicand
-            unary = $P0['unary_expression']
-            past_unary = tree.'get'('past', unary, 'Plumhead::Grammar::expression')
+            past_unary = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
             multiplicand_0 = multiplicand[0]
             .local string mul_op, pirop
             pirop = 'n_mul'
@@ -169,13 +173,17 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
             $P2 = $P0['UNARY_MINUS']
             if null $P2 goto no_minus
                 past = new 'PAST::Op'
-                past.init( 'node' => $P1, 'name' => 'prefix:-' )
                 .local pmc cpast
                 cpast = tree.'get'('past', $P1, 'Plumhead::Grammar::expression')
-                past.push( cpast )
+                past.init( cpast, 'node' => $P0, 'name' => 'prefix:-' )
                 goto handled_expression
             no_minus:
-            past = tree.'get'('past', $P1, 'Plumhead::Grammar::expression')
+            $P2 = $P1['expression']
+            if null $P2 goto no_expression
+                past = tree.'get'('past', $P2, 'Plumhead::Grammar::expression')
+                goto handled_expression
+            no_expression:
+            past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
             goto handled_expression
     no_unary_expression:
 

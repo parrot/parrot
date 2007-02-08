@@ -13,6 +13,8 @@ token CODE_END                { \? \> }
 token DOUBLEQUOTE_STRING      { " <-["]>* " }
 token SINGLEQUOTE_STRING      { ' <-[']>* ' }
 token ECHO                    { e c h o }
+token PAREN_OPEN              { \( }
+token PAREN_CLOSE             { \) }
 
 token NUMBER                  { \d+ }
 
@@ -41,5 +43,5 @@ rule multiplicand      { <MUL_OP> <multiplying_expression> }
 
 rule unary_expression { <UNARY_MINUS>? <postfix_expression> }
 
-rule postfix_expression { <NUMBER> }
+rule postfix_expression { <NUMBER> | <?PAREN_OPEN> <expression> <?PAREN_CLOSE> }
 
