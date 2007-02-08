@@ -161,6 +161,7 @@ rule pir_instr {
     <local_decl>
   | <lexical_decl>
   | <const_def>
+  | <globalconst_def>
   | <conditional_stat>
   | <assignment_stat>
   | <open_namespace>
@@ -169,7 +170,7 @@ rule pir_instr {
   | <sub_invocation>
   | <macro_invocation>
   | <jump_stat>  
-  | <source_info>
+  | <source_info>  
 }
 
 rule macro_invocation {
@@ -217,8 +218,16 @@ rule global_def {
 ## Const definitions, a check is done for the constant type and
 ## the type of the constant value.
 ##
+
 rule const_def {
-  <'.const'>
+	<'.const'> <const_def_tail>
+}
+
+rule globalconst_def {
+	<'.globalconst'> <const_def_tail>
+}
+
+rule const_def_tail {  
   [ [ int <const_assign>
       [ <int_constant>    | <syntax_error: integer constant expected> ]
     ]
@@ -840,6 +849,7 @@ token pir_directive {
   | <'.endnamespace'>
   | <'.eom'>  
   | <'.get_results'>
+  | <'.globalconst'>
   | <'.global'>
   | <'.HLL_map'>
   | <'.HLL'>
