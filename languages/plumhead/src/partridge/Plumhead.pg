@@ -16,7 +16,7 @@ token ECHO                    { e c h o }
 token PAREN_OPEN              { \( }
 token PAREN_CLOSE             { \) }
 
-token NUMBER                  { \d+ }
+token NUMBER                  { \d+ ( . \d+ )? | . \d+ }
 
 token UNARY_MINUS             { \- }
 token UNARY_PLUS              { \+ }
