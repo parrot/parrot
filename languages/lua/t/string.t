@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 20;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.byte' );
@@ -106,16 +106,53 @@ pi = 3.1416
 <h1>a title</h1>
 OUTPUT
 
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.format %q' );
+print(string.format('%q', 'a string with "quotes" and \n new line'))
+CODE
+"a string with \"quotes\" and \
+ new line"
+OUTPUT
+
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (too many arg)' );
 print(string.format("%s %s", 1, 2, 3))
 CODE
 1 2
 OUTPUT
 
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (too few arg)' );
+print(string.format("%s %s", 1))
+CODE
+/string expected, got no value/
+OUTPUT
+
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (bad arg)' );
 print(string.format("%d", 'toto'))
 CODE
-/bad argument #(\d+|\?) to 'format'/
+/number expected, got string/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (invalid option)' );
+print(string.format("%k", 'toto'))
+CODE
+/invalid option '%k' to 'format'/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (invalid format)' );
+print(string.format("%------s", 'toto'))
+CODE
+/invalid format \(repeated flags\)/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (invalid format)' );
+print(string.format("pi = %.123f", math.pi))
+CODE
+/invalid format \(width or precision too long\)/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (invalid format)' );
+print(string.format("% 123s", 'toto'))
+CODE
+/invalid format \(width or precision too long\)/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.len' );

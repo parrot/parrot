@@ -73,7 +73,9 @@ L3:
     .param pmc arg
     $S0 = "no value"
     if_null arg, L0
-    $S0 = typeof arg
+    $S1 = typeof arg
+    if $S1 == 'Undef' goto L0
+    $S0 = $S1
     $I0 = isa arg, 'LuaNumber'
     unless $I0 goto L1
     .return (arg)
@@ -125,7 +127,9 @@ L2:
     .local pmc val
     $S0 = "no value"
     if_null arg, L0
-    $S0 = typeof arg
+    $S1 = typeof arg
+    if $S1 == 'Undef' goto L0
+    $S0 = $S1
     $I0 = isa arg, 'LuaString'
     unless $I0 goto L1
     val = arg

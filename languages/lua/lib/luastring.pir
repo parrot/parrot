@@ -344,31 +344,186 @@ written. For instance, the call
 will produce the string:
 
     "a string with \"quotes\" and \
-    new line"
+     new line"
 
 The options C<c>, C<d>, C<E>, C<e>, C<f>, C<g>, C<G>, C<i>, C<o>, C<u>, C<X>,
 and C<x> all expect a number as argument, whereas C<q> and C<s> expect a string.
 
 This function does not accept string values containing embedded zeros.
 
-STILL INCOMPLETE.
-
 =cut
 
 .sub '_string_format' :anon
     .param pmc formatstring :optional
     .param pmc argv :slurpy
+    .local string strfrmt
+    .local string b
+    .local int arg
+    .local int idx
+    strfrmt = checkstring(formatstring)
+    $I1 = length strfrmt
+    b = ''
+    arg = 0
+    new $P1, .Array
+    set $P1, 1
+    idx = 0
+L1:
+    unless idx < $I1 goto L2
+    $S0 = substr strfrmt, idx, 1
+    unless $S0 != '%' goto L3
+    b .= $S0
+    inc idx
+    goto L1
+L3:
+    inc idx
+    $S0 = substr strfrmt, idx, 1
+    unless $S0 == '%' goto L4
+    b .= $S0
+    inc idx
+L4:
+    .local string form
+    .local string buff
+    $P0 = argv[arg]
+    inc arg
+    (idx, form) = scanformat(strfrmt, idx)
+    $S0 = substr strfrmt, idx, 1
+    unless $S0 == 'c' goto L5
+    $I0 = checknumber($P0)
+    $P1[0] = $I0
+    buff = sprintf form, $P1
+    goto L6
+L5:
+    $I0 = index 'diouxX', $S0
+    unless $I0 >= 0 goto L7
+    $I0 = checknumber($P0)
+    $P1[0] = $I0
+    buff = sprintf form, $P1
+    goto L6
+L7:
+    $I0 = index 'eEfgG', $S0
+    unless $I0 >= 0 goto L8
+    $N0 = checknumber($P0)
+    $P1[0] = $N0
+    buff = sprintf form, $P1
+    goto L6
+L8:
+    unless $S0 == 'q' goto L9
+    $S0 = checkstring($P0)
+    buff = quoted($S0)
+    goto L6
+L9:
+    unless $S0 == 's' goto L10
+    buff = checkstring($P0)
+    $I0 = index form, '.'
+    if $I0 >= 0 goto L11
+    $I0 = length $S0
+    unless $I0 >= 100 goto L11
+    goto L6
+L11:
+    $P1[0] = $P0
+    buff = sprintf form, $P1
+    goto L6
+L10:
+    $S1 = "invalid option '%" . $S0
+    $S1 .= "' to 'format'"
+    error($S1)
+L6:
+    b .= buff
+    inc idx
+    goto L1
+L2:
     .local pmc ret
-    $S0 = checkstring(formatstring)
-    push_eh _handler
-    $S1 = sprintf $S0, argv
     new ret, .LuaString
-    set ret, $S1
+    set ret, b
     .return (ret)
-_handler:
-    error("bad argument #? to 'format'")
 .end
 
+.sub 'scanformat' :anon
+    .param string strfrmt
+    .param int start
+    .const string flags = '-+ #0'
+    .const string digits = '0123456789'
+    .local int idx
+    $I1 = length strfrmt
+    idx = start
+L1:
+    unless idx < $I1 goto L2
+    $S0 = substr strfrmt, idx, 1
+    $I0 = index flags, $S0
+    unless $I0 >= 0 goto L2
+    inc idx
+    goto L1
+L2:
+    $I0 = idx - start
+    unless $I0 > 5 goto L3
+    error("invalid format (repeated flags)")
+L3:
+    $S0 = substr strfrmt, idx, 1
+    $I0 = index digits, $S0
+    unless $I0 >= 0 goto L4
+    inc idx
+L4:
+    $S0 = substr strfrmt, idx, 1
+    $I0 = index digits, $S0
+    unless $I0 >= 0 goto L5
+    inc idx
+L5:
+    unless $S0 == '.' goto L6
+    inc idx
+    $S0 = substr strfrmt, idx, 1
+    $I0 = index digits, $S0
+    unless $I0 >= 0 goto L7
+    inc idx
+L7:
+    $S0 = substr strfrmt, idx, 1
+    $I0 = index digits, $S0
+    unless $I0 >= 0 goto L6
+    inc idx
+L6:
+    $S0 = substr strfrmt, idx, 1
+    $I0 = index digits, $S0
+    unless $I0 >= 0 goto L8
+    error("invalid format (width or precision too long)")
+L8:
+    .local string form
+    $I0 = idx - start
+    inc $I0
+    $S0 = substr strfrmt, start, $I0
+    form = '%' . $S0
+    .return (idx, form)
+.end
+
+.sub 'quoted' :anon
+    .param string s
+    .local string b
+    .local int idx
+    $I1 = length s
+    b = '"'
+    idx = 0
+L1:
+    unless idx < $I1 goto L2
+    $S0 = substr s, idx, 1
+    inc idx
+    $I0 = index "\"\\\n", $S0
+    unless $I0 >= 0 goto L3
+    b .= "\\"
+    b .= $S0
+    goto L1
+L3:
+    unless $S0 == "\r" goto L4
+    b .= "\\r"
+    goto L1
+L4:
+    unless $S0 == "\0" goto L5
+    b .= "\\000"
+    goto L1
+L5:
+    b .= $S0
+    goto L1
+L2:
+    b .= '"'
+    .return (b)
+.end
 
 =item C<string.gmatch (s, pattern)>
 

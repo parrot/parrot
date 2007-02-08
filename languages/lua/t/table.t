@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function concat' );
@@ -221,6 +221,33 @@ function pairsByKeys (t, f)
 end
 
 for name, line in pairsByKeys(lines) do
+    print(name, line)
+end
+CODE
+luaH_get	24
+luaH_present	48
+luaH_set	10
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function sort' );
+lines = {
+    luaH_set = 10,
+    luaH_get = 24,
+    luaH_present = 48,
+}
+
+function pairsByKeys (t, f)
+    local a = {}
+    for n in pairs(t) do a[#a + 1] = n end
+    table.sort(a, f)
+    local i = 0     -- iterator variable
+    return function ()  -- iterator function
+        i = i + 1
+        return a[i], t[a[i]]
+    end
+end
+
+for name, line in pairsByKeys(lines, function (a, b) return a < b end) do
     print(name, line)
 end
 CODE
