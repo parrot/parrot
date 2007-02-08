@@ -703,19 +703,17 @@ rule id_list {
 #
 
 token int_constant {
-    [-]? \d+
-  | <binary_constant>
+    <binary_constant>
   | <hex_constant>
+  | [-]? \d+
 }
 
-# FIXTHIS
-regex hex_constant {
-  \d+
+token hex_constant {
+  0x\d+
 }
 
-# FIXTHIS
-regex binary_constant {
-  \d+
+token binary_constant {
+  0b\d+
 }
 
 token float_constant {
@@ -724,10 +722,13 @@ token float_constant {
 
 
 rule string_constant {
-  <charset_specifier>? 
+	[ <encoding_specifier>? <charset_specifier> ]?
   [ <stringdouble> | <stringsingle> ]
 }
 
+rule encoding_specifier {
+	<'utf8:'>
+}
 
 rule charset_specifier {
   [ <'ascii:'> | <'binary:'> | <'unicode:'> | <'iso-8859-1:'> ]  
