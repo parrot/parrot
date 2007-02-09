@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 20;
 use Parrot::Test::PGE;
 
 =head1 NAME
@@ -103,6 +103,16 @@ p6rule_is( '{ balanced nested [ with ] and ( is } okay',          $PTB );
 p6rule_is( '{ a quoted "}" unbalanced right bracket} okay',       $PTB );
 p6rule_is( '{ quoted "}" unbalanced quotes (`}}}"""}}}}`)} okay', $PTB );
 
+## escaped bracket characters in regex, nesting not checked
+## There might be a better suited file for these tests
+p6rule_is( '{ opening at start of string', '^\{' );
+p6rule_is( 'opening { at end of string {', '\{$' );
+p6rule_is( '} closing at start of string', '^\}' );
+p6rule_is( 'closing } at end of string }', '\}$' );
+p6rule_is( '[ opening at start of string', '^\[' );
+p6rule_is( 'opening [ at end of string [', '\[$' );
+p6rule_is( '] closing at start of string', '^\]' );
+p6rule_is( 'closing ] at end of string ]', '\]$' );
 
 # Local Variables:
 #   mode: cperl
