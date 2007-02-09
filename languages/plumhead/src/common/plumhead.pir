@@ -14,7 +14,7 @@ Driver for three variants of PHP on Parrot.
 
 =head2 Plumhead partridge
 
-Parser PHP with the Parrot compiler tools. This is the default variant.
+Parse PHP with the Parrot compiler tools. This is the default variant.
 
 =head2 Plumhead phc
 
@@ -23,7 +23,7 @@ Run the PAST-pm with the help of TGE.
 
 =head2 Plumhead antlr3
 
-Parse PHP with Java Parser and TreeParser, generated from ANTLR3 grammars.
+Parse PHP with Java based parser and tree parser, generated from ANTLR3 grammars.
 
 =head1 SEE ALSO
 
@@ -91,10 +91,12 @@ VARIANT_PARTRIDGE:
     err_msg = 'Compiling and executing with partridge failed'
     $P0 = compreg 'Plumhead'
 
-    #.return $P0.'evalfiles'(php_source_fn, 'target' => 'parse' )
-    #.return $P0.'evalfiles'(php_source_fn, 'target' => 'past' )
+    .local string target
+    target = opt['target']
+    unless target goto got_no_target
+        .return $P0.'evalfiles'(php_source_fn, 'target' => target )
+    got_no_target:
     .return $P0.'evalfiles'( php_source_fn )
-    end
 
 VARIANT_PHC:
     err_msg = 'Creating XML-AST with phc failed'
@@ -173,7 +175,8 @@ FINISH:
     push getopts, 'r=s'
     push getopts, 'f=s'
     push getopts, 'C'
-    push getopts, 'variant=s'
+    push getopts, 'variant=s'          # switch between variants
+    push getopts, 'target=s'           # relevant for 'Plumhead partridge'
 
     .local pmc opt
     opt = getopts."get_options"(argv)
@@ -214,6 +217,7 @@ n_deb:
 .end
 
 .namespace [ 'Plumhead::Grammar' ]
+
 .include 'src/partridge/Plumhead_gen.pir'
 
 .include 'src/partridge/PlumheadPAST_gen.pir'
