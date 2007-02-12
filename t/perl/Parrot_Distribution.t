@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 30;
+use Test::More tests => 31;
 use File::Spec;
 
 =head1 NAME
@@ -72,6 +72,7 @@ for my $dir (@old_directory_list) {
     ok( $d->perl_source_file_with_name('ops2c.pl'), 'Perl source file (.pl)' );
     ok( $d->perl_source_file_with_name('Distribution.pm'), 'Perl source file (.pm)' );
     ok( $d->perl_source_file_with_name('perlcritic.t'), 'Perl source file (.t)' );
+    ok( !$d->perl_source_file_with_name('p5rx.t'), 'Not a Perl source file (.t)' );
 }
 
 
