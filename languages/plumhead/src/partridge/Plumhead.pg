@@ -5,7 +5,7 @@ grammar Plumhead::Grammar;
 # a PHP grammar
 # derived from on languages/abc/abc.pg
 
-token TOP         { <program> }
+token TOP                     { <program> }
 
 regex SEA                     { .* <?before: \<> }
 token CODE_START              { \< \? p h p }
@@ -23,25 +23,29 @@ token UNARY_PLUS              { \+ }
 token ADD_OP                  { \+ | \- }
 token MUL_OP                  { \* | / | % }
 
-token program     { ^ <SEA> <code> }
+token IF                      { if }
+token ELSE                    { else }
+token program                 { ^ <SEA> <code> }
 
-rule  code        { <?CODE_START> <statement>* <?CODE_END> }
+rule  code                    { <?CODE_START> <statement>* <?CODE_END> }
 
-rule statement    { <ECHO> <expression> ; }
+rule statement                { <ECHO> <expression> ;
+                              | <IF> <?PAREN_OPEN> <expression> <?PAREN_CLOSE> \{ <statement>* \}
+                              }
 
-token expression  { <DOUBLEQUOTE_STRING> | <SINGLEQUOTE_STRING> | <adding_expression> }
+token expression              { <DOUBLEQUOTE_STRING> | <SINGLEQUOTE_STRING> | <adding_expression> }
 
-# TODO: this gets precedence wrong
-rule adding_expression { <multiplying_expression> <summand>? }
+# TODO: this gets precedence  wrong
+rule adding_expression        { <multiplying_expression> <summand>? }
 
-rule summand           { <ADD_OP> <adding_expression> }
+rule summand                  { <ADD_OP> <adding_expression> }
 
-# TODO: this gets precedence wrong
-rule multiplying_expression  { <unary_expression> <multiplicand>? }
+# TODO: this gets precedence  wrong
+rule multiplying_expression   { <unary_expression> <multiplicand>? }
 
-rule multiplicand      { <MUL_OP> <multiplying_expression> }
+rule multiplicand             { <MUL_OP> <multiplying_expression> }
 
-rule unary_expression { <UNARY_MINUS>? <postfix_expression> }
+rule unary_expression         { <UNARY_MINUS>? <postfix_expression> }
 
-rule postfix_expression { <NUMBER> | <?PAREN_OPEN> <expression> <?PAREN_CLOSE> }
+rule postfix_expression       { <NUMBER> | <?PAREN_OPEN> <expression> <?PAREN_CLOSE> }
 
