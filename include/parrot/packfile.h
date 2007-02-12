@@ -258,7 +258,7 @@ typedef enum {
 } pbc_action_enum_t;
 
 PARROT_API void PackFile_fixup_subs(Interp *, pbc_action_enum_t, PMC *eval_pmc);
-void do_sub_pragmas(Interp *, struct PackFile_ByteCode *, int, PMC *eval_pmc);
+PARROT_API void do_sub_pragmas(Interp *, struct PackFile_ByteCode *, int, PMC *eval_pmc);
 /*
  * directory functions
  */
