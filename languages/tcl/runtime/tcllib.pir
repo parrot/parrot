@@ -274,6 +274,8 @@ env_loop_done:
 
   .local string slash
   slash = $P1['slash']
+  $P2 = $P1['slash']
+  set_root_global ['_tcl'], 'slash', $P2
 
   .local pmc tcl_library
   tcl_library = get_global '$tcl_library'

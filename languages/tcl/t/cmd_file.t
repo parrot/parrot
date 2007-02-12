@@ -8,20 +8,38 @@ __DATA__
 
 source lib/test_more.tcl
 
-plan 4
+plan 9
 
 # [file exists]
 eval_is {file exists} \
   {wrong # args: should be "file exists name"} \
-  {too few args}
+  {[file exists] too few args}
 
 eval_is {file exists foo bar} \
   {wrong # args: should be "file exists name"} \
-  {too many args}
+  {[file exists] too many args}
 
 # this should fail everywhere
-is [file exists :%:/bar] 0 {does not exist}
+is [file exists :%:/bar] 0 {[file exists] does not exist}
 
 # we really should create a file to test this, but since our "source" line
 # above means we have to have that path to this file..
-is [file exists lib/test_more.tcl] 1 {does exist}
+is [file exists lib/test_more.tcl] 1 {[file exists] does exist}
+
+# [file rootname]
+eval_is {file rootname} \
+  {wrong # args: should be "file rootname name"} \
+  {[file rootname] too few args}
+eval_is {file rootname foo bar} \
+  {wrong # args: should be "file rootname name"} \
+  {[file rootname] too many args}
+eval_is {file rootname file} \
+  {file} \
+  {[file rootname] filename only}
+eval_is {file rootname file.ext} \
+  {file} \
+  {[file rootname] filename with extension}
+eval_is {file rootname f..i.le.ext} \
+  {f..i.le} \
+  {[file rootname] filename with dots and extension}
+

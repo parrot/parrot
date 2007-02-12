@@ -85,7 +85,8 @@ few_args:
   if argc == 0 goto bad_args
 
   .local string dirsep
-  dirsep = '/' # RT#40730: should pull from parrot config.
+  $P1 = get_root_global ['_tcl'], 'slash'
+  dirsep = $P1
 
   .local string result
   result = ''
@@ -463,10 +464,36 @@ badargs:
   .return(0)
 .end
 
-# RT#40728: Stub for test parsing
 .sub 'rootname'
-  .param pmc argv
-  .return(0)
+    .param pmc argv
+    .local int argc
+
+    argc = elements argv
+    if argc != 1 goto bad_args
+
+    .local string filename
+    filename = argv[0]
+
+    $P0 = split '.', filename
+    $I0 = elements $P0
+    if $I0 == 1 goto done
+    $S0 = pop $P0
+
+    .local string separator
+    $P1 = get_root_global ['_tcl'], 'slash'
+    separator = $P1
+
+    $I0 = index $S0, separator
+    if $I0 != -1 goto done
+
+    join $S0, '.', $P0
+    .return($S0)
+
+done:
+    .return(filename)
+
+  bad_args:
+    tcl_error 'wrong # args: should be "file rootname name"'
 .end
 
 .sub 'extension'
