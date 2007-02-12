@@ -23,7 +23,7 @@ such as a file, keyboard, or text console. Streams are also called
 
 =over 4
 
-=item - Parrot I/O objects support both streams and network I/O. 
+=item - Parrot I/O objects support both streams and network I/O.
 
 =item - Parrot has both synchronous and asynchronous I/O operations.
 
