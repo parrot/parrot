@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More 'tests' => 55;
+use Test::More 'tests' => 57;
 use File::Spec::Functions qw(:ALL);
 
 =head1 NAME
@@ -55,7 +55,7 @@ is( $p->name_without_suffix(), $name,     'name_without_suffix' );
 is( $p, Parrot::IO::Path->new($tmpfile), 'instance cached' );
 my $oldp = $p;
 $p->delete();
-ok( !defined $p, 'delete undefines instance' );
+ok( !defined $p, 'delete undefined instance' );
 
 # This will not create the file on disk.
 $p = Parrot::IO::Path->new($tmpfile);
@@ -63,7 +63,7 @@ isnt( $oldp, $p, 'delete from cache' );
 
 is( $p->parent_path(), tmp_dir_path(), 'parent_path' );
 
-my $r = Parrot::IO::Path->new(rootdir);
+my $r = Parrot::IO::Path->new(rootdir());
 ok( !$r->parent_path(), 'root has no parent_path' );
 
 teardown();
@@ -72,6 +72,8 @@ BEGIN { use_ok('Parrot::IO::Directory') }
 BEGIN { use_ok('Parrot::IO::File') }
 
 $r = Parrot::IO::Directory->new(rootdir);
+ok( $r,            'new' );
+isa_ok( $r, 'Parrot::IO::Directory' );
 ok( !$r->parent(), 'root has no parent' );
 
 my $d = Parrot::IO::Directory->tmp_directory('t');
