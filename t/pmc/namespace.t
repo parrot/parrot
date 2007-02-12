@@ -24,6 +24,7 @@ Test the NameSpace PMC as described in PDD21.
 =cut
 
 
+# L<PDD21/Namespace PMC API/>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     new $P0, .NameSpace
@@ -34,6 +35,7 @@ ok 1 - $P0 = new .NameSpace
 OUT
 
 
+# L<PDD21/Namespace PMC API/=head4 Untyped Interface>
 pir_output_is( <<'CODE', <<'OUT', 'NameSpace does "hash"' );
 .sub 'test' :main
     new $P0, .NameSpace
@@ -48,6 +50,7 @@ ok 1 - NameSpace does "hash"
 OUT
 
 
+# L<PDD21//>
 pir_output_is( <<'CODE', <<'OUTPUT', "find_global bar" );
 .sub 'main' :main
     $P0 = find_global "bar"
