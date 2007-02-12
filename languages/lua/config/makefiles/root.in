@@ -43,6 +43,7 @@ LIB_PBCS = \
  $(LIBPATH)/luabasic.pbc \
  $(LIBPATH)/luacoroutine.pbc \
  $(LIBPATH)/luapackage.pbc \
+ $(LIBPATH)/luaregex.pbc \
  $(LIBPATH)/luastring.pbc \
  $(LIBPATH)/luatable.pbc \
  $(LIBPATH)/luamath.pbc \
@@ -103,6 +104,9 @@ $(LIBPATH)/luacoroutine.pbc: $(LIBPATH)/luacoroutine.pir
 
 $(LIBPATH)/luapackage.pbc: $(LIBPATH)/luapackage.pir
 	$(PARROT) --output=$(LIBPATH)/luapackage.pbc $(LIBPATH)/luapackage.pir
+
+$(LIBPATH)/luaregex.pbc: $(LIBPATH)/luaregex.pir
+	$(PARROT) --output=$(LIBPATH)/luaregex.pbc $(LIBPATH)/luaregex.pir
 
 $(LIBPATH)/luastring.pbc: $(LIBPATH)/luastring.pir
 	$(PARROT) --output=$(LIBPATH)/luastring.pbc $(LIBPATH)/luastring.pir

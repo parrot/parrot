@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -112,6 +112,11 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
     set $P1, '__index'
     _lua_mt_string[$P1] = _string
 
+
+    load_bytecode 'languages/lua/lib/luaregex.pbc'
+    $P0 = compreg 'PGE::LuaRegex'
+    global '_REGEX_COMP' = $P0
+
 .end
 
 
@@ -146,6 +151,7 @@ L1:
     unless $I3 > $I1 goto L2
     $I3 = $I1
 L2:
+    $S1 = substr $S1, $I3
     unless find goto L3
     if_null plain, L4
     $I0 = istrue plain
@@ -163,7 +169,6 @@ L6:
 L5:
     # do a plain search
     .local int idx
-    $S1 = substr $S1, $I3
     idx = index $S1, $S2
     if idx < 0 goto L7
     .local pmc start
@@ -178,19 +183,54 @@ L5:
     set end, $I0
     .return (start, end)
 L3:
-    .local int anchor
-    .local string s1
-    anchor = 0
-    $I0 = index $S2, '^'
-    unless $I0 == 0 goto L8
-    anchor = 1
-    $S2 = substr $S2, 1
+    .local pmc regex_comp
+    regex_comp = global '_REGEX_COMP'
+    .local pmc rulesub
+    rulesub = regex_comp($S2)
+    .local pmc match
+    match = rulesub($S1)
+    unless match goto L7
+    new $P0, .Array
+    .local pmc capts
+    capts = match.'get_array'()
+    if_null capts, L10
+    $I1 = capts
+    set $P0, $I1
+    $I0 = 0
+L9:
+    unless $I0 < $I1 goto L10
+    $P1 = capts[$I0]
+    $S0 = $P1
+    new $P2, .LuaString
+    set $P2, $S0
+    $P0[$I0] = $P2
+    inc $I0
+    goto L9
+L10:
+    unless find goto L8
+    .local pmc start
+    .local pmc end
+    new start, .LuaNumber
+    $I0 = match.'from'()
+    $I0 += $I3
+    inc $I0
+    set start, $I0
+    new end, .LuaNumber
+    $I0 = match.'to'()
+    $I0 += $I3
+    set end, $I0
+    .return (start, end, $P0 :flat)
 L8:
-    s1 = substr $S1, $I3
-    not_implemented()
+    if $P0 goto L11
+    .local pmc ret
+    $S0 = match.'text'()
+    new ret, .LuaString
+    set ret, $S0
+    .return (ret)
+L11:
+    .return ($P0 :flat)
 L7:
     # not found
-    .local pmc ret
     new ret, .LuaNil
     .return (ret)
 .end
@@ -317,7 +357,7 @@ that if C<plain> is given, then C<init> must be given as well.
 If the pattern has captures, then in a successful match the captured values
 are also returned, after the two indices.
 
-STILL INCOMPLETE (see str_find_aux).
+STILL INCOMPLETE (see F<languages/lua/lib/luaregex.pir>).
 
 =cut
 
@@ -550,7 +590,7 @@ table:
         t[k] = v
     end
 
-NOT YET IMPLEMENTED (see gmatch_aux).
+STILL INCOMPLETE (see F<languages/lua/lib/luaregex.pir>).
 
 =cut
 
@@ -559,9 +599,13 @@ NOT YET IMPLEMENTED (see gmatch_aux).
     .param pmc pattern :optional
     .local pmc ret
     checkstring(s)
-    checkstring(pattern)
+    $S2 = checkstring(pattern)
+    .local pmc regex_comp
+    regex_comp = global '_REGEX_COMP'
+    .local pmc rulesub
+    rulesub = regex_comp($S2)
+    .lex 'upvar_rulesub', rulesub
     .lex 'upvar_s', s
-    .lex 'upvar_pattern', pattern
     .const .Sub gmatch_aux = 'gmatch_aux'
     ret = newclosure gmatch_aux
     .return (ret)
@@ -569,11 +613,44 @@ NOT YET IMPLEMENTED (see gmatch_aux).
 
 .sub 'gmatch_aux' :anon :lex :outer(_string_gmatch)
     .local pmc s
-    .local pmc pattern
+    .local pmc rulesub
+    .local pmc match
     .local pmc ret
     s = find_lex 'upvar_s'
-    pattern = find_lex 'upvar_pattern'
-    not_implemented()
+    rulesub = find_lex 'upvar_rulesub'
+    $S1 = s
+    match = rulesub($S1)
+    unless match goto L1
+    $I0 = match.'to'()
+    $S1 = substr $S1, $I0
+    set s, $S1
+    .local pmc capts
+    capts = match.'get_array'()
+    if_null capts, L2
+    $I1 = capts
+    new $P0, .Array
+    set $P0, $I1
+    $I0 = 0
+L3:
+    unless $I0 < $I1 goto L4
+    $P1 = capts[$I0]
+    $S0 = $P1
+    new $P2, .LuaString
+    set $P2, $S0
+    $P0[$I0] = $P2
+    inc $I0
+    goto L3
+L4:
+    .return ($P0 :flat)
+L2:
+    $S0 = match.'text'()
+    new ret, .LuaString
+    set ret, $S0
+    .return (ret)
+L1:
+    .local pmc ret
+    new ret, .LuaNil
+    .return (ret)
 .end
 
 =item C<string.gsub (s, pat, repl [, n])>
@@ -660,7 +737,7 @@ returns B<nil>. If C<pattern> specifies no captures, then the whole match is
 returned. A third, optional numerical argument C<init> specifies where to
 start the search; its default value is 1 and may be negative.
 
-NOT YET IMPLEMENTED (see str_find_aux).
+STILL INCOMPLETE (see F<languages/lua/lib/luaregex.pir>).
 
 =cut
 

@@ -94,7 +94,7 @@ There are eight basic types in Lua, each of them is implemented by a PMC.
 
 =item * string F<languages/lua/pmc/luastring.pmc>
 
-=item * function F<languages/lua/pmc/luafunction.pmc> 
+=item * function F<languages/lua/pmc/luafunction.pmc>
 & F<languages/lua/pmc/luaclosure.pmc>
 
 =item * userdata F<languages/lua/pmc/luauserdata.pmc>
@@ -115,7 +115,7 @@ This type is I<the> data structure of the language.
 
 =back
 
-F<languages/lua/pmc/luaany.pmc> provides an abstract base class for all 
+F<languages/lua/pmc/luaany.pmc> provides an abstract base class for all
 Lua types.
 
 F<languages/lua/pmc/lua.pmc> is a singleton PMC what holds some static methods.
@@ -165,9 +165,11 @@ Lua 5.1 defines the following standard libraries:
 
 F<languages/lua/lib/luaaux.pir> is the equivalent of Auxiliary Library.
 
+F<languages/lua/lib/luaregex.pir> implements a regex compiler using PGE.
+
 =head2 TODO
 
-Except math library, all of these libraries are incomplete.
+Except math & table libraries, all of these libraries are incomplete.
 
 =head1 Next Milestones
 

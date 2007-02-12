@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 25;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.byte' );
@@ -94,6 +94,21 @@ nil
 7	11
 OUTPUT
 
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.find (with regex & captures)' );
+s = "hello world"
+print(string.find(s, "^h.ll."))
+print(string.find(s, "w.rld", 2))
+print(string.find(s, "W.rld"))
+print(string.find(s, "^(h.ll.)"))
+print(string.find(s, "^(h.)l(l.)"))
+CODE
+1	5
+7	11
+nil
+1	5	hello
+1	5	he	lo
+OUTPUT
+
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.format' );
 print(string.format("pi = %.4f", math.pi))
 d = 5; m = 11; y = 1990
@@ -155,6 +170,43 @@ CODE
 /invalid format \(width or precision too long\)/
 OUTPUT
 
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.gmatch' );
+s = "hello"
+for c in string.gmatch(s, "..") do
+    print(c)
+end
+for c1, c2 in string.gmatch(s, "(.)(.)") do
+    print(c1, c2)
+end
+CODE
+he
+ll
+h	e
+l	l
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.gmatch' );
+s = "hello world from Lua"
+for w in string.gmatch(s, "%a+") do
+    print(w)
+end
+CODE
+hello
+world
+from
+Lua
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.gmatch' );
+s = "from=world, to=Lua"
+for k, v in string.gmatch(s, "(%w+)=(%w+)") do
+    print(k, v)
+end
+CODE
+from	world
+to	Lua
+OUTPUT
+
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.len' );
 print(string.len(""))
 print(string.len("test"))
@@ -173,6 +225,25 @@ print(string.lower("TeSt"))
 CODE
 test
 test
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.match' );
+s = "hello world"
+print(string.match(s, "^hello"))
+print(string.match(s, "world", 2))
+print(string.match(s, "World"))
+print(string.match(s, "^(h.ll.)"))
+print(string.match(s, "^(h.)l(l.)"))
+date = "Today is 17/7/1990"
+d = string.match(date, "%d+/%d+/%d+")
+print(d)
+CODE
+hello
+world
+nil
+hello
+he	lo
+17/7/1990
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.rep' );
