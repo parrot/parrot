@@ -8,7 +8,7 @@ __DATA__
 
 source lib/test_more.tcl
 
-plan 9
+plan 9 ;# from outer space. (HAH!)
 
 # [file exists]
 eval_is {file exists} \
@@ -33,13 +33,12 @@ eval_is {file rootname} \
 eval_is {file rootname foo bar} \
   {wrong # args: should be "file rootname name"} \
   {[file rootname] too many args}
-eval_is {file rootname file} \
-  {file} \
-  {[file rootname] filename only}
-eval_is {file rootname file.ext} \
-  {file} \
-  {[file rootname] filename with extension}
-eval_is {file rootname f..i.le.ext} \
-  {f..i.le} \
-  {[file rootname] filename with dots and extension}
 
+is [file rootname file] file  \
+  {[file rootname] filename only}
+
+is [file rootname file.ext] file \
+  {[file rootname] filename with extension}
+
+is [file rootname f..i.le.ext] f..i.le \
+  {[file rootname] filename with dots and extension}
