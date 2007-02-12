@@ -228,16 +228,16 @@ rule globalconst_def {
 }
 
 rule const_def_tail {  
-  [ [ int <const_assign>
+  [ [ <'int'> <const_assign>
       [ <int_constant>    | <syntax_error: integer constant expected> ]
     ]
-  | [ num <const_assign>
+  | [ <'num'> <const_assign>
       [ <float_constant>  | <syntax_error: floating point constant expected> ]
     ]
-  | [ pmc <const_assign>
+  | [ [ <'pmc'> | <macro_id> | <id> ] <const_assign>
       [ <string_constant> | <syntax_error: string constant expected> ]
     ]
-  | [ string <const_assign>
+  | [ <'string'> <const_assign>
       [ <string_constant> | <syntax_error: string constant expected> ]
     ]
   | <syntax_error: type expected for constant>
@@ -255,13 +255,15 @@ rule const_assign {
 
 rule conditional_stat {
   [ <'if'> | <'unless'> ]
-  [ <'null'> <target>
-  | <simple_expr> [ <relational_operator> <simple_expr> ]?
-  ]
+  <conditional_expr>
   [ <'goto'> | <syntax_error: 'goto' expected> ]
   [ <id> | <pasm_instr> | <syntax_error: label identifier expected> ]
 }
 
+rule conditional_expr {
+		[ <'null'> <target> ]
+  | [ <simple_expr> [ <relational_operator> <simple_expr> ]? ]
+}
 
 ## Jump statements
 ##
@@ -693,7 +695,7 @@ rule namespace_id {
 }
 
 rule source_info {
-  <'.line'> <int_constant> [ \, <string_constant> ]?
+  <'.line'> <int_constant> [ <','> <string_constant> ]?
 }
 
 
@@ -753,9 +755,11 @@ rule type {
   | <'pmc'> 
   | <'object'>
   | <'string'>   
-  | <'Array'> 
-  | <'Hash'> 
+  
   ]
+  #| <'Array'> 
+  #| <'Hash'> 
+  
 }
 
 token target {
