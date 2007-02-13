@@ -101,12 +101,16 @@ print(string.find(s, "w.rld", 2))
 print(string.find(s, "W.rld"))
 print(string.find(s, "^(h.ll.)"))
 print(string.find(s, "^(h.)l(l.)"))
+s = "Deadline is 30/05/1999, firm"
+date = "%d%d/%d%d/%d%d%d%d"
+print(string.sub(s, string.find(s, date)))
 CODE
 1	5
 7	11
 nil
 1	5	hello
 1	5	he	lo
+30/05/1999
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.format' );
@@ -237,6 +241,12 @@ print(string.match(s, "^(h.)l(l.)"))
 date = "Today is 17/7/1990"
 d = string.match(date, "%d+/%d+/%d+")
 print(d)
+d, m, y = string.match(date, "(%d+)/(%d+)/(%d+)")
+print(d, m, y)
+print(string.match("The number 1298 is even", "%d+"))
+pair = "name = Anna"
+key, value = string.match(pair, "(%a+)%s*=%s*(%a+)")
+print(key, value)
 CODE
 hello
 world
@@ -244,6 +254,9 @@ nil
 hello
 he	lo
 17/7/1990
+17	7	1990
+1298
+name	Anna
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.rep' );
