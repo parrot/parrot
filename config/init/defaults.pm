@@ -189,9 +189,9 @@ sub runstep {
     );
 
     # add profiling if needed
-    # FIXME gcc syntax
+    # RT#41497 gcc syntax
     # we should have this in the hints files e.g. cc_profile
-    # FIXME move profiling to it's own step
+    # RT#41496 move profiling to it's own step
     if ( $conf->options->get('profile') ) {
         $conf->data->set(
             cc_debug => " -pg ",
