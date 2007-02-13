@@ -1,21 +1,58 @@
+# Copyright (C) 2007, The Perl Foundation.
 # $Id$
 
-This is a partial list of the folks with SVN commit access and the areas
-they're directly responsible for.  This does not list all the people with
-SVN commit access, just those who have an area they've taken responsibility
+This is a list of project roles, with a partial list of the folks who have
+taken responsibility for them.  This does not list all the people with
+SVN commit access, just those who have a role they've taken responsibility
 for.
 
-High-level architecture         Allison Randal
-Low-level arch                  Chip Salzenberg
-JIT x86                         Leopold Toetsch
-JIT ppc                         Leopold Toetsch
-JIT (others)                    ? <volunteer?>
-Configure                       Joshua Hoblitt
-Garbage Collector               ? <volunteer?>
-IMCC & PIR                      Leopold Toetsch, Vishal Soni
-Debian packaging                Florian Ragwitz
-Test suite                      Jerry Gay
-Bytecode format and loader      Jonathan Worthington
+See docs/roles_responsibilities.pod for role definitions, and
+languages/LANGUAGES.STATUS.pod for more language authors/maintainers.
 
-See also docs/roles_responsibilities.pod for role definitions,
-and languages/LANGUAGES.STATUS.pod for language authors/maintainers.
+
+Project Team
+------------
+
+Architect                       Allison Randal
+
+Pumpking                        Chip Salzenberg
+
+Release Manager                 Jerry Gay
+                                Patrick Michaud
+                                Matt Diephouse
+                                Will Coleda
+                                chromatic
+                                Allison Randal
+
+Metacommitter                   Allison Randal
+                                Chip Salzenberg
+                                Jerry Gay
+                                Jesse Vincent
+
+
+Committers
+----------
+
+Core Developer                  Leopold Toetsch (incl. JIT x86, ppc)
+                                Jonathan Worthington (bytecode format/loader)
+
+Compiler Developer              Leopold Toetsch (IMCC)
+                                Vishal Soni (BCG, IMCC)
+                                Patrick Michaud (PGE)
+
+High Level Language Developer   Patrick Michaud (Perl 6)
+                                Matt Diephouse (Tcl)
+                                Will Coleda (Tcl)
+
+Build Manager                   Joshua Hoblitt
+
+Lead Tester                     Jerry Gay
+
+Platform Porter                 Florian Ragwitz (Debian)
+
+
+Contributors
+------------
+
+See CREDITS.
+
