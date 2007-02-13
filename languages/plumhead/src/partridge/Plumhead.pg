@@ -30,8 +30,9 @@ token program                 { ^ <SEA> <code> }
 rule  code                    { <?CODE_START> <statement>* <?CODE_END> }
 
 rule statement                { <ECHO> <expression> ;
-                              | <IF> <?PAREN_OPEN> <expression> <?PAREN_CLOSE> \{ <statement>* \}
+                              | <IF> <?PAREN_OPEN> <expression> <?PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
                               }
+rule else_clause              { <?ELSE> \{ <statement>* \} }
 
 token expression              { <DOUBLEQUOTE_STRING> | <SINGLEQUOTE_STRING> | <adding_expression> }
 

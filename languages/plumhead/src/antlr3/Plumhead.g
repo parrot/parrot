@@ -95,7 +95,7 @@ statement
   : ECHO^ expression ';'! 
   | IF '(' relational_expression ')' '{' s1=statements '}'
     ( ELSE '{' s2=statements '}' -> ^( IF relational_expression ^( STMTS $s1 ) ^( STMTS $s2 ) )
-    |                           -> ^( IF relational_expression ^( STMTS $s1 ) )
+    |                            -> ^( IF relational_expression ^( STMTS $s1 ) )
     ) 
   | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] )
   | SCALAR ASSIGN_OP^ expression ';'!
