@@ -95,6 +95,7 @@ my @unified_testable_languages
           split( /\s*,\s*/, $languages_list )
           : 
           qw( APL
+              abc
               befunge
               bf
               cardinal

@@ -141,6 +141,7 @@ Implemented with the Parrot compiler tools PGE and TGE.
 Almost complete. 
 A former implementation in languages/bc has been
 removed in revision 16528.
+Part of languages smoke testing.
 
 =item Last verified with parrot version
 
