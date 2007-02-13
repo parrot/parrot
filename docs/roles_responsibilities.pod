@@ -87,6 +87,10 @@ Develops, maintains, and extends test suite and testing tools. Responsible
 for testing goals, including complete coverage of core components on targeted
 platforms.
 
+=head2 Platform Porter
+
+Develops and maintains installation packages on various platforms.
+
 =head1 Contributors
 
 Contributors are volunteers who write code or documentation patches, take
@@ -115,7 +119,7 @@ viewed as a good way to get familiar with parrot internals.
 
 =head1 STABILITY
 
-This document is 'Evolving.' It should 'Stable' before the next release.
+This document is 'Stable'. Changes must be approved by the Project Team.
 
 =head1 AUTHOR
 
