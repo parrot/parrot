@@ -200,7 +200,7 @@ sub runstep {
     }
 
     # adjust archname, cc and libs for e.g. --m=32
-    # TODO this is maybe gcc only
+    # RT#41499 this is maybe gcc only
     my $m        = $conf->options->get('m');
     my $archname = $Config{archname};
     if ($m) {
@@ -221,7 +221,7 @@ sub runstep {
         }
     }
 
-    # TODO adjust lib install-path /lib64 vs. lib
+    # RT#41500 adjust lib install-path /lib64 vs. lib
     # remember corrected archname - jit.pm was using $Config('archname')
     $conf->data->set( 'archname', $archname );
 
