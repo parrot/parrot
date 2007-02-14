@@ -17,6 +17,8 @@ running compilers from a command line.
     $P0 = newclass [ 'HLLCompiler' ]
     addattribute $P0, '$parsegrammar'
     addattribute $P0, '$astgrammar'
+    addattribute $P0, '$ostgrammar'
+    addattribute $P0, '@stages'
     addattribute $P0, '$!compsub'
 .end
 
@@ -34,6 +36,11 @@ by C<attrname> based on C<has_value>.
 .namespace [ 'HLLCompiler' ]
 
 .include 'cclass.pasm'
+
+.sub '__init' :method
+    $P0 = split ' ', 'parse past post pir run'
+    setattribute self, '@stages', $P0
+.end
 
 .sub 'attr' :method
     .param string attrname
@@ -73,6 +80,10 @@ Accessor for the C<parsegrammar> attribute.
 
 Accessor for the C<astgrammar> attribute.
 
+=item ostgrammar([string grammar])
+
+Accessor for the 'ostgrammar' attribute.
+
 =cut
 
 .sub 'parsegrammar' :method
@@ -88,6 +99,37 @@ Accessor for the C<astgrammar> attribute.
     .return self.'attr'('$astgrammar', value, has_value)
 .end
 
+.sub 'ostgrammar' :method
+    .param string value        :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('$ostgrammar', value, has_value)
+.end
+
+=item removestage([string stagename])
+
+Delete a stage from the compilation process queue.
+
+=cut
+
+.sub 'removestage' :method
+    .param string stagename    :optional
+    .param int has_stagename   :opt_flag
+
+    .local pmc stages, iter, newstages
+    stages = getattribute self, '@stages'
+    newstages = new .ResizableStringArray
+
+    iter = new .Iterator, stages
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc current
+    current = shift iter
+    if current == stagename goto iter_loop
+      push newstages, current
+    goto iter_loop
+  iter_end:
+    setattribute self, '@stages', newstages
+.end
 
 =item compile(pmc code [, "option" => value, ... ])
 
@@ -112,13 +154,19 @@ to get to an AST and compile it, otherwise throw an exception.
     target = adverbs['target']
     target = downcase target
 
-    .local pmc result
-    result = self.'parse'(source, adverbs :flat :named)
-    if target == 'parse' goto have_result
-    result = self.'ast'(result, adverbs :flat :named)
-    if target == 'past' goto have_result
-    $P0 = compreg 'PAST'
-    result = $P0.'compile'(result, adverbs :flat :named)
+    .local pmc stages, result, iter
+    result = source
+    stages = getattribute self, '@stages'
+    iter = new .Iterator, stages
+  iter_loop:
+    unless iter goto iter_end
+    .local string stagename
+    stagename = shift iter
+    result = self.stagename(result, adverbs :flat :named)
+    if target == stagename goto have_result
+    goto iter_loop
+  iter_end:
+
   have_result:
     .return (result)
 .end
@@ -166,7 +214,7 @@ resulting ast.
 
 =cut
 
-.sub 'ast' :method
+.sub 'past' :method
     .param pmc source
     .param pmc adverbs         :slurpy :named
     .local string astgrammar_name
@@ -443,6 +491,49 @@ based on double-colon separators.
     .param string name
     $P0 = split '::', name
     .return ($P0)
+.end
+
+=item ost(source [, adverbs :slurpy :named])
+
+Transform C<source> using the compiler's C<ostgrammar>
+according to any options given by C<adverbs>, and return the
+resulting ost.
+
+=cut
+
+.sub 'post' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+    .local string ostgrammar_name
+    .local pmc ostgrammar, ostbuilder
+    ostgrammar_name = self.'ostgrammar'()
+    unless ostgrammar_name goto default_ostgrammar
+    $I0 = find_type ostgrammar_name
+    ostgrammar = new $I0
+    ostbuilder = ostgrammar.'apply'(source)
+    .return ostbuilder.'get'('post')
+
+  default_ostgrammar:
+    $P0 = compreg 'PAST'
+    .return $P0.'compile'(source, adverbs :flat :named)
+.end
+
+.sub 'pir' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+
+    $P0 = compreg 'POST'
+    $P1 = $P0.'compile'(source, adverbs :flat :named)
+    .return ($P1)
+.end
+
+.sub 'run' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+
+    $P0 = compreg 'PIR'
+    $P1 = $P0(source)
+    .return ($P1)
 .end
 
 

@@ -3,6 +3,7 @@
 
 .sub main :main
     load_bytecode 'PAST-pm.pbc'
+    load_bytecode 'Parrot/HLLCompiler.pbc'
 
     .local pmc block
     block = new 'PAST::Block'
@@ -26,11 +27,15 @@
     $P1 = block.'push_new'('PAST::Op', $P0, 'name'=>'say')
 
     # compile to PIR and display
-    $S99 = block.'compile'('target'=>'pir')
+    .local pmc astcompiler
+    astcompiler = new 'HLLCompiler'
+    astcompiler.'removestage'('parse')
+    astcompiler.'removestage'('past')
+    $S99 = astcompiler.'compile'(block, 'target'=>'pir')
     print $S99
 
     #compile to bytecode and execute
-    $P99 = block.'compile'()
+    $P99 = astcompiler.'compile'(block)
     $P99()
 .end
 

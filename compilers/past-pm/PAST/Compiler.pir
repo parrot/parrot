@@ -37,21 +37,12 @@ to executable code (but not executed).
     .param pmc past
     .param pmc adverbs         :slurpy :named
 
-    .local string target
-    target = adverbs['target']
-    target = downcase target
-    if target == 'past' goto return_past
-    if target == 'parse' goto return_past
-
     .local pmc postgrammar, postbuilder, post
     postgrammar = new 'POST::Grammar'
     postbuilder = postgrammar.'apply'(past)
     post = postbuilder.'get'('root')
-    $P0 = compreg 'POST'
-    .return $P0.'compile'(post, adverbs :flat :named)
+    .return (post)
 
-  return_past:
-    .return (past)
 .end
 
 =back

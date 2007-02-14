@@ -38,12 +38,18 @@ pir_output_is( <<'CODE', <<'OUT', 'some of the auxiliary methods' );
     $P0.'astgrammar'('None::Grammar')
     $S1 = $P0.'astgrammar'()
     say $S1
+
+    $P0.'ostgrammar'('None::Grammar')
+    $S1 = $P0.'ostgrammar'()
+    say $S1
+
     end
 .end
 CODE
 None
 Module
 None::Parser
+None::Grammar
 None::Grammar
 OUT
 
