@@ -25,7 +25,8 @@ t/distro/file_metadata.t - verify file metadata matches expectations
 
 Makes sure that file metadata meets our expectations. For example, checks
 include 'all test files have "text/plain" mime-type',
-and 'all "text/plain" files have keyword expansion enabled'.
+and 'all "text/plain" files have keyword expansion enabled'.  Also checks
+that all "test/plain" files have their svn:eol-style set to 'native'.
 
 Note: These tests would benefit from judicial application of Iterators.
 
@@ -99,6 +100,40 @@ KEYWORD_EXP: {
 
 }    # KEYWORD_EXP
 
+## eol-style should be set to 'native' for any manifest files with an explicit
+## mime type of text/plain. Assume a default of text/plain if not specified
+
+EOL_STYLE: {
+
+    # we only want those files whose mime types that start with text/plain
+
+    my @plain_files;
+    foreach my $file ( keys %$mime_types ) {
+        if ( !defined( $mime_types->{$file} )
+            || $mime_types->{$file} =~ qr{^text/plain} )
+        {
+
+            push @plain_files, $file;
+        }
+    }
+
+    my $test     = 'svn:eol-style';
+    my $expected = 'native';
+    my $keywords = get_attribute( $test, @plain_files );
+
+    my @failed = verify_attributes( $test, $expected, 1, $keywords );
+
+    if (@failed) {
+        my $failure = join " ($expected)\n", @failed;
+        $failure = "\n" . $failure . " ($expected)\n";
+        is( $failure, "", $test );
+    }
+    else {
+        pass($test);
+    }
+
+}    # EOL_STYLE
+
 =for skip
 
 # When unskipped, rewrite to conform to other tests.
@@ -140,7 +175,7 @@ BEGIN {
     unless ( $Parrot::Revision::current or `svk ls .` ) {
         plan skip_all => 'not a working copy';
     }
-    else { plan tests => 2 }
+    else { plan tests => 3 }
 }
 
 exit;
