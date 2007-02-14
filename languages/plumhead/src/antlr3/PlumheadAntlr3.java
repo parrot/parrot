@@ -29,7 +29,7 @@ public class PlumheadAntlr3
     // Printing out PIR, that sets up PAST in PIR
     System.setOut( new PrintStream( new FileOutputStream( pirFn ) ) );
     CommonTreeNodeStream nodes = new CommonTreeNodeStream((Tree)antlrPast.tree);
-    GenPastPirTreeParser treeParser = new GenPastPirTreeParser(nodes);
+    GenPastPir treeParser = new GenPastPir(nodes);
     treeParser.gen_pir_past();
   }
 }
