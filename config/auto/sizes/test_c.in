@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
 	printf("\tfloatsize => %d,\n",		sizeof(float));
 	printf("\tdoublesize => %d,\n",		sizeof(double));
 	
-	printf(");");
+	printf(");\n");
 	
 	return 0;
 }

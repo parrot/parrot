@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 	printf("\thugeintval => '%s',\n", 	"@int8_t@");
 	printf("\thugeintvalsize => %d,\n",	sizeof(@int8_t@));
 
-	printf(");");
+	printf(");\n");
 	
 	return 0;
 }
