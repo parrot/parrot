@@ -97,7 +97,7 @@ LOOP:
 L1:
     $S0 = substr target, pos, 1
     if $S0 != delim goto L2
-    mob.'value'(literal)
+    mob.'result_object'(literal)
     mpos = pos
     .return (mob)
 L2:
@@ -111,7 +111,7 @@ L3:
     $S0 = substr target, pos, 1
     $I0 = index 'abfnrtv', $S0
     if $I0 < 0 goto L4
-    $S0 = substr "\x07\x08\f\n\r\t\x0b", $I0, 1
+    $S0 = substr "\a\b\f\n\r\t\x0b", $I0, 1
     goto CONCAT
 L4:
     $I0 = index "\n\r", $S0
@@ -201,7 +201,7 @@ L4:
     ($I0, $I1) = _skip_sep(target, pos, ']')
     if $I1 != sep goto L7
     pos = $I0 + 1
-    mob.'value'(literal)
+    mob.'result_object'(literal)
     mpos = pos
     goto END
 L7:
@@ -273,7 +273,7 @@ L4:
     ($I0, $I1) = _skip_sep(target, pos, ']')
     if $I1 != sep goto L7
     pos = $I0 + 1
-#    mob.'value'(literal)
+#    mob.'result_object'(literal)
     mpos = pos
     goto END
 L7:

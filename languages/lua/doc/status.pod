@@ -17,7 +17,13 @@ The reference manual is available on L<http://www.lua.org/manual/>.
 
 This implementation is aligned with Lua 5.1 specifications.
 
-=head1 Compiler
+=head1 PIR Compiler/Interpreter
+
+Work started in languages/lua/src.
+
+Not functional.
+
+=head1 Perl Compiler
 
 This compiler is written in Perl5 :
 
