@@ -4,14 +4,14 @@
 
 This is a regular expression/rules/grammar engine/parser designed to
 run in Parrot.  It's still a work in progress, but has a lot of
-nice features in it, including support for perl 6 regexes, globs, 
+nice features in it, including support for perl 6 regexes, globs,
 shift-reduce parsing, and some support for perl 5 regular expressions.
 It also includes the "pgc.pir" grammar compiler, which can convert
 an entire grammar specification into the appropriate PIR code
 for execution.
 
 A nice feature of PGE is that one can easily combine many
-different parsing styles into a single interface.  PGE uses 
+different parsing styles into a single interface.  PGE uses
 perl 6 rules for its top-down parsing, an operator precedence
 parser for bottom-up (shift/reduce) parsing, and allows control
 to pass freely between the two styles as well as to custom parsing
@@ -19,13 +19,13 @@ subroutines.
 
 =head1 Installation
 
-PGE assumes that it is part of the parrot distribution in the 
+PGE assumes that it is part of the parrot distribution in the
 F<compilers/pge> directory.   Simply type C<make> in this directory
 to build the various *.pbc files and install them into
-runtime/parrot/library.  
+runtime/parrot/library.
 
 The distribution comes with a small F<demo.pir> program that gives an
-example of using PGE.  To run the demo, simply do 
+example of using PGE.  To run the demo, simply do
 C<parrot demo.pir>.  The demo understands the following commands:
 
     rule pattern      - compile a Perl 6 rule from "pattern"
@@ -41,16 +41,16 @@ C<parrot demo.pir>.  The demo understands the following commands:
 Once PGE is compiled and installed, you generally load it using
 the load_bytecode operation, as in
 
-    load_bytecode 'PGE.pbc'          
+    load_bytecode 'PGE.pbc'
 
 This imports the PGE::P6Regex compiler, which can be used to compile
 strings of Perl 6 rules.  A sample compile sequence would be:
 
     .local pmc p6regex_compile
-    p6rule_compile = compreg 'PGE::P6Regex'         # get the compiler
+    p6regex_compile = compreg 'PGE::P6Regex'         # get the compiler
 
-    .local string pattern       
-    .local pmc rulesub                     
+    .local string pattern
+    .local pmc rulesub
     pattern = '^(From|Subject)\:'                  # pattern to compile
     rulesub = p6regex_compile(pattern)             # compile it to rulesub
 
@@ -72,12 +72,12 @@ of the match:
   match_loop:
     unless match goto match_fail                   # if match fails stop
     print "match succeeded\n"
-    _dumper(match)                      
+    _dumper(match)
     match.'next'()                                 # find the next match
     goto match_loop
 
   match_fail:
-    print "match failed\n"            
+    print "match failed\n"
 
 One can also get the intermediate PIR code that PGE generates for
 the rule subroutine -- just use
@@ -91,7 +91,7 @@ features.
 
 =head1 Known limitations of the rule engine
 
-PGE doesn't (yet) properly handle nested repetitions of zero-length 
+PGE doesn't (yet) properly handle nested repetitions of zero-length
 patterns in groups -- that's coming soon.
 
 Many well-known optimizations (e.g., Boyer-Moore) aren't
@@ -112,19 +112,19 @@ format, and a code generator.
 
 The parsers can be written using PIR subroutines or PGE's built-in
 operator precedence (shift/reduce) parser; the parser for Perl 6
-regexes is built with the operator precedence parser.  This parser 
-produces a parse tree (in the form of a Match object) for a given 
-Perl 6 regex.  The parse tree then goes through semantic analysis 
-and reduction phases before being sent to code generation to 
-produce a PIR subroutine.  
+regexes is built with the operator precedence parser.  This parser
+produces a parse tree (in the form of a Match object) for a given
+Perl 6 regex.  The parse tree then goes through semantic analysis
+and reduction phases before being sent to code generation to
+produce a PIR subroutine.
 
 The generated PIR code uses bsr/ret for its internal backtracking
-(optimized for tailcalls) and uses Parrot calling conventions for 
+(optimized for tailcalls) and uses Parrot calling conventions for
 all interfaces with external callers/callees such as subrules.
 
 PGE also uses Parrot coroutines for the matching
-engine, so that after a successful match is found, the 
-next match within the same string can be found by simply 
+engine, so that after a successful match is found, the
+next match within the same string can be found by simply
 returning control to the matching coroutine, which then
 picks up from where it had previously left off until
 another match is discovered.
