@@ -60,10 +60,12 @@ a Patrick Michaud PAST and runs the PAST.
     # pir = past_node_<xsl:value-of select="generate-id(.)" />.'compile'( 'target' => 'pir' )
     # print pir
                                                                   
-    .local pmc eval_past
-    eval_past = past_node_<xsl:value-of select="generate-id(.)" />.'compile'( )
+    .local pmc pastcompiler, eval_past
+    pastcompiler = new 'HLLCompiler'
+    pastcompiler.'removestage'('parse')
+    pastcompiler.'removestage'('past')
+    eval_past = pastcompiler.'compile'(past_node_<xsl:value-of select="generate-id(.)" />)
     eval_past()
-    # '_dumper'(eval, 'eval')
 
 .end                                                              
                                                                   
@@ -127,6 +129,7 @@ a Patrick Michaud PAST and runs the PAST.
 
   load_bytecode 'languages/plumhead/src/common/plumheadlib.pbc'
   load_bytecode 'PAST-pm.pbc'                                        
+  load_bytecode 'Parrot/HLLCompiler.pbc'
   load_bytecode 'MIME/Base64.pbc'              
   load_bytecode 'dumper.pbc'
   load_bytecode 'CGI/QueryHash.pbc'
