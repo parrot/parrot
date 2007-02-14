@@ -76,7 +76,7 @@ sub source_files {
         next if !( -e $filename );
 
         push @test_files, $filename
-            if ( $filename =~ m/\.(c|h|pod|pl)$/ );
+            if ( $filename =~ m/\.(c|h|pod|pl|pm)$/ );
     }
 
     return @test_files;
