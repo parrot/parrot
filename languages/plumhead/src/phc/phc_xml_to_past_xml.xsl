@@ -129,7 +129,7 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
 </xsl:template>
 
 <xsl:template match="phc:AST_variable[phc:AST_expr_list/phc:Token_string | phc:AST_expr_list/phc:Token_int]" >
-  <past:Var scope="keyed" >
+  <past:Var scope="keyed" viviself= ".Undef" islvalue="1" >
     <xsl:choose>
       <xsl:when test="phc:Token_variable_name/phc:value = '_GET' or phc:Token_variable_name/phc:value = '_POST'" >
         <past:Var scope="package" >
