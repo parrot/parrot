@@ -115,7 +115,7 @@ via the C<open> opcode.]
 
   $P0 = $P1.open()
   $P0 = $P1.open($S2)
-  $P0 = $P1.open($S2, $S2)
+  $P0 = $P1.open($S2, $S3)
 
 Opens a stream on an existing I/O stream object, and returns a status
 object. With no arguments, it can be used to reopen a previously opened
