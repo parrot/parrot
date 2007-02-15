@@ -23,6 +23,7 @@
 	.IMPORT( 'Test::More', 'is' )
 	.IMPORT( 'Test::More', 'diag' )
 	.IMPORT( 'Test::More', 'like' )
+	.IMPORT( 'Test::More', 'skip' )
 	.IMPORT( 'Test::More', 'is_deeply' )
 	.IMPORT( 'Test::Builder::Tester', 'plan' )
 	.IMPORT( 'Test::Builder::Tester', 'test_out' )
@@ -31,7 +32,7 @@
 	.IMPORT( 'Test::Builder::Tester', 'test_pass' )
 	.IMPORT( 'Test::Builder::Tester', 'test_test' )
 
-	plan( 43 )
+	plan( 47 )
 	test_ok()
 	test_is()
 	test_like()
@@ -341,4 +342,21 @@
 	test_out( 'ok 44 #skip skipping' )
     test.'skip'( 2, 'skipping' )
 	test_test( 'skip test should pass' )
+
+	test_out( 'ok 45 #skip skipped' )
+	skip( 1 )
+	test_test( 'skip(int)' )
+
+	test_out( 'ok 46 #skip jumping' )
+	skip( "jumping" )
+	test_test( 'skip(string)' )
+
+	test_out( 'ok 47 #skip lunch' )
+	test_out( 'ok 48 #skip lunch' )
+	skip( 2, "lunch" )
+	test_test( 'skip(int, string)' )
+
+	test_out( 'ok 49 #skip skipped' )
+	skip()
+	test_test( 'skip()' )
 .end

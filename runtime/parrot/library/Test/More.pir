@@ -737,6 +737,44 @@ optional test description in C<description>.
   done:
 .end
 
+=item C<skip( how_many, why )>
+
+Pass a number of tests, but with a comment that marks the test was
+actually skipped.  Arguments are optional.
+
+=cut
+
+.sub skip :multi(int, string)
+    .param int how_many
+    .param string description
+
+    .local pmc test
+    find_global test, 'Test::More', '_test'
+    test.'skip'(how_many, description)
+.end
+
+.sub skip :multi(int)
+    .param int how_many
+
+    .local pmc test
+    find_global test, 'Test::More', '_test'
+    test.'skip'(how_many)
+.end
+
+.sub skip :multi(string)
+    .param string description
+
+    .local pmc test
+    find_global test, 'Test::More', '_test'
+    test.'skip'(1, description)
+.end
+
+.sub skip :multi()
+    .local pmc test
+    find_global test, 'Test::More', '_test'
+    test.'skip'()
+.end
+
 .sub _make_diagnostic
     .param string received
     .param string expected
