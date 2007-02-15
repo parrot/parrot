@@ -1,4 +1,4 @@
-// $ANTLR 3.0b6 src/antlr3/GenPastPir.g 2007-02-14 22:26:29
+// $ANTLR 3.0b6 src/antlr3/GenPastPir.g 2007-02-15 23:40:32
 
   import java.util.regex.*;
 
@@ -10,31 +10,31 @@ import java.util.ArrayList;
 
 public class GenPastPir extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "NOQUOTE_STRING", "STMTS", "SEA", "CODE_START", "CODE_END", "WS", "DOUBLEQUOTE_STRING", "SINGLEQUOTE_STRING", "ECHO", "IDENT", "SCALAR", "ARRAY", "INTEGER", "NUMBER", "MINUS", "PLUS", "MUL_OP", "ASSIGN_OP", "REL_OP", "IF", "ELSE", "';'", "'('", "')'", "'{'", "'}'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "NOQUOTE_STRING", "STMTS", "ARRAY", "SEA", "CODE_START", "CODE_END", "WS", "DOUBLEQUOTE_STRING", "SINGLEQUOTE_STRING", "ECHO", "IDENT", "SCALAR", "INTEGER", "NUMBER", "MINUS", "PLUS", "MUL_OP", "ASSIGN_OP", "REL_OP", "IF", "ELSE", "';'", "'('", "')'", "'{'", "'}'", "'['", "']'"
     };
-    public static final int CODE_START=8;
+    public static final int CODE_START=9;
     public static final int MINUS=19;
-    public static final int ARRAY=16;
-    public static final int IDENT=14;
-    public static final int WS=10;
+    public static final int IDENT=15;
+    public static final int ARRAY=7;
+    public static final int WS=11;
     public static final int NUMBER=18;
-    public static final int SINGLEQUOTE_STRING=12;
+    public static final int SINGLEQUOTE_STRING=13;
     public static final int MUL_OP=21;
-    public static final int SEA=7;
-    public static final int CODE_END=9;
+    public static final int SEA=8;
+    public static final int CODE_END=10;
     public static final int STMTS=6;
     public static final int PROGRAM=4;
     public static final int ASSIGN_OP=22;
     public static final int INTEGER=17;
-    public static final int DOUBLEQUOTE_STRING=11;
-    public static final int ECHO=13;
+    public static final int DOUBLEQUOTE_STRING=12;
+    public static final int ECHO=14;
     public static final int ELSE=25;
     public static final int IF=24;
     public static final int EOF=-1;
     public static final int REL_OP=23;
     public static final int PLUS=20;
     public static final int NOQUOTE_STRING=5;
-    public static final int SCALAR=15;
+    public static final int SCALAR=16;
 
         public GenPastPir(TreeNodeStream input) {
             super(input);
@@ -145,7 +145,7 @@ public class GenPastPir extends TreeParser {
                     + "                                                                  \n"
                     + "  past_root.'push'( past_stmts )                                  \n"
                     + "                                                                  \n"
-                    + "    # '_dumper'(past_root, 'past')                                \n"
+                    + "    '_dumper'(past_root, 'past')                                \n"
                     + "    # '_dumper'(superglobal_POST , 'superglobal_POST')            \n"
                     + "    # '_dumper'(superglobal_GET , 'superglobal_GET')              \n"
                     + "                                                                  \n"
@@ -654,7 +654,7 @@ public class GenPastPir extends TreeParser {
  
 
     public static final BitSet FOLLOW_PROGRAM_in_gen_pir_past75 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_gen_pir_past77 = new BitSet(new long[]{0x0000000001FCB868L});
+    public static final BitSet FOLLOW_node_in_gen_pir_past77 = new BitSet(new long[]{0x0000000001FD7068L});
     public static final BitSet FOLLOW_ECHO_in_node109 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_node_in_node111 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_NOQUOTE_STRING_in_node126 = new BitSet(new long[]{0x0000000000000002L});
@@ -662,19 +662,19 @@ public class GenPastPir extends TreeParser {
     public static final BitSet FOLLOW_DOUBLEQUOTE_STRING_in_node150 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_NUMBER_in_node162 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_node186 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node198 = new BitSet(new long[]{0x0000000001FCB860L});
+    public static final BitSet FOLLOW_node_in_node198 = new BitSet(new long[]{0x0000000001FD7060L});
     public static final BitSet FOLLOW_node_in_node201 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_REL_OP_in_node224 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node226 = new BitSet(new long[]{0x0000000001FCB860L});
+    public static final BitSet FOLLOW_node_in_node226 = new BitSet(new long[]{0x0000000001FD7060L});
     public static final BitSet FOLLOW_node_in_node229 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_IF_in_node252 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node254 = new BitSet(new long[]{0x0000000001FCB860L});
-    public static final BitSet FOLLOW_node_in_node257 = new BitSet(new long[]{0x0000000001FCB868L});
+    public static final BitSet FOLLOW_node_in_node254 = new BitSet(new long[]{0x0000000001FD7060L});
+    public static final BitSet FOLLOW_node_in_node257 = new BitSet(new long[]{0x0000000001FD7068L});
     public static final BitSet FOLLOW_node_in_node260 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_STMTS_in_node284 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node286 = new BitSet(new long[]{0x0000000001FCB868L});
+    public static final BitSet FOLLOW_node_in_node286 = new BitSet(new long[]{0x0000000001FD7068L});
     public static final BitSet FOLLOW_ASSIGN_OP_in_node310 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_node_in_node312 = new BitSet(new long[]{0x0000000001FCB860L});
+    public static final BitSet FOLLOW_node_in_node312 = new BitSet(new long[]{0x0000000001FD7060L});
     public static final BitSet FOLLOW_node_in_node315 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_SCALAR_in_node330 = new BitSet(new long[]{0x0000000000000002L});
 

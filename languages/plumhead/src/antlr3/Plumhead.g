@@ -19,6 +19,7 @@ tokens
   PROGRAM;
   NOQUOTE_STRING;
   STMTS;
+  ARRAY;
 }
 
 @lexer::members
@@ -45,7 +46,6 @@ fragment
 IDENT   : { codeMode }?=> ( 'a'..'z' | 'A'..'Z' )( 'a'..'z' | 'A'..'Z' )*;
 
 SCALAR  : { codeMode }?=> '$' IDENT ;
-ARRAY   : { codeMode }?=> '@' IDENT ;
 
 fragment
 INTEGER : { codeMode }?=> ('0'..'9' )+ ;
@@ -99,13 +99,14 @@ statement
     ) 
   | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] )
   | SCALAR ASSIGN_OP^ expression ';'!
+  | s=SCALAR '[' key=expression ']' ASSIGN_OP val=expression ';' -> ^( ASSIGN_OP ^( ARRAY[$s] $key ) $val )
   ;
 
 expression
   : DOUBLEQUOTE_STRING
   | SINGLEQUOTE_STRING
   | adding_expression
-  | SCALAR
+  | SCALAR ( '[' expression ']' )?
   ;
 
 adding_expression

@@ -24,8 +24,18 @@ use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 use Parrot::Config (); 
 use Parrot::Test;
-use Test::More     tests => 4;
+use Test::More     tests => 5;
 
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'less than' );
+<?php
+$hello['world'] = 'hi';
+echo $hello['world'];
+echo "\n";
+?>
+END_CODE
+hi
+END_OUT
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_OUT', 'less than' );
 <?php
