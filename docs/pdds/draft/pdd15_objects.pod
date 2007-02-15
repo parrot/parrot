@@ -66,10 +66,9 @@ Properties are generally assigned at runtime, and a particular property may or
 may not exist on a PMC at any particular time. Properties are not restricted to
 objects as such--any PMC may have a property attached to it.
 
-=item Interface
+=head2 Interface
 
 An interface is a role that only adds methods.
-
 
 =head1 DESCRIPTION
 
