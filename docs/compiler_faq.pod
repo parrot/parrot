@@ -495,10 +495,10 @@ To build dynamic PMCs, add something like the following to your Makefile:
   PMC_FILES = MyInteger.pmc MyFloat.pmc MyString.pmc MyObject.pmc
 
   dynpmcs : $(PMC_FILES)
-      @cd $(PMCDIR) && $(BUILD) generate $(PMCS)
-      @cd $(PMCDIR) && $(BUILD) compile $(PMCS)
-      @cd $(PMCDIR) && $(BUILD) linklibs $(PMCS)
-      @cd $(PMCDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(PMCS)
+      @cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
+      @cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
+      @cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
+      @cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(DESTDIR)" $(PMCS)
 
 =head2 How do I add another op to Parrot?
 
