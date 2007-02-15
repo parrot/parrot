@@ -105,15 +105,14 @@ Accessor for the 'ostgrammar' attribute.
     .return self.'attr'('$ostgrammar', value, has_value)
 .end
 
-=item removestage([string stagename])
+=item removestage(string stagename)
 
 Delete a stage from the compilation process queue.
 
 =cut
 
 .sub 'removestage' :method
-    .param string stagename    :optional
-    .param int has_stagename   :opt_flag
+    .param string stagename
 
     .local pmc stages, iter, newstages
     stages = getattribute self, '@stages'
@@ -129,6 +128,67 @@ Delete a stage from the compilation process queue.
     goto iter_loop
   iter_end:
     setattribute self, '@stages', newstages
+.end
+
+=item addstage(string stagename [, "option" => value, ... ])
+
+Add a stage to the compilation process queue. Takes either a "before" or
+"after" named argument, which gives the relative ordering of the stage
+to be added. If "before" and "after" aren't specified, the new stage is
+inserted at the end of the queue.
+
+=cut
+
+.sub 'addstage' :method
+    .param string stagename
+    .param pmc adverbs         :slurpy :named
+
+    .local string position, target
+    .local pmc stages
+    stages = getattribute self, '@stages'
+
+    $I0 = exists adverbs['before']
+    unless $I0 goto next_test
+      position = 'before'
+      target = adverbs['before']
+    goto positional_insert
+
+  next_test:
+    $I0 = exists adverbs['after']
+    unless $I0 goto simple_insert
+      position = 'after'
+      target = adverbs['after']
+
+  positional_insert:
+    .local pmc iter, newstages
+    newstages = new .ResizableStringArray
+
+    iter = new .Iterator, stages
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc current
+    current = shift iter
+    unless current == target goto no_insert_before
+      unless position == 'before' goto no_insert_before
+        push newstages, stagename
+    no_insert_before:
+
+    push newstages, current
+
+    unless current == target goto no_insert_after
+      unless position == 'after' goto no_insert_after
+        push newstages, stagename
+    no_insert_after:
+
+    goto iter_loop
+  iter_end:
+    setattribute self, '@stages', newstages
+    goto done
+
+  simple_insert:
+    push stages, stagename
+  done:
+
 .end
 
 =item compile(pmc code [, "option" => value, ... ])
