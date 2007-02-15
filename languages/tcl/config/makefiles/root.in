@@ -31,7 +31,8 @@ PMCS = \
  tclfloat \
  tcllist \
  tclarray \
- tcldict
+ tcldict \
+ tclproc
 
 GENERATED_INLINES = \
  $(C_BUILTIN)/break.pir \

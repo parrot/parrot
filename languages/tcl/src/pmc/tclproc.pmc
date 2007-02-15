@@ -1,0 +1,23 @@
+/* TclProc.pmc
+ *  Copyright (C) 2007 The Perl Foundation.
+ *     $Id: /parrot/offline/languages/tcl/src/pmc/tclstring.pmc 3620 2007-01-14T05:00:14.970516Z coke  $
+ */
+
+#include "parrot/parrot.h"
+
+pmclass TclProc
+    dynpmc
+    extends Sub
+    group   tcl_group
+    hll     Tcl
+    maps    Sub
+{
+
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
