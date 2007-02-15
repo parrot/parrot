@@ -21,7 +21,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '' );
 
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -33,7 +33,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -43,7 +43,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '' );
 
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -53,6 +53,6 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '' );
 
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT

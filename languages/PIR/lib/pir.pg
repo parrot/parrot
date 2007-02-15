@@ -1,4 +1,4 @@
-grammar PIRGrammar;
+grammar PIR::Grammar;
 
 # TO DO:
 # 1. fix Heredocs parsing

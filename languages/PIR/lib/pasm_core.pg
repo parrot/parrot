@@ -1,4 +1,4 @@
-grammar PIRGrammar;
+grammar PIR::Grammar;
   
   
 rule core_op {

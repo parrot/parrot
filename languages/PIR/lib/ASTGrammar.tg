@@ -10,21 +10,21 @@ transform past (ROOT) :language('PIR') {
     .local pmc past
 		past = new 'PAST::Block'
 		#past.'init'('node'=>node)
-		past.'init'('node'=>node, 'name'=>'anon')            
+		past.'init'('node'=>node, 'blocktype'=>'immediate', 'name'=>'anon')            
         
     .local pmc childnode, childpast
     childnode = node['program']
-    childpast = tree.'get'('past', childnode, 'PIRGrammar::program')
+    childpast = tree.'get'('past', childnode, 'PIR::Grammar::program')
 		past.'push'(childpast)    
     .return (past)  
     #.return (childpast)
 }
 
-# past (PIRGrammar::program)
+# past (PIR::Grammar::program)
 #
 # Store each of the compilation units into a PAST::Stmts node.
 #
-transform past (PIRGrammar::program) :language('PIR') {
+transform past (PIR::Grammar::program) :language('PIR') {
     .local pmc past
     past = new 'PAST::Stmts'
     past.'init'('node'=>node)
@@ -37,53 +37,53 @@ transform past (PIRGrammar::program) :language('PIR') {
     unless iter goto iter_end
     .local pmc cnode, cpast
     cnode = shift iter
-    cpast = tree.'get'('past', cnode, 'PIRGrammar::compilation_unit')
+    cpast = tree.'get'('past', cnode, 'PIR::Grammar::compilation_unit')
     past.'push'(cpast)
     goto iter_loop
   iter_end:
     .return (past)
 }
 
-# past (PIRGrammar::compilation_unit)
+# past (PIR::Grammar::compilation_unit)
 #
 # Call the appropiate transform rule depending on the type of compilation unit.
 #
-transform past (PIRGrammar::compilation_unit) :language('PIR') {
+transform past (PIR::Grammar::compilation_unit) :language('PIR') {
   global_def:
     $P0 = node['global_def']
     if null $P0 goto sub_def
-    .return tree.'get'('past', $P0, 'PIRGrammar::global_def')
+    .return tree.'get'('past', $P0, 'PIR::Grammar::global_def')
   sub_def:
     $P0 = node['sub_def']
     if null $P0 goto const_def
-    .return tree.'get'('past', $P0, 'PIRGrammar::sub_def')
+    .return tree.'get'('past', $P0, 'PIR::Grammar::sub_def')
   const_def:
     $P0 = node['const_def']
     if null $P0 goto macro_def
-    .return tree.'get'('past', $P0, 'PIRGrammar::const_def')
+    .return tree.'get'('past', $P0, 'PIR::Grammar::const_def')
   macro_def:
     $P0 = node['macro_def']
     if null $P0 goto pragma
-    .return tree.'get'('past', $P0, 'PIRGrammar::macro_def')
+    .return tree.'get'('past', $P0, 'PIR::Grammar::macro_def')
   pragma:
   	$P0 = node['pragma']
     if null $P0 goto emit
-    .return tree.'get'('past', $P0, 'PIRGrammar::pragma')
+    .return tree.'get'('past', $P0, 'PIR::Grammar::pragma')
   emit:  
     $P0 = node['emit']
     if null $P0 goto const_def
-    .return tree.'get'('past', $P0, 'PIRGrammar::emit') 
+    .return tree.'get'('past', $P0, 'PIR::Grammar::emit') 
 }
 
-transform past (PIRGrammar::global_def) :language('PIR') {
+transform past (PIR::Grammar::global_def) :language('PIR') {
 
 }
 
-# past (PIRGrammar::sub_def)
+# past (PIR::Grammar::sub_def)
 #
 # Transform a sub_def into a PAST::Block node.
 #
-transform past (PIRGrammar::sub_def) :language('PIR') {		
+transform past (PIR::Grammar::sub_def) :language('PIR') {		
 		
 		.local pmc past
   	past = new 'PAST::Block'
@@ -95,22 +95,22 @@ transform past (PIRGrammar::sub_def) :language('PIR') {
     .local pmc pnode, pragma
     pnode = node['sub_pragmas']
     if null pnode goto skip_pragma
- 		pragma = tree.'get'('past', pnode, 'PIRGrammar::sub_pragma') 		
+ 		pragma = tree.'get'('past', pnode, 'PIR::Grammar::sub_pragma') 		
     past.'pragma'(pragma)
   skip_pragma:
     
     .local pmc child           
     $P1 = node['body']
-    child = tree.'get'('past', $P1, 'PIRGrammar::body')
+    child = tree.'get'('past', $P1, 'PIR::Grammar::body')
     past.'push'(child)
     .return (past)
 }
 
-#transform past (PIRGrammar::sub_pragmas) {
+#transform past (PIR::Grammar::sub_pragmas) {
 #		
 #}
 
-transform past (PIRGrammar::sub_pragma) {
+transform past (PIR::Grammar::sub_pragma) {
 		.local pmc past		
 		past = node[':main'] ### mmm why does *this* work for all pragmas??
 		if null past goto skip
@@ -119,7 +119,7 @@ transform past (PIRGrammar::sub_pragma) {
 		.return ()
 }
 
-transform past (PIRGrammar::const_def) :language('PIR') {
+transform past (PIR::Grammar::const_def) :language('PIR') {
 	.local pmc past
 	past = new 'PASM::Op'
 	# FIX:
@@ -127,56 +127,87 @@ transform past (PIRGrammar::const_def) :language('PIR') {
 	.return (past)
 }
 
-transform past (PIRGrammar::macro_def) :language('PIR') {
+transform past (PIR::Grammar::macro_def) :language('PIR') {
 
 }
 
-transform past (PIRGrammar::pragma) :language('PIR') {
+transform past (PIR::Grammar::pragma) :language('PIR') {
 		.local pmc past
 		
 	include_pragma:
-		$P0 = node['.include']
+		$P0 = node['include']
 		if null $P0 goto n_op_pragma
-		past = new 'PASM::Op'	
-		past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'.include')	
-		.return (past)
+		#past = new 'PAST::Op'	
+		#past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'.include')	
+		.return tree.'get'('past', $P0, 'PIR::Grammar::include')
+		#.return (past)
 	n_op_pragma:
+		$P0 = node['new_operators']
 		if null $P0 goto loadlib_pragma
-		past = new 'PASM::Op'	
+		past = new 'PAST::Op'	
 		past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'.include')	
 		.return (past)
 	loadlib_pragma:
+		$P0 = node['loadlib']
 		if null $P0 goto namespace_pragma
-		past = new 'PASM::Op'	
+		past = new 'PAST::Op'	
 		past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'.include')	
 		.return (past)
 	namespace_pragma:
+		$P0 = node['namespace']
 		if null $P0 goto hll_map_pragma
-		past = new 'PASM::Op'	
+		past = new 'PAST::Op'	
 		past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'.include')	
 		.return (past)
 	hll_map_pragma:
+		$P0 = node['hll_mapping']
 		if null $P0 goto hll_spec_pragma
-		past = new 'PASM::Op'	
+		past = new 'PAST::Op'	
 		past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'.include')	
 		.return (past)
 	hll_spec_pragma:
+		$P0 = node['hll_specifier']
 		if null $P0 goto source_pragma
-		past = new 'PASM::Op'	
+		past = new 'PAST::Op'	
 		past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'.include')	
 		.return (past)
 	source_pragma:
+		$P0 = node['source_info']
 		if null $P0 goto unknown
-		past = new 'PASM::Op'	
+		past = new 'PAST::Op'	
 		past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'.include')	
 		.return (past)
+	
 	unknown:
 		printerr "unknown pragma in tree transformation\n"
+		.local pmc iter, obj
+		iter = new .Iterator, node
+	loop:		
+		unless iter goto endloop
+		obj = shift iter
+		printerr obj	
+		printerr "\n"
+		goto loop
+	endloop:	
+		
 		end
 	
 }
 
-transform past (PIRGrammar::emit) :language('PIR') {
+transform past (PIR::Grammar::include) :language('PIR') {
+		.local pmc past
+		
+		.local pmc strn, strp
+		strn = node['string_constant']
+		strp = tree.'get'('past', strn, 'PIR::Grammar::string_constant')
+				
+		past = new 'PAST::Op'
+		past.'init'('node'=>node, 'pasttype'=>'inline', 'inline'=>".include %0")
+		past.'push'(strp)
+		.return (past)
+}
+
+transform past (PIR::Grammar::emit) :language('PIR') {
 		.local pmc past, startop, endop
 		past = new 'PAST::Block'
 		past.'init'('node'=>node)
@@ -193,11 +224,11 @@ transform past (PIRGrammar::emit) :language('PIR') {
 }
 
 
-# past (PIRGrammar::body)
+# past (PIR::Grammar::body)
 #
 # Store each of the instructions in a body node in a PAST::Stmts node.
 #
-transform past (PIRGrammar::body) :language('PIR') {		
+transform past (PIR::Grammar::body) :language('PIR') {		
     .local pmc past
     past = new 'PAST::Stmts'
     past.'init'('node'=>node)		
@@ -212,7 +243,7 @@ transform past (PIRGrammar::body) :language('PIR') {
   iter_param_loop:
   	unless iter goto iter_param_end
   	cnode = shift iter
-    cpast = tree.'get'('past', cnode, 'PIRGrammar::param_decl')
+    cpast = tree.'get'('past', cnode, 'PIR::Grammar::param_decl')
     past.'push'(cpast)
     goto iter_param_loop
   iter_param_end:  
@@ -225,58 +256,68 @@ transform past (PIRGrammar::body) :language('PIR') {
     unless iter goto iter_instr_end
     
     cnode = shift iter
-    cpast = tree.'get'('past', cnode, 'PIRGrammar::labeled_pir_instr')
+    cpast = tree.'get'('past', cnode, 'PIR::Grammar::labeled_pir_instr')
     past.'push'(cpast)
     goto iter_instr_loop
   iter_instr_end:
     .return (past)	
 }
 
-transform past (PIRGrammar::param_decl) :language('PIR') {
-		.local pmc past, name
-		past = new 'PAST::Var'
-		name = node['id']
-		unless null name goto done			
-		name = node['reg']		
-	done:
+transform past (PIR::Grammar::param_decl) :language('PIR') {
+		.local pmc past
+		past = new 'PAST::Op'
 		
-		past.'init'('node'=>node, 'scope'=>'parameter', 'name'=>name)	
+		$P0 = node['id']		
+		if null $P0 goto get_reg
+		.local pmc idpast, typepast, typenode
+		idpast = tree.'get'('past', $P0, 'PIR::Grammar::id')
+		typenode = node['type']
+		typepast = tree.'get'('past', typenode, 'PIR::Grammar::type')
+		
+		past.'init'('node'=>node, 'pasttype'=>'inline', 'inline'=>".param %0 %1")	
+		past.'push'(typepast)
+		past.'push'(idpast)
+		goto done
+		
+	get_reg:		
+		.local pmc regnode, regpast
+		regnode = node['reg']		
+		regpast = tree.'get'('past', regnode, 'PIR::Grammar::reg')		
+		past.'init'('node'=>node, 'pasttype'=>'inline', 'inline'=>".param %0")	
+		past.'push'(regpast)
+		
+	done:					
 		.return (past)
 }
 
   
-transform past (PIRGrammar::local_decl) :language('PIR') {
+transform past (PIR::Grammar::local_decl) :language('PIR') {
 		.local pmc past, cnode
 		past = new 'PAST::Op'
 		$P0 = node['type']
-		cnode = tree.'get'('past', $P0, 'PIRGrammar::type')
+		cnode = tree.'get'('past', $P0, 'PIR::Grammar::type')
 		past.'push'(cnode)
 		past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'.local')
 		.return (past)	
 }
 
-transform past (PIRGrammar::type) :language('PIR') {
-		.local pmc past
-		past = new 'PAST::Val'				
-	 	past.'init'('node'=>node, 'vtype'=>'.String', 'ctype'=>'s')
-		.return (past)
-}
 
-transform past (PIRGrammar::lexical_decl) :language('PIR') {
+
+transform past (PIR::Grammar::lexical_decl) :language('PIR') {
 		.local pmc past
 		past = new 'PAST::Op'
 		past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'.lex')
 		.return (past)	
 }
 
-transform past (PIRGrammar::const_def) :language('PIR') {
+transform past (PIR::Grammar::const_def) :language('PIR') {
 		.local pmc past
 		past = new 'PAST::Op'
 		past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'.const')
 		.return (past)	
 }
 
-transform past (PIRGrammar::assignment_stat) :language('PIR') {
+transform past (PIR::Grammar::assignment_stat) :language('PIR') {
 		.local pmc past, lhs
 		past = new 'PAST::Var'
 		lhs = node['target']
@@ -287,21 +328,21 @@ transform past (PIRGrammar::assignment_stat) :language('PIR') {
 	others:
 }
 
-transform past (PIRGrammar::open_namespace) :language('PIR') {
+transform past (PIR::Grammar::open_namespace) :language('PIR') {
 		.local pmc past	
 		past = new 'PAST::Op'	
 		past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'.namespace')		
 		.return (past)
 }
 
-transform past (PIRGrammar::close_namespace) :language('PIR') {
+transform past (PIR::Grammar::close_namespace) :language('PIR') {
 		.local pmc past
 		past = new 'PAST::Op'
 		past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'.endnamespace')	
 		.return (past)
 }
   
-transform past (PIRGrammar::return_stat) :language('PIR') {
+transform past (PIR::Grammar::return_stat) :language('PIR') {
 		.local pmc past, begin_ret, end_ret
 		past = new 'PAST::Stmts'
 		
@@ -315,7 +356,7 @@ transform past (PIRGrammar::return_stat) :language('PIR') {
 		.return (past)	
 }
 
-transform past (PIRGrammar::sub_invocation) :language('PIR') {
+transform past (PIR::Grammar::sub_invocation) :language('PIR') {
 		.local pmc past, op_begin, op_call, op_end
 		past = new 'PAST::Stmts'
 		op_begin = new 'PAST::Op'
@@ -334,18 +375,18 @@ transform past (PIRGrammar::sub_invocation) :language('PIR') {
 	
 }
 
-transform past (PIRGrammar::macro_invocation) :language('PIR') {
+transform past (PIR::Grammar::macro_invocation) :language('PIR') {
 	
 }
 
-transform past (PIRGrammar::globalconst_def) :language('PIR') {
+transform past (PIR::Grammar::globalconst_def) :language('PIR') {
 		.local pmc past
 		past = new 'PAST::Op'
 		past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'.globalconst')
 		.return (past)
 }
 
-transform past (PIRGrammar::conditional_stat) :language('PIR') {
+transform past (PIR::Grammar::conditional_stat) :language('PIR') {
 		.local pmc past, expr, exprnode, gotolabel, block
 		expr = node['conditional_expr']
 		gotolabel = node['id']
@@ -363,26 +404,26 @@ transform past (PIRGrammar::conditional_stat) :language('PIR') {
 	
 		# now handle common stuff
 	do_body:	
-		#exprnode = tree.'get'('past', expr, 'PIRGrammar::conditional_expr')
+		#exprnode = tree.'get'('past', expr, 'PIR::Grammar::conditional_expr')
 		#past.'push'(exprnode)
 		#past.'push'(gotolabel)
 		.return (past)		
 }
 
-transform past (PIRGrammar::conditional_expr) :language('PIR') {
+transform past (PIR::Grammar::conditional_expr) :language('PIR') {
 		.local pmc past
 		past = node['simple_expr']
 		.return (past)
 }
 
-transform past (PIRGrammar::jump_stat) :language('PIR') {
+transform past (PIR::Grammar::jump_stat) :language('PIR') {
 	.local pmc past
 	past = new 'PAST::Op'
 	past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'goto')	
 	.return (past)
 }
 
-transform past (PIRGrammar::source_info) :language('PIR') {
+transform past (PIR::Grammar::source_info) :language('PIR') {
 		.local pmc past
 		past = new 'PAST::Op'
 		past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'#line')
@@ -390,83 +431,83 @@ transform past (PIRGrammar::source_info) :language('PIR') {
 }       
         
         
-transform past (PIRGrammar::instr) :language('PIR') {		
+transform past (PIR::Grammar::instr) :language('PIR') {		
 		$P0 = node['pir_instr']
 		if null $P0 goto pasm_instr
 	pir_instr:
-		.return tree.'get'('past', $P0, 'PIRGrammar::pir_instr')
+		.return tree.'get'('past', $P0, 'PIR::Grammar::pir_instr')
 	pasm_instr:	
 		$P0 = node['pasm_instr']
-		.return tree.'get'('past', $P0, 'PIRGrammar::pasm_instr')
+		.return tree.'get'('past', $P0, 'PIR::Grammar::pasm_instr')
 }
 
-transform past (PIRGrammar::labeled_pir_instr) :language('PIR') {
+transform past (PIR::Grammar::labeled_pir_instr) :language('PIR') {
 		$P0 = node['instr']
 		if null $P0 goto end
-		.return tree.'get'('past', $P0, 'PIRGrammar::instr')
+		.return tree.'get'('past', $P0, 'PIR::Grammar::instr')
 	end:
 }
 
 
-# past (PIRGrammar::pir_instr)
+# past (PIR::Grammar::pir_instr)
 #
 # Return the transformed tree of a PIR instruction.
 #
-transform past (PIRGrammar::pir_instr) :language('PIR') {
+transform past (PIR::Grammar::pir_instr) :language('PIR') {
 	local_decl:
 		$P0 = node['local_decl']
 		if null $P0 goto lexical_decl
-		.return tree.'get'('past', $P0, 'PIRGrammar::local_decl')
+		.return tree.'get'('past', $P0, 'PIR::Grammar::local_decl')
 	lexical_decl:
 		$P0 = node['lexical_decl']
 		if null $P0 goto const_def
-		.return tree.'get'('past', $P0, 'PIRGrammar::lexical_decl')
+		.return tree.'get'('past', $P0, 'PIR::Grammar::lexical_decl')
 	const_def:
 		$P0 = node['const_def']
 		if null $P0 goto globalconst_def
-		.return tree.'get'('past', $P0, 'PIRGrammar::const_def')	
+		.return tree.'get'('past', $P0, 'PIR::Grammar::const_def')	
 	globalconst_def:
 		$P0 = node['globalconst_def']
 		if null $P0 goto conditional_stat
-		.return tree.'get'('past', $P0, 'PIRGrammar::globalconst_def')	
+		.return tree.'get'('past', $P0, 'PIR::Grammar::globalconst_def')	
 	conditional_stat:	
 		$P0 = node['conditional_stat']
 		if null $P0 goto assignment_stat
-		.return tree.'get'('past', $P0, 'PIRGrammar::conditional_stat')	
+		.return tree.'get'('past', $P0, 'PIR::Grammar::conditional_stat')	
 	assignment_stat:
 		$P0 = node['assignment_stat']
 		if null $P0 goto open_namespace
-		.return tree.'get'('past', $P0, 'PIRGrammar::assignment_stat')
+		.return tree.'get'('past', $P0, 'PIR::Grammar::assignment_stat')
 	open_namespace:
 		$P0 = node['open_namespace']
 		if null $P0 goto close_namespace
-		.return tree.'get'('past', $P0, 'PIRGrammar::open_namespace')
+		.return tree.'get'('past', $P0, 'PIR::Grammar::open_namespace')
 	close_namespace:
 		$P0 = node['close_namespace']
 		if null $P0 goto return_stat
-		.return tree.'get'('past', $P0, 'PIRGrammar::close_namespace')	
+		.return tree.'get'('past', $P0, 'PIR::Grammar::close_namespace')	
 	return_stat:
 		$P0 = node['return_stat']
 		if null $P0 goto sub_invocation
-		.return tree.'get'('past', $P0, 'PIRGrammar::return_stat')		
+		.return tree.'get'('past', $P0, 'PIR::Grammar::return_stat')		
 	sub_invocation:
 		$P0 = node['sub_invocation']
 		if null $P0 goto macro_invocation
-		.return tree.'get'('past', $P0, 'PIRGrammar::sub_invocation')
+		.return tree.'get'('past', $P0, 'PIR::Grammar::sub_invocation')
 	macro_invocation:
 		$P0 = node['macro_invocation']
 		if null $P0 goto unknown
-		.return tree.'get'('past', $P0, 'PIRGrammar::macro_invocation')
+		.return tree.'get'('past', $P0, 'PIR::Grammar::macro_invocation')
 	unknown:
 		printerr "Error in Tree Transform!\n"
 }
 
 
-# past (PIRGrammar::pasm_instr)
+# past (PIR::Grammar::pasm_instr)
 #
 # Create a PAST::Op node that represents the PASM instruction
 #
-transform past (PIRGrammar::pasm_instr) :language('PIR') {
+transform past (PIR::Grammar::pasm_instr) :language('PIR') {
 	.local pmc past	
 	past = new 'PAST::Op'
 	# FIX: set the correct pirop
@@ -476,7 +517,7 @@ transform past (PIRGrammar::pasm_instr) :language('PIR') {
 
 
 
-transform past (PIRGrammar::simple_expr) :language('PIR') {   
+transform past (PIR::Grammar::simple_expr) :language('PIR') {   
 		.local pmc past
   int_constant:
    	$P0 = node['int_constant']
@@ -493,28 +534,41 @@ transform past (PIRGrammar::simple_expr) :language('PIR') {
   string_constant:
   	$P0 = node['string_constant']
     if null $P0 goto target
-		.return tree.'get'('past', $P0, 'PIRGrammar::string_constant')
+		.return tree.'get'('past', $P0, 'PIR::Grammar::string_constant')
   target:    
     $P0 = node['target']
-    .return tree.'get'('past', $P0, 'PIRGrammar::target')     
+    .return tree.'get'('past', $P0, 'PIR::Grammar::target')     
 }
 
-transform past (PIRGrammar::target) :language('PIR') {
+transform past (PIR::Grammar::target) :language('PIR') {
 
 }
 
+transform past (PIR::Grammar::id) :language('PIR') {
+		.local pmc past	
+		past = new 'PAST::Val'
+		past.'init'('node'=>node, 'name'=>node, 'ctype'=>'~')
+		.return (past)
+}
 
-transform past (PIRGrammar::string_constant) :language('PIR') {
+transform past (PIR::Grammar::type) :language('PIR') {
+		.local pmc past
+		past = new 'PAST::Val'
+		past.'init'('node'=>node, 'name'=>node)
+		.return (past)
+}
+
+transform past (PIR::Grammar::string_constant) :language('PIR') {
 	stringsingle:
 		$P0 = node['stringsingle']
 		if null $P0 goto stringdouble
-		.return tree.'get'('past', $P0, 'PIRGrammar::stringsingle')
+		.return tree.'get'('past', $P0, 'PIR::Grammar::stringsingle')
  	stringdouble:
  		$P0 = node['stringsingle']		
-		.return tree.'get'('past', $P0, 'PIRGrammar::stringsingle')
+		.return tree.'get'('past', $P0, 'PIR::Grammar::stringdouble')
 }
 
-transform past (PIRGrammar::stringdouble) :language('PIR') {
+transform past (PIR::Grammar::stringdouble) :language('PIR') {
     .local pmc result
     result = new 'PAST::Val'
     
@@ -535,20 +589,19 @@ transform past (PIRGrammar::stringdouble) :language('PIR') {
     .return (result)
 }
 
-transform past (PIRGrammar::stringsingle) :language('PIR') {
-    .local pmc result
+transform past (PIR::Grammar::stringsingle) :language('PIR') {
+    .local pmc result  		
     result = new 'PAST::Val'
-
+ 
     .local string value
     # Check if this is a string match
     $I0 = defined node["PGE::Text::bracketed"]
-    if $I0 goto bracketed_value
+    if $I0 goto bracketed_value 
     value = node
     goto no_bracketed_value
   bracketed_value:
-    value = node["PGE::Text::bracketed"]
-  no_bracketed_value:
-
-    result.'init'('node'=>node, 'vtype'=>'.String', 'name'=>value)
-    .return (result)
+    value = node["PGE::Text::bracketed"] 		
+  no_bracketed_value: 
+    result.'init'('node'=>node, 'vtype'=>'.String', 'name'=>value) 
+ 		.return (result)
 }

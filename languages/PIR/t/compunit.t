@@ -13,7 +13,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'global defs' );
 .global g_Y
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -28,7 +28,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'const defs' );
 .const pmc pConst = "is a PMC const a string?"
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -38,7 +38,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple macro, no params' );
 .endm
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -48,7 +48,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple macro, params' );
 .endm
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -58,7 +58,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'include directive' );
 .include "Hitchhikers.pir"
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -67,7 +67,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'loadlib directive' );
 .loadlib "Hitchhikers"
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -76,7 +76,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'n_operators directive' );
 .pragma n_operators 1
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -87,7 +87,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'namespaces 1' );
 .namespace [""]
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -98,7 +98,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'namespaces 2' );
 .namespace ["PIR"]
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -109,7 +109,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'namespaces 3' );
 .namespace ["PIR";"Grammar"]
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -118,7 +118,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'Root namespace' );
 .namespace
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -128,7 +128,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'HLL' );
 .HLL "PIR", "PIRlib"
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -137,7 +137,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'HLL map' );
 .HLL_map 42, 10
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -148,7 +148,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'source line info' );
 .line 42, "Hitchhikers.pir"
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -160,7 +160,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'emit' );
 .eom
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 

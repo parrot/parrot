@@ -24,7 +24,7 @@ L6:
 
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -47,7 +47,7 @@ L6:
 
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -59,6 +59,6 @@ L1:
 
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT

@@ -308,7 +308,7 @@ Parameter definitions have the following syntax:
 	  .param num nParam
 	  .param pmc argv :slurpy
 	  .param string sParam :named('foo')
-	  .param $P0 :named('bar')
+	  .param $P0 :named('bar')	  
 	  # body
 	.end
 
@@ -327,7 +327,15 @@ Details can be found in PDD03 - Parrot Calling Conventions.
 
  :named('x')
 
-The parameter is known in the called sub by name C<'x'>.
+The parameter is known in the called sub by name C<'x'>. The C<:named> flag can also be used B<without> an 
+identifier, in combination with the C<:flat> or C<:slurpy> flag, i.e. on a container holding several values:
+
+	.param pmc args :slurpy :named
+
+and
+
+	.arg args :flat :named
+	
 
 =item *
 
@@ -452,6 +460,15 @@ Instead of a register, one can also specify a local variable, like so:
 
 	.local pmc p
 	.lex 'i', p
+
+The same is true when a parameter should be stored as a lexical:
+
+	.param pmc p
+	.lex 'i', p
+	
+So, now it is also clear why C<.lex 'i', p> is B<not> a declaration of p:
+it needs a separate declaration, because it may either be a C<.local> or a C<.param>.
+The C<.lex> directive merely is a shortcut for saving and retrieving lexical variables.
 
 =head2 Global definitions
 
@@ -795,7 +812,13 @@ Flatten the (aggregate) argument. This argument can only be of type C<pmc>.
 
 Pass the denoted argument into the named parameter that is denoted by 'x', like so:
 
- .param <type> <identifier> :named('x')
+ .param int myX :named('x')   # the type 'int' is just an example
+
+As was mentioned at the parameter declaration section, the C<:named> section can be used
+on an aggregate value in combination with the C<:flat> flag.
+
+ .arg pmc myArgs :flat :named
+ 
 
 =back
 
@@ -840,6 +863,7 @@ Or a method call:
 	obj.'toString'() # call the method 'toString'
 	obj.x() # call the method whose name is stored in 'x'.
 
+Note that no spaces are allowed between the invocant and the dot; "obj . 'toString'" is not valid.
 IMCC also allows the "->" instead of a dot, to make it readable for C++ programmers:
 
 	obj->'toString'()
@@ -929,6 +953,13 @@ is invoked again. Returning values is identical to I<normal> return statements.
 	foo() # returns 42
 	foo() # returns 43
 
+NOTE: IMCC allows for writing:
+
+	.pcc_begin_yield
+	...
+	.pcc_end_return
+
+which is of course not consistent; languages/PIR does B<not> allow this.
 
 =head2 Short yield statements
 
@@ -956,7 +987,10 @@ Returns the return values from C<foo>. This is implemented by a tail call, which
 	.return(results)
 
 The call to C<foo> can be considered a normal function call with respect to parameters: it can take the exact
-same format using argument flags.
+same format using argument flags. The tail call can also be a method call, like so:
+
+	.return obj.'foo'()
+	
 
 =head2 Symbol namespaces
 
@@ -1132,8 +1166,11 @@ TODO: check flags and syntax for this.
 =head2 Tokens, types and targets
 
   string_constant:
-    charset_specifier?  quoted_string
+    [ encoding_specifier? charset_specifier ]?  quoted_string
 
+  encoding_specifier:
+    "utf8:"
+    
   charset_specifier:
       "ascii:"
     | "binary:"
@@ -1161,6 +1198,10 @@ A string constant can be written like:
 but if desirable, the character set can be specified:
 
 	unicode:"Hello world"
+	
+When using the "unicode" character set, one can also specify an encoding specifier; currently only C<utf8> is allowed:
+
+	utf8:unicode:"hello world"
 
 IMCC currently allows identifiers to be used as types. During the parse, the identifier
 is checked whether it is a defined class. The built-in types int, num, pmc and string are

@@ -1,4 +1,4 @@
-grammar PIRGrammar;
+grammar PIR::Grammar;
 
 # This file lists all PASM instructions, the rule
 # <id> uses this rule as an assertion, so that no

@@ -99,24 +99,7 @@ extend PIR with non-features.
 	 which line is being parsed/assembled. It'd be more consistent with respect to
 	 other PIR directives ('.include' etc.). The current spelling seems rather arbitrary.
 
-8. Parameter and argument flags
 
-	 :named without a parameter does not seem to work - ever.
-	 
-	 Proposal: require :named to take a parenthesized identifier.
-	 
-9. .lex + .local
-
-	 When declaring a .lexical like:
-	 
-	 .lex "a", b
-	 
-	 one also needs the declaration:
-	 
-	 .local pmc b
-	 
-	 Proposal: remove the need for .local declaration. Parsing the .lex declaration
-	 expands to including the .local declaration.
 
 
 NEW FEATURE PROPOSALS GO HERE:	 

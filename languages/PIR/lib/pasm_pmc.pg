@@ -1,4 +1,4 @@
-grammar PIRGrammar;
+grammar PIR::Grammar;
 
 rule pmc_op { 
   callmethodcc        <arg_hack> #

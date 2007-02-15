@@ -14,7 +14,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple assignments' );
 	d = e
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -25,7 +25,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'int/hex/bin' );
 	c = 0x10	
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -37,7 +37,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'get keyed assignments' );
 	h = x[e]	
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -49,7 +49,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'set keyed assignments' );
 	x[e]				= f
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -74,7 +74,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple expressions' );
 	a = ~ x
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -92,7 +92,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'assign operators' );
 	x >>>= 1
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -106,7 +106,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'string charset modifiers' );
 	s = utf8:unicode:"Hello World"
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 

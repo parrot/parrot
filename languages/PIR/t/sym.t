@@ -16,7 +16,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'local decls 1' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -30,7 +30,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'local decls 2' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -44,7 +44,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'local decls - unique_reg' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -57,7 +57,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'sym decls - unique_reg' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -71,7 +71,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'lexicals' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 

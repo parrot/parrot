@@ -1,3 +1,4 @@
+.include 'HELLO'
 
 
 .sub 'main' :main

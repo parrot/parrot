@@ -13,7 +13,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'comments before code' );
 .sub main			
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -24,7 +24,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'comments after code' );
 # comments after code
 #
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -35,7 +35,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'comments in code' );
 #
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -48,7 +48,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'comments after code' );
 	
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -163,7 +163,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'pre-code whitespace' );
 .sub main			
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -346,7 +346,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'in-code whitespace' );
 
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -460,7 +460,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'after-code whitespace' );
 
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -486,7 +486,7 @@ documentation rocks!
 .sub main			
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -502,7 +502,7 @@ Parrot rocks too!
 =cut
 .end
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -518,7 +518,7 @@ Don't forget to hit enter after typing last OUT marker in the test file!
 =cut
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 

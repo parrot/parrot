@@ -31,7 +31,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'long sub invocation' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -49,7 +49,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'long sub invocation 2' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -68,7 +68,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'short sub invocation' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -81,7 +81,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'short yield' );
 
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -96,7 +96,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'long yield' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -116,7 +116,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'tail call' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -135,7 +135,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'tail method call' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -149,7 +149,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'nci call' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -164,7 +164,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'long method call' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 
@@ -189,7 +189,7 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'short sub call with flags' );
 .end
 
 CODE
-"parse" => PMC 'PIRGrammar' { ... }
+"parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
 

@@ -16,7 +16,7 @@
 
     $P0 = new [ 'HLLCompiler' ]
     $P0.'language'('languages-PIR')
-    $P0.'parsegrammar'('PIRGrammar')
+    $P0.'parsegrammar'('PIR::Grammar')
     $P0.'astgrammar'('ASTGrammar')
 
 .end
@@ -136,14 +136,14 @@ OPTIONS
 .end
 
 
-.namespace [ 'PIRGrammar' ]
+.namespace [ 'PIR::Grammar' ]
 
 .sub _load :load :init
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Text.pbc'
 
     $P0 = getclass 'PGE::Grammar'
-    $P1 = subclass $P0, 'PIRGrammar'
+    $P1 = subclass $P0, 'PIR::Grammar'
 
     # The parser is split up into several files
     # for faster edit-compile-test cycles.
@@ -157,6 +157,36 @@ OPTIONS
     load_bytecode 'languages/PIR/lib/pasm_pmc_gen.pbc'
     load_bytecode 'languages/PIR/lib/pasm_core_gen.pbc'
 .end
+
+.sub parenthesized_args_2
+	.param pmc mob	
+	.param pmc adverbs :slurpy :named
+	.local pmc match
+	.local string target
+	.local int cpos, mfrom, mpos	
+	
+	(mob, target, mfrom, mpos) = mob.'newfrom'(mob)    
+	printerr "Target: ["
+	printerr target
+	printerr "]"
+	printerr "\n"
+	$S0 = mob.'text'()
+	printerr $S0
+	mob.'next'()
+	$S0 = mob.'text'()
+	printerr $S0      
+ 
+	#
+	#printerr match
+	#printerr "\n"
+	#
+	#printerr cpos
+	#printerr "\n"
+	#printerr target
+	#printerr "\n"
+	.return(mob)
+.end
+
 
 
 .sub warning
