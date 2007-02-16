@@ -7,8 +7,8 @@ docs/glossary.pod - Parrot Glossary
 
 =head1 SUMMARY
 
-Short descriptions of words you might need to know that show up in Parrot
-development.
+Short descriptions of words you might need to know
+because they show up in Parrot development.
 
 =head1 GLOSSARY
 
@@ -204,6 +204,10 @@ See also L<"PIR">.
 In the Parrot context a JAPH is a small script that prints the string "Just
 another Parrot Hacker\".
 
+=head2 MRO
+
+Method resolution order
+
 =head2 Native Call Interface
 
 This let's Parrot talk to native "C" libraries, without a C-compiler.
@@ -212,14 +216,14 @@ This let's Parrot talk to native "C" libraries, without a C-compiler.
 
 Acronym for Native Call Interface.
 
-=head2 PAST
-
-Acronym for Parrot Abstract Syntax Tree.
-
 =head2 Packfile
 
 Another name for a PBC file, due to the names used for data structures in one
 of the early implementations in Perl 5.
+
+=head2 PAST
+
+Acronym for Parrot Abstract Syntax Tree.
 
 =head2 PBC
 
