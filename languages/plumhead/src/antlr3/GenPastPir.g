@@ -70,6 +70,7 @@ gen_pir_past
         + "    past_stmts = new 'PAST::Stmts'                                \n"
         + "                                                                  \n"
         + "    .sym pmc past_temp                                            \n"
+        + "    .sym pmc past_name                                            \n"
         + "    .sym pmc past_if_op                                           \n"
         + "                                                                  \n"
       );
@@ -81,7 +82,7 @@ gen_pir_past
         + "                                                                  \n"
         + "  past_root.'push'( past_stmts )                                  \n"
         + "                                                                  \n"
-        + "    # '_dumper'(past_root, 'past')                                \n"
+        + "    #'_dumper'(past_root, 'past')                                \n"
         + "    # '_dumper'(superglobal_POST , 'superglobal_POST')            \n"
         + "    # '_dumper'(superglobal_GET , 'superglobal_GET')              \n"
         + "                                                                  \n"
@@ -290,14 +291,13 @@ node[String reg_mother]
         + "    # entering ASSIGN_OP                                           \n"
         + "    .sym pmc " + reg_assign + "                                    \n"
         + "    " + reg_assign + " = new 'PAST::Op'                            \n"
+        + "    " + reg_assign + ".init( 'name' => 'infix:=', 'pasttype' => 'assign' ) \n"
       );
     }
     ^( ASSIGN_OP node[reg_assign] node[reg_assign] )
     {
       System.out.print( 
-          "  " + reg_assign + ".'attr'( 'name', 'infix:=' , 1 )               \n"
-        + "  " + reg_assign + ".'attr'( 'pasttype', 'assign' , 1 )            \n"
-        + "  " + $node.reg_mother + ".'push'( " + reg_assign + " )            \n"
+          "  " + $node.reg_mother + ".'push'( " + reg_assign + " )            \n"
         + "  # leaving ASSIGN_OP                                              \n"
       );
     }
@@ -309,7 +309,31 @@ node[String reg_mother]
         + "  past_temp = new 'PAST::Var'                                     \n"
         + "      past_temp.'init'( 'name' => '" + $SCALAR.text + "', 'viviself' => '.Undef', 'islvalue' => 1 )      \n"
         + "  " + $node.reg_mother + ".'push'( past_temp )                    \n"
-        + "  # end of NUMBER                                                 \n"
+        + "  # leaving SCALAR                                                \n"
+      );
+    }
+  | {
+      reg_num++;
+      String reg_array = "reg_array_" + reg_num;
+      System.out.print( 
+          "                                                                  \n"
+        + "    # entering ARRAY                                              \n"
+        + "    .sym pmc " + reg_array + "                                    \n"
+        + "    " + reg_array + " = new 'PAST::Var'                           \n"
+        + "    " + reg_array + ".init( 'scope' => 'keyed', 'viviself' => '.Undef', 'islvalue' => 1 ) \n"
+      );
+    }
+    ^( ARRAY node[reg_array] )
+    {
+      System.out.println( 
+          "                                                                  \n"
+        + "  past_name = new 'PAST::Var'                                     \n"
+        + "  past_name.'init'( 'name' => 'past_name" + $ARRAY.text + "', 'viviself' => '.Hash', 'islvalue' => 1 )      \n"
+        + "  # PAST-pm has no unshift yet                                    \n"
+        + "  \$P0 = " + reg_array + ".'get_array'()                            \n"
+        + "  unshift \$P0, past_name                                          \n"
+        + "  " + $node.reg_mother + ".'push'( " + reg_array + " )            \n"
+        + "  # leaving ARRAY                                                 \n"
       );
     }
   ;

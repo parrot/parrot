@@ -106,7 +106,7 @@ expression
   : DOUBLEQUOTE_STRING
   | SINGLEQUOTE_STRING
   | adding_expression
-  | SCALAR ( '[' expression ']' )?
+  | s=SCALAR ( '[' key=expression ']' -> ^( ARRAY[$s] $key ) )?
   ;
 
 adding_expression
