@@ -128,14 +128,13 @@ rule tablefield {
   [ <recfield> | <expr> ]*
 }
 
-
 rule parlist {
-    [ <namelist1> [ <','> <'...'> ]? ]?
+    <namelist1> [ <','> <'...'> ]?
   | <'...'>
 }
 
 rule body {
-  <'('> <parlist> <?closeparen> <block> <?end>
+  <'('> <parlist>? <?closeparen> <block> <?end>
 }
 
 rule explist1 {
@@ -317,12 +316,20 @@ token ws {
     ]*
 }
 
+=head2 Keywords
+
+Lua keywords may B<not> be used as identifiers. To make sure the longest
+identifier is matched, so that identifiers that B<start> with a keyword
+is still an identifier, a keyword should end at a word boundary.
+This way, for instance, the identifier C<format> is not read as C<for>.
+
+=cut
 
 token keyword {
-    <'and'>      |  <'break'> | <'do'>    | <'elseif'>
+  [  <'and'>     | <'break'>  | <'do'>    | <'elseif'>
   | <'else'>     | <'end'>    | <'false'> | <'for'>
   | <'function'> | <'if'>     | <'in'>    | <'local'>
   | <'nil'>      | <'not'>    | <'or'>    | <'repeat'>
   | <'return'>   | <'then'>   | <'true'>  | <'until'>
-  | <'while'>
+  | <'while'> 	] \b
 }
