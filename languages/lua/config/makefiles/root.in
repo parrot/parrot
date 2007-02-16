@@ -54,12 +54,17 @@ LIB_PBCS = \
 GEN_PIR = \
  src/lua51_grammar_gen.pir \
  src/lua51_testlex_gen.pir \
- src/dumplex_gen.pir
+ src/dumplex_gen.pir \
+ src/lua_grammar_gen.pir \
+ src/ASTGrammar.pir
 
 GEN_PBC = \
  src/Lua51.pbc \
  src/Lua51TestLex.pbc \
- src/LuaDumpLex.pbc
+ src/LuaDumpLex.pbc \
+ src/lua_grammar_gen.pbc \
+ src/ASTGrammar.pbc \
+ luac.pbc
 
 all: \
  pmc/lua_group$(LOAD_EXT) \
@@ -86,6 +91,24 @@ src/dumplex_gen.pir: src/dumplex.tg
 src/LuaDumpLex.pbc: src/dumplex_gen.pir
 	$(PARROT) -o src/LuaDumpLex.pbc --output-pbc src/dumplex_gen.pir
 
+### <
+
+src/lua_grammar_gen.pir: src/lua.pg
+	$(PGE) --output=src/lua_grammar_gen.pir src/lua.pg
+
+src/lua_grammar_gen.pbc: src/lua_grammar_gen.pir
+	$(PARROT) -o src/lua_grammar_gen.pbc --output-pbc src/lua_grammar_gen.pir
+
+src/ASTGrammar.pir: src/ASTGrammar.tg
+	$(TGE) --output=src/ASTGrammar.pir src/ASTGrammar.tg
+
+src/ASTGrammar.pbc: src/ASTGrammar.pir
+	$(PARROT) -o src/ASTGrammar.pbc --output-pbc src/ASTGrammar.pir
+
+luac.pbc: lua.pir src/lua_grammar_gen.pbc src/ASTGrammar.pbc
+	$(PARROT) -o luac.pbc --output-pbc lua.pir
+
+### >
 
 pmc/lua_group$(LOAD_EXT) : $(PMC_FILES)
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
@@ -150,6 +173,10 @@ help:
 
 test:
 	cd .. && $(PERL) t/harness --languages=lua
+
+test2:
+	cd .. && cd lua2 && $(PERL) -I../../lib t/harness
+
 
 TEST_CLEANERS = \
  "t/pmc/*.pir" \

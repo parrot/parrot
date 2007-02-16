@@ -1,0 +1,328 @@
+=head1 NAME
+
+lua.pg - a Lua grammar in PGE
+
+=head1 GRAMMAR RULES
+
+The grammar rules are according to the original Lua parser as defined lparser.c
+in the lua distribution.
+
+=cut
+
+grammar Lua::Grammar;
+
+token TOP {
+  ^ <block> $
+}
+
+rule block {
+  [ <statement> <';'>? ]* [ <laststat> <';'>? ]?
+}
+
+rule statement {
+    <ifstat>
+  | <whilestat>
+  | <doblock>
+  | <forstat>
+  | <repeatstat>
+  | <localstat>
+  | <exprstat>
+  | <funcstat>
+}
+
+rule funcstat {
+  <'function'> <funcname> <body>
+}
+
+rule laststat {
+  	<'return'> <explist1>?
+  | <'break'>
+}
+
+rule doblock {
+  <'do'> <block> <?end>
+}
+
+rule localstat {
+  <localfunc> | <localdecl>
+}
+
+rule exprstat {
+  <primaryexp> <assignment>?
+}
+
+rule assignment {
+    <','> <primaryexp> <assignment>
+  | <'='> <explist1>
+}
+
+rule whilestat {
+  <'while'> <expr1> <?do> <block> <?end>
+}
+
+rule repeatstat {
+  <'repeat'> <block> <?until> <expr1>
+}
+
+rule forbody {
+  <?do> <block> <?end>
+}
+
+rule fornum {
+  <name> <'='> <expr1> <?comma> <expr1> [ <','> <expr1> ]?
+}
+
+rule forlist {
+  <namelist1> <?in> <explist1>
+}
+
+rule forstat {
+  <'for'> [ <fornum> | <forlist> ] <forbody>
+}
+
+rule ifstat {
+  <'if'> <expr1> <?then> <block> <elseifblock>* <elseblock>? <?end>
+}
+
+rule elseifblock {
+  <'elseif'> <expr1> <?then> <block>
+}
+
+rule elseblock {
+  <'else'> <block>
+}
+
+rule localdecl {
+  <'local'> <name> [ <','> <name> ]* [ <'='> <explist1> ]?
+}
+
+rule localfunc {
+  <'local'> <'function'> <name> <body>
+}
+
+rule funcname {
+  <name> [ <'.'> <name> ]* [ <':'> <name> ]?
+}
+
+rule index {
+  <'['> <expr1> <?closebracket>
+}
+
+rule recfield {
+  [ <name> | <index> ] <?assign> <expr1>
+}
+
+rule constructor {
+  <'{'> <tablefieldlist>? <?closebrace>
+}
+
+rule tablefieldlist {
+  <tablefield> [ <?fieldsep> <tablefield> ]* <?fieldsep>?
+}
+
+rule fieldsep {
+  <','> | <';'>
+}
+
+rule tablefield {
+  [ <recfield> | <expr> ]*
+}
+
+
+rule parlist {
+    [ <namelist1> [ <','> <'...'> ]? ]?
+  | <'...'>
+}
+
+rule body {
+  <'('> <parlist> <?closeparen> <block> <?end>
+}
+
+rule explist1 {
+  <expr> [ <','> <expr> ]*
+}
+
+rule namelist1 {
+  <name> [ <','> <name> ]*
+}
+
+rule funcargs {
+    <'('> <explist1>? <?closeparen>
+  | <constructor>
+  | <string>
+}
+
+rule prefixexp {
+    <name>
+  | <'('> <expr1> <?closeparen>
+}
+
+rule primaryexp {
+  <prefixexp>
+  [ <'.'> <name>
+  | <index>
+  | <':'> <name> <funcargs>
+  | <funcargs>
+  ]*
+
+}
+
+rule simpleexpr {
+    <number>
+  | <string>
+  | <'nil'>
+  | <'true'>
+  | <'false'>
+  | <'...'>
+  | <constructor>
+  | <'function'> <body>
+  | <primaryexp>
+}
+
+
+=head1 EXPRESSIONS
+
+Operator precedence is implemented using an optable.
+
+=cut
+
+rule 'expr'         is optable { ... }
+
+proto 'term:'       is precedence('=') is parsed(&simpleexpr) { ... }
+
+proto 'infix:^'     is looser('term:')
+                    is assoc('right')           { ... }
+
+proto 'prefix:not'  is looser('infix:^')        { ... }
+proto 'prefix:#'    is equiv('prefix:not')      { ... }
+proto 'prefix:-'    is equiv('prefix:not')      { ... }
+
+proto 'infix:*'     is looser('prefix:not')     { ... }
+proto 'infix:/'     is equiv('infix:*')         { ... }
+proto 'infix:%'     is equiv('infix:*')         { ... }
+
+proto 'infix:+'     is looser('infix:*')        { ... }
+proto 'infix:-'     is equiv('infix:+')         { ... }
+
+proto 'infix:..'    is looser('infix:+')
+                    is assoc('right')           { ... }
+
+proto 'infix:<'     is looser('infix:..')       { ... }
+proto 'infix:>'     is equiv('infix:<')         { ... }
+proto 'infix:<='    is equiv('infix:<')         { ... }
+proto 'infix:>='    is equiv('infix:<')         { ... }
+proto 'infix:~='    is equiv('infix:<')         { ... }
+proto 'infix:=='    is equiv('infix:<')         { ... }
+
+proto 'infix:and'   is looser('infix:<')        { ... }
+
+proto 'infix:or'    is looser('infix:and')      { ... }
+
+
+=head1 HELPER RULES
+
+Helper rules will match a specific token, otherwise a syntax error is generated.
+These rules make the grammar more readable, so the calls to syntax_error() are
+not all over the grammar, but only in these rules.
+
+=cut
+
+rule do {
+  <'do'> | <syntax_error: 'do' expected>
+}
+
+rule then {
+  <'then'> | <syntax_error: 'then' expected>
+}
+
+rule end {
+  <'end'> | <syntax_error: 'end' expected>
+}
+
+rule until {
+  <'until'> | <syntax_error: 'until' expected>
+}
+
+rule comma {
+  <','> | <syntax_error: ',' expected>
+}
+
+rule in {
+  <'in'> | <syntax_error: 'in' expected>
+}
+
+rule assign {
+  <'='>  | <syntax_error: '=' expected>
+}
+
+rule closebracket {
+  <']'>  | <syntax_error: ']' expected>
+}
+
+rule closebrace {
+  <'}'> | <syntax_error: '}' expected>
+}
+
+rule closeparen {
+  <')'> | <syntax_error: ')' expected>
+}
+
+rule expr1 {
+  <expr> | <syntax_error: expression expected>
+}
+
+
+=head1 TOKENS
+
+=head2 Name
+
+an identifier MUST start on a word boundary. If the \b is removed,
+this is allowed: a=1b=2, which of course should be an error.
+
+=cut
+
+token name {
+  <!keyword> \b <ident>
+}
+
+
+=head2 Strings
+
+A string can be either a single-quoted, double-quoted or a long string.
+Long strings are parsed using a custom parsing method.
+
+=cut
+
+rule string {
+  <stringdouble> | <stringsingle> | <long_string>
+}
+
+regex stringdouble { <PGE::Text::bracketed: "> }
+regex stringsingle { <PGE::Text::bracketed: '> }
+
+token number {
+  [ <digit>+
+    [ <'.'> <digit>+ ]?
+    [ <[eE]> <[+\-]>? <digit>+ ]?
+  ]
+  | [ <'.'> <digit>+  ] [ <[eE]> <[+\-]>? <digit>+ ]?
+  | [ 0 <[xX]> <xdigit>+ ]
+}
+
+
+token ws {
+    [ \s+
+    | <'--'> \N*
+    | <'--'> <long_comment>
+    ]*
+}
+
+
+token keyword {
+    <'and'>      |  <'break'> | <'do'>    | <'elseif'>
+  | <'else'>     | <'end'>    | <'false'> | <'for'>
+  | <'function'> | <'if'>     | <'in'>    | <'local'>
+  | <'nil'>      | <'not'>    | <'or'>    | <'repeat'>
+  | <'return'>   | <'then'>   | <'true'>  | <'until'>
+  | <'while'>
+}

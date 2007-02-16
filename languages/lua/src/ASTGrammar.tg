@@ -1,0 +1,498 @@
+
+grammar ASTGrammar is TGE::Grammar;
+
+
+transform past (ROOT) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Block'
+    past.'init'('node'=>node, 'name'=>'anon')
+
+    .local pmc blocknode, blockpast
+    blocknode = node['block']
+    blockpast = tree.'get'('past', blocknode, 'Lua::Grammar::block')
+    past.'push'(blockpast)
+    .return (past)
+}
+
+transform past (Lua::Grammar::block) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Stmts'
+    past.'init'('node'=>node)
+
+    .local pmc iter
+    $P0 = node['statement']
+    if null $P0 goto iter_end
+    iter = new .Iterator, $P0
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cnode, cpast
+    cnode = shift iter
+    cpast = tree.'get'('past', cnode, 'Lua::Grammar::statement')
+    past.'push'(cpast)
+    goto iter_loop
+  iter_end:
+
+ #   $P0 = node['laststat']
+ #   if null $P0 goto no_last_stat
+ #   $P1 = tree.'get'('past', $P0, 'Lua::Grammar::laststat')
+ #   past.'push'($P1)
+ # no_last_stat:
+    .return (past)
+}
+
+transform past (Lua::Grammar::statement) :language('PIR') {
+  ifstat:
+    $P0 = node['ifstat']
+    if null $P0 goto whilestat
+    .return tree.'get'('past', $P0, 'Lua::Grammar::ifstat')
+  whilestat:
+    $P0 = node['whilestat']
+    if null $P0 goto doblock
+    .return tree.'get'('past', $P0, 'Lua::Grammar::whilestat')
+  doblock:
+    $P0 = node['do']
+    if null $P0 goto forstat
+    .return tree.'get'('past', $P0, 'Lua::Grammar::block')
+  forstat:
+    $P0 = node['forstat']
+    if null $P0 goto repeatstat
+    .return tree.'get'('past', $P0, 'Lua::Grammar::forstat')
+  repeatstat:
+    $P0 = node['repeatstat']
+    if null $P0 goto localstat
+    .return tree.'get'('past', $P0, 'Lua::Grammar::repeatstat')
+  localstat:
+    $P0 = node['localstat']
+    if null $P0 goto exprstat
+    .return tree.'get'('past', $P0, 'Lua::Grammar::localstat')
+  exprstat:
+    $P0 = node['exprstat']
+    if null $P0 goto funcstat
+    .return tree.'get'('past', $P0, 'Lua::Grammar::exprstat')
+  funcstat:
+    $P0 = node['funcstat']
+    if null $P0 goto error
+    .return tree.'get'('past', $P0, 'Lua::Grammar::funcstat')
+  error:
+    printerr "Unknown type of statement"
+    exit 1
+}
+
+transform past (Lua::Grammar::laststat) :language('PIR') {
+    .local pmc past
+  returnstat:
+    $P0 = node['return']
+    if null $P0 goto breakstat
+    .local pmc exprpast
+    past = new 'PAST::Op'
+    past.'init'('node'=>node)
+    $P0 = node['explist1']
+    if null $P0 goto no_return_values
+    exprpast = tree.'get'('past', $P0, 'Lua::Grammar::explist1')
+    past.'push'(exprpast)
+
+  no_return_values:
+    .return (past)
+
+  breakstat:
+    past = new 'PAST::Op'
+    past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'goto')
+    .return (past)
+}
+
+transform past (Lua::Grammar::ifstat) :language('PIR') {
+    .local pmc past
+
+    # create the PAST node for an if statement
+    past = new 'PAST::Op'
+    past.'init'('node'=>node, 'pasttype'=>'if')
+
+    .local pmc condnode, condpast
+    # get the PAST node for the condition
+    condnode = node['expr1']
+    condpast = tree.'get'('past', condnode, 'Lua::Grammar::expr1')
+    past.'push'(condpast)
+
+    .local pmc ifnode, ifpast
+    # get the PAST node for the if block
+    ifnode = node['block']
+    ifpast = tree.'get'('past', ifnode, 'Lua::Grammar::block')
+    past.'push'(ifpast)
+
+    .local pmc elseifnode, elseifpast
+    # get the elseifblock nodes
+    elseifnode = node['elseifblocks']
+    if null elseifnode goto skip_elseifs
+    elseifpast = tree.'get'('past', elseifnode, 'Lua::Grammar::elseifblocks')
+    past.'push'(elseifpast)
+
+  skip_elseifs:
+    .local pmc elsenode, elsepast
+    # get the elseblock nodes
+    elsenode = node['elseblock']
+    if null elsenode goto skip_else
+    elsepast = tree.'get'('past', elsenode, 'Lua::Grammar::block')
+    past.'push'(elsepast)
+
+  skip_else:
+    .return (past)
+}
+
+transform past (Lua::Grammar::elseifblocks) :language('PIR') {
+    .local pmc past, iter
+
+    $P0 = node['elseifblock']
+    iter = new .Iterator, $P0
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cnode, cpast
+    cnode = shift iter
+    cpast = tree.'get'('past', cnode, 'Lua::Grammar::elseifblock')
+    past.'push'(cpast)
+    goto iter_loop
+  iter_end:
+
+    .return (past)
+}
+
+transform past (Lua::Grammar::elseifblock) :language('PIR') {
+    .local pmc past
+
+    past = new 'PAST::Op'
+    past.'init'('node'=>node, 'pasttype'=>'if')
+
+    .local pmc condnode, condpast
+    condnode = node['expr1']
+    condpast = tree.'get'('past', condnode, 'Lua::Grammar::expr1')
+    past.'push'(condpast)
+
+    .local pmc ifnode, ifpast
+    ifnode = node['block']
+    ifpast = tree.'get'('past', ifnode, 'Lua::Grammar::block')
+    past.'push'(ifpast)
+
+    .return (past)
+}
+
+transform past (ABC::Grammar::if_statement) :language('PIR') {
+    .local pmc exprnode, thennode, elsenode
+    exprnode = node['expression']
+    $P0 = node['statement']
+    thennode = $P0[0]
+    elsenode = $P0[1]
+
+    .local pmc past
+    past = new 'PAST::Op'
+    past.'init'('node'=>node, 'pasttype'=>'if')
+    .local pmc exprpast, thenpast, elsepast
+    exprpast = tree.'get'('past', exprnode, 'ABC::Grammar::expression')
+    past.'push'(exprpast)
+    thenpast = tree.'get'('past', thennode, 'ABC::Grammar::statement')
+    past.'push'(thenpast)
+    $I0 = defined elsenode
+    if $I0 == 0 goto done_else
+    elsepast = tree.'get'('past', elsenode, 'ABC::Grammar::statement')
+    past.'push'(elsepast)
+  done_else:
+    .return (past)
+}
+
+transform past (Lua::Grammar::localstat) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Var'
+    past.'init'('node'=>node)
+    .return (past)
+}
+
+transform past (Lua::Grammar::whilestat) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Op'
+    past.'init'('node'=>node, 'pasttype'=>'while')
+
+    .local pmc condnode, condpast
+    condnode = node['expr1']
+    condpast = tree.'get'('past', condnode, 'Lua::Grammar::expr1')
+    past.'push'(condpast)
+
+    .local pmc blocknode, blockpast
+    blocknode = node['block']
+    blockpast = tree.'get'('past', blocknode, 'Lua::Grammar::block')
+    past.'push'(blockpast)
+
+    .return (past)
+}
+
+transform past (Lua::Grammar::repeatstat) {
+    .local pmc past
+    past = new 'PAST::Op'
+    past.'init'('node'=>node)
+
+    .local pmc exprnode, exprpast
+    exprnode = node['expr1']
+    exprpast = tree.'get'('past', exprnode, 'Lua::Grammar::expr1')
+
+    .local pmc blocknode, blockpast
+    blocknode = node['block']
+    blockpast = tree.'get'('past', blocknode, 'Lua::Grammar::block')
+    past.'push'(blockpast)
+
+    .return (past)
+}
+
+transform past (Lua::Grammar::forstat) :language('PIR') {
+    .local pmc past
+  fornum:
+    $P0 = node['fornum']
+    if null $P0 goto forlist
+    past = tree.'get'('past', $P0, 'Lua::Grammar::fornum')
+  forlist:
+    $P0 = node['forlist']
+    past = tree.'get'('past', $P0, 'Lua::Grammar::forlist')
+    .return (past)
+}
+
+transform past (Lua::Grammar::fornum) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Op'
+    past.'init'('node'=>node)
+    .return (past)
+}
+
+transform past (Lua::Grammar::forlist) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Op'
+    #past.'init'('node'=>node)
+    .return (past)
+}
+
+
+
+transform past (Lua::Grammar::retstat) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Op'
+    past.'init'('node'=>node)
+    .return (past)
+}
+
+transform past (Lua::Grammar::exprstat) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Op'
+    $P0 = node['primaryexp']
+
+    .return (past)
+}
+
+transform past (Lua::Grammar::funcargs) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Val'
+    .return (past)
+}
+
+transform past (Lua::Grammar::funcstat) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Op'
+    past.'init'('node'=>node, 'pasttype'=>'assign')
+    .local pmc bodynode, bodypast
+    bodynode = node['body']
+    bodypast = tree.'get'('past', bodynode, 'Lua::Grammar::body')
+    past.'push'(bodypast)
+    .return (past)
+}
+
+
+# past (Lua::Grammar::body)
+#
+# Store each of the instructions in a body node in a PAST::Stmts node.
+#
+transform past (Lua::Grammar::body) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Block'
+    past.'init'('node'=>node)
+
+    # handle parameters
+
+    # handle block
+    .local pmc blocknode, blockpast
+    blocknode = node['block']
+    blockpast = tree.'get'('past', blocknode, 'Lua::Grammar::block')
+    past.'push'(blockpast)
+
+    .return (past)
+}
+
+transform past (Lua::Grammar::param) :language('PIR') {
+    .local pmc past, name
+    past = new 'PAST::Var'
+
+    past.'init'('node'=>node, 'scope'=>'parameter', 'name'=>name)
+    .return (past)
+}
+
+
+
+
+transform past (Lua::Grammar::name) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Var'
+    past.'init'('node'=>node)
+    .return (past)
+}
+
+transform past (Lua::Grammar::number) :language('PIR') {
+    .local pmc past, lhs
+    past = new 'PAST::Val'
+    past.'init'('node'=>node)
+    .return (past)
+}
+
+transform past (Lua::Grammar::prefixexp) :language('PIR') {
+    .local pmc past, lhs
+    past = new 'PAST::Var'
+    past.'init'('node'=>node)
+    .return (past)
+}
+
+transform past (Lua::Grammar::primaryxexp) :language('PIR') {
+    .local pmc past, lhs
+    past = new 'PAST::Var'
+    past.'init'('node'=>node)
+    .return (past)
+}
+
+transform past (Lua::Grammar::constructor) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Var'
+    past.'init'('node'=>node)
+    .return (past)
+}
+
+transform past (Lua::Grammar::expr1) :language('PIR') {
+    $P0 = node['expr']
+    #.return tree.'get'('past', $P0, 'Lua::Grammar::simpleexpr')
+    .local pmc past
+    past = new 'PAST::Val'
+    .return (past) ## FIX
+}
+
+transform past (Lua::Grammar::simpleexpr) :language('PIR') {
+    .local pmc past
+
+  number:
+    $P0 = node['number']
+    if null $P0 goto stringexpr
+    past = new 'PAST::Val'
+    past.'init'()
+    .return (past)
+  stringexpr:
+    $P0 = node['string']
+    if null $P0 goto nilexpr
+    .return tree.'get'('past', $P0, 'Lua::Grammar::string')
+  nilexpr:
+    $P0 = node['nil']
+    if null $P0 goto trueexpr
+    past = new 'PAST::Val'
+    past.'init'()
+    .return (past)
+  trueexpr:
+    $P0 = node['true']
+    if null $P0 goto falseexpr
+    past = new 'PAST::Val'
+    past.'init'()
+    .return (past)
+  falseexpr:
+    $P0 = node['false']
+    if null $P0 goto vararg
+    past = new 'PAST::Val'
+    past.'init'()
+    .return (past)
+  vararg:
+    $P0 = node['...']
+    if null $P0 goto function
+    past = new 'PAST::Val'
+    past.'init'()
+    .return (past)
+  function:
+    $P0 = node['body']
+    if null $P0 goto primaryexp
+    .return tree.'get'('past', $P0, 'Lua::Grammar::body')
+  primaryexp:
+    $P0 = node['primaryexp']
+    if null $P0 goto error
+    .return tree.'get'('past', $P0, 'Lua::Grammar::primaryexp')
+  error:
+    printerr "Unknown expression\n"
+
+    exit 1
+}
+
+transform past (Lua::Grammar::primaryexp) :language('PIR') {
+    .local pmc past, prefixnode, prefixpast
+    past = new 'PAST::Val'
+    prefixnode = node['prefixexp']
+    prefixpast = tree.'get'('past', prefixnode, 'Lua::Grammar::prefixnode')
+    past.'push'(prefixpast)
+    .return (past)
+}
+
+transform past (Lua::Grammar::prefixnode) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Var'
+    past.'init'('node'=>node)
+    .return (past)
+}
+
+transform past (Lua::Grammar::cond) :language('PIR') {
+    .local pmc past
+    $P0 = node['expr']
+    .return tree.'get'('past', $P0, 'Lua::Grammar::expr')
+}
+
+
+transform past (Lua::Grammar::string) :language('PIR') {
+  stringsingle:
+    $P0 = node['stringsingle']
+    if null $P0 goto stringdouble
+    .return tree.'get'('past', $P0, 'Lua::Grammar::stringsingle')
+   stringdouble:
+     $P0 = node['stringsingle']
+    .return tree.'get'('past', $P0, 'Lua::Grammar::stringsingle')
+}
+
+transform past (Lua::Grammar::stringdouble) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Val'
+
+    .local string value
+    # Check if this is a string match
+    $I0 = defined node["PGE::Text::bracketed"]
+    if $I0 goto bracketed_value
+    value = node
+    goto no_bracketed_value
+  bracketed_value:
+    value = node["PGE::Text::bracketed"]
+  no_bracketed_value:
+
+    # NOTE: Will have to come back and handle interpolation properly.
+    # Currently have no way to distinguish between single quoted and
+    # double quoted strings.
+    result.'init'('node'=>node, 'vtype'=>'.String', 'name'=>value)
+    .return (result)
+}
+
+transform past (Lua::Grammar::stringsingle) :language('PIR') {
+    .local pmc result
+    result = new 'PAST::Val'
+
+    .local string value
+    # Check if this is a string match
+    $I0 = defined node["PGE::Text::bracketed"]
+    if $I0 goto bracketed_value
+    value = node
+    goto no_bracketed_value
+  bracketed_value:
+    value = node["PGE::Text::bracketed"]
+  no_bracketed_value:
+
+    result.'init'('node'=>node, 'vtype'=>'.String', 'name'=>value)
+    .return (result)
+}
