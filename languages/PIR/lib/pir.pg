@@ -2,8 +2,7 @@ grammar PIR::Grammar;
 
 # TO DO:
 # 1. fix Heredocs parsing
-# 2. fix macro parsing
-# 3. Test and fix things
+# 2. Test and fix things
 
 token TOP {
   ^ <program> [ $ | <syntax_error: end of file expected> ]
@@ -151,14 +150,11 @@ rule instr {
   
 }
 
-# this is a token, because no spaces are allowed between
-# the id and the colon.
-token label {
-  <id> <':'>
-}
+
 
 rule pir_instr {
     <local_decl>
+  | <sym_decl>
   | <lexical_decl>
   | <const_def>
   | <globalconst_def>
@@ -181,11 +177,27 @@ rule macro_invocation {
 ## Locals and Lexicals
 ## 
 
+
+=head2 Local declarations
+
+Local declarations can be done using C<.sym> or C<.local> in normal context.
+In macro context however, only C<.sym> is allowed, and the C<.local> keyword
+indicates a label declaration. 
+
+=cut
+
 rule local_decl {
-  [ <'.local'> | <'.sym'> ]
+  <'.local'>
   [ <type> | <syntax_error: type for local symbol expected> ]
   <local_id_list>
 }
+
+rule sym_decl {
+	<'.sym'>
+	[ <type> | <syntax_error: type for local symbol expected> ]
+  <local_id_list>
+}
+
 
 rule local_id_list {
   <local_id> [ <','> <local_id> ]*
@@ -261,8 +273,8 @@ rule conditional_stat {
 }
 
 rule conditional_expr {
-		[ <'null'> <target> ]
-  | [ <simple_expr> [ <relational_operator> <simple_expr> ]? ]
+		<'null'> <target> 
+  | <simple_expr> [ <relational_operator> <simple_expr> ]?
 }
 
 ## Jump statements
@@ -461,7 +473,9 @@ rule short_sub_call {
   | [ <target> <'->'> ]
   ]?                               # optional invocant
   [ <target> | <string_constant> ] # method or sub name/id
-  <parenthesized_args>             # sub args
+  <parenthesized_args>             # sub args  
+  <process_heredocs>
+  <clear_heredocs>
 }
 
 rule sub_invocation {
@@ -500,7 +514,16 @@ rule arg {
       [ <target> | <syntax_error: target for named argument expected> ]
     ]?
   | <target>
+  | <heredoc_id>
   ] <set_flags>?
+}
+
+token heredoc_id {
+	<'<<'> <string_constant> <store_heredoc_label: $1>
+}
+
+rule heredoc_label {
+	.* ^^ <ident> $$
 }
 
 
@@ -633,10 +656,15 @@ rule macro_parameters {
   [ <')'>   | <syntax_error: ')' expected> ]
 }
 
-#### TODO: FIX
+# In order to be able to parse macro identifiers, before 
+# the macro body is parsed, some rules are redefined. 
+# After parsing the macro body, they are restored.
+#
 regex macro_body {
-  .*?
-  <'.endm'> \h* \n
+	<init_macro_rules>
+  <labeled_pir_instr>*  
+  <'.endm'>
+  <close_macro_rules>
 }
 
 
@@ -713,6 +741,22 @@ rule id_list {
 # Tokens
 #
 
+# this is a token, because no spaces are allowed between
+# the id and the colon.
+token normal_label {
+ 	<id> <':'>
+}
+
+
+token macro_label {
+	<'$'> <id> <':'>
+}
+
+rule macro_label_decl {
+		<'.local'> [ <macro_label> | <syntax_error: $LABEL: expected> ]
+	|	<normal_label>
+}
+
 token int_constant {
     <binary_constant>
   | <hex_constant>
@@ -762,8 +806,15 @@ rule type {
   
 }
 
-token target {
-  [ <id> | <reg> ]
+token normal_target {
+	<id> | <reg> 
+}
+
+# in a macro, a target can also be a 
+# macro_id
+#
+token macro_target {
+	<id> | <reg> | <macro_id>
 }
 
 token id {
