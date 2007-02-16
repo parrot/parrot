@@ -284,13 +284,14 @@ op find_method(out PMC, invar PMC, in STR) {
 
 =item B<defined>(out INT, invar PMC, in KEY)
 
-Test for PMC definedness.
+Test PMC for definedness.
 
 =item B<exists>(out INT, invar PMC, in INTKEY)
 
 =item B<exists>(out INT, invar PMC, in KEY)
 
-Test for key existence.
+Tests whether KEY or INTKEY exists in the aggregate PMC.
+Places the answer in INT.
 
 =cut
 
@@ -444,7 +445,7 @@ inline op pop (out PMC, invar PMC) {
 
 =item B<unshift>(invar PMC, invar PMC)
 
-Unshift $2 onto the end of the aggregate PMC $1, if that operation is defined.
+Unshift $2 onto the front of the aggregate PMC $1.
 
 =cut
 
@@ -478,7 +479,7 @@ inline op unshift (invar PMC, invar PMC) {
 
 =item B<shift>(out PMC, invar PMC)
 
-Shift off last entry in the aggregate $2, placing the result in $1.
+Shift off the first entry in the aggregate $2 and places it in $1.
 
 =cut
 
@@ -716,7 +717,7 @@ op get_mro(out PMC, invar PMC) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 
 =head1 LICENSE
 
