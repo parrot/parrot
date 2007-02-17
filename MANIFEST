@@ -18,6 +18,7 @@ LICENSES/gpl.txt                                            [main]doc
 MANIFEST                                                    []
 MANIFEST.SKIP                                               []
 MANIFEST.generated                                          []
+Makefile.PL                                                 []
 META.yml                                                    []
 NEWS                                                        [devel]doc
 PBC_COMPAT                                                  [devel]doc
