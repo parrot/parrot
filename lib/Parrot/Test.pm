@@ -131,23 +131,25 @@ Pass if the generated PASM matches $expected.
 
 =item C<pir_2_pasm_isnt($code, $unexpected, $description)>
 
-Compile the Parrot Intermediate Representation and generate Parrot Assembler Code.
-Pass unless the generated PASM is $expected.
+Compile the Parrot Intermediate Representation and generate Parrot Assembler
+Code.  Pass unless the generated PASM is $expected.
 
-=item C<c_output_is($code, $expected, $description)>
+=item C<c_output_is($code, $expected, $description, %options)>
 
-Compiles and runs the C code, passing the test if a string comparison of
-output with the expected result it true.
+Compiles and runs the C code, passing the test if a string comparison of output
+with the expected result it true.  Valid options are 'todo' => 'reason' to mark
+a TODO test.
 
-=item C<c_output_like($code, $expected, $description)>
+=item C<c_output_like($code, $expected, $description, %options)>
 
-Compiles and runs the C code, passing the test if output matches the
-expected result.
+Compiles and runs the C code, passing the test if output matches the expected
+result.  Valid options are 'todo' => 'reason' to mark a TODO test.
 
-=item C<c_output_isnt($code, $unexpected, $description)>
+=item C<c_output_isnt($code, $unexpected, $description, %options)>
 
-Compiles and runs the C code, passing the test if a string comparison of
-output with the unexpected result is false.
+Compiles and runs the C code, passing the test if a string comparison of output
+with the unexpected result is false.  Valid options are 'todo' => 'reason' to
+mark a TODO test.
 
 =item C<example_output_is( $example_f, $expected, @todo )>
 
@@ -724,7 +726,7 @@ sub _generate_functions {
         no strict 'refs';
 
         *{ $package . '::' . $func } = sub {
-            my ( $source, $expected, $desc ) = @_;
+            my ( $source, $expected, $desc, %options ) = @_;
 
             # $test_no will be part of temporary file
             my $test_no = $builder->current_test() + 1;
@@ -801,6 +803,8 @@ sub _generate_functions {
             $exit_code = run_command( $cmd, 'STDOUT' => $out_f, 'STDERR' => $out_f );
 
             my $meth = $c_test_map{$func};
+            local *main::TODO;
+            *main::TODO = \$options{todo} if $options{todo};
             my $pass = $builder->$meth( slurp_file($out_f), $expected, $desc );
             $builder->diag("'$cmd' failed with exit code $exit_code")
                 if $exit_code and not $pass;
