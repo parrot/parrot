@@ -10,7 +10,7 @@ use Test::More;
 use Parrot::Test;
 use Parrot::Config;
 
-plan $^O =~ m/MSWin32/ ? ( skip_all => 'broken on win32' ) : ( tests => 15 );
+plan $^O =~ m/MSWin32/ ? ( skip_all => 'broken on win32' ) : ( tests => 16 );
 
 =head1 NAME
 
@@ -560,6 +560,24 @@ print $S <<'EOF';
     compiled_sub()
     end
 .end
+
+.sub add :multi( int, int )
+    .param int l
+    .param int r
+
+    .local int sum
+    sum = l + r
+    .return( sum )
+.end
+
+.sub add :multi( num, num )
+    .param num l
+    .param num r
+
+    .local num sum
+    sum = l + r
+    .return( sum )
+.end
 EOF
 close $S;
 
@@ -645,6 +663,38 @@ main(int argc, char* argv[])
 }
 CODE
 Hello from foo!
+OUTPUT
+
+c_output_is( <<"CODE", <<'OUTPUT', "call multi sub from C - #41511", todo => 'RT #41511' );
+#include <parrot/parrot.h>
+#include <parrot/embed.h>
+#include <parrot/extend.h>
+
+int
+main(int argc, char* argv[])
+{
+    Parrot_Int      result;
+    Parrot_PMC      sub;
+    Parrot_PackFile pf;
+    Parrot_Interp   interp = Parrot_new(NULL);
+
+    if (!interp) {
+        printf( "No interpreter\\n" );
+        return 1;
+    }
+
+    pf = Parrot_readbc( interp, "$temp.pbc" );
+    Parrot_loadbc( interp, pf );
+
+    sub      = Parrot_find_global_cur( interp, const_string( interp, "add" ) );
+    result   = Parrot_call_sub( interp, sub, "III", 100, 200 );
+    printf( "Result is %d.\\n", result );
+
+    Parrot_exit(interp, 0);
+    return 0;
+}
+CODE
+Result is 300.
 OUTPUT
 
 unlink "$temp.pasm", "$temp.pir", "$temp.pbc" unless $ENV{POSTMORTEM};
