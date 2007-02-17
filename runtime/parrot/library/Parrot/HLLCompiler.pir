@@ -137,6 +137,12 @@ Add a stage to the compilation process queue. Takes either a "before" or
 to be added. If "before" and "after" aren't specified, the new stage is
 inserted at the end of the queue.
 
+It's possible to add multiple stages of the same name: for example, you
+might repeat a stage like "optimize_tree" or "display_benchmarks" after
+each transformation. If you have multiple stages of the same name, and
+add a new stage before or after that repeated stage, the new stage will
+be added at every instance of the repeated stage.
+
 =cut
 
 .sub 'addstage' :method
