@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 38;
 
 =head1 NAME
 
@@ -942,7 +942,7 @@ CODE
 foofoo
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "super 1" );
+pir_output_is( <<'CODE', <<'OUTPUT', "super 1 - two classes" );
 .sub main :main
     .local pmc o, cl
     cl = newclass 'Parent'
@@ -972,6 +972,96 @@ Child foo
 Parent foo
 Parent bar
 OUTPUT
+
+TODO: {
+    local $TODO = "3 class interitance, 4-class diamond inheritance";
+pir_output_is( <<'CODE', <<'OUTPUT', "super 2 - three classes" );
+.sub main :main
+    .local pmc o, p, c, g
+    p = newclass 'Parent'
+    c = subclass p, 'Child'
+    g = subclass c, 'GrandChild'
+    o = new 'GrandChild'
+    o."foo"()
+.end
+
+.namespace ['Parent']
+.sub foo :method
+    print "Parent foo\n"
+    self."foo"()
+.end
+
+.namespace ['Child']
+.sub foo :method
+    print "Child foo\n"
+    .local pmc s
+    s = new .Super, self
+    s."foo"()
+.end
+
+.namespace ['GrandChild']
+.sub foo :method
+    print "GrandChild foo\n"
+    .local pmc s
+    s = new .Super, self
+    s."foo"()
+.end
+
+CODE
+GrandChild foo
+Child foo
+Parent foo
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "super 3 - diamond" );
+.sub main :main
+    .local pmc o, p, c1, c2, i
+    p = newclass 'Parent'
+    c1 = subclass p, 'Child1'
+    c2 = subclass p, 'Child2'
+    i = subclass c1, 'Inbred'
+    addparent i, c2
+    o = new 'Inbred'
+    o."foo"()
+.end
+
+.namespace ['Parent']
+.sub foo :method
+    print "Parent foo\n"
+    self."foo"()
+.end
+
+.namespace ['Child1']
+.sub foo :method
+    print "Child1 foo\n"
+    .local pmc s
+    s = new .Super, self
+    s."foo"()
+.end
+
+.namespace ['Child2']
+.sub foo :method
+    print "Child2 foo\n"
+    .local pmc s
+    s = new .Super, self
+    s."foo"()
+.end
+
+.namespace ['Inbred']
+.sub foo :method
+    print "Inbred foo\n"
+    .local pmc s
+    s = new .Super, self
+    s."foo"()
+.end
+
+CODE
+Inbred foo
+Child1 foo
+Child2 foo
+Parent foo
+OUTPUT
+}
 
 pir_output_is( <<'CODE', <<'OUTPUT', "delegate keyed_int" );
 .sub main :main
