@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 40;
 
 =head1 NAME
 
@@ -975,7 +975,72 @@ OUTPUT
 
 TODO: {
     local $TODO = "3 class interitance, 4-class diamond inheritance";
-pir_output_is( <<'CODE', <<'OUTPUT', "super 2 - three classes" );
+pir_output_is( <<'CODE', <<'OUTPUT', "super 2 - test dispatch" );
+.sub main :main
+    .local pmc o, cl, cl2
+    cl = newclass 'Parent'
+    #cl = subclass cl, 'Child'
+    cl2 = newclass 'Child'
+    addparent cl2, cl
+    o = new 'Child'
+    o."foo"()
+.end
+
+.namespace ['Parent']
+.sub foo :method
+    print "Parent foo\n"
+    self."bar"()
+.end
+.sub bar :method
+    print "Parent bar\n"
+.end
+
+.namespace ['Child']
+.sub foo :method
+    print "Child foo\n"
+    .local pmc s
+    s = new .Super, self
+    s."foo"()
+.end
+CODE
+Child foo
+Parent foo
+Parent bar
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "super 3 - two classes, addparent" );
+.sub main :main
+    .local pmc o, p, c
+    p = newclass 'Parent'
+    c = newclass 'Child'
+    addparent c, p
+    o = new 'Child'
+    o."foo"()
+.end
+
+.namespace ['Parent']
+.sub foo :method
+    print "Parent foo\n"
+    self."bar"()
+.end
+.sub bar :method
+    print "Parent bar\n"
+.end
+
+.namespace ['Child']
+.sub foo :method
+    print "Child foo\n"
+    .local pmc s
+    s = new .Super, self
+    s."foo"()
+.end
+CODE
+Child foo
+Parent foo
+Parent bar
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "super 4 - three classes" );
 .sub main :main
     .local pmc o, p, c, g
     p = newclass 'Parent'
@@ -1013,7 +1078,7 @@ Child foo
 Parent foo
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "super 3 - diamond" );
+pir_output_is( <<'CODE', <<'OUTPUT', "super 5 - diamond" );
 .sub main :main
     .local pmc o, p, c1, c2, i
     p = newclass 'Parent'
