@@ -89,25 +89,24 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'inserting and removing stages' );
 .sub _main :main
     load_bytecode 'Parrot/HLLCompiler.pbc'
-    load_bytecode 'Data/Dumper.pbc'
 
     .local pmc hllcompiler
     hllcompiler = new [ 'HLLCompiler' ]
 
     hllcompiler.removestage('parse')
     hllcompiler.addstage('foo')
-    hllcompiler.addstage('bar', 'after' => 'past')
-    hllcompiler.addstage('baz', 'before' => 'run')
+    hllcompiler.addstage('bar', 'before' => 'run')
+    hllcompiler.addstage('optimize', 'after' => 'past')
+    hllcompiler.addstage('optimize', 'after' => 'post')
+    hllcompiler.addstage('peel', 'after' => 'optimize')
     $P0 = getattribute hllcompiler, "@stages"
     $S0 = join " ", $P0
     say $S0
-#    _dumper($P0, "hllcompiler")
-
     .return()
 .end
 
 CODE
-past bar post pir baz run foo
+past optimize peel post optimize peel pir bar run foo
 OUT
 
 
