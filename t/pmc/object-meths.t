@@ -1253,11 +1253,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "init calls" );
 
 .sub init_pmc :method :vtable
     .param pmc initializer 
-    print "WTF!\n"
+    print "init_pmc was called\n"
 .end
 CODE
 init was called
-init was called
+init_pmc was called
 OUTPUT
 
 # Local Variables:
