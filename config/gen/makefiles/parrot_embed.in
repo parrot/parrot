@@ -1,0 +1,57 @@
+# Copyright (C) 2007, The Perl Foundation.
+# $Id$
+#
+# cross-platform commands and paths
+RM_F            = @rm_f@
+RM_RF           = @rm_rf@
+MKPATH          = @mkpath@
+CP              = @cp@
+PERL            = @perl@
+PERL_INC       = $(shell $(PERL) -MConfig -e "print \$$Config::Config{archlib}")/CORE
+PERL_TYPEMAP    = $(shell $(PERL) -MExtUtils::MakeMaker -e "\$$_ = \$$INC{\"ExtUtils/MakeMaker.pm\"}; s/MakeMaker.pm/typemap/; print")
+PARROT          = ../../parrot$(EXE)
+
+# compilation options
+O               = @o@
+SHARE_EXT       = @share_ext@
+C_LIBS          = @libs@
+ALL_PARROT_LIBS = @libparrot_ldflags@ $(ICU_SHARED) $(C_LIBS)
+LINKFLAGS       = @linkflags@ @link_debug@ @ld_debug@
+LINK            = @link@
+LD_SHARE_FLAGS  = @ld_share_flags@
+CC_INC          = -I$(PERL_INC) -I../../include
+CFLAGS          = $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ $(CC_SHARED)
+
+# files needing compilation
+C_FILE          = lib/Parrot/Embed.c
+SO_FILE         = blib/arch/auto/Parrot/Embed/Embed$(SHARE_EXT)
+O_FILE          = lib/Parrot/Embed$(O)
+
+# other useful files
+PM              = blib/lib/Parrot/Embed.pm
+PBC             = t/greet.pbc
+TEST_FILES      = t/*.t
+
+all : $(SO_FILE) $(PM) $(PBC)
+
+$(O_FILE) : $(C_FILE)
+
+$(PM) : lib/Parrot/Embed.pm
+	$(MKPATH) blib/lib/Parrot
+	$(CP) lib/Parrot/Embed.pm blib/lib/Parrot
+
+$(SO_FILE) : $(O_FILE)
+	$(MKPATH) blib/arch/auto/Parrot/Embed
+	$(LINK) $(LD_SHARE_FLAGS) -o $(SO_FILE) $(O_FILE) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+
+$(C_FILE) : lib/Parrot/Embed.xs
+	( cd lib/Parrot; xsubpp -prototypes -typemap $(PERL_TYPEMAP) -typemap ../../typemap Embed.xs > Embed.c )
+
+$(PBC) : t/greet.pir
+	$(PARROT) -o $(PBC) t/greet.pir
+
+test : $(TEST_FILES)
+	prove -b $(TEST_FILES)
+
+clean : 
+	$(RM_RF) blib $(C_FILE) $(O_FILE)

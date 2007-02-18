@@ -60,6 +60,7 @@ sub makefiles {
     my ( $self, $conf ) = @_;
 
     genfile( 'config/gen/makefiles/root.in' => 'Makefile' );
+    genfile( 'config/gen/makefiles/parrot_embed.in' => 'ext/Parrot-Embed/Makefile' );
 
     genfile( 'config/gen/makefiles/past.in'      => 'compilers/past/Makefile' );
     genfile( 'config/gen/makefiles/past-pm.in'   => 'compilers/past-pm/Makefile' );
