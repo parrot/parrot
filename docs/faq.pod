@@ -37,14 +37,19 @@ L<apocalypses|"LINKS">.
 
 Yes.
 
-Parrot is in the early phases of its implementation.  The primary way to use
-Parrot is to write Parrot assembly code, described in L<PDD6|pdds/pdd6.pod>.
+Although Parrot is currently still under development, Parrot has been usable for 
+a long time. The primary way to use Parrot is to write Parrot Intermediate 
+Representation (PIR), described in L<PDD6|pdds/pdd19.pod>. PIR is a high-level 
+assembly language. PIR maps to the more low-level Parrot Assembly language (PASM),
+which is harder to write and read. Although you could write PASM instead of PIR,
+PIR is the recommended way to program your Parrot. See the examples to see what
+both PIR and PASM looks like.
 
 You can also create dynamic content within Apache using Ask Bjorn Hansen's
 mod_parrot module.  You are strongly advised that mod_parrot is a toy, and
 should not be used with any production code.
 
-=head2 Why should I program in Parrot Assembly language?
+=head2 Why should I program in PIR?
 
 Lots of reasons, actually.  :^)
 
@@ -56,59 +61,57 @@ All the L<cool kids|"LINKS"> are doing it.
 
 =item *
 
-It's a neat hack.
+It's easy to write and read.
 
 =item *
 
-You get all the pleasure of programming in assembly language without any of the
-requisite system crashes.
+You get all the pleasure of programming in assembly language (albeit a high-level
+assembly language) without any of the requisite system crashes.
 
 =back
 
-Seriously, though, programming in Parrot assembly language is an interesting
+Seriously, though, programming in PIR is an effective way to write
 challenge.  It's also one of the best ways to write test cases for Parrot.
 
 =head2 When can I expect to use Parrot with a I<real> programming language?
 
-It depends on what you mean by I<real>.  :^)
+You can already today! There are quite some high level languages being targeted
+to Parrot. Since the introduction of the Parrot Compiler Tools (the Parrot
+Grammar Engine (PGE) and the Tree Grammar Engine (TGE)), targeting a 
+language to Parrot has become a snap! Please note that, although some languages
+have come a long way, due to the fact that Parrot is still under active development,
+it's most safe to program in PIR. 
+
+Below is a list of some languages that are actively worked on.
 
 =over 4
 
 =item *
 
-Leon Brocard has released a proof-of-concept L<Java bytecode to Parrot
-bytecode|"LINKS"> compiler.
+Will Coleda and Matt Diephouse are working hard on their Tcl port to Parrot
+(called ParTcl). Will also created an APL implementation.
 
 =item *
 
-Gregor Purdy is working on a little language called Jako that targets Parrot
-bytecode directly.  (Available with the Parrot distribution.)
+Patrick R. Michaud is working on a Perl 6 implementation using the Parrot Compiler 
+Tools. (although the Perl 6 specification is not finished yet).
 
 =item *
 
-Dan Sugalski and Jeff Goff have started work on compiling Scheme down to Parrot
-bytecode.  (Available with the Parrot distribution.)
+François Perrad is working on a Lua implementation for Parrot.
 
 =item *
 
-Clint Pierce wrote an Integer Basic implementation in parrot assembly, which is
-shipped with the parrot distribution, as are a few example programs. (Including
-Hunt the Wumpus and Eliza)
+Allison Randal has been working on a Perl 1 port to Parrot, called Punie.
 
 =item *
 
-There's a Befunge interpreter in the languages directory
+Jonathan Worthington has been working on a .NET to Parrot translator.
 
 =item *
 
-There's an (ahem)BF interpreter in the languages directory. Be aware that BF is
-not, strictly speaking, the language's name, merely its initials.
-
-=item *
-
-There is a prototype Perl 6 implementation in the languages directory as well,
-though it's only as complete as the Perl 6 spec. (Which, at this writing, isn't
-sufficiently complete)
+Many other languages are worked on, some more actively than others. See 
+C<http://www.parrotcode.org/languages/> for a complete list.
 
 =back
 
@@ -545,34 +548,4 @@ Really.:
 L<http://developer.apple.com/techpubs/mac/PPCSoftware/PPCSoftware-13.html>
 
 =cut
-
-=head1 VERSION
-
-The FAQ is now in version control and "Revision" isn't really being tracked.
-The most recent SVN ID is C<$Id$>
-
-=over 4
-
-=item Revision 0.5 - 04 September 2002
-
-=item Revision 0.4 - 26 August 2002
-
-Fixed up the licensing bits
-
-=item Revision 0.3 - 13 March 2002
-
-Translated to POD and added "Why aren't we using external tool or library
-I<X>?"
-
-=item Revision 0.2 - 03 December 2001
-
-Added the "Parrot and Perl" section and "Why Re-implement Perl".  Incorporated
-Dan's Q&A items.
-
-=item Revision 0.1 - 03 December 2001
-
-Adopted from Simon Cozens's article, "Parrot: A Cross-Language Virtual Machine
-Architecture".
-
-=back
 
