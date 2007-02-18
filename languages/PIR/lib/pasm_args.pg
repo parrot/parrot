@@ -1,4 +1,4 @@
-grammar PIRGrammar;
+grammar PIR::Grammar;
 
 # This file contains helper rules to handle
 # the PASM instruction arguments. Many instructions

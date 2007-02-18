@@ -31,7 +31,7 @@ rule pmc_op {
 | find_method         <arg_hack> #
 | defined             <arg_hack> #
 | exists              <arg_hack> #
-| delete              <arg_hack> #
+| delete              <target> <PGE::Text::bracketed: []> #
 | elements            <arg_hack> #
 | push                <arg_hack> #
 | pop                 <arg_hack> #
