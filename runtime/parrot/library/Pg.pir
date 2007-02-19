@@ -81,7 +81,7 @@ A class method that returns a new connection object.
     ok = o_con.'status'()
     if ok == CONNECTION_OK goto is_ok
     con = new .Undef
-    o_con.'__init'(con)
+    o_con = new $I0, con
 is_ok:
     .return (o_con)
 .end
