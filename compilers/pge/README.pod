@@ -82,7 +82,7 @@ of the match:
 One can also get the intermediate PIR code that PGE generates for
 the rule subroutine -- just use
 
-    $S0 = p6regex_compiler(pattern, 'target'=>'PIR')
+    $S0 = p6regex_compile(pattern, 'target'=>'PIR')
 
 and you can print/inspect the contents of $S0 to see the generated code.
 
