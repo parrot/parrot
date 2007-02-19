@@ -96,6 +96,10 @@ N: Bob Rogers
 D: Random small bug fixes, including one for the linguine bug.
 E: rogers-perl6@rgrjr.dyndns.org
 
+N: Bram Geron
+D: IMCC documentation update
+E: bgeron@gmail.com
+
 N: Brent Royal-Gordon
 D: Configure, Parrot_sprintf, embedding, early regex engine.
 D: Early contributions under the name Brent Dax.
@@ -472,6 +476,9 @@ E: fonseka@gmail.com
 
 N: Sam Ruby
 D: Pythonic and OO patches
+
+N: Sam Vilain
+D: Prototype object model and tests
 
 N: Sean O'Rourke
 D: Original Perl6 compiler
