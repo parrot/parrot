@@ -194,7 +194,9 @@ BEGIN {
                 ],
             },
             yacc => { file_exts => ['y'] },
-            perl => { file_exts => ['pl', 'pm', 'in', 't'] },
+            perl => { file_exts => ['pl', 'pm', 'in', 't'],
+                      shebang      => qr/^#!\s*perl/,
+                      shebang_ext  => qr/.t$/ },
         },
         header => {
             c    => { file_exts => ['h'] },
@@ -208,8 +210,10 @@ BEGIN {
         for my $type ( keys %{ $file_class{$class} } ) {
             no strict 'refs';
 
-            my @exts       = @{ $file_class{$class}{$type}{file_exts} };
-            my @exceptions = defined $file_class{$class}{$type}{except_dirs}
+            my @exts        = @{ $file_class{$class}{$type}{file_exts} };
+            my $shebang     = $file_class{$class}{$type}{shebang};
+            my $shebang_ext = $file_class{$class}{$type}{shebang_ext};
+            my @exceptions  = defined $file_class{$class}{$type}{except_dirs}
                 ? @{ $file_class{$class}{$type}{except_dirs} }
                 : ();
             my $method     = join '_' => $type, $class;
@@ -255,8 +259,14 @@ BEGIN {
 
                 my $meth = $method . '_file_directories';
                 for my $dir ( $self->$meth ) {
-                    return $dir->file_with_name($name)
-                        if $dir->file_exists_with_name($name);
+                    if ($dir->file_exists_with_name($name)) {
+
+                        my $file = $dir->file_with_name($name);
+                        return $file unless $shebang && $name =~ $shebang_ext;
+
+                        my $first_line = ($file->read)[0];
+                        return $file if $first_line =~ $shebang;
+                    };
                 }
 
                 print 'WARNING: ' . __FILE__ . ':' . __LINE__
