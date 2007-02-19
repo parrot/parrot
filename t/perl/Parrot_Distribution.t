@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 31;
+use Test::More tests => 32;
 use File::Spec;
 
 =head1 NAME
@@ -28,6 +28,11 @@ die "Run these tests from the distribution root\n" unless -d 't/perl';
 chdir 't/perl';
 my $d = Parrot::Distribution->new();
 isa_ok( $d, 'Parrot::Docs::Directory' );
+
+{
+    my $d2 = Parrot::Distribution->new;
+    ok( $d == $d2, 'Parrot::Distribution is a singleton' );
+}
 
 ok( $d->c_source_file_with_name('pf_items'), 'C source file' );
 ok( !$d->c_source_file_with_name('moomoo'), 'C source file not there' );
