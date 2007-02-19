@@ -556,15 +556,16 @@ everything via the VTABLE api.
 */
 
     void splice(PMC* value, INTVAL offset, INTVAL count) {
+        INTVAL length, elems, shift, i;
+
         if (value->vtable->base_type != SELF->vtable->base_type &&
                 value->vtable->base_type != enum_class_FixedStringArray)
             real_exception(INTERP, NULL, E_TypeError,
                     "ResizableStringArray: illegal type for splice!");
 
-        INTVAL length = VTABLE_elements(INTERP, SELF);
-        INTVAL elems  = VTABLE_elements(INTERP, value);
-        INTVAL shift  = elems - count;
-        INTVAL i;
+        length = VTABLE_elements(INTERP, SELF);
+        elems  = VTABLE_elements(INTERP, value);
+        shift  = elems - count;
 
         /* start from end? */
         if (offset < 0)
