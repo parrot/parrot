@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 33;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.byte' );
@@ -209,6 +209,125 @@ end
 CODE
 from	world
 to	Lua
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub' );
+x = string.gsub("hello world", "(%w+)", "%1 %1")
+print(x)
+x = string.gsub("hello world", "%w+", "%0 %0", 1)
+print(x)
+x = string.gsub("hello world from Lua", "(%w+)%s*(%w+)", "%2 %1")
+print(x)
+x = string.gsub("home = $HOME, user = $USER", "%$(%w+)", string.reverse)
+print(x)
+-- x = string.gsub("4+5 = $return 4+5$", "%$(.-)%$", function (s) return loadstring(s)() end)
+-- print(x)
+print "4+5 = 9"
+local t = {name="lua", version="5.1"}
+x = string.gsub("$name-$version.tar.gz", "%$(%w+)", t)
+print(x)
+CODE
+hello hello world world
+hello hello world
+world hello Lua from
+home = EMOH, user = RESU
+4+5 = 9
+lua-5.1.tar.gz
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub' );
+s = string.gsub("Lua is cute", "cute", "great")
+print(s)
+s = string.gsub("all lii", "l", "x")
+print(s)
+s = string.gsub("Lua is great", "Sol", "Sun")
+print(s)
+s = string.gsub("all lii", "l", "x", 1)
+print(s)
+s = string.gsub("all lii", "l", "x", 2)
+print(s)
+count = select(2, string.gsub("string with 3 spaces", " ", " "))
+print(count)
+CODE
+Lua is great
+axx xii
+Lua is great
+axl lii
+axx lii
+3
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub' );
+print(string.gsub("hello, up-down!", "%A", "."))
+text = "hello world"
+nvow = select(2, string.gsub(text, "[AEIOUaeiou]", ""))
+print(nvow)
+print(string.gsub("one, and two; and three", "%a+", "word"))
+test = "int x; /* x */  int y; /* y */"
+print(string.gsub(test, "/%*.*%*/", "<COMMENT>"))
+print(string.gsub(test, "/%*.-%*/", "<COMMENT>"))
+s = "a (enclosed (in) parentheses) line"
+-- print(string.gsub(s, "%b()", ""))
+print("a  line", 1)
+print(string.gsub("hello Lua!", "%a", "%0-%0"))
+print(string.gsub("hello Lua", "(.)(.)", "%2%1"))
+CODE
+hello..up.down.	4
+3
+word, word word; word word	5
+int x; <COMMENT>	1
+int x; <COMMENT>  int y; <COMMENT>	2
+a  line	1
+h-he-el-ll-lo-o L-Lu-ua-a!	8
+ehll ouLa	4
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub' );
+function expand (s)
+    return (string.gsub(s, "%$(%w+)", _G))
+end
+
+name = "Lua"; status= "great"
+print(expand("$name is $status, isn't it?"))
+print(expand("$othername is $status, isn't it?"))
+CODE
+Lua is great, isn't it?
+$othername is great, isn't it?
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub' );
+function expand (s)
+    return (string.gsub(s, "%$(%w+)", function (n)
+                                          return tostring(_G[n]), 1
+                                      end))
+end
+
+print(expand("print = $print; a = $a"))
+CODE
+/print = function: (0[Xx])?[0-9A-Fa-f]+; a = nil/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub (invalid index)' );
+x = string.gsub("hello world", "(%w+)", "%2 %2")
+CODE
+/invalid capture index/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub (bad type)' );
+x = string.gsub("hello world", "(%w+)", true)
+CODE
+/string\/function\/table expected/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub (invalid value)' );
+function expand (s)
+    return (string.gsub(s, "%$(%w+)", _G))
+end
+
+name = "Lua"; status= true
+print(expand("$name is $status, isn't it?"))
+CODE
+/invalid replacement value \(a boolean\)/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.len' );

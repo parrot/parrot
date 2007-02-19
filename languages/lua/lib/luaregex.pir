@@ -342,8 +342,16 @@ Francois Perrad
   initchar_ok:
     if initchar == ')' goto end
     inc pos
-    if initchar != "\\" goto term_literal
+  term_percent:
+    if initchar != '%' goto term_backslash
+    initchar = substr target, pos, 1
+    inc pos
+    if pos <= lastpos goto term_percent_ok
+    parse_error(mob, pos, "Search pattern not terminated")
+  term_percent_ok:
+    goto term_literal
   term_backslash:
+    if initchar != "\\" goto term_literal
     initchar = substr target, pos, 1
     inc pos
     if pos <= lastpos goto term_backslash_ok
@@ -382,7 +390,6 @@ Francois Perrad
 .const int PGE_INF = 2147483647
 .const int PGE_BACKTRACK_GREEDY = 1
 .const int PGE_BACKTRACK_EAGER = 2
-.const int PGE_BACKTRACK_NONE = 3
 
 .sub "parse_quant"
     .param pmc mob
@@ -398,7 +405,7 @@ Francois Perrad
     lastpos = length target
     min = 0
     max = PGE_INF
-    backtrack = PGE_BACKTRACK_NONE
+    backtrack = PGE_BACKTRACK_GREEDY
     if key != '+' goto quant_max
     min = 1
   quant_max:

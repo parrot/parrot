@@ -69,7 +69,7 @@ language_output_is( 'lua', $code, $out, 'fasta', params => '1000' );
 
 TODO:
 {
-    local $TODO = 'string.gsub is not implemented';
+    local $TODO = 'loadstring is not implemented';
 
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'pidigits.lua-2.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'pidigits-output.txt' ));
@@ -92,7 +92,7 @@ language_output_is( 'lua', $code, $out, 'nsieve' );
 
 TODO:
 {
-    local $TODO = 'string.gsub is not implemented';
+    local $TODO = 'string.gsub is still incomplete';
 
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'regexdna.lua-3.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'regexdna-output.txt' ));

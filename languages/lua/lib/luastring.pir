@@ -131,110 +131,6 @@ L0:
 .end
 
 
-.sub 'str_find_aux' :anon
-    .param int find
-    .param pmc s :optional
-    .param pmc pattern :optional
-    .param pmc init :optional
-    .param pmc plain :optional
-    $S1 = checkstring(s)
-    $I1 = length $S1
-    $S2 = checkstring(pattern)
-    $I2 = length $S2
-    $I3 = optint(init, 1)
-    $I3 = posrelat($I3, $I1)
-    dec $I3
-    unless $I3 < 0 goto L1
-    $I3 = 0
-    goto L2
-L1:
-    unless $I3 > $I1 goto L2
-    $I3 = $I1
-L2:
-    $S1 = substr $S1, $I3
-    unless find goto L3
-    if_null plain, L4
-    $I0 = istrue plain
-    if $I0 goto L5
-L4:
-    .const string specials = "^$*+?.([%-"
-    $P0 = split '', specials
-L6:
-    $I0 = $P0
-    unless $I0 goto L5
-    $S0 = shift $P0
-    $I0 = index $S2, $S0
-    if $I0 >= 0 goto L3
-    goto L6
-L5:
-    # do a plain search
-    .local int idx
-    idx = index $S1, $S2
-    if idx < 0 goto L7
-    .local pmc start
-    .local pmc end
-    new start, .LuaNumber
-    $I0 = $I3 + idx
-    inc $I0
-    set start, $I0
-    new end, .LuaNumber
-    $I0 = $I3 + idx
-    $I0 += $I2
-    set end, $I0
-    .return (start, end)
-L3:
-    .local pmc regex_comp
-    regex_comp = global '_REGEX_COMP'
-    .local pmc rulesub
-    rulesub = regex_comp($S2)
-    .local pmc match
-    match = rulesub($S1)
-    unless match goto L7
-    new $P0, .Array
-    .local pmc capts
-    capts = match.'get_array'()
-    if_null capts, L10
-    $I1 = capts
-    set $P0, $I1
-    $I0 = 0
-L9:
-    unless $I0 < $I1 goto L10
-    $P1 = capts[$I0]
-    $S0 = $P1
-    new $P2, .LuaString
-    set $P2, $S0
-    $P0[$I0] = $P2
-    inc $I0
-    goto L9
-L10:
-    unless find goto L8
-    .local pmc start
-    .local pmc end
-    new start, .LuaNumber
-    $I0 = match.'from'()
-    $I0 += $I3
-    inc $I0
-    set start, $I0
-    new end, .LuaNumber
-    $I0 = match.'to'()
-    $I0 += $I3
-    set end, $I0
-    .return (start, end, $P0 :flat)
-L8:
-    if $P0 goto L11
-    .local pmc ret
-    $S0 = match.'text'()
-    new ret, .LuaString
-    set ret, $S0
-    .return (ret)
-L11:
-    .return ($P0 :flat)
-L7:
-    # not found
-    new ret, .LuaNil
-    .return (ret)
-.end
-
 =item C<string.byte (s [, i [, j]])>
 
 Returns the internal numerical codes of the characters C<s[i]>, C<s[i+1]>,...,
@@ -366,6 +262,121 @@ STILL INCOMPLETE (see F<languages/lua/lib/luaregex.pir>).
     .return str_find_aux(1, argv :flat)
 .end
 
+.sub 'str_find_aux' :anon
+    .param int find
+    .param pmc s :optional
+    .param pmc pattern :optional
+    .param pmc init :optional
+    .param pmc plain :optional
+    $S1 = checkstring(s)
+    $I1 = length $S1
+    $S2 = checkstring(pattern)
+    $I2 = length $S2
+    $I3 = optint(init, 1)
+    $I3 = posrelat($I3, $I1)
+    dec $I3
+    unless $I3 < 0 goto L1
+    $I3 = 0
+    goto L2
+L1:
+    unless $I3 > $I1 goto L2
+    $I3 = $I1
+L2:
+    $S1 = substr $S1, $I3
+    unless find goto L3
+    if_null plain, L4
+    $I0 = istrue plain
+    if $I0 goto L5
+L4:
+    .const string specials = "^$*+?.([%-"
+    $P0 = split '', specials
+L6:
+    $I0 = $P0
+    unless $I0 goto L5
+    $S0 = shift $P0
+    $I0 = index $S2, $S0
+    if $I0 >= 0 goto L3
+    goto L6
+L5:
+    # do a plain search
+    .local int idx
+    idx = index $S1, $S2
+    if idx < 0 goto L7
+    .local pmc start
+    .local pmc end
+    new start, .LuaNumber
+    $I0 = $I3 + idx
+    inc $I0
+    set start, $I0
+    new end, .LuaNumber
+    $I0 = $I3 + idx
+    $I0 += $I2
+    set end, $I0
+    .return (start, end)
+L3:
+    .local pmc regex_comp
+    regex_comp = global '_REGEX_COMP'
+    .local pmc rulesub
+    rulesub = regex_comp($S2)
+    .local pmc match
+    match = rulesub($S1)
+    unless match goto L7
+    unless find goto L8
+    .local pmc start
+    .local pmc end
+    new start, .LuaNumber
+    $I0 = match.'from'()
+    $I0 += $I3
+    inc $I0
+    set start, $I0
+    new end, .LuaNumber
+    $I0 = match.'to'()
+    $I0 += $I3
+    set end, $I0
+    $P0 = captures(match, 0)
+    .return (start, end, $P0 :flat)
+L8:
+    $P0 = captures(match, 1)
+    .return ($P0 :flat)
+L7:
+    # not found
+    .local pmc ret
+    new ret, .LuaNil
+    .return (ret)
+.end
+
+.sub 'captures' :anon
+    .param pmc match
+    .param int whole
+    .local pmc ret
+    new ret, .Array
+    .local pmc capts
+    capts = match.'get_array'()
+    if_null capts, L1
+    $I1 = capts
+    set ret, $I1
+    $I0 = 0
+L2:
+    unless $I0 < $I1 goto L3
+    $P0 = capts[$I0]
+    $S0 = $P0.'text'()
+    new $P1, .LuaString
+    set $P1, $S0
+    ret[$I0] = $P1
+    inc $I0
+    goto L2
+L3:
+    .return (ret)
+L1:
+    unless whole == 1 goto L4
+    set ret, 1
+    $S0 = match.'text'()
+    new $P1, .LuaString
+    set $P1, $S0
+    ret[0] = $P1
+L4:
+    .return (ret)
+.end
 
 =item C<string.format (formatstring, e1, e2, ...)>
 
@@ -478,11 +489,12 @@ L2:
     .return (ret)
 .end
 
+.const string digits = '0123456789'
+
 .sub 'scanformat' :anon
     .param string strfrmt
     .param int start
     .const string flags = '-+ #0'
-    .const string digits = '0123456789'
     .local int idx
     $I1 = length strfrmt
     idx = start
@@ -624,29 +636,8 @@ STILL INCOMPLETE (see F<languages/lua/lib/luaregex.pir>).
     $I0 = match.'to'()
     $S1 = substr $S1, $I0
     set s, $S1
-    .local pmc capts
-    capts = match.'get_array'()
-    if_null capts, L2
-    $I1 = capts
-    new $P0, .Array
-    set $P0, $I1
-    $I0 = 0
-L3:
-    unless $I0 < $I1 goto L4
-    $P1 = capts[$I0]
-    $S0 = $P1
-    new $P2, .LuaString
-    set $P2, $S0
-    $P0[$I0] = $P2
-    inc $I0
-    goto L3
-L4:
+    $P0 = captures(match, 1)
     .return ($P0 :flat)
-L2:
-    $S0 = match.'text'()
-    new ret, .LuaString
-    set ret, $S0
-    .return (ret)
 L1:
     .local pmc ret
     new ret, .LuaNil
@@ -674,7 +665,7 @@ The optional last parameter C<n> limits the maximum number of substitutions
 to occur. For instance, when C<n> is 1 only the first occurrence of C<pat>
 is replaced.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE (see F<languages/lua/lib/luaregex.pir>).
 
 =cut
 
@@ -682,15 +673,156 @@ NOT YET IMPLEMENTED.
     .param pmc s :optional
     .param pmc pat :optional
     .param pmc repl :optional
-    .param pmc n :optional
-    $S0 = checkstring(s)
-    $I0 = length $S0
-    $S1 = checkstring(pat)
-    $I1 = $I0 + 1
-    $I2 = optint(n, $I1)
-    not_implemented()
+    .param pmc max :optional
+    .local string src
+    src = checkstring(s)
+    $I1 = length src
+    $S2 = checkstring(pat)
+    $I0 = $I1 + 1
+    $I4 = optint(max, $I0)
+    .local int anchor
+    anchor = 0
+    $S0 = substr $S2, 0, 1
+    unless $S0 == '^' goto L1
+    anchor = 1
+L1:
+    .local int n
+    n = 0
+    .local pmc regex_comp
+    regex_comp = global '_REGEX_COMP'
+    .local pmc rulesub
+    rulesub = regex_comp($S2)
+    .local pmc b
+    new b, .LuaString
+L2:
+    unless n < $I4 goto L3
+    .local pmc match
+    match = rulesub(src)
+    unless match goto L3
+    inc n
+    add_value(b, src, match, repl)
+    $I0 = match.'to'()
+    src = substr src, $I0
+    if anchor goto L3
+    goto L2
+L3:
+    $S0 = b
+    $S0 .= src
+    set b, $S0
+    new $P0, .LuaNumber
+    set $P0, n
+    .return (b, $P0)
 .end
 
+.sub 'add_value' :anon
+    .param pmc b
+    .param string s
+    .param pmc match
+    .param pmc repl
+    $I0 = isa repl, 'LuaNumber'
+    unless $I0 goto L1
+    $P0 = repl.'tostring'()
+    .return add_s(b, s, match, $P0)
+L1:
+    $I0 = isa repl, 'LuaString'
+    unless $I0 goto L2
+    .return add_s(b, s, match, repl)
+L2:
+    $I0 = isa repl, 'LuaClosure'
+    if $I0 goto L3
+    $I0 = isa repl, 'LuaFunction'
+    if $I0 goto L3
+    goto L4
+L3:
+    $P0 = captures(match, 1)
+    ($P1) = repl($P0 :flat)
+    goto L5
+L4:
+    $I0 = isa repl, 'LuaTable'
+    unless $I0 goto L6
+    $S0 = onecapture(match, 0)
+    new $P0, .LuaString
+    set $P0, $S0
+    $P1 = repl[$P0]
+    goto L5
+L6:
+    error("string/function/table expected")
+L5:
+    if $P1 goto L7  # nil or false?
+    # keep original text
+    $S1 = b
+    $I0 = match.'to'()
+    $S0 = substr s, 0, $I0
+    $S1 .= $S0
+    set b, $S1
+    .return ()
+L7:
+    $I0 = isa $P1, 'LuaString'
+    if $I0 goto L8
+    $I0 = isa $P1, 'LuaNumber'
+    if $I0 goto L8
+    $S0 = "invalid replacement value (a "
+    $S1 = typeof $P1
+    $S0 .= $S1
+    $S0 .= ")"
+    error($S0)
+L8:
+    $S1 = b
+    $I0 = match.'from'()
+    $S0 = substr s, 0, $I0
+    $S1 .= $S0
+    $S0 = $P1
+    $S1 .= $S0
+    set b, $S1
+    .return ()
+.end
+
+.sub 'add_s' :anon
+    .param pmc b
+    .param string s
+    .param pmc match
+    .param pmc repl
+    $S1 = b
+    $I0 = match.'from'()
+    $S0 = substr s, 0, $I0
+    $S1 .= $S0
+    $S4 = repl
+    $I4 = length $S4
+    .local int i
+    i = 0
+L1:
+    unless i < $I4 goto L2
+    $S0 = substr $S4, i, 1
+    if $S0 != '%' goto L3
+    inc i
+    $S0 = substr $S4, i, 1
+    $I0 = index digits, $S0
+    if $I0 < 0 goto L3
+    unless $S0 == '0' goto L4
+    $S0 = match.'text'()
+    goto L3
+L4:
+    dec $I0
+    $S0 = onecapture(match, $I0)
+L3:
+    $S1 .= $S0
+    inc i
+    goto L1
+L2:
+    set b, $S1
+.end
+
+.sub 'onecapture' :anon
+    .param pmc match
+    .param int i
+    push_eh _handler
+    $P0 = match.'get_array'()
+    $P1 = $P0[i]
+    $S0 = $P1.'text'()
+    .return ($S0)
+_handler:
+    error("invalid capture index")
+.end
 
 =item C<string.len (s)>
 
