@@ -5,12 +5,12 @@
 .const int TESTS = 47
 
 .macro IMPORT(lib,func)
-    import_sub = find_global .lib, .func
-    store_global .func, import_sub
+    _ = find_global .lib, .func
+    store_global .func, _
 .endm
 
 .macro TEST_IMPORT()
-    .sym pmc import_sub
+    .sym pmc _
     .IMPORT('Test::More', 'ok')
     .IMPORT('Test::More', 'is')
     .IMPORT('Test::More', 'diag')
@@ -29,7 +29,7 @@
     store_global 'TEST_VERBOSE', $P0
 
   import:
-    .local pmc import_sub
+    .local pmc _
     .IMPORT('Test::More', 'plan')
     'plan'( TESTS )
 
