@@ -1357,6 +1357,7 @@ SRC_TEST_FILES = \
 TOOLS_TEST_FILES = \
     t/tools/*.t
 PMC2CUTILS_DIR = t/tools/pmc2cutils
+OPS2PMUTILS_DIR = t/tools/ops2pmutils
 BUILDTOOLS_TEST_FILES = \
         $(PMC2CUTILS_DIR)/00-qualify.t \
         $(PMC2CUTILS_DIR)/01-pmc2cutils.t \
@@ -1365,7 +1366,19 @@ BUILDTOOLS_TEST_FILES = \
         $(PMC2CUTILS_DIR)/04-dump_pmc.t \
         $(PMC2CUTILS_DIR)/05-gen_c.t \
         $(PMC2CUTILS_DIR)/06-print_tree.t \
-        $(PMC2CUTILS_DIR)/07-open_file.t
+        $(PMC2CUTILS_DIR)/07-open_file.t \
+        $(OPS2PMUTILS_DIR)/00-qualify.t \
+        $(OPS2PMUTILS_DIR)/01-ops2pmutils.t \
+        $(OPS2PMUTILS_DIR)/02-usage.t \
+        $(OPS2PMUTILS_DIR)/03-new.t \
+        $(OPS2PMUTILS_DIR)/04-prepare_ops.t \
+        $(OPS2PMUTILS_DIR)/05-renum_op_map_file.t \
+        $(OPS2PMUTILS_DIR)/06-load_op_map_files.t \
+        $(OPS2PMUTILS_DIR)/07-no_ops_skip.t \
+        $(OPS2PMUTILS_DIR)/08-sort_ops.t \
+        $(OPS2PMUTILS_DIR)/09-prepare_real_ops.t \
+        $(OPS2PMUTILS_DIR)/10-print_module.t \
+        $(OPS2PMUTILS_DIR)/11-print_h.t
 
 # Common prep for all test targets.
 # We probably need a complete build before running the tests.
@@ -1816,3 +1829,4 @@ smoke-clean :
 # mode: makefile
 # End:
 #
+
