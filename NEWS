@@ -1,5 +1,37 @@
 # $Id$
 
+New in 0.4.9
+
+- Compilers:
+   + IMCC: Parrot calling conventions now available in C PMCs, allowing
+     named, optional, slurpy, and flat parameter passing
+   + PGE: extended support for Perl 5 Regexes
+   + smop: prototype object model implementation
+   + hllcompiler: refactored to run a configurable set of compilation stages
+- PAST:
+   + redesigned assign/binding to support Perl 6 binding semantics
+- Languages:
+   + Updated Lua, PHP ("Plumhead"), Tcl ("ParTcl"), perl6, perl5
+   + New language: PIR - a PGE-based implementation of Parrot PIR
+   + perl6 now supports binding (':='), join
+   + <insert other specific language news here>
+- Design:
+   + PDD21 "Objects" - rewritten
+   + PDD22 "I/O" - updated and 'TODO' tests added
+- Documentation:
+   + Interface stability classification standards approved
+   + Roles and Responsibilities documented approved
+- Implementation:
+   + More NameSpace and OS PMC methods implemented
+   + Parrot executable fullname and basename now available in PIR/PASM code
+   + new 'chomp' library function
+- Build:
+   + Major improvements in test coverage for 'ops2pm.pl'
+- Misc:
+   + many bugfixes, enhancements, and coding standard updates
+   + extended support for Sun Workshop Compilers
+   + Parrot now builds on PocketPC platform
+
 New in 0.4.8
 
 - Compilers:
