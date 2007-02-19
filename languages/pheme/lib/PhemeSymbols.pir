@@ -312,6 +312,12 @@
 	.return( 1 )
 .end
 
+# XXX - a cheat for now
+.sub 'atom?' :multi( string )
+	.param pmc val
+	.return( 1 )
+.end
+
 .sub 'null?' :multi( [ 'Pheme'; 'Cons' ] )
 	.param pmc cons
 	.local int count
