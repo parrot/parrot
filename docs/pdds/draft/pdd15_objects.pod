@@ -7,7 +7,7 @@ docs/pdds/pdd15_objects.pod - Object and Class semantics for Parrot
 
 =head1 ABSTRACT
 
-This PDD describes the semantics of Parrot's object and class systems. 
+This PDD describes the semantics of Parrot's object and class systems.
 
 =head1 VERSION
 
@@ -151,7 +151,7 @@ class for each OO class, and they all share the Class or Object vtable,
 respectively.
 
 
-An instance of the Class PMC has 5 attributes, which are:
+An instance of the Class PMC has six attributes, which are:
 
 =over 4
 
@@ -174,17 +174,17 @@ optimization, and can be calculated from the class's rules of
 inheritance, the list of immediate parent classes, and the parent
 classes' rules of inheritance)
 
-=item 3
+=item 4
 
 An array PMC of the composed roles
 
-=item 4
+=item 5
 
 An array PMC of the methods defined in the class or composed into the
 class
 
 
-=item 5
+=item 6
 
 The class attribute hash. Keys are the attribute names and the values
 are a hash of attribute characteristics, including name, type, and the
@@ -210,38 +210,42 @@ Class PMCs also have the "I am a class" flag set on them.
 
 =head3 Methods
 
-=head2 name
+=over 4
+
+=item name
 
 The accessor for the name attribute. With no argument, it simply returns
 the current value for name. When passed an argument, it sets the name of
 the class, and also sets the association with a namespace.
 
-=head2 new
+=item new
 
     obj = class.'new'( 'myattrib' => "Foo" )
 
 Create a new instance object from the class object. It takes an optional
 slurpy, named list of attributes and values to initialize the object.
 
-=head2 attributes
+=item attributes
 
 An accessor for the attributes of the class. It returns the a Hash of
 all attributes, with a key of the attribute name, and a value of the
 Attribute object. The accessor is read-only.
 
-=head2 add_attribute
+=item add_attribute
 
 Adds a single attribute to the class. It takes a simple string name, and
 a simple string value for type.
 
-=head2 parents
+=item parents
 
 An accessor for the parents of the class. It returns an Array of all
 parents. The accessor is read-only.
 
-=head2 add_parent
+=item add_parent
 
 Adds a single parent to the class. It takes a simple string name.
+
+=back
 
 =head2 Object PMC API
 
