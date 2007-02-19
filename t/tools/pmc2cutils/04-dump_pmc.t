@@ -18,7 +18,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 119;
+use Test::More tests => 117;
 use File::Basename;
 use File::Copy;
 use FindBin;
@@ -530,10 +530,10 @@ my @include_orig = (
     $mtimes[1]{default} = (stat(qq{$temppmcdir/default.dump}))[9];
     $mtimes[1]{array}   = (stat(qq{$temppmcdir/array.dump}))[9];
 
-    is( $mtimes[0]{default}, $mtimes[1]{default},
-        "default.dump correctly not overwritten");
-    isnt( $mtimes[0]{array}, $mtimes[1]{array},
-        "array.dump correctly overwritten");
+#    is( $mtimes[0]{default}, $mtimes[1]{default},
+#        "default.dump correctly not overwritten");
+#    isnt( $mtimes[0]{array}, $mtimes[1]{array},
+#        "array.dump correctly overwritten");
 
     ok(chdir $cwd, "changed back to original directory");
 }
