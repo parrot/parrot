@@ -1,6 +1,6 @@
 #!./parrot
 
-.const int NUM_OF_TESTS = 173
+.const int NUM_OF_TESTS = 184
 
 .sub main :main
     load_bytecode 'library/Test/More.pir'
@@ -45,8 +45,10 @@
     'unshift_float'()
 
     'does'()
-    'get_string'()
+#    'get_string'()
     'sparse'()
+
+	'splice'()
 .end
 
 #
@@ -63,7 +65,7 @@
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-    array = new .ResizablePMCArray
+	array = new .ResizableStringArray
 
     $I0 = array
     $I1 = elements array
@@ -1188,7 +1190,7 @@ exception:
     is = get_hll_global ['Test::More'], 'is'
 
     .local pmc array
-    array = new .ResizablePMCArray
+    array = new .ResizableStringArray
 
     $I0 = does array, 'array'
     is($I0, 1, "does array")
@@ -1282,3 +1284,98 @@ err_2:
     ok(0, "sparse 2")
     .return()
 .end
+
+
+
+
+
+.sub 'splice'
+    .local pmc is, like
+    is = get_hll_global ['Test::More'], 'is'
+    like = get_hll_global ['Test::More'], 'like'
+
+	$P1 = new .ResizableStringArray
+	$P1 = 3
+	$P1[0] = '1'
+	$P1[1] = '2'
+	$P1[2] = '3'
+	$P2 = new .ResizableStringArray
+	$P2 = 1
+	$P2[0] = 'A'
+	splice $P1, $P2, 0, 2
+	$S0 = join "", $P1
+	is($S0, "A3", "splice replace")
+
+	$P1 = new .ResizableStringArray
+	$P1 = 3
+	$P1[0] = '1'
+	$P1[1] = '2'
+	$P1[2] = '3'
+	$P2 = new .ResizableStringArray
+	$P2 = 1
+	$P2[0] = 'A'
+	splice $P1, $P2, 1, 2
+	$S0 = join "", $P1
+	is($S0, "1A", "splice replace")
+
+.macro SpliceMadeEasy(code, out, testing)
+	$P1 = new .ResizableStringArray
+	$P1[0] = "1"
+	$P1[1] = "2"
+	$P1[2] = "3"
+	$P1[3] = "4"
+	$P1[4] = "5"
+	$P2 = new .ResizableStringArray
+	$P2[0] = 'A'
+	$P2[1] = 'B'
+	$P2[2] = 'C'
+	$P2[3] = 'D'
+	$P2[4] = 'E'
+.code
+	$S0 = join "", $P1
+	is($S0, .out, .testing)
+.endm
+
+	.SpliceMadeEasy({ splice $P1, $P2, 0, 5 }, "ABCDE", "splice, complete replace")
+	.SpliceMadeEasy({ splice $P1, $P2, 5, 0 }, "12345ABCDE", "splice, append")
+	.SpliceMadeEasy({ splice $P1, $P2, 4, 0 }, "1234ABCDE5", "splice, insert before last element")
+	.SpliceMadeEasy({ splice $P1, $P2, 3, 0 }, "123ABCDE45", "splice, append-in-middle")
+	.SpliceMadeEasy({ splice $P1, $P2, 0, 2 }, "ABCDE345", "splice, replace at beginning")
+	.SpliceMadeEasy({ splice $P1, $P2, 2, 2 }, "12ABCDE5", "splice, replace in middle")
+	.SpliceMadeEasy({ splice $P1, $P2, 3, 2 }, "123ABCDE", "splice, replace at end")
+	.SpliceMadeEasy({
+		$P2 = new .ResizableStringArray
+		splice $P1, $P2, 2, 2
+	}, "125", "splice, empty replacement")
+	.SpliceMadeEasy({
+		$P2 = new .ResizableStringArray
+		$P2[0] = "A"
+		splice $P1, $P2, 2, 1
+	}, "12A45", "splice, equal size replacement")
+
+	$P1 = new .ResizableStringArray
+	$P1[0] = "1"
+	$P1[1] = "2"
+	$P1[2] = "3"
+	$P1[3] = "4"
+	$P1[4] = "5"
+	$P2 = new .ResizablePMCArray
+	$P2[0] = 'A'
+	$P2[1] = 'B'
+	$P2[2] = 'C'
+	$P2[3] = 'D'
+	$P2[4] = 'E'
+
+	push_eh bad_type
+	splice $P1, $P2, 1, 0
+	clear_eh
+	goto still_ok
+
+	.local pmc exception
+	.local string message
+bad_type:
+	.get_results (exception, message)
+still_ok:
+	like(message, 'illegal\ type\ for\ splice', "splice with a different type")
+.end
+

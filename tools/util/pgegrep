@@ -1,0 +1,274 @@
+#!./parrot
+# Or where ever it's at
+=head1 NAME
+
+pgegrep - A simple grep using PGE for matching
+
+=head1 SYNOPSIS
+
+B<pgegrep> [I<OPTIONS>] B<PATTERN> [I<FILE...>]
+
+=head1 DESCRIPTION
+
+pgegrep aims to be a small and easy to use program in replacement of the
+standard grep utility.  Regex support is whatever PGE will allow.  It searches through files line by line and tests if the given pattern matches.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -v
+
+=item --invert-match
+
+print lines not matching PATTERN
+
+=item -V
+
+=item --version
+
+print the version and exit
+
+=item --help
+
+show this help and exit
+
+=item -r
+
+=item --recursive
+
+recursively descend into directories
+
+=item -L
+
+=item --files-without-matches
+
+print a list of files that do not match PATTERN
+
+=item -l
+
+=item --files-with-matches
+
+print a list of files that do match PATTERN
+
+=item -c
+
+=item --count
+
+count the number of lines that match PATTERN in each file and print
+
+=item -n
+
+=item --line-number
+
+print the line number for each match
+
+=item -H
+
+=item --with-filename
+
+print the filename for each match
+
+=back
+
+=head1 AUTHOR
+
+Written and maintained by Joshua Isom L<jrisom@gmail.com>
+
+PGE is authored and maintained by Patrick Michaud L<pmichaud@pobox.com>
+
+=cut
+
+# Readability improved!
+.include "hllmacros.pir"
+
+.sub main :main
+	.param pmc argv
+	.local string progname
+	progname = shift argv
+	load_bytecode "Getopt/Obj.pbc"
+	load_bytecode "PGE.pbc"
+	.local pmc getopts
+	getopts = new "Getopt::Obj"
+	getopts."notOptStop"(1)
+	push getopts, "count|c"
+	push getopts, "with-filename|H"
+	push getopts, "files-with-matches|l"
+	push getopts, "files-without-matches|L"
+	push getopts, "line-number|n"
+	push getopts, "recursive|r"
+	push getopts, "invert-match|v"
+	push getopts, "version|V"
+	push getopts, "help"
+	push_eh handler
+	.local pmc opts
+	opts = getopts."get_options"(argv)
+	$I0 = defined opts["help"]
+	.If($I0, {
+		showhelp()
+	})
+	$I0 = defined opts["version"]
+	.If($I0, {
+		showversion()
+	})
+
+	
+	.local string rule
+	.local pmc p6rule_compile, matchsub
+	rule = shift argv
+	p6rule_compile = compreg "PGE::P6Regex"
+	matchsub = p6rule_compile(rule)
+	.If(null matchsub, {
+		printerr "Null matchsub, probably a syntax error\n"
+		end
+	})
+
+	.local int i, filecount
+	.local string filename
+	.local pmc File, OS, files, handle
+	files = new .ResizableStringArray
+	files = argv
+	filecount = files
+	# define with-filename if there's more than one file
+	.If(filecount >= 2, { opts["with-filename"] = 1 })
+	File = new .File
+	OS = new .OS
+	# This must be here, or else it'll get filled with junk data we use stdin...
+	i = 0
+	.Unless(filecount, {
+		# no args, use stdin
+	stdindashhack:
+		handle = getstdin
+		filename = '(standard input)'
+		goto stdinhack
+	})
+	.For(, i < filecount, inc i, {
+		filename = files[i]
+		.If(filename == '-', {
+			goto stdindashhack
+		})
+		$I1 = File."is_file"(filename)
+		.IfElse($I1, {
+			# Is a file
+			handle = open filename, "<"
+		},{
+			# Not a file, hopefully a directory
+			$I1 = File."is_dir"(filename)
+			$I0 = defined opts["recursive"]
+			$I1 &= $I0
+			.Unless($I1, {
+				printerr "pgegrep: "
+				printerr filename
+				printerr ": Operation not supported.\n"
+				goto nextfor_0
+			})
+			$P0 = OS."readdir"(filename)
+			.Foreach($S0, $P0, {
+				.If($S0 != '.', {
+				.If($S0 != '..', {
+					$S1 = filename . '/'
+					$S0 = $S1 . $S0
+					$P1 = new .ResizableStringArray
+					$P1[0] = $S0
+					$I0 = i + 1
+					splice files, $P1, $I0, 0
+				}) })
+			})
+			filecount = files
+			goto nextfor_0
+		})
+	stdinhack:
+		checkfile(handle, filename, matchsub, opts)
+		close handle
+	nextfor_0:
+	})
+
+	end
+handler:
+	.local pmc exception
+	.local string message
+	.get_results (exception, message)
+	printerr "pgegrep: "
+	printerr message
+	printerr "\n"
+	end
+.end
+
+.sub checkfile
+	.param pmc handle
+	.param string filename
+	.param pmc matchsub
+	.param pmc opts
+	.local pmc match
+	.local string line
+	.local int lineno, linelen, matched
+	lineno = 1
+	matched = 0 # Only used for --files-without-matches
+	line = readline handle
+	linelen = length line 
+	.For(, linelen, { line = readline handle .NL() linelen = length line .NL() inc lineno }, {
+		match = matchsub(line)
+		$I1 = match.__get_bool()
+		$I0 = defined opts["files-without-matches"]
+		.If($I0, {
+			.If($I1, { matched = 1 })
+			goto next
+		})
+		$I0 = defined opts["files-with-matches"]
+		$I0 = $I0 && $I1
+		.If($I0, {
+			print filename
+			print "\n"
+			.return()
+		})
+
+		$I0 = defined opts["invert-match"]
+		not $I0
+		$I1 = xor $I1, $I0
+		.Unless($I1, {
+			$I0 = defined opts["with-filename"]
+			$I1 = defined opts["recursive"] # although recursive isn't there yet
+			$I0 = $I0 || $I1
+			.If($I0, { print filename .NL() print ':' })
+			$I0 = defined opts["line-number"]
+			.If($I0, { print lineno .NL() print ':' })
+			print line
+		})
+		#---------
+	next:
+	})
+	$I0 = defined opts["files-without-matches"]
+	.If($I0, { print filename .NL() print "\n" })
+	.return()
+.end
+
+.sub showhelp
+	print <<'HELP'
+Usage: pgegrep [OPTIONS] PATTERN [FILE...]
+Search for the Perl 6 Rule PATTERN in each file.
+Use `perldoc pgegrep` for fuller documentation.
+
+  -v --invert-match          print lines not matching PATTERN
+  -V --version               print the version and exit
+     --help                  show this help and exit
+  -r --recursive             recursively descend into directories
+  -L --files-without-matches print a list of files that do not match PATTERN
+  -l --files-with-matches    print a list of files that do match PATTERN
+  -c --count                 count the number of lines that match PATTERN
+                             in each file and print
+  -n --line-number           print the line number for each match
+  -H --with-filename         print the filename for each match
+
+HELP
+	end
+.end
+
+.sub showversion
+	print <<'VERSION'
+pgegrep v0.0.1
+VERSION
+	end
+.end
+
+# vim: ft=pir
+

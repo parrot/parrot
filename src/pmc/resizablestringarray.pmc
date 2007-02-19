@@ -538,6 +538,65 @@ Removes the element at C<*key>.
             data[i] = data[i + 1];
         DYNSELF.set_integer_native(size - 1);
     }
+
+/*
+
+=item C<void splice(PMC* value, INTVAL offset, INTVAL count)>
+
+Replaces C<count> elements starting at C<offset> with the elements in
+C<value>.
+
+Note that the C<value> PMC can be of any of the various array types.
+
+Note that this implementation can be *VERY* inefficient as it manipulates
+everything via the VTABLE api.
+
+=cut
+
+*/
+
+    void splice(PMC* value, INTVAL offset, INTVAL count) {
+        if (value->vtable->base_type != SELF->vtable->base_type &&
+                value->vtable->base_type != enum_class_FixedStringArray)
+            real_exception(INTERP, NULL, E_TypeError,
+                    "ResizableStringArray: illegal type for splice!");
+
+        INTVAL length = VTABLE_elements(INTERP, SELF);
+        INTVAL elems  = VTABLE_elements(INTERP, value);
+        INTVAL shift  = elems - count;
+        INTVAL i;
+
+        /* start from end? */
+        if (offset < 0)
+            offset += length;
+        if (offset < 0)
+            internal_exception(OUT_OF_BOUNDS, "illegal splice offset\n");
+
+        /* shrink the array */
+        if (shift < 0) {
+            /* start at offset so we don't overwrite values we'll need */
+            for (i=offset+count; i<length; i++)
+                VTABLE_set_pmc_keyed_int(INTERP, SELF, i + shift,
+                    VTABLE_get_pmc_keyed_int(INTERP, SELF, i));
+
+            DYNSELF.set_integer_native(length + shift);
+        }
+        /* grow the array */
+        else if (shift > 0) {
+            DYNSELF.set_integer_native(length + shift);
+
+            /* move the existing values */
+            /* start at length-1 so we don't overwrite values we'll need */
+            for (i=length-1; i>=offset; i--)
+                VTABLE_set_pmc_keyed_int(INTERP, SELF, i + shift,
+                    VTABLE_get_pmc_keyed_int(INTERP, SELF, i));
+        }
+
+        /* copy the new values */
+        for (i=0; i<elems; i++)
+            VTABLE_set_pmc_keyed_int(INTERP, SELF, i + offset,
+                VTABLE_get_pmc_keyed_int(INTERP, value, i));
+    }
 }
 
 
