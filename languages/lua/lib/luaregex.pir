@@ -1,5 +1,5 @@
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: luaregex.pir 16887 2007-02-03 18:28:40Z fperrad $
+# $Id$
 
 =head1 NAME
 

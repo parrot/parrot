@@ -1,6 +1,6 @@
 /* TclProc.pmc
  *  Copyright (C) 2007 The Perl Foundation.
- *     $Id: /parrot/offline/languages/tcl/src/pmc/tclstring.pmc 3620 2007-01-14T05:00:14.970516Z coke  $
+ *     $Id$
  */
 
 #include "parrot/parrot.h"
