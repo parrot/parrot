@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More;
+use Test::More tests => 2;
 
 use Data::Dumper;
 use File::Find qw(find);
@@ -34,7 +34,7 @@ SKIP:
 
     # check that MANIFEST.SKIP is in sync with svn:ignore
     # An new MANIFEST.SKIP can be generated with tools/dev/gen_manifest_skip.pl
-    skip 'Not a working copy' => 3
+    skip 'Not a working copy' => 2
         unless ( $Parrot::Revision::svn_entries || `svk ls .` );
 
     diag "this may take a while...";
@@ -58,10 +58,10 @@ SKIP:
         or diag("Files ignored by SVN but not in MANIFEST.SKIP:\n\t@$manifest_skip_miss");
 }
 
-# remember to change the number of tests :-)
-BEGIN { plan tests => 2; }
+
 
 exit;
+
 
 sub list_diff {
     my ( $a, $b ) = @_;
@@ -73,6 +73,7 @@ sub list_diff {
     return ( [ sort grep { $elem{$_} < 0 } keys %elem ],
         [ sort grep { $elem{$_} > 0 } keys %elem ] );
 }
+
 
 # Local Variables:
 #   mode: cperl
