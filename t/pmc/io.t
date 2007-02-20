@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 45;
 
 =head1 NAME
 
@@ -244,6 +244,22 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "open and readline" );
 CODE
 1
 2
+OUTPUT
+
+open $FOO, '>', "temp.file" or die "can't open 'temp.file': $!";
+print $FOO "12\n34";
+close $FOO;
+pasm_output_is( <<'CODE', <<'OUTPUT', "open and readline, no final newline" );
+    open P0, "temp.file"
+    set S0, ""
+    set S1, ""
+    readline S0, P0
+    readline S1, P0
+    print S1
+    print S0
+    end
+CODE
+3412
 OUTPUT
 
 open $FOO, '>', "temp.file";    # Clobber previous contents
