@@ -114,8 +114,6 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
 
 
     load_bytecode 'languages/lua/lib/luaregex.pbc'
-    $P0 = compreg 'PGE::LuaRegex'
-    global '_REGEX_COMP' = $P0
 
 .end
 
@@ -315,7 +313,7 @@ L5:
     .return (start, end)
 L3:
     .local pmc regex_comp
-    regex_comp = global '_REGEX_COMP'
+    regex_comp = compreg 'PGE::LuaRegex'
     .local pmc rulesub
     rulesub = regex_comp($S2)
     .local pmc match
@@ -613,7 +611,7 @@ STILL INCOMPLETE (see F<languages/lua/lib/luaregex.pir>).
     checkstring(s)
     $S2 = checkstring(pattern)
     .local pmc regex_comp
-    regex_comp = global '_REGEX_COMP'
+    regex_comp = compreg 'PGE::LuaRegex'
     .local pmc rulesub
     rulesub = regex_comp($S2)
     .lex 'upvar_rulesub', rulesub
@@ -689,7 +687,7 @@ L1:
     .local int n
     n = 0
     .local pmc regex_comp
-    regex_comp = global '_REGEX_COMP'
+    regex_comp = compreg 'PGE::LuaRegex'
     .local pmc rulesub
     rulesub = regex_comp($S2)
     .local pmc b
