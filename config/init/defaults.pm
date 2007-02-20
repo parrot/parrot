@@ -23,6 +23,7 @@ use Config;
 use FindBin;    # see build_dir
 use Parrot::Configure::Step;
 use Cwd qw(abs_path);
+use File::Spec;
 
 $description = q{Setting up Configure's default values};
 
@@ -135,6 +136,7 @@ sub runstep {
         libparrot_soname => '',
 
         perl      => $^X,
+        perl_inc  => $self->find_perl_headers(),
         test_prog => 'parrot',
         rm_f      => '$(PERL) -MExtUtils::Command -e rm_f',
         rm_rf     => '$(PERL) -MExtUtils::Command -e rm_rf',
@@ -226,6 +228,11 @@ sub runstep {
     $conf->data->set( 'archname', $archname );
 
     return $self;
+}
+
+sub find_perl_headers {
+    my $self = shift;
+    return File::Spec->catdir( $Config::Config{archlib}, 'CORE' );
 }
 
 1;

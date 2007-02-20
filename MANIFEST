@@ -713,6 +713,7 @@ ext/Parrot-Embed/lib/Parrot/Interpreter.pm                  []
 ext/Parrot-Embed/lib/Parrot/PMC.pm                          []
 ext/Parrot-Embed/t/greet.pir                                []
 ext/Parrot-Embed/t/interp.t                                 []
+ext/Parrot-Embed/tools/write_typemap.pl                     []
 ext/Parrot-Embed/typemap                                    []
 include/parrot/atomic.h                                     [main]include
 include/parrot/atomic/fallback.h                            [main]include
