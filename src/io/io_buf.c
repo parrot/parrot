@@ -557,7 +557,7 @@ PIO_buf_readline(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
     }
 
     buf_start = b->next;
-    for (l = 0; ; ) {
+    for (l = 0; b->next < b->endb; ) {
         l++;
         if (IS_EOL(io, b->next++)) {
             break;
