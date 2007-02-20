@@ -43,6 +43,7 @@ Compiler Developer              Leopold Toetsch (IMCC)
 High Level Language Developer   Patrick Michaud (Perl 6)
                                 Matt Diephouse (Tcl)
                                 Will Coleda (Tcl)
+                                Francois Perrad (Lua)
 
 Build Manager                   Joshua Hoblitt
 
@@ -50,6 +51,7 @@ Lead Tester                     Jerry Gay
 
 Platform Porter                 Florian Ragwitz (Debian)
                                 Aldo Calpini (PocketPC)
+                                Francois Perrad (MinGW32)
 
 Contributors
 ------------
