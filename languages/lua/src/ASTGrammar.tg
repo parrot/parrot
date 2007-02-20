@@ -449,50 +449,23 @@ transform past (Lua::Grammar::cond) :language('PIR') {
 
 
 transform past (Lua::Grammar::string) :language('PIR') {
-  stringsingle:
-    $P0 = node['stringsingle']
-    if null $P0 goto stringdouble
-    .return tree.'get'('past', $P0, 'Lua::Grammar::stringsingle')
-   stringdouble:
-     $P0 = node['stringsingle']
-    .return tree.'get'('past', $P0, 'Lua::Grammar::stringsingle')
-}
-
-transform past (Lua::Grammar::stringdouble) :language('PIR') {
     .local pmc result
     result = new 'PAST::Val'
 
     .local string value
-    # Check if this is a string match
-    $I0 = defined node["PGE::Text::bracketed"]
-    if $I0 goto bracketed_value
-    value = node
-    goto no_bracketed_value
-  bracketed_value:
-    value = node["PGE::Text::bracketed"]
-  no_bracketed_value:
-
-    # NOTE: Will have to come back and handle interpolation properly.
-    # Currently have no way to distinguish between single quoted and
-    # double quoted strings.
+  quoted_literal:
+    $P0 = node['quoted_literal']
+    if null $P0 goto long_string
+    value = $P0
     result.'init'('node'=>node, 'vtype'=>'.String', 'name'=>value)
     .return (result)
-}
-
-transform past (Lua::Grammar::stringsingle) :language('PIR') {
-    .local pmc result
-    result = new 'PAST::Val'
-
-    .local string value
-    # Check if this is a string match
-    $I0 = defined node["PGE::Text::bracketed"]
-    if $I0 goto bracketed_value
-    value = node
-    goto no_bracketed_value
-  bracketed_value:
-    value = node["PGE::Text::bracketed"]
-  no_bracketed_value:
-
+  long_string:
+    $P0 = node['long_string']
+    if null $P0 goto error
+    value = $P0
     result.'init'('node'=>node, 'vtype'=>'.String', 'name'=>value)
     .return (result)
+  error:
+    printerr "Unknown string\n"
 }
+

@@ -292,27 +292,24 @@ Long strings are parsed using a custom parsing method.
 
 =cut
 
-rule string {
-  <stringdouble> | <stringsingle> | <long_string>
+token string {
+  | \" <quoted_literal: "> \"
+  | \' <quoted_literal: '> \'
+  | <long_string>
 }
 
-regex stringdouble { <PGE::Text::bracketed: "> }
-regex stringsingle { <PGE::Text::bracketed: '> }
 
 token number {
-  [ <digit>+
-    [ <'.'> <digit>+ ]?
-    [ <[eE]> <[+\-]>? <digit>+ ]?
-  ]
-  | [ <'.'> <digit>+  ] [ <[eE]> <[+\-]>? <digit>+ ]?
-  | [ 0 <[xX]> <xdigit>+ ]
+  | 0 <[Xx]> <xdigit>+
+  | [ <digit>+ [ \. <digit>* ]? | \. <digit>+ ]
+    [ <[Ee]> <[+\-]>? <digit>+ ]?
 }
 
 
 token ws {
     [ \s+
-    | <'--'> \N*
     | <'--'> <long_comment>
+    | <'--'> \N*
     ]*
 }
 
