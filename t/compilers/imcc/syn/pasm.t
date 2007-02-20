@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2001-2006, The Perl Foundation.
-# $Id:$
+# $Id$
 
 # Test some basic pasm errors, not pir
 
