@@ -1,22 +1,18 @@
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 grammar Lua::TestLex
 
 rule start {
-        <token>* [ $ | <error>]
-#        |
-#        [ <token> | <error> ]*
-#        | <error>
+        <token>* [ $ | <die>]
 }
 
 rule token {
         | <Name>
-        | <reserved_words>
+        | <keyword>
         | <String>
         | <Number>
         | <punctuator>
-#        | <?error>
 }
 
 token punctuator {
@@ -48,29 +44,42 @@ token punctuator {
         | \]
 }
 
-token reserved_words {
-        | and
-        | break
-        | do
-        | else
-        | elseif
-        | end
-        | false
-        | for
-        | function
-        | if
-        | in
-        | local
-        | nil
-        | not
-        | or
-        | repeat
-        | return
-        | then
-        | true
-        | until
-        | while
+token Name {
+  <!keyword> \b <ident>
 }
+
+token keyword {
+  [  <'and'>     | <'break'>  | <'do'>    | <'elseif'>
+  | <'else'>     | <'end'>    | <'false'> | <'for'>
+  | <'function'> | <'if'>     | <'in'>    | <'local'>
+  | <'nil'>      | <'not'>    | <'or'>    | <'repeat'>
+  | <'return'>   | <'then'>   | <'true'>  | <'until'>
+  | <'while'>    ] \b
+}
+
+#token keyword {
+#        | and
+#        | break
+#        | do
+#        | else
+#        | elseif
+#        | end
+#        | false
+#        | for
+#        | function
+#        | if
+#        | in
+#        | local
+#        | nil
+#        | not
+#        | or
+#        | repeat
+#        | return
+#        | then
+#        | true
+#        | until
+#        | while
+#}
 
 token String {
         | \" <quoted_literal: "> \"

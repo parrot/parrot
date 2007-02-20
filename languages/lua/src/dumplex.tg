@@ -1,4 +1,4 @@
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 grammar Lua::DumpLex is TGE::Grammar;
@@ -38,10 +38,10 @@ L5:
     tree.get('dump', $P1, 'Lua::TestLex::punctuator')
 
 L6:
-    $I0 = defined $P0['reserved_words']
+    $I0 = defined $P0['keyword']
     unless $I0 goto L7
-    $P1 = $P0['reserved_words']
-    tree.get('dump', $P1, 'Lua::TestLex::reserved_words')
+    $P1 = $P0['keyword']
+    tree.get('dump', $P1, 'Lua::TestLex::keyword')
 
 L7:
     $I0 = defined $P0['ws']
@@ -54,8 +54,8 @@ L8:
 L2:
 }
 
-transform dump (Lua::TestLex::reserved_words) :language('PIR') {
-    print "word:\t"
+transform dump (Lua::TestLex::keyword) :language('PIR') {
+    print "keyword:\t"
     print node
     print "\n"
 }

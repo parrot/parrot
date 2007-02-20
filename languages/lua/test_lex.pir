@@ -1,4 +1,4 @@
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -21,6 +21,22 @@ C<test_lex> is a dumper for Lua 5.1 lexicography.
     load_bytecode 'PGE/Util.pbc'
     load_bytecode 'languages/lua/src/Lua51TestLex.pbc'
     load_bytecode 'languages/lua/src/LuaDumpLex.pbc'
+    load_bytecode 'languages/lua/src/lua.pbc'
+
+    # import PGE::Util::die into Lua::TestLex
+    $P0 = get_hll_global ['PGE::Util'], 'die'
+    set_hll_global ['Lua::TestLex'], 'die', $P0
+
+    # import Lua::Grammar::* into Lua::TestLex
+#    $P0 = get_hll_global ['Lua::Grammar'], 'Name'
+#    set_hll_global ['Lua::TestLex'], 'Name', $P0
+    $P0 = get_hll_global ['Lua::Grammar'], 'quoted_literal'
+    set_hll_global ['Lua::TestLex'], 'quoted_literal', $P0
+    $P0 = get_hll_global ['Lua::Grammar'], 'long_string'
+    set_hll_global ['Lua::TestLex'], 'long_string', $P0
+    $P0 = get_hll_global ['Lua::Grammar'], 'long_comment'
+    set_hll_global ['Lua::TestLex'], 'long_comment', $P0
+
     .local int argc
     argc = elements argv
     if argc != 2 goto USAGE
@@ -74,9 +90,6 @@ _handler:
 L1:
     .return (content)
 .end
-
-.namespace [ 'Lua::TestLex' ]
-.include 'languages/lua/src/parse.pir'
 
 =head1 AUTHOR
 

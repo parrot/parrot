@@ -72,6 +72,78 @@
 .end
 
 
+.sub 'quoted_literal'
+    .param pmc mob
+    .param string delim
+    .param pmc adv :slurpy :named
+
+    .local string target
+    .local pmc mfrom, mpos
+    .local int pos, lastpos
+    (mob, target, mfrom, mpos) = mob.'newfrom'(mob)
+    pos = mfrom
+    lastpos = length target
+
+    .local string literal
+    literal = ''
+LOOP:
+    if pos < lastpos goto L1
+    error(mob, "unfinished string")
+L1:
+    $S0 = substr target, pos, 1
+    if $S0 != delim goto L2
+    mob.'result_object'(literal)
+    mpos = pos
+    .return (mob)
+L2:
+    $I0 = index "\n\r", $S0
+    if $I0 < 0 goto L3
+    error(mob, "unfinished string")
+L3:
+    if $S0 != "\\" goto CONCAT
+    inc pos
+    if pos == lastpos goto LOOP # error
+    $S0 = substr target, pos, 1
+    $I0 = index 'abfnrtv', $S0
+    if $I0 < 0 goto L4
+    $S0 = substr "\a\b\f\n\r\t\x0b", $I0, 1
+    goto CONCAT
+L4:
+    $I0 = index "\n\r", $S0
+    if $I0 < 0 goto L5
+    $S0 = "\n"
+    goto CONCAT
+L5:
+    $I0 = index '0123456789', $S0
+    if $I0 < 0 goto CONCAT
+    inc pos
+    $S0 = substr target, pos, 1
+    $I1 = index '0123456789', $S0
+    if $I1 < 0 goto L6
+    $I0 *= 10
+    $I0 += $I1
+    inc pos
+    $S0 = substr target, pos, 1
+    $I1 = index '0123456789', $S0
+    if $I1 < 0 goto L6
+    $I0 *= 10
+    $I0 += $I1
+    goto L7
+L6:
+    dec pos
+L7:
+    if $I0 < 256 goto L8
+    error(mob, "escape sequence too large")
+L8:
+    $S0 = chr $I0
+
+CONCAT:
+    concat literal, $S0
+    inc pos
+    goto LOOP
+.end
+
+
 .sub 'long_string'
     .param pmc mob
     .param pmc adv :slurpy :named
