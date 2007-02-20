@@ -1,8 +1,17 @@
+=head1 NAME
+
+pir.pg - A PIR grammar for PGE.
+
+TODO:
+
+ 1. fix Heredocs parsing
+ 2. Test and fix things
+
+=cut
+
+
 grammar PIR::Grammar;
 
-# TO DO:
-# 1. fix Heredocs parsing
-# 2. Test and fix things
 
 token TOP {
   ^ <program> [ $ | <syntax_error: end of file expected> ]
@@ -25,8 +34,9 @@ rule compilation_unit {
 }
 
 
-## Sub defs, sub pragmas, sub body and parameters
-##
+=head2 Sub defs, sub pragmas, sub body and parameters
+
+=cut
 
 rule sub_def {
   [ <'.sub'> | <'.pcc_sub'> ]
@@ -40,8 +50,12 @@ rule sub_id {
   [ <id> | <string_constant> ]
 }
 
-## The comma to separate the sub pragmas is optional.
-##
+=head3 sub_pragmas
+
+The comma to separate the sub pragmas is optional.
+
+=cut
+
 rule sub_pragmas {
   <sub_pragma>
   [
@@ -63,7 +77,12 @@ rule sub_pragma {
   | <outer_pragma>
 }
 
-### This one is not sure yet
+=head3 wrap_pragma
+
+This one is not sure yet
+
+=cut
+
 rule wrap_pragma {
   <':wrap'> <parenthesized_string>  
 }
@@ -119,17 +138,17 @@ rule param_decl {
   | <reg>
   | <syntax_error: parameter type or register expected>
   ]
-  <get_flags>?
+  [ <get_flags> | <':unique_reg'> ]*
   [ <?nl>   | <syntax_error: newline expected after parameter declaration> ]
 }
 
 
 
 
-#
-# PIR instructions
-#
 
+=head2 PIR instructions
+
+=cut
 
 rule labeled_pir_instr {
   [ <label> <instr>?
@@ -174,10 +193,6 @@ rule macro_invocation {
 }
 
 
-## Locals and Lexicals
-## 
-
-
 =head2 Local declarations
 
 Local declarations can be done using C<.sym> or C<.local> in normal context.
@@ -207,8 +222,6 @@ rule local_id {
   <id> <local_flag>?
 }
 
-## Maybe more future flags for local symbols
-##
 rule local_flag {  
   <':unique_reg'>
 }
@@ -221,15 +234,15 @@ rule lexical_decl {
 }
 
 
-## Global definition
-##
 rule global_def {
   <'.global'> [ <id> | <syntax_error: identifier expected> ]
 }
 
-## Const definitions, a check is done for the constant type and
-## the type of the constant value.
-##
+=head2 Const definition
+
+Const definitions, a check is done for the constant type and the type of the constant value.
+
+=cut
 
 rule const_def {
 	<'.const'> <const_def_tail>
@@ -262,9 +275,6 @@ rule const_assign {
 }
 
 
-## Conditional statements and expressions
-##
-
 rule conditional_stat {
   [ <'if'> | <'unless'> ]
   <conditional_expr>
@@ -277,16 +287,10 @@ rule conditional_expr {
   | <simple_expr> [ <relational_operator> <simple_expr> ]?
 }
 
-## Jump statements
-##
 rule jump_stat {
   <'goto'> [ <id> | <syntax_error: label expected after 'goto'> ]
 }
 
-
-
-## Expressions, adjusted from abc.pg
-##
 
 rule relational_operator {
     <'=='>
@@ -363,15 +367,13 @@ rule key {
   | [ <'..'> <simple_expr> ]
 }
 
-
-## Assignments and misc. operations with a '=' sign
-##
 rule assignment_stat {
     <target> <'='> <short_sub_call>
   | <target> <'='> <target> <keylist>
   | <target> <'='> <expression>
-  | <target> <'='> <pasm_op_1> <simple_expr>
-  | <target> <'='> <pasm_op_2> <simple_expr> \, <simple_expr>
+  | <target> <'='> <pasm_instruction> \N*
+  #| <target> <'='> <pasm_op_1> <simple_expr>
+  #| <target> <'='> <pasm_op_2> <simple_expr> \, <simple_expr>
   | <target> <'='> <'new'> [ <int_constant> | <string_constant> | <macro_id> ]
   | <target> <'='> <'new'> <keylist>
   | <target> <'='> <'find_type'> [ <string_constant> | <string_reg> | <id> ]
@@ -383,47 +385,29 @@ rule assignment_stat {
   | <result_var_list> [ <'='> | <syntax_error: '=' expected> ] <short_sub_call>
 }
 
-## Rewrite of assignment_stat
-##
-##rule assignment_stat {
-##  <target> <'='> <rhs>
-##| <target> <op_assign> <simple_expr>
-##| <target> <keylist> <'='> <simple_expr>
-##| <'global'> <string_constant> <'='> <target> # deprecated?
-##| <result_var_list> [ <'='> | <syntax_error: '=' expected> ] <short_sub_call>
-##}
-##
-##rule rhs {
-##  <short_sub_call>
-##| <expression>
-##| <pasm_op_1> <target>
-##| <pasm_op_2> <target> <','> <target>
-##| <'new'> [ <int_constant> | <string_constant> | <macro_id> ]
-##| <'find_type'> [ <string_constant> | <string_reg> | <id> ]
-##| <heredoc_string>
-##| <global'> <string_constant> # deprecated?
-##}
+
 
 # pasm ops that take 1 argument
 #
-rule pasm_op_1 {
-    clone
-  | compreg
-  | defined
-  | assign
-  | addr
-  | istrue
-  | isfalse
-  | isnull
-  #| others
-}
-
-# pasm ops that take 2 arguments
+#rule pasm_op_1 {
+#    clone
+#  | compreg
+#  | defined
+#  | assign
+#  | addr
+#  | istrue
+#  | isfalse
+#  | isnull
+#  #| others
+#}
 #
-rule pasm_op_2 {
-    issame
-  | isntsame
-}
+## pasm ops that take 2 arguments
+##
+#rule pasm_op_2 {
+#    issame
+#  | isntsame
+#}
+#
 
 rule heredoc {
   <'<<'>
@@ -444,10 +428,6 @@ rule heredoc_string {
   [ \N | \n ]*
 }
 
-
-
-## Sub/method invocation
-##
 rule long_sub_call {
   <'.pcc_begin'>
   [ <?nl>  | <syntax_error: newline after '.pcc_begin' expected> ]
@@ -474,8 +454,8 @@ rule short_sub_call {
   ]?                               # optional invocant
   [ <target> | <string_constant> ] # method or sub name/id
   <parenthesized_args>             # sub args  
-  <process_heredocs>
-  <clear_heredocs>
+  <process_heredocs>							 # process the list of heredoc labels, if any
+  <clear_heredocs>		
 }
 
 rule sub_invocation {
@@ -526,10 +506,6 @@ rule heredoc_label {
 	.* ^^ <ident> $$
 }
 
-
-
-## Argument passing
-##
 rule arguments {
   [ <'.arg'>
     [ <simple_expr> | <syntax_error: argument expression expected> ]
@@ -538,10 +514,6 @@ rule arguments {
   ]*
 }
 
-
-
-## Receiving return values
-##
 rule result_values {
   [ <'.result'>
     [ <target> | <syntax_error: target expected to hold the result> ]
@@ -550,16 +522,12 @@ rule result_values {
   ]*
 }
 
-## flags for setting arguments and return values
-##
 rule set_flags {
   [ <':flat'>
   | <named_flag>
   ]+
 }
 
-## flags for getting parameters and result values
-##
 rule get_flags {
   [ <':slurpy'>
   | <':optional'>
@@ -572,9 +540,6 @@ rule named_flag {
   <':named'> <parenthesized_string>?
 }
 
-
-## Returning values
-##
 rule return_stat {  
     <long_return_stat>
   | <short_return_stat>
@@ -616,10 +581,6 @@ rule tail_call {
   <'.return'> <short_sub_call>
 }
 
-
-
-## Namespaces
-##
 rule open_namespace {
   <'.namespace'> [ <id> | <syntax_error: namespace identifier expected> ]
 }
@@ -628,9 +589,7 @@ rule close_namespace {
   <'.endnamespace'> [ <id> | <syntax_error: namespace identifier expected> ]
 }
 
-#
-# Emit
-#
+
 rule emit {
   <'.emit'>
   [ <?nl>        | <syntax_error: newline expected> ]
@@ -638,9 +597,7 @@ rule emit {
   [ <'.eom'>     | <syntax_error: '.eom' expected> ]
 }
 
-#
-# Macro
-#
+
 rule macro_def {
   <'.macro'>
   [ <id>  | <syntax_error: macro identifier expected> ]
@@ -656,10 +613,14 @@ rule macro_parameters {
   [ <')'>   | <syntax_error: ')' expected> ]
 }
 
-# In order to be able to parse macro identifiers, before 
-# the macro body is parsed, some rules are redefined. 
-# After parsing the macro body, they are restored.
-#
+=head2 Macro body
+
+In order to be able to parse macro identifiers, before 
+the macro body is parsed, some rules are redefined. 
+After parsing the macro body, they are restored.
+
+=cut
+
 regex macro_body {
 	<init_macro_rules>
   <labeled_pir_instr>*  
@@ -668,9 +629,11 @@ regex macro_body {
 }
 
 
-#
-# Pragmas
-#
+
+=head2 Pragmas
+
+=cut
+
 rule pragma {
     <include>
   | <new_operators>
@@ -737,12 +700,15 @@ rule id_list {
 }
 
 
-#
-# Tokens
-#
 
-# this is a token, because no spaces are allowed between
-# the id and the colon.
+=head2 Tokens
+
+=head3 normal_label
+
+this is a token, because no spaces are allowed between the id and the colon.
+
+=cut
+
 token normal_label {
  	<id> <':'>
 }
@@ -799,7 +765,7 @@ rule type {
   | <'pmc'> 
   | <'object'>
   | <'string'>   
-  
+  | <macro_id>
   ]
   #| <'Array'> 
   #| <'Hash'> 
@@ -810,9 +776,12 @@ token normal_target {
 	<id> | <reg> 
 }
 
-# in a macro, a target can also be a 
-# macro_id
-#
+=head2 Macro_target
+
+In a macro, a target can also be a macro_id
+
+=cut
+
 token macro_target {
 	<id> | <reg> | <macro_id>
 }
@@ -849,9 +818,6 @@ token num_reg {
   | \$N\d+
 }
 
-## whitespace is any space character but not a newline char,
-## a comment, or a pod comment 
-##
 token ws {
   [ [ \s & \N ]+  
   | \# \N*
@@ -860,20 +826,18 @@ token ws {
 }
 
 
+=head2 Newlines
 
+match the set of a newline and possible indention space 1 or more times
+this is necessary to be able to skip fully white lines (with some spaces/tabs in it).
+However, therefore it is also necessary to put the comments skipping here as well.
 
-
-# match the set of a newline and possible indention space 1 or more times
-# this is necessary to be able to skip fully white lines (with some spaces/tabs in it).
-# However, therefore it is also necessary to put the comments skipping here as well.
-
+=cut
 
 token nl {
   [ \n <?ws> ]+
 }
 
-## taken from perl6.pg
-##
 regex pod_comment {
     ^^ = [ [ cut \h*: | end [\h\N*]? ]
          | for [ \h\N+: ] \n [ \N+\n ]*:
@@ -882,20 +846,36 @@ regex pod_comment {
          [\n|$]
 }
 
-# PIR directives, PASM instructions and
-# the Parrot datatypes (int, string, num, pmc)
-# are keywords, and must not be used as
-# identifiers.
-#
+=head2 Keywords
+
+PIR directives, PASM instructions and
+the Parrot datatypes (int, string, num, pmc)
+are keywords, and must not be used as
+identifiers.
+
+=cut
+
 token keyword {
     <pir_directive>
   | <pasm_instruction> # pasm instructions may be identifiers in IMCC
-  | <type>  
+  | <reserved>
 }
 
-# TODO: put this in <%pir_directive>
-# PIR directives
-#
+token reserved {
+		int
+	| num
+	| pmc
+	| string
+	| self
+}
+	
+
+=head2 PIR directives
+
+TODO: put this in <%pir_directive> PIR directives
+
+=cut
+
 token pir_directive {
     <'.arg'>    
   | <'.const'>
@@ -907,8 +887,7 @@ token pir_directive {
   | <'.globalconst'>
   | <'.global'>
   | <'.HLL_map'>
-  | <'.HLL'>
-  | <'.immediate'>
+  | <'.HLL'>  
   | <'.include'>
   | <'.invocant'>
   | <'.lex'>

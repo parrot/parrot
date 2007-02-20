@@ -1,6 +1,6 @@
 =head1 NAME
 
-PIR.pod - The Grammar of languages/PIR
+pirgrammar.pod - The Grammar of languages/PIR
 
 =head1 DESCRIPTION
 
@@ -19,7 +19,7 @@ but are not implemented. An example of this is the C<.global> directive.
 
 =head1 VERSION
 
-0.1.1
+0.1.2
 
 =head1 LEXICAL CONVENTIONS
 
@@ -39,9 +39,9 @@ PIR directives are:
   .eom            .meth_call         .pragma
   .get_results    .namespace         .return
   .global         .nci_call          .result
-  .HLL_map        .param             .sub
-  .HLL            .pcc_begin_return  .sym
-  .immediate      .pcc_begin_yield   .yield
+  .globalconst    .param             .sub
+  .HLL_map        .pcc_begin_return  .sym
+  .HLL            .pcc_begin_yield   .yield
   .include        .pcc_begin
 
 
@@ -178,7 +178,7 @@ document.
     ".end"
 
   param_decl:
-    ".param"  [ [ type identifier ] | register ] get_flags? nl
+    ".param"  [ [ type identifier ] | register ] [ get_flags | ":unique_reg" ]* nl
 
   get_flags:
     [ ":slurpy"
@@ -194,13 +194,14 @@ document.
 
 The simplest example for a subroutine definition looks like:
 
-	.sub foo
-	# PIR instructions go here
-	.end
+  .sub foo
+  # PIR instructions go here
+  .end
 
 The body of the subroutine can contain PIR instructions. The subroutine can be given
 one or more flags, indicating the sub should behave in a special way. Below is a list of these
-flags and their meaning:
+flags and their meaning. The flag C<:unique_reg> is discussed in the section defining
+local declarations.
 
 =over 4
 
@@ -290,27 +291,28 @@ This flag is not (yet?) implemented in IMCC. It would indicate that this sub is 
 that when "bar" is invoked, this sub is called I<before> and I<after>. It is undecided yet whether this flag will
 be implemented. If so, its syntax may change.
 
+
 =back
 
 The sub flags are listed after the sub name. They may be separated by a comma, but this is
 not necessary. The subroutine name can also be a string instead of a bareword, as is shown in this
 example:
 
-	.sub 'foo' :load, :init :anon
-	# PIR body
-	.end
+  .sub 'foo' :load, :init :anon
+  # PIR body
+  .end
 
 Parameter definitions have the following syntax:
 
-	.sub main
-	  .param int argc :optional
-	  .param int has_argc :optional
-	  .param num nParam
-	  .param pmc argv :slurpy
-	  .param string sParam :named('foo')
-	  .param $P0 :named('bar')	  
-	  # body
-	.end
+  .sub main
+    .param int argc :optional
+    .param int has_argc :optional
+    .param num nParam
+    .param pmc argv :slurpy
+    .param string sParam :named('foo')
+    .param $P0 :named('bar')
+    # body
+  .end
 
 As shown, parameter definitions may take flags as well. These flags are listed here:
 
@@ -327,15 +329,15 @@ Details can be found in PDD03 - Parrot Calling Conventions.
 
  :named('x')
 
-The parameter is known in the called sub by name C<'x'>. The C<:named> flag can also be used B<without> an 
+The parameter is known in the called sub by name C<'x'>. The C<:named> flag can also be used B<without> an
 identifier, in combination with the C<:flat> or C<:slurpy> flag, i.e. on a container holding several values:
 
-	.param pmc args :slurpy :named
+  .param pmc args :slurpy :named
 
 and
 
-	.arg args :flat :named
-	
+  .arg args :flat :named
+
 
 =item *
 
@@ -402,15 +404,15 @@ defines the syntax for pure PASM instructions.
 Local temporary variables can be declared by the directives C<.local> or C<.sym>. There is no
 difference between these directives, except within macro definitions. (See Macros).
 
-	.local int i
-	.local num a, b, c
-	.sym string s1, s2
-	.sym pmc obj
+  .local int i
+  .local num a, b, c
+  .sym string s1, s2
+  .sym pmc obj
 
 The optional C<:unique_reg> modifier will force the register allocator to associate the identifier
 with a unique register for the duration of the compilation unit.
 
-	.local int j :unique_reg
+  .local int j :unique_reg
 
 =head2 Lexical declarations
 
@@ -421,12 +423,12 @@ with a unique register for the duration of the compilation unit.
 
 The declaration
 
-	.lex 'i', $P0
+  .lex 'i', $P0
 
 indicates that the value in $P0 is stored as a lexical variable, named by 'i'.
 Once the above lexical declaration is written, and given the following statement:
 
-	$P1 = new .Integer
+  $P1 = new .Integer
 
 then the following two statements have an identical effect:
 
@@ -458,14 +460,14 @@ Likewise, these two statements also have an identical effect:
 
 Instead of a register, one can also specify a local variable, like so:
 
-	.local pmc p
-	.lex 'i', p
+  .local pmc p
+  .lex 'i', p
 
 The same is true when a parameter should be stored as a lexical:
 
-	.param pmc p
-	.lex 'i', p
-	
+  .param pmc p
+  .lex 'i', p
+
 So, now it is also clear why C<.lex 'i', p> is B<not> a declaration of p:
 it needs a separate declaration, because it may either be a C<.local> or a C<.param>.
 The C<.lex> directive merely is a shortcut for saving and retrieving lexical variables.
@@ -483,7 +485,7 @@ all subroutines without doing a global lookup. It is unclear whether this featur
 
 An example is:
 
-	.global my_global_var
+  .global my_global_var
 
 
 =head2 Constant definitions
@@ -493,7 +495,7 @@ An example is:
 
 =head3 Example constant definitions
 
-	.const int answer = 42
+  .const int answer = 42
 
 defines an integer constant by name 'answer', giving it a value of 42.
 Note that the constant type and the value type should match, i.e. you cannot
@@ -514,20 +516,20 @@ check for this.
 The syntax for C<if> and C<unless> statements is the same, except for the keyword itself.
 Therefore the examples will use either.
 
-	if null $P0 goto L1
+  if null $P0 goto L1
 
 Checks whether $P0 is C<null>, if it is, flow of control jumps to label L1
 
-	unless $P0 goto L2
-	unless x   goto L2
-	unless 1.1 goto L2
+  unless $P0 goto L2
+  unless x   goto L2
+  unless 1.1 goto L2
 
 Unless $P0, x or 1.1 are 'true', flow of control jumps to L2. When the argument is a PMC (like
 the first example), true-ness depends on the PMC itself. For instance, in some languages, the number
 0 is defined as 'true', in others it is considered 'false' (like C).
 
-	if x < y goto L1
-	if y != z  goto L1
+  if x < y goto L1
+  if y != z  goto L1
 
 are examples that check for the logical expression after C<if>. Any of the I<relational> operators may
 be used here.
@@ -540,7 +542,7 @@ be used here.
 
 =head3 Examples branching statements
 
-	goto MyLabel
+  goto MyLabel
 
 The program will continue running at label 'MyLabel:'.
 
@@ -608,14 +610,14 @@ The program will continue running at label 'MyLabel:'.
 
 =head3 Example expressions
 
-	42
-	42 + x
-	1.1 / 0.1
-	"hello" . "world"
-	str1 . str2
-	-100
-	~obj
-	!isSomething
+  42
+  42 + x
+  1.1 / 0.1
+  "hello" . "world"
+  str1 . str2
+  -100
+  ~obj
+  !isSomething
 
 Arithmetic operators are only allowed on floating-point numbers and integer values (or variables of that type).
 Likewise, string concatenation (".") is only allowed on strings. These checks are B<not> done by the PIR parser.
@@ -668,23 +670,23 @@ As languages/PIR evolves, this will be completed.
 
 =head3 Examples assignment statements
 
-	$I1 = 1 + 2
-	$I1 += 1
-	$P0 = foo()
-	$I0 = $P0[1]
-	$I0 = $P0[12.34]
-	$I0 = $P0["Hello"]
-	$P0 = new 42 # but this is really not very clear, better use identifiers
+  $I1 = 1 + 2
+  $I1 += 1
+  $P0 = foo()
+  $I0 = $P0[1]
+  $I0 = $P0[12.34]
+  $I0 = $P0["Hello"]
+  $P0 = new 42 # but this is really not very clear, better use identifiers
 
-	$S0 = <<'HELLO'
-	...
-	HELLO
+  $S0 = <<'HELLO'
+  ...
+  HELLO
 
-	$P0 = global "X"
-	global "X" = $P0
+  $P0 = global "X"
+  global "X" = $P0
 
-	.local int a, b, c
-	(a, b, c) = foo()
+  .local int a, b, c
+  (a, b, c) = foo()
 
 =head2 Heredoc
 
@@ -704,23 +706,23 @@ NOTE: the heredoc rules are not complete or tested. Some work is required here.
 
 =head3 Example Heredoc
 
-	.local string str
-	str = <<'ENDOFSTRING'
-	  this text
-	       is stored in the
-	             variable
-	    named 'str'. Whitespace and newlines
-	  are                  stored as well.
-	ENDOFSTRING
+  .local string str
+  str = <<'ENDOFSTRING'
+    this text
+         is stored in the
+               variable
+      named 'str'. Whitespace and newlines
+    are                  stored as well.
+  ENDOFSTRING
 
 Note that the Heredoc identifier should be at the beginning of the line, no
 whitespace in front of it is allowed. Printing C<str> would print:
 
     this text
-	       is stored in the
-	             variable
-	    named 'str'. Whitespace and newlines
-	  are                  stored as well.
+         is stored in the
+               variable
+      named 'str'. Whitespace and newlines
+    are                  stored as well.
 
 
 =head2 Invoking subroutines and methods
@@ -776,25 +778,25 @@ The long subroutine call syntax is very suitable to be generated by a language c
 targeting Parrot. Its syntax is rather verbose, but easy to read. The minimal invocation
 looks like this:
 
-	.pcc_begin
-	.pcc_call $P0
-	.pcc_end
+  .pcc_begin
+  .pcc_call $P0
+  .pcc_end
 
 Invoking instance methods is a simple variation:
 
-	.pcc_begin
-	.invocant $P0
-	.meth_call $P1
-	.pcc_end
+  .pcc_begin
+  .invocant $P0
+  .meth_call $P1
+  .pcc_end
 
 Passing arguments and retrieving return values is done like this:
 
-	.pcc_begin
-	.arg 42
-	.pcc_call $P0
-	.local int res
-	.result res
-	.pcc_end
+  .pcc_begin
+  .arg 42
+  .pcc_call $P0
+  .local int res
+  .result res
+  .pcc_end
 
 Arguments can take flags as well. The following argument flags are defined:
 
@@ -818,28 +820,28 @@ As was mentioned at the parameter declaration section, the C<:named> section can
 on an aggregate value in combination with the C<:flat> flag.
 
  .arg pmc myArgs :flat :named
- 
+
 
 =back
 
-	.local pmc arr
-	arr = new .Array
-	arr = 2
-	arr[0] = 42
-	arr[1] = 43
-	.pcc_begin
-	.arg arr :flat
-	.arg $I0 :named('intArg')
-	.pcc_call foo
-	.pcc_end
+  .local pmc arr
+  arr = new .Array
+  arr = 2
+  arr[0] = 42
+  arr[1] = 43
+  .pcc_begin
+  .arg arr :flat
+  .arg $I0 :named('intArg')
+  .pcc_call foo
+  .pcc_end
 
 
 The Native Calling Interface (NCI) allows for calling C routines, in order to talk to the world
 outside of Parrot. Its syntax is a slight variation; it uses C<.nci_call> instead of C<.pcc_call>.
 
-	.pcc_begin
-	.nci_call $P0
-	.pcc_end
+  .pcc_begin
+  .nci_call $P0
+  .pcc_end
 
 
 =head2 Short subroutine invocation
@@ -856,27 +858,27 @@ outside of Parrot. Its syntax is a slight variation; it uses C<.nci_call> instea
 The short subroutine call syntax is useful when manually writing PIR code.
 Its simplest form is:
 
-	foo()
+  foo()
 
 Or a method call:
 
-	obj.'toString'() # call the method 'toString'
-	obj.x() # call the method whose name is stored in 'x'.
+  obj.'toString'() # call the method 'toString'
+  obj.x() # call the method whose name is stored in 'x'.
 
 Note that no spaces are allowed between the invocant and the dot; "obj . 'toString'" is not valid.
 IMCC also allows the "->" instead of a dot, to make it readable for C++ programmers:
 
-	obj->'toString'()
+  obj->'toString'()
 
 And of course, using the short version, passing arguments can be done as well, including all flags that were defined
 for the long version. The same example from the 'long subroutine invocation' is now shown in its short version:
 
-	.local pmc arr
-	arr = new .Array
-	arr = 2
-	arr[0] = 42
-	arr[1] = 43
-	foo(arr :flat, $I0 :named('intArg'))
+  .local pmc arr
+  arr = new .Array
+  arr = 2
+  arr[0] = 42
+  arr[1] = 43
+  foo(arr :flat, $I0 :named('intArg'))
 
 Please note that the short subroutine call does B<not> allow for C<NCI> calls.
 
@@ -903,10 +905,10 @@ Please note that the short subroutine call does B<not> allow for C<NCI> calls.
 Returning values from a subroutine is in fact similar to passing arguments I<to>
 a subroutine. Therefore, the same flags can be used:
 
-	.pcc_begin_return
-	.return 42 :named('answer')
-	.return $P0 :flat
-	.pcc_end_return
+  .pcc_begin_return
+  .return 42 :named('answer')
+  .return $P0 :flat
+  .pcc_end_return
 
 In this example, the value C<42> is passed into the return value that takes the named return value known by C<'answer'>.
 The aggregate value in C<$P0> is flattened, and each of its values is passed as a return value.
@@ -918,11 +920,11 @@ The aggregate value in C<$P0> is flattened, and each of its values is passed as 
 
 =head3 Example short return statement
 
-	.return(myVar, "hello", 2.76, 3.14);
+  .return(myVar, "hello", 2.76, 3.14);
 
 Just as the return values in the C<long return statement> could take flags, the C<short return statement> may as well:
 
-	.return(42 :named('answer'), $P0 :flat)
+  .return(42 :named('answer'), $P0 :flat)
 
 =head2 Long yield statements
 
@@ -937,27 +939,27 @@ A C<yield> statement works the same as a normal return value, except that the po
 was left is stored somewhere, so that the subroutine can be resumed from that point as soon as the subroutine
 is invoked again. Returning values is identical to I<normal> return statements.
 
-	.sub foo
-	  .pcc_begin_yield
-	  .return 42
-	  .pcc_end_yield
+  .sub foo
+    .pcc_begin_yield
+    .return 42
+    .pcc_end_yield
 
-	  # and later in the sub, one could return another value:
+    # and later in the sub, one could return another value:
 
-	  .pcc_begin_yield
-	  .return 43
-	  .pcc_end_yield
-	.end
+    .pcc_begin_yield
+    .return 43
+    .pcc_end_yield
+  .end
 
-	# when invoking twice:
-	foo() # returns 42
-	foo() # returns 43
+  # when invoking twice:
+  foo() # returns 42
+  foo() # returns 43
 
 NOTE: IMCC allows for writing:
 
-	.pcc_begin_yield
-	...
-	.pcc_end_return
+  .pcc_begin_yield
+  ...
+  .pcc_end_return
 
 which is of course not consistent; languages/PIR does B<not> allow this.
 
@@ -970,7 +972,7 @@ which is of course not consistent; languages/PIR does B<not> allow this.
 
 Again, the short version is identical to the short version of the return statement as well.
 
-	.yield("hello", 42)
+  .yield("hello", 42)
 
 =head2 Tail calls
 
@@ -979,18 +981,18 @@ Again, the short version is identical to the short version of the return stateme
 
 =head3 Example tail call
 
-	.return foo()
+  .return foo()
 
 Returns the return values from C<foo>. This is implemented by a tail call, which is more efficient than:
 
-	.local pmc results = foo()
-	.return(results)
+  .local pmc results = foo()
+  .return(results)
 
 The call to C<foo> can be considered a normal function call with respect to parameters: it can take the exact
 same format using argument flags. The tail call can also be a method call, like so:
 
-	.return obj.'foo'()
-	
+  .return obj.'foo'()
+
 
 =head2 Symbol namespaces
 
@@ -1002,23 +1004,23 @@ same format using argument flags. The tail call can also be a method call, like 
 
 =head3 Example open/close namespaces
 
-	.sub main
-	  .local int x
-	  x = 42
-	  say x
-	  .namespace NESTED
-	  .local int x
-	  x = 43
-	  say x
-	  .endnamespace NESTED
-	  say x
-	.end
+  .sub main
+    .local int x
+    x = 42
+    say x
+    .namespace NESTED
+    .local int x
+    x = 43
+    say x
+    .endnamespace NESTED
+    say x
+  .end
 
 Will print:
 
-	42
-	43
-	42
+  42
+  43
+  42
 
 Please note that it is B<not> necessary to I<pair> these statements; it is acceptable to open a C<.namespace> without closing it.
 The scope of the C<.namespace> is limited to the subroutine.
@@ -1035,14 +1037,14 @@ The scope of the C<.namespace> is limited to the subroutine.
 An emit block only allows PASM instructions,
 not PIR instructions.
 
-	.emit
-	   set I0, 10
-	   new P0, .Integer
-	   ret
-	 _foo:
-	   print "This is PASM subroutine "foo"
-	   ret
-	 .eom
+  .emit
+     set I0, 10
+     new P0, .Integer
+     ret
+   _foo:
+     print "This is PASM subroutine "foo"
+     ret
+  .eom
 
 =head2 Macros
 
@@ -1062,10 +1064,22 @@ not PIR instructions.
 
 =head3 Example Macros
 
-NOTE: the macro definition is not complete, and untested.
-This should be fixed. For now, all characters up to but not
-including ".endm" are 'matched'.
+When the following macro is defined:
 
+  .macro add2(n)
+    inc .n
+    inc .n
+  .endm
+
+then one can write in a subroutine:
+
+  .sub foo
+    .local int myNum
+    myNum = 42
+    .add2(myNum)
+    print myNum  # prints 44
+  .end
+    
 =head2 PIR Pragmas
 
   pragma:
@@ -1107,33 +1121,33 @@ including ".endm" are 'matched'.
 
 =head3 Examples pragmas
 
-	.include "myLib.pir"
+  .include "myLib.pir"
 
 includes the source from the file "myLib.pir" at the point of this directive.
 
-	.pragma n_operators 1
+  .pragma n_operators 1
 
 makes Parrot automatically create new PMCs when using arithmetic operators, like:
 
-	$P1 = new .Integer
-	$P2 = new .Integer
-	$P1 = 42
-	$P2 = 43
-	$P0 = $P1 * $P2
-	# now, $P0 is automatically assigned a newly created PMC.
+  $P1 = new .Integer
+  $P2 = new .Integer
+  $P1 = 42
+  $P2 = 43
+  $P0 = $P1 * $P2
+  # now, $P0 is automatically assigned a newly created PMC.
 
 
-	.line 100
-	.line 100, "myfile.pir"
+  .line 100
+  .line 100, "myfile.pir"
 
 NOTE: currently, the line directive is implemented in IMCC as #line.
 See the PROPOSALS document for more information on this.
 
 
-	.namespace ['Foo'] # namespace Foo
-	.namespace ['Object';'Foo'] # nested namespace
+  .namespace ['Foo'] # namespace Foo
+  .namespace ['Object';'Foo'] # nested namespace
 
-	.namespace # no [ id ] means the root namespace is activated
+  .namespace # no [ id ] means the root namespace is activated
 
 opens the namespace 'Foo'. When doing Object Oriented programming, this would indicate
 that sub or method definitions belong to the class 'Foo'. Of course, you can also define
@@ -1142,24 +1156,24 @@ namespaces without doing OO-programming.
 Please note that this C<.namespace> directive is I<different> from the C<.namespace> directive
 that is used within subroutines.
 
-	.HLL "Lua", "lua_group"
+  .HLL "Lua", "lua_group"
 
 is an example of specifying the High Level Language (HLL) for which the PIR is being generated.
 It is a shortcut for setting the namespace to 'Lua', and for loading the PMCs in the lua_group library.
 
-	.HLL_map .Integer, .LuaNumber
+  .HLL_map .Integer, .LuaNumber
 
 is a way of telling Parrot, that whenever an Integer is created somewhere in the system (C code), instead
 a LuaNumber object is created.
 
-	.loadlib "myLib"
+  .loadlib "myLib"
 
 is a shortcut for telling Parrot that the library "myLib" should be loaded when running the program. In fact,
 it is a shortcut for:
 
-	.sub _load :load :anon
-	  loadlib "myLib"
-	.end
+  .sub _load :load :anon
+    loadlib "myLib"
+  .end
 
 TODO: check flags and syntax for this.
 
@@ -1170,7 +1184,7 @@ TODO: check flags and syntax for this.
 
   encoding_specifier:
     "utf8:"
-    
+
   charset_specifier:
       "ascii:"
     | "binary:"
@@ -1193,15 +1207,15 @@ TODO: check flags and syntax for this.
 
 A string constant can be written like:
 
-	"Hello world"
+  "Hello world"
 
 but if desirable, the character set can be specified:
 
-	unicode:"Hello world"
-	
+  unicode:"Hello world"
+
 When using the "unicode" character set, one can also specify an encoding specifier; currently only C<utf8> is allowed:
 
-	utf8:unicode:"hello world"
+  utf8:unicode:"hello world"
 
 IMCC currently allows identifiers to be used as types. During the parse, the identifier
 is checked whether it is a defined class. The built-in types int, num, pmc and string are
@@ -1220,10 +1234,6 @@ Klaas-Jan Stol [parrotcode@gmail.com]
 Some work should be done on:
 
 =over 4
-
-=item *
-
-Macro parsing
 
 =item *
 
@@ -1268,9 +1278,40 @@ PDD20 - Lexically scoped variables in Parrot
 
 docs/imcc/calling_conventions.pod - definition of sub flags (:init etc)
 
+=item *
+
+docs/imcc/syntax.pod - official syntax for IMCC/PIR.
+
 =back
 
 =head1 CHANGES
+
+0.1.2
+
+=over 4
+
+=item *
+
+Removed C<.immediate>, it is C<:immediate>, and thus not a PIR directive, but a flag.
+This was a mistake.
+
+=item * 
+
+Added C<.globalconst>
+
+=item *
+
+Added macro parsing example (it is now fixed in languages/PIR).
+
+=item *
+
+Added reference to official doc for IMCC syntax.
+
+=item *
+
+Added C<:unique_reg> to allowed flags for incoming parameters.
+
+=back
 
 0.1.1
 
