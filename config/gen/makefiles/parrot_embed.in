@@ -7,16 +7,16 @@ RM_RF           = @rm_rf@
 MKPATH          = @mkpath@
 CP              = @cp@
 PERL            = @perl@
-PARROT          = ../../parrot$(EXE)
+PARROTDIR       = ../..
+PARROT          = $(PARROTDIR)/parrot$(EXE)
 
 # compilation options
-#CONDITIONED_LINE(win32):LIB_PREFIX := ../../
-#INVERSE_CONDITIONED_LINE(win32):LIB_PREFIX =
 A               = @a@
 O               = @o@
 SHARE_EXT       = @share_ext@
 C_LIBS          = @libs@
-ALL_PARROT_LIBS = $(LIB_PREFIX)@libparrot_ldflags@ $(ICU_SHARED) $(C_LIBS)
+#CONDITIONED_LINE(win32):ALL_PARROT_LIBS = $(PARROTDIR)/@libparrot_ldflags@ $(ICU_SHARED) $(C_LIBS)
+#INVERSE_CONDITIONED_LINE(win32):ALL_PARROT_LIBS = @libparrot_ldflags@ $(ICU_SHARED) $(C_LIBS)
 LINKFLAGS       = @linkflags@ @link_debug@ @ld_debug@
 LINK            = @link@
 LD_SHARE_FLAGS  = @ld_share_flags@
@@ -35,7 +35,8 @@ TEST_FILES      = t/*.t
 
 all : $(SO_FILE) $(PM) $(PBC)
 
-$(O_FILE) : $(C_FILE)
+.c$(O) :
+	@$(PERL) $(PARROTDIR)\tools\dev\cc_flags.pl $(PARROTDIR)\CFLAGS $(CC) "" $(CFLAGS) -I$(@D) -Fo$@ -c $<
 
 $(PM) : lib/Parrot/Embed.pm
 	$(MKPATH) blib/lib/Parrot
@@ -43,7 +44,7 @@ $(PM) : lib/Parrot/Embed.pm
 
 $(SO_FILE) : $(O_FILE)
 	$(MKPATH) blib/arch/auto/Parrot/Embed
-	$(LINK) $(LD_SHARE_FLAGS) @ld_out@$@ $(SO_FILE) $(O_FILE) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	$(LINK) $(LD_SHARE_FLAGS) @ld_out@$(SO_FILE) $(O_FILE) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 $(C_FILE) : lib/Parrot/Embed.xs
 	$(PERL) tools/write_typemap.pl
