@@ -8,6 +8,7 @@ TODO:
   - Support for the superglobals  _POST and _GET
   - Implement var_dump()
   - Subclass OrderedHash for PlumheadArray
+  - Add another variant 'perl5regex', using Perl 5.10 (ir)regular expressions
 
 DONE:
   - Start a builtins library
