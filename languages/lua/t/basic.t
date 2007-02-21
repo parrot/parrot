@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 31;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function assert' );
@@ -72,6 +72,28 @@ function	table	0
 2	b
 3	c
 nil	nil
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function loadstring' );
+f = loadstring("i = i + 1")
+i = 0
+f(); print(i)
+f(); print(i)
+CODE
+1
+2
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function loadstring' );
+i = 32
+local i = 0
+f = loadstring("i = i + 1; print(i)")
+g = function () i = i + 1; print(i) end
+f()
+g()
+CODE
+33
+1
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function next (array)' );

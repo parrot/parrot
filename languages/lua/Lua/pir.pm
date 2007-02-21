@@ -42,7 +42,14 @@ L2:
   load_bytecode 'languages/lua/lib/luaio.pir'
   load_bytecode 'languages/lua/lib/luaos.pbc'
   load_bytecode 'languages/lua/lib/luadebug.pbc'
+  load_bytecode 'languages/lua/lib/luaperl.pbc'
   _main($P0 :flat)
+.end
+
+.sub '__onload' :anon :init
+  .const .Sub main = '_main'
+#  print "onload tmp\n"
+  set_root_global 'tmp', main
 .end
 
 };

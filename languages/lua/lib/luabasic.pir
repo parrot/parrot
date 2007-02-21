@@ -422,7 +422,7 @@ To load and run a given string, use the idiom
 
     assert(loadstring(s))()
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE.
 
 =cut
 
@@ -431,7 +431,9 @@ NOT YET IMPLEMENTED.
     .param pmc chunkname :optional
     $S0 = checkstring(s)
     $S1 = optstring(chunkname, s)
-    not_implemented()
+    .local pmc lua_comp
+    lua_comp = compreg 'Lua'
+    .return lua_comp.'compile'(s)
 .end
 
 

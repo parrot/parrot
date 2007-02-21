@@ -39,6 +39,7 @@ PMC_FILES = \
  $(PMCDIR)/luauserdata.pmc
 
 LIB_PBCS = \
+ $(LIBPATH)/luaperl.pbc \
  $(LIBPATH)/luaaux.pbc \
  $(LIBPATH)/luabasic.pbc \
  $(LIBPATH)/luacoroutine.pbc \
@@ -100,6 +101,9 @@ pmc/lua_group$(LOAD_EXT) : $(PMC_FILES)
 	@cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
+
+$(LIBPATH)/luaperl.pbc: $(LIBPATH)/luaperl.pir
+	$(PARROT) --output=$(LIBPATH)/luaperl.pbc $(LIBPATH)/luaperl.pir
 
 $(LIBPATH)/luaaux.pbc: $(LIBPATH)/luaaux.pir
 	$(PARROT) --output=$(LIBPATH)/luaaux.pbc $(LIBPATH)/luaaux.pir
