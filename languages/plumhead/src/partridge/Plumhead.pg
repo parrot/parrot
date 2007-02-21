@@ -8,11 +8,11 @@ grammar Plumhead::Grammar;
 token TOP                     { <program> }
 
 regex SEA                     { .* <?before: \<> }
-token CODE_START              { \< \? p h p }
-token CODE_END                { \? \> }
+token CODE_START              { <'<?php'> }
+token CODE_END                { <'?>'> }
 token DOUBLEQUOTE_STRING      { " <-["]>* " }
 token SINGLEQUOTE_STRING      { ' <-[']>* ' }
-token ECHO                    { e c h o }
+token ECHO                    { <'echo'> }
 token PAREN_OPEN              { \( }
 token PAREN_CLOSE             { \) }
 
@@ -23,8 +23,8 @@ token UNARY_PLUS              { \+ }
 token ADD_OP                  { \+ | \- }
 token MUL_OP                  { \* | / | % }
 
-token IF                      { if }
-token ELSE                    { else }
+token IF                      { <'if'> }
+token ELSE                    { <'else'> }
 token program                 { ^ <SEA> <code> }
 
 rule  code                    { <?CODE_START> <statement>* <?CODE_END> }
