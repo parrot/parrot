@@ -16,6 +16,7 @@ New in 0.4.9
    + perl6 now supports binding (':='), join
    + lua generates tail call
    + lua supports its own regex flavor (PGE-based)
+   + Pheme still works, huzzah!
    + <insert other specific language news here>
 - Design:
    + PDD21 "Objects" - rewritten
