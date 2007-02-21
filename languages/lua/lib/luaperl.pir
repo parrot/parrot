@@ -114,6 +114,7 @@ _handler:
     .return ($P0)
 .end
 
+=over 4
 
 =item compile(pmc code)
 
