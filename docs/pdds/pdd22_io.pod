@@ -554,7 +554,7 @@ No asynchronous version.
 
 =item poll
 
-  $I0 = $P1, $I2, $I3, $I4
+  $I0 = poll $P1, $I2, $I3, $I4
 
 Polls a stream or socket object for particular types of events (an
 integer flag) at a frequency set by seconds and microseconds (the final
