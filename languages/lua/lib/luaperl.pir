@@ -34,6 +34,15 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
 
 .namespace [ 'Lua::PerlCompiler' ]
 
+.sub 'unlink' :anon
+    .param string filename
+    new $P0, .OS
+    push_eh _handler
+    $P0.'rm'(filename)
+_handler:
+    .return ()
+.end
+
 .sub 'save_lua' :anon
     .param string code
     .param string filename
@@ -100,14 +109,21 @@ _handler:
 .sub 'compile_file' :anon
     .param string filename
 #    $I0 = spawnw 'cd'
+    $I0 = index filename, '.'
+    $S1 = substr filename, 0, $I0
+    $S1 .= '.pir'
+    unlink($S1)
     $S0 = 'perl -Ilanguages/lua languages/lua/luac.pl '
     $S0 .= filename
     $I0 = spawnw $S0
-    $I0 = index filename, '.'
-    $S0 = substr filename, 0, $I0
-    $S0 .= '.pir'
     .local string pir
-    pir = load_script($S0)
+    pir = load_script($S1)
+    if pir goto L1
+    .local pmc ex
+    ex = new .Exception
+    ex['_message'] =  "no script PIR"
+    throw ex
+L1:
     .local pmc pir_comp
     pir_comp = compreg 'PIR'
     $P0 = pir_comp(pir)

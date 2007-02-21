@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 32;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function assert' );
@@ -94,6 +94,13 @@ g()
 CODE
 33
 1
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function loadstring (syntax error)' );
+f = loadstring("?syntax error?")
+print(f)
+CODE
+/nil$/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function next (array)' );

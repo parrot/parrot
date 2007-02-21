@@ -429,11 +429,17 @@ STILL INCOMPLETE.
 .sub '_lua_loadstring' :anon
     .param pmc s :optional
     .param pmc chunkname :optional
+    .local pmc ret
     $S0 = checkstring(s)
     $S1 = optstring(chunkname, s)
     .local pmc lua_comp
     lua_comp = compreg 'Lua'
-    .return lua_comp.'compile'(s)
+    push_eh _handler
+    ret = lua_comp.'compile'(s)
+    .return (ret)
+_handler:
+    new ret, .LuaNil
+    .return (ret)
 .end
 
 
