@@ -14,6 +14,8 @@ New in 0.4.9
    + Updated Lua, PHP ("Plumhead"), Tcl ("ParTcl"), perl6, perl5
    + New language: PIR - a PGE-based implementation of Parrot PIR
    + perl6 now supports binding (':='), join
+   + lua generates tail call
+   + lua supports its own regex flavor (PGE-based)
    + <insert other specific language news here>
 - Design:
    + PDD21 "Objects" - rewritten
@@ -141,7 +143,7 @@ New in 0.4.4
   - tgc, tree grammar compiler
 - perl6 compiler
   - support for many operators, lexical scalars, regex matches
-- new pheme (Parrot scheme) compiler  
+- new pheme (Parrot scheme) compiler
 
 New in 0.4.3
 
@@ -177,20 +179,20 @@ New in 0.4.1
 - OS pmc started (mkdir,cd,cwd,rm,umask,stat)
 - Shootout examples
 - Test files are now testable with 'prove'
-- Smoke (and smokej) outputs progress 
+- Smoke (and smokej) outputs progress
 - PIR supports: I = A < B (>,<=,>=,==,!=)
 - Add support for octal number constants
 - partcl updates:
   - almost finish [string]; start [file]
   - add build tool for generating inline'd tcl builtins from templates.
-- Jako updates: NCI, subroutines, global variables and constants all work. 
+- Jako updates: NCI, subroutines, global variables and constants all work.
   (Gregor)
 
 New in 0.4.0
 
 - New lexical handling and closure support including better
   introspection for caller and outer
-- PGE (Parrot Grammar Engine) provides now compilers for P6Rule, 
+- PGE (Parrot Grammar Engine) provides now compilers for P6Rule,
   P6Grammar, P5Regexp, and Glob
 - ca. 1000 new tests including 800 for Perl5 regexp
 - Improved unicode charset and encoding support
