@@ -1338,6 +1338,9 @@ Free memory associated with an extracted transaction log.
 void Parrot_STM_destroy_extracted(Interp *interp, void *saved_log_data) {
     STM_saved_tx_log *saved;
 
+    if (saved_log_data == NULL)
+        return;
+
     saved = saved_log_data;
     mem_sys_free(saved->reads);
     mem_sys_free(saved->writes);
