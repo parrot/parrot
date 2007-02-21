@@ -1,5 +1,6 @@
 #!./parrot
 # Or where ever it's at
+
 =head1 NAME
 
 pgegrep - A simple grep using PGE for matching
@@ -51,6 +52,16 @@ print a list of files that do not match PATTERN
 
 print a list of files that do match PATTERN
 
+=item -a
+
+=item --text
+
+treat binary files as text.
+
+This uses a basic hueristic to discover if a file is binary or not.  Files are
+read line by line, and it keeps processing "normally" until a control character
+is found, and then stops and goes onto the next file is that line matches.
+
 =item -c
 
 =item --count
@@ -96,6 +107,7 @@ PGE is authored and maintained by Patrick Michaud L<pmichaud@pobox.com>
 	push getopts, "files-with-matches|l"
 	push getopts, "files-without-matches|L"
 	push getopts, "line-number|n"
+	push getopts, "text|a"
 	push getopts, "recursive|r"
 	push getopts, "invert-match|v"
 	push getopts, "version|V"
@@ -206,9 +218,15 @@ handler:
 	matched = 0 # Only used for --files-without-matches
 	line = readline handle
 	linelen = length line 
+
+	.local pmc cntrlchar
+	$S0 = '<cntrl-[\t\r\n]>'
+	$P0 = compreg "PGE::P6Regex"
+	cntrlchar = $P0($S0)
+
 	.For(, linelen, { line = readline handle .NL() linelen = length line .NL() inc lineno }, {
-		match = matchsub(line)
-		$I1 = match.__get_bool()
+		match = matchsub(line)  .NL() $I1 = match.__get_bool()
+		match = cntrlchar(line) .NL() $I2 = match.__get_bool()
 		$I0 = defined opts["files-without-matches"]
 		.If($I0, {
 			.If($I1, { matched = 1 })
@@ -226,8 +244,16 @@ handler:
 		not $I0
 		$I1 = xor $I1, $I0
 		.Unless($I1, {
+			$I0 = defined opts["text"]
+			$I0 = xor $I0, $I2
+			.If($I0, {
+				print 'Binary file '
+				print filename
+				print " matches\n"
+				.return()
+			})
 			$I0 = defined opts["with-filename"]
-			$I1 = defined opts["recursive"] # although recursive isn't there yet
+			$I1 = defined opts["recursive"]
 			$I0 = $I0 || $I1
 			.If($I0, { print filename .NL() print ':' })
 			$I0 = defined opts["line-number"]
@@ -246,7 +272,6 @@ handler:
 	print <<'HELP'
 Usage: pgegrep [OPTIONS] PATTERN [FILE...]
 Search for the Perl 6 Rule PATTERN in each file.
-Use `perldoc pgegrep` for fuller documentation.
 
   -v --invert-match          print lines not matching PATTERN
   -V --version               print the version and exit
@@ -254,6 +279,7 @@ Use `perldoc pgegrep` for fuller documentation.
   -r --recursive             recursively descend into directories
   -L --files-without-matches print a list of files that do not match PATTERN
   -l --files-with-matches    print a list of files that do match PATTERN
+  -a --text                  treat binary files as text
   -c --count                 count the number of lines that match PATTERN
                              in each file and print
   -n --line-number           print the line number for each match
