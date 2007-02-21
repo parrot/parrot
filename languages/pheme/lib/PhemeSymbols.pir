@@ -330,7 +330,7 @@
 	.return( 1 )
 .end
 
-.sub '+' :multi( float, float )
+.sub '+' :multi( _ )
 	.param float first
 	.param pmc   rest   :slurpy
 
@@ -354,7 +354,7 @@
 	.return( result )
 .end
 
-.sub '*' :multi( float, float )
+.sub '*' :multi( _ )
 	.param float first
 	.param pmc   rest   :slurpy
 
@@ -378,7 +378,7 @@
 	.return( result )
 .end
 
-.sub '-' :multi( float, float )
+.sub '-' :multi( _ )
 	.param float first
 	.param pmc   rest :slurpy
 
@@ -402,7 +402,7 @@
 	.return( result )
 .end
 
-.sub '/' :multi( float, float )
+.sub '/'
 	.param float l
 	.param float r
 
