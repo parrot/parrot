@@ -26,7 +26,7 @@ t/distro/file_metadata.t - verify file metadata matches expectations
 Makes sure that file metadata meets our expectations. For example, checks
 include 'all test files have "text/plain" mime-type',
 and 'all "text/plain" files have keyword expansion enabled'.  Also checks
-that all "test/plain" files have their svn:eol-style set to 'native'.
+that all "text/plain" files have their svn:eol-style set to 'native'.
 
 Note: These tests would benefit from judicial application of Iterators.
 
@@ -42,7 +42,7 @@ my $chunk_size = 100;
 my @manifest_files =
     sort keys %{ maniread( catfile $PConfig{build_dir}, 'MANIFEST' ) };
 
-## all test files have "text/plain" mime-type. Assume anything in the
+## all test files must have "text/plain" mime-type. Assume anything in the
 ## repository with a .t is test file.
 
 my $mime_types = get_attribute( 'svn:mime-type', @manifest_files );
@@ -66,7 +66,7 @@ TEST_MIME: {
     }
 }    # TEST_MIME
 
-## keyword expansion should be set for any manifest files with an explicit
+## keyword expansion must be set for any manifest files with an explicit
 ## mime type of text/plain. Assume a default of text/plain if not specified
 
 KEYWORD_EXP: {
@@ -100,7 +100,7 @@ KEYWORD_EXP: {
 
 }    # KEYWORD_EXP
 
-## eol-style should be set to 'native' for any manifest files with an explicit
+## eol-style must be set to 'native' for any manifest files with an explicit
 ## mime type of text/plain. Assume a default of text/plain if not specified
 
 EOL_STYLE: {
