@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 36;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function assert' );
@@ -72,6 +72,55 @@ function	table	0
 2	b
 3	c
 nil	nil
+OUTPUT
+
+unlink('../foo.lua') if ( -f '../foo.lua' );
+my $X;
+open $X, '>', '../foo.lua';
+print {$X} << 'CODE';
+function foo (x)
+    print(x)
+end
+CODE
+close $X;
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function loadfile');
+f = loadfile('foo.lua')
+print(foo)
+f()
+foo("ok")
+CODE
+nil
+ok
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function loadfile (stdin)', params => "< foo.lua" );
+f = loadfile()
+print(foo)
+f()
+foo("ok")
+CODE
+nil
+ok
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function loadfile (no file)' );
+f = loadfile("no_file.lua")
+print(f)
+CODE
+nil
+OUTPUT
+
+unlink('../foo.lua') if ( -f '../foo.lua' );
+open $X, '>', '../foo.lua';
+print {$X} '?syntax error?';
+close $X;
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function loadfile (syntax error)');
+f = loadfile('foo.lua')
+print(f)
+CODE
+/nil$/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function loadstring' );

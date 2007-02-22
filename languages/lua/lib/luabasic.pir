@@ -403,14 +403,33 @@ NOT YET IMPLEMENTED.
 Similar to C<load>, but gets the chunk from file C<filename> or from the
 standard input, if no file name is given.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub '_lua_loadfile' :anon
     .param pmc filename :optional
-    $S0 = optstring(filename, '')
-    not_implemented()
+    .local pmc ret
+    .local pmc f
+    $S1 = optstring(filename, '')
+    unless_null filename, L1
+    f = getstdin
+    goto L2
+L1:
+    f = open $S1, '<'
+    unless f goto L3
+L2:
+    $S0 = f.'slurp'('')
+    if_null filename, L4
+    close f
+L4:
+    .local pmc lua_comp
+    lua_comp = compreg 'Lua'
+    push_eh _handler
+    ret = lua_comp.'compile'($S0)
+    .return (ret)
+_handler:
+L3:
+    new ret, .LuaNil
+    .return (ret)
 .end
 
 
