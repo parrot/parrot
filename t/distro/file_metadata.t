@@ -172,6 +172,8 @@ COPYRIGHT: {
 =cut
 
 BEGIN {
+    plan skip_all => '#41569 - this test is broken';
+
     unless ( $Parrot::Revision::current or `svk ls .` ) {
         plan skip_all => 'not a working copy';
     }
