@@ -83,9 +83,9 @@ To prepare a release:
         You can fix META.yml after the release.
 
     9.  Compose and send out the announcements -- parrot-porters,
-        perl6-language, perl6-announce, perl5-porters, use Perl, PerlMonks,
-        comp.lang.perl.misc, etc. Don't forget to include the next
-        scheduled release date.
+        perl6-language, perl6-announce, perl5-porters, use Perl,
+        PerlMonks, etc. Don't forget to include the next scheduled
+        release date.
 
     9a. Submit the use Perl announcement story to Slashdot, Newsforge, etc.
 
