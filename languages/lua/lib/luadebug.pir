@@ -330,7 +330,7 @@ be B<nil>).
     .param pmc metatable :optional
     .local pmc ret
     checktype(table, 'table')
-    if_null metatable, L0
+    if null metatable goto L0
     $S0 = typeof metatable
     if $S0 == 'nil' goto L1
     if $S0 == 'table' goto L1

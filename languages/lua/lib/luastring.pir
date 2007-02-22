@@ -282,7 +282,7 @@ L1:
 L2:
     $S1 = substr $S1, $I3
     unless find goto L3
-    if_null plain, L4
+    if null plain goto L4
     $I0 = istrue plain
     if $I0 goto L5
 L4:
@@ -350,7 +350,7 @@ L7:
     new ret, .Array
     .local pmc capts
     capts = match.'get_array'()
-    if_null capts, L1
+    if null capts goto L1
     $I1 = capts
     set ret, $I1
     $I0 = 0

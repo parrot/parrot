@@ -32,7 +32,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 .sub 'checkany'
     .param pmc arg
-    unless_null arg, L1
+    unless null arg goto L1
     argerror("value expected")
 L1:
 .end
@@ -72,7 +72,7 @@ L3:
 .sub 'checknumber'
     .param pmc arg
     $S0 = "no value"
-    if_null arg, L0
+    if null arg goto L0
     $S1 = typeof arg
     if $S1 == 'Undef' goto L0
     $S0 = $S1
@@ -126,7 +126,7 @@ L2:
     .param pmc arg
     .local pmc val
     $S0 = "no value"
-    if_null arg, L0
+    if null arg goto L0
     $S1 = typeof arg
     if $S1 == 'Undef' goto L0
     $S0 = $S1
@@ -152,7 +152,7 @@ L0:
     .param pmc arg
     .param string type
     $S0 = "no value"
-    if_null arg, L0
+    if null arg goto L0
     $S0 = typeof arg
     if $S0 != type goto L0
     .return ()
@@ -205,7 +205,7 @@ Support variable number of arguments function call.
 .sub 'optint'
     .param pmc arg
     .param int default
-    if_null arg, L0
+    if null arg goto L0
     unless arg goto L0
     $I1 = checknumber(arg)
     .return ($I1)
@@ -221,7 +221,7 @@ L0:
 .sub 'optstring'
     .param pmc arg
     .param string default
-    if_null arg, L0
+    if null arg goto L0
     unless arg goto L0
     $S0 = arg
     .return ($S0)

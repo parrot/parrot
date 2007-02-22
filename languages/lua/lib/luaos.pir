@@ -327,7 +327,7 @@ STILL INCOMPLETE.
 .sub '_os_time' :anon
     .param pmc table :optional
     .local pmc ret
-    if_null table, L0
+    if null table goto L0
     $S0 = typeof table
     if $S0 != 'nil' goto L1
 L0:

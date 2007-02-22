@@ -353,7 +353,7 @@ See C<next> for the caveats of modifying the table during its traversal.
     .param pmc t :optional
     .param pmc i :optional
     checktype(t, 'table')
-    unless_null i, L1
+    unless null i goto L1
     .local pmc _G
     _G = global '_G'
     .const .LuaString key_ipairs = 'ipairs'
@@ -410,7 +410,7 @@ standard input, if no file name is given.
     .local pmc ret
     .local pmc f
     $S1 = optstring(filename, '')
-    unless_null filename, L1
+    unless null filename goto L1
     f = getstdin
     goto L2
 L1:
@@ -418,7 +418,7 @@ L1:
     unless f goto L3
 L2:
     $S0 = f.'slurp'('')
-    if_null filename, L4
+    if null filename goto L4
     close f
 L4:
     .local pmc lua_comp
@@ -736,7 +736,7 @@ This function returns C<table>.
     .param pmc table :optional
     .param pmc metatable :optional
     checktype(table, 'table')
-    if_null metatable, L0
+    if null metatable goto L0
     $S0 = typeof metatable
     if $S0 == 'nil' goto L1
     if $S0 == 'table' goto L1
