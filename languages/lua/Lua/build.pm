@@ -181,6 +181,9 @@ sub BuildLiteral {
                         elsif ( $_ eq '"' ) {
                             $str .= '\"';
                         }
+                        elsif ( $_ eq "\\" ) {
+                            $str .= "\\\\";
+                        }
                         else {
                             $str .= $_;
                         }

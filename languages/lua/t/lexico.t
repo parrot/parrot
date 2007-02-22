@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'string' );
@@ -68,6 +68,15 @@ CODE
 3.1416
 255
 86
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'escape character' );
+print("\n")
+print("\"")
+CODE
+
+
+"
 OUT
 
 # Local Variables:
