@@ -87,7 +87,7 @@ D: Bugfixes
 D: Parrot m4
 D: Parrot bc
 D: Plumhead
-D: Cleanup of examples/assembly 
+D: Cleanup of examples/assembly
 
 N: Bob Diertens
 D: patch regarding macro argument expansion

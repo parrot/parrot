@@ -16,13 +16,13 @@ New in 0.4.9
    + perl6 now supports binding (':=') and 'join'
    + lua generates tail calls, and supports its own regex flavor (PGE-based)
    + Pheme still works, huzzah!
-   + <insert other specific language news here>
 - Design:
    + PDD21 "Objects" - rewritten
    + PDD22 "I/O" - updated and 'TODO' tests added
 - Documentation:
    + Interface stability classification standards approved
    + Roles and Responsibilities documented approved
+   + Official 'drafts' directory created (was 'clip')
 - Implementation:
    + More NameSpace and OS PMC methods implemented
    + Parrot executable fullname and basename now available in PIR/PASM code

@@ -38,12 +38,15 @@ Core Developer                  Leopold Toetsch (incl. JIT x86, ppc)
 
 Compiler Developer              Leopold Toetsch (IMCC)
                                 Vishal Soni (BCG, IMCC)
-                                Patrick Michaud (PGE)
+                                Patrick Michaud (PGE, PAST-pm, TGE)
+                                Allison Randal (TGE)
 
 High Level Language Developer   Patrick Michaud (Perl 6)
                                 Matt Diephouse (Tcl)
                                 Will Coleda (Tcl)
                                 Francois Perrad (Lua)
+                                Bernhard Schmalhofer (Plumhead (PHP))
+                                Kevin Tew (Cardinal (Ruby))
 
 Build Manager                   Joshua Hoblitt
 

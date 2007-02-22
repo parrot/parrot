@@ -3,7 +3,9 @@
 To prepare a release:
 
     0.  Announce to parrot-porters and #parrot at least a couple days in
-        advance, asking if there are any showstopping bugs.
+        advance, asking if there are any showstopping bugs.  You might
+        also select a name for your release ( e.g., perhaps select a
+        name from http://en.wikipedia.org/wiki/List_of_parrots ).
 
     1.  Make sure you're up to date:
 

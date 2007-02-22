@@ -34,9 +34,9 @@ This is the B<highest> priority.
 
 =back
 
-=head1 CURRENT RELEASE (0.4.8)
+=head1 CURRENT RELEASE (0.4.9)
 
-Parrot 0.4.8 was released on January 16th, 2007. For a list of new and fixed
+Parrot 0.4.9 was released on February 22, 2007. For a list of new and fixed
 feature see L<NEWS>.
 
 =head1 OVERVIEW
@@ -123,9 +123,7 @@ with someone who should know.)
 
 =item *
 
-Document project goals and priorities, based on Chip's talk to APW as found at
-L<http://feather.perl6.nl/~chip/Chip_APW.sxi> or
-L<http://feather.perl6.nl/~chip/Chip_APW.pdf>.
+Document project goals and priorities.
 
 =item *
 
@@ -382,7 +380,8 @@ Portable fcntl() replacement for platforms without it
 
 =item *
 
-See L<PORTABILITY>. Test suite should have no failure on supported platforms.
+See L<pdds/draft/pdd01_overview.pod>. Test suite should have no
+failure on supported platforms.
 
 =item *
 
