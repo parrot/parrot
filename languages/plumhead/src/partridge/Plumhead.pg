@@ -7,9 +7,9 @@ grammar Plumhead::Grammar;
 
 token TOP                     { <program> }
 
-regex SEA                     { .* <?before: \<> }
+regex SEA                     { .*? <?before: \<> }
 token CODE_START              { <'<?php'> }
-token CODE_END                { <'?>'> }
+token CODE_END                { <'?>'> <' '>* \n? }
 token DOUBLEQUOTE_STRING      { " <-["]>* " }
 token SINGLEQUOTE_STRING      { ' <-[']>* ' }
 token ECHO                    { <'echo'> }
@@ -31,8 +31,11 @@ rule  code                    { <?CODE_START> <statement>* <?CODE_END> }
 
 rule statement                { <ECHO> <expression> ;
                               | <IF> <?PAREN_OPEN> <expression> <?PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
+                              | <inline_sea> 
                               }
+
 rule else_clause              { <?ELSE> \{ <statement>* \} }
+token inline_sea              { <?CODE_END> <SEA> <?CODE_START> }
 
 token expression              { <DOUBLEQUOTE_STRING> | <SINGLEQUOTE_STRING> | <adding_expression> }
 

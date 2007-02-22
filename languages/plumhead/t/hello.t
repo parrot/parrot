@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 # core Perl modules
-use Test::More     tests => 12;
+use Test::More     tests => 13;
 
 # Parrot modules
 use Parrot::Test;
@@ -56,6 +56,15 @@ World!
 END_CODE
 Hello,
 World!
+END_EXPECTED
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'sea without following PHP code' );
+Hello,<?php
+  ?> World!
+<?php
+?>
+END_CODE
+Hello, World!
 END_EXPECTED
 
 

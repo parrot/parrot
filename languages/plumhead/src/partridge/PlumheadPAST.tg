@@ -73,7 +73,7 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
         iter = new .Iterator, $P0
         iter_loop:
             unless iter goto iter_end
-            .local pmc cnode, past_expression, past_echo, past_if, past_if_block, past_else_block
+            .local pmc cnode, past_else_block, past_expression, past_echo, past_if, past_if_block, past_sea
             cnode = shift iter
             if null cnode goto iter_loop
                  $P1 = cnode['ECHO']
@@ -105,6 +105,14 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
                      past.'push'(past_if)
                      goto iter_loop
                  no_if:
+                 $P1 = cnode['inline_sea']
+                 if null $P1 goto no_inline_sea
+                     $P2 = $P1['SEA']
+                     past_sea = tree.'get'('past', $P2, 'Plumhead::Grammar::SEA')
+                     past.'push'(past_sea)
+                     goto iter_loop
+                 no_inline_sea:
+                 # unknown statements are ignored
                  goto iter_loop
          iter_end:
 
