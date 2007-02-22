@@ -1210,9 +1210,10 @@ sub BuildParam {
             'arg1'   => $defn,
         );
         my $lbl = new_label($parser);
-        push @opcodes2, new BranchUnlessNullOp(
+        push @opcodes2, new BranchUnlessOp(
             $parser,
             'prolog' => 1,
+            'op'     => 'null',
             'arg1'   => $defn,
             'result' => $lbl,
         );
