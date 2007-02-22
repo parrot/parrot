@@ -22,6 +22,8 @@ LINK            = @link@
 LD_SHARE_FLAGS  = @ld_share_flags@
 CC_INC          = -I@perl_inc@ -I../../include
 CFLAGS          = $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ $(CC_SHARED)
+#CONDITIONED_LINE(win32):LD_FLAGS        = -def:lib\Parrot\Embed.def $(LD_SHARE_FLAGS)
+#INVERSE_CONDITIONED_LINE(win32):LD_FLAGS        = $(LD_SHARE_FLAGS)
 
 # files needing compilation
 C_FILE          = lib/Parrot/Embed.c
@@ -43,6 +45,7 @@ $(PM) : lib/Parrot/Embed.pm
 	$(CP) lib/Parrot/Embed.pm blib/lib/Parrot
 
 $(SO_FILE) : $(O_FILE)
+	$(PERL) -MExtUtils::Mksymlists -e "eval { Mksymlists( NAME => \"Parrot::Embed\" ) }"
 	$(MKPATH) blib/arch/auto/Parrot/Embed
 	$(LINK) $(LD_SHARE_FLAGS) @ld_out@$(SO_FILE) $(O_FILE) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
