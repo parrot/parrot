@@ -9,6 +9,7 @@
 
     .local pmc _
     .IMPORT( ['Crow::Utils'], 'merge_data', _ )
+    .IMPORT( ['Crow::Utils'], 'get_news', _ )
 
     $S0 = 'template'()
 
@@ -27,7 +28,11 @@
     $P0['Release.Date']              = '22 February 2007'
     $P0['Release.NextScheduledDate'] = 'xx March 2007'
 
-    # TODO get data from NEWS
+    # get data from NEWS
+    $S0 = $P0['Parrot.version']
+    $S1 = get_news($S0)
+    $P0['NEWS'] = $S1
+
     .return ($P0)
 .end
 
