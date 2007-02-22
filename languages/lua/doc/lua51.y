@@ -42,7 +42,12 @@
 %%
 
 chunk
-:   chunk   stat    _semicolon_opt
+:   _stat    laststat   _semicolon_opt
+|   _stat
+;
+
+_stat
+:   _stat   stat    _semicolon_opt
 |   /* empty */
 ;
 
@@ -53,7 +58,6 @@ _semicolon_opt
 
 block
 :   chunk
-|   chunk   laststat    _semicolon_opt
 ;
 
 stat
@@ -74,10 +78,10 @@ stat
                                     block   END
 |   FOR namelist    IN  explist1    DO
                                         block   END
-|   FUNCTION
-                funcname    funcbody
-|   LOCAL   FUNCTION
-                        NAME    funcbody
+|   FUNCTION    funcname
+                            funcbody
+|   LOCAL   FUNCTION    NAME
+                                funcbody
 |   LOCAL   namelist    '=' explist1
 |   LOCAL   namelist
 ;

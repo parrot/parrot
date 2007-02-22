@@ -53,14 +53,9 @@ language_output_is( 'lua', $code, $out, 'partial-sums', params => '25000');
 #       Generate and write random DNA sequences
 #
 
-TODO:
-{
-    local $TODO = 'loadstring is not implemented';
-
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'fasta.lua-2.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'fasta-output.txt' ));
 language_output_is( 'lua', $code, $out, 'fasta', params => '1000' );
-}
 
 #
 #   pidigits
@@ -69,7 +64,7 @@ language_output_is( 'lua', $code, $out, 'fasta', params => '1000' );
 
 TODO:
 {
-    local $TODO = 'loadstring is not implemented';
+    local $TODO = 'loadstring is still incomplete';
 
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'pidigits.lua-2.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'pidigits-output.txt' ));
@@ -183,10 +178,15 @@ language_output_is( 'lua', $code, $out, 'chameneos', params => '100' );
 #       Read DAN sequences - write their reverse-complement
 #
 
+SKIP:
+{
+    skip('maximum recursion depth exceeded', 1) unless (exists $ENV{PARROT_LUA_TEST_PROG});
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'revcomp.lua-3.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'revcomp-output.txt' ));
 $in = File::Spec->catfile( 'languages', @dir, 'revcomp-input.txt' );
 language_output_is( 'lua', $code, $out, 'reverse-complement', params => "< $in" );
+}
 
 #
 #   binary-trees

@@ -220,9 +220,8 @@ x = string.gsub("hello world from Lua", "(%w+)%s*(%w+)", "%2 %1")
 print(x)
 x = string.gsub("home = $HOME, user = $USER", "%$(%w+)", string.reverse)
 print(x)
--- x = string.gsub("4+5 = $return 4+5$", "%$(.-)%$", function (s) return loadstring(s)() end)
--- print(x)
-print "4+5 = 9"
+x = string.gsub("4+5 = $return 4+5$", "%$(.-)%$", function (s) return loadstring(s)() end)
+print(x)
 local t = {name="lua", version="5.1"}
 x = string.gsub("$name-$version.tar.gz", "%$(%w+)", t)
 print(x)
