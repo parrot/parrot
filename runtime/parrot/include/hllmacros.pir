@@ -2,7 +2,7 @@
 
 These macros are to make it easier to write readable and maintainable PIR by
 preprocessing common HLL forms into their low level PIR forms.  These are
-B<not> actually high level constructs, but merely preprocessor directives.  
+B<not> actually high level constructs, but merely preprocessor directives.
 
 =head2 Conditionals
 
@@ -35,6 +35,7 @@ Using C<.NL()> in a line will insert a linebreak.
 .macro NL()
 .endm
 
+
 =item C<.If(conditional, code)>
 
 Runs the code in C<code> if C<conditional> is true.
@@ -47,6 +48,7 @@ Runs the code in C<code> if C<conditional> is true.
 .local $endif:
 .endm
 
+
 =item C<.Unless(conditional, code)>
 
 Runs the code in C<code> if C<conditional> is false.
@@ -58,6 +60,7 @@ Runs the code in C<code> if C<conditional> is false.
     .code
 .local $endif:
 .endm
+
 
 =item C<.IfElse(conditional, true, false)>
 
@@ -75,6 +78,7 @@ C<false>.
 .local $endif:
 .endm
 
+
 =item C<.While(conditional, code)>
 
 Runs the code in C<code> as long as C<conditional> is true.
@@ -89,6 +93,7 @@ Runs the code in C<code> as long as C<conditional> is true.
 .local $endwhile:
 .endm
 
+
 =item C<.DoWhile(code, conditional)>
 
 Runs the code in C<code> once, and then as long as C<conditional> is true.
@@ -100,6 +105,7 @@ Runs the code in C<code> once, and then as long as C<conditional> is true.
     .code
     if .conditional goto .$beginwhile
 .endm
+
 
 =item C<.For(start, conditional, continue, code)>
 
@@ -117,6 +123,7 @@ true, runs C<code>, and then the C<continue> code, such as C<inc i>.
     goto .$beginfor
 .local $endfor:
 .endm
+
 
 =item C<.Foreach(name, array, code)>
 
@@ -138,6 +145,20 @@ work with in C<code>.
     goto .$beginforeach
 .local $endforeach:
 .endm
+
+
+=item C<.IMPORT(.macro IMPORT ( lib, subname, TEMP )>
+
+Imports a C<subname> from the C<lib> namespace into the current namespace.
+C<TEMP> is a temporary pmc used to store the sub.
+
+=cut
+
+.macro IMPORT( lib, subname, TEMP )
+    .TEMP = find_global .lib, .subname
+    store_global .subname, .TEMP
+.endm
+
 
 =back
 
@@ -209,6 +230,20 @@ Using C<.NL()>
         print j
         print "\n"
     })
+
+=head2 Importing subroutines
+
+    .include 'hllmacros.pir'
+    .sub 'main' :main
+        load_bytecode 'Test/More.pbc'
+        .local pmc _
+        .IMPORT( 'Test::More', 'plan', _ )
+        .IMPORT( 'Test::More', 'ok',   _ )
+
+        plan( 1 )
+        ok(1, 'my test works')
+    .end
+
 
 =head1 Caveats
 
