@@ -1,9 +1,11 @@
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
-grammar Plumhead::Grammar;
+# PHP grammar for Plumhead partrige
 
-# a PHP grammar
-# derived from on languages/abc/abc.pg
+# The starting rule is TOP
+
+grammar Plumhead::Grammar;
 
 token TOP                     { <program> }
 
@@ -22,6 +24,7 @@ token UNARY_MINUS             { \- }
 token UNARY_PLUS              { \+ }
 token ADD_OP                  { \+ | \- }
 token MUL_OP                  { \* | / | % }
+token REL_OP                  { <'=='> | <'<='> | <'>='> | <'!='> | <'<'>  | <'>'> }
 
 token IF                      { <'if'> }
 token ELSE                    { <'else'> }
@@ -29,11 +32,16 @@ token program                 { ^ <SEA> <code> }
 
 rule  code                    { <?CODE_START> <statement>* <?CODE_END> }
 
+rule relational_expression    { <expression> <rel_op_clause>? }
+
 rule statement                { <ECHO> <expression> ;
-                              | <IF> <?PAREN_OPEN> <expression> <?PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
+                              | <IF> <?PAREN_OPEN> <relational_expression> <?PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
                               | <inline_sea> 
                               }
 
+rule else_clause              { <?ELSE> \{ <statement>* \} }
+# TODO: rel_op_clause is not a nice name
+rule rel_op_clause            { <REL_OP> <expression> }
 rule else_clause              { <?ELSE> \{ <statement>* \} }
 token inline_sea              { <?CODE_END> <SEA> <?CODE_START> }
 

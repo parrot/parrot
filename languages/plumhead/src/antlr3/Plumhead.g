@@ -1,7 +1,7 @@
 // Copyright (C) 2006-2007, The Perl Foundation.
 // $Id$ 
  
-// Plumhead with ANTLR3
+// PHP grammar for Plumhead antlr3
 
 // The starting rule is 'program'
 
