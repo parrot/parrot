@@ -361,13 +361,14 @@ specifies the encoding to use for the input (e.g., "utf8").
     ##  libraries aren't present (RT #41103)
     if has_readline < 0 goto no_readline
     code = stdin.'readline'('> ')
+    if null code goto interactive_end
+    concat code, "\n"
     goto have_code
   no_readline:
     $S0 = readline stdin
     code = new .String
     code = $S0
   have_code:
-    if null code goto interactive_end
     unless code goto interactive_loop
     push_eh interactive_trap
     $P0 = self.'eval'(code, adverbs :flat :named)
