@@ -126,7 +126,47 @@ Note that not all types are valid as return types.
 =head2 Examples
 
 Most of the function parameters are reasonably self-evident. Some, however,
-merit additional explanation. The {{ ??? }}
+merit additional explanation.
+
+This section describes the simplest example for NCI possible. To every NCI
+invocation, there are two parts: the native function to be invoked, and the
+PIR code to do the invocation.
+
+First the native function, to be written in C.
+On Windows, it is necessary to do a DLL export specification of the NCI function:
+
+  /* foo.c */
+
+  /* specify the function prototype */
+
+	void foo(void);
+
+  /* or on Windows using Microsoft Visual Studio: */
+
+  __declspec(dllexport) void foo(void);
+
+  void foo(void) {
+    printf("Hello Parrot!\n");
+  }
+
+Then, after having compiled the file as a shared library, the PIR code looks
+like this:
+
+  .sub main :main
+     .local pmc lib, func
+
+     # load the shared library
+     lib = loadlib "hello" # no extension, .so or .dll is assumed
+
+     # get a reference to the function from the library just
+     # loaded, called "foo", and signature "void" (and no arguments)
+     func = dlfunc lib, "foo", "v"
+
+     # invoke
+     func()
+
+  .end
+
 
 =head2 Callbacks
 
@@ -224,15 +264,19 @@ L<t/pmc/nci.t>, L<src/nci_test.c>
     Maintainer: Dan Sugalski
     Class: Internals
     PDD Number: 16
-    Version: 1.1
+    Version: 1.2
     Status: Developing
-    Last Modified: Oct 12, 2004
+    Last Modified: Feb 23, 2007
     PDD Format: 1
     Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item version 1.2
+
+Updated with basic example.
 
 =item version 1.1
 
@@ -247,6 +291,10 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item version 1.2
+
+Updated with basic example.
 
 =item version 1.1
 
