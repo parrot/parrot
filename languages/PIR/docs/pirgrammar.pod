@@ -16,10 +16,16 @@ For a bugs and issues, see the section KNOWN ISSUES AND BUGS.
 The grammar includes some constructs that B<are> in the IMCC parser,
 but are not implemented. An example of this is the C<.global> directive.
 
+Please note that languages/PIR is B<not> the official definition of the
+PIR language. The reference implementation of PIR is IMCC, located
+in C<parrot/compilers/IMCC>. However, languages/PIR tries to be as close
+to IMCC as possible. IMCC's grammar could use some cleaning up;
+languages/PIR might be a basis to start with a clean reimplementation of
+PIR in C (using Lex/Yacc).
 
 =head1 VERSION
 
-0.1.2
+0.1.3
 
 =head1 LEXICAL CONVENTIONS
 
@@ -375,6 +381,7 @@ defines the syntax for pure PASM instructions.
       local_decl
     | lexical_decl
     | const_def
+    | globalconst_def
     | conditional_stat
     | assignment_stat
     | open_namespace
@@ -502,6 +509,27 @@ Note that the constant type and the value type should match, i.e. you cannot
 assign a floating point number to an integer constant. The PIR parser will
 check for this.
 
+
+=head2 Global constant definitions
+
+  globalconst_def:
+    ".globalconst" type identifier "=" constant_expr
+
+=head3 Example global constant definitions
+
+This directive is similar to C<const_def>, except that once a C<global constant>
+has been defined, it is accessible from B<all> subroutines.
+
+  .sub main :main
+    .global const int answer = 42
+    foo()
+  .end
+
+  .sub foo
+    print answer # prints 42
+  .end
+
+
 =head2 Conditional statements
 
   conditional_stat:
@@ -518,7 +546,7 @@ Therefore the examples will use either.
 
   if null $P0 goto L1
 
-Checks whether $P0 is C<null>, if it is, flow of control jumps to label L1
+Checks whether C<$P0> is C<null>, if it is, flow of control jumps to label C<L1>
 
   unless $P0 goto L2
   unless x   goto L2
@@ -725,6 +753,26 @@ whitespace in front of it is allowed. Printing C<str> would print:
     are                  stored as well.
 
 
+In IMCC, a heredoc identifier can be specified as an argument, like this:
+
+    foo(42, "hello", <<'EOS')
+
+    This is a heredoc text argument.
+
+  EOS
+
+In IMCC, only B<one> such argument can be specified. The languages/PIR implementation
+aims to allow for B<any> number of heredoc arguments, like this:
+
+    foo(<<'STR1', <<'STR2')
+
+  	argument 1
+  STR1
+    argument 2
+  STR2
+
+B<Currently, this is not working.>
+
 =head2 Invoking subroutines and methods
 
   sub_invocation:
@@ -880,7 +928,26 @@ for the long version. The same example from the 'long subroutine invocation' is 
   arr[1] = 43
   foo(arr :flat, $I0 :named('intArg'))
 
-Please note that the short subroutine call does B<not> allow for C<NCI> calls.
+In order to do a Native Call Interface invocation, the subroutine to be invoked needs to be in referenced
+from a PMC register, as its name is B<not> visible from Parrot. A NCI call looks like this:
+
+  .local pmc nci_sub, nci_lib
+  .local string c_function, signature
+
+  nci_lib = loadlib "myLib"
+
+  # name of the C function to be called
+  c_function = "sayHello"
+
+  # set signature to "void" (no arguments)
+  signature  = "v"
+
+  # get a PMC representing the C function
+  nci_sub = dlfunc nci_lib, c_function, signature
+
+  # and invoke
+  nci_sub()
+
 
 =head2 Return values from subroutines
 
@@ -1056,11 +1123,20 @@ not PIR instructions.
     "(" id_list? ")"
 
   macro_body:
-    .*?
+    <labeled_pir_instr>*
     ".endm" nl
 
   macro_invocation:
     macro_id parenthesized_args?
+
+
+Note that before a macro body will be parsed, some grammar rules
+will be changed. In a macro body, local variable declaration can
+B<only> be done using the C<.sym> directive. The C<.local> directive
+is only available for declaring labels.
+
+  macro_label:
+    ".local" "$"identifier":"
 
 =head3 Example Macros
 
@@ -1079,7 +1155,7 @@ then one can write in a subroutine:
     .add2(myNum)
     print myNum  # prints 44
   .end
-    
+
 =head2 PIR Pragmas
 
   pragma:
@@ -1256,6 +1332,9 @@ Bugs or improvements may be sent to the author, and are of course greatly
 appreciated. Moreover, if you find any missing constructs that are in
 IMCC, indications of these would be appreciated as well.
 
+Please see the PROPOSALS document for some proposals of the author to
+clean up the official grammar of PIR (as defined by the IMCC compiler).
+
 =back
 
 =head1 REFERENCES
@@ -1286,6 +1365,29 @@ docs/imcc/syntax.pod - official syntax for IMCC/PIR.
 
 =head1 CHANGES
 
+0.1.3
+
+=over 4
+
+=item *
+
+Updated short sub invocation for NCI invocations.
+
+=item *
+
+Added an example for C<.globalconst>.
+
+=item *
+
+Added some remarks at section for Macros.
+
+=item *
+
+Added some remarks here and there, and fixed some style issues.
+
+=back
+
+
 0.1.2
 
 =over 4
@@ -1295,7 +1397,7 @@ docs/imcc/syntax.pod - official syntax for IMCC/PIR.
 Removed C<.immediate>, it is C<:immediate>, and thus not a PIR directive, but a flag.
 This was a mistake.
 
-=item * 
+=item *
 
 Added C<.globalconst>
 
