@@ -29,6 +29,7 @@ for compiling programs in Parrot.
     $P0 = subclass base, 'PAST::Val'
     $P0 = subclass base, 'PAST::Var'
     $P0 = subclass base, 'PAST::Block'
+    $P0 = subclass base, 'PAST::VarList'
 
     $P0 = new .Integer
     $P0 = 10
@@ -661,6 +662,15 @@ Get/set any pragmas (PIR) for this block.
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .return self.'attr'('pragma', value, has_value)
+.end
+
+
+.namespace [ 'PAST::VarList' ]
+
+.sub 'bindvalue' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('bindvalue', value, has_value)
 .end
 
 

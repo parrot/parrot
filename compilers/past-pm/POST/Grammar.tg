@@ -613,3 +613,27 @@ transform post (PAST::Var) :language('PIR') {
     .return (post)
 }
 
+
+transform bind (PAST::VarList) :language('PIR') {
+    .local pmc post, bindvalue, binditer
+    post = new 'POST::Ops'
+    post.'init'('node'=>node)
+
+    bindvalue = node.'bindvalue'()
+    binditer = post.'push_new'('POST::Op', 'pirop'=>'new')
+    binditer.'arglist'(binditer, '.Iterator', bindvalue)
+
+    .local pmc iter
+    iter = node.'iterator'()
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cpast, cpost
+    cpast = shift iter
+    post.'push_pirop'('shift', post, binditer)
+    cpast.'bindvalue'(post)
+    cpost = tree.'get'('bind', cpast)
+    post.'push'(cpost)
+    goto iter_loop
+  iter_end:
+    .return (post)
+}
