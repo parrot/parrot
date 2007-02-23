@@ -38,7 +38,7 @@ Return true if C<name> is a valid vtable slot name.
 */
 
 int
-Parrot_is_vtable_name(Interp *interp, const char *name)
+Parrot_get_vtable_index(Interp *interp, const char *name)
 {
     int i;
     const char *meth;
@@ -47,9 +47,53 @@ Parrot_is_vtable_name(Interp *interp, const char *name)
             continue;
         /* XXX slot_names still have __ in front */
         if (strcmp(name, meth + 2) == 0)
-            return 1;
+            return i;
     }
-    return 0;
+    return -1;
+}
+
+PMC*
+Parrot_find_vtable_meth(Interp* interp, PMC *pmc, STRING *meth) {
+    PMC *class = pmc;
+    PMC *ns = NULL;
+    PMC *mro;
+    PMC *key;
+    INTVAL i, n, j, k;
+
+    /* Get index in Parrot_vtable_slot_names[]. */
+    int vtable_index = Parrot_get_vtable_index(interp,
+        string_to_cstring(interp, meth));
+    if (vtable_index == -1)
+      return NULL;
+
+    /* Get class. */
+    if (PObj_is_object_TEST(pmc)) {
+        class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
+    }
+
+    /* Get MRO and iterate over it to find method with a matching
+       vtable index. */
+    mro = class->vtable->mro;
+    n = VTABLE_elements(interp, mro);
+    for (i = 0; i < n; ++i) {
+        class = VTABLE_get_pmc_keyed_int(interp, mro, i);
+        ns = VTABLE_namespace(interp, class);
+        if (!PMC_IS_NULL(ns)) {
+            k = VTABLE_elements(interp, ns);
+            key = VTABLE_nextkey_keyed(interp, key_new(interp), ns,
+                ITERATE_FROM_START);
+            for (j = 0; j < k; ++j) {
+                STRING *ns_key = parrot_hash_get_idx(interp, PMC_struct_val(ns), key);
+                PMC *res = VTABLE_get_pmc_keyed_str(interp, ns, ns_key);
+                if (res->vtable->base_type == enum_class_Sub &&
+                        PMC_sub(res)->vtable_index == vtable_index)
+                    return res;
+            }
+        }
+    }
+
+    /* If we get here, not found in the current class. */
+    return NULL;
 }
 
 STRING*
@@ -215,21 +259,15 @@ given class. If one is found, returns the method.
 */
 
 static PMC*
-find_vtable_override_byname(Interp *interp, PMC *class_name,
-                            STRING *method_name)
+find_vtable_override_byname(Interp *interp, PMC *class,
+                            PMC *class_name, STRING *method_name)
 {
     /* First try it in the :vtable namespace. */
-    STRING* vtable_str = string_from_const_cstring(interp,
-        "\0VTABLE\0", 8);
-    PMC *ns = Parrot_find_global_k(interp, class_name, vtable_str);
-    if (!PMC_IS_NULL(ns)) {
-        STRING *no_underscores = string_substr(interp, method_name,
-            2, method_name->strlen - 2, NULL, 0);
-        PMC *res = VTABLE_get_pmc_keyed_str(interp, ns,
-            no_underscores);
-        if (!PMC_IS_NULL(res))
-            return res;
-    }
+    STRING *no_underscores = string_substr(interp, method_name,
+        2, method_name->strlen - 2, NULL, 0);
+    PMC *res = Parrot_find_vtable_meth(interp, class, no_underscores);
+    if (!PMC_IS_NULL(res))
+        return res;
 
     /* Otherwise, do lookup in the old way. */
     return Parrot_find_global_k(interp, class_name, method_name);
@@ -277,7 +315,7 @@ create_deleg_pmc_vtable(Interp *interp, PMC *class,
         meth_str.strstart = const_cast(meth);
         meth_str.strlen = meth_str.bufused = strlen(meth);
         meth_str.hashval = 0;
-        if (find_vtable_override_byname(interp, class_name, &meth_str)) {
+        if (find_vtable_override_byname(interp, class, class_name, &meth_str)) {
             /*
              * the method exists; keep the ParrotObject aka delegate vtable slot
              */
@@ -788,9 +826,6 @@ do_initcall(Interp *interp, PMC* class, PMC *object, PMC *init)
         /* no method found and no BUILD property set? */
         if (!meth && meth_str == NULL) {
             PMC *ns;
-            PMC *vtable_ns;
-            STRING *vtable_ns_name = string_from_const_cstring(interp,
-                "\0VTABLE\0", 8);
             STRING *meth_str_v;
             /* use __init or __init_pmc (depending on if an argument was passed)
              * as fallback constructor method, if it exists */
@@ -803,12 +838,9 @@ do_initcall(Interp *interp, PMC* class, PMC *object, PMC *init)
                 meth_str_v = CONST_STRING(interp, "init");
             }
             ns = VTABLE_namespace(interp, parent_class);
-            vtable_ns = Parrot_get_namespace_keyed_str(interp, ns,
-                vtable_ns_name);
             /* can't use find_method, it walks mro */
-            if (!PMC_IS_NULL(vtable_ns))
-                meth = VTABLE_get_pmc_keyed_str(interp, vtable_ns,
-                    meth_str_v);
+            meth = Parrot_find_vtable_meth(interp, class,
+                meth_str_v);
             if (PMC_IS_NULL(meth))
                 meth = VTABLE_get_pmc_keyed_str(interp, ns, meth_str);
             if (meth == PMCNULL)
