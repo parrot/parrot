@@ -23,6 +23,10 @@ This encapsulation is used to implement some Lua functions :
 
 It's a temporary work. Waiting for the real PIR compiler/interpreter.
 
+=head2 Methods
+
+=over 4
+
 =cut
 
 .namespace
@@ -108,20 +112,26 @@ _handler:
 
 .sub 'compile_file' :anon
     .param string filename
+    .const string out = 'luac.out'
 #    $I0 = spawnw 'cd'
     $I0 = index filename, '.'
     $S1 = substr filename, 0, $I0
     $S1 .= '.pir'
     unlink($S1)
+    unlink(out)
     $S0 = 'perl -Ilanguages/lua languages/lua/luac.pl '
     $S0 .= filename
+    $S0 .= ' > '
+    $S0 .= out
     $I0 = spawnw $S0
     .local string pir
     pir = load_script($S1)
     if pir goto L1
+    $P0 = getclass 'ParrotIO'
+    $S0 = $P0.'slurp'(out)
     .local pmc ex
     ex = new .Exception
-    ex['_message'] =  "no script PIR"
+    ex['_message'] = $S0
     throw ex
 L1:
     .local pmc pir_comp
@@ -130,9 +140,8 @@ L1:
     .return ($P0)
 .end
 
-=over 4
 
-=item compile(pmc code)
+=item compile(pmc source)
 
 Compile C<source>.
 
@@ -150,24 +159,6 @@ Compile C<source>.
     load_bytecode $S3
     $P1 = get_root_global 'tmp'
     .return ($P1)
-.end
-
-
-=item evalfiles(file)
-
-Compile and evaluate a file.
-
-=cut
-
-.sub 'evalfiles' :method
-    .param pmc file
-
-    $S1 = file
-    $P0 = compile_file($S1)
-    $S3 = save_pbc($P0, $S0)
-    load_bytecode $S3
-    $P1 = get_root_global 'tmp'
-    .return $P1()
 .end
 
 =back

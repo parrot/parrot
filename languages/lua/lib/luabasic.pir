@@ -254,16 +254,50 @@ without arguments, C<dofile> executes the contents of the standard input
 C<dofile> propagates the error to its caller (that is, dofile does not run in
 protected mode).
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub '_lua_dofile' :anon
     .param pmc filename :optional
-    $S0 = optstring(filename, '')
-    not_implemented()
+    $S1 = optstring(filename, '')
+    ($P0, $S0) = loadfile($S1)
+    if null $P0 goto L1
+    .return $P0()
+L1:
+    error($S0)
 .end
 
+.sub 'loadfile' :anon
+    .param string filename
+    .local pmc f
+    unless filename == '' goto L1
+    f = getstdin
+    goto L2
+L1:
+    f = open filename, '<'
+    unless f goto L3
+L2:
+    $S0 = f.'slurp'('')
+    if filename == '' goto L4
+    close f
+L4:
+    .local pmc lua_comp
+    lua_comp = compreg 'Lua'
+    push_eh _handler
+    $P0 = lua_comp.'compile'($S0)
+    .return ($P0, '')
+_handler:
+    .get_results ($P0, $S0)
+    goto L5
+L3:
+    $S0 = 'cannot open '
+    $S0 .= filename
+    $S0 .= ': '
+    $S1 = err
+    $S0 .= $S1
+L5:
+    null $P0
+    .return ($P0, $S0)
+.end
 
 =item C<error (message [, level])>
 
@@ -394,7 +428,25 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub '_lua_load' :anon
+    .param pmc func :optional
+    .param pmc chunkname :optional
+    checktype(func, 'function')
+    $S2 = optstring(chunkname, '=(load)')
     not_implemented()
+    .return load_aux($P0, $S0)
+.end
+
+.sub 'load_aux' :anon
+    .param pmc func
+    .param string error
+    if null func goto L1
+    .return (func)
+L1:
+    .local pmc msg
+    new msg, .LuaString
+    set msg, error
+    new func, .LuaNil
+    .return (func, msg)
 .end
 
 
@@ -407,29 +459,9 @@ standard input, if no file name is given.
 
 .sub '_lua_loadfile' :anon
     .param pmc filename :optional
-    .local pmc ret
-    .local pmc f
     $S1 = optstring(filename, '')
-    unless null filename goto L1
-    f = getstdin
-    goto L2
-L1:
-    f = open $S1, '<'
-    unless f goto L3
-L2:
-    $S0 = f.'slurp'('')
-    if null filename goto L4
-    close f
-L4:
-    .local pmc lua_comp
-    lua_comp = compreg 'Lua'
-    push_eh _handler
-    ret = lua_comp.'compile'($S0)
-    .return (ret)
-_handler:
-L3:
-    new ret, .LuaNil
-    .return (ret)
+    ($P0, $S0) = loadfile($S1)
+    .return load_aux($P0, $S0)
 .end
 
 
@@ -441,24 +473,29 @@ To load and run a given string, use the idiom
 
     assert(loadstring(s))()
 
-STILL INCOMPLETE.
-
 =cut
 
 .sub '_lua_loadstring' :anon
     .param pmc s :optional
     .param pmc chunkname :optional
-    .local pmc ret
-    $S0 = checkstring(s)
-    $S1 = optstring(chunkname, s)
+    $S1 = checkstring(s)
+    $S2 = optstring(chunkname, $S1)
+    ($P0, $S0) = loadbuffer($S1, $S2)
+    .return load_aux($P0, $S0)
+.end
+
+.sub 'loadbuffer' :anon
+    .param string s
+    .param string chunkname
     .local pmc lua_comp
     lua_comp = compreg 'Lua'
     push_eh _handler
-    ret = lua_comp.'compile'(s)
-    .return (ret)
+    $P0 = lua_comp.'compile'(s)
+    .return ($P0, '')
 _handler:
-    new ret, .LuaNil
-    .return (ret)
+    .get_results ($P0, $S0)
+    null $P0
+    .return ($P0, $S0)
 .end
 
 

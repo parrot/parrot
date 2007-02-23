@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 40;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function assert' );
@@ -54,6 +54,53 @@ CODE
 /assertion failed!/
 OUTPUT
 
+unlink('../lib1.lua') if ( -f '../lib1.lua' );
+my $X;
+open $X, '>', '../lib1.lua';
+print {$X} << 'CODE';
+function norm (x, y)
+    return (x^2 + y^2)^0.5
+end
+
+function twice (x)
+    return 2*x
+end
+CODE
+close $X;
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function dofile');
+dofile('lib1.lua')
+n = norm(3.4, 1.0)
+print(twice(n))
+CODE
+7.0880180586677
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function dofile (stdin)', params => "< lib1.lua" );
+dofile()
+n = norm(3.4, 1.0)
+print(twice(n))
+CODE
+7.0880180586677
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function dofile (no file)' );
+dofile("no_file.lua")
+CODE
+/cannot open no_file.lua: No such file or directory/
+OUTPUT
+
+unlink('../foo.lua') if ( -f '../foo.lua' );
+open $X, '>', '../foo.lua';
+print {$X} '?syntax error?';
+close $X;
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function dofile (syntax error)');
+dofile('foo.lua')
+CODE
+/\?/
+OUTPUT
+
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function ipairs' );
 a = {"a","b","c"}
 local f, v, s = ipairs(a)
@@ -75,7 +122,6 @@ nil	nil
 OUTPUT
 
 unlink('../foo.lua') if ( -f '../foo.lua' );
-my $X;
 open $X, '>', '../foo.lua';
 print {$X} << 'CODE';
 function foo (x)
@@ -104,11 +150,11 @@ nil
 ok
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function loadfile (no file)' );
-f = loadfile("no_file.lua")
-print(f)
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function loadfile (no file)' );
+f, msg = loadfile("no_file.lua")
+print(f, msg)
 CODE
-nil
+/^nil\t.*cannot open no_file.lua: No such file or directory/
 OUTPUT
 
 unlink('../foo.lua') if ( -f '../foo.lua' );
@@ -117,10 +163,10 @@ print {$X} '?syntax error?';
 close $X;
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function loadfile (syntax error)');
-f = loadfile('foo.lua')
-print(f)
+f, msg = loadfile('foo.lua')
+print(f, msg)
 CODE
-/nil$/
+/nil\t.*\?/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function loadstring' );
@@ -146,10 +192,10 @@ CODE
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function loadstring (syntax error)' );
-f = loadstring("?syntax error?")
-print(f)
+f, msg = loadstring("?syntax error?")
+print(f, msg)
 CODE
-/nil$/
+/nil\t.*\?/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function next (array)' );
