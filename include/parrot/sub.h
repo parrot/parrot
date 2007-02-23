@@ -127,6 +127,7 @@ typedef struct Parrot_sub {
                                   */
     PMC      *namespace_stash;   /* the actual hash, HLL::namespace */
     STRING   *name;              /* name of the sub */
+    INTVAL   vtable_index;       /* index in Parrot_vtable_slot_names */
     PMC      *multi_signature;   /* list of types for MMD */
     INTVAL   n_regs_used[4];     /* INSP in PBC */
 
@@ -157,6 +158,7 @@ typedef struct Parrot_coro {
                                   */
     PMC      *namespace_stash;   /* the actual hash, HLL::namespace */
     STRING   *name;              /* name of the sub */
+    INTVAL   vtable_index;       /* index in Parrot_vtable_slot_names */
     PMC      *multi_signature;   /* list of types for MMD */
     INTVAL   n_regs_used[4];     /* INSP in PBC */
 

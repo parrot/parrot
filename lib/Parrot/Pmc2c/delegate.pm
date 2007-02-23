@@ -120,7 +120,7 @@ EOC
     $cout .= <<EOC;
     STRING *meth = CONST_STRING(interp, "__$meth");
     STRING *meth_v = CONST_STRING(interp, "$meth");
-    PMC *sub = find_vtable_meth(interp, pmc, meth_v);
+    PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
     if (PMC_IS_NULL(sub))
         sub = find_or_die(interp, pmc, meth);
     ${func_ret}Parrot_run_meth_fromc_args$ret_type(interp, sub,
@@ -135,4 +135,5 @@ EOC
 }
 
 1;
+
 

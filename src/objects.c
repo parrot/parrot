@@ -29,9 +29,9 @@ static void parrot_class_register(Interp * , PMC *name,
 
 /*
 
-=item C<int Parrot_is_vtable_name(Interp *, const char *name)>
+=item C<int Parrot_get_vtable_index(Interp *, const char *name)>
 
-Return true if C<name> is a valid vtable slot name.
+Return index if C<name> is a valid vtable slot name.
 
 =cut
 

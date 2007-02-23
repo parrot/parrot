@@ -650,6 +650,7 @@ add_const_pmc_sub(Interp *interp, SymReg *r,
     IMC_Unit *unit;
     STRING *vtable_name;
     char *c_name;
+    int vtable_index;
 
     unit = globals.cs->subs->unit;
 
@@ -716,6 +717,7 @@ add_const_pmc_sub(Interp *interp, SymReg *r,
     sub->lex_info = create_lexinfo(interp, unit, sub_pmc,
             r->pcc_sub->pragma & P_NEED_LEX);
     sub->outer_sub = find_outer(interp, unit);
+    sub->vtable_index = -1;
     /*
      * check if it's declared multi
      */
@@ -736,55 +738,15 @@ add_const_pmc_sub(Interp *interp, SymReg *r,
 
         /* Check this is a valid vtable method to override. */
         c_name = string_to_cstring(interp, vtable_name);
-        if (!Parrot_is_vtable_name(interp, c_name)) {
+        vtable_index = Parrot_get_vtable_index(interp, c_name);
+        if (vtable_index == -1) {
             IMCC_fatal(interp, 1,
                 "'%s' is not a v-table method, but was used with :vtable.\n",
                 c_name);
         }
 
-        /* Need to store it in a v-table namespace.
-           XXX At the moment, we're just creating a name-managled entry in the
-           namespace to hold these, but in the long run we need a good way to
-           do this. */
-        if (!PMC_IS_NULL(ns_pmc))
-        {
-            STRING* vtable_ns_name_s = string_from_const_cstring(interp,
-                "\0VTABLE\0", 8);
-            PMC* vtable_ns_name;
-            PMC* sub_copy = VTABLE_clone(interp, sub_pmc);
-            PMC* vtable_ns_pmc = NULL;
-            PMC* tmp = NULL;
-
-            PMC_sub(sub_copy)->name = vtable_name;
-            PObj_get_FLAGS(sub_copy) &= !SUB_FLAG_PF_ANON;
-
-            switch (ns_pmc->vtable->base_type)
-            {
-                case enum_class_Key:
-                    /* Just add the extra v-table entry to a copy of the
-                       namespace key. */
-                    vtable_ns_pmc = VTABLE_clone(interp, ns_pmc);
-                    vtable_ns_name = pmc_new(interp, enum_class_Key);
-                    VTABLE_set_string_native(interp, vtable_ns_name,
-                        vtable_ns_name_s);
-                    VTABLE_push_pmc(interp, vtable_ns_pmc,
-                        vtable_ns_name);
-                    break;
-                case enum_class_String:
-                    /* Need to create a new key. */
-                    vtable_ns_pmc = pmc_new(interp, enum_class_Key);
-                    VTABLE_set_string_native(interp, vtable_ns_pmc,
-                        VTABLE_get_string(interp, ns_pmc));
-                    tmp = pmc_new(interp, enum_class_Key);
-                    VTABLE_set_string_native(interp, tmp,
-                        vtable_ns_name_s);
-                    VTABLE_push_pmc(interp, vtable_ns_pmc, tmp);
-                    break;
-            }
-            PMC_sub(sub_copy)->namespace = vtable_ns_pmc;
-
-            Parrot_store_sub_in_namespace(interp, sub_copy);
-        }
+        /* TODO check for duplicates */
+        sub->vtable_index = vtable_index;
     }
 
     pfc->type = PFC_PMC;
@@ -1409,4 +1371,5 @@ e_pbc_close(Interp *interp, void *param)
  * End:
  * vim: expandtab shiftwidth=4:
  */
+
 

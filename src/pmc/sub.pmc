@@ -471,6 +471,7 @@ Archives the subroutine.
          * - multi_signature
          * - n_regs_used[i]
          * - lex_info
+         * - vtable_index
          */
 
         io->vtable->push_integer(INTERP, io, (INTVAL) sub->start_offs);
@@ -479,6 +480,7 @@ Archives the subroutine.
         io->vtable->push_string(INTERP, io, sub->name);
         io->vtable->push_integer(INTERP, io, sub->HLL_id);
         io->vtable->push_integer(INTERP, io, sub->comp_flags);
+        io->vtable->push_integer(INTERP, io, sub->vtable_index);
         for (i = 0; i < 4; ++i)
             io->vtable->push_integer(INTERP, io, sub->n_regs_used[i]);
     }
@@ -511,6 +513,7 @@ Unarchives the subroutine.
             sub->name = io->vtable->shift_string(INTERP, io);
             sub->HLL_id  = io->vtable->shift_integer(INTERP, io);
             sub->comp_flags = io->vtable->shift_integer(INTERP, io);
+            sub->vtable_index = io->vtable->shift_integer(INTERP, io);
             for (i = 0; i < 4; ++i)
                 sub->n_regs_used[i] = io->vtable->shift_integer(INTERP, io);
         }
