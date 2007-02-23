@@ -1318,6 +1318,9 @@ void Parrot_STM_mark_extracted(Interp *interp, void *saved_log_data) {
     STM_saved_tx_log *saved;
     int i;
 
+    if (saved_log_data == NULL)
+        return;
+
     saved = saved_log_data;
 
     for (i = 0; i < saved->num_reads; ++i)
