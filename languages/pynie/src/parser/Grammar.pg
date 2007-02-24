@@ -1,0 +1,140 @@
+## $Id: grammar_rules.pg 17096 2007-02-20 20:20:48Z paultcochrane $
+
+## TITLE
+##     Pynie::Grammar -- a grammar for parsing Python
+##
+## DESCRIPTION
+##
+## These are a set of rules for parsing programs written in Python.
+## Many of the rules are derived from the "Python Language Reference
+## Manual", by Guido van Rossum (Fred L. Drake, Jr., Editor).
+
+grammar Pynie::Grammar ;
+
+## C<TOP> defines the top level rule to the HLLCompiler.
+token TOP { <?indent_zero> <file_input> }
+
+token newline { [ <?ws> \n ]+ }
+
+token ws { \h* [ <'#'> \N* ]? }
+
+token file_input { ^ [ <?newline> | <statement> ]* [ $ | <?die: syntax_error> ] }
+
+token suite {
+    | <stmt_list> <?newline>
+    | <?newline> <?indent> <statement>
+                [ <?indent_same> <statement> ]*
+                [ <?dedent> | <?die: IndentationError: unindent does not match any outer indentation level> ]
+}
+
+token statement {
+    | <compound_stmt>
+    | <stmt_list> <?newline>
+}
+
+token stmt_list { <simple_stmt> [ <';'> <simple_stmt> ]* <';'>? }
+
+token compound_stmt {
+    | <if_stmt>
+    | <while_stmt>
+}
+
+rule if_stmt {
+    <'if'> <expression> <':'> <suite>
+    [ <'elif'> <expression> <':'> <suite> ]*
+    [ <'else'> <':'> <suite> ]?
+}
+
+rule while_stmt {
+    <'while'> <expression> <':'> <suite>
+    [ <'else'> <':'> <suite> ]?
+}
+
+token simple_stmt {
+    | <print_stmt>
+    | <assignment_stmt>
+    | <expression>
+}
+
+rule assignment_stmt { [ <target_list> <'='> ]+ <expression_list> }
+
+rule target_list { <target> [ <','> <target> ]* (<','>)? }
+
+token target { <identifier> }
+
+token identifier { [ <?alpha> | <'_'> ] \w* }
+
+rule print_stmt {
+    <'print'> [ <expression> [ <','> <expression> ]* (<','>?) ]?
+}
+
+
+token literal {
+    | <stringliteral>
+    | <integer>
+}
+
+token integer { \d+ }
+
+token floatnumber {
+    | \d* <'.'> \d+
+    | \d+ <'.'>
+    | [ <'.'>? \d+ ] <[eE]> <[+\-]> \d+
+}
+
+token stringliteral {
+    | " ( [ \\ . | <-["]> ]* ) "
+    | ' ( [ \\ . | <-[']> ]* ) '
+}
+
+rule expression_list { <expression> [ , <expression> ]* }
+
+rule list_display { <'['> <listmaker>? <']'> }
+
+rule listmaker { <expression> [ <','> <expression> ]* (<','>)? }
+
+
+##  This identifies operators for the bottom-up parser
+
+token 'expression' is optable { ... }
+
+proto 'term:'      is precedence('=')
+    is parsed(&term)
+    { ... }
+
+token term {
+    | <literal>
+    | <identifier>
+    | <list_display>
+}
+
+proto 'infix:**'   is looser('term:')  {...}
+
+proto 'infix:*'    is looser('infix:**')
+    is pirop('mul')
+    { ... }
+
+proto 'infix:/'    is equiv('infix:*')
+    is pirop('div')
+    { ... }
+
+proto 'infix:%'    is equiv('infix:*')
+    is pirop('mod')
+    { ... }
+
+proto 'infix:+'    is looser('infix:*')
+    is pirop('add')
+    { ... }
+
+proto 'infix:-'    is equiv('infix:+')
+    is pirop('sub')
+    { ... }
+
+proto 'infix:=='   is looser('infix:+')  { ... }
+proto 'infix:!='   is equiv('infix:==')  { ... }
+proto 'infix:<='   is equiv('infix:==')  { ... }
+proto 'infix:>='   is equiv('infix:==')  { ... }
+proto 'infix:<'    is equiv('infix:==')  { ... }
+proto 'infix:>'    is equiv('infix:==')  { ... }
+
+## vim: expandtab sw=4

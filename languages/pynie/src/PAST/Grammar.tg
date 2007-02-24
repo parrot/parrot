@@ -1,0 +1,338 @@
+grammar Pynie::PAST::Grammar is TGE::Grammar;
+
+transform past (ROOT) :language('PIR') {
+    node = node['file_input']
+    .local pmc past
+    past = new 'PAST::Block'
+    past.'init'('node'=>node, 'name'=>'anon')
+    .local pmc iter
+    $P0 = node['statement']
+    iter = new .Iterator, $P0
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cnode, cpast
+    cnode = shift iter
+    cpast = tree.'get'('past', cnode, 'Pynie::Grammar::statement')
+    past.'push'(cpast)
+    goto iter_loop
+  iter_end:
+    .return (past)
+}
+
+
+transform past (Pynie::Grammar::statement) :language('PIR') {
+  stmt_list:
+    $P0 = node['stmt_list']
+    if null $P0 goto compound_stmt
+    .return tree.'get'('past', $P0, 'Pynie::Grammar::stmt_list')
+
+  compound_stmt:
+    $P0 = node['compound_stmt']
+    $P1 = $P0['if_stmt']
+    if null $P1 goto while_stmt
+    .return tree.'get'('past', $P1, 'Pynie::Grammar::if_stmt')
+  while_stmt:
+    $P1 = $P0['while_stmt']
+    .return tree.'get'('past', $P1, 'Pynie::Grammar::while_stmt')
+}
+
+
+transform past (Pynie::Grammar::stmt_list) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Stmts'
+    past.'init'('node'=>node)
+
+    .local pmc iter
+    $P0 = node['simple_stmt']
+    iter = new .Iterator, $P0
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cnode, cpast
+    cnode = shift iter
+    cpast = tree.'get'('past', cnode, 'Pynie::Grammar::simple_stmt')
+    past.'push'(cpast)
+    goto iter_loop
+  iter_end:
+    .return (past)
+}
+
+
+transform past (Pynie::Grammar::simple_stmt) :language('PIR') {
+    .local pmc hash, iter, cnode
+    .local string key
+    hash = node.'get_hash'()
+    iter = new .Iterator, hash
+    key = shift iter
+    cnode = hash[key]
+    key = concat 'Pynie::Grammar::', key
+    .return tree.'get'('past', cnode, key)
+}
+
+
+transform past (Pynie::Grammar::print_stmt) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Op'
+    past.'init'('node'=>node, 'name'=>'print')
+
+    $P0 = node[0]
+    $S0 = $P0[0]
+    if $S0 == ',' goto skip_nl
+    past.'name'('printnl')
+  skip_nl:
+
+    .local pmc iter
+    $P0 = node['expression']
+    iter = new .Iterator, $P0
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cnode, cpast
+    cnode = shift iter
+    cpast = tree.'get'('past', cnode, 'Pynie::Grammar::expression')
+    past.'push'(cpast)
+    goto iter_loop
+  iter_end:
+    .return (past)
+}
+
+
+transform past (Pynie::Grammar::expression) :language('PIR') {
+    $P0 = node['expr']
+    .return tree.'get'('past', $P0, 'Pynie::Grammar::expr')
+}
+
+
+transform past (Pynie::Grammar::expr) :language('PIR') {
+    .local string type
+    type = node['type']
+    if type == 'term:' goto past_term
+
+    .local pmc optable, optok
+    .local string pasttype, pirop, returns
+    .local int islvalue
+    optable = get_hll_global [ 'Pynie::Grammar' ], '$optable'
+    optok = optable[type]
+    pasttype = optok['past']
+    pirop = optok['pirop']
+    returns = optok['returns']
+    islvalue = optok['lvalue']
+
+    .local pmc past, iter
+    past = new 'PAST::Op'
+    past.'init'('node'=>node, 'name'=>type, 'pasttype'=>pasttype, 'pirop'=>pirop, 'returns'=>returns)
+
+    $P0 = node.'get_array'()
+    if null $P0 goto iter_end
+    iter = new .Iterator, $P0
+    unless iter goto iter_end
+    $P0[0;'islvalue'] = islvalue
+  iter_loop:
+    .local pmc cnode, cpast
+    cnode = shift iter
+    cpast = tree.'get'('past', cnode, 'Pynie::Grammar::expr')
+    if null cpast goto iter_loop
+    past.'push'(cpast)
+    if iter goto iter_loop
+  iter_end:
+    .return (past)
+
+  past_term:
+    .return tree.'get'('past_term', node, 'Pynie::Grammar::expr')
+}
+
+
+transform past_term (Pynie::Grammar::expr) :language('PIR') {
+    .local pmc cnode
+    cnode = node['literal']
+    if null cnode goto list_display
+    .return tree.'get'('past', cnode, 'Pynie::Grammar::literal')
+  list_display:
+    cnode = node['list_display']
+    if null cnode goto identifier
+    .return tree.'get'('past', cnode, 'Pynie::Grammar::list_display')
+  identifier:
+    cnode = node['identifier']
+    .return tree.'get'('past', cnode, 'Pynie::Grammar::identifier')
+}
+
+
+transform past (Pynie::Grammar::literal) :language('PIR') {
+    .local pmc past, cnode
+    cnode = node['integer']
+    unless null cnode goto integer
+    cnode = node['stringliteral']
+    unless null cnode goto stringliteral
+
+  integer:
+    past = new 'PAST::Val'
+    past.'init'('node'=>cnode, 'vtype'=>'.Integer', 'name'=>node, 'ctype'=>'i+')
+    .return (past)
+
+  stringliteral:
+    past = new 'PAST::Val'
+    $S0 = cnode
+    past.'init'('node'=>cnode, 'vtype'=>'.Undef', 'name'=>$S0)
+    .return (past)
+}
+
+
+transform past (Pynie::Grammar::list_display) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Op'
+    past.'init'('node'=>node, 'name'=>'listmaker')
+
+    $P0 = node['listmaker']
+    unless $P0 goto end
+    $P0 = $P0[0]
+    $P0 = $P0['expression']
+    .local pmc iter
+    iter = new .Iterator, $P0
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cnode, cpast
+    cnode = shift iter
+    cpast = tree.'get'('past', cnode, 'Pynie::Grammar::expression')
+    past.'push'(cpast)
+    goto iter_loop
+  iter_end:
+  end:
+    .return (past)
+}
+
+
+transform past (Pynie::Grammar::identifier) :language('PIR') {
+    .local pmc past
+    $S0 = node
+    past = new 'PAST::Var'
+    past.'init'('node'=>node, 'name'=>$S0, 'scope'=>'package')
+    .return (past)
+}
+
+
+transform past (Pynie::Grammar::assignment_stmt) :language('PIR') {
+    .local pmc tnode, tpast, enode, epast, past
+    $P0 = node['target_list']
+    tnode = $P0[0]
+    tpast = tree.'get'('past', tnode, 'Pynie::Grammar::target_list')
+    enode = node['expression_list']
+    epast = tree.'get'('past', enode, 'Pynie::Grammar::expression_list')
+    past = epast.'new'('PAST::Op', tpast, epast, 'pasttype'=>'bind', 'node'=>node)
+    .return (past)
+}
+
+
+transform past (Pynie::Grammar::target_list) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::VarList'
+    past.'init'('node'=>node)
+
+    .local pmc targetiter
+    $P0 = node['target']
+    targetiter = new .Iterator, $P0
+  iter_loop:
+    unless targetiter goto iter_end
+    .local pmc targetnode
+    targetnode = shift targetiter
+    $S0 = targetnode
+    past.'push_new'('PAST::Var', 'name'=>$S0, 'islvalue'=>1, 'scope'=>'package')
+    goto iter_loop
+  iter_end:
+    .return (past)
+}
+
+
+transform past (Pynie::Grammar::expression_list) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Op'
+    past.'init'('node'=>node, 'name'=>'listmaker')
+    .local pmc expriter
+    $P0 = node['expression']
+    expriter = new .Iterator, $P0
+  iter_loop:
+    unless expriter goto iter_end
+    .local pmc enode, epast
+    enode = shift expriter
+    epast = tree.'get'('past', enode, 'Pynie::Grammar::expression')
+    past.'push'(epast)
+    goto iter_loop
+  iter_end:
+    .return (past)
+}
+
+
+transform past (Pynie::Grammar::if_stmt) :language('PIR') {
+    .local pmc exprlist, suitelist
+    exprlist = node['expression']
+    suitelist = node['suite']
+
+    ##   do we have an else clause?
+    .local pmc elsenode, elsepast
+    .local int exprc, suitec
+    null elsepast
+  else_suite:
+    exprc = elements exprlist
+    suitec = elements suitelist
+    if suitec <= exprc goto expr_suite_pair
+    dec suitec
+    elsenode = suitelist[suitec]
+    elsepast = tree.'get'('past', elsenode, 'Pynie::Grammar::suite')
+    elsepast.'suitetype'('immediate')
+
+  expr_suite_pair:
+    ##   each remaining suite is paired with an "if" (or "elsif")
+    ##   expression, except the first which could be "unless".
+    .local pmc exprnode, exprpast, thennode, thenpast
+    dec exprc
+    exprnode = exprlist[exprc]
+    exprpast = tree.'get'('past', exprnode, 'Pynie::Grammar::expression')
+    thennode = suitelist[exprc]
+    thenpast = tree.'get'('past', thennode, 'Pynie::Grammar::suite')
+    .local pmc past
+    past = new 'PAST::Op'
+    past.'init'(exprpast, thenpast, elsepast, 'node'=>node, 'pasttype'=>'if')
+    elsepast = past
+    if exprc > 0 goto expr_suite_pair
+    past.'pasttype'('if')
+    .return (past)
+}
+
+
+transform past (Pynie::Grammar::while_stmt) :language('PIR') {
+    .local pmc exprnode, stmtnode
+    exprnode = node['expression']
+    stmtnode = node['suite']
+    stmtnode = stmtnode[0]
+
+    .local pmc past, exprpast, stmtpast
+    past = new 'PAST::Op'
+    past.'init'('node'=>node, 'pasttype'=>'while')
+    exprpast = tree.'get'('past', exprnode, 'Pynie::Grammar::expression')
+    past.'push'(exprpast)
+    stmtpast = tree.'get'('past', stmtnode, 'Pynie::Grammar::suite')
+    past.'push'(stmtpast)
+    .return (past)
+}
+
+
+
+transform past (Pynie::Grammar::suite) :language('PIR') {
+    $P0 = node['stmt_list']
+    if null $P0 goto statements
+    .return tree.'get'('past', $P0, 'Pynie::Grammar::stmt_list')
+
+  statements:
+    .local pmc past, iter
+    past = new 'PAST::Stmts'
+    past.'init'('node'=>node)
+    $P0 = node['statement']
+    iter = new .Iterator, $P0
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cnode, cpast
+    cnode = shift iter
+    cpast = tree.'get'('past', cnode, 'Pynie::Grammar::statement')
+    past.'push'(cpast)
+    goto iter_loop
+  iter_end:
+    .return (past)
+}
+

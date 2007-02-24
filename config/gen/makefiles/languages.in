@@ -34,6 +34,7 @@ LANGUAGES = \
     perl6 \
     pheme \
     punie \
+    pynie \
     regex \
     scheme \
     tap \
@@ -107,6 +108,7 @@ clean: \
     perl6.clean \
     pheme.clean \
     punie.clean \
+    pynie.clean \
     regex.clean \
     scheme.clean \
     tap.clean \
@@ -321,6 +323,14 @@ punie.test:
 	- $(MAKE) punie test
 punie.clean:
 	- $(MAKE) punie clean
+
+pynie : pynie.dummy
+pynie.dummy:
+	- $(MAKE) pynie
+pynie.test:
+	- $(MAKE) pynie test
+pynie.clean:
+	- $(MAKE) pynie clean
 
 regex: regex.dummy
 regex.dummy:
