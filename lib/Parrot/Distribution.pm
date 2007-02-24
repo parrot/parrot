@@ -417,7 +417,7 @@ any external modules Parrot might have.
     sub is_perl_exemption {
         my( $self, $file ) = @_;
 
-        # TODO: for some reason the * isn't picking up subdirectories in
+        # RT#41610: for some reason the * isn't picking up subdirectories in
         # this map.  The addition of subdirectory names such as
         # lib/Pod/Simple should be considered a temporary hack only!
         # TODO: write a test to make sure these files don't get picked up
