@@ -59,14 +59,13 @@ GEN_PIR = \
  src/ASTGrammar.pir
 
 GEN_PBC = \
- src/Lua51TestLex.pbc \
- src/LuaDumpLex.pbc \
  src/lua.pbc \
  luac.pbc
 
 all: \
  pmc/lua_group$(LOAD_EXT) \
  $(LIB_PBCS) \
+ $(GEN_PIR) \
  $(GEN_PBC) \
  Lua/parser.pm
 
@@ -74,14 +73,8 @@ all: \
 src/lua51_testlex_gen.pir: src/lua51_testlex.pg
 	$(PGE) --output=src/lua51_testlex_gen.pir src/lua51_testlex.pg
 
-src/Lua51TestLex.pbc: src/lua51_testlex_gen.pir
-	$(PARROT) -o src/Lua51TestLex.pbc --output-pbc src/lua51_testlex_gen.pir
-
 src/dumplex_gen.pir: src/dumplex.tg
 	$(TGE) --output=src/dumplex_gen.pir src/dumplex.tg
-
-src/LuaDumpLex.pbc: src/dumplex_gen.pir
-	$(PARROT) -o src/LuaDumpLex.pbc --output-pbc src/dumplex_gen.pir
 
 src/lua_grammar_gen.pir: src/lua.pg
 	$(PGE) --output=src/lua_grammar_gen.pir src/lua.pg

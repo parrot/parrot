@@ -3,7 +3,7 @@
 
 grammar Lua::DumpLex is TGE::Grammar;
 
-transform dump (ROOT) :language('PIR') {
+transform past (ROOT) :language('PIR') {
     $P0 = node['token']
 
     .local pmc iter
@@ -17,62 +17,63 @@ L1:
     $I0 = defined $P0['Name']
     unless $I0 goto L3
     $P1 = $P0['Name']
-    tree.get('dump', $P1, 'Lua::TestLex::Name')
+    tree.get('past', $P1, 'Lua::TestLex::Name')
 
 L3:
     $I0 = defined $P0['String']
     unless $I0 goto L4
     $P1 = $P0['String']
-    tree.get('dump', $P1, 'Lua::TestLex::String')
+    tree.get('past', $P1, 'Lua::TestLex::String')
 
 L4:
     $I0 = defined $P0['Number']
     unless $I0 goto L5
     $P1 = $P0['Number']
-    tree.get('dump', $P1, 'Lua::TestLex::Number')
+    tree.get('past', $P1, 'Lua::TestLex::Number')
 
 L5:
     $I0 = defined $P0['punctuator']
     unless $I0 goto L6
     $P1 = $P0['punctuator']
-    tree.get('dump', $P1, 'Lua::TestLex::punctuator')
+    tree.get('past', $P1, 'Lua::TestLex::punctuator')
 
 L6:
     $I0 = defined $P0['keyword']
     unless $I0 goto L7
     $P1 = $P0['keyword']
-    tree.get('dump', $P1, 'Lua::TestLex::keyword')
+    tree.get('past', $P1, 'Lua::TestLex::keyword')
 
 L7:
     $I0 = defined $P0['ws']
     unless $I0 goto L8
     $P1 = $P0['ws']
-    tree.get('dump', $P1, 'Lua::TestLex::ws')
+    tree.get('past', $P1, 'Lua::TestLex::ws')
 
 L8:
     goto L1
 L2:
+    .return (node)
 }
 
-transform dump (Lua::TestLex::keyword) :language('PIR') {
+transform past (Lua::TestLex::keyword) :language('PIR') {
     print "keyword:\t"
     print node
     print "\n"
 }
 
-transform dump (Lua::TestLex::punctuator) :language('PIR') {
+transform past (Lua::TestLex::punctuator) :language('PIR') {
     print "punct:\t"
     print node
     print "\n"
 }
 
-transform dump (Lua::TestLex::Name) :language('PIR') {
+transform past (Lua::TestLex::Name) :language('PIR') {
     print "Name:\t"
     print node
     print "\n"
 }
 
-transform dump (Lua::TestLex::String) :language('PIR') {
+transform past (Lua::TestLex::String) :language('PIR') {
     $I0 = defined node['quoted_literal']
     unless $I0 goto L1
     $P0 = node['quoted_literal']
@@ -90,13 +91,13 @@ L1:
 L2:
 }
 
-transform dump (Lua::TestLex::Number) :language('PIR') {
+transform past (Lua::TestLex::Number) :language('PIR') {
     print "Number:\t"
     print node
     print "\n"
 }
 
-transform dump (Lua::TestLex::ws) :language('PIR') {
+transform past (Lua::TestLex::ws) :language('PIR') {
     print "ws\n"
 }
 

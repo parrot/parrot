@@ -3,7 +3,7 @@
 
 grammar Lua::TestLex
 
-rule start {
+rule TOP {
         <token>* [ $ | <die>]
 }
 
