@@ -284,7 +284,7 @@ L4:
     lua_comp = compreg 'Lua'
     push_eh _handler
     $P0 = lua_comp.'compile'($S0)
-    .return ($P0, '')
+    .return ($P0)
 _handler:
     .get_results ($P0, $S0)
     goto L5
@@ -491,7 +491,7 @@ To load and run a given string, use the idiom
     lua_comp = compreg 'Lua'
     push_eh _handler
     $P0 = lua_comp.'compile'(s)
-    .return ($P0, '')
+    .return ($P0)
 _handler:
     .get_results ($P0, $S0)
     null $P0

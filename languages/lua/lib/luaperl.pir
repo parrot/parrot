@@ -151,13 +151,22 @@ Compile C<source>.
     .param pmc source
 
     $S0 = 'tmp'
+    $P0 = getprop 'num', self
+    unless null $P0 goto L1
+    new $P0, .Integer
+    set $P0, 0
+L1:
+    inc $P0
+    $S1 = $P0
+    $S0 .= $S1
+    setprop self, 'num', $P0
     $S1 = $S0 . '.lua'
     $S2 = source
     save_lua($S2, $S1)
     $P0 = compile_file($S1)
     $S3 = save_pbc($P0, $S0)
     load_bytecode $S3
-    $P1 = get_root_global 'tmp'
+    $P1 = get_root_global $S0
     .return ($P1)
 .end
 

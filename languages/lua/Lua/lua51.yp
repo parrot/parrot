@@ -705,7 +705,10 @@ sub Generate {
 
     my $generator = new pirVisitor($FH);
 #    my $generator = new pirVisitor(\*STDOUT);
-    print {$FH} $generator->{prologue};
+    my $prologue = $generator->{prologue};
+    $filename =~ s/\.pir$//;
+    $prologue =~ s/tmp/$filename/gm;
+    print {$FH} $prologue;
     foreach my $fct ( @{ $parser->YYData->{functs} } ) {
         foreach my $op ( @{$fct} ) {
             if ( ref($op) =~ /(Dir|Op)$/ ) {
