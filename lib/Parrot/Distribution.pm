@@ -417,10 +417,26 @@ any external modules Parrot might have.
     sub is_perl_exemption {
         my( $self, $file ) = @_;
 
+        # TODO: for some reason the * isn't picking up subdirectories in
+        # this map.  The addition of subdirectory names such as
+        # lib/Pod/Simple should be considered a temporary hack only!
+        # TODO: write a test to make sure these files don't get picked up
+        # again...  i.e. a test of is_perl_exemption
+        # TODO: make the list of exemption files a variable so that the test
+        # can pick it up, and so that the list is only mentioned in the one
+        # place to make maintenance of such a list easier
         push @exemptions => map { File::Spec->canonpath($_) } qw{
-            languages/lua/Lua/parser.pm  languages/regex/lib/Regex/Grammar.pm
-            lib/Class/* lib/Digest/*     lib/File/*     lib/Parse/*
-            lib/Pod/*   lib/SmartLink.pm lib/Test/*     lib/Text/*
+            languages/lua/Lua/parser.pm
+            languages/regex/lib/Regex/Grammar.pm
+            lib/Class/*
+            lib/Digest/Perl/*
+            lib/File/*
+            lib/Parse/*
+            lib/Pod/*
+            lib/Pod/Simple/*
+            lib/SmartLink.pm
+            lib/Test/*
+            lib/Text/*
         } unless @exemptions;
 
         $file->path =~ /\Q$_\E$/ && return 1
