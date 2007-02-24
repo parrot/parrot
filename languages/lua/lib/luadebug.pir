@@ -44,6 +44,8 @@ See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
     set $P1, 'debug'
     _lua__GLOBAL[$P1] = _debug
 
+    _register($P1, _debug)
+
     .const .Sub _debug_debug = '_debug_debug'
     set $P1, 'debug'
     _debug[$P1] = _debug_debug

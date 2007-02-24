@@ -34,6 +34,8 @@ See "Lua 5.1 Reference Manual", section 5.8 "Operating System Facilities".
     set $P1, 'os'
     _lua__GLOBAL[$P1] = _os
 
+    _register($P1, _os)
+
     .const .Sub _os_clock = '_os_clock'
     set $P1, 'clock'
     _os[$P1] = _os_clock

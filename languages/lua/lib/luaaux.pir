@@ -230,6 +230,21 @@ L0:
 .end
 
 
+=item C<_register (libname, lib)>
+
+=cut
+
+.sub '_register'
+    .param pmc libname
+    .param pmc lib
+    .const .LuaString _loaded = '_LOADED'
+    .local pmc _lua__REGISTRY
+    _lua__REGISTRY = global '_REGISTRY'
+    $P0 = _lua__REGISTRY[_loaded]
+    $P0[libname] = lib
+.end
+
+
 =item C<tag_error (got, expec)>
 
 =cut

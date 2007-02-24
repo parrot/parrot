@@ -45,6 +45,8 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
     set $P1, 'string'
     _lua__GLOBAL[$P1] = _string
 
+    _register($P1, _string)
+
     .const .Sub _string_byte = '_string_byte'
     set $P1, 'byte'
     _string[$P1] = _string_byte

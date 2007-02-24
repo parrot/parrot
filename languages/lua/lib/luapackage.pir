@@ -41,11 +41,16 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     set $P1, 'package'
     _lua__GLOBAL[$P1] = _package
 
+    _register($P1, _package)
+
     new $P0, .LuaString
     set $P1, 'cpath'
     _package[$P1] = $P0
 
-    new $P0, .LuaTable
+    .local pmc _lua__REGISTRY
+    _lua__REGISTRY = global '_REGISTRY'
+    set $P1, '_LOADED'
+    $P0 = _lua__REGISTRY[$P1]
     set $P1, 'loaded'
     _package[$P1] = $P0
 

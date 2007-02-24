@@ -49,6 +49,8 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     set $P1, 'io'
     _lua__GLOBAL[$P1] = _io
 
+    _register($P1, _io)
+
     .const .Sub _io_close = '_io_close'
     set $P1, 'close'
     _io[$P1] = _io_close
@@ -144,7 +146,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = global '_REGISTRY'
-    set $P1, 'file'
+    set $P1, 'ParrotIO'
     _lua__REGISTRY[$P1] = _lua_mt_file
 
 
@@ -237,7 +239,7 @@ L0:
     .local pmc _lua__REGISTRY
     .local pmc mt
     _lua__REGISTRY = global '_REGISTRY'
-    .const .LuaString key = 'file'
+    .const .LuaString key = 'ParrotIO'
     mt = _lua__REGISTRY[key]
     new file, .LuaUserdata
     file.'set_metatable'(mt)
@@ -315,7 +317,7 @@ L2:
     mt = file.'get_metatable'()
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = global '_REGISTRY'
-    .const .LuaString key = 'file'
+    .const .LuaString key = 'ParrotIO'
     mt_file = _lua__REGISTRY[key]
     unless mt == mt_file goto L1
     ret = getattribute file, 'data'
@@ -647,7 +649,7 @@ handle, and B<nil> if C<obj> is not a file handle.
     mt = obj.'get_metatable'()
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = global '_REGISTRY'
-    .const .LuaString key = 'file'
+    .const .LuaString key = 'ParrotIO'
     mt_file = _lua__REGISTRY[key]
     if mt == mt_file goto L1
     ret = new .LuaNil

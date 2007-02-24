@@ -39,6 +39,8 @@ See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
     set $P1, 'table'
     _lua__GLOBAL[$P1] = _table
 
+    _register($P1, _table)
+
     .const .Sub _table_concat = '_table_concat'
     set $P1, 'concat'
     _table[$P1] = _table_concat

@@ -38,6 +38,10 @@ See "Lua 5.1 Reference Manual", section 5.1 "Basic Functions".
     global '_G' = _lua__GLOBAL
     new $P1, .LuaString
 
+    set $P1, '_LOADED'
+    new $P0, .LuaTable
+    _lua__REGISTRY[$P1] = $P0
+
 =item C<_G>
 
 A global variable (not a function) that holds the global environment (that is,
@@ -49,6 +53,8 @@ environments.)
 
     set $P1, '_G'
     _lua__GLOBAL[$P1] = _lua__GLOBAL
+
+    _register($P1, _lua__GLOBAL)
 
 =item C<_VERSION>
 

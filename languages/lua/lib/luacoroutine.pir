@@ -36,6 +36,8 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
     set $P1, 'coroutine'
     _lua__GLOBAL[$P1] = _coroutine
 
+    _register($P1, _coroutine)
+
     .const .Sub _coroutine_create = '_coroutine_create'
     set $P1, 'create'
     _coroutine[$P1] = _coroutine_create

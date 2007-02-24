@@ -63,6 +63,8 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     set $P1, 'math'
     _lua__GLOBAL[$P1] = _math
 
+    _register($P1, _math)
+
     .const .Sub _math_abs = '_math_abs'
     set $P1, 'abs'
     _math[$P1] = _math_abs
