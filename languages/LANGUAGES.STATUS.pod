@@ -990,6 +990,32 @@ C<languages/punie>
 =back
 
 
+=head2 Pynie
+
+=over 4
+
+=item Author
+
+Patrick Michaud
+
+=item Description
+
+A Python compiler for Parrot, based on PGE and TGE.
+
+=item Status
+
+Functions and simple expressions are working.
+
+=item Last verified with parrot version
+
+0.4.9
+
+=item Location
+
+C<languages/pynie>
+
+=back
+
 =head2 Python
 
 =over 4
