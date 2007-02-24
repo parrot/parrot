@@ -420,7 +420,7 @@ any external modules Parrot might have.
         # RT#41610: for some reason the * isn't picking up subdirectories in
         # this map.  The addition of subdirectory names such as
         # lib/Pod/Simple should be considered a temporary hack only!
-        # TODO: write a test to make sure these files don't get picked up
+        # RT#41611: write a test to make sure these files don't get picked up
         # again...  i.e. a test of is_perl_exemption
         # TODO: make the list of exemption files a variable so that the test
         # can pick it up, and so that the list is only mentioned in the one
