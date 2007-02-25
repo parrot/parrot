@@ -3,15 +3,15 @@
 
 =head1 NAME
 
-lazy-k/t/calc.t - testing calc.lazy
+lazy-k/t/cat.t - testing cat.lazy
 
 =head1 SYNOPSIS
 
-    % cd languages && perl lazy-k/t/calc.t
+    % cd languages && perl lazy-k/t/cat.t
 
 =head1 DESCRIPTION
 
-Test calc.lazy.
+Test cat.lazy.
 
 =head1 AUTHOR
 
@@ -33,7 +33,7 @@ my $is_win32  = $^O eq 'MSWin32';
 
 my $parrot    = File::Spec->catfile( File::Spec->updir(), $PConfig{test_prog} );
 my $lazy_k    = $parrot . q{ } . File::Spec->catfile( 'lazy-k', 'lazy.pir' );
-my $source_fn = File::Spec->catfile( 'lazy-k', 'calc.lazy' ); 
+my $source_fn = File::Spec->catfile( 'lazy-k', 'cat.lazy' ); 
 
 # XXX This does not look portable.
 my $cmd;
@@ -46,4 +46,4 @@ else {
 }
 
 # die Dumper( $cmd );
-is( `$cmd`, "7\n", 'calc.lazy' );
+is( `$cmd`, "1+2*3\n", 'cat.lazy' );
