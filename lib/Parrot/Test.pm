@@ -74,21 +74,6 @@ the  output matches the expected result.
 Runs the Parrot Assembler code and passes the test
 if a string comparison of the output with the unexpected result is false.
 
-=item C<past_output_is($code, $expected, $description)>
-
-Runs the PAST code and passes the test if a string comparison of output
-with the expected result is true.
-
-=item C<past_output_like($code, $expected, $description)>
-
-Runs the PAST code and passes the test if output matches the expected
-result.
-
-=item C<past_output_isnt($code, $unexpected, $description)>
-
-Runs the PAST code and passes the test if a string comparison of the output
-with the unexpected result is false.
-
 =item C<pir_output_is($code, $expected, $description)>
 
 Runs the PIR code and passes the test if a string comparison of output
@@ -382,10 +367,6 @@ sub _generate_functions {
         pasm_output_isnt   => 'isnt_eq',
         pasm_output_like   => 'like',
         pasm_output_unlike => 'unlike',
-        past_output_is     => 'is_eq',
-        past_output_isnt   => 'isnt_eq',
-        past_output_like   => 'like',
-        past_output_unlike => 'unlike',
         pir_output_is      => 'is_eq',
         pir_output_isnt    => 'isnt_eq',
         pir_output_like    => 'like',
@@ -424,9 +405,6 @@ sub _generate_functions {
             }
             elsif ( $func =~ m/^pasm_output_/ ) {
                 $code_f = per_test( '.pasm', $test_no );
-            }
-            elsif ( $func =~ m/^past_/ ) {
-                $code_f = per_test( '.past', $test_no );
             }
             elsif ( $func =~ m/^pbc_output_/ ) {
                 $code_f = per_test( '.pbc', $test_no );
@@ -622,7 +600,6 @@ sub _generate_functions {
     my %builtin_language_prefix = (
         IMC  => 'pir',
         PASM => 'pasm',
-        PAST => 'past',
         PIR  => 'pir',
     );
 
@@ -692,15 +669,14 @@ sub _generate_functions {
 
             my %lang_for_extension = (
                 pasm => 'PASM',
-                past => 'PAST',
                 pir  => 'PIR',
                 imc  => 'PIR',
             );
 
-            my ($extension) = $example_f =~ m{ [.]                         # introducing extension
-                                                 ( pasm | pir | imc | past ) # match and capture the extension
-                                                 \z                          # at end of string
-                                               }ixms or Usage();
+            my ($extension) = $example_f =~ m{ [.]                    # introducing extension
+                                               ( pasm | pir | imc  )  # match and capture the extension
+                                               \z                     # at end of string
+                                             }ixms or Usage();
             if ( defined $extension ) {
                 my $code = slurp_file($example_f);
                 my $test_func = join( '::', $package, $example_test_map{$func} );

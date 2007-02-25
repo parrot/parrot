@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -47,7 +47,6 @@ can_ok( 'Parrot::Test', $_ ) for qw/
     language_output_is language_output_like language_output_isnt
     example_output_is
     pasm_output_is     pasm_output_like     pasm_output_isnt
-    past_output_is     past_output_like     past_output_isnt
     pir_output_is      pir_output_like      pir_output_isnt
     pir_2_pasm_is      pir_2_pasm_like      pir_2_pasm_isnt
     pbc_output_is      pbc_output_like      pbc_output_isnt
@@ -262,7 +261,7 @@ OUTPUT
 test_test $desc;
 
 ## remember to change the number of tests :-)
-BEGIN { plan tests => 42; }
+BEGIN { plan tests => 39; }
 
 # Local Variables:
 #   mode: cperl
