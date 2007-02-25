@@ -83,8 +83,10 @@ my $result = GetOptions( 'html'          => \$do_gen_html,
 # lisp                 No t/harness
 # miniperl             not maintained, should be removed
 # parakeet             No t/harness
-# perl6                test scrips are written in Perl 6, not Perl 5
-# pheme                test scrips are written in Scheme, not Perl 5
+# perl6                test scripts are written in Perl 6, not Perl 5
+# pheme                test scripts are written in Scheme, not Perl 5
+# pynie                test scripts are written in PIR, not Perl 5
+# PIR                  adaptions in language_output_is() required
 # python               not maintained
 # ruby                 not maintained, should be removed
 

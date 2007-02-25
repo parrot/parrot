@@ -427,7 +427,10 @@ N: OOLLEY kj
 D: Miscellaneous cleanup and PDD07-conformance
 
 N: Patrick R. Michaud
-D: Parrot Grammar Engine, Perl 6 pumpking, APL
+D: Parrot Grammar Engine
+D: Perl 6 pumpking
+D: APL
+D: Pynie
 E: pmichaud@pobox.com
 
 N: Pat Eyler

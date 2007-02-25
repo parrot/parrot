@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -68,6 +68,7 @@ sub new {
         $self->new_section( 'Plumhead',    'plumhead.html',   '', 'languages/plumhead' ),
         $self->new_section( 'Pugs',        'pugs.html',       '', 'languages/pugs' ),
         $self->new_section( 'Punie',       'punie.html',      '', 'languages/punie' ),
+        $self->new_section( 'Pynie',       'pynie.html',      '', 'languages/pynie' ),
         $self->new_section( 'Regex',       'regex.html',      '', 'languages/regex' ),
         $self->new_section( 'Scheme',      'scheme.html',     '', 'languages/scheme' ),
         $self->new_section( 'TAP',         'tap.html',        '', 'languages/tap' ),
