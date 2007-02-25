@@ -36,9 +36,6 @@ With an original C<Lua> in your path, it's possible to check the test suite.
 Lua PMC have problems with the Parrot garbage collector. So, use the option
 C<--no-gc>.
 
-All your Lua code must be in a single source file (users libraries are not
-supported).
-
 =head1 SEE ALSO
 
 F<languages/lua/doc/status.pod>

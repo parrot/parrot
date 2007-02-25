@@ -174,6 +174,63 @@ L0:
 .end
 
 
+=item C<loadbuffer (buff, name)>
+
+=cut
+
+.sub 'loadbuffer'
+    .param string buff
+    .param string chunkname
+    .local pmc lua_comp
+    lua_comp = compreg 'Lua'
+    push_eh _handler
+    $P0 = lua_comp.'compile'(buff)
+    .return ($P0)
+_handler:
+    .get_results ($P0, $S0)
+    null $P0
+    .return ($P0, $S0)
+.end
+
+
+=item C<loadfile (filename)>
+
+=cut
+
+.sub 'loadfile'
+    .param string filename
+    .local pmc f
+    unless filename == '' goto L1
+    f = getstdin
+    goto L2
+L1:
+    f = open filename, '<'
+    unless f goto L3
+L2:
+    $S0 = f.'slurp'('')
+    if filename == '' goto L4
+    close f
+L4:
+    .local pmc lua_comp
+    lua_comp = compreg 'Lua'
+    push_eh _handler
+    $P0 = lua_comp.'compile'($S0)
+    .return ($P0)
+_handler:
+    .get_results ($P0, $S0)
+    goto L5
+L3:
+    $S0 = 'cannot open '
+    $S0 .= filename
+    $S0 .= ': '
+    $S1 = err
+    $S0 .= $S1
+L5:
+    null $P0
+    .return ($P0, $S0)
+.end
+
+
 =item C<mkarg (argv)>
 
 Support variable number of arguments function call.

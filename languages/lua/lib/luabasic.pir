@@ -272,39 +272,6 @@ L1:
     error($S0)
 .end
 
-.sub 'loadfile' :anon
-    .param string filename
-    .local pmc f
-    unless filename == '' goto L1
-    f = getstdin
-    goto L2
-L1:
-    f = open filename, '<'
-    unless f goto L3
-L2:
-    $S0 = f.'slurp'('')
-    if filename == '' goto L4
-    close f
-L4:
-    .local pmc lua_comp
-    lua_comp = compreg 'Lua'
-    push_eh _handler
-    $P0 = lua_comp.'compile'($S0)
-    .return ($P0)
-_handler:
-    .get_results ($P0, $S0)
-    goto L5
-L3:
-    $S0 = 'cannot open '
-    $S0 .= filename
-    $S0 .= ': '
-    $S1 = err
-    $S0 .= $S1
-L5:
-    null $P0
-    .return ($P0, $S0)
-.end
-
 =item C<error (message [, level])>
 
 Terminates the last protected function called and returns C<message> as the
@@ -488,20 +455,6 @@ To load and run a given string, use the idiom
     $S2 = optstring(chunkname, $S1)
     ($P0, $S0) = loadbuffer($S1, $S2)
     .return load_aux($P0, $S0)
-.end
-
-.sub 'loadbuffer' :anon
-    .param string s
-    .param string chunkname
-    .local pmc lua_comp
-    lua_comp = compreg 'Lua'
-    push_eh _handler
-    $P0 = lua_comp.'compile'(s)
-    .return ($P0)
-_handler:
-    .get_results ($P0, $S0)
-    null $P0
-    .return ($P0, $S0)
 .end
 
 
