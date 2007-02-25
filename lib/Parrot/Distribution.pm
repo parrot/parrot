@@ -196,7 +196,8 @@ BEGIN {
             yacc => { file_exts => ['y'] },
             perl => { file_exts => ['pl', 'pm', 'in', 't'],
                       shebang      => qr/^#!\s*perl/,
-                      shebang_ext  => qr/.t$/ },
+                      shebang_ext  => qr/.t$/,
+            },
         },
         header => {
             c    => { file_exts => ['h'] },
@@ -422,27 +423,37 @@ any external modules Parrot might have.
         # lib/Pod/Simple should be considered a temporary hack only!
         # RT#41611: write a test to make sure these files don't get picked up
         # again...  i.e. a test of is_perl_exemption
-        # TODO: make the list of exemption files a variable so that the test
-        # can pick it up, and so that the list is only mentioned in the one
-        # place to make maintenance of such a list easier
-        push @exemptions => map { File::Spec->canonpath($_) } qw{
-            languages/lua/Lua/parser.pm
-            languages/regex/lib/Regex/Grammar.pm
-            lib/Class/*
-            lib/Digest/Perl/*
-            lib/File/*
-            lib/Parse/*
-            lib/Pod/*
-            lib/Pod/Simple/*
-            lib/SmartLink.pm
-            lib/Test/*
-            lib/Text/*
-        } unless @exemptions;
+        push @exemptions => 
+            map { File::Spec->canonpath($_) } $self->get_perl_exemption_regexp()
+                unless @exemptions;
 
         $file->path =~ /\Q$_\E$/ && return 1
             for <@exemptions>;
         return;
     }
+}
+
+=item C<get_perl_exemption_regexp()>
+
+Returns a list of regular expressions containing the currently 
+coding-standard-exempt Perl files within Parrot
+
+=cut
+
+sub get_perl_exemption_regexp {
+    my $self = shift;
+    return qw{
+        languages/lua/Lua/parser.pm
+        languages/regex/lib/Regex/Grammar.pm
+        lib/Class/*
+        lib/Digest/Perl/*
+        lib/File/*
+        lib/Parse/*
+        lib/Pod/*
+        lib/SmartLink.pm
+        lib/Test/*
+        lib/Text/*
+        };
 }
 
 
