@@ -13,6 +13,71 @@ pmclass TclProc
     maps    Sub
 {
 
+/*
+
+=item C<void assign_pmc(PMC* other)>
+
+Set SELF to the data in other. Be slightly more forgiving than our .Sub
+parent, and allow TclProcs or .Subs...
+
+=cut
+
+*/
+
+    void assign_pmc(PMC* other) {
+        /* only handle the case where the other PMC is the same type */
+        if (other->vtable->base_type == SELF->vtable->base_type ||
+            other->vtable->base_type == enum_class_Sub ) {
+            /* copy the sub struct */
+            memcpy(PMC_sub(SELF), PMC_sub(other), sizeof (struct Parrot_sub));
+            /* copy the name so it's a different string in memory */
+            PMC_sub(SELF)->name = string_copy(INTERP, PMC_sub(SELF)->name);
+        }
+        else {
+            real_exception(INTERP, NULL, E_TypeError,
+                           "Can't assign a non-Sub type to a Sub");
+        }
+    }
+
+/*
+
+=item C<PMC* get_attr(INTVAL idx)>
+
+Return attribute number C<idx>.
+
+=item C<PMC* get_attr_str(STRING *name)>
+
+Return attribute named C<name>.
+
+=item C<void set_attr(INTVAL idx, PMC *val)>
+
+Set attribute number C<idx>.
+
+=item C<void set_attr_str(STRING *name, PMC *val)>
+
+Set attribute named C<name>.
+
+=cut
+
+*/
+/*
+    PMC* get_attr(INTVAL idx) {
+        return Parrot_get_attrib_by_num(INTERP, SELF, idx);
+    }
+
+    PMC* get_attr_str(STRING* idx) {
+        return Parrot_get_attrib_by_str(INTERP, SELF, idx);
+    }
+
+    void set_attr(INTVAL idx, PMC* value) {
+        Parrot_set_attrib_by_num(INTERP, SELF, idx, value);
+    }
+
+    void set_attr_str(STRING* idx, PMC* value) {
+        Parrot_set_attrib_by_str(INTERP, SELF, idx, value);
+    }
+*/
+
 }
 
 /*

@@ -37,9 +37,9 @@ Create a PIR sub on the fly for this user defined proc.
   .local pmc ns
   .local string name
   ns   = new .ResizablePMCArray
-  name = ""
+  name = ''
 
-  if full_name == "" goto create
+  if full_name == '' goto create
   
   ns   = __namespace(full_name, 1)
   $I0  = elements ns
@@ -256,15 +256,37 @@ not_return_nor_ok:
 END_PIR
 
   .local pmc pir_compiler
-  pir_compiler = compreg "PIR"
+  pir_compiler = compreg 'PIR'
 
   # (see note on trans_charset in lib/parser.pir) RT#40752:
   $S0 = code
   $I0 = find_charset 'ascii'
   $S0 = trans_charset $I0
   $P0 = pir_compiler($S0)
+ 
+  # the PIR compiler returns an Eval PMC, which contains each sub that
+  # was compiled in it. we want the first one, and we want to put it
+  # into a TclProc...
+  $P0 = $P0[0]
+ 
+  $P1 = new .TclProc 
+  assign $P1, $P0
 
-  .return ("")
+  # Attach some metadata to the sub...
+  # RT#41614
+  #$P8 = getclass "TclProc"
+  #addattribute $P8, 'source'
+  #$P9 = new .String
+  #$P9 = $S0
+  #setattribute $P1, 'source',     $P9
+  ##setattribute $P1, 'HLL_source', body
+ 
+  # And now store it into the appropriate slot in the namespace
+
+  #say name
+  #ns[name] = $P1
+
+  .return ('')
 
 unknown_namespace:
   $S0 = "can't create procedure \""
