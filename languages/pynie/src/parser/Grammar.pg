@@ -7,7 +7,9 @@
 ##
 ## These are a set of rules for parsing programs written in Python.
 ## Many of the rules are derived from the "Python Language Reference
-## Manual", by Guido van Rossum (Fred L. Drake, Jr., Editor).
+## Manual", version 2.5 by Guido van Rossum (Fred L. Drake, Jr., Editor).
+## Available online at http://docs.python.org/ref/ and
+## http://docs.python.org/ref/grammar.txt .
 
 grammar Pynie::Grammar ;
 
@@ -23,8 +25,8 @@ token file_input { ^ [ <?newline> | <statement> ]* [ $ | <?die: syntax_error> ] 
 token suite {
     | <stmt_list> <?newline>
     | <?newline> <?indent> <statement>
-                [ <?indent_same> <statement> ]*
-                [ <?dedent> | <?die: IndentationError: unindent does not match any outer indentation level> ]
+        [ <?indent_same> <statement> ]*
+        [ <?dedent> | <?die: IndentationError: unindent does not match any outer indentation level> ]
 }
 
 token statement {
@@ -95,14 +97,14 @@ rule decorator {
 }
 
 rule argument_list {
-    <positional_arguments> [ <','> <keyword_arguments> ]?
-      [ <','> <'*'> <expression> ]?
-      [ <','> <'**'> <expression> ]?
+    | <positional_arguments> [ <','> <keyword_arguments> ]?
+        [ <','> <'*'> <expression> ]?
+        [ <','> <'**'> <expression> ]?
     | <keyword_arguments>
         [ <','> <'*'> <expression> ]?
         [ <','> <'**'> <expression> ]?
     | <','> <'*'> <expression>
-      [ <','> <'**'> <expression> ]?
+        [ <','> <'**'> <expression> ]?
     | <','> <'**'> <expression>
 }
 
@@ -128,8 +130,7 @@ rule funcname {
 
 rule parameter_list {
     [ <defparameter> <','> ]*
-    [
-      <'*'> <identifier> [ <','> <'**'> <identifier> ]?
+    [ <'*'> <identifier> [ <','> <'**'> <identifier> ]?
     | <'**'> <identifier>
     | <defparameter> <','>?
     ]
@@ -209,52 +210,52 @@ rule augmented_assignment_stmt { <target> <augop> <expression_list> }
 rule target_list { <target> [ <','> <target> ]* <','>? }
 
 rule target {
-  <identifier>
-  | <'('> <target_list> <')'>
-  | <'['> <target_list> <']'>
-  | <attributeref>
-  | <subscription>
-  | <slicing>
+    | <identifier>
+    | <'('> <target_list> <')'>
+    | <'['> <target_list> <']'>
+    | <attributeref>
+    | <subscription>
+    | <slicing>
 }
 
 rule attributeref {
-		<primary> <'.'> <identifier>
+    <primary> <'.'> <identifier>
 }
 
 rule subscription {
-		<primary> <'['> <expression_list> <']'>
+    <primary> <'['> <expression_list> <']'>
 }
 
 rule slicing {
-		<simple_slicing> | <extended_slicing>
+    <simple_slicing> | <extended_slicing>
 }
 
 rule simple_slicing {
-		<primary> <'['> <short_slice> <']'>
+    <primary> <'['> <short_slice> <']'>
 }
 
 rule extended_slicing {
-		<primary> <'['> <slice_list> <']'>
+    <primary> <'['> <slice_list> <']'>
 }
 
 rule slice_list {
-		<slice_item> [ <','> <slice_item> ]* <','>?
+    <slice_item> [ <','> <slice_item> ]* <','>?
 }
 
 rule slice_item {
-		<expression> | <proper_slice> | <'...'>
+    <expression> | <proper_slice> | <'...'>
 }
 
 rule proper_slice {
-		<short_slice> | <long_slice>
+    <short_slice> | <long_slice>
 }
 
 rule short_slice {
-		<expression>? <':'> <expression>?		
+    <expression>? <':'> <expression>?
 }
 
 rule long_slice {
-		<short_slice> <':'> <expression>?
+    <short_slice> <':'> <expression>?
 }
 
 token identifier { <!reserved> [ <?alpha> | <'_'> ] \w* }
@@ -333,10 +334,10 @@ token literal {
     | <imagnumber>
 }
 
-token integer { 
-		| <[1..9]> \d* | <'0'>
-		| <'0'> <[0..7]>+
-		| <'0'> <[xX]> [ \d | <[a..f]> | <[A..F]> ]+
+token integer {
+    | <[1..9]> \d* | <'0'>
+    | <'0'> <[0..7]>+
+    | <'0'> <[xX]> [ \d | <[a..f]> | <[A..F]> ]+
 }
 
 token intpart { \d+ }
@@ -362,8 +363,8 @@ token shortstring {
 }
 
 regex longstring {
-    | """ ( [ \\ . | <-["""]> ]* ) """
-    | ''' ( [ \\ . | <-[''']> ]* ) '''
+    | """ ( [ \\ . | . ]* ) """
+    | ''' ( [ \\ . | . ]* ) '''
 }
 
 
@@ -375,30 +376,32 @@ rule expression_list { <expression> [ , <expression> ]* <','>? }
 
 rule list_display { <'['> <listmaker>? <']'> }
 
-rule listmaker { 
-		<expression> [ <list_for> 
-		| [ <','> <expression> ]* <','>? ] 
+rule listmaker {
+    <expression>
+    [ <list_for>
+    | [ <','> <expression> ]* <','>?
+    ]
 }
 
 rule list_iter {
-		<list_for> | <list_if>
+    <list_for> | <list_if>
 }
 
 rule list_for {
-		<'for'> <expression_list> <'in'> <testlist>
-		<list_iter>?
+    <'for'> <expression_list> <'in'> <testlist>
+    <list_iter>?
 }
 
 rule test {
-		<or_test> | <lambda_form>
+    <or_test> | <lambda_form>
 }
 
 rule testlist {
-		<test> [ <','> <test> ]* <','>?
+    <test> [ <','> <test> ]* <','>?
 }
 
 rule list_if {
-		<'if'> <test> <list_iter>?
+    <'if'> <test> <list_iter>?
 }
 
 token augop {
@@ -421,52 +424,52 @@ rule primary {
 }
 
 rule atom {
-		<identifier> | <literal> | <enclosure>
+    <identifier> | <literal> | <enclosure>
 }
 
 rule parenth_form {
-		<'('> <expression_list>? <')'>
+    <'('> <expression_list>? <')'>
 }
 
 rule enclosure {
-		| <parenth_form> 
-		| <list_display> 
-		| <generator_expression> 
-		| <dict_display>
-		| <string_conversion>
+    | <parenth_form>
+    | <list_display>
+    | <generator_expression>
+    | <dict_display>
+    | <string_conversion>
 }
 
 rule generator_expression {
-		<'('> <test> <genexpr_for> <')'>
+    <'('> <test> <genexpr_for> <')'>
 }
 
 rule genexpr_for {
-		<'for'> <expression_list> <'in'> <test> 
-		<genexpr_iter>?
+    <'for'> <expression_list> <'in'> <test> 
+    <genexpr_iter>?
 }
 
 rule genexpr_iter {
-		<genexpr_for> | <genexpr_if>
+    <genexpr_for> | <genexpr_if>
 }
 
 rule genexpr_if {
-		<'if'> <test> <genexpr_iter>?
+    <'if'> <test> <genexpr_iter>?
 }
 
 rule dict_display {
-		<'{'> <key_datum_list>? <'}'>
+    <'{'> <key_datum_list>? <'}'>
 }
 
 rule key_datum_list {
-		<key_datum> [ <','> <key_datum> ]* <','>?
+    <key_datum> [ <','> <key_datum> ]* <','>?
 }
 
 rule key_datum {
-		<expression> <':'> <expression>
+    <expression> <':'> <expression>
 }
 
 rule string_conversion {
-		<'`'> <expression_list> <'`'>
+    <'`'> <expression_list> <'`'>
 }
 
 ## This identifies operators for the bottom-up parser
