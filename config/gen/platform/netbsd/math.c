@@ -1,4 +1,4 @@
-# $Id$
+/* $Id$ */
 
 /*
  * math stuff
