@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require' );
@@ -97,6 +97,72 @@ require "foo"
 CODE
 /error loading module 'foo' from file '.*foo.lua':\n/
 OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require & preload' );
+foo = {}
+foo.bar = 1234
+function foo_loader ()
+    return foo
+end
+package.preload.foo = foo_loader
+
+m = require 'foo'
+assert(m == foo)
+print(m.bar)
+CODE
+1234
+OUTPUT
+
+SKIP:
+{
+skip('only with Parrot', 1) if (exists $ENV{PARROT_LUA_TEST_PROG});
+
+unlink('../mod_foo.pbc') if ( -f '../mod_foo.pbc' );
+unlink('../mod_foo.pir') if ( -f '../mod_foo.pir' );
+open $X, '>', '../mod_foo.pir';
+print {$X} <<'PIR';
+.HLL 'Lua', 'lua_group'
+
+.sub '__onload' :anon :load
+#    print "__onload mod_foo\n"
+    .const .Sub entry = 'luaopen_mod_foo'
+    set_root_global 'luaopen_mod_foo', entry
+.end
+
+.sub 'luaopen_mod_foo'
+#    print "luaopen_mod_foo\n"
+    .local pmc _lua__GLOBAL
+    _lua__GLOBAL = global '_G'
+    new $P1, .LuaString
+    .local pmc _mod_foo
+    new _mod_foo, .LuaTable
+    set $P1, 'mod_foo'
+    _lua__GLOBAL[$P1] = _mod_foo
+    .const .Sub _mod_foo_bar = '_mod_foo_bar'
+    set $P1, 'bar'
+    _mod_foo[$P1] = _mod_foo_bar
+    .return (_mod_foo)
+.end
+
+.sub '_mod_foo_bar' :anon
+    .param pmc extra :slurpy
+    new $P0, .LuaNumber
+    set $P0, 3.14
+    .return ($P0)
+.end
+PIR
+close $X;
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require (PIR)' );
+assert(nil == mod_foo)
+m = require "mod_foo"
+assert(m == mod_foo)
+assert(m == package.loaded.mod_foo)
+print(m.bar())
+CODE
+3.14
+OUTPUT
+}
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'table package.loaded' );
 t = {}

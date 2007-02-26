@@ -54,22 +54,26 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     set $P1, 'seeall'
     _package[$P1] = _package_seeall
 
-    .local pmc _lua__ENVIRON
-    _lua__ENVIRON = global '_ENVIRON'
-
     .local pmc _loaders
     new _loaders, .LuaTable
     set $P1, 'loaders'
-    _lua__ENVIRON[$P1] = _loaders
     _package[$P1] = _loaders
     new $P2, .LuaNumber
 
-    .const .Sub loader_Lua = 'loader_Lua'
+    .const .Sub loader_preload = 'loader_preload'
     set $P2, 1
+    _loaders[$P2] = loader_preload
+
+    .const .Sub loader_Lua = 'loader_Lua'
+    inc $P2
     _loaders[$P2] = loader_Lua
 
-    setpath(_package, 'path', 'LUA_PATH', '')
-    setpath(_package, 'pirpath', 'LUA_PIRPATH', '')
+    .const .Sub loader_PBC = 'loader_PBC'
+    inc $P2
+    _loaders[$P2] = loader_PBC
+
+    setpath(_package, 'path', 'LUA_PATH', './?.lua')
+    setpath(_package, 'pbcpath', 'LUA_PBCPATH', './?.pbc;./?.pir')
 
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = global '_REGISTRY'
@@ -106,17 +110,17 @@ L2:
 .sub 'findfile' :anon
     .param pmc name
     .param string pname
-    $S0 = name
-    $S0 .= '.lua'
-    $I0 = stat $S0, 0
+    $S1 = name
+    $S1 .= '.lua'
+    $I0 = stat $S1, 0
     unless $I0 goto L1
-    .return ($S0)
+    .return ($S1)
 L1:
-    $S1 = "\n\tno file '"
-    $S1 .= $S0
-    $S1 .= "'"
+    $S0 = "\n\tno file '"
+    $S0 .= $S1
+    $S0 .= "'"
     new $P0, .LuaString
-    set $P0, $S1
+    set $P0, $S0
     .return ('', $P0)
 .end
 
@@ -147,6 +151,100 @@ L1:
     loaderror($S1, filename, $S0)
 L2:
     # library loaded successfully
+    .return ($P0)
+.end
+
+.sub 'findfile2' :anon
+    .param pmc name
+    .param string pname
+    $S1 = name
+    $S1 .= '.pbc'
+    $I0 = stat $S1, 0
+    unless $I0 goto L1
+    .return ($S1)
+L1:
+    $S0 = "\n\tno file '"
+    $S0 .= $S1
+    $S0 .= "'"
+    $S1 = name
+    $S1 .= '.pir'
+    $I0 = stat $S1, 0
+    unless $I0 goto L2
+    .return ($S1)
+L2:
+    $S0 .= "\n\tno file '"
+    $S0 .= $S1
+    $S0 .= "'"
+    new $P0, .LuaString
+    set $P0, $S0
+    .return ('', $P0)
+.end
+
+.sub 'loader_PBC' :anon
+    .param pmc name :optional
+    .local string funcname
+    .local string filename
+    $S1 = checkstring(name)
+    (filename, $P0) = findfile2(name, 'pbcpath')
+    unless filename == '' goto L1
+    # library not found in this path
+    .return ($P0)
+L1:
+    funcname = mkfuncname(name)
+    ($P0, $S0) = loadfunc(filename, funcname)
+    unless null $P0 goto L2
+    loaderror($S1, filename, $S0)
+L2:
+    # library loaded successfully
+    .return ($P0)
+.end
+
+.sub 'mkfuncname' :anon
+    .param pmc modname
+    $S1 = modname
+    $S0 = 'luaopen_'
+    $S0 .= $S1
+    .return ($S0)
+.end
+
+.sub 'loadfunc'
+    .param string path
+    .param string sym
+    load_bytecode path
+    $P0 = get_root_global sym
+    if null $P0 goto L1
+    .return ($P0)
+L1:
+    $S0 = "can't found function '"
+    $S0 .= sym
+    $S0 .= "' in module '"
+    $S0 .= path
+    $S0 .= "'"
+    .return ($P0, $S0)
+.end
+
+.sub 'loader_preload' :anon
+    .param pmc name :optional
+    $S1 = checkstring(name)
+    $P0 = global '_G'
+    new $P1, .LuaString
+    set $P1, 'package'
+    $P0 = $P0[$P1]
+    set $P1, 'preload'
+    $P0 = $P0[$P1]
+    $I0 = isa $P0, 'LuaTable'
+    if $I0 goto L1
+    error("'package.preload' must be a table")
+L1:
+    $P0 = $P0[name]
+    $I0 = isa $P0, 'LuaNil'
+    unless $I0 goto L2
+    $S0 = "\n\tno field package.preload['"
+    $S0 .= $S1
+    $S0 .= "']"
+    new $P0, .LuaString
+    set $P0, $S0
+L2:
     .return ($P0)
 .end
 
@@ -231,11 +329,12 @@ L2:
     # package is already loaded
     .return (ret)
 L1:
-    .local pmc _lua__ENVIRON
-    _lua__ENVIRON = global '_ENVIRON'
+    $P0 = global '_G'
+    set $P1, 'package'
+    $P0 = $P0[$P1]
     .local pmc loaders
     set $P1, 'loaders'
-    loaders = _lua__ENVIRON[$P1]
+    loaders = $P0[$P1]
     .local pmc i
     new i, .LuaNumber
     set i, 1
@@ -290,7 +389,7 @@ Lua initializes the C path C<package.cpath> in the same way it initializes
 the Lua path C<package.path>, using the environment variable C<LUA_CPATH>
 (plus another default path).
 
-NOT USED (see package.pirpath).
+NOT USED (see package.pbcpath).
 
 
 =item C<package.loaded>
@@ -342,9 +441,9 @@ C<./foo.lua>, C<./foo.lc>, and C</usr/local/foo/init.lua>, in that order.
 
 STILL INCOMPLETE.
 
-=item C<package.pirpath>
+=item C<package.pbcpath>
 
-The path used by C<require> to search for a PIR loader.
+The path used by C<require> to search for a PBC loader.
 
 STILL INCOMPLETE.
 
