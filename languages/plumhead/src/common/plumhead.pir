@@ -25,6 +25,10 @@ Run the PAST-pm with the help of TGE.
 
 Parse PHP with Java based parser and tree parser, generated from ANTLR3 grammars.
 
+=head2 Plumhead perl5re
+
+Parse PHP with Perl 5 regexes.
+
 =head1 SEE ALSO
 
 F<languages/plumhead/docs>
@@ -86,6 +90,7 @@ GOT_PHP_SOURCE_FN:
     if variant == 'antlr3'    goto VARIANT_ANTLR3
     if variant == 'partridge' goto VARIANT_PARTRIDGE
     if variant == 'phc'       goto VARIANT_PHC
+    if variant == 'perl5re'   goto VARIANT_PERL5RE
 
 VARIANT_PARTRIDGE:
     err_msg = 'Compiling and executing with partridge failed'
@@ -113,6 +118,16 @@ VARIANT_PHC:
 
     err_msg = 'Creating PIR with xsltproc failed'
     cmd = 'xsltproc languages/plumhead/src/phc/past_xml_to_past_pir.xsl  plumhead_past.xml  > plumhead_past.pir'
+    ret = spawnw cmd
+    if ret goto ERROR
+    goto EXECUTE_PAST_PIR
+
+VARIANT_PERL5RE:
+    err_msg = 'Creating PAST with Perl 5 regexes failed'
+    # TODO: this is not portable
+    cmd = 'perl5.9.5 languages/plumhead/src/perl5re/gen_past_pir.pl '
+    concat cmd, php_source_fn
+    concat cmd, '> plumhead_past.pir'
     ret = spawnw cmd
     if ret goto ERROR
     goto EXECUTE_PAST_PIR

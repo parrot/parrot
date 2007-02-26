@@ -20,9 +20,11 @@ strategies of PHP on Parrot.
 
 =item phc       - XSLT munges output from phc, started
 
-=item antlr3    - ANTLR3, converted from languages/bc, planned
+=item antlr3    - ANTLR3, converted from languages/bc, started
 
-=item partridge - Parrot compiler toolchain, planned
+=item partridge - Parrot compiler toolchain, started
+
+=item perl5re   - Perl5.10 regexes, planned
 
 =back
 
@@ -41,6 +43,10 @@ xsltproc and phc need to be in PATH.
 =item antlr3
 
 java.
+
+=item perl5re
+
+Perl5.10
 
 =back
 
