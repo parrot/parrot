@@ -5,7 +5,13 @@ package Parrot::Pmc2c::PMETHODs;
 use strict;
 use warnings;
 use Data::Dumper;
-use Carp;
+use Carp qw(longmess croak);
+
+=pod
+$SIG{__WARN__} = sub {
+    print longmess;
+};
+=cut
 
 =head1 NAME
 
@@ -120,19 +126,15 @@ sub get_arg_type {
     ($_) = @_;
     if (/INTVAL|int/i) {
       return REGNO_INT;
-      return "INTVAL";
     }
     elsif (/FLOATVAL|double/i) {
       return REGNO_NUM;
-      return "FLOATVAL";
     }
     elsif (/STRING/i) {
       return REGNO_STR;
-      return "STRING";
     }
     elsif (/PMC/i) {
       return REGNO_PMC;
-      return "PMC";
     }
     croak "$_ not recognized as INTVAL, FLOATVAL, STRING, or PMC";
 }
@@ -176,13 +178,13 @@ sub gen_arg_accessor {
     croak "$_ not recognized as INTVAL, FLOATVAL, STRING, or PMC";
   }
 
-  if ($arg_type eq 'param') {
+  if ($arg_type eq 'param' or $arg_type eq 'result') {
     return "    $type->{s} $name = CTX_REG_$type->{l}(ctx, $index);\n";
   }
   elsif ($arg_type eq 'name') {
-    return "    CTX_REG_$type->{l}(ctx, $index) = string_from_cstring(interp, $name, 0);\n";
+    return "    CTX_REG_$type->{l}(ctx, $index) = string_from_const_cstring(interp, $name, 0);\n";
   }
-  else { #$arg_type eq 'result'
+  else { #$arg_type eq 'arg' or $arg_type eq 'return'
     return "    CTX_REG_$type->{l}(ctx, $index) = $name;\n";
   }
 }
@@ -211,7 +213,7 @@ sub rewrite_pmethod_returns {
   while ($$body and $$body =~ m/$signature_re/) {
     my $goto_string = "goto $method"."_returns;";
     my ($returns_n_regs_used, $returns_indexes, $returns_flags, $returns_accessors)
-        = parse_pmethod_args_normal($2, 'result');
+        = parse_pmethod_args_normal($2, 'return');
     push @$regs_used, $returns_n_regs_used;
     my $file = '"' . __FILE__ . '"';
     my $lineno = __LINE__ + 6;
@@ -224,8 +226,8 @@ $returns_accessors
         int temp_return_indexes[] = { $returns_indexes };
         return_indexes = (opcode_t *) temp_return_indexes;
     }
-    return_sig = Parrot_FixedIntegerArray_new_from_string(interp, type,
-        string_from_cstring(interp, $returns_flags, 0), PObj_constant_FLAG);
+    return_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
+        string_from_const_cstring(interp, $returns_flags, 0), PObj_constant_FLAG);
     $goto_string
     /*END PRETURN $2 */
 END
@@ -249,6 +251,38 @@ sub parse_pmethod_args_add_obj {
   };
   unshift @$linear_args, $arg;
   process_pmethod_args( $linear_args, $_[1] );
+}
+
+sub parse_pmethod_invoke {
+  my @results = split(/,/, $_[0], 4);
+  for my $x (@results){
+    $x = trim($x);
+  }
+
+  if ( $#results >= 3)
+  {
+    my $rest = pop @results;
+    push @results, process_pmethod_args( parse_pmethod_args($rest), $_[1] );
+  }
+  else
+  {
+    push @results, ( [0, 0, 0, 0], "0", "\"\"", "", "");
+  }
+
+  shift @results;
+  @results;
+}
+
+sub parse_pmethod_invoke_results {
+  if ( defined $_[0])
+  {
+    my $linear_args = parse_pmethod_args($_[0]);
+    process_pmethod_args( $linear_args, $_[1] );
+  }
+  else
+  {
+    return ( [0, 0, 0, 0], "0", "\"\"", "");
+  }
 }
 
 sub parse_pmethod_args {
@@ -331,20 +365,20 @@ sub find_max_regs {
 }
 
 =head3 C<rewrite_pmethod()>
-
+    
     rewrite_pmethod($method_hash);
 
 =cut
 
 
 sub rewrite_pmethod {
-    #"include pmc_fixedintegerarray.h";
     my ($self) = @_;
     croak "return method of PMETHOD must be void, not $self->{type}" if $self->{type} ne 'void';
     my $parameters = $self->{parameters};
     my ($params_n_regs_used, $params_indexes, $params_flags, $params_accessors, $named_names)
         = parse_pmethod_args_add_obj($parameters, 'param');
     my $n_regs = rewrite_pmethod_returns($self->{meth}, \$self->{body});
+    my $n_regs2 = rewrite_pminvoke($self->{meth}, \$self->{body});
     unshift @$n_regs, $params_n_regs_used;
     my $n_regs_used = find_max_regs($n_regs);
 
@@ -357,24 +391,21 @@ sub rewrite_pmethod {
     opcode_t param_indexes[] = { $params_indexes };
     opcode_t *return_indexes;
     opcode_t *current_args;
-    PMC* type = pmc_new(interp, enum_class_FixedIntegerArray);
-    PMC* param_sig = Parrot_FixedIntegerArray_new_from_string(interp, type,
-        string_from_cstring(interp, $params_flags, 0), PObj_constant_FLAG);
+    PMC* _type = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC* param_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
+        string_from_const_cstring(interp, $params_flags, 0), PObj_constant_FLAG);
     PMC* return_sig = PMCNULL;
     parrot_context_t *caller_ctx = CONTEXT(interp->ctx);
     parrot_context_t *ctx = Parrot_push_context(interp, n_regs_used);
     PMC *ccont = caller_ctx->current_cont;
-    opcode_t *pc;
-    struct call_state st;
 
     current_args = interp->current_args;
     interp->current_args = NULL;
 
 $named_names
 
-    Parrot_init_arg_op(interp, caller_ctx, current_args, &st.src);
-    Parrot_init_arg_indexes_and_sig_pmc(interp, ctx, param_indexes, param_sig, &st.dest);
-    Parrot_process_args(interp, &st, PARROT_PASS_PARAMS);
+    interp->params_signature = param_sig;
+    parrot_pass_args(interp, caller_ctx, ctx, current_args, param_indexes, PARROT_PASS_PARAMS);
 
     if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
         PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
@@ -408,22 +439,112 @@ END
             internal_exception(1, "No caller_ctx for continuation \%p.", ccont);
         }
 
-        Parrot_init_arg_indexes_and_sig_pmc(interp, ctx, return_indexes, return_sig, &st.src);
-        Parrot_init_arg_op(interp, caller_ctx, caller_ctx->current_results, &st.dest);
-        Parrot_process_args(interp, &st, PARROT_PASS_RESULTS);
+        interp->returns_signature = return_sig;
+        parrot_pass_args(interp, ctx, caller_ctx, return_indexes, caller_ctx->current_results, PARROT_PASS_RESULTS);
     }
 
 
     /* END PARAMS SCOPE */
     }
     no_return:
-    PObj_live_CLEAR(type);
+    PObj_live_CLEAR(_type);
     PObj_live_CLEAR(param_sig);
     PObj_live_CLEAR(return_sig);
     Parrot_pop_context(interp);
 END
     ($self->{parameters}, $self->{pre_block}, $self->{post_block}) = ("", $PRE_STUB, $POST_STUB);
     return;
+}
+
+sub isquoted {
+ 1;
+}
+
+sub rewrite_pminvoke {
+  my ( $method, $body) = @_;
+  my $signature_re = qr{
+  ((
+  \( ([^\(]*) \)   #result spec
+  \s*              #optional whitespace
+  = 
+  )?
+  \s*              #optional whitespace
+  PMINVOKE          #method name
+  \s*              #optional whitespace
+  \( ([^\(]*) \)   #parameters
+  ;?)
+  }sx;
+  
+  my $regs_used = [];
+
+  while ($$body and $$body =~ m/$signature_re/) {
+    #print Dumper($1, $2, $3, $4);
+    my ($result_n_regs_used, $result_indexes, $result_flags, $result_accessors)
+        = parse_pmethod_invoke_results($3, 'result');
+    push @$regs_used, $result_n_regs_used;
+    my ($pmc, $name, $args_n_regs_used, $arg_indexes, $arg_flags, $arg_accessors, $named_names) 
+        = parse_pmethod_invoke($4, 'arg');
+
+    push @$regs_used, $args_n_regs_used;
+    my $n_regs_used = find_max_regs($regs_used);
+
+    my $replacement = "";
+
+    if (isquoted($name)) {
+        $name = "string_from_const_cstring(interp, $name, 0)";
+    }
+    
+    my $file = '"' . __FILE__ . '"';
+    my $lineno = __LINE__ + 7;
+    
+    if (defined $n_regs_used) {
+    $replacement .= <<END;
+
+    /*BEGIN PMINVOKE $name */
+#line $lineno $file
+    {
+      INTVAL n_regs_used[] = { $n_regs_used };
+      opcode_t arg_indexes[] = { $arg_indexes };
+      opcode_t result_indexes[] = { $result_indexes };
+      PMC* _type = pmc_new(interp, enum_class_FixedIntegerArray);
+      PMC* args_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
+          string_from_const_cstring(interp, $arg_flags, 0), PObj_constant_FLAG);
+      PMC* results_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
+          string_from_const_cstring(interp, $result_flags, 0), PObj_constant_FLAG);
+      parrot_context_t *ctx = Parrot_push_context(interp, n_regs_used);
+
+      interp->current_args = arg_indexes;
+      interp->args_signature = args_sig;
+      ctx->current_results = result_indexes;
+      ctx->results_signature = results_sig;
+
+$named_names
+
+$arg_accessors
+END
+    }
+    
+    $replacement .= <<END;
+
+      VTABLE_invoke(interp, $pmc, $name);
+
+$result_accessors
+
+END
+    if (defined $n_regs_used) {
+    $replacement .= <<END;
+
+    PObj_live_CLEAR(_type);
+    PObj_live_CLEAR(args_sig);
+    PObj_live_CLEAR(results_sig);
+    Parrot_pop_context(interp);
+    }
+    /*END PMINVOKE $name */
+END
+    }
+
+    $$body =~ s/\Q$1\E/$replacement/;
+  }
 }
 
 1;

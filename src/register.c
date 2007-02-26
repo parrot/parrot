@@ -229,6 +229,7 @@ init_context(Interp *interp, parrot_context_t *ctx, parrot_context_t *old)
 {
     ctx->ref_count = 0;                 /* TODO 1 - Exceptions !!! */
     ctx->current_results = NULL;
+    ctx->results_signature = NULL;
     ctx->lex_pad = PMCNULL;
     ctx->outer_ctx = NULL;
     ctx->current_cont = NULL;

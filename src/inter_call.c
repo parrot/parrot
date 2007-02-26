@@ -106,6 +106,13 @@ int
 Parrot_init_arg_indexes_and_sig_pmc(Interp *interp, parrot_context_t *ctx,
         opcode_t *indexes, PMC* sig_pmc, struct call_state_item *st)
 {
+    if (!sig_pmc && indexes) {
+        ++indexes;
+        sig_pmc = ctx->constants[*indexes]->u.key;
+        ASSERT_SIG_PMC(sig_pmc);
+        ++indexes;
+    }
+
     st->i = 0;
     st->n = 0;
     st->mode = CALL_STATE_OP;
@@ -1042,8 +1049,24 @@ parrot_pass_args(Interp *interp, parrot_context_t *src_ctx, parrot_context_t *de
         opcode_t *src_indexes, opcode_t *dest_indexes, arg_pass_t  param_or_result)
 {
     struct call_state st;
-    Parrot_init_arg_op(interp, dest_ctx, dest_indexes, &st.dest);
-    Parrot_init_arg_op(interp, src_ctx, src_indexes, &st.src);
+    PMC* src_signature;
+    PMC* dest_signature;
+
+    if (param_or_result == PARROT_PASS_PARAMS) {
+        src_signature = interp->args_signature;
+        dest_signature = interp->params_signature;
+        interp->args_signature = NULL;
+        interp->params_signature = NULL;
+    }
+    else /* (param_or_result == PARROT_PASS_RESULTS) */ {
+        src_signature = interp->returns_signature;
+        dest_signature = dest_ctx->results_signature;
+        interp->returns_signature = NULL;
+        dest_ctx->results_signature = NULL;
+    }
+
+    Parrot_init_arg_indexes_and_sig_pmc(interp, src_ctx, src_indexes, src_signature, &st.src);
+    Parrot_init_arg_indexes_and_sig_pmc(interp, dest_ctx, dest_indexes, dest_signature, &st.dest);
     Parrot_process_args(interp, &st, param_or_result);
 }
 

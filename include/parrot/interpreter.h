@@ -233,6 +233,7 @@ typedef struct Parrot_Context {
     PMC *current_namespace;     /* The namespace we're currently in */
     INTVAL current_HLL;         /* see also src/hll.c */
     opcode_t *current_results;  /* ptr into code with get_results opcode */
+    PMC *results_signature;     /* results signature pmc if it is non-const */
     /* deref the constants - we need it all the time */
     struct PackFile_Constant ** constants;
     /* code->prederefed.code - code->base.data in opcodes
@@ -411,6 +412,9 @@ struct parrot_interp_t {
     opcode_t *current_args;                   /* ptr into code with set_args opcode */
     opcode_t *current_params;                 /* ptr into code with get_params opcode */
     opcode_t *current_returns;                /* ptr into code with get_returns opcode */
+    PMC *args_signature;                      /* args signature pmc if it is non-const */
+    PMC *params_signature;                    /* params signature pmc if it is non-const */
+    PMC *returns_signature;                   /* returns signature pmc if it is non-const */
     /* during a call sequencer the caller fills these objects
      * inside the invoke these get moved to the context structure
      */

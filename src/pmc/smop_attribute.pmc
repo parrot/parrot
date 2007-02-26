@@ -1,0 +1,152 @@
+/*
+Copyright (C) 2001-2005, The Perl Foundation.
+$Id: /parrot/cc/src/pmc/resizablepmcarray.pmc 2034 2007-01-14T22:25:58.386168Z tewk  $
+
+=head1 NAME
+
+src/pmc/smop_class.pmc - SMOP Class
+
+=head1 DESCRIPTION
+
+This class, smop_class, implements the class class of the simple meta
+object protocol.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#define SMOP_attr(o) ((SMOP_Attribute *) PMC_data(o))
+
+typedef struct SMOP_Attribute {
+    STRING *name;
+    STRING *type_;
+    PMC *class_;
+} SMOP_Attribute;
+
+static void smop_init(Interp *interp, PMC *self) {
+    /* turn on marking of the class_data array */
+    PObj_data_is_PMC_array_SET(self);
+    /* turn on custom destruction since our PMC* array is dynamically allocated */
+    PObj_active_destroy_SET(self);
+
+    PMC_data(self) = mem_sys_allocate_zeroed(sizeof(SMOP_Attribute));
+    SMOP_Attribute *smop = SMOP_attr(self);
+}
+
+
+pmclass SMOP_Attribute need_ext {
+
+/*
+
+=item C<void init()>
+
+Initializes the class flags.
+
+=item C<void init_pmc(PMC *init)>
+
+The actual class creation code, called from C<newclass> opcode. The C<init>
+argument is not a PMC* but the C<classname> STRING.
+
+=cut
+
+*/
+
+    void init() {
+        smop_init(INTERP, SELF);
+    }
+
+    void init_pmc(PMC* args) {
+        SELF.init();
+    }
+
+/*
+
+=item C<void destroy()>
+
+Free the class's attribute array, if any. Also used by ParrotObjects.
+
+=cut
+
+*/
+    void destroy() {
+            mem_sys_free(PMC_data(SELF));
+    }
+
+
+/*
+
+=item C<void name(PMC *name)>
+
+ name attribute accessor 
+
+=cut
+
+*/
+    PMETHOD void name(PMC *name :optional, int got_name :opt_flag) {
+        if ( got_name ) {
+            SMOP_attr(SELF)->name = VTABLE_get_string(interp, name);
+        }
+        STRING* name_attr = SMOP_attr(SELF)->name;
+        preturn( STRING *name_attr );
+    }
+/*
+
+=item C<void class(PMC *class)>
+
+ class attribute accessor 
+
+=cut
+
+*/
+    PMETHOD void class(PMC *class :optional, int got_class :opt_flag) {
+        if ( got_class ) {
+            SMOP_attr(SELF)->class_ = class;
+        }
+        PMC* class_attr = SMOP_attr(SELF)->class_;
+        preturn( PMC *class_attr );
+    }
+/*
+
+=item C<void type(PMC *type)>
+
+ type attribute accessor 
+
+=cut
+
+*/
+    PMETHOD void type(PMC *type :optional, int got_type :opt_flag) {
+        if ( got_type ) {
+            SMOP_attr(SELF)->type_ = VTABLE_get_string(interp, type);
+        }
+        STRING* type_string = SMOP_attr(SELF)->type_;
+        preturn( STRING *type_string );
+    }
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd15_objects.pod>.
+
+=head1 HISTORY
+
+Initial version                  - Kevin Tew 2007-02-12
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
