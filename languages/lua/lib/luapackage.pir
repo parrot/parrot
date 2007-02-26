@@ -1,4 +1,4 @@
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -79,7 +79,7 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     _package[$P1] = $P0
 
     new $P0, .LuaTable
-    set $P1, 'preloaded'
+    set $P1, 'preload'
     _package[$P1] = $P0
 
 .end
@@ -128,7 +128,7 @@ L1:
     $S0 .= name
     $S0 .= "' from file '"
     $S0 .= filename
-    $S0 .= ":\n\t"
+    $S0 .= "':\n\t"
     $S0 .= msg
     error($S0)
 .end
@@ -299,9 +299,6 @@ A table used by C<require> to control which modules are already loaded.
 When you require a module C<modname> and C<package.loaded[modname]> is not
 false, C<require> simply returns the value stored there.
 
-NOT YET IMPLEMENTED.
-
-
 =item C<package.loadlib (libname, funcname)>
 
 Dynamically links the host program with the C library C<libname>. Inside
@@ -343,22 +340,19 @@ the resulting file name. So, for instance, if the Lua path is
 the search for a Lua loader for module C<foo> will try to load the files
 C<./foo.lua>, C<./foo.lc>, and C</usr/local/foo/init.lua>, in that order.
 
-NOT YET IMPLEMENTED.
-
+STILL INCOMPLETE.
 
 =item C<package.pirpath>
 
 The path used by C<require> to search for a PIR loader.
 
-NOT YET IMPLEMENTED.
-
+STILL INCOMPLETE.
 
 =item C<package.preload>
 
 A table to store loaders for specific modules (see C<require>).
 
-NOT YET IMPLEMENTED.
-
+STILL INCOMPLETE.
 
 =item C<package.seeall (module)>
 
@@ -378,6 +372,7 @@ NOT YET IMPLEMENTED.
 
 =head1 AUTHORS
 
+Francois Perrad
 
 =cut
 

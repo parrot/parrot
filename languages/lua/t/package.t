@@ -25,10 +25,10 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 7;
 use Test::More;
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'require' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require' );
 local m = require "io"
 m.write("hello world\n")
 CODE
@@ -73,7 +73,7 @@ return complex
 CODE
 close $X;
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'require' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require' );
 m = require "complex"
 assert(m == complex)
 print(complex.i.r, complex.i.i)
@@ -81,10 +81,21 @@ CODE
 0	1
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'require (no module)' );
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function require (no module)' );
 require "no_module"
 CODE
 /module 'no_module' not found:\n/
+OUTPUT
+
+unlink('../foo.lua') if ( -f '../foo.lua' );
+open $X, '>', '../foo.lua';
+print {$X} '?syntax error?';
+close $X;
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function require (syntax error)');
+require "foo"
+CODE
+/error loading module 'foo' from file '.*foo.lua':\n/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'table package.loaded' );
@@ -106,6 +117,20 @@ os
 package
 string
 table
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'table package.path' );
+print(type(package.path))
+CODE
+string
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'table package.preload' );
+print(type(package.preload))
+print(# package.preload)
+CODE
+table
+0
 OUTPUT
 
 # Local Variables:
