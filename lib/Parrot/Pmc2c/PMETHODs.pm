@@ -8,9 +8,11 @@ use Data::Dumper;
 use Carp qw(longmess croak);
 
 =pod
+
 $SIG{__WARN__} = sub {
     print longmess;
 };
+
 =cut
 
 =head1 NAME

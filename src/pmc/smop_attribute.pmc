@@ -82,7 +82,7 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
 
 =item C<void name(PMC *name)>
 
- name attribute accessor 
+ name attribute accessor
 
 =cut
 
@@ -98,7 +98,7 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
 
 =item C<void class(PMC *class)>
 
- class attribute accessor 
+ class attribute accessor
 
 =cut
 
@@ -114,7 +114,7 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
 
 =item C<void type(PMC *type)>
 
- type attribute accessor 
+ type attribute accessor
 
 =cut
 
