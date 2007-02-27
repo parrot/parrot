@@ -29,6 +29,25 @@ This method will be renamed to C<get_name> in the March 2007 release
 
 =back
 
+=head1 Deprecated ops
+
+From http://www.parrotcode.org/docs/ops/var.html, the following ops are 
+deprecated:
+
+=over 4
+
+=item store_global
+
+=item find_global
+
+=item find_name
+
+=back
+
+There are several variants of some of the above ops; all are deprecated,
+and are replaced by the ops {set,get}_[hll,root]_global. See also
+http://www.parrotcode.org/docs/ops/var.html.
+
 =head1 FUTURE changes
 
 Not yet deprecated, but it's recommended to use the new syntax and
