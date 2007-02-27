@@ -7,14 +7,14 @@ docs/pdds/pdd06_pasm.pod - Parrot Assembly Language
 
 =head1 ABSTRACT
 
-This PDD describes the format of Parrot's bytecode assembly language.
+The format of Parrot's bytecode assembly language.
 
 =head1 DESCRIPTION
 
 Parrot's bytecode can be thought of as a form of machine language for a virtual
 super CISC machine. It makes sense, then, to define an assembly language for it
 for those people who may need to generate bytecode directly, rather than
-indirectly via the perl (or any other) language.
+indirectly through a high-level language.
 
 {{ NOTE: out-of-date and incomplete. It seems that it would be more
 useful as a specification of the format of PASM than as a comprehensive
