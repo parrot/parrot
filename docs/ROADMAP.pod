@@ -414,14 +414,6 @@ dynamic library loading
 
 Items in languages/tcl/TODO must be completed.
 
-=item *
-
-Get python bytecode translator done
-
-=item *
-
-Pass the pie-thon test suite.
-
 =back
 
 =head1 FUTURE
