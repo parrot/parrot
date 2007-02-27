@@ -9,7 +9,7 @@
 $Id$
 
 This transformation takes a XML abstract syntax tree as generated 
-by phc from PHP source. It generates an XML equivalent to PAST-pm.
+by phc from PHP source. It generates a PAST-pm data structure in XML.
 
 -->
 <xsl:output method='xml' indent='yes' />
@@ -161,8 +161,8 @@ by phc from PHP source. It generates an XML equivalent to PAST-pm.
 
 <!-- looks like phc is running into a floating point issue -->
 <xsl:template match="phc:Token_real" >
-  <past:Val ctype="n" >
-    <xsl:apply-templates select="phc:source_rep" />
+  <past:Val ctype='n+' vtype='.Float' >
+    <xsl:attribute name="name" ><xsl:value-of select="phc:source_rep" /></xsl:attribute>
   </past:Val>
 </xsl:template>
 
