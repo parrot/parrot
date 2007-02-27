@@ -72,6 +72,10 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     inc $P2
     _loaders[$P2] = loader_PBC
 
+    .const .Sub loader_PBCroot = 'loader_PBCroot'
+    inc $P2
+    _loaders[$P2] = loader_PBCroot
+
     setpath(_package, 'path', 'LUA_PATH', './?.lua')
     setpath(_package, 'pbcpath', 'LUA_PBCPATH', './?.pbc;./?.pir')
 
@@ -101,6 +105,8 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     $S0 = default
     goto L2
 L1:
+    $S0 = gsub($S0, ';;', ';,;')
+    $S0 = gsub($S0, ',', default)
 L2:
     new $P0, .LuaString
     set $P0, $S0
@@ -108,20 +114,69 @@ L2:
 .end
 
 .sub 'findfile' :anon
-    .param pmc name
+    .param string name
     .param string pname
-    $S1 = name
-    $S1 .= '.lua'
-    $I0 = stat $S1, 0
-    unless $I0 goto L1
-    .return ($S1)
+    name = gsub(name, '.', '/')
+    $P0 = global '_G'
+    new $P1, .LuaString
+    set $P1, 'package'
+    $P0 = $P0[$P1]
+    set $P1, pname
+    $P0 = $P0[$P1]
+    $I0 = isa $P0, 'LuaString'
+    if $I0 goto L1
+    $S0 = "'package."
+    $S0 .= pname
+    $S0 .= "' must be a string"
+    error($S0)
 L1:
-    $S0 = "\n\tno file '"
-    $S0 .= $S1
+    .local string path
+    .local string tmpl
+    path = $P0
+    .local pmc msg      # error accumulator
+    new msg, .LuaString
+    set msg, ''
+L2:
+    (path, tmpl) = nexttemplate(path)
+    if tmpl == '' goto L3
+    .local string filename
+    filename = gsub(tmpl, '?', name)
+    $I0 = stat filename, 0
+    unless $I0 goto L4
+    .return (filename)
+L4:
+    $S0 = msg
+    $S0 .= "\n\tno file '"
+    $S0 .= filename
     $S0 .= "'"
-    new $P0, .LuaString
-    set $P0, $S0
-    .return ('', $P0)
+    set msg, $S0
+    goto L2
+L3:
+    # not found
+    .return ('', msg)
+.end
+
+.sub 'nexttemplate' :anon
+    .param string path
+L1:
+    $S0 = substr path, 0, 1
+    unless $S0 == ';' goto L2
+    # skip separators
+    path = substr path, 1
+    goto L1
+L2:
+    unless path == '' goto L3
+    # no more templates
+    .return ('', '')
+L3:
+    $I0 = index path, ';'
+    unless $I0 < 0 goto L4
+    .return ('', path)
+L4:
+    $S0 = substr path, 0, $I0
+    inc $I0
+    path = substr path, $I0
+    .return (path, $S0)
 .end
 
 .sub 'loaderror' :anon
@@ -141,7 +196,7 @@ L1:
     .param pmc name :optional
     .local string filename
     $S1 = checkstring(name)
-    (filename, $P0) = findfile(name, 'path')
+    (filename, $P0) = findfile($S1, 'path')
     unless filename == '' goto L1
     # library not found in this path
     .return ($P0)
@@ -154,38 +209,12 @@ L2:
     .return ($P0)
 .end
 
-.sub 'findfile2' :anon
-    .param pmc name
-    .param string pname
-    $S1 = name
-    $S1 .= '.pbc'
-    $I0 = stat $S1, 0
-    unless $I0 goto L1
-    .return ($S1)
-L1:
-    $S0 = "\n\tno file '"
-    $S0 .= $S1
-    $S0 .= "'"
-    $S1 = name
-    $S1 .= '.pir'
-    $I0 = stat $S1, 0
-    unless $I0 goto L2
-    .return ($S1)
-L2:
-    $S0 .= "\n\tno file '"
-    $S0 .= $S1
-    $S0 .= "'"
-    new $P0, .LuaString
-    set $P0, $S0
-    .return ('', $P0)
-.end
-
 .sub 'loader_PBC' :anon
     .param pmc name :optional
     .local string funcname
     .local string filename
     $S1 = checkstring(name)
-    (filename, $P0) = findfile2(name, 'pbcpath')
+    (filename, $P0) = findfile($S1, 'pbcpath')
     unless filename == '' goto L1
     # library not found in this path
     .return ($P0)
@@ -195,6 +224,31 @@ L1:
     unless null $P0 goto L2
     loaderror($S1, filename, $S0)
 L2:
+    # library loaded successfully
+    .return ($P0)
+.end
+
+.sub 'loader_PBCroot' :anon
+    .param pmc name :optional
+    .local string funcname
+    .local string filename
+    $S1 = checkstring(name)
+    $I0 = index $S1, '.'
+    unless $I0 < 0 goto L1
+    new $P0, .LuaString
+    .return ($P0)
+L1:
+    $S0 = substr name, 0, $I0
+    (filename, $P0) = findfile($S1, 'pbcpath')
+    unless filename == '' goto L2
+    # root not found
+    .return ($P0)
+L2:
+    funcname = mkfuncname(name)
+    ($P0, $S0) = loadfunc(filename, funcname)
+    unless null $P0 goto L3
+    loaderror($S1, filename, $S0)
+L3:
     # library loaded successfully
     .return ($P0)
 .end

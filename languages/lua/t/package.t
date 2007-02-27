@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 12;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require' );
@@ -190,6 +190,36 @@ print(type(package.path))
 CODE
 string
 OUTPUT
+
+SKIP:
+{
+skip('only with Parrot', 3) if (exists $ENV{PARROT_LUA_TEST_PROG});
+
+delete $ENV{LUA_PBCPATH};
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'table package.pbcpath' );
+print(type(package.pbcpath))
+print(package.pbcpath)
+CODE
+string
+./?.pbc;./?.pir
+OUTPUT
+
+$ENV{LUA_PBCPATH} = "?.pbc";
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'table package.pbcpath' );
+print(package.pbcpath)
+CODE
+?.pbc
+OUTPUT
+
+$ENV{LUA_PBCPATH} = ";;languages/lua/?.pbc";
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'table package.pbcpath' );
+print(package.pbcpath)
+CODE
+;./?.pbc;./?.pir;languages/lua/?.pbc
+OUTPUT
+
+delete $ENV{LUA_PBCPATH};
+}
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'table package.preload' );
 print(type(package.preload))

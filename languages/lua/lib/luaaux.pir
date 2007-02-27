@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -171,6 +171,32 @@ L0:
     ex = new .Exception
     ex['_message'] =  message
     throw ex
+.end
+
+
+=item C<gsub (src, pat, repl)>
+
+=cut
+
+.sub 'gsub'
+    .param string src
+    .param string pat
+    .param string repl
+    $I2 = length pat
+    .local string b
+    b = ''
+L1:
+    $I0 = index src, pat
+    if $I0 < 0 goto L2
+    $S0 = substr src, 0, $I0
+    b .= $S0
+    b .= repl
+    $I0 += $I2
+    src = substr src, $I0
+    goto L1
+L2:
+    b .= src
+    .return (b)
 .end
 
 
