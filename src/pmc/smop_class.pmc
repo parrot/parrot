@@ -32,6 +32,7 @@ typedef struct SMOP_Class {
 } SMOP_Class;
 
 static void smop_init(Interp *interp, PMC *self) {
+    SMOP_Class *smop = NULL;
     /* But we are a class, really */
     PObj_is_class_SET(self);
     /* turn on marking of the class_data array */
@@ -40,7 +41,7 @@ static void smop_init(Interp *interp, PMC *self) {
     PObj_active_destroy_SET(self);
 
     PMC_data(self) = mem_sys_allocate_zeroed(sizeof(SMOP_Class));
-    SMOP_Class *smop = SMOP(self);
+    smop                = SMOP(self);
     smop->attributes    = pmc_new(interp, enum_class_Hash);
     smop->methods       = pmc_new(interp, enum_class_Hash);
     smop->superclasses  = pmc_new(interp, enum_class_Hash);
