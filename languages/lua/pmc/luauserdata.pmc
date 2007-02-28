@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2006, The Perl Foundation.
+Copyright (C) 2005-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -71,6 +71,25 @@ Marks the userdata as live.
     void mark () {
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
+    }
+
+/*
+
+=item C<void destroy()>
+
+Call finalizer and free the userdata.
+
+=cut
+
+*/
+    void destroy () {
+        PMC* meth = find_meth(INTERP, SELF, "__gc");
+        if (meth != NULL) {
+            (void)Parrot_runops_fromc_args(INTERP, meth, "vP", SELF);
+        }
+        if (PMC_pmc_val(SELF)) {
+            PMC_pmc_val(SELF) = NULL;
+        }
     }
 
 /*
