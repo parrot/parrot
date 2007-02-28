@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -275,6 +275,34 @@ L1:
     new ret, .LuaString
     set ret, $S0
 L2:
+    .return (ret)
+.end
+
+.include 'cclass.pasm'
+
+.sub 'read_number' :anon
+    .param pmc f
+    .local pmc ret
+L1:
+    $S0 = peek f
+    $I0 = is_cclass .CCLASS_WHITESPACE, $S0, 0
+    unless $I0 goto L2
+    $S0 = read f, 1
+    goto L1
+L2:
+    $S1 = ''
+L3:
+    $S0 = peek f
+    if $S0 == '' goto L4
+    $I0 = is_cclass .CCLASS_WHITESPACE, $S0, 0
+    if $I0 goto L4
+    $S0 = read f, 1
+    $S1 .= $S0
+    goto L3
+L4:
+    new $P1, .LuaString
+    set $P1, $S1
+    ret = $P1.'tonumber'()
     .return (ret)
 .end
 
@@ -761,8 +789,6 @@ empty string, or B<nil> on end of file.
 
 =back
 
-STILL INCOMPLETE.
-
 =cut
 
 .sub '_file_read' :method :anon
@@ -798,16 +824,23 @@ L5:
     goto L6
 L4:
     $S0 = checkstring(format)
-    unless $S0 == '*n' goto L7
-    not_implemented()
+    $I0 = index $S0, '*n'
+    unless $I0 == 0 goto L7
+    # number
+    $P0 = read_number(f)
+    ret[i] = $P0
     goto L6
 L7:
-    unless $S0 == '*l' goto L8
+    $I0 = index $S0, '*l'
+    unless $I0 == 0 goto L8
+    # line
     $P0 = read_line(f)
     ret[i] = $P0
     goto L6
 L8:
-    unless $S0 == '*a' goto L9
+    $I0 = index $S0, '*a'
+    unless $I0 == 0 goto L9
+    # file
     $P0 = read_chars(f, 65535)
     ret[i] = $P0
     goto L6
@@ -858,17 +891,17 @@ position to the end of the file, and returns its size.
 .sub '_file_seek' :method :anon
     .param pmc whence :optional
     .param pmc offset :optional
-    .local pmc options
+    .local pmc modenames
     .local pmc f
     .local pmc ret
     tofile(self)
-    new options, .Array
-    set options, 3
-    options[0] = 'set'
-    options[1] = 'cur'
-    options[2] = 'end'
+    new modenames, .Array
+    set modenames, 3
+    modenames[0] = 'set'
+    modenames[1] = 'cur'
+    modenames[2] = 'end'
     $S1 = optstring(whence, 'cur')
-    $I1 = checkoption($S1, options)
+    $I1 = checkoption($S1, modenames)
     $I2 = optint(offset, 0)
     f = getattribute self, 'data'
     seek f, $I2, $I1
@@ -911,20 +944,33 @@ NOT YET IMPLEMENTED.
 .sub '_file_setvbuf' :method :anon
     .param pmc mode :optional
     .param pmc size :optional
-    .local pmc options
+    .local pmc modenames
+    .local pmc mode
     .local pmc f
     .local pmc ret
     tofile(self)
-    new options, .Array
-    set options, 3
-    options[0] = 'no'
-    options[1] = 'full'
-    options[2] = 'line'
+    new modenames, .Array
+    set modenames, 3
+    modenames[0] = 'no'
+    modenames[1] = 'full'
+    modenames[2] = 'line'
     $S1 = checkstring(mode)
-    $I1 = checkoption($S1, options)
-    $I2 = optint(size, 512)
+    $I1 = checkoption($S1, modenames)
+    $I2 = optint(size, 512)     # LUAL_BUFFERSIZE
+    new mode, .Array
+    set mode, 3
+    mode[0] = 0     # PIO_NONBUF
+    mode[1] = 2     # PIO_FULLBUF
+    mode[2] = 1     # PIO_LINEBUF
     f = getattribute self, 'data'
-    not_implemented()
+    $I0 = mode[$I1]
+    # not_implemented
+    f.'buffer_type'($I0)
+    if $I1 == 0 goto L1
+    f.'buffer_size'($I2)
+L1:
+    new ret, .LuaBoolean
+    set ret, 1
     .return (ret)
 .end
 

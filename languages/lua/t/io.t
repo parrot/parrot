@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 37;
 use Test::More;
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'io.stdin' );
@@ -137,7 +137,7 @@ CODE
 /^file \((0[Xx])?[0-9A-Fa-f]+\)/
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.read', params => "< file.txt"  );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.read *l', params => "< file.txt"  );
 print(io.read("*l"))
 print(io.read("*l"))
 print(io.type(io.stdin))
@@ -145,6 +145,26 @@ CODE
 file with text
 nil
 file
+OUTPUT
+
+unlink('../number.txt') if ( -f '../number.txt' );
+open my $Y, '>', '../number.txt';
+binmode $Y, ':raw';
+print {$Y} << 'DATA';
+6.0     -3.23   15e12
+4.3     234     1000001
+DATA
+close $Y;
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io:read *number', params => "< number.txt" );
+while true do
+    local n1, n2, n3 = io.read("*number", "*number", "*number")
+    if not n1 then break end
+    print(math.max(n1, n2, n3))
+end
+CODE
+15000000000000
+1000001
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.lines filename' );
@@ -155,7 +175,7 @@ CODE
 file with text
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.lines', params => "< file.txt"  );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.lines', params => "< file.txt" );
 for line in io.lines() do
     print(line)
 end
@@ -228,6 +248,15 @@ CODE
 nil
 OUTPUT
 
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:read *n' );
+f = io.open("file.txt")
+n1, n2 = f:read("*n", "*n")
+print(n1, n1)
+f:close()
+CODE
+nil	nil
+OUTPUT
+
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:read *a' );
 f = io.open("file.txt")
 s = f:read("*a")
@@ -287,6 +316,35 @@ f:close()
 CODE
 15
 OUTPUT
+
+TODO:
+{
+    local $TODO = 'buffer_type & buffer_size are not implemented';
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:setvbuf "no"' );
+f = io.open("file.txt")
+print(f:setvbuf("no"))
+f:close()
+CODE
+true
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:setvbuf "full"' );
+f = io.open("file.txt")
+print(f:setvbuf("full", 4096))
+f:close()
+CODE
+true
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:setvbuf "line"' );
+f = io.open("file.txt")
+print(f:setvbuf("line", 132))
+f:close()
+CODE
+true
+OUTPUT
+}
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'file:write closed' );
 f = io.open("file.out", "w")
