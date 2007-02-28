@@ -174,6 +174,43 @@ L0:
 .end
 
 
+=item C<findtable (t, fname)>
+
+=cut
+
+.sub 'findtable'
+    .param pmc t
+    .param string fname
+    new $P1, .LuaString
+L1:
+    $I1 = index fname, '.'
+    $I2 = $I2
+    unless $I1 < 0 goto L2
+    $I2 = length fname
+L2:
+    $S1 = substr fname, 0, $I2
+    set $P1, $S1
+    $P0 = t[$P1]
+    $I0 = isa $P0, 'LuaNil'
+    unless $I0 goto L3
+    new $P0, .LuaTable
+    t[$P1] = $P0
+    goto L4
+L3:
+    $I0 = isa $P0, 'LuaTable'
+    unless $I0 goto L4
+    null $P0
+    .return ($P0, fname)
+L4:
+    if $I1 < 0 goto L5
+    inc $I1
+    fname = substr fname, $I1
+    goto L1
+L5:
+    .return ($P0)
+.end
+
+
 =item C<gsub (src, pat, repl)>
 
 =cut

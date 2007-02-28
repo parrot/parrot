@@ -25,8 +25,19 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 15;
 use Test::More;
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function module' );
+print(type(mod))
+local _G = _G
+module("mod")
+_G.print(_G.type(_G.mod))
+_G.assert(_G.mod == _G.package.loaded.mod)
+CODE
+nil
+table
+OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require' );
 local m = require "io"
@@ -98,7 +109,7 @@ CODE
 /error loading module 'foo' from file '.*foo.lua':\n/
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require & preload' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require & package.preload' );
 foo = {}
 foo.bar = 1234
 function foo_loader ()
@@ -112,6 +123,52 @@ print(m.bar)
 CODE
 1234
 OUTPUT
+
+TODO:
+{
+    local $TODO = 'need setfenv';
+
+unlink('../complex.lua') if ( -f '../complex.lua' );
+open $X, '>', '../complex.lua';
+print {$X} << 'CODE';
+module(...)
+
+function new (r, i) return {r=r, i=i} end
+
+--defines a constant 'i'
+i = new(0, 1)
+
+function add (c1, c2)
+    return new(c1.r + c2.r, c1.i + c2.i)
+end
+
+function sub (c1, c2)
+    return new(c1.r - c2.r, c1.i - c2.i)
+end
+
+function mul (c1, c2)
+    return new(c1.r*c2.r - c1.i*c2.i,
+               c1.r*c2.i + c1.i*c2.r)
+end
+
+local function inv (c)
+    local n = c.r^2 + c.i^2
+    return new(c.r/n, -c.i/n)
+end
+
+function div (c1, c2)
+    return mul(c1, inv(c2))
+end
+CODE
+close $X;
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require & module' );
+require "complex"
+print(complex.i.r, complex.i.i)
+CODE
+0	1
+OUTPUT
+}
 
 SKIP:
 {
@@ -227,6 +284,14 @@ print(# package.preload)
 CODE
 table
 0
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function package.seeall' );
+m = {}
+package.seeall(m)
+m.print("hello")
+CODE
+hello
 OUTPUT
 
 # Local Variables:

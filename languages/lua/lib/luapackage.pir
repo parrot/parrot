@@ -325,14 +325,69 @@ in field C<c> of field C<b> of global C<a>.
 This function may receive optional I<options> after the module name, where
 each option is a function to be applied over the module.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE (see setfenv).
 
 =cut
 
 .sub '_lua_module' :anon
     .param pmc name :optional
-    $S0 = checkstring(name)
-    not_implemented()
+    .param pmc options :slurpy
+    .local pmc m
+    $S1 = checkstring(name)
+    .local pmc _lua__REGISTRY
+    _lua__REGISTRY = global '_REGISTRY'
+    new $P1, .LuaString
+    set $P1, '_LOADED'
+    .local pmc _LOADED
+    _LOADED = _lua__REGISTRY[$P1]
+    m = _LOADED[name]
+    $I0 = isa m, 'LuaTable'
+    if $I0 goto L1
+    # try global variable (and create one if it does not exist)
+    $P0 = global '_G'
+    m = findtable($P0, $S1)
+    unless null m goto L2
+    $S0 = "name conflict for module '"
+    $S0 .= $S1
+    $S0 .= "'"
+    error($S0)
+L2:
+    _LOADED[name] = m
+L1:
+    # check whether table already has a _NAME field
+    set $P1, '_NAME'
+    $P0 = m[$P1]
+    $I0 = isa $P0, 'LuaNil'
+    unless $I0 goto L3
+    # no; initialize it
+    m[$P1] = name
+    set $P1, '_M'
+    m[$P1] = m
+    set $P1, '_PACKAGE'
+    $I0 = index $S1, '.'
+    if $I0 < 0 goto L4
+L5:
+    $I1 = $I0
+    inc $I0
+    $I0 = index $S1, '.', $I0
+    unless $I0 < 0 goto L5
+    dec $I1
+    $S0 = substr $S1, 0, $I1
+    # set _PACKAGE as package name (full module name minus last part)
+    new $P0, .LuaString
+    set $P0, $S0
+    m[$P1] = $P0
+    goto L3
+L4:
+    m[$P1] = name
+L3:
+    # setfenv(1, m)
+L6:
+    unless options goto L7
+    $P0 = shift options
+    $P0(m)
+    goto L6
+L7:
 .end
 
 
@@ -507,12 +562,23 @@ Sets a metatable for C<module> with its C<__index> field referring to the
 global environment, so that this module inherits values from the global
 environment. To be used as an option to function C<module>.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub '_package_seeall' :anon
-    not_implemented()
+    .param pmc module :optional
+    .local pmc mt
+    checktype(module, 'table')
+    mt = module.'get_metatable'()
+    $I0 = isa mt, 'LuaNil'
+    unless $I0 goto L1
+    new mt, .LuaTable
+    module.'set_metatable'(mt)
+L1:
+    # mt.__index = _G
+    $P0 = global '_G'
+    new $P1, .LuaString
+    set $P1, '__index'
+    mt[$P1] = $P0
 .end
 
 =back
