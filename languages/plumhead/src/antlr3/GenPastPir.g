@@ -195,30 +195,75 @@ node[String reg_mother]
         + "  # end of NUMBER                                                 \n"
       );
     }
+  | INTEGER
+    {
+      System.out.println( 
+          "                                                                  \n"
+        + "  # start of INTEGER                                              \n"
+        + "  past_temp = new 'PAST::Val'                                     \n"
+        + "      past_temp.'attr'( 'name', '" + $INTEGER.text + "', 1 )      \n"
+        + "      past_temp.'attr'( 'ctype', 'i+', 1 )                        \n"
+        + "      past_temp.'attr'( 'vtype', '.Integer', 1 )                  \n"
+        + "  " + $node.reg_mother + ".'push'( past_temp )                    \n"
+        + "  # end of INTEGER                                                \n"
+      );
+    }
   | {
       reg_num++;
       String reg = "reg_" + reg_num;
       System.out.print( 
           "                                                                   \n"
-        + "    # entering PLUS | MINUS | MUL_OP                               \n"
+        + "    # entering PLUS | MINUS | MUL_OP | BITWISE_OP                  \n"
         + "      .sym pmc " + reg + "                                         \n"
         + "      " + reg + " = new 'PAST::Op'                                 \n"
       );
     }
-    ^( infix=( PLUS | MINUS | MUL_OP ) node[reg] node[reg] )
+    ^( infix=( PLUS | MINUS | MUL_OP | BITWISE_OP ) node[reg] node[reg] )
     {
       // Todo. This is not nice, handle pirops in Plumhead.g
-      String pirop = $infix.text;
-      if      ( pirop.equals( "+" ) )  { pirop = "n_add"; }
-      else if ( pirop.equals( "-" ) )  { pirop = "n_sub"; }
-      else if ( pirop.equals( "*" ) )  { pirop = "n_mul"; }
-      else if ( pirop.equals( "/" ) )  { pirop = "n_div"; }
-      else if ( pirop.equals( "\%" ) ) { pirop = "n_mod"; }
+      String op = $infix.text;
+      String pirop = "";
+      if      ( op.equals( "+" ) )  { pirop = "n_add"; }
+      else if ( op.equals( "-" ) )  { pirop = "n_sub"; }
+      else if ( op.equals( "/" ) )  { pirop = "n_div"; }
+      else if ( op.equals( "*" ) )  { pirop = "n_mul"; }
+      else if ( op.equals( "\%" ) ) { pirop = "n_mod"; }
       
+      String name = op;
+      if      ( op.equals( "&" ) )  { name = "+&"; }
+      else if ( op.equals( "|" ) )  { name = "+|"; }
+      name = "infix:" + name;
+
       System.out.print( 
-          "  " + reg + ".'attr'( 'pirop', '" + pirop + "' , 1 )               \n"
+          "  " + reg + ".'attr'( 'pirop', '" + pirop + "', 1 )                \n"
+        + "  " + reg + ".'attr'( 'name',  '" + name + "' , 1 )                \n"
+        + "  " + reg + ".'attr'( 'islvalue',  0 , 1 )                \n"
         + "  " + $node.reg_mother + ".'push'( " + reg + " )                   \n"
-        + "    # leaving PLUS | MINUS | MUL_OP                                \n"
+        + "    # leaving PLUS | MINUS | MUL_OP | BITWISE_OP                   \n"
+      );
+    }
+  | {
+      reg_num++;
+      String reg = "reg_" + reg_num;
+      System.out.print( 
+          "                                                                   \n"
+        + "    # entering PREFIX                                              \n"
+        + "      .sym pmc " + reg + "                                         \n"
+        + "      " + reg + " = new 'PAST::Op'                                 \n"
+      );
+    }
+    ^( prefix=PREFIX node[reg] )
+    {
+      // Todo. This is not nice, handle pirops in Plumhead.g
+      String op = $prefix.text;
+      
+      String name = op;
+      name = "prefix:" + name;
+
+      System.out.print( 
+          "  " + reg + ".'attr'( 'name',  '" + name + "' , 1 )                \n"
+        + "  " + $node.reg_mother + ".'push'( " + reg + " )                   \n"
+        + "    # leaving PREFIX                                               \n"
       );
     }
   | {

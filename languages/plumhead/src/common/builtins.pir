@@ -44,6 +44,25 @@
 .end
 
 
+.sub 'infix:+&'
+    .param int a
+    .param int b
+
+    $I0 = band a, b
+
+    .return ($I0)
+.end
+
+.sub 'infix:+|'
+    .param int a
+    .param int b
+
+    $I0 = bor a, b
+
+    .return ($I0)
+.end
+
+
 .sub 'infix:<'
     .param pmc a
     .param pmc b

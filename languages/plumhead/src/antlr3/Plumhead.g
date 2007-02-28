@@ -20,6 +20,7 @@ tokens
   NOQUOTE_STRING;
   STMTS;
   ARRAY;
+  PREFIX;
 }
 
 @lexer::members
@@ -38,31 +39,31 @@ WS
       $channel = HIDDEN;       // send into nirwana 
     }
   ;
-DOUBLEQUOTE_STRING  : { codeMode }?=> '\"' ( ~'\"' )*  '\"' ;
-SINGLEQUOTE_STRING  : { codeMode }?=> '\'' ( ~'\'' )*  '\'' ;
-ECHO                : { codeMode }?=> 'echo' ;
+DOUBLEQUOTE_STRING  : { codeMode }?=>  '\"' ( ~'\"' )*  '\"' ;
+SINGLEQUOTE_STRING  : { codeMode }?=>  '\'' ( ~'\'' )*  '\'' ;
+ECHO                : { codeMode }?=>  'echo' ;
 
 fragment
-IDENT   : { codeMode }?=> ( 'a'..'z' | 'A'..'Z' )( 'a'..'z' | 'A'..'Z' )*;
+IDENT               : { codeMode }?=>  ( 'a'..'z' | 'A'..'Z' )( 'a'..'z' | 'A'..'Z' )*;
 
-SCALAR  : { codeMode }?=> '$' IDENT ;
+SCALAR              : { codeMode }?=>  '$' IDENT ;
 
 fragment
-INTEGER : { codeMode }?=> ('0'..'9' )+ ;
+DIGITS              : { codeMode }?=>  ('0'..'9' )+ ;
 
-NUMBER
-    :{ codeMode }?=>  INTEGER ('.' INTEGER)?
-    | '.' INTEGER
-    ;
+INTEGER             : { codeMode }?=>  DIGITS ;
 
-MINUS      :{ codeMode }?=>  '-' ;
-PLUS       :{ codeMode }?=>  '+' ;
-MUL_OP     :{ codeMode }?=>  '*'  | '/'  | '%' ;
-ASSIGN_OP  :{ codeMode }?=>  '=' ;
-REL_OP     :{ codeMode }?=>  '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
+NUMBER              : { codeMode }?=>  DIGITS? '.' DIGITS ;
 
-IF         :{ codeMode }?=>  'if' ;
-ELSE       :{ codeMode }?=>  'else' ;
+MINUS               : { codeMode }?=>  '-' ;
+PLUS                : { codeMode }?=>  '+' ;
+MUL_OP              : { codeMode }?=>  '*'  | '/'  | '%' ;
+BITWISE_OP          : { codeMode }?=>  '|'  | '&';
+ASSIGN_OP           : { codeMode }?=>  '=' ;
+REL_OP              : { codeMode }?=>  '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
+
+IF                  : { codeMode }?=>  'if' ;
+ELSE                : { codeMode }?=>  'else' ;
 
 
 // productions
@@ -105,8 +106,12 @@ statement
 expression
   : DOUBLEQUOTE_STRING
   | SINGLEQUOTE_STRING
-  | adding_expression
+  | bitwise_expression
   | s=SCALAR ( '[' key=expression ']' -> ^( ARRAY[$s] $key ) )?
+  ;
+
+bitwise_expression
+  : adding_expression ( BITWISE_OP^ adding_expression )*
   ;
 
 adding_expression
@@ -119,10 +124,11 @@ multiplying_expression
 
 unary_expression
   : postfix_expression
-  | MINUS postfix_expression -> ^( MUL_OP["n_mul"] NUMBER["-1"] postfix_expression )
+  | MINUS postfix_expression -> ^( PREFIX["-"] postfix_expression )
   ;
 
 postfix_expression
   : NUMBER
+  | INTEGER
   | '(' expression ')' -> expression
   ;
