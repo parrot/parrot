@@ -219,7 +219,7 @@ L2:
     # library not found in this path
     .return ($P0)
 L1:
-    funcname = mkfuncname(name)
+    funcname = mkfuncname($S1)
     ($P0, $S0) = loadfunc(filename, funcname)
     unless null $P0 goto L2
     loaderror($S1, filename, $S0)
@@ -244,7 +244,7 @@ L1:
     # root not found
     .return ($P0)
 L2:
-    funcname = mkfuncname(name)
+    funcname = mkfuncname($S1)
     ($P0, $S0) = loadfunc(filename, funcname)
     unless null $P0 goto L3
     loaderror($S1, filename, $S0)
@@ -254,10 +254,8 @@ L3:
 .end
 
 .sub 'mkfuncname' :anon
-    .param pmc modname
-    $S1 = modname
-    $S0 = 'luaopen_'
-    $S0 .= $S1
+    .param string modname
+    $S0 = 'luaopen_' . modname
     .return ($S0)
 .end
 
@@ -355,8 +353,6 @@ loader (see below).
 
 If there is any error loading or running the module, or if it cannot find
 any loader for the module, then C<require> signals an error.
-
-STILL INCOMPLETE (see loaders).
 
 =cut
 
@@ -493,19 +489,17 @@ the resulting file name. So, for instance, if the Lua path is
 the search for a Lua loader for module C<foo> will try to load the files
 C<./foo.lua>, C<./foo.lc>, and C</usr/local/foo/init.lua>, in that order.
 
-STILL INCOMPLETE.
+STILL INCOMPLETE (see default).
 
 =item C<package.pbcpath>
 
 The path used by C<require> to search for a PBC loader.
 
-STILL INCOMPLETE.
+STILL INCOMPLETE (see default).
 
 =item C<package.preload>
 
 A table to store loaders for specific modules (see C<require>).
-
-STILL INCOMPLETE.
 
 =item C<package.seeall (module)>
 

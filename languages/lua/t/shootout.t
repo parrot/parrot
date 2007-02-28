@@ -34,10 +34,15 @@ my @dir = ( 'lua', 't', 'shootout' );
 #       Hashtable update and k-nucleotide strings
 #
 
+TODO:
+{
+    local $TODO = 'broken';
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'knucleotide.lua-2.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'knucleotide-output.txt' ));
 $in = File::Spec->catfile( 'languages', @dir, 'knucleotide-input.txt' );
 language_output_is( 'lua', $code, $out, 'k-nucleotide', params => "< $in" );
+}
 
 #
 #   partial-sums
@@ -64,7 +69,7 @@ language_output_is( 'lua', $code, $out, 'fasta', params => '1000' );
 
 TODO:
 {
-    local $TODO = 'loadstring is still incomplete';
+    local $TODO = 'pb with loadstring ?';
 
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'pidigits.lua-2.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'pidigits-output.txt' ));
@@ -87,7 +92,7 @@ language_output_is( 'lua', $code, $out, 'nsieve' );
 
 TODO:
 {
-    local $TODO = 'string.gsub is still incomplete';
+    local $TODO = 'pb with string.gsub ?';
 
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'regexdna.lua-3.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'regexdna-output.txt' ));
