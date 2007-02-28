@@ -248,7 +248,7 @@ STILL INCOMPLETE (see gc).
     .param pmc opt :optional
     .param pmc arg :optional
     .local pmc ret
-    new $P0, .Array
+    new $P0, .FixedStringArray
     set $P0, 7
     $P0[0] = 'stop'
     $P0[1] = 'restart'
@@ -278,7 +278,7 @@ L2:
 .sub 'gc' :anon
     .param string what
     .param int data
-    .local num res
+    .local float res
     res = 0
 L_stop:
     unless what == 'stop' goto L_restart
@@ -743,8 +743,8 @@ L3:
     argerror("index out of range")
 L4:
     $I0 = n - i
-    new ret, .Array
-    ret = $I0
+    new ret, .FixedPMCArray
+    set ret, $I0
     $I1 = 0
     dec i
 L5:
@@ -920,7 +920,7 @@ length operator.
     e = optint(j, $I0)
     n = e - $I1
     inc n
-    new ret, .Array
+    new ret, .FixedPMCArray
     set ret, n
     new index, .LuaNumber
     set index, $I1

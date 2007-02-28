@@ -166,7 +166,7 @@ L2:
     n = pose - posi
     inc n
     .local pmc ret
-    new ret, .Array
+    new ret, .FixedPMCArray
     set ret, n
     .local int i
     i = 0
@@ -349,7 +349,7 @@ L7:
     .param pmc match
     .param int whole
     .local pmc ret
-    new ret, .Array
+    new ret, .FixedPMCArray
     .local pmc capts
     capts = match.'get_array'()
     if null capts goto L1
@@ -415,7 +415,7 @@ This function does not accept string values containing embedded zeros.
     $I1 = length strfrmt
     b = ''
     arg = 0
-    new $P1, .Array
+    new $P1, .FixedPMCArray
     set $P1, 1
     idx = 0
 L1:

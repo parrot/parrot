@@ -804,7 +804,7 @@ L1:
     .local int i
     .local pmc format
     narg = formats
-    new ret, .Array
+    new ret, .FixedPMCArray
     set ret, narg
     i = 0
 L2:
@@ -895,7 +895,7 @@ position to the end of the file, and returns its size.
     .local pmc f
     .local pmc ret
     tofile(self)
-    new modenames, .Array
+    new modenames, .FixedStringArray
     set modenames, 3
     modenames[0] = 'set'
     modenames[1] = 'cur'
@@ -949,7 +949,7 @@ NOT YET IMPLEMENTED.
     .local pmc f
     .local pmc ret
     tofile(self)
-    new modenames, .Array
+    new modenames, .FixedStringArray
     set modenames, 3
     modenames[0] = 'no'
     modenames[1] = 'full'
@@ -957,7 +957,7 @@ NOT YET IMPLEMENTED.
     $S1 = checkstring(mode)
     $I1 = checkoption($S1, modenames)
     $I2 = optint(size, 512)     # LUAL_BUFFERSIZE
-    new mode, .Array
+    new mode, .FixedIntegerArray
     set mode, 3
     mode[0] = 0     # PIO_NONBUF
     mode[1] = 2     # PIO_FULLBUF
