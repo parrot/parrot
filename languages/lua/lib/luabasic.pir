@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -240,15 +240,78 @@ sets C<arg>/100 as the new value for the I<step multiplier> of the collector.
 
 =back
 
-DUMMY IMPLEMENTATION.
+STILL INCOMPLETE (see gc).
 
 =cut
 
 .sub '_lua_collectgarbage' :anon
     .param pmc opt :optional
     .param pmc arg :optional
-    $S0 = checkstring(opt)
-#    not_implemented()
+    .local pmc ret
+    new $P0, .Array
+    set $P0, 7
+    $P0[0] = 'stop'
+    $P0[1] = 'restart'
+    $P0[2] = 'collect'
+    $P0[3] = 'count'
+    $P0[4] = 'step'
+    $P0[5] = 'setpause'
+    $P0[6] = 'setstepmul'
+    $S1 = optstring(opt, 'collect')
+    $I1 = checkoption($S1, $P0)
+    $I2 = optint(arg, 0)
+    $N0 = gc($S1, $I2)
+    unless $S1 == 'step' goto L1
+    new ret, .LuaBoolean
+    $I0 = $N0
+    set ret, $I0
+    goto L2
+L1:
+    new ret, .LuaNumber
+    set ret, $N0
+L2:
+    .return (ret)
+.end
+
+.include 'interpinfo.pasm'
+
+.sub 'gc' :anon
+    .param string what
+    .param int data
+    .local num res
+    res = 0
+L_stop:
+    unless what == 'stop' goto L_restart
+    collectoff
+    goto L_end
+L_restart:
+    unless what == 'restart' goto L_collect
+    collecton
+    goto L_end
+L_collect:
+    unless what == 'collect' goto L_count
+    collect
+    goto L_end
+L_count:
+    unless what == 'count' goto L_step
+    interpinfo $I0, .INTERPINFO_TOTAL_MEM_ALLOC
+    # GC values are expressed in Kbytes
+    res = $I0 / 1024
+    goto L_end
+L_step:
+    unless what == 'step' goto L_setpause
+    goto L_end
+L_setpause:
+    unless what == 'setpause' goto L_setstepmul
+    # not_implemented()
+    goto L_end
+L_setstepmul:
+    unless what == 'setstepmul' goto L_default
+    goto L_end
+L_default:
+    res = -1
+L_end:
+    .return (res)
 .end
 
 

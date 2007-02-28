@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 43;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function assert' );
@@ -52,6 +52,30 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function assert(false, nil
 assert(false, nil)
 CODE
 /assertion failed!/
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function collectgarbage "stop/restart/collect"' );
+print(collectgarbage('stop'))
+print(collectgarbage('restart'))
+print(collectgarbage('collect'))
+print(collectgarbage())
+CODE
+0
+0
+0
+0
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function collectgarbage "count"' );
+print(collectgarbage('count'))
+CODE
+/^\d+(\.\d+)?$/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function collectgarbage invalid' );
+collectgarbage('unknown')
+CODE
+/invalid option 'unknown'/
 OUTPUT
 
 unlink('../lib1.lua') if ( -f '../lib1.lua' );
