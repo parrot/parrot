@@ -129,7 +129,7 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
             for (i=0; i<n; i++); {
                 PMC *key = VTABLE_get_pmc_keyed_int(interp, attribs, i);
                 PMC *value = VTABLE_get_pmc_keyed(interp, attribs, key);
-                () = PMINVOKE(interp, pmc, method_name, PMC* key, PMC* value);
+                PMINVOKE(interp, pmc, method_name, PMC* key, PMC* value);
             }
         }
         rv = VTABLE_get_attr_str(interp, pmc, attributes_string);

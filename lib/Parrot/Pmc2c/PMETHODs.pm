@@ -180,8 +180,11 @@ sub gen_arg_accessor {
     croak "$_ not recognized as INTVAL, FLOATVAL, STRING, or PMC";
   }
 
-  if ($arg_type eq 'param' or $arg_type eq 'result') {
+  if ($arg_type eq 'param') {
     return "    $type->{s} $name = CTX_REG_$type->{l}(ctx, $index);\n";
+  }
+  elsif ($arg_type eq 'result') {
+    return "    $name = CTX_REG_$type->{l}(ctx, $index);\n";
   }
   elsif ($arg_type eq 'name') {
     return "    CTX_REG_$type->{l}(ctx, $index) = string_from_const_cstring(interp, $name, 0);\n";
