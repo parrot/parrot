@@ -333,9 +333,10 @@ be B<nil>).
     .local pmc ret
     checktype(table, 'table')
     if null metatable goto L0
-    $S0 = typeof metatable
-    if $S0 == 'nil' goto L1
-    if $S0 == 'table' goto L1
+    $I0 = isa metatable, 'LuaNil'
+    if $I0 goto L1
+    $I0 = isa metatable, 'LuaTable'
+    if $I0 goto L1
 L0:
     argerror("nil or table expected")
 L1:

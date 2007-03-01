@@ -796,9 +796,10 @@ This function returns C<table>.
     .param pmc metatable :optional
     checktype(table, 'table')
     if null metatable goto L0
-    $S0 = typeof metatable
-    if $S0 == 'nil' goto L1
-    if $S0 == 'table' goto L1
+    $I0 = isa metatable, 'LuaNil'
+    if $I0 goto L1
+    $I0 = isa metatable, 'LuaTable'
+    if $I0 goto L1
 L0:
     argerror("nil or table expected")
 L1:
@@ -968,12 +969,15 @@ _handler:
     .local pmc e
     .local pmc msg
     set status, 0
-    $S0 = typeof err
-    unless $S0 == 'function' goto L0
+    $I0 = isa err, 'LuaFunction'
+    if $I0 goto L1
+    $I0 = isa err, 'LuaClosure'
+    unless $I0 goto L2
+L1:
     .get_results (e)
     (ret :slurpy) = err(e)
     .return (status, ret :flat)
-L0:
+L2:
     .return (status)
 .end
 

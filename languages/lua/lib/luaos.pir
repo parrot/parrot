@@ -484,7 +484,7 @@ Returns a string with a file name that can be used for a temporary file.
 The file must be explicitly opened before its use and explicitly removed
 when no longer needed.
 
-NOT YET IMPLEMENTED (no tmpname()).
+NOT YET IMPLEMENTED (no tmpname).
 
 =cut
 
