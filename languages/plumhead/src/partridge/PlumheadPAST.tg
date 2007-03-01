@@ -209,6 +209,9 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
             if mul_op != '/' goto not_div
                 pirop = 'n_div'
             not_div:
+            if mul_op != '%' goto not_mod
+                pirop = 'n_mod'
+            not_mod:
             mul_op = 'infix:' . mul_op 
             past_multiplicand_0 = tree.'get'('past', multiplicand_0, 'Plumhead::Grammar::expression')
             past = new 'PAST::Op'
