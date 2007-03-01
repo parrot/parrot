@@ -95,12 +95,18 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     set $P1, 'write'
     _io[$P1] = _io_write
 
+    .const .Sub _io_fclose = '_io_fclose'
+    set $P1, '__close'
+    _io[$P1] = _io_fclose
+
     #
     #    File
     #
 
     .local pmc _file
-    new _file, .LuaTable
+    _file = newmetatable('ParrotIO')
+    set $P1, '__index'
+    _file[$P1] = _file
 
     .const .Sub _file_close = '_io_close'
     set $P1, 'close'
@@ -130,25 +136,13 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     set $P1, 'write'
     _file[$P1] = _file_write
 
-#    .const .Sub _file__tostring = '_file__tostring'
-#    set $P1, '__tostring'
-#    _file[$P1] = _file__tostring
-
-    .local pmc _lua_mt_file
-    new _lua_mt_file, .LuaTable
-    set $P1, '__index'
-    _lua_mt_file[$P1] = _file
+    .const .Sub _file__gc = '_file__gc'
+    set $P1, '__gc'
+    _file[$P1] = _file__gc
 
     .const .Sub _file__tostring = '_file__tostring'
     set $P1, '__tostring'
-    _lua_mt_file[$P1] = _file__tostring
-
-
-    .local pmc _lua__REGISTRY
-    _lua__REGISTRY = global '_REGISTRY'
-    set $P1, 'ParrotIO'
-    _lua__REGISTRY[$P1] = _lua_mt_file
-
+    _file[$P1] = _file__tostring
 
     #
     #    Standard Files
@@ -162,7 +156,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     $P2 = getstdin
     new $P0, .LuaUserdata
     setattribute $P0, 'data', $P2
-    $P0.'set_metatable'(_lua_mt_file)
+    $P0.'set_metatable'(_file)
     _io[$P1] = $P0
     set $P3, 0
     _lua__ENVIRON[$P3] = $P0
@@ -171,7 +165,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     $P2 = getstdout
     new $P0, .LuaUserdata
     setattribute $P0, 'data', $P2
-    $P0.'set_metatable'(_lua_mt_file)
+    $P0.'set_metatable'(_file)
     _io[$P1] = $P0
     set $P3, 1
     _lua__ENVIRON[$P3] = $P0
@@ -180,7 +174,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     $P2 = getstderr
     new $P0, .LuaUserdata
     setattribute $P0, 'data', $P2
-    $P0.'set_metatable'(_lua_mt_file)
+    $P0.'set_metatable'(_file)
     _io[$P1] = $P0
     set $P3, 2
     _lua__ENVIRON[$P3] = $P0
@@ -366,12 +360,14 @@ L1:
 
 .sub 'aux_close' :anon
     .param pmc file
-    .local pmc f
-    f = topfile(file)
-    close f
-    null f
-    setattribute file, 'data', f
-    .return (1)
+    # TODO: getfenv
+    $P0 = global '_G'
+    new $P1, .LuaString
+    set $P1, 'io'
+    $P0 = $P0[$P1]
+    set $P1, '__close'
+    $P0 = $P0[$P1]
+    .return $P0(file)
 .end
 
 .sub 'aux_lines' :anon :lex
@@ -416,10 +412,7 @@ file.
     file = getiofile(1)
 L1:
     tofile(file)
-    $I0 = aux_close(file)
-    new ret, .LuaBoolean
-    set ret, $I0
-    .return (ret)
+    .return aux_close(file)
 .end
 
 
@@ -630,8 +623,6 @@ NOT YET IMPLEMENTED.
 =item C<io.read (format1, ...)>
 
 Equivalent to C<io.input():read>.
-
-STILL INCOMPLETE (see file:read).
 
 =cut
 
@@ -1010,6 +1001,38 @@ L2:
     new ret, .LuaBoolean
     set ret, 1
     .return (ret)
+.end
+
+
+.sub '_io_fclose' :anon
+    .param pmc file
+    .local pmc f
+    .local pmc ret
+    f = topfile(file)
+    close f
+    null f
+    setattribute file, 'data', f
+    new ret, .LuaBoolean
+    set ret, 1
+    .return (ret)
+.end
+
+
+.sub '_file__gc' :method :anon
+    .local pmc f
+    f = topfile(self)
+    # ignore closed files and standard files
+    if null f goto L1
+    $P0 = getstdin
+    if $P0 == f goto L1
+    $P0 = getstdout
+    if $P0 == f goto L1
+    $P0 = getstderr
+    if $P0 == f goto L1
+    print "closing file for you.\n"
+    aux_close(self)
+L1:
+    .return ()
 .end
 
 

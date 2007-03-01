@@ -306,6 +306,27 @@ Support variable number of arguments function call.
 .end
 
 
+=item C<newmetatable (tname)>
+
+=cut
+
+.sub 'newmetatable'
+    .param string tname
+    .local pmc _lua__REGISTRY
+    .local pmc ret
+    _lua__REGISTRY = global '_REGISTRY'
+    new $P1, .LuaString
+    set $P1, tname
+    ret = _lua__REGISTRY[$P1]
+    $I0 = isa ret, 'LuaNil'
+    unless $I0 goto L1
+    new ret, .LuaTable
+    _lua__REGISTRY[$P1] = ret
+L1:
+    .return (ret)
+.end
+
+
 =item C<not_implemented ()>
 
 =cut
