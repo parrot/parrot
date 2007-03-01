@@ -42,6 +42,8 @@ WS
 DOUBLEQUOTE_STRING  : { codeMode }?=>  '\"' ( ~'\"' )*  '\"' ;
 SINGLEQUOTE_STRING  : { codeMode }?=>  '\'' ( ~'\'' )*  '\'' ;
 ECHO                : { codeMode }?=>  'echo' ;
+PAREN_OPEN          : { codeMode }?=>  '(' ;
+PAREN_CLOSE         : { codeMode }?=>  ')' ;
 
 fragment
 IDENT               : { codeMode }?=>  ( 'a'..'z' | 'A'..'Z' )( 'a'..'z' | 'A'..'Z' )*;
@@ -94,7 +96,7 @@ statements
 
 statement
   : ECHO^ expression ';'! 
-  | IF '(' relational_expression ')' '{' s1=statements '}'
+  | IF PAREN_OPEN relational_expression PAREN_CLOSE '{' s1=statements '}'
     ( ELSE '{' s2=statements '}' -> ^( IF relational_expression ^( STMTS $s1 ) ^( STMTS $s2 ) )
     |                            -> ^( IF relational_expression ^( STMTS $s1 ) )
     ) 
@@ -130,5 +132,5 @@ unary_expression
 postfix_expression
   : NUMBER
   | INTEGER
-  | '(' expression ')' -> expression
+  | PAREN_OPEN expression PAREN_CLOSE -> expression
   ;
