@@ -23,6 +23,10 @@ C<test_lex> is a dumper for Lua 5.1 lexicography.
     $P0.'parsegrammar'('Lua::TestLex')
     $P0.'astgrammar'('Lua::DumpLex')
 
+    $S0 = "Lexico of Lua 5.1 on Parrot  Copyright (C) 2005-2007, The Perl Foundation.\n"
+    $P0.'commandline_banner'($S0)
+    $P0.'commandline_prompt'('> ')
+
     # import PGE::Util::die into Lua::TestLex
     $P0 = get_hll_global ['PGE::Util'], 'die'
     set_hll_global ['Lua::TestLex'], 'die', $P0
