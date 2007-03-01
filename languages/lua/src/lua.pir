@@ -12,6 +12,10 @@
     $P0.'language'('Lua')
     $P0.'parsegrammar'('Lua::Grammar')
     $P0.'astgrammar'('ASTGrammar')
+
+    $S0 = "Lua 5.1 on Parrot  Copyright (C) 2005-2007, The Perl Foundation.\n"
+    $P0.'commandline_banner'($S0)
+    $P0.'commandline_prompt'('> ')
 .end
 
 

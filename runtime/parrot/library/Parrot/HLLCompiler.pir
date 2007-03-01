@@ -20,6 +20,11 @@ running compilers from a command line.
     addattribute $P0, '$ostgrammar'
     addattribute $P0, '@stages'
     addattribute $P0, '$!compsub'
+
+    # the commandline_banner is the welcome message for interactive mode
+    addattribute $P0, '$commandline_banner'
+    # the commandline_prompt is the prompt to show for input
+    addattribute $P0, '$commandline_prompt'
 .end
 
 =head2 Methods
@@ -103,6 +108,18 @@ Accessor for the 'ostgrammar' attribute.
     .param string value        :optional
     .param int has_value       :opt_flag
     .return self.'attr'('$ostgrammar', value, has_value)
+.end
+
+.sub 'commandline_banner' :method
+    .param string value        :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('$commandline_banner', value, has_value)
+.end
+
+.sub 'commandline_prompt' :method
+    .param string value        :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('$commandline_prompt', value, has_value)
 .end
 
 =item removestage(string stagename)
@@ -274,8 +291,8 @@ to any options and return the resulting parse tree.
 
 =item ast(source [, "option" => value, ...])
 
-Transform C<source> into an AST using the compiler's 
-C<astgrammar> according to any options, and return the 
+Transform C<source> into an AST using the compiler's
+C<astgrammar> according to any options, and return the
 resulting ast.
 
 =cut
@@ -347,6 +364,10 @@ specifies the encoding to use for the input (e.g., "utf8").
     target = adverbs['target']
     target = downcase target
 
+    # on startup show the welcome message
+    $P0 = self.'commandline_banner'()
+    printerr $P0
+
     .local pmc stdin
     .local int has_readline
     stdin = getstdin
@@ -359,6 +380,11 @@ specifies the encoding to use for the input (e.g., "utf8").
     unless stdin goto interactive_end
     ##  FIXME:  we have to avoid stdin.'readline'() when readline
     ##  libraries aren't present (RT #41103)
+
+    # for each input line, print the prompt
+    $P0 = self.'commandline_prompt'()
+    printerr $P0
+
     if has_readline < 0 goto no_readline
     code = stdin.'readline'('> ')
     if null code goto interactive_end
@@ -606,7 +632,7 @@ resulting ost.
 
 =item register(string name, pmc compsub)  # DEPRECATED
 
-(Deprecated.) Registers this compiler object as C<name> and 
+(Deprecated.) Registers this compiler object as C<name> and
 using C<compsub> as the subroutine to call for performing compilation.
 
 =cut

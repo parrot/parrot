@@ -36,6 +36,9 @@ object.
     $P0.'parsegrammar'('Pynie::Grammar')
     $P0.'astgrammar'('Pynie::PAST::Grammar')
 
+    $P0.'commandline_banner'("Pynie: a Python compiler for Parrot.\n")
+    $P0.'commandline_prompt'('>>> ')
+
     $P0 = get_hll_global ['PGE::Util'], 'die'
     set_hll_global ['Pynie::Grammar'], 'die', $P0
 .end
