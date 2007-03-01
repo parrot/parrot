@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -88,7 +88,7 @@ See "Lua 5.1 Reference Manual", section 5.8 "Operating System Facilities".
 Returns an approximation of the amount in seconds of CPU time used by the
 program.
 
-NOT YET IMPLEMENTED.
+NOT YET IMPLEMENTED (no clock).
 
 =cut
 
@@ -122,15 +122,86 @@ When called without arguments, C<date> returns a reasonable date and time
 representation that depends on the host system and on the current locale
 (that is, C<os.date()> is equivalent to C<os.date("%c")>).
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE (see strftime).
 
 =cut
+
+.include 'tm.pasm'
 
 .sub '_os_date' :anon
     .param pmc format :optional
     .param pmc time :optional
-    $S0 = optstring(format, "%c")
-    $I0 = optint(time, -1)
+    .local pmc ret
+    .local int t
+    $S1 = optstring(format, '%c')
+    $I0 = time
+    t = optint(time, $I0)
+    $S0 = substr $S1, 0, 1
+    unless $S0 == '!' goto L1
+    $P0 = decodetime t
+    $S1 = substr $S1, 1
+    goto L2
+L1:
+    $P0 = decodelocaltime t
+L2:
+    unless null $P0 goto L3
+    new ret, .LuaNil
+    .return (ret)
+L3:
+    unless $S1 == '*t' goto L4
+    new ret, .LuaTable
+    new $P1, .LuaString
+    new $P2, .LuaNumber
+    set $P1, 'sec'
+    $I0 = $P0[.TM_SEC]
+    set $P2, $I0
+    ret[$P1] = $P2
+    set $P1, 'min'
+    $I0 = $P0[.TM_MIN]
+    set $P2, $I0
+    ret[$P1] = $P2
+    set $P1, 'hour'
+    $I0 = $P0[.TM_HOUR]
+    set $P2, $I0
+    ret[$P1] = $P2
+    set $P1, 'day'
+    $I0 = $P0[.TM_MDAY]
+    set $P2, $I0
+    ret[$P1] = $P2
+    set $P1, 'month'
+    $I0 = $P0[.TM_MON]
+    set $P2, $I0
+    ret[$P1] = $P2
+    set $P1, 'year'
+    $I0 = $P0[.TM_YEAR]
+    set $P2, $I0
+    ret[$P1] = $P2
+    set $P1, 'wday'
+    $I0 = $P0[.TM_WDAY]
+    inc $I0
+    set $P2, $I0
+    ret[$P1] = $P2
+    set $P1, 'yday'
+    $I0 = $P0[.TM_YDAY]
+    inc $I0
+    set $P2, $I0
+    ret[$P1] = $P2
+    new $P2, .LuaBoolean
+    set $P1, 'isdst'
+    $I0 = $P0[.TM_ISDST]
+    set $P2, $I0
+    ret[$P1] = $P2
+    .return (ret)
+L4:
+    $S0 = strftime($S1, $P0)
+    new ret, .LuaString
+    set ret, $P0
+    .return (ret)
+.end
+
+.sub 'strftime' :anon
+    .param string format
+    .param pmc t
     not_implemented()
 .end
 
@@ -140,16 +211,18 @@ NOT YET IMPLEMENTED.
 Returns the number of seconds from time C<t1> to time C<t2>. In Posix,
 Windows, and some other systems, this value is exactly C<t2-t1>.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub '_os_difftime' :anon
     .param pmc t2 :optional
     .param pmc t1 :optional
-    $I0 = checknumber(t2)
+    .local pmc ret
+    $I2 = checknumber(t2)
     $I1 = optint(t1, 0)
-    not_implemented()
+    $I0 = $I2 - $I1
+    new ret, .LuaNumber
+    set ret, $I0
+    .return (ret)
 .end
 
 
@@ -169,12 +242,12 @@ shell is available and zero otherwise.
 .sub '_os_execute' :anon
     .param pmc command :optional
     .local pmc ret
-    $S0 = optstring(command, '')
-    unless $S0 == '' goto L1
+    $S1 = optstring(command, '')
+    unless $S1 == '' goto L1
     $I0 = 1
     goto L2
 L1:
-    $I0 = spawnw $S0
+    $I0 = spawnw $S1
     $I0 = $I0 / 256
 L2:
     new ret, .LuaNumber
@@ -192,8 +265,8 @@ program. The default value for C<code> is the success code.
 
 .sub '_os_exit' :anon
     .param pmc code :optional
-    $I0 = optint(code, 0)
-    exit $I0
+    $I1 = optint(code, 0)
+    exit $I1
 .end
 
 
@@ -207,15 +280,15 @@ if the variable is not defined.
 .sub '_os_getenv' :anon
     .param pmc varname :optional
     .local pmc ret
-    $S0 = checkstring(varname)
+    $S1 = checkstring(varname)
     new $P0, .Env
-    $S1 = $P0[$S0]
-    if $S1 goto L0
+    $S0 = $P0[$S1]
+    if $S0 goto L0
     new ret, .LuaNil
     .return (ret)
 L0:
     new ret, .LuaString
-    set ret, $S1
+    set ret, $S0
     .return (ret)
 .end
 
@@ -231,11 +304,11 @@ describing the error.
 .sub '_os_remove' :anon
     .param pmc filename :optional
     .local pmc ret
-    $S0 = checkstring(filename)
-    $S1 = $S0
+    $S1 = checkstring(filename)
+    $S0 = $S1
     new $P0, .OS
     push_eh _handler
-    $P0.'rm'($S0)
+    $P0.'rm'($S1)
     new ret, .LuaBoolean
     set ret, 1
     .return (ret)
@@ -245,11 +318,11 @@ _handler:
     .local pmc e
     .local string s
     .get_results (e, s)
-    concat $S1, ': '
-    concat $S1, s
+    concat $S0, ': '
+    concat $S0, s
     new nil, .LuaNil
     new msg, .LuaString
-    set msg, $S1
+    set msg, $S0
     .return (nil, msg)
 .end
 
@@ -265,12 +338,12 @@ fails, it returns B<nil>, plus a string describing the error.
     .param pmc oldname :optional
     .param pmc newname :optional
     .local pmc ret
-    $S0 = checkstring(oldname)
-    $S2 = $S0
-    $S1 = checkstring(newname)
+    $S1 = checkstring(oldname)
+    $S0 = $S1
+    $S2 = checkstring(newname)
     new $P0, .OS
     push_eh _handler
-    $P0.'rename'($S0, $S1)
+    $P0.'rename'($S1, $S2)
     new ret, .LuaBoolean
     set ret, 1
     .return (ret)
@@ -280,11 +353,11 @@ _handler:
     .local pmc e
     .local string s
     .get_results (e, s)
-    concat $S2, ': '
-    concat $S2, s
+    concat $S0, ': '
+    concat $S0, s
     new nil, .LuaNil
     new msg, .LuaString
-    set msg, $S2
+    set msg, $S0
     .return (nil, msg)
 .end
 
@@ -297,14 +370,25 @@ C<"all">, C<"collate">, C<"ctype">, C<"monetary">, C<"numeric">, or C<"time">;
 the default category is C<"all">. The function returns the name of the new
 locale, or B<nil> if the request cannot be honored.
 
-NOT YET IMPLEMENTED.
+NOT YET IMPLEMENTED (no setlocale).
 
 =cut
 
 .sub '_os_setlocale' :anon
     .param pmc locale :optional
     .param pmc category :optional
-    $S1 = optstring(category, 'all')
+    .local pmc catnames
+    $S1 = optstring(locale, '')
+    new catnames, .FixedStringArray
+    set catnames, 6
+    catnames[0] = 'all'
+    catnames[1] = 'collate'
+    catnames[2] = 'ctype'
+    catnames[3] = 'monetary'
+    catnames[4] = 'numeric'
+    catnames[5] = 'time'
+    $S2 = optstring(category, 'all')
+    $I2 = checkoption($S2, catnames)
     not_implemented()
 .end
 
@@ -322,7 +406,7 @@ seconds since some given start time (the "epoch"). In other systems, the
 meaning is not specified, and the number returned by C<time> can be used only
 as an argument to C<date> and C<difftime>.
 
-STILL INCOMPLETE.
+STILL INCOMPLETE (no mktime).
 
 =cut
 
@@ -330,8 +414,8 @@ STILL INCOMPLETE.
     .param pmc table :optional
     .local pmc ret
     if null table goto L0
-    $S0 = typeof table
-    if $S0 != 'nil' goto L1
+    $I0 = isa table, 'LuaNil'
+    unless $I0 goto L1
 L0:
     $I0 = time
     new ret, .LuaNumber
@@ -339,7 +423,58 @@ L0:
     .return (ret)
 L1:
     checktype(table, 'table')
+    $I1 = getfield(table, 'sec', 0)
+    $I2 = getfield(table, 'min', 0)
+    $I3 = getfield(table, 'hour', 12)
+    $I4 = getfield(table, 'day', -1)
+    $I5 = getfield(table, 'month', -1)
+    $I5 -= 1
+    $I6 = getfield(table, 'year', -1)
+    $I6 -= 1900
+    $I7 = getboolfield(table, 'isdst')
     not_implemented()
+.end
+
+.sub 'getfield' :anon
+    .param pmc t
+    .param string key
+    .param int d
+    .local int ret
+    new $P1, .LuaString
+    set $P1, key
+    $P0 = t[$P1]
+    $P0 = $P0.'tonumber'()
+    $I0 = isa $P0, 'LuaNumber'
+    unless $I0 goto L1
+    ret = $P0
+    goto L2
+L1:
+    unless d < 0 goto L3
+    $S0 = "field '"
+    $S0 .= key
+    $S0 .= "' missing in date table"
+    error($S0)
+L3:
+    ret = d
+L2:
+    .return (ret)
+.end
+
+.sub 'getboolfield' :anon
+    .param pmc t
+    .param string key
+    .local int ret
+    new $P1, .LuaString
+    set $P1, key
+    $P0 = t[$P1]
+    $I0 = isa $P0, 'LuaNil'
+    unless $I0 goto L1
+    ret = -1
+    goto L2
+L1:
+    ret = istrue $P0
+L2:
+    .return (ret)
 .end
 
 
@@ -349,7 +484,7 @@ Returns a string with a file name that can be used for a temporary file.
 The file must be explicitly opened before its use and explicitly removed
 when no longer needed.
 
-NOT YET IMPLEMENTED.
+NOT YET IMPLEMENTED (no tmpname()).
 
 =cut
 

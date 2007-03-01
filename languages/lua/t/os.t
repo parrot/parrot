@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -27,10 +27,27 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 17;
 use Test::More;
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function execute' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.date' );
+d = os.date("!*t", 0)
+print(d.year, d.month, d.day, d.hour, d.min, d.sec)
+print(d.wday, d.yday, d.isdst)
+CODE
+1970	1	1	0	0	0
+5	1	false
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.difftime' );
+print(os.difftime(1234, 1200))
+print(os.difftime(1234))
+CODE
+34
+1234
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.execute' );
 cmd = "perl -e \"print 'test'; exit(2)\""
 r = os.execute(cmd)
 print(r)
@@ -38,14 +55,14 @@ CODE
 test2
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function execute' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.execute' );
 r = os.execute()
 print(r)
 CODE
 1
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function exit' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.exit' );
 print("reached")
 os.exit()
 print("not reached")
@@ -53,7 +70,7 @@ CODE
 reached
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function getenv' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.getenv' );
 print(os.getenv("PARROT_TMP"))
 CODE
 nil
@@ -61,7 +78,7 @@ OUTPUT
 
 $ENV{PARROT_TMP} = "GETENV_PARROT";
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function getenv' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.getenv' );
 print(os.getenv("PARROT_TMP"))
 CODE
 GETENV_PARROT
@@ -71,7 +88,7 @@ open my $X, '>', '../file.rm';
 print {$X} 'file to remove';
 close $X;
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function remove' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.remove' );
 r = os.remove("file.rm")
 print(r)
 CODE
@@ -81,7 +98,7 @@ OUTPUT
 ok( !-e '../file.rm', 'Test that the file is removed' );
 unlink('../file.rm') if ( -e '../file.rm' );
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function remove' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.remove' );
 r, msg = os.remove("file.rm")
 print(r)
 print(msg)
@@ -94,7 +111,7 @@ open $X, '>', '../file.old';
 print {$X} 'file to rename';
 close $X;
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function rename' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.rename' );
 r = os.rename("file.old", "file.new")
 print(r)
 CODE
@@ -106,7 +123,7 @@ ok( -e '../file.new', 'Test that new file is here' );
 unlink('../file.old') if ( -e '../file.old' );
 unlink('../file.new') if ( -e '../file.new' );
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function rename' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.rename' );
 r, msg = os.rename("file.old", "file.new")
 print(r)
 print(msg)
@@ -115,10 +132,22 @@ nil
 file.old: No such file or directory
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function time' );
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time' );
 print(os.time())
 CODE
 /\d+/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time' );
+print(os.time(nil))
+CODE
+/\d+/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time (missing field)' );
+print(os.time({}))
+CODE
+/field 'day' missing in date table/
 OUTPUT
 
 # Local Variables:
