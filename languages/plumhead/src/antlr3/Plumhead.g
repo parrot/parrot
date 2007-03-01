@@ -29,43 +29,32 @@ tokens
 }
 
 // real tokens
-SEA        :  { !codeMode }?=> (~'<')+ ;
-CODE_START :  '<?php'              { codeMode = true; } ;
-CODE_END   :  { codeMode }?=> '?>' '\n'? { codeMode = false; } ;
-WS
-  : { codeMode }?=> 
-    ( ' ' | '\t' | '\r' | '\n' )+
-    {
-      $channel = HIDDEN;       // send into nirwana 
-    }
-  ;
-DOUBLEQUOTE_STRING  : { codeMode }?=>  '\"' ( ~'\"' )*  '\"' ;
-SINGLEQUOTE_STRING  : { codeMode }?=>  '\'' ( ~'\'' )*  '\'' ;
-ECHO                : { codeMode }?=>  'echo' ;
-PAREN_OPEN          : { codeMode }?=>  '(' ;
-PAREN_CLOSE         : { codeMode }?=>  ')' ;
+SEA                 : { !codeMode }?=>  (~'<')+ ;
+CODE_START          :                   '<?php'                       { codeMode = true;  } ;
+CODE_END            : {  codeMode }?=>  '?>' '\n'?                    { codeMode = false; } ;
+WS                  : {  codeMode }?=>  ( ' ' | '\t' | '\r' | '\n' )+ { $channel = HIDDEN; } ;
+DOUBLEQUOTE_STRING  : {  codeMode }?=>  '\"' ( ~'\"' )*  '\"' ;
+SINGLEQUOTE_STRING  : {  codeMode }?=>  '\'' ( ~'\'' )*  '\'' ;
+ECHO                : {  codeMode }?=>  'echo' ;
+PAREN_OPEN          : {  codeMode }?=>  '(' ;
+PAREN_CLOSE         : {  codeMode }?=>  ')' ;
 
-fragment
-IDENT               : { codeMode }?=>  ( 'a'..'z' | 'A'..'Z' )( 'a'..'z' | 'A'..'Z' )*;
+fragment IDENT      : {  codeMode }?=>  ( 'a'..'z' | 'A'..'Z' )( 'a'..'z' | 'A'..'Z' )*;
+SCALAR              : {  codeMode }?=>  '$' IDENT ;
 
-SCALAR              : { codeMode }?=>  '$' IDENT ;
+fragment DIGITS     : {  codeMode }?=>  ('0'..'9' )+ ;
+INTEGER             : {  codeMode }?=>  DIGITS ;
+NUMBER              : {  codeMode }?=>  DIGITS? '.' DIGITS ;
 
-fragment
-DIGITS              : { codeMode }?=>  ('0'..'9' )+ ;
+MINUS               : {  codeMode }?=>  '-' ;
+PLUS                : {  codeMode }?=>  '+' ;
+MUL_OP              : {  codeMode }?=>  '*'  | '/'  | '%' ;
+BITWISE_OP          : {  codeMode }?=>  '|'  | '&';
+ASSIGN_OP           : {  codeMode }?=>  '=' ;
+REL_OP              : {  codeMode }?=>  '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
 
-INTEGER             : { codeMode }?=>  DIGITS ;
-
-NUMBER              : { codeMode }?=>  DIGITS? '.' DIGITS ;
-
-MINUS               : { codeMode }?=>  '-' ;
-PLUS                : { codeMode }?=>  '+' ;
-MUL_OP              : { codeMode }?=>  '*'  | '/'  | '%' ;
-BITWISE_OP          : { codeMode }?=>  '|'  | '&';
-ASSIGN_OP           : { codeMode }?=>  '=' ;
-REL_OP              : { codeMode }?=>  '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
-
-IF                  : { codeMode }?=>  'if' ;
-ELSE                : { codeMode }?=>  'else' ;
+IF                  : {  codeMode }?=>  'if' ;
+ELSE                : {  codeMode }?=>  'else' ;
 
 
 // productions

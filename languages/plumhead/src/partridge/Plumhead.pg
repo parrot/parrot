@@ -18,7 +18,12 @@ token ECHO                    { <'echo'> }
 token PAREN_OPEN              { \( }
 token PAREN_CLOSE             { \) }
 
-token NUMBER                  { \d+ ( . \d+ )? | . \d+ }
+# TODO:
+# fragment IDENT              { ( <a..z> | <A..Z> )( <a..z> | <A..Z> )*; }
+# SCALAR                      { <'$'> <IDENT> <';'> }
+
+token INTEGER                 { \d+ }
+token NUMBER                  { ( \d+ )? <'.'> \d+ }
 
 token UNARY_MINUS             { \- }
 token UNARY_PLUS              { \+ }
@@ -59,5 +64,5 @@ rule multiplicand             { <MUL_OP> <multiplying_expression> }
 
 rule unary_expression         { <UNARY_MINUS>? <postfix_expression> }
 
-rule postfix_expression       { <NUMBER> | <?PAREN_OPEN> <expression> <?PAREN_CLOSE> }
+rule postfix_expression       { <NUMBER> | <INTEGER> | <?PAREN_OPEN> <expression> <?PAREN_CLOSE> }
 

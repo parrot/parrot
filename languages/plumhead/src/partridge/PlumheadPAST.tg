@@ -167,6 +167,12 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
     goto handled_expression
     no_NUMBER:
 
+    $P0 = node['INTEGER']
+    if null $P0 goto no_INTEGER
+    past = tree.'get'('past', $P0, 'Plumhead::Grammar::INTEGER')
+    goto handled_expression
+    no_INTEGER:
+
     $P0 = node['adding_expression']
     if null $P0 goto no_adding_expression
         .local pmc past_mult, summand, summand_0, past_summand_0
@@ -278,6 +284,16 @@ transform past (Plumhead::Grammar::NUMBER) :language('PIR') {
     .local string val
     val = node
     past.'init'( 'name' => val, 'vtype' => '.Float', 'ctype' => 'n+' )                              
+    .return (past)
+}
+
+transform past (Plumhead::Grammar::INTEGER) :language('PIR') {
+
+    .local pmc past
+    past = new 'PAST::Val'                             
+    .local string val
+    val = node
+    past.'init'( 'name' => val, 'vtype' => '.Integer', 'ctype' => 'i+' )                              
     .return (past)
 }
 
