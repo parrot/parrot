@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function alarm' );
@@ -48,6 +48,30 @@ CODE
 hello
 in alarm!
 in alarm!
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function alarm (repeat)' );
+require "alarm"
+
+function myalarm()
+    --print("in alarm!",os.date"%T",a,math.floor(100*a/N).."%")
+    print("in alarm!",a,math.floor(100*a/N).."%")
+    alarm(1)
+end
+
+N=100000
+
+print"hello"
+alarm(1,myalarm)
+a=0
+for i=1,N do
+    a=a+1
+    math.sin(a) -- waste some time...
+end
+print(a)
+print"bye"
+CODE
+/^hello\n(in alarm!\t\d+\t\d+%\n)+100000\nbye/gm
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function alarm (bad delay)' );
