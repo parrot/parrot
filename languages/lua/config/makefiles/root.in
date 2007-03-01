@@ -50,7 +50,8 @@ LIB_PBCS = \
  $(LIBPATH)/luamath.pbc \
  $(LIBPATH)/luaio.pbc \
  $(LIBPATH)/luaos.pbc \
- $(LIBPATH)/luadebug.pbc
+ $(LIBPATH)/luadebug.pbc \
+ $(LIBPATH)/alarm.pbc
 
 GEN_PIR = \
  src/lua51_testlex_gen.pir \
@@ -130,6 +131,9 @@ $(LIBPATH)/luaos.pbc: $(LIBPATH)/luaos.pir
 
 $(LIBPATH)/luadebug.pbc: $(LIBPATH)/luadebug.pir
 	$(PARROT) --output=$(LIBPATH)/luadebug.pbc $(LIBPATH)/luadebug.pir
+
+$(LIBPATH)/alarm.pbc: $(LIBPATH)/alarm.pir
+	$(PARROT) --output=$(LIBPATH)/alarm.pbc $(LIBPATH)/alarm.pir
 
 Lua/parser.pm: Lua/lua51.yp
 	yapp -s -v -m Lua::parser -o Lua/parser.pm Lua/lua51.yp

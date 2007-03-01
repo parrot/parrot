@@ -77,7 +77,7 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     _loaders[$P2] = loader_PBCroot
 
     setpath(_package, 'path', 'LUA_PATH', './?.lua')
-    setpath(_package, 'pbcpath', 'LUA_PBCPATH', './?.pbc;./?.pir')
+    setpath(_package, 'pbcpath', 'LUA_PBCPATH', './?.pbc;./?.pir;languages/lua/lib/?.pbc')
 
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = global '_REGISTRY'
