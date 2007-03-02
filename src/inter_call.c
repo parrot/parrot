@@ -26,6 +26,16 @@ subroutines.
 #include "inter_call.str"
 
 
+#define SAVE_OFF_REGS(orig, next, save) \
+        save.bp = orig.bp;\
+        save.bp_ps = orig.bp_ps;\
+        orig.bp = next.bp;\
+        orig.bp_ps = next.bp_ps;
+
+#define RESTORE_REGS(orig, save) \
+        orig.bp = save.bp;\
+        orig.bp_ps = save.bp_ps;
+
 
 static int next_arg(Interp *, struct call_state_item *st);
 static void next_arg_sig(Interp *interp, struct call_state_item *st);
