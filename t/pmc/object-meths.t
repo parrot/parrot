@@ -860,15 +860,15 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "callmethod - method name" );
 .namespace ["Foo"]
 .pcc_sub meth:
     print "in meth\n"
-    .include "interpinfo.pasm"
-    interpinfo S0, .INTERPINFO_CURRENT_METHOD
-    print S0
+    getinterp P0
+    set P1, P0["sub"]
+    print P1
     print "\n"
     returncc
 CODE
 main
 in meth
-meth
+parrot;Foo;meth
 back
 OUTPUT
 

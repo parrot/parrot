@@ -57,9 +57,6 @@ mark_context(Interp *interp, parrot_context_t* ctx)
     obj = (PObj*)ctx->current_cont;
     if (obj && !PObj_live_TEST(obj))
         pobject_lives(interp, obj);
-    obj = (PObj*)ctx->current_method;
-    if (obj)
-        pobject_lives(interp, obj);
     obj = (PObj*)ctx->current_namespace;
     if (obj)
         pobject_lives(interp, obj);

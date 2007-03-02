@@ -309,8 +309,6 @@ interpinfo_s(Interp *interp, INTVAL what)
     int pos;
 
     switch (what) {
-        case CURRENT_METHOD:
-            return CONTEXT(interp->ctx)->current_method;
         case EXECUTABLE_FULLNAME:
             return VTABLE_get_string(interp,
                 VTABLE_get_pmc_keyed_int(interp, interp->iglobals,

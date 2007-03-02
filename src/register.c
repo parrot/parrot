@@ -233,7 +233,6 @@ init_context(Interp *interp, parrot_context_t *ctx, parrot_context_t *old)
     ctx->lex_pad = PMCNULL;
     ctx->outer_ctx = NULL;
     ctx->current_cont = NULL;
-    ctx->current_method = NULL; /* XXX who clears it? */
     ctx->current_object = NULL; /* XXX who clears it?  */
     ctx->current_HLL = 0;
     if (old) {

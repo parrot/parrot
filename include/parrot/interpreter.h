@@ -228,7 +228,6 @@ typedef struct Parrot_Context {
      */
     PMC *current_cont;          /* the return continuation PMC */
     PMC *current_object;        /* current object if a method call */
-    STRING *current_method;     /* name of method */
     opcode_t *current_pc;       /* program counter of Sub invocation */
     PMC *current_namespace;     /* The namespace we're currently in */
     INTVAL current_HLL;         /* see also src/hll.c */
@@ -420,7 +419,6 @@ struct parrot_interp_t {
      */
     PMC *current_cont;                        /* the return continuation PMC */
     PMC *current_object;                      /* current object if a method call */
-    STRING *current_method;                   /* name of method */
 };
 
 /* typedef struct parrot_interp_t Interp;    done in parrot.h so that

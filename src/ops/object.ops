@@ -56,7 +56,6 @@ op callmethodcc(invar PMC, in STR) :object_base {
   next = expr NEXT();
   interp->current_object = object;
   interp->current_cont = NEED_CONTINUATION;
-  interp->current_method = meth;
   method_pmc = VTABLE_find_method(interp, object, meth);
   if (!method_pmc) {
     real_exception(interp, next, METH_NOT_FOUND,
@@ -78,7 +77,6 @@ op callmethodcc(invar PMC, invar PMC) :object_base {
   next = expr NEXT();
   interp->current_object = object;
   interp->current_cont = NEED_CONTINUATION;
-  interp->current_method = VTABLE_get_string(interp, method_pmc);
   dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
   goto ADDRESS(dest);
 }
@@ -94,7 +92,6 @@ op callmethod(invar PMC, in STR, invar PMC) :object_base {
   next = expr NEXT();
   interp->current_object = object;
   interp->current_cont = $3;
-  interp->current_method = meth;
   method_pmc = VTABLE_find_method(interp, object, meth);
   if (!method_pmc) {
     real_exception(interp, next, METH_NOT_FOUND,
@@ -115,7 +112,6 @@ op callmethod(invar PMC, invar PMC, invar PMC) :object_base {
   next = expr NEXT();
   interp->current_object = object;
   interp->current_cont = $3;
-  interp->current_method = VTABLE_get_string(interp, method_pmc);
   dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
   goto ADDRESS(dest);
 }
@@ -131,7 +127,6 @@ op tailcallmethod(invar PMC, in STR) :object_base {
   interp->current_cont = CONTEXT(interp->ctx)->current_cont;
   PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
   interp->current_object = object;
-  interp->current_method = meth;
   method_pmc = VTABLE_find_method(interp, object, meth);
   if (!method_pmc) {
     real_exception(interp, next, METH_NOT_FOUND,
@@ -151,7 +146,6 @@ op tailcallmethod(invar PMC, invar PMC) :object_base {
   interp->current_cont = CONTEXT(interp->ctx)->current_cont;
   PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
   interp->current_object = object;
-  interp->current_method = VTABLE_get_string(interp, method_pmc);
   dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
   goto ADDRESS(dest);
 }

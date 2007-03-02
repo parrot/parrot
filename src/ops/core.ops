@@ -881,7 +881,7 @@ The valid constants for each return value are:
 
 =item B<interpinfo>(out STR, in INT)
 
-.CURRENT_METHOD, .EXECUTABLE_FULLNAME, .EXECUTABLE_BASENAME
+.EXECUTABLE_FULLNAME, .EXECUTABLE_BASENAME
 
 =back
 

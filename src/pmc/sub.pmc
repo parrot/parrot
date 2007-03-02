@@ -288,8 +288,6 @@ Invokes the subroutine.
         if (!PMC_IS_NULL(INTERP->current_object)) {
             context->current_object = INTERP->current_object;
             INTERP->current_object = NULL;
-            context->current_method = INTERP->current_method;
-            INTERP->current_method = NULL;
         }
         context->current_HLL = sub->HLL_id;
         context->current_namespace = sub->namespace_stash;
