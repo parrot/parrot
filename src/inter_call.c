@@ -530,7 +530,11 @@ init_first_dest_named(Interp *interp, struct call_state *st)
             continue;
         /* slurpy named args, create slurpy hash */
         else if (sig & PARROT_ARG_SLURPY_ARRAY) {
+            /* Create PMC for slurpy mode and register it; we must do this
+             * otherwise it may get collected. */
             st->dest.slurp = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Hash));
+            dod_register_pmc(interp, st->dest.slurp);
+
             /* pass the slurpy hash */
             idx = st->dest.u.op.pc[i];
             CTX_REG_PMC(st->dest.ctx, idx) = st->dest.slurp;
@@ -669,6 +673,11 @@ create_slurpy_array(Interp *interp, struct call_state *st, INTVAL idx)
 {
     st->dest.slurp =
         pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
+    
+    /* Must register this PMC or it may get collected when only the struct
+     * references it. */
+    dod_register_pmc(interp, st->dest.slurp);
+    
     CTX_REG_PMC(st->dest.ctx, idx) = st->dest.slurp;
     st->dest.mode |= CALL_STATE_SLURP;
     st->dest.mode &= ~CALL_STATE_OPT;
@@ -1068,6 +1077,10 @@ parrot_pass_args(Interp *interp, parrot_context_t *src_ctx, parrot_context_t *de
     Parrot_init_arg_indexes_and_sig_pmc(interp, src_ctx, src_indexes, src_signature, &st.src);
     Parrot_init_arg_indexes_and_sig_pmc(interp, dest_ctx, dest_indexes, dest_signature, &st.dest);
     Parrot_process_args(interp, &st, param_or_result);
+
+    /* If we created a slurpy, we had to DOD register it so it did not get
+     * collected during arg processing; we'll now unregister it. */
+    dod_unregister_pmc(interp, st.dest.slurp);
 }
 
 /*
