@@ -103,9 +103,9 @@ rule argument_list {
     | <keyword_arguments>
         [ <','> <'*'> <expression> ]?
         [ <','> <'**'> <expression> ]?
-    | <','> <'*'> <expression>
+    | <'*'> <expression>
         [ <','> <'**'> <expression> ]?
-    | <','> <'**'> <expression>
+    | <'**'> <expression>
 }
 
 rule positional_arguments {
@@ -161,17 +161,6 @@ rule inheritance {
     <'('> <expression_list>? <')'>
 }
 
-rule or_test {
-    <and_test> | <or_test> <'or'> <and_test>
-}
-
-rule and_test {
-    <not_test> | <and_test> <'and'> <not_test>
-}
-
-rule not_test {
-    <comparison> | <'not'> <not_test>
-}
 
 rule lambda_form {
     <'lambda'> <parameter_list>? <':'> <expression>
@@ -210,20 +199,26 @@ rule augmented_assignment_stmt { <target> <augop> <expression_list> }
 rule target_list { <target> [ <','> <target> ]* <','>? }
 
 rule target {
-    | <identifier>
     | <'('> <target_list> <')'>
     | <'['> <target_list> <']'>
-    | <attributeref>
-    | <subscription>
-    | <slicing>
+    | <primary>
+    #| <primary> <attributeref>
+    #| <primary> <subscription>
+    #| <primary> <slicing>
+    | <identifier>
+}
+
+rule call {
+    | <'('> [ <argument_list>? <','>? ]? <')'>
+    | <'('> [ <argument_list> <','>? | <test> <genexpr_for> ] <')'>
 }
 
 rule attributeref {
-    <primary> <'.'> <identifier>
+    <'.'> <identifier>
 }
 
 rule subscription {
-    <primary> <'['> <expression_list> <']'>
+    <'['> <expression_list> <']'>
 }
 
 rule slicing {
@@ -231,11 +226,11 @@ rule slicing {
 }
 
 rule simple_slicing {
-    <primary> <'['> <short_slice> <']'>
+    <'['> <short_slice> <']'>
 }
 
 rule extended_slicing {
-    <primary> <'['> <slice_list> <']'>
+    <'['> <slice_list> <']'>
 }
 
 rule slice_list {
@@ -263,7 +258,7 @@ token identifier { <!reserved> [ <?alpha> | <'_'> ] \w* }
 token name { <!reserved> <[a..z]> [ <alpha> | <'_'> ]* }
 
 rule print_stmt {
-    <'print'> [ <expression> [ <','> <expression> ]* (<','>?) ]?
+    <'print'> [ <expression> [ <','> <expression> ]* <','>? ]?
 }
 
 rule pass_stmt {
@@ -409,19 +404,17 @@ token augop {
     | <'>>='> | <'<<='> | <'&='> | <'^='> | <'|='>
 }
 
-
-rule call {
-    <primary> <'('> [ <argument_list>? <','>? ]? <')'>
-    # XXX
-}
-
 rule primary {
-    | <atom>
-    #| <attributeref>
-    #| <subscription>
-    #| <slicing>
-    #| <call>
+    <atom> <postop>*
 }
+
+rule postop {
+    | <attributeref>
+    | <subscription>
+    | <slicing>
+    | <call>
+}
+
 
 rule atom {
     <identifier> | <literal> | <enclosure>
@@ -444,7 +437,7 @@ rule generator_expression {
 }
 
 rule genexpr_for {
-    <'for'> <expression_list> <'in'> <test> 
+    <'for'> <expression_list> <'in'> <test>
     <genexpr_iter>?
 }
 
@@ -472,80 +465,62 @@ rule string_conversion {
     <'`'> <expression_list> <'`'>
 }
 
-## This identifies operators for the bottom-up parser
-## See operator precedence table at http://docs.python.org/ref/summary.html
-
-token 'expression' is optable { ... }
-
-proto 'term:'      is precedence('=')
-    is parsed(&term)
-    { ... }
-
-# should this be primary??
-token term {
-    | <literal>
-    | <identifier>
-    | <list_display>
+# Evaluation order of expressions is based on the table as provided in
+# http://docs.python.org/ref/summary.html
+#
+#
+rule expression {
+    | <or_test> [ <'if'> <or_test> <'else'> <test> ]?
+    | <lambda_form>
 }
 
-proto 'infix:**'   is looser('term:')  {...}
+rule or_test {
+    <and_test> [ <'or'> <and_test> ]*
+}
 
-proto 'prefix:~'    is looser('infix:**') { ... }
-proto 'prefix:+'    is looser('prefix:~') { ... }
-proto 'prefix:-'    is equiv('prefix:+') { ... }
+rule and_test {
+    <not_test> [ <'and'> <not_test> ]*
+}
 
-proto 'infix:*'    is looser('prefix:+')
-    is pirop('mul')
-    { ... }
+rule not_test {
+    | <'not'> <not_test>
+    | <not_in_test>
+}
 
-proto 'infix:/'    is equiv('infix:*')
-    is pirop('div')
-    { ... }
+rule not_in_test {
+    <is_not_test> [ <'not'>? <'in'> <is_not_test> ]*
+}
 
-proto 'infix:%'    is equiv('infix:*')
-    is pirop('mod')
-    { ... }
+rule is_not_test {
+    <comparison> [ <'is'> <'not'>? <comparison> ]*
+}
 
-proto 'infix:+'    is looser('infix:*')
-    is pirop('add')
-    { ... }
+token 'comparison' is optable { ... }
 
-proto 'infix:-'    is equiv('infix:+')
-    is pirop('sub')
-    { ... }
+proto 'term:'      is precedence('=')    is parsed(&primary) { ... }
+proto 'infix:**'   is looser('term:')        { ... }
+proto 'prefix:~'   is looser('infix:**')     { ... }
+proto 'prefix:+'   is looser('prefix:~')     { ... }
+proto 'prefix:-'   is equiv('prefix:+')      { ... }
+proto 'infix:*'    is looser('prefix:+') is pirop('mul')     { ... }
+proto 'infix:/'    is equiv('infix:*')   is pirop('div')     { ... }
+proto 'infix://'   is equiv('infix:*')       { ... }
+proto 'infix:%'    is equiv('infix:*')   is pirop('mod')     { ... }
+proto 'infix:+'    is looser('infix:*')  is pirop('add')     { ... }
+proto 'infix:-'    is equiv('infix:+')   is pirop('sub')     { ... }
 
+proto 'infix:<<'   is looser('infix:+')      { ... }
+proto 'infix:>>'   is equiv('infix:<<')      { ... }
+proto 'infix:&'    is looser('infix:<<')     { ... }
+proto 'infix:^'    is looser('infix:&')      { ... }
+proto 'infix:|'    is looser('infix:^')      { ... }
 
-
-proto 'infix:<<' is looser('infix:+') { ... }
-proto 'infix:>>' is equiv('infix:<<') { ... }
-proto 'infix:&' is looser('infix:<<') { ... }
-proto 'infix:^' is looser('infix:&') { ... }
-proto 'infix:|' is looser('infix:^') { ... }
-
-proto 'infix:=='   is looser('infix:|')  { ... }
-proto 'infix:!='   is equiv('infix:==')  { ... }
-proto 'infix:<='   is equiv('infix:==')  { ... }
-proto 'infix:>='   is equiv('infix:==')  { ... }
-proto 'infix:<'    is equiv('infix:==')  { ... }
-proto 'infix:>'    is equiv('infix:==')  { ... }
-
-# "is not" infix operator is handled by combining 'prefix:not' and 'infix:is'
-proto 'infix:is' is looser('infix:==') { ... }
-proto 'infix:in' is looser('infix:is') { ... }
-
-proto 'prefix:not' is looser('infix:in') { ... }
-
-# to handle "not in" as infix op, combine 'prefix:in' and 'infix:not'
-# this also allows for "x = 1 not 2", which is of course Wrong.
-# Fix this later (new category of operator??)
-#
-proto 'infix:not' is looser('infix:in') { ... }
-proto 'prefix:in' is looser('infix:is') { ... }
-
-proto 'infix:and' is looser('prefix:not') { ... }
-proto 'infix:or' is looser('infix:and') { ... }
-
-
+proto 'infix:=='   is looser('infix:|')      { ... }
+proto 'infix:!='   is equiv('infix:==')      { ... }
+proto 'infix:<='   is equiv('infix:==')      { ... }
+proto 'infix:>='   is equiv('infix:==')      { ... }
+proto 'infix:<'    is equiv('infix:==')      { ... }
+proto 'infix:>'    is equiv('infix:==')      { ... }
 
 
 ## Python reserved words and keywords
