@@ -293,6 +293,7 @@ GEN_MODULES = \
 
 GEN_LIBRARY = \
     $(LIBRARY_DIR)/CGI/QueryHash.pbc \
+    $(LIBRARY_DIR)/Crow.pbc \
     $(LIBRARY_DIR)/config.pbc \
     $(LIBRARY_DIR)/Data/Dumper/Base.pbc \
     $(LIBRARY_DIR)/Data/Dumper/Default.pbc \

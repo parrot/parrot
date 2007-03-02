@@ -1,4 +1,71 @@
-.namespace ['Crow::Utils']
+.namespace ['Crow']
+
+.sub 'get_args'
+    .param pmc    args
+
+    .local string prog
+    prog = shift args
+
+    load_bytecode 'Getopt/Obj.pbc'
+
+    .local pmc getopts
+    getopts = new 'Getopt::Obj'
+    getopts.'notOptStop'(1)
+
+    getopts = push 'date|D=s'
+    getopts = push 'help|h'
+    getopts = push 'name|n=s'
+    getopts = push 'nextdate|N=s'
+    getopts = push 'version|v=s'
+
+    .local pmc opts
+    opts = getopts.'get_options'(args)
+
+    $I0 = exists opts['help']
+    if $I0 goto help
+    .return (opts)
+
+  help:
+    .return 'help'(prog)
+.end
+
+
+.sub 'help'
+    .param string prog
+
+    .local pmc data
+    data = new .Hash
+    data['prog'] = prog
+
+    .local string template
+    template = <<'END_HELP'
+@prog@ -- Make noise about the new Parrot release
+
+  parrot @prog@ [OPTIONS]
+
+  OPTIONS:
+    --date     | -D DATE
+        set the release date
+
+    --help     | -h
+        display this message
+
+    --name     | -n
+        set the name of the release
+
+    --nextdate | -N
+        set the date of the next scheduled release
+
+    --version  | -v
+        set the release version
+
+END_HELP
+
+    $S0 = 'process'(template, data)
+    print $S0
+    end
+.end
+
 
 .sub 'get_news'
     .param string version
@@ -13,6 +80,8 @@
     start    = concat 'New in ', version
 
   before:
+    $I0 = newsfile.'eof'()
+    if $I0 goto err_news
     buf      = readline newsfile
     $I0      = index buf, start
     if  $I0 != 0 goto before
@@ -44,7 +113,7 @@
 .end
 
 
-.sub 'merge_data'
+.sub 'process'
     .param string template
     .param pmc    data
 
