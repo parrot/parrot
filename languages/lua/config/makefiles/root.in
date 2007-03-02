@@ -56,7 +56,7 @@ LIB_PBCS = \
 GEN_PIR = \
  src/lua51_testlex_gen.pir \
  src/dumplex_gen.pir \
- src/lua_grammar_gen.pir \
+ src/lua51_grammar_gen.pir \
  src/ASTGrammar.pir
 
 GEN_PBC = \
@@ -77,13 +77,13 @@ src/lua51_testlex_gen.pir: src/lua51_testlex.pg
 src/dumplex_gen.pir: src/dumplex.tg
 	$(TGE) --output=src/dumplex_gen.pir src/dumplex.tg
 
-src/lua_grammar_gen.pir: src/lua.pg
-	$(PGE) --output=src/lua_grammar_gen.pir src/lua.pg
+src/lua51_grammar_gen.pir: src/lua.pg
+	$(PGE) --output=src/lua51_grammar_gen.pir src/lua.pg
 
 src/ASTGrammar.pir: src/ASTGrammar.tg
 	$(TGE) --output=src/ASTGrammar.pir src/ASTGrammar.tg
 
-src/lua.pbc: src/lua.pir src/lua_grammar_gen.pir src/ASTGrammar.pir
+src/lua.pbc: src/lua.pir src/lua51_grammar_gen.pir src/ASTGrammar.pir
 	$(PARROT) -o src/lua.pbc --output-pbc src/lua.pir
 
 luac.pbc: luac.pir

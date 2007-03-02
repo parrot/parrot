@@ -310,7 +310,7 @@ L3:
 
 
 .include 'languages/lua/src/ASTGrammar.pir'
-.include 'languages/lua/src/lua_grammar_gen.pir'
+.include 'languages/lua/src/lua51_grammar_gen.pir'
 
 =head1 LICENSE
 
