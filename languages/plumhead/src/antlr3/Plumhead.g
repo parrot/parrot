@@ -38,6 +38,7 @@ WS                  : {  codeMode }?=>  ( ' ' | '\t' | '\r' | '\n' )+ { $channel
 DOUBLEQUOTE_STRING  : {  codeMode }?=>  '\"' ( ~'\"' )*  '\"' ;
 SINGLEQUOTE_STRING  : {  codeMode }?=>  '\'' ( ~'\'' )*  '\'' ;
 ECHO                : {  codeMode }?=>  'echo' ;
+VAR_DUMP            : {  codeMode }?=>  'var_dump' ;
 PAREN_OPEN          : {  codeMode }?=>  '(' ;
 PAREN_CLOSE         : {  codeMode }?=>  ')' ;
 
@@ -87,6 +88,7 @@ statements
 
 statement
   : ECHO expression ';'                                             -> ^( ECHO expression )
+  | VAR_DUMP PAREN_OPEN  expression PAREN_CLOSE ';'                 -> ^( VAR_DUMP expression )
   | IF PAREN_OPEN relational_expression PAREN_CLOSE '{' s1=statements '}'
     ( ELSE '{' s2=statements '}'                                    -> ^( IF relational_expression ^( STMTS $s1 ) ^( STMTS $s2 ) )
     |                                                               -> ^( IF relational_expression ^( STMTS $s1 ) )

@@ -125,6 +125,23 @@ node[String reg_mother]
         + "  # end of ECHO node                                              \n"
       );
     }
+  | {
+      System.out.println( 
+          "                                                                  \n"
+        + "  # start of VAR_DUMP node                                        \n"
+        + "  .local pmc past_var_dump                                        \n"
+        + "  past_var_dump = new 'PAST::Op'                                  \n"
+      );
+    }
+    ^( VAR_DUMP node["past_var_dump"] )
+    {
+      System.out.println( 
+          "                                                                  \n"
+        + "  past_var_dump.'attr'( 'name', 'var_dump', 1 )                   \n"
+        + "  " + $node.reg_mother + ".'push'( past_var_dump )                \n"
+        + "  # end of VAR_DUMP node                                          \n"
+      );
+    }
   | NOQUOTE_STRING
     {
       String noquote = $NOQUOTE_STRING.text;
