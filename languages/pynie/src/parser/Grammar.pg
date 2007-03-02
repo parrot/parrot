@@ -201,11 +201,11 @@ rule target_list { <target> [ <','> <target> ]* <','>? }
 rule target {
     | <'('> <target_list> <')'>
     | <'['> <target_list> <']'>
-    | <primary>
+    | <identifier>
+    #| <primary>
     #| <primary> <attributeref>
     #| <primary> <subscription>
     #| <primary> <slicing>
-    | <identifier>
 }
 
 rule call {

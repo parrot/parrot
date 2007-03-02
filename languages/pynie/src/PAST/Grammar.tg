@@ -348,19 +348,7 @@ transform past (Pynie::Grammar::list_display) :language('PIR') {
 
 transform past (Pynie::Grammar::identifier) :language('PIR') {
     .local pmc past
-    $P0 = new .Iterator, node
-    #printerr "'"
-    #printerr node
-    #printerr "'\n"
-   L1:
-    unless $P0 goto L2
-    $P1 = shift $P0
-    #printerr $P1
-    #printerr "\n"
-    goto L1
-   L2:
-
-    $S0 = node['identifier']
+    $S0 = node
     past = new 'PAST::Var'
     past.'init'('node'=>node, 'name'=>$S0, 'scope'=>'package')
     .return (past)
@@ -391,12 +379,20 @@ transform past (Pynie::Grammar::target_list) :language('PIR') {
     unless targetiter goto iter_end
     .local pmc targetnode, targetpast
     targetnode = shift targetiter
-    targetpast = tree.'get'('past', targetnode, 'Pynie::Grammar::identifier')
-    $S0 = targetpast['name']
-    past.'push_new'('PAST::Var', 'name'=>$S0, 'islvalue'=>1, 'scope'=>'package')
+    targetpast = tree.'get'('past', targetnode, 'Pynie::Grammar::target')
+    past.'push'(targetpast)
     goto iter_loop
   iter_end:
     .return (past)
+}
+
+
+transform past (Pynie::Grammar::target) :language('PIR') {
+    .local pmc cnode, cpast
+    cnode = node['identifier']
+    cpast = tree.'get'('past', cnode, 'Pynie::Grammar::identifier')
+    cpast.'islvalue'(1)
+    .return (cpast)
 }
 
 
