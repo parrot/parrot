@@ -22,39 +22,10 @@ transform past (ROOT) :language('PIR') {
 
 transform past (Pynie::Grammar::statement) :language('PIR') {
   stmt_list:
-    $P0 = node['stmt_list']
-    if null $P0 goto compound_stmt
-    .return tree.'get'('past', $P0, 'Pynie::Grammar::stmt_list')
-
-  compound_stmt:
-    $P0 = node['compound_stmt']
-  if_stmt:
-    $P1 = $P0['if_stmt']
-    if null $P1 goto while_stmt
-    .return tree.'get'('past', $P1, 'Pynie::Grammar::if_stmt')
-  while_stmt:
-    $P1 = $P0['while_stmt']
-    if null $P1 goto for_stmt
-    .return tree.'get'('past', $P1, 'Pynie::Grammar::while_stmt')
-  for_stmt:
-    $P1 = $P0['for_stmt']
-    if null $P1 goto try_stmt
-    .return tree.'get'('past', $P1, 'Pynie::Grammar::for_stmt')
-  try_stmt:
-    $P1 = $P0['try_stmt']
-    if null $P1 goto with_stmt
-    .return tree.'get'('past', $P1, 'Pynie::Grammar::try_stmt')
-  with_stmt:
-    $P1 = $P0['with_stmt']
-    if null $P1 goto funcdef
-    .return tree.'get'('past', $P1, 'Pynie::Grammar::with_stmt')
-  funcdef:
-    $P1 = $P0['funcdef']
-    if null $P1 goto classdef
-    .return tree.'get'('past', $P1, 'Pynie::Grammar::funcdef')
-  classdef:
-    $P1 = $P0['classdef']
-    .return tree.'get'('past', $P1, 'Pynie::Grammar::classdef')
+    $S0 = node.'find_key'()
+    $P0 = node[$S0]
+    $S0 = concat 'Pynie::Grammar::', $S0
+    .return tree.'get'('past', $P0, $S0)
 }
 
 
