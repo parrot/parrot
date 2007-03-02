@@ -258,7 +258,7 @@ token identifier { <!reserved> [ <?alpha> | <'_'> ] \w* }
 token name { <!reserved> <[a..z]> [ <alpha> | <'_'> ]* }
 
 rule print_stmt {
-    <'print'> [ <expression> [ <','> <expression> ]* <','>? ]?
+    <'print'> [ <expression> [ <','> <expression> ]* ( <','>? ) ]?
 }
 
 rule pass_stmt {
@@ -417,19 +417,17 @@ rule postop {
 
 
 rule atom {
-    <identifier> | <literal> | <enclosure>
+    | <identifier>
+    | <literal>
+    | <parenth_form>                   # python's <enclosure>
+   #| <list_display>                   #   ""
+   #| <generator_expression>           #   ""
+   #| <dict_display>                   #   ""
+   #| <string_conversion>              #   ""
 }
 
 rule parenth_form {
     <'('> <expression_list>? <')'>
-}
-
-rule enclosure {
-    | <parenth_form>
-    | <list_display>
-    | <generator_expression>
-    | <dict_display>
-    | <string_conversion>
 }
 
 rule generator_expression {

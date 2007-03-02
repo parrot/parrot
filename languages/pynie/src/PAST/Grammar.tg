@@ -194,14 +194,12 @@ transform past (Pynie::Grammar::print_stmt) :language('PIR') {
     past = new 'PAST::Op'
     past.'init'('node'=>node, 'name'=>'print')
 
-    ###printerr "expression\n"
- #   $P0 = node[0]
- #   $S0 = $P0[0]
- #   if $S0 == ',' goto skip_nl
- #   past.'name'('printnl')
+    $P0 = node[0]
+    $S0 = $P0[0]
+    if $S0 == ',' goto skip_nl
+    past.'name'('printnl')
   skip_nl:
 
-    ###printerr "get print expression\n"
     .local pmc iter
     $P0 = node['expression']
     iter = new .Iterator, $P0
