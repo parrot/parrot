@@ -38,7 +38,6 @@ dumper = find_global '_dumper'
     .IMPORT( ['Crow'], 'get_news', _ )
     .IMPORT( ['Crow'], 'process', _ )
 
-# XXX this isn't working
     .local pmc opts
     opts = get_args(args)
 
@@ -67,47 +66,30 @@ dumper = find_global '_dumper'
 
     if has_indata goto init
     data = new .Hash
-    goto set
+    goto assign
   init:
     data = indata
 
-#load_bytecode 'dumper.pir'
-#.local pmc dumper
-#dumper = find_global '_dumper'
-#dumper(indata)
+  assign:
+    $P0 = data['version']
+    'infix://='($P0, '0.4.9')
 
-#trace 1
-    # TODO i'd love to macroize this, if possible make each call a one liner
-  set:
-    $S0 = 'version'
-    $P0 = data[$S0]
-    $P0 = 'assigninfix'($P0, '//=', '0.4.9')
-    data[$S0] = $P0
+trace 1
+    $P0 = data['name']
+    'infix://='($P0, 'Socorro')
+trace 0
 
-    $S0 = 'name'
-    $P0 = data[$S0]
-    $P0 = 'assigninfix'($P0, '//=', 'Socorro')
-    data[$S0] = $P0
+    $P0 = data['web.root']
+    'infix://='($P0, 'http://parrotcode.org')
 
-    $S0 = 'web.root'
-    $P0 = data[$S0]
-    $P0 = 'assigninfix'($P0, '//=', 'http://parrotcode.org')
-    data[$S0] = $P0
+    $P0 = data['web.source']
+    'infix://='($P0, 'http://parrotcode.org/source')
 
-    $S0 = 'web.source'
-    $P0 = data[$S0]
-    $P0 = 'assigninfix'($P0, '//=', 'http://parrotcode.org/source')
-    data[$S0] = $P0
+    $P0 = data['date']
+    'infix://='($P0, '22 February 2007')
 
-    $S0 = 'date'
-    $P0 = data[$S0]
-    $P0 = 'assigninfix'($P0, '//=', '22 February 2007')
-    data[$S0] = $P0
-
-    $S0 = 'nextdate'
-    $P0 = data[$S0]
-    $P0 = 'assign'($P0, '//=', 'xx March 2007')
-    data[$S0] = $P0
+    $P0 = data['nextdate']
+    'infix://='($P0, 'xx March 2007')
 
     # get data from NEWS
     $S0 = data['version']
@@ -118,26 +100,16 @@ dumper = find_global '_dumper'
 .end
 
 
-.sub 'assign'
+.sub 'infix://='
     .param pmc    a
-    .param string op
     .param pmc    b
 
-    # //=
-    unless op == '//=' goto unknown_op
     $I0 = defined a
     if $I0 goto OP_end
     a = new .Undef
-    a = b
-    goto OP_end
+    assign a, b
 
-  unknown_op:
-    $P0 = new .Exception
-    $S0 = concat 'Unknown op: ', op
-    $P0['_message'] = $S0
-    throw $P0
   OP_end:
-    .return (a)
 .end
 
 
@@ -147,7 +119,6 @@ dumper = find_global '_dumper'
 
 # TODO process the type arg
 
-# TODO make this the release template
     $S0 = <<'EOT'
 On behalf of the Parrot team, I'm proud to announce Parrot @version@
 "@name@." Parrot (@web.root@) is a virtual machine aimed
