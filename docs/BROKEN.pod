@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 What's Broken in Parrot Right Now
@@ -92,20 +94,6 @@ https://rt.perl.org/rt3//Ticket/Display.html?id=33920
 =head2 Language-Specific Items
 
 =over 4
-
-=item * Make Perl a F</language>
-
-=over 4
-
-=item * Don't have Perl deps in static classes
-
-https://rt.perl.org/rt3//Ticket/Display.html?id=32642
-
-=item * Make Perl PMCs dynamic
-
-https://rt.perl.org/rt3//Ticket/Display.html?id=32646
-
-=back
 
 =item * Let languages be self contained
 
