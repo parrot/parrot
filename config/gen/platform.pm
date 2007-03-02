@@ -68,6 +68,7 @@ CODA
         signal.h
         stat.h
         threads.h
+        string.h
         /;
 
     open my $PLATFORM_H, ">", "include/parrot/platform.h"
