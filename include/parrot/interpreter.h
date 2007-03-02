@@ -333,7 +333,9 @@ struct parrot_interp_t {
     int         n_libs;                       /* count of libs below */
     op_lib_t  **all_op_libs;                  /* all loaded opcode libraries */
 
-    Interp_flags flags;                       /* Various interpreter flags that */
+    Interp_flags flags;                       /* Various interpreter flags that
+                                               * signal that runops should do
+                                               * something */
 
     UINTVAL debug_flags;                      /* debug settings */
 
