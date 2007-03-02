@@ -299,55 +299,28 @@ transform past (Pynie::Grammar::atom) :language('PIR') {
     .return tree.'get'('past', cnode, $S0)
 }
 
-#transform past_term (Pynie::Grammar::expr) :language('PIR') {
-#    .local pmc cnode
-#    cnode = node['literal']
-#    if null cnode goto list_display
-#    .return tree.'get'('past', cnode, 'Pynie::Grammar::literal')
-#  list_display:
-#    cnode = node['list_display']
-#    if null cnode goto identifier
-#    .return tree.'get'('past', cnode, 'Pynie::Grammar::list_display')
-#  identifier:
-#    cnode = node['identifier']
-#    .return tree.'get'('past', cnode, 'Pynie::Grammar::identifier')
-#}
-
-
 transform past (Pynie::Grammar::literal) :language('PIR') {
-    .local pmc past, cnode
-    cnode = node['integer']
-    unless null cnode goto integer
-    cnode = node['stringliteral']
-    unless null cnode goto stringliteral
-    cnode = node['longinteger']
-    unless null cnode goto longinteger
-    cnode = node['floatnumber']
-    unless null cnode goto floatnumber
-    cnode = node['imagnumber']
-    unless null cnode goto imagnumber
-    #printerr "Error in past::literal\n"
-    exit 1
-
-  integer:
-    past = new 'PAST::Val'
-    past.'init'('node'=>cnode, 'vtype'=>'.Integer', 'name'=>node, 'ctype'=>'i+')
-    .return (past)
-
-  stringliteral:
-    past = new 'PAST::Val'
-    $S0 = cnode
-    past.'init'('node'=>cnode, 'vtype'=>'.Undef', 'name'=>$S0)
-    .return (past)
-
-  longinteger:
-
-  floatnumber:
-
-  imagnumber:
-
+    .local pmc cnode
+    $S0 = node.'find_key'()
+    cnode = node[$S0]
+    $S0 = concat 'Pynie::Grammar::', $S0
+    .return tree.'get'('past', cnode, $S0)
 }
 
+transform past (Pynie::Grammar::integer) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Val'
+    past.'init'('node'=>node, 'vtype'=>'.Integer', 'name'=>node, 'ctype'=>'i+')
+    .return (past)
+}
+
+transform past (Pynie::Grammar::stringliteral) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Val'
+    $S0 = node
+    past.'init'('node'=>node, 'vtype'=>'.Undef', 'name'=>$S0)
+    .return (past)
+}
 
 transform past (Pynie::Grammar::list_display) :language('PIR') {
     .local pmc past
