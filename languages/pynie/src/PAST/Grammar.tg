@@ -210,10 +210,19 @@ transform past (Pynie::Grammar::expression) :language('PIR') {
 }
 
 transform past (Pynie::Grammar::or_test) :language('PIR') {
-    $P0 = node['and_test']
-    $P0 = $P0[0] # this is a hack, 'rule expression' has 1 or more <or_test>s, so it stores them in an array. Handle $P0[1] later.
-    #printerr "pynie::grammar::or_test\n"
-    .return tree.'get'('past', $P0, 'Pynie::Grammar::and_test')
+    .local pmc past, iter, clist, cnode
+    clist = node['and_test']
+    clist = clone clist
+    cnode = pop clist
+    past = tree.'get'('past', cnode, 'Pynie::Grammar::and_test')
+    unless clist goto end
+  clist_loop:
+    cnode = pop clist
+    $P0 = tree.'get'('past', cnode, 'Pynie::Grammar::and_test')
+    past = past.'new'('PAST::Op', $P0, past, 'node'=>node, 'pasttype'=>'unless')
+    if clist goto clist_loop
+  end:
+    .return (past)
 }
 
 transform past (Pynie::Grammar::and_test) :language('PIR') {
