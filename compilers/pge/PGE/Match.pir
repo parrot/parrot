@@ -100,10 +100,10 @@ the current position of C<mob>.
 Creates a new Match object based on C<src>.  If the C<grammar>
 adverb is specified, then the new Match object is of the given
 grammar class, otherwise if C<src> is an instance of C<Match>
-(or a subclass) then that class is used to create the object, 
-otherwise it uses the class of the invocant.  
+(or a subclass) then that class is used to create the object,
+otherwise it uses the class of the invocant.
 
-The C<pos>, C<p>, C<continue>, or C<c> adverbs specify where 
+The C<pos>, C<p>, C<continue>, or C<c> adverbs specify where
 the match object should begin.  If no starting position is
 given, the current position of C<src> is used if it has one,
 otherwise the start position is at offset zero.  The C<from>
@@ -208,7 +208,7 @@ is set or implied.
     throw ex
 .end
 
-    
+
 =item C<next()>
 
 Tell a Match object to continue the previous match from where
@@ -292,8 +292,8 @@ Returns the portion of the target string matched by this object.
 
 =item C<result_object([pmc obj])>
 
-Returns or sets the "result object" for the match object.  If no 
-result object has been explicitly set (by an embedded closure), 
+Returns or sets the "result object" for the match object.  If no
+result object has been explicitly set (by an embedded closure),
 return the substring that was matched by this match object.
 
 =cut
@@ -313,9 +313,39 @@ return the substring that was matched by this match object.
 .end
 
 
+=item C<find_key([ key1, key2, ... ])>
+
+Find the first of C<key1>, C<key2>, etc. in the current
+Match object, and return it.  Returns '' if none of
+the specified keys are found.  If no keys are specified,
+then simply return the first key found.
+
+=cut
+
+.sub 'find_key' :method
+    .param pmc keys            :slurpy
+    if null keys goto first_key
+    unless keys goto first_key
+  loop:
+    unless keys goto not_found
+    $S0 = shift keys
+    $I0 = exists self[$S0]
+    unless $I0 goto loop
+    .return ($S0)
+  first_key:
+    $P0 = self.'get_hash'()
+    $P1 = new .Iterator, $P0
+    unless $P1 goto not_found
+    $S0 = shift $P1
+    .return ($S0)
+  not_found:
+    .return ('')
+.end
+
+
 =item C<_failcut(int cutvalue)>
 
-Immediately "fail" this Match object, removing any 
+Immediately "fail" this Match object, removing any
 captured entities and coroutine continuation.  Set
 the position of the match object to C<cutvalue>.
 
@@ -340,7 +370,7 @@ the position of the match object to C<cutvalue>.
   iter_end:
     .return ()
 .end
-    
+
 
 =item C<__get_bool()>
 
