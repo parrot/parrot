@@ -1,0 +1,5 @@
+(a.)..(..)		zzzabcdefzzz	ab\tef			basic match
+(a(b(c))(d))		abcd		abcd\tbc\tc\td		nested match
+((%w+))			abcd		abcd\tabcd		nested match
+
+## vim: noexpandtab tabstop=4 shiftwidth=4
