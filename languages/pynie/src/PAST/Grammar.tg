@@ -202,7 +202,6 @@ transform past (Pynie::Grammar::global_stmt) :language('PIR') {
 }
 
 
-
 transform past (Pynie::Grammar::expression) :language('PIR') {
     $P0 = node['or_test']
     $P0 = $P0[0] # this is a hack, 'rule expression' has 1 or more <or_test>s, so it stores them in an array. Handle $P0[1] later.
@@ -254,18 +253,12 @@ transform past (Pynie::Grammar::expr) :language('PIR') {
     .local pmc optable, optok
     .local string pasttype, pirop, returns
     .local int islvalue
-    ##printerr "ok 1\n"
     optable = get_hll_global [ 'Pynie::Grammar' ], '$optable'
     optok = optable[type]
-    ##printerr "ok 2\n"
     pasttype = optok['past']
-    ##printerr "ok 3\n"
     pirop = optok['pirop']
-    ##printerr "ok 4\n"
     returns = optok['returns']
-    ##printerr "ok 5\n"
     islvalue = optok['lvalue']
-    ##printerr "ok 6\n"
 
     .local pmc past, iter
     past = new 'PAST::Op'
@@ -288,13 +281,10 @@ transform past (Pynie::Grammar::expr) :language('PIR') {
     .return (past)
 
   past_term:
-#   .return tree.'get'('past_term', node, 'Pynie::Grammar::expr')
-    $P0 = node['atom']
-    .return tree.'get'('past', $P0, 'Pynie::Grammar::atom')
-
+    .return tree.'get'('past_primary', node, 'Pynie::Grammar::primary')
 }
 
-transform past (Pynie::Grammar::primary) :language('PIR') {
+transform past_primary (Pynie::Grammar::primary) :language('PIR') {
     .local pmc atomnode, atompast
     atomnode = node['atom']
     atompast = tree.'get'('past', atomnode, 'Pynie::Grammar::atom')
@@ -303,18 +293,10 @@ transform past (Pynie::Grammar::primary) :language('PIR') {
 
 transform past (Pynie::Grammar::atom) :language('PIR') {
     .local pmc cnode
-  identifier:
-    cnode = node['identifier']
-    if null cnode goto literal
-    #printerr "atom::identifier\n"
-    .return tree.'get'('past', cnode, 'Pynie::Grammar::identifier')
-  literal:
-    cnode = node['literal']
-    if null cnode goto enclosure
-    .return tree.'get'('past', cnode, 'Pynie::Grammar::literal')
-  enclosure:
-    cnode = node['enclosure']
-    .return tree.'get'('past', cnode, 'Pynie::Grammar::enclosure')
+    $S0 = node.'find_key'()
+    cnode = node[$S0]
+    $S0 = concat 'Pynie::Grammar::', $S0
+    .return tree.'get'('past', cnode, $S0)
 }
 
 #transform past_term (Pynie::Grammar::expr) :language('PIR') {
