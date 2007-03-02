@@ -181,7 +181,7 @@ token simple_stmt {
     | <assert_stmt>
     | <assignment_stmt>
     | <augmented_assignment_stmt>
-    | <expression_stmt>
+    | <expression_list>
     | <pass_stmt>
     | <del_stmt>
     | <print_stmt>
@@ -195,9 +195,9 @@ token simple_stmt {
     | <exec_stmt>
 }
 
-rule expression_stmt {
-    <expression_list>
-}
+#rule expression_stmt {
+#    <expression_list>
+#}
 
 rule assert_stmt {
     <'assert'> <expression> [ <','> <expression> ]?

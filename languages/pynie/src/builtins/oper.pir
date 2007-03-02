@@ -91,7 +91,7 @@ src/builtins/oper.pir - operators
     .return ($N0)
 .end
 
-.sub 'infix:&&'
+.sub 'infix:&'
     .param pmc a
     .param pmc b
     $I0 = istrue a
@@ -100,7 +100,7 @@ src/builtins/oper.pir - operators
     .return ($I0)
 .end
 
-.sub 'infix:||'
+.sub 'infix:|'
     .param pmc a
     .param pmc b
     $I0 = istrue a
