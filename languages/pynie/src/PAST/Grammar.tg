@@ -50,16 +50,11 @@ transform past (Pynie::Grammar::stmt_list) :language('PIR') {
 
 
 transform past (Pynie::Grammar::simple_stmt) :language('PIR') {
-    .local pmc hash, iter, cnode
     .local string key
-    hash = node.'get_hash'()
-    iter = new .Iterator, hash
-    key = shift iter
-    cnode = hash[key]
+    .local pmc cnode
+    key = node.'find_key'()
+    cnode = node[key]
     key = concat 'Pynie::Grammar::', key
-    ##printerr "past::simple_stmt; invoking "
-    ##printerr key
-    ##printerr "\n"
     .return tree.'get'('past', cnode, key)
 }
 
