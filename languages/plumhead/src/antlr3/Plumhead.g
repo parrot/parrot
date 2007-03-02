@@ -19,7 +19,9 @@ tokens
   PROGRAM;
   NOQUOTE_STRING;
   STMTS;
+  SCALAR;
   ARRAY;
+  FUNCTION;
   PREFIX;
 }
 
@@ -39,8 +41,8 @@ ECHO                : {  codeMode }?=>  'echo' ;
 PAREN_OPEN          : {  codeMode }?=>  '(' ;
 PAREN_CLOSE         : {  codeMode }?=>  ')' ;
 
-fragment IDENT      : {  codeMode }?=>  ( 'a'..'z' | 'A'..'Z' )( 'a'..'z' | 'A'..'Z' )*;
-SCALAR              : {  codeMode }?=>  '$' IDENT ;
+fragment IDENT      : {  codeMode }?=>  ( 'a'..'z' | 'A'..'Z' )( 'a'..'z' | 'A'..'Z' | '_' | '0'..'9' )*;
+VAR_IDENT           : {  codeMode }?=>  '$' IDENT ;
 
 fragment DIGITS     : {  codeMode }?=>  ('0'..'9' )+ ;
 INTEGER             : {  codeMode }?=>  DIGITS ;
@@ -72,7 +74,7 @@ sea
   ;
 
 code
-  : CODE_START statements CODE_END -> statements
+  : CODE_START statements CODE_END? -> statements
   ;
 
 relational_expression 
@@ -84,21 +86,21 @@ statements
   ;
 
 statement
-  : ECHO^ expression ';'! 
+  : ECHO expression ';'                                             -> ^( ECHO expression )
   | IF PAREN_OPEN relational_expression PAREN_CLOSE '{' s1=statements '}'
-    ( ELSE '{' s2=statements '}' -> ^( IF relational_expression ^( STMTS $s1 ) ^( STMTS $s2 ) )
-    |                            -> ^( IF relational_expression ^( STMTS $s1 ) )
+    ( ELSE '{' s2=statements '}'                                    -> ^( IF relational_expression ^( STMTS $s1 ) ^( STMTS $s2 ) )
+    |                                                               -> ^( IF relational_expression ^( STMTS $s1 ) )
     ) 
-  | CODE_END SEA CODE_START -> ^( ECHO NOQUOTE_STRING[$SEA] )
-  | SCALAR ASSIGN_OP^ expression ';'!
-  | s=SCALAR '[' key=expression ']' ASSIGN_OP val=expression ';' -> ^( ASSIGN_OP ^( ARRAY[$s] $key ) $val )
+  | CODE_END SEA CODE_START                                         -> ^( ECHO NOQUOTE_STRING[$SEA] )
+  | VAR_IDENT ASSIGN_OP val=expression ';'                          -> ^( ASSIGN_OP SCALAR[$VAR_IDENT] $val ) 
+  | VAR_IDENT '[' key=expression ']' ASSIGN_OP val=expression ';'   -> ^( ASSIGN_OP ^( ARRAY[$VAR_IDENT] $key ) $val )
   ;
 
 expression
   : DOUBLEQUOTE_STRING
   | SINGLEQUOTE_STRING
   | bitwise_expression
-  | s=SCALAR ( '[' key=expression ']' -> ^( ARRAY[$s] $key ) )?
+  | a=VAR_IDENT ( '[' key=expression ']' -> ^( ARRAY[$a] $key ) )?
   ;
 
 bitwise_expression

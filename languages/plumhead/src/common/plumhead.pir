@@ -4,11 +4,15 @@
 
 =head1 NAME
 
-plumhead.pir - three variants of PHP on Parrot
+plumhead.pir - four variants of PHP on Parrot
+
+=head1 SYNOPSIS
+
+   ./parrot languages/plumhead/plumhead.pbc t.php
 
 =head1 DESCRIPTION
 
-Driver for three variants of PHP on Parrot.
+Driver for four variants of PHP on Parrot.
 
 =head1 Variants
 

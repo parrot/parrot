@@ -2,7 +2,7 @@
 // $Id$
 
 // Transform ANTLR PAST to PIR that sets up a PAST data structure
-// let the Parrot Compiler Tools handle the execution.
+// Let the Parrot Compiler Tools handle the execution.
 // Jumpstarted by languages/bc/grammar/antlr_3/antlr_past2pir_past.g 
 
 tree grammar GenPastPir;
@@ -114,13 +114,13 @@ node[String reg_mother]
         + "  # start of ECHO node                                            \n"
         + "  .local pmc past_echo                                            \n"
         + "  past_echo = new 'PAST::Op'                                      \n"
-        + "  past_echo.'attr'( 'name', 'echo', 1 )                           \n"
       );
     }
     ^( ECHO node["past_echo"] )
     {
       System.out.println( 
           "                                                                  \n"
+        + "  past_echo.'attr'( 'name', 'echo', 1 )                           \n"
         + "  " + $node.reg_mother + ".'push'( past_echo )                    \n"
         + "  # end of ECHO node                                              \n"
       );
@@ -152,7 +152,7 @@ node[String reg_mother]
           "                                                                  \n"
         + "  # start of SINGLEQUOTE_STRING                                   \n"
         + "  .local string val                                               \n"
-        + "  val = " + singlequote + "                                      \n"
+        + "  val = " + singlequote + "                                       \n"
         + "  past_temp = new 'PAST::Val'                                     \n"
         + "  .local pmc code_string                                          \n"
         + "  code_string = new 'PGE::CodeString'                             \n"
@@ -373,10 +373,10 @@ node[String reg_mother]
       System.out.println( 
           "                                                                  \n"
         + "  past_name = new 'PAST::Var'                                     \n"
-        + "  past_name.'init'( 'name' => 'past_name" + $ARRAY.text + "', 'viviself' => '.Hash', 'islvalue' => 1 )      \n"
+        + "  past_name.'init'( 'name' => 'past_array_" + $ARRAY.text + "', 'viviself' => '.Hash', 'islvalue' => 1 )      \n"
         + "  # PAST-pm has no unshift yet                                    \n"
-        + "  \$P0 = " + reg_array + ".'get_array'()                            \n"
-        + "  unshift \$P0, past_name                                          \n"
+        + "  \$P0 = " + reg_array + ".'get_array'()                          \n"
+        + "  unshift \$P0, past_name                                         \n"
         + "  " + $node.reg_mother + ".'push'( " + reg_array + " )            \n"
         + "  # leaving ARRAY                                                 \n"
       );

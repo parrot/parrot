@@ -1,6 +1,7 @@
 # $Id$
 
 TODO:
+  - segfault array_3.php with Partridge antlr3
   - unified testing
   - Implementation with PGE, make it the default implementation
   - Implementation of 'antlr3' variant, Java backend
@@ -9,6 +10,7 @@ TODO:
   - Implement var_dump()
   - Subclass OrderedHash for PlumheadArray
   - Add another variant 'perl5regex', using Perl 5.10 (ir)regular expressions
+  - distinguish between subs and keywords
 
 DONE:
   - Start a builtins library
