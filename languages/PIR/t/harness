@@ -1,3 +1,8 @@
 #! perl
 
-use Parrot::Test::Harness language => 'PIR_PGE';
+# $Id$
+
+# language is the directory where the language implementation lives
+# See perldoc Parrot::Test::Harness for details
+
+use Parrot::Test::Harness language => 'PIR';

@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -46,17 +46,17 @@ B<Note:> you I<must> use a C<$description> with TODO tests.
 
 =item C<language_output_is( $language, $code, $expected, $description)>
 
-Runs a langugage test and passes the test if a string comparison
+Runs a language test and passes the test if a string comparison
 of the output with the expected result it true.
 
 =item C<language_output_like( $language, $code, $expected, $description)>
 
-Runs a langugage test and passes the test
+Runs a language test and passes the test
 if the  output matches the expected result.
 
 =item C<language_output_isnt( $language, $code, $expected, $description)>
 
-Runs a langugage test and passes the test if a string comparison
+Runs a language test and passes the test if a string comparison
 if a string comparison of the output with the unexpected result is false.
 
 =item C<pasm_output_is($code, $expected, $description)> or C<output_is($code, $expected, $description)>
@@ -598,9 +598,8 @@ sub _generate_functions {
     }
 
     my %builtin_language_prefix = (
-        IMC  => 'pir',
-        PASM => 'pasm',
-        PIR  => 'pir',
+        PIR_IMCC  => 'pir',
+        PASM_IMCC => 'pasm',
     );
 
     my %language_test_map = (
@@ -618,6 +617,7 @@ sub _generate_functions {
 
             my $meth = $language_test_map{$func};
             if ( my $prefix = $builtin_language_prefix{$language} ) {
+                # builtin languages are no tested with the example_output_xx() functions
                 my $level = $builder->level();
                 $builder->level( $level + 2 );
                 my $test_func = "${package}::${prefix}_${meth}";
@@ -650,7 +650,7 @@ sub _generate_functions {
                 # restore prior level, just in case.
                 $builder->level($level);
             }
-            }
+        }
     }
 
     # XXX this is broken WRT todo tests
@@ -668,13 +668,12 @@ sub _generate_functions {
             my ( $example_f, $expected, @options ) = @_;
 
             my %lang_for_extension = (
-                pasm => 'PASM',
-                pir  => 'PIR',
-                imc  => 'PIR',
+                pasm => 'PASM_IMCC',
+                pir  => 'PIR_IMCC',
             );
 
             my ($extension) = $example_f =~ m{ [.]                    # introducing extension
-                                               ( pasm | pir | imc  )  # match and capture the extension
+                                               ( pasm | pir )         # match and capture the extension
                                                \z                     # at end of string
                                              }ixms or Usage();
             if ( defined $extension ) {
@@ -688,7 +687,7 @@ sub _generate_functions {
             else {
                 fail( defined $extension, "no extension recognized for $example_f" );
             }
-            }
+        }
     }
 
     my %c_test_map = (

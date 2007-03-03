@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -86,7 +86,6 @@ my $result = GetOptions( 'html'          => \$do_gen_html,
 # perl6                test scripts are written in Perl 6, not Perl 5
 # pheme                test scripts are written in Scheme, not Perl 5
 # pynie                test scripts are written in PIR, not Perl 5
-# PIR                  adaptions in language_output_is() required
 # python               not maintained
 # ruby                 not maintained, should be removed
 
@@ -96,8 +95,8 @@ my @unified_testable_languages
     = defined $languages_list ?
           split( /\s*,\s*/, $languages_list )
           : 
-          qw( APL
-              abc
+          qw( abc
+              APL
               befunge
               bf
               cardinal
@@ -110,6 +109,7 @@ my @unified_testable_languages
               ook
               parrot_compiler
               pheme
+              PIR
               punie
               regex
               scheme
