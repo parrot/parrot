@@ -1,4 +1,4 @@
-# $Id: root.in 17096 2007-02-20 20:20:48Z paultcochrane $
+# $Id$
 
 # Setup some commands
 LN_S     = @lns@

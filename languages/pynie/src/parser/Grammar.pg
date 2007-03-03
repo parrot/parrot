@@ -1,4 +1,4 @@
-## $Id: grammar_rules.pg 17096 2007-02-20 20:20:48Z paultcochrane $
+## $Id$
 
 ## TITLE
 ##     Pynie::Grammar -- a grammar for parsing Python

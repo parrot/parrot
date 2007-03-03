@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: /parrot/cc/t/pmc/pmethod_test.t 2562 2007-02-24T15:21:50.392350Z tewk  $
+# $Id$
 
 use strict;
 use warnings;

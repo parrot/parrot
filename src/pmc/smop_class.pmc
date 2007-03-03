@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001-2005, The Perl Foundation.
-$Id: /parrot/cc/src/pmc/resizablepmcarray.pmc 2034 2007-01-14T22:25:58.386168Z tewk  $
+$Id$
 
 =head1 NAME
 
