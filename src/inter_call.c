@@ -683,11 +683,11 @@ create_slurpy_array(Interp *interp, struct call_state *st, INTVAL idx)
 {
     st->dest.slurp =
         pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
-    
+
     /* Must register this PMC or it may get collected when only the struct
      * references it. */
     dod_register_pmc(interp, st->dest.slurp);
-    
+
     CTX_REG_PMC(st->dest.ctx, idx) = st->dest.slurp;
     st->dest.mode |= CALL_STATE_SLURP;
     st->dest.mode &= ~CALL_STATE_OPT;
