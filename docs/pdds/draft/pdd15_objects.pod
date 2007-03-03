@@ -306,6 +306,8 @@ sections below on L<Objects> and L<Vtables>.
 
 An instance of the Role PMC has four attributes, which are:
 
+=over 4
+
 =item 0
 
 The role name
@@ -328,6 +330,8 @@ role
 The role attribute hash. Keys are the attribute names and the values
 are a hash of attribute characteristics, including name, type, and the
 role they're associated with.
+
+=back
 
 =head3 Methods
 
