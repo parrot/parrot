@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -15,9 +15,16 @@ $Revision$
 
 =head1 DEFINITIONS
 
-=head2 Class
 
 =head2 Object
+
+An object is kind a variable that incorporates both data and behavior
+related to that data.
+
+=head2 Class
+
+A class defines a pattern of characteristcs and behaviors from which
+objects are constructed.
 
 =head2 Attribute
 
@@ -34,6 +41,7 @@ offsets, but only via named lookup.
 =head2 Method
 
 A method is a piece of code that you invoke by name through an object.
+Methods implement the behaviour of an object.
 
 =head2 Parent class
 
@@ -150,7 +158,6 @@ Object PMCs. It isn't necessary to create a brand new low-level PMC
 class for each OO class, and they all share the Class or Object vtable,
 respectively.
 
-
 An instance of the Class PMC has six attributes, which are:
 
 =over 4
@@ -245,6 +252,16 @@ parents. The accessor is read-only.
 
 Adds a single parent to the class. It takes a simple string name.
 
+=item roles
+
+An accessor for the roles of the class. It returns an Array of all
+roles. The accessor is read-only.
+
+=item add_role
+
+Adds a single role to the class. It takes a simple string name.
+
+
 =back
 
 =head2 Object PMC API
@@ -285,10 +302,70 @@ class. They do have vtable methods providing access to certain low-level
 information about the object, method call functionality, etc. See the
 sections below on L<Objects> and L<Vtables>.
 
+=head2 Role PMC API
+
+An instance of the Role PMC has four attributes, which are:
+
+=item 0
+
+The role name
+
+=item 1
+
+A link to the role's associated namespace
+
+=item 2
+
+An array PMC of composed roles
+
+=item 3
+
+An array PMC of the methods defined in the role or composed into the
+role
+
+=item 4
+
+The role attribute hash. Keys are the attribute names and the values
+are a hash of attribute characteristics, including name, type, and the
+role they're associated with.
+
+=head3 Methods
+
+=over 4
+
+=item name
+
+The accessor for the name attribute. With no argument, it simply returns
+the current value for name. When passed an argument, it sets the name of
+the role, and also sets the association with a namespace.
+
+=item attributes
+
+An accessor for the attributes of the role. It returns the a Hash of
+all attributes, with a key of the attribute name, and a value of the
+Attribute object. The accessor is read-only.
+
+=item add_attribute
+
+Adds a single attribute to the role. It takes a simple string name, and
+a simple string value for type.
+
+=item roles
+
+An accessor for the roles composed into the role. It returns an Array of
+all roles. The accessor is read-only.
+
+=item add_role
+
+Adds a single role to the role. It takes a simple string name.
+
+=back
+
+
 =head2 Opcodes
 
 The following ops are provided to deal with objects. Please note that method
-calls are governed by parrot's calling conventions, and as such objects, method
+calls are governed by Parrot's calling conventions, and as such objects, method
 PMCs, return continuations, and parameters must be in the right places, though
 some ops will put parameters where they need to go.
 
@@ -371,6 +448,11 @@ of class Px and children of class Px, with a default value of C<Null>.
 
 Remove the attribute Sy from class Px, all objects of class Px, and all objects
 of a child of class Px.
+
+=item addrole Px, Py
+
+Add role Py to the end of the list of roles of class Px. Adds any
+attributes of Py that aren't already in Px.
 
 =item instantiate Px, Py, Sz (Unimplemented) [deprecated]
 
