@@ -26,11 +26,6 @@ module, L<runtime/parrot/library/Crow.pir>.
 .sub 'main' :main
     .param pmc    args
 
-load_bytecode 'dumper.pir'
-.local pmc dumper
-dumper = find_global '_dumper'
-#dumper(args)
-
     load_bytecode 'Crow.pir' # TODO s/pbc/pir/
 
     .local pmc _
@@ -44,8 +39,6 @@ dumper = find_global '_dumper'
     unless null opts goto got_opts
     opts = new .Hash
   got_opts:
-
-#dumper(opts)
 
     .local string template
     template = 'template'('email')
@@ -71,25 +64,23 @@ dumper = find_global '_dumper'
     data = indata
 
   assign:
-    $P0 = data['version']
+    $P0 = 'get_or_vivify'(data, 'version')
     'infix://='($P0, '0.4.9')
 
-trace 1
-    $P0 = data['name']
+    $P0 = 'get_or_vivify'(data, 'name')
     'infix://='($P0, 'Socorro')
-trace 0
 
-    $P0 = data['web.root']
-    'infix://='($P0, 'http://parrotcode.org')
+    $P0 = 'get_or_vivify'(data, 'web.root')
+    $P0 = 'infix://='($P0, 'http://parrotcode.org')
 
-    $P0 = data['web.source']
-    'infix://='($P0, 'http://parrotcode.org/source')
+    $P0 = 'get_or_vivify'(data, 'web.source')
+    $P0 = 'infix://='($P0, 'http://parrotcode.org/source')
 
-    $P0 = data['date']
-    'infix://='($P0, '22 February 2007')
+    $P0 = 'get_or_vivify'(data, 'date')
+    $P0 = 'infix://='($P0, '22 February 2007')
 
-    $P0 = data['nextdate']
-    'infix://='($P0, 'xx March 2007')
+    $P0 = 'get_or_vivify'(data, 'nextdate')
+    $P0 = 'infix://='($P0, 'xx March 2007')
 
     # get data from NEWS
     $S0 = data['version']
@@ -97,19 +88,6 @@ trace 0
     data['NEWS'] = $S1
 
     .return (data)
-.end
-
-
-.sub 'infix://='
-    .param pmc    a
-    .param pmc    b
-
-    $I0 = defined a
-    if $I0 goto OP_end
-    a = new .Undef
-    assign a, b
-
-  OP_end:
 .end
 
 
@@ -140,5 +118,41 @@ Enjoy!
 
 EOT
     .return ($S0)
+.end
+
+
+.sub 'get_or_vivify'
+    .param pmc a
+    .param pmc b
+
+    if null a goto agg_undefined
+
+    .local pmc temp
+    temp = a[b]
+
+    unless null temp goto return
+
+    temp = new .Undef
+    a[b] = temp
+
+  return:
+    .return (temp)
+
+  agg_undefined:
+    $P0 = new .Exception
+    $P0['_message'] = "aggregate undefined!"
+    throw $P0
+.end
+
+
+.sub 'infix://='
+    .param pmc    a
+    .param pmc    b
+
+    $I0 = defined a
+    if $I0 goto OP_end
+    assign a, b
+
+  OP_end:
 .end
 
