@@ -172,6 +172,10 @@ A link to the class's associated namespace
 
 =item 2
 
+A "have I been instantiated since I was last modified" flag
+
+=item 2
+
 An array PMC of the immediate parent classes
 
 =item 3
@@ -261,8 +265,35 @@ roles. The accessor is read-only.
 
 Adds a single role to the class. It takes a simple string name.
 
-
 =back
+
+=head3 Classes, Namespaces, and the Class Registry
+
+[Stream-of-consciousness to be cleaned up later]
+The class registry has a much diminished role in this implementation.
+Its only responsibility is maintaining a mapping of unique IDs to class
+objects throught the system. (We may eventually be able to eliminate the
+registry altogether.) It can't be used for looking up classes by name,
+because it's possible to have multiple classes with the same name in the
+same namespace. (When you extend an existing class, it actually creates
+a new class, that replaces the old class in the Namespace, but the old
+class can't be thrown away if it has objects instantiated in it. The old
+objects still point to the old class and do their method resolution and
+attribute lookup through that class. If a class hasn't been
+instantiated, adding a method doesn't create a new class. If it has been
+instantiated, the it creates a new class the first time its extended,
+and then doesn't create a new class until it is instantiated again.) The
+class registry needs to have names removed entirely (it doesn't care
+about names anymore).  Low-level PMC types also need entries in the
+namespace hierarchy.
+
+The Namespace always points to the most current incarnation of the
+class. All the class objects that nominally exist in a namespace point
+to that namespace object.
+
+A class can be garbage collected when it has no instantiatated objects
+referencing it. When a class is garbage collected, it should remove itself
+from the registry.
 
 =head2 Object PMC API
 
@@ -281,6 +312,10 @@ The class PMC
 =item 1
 
 The class name
+
+=item 2
+
+The container type
 
 =item 2
 
