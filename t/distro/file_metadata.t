@@ -172,7 +172,8 @@ COPYRIGHT: {
 =cut
 
 BEGIN {
-    plan skip_all => '#41569 - this test is broken';
+    plan skip_all => 'RT #41569 - this test is broken on win32'
+        if $^O eq 'MSWin32'; 
 
     unless ( $Parrot::Revision::current or `svk ls .` ) {
         plan skip_all => 'not a working copy';
