@@ -390,17 +390,7 @@ Returns the Perl language source files within Parrot.  Namely:
 sub get_perl_language_files {
     my $self = shift;
 
-    my @files = (
-        $self->perl_source_files,
-    );
-
-    my @perl_language_files = ();
-    foreach my $file ( @files ) {
-        next if $self->is_perl_exemption($file);
-        push @perl_language_files, $file;
-    }
-
-    return @perl_language_files;
+    return grep { !$self->is_perl_exemption($_) } $self->perl_source_files;
 }
 
 
