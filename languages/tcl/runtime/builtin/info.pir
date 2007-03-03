@@ -76,9 +76,24 @@ bad_subcommand:
 
   .local string procname
   procname = shift argv
-  $P1 = get_root_global ['_tcl'], 'proc_args'
-  $P2 = $P1[procname]
-  if_null $P2, no_args
+
+  .local pmc __namespace
+  __namespace = get_root_global ['_tcl'], '__namespace'
+
+  .local pmc    ns
+  .local string name
+  ns   = __namespace(procname)
+  name = pop ns
+  name = '&' . name
+
+  unshift ns, 'tcl'
+  $P1 = get_root_global ns, name
+  if null $P1 goto no_args
+
+  $P2 = getattribute $P1, 'args'
+  if null $P2 goto no_args
+  .return($P2)
+
   .return($P2)
 
 no_args:
@@ -108,11 +123,12 @@ bad_args:
   .local string name
   ns   = __namespace(procname)
   name = pop ns
+  name = '&' . name
 
   unshift ns, 'tcl'
-  $P1 = get_root_global ns, 'proc_body'
+  $P1 = get_root_global ns, name
   if null $P1 goto no_body
-  $P2 = $P1[name]
+  $P2 = getattribute $P1, 'HLL_source'
   if null $P2 goto no_body
   .return($P2)
 
@@ -169,9 +185,23 @@ bad_args:
 
   .local pmc __set
   __set = get_root_global ['_tcl'], '__set'
-  $P1 = get_root_global ['_tcl'], 'proc_defaults'
-  $P2 = $P1[procname]
-  if_null $P2, not_proc
+
+  .local pmc __namespace
+  __namespace = get_root_global ['_tcl'], '__namespace'
+
+  .local pmc    ns
+  .local string name
+  ns   = __namespace(procname)
+  name = pop ns
+  name = '&' . name
+
+  unshift ns, 'tcl'
+  $P1 = get_root_global ns, name
+  if null $P1 goto not_proc
+
+  $P2 = getattribute $P1, 'defaults'
+  $P9 = getattribute $P1, 'args'
+  if null $P2 goto check_arg
 
   $P3 = $P2[argname]
   if_null $P3, check_arg
@@ -184,9 +214,7 @@ bad_args:
 
 check_arg:
   # there's no default. is there even an arg?
-  $P1 = get_root_global ['_tcl'], 'proc_args'
-  $P2 = $P1[procname]
-  $P3 = __list($P2)
+  $P3 = __list($P9)
   $P4 = new .Iterator, $P3
 loop:
   unless $P4 goto not_argument 

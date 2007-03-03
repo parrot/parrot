@@ -31,8 +31,7 @@ PMCS = \
  tclfloat \
  tcllist \
  tclarray \
- tcldict \
- tclproc
+ tcldict
 
 GENERATED_INLINES = \
  $(C_BUILTIN)/break.pir \
@@ -106,7 +105,8 @@ $(GENERATED_INLINES) : tools/gen_inline.pl
 	$(PARROT) tcl.pbc $< --pir > $@
 
 CLASSES = \
-  $(CLASSDIR)/tclconst.pir
+  $(CLASSDIR)/tclconst.pir \
+  $(CLASSDIR)/tclproc.pir
 
 pmcs:
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
