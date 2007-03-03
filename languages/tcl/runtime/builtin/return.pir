@@ -24,7 +24,7 @@
     tcl_error $S2
 
 bad_call:
-    tcl_error "XXX: bad call to return"
+    tcl_error 'XXX: bad call to return'
 
 onearg:
     $P0 = argv[0]

@@ -62,7 +62,7 @@ space:
 not_space:
   dec $I0
   $I1 = $I2 - $I0
-  substr contents, $I0, $I1, " "
+  substr contents, $I0, $I1, ' '
   dec $I1
   len -= $I1
   goto backslash_loop

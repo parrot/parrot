@@ -4,8 +4,8 @@ A .Sub with attributes
 
 =cut
 
-.include "languages/tcl/src/returncodes.pir"
-.include "languages/tcl/src/macros.pir"
+.include 'languages/tcl/src/returncodes.pir'
+.include 'languages/tcl/src/macros.pir'
 
 .HLL 'parrot', ''
 .namespace [ 'TclProc' ]
@@ -28,5 +28,6 @@ Define the attributes required for the class.
   addattribute $P1, 'HLL'         # In our case, Tcl...
   addattribute $P1, 'HLL_source'
   addattribute $P1, 'args'
-  addattribute $P1, 'defaults'    # Should combine this with 'args' for a more Perl-sixy way of specifying args.
+  # Should combine this with 'args' for P6-style args..
+  addattribute $P1, 'defaults'
 .end

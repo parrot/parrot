@@ -167,7 +167,7 @@ space:
 not_space:
   dec $I0
   $I1 = $I2 - $I0
-  substr contents, $I0, $I1, " "
+  substr contents, $I0, $I1, ' '
   dec $I1
   len -= $I1
   goto backslash_loop
@@ -226,11 +226,11 @@ file_error:
   end
 
 continue_outside_loop:
-  print "invoked \"continue\" outside of a loop\n"
+  say 'invoked "continue" outside of a loop'
   end
 
 break_outside_loop:
-  print "invoked \"break\" outside of a loop\n"
+  say 'invoked "break" outside of a loop'
   end
 
 exit_exception:

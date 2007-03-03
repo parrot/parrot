@@ -21,10 +21,10 @@
     if arg_num >= argc goto end_loop 
     $P1 = argv[arg_num]
     pir_code .= retval  
-    pir_code .= "["
+    pir_code .= '['
     $S0 = arg_num
     pir_code .= $S0
-    pir_code .= "] = "
+    pir_code .= '] = '
     $S0 = $P1
     pir_code .= $S0
     pir_code .= "\n"

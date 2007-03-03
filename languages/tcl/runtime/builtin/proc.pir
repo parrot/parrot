@@ -7,7 +7,7 @@ Create a PIR sub on the fly for this user defined proc.
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-.sub "&proc"
+.sub '&proc'
   .param pmc argv :slurpy
 
   .local int argc
@@ -22,7 +22,7 @@ Create a PIR sub on the fly for this user defined proc.
   body      = argv[2]
 
   .local pmc pir_compiler, __script, __list, __namespace
-  pir_compiler = compreg "PIR"
+  pir_compiler = compreg 'PIR'
   __script     = get_root_global ['_tcl'], '__script'
   __list       = get_root_global ['_tcl'], '__list'
   __namespace  = get_root_global ['_tcl'], '__namespace'
@@ -112,7 +112,7 @@ END_PIR
   if elems == 0 goto args_loop_done
   $I0 = elems - 1
   $S0 = args[$I0]
-  if $S0 != "args" goto args_loop
+  if $S0 != 'args' goto args_loop
   is_slurpy = 1
   dec elems
 args_loop:
@@ -122,17 +122,17 @@ args_loop:
   
   $S0 = arg[0]
   args_info .= $S0
-  args_info .= " "
+  args_info .= ' '
   
   $I0 = elements arg
   if $I0 > 2 goto too_many_fields
   if $I0 == 2 goto default_arg
   
   min = i + 1
-  args_code.emit("  $P1 = shift args")
+  args_code.emit('  $P1 = shift args')
   args_code.emit("  lexpad['$%0'] = $P1", $S0)
   
-  args_usage .= " "
+  args_usage .= ' '
   args_usage .= $S0
   goto args_next
 
@@ -156,9 +156,9 @@ default_%0:
   lexpad['$%1'] = $P1
 END_PIR
 
-  args_usage .= " ?"
+  args_usage .= ' ?'
   args_usage .= $S0
-  args_usage .= "?"
+  args_usage .= '?'
 
 args_next:
   inc i
@@ -168,8 +168,8 @@ args_loop_done:
   chopn args_info,  1
 
   unless is_slurpy goto store_info
-  args_usage .= " ..."
-  args_info  .= " args"
+  args_usage .= ' ...'
+  args_info  .= ' args'
 
 store_info:
 
@@ -178,15 +178,15 @@ store_info:
   argc = elements args
 END_PIR
 
-  code.emit("  if argc < %0 goto BAD_ARGS", min)
+  code.emit('  if argc < %0 goto BAD_ARGS', min)
   if is_slurpy goto emit_args
-  code.emit("  if argc > %0 goto BAD_ARGS", max)
+  code.emit('  if argc > %0 goto BAD_ARGS', max)
 
 emit_args:
   code .= args_code
   
   # Convert the remaining elements returned by foldup into a TclList
-  code.emit(<<"END_PIR")
+  code.emit(<<'END_PIR')
   .local pmc arg_list
   arg_list = new .TclList
   unless args goto NO_SLURPY_ARGS
@@ -196,13 +196,13 @@ NO_SLURPY_ARGS:
 END_PIR
 
 done_args:
-  code.emit("  goto ARGS_OK")
+  code.emit('  goto ARGS_OK')
   code .= defaults
-  code.emit(<<"END_PIR", name, args_usage)
+  code.emit(<<'END_PIR', name, args_usage)
   goto ARGS_OK
 BAD_ARGS:
   $P0 = pop call_chain
-  tcl_error 'wrong # args: should be \"%0%1\"'
+  tcl_error 'wrong # args: should be "%0%1"'
 ARGS_OK:
   push_eh is_return
 END_PIR
@@ -213,14 +213,14 @@ END_PIR
 
   code .= parsed_body
   
-  code.emit(<<"END_PIR", body_reg)
+  code.emit(<<'END_PIR', body_reg)
   clear_eh
 was_ok:
   $P0 = pop call_chain
   .return(%0)
 END_PIR
 
-  code .= <<"END_PIR"
+  code .= <<'END_PIR'
 is_return:
   .catch()
   .get_return_code($I0)

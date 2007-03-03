@@ -54,7 +54,7 @@ is_string:
     if a >  1 goto domain_error
  
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     $N0 = acos $N0
     ret = $N0
@@ -89,7 +89,7 @@ domain_error:
     if a >  1 goto domain_error
     
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     $N0 = asin $N0
     ret = $N0
@@ -121,7 +121,7 @@ domain_error:
     clear_eh
     
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     $N0 = atan $N0
     ret = $N0
@@ -154,7 +154,7 @@ is_string:
     clear_eh
     
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     $N0 = ceil $N0
     ret = $N0
@@ -175,7 +175,7 @@ is_string:
     clear_eh
     
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     $N0 = cos $N0
     ret = $N0
@@ -199,7 +199,7 @@ is_string:
     clear_eh
     
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     $N0 = cosh $N0
     ret = $N0
@@ -223,7 +223,7 @@ is_string:
     clear_eh
     
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     ret = $N0
     .return (ret)
@@ -265,7 +265,7 @@ is_string:
     clear_eh
     
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     $N0 = exp $N0
     ret = $N0
@@ -351,7 +351,7 @@ is_string:
     if a < 0 goto domain_error
 
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     $N0 = ln $N0
     ret = $N0
@@ -385,7 +385,7 @@ is_string:
     if a < 0 goto domain_error
 
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     $N0 = log10 $N0
     ret = $N0
@@ -475,7 +475,7 @@ is_string:
     clear_eh
     
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     $N0 = sin $N0
     ret = $N0
@@ -499,7 +499,7 @@ is_string:
     clear_eh
     
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     $N0 = sinh $N0
     ret = $N0
@@ -524,7 +524,7 @@ is_string:
     
     .local pmc ret
     if a < 0 goto domain_error
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     $N0 = sqrt $N0
     ret = $N0
@@ -559,7 +559,7 @@ is_string:
     clear_eh
     
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     $N0 = tan $N0
     ret = $N0
@@ -583,7 +583,7 @@ is_string:
     clear_eh
     
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     $N0 = a
     $N0 = tanh $N0
     ret = $N0
@@ -662,7 +662,7 @@ is_string:
     $N1 = b
     $N0 = $N0 % $N1
     .local pmc ret
-    ret = new "TclFloat"
+    ret = new 'TclFloat'
     ret = $N0
     .return (ret)
 

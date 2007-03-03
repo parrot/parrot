@@ -93,12 +93,12 @@ subst:
 
     pir.emit(".HLL 'Tcl', ''")
     pir.emit(".loadlib 'tcl_ops'")
-    pir.emit(".namespace %0", namespace)
+    pir.emit('.namespace %0', namespace)
     pir.emit(".include 'languages/tcl/src/returncodes.pir'")
     pir.emit(".sub '_anon' :anon")
     pir .= code
-    pir.emit("  .return(%0)", ret)
-    pir.emit(".end")
+    pir.emit('  .return(%0)', ret)
+    pir.emit('.end')
     $S0 = pir
 
     $P1    = compreg 'PIR'

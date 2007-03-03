@@ -69,7 +69,7 @@ emit_char:
   goto loop
 
 emit_escaped_char:
-  replStr .= "\\"
+  replStr .= '\'
   goto emit_char
 
 emit_0:

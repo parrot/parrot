@@ -68,7 +68,7 @@ scalar:
   if null variable goto no_such_variable
  
   $S0 = typeof variable 
-  if $S0 == "TclArray" goto cant_read_array
+  if $S0 == 'TclArray' goto cant_read_array
   .return(variable)
 
 cant_read_array:
@@ -239,7 +239,7 @@ scalar:
   $P0 = __find_var(name)
   if null $P0 goto create_scalar
   $S0 = typeof $P0
-  if $S0 == "TclArray" goto cant_set_array
+  if $S0 == 'TclArray' goto cant_set_array
 
 create_scalar:
   __store_var(name, value)

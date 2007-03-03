@@ -18,13 +18,13 @@
   nocomplain = 0
   
   $S0 = argv[0]
-  if $S0 != "-nocomplain" goto flags_done
+  if $S0 != '-nocomplain' goto flags_done
   nocomplain = 1
   i = 1
   
   if argc < 2 goto flags_done
   $S0 = argv[1]
-  if $S0 != "--" goto flags_done
+  if $S0 != '--' goto flags_done
   i = 2
 
 flags_done:

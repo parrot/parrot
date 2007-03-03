@@ -28,7 +28,7 @@ END_PIR
 cd_it:
   pir.emit(<<'END_PIR', retval, dir)
   $P0 = new .OS
-  %0  = $P0."chdir"(%1)
+  %0  = $P0.'chdir'(%1)
 END_PIR
 
   .return(pir)

@@ -29,7 +29,7 @@
   the_index = __index(position, the_list)
 
   $S0 = substr position, 0, 3
-  if $S0 != "end" goto next
+  if $S0 != 'end' goto next
   inc the_index
   
 next:

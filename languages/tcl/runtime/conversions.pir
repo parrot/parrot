@@ -144,7 +144,7 @@ Given a PMC, get an integer from it.
 
   unless has_rawhex goto normal
   $S0 = value
-  $S0 =  "0x" . $S0
+  $S0 =  '0x' . $S0
   value = $S0
 
 normal: 
@@ -335,7 +335,7 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     pir = new 'PGE::CodeString'
 
     pir.emit(".HLL 'Tcl', ''")
-    pir.emit(".namespace %0", namespace)
+    pir.emit('.namespace %0', namespace)
     pir.emit(".sub '_anon' :anon")
     pir .= result
     pir.emit("  .return(%0)", ret)
@@ -426,12 +426,12 @@ Given a chunk of tcl code, return a subroutine.
 
     pir.emit(".HLL 'Tcl', ''")
     pir.emit(".loadlib 'tcl_ops'")
-    pir.emit(".namespace %0", namespace)
+    pir.emit('.namespace %0', namespace)
     pir.emit(".include 'languages/tcl/src/returncodes.pir'")
     pir.emit(".sub '_anon' :anon")
     pir .= result
-    pir.emit("  .return(%0)", ret)
-    pir.emit(".end")
+    pir.emit('  .return(%0)', ret)
+    pir.emit('.end')
 
     $P1 = compreg 'PIR'
     $P2 = $P1(pir)
@@ -474,7 +474,7 @@ depth_set:
   $I0 = elements ns_name
   if $I0 == 0 goto relative
   $S0 = ns_name[0]
-  if $S0 != "" goto relative
+  if $S0 != '' goto relative
   
 absolute:
   $P1 = shift ns_name
@@ -485,7 +485,7 @@ relative:
   interp = getinterp
 relative_loop:
   inc depth
-  $P0 = interp["sub"; depth]
+  $P0 = interp['sub'; depth]
   $P0 = $P0.'get_namespace'()
   $P0 = $P0.'get_name'()
   $S0 = $P0[0]
@@ -588,8 +588,8 @@ was this a valid tcl-style level, or did we get this value as a default?
 get_absolute:
   # Is this an absolute?
   $S0 = tcl_level
-  $S1 = substr $S0, 0, 1, ""
-  if $S1 != "#" goto get_integer
+  $S1 = substr $S0, 0, 1, ''
+  if $S1 != '#' goto get_integer
   push_eh default
     parrot_level = __number($S0)
   clear_eh
@@ -620,7 +620,7 @@ bounds_check:
 
 bad_level:
   $S0 = tcl_level
-  $S0 = "bad level \"" . $S0
-  $S0 = $S0 . "\""
+  $S0 = 'bad level "' . $S0
+  $S0 = $S0 . '"'
   tcl_error $S0
 .end

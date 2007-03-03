@@ -55,7 +55,7 @@ Creates the C<PAST::*> classes.
     $P0 = subclass base, 'PAST::Var'
 
     $P0 = new .Integer
-    store_global "TclExpr::PAST", "$!serno", $P0
+    store_global 'TclExpr::PAST', '$!serno', $P0
 .end
 
 .namespace [ 'PAST::Node' ]

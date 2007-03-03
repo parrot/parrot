@@ -30,7 +30,7 @@ loop:
     if $I0 == -1 goto store
     $S0 = name
     $S0 = "can't define \"" . $S0
-    $S0 = $S0 . "\": name refers to an element in an array"
+    $S0 = $S0 . '": name refers to an element in an array'
     tcl_error $S0
 
 store:

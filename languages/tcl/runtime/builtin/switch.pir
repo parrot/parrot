@@ -74,7 +74,7 @@ got_body:
 
   # check to make sure the last option isn't a fall-through
   $S0 = body[-1]
-  unless $S0 == "-" goto check_mode
+  unless $S0 == '-' goto check_mode
   $S0 = body[-2]
   $S0 = 'no body specified for pattern "' . $S0
   $S0 = $S0 . '"'
@@ -141,7 +141,7 @@ fallthrough:
   $S0  = shift body
   code = shift body
 body_match:
-  if code == "-" goto fallthrough
+  if code == '-' goto fallthrough
   .local pmc __script
   __script = get_root_global ['_tcl'], '__script'
   $P1 = __script(code)

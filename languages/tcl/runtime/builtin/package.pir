@@ -8,7 +8,7 @@
 # RT#40707: Stub 
 # help tcltest compile
 
-.sub "&package"
+.sub '&package'
     .param pmc args :slurpy
 
     .return('')

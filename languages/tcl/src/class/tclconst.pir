@@ -1,5 +1,5 @@
-.include "languages/tcl/src/returncodes.pir"
-.include "languages/tcl/src/macros.pir"
+.include 'languages/tcl/src/returncodes.pir'
+.include 'languages/tcl/src/macros.pir'
 
 .HLL 'parrot', ''
 .namespace [ 'TclConst' ]
@@ -13,8 +13,8 @@ Define the attributes required for the class.
 =cut
 
 .sub __class_init :load
-  $P0 = getclass "String"
-  $P1 = subclass $P0, "TclConst"
+  $P0 = getclass 'String'
+  $P1 = subclass $P0, 'TclConst'
   
   $P0 = new .Hash
   $P0[ 97] = "\a"
@@ -29,7 +29,7 @@ Define the attributes required for the class.
   set_root_global ['_tcl'], 'backslashes', $P0
 
   $P0 = new .Hash
-  $P0[ 48] =  0 # "0"
+  $P0[ 48] =  0 # '0'
   $P0[ 49] =  1
   $P0[ 50] =  2
   $P0[ 51] =  3
@@ -39,13 +39,13 @@ Define the attributes required for the class.
   $P0[ 55] =  7
   $P0[ 56] =  8
   $P0[ 57] =  9
-  $P0[ 65] = 10 # "A"
+  $P0[ 65] = 10 # 'A'
   $P0[ 66] = 11
   $P0[ 67] = 12
   $P0[ 68] = 13
   $P0[ 69] = 14
   $P0[ 70] = 15
-  $P0[ 97] = 10 # "a"
+  $P0[ 97] = 10 # 'a'
   $P0[ 98] = 11
   $P0[ 99] = 12
   $P0[100] = 13
@@ -69,7 +69,7 @@ Define the attributes required for the class.
   pos = 0
 loop:
   value_length = length value
-  pos = index value, "\\", pos
+  pos = index value, '\', pos
   if pos == -1 goto done
  
   $I0 = pos + 1
@@ -83,7 +83,7 @@ simple:
   $I1 = exists backslashes[$I0]
   if $I1 goto special
   
-  substr value, pos, 1, ""
+  substr value, pos, 1, ''
   inc pos
   goto loop
 
@@ -193,7 +193,7 @@ hex_done:
 
 hex_not_really:
   # This was a \x escape that had no hex value..
-  substr value, pos, 2, "x"
+  substr value, pos, 2, 'x'
   inc pos
   goto loop
 
@@ -236,7 +236,7 @@ uni_done:
 
 uni_not_really:
   # This was a \u escape that had no uni value..
-  substr value, pos, 2, "u"
+  substr value, pos, 2, 'u'
   inc pos
   goto loop
 
@@ -247,7 +247,7 @@ special:
   goto loop
   
 done:
-  $I0 = classoffset self, "TclConst"
+  $I0 = classoffset self, 'TclConst'
   $P0 = getattribute self, $I0
   $P0 = value
 .end
@@ -262,7 +262,7 @@ Generate PIR code which can be used to generate our value
    .param int argnum
   
    .local pmc value
-   $I0 = classoffset self, "TclConst"
+   $I0 = classoffset self, 'TclConst'
    value = getattribute self, $I0
 
    .local pmc compiler

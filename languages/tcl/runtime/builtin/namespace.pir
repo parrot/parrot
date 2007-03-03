@@ -79,8 +79,8 @@ no_args:
   .local pmc ns, __namespace
   __namespace = get_root_global ['_tcl'], '__namespace'
   ns  = __namespace('')
-  $S0 = join "::", ns
-  $S0 = "::" . $S0
+  $S0 = join '::', ns
+  $S0 = '::' . $S0
   .return($S0)
 
 bad_args:
@@ -123,7 +123,7 @@ return:
   .return('')
 .end
 
-.sub "exists"
+.sub 'exists'
   .param pmc argv
 
   .local int argc
@@ -141,7 +141,7 @@ return:
   if $I0 == 0 goto relative
 
   $S0 = $P0[0]
-  if $S0 != "" goto relative
+  if $S0 != '' goto relative
   $P1 = pop $P0
   goto get
 
@@ -252,7 +252,7 @@ bad_args:
   ns = __namespace(ns, 1)
 
   .local string namespace
-  namespace = ""
+  namespace = ''
   $I0 = elements ns
   if $I0 == 0 goto global_ns
   
@@ -264,7 +264,7 @@ global_ns:
   .local pmc __script, code
   __script = get_root_global ['_tcl'], '__script'
   code     = new 'PGE::CodeString'
-  $S0 = join " ", argv
+  $S0 = join ' ', argv
   ($S0, $S1) = __script($S0, 'pir_only'=>1)
   $I0 = code.unique()
   code.emit(<<'END_PIR', namespace, $S0, $I0, $S1)
@@ -273,7 +273,7 @@ global_ns:
 # src/compiler.pir :: pir_compiler (2)
 .pragma n_operators 1
 .sub compiled_tcl_sub_%2 
-  .include "languages/tcl/src/returncodes.pir"
+  .include 'languages/tcl/src/returncodes.pir'
   .local pmc epoch, colons, split, unk, interactive :unique_reg
   epoch  = get_root_global ['_tcl'], 'epoch'
   colons = get_root_global ['_tcl'], 'colons'
@@ -285,7 +285,7 @@ global_ns:
 END_PIR
   
   .local pmc pir_compiler
-  pir_compiler = compreg "PIR"
+  pir_compiler = compreg 'PIR'
   push_eh restore_call_chain
     $P0 = pir_compiler(code)
     $P0 = $P0()
@@ -330,7 +330,7 @@ iterate:
   .local pmc __namespace, ns, ns_name
   .local string name
   __namespace = get_root_global ['_tcl'], '__namespace'
-  name = ""
+  name = ''
   if argc == 0 goto getname
 
   name = argv[0]
@@ -347,12 +347,12 @@ loop:
   unless iter goto end
   $S0 = shift iter
   $P0 = ns[$S0]
-  $I0 = isa $P0, "NameSpace"
+  $I0 = isa $P0, 'NameSpace'
   unless $I0 goto loop
   $P0 = $P0.'get_name'()
   $S0 = shift $P0 # get rid of 'tcl'
-  $S0 = join "::", $P0
-  $S0 = "::" . $S0
+  $S0 = join '::', $P0
+  $S0 = '::' . $S0
   $P0 = new .TclString
   $P0 = $S0
   unless has_pattern goto is_namespace
@@ -447,7 +447,7 @@ b_first:
   argc = elements argv
 
   .local string name
-  name = ""
+  name = ''
   
   if argc > 1  goto bad_args
   if argc == 0 goto get_parent
@@ -458,14 +458,14 @@ get_parent:
   .local pmc ns, __namespace
   __namespace = get_root_global ['_tcl'], '__namespace'
   ns  = __namespace(name)
-  if $S0 != "" goto no_pop
+  if $S0 != '' goto no_pop
   # for when someone calls [namespace current] from ::
   push_eh current_in_root
     $S0 = pop ns
   clear_eh
 no_pop:
-  $S0 = join "::", ns
-  $S0 = "::" . $S0
+  $S0 = join '::', ns
+  $S0 = '::' . $S0
   .return($S0)
 
 current_in_root:

@@ -21,7 +21,7 @@
   .return($P0)
 
 onearg:
-  pir_code = "tcl_return "
+  pir_code = 'tcl_return '
   $S1 = argv[0]
   pir_code.= $S1
   pir_code.= "\n"

@@ -122,7 +122,7 @@ done:
 couldnt_set:
   $S0 =  "couldn't set loop variable: \""
   $S0 .= varname
-  $S0 .= "\""
+  $S0 .= '"'
   tcl_error $S0
 
 bad_args:

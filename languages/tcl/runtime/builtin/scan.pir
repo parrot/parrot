@@ -44,7 +44,7 @@ loop:
 
   # Get the next thing in the format.
   $S0 = substr format, format_pos, 1
-  if $S0 == "%" goto handle_percent
+  if $S0 == '%' goto handle_percent
   $I0 = is_cclass .CCLASS_WHITESPACE, format, format_pos
   unless $I0 goto handle_other
 
@@ -129,7 +129,7 @@ check_xpg3:
 
   $S0 = substr format, format_pos, 1  
 
-  if $S0 == "$" goto got_xpg3
+  if $S0 == '$' goto got_xpg3
   # We got a number, but it was the width.
   $S0 = match
   width = __integer($S0)
@@ -377,7 +377,7 @@ handle_float:
   $P0 = __number($S0)
   $S1 = typeof $P0
   if $S1 == 'TclFloat' goto done_float
-  $S0 = $S0 . ".0"
+  $S0 = $S0 . '.0'
   $P0 = $P1($S0)
 
 done_float:

@@ -37,7 +37,7 @@ end:
   pir = new 'PGE::CodeString'
   pir .= $P0
 
-  pir.emit("  %0 = %1", retval, $S0)
+  pir.emit('  %0 = %1', retval, $S0)
 
   .return(pir)
 
@@ -57,7 +57,7 @@ exception:
   $P0.replace('"', '\"')
   $S0 = $P0
   .local string error
-  error = "tcl_error \""
+  error = 'tcl_error "'
   error .= $S0
   error .= "\"\n"
   .return(error)

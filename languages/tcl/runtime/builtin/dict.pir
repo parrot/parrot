@@ -119,7 +119,7 @@ loop_done:
 cant_dict_array:
   $S1 = dict_name
   $S1 = "can't set \"" . $S1
-  $S1 .= "\": variable is array"
+  $S1 .= '": variable is array'
   tcl_error $S1
 
 bad_args:
@@ -477,7 +477,7 @@ done:
 cant_dict_array:
   $S1 = dict_name
   $S1 = "can't set \"" . $S1
-  $S1 .= "\": variable is array"
+  $S1 .= '": variable is array'
   tcl_error $S1
 
 bad_args:
@@ -561,7 +561,7 @@ loop_done:
 cant_dict_array:
   $S1 = dict_name
   $S1 = "can't set \"" . $S1
-  $S1 .= "\": variable is array"
+  $S1 .= '": variable is array'
   tcl_error $S1
 
 bad_args:
@@ -707,7 +707,7 @@ loop_done:
   .return (dictionary)
 
 odd_args:
-  tcl_error "missing value to go with key"
+  tcl_error 'missing value to go with key'
 
 bad_args:
   tcl_error 'wrong # args: should be "dict replace dictionary ?key value ...?"'
@@ -768,7 +768,7 @@ loop_done:
 cant_dict_array:
   $S1 = dict_name
   $S1 = "can't set \"" . $S1
-  $S1 .= "\": variable is array"
+  $S1 .= '": variable is array'
   tcl_error $S1
 
 bad_args:
@@ -847,7 +847,7 @@ not_exist:
 cant_dict_array:
   $S1 = dict_name
   $S1 = "can't set \"" . $S1
-  $S1 .= "\": variable is array"
+  $S1 .= '": variable is array'
   tcl_error $S1
 
 bad_args:
@@ -924,7 +924,7 @@ done:
 cant_dict_array:
   $S1 = dict_name
   $S1 = "can't set \"" . $S1
-  $S1 .= "\": variable is array"
+  $S1 .= '": variable is array'
   tcl_error $S1
 
 bad_args:
@@ -1044,7 +1044,7 @@ done_update:
 cant_dict_array:
   $S1 = dict_name
   $S1 = "can't set \"" . $S1
-  $S1 .= "\": variable is array"
+  $S1 .= '": variable is array'
   tcl_error $S1
 
 bad_args:

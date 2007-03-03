@@ -35,12 +35,12 @@
 # First pass at RT#40748
 compiler_error:
   get_results'(0,0)', $P1, $S1
-  $S1 = "compile error: " . $S1
+  $S1 = 'compile error: ' . $S1
   tcl_error $S1
 
 runtime_error:
   get_results'(0,0)', $P1, $S1
-  $S1 = "runtime error: " . $S1
+  $S1 = 'runtime error: ' . $S1
   tcl_error $S1
 
 bad_args:

@@ -12,7 +12,7 @@
 
   .local string splitchars,splitstring
   splitstring = argv[0]
-  if splitstring != "" goto check_splitchars
+  if splitstring != '' goto check_splitchars
   .return ('')
 
 check_splitchars:
