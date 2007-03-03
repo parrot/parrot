@@ -1,4 +1,4 @@
-// $ANTLR 3.0b6 src/antlr3/GenPastPir.g 2007-03-03 21:45:40
+// $ANTLR 3.0b6 src/antlr3/GenPastPir.g 2007-03-03 22:38:32
 
   import java.util.regex.*;
 
@@ -94,11 +94,11 @@ public class GenPastPir extends TreeParser {
                     + "    # the superglobals                                            \n"
                     + "    .local pmc superglobal_GET                                    \n"
                     + "    ( superglobal_GET ) = parse_get_sub()                         \n"
-                    + "    set_global '_GET', superglobal_GET                            \n"
+                    + "    set_global '$_GET', superglobal_GET                            \n"
                     + "                                                                  \n"
                     + "    .local pmc superglobal_POST                                   \n"
                     + "    ( superglobal_POST ) = parse_post_sub()                       \n"
-                    + "    set_global '_POST', superglobal_POST                          \n"
+                    + "    set_global '$_POST', superglobal_POST                          \n"
                     + "                                                                  \n"
                     + "    # The root node of PAST.                                      \n"
                     + "    .local pmc past_root                                          \n"

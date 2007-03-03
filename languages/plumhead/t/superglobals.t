@@ -19,7 +19,7 @@ use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 use Parrot::Config (); 
 use Parrot::Test;
-use Test::More     tests => 2;
+use Test::More     tests => 3;
 
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
 <?php
@@ -32,6 +32,7 @@ END_EXPECTED
 
 $ENV{REQUEST_TYPE} = 'GET';
 $ENV{QUERY_STRING} = 'as=df';
+
 language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
 <?php
 echo $_GET['as'];
@@ -39,5 +40,18 @@ echo "\n";
 ?>
 END_CODE
 df
+END_EXPECTED
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
+<?php
+var_dump( $_GET );
+echo "\n";
+?>
+END_CODE
+array(1) {
+  ["as"]=>
+  string(2) "df"
+}
+
 END_EXPECTED
 

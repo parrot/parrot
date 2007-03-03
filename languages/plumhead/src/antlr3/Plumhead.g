@@ -42,7 +42,7 @@ VAR_DUMP            : {  codeMode }?=>  'var_dump' ;
 PAREN_OPEN          : {  codeMode }?=>  '(' ;
 PAREN_CLOSE         : {  codeMode }?=>  ')' ;
 
-fragment IDENT      : {  codeMode }?=>  ( 'a'..'z' | 'A'..'Z' )( 'a'..'z' | 'A'..'Z' | '_' | '0'..'9' )*;
+fragment IDENT      : {  codeMode }?=>  ( 'a'..'z' | 'A'..'Z' | '_' )( 'a'..'z' | 'A'..'Z' | '_' | '0'..'9' )*;
 VAR_NAME            : {  codeMode }?=>  '$' IDENT ;
 
 fragment DIGITS     : {  codeMode }?=>  ('0'..'9' )+ ;

@@ -1,4 +1,4 @@
-// $ANTLR 3.0b6 src/antlr3/Plumhead.g 2007-03-03 21:45:37
+// $ANTLR 3.0b6 src/antlr3/Plumhead.g 2007-03-03 22:38:29
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -684,13 +684,13 @@ public class PlumheadLexer extends Lexer {
     public void mIDENT() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            // src/antlr3/Plumhead.g:45:23: ({...}? => ('a'..'z'|'A'..'Z') ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))* )
-            // src/antlr3/Plumhead.g:45:23: {...}? => ('a'..'z'|'A'..'Z') ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))*
+            // src/antlr3/Plumhead.g:45:23: ({...}? => ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))* )
+            // src/antlr3/Plumhead.g:45:23: {...}? => ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))*
             {
             if ( !(  codeMode ) ) {
                 throw new FailedPredicateException(input, "IDENT", "  codeMode ");
             }
-            if ( (input.LA(1)>='A' && input.LA(1)<='Z')||(input.LA(1)>='a' && input.LA(1)<='z') ) {
+            if ( (input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
                 input.consume();
 
             }
@@ -700,7 +700,7 @@ public class PlumheadLexer extends Lexer {
                 recover(mse);    throw mse;
             }
 
-            // src/antlr3/Plumhead.g:45:64: ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))*
+            // src/antlr3/Plumhead.g:45:70: ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))*
             loop6:
             do {
                 int alt6=2;
@@ -712,7 +712,7 @@ public class PlumheadLexer extends Lexer {
 
                 switch (alt6) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:45:66: ('a'..'z'|'A'..'Z'|'_'|'0'..'9')
+            	    // src/antlr3/Plumhead.g:45:72: ('a'..'z'|'A'..'Z'|'_'|'0'..'9')
             	    {
             	    if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
             	        input.consume();
@@ -1549,7 +1549,7 @@ public class PlumheadLexer extends Lexer {
         "\1\57",
         "\74\35\1\uffff\uffc2\35",
         "\74\35\1\uffff\uffc2\35",
-        "\32\62\6\uffff\32\62",
+        "\32\62\4\uffff\1\62\1\uffff\32\62",
         "\56\35\1\21\1\35\12\20\2\35\1\uffff\uffc2\35",
         "\12\64",
         "\74\35\1\uffff\uffc2\35",
@@ -2178,7 +2178,7 @@ public class PlumheadLexer extends Lexer {
                     case 53 : 
                         int LA12_15 = input.LA(1);
                         s = -1;
-                        if ( ((LA12_15>='A' && LA12_15<='Z')||(LA12_15>='a' && LA12_15<='z')) && ((  codeMode || !codeMode ))) {s = 50;}
+                        if ( ((LA12_15>='A' && LA12_15<='Z')||LA12_15=='_'||(LA12_15>='a' && LA12_15<='z')) && ((  codeMode || !codeMode ))) {s = 50;}
 
                         else s = 29;
 
