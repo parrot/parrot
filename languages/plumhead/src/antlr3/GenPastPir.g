@@ -390,7 +390,7 @@ node[String reg_mother]
       System.out.println( 
           "                                                                  \n"
         + "  past_name = new 'PAST::Var'                                     \n"
-        + "  past_name.'init'( 'name' => 'past_array_" + $ARRAY.text + "', 'viviself' => '.Hash', 'islvalue' => 1 )      \n"
+        + "  past_name.'init'( 'name' => '" + $ARRAY.text + "', 'viviself' => '.Hash', 'islvalue' => 1 )      \n"
         + "  # PAST-pm has no unshift yet                                    \n"
         + "  \$P0 = " + reg_array + ".'get_array'()                          \n"
         + "  unshift \$P0, past_name                                         \n"

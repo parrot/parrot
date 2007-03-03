@@ -1,4 +1,4 @@
-// $ANTLR 3.0b6 src/antlr3/Plumhead.g 2007-03-02 17:36:05
+// $ANTLR 3.0b6 src/antlr3/Plumhead.g 2007-03-03 21:45:37
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -8,8 +8,9 @@ import java.util.ArrayList;
 public class PlumheadLexer extends Lexer {
     public static final int CODE_START=12;
     public static final int MINUS=26;
-    public static final int IDENT=21;
+    public static final int VAR_NAME=22;
     public static final int DIGITS=23;
+    public static final int IDENT=21;
     public static final int ARRAY=8;
     public static final int BITWISE_OP=29;
     public static final int T36=36;
@@ -23,8 +24,8 @@ public class PlumheadLexer extends Lexer {
     public static final int CODE_END=13;
     public static final int STMTS=6;
     public static final int PROGRAM=4;
-    public static final int PREFIX=10;
     public static final int PAREN_OPEN=19;
+    public static final int PREFIX=10;
     public static final int INTEGER=24;
     public static final int ASSIGN_OP=30;
     public static final int DOUBLEQUOTE_STRING=15;
@@ -41,7 +42,6 @@ public class PlumheadLexer extends Lexer {
     public static final int PLUS=27;
     public static final int T38=38;
     public static final int NOQUOTE_STRING=5;
-    public static final int VAR_IDENT=22;
     public static final int SCALAR=7;
 
       public static boolean codeMode = false;
@@ -743,11 +743,11 @@ public class PlumheadLexer extends Lexer {
     }
     // $ANTLR end IDENT
 
-    // $ANTLR start VAR_IDENT
-    public void mVAR_IDENT() throws RecognitionException {
+    // $ANTLR start VAR_NAME
+    public void mVAR_NAME() throws RecognitionException {
         try {
             ruleNestingLevel++;
-            int _type = VAR_IDENT;
+            int _type = VAR_NAME;
             int _start = getCharIndex();
             int _line = getLine();
             int _charPosition = getCharPositionInLine();
@@ -756,7 +756,7 @@ public class PlumheadLexer extends Lexer {
             // src/antlr3/Plumhead.g:46:23: {...}? => '$' IDENT
             {
             if ( !(  codeMode ) ) {
-                throw new FailedPredicateException(input, "VAR_IDENT", "  codeMode ");
+                throw new FailedPredicateException(input, "VAR_NAME", "  codeMode ");
             }
             match('$'); 
             mIDENT(); 
@@ -774,7 +774,7 @@ public class PlumheadLexer extends Lexer {
             ruleNestingLevel--;
         }
     }
-    // $ANTLR end VAR_IDENT
+    // $ANTLR end VAR_NAME
 
     // $ANTLR start DIGITS
     public void mDIGITS() throws RecognitionException {
@@ -1299,7 +1299,7 @@ public class PlumheadLexer extends Lexer {
     // $ANTLR end ELSE
 
     public void mTokens() throws RecognitionException {
-        // src/antlr3/Plumhead.g:1:10: ( T34 | T35 | T36 | T37 | T38 | SEA | CODE_START | CODE_END | WS | DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | ECHO | VAR_DUMP | PAREN_OPEN | PAREN_CLOSE | VAR_IDENT | INTEGER | NUMBER | MINUS | PLUS | MUL_OP | BITWISE_OP | ASSIGN_OP | REL_OP | IF | ELSE )
+        // src/antlr3/Plumhead.g:1:10: ( T34 | T35 | T36 | T37 | T38 | SEA | CODE_START | CODE_END | WS | DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | ECHO | VAR_DUMP | PAREN_OPEN | PAREN_CLOSE | VAR_NAME | INTEGER | NUMBER | MINUS | PLUS | MUL_OP | BITWISE_OP | ASSIGN_OP | REL_OP | IF | ELSE )
         int alt12=26;
         alt12 = dfa12.predict(input);
         switch (alt12) {
@@ -1409,77 +1409,77 @@ public class PlumheadLexer extends Lexer {
                 }
                 break;
             case 16 :
-                // src/antlr3/Plumhead.g:1:132: VAR_IDENT
+                // src/antlr3/Plumhead.g:1:132: VAR_NAME
                 {
-                mVAR_IDENT(); 
+                mVAR_NAME(); 
 
                 }
                 break;
             case 17 :
-                // src/antlr3/Plumhead.g:1:142: INTEGER
+                // src/antlr3/Plumhead.g:1:141: INTEGER
                 {
                 mINTEGER(); 
 
                 }
                 break;
             case 18 :
-                // src/antlr3/Plumhead.g:1:150: NUMBER
+                // src/antlr3/Plumhead.g:1:149: NUMBER
                 {
                 mNUMBER(); 
 
                 }
                 break;
             case 19 :
-                // src/antlr3/Plumhead.g:1:157: MINUS
+                // src/antlr3/Plumhead.g:1:156: MINUS
                 {
                 mMINUS(); 
 
                 }
                 break;
             case 20 :
-                // src/antlr3/Plumhead.g:1:163: PLUS
+                // src/antlr3/Plumhead.g:1:162: PLUS
                 {
                 mPLUS(); 
 
                 }
                 break;
             case 21 :
-                // src/antlr3/Plumhead.g:1:168: MUL_OP
+                // src/antlr3/Plumhead.g:1:167: MUL_OP
                 {
                 mMUL_OP(); 
 
                 }
                 break;
             case 22 :
-                // src/antlr3/Plumhead.g:1:175: BITWISE_OP
+                // src/antlr3/Plumhead.g:1:174: BITWISE_OP
                 {
                 mBITWISE_OP(); 
 
                 }
                 break;
             case 23 :
-                // src/antlr3/Plumhead.g:1:186: ASSIGN_OP
+                // src/antlr3/Plumhead.g:1:185: ASSIGN_OP
                 {
                 mASSIGN_OP(); 
 
                 }
                 break;
             case 24 :
-                // src/antlr3/Plumhead.g:1:196: REL_OP
+                // src/antlr3/Plumhead.g:1:195: REL_OP
                 {
                 mREL_OP(); 
 
                 }
                 break;
             case 25 :
-                // src/antlr3/Plumhead.g:1:203: IF
+                // src/antlr3/Plumhead.g:1:202: IF
                 {
                 mIF(); 
 
                 }
                 break;
             case 26 :
-                // src/antlr3/Plumhead.g:1:206: ELSE
+                // src/antlr3/Plumhead.g:1:205: ELSE
                 {
                 mELSE(); 
 
@@ -1665,7 +1665,7 @@ public class PlumheadLexer extends Lexer {
             }
         }
         public String getDescription() {
-            return "1:1: Tokens : ( T34 | T35 | T36 | T37 | T38 | SEA | CODE_START | CODE_END | WS | DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | ECHO | VAR_DUMP | PAREN_OPEN | PAREN_CLOSE | VAR_IDENT | INTEGER | NUMBER | MINUS | PLUS | MUL_OP | BITWISE_OP | ASSIGN_OP | REL_OP | IF | ELSE );";
+            return "1:1: Tokens : ( T34 | T35 | T36 | T37 | T38 | SEA | CODE_START | CODE_END | WS | DOUBLEQUOTE_STRING | SINGLEQUOTE_STRING | ECHO | VAR_DUMP | PAREN_OPEN | PAREN_CLOSE | VAR_NAME | INTEGER | NUMBER | MINUS | PLUS | MUL_OP | BITWISE_OP | ASSIGN_OP | REL_OP | IF | ELSE );";
         }
         public int specialStateTransition(int s) throws NoViableAltException {
         	int _s = s;

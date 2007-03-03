@@ -1,4 +1,4 @@
-// $ANTLR 3.0b6 src/antlr3/GenPastPir.g 2007-03-02 17:36:08
+// $ANTLR 3.0b6 src/antlr3/GenPastPir.g 2007-03-03 21:45:40
 
   import java.util.regex.*;
 
@@ -10,12 +10,13 @@ import java.util.ArrayList;
 
 public class GenPastPir extends TreeParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "NOQUOTE_STRING", "STMTS", "SCALAR", "ARRAY", "FUNCTION", "PREFIX", "SEA", "CODE_START", "CODE_END", "WS", "DOUBLEQUOTE_STRING", "SINGLEQUOTE_STRING", "ECHO", "VAR_DUMP", "PAREN_OPEN", "PAREN_CLOSE", "IDENT", "VAR_IDENT", "DIGITS", "INTEGER", "NUMBER", "MINUS", "PLUS", "MUL_OP", "BITWISE_OP", "ASSIGN_OP", "REL_OP", "IF", "ELSE", "';'", "'{'", "'}'", "'['", "']'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PROGRAM", "NOQUOTE_STRING", "STMTS", "SCALAR", "ARRAY", "FUNCTION", "PREFIX", "SEA", "CODE_START", "CODE_END", "WS", "DOUBLEQUOTE_STRING", "SINGLEQUOTE_STRING", "ECHO", "VAR_DUMP", "PAREN_OPEN", "PAREN_CLOSE", "IDENT", "VAR_NAME", "DIGITS", "INTEGER", "NUMBER", "MINUS", "PLUS", "MUL_OP", "BITWISE_OP", "ASSIGN_OP", "REL_OP", "IF", "ELSE", "';'", "'{'", "'}'", "'['", "']'"
     };
     public static final int CODE_START=12;
     public static final int MINUS=26;
-    public static final int IDENT=21;
+    public static final int VAR_NAME=22;
     public static final int DIGITS=23;
+    public static final int IDENT=21;
     public static final int ARRAY=8;
     public static final int BITWISE_OP=29;
     public static final int NUMBER=25;
@@ -26,8 +27,8 @@ public class GenPastPir extends TreeParser {
     public static final int CODE_END=13;
     public static final int STMTS=6;
     public static final int PROGRAM=4;
-    public static final int PREFIX=10;
     public static final int PAREN_OPEN=19;
+    public static final int PREFIX=10;
     public static final int INTEGER=24;
     public static final int ASSIGN_OP=30;
     public static final int DOUBLEQUOTE_STRING=15;
@@ -41,7 +42,6 @@ public class GenPastPir extends TreeParser {
     public static final int REL_OP=31;
     public static final int PLUS=27;
     public static final int NOQUOTE_STRING=5;
-    public static final int VAR_IDENT=22;
     public static final int SCALAR=7;
 
         public GenPastPir(TreeNodeStream input) {
@@ -787,7 +787,7 @@ public class GenPastPir extends TreeParser {
                           System.out.println( 
                               "                                                                  \n"
                             + "  past_name = new 'PAST::Var'                                     \n"
-                            + "  past_name.'init'( 'name' => 'past_array_" + ARRAY8.getText() + "', 'viviself' => '.Hash', 'islvalue' => 1 )      \n"
+                            + "  past_name.'init'( 'name' => '" + ARRAY8.getText() + "', 'viviself' => '.Hash', 'islvalue' => 1 )      \n"
                             + "  # PAST-pm has no unshift yet                                    \n"
                             + "  $P0 = " + reg_array + ".'get_array'()                          \n"
                             + "  unshift $P0, past_name                                         \n"

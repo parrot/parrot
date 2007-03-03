@@ -43,7 +43,7 @@ PAREN_OPEN          : {  codeMode }?=>  '(' ;
 PAREN_CLOSE         : {  codeMode }?=>  ')' ;
 
 fragment IDENT      : {  codeMode }?=>  ( 'a'..'z' | 'A'..'Z' )( 'a'..'z' | 'A'..'Z' | '_' | '0'..'9' )*;
-VAR_IDENT           : {  codeMode }?=>  '$' IDENT ;
+VAR_NAME            : {  codeMode }?=>  '$' IDENT ;
 
 fragment DIGITS     : {  codeMode }?=>  ('0'..'9' )+ ;
 INTEGER             : {  codeMode }?=>  DIGITS ;
@@ -94,15 +94,16 @@ statement
     |                                                               -> ^( IF relational_expression ^( STMTS $s1 ) )
     ) 
   | CODE_END SEA CODE_START                                         -> ^( ECHO NOQUOTE_STRING[$SEA] )
-  | VAR_IDENT ASSIGN_OP val=expression ';'                          -> ^( ASSIGN_OP SCALAR[$VAR_IDENT] $val ) 
-  | VAR_IDENT '[' key=expression ']' ASSIGN_OP val=expression ';'   -> ^( ASSIGN_OP ^( ARRAY[$VAR_IDENT] $key ) $val )
+  | VAR_NAME ASSIGN_OP val=expression ';'                           -> ^( ASSIGN_OP SCALAR[$VAR_NAME] $val ) 
+  | VAR_NAME '[' key=expression ']' ASSIGN_OP val=expression ';'    -> ^( ASSIGN_OP ^( ARRAY[$VAR_NAME] $key ) $val )
   ;
 
 expression
   : DOUBLEQUOTE_STRING
   | SINGLEQUOTE_STRING
   | bitwise_expression
-  | a=VAR_IDENT ( '[' key=expression ']' -> ^( ARRAY[$a] $key ) )?
+  | VAR_NAME '[' key=expression ']'    -> ^( ARRAY[$VAR_NAME] $key )
+  | VAR_NAME                           -> SCALAR[$VAR_NAME]
   ;
 
 bitwise_expression
