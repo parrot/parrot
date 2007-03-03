@@ -22,8 +22,15 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 6;
+use Parrot::Test;
 use Test::More;
+
+if ( exists $ENV{PARROT_LUA_TEST_PROG} ) {
+    plan skip_all => "parrot only";
+}
+else {
+    plan tests => 6;
+}
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function alarm' );
 require "alarm"

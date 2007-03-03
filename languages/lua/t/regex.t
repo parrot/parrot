@@ -68,15 +68,23 @@ foreach (@test_files) {
         next if (/^\s*$/);
         my ($pattern, $target, $result, $desc) = split /\t+/, $_;
         $pattern = '' if ($pattern eq "''");
+        $pattern =~ s/"/\\"/g;
         $target = '' if ($target eq "''");
+        $target =~ s/"/\\"/g;
+        $result = '' if ($result eq "''");
         my $output = $result;
         $output =~ s/\\f/\f/g;
         $output =~ s/\\n/\n/g;
         $output =~ s/\\r/\r/g;
         $output =~ s/\\t/\t/g;
+        $output =~ s/\\01/\01/g;
+        $output =~ s/\\02/\02/g;
+        $output =~ s/\\03/\03/g;
+        $output =~ s/\\04/\04/g;
+        $output =~ s/\\0/\0/g;
         $test_number ++;
 
-        my $code = "print(string.match('$target', '$pattern'))";
+        my $code = "print(string.match(\"$target\", \"$pattern\"))";
         if ($output =~ /^\//) {
             language_output_like( 'lua', $code, $output . "\n", $desc );
         }

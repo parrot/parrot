@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.byte' );
@@ -376,6 +376,24 @@ he	lo
 1298
 name	Anna
 OUTPUT
+
+TODO: {
+    local $TODO = 'back reference';
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.match (back ref)' );
+s = [[then he said: "it's all right"!]]
+q, quotedPart = string.match(s, "([\"'])(.-)%1")
+print(quotedPart)
+print(q)
+p = "%[(=*)%[(.-)%]%1%]"
+s = "a = [=[[[ something ]] ]==]x]=]; print(a)"
+print(string.match(s, p))
+CODE
+it's all right
+"
+=	[[ something ]] ]==]x
+OUTPUT
+}
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.rep' );
 print(string.rep("ab", 3))

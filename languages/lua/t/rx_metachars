@@ -15,14 +15,11 @@ def$			def\nabc	nil		start and end of string ($)
 def$\nabc		def\nabc	nil		start and end of string (^)
 abc\n$			abc\n		abc\n		end of string ($)
 abc$			abc\n		nil		end of string ($)
-c\nd			abc\ndef	c\nd		logical newline (\n)
-c\nd			abc\010def	c\nd		logical newline (\n)
-#c\nd			abc\013def	c\nd		logical newline (\n)
-c\n+d			abc\n\ndef	c\n\nd		logical newline (\n)
-a\n+f			abcdef		nil		logical newline (\n)
-c\nd			abc\010\013def	nil		logical newline (\n)
-#c\nd			abc\013\010def	c\nd		logical newline (\n)
-b\nc			abc\ndef	nil		logical newline (\n)
+c\nd			abc\ndef	c\nd		newline (\n)
+c\nd			abc\010def	c\nd		newline (\n)
+c\n+d			abc\n\ndef	c\n\nd		newline (\n)
+a\n+f			abcdef		nil		newline (\n)
+b\nc			abc\ndef	nil		newline (\n)
 c\td			abc\tdef	c\td		horizontal tab (\t)
 c\td			abc\09def	c\td		horizontal tab (\t)
 c\t+d			abc\t\tdef	c\t\td		horizontal tab (\t)
@@ -43,6 +40,24 @@ c\033d			abc\033def	c!d		dec (\0)
 c\033+d			abc!!def	c!!d		dec (\0)
 a\033+f			abcdef		nil		dec (\0)
 b\033c			abc!def		nil		dec (\0)
+a%^d			a^d		a^d		escaped (useless)
+a^d			a^d		a^d		not escaped
+%^d			^d		^d		escaped
+a%$d			a$d		a$d		escaped (useless)
+a$d			a$d		a$d		not escaped
+a%$			a$		a$		escaped
+a%(d			a(d		a(d		escaped
+a%)d			a)d		a)d		escaped
+a%%d			a%d		a%d		escaped
+a%.d			a.d		a.d		escaped
+a%.d			abd		nil		escaped
+a%[d			a[d		a[d		escaped
+a%]d			a]d		a]d		escaped
+a%*d			a*d		a*d		escaped
+a%+d			a+d		a+d		escaped
+a%-d			a-d		a-d		escaped
+a%?d			a?d		a?d		escaped
+a%yd			ayd		ayd		escaped
 a%w+f			a=[ *f		nil		word character
 a%w+f			abcdef		abcdef		word character
 a%W+f			a&%- f		a&%- f		not word character
@@ -51,5 +66,37 @@ a%d+f			abcdef		nil		digit
 ab%d+cdef		ab42cdef	ab42cdef	digit
 a%D+f			abcdef		abcdef		not digit
 a%D+f			ab0cdef		nil		not digit
+a%l+f			aBCDEf		nil		lowercase letter
+a%l+f			abcdef		abcdef		lowercase letter
+a%L+f			a&2D f		a&2D f		not lowercase letter
+a%L+f			aBCdEf		nil		not lowercase letter
+a%u+f			abcdef		nil		uppercase letter
+a%u+f			aBCDEf		aBCDEf		uppercase letter
+a%U+f			a&2d f		a&2d f		not uppercase letter
+a%U+f			a&2D f		nil		not uppercase letter
+a%a+f			aBcDef		aBcDef		all letter
+a%a+f			a=[ *f		nil		all letter
+a%A+f			a&%- f		a&%- f		not all letter
+a%A+f			abcdef		nil		not all letter
+a%p+f			abcdef		nil		ponctuation
+a%p+f			a,;:!f		a,;:!f		ponctuation
+a%P+f			abcdef		abcdef		not ponctuation
+a%P+f			adc:ef		nil		not ponctuation
+a%c+f			abcdef		nil		control character
+a%c+f			a\04\03\02f	a\04\03\02f	control character
+a%C+f			abcdef		abcdef		not control character
+a%C+f			abc\01ef	nil		not control character
+a%x+f			axyzef		nil		hexadecimal
+a%x+f			ab3Def		ab3Def		hexadecimal
+a%X+f			abcdef		nil		not hexadecimal
+a%X+f			axy;Zf		axy;Zf		not hexadecimal
+a%z+f			abcdef		nil		zero
+a%z+f			a\0f		a		zero
+a%Z+f			abcdef		abcdef		not zero
+a%Z+f			abc\0ef		nil		not zero
+a%b()f			a(bcde)f	a(bcde)f	balanced
+a%b()f			a(b(de)f	nil		balanced
+a%b()f			a(b(d)e)f	a(b(d)e)f	balanced
+a%b''f			a'bcde'f	a'bcde'f	balanced
 
 ## vim: noexpandtab tabstop=4 shiftwidth=4
