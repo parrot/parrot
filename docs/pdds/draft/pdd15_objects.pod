@@ -315,10 +315,6 @@ The class name
 
 =item 2
 
-The container type
-
-=item 2
-
 The object attribute hash. Keys are the attribute names and the values
 are the attribute values. (The "hash" may be implemented as a typed
 structure following the CStruct proposal.)
@@ -336,6 +332,24 @@ Object PMCs have no methods aside from those defined in their associated
 class. They do have vtable methods providing access to certain low-level
 information about the object, method call functionality, etc. See the
 sections below on L<Objects> and L<Vtables>.
+
+[stream-of-consciousness again]
+In addition to a value type, objects can have a containter type. The
+container type can't be stored in the object itself, because a single
+object may live within multiple containers. So, the container type (when
+it exists) is stored in the LexPad or Namespace entry for a particular
+variable.
+
+In a static language like C#.Net:
+B isa A
+A o1 = new B();
+B o2 = new B();
+
+o1.x; # retrieves A's attribute
+o2.x; # retrieves B's attribute
+
+o1.foo(); # call's B's method
+o2.foo(); # call's B's method
 
 =head2 Role PMC API
 
