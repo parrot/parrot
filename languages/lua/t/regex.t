@@ -57,6 +57,15 @@ my @test_files = (
     'rx_metachars',
 );
 
+my %todo_info = (
+    7   => 'empty capture',
+    8   => 'back reference',
+    9   => 'back reference',
+    145 => 'balanced',
+    147 => 'balanced',
+    148 => 'balanced',
+);
+
 my $test_number = 0;
 
 foreach (@test_files) {
@@ -64,8 +73,7 @@ foreach (@test_files) {
     open my $FH, '<', $filename
             or die "can't open $filename ($!)\n";
     while (<$FH>) {
-        next if (/^#/);
-        next if (/^\s*$/);
+        last if (/^\s*$/);
         my ($pattern, $target, $result, $desc) = split /\t+/, $_;
         $pattern = '' if ($pattern eq "''");
         $pattern =~ s/"/\\"/g;
@@ -85,6 +93,8 @@ foreach (@test_files) {
         $test_number ++;
 
         my $code = "print(string.match(\"$target\", \"$pattern\"))";
+
+        local $TODO = $todo_info{$test_number} if (exists $todo_info{$test_number});
         if ($output =~ /^\//) {
             language_output_like( 'lua', $code, $output . "\n", $desc );
         }

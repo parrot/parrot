@@ -439,7 +439,7 @@ Francois Perrad
     if pos >= lastpos goto err_close
     $S0 = substr target, pos, 1
     inc pos
-    if $S0 == "\\" goto backslash
+    if $S0 == '%' goto percent
     goto addchar
   scan:
     if pos >= lastpos goto err_close
@@ -447,13 +447,10 @@ Francois Perrad
     inc pos
     if $S0 == ']' goto endclass
     if $S0 == '-' goto hyphenrange
-    if $S0 != "\\" goto addchar
-  backslash:
+    if $S0 != '%' goto addchar
+  percent:
     $S0 = substr target, pos, 1
     inc pos
-    $I0 = index 'nrtfae0b', $S0
-    if $I0 == -1 goto addchar
-    $S0 = substr "\n\r\t\f\a\e\0\b", $I0, 1
   addchar:
     if isrange goto addrange
     charlist .= $S0
