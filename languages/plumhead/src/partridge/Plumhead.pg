@@ -18,9 +18,8 @@ token ECHO                    { <'echo'> }
 token PAREN_OPEN              { \( }
 token PAREN_CLOSE             { \) }
 
-# TODO:
-# fragment IDENT              { ( <a..z> | <A..Z> )( <a..z> | <A..Z> )*; }
-# SCALAR                      { <'$'> <IDENT> <';'> }
+token IDENT                   { ( <[a..z]> | <[A..Z]> | <'_'> )( <[a..z]> | <[A..Z]> | <'_'> )* }
+token VAR_NAME                {  <'$'> <IDENT> }
 
 token INTEGER                 { \d+ }
 token NUMBER                  { ( \d+ )? <'.'> \d+ }
@@ -30,6 +29,7 @@ token UNARY_PLUS              { \+ }
 token ADD_OP                  { \+ | \- }
 token MUL_OP                  { \* | / | % }
 token BITWISE_OP              { <'|'>  | <'&'> | <'^'> }
+token ASSIGN_OP               { <'='> }
 token REL_OP                  { <'=='> | <'<='> | <'>='> | <'!='> | <'<'>  | <'>'> }
 
 token IF                      { <'if'> }
@@ -40,20 +40,25 @@ rule  code                    { <?CODE_START> <statement>* <?CODE_END> }
 
 rule relational_expression    { <expression> <rel_op_clause>? }
 
-rule statement                { <ECHO> <expression> ;
-                              | <IF> <?PAREN_OPEN> <relational_expression> <?PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
-                              | <inline_sea> 
+rule statement                {
+    <ECHO> <expression> ;
+  | <IF> <?PAREN_OPEN> <relational_expression> <?PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
+  | <inline_sea> 
+  | <scalar_assign>
                               }
 
 rule else_clause              { <?ELSE> \{ <statement>* \} }
 # TODO: rel_op_clause is not a nice name
-rule rel_op_clause            { <REL_OP> <expression> }
-rule else_clause              { <?ELSE> \{ <statement>* \} }
+rule  rel_op_clause           { <REL_OP> <expression> }
+rule  else_clause             { <?ELSE> \{ <statement>* \} }
 token inline_sea              { <?CODE_END> <SEA> <?CODE_START> }
+rule  scalar_assign           { <scalar> <ASSIGN_OP> <expression> ; }
+rule  scalar                  { <VAR_NAME> }
 
 token expression              {   <DOUBLEQUOTE_STRING>
                                 | <SINGLEQUOTE_STRING>
                                 | <bitwise_expression>
+                                | <scalar>
                               }
 
 rule bitwise_expression       { <adding_expression> <bitwise_tail>? }
