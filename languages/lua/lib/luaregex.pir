@@ -184,16 +184,19 @@ Francois Perrad
 
 =cut
 
-.sub "__onload" :load
+.sub '__onload' :load
     load_bytecode 'PGE.pbc'
 
-    $P0 = getclass "PGE::Exp::CCShortcut"
-    $P1 = subclass $P0, "PGE::Exp::LuaCCShortcut"
+    $P0 = getclass 'PGE::Exp::CCShortcut'
+    $P1 = subclass $P0, 'PGE::Exp::LuaCCShortcut'
+
+    $P0 = getclass 'PGE::Exp'
+    $P1 = subclass $P0, 'PGE::Exp::LuaBalanced'
 .end
 
-.namespace [ "PGE::LuaRegex" ]
+.namespace [ 'PGE::LuaRegex' ]
 
-.sub "compile_luaregex"
+.sub 'compile_luaregex'
     .param pmc source
     .param pmc adverbs         :slurpy :named
 
@@ -211,7 +214,7 @@ Francois Perrad
     target = downcase target
 
     .local pmc match
-    $P0 = get_global "luaregex"
+    $P0 = get_global 'luaregex'
     match = $P0(source)
     if target != 'parse' goto check
     .return (match)
@@ -235,26 +238,26 @@ Francois Perrad
 .end
 
 
-.sub "luaregex"
+.sub 'luaregex'
     .param pmc mob
     .local pmc optable
-    optable = get_hll_global ["PGE::LuaRegex"], "$optable"
-    $P0 = optable."parse"(mob)
+    optable = get_hll_global ['PGE::LuaRegex'], '$optable'
+    $P0 = optable.'parse'(mob)
     .return ($P0)
 .end
 
 
-.include "cclass.pasm"
+.include 'cclass.pasm'
 
 
-.sub "__onload" :load
+.sub '__onload' :load
     .local pmc optable
 
-    $I0 = find_type "PGE::OPTable"
+    $I0 = find_type 'PGE::OPTable'
     optable = new $I0
-    set_hll_global ["PGE::LuaRegex"], "$optable", optable
+    set_hll_global ['PGE::LuaRegex'], '$optable', optable
 
-    $P0 = get_hll_global ["PGE::LuaRegex"], "parse_lit"
+    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_lit'
     optable.newtok('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
 
     optable.newtok('term:^',   'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
@@ -278,14 +281,18 @@ Francois Perrad
     optable.newtok('term:%W', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
     optable.newtok('term:%x', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
     optable.newtok('term:%X', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-#    optable.newtok('term:%z', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-#    optable.newtok('term:%Z', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
 
     optable.newtok('circumfix:( )',   'equiv'=>'term:', 'nows'=>1, 'nullterm'=>1, 'match'=>'PGE::Exp::CGroup')
 
     $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_enumclass'
     optable.newtok('term:[', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
+    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_enumclass2'
     optable.newtok('term:.', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:%z', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:%Z', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+
+    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_balanced'
+    optable.newtok('term:%b', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
     $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_quant'
     optable.newtok('postfix:*', 'looser'=>'term:', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
@@ -295,8 +302,8 @@ Francois Perrad
 
     optable.newtok('infix:',  'looser'=>'postfix:*', 'right'=>1, 'nows'=>1, 'match'=>'PGE::Exp::Concat')
 
-    $P0 = get_hll_global ["PGE::LuaRegex"], "compile_luaregex"
-    compreg "PGE::LuaRegex", $P0
+    $P0 = get_hll_global ['PGE::LuaRegex'], 'compile_luaregex'
+    compreg 'PGE::LuaRegex', $P0
 .end
 
 
@@ -324,22 +331,18 @@ Francois Perrad
 .end
 
 
-.sub "parse_lit"
+.sub 'parse_lit'
     .param pmc mob
     .local pmc newfrom
     .local string target
     .local int pos, lastpos
     .local int litstart, litlen
     .local string initchar
-    newfrom = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, $P0, $P1) = newfrom(mob, 0, "PGE::Exp::Literal")
+    newfrom = get_hll_global ['PGE::Match'], 'newfrom'
+    (mob, target, $P0, $P1) = newfrom(mob, 0, 'PGE::Exp::Literal')
     pos = $P0
     lastpos = length target
     initchar = substr target, pos, 1
-    unless initchar == '*' goto initchar_ok
-    parse_error(mob, pos, "Quantifier follows nothing")
-
-  initchar_ok:
     if initchar == ')' goto end
     inc pos
   term_percent:
@@ -357,7 +360,7 @@ Francois Perrad
     if pos <= lastpos goto term_backslash_ok
     parse_error(mob, pos, "Search pattern not terminated")
   term_backslash_ok:
-    $I0 = index "abfnrtv", initchar
+    $I0 = index 'abfnrtv', initchar
     if $I0 < 0 goto term_literal
     initchar = substr "\a\b\f\n\r\t\x0b", $I0, 1
   term_literal:
@@ -366,7 +369,7 @@ Francois Perrad
   term_literal_loop:
     if pos >= lastpos goto term_literal_end
     $S0 = substr target, pos, 1
-    $I0 = index "^$()%.[]*+-?", $S0
+    $I0 = index '()%.[]*+-?', $S0
     # if not in circumfix:( ) throw error on end paren
     if $I0 >= 0 goto term_literal_end
     inc pos
@@ -391,7 +394,7 @@ Francois Perrad
 .const int PGE_BACKTRACK_GREEDY = 1
 .const int PGE_BACKTRACK_EAGER = 2
 
-.sub "parse_quant"
+.sub 'parse_quant'
     .param pmc mob
     .local string target
     .local int min, max, backtrack
@@ -399,8 +402,8 @@ Francois Perrad
     .local pmc mfrom, mpos
     .local string key
     key = mob['KEY']
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::Quant")
+    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
+    (mob, target, mfrom, mpos) = $P0(mob, 0, 'PGE::Exp::Quant')
     pos = mfrom
     lastpos = length target
     min = 0
@@ -409,23 +412,21 @@ Francois Perrad
     if key != '+' goto quant_max
     min = 1
   quant_max:
-    if key != "?" goto quant_eager
+    if key != '?' goto quant_eager
     max = 1
   quant_eager:
-    if key != "-" goto end
+    if key != '-' goto end
     backtrack = PGE_BACKTRACK_EAGER
   end:
-    mob["min"] = min
-    mob["max"] = max
-    mob["backtrack"] = backtrack
+    mob['min'] = min
+    mob['max'] = max
+    mob['backtrack'] = backtrack
     mpos = pos
     .return (mob)
-  err_range:
-    parse_error(mob, pos, "Error in quantified range")
 .end
 
 
-.sub "parse_enumclass"
+.sub 'parse_enumclass'
     .param pmc mob
     .local string target
     .local pmc mfrom, mpos
@@ -434,17 +435,16 @@ Francois Perrad
     .local string charlist
     .local string key
     key = mob['KEY']
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::EnumCharList")
+    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
+    (mob, target, mfrom, mpos) = $P0(mob, 0, 'PGE::Exp::EnumCharList')
     pos = mfrom
-    if key == '.' goto dot
     lastpos = length target
-    charlist = ""
-    mob["isnegated"] = 0
+    charlist = ''
+    mob['isnegated'] = 0
     isrange = 0
     $S0 = substr target, pos, 1
-    if $S0 != "^" goto scan_first
-    mob["isnegated"] = 1
+    if $S0 != '^' goto scan_first
+    mob['isnegated'] = 1
     inc pos
   scan_first:
     if pos >= lastpos goto err_close
@@ -456,13 +456,13 @@ Francois Perrad
     if pos >= lastpos goto err_close
     $S0 = substr target, pos, 1
     inc pos
-    if $S0 == "]" goto endclass
-    if $S0 == "-" goto hyphenrange
+    if $S0 == ']' goto endclass
+    if $S0 == '-' goto hyphenrange
     if $S0 != "\\" goto addchar
   backslash:
     $S0 = substr target, pos, 1
     inc pos
-    $I0 = index "nrtfae0b", $S0
+    $I0 = index 'nrtfae0b', $S0
     if $I0 == -1 goto addchar
     $S0 = substr "\n\r\t\f\a\e\0\b", $I0, 1
   addchar:
@@ -486,18 +486,14 @@ Francois Perrad
     goto scan
   endclass:
     if isrange == 0 goto end
-    charlist .= "-"
-    goto end
-  dot:
-    charlist = "\n"
-    mob["isnegated"] = 1
+    charlist .= '-'
   end:
     mpos = pos
     mob.'result_object'(charlist)
     .return (mob)
 
   err_close:
-    parse_error(mob, pos, "Unmatched [")
+    parse_error(mob, pos, "malformed pattern (missing ']')")
   err_range:
     $S0 = 'Invalid [] range "'
     $S1 = chr $I2
@@ -510,9 +506,58 @@ Francois Perrad
 .end
 
 
-.namespace [ "PGE::Exp" ]
+.sub 'parse_enumclass2'
+    .param pmc mob
+    .local string target
+    .local pmc mfrom, mpos
+    .local int pos
+    .local string charlist
+    .local string key
+    key = mob['KEY']
+    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
+    (mob, target, mfrom, mpos) = $P0(mob, 0, 'PGE::Exp::EnumCharList')
+    pos = mfrom
+    unless key == '.' goto zero
+    charlist = ''
+    mob['isnegated'] = 1
+    goto end
+  zero:
+    charlist = "\0"
+    mob['isnegated'] = 0
+    unless key == '%Z' goto end
+    mob['isnegated'] = 1
+  end:
+    mpos = pos
+    mob.'result_object'(charlist)
+    .return (mob)
+.end
 
-.sub "luaanalyze" :method
+
+.sub 'parse_balanced'
+    .param pmc mob
+    .local string target
+    .local pmc mfrom, mpos
+    .local int pos, lastpos
+    .local string xy
+    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
+    (mob, target, mfrom, mpos) = $P0(mob, 0, 'PGE::Exp::LuaBalanced')
+    pos = mfrom
+    lastpos = length target
+    if lastpos < 2 goto err
+    xy = substr target, pos, 2
+    pos += 2
+    mpos = pos
+    mob.'result_object'(xy)
+    .return (mob)
+
+  err:
+    parse_error(mob, pos, "unbalanced pattern")
+.end
+
+
+.namespace [ 'PGE::Exp' ]
+
+.sub 'luaanalyze' :method
     .param pmc pad
     .local pmc exp
     $I0 = 0
@@ -520,7 +565,7 @@ Francois Perrad
     $I1 = defined self[$I0]
     if $I1 == 0 goto end
     $P0 = self[$I0]
-    $P0 = $P0."luaanalyze"(pad)
+    $P0 = $P0.'luaanalyze'(pad)
     self[$I0] = $P0
     inc $I0
     goto loop
@@ -528,27 +573,29 @@ Francois Perrad
     .return (self)
 .end
 
-.namespace [ "PGE::Exp::CGroup" ]
 
-.sub "luaanalyze" :method
+.namespace [ 'PGE::Exp::CGroup' ]
+
+.sub 'luaanalyze' :method
     .param pmc pad
     .local pmc exp
 
-    self["iscapture"] = 0
-    if self != "(" goto end
-    self["iscapture"] = 1
-    self["isscope"] = 0
-    self["isarray"] = 0
-    $I0 = pad["subpats"]
-    self["cname"] = $I0
+    self['iscapture'] = 0
+    if self != '(' goto end
+    self['iscapture'] = 1
+    self['isscope'] = 0
+    self['isarray'] = 0
+    $I0 = pad['subpats']
+    self['cname'] = $I0
     inc $I0
-    pad["subpats"] = $I0
+    pad['subpats'] = $I0
   end:
     exp = self[0]
-    exp = exp."luaanalyze"(pad)
+    exp = exp.'luaanalyze'(pad)
     self[0] = exp
     .return (self)
 .end
+
 
 .namespace [ 'PGE::Exp::LuaCCShortcut' ]
 
@@ -567,7 +614,6 @@ Francois Perrad
     if token == '%U' goto upper
     if token == '%W' goto word
     if token == '%X' goto hexa
-#    if token == '%Z' goto z
     self['negate'] = 0
     if token == '%a' goto letter
     if token == '%c' goto ctrl
@@ -578,7 +624,6 @@ Francois Perrad
     if token == '%u' goto upper
     if token == '%w' goto word
     if token == '%x' goto hexa
-#    if token == '%z' goto z
     self['cclass'] = .CCLASS_ANY
     goto end
   letter:
@@ -609,5 +654,31 @@ Francois Perrad
     self['cclass'] = .CCLASS_HEXADECIMAL
   end:
     .return (self)
+.end
+
+
+.namespace [ 'PGE::Exp::LuaBalanced' ]
+
+.sub 'reduce' :method
+    .param pmc next
+    .return (self)
+.end
+
+.sub 'pir' :method
+    .param pmc code
+    .param string label
+    .param string next
+
+    .local string x, y
+    $S0 = self
+    x = substr $S0, 0, 1
+    y = substr $S0, 1, 1
+
+    # TODO
+    code.emit(<<"        CODE", label, $S0, next)
+        %0: # balanced %1
+          goto %2
+        CODE
+    .return ()
 .end
 

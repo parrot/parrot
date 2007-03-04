@@ -360,6 +360,11 @@ L2:
     unless $I0 < $I1 goto L3
     $P0 = capts[$I0]
     $S0 = $P0.'text'()
+    $I2 = index $S0, "\0"
+    if $I2 < 0 goto L4
+    # sorry, strictly compatible
+    $S0 = substr $S0, 0, $I2
+L4:
     new $P1, .LuaString
     set $P1, $S0
     ret[$I0] = $P1
@@ -368,13 +373,18 @@ L2:
 L3:
     .return (ret)
 L1:
-    unless whole == 1 goto L4
+    unless whole == 1 goto L5
     set ret, 1
     $S0 = match.'text'()
+    $I2 = index $S0, "\0"
+    if $I2 < 0 goto L6
+    # sorry, strictly compatible
+    $S0 = substr $S0, 0, $I2
+L6:
     new $P1, .LuaString
     set $P1, $S0
     ret[0] = $P1
-L4:
+L5:
     .return (ret)
 .end
 
@@ -819,6 +829,11 @@ L2:
     $P0 = match.'get_array'()
     $P1 = $P0[i]
     $S0 = $P1.'text'()
+    $I0 = index $S0, "\0"
+    if $I0 < 0 goto L1
+    # sorry, strictly compatible
+    $S0 = substr $S0, 0, $I0
+L1:
     .return ($S0)
 _handler:
     error("invalid capture index")

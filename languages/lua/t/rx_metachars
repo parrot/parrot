@@ -54,6 +54,7 @@ a%.d			abd		nil		escaped
 a%[d			a[d		a[d		escaped
 a%]d			a]d		a]d		escaped
 a%*d			a*d		a*d		escaped
+*ad			*ad		*ad		not escaped
 a%+d			a+d		a+d		escaped
 a%-d			a-d		a-d		escaped
 a%?d			a?d		a?d		escaped
