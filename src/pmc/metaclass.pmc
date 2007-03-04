@@ -1,0 +1,258 @@
+/*
+Copyright (C) 2001-2007, The Perl Foundation.
+$Id: metaclass.pmc 17304 2007-03-03 03:45:27Z coke $
+
+=head1 NAME
+
+src/pmc/metaclass.pmc - Metaclass - defines a class
+
+=head1 DESCRIPTION
+
+This class implements the basic Parrot metaclass, used for describing a
+class.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#define PARROT_METACLASS(o) ((Parrot_MetaClass *) PMC_data(o))
+
+typedef struct Parrot_MetaClass {
+    STRING *name;         /* The name of the class. */
+    PMC *namespace;       /* The namespace it's linked to, if any. */
+    int instantiated;     /* Any instantiations since last modification? */
+    PMC *parents;         /* Immediate parent classes. */
+    PMC *all_parents;     /* Cached list of all parents, in MRO order. */
+    PMC *roles;           /* An array of roles. */
+    PMC *methods;         /* Hash of method names to methods in this class. */
+    PMC *vtable_methods;  /* Hash of Parrot v-table methods we override. */
+    PMC *attrib_metadata; /* Hash of attributes in this class to metadata. */
+    PMC *attrib_index;   /* Lookup table for attributes in this and parents. */
+    PMC *attrib_cache;    /* Cache of visible attrib names to indexes. */
+} Parrot_MetaClass;
+
+
+pmclass MetaClass need_ext {
+/*
+
+=item C<void init()>
+
+Initializes the class flags.
+
+=item C<void init_pmc(PMC *init)>
+
+The actual class creation code, called from C<newclass> opcode. The C<init>
+argument is not a PMC* but the C<classname> STRING.
+
+=cut
+
+*/
+
+    void init() {
+        Parrot_MetaClass *class = NULL;
+
+        /* But we are a class, really */
+        PObj_is_class_SET(SELF);
+        
+        /* Custom DOD mark and destory. */
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+
+        /* Init the class object. */
+        class = mem_sys_allocate_zeroed(sizeof(Parrot_MetaClass));
+        class->namespace = PMCNULL;
+        class->parents = pmc_new(interp, enum_class_ResizablePMCArray);
+        class->all_parents = pmc_new(interp, enum_class_ResizablePMCArray);
+        class->roles = pmc_new(interp, enum_class_ResizablePMCArray);
+        class->methods = pmc_new(interp, enum_class_Hash);
+        class->vtable_methods = pmc_new(interp, enum_class_Hash);
+        class->attrib_metadata = pmc_new(interp, enum_class_Hash);
+        class->attrib_index = pmc_new(interp, enum_class_Hash);
+        class->attrib_cache = pmc_new(interp, enum_class_Hash);
+
+        PMC_data(SELF) = class;
+    }
+
+    void init_pmc(PMC* args) {
+        SELF.init();
+    }
+
+/*
+
+=item C<void destroy()>
+
+Free the memory associated with the underlying struct.
+
+=cut
+
+*/
+    void destroy() {
+            mem_sys_free(PMC_data(SELF));
+    }
+
+/*
+
+=item C<void destroy()>
+
+Mark any referenced strings and PMCs.
+
+=cut
+
+*/
+    void mark() {
+        Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+        if (class->namespace)
+            pobject_lives(interp, (PObj*)class->namespace);
+        if (class->parents)
+            pobject_lives(interp, (PObj*)class->parents);
+        if (class->all_parents)
+            pobject_lives(interp, (PObj*)class->all_parents);
+        if (class->roles)
+            pobject_lives(interp, (PObj*)class->roles);
+        if (class->methods)
+            pobject_lives(interp, (PObj*)class->methods);
+        if (class->vtable_methods)
+            pobject_lives(interp, (PObj*)class->vtable_methods);
+        if (class->attrib_metadata)
+            pobject_lives(interp, (PObj*)class->attrib_metadata);
+        if (class->attrib_index)
+            pobject_lives(interp, (PObj*)class->attrib_index);
+        if (class->attrib_cache)
+            pobject_lives(interp, (PObj*)class->attrib_cache);
+    }
+
+/*
+
+=item C<void add_attribute()>
+
+Add an attribute to the class. Requires a name and, optionally, a type.
+
+=cut
+
+*/    
+    PMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
+        Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+        PMC *new_attribute = pmc_new(interp, enum_class_MetaAttribute);
+
+        /* Set name and type. */
+        PMINVOKE(interp, pmc, "name", STRING* attribute_name);
+        if (got_type) {
+            PMINVOKE(interp, SELF, "type", STRING* attribute_type);
+        }
+
+        /* If we've been instantiated already, need a new class. */
+        /* if (class->instantiated) ... */
+
+        /* Enter the attribute in the attributes array. */
+        VTABLE_set_pmc_keyed_str(interp, class->attrib_metadata, attribute_name, new_attribute);
+    }
+
+/*
+
+=item C<void name()>
+
+Sets the name of the class.
+
+=cut
+
+*/
+    PMETHOD void name(STRING *name :optional, int got_name :opt_flag) {
+        Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+        STRING *ret_name = NULL;
+
+        if (got_name) {
+            /* Set class name. */
+            class->name = name;
+        }
+
+        ret_name = class->name;
+        preturn(STRING *ret_name);
+    }
+
+/*
+
+=item C<void namespace()>
+
+With a parameter, sets the namespace for the class. Expects a fully
+qualified namespace to be specified as a key. If you already have linked another
+namespace with this class, this link will be broken and the new namespace
+specified will be linked to this class.
+
+=cut
+
+*/
+    PMETHOD void namespace(PMC *namespace :optional, int got_name :opt_flag) {
+        Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+        PMC *ret_namespace = NULL;
+
+        if (got_name) {
+            /* Check namespace is a key. */
+            if (namespace->vtable->base_type != enum_class_Key)
+            {
+                real_exception(interp, NULL, E_NameError, "Namespace must be a key");
+                return;
+            }
+
+            /* If we already have a namespace, it shouldn't refer to the
+               class any more. */
+            if (class->namespace)
+            {
+                /* XXX */
+            }
+            
+            /* Set namespace. */
+            class->namespace = Parrot_get_namespace_keyed(interp,
+                interp->HLL_namespace, namespace);
+
+            /* XXX Link namespace to this class; currently missing slot for that. */
+        }
+
+        ret_namespace = class->namespace;
+        preturn(PMC *ret_namespace);
+    }
+
+/*
+
+=item C<void new()>
+
+Creates an instance of the object.
+
+=cut
+
+*/ /*
+    PMETHOD void new(PMC *args :slurpy :named) {
+        Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+        PMC *obj;
+        STRING *name;
+        INTVAL type_id;
+
+        type_id = pmc_type(interp, class->name);
+        obj = pmc_new_init(interp, type_id, args);
+        preturn(PMC *obj)
+    }
+*/
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd15_objects.pod>.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
