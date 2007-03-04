@@ -49,6 +49,7 @@ a%$			a$		a$		escaped
 a%(d			a(d		a(d		escaped
 a%)d			a)d		a)d		escaped
 a%%d			a%d		a%d		escaped
+a%			a%		/malformed pattern \(ends with '%'\)/	not escaped
 a%.d			a.d		a.d		escaped
 a%.d			abd		nil		escaped
 a%[d			a[d		a[d		escaped

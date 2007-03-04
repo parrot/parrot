@@ -29,7 +29,7 @@
 [^+%-]			------		nil		negated escaped hyphen in range
 ["\\]			\\		\		escaped backslash
 [%]]			]		]		escaped close bracket
-[%]			\\]]		/malformed pattern/	unescaped backslash (or no closing brace)
+[%]			\\]]		/malformed pattern \(missing ']'\)/	unescaped backslash (or no closing brace)
 ab\\cd			ab\092cd	ab\cd		literal match with backslash
 %?			ab<?		?		literal match with question mark
 [A-Z0-9]		abcdef		nil		two enumerated ranges

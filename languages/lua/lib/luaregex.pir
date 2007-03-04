@@ -257,7 +257,7 @@ Francois Perrad
     optable = new $I0
     set_hll_global ['PGE::LuaRegex'], '$optable', optable
 
-    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_lit'
+    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_literal'
     optable.newtok('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
 
     optable.newtok('term:^',   'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
@@ -294,7 +294,7 @@ Francois Perrad
     $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_balanced'
     optable.newtok('term:%b', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_quant'
+    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_quantifier'
     optable.newtok('postfix:*', 'looser'=>'term:', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('postfix:+', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('postfix:?', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
@@ -331,7 +331,7 @@ Francois Perrad
 .end
 
 
-.sub 'parse_lit'
+.sub 'parse_literal'
     .param pmc mob
     .local pmc newfrom
     .local string target
@@ -346,23 +346,12 @@ Francois Perrad
     if initchar == ')' goto end
     inc pos
   term_percent:
-    if initchar != '%' goto term_backslash
-    initchar = substr target, pos, 1
-    inc pos
-    if pos <= lastpos goto term_percent_ok
-    parse_error(mob, pos, "Search pattern not terminated")
+    if initchar != '%' goto term_literal
+    if pos < lastpos goto term_percent_ok
+    parse_error(mob, pos, "malformed pattern (ends with '%')")
   term_percent_ok:
-    goto term_literal
-  term_backslash:
-    if initchar != "\\" goto term_literal
     initchar = substr target, pos, 1
     inc pos
-    if pos <= lastpos goto term_backslash_ok
-    parse_error(mob, pos, "Search pattern not terminated")
-  term_backslash_ok:
-    $I0 = index 'abfnrtv', initchar
-    if $I0 < 0 goto term_literal
-    initchar = substr "\a\b\f\n\r\t\x0b", $I0, 1
   term_literal:
     litstart = pos
     litlen = 0
@@ -394,7 +383,7 @@ Francois Perrad
 .const int PGE_BACKTRACK_GREEDY = 1
 .const int PGE_BACKTRACK_EAGER = 2
 
-.sub 'parse_quant'
+.sub 'parse_quantifier'
     .param pmc mob
     .local string target
     .local int min, max, backtrack
