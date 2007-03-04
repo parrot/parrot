@@ -29,6 +29,7 @@ token UNARY_MINUS             { \- }
 token UNARY_PLUS              { \+ }
 token ADD_OP                  { \+ | \- }
 token MUL_OP                  { \* | / | % }
+token BITWISE_OP              { \|  | \& }
 token REL_OP                  { <'=='> | <'<='> | <'>='> | <'!='> | <'<'>  | <'>'> }
 
 token IF                      { <'if'> }
@@ -50,12 +51,19 @@ rule rel_op_clause            { <REL_OP> <expression> }
 rule else_clause              { <?ELSE> \{ <statement>* \} }
 token inline_sea              { <?CODE_END> <SEA> <?CODE_START> }
 
-token expression              { <DOUBLEQUOTE_STRING> | <SINGLEQUOTE_STRING> | <adding_expression> }
+token expression              {   <DOUBLEQUOTE_STRING>
+                                | <SINGLEQUOTE_STRING>
+                                | <bitwise_expression>
+                              }
 
-# TODO: this gets precedence  wrong
-rule adding_expression        { <multiplying_expression> <summand>? }
+rule bitwise_expression       { <adding_expression> <bitwise_tail>? }
 
-rule summand                  { <ADD_OP> <adding_expression> }
+rule bitwise_tail             { <BITWISE_OP> <adding_expression> }
+
+# BUG: this gets precedence  wrong
+rule adding_expression        { <multiplying_expression> <adding_tail>? }
+
+rule adding_tail              { <ADD_OP> <adding_expression> }
 
 # TODO: this gets precedence  wrong
 rule multiplying_expression   { <unary_expression> <multiplicand>? }

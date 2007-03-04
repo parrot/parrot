@@ -173,25 +173,50 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
     goto handled_expression
     no_INTEGER:
 
+    $P0 = node['bitwise_expression']
+    if null $P0 goto no_bitwise_expression
+        .local pmc past_adding, bitwise_tail, bitwise_tail_0, past_bitwise_tail_0
+        bitwise_tail = $P0['bitwise_tail']
+        if null bitwise_tail goto no_bitwise_tail
+            past_adding = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+            bitwise_tail_0 = bitwise_tail[0]
+            .local string op
+            op = bitwise_tail_0['BITWISE_OP']
+            if op != '&' goto not_and
+                op = '+&'
+            not_and:
+            if op != '|' goto not_or
+                op = '+|'
+            not_or:
+            op = 'infix:' . op 
+            past_bitwise_tail_0 = tree.'get'('past', bitwise_tail_0, 'Plumhead::Grammar::expression')
+            past = new 'PAST::Op'
+            past.init( past_adding, past_bitwise_tail_0, 'name' => op )
+            goto handled_expression
+        no_bitwise_tail:
+        past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+    goto handled_expression
+    no_bitwise_expression:
+
     $P0 = node['adding_expression']
     if null $P0 goto no_adding_expression
-        .local pmc past_mult, summand, summand_0, past_summand_0
-        summand = $P0['summand']
-        if null summand goto no_summand
+        .local pmc past_mult, adding_tail, adding_tail_0, past_adding_tail_0
+        adding_tail = $P0['adding_tail']
+        if null adding_tail goto no_adding_tail
             past_mult = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
-            summand_0 = summand[0]
+            adding_tail_0 = adding_tail[0]
             .local string add_op, pirop
             pirop = 'n_add'
-            add_op = summand_0['ADD_OP']
+            add_op = adding_tail_0['ADD_OP']
             if add_op != '-' goto not_minus
                 pirop = 'n_sub'
             not_minus:
             add_op = 'infix:' . add_op 
-            past_summand_0 = tree.'get'('past', summand_0, 'Plumhead::Grammar::expression')
+            past_adding_tail_0 = tree.'get'('past', adding_tail_0, 'Plumhead::Grammar::expression')
             past = new 'PAST::Op'
-            past.init( past_mult, past_summand_0, 'name' => add_op, 'pirop' => pirop )
+            past.init( past_mult, past_adding_tail_0, 'name' => add_op, 'pirop' => pirop )
             goto handled_expression
-        no_summand:
+        no_adding_tail:
         past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
     goto handled_expression
     no_adding_expression:
