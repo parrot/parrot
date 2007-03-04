@@ -1,3 +1,6 @@
+# Copyright (C) 2006-2007, The Perl Foundation.
+# $Id$
+
 =head1 NAME
 
 Software Transactional Memory internals
@@ -8,8 +11,12 @@ $Revision$
 
 =head1 DESCRIPTION
 
-The STM implementation is based on Ennals' paper, see
-L<http://www.cambridge.intel-research.net/~rennals/052_Rob_Ennals.pdf>.
+The STM implementation is based on Robert Ennals' paper called "Software
+Transactional Memory Should Not Be Obstruction-Free", originally at
+L<http://www.cambridge.intel-research.net/~rennals/052_Rob_Ennals.pdf>, now
+apparently available from
+L<http://www.cs.wisc.edu/trans-memory/misc-papers/052_Rob_Ennals.pdf>.
+
 Most of the internals of the STM implementation are contained in
 C<src/stm/backend.c> and C<src/stm/stm_internals.h>
 
