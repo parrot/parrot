@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2006, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2007, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 1;
 
 =head1 NAME
 
@@ -23,17 +17,29 @@ Tests the SMOP_Class PMC.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'create a SMOP_Class' );
-.sub main :main
-  $P0 = new 'SMOP_Class'
+.macro IMPORT ( lib, subname, TEMP )
+	.TEMP = find_global .lib, .subname
+	store_global .subname, .TEMP
+.endm
+
+.sub _main :main
+    load_bytecode 'library/Test/More.pir'
+
+    .local pmc _
+    .IMPORT( 'Test::More', 'plan', _ )
+    .IMPORT( 'Test::More', 'ok',   _ )
+    .IMPORT( 'Test::More', 'is',   _ )
+
+    plan( 1 )
+
+    $P0 = new 'SMOP_Class'
+    ok (1)
+#    ok ($P0)
 .end
-CODE
-OUT
 
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:

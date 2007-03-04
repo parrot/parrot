@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2006, The Perl Foundation.
+#!./parrot
+# Copyright (C) 2007, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 5;
 
 =head1 NAME
 
@@ -23,45 +17,39 @@ Tests the SMOP_Attribute PMC.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'create a SMOP_Attribute' );
-.sub main :main
-  $P0 = new 'SMOP_Attribute'
-.end
-CODE
-OUT
+.macro IMPORT ( lib, subname, TEMP )
+	.TEMP = find_global .lib, .subname
+	store_global .subname, .TEMP
+.endm
 
-pir_output_is( <<'CODE', <<'OUT', 'test the SMOP_Attribute name method' );
-.sub main :main
+.sub _main :main
+    load_bytecode 'library/Test/More.pir'
+
+    .local pmc _
+    .IMPORT( 'Test::More', 'plan', _ )
+    .IMPORT( 'Test::More', 'ok',   _ )
+    .IMPORT( 'Test::More', 'is',   _ )
+
+    plan( 9 )
+
+    $P0 = new 'SMOP_Attribute'
+#    ok ($P0, 'create a SMOP_Attribute')
+    ok (1, 'create a SMOP_Attribute')
+
+
   $P0 = new 'SMOP_Attribute'
   $S0 = $P0.'name'("TestClass1")
-  print $S0
-  print "\n"
-  $S1 = $P0.'name'()
-  print $S1
-  print "\n"
-.end
-CODE
-TestClass1
-TestClass1
-OUT
+  is ($S0, 'TestClass1', 'test the SMOP_Attribute name method')
 
-pir_output_is( <<'CODE', <<'OUT', 'test the SMOP_Attribute type method' );
-.sub main :main
+  $S1 = $P0.'name'()
+  is ($S1, 'TestClass1', 'test the SMOP_Attribute name method')
+
   $P0 = new 'SMOP_Attribute'
   $S0 = $P0.'type'("TestTypeClass1")
-  print $S0
-  print "\n"
+  is ($S0, 'TestTypeClass1', 'test the SMOP_Attribute name method')
   $S1 = $P0.'type'()
-  print $S1
-  print "\n"
-.end
-CODE
-TestTypeClass1
-TestTypeClass1
-OUT
+  is ($S1, 'TestTypeClass1', 'test the SMOP_Attribute name method')
 
-pir_output_is( <<'CODE', <<'OUT', 'test the SMOP_Attribute type method with a ResizableIntegerArray' );
-.sub main :main
   $P1 = new 'ResizableIntegerArray'
   push $P1, 1
   push $P1, 2
@@ -70,20 +58,12 @@ pir_output_is( <<'CODE', <<'OUT', 'test the SMOP_Attribute type method with a Re
   $P0 = new 'SMOP_Attribute'
   $P2 = $P0.'class'($P1)
   get_repr $S0, $P2
-  print $S0
-  print "\n"
+  is ($S0, '[ 1, 2, 3 ]', 'test the SMOP_Attribute type method with a ResizableIntegerArray' )
   $P3 = $P0.'class'()
   get_repr $S1, $P3
-  print $S1
-  print "\n"
-.end
-CODE
-[ 1, 2, 3 ]
-[ 1, 2, 3 ]
-OUT
+  is ($S1, '[ 1, 2, 3 ]', 'test the SMOP_Attribute type method with a ResizableIntegerArray' )
 
-pir_output_is( <<'CODE', <<'OUT', 'test the SMOP_Attribute class method with a FixedIntegerArray' );
-.sub main :main
+
   $P1 = new 'FixedIntegerArray'
   set $P1, 3
   $P1[0]= 1
@@ -93,21 +73,15 @@ pir_output_is( <<'CODE', <<'OUT', 'test the SMOP_Attribute class method with a F
   $P0 = new 'SMOP_Attribute'
   $P2 = $P0.'class'($P1)
   get_repr $S0, $P2
-  print $S0
-  print "\n"
+  is( $S0, '[ 1, 2, 3 ]', 'test the SMOP_Attribute class method with a FixedIntegerArray' )
   $P3 = $P0.'class'()
   get_repr $S1, $P3
-  print $S1
-  print "\n"
+  is( $S1, '[ 1, 2, 3 ]', 'test the SMOP_Attribute class method with a FixedIntegerArray' )
+
 .end
-CODE
-[ 1, 2, 3 ]
-[ 1, 2, 3 ]
-OUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
