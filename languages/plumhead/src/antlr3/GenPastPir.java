@@ -1,4 +1,4 @@
-// $ANTLR 3.0b6 src/antlr3/GenPastPir.g 2007-03-03 22:38:32
+// $ANTLR 3.0b6 src/antlr3/GenPastPir.g 2007-03-04 12:53:44
 
   import java.util.regex.*;
 
@@ -495,6 +495,7 @@ public class GenPastPir extends TreeParser {
                           String name = op;
                           if      ( op.equals( "&" ) )  { name = "+&"; }
                           else if ( op.equals( "|" ) )  { name = "+|"; }
+                          else if ( op.equals( "^" ) )  { name = "+^"; }
                           name = "infix:" + name;
 
                           System.out.print( 
@@ -509,7 +510,7 @@ public class GenPastPir extends TreeParser {
                     }
                     break;
                 case 9 :
-                    // src/antlr3/GenPastPir.g:262:5: ^(prefix= PREFIX node[reg] )
+                    // src/antlr3/GenPastPir.g:263:5: ^(prefix= PREFIX node[reg] )
                     {
 
                           reg_num++;
@@ -548,7 +549,7 @@ public class GenPastPir extends TreeParser {
                     }
                     break;
                 case 10 :
-                    // src/antlr3/GenPastPir.g:286:5: ^( REL_OP node[reg] node[reg] )
+                    // src/antlr3/GenPastPir.g:287:5: ^( REL_OP node[reg] node[reg] )
                     {
 
                           reg_num++;
@@ -591,7 +592,7 @@ public class GenPastPir extends TreeParser {
                     }
                     break;
                 case 11 :
-                    // src/antlr3/GenPastPir.g:310:5: ^( IF node[\"past_if_op\"] node[\"past_if_op\"] ( node[\"past_if_op\"] )? )
+                    // src/antlr3/GenPastPir.g:311:5: ^( IF node[\"past_if_op\"] node[\"past_if_op\"] ( node[\"past_if_op\"] )? )
                     {
 
                           reg_num++;
@@ -617,7 +618,7 @@ public class GenPastPir extends TreeParser {
                     node("past_if_op");
                     _fsp--;
 
-                    // src/antlr3/GenPastPir.g:323:49: ( node[\"past_if_op\"] )?
+                    // src/antlr3/GenPastPir.g:324:49: ( node[\"past_if_op\"] )?
                     int alt2=2;
                     int LA2_0 = input.LA(1);
                     if ( ((LA2_0>=NOQUOTE_STRING && LA2_0<=ARRAY)||LA2_0==PREFIX||(LA2_0>=DOUBLEQUOTE_STRING && LA2_0<=VAR_DUMP)||(LA2_0>=INTEGER && LA2_0<=IF)) ) {
@@ -625,7 +626,7 @@ public class GenPastPir extends TreeParser {
                     }
                     switch (alt2) {
                         case 1 :
-                            // src/antlr3/GenPastPir.g:323:49: node[\"past_if_op\"]
+                            // src/antlr3/GenPastPir.g:324:49: node[\"past_if_op\"]
                             {
                             pushFollow(FOLLOW_node_in_node328);
                             node("past_if_op");
@@ -650,7 +651,7 @@ public class GenPastPir extends TreeParser {
                     }
                     break;
                 case 12 :
-                    // src/antlr3/GenPastPir.g:331:5: ^( STMTS ( node[reg_stmts] )* )
+                    // src/antlr3/GenPastPir.g:332:5: ^( STMTS ( node[reg_stmts] )* )
                     {
 
                           reg_num++;
@@ -666,7 +667,7 @@ public class GenPastPir extends TreeParser {
 
                     if ( input.LA(1)==Token.DOWN ) {
                         match(input, Token.DOWN, null); 
-                        // src/antlr3/GenPastPir.g:341:14: ( node[reg_stmts] )*
+                        // src/antlr3/GenPastPir.g:342:14: ( node[reg_stmts] )*
                         loop3:
                         do {
                             int alt3=2;
@@ -678,7 +679,7 @@ public class GenPastPir extends TreeParser {
 
                             switch (alt3) {
                         	case 1 :
-                        	    // src/antlr3/GenPastPir.g:341:14: node[reg_stmts]
+                        	    // src/antlr3/GenPastPir.g:342:14: node[reg_stmts]
                         	    {
                         	    pushFollow(FOLLOW_node_in_node354);
                         	    node(reg_stmts);
@@ -706,7 +707,7 @@ public class GenPastPir extends TreeParser {
                     }
                     break;
                 case 13 :
-                    // src/antlr3/GenPastPir.g:348:5: ^( ASSIGN_OP node[reg_assign] node[reg_assign] )
+                    // src/antlr3/GenPastPir.g:349:5: ^( ASSIGN_OP node[reg_assign] node[reg_assign] )
                     {
 
                           reg_num++;
@@ -742,7 +743,7 @@ public class GenPastPir extends TreeParser {
                     }
                     break;
                 case 14 :
-                    // src/antlr3/GenPastPir.g:366:5: SCALAR
+                    // src/antlr3/GenPastPir.g:367:5: SCALAR
                     {
                     SCALAR7=(CommonTree)input.LT(1);
                     match(input,SCALAR,FOLLOW_SCALAR_in_node398); 
@@ -760,7 +761,7 @@ public class GenPastPir extends TreeParser {
                     }
                     break;
                 case 15 :
-                    // src/antlr3/GenPastPir.g:377:5: ^( ARRAY node[reg_array] )
+                    // src/antlr3/GenPastPir.g:378:5: ^( ARRAY node[reg_array] )
                     {
 
                           reg_num++;

@@ -62,6 +62,15 @@
     .return ($I0)
 .end
 
+.sub 'infix:+^'
+    .param int a
+    .param int b
+
+    $I0 = bxor a, b
+
+    .return ($I0)
+.end
+
 
 .sub 'infix:<'
     .param pmc a

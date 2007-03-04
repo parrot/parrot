@@ -52,7 +52,7 @@ NUMBER              : {  codeMode }?=>  DIGITS? '.' DIGITS ;
 MINUS               : {  codeMode }?=>  '-' ;
 PLUS                : {  codeMode }?=>  '+' ;
 MUL_OP              : {  codeMode }?=>  '*'  | '/'  | '%' ;
-BITWISE_OP          : {  codeMode }?=>  '|'  | '&';
+BITWISE_OP          : {  codeMode }?=>  '|'  | '&' | '^' ;
 ASSIGN_OP           : {  codeMode }?=>  '=' ;
 REL_OP              : {  codeMode }?=>  '==' | '<=' | '>=' | '!=' | '<'  | '>' ;
 

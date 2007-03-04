@@ -116,6 +116,7 @@ my @tests = (
     [ '1 & 3', '1', 'bitwise and', ],
     [ '2 & 2 + 8', '2', 'bitwise and, less precedence than +', ],
     [ '1 | 2', '3', 'bitwise or', ],
+    [ '6 ^ 5', '3', 'bitwise xor', ],
     [ '010', 8, 'octal' ],
     [ '0x10', 16, 'hex' ],
 );

@@ -249,6 +249,7 @@ node[String reg_mother]
       String name = op;
       if      ( op.equals( "&" ) )  { name = "+&"; }
       else if ( op.equals( "|" ) )  { name = "+|"; }
+      else if ( op.equals( "^" ) )  { name = "+^"; }
       name = "infix:" + name;
 
       System.out.print( 

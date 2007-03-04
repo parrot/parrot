@@ -29,7 +29,7 @@ token UNARY_MINUS             { \- }
 token UNARY_PLUS              { \+ }
 token ADD_OP                  { \+ | \- }
 token MUL_OP                  { \* | / | % }
-token BITWISE_OP              { \|  | \& }
+token BITWISE_OP              { <'|'>  | <'&'> | <'^'> }
 token REL_OP                  { <'=='> | <'<='> | <'>='> | <'!='> | <'<'>  | <'>'> }
 
 token IF                      { <'if'> }
