@@ -1,0 +1,111 @@
+/*
+Copyright (C) 2001-2007, The Perl Foundation.
+$Id: object.pmc 17304 2007-03-03 03:45:27Z coke $
+
+=head1 NAME
+
+src/pmc/object.pmc - An instance of a class
+
+=head1 DESCRIPTION
+
+Implements an instance of a class.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#define PARROT_OBJECT(o) ((Parrot_Object *) PMC_data(o))
+
+typedef struct Parrot_Object {
+    PMC *class;
+    PMC *attrib_store;
+} Parrot_Object;
+
+
+pmclass Object need_ext {
+
+/*
+
+=item C<void init()>
+
+Initializes the class flags.
+
+=item C<void init_pmc(PMC *init)>
+
+Allocate an object.
+
+=cut
+
+*/
+
+    void init() {
+        Parrot_Object *obj = NULL;
+
+        /* Custom DOD mark and destory. */
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+
+        /* Set up the object. */
+        obj = mem_sys_allocate_zeroed(sizeof(Parrot_Object));
+        PMC_data(SELF) = obj;
+    }
+
+    void init_pmc(PMC* args) {
+        SELF.init();
+    }
+
+/*
+
+=item C<void destroy()>
+
+Free the object's underlying struct.
+
+=cut
+
+*/
+    void destroy() {
+            mem_sys_free(PMC_data(SELF));
+    }
+
+/*
+
+=item C<void destroy()>
+
+Mark any referenced strings and PMCs.
+
+=cut
+
+*/
+    void mark() {
+        Parrot_Object *obj = PARROT_OBJECT(SELF);
+        if (obj->class)
+            pobject_lives(interp, (PObj*)obj->class);
+        if (obj->attrib_store)
+            pobject_lives(interp, (PObj*)obj->attrib_store);
+    }
+
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd15_objects.pod>.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
