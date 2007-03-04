@@ -18,7 +18,7 @@ $Revision$
 
 =head2 Object
 
-An object is kind a variable that incorporates both data and behavior
+An object is a variable that incorporates both data and behavior
 related to that data.
 
 =head2 Class
@@ -194,12 +194,35 @@ An array PMC of the composed roles
 An array PMC of the methods defined in the class or composed into the
 class
 
-
 =item 6
 
-The class attribute hash. Keys are the attribute names and the values
-are a hash of attribute characteristics, including name, type, and the
-class they're associated with.
+The v-table for the class. The order of dispatch used when building the
+v-table should follow the MRO, and it should be invalidated when the MRO
+changes. Essentially, it is a cache.
+
+=item 7
+
+The class attribute metadata hash. Keys are the attribute names and the
+values are a hash of attribute characteristics, including name, type, the
+class they're associated with and any flags (for example, private). Note
+that this only stores metadata for the attributes defined in this class,
+and not for attributes inherited from its parents.
+
+=item 8
+
+The full attribute lookup table. This includes all attributes defined in
+the current class and every other class that it inherits from either
+directly or indirectly. The table is keyed on the name of the class the
+attribute is defined in along with the attribute name. The value is an
+index into the per-object attribute store.
+
+=item 9
+
+The attribute cache. While the attribute lookup table defines every
+attribute, whether it is visible or not with the current MRO, the cache
+maps the names of the visible attributes directly to an index in the per-
+object attribute store. That saves a more costly lookup in the full
+attribute lookup table.
 
 =back
 
@@ -209,13 +232,11 @@ classes as well as the instantiated class for attributes defined there.
 The inheritance rules for a particular HLL will determine which child
 class attributes override which parent class attributes. 
 
-We may also add a cache to the class object: a hash that contains all
-child and parent attribute characteristcs. Whether this is useful
-largely depends on how slow it is to scan through the list of parent
-classes, and how dynamic we want the system to be. (If a parent class
-changes its set of attributes, should that change appear in later
-instantiations of objects from child classes? Probably, in which case
-caching parent attributes is an obstacle.)
+(If a parent class changes its set of attributes, should that change
+appear in later instantiations of objects from child classes? If so, all
+of these classes would need to be re-constructed as a result of the
+change; note that any already instantiated objects would refer to the old
+class.)
 
 Class PMCs also have the "I am a class" flag set on them.
 
@@ -311,20 +332,15 @@ The class PMC
 
 =item 1
 
-The class name
-
-=item 2
-
-The object attribute hash. Keys are the attribute names and the values
-are the attribute values. (The "hash" may be implemented as a typed
-structure following the CStruct proposal.)
+The object attribute store. This is simply an array of PMCs that
+provide the values for the attributes. It may be a resizable PMC array
+to provide lazy growth rather than allocating all needed memory for
+all attributes. We find the indexes into this array from the attribute
+cache or lookup table in the class.
 
 =back
 
-A list of the object's attributes is accessible by extracting the keys
-from the object attribute hash. This direct introspetive capability may
-not be directly exposed in the HLLs (preserving the boundaries of an
-opaque object).
+A list of the object's attributes is accessible from the class.
 
 Note that Object PMCs have the "I am an object" flag set on them.
 
