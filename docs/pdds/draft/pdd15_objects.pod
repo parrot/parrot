@@ -15,10 +15,9 @@ $Revision$
 
 =head1 DEFINITIONS
 
-
 =head2 Object
 
-An object is a variable that incorporates both data and behavior
+An object is a value that incorporates both data and behavior
 related to that data.
 
 =head2 Class
