@@ -88,11 +88,11 @@ Other class systems may be implemented later to support other languages.
 
 =item - Classes have an associated namespace. (Which may be anonymous)
 
-=item - Classes have one or more immediate parent classes
+=item - Classes may have one or more immediate parent classes
 
-=item - Classes have a catalog of attribute names.
+=item - Classes may have a catalog of attribute names.
 
-=item - Classes have a list of roles they implement
+=item - Classes may have a list of roles they implement
 
 =item - Classes can instantiate an object of their class
 
@@ -105,7 +105,7 @@ Other class systems may be implemented later to support other languages.
 =item - Classes are instances of a meta-class and have their own sets of
 class methods and class attributes
 
-=item - Objects have an array of attributes. Attribute values may be
+=item - Objects may have an array of attributes. Attribute values may be
 PMCs or a low-level type.
 
 =item - Objects have an associated class.
@@ -313,8 +313,8 @@ class. All the class objects that nominally exist in a namespace point
 to that namespace object.
 
 A class can be garbage collected when it has no instantiatated objects
-referencing it. When a class is garbage collected, it should remove itself
-from the registry.
+and no Namespace object referencing it. When a class is garbage
+collected, it should remove itself from the registry.
 
 =head2 Object PMC API
 
