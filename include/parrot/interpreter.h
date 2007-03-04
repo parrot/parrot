@@ -140,12 +140,6 @@ typedef struct warnings_t {
     Warnings_classes classes;
 } *Warnings;
 
-#if 0
-typedef STRING_FUNCS *(str_func_t)();
-typedef opcode_t *(**op_func_table)(); /* Opcode function table */
-typedef STRING_FUNCS *(**string_funcs)();      /* String function table */
-#endif
-
 /*
  * ProfData have these extra items in front followed by
  * one entry per op at (op + extra)
