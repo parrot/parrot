@@ -1,8 +1,8 @@
 # RT#40701: Stub 
 # help shootout compile
 
-.HLL '_Tcl', ''
-.namespace [ 'builtins']
+.HLL '_Tcl', 'tcl_group'
+.namespace
 
 .sub 'interp'
   .param string retval

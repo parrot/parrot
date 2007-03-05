@@ -1,10 +1,10 @@
-# RT#40698: Stub 
+# RT#40704: Stub 
 # help tcltest compile
 
-.HLL '_Tcl', ''
-.namespace [ 'builtins']
+.HLL '_Tcl', 'tcl_group'
+.namespace
 
-.sub 'exec'
+.sub 'fconfigure'
   .param string retval
   .param pmc    raw_args
   .param pmc    argv

@@ -52,18 +52,10 @@ GENERATED_INLINES = \
 RUNTIME_PIR = $(addprefix runtime/builtin/,$(notdir $(wildcard languages/tcl/runtime/builtin/*.pir)))
 
 DEPS = \
-$(C_BUILTIN)/auto_execok.pir \
-$(C_BUILTIN)/auto_load.pir \
 $(C_BUILTIN)/cd.pir \
-$(C_BUILTIN)/exec.pir \
 $(C_BUILTIN)/expr.pir \
-$(C_BUILTIN)/fconfigure.pir \
-$(C_BUILTIN)/glob.pir \
-$(C_BUILTIN)/interp.pir \
 $(C_BUILTIN)/list.pir \
 $(C_BUILTIN)/return.pir \
-$(C_BUILTIN)/trace.pir \
-$(C_BUILTIN)/update.pir \
 runtime/conversions.pir \
 runtime/list_to_string.pir \
 runtime/string_to_list.pir \

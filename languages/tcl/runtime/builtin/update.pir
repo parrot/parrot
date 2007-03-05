@@ -1,8 +1,8 @@
 # RT#40705: Stub 
 # help tcltest compile
 
-.HLL '_Tcl', ''
-.namespace [ 'builtins']
+.HLL '_Tcl', 'tcl_group'
+.namespace
 
 .sub 'update'
   .param string retval

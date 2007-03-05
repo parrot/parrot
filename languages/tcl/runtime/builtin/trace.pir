@@ -1,5 +1,14 @@
-.HLL 'Tcl', 'tcl_group'
+# RT#40703: Stub 
+# help tcltest compile
+
+.HLL '_Tcl', 'tcl_group'
 .namespace
 
-.sub '&trace'
+.sub 'trace'
+  .param string retval
+  .param pmc    raw_args
+  .param pmc    argv
+
+  .return('')
 .end
+
