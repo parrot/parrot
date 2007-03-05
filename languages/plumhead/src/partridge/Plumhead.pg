@@ -36,7 +36,7 @@ token IF                      { <'if'> }
 token ELSE                    { <'else'> }
 token program                 { ^ <SEA> <code> }
 
-rule  code                    { <?CODE_START> <statement>* <?CODE_END> }
+rule  code                    { <?CODE_START> <statement>* <?CODE_END>? }
 
 rule relational_expression    { <expression> <rel_op_clause>? }
 
@@ -45,6 +45,7 @@ rule statement                {
   | <IF> <?PAREN_OPEN> <relational_expression> <?PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
   | <inline_sea> 
   | <scalar_assign>
+  | <array_assign>
                               }
 
 rule else_clause              { <?ELSE> \{ <statement>* \} }
@@ -52,14 +53,18 @@ rule else_clause              { <?ELSE> \{ <statement>* \} }
 rule  rel_op_clause           { <REL_OP> <expression> }
 rule  else_clause             { <?ELSE> \{ <statement>* \} }
 token inline_sea              { <?CODE_END> <SEA> <?CODE_START> }
-rule  scalar_assign           { <scalar> <ASSIGN_OP> <expression> ; }
-rule  scalar                  { <VAR_NAME> }
+rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ; }
+rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ; }
 
 token expression              {   <DOUBLEQUOTE_STRING>
                                 | <SINGLEQUOTE_STRING>
                                 | <bitwise_expression>
-                                | <scalar>
+                                | <array_elem>
+                                | <var>
                               }
+
+rule  array_elem              { <VAR_NAME> <'['> <expression> <']'> }
+rule  var                     { <VAR_NAME> }
 
 rule bitwise_expression       { <adding_expression> <bitwise_tail>? }
 

@@ -74,7 +74,7 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
         iter = new .Iterator, $P0
         iter_loop:
             unless iter goto iter_end
-            .local pmc cnode, past_else_block, past_condition, past_expression, past_scalar, past_assign, past_rel_expression, past_echo, past_if, past_if_block, past_sea
+            .local pmc cnode, past_else_block, past_condition, past_expression, past_var, past_array_elem, past_assign, past_rel_expression, past_echo, past_if, past_if_block, past_sea
             cnode = shift iter
             if null cnode goto iter_loop
 
@@ -103,7 +103,7 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
                          name = $P6
                          name = 'infix:' . name
                          past_expression     = tree.'get'('past', $P2, 'Plumhead::Grammar::expression')
-                         past_rel_expression = tree.'get'('past', $P4, 'Plumhead::Grammar::expression')
+                         past_rel_expression = tree.'get'('past', $P5, 'Plumhead::Grammar::expression')
                          past_condition = new 'PAST::Op'
                          past_condition.'init'( past_expression, past_rel_expression, 'node'=> node, 'name' => name )
                          goto got_past_condition
@@ -136,16 +136,29 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
 
                  $P1 = cnode['scalar_assign']
                  if null $P1 goto no_scalar_assign
-                     $P2 = $P1['scalar']
+                     $P2 = $P1['var']
                      $P3 = $P1['expression']
                      if null $P2 goto iter_loop
-                         past_scalar     = tree.'get'('past', $P2, 'Plumhead::Grammar::expression')
+                         past_var     = tree.'get'('past', $P2, 'Plumhead::Grammar::expression')
                          past_expression = tree.'get'('past', $P3, 'Plumhead::Grammar::expression')
                          past_assign = new 'PAST::Op'
-                         past_assign.'init'( past_scalar, past_expression, 'node'=> node, 'name' => 'infix:=', 'pasttype' => 'assign' )  
+                         past_assign.'init'( past_var, past_expression, 'node'=> node, 'name' => 'infix:=', 'pasttype' => 'assign' )  
                          past.'push'(past_assign)
                          goto iter_loop
                  no_scalar_assign:
+
+                 $P1 = cnode['array_assign']
+                 if null $P1 goto no_array_assign
+                     $P2 = $P1['array_elem']
+                     $P3 = $P1['expression']
+                     if null $P2 goto iter_loop
+                         past_array_elem     = tree.'get'('past', $P2, 'Plumhead::Grammar::expression')
+                         past_expression = tree.'get'('past', $P3, 'Plumhead::Grammar::expression')
+                         past_assign = new 'PAST::Op'
+                         past_assign.'init'( past_array_elem, past_expression, 'node'=> node, 'name' => 'infix:=', 'pasttype' => 'assign' )  
+                         past.'push'(past_assign)
+                         goto iter_loop
+                 no_array_assign:
 
                  # unknown statements are ignored
                  goto iter_loop
@@ -162,9 +175,26 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     $P0 = node['expression']
     if null $P0 goto no_expression_1
+        .local pmc dummy_1
+        dummy_1 = node['VAR_NAME']
+        if null dummy_1 goto no_var_name_1
+            .local string var
+            var = dummy_1
+            past = new 'PAST::Var'
+            .local pmc past_expression_1
+            past_expression_1 = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+            past.'init'( past_expression_1, 'name' => var, 'viviself' => '.Hash', 'islvalue' => 1 )
+            goto handled_expression
+        no_var_name_1:
+            past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+            goto handled_expression
+    no_expression_1:
+
+    $P0 = node['array_elem']
+    if null $P0 goto no_array_elem_1
         past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
         goto handled_expression
-    no_expression_1:
+    no_array_elem_1:
 
     $P0 = node['DOUBLEQUOTE_STRING']
     if null $P0 goto no_DOUBLEQUOTE_STRING
@@ -291,11 +321,11 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
         goto handled_expression
     no_postfix_expression:
 
-    $P0 = node['scalar']
-    if null $P0 goto no_scalar
+    $P0 = node['var']
+    if null $P0 goto no_var
         past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
         goto handled_expression
-    no_scalar:
+    no_var:
 
     $P0 = node['VAR_NAME']
     if null $P0 goto no_var_name
