@@ -71,16 +71,16 @@ module, L<runtime/parrot/library/Crow.pir>.
     'infix://='($P0, 'Socorro')
 
     $P0 = 'get_or_vivify'(data, 'web.root')
-    $P0 = 'infix://='($P0, 'http://parrotcode.org')
+    'infix://='($P0, 'http://parrotcode.org')
 
     $P0 = 'get_or_vivify'(data, 'web.source')
-    $P0 = 'infix://='($P0, 'http://parrotcode.org/source')
+    'infix://='($P0, 'http://parrotcode.org/source')
 
     $P0 = 'get_or_vivify'(data, 'date')
-    $P0 = 'infix://='($P0, '22 February 2007')
+    'infix://='($P0, '22 February 2007')
 
     $P0 = 'get_or_vivify'(data, 'nextdate')
-    $P0 = 'infix://='($P0, 'xx March 2007')
+    'infix://='($P0, 'xx March 2007')
 
     # get data from NEWS
     $S0 = data['version']
@@ -149,10 +149,17 @@ EOT
     .param pmc    a
     .param pmc    b
 
+    if null a goto agg_undefined
     $I0 = defined a
-    if $I0 goto OP_end
+    if $I0 goto return
     assign a, b
 
-  OP_end:
+  return:
+    .return ()
+
+  agg_undefined:
+    $P0 = new .Exception
+    $P0['_message'] = "cannot assign to Null PMC!"
+    throw $P0
 .end
 
