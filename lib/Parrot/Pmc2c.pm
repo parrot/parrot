@@ -25,6 +25,7 @@ use warnings;
 use Parrot::PMC qw(%pmc_types);
 use Parrot::Pmc2c::UtilFunctions qw( gen_ret dont_edit count_newlines dynext_load_code c_code_coda );
 use Text::Balanced 'extract_bracketed';
+use Parrot::Pmc2c::PMETHODs;
 
 =back
 
@@ -523,6 +524,7 @@ sub body {
     else {
         $total_body = rewrite_nci_method( $classname, $meth, $body );
     }
+    Parrot::Pmc2c::PMETHODs::rewrite_pminvoke($method, \$total_body);
 
     # now split into MMD if necessary:
     my $additional_bodies = '';

@@ -8,8 +8,7 @@ src/pmc/smop_class.pmc - SMOP Class
 
 =head1 DESCRIPTION
 
-This class, smop_class, implements the class class of the simple meta
-object protocol.
+This class, smop_class, implements the class class of the simple meta object protocol.
 
 =head2 Functions
 
@@ -30,22 +29,6 @@ typedef struct SMOP_Class {
     PMC *methods;
     PMC *superclasses;
 } SMOP_Class;
-
-static void smop_init(Interp *interp, PMC *self) {
-    SMOP_Class *smop = NULL;
-    /* But we are a class, really */
-    PObj_is_class_SET(self);
-    /* turn on marking of the class_data array */
-    PObj_data_is_PMC_array_SET(self);
-    /* turn on custom destruction since our PMC* array is dynamically allocated */
-    PObj_active_destroy_SET(self);
-
-    PMC_data(self) = mem_sys_allocate_zeroed(sizeof(SMOP_Class));
-    smop                = SMOP(self);
-    smop->attributes    = pmc_new(interp, enum_class_Hash);
-    smop->methods       = pmc_new(interp, enum_class_Hash);
-    smop->superclasses  = pmc_new(interp, enum_class_Hash);
-}
 
 PARROT_API void Parrot_smop_find_class(Interp *interp, PMC *self);
 PARROT_API void Parrot_smop_find_class(Interp *interp, PMC *self) {
@@ -68,9 +51,56 @@ argument is not a PMC* but the C<classname> STRING.
 =cut
 
 */
+    void class_init() {
+        if (pass) {
+            /*Parrot_SMOP_Class_class_init_2(interp, NULL);*/
+        }
+    }
+
+    METHOD void class_init_2()
+    {
+            int i;
+            PMC* class = pmc_new(interp, enum_class_SMOP_Class);
+            PMC* class_meta;
+            PMC* class_string;
+            PMC* attributes = pmc_new(interp, enum_class_ResizablePMCArray);
+            const char *attribute_names[] = { "name", "namespace", "_parrotclass", "attributes", "methods", "superclasses" };
+
+            for (i=0; i<6; i++) {
+                PMC* attribute = pmc_new(interp, enum_class_SMOP_Attribute);
+                STRING *attrib_name = string_from_const_cstring(interp, attribute_names[i], 0);
+                PMINVOKE(interp, attribute, "name", STRING* attrib_name);
+                PMINVOKE(interp, attribute, "class", PMC* class);
+                VTABLE_push_pmc(interp, attributes, attribute);
+            }
+
+            /* we sidestep the MetaModel bootstrap problem by building the MetaClass manually */
+
+            (PMC* class_meta) = PMINVOKE(interp, class, "new");
+            class_string = pmc_new(interp, enum_class_String);
+            VTABLE_set_string_native(interp, class_string, string_from_const_cstring(interp, "Class", 0));
+            VTABLE_set_attr_str(interp, class_meta, string_from_const_cstring(interp, attribute_names[0], 0), class_string);
+            VTABLE_set_attr_str(interp, class_meta, string_from_const_cstring(interp, attribute_names[2], 0), class);
+            VTABLE_init(interp,class_meta);
+            VTABLE_set_attr_str(interp, class_meta, string_from_const_cstring(interp, attribute_names[3], 0), attributes);
+            Parrot_store_global_n(interp, interp->root_namespace, string_from_const_cstring(interp, "class_object", 0), class_meta);
+    }
+
 
     void init() {
-        smop_init(INTERP, SELF);
+        SMOP_Class *smop;
+        /* But we are a class, really */
+        PObj_is_class_SET(SELF);
+        /* turn on marking of the class_data array */
+        PObj_data_is_PMC_array_SET(SELF);
+        /* turn on custom destruction since our PMC* array is dynamically allocated */
+        PObj_active_destroy_SET(SELF);
+
+        PMC_data(SELF) = mem_sys_allocate_zeroed(sizeof(SMOP_Class));
+        smop                = SMOP(SELF);
+        smop->attributes    = pmc_new(interp, enum_class_Hash);
+        smop->methods       = pmc_new(interp, enum_class_Hash);
+        smop->superclasses  = pmc_new(interp, enum_class_Hash);
     }
 
     void init_pmc(PMC* args) {
@@ -97,7 +127,7 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
 
 */
     void destroy() {
-            mem_sys_free(PMC_data(SELF));
+        mem_sys_free(PMC_data(SELF));
     }
 
     PMETHOD void name(PMC *name :optional, int got_name :opt_flag) {
@@ -148,6 +178,10 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
         }
 
         /* SELF.set_meta_attribute(attribute_name, new_attribute); */
+    }
+
+    PMC* get_attr_str(STRING* attr_name) {
+        return PMCNULL;
     }
 
     METHOD void add_superclass(STRING* superclass) {
