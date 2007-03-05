@@ -22,7 +22,7 @@ related to that data.
 
 =head2 Class
 
-A class defines a pattern of characteristcs and behaviors from which
+A class defines a pattern of characteristics and behaviors from which
 objects are constructed.
 
 =head2 Attribute
@@ -34,7 +34,7 @@ Attributes are set on a class-wide basis, and all the objects of a class
 will have the same set of attributes.  Most OO languages don't allow
 attribute changes to existing classes, but Parrot's base attribute
 system does allow it. In order to safely support advanced dynamic
-features in HLLs, attributes are not accesible via fixed attribute
+features in HLLs, attributes are not accessible via fixed attribute
 offsets, but only via named lookup.
 
 =head2 Method
@@ -230,7 +230,7 @@ The attribute catalog holds only the attributes defined in a particular
 class. When instantiating an object, the object data store is created as
 a ResizablePMCArray, so doesn't need any specific details of the class's
 attribute structure. As attributes are set in the object (based on the
-index in the lookup table), the Array expands to accomodate the
+index in the lookup table), the Array expands to accommodate the
 attribute indexes that are actually used. In the common case, a
 relatively small set near the lower index range is all that will be
 used.
@@ -313,7 +313,7 @@ class can't be thrown away if it has objects instantiated in it. The old
 objects still point to the old class and do their method resolution and
 attribute lookup through that class. If a class hasn't been
 instantiated, adding a method doesn't create a new class. If it has been
-instantiated, it creates a new class the first time its extended,
+instantiated, it creates a new class the first time it's extended,
 and then doesn't create a new class until it is instantiated again.) The
 class registry needs to have names removed entirely (it doesn't care
 about names anymore).  Low-level PMC types also need entries in the
@@ -365,7 +365,7 @@ information about the object, method call functionality, etc. See the
 sections below on L<Objects> and L<Vtables>.
 
 [stream-of-consciousness again]
-In addition to a value type, objects can have a containter type. The
+In addition to a value type, objects can have a container type. The
 container type can't be stored in the object itself, because a single
 object may live within multiple containers. So, the container type (when
 it exists) is stored in the LexPad or Namespace entry for a particular
@@ -680,7 +680,7 @@ With named access:
 =head1 Explanations
 
 To get a new class, you can do a C<newclass>, which creates a new class with no
-parents besides parrot's default super-ish parent class.
+parents besides Parrot's default super-ish parent class.
 
 To get a new child class, you have two potential options:
 
@@ -703,7 +703,7 @@ the rest of the immediate parents.
 
 Classes may override the vtable methods, allowing objects of a class to behave
 like a primitive PMC. Each vtable slot has a corresponding named method that
-parrot looks for in your class hierarchy when an object is used in a primitive
+Parrot looks for in your class hierarchy when an object is used in a primitive
 context.
 
 To use these properly at a low-level requires a good working knowledge of the
@@ -716,7 +716,7 @@ escape the vtable method's execution. This is due to the way that vtable
 methods are called by the interpreter--once a vtable method is exited any
 continuation taken within it is no longer valid and may not be used.
 
-Note that any class method that wishes to use parrot's multi-method dispatch
+Note that any class method that wishes to use Parrot's multi-method dispatch
 system may do so. This is, in fact, encouraged, though it is not required. In
 the absence of explicit multimethod dispatch, a left-side wins scheme is used.
 
@@ -1116,7 +1116,7 @@ ParrotClass
 
 =head2 Objectspace
 
-Ruby: Objectspace in ruby allows the programmer to iterate through every live object
+Ruby: Objectspace in Ruby allows the programmer to iterate through every live object
 in the system.  There is some debate about how to make this play nice with different
 garbage collection schemes.
 
@@ -1177,7 +1177,7 @@ Perl 6: Multiple inheritance.
 
 .Net: Single inheritance.
 
-Ruby: Single inheritance but support for mixins of ruby modules.
+Ruby: Single inheritance but support for mixins of Ruby modules.
 
 =head2 Interfaces
 
@@ -1258,7 +1258,7 @@ The interaction between objects and PMCs is currently underspecified.
 =head2 Translation
 
 The following list a set of languages, then within each language what the
-parrot term translates to.
+Parrot term translates to.
 
 =over 4
 
@@ -1268,7 +1268,7 @@ parrot term translates to.
 
 =item Attribute
 
-A Python attribute maps to a parrot property
+A Python attribute maps to a Parrot property
 
 =back
 
@@ -1278,7 +1278,7 @@ A Python attribute maps to a parrot property
 
 =item Attribute
 
-What .NET calls an attribute parrot calls a property
+What .NET calls an attribute Parrot calls a property
 
 =item Property
 
