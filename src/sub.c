@@ -336,12 +336,12 @@ Parrot_Context_info(Interp *interp, parrot_context_t *ctx,
     info->subname = sub->name;
 
     /* set the namespace name and fullname of the sub */
-    if (PMC_IS_NULL(sub->namespace)) {
+    if (PMC_IS_NULL(sub->namespace_name)) {
         info->nsname = string_from_cstring(interp, "", 0);
         info->fullname = info->subname;
     }
     else {
-        info->nsname = VTABLE_get_string(interp, sub->namespace);
+        info->nsname = VTABLE_get_string(interp, sub->namespace_name);
         info->fullname = Parrot_full_sub_name(interp, ctx->current_sub);
     }
 

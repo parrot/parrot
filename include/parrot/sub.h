@@ -121,7 +121,7 @@ typedef struct Parrot_sub {
     size_t   end_offs;
 
     INTVAL   HLL_id;             /* see src/hll.c XXX or per segment? */
-    PMC      *namespace;         /* where this Sub is in - this is either
+    PMC      *namespace_name;    /* where this Sub is in - this is either
                                   * a String or a [Key] and describes
                                   * the relative path in the NameSpace
                                   */

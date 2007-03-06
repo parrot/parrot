@@ -708,7 +708,7 @@ add_const_pmc_sub(Interp *interp, SymReg *r,
                 break;
         }
     }
-    sub->namespace = ns_pmc;
+    sub->namespace_name = ns_pmc;
     sub->start_offs = offs;
     sub->end_offs = end;
     sub->HLL_id = CONTEXT(interp->ctx)->current_HLL;

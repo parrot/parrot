@@ -452,7 +452,7 @@ Parrot_find_name_op(Interp *interp, STRING *name, void *next)
 static PMC *
 get_namespace_pmc(Parrot_Interp interp, PMC *sub)
 {
-    PMC *nsname = PMC_sub(sub)->namespace;
+    PMC *nsname = PMC_sub(sub)->namespace_name;
     PMC *nsroot = Parrot_get_HLL_namespace(interp, PMC_sub(sub)->HLL_id);
 
     /* If we have a NULL, return the HLL namespace */
@@ -513,7 +513,7 @@ Parrot_store_sub_in_namespace(Parrot_Interp interp, PMC *sub)
     /* store other subs (as long as they're not :anon) */
     else if (!(PObj_get_FLAGS(sub) & SUB_FLAG_PF_ANON)) {
         STRING *name   = PMC_sub(sub)->name;
-        PMC    *nsname = PMC_sub(sub)->namespace;
+        PMC    *nsname = PMC_sub(sub)->namespace_name;
 
         Parrot_store_global_n(interp, ns, name, sub);
 
