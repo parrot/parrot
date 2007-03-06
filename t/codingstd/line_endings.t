@@ -15,6 +15,14 @@ BEGIN {
     if ($@) {
         plan skip_all => 'SVN::Client not installed';
     }
+    eval {
+        require SVK;
+        require SVK::XD;
+        require SVK::Util;
+    };
+    if ($@) {
+        warn "SVK not installed\n";
+    }
 }
 
 # are we using svk?
@@ -127,15 +135,12 @@ sub source_files {
 }
 
 sub is_svk_working_dir {
-    use SVK;
-    use SVK::XD;
-    use SVK::Util qw(catfile);
 
     # set up svk so that we can use it
-    my $svkpath = $ENV{SVKROOT} || catfile( $ENV{HOME}, ".svk" );
+    my $svkpath = $ENV{SVKROOT} || SVK::Util::catfile( $ENV{HOME}, ".svk" );
     my $xd = SVK::XD->new(
-        giantlock => catfile( $svkpath, 'lock' ),
-        statefile => catfile( $svkpath, 'config' ),
+        giantlock => SVK::Util::catfile( $svkpath, 'lock' ),
+        statefile => SVK::Util::catfile( $svkpath, 'config' ),
         svkpath   => $svkpath,
     );
 
