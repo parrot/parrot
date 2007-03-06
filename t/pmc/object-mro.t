@@ -242,7 +242,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "print mro 4" );
 #
-#          Object
+#        TestObject
 #            ^
 #            |
 #         LifeForm
@@ -265,11 +265,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "print mro 4" );
 #  define class <vulcan> (<intelligent>, <humanoid>) end class;
 #
 .sub main :main
-    .local pmc Object, LifeForm, Sentient, BiPedal, Intelligent, Humanoid, Vulcan
+    .local pmc TestObject, LifeForm, Sentient, BiPedal, Intelligent, Humanoid, Vulcan
 
-    newclass Object, "Object"
+    newclass TestObject, "TestObject"
 
-    subclass LifeForm, Object, "LifeForm"
+    subclass LifeForm, TestObject, "LifeForm"
 
     subclass Sentient, LifeForm, "Sentient"
     subclass Intelligent, Sentient, "Intelligent"
@@ -297,7 +297,7 @@ ex:
     print_newline
 .end
 CODE
-Vulcan Intelligent Sentient Humanoid BiPedal LifeForm Object R
+Vulcan Intelligent Sentient Humanoid BiPedal LifeForm TestObject R
 OUTPUT
 
 # ... now some tests which fail to compose the class
