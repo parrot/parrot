@@ -77,9 +77,6 @@ pmclass TclFloat
         return buff;
     }
 
-    METHOD PMC* interpret() {
-        return SELF;
-    }
 }
 
 /*
