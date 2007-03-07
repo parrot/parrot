@@ -5,7 +5,6 @@
 
 use strict;
 use warnings;
-use 5.006;
 use lib qw( lib ../lib );
 
 use File::Spec;
@@ -88,8 +87,6 @@ my $result = GetOptions( 'html'          => \$do_gen_html,
 # pynie                test scripts are written in PIR, not Perl 5
 # python               not maintained
 # ruby                 not maintained, should be removed
-
-
 
 my @unified_testable_languages
     = defined $languages_list ?
@@ -177,7 +174,7 @@ if ( ! $do_gen_html ) {
                 print STDERR "- $file\n";
                 $data = $self->run_test($file);
                 $stats{tests} += $data->{results}{max};
-                $stats{ok}    += $data->{results}{ok};
+                $stats{ok}    += $data->{results}{ok} || 0;
             }
 
             printf STDERR "%s OK from %s tests (%.2f%% ok)\n\n",
@@ -188,9 +185,9 @@ if ( ! $do_gen_html ) {
             $self->{meat}{end_time} = time;
         };
 
-        my $start = time;
+        my $start = time();
         my $model = Test::TAP::Model::Visual->new_with_tests(@tests);
-        my $end = time;
+        my $end   = time();
 
         my $duration = $end - $start;
         my $languages = join( q{ }, @unified_testable_languages );
