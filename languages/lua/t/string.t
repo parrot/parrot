@@ -377,9 +377,6 @@ he	lo
 name	Anna
 OUTPUT
 
-TODO: {
-    local $TODO = 'back reference';
-
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.match (back ref)' );
 s = [[then he said: "it's all right"!]]
 q, quotedPart = string.match(s, "([\"'])(.-)%1")
@@ -393,7 +390,6 @@ it's all right
 "
 =	[[ something ]] ]==]x
 OUTPUT
-}
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.rep' );
 print(string.rep("ab", 3))

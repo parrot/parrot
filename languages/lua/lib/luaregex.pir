@@ -282,6 +282,17 @@ Francois Perrad
     optable.newtok('term:%x', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
     optable.newtok('term:%X', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
 
+    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_backref'
+    optable.newtok('term:%1', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:%2', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:%3', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:%4', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:%5', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:%6', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:%7', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:%8', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:%9', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+
     optable.newtok('circumfix:( )',   'equiv'=>'term:', 'nows'=>1, 'nullterm'=>1, 'match'=>'PGE::Exp::CGroup')
 
     $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_enumclass'
@@ -538,6 +549,28 @@ Francois Perrad
 
   err:
     parse_error(mob, pos, "unbalanced pattern")
+.end
+
+
+.sub 'parse_backref'
+    .param pmc mob
+    .local string target
+    .local int pos
+    .local pmc newfrom, mfrom, mpos
+    .local string cname
+    newfrom = get_hll_global ['PGE::Match'], 'newfrom'
+    $P0 = getattribute mob, '$.target'
+    target = $P0
+    $P0 = getattribute mob, '$.pos'
+    pos = $P0
+    $I0 = pos - 1
+    $S0 = substr target, $I0, 1
+    (mob, $P0, mfrom, mpos) = newfrom(mob, 0, 'PGE::Exp::Scalar')
+    $I0 = $S0
+    dec $I0
+    mob["cname"] = $I0
+    mpos = pos
+    .return (mob)
 .end
 
 

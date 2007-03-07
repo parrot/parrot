@@ -47,7 +47,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test 'no_plan';
+use Parrot::Test tests => 148;
 use Test::More;
 use File::Spec;
 
@@ -59,8 +59,6 @@ my @test_files = (
 
 my %todo_info = (
     7   => 'empty capture',
-    8   => 'back reference',
-    9   => 'back reference',
     145 => 'balanced',
     147 => 'balanced',
     148 => 'balanced',
@@ -90,13 +88,14 @@ foreach (@test_files) {
         $output =~ s/\\03/\03/g;
         $output =~ s/\\04/\04/g;
         $output =~ s/\\0/\0/g;
+        chomp $desc;
         $test_number ++;
 
         my $code = "print(string.match(\"$target\", \"$pattern\"))";
 
         local $TODO = $todo_info{$test_number} if (exists $todo_info{$test_number});
         if ($output =~ /^\//) {
-            language_output_like( 'lua', $code, $output . "\n", $desc );
+            language_output_like( 'lua', $code, $output, $desc );
         }
         else {
             language_output_is( 'lua', $code, $output . "\n", $desc );
