@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -191,6 +191,24 @@ CODE
 1
 1
 OUT
+
+pir_output_like( <<'CODE', <<'OUT', 'RT#41732');
+.namespace ['Foo']
+
+.sub __invoke :method
+  .param pmc a
+  say 'hi'
+.end
+
+.sub main :main
+    $P0 = newclass "Foo"
+    $P1 = new "Foo"
+    $P1()
+.end
+CODE
+/1 params expected/
+OUT
+
 
 # '
 
