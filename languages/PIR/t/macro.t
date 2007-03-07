@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 5;
 use Test::More;
 
 language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'macro pasring' );
@@ -40,3 +40,51 @@ CODE
 "parse" => PMC 'PIR::Grammar' { ... }
 Parse successful!
 OUT
+
+language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple macro, no params' );
+
+.macro myMacro
+.endm
+
+CODE
+"parse" => PMC 'PIR::Grammar' { ... }
+Parse successful!
+OUT
+
+language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple macro, params' );
+
+.macro doIt(A,B)
+.endm
+
+CODE
+"parse" => PMC 'PIR::Grammar' { ... }
+Parse successful!
+OUT
+
+language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '.constant' );
+
+.constant answer 42
+
+.constant name "Parrot"
+
+.constant x P0
+.constant y S1
+.constant a I10
+.constant b P20
+
+CODE
+"parse" => PMC 'PIR::Grammar' { ... }
+Parse successful!
+OUT
+
+
+language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '.include' );
+
+.include "Hello"
+
+CODE
+"parse" => PMC 'PIR::Grammar' { ... }
+Parse successful!
+OUT
+
+

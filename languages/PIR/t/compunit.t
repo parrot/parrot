@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 12;
 use Test::More;
 
 language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'global defs' );
@@ -32,35 +32,8 @@ CODE
 Parse successful!
 OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple macro, no params' );
-
-.macro myMacro
-.endm
-
-CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
-
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple macro, params' );
-
-.macro doIt(A,B)
-.endm
-
-CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'include directive' );
-
-.include "Hitchhikers.pir"
-
-CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'loadlib directive' );
 
