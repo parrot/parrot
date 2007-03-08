@@ -197,6 +197,27 @@ useful defaults and don't throw exceptions.
         return SUPER();
     }
 
+/*
+
+=item C<void *invoke(void *next)>
+
+Invokes a subroutine.
+
+=cut
+
+*/
+
+    void* invoke(void *next) {
+        STRING *meth = CONST_STRING(interp, "__invoke");
+        STRING *meth_v = CONST_STRING(interp, "invoke");
+        PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_or_die(interp, pmc, meth);
+        (void *)Parrot_run_meth_fromc_args(interp, sub, pmc, meth, "??");
+
+        return next;
+    }
+
 }
 
 /*
