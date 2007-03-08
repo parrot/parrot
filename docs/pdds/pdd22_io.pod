@@ -79,7 +79,9 @@ Communication between the calling code and the asynchronous operation
 task is handled by a shared status object. The operation task updates
 the status object whenever the status changes, and the calling code can
 check the status object at any time.  The status object contains a
-reference to the returned result of an asynchronous I/O call.
+reference to the returned result of an asynchronous I/O call. In order
+to allow sharing of the status object, asynchronous ops both pass the
+status object to the callback PMC, and return it to the calling code.
 
 The lightweight tasks typically used by the asynchronous I/O system
 capture no state other than the arguments passed to the I/O call, and
@@ -147,16 +149,17 @@ you the option of executing an action when the stream has been closed.]
 
 =item print
 
-  $P0.print($I1)
-  $P0.print($N1)
-  $P0.print($S1)
-  $P0.print($P1)
-  $P0.print($I1, $P2)
-  $P0.print($N1, $P2)
-  $P0.print($S1, $P2)
-  $P0.print($P1, $P2)
+  $P0 = $P1.print($I2)
+  $P0 = $P1.print($N2)
+  $P0 = $P1.print($S2)
+  $P0 = $P1.print($P2)
+  $P0 = $P1.print($I2, $P3)
+  $P0 = $P1.print($N2, $P3)
+  $P0 = $P1.print($S2, $P3)
+  $P0 = $P1.print($P2, $P3)
 
 Writes an integer, float, string, or PMC value to an I/O stream object.
+Returns a PMC status object.
 
 The asynchronous version takes an additional final PMC callback
 argument $P2. When the print operation is complete, it invokes the callback,
@@ -285,7 +288,7 @@ move away from that, is there a better representation?]
 
 =item get_bool (vtable)
 
-  if $P1 goto ...
+  if $P0 goto ...
 
 Returns a boolean status for the status object, C<true> for successful
 completion or while still running, C<false> for an error.
@@ -625,10 +628,10 @@ buffer-type commands:
   0    PIOCTL_NONBUF
            Unbuffered I/O. Bytes are sent as soon as possible.
   1    PIOCTL_LINEBUF
-	   Line buffered I/O. Bytes are sent when a newline is
+           Line buffered I/O. Bytes are sent when a newline is
            encountered.
   2    PIOCTL_BLKBUF
-	   Fully buffered I/O. Bytes are sent when the buffer is full.
+           Fully buffered I/O. Bytes are sent when the buffer is full.
 
 =back
 
@@ -673,7 +676,7 @@ information requested (see F<runtime/parrot/include/stat.pasm>):
   7    STAT_CHANGETIME
            The last time the file metadata was changed.
   8    STAT_BACKUPTIME
-	   The last time the file was backed up. 
+           The last time the file was backed up. 
            (Currently just returns -1.)
   9    STAT_UID
            The user ID of the file.
