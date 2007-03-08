@@ -1,8 +1,6 @@
 .HLL 'Tcl', 'tcl_group'
 .namespace
 
-# RT#40779: this is only a stub.
-
 .sub '&subst'
     .param pmc argv :slurpy
 
