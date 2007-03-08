@@ -313,6 +313,10 @@ N: Josh Wilmes
 N: Juergen Boemmels
 D: Parrot I/O; macro stuff in assembler.
 
+N: Julian Fondren
+E: ayrnieu@gmail.com
+D: Standardize and add languages/*/MAINTAINER files
+
 N: Karl Forner
 D: shootout examples testing
 E: karl.forner@gmail.com
