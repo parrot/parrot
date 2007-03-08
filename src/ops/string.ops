@@ -389,6 +389,8 @@ inline op new(out STR, in INT) :base_mem {
 =item B<stringinfo>(out INT, in STR, in INT)
 
 Extract some information about string $2 and store it in $1.
+If a null string is passed, $1 is always set to 0.
+If an invalid $3 is passed, an exception is thrown.
 Possible values for $3 are:
 
 =over 4
@@ -410,21 +412,35 @@ Possible values for $3 are:
 =cut
 
 inline op stringinfo(out INT, in STR, in INT) :base_core {
-  switch ($3) {
-    case STRINGINFO_HEADER:   $1 = PTR2UINTVAL($2);
-                              break;
-    case STRINGINFO_STRSTART: $1 = PTR2UINTVAL($2->strstart);
-                              break;
-    case STRINGINFO_BUFLEN:   $1 = PObj_buflen($2);
-                              break;
-    case STRINGINFO_FLAGS:    $1 = PObj_get_FLAGS($2);
-                              break;
-    case STRINGINFO_BUFUSED:  $1 = $2->bufused;
-                              break;
-    case STRINGINFO_STRLEN:   $1 = $2->strlen;
-                              break;
-  }
-  goto NEXT();
+    if ($2 == NULL) {
+        $1 = 0;
+    }
+    else {
+        switch ($3) {
+            case STRINGINFO_HEADER:
+                $1 = PTR2UINTVAL($2);
+                break;
+            case STRINGINFO_STRSTART:
+                $1 = PTR2UINTVAL($2->strstart);
+                break;
+            case STRINGINFO_BUFLEN:
+                $1 = PObj_buflen($2);
+                break;
+            case STRINGINFO_FLAGS:
+                $1 = PObj_get_FLAGS($2);
+                break;
+            case STRINGINFO_BUFUSED:
+                $1 = $2->bufused;
+                break;
+            case STRINGINFO_STRLEN:
+                $1 = $2->strlen;
+                break;
+            default:
+                real_exception(interp, NULL, 1,
+                    "stringinfo: unknown info type: %d", $3);
+        }
+    }
+    goto NEXT();
 }
 
 ########################################
