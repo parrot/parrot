@@ -217,18 +217,18 @@ PackFile_Constant_dump(Interp *interp, struct PackFile_ConstTable *ct,
                 case enum_class_Sub:
                 case enum_class_Coroutine:
                     sub = PMC_sub(pmc);
-                    if (sub->namespace) {
-                        switch (sub->namespace->vtable->base_type) {
+                    if (sub->namespace_name) {
+                        switch (sub->namespace_name->vtable->base_type) {
                             case enum_class_String:
                                 namespace_description = string_from_cstring(interp, "'", 1);
-                                namespace_description = string_append(interp, namespace_description, PMC_str_val(sub->namespace));
+                                namespace_description = string_append(interp, namespace_description, PMC_str_val(sub->namespace_name));
                                 namespace_description = string_append(interp, namespace_description, string_from_cstring(interp, "'", 1));
                                 break;
                             case enum_class_Key:
-                                namespace_description = key_set_to_string(interp, sub->namespace);
+                                namespace_description = key_set_to_string(interp, sub->namespace_name);
                                 break;
                             default:
-                                namespace_description = sub->namespace->vtable->whoami;
+                                namespace_description = sub->namespace_name->vtable->whoami;
                         }
                     }
                     else {
