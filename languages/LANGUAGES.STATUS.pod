@@ -1,24 +1,29 @@
 # $Id$
 
-=head1 Languages targeting parrot
+=head1 What's this?
 
-Any language that targets parrot should be listed here. In addition,
-any languages bundled with parrot that work with the unified test
-suite will have their test results listed under the smokes marked
-'languages' at http://smoke.parrotcode.org/smoke/.
+Language implementations that target parrot are listed here.
+At least the implementations that live in the 'languages' directory
+of the parrot repository should be covered.
 
+No author information is given here. This is because maintainers 
+should be tracked in the languages/*/MAINTAINER files, and we
+don't want to repeat ourselves.
+
+For current status of some languages see also http://smoke.parrotcode.org/smoke/.
+Languages that work with the unified languages test suite
+will have their test results listed under the smokes marked
+'languages'.
+
+=head1 List of languages
 
 =head2 Amber for parrot
 
 =over 4
 
-=item Author
-
-Roger Browne
-
 =item Description
 
-Scripting language inspired by Eiffel and ruby.
+Scripting language inspired by Eiffel and Ruby.
 
 =item Status
 
@@ -43,10 +48,6 @@ The Amber PMCs are in C<languages/amber>.
 =head2 APL
 
 =over 4
-
-=item Author
-
-Will Coleda, Patrick Michaud
 
 =item Description
 
@@ -73,10 +74,6 @@ L<languages/APL>
 
 =over 4
 
-=item Author
-
-Clint Pierce, Will Coleda (work with parrot 0.3.0+)
-
 =item Description
 
 BASIC Compiler
@@ -100,17 +97,13 @@ C<languages/BASIC/compiler>
 
 =over 4
 
-=item Author
-
-Clint Pierce
-
 =item Description
 
-BASIC Interpreter written in pure Parrot
+BASIC Interpreter written in pure Parrot.
 
 =item Status
 
-Broken - probably due to recent deprecations.
+Has been broken for a long time.
 
 =item Last verified with parrot version
 
@@ -126,10 +119,6 @@ C<languages/BASIC/interpreter>
 =head2 bc
 
 =over 4
-
-=item Author
-
-Patrick Michaud
 
 =item Description
 
@@ -158,10 +147,6 @@ C<languages/abc>
 
 =over 4
 
-=item Author
-
-Jerome Quelin
-
 =item Description
 
 Functioning -93 interpreter (input routines may be funky).
@@ -187,10 +172,6 @@ C<languages/befunge>
 
 =over 4
 
-=item Author
-
-Leon Brocard
-
 =item Description
 
 bf. See http://en.wikipedia.org/wiki/Brainfuck.
@@ -209,17 +190,14 @@ C<languages/bf>
 
 =back
 
+
 =head2 c99
 
 =over 4
 
-=item Author
-
-Kevin Tew
-
 =item Description
 
-PGE grammar for C99
+PGE grammar for C99.
 
 =item Status
 
@@ -236,13 +214,10 @@ C<languages/c99>
 
 =back
 
+
 =head2 Cardinal
 
 =over 4
-
-=item Author
-
-Kevin Tew
 
 =item Description
 
@@ -263,13 +238,10 @@ C<languages/cardinal>
 
 =back
 
+
 =head2 Cardinal OLD DEAD
 
 =over 4
-
-=item Author
-
-Mark Spashett
 
 =item Description
 
@@ -293,10 +265,6 @@ http://rubyforge.org/projects/cardinal/
 =head2 Cola
 
 =over 4
-
-=item Author
-
-Melvin Smith
 
 =item Description
 
@@ -323,10 +291,6 @@ C<languages/cola>
 
 =over 4
 
-=item Author
-
-Cory Spencer
-
 =item Description
 
 Aspires to implement a significant subset of the Common Lisp language.
@@ -346,41 +310,9 @@ C<languages/lisp>
 =back
 
 
-=head2 conversion
-
-=over 4
-
-=item Author
-
-Unknown
-
-=item Description
-
-An early attempt to support grammars in Bachus-Naur-Format.
-
-=item Status
-
-Unmaintained. Removed from trunk of Parrot subversion repository.
-
-=item Last verified with parrot version
-
-Unknown
-
-=item Location
-
-Up to revision 12805 of the Parrot subversion repository:
-L<languages/conversion>.
-
-=back
-
-
 =head2 .Net To PIR Translator
 
 =over 4
-
-=item Author
-
-Jonathan Worthington
 
 =item Description
 
@@ -393,7 +325,7 @@ library.
 
 =item Last verified with parrot version
 
-0.4.4
+0.4.9
 
 =item Location
 
@@ -405,10 +337,6 @@ C<languages/dotnet>
 =head2 forth
 
 =over 4
-
-=item Author
-
-Dan Sugalski
 
 =item Description
 
@@ -434,10 +362,6 @@ C<languages/forth>
 
 =over 4
 
-=item Author
-
-Bernhard Schmalhofer
-
 =item Description
 
 A joke language. See http://en.wikipedia.org/wiki/HQ9+
@@ -460,10 +384,6 @@ C<languages/HQ9plus>
 =head2 Jako
 
 =over 4
-
-=item Author
-
-Gregor Purdy
 
 =item Description
 
@@ -503,10 +423,6 @@ C<languages/jako>
 
 =over 4
 
-=item Author
-
-Leopold TE<ouml>tsch
-
 =item Description
 
 lazy-k is a pure functional programming language according to the SKI calculus.
@@ -530,10 +446,6 @@ C<languages/lazy-k>
 =head2 Lua
 
 =over 4
-
-=item Author
-
-Francois Perrad
 
 =item Description
 
@@ -596,10 +508,6 @@ The Lua PMCs are in C<languages/lua>.
 
 =over 4
 
-=item Author
-
-Bernhard Schmalhofer
-
 =item Description
 
 Port of GNU m4 to PIR.
@@ -628,17 +536,13 @@ C<languages/m4>
 
 =over 4
 
-=item Author
-
-Jeff Goff
-
 =item Description
 
 miniperl
 
 =item Status
 
-Unmaintained. Removed from trunk of Parrot subversion repository.
+Written by Jeff Goff. Unmaintained. Removed from trunk of Parrot subversion repository.
 
 =item Last verified with parrot version
 
@@ -656,13 +560,9 @@ C<languages/miniperl>
 
 =over 4
 
-=item Author
-
-Jerome Quelin
-
 =item Description
 
-Functioning compiler targeting pasm.
+Functioning compiler targeting PASM.
 
 =item Status
 
@@ -671,7 +571,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.5
+0.4.9
 
 =item Location
 
@@ -683,10 +583,6 @@ C<languages/ook>
 =head2 OpenComal
 
 =over 4
-
-=item Author
-
-Unknown
 
 =item Description
 
@@ -710,10 +606,6 @@ http://www.josvisser.nl/opencomal
 =head2 Parakeet
 
 =over 4
-
-=item Author
-
-Michel Pelletier
 
 =item Description
 
@@ -741,10 +633,6 @@ C<languages/parakeet>
 
 =over 4
 
-=item Author
-
-Bernhard Schmalhofer played with it.
-
 =item Description
 
 An example on how the builtin PASM, PIR and PAST compilers can be used
@@ -756,13 +644,14 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.5
+0.4.9
 
 =item Location
 
 C<languages/parrot_compiler>
 
 =back
+
 
 =head2 Perl 5
 
@@ -779,13 +668,10 @@ This directory may be removed in a future release.
 
 =back
 
+
 =head2 Perl 6 parser/compiler
 
 =over 4
-
-=item Author
-
-Patrick Michaud (pmichaud@pobox.com) is the author and maintainer.
 
 =item Description
 
@@ -814,10 +700,6 @@ C<languages/perl6>
 
 =over 4
 
-=item Author
-
-chromatic
-
 =item Description
 
 It's not Scheme, it's Pheme!  Pheme is a cleaned-up, partially implemented
@@ -845,10 +727,6 @@ C<languages/pheme>
 
 =over 4
 
-=item Author
-
-Alan Knowles
-
 =item Description
 
 An experimental implementation of PHP
@@ -873,10 +751,6 @@ http://www.akbkhome.com/blog.php/View/44/Latest_in_Vapourware_PintCompiler__dbdo
 
 =over 4
 
-=item Author
-
-Klaas-Jan Stol
-
 =item Description
 
 A PIR compiler using Parrot compiler tools.
@@ -888,7 +762,7 @@ Only Parser currently (using PGE).
 
 =item Last verified with parrot version
 
-0.4.8
+0.4.9
 
 =item location
 
@@ -897,14 +771,9 @@ languages/PIR
 =back
 
 
-
 =head2 Plumhead
 
 =over 4
-
-=item Author
-
-Bernhard Schmalhofer
 
 =item Description
 
@@ -932,14 +801,9 @@ L<http://rakudo.org/parrot/index.cgi?plumhead>
 =back
 
 
-
 =head2 Pugs
 
 =over 4
-
-=item Author
-
-Audrey Tang, et al.
 
 =item Description
 
@@ -963,10 +827,6 @@ http://pugscode.org/
 =head2 Punie
 
 =over 4
-
-=item Author
-
-Allison Randal
 
 =item Description
 
@@ -994,10 +854,6 @@ C<languages/punie>
 
 =over 4
 
-=item Author
-
-Patrick Michaud
-
 =item Description
 
 A Python compiler for Parrot, based on PGE and TGE.
@@ -1016,13 +872,10 @@ C<languages/pynie>
 
 =back
 
+
 =head2 Python
 
 =over 4
-
-=item Author
-
-Michal J Wallace
 
 =item Description
 
@@ -1048,10 +901,6 @@ http://pirate.tangentcode.com/
 
 =over 4
 
-=item Author
-
-Steve Fink
-
 =item Description
 
 regex
@@ -1076,10 +925,6 @@ C<languages/regex>
 
 =over 4
 
-=item Author
-
-Jeff Goff
-
 =item Description
 
 Ruby
@@ -1103,10 +948,6 @@ C<languages/ruby>
 =head2 Span
 
 =over 4
-
-=item Author
-
-Matt Kennedy
 
 =item Description
 
@@ -1134,10 +975,6 @@ http://homepage.mac.com/matt.kennedy/Span
 
 =over 4
 
-=item Author
-
-Jeffrey Goff, Juergen Boemmels
-
 =item Description
 
 Scheme
@@ -1162,10 +999,6 @@ C<languages/scheme>
 =head2 Tcl ("partcl")
 
 =over 4
-
-=item Author
-
-Will Coleda, Matt Diephouse, et al.
 
 =item Description
 
@@ -1192,10 +1025,6 @@ C<languages/tcl>
 
 =over 4
 
-=item Author
-
-Chris Dolan and Jerry Gay
-
 =item Description
 
 A parser for the Test Anything Protocol
@@ -1218,10 +1047,6 @@ C<languages/tap>
 =head2 unlambda
 
 =over 4
-
-=item Author
-
-Leopold TE<ouml>tsch
 
 =item Description
 
@@ -1249,13 +1074,9 @@ C<languages/unlambda>
 
 =over 4
 
-=item Author
-
-Marcus Thiesen
-
 =item Description
 
-URM
+URM, Universal register machine.
 
 =item Status
 
@@ -1276,10 +1097,6 @@ C<languages/urm>
 =head2 WMLScript Translator
 
 =over 4
-
-=item Author
-
-Francois Perrad
 
 =item Description
 
@@ -1309,10 +1126,6 @@ C<languages/WMLScript>
 
 =over 4
 
-=item Author
-
-Leopold TE<ouml>tsch
-
 =item Description
 
 Yet Another Language
@@ -1337,10 +1150,6 @@ http://toetsch.at/yal/
 
 =over 4
 
-=item Author
-
-Amir Karger, Leopold TE<ouml>tsch
-
 =item Description
 
 Infocom's Z-machine. See also http://en.wikipedia.org/wiki/Z-machine.
@@ -1359,5 +1168,3 @@ Infocom's Z-machine. See also http://en.wikipedia.org/wiki/Z-machine.
 C<languges/Zcode>
 
 =back
-
-
