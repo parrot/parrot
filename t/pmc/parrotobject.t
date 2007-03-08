@@ -211,7 +211,7 @@ you invoked me!
 got here
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'params/returns from overridden invoke', 'todo' => 'not sure how to do this yet');
+pir_output_is(<<'CODE', <<'OUT', 'params/returns from overridden invoke');
 .namespace ['Foo']
 
 .sub invoke :vtable
@@ -234,10 +234,10 @@ CODE
 3
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', 'RT#41732', 'todo' => 'not sure how to do this yet');
+pir_output_like( <<'CODE', <<'OUT', 'RT#41732');
 .namespace ['Foo']
 
-.sub __invoke :method
+.sub __invoke
   .param pmc a
   say 'hi'
 .end
