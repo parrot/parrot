@@ -611,7 +611,7 @@ int yywrap (void* yyscanner) {
     Interp* interp = yyget_extra(yyscanner);
 
     if (!interp) {
-        fprintf(stderr, "Argh, nao tenho interp\n");
+        fprintf(stderr, "Argh, interp not found\n");
         exit (1);
     }
 
