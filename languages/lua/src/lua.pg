@@ -16,100 +16,100 @@ token TOP {
 }
 
 rule block {
-  [ <statement> <';'>? ]* [ <laststat> <';'>? ]?
+  [ <statement> <';'>? ]* [ <last_statement> <';'>? ]?
 }
 
 rule statement {
-    <ifstat>
-  | <whilestat>
-  | <doblock>
-  | <forstat>
-  | <repeatstat>
-  | <localstat>
-  | <exprstat>
-  | <funcstat>
+  | <if_stat>
+  | <while_stat>
+  | <do_block>
+  | <for_stat>
+  | <repeat_stat>
+  | <local_stat>
+  | <expression_stat>
+  | <function_stat>
 }
 
-rule funcstat {
-  <'function'> <funcname> <body>
+rule function_stat {
+  <'function'> <functionname> <body>
 }
 
-rule laststat {
-  	<'return'> <explist1>?
-  | <'break'>
+rule last_statement {
+  | (<'return'>) <expression_list>?
+  | (<'break'>)
 }
 
-rule doblock {
+rule do_block {
   <'do'> <block> <?end>
 }
 
-rule localstat {
-  <localfunc> | <localdecl>
+rule local_stat {
+  <local_function> | <local_declaration>
 }
 
-rule exprstat {
-  <primaryexp> <assignment>?
+rule expression_stat {
+  <primary_expression> <assignment>?
 }
 
 rule assignment {
-    <','> <primaryexp> <assignment>
-  | <'='> <explist1>
+  | <','> <primary_expression> <assignment>
+  | <'='> <expression_list>
 }
 
-rule whilestat {
-  <'while'> <expr1> <?do> <block> <?end>
+rule while_stat {
+  <'while'> <expression> <?do> <block> <?end>
 }
 
-rule repeatstat {
-  <'repeat'> <block> <?until> <expr1>
+rule repeat_stat {
+  <'repeat'> <block> <?until> <expression>
 }
 
-rule forbody {
+rule for_body {
   <?do> <block> <?end>
 }
 
 rule fornum {
-  <name> <'='> <expr1> <?comma> <expr1> [ <','> <expr1> ]?
+  <name> <'='> <expression> <?comma> <expression> [ <','> <expression> ]?
 }
 
 rule forlist {
-  <namelist1> <?in> <explist1>
+  <name_list> <?in> <expression_list>
 }
 
-rule forstat {
-  <'for'> [ <fornum> | <forlist> ] <forbody>
+rule for_stat {
+  <'for'> [ <fornum> | <forlist> ] <for_body>
 }
 
-rule ifstat {
-  <'if'> <expr1> <?then> <block> <elseifblock>* <elseblock>? <?end>
+rule if_stat {
+  <'if'> <expression> <?then> <block> <elseif_block>* <else_block>? <?end>
 }
 
-rule elseifblock {
-  <'elseif'> <expr1> <?then> <block>
+rule elseif_block {
+  <'elseif'> <expression> <?then> <block>
 }
 
-rule elseblock {
+rule else_block {
   <'else'> <block>
 }
 
-rule localdecl {
-  <'local'> <name> [ <','> <name> ]* [ <'='> <explist1> ]?
+rule local_declaration {
+  <'local'> <name> [ <','> <name> ]* [ <'='> <expression_list> ]?
 }
 
-rule localfunc {
-  <'local'> <'function'> <name> <body>
+rule local_function {
+  <'local'> <'function'> <name> <function_body>
 }
 
-rule funcname {
+rule functionname {
   <name> [ <'.'> <name> ]* [ <':'> <name> ]?
 }
 
 rule index {
-  <'['> <expr1> <?closebracket>
+  <'['> <expression> <?closebracket>
 }
 
-rule recfield {
-  [ <name> | <index> ] <?assign> <expr1>
+rule record_field {
+  [ <name> | <index> ] <?assign> <expression>
 }
 
 rule constructor {
@@ -125,49 +125,49 @@ rule fieldsep {
 }
 
 rule tablefield {
-  [ <recfield> | <expr> ]*
+  [ <record_field> | <expression> ]*
 }
 
-rule parlist {
-    <namelist1> [ <','> <'...'> ]?
+rule parameter_list {
+  | <name_list> [ <','> <'...'> ]?
   | <'...'>
 }
 
-rule body {
-  <'('> <parlist>? <?closeparen> <block> <?end>
+rule function_body {
+  <'('> <parameter_list>? <?closeparen> <block> <?end>
 }
 
-rule explist1 {
-  <expr> [ <','> <expr> ]*
+rule expression_list {
+  <expression> [ <','> <expression> ]*
 }
 
-rule namelist1 {
+rule name_list {
   <name> [ <','> <name> ]*
 }
 
-rule funcargs {
-    <'('> <explist1>? <?closeparen>
+rule function_args {
+  | <'('> <expression_list>? <?closeparen>
   | <constructor>
   | <string>
 }
 
-rule prefixexp {
-    <name>
-  | <'('> <expr1> <?closeparen>
+rule prefix_expression {
+  | <name>
+  | <'('> <expression> <?closeparen>
 }
 
-rule primaryexp {
-  <prefixexp>
+rule primary_expression {
+  <prefix_expression>
   [ <'.'> <name>
   | <index>
-  | <':'> <name> <funcargs>
-  | <funcargs>
+  | <':'> <name> <function_args>
+  | <function_args>
   ]*
 
 }
 
-rule simpleexpr {
-    <number>
+rule simple_expression {
+  | <number>
   | <string>
   | <'nil'>
   | <'true'>
@@ -175,7 +175,7 @@ rule simpleexpr {
   | <'...'>
   | <constructor>
   | <'function'> <body>
-  | <primaryexp>
+  | <primary_expression>
 }
 
 
@@ -185,25 +185,25 @@ Operator precedence is implemented using an optable.
 
 =cut
 
-rule 'expr'         is optable { ... }
+rule 'expression'   is optable { ... }
 
-proto 'term:'       is precedence('=') is parsed(&simpleexpr) { ... }
+proto 'term:'       is precedence('=')      is parsed(&simple_expression) { ... }
 
 proto 'infix:^'     is looser('term:')
                     is assoc('right')           { ... }
 
-proto 'prefix:not'  is looser('infix:^')        { ... }
-proto 'prefix:#'    is equiv('prefix:not')      { ... }
-proto 'prefix:-'    is equiv('prefix:not')      { ... }
+proto 'prefix:not'  is looser('infix:^')    is pirop('not')      { ... }
+proto 'prefix:#'    is equiv('prefix:not')  is pirop('elements') { ... } # does this work?? it needs an I register
+proto 'prefix:-'    is equiv('prefix:not')  is pirop('neg')      { ... }
 
-proto 'infix:*'     is looser('prefix:not')     { ... }
-proto 'infix:/'     is equiv('infix:*')         { ... }
-proto 'infix:%'     is equiv('infix:*')         { ... }
+proto 'infix:*'     is looser('prefix:not') is pirop('mul') { ... }
+proto 'infix:/'     is equiv('infix:*')     is pirop('div') { ... }
+proto 'infix:%'     is equiv('infix:*')     is pirop('mod') { ... }
 
-proto 'infix:+'     is looser('infix:*')        { ... }
-proto 'infix:-'     is equiv('infix:+')         { ... }
+proto 'infix:+'     is looser('infix:*')    is pirop('add') { ... }
+proto 'infix:-'     is equiv('infix:+')     is pirop('sub') { ... }
 
-proto 'infix:..'    is looser('infix:+')
+proto 'infix:..'    is looser('infix:+')    is pirop('concat')
                     is assoc('right')           { ... }
 
 proto 'infix:<'     is looser('infix:..')       { ... }
@@ -266,10 +266,6 @@ rule closeparen {
   <')'> | <syntax_error: ')' expected>
 }
 
-rule expr1 {
-  <expr> | <syntax_error: expression expected>
-}
-
 
 =head1 TOKENS
 
@@ -300,7 +296,7 @@ token string {
 
 
 token number {
-  | 0 <[Xx]> <xdigit>+
+  |  0 <[Xx]> <xdigit>+
   | [ <digit>+ [ \. <digit>* ]? | \. <digit>+ ]
     [ <[Ee]> <[+\-]>? <digit>+ ]?
 }
@@ -328,5 +324,6 @@ token keyword {
   | <'function'> | <'if'>     | <'in'>    | <'local'>
   | <'nil'>      | <'not'>    | <'or'>    | <'repeat'>
   | <'return'>   | <'then'>   | <'true'>  | <'until'>
-  | <'while'> 	] \b
+  | <'while'>    ] \b
 }
+

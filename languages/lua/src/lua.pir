@@ -11,7 +11,7 @@
     $P0 = new [ 'HLLCompiler' ]
     $P0.'language'('Lua')
     $P0.'parsegrammar'('Lua::Grammar')
-    $P0.'astgrammar'('ASTGrammar')
+    $P0.'astgrammar'('Lua::PAST::Grammar')
 
     $S0 = "Lua 5.1 on Parrot  Copyright (C) 2005-2007, The Perl Foundation.\n"
     $P0.'commandline_banner'($S0)
