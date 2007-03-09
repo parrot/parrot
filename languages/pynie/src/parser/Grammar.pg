@@ -322,17 +322,17 @@ rule module {
 }
 
 token literal {
-    | <stringliteral>
-    | <integer>
-    | <longinteger>
-    | <floatnumber>
+    | <stringliteral>    
     | <imagnumber>
+    | <floatnumber>    
+    | <longinteger>     
+    | <integer> 
 }
 
-token integer {
-    | <[1..9]> \d* | <'0'>
+token integer {    
     | <'0'> <[0..7]>+
     | <'0'> <[xX]> [ \d | <[a..f]> | <[A..F]> ]+
+    | <[1..9]> \d* | <'0'>
 }
 
 token intpart { \d+ }
@@ -341,10 +341,10 @@ token longinteger { <integer> <[lL]> }
 
 token imagnumber { [ <floatnumber> | <intpart> ] <[jJ]> }
 
-token floatnumber {
-    | \d* <'.'> \d+
-    | \d+ <'.'>
-    | [ <'.'>? \d+ ] <[eE]> <[+\-]> \d+
+token floatnumber {    
+    | \d* <'.'> \d+ [ <[eE]> <[+\-]>? \d+ ]?
+    | \d+ <'.'> [ <[eE]> <[+\-]>? \d+ ]?
+    | \d+ <[eE]> <[+\-]>? \d+
 }
 
 token stringliteral {
@@ -482,15 +482,15 @@ rule and_test {
 
 rule not_test {
     | <'not'> <not_test>
-    | <not_in_test>
+    | <in_test>
 }
 
-rule not_in_test {
-    <is_not_test> [ <'not'>? <'in'> <is_not_test> ]*
+rule in_test {
+    <is_test> [ (<'not'>)? <'in'> <is_test> ]*
 }
 
-rule is_not_test {
-    <comparison> [ <'is'> <'not'>? <comparison> ]*
+rule is_test {
+    <comparison> [ <'is'> (<'not'>)? <comparison> ]*
 }
 
 token 'comparison' is optable { ... }

@@ -28,6 +28,13 @@ transform past (Pynie::Grammar::statement) :language('PIR') {
     .return tree.'get'('past', $P0, $S0)
 }
 
+transform past (Pynie::Grammar::compound_stmt) :language('PIR') {
+    $S0 = node.'find_key'()
+    $P0 = node[$S0]
+    $S0 = concat 'Pynie::Grammar::', $S0
+    .return tree.'get'('past', $P0, $S0)
+}
+
 
 transform past (Pynie::Grammar::stmt_list) :language('PIR') {
     .local pmc past
@@ -226,30 +233,94 @@ transform past (Pynie::Grammar::or_test) :language('PIR') {
 }
 
 transform past (Pynie::Grammar::and_test) :language('PIR') {
-    $P0 = node['not_test']
-    $P0 = $P0[0] # this is a hack, 'rule expression' has 1 or more <or_test>s, so it stores them in an array. Handle $P0[1] later.
-    #printerr "pynie::grammar::and_test\n"
-    .return tree.'get'('past', $P0, 'Pynie::Grammar::not_test')
+  .local pmc past, iter, clist, cnode
+    clist = node['not_test']
+    clist = clone clist
+    cnode = pop clist
+    past = tree.'get'('past', cnode, 'Pynie::Grammar::not_test')
+    unless clist goto end
+  clist_loop:
+    cnode = pop clist
+    $P0 = tree.'get'('past', cnode, 'Pynie::Grammar::not_test')
+    past = past.'new'('PAST::Op', $P0, past, 'node'=>node, 'pasttype'=>'if')
+    if clist goto clist_loop
+  end:
+    .return (past)
 }
 
 transform past (Pynie::Grammar::not_test) :language('PIR') {
-    $P0 = node['not_in_test']
-    #printerr "pynie::grammar::not_test\n"
-    .return tree.'get'('past', $P0, 'Pynie::Grammar::not_in_test')
+    .local string key, fullkey
+    .local pmc cnode, past, notpast
+
+    cnode = node['not_test']
+    if null cnode goto do_in_test
+    notpast = tree.'get'('past', cnode, 'Pynie::Grammar::not_test')
+
+    past = new 'PAST::Op'
+    past.'init'('node'=>cnode, 'pasttype'=>'pirop', 'pirop'=>'not')
+    past.'push'(notpast)
+
+    .return (past)
+
+  do_in_test:
+    cnode = node['in_test']
+    past = tree.'get'('past', cnode, 'Pynie::Grammar::in_test')
+    .return (past)
 }
 
-transform past (Pynie::Grammar::not_in_test) :language('PIR') {
-    $P0 = node['is_not_test']
-    $P0 = $P0[0] # this is a hack, 'rule expression' has 1 or more <or_test>s, so it stores them in an array. Handle $P0[1] later.
-    #printerr "pynie::grammar::not_in_test\n"
-    .return tree.'get'('past', $P0, 'Pynie::Grammar::is_not_test')
+transform past (Pynie::Grammar::in_test) :language('PIR') {
+    .local pmc past, iter, clist, cnode
+    clist = node['is_test']
+    clist = clone clist
+    cnode = pop clist
+    past = tree.'get'('past', cnode, 'Pynie::Grammar::is_test')
+    unless clist goto end
+  clist_loop:
+    cnode = pop clist
+    $P0 = tree.'get'('past', cnode, 'Pynie::Grammar::is_test')
+    #
+    # FIX THIS; also check for "not"
+    #
+    past = past.'new'('PAST::Op', $P0, past, 'node'=>node, 'pasttype'=>'pirop', 'pirop'=>'IN (FIX)')
+    if clist goto clist_loop
+  end:
+    .return (past)
 }
 
-transform past (Pynie::Grammar::is_not_test) :language('PIR') {
-    $P0 = node['comparison']
-    $P0 = $P0[0]
-    $P0 = $P0['expr']
-    #printerr "pynie::grammar::is_not_test\n"
+transform past (Pynie::Grammar::is_test) :language('PIR') {
+    .local pmc past, iter, clist, cnode
+    .local int hasnot
+
+    hasnot = 1
+    # HACK:
+    # TODO: figure out how presence of "not" can be checked.
+    # then set flag for each iteration.
+
+    clist = node['comparison']
+    clist = clone clist
+
+    cnode = pop clist
+    past = tree.'get'('past', cnode, 'Pynie::Grammar::comparison')
+    unless clist goto end
+
+  clist_loop:
+    cnode = pop clist
+    $P0 = tree.'get'('past', cnode, 'Pynie::Grammar::comparison')
+  if hasnot == 0 goto do_issame
+    $S0 = "isntsame"
+    goto done
+  do_issame:
+    $S0 = "issame"
+  done:
+    past = past.'new'('PAST::Op', $P0, past, 'node'=>node, 'pasttype'=>'pirop', 'pirop'=>$S0)
+    if clist goto clist_loop
+  end:
+    .return (past)
+}
+
+
+transform past (Pynie::Grammar::comparison) :language('PIR') {
+    $P0 = node['expr']
     .return tree.'get'('past', $P0, 'Pynie::Grammar::expr')
 }
 
@@ -320,6 +391,29 @@ transform past (Pynie::Grammar::integer) :language('PIR') {
     .local pmc past
     past = new 'PAST::Val'
     past.'init'('node'=>node, 'vtype'=>'.Integer', 'name'=>node, 'ctype'=>'i+')
+    .return (past)
+}
+
+transform past (Pynie::Grammar::longinteger) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Val'
+    past.'init'('node'=>node, 'vtype'=>'.Integer', 'name'=>node, 'ctype'=>'i+')
+    .return (past)
+}
+
+transform past (Pynie::Grammar::floatnumber) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Val'
+    # FIX
+    #past.'init'('node'=>node, 'vtype'=>'.Integer', 'name'=>node, 'ctype'=>'i+')
+    .return (past)
+}
+
+transform past (Pynie::Grammar::imagnumber) :language('PIR') {
+    .local pmc past
+    past = new 'PAST::Val'
+    # FIX
+    #past.'init'('node'=>node, 'vtype'=>'.Integer', 'name'=>node, 'ctype'=>'i+')
     .return (past)
 }
 
@@ -439,8 +533,9 @@ transform past (Pynie::Grammar::if_stmt) :language('PIR') {
     if suitec <= exprc goto expr_suite_pair
     dec suitec
     elsenode = suitelist[suitec]
-    elsepast = tree.'get'('past', elsenode, 'Pynie::Grammar::suite')
-    elsepast.'suitetype'('immediate')
+    elsepast = tree.'get'('past', elsenode, 'Pynie::Grammar::suite')    
+    # 'suitetype' does not exist...
+    ##elsepast.'suitetype'('immediate')
 
   expr_suite_pair:
     ##   each remaining suite is paired with an "if" (or "elsif")
@@ -462,23 +557,30 @@ transform past (Pynie::Grammar::if_stmt) :language('PIR') {
 
 
 transform past (Pynie::Grammar::while_stmt) :language('PIR') {
-   # .local pmc past
-   # past = new 'PAST::Op'
-   # past.'init'('node'=>node, 'pasttype'=>'inline', 'inline'=>'# while stmt not implemented')
-   # .return (past)
-
-    .local pmc exprnode, stmtnode
+    .local pmc exprnode, stmtnode, suitenode
     exprnode = node['expression']
-    stmtnode = node['suite']
-    stmtnode = stmtnode[0]
+    suitenode = node['suite']
+    stmtnode = suitenode[0]
 
-    .local pmc past, exprpast, stmtpast
-    past = new 'PAST::Op'
-    past.'init'('node'=>node, 'pasttype'=>'while')
+    .local pmc past, whilepast, exprpast, stmtpast
+    past = new 'PAST::Stmts'
+    past.'init'('node'=>node)
+
+    whilepast = new 'PAST::Op'
+    whilepast.'init'('node'=>node, 'pasttype'=>'while')
     exprpast = tree.'get'('past', exprnode, 'Pynie::Grammar::expression')
-    past.'push'(exprpast)
+    whilepast.'push'(exprpast)
+    stmtpast = tree.'get'('past', stmtnode, 'Pynie::Grammar::suite')
+    whilepast.'push'(stmtpast)
+    past.'push'(whilepast)
+
+    stmtnode = suitenode[1]
+    if null stmtnode goto no_else
+    unless stmtnode goto no_else # check for .Undef # why does that happen?
     stmtpast = tree.'get'('past', stmtnode, 'Pynie::Grammar::suite')
     past.'push'(stmtpast)
+
+  no_else:
     .return (past)
 }
 
