@@ -2,7 +2,7 @@
 
 # check literals
 
-print '1..5'
+print '1..7'
 
 0
 1
@@ -73,7 +73,9 @@ print 4
 #3.14e-10j
 #1J
 
-print "ok 5\n",
+print 'ok 5'
 
-
-
+# prefix:+
+print 'ok', +6
+x = +7
+print 'ok', x
