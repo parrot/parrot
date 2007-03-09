@@ -104,7 +104,7 @@ the current namespace.
 
     void init() {
         Parrot_MetaClass *class = NULL;
-        
+
         /* Custom DOD mark and destory. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
@@ -264,7 +264,7 @@ specified will be linked to this class.
             {
                 /* XXX */
             }
-            
+
             /* Set namespace. */
             class->namespace = Parrot_get_namespace_keyed(interp,
                 interp->HLL_namespace, namespace);
@@ -300,8 +300,8 @@ Creates an instance of the object.
         obj = pmc_new_init(interp, enum_class_Object, SELF);
 
         /* XXX Call constructor with the supplied arguments? */
- 
-         preturn(PMC *obj)
+
+        preturn(PMC *obj)
      }
 }
 
