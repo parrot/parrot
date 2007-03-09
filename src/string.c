@@ -317,7 +317,7 @@ string_make_empty(Interp *interp,
         s->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, s);;
     }
     else {
-        internal_exception(INVALID_CHARTYPE, "Unsupported representation");
+        real_exception(interp, NULL, INVALID_CHARTYPE, "Unsupported representation");
     }
 
     Parrot_allocate_string(interp,
@@ -522,7 +522,7 @@ string_primary_encoding_for_representation(Interp *interp,
             return "ascii";
             break;
         default:
-            internal_exception(INVALID_STRING_REPRESENTATION,
+            real_exception(interp, NULL, INVALID_STRING_REPRESENTATION,
                 "string_primary_encoding_for_representation: "
                 "invalid string representation");
             return NULL;
@@ -584,7 +584,7 @@ string_make(Interp *interp, const void *buffer,
     }
     charset = Parrot_find_charset(interp, charset_name);
     if (!charset) {
-        internal_exception(UNIMPLEMENTED,
+        real_exception(interp, NULL, UNIMPLEMENTED,
                 "Can't make '%s' charset strings", charset_name);
     }
     encoding = charset->preferred_encoding;
@@ -745,7 +745,7 @@ string_ord(Interp *interp, const STRING *s, INTVAL idx)
     const UINTVAL len = string_length(interp, s);
 
     if (len == 0) {
-        internal_exception(ORD_OUT_OF_STRING,
+        real_exception(interp, NULL, ORD_OUT_OF_STRING,
             "Cannot get character of empty string");
     }
     else {
@@ -754,7 +754,7 @@ string_ord(Interp *interp, const STRING *s, INTVAL idx)
 
         if (idx < 0) {
             if ((INTVAL)(idx + len) < 0) {
-                internal_exception(ORD_OUT_OF_STRING,
+                real_exception(interp, NULL, ORD_OUT_OF_STRING,
                     "Cannot get character before beginning of string");
             }
             else {
@@ -763,7 +763,7 @@ string_ord(Interp *interp, const STRING *s, INTVAL idx)
         }
 
         if (true_index > (len - 1)) {
-            internal_exception(ORD_OUT_OF_STRING,
+            real_exception(interp, NULL, ORD_OUT_OF_STRING,
                 "Cannot get character past end of string");
         }
 
@@ -958,7 +958,7 @@ string_substr(Interp *interp, STRING *src,
     }
 
     if (src->strlen == 0 || true_offset > src->strlen - 1) {   /* 0 based... */
-        internal_exception(SUBSTR_OUT_OF_STRING,
+        real_exception(interp, NULL, SUBSTR_OUT_OF_STRING,
                 "Cannot take substr outside string");
     }
 
@@ -1054,7 +1054,7 @@ string_replace(Interp *interp, STRING *src,
      * Only give exception if caller trys to replace end of string + 2
      */
     if (true_offset > src->strlen) {
-        internal_exception(SUBSTR_OUT_OF_STRING,
+        real_exception(interp, NULL, SUBSTR_OUT_OF_STRING,
                 "Can only replace inside string or index after end of string");
     }
     if (true_length > (src->strlen - true_offset)) {
@@ -1089,7 +1089,7 @@ string_replace(Interp *interp, STRING *src,
 
     /* not possible.... */
     if (end_byte < start_byte) {
-        internal_exception(SUBSTR_OUT_OF_STRING,
+        real_exception(interp, NULL, SUBSTR_OUT_OF_STRING,
                 "replace: subend somehow is less than substart");
     }
 
@@ -2143,12 +2143,12 @@ string_unescape_cstring(Interp *interp,
         *p = '\0';
         encoding = Parrot_find_encoding(interp, enc_char);
         if (!encoding) {
-            internal_exception(UNIMPLEMENTED,
+            real_exception(interp, NULL, UNIMPLEMENTED,
                     "Can't make '%s' encoding strings", enc_char);
         }
         charset = Parrot_find_charset(interp, p + 1);
         if (!charset) {
-            internal_exception(UNIMPLEMENTED,
+            real_exception(interp, NULL, UNIMPLEMENTED,
                     "Can't make '%s' charset strings", p + 1);
         }
         result = string_make_direct(interp, cstring, clength,
@@ -2187,7 +2187,7 @@ string_unescape_cstring(Interp *interp,
         string_compute_strlen(interp, result);
     }
     else if (!CHARSET_VALIDATE(interp, result, 0)) {
-        internal_exception(INVALID_STRING_REPRESENTATION,
+        real_exception(interp, NULL, INVALID_STRING_REPRESENTATION,
                 "Malformed string");
     }
     if (result->encoding == Parrot_utf8_encoding_ptr) {
@@ -2321,7 +2321,7 @@ string_increment(Interp *interp, const STRING *s)
     INTVAL o;
 
     if (string_length(interp, s) != 1)
-        internal_exception(1, "increment only for length=1 done");
+        real_exception(interp, NULL, UNIMPLEMENTED, "increment only for length=1 done");
 
     o = string_ord(interp, s, 0);
     if ((o >= 'A' && o < 'Z') ||
@@ -2330,7 +2330,7 @@ string_increment(Interp *interp, const STRING *s)
         /* TODO increment in place */
         return string_chr(interp, o);
     }
-    internal_exception(1, "increment out of range - unimplemented");
+    real_exception(interp, NULL, UNIMPLEMENTED, "increment out of range - unimplemented");
     return NULL;
 }
 

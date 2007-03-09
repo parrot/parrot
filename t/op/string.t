@@ -260,25 +260,25 @@ length
 OUTPUT
 
 # This asks for substring it shouldn't be allowed...
-pasm_output_is( <<'CODE', <<'OUTPUT', 'substr OOB' );
+pasm_output_like( <<'CODE', <<'OUTPUT', 'substr OOB' );
 	set	S0, "A string of length 21"
 	set I0, -99
 	set I1, 6
 	substr S1, S0, I0, I1
 	end
 CODE
-Cannot take substr outside string
+/^Cannot take substr outside string/
 OUTPUT
 
 # This asks for substring it shouldn't be allowed...
-pasm_output_is( <<'CODE', <<'OUTPUT', 'substr OOB' );
+pasm_output_like( <<'CODE', <<'OUTPUT', 'substr OOB' );
 	set S0, "A string of length 21"
 	set I0, 99
 	set I1, 6
 	substr S1, S0, I0, I1
 	end
 CODE
-Cannot take substr outside string
+/^Cannot take substr outside string/
 OUTPUT
 
 # This asks for substring much greater than length of original string
@@ -381,7 +381,7 @@ xyz
 
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, offset past end of string' );
+pasm_output_like( <<'CODE', <<'OUTPUT', '5 arg substr, offset past end of string' );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, 12, 3, S1
@@ -393,7 +393,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, offset past end of string' 
   print "\n"
   end
 CODE
-Can only replace inside string or index after end of string
+/^Can only replace inside string or index after end of string/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, -ve offset, repl=length' );
@@ -447,7 +447,7 @@ xyz
 fghi
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, -ve offset out of string' );
+pasm_output_like( <<'CODE', <<'OUTPUT', '5 arg substr, -ve offset out of string' );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, -12, 4, S1
@@ -459,7 +459,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, -ve offset out of string' )
   print "\n"
   end
 CODE
-Can only replace inside string or index after end of string
+/^Can only replace inside string or index after end of string/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, length > strlen ' );
@@ -1015,36 +1015,36 @@ CODE
 foo
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '2-param ord, empty string' );
+pasm_output_like( <<'CODE', <<'OUTPUT', '2-param ord, empty string' );
 	ord I0,""
 	print I0
 	end
 CODE
-Cannot get character of empty string
+/^Cannot get character of empty string/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '2-param ord, empty string register' );
+pasm_output_like( <<'CODE', <<'OUTPUT', '2-param ord, empty string register' );
 	ord I0,S0
 	print I0
 	end
 CODE
-Cannot get character of empty string
+/^Cannot get character of empty string/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '3-param ord, empty string' );
+pasm_output_like( <<'CODE', <<'OUTPUT', '3-param ord, empty string' );
 	ord I0,"",0
 	print I0
 	end
 CODE
-Cannot get character of empty string
+/^Cannot get character of empty string/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '3-param ord, empty string register' );
+pasm_output_like( <<'CODE', <<'OUTPUT', '3-param ord, empty string register' );
 	ord I0,S0,0
 	print I0
 	end
 CODE
-Cannot get character of empty string
+/^Cannot get character of empty string/
 OUTPUT
 
 pasm_output_is( <<'CODE', ord('a'), '2-param ord, one-character string' );
@@ -1092,21 +1092,21 @@ pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string registe
 	end
 CODE
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string' );
+pasm_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string' );
 	ord I0,"ab",2
 	print I0
 	end
 CODE
-Cannot get character past end of string
+/^Cannot get character past end of string/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string' );
+pasm_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string' );
 	set S0,"ab"
 	ord I0,S0,2
 	print I0
 	end
 CODE
-Cannot get character past end of string
+/^Cannot get character past end of string/
 OUTPUT
 
 pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string, from end' );
@@ -1135,14 +1135,14 @@ pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string registe
 	end
 CODE
 
-pasm_output_is(
+pasm_output_like(
     <<'CODE', <<'OUTPUT', '3-param ord, multi-character string register, from end, OOB' );
 	set S0,"ab"
 	ord I0,S0,-3
 	print I0
         end
 CODE
-Cannot get character before beginning of string
+/^Cannot get character before beginning of string/
 OUTPUT
 
 pasm_output_is( <<'CODE', chr(32), 'chr of 32 is space in ASCII' );
@@ -2789,23 +2789,23 @@ pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string registe
 	end
 CODE
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string, I' );
+pasm_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string, I' );
 	set I1, 2
 	ord I0,"ab",I1
 	print I0
 	end
 CODE
-Cannot get character past end of string
+/^Cannot get character past end of string/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string, I' );
+pasm_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string, I' );
 	set I1, 2
 	set S0,"ab"
 	ord I0,S0,I1
 	print I0
 	end
 CODE
-Cannot get character past end of string
+/^Cannot get character past end of string/
 OUTPUT
 
 pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string, from end, I' );
@@ -2838,7 +2838,7 @@ pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string registe
 	end
 CODE
 
-pasm_output_is(
+pasm_output_like(
     <<'CODE', <<'OUTPUT', '3-param ord, multi-character string register, from end, OOB, I' );
 	set I1, -3
 	set S0,"ab"
@@ -2846,7 +2846,7 @@ pasm_output_is(
 	print I0
         end
 CODE
-Cannot get character before beginning of string
+/^Cannot get character before beginning of string/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUT', 'more string_to_int' );
