@@ -57,6 +57,10 @@ src/builtins/oper.pir - operators
     .return ($I0)
 .end
 
+.sub 'prefix:+'
+    .param pmc n
+    .return (n)
+.end
 
 .sub 'prefix:++'
     .param pmc n
