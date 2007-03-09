@@ -122,8 +122,6 @@ When called without arguments, C<date> returns a reasonable date and time
 representation that depends on the host system and on the current locale
 (that is, C<os.date()> is equivalent to C<os.date("%c")>).
 
-STILL INCOMPLETE (see strftime).
-
 =cut
 
 .include 'tm.pasm'
@@ -193,16 +191,9 @@ L3:
     ret[$P1] = $P2
     .return (ret)
 L4:
-    $S0 = strftime($S1, $P0)
-    new ret, .LuaString
-    set ret, $P0
+    new $P1, .Lua
+    ret = $P1.'strftime'($S1, $P0)
     .return (ret)
-.end
-
-.sub 'strftime' :anon
-    .param string format
-    .param pmc t
-    not_implemented()
 .end
 
 

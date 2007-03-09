@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.date' );
@@ -37,6 +37,12 @@ print(d.wday, d.yday, d.isdst)
 CODE
 1970	1	1	0	0	0
 5	1	false
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.date' );
+print(os.date("!%c", 0))
+CODE
+01/01/70 00:00:00
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.difftime' );

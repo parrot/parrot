@@ -20,6 +20,10 @@ This singleton PMC holds some static methods.
 
 #include "parrot/parrot.h"
 
+extern INTVAL dynpmc_LuaNil;
+extern INTVAL dynpmc_LuaNumber;
+extern INTVAL dynpmc_LuaString;
+
 static PMC * Lua_PMC;
 
 
@@ -61,12 +65,10 @@ information see F<src/pmc.c>.
         PMC *retval;
         int e;
 
-        y = pmc_new(INTERP, pmc_type(INTERP,
-              const_string(INTERP, "LuaNumber")));
-        expn = pmc_new(INTERP, pmc_type(INTERP,
-              const_string(INTERP, "LuaNumber")));
+        y = pmc_new(INTERP, dynpmc_LuaNumber);
+        expn = pmc_new(INTERP, dynpmc_LuaNumber);
         VTABLE_set_number_native(INTERP, y,
-              frexp(VTABLE_get_number(INTERP, x), &e));
+                                 frexp(VTABLE_get_number(INTERP, x), &e));
         VTABLE_set_integer_native(INTERP, expn, e);
         retval = pmc_new(INTERP, enum_class_Array);
         VTABLE_set_integer_native(INTERP, retval, 2);
@@ -83,11 +85,10 @@ information see F<src/pmc.c>.
 
 */
     METHOD PMC* ldexp(PMC* x, PMC* expn) {
-        PMC *retval = pmc_new(INTERP, pmc_type(INTERP,
-              const_string(INTERP, "LuaNumber")));
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
         VTABLE_set_number_native(INTERP, retval,
-              ldexp(VTABLE_get_number(INTERP, x),
-              VTABLE_get_integer(INTERP, expn)));
+                                 ldexp(VTABLE_get_number(INTERP, x),
+                                       VTABLE_get_integer(INTERP, expn)));
         return retval;
     }
 
@@ -104,17 +105,52 @@ information see F<src/pmc.c>.
         PMC *retval;
         FLOATVAL _d;
 
-        y = pmc_new(INTERP, pmc_type(INTERP,
-              const_string(INTERP, "LuaNumber")));
-        d = pmc_new(INTERP, pmc_type(INTERP,
-              const_string(INTERP, "LuaNumber")));
+        y = pmc_new(INTERP, dynpmc_LuaNumber);
+        d = pmc_new(INTERP, dynpmc_LuaNumber);
         VTABLE_set_number_native(INTERP, y,
-              modf(VTABLE_get_number(INTERP, x), &_d));
+                                 modf(VTABLE_get_number(INTERP, x), &_d));
         VTABLE_set_number_native(INTERP, d, _d);
         retval = pmc_new(INTERP, enum_class_Array);
         VTABLE_set_integer_native(INTERP, retval, 2);
         VTABLE_set_pmc_keyed_int(INTERP, retval, 0, d);
         VTABLE_set_pmc_keyed_int(INTERP, retval, 1, y);
+        return retval;
+    }
+
+/*
+
+=item C<PMC* strftime(STRING* fmt, PMC* tm)>
+
+=cut
+
+*/
+    METHOD PMC* strftime(STRING* fmt, PMC* tm) {
+        PMC *retval = NULL;
+        struct tm stm;
+        char b[256];
+        const char *s = string_to_cstring(INTERP, fmt);
+
+        stm.tm_sec   = VTABLE_get_integer_keyed_int(INTERP, tm, 0);
+        stm.tm_min   = VTABLE_get_integer_keyed_int(INTERP, tm, 1);
+        stm.tm_hour  = VTABLE_get_integer_keyed_int(INTERP, tm, 2);
+        stm.tm_mday  = VTABLE_get_integer_keyed_int(INTERP, tm, 3);
+        stm.tm_mon   = VTABLE_get_integer_keyed_int(INTERP, tm, 4) - 1;
+        stm.tm_year  = VTABLE_get_integer_keyed_int(INTERP, tm, 5) - 1900;
+        stm.tm_wday  = VTABLE_get_integer_keyed_int(INTERP, tm, 6);
+        stm.tm_yday  = VTABLE_get_integer_keyed_int(INTERP, tm, 7);
+        stm.tm_isdst = VTABLE_get_integer_keyed_int(INTERP, tm, 8);
+
+        if (strftime(b, sizeof b, s, &stm)) {
+            retval = pmc_new(INTERP, dynpmc_LuaString);
+            VTABLE_set_string_native(INTERP, retval,
+                                     string_from_cstring(INTERP, b, 0));
+        }
+        else {
+            PMC* func = Parrot_find_global_cur(INTERP,
+                                               const_string(INTERP, "error"));
+            STRING* msg = const_string(INTERP, "'date' format too long");
+            (void)Parrot_runops_fromc_args(INTERP, func, "vS", msg);
+        }
         return retval;
     }
 
