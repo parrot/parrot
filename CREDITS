@@ -182,6 +182,10 @@ E: dmitry@karasik.eu.org
 N: Eirik Berg Hanssen
 D: Use unix98 ps option in signal.t
 
+N: Eric Hanchrow
+D: add "clone" to iterator
+E: offby1@blarg.net
+
 N: Eric Lubow
 D: makefile fixes
 E: eric@lubow.org

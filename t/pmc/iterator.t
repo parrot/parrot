@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 42;
 
 =head1 NAME
 
@@ -1317,6 +1317,50 @@ CODE
 pi
 3
 6.28
+OUTPUT
+
+pir_output_is (<< 'CODE', << 'OUTPUT', "iterator can be cloned");
+.sub main :main
+    .local pmc ar, i1, i2
+    ar = new ResizableIntegerArray
+    push ar, 17
+    new i1, .Iterator, ar
+    clone i2, i1
+.end
+CODE
+OUTPUT
+
+pir_output_is (<< 'CODE', << 'OUTPUT', "cloned iterator independent of original");
+.sub main :main
+    .local pmc ar, i1, i2
+    ar = new ResizableIntegerArray
+    push ar, 17
+    push ar, 42
+
+    new i1, .Iterator, ar
+    clone i2, i1
+
+    .local Integer temp
+
+    shift temp, i1
+    unless temp == 17 goto fail
+
+    shift temp, i1
+    unless temp == 42 goto fail
+
+    shift temp, i2
+    unless temp == 17 goto fail
+
+    shift temp, i2
+    unless temp == 42 goto fail
+
+    say "ok"
+    end
+fail:
+    say "not ok"
+.end
+CODE
+ok
 OUTPUT
 
 # Local Variables:
