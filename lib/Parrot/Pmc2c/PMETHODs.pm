@@ -259,6 +259,7 @@ sub parse_pmethod_args_add_obj {
 }
 
 sub parse_pmethod_invoke {
+  # Get (interp, invocant, method name, arguments)
   my @results = split(/,/, $_[0], 4);
   for my $x (@results){
     $x = trim($x);
@@ -267,11 +268,15 @@ sub parse_pmethod_invoke {
   if ( $#results >= 3)
   {
     my $rest = pop @results;
+    
+    # Need to add object to the signature so it gets passed.
+    $rest = "PMC* $results[1]" . ($rest ? ", $rest" : "");
+
     push @results, process_pmethod_args( parse_pmethod_args($rest), $_[1] );
   }
   else
   {
-    push @results, ( [0, 0, 0, 0], "0", "\"\"", "", "");
+    push @results, process_pmethod_args( parse_pmethod_args("PMC* $results[1]"), $_[1] );
   }
 
   shift @results;
@@ -517,6 +522,7 @@ sub rewrite_pminvoke {
       PMC* results_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
           string_from_const_cstring(interp, $result_flags, 0), PObj_constant_FLAG);
       parrot_context_t *ctx = Parrot_push_context(interp, n_regs_used);
+      PMC* pminvoke_meth;
 
       interp->current_args = arg_indexes;
       interp->args_signature = args_sig;
@@ -530,8 +536,16 @@ END
     }
 
     $replacement .= <<END;
-
-      VTABLE_invoke(interp, $pmc, $name);
+      interp->current_object = $pmc;
+      interp->current_cont = NEED_CONTINUATION;
+      ctx->current_cont = new_ret_continuation_pmc(interp, NULL);
+      pminvoke_meth = VTABLE_find_method(interp, $pmc, $name);
+      if (!pminvoke_meth) {
+          real_exception(interp, NULL, METH_NOT_FOUND,
+              "Method '%Ss' not found", $name);
+          return;
+      }
+      VTABLE_invoke(interp, pminvoke_meth, NULL);
 
 $result_accessors
 
