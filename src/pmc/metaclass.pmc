@@ -27,27 +27,76 @@ typedef struct Parrot_MetaClass {
     PMC *namespace;       /* The namespace it's linked to, if any. */
     int instantiated;     /* Any instantiations since last modification? */
     PMC *parents;         /* Immediate parent classes. */
-    PMC *all_parents;     /* Cached list of all parents, in MRO order. */
+    PMC *all_parents;     /* Cached list of ourself and all parents, in MRO order. */
     PMC *roles;           /* An array of roles. */
     PMC *methods;         /* Hash of method names to methods in this class. */
     PMC *vtable_methods;  /* Hash of Parrot v-table methods we override. */
     PMC *attrib_metadata; /* Hash of attributes in this class to metadata. */
-    PMC *attrib_index;   /* Lookup table for attributes in this and parents. */
+    PMC *attrib_index;    /* Lookup table for attributes in this and parents. */
     PMC *attrib_cache;    /* Cache of visible attrib names to indexes. */
 } Parrot_MetaClass;
 
-
 pmclass MetaClass need_ext {
+    /* This functions builds the attribute index (table to map class name and
+     * attribute name to an index) for the current class. Note: we have to
+     * make this a method so we can use PMINVOKE for now. XXX Fix that. */
+    METHOD void build_attrib_index() {
+        Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+        int num_classes = VTABLE_elements(interp, class->all_parents);
+        int i;
+        int cur_index = 0;
+        PMC *table = pmc_new(interp, enum_class_Hash);
+
+        /* We will go over the list of all parents to construct the table. */
+        for (i = 0; i < num_classes; i++) {
+           /* Get the class and its attribute metadata hash. */
+            PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, class->all_parents, i);
+            Parrot_MetaClass *class_info = PARROT_METACLASS(cur_class);
+            PMC *attribs = class_info->attrib_metadata;
+            PMC *iter = VTABLE_get_iter(interp, attribs);
+
+            /* Iterate over the attributes. */
+            while (VTABLE_get_bool(interp, iter)) {
+                /* Get attribute. */
+                PMC *cur_attrib = VTABLE_get_pmc_keyed(interp, attribs,
+                    VTABLE_shift_pmc(interp, iter));
+                STRING *attrib_name;
+
+                /* Get fully qualified class name. */
+                /* XXX BAD AND WRONG! Need to call method properly! */
+                PMC *fq_name;
+                if (!PMC_IS_NULL(class_info->namespace))
+                    fq_name = Parrot_NameSpace_get_name(interp, class_info->namespace);
+                else
+                    fq_name = pmc_new(interp, enum_class_ResizableStringArray);
+
+                /* Get attribute name and append it. */
+                (STRING *attrib_name) = PMINVOKE(interp, cur_attrib, "name");
+                printf("arg %s\n", string_to_cstring(interp, attrib_name));
+                VTABLE_push_string(interp, fq_name, attrib_name);
+
+                /* Insert into hash, along with index. */
+                VTABLE_set_integer_keyed(interp, table, fq_name, cur_index);
+                cur_index++;
+            }
+        }
+
+        /* Store built table and invalidate cache. */
+        class->attrib_index = table;
+        class->attrib_cache = pmc_new(interp, enum_class_Hash);
+    }
+
 /*
 
 =item C<void init()>
 
-Initializes the class flags.
+Initializes the class.
 
-=item C<void init_pmc(PMC *init)>
+=item C<void init_pmc(PMC *name)>
 
 The actual class creation code, called from C<newclass> opcode. The C<init>
-argument is not a PMC* but the C<classname> STRING.
+argument should stringify to the C<classname>. The class will be attatched to
+the current namespace.
 
 =cut
 
@@ -55,13 +104,13 @@ argument is not a PMC* but the C<classname> STRING.
 
     void init() {
         Parrot_MetaClass *class = NULL;
-
-        /* But we are a class, really */
-        PObj_is_class_SET(SELF);
         
         /* Custom DOD mark and destory. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
+
+        /* We are a class. */
+        PObj_is_class_SET(SELF);
 
         /* Init the class object. */
         class = mem_sys_allocate_zeroed(sizeof(Parrot_MetaClass));
@@ -72,14 +121,25 @@ argument is not a PMC* but the C<classname> STRING.
         class->methods = pmc_new(interp, enum_class_Hash);
         class->vtable_methods = pmc_new(interp, enum_class_Hash);
         class->attrib_metadata = pmc_new(interp, enum_class_Hash);
-        class->attrib_index = pmc_new(interp, enum_class_Hash);
-        class->attrib_cache = pmc_new(interp, enum_class_Hash);
+        class->attrib_index = PMCNULL;
+        class->attrib_cache = PMCNULL;
+
+        /* We put ourself on the all parents list. */
+        VTABLE_push_pmc(interp, class->all_parents, SELF);
 
         PMC_data(SELF) = class;
     }
 
-    void init_pmc(PMC* args) {
+    void init_pmc(PMC* name) {
+        Parrot_MetaClass *class = NULL;
+
+        /* Set up the object. */
         SELF.init();
+
+        /* Set name and namespace. */
+        class = PARROT_METACLASS(SELF);
+        class->name = VTABLE_get_string(interp, name);
+        class->namespace = CONTEXT(interp->ctx)->current_namespace;
     }
 
 /*
@@ -97,7 +157,7 @@ Free the memory associated with the underlying struct.
 
 /*
 
-=item C<void destroy()>
+=item C<void mark()>
 
 Mark any referenced strings and PMCs.
 
@@ -134,15 +194,15 @@ Add an attribute to the class. Requires a name and, optionally, a type.
 
 =cut
 
-*/    
+*/
     PMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *new_attribute = pmc_new(interp, enum_class_MetaAttribute);
 
         /* Set name and type. */
-        PMINVOKE(interp, pmc, "name", STRING* attribute_name);
+        PMINVOKE(interp, new_attribute, "name", STRING* attribute_name);
         if (got_type) {
-            PMINVOKE(interp, SELF, "type", STRING* attribute_type);
+            PMINVOKE(interp, new_attribute, "type", STRING* attribute_type);
         }
 
         /* If we've been instantiated already, need a new class. */
@@ -224,18 +284,25 @@ Creates an instance of the object.
 
 =cut
 
-*/ /*
+*/
     PMETHOD void new(PMC *args :slurpy :named) {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *obj;
-        STRING *name;
-        INTVAL type_id;
 
-        type_id = pmc_type(interp, class->name);
-        obj = pmc_new_init(interp, type_id, args);
-        preturn(PMC *obj)
-    }
-*/
+        /* Ensure we've built attributes list. */
+        if (PMC_IS_NULL(class->attrib_index))
+            Parrot_MetaClass_build_attrib_index(interp, SELF);
+
+        /* Set instantiated flag. */
+        class->instantiated = 1;
+
+        /* Create object. */
+        obj = pmc_new_init(interp, enum_class_Object, SELF);
+
+        /* XXX Call constructor with the supplied arguments? */
+ 
+         preturn(PMC *obj)
+     }
 }
 
 /*

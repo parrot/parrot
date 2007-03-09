@@ -22,8 +22,8 @@ Implements an instance of a class.
 #define PARROT_OBJECT(o) ((Parrot_Object *) PMC_data(o))
 
 typedef struct Parrot_Object {
-    PMC *class;
-    PMC *attrib_store;
+    PMC *class;          /* The class this is an instance of. */
+    PMC *attrib_store;   /* The attributes store - a resizable PMC array. */
 } Parrot_Object;
 
 
@@ -61,7 +61,7 @@ Allocate an object.
 
 /*
 
-=item C<void destroy()>
+=item C<void mark()>
 
 Free the object's underlying struct.
 
