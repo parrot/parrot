@@ -59,6 +59,9 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     load_bytecode 'Parrot/HLLCompiler.pbc'
     load_bytecode 'PAST-pm.pbc'
     load_bytecode 'languages/plumhead/src/common/plumheadlib.pbc'
+    load_bytecode 'CGI/QueryHash.pbc'    
+    load_bytecode 'dumper.pbc'                                      
+    
 
     # import PGE::Util::die into Plumhead::Grammar
     $P0 = get_hll_global ['PGE::Util'], 'die'
@@ -97,6 +100,22 @@ GOT_PHP_SOURCE_FN:
     if variant == 'perl5re'   goto VARIANT_PERL5RE
 
 VARIANT_PARTRIDGE:
+    # look for subs in other namespaces                           
+    .local pmc parse_get_sub, parse_post_sub   
+    parse_get_sub  = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_get'         
+    parse_post_sub = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_post'        
+                                                                  
+    # the superglobals                                            
+    .local pmc superglobal_GET                                    
+    ( superglobal_GET ) = parse_get_sub()                         
+    set_hll_global '$_GET', superglobal_GET                            
+    #'_dumper'( superglobal_GET, 'GET' ) 
+                                                                  
+    .local pmc superglobal_POST                                   
+    ( superglobal_POST ) = parse_post_sub()                       
+    set_hll_global '$_POST', superglobal_POST                          
+    #'_dumper'( superglobal_POST, 'POST' ) 
+                                                                  
     err_msg = 'Compiling and executing with partridge failed'
     $P0 = compreg 'Plumhead'
 

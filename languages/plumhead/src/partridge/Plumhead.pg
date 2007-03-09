@@ -63,7 +63,8 @@ token expression              {   <DOUBLEQUOTE_STRING>
                                 | <var>
                               }
 
-rule  array_elem              { <VAR_NAME> <'['> <expression> <']'> }
+rule  array_elem              { <VAR_NAME> <'['> <array_key> <']'> }
+rule  array_key               { <expression>  }
 rule  var                     { <VAR_NAME> }
 
 rule bitwise_expression       { <adding_expression> <bitwise_tail>? }

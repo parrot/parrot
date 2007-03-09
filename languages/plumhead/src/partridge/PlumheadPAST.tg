@@ -152,7 +152,7 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
                      $P2 = $P1['array_elem']
                      $P3 = $P1['expression']
                      if null $P2 goto iter_loop
-                         past_array_elem     = tree.'get'('past', $P2, 'Plumhead::Grammar::expression')
+                         past_array_elem     = tree.'get'('past', $P1, 'Plumhead::Grammar::expression')
                          past_expression = tree.'get'('past', $P3, 'Plumhead::Grammar::expression')
                          past_assign = new 'PAST::Op'
                          past_assign.'init'( past_array_elem, past_expression, 'node'=> node, 'name' => 'infix:=', 'pasttype' => 'assign' )  
@@ -175,9 +175,11 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     $P0 = node['expression']
     if null $P0 goto no_expression_1
-        .local pmc dummy_1
-        dummy_1 = node['VAR_NAME']
-        if null dummy_1 goto no_var_name_1
+        .local pmc dummy_1, dummy_2
+        dummy_1 = node['array_elem']
+        unless null dummy_1 goto no_expression_1
+        dummy_2 = node['VAR_NAME']
+        if null dummy_2 goto no_var_name_1
             .local string var
             var = dummy_1
             past = new 'PAST::Var'
@@ -192,7 +194,16 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     $P0 = node['array_elem']
     if null $P0 goto no_array_elem_1
-        past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+        $P1 = $P0['VAR_NAME']
+        $P2 = $P0['array_key']
+        .local string var
+        var = $P1
+        .local pmc past_key, past_var_name
+        past_var_name = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+        past_var_name.'attr'('viviself', '.Hash', 1 )
+        past_key      = tree.'get'('past', $P2, 'Plumhead::Grammar::expression')
+        past = new 'PAST::Var'
+        past.'init'( past_var_name, past_key, 'scope' => 'keyed', 'viviself' => '.Undef', 'islvalue' => 1 )                              
         goto handled_expression
     no_array_elem_1:
 
