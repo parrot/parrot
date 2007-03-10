@@ -1,4 +1,4 @@
-transform root (ROOT) :language('PIR') {
+transform past (ROOT) :language('PIR') {
     .local pmc past, traplabel
 
     past = new 'PAST::Block'
@@ -14,7 +14,7 @@ transform root (ROOT) :language('PIR') {
         # %r
 END_INLINE
     .local pmc iter
-    $P0 = node['statement']
+    $P0 = node['statement_list'; 'statement']
     iter = new .Iterator, $P0
   iter_loop:
     unless iter goto iter_end

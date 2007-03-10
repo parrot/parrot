@@ -440,8 +440,7 @@ Resizes the array to C<size> elements.
         if (SELF == value)
             return;
 
-        if (value->vtable->base_type != enum_class_FixedPMCArray &&
-                value->vtable->base_type != enum_class_ResizablePMCArray)
+        if (!VTABLE_does(interp, value, CONST_STRING(interp, "array")))
             real_exception(INTERP, NULL, E_TypeError,
                     "Can't set self from this type");
 

@@ -72,48 +72,11 @@ Initializes the compiling subsystem.
     $P0 = getclass 'TGE::Grammar'
     $P1 = subclass $P0, 'APL::PAST::Grammar'
 
-    $P0 = get_global 'compile'
-    $P1 = new [ 'HLLCompiler' ]
-    $P1.'register'('APL', $P0)
+    $P0 = new [ 'HLLCompiler' ]
+    $P0.'language'('APL')
+    $P0.'parsegrammar'('APL::Grammar')
+    $P0.'astgrammar'('APL::PAST::Grammar')
 .end
-
-=item C<compile(STR code [, 'target' => target])>
-
-Compile the APL program given by C<code>.  The C<target>
-named parameter allows the caller to specify the degree of
-compilation to be performed; a value of C<parse> returns
-the parse tree, C<PAST> returns the abstract syntax tree,
-C<PIR> returns the generated PIR code, and all other values 
-cause the program or statements to be executed.
-
-=cut
-
-.sub 'compile'
-    .param pmc code
-    .param pmc adverbs         :slurpy :named
-
-    .local string target
-    target = adverbs['target']
-    target = downcase target
-
-  parse:
-    .local pmc parse, match
-    parse = find_global 'APL::Grammar', 'statement_list'
-    match = parse(code, 'grammar'=>'APL::Grammar', 'pos'=>0)
-    unless match goto return_match
-    if target == 'parse' goto return_match
-
-  build_ast:
-    .local pmc astgrammar, astbuilder, ast
-    astgrammar = new 'APL::PAST::Grammar'
-    astbuilder = astgrammar.'apply'(match)
-    ast = astbuilder.'get'('root')
-    .return ast.'compile'(adverbs :flat :named)
-
-  return_match:
-    .return (match)
-.end
-
 
 =item C<main(PMC args)>
 
