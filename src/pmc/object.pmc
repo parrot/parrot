@@ -31,19 +31,15 @@ pmclass Object need_ext {
 
 /*
 
-=item C<void init()>
+=item C<void init_pmc(PMC *class)>
 
-Initializes the class flags.
-
-=item C<void init_pmc(PMC *init)>
-
-Allocate an object.
+Instantiates an object of the given class.
 
 =cut
 
 */
 
-    void init() {
+    void init_pmc(PMC* class) {
         Parrot_Object *obj = NULL;
 
         /* Custom DOD mark and destory. */
@@ -52,11 +48,9 @@ Allocate an object.
 
         /* Set up the object. */
         obj = mem_sys_allocate_zeroed(sizeof(Parrot_Object));
+        obj->class = class;
+        obj->attrib_store = pmc_new(interp, enum_class_ResizablePMCArray);
         PMC_data(SELF) = obj;
-    }
-
-    void init_pmc(PMC* args) {
-        SELF.init();
     }
 
 /*
@@ -87,6 +81,57 @@ Mark any referenced strings and PMCs.
             pobject_lives(interp, (PObj*)obj->class);
         if (obj->attrib_store)
             pobject_lives(interp, (PObj*)obj->attrib_store);
+    }
+
+/*
+
+=item C<PMC* get_attr_str(STRING *idx)>
+
+Gets the value of an attribute for this object. Will find the first attribute
+of the given name walking up the inheritance tree.
+
+=cut
+
+*/
+    PMC* get_attr_str(STRING *name) {
+        /* Use the class to look up the index. */
+        Parrot_Object *obj = PARROT_OBJECT(SELF);
+        PMC *class = obj->class;
+        INTVAL index;
+        (INTVAL index) = PMINVOKE(interp, class, "_get_attrib_index", STRING* name);
+
+        /* If lookup failed, exception. */
+        if (index == -1) {
+            real_exception(interp, NULL, ATTRIB_NOT_FOUND, "No such attribute '%S'", name);
+            return PMCNULL;
+        } else {
+            return VTABLE_get_pmc_keyed_int(interp, obj->attrib_store, index);
+        }
+    }
+
+/*
+
+=item C<void set_attr_str(STRING* name, PMC* value)>
+
+Sets the value of an attribute for this object. Will set the first attribute
+of the given name walking up the inheritance tree.
+
+=cut
+
+*/
+    void set_attr_str(STRING* name, PMC* value) {
+        /* Use the class to look up the index. */
+        Parrot_Object *obj = PARROT_OBJECT(SELF);
+        PMC *class = obj->class;
+        INTVAL index;
+        (INTVAL index) = PMINVOKE(interp, class, "_get_attrib_index", STRING* name);
+
+        /* If lookup failed, exception. */
+        if (index == -1) {
+            real_exception(interp, NULL, ATTRIB_NOT_FOUND, "No such attribute '%S'", name);
+        } else {
+            VTABLE_set_pmc_keyed_int(interp, obj->attrib_store, index, value);
+        }
     }
 
 }

@@ -22,6 +22,8 @@ class.
 #include "parrot/parrot.h"
 #define PARROT_METACLASS(o) ((Parrot_MetaClass *) PMC_data(o))
 
+
+/* This is the underlying structure of this PMC. */
 typedef struct Parrot_MetaClass {
     STRING *name;         /* The name of the class. */
     PMC *namespace;       /* The namespace it's linked to, if any. */
@@ -36,8 +38,34 @@ typedef struct Parrot_MetaClass {
     PMC *attrib_cache;    /* Cache of visible attrib names to indexes. */
 } Parrot_MetaClass;
 
+
+/* Build a string representing the fully qualified class name. */
+static STRING* get_fq_classname(Parrot_Interp interp, Parrot_MetaClass *class_info) {
+    STRING *fq_class = string_from_cstring(interp, "", 0);
+    STRING *seperator = string_from_const_cstring(interp, "::", 0);
+    if (!PMC_IS_NULL(class_info->namespace)) {
+        /* If we have a namespace name, make a key from it's name. */
+        /* XXX BAD AND WRONG! Need to call get_name method properly! */
+        PMC *fq_name = Parrot_NameSpace_get_name(interp, class_info->namespace);
+        int elements = VTABLE_elements(interp, fq_name);
+        int j;
+        for (j = 0; j < elements; j++) {
+            /* Append to class name. */
+            fq_class = string_append(interp, fq_class, 
+                VTABLE_get_string_keyed_int(interp, fq_name, j));
+            fq_class = string_append(interp, fq_class, seperator);
+        }
+    } else if (class_info->name != NULL) {
+        /* If we don't have a namespace but we do have a name,
+         * use that. XXX Is this sensible? */
+        fq_class = string_copy(interp, class_info->name);
+    }
+    return fq_class;
+}
+
+
 pmclass MetaClass need_ext {
-    /* This functions builds the attribute index (table to map class name and
+    /* This function builds the attribute index (table to map class name and
      * attribute name to an index) for the current class. Note: we have to
      * make this a method so we can use PMINVOKE for now. XXX Fix that. */
     METHOD void build_attrib_index() {
@@ -55,28 +83,23 @@ pmclass MetaClass need_ext {
             PMC *attribs = class_info->attrib_metadata;
             PMC *iter = VTABLE_get_iter(interp, attribs);
 
+            /* Build a string representing the fully qualified class name. */
+            STRING *fq_class = get_fq_classname(interp, class_info);
+
             /* Iterate over the attributes. */
             while (VTABLE_get_bool(interp, iter)) {
                 /* Get attribute. */
                 PMC *cur_attrib = VTABLE_get_pmc_keyed(interp, attribs,
                     VTABLE_shift_pmc(interp, iter));
                 STRING *attrib_name;
+                STRING *full_key = string_copy(interp, fq_class);
 
-                /* Get fully qualified class name. */
-                /* XXX BAD AND WRONG! Need to call method properly! */
-                PMC *fq_name;
-                if (!PMC_IS_NULL(class_info->namespace))
-                    fq_name = Parrot_NameSpace_get_name(interp, class_info->namespace);
-                else
-                    fq_name = pmc_new(interp, enum_class_ResizableStringArray);
-
-                /* Get attribute name and append it. */
+                /* Get attribute name and append it to the key. */
                 (STRING *attrib_name) = PMINVOKE(interp, cur_attrib, "name");
-                printf("arg %s\n", string_to_cstring(interp, attrib_name));
-                VTABLE_push_string(interp, fq_name, attrib_name);
-
+                full_key = string_append(interp, full_key, attrib_name);
+                
                 /* Insert into hash, along with index. */
-                VTABLE_set_integer_keyed(interp, table, fq_name, cur_index);
+                VTABLE_set_integer_keyed_str(interp, table, full_key, cur_index);
                 cur_index++;
             }
         }
@@ -114,7 +137,7 @@ the current namespace.
 
         /* Init the class object. */
         class = mem_sys_allocate_zeroed(sizeof(Parrot_MetaClass));
-/*        class->name = 'MetaClass'; */
+        class->name = NULL;
         class->namespace = PMCNULL;
         class->parents = pmc_new(interp, enum_class_ResizablePMCArray);
         class->all_parents = pmc_new(interp, enum_class_ResizablePMCArray);
@@ -309,8 +332,11 @@ Creates an instance of the object.
         PMC *obj;
 
         /* Ensure we've built attributes list. */
-        if (PMC_IS_NULL(class->attrib_index))
+        if (PMC_IS_NULL(class->attrib_index)) {
             Parrot_MetaClass_build_attrib_index(interp, SELF);
+            if (PMC_IS_NULL(class->attrib_index))
+                return;
+        }
 
         /* Set instantiated flag. */
         class->instantiated = 1;
@@ -355,6 +381,54 @@ Return the roles array PMC.
         preturn(PMC *ret_roles);
     }
 
+/*
+
+=item C<void _get_attrib_index()>
+
+This finds the index of an attribute in an object's attribute store and
+returns it. Returns -1 if the attribute does not exist. This method exists
+solely for the use of the Object PMC or any PMCs derived from it; the index
+will be useless anyway, since only the Object knows what to do with it.
+
+=cut
+
+*/
+    PMETHOD void _get_attrib_index(STRING *name) {
+        Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+        
+        /* If we can't find the attribute, we hand back -1. */
+        int index = -1;
+
+        /* First see if we can find it in the cache. */
+        if (VTABLE_exists_keyed_str(interp, class->attrib_cache, name)) {
+            /* Yay! We got a cache hit! */
+            index = VTABLE_get_integer_keyed_str(interp, class->attrib_cache, name);
+        } else {
+            /* No hit. We need to walk up the list of parents to try and find the
+             * attribute. */
+            int num_classes = VTABLE_elements(interp, class->all_parents);
+            int i;
+            for (i = 0; i < num_classes; i++) {
+                /* Get the class and its attribute metadata hash. */
+                PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, class->all_parents, i);
+                Parrot_MetaClass *class_info = PARROT_METACLASS(cur_class);
+
+                /* Build a string representing the fully qualified attribute name. */
+                STRING *fq_name = get_fq_classname(interp, class_info);
+                fq_name = string_append(interp, fq_name, name);
+
+                /* Look up. */
+                if (VTABLE_exists_keyed_str(interp, class->attrib_index, fq_name)) {
+                    /* Found it. Get value, cache it and we're done. */
+                    index = VTABLE_get_integer_keyed_str(interp, class->attrib_index, fq_name);
+                    VTABLE_set_integer_keyed_str(interp, class->attrib_cache, name, index);
+                    break;
+                }
+            }
+        }
+
+        preturn(int index);
+    }
 
 } /* END pmclass */
 
