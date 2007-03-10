@@ -192,14 +192,15 @@ Mark any referenced strings and PMCs.
 
 =item C<void attributes()>
 
-Return the attributes Hash PMC.
+Return a hash where the keys are attribute names and the values are instances
+of MetaAttribute, describing the attribute.
 
 =cut
 
 */
     PMETHOD void attributes() {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
-        PMC *ret_attrib_metadata = class->attrib_metadata;
+        PMC *ret_attrib_metadata = VTABLE_clone(interp, class->attrib_metadata);
         preturn(PMC *ret_attrib_metadata);
     }
 
@@ -334,7 +335,7 @@ Return the parents array PMC.
 */
     PMETHOD void parents() {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
-        PMC *ret_parents = class->parents;
+        PMC *ret_parents = VTABLE_clone(interp, class->parents);
         preturn(PMC *ret_parents);
     }
 
@@ -350,7 +351,7 @@ Return the roles array PMC.
 */
     PMETHOD void roles() {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
-        PMC *ret_roles = class->roles;
+        PMC *ret_roles = VTABLE_clone(interp, class->roles);
         preturn(PMC *ret_roles);
     }
 
