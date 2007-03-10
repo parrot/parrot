@@ -201,8 +201,8 @@ unless ($html) {
             my $data;
             print STDERR "- $file\n";
             $data = $self->run_test($file);
-            $stats{tests} += $data->{results}{max};
-            $stats{ok}    += $data->{results}{ok} || 0;
+            $stats{tests} += $data->{results}{max} || 0;
+            $stats{ok}    += $data->{results}{ok}  || 0;
         }
 
         printf STDERR "%s OK from %s tests (%.2f%% ok)\n\n",
