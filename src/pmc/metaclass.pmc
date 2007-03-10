@@ -114,6 +114,7 @@ the current namespace.
 
         /* Init the class object. */
         class = mem_sys_allocate_zeroed(sizeof(Parrot_MetaClass));
+/*        class->name = 'MetaClass'; */
         class->namespace = PMCNULL;
         class->parents = pmc_new(interp, enum_class_ResizablePMCArray);
         class->all_parents = pmc_new(interp, enum_class_ResizablePMCArray);
@@ -185,6 +186,23 @@ Mark any referenced strings and PMCs.
         if (class->attrib_cache)
             pobject_lives(interp, (PObj*)class->attrib_cache);
     }
+
+
+/*
+
+=item C<void attributes()>
+
+Return the attributes Hash PMC.
+
+=cut
+
+*/
+    PMETHOD void attributes() {
+        Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+        PMC *ret_attrib_metadata = class->attrib_metadata;
+        preturn(PMC *ret_attrib_metadata);
+    }
+
 
 /*
 
@@ -303,7 +321,41 @@ Creates an instance of the object.
 
         preturn(PMC *obj)
      }
-}
+
+
+/*
+
+=item C<void parents()>
+
+Return the parents array PMC.
+
+=cut
+
+*/
+    PMETHOD void parents() {
+        Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+        PMC *ret_parents = class->parents;
+        preturn(PMC *ret_parents);
+    }
+
+
+/*
+
+=item C<void roles()>
+
+Return the roles array PMC.
+
+=cut
+
+*/
+    PMETHOD void roles() {
+        Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+        PMC *ret_roles = class->roles;
+        preturn(PMC *ret_roles);
+    }
+
+
+} /* END pmclass */
 
 /*
 
