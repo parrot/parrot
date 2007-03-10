@@ -32,6 +32,7 @@ package Parrot::Distribution;
 use strict;
 use warnings;
 
+use Cwd;
 use Data::Dumper;
 use ExtUtils::Manifest;
 use File::Spec;
@@ -404,6 +405,7 @@ any external modules Parrot might have.
 
 {
     my @exemptions;
+    my $exemptions;
 
     sub is_perl_exemption {
         my( $self, $file ) = @_;
@@ -413,13 +415,10 @@ any external modules Parrot might have.
         # lib/Pod/Simple should be considered a temporary hack only!
         # RT#41611: write a test to make sure these files don't get picked up
         # again...  i.e. a test of is_perl_exemption
-        push @exemptions => 
-            map { File::Spec->canonpath($_) } $self->get_perl_exemption_regexp()
-                unless @exemptions;
 
-        $file->path =~ /\Q$_\E$/ && return 1
-            for <@exemptions>;
-        return;
+        $exemptions ||= $self->get_perl_exemption_regexp();
+
+        return $file->path =~ $exemptions;
     }
 }
 
@@ -431,19 +430,25 @@ coding-standard-exempt Perl files within Parrot
 =cut
 
 sub get_perl_exemption_regexp {
-    my $self = shift;
-    return qw{
-        languages/lua/Lua/parser.pm
-        languages/regex/lib/Regex/Grammar.pm
-        lib/Class/*
-        lib/Digest/Perl/*
-        lib/File/*
-        lib/Parse/*
-        lib/Pod/*
-        lib/SmartLink.pm
-        lib/Test/*
-        lib/Text/*
+    my $self  = shift;
+    my $cwd   = cwd();
+
+    my @paths = map { File::Spec->catdir( $cwd, File::Spec->canonpath( $_ ) ) }
+        qw{
+            languages/lua/Lua/parser.pm
+            languages/regex/lib/Regex/Grammar.pm
+            lib/Class/
+            lib/Digest/Perl/
+            lib/File/
+            lib/Parse/
+            lib/Pod/
+            lib/SmartLink.pm
+            lib/Test/
+            lib/Text/
         };
+
+    my $regex = join '|', map { quotemeta } @paths;
+    return qr/^$regex/;
 }
 
 
