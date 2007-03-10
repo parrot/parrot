@@ -543,9 +543,9 @@ END
       if (!pminvoke_meth) {
           real_exception(interp, NULL, METH_NOT_FOUND,
               "Method '%Ss' not found", $name);
-          return;
+      } else {
+          VTABLE_invoke(interp, pminvoke_meth, NULL);
       }
-      VTABLE_invoke(interp, pminvoke_meth, NULL);
 
 $result_accessors
 
