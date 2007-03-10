@@ -51,7 +51,7 @@ static STRING* get_fq_classname(Parrot_Interp interp, Parrot_MetaClass *class_in
         int j;
         for (j = 0; j < elements; j++) {
             /* Append to class name. */
-            fq_class = string_append(interp, fq_class, 
+            fq_class = string_append(interp, fq_class,
                 VTABLE_get_string_keyed_int(interp, fq_name, j));
             fq_class = string_append(interp, fq_class, seperator);
         }
@@ -97,7 +97,7 @@ pmclass MetaClass need_ext {
                 /* Get attribute name and append it to the key. */
                 (STRING *attrib_name) = PMINVOKE(interp, cur_attrib, "name");
                 full_key = string_append(interp, full_key, attrib_name);
-                
+
                 /* Insert into hash, along with index. */
                 VTABLE_set_integer_keyed_str(interp, table, full_key, cur_index);
                 cur_index++;
@@ -395,7 +395,7 @@ will be useless anyway, since only the Object knows what to do with it.
 */
     PMETHOD void _get_attrib_index(STRING *name) {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
-        
+
         /* If we can't find the attribute, we hand back -1. */
         int index = -1;
 
@@ -403,7 +403,8 @@ will be useless anyway, since only the Object knows what to do with it.
         if (VTABLE_exists_keyed_str(interp, class->attrib_cache, name)) {
             /* Yay! We got a cache hit! */
             index = VTABLE_get_integer_keyed_str(interp, class->attrib_cache, name);
-        } else {
+        }
+        else {
             /* No hit. We need to walk up the list of parents to try and find the
              * attribute. */
             int num_classes = VTABLE_elements(interp, class->all_parents);
