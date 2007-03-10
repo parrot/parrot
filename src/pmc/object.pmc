@@ -104,7 +104,8 @@ of the given name walking up the inheritance tree.
         if (index == -1) {
             real_exception(interp, NULL, ATTRIB_NOT_FOUND, "No such attribute '%S'", name);
             return PMCNULL;
-        } else {
+        }
+        else {
             return VTABLE_get_pmc_keyed_int(interp, obj->attrib_store, index);
         }
     }
@@ -129,7 +130,8 @@ of the given name walking up the inheritance tree.
         /* If lookup failed, exception. */
         if (index == -1) {
             real_exception(interp, NULL, ATTRIB_NOT_FOUND, "No such attribute '%S'", name);
-        } else {
+        }
+        else {
             VTABLE_set_pmc_keyed_int(interp, obj->attrib_store, index, value);
         }
     }
