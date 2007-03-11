@@ -391,7 +391,15 @@ Returns the Perl language source files within Parrot.  Namely:
 sub get_perl_language_files {
     my $self = shift;
 
-    return grep { !$self->is_perl_exemption($_) } $self->perl_source_files;
+    # make sure we're picking up perl files (i.e. look for the shebang line)
+    my @perl_files;
+    for my $file ( $self->perl_source_files ) {
+        push @perl_files, $file
+            if $self->is_perl($file->path);
+    }
+
+    # return only those files which aren't exempt
+    return grep { !$self->is_perl_exemption($_) } @perl_files;
 }
 
 
