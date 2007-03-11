@@ -8,7 +8,7 @@ src/parrot.c -
 
 =head1 DESCRIPTION
 
-THIS FILE IS NOT USED.
+THIS FILE IS NOT USED. (RT#41783)
 The main function for parrot is found in ../compilers/imcc/main.c.
 
 =cut
