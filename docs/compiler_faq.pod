@@ -453,9 +453,23 @@ An exception handler is called with two arguments: the exception and the
 message.  More information is available inside the exception 'object' (TBD).
 
   handler:
-    get_results '(0,0') P0, S0      # PASM syntax
+    get_results '(0,0)', P0, S0      # PASM syntax
     print "Exception caught!\n"
     exit 1
+
+=head2 How do I let exceptions from C<exit> pass through my handler?
+
+Rethrow the exception if it has a severity of C<EXCEPT_EXIT>.
+
+  handler:
+    .include 'except_severity.pasm'
+    get_results '(0,0)', $P0, $S0
+    $I0 = $P0[2]
+    if $I0 == .EXCEPT_EXIT goto unexceptional
+    print "Exception caught!\n"
+    exit 1
+  unexceptional:
+    rethrow $P0
 
 =head2 How do I access the error message of an exception I've caught?
 
