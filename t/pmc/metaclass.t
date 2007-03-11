@@ -45,7 +45,7 @@ ok 2 - isa $P0, 'MetaClass'
 OUT
 
 # L<PDD15/Class PMC API/'Class PMCs also have the "I am a class" flag set on them.'>
-pir_output_is( <<'CODE', <<'OUT', 'Class have "I am a class" flag set' );
+pir_output_is( <<'CODE', <<'OUT', 'Class PMC has "I am a class" flag set' );
 .include 'pmcinfo.pasm'
 
 .sub 'test' :main
@@ -157,7 +157,6 @@ OUT
 ## Q: what attributes the base Class have by default?
 
 
-## TODO add_attribute
 # L<PDD15/Class PMC API/=item add_attribute>
 pir_output_is( <<'CODE', <<'OUT', 'add_attribute' );
 .sub 'test' :main
@@ -204,6 +203,8 @@ OUT
 ## Q: should adding an attribute with unknown type fail? i think so.
 ## Q: should adding an attr with the same name as an existing one fail? i say yes.
 
+
+## NOTE i think this belongs in the Object PMC tests
 # L<PDD15/Class PMC API>
 pir_output_is( <<'CODE', <<'OUT', 'set_attr/get_attr VTABLE methods' );
 .sub 'test' :main
@@ -233,6 +234,7 @@ ok 3 - set an attribute
 ok 4 - got an attribute
 OUT
 
+
 # L<PDD15/Class PMC API/=item parents>
 pir_output_is( <<'CODE', <<'OUT', 'parents' );
 .sub 'test' :main
@@ -247,14 +249,13 @@ pir_output_is( <<'CODE', <<'OUT', 'parents' );
 CODE
 ok 1 - parents() returns a ResizablePMCArray
 OUT
-## NOTES test that accessor is read-only
-## NOTES figure out what parents the base Class has by default (if any)
+## NOTE test that accessor is read-only
+## NOTE figure out what parents the base Class has by default (if any)
 
 
 ## TODO add_parent
 
 
-## TODO roles
 # L<PDD15/Class PMC API/=item roles>
 pir_output_is( <<'CODE', <<'OUT', 'roles' );
 .sub 'test' :main
@@ -269,8 +270,8 @@ pir_output_is( <<'CODE', <<'OUT', 'roles' );
 CODE
 ok 1 - roles() returns a ResizablePMCArray
 OUT
-## NOTES test that accessor is read-only
-## NOTES figure out what roles the base Class has by default (if any)
+## NOTE test that accessor is read-only
+## NOTE figure out what roles the base Class has by default (if any)
 
 
 ## TODO add_role
