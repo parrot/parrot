@@ -208,18 +208,18 @@ struct Parrot_coro * new_coroutine(Interp * interp);
 struct Parrot_cont * new_continuation(Interp * interp, struct Parrot_cont *to);
 struct Parrot_cont * new_ret_continuation(Interp * interp);
 
-PMC * new_ret_continuation_pmc(Interp *, opcode_t * address);
+PARROT_API PMC * new_ret_continuation_pmc(Interp *, opcode_t * address);
 
 void mark_context(Interp *, parrot_context_t *);
 
 void invalidate_retc_context(Interp *interp, PMC *cont);
 
-STRING* Parrot_full_sub_name(Interp *interp, PMC* sub);
-int Parrot_Context_info(Interp *interp, parrot_context_t *, struct Parrot_Context_info *);
-STRING* Parrot_Context_infostr(Interp *interp, parrot_context_t *);
+PARROT_API STRING* Parrot_full_sub_name(Interp *interp, PMC* sub);
+PARROT_API int Parrot_Context_info(Interp *interp, parrot_context_t *, struct Parrot_Context_info *);
+PARROT_API STRING* Parrot_Context_infostr(Interp *interp, parrot_context_t *);
 
-PMC* Parrot_find_pad(Interp*, STRING *lex_name, parrot_context_t *);
-PMC* parrot_new_closure(Interp*, PMC*);
+PARROT_API PMC* Parrot_find_pad(Interp*, STRING *lex_name, parrot_context_t *);
+PARROT_API PMC* parrot_new_closure(Interp*, PMC*);
 
 #endif /* PARROT_SUB_H_GUARD */
 
