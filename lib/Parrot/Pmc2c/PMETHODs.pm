@@ -406,8 +406,11 @@ sub rewrite_pmethod {
         string_from_const_cstring(interp, $params_flags, 0), PObj_constant_FLAG);
     PMC* return_sig = PMCNULL;
     parrot_context_t *caller_ctx = CONTEXT(interp->ctx);
+    PMC* ret_cont = new_ret_continuation_pmc(interp, NULL);
     parrot_context_t *ctx = Parrot_push_context(interp, n_regs_used);
-    PMC *ccont = caller_ctx->current_cont;
+    PMC* ccont = caller_ctx->current_cont;
+
+    ctx->current_cont = ret_cont;
 
     current_args = interp->current_args;
     interp->current_args = NULL;
@@ -440,7 +443,7 @@ END
     /* END PMEHTOD BODY */
     $method_returns
 
-    //if (PMC_cont(ccont)->address) {
+    /* if (PMC_cont(ccont)->address) { */
     {
         //parrot_context_t * const caller_ctx = PMC_cont(ccont)->to_ctx;
         if (! caller_ctx) {
@@ -521,6 +524,7 @@ sub rewrite_pminvoke {
           string_from_const_cstring(interp, $arg_flags, 0), PObj_constant_FLAG);
       PMC* results_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
           string_from_const_cstring(interp, $result_flags, 0), PObj_constant_FLAG);
+      PMC* ret_cont = new_ret_continuation_pmc(interp, NULL);
       parrot_context_t *ctx = Parrot_push_context(interp, n_regs_used);
       PMC* pminvoke_meth;
 
@@ -538,7 +542,7 @@ END
     $replacement .= <<END;
       interp->current_object = $pmc;
       interp->current_cont = NEED_CONTINUATION;
-      ctx->current_cont = new_ret_continuation_pmc(interp, NULL);
+      ctx->current_cont = ret_cont;
       pminvoke_meth = VTABLE_find_method(interp, $pmc, $name);
       if (!pminvoke_meth) {
           real_exception(interp, NULL, METH_NOT_FOUND,
