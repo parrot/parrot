@@ -50,7 +50,7 @@ pir_output_is( <<'CODE', <<'OUT', 'Class PMC has ten attributes' );
 .sub 'test' :main
     new $P0, .MetaClass
     $P1 = $P0.'attributes'()
-    $I0 = $P1.'keys'()
+    $I0 = $P1
     if $I0 == 10 goto ok_1
     print 'not '
   ok_1:
@@ -156,14 +156,14 @@ pir_output_is( <<'CODE', <<'OUT', 'parents' );
 .sub 'test' :main
     new $P0, .MetaClass
     $P1 = $P0.'parents'()
-    $I0 = isa $P1, 'ResizableStringArray'  ## XXX really?
+    $I0 = isa $P1, 'ResizablePMCArray'  ## XXX really?
     if $I0 goto ok_1
     print 'not '
   ok_1:
-    say 'ok 1 - parents() returns a ResizableStringArray'
+    say 'ok 1 - parents() returns a ResizablePMCArray'
 .end
 CODE
-ok 1 - parents() returns a ResizableStringArray
+ok 1 - parents() returns a ResizablePMCArray
 OUT
 ## NOTES test that accessor is read-only
 ## NOTES figure out what parents the base Class has by default (if any)
@@ -178,14 +178,14 @@ pir_output_is( <<'CODE', <<'OUT', 'roles' );
 .sub 'test' :main
     new $P0, .MetaClass
     $P1 = $P0.'roles'()
-    $I0 = isa $P1, 'ResizableStringArray'  ## XXX really?
+    $I0 = isa $P1, 'ResizablePMCArray'  ## XXX really?
     if $I0 goto ok_1
     print 'not '
   ok_1:
-    say 'ok 1 - roles() returns a ResizableStringArray'
+    say 'ok 1 - roles() returns a ResizablePMCArray'
 .end
 CODE
-ok 1 - roles() returns a ResizableStringArray
+ok 1 - roles() returns a ResizablePMCArray
 OUT
 ## NOTES test that accessor is read-only
 ## NOTES figure out what roles the base Class has by default (if any)
