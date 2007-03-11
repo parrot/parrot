@@ -6,13 +6,6 @@ What's Broken in Parrot Right Now
 
 =head1 PURPOSE
 
-This is a list of items we think are broken in Parrot at the current revision.
-It's not a list of bugs -- it's a list of missing and broken features that
-prevent developers from working on their parts of the system.
-
-Committers, please add to the list as you find things and remove from the list
-as you resolve things.
-
 =head2 Missing Features
 
 Ways to emulate these would be nice too.
@@ -39,77 +32,9 @@ See the C<setstdout> and C<setstderr> ops.
 
 =over 4
 
-=item * Existing Code Marked As Broken
-
-Lots of comments in the code read C<XXX>, C<???>, C<FIXME>, or 
-C<UNIMPL>.  Fix them.
-
 =item * Nested *Struct PMCs Share State
 
 chromatic has a test case almost ready to show this.
-
-=item * C<setattribute> Sometimes Misses
-
-https://rt.perl.org/rt3//Ticket/Display.html?id=36411
-
-=back
-
-=head2 Unfinished Opcodes
-
-None at this time.
-
-=head2 Missing Vtables
-
-=over 4
-
-=item * ResizableIntegerArray
-
-# XXX This is the wrong ticket number.
-https://rt.perl.org/rt3//Ticket/Display.html?id=32374
-
-=item * splice
-
-https://rt.perl.org/rt3//Ticket/Display.html?id=34394
-
-=back
-
-=head2 Missing PDDs
-
-=over
-
-=item * Embedding (PDD 10)
-
-https://rt.perl.org/rt3//Ticket/Display.html?id=33918
-
-=item * Assembly (PDD 12)
-
-https://rt.perl.org/rt3//Ticket/Display.html?id=33919
-
-=item * Bytecode (PDD 13)
-
-https://rt.perl.org/rt3//Ticket/Display.html?id=33920
-
-=back
-
-=head2 Language-Specific Items
-
-=over 4
-
-=item * Let languages be self contained
-
-https://rt.perl.org/rt3//Ticket/Display.html?id=31633
-
-Right now many languages are in the  F<MANIFEST>, using the global config, etc.
-As far as Perl goes, this  could let us move Perl PMCs into
-F<languages/perl[6]>).
-
-=back
-
-=head2 Obsolete Features
-
-=over 4
-
-=item * Everything in F<DEPRECATED.pod>
 
 =back
 
@@ -119,12 +44,9 @@ F<languages/perl[6]>).
 
 =item * Generate accurate file/line number information in stack traces.  
 
-=item * Get name of C<parrot> executable
-
-https://rt.perl.org/rt3//Ticket/Display.html?id=33923 
-
 =item * Give invokable PMCs a canonical way to store their associated HLL
-source and argument information.
+source and argument information. languages/tcl/src/class/tclproc.pir shows
+a way to do this using a parrotobject wrapper and attributes.
 
 =item * Allow Runtime Compiler Registration
 
