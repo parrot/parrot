@@ -190,6 +190,8 @@ Mark any referenced strings and PMCs.
 */
     void mark() {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+        if (class->name)
+            pobject_lives(interp, (PObj*)class->name);
         if (class->namespace)
             pobject_lives(interp, (PObj*)class->namespace);
         if (class->parents)
@@ -240,15 +242,19 @@ Add an attribute to the class. Requires a name and, optionally, a type.
     PMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *new_attribute = pmc_new(interp, enum_class_MetaAttribute);
+        
+        /* If we've been instantiated already, need a new class. */
+        if (class->instantiated) {
+            /* XXX Unimplemented! */
+            real_exception(interp, NULL, E_NotImplementedError,
+                "Modifications to already instantiated classes not allowed yet.");
+        }
 
         /* Set name and type. */
         PMINVOKE(interp, new_attribute, "name", STRING* attribute_name);
         if (got_type) {
             PMINVOKE(interp, new_attribute, "type", STRING* attribute_type);
         }
-
-        /* If we've been instantiated already, need a new class. */
-        /* if (class->instantiated) ... */
 
         /* Enter the attribute in the attributes array. */
         VTABLE_set_pmc_keyed_str(interp, class->attrib_metadata, attribute_name, new_attribute);
@@ -331,8 +337,19 @@ Creates an instance of the object.
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *obj;
 
-        /* Ensure we've built attributes list. */
-        if (PMC_IS_NULL(class->attrib_index)) {
+        /* If we've not been instantiated before... */
+        if (!class->instantiated) {
+            /* Build full parents list.
+             * XXX While waiting a decision on the MRO stuff, we just put
+             * ourself and our immediate parents in the list... */
+            int i;
+            class->all_parents = pmc_new(interp, enum_class_ResizablePMCArray);
+            VTABLE_push_pmc(interp, class->all_parents, SELF);
+            for (i = 0; i < VTABLE_elements(interp, class->parents); i++)
+                VTABLE_push_pmc(interp, class->all_parents,
+                    VTABLE_get_pmc_keyed_int(interp, class->parents, i));
+            
+            /* Build attributes index. */
             Parrot_MetaClass_build_attrib_index(interp, SELF);
             if (PMC_IS_NULL(class->attrib_index))
                 return;
@@ -363,6 +380,37 @@ Return the parents array PMC.
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *ret_parents = VTABLE_clone(interp, class->parents);
         preturn(PMC *ret_parents);
+    }
+
+/*
+
+=item C<void add_parent(PMC *parent)>
+
+Return the parents array PMC.
+
+=cut
+
+*/
+    PMETHOD void add_parent(PMC* parent) {
+        Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+        
+        /* If we've been instantiated already, need a new class. */
+        if (class->instantiated) {
+            /* XXX Unimplemented! */
+            real_exception(interp, NULL, E_NotImplementedError,
+                "Modifications to already instantiated classes not allowed yet.");
+            return;
+        }
+
+        /* Ensure it really is a class. */
+        if (!PObj_is_class_TEST(parent)) {
+            real_exception(interp, NULL, E_TypeError,
+                "You can only add a class as a parent to another class.");
+            return;
+        }
+
+        /* Add to the list of our immediate parents. */
+        VTABLE_push_pmc(interp, class->parents, parent);
     }
 
 

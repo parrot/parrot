@@ -55,7 +55,7 @@ Instantiates an object of the given class.
 
 /*
 
-=item C<void mark()>
+=item C<void destory()>
 
 Free the object's underlying struct.
 
@@ -68,7 +68,7 @@ Free the object's underlying struct.
 
 /*
 
-=item C<void destroy()>
+=item C<void mark()>
 
 Mark any referenced strings and PMCs.
 
