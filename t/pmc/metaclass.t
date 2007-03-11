@@ -44,23 +44,6 @@ ok 1 - $P0 = new .MetaClass
 ok 2 - isa $P0, 'MetaClass'
 OUT
 
-
-# L<PDD15/Class PMC API/"An instance of the Class PMC has ten attributes">
-pir_output_is( <<'CODE', <<'OUT', 'Class PMC has ten attributes' );
-.sub 'test' :main
-    new $P0, .MetaClass
-    $P1 = $P0.'attributes'()
-    $I0 = $P1
-    if $I0 == 10 goto ok_1
-    print 'not '
-  ok_1:
-    say 'ok 1 - Class PMC has ten attributes'
-.end
-CODE
-ok 1 - Class PMC has ten attributes
-OUT
-
-
 # L<PDD15/Class PMC API/'Class PMCs also have the "I am a class" flag set on them.'>
 pir_output_is( <<'CODE', <<'OUT', 'Class have "I am a class" flag set' );
 .include 'pmcinfo.pasm'
@@ -86,10 +69,10 @@ pir_output_is( <<'CODE', <<'OUT', 'name' );
 .sub 'test' :main
     new $P0, .MetaClass
     $P1 = $P0.'name'()
-    if $P1 == 'MetaClass' goto ok_1
+    if $P1 == '' goto ok_1
     print 'not '
   ok_1:
-    say 'ok 1 - name() with no args returns class name'
+    say 'ok 1 - name() with no args returns class name, which is empty at first'
 
     $P0.'name'('Alex')
     $P1 = $P0.'name'()
@@ -108,7 +91,7 @@ pir_output_is( <<'CODE', <<'OUT', 'name' );
 
 .end
 CODE
-ok 1 - name() with no args returns class name
+ok 1 - name() with no args returns class name, which is empty at first
 ok 2 - name() with args sets class name
 ok 3 - name() with too many args fails
 OUT
@@ -137,6 +120,7 @@ ok 1 - new() with no args returns an object
 ok 2 - new() with args returns an object
 OUT
 ## test what's set in the object by .'new'() in t/pmc/object.t
+## XXX Second test here should probably fail if the class has no abc attribute
 
 
 # L<PDD15/Class PMC API/=item attributes>
@@ -150,18 +134,25 @@ pir_output_is( <<'CODE', <<'OUT', 'attributes' );
   ok_1:
     say 'ok 1 - attributes() returns a Hash'
 
-    push_eh ok_2
+    $I0 = $P1
+    if $I0 == 0 goto ok_2
+    print 'not '
+  ok_2:
+    say 'ok 2 - New Class PMC has no attributes'
+
+    push_eh ok_3
     $P1 = $P0.'attributes'( 'foo' )
     clear_eh
 
     print 'not '
-    goto ok_2
-  ok_2:
-    say 'ok 2 - attributes() is read-only accessor'
+    goto ok_3
+  ok_3:
+    say 'ok 3 - attributes() is read-only accessor'
 .end
 CODE
 ok 1 - attributes() returns a Hash
-ok 2 - attributes() is read-only accessor
+ok 2 - New Class PMC has no attributes
+ok 3 - attributes() is read-only accessor
 OUT
 ## Q: what attributes the base Class have by default?
 
@@ -213,7 +204,34 @@ OUT
 ## Q: should adding an attribute with unknown type fail? i think so.
 ## Q: should adding an attr with the same name as an existing one fail? i say yes.
 
+# L<PDD15/Class PMC API>
+pir_output_is( <<'CODE', <<'OUT', 'set_attr/get_attr VTABLE methods' );
+.sub 'test' :main
+    new $P0, .MetaClass
+    $P0.'name'("Test")
+    $P0.'add_attribute'("foo")
+    say 'ok 1 - created a class with two attributes'
 
+    $P1 = $P0.'new'()
+    say 'ok 2 - instantiated the class'
+
+    $P2 = new Integer
+    $P2 = 42
+    setattribute $P1, "foo", $P2
+    say 'ok 3 - set an attribute'
+
+    $P3 = getattribute $P1, "foo"
+    print $P3
+    print "\n"
+    say 'ok 4 - got an attribute'
+.end
+CODE
+ok 1 - created a class with two attributes
+ok 2 - instantiated the class
+ok 3 - set an attribute
+42
+ok 4 - got an attribute
+OUT
 
 # L<PDD15/Class PMC API/=item parents>
 pir_output_is( <<'CODE', <<'OUT', 'parents' );
