@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -97,12 +97,21 @@ pir_output_is( <<'CODE', <<'OUT', 'name' );
     print 'not '
   ok_2:
     say 'ok 2 - name() with args sets class name'
+
+    push_eh ok_3
+    $P0.'name'('Alice', 'Bob')
+    clear_eh
+
+    print 'not '
+  ok_3:
+    say 'ok 3 - name() with too many args fails'
+
 .end
 CODE
 ok 1 - name() with no args returns class name
 ok 2 - name() with args sets class name
+ok 3 - name() with too many args fails
 OUT
-## TODO test multiple arguments fails as expected
 
 
 # L<PDD15/Class PMC API/=item new>
@@ -140,15 +149,70 @@ pir_output_is( <<'CODE', <<'OUT', 'attributes' );
     print 'not '
   ok_1:
     say 'ok 1 - attributes() returns a Hash'
+
+    push_eh ok_2
+    $P1 = $P0.'attributes'( 'foo' )
+    clear_eh
+
+    print 'not '
+    goto ok_2
+  ok_2:
+    say 'ok 2 - attributes() is read-only accessor'
 .end
 CODE
 ok 1 - attributes() returns a Hash
+ok 2 - attributes() is read-only accessor
 OUT
-## NOTES test that accessor is read-only
-## NOTES figure out what attributes the base Class has by default (if any)
+## Q: what attributes the base Class have by default?
 
 
 ## TODO add_attribute
+# L<PDD15/Class PMC API/=item add_attribute>
+pir_output_is( <<'CODE', <<'OUT', 'add_attribute' );
+.sub 'test' :main
+    new $P0, .MetaClass
+
+    push_eh ok_1
+    $P0.'add_attribute'()
+    clear_eh
+
+    print 'not '
+  ok_1:
+    say 'ok 1 - add_attribute() with no args fails'
+
+    push_eh ok_2
+    $P0.'add_attribute'( 'foo', 'bar' )
+    clear_eh
+
+    print 'not '
+  ok_2:
+    say 'ok 2 - add_attribute() with unknown type fails'
+
+    $P0.'add_attribute'( 'foo', 'Integer' )
+    $P1 = $P0.'attributes'()
+    $I0 = $P1
+    if $I0 == 1 goto ok_3
+    print 'not '
+  ok_3:
+    say 'ok 3 - add_attributes() with valid args adds an attribute'
+
+    push_eh ok_4
+    $P0.'add_attribute'( 'foo', 'String' )
+    clear_eh
+
+    print 'not '
+  ok_4:
+    say 'ok 4 - add_attributes() with existing attribute name fails'
+.end
+CODE
+ok 1 - add_attribute() with no args fails
+ok 2 - add_attribute() with unknown type fails
+ok 3 - add_attribute() with valid args adds an attribute
+ok 4 - add_attribute() with existing attribute name fails
+OUT
+## Q: should adding an attribute with unknown type fail? i think so.
+## Q: should adding an attr with the same name as an existing one fail? i say yes.
+
 
 
 # L<PDD15/Class PMC API/=item parents>
