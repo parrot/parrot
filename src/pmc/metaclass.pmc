@@ -137,7 +137,7 @@ the current namespace.
 
         /* Init the class object. */
         class = mem_sys_allocate_zeroed(sizeof(Parrot_MetaClass));
-        class->name = NULL;
+        class->name = CONST_STRING(interp, "");
         class->namespace = PMCNULL;
         class->parents = pmc_new(interp, enum_class_ResizablePMCArray);
         class->all_parents = pmc_new(interp, enum_class_ResizablePMCArray);
