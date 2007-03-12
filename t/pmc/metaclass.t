@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -10,15 +10,15 @@ use Parrot::Test tests => 9;
 
 =head1 NAME
 
-t/pmc/class.t - test the Class PMC
+t/pmc/metaclass.t - test the MetaClass PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/class.t
+    % prove t/pmc/metaclass.t
 
 =head1 DESCRIPTION
 
-Tests the Class PMC.
+Tests the MetaClass PMC.
 
 =cut
 
