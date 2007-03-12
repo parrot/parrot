@@ -485,7 +485,7 @@ Flex. The Parser is built with Bison.  TreeCC is used to generate the
 code for creating the Abstract Syntax Tree.
 
 There is also a Lua bytecode to PIR compiler at
-http://members.home.nl/joeijoei/lua2pir/
+http://kjs.home.fmf.nl/lua2pir/
 
 =item Status
 
@@ -497,7 +497,7 @@ Simple examples are working. The current version is 0.2.2.
 
 =item Location
 
-http://members.home.nl/joeijoei/parrot/
+http://kjs.home.fmf.nl/parrot/
 
 The Lua PMCs are in C<languages/lua>.
 
@@ -731,8 +731,9 @@ A PIR compiler using Parrot compiler tools.
 
 =item Status
 
-Initial implementation. Not complete.
-Only Parser currently (using PGE).
+Fairly complete, about 95%. Note that this implementation is not exactly the same
+as the language as accepted by IMCC. 
+
 
 =item Last verified with parrot version
 
