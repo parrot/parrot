@@ -127,6 +127,6 @@ Jerry Gay a.k.a. particle
 
 =head1 SEE ALSO
 
-F<RESPONSIBILE_PARTIES>
+F<RESPONSIBILE_PARTIES>, F<docs/project/>
 
 =cut
