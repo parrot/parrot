@@ -8,6 +8,8 @@ token ws {
     ]*
 }
 
+##pod comments 
+##large multiline commentws
 regex pod_comment {
     ^^ = [ [ pod \h*: ]
          | for [ \h\N+: ] \n [ \N+\n ]*:
