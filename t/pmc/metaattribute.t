@@ -111,6 +111,9 @@ ok 3 - type() with too many args fails
 OUT
 
 
+## TODO add more tests as this is documented and implemented
+
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
