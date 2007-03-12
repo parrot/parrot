@@ -319,7 +319,6 @@ config/inter/progs.pm                                       []
 config/inter/shlibs.pm                                      []
 config/inter/types.pm                                       []
 config/inter/yacc.pm                                        []
-docs/BROKEN.pod                                             [devel]doc
 docs/ROADMAP.pod                                            [devel]doc
 docs/art/pp001-intro.pod                                    [main]doc
 docs/art/pp002-pmc.pod                                      [main]doc
