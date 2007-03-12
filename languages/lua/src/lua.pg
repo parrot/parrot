@@ -31,7 +31,7 @@ rule statement {
 }
 
 rule function_stat {
-  <'function'> <functionname> <body>
+  <'function'> <functionname> <function_body>
 }
 
 rule last_statement {
@@ -163,7 +163,6 @@ rule primary_expression {
   | <':'> <name> <function_args>
   | <function_args>
   ]*
-
 }
 
 rule simple_expression {
@@ -174,7 +173,7 @@ rule simple_expression {
   | <'false'>
   | <'...'>
   | <constructor>
-  | <'function'> <body>
+  | <'function'> <function_body>
   | <primary_expression>
 }
 
