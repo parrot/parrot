@@ -14,9 +14,9 @@ use Test::More;
 use Parrot::Distribution;
 
 BEGIN {
-    eval { require Perl::Critic; };
+    eval { require Perl::Critic 1.01; };
     if ($@) {
-        plan skip_all => 'Perl::Critic not installed';
+        plan skip_all => 'Perl::Critic not installed or invalid version';
     }
 }
 
@@ -107,11 +107,7 @@ if ( !keys %policies ) {
         'CodeLayout::ProhibitTrailingWhitespace'          => 1,
         'CodeLayout::ProhibitHardTabs'                    => { allow_leading_tabs => 0 },
         'CodeLayout::RequireTidyCode'                     => { perltidyrc => $perl_tidy_conf },
-
-        #40564 [TODO] fix perlcritic Subroutines::RequireFinalReturn policy
-        # below commented out because it does not ignore subs which 'exit'
-        # or 'die'
-        # 'Subroutines::RequireFinalReturn'            => 1,
+        'Subroutines::RequireFinalReturn'            => 1,
     );
 
     # Give a diag to let users know if this is doing anything, how to repeat.
