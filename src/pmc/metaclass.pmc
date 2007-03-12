@@ -242,7 +242,7 @@ Add an attribute to the class. Requires a name and, optionally, a type.
     PMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *new_attribute = pmc_new(interp, enum_class_MetaAttribute);
-        
+
         /* If we've been instantiated already, need a new class. */
         if (class->instantiated) {
             /* XXX Unimplemented! */
@@ -348,7 +348,7 @@ Creates an instance of the object.
             for (i = 0; i < VTABLE_elements(interp, class->parents); i++)
                 VTABLE_push_pmc(interp, class->all_parents,
                     VTABLE_get_pmc_keyed_int(interp, class->parents, i));
-            
+
             /* Build attributes index. */
             Parrot_MetaClass_build_attrib_index(interp, SELF);
             if (PMC_IS_NULL(class->attrib_index))
@@ -393,7 +393,7 @@ Return the parents array PMC.
 */
     PMETHOD void add_parent(PMC* parent) {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
-        
+
         /* If we've been instantiated already, need a new class. */
         if (class->instantiated) {
             /* XXX Unimplemented! */
