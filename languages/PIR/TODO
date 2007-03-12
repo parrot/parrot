@@ -1,9 +1,0 @@
-TODO for PIR language using Parrot Compiler Tools
-
-These are the most important issues:
-
-* Add more tests 
-* Add support for macro parsing
-* Add support for Heredoc parsing
-* Fix Parrot instruction parsing (arguments)
-* Use <% .. > construct for Parrot instructions as soon as PGE supports it

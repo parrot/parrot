@@ -25,7 +25,7 @@ PIR in C (using Lex/Yacc).
 
 =head1 VERSION
 
-0.1.3
+0.1.4
 
 =head1 LEXICAL CONVENTIONS
 
@@ -123,7 +123,7 @@ document.
       global_def
     | sub_def
     | const_def
-    | macro_def
+    | expansion
     | pragma
     | emit
 
@@ -578,50 +578,20 @@ The program will continue running at label 'MyLabel:'.
 =head2 Operators
 
   relational_op:
-      "=="
-    | "!="
-    | "<="
-    | "<"
-    | <"="
-    | <""
+      "==" | "!=" | "<=" | "<" | <"=" | <""
 
   binary_op:
-      "+"
-    | "-"
-    | "/"
-    | "**"
-    | "*"
-    | "%"
-    | "<<"
-    | <">>"
-    | <">"
-    | "&&"
-    | "||"
-    | "~~"
-    | "|"
-    | "&"
-    | "~"
-    | "."
-
+      "+"  | "-"   | "/"  | "**"
+    | "*"  | "%"   | "<<" | <">>"
+    | <">" | "&&"  | "||" | "~~"
+    | "|"  | "&"   | "~"  | "."
 
   assign_op:
-      "+="
-    | "-="
-    | "/="
-    | "%="
-    | "*="
-    | ".="
-    | "&="
-    | "|="
-    | "~="
-    | "<<="
-    | <">="
-    | <">>="
+      "+=" | "-=" | "/=" | "%="  | "*="  | ".="
+    | "&=" | "|=" | "~=" | "<<=" | <">=" | <">>="
 
   unary_op:
-      "!"
-    | "-"
-    | "~"
+      "!" | "-" | "~"
 
 =head2 Expressions
 
@@ -766,7 +736,7 @@ aims to allow for B<any> number of heredoc arguments, like this:
 
     foo(<<'STR1', <<'STR2')
 
-  	argument 1
+    argument 1
   STR1
     argument 2
   STR2
@@ -1113,6 +1083,22 @@ not PIR instructions.
      ret
   .eom
 
+=head2 Expansions
+
+  expansion:
+      macro_def
+    | include
+    | pasm_constant
+
+
+  include:
+    ".include" string_constant
+
+  pasm_constant:
+    ".constant" identifier [ constant_value | register ]
+
+
+
 =head2 Macros
 
   macro_def:
@@ -1159,17 +1145,12 @@ then one can write in a subroutine:
 =head2 PIR Pragmas
 
   pragma:
-      include
-    | new_operators
+      new_operators
     | loadlib
     | namespace
     | hll_mapping
     | hll_specifier
     | source_info
-
-
-  include:
-    ".include" string_constant
 
   new_operators:
     ".pragma" "n_operators" int_constant
@@ -1364,6 +1345,21 @@ docs/imcc/syntax.pod - official syntax for IMCC/PIR.
 =back
 
 =head1 CHANGES
+
+0.1.4
+
+=over 4
+
+=item *
+
+Added C<expansion> rule, moved C<include> and C<macro_def> rules to that rule.
+Added C<pasm_constant> definition.
+
+=item *
+
+Removed newlines in operator definition to save some lines for readability.
+
+=back
 
 0.1.3
 

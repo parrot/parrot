@@ -1,0 +1,43 @@
+
+=head1 NAME
+
+TODO.pod - A ToDo list for PIR language using Parrot Compiler Tools
+
+=head1 DESCRIPTION
+
+Languages/PIR is an attempt to implement a compiler for Parrot Intermediate
+Representation (PIR). This is B<not> the reference implementation of PIR,
+which is compilers/IMCC. Languages/PIR does try to be as close as possible.
+
+=head1 TODO LIST
+
+=over 4
+
+=item *
+
+Add more tests.
+
+=item *
+
+Add support for Heredoc parsing. Not complete yet.
+
+=item *
+
+Fix Parrot instruction parsing (arguments)
+
+=item *
+
+Use <% .. > construct for Parrot instructions as soon as PGE supports it.
+This will hugely improve compilation speed of larger scripts (now it has
+to check each alternative until it matches an instruction).
+
+=back
+
+=head1 AUTHOR
+
+Klaas-Jan Stol
+
+=cut
+
+
+
