@@ -12,7 +12,7 @@ Define the attributes required for the class.
 
 =cut
 
-.sub __class_init :load
+.sub __class_init :anon :load
   $P0 = getclass 'String'
   $P1 = subclass $P0, 'TclConst'
   
@@ -56,7 +56,7 @@ Define the attributes required for the class.
 
 .end
 
-.sub __set_string_native :method
+.sub set_string_native :vtable :method
   .param string value
 
   .local int value_length

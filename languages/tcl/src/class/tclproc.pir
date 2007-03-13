@@ -18,7 +18,7 @@ Define the attributes required for the class.
 
 =cut
 
-.sub __class_init :load
+.sub __class_init :anon :load
 
   $P0 = getclass 'Sub'
   $P1 = subclass $P0, 'TclProc'

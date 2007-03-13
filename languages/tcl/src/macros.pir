@@ -84,13 +84,13 @@ define them once and just include them.
 
 =head2 cloneable ()
 
-Simplistic implementation of C<__clone>
+Simplistic implementation of C<clone> vtable
 
 =cut
 
 .macro cloneable ()
 
-.sub __clone :method
+.sub clone :vtable :method
   .sym pmc obj
   obj = new .Undef
   assign obj, self
