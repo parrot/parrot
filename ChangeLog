@@ -1,13 +1,13 @@
 #1 $Id$
 
-2006.02.22    pmichaud
+2007.02.22    pmichaud
 	* Released 0.4.9
 	See NEWS for more.
 
-2006.01.17    chromatic
+2007.01.17    chromatic
 	* changed 'name' method on namespaces to 'get_name' per pdd21
 
-2006.01.16    particle
+2007.01.16    particle
 	* Released 0.4.8
 	See NEWS for more.
 
