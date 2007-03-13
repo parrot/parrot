@@ -25,7 +25,6 @@ PBC_COMPAT                                                  [devel]doc
 PLATFORMS                                                   [devel]doc
 README                                                      [devel]doc
 README.win32.pod                                            [devel]doc
-RELEASE_INSTRUCTIONS                                        []
 RESPONSIBLE_PARTIES                                         [main]doc
 TODO                                                        [main]doc
 VERSION                                                     []
@@ -400,6 +399,7 @@ docs/pmc/subs.pod                                           [main]doc
 docs/porting_intro.pod                                      [main]doc
 docs/practical_notes.pod                                    [main]doc
 docs/project/metacommitter_guide.pod                        [main]doc
+docs/project/release_manager_guide.pod                      [main]doc
 docs/req/model_users.pod                                    [main]doc
 docs/resources/favicon.ico                                  [main]doc
 docs/resources/parrot.small.png                             [main]doc

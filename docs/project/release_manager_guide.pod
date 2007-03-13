@@ -1,0 +1,222 @@
+# $Id$
+
+=head1 Release Instructions
+
+To prepare a release:
+
+=over 4
+
+=item 0.
+
+Announce to parrot-porters and #parrot at least a couple days in advance,
+asking if there are any showstopping bugs. You might also select a name
+for your release (e.g., perhaps select a name from
+L<http://en.wikipedia.org/wiki/List_of_parrots>).
+
+=item 1.
+
+Make sure you're up to date:
+
+ $ svn update
+
+You may want to ask the developer base to stop committing big changes;
+it will avoid complications. Or you could create a release branch before
+releasing, rather than after. Then you could fold the release-oriented
+changes into the trunk once the release is done.
+
+TODO: explain how to do this 
+
+=item 2.
+
+Update files with version-specific information:
+
+=over 4
+
+=item a
+
+Increment the version number in VERSION, parrot.spec, MANIFEST.generated,
+and META.yml
+
+=item b
+
+Change the information in DEVELOPING to reflect this release's
+version number and date.
+
+=item c
+
+Update README.
+
+=item d
+
+Update ChangeLog, NEWS, docs/parrothist.pod, docs/ROADMAP.pod,
+and docs/BROKEN.pod.
+
+=item e
+
+Make sure RESPONSIBLE_PARTIES is still accurate.
+
+=item f
+
+Run C<perl t/harness t/distro/*.t>, and either fix what those tests
+complain about, or fix them so they don't complain.
+
+=item g
+
+Update PBC_COMPAT, perhaps by collapsing intra-release entries
+into a single entry naming the release.
+
+=item h
+
+Run C<perl tools/dev/pbc_header.pl --upd t/native_pbc/*.pbc>
+to update version and fingerprint in the native tests.
+
+=item i
+
+Make sure everything works:
+
+ $ make realclean
+ $ perl Configure.pl ...
+ $ make -s all world fulltest
+
+=back
+
+=item 3.
+
+ svn commit
+
+=item 4.
+
+Make the release tarball:
+
+ $ make release VERSION=a.b.c
+
+...where a.b.c is the version number. This will create the tarball,
+named parrot-a.b.c.tar.gz.
+
+=item 5.
+
+Untar parrot-a.b.c.tar.gz into another area.
+
+=item 6.
+
+Make sure everything works:
+
+ $ perl Configure.pl
+ $ make world
+ $ make fulltest
+
+=item 7.
+
+Tag the release as "RELEASE_a_b_c", where a.b.c is the version number. If 
+you're working in head, be sure to specify the revision number generated
+in step 3, above.
+
+ $ export SVNPARROT=https://svn.perl.org/parrot
+ $ svn copy -m"tagged release a.b.c" \
+   SVNPARROT/trunk $SVNPARROT/tags/RELEASE_a_b_c
+
+See also L<Appendix 1> below.
+
+=item 8.
+
+Upload to CPAN.
+
+NOTE: you may get a failure message from the CPAN Indexer about
+the content of META.yml. Don't worry, the tarball still uploaded okay.
+You can fix META.yml after the release. (TODO: clarify what this means)
+
+=item 9.
+
+Compose and send out the announcements -- parrot-porters,
+perl6-language, perl6-announce, perl5-porters, use Perl,
+PerlMonks, etc. Don't forget to include the next scheduled
+release date.
+
+=over 4
+
+=item a
+
+Submit the use Perl announcement story to Slashdot, Newsforge, etc.
+Don't forget to set a Reply-To: or Followup-To: header, if your mail
+client lets you.
+
+=item b
+
+Modify the topic on #parrot, e.g.:
+
+ /topic #parrot Parrot 0.4.8 Released | http://parrotcode.org/
+
+=item c
+
+Update the next planned release date on the wiki.
+
+=item d
+
+Close any release-related tickets in RT. If they are not yet resolved,
+migrate them to the next milestone release ticket.
+
+=back
+
+=item 10.
+
+You're done! Help yourself to a beer, cola or other celebratory drink.
+
+=back
+
+=head2 ABOUT THIS DOCUMENT
+
+This document was written after a couple of subtly incorrectly assembled
+releases--usually when someone forgot to delete DEVELOPING, but at least
+once where the MANIFEST check failed. The intent of this file is to
+document what must be done to release so that such mistakes don't happen
+again.
+
+=head1 Appendix 1
+
+parrot repository layout as of end of Apr 2005
+
+ $ svn ls $SVNPARROT
+ branches/
+ tags/
+ trunk/
+
+ $ svn ls $SVNPARROT/tags
+ PRE_REL_0_0_8/
+ RELEASE_0_0_10/
+ RELEASE_0_0_11/
+ RELEASE_0_0_13/
+ RELEASE_0_0_6/
+ RELEASE_0_0_8/
+ RELEASE_0_0_9/
+ RELEASE_0_1_0/
+ RELEASE_0_1_1/
+ RELEASE_0_1_2/
+ REL_0_0_5/
+ V1/
+ file_move_031023/
+ help/
+ ponie-PRE-P5_592/
+
+=head1 Appendix 2
+
+Planned releases in 2007.
+
+To make a monthly release schedule possible, we're spreading the burden
+of releases across multiple release managers. Each release manager takes
+one release in a 6 month rotation. Releases are scheduled for the 3rd
+Tuesday of the month.
+
+ - Jan 16th (0.4.8), Jerry Gay (particle)
+ - Feb 20th (0.4.9), Patrick Michaud (pmichaud)
+ - Mar 20th, Will Coleda (Coke)
+ - Apr 17th, Matt Diephouse (mdiep)
+ - May 15th, chromatic
+ - Jun 19th, Allison Randal
+ - Jul 17th, Jerry Gay (particle)
+ - Aug 21th, Patrick Michaud (pmichaud)
+ - Sep 18th, Matt Diephouse (mdiep)
+ - Oct 16th, Will Coleda (Coke)
+ - Nov 20th, chromatic
+ - Dec 18th, Allison Randal
+
+=cut
