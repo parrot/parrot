@@ -112,12 +112,7 @@ sub generate_regular {
 sub process {
     my ( $input, $output ) = @_;
 
-    my $TEST;
-    open( $TEST, '<', "$PARROT_EXE test_regex.pbc '$input' |" );
-
-    local $/;
-    my $actual_output = <$TEST>;
-    close $TEST;
+    my $actual_output = `$PARROT_EXE test_regex.pbc '$input'`;
     Test::More::is( $actual_output, $output );
 
     return;

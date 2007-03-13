@@ -887,7 +887,7 @@ Part of languages smoke testing. Almost all tests are succeeding.
 
 =item Last verified with parrot version
 
-0.4.5
+0.4.9
 
 =item Location
 
