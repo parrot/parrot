@@ -49,8 +49,7 @@ Update F<README>.
 
 =item d
 
-Update F<ChangeLog>, F<NEWS>, F<docs/parrothist.pod>, F<docs/ROADMAP.pod>,
-and F<docs/BROKEN.pod>.
+Update F<ChangeLog>, F<NEWS>, F<docs/parrothist.pod>, and F<docs/ROADMAP.pod>.
 
 =item e
 
@@ -87,12 +86,25 @@ Make sure everything works:
 
 =item 4.
 
+Prepare the release tarball.
+
+=over 4
+
+=item a
+
+Delete F<DEVELOPING>, and it's corresponding F<MANIFEST> entry.
+This file should never appear in a release.
+
+=item b
+
 Make the release tarball:
 
  $ make release VERSION=a.b.c
 
 where a.b.c is the version number. This will create the tarball named
 F<parrot-a.b.c.tar.gz>.
+
+=back
 
 =item 5.
 
@@ -170,6 +182,10 @@ This document was written after a couple of subtly incorrectly assembled
 releases--usually when someone forgot to delete F<DEVELOPING>, but at least
 once where the F<MANIFEST> check failed. The intent of this file is to
 document what must be done to release so that such mistakes don't happen again.
+
+=head1 SEE ALSO
+
+F<README>, F<RESPONSIBLE_PARTIES>.
 
 =head1 Appendix 1
 
