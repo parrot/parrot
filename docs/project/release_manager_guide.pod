@@ -35,42 +35,40 @@ Update files with version-specific information:
 
 =item a
 
-Increment the version number in F<VERSION>, F<parrot.spec>,
-F<MANIFEST.generated>, and F<META.yml>
+Increment the version number in the following files:
+F<VERSION>, F<parrot.spec>, F<MANIFEST.generated>, F<META.yml>,
+F<README>.
+
+Also update the version number, date, and your name in the
+following files: F<DEVELOPING>, F<docs/parrothist.pod>,
+and F<docs/ROADMAP.pod>
 
 =item b
 
-Change the information in F<DEVELOPING> to reflect this release's
-version number and date.
+Update F<ChangeLog>, F<NEWS> with the new version number and any other
+changes that have occurred since the last release: Hopefully these files
+are being updated as committers work.
 
 =item c
 
-Update F<README>.
-
-=item d
-
-Update F<ChangeLog>, F<NEWS>, F<docs/parrothist.pod>, and F<docs/ROADMAP.pod>.
-
-=item e
-
 Make sure F<RESPONSIBLE_PARTIES> is still accurate.
 
-=item f
+=item d
 
 Run C<perl t/harness t/distro/*.t>, and either fix what those tests
 complain about, or fix them so they don't complain.
 
-=item g
+=item e
 
 Update F<PBC_COMPAT>, perhaps by collapsing intra-release entries
 into a single entry naming the release.
 
-=item h
+=item f
 
 Run C<perl tools/dev/pbc_header.pl --upd t/native_pbc/*.pbc>
 to update version and fingerprint in the native tests.
 
-=item i
+=item g
 
 Make sure everything works:
 
@@ -92,7 +90,7 @@ Prepare the release tarball.
 
 =item a
 
-Delete F<DEVELOPING>, and it's corresponding F<MANIFEST> entry.
+Delete F<DEVELOPING>, and its corresponding F<MANIFEST> entry.
 This file should never appear in a release.
 
 =item b
@@ -121,7 +119,7 @@ Make sure everything works:
 =item 7.
 
 Tag the release as "RELEASE_a_b_c", where a.b.c is the version number. If
-you're working in head, be sure to specify the revision number generated
+you're working in trunk, be sure to specify the revision number generated
 in step 3, above.
 
  $ export SVNPARROT=https://svn.perl.org/parrot
