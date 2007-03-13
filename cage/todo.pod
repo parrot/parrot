@@ -226,5 +226,5 @@ If neither, please report your findings so that everyone can decide what to do.
 
 =head1 See Also
 
-Also look at F<docs/BROKEN.pod>, F<docs/ROADMAP.pod>, and
-the list of Cage items on RT: L<http://xrl.us/owsd> (Link to rt.perl.org)
+Also look at F<docs/ROADMAP.pod> and the list of Cage items on RT:
+L<http://xrl.us/owsd> (Link to rt.perl.org)
