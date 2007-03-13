@@ -1,3 +1,4 @@
+# Copyright (C) 2007, The Perl Foundation.
 # $Id$
 
 =head1 Release Instructions
@@ -24,7 +25,7 @@ it will avoid complications. Or you could create a release branch before
 releasing, rather than after. Then you could fold the release-oriented
 changes into the trunk once the release is done.
 
-TODO: explain how to do this 
+TODO: explain how to do this
 
 =item 2.
 
@@ -34,26 +35,26 @@ Update files with version-specific information:
 
 =item a
 
-Increment the version number in VERSION, parrot.spec, MANIFEST.generated,
-and META.yml
+Increment the version number in F<VERSION>, F<parrot.spec>,
+F<MANIFEST.generated>, and F<META.yml>
 
 =item b
 
-Change the information in DEVELOPING to reflect this release's
+Change the information in F<DEVELOPING> to reflect this release's
 version number and date.
 
 =item c
 
-Update README.
+Update F<README>.
 
 =item d
 
-Update ChangeLog, NEWS, docs/parrothist.pod, docs/ROADMAP.pod,
-and docs/BROKEN.pod.
+Update F<ChangeLog>, F<NEWS>, F<docs/parrothist.pod>, F<docs/ROADMAP.pod>,
+and F<docs/BROKEN.pod>.
 
 =item e
 
-Make sure RESPONSIBLE_PARTIES is still accurate.
+Make sure F<RESPONSIBLE_PARTIES> is still accurate.
 
 =item f
 
@@ -62,7 +63,7 @@ complain about, or fix them so they don't complain.
 
 =item g
 
-Update PBC_COMPAT, perhaps by collapsing intra-release entries
+Update F<PBC_COMPAT>, perhaps by collapsing intra-release entries
 into a single entry naming the release.
 
 =item h
@@ -90,12 +91,12 @@ Make the release tarball:
 
  $ make release VERSION=a.b.c
 
-...where a.b.c is the version number. This will create the tarball,
-named parrot-a.b.c.tar.gz.
+where a.b.c is the version number. This will create the tarball named
+F<parrot-a.b.c.tar.gz>.
 
 =item 5.
 
-Untar parrot-a.b.c.tar.gz into another area.
+Untar F<parrot-a.b.c.tar.gz> into another area.
 
 =item 6.
 
@@ -107,7 +108,7 @@ Make sure everything works:
 
 =item 7.
 
-Tag the release as "RELEASE_a_b_c", where a.b.c is the version number. If 
+Tag the release as "RELEASE_a_b_c", where a.b.c is the version number. If
 you're working in head, be sure to specify the revision number generated
 in step 3, above.
 
@@ -166,10 +167,9 @@ You're done! Help yourself to a beer, cola or other celebratory drink.
 =head2 ABOUT THIS DOCUMENT
 
 This document was written after a couple of subtly incorrectly assembled
-releases--usually when someone forgot to delete DEVELOPING, but at least
-once where the MANIFEST check failed. The intent of this file is to
-document what must be done to release so that such mistakes don't happen
-again.
+releases--usually when someone forgot to delete F<DEVELOPING>, but at least
+once where the F<MANIFEST> check failed. The intent of this file is to
+document what must be done to release so that such mistakes don't happen again.
 
 =head1 Appendix 1
 
