@@ -1359,6 +1359,7 @@ TOOLS_TEST_FILES = \
     t/tools/*.t
 PMC2CUTILS_DIR = t/tools/pmc2cutils
 OPS2PMUTILS_DIR = t/tools/ops2pmutils
+OPS2CUTILS_DIR = t/tools/ops2cutils
 BUILDTOOLS_TEST_FILES = \
         $(PMC2CUTILS_DIR)/00-qualify.t \
         $(PMC2CUTILS_DIR)/01-pmc2cutils.t \
@@ -1379,7 +1380,16 @@ BUILDTOOLS_TEST_FILES = \
         $(OPS2PMUTILS_DIR)/08-sort_ops.t \
         $(OPS2PMUTILS_DIR)/09-prepare_real_ops.t \
         $(OPS2PMUTILS_DIR)/10-print_module.t \
-        $(OPS2PMUTILS_DIR)/11-print_h.t
+        $(OPS2PMUTILS_DIR)/11-print_h.t \
+        $(OPS2CUTILS_DIR)/01-new.t \
+        $(OPS2CUTILS_DIR)/02-usage.t \
+        $(OPS2CUTILS_DIR)/03-print_c_header_file.t \
+        $(OPS2CUTILS_DIR)/04-print_c_source_top.t \
+        $(OPS2CUTILS_DIR)/05-print_c_source_bottom.t \
+        $(OPS2CUTILS_DIR)/06-dynamic.t \
+        $(OPS2CUTILS_DIR)/07-make_incdir.t \
+        $(OPS2CUTILS_DIR)/08-nolines.t \
+        $(OPS2CUTILS_DIR)/09-dynamic_nolines.t
 
 # Common prep for all test targets.
 # We probably need a complete build before running the tests.
@@ -1830,4 +1840,5 @@ smoke-clean :
 # mode: makefile
 # End:
 #
+
 
