@@ -7,10 +7,10 @@ use warnings;
 
 use lib qw(. lib ../lib ../../lib);
 
-use ExtUtils::Manifest qw(maniread);
 use Fatal qw(open);
 use File::Find;
 use Test::More;
+use Parrot::Config qw{%PConfig};
 use Parrot::Distribution;
 
 BEGIN {
@@ -54,16 +54,21 @@ while (@ARGV) {
 # get the files to check
 my $DIST = Parrot::Distribution->new();
 if ( !@ARGV ) {
-    @files = map { $_->path } $DIST->get_perl_language_files();
+    # XXX We should skip any files that are copied wholesale
+    #     into our repository. Add a method to $DIST for this. -Coke
+
+    @files = map {$_->path} $DIST->get_perl_language_files();
+
+    # Skip any language files...
+    @files = grep {! m{$PConfig{build_dir}/languages/} } @files;
 }
 else {
-
-    # does the first
-
     # if we're passed a directory, find all the matching files
     # under that directory.
 
     # use $_ for the check below, as File::Find chdirs on us.
+    # XXX Change this to simply return all files in the distribution
+    #     from this point down? -Coke
     foreach my $file (@ARGV) {
         ( -d $file )
             ? find(
@@ -109,9 +114,11 @@ if ( !keys %policies ) {
         'CodeLayout::UseParrotCoda'                       => 1,
         'CodeLayout::ProhibitDuplicateCoda'               => 1,
         'CodeLayout::ProhibitTrailingWhitespace'          => 1,
-        'CodeLayout::ProhibitHardTabs'                    => { allow_leading_tabs => 0 },
-        'CodeLayout::RequireTidyCode'                     => { perltidyrc => $perl_tidy_conf },
-        'Subroutines::RequireFinalReturn'            => 1,
+        'CodeLayout::ProhibitHardTabs'                    => 
+            { allow_leading_tabs => 0 },
+        'CodeLayout::RequireTidyCode'                     => 
+            { perltidyrc => $perl_tidy_conf },
+        'Subroutines::RequireFinalReturn'                 => 1,
     );
 
     # Give a diag to let users know if this is doing anything, how to repeat.
@@ -137,37 +144,47 @@ else {
     exit;
 }
 
-# loop over each policy, such that each policy is a test, and report the
-# names of the files failing the given policy
-foreach my $policy ( keys %policies ) {
-    # By default, don't complain about anything.
-    my $config = Perl::Critic::Config->new( -exclude => [qr/.*/] );
+# Create a critic object with all of the policies we care about.
 
+
+# By default, don't complain about anything.
+my $config = Perl::Critic::Config->new( -exclude => [qr/.*/] );
+
+foreach my $policy ( keys %policies ) {
     $config->add_policy(
         -policy => $policy,
         ref $policies{$policy} ? ( -config => $policies{$policy} ) : (),
     ) or die;
+}
 
-    my $critic = Perl::Critic->new(
-        -config => $config,
-        -top => 1);
+my $critic = Perl::Critic->new(
+    -config  => $config,
+    -top     => 50,
+);
 
-    # check each file for the given policy
-    my @failed_files;
-    foreach my $file ( sort @files ) {
-        if ( !-r $file ) {
-            diag "skipping invalid file: $file\n";
-            next;
-        }
+$Perl::Critic::Violation::FORMAT = '%f:%l.%c';
 
-        my @violations = $critic->critique($file);
-        push @failed_files => "$file\n"
-            if scalar @violations;
+my %violations = map {$_, []} (keys %policies);
+
+# check each file for the given policies
+foreach my $file ( sort @files ) {
+    if ( !-r $file ) {
+        diag "skipping invalid file: $file\n";
+        next;
     }
 
-    ok( !scalar(@failed_files), $policy )
-        or diag( "Policy: $policy failed in " . scalar @failed_files . " files:\n@failed_files" );
+    foreach my $violation ($critic->critique($file)) {
+        my $policy = $violation->policy();
+        $policy =~ s/^Perl::Critic::Policy:://;
+        push @{$violations{$policy}},  $violation->to_string();
+    } 
+}
 
+foreach my $policy ( sort keys %violations ) {
+    my @violations = @{$violations{$policy}};
+    ok ( ! @violations, $policy) 
+        or diag( "Policy: $policy failed in " . scalar @violations . 
+                 " files:\n" . join ("\n", @violations) );
 }
 
 __END__
@@ -200,6 +217,11 @@ If you just wish to get a listing of the polices that will be checked
 without actually running them, use:
 
  perl t/codingstd/perlcritic.t --list
+
+If you just wish to get a listing of the files that will be checked
+without actually running the tests, use:
+
+ perl t/codingstd/perlcritic.t --listfils
 
 =head1 BUGS AND LIMITATIONS
 
