@@ -14,9 +14,13 @@ use Test::More;
 use Parrot::Distribution;
 
 BEGIN {
-    eval { require Perl::Critic 1.01; };
+    eval { require Perl::Critic };
     if ($@) {
-        plan skip_all => 'Perl::Critic not installed or invalid version';
+        plan skip_all => 'Perl::Critic not installed';
+    }
+    my $required_version = 1.01;
+    if ($Perl::Critic::VERSION < $required_version) {
+        plan skip_all => "Perl::Critic v$required_version required, v$Perl::Critic::VERSION found";
     }
 }
 
