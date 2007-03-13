@@ -626,7 +626,7 @@ pasm_output_like( <<'CODE', <<'OUTPUT', "Out-of-bounds substr, +ve offset" );
         substr S0, P0, 123, 22
         end
 CODE
-/^Cannot take substr outside string$/
+/^Cannot take substr outside string/
 OUTPUT
 
 pasm_output_like( <<'CODE', <<'OUTPUT', "Out-of-bounds substr, -ve offset" );
@@ -635,7 +635,7 @@ pasm_output_like( <<'CODE', <<'OUTPUT', "Out-of-bounds substr, -ve offset" );
         substr S0, P0, -123, 22
         end
 CODE
-/^Cannot take substr outside string$/
+/^Cannot take substr outside string/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "bands NULL string" );
