@@ -139,7 +139,7 @@ create_initial_context(Interp *interp)
 
 =item C<void parrot_gc_context(Interp *)>
 
-Cleanup dead context memory. Called by the gargabe collector.
+Cleanup dead context memory. Called by the garbage collector.
 
 =item C<parrot_context_t* Parrot_alloc_context(Interp *, INTVAL *n_regs_used)>
 

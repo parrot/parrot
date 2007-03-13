@@ -9,7 +9,7 @@ src/pmc/stmlog.pmc -- Holds a transaction log that can be replayed
 =head1 DESCRIPTION
 
 This PMC class holds an STM transaction log that can be replayed.
-Replaying is only gaurenteed to be implemented enough to allow
+Replaying is only guaranteed to be implemented enough to allow
 choice (Haskell `orElse`) to be implemented.
 
 This PMC will copy the current the transaction's log when it

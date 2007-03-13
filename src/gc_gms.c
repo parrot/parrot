@@ -683,7 +683,7 @@ parrot_gc_gms_wb(Interp *interp, PMC *agg, void *old, void *new)
 
     /*
      * TODO check old - its overwritten, increment overwrite count,
-     * if its an aggregate all contents *may* be dead now, so
+     * if it's an aggregate all contents *may* be dead now, so
      * increment overwrite count by elements
      */
 }
@@ -1024,7 +1024,7 @@ parrot_gc_gms_pobject_lives(Interp* interp, PObj *obj)
     if (priority)
         ++interp->arena_base->num_early_PMCs_seen;
     h = PObj_to_GMSH(obj);
-    /* unsnap it from white, put it into grey or black */
+    /* unsnap it from white, put it into gray or black */
     if (PObj_is_PMC_TEST(obj) && ((PMC*)obj)->pmc_ext)
         gc_gms_setto_gray(interp, h, priority);
     else

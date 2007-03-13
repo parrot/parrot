@@ -10,7 +10,7 @@ src/stm/backend.c -- Software transactional memory implementation
 
 This file implements the non-user-visible parts of the Software
 Transactional Memory implementation, including handling of all
-the low-level synchornization.
+the low-level synchronization.
 
 =head2 Functions
 
@@ -1261,7 +1261,7 @@ void* Parrot_STM_extract(Interp *interp) {
 =item C<void Parrot_STM_replay_extracted(Interp *interp, void *saved_log_data)>
 
 Replay a transaction log extracted with C<Parrot_STM_extract>. At the moment
-this is only gaurenteed to work well enough to use STM_wait(). If one
+this is only guaranteed to work well enough to use STM_wait(). If one
 attempts to use it to replay transactions to commit them, it is likely to
 produce wrong results if the recorded transaction had dependencies on its outer
 transactions and it is not replayed inside the same transactions it was recorded
@@ -1277,6 +1277,9 @@ void Parrot_STM_replay_extracted(Interp *interp, void *saved_log_data) {
     int i;
     STM_tx_log_sub *sublog;
 
+    if (saved_log_data == NULL)
+        return;
+
     saved = saved_log_data;
 
     log = Parrot_STM_tx_log_get(interp);
@@ -1284,16 +1287,13 @@ void Parrot_STM_replay_extracted(Interp *interp, void *saved_log_data) {
     if (log->depth == 0)
         internal_exception(1, "replay_extracted outside of transaction");
 
-    if (saved == NULL)
-        return;
-
     sublog = get_sublog(log, log->depth);
 
     start = log->last_read;
     for (i = 0; i < saved->num_reads; ++i)
         *(alloc_read(interp, log)) = saved->reads[i];
 
-    start =  log->last_write;
+    start = log->last_write;
     for (i = 0; i < saved->num_writes; ++i) {
         STM_write_record *write;
         int successp;

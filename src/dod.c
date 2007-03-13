@@ -875,7 +875,7 @@ Run the stop-the-world mark & sweep collector.
 
 
 =item C<void
-Parrot_dod_ms_run_init(Interp *interp, UINTVAL flags)>
+Parrot_dod_ms_run_init(Interp *interp)>
 
 Prepare for a mark & sweep DOD run.
 
@@ -927,9 +927,9 @@ Parrot_dod_ms_run(Interp *interp, int flags)
     if (interp->debugger) {
         /*
          * if the other interpreter did a DOD run, it can set
-         * life bits of shared objects, but these aren't reset, because
+         * live bits of shared objects, but these aren't reset, because
          * they are in a different arena. When now such a PMC points to
-         * other non-shared object, these wouldn't be marked amd hence
+         * other non-shared object, these wouldn't be marked and hence
          * collected.
          */
         Parrot_dod_clear_live_bits(interp);

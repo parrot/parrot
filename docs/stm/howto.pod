@@ -7,20 +7,20 @@ docs/stm/howto.pod -- Using software transactional memory in Parrot
 The Parrot STM (software transactional memory) system provides
 transactional access to PMCs in a thread-safe way. Like database
 transactions, STM transactions logically occur either all at once or not
-at all. Note that the STM system only provides such gaurentees for reads
+at all. Note that the STM system only provides such guarantees for reads
 and writes made on references to PMCs managed by STM. In practice, STM
-uses optimisitic concurrency control, meaning that STM may discover that
+uses optimistic concurrency control, meaning that STM may discover that
 a transaction is not valid after the code implementing it runs and need
 to rerun it. The STM-related side effects of the failed transaction will
 not be seen. It is your responsibility to prevent other side effects
-from occuring.
+from occurring.
 
 =head2 STM-managed references
 
 STM provides two types of references to PMCs: STMVars, in which read
 and write operations are explicit, and STMRefs, which attempt to act
 like a 'normal' PMC. Their full interfaces are documented in
-C<docs/stm/stm_frontend.pod>. You can provide another thread with
+L<docs/stm/stm_frontend.pod>. You can provide another thread with
 STMVar and STMRef instances you created by passing them as arguments
 to the thread's starting function or by passing them through an STMVar
 or STMRef.
@@ -85,15 +85,15 @@ calls. STM support more tightly integrated into a language might be able
 to provide the desired flow control without needing to capture explicit
 continuations (or use exceptions). Exception support is currently not
 present in the library because exception support was not stable at the
-time it was written. It is compiled to C<STM.pbc> and is contained
+time it was written. It is compiled to F<STM.pbc> and is contained
 entirely in the C<parrot;STM> namespace. The library is implemented
-using the STM opcodes documented in C<src/ops/stm.ops> and using the
+using the STM opcodes documented in F<src/ops/stm.ops> and using the
 STMLog PMC type.
 
 =head2 Starting and ending transactions
 
 The runtime library C<transaction> runs a supplied subroutine (with
-optional supplied arugments) in a seperate transaction commiting the
+optional supplied arugments) in a separate transaction commiting the
 result. For example, (Perlish) psuedocode for inserting at the beginning
 of a linked list might look like this:
 
@@ -111,7 +111,7 @@ of a linked list might look like this:
  })
 
 The supplied closure will be run in a seperate transaction until it
-commits successfully. STM will guarentee that other threads see the
+commits successfully. STM will guarantee that other threads see the
 transaction as taking place all at once (so, e.g., C<defined
 $list.head.get_read().prev.get_read()> will always be false in another
 thread's transaction).
@@ -127,13 +127,13 @@ In simple cases, STM::transaction may be reduced to the PIR:
     retval = subtocall(args :flat)
     stm_commit start_label # goes to start_label if commit fails
     .return (retval)
- .end  
+ .end
 
 However, it is more complicated in order to support other operations
 mentioned below.
 
 One cannot use writing operations on an STMRef (except for setref) or
-the 'get_update' method on STMVar without an active transaction. For
+the C<get_update> method on STMVar without an active transaction. For
 programming convenience, if other operations occur outside any
 transaction, it will be as if each operation occured in its own
 transaction. This, of course, is only suitable for situations where, if
@@ -184,10 +184,10 @@ PMC then replaying them and retrying itself. For example one could
 remove a value on one of several (STM-using) lists using code like:
 
  my $value = STM::choice(
-                sub { return $list1.removeTail() }, 
+                sub { return $list1.removeTail() },
                 sub { return $list2.removeTail() },
                 ...
-             );   
+             );
 
 This will not block if either of the lists has a value available
 and will properly wait for either list to have a value available if
@@ -196,7 +196,7 @@ both do not.
 =head2 Rolling back transactions
 
 For cases when one detects an error during a transaction, the runtime
-provides the function give_up() which tells transaction() to rollback
+provides the function C<give_up()> which tells C<transaction()> to rollback
 (using the C<stm_abort> op) the transaction when it regains but still
 return whatever the subroutine did:
 
@@ -249,16 +249,16 @@ could even, for example, create a function
 and then use it in something like:
 
  my $value = STM::choice(
-    sub { findValue() }, 
+    sub { findValue() },
     sub { $other_list.removeTail() }
  );
 
 In the implementation of the runtime library or equivalents some extra
 effort is needed to deal properly with nesting though this is
 transparent to the user. Most importantly, an inner transaction might
-fail to commit (and instead do something like call retry()) repeatedly
+fail to commit (and instead do something like call C<retry()>) repeatedly
 because the outer transaction constrains it to seeing an outdated view
-of objects. To compensate for this, one must check ifthe outer
+of objects. To compensate for this, one must check if the outer
 transaction is invalid, which can be done explicitly using the
 C<stm_validate> op and which is always done by C<stm_wait>, and, if it
 is, rollback and restart the outer transaction.
