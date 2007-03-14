@@ -1,4 +1,4 @@
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 # Makefile for languages/regex
@@ -21,19 +21,7 @@ regex-compiler.pbc : regex-compiler.pir
 # working on to the oldest, so that I see the failures quicker.
 .PHONY: test
 test :
-	-$(PERL) test.pl t/basic/backopt.t
-	-$(PERL) test.pl t/basic/quantindex.t
-	-$(PERL) test.pl t/basic/literal.t
-	-$(PERL) test.pl t/basic/optional.t
-	-$(PERL) test.pl t/basic/group.t
-	-$(PERL) test.pl t/basic/a.t
-	-$(PERL) test.pl t/basic/star.t
-	-$(PERL) test.pl t/basic/scanstar.t
-	-$(PERL) test.pl t/basic/alt.t
-	-$(PERL) test.pl t/basic/scanalt.t
-	-$(PERL) test.pl t/basic/staralt.t
-	-$(PERL) test.pl t/basic/plus.t
-	-$(PERL) test.pl t/basic/example.t
+	$(PERL) t/harness
 
 # This is a TODO test -- currently, it loops forever. It will require
 # adding a check to the matcher that it is making progress. Or

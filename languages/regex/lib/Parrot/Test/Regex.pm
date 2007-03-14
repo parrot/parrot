@@ -11,6 +11,7 @@ use Data::Dumper;
 use File::Basename;
 use File::Spec::Functions;
 use Parrot::Config;
+use Parrot::Test;
 
 =head1 NAME
 
@@ -22,7 +23,7 @@ Does the same a 'languages/regex/test.pl'
 
 =cut
 
-my $PARROT_EXE = File::Spec->catfile( File::Spec->updir(), $PConfig{test_prog} );
+my $PARROT_EXE = File::Spec->catfile( Parrot::Test::path_to_parrot(), $PConfig{test_prog} );
 
 sub run_spec {
     my ($spec_fh) = @_;
