@@ -70,12 +70,12 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
 
     $P0 = node['statement']
     if null $P0 goto handled_statement
-        .local pmc iter
-        iter = new .Iterator, $P0
+        .local pmc statement_iter
+        statement_iter = new .Iterator, $P0
         iter_loop:
-            unless iter goto iter_end
+            unless statement_iter goto iter_end
             .local pmc cnode, past_else_block, past_condition, past_expression, past_var, past_array_elem, past_assign, past_rel_expression, past_echo, past_if, past_if_block, past_sea
-            cnode = shift iter
+            cnode = shift statement_iter
             if null cnode goto iter_loop
 
                  $P1 = cnode['ECHO']
@@ -258,25 +258,30 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     $P0 = node['adding_expression']
     if null $P0 goto no_adding_expression
-        .local pmc past_mult, adding_tail, adding_tail_0, past_adding_tail_0
-        adding_tail = $P0['adding_tail']
-        if null adding_tail goto no_adding_tail
-            past_mult = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
-            adding_tail_0 = adding_tail[0]
-            .local string add_op, pirop
-            pirop = 'n_add'
-            add_op = adding_tail_0['ADD_OP']
-            if add_op != '-' goto not_minus
-                pirop = 'n_sub'
-            not_minus:
-            add_op = 'infix:' . add_op 
-            past_adding_tail_0 = tree.'get'('past', adding_tail_0, 'Plumhead::Grammar::expression')
-            past = new 'PAST::Op'
-            past.init( past_mult, past_adding_tail_0, 'name' => add_op, 'pirop' => pirop )
-            goto handled_expression
-        no_adding_tail:
+        .local pmc adding_tail_iter, past_mult, past_prev, adding_tail 
         past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
-    goto handled_expression
+        adding_tail = $P0['adding_tail']
+        if null adding_tail goto handled_expression
+            .local pmc past_prev, cnode 
+            adding_tail_iter = new .Iterator, adding_tail
+            iter_loop:
+                unless adding_tail_iter goto iter_end
+                .local pmc cnode
+                cnode = shift adding_tail_iter
+                past_mult = tree.'get'('past', cnode, 'Plumhead::Grammar::expression')
+                past_prev = past
+                .local string add_op, pirop
+                pirop = 'n_add'
+                add_op = cnode['ADD_OP']
+                if add_op != '-' goto not_minus
+                    pirop = 'n_sub'
+                not_minus:
+                add_op = 'infix:' . add_op 
+                past = new 'PAST::Op'
+                past.init( past_prev, past_mult, 'name' => add_op, 'pirop' => pirop )
+                goto iter_loop
+            iter_end:
+            goto handled_expression
     no_adding_expression:
 
     $P0 = node['multiplying_expression']

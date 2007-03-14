@@ -1,6 +1,7 @@
 # $Id$
 
 TODO:
+  - add --target option for the non-partridge variants
   - segfault array_3.php with Partridge antlr3
   - unified testing
   - Implementation with PGE, make it the default implementation
