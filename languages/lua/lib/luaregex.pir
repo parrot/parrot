@@ -688,15 +688,32 @@ Francois Perrad
     .param string label
     .param string next
 
-    .local string x, y
+    .local string begin, end
     $S0 = self
-    x = substr $S0, 0, 1
-    y = substr $S0, 1, 1
+    begin = substr $S0, 0, 1
+    begin = code.escape(begin)
+    end = substr $S0, 1, 1
+    end = code.escape(end)
 
-    # TODO
-    code.emit(<<"        CODE", label, $S0, next)
-        %0: # balanced %1
-          goto %2
+    code.emit(<<"        CODE", label, begin, end, next)
+        %0: # balanced
+          if pos >= lastpos goto fail
+          $S0 = substr target, pos, 1
+          if $S0 != %1 goto fail
+          $I1 = 1
+        %0_1:
+          inc pos
+          if pos >= lastpos goto fail
+          $S0 = substr target, pos, 1
+          if $S0 != %2 goto %0_2
+          dec $I1
+          if $I1 != 0 goto %0_1
+          inc pos
+          goto %3
+        %0_2:
+          if $S0 != %1 goto %0_1
+          inc $I1
+          goto %0_1
         CODE
     .return ()
 .end

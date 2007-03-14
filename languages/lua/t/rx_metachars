@@ -100,5 +100,6 @@ a%b()f			a(bcde)f	a(bcde)f	balanced
 a%b()f			a(b(de)f	nil		balanced
 a%b()f			a(b(d)e)f	a(b(d)e)f	balanced
 a%b''f			a'bcde'f	a'bcde'f	balanced
+a%b""f			a"bcde"f	a"bcde"f	balanced
 
 ## vim: noexpandtab tabstop=4 shiftwidth=4

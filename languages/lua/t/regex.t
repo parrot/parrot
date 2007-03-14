@@ -47,7 +47,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 148;
+use Parrot::Test tests => 149;
 use Test::More;
 use File::Spec;
 
@@ -59,9 +59,6 @@ my @test_files = (
 
 my %todo_info = (
     7   => 'empty capture',
-    145 => 'balanced',
-    147 => 'balanced',
-    148 => 'balanced',
 );
 
 my $test_number = 0;

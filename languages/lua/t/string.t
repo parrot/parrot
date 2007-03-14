@@ -266,8 +266,7 @@ test = "int x; /* x */  int y; /* y */"
 print(string.gsub(test, "/%*.*%*/", "<COMMENT>"))
 print(string.gsub(test, "/%*.-%*/", "<COMMENT>"))
 s = "a (enclosed (in) parentheses) line"
--- print(string.gsub(s, "%b()", ""))
-print("a  line", 1)
+print(string.gsub(s, "%b()", ""))
 print(string.gsub("hello Lua!", "%a", "%0-%0"))
 print(string.gsub("hello Lua", "(.)(.)", "%2%1"))
 CODE
