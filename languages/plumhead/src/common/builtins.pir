@@ -34,13 +34,21 @@
     .return (1)
 .end
 
-.sub 'prefix:-'
+.sub 'prefix:-' :multi(Float)
     .param pmc a
 
     $N0 = a
     $N0 = neg $N0
 
     .return ($N0)
+.end
+
+.sub 'prefix:-' :multi(Integer)
+    .param int a
+
+    $I0 = neg a
+
+    .return ($I0)
 .end
 
 
