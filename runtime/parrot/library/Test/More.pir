@@ -260,11 +260,11 @@ add more.
     .local int pass
     pass = 0
 
-	.local string l_type
-	l_type = typeof left
+	.local string r_type
+	r_type = typeof right
 
-	if l_type == 'Float' goto num_compare
-	if l_type == 'Int'   goto num_compare
+	if r_type == 'Float' goto num_compare
+	if r_type == 'Int'   goto num_compare
 	goto string_compare
 
   num_compare:
