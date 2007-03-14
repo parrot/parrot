@@ -32,7 +32,7 @@ sub output_is {
     my $out_f  = Parrot::Test::per_test( '.out', $count );
     my $parrotdir = dirname $self->{parrot};
 
-		
+                
     my $args = $ENV{TEST_PROG_ARGS} || '';
 
     $lang_f = File::Spec->rel2abs($lang_f);
@@ -42,7 +42,7 @@ sub output_is {
     my $cmd;
     my $exit_code = 0;
     my $pass      = 0;
-		
+                
     $cmd = "$self->{parrot} $args languages/PIR/pir.pbc $lang_f";
 
     $exit_code = Parrot::Test::run_command(

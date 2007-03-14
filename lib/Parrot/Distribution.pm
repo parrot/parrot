@@ -541,26 +541,26 @@ sub perl_script_file_directories
 
     return
         map $self->directory_with_name($_) =>
-	    'compilers/imcc',
-	    'editor',
-	    'examples/benchmarks', 'examples/mops',
-	    'languages',
-	    map("languages/$_" => qw<
-		APL/tools 
-		BASIC/compiler BASIC/interpreter
-		WMLScript/build
-		dotnet dotnet/build dotnet/tools
-		lua
-		m4/tools
-		plumhead
-		python
-		regex
-		scheme scheme/Scheme
-		tcl/tools
-		urm
-		>
-	    ),
-	    map("tools/$_" => qw<build dev docs util>),
+            'compilers/imcc',
+            'editor',
+            'examples/benchmarks', 'examples/mops',
+            'languages',
+            map("languages/$_" => qw<
+                APL/tools 
+                BASIC/compiler BASIC/interpreter
+                WMLScript/build
+                dotnet dotnet/build dotnet/tools
+                lua
+                m4/tools
+                plumhead
+                python
+                regex
+                scheme scheme/Scheme
+                tcl/tools
+                urm
+                >
+            ),
+            map("tools/$_" => qw<build dev docs util>),
     ;
 }
 
@@ -601,49 +601,49 @@ sub perl_module_file_directories
 
     return
         map $self->directory_with_name($_) =>
-	    map("config/$_" => qw<auto auto/cpu/i386 auto/cpu/ppc
-		auto/cpu/sun4 auto/cpu/x86_64 
-		gen gen/cpu/i386 gen/cpu/x86_64 init init/hints inter>),
-	    'ext/Parrot-Embed/lib/Parrot',
-	    map("languages/$_" => qw<
-		APL/t 
-		BASIC/compiler
-		HQ9plus/lib/Parrot/Test
-		WMLScript/build/SRM WMLScript/t/Parrot/Test
-		bc/lib/Parrot/Test bc/lib/Parrot/Test/Bc
-		dotnet/build/SRM dotnet/t
-		jako/lib/Jako
-		jako/lib/Jako/Construct
-		lua/Lua lua/t/Parrot/Test
-		m4/lib/Parrot/Test m4/lib/Parrot/Test/M4
-		parrot_compiler/lib/Parrot/Test
-		perl6/t/01-sanity
-		plumhead/lib/Parrot/Test plumhead/lib/Parrot/Test/Plumhead
-		pugs/t
-		regex/lib
-		scheme scheme/Scheme
-		tcl/lib/Parrot/Test
-		urm/lib/URM
-		>
-	    ),
-	    map("languages/jako/lib/Jako/Construct/$_" => qw<
-		Block Block/Conditional Block/Loop Declaration
-		Expression Expression/Value Statement Type
-		>
-	    ),
-	    map("languages/regex/lib/$_" => qw<
-		Parrot/Test Regex Regex/CodeGen Regex/Ops Regex/Parse
-		>
-	    ),
-	    map("lib/$_" => qw<
-		Class Digest/Perl File Parrot Parse Pod Pod/Simple Test Text
-		>
-	    ),
-	    map("lib/Parrot/$_" => qw<
-		Config Configure Configure/Step Docs Docs/Section IO
-		OpLib OpTrans PIR Pmc2c Test
-		>
-	    ),
+            map("config/$_" => qw<auto auto/cpu/i386 auto/cpu/ppc
+                auto/cpu/sun4 auto/cpu/x86_64 
+                gen gen/cpu/i386 gen/cpu/x86_64 init init/hints inter>),
+            'ext/Parrot-Embed/lib/Parrot',
+            map("languages/$_" => qw<
+                APL/t 
+                BASIC/compiler
+                HQ9plus/lib/Parrot/Test
+                WMLScript/build/SRM WMLScript/t/Parrot/Test
+                bc/lib/Parrot/Test bc/lib/Parrot/Test/Bc
+                dotnet/build/SRM dotnet/t
+                jako/lib/Jako
+                jako/lib/Jako/Construct
+                lua/Lua lua/t/Parrot/Test
+                m4/lib/Parrot/Test m4/lib/Parrot/Test/M4
+                parrot_compiler/lib/Parrot/Test
+                perl6/t/01-sanity
+                plumhead/lib/Parrot/Test plumhead/lib/Parrot/Test/Plumhead
+                pugs/t
+                regex/lib
+                scheme scheme/Scheme
+                tcl/lib/Parrot/Test
+                urm/lib/URM
+                >
+            ),
+            map("languages/jako/lib/Jako/Construct/$_" => qw<
+                Block Block/Conditional Block/Loop Declaration
+                Expression Expression/Value Statement Type
+                >
+            ),
+            map("languages/regex/lib/$_" => qw<
+                Parrot/Test Regex Regex/CodeGen Regex/Ops Regex/Parse
+                >
+            ),
+            map("lib/$_" => qw<
+                Class Digest/Perl File Parrot Parse Pod Pod/Simple Test Text
+                >
+            ),
+            map("lib/Parrot/$_" => qw<
+                Config Configure Configure/Step Docs Docs/Section IO
+                OpLib OpTrans PIR Pmc2c Test
+                >
+            ),
     ;
 }
 
