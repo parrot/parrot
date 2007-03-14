@@ -25,7 +25,7 @@ Tests the Role PMC.
 
 # L<PDD15/Role PMC API>
 # TODO fix smartlinks once this is specced
-pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not yet implemented' );
+pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     $P0 = new .Role
     say 'ok 1 - $P0 = new .Role'

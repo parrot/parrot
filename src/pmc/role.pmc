@@ -1,0 +1,257 @@
+/*
+Copyright (C) 2001-2007, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/role.pmc - Role - defines a role
+
+=head1 DESCRIPTION
+
+This class implements the basic Parrot role PMC, for defining a role.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#define PARROT_ROLE(o) ((Parrot_Role *) PMC_data(o))
+
+
+/* This is the underlying structure of this PMC. */
+typedef struct Parrot_Role {
+    STRING *name;         /* The name of the role. */
+    PMC *namespace;       /* The namespace it's linked to, if any. */
+    PMC *roles;           /* Any roles that this role is composed from. */
+    PMC *methods;         /* Hash of method names to methods in this role. */
+    PMC *attrib_metadata; /* Hash of attributes in this role to metadata. */
+} Parrot_Role;
+
+
+pmclass Role need_ext {
+/*
+
+=item C<void init()>
+
+Initializes the role.
+
+=item C<void init_pmc(PMC *name)>
+
+The actual role creation code, called from C<newrole> opcode. The C<init>
+argument should stringify to the name of the role. The role will be attatched
+to the current namespace.
+
+=cut
+
+*/
+
+    void init() {
+        Parrot_Role *role = NULL;
+
+        /* Custom DOD mark and destory. */
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+
+        /* Init the role object. */
+        role = mem_sys_allocate_zeroed(sizeof(Parrot_Role));
+        role->name = CONST_STRING(interp, "");
+        role->namespace = PMCNULL;
+        role->roles = pmc_new(interp, enum_class_ResizablePMCArray);
+        role->methods = pmc_new(interp, enum_class_Hash);
+        role->attrib_metadata = pmc_new(interp, enum_class_Hash);
+
+        PMC_data(SELF) = role;
+    }
+
+    void init_pmc(PMC* name) {
+        Parrot_Role *role = NULL;
+
+        /* Set up the role. */
+        SELF.init();
+
+        /* Set name and namespace. */
+        role = PARROT_ROLE(SELF);
+        role->name = VTABLE_get_string(interp, name);
+        role->namespace = CONTEXT(interp->ctx)->current_namespace;
+    }
+
+/*
+
+=item C<void destroy()>
+
+Free the memory associated with the underlying struct.
+
+=cut
+
+*/
+    void destroy() {
+            mem_sys_free(PMC_data(SELF));
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark any referenced strings and PMCs.
+
+=cut
+
+*/
+    void mark() {
+        Parrot_Role *role = PARROT_ROLE(SELF);
+        if (role->name)
+            pobject_lives(interp, (PObj*)role->name);
+        if (role->namespace)
+            pobject_lives(interp, (PObj*)role->namespace);
+        if (role->roles)
+            pobject_lives(interp, (PObj*)role->roles);
+        if (role->methods)
+            pobject_lives(interp, (PObj*)role->methods);
+        if (role->attrib_metadata)
+            pobject_lives(interp, (PObj*)role->attrib_metadata);
+    }
+
+
+/*
+
+=item C<void attributes()>
+
+Return a hash where the keys are attribute names and the values are instances
+of MetaAttribute, describing the attribute.
+
+=cut
+
+*/
+    PMETHOD void attributes() {
+        Parrot_Role *role = PARROT_ROLE(SELF);
+        PMC *ret_attrib_metadata = VTABLE_clone(interp, role->attrib_metadata);
+        preturn(PMC *ret_attrib_metadata);
+    }
+
+
+/*
+
+=item C<void add_attribute()>
+
+Add an attribute to the role. Requires a name and, optionally, a type.
+
+=cut
+
+*/
+    PMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
+        Parrot_Role *role = PARROT_ROLE(SELF);
+        PMC *new_attribute = pmc_new(interp, enum_class_MetaAttribute);
+
+        /* Set name and type. */
+        PMINVOKE(interp, new_attribute, "name", STRING* attribute_name);
+        if (got_type) {
+            PMINVOKE(interp, new_attribute, "type", STRING* attribute_type);
+        }
+
+        /* Enter the attribute in the attributes array. */
+        VTABLE_set_pmc_keyed_str(interp, role->attrib_metadata, attribute_name, new_attribute);
+    }
+
+/*
+
+=item C<void name()>
+
+Sets the name of the role.
+
+=cut
+
+*/
+    PMETHOD void name(STRING *name :optional, int got_name :opt_flag) {
+        Parrot_Role *role = PARROT_ROLE(SELF);
+        STRING *ret_name = NULL;
+
+        if (got_name) {
+            /* Set role name. */
+            role->name = name;
+        }
+
+        ret_name = role->name;
+        preturn(STRING *ret_name);
+    }
+
+/*
+
+=item C<void namespace()>
+
+With a parameter, sets the namespace for the role. Expects a fully
+qualified namespace to be specified as a key. If you already have linked another
+namespace with this role, this link will be broken and the new namespace
+specified will be linked to this role.
+
+=cut
+
+*/
+    PMETHOD void namespace(PMC *namespace :optional, int got_name :opt_flag) {
+        Parrot_Role *role = PARROT_ROLE(SELF);
+        PMC *ret_namespace = NULL;
+
+        if (got_name) {
+            /* Check namespace is a key. */
+            if (namespace->vtable->base_type != enum_class_Key)
+            {
+                real_exception(interp, NULL, E_NameError, "Namespace must be a key");
+                return;
+            }
+
+            /* If we already have a namespace, it shouldn't refer to the
+               role any more. */
+            if (role->namespace)
+            {
+                /* XXX */
+            }
+
+            /* Set namespace. */
+            role->namespace = Parrot_get_namespace_keyed(interp,
+                interp->HLL_namespace, namespace);
+
+            /* XXX Link namespace to this role; currently missing slot for that. */
+        }
+
+        ret_namespace = role->namespace;
+        preturn(PMC *ret_namespace);
+    }
+
+/*
+
+=item C<void roles()>
+
+Return the roles array PMC.
+
+=cut
+
+*/
+    PMETHOD void roles() {
+        Parrot_Role *role = PARROT_ROLE(SELF);
+        PMC *ret_roles = VTABLE_clone(interp, role->roles);
+        preturn(PMC *ret_roles);
+    }
+
+} /* END pmclass */
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd15_objects.pod>.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
