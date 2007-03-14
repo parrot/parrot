@@ -33,12 +33,12 @@
 	.IMPORT( 'Test::Builder::Tester', 'test_test' )
 
 	plan( 47 )
+	test_skip()
 	test_ok()
 	test_is()
 	test_like()
 	test_is_deeply()
 	test_diagnostics()
-    test_skip()
 
 	test.'finish'()
 .end
@@ -338,25 +338,25 @@
     .local pmc test
     test = new 'Test::Builder'
 
-	test_out( 'ok 43 #skip skipping' )
-	test_out( 'ok 44 #skip skipping' )
+	test_out( 'ok 1 #skip skipping' )
+	test_out( 'ok 2 #skip skipping' )
     test.'skip'( 2, 'skipping' )
 	test_test( 'skip test should pass' )
 
-	test_out( 'ok 45 #skip skipped' )
+	test_out( 'ok 3 #skip skipped' )
 	skip( 1 )
 	test_test( 'skip(int)' )
 
-	test_out( 'ok 46 #skip jumping' )
+	test_out( 'ok 4 #skip jumping' )
 	skip( "jumping" )
 	test_test( 'skip(string)' )
 
-	test_out( 'ok 47 #skip lunch' )
-	test_out( 'ok 48 #skip lunch' )
+	test_out( 'ok 5 #skip lunch' )
+	test_out( 'ok 6 #skip lunch' )
 	skip( 2, "lunch" )
 	test_test( 'skip(int, string)' )
 
-	test_out( 'ok 49 #skip skipped' )
+	test_out( 'ok 7 #skip skipped' )
 	skip()
 	test_test( 'skip()' )
 .end
