@@ -246,6 +246,9 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
             if op != '|' goto not_or
                 op = '+|'
             not_or:
+            if op != '^' goto not_xor
+                op = '+^'
+            not_xor:
             op = 'infix:' . op 
             past_bitwise_tail_0 = tree.'get'('past', bitwise_tail_0, 'Plumhead::Grammar::expression')
             past = new 'PAST::Op'
