@@ -25,16 +25,6 @@ setup and configuration is a pain.  Andy has tried to get Perl 5
 running under it nicely, but has met with limited success.  Maybe
 the Parrot will be nicer.
 
-=over 4
-
-=item * Make a reasonable set of rules for splint.
-
-splint spews many many errors by default.  Take a look at the
-Makefile that perl5 has for the start of some rules that Andy worked
-on for the perl5 code.
-
-=back
-
 =head2 Solaris lint
 
 Sun has made its dev tools freely available at
