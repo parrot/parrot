@@ -868,7 +868,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "callmethod - method name" );
 CODE
 main
 in meth
-parrot;Foo;meth
+meth
 back
 OUTPUT
 

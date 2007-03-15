@@ -469,10 +469,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "get_pmc_keyed_int" );
     .local pmc e, s, compi
     code = <<"EOC"
     .sub foo
-    noop
+        noop
     .end
     .sub bar
-    noop
+        noop
     .end
 EOC
     compi = compreg "PIR"
@@ -485,8 +485,8 @@ EOC
     print "\n"
 .end
 CODE
-parrot;foo
-parrot;bar
+foo
+bar
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "catch compile err: RT:#39892" );

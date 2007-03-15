@@ -383,7 +383,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer' );
     print "\n"
 .end
 CODE
-parrot;main
+main
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer 2' );
@@ -404,8 +404,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer 2' );
     print "\n"
 .end
 CODE
-parrot;foo
-parrot;main
+foo
+main
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer via interp' );
@@ -444,10 +444,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer via interp' );
     pad['a'] = $P0
 .end
 CODE
-parrot;foo
-parrot;foo
-parrot;main
-parrot;main
+foo
+foo
+main
+main
 I messed with your var
 OUTPUT
 

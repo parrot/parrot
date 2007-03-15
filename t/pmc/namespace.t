@@ -886,7 +886,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Nested namespace introspection" );
 CODE
 Found namespace: Foo
 Found nested namespace: Bar
-Found sub: parrot;Foo;Bar;a_sub
+Found sub: a_sub
 Found var: a string PMC
 OUTPUT
 

@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 60;
+use Parrot::Test tests => 61;
 use Parrot::Config;
 
 =head1 NAME
@@ -828,9 +828,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "sub names" );
     interpinfo P1, .INTERPINFO_CURRENT_CONT
     returncc
 CODE
-parrot;main
-parrot;the_sub
-parrot;main
+main
+the_sub
+main
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub names w MAIN" );
@@ -855,9 +855,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "sub names w MAIN" );
     interpinfo P1, .INTERPINFO_CURRENT_CONT
     returncc
 CODE
-parrot;main
-parrot;the_sub
-parrot;main
+main
+the_sub
+main
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "caller introspection via interp" );
@@ -904,15 +904,15 @@ tb_end:
 CODE
 main foo
 Bar bar
-subname: parrot;Bar;bar
+subname: bar
 Bar foo
-caller 0 parrot;Bar;foo
-caller 1 parrot;Bar;bar
-caller 2 parrot;foo
-caller 3 parrot;main
+caller 0 foo
+caller 1 bar
+caller 2 foo
+caller 3 main
 Bar foo
-caller 0 parrot;Bar;foo
-caller 1 parrot;main
+caller 0 foo
+caller 1 main
 ok
 OUTPUT
 
@@ -1351,6 +1351,30 @@ pir_output_is(<<'CODE', <<'OUTPUT', 'assign w/:outer');
 .end
 CODE
 ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', 'get_namespace()');
+.sub main :main
+    $P0 = get_global 'main'
+    $P0 = $P0.'get_namespace'()
+    $P0 = $P0.'get_name'()
+    $S0 = join ';', $P0
+    say $S0
+
+    $P0 = get_global ['Foo'; 'Bar'], 'foo'
+    $P0 = $P0.'get_namespace'()
+    $P0 = $P0.'get_name'()
+    $S0 = join ';', $P0
+    say $S0
+.end
+
+.namespace ['Foo'; 'Bar']
+.sub foo
+    noop
+.end
+CODE
+parrot
+parrot;Foo;Bar
 OUTPUT
 
 

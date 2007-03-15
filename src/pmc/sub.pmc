@@ -120,7 +120,8 @@ Sets the name of the subroutine.
 */
 
     STRING* get_string() {
-        return Parrot_full_sub_name(INTERP, SELF);
+        struct Parrot_sub * const sub = PMC_sub(SELF);
+        return Parrot_make_COW_reference(INTERP, sub->name);
     }
 
     void set_string_native(STRING *subname) {
