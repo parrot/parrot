@@ -2,6 +2,7 @@
 # $Id$
 package GenerateCore;
 use strict;
+use warnings;
 our (@ISA, @EXPORT_OK);
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(

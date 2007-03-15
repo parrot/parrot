@@ -2,6 +2,7 @@
 # $Id$
 package Capture;
 use strict;
+use warnings;
 # Adapted from IO::Capture::Tie_STDx.
 # Thanks as always to Mark Reynolds and Jon Morgan!
 
