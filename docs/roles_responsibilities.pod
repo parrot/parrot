@@ -47,6 +47,8 @@ Release managers have responsibility for executing a product release,
 according to the release schedule. The release schedule is developed and
 maintained jointly with the Architect and the Pumpking.
 
+See F<docs/project/release_manager_guide.pod> for more information.
+
 =head2 Metacommitter
 
 All Metacommitters are responsible for managing commit access to the Parrot
@@ -54,6 +56,8 @@ repository. Once the Architect or Pumpking approves a request for a
 Contributor to be given commit access, a Metacommitter provides that access.
 The Architect and Pumpking are Metacommitters, but other Project Team members
 may also hold this role.
+
+See F<docs/project/metacommiter_guide.pod> for more information.
 
 =head1 Committers
 
