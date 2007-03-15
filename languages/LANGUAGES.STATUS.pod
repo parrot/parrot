@@ -1136,7 +1136,7 @@ Infocom's Z-machine. See also http://en.wikipedia.org/wiki/Z-machine.
 
 =item Last verified with parrot version
 
-0.4.5
+0.4.10
 
 =item Location
 

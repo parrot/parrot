@@ -467,6 +467,7 @@ text_loop:
 
   unless fin goto text_loop
   .local pmc escape
+  load_bytecode 'Data/Escape.pir'
   escape = find_global "Data::Escape", "String"
   s = escape(s)
   s .= "\""
