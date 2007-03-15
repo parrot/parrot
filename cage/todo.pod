@@ -161,12 +161,6 @@ many more.
 Valgrind (L<http://valgrind.org/>) is a profiler/debugger most notable
 for the way it magically monitors memory accesses and management.
 
-=over 4
-
-=item * Make a "make valgrind" target
-
-=back
-
 =head2 Run under Coverity Prevent
 
 Coverity already runs Prevent on the Perl 5 source.  Let's get
