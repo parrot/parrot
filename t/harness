@@ -161,7 +161,6 @@ my @coding_std_tests = map { "t/codingstd/$_" } qw(
     c_indent.t
     cppcomments.t 
     cuddled_else.t 
-    line_endings.t
     tabs.t 
     trailing_space.t
 );
