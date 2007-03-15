@@ -31,8 +31,8 @@ use constant SKIP_FILE  => "src/ops/ops.skip";
 ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
     );
     my $cwd = cwd();
     {
@@ -60,7 +60,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             inc_f           => "ops.h",
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -70,7 +70,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
         ok(-f $skip, "ops.skip located after renumbering");
 
         ok($self->sort_ops(), "sort_ops returned successfully");
-        
+
         ok($self->prepare_real_ops(),
             "prepare_real_ops() returned successfully");
 
@@ -100,13 +100,13 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable methods of 
-F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.   
-By doing so, they test the functionality of the F<ops2pm.pl> utility.  
-That functionality has largely been extracted 
+The files in this directory test the publicly callable methods of
+F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
+By doing so, they test the functionality of the F<ops2pm.pl> utility.
+That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
-F<11-print_h.t> tests whether 
+F<11-print_h.t> tests whether
 C<Parrot::Ops2pm::Utils::print_h()> works properly.
 
 =head1 TODO

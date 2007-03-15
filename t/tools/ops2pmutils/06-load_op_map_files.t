@@ -32,8 +32,8 @@ use constant SKIP_FILE  => "src/ops/ops.skip";
 ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
     );
     my $cwd = cwd();
     {
@@ -57,7 +57,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             renum           => undef,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -73,8 +73,8 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 ## fail to provide ops.num file
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
     );
     my $cwd = cwd();
     {
@@ -98,7 +98,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             renum           => undef,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -113,8 +113,8 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # provide defective ops.num file:  hole:  missing number
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
     );
     my $cwd = cwd();
     {
@@ -131,7 +131,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
         my $tmpnum = $realnum . q{.tmp};
         ok(copy(qq{$cwd/$num}, $tmpnum),
             "copied ops.num file to temporary file");
-        
+
         my $fhin  = IO::File->new();
         ok(($fhin->open("<$tmpnum")), "Able to open file for reading");
         my $fhout = IO::File->new();
@@ -156,7 +156,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             renum           => undef,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -171,8 +171,8 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # provide defective ops.num file:  opname mentioned twice
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
     );
     my $cwd = cwd();
     {
@@ -189,7 +189,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
         my $tmpnum = $realnum . q{.tmp};
         ok(copy(qq{$cwd/$num}, $tmpnum),
             "copied ops.num file to temporary file");
-        
+
         my $fhin  = IO::File->new();
         ok(($fhin->open("<$tmpnum")), "Able to open file for reading");
         my @outopnames;
@@ -225,7 +225,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             renum           => undef,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -240,8 +240,8 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # provide defective ops.skip file:  opname also found in ops.num
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
     );
     my $cwd = cwd();
     {
@@ -261,7 +261,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
         my $tmpskip = $realskip . q{.tmp};
         ok(copy(qq{$cwd/$skip}, $tmpskip),
             "copied ops.skip file to temporary file");
-        
+
         my $fhin  = IO::File->new();
         ok(($fhin->open("<$tmpskip")), "Able to open file for reading");
         my @outopnames;
@@ -291,7 +291,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             renum           => undef,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -317,13 +317,13 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable methods of 
-F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.   
-By doing so, they test the functionality of the F<ops2pm.pl> utility.  
-That functionality has largely been extracted 
+The files in this directory test the publicly callable methods of
+F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
+By doing so, they test the functionality of the F<ops2pm.pl> utility.
+That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
-F<06-load_op_map_files.t> tests whether 
+F<06-load_op_map_files.t> tests whether
 C<Parrot::Ops2pm::Utils::load_op_map_files()> works properly.
 
 =head1 TODO
@@ -339,7 +339,7 @@ Uncovered implicit 'else':
 
     $self->{max_op_num} ||= 0;
 
-Real question:  can C<$self->{max_op_num}> ever be C<undef>, C<0> 
+Real question:  can C<$self->{max_op_num}> ever be C<undef>, C<0>
 or empty string?
 
 =item *

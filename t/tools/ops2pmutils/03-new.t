@@ -33,11 +33,11 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
     like($@, qr/Could not find ops file/,
         "Got expected error message when file could not be found");
 }
- 
+
 {
-    local @ARGV = qw( src/ops/core.ops 
+    local @ARGV = qw( src/ops/core.ops
         src/ops/bit.ops src/ops/cmp.ops src/ops/debug.ops
-        src/ops/experimental.ops src/ops/io.ops src/ops/math.ops 
+        src/ops/experimental.ops src/ops/io.ops src/ops/math.ops
         src/ops/object.ops src/ops/pic.ops src/ops/pmc.ops
         src/ops/set.ops src/ops/stack.ops src/ops/stm.ops
         src/ops/string.ops src/ops/sys.ops src/ops/var.ops
@@ -63,13 +63,13 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable subroutines of 
-F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.   
-By doing so, they test the functionality of the F<ops2pm.pl> utility.  
-That functionality has largely been extracted 
+The files in this directory test the publicly callable subroutines of
+F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
+By doing so, they test the functionality of the F<ops2pm.pl> utility.
+That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
-F<03-new.t> tests whether Parrot::Ops2pm::Utils::new() 
+F<03-new.t> tests whether Parrot::Ops2pm::Utils::new()
 works properly.
 
 =head1 AUTHOR

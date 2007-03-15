@@ -32,8 +32,8 @@ use constant SKIP_FILE  => "src/ops/ops.skip";
 ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
     );
     my $cwd = cwd();
     {
@@ -57,7 +57,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             renum           => undef,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -67,7 +67,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
         ok(-f $skip, "ops.skip located after renumbering");
 
         ok($self->sort_ops(), "sort_ops returned successfully");
-        
+
         ok($self->prepare_real_ops(),
             "prepare_real_ops() returned successfully");
 
@@ -77,8 +77,8 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
     );
     my $cwd = cwd();
     {
@@ -97,7 +97,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
         my $tmpnum = $realnum . q{.tmp};
         ok(copy(qq{$cwd/$num}, $tmpnum),
             "copied ops.num file to temporary file");
-        
+
         my $fhin  = IO::File->new();
         ok(($fhin->open("<$tmpnum")), "Able to open file for reading");
         my @outlines;
@@ -131,7 +131,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             renum           => undef,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -141,7 +141,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
         ok(-f $skip, "ops.skip located after renumbering");
 
         ok($self->sort_ops(), "sort_ops returned successfully");
-        
+
         eval { $self->prepare_real_ops(); };
 #        like($@, qr/number mismatch/,
 #            "Number mismatch correctly detected");
@@ -164,13 +164,13 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable methods of 
-F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.   
-By doing so, they test the functionality of the F<ops2pm.pl> utility.  
-That functionality has largely been extracted 
+The files in this directory test the publicly callable methods of
+F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
+By doing so, they test the functionality of the F<ops2pm.pl> utility.
+That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
-F<09-prepare_real_ops.t> tests whether 
+F<09-prepare_real_ops.t> tests whether
 C<Parrot::Ops2pm::Utils::prepare_real_ops()> works properly.
 
 =head1 TODO

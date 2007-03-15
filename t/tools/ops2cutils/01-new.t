@@ -60,13 +60,13 @@ my ($msg, $tie);
         } );
         $msg = $tie->READLINE;
         untie *STDERR or croak "Unable to untie";
-        ok(! defined $self, 
+        ok(! defined $self,
             "Constructor correctly returned undef due to lack of command-line arguments");
         like($msg,
             qr/^Parrot::Ops2c::Utils::new\(\) requires 'trans' options/,
             "Error message is correct");
     }
-    
+
     {
         local @ARGV = qw( gobbledygook );
         $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
@@ -77,13 +77,13 @@ my ($msg, $tie);
         } );
         $msg = $tie->READLINE;
         untie *STDERR or croak "Unable to untie";
-        ok(! defined $self, 
+        ok(! defined $self,
             "Constructor correctly returned undef due to bad class name command-line argument");
         like($msg,
             qr/Parrot::Ops2c::Utils::new\(\) requires C, CGoto, CGP, CSwitch and\/or  CPrederef/,
             "Got correct error message");
     }
-    
+
     test_single_trans(q{C});
     test_single_trans(q{CGoto});
     test_single_trans(q{CGP});
@@ -96,7 +96,7 @@ my ($msg, $tie);
             argv            => [ @ARGV ],
             flag            => { core => 1 },
         } );
-        ok(defined $self, 
+        ok(defined $self,
             "Constructor correctly returned when provided >= 1 arguments");
     }
 
@@ -107,7 +107,7 @@ my ($msg, $tie);
             flag            => { core => 1 },
             script          => "tools/build/ops2c.pl",
         } );
-        ok(defined $self, 
+        ok(defined $self,
             "Constructor correctly returned when provided with explicit 'script' argument");
     }
 
@@ -120,13 +120,13 @@ my ($msg, $tie);
         } );
         $msg = $tie->READLINE;
         untie *STDERR or croak "Unable to untie";
-        ok(! defined $self, 
+        ok(! defined $self,
             "Constructor correctly returned undef when lacking reference to options");
         like($msg,
             qr/^Parrot::Ops2c::Utils::new\(\) requires reference to hash of command-line options/,
             "Error message correctly returned");
     }
-    
+
     ok(chdir($cwd), "returned to starting directory");
 }
 
@@ -142,7 +142,7 @@ sub test_single_trans {
             argv            => [ $trans ],
             flag            => { core => 1 },
         } );
-    ok(defined $self, 
+    ok(defined $self,
         "Constructor correct when provided with single argument $trans");
 }
 
@@ -158,10 +158,10 @@ sub test_single_trans {
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable subroutines of 
-F<lib/Parrot/Ops2c/Utils.pm> and F<lib/Parrot/Ops2c/Auxiliary.pm>.   
-By doing so, they test the functionality of the F<ops2c.pl> utility.  
-That functionality has largely been extracted 
+The files in this directory test the publicly callable subroutines of
+F<lib/Parrot/Ops2c/Utils.pm> and F<lib/Parrot/Ops2c/Auxiliary.pm>.
+By doing so, they test the functionality of the F<ops2c.pl> utility.
+That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
 All the files in this directory are intended to be run B<after>
@@ -170,7 +170,7 @@ are B<not> part of the test suite run by F<make test>.   Once you have run
 F<Configure.pl>, however, you may run these tests as part of F<make
 buildtools_tests>.
 
-F<01-new.t> tests whether C<Parrot::Ops2c::Utils::new()> 
+F<01-new.t> tests whether C<Parrot::Ops2c::Utils::new()>
 works properly.
 
 =head1 AUTHOR

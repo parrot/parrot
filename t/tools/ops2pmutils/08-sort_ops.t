@@ -34,8 +34,8 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # regular case
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
     );
     my $cwd = cwd();
     {
@@ -59,7 +59,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             renum           => undef,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -79,9 +79,9 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # include experimental.ops in @ARGV
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
-        src/ops/experimental.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
+        src/ops/experimental.ops
     );
     my $cwd = cwd();
     {
@@ -105,7 +105,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             renum           => undef,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -125,9 +125,9 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # include experimental.ops in @ARGV; use 'DEVELOPING' to trigger warning
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
-        src/ops/experimental.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
+        src/ops/experimental.ops
     );
     my $cwd = cwd();
     {
@@ -153,7 +153,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             renum           => undef,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -181,9 +181,9 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # include object.ops in @ARGV; use 'DEVELOPING' to trigger warning
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
-        src/ops/object.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
+        src/ops/object.ops
     );
     my $cwd = cwd();
     {
@@ -209,7 +209,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             renum           => undef,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -237,9 +237,9 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # include object.ops in @ARGV; do not use 'DEVELOPING' to trigger warning
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
-        src/ops/object.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
+        src/ops/object.ops
     );
     my $cwd = cwd();
     {
@@ -265,7 +265,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             renum           => undef,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -302,13 +302,13 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable subroutines of 
-F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.   
-By doing so, they test the functionality of the F<ops2pm.pl> utility.  
-That functionality has largely been extracted 
+The files in this directory test the publicly callable subroutines of
+F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
+By doing so, they test the functionality of the F<ops2pm.pl> utility.
+That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
-F<08-sort_ops.t> tests whether 
+F<08-sort_ops.t> tests whether
 C<Parrot::Ops2pm::Utils::sort_ops()> works properly.
 
 =head1 AUTHOR

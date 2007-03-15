@@ -33,21 +33,21 @@ sub generate_core {
     copy(qq{$cwd/$num}, qq{$tdir/$num});
     copy(qq{$cwd/$skip}, qq{$tdir/$skip});
     my @opsfiles = glob("./src/ops/*.ops");
-    
+
     mkdir qq{$tdir/lib};
     mkdir qq{$tdir/lib/Parrot};
     mkdir qq{$tdir/lib/Parrot/Ops2c};
     mkdir qq{$tdir/include};
     mkdir qq{$tdir/include/parrot};
     mkdir qq{$tdir/include/parrot/oplib};
-    
+
     my $o2p = Parrot::Ops2pm::Utils->new( {
         argv            => [ @opsfiles ],
         script          => "tools/build/ops2pm.pl",
         moddir          => "lib/Parrot/OpLib",
         module          => "core.pm",
     } );
-    
+
     $o2p->prepare_ops();
     $o2p->load_op_map_files();
     $o2p->sort_ops();
@@ -74,10 +74,10 @@ GenerateCore - functionality used in testing Parrot::Ops2c::Utils
 
     @srcopsfiles = qw(
         src/ops/core.ops src/ops/bit.ops src/ops/cmp.ops
-        src/ops/debug.ops src/ops/experimental.ops src/ops/io.ops 
-        src/ops/math.ops src/ops/object.ops src/ops/pic.ops 
-        src/ops/pmc.ops src/ops/set.ops src/ops/stack.ops 
-        src/ops/stm.ops src/ops/string.ops src/ops/sys.ops 
+        src/ops/debug.ops src/ops/experimental.ops src/ops/io.ops
+        src/ops/math.ops src/ops/object.ops src/ops/pic.ops
+        src/ops/pmc.ops src/ops/set.ops src/ops/stack.ops
+        src/ops/stm.ops src/ops/string.ops src/ops/sys.ops
         src/ops/var.ops
     );
 
@@ -99,7 +99,7 @@ Parrot::Ops2c::Utils.  Those methods are invoked by Parrot build tool
 F<tools/build/ops2c.pl>, which in turn is invoked several times by F<make>.
 Parrot::Ops2c::Utils has as a prerequisite Parrot::OpLib::core.  But
 Parrot::OpLib::core is not part of the Parrot distribution, nor does it exist
-at the point F<make> is called.  Rather, it is created 
+at the point F<make> is called.  Rather, it is created
 during the Parrot build process prior to the first call to F<ops2c.pl>.
 
 To test Parrot::Ops2c::Utils therefore requires a module which does not exist
@@ -109,9 +109,9 @@ solution to this conundrum is to create a copy of Parrot::OpLib::core which
 exists only for the duration of a single test file.
 
 This package, GenerateCore, exports upon request a single subroutine,
-C<generate_core>, which (a) creates subdirectories needed underneath a 
+C<generate_core>, which (a) creates subdirectories needed underneath a
 temporary directory created solely for testing purposes; then
-(b) creates a temporary copy of Parrot::OpLib::core such that 
+(b) creates a temporary copy of Parrot::OpLib::core such that
 C<Parrot::Ops2c::Utils::new()> can successfully execute.
 
 =head2 C<generate_core()>
@@ -123,13 +123,13 @@ C<Parrot::Ops2c::Utils::new()> can successfully execute.
 =item *  B<Arguments:>  Five scalar arguments, in this order:
 
   cwd           :   String with full path of directory from which
-                    tests are invoked (generally, the top-level 
+                    tests are invoked (generally, the top-level
                     Parrot directory).
-  tdir          :   String holding full path of temporary 
-                    directory into which you have changed for 
+  tdir          :   String holding full path of temporary
+                    directory into which you have changed for
                     testing.
-  \@srcopsfiles :   Reference to an array of F<.ops> files 
-                    (generally, the list of arguments to ops2c.pl 
+  \@srcopsfiles :   Reference to an array of F<.ops> files
+                    (generally, the list of arguments to ops2c.pl
                     as invoked by make).
   $num          :   Path to ops.num file.
   $skip         :   Path to ops.skip file.

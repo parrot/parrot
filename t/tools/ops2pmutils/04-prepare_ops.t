@@ -31,8 +31,8 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # regular case
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
     );
     my $self = Parrot::Ops2pm::Utils->new( {
         argv            => [ @ARGV ],
@@ -61,8 +61,8 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # nolines option is set true
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
    );
     my $self = Parrot::Ops2pm::Utils->new( {
         argv            => [ @ARGV ],
@@ -91,9 +91,9 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # mistakenly list an ops file twice; confirm warning is correct
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
+        src/ops/bit.ops
     );
     my $self = Parrot::Ops2pm::Utils->new( {
         argv            => [ @ARGV ],
@@ -148,9 +148,9 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # provide experimental.ops as one argument
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
-        src/ops/experimental.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
+        src/ops/experimental.ops
     );
     my $self = Parrot::Ops2pm::Utils->new( {
         argv            => [ @ARGV ],
@@ -179,8 +179,8 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # provide a file with good name but bad content
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
     );
     my $cwd = cwd();
     {
@@ -207,7 +207,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             nolines         => undef,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         eval { $self->prepare_ops; };
         like($@, qr/OPS invalid for.*?cmp\.ops/,
             "ops file with bad content correctly detected");
@@ -230,13 +230,13 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable methods of 
-F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.   
-By doing so, they test the functionality of the F<ops2pm.pl> utility.  
-That functionality has largely been extracted 
+The files in this directory test the publicly callable methods of
+F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
+By doing so, they test the functionality of the F<ops2pm.pl> utility.
+That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
-F<04-prepare_ops.t> tests whether C<Parrot::Ops2pm::Utils::prepare_ops()> 
+F<04-prepare_ops.t> tests whether C<Parrot::Ops2pm::Utils::prepare_ops()>
 works properly.
 
 =head1 TODO

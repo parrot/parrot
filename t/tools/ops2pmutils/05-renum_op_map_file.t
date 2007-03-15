@@ -30,8 +30,8 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # regular case
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
     );
     my $cwd = cwd();
     {
@@ -53,7 +53,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             renum           => 1,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -68,8 +68,8 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
 # explicit second argument
 {
     local @ARGV = qw(
-        src/ops/core.ops 
-        src/ops/bit.ops 
+        src/ops/core.ops
+        src/ops/bit.ops
     );
     my $cwd = cwd();
     {
@@ -91,7 +91,7 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             renum           => 1,
         } );
         isa_ok($self, q{Parrot::Ops2pm::Utils});
-    
+
         ok($self->prepare_ops, "prepare_ops() returned successfully");
         ok(defined($self->{ops}), "'ops' key has been defined");
 
@@ -117,13 +117,13 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable methods of 
-F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.   
-By doing so, they test the functionality of the F<ops2pm.pl> utility.  
-That functionality has largely been extracted 
+The files in this directory test the publicly callable methods of
+F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
+By doing so, they test the functionality of the F<ops2pm.pl> utility.
+That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
-F<05-renum_op_map_file.t> tests whether 
+F<05-renum_op_map_file.t> tests whether
 C<Parrot::Ops2pm::Utils::renum_op_map_file()> works properly.
 
 =head1 TODO

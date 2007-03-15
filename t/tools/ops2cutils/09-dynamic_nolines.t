@@ -76,7 +76,7 @@ sub test_dynops_nolines {
             argv            => $local_argv_ref,
             flag            => { dynamic => 1, nolines => 1 },
         } );
-        ok(defined $self, 
+        ok(defined $self,
             "Constructor correctly returned when provided >= 1 arguments");
 
         my $c_header_file = $self->print_c_header_file();
@@ -106,10 +106,10 @@ sub test_dynops_nolines {
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable subroutines of 
-F<lib/Parrot/Ops2c/Utils.pm> and F<lib/Parrot/Ops2c/Auxiliary.pm>.   
-By doing so, they test the functionality of the F<ops2c.pl> utility.  
-That functionality has largely been extracted 
+The files in this directory test the publicly callable subroutines of
+F<lib/Parrot/Ops2c/Utils.pm> and F<lib/Parrot/Ops2c/Auxiliary.pm>.
+By doing so, they test the functionality of the F<ops2c.pl> utility.
+That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
 All the files in this directory are intended to be run B<after>
@@ -118,7 +118,7 @@ are B<not> part of the test suite run by F<make test>.   Once you have run
 F<Configure.pl>, however, you may run these tests as part of F<make
 buildtools_tests>.
 
-F<09-dynamic_nolines.t> tests whether 
+F<09-dynamic_nolines.t> tests whether
 C<Parrot::Ops2c::Utils::new()> work properly when the C<--nolines> and
 C<--dynamic> options are passed to F<tools/build/ops2c.pl>.
 

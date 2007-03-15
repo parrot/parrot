@@ -75,7 +75,7 @@ my ($msg, $tie);
         } );
         $msg = $tie->READLINE;
         untie *STDERR or croak "Unable to untie";
-        ok(defined $self, 
+        ok(defined $self,
             "Constructor correctly returned when provided >= 1 arguments");
         like($msg,
             qr/Ops file 'dan\.ops' mentioned more than once!/,
@@ -105,7 +105,7 @@ sub test_dynops {
             argv            => $local_argv_ref,
             flag            => { dynamic => 1 },
         } );
-        ok(defined $self, 
+        ok(defined $self,
             "Constructor correctly returned when provided >= 1 arguments");
 
         my $c_header_file = $self->print_c_header_file();
@@ -138,10 +138,10 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable subroutines of 
-F<lib/Parrot/Ops2c/Utils.pm> and F<lib/Parrot/Ops2c/Auxiliary.pm>.   
-By doing so, they test the functionality of the F<ops2c.pl> utility.  
-That functionality has largely been extracted 
+The files in this directory test the publicly callable subroutines of
+F<lib/Parrot/Ops2c/Utils.pm> and F<lib/Parrot/Ops2c/Auxiliary.pm>.
+By doing so, they test the functionality of the F<ops2c.pl> utility.
+That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
 All the files in this directory are intended to be run B<after>
@@ -150,7 +150,7 @@ are B<not> part of the test suite run by F<make test>.   Once you have run
 F<Configure.pl>, however, you may run these tests as part of F<make
 buildtools_tests>.
 
-F<06-dynamic.t> tests how well 
+F<06-dynamic.t> tests how well
 C<Parrot::Ops2c::Utils()> works when the C<--dynamic> flag is passed to
 F<tools/build/ops2c.pl>.
 

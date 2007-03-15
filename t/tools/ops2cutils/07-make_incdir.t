@@ -51,21 +51,21 @@ my $cwd = cwd();
     copy(qq{$cwd/$num}, qq{$tdir/$num});
     copy(qq{$cwd/$skip}, qq{$tdir/$skip});
     my @opsfiles = glob("./src/ops/*.ops");
-    
+
     mkdir qq{$tdir/lib};
     mkdir qq{$tdir/lib/Parrot};
     mkdir qq{$tdir/lib/Parrot/Ops2c};
     mkdir qq{$tdir/include};
     mkdir qq{$tdir/include/parrot};
 #    mkdir qq{$tdir/include/parrot/oplib};
-    
+
     my $o2p = Parrot::Ops2pm::Utils->new( {
         argv            => [ @opsfiles ],
         script          => "tools/build/ops2pm.pl",
         moddir          => "lib/Parrot/OpLib",
         module          => "core.pm",
     } );
-    
+
     $o2p->prepare_ops();
     $o2p->load_op_map_files();
     $o2p->sort_ops();
@@ -86,7 +86,7 @@ my $cwd = cwd();
             argv            => [ @ARGV ],
             flag            => { core => 1 },
         } );
-        ok(defined $self, 
+        ok(defined $self,
             "Constructor correctly returned even though include/parrot/oplib had to be created");
     }
 }
@@ -103,7 +103,7 @@ sub test_single_trans {
             argv            => [ $trans ],
             flag            => { core => 1 },
         } );
-    ok(defined $self, 
+    ok(defined $self,
         "Constructor correct when provided with single argument $trans");
 }
 
@@ -119,10 +119,10 @@ sub test_single_trans {
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable subroutines of 
-F<lib/Parrot/Ops2c/Utils.pm> and F<lib/Parrot/Ops2c/Auxiliary.pm>.   
-By doing so, they test the functionality of the F<ops2c.pl> utility.  
-That functionality has largely been extracted 
+The files in this directory test the publicly callable subroutines of
+F<lib/Parrot/Ops2c/Utils.pm> and F<lib/Parrot/Ops2c/Auxiliary.pm>.
+By doing so, they test the functionality of the F<ops2c.pl> utility.
+That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
 All the files in this directory are intended to be run B<after>
@@ -131,7 +131,7 @@ are B<not> part of the test suite run by F<make test>.   Once you have run
 F<Configure.pl>, however, you may run these tests as part of F<make
 buildtools_tests>.
 
-F<07-make_incdir.t> tests whether C<Parrot::Ops2c::Utils::new()> 
+F<07-make_incdir.t> tests whether C<Parrot::Ops2c::Utils::new()>
 works properly when F<include/parrot/oplib> was not previously created..
 
 =head1 AUTHOR
