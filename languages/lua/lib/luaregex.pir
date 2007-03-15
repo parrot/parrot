@@ -190,6 +190,9 @@ Francois Perrad
     $P0 = getclass 'PGE::Exp::CCShortcut'
     $P1 = subclass $P0, 'PGE::Exp::LuaCCShortcut'
 
+    $P0 = getclass 'PGE::Exp::CGroup'
+    $P1 = subclass $P0, 'PGE::Exp::LuaCGroup'
+
     $P0 = getclass 'PGE::Exp'
     $P1 = subclass $P0, 'PGE::Exp::LuaBalanced'
 .end
@@ -293,7 +296,7 @@ Francois Perrad
     optable.newtok('term:%8', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('term:%9', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    optable.newtok('circumfix:( )',   'equiv'=>'term:', 'nows'=>1, 'nullterm'=>1, 'match'=>'PGE::Exp::CGroup')
+    optable.newtok('circumfix:( )',   'equiv'=>'term:', 'nows'=>1, 'nullterm'=>1, 'match'=>'PGE::Exp::LuaCGroup')
 
     $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_enumclass'
     optable.newtok('term:[', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
@@ -593,7 +596,7 @@ Francois Perrad
 .end
 
 
-.namespace [ 'PGE::Exp::CGroup' ]
+.namespace [ 'PGE::Exp::LuaCGroup' ]
 
 .sub 'luaanalyze' :method
     .param pmc pad
@@ -613,6 +616,43 @@ Francois Perrad
     exp = exp.'luaanalyze'(pad)
     self[0] = exp
     .return (self)
+.end
+
+.sub 'pir' :method
+    .param pmc code
+    .param string label
+    .param string next
+
+    $P0 = self[0]
+    $I0 = isa $P0, 'PGE::Exp::Literal'
+    unless $I0 goto super
+    $S0 = $P0
+    unless $S0 == '' goto super
+
+    .local pmc args
+    args = self.getargs(label, next)
+
+    .local string captgen, captsave, captback
+    (captgen, captsave, captback) = self.'gencapture'(label)
+
+    code.emit(<<"        CODE", captgen, captsave, captback, args :flat :named)
+        %L: # empty capture
+          %0
+          push ustack, captscope
+          new captob, .Integer
+          set captob, pos
+          inc captob
+          %1
+          bsr %S
+          %2
+          captscope = pop ustack
+          goto fail\n
+        CODE
+    .return ()
+
+  super:
+    $P0 = get_hll_global ['PGE::Exp::CGroup'], 'pir'
+    .return $P0(self, code, label, next)
 .end
 
 

@@ -253,8 +253,6 @@ that if C<plain> is given, then C<init> must be given as well.
 If the pattern has captures, then in a successful match the captured values
 are also returned, after the two indices.
 
-STILL INCOMPLETE (see F<languages/lua/lib/luaregex.pir>).
-
 =cut
 
 .sub '_string_find' :anon
@@ -359,23 +357,14 @@ L7:
 L2:
     unless $I0 < $I1 goto L3
     $P0 = capts[$I0]
-    $S0 = $P0.'text'()
-    $I2 = index $S0, "\0"
-    if $I2 < 0 goto L4
-    # sorry, strictly compatible
-    $S0 = substr $S0, 0, $I2
+    $I10 = can $P0, 'text'
+    if $I10 goto L4
+    $I10 = $P0
+    new $P1, .LuaNumber
+    set $P1, $I10
+    goto L5
 L4:
-    new $P1, .LuaString
-    set $P1, $S0
-    ret[$I0] = $P1
-    inc $I0
-    goto L2
-L3:
-    .return (ret)
-L1:
-    unless whole == 1 goto L5
-    set ret, 1
-    $S0 = match.'text'()
+    $S0 = $P0.'text'()
     $I2 = index $S0, "\0"
     if $I2 < 0 goto L6
     # sorry, strictly compatible
@@ -383,8 +372,25 @@ L1:
 L6:
     new $P1, .LuaString
     set $P1, $S0
-    ret[0] = $P1
 L5:
+    ret[$I0] = $P1
+    inc $I0
+    goto L2
+L3:
+    .return (ret)
+L1:
+    unless whole == 1 goto L7
+    set ret, 1
+    $S0 = match.'text'()
+    $I2 = index $S0, "\0"
+    if $I2 < 0 goto L8
+    # sorry, strictly compatible
+    $S0 = substr $S0, 0, $I2
+L8:
+    new $P1, .LuaString
+    set $P1, $S0
+    ret[0] = $P1
+L7:
     .return (ret)
 .end
 
@@ -612,8 +618,6 @@ table:
         t[k] = v
     end
 
-STILL INCOMPLETE (see F<languages/lua/lib/luaregex.pir>).
-
 =cut
 
 .sub '_string_gmatch' :anon :lex
@@ -674,8 +678,6 @@ string.
 The optional last parameter C<n> limits the maximum number of substitutions
 to occur. For instance, when C<n> is 1 only the first occurrence of C<pat>
 is replaced.
-
-STILL INCOMPLETE (see F<languages/lua/lib/luaregex.pir>).
 
 =cut
 
@@ -750,9 +752,7 @@ L3:
 L4:
     $I0 = isa repl, 'LuaTable'
     unless $I0 goto L6
-    $S0 = onecapture(match, 0)
-    new $P0, .LuaString
-    set $P0, $S0
+    $P0 = onecapture(match, 0)
     $P1 = repl[$P0]
     goto L5
 L6:
@@ -825,17 +825,26 @@ L2:
 .sub 'onecapture' :anon
     .param pmc match
     .param int i
-    push_eh _handler
     $P0 = match.'get_array'()
     $P1 = $P0[i]
+    unless $P1 goto L1
+    $I0 = can $P1, 'text'
+    if $I0 goto L2
+    $I0 = $P1
+    new $P0, .LuaNumber
+    set $P0, $I0
+    .return ($P0)
+L2:
     $S0 = $P1.'text'()
     $I0 = index $S0, "\0"
-    if $I0 < 0 goto L1
+    if $I0 < 0 goto L3
     # sorry, strictly compatible
     $S0 = substr $S0, 0, $I0
+L3:
+    new $P0, .LuaString
+    set $P0, $S0
+    .return ($P0)
 L1:
-    .return ($S0)
-_handler:
     error("invalid capture index")
 .end
 
@@ -883,8 +892,6 @@ one, then C<match> returns the captures from the pattern; otherwise it
 returns B<nil>. If C<pattern> specifies no captures, then the whole match is
 returned. A third, optional numerical argument C<init> specifies where to
 start the search; its default value is 1 and may be negative.
-
-STILL INCOMPLETE (see F<languages/lua/lib/luaregex.pir>).
 
 =cut
 

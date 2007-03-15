@@ -58,7 +58,6 @@ my @test_files = (
 );
 
 my %todo_info = (
-    7   => 'empty capture',
 );
 
 my $test_number = 0;
