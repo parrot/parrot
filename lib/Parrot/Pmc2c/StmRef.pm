@@ -1,5 +1,6 @@
 package Parrot::Pmc2c::STMRef;
 use base 'Parrot::Pmc2c::Ref';
+use warnings;
 
 =head1 Parrot::Pmc2c::STMRef Instance Methods
 

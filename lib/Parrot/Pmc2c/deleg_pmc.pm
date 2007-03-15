@@ -1,5 +1,6 @@
 package Parrot::Pmc2c::deleg_pmc;
 use base 'Parrot::Pmc2c';
+use warnings;
 use Parrot::Pmc2c::UtilFunctions qw( gen_ret );
 
 =over 4

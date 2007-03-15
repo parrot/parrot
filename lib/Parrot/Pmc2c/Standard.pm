@@ -8,6 +8,7 @@ Standard behavior.
 
 package Parrot::Pmc2c::Standard;
 use base 'Parrot::Pmc2c';
+use warnings;
 
 =item C<body($method, $line, $out_name)>
 

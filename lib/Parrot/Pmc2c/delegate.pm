@@ -6,6 +6,7 @@
 
 package Parrot::Pmc2c::delegate;
 use base 'Parrot::Pmc2c';
+use warnings;
 
 =item C<implements($method)>
 

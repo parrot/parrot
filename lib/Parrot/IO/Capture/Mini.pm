@@ -2,6 +2,7 @@
 # $Id$
 package Parrot::IO::Capture::Mini;
 use strict;
+use warnings;
 
 sub TIEHANDLE {
     my $class = shift;

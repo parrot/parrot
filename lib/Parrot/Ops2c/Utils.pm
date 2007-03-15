@@ -2,6 +2,7 @@
 # $Id$
 package Parrot::Ops2c::Utils;
 use strict;
+use warnings;
 use lib ("lib/");
 use Parrot::OpLib::core;
 use Parrot::OpsFile;

@@ -6,6 +6,7 @@
 
 package Parrot::Pmc2c::SharedRef;
 use base 'Parrot::Pmc2c::Ref';
+use warnings;
 
 =item C<prederef($method)>
 
