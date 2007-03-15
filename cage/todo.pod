@@ -32,19 +32,6 @@ L<http://developers.sun.com/prodtech/cc/>.  Its lint is the best one
 out there, except from Gimpel's FlexeLint
 (L<http://www.gimpel.com/html/flex.htm>) which costs many dollars.
 
-=over 4
-
-=item * Create a F<make> target for lint.
-
-Make lint run against all the F<*.c> files.
-
-=item * Make a reasonable set of rules for lint.
-
-Andy has a pretty decent set of rules for perl5's code in that
-project's Makefile.  Take a look at those for a start.
-
-=back
-
 =head2 Enforcing coding standards, naming conventions, etc
 
 =over 4
