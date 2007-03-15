@@ -528,6 +528,10 @@ sub rewrite_pminvoke {
       parrot_context_t *ctx = Parrot_push_context(interp, n_regs_used);
       PMC* pminvoke_meth;
 
+      PMC* save_current_args = interp->current_args;
+      PMC* save_args_signature = interp->args_signature;
+      PMC* save_current_object = interp->current_object;
+
       interp->current_args = arg_indexes;
       interp->args_signature = args_sig;
       ctx->current_results = result_indexes;
@@ -561,6 +565,9 @@ END
     PObj_live_CLEAR(args_sig);
     PObj_live_CLEAR(results_sig);
     Parrot_pop_context(interp);
+    interp->current_args = save_current_args;
+    interp->args_signature = save_args_signature;
+    interp->current_object = save_current_object;
     }
     /*END PMINVOKE $name */
 END
