@@ -9,7 +9,7 @@ use Parrot::Ops2c::Utils;
 
 my $flagref = getoptions();
 if (
-        (not defined $flagref) or 
+        (not defined $flagref) or
         $flagref->{help} or
         (not @ARGV)
     ) {
@@ -131,11 +131,11 @@ to which the tests exercise the code.
 Based on the commit logs, the following members of the Parrot project have
 contributed to this program:
 
-    ambs bernhard boemmels brentdax chip 
-    coke dan gregor grunblatt jgoff 
-    jkeenan jonathan josh jrieks leo 
-    mikescott mrjoltcola nicholas particle paultcochrane 
-    petdance rgrjr robert simon 
+    ambs bernhard boemmels brentdax chip
+    coke dan gregor grunblatt jgoff
+    jkeenan jonathan josh jrieks leo
+    mikescott mrjoltcola nicholas particle paultcochrane
+    petdance rgrjr robert simon
 
 =head1 SEE ALSO
 

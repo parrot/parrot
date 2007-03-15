@@ -27,7 +27,7 @@ my $self = Parrot::Ops2pm::Utils->new( {
 } );
 
 $self->prepare_ops();
-    
+
 if ($flagref->{renum}) {
     $self->renum_op_map_file();
     exit 0;
@@ -55,7 +55,7 @@ tools/build/ops2pm.pl - Generate Perl module from operation definitions
 =head1 DESCRIPTION
 
 Reads the ops files listed on the command line and outputs a
-F<Parrot::OpLib::core> module containing information about the ops.  
+F<Parrot::OpLib::core> module containing information about the ops.
 Also outputs F<include/parrot/oplib/ops.h>.  This program is called by Parrot's
 F<make>.
 
@@ -81,10 +81,10 @@ order in the given ops files. See also F<tools/dev/ops_renum.mak>.
 
 =back
 
-Most of the functionality in this program is now held in Parrot::Ops2pm::Util 
-methods and a small number of Parrot::Ops2pm::Auxiliary subroutines.  
+Most of the functionality in this program is now held in Parrot::Ops2pm::Util
+methods and a small number of Parrot::Ops2pm::Auxiliary subroutines.
 See those modules' documentation for discussion of those functions.
-Revisions to the functionality should be made in those packages and tested 
+Revisions to the functionality should be made in those packages and tested
 against tests found in F<t/tools/ops2pmutils/>.
 
 =head1 WARNING
@@ -156,7 +156,7 @@ Others who provided code cited in the version control logs include:
   Andy Dougherty
   Jeff Gof
   Steve Fink
-  
+
 =cut
 
 # Local Variables:
