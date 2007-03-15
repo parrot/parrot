@@ -391,7 +391,7 @@ Return the parents array PMC.
 =cut
 
 */
-    PMETHOD void add_parent(PMC* parent) {
+    PMETHOD void add_parent(PMC *parent) {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
 
         /* If we've been instantiated already, need a new class. */
@@ -413,6 +413,30 @@ Return the parents array PMC.
         VTABLE_push_pmc(interp, class->parents, parent);
     }
 
+/*
+
+=item C<void add_method(STRING *name, PMC *sub)>
+
+Adds the given sub PMC as a method with the given name.
+
+=cut
+
+*/
+    PMETHOD void add_method(STRING *name, PMC *sub)
+    {
+        Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+
+        /* If we have already added a method with this name... */
+        if (VTABLE_exists_keyed_str(interp, class->methods, name)) {
+            /* XXX Need to handle multi methods here. */
+            real_exception(interp, NULL, E_NotImplementedError,
+                "Currently, adding multiple methods of the same name is not supported.");
+        }
+        else {
+            /* Enter it into the table. */
+            VTABLE_set_pmc_keyed_str(interp, class->methods, name, sub);
+        }
+    }
 
 /*
 
@@ -478,6 +502,38 @@ will be useless anyway, since only the Object knows what to do with it.
 
         preturn(int index);
     }
+
+/*
+
+=item C<void _get_method_pmc(STRING *name)>
+
+This walks the method resolution order and tries to locate a method of the
+give name. Returns the first one it finds, or NULL if no method is found.
+This method is intended to be used by the Object PMC.
+
+=cut
+
+*/
+    PMETHOD void _get_method_pmc(STRING *name) {
+        Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+
+        /* Walk and search. */
+        PMC *found = NULL;
+        int num_classes = VTABLE_elements(interp, class->all_parents);
+        int i;
+        for (i = 0; i < num_classes; i++) {
+            /* Get the class and see if it has the method. */
+            PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, class->all_parents, i);
+            Parrot_MetaClass *class_info = PARROT_METACLASS(cur_class);
+            if (VTABLE_exists_keyed_str(interp, class_info->methods, name)) {
+                /* Found it! */
+                found = VTABLE_get_pmc_keyed_str(interp, class_info->methods, name);
+            }
+        }
+
+        preturn(PMC *found);
+    }
+
 
 } /* END pmclass */
 
