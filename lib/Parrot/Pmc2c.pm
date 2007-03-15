@@ -235,7 +235,7 @@ sub make_ro {
 
 =item C<init()>
 
-Initializes the instance. 
+Initializes the instance.
 
 =cut
 
@@ -259,7 +259,7 @@ sub init {
         # Since singletons are shared between interpreters, we need to make special effort to use
         # the right namespace for method lookups.
         #
-        # Note that this trick won't work if the singleton inherits from something else 
+        # Note that this trick won't work if the singleton inherits from something else
         # (because the MRO will still be shared).
         unless ( $self->implements('namespace') or $self->{super}{'namespace'} ne 'default' )
         {
@@ -556,7 +556,7 @@ EOH
         }
 
     }
-    
+
     $cout .= $self->decl( $classname, $method, 0 );
 
     if ( exists $method->{pre_block} ) {
@@ -1177,14 +1177,14 @@ sub implements_vtable {
 =cut
 
 require Parrot::Pmc2c::default;
-require Parrot::Pmc2c::delegate;  
+require Parrot::Pmc2c::delegate;
 require Parrot::Pmc2c::deleg_pmc;
 require Parrot::Pmc2c::Null;
 require Parrot::Pmc2c::Ref;
 require Parrot::Pmc2c::SharedRef;
 require Parrot::Pmc2c::Standard;
 require Parrot::Pmc2c::StandardConst;
-require Parrot::Pmc2c::StandardRO;  
+require Parrot::Pmc2c::StandardRO;
 require Parrot::Pmc2c::StmRef;
 
 1;

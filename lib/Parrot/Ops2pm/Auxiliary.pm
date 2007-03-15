@@ -36,7 +36,7 @@ Parrot::Ops2pm::Auxiliary - Non-method subroutines holding functionality for F<t
 =head1 SYNOPSIS
 
     use Parrot::Ops2pm::Auxiliary qw( Usage getoptions );
-    
+
     Usage();
 
     $flagref = getoptions();

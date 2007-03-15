@@ -29,7 +29,7 @@ Parrot::Ops2c::Utils - Methods holding functionality for F<tools/build/ops2c.pl>
 Parrot::Ops2c::Utils provides methods called by F<tools/build/ops2c.pl>, a
 program which is called at various points in the Parrot F<make> process.
 The program's function is to create a pair of C header (F<*.h>) and
-implementation (F<*.c>) files from the operation definitions found in 
+implementation (F<*.c>) files from the operation definitions found in
 one or more F<*.ops> files.
 
 The functionality originally found in F<tools/build/ops2c.pl> has been
@@ -52,7 +52,7 @@ and initialize a Parrot::Ops2c::Utils object.
 Hash reference with the following elements:
 
     argv        :   reference to @ARGV
-    flag        :   hash reference which is the return value of 
+    flag        :   hash reference which is the return value of
                     Parrot::Ops2c::Utils::getoptions();
                     hash will have keys such as 'core', 'dynamic' or 'nolines'
     script      :   name of the script to be executed by 'make'
@@ -126,7 +126,7 @@ sub new {
         $flagref->{dynamic} = 1;
     }
 
-    my $sym_export = $flagref->{dynamic} 
+    my $sym_export = $flagref->{dynamic}
         ? 'PARROT_DYNEXT_EXPORT'
         : 'PARROT_API';
 
@@ -313,7 +313,7 @@ sub _print_run_core_func_decl_header {
     my ($self, $fh) = @_;
 
     if ( $self->{trans}->can("run_core_func_decl") ) {
-        my $run_core_func = 
+        my $run_core_func =
             $self->{trans}->run_core_func_decl($self->{base});
         print $fh "$run_core_func;\n";
     } else {
@@ -340,7 +340,7 @@ END_C
 
 =item * Purpose
 
-Writes the top half of a C-source file corresponding to a particular op.  
+Writes the top half of a C-source file corresponding to a particular op.
 Such files will have names like these:
 
     src/ops/core_ops.c
@@ -356,7 +356,7 @@ Returns a still-open filehandle to the C-source file.
 
 =item * Comment
 
-B<Q:>  Why does this method write only the top-half of the C-source file 
+B<Q:>  Why does this method write only the top-half of the C-source file
 rather than the whole thing?
 
 B<A:>  Mainly for convenience in maintenance and testing.
@@ -559,8 +559,8 @@ END_C
     # Finish the SOURCE file's array initializer:
     my $CORE_SPLIT = 300;
     for ( my $i = 0 ; $i < @op_funcs ; $i++ ) {
-        if ( $i && 
-            $i % $CORE_SPLIT == 0 && 
+        if ( $i &&
+            $i % $CORE_SPLIT == 0 &&
             $self->{trans}->can("run_core_split") )
         {
             print $fh $self->{trans}->run_core_split($self->{base});
@@ -580,7 +580,7 @@ END_C
 
 =item * Purpose
 
-Writes the bottom half of a C-source file corresponding to a particular op.  
+Writes the bottom half of a C-source file corresponding to a particular op.
 
 =item * Arguments
 
@@ -605,28 +605,28 @@ sub print_c_source_bottom {
     my $index = $self->{index};
 
     $SOURCE = $self->_reset_line_number($SOURCE);
-    
+
     $self->_op_func_table($SOURCE);
-    
+
     $self->{names} = {};
     $self->_op_info_table($SOURCE);
 
     $self->_op_lookup($SOURCE);
-    
+
     $self->_print_op_lib_descriptor($SOURCE);
-    
+
     $self->_generate_init_func($SOURCE);
-    
+
     $self->_print_dynamic_lib_load($SOURCE);
-    
+
     _print_coda($SOURCE);
-    
+
     close $SOURCE or die "Unable to close handle to $self->{source}: $!";
-    
+
     my $c_source_final = $self->_rename_source();
     return $c_source_final;
 }
-    
+
 sub _reset_line_number {
     my ($self, $fh) = @_;
 
@@ -652,7 +652,7 @@ sub _op_func_table {
     my ( $op_info, $op_func, $getop );
     $op_info = $op_func = 'NULL';
     $getop = '( int (*)(const char *, int) )NULL';
-    
+
     if ( $self->{suffix} eq '' ) {
         $op_func = $self->{bs} . q{op_func_table};
         print $fh <<END_C;
@@ -693,7 +693,7 @@ sub _op_info_table {
 
     if ( $self->{suffix} eq '' ) {
         $self->{op_info} = "$self->{bs}op_info_table";
-    
+
         #
         # Op Info Table:
         #
@@ -707,7 +707,7 @@ static op_info_t $self->{op_info}\[$self->{num_entries}] = {
 END_C
 
         $self->{index} = 0;
-    
+
         foreach my $op ( $self->{ops}->ops ) {
             my $type = sprintf( "PARROT_%s_OP", uc $op->type );
             my $name = $op->name;
@@ -717,7 +717,7 @@ END_C
             my $body      = $op->body;
             my $jump      = $op->jump || 0;
             my $arg_count = $op->size;
-    
+
             ## 0 inserted if arrays are empty to prevent msvc compiler errors
             my $arg_types = "{ "
                 . join( ", ",
@@ -738,7 +738,7 @@ END_C
                 : 0
                 ) . " }";
             my $flags = 0;
-    
+
             print $fh <<END_C;
   { /* $self->{index} */
     /* type $type, */
@@ -920,13 +920,13 @@ sub _generate_init_func {
     if ( $self->{trans}->can("init_func_init1") ) {
         $init1_code = $self->{trans}->init_func_init1($self->{base});
     }
-    
+
     my $init_set_dispatch = "";
     if ( $self->{trans}->can("init_set_dispatch") ) {
-        $init_set_dispatch 
+        $init_set_dispatch
             = $self->{trans}->init_set_dispatch($self->{bs});
     }
-    
+
     print $fh <<END_C;
 op_lib_t *
 $self->{init_func}(long init) {
@@ -997,7 +997,7 @@ sub _rename_source {
 
 =item * Parrot::OpLib::core
 
-This package is not part of the Parrot distribution.  It is created during 
+This package is not part of the Parrot distribution.  It is created during
 Parrot's F<make> process before the first invocation of F<tools/build/ops2c.pl>.
 
 =back

@@ -42,13 +42,13 @@ sub getoptions {
 
 =head1 NAME
 
-Parrot::Ops2c::Auxiliary - Non-method subroutines holding functionality for 
+Parrot::Ops2c::Auxiliary - Non-method subroutines holding functionality for
 F<tools/build/ops2c.pl>.
 
 =head1 SYNOPSIS
 
     use Parrot::Ops2c::Auxiliary qw( Usage getoptions );
-    
+
     Usage();
 
     $flagref = getoptions();

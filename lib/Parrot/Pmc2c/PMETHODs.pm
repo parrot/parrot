@@ -268,7 +268,7 @@ sub parse_pmethod_invoke {
   if ( $#results >= 3)
   {
     my $rest = pop @results;
-    
+
     # Need to add object to the signature so it gets passed.
     $rest = "PMC* $results[1]" . ($rest ? ", $rest" : "");
 

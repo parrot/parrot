@@ -432,7 +432,7 @@ any external modules Parrot might have.
 
 =item C<get_perl_exemption_regexp()>
 
-Returns a list of regular expressions containing the currently 
+Returns a list of regular expressions containing the currently
 coding-standard-exempt Perl files within Parrot
 
 =cut
@@ -546,7 +546,7 @@ sub perl_script_file_directories
             'examples/benchmarks', 'examples/mops',
             'languages',
             map("languages/$_" => qw<
-                APL/tools 
+                APL/tools
                 BASIC/compiler BASIC/interpreter
                 WMLScript/build
                 dotnet dotnet/build dotnet/tools
@@ -602,11 +602,11 @@ sub perl_module_file_directories
     return
         map $self->directory_with_name($_) =>
             map("config/$_" => qw<auto auto/cpu/i386 auto/cpu/ppc
-                auto/cpu/sun4 auto/cpu/x86_64 
+                auto/cpu/sun4 auto/cpu/x86_64
                 gen gen/cpu/i386 gen/cpu/x86_64 init init/hints inter>),
             'ext/Parrot-Embed/lib/Parrot',
             map("languages/$_" => qw<
-                APL/t 
+                APL/t
                 BASIC/compiler
                 HQ9plus/lib/Parrot/Test
                 WMLScript/build/SRM WMLScript/t/Parrot/Test
