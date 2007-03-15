@@ -27,10 +27,6 @@ the Parrot will be nicer.
 
 =over 4
 
-=item * Create a F<make> target for splint.
-
-Make splint run against all the F<*.c> files.
-
 =item * Make a reasonable set of rules for splint.
 
 splint spews many many errors by default.  Take a look at the
