@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: 04-print_c_source_top.t 17373 2007-03-07 00:58:56Z jkeenan $
+# $Id$
 # 04-print_c_source_top.t
 
 use strict;

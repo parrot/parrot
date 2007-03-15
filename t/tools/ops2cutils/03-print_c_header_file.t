@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: 03-print_c_header_file.t 17373 2007-03-07 00:58:56Z jkeenan $
+# $Id$
 # 03-print_c_header_file.t
 
 use strict;

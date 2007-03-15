@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: 08-nolines.t 17373 2007-03-07 00:58:56Z jkeenan $
+# $Id$
 # 08-nolines.t
 
 use strict;

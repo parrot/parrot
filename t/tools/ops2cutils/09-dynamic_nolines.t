@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: 09-dynamic_nolines.t 17373 2007-03-07 00:58:56Z jkeenan $
+# $Id$
 # 09-dynamic_nolines.t
 
 use strict;
