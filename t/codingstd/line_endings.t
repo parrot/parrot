@@ -57,7 +57,7 @@ foreach my $file (@files) {
 }
 
 ok( !scalar(@dos_files), 'Line endings correct' )
-    or diag( "DOS line ending found in " . scalar @dos_files . 
+    or diag( "DOS line ending found in " . scalar @dos_files .
         " files:\n@dos_files" );
 
 exit;
