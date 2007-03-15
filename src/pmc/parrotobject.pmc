@@ -164,39 +164,90 @@ Return the class of this object.
 
     PMC* find_method(STRING* name) {
         PMC *class = VTABLE_get_class(INTERP, SELF);
-        return VTABLE_find_method(INTERP, class, name);
+        STRING *meth = CONST_STRING(interp, "__find_method");
+        STRING *meth_v = CONST_STRING(interp, "find_method");
+        PMC *sub = Parrot_find_vtable_meth(interp, SELF, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interp, SELF, meth);
+        if (PMC_IS_NULL(sub))
+            return VTABLE_find_method(INTERP, class, name);
+        return (PMC*) Parrot_run_meth_fromc_args(interp, sub,
+            SELF, meth, "PS", name);
     }
 
     PMC* get_attr(INTVAL idx) {
-        return Parrot_get_attrib_by_num(INTERP, SELF, idx);
+        STRING *meth = CONST_STRING(interp, "__get_attr");
+        STRING *meth_v = CONST_STRING(interp, "get_attr");
+        PMC *sub = Parrot_find_vtable_meth(interp, SELF, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interp, SELF, meth);
+        if (PMC_IS_NULL(sub))
+            return Parrot_get_attrib_by_num(INTERP, SELF, idx);
+        return (PMC*) Parrot_run_meth_fromc_args(interp, sub,
+            SELF, meth, "PI", idx);
     }
 
     PMC* get_attr_str(STRING* idx) {
-        return Parrot_get_attrib_by_str(INTERP, SELF, idx);
+        STRING *meth = CONST_STRING(interp, "__get_attr_str");
+        STRING *meth_v = CONST_STRING(interp, "get_attr_str");
+        PMC *sub = Parrot_find_vtable_meth(interp, SELF, meth_v);
+        PMC* r;
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interp, SELF, meth);
+        if (PMC_IS_NULL(sub))
+            r = Parrot_get_attrib_by_str(INTERP, SELF, idx);
+        else r = (PMC*) Parrot_run_meth_fromc_args(interp, sub,
+            SELF, meth, "PS", idx);
+        return r;
     }
 
     void set_attr(INTVAL idx, PMC* value) {
-        Parrot_set_attrib_by_num(INTERP, SELF, idx, value);
+        STRING *meth = CONST_STRING(interp, "__set_attr");
+        STRING *meth_v = CONST_STRING(interp, "set_attr");
+        PMC *sub = Parrot_find_vtable_meth(interp, SELF, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interp, SELF, meth);
+        if (PMC_IS_NULL(sub))
+            return Parrot_set_attrib_by_num(INTERP, SELF, idx, value);
+        (PMC*) Parrot_run_meth_fromc_args(interp, sub,
+            SELF, meth, "vIP", idx, value);
     }
 
     void set_attr_str(STRING* idx, PMC* value) {
-        Parrot_set_attrib_by_str(INTERP, SELF, idx, value);
+        STRING *meth = CONST_STRING(interp, "__set_attr_str");
+        STRING *meth_v = CONST_STRING(interp, "set_attr_str");
+        PMC *sub = Parrot_find_vtable_meth(interp, SELF, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interp, SELF, meth);
+        if (PMC_IS_NULL(sub))
+            return Parrot_set_attrib_by_str(INTERP, SELF, idx, value);
+        (PMC*) Parrot_run_meth_fromc_args(interp, sub,
+            SELF, meth, "vSP", idx, value);
     }
 
     PMC* get_class() {
-        if (!PObj_is_PMC_shared_TEST(SELF)) {
-            return GET_CLASS(PMC_data(SELF), SELF);
-        }
-        else {
-            /* get the class object for this interpreter */
-            /* XXX this is rather a hack, it is, however, necessary:
-             * otherwise we will be accessing the wrong interpreter's
-             * namespace
-             */
-            int type_num = SELF->vtable->base_type;
-
-            return INTERP->vtables[type_num]->class;
-        }
+        STRING *meth = CONST_STRING(interp, "__get_class");
+        STRING *meth_v = CONST_STRING(interp, "get_class");
+        PMC *sub = Parrot_find_vtable_meth(interp, SELF, meth_v);
+        if (PMC_IS_NULL(sub))
+            sub = find_meth(interp, SELF, meth);
+        if (PMC_IS_NULL(sub)) {
+            if (!PObj_is_PMC_shared_TEST(SELF)) {
+                return GET_CLASS(PMC_data(SELF), SELF);
+            }
+            else {
+                /* get the class object for this interpreter */
+                /* XXX this is rather a hack, it is, however, necessary:
+                 * otherwise we will be accessing the wrong interpreter's
+                 * namespace
+                 */
+                int type_num = SELF->vtable->base_type;
+ 
+                return INTERP->vtables[type_num]->class;
+            }
+         }
+        return (PMC*) Parrot_run_meth_fromc_args(interp, sub,
+            SELF, meth, "P");
     }
 
 /*

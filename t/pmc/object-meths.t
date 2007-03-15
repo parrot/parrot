@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 43;
 
 =head1 NAME
 
@@ -1323,6 +1323,91 @@ pir_output_is( <<'CODE', <<'OUTPUT', "init calls" );
 CODE
 init was called
 init_pmc was called
+OUTPUT
+
+
+pir_output_is( <<'CODE', <<'OUTPUT', "overloading find_method vtable" );
+.sub main :main
+    .local pmc cl, o
+    cl = newclass 'MyClass'
+    o = new 'MyClass'
+    o.'foo'()
+.end
+
+.namespace ['MyClass']
+
+.sub find_method :method :vtable
+    .param string methodname
+    print "find_method was called\n"
+    $P0 = find_global "MyClass", methodname
+    .return($P0)
+.end
+
+.sub foo
+  print "foo was called\n"
+.end
+
+CODE
+find_method was called
+foo was called
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "overloading attribute accessor vtable" );
+.sub main :main
+    .local pmc cl, o
+    cl = newclass 'MyClass'
+    o = new 'MyClass'
+    $P2 = new String
+    $P2 = "blue"
+    setattribute o, 0, $P2
+    setattribute o, "blue", $P2
+    $P1 = getattribute o, 0
+    $P1 = getattribute o, "blue"
+.end
+
+.namespace ['MyClass']
+
+.sub get_attr :method :vtable
+    .param int offset
+    print "get_attr was called\n"
+.end
+.sub get_attr_str :method :vtable
+    .param string attrname
+    print "get_attr_str was called\n"
+.end
+.sub set_attr :method :vtable
+    .param int offset
+    .param pmc val
+    print "set_attr was called\n"
+.end
+.sub set_attr_str :method :vtable
+    .param string attrname
+    .param pmc val
+    print "set_attr_str was called\n"
+.end
+CODE
+set_attr was called
+set_attr_str was called
+get_attr was called
+get_attr_str was called
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "overloading get_class vtable" );
+.sub main :main
+    .local pmc cl, o, cl2
+    cl = newclass 'MyClass'
+    o = new 'MyClass'
+    cl2 = class o
+.end
+
+.namespace ['MyClass']
+
+.sub get_class :method :vtable
+    print "get_class was called\n"
+.end
+
+CODE
+get_class was called
 OUTPUT
 
 # Local Variables:

@@ -54,13 +54,13 @@ op callmethodcc(invar PMC, in STR) :object_base {
   object = $1;
   meth = $2;
   next = expr NEXT();
-  interp->current_object = object;
-  interp->current_cont = NEED_CONTINUATION;
   method_pmc = VTABLE_find_method(interp, object, meth);
   if (!method_pmc) {
     real_exception(interp, next, METH_NOT_FOUND,
         "Method '%Ss' not found", meth);
   }
+  interp->current_object = object;
+  interp->current_cont = NEED_CONTINUATION;
   dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
   goto ADDRESS(dest);
 }
@@ -90,13 +90,13 @@ op callmethod(invar PMC, in STR, invar PMC) :object_base {
   object = $1;
   meth = $2;
   next = expr NEXT();
-  interp->current_object = object;
-  interp->current_cont = $3;
   method_pmc = VTABLE_find_method(interp, object, meth);
   if (!method_pmc) {
     real_exception(interp, next, METH_NOT_FOUND,
         "Method '%Ss' not found", meth);
   }
+  interp->current_object = object;
+  interp->current_cont = $3;
   dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
   goto ADDRESS(dest);
 }
@@ -124,14 +124,14 @@ op tailcallmethod(invar PMC, in STR) :object_base {
 
   object = $1;
   meth = $2;
-  interp->current_cont = CONTEXT(interp->ctx)->current_cont;
-  PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
-  interp->current_object = object;
   method_pmc = VTABLE_find_method(interp, object, meth);
   if (!method_pmc) {
     real_exception(interp, next, METH_NOT_FOUND,
         "Method '%Ss' not found", meth);
   }
+  interp->current_cont = CONTEXT(interp->ctx)->current_cont;
+  PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
+  interp->current_object = object;
   dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
   goto ADDRESS(dest);
 }

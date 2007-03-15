@@ -572,3 +572,7 @@ E: nnunley@gmail.com
 N: Vishal Soni
 E: vishalrsoni@gmail.com
 D: Bug fixes in IMCC, ECMAScript
+
+N: Alek Storm
+E: alek.storm@gmail.com
+D: Fixed object vtable method overrides in PIR
