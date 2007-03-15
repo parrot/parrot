@@ -100,6 +100,8 @@ KEYWORD_EXP: {
 
 }    # KEYWORD_EXP
 
+=for skip
+
 ## eol-style must be set to 'native' for any manifest files with an explicit
 ## mime type of text/plain. Assume a default of text/plain if not specified
 
@@ -133,6 +135,8 @@ EOL_STYLE: {
     }
 
 }    # EOL_STYLE
+
+=cut
 
 =for skip
 
@@ -175,7 +179,7 @@ BEGIN {
     unless ( $Parrot::Revision::current or `svk ls .` ) {
         plan skip_all => 'not a working copy';
     }
-    else { plan tests => 3 }
+    else { plan tests => 2 }
 }
 
 exit;
