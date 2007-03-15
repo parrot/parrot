@@ -599,7 +599,7 @@ cleanup_next_for_GC_pool(Parrot_Interp interp,
                 if (p->pmc_ext)
                     PMC_next_for_GC(p) = NULL;
             }
-            p = (PMC *)((char *)p + sizeof (PMC));
+            p++;
         }
     }
 }

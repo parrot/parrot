@@ -95,11 +95,7 @@ static struct PackFile_Constant **find_constants(Interp*,
 
 #define ROUND_16(val) (((val) & 0xf) ? 16 - ((val) & 0xf) : 0)
 #define ALIGN_16(st, cursor) \
-    do { \
-        (cursor) = (opcode_t *) \
-           ((char *)(cursor) \
-            + ROUND_16((char *)(cursor) - (char *)(st))); \
-    } while (0)
+    (cursor) += ROUND_16( (char *)(cursor) - (char *)(st) )/sizeof(opcode_t)
 
 /*
 
@@ -559,7 +555,7 @@ PackFile_unpack(Interp *interp, struct PackFile *self,
      * Map the header on top of the buffer later when we are sure
      * we have alignment done right.
      */
-    cursor = (opcode_t*)((char*)packed + PACKFILE_HEADER_BYTES);
+    cursor = packed + PACKFILE_HEADER_BYTES/sizeof(opcode_t);
     memcpy(header, packed, PACKFILE_HEADER_BYTES);
 
     if (header->wordsize != 4 && header->wordsize != 8) {
