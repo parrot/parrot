@@ -114,9 +114,9 @@ if ( !keys %policies ) {
         'CodeLayout::UseParrotCoda'                       => 1,
         'CodeLayout::ProhibitDuplicateCoda'               => 1,
         'CodeLayout::ProhibitTrailingWhitespace'          => 1,
-        'CodeLayout::ProhibitHardTabs'                    => 
+        'CodeLayout::ProhibitHardTabs'                    =>
             { allow_leading_tabs => 0 },
-        'CodeLayout::RequireTidyCode'                     => 
+        'CodeLayout::RequireTidyCode'                     =>
             { perltidyrc => $perl_tidy_conf },
         'Subroutines::RequireFinalReturn'                 => 1,
     );
@@ -177,13 +177,13 @@ foreach my $file ( sort @files ) {
         my $policy = $violation->policy();
         $policy =~ s/^Perl::Critic::Policy:://;
         push @{$violations{$policy}},  $violation->to_string();
-    } 
+    }
 }
 
 foreach my $policy ( sort keys %violations ) {
     my @violations = @{$violations{$policy}};
-    ok ( ! @violations, $policy) 
-        or diag( "Policy: $policy failed in " . scalar @violations . 
+    ok ( ! @violations, $policy)
+        or diag( "Policy: $policy failed in " . scalar @violations .
                  " files:\n" . join ("\n", @violations) );
 }
 

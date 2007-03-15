@@ -84,7 +84,7 @@ for my $dir (@old_directory_list) {
 {
     my @perl_exemption_regexp;
     my @perl_files = $d->get_perl_language_files();
-    ok( ( @perl_exemption_regexp = $d->get_perl_exemption_regexp ), 
+    ok( ( @perl_exemption_regexp = $d->get_perl_exemption_regexp ),
         'Got perl exemption regexp');
     # check that exemptions found match those expected
     my @perl_exemptions;
@@ -100,7 +100,7 @@ for my $dir (@old_directory_list) {
         push @exemptions_in_perl_list, $file->path
             if (map $file->path =~ m/$_/, @perl_exemption_regexp);
     }
-    ok( ( !scalar @exemptions_in_perl_list ), 
+    ok( ( !scalar @exemptions_in_perl_list ),
         'No exemptions in Perl source list');
     if ( scalar @exemptions_in_perl_list ) {
         for my $exemption ( @exemptions_in_perl_list ) {
