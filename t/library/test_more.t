@@ -25,6 +25,7 @@
 	.IMPORT( 'Test::More', 'like' )
 	.IMPORT( 'Test::More', 'skip' )
 	.IMPORT( 'Test::More', 'is_deeply' )
+	.IMPORT( 'Test::More', 'isa_ok' )
 	.IMPORT( 'Test::Builder::Tester', 'plan' )
 	.IMPORT( 'Test::Builder::Tester', 'test_out' )
 	.IMPORT( 'Test::Builder::Tester', 'test_diag' )
@@ -32,13 +33,14 @@
 	.IMPORT( 'Test::Builder::Tester', 'test_pass' )
 	.IMPORT( 'Test::Builder::Tester', 'test_test' )
 
-	plan( 47 )
+	plan( 53 )
 	test_skip()
 	test_ok()
 	test_is()
 	test_like()
 	test_is_deeply()
 	test_diagnostics()
+	test_isa_ok()
 
 	test.'finish'()
 .end
@@ -359,4 +361,45 @@
 	test_out( 'ok 7 #skip skipped' )
 	skip()
 	test_test( 'skip()' )
+.end
+
+.sub test_isa_ok
+	.local pmc dog, terrier, daschund, Spot, Sossy
+
+	dog = newclass "dog"
+	terrier = subclass dog, "terrier"
+	daschund = subclass dog, "daschund"
+
+	Spot = new "terrier"
+	Sossy = new "daschund"
+
+	test_pass( 'Spot isa terrier' )
+	isa_ok(Spot, "terrier", "Spot")
+	test_test( 'passing isa_ok for PMC/string (class =)' )
+
+	test_pass( 'Spot isa dog' )
+	isa_ok(Spot, "dog", "Spot")
+	test_test( 'passing isa_ok for PMC/string (super)')
+
+	test_pass( 'Sossy isa daschund' )
+	$P1 = new String
+        $P1 = "daschund"
+	isa_ok(Sossy, $P1, "Sossy")
+	test_test( 'passing isa_ok for PMC/PMC (class =)' )
+
+	test_pass( 'Sossy isa dog' )
+	$P2 = new String
+        $P2 = "dog"
+	isa_ok(Sossy, $P2, "Sossy")
+	test_test( 'passing isa_ok for PMC/PMC (super)')
+
+	test_pass( 'The object isa terrier' )
+	isa_ok(Spot, "terrier")
+	test_test( 'passing isa_ok with no object description (class =)' )
+
+	test_fail( 'Spot isa daschund' )
+	test_diag( "Spot isn't a daschund it's a terrier" )
+	isa_ok(Spot, 'daschund', "Spot")
+	test_test( 'failing test isnt() for PMC/string')
+
 .end

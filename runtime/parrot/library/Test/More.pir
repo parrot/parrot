@@ -45,6 +45,11 @@ Test::More - Parrot extension for testing modules
 
     like( 'foo', 'f o**{2}', 'passing regex compare with diagnostic' )
 
+    $P0 = getclass "Squirrel"
+    $P0.new()
+
+    isa_ok($P0, "Squirrel", "new Squirrel")
+
 =head1 DESCRIPTION
 
 C<Test::More> is a pure-Parrot library for testing modules.  It provides
@@ -773,6 +778,51 @@ actually skipped.  Arguments are optional.
     .local pmc test
     find_global test, 'Test::More', '_test'
     test.'skip'()
+.end
+
+=item C<isa_ok( object, class_name, object_name )>
+
+Pass if the object C<isa> class of the given class name.  The object
+name passed in is not a full description, but a name to be included in
+the description. The description is presented as "<object_name> isa
+<class>".
+
+Good input: "C<new MyObject>", "C<return from bar()>"
+
+Bad input: "C<test that the return from Foo is correct type>"
+
+=cut
+
+.sub isa_ok
+    .param pmc thingy
+    .param pmc class_name
+    .param pmc object_name :optional
+    .param int got_name :opt_flag
+
+    .local pmc test
+    find_global test, 'Test::More', '_test'
+
+    .local string description, diagnostic
+    description = "The object"
+    unless got_name goto keep_default
+    description = object_name
+  keep_default:	
+    diagnostic = description
+    description .= " isa "
+    $S0 = class_name
+    description .= $S0
+
+    $I0 = isa thingy, class_name
+    test.'ok'($I0, description)
+    if $I0 goto out
+    diagnostic .= " isn't a "
+    $S1 = class_name
+    diagnostic .= $S1
+    diagnostic .= " it's a "
+    $S2 = typeof thingy
+    diagnostic .= $S2
+    test.'diag'(diagnostic)
+out:	
 .end
 
 .sub _make_diagnostic
