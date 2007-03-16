@@ -100,7 +100,8 @@ L<http://gnuwin32.sourceforge.net/>
 
 =item Optional utilities
 
-The availability of these utilities is checked by Configure.pl.
+The availability of these utilities is checked by Configure.pl
+or by some test.
 
 B<antlr> - ANother Tool for Language Recognition
 L<http://www.antlr.org/>
@@ -114,11 +115,14 @@ L<http://gnuwin32.sourceforge.net/>
 B<Python> - an interpreted, interactive, object-oriented programming language
 L<http://www.python.org/>
 
+B<SVN::Client> - Perl wrapper of Subversion client functions
+L<http://subversion.tigris.org/> (svn-win32-1.4.x_pl.zip)
+
 =item Inno Setup
 
 Inno Setup is a I<free> installer for Windows programs.
 
-The latest release of Inno Setup at the time of writing is 5.1.9.
+The latest release of Inno Setup at the time of writing is 5.1.11.
 
 The HomePage is on L<http://www.jrsoftware.org/>.
 
@@ -237,6 +241,6 @@ This document borrows heavily from Perl's README.win32.
 
 GCC/mingw32 support was added in 0.1.2 (François Perrad).
 
-Last updated: 18 January 2007
+Last updated: 15 March 2007
 
 =cut
