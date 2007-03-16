@@ -242,7 +242,7 @@ Return the class of this object.
                  * namespace
                  */
                 int type_num = SELF->vtable->base_type;
- 
+
                 return INTERP->vtables[type_num]->class;
             }
          }
