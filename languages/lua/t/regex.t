@@ -47,7 +47,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 149;
+use Parrot::Test tests => 150;
 use Test::More;
 use File::Spec;
 
@@ -58,6 +58,7 @@ my @test_files = (
 );
 
 my %todo_info = (
+    11  => 'bug on precedence',
 );
 
 my $test_number = 0;
