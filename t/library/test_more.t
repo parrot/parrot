@@ -1,10 +1,5 @@
 #!./parrot
 
-.macro IMPORT ( lib, subname )
-	import_sub = find_global .lib, .subname
-	store_global .subname, import_sub
-.endm
-
 .sub _main :main
 	load_bytecode 'library/Test/Builder/Tester.pir'
 	load_bytecode 'library/Test/More.pir'
@@ -18,20 +13,15 @@
 	.local pmc test
 	test = new tb_type, tb_args
 
-	.local pmc import_sub
-	.IMPORT( 'Test::More', 'ok' )
-	.IMPORT( 'Test::More', 'is' )
-	.IMPORT( 'Test::More', 'diag' )
-	.IMPORT( 'Test::More', 'like' )
-	.IMPORT( 'Test::More', 'skip' )
-	.IMPORT( 'Test::More', 'is_deeply' )
-	.IMPORT( 'Test::More', 'isa_ok' )
-	.IMPORT( 'Test::Builder::Tester', 'plan' )
-	.IMPORT( 'Test::Builder::Tester', 'test_out' )
-	.IMPORT( 'Test::Builder::Tester', 'test_diag' )
-	.IMPORT( 'Test::Builder::Tester', 'test_fail' )
-	.IMPORT( 'Test::Builder::Tester', 'test_pass' )
-	.IMPORT( 'Test::Builder::Tester', 'test_test' )
+	.local pmc exports, curr_namespace, test_namespace
+	curr_namespace = get_namespace
+	test_namespace = get_namespace [ "Test::More" ]
+	exports = split " ", "ok is diag like skip is_deeply isa_ok"
+	test_namespace.export_to(curr_namespace, exports)
+
+	test_namespace = get_namespace [ "Test::Builder::Tester" ]
+	exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
+	test_namespace.export_to(curr_namespace, exports)
 
 	plan( 53 )
 	test_skip()
