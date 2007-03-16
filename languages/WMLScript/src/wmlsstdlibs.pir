@@ -1,4 +1,4 @@
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -48,7 +48,7 @@ See "WMLScript Standard Libraries Specification".
 
 .sub 'not_implemented'
     .local pmc ex
-    ex = new .Exception
+    new ex, .Exception
     ex['_message'] =  "not implemented"
     throw ex
 .end
@@ -118,14 +118,14 @@ _handler_1:
     .get_results (e, s)
     print s
     print "\n"
-    ex = new .Exception
+    new ex, .Exception
     $S0 = "verification failed (can't translate '"
     $S0 .= url
     $S0 .= "')"
     ex['_message'] = $S0
     throw ex
 _handler_2:
-    ex = new .Exception
+    new ex, .Exception
     $S0 = "external function '"
     $S0 .= function
     $S0 .= "' not found in '"
@@ -134,7 +134,7 @@ _handler_2:
     ex['_message'] = $S0
     throw ex
 L1:
-    ex = new .Exception
+    new ex, .Exception
     $S0 = "unable to load compilation unit"
     ex['_message'] = $S0
     throw ex

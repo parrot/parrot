@@ -431,12 +431,12 @@ PIRCODE
 BDISPATCH_NOT_FOUND:
     .local pmc ex
     .local string msg
-    ex = new Exception
+    new ex, .Exception
     msg = "unknown instruction (code "
     $S0 = cur_ic
     msg = concat $S0
     msg = concat ")"
-    ex["_message"] = msg
+    ex['_message'] = msg
     throw ex
 
 PIRCODE
@@ -857,7 +857,7 @@ COMPLETE:
     $S0 = "\n"
 L1_CST:
     $S1 = shift $P0
-    if_null $S1, L2_CST
+    if null $S1 goto L2_CST
     $S1 = $P0[$S1]
     $S0 = concat $S1
     goto L1_CST

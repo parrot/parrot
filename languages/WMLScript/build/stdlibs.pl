@@ -81,13 +81,13 @@ sub generate_pir {
 .sub _init_lib
     .local pmc stdlibs
     .local pmc lib
-    stdlibs = new .Hash
+    new stdlibs, .Hash
 PIRCODE
 
     while ( my ( $num_lib, $lib ) = each %{$cfg} ) {
         my ( $name, $h_lib ) = @{$lib};
         $pir .= "\n    # $name\n";
-        $pir .= "    lib = new .Hash\n";
+        $pir .= "    new lib, .Hash\n";
 
         while ( my ( $num_func, $func ) = each %{$h_lib} ) {
             my ( $name, $nb ) = @{$func};
@@ -100,14 +100,14 @@ PIRCODE
     # Emit the final PIR.
     $pir .= <<'PIRCODE';
 
-    global "stdlibs" = stdlibs
+    global 'stdlibs' = stdlibs
 .end
 
 .sub get_nb_arg_lib
     .param int lib
     .param int func
     .local pmc stdlib
-    stdlib = global "stdlibs"
+    stdlib = global 'stdlibs'
     $P0 = stdlib[lib]
     $I0 = $P0[func]
     .return ($I0)

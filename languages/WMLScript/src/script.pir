@@ -97,11 +97,9 @@
 
 .sub '__onload' :load :anon
 
-  push_eh _handler
   $P0 = global '@stdlibs'
-  goto L1
-_handler:
-    load_bytecode 'languages/WMLScript/src/WMLScript.pbc'
+  unless null $P0 goto L1
+  load_bytecode 'languages/WMLScript/src/WMLScript.pbc'
 L1:
 PIRCODE
 
