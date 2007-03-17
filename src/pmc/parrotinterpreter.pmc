@@ -300,7 +300,7 @@ Runs the interpreter's byte code.
          */
         pt_thread_prepare_for_run(new_interp, interp);
         /*
-         * TODO pass arguments fro parent (interp)
+         * TODO pass arguments from parent (interp)
          *      to child (new_interp)
          *      by possibly clone of share the arguments
          *      r/o args can be passed as is
@@ -646,6 +646,10 @@ Finish thawing.
             /* TODO destruct old HLL_info are constants */
             INTERP->HLL_info = new_info;
         }
+    }
+
+    METHOD void run_gc() {
+        Parrot_do_dod_run(PMC_data(SELF), 0);
     }
 }
 
