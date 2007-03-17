@@ -21,8 +21,6 @@ package main;
 use strict;
 use warnings;
 
-use File::Find;
-
 my @dirs;    # will be filled in wanted
 
 # XXX Most of these can probably be cleaned up
@@ -166,30 +164,9 @@ foreach my $dir ( sort keys %ignore ) {
 close $MANI;
 close $SKIP;
 
-sub wanted {
-
-    return if $File::Find::name =~ m[/\.svn|blib|debian];
-
-    # This is currently the only ignored directory
-    return if $File::Find::name =~ m{runtime.parrot.library.PAST};
-
-    $File::Find::name =~ s[^\./][];
-    if ( -d $_ ) {
-        push @dirs, $File::Find::name;
-    }
-
-    my $svnbase = ".svn/text-base/$_.svn-base";
-    if ( -f $_ and -e $svnbase ) {
-        MANIFEST();
-    }
-
-    return;    # ignored
-}
-
 sub MANIFEST {
     my $file = shift;
     my $loc = '[]';
-    #for ($File::Find::name) {
     for ($file) {
         $loc =
               exists( $special{$_} ) ? $special{$_}
