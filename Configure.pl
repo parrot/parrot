@@ -310,8 +310,7 @@ for (@ARGV) {
 
     for ($key) {
         m/version/ && do {
-            my $svnid =
-                '$Id$';
+            my $svnid = '$Id$';
             print <<"END";
 Parrot Version $parrot_version Configure 2.0
 $svnid
@@ -521,6 +520,7 @@ my @steps = qw(
 
 my $conf = Parrot::Configure->new;
 {
+
     # RT#41201 $Parrot::Configure::Step::conf is a temporary hack
     no warnings qw(once);
     $Parrot::Configure::Step::conf = $conf;
