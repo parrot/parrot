@@ -107,13 +107,26 @@ KEYWORD_EXP: {
 ## Parrot's current IO mechanism.  Therefore, we need to check that the
 ## files with LF are the ones we expect, and that the rest are native.
 
-our $lf_files_regexp = qr{
-    ^examples/shootout/.*\.input$ |
-    ^examples/shootout/.*\.output$ |
-    ^t/compilers/pge/p5regex/re_tests$ | 
-    ^t/library/perlhist.txt$ | 
-    ^t/op/sprintf_tests$
-    }x;
+our $lf_files_regexp;
+if ($^O eq 'MSWin32') {
+    $lf_files_regexp = qr{
+        ^examples\\shootout\\.*\.input$ |
+        ^examples\\shootout\\.*\.output$ |
+        ^t\\compilers\\pge\\p5regex\\re_tests$ | 
+        ^t\\library\\perlhist.txt$ | 
+        ^t\\op\\sprintf_tests$
+        }x;
+}
+else {
+    $lf_files_regexp = qr{
+        ^examples/shootout/.*\.input$ |
+        ^examples/shootout/.*\.output$ |
+        ^t/compilers/pge/p5regex/re_tests$ | 
+        ^t/library/perlhist.txt$ | 
+        ^t/op/sprintf_tests$
+        }x;
+}
+
 
 NATIVE_EOL_STYLE: {
 
