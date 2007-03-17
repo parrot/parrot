@@ -82,11 +82,6 @@ to make the interpreter a C++ object for Windows environments, and
 it wouldn't hurt to make that possible, or at least work in that
 direction, as long as clarity doesn't suffer.
 
-=item * Redo CONTEXT(interp->ctx)->foo
-
-Eliminating the C<< CONTEXT(interp->ctx)->foo >> usage in favor of
-the much simpler C<< interp->ctx->foo >>, or similar simplification.
-
 =item * Parrot_xxx macros
 
 Automated processing that would make a macro to let us write
