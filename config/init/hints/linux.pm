@@ -23,7 +23,7 @@ sub runstep {
         $libs .= ' -lpthread';
     }
     my $ld_share_flags = $conf->data->get('ld_share_flags');
-    my $cc_shared = $conf->data->get( 'cc_shared' );
+    my $cc_shared      = $conf->data->get('cc_shared');
 
     if ( $cc =~ /icc/ ) {
 
@@ -38,24 +38,27 @@ sub runstep {
         if ( $ld_share_flags !~ /-fPIC/ ) {
             $ld_share_flags .= ' -fPIC';
         }
-        if ($cc_shared !~ /-fPIC/ ) {
+        if ( $cc_shared !~ /-fPIC/ ) {
             $cc_shared .= ' -fPIC';
         }
-    } elsif ( $cc =~ /suncc/ ) {
+    }
+    elsif ( $cc =~ /suncc/ ) {
         $link = 'sunCC';
         if ( $ld_share_flags !~ /-KPIC/ ) {
             $ld_share_flags = '-KPIC';
         }
-        if ($cc_shared !~ /-KPIC/ ) {
+        if ( $cc_shared !~ /-KPIC/ ) {
             $cc_shared = '-KPIC';
         }
-    } else {
+    }
+    else {
         if ( $ld_share_flags !~ /-fPIC/ ) {
             $ld_share_flags .= ' -fPIC';
         }
-        if ($cc_shared !~ /-fPIC/ ) {
+        if ( $cc_shared !~ /-fPIC/ ) {
             $cc_shared .= ' -fPIC';
         }
+
         # --export-dynamic, s. info gcc, ld
         $linkflags .= ' -Wl,-E';
     }
