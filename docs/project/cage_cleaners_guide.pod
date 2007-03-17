@@ -192,6 +192,12 @@ To generate html output of unused code within parrot use:
 
   pmd . html rulesets/unusedcode.xml > unused_code.html
 
+Also distributed with PMD is the CPD (Copy/Paste Detector) which finds
+duplicate code.  An easy way to get started with this tool is to use the gui
+(cpdgui).  Set the root source directory to your parrot working directory,
+and choose the C<by extension...> option of the C<Language:> menu.  Then put
+C<.c> in the C<Extension:> box and click C<Go>.
+
 =head2 Automated source macros
 
 Perl5 has a lot of good source management techniques that we can use.
