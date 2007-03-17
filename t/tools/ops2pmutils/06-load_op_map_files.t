@@ -5,14 +5,16 @@
 
 use strict;
 use warnings;
+
 BEGIN {
     use FindBin qw($Bin);
     use Cwd qw(cwd realpath);
     realpath($Bin) =~ m{^(.*\/parrot)\/[^/]*\/[^/]*\/[^/]*$};
     our $topdir = $1;
-    if (defined $topdir) {
+    if ( defined $topdir ) {
         print "\nOK:  Parrot top directory located\n";
-    } else {
+    }
+    else {
         $topdir = realpath($Bin) . "/../../..";
     }
     unshift @INC, qq{$topdir/lib};
@@ -24,12 +26,12 @@ use File::Copy;
 use File::Temp (qw| tempdir |);
 use IO::File;
 
-use_ok( 'Parrot::Ops2pm::Utils' );
+use_ok('Parrot::Ops2pm::Utils');
 
-use constant NUM_FILE   => "src/ops/ops.num";
-use constant SKIP_FILE  => "src/ops/ops.skip";
+use constant NUM_FILE  => "src/ops/ops.num";
+use constant SKIP_FILE => "src/ops/ops.skip";
 
-ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
+ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 {
     local @ARGV = qw(
         src/ops/core.ops
@@ -37,36 +39,37 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
     );
     my $cwd = cwd();
     {
-        my $tdir = tempdir( CLEANUP => 1);
-        ok(chdir $tdir, 'changed to temp directory for testing');
-        ok((mkdir qq{$tdir/src}), "able to make tempdir/src");
-        ok((mkdir qq{$tdir/src/ops}), "able to make tempdir/src");
+        my $tdir = tempdir( CLEANUP => 1 );
+        ok( chdir $tdir, 'changed to temp directory for testing' );
+        ok( ( mkdir qq{$tdir/src} ),     "able to make tempdir/src" );
+        ok( ( mkdir qq{$tdir/src/ops} ), "able to make tempdir/src" );
         foreach my $f (@ARGV) {
-            ok(copy(qq{$cwd/$f}, qq{$tdir/$f}), "copied .ops file");
+            ok( copy( qq{$cwd/$f}, qq{$tdir/$f} ), "copied .ops file" );
         }
-        my $num = NUM_FILE;
+        my $num  = NUM_FILE;
         my $skip = SKIP_FILE;
-        ok(copy(qq{$cwd/$num}, qq{$tdir/$num}), "copied ops.num file");
-        ok(copy(qq{$cwd/$skip}, qq{$tdir/$skip}), "copied ops.skip file");
+        ok( copy( qq{$cwd/$num},  qq{$tdir/$num} ),  "copied ops.num file" );
+        ok( copy( qq{$cwd/$skip}, qq{$tdir/$skip} ), "copied ops.skip file" );
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new( {
-            argv            => [ @opsfiles ],
-            script          => "tools/build/ops2pm.pl",
-            nolines         => undef,
-            renum           => undef,
-        } );
-        isa_ok($self, q{Parrot::Ops2pm::Utils});
+        my $self = Parrot::Ops2pm::Utils->new(
+            {
+                argv    => [@opsfiles],
+                script  => "tools/build/ops2pm.pl",
+                nolines => undef,
+                renum   => undef,
+            }
+        );
+        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
-        ok($self->prepare_ops, "prepare_ops() returned successfully");
-        ok(defined($self->{ops}), "'ops' key has been defined");
+        ok( $self->prepare_ops, "prepare_ops() returned successfully" );
+        ok( defined( $self->{ops} ), "'ops' key has been defined" );
 
-        ok($self->load_op_map_files(),
-            "load_op_map_files() completed successfully");
-        ok(-f $num, "ops.num located after renumbering");
-        ok(-f $skip, "ops.skip located after renumbering");
+        ok( $self->load_op_map_files(), "load_op_map_files() completed successfully" );
+        ok( -f $num,                    "ops.num located after renumbering" );
+        ok( -f $skip,                   "ops.skip located after renumbering" );
 
-        ok(chdir $cwd, 'changed back to starting directory after testing');
+        ok( chdir $cwd, 'changed back to starting directory after testing' );
     }
 }
 
@@ -78,35 +81,40 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
     );
     my $cwd = cwd();
     {
-        my $tdir = tempdir( CLEANUP => 1);
-        ok(chdir $tdir, 'changed to temp directory for testing');
-        ok((mkdir qq{$tdir/src}), "able to make tempdir/src");
-        ok((mkdir qq{$tdir/src/ops}), "able to make tempdir/src");
+        my $tdir = tempdir( CLEANUP => 1 );
+        ok( chdir $tdir, 'changed to temp directory for testing' );
+        ok( ( mkdir qq{$tdir/src} ),     "able to make tempdir/src" );
+        ok( ( mkdir qq{$tdir/src/ops} ), "able to make tempdir/src" );
         foreach my $f (@ARGV) {
-            ok(copy(qq{$cwd/$f}, qq{$tdir/$f}), "copied .ops file");
+            ok( copy( qq{$cwd/$f}, qq{$tdir/$f} ), "copied .ops file" );
         }
-        my $num = NUM_FILE;
+        my $num  = NUM_FILE;
         my $skip = SKIP_FILE;
-#        ok(copy(qq{$cwd/$num}, qq{$tdir/$num}), "copied ops.num file");
-        ok(copy(qq{$cwd/$skip}, qq{$tdir/$skip}), "copied ops.skip file");
+
+        #        ok(copy(qq{$cwd/$num}, qq{$tdir/$num}), "copied ops.num file");
+        ok( copy( qq{$cwd/$skip}, qq{$tdir/$skip} ), "copied ops.skip file" );
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new( {
-            argv            => [ @opsfiles ],
-            script          => "tools/build/ops2pm.pl",
-            nolines         => undef,
-            renum           => undef,
-        } );
-        isa_ok($self, q{Parrot::Ops2pm::Utils});
+        my $self = Parrot::Ops2pm::Utils->new(
+            {
+                argv    => [@opsfiles],
+                script  => "tools/build/ops2pm.pl",
+                nolines => undef,
+                renum   => undef,
+            }
+        );
+        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
-        ok($self->prepare_ops, "prepare_ops() returned successfully");
-        ok(defined($self->{ops}), "'ops' key has been defined");
+        ok( $self->prepare_ops, "prepare_ops() returned successfully" );
+        ok( defined( $self->{ops} ), "'ops' key has been defined" );
 
         eval { $self->load_op_map_files(); };
-        like($@, qr|^Can't open.*src/ops/ops\.num|,  #'
-            "Failure to prove ops.num correctly detected");
+        like(
+            $@, qr|^Can't open.*src/ops/ops\.num|,    #'
+            "Failure to prove ops.num correctly detected"
+        );
 
-        ok(chdir $cwd, 'changed back to starting directory after testing');
+        ok( chdir $cwd, 'changed back to starting directory after testing' );
     }
 }
 
@@ -118,53 +126,53 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
     );
     my $cwd = cwd();
     {
-        my $tdir = tempdir( CLEANUP => 1);
-        ok(chdir $tdir, 'changed to temp directory for testing');
-        ok((mkdir qq{$tdir/src}), "able to make tempdir/src");
-        ok((mkdir qq{$tdir/src/ops}), "able to make tempdir/src");
+        my $tdir = tempdir( CLEANUP => 1 );
+        ok( chdir $tdir, 'changed to temp directory for testing' );
+        ok( ( mkdir qq{$tdir/src} ),     "able to make tempdir/src" );
+        ok( ( mkdir qq{$tdir/src/ops} ), "able to make tempdir/src" );
         foreach my $f (@ARGV) {
-            ok(copy(qq{$cwd/$f}, qq{$tdir/$f}), "copied .ops file");
+            ok( copy( qq{$cwd/$f}, qq{$tdir/$f} ), "copied .ops file" );
         }
-        my $num = NUM_FILE;
-        my $skip = SKIP_FILE;
+        my $num     = NUM_FILE;
+        my $skip    = SKIP_FILE;
         my $realnum = qq{$tdir/$num};
-        my $tmpnum = $realnum . q{.tmp};
-        ok(copy(qq{$cwd/$num}, $tmpnum),
-            "copied ops.num file to temporary file");
+        my $tmpnum  = $realnum . q{.tmp};
+        ok( copy( qq{$cwd/$num}, $tmpnum ), "copied ops.num file to temporary file" );
 
-        my $fhin  = IO::File->new();
-        ok(($fhin->open("<$tmpnum")), "Able to open file for reading");
+        my $fhin = IO::File->new();
+        ok( ( $fhin->open("<$tmpnum") ), "Able to open file for reading" );
         my $fhout = IO::File->new();
-        ok(($fhout->open(">$realnum")), "Able to open file for writing");
-        while (defined (my $line = <$fhin>) ) {
+        ok( ( $fhout->open(">$realnum") ), "Able to open file for writing" );
+        while ( defined( my $line = <$fhin> ) ) {
             chomp $line;
             next if $line =~ /^#/;
             next if $line =~ /^\s*$/;
-            next if $line =~ /^c/;  # to create holes
+            next if $line =~ /^c/;      # to create holes
             $fhout->print("$line\n");
         }
-        ok($fhout->close(), "Able to close file after writing");
-        ok($fhin->close(), "Able to close file after reading");
+        ok( $fhout->close(), "Able to close file after writing" );
+        ok( $fhin->close(),  "Able to close file after reading" );
 
-        ok(copy(qq{$cwd/$skip}, qq{$tdir/$skip}), "copied ops.skip file");
+        ok( copy( qq{$cwd/$skip}, qq{$tdir/$skip} ), "copied ops.skip file" );
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new( {
-            argv            => [ @opsfiles ],
-            script          => "tools/build/ops2pm.pl",
-            nolines         => undef,
-            renum           => undef,
-        } );
-        isa_ok($self, q{Parrot::Ops2pm::Utils});
+        my $self = Parrot::Ops2pm::Utils->new(
+            {
+                argv    => [@opsfiles],
+                script  => "tools/build/ops2pm.pl",
+                nolines => undef,
+                renum   => undef,
+            }
+        );
+        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
-        ok($self->prepare_ops, "prepare_ops() returned successfully");
-        ok(defined($self->{ops}), "'ops' key has been defined");
+        ok( $self->prepare_ops, "prepare_ops() returned successfully" );
+        ok( defined( $self->{ops} ), "'ops' key has been defined" );
 
         eval { $self->load_op_map_files(); };
-        like($@, qr|^hole in ops\.num before|,
-            "Holes in ops.num correctly detected");
+        like( $@, qr|^hole in ops\.num before|, "Holes in ops.num correctly detected" );
 
-        ok(chdir $cwd, 'changed back to starting directory after testing');
+        ok( chdir $cwd, 'changed back to starting directory after testing' );
     }
 }
 
@@ -176,64 +184,64 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
     );
     my $cwd = cwd();
     {
-        my $tdir = tempdir( CLEANUP => 1);
-        ok(chdir $tdir, 'changed to temp directory for testing');
-        ok((mkdir qq{$tdir/src}), "able to make tempdir/src");
-        ok((mkdir qq{$tdir/src/ops}), "able to make tempdir/src");
+        my $tdir = tempdir( CLEANUP => 1 );
+        ok( chdir $tdir, 'changed to temp directory for testing' );
+        ok( ( mkdir qq{$tdir/src} ),     "able to make tempdir/src" );
+        ok( ( mkdir qq{$tdir/src/ops} ), "able to make tempdir/src" );
         foreach my $f (@ARGV) {
-            ok(copy(qq{$cwd/$f}, qq{$tdir/$f}), "copied .ops file");
+            ok( copy( qq{$cwd/$f}, qq{$tdir/$f} ), "copied .ops file" );
         }
-        my $num = NUM_FILE;
-        my $skip = SKIP_FILE;
+        my $num     = NUM_FILE;
+        my $skip    = SKIP_FILE;
         my $realnum = qq{$tdir/$num};
-        my $tmpnum = $realnum . q{.tmp};
-        ok(copy(qq{$cwd/$num}, $tmpnum),
-            "copied ops.num file to temporary file");
+        my $tmpnum  = $realnum . q{.tmp};
+        ok( copy( qq{$cwd/$num}, $tmpnum ), "copied ops.num file to temporary file" );
 
-        my $fhin  = IO::File->new();
-        ok(($fhin->open("<$tmpnum")), "Able to open file for reading");
+        my $fhin = IO::File->new();
+        ok( ( $fhin->open("<$tmpnum") ), "Able to open file for reading" );
         my @outopnames;
-        while (defined (my $line = <$fhin>) ) {
+        while ( defined( my $line = <$fhin> ) ) {
             chomp $line;
             next if $line =~ /^#/;
             next if $line =~ /^\s*$/;
-            my ($name, $number) = split /\s+/, $line, 2;
+            my ( $name, $number ) = split /\s+/, $line, 2;
             push @outopnames, $name;
         }
-        ok($fhin->close(), "Able to close file after reading");
+        ok( $fhin->close(), "Able to close file after reading" );
         my $fhout = IO::File->new();
-        ok(($fhout->open(">$realnum")), "Able to open file for writing");
-        for (my $n=0; $n < 3; $n++) {
+        ok( ( $fhout->open(">$realnum") ), "Able to open file for writing" );
+        for ( my $n = 0 ; $n < 3 ; $n++ ) {
             $fhout->print("$outopnames[$n]\t$n\n");
         }
         my $i = 3;
         $fhout->print("$outopnames[3]\t$i\n");
         $i++;
-        for (my $m=3; $m <= $#outopnames; $m++) {
+        for ( my $m = 3 ; $m <= $#outopnames ; $m++ ) {
             $fhout->print("$outopnames[$m]\t$i\n");
             $i++;
         }
-        ok($fhout->close(), "Able to close file after writing");
+        ok( $fhout->close(), "Able to close file after writing" );
 
-        ok(copy(qq{$cwd/$skip}, qq{$tdir/$skip}), "copied ops.skip file");
+        ok( copy( qq{$cwd/$skip}, qq{$tdir/$skip} ), "copied ops.skip file" );
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new( {
-            argv            => [ @opsfiles ],
-            script          => "tools/build/ops2pm.pl",
-            nolines         => undef,
-            renum           => undef,
-        } );
-        isa_ok($self, q{Parrot::Ops2pm::Utils});
+        my $self = Parrot::Ops2pm::Utils->new(
+            {
+                argv    => [@opsfiles],
+                script  => "tools/build/ops2pm.pl",
+                nolines => undef,
+                renum   => undef,
+            }
+        );
+        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
-        ok($self->prepare_ops, "prepare_ops() returned successfully");
-        ok(defined($self->{ops}), "'ops' key has been defined");
+        ok( $self->prepare_ops, "prepare_ops() returned successfully" );
+        ok( defined( $self->{ops} ), "'ops' key has been defined" );
 
         eval { $self->load_op_map_files(); };
-        like($@, qr|^duplicate opcode|,
-            "Duplicate opcode correctly detected");
+        like( $@, qr|^duplicate opcode|, "Duplicate opcode correctly detected" );
 
-        ok(chdir $cwd, 'changed back to starting directory after testing');
+        ok( chdir $cwd, 'changed back to starting directory after testing' );
     }
 }
 
@@ -245,27 +253,27 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
     );
     my $cwd = cwd();
     {
-        my $tdir = tempdir( CLEANUP => 1);
-        ok(chdir $tdir, 'changed to temp directory for testing');
-        ok((mkdir qq{$tdir/src}), "able to make tempdir/src");
-        ok((mkdir qq{$tdir/src/ops}), "able to make tempdir/src");
+        my $tdir = tempdir( CLEANUP => 1 );
+        ok( chdir $tdir, 'changed to temp directory for testing' );
+        ok( ( mkdir qq{$tdir/src} ),     "able to make tempdir/src" );
+        ok( ( mkdir qq{$tdir/src/ops} ), "able to make tempdir/src" );
         foreach my $f (@ARGV) {
-            ok(copy(qq{$cwd/$f}, qq{$tdir/$f}), "copied .ops file");
+            ok( copy( qq{$cwd/$f}, qq{$tdir/$f} ), "copied .ops file" );
         }
-        my $num = NUM_FILE;
+        my $num  = NUM_FILE;
         my $skip = SKIP_FILE;
-        ok(copy(qq{$cwd/$num}, qq{$tdir/$num}), "copied ops.num file");
-#        ok(copy(qq{$cwd/$skip}, qq{$tdir/$skip}), "copied ops.skip file");
+        ok( copy( qq{$cwd/$num}, qq{$tdir/$num} ), "copied ops.num file" );
+
+        #        ok(copy(qq{$cwd/$skip}, qq{$tdir/$skip}), "copied ops.skip file");
 
         my $realskip = qq{$tdir/$skip};
-        my $tmpskip = $realskip . q{.tmp};
-        ok(copy(qq{$cwd/$skip}, $tmpskip),
-            "copied ops.skip file to temporary file");
+        my $tmpskip  = $realskip . q{.tmp};
+        ok( copy( qq{$cwd/$skip}, $tmpskip ), "copied ops.skip file to temporary file" );
 
-        my $fhin  = IO::File->new();
-        ok(($fhin->open("<$tmpskip")), "Able to open file for reading");
+        my $fhin = IO::File->new();
+        ok( ( $fhin->open("<$tmpskip") ), "Able to open file for reading" );
         my @outopnames;
-        while (defined (my $line = <$fhin>) ) {
+        while ( defined( my $line = <$fhin> ) ) {
             chomp $line;
             next if $line =~ /^#/;
             next if $line =~ /^\s*$/;
@@ -273,33 +281,34 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
             $line =~ s/^\s+//;
             push @outopnames, $line;
         }
-        ok($fhin->close(), "Able to close file after reading");
+        ok( $fhin->close(), "Able to close file after reading" );
         my $fhout = IO::File->new();
-        ok(($fhout->open(">$realskip")), "Able to open file for writing");
+        ok( ( $fhout->open(">$realskip") ), "Able to open file for writing" );
         $fhout->print("noop\n");
         for my $l (@outopnames) {
             $fhout->print("$l\n");
         }
-        ok($fhout->close(), "Able to close file after writing");
+        ok( $fhout->close(), "Able to close file after writing" );
 
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new( {
-            argv            => [ @opsfiles ],
-            script          => "tools/build/ops2pm.pl",
-            nolines         => undef,
-            renum           => undef,
-        } );
-        isa_ok($self, q{Parrot::Ops2pm::Utils});
+        my $self = Parrot::Ops2pm::Utils->new(
+            {
+                argv    => [@opsfiles],
+                script  => "tools/build/ops2pm.pl",
+                nolines => undef,
+                renum   => undef,
+            }
+        );
+        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
-        ok($self->prepare_ops, "prepare_ops() returned successfully");
-        ok(defined($self->{ops}), "'ops' key has been defined");
+        ok( $self->prepare_ops, "prepare_ops() returned successfully" );
+        ok( defined( $self->{ops} ), "'ops' key has been defined" );
 
         eval { $self->load_op_map_files(); };
-        like($@, qr|^skipped opcode is also in|,
-            "Opcode detected in both ops.num and ops.skip");
+        like( $@, qr|^skipped opcode is also in|, "Opcode detected in both ops.num and ops.skip" );
 
-        ok(chdir $cwd, 'changed back to starting directory after testing');
+        ok( chdir $cwd, 'changed back to starting directory after testing' );
     }
 }
 
@@ -369,3 +378,4 @@ James E Keenan
 Parrot::Ops2pm::Utils, F<ops2pm.pl>.
 
 =cut
+

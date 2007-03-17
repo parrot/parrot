@@ -3,6 +3,7 @@
 package Capture;
 use strict;
 use warnings;
+
 # Adapted from IO::Capture::Tie_STDx.
 # Thanks as always to Mark Reynolds and Jon Morgan!
 
@@ -12,8 +13,8 @@ sub TIEHANDLE {
 }
 
 sub PRINT {
-     my $self = shift;
-     push @$self, join '',@_;
+    my $self = shift;
+    push @$self, join '', @_;
 }
 
 sub READLINE {

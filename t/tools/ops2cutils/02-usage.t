@@ -5,35 +5,38 @@
 
 use strict;
 use warnings;
+
 BEGIN {
     use FindBin qw($Bin);
     use Cwd qw(cwd realpath);
     realpath($Bin) =~ m{^(.*\/parrot)\/[^/]*\/[^/]*\/[^/]*$};
     our $topdir = $1;
-    if (defined $topdir) {
+    if ( defined $topdir ) {
         print "\nOK:  Parrot top directory located\n";
-    } else {
+    }
+    else {
         $topdir = realpath($Bin) . "/../../..";
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests =>  30;
+use Test::More tests => 30;
 use Carp;
 use Cwd;
-use_ok( "Parrot::IO::Capture::Mini" );
+use_ok("Parrot::IO::Capture::Mini");
 use_ok( 'Parrot::Ops2c::Auxiliary', qw| Usage getoptions | );
 
-ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
+ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 my $cwd = cwd();
-my ($msg, $tie, @lines);
+my ( $msg, $tie, @lines );
 {
     $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
     my $rv = Usage();
     $msg = $tie->READLINE;
     untie *STDERR or croak "Unable to untie";
-    is($rv, 1, "Usage() returned");
-    like($msg,
+    is( $rv, 1, "Usage() returned" );
+    like(
+        $msg,
         qr|^
             \s*%\sperl\stools\/build\/ops2c\.pl\strans.*
             trans\s:=.*
@@ -41,61 +44,62 @@ my ($msg, $tie, @lines);
             core.*
             dynamic.*
             |msx,
-        "Got expected usage message");
+        "Got expected usage message"
+    );
 }
 
 {
     local @ARGV = qw( --no-lines );
     my $flagsref = getoptions();
-    ok($flagsref->{nolines}, "no-lines option detected");
-    ok(! defined $flagsref->{help}, "help option not defined");
-    ok(! defined $flagsref->{dynamic}, "dynamic option not defined");
-    ok(! defined $flagsref->{core}, "core option not defined");
+    ok( $flagsref->{nolines},          "no-lines option detected" );
+    ok( !defined $flagsref->{help},    "help option not defined" );
+    ok( !defined $flagsref->{dynamic}, "dynamic option not defined" );
+    ok( !defined $flagsref->{core},    "core option not defined" );
 }
 
 {
     local @ARGV = ();
     my $flagsref = getoptions();
-    ok(! defined $flagsref->{nolines}, "no-lines option not defined");
-    ok(! defined $flagsref->{help}, "help option not defined");
-    ok(! defined $flagsref->{dynamic}, "dynamic option not defined");
-    ok(! defined $flagsref->{core}, "core option not defined");
+    ok( !defined $flagsref->{nolines}, "no-lines option not defined" );
+    ok( !defined $flagsref->{help},    "help option not defined" );
+    ok( !defined $flagsref->{dynamic}, "dynamic option not defined" );
+    ok( !defined $flagsref->{core},    "core option not defined" );
 }
 
 {
     local @ARGV = qw( --no-lines --help --core );
     my $flagsref = getoptions();
-    ok($flagsref->{nolines}, "no-lines option detected");
-    ok($flagsref->{help}, "help option detected");
-    ok(! defined $flagsref->{dynamic}, "dynamic option not defined");
-    ok($flagsref->{core}, "core option detected");
+    ok( $flagsref->{nolines},          "no-lines option detected" );
+    ok( $flagsref->{help},             "help option detected" );
+    ok( !defined $flagsref->{dynamic}, "dynamic option not defined" );
+    ok( $flagsref->{core},             "core option detected" );
 }
 
 {
     local @ARGV = qw( --dynamic );
     my $flagsref = getoptions();
-    ok(! defined $flagsref->{nolines}, "no-lines option not defined");
-    ok(! defined $flagsref->{help}, "help option not defined");
-    ok(defined $flagsref->{dynamic}, "dynamic option defined");
-    ok(! defined $flagsref->{core}, "core option not defined");
+    ok( !defined $flagsref->{nolines}, "no-lines option not defined" );
+    ok( !defined $flagsref->{help},    "help option not defined" );
+    ok( defined $flagsref->{dynamic},  "dynamic option defined" );
+    ok( !defined $flagsref->{core},    "core option not defined" );
 }
 
 {
     local @ARGV = qw( --d );
     my $flagsref = getoptions();
-    ok(! defined $flagsref->{nolines}, "no-lines option not defined");
-    ok(! defined $flagsref->{help}, "help option not defined");
-    ok(defined $flagsref->{dynamic}, "dynamic option defined");
-    ok(! defined $flagsref->{core}, "core option not defined");
+    ok( !defined $flagsref->{nolines}, "no-lines option not defined" );
+    ok( !defined $flagsref->{help},    "help option not defined" );
+    ok( defined $flagsref->{dynamic},  "dynamic option defined" );
+    ok( !defined $flagsref->{core},    "core option not defined" );
 }
 
 {
     local @ARGV = qw( --no-lines --help --core --d );
     my $flagsref = getoptions();
-    ok($flagsref->{nolines}, "no-lines option detected");
-    ok($flagsref->{help}, "help option detected");
-    ok(defined $flagsref->{dynamic}, "dynamic option defined");
-    ok($flagsref->{core}, "core option detected");
+    ok( $flagsref->{nolines},         "no-lines option detected" );
+    ok( $flagsref->{help},            "help option detected" );
+    ok( defined $flagsref->{dynamic}, "dynamic option defined" );
+    ok( $flagsref->{core},            "core option detected" );
 }
 
 pass("Completed all tests in $0");
@@ -136,3 +140,4 @@ James E Keenan
 Parrot::Ops2c::Auxiliary, F<ops2c.pl>.
 
 =cut
+

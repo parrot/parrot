@@ -7,21 +7,23 @@ use strict;
 use warnings;
 use Test::More tests => 11;
 use FindBin;
-use lib (
-    "$FindBin::Bin/../../../lib",
-);
-use_ok( 'Parrot::Ops2pm::Utils' );
+use lib ( "$FindBin::Bin/../../../lib", );
+use_ok('Parrot::Ops2pm::Utils');
 
-ok(-f "$FindBin::Bin/../../../Makefile", "Makefile located");
-ok(-f "$FindBin::Bin/../../../myconfig", "myconfig located");
-ok(-f "$FindBin::Bin/../../../lib/Parrot/OpsFile.pm", "lib/Parrot/OpsFile.pm located");
-ok(-f "$FindBin::Bin/../../../src/ops/core.ops", "src/ops/core.ops located");
-ok(-f "$FindBin::Bin/../../../src/ops/ops.num", "src/ops/ops.num located");
-ok(-f "$FindBin::Bin/../../../src/ops/ops.skip", "src/ops/ops.skip located");
-ok(! -e "$FindBin::Bin/../../../lib/Parrot/OpLib/core.pm",
-    "lib/Parrot/OpLib/core.pm correctly does not yet exist");
-ok(! -e "$FindBin::Bin/../../../include/parrot/oplib/ops.h",
-    "include/parrot/oplib/ops.h correctly does not yet exist");
+ok( -f "$FindBin::Bin/../../../Makefile",              "Makefile located" );
+ok( -f "$FindBin::Bin/../../../myconfig",              "myconfig located" );
+ok( -f "$FindBin::Bin/../../../lib/Parrot/OpsFile.pm", "lib/Parrot/OpsFile.pm located" );
+ok( -f "$FindBin::Bin/../../../src/ops/core.ops",      "src/ops/core.ops located" );
+ok( -f "$FindBin::Bin/../../../src/ops/ops.num",       "src/ops/ops.num located" );
+ok( -f "$FindBin::Bin/../../../src/ops/ops.skip",      "src/ops/ops.skip located" );
+ok(
+    !-e "$FindBin::Bin/../../../lib/Parrot/OpLib/core.pm",
+    "lib/Parrot/OpLib/core.pm correctly does not yet exist"
+);
+ok(
+    !-e "$FindBin::Bin/../../../include/parrot/oplib/ops.h",
+    "include/parrot/oplib/ops.h correctly does not yet exist"
+);
 
 my $message = <<END_OF_MESSAGE;
 

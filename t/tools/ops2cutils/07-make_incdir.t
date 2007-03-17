@@ -5,51 +5,53 @@
 
 use strict;
 use warnings;
+
 BEGIN {
     use FindBin qw($Bin);
     use Cwd qw(cwd realpath);
     realpath($Bin) =~ m{^(.*\/parrot)\/[^/]*\/[^/]*\/[^/]*$};
     our $topdir = $1;
-    if (defined $topdir) {
+    if ( defined $topdir ) {
         print "\nOK:  Parrot top directory located\n";
-    } else {
+    }
+    else {
         $topdir = realpath($Bin) . "/../../..";
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests =>   7;
+use Test::More tests => 7;
 use Carp;
 use Cwd;
 use File::Copy;
 use File::Temp (qw| tempdir |);
-use_ok( 'Parrot::Ops2pm::Utils' );
-use lib ("$main::topdir/t/tools/ops2cutils/testlib", "./lib");
+use_ok('Parrot::Ops2pm::Utils');
+use lib ( "$main::topdir/t/tools/ops2cutils/testlib", "./lib" );
 use_ok( "GenerateCore", qw| generate_core | );
 
 my @srcopsfiles = qw( src/ops/core.ops src/ops/bit.ops src/ops/cmp.ops
-src/ops/debug.ops src/ops/experimental.ops src/ops/io.ops src/ops/math.ops
-src/ops/object.ops src/ops/pic.ops src/ops/pmc.ops src/ops/set.ops
-src/ops/stack.ops src/ops/stm.ops src/ops/string.ops src/ops/sys.ops
-src/ops/var.ops );
-my $num = "src/ops/ops.num";
+    src/ops/debug.ops src/ops/experimental.ops src/ops/io.ops src/ops/math.ops
+    src/ops/object.ops src/ops/pic.ops src/ops/pmc.ops src/ops/set.ops
+    src/ops/stack.ops src/ops/stm.ops src/ops/string.ops src/ops/sys.ops
+    src/ops/var.ops );
+my $num  = "src/ops/ops.num";
 my $skip = "src/ops/ops.skip";
 
-ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
+ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 my $cwd = cwd();
 
 {
     my $tdir = tempdir( CLEANUP => 1 );
-    ok(chdir $tdir, 'changed to temp directory for testing');
+    ok( chdir $tdir, 'changed to temp directory for testing' );
 
     mkdir qq{$tdir/src};
     mkdir qq{$tdir/src/ops};
     mkdir qq{$tdir/src/dynoplibs};
 
     foreach my $f (@srcopsfiles) {
-        copy(qq{$cwd/$f}, qq{$tdir/$f});
+        copy( qq{$cwd/$f}, qq{$tdir/$f} );
     }
-    copy(qq{$cwd/$num}, qq{$tdir/$num});
-    copy(qq{$cwd/$skip}, qq{$tdir/$skip});
+    copy( qq{$cwd/$num},  qq{$tdir/$num} );
+    copy( qq{$cwd/$skip}, qq{$tdir/$skip} );
     my @opsfiles = glob("./src/ops/*.ops");
 
     mkdir qq{$tdir/lib};
@@ -57,14 +59,17 @@ my $cwd = cwd();
     mkdir qq{$tdir/lib/Parrot/Ops2c};
     mkdir qq{$tdir/include};
     mkdir qq{$tdir/include/parrot};
-#    mkdir qq{$tdir/include/parrot/oplib};
 
-    my $o2p = Parrot::Ops2pm::Utils->new( {
-        argv            => [ @opsfiles ],
-        script          => "tools/build/ops2pm.pl",
-        moddir          => "lib/Parrot/OpLib",
-        module          => "core.pm",
-    } );
+    #    mkdir qq{$tdir/include/parrot/oplib};
+
+    my $o2p = Parrot::Ops2pm::Utils->new(
+        {
+            argv   => [@opsfiles],
+            script => "tools/build/ops2pm.pl",
+            moddir => "lib/Parrot/OpLib",
+            module => "core.pm",
+        }
+    );
 
     $o2p->prepare_ops();
     $o2p->load_op_map_files();
@@ -73,21 +78,23 @@ my $cwd = cwd();
     $o2p->print_module();
 
     croak "Temporary core.pm file not written"
-        unless (-f qq|$tdir/$o2p->{moddir}/$o2p->{module}|);
+        unless ( -f qq|$tdir/$o2p->{moddir}/$o2p->{module}| );
 
     my $tlib = qq{$tdir/lib};
-    ok(-d $tlib, "lib directory created under tempdir");
+    ok( -d $tlib, "lib directory created under tempdir" );
     unshift @INC, $tlib;
     require Parrot::Ops2c::Utils;
 
     {
         local @ARGV = qw( C CGoto CGP CSwitch CPrederef );
-        my $self = Parrot::Ops2c::Utils->new( {
-            argv            => [ @ARGV ],
-            flag            => { core => 1 },
-        } );
-        ok(defined $self,
-            "Constructor correctly returned even though include/parrot/oplib had to be created");
+        my $self = Parrot::Ops2c::Utils->new(
+            {
+                argv => [@ARGV],
+                flag => { core => 1 },
+            }
+        );
+        ok( defined $self,
+            "Constructor correctly returned even though include/parrot/oplib had to be created" );
     }
 }
 
@@ -95,16 +102,17 @@ pass("Completed all tests in $0");
 
 sub test_single_trans {
     my $trans = shift;
-    my %available = map {$_, 1} qw( C CGoto CGP CSwitch CPrederef );
+    my %available = map { $_, 1 } qw( C CGoto CGP CSwitch CPrederef );
     croak "Bad argument $trans to test_single_trans()"
         unless $available{$trans};
 
-    my $self = Parrot::Ops2c::Utils->new( {
-            argv            => [ $trans ],
-            flag            => { core => 1 },
-        } );
-    ok(defined $self,
-        "Constructor correct when provided with single argument $trans");
+    my $self = Parrot::Ops2c::Utils->new(
+        {
+            argv => [$trans],
+            flag => { core => 1 },
+        }
+    );
+    ok( defined $self, "Constructor correct when provided with single argument $trans" );
 }
 
 ################### DOCUMENTATION ###################

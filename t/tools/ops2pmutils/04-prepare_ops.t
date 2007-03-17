@@ -5,14 +5,16 @@
 
 use strict;
 use warnings;
+
 BEGIN {
     use FindBin qw($Bin);
     use Cwd qw(cwd realpath);
     realpath($Bin) =~ m{^(.*\/parrot)\/[^/]*\/[^/]*\/[^/]*$};
     our $topdir = $1;
-    if (defined $topdir) {
+    if ( defined $topdir ) {
         print "\nOK:  Parrot top directory located\n";
-    } else {
+    }
+    else {
         $topdir = realpath($Bin) . "/../../..";
     }
     unshift @INC, qq{$topdir/lib};
@@ -23,39 +25,42 @@ use File::Copy;
 use File::Temp (qw| tempdir |);
 use IO::File;
 use lib ("$main::topdir/t/tools/ops2pmutils/testlib");
-use_ok( "Capture" );
+use_ok("Capture");
 
-use_ok( 'Parrot::Ops2pm::Utils' );
+use_ok('Parrot::Ops2pm::Utils');
 
-ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
+ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
+
 # regular case
 {
     local @ARGV = qw(
         src/ops/core.ops
         src/ops/bit.ops
     );
-    my $self = Parrot::Ops2pm::Utils->new( {
-        argv            => [ @ARGV ],
-        script          => "tools/build/ops2pm.pl",
-        nolines         => undef,
-    } );
-    isa_ok($self, q{Parrot::Ops2pm::Utils});
+    my $self = Parrot::Ops2pm::Utils->new(
+        {
+            argv    => [@ARGV],
+            script  => "tools/build/ops2pm.pl",
+            nolines => undef,
+        }
+    );
+    isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
-    ok($self->prepare_ops, "prepare_ops() returned successfully");
-    ok(defined($self->{ops}), "'ops' key has been defined");
+    ok( $self->prepare_ops, "prepare_ops() returned successfully" );
+    ok( defined( $self->{ops} ), "'ops' key has been defined" );
 
     # The following tests will break if the output of Parrot::OpsFile changes
-    my %temp = %{$self->{ops}};
-    is(scalar(keys %temp), 4, "4 keys in object's internal hash");
-    ok(defined($temp{FILE}), "FILE key in object is defined");
-    ok(defined($temp{OPS}), "OPS key in object is defined");
-    ok(defined($temp{PREAMBLE}), "PREAMBLE key in object is defined");
-    ok(defined($temp{VERSION}), "VERSION key in object is defined");
-    ok(! ref($temp{FILE}), "FILE key in object is not a reference");
-    ok(  ref($temp{OPS}), "OPS key in object is a reference");
-    is(ref($temp{OPS}), q{ARRAY}, "OPS key in object is an array reference");
-    ok(! ref($temp{PREAMBLE}), "PREAMBLE key in object is not a reference");
-    ok(! ref($temp{VERSION}), "VERSION key in object is not a reference");
+    my %temp = %{ $self->{ops} };
+    is( scalar( keys %temp ), 4, "4 keys in object's internal hash" );
+    ok( defined( $temp{FILE} ),     "FILE key in object is defined" );
+    ok( defined( $temp{OPS} ),      "OPS key in object is defined" );
+    ok( defined( $temp{PREAMBLE} ), "PREAMBLE key in object is defined" );
+    ok( defined( $temp{VERSION} ),  "VERSION key in object is defined" );
+    ok( !ref( $temp{FILE} ),        "FILE key in object is not a reference" );
+    ok( ref( $temp{OPS} ),          "OPS key in object is a reference" );
+    is( ref( $temp{OPS} ), q{ARRAY}, "OPS key in object is an array reference" );
+    ok( !ref( $temp{PREAMBLE} ), "PREAMBLE key in object is not a reference" );
+    ok( !ref( $temp{VERSION} ),  "VERSION key in object is not a reference" );
 }
 
 # nolines option is set true
@@ -63,29 +68,31 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
     local @ARGV = qw(
         src/ops/core.ops
         src/ops/bit.ops
-   );
-    my $self = Parrot::Ops2pm::Utils->new( {
-        argv            => [ @ARGV ],
-        script          => "tools/build/ops2pm.pl",
-        nolines         => 1,
-    } );
-    isa_ok($self, q{Parrot::Ops2pm::Utils});
+    );
+    my $self = Parrot::Ops2pm::Utils->new(
+        {
+            argv    => [@ARGV],
+            script  => "tools/build/ops2pm.pl",
+            nolines => 1,
+        }
+    );
+    isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
-    ok($self->prepare_ops, "prepare_ops() returned successfully");
-    ok(defined($self->{ops}), "'ops' key has been defined");
+    ok( $self->prepare_ops, "prepare_ops() returned successfully" );
+    ok( defined( $self->{ops} ), "'ops' key has been defined" );
 
     # The following tests will break if the output of Parrot::OpsFile changes
-    my %temp = %{$self->{ops}};
-    is(scalar(keys %temp), 4, "4 keys in object's internal hash");
-    ok(defined($temp{FILE}), "FILE key in object is defined");
-    ok(defined($temp{OPS}), "OPS key in object is defined");
-    ok(defined($temp{PREAMBLE}), "PREAMBLE key in object is defined");
-    ok(defined($temp{VERSION}), "VERSION key in object is defined");
-    ok(! ref($temp{FILE}), "FILE key in object is not a reference");
-    ok(  ref($temp{OPS}), "OPS key in object is a reference");
-    is(ref($temp{OPS}), q{ARRAY}, "OPS key in object is an array reference");
-    ok(! ref($temp{PREAMBLE}), "PREAMBLE key in object is not a reference");
-    ok(! ref($temp{VERSION}), "VERSION key in object is not a reference");
+    my %temp = %{ $self->{ops} };
+    is( scalar( keys %temp ), 4, "4 keys in object's internal hash" );
+    ok( defined( $temp{FILE} ),     "FILE key in object is defined" );
+    ok( defined( $temp{OPS} ),      "OPS key in object is defined" );
+    ok( defined( $temp{PREAMBLE} ), "PREAMBLE key in object is defined" );
+    ok( defined( $temp{VERSION} ),  "VERSION key in object is defined" );
+    ok( !ref( $temp{FILE} ),        "FILE key in object is not a reference" );
+    ok( ref( $temp{OPS} ),          "OPS key in object is a reference" );
+    is( ref( $temp{OPS} ), q{ARRAY}, "OPS key in object is an array reference" );
+    ok( !ref( $temp{PREAMBLE} ), "PREAMBLE key in object is not a reference" );
+    ok( !ref( $temp{VERSION} ),  "VERSION key in object is not a reference" );
 }
 
 # mistakenly list an ops file twice; confirm warning is correct
@@ -95,36 +102,40 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
         src/ops/bit.ops
         src/ops/bit.ops
     );
-    my $self = Parrot::Ops2pm::Utils->new( {
-        argv            => [ @ARGV ],
-        script          => "tools/build/ops2pm.pl",
-        nolines         => undef,
-    } );
-    isa_ok($self, q{Parrot::Ops2pm::Utils});
+    my $self = Parrot::Ops2pm::Utils->new(
+        {
+            argv    => [@ARGV],
+            script  => "tools/build/ops2pm.pl",
+            nolines => undef,
+        }
+    );
+    isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
     my $msg;
     my $tie = tie *STDERR, "Capture";
-    ok(defined $tie, "tie established for testing");
-    ok($self->prepare_ops, "prepare_ops() returned successfully");
+    ok( defined $tie, "tie established for testing" );
+    ok( $self->prepare_ops, "prepare_ops() returned successfully" );
     $msg = $tie->READLINE;
     untie *STDERR;
-    ok(defined($self->{ops}), "'ops' key has been defined");
-    like($msg,
+    ok( defined( $self->{ops} ), "'ops' key has been defined" );
+    like(
+        $msg,
         qr|Ops file 'src/ops/bit.ops' mentioned more than once!|,
-        "Got expected message about .ops file being mentioned twice");
+        "Got expected message about .ops file being mentioned twice"
+    );
 
     # The following tests will break if the output of Parrot::OpsFile changes
-    my %temp = %{$self->{ops}};
-    is(scalar(keys %temp), 4, "4 keys in object's internal hash");
-    ok(defined($temp{FILE}), "FILE key in object is defined");
-    ok(defined($temp{OPS}), "OPS key in object is defined");
-    ok(defined($temp{PREAMBLE}), "PREAMBLE key in object is defined");
-    ok(defined($temp{VERSION}), "VERSION key in object is defined");
-    ok(! ref($temp{FILE}), "FILE key in object is not a reference");
-    ok(  ref($temp{OPS}), "OPS key in object is a reference");
-    is(ref($temp{OPS}), q{ARRAY}, "OPS key in object is an array reference");
-    ok(! ref($temp{PREAMBLE}), "PREAMBLE key in object is not a reference");
-    ok(! ref($temp{VERSION}), "VERSION key in object is not a reference");
+    my %temp = %{ $self->{ops} };
+    is( scalar( keys %temp ), 4, "4 keys in object's internal hash" );
+    ok( defined( $temp{FILE} ),     "FILE key in object is defined" );
+    ok( defined( $temp{OPS} ),      "OPS key in object is defined" );
+    ok( defined( $temp{PREAMBLE} ), "PREAMBLE key in object is defined" );
+    ok( defined( $temp{VERSION} ),  "VERSION key in object is defined" );
+    ok( !ref( $temp{FILE} ),        "FILE key in object is not a reference" );
+    ok( ref( $temp{OPS} ),          "OPS key in object is a reference" );
+    is( ref( $temp{OPS} ), q{ARRAY}, "OPS key in object is an array reference" );
+    ok( !ref( $temp{PREAMBLE} ), "PREAMBLE key in object is not a reference" );
+    ok( !ref( $temp{VERSION} ),  "VERSION key in object is not a reference" );
 }
 
 # mistakenly provide a non-existent ops file; catch fatal error
@@ -132,17 +143,20 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
     my $phony = q{src/ops/sdifupasdufisduuapsdfi.ops};
     local @ARGV = ( "src/ops/core.ops", $phony );
 
-    my $self = Parrot::Ops2pm::Utils->new( {
-        argv            => [ @ARGV ],
-        script          => "tools/build/ops2pm.pl",
-        nolines         => undef,
-    } );
-    isa_ok($self, q{Parrot::Ops2pm::Utils});
-    eval {
-        $self->prepare_ops;
-    };
-    like($@, qr/Could not find ops file '$phony'!/,
-        "Got expected error message re missing .ops file");
+    my $self = Parrot::Ops2pm::Utils->new(
+        {
+            argv    => [@ARGV],
+            script  => "tools/build/ops2pm.pl",
+            nolines => undef,
+        }
+    );
+    isa_ok( $self, q{Parrot::Ops2pm::Utils} );
+    eval { $self->prepare_ops; };
+    like(
+        $@,
+        qr/Could not find ops file '$phony'!/,
+        "Got expected error message re missing .ops file"
+    );
 }
 
 # provide experimental.ops as one argument
@@ -152,28 +166,30 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
         src/ops/bit.ops
         src/ops/experimental.ops
     );
-    my $self = Parrot::Ops2pm::Utils->new( {
-        argv            => [ @ARGV ],
-        script          => "tools/build/ops2pm.pl",
-        nolines         => undef,
-    } );
-    isa_ok($self, q{Parrot::Ops2pm::Utils});
+    my $self = Parrot::Ops2pm::Utils->new(
+        {
+            argv    => [@ARGV],
+            script  => "tools/build/ops2pm.pl",
+            nolines => undef,
+        }
+    );
+    isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
-    ok($self->prepare_ops, "prepare_ops() returned successfully");
-    ok(defined($self->{ops}), "'ops' key has been defined");
+    ok( $self->prepare_ops, "prepare_ops() returned successfully" );
+    ok( defined( $self->{ops} ), "'ops' key has been defined" );
 
     # The following tests will break if the output of Parrot::OpsFile changes
-    my %temp = %{$self->{ops}};
-    is(scalar(keys %temp), 4, "4 keys in object's internal hash");
-    ok(defined($temp{FILE}), "FILE key in object is defined");
-    ok(defined($temp{OPS}), "OPS key in object is defined");
-    ok(defined($temp{PREAMBLE}), "PREAMBLE key in object is defined");
-    ok(defined($temp{VERSION}), "VERSION key in object is defined");
-    ok(! ref($temp{FILE}), "FILE key in object is not a reference");
-    ok(  ref($temp{OPS}), "OPS key in object is a reference");
-    is(ref($temp{OPS}), q{ARRAY}, "OPS key in object is an array reference");
-    ok(! ref($temp{PREAMBLE}), "PREAMBLE key in object is not a reference");
-    ok(! ref($temp{VERSION}), "VERSION key in object is not a reference");
+    my %temp = %{ $self->{ops} };
+    is( scalar( keys %temp ), 4, "4 keys in object's internal hash" );
+    ok( defined( $temp{FILE} ),     "FILE key in object is defined" );
+    ok( defined( $temp{OPS} ),      "OPS key in object is defined" );
+    ok( defined( $temp{PREAMBLE} ), "PREAMBLE key in object is defined" );
+    ok( defined( $temp{VERSION} ),  "VERSION key in object is defined" );
+    ok( !ref( $temp{FILE} ),        "FILE key in object is not a reference" );
+    ok( ref( $temp{OPS} ),          "OPS key in object is a reference" );
+    is( ref( $temp{OPS} ), q{ARRAY}, "OPS key in object is an array reference" );
+    ok( !ref( $temp{PREAMBLE} ), "PREAMBLE key in object is not a reference" );
+    ok( !ref( $temp{VERSION} ),  "VERSION key in object is not a reference" );
 }
 
 # provide a file with good name but bad content
@@ -184,35 +200,36 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
     );
     my $cwd = cwd();
     {
-        my $tdir = tempdir( CLEANUP => 1);
-        ok(chdir $tdir, 'changed to temp directory for testing');
-        ok((mkdir qq{$tdir/src}), "able to make tempdir/src");
-        ok((mkdir qq{$tdir/src/ops}), "able to make tempdir/src");
+        my $tdir = tempdir( CLEANUP => 1 );
+        ok( chdir $tdir, 'changed to temp directory for testing' );
+        ok( ( mkdir qq{$tdir/src} ),     "able to make tempdir/src" );
+        ok( ( mkdir qq{$tdir/src/ops} ), "able to make tempdir/src" );
         foreach my $f (@ARGV) {
-            ok(copy(qq{$cwd/$f}, qq{$tdir/$f}), "copied .ops file");
+            ok( copy( qq{$cwd/$f}, qq{$tdir/$f} ), "copied .ops file" );
         }
         my $badops = qq{$tdir/src/ops/cmp.ops};
-        my $fh = IO::File->new();
-        ok(($fh->open(">$badops")), "Able to open file for writing");
-        ok(($fh->print("alpha\nbeta\n")), "Able to print to file");
-        ok(($fh->close), "Able to close file after writing");
+        my $fh     = IO::File->new();
+        ok( ( $fh->open(">$badops") ),       "Able to open file for writing" );
+        ok( ( $fh->print("alpha\nbeta\n") ), "Able to print to file" );
+        ok( ( $fh->close ),                  "Able to close file after writing" );
 
         my $num = qq{src/ops/ops.num};
-        ok(copy(qq{$cwd/$num}, qq{$tdir/$num}), "copied ops.num file");
+        ok( copy( qq{$cwd/$num}, qq{$tdir/$num} ), "copied ops.num file" );
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new( {
-            argv            => [ @opsfiles ],
-            script          => "tools/build/ops2pm.pl",
-            nolines         => undef,
-        } );
-        isa_ok($self, q{Parrot::Ops2pm::Utils});
+        my $self = Parrot::Ops2pm::Utils->new(
+            {
+                argv    => [@opsfiles],
+                script  => "tools/build/ops2pm.pl",
+                nolines => undef,
+            }
+        );
+        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
         eval { $self->prepare_ops; };
-        like($@, qr/OPS invalid for.*?cmp\.ops/,
-            "ops file with bad content correctly detected");
+        like( $@, qr/OPS invalid for.*?cmp\.ops/, "ops file with bad content correctly detected" );
 
-        ok(chdir $cwd, 'changed back to starting directory after testing');
+        ok( chdir $cwd, 'changed back to starting directory after testing' );
     }
 }
 

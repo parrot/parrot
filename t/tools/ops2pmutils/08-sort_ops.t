@@ -5,14 +5,16 @@
 
 use strict;
 use warnings;
+
 BEGIN {
     use FindBin qw($Bin);
     use Cwd qw(cwd realpath);
     realpath($Bin) =~ m{^(.*\/parrot)\/[^/]*\/[^/]*\/[^/]*$};
     our $topdir = $1;
-    if (defined $topdir) {
+    if ( defined $topdir ) {
         print "\nOK:  Parrot top directory located\n";
-    } else {
+    }
+    else {
         $topdir = realpath($Bin) . "/../../..";
     }
     unshift @INC, qq{$topdir/lib};
@@ -22,15 +24,16 @@ use Cwd;
 use Data::Dumper;
 use File::Copy;
 use File::Temp (qw| tempdir |);
-use lib ("$main::topdir/t/tools/ops2pmutils/testlib");
-use_ok( "Capture" );
+use lib        ("$main::topdir/t/tools/ops2pmutils/testlib");
+use_ok("Capture");
 
-use_ok( 'Parrot::Ops2pm::Utils' );
+use_ok('Parrot::Ops2pm::Utils');
 
-use constant NUM_FILE   => "src/ops/ops.num";
-use constant SKIP_FILE  => "src/ops/ops.skip";
+use constant NUM_FILE  => "src/ops/ops.num";
+use constant SKIP_FILE => "src/ops/ops.skip";
 
-ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
+ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
+
 # regular case
 {
     local @ARGV = qw(
@@ -39,40 +42,41 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
     );
     my $cwd = cwd();
     {
-        my $tdir = tempdir( CLEANUP => 1);
-        ok(chdir $tdir, 'changed to temp directory for testing');
-        ok((mkdir qq{$tdir/src}), "able to make tempdir/src");
-        ok((mkdir qq{$tdir/src/ops}), "able to make tempdir/src");
+        my $tdir = tempdir( CLEANUP => 1 );
+        ok( chdir $tdir, 'changed to temp directory for testing' );
+        ok( ( mkdir qq{$tdir/src} ),     "able to make tempdir/src" );
+        ok( ( mkdir qq{$tdir/src/ops} ), "able to make tempdir/src" );
         foreach my $f (@ARGV) {
-            ok(copy(qq{$cwd/$f}, qq{$tdir/$f}), "copied .ops file");
+            ok( copy( qq{$cwd/$f}, qq{$tdir/$f} ), "copied .ops file" );
         }
-        my $num = NUM_FILE;
+        my $num  = NUM_FILE;
         my $skip = SKIP_FILE;
-        ok(copy(qq{$cwd/$num}, qq{$tdir/$num}), "copied ops.num file");
-        ok(copy(qq{$cwd/$skip}, qq{$tdir/$skip}), "copied ops.skip file");
+        ok( copy( qq{$cwd/$num},  qq{$tdir/$num} ),  "copied ops.num file" );
+        ok( copy( qq{$cwd/$skip}, qq{$tdir/$skip} ), "copied ops.skip file" );
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new( {
-            argv            => [ @opsfiles ],
-            script          => "tools/build/ops2pm.pl",
-            nolines         => undef,
-            renum           => undef,
-        } );
-        isa_ok($self, q{Parrot::Ops2pm::Utils});
+        my $self = Parrot::Ops2pm::Utils->new(
+            {
+                argv    => [@opsfiles],
+                script  => "tools/build/ops2pm.pl",
+                nolines => undef,
+                renum   => undef,
+            }
+        );
+        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
-        ok($self->prepare_ops, "prepare_ops() returned successfully");
-        ok(defined($self->{ops}), "'ops' key has been defined");
+        ok( $self->prepare_ops, "prepare_ops() returned successfully" );
+        ok( defined( $self->{ops} ), "'ops' key has been defined" );
 
-        ok($self->load_op_map_files(),
-            "load_op_map_files() completed successfully");
-        ok(-f $num, "ops.num located after renumbering");
-        ok(-f $skip, "ops.skip located after renumbering");
+        ok( $self->load_op_map_files(), "load_op_map_files() completed successfully" );
+        ok( -f $num,                    "ops.num located after renumbering" );
+        ok( -f $skip,                   "ops.skip located after renumbering" );
 
-        ok($self->sort_ops(), "sort_ops returned successfully");
+        ok( $self->sort_ops(), "sort_ops returned successfully" );
 
         # To do:  Test that the sorting was correct.
 
-        ok(chdir $cwd, 'changed back to starting directory after testing');
+        ok( chdir $cwd, 'changed back to starting directory after testing' );
     }
 }
 
@@ -85,40 +89,41 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
     );
     my $cwd = cwd();
     {
-        my $tdir = tempdir( CLEANUP => 1);
-        ok(chdir $tdir, 'changed to temp directory for testing');
-        ok((mkdir qq{$tdir/src}), "able to make tempdir/src");
-        ok((mkdir qq{$tdir/src/ops}), "able to make tempdir/src");
+        my $tdir = tempdir( CLEANUP => 1 );
+        ok( chdir $tdir, 'changed to temp directory for testing' );
+        ok( ( mkdir qq{$tdir/src} ),     "able to make tempdir/src" );
+        ok( ( mkdir qq{$tdir/src/ops} ), "able to make tempdir/src" );
         foreach my $f (@ARGV) {
-            ok(copy(qq{$cwd/$f}, qq{$tdir/$f}), "copied .ops file");
+            ok( copy( qq{$cwd/$f}, qq{$tdir/$f} ), "copied .ops file" );
         }
-        my $num = NUM_FILE;
+        my $num  = NUM_FILE;
         my $skip = SKIP_FILE;
-        ok(copy(qq{$cwd/$num}, qq{$tdir/$num}), "copied ops.num file");
-        ok(copy(qq{$cwd/$skip}, qq{$tdir/$skip}), "copied ops.skip file");
+        ok( copy( qq{$cwd/$num},  qq{$tdir/$num} ),  "copied ops.num file" );
+        ok( copy( qq{$cwd/$skip}, qq{$tdir/$skip} ), "copied ops.skip file" );
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new( {
-            argv            => [ @opsfiles ],
-            script          => "tools/build/ops2pm.pl",
-            nolines         => undef,
-            renum           => undef,
-        } );
-        isa_ok($self, q{Parrot::Ops2pm::Utils});
+        my $self = Parrot::Ops2pm::Utils->new(
+            {
+                argv    => [@opsfiles],
+                script  => "tools/build/ops2pm.pl",
+                nolines => undef,
+                renum   => undef,
+            }
+        );
+        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
-        ok($self->prepare_ops, "prepare_ops() returned successfully");
-        ok(defined($self->{ops}), "'ops' key has been defined");
+        ok( $self->prepare_ops, "prepare_ops() returned successfully" );
+        ok( defined( $self->{ops} ), "'ops' key has been defined" );
 
-        ok($self->load_op_map_files(),
-            "load_op_map_files() completed successfully");
-        ok(-f $num, "ops.num located after renumbering");
-        ok(-f $skip, "ops.skip located after renumbering");
+        ok( $self->load_op_map_files(), "load_op_map_files() completed successfully" );
+        ok( -f $num,                    "ops.num located after renumbering" );
+        ok( -f $skip,                   "ops.skip located after renumbering" );
 
-        ok($self->sort_ops(), "sort_ops returned successfully");
+        ok( $self->sort_ops(), "sort_ops returned successfully" );
 
         # To do:  Test that the sorting was correct.
 
-        ok(chdir $cwd, 'changed back to starting directory after testing');
+        ok( chdir $cwd, 'changed back to starting directory after testing' );
     }
 }
 
@@ -131,50 +136,52 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
     );
     my $cwd = cwd();
     {
-        my $tdir = tempdir( CLEANUP => 1);
-        ok(chdir $tdir, 'changed to temp directory for testing');
-        ok((mkdir qq{$tdir/src}), "able to make tempdir/src");
-        ok((mkdir qq{$tdir/src/ops}), "able to make tempdir/src");
+        my $tdir = tempdir( CLEANUP => 1 );
+        ok( chdir $tdir, 'changed to temp directory for testing' );
+        ok( ( mkdir qq{$tdir/src} ),     "able to make tempdir/src" );
+        ok( ( mkdir qq{$tdir/src/ops} ), "able to make tempdir/src" );
         foreach my $f (@ARGV) {
-            ok(copy(qq{$cwd/$f}, qq{$tdir/$f}), "copied .ops file");
+            ok( copy( qq{$cwd/$f}, qq{$tdir/$f} ), "copied .ops file" );
         }
-        my $num = NUM_FILE;
+        my $num  = NUM_FILE;
         my $skip = SKIP_FILE;
-        ok(copy(qq{$cwd/$num}, qq{$tdir/$num}), "copied ops.num file");
-        ok(copy(qq{$cwd/$skip}, qq{$tdir/$skip}), "copied ops.skip file");
-        ok(copy(qq{$cwd/DEVELOPING}, qq{$tdir/DEVELOPING}),
-            "copied DEVELOPING file");
+        ok( copy( qq{$cwd/$num},       qq{$tdir/$num} ),       "copied ops.num file" );
+        ok( copy( qq{$cwd/$skip},      qq{$tdir/$skip} ),      "copied ops.skip file" );
+        ok( copy( qq{$cwd/DEVELOPING}, qq{$tdir/DEVELOPING} ), "copied DEVELOPING file" );
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new( {
-            argv            => [ @opsfiles ],
-            script          => "tools/build/ops2pm.pl",
-            nolines         => undef,
-            renum           => undef,
-        } );
-        isa_ok($self, q{Parrot::Ops2pm::Utils});
+        my $self = Parrot::Ops2pm::Utils->new(
+            {
+                argv    => [@opsfiles],
+                script  => "tools/build/ops2pm.pl",
+                nolines => undef,
+                renum   => undef,
+            }
+        );
+        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
-        ok($self->prepare_ops, "prepare_ops() returned successfully");
-        ok(defined($self->{ops}), "'ops' key has been defined");
+        ok( $self->prepare_ops, "prepare_ops() returned successfully" );
+        ok( defined( $self->{ops} ), "'ops' key has been defined" );
 
-        ok($self->load_op_map_files(),
-            "load_op_map_files() completed successfully");
-        ok(-f $num, "ops.num located after renumbering");
-        ok(-f $skip, "ops.skip located after renumbering");
+        ok( $self->load_op_map_files(), "load_op_map_files() completed successfully" );
+        ok( -f $num,                    "ops.num located after renumbering" );
+        ok( -f $skip,                   "ops.skip located after renumbering" );
 
         my $msg;
         my $tie = tie *STDERR, "Capture";
-        ok(defined $tie, "tie established for testing");
-        ok($self->sort_ops(), "sort_ops returned successfully");
+        ok( defined $tie, "tie established for testing" );
+        ok( $self->sort_ops(), "sort_ops returned successfully" );
         $msg = $tie->READLINE;
         untie *STDERR;
-        like($msg,
+        like(
+            $msg,
             qr|experimental, not in ops\.num|,
-            "Got expected warning about experimental ops");
+            "Got expected warning about experimental ops"
+        );
 
         # To do:  Test that the sorting was correct.
 
-        ok(chdir $cwd, 'changed back to starting directory after testing');
+        ok( chdir $cwd, 'changed back to starting directory after testing' );
     }
 }
 
@@ -187,50 +194,52 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
     );
     my $cwd = cwd();
     {
-        my $tdir = tempdir( CLEANUP => 1);
-        ok(chdir $tdir, 'changed to temp directory for testing');
-        ok((mkdir qq{$tdir/src}), "able to make tempdir/src");
-        ok((mkdir qq{$tdir/src/ops}), "able to make tempdir/src");
+        my $tdir = tempdir( CLEANUP => 1 );
+        ok( chdir $tdir, 'changed to temp directory for testing' );
+        ok( ( mkdir qq{$tdir/src} ),     "able to make tempdir/src" );
+        ok( ( mkdir qq{$tdir/src/ops} ), "able to make tempdir/src" );
         foreach my $f (@ARGV) {
-            ok(copy(qq{$cwd/$f}, qq{$tdir/$f}), "copied .ops file");
+            ok( copy( qq{$cwd/$f}, qq{$tdir/$f} ), "copied .ops file" );
         }
-        my $num = NUM_FILE;
+        my $num  = NUM_FILE;
         my $skip = SKIP_FILE;
-        ok(copy(qq{$cwd/$num}, qq{$tdir/$num}), "copied ops.num file");
-        ok(copy(qq{$cwd/$skip}, qq{$tdir/$skip}), "copied ops.skip file");
-        ok(copy(qq{$cwd/DEVELOPING}, qq{$tdir/DEVELOPING}),
-            "copied DEVELOPING file");
+        ok( copy( qq{$cwd/$num},       qq{$tdir/$num} ),       "copied ops.num file" );
+        ok( copy( qq{$cwd/$skip},      qq{$tdir/$skip} ),      "copied ops.skip file" );
+        ok( copy( qq{$cwd/DEVELOPING}, qq{$tdir/DEVELOPING} ), "copied DEVELOPING file" );
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new( {
-            argv            => [ @opsfiles ],
-            script          => "tools/build/ops2pm.pl",
-            nolines         => undef,
-            renum           => undef,
-        } );
-        isa_ok($self, q{Parrot::Ops2pm::Utils});
+        my $self = Parrot::Ops2pm::Utils->new(
+            {
+                argv    => [@opsfiles],
+                script  => "tools/build/ops2pm.pl",
+                nolines => undef,
+                renum   => undef,
+            }
+        );
+        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
-        ok($self->prepare_ops, "prepare_ops() returned successfully");
-        ok(defined($self->{ops}), "'ops' key has been defined");
+        ok( $self->prepare_ops, "prepare_ops() returned successfully" );
+        ok( defined( $self->{ops} ), "'ops' key has been defined" );
 
-        ok($self->load_op_map_files(),
-            "load_op_map_files() completed successfully");
-        ok(-f $num, "ops.num located after renumbering");
-        ok(-f $skip, "ops.skip located after renumbering");
+        ok( $self->load_op_map_files(), "load_op_map_files() completed successfully" );
+        ok( -f $num,                    "ops.num located after renumbering" );
+        ok( -f $skip,                   "ops.skip located after renumbering" );
 
         my $msg;
         my $tie = tie *STDERR, "Capture";
-        ok(defined $tie, "tie established for testing");
-        ok($self->sort_ops(), "sort_ops returned successfully");
+        ok( defined $tie, "tie established for testing" );
+        ok( $self->sort_ops(), "sort_ops returned successfully" );
         $msg = $tie->READLINE;
         untie *STDERR;
-        like($msg,
+        like(
+            $msg,
             qr|not in ops\.num nor ops\.skip|,
-            "Got expected warning about ops in neither ops.num or ops.skip");
+            "Got expected warning about ops in neither ops.num or ops.skip"
+        );
 
         # To do:  Test that the sorting was correct.
 
-        ok(chdir $cwd, 'changed back to starting directory after testing');
+        ok( chdir $cwd, 'changed back to starting directory after testing' );
     }
 }
 
@@ -243,48 +252,50 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
     );
     my $cwd = cwd();
     {
-        my $tdir = tempdir( CLEANUP => 1);
-        ok(chdir $tdir, 'changed to temp directory for testing');
-        ok((mkdir qq{$tdir/src}), "able to make tempdir/src");
-        ok((mkdir qq{$tdir/src/ops}), "able to make tempdir/src");
+        my $tdir = tempdir( CLEANUP => 1 );
+        ok( chdir $tdir, 'changed to temp directory for testing' );
+        ok( ( mkdir qq{$tdir/src} ),     "able to make tempdir/src" );
+        ok( ( mkdir qq{$tdir/src/ops} ), "able to make tempdir/src" );
         foreach my $f (@ARGV) {
-            ok(copy(qq{$cwd/$f}, qq{$tdir/$f}), "copied .ops file");
+            ok( copy( qq{$cwd/$f}, qq{$tdir/$f} ), "copied .ops file" );
         }
-        my $num = NUM_FILE;
+        my $num  = NUM_FILE;
         my $skip = SKIP_FILE;
-        ok(copy(qq{$cwd/$num}, qq{$tdir/$num}), "copied ops.num file");
-        ok(copy(qq{$cwd/$skip}, qq{$tdir/$skip}), "copied ops.skip file");
-#        ok(copy(qq{$cwd/DEVELOPING}, qq{$tdir/DEVELOPING}),
-#            "copied DEVELOPING file");
+        ok( copy( qq{$cwd/$num},  qq{$tdir/$num} ),  "copied ops.num file" );
+        ok( copy( qq{$cwd/$skip}, qq{$tdir/$skip} ), "copied ops.skip file" );
+
+        #        ok(copy(qq{$cwd/DEVELOPING}, qq{$tdir/DEVELOPING}),
+        #            "copied DEVELOPING file");
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new( {
-            argv            => [ @opsfiles ],
-            script          => "tools/build/ops2pm.pl",
-            nolines         => undef,
-            renum           => undef,
-        } );
-        isa_ok($self, q{Parrot::Ops2pm::Utils});
+        my $self = Parrot::Ops2pm::Utils->new(
+            {
+                argv    => [@opsfiles],
+                script  => "tools/build/ops2pm.pl",
+                nolines => undef,
+                renum   => undef,
+            }
+        );
+        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
-        ok($self->prepare_ops, "prepare_ops() returned successfully");
-        ok(defined($self->{ops}), "'ops' key has been defined");
+        ok( $self->prepare_ops, "prepare_ops() returned successfully" );
+        ok( defined( $self->{ops} ), "'ops' key has been defined" );
 
-        ok($self->load_op_map_files(),
-            "load_op_map_files() completed successfully");
-        ok(-f $num, "ops.num located after renumbering");
-        ok(-f $skip, "ops.skip located after renumbering");
+        ok( $self->load_op_map_files(), "load_op_map_files() completed successfully" );
+        ok( -f $num,                    "ops.num located after renumbering" );
+        ok( -f $skip,                   "ops.skip located after renumbering" );
 
         my $msg;
         my $tie = tie *STDERR, "Capture";
-        ok(defined $tie, "tie established for testing");
-        ok($self->sort_ops(), "sort_ops returned successfully");
+        ok( defined $tie, "tie established for testing" );
+        ok( $self->sort_ops(), "sort_ops returned successfully" );
         $msg = $tie->READLINE;
         untie *STDERR;
-        ok(! defined $msg, "Got no warning, as expected");
+        ok( !defined $msg, "Got no warning, as expected" );
 
         # To do:  Test that the sorting was correct.
 
-        ok(chdir $cwd, 'changed back to starting directory after testing');
+        ok( chdir $cwd, 'changed back to starting directory after testing' );
     }
 }
 

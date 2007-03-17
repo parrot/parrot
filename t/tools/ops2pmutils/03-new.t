@@ -5,33 +5,40 @@
 
 use strict;
 use warnings;
+
 BEGIN {
     use FindBin qw($Bin);
     use Cwd qw(cwd realpath);
     realpath($Bin) =~ m{^(.*\/parrot)\/[^/]*\/[^/]*\/[^/]*$};
     our $topdir = $1;
-    if (defined $topdir) {
+    if ( defined $topdir ) {
         print "\nOK:  Parrot top directory located\n";
-    } else {
+    }
+    else {
         $topdir = realpath($Bin) . "/../../..";
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests =>  5;
+use Test::More tests => 5;
 
-use_ok( 'Parrot::Ops2pm::Utils' );
+use_ok('Parrot::Ops2pm::Utils');
 
-ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
+ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 {
     local @ARGV = qw( fkadfudofyufyd );
     eval {
-        my $self = Parrot::Ops2pm::Utils->new( {
-            argv            => [ @ARGV ],
-            script          => "tools/build/ops2pm.pl",
-        } );
+        my $self = Parrot::Ops2pm::Utils->new(
+            {
+                argv   => [@ARGV],
+                script => "tools/build/ops2pm.pl",
+            }
+        );
     };
-    like($@, qr/Could not find ops file/,
-        "Got expected error message when file could not be found");
+    like(
+        $@,
+        qr/Could not find ops file/,
+        "Got expected error message when file could not be found"
+    );
 }
 
 {
@@ -42,11 +49,13 @@ ok(chdir $main::topdir, "Positioned at top-level Parrot directory");
         src/ops/set.ops src/ops/stack.ops src/ops/stm.ops
         src/ops/string.ops src/ops/sys.ops src/ops/var.ops
     );
-    my $self = Parrot::Ops2pm::Utils->new( {
-        argv            => [ @ARGV ],
-        script          => "tools/build/ops2pm.pl",
-    } );
-    isa_ok($self, q{Parrot::Ops2pm::Utils});
+    my $self = Parrot::Ops2pm::Utils->new(
+        {
+            argv   => [@ARGV],
+            script => "tools/build/ops2pm.pl",
+        }
+    );
+    isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 }
 
 pass("Completed all tests in $0");
