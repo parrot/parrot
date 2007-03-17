@@ -60,6 +60,8 @@ do lots of checking that wouldn't normally be possible.  Walk the
 source code adding the C<const> qualifier wherever possible.  The
 biggest bang is always in passing pointers into functions.
 
+=back
+
 =head2 Why consting is good
 
 In Perl, we have the C<use constant> pragma to define unchanging
@@ -273,10 +275,6 @@ L<http://www.oreillynet.com/onlamp/blog/2006/07/calling_for_parrot_janitors.html
     and help our new contributor bang the code into Parrotish form.
 
 =head2 Fix usage of deprecated features
-
-=over 4
-
-=back
 
 =head2 Clean up skipped tests
 
