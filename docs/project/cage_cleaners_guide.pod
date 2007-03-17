@@ -204,11 +204,6 @@ Perl5 has a lot of good source management techniques that we can use.
 
 =over 4
 
-=item * Standardizing on "interp"
-
-Standarizing on "interp" or maybe even "intr" as the interpreter
-variable, for brevity & consistency
-
 =item * Macro for interp argument
 
 A macro for declaring the interpreter argument, and maybe a macro
