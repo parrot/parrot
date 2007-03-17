@@ -167,3 +167,10 @@ Parrot::Ops2c::Auxiliary, F<ops2c.pl>.
 
 =cut
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
