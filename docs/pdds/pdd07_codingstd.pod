@@ -322,6 +322,16 @@ Perl source files must end with this coda:
     # End:
     # vim: expandtab shiftwidth=4:
 
+=item *
+
+PIR source files should end with this coda:
+
+    # Local Variables:
+    #   mode: pir
+    #   fill-column: 100
+    # End:
+    # vim: expandtab shiftwidth=4:
+
 =back
 
 {{ XXX - Proper formatting and syntax coloring of C code under Emacs requires
