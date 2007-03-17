@@ -50,7 +50,7 @@ inline op pic_infix__(inconst INT, invar PMC, invar PMC) :pic {
     left = $2;
     right = $3;
     lru = &mic->lru;
-    lr_types = (left->vtable->base_type << 16) | right->vtable->base_type;
+    lr_types = (VTABLE_type(interp, left) << 16) | VTABLE_type(interp, right);
     if (lru->u.type == lr_types) {
 runit_v_pp:
         ((mmd_f_v_pp)lru->f.real_function)(interp, left, right);
@@ -88,10 +88,10 @@ inline op pic_inline_sub__(inconst INT, invar PMC, invar PMC) :pic {
 
     left = $2;
     mic = (Parrot_MIC *) cur_opcode[1];
-    lt = left->vtable->base_type;
+    lt = VTABLE_type(interp, left);
     right = $3;
     lru = &mic->lru;
-    rt = right->vtable->base_type;
+    rt = VTABLE_type(interp, right);
     lr_types = (lt << 16) | rt;
     if (lru->u.type == lr_types) {
         INTVAL a = lt == enum_class_Integer ? PMC_int_val(left) :

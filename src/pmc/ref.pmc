@@ -96,6 +96,20 @@ Get the referenced PMC.
 
 /*
 
+=item C<INTVAL type()>
+
+Returns the PMC's type.
+
+=cut
+
+*/
+
+    INTVAL type() {
+        return VTABLE_type(interp, PMC_pmc_val(SELF));
+    }
+
+/*
+
 =item C<void mark()>
 
 Marks the referenced PMC as live.

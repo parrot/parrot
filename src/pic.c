@@ -660,8 +660,8 @@ parrot_pic_find_infix_v_pp(Interp *interp, PMC *left, PMC *right,
     /*
      * get real dispatch function
      */
-    left_type = left->vtable->base_type;
-    right_type = right->vtable->base_type;
+    left_type = VTABLE_type(interp, left);
+    right_type = VTABLE_type(interp, right);
     func = get_mmd_dispatch_type(interp,
             mic->m.func_nr, left_type, right_type, &is_pmc);
     if (is_pmc) {
