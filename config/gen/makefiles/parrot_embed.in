@@ -1,62 +1,45 @@
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
 #
+use Config;
+use File::Copy;
+use ExtUtils::MakeMaker;
+
+copy( 'lib/Parrot/Embed.xs', 'Embed.xs' );
+
 # cross-platform commands and paths
-RM_F            = @rm_f@
-RM_RF           = @rm_rf@
-MKPATH          = @mkpath@
-CP              = @cp@
-PERL            = @perl@
-PARROTDIR       = ../..
-PARROT          = $(PARROTDIR)/parrot$(EXE)
+my %config;
+$config{EXE}             = '@exe@';
+$config{PARROTDIR}       = '../..';
+$config{PARROT}          = "$config{PARROTDIR}/parrot$config{EXE}";
+$config{C_LIBS}          = '@libs@';
+$config{INCLUDE}         = "$config{PARROTDIR}/include";
+$config{ALL_PARROT_LIBS} = "@libparrot_ldflags@ $config{C_LIBS}";
+$config{LDDLFLAGS}       = $Config{lddlflags} .
+                          ($^O =~ /Win32/ ? qq| -L "$config{PARROTDIR}"| : '');
 
-# compilation options
-A               = @a@
-O               = @o@
-SHARE_EXT       = @share_ext@
-C_LIBS          = @libs@
-#CONDITIONED_LINE(win32):ALL_PARROT_LIBS = $(PARROTDIR)/@libparrot_ldflags@ $(ICU_SHARED) $(C_LIBS)
-#INVERSE_CONDITIONED_LINE(win32):ALL_PARROT_LIBS = @libparrot_ldflags@ $(ICU_SHARED) $(C_LIBS)
-LINKFLAGS       = @linkflags@ @link_debug@ @ld_debug@
-LINK            = @link@
-LD_SHARE_FLAGS  = @ld_share_flags@
-CC_INC          = -I@perl_inc@ -I../../include
-CFLAGS          = $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ $(CC_SHARED)
-#CONDITIONED_LINE(win32):LD_FLAGS        = -def:lib\Parrot\Embed.def $(LD_SHARE_FLAGS)
-#INVERSE_CONDITIONED_LINE(win32):LD_FLAGS        = $(LD_SHARE_FLAGS)
+WriteMakefile(
+    'NAME'         => 'Parrot::Embed',
+    'VERSION_FROM' => 'lib/Parrot/Embed.pm',
+    'PREREQ_PM'    => { 'ExtUtils::CBuilder' => 0 },
+    'LIBS'         => [ $config{ALL_PARROT_LIBS} ],
+    'INC'          => "-I$config{INCLUDE}",
+    'PM'           => { map { $_ => "blib/$_" } <lib/Parrot/*pm> },          
+    'clean'        => { FILES => '*.xs t/greet.pbc' },
+    'LDDLFLAGS'    => $config{LDDLFLAGS},
+);
 
-# files needing compilation
-C_FILE          = lib/Parrot/Embed.c
-SO_FILE         = blib/arch/auto/Parrot/Embed/Embed$(SHARE_EXT)
-O_FILE          = lib/Parrot/Embed$(O)
+package MY;
 
-# other useful files
-PM              = blib/lib/Parrot/Embed.pm
-PBC             = t/greet.pbc
-TEST_FILES      = t/*.t
+sub postamble
+{
+    "t/greet.pbc:\n\t$config{PARROT} -o t/greet.pbc t/greet.pir\n";
+}
 
-all : $(SO_FILE) $(PM) $(PBC)
-
-.c$(O) :
-	@$(PERL) $(PARROTDIR)\tools\dev\cc_flags.pl $(PARROTDIR)\CFLAGS $(CC) "" $(CFLAGS) -I$(@D) -Fo$@ -c $<
-
-$(PM) : lib/Parrot/Embed.pm
-	$(MKPATH) blib/lib/Parrot
-	$(CP) lib/Parrot/Embed.pm blib/lib/Parrot
-
-$(SO_FILE) : $(O_FILE)
-	$(PERL) -MExtUtils::Mksymlists -e "eval { Mksymlists( NAME => \"Parrot::Embed\" ) }"
-	$(MKPATH) blib/arch/auto/Parrot/Embed
-	$(LINK) $(LD_SHARE_FLAGS) @ld_out@$(SO_FILE) $(O_FILE) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
-
-$(C_FILE) : lib/Parrot/Embed.xs
-	$(PERL) tools/write_typemap.pl
-
-$(PBC) : t/greet.pir
-	$(PARROT) -o $(PBC) t/greet.pir
-
-test : $(TEST_FILES)
-	prove -b $(TEST_FILES)
-
-clean :
-	$(RM_RF) blib $(C_FILE) $(O_FILE)
+sub dynamic_lib
+{
+    my $inherited  = shift->SUPER::dynamic_lib(@_);
+    my $sub_target = quotemeta( ': $(OBJECT)' );
+    $inherited     =~ s{($sub_target)}{$1 t/greet.pbc};
+    $inherited;
+}

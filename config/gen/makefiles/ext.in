@@ -3,7 +3,7 @@
 # setup of commands
 @make_set_make@
 PERL      = @perl@
-MAKE      = @make_c@
+MAKE      = @make@
 RM_F      = @rm_f@
 
 # add new languages here
@@ -16,10 +16,8 @@ all: $(EXT)
 
 # hard-code these for now
 test: Parrot-Embed
-	- cd Parrot-Embed && $(PERL) Build test
+	- cd Parrot-Embed && $(MAKE) test
 
-clean: Parrot-Embed
-	- cd Parrot-Embed && $(PERL) Build clean
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -61,4 +59,7 @@ clean: \
 Parrot-Embed : Parrot-Embed.dummy
 
 Parrot-Embed.dummy:
-	- cd Parrot-Embed && $(PERL) Build.PL && $(PERL) Build
+	- cd Parrot-Embed && $(PERL) Makefile.PL && $(MAKE)
+
+Parrot-Embed.clean:
+	- cd Parrot-Embed && $(MAKE) clean
