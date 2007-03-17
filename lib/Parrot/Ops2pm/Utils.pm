@@ -689,7 +689,6 @@ it in this package's methods.
 
 1;
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

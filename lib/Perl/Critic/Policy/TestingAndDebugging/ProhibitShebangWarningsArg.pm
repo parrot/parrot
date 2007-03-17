@@ -26,19 +26,20 @@ sub violates {
     my @elements = $doc->children();
 
     # look for the shebang line, if any
-    foreach my $element ( @elements) {
-        # if the element isn't on the first line, it's not a valid shebang
-        return if ($element->location()->[0] != 1);
+    foreach my $element (@elements) {
 
-        if ($element =~ m/^\#! .*? perl/xgs) {
+        # if the element isn't on the first line, it's not a valid shebang
+        return if ( $element->location()->[0] != 1 );
+
+        if ( $element =~ m/^\#! .*? perl/xgs ) {
+
             # if the shebang line matches '-w', report the violation
-            if ($element =~ m/-[^w]*w/s) {
+            if ( $element =~ m/-[^w]*w/s ) {
                 my $sev = $self->get_severity();
-                return Perl::Critic::Violation
-                    ->new( $desc, $expl, $element, $sev );
+                return Perl::Critic::Violation->new( $desc, $expl, $element, $sev );
             }
             else {
-                last;  # shebang line ok; skip to the end of the elements
+                last;    # shebang line ok; skip to the end of the elements
             }
         }
     }

@@ -267,7 +267,6 @@ Called by C<goto_address()>.
 
 1;
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

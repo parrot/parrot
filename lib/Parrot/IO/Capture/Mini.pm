@@ -70,7 +70,6 @@ IO::Capture (L<http://search.cpan.org/dist/IO-Capture/>).
 
 =cut
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

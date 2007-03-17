@@ -36,7 +36,7 @@ sub violates {
     my $content = $doc->content();
     my @lines = split /\n/, $content;
 
-    foreach my $line ( @lines ) {
+    foreach my $line (@lines) {
         if ( $line =~ m{.?[ \t]+$}m ) {
             return $self->violation( $desc, $expl, $doc );
         }

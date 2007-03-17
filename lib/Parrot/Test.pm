@@ -617,6 +617,7 @@ sub _generate_functions {
 
             my $meth = $language_test_map{$func};
             if ( my $prefix = $builtin_language_prefix{$language} ) {
+
                 # builtin languages are no tested with the example_output_xx() functions
                 my $level = $builder->level();
                 $builder->level( $level + 2 );
@@ -650,7 +651,7 @@ sub _generate_functions {
                 # restore prior level, just in case.
                 $builder->level($level);
             }
-        }
+            }
     }
 
     # XXX this is broken WRT todo tests
@@ -687,7 +688,7 @@ sub _generate_functions {
             else {
                 fail( defined $extension, "no extension recognized for $example_f" );
             }
-        }
+            }
     }
 
     my %c_test_map = (
@@ -824,7 +825,7 @@ sub report_odd_hash {
         shift @args;
         my $func = ( caller() )[2];
 
-        Carp::carp( "Odd $func invocation; probably missing description for TODO test" );
+        Carp::carp("Odd $func invocation; probably missing description for TODO test");
     }
     else {
         warn $warning;

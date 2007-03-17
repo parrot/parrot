@@ -67,25 +67,21 @@ message if arguments are defective.
 =cut
 
 sub new {
-    my ($class, $allargsref) = @_;
+    my ( $class, $allargsref ) = @_;
     die "Must pass a hash ref to Parrot::Pmc2c::Utils::new"
         unless ref($allargsref) eq q{HASH};
     die "Must have key 'include' which is a reference to an array of directories"
-        unless (defined $allargsref->{include} and ref($allargsref->{include}) eq q{ARRAY});
+        unless ( defined $allargsref->{include} and ref( $allargsref->{include} ) eq q{ARRAY} );
     die "Must have key 'opt' which is a reference to a hash of option values"
-        unless (defined $allargsref->{opt} and ref($allargsref->{opt}) eq q{HASH});
+        unless ( defined $allargsref->{opt} and ref( $allargsref->{opt} ) eq q{HASH} );
     die "Must have key 'args' which is a reference to a list of the remaining arguments"
-        unless (defined $allargsref->{args} and ref($allargsref->{args}) eq q{ARRAY}
-        );
+        unless ( defined $allargsref->{args} and ref( $allargsref->{args} ) eq q{ARRAY} );
 
-    unshift @{$allargsref->{include}}, (
-        ".",
-        "$FindBin::Bin/../..",
-        "$FindBin::Bin/../../src/pmc/"
-    );
+    unshift @{ $allargsref->{include} },
+        ( ".", "$FindBin::Bin/../..", "$FindBin::Bin/../../src/pmc/" );
 
     foreach my $opt qw(nobody nolines debug verbose) {
-        if (! defined $allargsref->{opt}{$opt}) {
+        if ( !defined $allargsref->{opt}{$opt} ) {
             $allargsref->{opt}{$opt} = 0;
         }
     }
@@ -114,20 +110,19 @@ B<Comment:>  Called inside C<read_dump()> and C<dump_pmc()>.
 =cut
 
 sub find_file {
-    my ($self, $file, $die_unless_found) = @_;
+    my ( $self, $file, $die_unless_found ) = @_;
 
-    return $file if (File::Spec->file_name_is_absolute($file) && -e $file);
+    return $file if ( File::Spec->file_name_is_absolute($file) && -e $file );
 
-    my @includes = @{$self->{include}};
-    foreach my $dir ( @includes ) {
+    my @includes = @{ $self->{include} };
+    foreach my $dir (@includes) {
         my $path = File::Spec->catfile( $dir, $file );
         return $path if -e $path;
     }
 
-    die "cannot find file '$file' in path '", join("', '", @includes), "'" if $die_unless_found;
+    die "cannot find file '$file' in path '", join( "', '", @includes ), "'" if $die_unless_found;
     return;
 }
-
 
 =head3 C<dump_vtable()>
 
@@ -152,7 +147,7 @@ When the caller is F<make>, that directory is the top-level Parrot directory.
 =cut
 
 sub dump_vtable {
-    my ($self, $file) = @_;
+    my ( $self, $file ) = @_;
     my $default = parse_vtable($file);
     my $dump    = $file;
     $dump =~ s/\.\w+$/\.dump/;
@@ -161,34 +156,33 @@ sub dump_vtable {
     my $vtd = open_file( ">", $dump, $self->{opt}{verbose} );
 
     my %vtable = (
-        flags   => {},
-        pre     => '',
-        post    => '',
+        flags => {},
+        pre   => '',
+        post  => '',
     );
     my %meth_hash;
     my $i = 0;
     foreach my $entry (@$default) {
-        $meth_hash{$entry->[1]} = $i++;
-        push @{$vtable{methods}},
+        $meth_hash{ $entry->[1] } = $i++;
+        push @{ $vtable{methods} },
             {
-                parameters  => $entry->[2],
-                meth        => $entry->[1],
-                type        => $entry->[0],
-                section     => $entry->[3],
-                mmd         => $entry->[4],
-                attr        => $entry->[5]
+            parameters => $entry->[2],
+            meth       => $entry->[1],
+            type       => $entry->[0],
+            section    => $entry->[3],
+            mmd        => $entry->[4],
+            attr       => $entry->[5]
             };
     }
     $vtable{'has_method'} = \%meth_hash;
 
-    my $Dumper = Data::Dumper->new([\%vtable], ['class']);
+    my $Dumper = Data::Dumper->new( [ \%vtable ], ['class'] );
     $Dumper->Indent(3);
     print $vtd $Dumper->Dump();
     close $vtd;
 
     return $dump;
 }
-
 
 =head3 C<print_tree()>
 
@@ -235,23 +229,28 @@ point is to go from F<.pmc> to F<.c> files.
 =cut
 
 sub print_tree {
-    my ($self, $argsref) = @_;
+    my ( $self, $argsref ) = @_;
     my $depth = $argsref->{depth} || 0;
     my @files;
+
     # First, look for list of files provided as argument to 'files' key in
     # hash passed by ref to this method call.
-    if (defined $argsref->{files}) {
+    if ( defined $argsref->{files} ) {
         die "Value of 'files' key in call to print_tree() must be array ref"
-            unless ref($argsref->{files}) eq 'ARRAY';
-        die "Array ref which is value of 'files' key in call to print_tree() must hold positive number of files"
-            unless scalar(@{$argsref->{files}});
-        @files = @{$argsref->{files}};
-    # Next, look for list of files provided as argument to 'args' key of
-    # constructor.
-    } else {
-        if (@{$self->{args}}) {
-            @files = @{$self->{args}};
-        } else {
+            unless ref( $argsref->{files} ) eq 'ARRAY';
+        die
+"Array ref which is value of 'files' key in call to print_tree() must hold positive number of files"
+            unless scalar( @{ $argsref->{files} } );
+        @files = @{ $argsref->{files} };
+
+        # Next, look for list of files provided as argument to 'args' key of
+        # constructor.
+    }
+    else {
+        if ( @{ $self->{args} } ) {
+            @files = @{ $self->{args} };
+        }
+        else {
             die "print_tree() lacked files to print; nothing in constructor's 'args' key";
         }
     }
@@ -259,16 +258,17 @@ sub print_tree {
     for my $f (@files) {
         my $class = $self->read_dump($f);
         print "    " x $depth, $class->{class}, "\n";
-        for my $k (keys %{$class->{flags}{extends}}) {
-            $self->print_tree( {
-                depth   => $depth + 1,
-                files   => [ lc("$k.pmc") ],
-            } );
+        for my $k ( keys %{ $class->{flags}{extends} } ) {
+            $self->print_tree(
+                {
+                    depth => $depth + 1,
+                    files => [ lc("$k.pmc") ],
+                }
+            );
         }
     }
     return 1;
 }
-
 
 =head3 C<read_dump()>
 
@@ -294,12 +294,12 @@ C<dump_pmc()>.
 =cut
 
 sub read_dump {
-    my ($self, $file) = @_;
+    my ( $self, $file ) = @_;
 
     $file =~ s/\.\w+$/.dump/;
-    $file = $self->find_file($file, 1);
+    $file = $self->find_file( $file, 1 );
 
-    my $fh = open_file( "<", $file, $self->{opt}{verbose});
+    my $fh = open_file( "<", $file, $self->{opt}{verbose} );
 
     my $class;
     eval do { local $/; <$fh> };
@@ -308,7 +308,6 @@ sub read_dump {
     close $fh;
     return $class;
 }
-
 
 =head3 C<gen_c()>
 
@@ -330,17 +329,14 @@ Perl-ish C<1>.
 
 sub gen_c {
     my $self    = shift;
-    my @files   = @{$self->{args}};
+    my @files   = @{ $self->{args} };
     my $optsref = $self->{opt};
     my %pmcs    = map { $_, $self->read_dump($_) } @files;
 
-    Parrot::Pmc2c::Library
-        ->new( $optsref, $self->read_dump("vtable.pmc"), %pmcs )
-        ->write_all_files;
+    Parrot::Pmc2c::Library->new( $optsref, $self->read_dump("vtable.pmc"), %pmcs )->write_all_files;
 
     return 1;
 }
-
 
 =head3 C<dump_pmc()>
 
@@ -369,24 +365,25 @@ F<pmc2c.pl>.
 =cut
 
 sub dump_pmc {
-    my $self = shift;
+    my $self    = shift;
     my $include = $self->{include};
-    my @files = @{$self->{args}};
-    my $opt = $self->{opt};
+    my @files   = @{ $self->{args} };
+    my $opt     = $self->{opt};
 
     # help these dumb 'shells' that are no shells
-    if ($files[0] eq 'src/pmc/*.pmc') {
+    if ( $files[0] eq 'src/pmc/*.pmc' ) {
         @files = glob $files[0];
     }
+
     # make sure that a default.dump will always be created if it doesn't
     # already exist; do so by adding default.pmc to list of files for dumping
-    unless (-e qq{./src/pmc/default.dump}) {
+    unless ( -e qq{./src/pmc/default.dump} ) {
         unshift @files, qq{./src/pmc/default.pmc};
     }
 
     my $all;
     for my $file (@files) {
-        my ($class, $result) = $self->find_and_parse_pmc($file);
+        my ( $class, $result ) = $self->find_and_parse_pmc($file);
         $result->{file} = $file;
         $all->{$class} = $result;
     }
@@ -401,8 +398,8 @@ sub dump_pmc {
         $all->{default}->{super}{$meth} = 'default';
     }
 
-    DO_A_DUMP: foreach my $name (keys %{$all}) {
-        my $file = $all->{$name}->{file};
+DO_A_DUMP: foreach my $name ( keys %{$all} ) {
+        my $file     = $all->{$name}->{file};
         my $dumpfile = $file;
         $dumpfile =~ s/\.\w+$/.dump/;
 
@@ -412,36 +409,37 @@ sub dump_pmc {
         # than the corresponding .pmc file (e.g., if it's some .dump file from
         # an earlier run of 'make'), shouldn't it be overwritten so that we
         # have an up-to-date .dump file?
-        if (defined $existing && dump_is_newer($existing)) {
-            if ($dumpfile =~ /default\.dump$/) {
+        if ( defined $existing && dump_is_newer($existing) ) {
+            if ( $dumpfile =~ /default\.dump$/ ) {
+
                 # don't overwrite default.dump
                 # skip all preparations for dumping
                 next DO_A_DUMP;
             }
             else {
+
                 # overwrite anything else
                 # continue with preparations for dumping
-        # And what good is assigning the name of the existing dump file to
-        # that of the newly-to-be-created dumpfile.  Wouldn't they have the
-        # same name in any case?  (Or are we dealing with the possibility that
-        # find_file() will return a file of the same basename but in a
-        # different directory?  Is that a real possibility?)
+                # And what good is assigning the name of the existing dump file to
+                # that of the newly-to-be-created dumpfile.  Wouldn't they have the
+                # same name in any case?  (Or are we dealing with the possibility that
+                # find_file() will return a file of the same basename but in a
+                # different directory?  Is that a real possibility?)
                 $dumpfile = $existing;
             }
         }
 
-        $all = $self->gen_parent_list($name, $all);
+        $all = $self->gen_parent_list( $name, $all );
 
-        my $class = gen_super_meths($name, $all, $vt);
-        my $Dumper = Data::Dumper->new([$class], ['class']);
+        my $class = gen_super_meths( $name, $all, $vt );
+        my $Dumper = Data::Dumper->new( [$class], ['class'] );
         $Dumper->Indent(1);
         my $fh = open_file( ">", $dumpfile );
         print $fh $Dumper->Dump;
         close $fh;
-    } # end foreach loop
+    }    # end foreach loop
     return 1;
 }
-
 
 =head2 Non-Public Methods
 
@@ -471,18 +469,17 @@ variable.  Rather, it is a step called by C<dump_pmc()> to prepare for dumping.
 =cut
 
 sub find_and_parse_pmc {
-    my ($self, $file) = @_;
+    my ( $self, $file ) = @_;
     my $opt = $self->{opt};
     $file =~ s/\.\w+$/.pmc/;
-    $file = $self->find_file($file, 1);
+    $file = $self->find_file( $file, 1 );
 
     my $fh = open_file( "<", $file );
     my $contents = do { local $/; <$fh> };
     close $fh;
-    my ($classname, $attributesref)  = parse_pmc($contents, $opt);
-    return ($classname, $attributesref);
+    my ( $classname, $attributesref ) = parse_pmc( $contents, $opt );
+    return ( $classname, $attributesref );
 }
-
 
 =head3 C<gen_parent_list()>
 
@@ -514,33 +511,32 @@ B<Comments:>  Called within C<dump_pmc()>.
 =cut
 
 sub gen_parent_list {
-    my ($self, $name, $all) = @_;
+    my ( $self, $name, $all ) = @_;
     my $class = $all->{$name};
 
     # An interesting construction:  note below that in the course of processing
     # @todo, new elements can be pushed on to it.  So it's not necessarily
     # exhausted when $n is shifted off it.
-    my @todo  = ($name);
+    my @todo = ($name);
     while (@todo) {
         my $n   = shift @todo;
         my $sub = $all->{$n};
         next if $n eq 'default';
 
-        my %parent_hash = %{$sub->{flags}{extends}};
+        my %parent_hash = %{ $sub->{flags}{extends} };
         my @parents =
             sort { $parent_hash{$a} <=> $parent_hash{$b} } keys %parent_hash;
         for my $parent (@parents) {
-            $all->{$parent} = $self->read_dump(lc("$parent.pmc"))
+            $all->{$parent} = $self->read_dump( lc("$parent.pmc") )
                 if not $all->{$parent};
 
-            $class->{has_parent}{$parent} = { %{$all->{$parent}{has_method} }};
+            $class->{has_parent}{$parent} = { %{ $all->{$parent}{has_method} } };
             push @todo, $parent;
             push @{ $class->{parents} }, $parent;
         }
     }
     return $all;
 }
-
 
 =head2 Subroutines
 
@@ -581,18 +577,17 @@ and C<dump_pmc()>.
 =cut
 
 sub open_file {
-    my ($direction, $filename, $verbose) = @_;
+    my ( $direction, $filename, $verbose ) = @_;
 
     my $action =
-        ($direction eq "<")  ? "Reading"    :
-        ($direction eq ">>") ? "Appending"  :
-                               "Writing";
+          ( $direction eq "<" )  ? "Reading"
+        : ( $direction eq ">>" ) ? "Appending"
+        :                          "Writing";
 
     print "$action $filename\n" if $verbose;
     open my $fh, $direction, $filename or die "$action $filename: $!\n";
     return $fh;
 }
-
 
 =head3 C<parse_pmc()>
 
@@ -642,15 +637,15 @@ B<Comments:>  Called internally by C<find_and_parse_pmc()>.
 =cut
 
 sub parse_pmc {
-    my ($code, $opt) = @_;
+    my ( $code, $opt ) = @_;
 
-    my ($pre, $classname, $flags_ref) = parse_flags(\$code);
-    my ($classblock, $post) = extract_balanced($code);
+    my ( $pre, $classname, $flags_ref ) = parse_flags( \$code );
+    my ( $classblock, $post ) = extract_balanced($code);
 
-    my $lineno  = 1 + count_newlines($pre);
-    $classblock = substr($classblock, 1,-1); # trim out the { }
+    my $lineno = 1 + count_newlines($pre);
+    $classblock = substr( $classblock, 1, -1 );    # trim out the { }
 
-    my (@methods, %meth_hash, $class_init);
+    my ( @methods, %meth_hash, $class_init );
     my $signature_re = qr{
     ^
     (?:                 #blank spaces and comments and spurious semicolons
@@ -669,39 +664,38 @@ sub parse_pmc {
     ((?::(\w+)\s*)*)    #method attrs
     }sx;
 
-
-    while ($classblock =~ s/($signature_re)//) {
+    while ( $classblock =~ s/($signature_re)// ) {
         $lineno += count_newlines($1);
-        my ($flag, $type, $methodname, $parameters) = ($2,$3,$4,$5);
+        my ( $flag, $type, $methodname, $parameters ) = ( $2, $3, $4, $5 );
         my $attrs = parse_method_attrs($6);
-        my ($methodblock, $remainder_part) = extract_balanced($classblock);
+        my ( $methodblock, $remainder_part ) = extract_balanced($classblock);
         $methodblock = "" if $opt->{nobody};
 
         my $method_hash = {
-                    meth        => $methodname,
-                    body        => $methodblock,
-                    line        => $lineno,
-                    type        => $type,
-                    parameters  => $parameters,
-                    loc         => "vtable",
-                    attrs       => $attrs,
-                  };
+            meth       => $methodname,
+            body       => $methodblock,
+            line       => $lineno,
+            type       => $type,
+            parameters => $parameters,
+            loc        => "vtable",
+            attrs      => $attrs,
+        };
 
-        if ($flag and $flag =~ /PMETHOD/) {
+        if ( $flag and $flag =~ /PMETHOD/ ) {
             Parrot::Pmc2c::PMETHODs::rewrite_pmethod($method_hash);
             $flags_ref->{pmethod_present} = 1;
         }
 
-
-        if ($methodname eq 'class_init') {
+        if ( $methodname eq 'class_init' ) {
             $class_init = $method_hash;
         }
         else {
+
             # name => method idx mapping
             $meth_hash{$methodname} = scalar @methods;
 
-            $method_hash->{loc}  = "nci" if $flag;
-            $method_hash->{mmds} = [ ($methodblock =~ /MMD_(\w+):/g) ];
+            $method_hash->{loc} = "nci" if $flag;
+            $method_hash->{mmds} = [ ( $methodblock =~ /MMD_(\w+):/g ) ];
             push @methods, $method_hash;
         }
 
@@ -713,14 +707,15 @@ sub parse_pmc {
         $meth_hash{'class_init'} = scalar @methods;
         push @methods, $class_init;
     }
-    return $classname, {
-        pre          => $pre,
-        flags        => $flags_ref,
-        methods      => \@methods,
-        post         => $post,
-        class        => $classname,
-        has_method   => \%meth_hash,
-    };
+    return $classname,
+        {
+        pre        => $pre,
+        flags      => $flags_ref,
+        methods    => \@methods,
+        post       => $post,
+        class      => $classname,
+        has_method => \%meth_hash,
+        };
 }
 
 =head3 C<parse_flags()>
@@ -759,21 +754,21 @@ sub parse_flags {
     my $c = shift;
 
     $$c =~ s/^(.*?^\s*)pmclass ([\w]*)//ms;
-    my ($pre, $classname) = ($1, $2);
+    my ( $pre, $classname ) = ( $1, $2 );
 
     # flags that have values passed with them
     my %has_value = map { $_ => 1 } qw(does extends group lib hll maps);
 
-    my (%flags, $parent_nr);
+    my ( %flags, $parent_nr );
+
     # look through the pmc declaration header for flags such as noinit
-    while ($$c =~ s/^\s*(\w+)//s) {
+    while ( $$c =~ s/^\s*(\w+)//s ) {
         my $flag = $1;
-        if ($has_value{$flag}) {
+        if ( $has_value{$flag} ) {
             $$c =~ s/^\s+(\w+)//s
                 or die "Parser error: no value for '$flag'";
 
-            $flags{$flag}{$1} =
-                $flag eq 'extends' ? ++$parent_nr : 1;
+            $flags{$flag}{$1} = $flag eq 'extends' ? ++$parent_nr : 1;
         }
         else {
             $flags{$flag} = 1;
@@ -781,14 +776,13 @@ sub parse_flags {
     }
 
     # setup some defaults
-    if ($classname ne 'default') {
+    if ( $classname ne 'default' ) {
         $flags{extends}{default} = 1 unless $flags{extends};
         $flags{does}{scalar}     = 1 unless $flags{does};
     }
 
     return $pre, $classname, \%flags;
 }
-
 
 =head3 C<extract_balanced()>
 
@@ -838,21 +832,21 @@ sub extract_balanced {
     ]
     [ "-" x length $1 ]sexg;
 
-    /^\{/ or die "bad block open: ", substr($code,0,10), "...";
+    /^\{/ or die "bad block open: ", substr( $code, 0, 10 ), "...";
 
     while (/ (\{) | (\}) /gx) {
-        if($1) {
+        if ($1) {
             $balance++;
-        } else { # $2
+        }
+        else {    # $2
             $balance--;
-            return substr($code, 0, pos, ""), $code
+            return substr( $code, 0, pos, "" ), $code
                 if not $balance;
         }
     }
     die "Badly balanced" if $balance;
     return;
 }
-
 
 =head3 C<parse_method_attrs()>
 
@@ -875,7 +869,6 @@ sub parse_method_attrs {
     return \%result;
 }
 
-
 =head3 C<dump_is_newer()>
 
     dump_is_newer($existing);
@@ -894,17 +887,17 @@ B<Comments:>  Called within C<find_and_parse_pmc()>.
 
 sub dump_is_newer {
     my $dumpfile = shift;
+
     # Extract name of .pmc file corresponding to .dump file
     my $pmc = $dumpfile;
     $pmc =~ s/\.\w+$/.pmc/;
 
     my $pmc_dt  = 0;
     my $dump_dt = 0;
-    $pmc_dt  = (stat $pmc)[9];
-    $dump_dt = (stat $dumpfile)[9];
+    $pmc_dt  = ( stat $pmc )[9];
+    $dump_dt = ( stat $dumpfile )[9];
     return $dump_dt > $pmc_dt;
 }
-
 
 =head3 C<gen_super_meths()>
 
@@ -939,33 +932,34 @@ B<Comments:>  Called within C<dump_pmc()>.
 =cut
 
 sub gen_super_meths {
-    my ($name, $all, $vt) = @_;
+    my ( $name, $all, $vt ) = @_;
     my $class = $all->{$name};
 
     # look through all meths in class and locate the nearest parent
-    foreach my $entry (@{ $vt->{methods} } ) {
+    foreach my $entry ( @{ $vt->{methods} } ) {
         my $meth = $entry->{meth};
         next if exists $class->{super}{$meth};
-        foreach my $pname (@{ $class->{parents} } ) {
-            if (exists ($class->{has_parent}{$pname}{$meth} )) {
+        foreach my $pname ( @{ $class->{parents} } ) {
+            if ( exists( $class->{has_parent}{$pname}{$meth} ) ) {
                 $class->{super}{$meth} = $pname;
                 my $n = $class->{has_parent}{$pname}{$meth};
-                $class->{super_attrs}{$meth} =
-                    $all->{$pname}{methods}[$n]{attrs};
-                if (exists $class->{has_method}{$meth}) {
-                    $class = inherit_attrs($class, $meth);
+                $class->{super_attrs}{$meth} = $all->{$pname}{methods}[$n]{attrs};
+                if ( exists $class->{has_method}{$meth} ) {
+                    $class = inherit_attrs( $class, $meth );
                 }
                 my $super_mmd = $all->{$pname}{methods}[$n]{mmds};
-                if ($super_mmd && scalar @{ $super_mmd }) {
-                    push @{ $class->{super_mmd} }, {
+                if ( $super_mmd && scalar @{$super_mmd} ) {
+                    push @{ $class->{super_mmd} },
+                        {
                         $pname => $super_mmd,
                         'meth' => $meth,
-                    };
+                        };
                 }
                 last;
             }
         }
-        unless (exists $class->{super}{$meth}) {
+        unless ( exists $class->{super}{$meth} ) {
+
             # XXX this is a quick hack to get the inheritance
             # ParrotClass isa delegate
             #
@@ -976,15 +970,14 @@ sub gen_super_meths {
             # $class->implements but when dumping there isn't
             # a $class object
             $class->{super}{$meth} =
-                $class->{class} eq 'ParrotObject' ||
-                $class->{class} eq 'ParrotClass' ?
-                'delegate' :
-                'default';
+                   $class->{class} eq 'ParrotObject'
+                || $class->{class} eq 'ParrotClass'
+                ? 'delegate'
+                : 'default';
         }
     }
     return $class;
 }
-
 
 =head3 C<inherit_attrs()>
 
@@ -1015,14 +1008,12 @@ B<Comments:> Called within C<gen_super_meths()>.
 =cut
 
 sub inherit_attrs {
-    my ($class, $meth) = @_;
-    my $super_attrs = $class->{methods}[$class->{has_method}{$meth}]->{attrs};
+    my ( $class, $meth ) = @_;
+    my $super_attrs = $class->{methods}[ $class->{has_method}{$meth} ]->{attrs};
     my $attrs       = $class->{super_attrs}{$meth};
-    if (
-        ($super_attrs->{read} or $super_attrs->{write})
-        and
-        not ($attrs->{read} or $attrs->{write})
-    ) {
+    if ( ( $super_attrs->{read} or $super_attrs->{write} )
+        and not( $attrs->{read} or $attrs->{write} ) )
+    {
         $attrs->{read} = $super_attrs->{read}
             if exists $super_attrs->{read};
         $attrs->{write} = $super_attrs->{write}
@@ -1030,7 +1021,6 @@ sub inherit_attrs {
     }
     return $class;
 }
-
 
 =head1 AUTHOR
 

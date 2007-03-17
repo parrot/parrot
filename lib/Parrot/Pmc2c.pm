@@ -23,7 +23,8 @@ package Parrot::Pmc2c;
 use strict;
 use warnings;
 use Parrot::PMC qw(%pmc_types);
-use Parrot::Pmc2c::UtilFunctions qw( gen_ret dont_edit count_newlines dynext_load_code c_code_coda );
+use Parrot::Pmc2c::UtilFunctions
+    qw( gen_ret dont_edit count_newlines dynext_load_code c_code_coda );
 use Text::Balanced 'extract_bracketed';
 use Parrot::Pmc2c::PMETHODs;
 
@@ -50,13 +51,13 @@ my %special_class_name =
     map { ( $_, 1 ) } qw( STMRef Ref default Null delegate SharedRef deleg_pmc );
 
 sub new {
-    my ($this, $self, $options) = @_;
+    my ( $this, $self, $options ) = @_;
     $self->{opt} = $options;
 
     #determine blessed classname
     my $this_classname = ref($this) || $this;
-    my $classname = $self->{class};
-    my $suffix = $special_class_name{$classname} ?  $classname : "Standard";
+    my $classname      = $self->{class};
+    my $suffix         = $special_class_name{$classname} ? $classname : "Standard";
     $classname = $this_classname . "::" . $suffix;
 
     bless $self, $classname;
@@ -206,8 +207,8 @@ C<init()> to to create the read-only set methods.
 =cut
 
 sub make_const {
-    my ( $self ) = @_;
-    my $const = $self->make_constlike( 'Const' );
+    my ($self) = @_;
+    my $const = $self->make_constlike('Const');
     $self->{const} = $const;
     $const->{flags}->{is_const} = 1;
     delete $const->{flags}{const_too};
@@ -224,7 +225,7 @@ to create the read-only set methods and vtable variant.
 =cut
 
 sub make_ro {
-    my ( $self ) = @_;
+    my ($self) = @_;
     my $ro = $self->make_constlike( 'RO', '' );
     $self->{flags}{has_ro} = 1;
     $self->{ro} = $ro;
@@ -240,13 +241,13 @@ Initializes the instance.
 =cut
 
 sub init {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     # XXX FIXME unused?
     #Creates a hash of all the method names correspdoning vtable section.
     #Creates a hash of all the method names correspdoning to their attributes.
     foreach my $entry ( @{ $self->{vtable}->{methods} } ) {
-        $self->{all}{ $entry->{meth} } = $entry->{section};
+        $self->{all}{ $entry->{meth} }   = $entry->{section};
         $self->{attrs}{ $entry->{meth} } = $entry->{attr};
     }
 
@@ -256,26 +257,28 @@ sub init {
     elsif ( $self->{flags}{abstract} ) {
     }
     elsif ( $self->{flags}{singleton} ) {
+
         # Since singletons are shared between interpreters, we need to make special effort to use
         # the right namespace for method lookups.
         #
         # Note that this trick won't work if the singleton inherits from something else
         # (because the MRO will still be shared).
-        unless ( $self->implements('namespace') or $self->{super}{'namespace'} ne 'default' )
-        {
-            push @{ $self->{methods} }, {
-                meth        => 'namespace',
-                parameters  => '',
-                body        => '{ return INTERP->vtables[SELF->vtable->base_type]->_namespace; }',
-                loc         => 'vtable',
-                mmds        => [],
-                type        => 'PMC*',
-                line        => 1,
-                attrs       => {},
-            };
+        unless ( $self->implements('namespace') or $self->{super}{'namespace'} ne 'default' ) {
+            push @{ $self->{methods} },
+                {
+                meth       => 'namespace',
+                parameters => '',
+                body       => '{ return INTERP->vtables[SELF->vtable->base_type]->_namespace; }',
+                loc        => 'vtable',
+                mmds       => [],
+                type       => 'PMC*',
+                line       => 1,
+                attrs      => {},
+                };
             $self->{has_method}{namespace} = $#{ $self->{methods} };
         }
     }
+
     #!( const_too or singleton or abstract ) everything else gets readonly version of methods too.
     else {
         $self->make_ro;
@@ -334,7 +337,7 @@ sub includes {
 #include "parrot/dynext.h"
 EOC
 
-    $cout .= qq{#include "pmc_fixedintegerarray.h"\n} if ($self->{flags}->{pmethod_present});
+    $cout .= qq{#include "pmc_fixedintegerarray.h"\n} if ( $self->{flags}->{pmethod_present} );
     foreach my $parents ( $self->{class}, @{ $self->{parents} } ) {
         my $name = lc $parents;
         $cout .= qq{#include "pmc_$name.h"\n};
@@ -524,7 +527,7 @@ sub body {
     else {
         $total_body = rewrite_nci_method( $classname, $meth, $body );
     }
-    Parrot::Pmc2c::PMETHODs::rewrite_pminvoke($method, \$total_body);
+    Parrot::Pmc2c::PMETHODs::rewrite_pminvoke( $method, \$total_body );
 
     # now split into MMD if necessary:
     my $additional_bodies = '';
@@ -561,6 +564,7 @@ EOH
 
     if ( exists $method->{pre_block} ) {
         $cout .= $method->{pre_block};
+
         # This is the part that comes from the PMC file.
         $cout .= $self->line_directive( $method->{line}, $self->{file} );
         $cout .= $standard_body;
@@ -568,6 +572,7 @@ EOH
         $cout .= "\n}\n";
     }
     else {
+
         # This is the part that comes from the PMC file.
         $cout .= $self->line_directive( $method->{line}, $self->{file} );
         $cout .= "{$standard_body\n}\n";
@@ -818,7 +823,6 @@ ENDOFCODE
     return $cout;
 }
 
-
 =item C<init_func()>
 
 Returns the C code for the PMC's initialization method, or an empty
@@ -836,9 +840,8 @@ sub init_func {
 
     my $classname = $self->{class};
 
-    my $mmd_list = join( ",\n        ",
-        map { "{ $_->[0], $_->[1], $_->[2], (funcptr_t) $_->[3] }" } @$mmds
-    );
+    my $mmd_list =
+        join( ",\n        ", map { "{ $_->[0], $_->[1], $_->[2], (funcptr_t) $_->[3] }" } @$mmds );
     my $isa = join( " ", $classname, @{ $self->{parents} } );
     $isa =~ s/\s?default$//;
     my $does = join( " ", keys( %{ $self->{flags}{does} } ) );
@@ -1042,12 +1045,11 @@ EOC
 } /* Parrot_${classname}_class_init */
 EOC
     if ( $self->{flags}{dynpmc} ) {
-        $cout .= dynext_load_code($classname, $classname => {});
+        $cout .= dynext_load_code( $classname, $classname => {} );
     }
 
     $cout;
 }
-
 
 =item C<gen_c($out_name)>
 
@@ -1109,7 +1111,7 @@ sub hdecls {
 
     # class init decl
     $hout .= 'PARROT_DYNEXT_EXPORT ' if ( $self->{flags}->{dynpmc} );
-    $hout .= "void Parrot_${classname}_class_init(Parrot_Interp, int, int);\n";
+    $hout           .= "void Parrot_${classname}_class_init(Parrot_Interp, int, int);\n";
     $self->{hdecls} .= $hout;
     $self->{hdecls};
 }
@@ -1135,8 +1137,8 @@ EOH
 
     $hout .= "#define PARROT_IN_EXTENSION\n" if ( $self->{flags}{dynpmc} );
     $hout .= $self->hdecls();
-    $hout .= $self->{const}->hdecls() if ( $self->{const} );
-    $hout .= $self->{ro}->hdecls() if ( $self->{ro} );
+    $hout .= $self->{const}->hdecls()        if ( $self->{const} );
+    $hout .= $self->{ro}->hdecls()           if ( $self->{ro} );
     $hout .= <<"EOH";
 
 #endif

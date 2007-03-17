@@ -26,16 +26,16 @@ sub violates {
     # grab all elements in the document
     my @elements = $doc->children();
 
-    foreach my $element ( @elements ) {
+    foreach my $element (@elements) {
 
         # look for a shebang line
-        if ($element =~ m/^\#!/xs) {
+        if ( $element =~ m/^\#!/xs ) {
+
             # if the shebang line isn't on the first line, report the
             # policy violation
-            if ($element->location()->[0] != 1) {
+            if ( $element->location()->[0] != 1 ) {
                 my $sev = $self->get_severity();
-                return Perl::Critic::Violation
-                    ->new( $desc, $expl, $element, $sev );
+                return Perl::Critic::Violation->new( $desc, $expl, $element, $sev );
             }
         }
     }

@@ -51,8 +51,8 @@ sub new {
             'compilers/past-pm'
         ),
         $self->new_group( 'smop', 'Simple Meta Object Protocol', 'compilers/smop' ),
-        $self->new_group( 'BCG',  'Byte Code Generation',       'compilers/bcg' ),
-        $self->new_group( 'JSON', 'JavaScript Object Notation', 'compilers/json' ),
+        $self->new_group( 'BCG',  'Byte Code Generation',        'compilers/bcg' ),
+        $self->new_group( 'JSON', 'JavaScript Object Notation',  'compilers/json' ),
     );
 }
 

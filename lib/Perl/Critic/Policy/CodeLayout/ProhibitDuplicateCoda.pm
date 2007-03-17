@@ -34,18 +34,16 @@ sub violates {
     my ( $self, $elem, $doc ) = @_;
 
     # search all comment nodes which match 'vim:' or 'Local Variables:'
-    my $vim_count = 0;
+    my $vim_count   = 0;
     my $emacs_count = 0;
-    for (my $node = $doc->first_element;
-        $node;
-        $node = $node->next_sibling) {
+    for ( my $node = $doc->first_element ; $node ; $node = $node->next_sibling ) {
 
         if ( $node->isa('PPI::Token::Comment') ) {
-            $vim_count += grep /vim:/, $node;
+            $vim_count   += grep /vim:/,             $node;
             $emacs_count += grep /Local Variables:/, $node;
 
             return $self->violation( $desc, $expl, $node || $doc )
-                if ($vim_count > 1 or $emacs_count > 1);
+                if ( $vim_count > 1 or $emacs_count > 1 );
         }
         else {
             next;

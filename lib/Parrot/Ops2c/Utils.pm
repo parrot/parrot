@@ -1022,7 +1022,6 @@ it in this package's methods.
 
 =cut
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

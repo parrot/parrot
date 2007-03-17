@@ -26,25 +26,28 @@ sub violates {
     # grab all elements in the document
     my @elements = $doc->children();
 
-    foreach my $element ( @elements ) {
+    foreach my $element (@elements) {
+
         # if the element isn't on the first line, it's not a valid shebang
-        return if ($element->location()->[0] != 1);
+        return if ( $element->location()->[0] != 1 );
 
         # look for a perl shebang line
-        if ($element =~ m/^\#! .*? perl/xs) {
+        if ( $element =~ m/^\#! .*? perl/xs ) {
 
             # if we have a platform-specific shebang, barf
-            if ($element !~ m{^\#!     # get shebang part at line's start
+            if (
+                $element !~ m{^\#!     # get shebang part at line's start
                                [ ]*    # any number of spaces
                                perl    # the word 'perl'
                                \s      # a space
-                              }xms) {
+                              }xms
+                )
+            {
                 my $sev = $self->get_severity();
-                return Perl::Critic::Violation
-                    ->new( $desc, $expl, $element, $sev );
+                return Perl::Critic::Violation->new( $desc, $expl, $element, $sev );
             }
             else {
-                return;  # shebang line ok, return
+                return;    # shebang line ok, return
             }
         }
     }
