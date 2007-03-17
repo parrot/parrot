@@ -100,27 +100,39 @@ KEYWORD_EXP: {
 
 }    # KEYWORD_EXP
 
-=for skip
-
 ## eol-style must be set to 'native' for any manifest files with an explicit
-## mime type of text/plain. Assume a default of text/plain if not specified
+## mime type of text/plain. Assume a default of text/plain if not specified.
+## This is, however, *not* true for many files.  Some text files need to
+## have a single LF character as the EOL character on *all* platforms due to
+## Parrot's current IO mechanism.  Therefore, we need to check that the
+## files with LF are the ones we expect, and that the rest are native.
 
-EOL_STYLE: {
+our $lf_files_regexp = qr{
+    ^examples/shootout/.*\.input$ |
+    ^examples/shootout/.*\.output$ |
+    ^t/compilers/pge/p5regex/re_tests$ | 
+    ^t/library/perlhist.txt$ | 
+    ^t/op/sprintf_tests$
+    }x;
 
+NATIVE_EOL_STYLE: {
+
+    # we need to skip the files which *should* have LF as the eol-style
     # we only want those files whose mime types that start with text/plain
-
+    ## collect the files to test
     my @plain_files;
     foreach my $file ( keys %$mime_types ) {
         if ( !defined( $mime_types->{$file} )
             || $mime_types->{$file} =~ qr{^text/plain} )
         {
-
-            push @plain_files, $file;
+            push @plain_files, $file
+                unless $file =~ $lf_files_regexp;
         }
     }
 
     my $test     = 'svn:eol-style';
     my $expected = 'native';
+    my $test_name = $test . "=" . $expected;
     my $keywords = get_attribute( $test, @plain_files );
 
     my @failed = verify_attributes( $test, $expected, 1, $keywords );
@@ -128,15 +140,44 @@ EOL_STYLE: {
     if (@failed) {
         my $failure = join " ($expected)\n", @failed;
         $failure = "\n" . $failure . " ($expected)\n";
-        is( $failure, "", $test );
+        is( $failure, "", $test_name );
     }
     else {
-        pass($test);
+        pass($test_name);
     }
 
-}    # EOL_STYLE
+}    # NATIVE_EOL_STYLE
 
-=cut
+LF_EOL_STYLE: {
+
+    ## collect the files to test
+    my @lf_files;
+    foreach my $file ( keys %$mime_types ) {
+        if ( !defined( $mime_types->{$file} )
+            || $mime_types->{$file} =~ qr{^text/plain} )
+        {
+            push @lf_files, $file
+                if $file =~ $lf_files_regexp;
+        }
+    }
+
+    my $test     = 'svn:eol-style';
+    my $expected = 'LF';
+    my $test_name = $test . "=" . $expected;
+    my $keywords = get_attribute( $test, @lf_files );
+
+    my @failed = verify_attributes( $test, $expected, 1, $keywords );
+
+    if (@failed) {
+        my $failure = join " ($expected)\n", @failed;
+        $failure = "\n" . $failure . " ($expected)\n";
+        is( $failure, "", $test_name );
+    }
+    else {
+        pass($test_name);
+    }
+
+}    # LF_EOL_STYLE
 
 =for skip
 
@@ -179,7 +220,7 @@ BEGIN {
     unless ( $Parrot::Revision::current or `svk ls .` ) {
         plan skip_all => 'not a working copy';
     }
-    else { plan tests => 2 }
+    else { plan tests => 4 }
 }
 
 exit;
