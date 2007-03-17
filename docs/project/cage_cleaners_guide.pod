@@ -182,6 +182,16 @@ PMD (L<http://pmd.sourceforge.net/>) has been used on C code, even
 though it's a Java tool.  It looks for repeated strings of tokens
 that are candidates for either functions or macros.
 
+=head3 PMD usage
+
+General usage:
+
+  pmd [directory] [report format] [ruleset file]
+
+To generate html output of unused code within parrot use:
+
+  pmd . html rulesets/unusedcode.xml > unused_code.html
+
 =head2 Automated source macros
 
 Perl5 has a lot of good source management techniques that we can use.
