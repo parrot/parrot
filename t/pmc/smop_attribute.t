@@ -30,8 +30,7 @@ Tests the SMOP_Attribute PMC.
     plan( 9 )
 
     $P0 = new 'SMOP_Attribute'
-#    ok ($P0, 'create a SMOP_Attribute')
-    ok (1, 'create a SMOP_Attribute')
+    isa_ok ($P0, 'SMOP_Attribute')
 
 
   $P0 = new 'SMOP_Attribute'

@@ -30,8 +30,7 @@ Tests the SMOP_Class PMC.
     plan( 1 )
 
     $P0 = new 'SMOP_Class'
-    ok (1)
-#    ok ($P0)
+    isa_ok($P0, 'SMOP_Class')
 .end
 
 
