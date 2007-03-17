@@ -188,7 +188,6 @@ sub runstep {
                 link      => 'gcc',
                 linkflags => '',
                 o         => '.o',
-                slash     => '\\',
                 blib_dir  => 'blib\\lib',
             );
             if ( $conf->data->get(qw(optimize)) eq "1" ) {
@@ -214,6 +213,7 @@ sub runstep {
             sym_import          => '__declspec(dllimport)',
             make                => 'mingw32-make',
             make_c              => 'mingw32-make -C',
+            slash               => '\\',
         );
     }
 }
