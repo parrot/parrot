@@ -1,5 +1,5 @@
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: metacommitter_guide.pod 17497 2007-03-15 18:50:37Z paultcochrane $
+# $Id$
 
 =head1 Cage Cleaner Guide
 
