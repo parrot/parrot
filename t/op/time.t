@@ -107,7 +107,6 @@ pasm_output_is( <<'CODE', $year, "decodelocaltime" );
     end
 CODE
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

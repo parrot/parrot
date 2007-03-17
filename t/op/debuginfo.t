@@ -159,7 +159,6 @@ called from Sub 'rec' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

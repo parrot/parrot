@@ -381,7 +381,6 @@ AB
 A\x00B\x00
 OUTPUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

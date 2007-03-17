@@ -760,7 +760,6 @@ CODE
 0.015625
 OUTPUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

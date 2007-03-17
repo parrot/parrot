@@ -32,7 +32,6 @@ pasm_output_is( <<'CODE', 'yes', "find_type" );
 	end
 CODE
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

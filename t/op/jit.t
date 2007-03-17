@@ -1266,7 +1266,6 @@ CODE
 16
 OUTPUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

@@ -32,7 +32,6 @@ pasm_output_is( $code, <<'OUT', "fileformat dos w ctrl-z" );
 ok
 OUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

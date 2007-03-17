@@ -170,7 +170,6 @@ CODE
 ok
 OUTPUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

@@ -89,7 +89,6 @@ CODE
 /^[48]4-1$/
 OUTPUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

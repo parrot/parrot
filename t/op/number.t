@@ -1230,7 +1230,6 @@ pasm_output_is( <<'CODE', <<OUTPUT, "mod_n_n_nc by zero" );
 CODE
 OUTPUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

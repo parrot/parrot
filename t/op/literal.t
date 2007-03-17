@@ -66,7 +66,6 @@ CODE
 42
 OUTPUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

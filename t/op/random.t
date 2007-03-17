@@ -31,7 +31,6 @@ CODE
 Called random just fine
 OUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

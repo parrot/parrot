@@ -166,7 +166,6 @@ CODE
 return code: 10
 OUTPUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

@@ -502,7 +502,6 @@ CODE
 6
 OUTPUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

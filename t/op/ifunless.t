@@ -194,7 +194,6 @@ ok 1
 ok 2
 OUTPUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
