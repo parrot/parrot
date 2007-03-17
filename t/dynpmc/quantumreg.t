@@ -89,7 +89,6 @@ CODE
 0
 OUTPUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

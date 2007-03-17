@@ -22,9 +22,7 @@ Tests the I/O Iterator PMC described in PDD22.
 
 =cut
 
-
 # TODO create helper functions to put data in an i/o pmc
-
 
 # L<PDD22/I\/O Iterator PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not yet implemented' );
@@ -36,7 +34,6 @@ pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not yet implemented' );
 CODE
 ok 1 - $P0 = new .Iterator, $P1
 OUT
-
 
 # L<PDD22/I\/O Iterator PMC API/=item shift>
 pir_output_is( <<'CODE', <<'OUT', 'shift', todo => 'not yet implemented' );
@@ -56,7 +53,6 @@ pir_output_is( <<'CODE', <<'OUT', 'shift', todo => 'not yet implemented' );
 CODE
 ok 1 - $I0 = shift $P1 # success
 OUT
-
 
 # L<PDD22/I\/O Iterator PMC API/=item get_bool (vtable)>
 pir_output_is( <<'CODE', <<'OUT', 'get_bool (vtable)', todo => 'not yet implemented' );
@@ -105,7 +101,6 @@ ok 2 - $P0 # i/o object with data returns true
 ok 3 - $P0 # i/o object with more data returns true
 ok 4 - $P0 # i/o object with no more data returns false
 OUT
-
 
 # Local Variables:
 #   mode: cperl

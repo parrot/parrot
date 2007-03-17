@@ -22,7 +22,6 @@ Tests the ParrotIO PMC.
 
 =cut
 
-
 # L<PDD22/I\/O PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
@@ -32,7 +31,6 @@ pir_output_is( <<'CODE', <<'OUT', 'new' );
 CODE
 ok 1 - $P0 = new .ParrotIO
 OUT
-
 
 # L<PDD22/I\/O PMC API/=item open.*=item close>
 pir_output_is( <<'CODE', <<'OUT', 'open and close - synchronous', todo => 'not yet implemented' );
@@ -80,17 +78,14 @@ ok 5 - $P0.open($S1)      # with bad file
 ok 6 - $P0.open($S1, $S2) # new file, write mode succeeds
 OUT
 
-
 # TODO test open file, close file, delete file, reopen previously opened stream
 
-
 # TODO cleanup 'new_file'
-
 
 SKIP: {
     skip 'no asynch calls yet' => 1;
 
-pir_output_is( <<'CODE', <<'OUT', 'open and close - asynchronous' );
+    pir_output_is( <<'CODE', <<'OUT', 'open and close - asynchronous' );
 .sub 'test' :main
     $P1 = # TODO create a callback here
     $P0 = new .ParrotIO
@@ -119,9 +114,9 @@ ok 4 - $P0.open()
 OUT
 }
 
-
 # L<PDD22/I\/O PMC API/=item print.*=item readline>
-pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - synchronous', todo => 'not yet implemented' );
+pir_output_is(
+    <<'CODE', <<'OUT', 'print, read, and readline - synchronous', todo => 'not yet implemented' );
 .sub 'test' :main
     load_bytecode 'String/Utils.pbc'
     .local pmc chomp
@@ -172,15 +167,11 @@ ok 4 - $S0 = $P1.readline($I2)
 ok 5 - $S0 = $P1.readline($I2) # again on same stream
 OUT
 
-
 # TODO test reading/writing code points once supported
-
 
 # TODO test reading long chunks, eof, and across newlines
 
-
 # TODO pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
-
 
 # L<PDD22/I\/O PMC API/=item record_separator>
 pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implemented' );
@@ -217,7 +208,6 @@ ok 1 - $S0 = $P1.record_separator() # default
 ok 2 - $P0.record_separator($S1)
 ok 3 - $P0.record_separator() # .readline works as expected
 OUT
-
 
 # L<PDD22/I\/O PMC API/=item buffer_type>
 pir_output_is( <<'CODE', <<'OUT', 'buffer_type', todo => 'not yet implemented' );
@@ -277,9 +267,7 @@ ok 5 - $I0 = $P1.buffer_type() # PIO_FULLBUF
 ok 6 - $S0 = $P1.buffer_type() # PIO_FULLBUF
 OUT
 
-
 # TODO test effects of buffer_type, not just set/get
-
 
 # TODO
 # L<PDD22/I\/O PMC API/=item buffer_size>
@@ -288,10 +276,8 @@ OUT
 # change buffer size while it contains data
 # try with all 'buffer_type' modes
 
-
 # L<PDD22/I\/O PMC API/=item get_fd>
 # NOTES: this is going to be platform dependent
-
 
 # Local Variables:
 #   mode: cperl

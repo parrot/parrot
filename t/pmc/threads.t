@@ -935,7 +935,8 @@ okay:
 .end
 CODE
 
-pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE|CLONE_GLOBALS|CLONE_HLL|CLONE_LIBRARIES", todo=> 'RT#41373' );
+pir_output_is(
+    <<'CODE', <<'OUTPUT', "CLONE_CODE|CLONE_GLOBALS|CLONE_HLL|CLONE_LIBRARIES", todo => 'RT#41373' );
 .HLL 'Perl', 'perl_group'
 
 .include 'interpinfo.pasm'

@@ -23,7 +23,6 @@ Test the NameSpace PMC as described in PDD21.
 
 =cut
 
-
 # L<PDD21/Namespace PMC API/>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
@@ -33,7 +32,6 @@ pir_output_is( <<'CODE', <<'OUT', 'new' );
 CODE
 ok 1 - $P0 = new .NameSpace
 OUT
-
 
 # L<PDD21/Namespace PMC API/=head4 Untyped Interface>
 pir_output_is( <<'CODE', <<'OUT', 'NameSpace does "hash"' );
@@ -48,7 +46,6 @@ pir_output_is( <<'CODE', <<'OUT', 'NameSpace does "hash"' );
 CODE
 ok 1 - NameSpace does "hash"
 OUT
-
 
 # L<PDD21//>
 pir_output_is( <<'CODE', <<'OUTPUT', "find_global bar" );
@@ -937,7 +934,7 @@ CODE
 Didn't find root namespace 'Foo'.
 OUTPUT
 
-my $create_nested_key =<<'CREATE_NESTED_KEY';
+my $create_nested_key = <<'CREATE_NESTED_KEY';
 .sub create_nested_key
     .param string name
     .param pmc other_names :slurpy
@@ -1514,6 +1511,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', 'del_var()' );
 
 CODE
 OUTPUT
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

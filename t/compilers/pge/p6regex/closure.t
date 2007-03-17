@@ -66,7 +66,6 @@ p6rule_like(
     qr/357/, "PIR closure modifying match"
 );
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

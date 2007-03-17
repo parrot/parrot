@@ -22,11 +22,9 @@ Tests the MetaAttribute PMC.
 
 =cut
 
-
 ## TODO PDD does not spec MetaAttribute, but it's been implemented
 ## in most of these tests, i'm either testing what's been implemented,
 ## or my assumptions -- particle
-
 
 # L<PDD15/MetaAttribute PMC API>
 # TODO fix smartlinks once this is specced
@@ -45,7 +43,6 @@ CODE
 ok 1 - $P0 = new .MetaAttribute
 ok 2 - isa $P0, 'MetaAttribute'
 OUT
-
 
 pir_output_is( <<'CODE', <<'OUT', 'name' );
 .sub 'test' :main
@@ -78,7 +75,6 @@ ok 2 - name() with args sets attribute name
 ok 3 - name() with too many args fails
 OUT
 
-
 pir_output_is( <<'CODE', <<'OUT', 'type' );
 .sub 'test' :main
     $P0 = new .MetaAttribute
@@ -110,9 +106,7 @@ ok 2 - type() with args sets attribute type
 ok 3 - type() with too many args fails
 OUT
 
-
 ## TODO add more tests as this is documented and implemented
-
 
 # Local Variables:
 #   mode: cperl

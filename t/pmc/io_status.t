@@ -22,7 +22,6 @@ Tests the Status PMC described in PDD22.
 
 =cut
 
-
 # L<PDD22/Status Object PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not yet implemented' );
 .sub 'test' :main
@@ -32,7 +31,6 @@ pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not yet implemented' );
 CODE
 ok 1 - $P0 = new .Status
 OUT
-
 
 # L<PDD22/Status Object PMC API/=item get_integer (vtable)>
 pir_output_is( <<'CODE', <<'OUT', 'get_integer (vtable)', todo => 'not yet implemented' );
@@ -64,7 +62,6 @@ ok 2 - $I0 = $P0 # still running
 ok 3 - $I0 = $P0 # failure
 OUT
 
-
 # L<PDD22/Status Object PMC API/=item get_bool (vtable)>
 pir_output_is( <<'CODE', <<'OUT', 'get_bool (vtable)', todo => 'not yet implemented' );
 .sub 'test' :main
@@ -92,7 +89,6 @@ ok 1 - $P0 # success
 ok 2 - $P0 # still running
 ok 3 - $P0 # failure
 OUT
-
 
 # L<PDD22/Status Object PMC API/=item return>
 pir_output_is( <<'CODE', <<'OUT', 'return', todo => 'not yet implemented' );
@@ -126,7 +122,6 @@ ok 1 - $P0 = $P1.return() # success
 ok 2 - $P0 = $P1.return() # still running
 ok 3 - $P0 = $P1.return() # no return value
 OUT
-
 
 # L<PDD22/Status Object PMC API/=item error>
 pir_output_is( <<'CODE', <<'OUT', 'error', todo => 'not yet implemented' );
@@ -180,7 +175,6 @@ ok 4 - $P0 = $P1.error() # error isa Exception
 ok 5 - $P0 = $P1.error() # no error
 OUT
 
-
 # L<PDD22/Status Object PMC API/=item throw>
 pir_output_is( <<'CODE', <<'OUT', 'throw', todo => 'not yet implemented' );
 .sub 'test' :main
@@ -218,7 +212,6 @@ CODE
 ok 1 - $P1.throw() # no error
 ok 2 - $P1.throw() # error
 OUT
-
 
 # Local Variables:
 #   mode: cperl

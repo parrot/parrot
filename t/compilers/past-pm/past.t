@@ -5,7 +5,7 @@ use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 11;
 
-pir_output_is(<<'CODE', <<'OUT', 'load the libraries');
+pir_output_is( <<'CODE', <<'OUT', 'load the libraries' );
 .sub _main
     load_bytecode 'PAST-pm.pbc'
 .end
@@ -13,19 +13,19 @@ CODE
 OUT
 
 foreach my $name (qw(Node Val Var Op Block Stmts)) {
-my $module = "PAST::$name";
-my $code = <<'CODE'
+    my $module = "PAST::$name";
+    my $code   = <<'CODE'
 .sub _main
     load_bytecode 'PAST-pm.pbc'
     load_bytecode 'Dumper.pbc'
     .local pmc node
     .local pmc node2
 CODE
-;
+        ;
 
-$code .= "    node = new '$module'\n";
-$code .= "    node2 = new '$module'\n";
-$code .= <<'CODE'
+    $code .= "    node = new '$module'\n";
+    $code .= "    node2 = new '$module'\n";
+    $code .= <<'CODE'
     node.'init'('name' => 'foo', 'atype'=> '42')
     node2.'init'('name' => 'bar', 'atype'=> '43')
     node.'push'(node2)
@@ -36,9 +36,9 @@ $code .= <<'CODE'
     .return ()
 .end
 CODE
-;
+        ;
 
-pir_output_is($code, <<"OUT", "set attributes for $module via method");
+    pir_output_is( $code, <<"OUT", "set attributes for $module via method" );
 foo
 "ast" => PMC '$module'  {
     <name> => "foo"
@@ -52,7 +52,7 @@ OUT
 
 }
 
-pir_output_is(<<'CODE', <<'OUT', 'dump PAST::Val node in visual format');
+pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Val node in visual format' );
 .sub _main
     load_bytecode 'PAST-pm.pbc'
     load_bytecode 'Dumper.pbc'
@@ -76,7 +76,7 @@ s~
 }
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'dump PAST::Var node in visual format');
+pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Var node in visual format' );
 .sub _main
     load_bytecode 'PAST-pm.pbc'
     load_bytecode 'Dumper.pbc'
@@ -100,7 +100,7 @@ CODE
 }
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'dump PAST::Op node in visual format');
+pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Op node in visual format' );
 .sub _main
     load_bytecode 'PAST-pm.pbc'
     load_bytecode 'Dumper.pbc'
@@ -124,7 +124,7 @@ CODE
 }
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'dump PAST::Block node in visual format');
+pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Block node in visual format' );
 .sub _main
     load_bytecode 'PAST-pm.pbc'
     load_bytecode 'Dumper.pbc'

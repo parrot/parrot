@@ -448,7 +448,6 @@ CODE
 OUTPUT
 unlink('gdbm_hash_1');
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

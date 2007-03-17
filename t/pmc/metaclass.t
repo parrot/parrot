@@ -22,10 +22,8 @@ Tests the MetaClass PMC.
 
 =cut
 
-
 ## TODO PDD says 'Class', impl says 'MetaClass'
 ## i'm testing the impl, cause that's more fun
-
 
 # L<PDD15/Class PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
@@ -63,7 +61,6 @@ CODE
 ok 1 - Class PMC has "I am a class" flag set
 OUT
 
-
 # L<PDD15/Class PMC API/=item name>
 pir_output_is( <<'CODE', <<'OUT', 'name' );
 .sub 'test' :main
@@ -96,7 +93,6 @@ ok 2 - name() with args sets class name
 ok 3 - name() with too many args fails
 OUT
 
-
 # L<PDD15/Class PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
@@ -121,7 +117,6 @@ ok 2 - new() with args returns an object
 OUT
 ## test what's set in the object by .'new'() in t/pmc/object.t
 ## XXX Second test here should probably fail if the class has no abc attribute
-
 
 # L<PDD15/Class PMC API/=item attributes>
 pir_output_is( <<'CODE', <<'OUT', 'attributes' );
@@ -155,7 +150,6 @@ ok 2 - New Class PMC has no attributes
 ok 3 - attributes() is read-only accessor
 OUT
 ## Q: what attributes the base Class have by default?
-
 
 # L<PDD15/Class PMC API/=item add_attribute>
 pir_output_is( <<'CODE', <<'OUT', 'add_attribute' );
@@ -203,7 +197,6 @@ OUT
 ## Q: should adding an attribute with unknown type fail? i think so.
 ## Q: should adding an attr with the same name as an existing one fail? i say yes.
 
-
 ## NOTE i think this belongs in the Object PMC tests
 # L<PDD15/Class PMC API>
 pir_output_is( <<'CODE', <<'OUT', 'set_attr/get_attr VTABLE methods' );
@@ -234,7 +227,6 @@ ok 3 - set an attribute
 ok 4 - got an attribute
 OUT
 
-
 # L<PDD15/Class PMC API/=item parents>
 pir_output_is( <<'CODE', <<'OUT', 'parents' );
 .sub 'test' :main
@@ -252,9 +244,7 @@ OUT
 ## NOTE test that accessor is read-only
 ## NOTE figure out what parents the base Class has by default (if any)
 
-
 ## TODO add_parent
-
 
 # L<PDD15/Class PMC API/=item roles>
 pir_output_is( <<'CODE', <<'OUT', 'roles' );
@@ -273,9 +263,7 @@ OUT
 ## NOTE test that accessor is read-only
 ## NOTE figure out what roles the base Class has by default (if any)
 
-
 ## TODO add_role
-
 
 # Local Variables:
 #   mode: cperl

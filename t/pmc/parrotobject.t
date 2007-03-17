@@ -166,9 +166,9 @@ Foo::__get_string
 Bar::get_string
 OUT
 
-
 # assign opcode in inherited classes
-pir_output_is( <<'CODE', <<'OUT', 'assign opcode in inherited classes', 'todo' => 'assign opcode inheritance' );
+pir_output_is(
+    <<'CODE', <<'OUT', 'assign opcode in inherited classes', 'todo' => 'assign opcode inheritance' );
 .sub main :main
     $P1 = new .ResizablePMCArray
     push $P1, 3
@@ -192,7 +192,7 @@ CODE
 1
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'RT#41733 - Execution ends after returning from invoke');
+pir_output_is( <<'CODE', <<'OUT', 'RT#41733 - Execution ends after returning from invoke' );
 .namespace ['Foo']
 
 .sub invoke :vtable
@@ -211,7 +211,7 @@ you invoked me!
 got here
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'params/returns from overridden invoke');
+pir_output_is( <<'CODE', <<'OUT', 'params/returns from overridden invoke' );
 .namespace ['Foo']
 
 .sub invoke :vtable
@@ -234,7 +234,7 @@ CODE
 3
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', 'RT#41732');
+pir_output_like( <<'CODE', <<'OUT', 'RT#41732' );
 .namespace ['Foo']
 
 .sub __invoke
@@ -250,7 +250,6 @@ pir_output_like( <<'CODE', <<'OUT', 'RT#41732');
 CODE
 /1 params expected/
 OUT
-
 
 # '
 

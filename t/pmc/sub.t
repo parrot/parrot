@@ -25,7 +25,7 @@ C<Continuation> PMCs.
 
 =cut
 
-my $temp      = "temp.pasm";
+my $temp       = "temp.pasm";
 my $load_types = <<'END_PASM';
     loadlib P20, 'perl_group'
     find_type I24, 'Integer'
@@ -756,7 +756,7 @@ OUTPUT
 
 # This is the behavior of Parrot 0.4.3
 # XXX Should there be a warning ?
-pir_output_is( <<'CODE', '', 'warn on in main');
+pir_output_is( <<'CODE', '', 'warn on in main' );
 .sub _main :main
 .include "warnings.pasm"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
@@ -786,7 +786,7 @@ OUTPUT
 # XXX This is the behavior of Parrot 0.4.3
 # It looks like core PMCs never emit warning.
 # Look in perlundef.t for a more sane test of 'warningson' in subs
-pir_output_is( <<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2");
+pir_output_is( <<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2" );
 .sub _main :main
 .include "warnings.pasm"
     _f1()
@@ -1115,7 +1115,8 @@ CODE
 2301
 OUTPUT
 
-pir_output_like( <<"CODE", <<'OUTPUT', 'warn on in main', todo => "XXX core undef doesn't warn here. Should it?");
+pir_output_like(
+    <<"CODE", <<'OUTPUT', 'warn on in main', todo => "XXX core undef doesn't warn here. Should it?" );
 .sub 'test' :main
 .include "warnings.pasm"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
@@ -1147,7 +1148,8 @@ CODE
 ok
 OUTPUT
 
-pir_output_like( <<"CODE", <<'OUTPUT', 'warn on in sub, turn off in f2', todo=> "XXX core undef doesn't warn here. Should it?");
+pir_output_like(
+    <<"CODE", <<'OUTPUT', 'warn on in sub, turn off in f2', todo => "XXX core undef doesn't warn here. Should it?" );
 .sub 'test' :main
 $load_types
 .include "warnings.pasm"
@@ -1319,7 +1321,7 @@ in inited
 main
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'assign');
+pir_output_is( <<'CODE', <<'OUTPUT', 'assign' );
 .sub main :main
     $P0 = get_global 'ok'
 
@@ -1336,7 +1338,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'assign w/:outer');
+pir_output_is( <<'CODE', <<'OUTPUT', 'assign w/:outer' );
 .sub main :main
     $P0 = get_global 'ok'
 
@@ -1353,7 +1355,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'get_namespace()');
+pir_output_is( <<'CODE', <<'OUTPUT', 'get_namespace()' );
 .sub main :main
     $P0 = get_global 'main'
     $P0 = $P0.'get_namespace'()
@@ -1376,7 +1378,6 @@ CODE
 parrot
 parrot;Foo;Bar
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

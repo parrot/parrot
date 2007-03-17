@@ -65,7 +65,6 @@ CODE
 foo
 OUTPUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

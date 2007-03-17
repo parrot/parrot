@@ -22,7 +22,6 @@ Tests the Role PMC.
 
 =cut
 
-
 # L<PDD15/Role PMC API>
 # TODO fix smartlinks once this is specced
 pir_output_is( <<'CODE', <<'OUT', 'new' );
@@ -41,9 +40,7 @@ ok 1 - $P0 = new .Role
 ok 2 - isa $P0, 'Role'
 OUT
 
-
 ## TODO add more tests as this is documented and implemented
-
 
 # Local Variables:
 #   mode: cperl

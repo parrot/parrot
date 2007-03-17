@@ -50,7 +50,7 @@ pir_output_like( $test_3_pir_code, <<'OUT', "check parser recovery patience." );
 /Too many errors. Correct some first.\n$/
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', '#line nnn "file"');
+pir_output_like( <<'CODE', <<'OUT', '#line nnn "file"' );
 .sub main :main
 #line 54 "xyz.pir"
     say "Hello"

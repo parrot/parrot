@@ -975,7 +975,7 @@ OUTPUT
 
 TODO: {
     local $TODO = "3 class interitance, 4-class diamond inheritance";
-pir_output_is( <<'CODE', <<'OUTPUT', "super 2 - test dispatch" );
+    pir_output_is( <<'CODE', <<'OUTPUT', "super 2 - test dispatch" );
 .sub main :main
     .local pmc o, cl, cl2
     cl = newclass 'Parent'
@@ -1008,7 +1008,7 @@ Parent foo
 Parent bar
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "super 3 - two classes, addparent" );
+    pir_output_is( <<'CODE', <<'OUTPUT', "super 3 - two classes, addparent" );
 .sub main :main
     .local pmc o, p, c
     p = newclass 'Parent'
@@ -1040,7 +1040,7 @@ Parent foo
 Parent bar
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "super 4 - three classes" );
+    pir_output_is( <<'CODE', <<'OUTPUT', "super 4 - three classes" );
 .sub main :main
     .local pmc o, p, c, g
     p = newclass 'Parent'
@@ -1078,7 +1078,7 @@ Child foo
 Parent foo
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "super 5 - diamond" );
+    pir_output_is( <<'CODE', <<'OUTPUT', "super 5 - diamond" );
 .sub main :main
     .local pmc o, p, c1, c2, i
     p = newclass 'Parent'
@@ -1324,7 +1324,6 @@ CODE
 init was called
 init_pmc was called
 OUTPUT
-
 
 pir_output_is( <<'CODE', <<'OUTPUT', "overloading find_method vtable" );
 .sub main :main

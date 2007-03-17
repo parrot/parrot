@@ -13,7 +13,7 @@ use File::Spec;
 
 my $MSWin32 = $^O =~ m!MSWin32!;
 my $cygwin  = $^O =~ m!cygwin!;
-my $MSVC    = grep { $PConfig{cc} eq $_ } (qw(cl cl.exe));
+my $MSVC = grep { $PConfig{cc} eq $_ } (qw(cl cl.exe));
 
 =head1 NAME
 
@@ -195,7 +195,7 @@ CODE
 
 # test readdir
 SKIP: {
-    skip 'not implemented on windows yet', 1 if ($MSWin32 && $MSVC);
+    skip 'not implemented on windows yet', 1 if ( $MSWin32 && $MSVC );
 
     opendir IN, '.';
     my @entries = readdir IN;

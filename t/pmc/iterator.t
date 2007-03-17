@@ -1319,7 +1319,7 @@ pi
 6.28
 OUTPUT
 
-pir_output_is (<< 'CODE', << 'OUTPUT', "iterator can be cloned");
+pir_output_is( << 'CODE', << 'OUTPUT', "iterator can be cloned" );
 .sub main :main
     .local pmc ar, i1, i2
     ar = new ResizableIntegerArray
@@ -1330,7 +1330,7 @@ pir_output_is (<< 'CODE', << 'OUTPUT', "iterator can be cloned");
 CODE
 OUTPUT
 
-pir_output_is (<< 'CODE', << 'OUTPUT', "cloned iterator independent of original");
+pir_output_is( << 'CODE', << 'OUTPUT', "cloned iterator independent of original" );
 .sub main :main
     .local pmc ar, i1, i2
     ar = new ResizableIntegerArray

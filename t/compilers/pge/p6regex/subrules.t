@@ -91,7 +91,6 @@ p6rule_is(
     "negated charclass in subrule"
 );
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

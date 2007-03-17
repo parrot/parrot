@@ -22,7 +22,6 @@ Tests the Object PMC.
 
 =cut
 
-
 # L<PDD15/Object PMC API>
 # TODO fix smartlinks once this is specced
 pir_output_is( <<'CODE', <<'OUT', 'new' );
@@ -41,9 +40,7 @@ ok 1 - $P0 = new .Object
 ok 2 - isa $P0, 'Object'
 OUT
 
-
 ## TODO add more tests as this is documented and implemented
-
 
 # Local Variables:
 #   mode: cperl
