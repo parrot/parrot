@@ -124,6 +124,7 @@ for my $file ( @versioned_files ) {
 
     # don't want to keep directories
     if ( -d $file ) {
+        push @dirs, $file;
         next;
     }
 
