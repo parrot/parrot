@@ -1,0 +1,21 @@
+# Copyright (C) 2007, The Perl Foundation.
+# $Id: metacommitter_guide.pod 17497 2007-03-15 18:50:37Z paultcochrane $
+
+=head1 Cage Cleaner Guide
+
+From F<docs/roles_responsibilities.pod>:
+
+ Fixes failing tests, makes sure coding standards are implemented, reviews
+ documentation and examples. A class of tickets in the tracking system (RT)
+ has been created for use by this group. This is an entry level position, and
+ viewed as a good way to get familiar with parrot internals.
+
+=head1 AUTHOR
+
+Paul Cochrane a.k.a. ptc
+
+=head1 SEE ALSO
+
+F<docs/roles_responsibilities.pod>, F<RESPONSIBLE_PARTIES>
+
+=cut
