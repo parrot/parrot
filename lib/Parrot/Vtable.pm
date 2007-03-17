@@ -421,7 +421,7 @@ sub parse_params {
 
 =item F<src/pmc/null.pl>
 
-=back
+=cut
 
 1;
 
