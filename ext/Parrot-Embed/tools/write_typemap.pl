@@ -15,3 +15,10 @@ my $c_file = qx/xsubpp -prototypes -typemap $perl_typemap -typemap $custom_typem
 open( my $file, '>', 'Embed.c' ) or die "Cannot write Embed.c\n";
 print {$file} $c_file;
 close $file;
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
