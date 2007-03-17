@@ -141,7 +141,6 @@ EOC
 EOC
 }
 
-
 =item C<c_code_coda()>
 
 Returns the Parrot C code coda
@@ -163,6 +162,5 @@ sub c_code_coda() {
 EOC
     "$cout\n";
 }
-
 
 1;

@@ -1,3 +1,4 @@
+
 =head1 Parrot::Pmc2c::Null Instance Methods
 
 =over 4

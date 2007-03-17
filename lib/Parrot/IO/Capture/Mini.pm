@@ -10,8 +10,8 @@ sub TIEHANDLE {
 }
 
 sub PRINT {
-     my $self = shift;
-     push @$self, join '',@_;
+    my $self = shift;
+    push @$self, join '', @_;
 }
 
 sub READLINE {
@@ -69,3 +69,4 @@ always to the authors of IO::Capture, Mark Reynolds and Jon Morgan!
 IO::Capture (L<http://search.cpan.org/dist/IO-Capture/>).
 
 =cut
+

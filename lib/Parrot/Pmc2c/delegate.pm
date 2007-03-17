@@ -1,3 +1,4 @@
+
 =head1 Parrot::Pmc2c::delegate Instance Methods
 
 =over 4
@@ -137,5 +138,4 @@ EOC
 }
 
 1;
-
 

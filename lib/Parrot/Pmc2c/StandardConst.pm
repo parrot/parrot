@@ -1,3 +1,4 @@
+
 =head1 Parrot::Pmc2c::Standard::Const Instance Methods
 
 Returns the C code for the method body.

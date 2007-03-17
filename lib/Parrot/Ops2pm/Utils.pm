@@ -67,8 +67,8 @@ testing and future refactoring.
 
 ############### Package-scoped Lexical Variables ###############
 
-my $NUM_FILE   = "src/ops/ops.num";
-my $SKIP_FILE  = "src/ops/ops.skip";
+my $NUM_FILE  = "src/ops/ops.num";
+my $SKIP_FILE = "src/ops/ops.skip";
 
 ############### Subroutines ###############
 
@@ -120,8 +120,8 @@ for F<make>'s call to F<tools/build/ops2pm.pl>.
 =cut
 
 sub new {
-    my ($class, $argsref) = @_;
-    my @argv = @{$argsref->{argv}};
+    my ( $class, $argsref ) = @_;
+    my @argv = @{ $argsref->{argv} };
     my $file = shift @argv;
     die "$argsref->{script}: Could not find ops file '$file'!\n"
         unless -e $file;
@@ -162,14 +162,14 @@ to the object just created.  Experimental ops are marked as such.
 
 sub prepare_ops {
     my $self = shift;
-    my $ops = Parrot::OpsFile->new( [$self->{file}], $self->{nolines} );
+    my $ops = Parrot::OpsFile->new( [ $self->{file} ], $self->{nolines} );
     die "$self->{script}: Could not read ops file '$self->{file}'!\n"
         unless defined $ops;
 
     # Copy the ops from the remaining .ops files to the object just created.
     my %seen;
 
-    while ( defined (my $f = shift( @{$self->{argv}} ) ) ) {
+    while ( defined( my $f = shift( @{ $self->{argv} } ) ) ) {
         if ( $seen{$f} ) {
             print STDERR "$self->{script}: Ops file '$f' mentioned more than once!\n";
             next;
@@ -184,6 +184,7 @@ sub prepare_ops {
         die "OPS invalid for $f" unless ref $temp_ops->{OPS};
 
         my $experimental = $f =~ /experimental/;
+
         # mark experimental ops
         if ($experimental) {
             for my $el ( @{ $temp_ops->{OPS} } ) {
@@ -231,7 +232,7 @@ stepping stone on the path to building F<lib/Parrot/OpLib/core.pm>.
 sub renum_op_map_file {
     my $self = shift;
 
-    my $file = scalar(@_) ? shift : $NUM_FILE;
+    my $file = scalar(@_) ? shift: $NUM_FILE;
     my ( $name, $number, @lines, %seen, %fixed, $fix );
     $fix = 1;
     open my $OP, '<', $file
@@ -307,7 +308,7 @@ F<src/ops/ops.skip>.
 =cut
 
 sub load_op_map_files {
-    my $self = shift;
+    my $self      = shift;
     my $num_file  = $NUM_FILE;
     my $skip_file = $SKIP_FILE;
 
@@ -387,25 +388,21 @@ Will emit warnings under these circumstances:
 sub sort_ops {
     my $self = shift;
     for my $el ( @{ $self->{ops}->{OPS} } ) {
-        if ( exists $self->{optable}->{$el->full_name} ) {
-            $el->{CODE} = $self->{optable}->{$el->full_name};
+        if ( exists $self->{optable}->{ $el->full_name } ) {
+            $el->{CODE} = $self->{optable}->{ $el->full_name };
         }
-        elsif ( exists $self->{skiptable}->{$el->full_name} ) {
+        elsif ( exists $self->{skiptable}->{ $el->full_name } ) {
             $el->{CODE} = -1;
         }
-        elsif ($el->{experimental}) {
-            my $n = $self->{optable}->{$el->full_name} = ++$self->{max_op_num};
-            warn sprintf(
-                "%-25s %-10s experimental, not in ops.num\n",
-                $el->full_name, $n
-            ) if -e "DEVELOPING";
+        elsif ( $el->{experimental} ) {
+            my $n = $self->{optable}->{ $el->full_name } = ++$self->{max_op_num};
+            warn sprintf( "%-25s %-10s experimental, not in ops.num\n", $el->full_name, $n )
+                if -e "DEVELOPING";
             $el->{CODE} = $n;
         }
         else {
-            warn sprintf(
-                "%-25s %-10s SKIPPED: not in ops.num nor ops.skip\n",
-                $el->full_name, ""
-            ) if -e "DEVELOPING";
+            warn sprintf( "%-25s %-10s SKIPPED: not in ops.num nor ops.skip\n", $el->full_name, "" )
+                if -e "DEVELOPING";
             $el->{CODE} = -1;
         }
     }
@@ -449,7 +446,7 @@ sub prepare_real_ops {
     for my $el ( @{ $self->{ops}->{OPS} } ) {
         next if ( $el->{CODE} < 0 );    # skip
         my $opname = $el->full_name;
-        my $n      = $self->{optable}->{$opname};  # former global
+        my $n      = $self->{optable}->{$opname};    # former global
         if ( $n != $el->{CODE} ) {
             die "op $opname: number mismatch: ops.num $n vs. core.ops $el->{CODE}";
         }
@@ -487,14 +484,14 @@ Returns true value upon success.
 =cut
 
 sub print_module {
-    my $self = shift;
-    my $cwd = cwd();
+    my $self    = shift;
+    my $cwd     = cwd();
     my $fulldir = File::Spec->catdir( $cwd, $self->{moddir} );
     if ( !-d $fulldir ) {
         File::Path::mkpath( $fulldir, 0, 0755 )
             or die "$self->{script}: Could not mkdir $fulldir: $!!\n";
     }
-    my $fullpath = File::Spec->catfile( ($fulldir), $self->{module});
+    my $fullpath = File::Spec->catfile( ($fulldir), $self->{module} );
     open my $MODULE, '>', $fullpath
         or die "$self->{script}: Could not open module file '$fullpath' for writing: $!!\n";
 
@@ -536,13 +533,8 @@ use vars qw(\$VERSION \$ops \$preamble);
 END_C
 
     print $MODULE $preamble;
-    print $MODULE Data::Dumper->Dump(
-        [
-            $self->{real_ops}->preamble,
-            [ $self->{real_ops}->ops ]
-        ],
-        [qw($preamble $ops)]
-    );
+    print $MODULE Data::Dumper->Dump( [ $self->{real_ops}->preamble, [ $self->{real_ops}->ops ] ],
+        [qw($preamble $ops)] );
 
     print $MODULE <<END_C;
 
@@ -578,15 +570,15 @@ Returns true value upon success.
 =cut
 
 sub print_h {
-    my $self = shift;
-    my $cwd = cwd();
+    my $self    = shift;
+    my $cwd     = cwd();
     my $fulldir = File::Spec->catdir( $cwd, $self->{inc_dir} );
     if ( !-d $fulldir ) {
         File::Path::mkpath( $fulldir, 0, 0755 )
             or die "$self->{script}: Could not mkdir $fulldir: $!!\n";
     }
 
-    my $fullpath = File::Spec->catfile( ($fulldir), $self->{inc_f});
+    my $fullpath = File::Spec->catfile( ($fulldir), $self->{inc_f} );
     open my $OUT, '>', $fullpath
         or die "$self->{script}: Could not open module file '$fullpath' for writing: $!!\n";
 
@@ -607,7 +599,7 @@ typedef enum {
 END_C
 
     my @OPS = @{ $self->{real_ops}->{OPS} };
-    for my $el ( @OPS ) {
+    for my $el (@OPS) {
         my $opname = $el->full_name;
         my $n      = $el->{CODE};
         my $comma  = $n < @OPS - 1 ? "," : "";

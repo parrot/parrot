@@ -75,38 +75,41 @@ testable.
 =cut
 
 sub new {
-    my ($class, $argsref) = @_;
-    unless (defined $argsref->{flag}) {
-        print STDERR "Parrot::Ops2c::Utils::new() requires reference to hash of command-line options: $!";
+    my ( $class, $argsref ) = @_;
+    unless ( defined $argsref->{flag} ) {
+        print STDERR
+            "Parrot::Ops2c::Utils::new() requires reference to hash of command-line options: $!";
         return;
     }
     my $flagref = $argsref->{flag};
-    my @argv = @{$argsref->{argv}};
+    my @argv    = @{ $argsref->{argv} };
     $argsref->{script} ||= "tools/build/ops2c.pl";
     unless (@argv) {
         print STDERR "Parrot::Ops2c::Utils::new() requires 'trans' options: $!";
         return;
-    };
+    }
     my $class_name = shift @argv;
     my %is_allowed = map { $_ => 1 } qw(C CGoto CGP CSwitch CPrederef);
-    unless ($is_allowed{$class_name}) {
-        print STDERR "Parrot::Ops2c::Utils::new() requires C, CGoto, CGP, CSwitch and/or  CPrederef: $!";
+    unless ( $is_allowed{$class_name} ) {
+        print STDERR
+            "Parrot::Ops2c::Utils::new() requires C, CGoto, CGP, CSwitch and/or  CPrederef: $!";
         return;
-    };
+    }
 
     my $trans_class = "Parrot::OpTrans::" . $class_name;
     eval "require $trans_class";
-    my $trans   = $trans_class->new();
+    my $trans = $trans_class->new();
+
     # Don't yet know how to test the following.
-    unless (defined $trans) {
+    unless ( defined $trans ) {
         print STDERR "Unable to construct $trans object: $!";
         return;
-    };
+    }
 
-    my $suffix  = $trans->suffix();     # Invoked (sometimes) as ${suffix}
+    my $suffix = $trans->suffix();    # Invoked (sometimes) as ${suffix}
 
     my $file = $flagref->{core} ? 'core.ops' : shift @argv;
-    my $base = $file;   # Invoked (sometimes) as ${base}
+    my $base = $file;    # Invoked (sometimes) as ${base}
     $base =~ s/\.ops$//;
     my $base_ops_stub = $base . q{_ops} . $suffix;
     my $base_ops_h    = $base_ops_stub . q{.h};
@@ -120,31 +123,36 @@ sub new {
     my $source = "src/ops/$base_ops_stub.c.temp";
 
     if ( $flagref->{dynamic} ) {
-        $source             =~ s!src/ops/!!;
-        $header             = $base_ops_h;
-        $base               =~ s!^.*[/\\]!!;
-        $include            = $base_ops_h;
+        $source =~ s!src/ops/!!;
+        $header = $base_ops_h;
+        $base =~ s!^.*[/\\]!!;
+        $include = $base_ops_h;
         $flagref->{dynamic} = 1;
     }
 
-    my $sym_export = $flagref->{dynamic}
+    my $sym_export =
+        $flagref->{dynamic}
         ? 'PARROT_DYNEXT_EXPORT'
         : 'PARROT_API';
 
     my $ops;
-    if ($flagref->{core}) {
-        $ops = _prepare_core( {
-            file        => $file,
-            flag        => $flagref,
-        } );
+    if ( $flagref->{core} ) {
+        $ops = _prepare_core(
+            {
+                file => $file,
+                flag => $flagref,
+            }
+        );
     }
     else {
-        $ops = _prepare_non_core( {
-            file        => $file,
-            argv        => [ @argv ],
-            flag        => $flagref,
-            script      => $argsref->{script},
-        } );
+        $ops = _prepare_non_core(
+            {
+                file   => $file,
+                argv   => [@argv],
+                flag   => $flagref,
+                script => $argsref->{script},
+            }
+        );
     }
 
     my %versions = (
@@ -152,42 +160,38 @@ sub new {
         minor => $ops->minor_version,
         patch => $ops->patch_version,
     );
-    my $num_ops       = scalar $ops->ops;
-    my $num_entries   = $num_ops + 1;          # For trailing NULL
+    my $num_ops     = scalar $ops->ops;
+    my $num_entries = $num_ops + 1;       # For trailing NULL
 
-    if ( ! $flagref->{dynamic} && ! -d $incdir ) {
+    if ( !$flagref->{dynamic} && !-d $incdir ) {
         mkdir( $incdir, 0755 )
             or die "ops2c.pl: Could not mkdir $incdir $!!\n";
     }
 
-    my $preamble = _compose_preamble($file, $argsref->{script});
+    my $preamble = _compose_preamble( $file, $argsref->{script} );
 
-    my $init_func = join q{_}, (
-        q{Parrot},
-        q{DynOp},
-        $base . $suffix,
-        @versions{ qw(major minor patch) },
-    );
+    my $init_func = join q{_},
+        ( q{Parrot}, q{DynOp}, $base . $suffix, @versions{qw(major minor patch)}, );
 
     ##### Populate the object #####
-    $argsref->{argv} = \@argv;
-    $argsref->{trans} = $trans;
+    $argsref->{argv}   = \@argv;
+    $argsref->{trans}  = $trans;
     $argsref->{suffix} = $suffix;
 
-    $argsref->{file} = $file;
-    $argsref->{base} = $base;
-    $argsref->{incdir} = $incdir;
-    $argsref->{include} = $include;
-    $argsref->{header} = $header;
-    $argsref->{source} = $source;
+    $argsref->{file}       = $file;
+    $argsref->{base}       = $base;
+    $argsref->{incdir}     = $incdir;
+    $argsref->{include}    = $include;
+    $argsref->{header}     = $header;
+    $argsref->{source}     = $source;
     $argsref->{sym_export} = $sym_export;
 
-    $argsref->{ops} = $ops;
-    $argsref->{versions} = \%versions;
-    $argsref->{num_ops} = $num_ops;
+    $argsref->{ops}         = $ops;
+    $argsref->{versions}    = \%versions;
+    $argsref->{num_ops}     = $num_ops;
     $argsref->{num_entries} = $num_entries;
 
-    $argsref->{preamble} = $preamble;
+    $argsref->{preamble}  = $preamble;
     $argsref->{init_func} = $init_func;
 
     $argsref->{flag} = $flagref;
@@ -196,10 +200,7 @@ sub new {
 
 sub _prepare_core {
     my $argsref = shift;
-    my $ops = Parrot::OpsFile->new(
-        [ qq|src/ops/$argsref->{file}| ],
-        $argsref->{flag}->{nolines},
-    );
+    my $ops = Parrot::OpsFile->new( [qq|src/ops/$argsref->{file}|], $argsref->{flag}->{nolines}, );
     $ops->{OPS}      = $Parrot::OpLib::core::ops;
     $ops->{PREAMBLE} = $Parrot::OpLib::core::preamble;
     return $ops;
@@ -210,7 +211,7 @@ sub _prepare_non_core {
     my %opsfiles;
     my @opsfiles;
 
-    foreach my $f ( $argsref->{file}, @{$argsref->{argv}} ) {
+    foreach my $f ( $argsref->{file}, @{ $argsref->{argv} } ) {
         if ( $opsfiles{$f} ) {
             print STDERR "$argsref->{script}: Ops file '$f' mentioned more than once!\n";
             next;
@@ -232,7 +233,7 @@ sub _prepare_non_core {
 }
 
 sub _compose_preamble {
-    my ($file, $script) = @_;
+    my ( $file, $script ) = @_;
     my $preamble = <<END_C;
 /* ex: set ro:
  * !!!!!!!   DO NOT EDIT THIS FILE   !!!!!!!
@@ -288,17 +289,17 @@ sub print_c_header_file {
 
     _print_coda($HEADER);
 
-    close $HEADER or die "Unable to close handle to $self->{header}: $!";
-    (-e $self->{header}) or die "$self->{header} not created: $!";
-    (-s $self->{header}) or die "$self->{header} has 0 size: $!";
+    close $HEADER          or die "Unable to close handle to $self->{header}: $!";
+    ( -e $self->{header} ) or die "$self->{header} not created: $!";
+    ( -s $self->{header} ) or die "$self->{header} has 0 size: $!";
     return $self->{header};
 }
 
 sub _print_preamble_header {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
     print $fh $self->{preamble};
-    if ($self->{flag}->{dynamic}) {
+    if ( $self->{flag}->{dynamic} ) {
         print $fh "#define PARROT_IN_EXTENSION\n";
     }
     print $fh <<END_C;
@@ -311,13 +312,13 @@ END_C
 }
 
 sub _print_run_core_func_decl_header {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
     if ( $self->{trans}->can("run_core_func_decl") ) {
-        my $run_core_func =
-            $self->{trans}->run_core_func_decl($self->{base});
+        my $run_core_func = $self->{trans}->run_core_func_decl( $self->{base} );
         print $fh "$run_core_func;\n";
-    } else {
+    }
+    else {
         return;
     }
 }
@@ -379,8 +380,8 @@ B<A:>  It is re-used as an argument to the next method.
 
 sub print_c_source_top {
     my $self = shift;
-    $self->{defines} = $self->{trans}->defines();    # Invoked as:  ${defines}
-    $self->{bs} = "$self->{base}$self->{suffix}_";   # Also invoked as ${bs}
+    $self->{defines}      = $self->{trans}->defines();          # Invoked as:  ${defines}
+    $self->{bs}           = "$self->{base}$self->{suffix}_";    # Also invoked as ${bs}
     $self->{opsarraytype} = $self->{trans}->opsarraytype();
 
     ##### BEGIN printing to $SOURCE #####
@@ -406,7 +407,7 @@ sub print_c_source_top {
 }
 
 sub _print_preamble_source {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
     print $fh $self->{preamble};
     print $fh <<END_C;
@@ -417,29 +418,31 @@ static op_lib_t $self->{bs}op_lib;
 
 END_C
 
-    my $text = $self->{ops}->preamble($self->{trans});
+    my $text = $self->{ops}->preamble( $self->{trans} );
     $text =~ s/\bops_addr\b/$self->{bs}ops_addr/g;
     print $fh $text;
 }
 
 sub _print_ops_addr_decl {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
     if ( $self->{trans}->can("ops_addr_decl") ) {
-        print $fh $self->{trans}->ops_addr_decl($self->{bs});
-    } else {
+        print $fh $self->{trans}->ops_addr_decl( $self->{bs} );
+    }
+    else {
         return;
     }
 }
 
 sub _print_run_core_func_decl_source {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
     if ( $self->{trans}->can("run_core_func_decl") ) {
-        print $fh $self->{trans}->run_core_func_decl($self->{base});
+        print $fh $self->{trans}->run_core_func_decl( $self->{base} );
         print $fh "\n{\n";
         print $fh $self->{trans}->run_core_func_start;
-    } else {
+    }
+    else {
         return;
     }
 }
@@ -454,7 +457,7 @@ sub _iterate_over_ops {
 
     $prev_src = '';
     foreach my $op ( $self->{ops}->ops ) {
-        my $func_name = $op->func_name($self->{trans});
+        my $func_name = $op->func_name( $self->{trans} );
         my $arg_types = "$self->{opsarraytype} *, Interp *";
         my $prototype = "$self->{sym_export} $self->{opsarraytype} * $func_name ($arg_types)";
         my $args      = "$self->{opsarraytype} *cur_opcode, Interp *interp";
@@ -474,7 +477,7 @@ sub _iterate_over_ops {
             $definition = "$prototype;\n$self->{opsarraytype} *\n$func_name ($args)";
         }
 
-        my $src = $op->source($self->{trans});
+        my $src = $op->source( $self->{trans} );
         $src =~ s/\bop_lib\b/$self->{bs}op_lib/g;
         $src =~ s/\bops_addr\b/$self->{bs}ops_addr/g;
 
@@ -500,16 +503,16 @@ sub _iterate_over_ops {
         }
         $index++;
     }
-    $self->{index} =  $index;
-    $self->{op_funcs} = \@op_funcs;
+    $self->{index}         = $index;
+    $self->{op_funcs}      = \@op_funcs;
     $self->{op_func_table} = \@op_func_table;
     $self->{cg_jump_table} = \@cg_jump_table;
 }
 
 sub _print_cg_jump_table {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
-    my @cg_jump_table = @{$self->{cg_jump_table}};
+    my @cg_jump_table = @{ $self->{cg_jump_table} };
 
     if ( $self->{suffix} =~ /cg/ ) {
         print $fh @cg_jump_table;
@@ -517,12 +520,12 @@ sub _print_cg_jump_table {
         NULL
     };
 END_C
-        print $fh $self->{trans}->run_core_after_addr_table($self->{bs});
+        print $fh $self->{trans}->run_core_after_addr_table( $self->{bs} );
     }
 }
 
 sub _print_goto_opcode {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
     if ( $self->{suffix} =~ /cgp/ ) {
         print $fh <<END_C;
@@ -547,9 +550,9 @@ END_C
 }
 
 sub _print_op_function_definitions {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
-    my @op_funcs = @{$self->{op_funcs}};
+    my @op_funcs = @{ $self->{op_funcs} };
     print $fh <<END_C;
 /*
 ** Op Function Definitions:
@@ -560,17 +563,17 @@ END_C
     # Finish the SOURCE file's array initializer:
     my $CORE_SPLIT = 300;
     for ( my $i = 0 ; $i < @op_funcs ; $i++ ) {
-        if ( $i &&
-            $i % $CORE_SPLIT == 0 &&
-            $self->{trans}->can("run_core_split") )
+        if (   $i
+            && $i % $CORE_SPLIT == 0
+            && $self->{trans}->can("run_core_split") )
         {
-            print $fh $self->{trans}->run_core_split($self->{base});
+            print $fh $self->{trans}->run_core_split( $self->{base} );
         }
         print $fh $op_funcs[$i];
     }
 
     if ( $self->{trans}->can("run_core_finish") ) {
-        print $fh $self->{trans}->run_core_finish($self->{base});
+        print $fh $self->{trans}->run_core_finish( $self->{base} );
     }
     close($fh) || die "Unable to close after writing: $!";
 }
@@ -600,10 +603,10 @@ testing.
 =cut
 
 sub print_c_source_bottom {
-    my ($self, $SOURCE) = @_;
-    my @op_func_table = @{$self->{op_func_table}};
-    my $bs = $self->{bs};
-    my $index = $self->{index};
+    my ( $self, $SOURCE ) = @_;
+    my @op_func_table = @{ $self->{op_func_table} };
+    my $bs            = $self->{bs};
+    my $index         = $self->{index};
 
     $SOURCE = $self->_reset_line_number($SOURCE);
 
@@ -629,26 +632,26 @@ sub print_c_source_bottom {
 }
 
 sub _reset_line_number {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
     my $source = $self->{source};
-    my $line = 0;
+    my $line   = 0;
     open( $fh, '<', $source ) || die "Error re-reading $source: $!\n";
     while (<$fh>) { $line++; }
     $line += 2;
     close($fh) || die "Error closing $source:  $!";
     open( $fh, '>>', $source ) || die "Error appending to $source: $!\n";
-    unless ($self->{flag}->{nolines}) {
+    unless ( $self->{flag}->{nolines} ) {
         my $source_escaped = $source;
         $source_escaped =~ s|\.temp||;
         $source_escaped =~ s|(\\)|$1$1|g;    # escape backslashes
         print $fh qq{#line $line "$source_escaped"\n};
     }
-    return $fh;  # filehandle remains open
+    return $fh;                              # filehandle remains open
 }
 
 sub _op_func_table {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
     my ( $op_info, $op_func, $getop );
     $op_info = $op_func = 'NULL';
@@ -667,7 +670,7 @@ INTVAL $self->{bs}numops$self->{suffix} = $self->{num_ops};
 static op_func$self->{suffix}_t ${op_func}\[$self->{num_entries}] = {
 END_C
 
-        print $fh @{$self->{op_func_table}};
+        print $fh @{ $self->{op_func_table} };
 
         print $fh <<END_C;
   (op_func$self->{suffix}_t)0  /* NULL function pointer */
@@ -678,13 +681,13 @@ END_C
     }
     $self->{op_info} = $op_info;
     $self->{op_func} = $op_func;
-    $self->{getop} = $getop;
+    $self->{getop}   = $getop;
 }
 
 sub _op_info_table {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
-    my %names = %{$self->{names}};
+    my %names           = %{ $self->{names} };
     my %arg_dir_mapping = (
         ''   => 'PARROT_ARGDIR_IGNORED',
         'i'  => 'PARROT_ARGDIR_IN',
@@ -714,7 +717,7 @@ END_C
             my $name = $op->name;
             $names{$name} = 1;
             my $full_name = $op->full_name;
-            my $func_name = $op->func_name($self->{trans});
+            my $func_name = $op->func_name( $self->{trans} );
             my $body      = $op->body;
             my $jump      = $op->jump || 0;
             my $arg_count = $op->size;
@@ -766,12 +769,12 @@ END_C
 }
 
 sub _op_lookup {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
     if ( $self->{suffix} eq '' && !$self->{flag}->{dynamic} ) {
         $self->{getop} = 'get_op';
         my $hash_size = 3041;
-        my $tot = $self->{index} + scalar keys(%{$self->{names}});
+        my $tot       = $self->{index} + scalar keys( %{ $self->{names} } );
         if ( $hash_size < $tot * 1.2 ) {
             print STDERR "please increase hash_size ($hash_size) in lib/Parrot/Ops2c/Utils.pm "
                 . "to a prime number > ", $tot * 1.2, "\n";
@@ -880,7 +883,8 @@ static void hop_deinit(void)
 }
 
 END_C
-    } else {
+    }
+    else {
         print $fh <<END_C;
 static void hop_deinit(void) {}
 END_C
@@ -888,7 +892,7 @@ END_C
 }
 
 sub _print_op_lib_descriptor {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
     my $core_type = $self->{trans}->core_type();
     print $fh <<END_C;
@@ -915,17 +919,16 @@ END_C
 }
 
 sub _generate_init_func {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
     my $init1_code = "";
     if ( $self->{trans}->can("init_func_init1") ) {
-        $init1_code = $self->{trans}->init_func_init1($self->{base});
+        $init1_code = $self->{trans}->init_func_init1( $self->{base} );
     }
 
     my $init_set_dispatch = "";
     if ( $self->{trans}->can("init_set_dispatch") ) {
-        $init_set_dispatch
-            = $self->{trans}->init_set_dispatch($self->{bs});
+        $init_set_dispatch = $self->{trans}->init_set_dispatch( $self->{bs} );
     }
 
     print $fh <<END_C;
@@ -951,16 +954,11 @@ END_C
 }
 
 sub _print_dynamic_lib_load {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
 
-    if ($self->{flag}->{dynamic}) {
-        my $load_func = join q{_}, (
-            q{Parrot},
-            q{lib},
-            $self->{base},
-            (q{ops} . $self->{suffix}),
-            q{load},
-        );
+    if ( $self->{flag}->{dynamic} ) {
+        my $load_func = join q{_},
+            ( q{Parrot}, q{lib}, $self->{base}, ( q{ops} . $self->{suffix} ), q{load}, );
         print $fh <<END_C;
 /*
  * dynamic lib load function - called once
@@ -1023,3 +1021,4 @@ it in this package's methods.
 =back
 
 =cut
+
