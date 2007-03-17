@@ -6,6 +6,7 @@
 
 package Parrot::Pmc2c::Null;
 use base 'Parrot::Pmc2c';
+use strict;
 use warnings;
 use Parrot::Pmc2c::UtilFunctions qw( gen_ret );
 

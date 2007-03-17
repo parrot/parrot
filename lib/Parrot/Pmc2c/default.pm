@@ -6,6 +6,7 @@
 
 package Parrot::Pmc2c::default;
 use base 'Parrot::Pmc2c';
+use strict;
 use warnings;
 import Parrot::Pmc2c qw( gen_ret );
 

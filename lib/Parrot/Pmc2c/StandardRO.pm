@@ -8,6 +8,7 @@ Returns the C code for the method body.
 
 package Parrot::Pmc2c::Standard::RO;
 use base 'Parrot::Pmc2c::Standard';
+use strict;
 use warnings;
 use  Parrot::Pmc2c::UtilFunctions qw( gen_ret );
 
