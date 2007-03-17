@@ -4,19 +4,6 @@
 
 .const int TESTS = 47
 
-.macro IMPORT(lib,func)
-    _ = find_global .lib, .func
-    store_global .func, _
-.endm
-
-.macro TEST_IMPORT()
-    .sym pmc _
-    .IMPORT('Test::More', 'ok')
-    .IMPORT('Test::More', 'is')
-    .IMPORT('Test::More', 'diag')
-.endm
-
-
 .sub 'main' :main
     load_bytecode 'Test/More.pir'
 
@@ -29,8 +16,12 @@
     store_global 'TEST_VERBOSE', $P0
 
   import:
-    .local pmc _
-    .IMPORT('Test::More', 'plan')
+    .local pmc exports, curr_namespace, test_namespace
+    curr_namespace = get_namespace
+    test_namespace = get_namespace [ "Test::More" ]
+    exports = split " ", "plan ok is diag"
+    test_namespace.export_to(curr_namespace, exports)
+
     'plan'( TESTS )
 
     'load'()
@@ -43,7 +34,6 @@
 
 
 .sub 'load'
-    .TEST_IMPORT()
     'diag'('test library loading')
 
   T1:
@@ -65,7 +55,6 @@
 
 
 .sub 'object_init'
-    .TEST_IMPORT()
     'diag'('test object initialization')
 
   T1:
@@ -101,7 +90,6 @@
 
 
 .sub 'FixedPMCArray_empty'
-    .TEST_IMPORT()
     'diag'('test empty FixedPMCArray')
 
   T1:
@@ -146,7 +134,6 @@
 
 
 .sub 'FixedPMCArray_3elem'
-    .TEST_IMPORT()
     'diag'('test FixedPMCArray with three elements')
 
   T1:
@@ -239,7 +226,6 @@
 
 
 .sub 'ResizablePMCArray_empty'
-    .TEST_IMPORT()
     'diag'('test empty ResizablePMCArray')
 
   T1:
@@ -284,7 +270,6 @@
 
 
 .sub 'ResizablePMCArray_3elem'
-    .TEST_IMPORT()
     'diag'('test ResizablePMCArray with three elements')
 
   T1:

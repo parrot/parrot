@@ -2,11 +2,6 @@
 # Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
-.macro IMPORT ( lib, subname, TEMP )
-	.TEMP = find_global .lib, .subname
-	store_global .subname, .TEMP
-.endm
-
 =head1 NAME
 
 t/pmc/multisub.t - Multi Sub PMCs
@@ -25,10 +20,11 @@ Tests the creation and invocation of Perl6 multi subs.
 .sub main :main
     load_bytecode 'library/Test/More.pir'
 
-    .local pmc _
-    .IMPORT( 'Test::More', 'plan', _ )
-    .IMPORT( 'Test::More', 'ok',   _ )
-    .IMPORT( 'Test::More', 'is',   _ )
+    .local pmc exports, curr_namespace, test_namespace
+    curr_namespace = get_namespace
+    test_namespace = get_namespace [ "Test::More" ]
+    exports = split " ", "plan ok is"
+    test_namespace.export_to(curr_namespace, exports)
 
     plan( 6 )
 

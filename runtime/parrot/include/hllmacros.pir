@@ -147,19 +147,6 @@ work with in C<code>.
 .endm
 
 
-=item C<.IMPORT(.macro IMPORT ( lib, subname, TEMP )>
-
-Imports a C<subname> from the C<lib> namespace into the current namespace.
-C<TEMP> is a temporary pmc used to store the sub.
-
-=cut
-
-.macro IMPORT( lib, subname, TEMP )
-    .TEMP = find_global .lib, .subname
-    store_global .subname, .TEMP
-.endm
-
-
 =back
 
 =head1 Examples
@@ -230,19 +217,6 @@ Using C<.NL()>
         print j
         print "\n"
     })
-
-=head2 Importing subroutines
-
-    .include 'hllmacros.pir'
-    .sub 'main' :main
-        load_bytecode 'Test/More.pbc'
-        .local pmc _
-        .IMPORT( 'Test::More', 'plan', _ )
-        .IMPORT( 'Test::More', 'ok',   _ )
-
-        plan( 1 )
-        ok(1, 'my test works')
-    .end
 
 
 =head1 Caveats

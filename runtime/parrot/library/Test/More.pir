@@ -8,19 +8,12 @@ Test::More - Parrot extension for testing modules
     load_bytecode 'library/Test/More.pir'
 
     # get the testing functions
-    .local pmc plan
-    .local pmc diag
-    .local pmc ok
-    .local pmc is
-    .local pmc is_deeply
-    .local pmc like
+    .local pmc exports, curr_namespace, test_namespace
+    curr_namespace = get_namespace
+    test_namespace = get_namespace [ "Test::More" ]
+    exports = split " ", "plan diag ok is is_deeply like isa_ok"
 
-    plan      = find_global 'Test::More', 'plan'
-    diag      = find_global 'Test::More', 'diag'
-    ok        = find_global 'Test::More', 'ok'
-    is        = find_global 'Test::More', 'is'
-    is_deeply = find_global 'Test::More', 'is_deeply'
-    like      = find_global 'Test::More', 'like'
+    test_namespace."export_to"(curr_namespace, exports)
 
     # set a test plan
     plan( 12 )

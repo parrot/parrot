@@ -1,19 +1,15 @@
 #!./parrot
 
-.macro IMPORT ( lib, subname, TEMP )
-	.TEMP = find_global .lib, .subname
-	store_global .subname, .TEMP
-.endm
-
 .sub _main :main
     load_bytecode 'library/Test/More.pir'
     load_bytecode 'compilers/smop/Class.pir'
     load_bytecode 'compilers/smop/Attribute.pir'
 
-    .local pmc _
-    .IMPORT( 'Test::More', 'plan', _ )
-    .IMPORT( 'Test::More', 'ok',   _ )
-    .IMPORT( 'Test::More', 'is',   _ )
+    .local pmc exports, curr_namespace, test_namespace
+    curr_namespace = get_namespace
+    test_namespace = get_namespace [ "Test::More" ]
+    exports = split " ", "plan ok is"
+    test_namespace.export_to(curr_namespace, exports)
 
     plan( 12 )
 

@@ -19,12 +19,6 @@ Tests all non-branching conditional operators.
 
 .const int TESTS = 88
 
-
-.macro IMPORT( lib, subname )
-    import_sub = find_global .lib, .subname
-    store_global .subname, import_sub
-.endm
-
 .macro EXP()
   exp_nok:
     exp = 0
@@ -53,11 +47,13 @@ Tests all non-branching conditional operators.
 .sub 'main' :main
     load_bytecode 'Test/More.pir'
 
-    .local pmc import_sub
-    .IMPORT( 'Test::More', 'plan' )
+    .local pmc exports, curr_namespace, test_namespace
+    curr_namespace = get_namespace
+    test_namespace = get_namespace [ "Test::More" ]
+    exports = split " ", "plan is"
+    test_namespace.export_to(curr_namespace, exports)
 
     .local string res, exp, desc
-
 
     'plan'(TESTS)
 
@@ -77,10 +73,6 @@ Tests all non-branching conditional operators.
 
 
 .sub 'issame'
-    load_bytecode 'Test/More.pir'
-    .local pmc import_sub
-    .IMPORT( 'Test::More', 'is' )
-
     .local int exp, res
     .local string desc
     .SET_DESC('issame')
@@ -108,10 +100,6 @@ Tests all non-branching conditional operators.
 
 
 .sub 'isntsame'
-    load_bytecode 'Test/More.pir'
-    .local pmc import_sub
-    .IMPORT( 'Test::More', 'is' )
-
     .local int exp, res
     .local string desc
     .SET_DESC('isntsame')
@@ -139,10 +127,6 @@ Tests all non-branching conditional operators.
 
 
 .sub 'istrue'
-    load_bytecode 'Test/More.pir'
-    .local pmc import_sub
-    .IMPORT( 'Test::More', 'is' )
-
     .local int exp, res
     .local string desc
     .SET_DESC('istrue')
@@ -165,10 +149,6 @@ Tests all non-branching conditional operators.
 
 
 .sub 'isfalse'
-    load_bytecode 'Test/More.pir'
-    .local pmc import_sub
-    .IMPORT( 'Test::More', 'is' )
-
     .local int exp, res
     .local string desc
     .SET_DESC('isfalse')
@@ -191,10 +171,6 @@ Tests all non-branching conditional operators.
 
 
 .sub 'isnull'
-    load_bytecode 'Test/More.pir'
-    .local pmc import_sub
-    .IMPORT( 'Test::More', 'is' )
-
     .local int exp, res
     .local string desc
     .SET_DESC('isnull')
@@ -226,10 +202,6 @@ Tests all non-branching conditional operators.
 
 
 .sub 'isgt'
-    load_bytecode 'Test/More.pir'
-    .local pmc import_sub
-    .IMPORT( 'Test::More', 'is' )
-
     .local string exp, res
     .local string desc
 
@@ -387,10 +359,6 @@ Tests all non-branching conditional operators.
 
 
 .sub 'isge'
-    load_bytecode 'Test/More.pir'
-    .local pmc import_sub
-    .IMPORT( 'Test::More', 'is' )
-
     .local string exp, res
     .local string desc
 
@@ -548,10 +516,6 @@ Tests all non-branching conditional operators.
 
 
 .sub 'isle'
-    load_bytecode 'Test/More.pir'
-    .local pmc import_sub
-    .IMPORT( 'Test::More', 'is' )
-
     .local string exp, res
     .local string desc
 
@@ -709,10 +673,6 @@ Tests all non-branching conditional operators.
 
 
 .sub 'islt'
-    load_bytecode 'Test/More.pir'
-    .local pmc import_sub
-    .IMPORT( 'Test::More', 'is' )
-
     .local string exp, res
     .local string desc
 
@@ -870,10 +830,6 @@ Tests all non-branching conditional operators.
 
 
 .sub 'iseq'
-    load_bytecode 'Test/More.pir'
-    .local pmc import_sub
-    .IMPORT( 'Test::More', 'is' )
-
     .local string exp, res
     .local string desc
 
@@ -1031,10 +987,6 @@ Tests all non-branching conditional operators.
 
 
 .sub 'isne'
-    load_bytecode 'Test/More.pir'
-    .local pmc import_sub
-    .IMPORT( 'Test::More', 'is' )
-
     .local string exp, res
     .local string desc
 
@@ -1192,10 +1144,6 @@ Tests all non-branching conditional operators.
 
 
 .sub 'cmp'
-    load_bytecode 'Test/More.pir'
-    .local pmc import_sub
-    .IMPORT( 'Test::More', 'is' )
-
     .local string exp, res
     .local string desc
     .SET_DESC('cmp')

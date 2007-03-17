@@ -17,18 +17,15 @@ Tests the SMOP_Class PMC.
 
 =cut
 
-.macro IMPORT ( lib, subname, TEMP )
-	.TEMP = find_global .lib, .subname
-	store_global .subname, .TEMP
-.endm
-
 .sub _main :main
     load_bytecode 'library/Test/More.pir'
 
-    .local pmc _
-    .IMPORT( 'Test::More', 'plan', _ )
-    .IMPORT( 'Test::More', 'ok',   _ )
-    .IMPORT( 'Test::More', 'is',   _ )
+    # import test routines
+    .local pmc exports, curr_namespace, test_namespace
+    curr_namespace = get_namespace
+    test_namespace = get_namespace [ "Test::More" ]
+    exports = split " ", "plan ok is isa_ok"
+    test_namespace.export_to(curr_namespace, exports)
 
     plan( 1 )
 

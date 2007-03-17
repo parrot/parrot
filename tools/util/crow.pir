@@ -20,18 +20,16 @@ module, L<runtime/parrot/library/Crow.pir>.
 =cut
 
 
-.include 'hllmacros.pir'
-
-
 .sub 'main' :main
     .param pmc    args
 
     load_bytecode 'Crow.pir' # TODO s/pbc/pir/
 
-    .local pmc _
-    .IMPORT( ['Crow'], 'get_args', _ )
-    .IMPORT( ['Crow'], 'get_news', _ )
-    .IMPORT( ['Crow'], 'process', _ )
+    .local pmc exports, curr_namespace, test_namespace
+    curr_namespace = get_namespace
+    test_namespace = get_namespace [ 'Crow' ]
+    exports = split " ", "get_args get_news process"
+    test_namespace.export_to(curr_namespace, exports)
 
     .local pmc opts
     opts = get_args(args)
