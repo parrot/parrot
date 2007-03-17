@@ -103,8 +103,34 @@ print {$SKIP} <<"END_HEADER";
 END_HEADER
 
 my $cmd = -d '.svn' ? 'svn' : 'svk';
+
+# get all files from sv[nk] status -v
+my @status_output = qx($cmd status -v);
+
+# now grab the versioned resources:
+my @versioned_files = ();
+my @versioned_output = grep !/^\?/, @status_output;
+for my $line ( @versioned_output ) {
+    my @line_info = split(/\s+/, $line);
+    # the file is the 5th item in the @line_info array
+    push @versioned_files, $line_info[4];
+}
+
 my @MANI = ();
-find( \&wanted, '.' );
+
+for my $file ( @versioned_files ) {
+    # ignore the debian directory
+    next if $file =~ m[/\.svn|blib|debian];
+
+    # don't want to keep directories
+    if ( -d $file ) {
+        next;
+    }
+
+    # now get the manifest entry
+    MANIFEST($file);
+}
+
 print $MANI $_ for ( sort @MANI );
 
 my $svnignore = `$cmd propget svn:ignore @dirs`;
@@ -151,7 +177,6 @@ sub wanted {
         push @dirs, $File::Find::name;
     }
 
-    #my $result = system(qq($cmd propget svn:mime-type $_));
     my $svnbase = ".svn/text-base/$_.svn-base";
     if ( -f $_ and -e $svnbase ) {
         MANIFEST();
@@ -161,8 +186,10 @@ sub wanted {
 }
 
 sub MANIFEST {
+    my $file = shift;
     my $loc = '[]';
-    for ($File::Find::name) {
+    #for ($File::Find::name) {
+    for ($file) {
         $loc =
               exists( $special{$_} ) ? $special{$_}
             : !m[/]                  ? '[]'
@@ -179,7 +206,7 @@ sub MANIFEST {
             : m[^(apps/\w+)/] ? "[$1]"
             :                   '[]';
     }
-    push @MANI, sprintf( "%- 59s %s\n", $File::Find::name, $loc );
+    push @MANI, sprintf( "%- 59s %s\n", $file, $loc );
 
     return;
 }
