@@ -11,21 +11,21 @@ use Getopt::Long;
 use Data::Dumper;
 use Parrot::Pmc2c::Utils;
 
-my (%opt, @include);
+my ( %opt, @include );
 my %action;
 
 GetOptions(
-    "include=s"     => \@include,
-    "vtable"        => \$action{default},
-    "dump"          => \$action{dump},
-    "c|gen-c"       => \$action{gen_c},
-    "tree"          => \$action{tree},
-    "no-body"       => \$opt{nobody},
-    "no-lines"      => \$opt{nolines},
-    "debug+"        => \$opt{debug},
-    "verbose+"      => \$opt{verbose},
-    "library=s"     => \$opt{library},
-    "testing"       => \$opt{testing},
+    "include=s" => \@include,
+    "vtable"    => \$action{default},
+    "dump"      => \$action{dump},
+    "c|gen-c"   => \$action{gen_c},
+    "tree"      => \$action{tree},
+    "no-body"   => \$opt{nobody},
+    "no-lines"  => \$opt{nolines},
+    "debug+"    => \$opt{debug},
+    "verbose+"  => \$opt{verbose},
+    "library=s" => \$opt{library},
+    "testing"   => \$opt{testing},
 ) or exit 1;
 
 if ( 0 == grep { $action{$_} } keys %action ) {
@@ -34,11 +34,13 @@ if ( 0 == grep { $action{$_} } keys %action ) {
 
 my @args = @ARGV;
 
-my $self = Parrot::Pmc2c::Utils->new( {
-    include => \@include,
-    opt     => \%opt,
-    args    => \@args,
-} );
+my $self = Parrot::Pmc2c::Utils->new(
+    {
+        include => \@include,
+        opt     => \%opt,
+        args    => \@args,
+    }
+);
 
 if ( $action{default} ) {
     my $dump_file = $self->dump_vtable("$FindBin::Bin/../../vtable.tbl");
@@ -51,9 +53,7 @@ if ( $action{dump} ) {
 }
 
 if ( $action{tree} ) {
-    $self->print_tree( {
-        depth   => 0,
-    } );
+    $self->print_tree( { depth => 0, } );
     exit;
 }
 

@@ -10,25 +10,27 @@ use Parrot::Ops2pm::Auxiliary qw( Usage getoptions );
 
 my $flagref = getoptions();
 
-if ($flagref->{help} or ! @ARGV) {
+if ( $flagref->{help} or !@ARGV ) {
     Usage();
     exit;
 }
 
-my $self = Parrot::Ops2pm::Utils->new( {
-    argv            => [ @ARGV ],
-    nolines         => $flagref->{nolines},
-    renum           => $flagref->{renum},
-    moddir          => "lib/Parrot/OpLib",
-    module          => "core.pm",
-    inc_dir         => "include/parrot/oplib",
-    inc_f           => "ops.h",
-    script          => "tools/build/ops2pm.pl",
-} );
+my $self = Parrot::Ops2pm::Utils->new(
+    {
+        argv    => [@ARGV],
+        nolines => $flagref->{nolines},
+        renum   => $flagref->{renum},
+        moddir  => "lib/Parrot/OpLib",
+        module  => "core.pm",
+        inc_dir => "include/parrot/oplib",
+        inc_f   => "ops.h",
+        script  => "tools/build/ops2pm.pl",
+    }
+);
 
 $self->prepare_ops();
 
-if ($flagref->{renum}) {
+if ( $flagref->{renum} ) {
     $self->renum_op_map_file();
     exit 0;
 }

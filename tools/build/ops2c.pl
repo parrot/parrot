@@ -8,21 +8,22 @@ use Parrot::Ops2c::Auxiliary qw( Usage getoptions );
 use Parrot::Ops2c::Utils;
 
 my $flagref = getoptions();
-if (
-        (not defined $flagref) or
-        $flagref->{help} or
-        (not @ARGV)
-    ) {
-        Usage();
-        exit 1;
+if (   ( not defined $flagref )
+    or $flagref->{help}
+    or ( not @ARGV ) )
+{
+    Usage();
+    exit 1;
 }
 
-my $self = Parrot::Ops2c::Utils->new( {
-    argv    => [ @ARGV ],
-    flag    => $flagref,
-    script  => $0,
-} );
-if (not defined $self) {
+my $self = Parrot::Ops2c::Utils->new(
+    {
+        argv   => [@ARGV],
+        flag   => $flagref,
+        script => $0,
+    }
+);
+if ( not defined $self ) {
     Usage();
     exit 1;
 }

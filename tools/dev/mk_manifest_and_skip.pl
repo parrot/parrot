@@ -108,15 +108,17 @@ my @status_output = qx($cmd status -v);
 # now grab the versioned resources:
 my @versioned_files = ();
 my @versioned_output = grep !/^\?/, @status_output;
-for my $line ( @versioned_output ) {
-    my @line_info = split(/\s+/, $line);
+for my $line (@versioned_output) {
+    my @line_info = split( /\s+/, $line );
+
     # the file is the 5th item in the @line_info array
     push @versioned_files, $line_info[4];
 }
 
 my @MANIFEST_LINES = ();
 
-for my $file ( @versioned_files ) {
+for my $file (@versioned_files) {
+
     # ignore the debian directory
     next if $file =~ m[/\.svn|blib|debian];
 
@@ -166,7 +168,7 @@ close $MANIFEST_SKIP;
 
 sub get_manifest_entry {
     my $file = shift;
-    my $loc = '[]';
+    my $loc  = '[]';
     for ($file) {
         $loc =
               exists( $special{$_} ) ? $special{$_}

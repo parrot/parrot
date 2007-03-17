@@ -6,8 +6,7 @@ use warnings;
 use strict;
 
 my ($svnid) =
-    '$Id$'
-    =~ /^\$[iI][dD]:\s(.*)\$$/;
+    '$Id$' =~ /^\$[iI][dD]:\s(.*)\$$/;
 
 =head1 NAME
 

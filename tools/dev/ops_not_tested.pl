@@ -9,7 +9,6 @@ use Parrot::Config qw/ %PConfig /;
 use Parrot::Op;
 use Parrot::OpLib::core;
 
-
 =head1 The problem
 
 10:23 <toor> # Tests - ~1/3 of opcodes are uncovered by tests <--
@@ -33,68 +32,59 @@ use Parrot::OpLib::core;
 
 my @dirs = @ARGV ? @ARGV : 't/';
 
-my $make= $PConfig{make};
-my $disassemble= 'disassemble' . $PConfig{exe};
-# First of all we need the disassemble program
-system($make, $disassemble) == 0
-    or die "<$make $disassemble> failed: $!\n";
+my $make        = $PConfig{make};
+my $disassemble = 'disassemble' . $PConfig{exe};
 
+# First of all we need the disassemble program
+system( $make, $disassemble ) == 0
+    or die "<$make $disassemble> failed: $!\n";
 
 # Parse 'lib/Parrot/OpLib/core.pm' to find all defined opcodes
 # Extract the full name from the opcode data
 my $opcodes;
-$$opcodes{ $_->full_name }++
-    for @$Parrot::OpLib::core::ops;
+$$opcodes{ $_->full_name }++ for @$Parrot::OpLib::core::ops;
 
 # Count the number of opcodes
 my $opcount = scalar keys %$opcodes;
 print "$opcount opcodes found$/";
 
-
 # *Assuming* 'make testr' has been run, find all .pbc under t/
 my $pbcfiles;
 File::Find::find(
     {
-        wanted => sub{ m/\.pbc$/i and push @$pbcfiles => $File::Find::name },
+        wanted => sub { m/\.pbc$/i and push @$pbcfiles => $File::Find::name },
         nochdir => 1,
     },
     @dirs,
 );
 
-
-check_opcodes($_, $opcodes)
-    for @$pbcfiles;
-
+check_opcodes( $_, $opcodes ) for @$pbcfiles;
 
 # Count how many opcodes from core are not tested
-my $percent = 100 * keys( %$opcodes ) / $opcount;
+my $percent = 100 * keys(%$opcodes) / $opcount;
 
 # And now send the results to the user
 #print "$_\n"
 #    for keys %$opcodes;
 
-print scalar( keys %$opcodes )
-    . sprintf " of %d opcodes untested! (%2.2d%%)\n", $opcount, $percent;
+print scalar( keys %$opcodes ) . sprintf " of %d opcodes untested! (%2.2d%%)\n", $opcount, $percent;
 
-print $_,$/
-    for sort keys %$opcodes;
-
+print $_, $/ for sort keys %$opcodes;
 
 exit;
 
-
 sub check_opcodes {
-    my( $file, $opcodes )= @_;
+    my ( $file, $opcodes ) = @_;
     my @data = qx/$disassemble $file/
-        or warn "<$disassemble $file> failed: $!$/" and return;
-    for( @data ) {
-        s/L\w+\:\s+//;          # Remove the Lxx marks
-        s/^(\w+).*/$1/;         # Extract the opcode
+        or warn "<$disassemble $file> failed: $!$/"
+        and return;
+    for (@data) {
+        s/L\w+\:\s+//;     # Remove the Lxx marks
+        s/^(\w+).*/$1/;    # Extract the opcode
         chomp;
         delete $$opcodes{$_};
     }
 }
-
 
 # Local Variables:
 #   mode: cperl
