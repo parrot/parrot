@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 31;
 
 # macro tests
 
@@ -408,6 +408,30 @@ CODE
 foo
 OUTPUT
 
+pir_output_is( <<'CODE', <<OUTPUT, "test that macros labels names can have the prefix \$" );
+.sub test :main
+.macro test_label_names()
+    branch .$jump
+    print 'do not print this'
+  .local $jump:
+    print 'print this'
+    print "\n"
+.endm
+    .test_label_names()
+.end
+CODE
+print this
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "test that macros labels names can have the prefix \$" );
+.sub test :main
+.macro SpinForever (Count)
+    .local $LOOP: dec .COUNT # ".local $LOOP" defines a local label.
+    branch .$LOOP # Jump to said label.
+.endm
+.end
+CODE
+OUTPUT
 
 # Local Variables:
 #   mode: cperl
