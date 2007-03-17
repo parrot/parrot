@@ -144,13 +144,13 @@ sub wanted {
     return if $File::Find::name =~ m{runtime.parrot.library.PAST};
 
     $File::Find::name =~ s[^\./][];
-    # TODO: change to if (-d $_) { push @dirs, $File::Find::name; }
-    -d and push @dirs, $File::Find::name;
+    if ( -d $_ ) {
+        push @dirs, $File::Find::name;
+    }
 
     #my $result = system(qq($cmd propget svn:mime-type $_));
-    # TODO: -f $svnbase should be -f $_
     my $svnbase = ".svn/text-base/$_.svn-base";
-    if (-f $_ and -e $svnbase) {
+    if ( -f $_ and -e $svnbase ) {
         MANIFEST();
     }
 
