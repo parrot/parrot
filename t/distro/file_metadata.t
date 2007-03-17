@@ -112,8 +112,8 @@ if ($^O eq 'MSWin32') {
     $lf_files_regexp = qr{
         ^examples\\shootout\\.*\.input$ |
         ^examples\\shootout\\.*\.output$ |
-        ^t\\compilers\\pge\\p5regex\\re_tests$ | 
-        ^t\\library\\perlhist.txt$ | 
+        ^t\\compilers\\pge\\p5regex\\re_tests$ |
+        ^t\\library\\perlhist.txt$ |
         ^t\\op\\sprintf_tests$
         }x;
 }
@@ -121,8 +121,8 @@ else {
     $lf_files_regexp = qr{
         ^examples/shootout/.*\.input$ |
         ^examples/shootout/.*\.output$ |
-        ^t/compilers/pge/p5regex/re_tests$ | 
-        ^t/library/perlhist.txt$ | 
+        ^t/compilers/pge/p5regex/re_tests$ |
+        ^t/library/perlhist.txt$ |
         ^t/op/sprintf_tests$
         }x;
 }
