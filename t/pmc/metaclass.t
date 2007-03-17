@@ -152,7 +152,7 @@ OUT
 ## Q: what attributes the base Class have by default?
 
 # L<PDD15/Class PMC API/=item add_attribute>
-pir_output_is( <<'CODE', <<'OUT', 'add_attribute' );
+pir_output_is( <<'CODE', <<'OUT', 'add_attribute' ,todo=>'fixme');
 .sub 'test' :main
     new $P0, .MetaClass
 
