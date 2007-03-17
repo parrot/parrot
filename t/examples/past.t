@@ -35,8 +35,7 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 # Set up expected output for examples
 
 # A stub for future PAST-pm example
-my %expected = (
-);
+my %expected = ();
 
 while ( my ( $example, $expected ) = each %expected ) {
     example_output_is( "examples/past/$example", $expected );

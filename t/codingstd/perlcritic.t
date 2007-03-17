@@ -19,7 +19,7 @@ BEGIN {
         plan skip_all => 'Perl::Critic not installed';
     }
     my $required_version = 1.03;
-    if ($Perl::Critic::VERSION < $required_version) {
+    if ( $Perl::Critic::VERSION < $required_version ) {
         plan skip_all => "Perl::Critic v$required_version required, v$Perl::Critic::VERSION found";
     }
 }
@@ -54,15 +54,17 @@ while (@ARGV) {
 # get the files to check
 my $DIST = Parrot::Distribution->new();
 if ( !@ARGV ) {
+
     # XXX We should skip any files that are copied wholesale
     #     into our repository. Add a method to $DIST for this. -Coke
 
-    @files = map {$_->path} $DIST->get_perl_language_files();
+    @files = map { $_->path } $DIST->get_perl_language_files();
 
     # Skip any language files...
-    @files = grep {! m{$PConfig{build_dir}/languages/} } @files;
+    @files = grep { !m{$PConfig{build_dir}/languages/} } @files;
 }
 else {
+
     # if we're passed a directory, find all the matching files
     # under that directory.
 
@@ -87,9 +89,9 @@ else {
     }
 }
 
-if ( $list_files ) {
+if ($list_files) {
     print "Files to be tested by perlcritic:\n";
-    for my $file ( @files ) {
+    for my $file (@files) {
         print $file, "\n";
     }
     exit;
@@ -114,10 +116,8 @@ if ( !keys %policies ) {
         'CodeLayout::UseParrotCoda'                       => 1,
         'CodeLayout::ProhibitDuplicateCoda'               => 1,
         'CodeLayout::ProhibitTrailingWhitespace'          => 1,
-        'CodeLayout::ProhibitHardTabs'                    =>
-            { allow_leading_tabs => 0 },
-        'CodeLayout::RequireTidyCode'                     =>
-            { perltidyrc => $perl_tidy_conf },
+        'CodeLayout::ProhibitHardTabs'                    => { allow_leading_tabs => 0 },
+        'CodeLayout::RequireTidyCode'                     => { perltidyrc => $perl_tidy_conf },
         'Subroutines::RequireFinalReturn'                 => 1,
     );
 
@@ -146,7 +146,6 @@ else {
 
 # Create a critic object with all of the policies we care about.
 
-
 # By default, don't complain about anything.
 my $config = Perl::Critic::Config->new( -exclude => [qr/.*/] );
 
@@ -158,13 +157,13 @@ foreach my $policy ( keys %policies ) {
 }
 
 my $critic = Perl::Critic->new(
-    -config  => $config,
-    -top     => 50,
+    -config => $config,
+    -top    => 50,
 );
 
 $Perl::Critic::Violation::FORMAT = '%f:%l.%c';
 
-my %violations = map {$_, []} (keys %policies);
+my %violations = map { $_, [] } ( keys %policies );
 
 # check each file for the given policies
 foreach my $file ( sort @files ) {
@@ -173,18 +172,20 @@ foreach my $file ( sort @files ) {
         next;
     }
 
-    foreach my $violation ($critic->critique($file)) {
+    foreach my $violation ( $critic->critique($file) ) {
         my $policy = $violation->policy();
         $policy =~ s/^Perl::Critic::Policy:://;
-        push @{$violations{$policy}},  $violation->to_string();
+        push @{ $violations{$policy} }, $violation->to_string();
     }
 }
 
 foreach my $policy ( sort keys %violations ) {
-    my @violations = @{$violations{$policy}};
-    ok ( ! @violations, $policy)
-        or diag( "Policy: $policy failed in " . scalar @violations .
-                 " files:\n" . join ("\n", @violations) );
+    my @violations = @{ $violations{$policy} };
+    ok( !@violations, $policy )
+        or diag( "Policy: $policy failed in "
+            . scalar @violations
+            . " files:\n"
+            . join( "\n", @violations ) );
 }
 
 __END__

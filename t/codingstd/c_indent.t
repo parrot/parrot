@@ -147,7 +147,7 @@ sub check_indent {
                             . "apparent non-4 space indenting ("
                             . length($indent)
                             . " spaces)";
-                        $c_failed{"$path\n"} = 1;;
+                        $c_failed{"$path\n"} = 1;
                     }
                 }
                 $f = undef;
@@ -156,7 +156,7 @@ sub check_indent {
     }
 
     # get the lists of files failing the test
-    my @c_failed_files = keys %c_failed;
+    my @c_failed_files  = keys %c_failed;
     my @pp_failed_files = keys %pp_failed;
 
 ## L<PDD07/Code Formatting/"Preprocessor #directives must be indented two columns per nesting level, with two exceptions: neither PARROT_IN_CORE nor the outermost _GUARD #ifdefs cause the level of indenting to increase">
@@ -168,8 +168,7 @@ sub check_indent {
             . " files:\n@pp_indent" );
 
     ok( !scalar(@c_indent) )
-        or
-        diag( "incorrect indenting in C file found "
+        or diag( "incorrect indenting in C file found "
             . scalar @c_indent
             . " occurrences in "
             . scalar @c_failed_files

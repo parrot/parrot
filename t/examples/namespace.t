@@ -49,7 +49,6 @@ while ( my ( $example, $expected ) = each %expected ) {
     example_output_like( "examples/namespace/$example", $expected );
 }
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

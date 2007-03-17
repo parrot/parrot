@@ -30,10 +30,10 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
-my $DIST = Parrot::Distribution->new;
+my $DIST  = Parrot::Distribution->new;
 my @files = @ARGV
     ? $^O eq 'MSWin32' ? <@ARGV> : @ARGV
-    : $DIST->get_c_language_files();
+    :   $DIST->get_c_language_files();
 my @struct;
 
 for my $file (@files) {

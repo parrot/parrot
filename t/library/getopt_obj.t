@@ -710,7 +710,6 @@ F<runtime/parrot/library/Getopt/Obj.pir>
 
 =cut
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

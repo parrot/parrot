@@ -112,7 +112,6 @@ F<runtime/parrot/library/parrotlib.pir>
 
 =cut
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

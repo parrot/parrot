@@ -22,7 +22,6 @@ Tests the C3 Method Resolution order for the OO implementation.
 
 =cut
 
-
 # L<PDD15>
 # TODO update smartlink
 # TODO write real tests :)
@@ -33,7 +32,6 @@ pir_output_is( <<'CODE', <<'OUT', 'stup' );
 CODE
 ok 1 - just a stub
 OUT
-
 
 # Local Variables:
 #   mode: cperl
