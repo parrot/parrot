@@ -136,6 +136,9 @@ foreach my $dir ( sort keys %ignore ) {
     }
 }
 
+close $MANI;
+close $SKIP;
+
 sub wanted {
 
     return if $File::Find::name =~ m[/\.svn|blib|debian];
@@ -180,11 +183,6 @@ sub MANIFEST {
 
     return;
 }
-
-# TODO: move these closes above the sub definitions
-
-close $MANI;
-close $SKIP;
 
 # Local Variables:
 #   mode: cperl
