@@ -114,7 +114,7 @@ for my $line ( @versioned_output ) {
     push @versioned_files, $line_info[4];
 }
 
-my @MANI = ();
+my @MANIFEST_LINES = ();
 
 for my $file ( @versioned_files ) {
     # ignore the debian directory
@@ -127,10 +127,10 @@ for my $file ( @versioned_files ) {
     }
 
     # now get the manifest entry
-    MANIFEST($file);
+    get_manifest_entry($file);
 }
 
-print $MANI $_ for ( sort @MANI );
+print $MANI $_ for ( sort @MANIFEST_LINES );
 
 my $svnignore = `$cmd propget svn:ignore @dirs`;
 my %ignore;
@@ -164,7 +164,7 @@ foreach my $dir ( sort keys %ignore ) {
 close $MANI;
 close $SKIP;
 
-sub MANIFEST {
+sub get_manifest_entry {
     my $file = shift;
     my $loc = '[]';
     for ($file) {
@@ -184,7 +184,7 @@ sub MANIFEST {
             : m[^(apps/\w+)/] ? "[$1]"
             :                   '[]';
     }
-    push @MANI, sprintf( "%- 59s %s\n", $file, $loc );
+    push @MANIFEST_LINES, sprintf( "%- 59s %s\n", $file, $loc );
 
     return;
 }
