@@ -102,11 +102,12 @@ print {$SKIP} <<"END_HEADER";
 ^debian/
 END_HEADER
 
+my $cmd = -d '.svn' ? 'svn' : 'svk';
 my @MANI = ();
 find( \&wanted, '.' );
 print $MANI $_ for ( sort @MANI );
 
-my $svnignore = `svn propget svn:ignore @dirs`;
+my $svnignore = `$cmd propget svn:ignore @dirs`;
 my %ignore;
 my @ignore = split( /\n\n/, $svnignore );
 foreach (@ignore) {
