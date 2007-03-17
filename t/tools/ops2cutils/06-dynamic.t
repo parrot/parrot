@@ -167,7 +167,6 @@ Parrot::Ops2c::Auxiliary, F<ops2c.pl>.
 
 =cut
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

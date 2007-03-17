@@ -5,31 +5,27 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  9;
+use Test::More tests => 9;
 use FindBin;
-use lib (
-    "$FindBin::Bin/../..",
-    "$FindBin::Bin/../../lib",
-    "$FindBin::Bin/../../../lib",
-);
-use_ok( 'Parrot::Pmc2c::Utils' );
+use lib ( "$FindBin::Bin/../..", "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../lib", );
+use_ok('Parrot::Pmc2c::Utils');
 
-ok(-f "$FindBin::Bin/../../../Makefile", "Makefile located");
-ok(-f "$FindBin::Bin/../../../myconfig", "myconfig located");
-ok(-f "$FindBin::Bin/../../../lib/Parrot/PMC.pm", "lib/Parrot/PMC.pm located");
+ok( -f "$FindBin::Bin/../../../Makefile",          "Makefile located" );
+ok( -f "$FindBin::Bin/../../../myconfig",          "myconfig located" );
+ok( -f "$FindBin::Bin/../../../lib/Parrot/PMC.pm", "lib/Parrot/PMC.pm located" );
 
-my (@files, %sfx);
+my ( @files, %sfx );
 @files = glob("$FindBin::Bin/../../../src/pmc/*");
 for my $f (@files) {
-    if ($f =~ m/.*\.(.*)$/) {
+    if ( $f =~ m/.*\.(.*)$/ ) {
         my $s = $1;
         $sfx{$s}++;
     }
 }
 
-is(scalar(keys %sfx), 2, "only 2 file suffixes in src/pmc");;
-ok($sfx{'num'}, ".num suffix correctly located");
-ok($sfx{'pmc'}, ".pmc suffix correctly located");
+is( scalar( keys %sfx ), 2, "only 2 file suffixes in src/pmc" );
+ok( $sfx{'num'}, ".num suffix correctly located" );
+ok( $sfx{'pmc'}, ".pmc suffix correctly located" );
 
 my $message = <<END_OF_MESSAGE;
 

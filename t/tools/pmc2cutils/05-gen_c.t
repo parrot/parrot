@@ -11,9 +11,10 @@ BEGIN {
     use Cwd qw(cwd realpath);
     realpath($Bin) =~ m{^(.*\/parrot)\/[^/]*\/[^/]*\/[^/]*$};
     our $topdir = $1;
-    if (defined $topdir) {
+    if ( defined $topdir ) {
         print "\nOK:  Parrot top directory located\n";
-    } else {
+    }
+    else {
         $topdir = realpath($Bin) . "/../../..";
     }
     unshift @INC, qq{$topdir/lib};
@@ -23,285 +24,254 @@ use File::Basename;
 use File::Copy;
 use FindBin;
 use Data::Dumper;
-use_ok( 'Parrot::Pmc2c::Utils' );
-use_ok( 'Cwd' );
-use_ok( 'File::Temp', qw| tempdir |);
+use_ok('Parrot::Pmc2c::Utils');
+use_ok('Cwd');
+use_ok( 'File::Temp', qw| tempdir | );
 
-my (%opt, @include, @args);
+my ( %opt, @include, @args );
 my $dump_file;
 my $self;
 my $rv;
 my $cwd = cwd();
 
-my @include_orig = (
-    qq{$main::topdir},
-    qq{$main::topdir/src/pmc},
-);
+my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 
 # basic test:  @args holds default.pmc
 {
-    my $tdir = tempdir( CLEANUP => 1);
-    ok(chdir $tdir, 'changed to temp directory for testing');
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, 'changed to temp directory for testing' );
     my $pmcdir = q{src/pmc};
-    ok((mkdir qq{$tdir/src}), "created src/ under tempdir");
+    ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
-    ok((mkdir $temppmcdir), "created src/pmc/ under tempdir");
+    ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = (
-        "$main::topdir/src/pmc/default.pmc",
-        "$main::topdir/src/pmc/array.pmc",
-    );
+    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc", );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
         my $basename = basename($pmcfile);
-        my $rv = copy ($pmcfile, qq{$temppmcdir/$basename});
+        my $rv = copy( $pmcfile, qq{$temppmcdir/$basename} );
         $copycount++ if $rv;
     }
-    is($copycount, $pmcfilecount,
-        "all src/pmc/*.pmc files copied to tempdir");
-    my @include = ($tdir, $temppmcdir, @include_orig);
+    is( $copycount, $pmcfilecount, "all src/pmc/*.pmc files copied to tempdir" );
+    my @include = ( $tdir, $temppmcdir, @include_orig );
 
-    @args = (
-        qq{$temppmcdir/default.pmc},
+    @args = ( qq{$temppmcdir/default.pmc}, );
+    $self = Parrot::Pmc2c::Utils->new(
+        {
+            include => \@include,
+            opt     => \%opt,
+            args    => [@args],
+        }
     );
-    $self = Parrot::Pmc2c::Utils->new( {
-        include => \@include,
-        opt     => \%opt,
-        args    => [ @args ],
-    } );
-    isa_ok($self, q{Parrot::Pmc2c::Utils});
+    isa_ok( $self, q{Parrot::Pmc2c::Utils} );
     $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
-    ok(-e $dump_file, "dump_vtable created vtable.dump");
+    ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
-    ok($self->dump_pmc(), "dump_pmc succeeded");
-    ok(-f qq{$temppmcdir/default.dump},
-        "default.dump created as expected");
+    ok( $self->dump_pmc(), "dump_pmc succeeded" );
+    ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
 
     $rv = $self->gen_c();
-    ok($rv, "gen_c completed successfully; args:  default.pmc");
+    ok( $rv, "gen_c completed successfully; args:  default.pmc" );
 
-    ok(chdir $cwd, "changed back to original directory");
+    ok( chdir $cwd, "changed back to original directory" );
 }
 
 # @args holds default.pmc and one other .pmc
 {
-    my $tdir = tempdir( CLEANUP => 1);
-    ok(chdir $tdir, 'changed to temp directory for testing');
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, 'changed to temp directory for testing' );
     my $pmcdir = q{src/pmc};
-    ok((mkdir qq{$tdir/src}), "created src/ under tempdir");
+    ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
-    ok((mkdir $temppmcdir), "created src/pmc/ under tempdir");
+    ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = (
-        "$main::topdir/src/pmc/default.pmc",
-        "$main::topdir/src/pmc/array.pmc",
-    );
+    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc", );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
         my $basename = basename($pmcfile);
-        my $rv = copy ($pmcfile, qq{$temppmcdir/$basename});
+        my $rv = copy( $pmcfile, qq{$temppmcdir/$basename} );
         $copycount++ if $rv;
     }
-    is($copycount, $pmcfilecount,
-        "all src/pmc/*.pmc files copied to tempdir");
-    my @include = ($tdir, $temppmcdir, @include_orig);
+    is( $copycount, $pmcfilecount, "all src/pmc/*.pmc files copied to tempdir" );
+    my @include = ( $tdir, $temppmcdir, @include_orig );
 
-    @args = (
-        qq{$temppmcdir/default.pmc},
-        qq{$temppmcdir/array.pmc},
+    @args = ( qq{$temppmcdir/default.pmc}, qq{$temppmcdir/array.pmc}, );
+    $self = Parrot::Pmc2c::Utils->new(
+        {
+            include => \@include,
+            opt     => \%opt,
+            args    => [@args],
+        }
     );
-    $self = Parrot::Pmc2c::Utils->new( {
-        include => \@include,
-        opt     => \%opt,
-        args    => [ @args ],
-    } );
-    isa_ok($self, q{Parrot::Pmc2c::Utils});
+    isa_ok( $self, q{Parrot::Pmc2c::Utils} );
     $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
-    ok(-e $dump_file, "dump_vtable created vtable.dump");
+    ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
-    ok($self->dump_pmc(), "dump_pmc succeeded");
-    ok(-f qq{$temppmcdir/default.dump},
-        "default.dump created as expected");
-    ok(-f qq{$temppmcdir/array.dump},
-        "array.dump created as expected");
+    ok( $self->dump_pmc(),               "dump_pmc succeeded" );
+    ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
+    ok( -f qq{$temppmcdir/array.dump},   "array.dump created as expected" );
 
     $rv = $self->gen_c();
-    ok($rv, "gen_c completed successfully; args:  default.pmc and array.pmc");
+    ok( $rv, "gen_c completed successfully; args:  default.pmc and array.pmc" );
 
-    ok(chdir $cwd, "changed back to original directory");
+    ok( chdir $cwd, "changed back to original directory" );
 }
 
 # debug option
 {
-    my $tdir = tempdir( CLEANUP => 1);
-    ok(chdir $tdir, 'changed to temp directory for testing');
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, 'changed to temp directory for testing' );
     my $pmcdir = q{src/pmc};
-    ok((mkdir qq{$tdir/src}), "created src/ under tempdir");
+    ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
-    ok((mkdir $temppmcdir), "created src/pmc/ under tempdir");
+    ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = (
-        "$main::topdir/src/pmc/default.pmc",
-        "$main::topdir/src/pmc/array.pmc",
-    );
+    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc", );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
         my $basename = basename($pmcfile);
-        my $rv = copy ($pmcfile, qq{$temppmcdir/$basename});
+        my $rv = copy( $pmcfile, qq{$temppmcdir/$basename} );
         $copycount++ if $rv;
     }
-    is($copycount, $pmcfilecount,
-        "all src/pmc/*.pmc files copied to tempdir");
-    my @include = ($tdir, $temppmcdir, @include_orig);
+    is( $copycount, $pmcfilecount, "all src/pmc/*.pmc files copied to tempdir" );
+    my @include = ( $tdir, $temppmcdir, @include_orig );
 
-    @args = (
-        qq{$temppmcdir/default.pmc},
-    );
+    @args = ( qq{$temppmcdir/default.pmc}, );
     my %opt = ( debug => 1 );
-    $self = Parrot::Pmc2c::Utils->new( {
-        include => \@include,
-        opt     => \%opt,
-        args    => [ @args ],
-    } );
-    isa_ok($self, q{Parrot::Pmc2c::Utils});
+    $self = Parrot::Pmc2c::Utils->new(
+        {
+            include => \@include,
+            opt     => \%opt,
+            args    => [@args],
+        }
+    );
+    isa_ok( $self, q{Parrot::Pmc2c::Utils} );
     $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
-    ok(-e $dump_file, "dump_vtable created vtable.dump");
+    ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
-    ok($self->dump_pmc(), "dump_pmc succeeded");
-    ok(-f qq{$temppmcdir/default.dump},
-        "default.dump created as expected");
+    ok( $self->dump_pmc(), "dump_pmc succeeded" );
+    ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
 
-    my ($fh, $msg, $rv);
+    my ( $fh, $msg, $rv );
     {
         my $currfh = select($fh);
-        open($fh, '>', \$msg) or die "Unable to open handle: $!";
+        open( $fh, '>', \$msg ) or die "Unable to open handle: $!";
         $rv = $self->gen_c();
         select($currfh);
     }
-    ok($rv, "gen_c completed successfully; args:  default.pmc");
-    like($msg, qr{src/pmc/default\.pmc},
-        "debug option worked");
+    ok( $rv, "gen_c completed successfully; args:  default.pmc" );
+    like( $msg, qr{src/pmc/default\.pmc}, "debug option worked" );
 
-    ok(chdir $cwd, "changed back to original directory");
+    ok( chdir $cwd, "changed back to original directory" );
 }
 
 # debug and verbose options
 {
-    my $tdir = tempdir( CLEANUP => 1);
-    ok(chdir $tdir, 'changed to temp directory for testing');
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, 'changed to temp directory for testing' );
     my $pmcdir = q{src/pmc};
-    ok((mkdir qq{$tdir/src}), "created src/ under tempdir");
+    ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
-    ok((mkdir $temppmcdir), "created src/pmc/ under tempdir");
+    ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = (
-        "$main::topdir/src/pmc/default.pmc",
-        "$main::topdir/src/pmc/array.pmc",
-    );
+    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc", );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
         my $basename = basename($pmcfile);
-        my $rv = copy ($pmcfile, qq{$temppmcdir/$basename});
+        my $rv = copy( $pmcfile, qq{$temppmcdir/$basename} );
         $copycount++ if $rv;
     }
-    is($copycount, $pmcfilecount,
-        "all src/pmc/*.pmc files copied to tempdir");
-    my @include = ($tdir, $temppmcdir, @include_orig);
+    is( $copycount, $pmcfilecount, "all src/pmc/*.pmc files copied to tempdir" );
+    my @include = ( $tdir, $temppmcdir, @include_orig );
 
-    @args = (
-        qq{$temppmcdir/default.pmc},
-    );
+    @args = ( qq{$temppmcdir/default.pmc}, );
     my %opt = ( debug => 2, verbose => 1 );
-    $self = Parrot::Pmc2c::Utils->new( {
-        include => \@include,
-        opt     => \%opt,
-        args    => [ @args ],
-    } );
-    isa_ok($self, q{Parrot::Pmc2c::Utils});
+    $self = Parrot::Pmc2c::Utils->new(
+        {
+            include => \@include,
+            opt     => \%opt,
+            args    => [@args],
+        }
+    );
+    isa_ok( $self, q{Parrot::Pmc2c::Utils} );
 
-    my ($fh, $msg, $rv);
+    my ( $fh, $msg, $rv );
     {
         my $currfh = select($fh);
-        open($fh, '>', \$msg) or die "Unable to open handle: $!";
+        open( $fh, '>', \$msg ) or die "Unable to open handle: $!";
         $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
         select($currfh);
     }
-    ok(-e $dump_file, "dump_vtable created vtable.dump");
-    like($msg, qr{^Writing},
-        "verbose option worked");
+    ok( -e $dump_file, "dump_vtable created vtable.dump" );
+    like( $msg, qr{^Writing}, "verbose option worked" );
 
     {
         my $currfh = select($fh);
-        open($fh, '>', \$msg) or die "Unable to open handle: $!";
-        ok($self->dump_pmc(), "dump_pmc succeeded");
+        open( $fh, '>', \$msg ) or die "Unable to open handle: $!";
+        ok( $self->dump_pmc(), "dump_pmc succeeded" );
         select($currfh);
     }
-    ok(-f qq{$temppmcdir/default.dump},
-        "default.dump created as expected");
-    like($msg, qr{^Reading},
-        "verbose option worked");
+    ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
+    like( $msg, qr{^Reading}, "verbose option worked" );
 
     {
         my $currfh = select($fh);
-        open($fh, '>', \$msg) or die "Unable to open handle: $!";
+        open( $fh, '>', \$msg ) or die "Unable to open handle: $!";
         $rv = $self->gen_c();
         select($currfh);
     }
-    ok($rv, "gen_c completed successfully; args:  default.pmc");
-    like($msg, qr{src/pmc/default\.pmc},
-        "debug option worked");
+    ok( $rv, "gen_c completed successfully; args:  default.pmc" );
+    like( $msg, qr{src/pmc/default\.pmc}, "debug option worked" );
 
-    ok(chdir $cwd, "changed back to original directory");
+    ok( chdir $cwd, "changed back to original directory" );
 }
 
 # failure case:  calling gen_c() without first having called dump_pmc()
 {
-    my $tdir = tempdir( CLEANUP => 1);
-    ok(chdir $tdir, 'changed to temp directory for testing');
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, 'changed to temp directory for testing' );
     my $pmcdir = q{src/pmc};
-    ok((mkdir qq{$tdir/src}), "created src/ under tempdir");
+    ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
-    ok((mkdir $temppmcdir), "created src/pmc/ under tempdir");
+    ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = (
-        "$main::topdir/src/pmc/default.pmc",
-        "$main::topdir/src/pmc/array.pmc",
-    );
+    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc", );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
         my $basename = basename($pmcfile);
-        my $rv = copy ($pmcfile, qq{$temppmcdir/$basename});
+        my $rv = copy( $pmcfile, qq{$temppmcdir/$basename} );
         $copycount++ if $rv;
     }
-    is($copycount, $pmcfilecount,
-        "src/pmc/*.pmc files copied to tempdir");
-    my @include = ($tdir, $temppmcdir, @include_orig);
+    is( $copycount, $pmcfilecount, "src/pmc/*.pmc files copied to tempdir" );
+    my @include = ( $tdir, $temppmcdir, @include_orig );
 
-    @args = (
-        qq{$temppmcdir/default.pmc},
-        qq{$temppmcdir/array.pmc},
+    @args = ( qq{$temppmcdir/default.pmc}, qq{$temppmcdir/array.pmc}, );
+    $self = Parrot::Pmc2c::Utils->new(
+        {
+            include => \@include,
+            opt     => \%opt,
+            args    => [@args],
+        }
     );
-    $self = Parrot::Pmc2c::Utils->new( {
-        include => \@include,
-        opt     => \%opt,
-        args    => [ @args ],
-    } );
-    isa_ok($self, q{Parrot::Pmc2c::Utils});
+    isa_ok( $self, q{Parrot::Pmc2c::Utils} );
     $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
-    ok(-e $dump_file, "dump_vtable created vtable.dump");
+    ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     # $self->dump_pmc();
 
     eval { $rv = $self->gen_c(); };
-    like($@, qr<^cannot find file '.*/src/pmc/default.dump' in path>,
-        "gen_c() predictably failed because dump_pmc() was not called first");
+    like(
+        $@,
+        qr<^cannot find file '.*/src/pmc/default.dump' in path>,
+        "gen_c() predictably failed because dump_pmc() was not called first"
+    );
 
-    ok(chdir $cwd, "changed back to original directory");
+    ok( chdir $cwd, "changed back to original directory" );
 }
 
 pass("Completed all tests in $0");

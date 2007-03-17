@@ -11,9 +11,10 @@ BEGIN {
     use Cwd qw(cwd realpath);
     realpath($Bin) =~ m{^(.*\/parrot)\/[^/]*\/[^/]*\/[^/]*$};
     our $topdir = $1;
-    if (defined $topdir) {
+    if ( defined $topdir ) {
         print "\nOK:  Parrot top directory located\n";
-    } else {
+    }
+    else {
         $topdir = realpath($Bin) . "/../../..";
     }
     unshift @INC, qq{$topdir/lib};
@@ -23,116 +24,107 @@ use File::Basename;
 use File::Copy;
 use FindBin;
 use Data::Dumper;
-use_ok( 'Parrot::Pmc2c::Utils' );
-use_ok( 'Cwd' );
-use_ok( 'File::Temp', qw| tempdir |);
+use_ok('Parrot::Pmc2c::Utils');
+use_ok('Cwd');
+use_ok( 'File::Temp', qw| tempdir | );
 
-my (%opt, @include, @args);
+my ( %opt, @include, @args );
 my $dump_file;
 my $self;
 my $rv;
 my $cwd = cwd();
 
 my $file = q{sample.txt};
-my ($direction, $verbose);
+my ( $direction, $verbose );
 my $fh;
 
 {
-    my $tdir = tempdir( CLEANUP => 1);
-    ok(chdir $tdir, 'changed to temp directory for testing');
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, 'changed to temp directory for testing' );
 
-    ok(create_test_file($file), "test file created");
+    ok( create_test_file($file), "test file created" );
 
     $direction = '<';
-    ok($fh = Parrot::Pmc2c::Utils::open_file(
-        $direction, $file, $verbose),
-        "file opened for reading");
+    ok( $fh = Parrot::Pmc2c::Utils::open_file( $direction, $file, $verbose ),
+        "file opened for reading" );
     close $fh or die "Unable to close handle to test file";
 
     $direction = '>';
-    ok($fh = Parrot::Pmc2c::Utils::open_file(
-        $direction, $file, $verbose),
-        "file opened for writing");
+    ok( $fh = Parrot::Pmc2c::Utils::open_file( $direction, $file, $verbose ),
+        "file opened for writing" );
     close $fh or die "Unable to close handle to test file";
 
     $direction = '>>';
-    ok($fh = Parrot::Pmc2c::Utils::open_file(
-        $direction, $file, $verbose),
-        "file opened for appending");
+    ok( $fh = Parrot::Pmc2c::Utils::open_file( $direction, $file, $verbose ),
+        "file opened for appending" );
     close $fh or die "Unable to close handle to test file";
 
-    ok(chdir $cwd, "changed back to original directory");
+    ok( chdir $cwd, "changed back to original directory" );
 }
 
 {
-    my $tdir = tempdir( CLEANUP => 1);
-    ok(chdir $tdir, 'changed to temp directory for testing');
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, 'changed to temp directory for testing' );
 
-    ok(create_test_file($file), "test file created");
+    ok( create_test_file($file), "test file created" );
 
     $verbose = 1;
-    my ($currfh, $msg, $msgfh);
+    my ( $currfh, $msg, $msgfh );
 
     $direction = '<';
     {
         $currfh = select($msgfh);
-        open($msgfh, '>', \$msg) or die "Unable to open handle: $!";
-        $fh = Parrot::Pmc2c::Utils::open_file(
-            $direction, $file, $verbose);
-        ok($fh, "file opened for reading");
+        open( $msgfh, '>', \$msg ) or die "Unable to open handle: $!";
+        $fh = Parrot::Pmc2c::Utils::open_file( $direction, $file, $verbose );
+        ok( $fh, "file opened for reading" );
         close $fh or die "Unable to close handle: $!";
         select($currfh);
     }
-    like($msg, qr/^Reading/, "verbose option reports Reading");
+    like( $msg, qr/^Reading/, "verbose option reports Reading" );
 
     $direction = '>';
     {
         $currfh = select($msgfh);
-        open($msgfh, '>', \$msg) or die "Unable to open handle: $!";
-        $fh = Parrot::Pmc2c::Utils::open_file(
-            $direction, $file, $verbose);
-        ok($fh, "file opened for writing");
+        open( $msgfh, '>', \$msg ) or die "Unable to open handle: $!";
+        $fh = Parrot::Pmc2c::Utils::open_file( $direction, $file, $verbose );
+        ok( $fh, "file opened for writing" );
         close $fh or die "Unable to close handle: $!";
         select($currfh);
     }
-    like($msg, qr/^Writing/, "verbose option reports Writing");
+    like( $msg, qr/^Writing/, "verbose option reports Writing" );
 
     $direction = '>>';
     {
         $currfh = select($msgfh);
-        open($msgfh, '>', \$msg) or die "Unable to open handle: $!";
-        $fh = Parrot::Pmc2c::Utils::open_file(
-            $direction, $file, $verbose);
-        ok($fh, "file opened for appending");
+        open( $msgfh, '>', \$msg ) or die "Unable to open handle: $!";
+        $fh = Parrot::Pmc2c::Utils::open_file( $direction, $file, $verbose );
+        ok( $fh, "file opened for appending" );
         close $fh or die "Unable to close handle: $!";
         select($currfh);
     }
-    like($msg, qr/^Appending/, "verbose option reports Appending");
+    like( $msg, qr/^Appending/, "verbose option reports Appending" );
 
-    ok(chdir $cwd, "changed back to original directory");
+    ok( chdir $cwd, "changed back to original directory" );
 }
 
 # failure case:  nonexistent file
 {
-    my $tdir = tempdir( CLEANUP => 1);
-    ok(chdir $tdir, 'changed to temp directory for testing');
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, 'changed to temp directory for testing' );
 
-    my ($currfh, $msg, $msgfh);
+    my ( $currfh, $msg, $msgfh );
 
     $direction = '<';
     {
         $currfh = select($msgfh);
-        open($msgfh, '>', \$msg) or die "Unable to open handle: $!";
-        eval { $fh = Parrot::Pmc2c::Utils::open_file(
-            $direction, $file, $verbose); };
+        open( $msgfh, '>', \$msg ) or die "Unable to open handle: $!";
+        eval { $fh = Parrot::Pmc2c::Utils::open_file( $direction, $file, $verbose ); };
         select($currfh);
     }
-    like($@, qr/^Reading sample.txt/,
-        "correctly failed to read nonexistent file");
-    like($msg, qr/^Reading sample.txt/,
-        "correct message upon trying to read nonexistent file");
+    like( $@,   qr/^Reading sample.txt/, "correctly failed to read nonexistent file" );
+    like( $msg, qr/^Reading sample.txt/, "correct message upon trying to read nonexistent file" );
 
-    ok(chdir $cwd, "changed back to original directory");
+    ok( chdir $cwd, "changed back to original directory" );
 }
 
 pass("Completed all tests in $0");

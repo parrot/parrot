@@ -11,49 +11,53 @@ BEGIN {
     use Cwd qw(cwd realpath);
     realpath($Bin) =~ m{^(.*\/parrot)\/[^/]*\/[^/]*\/[^/]*$};
     our $topdir = $1;
-    if (defined $topdir) {
+    if ( defined $topdir ) {
         print "\nOK:  Parrot top directory located\n";
-    } else {
+    }
+    else {
         $topdir = realpath($Bin) . "/../../..";
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests =>  7;
-use_ok( 'Parrot::Pmc2c::Utils' );
+use Test::More tests => 7;
+use_ok('Parrot::Pmc2c::Utils');
 
-my (%opt, @include, @args);
+my ( %opt, @include, @args );
 my $self;
 
 my $pmcdir = qq{$main::topdir/src/pmc};
-@include = ( $pmcdir );
-$self = Parrot::Pmc2c::Utils->new( {
-    include => \@include,
-    opt     => \%opt,
-    args    => [ @args ],
-} );
+@include = ($pmcdir);
+$self    = Parrot::Pmc2c::Utils->new(
+    {
+        include => \@include,
+        opt     => \%opt,
+        args    => [@args],
+    }
+);
 
-my ($file, $path);
+my ( $file, $path );
 $file = q{array.pmc};
 
 $path = $self->find_file($file);
-ok(-f $path, "$file found");
+ok( -f $path, "$file found" );
 
 $path = $self->find_file(qq{$pmcdir/$file});
-ok(-f $path, "absolute path; $file found");
+ok( -f $path, "absolute path; $file found" );
 
 $file = q{dskflajsdfghjdshfg};
 
 $path = $self->find_file($file);
-ok(! defined $path,
-    "nonexistent file correctly returned undef");
+ok( !defined $path, "nonexistent file correctly returned undef" );
 
 $path = $self->find_file(qq{$pmcdir/$file});
-ok(! defined $path,
-    "absolute path but nonexistent file correctly returned undef");
+ok( !defined $path, "absolute path but nonexistent file correctly returned undef" );
 
-eval { $path = $self->find_file($file, 1); };
-like($@, qr/^cannot find file '$file' in path/,
-    "program correctly died when 'die_unless_found' flag is set");
+eval { $path = $self->find_file( $file, 1 ); };
+like(
+    $@,
+    qr/^cannot find file '$file' in path/,
+    "program correctly died when 'die_unless_found' flag is set"
+);
 
 pass("Completed all tests in $0");
 

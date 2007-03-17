@@ -63,7 +63,7 @@ isnt( $oldp, $p, 'delete from cache' );
 
 is( $p->parent_path(), tmp_dir_path(), 'parent_path' );
 
-my $r = Parrot::IO::Path->new(rootdir());
+my $r = Parrot::IO::Path->new( rootdir() );
 ok( !$r->parent_path(), 'root has no parent_path' );
 
 teardown();
@@ -72,7 +72,7 @@ BEGIN { use_ok('Parrot::IO::Directory') }
 BEGIN { use_ok('Parrot::IO::File') }
 
 $r = Parrot::IO::Directory->new(rootdir);
-ok( $r,            'new' );
+ok( $r, 'new' );
 isa_ok( $r, 'Parrot::IO::Directory' );
 ok( !$r->parent(), 'root has no parent' );
 

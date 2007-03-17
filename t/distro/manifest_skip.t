@@ -58,10 +58,7 @@ SKIP:
         or diag("Files ignored by SVN but not in MANIFEST.SKIP:\n\t@$manifest_skip_miss");
 }
 
-
-
 exit;
-
 
 sub list_diff {
     my ( $a, $b ) = @_;
@@ -73,7 +70,6 @@ sub list_diff {
     return ( [ sort grep { $elem{$_} < 0 } keys %elem ],
         [ sort grep { $elem{$_} > 0 } keys %elem ] );
 }
-
 
 # Local Variables:
 #   mode: cperl

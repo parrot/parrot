@@ -11,69 +11,71 @@ BEGIN {
     use Cwd qw(cwd realpath);
     realpath($Bin) =~ m{^(.*\/parrot)\/[^/]*\/[^/]*\/[^/]*$};
     our $topdir = $1;
-    if (defined $topdir) {
+    if ( defined $topdir ) {
         print "\nOK:  Parrot top directory located\n";
-    } else {
+    }
+    else {
         $topdir = realpath($Bin) . "/../../..";
     }
     unshift @INC, qq{$topdir/lib};
 }
 use Test::More tests => 12;
-use_ok( 'Parrot::Pmc2c::Utils' );
-use_ok( 'File::Basename' );
-use_ok( 'File::Temp', qw| tempdir |);
+use_ok('Parrot::Pmc2c::Utils');
+use_ok('File::Basename');
+use_ok( 'File::Temp', qw| tempdir | );
 use Data::Dumper;
 
-my (%opt, @include, @args);
+my ( %opt, @include, @args );
 my $self;
 my $dump_file;
 my $cwd;
 
-
 # basic test
 {
     $cwd = cwd();
-    my $tdir1 = tempdir( CLEANUP => 1);
-    ok(chdir $tdir1, 'changed to temp directory for testing');
+    my $tdir1 = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir1, 'changed to temp directory for testing' );
 
-    $self = Parrot::Pmc2c::Utils->new( {
-        include => \@include,
-        opt     => \%opt,
-        args    => [ @args ],
-    } );
+    $self = Parrot::Pmc2c::Utils->new(
+        {
+            include => \@include,
+            opt     => \%opt,
+            args    => [@args],
+        }
+    );
     $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
-    ok(-e $dump_file, "dump_vtable created vtable.dump");
+    ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
-    is(dirname($dump_file), realpath($tdir1),
-        "vtable.dump created in expected directory");
+    is( dirname($dump_file), realpath($tdir1), "vtable.dump created in expected directory" );
 
-    ok(chdir $cwd, "changed back to original directory");
+    ok( chdir $cwd, "changed back to original directory" );
 }
 
 # test verbose option
 {
     $cwd = cwd();
-    my $tdir2 = tempdir( CLEANUP => 1);
-    ok(chdir $tdir2, 'changed to temp directory for testing');
+    my $tdir2 = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir2, 'changed to temp directory for testing' );
 
     %opt = ( verbose => 1 );
-    $self = Parrot::Pmc2c::Utils->new( {
-        include => \@include,
-        opt     => \%opt,
-        args    => [ @args ],
-    } );
-    my ($fh,$msg);
+    $self = Parrot::Pmc2c::Utils->new(
+        {
+            include => \@include,
+            opt     => \%opt,
+            args    => [@args],
+        }
+    );
+    my ( $fh, $msg );
     {
         my $currfh = select($fh);
-        open($fh, '>', \$msg) or die "Unable to open handle: $!";
+        open( $fh, '>', \$msg ) or die "Unable to open handle: $!";
         $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
         select($currfh);
     }
-    ok(-e $dump_file, "dump_vtable created dump file");
-    like($msg, qr/^Writing/,
-        "verbose output is as expected");
+    ok( -e $dump_file, "dump_vtable created dump file" );
+    like( $msg, qr/^Writing/, "verbose output is as expected" );
 
-    ok(chdir $cwd, "changed back to original directory");
+    ok( chdir $cwd, "changed back to original directory" );
 }
 
 pass("Completed all tests in $0");

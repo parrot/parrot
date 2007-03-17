@@ -108,7 +108,7 @@ KEYWORD_EXP: {
 ## files with LF are the ones we expect, and that the rest are native.
 
 our $lf_files_regexp;
-if ($^O eq 'MSWin32') {
+if ( $^O eq 'MSWin32' ) {
     $lf_files_regexp = qr{
         ^examples\\shootout\\.*\.input$ |
         ^examples\\shootout\\.*\.output$ |
@@ -127,7 +127,6 @@ else {
         }x;
 }
 
-
 NATIVE_EOL_STYLE: {
 
     # we need to skip the files which *should* have LF as the eol-style
@@ -143,10 +142,10 @@ NATIVE_EOL_STYLE: {
         }
     }
 
-    my $test     = 'svn:eol-style';
-    my $expected = 'native';
+    my $test      = 'svn:eol-style';
+    my $expected  = 'native';
     my $test_name = $test . "=" . $expected;
-    my $keywords = get_attribute( $test, @plain_files );
+    my $keywords  = get_attribute( $test, @plain_files );
 
     my @failed = verify_attributes( $test, $expected, 1, $keywords );
 
@@ -174,10 +173,10 @@ LF_EOL_STYLE: {
         }
     }
 
-    my $test     = 'svn:eol-style';
-    my $expected = 'LF';
+    my $test      = 'svn:eol-style';
+    my $expected  = 'LF';
     my $test_name = $test . "=" . $expected;
-    my $keywords = get_attribute( $test, @lf_files );
+    my $keywords  = get_attribute( $test, @lf_files );
 
     my @failed = verify_attributes( $test, $expected, 1, $keywords );
 
@@ -286,7 +285,8 @@ sub get_attribute {
 
                 # This RE may be a little wonky.
                 if ( $result =~ m{(.*) - (.*)} ) {
-                    my ($file, $attribute) = ($1, $2);
+                    my ( $file, $attribute ) = ( $1, $2 );
+
                     # file names are reported with backslashes on Windows,
                     # but we want forward slashes
                     $file =~ s!\\!/!g if $^O eq 'MSWin32';

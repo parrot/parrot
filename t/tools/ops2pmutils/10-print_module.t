@@ -205,7 +205,6 @@ Parrot::Ops2pm::Utils, F<ops2pm.pl>.
 
 =cut
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
