@@ -74,3 +74,9 @@ documentation at L<http://www.json.org/>.
    P0[0] = "invalid JSON value"
    throw P0
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
