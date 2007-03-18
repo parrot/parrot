@@ -5,10 +5,10 @@
 #
 
 eval 'exec perl -w -S $0 ${1+"$@"}'
-  if $running_under_some_shell;
+    if $running_under_some_shell;
 
-$^W = 1; # Set warnings;
 use strict;
+use warnings;
 
 use Config;
 use File::Spec;
@@ -523,7 +523,8 @@ arch=   $Config{archname}
 EOT
 
     my $cc = $Config{cc};
-    $report .= "cc=     $cc $Config{${cc}.'version'}\n";
+    #$report .= "cc=     $cc $Config{${cc}.'version'}\n";
+    $report .= "cc=     $cc\n";
 
 
     # ... flags...
@@ -548,8 +549,8 @@ EOT
     push @env, grep /^(?:PERL|LC_|LANG|CYGWIN)/, keys %ENV;
     my %env; @env{@env} = @env;
     for my $env (sort keys %env) {
-	$report .= "    $env",
-          exists $ENV{$env} ? "=$ENV{$env}\n" : " (unset)\n";
+        my $env_value = exists $ENV{$env} ? "=$ENV{$env}\n" : " (unset)\n";
+	$report .= "    $env $env_value";
     }
 
     return $report;
@@ -826,4 +827,9 @@ perlbug(1), parrot(1), diff(1), patch(1)
 
 =cut
 
-
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
