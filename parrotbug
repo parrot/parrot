@@ -147,9 +147,9 @@ sub init {
     ##
     ## Process options.
     ##
-    @ARGV = split m/\s+/,
-        MacPerl::Ask("Provide command-line args here (-h for help):")
-        if $is_macos && $MacPerl::Version =~ /App/;
+    #@ARGV = split m/\s+/,
+    #MacPerl::Ask("Provide command-line args here (-h for help):")
+    #if $is_macos && $MacPerl::Version =~ /App/;
     Getopt::Long::Configure("no_bundling", "no_ignore_case", "auto_abbrev");
     help() unless GetOptions
       ( \%opts,
@@ -381,14 +381,14 @@ EOT
     
     # Try and guess return address
     my ($from, $guess);
-    if ( $is_macos ) {
-        require Mac::InternetConfig;
-        $guess = $Mac::InternetConfig::InternetConfig{
-                   Mac::InternetConfig::kICEmail()
-                 };
-    } else {
-        $guess = $ENV{'REPLY-TO'} || $ENV{REPLYTO} || "";
-    }
+    #if ( $is_macos ) {
+    #require Mac::InternetConfig;
+    #$guess = $Mac::InternetConfig::InternetConfig{
+    #Mac::InternetConfig::kICEmail()
+    #};
+    #} else {
+    $guess = $ENV{'REPLY-TO'} || $ENV{REPLYTO} || "";
+    #}
 
     if ( ! $guess ) {
         # Use $domain if we can.
@@ -443,14 +443,14 @@ sub edit_bug_report {
 
     # Launch editor.
     my $retval;
-    if ($is_macos) {
-        require ExtUtils::MakeMaker;
-        ExtUtils::MM_MacOS::launch_file($filename);
-        print "Press Enter when done.\n";
-        scalar <STDIN>;
-    } else {
-        $retval = system("$editor $filename");
-    }
+    #if ($is_macos) {
+    #require ExtUtils::MakeMaker;
+    #ExtUtils::MM_MacOS::launch_file($filename);
+    #print "Press Enter when done.\n";
+    #scalar <STDIN>;
+    #} else {
+    $retval = system("$editor $filename");
+    #}
 
     # Check whether editor run was successful.
     die <<EOT if $retval;
@@ -547,7 +547,8 @@ EOT
     my @env = qw[ PATH LD_LIBRARY_PATH LANG SHELL HOME LOGDIR LANGUAGE ];
     push @env, $Config{ldlibpthname} if $Config{ldlibpthname} ne '';
     push @env, grep /^(?:PERL|LC_|LANG|CYGWIN)/, keys %ENV;
-    my %env; @env{@env} = @env;
+    my %env; 
+    @env{@env} = @env;
     for my $env (sort keys %env) {
         my $env_value = exists $ENV{$env} ? "=$ENV{$env}\n" : " (unset)\n";
 	$report .= "    $env $env_value";
