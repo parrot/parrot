@@ -182,6 +182,7 @@ BEGIN {
         source => {
             c   => { file_exts => ['c'] },
             pmc => { file_exts => ['pmc'] },
+            pir => { file_exts => ['pir'] },
             ops => { file_exts => ['ops'] },
             lex => {
                 file_exts   => ['l'],
@@ -477,6 +478,26 @@ sub is_perl {
     }
 
     return 0;
+}
+
+=item C<get_pir_language_files()>
+
+Returns the PIR language source files within Parrot.
+
+returns a Parrot::Docs::File object
+
+=back
+
+=cut
+
+sub get_pir_language_files {
+    my $self = shift;
+
+    my @pir_files = (
+        $self->pir_source_files,
+    );
+
+    return @pir_files;
 }
 
 =item C<file_for_perl_module($module)>
