@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 57;
+use Test::More tests => 68;
 use File::Basename;
 use File::Copy;
 use FindBin;
@@ -270,6 +270,51 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
         qr<^cannot find file '.*/src/pmc/default.dump' in path>,
         "gen_c() predictably failed because dump_pmc() was not called first"
     );
+
+    ok( chdir $cwd, "changed back to original directory" );
+}
+
+# @args holds default.pmc and one metaclass.pmc
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, 'changed to temp directory for testing' );
+    my $pmcdir = q{src/pmc};
+    ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
+    my $temppmcdir = qq{$tdir/src/pmc};
+    ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
+
+    my @pmcfiles = (
+        "$main::topdir/src/pmc/default.pmc",
+        "$main::topdir/src/pmc/metaclass.pmc",
+    );
+    my $pmcfilecount = scalar(@pmcfiles);
+    my $copycount;
+    foreach my $pmcfile (@pmcfiles) {
+        my $basename = basename($pmcfile);
+        my $rv = copy( $pmcfile, qq{$temppmcdir/$basename} );
+        $copycount++ if $rv;
+    }
+    is( $copycount, $pmcfilecount, "all src/pmc/*.pmc files copied to tempdir" );
+    my @include = ( $tdir, $temppmcdir, @include_orig );
+
+    @args = ( qq{$temppmcdir/default.pmc}, qq{$temppmcdir/metaclass.pmc}, );
+    $self = Parrot::Pmc2c::Utils->new(
+        {
+            include => \@include,
+            opt     => \%opt,
+            args    => [@args],
+        }
+    );
+    isa_ok( $self, q{Parrot::Pmc2c::Utils} );
+    $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
+    ok( -e $dump_file, "dump_vtable created vtable.dump" );
+
+    ok( $self->dump_pmc(),               "dump_pmc succeeded" );
+    ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
+    ok( -f qq{$temppmcdir/metaclass.dump},   "metaclass.dump created as expected" );
+
+    $rv = $self->gen_c();
+    ok( $rv, "gen_c completed successfully; args:  default.pmc and metaclass.pmc" );
 
     ok( chdir $cwd, "changed back to original directory" );
 }
