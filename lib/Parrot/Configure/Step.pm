@@ -438,7 +438,7 @@ sub _run_command {
     open OLDERR, ">&", "STDERR" or die "Can't save     stderr" if $err;
 
     open STDOUT, ">", "$out" or die "Can't redirect stdout" if $out;
-    open STDERR, ">", "$err" or die "Can't redirect stderr" if $err;
+    open STDERR, ">$err" or die "Can't redirect stderr" if $err;
 
     system $command;
     my $exit_code = $? >> 8;
