@@ -86,7 +86,8 @@ Below is a list of some languages that are actively worked on.
 =item *
 
 Will Coleda and Matt Diephouse are working hard on their Tcl port to Parrot
-(called ParTcl). Will also created an APL implementation.
+(called ParTcl). Will also created an APL implementation with Patrick R.
+Michaud.
 
 =item *
 
