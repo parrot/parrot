@@ -152,7 +152,7 @@ OUT
 ## Q: what attributes the base Class have by default?
 
 # L<PDD15/Class PMC API/=item add_attribute>
-pir_output_is( <<'CODE', <<'OUT', 'add_attribute' ,todo=>'fixme');
+pir_output_is( <<'CODE', <<'OUT', 'add_attribute');
 .sub 'test' :main
     new $P0, .MetaClass
 
@@ -164,21 +164,21 @@ pir_output_is( <<'CODE', <<'OUT', 'add_attribute' ,todo=>'fixme');
   ok_1:
     say 'ok 1 - add_attribute() with no args fails'
 
-    push_eh ok_2
-    $P0.'add_attribute'( 'foo', 'bar' )
-    clear_eh
-
-    print 'not '
-  ok_2:
-    say 'ok 2 - add_attribute() with unknown type fails'
-
-    $P0.'add_attribute'( 'foo', 'Integer' )
+    $P0.'add_attribute'( 'foo' )
     $P1 = $P0.'attributes'()
     $I0 = $P1
-    if $I0 == 1 goto ok_3
+    if $I0 == 1 goto ok_2
+    print 'not '
+  ok_2:
+    say 'ok 2 - add_attribute() with valid single arg adds an attribute'
+
+    $P0.'add_attribute'( 'bar', 'Integer' )
+    $P1 = $P0.'attributes'()
+    $I0 = $P1
+    if $I0 == 2 goto ok_3
     print 'not '
   ok_3:
-    say 'ok 3 - add_attributes() with valid args adds an attribute'
+    say 'ok 3 - add_attribute() with valid args adds an attribute'
 
     push_eh ok_4
     $P0.'add_attribute'( 'foo', 'String' )
@@ -186,16 +186,15 @@ pir_output_is( <<'CODE', <<'OUT', 'add_attribute' ,todo=>'fixme');
 
     print 'not '
   ok_4:
-    say 'ok 4 - add_attributes() with existing attribute name fails'
+    say 'ok 4 - add_attribute() with existing attribute name fails'
 .end
 CODE
 ok 1 - add_attribute() with no args fails
-ok 2 - add_attribute() with unknown type fails
+ok 2 - add_attribute() with valid single arg adds an attribute
 ok 3 - add_attribute() with valid args adds an attribute
 ok 4 - add_attribute() with existing attribute name fails
 OUT
-## Q: should adding an attribute with unknown type fail? i think so.
-## Q: should adding an attr with the same name as an existing one fail? i say yes.
+## Q: should adding an attribute with an invalid type name fail?
 
 ## NOTE i think this belongs in the Object PMC tests
 # L<PDD15/Class PMC API>

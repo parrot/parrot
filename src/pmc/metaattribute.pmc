@@ -92,6 +92,24 @@ Mark any referenced strings and PMCs.
 
 /*
 
+=item C<PMC* clone()>
+
+Creates a copy of the attribute metadata.
+
+=cut
+
+*/
+    PMC* clone() {
+        PMC *cloned = pmc_new(interp, enum_class_MetaAttribute);
+        Parrot_MetaAttribute *attr = PARROT_METAATTRIBUTE(SELF);
+        Parrot_MetaAttribute *attr_clone = PARROT_METAATTRIBUTE(cloned);
+        attr_clone->name = attr->name;
+        attr_clone->type = attr->type;
+        return cloned;
+    }
+
+/*
+
 =item C<void name(PMC *name)>
 
 Name attribute accessor/mutator.

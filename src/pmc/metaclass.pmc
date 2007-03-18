@@ -250,6 +250,13 @@ Add an attribute to the class. Requires a name and, optionally, a type.
                 "Modifications to already instantiated classes not allowed yet.");
         }
 
+        /* If we've already got an attribute of this name, it's an error. */
+        if (VTABLE_exists_keyed_str(interp, class->attrib_metadata, attribute_name)) {
+            real_exception(interp, NULL, INVALID_OPERATION,
+                "An attribute of this name already exists.");
+            return;
+        }
+
         /* Set name and type. */
         PMINVOKE(interp, new_attribute, "name", STRING* attribute_name);
         if (got_type) {
