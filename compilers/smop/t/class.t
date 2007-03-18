@@ -118,3 +118,9 @@ NEXT:
   rv = self._accessor( "tail", tail, got_tail )
   .return(rv)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

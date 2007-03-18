@@ -359,3 +359,9 @@
     iter.'next'()
     'ok'(1, ".'next'() runs without exception after iter exhaustion")
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
