@@ -321,3 +321,9 @@ the attribute, and a binary flag that says whether to set the attribute.
     print "]\n"
     .return ()
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

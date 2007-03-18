@@ -47,3 +47,9 @@ of Node.
     .param int passed_scope   :opt_flag
     .return self.'accessor'('scope', scope, passed_scope)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

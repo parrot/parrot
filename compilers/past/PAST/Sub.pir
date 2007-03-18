@@ -36,3 +36,9 @@ Node.
 	name_att = getattribute self, 'name'
 	.return( name_att )
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

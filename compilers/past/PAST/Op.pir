@@ -33,3 +33,9 @@ is a subclass of Node.
     .param int passed_op   :opt_flag
     .return self.'accessor'('op', op, passed_op)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

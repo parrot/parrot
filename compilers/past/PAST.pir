@@ -31,3 +31,9 @@ tree nodes created by a language compiler.
     addattribute base, "topnode" # the top node of the syntax tree
     .return ()
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -39,3 +39,9 @@ PAST::Val is a subclass of Node.
     .param int passed_valtype   :opt_flag
     .return self.'accessor'('valtype', valtype, passed_valtype)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
