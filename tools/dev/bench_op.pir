@@ -241,4 +241,8 @@ Leopold Toetsch <lt@toetsch.at>
 
 =cut
 
-# vim: expandtab sw=4 tw=70:
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
