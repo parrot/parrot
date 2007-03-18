@@ -486,8 +486,6 @@ Returns the PIR language source files within Parrot.
 
 returns a Parrot::Docs::File object
 
-=back
-
 =cut
 
 sub get_pir_language_files {
@@ -749,10 +747,6 @@ sub generated_files {
             keys %$generated
     };
 }
-
-=back
-
-=cut
 
 1;
 
