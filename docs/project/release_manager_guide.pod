@@ -163,12 +163,23 @@ Update the next planned release date on the wiki.
 
 =item d
 
-Close any release-related tickets in RT. If they are not yet resolved,
-migrate them to the next milestone release ticket.
+Update the website. The svn repository for the website is at 
+L<https://svn.perl.org/perl.org/docs/live/parrotcode>.
+
+Add a release announcement to news/[year]/Parrot-[release].html.
+Update C</index.html> (The old mini-announcement may be commented out).
+Update C</source.html>. Make sure all urls are updated appropriately.
+
+Test locally in combust before pushing update out.
 
 =back
 
 =item 10.
+
+Close any release-related tickets in RT. If they are not yet resolved,
+migrate them to the next milestone release ticket.
+
+=item 11.
 
 You're done! Help yourself to a beer, cola or other celebratory drink.
 
