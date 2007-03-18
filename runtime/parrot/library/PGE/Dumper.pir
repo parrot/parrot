@@ -494,3 +494,9 @@ This method enables Data::Dumper to work on PGE::OPTable objects.
 .end
 
 =back
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

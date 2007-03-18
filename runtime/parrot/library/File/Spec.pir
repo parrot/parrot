@@ -172,3 +172,9 @@ found_module:
 
 
 .include 'library/config.pir'
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

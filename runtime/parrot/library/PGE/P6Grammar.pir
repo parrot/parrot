@@ -364,3 +364,9 @@ the output to the correct output file.
     optable.emit("          optable.newtok('%0'%1)", name, traitlist)
   .return ()
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

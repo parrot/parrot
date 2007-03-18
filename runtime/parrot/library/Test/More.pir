@@ -846,4 +846,8 @@ Copyright (C) 2005 - 2006 The Perl Foundation.
 
 =cut
 
-# vim: expandtab sw=4
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -148,3 +148,9 @@ END_HELP
     $S1 = concat $S1, $S0
     .return ($S1)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

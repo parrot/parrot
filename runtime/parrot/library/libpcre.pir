@@ -176,3 +176,9 @@ E<lt>jerry dot gay at gmail dot com<gt>
 
 =cut
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

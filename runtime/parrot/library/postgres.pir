@@ -196,3 +196,9 @@ dlfunc $P2, $P1, 'PQsetNoticeReceiver', 'pppP'
 store_global 'PQsetNoticeReceiver', $P2
 .end
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

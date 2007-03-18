@@ -375,3 +375,9 @@ Thunk a better way to deal with the maximum recursion depth exception (Or make i
 =back
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

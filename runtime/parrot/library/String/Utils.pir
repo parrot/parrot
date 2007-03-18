@@ -68,3 +68,9 @@ and return in C<$S0>. If C<$S2> is not specified, the default C<\n> is used.
 Jerry Gay a.k.a. particle
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

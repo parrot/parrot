@@ -133,3 +133,9 @@ version until the Capture PMC is working properly.
   end:
     dumper.'deleteIndent'()
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

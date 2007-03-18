@@ -744,3 +744,9 @@ list.
 Copyright (c) 2004, 2006 The Perl Foundation.
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

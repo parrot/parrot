@@ -231,12 +231,8 @@ The .Foreach macro is not nestable within itself currently.  You can use other m
 
 Will not run as you would expect.
 
-=begin vim
-
-vim: ts=4 expandtab
-
-=end vim
-
-=cut
-
-
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

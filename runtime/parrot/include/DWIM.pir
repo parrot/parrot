@@ -309,3 +309,9 @@ and/or modified under the same terms as Parrot.
 
 =cut
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

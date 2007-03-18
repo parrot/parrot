@@ -842,10 +842,10 @@ Copyright (C) 2006, The Perl Foundation.
 This program is free software. It is subject to the same
 license as The Parrot Interpreter.
 
-=for vim
-
-" vim: ts=4 expandtab
-
 =cut
 
-
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

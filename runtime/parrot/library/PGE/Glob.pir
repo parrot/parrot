@@ -350,3 +350,9 @@ It has been updated for later versions of PGE by Patrick R. Michaud
 (pmichaud@pobox.com).
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

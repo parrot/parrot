@@ -161,3 +161,9 @@ Executes C<.'next'()>, and returns C<.'value'()>.
 Jerry Gay a.k.a. particle
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

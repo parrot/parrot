@@ -404,3 +404,9 @@ to the Perl 6 internals mailing list.
 Copyright (C) 2005, The Perl Foundation.
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
