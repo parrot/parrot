@@ -10,6 +10,25 @@ From F<docs/roles_responsibilities.pod>:
  has been created for use by this group. This is an entry level position, and
  viewed as a good way to get familiar with parrot internals.
 
+=head1 Testing Parrot after making a code cleaning change
+
+To be really I<really> sure you're not breaking anything after doing code
+cleaning or attending to the newspaper at the bottom of our Parrot's cage
+here are is the process I (ptc) go through before committing a new change:
+
+  make realclean > make_realclean.out 2>&1
+  perl Configure.pl > perl_configure.out 2>&1
+  make buildtools_tests > buildtools_tests.out 2>&1
+  make test > make_test.out 2>&1
+
+Then I diff the C<*.out> files with copies of the C<*.out> files I made on a
+previous test run.  If the diffs show nothing nasty is happening, you can be
+more sure that you've not broken anything and can commit the change.  Then
+rename the C<*.out> files to something like C<*.out.old> so that you
+maintain reasonably up to date references for the diffs.
+
+This process should be put into a script and stored somewhere...
+
 =head1 Parrot Cage Cleaners high-level goals
 
 =head2 Smoke testing on many platforms with many compilers
