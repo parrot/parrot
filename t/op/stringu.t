@@ -326,6 +326,8 @@ CODE
 1102269
 OUTPUT
 
+SKIP: {
+    skip "Tests seem to fail on big endian machines with icu", 2 if $PConfig{byteorder} eq '4321';
 # Tests for .CCLASS_NUMERIC
 pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_NUMERIC in unicode" );
 .sub main
@@ -380,6 +382,7 @@ AB
 AB
 A\x00B\x00
 OUTPUT
+}
 
 # Local Variables:
 #   mode: cperl
