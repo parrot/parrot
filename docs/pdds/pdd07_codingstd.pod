@@ -446,8 +446,6 @@ C<i> that's visible after it's used, which is confusing at best.
 
 =head3 svn:ignore
 
-(from F<docs/submissions.pod>)
-
 Sometimes new files will be created in the configuration and build process of
 Parrot. These files should not show up when checking the distribution with
 
@@ -466,54 +464,54 @@ the MANIFEST and MANIFEST.SKIP file should be regenerated with:
 
     perl tools/dev/mk_manifest_and_skip.pl
 
-=head3 svn:keywords
-
-The C<svn:keywords> property should be set to 
-
-    Author Date Id Revision
-
-on each(?) file.  Do this with the command:
-
-    svn propset svn:keywords "Author Date Id Revision" <filename>
-
-That the files needing this property is set is checked by
-F<t/distro/file_metadata.t>.
-
-=head3 svn:eol-style
-
-The C<svn:eol-style> property makes sure that whenever a file is checked out
-of subversion that it has the correct end-of-line characters appropriate for
-the given platform.  Therefore, B<most> files should have their
-C<svn:eol-style> property set to C<native>.  However, this is B<not> true
-for B<all> files.  Some input files to tests (such as the C<*.input> and
-C<*.output> files for pir tests) B<need> to have C<LF> as their
-C<svn:eol-style> property.  The current list of such files is described in
-F<t/distro/file_metadata.t>.
-
-Set the C<svn:eol-style> property to C<native> with the command:
-
-    svn propset svn:eol-sytle "native" <filename>
-
-Set the C<svn:eol-style> property to C<LF> with the command:
-
-    svn propset svn:eol-sytle "LF" <filename>
-
-That the files needing this property is set is checked by
-F<t/distro/file_metadata.t>.
-
 =head3 svn:mime-type
 
-(Adapted from L<http://www.parrotcode.org/source.html>)
-
-The C<svn:mime-type> property should be set to C<text-plain> for all test
-files.  For instance, one can set up the use of I<auto-props> within
-subversion so that this is set for you automatically.  To do so, add the
+The C<svn:mime-type> property must be set to C<text/plain> for all test
+files, and may be set to C<text/plain> for other source code files in
+the repository. Using I<auto-props>, Subversion can automatically set
+this property for you on test files.  To enable this option, add the
 following to your F<~/.subversion/config>:
 
     [miscellany]
     enable-auto-props = yes
     [auto-props]
     *.t = svn:mime-type=text/plain
+
+=head3 svn:keywords
+
+The C<svn:keywords> property should be set to:
+
+    Author Date Id Revision
+
+on each file with a mime-type of C<text/plain>.  Do this with the command:
+
+    svn propset svn:keywords "Author Date Id Revision" <filename>
+
+The F<t/distro/file_metadata.t> test checks that the files needing
+this property have it set.
+
+=head3 svn:eol-style
+
+The C<svn:eol-style> property makes sure that whenever a file is checked out
+of subversion it has the correct end-of-line characters appropriate for
+the given platform.  Therefore, most files should have their
+C<svn:eol-style> property set to C<native>.  However, this is not true
+for all files.  Some input files to tests (such as the C<*.input> and
+C<*.output> files for PIR tests) need to have C<LF> as their
+C<svn:eol-style> property.  The current list of such files is described in
+F<t/distro/file_metadata.t>.
+
+Set the C<svn:eol-style> property to C<native> with the command:
+
+    svn propset svn:eol-style "native" <filename>
+
+Set the C<svn:eol-style> property to C<LF> with the command:
+
+    svn propset svn:eol-style "LF" <filename>
+
+The F<t/distro/file_metadata.t> test checks that the files needing
+this property have it set.
+
 
 =head2 CHIP HAS EDITED THIS FAR INTO THE FILE
 
@@ -1006,30 +1004,10 @@ for example, all files under a given directory.
 
 =head1 REFERENCES
 
-
 The section on coding style is based on Perl5's F<Porting/patching.pod> by
 Daniel Grisinger. The section on naming conventions grew from some suggestions
 by Paolo Molaro <lupus@lettere.unipd.it>. Other snippets came from various
-P5Pers. The rest of it is probably my fault.
-
-=head2 CURRENT
-
-   Maintainer: Dave Mitchell <davem@fdgroup.com>
-   Class: Internals
-   PDD Number: 7
-   Version: 1
-   Status: Developing
-   Last Modified: 6 August 2001
-   PDD Format: 1
-   Language: English
-
-=head2 HISTORY
-
-Based on an earlier draft which covered only code comments.
-
-=head1 CHANGES
-
-None. First version
+P5Pers.
 
 =cut
 
