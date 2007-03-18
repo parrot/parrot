@@ -161,3 +161,9 @@ Bernhard Schmalhofer - C<Bernhard.Schmalhofer@gmx.de>
 F<runtime/parrot/library/Getopt/Obj.pir>
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

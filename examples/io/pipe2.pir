@@ -17,3 +17,9 @@ lp:
     if pipe goto lp
 .end
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

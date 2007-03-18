@@ -164,3 +164,9 @@ no_kid2:
    .pcc_begin_return
    .pcc_end_return
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -115,5 +115,3 @@ LOOP:
     end
 
 .end
-
-# vim: ft=imc sw=4:

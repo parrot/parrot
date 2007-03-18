@@ -47,3 +47,9 @@ You should check where the file is going to be before you run this.
 F<examples/io>.
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

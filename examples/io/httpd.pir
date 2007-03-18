@@ -417,3 +417,9 @@ next_item:
     if i < n goto lp_items
     .return (query_hash)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

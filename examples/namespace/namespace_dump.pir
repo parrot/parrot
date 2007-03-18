@@ -88,3 +88,9 @@ lp2:
     inc i
     if i < n goto loop
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

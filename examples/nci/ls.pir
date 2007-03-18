@@ -61,3 +61,9 @@ loop:
 done:
      libc::closedir(curdir)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

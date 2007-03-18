@@ -94,3 +94,9 @@ PRINT:  $I1 = k % 16
         dec y
         if y > 0 goto YREDO
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

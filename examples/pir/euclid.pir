@@ -44,3 +44,9 @@ done:   print "The greatest common denominator of 96 and 64 is "
         print  I2
         print  ".\n"
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

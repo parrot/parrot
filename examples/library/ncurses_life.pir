@@ -797,3 +797,9 @@ F<examples/library/acorn.l>, F<examples/pasm/life.pasm>,
 F<library/ncurses.pasm>, F<library/ncurses.declarations>.
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

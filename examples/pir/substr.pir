@@ -35,3 +35,9 @@ WANE:   I1 = length S1
         unless I1 == I3 goto WANE
 DONE:   
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

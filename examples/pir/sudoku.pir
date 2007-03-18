@@ -2434,4 +2434,8 @@ Another example of a 2-dim test is of course Y-Wing.
 
 =cut
 
-# vim: ft=imc sw=4:
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
