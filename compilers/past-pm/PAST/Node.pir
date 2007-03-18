@@ -691,3 +691,9 @@ Perl 6 compilers mailing lists.
 Copyright (C) 2006, The Perl Foundation.
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
