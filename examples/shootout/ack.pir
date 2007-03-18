@@ -55,3 +55,9 @@ a2:
     $I4 = x - 1
     .return ack($I4, $I3)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

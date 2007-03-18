@@ -46,3 +46,9 @@ endif:
 	.return Tak($N0, $N1, $N2)
 .end
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

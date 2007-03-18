@@ -573,3 +573,9 @@ If you want faster mandelbrot with iteractive zooming use Xaos:
 L<http://xaos.sourceforge.net/english.php>
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

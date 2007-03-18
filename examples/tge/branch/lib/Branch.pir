@@ -15,3 +15,9 @@ Branch - a sample branch node for Language::AttributeGrammar
     addattribute base, "right"           # right child
     .return ()
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

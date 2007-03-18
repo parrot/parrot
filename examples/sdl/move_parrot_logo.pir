@@ -202,3 +202,9 @@ chromatic, E<lt>chromatic at wgz dot orgE<gt>.
 Copyright (C) 2004, The Perl Foundation.
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

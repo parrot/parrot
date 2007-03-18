@@ -140,3 +140,9 @@ endif:
     .return TakInt($I0, tmp, z)
 .end
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

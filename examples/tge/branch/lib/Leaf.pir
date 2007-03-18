@@ -14,3 +14,9 @@ Leaf - a sample leaf node for Language::AttributeGrammar
     addattribute base, "value"   # the value of the leaf node
     .return ()
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
