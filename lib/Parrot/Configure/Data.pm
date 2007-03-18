@@ -32,7 +32,7 @@ L<Parrot::Configure::*> modules.
 
 =head2 Import Parameters
 
-This module accepts no arguments to it's C<import> method and exports no
+This module accepts no arguments to its C<import> method and exports no
 I<symbols>.
 
 =cut
@@ -96,7 +96,7 @@ sub get {
 
 Modifies or creates a new value.
 
-Accepts a list of C<key => value> pairs and returns a
+Accepts a list of C<< key => value >> pairs and returns a
 L<Parrot::Configure::Data> object.
 
 =cut
@@ -131,7 +131,7 @@ sub set {
 Either creates a new key or appends to an existing key, with the previous/new
 values joined together by C<$delim>.
 
-Accepts a delimiter value followed by a list of C<key => value> pairs and
+Accepts a delimiter value followed by a list of C<< key => value >> pairs and
 returns a L<Parrot::Configure::Data> object.
 
 =cut
@@ -169,7 +169,7 @@ sub keys {
 
 =item C<slurp()>
 
-Slurps in Parrot::Config data from previous configure.
+Slurps in L<Parrot::Config> data from previous configure.
 
 Accepts no arguments.
 

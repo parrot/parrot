@@ -118,7 +118,7 @@ sub file_checksum {
 =item C<copy_if_diff($from, $to, $ignore_pattern)>
 
 Copies the file specified by C<$from> to the location specified by C<$to> if
-it's contents have changed.
+its contents have changed.
 
 The regular expression specified by C<$ignore_pattern> is passed to
 C<file_checksum()> when comparing the files.
@@ -147,7 +147,7 @@ sub copy_if_diff {
 =item C<move_if_diff($from, $to, $ignore_pattern)>
 
 Moves the file specified by C<$from> to the location specified by C<$to> if
-it's contents have changed.
+its contents have changed.
 
 =cut
 
@@ -204,7 +204,7 @@ original text.
 
 =item replace_slashes
 
-If set to a true value, this causes any C</>'s in the file to automatically
+If set to a true value, this causes any C</>s in the file to automatically
 be replaced with an architecture appropriate slash. C</> or C<\>. This is
 a very helpful option when writing Makefiles.
 
@@ -215,13 +215,13 @@ into their full equivalents. For example:
 
  $(wildcard PATTERN)
 
-Will be replaced *at config time* with the list of files that match this
+Will be replaced I<at config time> with the list of files that match this
 pattern. Note! Be very careful when determining whether or not to disable
 this expansion during config time and letting gmake evaluate these: the
 config system itself may change state of the filesystem, causing the
 directives to expand differently depending on when they're run. Another
 potential issue to consider there is that most makefiles, while generated
-from the root directory, are *run* from a subdirectory. So relative path names
+from the root directory, are I<run> from a subdirectory. So relative path names
 become an issue.
 
 The gmake replacements are done repeatedly on a single line, so nested

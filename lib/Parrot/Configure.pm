@@ -119,7 +119,7 @@ sub options {
 
 =item * C<steps()>
 
-Provides a list of registered steps.  Where each steps is represented by an
+Provides a list of registered steps, where each step is represented by an
 L<Parrot::Configure::Task> object.  Steps are returned in the order in which
 they were registered in.
 
