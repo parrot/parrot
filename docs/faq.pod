@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -9,29 +9,23 @@ docs/faq.pod - Parrot FAQ
 
 =head2 What is Parrot?
 
-Parrot is the new interpreter being designed from scratch to support the
-upcoming Perl 6 language. It is being designed as a standalone virtual machine
-that can be used to execute bytecode compiled dynamic languages such as Perl 6,
-but also Perl 5. Ideally, Parrot can be used to support other dynamic,
-bytecode-compiled languages such as Python, Ruby and Tcl.
+Parrot is a virtual machine for dynamic languages such as PHP, Perl,
+Python, Ruby, Scheme, Tcl, etc. It compiles and executes bytecode, but is
+also designed to act as an interpreter. 
 
-=head2 Why "Parrot"?
+=head2 Why did you call it "Parrot"?
 
-The name "Parrot" relates to Simon Cozens's L<April Fool's Joke|"LINKS"> where
-Larry Wall and Guido van Rossum announced the merger of the Perl and Python
-languages.
+The name "Parrot" started with Simon Cozens's L<April Fool's Joke|
+http://www.perl.com/pub/a/2001/04/01/parrot.htm> where Larry Wall and Guido
+van Rossum announced the merger of the Perl and Python languages.
 
-As penance, Simon spent time as Parrot's lead developer, but he's gotten
-better.
+A year later, when we were looking for a name for our virtual machine that
+could run both Perl and Python, it seemed like a perfect fit.
 
 =head2 Is Parrot the same as Perl 6?
 
-No. Parrot is an implementation that is expected to be used to execute Perl 6
-programs. The Perl 6 language definition is currently being crafted by Larry
-Wall. While the true nature of Perl 6 is still unknown, it will be substantially
-similar to Perl as we know it today, and will need a runtime system. For more
-information on the nascent Perl 6 language definition, check out Larry's
-L<apocalypses|"LINKS">.
+No. Perl 6 is just one of the languages that will run on Parrot. For
+information about Perl 6 on Parrot, see L<languages/perl6/>.
 
 =head2 Can I use Parrot today?
 
@@ -39,11 +33,12 @@ Yes.
 
 Although Parrot is currently still under development, Parrot has been usable for 
 a long time. The primary way to use Parrot is to write Parrot Intermediate 
-Representation (PIR), described in L<PDD6|pdds/pdd19.pod>. PIR is a high-level 
-assembly language. PIR maps to the more low-level Parrot Assembly language (PASM),
-which is harder to write and read. Although you could write PASM instead of PIR,
-PIR is the recommended way to program your Parrot. See the examples to see what
-both PIR and PASM looks like.
+Representation (PIR), described in L<PDD19|docs/pdds/draft/pdd19_pir.pod>. 
+PIR is a high-level assembly language. PIR maps to the more low-level
+Parrot Assembly language (PASM), which is harder to write and read.
+Although you could write PASM instead of PIR, PIR is the recommended way
+to program for Parrot. See the examples to see what both PIR and PASM
+looks like.
 
 You can also create dynamic content within Apache using Ask Bjorn Hansen's
 mod_parrot module.  You are strongly advised that mod_parrot is a toy, and
@@ -70,17 +65,19 @@ assembly language) without any of the requisite system crashes.
 
 =back
 
-Seriously, though, programming in PIR is an effective way to write
-challenge.  It's also one of the best ways to write test cases for Parrot.
+Seriously, though, PIR is generally easy to learn if you have a background
+in dynamic languages. Programming in PIR is an effective way to write
+libraries for Parrot, and one of the best ways to write test cases for
+Parrot.
 
 =head2 When can I expect to use Parrot with a I<real> programming language?
 
-You can already today! There are quite some high level languages being targeted
+You can already today! There are quite a few high level languages being targeted
 to Parrot. Since the introduction of the Parrot Compiler Tools (the Parrot
 Grammar Engine (PGE) and the Tree Grammar Engine (TGE)), targeting a 
 language to Parrot has become a snap! Please note that, although some languages
 have come a long way, due to the fact that Parrot is still under active development,
-it's most safe to program in PIR. 
+most library development is still done in PIR. 
 
 Below is a list of some languages that are actively worked on.
 
@@ -102,7 +99,7 @@ François Perrad is working on a Lua implementation for Parrot.
 
 =item *
 
-Allison Randal has been working on a Perl 1 port to Parrot, called Punie.
+Allison Randal is working on a Perl 1 port to Parrot, called Punie.
 
 =item *
 
@@ -163,7 +160,7 @@ written (Artistic|GPL) for short.  Thus, Parrot's license is compatible with
 the GNU GPL, which means you can combine Parrot with GPL'ed code.
 
 Code accepted into the core interpreter must fall under the same terms as
-parrot. Library code (for example the ICU library we're using for Unicode) we
+Parrot. Library code (for example the ICU library we're using for Unicode) we
 link into the interpreter can be covered by other licenses so long as their
 terms don't prohibit this.
 
@@ -224,167 +221,59 @@ It's not anymore.  As of July 2006, the list is called parrot-porters
 to reflect the growing list of languages and platforms embraced by
 Parrot.  The old perl6-internals list forwards to the new one.
 
-=head2 Pugs is going great shakes - why not just toss Parrot and run
-Perl 6 on Pugs?
+=head1 PARROT IMPLEMENTATION ISSUES
 
-Perl 5 is highly portable, and builds on around 50 different systems, many far
-removed from Unix or MS Windows. We'd like Perl 6 to be able run everywhere
-that Perl 5 runs, so we need to keep Parrot as portable as possible.  The
-Glasgow Haskell Compiler is a pain to build on minor systems, and downright
-impossible on small systems. So by going with Pugs and GHC we'd be sacrificing
-portability.
+=head2 Why a register-based VM instead of a stack-based one?
 
-As well, other languages apart from Perl 6 are being targeted to Parrot.
-Significant parts of Python, Tcl, and Basic have already been implemented,
-and others are on the way. Running multiple languages on the same
-Parrot engine allows them to be cross-language compatible-- in other words, one
-targeted language could directly invoke the methods of another at the bytecode
-level.
+The JVM and the CLR (Mono and .NET) are two successful stack-based
+virtual machines. Many interpreters such as Perl, Python, and Ruby are
+also internally stack-based.
 
-Finally there is a reason the Parrot design keeps talking about running
-bytecode direct from disk rather than relying on doing compiling (from Perl or
-with a JIT) in memory. It's all very well doing such operations when running
-one program, but think what happens on a multi-user system when 300 people fire
-up "parrot order.pbc" - 300 parrot processes all fighting for resources.  To
-quote Dan,
+On the other hand, most hardware is register-based, as are several
+virtual machines designed to emulate hardware. (Such as the L<68K
+emulator|http://en.wikipedia.org/wiki/Mac_68k_emulator> Apple shipped
+with its PPC-enabled versions of Mac OS.)
 
-  non-jit vss/rss is 29784 17312, JIT vss/rss is 122032 108916. A not
-  insignificant difference :)
-
-With read only bytecode shared between processes, much of that "non-jit"
-resident memory is going to be shared. So much less swapping. And don't think
-that this won't matter to you because you don't have 300 users all running the
-same program - consider what happens if each Perl 6 module is compiled to
-bytecode. With read only bytecode 300 different Perl scripts all share the same
-memory for Carp.pbc, warnings.pbc, etc. Without, and they're all swapping like
-crazy...
-
-=head2 OK, so Parrot is fast... Pugs can back-end to Parrot, right?
-
-There was an early attempt for Pugs to target Parrot, but at the moment
-it is not actively maintained; instead, look into the F<languages/perl6/>
-directory in the Parrot source tree for an implementation that does not
-depend on either GHC or Perl 5's runtime.
-
-Still, the ultimate goal is for the Perl 6 compiler to be self-hosting
-(that is, written in itself) in order to improve introspection, debugger
-capabilities and compile-time semantic modulation.
-
-See L<http://dev.perl.org/perl6/doc/design/syn/S01.html#Project_Plan>
-for further discussions on Perl 6's project plan.
-
-=head1 PARROT AND PERL
-
-=head2 Why re-implement Perl?
-
-Good question.
-
-At The Perl Conference 4.0, in the summer of 2000, Larry Wall
-L<announced|"LINKS"> that it was time to recreate Perl from the ground up. This
-included the Perl language, the implementation of that language, the community
-of open source developers who volunteer to implement and maintain the language,
-and the larger community of programmers who use Perl.
-
-A variety of reasons were given for embarking on this project:
+A few reasons we chose a register-based architecture:
 
 =over 4
 
-=item *
+=item * 
 
-Perl 5 is a stable, reliable, robust platform for developing software; it's not
-going away for a long time, even after Perl 6 is released. (Proof: Perl 4 is
-still out there, no matter how much we all want it to go away.)
-
-=item *
-
-We have the ability to translate Perl 5 into Perl 6 if necessary. This preserves
-backward compatibility with a large body of existing Perl code, which is
-I<very> important.
+Executing opcodes on a register-based VM takes fewer instructions (since
+you eliminate all the steps to push items on to the stack and pull them
+off again), which means less CPU time.
 
 =item *
 
-The language can stand some revision: formats don't really belong in the core
-language, and typeglobs have outlived their usefulness. By revising the
-language now, we can make Perl better.
+One class of security problems in modern software are a result of
+problems with the stack (stack overflows, stack smashing). We can't
+entirely eliminate these (since Parrot is written in C, which is
+stack-based), but we can significantly minimize them.
 
 =item *
 
-Some warts really should be removed: C<system> should return I<true> instead of
-I<false> on success, and C<localtime> should return the year, not the year -
-1900.
+A register-based VM is far more pleasant to work with than a stack-based
+VM. 
 
 =item *
 
-It would be nice to write the Perl to Bytecode compiler in Perl, instead of C.
-That would make it much easier for Perl hackers to hack on Perl.
+In the early days of Parrot one motivating factor was taking advantage of
+decades of register-based hardware research. We've now moved away from a
+fixed number of registers to a variable (and potentially unlimited) number
+of registers per sub. This change opens up many new possibilities, but it
+does push us past the limits of most research into register-based hardware.
+
+=item *
+
+We're pushing forward the state-of-the art in virtual machines.
+Innovation often involves breaking with tradition. We're pleased
+with the results so far, and we're not finished yet.
 
 =back
 
-=head2 You want to write the Perl compiler in Perl?
 
-Sure.  Why not?  C, Java, Lisp, Scheme, and practically every other language is
-self-hoisting.  Why not?
-
-=head2 Isn't there a bootstrapping problem?
-
-No, not really.  Don't forget that we can use Perl 5 to run Perl 5 programs,
-such as a Perl 5 to Parrot compiler.
-
-=head2 How will Parrot handle both Perl 5 and Perl 6?
-
-We don't know yet, since it depends on the Perl 6 language definition.  But we
-I<could> use the more appropriate of two Perl compilers, depending of whether
-we're compiling Perl 5 or Perl 6.  Larry has mumbled something about a
-C<package> statement declaring that the file is Perl 5, but we're still not
-quite sure on how that fits in.
-
-=head2 Is this how Parrot will run Python, Ruby, and Tcl code?
-
-Probably.
-
-=head2 Latin and Klingon too?
-
-No, Parrot won't be twisted enough for Damian.  Perhaps when Parrot is ported
-to a pair of supercooled calcium ions, though...
-
-=head2 Huh?
-
-You had to L<be there|"LINKS">.
-
-=head1 PARROT IMPLEMENTATION ISSUES
-
-=head2 What's with the whole register thing machine?
-
-Not much, why do you ask?
-
-=head2 Don't you know that stack machines are the way to go in software?
-
-No, in fact, I don't.
-
-=head2 But look at all the successful stack-based VMs!
-
-Like what?  There's just the JVM.
-
-=head2 What about all the others?
-
-B<What> others?  That's it, unless you count Perl, Python, or Ruby.
-
-=head2 Yeah them!
-
-Yeah, right.  You never thought of them as VMs, admit it.  :^)
-
-Seriously, we're already running with a faster opcode dispatch than any of them
-are, and having registers just decreases the amount of stack thrash we get.
-
-=head2 Right, smarty.  Then name a successful register-based VM!
-
-The 68K emulator Apple ships with all its PPC-enabled versions of Mac OS.
-
-=head2 Really?
-
-L<Really.|"LINKS">
-
-=head2 You're not using reference counting. Why not?
+=head2 Why aren't you using reference counting?
 
 Reference counting has three big issues.
 
@@ -466,18 +355,19 @@ Whether we have a lot or not actually depends on how you count.  In absolute,
 unique op numbers we have more than pretty much any other processor, but that
 is in part because we have *no* runtime op variance.
 
-It's also important to note that there's no less code involved (or, for the
-hardware, complexity) doing it our way or the decode-at-runtime way -- all the
-code is still there in every case, since we all have to do the same things (add
-a mix of ints, floats, and objects, with a variety of ways of finding them) so
-there's no real penalty to doing it our way. It actually simplifies the JIT
-some (no need to puzzle out the parameter types), so in that we get a win over
-other platforms since JIT expenses are paid by the user every run, while our
-form of decoding's only paid when you compile.
+It's also important to note that there's no less code (or, for the
+hardware, complexity) involved in doing it our way or the decode-at-runtime
+way -- all the code is still there in every case, since we all have to do
+the same things (add a mix of ints, floats, and objects, with a variety of
+ways of finding them) so there's no real penalty to doing it our way. It
+actually simplifies the JIT some (no need to puzzle out the parameter
+types), so in that we get a win over other platforms since JIT expenses are
+paid by the user every run, while our form of decoding's only paid when you
+compile.
 
-Finally, there's the big "does it matter, and to whom?" question. As someone
-actually writing parrot assembly, it looks like parrot only has one "add" op --
-when emitting pasm or pir you use the "add" mnemonic. That it gets qualified
+Finally, there's the big "does it matter, and to whom?" question. To someone
+actually writing Parrot assembly, it looks like Parrot only has one "add" op --
+when emitting PASM or PIR you use the "add" mnemonic. That it gets qualified
 and assembles down to one variant or another based on the (fixed at assemble
 time) parameters is just an implementation detail. For those of us writing op
 bodies, it just looks like we've got an engine with full signature-based
@@ -519,33 +409,13 @@ to call (our sub/method call is a bit heavyweight) and that you'd have to do
 more work to find and call the functions. Seemed silly.
 
 Or, I suppose, you could think of it as if we had *no* opcodes at all other
-than end and loadoplib. Heck, we've a loadable opcode system -- it'd not be too
-much of a stretch to consider all the opcode functions other than those two as
-just functions with a fast-path calling system. The fact that a while bunch of
-'em are available when you start up's just a convenience for you.
+than C<end> and C<loadoplib>. Heck, we've a loadable opcode system -- it'd
+not be too much of a stretch to consider all the opcode functions other
+than those two as just functions with a fast-path calling system. The fact
+that a while bunch of 'em are available when you start up's just a
+convenience for you.
 
 See L<http://www.nntp.perl.org/group/perl.perl6.internals/22003> for more
 details.
 
-=head1 LINKS
-
-April Fool's Joke: L<http://www.perl.com/pub/a/2001/04/01/parrot.htm>
-
-apocalypses: L<http://dev.perl.org/perl6/apocalypse/>
-
-exegeses: L<http://dev.perl.org/perl6/exegesis/>
-
-synopses: L<http://dev.perl.org/perl6/synopsis/>
-
-Java bytecode to Parrot bytecode:
-L<http://archive.develooper.com/perl6-internals@perl.org/msg03864.html>
-
-L<http://www.perl.com/pub/a/2000/10/23/soto2000.html>
-
-be there: L<http://www.csse.monash.edu.au/~damian/papers/#Superpositions>
-
-Really.:
-L<http://developer.apple.com/techpubs/mac/PPCSoftware/PPCSoftware-13.html>
-
 =cut
-
