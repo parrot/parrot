@@ -111,8 +111,8 @@ my @versioned_output = grep !/^\?/, @status_output;
 for my $line (@versioned_output) {
     my @line_info = split( /\s+/, $line );
 
-    # the file is the 5th item in the @line_info array
-    push @versioned_files, $line_info[4];
+    # the file is the last item in the @line_info array
+    push @versioned_files, $line_info[-1];
 }
 
 my @MANIFEST_LINES = ();
