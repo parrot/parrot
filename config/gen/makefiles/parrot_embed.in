@@ -1,6 +1,7 @@
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
 #
+use Cwd;
 use Config;
 use File::Copy;
 use ExtUtils::MakeMaker;
@@ -9,14 +10,22 @@ copy( 'lib/Parrot/Embed.xs', 'Embed.xs' );
 
 # cross-platform commands and paths
 my %config;
+$config{CC}              = '@cc@';
 $config{EXE}             = '@exe@';
 $config{PARROTDIR}       = '../..';
 $config{PARROT}          = "$config{PARROTDIR}/parrot$config{EXE}";
 $config{C_LIBS}          = '@libs@';
 $config{INCLUDE}         = "$config{PARROTDIR}/include";
 $config{ALL_PARROT_LIBS} = "@libparrot_ldflags@ $config{C_LIBS}";
-$config{LDDLFLAGS}       = $Config{lddlflags} .
-                          ($^O =~ /Win32/ ? qq| -L "$config{PARROTDIR}"| : '');
+$config{ABS_PARROTDIR}   = Cwd::realpath(
+                               File::Spec->rel2abs( $config{PARROTDIR} ) );
+$config{LDDLFLAGS}       = $Config{lddlflags};
+
+if ($config{CC} eq 'cl')
+{
+    $config{LDDLFLAGS} .= qq| -libpath:"$config{ABS_PARROTDIR}"|
+        .  File::Spec->catfile( $config{ABS_PARROTDIR}, 'libparrot.lib' );
+}
 
 WriteMakefile(
     'NAME'         => 'Parrot::Embed',
@@ -34,6 +43,17 @@ package MY;
 sub postamble
 {
     "t/greet.pbc:\n\t$config{PARROT} -o t/greet.pbc t/greet.pir\n";
+}
+
+sub test
+{
+    my $inherited   = shift->SUPER::test(@_);
+    return $inherited unless $config{cc} eq 'cl';
+
+    my $dynlib_path = "\tset PATH=%PATH%:$config{ABS_PARROTDIR}";
+    $inherited      =~ s/^(test.*ic ::.*)$/$1\n$dynlib_path/mg;
+
+    return $inherited;
 }
 
 sub dynamic_lib
