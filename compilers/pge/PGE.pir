@@ -21,3 +21,9 @@ unit, calling the subroutines marked with the C<:load> subpragma for each.
 .include "compilers/pge/PGE/P5Regex.pir"
 .include "compilers/pge/PGE/builtins_gen.pir"
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

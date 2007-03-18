@@ -195,3 +195,9 @@ Patches and suggestions should be sent to the Perl 6 compiler list
 
 =cut
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

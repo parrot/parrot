@@ -49,3 +49,9 @@ the output to the correct output file.
     $P0 = get_hll_global [ 'PGE::P6Grammar::Compiler' ], 'main'
     .return $P0(args)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
