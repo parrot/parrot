@@ -34,3 +34,9 @@ F<docs/imcc/calling_conventions.pod>
 .sub foo
   .return( 10, 11, 12 )
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

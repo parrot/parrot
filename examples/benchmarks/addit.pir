@@ -73,3 +73,9 @@ F<examples/benchmarks/addit.pl>, F<examples/benchmarks/addit.pasm>,
 F<examples/benchmarks/addit2.pir>.
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

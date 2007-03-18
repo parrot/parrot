@@ -36,3 +36,9 @@ loop:
    dest = $I2
    .return (dest)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

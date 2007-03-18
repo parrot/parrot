@@ -25,3 +25,9 @@
 
 .include 'ambs1_gen.pir'
    
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

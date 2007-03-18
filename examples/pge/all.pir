@@ -95,3 +95,9 @@ PROMPT
 
 .include "simple.pir"
 .include "p6parse.pir"
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

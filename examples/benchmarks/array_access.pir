@@ -131,3 +131,9 @@ Y_DONE:
 Computer language shootout. L<http://shootout.alioth.debian.org>
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
