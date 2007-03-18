@@ -422,8 +422,8 @@ INTERP_O_FILES = \
     $(SRC_DIR)/inter_create$(O)  \
     $(SRC_DIR)/inter_misc$(O)  \
     $(SRC_DIR)/inter_run$(O)  \
-    $(SRC_DIR)/register$(O) \
-    $(SRC_DIR)/memory$(O) \
+    $(SRC_DIR)/gc/register$(O) \
+    $(SRC_DIR)/gc/memory$(O) \
     $(SRC_DIR)/objects$(O) \
     $(SRC_DIR)/packfile$(O) \
     $(SRC_DIR)/stacks$(O) \
@@ -450,12 +450,12 @@ INTERP_O_FILES = \
     $(SRC_DIR)/packout$(O) \
     $(SRC_DIR)/byteorder$(O) \
     $(SRC_DIR)/debug$(O) \
-    $(SRC_DIR)/smallobject$(O) \
     $(SRC_DIR)/headers$(O) \
     $(SRC_DIR)/hll$(O) \
-    $(SRC_DIR)/dod$(O) \
-    $(SRC_DIR)/gc_ims$(O) \
-    $(SRC_DIR)/gc_gms$(O) \
+    $(SRC_DIR)/gc/smallobject$(O) \
+    $(SRC_DIR)/gc/dod$(O) \
+    $(SRC_DIR)/gc/gc_ims$(O) \
+    $(SRC_DIR)/gc/gc_gms$(O) \
     $(SRC_DIR)/exit$(O) \
     $(SRC_DIR)/misc$(O) \
     $(SRC_DIR)/spf_render$(O) \
@@ -1002,19 +1002,19 @@ $(SRC_DIR)/exec_save$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@
 
 $(SRC_DIR)/key$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/smallobject$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/gc/smallobject$(O) : $(GENERAL_H_FILES)
+
+$(SRC_DIR)/gc/dod$(O) : $(GENERAL_H_FILES)
+
+$(SRC_DIR)/gc/gc_ims$(O) : $(GENERAL_H_FILES)
+
+$(SRC_DIR)/gc/gc_gms$(O) : $(GENERAL_H_FILES)
+
+$(SRC_DIR)/gc/resources$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/headers$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/dod$(O) : $(GENERAL_H_FILES)
-
-$(SRC_DIR)/gc_ims$(O) : $(GENERAL_H_FILES)
-
-$(SRC_DIR)/gc_gms$(O) : $(GENERAL_H_FILES)
-
 $(SRC_DIR)/hll$(O) : $(GENERAL_H_FILES)
-
-$(SRC_DIR)/resources$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/platform$(O) : $(GENERAL_H_FILES)
 
@@ -1079,7 +1079,7 @@ $(IO_DIR)/io_string$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
 $(IO_DIR)/io_passdown$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
-$(SRC_DIR)/memory$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/gc/memory$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/pic$(O) : $(GENERAL_H_FILES)
 
@@ -1099,7 +1099,7 @@ $(SRC_DIR)/packout$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/parrot$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/register$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/gc/register$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/runops_cores$(O) : $(GENERAL_H_FILES)
 

@@ -44,7 +44,7 @@ to get destroyed.
 Parrot_Interp
 Parrot_new(Parrot_Interp parent)
 {
-    /* interpreter.c:make_interpreter builds a new Parrot_Interp. */
+    /* inter_create.c:make_interpreter builds a new Parrot_Interp. */
     return make_interpreter(parent, PARROT_NO_FLAGS);
 }
 

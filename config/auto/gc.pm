@@ -101,9 +101,9 @@ EOF
     elsif ( $gc eq 'libc' ) {
         $conf->data->set(
             TEMP_gc_c => <<"EOF",
-\$(SRC_DIR)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/res_lea.c
+\$(SRC_DIR)/gc/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/gc/res_lea.c
 EOF
-            TEMP_gc_o => "\$(SRC_DIR)/res_lea\$(O)",
+            TEMP_gc_o => "\$(SRC_DIR)/gc/res_lea\$(O)",
             gc_flag   => '-DGC_IS_MALLOC',
         );
     }
@@ -111,9 +111,9 @@ EOF
         $gc = 'gc';
         $conf->data->set(
             TEMP_gc_c => <<"EOF",
-\$(SRC_DIR)/resources\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/resources.c
+\$(SRC_DIR)/gc/resources\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/gc/resources.c
 EOF
-            TEMP_gc_o => "\$(SRC_DIR)/resources\$(O)",
+            TEMP_gc_o => "\$(SRC_DIR)/gc/resources\$(O)",
             gc_flag   => '',
         );
     }
