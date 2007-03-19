@@ -263,8 +263,9 @@ Francois Perrad
     $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_literal'
     optable.newtok('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
 
-    optable.newtok('term:^',   'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
-    optable.newtok('term:$',   'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_anchor'
+    optable.newtok('term:^', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok('term:$', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
     optable.newtok('term:%a', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
     optable.newtok('term:%A', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
@@ -296,7 +297,7 @@ Francois Perrad
     optable.newtok('term:%8', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('term:%9', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    optable.newtok('circumfix:( )',   'equiv'=>'term:', 'nows'=>1, 'nullterm'=>1, 'match'=>'PGE::Exp::LuaCGroup')
+    optable.newtok('circumfix:( )', 'equiv'=>'term:', 'nows'=>1, 'nullterm'=>1, 'match'=>'PGE::Exp::LuaCGroup')
 
     $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_enumclass'
     optable.newtok('term:[', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
@@ -314,7 +315,7 @@ Francois Perrad
     optable.newtok('postfix:?', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('postfix:-', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
 
-    optable.newtok('infix:',  'looser'=>'postfix:*', 'right'=>1, 'nows'=>1, 'match'=>'PGE::Exp::Concat')
+    optable.newtok('infix:', 'looser'=>'postfix:*', 'right'=>1, 'nows'=>1, 'match'=>'PGE::Exp::Concat')
 
     $P0 = get_hll_global ['PGE::LuaRegex'], 'compile_luaregex'
     compreg 'PGE::LuaRegex', $P0
@@ -573,6 +574,28 @@ Francois Perrad
     dec $I0
     mob["cname"] = $I0
     mpos = pos
+    .return (mob)
+.end
+
+
+.sub 'parse_anchor'
+    .param pmc mob
+    .local string target
+    .local pmc mfrom, mpos
+    .local int pos, lastpos
+    .local string key
+    key = mob['KEY']
+    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
+    (mob, target, mfrom, mpos) = $P0(mob, 0, 'PGE::Exp::Anchor')
+    pos = mfrom
+    lastpos = length target
+    unless key == '$' goto start
+    unless pos == lastpos goto end
+    mpos = pos
+  start:
+    unless pos == 1 goto end
+    mpos = pos
+  end:
     .return (mob)
 .end
 

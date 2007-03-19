@@ -9,9 +9,6 @@ lib/alarm.pir - Lua Alarm Library
 
 The library exports a single function: alarm(s,[f]).
 
-
-See "Lua 5.1 Reference Manual", section 5.3 "Modules".
-
 =head2 Function
 
 =over 4

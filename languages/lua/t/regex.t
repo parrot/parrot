@@ -58,7 +58,6 @@ my @test_files = (
 );
 
 my %todo_info = (
-    11  => 'bug on precedence',
 );
 
 my $test_number = 0;

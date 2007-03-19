@@ -177,6 +177,8 @@ F<languages/lua/lib/luaregex.pir> implements a regex compiler using PGE.
 
 Except math & table libraries, all of these libraries are incomplete.
 
+=head2 IMPROVEMENT
+
 As compiled regex are not stored in Lua variable, the Regex compiler needs a
 Memoization mecanism (well-known optimization).
 
@@ -210,7 +212,7 @@ A Lua bytecode to PIR compiler
 
 =back
 
-See L<http://members.home.nl/joeijoei/>.
+See L<http://kjs.home.fmf.nl/>.
 
 =head1 AUTHOR
 

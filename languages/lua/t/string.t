@@ -282,7 +282,7 @@ OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub' );
 function expand (s)
-    return (string.gsub(s, "%$(%w+)", _G))
+    return (string.gsub(s, "$(%w+)", _G))
 end
 
 name = "Lua"; status= "great"
@@ -295,7 +295,7 @@ OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub' );
 function expand (s)
-    return (string.gsub(s, "%$(%w+)", function (n)
+    return (string.gsub(s, "$(%w+)", function (n)
                                           return tostring(_G[n]), 1
                                       end))
 end
@@ -319,7 +319,7 @@ OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub (invalid value)' );
 function expand (s)
-    return (string.gsub(s, "%$(%w+)", _G))
+    return (string.gsub(s, "$(%w+)", _G))
 end
 
 name = "Lua"; status= true
