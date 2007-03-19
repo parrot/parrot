@@ -23,7 +23,7 @@ $config{LDDLFLAGS}       = $Config{lddlflags};
 
 if ($config{CC} eq 'cl')
 {
-    $config{LDDLFLAGS} .= qq| -libpath:"$config{ABS_PARROTDIR}"|
+    $config{LDDLFLAGS} .= qq| -libpath:"$config{ABS_PARROTDIR} "|
         .  File::Spec->catfile( $config{ABS_PARROTDIR}, 'libparrot.lib' );
 }
 
