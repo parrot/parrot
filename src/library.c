@@ -166,16 +166,16 @@ static const char path_seperator = '/';
 
 static const char win32_path_seperator = '\\';
 
-/*
-   Converts a path with forward slashes to one with backward slashes.
+/* 
+   Converts a path with forward slashes to one with backward slashes. 
 */
 static void
 cnv_to_win32_filesep ( STRING *path ) {
     char* cnv;
-
+    
     assert(path->encoding == Parrot_fixed_8_encoding_ptr ||
         path->encoding == Parrot_utf8_encoding_ptr);
-
+    
     while (cnv = strchr(path->strstart, path_seperator))
         *cnv = win32_path_seperator;
 }
@@ -183,7 +183,7 @@ cnv_to_win32_filesep ( STRING *path ) {
 #endif
 
 static STRING*
-path_finalize(Interp *interp, STRING *path )
+path_finalize(Interp *interp, STRING *path ) 
 {
 
     /* TODO create a string API that just does that
@@ -196,7 +196,7 @@ path_finalize(Interp *interp, STRING *path )
     path = string_append(interp, path, nul);
     path->bufused--;
     path->strlen--;
-
+    
 #ifdef WIN32
     cnv_to_win32_filesep( path );
 #endif
@@ -205,26 +205,26 @@ path_finalize(Interp *interp, STRING *path )
 }
 
 /*
-  unary path arguement. the path string will have a
+  unary path arguement. the path string will have a 
   trailing path-seperator appended if it is not
   there already.
  */
 
 static STRING*
-path_garuntee_trailing_seperator(Interp *interp, STRING *path )
+path_garuntee_trailing_seperator(Interp *interp, STRING *path ) 
 {
     STRING *path_seperator_string = string_chr(interp, path_seperator);
 
     /* make sure the path has a trailing slash before appending the file */
     if ( string_index(interp, path , path->strlen - 1)
-         != string_index(interp, path_seperator_string, 0))
-        path = string_append(interp, path , path_seperator_string);
+	 != string_index(interp, path_seperator_string, 0))
+	path = string_append(interp, path , path_seperator_string);
 
     return path;
 }
 
 /*
-  binary path arguements, the left arg is modified.
+  binary path arguements, the left arg is modified. 
   a trailing seperator is garunteed for the left
   arguement and the right arguement is appended
  */
@@ -234,7 +234,7 @@ path_append(Interp *interp, STRING *l_path, STRING *r_path )
 {
     l_path = path_garuntee_trailing_seperator(interp, l_path );
     l_path = string_append(interp, l_path , r_path);
-
+    
     return l_path;
 }
 
@@ -248,84 +248,12 @@ static STRING*
 path_concat(Interp *interp, STRING *l_path, STRING *r_path )
 {
     STRING* join;
-
+    
     join = string_copy(interp, l_path);
     join = path_garuntee_trailing_seperator(interp, join );
     join = string_append(interp, join , r_path);
-
+    
     return join;
-}
-
-#define LOAD_EXT_CODE_LAST 3
-
-static const char* load_ext_code[ LOAD_EXT_CODE_LAST + 1 ] = {
-    ".pbc",
-
-    /* source level files */
-
-    ".pasm",
-    ".past",
-    ".pir",
-};
-
-static STRING*
-try_load_path(Interp *interp, STRING* path) {
-    STRING *final;
-
-    final = string_copy(interp, path);
-
-#if 0
-    printf("path is \"%s\"\n",
-           string_to_cstring(interp, final ));
-#endif
-
-    final = path_finalize(interp, final );
-
-    if (Parrot_stat_info_intval(interp, final , STAT_EXISTS)) {
-        return final;
-    }
-
-    return NULL;
-}
-
-/*
-  guess extensions, so that the user can drop the extensions
-  leaving it up to the build process/install wether or not
-  a .pbc or a .pir file is used.
- */
-
-static STRING*
-try_bytecode_extensions (Interp *interp, STRING* path )
-{
-    STRING *with_ext, *result;
-
-    int guess;
-
-    /*
-      first try the path without guessing ensure compatability with existing code.
-     */
-
-    with_ext = string_copy(interp, path);
-
-    if ( (result = try_load_path(interp, with_ext) ) )
-        return result;
-
-    /*
-      start guessing now. this version tries to find the lowest form of the
-      code, starting with bytecode and working up to PIR. note the atypical
-      loop control. This is so the array can easily be processed in reverse.
-     */
-
-    for( guess = 0 ; guess <= LOAD_EXT_CODE_LAST ; guess++ ) {
-        with_ext = string_copy(interp, path);
-        with_ext = string_append(interp,
-                                 with_ext, const_string(interp, load_ext_code[guess]));
-
-        if ( (result = try_load_path(interp, with_ext)) )
-            return result;
-    }
-
-    return NULL;
 }
 
 /*
@@ -360,11 +288,6 @@ Parrot_locate_runtime_file_str(Interp *interp, STRING *file,
     INTVAL i, n;
     PMC *paths;
 
-#if 0
-    printf("requesting path: \"%s\"\n",
-           string_to_cstring(interp, file ));
-#endif
-
     /* if this is an absolute path return it as is */
     if (is_abs_path(interp, file))
         return file;
@@ -382,27 +305,23 @@ Parrot_locate_runtime_file_str(Interp *interp, STRING *file,
         path = VTABLE_get_string_keyed_int(interp, paths, i);
         if (string_length(interp, prefix) &&
            !is_abs_path(interp,path)) {
-            full_name = path_concat(interp, prefix , path );
+ 	    full_name = path_concat(interp, prefix , path );
         }
         else
             full_name = string_copy(interp, path);
 
-        full_name = path_append(interp, full_name , file );
+ 	full_name = path_append(interp, full_name , file );
 
-        full_name = ( type & PARROT_RUNTIME_FT_DYNEXT )
-            ? try_load_path(interp, full_name )
-            : try_bytecode_extensions(interp, full_name );
-
-        if ( full_name )
+	full_name = path_finalize(interp, full_name );
+        if (Parrot_stat_info_intval(interp, full_name, STAT_EXISTS)) {
             return full_name;
+        }
     }
 
-    full_name = ( type & PARROT_RUNTIME_FT_DYNEXT )
-        ? try_load_path(interp, file )
-        : try_bytecode_extensions(interp, file );
-
-    if ( full_name )
+    full_name = path_finalize( interp, file );
+    if (Parrot_stat_info_intval(interp, full_name, STAT_EXISTS)) {
         return full_name;
+    }
 
     return NULL;
 }
