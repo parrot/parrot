@@ -160,6 +160,21 @@ is_abs_path(Interp* interp, STRING *file)
     return 0;
 }
 
+
+#ifdef WIN32
+/* Converts a path with forward slashes to one with backward slashes. */
+static void
+cnv_to_win32_filesep ( STRING *path ) {
+    char* cnv;
+    
+    assert(path->encoding == Parrot_fixed_8_encoding_ptr ||
+        path->encoding == Parrot_utf8_encoding_ptr);
+    
+    while (cnv = strchr(path->strstart, '/'))
+        *cnv = '\\';
+}
+#endif
+
 /*
 
 =item C<char* Parrot_locate_runtime_file(Interp *, const char *file_name,
@@ -235,15 +250,11 @@ Parrot_locate_runtime_file_str(Interp *interp, STRING *file,
         full_name = string_append(interp, full_name, nul);
         full_name->bufused--;
         full_name->strlen--;
+
 #ifdef WIN32
-        {
-            char *p;
-            assert(full_name->encoding == Parrot_fixed_8_encoding_ptr ||
-                   full_name->encoding == Parrot_utf8_encoding_ptr);
-            while ( (p = strchr(full_name->strstart, '/')) )
-                *p = '\\';
-        }
+	cnv_to_win32_filesep( full_name );
 #endif
+
         if (Parrot_stat_info_intval(interp, full_name, STAT_EXISTS)) {
             return full_name;
         }
@@ -252,15 +263,11 @@ Parrot_locate_runtime_file_str(Interp *interp, STRING *file,
     full_name = string_append(interp, file, nul);
     full_name->bufused--;
     full_name->strlen--;
+
 #ifdef WIN32
-    {
-        char *p;
-        assert(full_name->encoding == Parrot_fixed_8_encoding_ptr ||
-                full_name->encoding == Parrot_utf8_encoding_ptr);
-        while ( (p = strchr(full_name->strstart, '/')) )
-            *p = '\\';
-    }
+    cnv_to_win32_filesep( full_name );
 #endif
+
     if (Parrot_stat_info_intval(interp, full_name, STAT_EXISTS)) {
         return full_name;
     }
