@@ -9,3 +9,9 @@
 .include 'languages/WMLScript/src/script.pir'
 .include 'languages/WMLScript/src/opcode.pir'
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -199,7 +199,7 @@ L2:
     if $I2 < 0 goto L3
     if $I2 >= $I1 goto L3
     $S0 = substr $S1, $I2, 1
-    ret = $S0 
+    ret = $S0
 L3:
     .return (ret)
 L1:
@@ -271,7 +271,7 @@ L4:
     $I3 = Length
     if $I3 <= 0 goto L5
     $S0 = substr $S1, $I2, $I3
-    ret = $S0 
+    ret = $S0
 L5:
     .return (ret)
 L1:
@@ -375,7 +375,7 @@ If oldSubString is an empty string an C<invalid> value is returned.
     if $I2 == 0 goto L1
     $S3 = newSubString
     $P0 = split $S2, $S1
-    $S0 = join $S3, $P0    
+    $S0 = join $S3, $P0
     new ret, .WmlsString
     ret = $S0
     .return (ret)
@@ -500,7 +500,7 @@ L3:
 L4:
     $P0 = split $S3, $S1
     $I0 = elements $P0
-    if $I2 < $I0 goto L5 
+    if $I2 < $I0 goto L5
     $I2 = $I0 - 1
 L5:
     $S0 = $P0[$I2]
@@ -574,7 +574,7 @@ L3:
 L4:
     $P0 = split $S3, $S1
     $I4 = elements $P0
-    if $I2 < $I4 goto L5 
+    if $I2 < $I4 goto L5
     $I2 = $I4 - 1
 L5:
     dec $I4
@@ -583,16 +583,16 @@ L5:
     $I0 = 0
     $I1 = 0
 L6:
-    unless $I1 < $I4 goto L7 
-    $S0 = $P0[$I0] 
+    unless $I1 < $I4 goto L7
+    $S0 = $P0[$I0]
     $P1[$I1] = $S0
     if $I0 == $I2 goto L8
     inc $I1
 L8:
     inc $I0
-    goto L6     
+    goto L6
 L7:
-    $S0 = join $S3, $P1    
+    $S0 = join $S3, $P1
     ret = $S0
     .return (ret)
 L1:
@@ -670,11 +670,11 @@ L3:
 L4:
     $P0 = split $S4, $S1
     $I0 = elements $P0
-    if $I3 < $I0 goto L5 
+    if $I3 < $I0 goto L5
     $I3 = $I0 - 1
 L5:
     $P0[$I3] = $S2
-    $S0 = join $S4, $P0    
+    $S0 = join $S4, $P0
     ret = $S0
     .return (ret)
 L1:
@@ -752,7 +752,7 @@ L3:
 L4:
     $P0 = split $S4, $S1
     $I5 = elements $P0
-    if $I3 <= $I5 goto L5 
+    if $I3 <= $I5 goto L5
     $I3 = $I5
 L5:
     $I6 = $I5 + 1
@@ -761,7 +761,7 @@ L5:
     $I0 = 0
     $I1 = 0
 L6:
-    unless $I0 < $I5 goto L7 
+    unless $I0 < $I5 goto L7
     if $I1 != $I3 goto L8
     inc $I1
 L8:
@@ -769,10 +769,10 @@ L8:
     $P1[$I1] = $S0
     inc $I0
     inc $I1
-    goto L6     
+    goto L6
 L7:
     $P1[$I3] = $S2
-    $S0 = join $S4, $P1    
+    $S0 = join $S4, $P1
     ret = $S0
     .return (ret)
 L1:
@@ -818,11 +818,11 @@ L1:
 L3:
     ret = concat ' '
 L4:
-    inc idx     
+    inc idx
     $I0 = is_cclass .CCLASS_WHITESPACE, s, idx
     if $I0 goto L4
     goto L1
-L2:        
+L2:
     .return (ret)
 .end
 
@@ -868,7 +868,7 @@ L1:
     unless $I0 goto L2
     inc $I1
     goto L1
-L2: 
+L2:
     $I2 = length s
 L3:
     dec $I2
@@ -935,7 +935,7 @@ L2:
     if $S1 > $S2 goto L3
     ret = 0
     .return (ret)
-L3:       
+L3:
     ret = 1
     .return (ret)
 L1:
@@ -1095,7 +1095,7 @@ L2:
     $S1 = sprintf $S0, $P0
     new ret, .WmlsString
     ret = $S1
-    .return (ret)    
+    .return (ret)
 L1:
     new ret, .WmlsInvalid
     .return (ret)
@@ -1108,3 +1108,9 @@ Francois Perrad.
 
 =cut
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
