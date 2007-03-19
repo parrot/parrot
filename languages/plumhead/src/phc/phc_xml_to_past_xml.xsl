@@ -95,6 +95,7 @@ by phc from PHP source. It generates a PAST-pm data structure in XML.
         </xsl:when>
         <xsl:when test="phc:Token_op/phc:value = '==' and phc:Token_string" >infix:eq</xsl:when>
         <xsl:when test="phc:Token_op/phc:value = '!=' and phc:Token_string" >infix:ne</xsl:when>
+        <xsl:when test="phc:Token_op/phc:value = '^'" >infix:+^</xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="concat('infix:', phc:Token_op/phc:value)" />
         </xsl:otherwise>
