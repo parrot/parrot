@@ -160,9 +160,15 @@ is_abs_path(Interp* interp, STRING *file)
     return 0;
 }
 
+static const char path_seperator = '/';
 
 #ifdef WIN32
-/* Converts a path with forward slashes to one with backward slashes. */
+
+static const char win32_path_seperator = '\\';
+
+/* 
+   Converts a path with forward slashes to one with backward slashes. 
+*/
 static void
 cnv_to_win32_filesep ( STRING *path ) {
     char* cnv;
@@ -170,9 +176,10 @@ cnv_to_win32_filesep ( STRING *path ) {
     assert(path->encoding == Parrot_fixed_8_encoding_ptr ||
         path->encoding == Parrot_utf8_encoding_ptr);
     
-    while (cnv = strchr(path->strstart, '/'))
-        *cnv = '\\';
+    while (cnv = strchr(path->strstart, path_seperator))
+        *cnv = win32_path_seperator;
 }
+
 #endif
 
 static STRING*
@@ -184,7 +191,7 @@ path_finalize(Interp *interp, STRING *path )
      *      the goal is just to have for sure an invisible 0 at end
      */
 
-    STRING *nul = string_from_const_cstring(interp, "\0", 1);
+    STRING *nul = string_chr(interp, '\0');
 
     path = string_append(interp, path, nul);
     path->bufused--;
@@ -195,6 +202,58 @@ path_finalize(Interp *interp, STRING *path )
 #endif
 
     return path;
+}
+
+/*
+  unary path arguement. the path string will have a 
+  trailing path-seperator appended if it is not
+  there already.
+ */
+
+static STRING*
+path_garuntee_trailing_seperator(Interp *interp, STRING *path ) 
+{
+    STRING *path_seperator_string = string_chr(interp, path_seperator);
+
+    /* make sure the path has a trailing slash before appending the file */
+    if ( string_index(interp, path , path->strlen - 1)
+	 != string_index(interp, path_seperator_string, 0))
+	path = string_append(interp, path , path_seperator_string);
+
+    return path;
+}
+
+/*
+  binary path arguements, the left arg is modified. 
+  a trailing seperator is garunteed for the left
+  arguement and the right arguement is appended
+ */
+
+static STRING*
+path_append(Interp *interp, STRING *l_path, STRING *r_path )
+{
+    l_path = path_garuntee_trailing_seperator(interp, l_path );
+    l_path = string_append(interp, l_path , r_path);
+    
+    return l_path;
+}
+
+/*
+  binary path arguements. A new sting is created
+  that is the concatentation of the two path components
+  with a path-seperator.
+ */
+
+static STRING*
+path_concat(Interp *interp, STRING *l_path, STRING *r_path )
+{
+    STRING* join;
+    
+    join = string_copy(interp, l_path);
+    join = path_garuntee_trailing_seperator(interp, join );
+    join = string_append(interp, join , r_path);
+    
+    return join;
 }
 
 /*
@@ -225,7 +284,7 @@ STRING*
 Parrot_locate_runtime_file_str(Interp *interp, STRING *file,
         enum_runtime_ft type)
 {
-    STRING *prefix, *path, *full_name, *slash;
+    STRING *prefix, *path, *full_name;
     INTVAL i, n;
     PMC *paths;
 
@@ -240,30 +299,18 @@ Parrot_locate_runtime_file_str(Interp *interp, STRING *file,
     else
         paths = get_search_paths(interp, PARROT_LIB_PATH_INCLUDE);
 
-#ifdef WIN32
-    slash = CONST_STRING(interp, "\\");
-#else
-    slash = CONST_STRING(interp, "/");
-#endif
-
     Parrot_get_runtime_prefix(interp, &prefix);
     n = VTABLE_elements(interp, paths);
     for (i = 0; i < n; ++i) {
         path = VTABLE_get_string_keyed_int(interp, paths, i);
         if (string_length(interp, prefix) &&
            !is_abs_path(interp,path)) {
-            full_name = string_concat(interp, prefix, slash, 0);
-            full_name = string_append(interp, full_name, path);
+ 	    full_name = path_concat(interp, prefix , path );
         }
         else
             full_name = string_copy(interp, path);
 
-        /* make sure this path has a trailing slash before appending the file */
-        if (   string_index(interp, full_name, full_name->strlen - 1)
-            != string_index(interp, slash, 0))
-            full_name = string_append(interp, full_name, slash);
-
-        full_name = string_append(interp, full_name, file);
+ 	full_name = path_append(interp, full_name , file );
 
 	full_name = path_finalize(interp, full_name );
         if (Parrot_stat_info_intval(interp, full_name, STAT_EXISTS)) {
