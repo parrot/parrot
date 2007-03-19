@@ -32,7 +32,7 @@ pir_output_like( <<'CODE', <<'OUT', "check parser recovery 1." );
         print "\n"
 .end
 CODE
-/^error:imcc:syntax error, unexpected.*\n.*line 4.*\n.*error:imcc:syntax error, unexpected.*\n.*line 6/
+/^error:imcc:syntax error, unexpected.*\n.*line 4.*\n.*error:imcc:'\$1' is not a valid register name.*\n.*line 6/
 OUT
 
 # Test the patience of the parser. On imc.h PARROT_MAX_RECOVER_ERRORS

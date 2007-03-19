@@ -532,6 +532,10 @@ SP              [ ]
 <emit,INITIAL>\$N[0-9]+          DUP_AND_RET(valp, NREG);
 <emit,INITIAL>\$S[0-9]+          DUP_AND_RET(valp, SREG);
 <emit,INITIAL>\$P[0-9]+          DUP_AND_RET(valp, PREG);
+<emit,INITIAL>\$[a-zA-Z0-9]+ {
+    IMCC_fataly(interp, E_SyntaxError, "'%s' is not a valid register name", yytext);
+    }
+
 
 <emit,INITIAL>{WS}+ /* skip */;
 
