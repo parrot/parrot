@@ -117,7 +117,6 @@ sub trivial_subject {
 # (ok, nok or bug report).
 sub init {
     $is_linux   = lc($^O) eq 'linux';
-    $is_macos   = $^O eq 'MacOS';
     $is_mswin32 = $^O eq 'MSWin32';
     $is_os2     = $^O eq 'os2';
     $is_vms     = $^O eq 'VMS';
@@ -147,9 +146,6 @@ sub init {
     ##
     ## Process options.
     ##
-    #@ARGV = split m/\s+/,
-    #MacPerl::Ask("Provide command-line args here (-h for help):")
-    #if $is_macos && $MacPerl::Version =~ /App/;
     Getopt::Long::Configure("no_bundling", "no_ignore_case", "auto_abbrev");
     help() unless GetOptions
       ( \%opts,
@@ -381,14 +377,7 @@ EOT
     
     # Try and guess return address
     my ($from, $guess);
-    #if ( $is_macos ) {
-    #require Mac::InternetConfig;
-    #$guess = $Mac::InternetConfig::InternetConfig{
-    #Mac::InternetConfig::kICEmail()
-    #};
-    #} else {
     $guess = $ENV{'REPLY-TO'} || $ENV{REPLYTO} || "";
-    #}
 
     if ( ! $guess ) {
         # Use $domain if we can.
@@ -443,14 +432,7 @@ sub edit_bug_report {
 
     # Launch editor.
     my $retval;
-    #if ($is_macos) {
-    #require ExtUtils::MakeMaker;
-    #ExtUtils::MM_MacOS::launch_file($filename);
-    #print "Press Enter when done.\n";
-    #scalar <STDIN>;
-    #} else {
     $retval = system("$editor $filename");
-    #}
 
     # Check whether editor run was successful.
     die <<EOT if $retval;
