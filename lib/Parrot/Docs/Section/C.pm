@@ -250,8 +250,10 @@ sub new {
         $self->new_group(
             'Garbage Collection',
             '',
-            $self->c_pair_item( '', 'dod' ),
-            $self->c_source_item( '', 'cpu_dep' ),
+            $self->c_item(
+                'Parrot\'s garbage collection subsystem.',
+                'contents' => ['src/gc']
+            ),
         ),
         $self->new_group(
             'Debugging',
