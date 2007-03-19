@@ -175,6 +175,28 @@ cnv_to_win32_filesep ( STRING *path ) {
 }
 #endif
 
+static STRING*
+path_finalize(Interp *interp, STRING *path ) 
+{
+
+    /* TODO create a string API that just does that
+     *      a lot of ICU lib functions also need 0-terminated strings
+     *      the goal is just to have for sure an invisible 0 at end
+     */
+
+    STRING *nul = string_from_const_cstring(interp, "\0", 1);
+
+    path = string_append(interp, path, nul);
+    path->bufused--;
+    path->strlen--;
+    
+#ifdef WIN32
+    cnv_to_win32_filesep( path );
+#endif
+
+    return path;
+}
+
 /*
 
 =item C<char* Parrot_locate_runtime_file(Interp *, const char *file_name,
@@ -203,7 +225,7 @@ STRING*
 Parrot_locate_runtime_file_str(Interp *interp, STRING *file,
         enum_runtime_ft type)
 {
-    STRING *prefix, *path, *full_name, *slash, *nul;
+    STRING *prefix, *path, *full_name, *slash;
     INTVAL i, n;
     PMC *paths;
 
@@ -224,7 +246,6 @@ Parrot_locate_runtime_file_str(Interp *interp, STRING *file,
     slash = CONST_STRING(interp, "/");
 #endif
 
-    nul = string_from_const_cstring(interp, "\0", 1);
     Parrot_get_runtime_prefix(interp, &prefix);
     n = VTABLE_elements(interp, paths);
     for (i = 0; i < n; ++i) {
@@ -243,34 +264,18 @@ Parrot_locate_runtime_file_str(Interp *interp, STRING *file,
             full_name = string_append(interp, full_name, slash);
 
         full_name = string_append(interp, full_name, file);
-        /* TODO create a string API that just does that
-         *      a lot of ICU lib functions also need 0-terminated strings
-         *      the goal is just to have for sure an invisible 0 at end
-         */
-        full_name = string_append(interp, full_name, nul);
-        full_name->bufused--;
-        full_name->strlen--;
 
-#ifdef WIN32
-	cnv_to_win32_filesep( full_name );
-#endif
-
+	full_name = path_finalize(interp, full_name );
         if (Parrot_stat_info_intval(interp, full_name, STAT_EXISTS)) {
             return full_name;
         }
     }
-    /* finally try as is */
-    full_name = string_append(interp, file, nul);
-    full_name->bufused--;
-    full_name->strlen--;
 
-#ifdef WIN32
-    cnv_to_win32_filesep( full_name );
-#endif
-
+    full_name = path_finalize( interp, file );
     if (Parrot_stat_info_intval(interp, full_name, STAT_EXISTS)) {
         return full_name;
     }
+
     return NULL;
 }
 
