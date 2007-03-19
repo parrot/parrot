@@ -69,3 +69,10 @@ it under the same terms as Parrot.
 Klaas-Jan Stol <parrotcode@gmail.com>
 
 =cut
+
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

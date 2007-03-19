@@ -67,3 +67,10 @@ C<test_lex> is a dumper for Lua 5.1 lexicography.
 Francois Perrad
 
 =cut
+
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
