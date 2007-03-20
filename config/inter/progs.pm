@@ -40,10 +40,8 @@ sub runstep {
     my $null          = 'echo';
     my $first_working = sub {
         foreach (@_) {
-            for my $help (qw( --help --h /? )) {
-                `$_ $help 2>&1`;
-                return $_ if not $?;
-            }
+            `$_ -h 2>&1`;
+            return $_ if not $?;
         }
         return $null;
     };
@@ -68,11 +66,6 @@ END
     $cc = integrate( $conf->data->get('cc'), $conf->options->get('cc') );
     $cc = prompt( "What C compiler do you want to use?", $cc )
         if $ask;
-
-    if ($first_working->($cc) eq 'echo') {
-        warn "No compiler found (tried '$cc')\n";
-        exit 1;
-    }
     $conf->data->set( cc => $cc );
 
     $link = integrate( $conf->data->get('link'), $conf->options->get('link') );
