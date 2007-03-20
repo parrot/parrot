@@ -1,0 +1,21 @@
+{
+    "release.version"  : "0.4.10",
+    "release.name"     : "...",
+    "release.day"      : "Tuesday",
+    "release.date"     : "20 March 2007",
+    "release.nextdate" : "20 April 2007",
+
+    "web.root"         : "http://parrotcode.org/",
+    "web.source"       : "source",
+    "web.openpatches"  : "openpatches.html",
+
+    "bugday.day"       : "Saturday",
+    "bugday.date"      : "17 March 2007",
+
+    "rt.root"          : "http://rt.perl.org/rt3/",
+    "rt.tracking"      : "Ticket/Display.html?id=41581",
+    "rt.saved_search"  : "http://xrl.us/u9y2",
+
+    "wiki.root"        : "http://rakudo.org/parrot/index.cgi?",
+    "wiki.bugday"      : "planned_release_march_20_2007"
+}
