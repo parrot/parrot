@@ -12,11 +12,13 @@
     getopts = new 'Getopt::Obj'
     getopts.'notOptStop'(1)
 
-    getopts = push 'date|D=s'
     getopts = push 'help|h'
-    getopts = push 'name|n=s'
-    getopts = push 'nextdate|N=s'
-    getopts = push 'version|v=s'
+    getopts = push 'type|t=s'
+    ## TODO maybe implement these later
+    ## getopts = push 'date|D=s'
+    ## getopts = push 'name|n=s'
+    ## getopts = push 'nextdate|N=s'
+    ## getopts = push 'version|v=s'
 
     .local pmc opts
     opts = getopts.'get_options'(args)
@@ -44,11 +46,15 @@
   parrot @prog@ [OPTIONS]
 
   OPTIONS:
-    --date     | -D DATE
-        set the release date
-
     --help     | -h
         display this message
+
+END_HELP
+
+    ## TODO implement these later
+    $S999 = <<'END_HELP'
+    --date     | -D DATE
+        set the release date
 
     --name     | -n
         set the name of the release
