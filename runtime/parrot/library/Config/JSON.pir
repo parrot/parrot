@@ -20,9 +20,17 @@ If the data is not valid, an exception will be thrown.
 
     # Slurp in the file
     .local string text
-    .local pmc cl
-    cl = getclass 'ParrotIO'
-    text = cl.'slurp'(filename)
+    .local pmc pio
+
+    pio = open filename, '<'
+    if pio goto slurp_file
+    $P0 = new .Exception
+    $S0 = concat "can't open file: ", filename
+    $P0['_message'] = $S0
+    throw $P0
+
+  slurp_file:
+    text = pio.'slurp'(filename)
 
     # convert the text to an object and return it.
     load_bytecode 'compilers/json/JSON.pbc'
@@ -51,11 +59,11 @@ the rendered JSON will not be formatted. The default is false.
     .param string filename
     .param int    compact     :optional :named('compact')
     .param int    has_compact :opt_flag
-   
+
     if has_compact goto done_options
     compact = 0
 
-done_options:
+  done_options:
     .local int expanded
     expanded = not compact
 
