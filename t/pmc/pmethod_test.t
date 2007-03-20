@@ -34,7 +34,7 @@ test_method3
 OUT
 
 pir_output_is(
-    <<'CODE', <<'OUT', 'optional args and multiple returns', 'todo' => 'fails on x86_64? RT# 41576' );
+    <<'CODE', <<'OUT', 'optional args and multiple returns' );
 .sub main :main
   $P0 = new 'PMETHOD_Test'
   $P0.'test_method0'(1)
