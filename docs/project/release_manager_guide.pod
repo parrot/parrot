@@ -55,8 +55,8 @@ Make sure F<RESPONSIBLE_PARTIES> is still accurate.
 
 =item d
 
-Run C<perl t/harness t/distro/*.t>, and either fix what those tests
-complain about, or fix them so they don't complain.
+Configure parrot and run C<perl t/harness t/distro/*.t>, and either fix 
+what those tests complain about, or fix them so they don't complain.
 
 =item e
 
