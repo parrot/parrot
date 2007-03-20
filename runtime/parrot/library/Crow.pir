@@ -14,11 +14,6 @@
 
     getopts = push 'help|h'
     getopts = push 'type|t=s'
-    ## TODO maybe implement these later
-    ## getopts = push 'date|D=s'
-    ## getopts = push 'name|n=s'
-    ## getopts = push 'nextdate|N=s'
-    ## getopts = push 'version|v=s'
 
     .local pmc opts
     opts = getopts.'get_options'(args)
@@ -49,21 +44,8 @@
     --help     | -h
         display this message
 
-END_HELP
-
-    ## TODO implement these later
-    $S999 = <<'END_HELP'
-    --date     | -D DATE
-        set the release date
-
-    --name     | -n
-        set the name of the release
-
-    --nextdate | -N
-        set the date of the next scheduled release
-
-    --version  | -v
-        set the release version
+    --type     | -t  TYPE
+        select the type of message you want to generate
 
 END_HELP
 
@@ -75,12 +57,11 @@ END_HELP
 
 .sub 'get_news'
     .param string version
+
     .local pmc newsfile
     .local string buf, news, start
 
     newsfile = open 'NEWS', '<'
-
-    start    = 'New in 0.4.9'
 
     ## find the start of the news item for this version
     start    = concat 'New in ', version
@@ -113,9 +94,11 @@ END_HELP
     .return (news)
 
   err_news:
+    $P0 = new .Exception
     $S0 = concat "error: can't find news on version ", version
     $S0 .= " in 'NEWS'\n"
-    printerr $S0
+    $P0['_message'] = $S0
+    throw $P0
 .end
 
 

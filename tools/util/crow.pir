@@ -27,8 +27,8 @@ module, L<runtime/parrot/library/Crow.pir>.
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
-    test_namespace = get_namespace [ 'Crow' ]
-    exports = split " ", "get_args get_news process"
+    test_namespace = get_namespace ['Crow']
+    exports = split ' ', 'get_news get_args process'
     test_namespace.export_to(curr_namespace, exports)
 
     .local pmc opts
@@ -38,48 +38,60 @@ module, L<runtime/parrot/library/Crow.pir>.
     opts = new .Hash
   got_opts:
 
+    .local pmc templates
+    templates = 'get_json'('tools/util/templates.json')
+
     .local string template, type
     type = opts['type']
     'infix://='(type, 'email')
 
-    template = 'get_template'(type)
+    template = 'get_template'(templates, type)
 
     .local pmc data
-    data = 'get_data'()
+    data = 'get_json'('tools/util/release.json')
 
-    $S1 = process(template, data)
-    print $S1
+    .local string version
+    version = data['release.version']
+
+    $S0 = concat type, '.news'
+    $I0 = templates[$S0]
+    if $I0 goto get_news
+    data['NEWS'] = ''
+    goto process
+  get_news:
+    $S0 = 'get_news'(version)
+    data['NEWS'] = $S0
+
+
+  process:
+    .local string result
+    result = process(template, data)
+    say result
 .end
 
 
-.sub 'get_data'
+.sub 'get_json'
+    .param string filename
+
     load_bytecode 'Config/JSON.pir'
-    .local pmc reader
-    reader = get_global ['Config';'JSON'], 'ReadConfig'
 
-    .local pmc data
-    data = reader('tools/util/release.json')
+     .local pmc exports, curr_namespace, test_namespace
+    curr_namespace = get_namespace
+    test_namespace = get_namespace [ 'Config';'JSON' ]
+    exports = split ' ', 'ReadConfig'
+    test_namespace.export_to(curr_namespace, exports)
 
-    # get data from NEWS
-    $S0 = data['release.version']
-    $S1 = get_news($S0)
-    data['NEWS'] = $S1
+    .local pmc result
+    result = ReadConfig(filename)
 
-    .return (data)
+    .return (result)
 .end
 
 
 .sub 'get_template'
+    .param pmc templates
     .param string type
 
-    load_bytecode 'Config/JSON.pir'
-    .local pmc reader
-    reader = get_global ['Config';'JSON'], 'ReadConfig'
-
-    .local pmc templates
-    templates = reader('tools/util/templates.json')
-
-    ## return template
     $S0 = concat type, '.text'
     $S1 = templates[$S0]
     .return ($S1)

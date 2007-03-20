@@ -1,5 +1,5 @@
 {
-    "email.news" : 1,
+    "email.news" : true,
     "email.text" : "
 On behalf of the Parrot team, I'm proud to announce Parrot @release.version@
 \"@release.name@.\" Parrot (@web.root@) is a virtual machine aimed
@@ -21,7 +21,7 @@ Enjoy!
 
 ",
 
-    "bugday.news" : 0,
+    "bugday.news" : false,
     "bugday.text" : "
 Bug Day
 

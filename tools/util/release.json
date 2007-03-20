@@ -6,7 +6,7 @@
     "release.nextdate" : "20 April 2007",
 
     "web.root"         : "http://parrotcode.org/",
-    "web.source"       : "source",
+    "web.source"       : "source.html",
     "web.openpatches"  : "openpatches.html",
 
     "bugday.day"       : "Saturday",
