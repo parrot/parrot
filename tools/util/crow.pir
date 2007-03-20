@@ -43,7 +43,7 @@ module, L<runtime/parrot/library/Crow.pir>.
 
     .local string template, type
     type = opts['type']
-    'infix://='(type, 'email')
+    'infix://='(type, 'text')
 
     template = 'get_template'(templates, type)
 

@@ -46,6 +46,7 @@
 
     --type     | -t  TYPE
         select the type of message you want to generate
+        there are three valid types: text, html, and bugday
 
 END_HELP
 

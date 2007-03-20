@@ -1,5 +1,38 @@
 # $Id$
 
+New in 0.4.10
+
+- Compilers:
+   + IMCC: Parrot calling conventions now available between two C PMCs
+   + PGE: Match object improvements
+   + smop: added Attribute and Class PMCs
+   + HLLCompiler: improvements for interactive mode
+- PAST:
+   + extended binding to a list of variables
+- Languages:
+   + Updated Lua, PHP ("Plumhead"), Tcl ("ParTcl"), Ruby ("Cardinal")
+   + New language: Pynie - a Python compiler for Parrot
+   + lua implements require and many other ops, improved regex support
+   + XXX
+- Design:
+   + PDD01 "Overview" - updated architecture and platform information
+   + PDD15 "Objects" - details on roles, objects, and classes added
+   + PDD22 "I/O" - ahheh async ops and Status PMC details
+- Documentation:
+   + Added guides for Metacommitter, Relase Manager, and Cage Cleaner roles
+   + XXX
+- Implementation:
+   + Object, Class, Role, and Attribute PMC implementation has begun
+   + Perl 5 module "Parrot::Embed" now compiles and links on all platforms
+   + XXX
+- Build:
+   + Major improvements in test coverage for 'ops2c.pl'
+   + XXX
+- Misc:
+   + many bugfixes, enhancements, and coding standard updates
+   + extended support for XXX
+   + Parrot now builds on XXX
+
 New in 0.4.9
 
 - Compilers:
