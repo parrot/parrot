@@ -135,6 +135,7 @@ for my $file (@versioned_files) {
 print $MANIFEST $_ for ( sort @MANIFEST_LINES );
 
 my $svnignore = `$cmd propget svn:ignore @dirs`;
+$svnignore =~ s/\n{3,}/\n\n/; # cope with trailing newlines in svn:ignore output
 my %ignore;
 my @ignore = split( /\n\n/, $svnignore );
 foreach (@ignore) {
