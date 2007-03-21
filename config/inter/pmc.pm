@@ -146,8 +146,15 @@ E_NOTE
 src/pmc/$pmc.c : src/pmc/$pmc.dump
 \t\$(PMC2CC) src/pmc/$pmc.pmc
 
-src/pmc/$pmc.dump : vtable.dump $parent_dumps lib/Parrot/Pmc2c.pm \\
-\t\tsrc/pmc/$pmc.pmc
+src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \\
+\t\tlib/Parrot/Pmc2c/StmRef.pm      lib/Parrot/Pmc2c.pm \\
+\t\tlib/Parrot/Pmc2c/default.pm     lib/Parrot/Pmc2c/Library.pm \\
+\t\tlib/Parrot/Pmc2c/Ref.pm         lib/Parrot/Pmc2c/SharedRef.pm \\
+\t\tlib/Parrot/Pmc2c/Standard.pm    lib/Parrot/Pmc2c/UtilFunctions.pm \\
+\t\tlib/Parrot/Pmc2c/delegate.pm    lib/Parrot/Pmc2c/Null.pm \\
+\t\tlib/Parrot/Pmc2c/StandardRO.pm  lib/Parrot/Pmc2c/Utils.pm \\
+\t\tlib/Parrot/Pmc2c/deleg_pmc.pm   lib/Parrot/Pmc2c/PMETHODs.pm  \\
+\t\tlib/Parrot/Pmc2c/StandardConst.pm
 \t\$(PMC2CD) src/pmc/$pmc.pmc 
 
 src/pmc/pmc_$pmc.h: src/pmc/$pmc.c

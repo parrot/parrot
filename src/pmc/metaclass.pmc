@@ -20,6 +20,7 @@ class.
 */
 
 #include "parrot/parrot.h"
+#include "pmc_namespace.h"
 #define PARROT_METACLASS(o) ((Parrot_MetaClass *) PMC_data(o))
 
 

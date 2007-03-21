@@ -683,7 +683,11 @@ sub parse_pmc {
 
         if ( $flag and $flag =~ /PMETHOD/ ) {
             Parrot::Pmc2c::PMETHODs::rewrite_pmethod($method_hash);
-            $flags_ref->{pmethod_present} = 1;
+            $flags_ref->{need_fia_header} = 1;
+        }
+
+        if ( $methodblock and $methodblock =~ /PMINVOKE/ ) {
+            $flags_ref->{need_fia_header} = 1;
         }
 
         if ( $methodname eq 'class_init' ) {

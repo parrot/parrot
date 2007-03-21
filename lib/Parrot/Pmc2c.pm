@@ -337,7 +337,7 @@ sub includes {
 #include "parrot/dynext.h"
 EOC
 
-    $cout .= qq{#include "pmc_fixedintegerarray.h"\n} if ( $self->{flags}->{pmethod_present} );
+    $cout .= qq{#include "pmc_fixedintegerarray.h"\n} if ( $self->{flags}->{need_fia_header} );
     foreach my $parents ( $self->{class}, @{ $self->{parents} } ) {
         my $name = lc $parents;
         $cout .= qq{#include "pmc_$name.h"\n};
