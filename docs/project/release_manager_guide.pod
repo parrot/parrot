@@ -79,7 +79,7 @@ Make sure everything works:
 
  $ make realclean
  $ perl Configure.pl ...
- $ make -s all world fulltest
+ $ make -s all world fulltest # Note that fulltest runs separate harnesses..
 
 =back
 
@@ -96,7 +96,8 @@ Prepare the release tarball.
 =item a
 
 Delete F<DEVELOPING>, and its corresponding F<MANIFEST> entry.
-This file should never appear in a release.
+This file should never appear in a release. (TODO: incorporate this
+step into the 'make release' step)
 
 =item b
 
