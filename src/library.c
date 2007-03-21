@@ -160,11 +160,11 @@ is_abs_path(Interp* interp, STRING *file)
     return 0;
 }
 
-static const char path_seperator = '/';
+static const char path_separator = '/';
 
 #ifdef WIN32
 
-static const char win32_path_seperator = '\\';
+static const char win32_path_separator = '\\';
 
 /*
    Converts a path with forward slashes to one with backward slashes.
@@ -176,8 +176,8 @@ cnv_to_win32_filesep ( STRING *path ) {
     assert(path->encoding == Parrot_fixed_8_encoding_ptr ||
         path->encoding == Parrot_utf8_encoding_ptr);
 
-    while (cnv = strchr(path->strstart, path_seperator))
-        *cnv = win32_path_seperator;
+    while (cnv = strchr(path->strstart, path_separator))
+        *cnv = win32_path_separator;
 }
 
 #endif
@@ -206,33 +206,33 @@ path_finalize(Interp *interp, STRING *path )
 
 /*
   unary path arguement. the path string will have a
-  trailing path-seperator appended if it is not
+  trailing path-separator appended if it is not
   there already.
  */
 
 static STRING*
-path_garuntee_trailing_seperator(Interp *interp, STRING *path )
+path_guarantee_trailing_separator(Interp *interp, STRING *path )
 {
-    STRING *path_seperator_string = string_chr(interp, path_seperator);
+    STRING *path_separator_string = string_chr(interp, path_separator);
 
     /* make sure the path has a trailing slash before appending the file */
     if ( string_index(interp, path , path->strlen - 1)
-         != string_index(interp, path_seperator_string, 0))
-        path = string_append(interp, path , path_seperator_string);
+         != string_index(interp, path_separator_string, 0))
+        path = string_append(interp, path , path_separator_string);
 
     return path;
 }
 
 /*
   binary path arguements, the left arg is modified.
-  a trailing seperator is garunteed for the left
+  a trailing separator is guaranteed for the left
   arguement and the right arguement is appended
  */
 
 static STRING*
 path_append(Interp *interp, STRING *l_path, STRING *r_path )
 {
-    l_path = path_garuntee_trailing_seperator(interp, l_path );
+    l_path = path_guarantee_trailing_separator(interp, l_path );
     l_path = string_append(interp, l_path , r_path);
 
     return l_path;
@@ -241,7 +241,7 @@ path_append(Interp *interp, STRING *l_path, STRING *r_path )
 /*
   binary path arguements. A new sting is created
   that is the concatentation of the two path components
-  with a path-seperator.
+  with a path-separator.
  */
 
 static STRING*
@@ -250,7 +250,7 @@ path_concat(Interp *interp, STRING *l_path, STRING *r_path )
     STRING* join;
 
     join = string_copy(interp, l_path);
-    join = path_garuntee_trailing_seperator(interp, join );
+    join = path_guarantee_trailing_separator(interp, join );
     join = string_append(interp, join , r_path);
 
     return join;
