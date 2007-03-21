@@ -205,7 +205,7 @@ path_finalize(Interp *interp, STRING *path )
 }
 
 /*
-  unary path arguement. the path string will have a
+  unary path argument. the path string will have a
   trailing path-separator appended if it is not
   there already.
  */
@@ -224,9 +224,9 @@ path_guarantee_trailing_separator(Interp *interp, STRING *path )
 }
 
 /*
-  binary path arguements, the left arg is modified.
+  binary path arguments, the left arg is modified.
   a trailing separator is guaranteed for the left
-  arguement and the right arguement is appended
+  argument and the right argument is appended
  */
 
 static STRING*
@@ -239,7 +239,7 @@ path_append(Interp *interp, STRING *l_path, STRING *r_path )
 }
 
 /*
-  binary path arguements. A new sting is created
+  binary path arguments. A new string is created
   that is the concatentation of the two path components
   with a path-separator.
  */
