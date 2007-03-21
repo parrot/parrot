@@ -1,9 +1,9 @@
 {
     "release.version"  : "0.4.10",
-    "release.name"     : "...",
+    "release.name"     : "The Release Formerly Known as \"Prince\"",
     "release.day"      : "Tuesday",
     "release.date"     : "20 March 2007",
-    "release.nextdate" : "20 April 2007",
+    "release.nextdate" : "17 April 2007",
 
     "web.root"         : "http://parrotcode.org/",
     "web.source"       : "source.html",

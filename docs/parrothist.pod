@@ -14,7 +14,8 @@ Parrot history in brief...
 
 =head1 THE KEEPERS OF THE PUMPKIN
 
-Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg, Jerry Gay, Patrick Michaud
+Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg, Jerry Gay,
+Patrick Michaud, Will Coleda
 
 =head2 PUMPKIN?
 
@@ -88,5 +89,7 @@ the strings?).
  Jerry   0.4.8b         2007-Jan-16     "Eponymous"
 
  Patrick 0.4.9          2007-Feb-22     "Socorro"
+
+ Will    0.4.10         2007-Mar-20     "Release Formerly Known as Prince"
 
 =cut
