@@ -91,24 +91,11 @@ Make sure everything works:
 
 Prepare the release tarball.
 
-=over 4
-
-=item a
-
-Delete F<DEVELOPING>, and its corresponding F<MANIFEST> entry.
-This file should never appear in a release. (TODO: incorporate this
-step into the 'make release' step)
-
-=item b
-
-Make the release tarball:
-
  $ make release VERSION=a.b.c
 
 where a.b.c is the version number. This will create the tarball named
-F<parrot-a.b.c.tar.gz>.
-
-=back
+F<parrot-a.b.c.tar.gz>. This will automatically avoid including C<DEVELOPING>
+in the release tarball.
 
 =item 5.
 
@@ -203,9 +190,10 @@ You're done! Help yourself to a beer, cola or other celebratory drink.
 =head2 ABOUT THIS DOCUMENT
 
 This document was written after a couple of subtly incorrectly assembled
-releases--usually when someone forgot to delete F<DEVELOPING>, but at least
-once where the F<MANIFEST> check failed. The intent of this file is to
-document what must be done to release so that such mistakes don't happen again.
+releases--usually when someone forgot to delete F<DEVELOPING> (which is now
+automated!), but at least once where the F<MANIFEST> check failed. The intent
+of this file is to document what must be done to release so that such mistakes
+don't happen again.
 
 =head1 SEE ALSO
 
