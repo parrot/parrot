@@ -8,10 +8,10 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More tests => 2;
 
 use Data::Dumper;
+use Fatal qw(open close);
 use File::Find qw(find);
 use ExtUtils::Manifest;
 use Parrot::Distribution;
-use Parrot::Revision;
 
 =head1 NAME
 
@@ -33,18 +33,16 @@ SKIP:
 {
 
     # check that MANIFEST.SKIP is in sync with svn:ignore
-    # An new MANIFEST.SKIP can be generated with tools/dev/gen_manifest_skip.pl
-    skip 'Not a working copy' => 2
-        unless ( $Parrot::Revision::svn_entries || `svk ls .` );
+    # A new MANIFEST.SKIP can be generated with tools/dev/gen_manifest_skip.pl
 
-    diag "this may take a while...";
+    diag "Collecting svn:ignore properties...";
 
     my $dist = Parrot::Distribution->new();
     my @from_svn = grep { $_ && $_ !~ m/^#/ } @{ $dist->gen_manifest_skip() };
     unshift @from_svn, '\B\.svn\b', '^debian$', '^debian/';    # added in gen_manifest_skip.pl
-    open( *MANIFEST_SKIP, '<', $manifest_skip ) or die "Can't open $manifest_skip: $!";
-    my @from_manifest_skip = grep { $_ ne "\n" && $_ !~ m/^#/ } (<*MANIFEST_SKIP>);
-    close(*MANIFEST_SKIP);
+    open my $manifest_skip_fh, '<', $manifest_skip;
+    my @from_manifest_skip = grep { $_ ne "\n" && $_ !~ m/^#/ } <$manifest_skip_fh>;
+    close $manifest_skip_fh;
     chomp(@from_manifest_skip);
     my ( $svn_miss, $manifest_skip_miss ) = list_diff( \@from_svn, \@from_manifest_skip );
 

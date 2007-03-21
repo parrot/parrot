@@ -33,10 +33,8 @@ use strict;
 use warnings;
 
 use Cwd;
-use Data::Dumper;
 use ExtUtils::Manifest;
 use File::Spec;
-use Parrot::Revision;
 use Parrot::Configure::Step qw(capture_output);
 
 use Parrot::Docs::Directory;
@@ -691,37 +689,60 @@ sub gen_manifest_skip {
 
     # manicheck.pl is probably only useful for checked out revisions
     # Checkout is done either with svn or svk
-    my $svn_cmd;
-    if ( defined $Parrot::Revision::svn_entries
-        && $Parrot::Revision::svn_entries =~ m/\.svn/ )
-    {
-        $svn_cmd = 'svn';
-    }
-    else {
-        $svn_cmd = 'svk';
-    }
+    my $cmd = (-d '.svn') ? 'svn' : 'svk';
 
     # Find all directories in the Parrot distribution
     my %dir_list = map {
+        #uniq
+        $_, undef;
+    } grep {
+        # directories only...
+        -d $_
+    } map {
+        # extract directory component, if any 
         my $dir = ( File::Spec->splitpath($_) )[1];
-        $dir =~ s!\.svn/$!!;
-        $dir => 1
-    } keys %{ ExtUtils::Manifest::manifind() };
+    } map {
+        # strip off any .svn components. 
+        # (lets us match dirs with no versioned files)
+        s/\.svn.*//;
+        $_;
+    } keys %{ ExtUtils::Manifest::manifind() }; # start with everything
+
+    $dir_list{'.'} = undef; # check top level directory too.
+
     my @skip;    # regular expressions for files to skip
-    foreach my $dir ( sort keys %dir_list ) {
-        next if $dir =~ m/\.svn/;
-        next if ( $dir && !-d $dir );
 
-        my $patterns = capture_output("$svn_cmd propget svn:ignore $dir");
+    my @dirs = (sort keys %dir_list);
 
-        # TODO: escape chars that are special in regular expressions
-        push @skip, qq{# generated from svn:ignore of '$dir'}, map {
-            my $end = $dir_list{ $dir . $_ } ? '$' : '/';    # ignore file or dir
-            s/\./\\./g;                                      # . is simply a dot
-            s/\*/.*/g;                                       # * is any amount of chars
-            "^${dir}${_}\$",                                 # SVN globs are specific to a dir
-                "^${dir}${_}/",                              # SVN globs are specific to a dir
-        } split( /\n/, $patterns );
+    my $ignore_cmd = "$cmd propget svn:ignore @dirs";
+
+    my ($patterns, $err, $code) = capture_output($ignore_cmd);
+    die $err if $code;
+
+    my @patterns_list = split(/\n/, $patterns);
+    my ($dir);
+    foreach my $pattern ( @patterns_list ) {
+
+        next if $pattern =~ m/^\s*$/;
+        
+        if ($pattern =~ s/^(.*?) - //) {
+            $dir = $1;
+            if ($dir eq ".") {
+                $dir = q{};
+            }
+            else {
+                $dir .= '/';
+            }
+            push @skip, qq{# generated from svn:ignore of '$dir'};
+        }
+
+        # whatever's left must be a pattern to ignore in the previously
+        # found directory.
+
+        $pattern =~ s/\./\\./g;            # . is simply a dot
+        $pattern =~ s/\*/.*/g;             # * is any amount of chars
+        push @skip, "^${dir}$pattern\$"; # SVN globs are specific to a dir
+        push @skip, "^${dir}$pattern/";  # SVN globs are specific to a dir
     }
 
     return \@skip;
