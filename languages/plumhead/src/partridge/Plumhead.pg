@@ -15,6 +15,7 @@ token CODE_END                { <'?>'> <' '>* \n? }
 token DOUBLEQUOTE_STRING      { " <-["]>* " }
 token SINGLEQUOTE_STRING      { ' <-[']>* ' }
 token ECHO                    { <'echo'> }
+token VAR_DUMP                { <'var_dump'> }
 token PAREN_OPEN              { \( }
 token PAREN_CLOSE             { \) }
 
@@ -42,6 +43,7 @@ rule relational_expression    { <expression> <rel_op_clause>? }
 
 rule statement                {
     <ECHO> <expression> ;
+  | <VAR_DUMP> <?PAREN_OPEN>  <expression> <?PAREN_CLOSE> ;
   | <IF> <?PAREN_OPEN> <relational_expression> <?PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
   | <inline_sea> 
   | <scalar_assign>

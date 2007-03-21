@@ -74,7 +74,7 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
         statement_iter = new .Iterator, $P0
         iter_loop:
             unless statement_iter goto iter_end
-            .local pmc cnode, past_else_block, past_condition, past_expression, past_var, past_array_elem, past_assign, past_rel_expression, past_echo, past_if, past_if_block, past_sea
+            .local pmc cnode, past_else_block, past_condition, past_expression, past_var, past_array_elem, past_assign, past_rel_expression, past_echo, past_var_dump, past_if, past_if_block, past_sea
             cnode = shift statement_iter
             if null cnode goto iter_loop
 
@@ -89,6 +89,18 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
                          past.'push'(past_echo)
                          goto iter_loop
                  no_echo:
+
+                 $P1 = cnode['VAR_DUMP']
+                 if null $P1 goto no_var_dump
+                     $P2 = cnode['expression']
+                     if null $P2 goto iter_loop
+                         past_expression = tree.'get'('past', $P2, 'Plumhead::Grammar::expression')
+                         if null past_expression goto iter_loop
+                         past_var_dump = new 'PAST::Op'
+                         past_var_dump.'init'( past_expression, 'node'=> node, 'name' => 'var_dump' )  
+                         past.'push'(past_var_dump)
+                         goto iter_loop
+                 no_var_dump:
 
                  $P1 = cnode['IF']
                  if null $P1 goto no_if
