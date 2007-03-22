@@ -94,13 +94,25 @@ Heredocs work like single or double quoted strings. All lines up to
 the terminating delimiter is slurped into the string. The delimiter
 has to be on its own line with no trailing whitespace.
 
+Assignment of a heredoc:
+
   $S0 = <<'EOT'
   ...
  EOT
 
+A heredoc as an argument:
+
   function(<<"END_OF_HERE", arg)
   ...
  END_OF_HERE
+
+  .return(<<'EOS')
+  ...
+ EOS
+
+  .yield(<<'EOS')
+  ...
+ EOS
 
 Only one heredoc can be active per statement line.
 
@@ -345,7 +357,7 @@ global subroutine, a local B<identifier> or a B<reg>.
 
 =item .return ([<var> [:<flag> ...], ...])
 
-Return from the current compilation unit with zero or more values. 
+Return from the current compilation unit with zero or more values.
 
 The surrounded parentheses are mandatory. Besides making sequence
 break more conspicuous, this is necessary to distinguish this syntax
