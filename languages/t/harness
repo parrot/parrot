@@ -106,6 +106,7 @@ my @unified_testable_languages
               parrot_compiler
               pheme
               PIR
+              plumhead
               punie
               regex
               scheme

@@ -33,6 +33,7 @@ LANGUAGES = \
     perl5 \
     perl6 \
     pheme \
+    plumhead \
     punie \
     pynie \
     regex \
@@ -107,6 +108,7 @@ clean: \
     perl5.clean \
     perl6.clean \
     pheme.clean \
+    plumhead.clean \
     punie.clean \
     pynie.clean \
     regex.clean \
@@ -315,6 +317,14 @@ pheme.test:
 	- $(MAKE) pheme test
 pheme.clean:
 	- $(MAKE) pheme clean
+
+plumhead : plumhead.dummy
+plumhead.dummy:
+	- $(MAKE) plumhead
+plumhead.test:
+	- $(MAKE) plumhead test
+plumhead.clean:
+	- $(MAKE) plumhead clean
 
 punie : punie.dummy
 punie.dummy:

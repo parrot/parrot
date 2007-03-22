@@ -35,7 +35,7 @@ Use plumhead.pl in smoke testing.
 =cut
 
 sub new {
-    my $test_module = $ENV{PARROT_PLUMHEAD_TEST_MODULE} || 'Parrot::Test::Plumhead::Phc2Past';
+    my $test_module = $ENV{PARROT_PLUMHEAD_TEST_MODULE} || 'Parrot::Test::Plumhead::Partridge';
 
     return bless {}, $test_module;
 }

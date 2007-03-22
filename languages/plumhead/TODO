@@ -1,25 +1,13 @@
 # $Id$
 
-TODO:
-  - add --target option for the non-partridge variants
-  - segfault array_3.php with Partridge antlr3
-  - unified testing
-  - Implementation with PGE, make it the default implementation
-  - Implementation of 'antlr3' variant, Java backend
-  - Support for floating point numbers
-  - Support for the superglobals  _POST and _GET
-  - Implement var_dump()
-  - Subclass OrderedHash for PlumheadArray
-  - Add another variant 'perl5regex', using Perl 5.10 (ir)regular expressions
-  - distinguish between subs and keywords
-
-DONE:
-  - Start a builtins library
-  - String comparison ops
-  - Implement php_sapi_name(), as it is used for skipping in the PHP test suite
-  - bitwise op '|' and '&' 
-  - Set up list of tests that are expected to succeed
-  - Relational operators, decode base64 encoded op names 
-  - if { ... } else { .. }
-  - Migrate to Patrick Michauds PAST
-  - Rewrite plumhead.pl in PIR
+# Just some notes, on what might be next:
+---
+- Eliminate unneeded test modules
+- Turn commented out tests into proper TODO tests, or fix the problem
+- add --target option for the non-partridge variants
+- Support for floating point numbers
+- Support for the superglobals  _POST and _GET
+- Implement var_dump()
+- Subclass OrderedHash for PlumheadArray
+- Add another variant 'perl5regex', using Perl 5.10 (ir)regular expressions
+- distinguish between subs and keywords

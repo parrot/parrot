@@ -21,7 +21,10 @@ use Parrot::Config ();
 use Parrot::Test;
 use Test::More     tests => 3;
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
+TODO: {
+    local $TODO = 'no support for functions returning a value';
+
+    language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'php_sapi_name' );
 <?php
 echo php_sapi_name();
 echo "\n";
@@ -30,10 +33,12 @@ END_CODE
 cgi-fcgi
 END_EXPECTED
 
+}
+
 $ENV{REQUEST_TYPE} = 'GET';
 $ENV{QUERY_STRING} = 'as=df';
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', '$_GET' );
 <?php
 echo $_GET['as'];
 echo "\n";
@@ -42,7 +47,7 @@ END_CODE
 df
 END_EXPECTED
 
-language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello' );
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'var_dump( $_GET )' );
 <?php
 var_dump( $_GET );
 echo "\n";
