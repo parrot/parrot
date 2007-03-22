@@ -19,26 +19,37 @@ transform past (ROOT) :language('PIR') {
     .return (past)
 }
 
-# TODO: handle multiple code and sea blocks
 transform past (Plumhead::Grammar::program) :language('PIR') {
 
     .local pmc past
     past = new 'PAST::Stmts'
     past.'init'( 'node' => node )
 
-    $P0 = node['SEA']
-    if null $P0 goto handled_sea
-        .local pmc past_sea
-        past_sea = tree.'get'('past', $P0, 'Plumhead::Grammar::SEA')
-        past.'push'(past_sea)
-    handled_sea:
+    $P0 = node['sea_or_code']
+    .local pmc sea_or_code_iter
+    sea_or_code_iter = new .Iterator, $P0
+    iter_loop:
+        unless sea_or_code_iter goto iter_end
 
-    $P0 = node['code']
-    if null $P0 goto handled_code
-        .local pmc past_code
-        past_code = tree.'get'('past', $P0, 'Plumhead::Grammar::code')
-        past.'push'(past_code)
-    handled_code:
+        .local pmc cnode, past_sea, past_code 
+        cnode = shift sea_or_code_iter
+        if null cnode goto iter_loop
+
+        $P1 = cnode['SEA']
+        if null $P1 goto no_SEA
+            past_sea = tree.'get'('past', $P1, 'Plumhead::Grammar::SEA')
+            past.'push'(past_sea)
+        no_SEA:
+
+        $P1 = cnode['code']
+        if null $P1 goto no_code
+            past_code = tree.'get'('past', $P1, 'Plumhead::Grammar::code')
+            past.'push'(past_code)
+        no_code:
+
+        goto iter_loop
+
+    iter_end:
 
     .return (past)
 }
@@ -140,7 +151,7 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
 
                  $P1 = cnode['inline_sea']
                  if null $P1 goto no_inline_sea
-                     $P2 = $P1['SEA']
+                     $P2 = $P1['SEA_empty_allowed']
                      past_sea = tree.'get'('past', $P2, 'Plumhead::Grammar::SEA')
                      past.'push'(past_sea)
                      goto iter_loop

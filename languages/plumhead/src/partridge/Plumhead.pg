@@ -9,7 +9,8 @@ grammar Plumhead::Grammar;
 
 token TOP                     { <program> }
 
-regex SEA                     { .*? <?before: \<> }
+regex SEA                     { <-[<]>+? ( <?before: \<> | $ ) }
+regex SEA_empty_allowed       { <-[<]>*? <?before: \<> }
 token CODE_START              { <'<?php'> }
 token CODE_END                { <'?>'> <' '>* \n? }
 token DOUBLEQUOTE_STRING      { " <-["]>* " }
@@ -35,7 +36,8 @@ token REL_OP                  { <'=='> | <'<='> | <'>='> | <'!='> | <'<'>  | <'>
 
 token IF                      { <'if'> }
 token ELSE                    { <'else'> }
-token program                 { ^ <SEA> <code> }
+token program                 { ^ <sea_or_code>+ }
+token sea_or_code             { <SEA> | <code> }
 
 rule  code                    { <?CODE_START> <statement>* <?CODE_END>? }
 
@@ -54,7 +56,7 @@ rule else_clause              { <?ELSE> \{ <statement>* \} }
 # TODO: rel_op_clause is not a nice name
 rule  rel_op_clause           { <REL_OP> <expression> }
 rule  else_clause             { <?ELSE> \{ <statement>* \} }
-token inline_sea              { <?CODE_END> <SEA> <?CODE_START> }
+token inline_sea              { <?CODE_END> <SEA_empty_allowed> <?CODE_START> }
 rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ; }
 rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ; }
 
