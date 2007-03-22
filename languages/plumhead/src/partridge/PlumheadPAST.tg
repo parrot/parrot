@@ -120,15 +120,21 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
                      $P2 = $P3['expression']
                      $P4 = $P3['rel_op_clause']
                      if null $P4 goto no_rel_op_clause
-                         .local string name
+                         .local string op
                          $P5  = $P4[0]
                          $P6  = $P5['REL_OP']
-                         name = $P6
-                         name = 'infix:' . name
+                         op = $P6
+                         if op != '==' goto not_or
+                             op = 'eq'
+                         not_or:
+                         if op != '!=' goto not_xor
+                             op = 'ne'
+                         not_xor:
+                         op = 'infix:' . op
                          past_expression     = tree.'get'('past', $P2, 'Plumhead::Grammar::expression')
                          past_rel_expression = tree.'get'('past', $P5, 'Plumhead::Grammar::expression')
                          past_condition = new 'PAST::Op'
-                         past_condition.'init'( past_expression, past_rel_expression, 'node'=> node, 'name' => name )
+                         past_condition.'init'( past_expression, past_rel_expression, 'node'=> node, 'name' => op )
                          goto got_past_condition
                      no_rel_op_clause:
                          past_condition = tree.'get'('past', $P2, 'Plumhead::Grammar::expression')
