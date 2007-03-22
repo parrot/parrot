@@ -60,9 +60,17 @@ sub makefiles {
     my ( $self, $conf ) = @_;
 
     genfile( 'config/gen/makefiles/root.in'         => 'Makefile' );
+
+    genfile(
+        'config/gen/makefiles/ext.in' => 'ext/Makefile',
+        commentType                   => '#',
+        replace_slashes               => 1,
+        conditioned_lines             => 1
+    );
     genfile(
         'config/gen/makefiles/parrot_embed.in' => 'ext/Parrot-Embed/Makefile.PL',
-        replace_slashes                     => 1,
+        replace_slashes                     => 0,
+        conditioned_lines                   => 1
     );
 
     genfile( 'config/gen/makefiles/past.in'      => 'compilers/past/Makefile' );
@@ -86,11 +94,6 @@ sub makefiles {
         comment_type                           => '#',
         replace_slashes                        => 0,
         conditioned_lines                      => 1
-    );
-    genfile(
-        'config/gen/makefiles/ext.in' => 'ext/Makefile',
-        commentType                   => '#',
-        replace_slashes               => 1
     );
     genfile( 'config/gen/makefiles/parrot.pc.in' => 'parrot.pc' );
 

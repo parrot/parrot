@@ -11,12 +11,11 @@ copy( 'lib/Parrot/Embed.xs', 'Embed.xs' );
 # cross-platform commands and paths
 my %config;
 $config{CC}              = '@cc@';
-$config{EXE}             = '@exe@';
 $config{PARROTDIR}       = '../..';
-$config{PARROT}          = "$config{PARROTDIR}/parrot$config{EXE}";
+$config{PARROT}          = '..@slash@..@slash@parrot@exe@';
 $config{C_LIBS}          = '@libs@';
 $config{INCLUDE}         = "$config{PARROTDIR}/include";
-$config{ALL_PARROT_LIBS} = "@libparrot_ldflags@ $config{C_LIBS}";
+#INVERSE_CONDITIONED_LINE(win32):$config{ALL_PARROT_LIBS} = "@libparrot_ldflags@ $config{C_LIBS}";
 $config{ABS_PARROTDIR}   = Cwd::realpath(
                                File::Spec->rel2abs( $config{PARROTDIR} ) );
 $config{LDDLFLAGS}       = $Config{lddlflags};
@@ -31,9 +30,11 @@ WriteMakefile(
     'NAME'         => 'Parrot::Embed',
     'VERSION_FROM' => 'lib/Parrot/Embed.pm',
     'PREREQ_PM'    => { 'ExtUtils::CBuilder' => 0 },
-    'LIBS'         => [ $config{ALL_PARROT_LIBS} ],
+#CONDITIONED_LINE(win32):    'LIBS'         => [ $config{C_LIBS} ],
+#CONDITIONED_LINE(win32):    'OBJECT'       => "@libparrot_ldflags@ Embed@o@",
+#INVERSE_CONDITIONED_LINE(win32):    'LIBS'         => [ $config{ALL_PARROT_LIBS} ],
     'INC'          => "-I$config{INCLUDE}",
-    'PM'           => { map { $_ => "blib/$_" } <lib/Parrot/*pm> },          
+    'PM'           => { map { $_ => "blib/$_" } <lib/Parrot/*pm> },
     'clean'        => { FILES => '*.xs t/greet.pbc' },
     'LDDLFLAGS'    => $config{LDDLFLAGS},
 );
@@ -51,7 +52,7 @@ sub test
     return $inherited unless $config{cc} eq 'cl';
 
     my $dynlib_path = "\tset PATH=%PATH%:$config{ABS_PARROTDIR}";
-    $inherited      =~ s/^(test.*ic ::.*)$/$1\n$dynlib_path/mg;
+    $inherited      =~ s{^(test.*ic ::.*)$}{$1\n$dynlib_path}mg;
 
     return $inherited;
 }
