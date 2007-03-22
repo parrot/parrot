@@ -10,7 +10,7 @@ use Parrot::Test tests => 2;
 
 =head1 NAME
 
-t/pmc/pmethod_test.t - test the PMETHOD_Test PMC
+t/pmc/pmethod_test.t - test the PCCMETHOD_Test PMC
 
 
 =head1 SYNOPSIS
@@ -19,13 +19,13 @@ t/pmc/pmethod_test.t - test the PMETHOD_Test PMC
 
 =head1 DESCRIPTION
 
-Tests the PMETHOD_Test PMC.
+Tests the PCCMETHOD_Test PMC.
 
 =cut
 
 pir_output_is( <<'CODE', <<'OUT', 'named args' );
 .sub main :main
-  $P0 = new 'PMETHOD_Test'
+  $P0 = new 'PCCMETHOD_Test'
   $P0.'test_method3'( 'a1name' => 10, 'a2name' => 20 )
 .end
 CODE
@@ -36,7 +36,7 @@ OUT
 pir_output_is(
     <<'CODE', <<'OUT', 'optional args and multiple returns' );
 .sub main :main
-  $P0 = new 'PMETHOD_Test'
+  $P0 = new 'PCCMETHOD_Test'
   $P0.'test_method0'(1)
   $P0.'test_method1'(1, 2, 3, 4, 5, 6)
   $P0.'test_method2'()

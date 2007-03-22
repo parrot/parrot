@@ -1,32 +1,33 @@
 # Copyright (C) 2004-2006, The Perl Foundation.
 # $Id$
 
-package Parrot::Pmc2c::PMETHODs;
+package Parrot::Pmc2c::PCCMETHOD;
 use strict;
 use warnings;
 use Data::Dumper;
 use Carp qw(longmess croak);
 
 
+=pod
+
 $SIG{__WARN__} = sub {
     print longmess;
 };
 
-=pod
 =cut
 
 =head1 NAME
 
-Parrot::Pmc2c::Utils::PMETHODs - Parses and preps PMC PMETHODS
+Parrot::Pmc2c::Utils::PCCMETHOD - Parses and preps PMC PCCMETHOD
   called from F<Parrot:Pmc2c::Utils>
 
 =head1 SYNOPSIS
 
-    use Parrot::Pmc2c::PMETHODs;
+    use Parrot::Pmc2c::PCCMETHOD;
 
 =head1 DESCRIPTION
 
-Parrot::Pmc2c::PMETHODs - Parses and preps PMC PMETHODS called from F<Parrot:Pmc2c::Utils>
+Parrot::Pmc2c::PCCMETHOD - Parses and preps PMC PCCMETHOD called from F<Parrot:Pmc2c::Utils>
 
 =cut
 
@@ -34,9 +35,9 @@ Parrot::Pmc2c::PMETHODs - Parses and preps PMC PMETHODS called from F<Parrot:Pmc
 
 =head2 Publicly Available Methods
 
-=head3 C<rewrite_pmethod($self, $method, $body)>
+=head3 C<rewrite_pccmethod($self, $method, $body)>
 
-B<Purpose:>  Parse and Build PMC PMETHODS.
+B<Purpose:>  Parse and Build PMC PCCMETHODS.
 
 B<Arguments:>
 
@@ -54,7 +55,7 @@ Current Method Body
 
 =back
 
-=head3 C<rewrite_pminvoke($self, $method, $body)>
+=head3 C<rewrite_pccinvoke($self, $method, $body)>
 
 B<Purpose:>  Parse and Build a PINVOKE Call.
 
@@ -222,14 +223,14 @@ sub rewrite_preturns {
     }sx;
 
     if ( $body and $body =~ m/\breturn\b/ ) {
-        croak "return not allowed in pmethods, use preturn instead";
+        croak "return not allowed in pccmethods, use preturn instead";
     }
 
     while ( $$body and $$body =~ m/$signature_re/ ) {
         my ($match, $returns) = ( $1, $2 );
         my $goto_string = "goto ${method_name}_returns;";
         my ( $returns_n_regs_used, $returns_indexes, $returns_flags, $returns_accessors ) =
-            process_pmethod_args( parse_p_args_string( $returns ), 'return' );
+            process_pccmethod_args( parse_p_args_string( $returns ), 'return' );
 
         push @$regs_used, $returns_n_regs_used;
         my $file        = '"' . __FILE__ . '"';
@@ -282,7 +283,7 @@ sub is_named {
     return ( 0, '' );
 }
 
-sub process_pmethod_args {
+sub process_pccmethod_args {
     my ( $linear_args, $arg_type ) = @_;
     my $n_regs_used_a  = [ 0, 0, 0, 0 ];       # INT, FLOAT, STRING, PMC
     my $args           = [ [], [], [], [] ];   # actual INT, FLOAT, STRING, PMC arg stuctures
@@ -332,17 +333,17 @@ sub find_max_regs {
     return join( ", ", @$n_regs_used );
 }
 
-=head3 C<rewrite_pmethod()>
+=head3 C<rewrite_pccmethod()>
 
-    rewrite_pmethod($method_hash);
+    rewrite_pccmethod($method_hash);
 
 =cut
 
-sub rewrite_pmethod {
+sub rewrite_pccmethod {
     my ($self) = @_;
-    croak "return method of PMETHOD must be void, not $self->{type}" if $self->{type} ne 'void';
+    croak "return method of PCCMETHOD must be void, not $self->{type}" if $self->{type} ne 'void';
 
-    # parse pmethod parameters, then unshift the a PMC arg for the invocant
+    # parse pccmethod parameters, then unshift the a PMC arg for the invocant
     my $linear_args = parse_p_args_string( $self->{parameters} );
     unshift @$linear_args, 
     {
@@ -352,10 +353,10 @@ sub rewrite_pmethod {
     };
 
     my ( $params_n_regs_used, $params_indexes, $params_flags, $params_accessors, $named_names ) =
-    process_pmethod_args( $linear_args, 'arg' );
+    process_pccmethod_args( $linear_args, 'arg' );
 
     my $n_regs  = rewrite_preturns( $self, \$self->{body} );
-    rewrite_pminvoke( $self->{meth}, \$self->{body} );
+    rewrite_pccinvoke( $self->{meth}, \$self->{body} );
     unshift @$n_regs, $params_n_regs_used;
     my $n_regs_used = find_max_regs($n_regs);
 
@@ -443,17 +444,17 @@ sub isquoted {
     1;
 }
 
-sub rewrite_pminvoke {
+sub rewrite_pccinvoke {
     my ( $method, $body ) = @_;
     my $signature_re = qr{
       (
       (
       \( ([^\(]*) \)   #results
       \s*              #optional whitespace
-      =                #results equals PMINVOKE invocation
+      =                #results equals PCCONVOKE invocation
       )?               #results are optional
       \s*              #optional whitespace
-      PMINVOKE         #method name
+      PCCINVOKE         #method name
       \s*              #optional whitespace
       \( ([^\(]*) \)   #parameters
       ;?               #optional semicolon
@@ -464,17 +465,17 @@ sub rewrite_pminvoke {
     while ( $$body and $$body =~ m/$signature_re/ ) {
         my ($match, $result_clause, $results, $parameters) = ( $1, $2, $3, $4 );
         
-        #optional results portion of pminvoke statement
+        #optional results portion of pccinvoke statement
         my ( $result_n_regs_used, $result_indexes, $result_flags, $result_accessors )
-            = ( defined $results) ? process_pmethod_args( parse_p_args_string( $results ), 'result')
+            = ( defined $results) ? process_pccmethod_args( parse_p_args_string( $results ), 'result')
             : ( [ 0, 0, 0, 0 ], "0", "\"\"", "" );
 
-        #parameters portion of pminvoke statement
+        #parameters portion of pccinvoke statement
         my ($interp, $invocant, $method_name, $arguments) 
             = map { $_ = trim($_) } split( /,/, $parameters, 4 );
         $arguments = "PMC* $invocant" . ( $arguments ? ", $arguments" : "" );
         my ( $args_n_regs_used, $arg_indexes, $arg_flags, $arg_accessors, $named_names ) =
-           process_pmethod_args( parse_p_args_string( $arguments ), 'param' );
+           process_pccmethod_args( parse_p_args_string( $arguments ), 'param' );
 
         my $n_regs_used = find_max_regs( [$result_n_regs_used, $args_n_regs_used ] );
 
@@ -486,7 +487,7 @@ sub rewrite_pminvoke {
         my $replacement .= 
 <<END;
 
-    /*BEGIN PMINVOKE $invocant */
+    /*BEGIN PCCONVOKE $invocant */
 #line $lineno $file
     {
       INTVAL n_regs_used[] = { $n_regs_used };
@@ -499,7 +500,7 @@ sub rewrite_pminvoke {
           string_from_const_cstring(interp, $result_flags, 0), PObj_constant_FLAG);
       PMC* ret_cont = new_ret_continuation_pmc(interp, NULL);
       parrot_context_t *ctx = Parrot_push_context(interp, n_regs_used);
-      PMC* pminvoke_meth;
+      PMC* pccinvoke_meth;
 
       opcode_t* save_current_args = interp->current_args;
       PMC* save_args_signature = interp->args_signature;
@@ -517,12 +518,12 @@ $arg_accessors
       interp->current_object = $invocant;
       interp->current_cont = NEED_CONTINUATION;
       ctx->current_cont = ret_cont;
-      pminvoke_meth = VTABLE_find_method(interp, $invocant, $method_name);
-      if (!pminvoke_meth) {
+      pccinvoke_meth = VTABLE_find_method(interp, $invocant, $method_name);
+      if (!pccinvoke_meth) {
           real_exception(interp, NULL, METH_NOT_FOUND, "Method '%Ss' not found", $method_name);
       } 
       else {
-          VTABLE_invoke(interp, pminvoke_meth, NULL);
+          VTABLE_invoke(interp, pccinvoke_meth, NULL);
       }
 
 $result_accessors
@@ -535,7 +536,7 @@ $result_accessors
       interp->args_signature = save_args_signature;
       interp->current_object = save_current_object;
     }
-    /*END PMINVOKE $method_name */
+    /*END PCCONVOKE $method_name */
 END
     
         $$body =~ s/\Q$match\E/$replacement/;

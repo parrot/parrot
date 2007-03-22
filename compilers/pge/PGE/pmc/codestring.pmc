@@ -102,7 +102,7 @@ A newline is automatically added to the end of the fmt.
 =cut
 
 */
-    PMETHOD void emit(STRING *orig_format, PMC *args :slurpy, PMC *named_args :slurpy :named) {
+    PCCMETHOD void emit(STRING *orig_format, PMC *args :slurpy, PMC *named_args :slurpy :named) {
         INTVAL position = 0;
         INTVAL repl_len = 0;
         STRING *format;
@@ -171,7 +171,7 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 
 */
 
-    PMETHOD void unique(STRING *format :optional , INTVAL has_format :opt_flag) {
+    PCCMETHOD void unique(STRING *format :optional , INTVAL has_format :opt_flag) {
         static INTVAL serno = 10;
         STRING *id;
 

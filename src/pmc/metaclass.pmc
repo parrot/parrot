@@ -68,7 +68,7 @@ static STRING* get_fq_classname(Parrot_Interp interp, Parrot_MetaClass *class_in
 pmclass MetaClass need_ext {
     /* This function builds the attribute index (table to map class name and
      * attribute name to an index) for the current class. Note: we have to
-     * make this a method so we can use PMINVOKE for now. XXX Fix that. */
+     * make this a method so we can use PCCINVOKE for now. XXX Fix that. */
     METHOD void build_attrib_index() {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         int num_classes = VTABLE_elements(interp, class->all_parents);
@@ -96,7 +96,7 @@ pmclass MetaClass need_ext {
                 STRING *full_key = string_copy(interp, fq_class);
 
                 /* Get attribute name and append it to the key. */
-                (STRING *attrib_name) = PMINVOKE(interp, cur_attrib, "name");
+                (STRING *attrib_name) = PCCINVOKE(interp, cur_attrib, "name");
                 full_key = string_append(interp, full_key, attrib_name);
 
                 /* Insert into hash, along with index. */
@@ -224,7 +224,7 @@ of MetaAttribute, describing the attribute.
 =cut
 
 */
-    PMETHOD void attributes() {
+    PCCMETHOD void attributes() {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *ret_attrib_metadata = VTABLE_clone(interp, class->attrib_metadata);
         preturn(PMC *ret_attrib_metadata);
@@ -240,7 +240,7 @@ Add an attribute to the class. Requires a name and, optionally, a type.
 =cut
 
 */
-    PMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
+    PCCMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *new_attribute = pmc_new(interp, enum_class_MetaAttribute);
 
@@ -259,9 +259,9 @@ Add an attribute to the class. Requires a name and, optionally, a type.
         }
 
         /* Set name and type. */
-        PMINVOKE(interp, new_attribute, "name", STRING* attribute_name);
+        PCCINVOKE(interp, new_attribute, "name", STRING* attribute_name);
         if (got_type) {
-            PMINVOKE(interp, new_attribute, "type", STRING* attribute_type);
+            PCCINVOKE(interp, new_attribute, "type", STRING* attribute_type);
         }
 
         /* Enter the attribute in the attributes array. */
@@ -277,7 +277,7 @@ Sets the name of the class.
 =cut
 
 */
-    PMETHOD void name(STRING *name :optional, int got_name :opt_flag) {
+    PCCMETHOD void name(STRING *name :optional, int got_name :opt_flag) {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         STRING *ret_name = NULL;
 
@@ -302,7 +302,7 @@ specified will be linked to this class.
 =cut
 
 */
-    PMETHOD void namespace(PMC *namespace :optional, int got_name :opt_flag) {
+    PCCMETHOD void namespace(PMC *namespace :optional, int got_name :opt_flag) {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *ret_namespace = NULL;
 
@@ -341,7 +341,7 @@ Creates an instance of the object.
 =cut
 
 */
-    PMETHOD void new(PMC *args :slurpy :named) {
+    PCCMETHOD void new(PMC *args :slurpy :named) {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *obj;
 
@@ -384,7 +384,7 @@ Return the parents array PMC.
 =cut
 
 */
-    PMETHOD void parents() {
+    PCCMETHOD void parents() {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *ret_parents = VTABLE_clone(interp, class->parents);
         preturn(PMC *ret_parents);
@@ -399,7 +399,7 @@ Return the parents array PMC.
 =cut
 
 */
-    PMETHOD void add_parent(PMC *parent) {
+    PCCMETHOD void add_parent(PMC *parent) {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
 
         /* If we've been instantiated already, need a new class. */
@@ -430,7 +430,7 @@ Adds the given sub PMC as a method with the given name.
 =cut
 
 */
-    PMETHOD void add_method(STRING *name, PMC *sub)
+    PCCMETHOD void add_method(STRING *name, PMC *sub)
     {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
 
@@ -455,7 +455,7 @@ Return the roles array PMC.
 =cut
 
 */
-    PMETHOD void roles() {
+    PCCMETHOD void roles() {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *ret_roles = VTABLE_clone(interp, class->roles);
         preturn(PMC *ret_roles);
@@ -473,7 +473,7 @@ will be useless anyway, since only the Object knows what to do with it.
 =cut
 
 */
-    PMETHOD void _get_attrib_index(STRING *name) {
+    PCCMETHOD void _get_attrib_index(STRING *name) {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
 
         /* If we can't find the attribute, we hand back -1. */
@@ -522,7 +522,7 @@ This method is intended to be used by the Object PMC.
 =cut
 
 */
-    PMETHOD void _get_method_pmc(STRING *name) {
+    PCCMETHOD void _get_method_pmc(STRING *name) {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
 
         /* Walk and search. */

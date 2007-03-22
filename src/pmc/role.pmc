@@ -126,7 +126,7 @@ of MetaAttribute, describing the attribute.
 =cut
 
 */
-    PMETHOD void attributes() {
+    PCCMETHOD void attributes() {
         Parrot_Role *role = PARROT_ROLE(SELF);
         PMC *ret_attrib_metadata = VTABLE_clone(interp, role->attrib_metadata);
         preturn(PMC *ret_attrib_metadata);
@@ -142,14 +142,14 @@ Add an attribute to the role. Requires a name and, optionally, a type.
 =cut
 
 */
-    PMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
+    PCCMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
         Parrot_Role *role = PARROT_ROLE(SELF);
         PMC *new_attribute = pmc_new(interp, enum_class_MetaAttribute);
 
         /* Set name and type. */
-        PMINVOKE(interp, new_attribute, "name", STRING* attribute_name);
+        PCCINVOKE(interp, new_attribute, "name", STRING* attribute_name);
         if (got_type) {
-            PMINVOKE(interp, new_attribute, "type", STRING* attribute_type);
+            PCCINVOKE(interp, new_attribute, "type", STRING* attribute_type);
         }
 
         /* Enter the attribute in the attributes array. */
@@ -165,7 +165,7 @@ Sets the name of the role.
 =cut
 
 */
-    PMETHOD void name(STRING *name :optional, int got_name :opt_flag) {
+    PCCMETHOD void name(STRING *name :optional, int got_name :opt_flag) {
         Parrot_Role *role = PARROT_ROLE(SELF);
         STRING *ret_name = NULL;
 
@@ -190,7 +190,7 @@ specified will be linked to this role.
 =cut
 
 */
-    PMETHOD void namespace(PMC *namespace :optional, int got_name :opt_flag) {
+    PCCMETHOD void namespace(PMC *namespace :optional, int got_name :opt_flag) {
         Parrot_Role *role = PARROT_ROLE(SELF);
         PMC *ret_namespace = NULL;
 
@@ -229,7 +229,7 @@ Return the roles array PMC.
 =cut
 
 */
-    PMETHOD void roles() {
+    PCCMETHOD void roles() {
         Parrot_Role *role = PARROT_ROLE(SELF);
         PMC *ret_roles = VTABLE_clone(interp, role->roles);
         preturn(PMC *ret_roles);
@@ -244,7 +244,7 @@ Adds the given sub PMC as a method with the given name.
 =cut
 
 */
-    PMETHOD void add_method(STRING *name, PMC *sub)
+    PCCMETHOD void add_method(STRING *name, PMC *sub)
     {
         Parrot_Role *role = PARROT_ROLE(SELF);
 

@@ -69,14 +69,14 @@ argument is not a PMC* but the C<classname> STRING.
             for (i=0; i<6; i++) {
                 PMC* attribute = pmc_new(interp, enum_class_SMOP_Attribute);
                 STRING *attrib_name = string_from_const_cstring(interp, attribute_names[i], 0);
-                PMINVOKE(interp, attribute, "name", STRING* attrib_name);
-                PMINVOKE(interp, attribute, "class", PMC* class);
+                PCCINVOKE(interp, attribute, "name", STRING* attrib_name);
+                PCCINVOKE(interp, attribute, "class", PMC* class);
                 VTABLE_push_pmc(interp, attributes, attribute);
             }
 
             /* we sidestep the MetaModel bootstrap problem by building the MetaClass manually */
 
-            (PMC* class_meta) = PMINVOKE(interp, class, "new");
+            (PMC* class_meta) = PCCINVOKE(interp, class, "new");
             class_string = pmc_new(interp, enum_class_String);
             VTABLE_set_string_native(interp, class_string, string_from_const_cstring(interp, "Class", 0));
             VTABLE_set_attr_str(interp, class_meta, string_from_const_cstring(interp, attribute_names[0], 0), class_string);
@@ -130,25 +130,25 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
         mem_sys_free(PMC_data(SELF));
     }
 
-    PMETHOD void name(PMC *name :optional, int got_name :opt_flag) {
+    PCCMETHOD void name(PMC *name :optional, int got_name :opt_flag) {
         if (got_name) {
             Parrot_store_global_n(interp, interp->root_namespace, string_from_const_cstring(interp, "class_object", 0), name);
             VTABLE_set_attr_str(interp, SELF, string_from_const_cstring(interp, "namespace",0), CONTEXT(interp->ctx)->current_namespace);
         }
     }
 
-    PMETHOD void new(PMC *args :slurpy :named) {
+    PCCMETHOD void new(PMC *args :slurpy :named) {
         PMC *obj;
         STRING* name;
         INTVAL type_id;
 
-        (STRING* name) = PMINVOKE(interp, SELF, "name");
+        (STRING* name) = PCCINVOKE(interp, SELF, "name");
         type_id = pmc_type(interp, name);
         obj = pmc_new_init(interp,type_id, args);
         preturn(PMC *obj)
     }
 
-    PMETHOD void attributes(PMC *attribs :optional, int got_attribs :opt_flag) {
+    PCCMETHOD void attributes(PMC *attribs :optional, int got_attribs :opt_flag) {
         PMC *rv;
         STRING *method_name = string_from_const_cstring(interp, "add_attribute", 0);
         STRING *attributes_string = string_from_const_cstring(interp, "add_attribute", 0);
@@ -159,22 +159,22 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
             for (i=0; i<n; i++); {
                 PMC *key = VTABLE_get_pmc_keyed_int(interp, attribs, i);
                 PMC *value = VTABLE_get_pmc_keyed(interp, attribs, key);
-                PMINVOKE(interp, pmc, method_name, PMC* key, PMC* value);
+                PCCINVOKE(interp, pmc, method_name, PMC* key, PMC* value);
             }
         }
         rv = VTABLE_get_attr_str(interp, pmc, attributes_string);
         preturn(PMC *rv)
     }
 
-    PMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
+    PCCMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
         PMC *attributes;
         PMC *new_attribute = pmc_new(interp, pmc_type(interp, string_from_const_cstring(interp, "SMOP_Attribute", 0)));
 
-        PMINVOKE(interp, pmc, "name", STRING* attribute_name);
-        PMINVOKE(interp, SELF, "class", PMC* SELF);
+        PCCINVOKE(interp, pmc, "name", STRING* attribute_name);
+        PCCINVOKE(interp, SELF, "class", PMC* SELF);
 
         if (got_type) {
-            PMINVOKE(interp, SELF, "type", STRING* attribute_type);
+            PCCINVOKE(interp, SELF, "type", STRING* attribute_type);
         }
 
         /* SELF.set_meta_attribute(attribute_name, new_attribute); */

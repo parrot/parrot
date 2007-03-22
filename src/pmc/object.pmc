@@ -98,7 +98,7 @@ of the given name walking up the inheritance tree.
         Parrot_Object *obj = PARROT_OBJECT(SELF);
         PMC *class = obj->class;
         INTVAL index;
-        (INTVAL index) = PMINVOKE(interp, class, "_get_attrib_index", STRING* name);
+        (INTVAL index) = PCCINVOKE(interp, class, "_get_attrib_index", STRING* name);
 
         /* If lookup failed, exception. */
         if (index == -1) {
@@ -125,7 +125,7 @@ of the given name walking up the inheritance tree.
         Parrot_Object *obj = PARROT_OBJECT(SELF);
         PMC *class = obj->class;
         INTVAL index;
-        (INTVAL index) = PMINVOKE(interp, class, "_get_attrib_index", STRING* name);
+        (INTVAL index) = PCCINVOKE(interp, class, "_get_attrib_index", STRING* name);
 
         /* If lookup failed, exception. */
         if (index == -1) {
@@ -151,7 +151,7 @@ Walks the MRO of the class and finds the method with the given name.
         Parrot_Object *obj = PARROT_OBJECT(SELF);
         PMC *class = obj->class;
         PMC *method = NULL;
-        (PMC *method) = PMINVOKE(interp, class, "_get_method_pmc", STRING* method_name);
+        (PMC *method) = PCCINVOKE(interp, class, "_get_method_pmc", STRING* method_name);
         return method;
     }
 

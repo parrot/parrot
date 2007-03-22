@@ -8,7 +8,7 @@ use Data::Dumper;
 use Parrot::Vtable;
 use Parrot::Pmc2c::Library;
 use Parrot::Pmc2c::UtilFunctions qw(count_newlines);
-use Parrot::Pmc2c::PMETHODs;
+use Parrot::Pmc2c::PCCMETHOD;
 use Cwd qw(cwd realpath);
 use File::Basename;
 use Carp;
@@ -653,7 +653,7 @@ sub parse_pmc {
       (?:/\*.*?\*/)?    # C-like comments
     )*
 
-    (P?METHOD\s+)?        #method flag
+    ((?:PCC)?METHOD\s+)?        #method flag
 
     (\w+\**)            #type
       \s+
@@ -681,12 +681,12 @@ sub parse_pmc {
             attrs      => $attrs,
         };
 
-        if ( $flag and $flag =~ /PMETHOD/ ) {
-            Parrot::Pmc2c::PMETHODs::rewrite_pmethod($method_hash);
+        if ( $flag and $flag =~ /PCCMETHOD/ ) {
+            Parrot::Pmc2c::PCCMETHOD::rewrite_pccmethod($method_hash);
             $flags_ref->{need_fia_header} = 1;
         }
 
-        if ( $methodblock and $methodblock =~ /PMINVOKE/ ) {
+        if ( $methodblock and $methodblock =~ /PCCINVOKE/ ) {
             $flags_ref->{need_fia_header} = 1;
         }
 

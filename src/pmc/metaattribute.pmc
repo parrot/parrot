@@ -117,7 +117,7 @@ Name attribute accessor/mutator.
 =cut
 
 */
-    PMETHOD void name(STRING *name :optional, int got_name :opt_flag) {
+    PCCMETHOD void name(STRING *name :optional, int got_name :opt_flag) {
         Parrot_MetaAttribute *attr = PARROT_METAATTRIBUTE(SELF);
         STRING *name_attr = NULL;
 
@@ -138,7 +138,7 @@ Type attribute accessor.
 =cut
 
 */
-    PMETHOD void type(STRING *type :optional, int got_type :opt_flag) {
+    PCCMETHOD void type(STRING *type :optional, int got_type :opt_flag) {
         Parrot_MetaAttribute *attr = PARROT_METAATTRIBUTE(SELF);
         STRING *type_string = NULL;
 
