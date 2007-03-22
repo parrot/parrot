@@ -55,10 +55,6 @@ gradually change the old.
 
 =over 4
 
-=item CSub PMC [#41712]
-
-...will be removed, as it's superceded by NCI.
-
 =item PMC Class name IDs [#41237]
 
 ... will require a dot in front
