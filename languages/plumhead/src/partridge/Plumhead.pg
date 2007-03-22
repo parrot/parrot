@@ -12,7 +12,7 @@ token TOP                     { <program> }
 regex SEA                     { <-[<]>+? ( <?before: \<> | $ ) }
 regex SEA_empty_allowed       { <-[<]>*? <?before: \<> }
 token CODE_START              { <'<?php'> }
-token CODE_END                { <'?>'> <' '>* \n? }
+token CODE_END                { <'?>'> \n? }
 token DOUBLEQUOTE_STRING      { " <-["]>* " }
 token SINGLEQUOTE_STRING      { ' <-[']>* ' }
 token ECHO                    { <'echo'> }
