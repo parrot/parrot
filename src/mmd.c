@@ -782,7 +782,7 @@ mmd_register_sub(Interp *interp,
              PMC *sub)
 {
     PMC *fake;
-    if (sub->vtable->base_type == enum_class_CSub) {
+    if (sub->vtable->base_type == enum_class_NCI) {
         /* returned from mmdvt_find */
         mmd_register(interp, func_nr, left_type, right_type,
                 D2FPTR(PMC_struct_val(sub)));
@@ -826,9 +826,8 @@ mmd_destroy(Parrot_Interp interp)
 mmd_vtfind(Parrot_Interp interp, INTVAL type, INTVAL left, INTVAL right)>
 
 Return an MMD PMC function for the given data types. The return result is
-either a Sub PMC (for PASM MMD functions) or a CSub PMC holding the
-C function pointer in PMC_struct_val. This CSub is not invocable, you have to
-wrap it into an NCI function to get the required function arguments passed.
+either a Sub PMC (for PASM MMD functions) or a NCI PMC holding the
+C function pointer in PMC_struct_val.
 
 =cut
 
@@ -847,7 +846,7 @@ mmd_vtfind(Parrot_Interp interp, INTVAL func_nr,
          */
         return (PMC*)F2DPTR(func);
     }
-    f = pmc_new(interp, enum_class_CSub);
+    f = pmc_new(interp, enum_class_NCI);
     PMC_struct_val(f) = F2DPTR(func);
     return f;
 }
