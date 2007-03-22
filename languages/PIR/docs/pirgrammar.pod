@@ -53,14 +53,14 @@ PIR directives are:
 
 =head2 Registers
 
-PIR has two types of registers: real registers and symbolic or temporary registers.
-Real registers are actual registers in the Parrot VM, and are written like:
+PIR has two types of registers: real registers and symbolic or temporary (or
+I<virtual> if you like) registers.
+Real registers are actual registers in the Parrot VM. The symbolic, or temporary
+registers are mapped to those actual registers. Real registers are written like:
 
-  [S|N|I|P]n, where n is a number between 0 to, but not including, 100.
+  [S|N|I|P]n, where n is a positive integer.
 
-Symbolic, or temporary registers are written like:
-
-  $[S|N|I|P]n, where n is a positive integer.
+whereas symbolic registers have a B<$> prefix, like this: C<$P10>.
 
 Symbolic registers can be thought of local variable identifiers that don't need a declaration.
 This prevents you from writing C<.local> directives if you're in a hurry. Of course, it would
