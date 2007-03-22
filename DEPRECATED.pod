@@ -22,11 +22,6 @@ PGE::P6Regex is now a registered compiler, and should be used like so:
 
 This syntax is also true for PGE::Glob and PGE::P5Regex
 
-=item Namespace PMC C<name> method
-
-This method will be renamed to C<get_name> in the March 2007 release
-(0.4.10 or 0.5.0, whatever we decide to call it.)
-
 =back
 
 =head1 Deprecated ops
