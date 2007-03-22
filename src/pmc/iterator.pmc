@@ -89,14 +89,16 @@ Marks the current idx/key and the aggregate as live.
 
 =item C<PMC *clone()>
 
-Make a clone of the iterator that's reset to the beginning.
+Make a clone of the iterator.
 
 =cut
 
 */
 
     PMC* clone() {
-        return pmc_new_init(INTERP, SELF->vtable->base_type, PMC_pmc_val(SELF));
+        PMC * const key = PMC_struct_val(SELF);
+        PMC *res = pmc_new_init(INTERP, SELF->vtable->base_type, PMC_pmc_val(SELF));
+        PMC_struct_val(res) = VTABLE_clone(interp, key);
     }
 
 /*

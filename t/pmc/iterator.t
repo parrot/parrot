@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 43;
 
 =head1 NAME
 
@@ -1353,6 +1353,34 @@ pir_output_is( << 'CODE', << 'OUTPUT', "cloned iterator independent of original"
 
     shift temp, i2
     unless temp == 42 goto fail
+
+    say "ok"
+    end
+fail:
+    say "not ok"
+.end
+CODE
+ok
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "clone of partly-advanced iterator");
+.sub main :main
+    .local pmc ar, i1, i2
+    .local Integer temp
+    ar = new ResizableIntegerArray
+    push ar, 1
+    push ar, 2
+    new i1, .Iterator, ar
+
+    shift temp, i1
+    unless temp == 1 goto fail
+
+    clone i2, i1
+    shift temp, i1
+    unless temp == 2 goto fail
+
+    shift temp, i2
+    unless temp == 2 goto fail
 
     say "ok"
     end
