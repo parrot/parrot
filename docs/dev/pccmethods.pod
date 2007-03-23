@@ -1,0 +1,121 @@
+# Copyright (C) 2001-2007, The Perl Foundation.
+# $Id$
+
+=head1 NAME
+
+docs/dev/pccmethods.pod - PCCMETHOD and PCCINVOKE
+
+=head1 OVERVIEW
+
+A C<PCCMETHOD> is a method in a PMC that takes parameters using the Parrot
+Calling Conventions. By contrast, a standard C<METHOD> or a vtable method in
+a PMC uses the standard C calling conventions, which are somewhat more limited.
+
+C<PCCINVOKE> is used to call a method using the Parrot Calling Conventions.
+It uses the standard find_method/invoke approach that the callmethodcc opcode
+would.
+
+You can use C<PCCINVOKE> in any PMC method (including v-table methods), even
+if they are not C<PCCMETHOD>s. Usefully, you can call methods that are not
+implemented with C<PCCMETHOD> too.
+
+
+=head1 SYNTAX
+
+=head2 PCCMETHOD
+
+To declare that a method in a PMC should take arguments using the Parrot
+Calling Conventions, prefix its name with the keyword C<PCCMETHOD>. Where you
+would put the C parameter list, put a PCC parameter list. You should always
+use the void return type where you would write the C return type - the
+signature of the return is specified inside the method using C<PCCRETURN>.
+
+  PCCMETHOD void PlayRandomSong() {
+      ...
+  }
+
+  PCCMETHOD void PlaySong(STRING *artist, STRING *title) {
+      ...
+  }
+
+For full details of the parameter list syntax, see L<Parameter List Syntax>.
+
+
+=head2 PCCRETURN
+
+To return arguments using the Parrot Calling Conventions, which you should do
+if you have implemented a C<PCCMETHOD> (unless it returns no arguments, of
+course), use the C<PCCRETURN> keyword. This takes a signature as specified in
+the L<Parameter List Syntax> section.
+
+  PCCRETURN(PMC *status, INTVAL count);
+
+
+=head2 PCCINVOKE
+
+To call a method on an object using the Parrot Calling Conventions, use
+C<PCCINVOKE>. This takes 3 arguments, followed by the signature of the call
+and the arguments as specified in the L<Parameter List Syntax> section.
+
+=over 4
+
+=item The first argument is the current interpreter; use the INTERP macro in a
+PMC.
+
+=item The second argument is the object to call the method on.
+
+=item The third argument is the name of the method to call, between double
+quotes.
+
+=back
+
+Any return arguments appear, with the return signature, to the left of the
+call and in parentheses.
+
+For example:
+
+  PCCINVOKE(INTERP, monkey, "eat", PMC* banana);
+
+  (PMC *pooh) = PCCINVOKE(INTERP, monkey, "excrete");
+
+  (PMC *status, INTVAL count) = PCCINVOKE(INTERP, player, "PlaySong", artist, title);
+
+
+=head2 Parameter List Syntax
+
+The syntax for a PCC parameter list is a comma separated list of zero or more
+parameters. Each parameter takes the form:
+
+    { INTVAL | NUMVAL | STRING* | PMC* } NAME [ ADVERBS ]
+
+That is, a register type, followed by a name, optionally followed by one or
+more flags specified as adverbs. The list of supported adverbs is listed in
+L<PDD3>, the calling conventions design document.
+
+Note that in line with the Parrot code standards, you should write:
+
+  PMC *param :optional
+
+Instead of
+
+  PMC* param :optional
+
+
+=head1 OTHER CONSIDERATIONS
+
+=head2 Performance
+
+When a C<METHOD> or vtable method is called, C<NCI> is used to map the
+arguments held in the current Parrot_Context onto the C calling conventions.
+That is, you still end up involving the Parrot Calling Conventions anyway,
+so there is no reason to expect a C<PCCMETHOD> to be any slower. It may well
+be faster. It's probably best to just not care. :-)
+
+It is clearly true that C<PCCINVOKE> is going to be more costly than an
+invocation of a C method from another C method, if you do the call directly at
+the C level. However, if you do that you are ignoring any method overrides if
+you have been subclassed, and you wouldn't want to do that now, would you?
+
+
+# vim: expandtab shiftwidth=2 tw=70:
+
