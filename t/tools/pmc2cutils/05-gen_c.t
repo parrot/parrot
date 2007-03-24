@@ -274,7 +274,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     ok( chdir $cwd, "changed back to original directory" );
 }
 
-# @args holds default.pmc and one metaclass.pmc
+# @args holds default.pmc and one class.pmc
 {
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
@@ -285,7 +285,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 
     my @pmcfiles = (
         "$main::topdir/src/pmc/default.pmc",
-        "$main::topdir/src/pmc/metaclass.pmc",
+        "$main::topdir/src/pmc/class.pmc",
     );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
@@ -297,7 +297,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     is( $copycount, $pmcfilecount, "all src/pmc/*.pmc files copied to tempdir" );
     my @include = ( $tdir, $temppmcdir, @include_orig );
 
-    @args = ( qq{$temppmcdir/default.pmc}, qq{$temppmcdir/metaclass.pmc}, );
+    @args = ( qq{$temppmcdir/default.pmc}, qq{$temppmcdir/class.pmc}, );
     $self = Parrot::Pmc2c::Utils->new(
         {
             include => \@include,
@@ -311,10 +311,10 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 
     ok( $self->dump_pmc(),               "dump_pmc succeeded" );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
-    ok( -f qq{$temppmcdir/metaclass.dump},   "metaclass.dump created as expected" );
+    ok( -f qq{$temppmcdir/class.dump},   "class.dump created as expected" );
 
     $rv = $self->gen_c();
-    ok( $rv, "gen_c completed successfully; args:  default.pmc and metaclass.pmc" );
+    ok( $rv, "gen_c completed successfully; args:  default.pmc and class.pmc" );
 
     ok( chdir $cwd, "changed back to original directory" );
 }

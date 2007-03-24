@@ -25,7 +25,7 @@ Tests role composition in the OO implementation.
 pir_output_is( <<'CODE', <<'OUT', 'role with no methods' );
 .sub 'test' :main
     $P0 = new Role
-    $P1 = new MetaClass
+    $P1 = new Class
     
     $P1.'add_role'($P0)
     print "ok 1 - added role\n"
@@ -49,7 +49,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'role with one method, no methods in class' );
 .sub 'test' :main
     $P0 = new Role
-    $P1 = new MetaClass
+    $P1 = new Class
 
     $P2 = find_global "badger"
     $P0.'add_method'("badger", $P2)
@@ -88,7 +88,7 @@ pir_output_is( <<'CODE', <<'OUT', 'two roles and a class, a method each, no conf
 .sub 'test' :main
     $P0 = new Role
     $P1 = new Role
-    $P2 = new MetaClass
+    $P2 = new Class
 
     $P3 = find_global "snake"
     $P2.'add_method'("snake", $P3)
@@ -143,7 +143,7 @@ pir_output_is( <<'CODE', <<'OUT', 'two roles that conflict' );
 .sub 'test' :main
     $P0 = new Role
     $P1 = new Role
-    $P2 = new MetaClass
+    $P2 = new Class
 
     $P3 = find_global "badger"
     $P0.'add_method'("badger", $P3)
@@ -174,7 +174,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'role that conflicts with a class method' );
 .sub 'test' :main
     $P0 = new Role
-    $P1 = new MetaClass
+    $P1 = new Class
 
     $P2 = find_global "badger"
     $P1.'add_method'("badger", $P2)
@@ -204,7 +204,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by exclusion' );
 .sub 'test' :main
     $P0 = new Role
-    $P1 = new MetaClass
+    $P1 = new Class
 
     $P2 = find_global "badger"
     $P1.'add_method'("badger", $P2)
@@ -248,7 +248,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by aliasing' );
 .sub 'test' :main
     $P0 = new Role
-    $P1 = new MetaClass
+    $P1 = new Class
 
     $P2 = find_global "badger"
     $P1.'add_method'("badger", $P2)

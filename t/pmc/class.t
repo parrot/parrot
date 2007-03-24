@@ -10,36 +10,33 @@ use Parrot::Test tests => 9;
 
 =head1 NAME
 
-t/pmc/metaclass.t - test the MetaClass PMC
+t/pmc/class.t - test the Class PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/metaclass.t
+    % prove t/pmc/class.t
 
 =head1 DESCRIPTION
 
-Tests the MetaClass PMC.
+Tests the Class PMC.
 
 =cut
-
-## TODO PDD says 'Class', impl says 'MetaClass'
-## i'm testing the impl, cause that's more fun
 
 # L<PDD15/Class PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new $P0, .MetaClass
-    say 'ok 1 - $P0 = new .MetaClass'
+    new $P0, .Class
+    say 'ok 1 - $P0 = new .Class'
 
-    $I0 = isa $P0, 'MetaClass'
+    $I0 = isa $P0, 'Class'
     if $I0 goto ok_2
     print 'not '
   ok_2:
-    say "ok 2 - isa $P0, 'MetaClass'"
+    say "ok 2 - isa $P0, 'Class'"
 .end
 CODE
-ok 1 - $P0 = new .MetaClass
-ok 2 - isa $P0, 'MetaClass'
+ok 1 - $P0 = new .Class
+ok 2 - isa $P0, 'Class'
 OUT
 
 # L<PDD15/Class PMC API/'Class PMCs also have the "I am a class" flag set on them.'>
@@ -49,7 +46,7 @@ pir_output_is( <<'CODE', <<'OUT', 'Class PMC has "I am a class" flag set' );
 .sub 'test' :main
     .const int POBJ_IS_CLASS_FLAG = 536870912  # 1 << 29
 
-    new $P0, .MetaClass
+    new $P0, .Class
     $I0 = pmcinfo $P0, .PMCINFO_FLAGS          # XXX op currently experimental
     $I99 = $I0 & POBJ_IS_CLASS_FLAG
     if $I99 goto ok_1
@@ -64,7 +61,7 @@ OUT
 # L<PDD15/Class PMC API/=item name>
 pir_output_is( <<'CODE', <<'OUT', 'name' );
 .sub 'test' :main
-    new $P0, .MetaClass
+    new $P0, .Class
     $P1 = $P0.'name'()
     if $P1 == '' goto ok_1
     print 'not '
@@ -96,7 +93,7 @@ OUT
 # L<PDD15/Class PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new $P0, .MetaClass
+    new $P0, .Class
     $P1 = $P0.'new'()
     $I0 = isa $P1, 'Object'
     if $I0 goto ok_1
@@ -121,7 +118,7 @@ OUT
 # L<PDD15/Class PMC API/=item attributes>
 pir_output_is( <<'CODE', <<'OUT', 'attributes' );
 .sub 'test' :main
-    new $P0, .MetaClass
+    new $P0, .Class
     $P1 = $P0.'attributes'()
     $I0 = isa $P1, 'Hash'
     if $I0 goto ok_1
@@ -154,7 +151,7 @@ OUT
 # L<PDD15/Class PMC API/=item add_attribute>
 pir_output_is( <<'CODE', <<'OUT', 'add_attribute');
 .sub 'test' :main
-    new $P0, .MetaClass
+    new $P0, .Class
 
     push_eh ok_1
     $P0.'add_attribute'()
@@ -200,7 +197,7 @@ OUT
 # L<PDD15/Class PMC API>
 pir_output_is( <<'CODE', <<'OUT', 'set_attr/get_attr VTABLE methods' );
 .sub 'test' :main
-    new $P0, .MetaClass
+    new $P0, .Class
     $P0.'name'("Test")
     $P0.'add_attribute'("foo")
     say 'ok 1 - created a class with two attributes'
@@ -229,7 +226,7 @@ OUT
 # L<PDD15/Class PMC API/=item parents>
 pir_output_is( <<'CODE', <<'OUT', 'parents' );
 .sub 'test' :main
-    new $P0, .MetaClass
+    new $P0, .Class
     $P1 = $P0.'parents'()
     $I0 = isa $P1, 'ResizablePMCArray'  ## XXX really?
     if $I0 goto ok_1
@@ -248,7 +245,7 @@ OUT
 # L<PDD15/Class PMC API/=item roles>
 pir_output_is( <<'CODE', <<'OUT', 'roles' );
 .sub 'test' :main
-    new $P0, .MetaClass
+    new $P0, .Class
     $P1 = $P0.'roles'()
     $I0 = isa $P1, 'ResizablePMCArray'  ## XXX really?
     if $I0 goto ok_1
