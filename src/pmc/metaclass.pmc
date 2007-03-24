@@ -438,7 +438,7 @@ Adds the given sub PMC as a method with the given name.
         if (VTABLE_exists_keyed_str(interp, class->methods, name)) {
             /* XXX Need to handle multi methods here. */
             real_exception(interp, NULL, E_NotImplementedError,
-                "Currently, adding multiple methods of the same name is not supported.");
+                "A method of this name already exists. It may have been supplied by a role.");
         }
         else {
             /* Enter it into the table. */
@@ -459,6 +459,121 @@ Return the roles array PMC.
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *ret_roles = VTABLE_clone(interp, class->roles);
         PCCRETURN(PMC *ret_roles);
+    }
+
+/*
+
+=item C<void add_role(PMC* role, PMC* without :optional :named["without"], PMC* alias :optional :named["alias"])>
+
+Compose a role into a class with the given exclusions and aliases.
+
+=cut
+
+*/
+    PCCMETHOD void add_role(PMC* role, PMC* without :optional :named["without"], int got_without :opt_flag, PMC* alias :optional :named["alias"], int got_alias :opt_flag) {
+        Parrot_MetaClass *class = PARROT_METACLASS(SELF);
+        PMC *methods;
+        PMC *methods_iter;
+        PMC *proposed_add_methods;
+        int i, roles_count;
+
+        /* Check we have not already composed the role; if so, just ignore it. */
+        roles_count = VTABLE_elements(interp, class->roles);
+        for (i = 0; i < roles_count; i++) {
+            if (VTABLE_get_pmc_keyed_int(interp, class->roles, i) == role)
+                return;
+        }
+        
+        /* Get the methods from the role. */
+        (PMC *methods) = PCCINVOKE(interp, role, "methods");
+        if (PMC_IS_NULL(methods))
+            return;
+
+        /* We need to check for conflicts before we do the composition. We
+         * put each method that would be OK to add into a proposal list, and
+         * bail out right away if we find a problem. */
+        proposed_add_methods = pmc_new(interp, enum_class_Hash);
+        methods_iter = VTABLE_get_iter(interp, methods);
+        while (VTABLE_get_bool(interp, methods_iter)) {
+            /* Get current method and its name. */
+            PMC *method_name_pmc = VTABLE_shift_pmc(interp, methods_iter);
+            STRING *method_name = VTABLE_get_string(interp, method_name_pmc);
+            PMC *cur_method = VTABLE_get_pmc_keyed(interp, methods, method_name_pmc);
+
+            /* Need to find the name we'll check for a conflict on. */
+            STRING *check_name = method_name;
+            
+            /* Ignore if it's in the exclude list. */
+            if (got_without) {
+                int without_count = VTABLE_elements(interp, without);
+                for (i = 0; i < without_count; i++) {
+                    STRING *check = VTABLE_get_string_keyed_int(interp, without, i);
+                    if (string_equal(interp, check, method_name) == 0) {
+                        check_name = NULL;
+                        break;
+                    }
+                }
+            }
+
+            /* If we're not in the exclude list, now see if we've an alias. */
+            if (check_name != NULL && got_alias) {
+                if (VTABLE_exists_keyed_str(interp, alias, method_name))
+                    check_name = VTABLE_get_string_keyed_str(interp, alias, method_name);
+            }
+
+            /* If we weren't excluded... */
+            if (check_name != NULL) {
+                /* Is there a method with this name already in the class?
+                 * XXX TODO: multi-method handling. */
+                if (VTABLE_exists_keyed_str(interp, class->methods, check_name)) {
+                    /* Conflicts with something already in the class. */
+                    if (check_name == method_name)
+                        real_exception(interp, NULL, ROLE_COMPOSITOIN_METH_CONFLICT,
+                            "A conflict occurred during role composition due to method '%S'.",
+                            method_name);
+                    else
+                        real_exception(interp, NULL, ROLE_COMPOSITOIN_METH_CONFLICT,
+                            "A conflict occurred during role composition due to the aliasing of '%S' to '%S'.",
+                            method_name, check_name);
+                    return;
+                }
+
+                /* What about a conflict with ourslef? */
+                if (VTABLE_exists_keyed_str(interp, proposed_add_methods, check_name)) {
+                    /* If it's due to aliasing, say so. Otherwise, something
+                     * very weird is going on. */
+                    if (check_name != method_name)
+                        real_exception(interp, NULL, ROLE_COMPOSITOIN_METH_CONFLICT,
+                            "A conflict occurred during role composition; '%S' was aliased to '%S', but the role already has a '%S'.",
+                            method_name, check_name, check_name);
+                    else
+                        real_exception(interp, NULL, ROLE_COMPOSITOIN_METH_CONFLICT,
+                            "A conflict occurred during role composition; the method '%S' from the role managed to conflict with itself somehow.",
+                            method_name);
+                    return;
+                }
+
+                /* If we got here, no conflicts! Add it to the "to compose" list. */
+                VTABLE_set_pmc_keyed_str(interp, proposed_add_methods, check_name, cur_method);
+            }
+        }
+
+        /* If we get here, we detected no conflicts. Go ahead and compose the methods. */
+        methods_iter = VTABLE_get_iter(interp, proposed_add_methods);
+        while (VTABLE_get_bool(interp, methods_iter)) {
+            /* Get current method and its name. */
+            PMC *method_name_pmc = VTABLE_shift_pmc(interp, methods_iter);
+            STRING *method_name = VTABLE_get_string(interp, method_name_pmc);
+            PMC *cur_method = VTABLE_get_pmc_keyed(interp, proposed_add_methods,
+                method_name_pmc);
+
+            /* Add it to the methods of the class. */
+            VTABLE_set_pmc_keyed_str(interp, class->methods, method_name,
+                cur_method);
+        }
+
+        /* Add this role to the roles list. */
+        VTABLE_push_pmc(interp, class->roles, role);
     }
 
 /*

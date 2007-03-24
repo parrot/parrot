@@ -131,7 +131,8 @@ typedef enum {
         NOSPAWN,
         INTERNAL_NOT_IMPLEMENTED,
         ERR_OVERFLOW,
-        LOSSY_CONVERSION
+        LOSSY_CONVERSION,
+        ROLE_COMPOSITOIN_METH_CONFLICT
 } exception_type_enum;
 
 /* &end_gen */
