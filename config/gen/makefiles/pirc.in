@@ -16,12 +16,12 @@ CC_INC     = @cc_inc@
 C_LIBS     = @libs@
 CC_SHARED  = @cc_shared@
 CFLAGS     = $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ $(CC_SHARED)
-#LINK_DYNAMIC  = @link_dynamic@
-#LINK       = @link@
-#LINKFLAGS  = @linkflags@ @link_debug@ @ld_debug@
-#LD         = @ld@
-#LDFLAGS    = @ldflags@ @ld_debug@
-#
+LINK_DYNAMIC  = @link_dynamic@
+LINK       = @link@
+LINKFLAGS  = @linkflags@ @link_debug@ @ld_debug@
+LD         = @ld@
+LDFLAGS    = @ldflags@ @ld_debug@
+
 
 
 # the default target
@@ -37,7 +37,7 @@ SOURCES = src/pirmain.c \
 
 
 pirc: pirmain$(O) pirparser$(O) pirlexer$(O) 
-	$(CC) pirmain$(O) pirparser$(O) pirlexer$(O)
+	$(CC) -o pirc$(EXE) pirmain$(O) pirparser$(O) pirlexer$(O)
 
 pirmain$(O): src/pirmain.c src/pirparser.h
 	$(CC) $(CFLAGS) -c src/pirmain.c
