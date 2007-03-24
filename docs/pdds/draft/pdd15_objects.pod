@@ -145,6 +145,7 @@ multiple inheritance it must not emit code which would add multiple parents to
 a class. (Parrot may, at some point, allow imposition of runtime restrictions
 on a class, but currently it doesn't)
 
+
 =head2 Class PMC API
 
 There are two PMC classes, C<Class> and C<Object>.  Class PMCs hold all
@@ -271,13 +272,21 @@ slurpy, named list of attributes and values to initialize the object.
 =item attributes
 
 An accessor for the attributes of the class. It returns the a Hash of
-all attributes, with a key of the attribute name, and a value of the
-Attribute object. The accessor is read-only.
+all attributes, with a key of the attribute name and a value of a Hash
+containing the attribute's metadata. The accessor is read-only.
 
 =item add_attribute
 
-Adds a single attribute to the class. It takes a simple string name, and
-a simple string value for type.
+Adds a single attribute to the class. It takes a simple string name and,
+optionally, a simple string value for type. {{ Conjectural: Actually, the
+simple string value alone won't cut it. We need to take a key there too? }}
+
+=item methods
+
+An accessor for the methods of the class. It returns a Hash of all methods,
+with a key of the method name and a value of an invokable PMC. Note that the
+methods list includes any methods that were composed into the class from
+roles.
 
 =item parents
 
@@ -286,7 +295,7 @@ parents. The accessor is read-only.
 
 =item add_parent
 
-Adds a single parent to the class. It takes a simple string name.
+Adds a single parent to the class. It takes an instance of the Class PMC.
 
 =item roles
 
@@ -295,7 +304,9 @@ roles. The accessor is read-only.
 
 =item add_role
 
-Adds a single role to the class. It takes a simple string name.
+Adds a single role to the class. It takes an instance of the Role PMC as a
+required positional parameter, and the optional named parameters C<without>
+and C<alias>; see L<Role Conflict Resolution> for more details.
 
 =back
 
@@ -326,6 +337,7 @@ to that namespace object.
 A class can be garbage collected when it has no instantiatated objects
 and no Namespace object referencing it. When a class is garbage
 collected, it should remove itself from the registry.
+
 
 =head2 Object PMC API
 
@@ -372,15 +384,17 @@ it exists) is stored in the LexPad or Namespace entry for a particular
 variable.
 
 In a static language like C#.Net:
-B isa A
-A o1 = new B();
-B o2 = new B();
 
-o1.x; # retrieves A's attribute
-o2.x; # retrieves B's attribute
+  B isa A
+  A o1 = new B();
+  B o2 = new B();
+  
+  o1.x; # retrieves A's attribute
+  o2.x; # retrieves B's attribute
 
-o1.foo(); # call's B's method
-o2.foo(); # call's B's method
+  o1.foo(); # call's B's method
+  o2.foo(); # call's B's method
+
 
 =head2 Role PMC API
 
@@ -616,6 +630,45 @@ forward compatibility, generally good things. It also allows for multiple
 concurrent interoperable object systems. The major thrust is for transparent
 use of objects, though most class activity (including creation of subclasses
 and modifications of existing classes) should be transparent as well.
+
+
+=head2 Role Conflict Resolution
+
+{{ Conjectural:
+
+When a role is added to a class, we try to compose it right away, and flag up
+any conflicts that are detected. A conflict occurs if two roles try to supply
+a method of the same name (but see the note on multi-methods below). High
+level languaes will provide varying facilities to deal with this, and Parrot
+provides the primitives to implement them.
+
+When adding a role to a class, you can optionally supply an array of method
+names from the role to exclude from the composition process. This is done
+using the named parameter C<without>. It is not an error to list a method name
+in this array that the role does not have. This makes it possible to implement
+languages that provide for explicit exclusions on a role-by-role basis as well
+as Perl 6, which can supply an array of all method names in the class (since
+writing a method in the class resolves any conflicts between methods of the
+same name from roles, and automatically overrides it).
+
+The second primitive is aliasing. When adding a role to a class, the optional
+C<alias> named parameter can be supplied, with a value of a hash of strings to
+strings. The key of this hash is a method name in the role, and the value is
+the name we should give it when we compose it in to the class. This will allow
+Parrot to support languages that allow resolution of conflicts in this form.
+
+It is fine to use both C<without> and C<alias> with a single role. However,
+placing a method name in the exclude list and also aliasing it has undefined
+behaviour.
+
+If a method in a role is a MultiSub PMC and there is either no method of that
+name yet OR what is in the method slot with that name is also a MultiSub PMC,
+there will be no error. Instead, the multi-methods from the role will be added
+to the multi-methods of the MultiSub PMC already in the class. Any attempt to
+combine a multi with a non-multi will result in an error.
+
+}}
+
 
 =head1 EXAMPLES
 
