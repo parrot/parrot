@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 # POD
 
@@ -18,7 +18,6 @@ pir_output_is( <<'CODE', <<'OUT', "simple pod" );
 .end
 =head1 Some POD
 This should be ignored, incl. digit 1
-=cut
 CODE
 pass
 OUT
@@ -52,6 +51,33 @@ CODE
 pass
 ok
 OUT
+
+open FOO, ">", "include.tempfile";
+print FOO <<'ENDF';
+
+=head1 Foobar
+
+we don't cut out!!!
+
+ENDF
+close FOO;  
+
+SKIP: {
+       skip("Closing out of pod from included files", 1);
+pir_output_is( <<'CODE', <<'OUT', "simple pod" );
+.include "include.tempfile"
+.sub test :main
+    print "pass\n"
+    end
+.end
+CODE
+pass
+OUT
+}
+
+unlink("macro.tempfile");
+
+
 
 # Local Variables:
 #   mode: cperl

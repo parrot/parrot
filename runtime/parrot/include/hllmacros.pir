@@ -106,6 +106,17 @@ Runs the code in C<code> once, and then as long as C<conditional> is true.
     if .conditional goto .$beginwhile
 .endm
 
+=item C<.Loop(code)>
+
+Runs the code in C<code> forever.
+
+=cut
+
+.macro Loop(code)
+.local $beginloop:
+    .code
+    goto .$beginloop
+.endm
 
 =item C<.For(start, conditional, continue, code)>
 
@@ -230,6 +241,8 @@ The .Foreach macro is not nestable within itself currently.  You can use other m
     })
 
 Will not run as you would expect.
+
+=cut
 
 # Local Variables:
 #   mode: pir
