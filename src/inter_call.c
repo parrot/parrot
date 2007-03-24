@@ -1311,7 +1311,7 @@ invokes a PMC method
 void
 Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *signature, ... )
 {
-    const int PCC_ARG_MAX = 1024;
+#define PCC_ARG_MAX 1024
     /* variables from PCCINVOKE impl in PCCMETHOD.pm */
     INTVAL n_regs_used[] = { 0, 0, 0, 0 }; /* INSP */
     opcode_t arg_indexes[PCC_ARG_MAX];
@@ -1321,6 +1321,10 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
     PMC* ret_cont = new_ret_continuation_pmc(interp, NULL);
     parrot_context_t *ctx;
     PMC* pccinvoke_meth;
+    
+    opcode_t* save_current_args;
+    PMC* save_args_signature;
+    PMC* save_current_object;
 
     /* temporary state vars for building PCC index and PCC signature arrays. */
     opcode_t *indexes[2] = { arg_indexes, result_indexes };
@@ -1442,9 +1446,9 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
     }
     
     /* code from PCCINVOKE impl in PCCMETHOD.pm */
-    opcode_t* save_current_args = interp->current_args;
-    PMC* save_args_signature = interp->args_signature;
-    PMC* save_current_object = interp->current_object;
+    save_current_args = interp->current_args;
+    save_args_signature = interp->args_signature;
+    save_current_object = interp->current_object;
 
     interp->current_args = arg_indexes;
     interp->args_signature = args_sig;
