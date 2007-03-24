@@ -129,7 +129,7 @@ of MetaAttribute, describing the attribute.
     PCCMETHOD void attributes() {
         Parrot_Role *role = PARROT_ROLE(SELF);
         PMC *ret_attrib_metadata = VTABLE_clone(interp, role->attrib_metadata);
-        preturn(PMC *ret_attrib_metadata);
+        PCCRETURN(PMC *ret_attrib_metadata);
     }
 
 
@@ -175,7 +175,7 @@ Sets the name of the role.
         }
 
         ret_name = role->name;
-        preturn(STRING *ret_name);
+        PCCRETURN(STRING *ret_name);
     }
 
 /*
@@ -217,7 +217,7 @@ specified will be linked to this role.
         }
 
         ret_namespace = role->namespace;
-        preturn(PMC *ret_namespace);
+        PCCRETURN(PMC *ret_namespace);
     }
 
 /*
@@ -232,7 +232,7 @@ Return the roles array PMC.
     PCCMETHOD void roles() {
         Parrot_Role *role = PARROT_ROLE(SELF);
         PMC *ret_roles = VTABLE_clone(interp, role->roles);
-        preturn(PMC *ret_roles);
+        PCCRETURN(PMC *ret_roles);
     }
 
 /*

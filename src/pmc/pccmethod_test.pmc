@@ -66,7 +66,7 @@ Marks the hash as live.
         PIO_printf(interp, "test_method2\n");
         PIO_printf(interp, "%d, %d, %Ss %Ss\n", a1, a1o, VTABLE_name(interp, slurpy_pos), VTABLE_get_repr(interp,slurpy_pos));
 
-        preturn(int 1000, STRING* kevin);
+        PCCRETURN(int 1000, STRING* kevin);
     }
     PCCMETHOD void test_method3(PMC* a1 :named["a1name"], PMC* a2  :named["a2name"])
     {

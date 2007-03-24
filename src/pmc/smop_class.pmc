@@ -145,7 +145,7 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
         (STRING* name) = PCCINVOKE(interp, SELF, "name");
         type_id = pmc_type(interp, name);
         obj = pmc_new_init(interp,type_id, args);
-        preturn(PMC *obj)
+        PCCRETURN(PMC *obj)
     }
 
     PCCMETHOD void attributes(PMC *attribs :optional, int got_attribs :opt_flag) {
@@ -163,7 +163,7 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
             }
         }
         rv = VTABLE_get_attr_str(interp, pmc, attributes_string);
-        preturn(PMC *rv)
+        PCCRETURN(PMC *rv)
     }
 
     PCCMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {

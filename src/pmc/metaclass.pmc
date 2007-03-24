@@ -227,7 +227,7 @@ of MetaAttribute, describing the attribute.
     PCCMETHOD void attributes() {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *ret_attrib_metadata = VTABLE_clone(interp, class->attrib_metadata);
-        preturn(PMC *ret_attrib_metadata);
+        PCCRETURN(PMC *ret_attrib_metadata);
     }
 
 
@@ -287,7 +287,7 @@ Sets the name of the class.
         }
 
         ret_name = class->name;
-        preturn(STRING *ret_name);
+        PCCRETURN(STRING *ret_name);
     }
 
 /*
@@ -329,7 +329,7 @@ specified will be linked to this class.
         }
 
         ret_namespace = class->namespace;
-        preturn(PMC *ret_namespace);
+        PCCRETURN(PMC *ret_namespace);
     }
 
 /*
@@ -371,7 +371,7 @@ Creates an instance of the object.
 
         /* XXX Call constructor with the supplied arguments? */
 
-        preturn(PMC *obj)
+        PCCRETURN(PMC *obj)
      }
 
 
@@ -387,7 +387,7 @@ Return the parents array PMC.
     PCCMETHOD void parents() {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *ret_parents = VTABLE_clone(interp, class->parents);
-        preturn(PMC *ret_parents);
+        PCCRETURN(PMC *ret_parents);
     }
 
 /*
@@ -458,7 +458,7 @@ Return the roles array PMC.
     PCCMETHOD void roles() {
         Parrot_MetaClass *class = PARROT_METACLASS(SELF);
         PMC *ret_roles = VTABLE_clone(interp, class->roles);
-        preturn(PMC *ret_roles);
+        PCCRETURN(PMC *ret_roles);
     }
 
 /*
@@ -508,7 +508,7 @@ will be useless anyway, since only the Object knows what to do with it.
             }
         }
 
-        preturn(int index);
+        PCCRETURN(int index);
     }
 
 /*
@@ -539,7 +539,7 @@ This method is intended to be used by the Object PMC.
             }
         }
 
-        preturn(PMC *found);
+        PCCRETURN(PMC *found);
     }
 
 

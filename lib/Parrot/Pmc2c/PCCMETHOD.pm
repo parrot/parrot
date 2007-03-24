@@ -205,25 +205,25 @@ sub gen_arg_accessor {
     }
 }
 
-=head3 C<rewrite_preturns($method, $body)>
+=head3 C<rewrite_PCCRETURNs($method, $body)>
 
-Rewrites the method body performing the various macro substitutions for preturns.
+Rewrites the method body performing the various macro substitutions for PCCRETURNs.
 
 =cut
 
-sub rewrite_preturns {
+sub rewrite_PCCRETURNs {
     my ( $self, $body ) = @_;
     my $method_name = $self->{meth};
     my $regs_used = [];
     my $signature_re = qr{
-      (preturn         #method name
+      (PCCRETURN         #method name
       \s*              #optional whitespace
       \( ([^\(]*) \)   #returns ( stuff ... )
       ;?)              #optional semicolon
     }sx;
 
     if ( $body and $body =~ m/\breturn\b/ ) {
-        croak "return not allowed in pccmethods, use preturn instead";
+        croak "return not allowed in pccmethods, use PCCRETURN instead";
     }
 
     while ( $$body and $$body =~ m/$signature_re/ ) {
@@ -355,7 +355,7 @@ sub rewrite_pccmethod {
     my ( $params_n_regs_used, $params_indexes, $params_flags, $params_accessors, $named_names ) =
     process_pccmethod_args( $linear_args, 'arg' );
 
-    my $n_regs  = rewrite_preturns( $self, \$self->{body} );
+    my $n_regs  = rewrite_PCCRETURNs( $self, \$self->{body} );
     rewrite_pccinvoke( $self->{meth}, \$self->{body} );
     unshift @$n_regs, $params_n_regs_used;
     my $n_regs_used = find_max_regs($n_regs);

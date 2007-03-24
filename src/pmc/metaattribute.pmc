@@ -126,7 +126,7 @@ Name attribute accessor/mutator.
         }
 
         name_attr = attr->name;
-        preturn(STRING *name_attr);
+        PCCRETURN(STRING *name_attr);
     }
 
 /*
@@ -147,7 +147,7 @@ Type attribute accessor.
         }
 
         type_string = attr->type;
-        preturn(STRING *type_string);
+        PCCRETURN(STRING *type_string);
     }
 }
 

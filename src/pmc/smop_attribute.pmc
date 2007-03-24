@@ -94,7 +94,7 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
             SMOP_attr(SELF)->name = VTABLE_get_string(interp, name);
         }
         name_attr = SMOP_attr(SELF)->name;
-        preturn( STRING *name_attr );
+        PCCRETURN( STRING *name_attr );
     }
 /*
 
@@ -111,7 +111,7 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
             SMOP_attr(SELF)->class_ = class;
         }
         class_attr = SMOP_attr(SELF)->class_;
-        preturn( PMC *class_attr );
+        PCCRETURN( PMC *class_attr );
     }
 /*
 
@@ -128,7 +128,7 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
             SMOP_attr(SELF)->type_ = VTABLE_get_string(interp, type);
         }
         type_string = SMOP_attr(SELF)->type_;
-        preturn( STRING *type_string );
+        PCCRETURN( STRING *type_string );
     }
 }
 
