@@ -79,6 +79,7 @@ sub makefiles {
     genfile( 'config/gen/makefiles/tge.in'       => 'compilers/tge/Makefile' );
     genfile( 'config/gen/makefiles/bcg.in'       => 'compilers/bcg/Makefile' );
     genfile( 'config/gen/makefiles/json.in'      => 'compilers/json/Makefile' );
+    genfile( 'config/gen/makefiles/pirc.in'      => 'compilers/pirc/Makefile' );
     genfile( 'config/gen/makefiles/dynpmc.in'    => 'src/dynpmc/Makefile' );
     genfile( 'config/gen/makefiles/dynoplibs.in' => 'src/dynoplibs/Makefile' );
     genfile( 'config/gen/makefiles/editor.in'    => 'editor/Makefile' );
