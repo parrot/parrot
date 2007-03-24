@@ -1,0 +1,188 @@
+/*
+Copyright (C) 2007, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/exporter.pmc - Export globals from one namespace to another
+
+=head1 DESCRIPTION
+
+Exports globals from one namespace to another
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#define PARROT_EXPORTER(e) ((Parrot_Exporter *) PMC_data(e))
+
+typedef struct Parrot_Exporter {
+    PMC *ns_src;         /* The source NameSpace PMC */
+    PMC *ns_dest;        /* The destination NameSpace PMC */
+    PMC *globals;        /* The globals to export - a ResizableStringArray */
+} Parrot_Exporter;
+
+
+pmclass Exporter
+    need_ext {
+
+
+/*
+
+=item C<void init()>
+
+Instantiates an Exporter.
+
+=cut
+
+*/
+
+    void init() {
+        Parrot_Exporter *exp = NULL;
+
+        /* Custom DOD mark and destory. */
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+
+        /* Set up the object. */
+        exp = mem_sys_allocate_zeroed(sizeof(Parrot_Exporter));
+        exp->ns_src  = pmc_new(interp, enum_class_NameSpace);
+        exp->ns_dest = pmc_new(interp, enum_class_NameSpace);
+        exp->globals = pmc_new(interp, enum_class_ResizableStringArray);
+        PMC_data(SELF) = exp;
+    }
+
+
+/*
+
+=item C<void src(PMC *)>
+
+Return the C<globals> array.
+
+=cut
+
+*/
+
+    PCCMETHOD void src(PMC *src :optional, int got_src :opt_flag) {
+        Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
+        PMC *ret_ns_src;
+
+        /* TODO deal with non-namespace pmcs */
+        if (got_src) {
+            exp->ns_src = VTABLE_clone(interp, src);
+        }
+        else {
+            ret_ns_src = VTABLE_clone(interp, exp->ns_src);
+            PCCRETURN(PMC *ret_ns_src);
+        }
+    }
+
+
+/*
+
+=item C<PMC *globals(void)>
+
+Return the C<globals> array.
+
+=cut
+
+*/
+
+    PCCMETHOD void globals() {
+        Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
+        PMC *ret_globals = VTABLE_clone(interp, exp->globals);
+        PCCRETURN(PMC *ret_globals);
+    }
+
+
+/*
+
+=item C<void add_global(PMC *global)>
+
+Add C<global> to the array of globals.
+
+=cut
+
+*/
+
+    void add_global(PMC *global) {
+        Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
+        PMC *globals = exp->globals;
+    }
+
+
+/*
+
+=item C<PMC *import(PMC *dest, PMC *src, PMC *globals)>
+
+Import C<globals> from the C<src> namespace to the C<dest> namespace.
+
+=cut
+
+*/
+
+    PMC *import(PMC *dest, PMC *src, PMC *globals) {
+        Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
+        /*  */
+        return PMCNULL;
+    }
+
+/*
+
+=item C<void destory()>
+
+Free the object's underlying struct.
+
+=cut
+
+*/
+    void destroy() {
+            mem_sys_free(PMC_data(SELF));
+    }
+
+
+/*
+
+=item C<void mark()>
+
+Mark any referenced strings and PMCs.
+
+=cut
+
+*/
+    void mark() {
+        Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
+        if (exp->ns_src)
+            pobject_lives(interp, (PObj*)exp->ns_src);
+        if (exp->ns_dest)
+            pobject_lives(interp, (PObj*)exp->ns_dest);
+        if (exp->globals)
+            pobject_lives(interp, (PObj*)exp->globals);
+    }
+
+
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd17_basic_types.pod>.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
