@@ -18,5 +18,9 @@ extern void exit_parser(struct parser_state *p);
 /* get number of parse errors */
 extern int get_parse_errors(struct parser_state *p);
 
+extern struct lexer_state const *get_lexer(struct parser_state *p);
+
+extern token get_token(struct parser_state *p);
+
 #endif
 

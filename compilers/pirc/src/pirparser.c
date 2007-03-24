@@ -1,6 +1,8 @@
 #include "pirlexer.h"
 #include "pirparser.h"
 
+#include "pirout.h" /* for test output */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -27,8 +29,8 @@ typedef struct parser_state {
 
 
 
-/* call next() to get the next token from the lexer */
-#define next(P) P->curtoken = next_token(P->lexer)
+/* call next() to get the next token from the lexer */ /* NOTE: it's calling pirout() */
+#define next(P) do { pirout(P); P->curtoken = next_token(P->lexer); } while(0)
 
 /* prototypes */
 static void target(parser_state *p);
@@ -92,7 +94,7 @@ syntax_error(parser_state *p, int numargs, ...) {
  */
 static void
 match(parser_state *p, token expected) {
-    if (p->curtoken == expected) { /* if all is fine, get next token */
+    if (p->curtoken == expected) { /* if all is fine, get next token */                       
         next(p);
     }
     else {
@@ -100,9 +102,8 @@ match(parser_state *p, token expected) {
             syntax_error(p, 3 , "expected ", find_keyword(expected), " but got end of file");
             exit_parser(p);     /* no use to continue when having read end of file */
         }
-        else { /* 'normal' error; not end of file yet */
-            char *curtoken = get_current_token(p->lexer);
-            syntax_error(p, 5, "expected ", find_keyword(expected), " but got '", curtoken, "'");
+        else { /* 'normal' error; not end of file yet */            
+            syntax_error(p, 4, "expected ", find_keyword(expected), " but got: ", find_keyword(p->curtoken));
 
             /* Try to reduce errors; skip tokens up to ".end" and
              * try to continue with the next subroutine, if any
@@ -121,6 +122,14 @@ match(parser_state *p, token expected) {
 }
 
 
+struct lexer_state const *
+get_lexer(parser_state *p) {
+    return p->lexer;
+}
+
+token get_token(parser_state *p) {
+    return p->curtoken;   
+}
 
 
 
@@ -1083,7 +1092,7 @@ emit_block(parser_state *p) {
     /* emit_block -> '.emit' '\n' {pasm_instruction} '.eom' */
     match(p, T_EMIT);
     match(p, T_NEWLINE);
-
+    
     while (p->curtoken == T_PARROT_OP) {
         next(p);
         while (p->curtoken != T_NEWLINE) {
@@ -1093,7 +1102,8 @@ emit_block(parser_state *p) {
         }
         match(p, T_NEWLINE);
     }
-
+    if (p->curtoken == T_NEWLINE) next(p);
+    
     match(p, T_EOM);
 }
 
@@ -1288,9 +1298,9 @@ TOP(parser_state *p) {
         syntax_error(p, 3, "end of file expected in file '", get_current_file(p->lexer), "'\n");
 
     }
-    else {
-        fprintf(stderr, "TOP: end of file '%s'\n", get_current_file(p->lexer));
-    }
+    //else {
+    //    fprintf(stderr, "TOP: end of file '%s'\n", get_current_file(p->lexer));
+    //}
 
 }
 

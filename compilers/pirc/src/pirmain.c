@@ -16,6 +16,7 @@ main(int argc, char **argv) {
         fprintf(stderr, "usage: %s <file>\n", argv[0]);
         exit(1);
     }
+    
 
     /* create a new parser, specifying the file name */
     p = new_parser(argv[1]);
@@ -24,8 +25,8 @@ main(int argc, char **argv) {
     TOP(p);
 
     /* check for errors */
-    if (get_parse_errors(p) == 0) printf("parse successful\n");
-    else fprintf(stderr, "There were %d errors.\n", get_parse_errors(p));
+    if (get_parse_errors(p)) 
+        fprintf(stderr, "There were %d errors.\n", get_parse_errors(p));    
 
     /* clean up and exit */
     exit_parser(p);

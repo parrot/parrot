@@ -2,142 +2,142 @@
 #define __PIRLEXER_H
 
 typedef enum tokens {
-        T_GOTO,
-        T_IF,
-        T_INT,
-        T_N_OPERATORS,
-        T_NULL,
-        T_NUM,
-        T_PMC,
-        T_STRING,
-        T_UNLESS,
-
-        T_ARG,
-        T_CONST,
-        T_CONSTANT,
-        T_EMIT,
-        T_END,
-        T_ENDNAMESPACE,
-        T_ENDM,
-        T_EOM,
-        T_GET_RESULTS,
-        T_GLOBAL,
-        T_GLOBALCONST,
-        T_HLL,
-        T_HLL_MAP,
-        T_INCLUDE,
-        T_INVOCANT,
-        T_LEX,
-        T_LOADLIB,
-        T_LOCAL,
-        T_MACRO,
-        T_METH_CALL,
-        T_NAMESPACE,
-        T_NCI_CALL,
-        T_PARAM,
-        T_PCC_BEGIN,
-        T_PCC_BEGIN_RETURN,
-        T_PCC_BEGIN_YIELD,
-        T_PCC_CALL,
-        T_PCC_END,
-        T_PCC_END_RETURN,
-        T_PCC_END_YIELD,
-        T_PCC_SUB,
-        T_PRAGMA,
-        T_RESULT,
-        T_RETURN,
-        T_SUB,
-        T_SYM,
-        T_YIELD,
-
-        T_ANON_FLAG,
-        T_IMMEDIATE_FLAG,
-        T_INIT_FLAG,
-        T_LEX_FLAG,
-        T_LOAD_FLAG,
-        T_MAIN_FLAG,
-        T_MULTI_FLAG,
-        T_OUTER_FLAG,
-        T_POSTCOMP_FLAG,
-        T_VTABLE_FLAG,
-        T_NAMED_FLAG,
-        T_OPT_FLAG_FLAG,
-        T_OPTIONAL_FLAG,
-        T_SLURPY_FLAG,
-        T_FLAT_FLAG,
-        T_UNIQUE_REG_FLAG,
-
-        T_PLUS,
-        T_MINUS,
-        T_DIVIDE,
-        T_MODULO,
-        T_MULTIPLY,
-        T_CONCAT,
-        T_DOTDOT,
-        T_BAND,
-        T_AND,
-        T_BOR,
-        T_OR,
-        T_XOR,
-        T_HUH,
-        T_RSHIFT,
-        T_LSHIFT,
-        T_RRSHIFT,
-        T_GT,
-        T_LT,
-        T_GE,
-        T_LE,
-        T_EQ,
-        T_NE,
-        T_ARROW,
-        T_PTR,
-        T_COMMA,
-        T_SEMICOLON,
-        T_LPAREN,
-        T_RPAREN,
-        T_LBRACKET,
-        T_RBRACKET,
-        T_EOF,
-        T_NOT_FOUND,
-        T_PASM_PREG,
-        T_PASM_NREG,
-        T_PASM_IREG,
-        T_PASM_SREG,
-        T_PREG,
-        T_SREG,
-        T_NREG,
-        T_IREG,
-        T_MACRO_IDENT,
-        T_MACRO_LABEL,
-        T_TYPE,
-        T_IDENTIFIER,
-        T_INTEGER_CONSTANT,
-        T_NUMBER_CONSTANT,
-        T_LABEL,
-        T_NEWLINE,
-        T_ASSIGN,
-        T_DOUBLE_QUOTED_STRING,
-        T_SINGLE_QUOTED_STRING,
-        T_LITERAL,
-        T_INVOCANT_IDENT,
-        T_NUMBER,
-        T_ERROR,
-        T_POWER,
-        T_POWER_ASSIGN,
-        T_MULTIPLY_ASSIGN,
-        T_PLUS_ASSIGN,
-        T_MINUS_ASSIGN,
-        T_REGISTER,
-        T_DIVIDE_ASSIGN,
-        T_MODULO_ASSIGN,
-        T_BAND_ASSIGN,
-        T_BOR_ASSIGN,
-        T_RRSHIFT_ASSIGN,
-        T_RSHIFT_ASSIGN,
-        T_HEREDOC_ID,
-        T_HEREDOC_STRING,
-        T_PARROT_OP
-
+        T_GOTO,                				/* "goto",                    */
+        T_IF,                               /* "if",                      */
+        T_INT,                              /* "int",                     */
+        T_N_OPERATORS,                      /* "n_operators",             */
+        T_NULL,                             /* "null",                    */
+        T_NUM,                              /* "num",                     */
+        T_PMC,                              /* "pmc",                     */
+        T_STRING,                           /* "string",                  */
+        T_UNLESS,                           /* "unless",                  */
+                                            /* NULL,                      */
+        T_ARG,                              /* ".arg",                    */
+        T_CONST,                            /* ".const",                  */
+        T_CONSTANT,                         /* ".constant",               */
+        T_EMIT,                             /* ".emit",                   */
+        T_END,                              /* ".end",                    */
+        T_ENDNAMESPACE,                     /* ".endnamespace",           */
+        T_ENDM,                             /* ".endm",                   */
+        T_EOM,                              /* ".eom",                    */
+        T_GET_RESULTS,                      /* ".get_results",            */
+        T_GLOBAL,                           /* ".global",                 */
+        T_GLOBALCONST,                      /* ".globalconst",            */
+        T_HLL,                              /* ".HLL",                    */
+        T_HLL_MAP,                          /* ".HLL_map",                */
+        T_INCLUDE,                          /* ".include",                */
+        T_INVOCANT,                         /* ".invocant",               */
+        T_LEX,                              /* ".lex",                    */
+        T_LOADLIB,                          /* ".loadlib",                */
+        T_LOCAL,                            /* ".local",                  */
+        T_MACRO,                            /* ".macro",                  */
+        T_METH_CALL,                        /* ".meth_call",              */
+        T_NAMESPACE,                        /* ".namespace",              */
+        T_NCI_CALL,                         /* ".nci_call",               */
+        T_PARAM,                            /* ".param",                  */
+        T_PCC_BEGIN,                        /* ".pcc_begin",              */
+        T_PCC_BEGIN_RETURN,                 /* ".pcc_begin_return",       */
+        T_PCC_BEGIN_YIELD,                  /* ".pcc_begin_yield",        */
+        T_PCC_CALL,                         /* ".pcc_call",               */
+        T_PCC_END,                          /* ".pcc_end",                */
+        T_PCC_END_RETURN,                   /* ".pcc_end_return",         */
+        T_PCC_END_YIELD,                    /* ".pcc_end_yield",          */
+        T_PCC_SUB,                          /* ".pcc_sub",                */
+        T_PRAGMA,                           /* ".pragma",                 */
+        T_RESULT,                           /* ".result",                 */
+        T_RETURN,                           /* ".return",                 */
+        T_SUB,                              /* ".sub",                    */
+        T_SYM,                              /* ".sym",                    */
+        T_YIELD,                            /* ".yield",                  */
+                                            /* NULL,                      */
+        T_ANON_FLAG,                        /* ":anon",                   */
+        T_IMMEDIATE_FLAG,                   /* ":immediate",              */
+        T_INIT_FLAG,                        /* ":init",                   */
+        T_LEX_FLAG,                         /* ":lex",                    */
+        T_LOAD_FLAG,                        /* ":load",                   */
+        T_MAIN_FLAG,                        /* ":main",                   */
+        T_MULTI_FLAG,                       /* ":multi",                  */
+        T_OUTER_FLAG,                       /* ":outer",                  */
+        T_POSTCOMP_FLAG,                    /* ":postcomp",               */
+        T_VTABLE_FLAG,                      /* ":vtable",                 */
+        T_NAMED_FLAG,                       /* ":named",                  */
+        T_OPT_FLAG_FLAG,                    /* ":opt_flag",               */
+        T_OPTIONAL_FLAG,                    /* ":optional",               */
+        T_SLURPY_FLAG,                      /* ":slurpy",                 */
+        T_FLAT_FLAG,                        /* ":flat",                   */
+        T_UNIQUE_REG_FLAG,                  /* ":unique_reg",             */
+                                            /*   NULL,                    */
+        T_PLUS,                             /* "+",                       */
+        T_MINUS,                            /* "-",                       */
+        T_DIVIDE,                           /* "/",                       */
+        T_MODULO,                           /* "%",                       */
+        T_MULTIPLY,                         /* "*",                       */
+        T_CONCAT,                           /* ".",                       */
+        T_DOTDOT,                           /* "..",                      */
+        T_BAND,                             /* "&",                       */
+        T_AND,                              /* "&&",                      */
+        T_BOR,                              /* "|",                       */
+        T_OR,                               /* "||",                      */
+        T_XOR,                              /* "~",                       */
+        T_HUH,                              /* "~~",                      */
+        T_RSHIFT,                           /* ">>",                      */
+        T_LSHIFT,                           /* "<<",                      */
+        T_RRSHIFT,                          /* ">>>",                     */
+        T_GT,                               /* ">",                       */
+        T_LT,                               /* "<",                       */
+        T_GE,                               /* ">=",                      */
+        T_LE,                               /* "<=",                      */
+        T_EQ,                               /* "==",                      */
+        T_NE,                               /* "!=",                      */
+        T_ARROW,                            /* "=>",                      */
+        T_PTR,                              /* "->",                      */
+        T_COMMA,                            /* ",",                       */
+        T_SEMICOLON,                        /* ";",                       */
+        T_LPAREN,                           /* "(",                       */
+        T_RPAREN,                           /* ")",                       */
+        T_LBRACKET,                         /* "[",                       */
+        T_RBRACKET,                         /* "]",                       */
+        T_EOF,                              /* "end of file",             */
+        T_NOT_FOUND,                        /* "not found",               */
+        T_PASM_PREG,                        /* "PASM PREG",               */
+        T_PASM_NREG,                        /* "PASM NREG",               */
+        T_PASM_IREG,                        /* "PASM_IREG",               */
+        T_PASM_SREG,                        /* "PASM_SREG",               */
+        T_PREG,                             /* "PREG",                    */
+        T_SREG,                             /* "SREG",                    */
+        T_NREG,                             /* "NREG",                    */
+        T_IREG,                             /* "IREG",                    */
+        T_MACRO_IDENT,                      /* "macro identifier",        */
+        T_MACRO_LABEL,                      /* "macro label",             */
+        T_TYPE,                             /* "type specifier",          */
+        T_IDENTIFIER,                       /* "'identifier'",            */
+        T_INTEGER_CONSTANT,                 /* "int constant",            */
+        T_NUMBER_CONSTANT,                  /* "num constant",            */
+        T_LABEL,                            /* "label identifier",        */
+        T_NEWLINE,                          /* "'\\n'",                   */
+        T_ASSIGN,                           /* "=",                       */
+        T_DOUBLE_QUOTED_STRING,             /* "\"string\"",              */
+        T_SINGLE_QUOTED_STRING,             /* "'string'",                */
+        T_LITERAL,                          /* "'literal'",               */
+        T_INVOCANT_IDENT,                   /* "invocant id",             */
+        T_NUMBER,                           /* "'number'",                */
+        T_ERROR,                            /* "'error'",                 */
+        T_POWER,                            /* "**",                      */
+        T_POWER_ASSIGN,                     /* "**=",                     */
+        T_MULTIPLY_ASSIGN,                  /* "*=",                      */
+        T_PLUS_ASSIGN,                      /* "+=",                      */
+        T_MINUS_ASSIGN,                     /* "-=",                      */
+        T_REGISTER,                         /* "'register'",              */
+        T_DIVIDE_ASSIGN,                    /* "/=",                      */
+        T_MODULO_ASSIGN,                    /* "%=",                      */
+        T_BAND_ASSIGN,                      /* "&=",                      */
+        T_BOR_ASSIGN,                       /* "|=",                      */
+        T_RRSHIFT_ASSIGN,                   /* ">>=",                     */
+        T_RSHIFT_ASSIGN,                    /* ">>>=",                    */
+        T_HEREDOC_ID,                       /* "heredoc id",              */
+        T_HEREDOC_STRING,                   /* "heredoc string",          */
+        T_PARROT_OP                         /* "parrot op",               */
+                                            /* NULL                       */
 } token;
 
 /* Make sure MAX_TOKEN is the last enum value from enum token {} */

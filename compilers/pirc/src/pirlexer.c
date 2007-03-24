@@ -121,46 +121,46 @@ char const * dictionary[] = {
     ")",                        /* T_RPAREN,                */
     "[",                        /* T_LBRACKET               */
     "]",                        /* T_RBRACKET               */
-    "end of file",              /* descriptions of misc. tokens. Please note that these may NOT be  */
-    "not found",                /* single words, because then they might be considered "keywords"   */
-    "PASM PREG",                /* So, always use multiple words or 'strange' tokens like ' and "   */
-    "PASM NREG",                /*                          */
-    "PASM_IREG",                /*                          */
-    "PASM_SREG",                /*                          */
-    "PREG",                     /*                          */
-    "SREG",                     /*                          */
-    "NREG",                     /*                          */
-    "IREG",                     /*                          */
-    "macro identifier",         /*                          */
-    "macro label",              /*                          */
-    "type specifier",           /*                          */
-    "'identifier'",             /*                          */
-    "int constant",             /*                          */
-    "num constant",             /*                          */
-    "label identifier",         /*                          */
-    "'\\n'",                    /*                          */
-    "=",                        /*                          */
-    "\"string\"",               /*                          */
-    "'string'",                 /*                          */
-    "'literal'",                /*                          */
-    "invocant id",              /*                          */
-    "'number'",                 /*                          */
-    "'error'",                  /*                          */
-    "**",                       /*                          */
-    "**=",                      /*                          */
-    "*=",                       /*                          */
-    "+=",                       /*                          */
-    "-=",                       /*                          */
-    "'register'",               /*                          */
-    "/=",                       /*                          */
-    "%=",                       /*                          */
-    "&=",                       /*                          */
-    "|=",                       /*                          */
-    ">>=",                      /*                          */
-    ">>>=",                     /*                          */
-    "heredoc id",               /*                          */
-    "heredoc string",           /*                          */
-    "parrot op",                /*                          */
+    "end of file",              /* T_EOF                    */
+    "not found",                /* T_NOT_FOUND              */
+    "PASM PREG",                /* T_PASM_PREG              */             
+    "PASM NREG",                /* T_PASM_NREG              */
+    "PASM_IREG",                /* T_PASM_IREG,             */
+    "PASM_SREG",                /* T_PASM_SREG,             */
+    "PREG",                     /* T_PREG,                  */
+    "SREG",                     /* T_SREG,                  */
+    "NREG",                     /* T_NREG,                  */
+    "IREG",                     /* T_IREG,                  */
+    "macro identifier",         /* T_MACRO_IDENT,           */
+    "macro label",              /* T_MACRO_LABEL,           */
+    "type specifier",           /* T_TYPE,                  */
+    "'identifier'",             /* T_IDENTIFIER,            */
+    "int constant",             /* T_INTEGER_CONSTANT,      */
+    "num constant",             /* T_NUMBER_CONSTANT,       */
+    "label identifier",         /* T_LABEL,                 */
+    "'\\n'",                    /* T_NEWLINE,               */
+    "=",                        /* T_ASSIGN,                */
+    "\"string\"",               /* T_DOUBLE_QUOTED_STRING,  */
+    "'string'",                 /* T_SINGLE_QUOTED_STRING,  */
+    "'literal'",                /* T_LITERAL,               */
+    "invocant id",              /* T_INVOCANT_IDENT,        */
+    "'number'",                 /* T_NUMBER,                */
+    "'error'",                  /* T_ERROR,                 */
+    "**",                       /* T_POWER,                 */
+    "**=",                      /* T_POWER_ASSIGN,          */
+    "*=",                       /* T_MULTIPLY_ASSIGN,       */
+    "+=",                       /* T_PLUS_ASSIGN,           */
+    "-=",                       /* T_MINUS_ASSIGN,          */
+    "'register'",               /* T_REGISTER,              */
+    "/=",                       /* T_DIVIDE_ASSIGN,         */
+    "%=",                       /* T_MODULO_ASSIGN,         */
+    "&=",                       /* T_BAND_ASSIGN,           */
+    "|=",                       /* T_BOR_ASSIGN,            */
+    ">>=",                      /* T_RRSHIFT_ASSIGN,        */
+    ">>>=",                     /* T_RSHIFT_ASSIGN,         */
+    "heredoc id",               /* T_HEREDOC_ID,            */
+    "heredoc string",           /* T_HEREDOC_STRING,        */
+    "parrot op",                /* T_PARROT_OP              */
     NULL                        /*                          */
 };
 
@@ -212,11 +212,13 @@ typedef struct lexer_state {
  */
 char const *
 find_keyword(token t) {
-    if ((t > 0) && (t < MAX_TOKEN)) {
+    if ((t > 0) && (t <= MAX_TOKEN)) {
         return dictionary[t];
     }
     else {
         fprintf(stderr, "FATAL: invalid token in find_keyword()\n");
+        fprintf(stderr, "No entry for token %d\n", t);
+        if (t-1 <= MAX_TOKEN) fprintf(stderr, "Previous token: %s\n", dictionary[t - 1]);
         return "ERROR";
     }
 }
