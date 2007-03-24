@@ -143,6 +143,10 @@ FLOATVAL set_retval_f(Interp*, int sig_ret, parrot_context_t *ctx);
 STRING* set_retval_s(Interp*, int sig_ret, parrot_context_t *ctx);
 PMC* set_retval_p(Interp*, int sig_ret, parrot_context_t *ctx);
 
+/* PMC Method Invoke */
+PARROT_API void Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, 
+  const char *signature, ... );
+
 #define ASSERT_SIG_PMC(sig) \
     assert(PObj_is_PMC_TEST(sig) && \
            sig->vtable->base_type == enum_class_FixedIntegerArray)
