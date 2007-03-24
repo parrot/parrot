@@ -1,0 +1,64 @@
+=head1 NAME
+
+design.pod - description PIRC's design.
+
+=head1 DESCRIPTION
+
+This document describes the design and implementation of PIRC, a PIR Compiler.
+
+=head1 OVERVIEW
+
+PIRC currently consists of only a PIR parser, together with a lexer.
+
+
+=head1 OVERVIEW OF THE LEXER
+
+The lexer is defined in C<pirlexer.c>. The header file lists all tokens that
+may be returned by the lexer. 
+
+The lexer reads the complete file contents into a buffer, from which it reads
+the individual words, or I<tokens>. A buffer is much faster than using C<getc()>
+for each character, as I/O is relatively slow. 
+
+The lexer has three functions that may be invoked to receive the next token:
+
+=over 4
+
+=item C<token next_token()>
+
+C<next_token()> is used for the 'ordinary' case; it reads the next token from
+the current file.
+
+=item C<token read_heredoc(char *label)>
+
+C<read_heredoc()> reads all text up to the specified label. This label B<must>
+be at the start of a line. It returns the T_HEREDOC_STRING token on success, or
+T_EOF when the end of the file (buffer) is encountered.
+
+=item C<token read_macro()>
+
+C<read_macro()> is used to read a macro body. It reads up to the C<.endm> word,
+and then returns the T_ENDM token, which can then be matched by the parser.
+
+
+=head1 OVERVIEW OF THE PARSER
+
+The parser is defined in C<pirparser.c>. The header file only predeclares the
+C<parser_state> structure, but its definition is written in the C file, to hide
+the implementation details from other files. Access to specific fields is done
+through accessor functions, defined in the header file as well.
+
+The parser communicates with the lexer through the lexer's accessor function. Of
+these, the C<next_token()> function is most important: it requests the next token
+from the lexer. 
+
+The parser does not know anything about the spelling of tokens, although it can
+request these through C<find_keyword()>.
+
+B<more to come later>
+
+=head1 AUTHOR
+
+Klaas-Jan Stol <parrotcode at gmail dot com>
+
+=cut
