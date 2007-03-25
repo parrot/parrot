@@ -458,7 +458,8 @@ arguments(parser_state *p) {
     match(p, T_RPAREN);
 
     /* do NOT match() for T_NEWLINE, it will get the next token, but it might
-    * be a heredoc, which needs a special lexer function */
+    * be a heredoc, which needs a special lexer function 
+    */
     if (p->curtoken != T_NEWLINE) {
         syntax_error(p, 1, "'\\n' expected");
     }
@@ -488,7 +489,8 @@ just return.
 
   arith_expr -> [ binop expression ]
 
-  binop      -> '+' | '-' | '*' | '/' | '//' | '%' | '~~' | '~' | '&&' | '&' | '||' | '|' | '<<' | '>>' | '>>>' | '.'
+  binop      -> '+'  | '-' | '*'  | '/' | '//' | '%'  | '~~'  | '~' 
+              | '&&' | '&' | '||' | '|' | '<<' | '>>' | '>>>' | '.'
 
 =cut
 
@@ -525,11 +527,12 @@ arith_expression(parser_state *p) {
 
 =item assignment()
 
-  assignment -> '=' ( unop expr 
-                    | expr [binop expr] 
+  assignment -> '=' ( unop expression 
+                    | expression [binop expression] 
                     | target (keylist|arguments) 
                     | 'global' stringconstant
                     | heredocstring 
+                    | 'null'
                     ) '\n'
 
   unop       -> '-' | '!' | '~'
@@ -568,6 +571,9 @@ assignment(parser_state *p) {
         case T_GLOBAL:
             next(p);
             stringconstant(p);
+            break;
+        case T_NULL:
+            next(p);
             break;
         case T_HEREDOC_ID: { /* parse heredoc string */
             char *heredocid = clone_string(get_current_token(p->lexer));
@@ -1108,7 +1114,8 @@ long_yield_statement(parser_state *p) {
                     | target '->' (stringconstant|IDENT) arguments '\n'
                     | target arguments '\n'
 
-  augmented_op    -> '+=' | '-=' | '%=' | '/=' | '//=' | '*=' | '~=' | '&=' | '|=' | '**=' | '<<=' | '>>=' | '>>>='
+  augmented_op    -> '+=' | '-=' | '%=' | '/='  | '//=' | '*='  | '.=' 
+                   | '~=' | '&=' | '|=' | '**=' | '<<=' | '>>=' | '>>>='
 
 =cut
 
@@ -1124,6 +1131,7 @@ target_statement(parser_state *p) {
             break;
         case T_PLUS_ASSIGN: /* target '+=' simple_expr '\n' (and '-=' etc.) */
         case T_MINUS_ASSIGN:
+        case T_CONCAT_ASSIGN:
         case T_DIVIDE_ASSIGN:
         case T_FDIVIDE_ASSIGN:
         case T_POWER_ASSIGN:

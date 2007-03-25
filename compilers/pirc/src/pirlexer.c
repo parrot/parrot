@@ -38,6 +38,7 @@ just looking in a particular subsection ("while the iterator
 is not null"), so you don't have to look into a section
 that is not of interest. (not implemented right now)
 
+ global
  goto
  if
  int
@@ -191,6 +192,7 @@ char const * dictionary[] = {
     "*=",                       /* T_MULTIPLY_ASSIGN,       */
     "+=",                       /* T_PLUS_ASSIGN,           */
     "-=",                       /* T_MINUS_ASSIGN,          */
+    ".=",                       /* T_CONCAT_ASSIGN          */
     "'register'",               /* T_REGISTER,              */
     "/=",                       /* T_DIVIDE_ASSIGN,         */
     "//=",                      /* T_FDIVIDE_ASSIGN,        */
@@ -882,6 +884,7 @@ is indicated explicitly.
             c = read_char(lexer->curfile);
 
             if (c == EOF_MARKER) return T_EOF;
+            if (c == '=') return T_CONCAT_ASSIGN;
             if (c == '.') return T_DOTDOT;  /* ".." */
 
             if ( isspace(c) ) { /* a dot followed by a space */
@@ -1008,7 +1011,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
 
 =head3 Augmented operators
 
-    **=   *=    %=   /=   //=   +=   -=   >>=  >>>=   <<=  &=   |=   ~=
+    **=   *=    %=   /=   //=   +=   -=  .=  >>=  >>>=   <<=  &=   |=   ~= 
 
 =head3 Conditional operators
 

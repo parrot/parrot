@@ -130,6 +130,7 @@ typedef enum tokens {
         T_MULTIPLY_ASSIGN,                  /* "*=",                      */
         T_PLUS_ASSIGN,                      /* "+=",                      */
         T_MINUS_ASSIGN,                     /* "-=",                      */
+        T_CONCAT_ASSIGN,                    /* ".="                       */
         T_REGISTER,                         /* "'register'",              */
         T_DIVIDE_ASSIGN,                    /* "/=",                      */
         T_FDIVIDE_ASSIGN,                   /* "//=",                     */
