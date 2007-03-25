@@ -278,6 +278,23 @@ stringconstant(parser_state *p) {
 
 /*
 
+=item method()
+
+  method -> IDENT | stringconstant
+  
+=cut
+
+*/
+static void
+method(parser_state *p) {
+    if (p->curtoken == T_IDENTIFIER) next(p);
+    else stringconstant(p);
+}
+
+
+
+/*
+
 =item target()
 
   target -> REGISTER | IDENTIFIER
@@ -479,6 +496,24 @@ arguments(parser_state *p) {
     }
 }
 
+
+/*
+
+=item methodcall()
+
+  methodcall -> INVOCANT_IDENT method arguments '\n'
+
+=cut
+
+*/
+static void
+methodcall(parser_state *p) {
+    match(p, T_INVOCANT_IDENT);
+    method(p);
+    arguments(p);
+}
+
+
 /*
 
 =item arith_expression()
@@ -529,9 +564,11 @@ arith_expression(parser_state *p) {
 
   assignment -> '=' ( unop expression
                     | expression [binop expression]
-                    | target (keylist|arguments)
+                    | target ( keylist | [ '->' method ] arguments )
+                    | stringconstant arguments
                     | 'global' stringconstant
                     | heredocstring
+                    | methodcall                  
                     | 'null'
                     ) '\n'
 
@@ -551,13 +588,26 @@ assignment(parser_state *p) {
             next(p);
             expression(p);
             break;
+        case T_INVOCANT_IDENT: /* method call */
+            methodcall(p);
+            break;
+        case T_SINGLE_QUOTED_STRING: /* "foo"() */
+        case T_DOUBLE_QUOTED_STRING:
+            next(p);
+            arguments(p);            
+            break;
         case T_IDENTIFIER:
         case T_PREG:
         case T_PASM_PREG:
             next(p);
 
             switch (p->curtoken) {
-                case T_LPAREN:  /* function call */
+                case T_LPAREN:  /* function call; foo() */
+                    arguments(p);
+                    break;
+                case T_PTR: /* method call; foo '->' method arguments */
+                    next(p);
+                    method(p);
                     arguments(p);
                     break;
                 case T_LBRACKET: /* target '=' target '[' expr ']' */
@@ -568,7 +618,7 @@ assignment(parser_state *p) {
                     break;
             }
             break;
-        case T_GLOBAL:
+        case T_GLOBAL: /* x = glboal 'i' */
             next(p);
             stringconstant(p);
             break;
@@ -608,36 +658,9 @@ goto_statement(parser_state *p) {
 }
 
 
-/*
 
-=item method()
 
-  method -> IDENT | stringconstant
-  
-=cut
 
-*/
-static void
-method(parser_state *p) {
-    if (p->curtoken == T_IDENTIFIER) next(p);
-    else stringconstant(p);
-}
-
-/*
-
-=item methodcall()
-
-  methodcall -> INVOCANT_IDENT method arguments '\n'
-
-=cut
-
-*/
-static void
-methodcall(parser_state *p) {
-    match(p, T_INVOCANT_IDENT);
-    method(p);
-    arguments(p);
-}
 
 /*
 
@@ -768,7 +791,6 @@ declaration_list(parser_state *p) {
 */
 static void
 sym_declaration(parser_state *p) {
-
     match(p, T_SYM);
     declaration_list(p);
 }
@@ -1231,7 +1253,7 @@ multi_result_invocation(parser_state *p) {
     target_list(p);
     match(p, T_ASSIGN);
 
-    switch(p->curtoken) {
+    switch(p->curtoken) { /* TODO: REFACTOR */
         case T_IDENTIFIER: /* target_list '=' subcall */
         case T_PASM_PREG:
         case T_PREG:
