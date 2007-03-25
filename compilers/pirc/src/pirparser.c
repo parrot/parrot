@@ -458,7 +458,7 @@ arguments(parser_state *p) {
     match(p, T_RPAREN);
 
     /* do NOT match() for T_NEWLINE, it will get the next token, but it might
-    * be a heredoc, which needs a special lexer function 
+    * be a heredoc, which needs a special lexer function
     */
     if (p->curtoken != T_NEWLINE) {
         syntax_error(p, 1, "'\\n' expected");
@@ -489,7 +489,7 @@ just return.
 
   arith_expr -> [ binop expression ]
 
-  binop      -> '+'  | '-' | '*'  | '/' | '//' | '%'  | '~~'  | '~' 
+  binop      -> '+'  | '-' | '*'  | '/' | '//' | '%'  | '~~'  | '~'
               | '&&' | '&' | '||' | '|' | '<<' | '>>' | '>>>' | '.'
 
 =cut
@@ -527,11 +527,11 @@ arith_expression(parser_state *p) {
 
 =item assignment()
 
-  assignment -> '=' ( unop expression 
-                    | expression [binop expression] 
-                    | target (keylist|arguments) 
+  assignment -> '=' ( unop expression
+                    | expression [binop expression]
+                    | target (keylist|arguments)
                     | 'global' stringconstant
-                    | heredocstring 
+                    | heredocstring
                     | 'null'
                     ) '\n'
 
@@ -607,11 +607,43 @@ goto_statement(parser_state *p) {
     match(p, T_NEWLINE);
 }
 
+
+/*
+
+=item method()
+
+  method -> IDENT | stringconstant
+  
+=cut
+
+*/
+static void
+method(parser_state *p) {
+    if (p->curtoken == T_IDENTIFIER) next(p);
+    else stringconstant(p);
+}
+
+/*
+
+=item methodcall()
+
+  methodcall -> INVOCANT_IDENT method arguments '\n'
+
+=cut
+
+*/
+static void
+methodcall(parser_state *p) {
+    match(p, T_INVOCANT_IDENT);
+    method(p);
+    arguments(p);
+}
+
 /*
 
 =item return_statement()
 
-  return_statement -> '.return' (arguments|tailcall) '\n'
+  return_statement -> '.return' ( arguments | target arguments | methodcall ) '\n'
 
 =cut
 
@@ -619,12 +651,21 @@ goto_statement(parser_state *p) {
 static void
 return_statement(parser_state *p) {
     match(p, T_RETURN);
-    if (p->curtoken == T_LPAREN) { /* arguments */
-        arguments(p);
-    }
-    else { /* tailcall */
-        target(p);
-        arguments(p);
+    switch (p->curtoken) {
+        case T_LPAREN:
+            arguments(p);
+            break;
+        case T_INVOCANT_IDENT: /* tail method call */
+            methodcall(p);
+            break;
+        default: /* normal sub tailcall */
+            target(p);
+            if (p->curtoken == T_PTR) {
+                next(p);
+                method(p);                
+            }            
+            arguments(p);            
+            break;
     }
     match(p, T_NEWLINE);
 }
@@ -881,23 +922,6 @@ const_definition(parser_state *p) {
 }
 
 
-/*
-
-=item methodcall()
-
-  methodcall -> INVOCANT_IDENT (IDENT|stringconstant) arguments '\n'
-
-=cut
-
-*/
-static void
-methodcall(parser_state *p) {
-    match(p, T_INVOCANT_IDENT);
-    if (p->curtoken == T_IDENTIFIER) next(p);
-    else stringconstant(p);
-    arguments(p);
-    match(p, T_NEWLINE);
-}
 
 
 
@@ -1114,7 +1138,7 @@ long_yield_statement(parser_state *p) {
                     | target '->' (stringconstant|IDENT) arguments '\n'
                     | target arguments '\n'
 
-  augmented_op    -> '+=' | '-=' | '%=' | '/='  | '//=' | '*='  | '.=' 
+  augmented_op    -> '+=' | '-=' | '%=' | '/='  | '//=' | '*='  | '.='
                    | '~=' | '&=' | '|=' | '**=' | '<<=' | '>>=' | '>>>='
 
 =cut
@@ -1154,8 +1178,7 @@ target_statement(parser_state *p) {
             break;
         case T_PTR:  /* target '->' (stringc|identifier) arguments '\n' */
             next(p); /* skip '->' */
-            if (p->curtoken == T_IDENTIFIER) next(p);   /* target '->' IDENT arguments */
-            else stringconstant(p);                     /* target '->' stringc arguments */
+            method(p);
             arguments(p);
             match(p, T_NEWLINE);
             break;
@@ -1168,6 +1191,9 @@ target_statement(parser_state *p) {
             break;
     }
 }
+
+
+
 
 /*
 
@@ -1215,6 +1241,7 @@ multi_result_invocation(parser_state *p) {
             break;
         case T_INVOCANT_IDENT: /* target_list '=' methodcall */
             methodcall(p);
+            match(p, T_NEWLINE);
             break;
         default:
             syntax_error(p, 1, "sub or method invocation expected");
@@ -1410,6 +1437,7 @@ instructions(parser_state *p) {
                 break;
             case T_INVOCANT_IDENT:  /* dot attached to identifier, like 'id.' */
                 methodcall(p);
+                match(p, T_NEWLINE);
                 break;
             case T_PCC_BEGIN:
                 long_invocation(p);
