@@ -1,3 +1,12 @@
+/*
+
+=head1 NAME
+
+pirlexer.c - lexical analysis for Parrot Intermediate Representation
+
+=cut
+
+*/
 #include "pirlexer.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,18 +22,42 @@
 #define ERROR_CONTEXT_SIZE  30  /* number of characters being displayed in syntax errors */
 
 
-/* dictionary contains *all* keywords, directives, flags and
- * other (descriptions of) tokens that are recognized by the
- * lexer.
- *
- * XXX NOTE:
- * The several 'groups' of words (will be) are separated by NULL
- * entries; this way, we can later optimize the search, by
- * just looking in a particular subsection ("while the iterator
- * is not null"), so you don't have to look into a section
- * that is not of interest. (not implemented right now)
- *
- */
+/* 
+
+=head1 KEYWORDS
+
+
+dictionary contains *all* keywords, directives, flags and
+other (descriptions of) tokens that are recognized by the
+lexer.
+
+XXX NOTE:
+The several 'groups' of words (will be) are separated by NULL
+entries; this way, we can later optimize the search, by
+just looking in a particular subsection ("while the iterator
+is not null"), so you don't have to look into a section
+that is not of interest. (not implemented right now)
+
+ goto  
+ if   
+ int    
+ n_operators    
+ null
+ num   
+ pmc  
+ string 
+ unless
+ 
+ 
+=head1 DIRECTIVES
+
+
+=head1 FLAGS
+
+
+=cut
+
+*/
 char const * dictionary[] = {
     "goto",                     /* T_GOTO,                  */
     "if",                       /* T_IF,                    */
@@ -167,13 +200,20 @@ char const * dictionary[] = {
 
 
 
-/* Structure that represents a file.
- * It contains the filename, a buffer for the file contents,
- * a read pointer, the filesize, the current line number,
- * and a pointer to the previous buffer. If any, the
- * prevbuffer points to the structure of the file that
- * .include'd this file.
- */
+/* 
+
+=head2 file_buffer structure
+
+Structure that represents a file.
+It contains the filename, a buffer for the file contents,
+a read pointer, the filesize, the current line number,
+and a pointer to the previous buffer. If any, the
+prevbuffer points to the structure of the file that
+.include'd this file.
+
+=cut
+
+*/
 typedef struct file_buffer {
     char *filename;                 /* the name of this file                 */
     char *buffer;                   /* buffer holding contents of this file  */
@@ -186,10 +226,17 @@ typedef struct file_buffer {
 
 } file_buffer;
 
-/* Structure representing the lexer. It holds a pointer to
- * the current file being read, a buffer holding the current
- * token, and a pointer to add characters to the token buffer.
- */
+/* 
+
+=head2 lexer_state structure
+
+Structure representing the lexer. It holds a pointer to
+the current file being read, a buffer holding the current
+token, and a pointer to add characters to the token buffer.
+
+=cut
+
+*/
 typedef struct lexer_state {
     struct file_buffer *curfile;    /* pointer to the current file           */
     char *token_chars;              /* characters of the current token       */
@@ -200,16 +247,19 @@ typedef struct lexer_state {
 } lexer_state;
 
 
-/* public accessor functions */
+/* 
 
+=head1 ACCESSOR FUNCTIONS
 
+=over 4
 
+=item find_keyword()
 
+Get the spelling of a keyword based on the specified token.
 
-/* find_keyword()
- *
- * Get the spelling of a keyword based on the specified token.
- */
+=cut
+
+*/
 char const *
 find_keyword(token t) {
     if ((t > 0) && (t <= MAX_TOKEN)) {
@@ -223,40 +273,60 @@ find_keyword(token t) {
     }
 }
 
-/* get_current_token()
- *
- * return a constant pointer to the current token buffer
- */
+/* 
+
+=item get_current_token()
+
+return a constant pointer to the current token buffer
+
+=cut
+
+*/
 char * const
 get_current_token(lexer_state *s) {
     return s->token_chars;
 }
 
-/* get_current_file()
- *
- * return a constant pointer to the current file name
- */
+/* 
+
+=item get_current_file()
+
+return a constant pointer to the current file name
+
+=cut
+
+*/
 char * const
 get_current_file(struct lexer_state *s) {
     return s->curfile->filename;
 }
 
-/* get_current_line()
- *
- * return the current line number
- */
+/* 
+
+=item get_current_line()
+
+return the current line number
+
+=cut
+
+*/
 long
 get_current_line(struct lexer_state *s) {
     return s->curfile->line;
 }
 
 
-/* print_error_context()
- *
- * Print some surrounding text from the file to indicate
- * where the error occurred. This may make finding the error
- * easier.
- */
+/* 
+
+=item print_error_context()
+
+Print some surrounding text from the file to indicate
+where the error occurred. This may make finding the error
+easier.
+
+=cut
+
+*/
 void
 print_error_context(struct lexer_state *s) {
     /* print context of size ERROR_CONTEXT_SIZE */
@@ -273,19 +343,35 @@ print_error_context(struct lexer_state *s) {
 }
 
 
-/* buffer_char()
- *
- * Store a character in the lexer's buffer.
- */
+/*
+
+=back
+
+=head1 INTERNAL FUNCTIONS
+
+=over 4
+
+=item buffer_char()
+
+Store a character in the lexer's buffer.
+
+=cut
+
+*/
 static void
 buffer_char(lexer_state *lexer, char c) {
     *lexer->charptr++ = c;
 }
 
-/* read_char()
- *
- * Return the next character from the buffer.
- */
+/* 
+
+=item read_char()
+
+Return the next character from the buffer.
+
+=cut
+
+*/
 static char
 read_char(file_buffer *buf) {
     char c = *buf->curchar;
@@ -301,21 +387,33 @@ read_char(file_buffer *buf) {
 
 }
 
-/* Push back the last read character.
- * It was never removed from the buffer, so just
- * decrement the pointer in the buffer.
- */
+/* 
+
+=item unread_char()
+
+Push back the last read character.
+It was never removed from the buffer, so just
+decrement the pointer in the buffer.
+
+=cut
+
+*/
 static void
 unread_char(file_buffer *buf, char c) {
    --buf->curchar;
    --buf->linepos;
 }
 
-/* print_buffer()
- *
- * Debug function to show the rest of the current buffer.
- * (starting from current character)
- */
+/* 
+
+=item print_buffer()
+
+Debug function to show the rest of the current buffer.
+(starting from current character)
+
+=cut
+
+*/
 static void
 print_buffer(lexer_state *lexer) {
     fprintf(stderr, "Rest of buffer of file '%s'\n", lexer->curfile->filename);
@@ -323,11 +421,16 @@ print_buffer(lexer_state *lexer) {
 }
 
 
-/* clear_buffer()
- *
- * Clears the buffer in which the current token
- * is stored.
- */
+/* 
+
+=item clear_buffer()
+
+Clears the buffer in which the current token
+is stored.
+
+=cut
+
+*/
 static void
 clear_buffer(lexer_state *lexer) {
     while (lexer->charptr >= lexer->token_chars) {
@@ -337,11 +440,16 @@ clear_buffer(lexer_state *lexer) {
     lexer->charptr = lexer->token_chars;
 }
 
-/* clone_string()
- *
- * clone a string. Copy the characters of src into dest
- * and return dest.
- */
+/* 
+
+=item clone_string()
+
+clone a string. Copy the characters of src into dest
+and return dest.
+
+=cut
+
+*/
 char *
 clone_string(char const * src) {
     int srclen = strlen(src);
@@ -353,12 +461,17 @@ clone_string(char const * src) {
     return ptr;
 }
 
-/* read_file()
- *
- * Allocate a new file_buffer structure, allocate
- * memory for the file's contents and read all contents
- * into this buffer. The file_buffer structure is returned.
- */
+/* 
+
+=item read_file()
+
+Allocate a new file_buffer structure, allocate
+memory for the file's contents and read all contents
+into this buffer. The file_buffer structure is returned.
+
+=cut
+
+*/
 static file_buffer *
 read_file(char const * filename) {
     FILE *fileptr = NULL;
@@ -409,10 +522,15 @@ read_file(char const * filename) {
     return filebuff;
 }
 
-/* destroy_buffer()
- *
- * Destructor for file_buffer.
- */
+/* 
+
+=item destroy_buffer()
+
+Destructor for file_buffer.
+
+=cut
+
+*/
 static void
 destroy_buffer(file_buffer *buf) {
     free(buf->buffer);
@@ -421,12 +539,17 @@ destroy_buffer(file_buffer *buf) {
 
 
 
-/* do_include_file()
- *
- * Calls read_file() that returns a file_buffer structure.
- * This file_buffer's previous buffer is set to the current file_buffer.
- * The newfile buffer is assigned to the lexer's current file buffer.
- */
+/* 
+
+=item do_include_file()
+
+Calls read_file() that returns a file_buffer structure.
+This file_buffer's previous buffer is set to the current file_buffer.
+The newfile buffer is assigned to the lexer's current file buffer.
+
+=cut
+
+*/
 static void
 do_include_file(lexer_state *lexer, char const * filename) {
     file_buffer *newfile = read_file(filename);
@@ -435,11 +558,18 @@ do_include_file(lexer_state *lexer, char const * filename) {
 }
 
 
-/* TODO: FIX THIS
- *
- * Function to check if the specified id is a Parrot op.
- * Dynamically loaded op libraries need to be considered as well.
- */
+/* 
+
+=item is_op()
+
+TODO: FIX THIS
+
+Function to check if the specified id is a Parrot op.
+Dynamically loaded op libraries need to be considered as well.
+
+=cut
+
+*/
 static int
 is_op(char *word) {
     if (strcmp(word, "add") == 0) return 1; /* FIX */
@@ -448,11 +578,16 @@ is_op(char *word) {
 }
 
 
-/* is_start_of_line()
- *
- * Checks whether the current pointer in the specified file buffer
- * is at the beginning of a line.
- */
+/* 
+
+=item is_start_of_line()
+
+Checks whether the current pointer in the specified file buffer
+is at the beginning of a line.
+
+=cut
+
+*/
 static int
 is_start_of_line(file_buffer *buf) {
     if (buf->lastchar == '\n') return 1;
@@ -462,12 +597,17 @@ is_start_of_line(file_buffer *buf) {
 }
 
 
-/* check_dictionary()
- *
- * Checks whether the current token is a member of the specified
- * dictionary. If it is, the index of the word in the dict. is returned.
- * If not, T_NOT_FOUND is returned.
- */
+/* 
+
+=item check_dictionary()
+
+Checks whether the current token is a member of the specified
+dictionary. If it is, the index of the word in the dict. is returned.
+If not, T_NOT_FOUND is returned.
+
+=cut
+
+*/
 static token
 check_dictionary(lexer_state *lexer, char const *dictionary[]) {
     int index = 0;
@@ -481,12 +621,17 @@ check_dictionary(lexer_state *lexer, char const *dictionary[]) {
 }
 
 
-/* switch_buffer()
- *
- * set the current file_buffer to the previous one stored in
- * the field prevbuffer. The .include'ing file is now continued
- * to be processed after this.
- */
+/* 
+
+=item switch_buffer()
+
+set the current file_buffer to the previous one stored in
+the field prevbuffer. The .include'ing file is now continued
+to be processed after this.
+
+=cut
+
+*/
 static void
 switch_buffer(lexer_state *lexer) {
     /* destroy this buffer, set 'buf' to its previous buffer */
@@ -504,11 +649,16 @@ switch_buffer(lexer_state *lexer) {
 }
 
 
-/* read_digits()
- *
- * Helper function to read as many digits into the current token's buffer.
- * Returns the number of digits read.
- */
+/* 
+
+=item read_digits()
+
+Helper function to read as many digits into the current token's buffer.
+Returns the number of digits read.
+
+=cut
+
+*/
 static int
 read_digits(lexer_state *lexer) {
     int count = 0;
@@ -522,12 +672,17 @@ read_digits(lexer_state *lexer) {
     return count;
 }
 
-/* update_line()
- *
- * Updates the line number in the lexer, and adjusts the
- * error_context pointer, to show a bit of surrounding code
- * when an error occurs.
- */
+/* 
+
+=item update_line()
+
+Updates the line number in the lexer, and adjusts the
+error_context pointer, to show a bit of surrounding code
+when an error occurs.
+
+=cut
+
+*/
 static void
 update_line(lexer_state *lexer) {
     ++lexer->curfile->line;
@@ -535,10 +690,19 @@ update_line(lexer_state *lexer) {
 
 }
 
-/* read_token()
- *
- * Reads a token from the current file buffer.
- */
+/* 
+
+=item read_token()
+
+Reads a token from the current file buffer.
+
+=back
+
+=head1 LEXICAL SPECIFICATION
+
+=cut
+
+*/
 static token
 read_token(lexer_state *lexer) {
     char c;
@@ -567,6 +731,16 @@ read_token(lexer_state *lexer) {
 
 
         /* skip comments */
+        
+/*
+ 
+=pod
+
+   
+  
+=cut  
+
+*/        
         if (c == '#') {
             /* eat comments up to but not including newline */
             do {
@@ -579,6 +753,18 @@ read_token(lexer_state *lexer) {
             continue; /* with main loop */
         }
 
+/*
+
+=pod
+
+  PASM-PREG -> 'P'[0-9]*
+  PASM-SREG -> 'S'[0-9]*
+  PASM-NREG -> 'N'[0-9]*
+  PASM-IREG -> 'I'[0-9]*
+  
+=cut
+  
+*/
         /* now start checking for real tokens */
         switch(c) {
             case 'P':
@@ -599,6 +785,25 @@ read_token(lexer_state *lexer) {
 
         /* it was not a PASM register */
 
+/*
+
+=pod
+
+  IDENT -> [a-zA-Z_][a-zA-Z_0-9]*
+  
+  LABEL -> IDENT':'
+  
+  INVOCANT_IDENT -> IDENT'.'
+  
+  PARROT_OP -> IDENT
+  
+  MACRO_IDENT -> '.'IDENT
+  
+  DOTDOT -> '..'
+
+=cut
+
+*/
         if (isalpha(c) || c == '_' ) {  /* check for identifier, op, invocant or label */
             do {
                 buffer_char(lexer, c);
@@ -726,6 +931,15 @@ read_token(lexer_state *lexer) {
 
         /* check for single special tokens */
 
+/*
+
+=pod
+
+
+
+=cut
+
+*/
         switch(c) {
             case '(': buffer_char(lexer, c); return T_LPAREN;
             case ')': buffer_char(lexer, c); return T_RPAREN;
@@ -976,12 +1190,24 @@ read_token(lexer_state *lexer) {
 }
 
 
-/* read_heredoc()
- *
- * Reads heredoc text up to the specified heredoc label.
- * Returns either T_HEREDOC_STRING if successful, or T_EOF.
- * The heredoc string is stored in the token buffer.
- */
+/* 
+
+=back
+
+=head1 LEXER API
+
+=over 4
+
+
+=item read_heredoc()
+
+Reads heredoc text up to the specified heredoc label.
+Returns either T_HEREDOC_STRING if successful, or T_EOF.
+The heredoc string is stored in the token buffer.
+
+=cut
+
+*/
 token
 read_heredoc(lexer_state *lexer, char *heredoc_label) {
     char *heredoc_iter = heredoc_label;
@@ -1024,11 +1250,16 @@ read_heredoc(lexer_state *lexer, char *heredoc_label) {
 }
 
 
-/* read_macro()
- *
- * Just skip all tokens until we find ".endm" (or end of file)
- * Later this can be improved.
- */
+/* 
+
+=item read_macro()
+
+Just skip all tokens until we find ".endm" (or end of file)
+Later this can be improved.
+
+=cut
+
+*/
 token
 read_macro(lexer_state *lexer) {
     token t;
@@ -1039,10 +1270,15 @@ read_macro(lexer_state *lexer) {
     return t; /* return either T_ENDM or T_EOF */
 }
 
-/* new_lexer()
- *
- * Constructor for the lexer.
- */
+/* 
+
+=item new_lexer()
+
+Constructor for the lexer.
+
+=cut
+
+*/
 lexer_state *
 new_lexer(char const * filename) {
     lexer_state *lexer = (lexer_state *)malloc(sizeof(lexer_state));
@@ -1064,6 +1300,15 @@ new_lexer(char const * filename) {
     return lexer;
 }
 
+/*
+
+=item destroy_lexer()
+
+Destructor for lexer.
+
+=cut
+
+*/
 void
 destroy_lexer(lexer_state *lexer) {
     /* destroy the buffers */
@@ -1077,12 +1322,17 @@ destroy_lexer(lexer_state *lexer) {
     free(lexer);
 }
 
-/* include_file()
- *
- * This function takes a quoted string, to be found
- * the current token, and removes the quotes.
- * Then the file is included through do_include_file().
- */
+/* 
+
+=item include_file()
+
+This function takes a quoted string, to be found
+the current token, and removes the quotes.
+Then the file is included through do_include_file().
+
+=cut
+
+*/
 void
 open_include_file(lexer_state *lexer) {
     char *filename = lexer->token_chars;
@@ -1098,11 +1348,16 @@ open_include_file(lexer_state *lexer) {
     do_include_file(lexer, filename);
 }
 
-/* close_file()
- *
- * Opposite of include_file(), it sets the current file in the lexer
- * to the 'including' file (found through the 'prevbuffer' pointer).
- */
+/* 
+
+=item close_file()
+
+Opposite of include_file(), it sets the current file in the lexer
+to the 'including' file (found through the 'prevbuffer' pointer).
+
+=cut
+
+*/
 void
 close_include_file(lexer_state *lexer) {
     if (lexer->curfile->prevbuffer) { /* this was an .include'd file */
@@ -1114,20 +1369,33 @@ close_include_file(lexer_state *lexer) {
 }
 
 
-/* next_token()
- *
- * Calls read_token() for the next token.
- *
- * XXX NOTE: There used to be some checks in this function. If this doesn't prove
- * to be necessary, we can rename read_token() to next_token().
- */
+/* 
+
+=item next_token()
+
+Calls read_token() for the next token.
+
+XXX NOTE: There used to be some checks in this function. If this doesn't prove
+to be necessary, we can rename read_token() to next_token().
+
+=cut
+
+*/
 token
 next_token(lexer_state *lexer) {
     token t = read_token(lexer);
     return t;
 }
 
+/*
 
+=pod
+
+=back
+
+=cut
+
+*/
 
 /*
 int
