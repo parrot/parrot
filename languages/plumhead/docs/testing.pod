@@ -22,8 +22,9 @@ by the generated PIR. Something like this worked for me under Linux.
   ln -s ../../Parrot/trunk/parrot
   ln -s ../../Parrot/trunk/languages
   export PATH=.:$PATH
-  export TEST_PHP_EXECUTABLE=languages/plumhead/plumhead.sh
-  export TEST_PHP_CGI_EXECUTABLE=languages/plumhead/plumhead.sh
+  export TEST_PHP_EXECUTABLE=languages/plumhead/plumhead.pl
+  export TEST_PHP_CGI_EXECUTABLE=languages/plumhead/plumhead.pl
+  export PLUMHEAD_VARIANT=phc
   php run-tests.php -v --keep-all -r languages/plumhead/t/selection.txt | tee run-tests.log
   
 Good luck.

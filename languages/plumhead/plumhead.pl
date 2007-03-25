@@ -1,4 +1,4 @@
-#! perl
+#!/usr/bin/env perl
 
 # $Id$
 
@@ -7,7 +7,9 @@
 use strict;
 use warnings;
 
-exec './parrot', 'languages/plumhead/plumhead.pbc', @ARGV;
+# possible values are qw( phc antlr3 partridge perl5re );
+my $variant = $ENV{PLUMHEAD_VARIANT} || 'partridge';
+exec './parrot', 'languages/plumhead/plumhead.pbc', "--variant=$variant", @ARGV;
 
 # Local Variables:
 #   mode: cperl
