@@ -57,6 +57,7 @@ typedef enum tokens {
         T_LEX_FLAG,                         /* ":lex",                    */
         T_LOAD_FLAG,                        /* ":load",                   */
         T_MAIN_FLAG,                        /* ":main",                   */
+        T_METHOD_FLAG,                      /* ":method",                 */
         T_MULTI_FLAG,                       /* ":multi",                  */
         T_OUTER_FLAG,                       /* ":outer",                  */
         T_POSTCOMP_FLAG,                    /* ":postcomp",               */

@@ -259,16 +259,14 @@ expression(parser_state *p) {
 
 =item stringconstant()
 
-  strinconstant -> DOUBLE_QUOTED_STRING | SINGLE_QUOTED_STRING
+  stringconstant -> DOUBLE_QUOTED_STRING | SINGLE_QUOTED_STRING
 
 =cut
 
 */
 static void
 stringconstant(parser_state *p) {
-
-    if (p->curtoken == T_DOUBLE_QUOTED_STRING
-        || p->curtoken == T_SINGLE_QUOTED_STRING) {
+    if (p->curtoken == T_DOUBLE_QUOTED_STRING || p->curtoken == T_SINGLE_QUOTED_STRING) {
         next(p);
     }
     else {
@@ -281,7 +279,7 @@ stringconstant(parser_state *p) {
 =item method()
 
   method -> IDENT | stringconstant
-  
+
 =cut
 
 */
@@ -452,8 +450,7 @@ argument_list(parser_state *p) {
 
 */
 static void
-global_definition(parser_state *p) {
-    /* global_definition -> '.global' IDENT */
+global_definition(parser_state *p) {    
     match(p, T_GLOBAL_DECL);
     match(p, T_IDENTIFIER);
 }
@@ -568,7 +565,7 @@ arith_expression(parser_state *p) {
                     | stringconstant arguments
                     | 'global' stringconstant
                     | heredocstring
-                    | methodcall                  
+                    | methodcall
                     | 'null'
                     ) '\n'
 
@@ -594,7 +591,7 @@ assignment(parser_state *p) {
         case T_SINGLE_QUOTED_STRING: /* "foo"() */
         case T_DOUBLE_QUOTED_STRING:
             next(p);
-            arguments(p);            
+            arguments(p);
             break;
         case T_IDENTIFIER:
         case T_PREG:
@@ -618,7 +615,7 @@ assignment(parser_state *p) {
                     break;
             }
             break;
-        case T_GLOBAL: /* x = glboal 'i' */
+        case T_GLOBAL: /* x = global 'i' */
             next(p);
             stringconstant(p);
             break;
@@ -685,9 +682,9 @@ return_statement(parser_state *p) {
             target(p);
             if (p->curtoken == T_PTR) {
                 next(p);
-                method(p);                
-            }            
-            arguments(p);            
+                method(p);
+            }
+            arguments(p);
             break;
     }
     match(p, T_NEWLINE);
@@ -1290,30 +1287,6 @@ macro_expansion(parser_state *p) {
     match(p, T_NEWLINE);
 }
 
-/*
-
-=item var()
-
-  var -> IDENT | REGISTER
-
-=cut
-
-*/
-static void
-var(parser_state *p) {
-    switch (p->curtoken) {
-        case T_IDENTIFIER:
-        case T_PASM_PREG: case T_PREG:
-        case T_PASM_SREG: case T_SREG:
-        case T_PASM_NREG: case T_NREG:
-        case T_PASM_IREG: case T_IREG:
-            next(p);
-            break;
-        default:
-            syntax_error(p, 1, "identifier or register expected");
-            break;
-    }
-}
 
 /*
 
@@ -1326,7 +1299,6 @@ var(parser_state *p) {
 */
 static void
 get_results_instruction(parser_state *p) {
-
     match(p, T_GET_RESULTS);
     target_list(p);
     match(p, T_NEWLINE);
@@ -1484,7 +1456,7 @@ instructions(parser_state *p) {
                 break;
             case T_NULL: /* 'null' is a PIR keyword, but also an instruction. */
                 next(p);
-                var(p); /* IMCC accepts "null $I0", does that make sense?? */
+                target(p); /* IMCC accepts "null $I0", does that make sense?? */
                 break;
             case T_GET_RESULTS: /* '.get_results' target_list */
                 get_results_instruction(p);
@@ -1560,6 +1532,7 @@ multi_type_list(parser_state *p) {
              | ':init'
              | ':load'
              | ':main'
+             | ':method'
              | ':lex'
              | ':outer' '(' stringconstant ')'
              | ':vtable' '(' stringconstant ')'
@@ -1588,6 +1561,9 @@ sub_flags(parser_state *p) {
                 next(p);
                 break;
             case T_MAIN_FLAG:
+                next(p);
+                break;
+            case T_METHOD_FLAG:
                 next(p);
                 break;
             case T_LEX_FLAG:

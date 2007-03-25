@@ -119,6 +119,7 @@ char const * dictionary[] = {
     ":lex",                     /* T_LEX_FLAG               */
     ":load",                    /* T_LOAD_FLAG              */
     ":main",                    /* T_MAIN_FLAG              */
+    ":method",                  /* T_METHOD_FLAG            */
     ":multi",                   /* T_MULTI_FLAG             */
     ":outer",                   /* T_OUTER_FLAG             */
     ":postcomp",                /* T_POSTCOMP_FLAG          */
