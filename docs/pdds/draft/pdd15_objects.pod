@@ -281,6 +281,10 @@ Adds a single attribute to the class. It takes a simple string name and,
 optionally, a simple string value for type. {{ Conjectural: Actually, the
 simple string value alone won't cut it. We need to take a key there too? }}
 
+=item add_method
+
+Adds a method to the class.
+
 =item methods
 
 An accessor for the methods of the class. It returns a Hash of all methods,
@@ -456,6 +460,15 @@ all roles. The accessor is read-only.
 =item add_role
 
 Adds a single role to the role. It takes a simple string name.
+
+=item add_method
+
+Adds a method to the role.
+
+=item methods
+
+An accessor for the methods of the role. It returns a Hash of all methods,
+with a key of the method name and a value of an invokable PMC.
 
 =back
 
