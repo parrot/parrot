@@ -224,7 +224,7 @@ token get_token(parser_state *p) {
 
 Parse a simple expression. Returns the type of the expression.
 
-  expression -> IDENT | INTC | NUMC | STRINGC | REG
+  expression -> ( IDENT | INTC | NUMC | STRINGC | REG )
 
 =cut
 
@@ -232,7 +232,8 @@ Parse a simple expression. Returns the type of the expression.
 static token
 expression(parser_state *p) {
     token exprtok = T_ERROR;
-    switch(p->curtoken) {
+          
+    switch (p->curtoken) {
         case T_IDENTIFIER:
         case T_INTEGER_CONSTANT:
         case T_NUMBER_CONSTANT:
@@ -303,26 +304,32 @@ type(parser_state *p) {
 
 =item key()
 
-  key -> '..' expr
-  key -> expr [ '..' [ expr ] ]
+  key -> unop expr | '..' expr | expr [ '..' [ expr ] ]
 
 =cut
 
 */
 static void
-key(parser_state *p) {
-    if (p->curtoken == T_DOTDOT) { /* key -> '..' expr */
-        next(p);
-        expression(p);
-    }
-    else { /* key -> expr [ '..' [ expr ] ] */
-        expression(p);
-        if (p->curtoken == T_DOTDOT) {
+key(parser_state *p) {                      
+    switch (p->curtoken) {
+        case T_MINUS:
+        /*
+        case T_BXOR: 
+        case T_NOT: 
+        */
+        case T_DOTDOT: /* key -> '..' expr */
             next(p);
-            if (p->curtoken == T_RBRACKET) return;
-            else expression(p);
-        }
-    }
+            expression(p);
+            break;                
+        default: /* key -> expr [ '..' [ expr ] ] */
+            expression(p);
+            if (p->curtoken == T_DOTDOT) {
+                next(p);
+                if (p->curtoken == T_RBRACKET) return;
+                else expression(p);                    
+            }
+            break;    
+    }    
 }
 
 
