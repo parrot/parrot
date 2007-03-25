@@ -736,7 +736,11 @@ read_token(lexer_state *lexer) {
  
 =pod
 
-   
+=head2 Comments
+
+Comments start with the pound sign ('#') and continue up to the end of the line.
+
+POD comments are not yet supported.   
   
 =cut  
 
@@ -757,10 +761,20 @@ read_token(lexer_state *lexer) {
 
 =pod
 
-  PASM-PREG -> 'P'[0-9]*
-  PASM-SREG -> 'S'[0-9]*
-  PASM-NREG -> 'N'[0-9]*
-  PASM-IREG -> 'I'[0-9]*
+=head2 Tokens
+
+Any whitespace in the specification is merely for readability. Significant whitespace
+is indicated explicitly.
+
+  PASM-REG        -> PASM-PREG | PASM-SREG | PASM-NREG | PASM-IREG
+                  
+  PASM-PREG       -> 'P' DIGIT+
+                  
+  PASM-SREG       -> 'S' DIGIT+
+                  
+  PASM-NREG       -> 'N' DIGIT+
+                  
+  PASM-IREG       -> 'I' DIGIT+
   
 =cut
   
@@ -789,17 +803,30 @@ read_token(lexer_state *lexer) {
 
 =pod
 
-  IDENT -> [a-zA-Z_][a-zA-Z_0-9]*
+  IDENT           -> [a-zA-Z_][a-zA-Z_0-9]*
+                  
+  LABEL           -> IDENT ':'
+                  
+  INVOCANT-IDENT  -> IDENT '.'
+                  
+  PARROT-OP       -> IDENT
+                  
+  MACRO-IDENT     -> '.' IDENT
   
-  LABEL -> IDENT':'
+  MACRO-LABEL     -> '$' IDENT ':'                   
+                  
+  PIR-REGISTER    -> '$' PASM-REG
+                  
+  HEREDOC-IDENT   -> << STRINGC
   
-  INVOCANT_IDENT -> IDENT'.'
+  STRING-CONSTANT -> ' <characters> ' | " <characters> "
   
-  PARROT_OP -> IDENT
+  INT-CONSTANT    -> DIGIT+
   
-  MACRO_IDENT -> '.'IDENT
+  NUM-CONSTANT    -> DIGIT+ '.' DIGIT*
   
-  DOTDOT -> '..'
+  DIGIT           -> [0-9]       
+  
 
 =cut
 
@@ -935,7 +962,9 @@ read_token(lexer_state *lexer) {
 
 =pod
 
+=head2 Special tokens
 
+  ( ) [ ] , ; 
 
 =cut
 
@@ -950,6 +979,38 @@ read_token(lexer_state *lexer) {
             default:
                 break; /* continue below */
         }
+        
+/*
+
+=pod
+
+=head2 Operators
+
+Due to PIR's simplicity, there are no different levels of precedence for operators.
+
+=head3 Unary operators
+
+    - 
+
+=head3 Binary operators
+
+    **  *  %  /  //  +  -  >>  >>>  <<  &  &&  |  ||  .
+    
+=head3 Augmentive operators
+    
+    **=   *=    %=   /=   +=   -=   >>=  >>>=   <<=  &=   |=                       
+
+=head Conditional operators                                    
+   
+    <    >   ==   <=   >=  !=
+    
+=head3 Miscellaneous operators
+
+    ->   =>   ..
+    
+=cut
+
+*/        
 
         /* check for possible multi-character special tokens */
         if (c == '*') {
@@ -1012,7 +1073,7 @@ read_token(lexer_state *lexer) {
                 case EOF_MARKER: return T_EOF;
                 default:
                     unread_char(lexer->curfile, c);
-                    return T_MINUS;
+                    return T_ERROR;
             }
         }
         else if (c == '=') {
