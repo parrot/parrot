@@ -45,7 +45,7 @@ PAREN_CLOSE         : {  codeMode }?=>  ')' ;
 fragment IDENT      : {  codeMode }?=>  ( 'a'..'z' | 'A'..'Z' | '_' )( 'a'..'z' | 'A'..'Z' | '_' | '0'..'9' )*;
 VAR_NAME            : {  codeMode }?=>  '$' IDENT ;
 
-fragment DIGITS     : {  codeMode }?=>  ('0'..'9' )+ ;
+fragment DIGITS     : {  codeMode }?=>  ( '0'..'9' )+ ;
 INTEGER             : {  codeMode }?=>  DIGITS ;
 NUMBER              : {  codeMode }?=>  DIGITS? '.' DIGITS ;
 

@@ -44,8 +44,8 @@ rule  code                    { <?CODE_START> <statement>* <?CODE_END>? }
 rule relational_expression    { <expression> <rel_op_clause>? }
 
 rule statement                {
-    <ECHO> <expression> ;
-  | <VAR_DUMP> <?PAREN_OPEN>  <expression> <?PAREN_CLOSE> ;
+    <ECHO> <expression>  ( ; | <?before: \? > | $ )
+  | <VAR_DUMP> <?PAREN_OPEN>  <expression> <?PAREN_CLOSE> ( ; | <?before: \? > | $ )
   | <IF> <?PAREN_OPEN> <relational_expression> <?PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
   | <inline_sea> 
   | <scalar_assign>
@@ -57,8 +57,8 @@ rule else_clause              { <?ELSE> \{ <statement>* \} }
 rule  rel_op_clause           { <REL_OP> <expression> }
 rule  else_clause             { <?ELSE> \{ <statement>* \} }
 token inline_sea              { <?CODE_END> <SEA_empty_allowed> <?CODE_START> }
-rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ; }
-rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ; }
+rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ( ; | <?before: \? > | $ ) }
+rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ( ; | <?before: \? > | $ ) }
 
 token expression              {   <DOUBLEQUOTE_STRING>
                                 | <SINGLEQUOTE_STRING>

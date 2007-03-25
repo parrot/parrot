@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 # core Perl modules
-use Test::More     tests => 13;
+use Test::More     tests => 14;
 
 # Parrot modules
 use Parrot::Test;
@@ -157,6 +157,16 @@ language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'hello in a hash
 <?php
 $h["e"] = "Hello, World!\n";
 echo $h["e"];
+?>
+END_CODE
+Hello, World!
+END_EXPECTED
+
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'no semicolon befor CODE_END' );
+<?php
+echo 'Hello, ';
+echo "World!\n"
 ?>
 END_CODE
 Hello, World!
