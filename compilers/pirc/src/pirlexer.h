@@ -2,6 +2,7 @@
 #define __PIRLEXER_H
 
 typedef enum tokens {
+		T_GLOBAL,                           /* "global"                   */
         T_GOTO,                				/* "goto",                    */
         T_IF,                               /* "if",                      */
         T_INT,                              /* "int",                     */
@@ -21,7 +22,7 @@ typedef enum tokens {
         T_ENDM,                             /* ".endm",                   */
         T_EOM,                              /* ".eom",                    */
         T_GET_RESULTS,                      /* ".get_results",            */
-        T_GLOBAL,                           /* ".global",                 */
+        T_GLOBAL_DECL,                      /* ".global",                 */
         T_GLOBALCONST,                      /* ".globalconst",            */
         T_HLL,                              /* ".HLL",                    */
         T_HLL_MAP,                          /* ".HLL_map",                */

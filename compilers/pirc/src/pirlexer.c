@@ -63,6 +63,7 @@ The following are flags for subroutines and parameters/arguments.
 
 */
 char const * dictionary[] = {
+    "global",                   /* T_GLOBAL,                */
     "goto",                     /* T_GOTO,                  */
     "if",                       /* T_IF,                    */
     "int",                      /* T_INT,                   */
@@ -82,7 +83,7 @@ char const * dictionary[] = {
     ".endm",                    /* T_ENDM,                  */
     ".eom",                     /* T_EOM,                   */
     ".get_results",             /* T_GET_RESULTS            */
-    ".global",                  /* T_GLOBAL,                */
+    ".global",                  /* T_GLOBAL_DECL,           */
     ".globalconst",             /* T_GLOBALCONST            */
     ".HLL",                     /* T_HLL                    */
     ".HLL_map",                 /* T_HLL_MAP                */
@@ -271,7 +272,7 @@ Get the spelling of a keyword based on the specified token.
 */
 char const *
 find_keyword(token t) {
-    if ((t > 0) && (t <= MAX_TOKEN)) {
+    if ((t >= 0) && (t <= MAX_TOKEN)) {
         return dictionary[t];
     }
     else {

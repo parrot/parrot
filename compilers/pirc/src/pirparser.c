@@ -232,7 +232,7 @@ Parse a simple expression. Returns the type of the expression.
 static token
 expression(parser_state *p) {
     token exprtok = T_ERROR;
-          
+
     switch (p->curtoken) {
         case T_IDENTIFIER:
         case T_INTEGER_CONSTANT:
@@ -251,6 +251,29 @@ expression(parser_state *p) {
             break;
     }
     return exprtok;
+}
+
+
+
+/*
+
+=item stringconstant()
+
+  strinconstant -> DOUBLE_QUOTED_STRING | SINGLE_QUOTED_STRING
+
+=cut
+
+*/
+static void
+stringconstant(parser_state *p) {
+
+    if (p->curtoken == T_DOUBLE_QUOTED_STRING
+        || p->curtoken == T_SINGLE_QUOTED_STRING) {
+        next(p);
+    }
+    else {
+        syntax_error(p, 1, "string constant expected");
+    }
 }
 
 /*
@@ -310,26 +333,26 @@ type(parser_state *p) {
 
 */
 static void
-key(parser_state *p) {                      
+key(parser_state *p) {
     switch (p->curtoken) {
         case T_MINUS:
         /*
-        case T_BXOR: 
-        case T_NOT: 
+        case T_BXOR:
+        case T_NOT:
         */
         case T_DOTDOT: /* key -> '..' expr */
             next(p);
             expression(p);
-            break;                
+            break;
         default: /* key -> expr [ '..' [ expr ] ] */
             expression(p);
             if (p->curtoken == T_DOTDOT) {
                 next(p);
                 if (p->curtoken == T_RBRACKET) return;
-                else expression(p);                    
+                else expression(p);
             }
-            break;    
-    }    
+            break;
+    }
 }
 
 
@@ -414,7 +437,7 @@ argument_list(parser_state *p) {
 static void
 global_definition(parser_state *p) {
     /* global_definition -> '.global' IDENT */
-    match(p, T_GLOBAL);
+    match(p, T_GLOBAL_DECL);
     match(p, T_IDENTIFIER);
 }
 
@@ -502,7 +525,12 @@ arith_expression(parser_state *p) {
 
 =item assignment()
 
-  assignment -> '=' ( unop expr | expr [binop expr] | target (keylist|arguments) | heredocstring ) '\n'
+  assignment -> '=' ( unop expr 
+                    | expr [binop expr] 
+                    | target (keylist|arguments) 
+                    | 'global' stringconstant
+                    | heredocstring 
+                    ) '\n'
 
   unop       -> '-' | '!' | '~'
 
@@ -537,7 +565,10 @@ assignment(parser_state *p) {
                     break;
             }
             break;
-
+        case T_GLOBAL:
+            next(p);
+            stringconstant(p);
+            break;
         case T_HEREDOC_ID: { /* parse heredoc string */
             char *heredocid = clone_string(get_current_token(p->lexer));
             /* read_heredoc() returns a special token */
@@ -711,26 +742,6 @@ local_declaration(parser_state *p) {
 }
 
 
-/*
-
-=item stringconstant()
-
-  strinconstant -> DOUBLE_QUOTED_STRING | SINGLE_QUOTED_STRING
-
-=cut
-
-*/
-static void
-stringconstant(parser_state *p) {
-
-    if (p->curtoken == T_DOUBLE_QUOTED_STRING
-        || p->curtoken == T_SINGLE_QUOTED_STRING) {
-        next(p);
-    }
-    else {
-        syntax_error(p, 1, "string constant expected");
-    }
-}
 
 /*
 
@@ -1264,6 +1275,38 @@ get_results_instruction(parser_state *p) {
     match(p, T_NEWLINE);
 }
 
+/*
+
+=item global_assignment()
+
+Only PMCs can be stored as globals, so only PMC registers and identifiers
+are allowed. Currently no check is done on the type of the identifier
+
+  global_assignment -> 'global' stringconstant '=' (IDENT|PREG) '\n'
+
+=cut
+
+*/
+static void
+global_assignment(parser_state *p) {
+    match(p, T_GLOBAL);
+    stringconstant(p);
+    match(p, T_ASSIGN);
+
+    switch (p->curtoken) {
+        case T_IDENTIFIER:
+        case T_PASM_PREG:
+        case T_PREG:
+            next(p);
+            break;
+        default:
+            syntax_error(p, 1, "PMC object (register or identifier) expected");
+            break;
+    }
+
+    match(p, T_NEWLINE);
+}
+
 
 /*
 
@@ -1290,6 +1333,7 @@ get_results_instruction(parser_state *p) {
          | long_yield_statement
          | NULL var
          | get_results_instruction
+         | global_assignment
          | '\n'
 
 =cut
@@ -1386,6 +1430,9 @@ instructions(parser_state *p) {
                 break;
             case T_GET_RESULTS: /* '.get_results' target_list */
                 get_results_instruction(p);
+                break;
+            case T_GLOBAL:
+                global_assignment(p);
                 break;
             case T_NEWLINE: /* skip newlines */
                 next(p);
@@ -1803,7 +1850,7 @@ loadlib(parser_state *p) {
 static void
 compilation_unit(parser_state *p) {
     switch (p->curtoken) {
-        case T_GLOBAL: /* compilation_unit -> global_definition */
+        case T_GLOBAL_DECL: /* compilation_unit -> global_definition */
             global_definition(p);
             break;
         case T_SUB: /* compilation_unit -> sub_definition */
