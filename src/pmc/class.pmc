@@ -34,7 +34,7 @@ typedef struct Parrot_Class {
     PMC *roles;           /* An array of roles. */
     PMC *methods;         /* Hash of method names to methods in this class. */
     PMC *vtable_methods;  /* Hash of Parrot v-table methods we override. */
-    PMC *attrib_metadata; /* Hash of attributes in this class to metadata. */
+    PMC *attrib_metadata; /* Hash of attributes in this class to hashes of metadata. */
     PMC *attrib_index;    /* Lookup table for attributes in this and parents. */
     PMC *attrib_cache;    /* Cache of visible attrib names to indexes. */
 } Parrot_Class;
@@ -96,7 +96,8 @@ pmclass Class need_ext {
                 STRING *full_key = string_copy(interp, fq_class);
 
                 /* Get attribute name and append it to the key. */
-                (STRING *attrib_name) = PCCINVOKE(interp, cur_attrib, "name");
+                attrib_name = VTABLE_get_string_keyed_str(interp, cur_attrib,
+                    CONST_STRING(interp, "name"));
                 full_key = string_append(interp, full_key, attrib_name);
 
                 /* Insert into hash, along with index. */
@@ -218,8 +219,8 @@ Mark any referenced strings and PMCs.
 
 =item C<void attributes()>
 
-Return a hash where the keys are attribute names and the values are instances
-of MetaAttribute, describing the attribute.
+Return a hash where the keys are attribute names and the values are hashes
+providing a set of key/value pairs describing the attribute.
 
 =cut
 
@@ -242,7 +243,7 @@ Add an attribute to the class. Requires a name and, optionally, a type.
 */
     PCCMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
         Parrot_Class *class = PARROT_CLASS(SELF);
-        PMC *new_attribute = pmc_new(interp, enum_class_MetaAttribute);
+        PMC *new_attribute = pmc_new(interp, enum_class_Hash);
 
         /* If we've been instantiated already, need a new class. */
         if (class->instantiated) {
@@ -259,9 +260,11 @@ Add an attribute to the class. Requires a name and, optionally, a type.
         }
 
         /* Set name and type. */
-        PCCINVOKE(interp, new_attribute, "name", STRING* attribute_name);
+        VTABLE_set_string_keyed_str(interp, new_attribute, 
+            CONST_STRING(interp, "name"), attribute_name);
         if (got_type) {
-            PCCINVOKE(interp, new_attribute, "type", STRING* attribute_type);
+            VTABLE_set_string_keyed_str(interp, new_attribute, 
+                CONST_STRING(interp, "type"), attribute_type);
         }
 
         /* Enter the attribute in the attributes array. */

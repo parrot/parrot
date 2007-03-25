@@ -28,7 +28,7 @@ typedef struct Parrot_Role {
     PMC *namespace;       /* The namespace it's linked to, if any. */
     PMC *roles;           /* Any roles that this role is composed from. */
     PMC *methods;         /* Hash of method names to methods in this role. */
-    PMC *attrib_metadata; /* Hash of attributes in this role to metadata. */
+    PMC *attrib_metadata; /* Hash of attributes in this role to hashes of metadata. */
 } Parrot_Role;
 
 
@@ -120,8 +120,8 @@ Mark any referenced strings and PMCs.
 
 =item C<void attributes()>
 
-Return a hash where the keys are attribute names and the values are instances
-of MetaAttribute, describing the attribute.
+Return a hash where the keys are attribute names and the values are hashes
+providing a set of key/value pairs describing the attribute.
 
 =cut
 
@@ -144,12 +144,14 @@ Add an attribute to the role. Requires a name and, optionally, a type.
 */
     PCCMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
         Parrot_Role *role = PARROT_ROLE(SELF);
-        PMC *new_attribute = pmc_new(interp, enum_class_MetaAttribute);
+        PMC *new_attribute = pmc_new(interp, enum_class_Hash);
 
         /* Set name and type. */
-        PCCINVOKE(interp, new_attribute, "name", STRING* attribute_name);
+        VTABLE_set_string_keyed_str(interp, new_attribute, 
+            CONST_STRING(interp, "name"), attribute_name);
         if (got_type) {
-            PCCINVOKE(interp, new_attribute, "type", STRING* attribute_type);
+            VTABLE_set_string_keyed_str(interp, new_attribute, 
+                CONST_STRING(interp, "type"), attribute_type);
         }
 
         /* Enter the attribute in the attributes array. */
