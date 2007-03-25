@@ -26,7 +26,9 @@ main(int argc, char **argv) {
 
     /* check for errors */
     if (get_parse_errors(p)) 
-        fprintf(stderr, "There were %d errors.\n", get_parse_errors(p));    
+        fprintf(stderr, "\nThere were %d errors.\n", get_parse_errors(p));    
+    else
+        fprintf(stderr, "\nparsed successfully.\n");        
 
     /* clean up and exit */
     exit_parser(p);

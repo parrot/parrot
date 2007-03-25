@@ -74,15 +74,16 @@ typedef enum tokens {
         T_MULTIPLY,                         /* "*",                       */
         T_CONCAT,                           /* ".",                       */
         T_DOTDOT,                           /* "..",                      */
+        T_NOT,                              /* "!",                       */
         T_BAND,                             /* "&",                       */
         T_AND,                              /* "&&",                      */
         T_BOR,                              /* "|",                       */
         T_OR,                               /* "||",                      */
-        T_XOR,                              /* "~",                       */
-        T_HUH,                              /* "~~",                      */
+        T_BXOR,                             /* "~",                       */
+        T_XOR,                              /* "~~",                      */
         T_RSHIFT,                           /* ">>",                      */
         T_LSHIFT,                           /* "<<",                      */
-        T_RRSHIFT,                          /* ">>>",                     */
+        T_LOG_RSHIFT,                       /* ">>>",                     */
         T_GT,                               /* ">",                       */
         T_LT,                               /* "<",                       */
         T_GE,                               /* ">=",                      */
@@ -130,10 +131,12 @@ typedef enum tokens {
         T_REGISTER,                         /* "'register'",              */
         T_DIVIDE_ASSIGN,                    /* "/=",                      */
         T_MODULO_ASSIGN,                    /* "%=",                      */
+        T_BXOR_ASSIGN,                      /* "~=",                      */
         T_BAND_ASSIGN,                      /* "&=",                      */
         T_BOR_ASSIGN,                       /* "|=",                      */
-        T_RRSHIFT_ASSIGN,                   /* ">>=",                     */
-        T_RSHIFT_ASSIGN,                    /* ">>>=",                    */
+        T_RSHIFT_ASSIGN,                    /* ">>=",                     */
+        T_LOG_RSHIFT_ASSIGN,                /* ">>>=",                    */
+        T_LSHIFT_ASSIGN,                    /* "<<=",                     */
         T_HEREDOC_ID,                       /* "heredoc id",              */
         T_HEREDOC_STRING,                   /* "heredoc string",          */
         T_PARROT_OP                         /* "parrot op",               */

@@ -22,7 +22,7 @@ pirlexer.c - lexical analysis for Parrot Intermediate Representation
 #define ERROR_CONTEXT_SIZE  30  /* number of characters being displayed in syntax errors */
 
 
-/* 
+/*
 
 =head1 KEYWORDS
 
@@ -38,22 +38,26 @@ just looking in a particular subsection ("while the iterator
 is not null"), so you don't have to look into a section
 that is not of interest. (not implemented right now)
 
- goto  
- if   
- int    
- n_operators    
+ goto
+ if
+ int
+ n_operators
  null
- num   
- pmc  
- string 
+ num
+ pmc
+ string
  unless
- 
- 
+
+
 =head1 DIRECTIVES
 
+The following are PIR directives.
+
+XXX TODO
 
 =head1 FLAGS
 
+The following are flags for subroutines and parameters/arguments.
 
 =cut
 
@@ -131,15 +135,16 @@ char const * dictionary[] = {
     "*",                        /* T_MULTIPLY,              */
     ".",                        /* T_CONCAT,                */
     "..",                       /* T_DOTDOT,                */
+    "!",                        /* T_NOT                    */
     "&",                        /* T_BAND,                  */
     "&&",                       /* T_AND,                   */
     "|",                        /* T_BOR,                   */
     "||",                       /* T_OR,                    */
-    "~",                        /* T_XOR,                   */
-    "~~",                       /* T_HUH,                   */
+    "~",                        /* T_BXOR,                  */
+    "~~",                       /* T_XOR,                   */
     ">>",                       /* T_RSHIFT,                */
     "<<",                       /* T_LSHIFT,                */
-    ">>>",                      /* T_RRSHIFT,               */
+    ">>>",                      /* T_LOG_RSHIFT,            */
     ">",                        /* T_GT,                    */
     "<",                        /* T_LT,                    */
     ">=",                       /* T_GE,                    */
@@ -156,7 +161,7 @@ char const * dictionary[] = {
     "]",                        /* T_RBRACKET               */
     "end of file",              /* T_EOF                    */
     "not found",                /* T_NOT_FOUND              */
-    "PASM PREG",                /* T_PASM_PREG              */             
+    "PASM PREG",                /* T_PASM_PREG              */
     "PASM NREG",                /* T_PASM_NREG              */
     "PASM_IREG",                /* T_PASM_IREG,             */
     "PASM_SREG",                /* T_PASM_SREG,             */
@@ -187,10 +192,12 @@ char const * dictionary[] = {
     "'register'",               /* T_REGISTER,              */
     "/=",                       /* T_DIVIDE_ASSIGN,         */
     "%=",                       /* T_MODULO_ASSIGN,         */
+    "~=",                       /* T_BXOR_ASSIGN,           */
     "&=",                       /* T_BAND_ASSIGN,           */
     "|=",                       /* T_BOR_ASSIGN,            */
-    ">>=",                      /* T_RRSHIFT_ASSIGN,        */
-    ">>>=",                     /* T_RSHIFT_ASSIGN,         */
+    ">>=",                      /* T_RSHIFT_ASSIGN,         */
+    ">>>=",                     /* T_LOG_RSHIFT_ASSIGN,     */
+    "<<=",                      /* T_LSHIFT_ASSIGN,         */
     "heredoc id",               /* T_HEREDOC_ID,            */
     "heredoc string",           /* T_HEREDOC_STRING,        */
     "parrot op",                /* T_PARROT_OP              */
@@ -200,7 +207,7 @@ char const * dictionary[] = {
 
 
 
-/* 
+/*
 
 =head2 file_buffer structure
 
@@ -226,7 +233,7 @@ typedef struct file_buffer {
 
 } file_buffer;
 
-/* 
+/*
 
 =head2 lexer_state structure
 
@@ -247,7 +254,7 @@ typedef struct lexer_state {
 } lexer_state;
 
 
-/* 
+/*
 
 =head1 ACCESSOR FUNCTIONS
 
@@ -273,7 +280,7 @@ find_keyword(token t) {
     }
 }
 
-/* 
+/*
 
 =item get_current_token()
 
@@ -287,7 +294,7 @@ get_current_token(lexer_state *s) {
     return s->token_chars;
 }
 
-/* 
+/*
 
 =item get_current_file()
 
@@ -301,7 +308,7 @@ get_current_file(struct lexer_state *s) {
     return s->curfile->filename;
 }
 
-/* 
+/*
 
 =item get_current_line()
 
@@ -316,7 +323,7 @@ get_current_line(struct lexer_state *s) {
 }
 
 
-/* 
+/*
 
 =item print_error_context()
 
@@ -363,7 +370,7 @@ buffer_char(lexer_state *lexer, char c) {
     *lexer->charptr++ = c;
 }
 
-/* 
+/*
 
 =item read_char()
 
@@ -387,7 +394,7 @@ read_char(file_buffer *buf) {
 
 }
 
-/* 
+/*
 
 =item unread_char()
 
@@ -404,7 +411,7 @@ unread_char(file_buffer *buf, char c) {
    --buf->linepos;
 }
 
-/* 
+/*
 
 =item print_buffer()
 
@@ -421,7 +428,7 @@ print_buffer(lexer_state *lexer) {
 }
 
 
-/* 
+/*
 
 =item clear_buffer()
 
@@ -440,7 +447,7 @@ clear_buffer(lexer_state *lexer) {
     lexer->charptr = lexer->token_chars;
 }
 
-/* 
+/*
 
 =item clone_string()
 
@@ -461,7 +468,7 @@ clone_string(char const * src) {
     return ptr;
 }
 
-/* 
+/*
 
 =item read_file()
 
@@ -522,7 +529,7 @@ read_file(char const * filename) {
     return filebuff;
 }
 
-/* 
+/*
 
 =item destroy_buffer()
 
@@ -539,7 +546,7 @@ destroy_buffer(file_buffer *buf) {
 
 
 
-/* 
+/*
 
 =item do_include_file()
 
@@ -558,7 +565,7 @@ do_include_file(lexer_state *lexer, char const * filename) {
 }
 
 
-/* 
+/*
 
 =item is_op()
 
@@ -578,7 +585,7 @@ is_op(char *word) {
 }
 
 
-/* 
+/*
 
 =item is_start_of_line()
 
@@ -597,7 +604,7 @@ is_start_of_line(file_buffer *buf) {
 }
 
 
-/* 
+/*
 
 =item check_dictionary()
 
@@ -621,7 +628,7 @@ check_dictionary(lexer_state *lexer, char const *dictionary[]) {
 }
 
 
-/* 
+/*
 
 =item switch_buffer()
 
@@ -649,7 +656,7 @@ switch_buffer(lexer_state *lexer) {
 }
 
 
-/* 
+/*
 
 =item read_digits()
 
@@ -672,7 +679,7 @@ read_digits(lexer_state *lexer) {
     return count;
 }
 
-/* 
+/*
 
 =item update_line()
 
@@ -690,7 +697,7 @@ update_line(lexer_state *lexer) {
 
 }
 
-/* 
+/*
 
 =item read_token()
 
@@ -731,20 +738,20 @@ read_token(lexer_state *lexer) {
 
 
         /* skip comments */
-        
+
 /*
- 
+
 =pod
 
 =head2 Comments
 
 Comments start with the pound sign ('#') and continue up to the end of the line.
 
-POD comments are not yet supported.   
-  
-=cut  
+POD comments are not yet supported.
 
-*/        
+=cut
+
+*/
         if (c == '#') {
             /* eat comments up to but not including newline */
             do {
@@ -767,17 +774,17 @@ Any whitespace in the specification is merely for readability. Significant white
 is indicated explicitly.
 
   PASM-REG        -> PASM-PREG | PASM-SREG | PASM-NREG | PASM-IREG
-                  
+
   PASM-PREG       -> 'P' DIGIT+
-                  
+
   PASM-SREG       -> 'S' DIGIT+
-                  
+
   PASM-NREG       -> 'N' DIGIT+
-                  
+
   PASM-IREG       -> 'I' DIGIT+
-  
+
 =cut
-  
+
 */
         /* now start checking for real tokens */
         switch(c) {
@@ -804,29 +811,29 @@ is indicated explicitly.
 =pod
 
   IDENT           -> [a-zA-Z_][a-zA-Z_0-9]*
-                  
+
   LABEL           -> IDENT ':'
-                  
+
   INVOCANT-IDENT  -> IDENT '.'
-                  
+
   PARROT-OP       -> IDENT
-                  
+
   MACRO-IDENT     -> '.' IDENT
-  
-  MACRO-LABEL     -> '$' IDENT ':'                   
-                  
+
+  MACRO-LABEL     -> '$' IDENT ':'
+
   PIR-REGISTER    -> '$' PASM-REG
-                  
+
   HEREDOC-IDENT   -> << STRINGC
-  
+
   STRING-CONSTANT -> ' <characters> ' | " <characters> "
-  
+
   INT-CONSTANT    -> DIGIT+
-  
+
   NUM-CONSTANT    -> DIGIT+ '.' DIGIT*
-  
-  DIGIT           -> [0-9]       
-  
+
+  DIGIT           -> [0-9]
+
 
 =cut
 
@@ -964,7 +971,7 @@ is indicated explicitly.
 
 =head2 Special tokens
 
-  ( ) [ ] , ; 
+  ( ) [ ] , ;
 
 =cut
 
@@ -979,7 +986,7 @@ is indicated explicitly.
             default:
                 break; /* continue below */
         }
-        
+
 /*
 
 =pod
@@ -990,27 +997,27 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
 
 =head3 Unary operators
 
-    - 
+    -   !   ~
 
 =head3 Binary operators
 
-    **  *  %  /  //  +  -  >>  >>>  <<  &  &&  |  ||  .
-    
-=head3 Augmentive operators
-    
-    **=   *=    %=   /=   +=   -=   >>=  >>>=   <<=  &=   |=                       
+    **  *  %  /  //  +  -  >>  >>>  <<  ~   ~~   &  &&  |  ||  .
 
-=head Conditional operators                                    
-   
+=head3 Augmented operators
+
+    **=   *=    %=   /=   +=   -=   >>=  >>>=   <<=  &=   |=   ~=
+
+=head3 Conditional operators
+
     <    >   ==   <=   >=  !=
-    
+
 =head3 Miscellaneous operators
 
     ->   =>   ..
-    
+
 =cut
 
-*/        
+*/
 
         /* check for possible multi-character special tokens */
         if (c == '*') {
@@ -1069,11 +1076,11 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         else if (c == '!') {
             c = read_char(lexer->curfile);
             switch(c) {
-                case '=': return T_NE;
+                case '=': return T_NE;              /* != */
                 case EOF_MARKER: return T_EOF;
-                default:
+                default:                            /* ! */
                     unread_char(lexer->curfile, c);
-                    return T_ERROR;
+                    return T_NOT;
             }
         }
         else if (c == '=') {
@@ -1095,11 +1102,11 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                     if (c == '>') { /* >>> */
                         c = read_char(lexer->curfile);
                         if (c == '=') { /* >>>= */
-                            return T_RRSHIFT_ASSIGN;
+                            return T_LOG_RSHIFT_ASSIGN;
                         }
                         else { /* >>> */
                             unread_char(lexer->curfile, c);
-                            return T_RRSHIFT;
+                            return T_LOG_RSHIFT;
                         }
                     }
                     else if (c == '=') { /* >>= */
@@ -1131,15 +1138,31 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                         }
                         return T_HEREDOC_ID;
                     }
-                    else { /* no heredoc but '<<' */
-                        unread_char(lexer->curfile, c);
-                        return T_LSHIFT;
+                    else { /* no heredoc */
+                        if (c == '=') {                 /* <<= */
+                            return T_LSHIFT_ASSIGN;   
+                        }
+                        else {                          /* << */
+                            unread_char(lexer->curfile, c);
+                            return T_LSHIFT;
+                        }
                     }
                     break;
                 case EOF_MARKER: return T_EOF;
                 default:
                     unread_char(lexer->curfile, c);
                     return T_LT;
+            }
+        }
+        else if (c == '~') {
+            c = read_char(lexer->curfile);
+            switch(c) {
+                case '~': return T_XOR;             /* ~~ */
+                case '=': return T_BXOR_ASSIGN;     /* ~= */
+                case EOF_MARKER: return T_EOF;
+                default:
+                    unread_char(lexer->curfile, c); /* ~ */
+                    return T_BXOR;
             }
         }
         else if (c == '&') {
@@ -1153,14 +1176,14 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                     return T_BAND;
             }
         }
-        else if (c == '|') {
+        else if (c == '|') {                        
             c = read_char(lexer->curfile);
             switch(c) {
-                case '|': return T_OR;
-                case '=': return T_BOR_ASSIGN;
+                case '|': return T_OR;              /* || */
+                case '=': return T_BOR_ASSIGN;      /* |= */
                 case EOF_MARKER: return T_EOF;
                 default:
-                    unread_char(lexer->curfile, c);
+                    unread_char(lexer->curfile, c); /* | */
                     return T_BOR;
             }
         }
@@ -1251,9 +1274,9 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
 }
 
 
-/* 
+/*
 
-=back
+
 
 =head1 LEXER API
 
@@ -1311,7 +1334,7 @@ read_heredoc(lexer_state *lexer, char *heredoc_label) {
 }
 
 
-/* 
+/*
 
 =item read_macro()
 
@@ -1331,7 +1354,7 @@ read_macro(lexer_state *lexer) {
     return t; /* return either T_ENDM or T_EOF */
 }
 
-/* 
+/*
 
 =item new_lexer()
 
@@ -1383,7 +1406,7 @@ destroy_lexer(lexer_state *lexer) {
     free(lexer);
 }
 
-/* 
+/*
 
 =item include_file()
 
@@ -1409,7 +1432,7 @@ open_include_file(lexer_state *lexer) {
     do_include_file(lexer, filename);
 }
 
-/* 
+/*
 
 =item close_file()
 
@@ -1430,7 +1453,7 @@ close_include_file(lexer_state *lexer) {
 }
 
 
-/* 
+/*
 
 =item next_token()
 
