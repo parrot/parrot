@@ -147,10 +147,10 @@ Add an attribute to the role. Requires a name and, optionally, a type.
         PMC *new_attribute = pmc_new(interp, enum_class_Hash);
 
         /* Set name and type. */
-        VTABLE_set_string_keyed_str(interp, new_attribute, 
+        VTABLE_set_string_keyed_str(interp, new_attribute,
             CONST_STRING(interp, "name"), attribute_name);
         if (got_type) {
-            VTABLE_set_string_keyed_str(interp, new_attribute, 
+            VTABLE_set_string_keyed_str(interp, new_attribute,
                 CONST_STRING(interp, "type"), attribute_type);
         }
 

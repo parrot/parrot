@@ -260,10 +260,10 @@ Add an attribute to the class. Requires a name and, optionally, a type.
         }
 
         /* Set name and type. */
-        VTABLE_set_string_keyed_str(interp, new_attribute, 
+        VTABLE_set_string_keyed_str(interp, new_attribute,
             CONST_STRING(interp, "name"), attribute_name);
         if (got_type) {
-            VTABLE_set_string_keyed_str(interp, new_attribute, 
+            VTABLE_set_string_keyed_str(interp, new_attribute,
                 CONST_STRING(interp, "type"), attribute_type);
         }
 
@@ -486,7 +486,7 @@ Compose a role into a class with the given exclusions and aliases.
             if (VTABLE_get_pmc_keyed_int(interp, class->roles, i) == role)
                 return;
         }
-        
+
         /* Get the methods from the role. */
         (PMC *methods) = PCCINVOKE(interp, role, "methods");
         if (PMC_IS_NULL(methods))
@@ -505,7 +505,7 @@ Compose a role into a class with the given exclusions and aliases.
 
             /* Need to find the name we'll check for a conflict on. */
             STRING *check_name = method_name;
-            
+
             /* Ignore if it's in the exclude list. */
             if (got_without) {
                 int without_count = VTABLE_elements(interp, without);

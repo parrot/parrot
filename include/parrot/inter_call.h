@@ -1,7 +1,7 @@
 /* inter_call.h
  *  Copyright (C) 2001-2003, The Perl Foundation.
  *  SVN Info
- *     $Id$
+ *Id: inter_call.h 17714 2007-03-24 17:04:39Z tewk
  *  Overview:
  *  Data Structure and Algorithms:
  *     Call argument handling.
@@ -144,7 +144,7 @@ STRING* set_retval_s(Interp*, int sig_ret, parrot_context_t *ctx);
 PMC* set_retval_p(Interp*, int sig_ret, parrot_context_t *ctx);
 
 /* PMC Method Invoke */
-PARROT_API void Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, 
+PARROT_API void Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name,
   const char *signature, ... );
 
 #define ASSERT_SIG_PMC(sig) \
