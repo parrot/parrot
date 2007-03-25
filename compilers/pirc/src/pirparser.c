@@ -458,7 +458,7 @@ just return.
 
   arith_expr -> [ binop expression ]
 
-  binop      -> '+' | '-' | '*' | '/' | '%' | '~~' | '~' | '&&' | '&' | '||' | '|' | '<<' | '>>' | '>>>' | '.'
+  binop      -> '+' | '-' | '*' | '/' | '//' | '%' | '~~' | '~' | '&&' | '&' | '||' | '|' | '<<' | '>>' | '>>>' | '.'
 
 =cut
 
@@ -469,6 +469,7 @@ arith_expression(parser_state *p) {
         case T_PLUS:
         case T_MINUS:
         case T_DIVIDE:
+        case T_FDIVIDE:
         case T_MULTIPLY:
         case T_MODULO:
         case T_XOR:
@@ -1089,7 +1090,7 @@ long_yield_statement(parser_state *p) {
                     | target '->' (stringconstant|IDENT) arguments '\n'
                     | target arguments '\n'
 
-  augmented_op    -> '+=' | '-=' | '%=' | '/=' | '*=' | '~=' | '&=' | '|=' | '**=' | '<<=' | '>>=' | '>>>='
+  augmented_op    -> '+=' | '-=' | '%=' | '/=' | '//=' | '*=' | '~=' | '&=' | '|=' | '**=' | '<<=' | '>>=' | '>>>='
 
 =cut
 
@@ -1106,6 +1107,7 @@ target_statement(parser_state *p) {
         case T_PLUS_ASSIGN: /* target '+=' simple_expr '\n' (and '-=' etc.) */
         case T_MINUS_ASSIGN:
         case T_DIVIDE_ASSIGN:
+        case T_FDIVIDE_ASSIGN:
         case T_POWER_ASSIGN:
         case T_MULTIPLY_ASSIGN:
         case T_BXOR_ASSIGN:

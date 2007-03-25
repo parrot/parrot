@@ -131,6 +131,7 @@ char const * dictionary[] = {
     "+",                        /* T_PLUS,                  */
     "-",                        /* T_MINUS,                 */
     "/",                        /* T_DIVIDE,                */
+    "//",                       /* T_FDIVIDE,               */
     "%",                        /* T_MODULO,                */
     "*",                        /* T_MULTIPLY,              */
     ".",                        /* T_CONCAT,                */
@@ -191,6 +192,7 @@ char const * dictionary[] = {
     "-=",                       /* T_MINUS_ASSIGN,          */
     "'register'",               /* T_REGISTER,              */
     "/=",                       /* T_DIVIDE_ASSIGN,         */
+    "//=",                      /* T_FDIVIDE_ASSIGN,        */
     "%=",                       /* T_MODULO_ASSIGN,         */
     "~=",                       /* T_BXOR_ASSIGN,           */
     "&=",                       /* T_BAND_ASSIGN,           */
@@ -1005,7 +1007,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
 
 =head3 Augmented operators
 
-    **=   *=    %=   /=   +=   -=   >>=  >>>=   <<=  &=   |=   ~=
+    **=   *=    %=   /=   //=   +=   -=   >>=  >>>=   <<=  &=   |=   ~=
 
 =head3 Conditional operators
 
@@ -1038,13 +1040,22 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 case EOF_MARKER: return T_EOF;
                 default:
                     unread_char(lexer->curfile, c);
-                    return T_MODULO;
+                    return T_MODULO;              /* % */
             }
         }
         else if (c == '/') {
             c = read_char(lexer->curfile);
             switch(c) {
-                case '/': return T_ERROR; /* // --> return FDIV or w/e */
+                case '/': 
+                    c = read_char(lexer->curfile);
+                    if (c == '=') {
+                        return T_FDIVIDE_ASSIGN; /* //= */
+                    }
+                    else {
+                        unread_char(lexer->curfile, c);
+                        return T_FDIVIDE;   
+                    }
+                    break;
                 case '=': return T_DIVIDE_ASSIGN; /* /= */
                 case EOF_MARKER: return T_EOF;
                 default:

@@ -70,6 +70,7 @@ typedef enum tokens {
         T_PLUS,                             /* "+",                       */
         T_MINUS,                            /* "-",                       */
         T_DIVIDE,                           /* "/",                       */
+        T_FDIVIDE,                          /* "//",                      */
         T_MODULO,                           /* "%",                       */
         T_MULTIPLY,                         /* "*",                       */
         T_CONCAT,                           /* ".",                       */
@@ -130,6 +131,7 @@ typedef enum tokens {
         T_MINUS_ASSIGN,                     /* "-=",                      */
         T_REGISTER,                         /* "'register'",              */
         T_DIVIDE_ASSIGN,                    /* "/=",                      */
+        T_FDIVIDE_ASSIGN,                   /* "//=",                     */
         T_MODULO_ASSIGN,                    /* "%=",                      */
         T_BXOR_ASSIGN,                      /* "~=",                      */
         T_BAND_ASSIGN,                      /* "&=",                      */
