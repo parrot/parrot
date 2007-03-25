@@ -756,7 +756,7 @@ conditional_expression(parser_state *p) {
 
 =item unless_statement()
 
-  unless_statement -> 'unless' (null expression|conditional_epxression) 'goto' IDENT '\n' 
+  unless_statement -> 'unless' ('null' expression|conditional_epxression) 'goto' IDENT '\n' 
 
 =cut
 
@@ -781,7 +781,7 @@ unless_statement(parser_state *p) {
 
 =item if_statement()
 
-  if_statement -> 'if' (null expression|conditional_epxression) 'goto' IDENT '\n'
+  if_statement -> 'if' ('null' expression|conditional_epxression) 'goto' IDENT '\n'
 
 =cut
 
@@ -1364,7 +1364,9 @@ instructions(parser_state *p) {
 
 =item multi_type_list()
 
-  multi_type_list -> '(' [multi-type {',' multi_type } ] ')'
+  multi-type-list -> '(' [multi-type {',' multi-type } ] ')'
+  
+  multi-type -> IDENT | STRINGC | keylist | type
 
 =cut
 
@@ -1374,8 +1376,7 @@ multi_type_list(parser_state *p) {
     int wantmore = 1;
 
     match(p, T_LPAREN);
-    while (wantmore) {
-        /* multi-type -> IDENT | stringc | '[' keylist ']' | type */
+    while (wantmore) {        
         switch (p->curtoken) {
             case T_IDENTIFIER:
             case T_SINGLE_QUOTED_STRING:
