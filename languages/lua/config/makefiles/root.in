@@ -60,7 +60,7 @@ GEN_PIR = \
  src/ASTGrammar.pir
 
 GEN_PBC = \
- src/lua.pbc \
+ src/lua51.pbc \
  luac.pbc
 
 all: \
@@ -83,8 +83,8 @@ src/lua51_grammar_gen.pir: src/lua.pg
 src/ASTGrammar.pir: src/ASTGrammar.tg
 	$(TGE) --output=src/ASTGrammar.pir src/ASTGrammar.tg
 
-src/lua.pbc: src/lua.pir src/lua51_grammar_gen.pir src/ASTGrammar.pir
-	$(PARROT) -o src/lua.pbc --output-pbc src/lua.pir
+src/lua51.pbc: src/lua51.pir src/lua51_grammar_gen.pir src/ASTGrammar.pir
+	$(PARROT) -o src/lua51.pbc --output-pbc src/lua51.pir
 
 luac.pbc: luac.pir
 	$(PARROT) -o luac.pbc --output-pbc luac.pir

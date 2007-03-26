@@ -16,7 +16,7 @@ C<test_lex> is a dumper for Lua 5.1 lexicography.
 =cut
 
 .sub '__onload' :load :init
-    load_bytecode 'languages/lua/src/lua.pbc'
+    load_bytecode 'languages/lua/src/lua51.pbc'
 
     $P0 = new [ 'HLLCompiler' ]
     $P0.'language'('LuaTestLex')

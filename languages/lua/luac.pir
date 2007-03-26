@@ -17,7 +17,7 @@ C<luac> is a compiler for Lua version 5.1, running on Parrot.
 .sub 'main' :main
     .param pmc args
 
-    load_bytecode 'languages/lua/src/lua.pbc'
+    load_bytecode 'languages/lua/src/lua51.pbc'
     load_bytecode 'PGE/Dumper.pbc'
 
     # Register the Lua compiler
