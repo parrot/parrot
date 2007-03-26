@@ -2025,3 +2025,10 @@ TOP(parser_state *p) {
 =cut
 
 */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

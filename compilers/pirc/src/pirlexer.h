@@ -1,9 +1,9 @@
 #ifndef __PIRLEXER_H
-#define __PIRLEXER_H
+  #define __PIRLEXER_H
 
 typedef enum tokens {
-		T_GLOBAL,                           /* "global"                   */
-        T_GOTO,                				/* "goto",                    */
+        T_GLOBAL,                           /* "global"                   */
+        T_GOTO,                             /* "goto",                    */
         T_IF,                               /* "if",                      */
         T_INT,                              /* "int",                     */
         T_N_OPERATORS,                      /* "n_operators",             */
@@ -147,7 +147,7 @@ typedef enum tokens {
 } token;
 
 /* Make sure MAX_TOKEN is the last enum value from enum token {} */
-#define MAX_TOKEN T_PARROT_OP
+  #define MAX_TOKEN T_PARROT_OP
 
 
 /* pirlexer API */
@@ -198,3 +198,9 @@ extern char const * find_keyword(token t);
 
 #endif
 
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

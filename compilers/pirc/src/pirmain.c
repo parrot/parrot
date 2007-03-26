@@ -16,7 +16,7 @@ main(int argc, char **argv) {
         fprintf(stderr, "usage: %s <file>\n", argv[0]);
         exit(1);
     }
-    
+
 
     /* create a new parser, specifying the file name */
     p = new_parser(argv[1]);
@@ -25,12 +25,19 @@ main(int argc, char **argv) {
     TOP(p);
 
     /* check for errors */
-    if (get_parse_errors(p)) 
-        fprintf(stderr, "\nThere were %d errors.\n", get_parse_errors(p));    
+    if (get_parse_errors(p))
+        fprintf(stderr, "\nThere were %d errors.\n", get_parse_errors(p));
     else
-        fprintf(stderr, "\nparsed successfully.\n");        
+        fprintf(stderr, "\nparsed successfully.\n");
 
     /* clean up and exit */
     exit_parser(p);
     return 0;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
