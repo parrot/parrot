@@ -246,7 +246,7 @@ match(parser_state *p, token expected) {
 
 Parse a simple expression. Returns the type of the expression.
 
-  expression -> ( IDENT | INTC | NUMC | STRINGC | REG )
+  expression -> ( IDENTIFIER | INTC | NUMC | stringconstant | register )
 
 =cut
 
@@ -364,7 +364,7 @@ type(parser_state *p) {
 
 =item key()
 
-  key -> unop expr | '..' expr | expr [ '..' [ expr ] ]
+  key -> unop expression | '..' expression | expression [ '..' [ expression ] ]
 
 =cut
 
@@ -377,11 +377,11 @@ key(parser_state *p) {
         case T_BXOR:
         case T_NOT:
         */
-        case T_DOTDOT: /* key -> '..' expr */
+        case T_DOTDOT: /* key -> '..' expression */
             next(p);
             expression(p);
             break;
-        default: /* key -> expr [ '..' [ expr ] ] */
+        default: /* key -> expression [ '..' [ expression ] ] */
             expression(p);
             if (p->curtoken == T_DOTDOT) {
                 next(p);
@@ -407,7 +407,7 @@ keylist(parser_state *p) {
     match(p, T_LBRACKET); /* skip '[' */
     key(p);
     while(p->curtoken == T_SEMICOLON || p->curtoken == T_COMMA) {
-        next(p); /* skip ',' */
+        next(p); /* skip ';' or ',' */
         key(p);
     }
     match(p, T_RBRACKET); /* match closing ']' */
@@ -417,23 +417,23 @@ keylist(parser_state *p) {
 
 =item argument()
 
-  argument -> HEREDOCID | expr | STRINGC '='> expr
+  argument -> HEREDOCID | expression | stringconstant '=>' expression
 
 =cut
 
 */
 static void
 argument(parser_state *p) {
-    /* argument -> heredoc_ident | simple_expr */
+    /* argument -> heredoc_ident | expression */
     if (p->curtoken == T_HEREDOC_ID) { /* heredoc argument */
         p->heredoc_ids[p->heredoc_index++] = clone_string(get_current_token(p->lexer));
         next(p);
     }
-    else {
+    else { /* argument -> expression | stringconstant '=>' expression */
         token exprtok = expression(p);
-        /* allow for "stringc '=>' expr" */
+        /* allow for "stringc '=>' expression" */
         if (exprtok == T_SINGLE_QUOTED_STRING || exprtok == T_DOUBLE_QUOTED_STRING) {
-            if (p->curtoken == T_ARROW) {
+            if (p->curtoken == T_ARROW) { /* argument -> stringconstant '=>' expression */
                 next(p);
                 expression(p);
             }
@@ -465,7 +465,7 @@ argument_list(parser_state *p) {
 
 =item global_definition()
 
-  global_definition -> '.global' IDENT
+  global_definition -> '.global' IDENTIFIER
 
 =cut
 
@@ -628,7 +628,7 @@ assignment(parser_state *p) {
                     method(p);
                     arguments(p);
                     break;
-                case T_LBRACKET: /* target '=' target '[' expr ']' */
+                case T_LBRACKET: /* target '=' target '[' expression ']' */
                     keylist(p);
                     break;
                 default: /* expression with a PMC target/id as first operand */
@@ -651,7 +651,7 @@ assignment(parser_state *p) {
             free(heredocid); /* clean up */
             break;
         }
-        default: /* general case for 'expr binop expr' */
+        default: /* general case for 'expression binop expression' */
             expression(p);
             arith_expression(p);
             break;
@@ -662,7 +662,7 @@ assignment(parser_state *p) {
 
 =item goto_statement()
 
-  goto_statement -> 'goto' IDENT '\n'
+  goto_statement -> 'goto' IDENTIFIER '\n'
 
 =cut
 
@@ -726,7 +726,7 @@ yield_statement(parser_state *p) {
 
 =item close_ns()
 
-  close_ns -> '.endnamespace' IDENT '\n'
+  close_ns -> '.endnamespace' IDENTIFIER '\n'
 
 =cut
 
@@ -742,7 +742,7 @@ close_ns(parser_state *p) {
 
 =item open_ns()
 
-  open_ns -> '.namespace' IDENT '\n'
+  open_ns -> '.namespace' IDENTIFIER '\n'
 
 =cut
 
@@ -758,7 +758,7 @@ open_ns(parser_state *p) {
 
 =item local_id_list()
 
-  local_id_list -> IDENT [':unique_reg'] { ',' IDENT [':unique_reg'] }
+  local_id_list -> IDENTIFIER [':unique_reg'] { ',' IDENTIFIER [':unique_reg'] }
 
 =cut
 
@@ -830,7 +830,7 @@ local_declaration(parser_state *p) {
 
 =item lex_declaration()
 
-  lex_declaration -> '.lex' STRINGC ',' target '\n'
+  lex_declaration -> '.lex' stringconstant ',' target '\n'
 
 =cut
 
@@ -850,7 +850,9 @@ lex_declaration(parser_state *p) {
 
 =item condition_expression()
 
-  conditional_expression -> expression [ ('>'|'>='|'<'|'<='|'=='|'!=') expression]
+  conditional_expression -> expression [cond_op expression]
+
+  cond_op                -> '>' | '>=' | '<' | '<=' | '==' | '!='
 
 =cut
 
@@ -865,7 +867,7 @@ conditional_expression(parser_state *p) {
             next(p); /* skip comparison op */
             expression(p);
             break;
-        default: /* cond-expr -> expr */
+        default: /* cond-expr -> expression */
             break;
     }
 }
@@ -874,7 +876,7 @@ conditional_expression(parser_state *p) {
 
 =item unless_statement()
 
-  unless_statement -> 'unless' ('null' expression|conditional_epxression) 'goto' IDENT '\n'
+  unless_statement -> 'unless' ('null' expression|conditional_epxression) 'goto' IDENTIFIER '\n'
 
 =cut
 
@@ -883,11 +885,11 @@ static void
 unless_statement(parser_state *p) {
     match(p, T_UNLESS);
 
-    if (p->curtoken == T_NULL) { /* 'unless' 'null' expr 'goto' IDENT */
+    if (p->curtoken == T_NULL) { /* 'unless' 'null' expr 'goto' IDENTIFIER */
         next(p);
         expression(p);
     }
-    else { /* 'unless' cond_expr 'goto' IDENT */
+    else { /* 'unless' cond_expr 'goto' IDENTIFIER */
         conditional_expression(p);
     }
     match(p, T_GOTO);
@@ -899,7 +901,7 @@ unless_statement(parser_state *p) {
 
 =item if_statement()
 
-  if_statement -> 'if' ('null' expression|conditional_epxression) 'goto' IDENT '\n'
+  if_statement -> 'if' ('null' expression|conditional_epxression) 'goto' IDENTIFIER '\n'
 
 =cut
 
@@ -923,10 +925,10 @@ if_statement(parser_state *p) {
 
 =item const_definition()
 
-  const_definition -> 'int' IDENT '=' INTC
-                    | 'num' IDENT '=' NUMC
-                    | 'pmc' IDENT '=' stringconstant
-                    | 'string' IDENT '=' stringconstant
+  const_definition -> 'int' IDENTIFIER '=' INTC
+                    | 'num' IDENTIFIER '=' NUMC
+                    | 'pmc' IDENTIFIER '=' stringconstant
+                    | 'string' IDENTIFIER '=' stringconstant
 
 =cut
 
@@ -955,7 +957,6 @@ const_definition(parser_state *p) {
             break;
         default:
             syntax_error(p, 1, "type expected");
-            next(p);    /* try to restore, get next token */
             break;
     }
 }
@@ -1080,7 +1081,7 @@ param_flags(parser_state *p) {
 */
 static void
 long_invocation(parser_state *p) {
-    int results = 1; /* flag for while loop */
+    int more_results = 1; /* flag for while loop */
 
     match(p, T_PCC_BEGIN);  /* '.pcc_begin '\n' ... */
     match(p, T_NEWLINE);
@@ -1113,7 +1114,7 @@ long_invocation(parser_state *p) {
     }
 
 
-    while (results) {
+    while (more_results) {
         switch (p->curtoken) {
             case T_LOCAL:
                 local_declaration(p);
@@ -1125,13 +1126,13 @@ long_invocation(parser_state *p) {
                 match(p, T_NEWLINE);
                 break;
             case T_PCC_END:
-                results = 0; /* no more results, break loop */
+                more_results = 0; /* no more results, break loop */
                 break;
             default:
                 syntax_error(p, 3,
                     "'.local', '.result' or '.pcc_end' expected, but got '",
                     get_current_token(p->lexer), "'");
-                results = 0; /* stop loop */
+                more_results = 0; /* stop loop */
                 break;
         }
     }
@@ -1146,7 +1147,7 @@ long_invocation(parser_state *p) {
 =item long_yield_statement()
 
   long_yield_statement -> '.pcc_begin_yield' '\n'
-                          { '.yield' expr '\n' }
+                          { '.yield' expression '\n' }
                           '.pcc_end_yield' '\n'
 
 =cut
@@ -1170,13 +1171,13 @@ long_yield_statement(parser_state *p) {
 
 =item target_statement()
 
-  target_statement -> ( target '=' assignment
-                      | target augmented_op expression
-                      | target keylist '=' expression
-                      | target '->' (stringconstant|IDENT) arguments
-                      | target arguments
-                      )
-                      '\n'
+  target_statement -> target ( '=' assignment
+                             | augmented_op expression
+                             | keylist '=' expression
+                             | '->' (stringconstant|IDENTIFIER) arguments
+                             | arguments
+                             )
+                             '\n'
 
   augmented_op     -> '+=' | '-=' | '%=' | '/='  | '//=' | '*='  | '.='
                     | '~=' | '&=' | '|=' | '**=' | '<<=' | '>>=' | '>>>='
@@ -1213,7 +1214,7 @@ target_statement(parser_state *p) {
             match(p, T_ASSIGN);
             expression(p);
             break;
-        case T_PTR:  /* target '->' (stringc|identifier) arguments '\n' */
+        case T_PTR:  /* target '->' (stringconstant|identifier) arguments '\n' */
             next(p); /* skip '->' */
             method(p);
             arguments(p);
@@ -1235,7 +1236,7 @@ target_statement(parser_state *p) {
 
 =item target_list
 
-  target_list -> '(' target {',' target } ')'
+  target_list -> '(' target param_flags {',' target param_flags } ')'
 
 =cut
 
@@ -1247,7 +1248,6 @@ target_list(parser_state *p) {
     while(p->curtoken == T_COMMA) {
         next(p);
         target(p);
-        /* add flags like slurpy */
         param_flags(p);
     }
     match(p, T_RPAREN);
@@ -1342,7 +1342,7 @@ get_results_instruction(parser_state *p) {
 Only PMCs can be stored as globals, so only PMC registers and identifiers
 are allowed. Currently no check is done on the type of the identifier
 
-  global_assignment -> 'global' stringconstant '=' (IDENT|PREG) '\n'
+  global_assignment -> 'global' stringconstant '=' (IDENTIFIER|PREG) '\n'
 
 =cut
 
@@ -1380,7 +1380,7 @@ static void
 parrot_instruction(parser_state *p) {
     match(p, T_PARROT_OP); /* XXX for now, parse as many arguments as necessary */
     while (p->curtoken != T_NEWLINE) {
-        next(p);
+        expression(p);
         if (p->curtoken == T_COMMA) next(p);
         else break;
     }
@@ -1526,7 +1526,7 @@ instructions(parser_state *p) {
 
   multi-type-list -> '(' [multi-type {',' multi-type } ] ')'
 
-  multi-type -> IDENT | STRINGC | keylist | type
+  multi-type -> IDENTIFIER | stringconstant | keylist | type
 
 =cut
 
@@ -1590,7 +1590,6 @@ multi_type_list(parser_state *p) {
 */
 static void
 sub_flags(parser_state *p) {
-    /* sub_flags -> flag { [','] flag } */
     int ok = 1;
     int wantmore = 0; /* flag that is set when a ',' is parsed */
 
@@ -1658,7 +1657,7 @@ sub_flags(parser_state *p) {
 
 =item parameters()
 
-  parameters -> { '.param (register | type IDENT) [param_flag] '\n' }
+  parameters -> { '.param (register | type IDENTIFIER) [param_flag] '\n' }
 
 =cut
 
@@ -1884,7 +1883,7 @@ hll_mapping(parser_state *p) {
 
 =item namespace_declaration()
 
-  namespace_declaration -> '.namespace' [ '[' stringc { (','|';') stringc ']' ]
+  namespace_declaration -> '.namespace' [ '[' stringconstant { (','|';') stringconstant ']' ]
 
 =cut
 
@@ -1955,7 +1954,7 @@ compilation_unit(parser_state *p) {
         case T_EMIT: /* compilation_unit -> emit_block */
             emit_block(p);
             break;
-        case T_INCLUDE: /* compilation_unit -> '.include' stringc */
+        case T_INCLUDE: /* compilation_unit -> '.include' stringconstant */
             include(p);
             break;
         case T_MACRO:
