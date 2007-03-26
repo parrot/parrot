@@ -1370,8 +1370,10 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
     n_regs_used[3] = MAX( max_regs[3], max_regs[7] );
 
     /* initialize arg and return sig FIAs with collected info */
-    VTABLE_set_integer_native(interp, args_sig, arg_ret_cnt[0]);
-    VTABLE_set_integer_native(interp, results_sig, arg_ret_cnt[1]);
+    if (arg_ret_cnt[0] > 0)
+        VTABLE_set_integer_native(interp, args_sig, arg_ret_cnt[0]);
+    if (arg_ret_cnt[1] > 0)
+        VTABLE_set_integer_native(interp, results_sig, arg_ret_cnt[1]);
     ctx = Parrot_push_context(interp, n_regs_used);
 
     /* reset n_regs_used so they can be reused during arg index allocation step */
