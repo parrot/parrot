@@ -160,14 +160,14 @@ sub check_indent {
     my @pp_failed_files = keys %pp_failed;
 
 ## L<PDD07/Code Formatting/"Preprocessor #directives must be indented two columns per nesting level, with two exceptions: neither PARROT_IN_CORE nor the outermost _GUARD #ifdefs cause the level of indenting to increase">
-    ok( !scalar(@pp_indent) )
+    ok( !scalar(@pp_indent), 'Correctly indented preprocessor directives' )
         or diag( "incorrect indenting in preprocessor directive found "
             . scalar @pp_indent
             . " occurrences in "
             . scalar @pp_failed_files
             . " files:\n@pp_indent" );
 
-    ok( !scalar(@c_indent) )
+    ok( !scalar(@c_indent), 'Correctly indented C files' )
         or diag( "incorrect indenting in C file found "
             . scalar @c_indent
             . " occurrences in "
