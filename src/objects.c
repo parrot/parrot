@@ -1736,7 +1736,7 @@ static PMC* C3_merge(Interp *interp, PMC *merge_list)
                 PMC *check_list = VTABLE_get_pmc_keyed_int(interp, merge_list, j);
                 int check_length = VTABLE_elements(interp, check_list);
                 int k;
-                
+
                 for (k = 1; k < check_length; k++) {
                     if (VTABLE_get_pmc_keyed_int(interp, check_list, k) == cand_class) {
                         reject = 1;
