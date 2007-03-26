@@ -352,7 +352,7 @@ Creates an instance of the object.
         if (!class->instantiated) {
             /* Build full parents list.
              * XXX Need pluggable MRO, for now always do C3. */
-            class->all_parents = Parrot_ComputeMRO_C3(interp, class);
+            class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
 
             /* Build attributes index. */
             Parrot_Class_build_attrib_index(interp, SELF);
