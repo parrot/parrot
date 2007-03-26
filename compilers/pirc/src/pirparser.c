@@ -19,17 +19,28 @@ pirparser.c - parser for Parrot Intermediate Representation
 
 /*
 
-parser_state structure holds the current token, a pointer to the lexer,
-and keeps track of the number of errors.
+=head1 INTERNALS
+
+The parser_state structure has the following fields:
+
+ typedef struct parser_state {
+    struct lexer_state *lexer;       -- the lexer
+    token curtoken;                  -- the current token as returned by the lexer
+    char *heredoc_ids[10];           -- array for holding heredoc arguments. XXX Limited to 10 currently XXX
+    int heredoc_index;               -- index to keep track of heredoc ids in the array
+    unsigned parse_errors;           -- parse_errors
+ }
+
+=cut
 
 */
 
 typedef struct parser_state {
-    struct lexer_state *lexer;      /* the lexer */
-    token curtoken;                 /* the current token as returned by the lexer */
-    char *heredoc_ids[10];          /* array for holding heredoc arguments. XXX Limited to 10 currently XXX */
-    int heredoc_index;              /* index to keep track of heredoc ids in the array */
-    unsigned parse_errors;          /* parse_errors */
+    struct lexer_state *lexer;
+    token curtoken;
+    char *heredoc_ids[10];
+    int heredoc_index;
+    unsigned parse_errors;
 
 } parser_state;
 
@@ -44,7 +55,7 @@ typedef struct parser_state {
 
 /*
 
-=head1 HELPER FUNCTIONS
+=head1 PARSER API
 
 =over 4
 
@@ -100,8 +111,41 @@ new_parser(char const * filename) {
     return p;
 }
 
+/*
+
+=item struct lexer_state const *get_lexer()
+
+returns the specified parser's lexer
+
+=cut
+
+*/
+struct lexer_state const *
+get_lexer(parser_state *p) {
+    return p->lexer;
+}
 
 /*
+
+=item token get_token()
+
+returns the specified parser's current token
+
+=cut
+
+*/
+token get_token(parser_state *p) {
+    return p->curtoken;
+}
+
+
+/*
+
+=back
+
+=head1 HELPER FUNCTIONS
+
+=over 4
 
 =item static void syntax_error()
 
@@ -183,32 +227,7 @@ match(parser_state *p, token expected) {
     }
 }
 
-/*
 
-=item struct lexer_state const *get_lexer()
-
-returns the specified parser's lexer
-
-=cut
-
-*/
-struct lexer_state const *
-get_lexer(parser_state *p) {
-    return p->lexer;
-}
-
-/*
-
-=item token get_token()
-
-returns the specified parser's current token
-
-=cut
-
-*/
-token get_token(parser_state *p) {
-    return p->curtoken;
-}
 
 
 
@@ -382,7 +401,6 @@ key(parser_state *p) {
 */
 static void
 keylist(parser_state *p) {
-    /* keylist -> '[' key { (';'|',') key} ']' */
     match(p, T_LBRACKET); /* skip '[' */
     key(p);
     while(p->curtoken == T_SEMICOLON || p->curtoken == T_COMMA) {
@@ -450,7 +468,7 @@ argument_list(parser_state *p) {
 
 */
 static void
-global_definition(parser_state *p) {    
+global_definition(parser_state *p) {
     match(p, T_GLOBAL_DECL);
     match(p, T_IDENTIFIER);
 }
@@ -742,7 +760,7 @@ open_ns(parser_state *p) {
 
 =item local_id_list()
 
-  local_id_list -> IDENT [flag] { ',' IDENT [flag] }
+  local_id_list -> IDENT [':unique_reg'] { ',' IDENT [':unique_reg'] }
 
 =cut
 
@@ -756,6 +774,7 @@ local_id_list(parser_state *p) {
         next(p); /* skip comma */
         match(p, T_IDENTIFIER);
 
+        /* parse optional :unique_reg flag */
         if (p->curtoken == T_UNIQUE_REG_FLAG) next(p);
     }
 }
@@ -906,7 +925,10 @@ if_statement(parser_state *p) {
 
 =item const_definition()
 
-  const_definition -> type IDENT '=' constant
+  const_definition -> 'int' IDENT '=' INTC
+                    | 'num' IDENT '=' NUMC
+                    | 'pmc' IDENT '=' stringconstant
+                    | 'string' IDENT '=' stringconstant
 
 =cut
 
@@ -939,9 +961,6 @@ const_definition(parser_state *p) {
             break;
     }
 }
-
-
-
 
 
 /*
@@ -1036,6 +1055,7 @@ param_flags(parser_state *p) {
             /* however, if the current token is a comma or ')', then quit parsing flags */
             case T_COMMA:
             case T_RPAREN:
+            case T_NEWLINE:
                 ok = 0; /* stop loop */
                 break;
             /* if none of the above, error! */
@@ -1103,6 +1123,7 @@ long_invocation(parser_state *p) {
             case T_RESULT: /* '.result' target '\n' */
                 next(p);
                 target(p);
+                param_flags(p);
                 match(p, T_NEWLINE);
                 break;
             case T_PCC_END:
@@ -1599,10 +1620,9 @@ sub_flags(parser_state *p) {
 
         wantmore = 0; /* clear wantmore flag */
 
-        /* after the optional comma we expect another sub flag */
         if (p->curtoken == T_COMMA) {
             next(p); /* skip the comma */
-            wantmore = 1;
+            wantmore = 1;  /* after the optional comma we expect another sub flag */
         }
     }
 }
@@ -1742,7 +1762,7 @@ macro_definition(parser_state *p) {
 =item include()
 
 calls include_file() in the lexer. Then, the first token is initialized
-by calling next(); then the TOP() routine is invoked to start parsing
+by calling next(). then the TOP() routine is invoked to start parsing
 the included file. After having parsed that file, continue the current file
 by calling the next token.
 
