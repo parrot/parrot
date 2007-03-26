@@ -942,6 +942,7 @@ is indicated explicitly.
                 return T_INTEGER_CONSTANT;
             }
             else { /* 1 digit */
+                unread_char(lexer->curfile);
                 return T_INTEGER_CONSTANT;
             }
 

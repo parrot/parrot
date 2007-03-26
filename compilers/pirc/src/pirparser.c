@@ -50,6 +50,9 @@ typedef struct parser_state {
 
 
 /* call next() to get the next token from the lexer */ /* NOTE: it's calling pirout() */
+
+/* #define next(P) P->curtoken = next_token(P->lexer) */
+
 #define next(P) do { pirout(P); P->curtoken = next_token(P->lexer); } while(0)
 
 
@@ -584,8 +587,8 @@ arith_expression(parser_state *p) {
                     | 'global' stringconstant
                     | heredocstring
                     | methodcall
-                    | 'null' )
-                    '\n'
+                    | 'null'
+                    )
 
   unop       -> '-' | '!' | '~'
 
@@ -653,7 +656,6 @@ assignment(parser_state *p) {
             arith_expression(p);
             break;
     }
-    match(p, T_NEWLINE);
 }
 
 /*
@@ -1168,7 +1170,7 @@ long_yield_statement(parser_state *p) {
 
 =item target_statement()
 
-  target_statement -> target '=' assignment
+  target_statement -> target '=' assignment '\n'
                     | target augmented_op expression '\n'
                     | target keylist '=' expression '\n'
                     | target '->' (stringconstant|IDENT) arguments '\n'
@@ -1188,6 +1190,7 @@ target_statement(parser_state *p) {
     switch(p->curtoken) {
         case T_ASSIGN:   /* target '=' expression */
             assignment(p);
+            match(p, T_NEWLINE);
             break;
         case T_PLUS_ASSIGN: /* target '+=' simple_expr '\n' (and '-=' etc.) */
         case T_MINUS_ASSIGN:
