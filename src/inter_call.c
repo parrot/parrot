@@ -1236,10 +1236,10 @@ commit_last_arg(Interp *interp, int index, int cur, opcode_t *n_regs_used, int s
     int reg_offset = 0;
     /* calculate arg's register offset */
     switch (cur & PARROT_ARG_TYPE_MASK) { /* calc reg offset */
-        case 'I': reg_offset = n_regs_used[seen_arrow * 4 + 0]++; break;
-        case 'N': reg_offset = n_regs_used[seen_arrow * 4 + 1]++; break;
-        case 'S': reg_offset = n_regs_used[seen_arrow * 4 + 2]++; break;
-        case 'R': reg_offset = n_regs_used[seen_arrow * 4 + 3]++; break;
+        case PARROT_ARG_INTVAL:   reg_offset = n_regs_used[seen_arrow * 4 + REGNO_INT]++; break;
+        case PARROT_ARG_FLOATVAL: reg_offset = n_regs_used[seen_arrow * 4 + REGNO_NUM]++; break;
+        case PARROT_ARG_STRING:   reg_offset = n_regs_used[seen_arrow * 4 + REGNO_STR]++; break;
+        case PARROT_ARG_PMC :     reg_offset = n_regs_used[seen_arrow * 4 + REGNO_PMC]++; break;
         default:
                   real_exception(interp, NULL, E_IndexError,
                           "Parrot_PCCINVOKE: invalid reg type");
@@ -1253,10 +1253,10 @@ commit_last_arg(Interp *interp, int index, int cur, opcode_t *n_regs_used, int s
     /* perform the arg accessor function, assigning the arg to its corresponding register */
     if (!seen_arrow) {
         switch (cur & PARROT_ARG_TYPE_MASK) {
-            case 'I': CTX_REG_INT(ctx, reg_offset) = va_arg(*list, INTVAL); break;
-            case 'N': CTX_REG_NUM(ctx, reg_offset) = va_arg(*list, FLOATVAL); break;
-            case 'S': CTX_REG_STR(ctx, reg_offset) = va_arg(*list, STRING*); break;
-            case 'R': CTX_REG_PMC(ctx, reg_offset) = va_arg(*list, PMC*); break;
+            case PARROT_ARG_INTVAL:   CTX_REG_INT(ctx, reg_offset) = va_arg(*list, INTVAL); break;
+            case PARROT_ARG_FLOATVAL: CTX_REG_NUM(ctx, reg_offset) = va_arg(*list, FLOATVAL); break;
+            case PARROT_ARG_STRING:   CTX_REG_STR(ctx, reg_offset) = va_arg(*list, STRING*); break;
+            case PARROT_ARG_PMC :     CTX_REG_PMC(ctx, reg_offset) = va_arg(*list, PMC*); break;
             default:
                       real_exception(interp, NULL, E_IndexError,
                           "Parrot_PCCINVOKE: invalid reg type");
@@ -1351,10 +1351,10 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
             arg_ret_cnt[seen_arrow]++;
             /* calculate max reg types (INSP) needed in context */
             switch (*x) {
-                case 'I': max_regs[seen_arrow * 4 + 0]++; break;
-                case 'N': max_regs[seen_arrow * 4 + 1]++; break;
-                case 'S': max_regs[seen_arrow * 4 + 2]++; break;
-                case 'P': max_regs[seen_arrow * 4 + 3]++; break;
+                case 'I': max_regs[seen_arrow * 4 + REGNO_INT]++; break;
+                case 'N': max_regs[seen_arrow * 4 + REGNO_NUM]++; break;
+                case 'S': max_regs[seen_arrow * 4 + REGNO_STR]++; break;
+                case 'P': max_regs[seen_arrow * 4 + REGNO_PMC]++; break;
                 default:
                           real_exception(interp, NULL, E_IndexError,
                                   "Parrot_PCCINVOKE: invalid reg type %c!", *x);
@@ -1479,7 +1479,7 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
             FLOATVAL *tmpFLOATVAL;
             STRING **tmpSTRING;
             PMC **tmpPMC;
-            switch (cur & PARROT_ARG_TYPE_MASK) {
+            switch (*x) {
                 case 'I':
                     tmpINTVAL = va_arg(list, INTVAL*);
                     *tmpINTVAL = CTX_REG_INT(ctx, indexes[seen_arrow][index]);
