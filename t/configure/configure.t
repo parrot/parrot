@@ -18,7 +18,7 @@ t/configure/configure.t - tests Parrot::Configure
 
 =head1 DESCRIPTION
 
-Regressions tests for the L<Parrote::Configure> class.
+Regressions tests for the L<Parrot::Configure> class.
 
 =cut
 
