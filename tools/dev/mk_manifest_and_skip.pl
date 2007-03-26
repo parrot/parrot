@@ -112,7 +112,9 @@ for my $line (@versioned_output) {
     my @line_info = split( /\s+/, $line );
 
     # the file is the last item in the @line_info array
-    push @versioned_files, $line_info[-1];
+    my $filename = $line_info[-1];
+    $filename =~ s/\\/\//g;
+    push @versioned_files, $filename;
 }
 
 my @MANIFEST_LINES = ();
