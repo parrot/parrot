@@ -351,14 +351,8 @@ Creates an instance of the object.
         /* If we've not been instantiated before... */
         if (!class->instantiated) {
             /* Build full parents list.
-             * XXX While waiting a decision on the MRO stuff, we just put
-             * ourself and our immediate parents in the list... */
-            int i;
-            class->all_parents = pmc_new(interp, enum_class_ResizablePMCArray);
-            VTABLE_push_pmc(interp, class->all_parents, SELF);
-            for (i = 0; i < VTABLE_elements(interp, class->parents); i++)
-                VTABLE_push_pmc(interp, class->all_parents,
-                    VTABLE_get_pmc_keyed_int(interp, class->parents, i));
+             * XXX Need pluggable MRO, for now always do C3. */
+            class->all_parents = Parrot_ComputeMRO_C3(interp, class);
 
             /* Build attributes index. */
             Parrot_Class_build_attrib_index(interp, SELF);

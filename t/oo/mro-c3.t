@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 3;
 
 =head1 NAME
 
@@ -22,15 +22,132 @@ Tests the C3 Method Resolution order for the OO implementation.
 
 =cut
 
-# L<PDD15>
-# TODO update smartlink
-# TODO write real tests :)
-pir_output_is( <<'CODE', <<'OUT', 'stup' );
+pir_output_is( <<'CODE', <<'OUT', 'single parent', todo => 'Parrot_PCCINVOKE broken' );
 .sub 'test' :main
-    say 'ok 1 - just a stub'
+    .local pmc A, B
+
+    A = new .Class
+    $P0 = find_global 'testA'
+    A.'add_method'("foo", $P0)
+    A.'add_method'("bar", $P0)
+
+    B = new .Class
+    B.'add_parent'(A)
+    $P0 = find_global 'testB'
+    B.'add_method'("foo", $P0)
+
+    $P0 = B.'new'()
+    $P0.foo()
+    $P0.bar()
+.end
+
+.sub testA :method
+    print "Method from A called\n"
+.end
+.sub testB :method
+    print "Method from B called\n"
 .end
 CODE
-ok 1 - just a stub
+Method from B called
+Method from A called
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'grandparent', todo => 'Parrot_PCCINVOKE broken' );
+.sub 'test' :main
+    .local pmc A, B, C
+
+    A = new .Class
+    $P0 = find_global 'testA'
+    A.'add_method'("foo", $P0)
+    A.'add_method'("bar", $P0)
+    A.'add_method'("baz", $P0)
+
+    B = new .Class
+    B.'add_parent'(A)
+    $P0 = find_global 'testB'
+    B.'add_method'("foo", $P0)
+    B.'add_method'("bar", $P0)
+
+    C = new .Class
+    C.'add_parent'(B)
+    $P0 = find_global 'testC'
+    C.'add_method'("foo", $P0)
+
+    $P0 = C.'new'()
+    $P0.foo()
+    $P0.bar()
+    $P0.baz()
+.end
+
+.sub testA :method
+    print "Method from A called\n"
+.end
+.sub testB :method
+    print "Method from B called\n"
+.end
+.sub testC :method
+    print "Method from C called\n"
+.end
+CODE
+Method from C called
+Method from B called
+Method from A called
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'diamond inheritance', todo => 'Parrot_PCCINVOKE broken' );
+.sub 'test' :main
+    .local pmc A, B, C, D
+
+    A = new .Class
+    $P0 = find_global 'testA'
+    A.'add_method'("foo", $P0)
+    A.'add_method'("bar", $P0)
+    A.'add_method'("baz", $P0)
+    A.'add_method'("wag", $P0)
+
+    B = new .Class
+    B.'add_parent'(A)
+    $P0 = find_global 'testB'
+    B.'add_method'("foo", $P0)
+    B.'add_method'("bar", $P0)
+
+    C = new .Class
+    C.'add_parent'(A)
+    $P0 = find_global 'testC'
+    C.'add_method'("foo", $P0)
+    C.'add_method'("bar", $P0)
+    B.'add_method'("baz", $P0)
+    
+    D = new .Class
+    D.'add_parent'(B)
+    D.'add_parent'(C)
+    $P0 = find_global 'testD'
+    D.'add_method'("foo", $P0)
+
+    $P0 = D.'new'()
+    $P0.foo()
+    $P0.bar()
+    $P0.baz()
+    $P0.wag()
+.end
+
+.sub testA :method
+    print "Method from A called\n"
+.end
+.sub testB :method
+    print "Method from B called\n"
+.end
+.sub testC :method
+    print "Method from C called\n"
+.end
+.sub testD :method
+    print "Method from D called\n"
+.end
+CODE
+Method from D called
+Method from C called
+Method from B called
+Method from A called
 OUT
 
 # Local Variables:

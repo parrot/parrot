@@ -91,7 +91,7 @@ ok 3 - name() with too many args fails
 OUT
 
 # L<PDD15/Class PMC API/=item new>
-pir_output_is( <<'CODE', <<'OUT', 'new' );
+pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'Parrot_PCCINVOKE broken' );
 .sub 'test' :main
     new $P0, .Class
     $P1 = $P0.'new'()
@@ -195,7 +195,7 @@ OUT
 
 ## NOTE i think this belongs in the Object PMC tests
 # L<PDD15/Class PMC API>
-pir_output_is( <<'CODE', <<'OUT', 'set_attr/get_attr VTABLE methods' );
+pir_output_is( <<'CODE', <<'OUT', 'set_attr/get_attr VTABLE methods', todo => 'Parrot_PCCINVOKE broken' );
 .sub 'test' :main
     new $P0, .Class
     $P0.'name'("Test")

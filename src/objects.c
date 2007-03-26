@@ -1695,6 +1695,142 @@ void Parrot_set_class_fallback(Interp *interp, STRING *class,
 {
 }
 
+
+/* ************************************************************************ */
+/* ********* BELOW HERE IS NEW PPD15 IMPLEMENTATION RELATED STUFF ********* */
+/* ************************************************************************ */
+
+/*
+
+=item C<PMC* Parrot_ComputeMRO_C3(Interp *interp, PMC *class)>
+
+Computes the C3 linearization for the given class.
+
+=cut
+
+*/
+
+static PMC* C3_merge(Interp *interp, PMC *merge_list)
+{
+    PMC *result = pmc_new(interp, enum_class_ResizablePMCArray);
+    int list_count = VTABLE_elements(interp, merge_list);
+    int cand_count = 0;
+    int i;
+    PMC *accepted = PMCNULL;
+
+    /* Try and find something appropriate to add to the MRO - basically, the
+     * first list head that is not in the tail of all the other lists. */
+    for (i = 0; i < list_count; i++) {
+        PMC *cand_list = VTABLE_get_pmc_keyed_int(interp, merge_list, i);
+        PMC *cand_class;
+        int reject = 0;
+        int j;
+        if (VTABLE_elements(interp, cand_list) == 0)
+            continue;
+        cand_class = VTABLE_get_pmc_keyed_int(interp, cand_list, 0);
+        cand_count++;
+        for (j = 0; j < list_count; j++) {
+            /* Skip the current list. */
+            if (j != i) {
+                /* Is it in the tail? If so, reject. */
+                PMC *check_list = VTABLE_get_pmc_keyed_int(interp, merge_list, j);
+                int check_length = VTABLE_elements(interp, check_list);
+                int k;
+                
+                for (k = 1; k < check_length; k++) {
+                    if (VTABLE_get_pmc_keyed_int(interp, check_list, k) == cand_class) {
+                        reject = 1;
+                        break;
+                    }
+                }
+            }
+        }
+
+        /* If we didn't reject it, this candidate will do. */
+        if (!reject) {
+            accepted = cand_class;
+            break;
+        }
+    }
+
+    /* If we never found any candidates, return an empty list. */
+    if (cand_count == 0)
+        return pmc_new(interp, enum_class_ResizablePMCArray);
+
+    /* If we didn't find anything to accept, error. */
+    if (PMC_IS_NULL(accepted)) {
+        real_exception(interp, NULL, ILL_INHERIT,
+            "Could not build C3 linearization: ambiguous hierarchy");
+        return PMCNULL;
+    }
+
+    /* Otherwise, remove what was accepted from the merge lists. */
+    for (i = 0; i < list_count; i++) {
+        PMC *list = VTABLE_get_pmc_keyed_int(interp, merge_list, i);
+        int list_count = VTABLE_elements(interp, list);
+        int j;
+        for (j = 0; j < list_count; j++) {
+            if (VTABLE_get_pmc_keyed_int(interp, list, j) == accepted) {
+                VTABLE_delete_keyed_int(interp, list, j);
+                break;
+            }
+        }
+    }
+
+    /* Need to merge what remains of the list, then put what was accepted on
+     * the start of the list, and we're done. */
+    result = C3_merge(interp, merge_list);
+    VTABLE_unshift_pmc(interp, result, accepted);
+    return result;
+}
+
+PMC* Parrot_ComputeMRO_C3(Interp *interp, PMC *class)
+{
+    PMC *result;
+    PMC *merge_list = pmc_new(interp, enum_class_ResizablePMCArray);
+    PMC *immediate_parents;
+    int i, parent_count;
+
+    /* Now get immediate parents list. */
+    Parrot_PCCINVOKE(interp, class, string_from_const_cstring(interp, "parents", 0),
+        "->P", &immediate_parents);
+    if (immediate_parents == NULL) {
+        real_exception(interp, NULL, METH_NOT_FOUND,
+            "Failed to get parents list from class!");
+        return PMCNULL;
+    }
+    parent_count = VTABLE_elements(interp, immediate_parents);
+    if (parent_count == 0)
+    {
+        /* No parents - MRO just contains this class. */
+        result = pmc_new(interp, enum_class_ResizablePMCArray);
+        VTABLE_push_pmc(interp, result, class);
+        return result;
+    }
+
+    /* Otherwise, need to do merge. For that, need linearizations of all of
+     * our parents added to the merge list. */
+    for (i = 0; i < parent_count; i++) {
+        PMC *lin = Parrot_ComputeMRO_C3(interp,
+            VTABLE_get_pmc_keyed_int(interp, immediate_parents, i));
+        if (PMC_IS_NULL(lin))
+            return PMCNULL;
+        VTABLE_push_pmc(interp, merge_list, lin);
+    }
+
+    /* Finally, need list of direct parents on the end of the merge list, then
+     * we can merge. */
+    VTABLE_push_pmc(interp, merge_list, immediate_parents);
+    result = C3_merge(interp, merge_list);
+    if (PMC_IS_NULL(result))
+        return PMCNULL;
+
+    /* Merged result needs this class on the start, and then we're done. */
+    VTABLE_unshift_pmc(interp, result, class);
+    return result;
+}
+
+
 /*
 
 =back
