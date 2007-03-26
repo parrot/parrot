@@ -150,7 +150,7 @@ Return the LexInfo PMC, if any or a Null PMC.
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd20_lecical_vars.pod>, F<src/pmc/lexinfo.pmc>.
+F<docs/pdds/pdd20_lexical_vars.pod>, F<src/pmc/lexinfo.pmc>.
 
 =cut
 

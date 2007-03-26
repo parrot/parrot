@@ -165,7 +165,7 @@ Marks the lexpad hash as live.
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd20_lecical_vars.pod>, F<src/pmc/lexpad.pmc>,
+F<docs/pdds/pdd20_lexical_vars.pod>, F<src/pmc/lexpad.pmc>,
 F<src/pmc/lexinfo.pmc>.
 
 =cut

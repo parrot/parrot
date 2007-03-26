@@ -156,7 +156,7 @@ The implementation of the Hash PMC is called.
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd20_lecical_vars.pod>, F<src/classes/lexpad.pmc>.
+F<docs/pdds/pdd20_lexical_vars.pod>, F<src/classes/lexpad.pmc>.
 
 =cut
 
