@@ -12,29 +12,29 @@ void
 pirout(struct parser_state *p) {
     struct lexer_state *l = get_lexer(p);
     token t = get_token(p);
-    
+
     switch (t) {
         case T_RPAREN:            /* HACK */
             fprintf(stderr, ")"); /* and print newline as well, nec. for macros */
         case T_NEWLINE:
             fprintf(stderr, "\n");
-            break;              
+            break;
         case T_IDENTIFIER:
         case T_PASM_PREG:
-        case T_PASM_NREG:                                
+        case T_PASM_NREG:
         case T_PASM_IREG:
         case T_PASM_SREG:
         case T_PREG:
         case T_NREG:
-        case T_SREG:    
-        case T_IREG:    
-            fprintf(stderr, " %s ", get_current_token(l));	                              
+        case T_SREG:
+        case T_IREG:
+            fprintf(stderr, " %s ", get_current_token(l));
             break;
-        default:            
+        default:
             fprintf(stderr, "%s ", find_keyword(t));
             break;
     }
-	
+
 }
 
 /*
