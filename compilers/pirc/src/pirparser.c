@@ -1367,6 +1367,26 @@ global_assignment(parser_state *p) {
     match(p, T_NEWLINE);
 }
 
+/*
+
+=item parrot_instruction
+
+  parrot_instruction -> PARROT_OP [ expression {',' expression } ] '\n'
+
+=cut
+
+*/
+static void
+parrot_instruction(parser_state *p) {
+    match(p, T_PARROT_OP); /* XXX for now, parse as many arguments as necessary */
+    while (p->curtoken != T_NEWLINE) {
+        next(p);
+        if (p->curtoken == T_COMMA) next(p);
+        else break;
+    }
+    match(p, T_NEWLINE);
+}
+
 
 /*
 
@@ -1477,13 +1497,7 @@ instructions(parser_state *p) {
                 multi_result_invocation(p);
                 break;
             case T_PARROT_OP: /* parrot instructions */
-                next(p); /* XXX for now, parse as many arguments as necessary */
-                while (p->curtoken != T_NEWLINE) {
-                    next(p);
-                    if (p->curtoken == T_COMMA) next(p);
-                    else break;
-                }
-                match(p, T_NEWLINE);
+                parrot_instruction(p);
                 break;
             case T_NULL: /* 'null' is a PIR keyword, but also an instruction. */
                 next(p);
@@ -1708,7 +1722,7 @@ sub_definition(parser_state *p) {
 
 =item emit_block()
 
-  emit_block -> '.emit' '\n' {pasm_instruction} '.eom'
+  emit_block -> '.emit' '\n' {parrot_instruction} ['\n'] '.eom'
 
 Note that a PASM instruction looks like an identifier.
 This is checked for in the lexer.
@@ -1722,14 +1736,9 @@ emit_block(parser_state *p) {
     match(p, T_NEWLINE);
 
     while (p->curtoken == T_PARROT_OP) {
-        next(p);
-        while (p->curtoken != T_NEWLINE) {
-            next(p);
-            if (p->curtoken == T_COMMA) next(p);
-            else break; /* stop loop */
-        }
-        match(p, T_NEWLINE);
+        parrot_instruction(p);
     }
+
     if (p->curtoken == T_NEWLINE) next(p);
 
     match(p, T_EOM);
