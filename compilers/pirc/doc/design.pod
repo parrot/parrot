@@ -16,11 +16,11 @@ PIRC currently consists of only a PIR parser, together with a lexer.
 =head2 OVERVIEW
 
 The lexer is defined in C<pirlexer.c>. The header file lists all tokens that
-may be returned by the lexer. 
+may be returned by the lexer.
 
 The lexer reads the complete file contents into a buffer, from which it reads
 the individual words, or I<tokens>. A buffer is much faster than using C<getc()>
-for each character, as I/O is relatively slow. 
+for each character, as I/O is relatively slow.
 
 The lexer has three functions that may be invoked to receive the next token:
 
@@ -42,6 +42,7 @@ T_EOF when the end of the file (buffer) is encountered.
 C<read_macro()> is used to read a macro body. It reads up to the C<.endm> word,
 and then returns the T_ENDM token, which can then be matched by the parser.
 
+=back
 
 =head2 IMPLEMENTATION
 
@@ -52,10 +53,10 @@ access to its members.
 The structure looks like this:
 
  typedef struct lexer_state {
-    struct file_buffer *curfile;    
-    char *token_chars;              
-    char *charptr;                  
- 
+    struct file_buffer *curfile;
+    char *token_chars;
+    char *charptr;
+
  } lexer_state;
 
 It has three pointers: the first one is a pointer to a file_buffer structure, which
@@ -63,24 +64,24 @@ will be discussed shortly. The second is a pointer to the current token's charac
 This is a buffer in which the characters for the current token are stored.
 The field C<charptr> acts like an index to add and delete characters from C<token_chars>.
 
-As mentioned, the lexer reads the source file and returns tokens. The source file is 
+As mentioned, the lexer reads the source file and returns tokens. The source file is
 represented by another structure, called C<file_buffer>. It looks like this:
 
  typedef struct file_buffer {
-     char *filename;                 
-     char *buffer;                   
-     char *curchar;                  
-     unsigned filesize;              
-     unsigned int line;              
-     unsigned short linepos;         
-     char lastchar;                  
-     struct file_buffer *prevbuffer; 
- 
+     char *filename;
+     char *buffer;
+     char *curchar;
+     unsigned filesize;
+     unsigned int line;
+     unsigned short linepos;
+     char lastchar;
+     struct file_buffer *prevbuffer;
+
  } file_buffer;
- 
-The first field C<filename> holds the name of the file that is being scanned. 
+
+The first field C<filename> holds the name of the file that is being scanned.
 The second field C<buffer> is a pointer to the contents of the file. The field
-C<curchar> points into this buffer to the current position, and can be considered 
+C<curchar> points into this buffer to the current position, and can be considered
 the I<cursor>.
 Then, C<filesize> contains the length of the file; C<line> keeps track of what line
 is being processed; linepos keeps track of the number of characters since the last
@@ -100,7 +101,7 @@ through accessor functions, defined in the header file as well.
 
 The parser communicates with the lexer through the lexer's accessor function. Of
 these, the C<next_token()> function is most important: it requests the next token
-from the lexer. 
+from the lexer.
 
 The parser does not know anything about the spelling of tokens, although it can
 request these through C<find_keyword()>.
@@ -112,17 +113,17 @@ The parser is represented by a structure called C<parser_state>. Its layout is
 shown below:
 
  typedef struct parser_state {
-     struct lexer_state *lexer;      
-     token curtoken;                 
-     char *heredoc_ids[10];          
-     int heredoc_index;              
-     unsigned parse_errors;          
-  
+     struct lexer_state *lexer;
+     token curtoken;
+     char *heredoc_ids[10];
+     int heredoc_index;
+     unsigned parse_errors;
+
  } parser_state;
 
 It consists of the following fields: a pointer to a lexer_state object; the current
 token as returned by the lexer; a list to store heredoc identifiers, which is used
-when parsing heredocs as subroutine arguments; an index for this list; and finally a 
+when parsing heredocs as subroutine arguments; an index for this list; and finally a
 counter to keep track of parse errors.
 
 =head1 AUTHOR

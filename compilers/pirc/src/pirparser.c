@@ -516,7 +516,7 @@ arguments(parser_state *p) {
 
 =item methodcall()
 
-  methodcall -> INVOCANT_IDENT method arguments '\n'
+  methodcall -> INVOCANT_IDENT method arguments
 
 =cut
 
@@ -584,8 +584,8 @@ arith_expression(parser_state *p) {
                     | 'global' stringconstant
                     | heredocstring
                     | methodcall
-                    | 'null'
-                    ) '\n'
+                    | 'null' )
+                    '\n'
 
   unop       -> '-' | '!' | '~'
 
@@ -673,15 +673,11 @@ goto_statement(parser_state *p) {
 }
 
 
-
-
-
-
 /*
 
 =item return_statement()
 
-  return_statement -> '.return' ( arguments | target arguments | methodcall ) '\n'
+  return_statement -> '.return' ( arguments | target ['->' method] arguments | methodcall ) '\n'
 
 =cut
 
@@ -690,13 +686,13 @@ static void
 return_statement(parser_state *p) {
     match(p, T_RETURN);
     switch (p->curtoken) {
-        case T_LPAREN:
+        case T_LPAREN:   /* return_statement -> '.return' '(' [args] ')' */
             arguments(p);
             break;
-        case T_INVOCANT_IDENT: /* tail method call */
+        case T_INVOCANT_IDENT: /* '.return' methodcall */
             methodcall(p);
             break;
-        default: /* normal sub tailcall */
+        default: /* '.return' target ['->' method] arguments */
             target(p);
             if (p->curtoken == T_PTR) {
                 next(p);
@@ -1643,13 +1639,28 @@ static void
 parameters(parser_state *p) {
     while (p->curtoken == T_PARAM) {
         next(p); /* skip '.param */
-        if (p->curtoken == T_REGISTER) { /* parameter -> '.param' register */
-            next(p);
-        }
-        else { /* parameter -> '.param' type IDENT param_flag */
-            type(p);
-            match(p, T_IDENTIFIER);
-            param_flags(p);
+        switch (p->curtoken) {
+            case T_INT:
+            case T_NUM:
+            case T_PMC:
+            case T_STRING:
+                type(p);
+                match(p, T_IDENTIFIER);
+                param_flags(p);
+                break;
+            case T_PREG:
+            case T_NREG:
+            case T_SREG:
+            case T_IREG:
+            case T_PASM_PREG:
+            case T_PASM_NREG:
+            case T_PASM_SREG:
+            case T_PASM_IREG:
+                next(p);
+                break;
+            default:
+                syntax_error(p, 1, "type or register expected");
+                break;
         }
         match(p, T_NEWLINE);
     }

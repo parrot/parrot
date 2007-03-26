@@ -186,7 +186,6 @@ char const * dictionary[] = {
     "'string'",                 /* T_SINGLE_QUOTED_STRING,  */
     "'literal'",                /* T_LITERAL,               */
     "invocant id",              /* T_INVOCANT_IDENT,        */
-    "'number'",                 /* T_NUMBER,                */
     "'error'",                  /* T_ERROR,                 */
     "**",                       /* T_POWER,                 */
     "**=",                      /* T_POWER_ASSIGN,          */
@@ -194,7 +193,6 @@ char const * dictionary[] = {
     "+=",                       /* T_PLUS_ASSIGN,           */
     "-=",                       /* T_MINUS_ASSIGN,          */
     ".=",                       /* T_CONCAT_ASSIGN          */
-    "'register'",               /* T_REGISTER,              */
     "/=",                       /* T_DIVIDE_ASSIGN,         */
     "//=",                      /* T_FDIVIDE_ASSIGN,        */
     "%=",                       /* T_MODULO_ASSIGN,         */
@@ -247,15 +245,20 @@ Structure representing the lexer. It holds a pointer to
 the current file being read, a buffer holding the current
 token, and a pointer to add characters to the token buffer.
 
+ typedef struct lexer_state {
+     struct file_buffer *curfile;    -- pointer to the current file
+     char *token_chars;              -- characters of the current token
+     char *charptr;                  -- used for adding/removing token chars
+
+ } lexer_state;
+
 =cut
 
 */
 typedef struct lexer_state {
-    struct file_buffer *curfile;    /* pointer to the current file           */
-    char *token_chars;              /* characters of the current token       */
-    char *charptr;                  /* used for adding/removing token chars  */
-    /*Parrot_Interp interp;
-    */
+    struct file_buffer *curfile;
+    char *token_chars;
+    char *charptr;
 
 } lexer_state;
 
@@ -278,11 +281,10 @@ find_keyword(token t) {
     if ((t >= 0) && (t <= MAX_TOKEN)) {
         return dictionary[t];
     }
-    else {
+    else { /* this should never happen; error in dictionary */
         fprintf(stderr, "FATAL: invalid token in find_keyword()\n");
         fprintf(stderr, "No entry for token %d\n", t);
-        if (t-1 <= MAX_TOKEN) fprintf(stderr, "Previous token: %s\n", dictionary[t - 1]);
-        return "ERROR";
+        exit(1);
     }
 }
 
@@ -342,16 +344,17 @@ easier.
 */
 void
 print_error_context(struct lexer_state *s) {
-    /* print context of size ERROR_CONTEXT_SIZE */
+    /* print context of max. size ERROR_CONTEXT_SIZE */
     int read_chars = s->curfile->curchar - s->curfile->buffer;
     int context_length = read_chars > ERROR_CONTEXT_SIZE ? ERROR_CONTEXT_SIZE : read_chars;
     char *start = s->curfile->curchar - context_length;
     char *end = s->curfile->curchar;
 
+    /* print all characters from start to end */
     while (start < end ) {
         fprintf(stderr, "%c", *start++);
     }
-    /* print an indicator like "^" */
+    /* print an indicator like "^" on the next line */
     fprintf(stderr, "\n%*s\n", s->curfile->linepos - 1, "^");
 }
 
@@ -391,13 +394,12 @@ read_char(file_buffer *buf) {
 
     /* store previous character, but only if not at first character of file */
     if (buf->curchar > buf->buffer) buf->lastchar = *(buf->curchar - 1);
-    else buf->lastchar = '\n';
+    else buf->lastchar = '\n'; /* makes the check for prev. char. at start of file successful */
 
     buf->curchar++;  /* update pointer to current char. */
     buf->linepos++; /* update the token position */
 
     return c;
-
 }
 
 /*
@@ -405,14 +407,12 @@ read_char(file_buffer *buf) {
 =item unread_char()
 
 Push back the last read character.
-It was never removed from the buffer, so just
-decrement the pointer in the buffer.
 
 =cut
 
 */
 static void
-unread_char(file_buffer *buf, char c) {
+unread_char(file_buffer *buf) {
    --buf->curchar;
    --buf->linepos;
 }
@@ -681,7 +681,7 @@ read_digits(lexer_state *lexer) {
         c = read_char(lexer->curfile);
         count++;
     }
-    unread_char(lexer->curfile, c); /* no digit, put it back */
+    unread_char(lexer->curfile); /* no digit, put it back */
     return count;
 }
 
@@ -766,7 +766,7 @@ POD comments are not yet supported.
             }
             while (c != '\n');
 
-            unread_char(lexer->curfile, c);
+            unread_char(lexer->curfile);
             continue; /* with main loop */
         }
 
@@ -862,7 +862,7 @@ is indicated explicitly.
             else { /* not a label or invocant put the last read char. back */
                 token tmp;
 
-                unread_char(lexer->curfile, c);
+                unread_char(lexer->curfile);
 
                 tmp = check_dictionary(lexer, dictionary); /* look up the id */
 
@@ -889,7 +889,7 @@ is indicated explicitly.
             if (c == '.') return T_DOTDOT;  /* ".." */
 
             if ( isspace(c) ) { /* a dot followed by a space */
-                unread_char(lexer->curfile, c);
+                unread_char(lexer->curfile);
                 return T_CONCAT;
             }
 
@@ -898,7 +898,7 @@ is indicated explicitly.
                 c = read_char(lexer->curfile);
                 if (c == EOF_MARKER) break;
             }
-            unread_char(lexer->curfile, c);
+            unread_char(lexer->curfile);
             tmp = check_dictionary(lexer, dictionary);
 
             /* if not found, then it is a macro id */
@@ -911,18 +911,40 @@ is indicated explicitly.
         }
         else if (isdigit(c) ) { /* check for numbers */
             buffer_char(lexer, c);
-            read_digits(lexer);
-
             c = read_char(lexer->curfile);
-            if (c == '.') { /* floating point number */
+
+            if (isdigit(c)) { /* integer or float */
+                do {
+                    buffer_char(lexer, c);
+                    c = read_char(lexer->curfile);
+                }
+                while (isdigit(c));
+
+                /* it is a different char, either '.', ' ' or something else */
+                if (c == '.') { /* floating point number */
+                    buffer_char(lexer, c);
+                    read_digits(lexer);
+                    return T_NUMBER_CONSTANT;
+                }
+                else {
+                    unread_char(lexer->curfile); /* put back last read char. */
+                    return T_INTEGER_CONSTANT;
+                }
+            }
+            else if (c == 'b' || c == 'B') { /* 0b<digit>+ or 0B<digit>+ */
                 buffer_char(lexer, c);
                 read_digits(lexer);
-                return T_NUMBER_CONSTANT;
-            }
-            else {
-                unread_char(lexer->curfile, c); /* put back last read char. */
                 return T_INTEGER_CONSTANT;
             }
+            else if (c == 'x' || c == 'X') { /* 0x<digit>+ or 0X<digit>+ */
+                buffer_char(lexer, c);
+                read_digits(lexer);
+                return T_INTEGER_CONSTANT;
+            }
+            else { /* 1 digit */
+                return T_INTEGER_CONSTANT;
+            }
+
         }
         else if (c == '$') { /* parse PIR register or macro label */
             token regtype;
@@ -954,7 +976,7 @@ is indicated explicitly.
                         return T_MACRO_LABEL;
                     }
                     else { /* $ ??? */
-                        unread_char(lexer->curfile, c);
+                        unread_char(lexer->curfile);
                         return T_ERROR;
                     }
             }
@@ -1012,7 +1034,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
 
 =head3 Augmented operators
 
-    **=   *=    %=   /=   //=   +=   -=  .=  >>=  >>>=   <<=  &=   |=   ~= 
+    **=   *=    %=   /=   //=   +=   -=  .=  >>=  >>>=   <<=  &=   |=   ~=
 
 =head3 Conditional operators
 
@@ -1034,7 +1056,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 case '=': return T_POWER_ASSIGN; /* **= */
                 case EOF_MARKER: return T_EOF;
                 default:
-                    unread_char(lexer->curfile, c);
+                    unread_char(lexer->curfile);
                     return T_MULTIPLY;           /* * */
             }
         }
@@ -1044,27 +1066,27 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 case '=': return T_MODULO_ASSIGN; /* %= */
                 case EOF_MARKER: return T_EOF;
                 default:
-                    unread_char(lexer->curfile, c);
+                    unread_char(lexer->curfile);
                     return T_MODULO;              /* % */
             }
         }
         else if (c == '/') {
             c = read_char(lexer->curfile);
             switch(c) {
-                case '/': 
+                case '/':
                     c = read_char(lexer->curfile);
                     if (c == '=') {
                         return T_FDIVIDE_ASSIGN; /* //= */
                     }
                     else {
-                        unread_char(lexer->curfile, c);
-                        return T_FDIVIDE;   
+                        unread_char(lexer->curfile);
+                        return T_FDIVIDE;
                     }
                     break;
                 case '=': return T_DIVIDE_ASSIGN; /* /= */
                 case EOF_MARKER: return T_EOF;
                 default:
-                    unread_char(lexer->curfile, c);
+                    unread_char(lexer->curfile);
                     return T_DIVIDE;              /* / */
             }
         }
@@ -1074,7 +1096,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 case '=': return T_PLUS_ASSIGN; /* += */
                 case EOF_MARKER: return T_EOF;
                 default:
-                    unread_char(lexer->curfile, c);
+                    unread_char(lexer->curfile);
                     return T_PLUS;              /* + */
             }
         }
@@ -1085,7 +1107,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 case '=': return T_MINUS_ASSIGN; /* -= */
                 case EOF_MARKER: return T_EOF;
                 default:
-                    unread_char(lexer->curfile, c);
+                    unread_char(lexer->curfile);
                     return T_MINUS;
             }
         }
@@ -1095,7 +1117,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 case '=': return T_NE;              /* != */
                 case EOF_MARKER: return T_EOF;
                 default:                            /* ! */
-                    unread_char(lexer->curfile, c);
+                    unread_char(lexer->curfile);
                     return T_NOT;
             }
         }
@@ -1106,7 +1128,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 case '=': return T_EQ;             /* == */
                 case EOF_MARKER: return T_EOF;
                 default:
-                    unread_char(lexer->curfile, c);
+                    unread_char(lexer->curfile);
                     return T_ASSIGN;               /* = */
             }
         }
@@ -1121,7 +1143,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                             return T_LOG_RSHIFT_ASSIGN;
                         }
                         else { /* >>> */
-                            unread_char(lexer->curfile, c);
+                            unread_char(lexer->curfile);
                             return T_LOG_RSHIFT;
                         }
                     }
@@ -1129,13 +1151,13 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                         return T_RSHIFT_ASSIGN;
                     }
                     else { /* >> */
-                        unread_char(lexer->curfile, c);
+                        unread_char(lexer->curfile);
                         return T_RSHIFT;
                     }
                 case '=': return T_GE; /* >= */
                 case EOF_MARKER: return T_EOF;
                 default:  /* > */
-                    unread_char(lexer->curfile, c);
+                    unread_char(lexer->curfile);
                     return T_GT;
             }
         }
@@ -1156,17 +1178,17 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                     }
                     else { /* no heredoc */
                         if (c == '=') {                 /* <<= */
-                            return T_LSHIFT_ASSIGN;   
+                            return T_LSHIFT_ASSIGN;
                         }
                         else {                          /* << */
-                            unread_char(lexer->curfile, c);
+                            unread_char(lexer->curfile);
                             return T_LSHIFT;
                         }
                     }
                     break;
                 case EOF_MARKER: return T_EOF;
                 default:
-                    unread_char(lexer->curfile, c);
+                    unread_char(lexer->curfile);
                     return T_LT;
             }
         }
@@ -1177,7 +1199,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 case '=': return T_BXOR_ASSIGN;     /* ~= */
                 case EOF_MARKER: return T_EOF;
                 default:
-                    unread_char(lexer->curfile, c); /* ~ */
+                    unread_char(lexer->curfile); /* ~ */
                     return T_BXOR;
             }
         }
@@ -1188,18 +1210,18 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 case '=': return T_BAND_ASSIGN;     /* &= */
                 case EOF_MARKER: return T_EOF;
                 default:
-                    unread_char(lexer->curfile, c); /* & */
+                    unread_char(lexer->curfile); /* & */
                     return T_BAND;
             }
         }
-        else if (c == '|') {                        
+        else if (c == '|') {
             c = read_char(lexer->curfile);
             switch(c) {
                 case '|': return T_OR;              /* || */
                 case '=': return T_BOR_ASSIGN;      /* |= */
                 case EOF_MARKER: return T_EOF;
                 default:
-                    unread_char(lexer->curfile, c); /* | */
+                    unread_char(lexer->curfile); /* | */
                     return T_BOR;
             }
         }
@@ -1217,7 +1239,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
             while (isspace(c));
 
             /* the last read char. was not space/newline, put it back */
-            unread_char(lexer->curfile, c);
+            unread_char(lexer->curfile);
 
             return T_NEWLINE;
         }
@@ -1265,7 +1287,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
             }
             while ( isalnum(c) );
 
-            unread_char(lexer->curfile, c); /* push back last character not needed */
+            unread_char(lexer->curfile); /* push back last character not needed */
             tmp = check_dictionary(lexer, dictionary);
 
             /* if not found, then no valid flag found */
@@ -1333,7 +1355,7 @@ read_heredoc(lexer_state *lexer, char *heredoc_label) {
 
             /* the loop broke, but why? */
             if (*heredoc_iter == '\0' && isspace(c)) { /* loop broke because heredoc label was fully iterated; success! */
-                unread_char(lexer->curfile, c); /* we read 1 char too many; put back last read character */
+                unread_char(lexer->curfile); /* we read 1 char too many; put back last read character */
                 return T_HEREDOC_STRING;   /* return success */
             }
         }

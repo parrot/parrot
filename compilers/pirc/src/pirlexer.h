@@ -124,7 +124,6 @@ typedef enum tokens {
         T_SINGLE_QUOTED_STRING,             /* "'string'",                */
         T_LITERAL,                          /* "'literal'",               */
         T_INVOCANT_IDENT,                   /* "invocant id",             */
-        T_NUMBER,                           /* "'number'",                */
         T_ERROR,                            /* "'error'",                 */
         T_POWER,                            /* "**",                      */
         T_POWER_ASSIGN,                     /* "**=",                     */
@@ -132,7 +131,6 @@ typedef enum tokens {
         T_PLUS_ASSIGN,                      /* "+=",                      */
         T_MINUS_ASSIGN,                     /* "-=",                      */
         T_CONCAT_ASSIGN,                    /* ".="                       */
-        T_REGISTER,                         /* "'register'",              */
         T_DIVIDE_ASSIGN,                    /* "/=",                      */
         T_FDIVIDE_ASSIGN,                   /* "//=",                     */
         T_MODULO_ASSIGN,                    /* "%=",                      */
