@@ -300,7 +300,7 @@ stringconstant(parser_state *p) {
 
 =item method()
 
-  method -> IDENT | stringconstant
+  method -> IDENTIFIER | stringconstant
 
 =cut
 
@@ -317,7 +317,7 @@ method(parser_state *p) {
 
 =item target()
 
-  target -> REGISTER | IDENTIFIER
+  target   -> register | IDENTIFIER
 
 =cut
 
@@ -1170,14 +1170,16 @@ long_yield_statement(parser_state *p) {
 
 =item target_statement()
 
-  target_statement -> target '=' assignment '\n'
-                    | target augmented_op expression '\n'
-                    | target keylist '=' expression '\n'
-                    | target '->' (stringconstant|IDENT) arguments '\n'
-                    | target arguments '\n'
+  target_statement -> ( target '=' assignment
+                      | target augmented_op expression
+                      | target keylist '=' expression
+                      | target '->' (stringconstant|IDENT) arguments
+                      | target arguments
+                      )
+                      '\n'
 
-  augmented_op    -> '+=' | '-=' | '%=' | '/='  | '//=' | '*='  | '.='
-                   | '~=' | '&=' | '|=' | '**=' | '<<=' | '>>=' | '>>>='
+  augmented_op     -> '+=' | '-=' | '%=' | '/='  | '//=' | '*='  | '.='
+                    | '~=' | '&=' | '|=' | '**=' | '<<=' | '>>=' | '>>>='
 
 =cut
 
@@ -1186,11 +1188,9 @@ static void
 target_statement(parser_state *p) {
     target(p);
 
-    /* after a target follows an assignment or subcall */
     switch(p->curtoken) {
         case T_ASSIGN:   /* target '=' expression */
             assignment(p);
-            match(p, T_NEWLINE);
             break;
         case T_PLUS_ASSIGN: /* target '+=' simple_expr '\n' (and '-=' etc.) */
         case T_MINUS_ASSIGN:
@@ -1207,28 +1207,25 @@ target_statement(parser_state *p) {
         case T_LOG_RSHIFT_ASSIGN:
             next(p);
             expression(p);
-            match(p, T_NEWLINE);
             break;
         case T_LBRACKET: /* target '[' keylist ']' '=' expression */
             keylist(p);
             match(p, T_ASSIGN);
             expression(p);
-            match(p, T_NEWLINE);
             break;
         case T_PTR:  /* target '->' (stringc|identifier) arguments '\n' */
             next(p); /* skip '->' */
             method(p);
             arguments(p);
-            match(p, T_NEWLINE);
             break;
         case T_LPAREN:  /* target '(' arguments ')' */
             arguments(p);
-            match(p, T_NEWLINE);
             break;
         default:
             syntax_error(p, 1, "'=', '+=' (etc.) '[', '.', '->' or '(' expected");
             break;
     }
+    match(p, T_NEWLINE);
 }
 
 
@@ -1292,7 +1289,7 @@ multi_result_invocation(parser_state *p) {
 
 =item macro_expansion()
 
-  macro_expansion -> ??
+  macro_expansion -> MACRO_IDENT [ '(' [ expression { ',' expression } ')' ] '\n'
 
 TODO: create a parse tree for each macro definition, then on macro expansion
 the parse tree can be populated with the actual values (macro parameters).
@@ -1302,8 +1299,22 @@ the parse tree can be populated with the actual values (macro parameters).
 */
 static void
 macro_expansion(parser_state *p) {
-    while (p->curtoken != T_NEWLINE)
-        next(p);
+    match(p, T_MACRO_IDENT);
+
+    if (p->curtoken == T_LPAREN) { /* parentheses are optional if no arguments */
+        next(p); /* skip '(' */
+
+        /* closing parenthesis right away? if not, then arguments */
+        if (p->curtoken != T_RPAREN) {
+            expression(p);
+
+            while (p->curtoken == T_COMMA) {
+                next(p);
+                expression(p);
+            }
+        }
+        match(p, T_RPAREN);
+    }
     match(p, T_NEWLINE);
 }
 
@@ -1343,8 +1354,8 @@ global_assignment(parser_state *p) {
     match(p, T_ASSIGN);
 
     switch (p->curtoken) {
-        case T_IDENTIFIER:
-        case T_PASM_PREG:
+        case T_IDENTIFIER: /* identifier should be a PMC */
+        case T_PASM_PREG:  /* only PMCs are allowed */
         case T_PREG:
             next(p);
             break;
@@ -1673,7 +1684,7 @@ parameters(parser_state *p) {
 
 =item sub_definition()
 
-  sub_definition -> '.sub' (IDENT | stringc) '\n' parameters body '.end'
+  sub_definition -> '.sub' (IDENTIFIER | stringconstant) subflags '\n' parameters body '.end'
 
 =cut
 
@@ -1698,6 +1709,9 @@ sub_definition(parser_state *p) {
 =item emit_block()
 
   emit_block -> '.emit' '\n' {pasm_instruction} '.eom'
+
+Note that a PASM instruction looks like an identifier.
+This is checked for in the lexer.
 
 =cut
 
@@ -1749,7 +1763,7 @@ macro_parameters(parser_state *p) {
 
 =item macro_definition()
 
-  '.macro' IDENT parameters '\n' macro_body '.endm'
+  '.macro' IDENTIFIER parameters '\n' macro_body '.endm'
 
 =cut
 
