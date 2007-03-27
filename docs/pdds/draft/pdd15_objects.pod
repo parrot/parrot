@@ -159,7 +159,7 @@ Object PMCs. It isn't necessary to create a brand new low-level PMC
 class for each OO class, and they all share the Class or Object vtable,
 respectively.
 
-An instance of the Class PMC has ten attributes, which are:
+An instance of the Class PMC has ten internal attributes, which are:
 
 =over 4
 
@@ -260,14 +260,17 @@ Class PMCs also have the "I am a class" flag set on them.
 
 The accessor for the name attribute. With no argument, it simply returns
 the current value for name. When passed an argument, it sets the name of
-the class, and also sets the association with a namespace.
+the class, and also sets the association with a namespace. With no
+argument it only returns the current value of the name attribute.
 
 =item new
 
     obj = class.'new'( 'myattrib' => "Foo" )
 
-Create a new instance object from the class object. It takes an optional
-slurpy, named list of attributes and values to initialize the object.
+Create a new instance object from the class object. It takes an
+optional, slurpy, named list of attributes and values to initialize the
+object. Passing attribute names that weren't declared in the class is an
+error.
 
 =item attributes
 
@@ -341,6 +344,8 @@ to that namespace object.
 A class can be garbage collected when it has no instantiatated objects
 and no Namespace object referencing it. When a class is garbage
 collected, it should remove itself from the registry.
+
+A class object responds to C<isa>, C<can>, and C<does>.
 
 
 =head2 Object PMC API
@@ -441,11 +446,16 @@ The accessor for the name attribute. With no argument, it simply returns
 the current value for name. When passed an argument, it sets the name of
 the role, and also sets the association with a namespace.
 
+When you associate a class with a namespace, it pulls in all of the
+methods and vtable methods held within that namespace.  And when
+replacing one class with another in the association, it removes any
+methods and vtable methods from the previous class.
+
 =item attributes
 
-An accessor for the attributes of the role. It returns the a Hash of
-all attributes, with a key of the attribute name, and a value of the
-Attribute object. The accessor is read-only.
+An accessor for the attributes of the role. It returns the Hash of all
+attributes, with a key of the attribute name, and a value of the
+attribute's metadata (a Hash).  The accessor is read-only.
 
 =item add_attribute
 
@@ -455,7 +465,7 @@ a simple string value for type.
 =item roles
 
 An accessor for the roles composed into the role. It returns an Array of
-all roles. The accessor is read-only.
+all roles as PMC objects. The accessor is read-only.
 
 =item add_role
 
@@ -463,7 +473,13 @@ Adds a single role to the role. It takes a simple string name.
 
 =item add_method
 
-Adds a method to the role.
+Adds a method to the role. It takes a simple string name and a method
+PMC. If the method already exists (and isn't a Multi) it will replace
+the method with the new method and throw a warning.
+
+It also takes slurpy named parameters to flag whether the method is a
+vtable method, and whether its anonymous (no named entry as a method,
+only as a vtable). 
 
 =item methods
 
@@ -592,6 +608,13 @@ be constructed, returns a Null PMC.
 
 Note that for languages which support default fallback methods, such as Perl
 5's AUTOLOAD, this would be the place to return it if a normal lookup fails.
+
+Since the method list and vtable method list are stored in the class
+PMC, method finding is a lookup on the class object and not a lookups in
+the namespace. (This could be handled automatically whenever a class is
+associated with a namespace.) Just adding a sub to a namespace will not
+automatically make it a method of the class, you have to call add_method
+too.
 
 =item isa(class *)
 
