@@ -84,10 +84,11 @@ foreach my $script (@shootouts) {
     }
     unless ( $PConfig{cg_flag} =~ /HAVE/ ) {
         $args =~ s/-Cj/-j/;
-        $args =~ s/C//;
+        # Remove any plain -C option.
+        $args =~ s/(^|\s)-C(\s|$)/$1$2/;
+        # Remove any extra Cs still floating around
+        $args =~ s/C//; 
     }
-
-    $args eq '-' and $args = '';
 
     # look for input files
     my $input = "$file$INPUT_EXT";
