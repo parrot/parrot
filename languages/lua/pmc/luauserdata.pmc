@@ -57,6 +57,7 @@ Initializes the userdata.
 */
     void init () {
         PMC_pmc_val(SELF) = NULL;
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
@@ -83,10 +84,14 @@ Call finalizer and free the userdata.
 
 */
     void destroy () {
+        /* printf("userdata destroy\n"); */
+#if 0
+        /* FIXME : crash because metatable is already freed */
         PMC* meth = find_meth(INTERP, SELF, "__gc");
         if (meth != NULL) {
             (void)Parrot_runops_fromc_args(INTERP, meth, "vP", SELF);
         }
+#endif
         if (PMC_pmc_val(SELF)) {
             PMC_pmc_val(SELF) = NULL;
         }
