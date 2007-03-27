@@ -24,10 +24,10 @@ pirparser.c - parser for Parrot Intermediate Representation
 The parser_state structure has the following fields:
 
  typedef struct parser_state {
-    struct lexer_state *lexer;       -- the lexer
-    token curtoken;                  -- the current token as returned by the lexer
-    char *heredoc_ids[10];           -- array for holding heredoc arguments. XXX Limited to 10 currently XXX
-    int heredoc_index;               -- index to keep track of heredoc ids in the array
+    struct   lexer_state *lexer;     -- the lexer
+    token    curtoken;               -- the current token as returned by the lexer
+    char    *heredoc_ids[10];        -- array for holding heredoc arguments. XXX Limited to 10 currently XXX
+    unsigned heredoc_index;          -- index to keep track of heredoc ids in the array
     unsigned parse_errors;           -- parse_errors
  }
 
@@ -36,10 +36,10 @@ The parser_state structure has the following fields:
 */
 
 typedef struct parser_state {
-    struct lexer_state *lexer;
-    token curtoken;
-    char *heredoc_ids[10];
-    int heredoc_index;
+    struct   lexer_state *lexer;
+    token    curtoken;
+    char    *heredoc_ids[10];
+    unsigned heredoc_index;
     unsigned parse_errors;
 
 } parser_state;
@@ -73,6 +73,7 @@ void
 exit_parser(parser_state *p) {
     destroy_lexer(p->lexer);
     free(p);
+    p = NULL;
     exit(0);
 }
 
@@ -502,12 +503,13 @@ arguments(parser_state *p) {
 
     /* check whehter there are any heredocs to be parsed */
     if ( p->heredoc_index > 0) {
-        int i;
+        unsigned i;
         for (i = 0; i < p->heredoc_index; i++) {
             char *heredocid = p->heredoc_ids[i];
             p->curtoken = read_heredoc(p->lexer, heredocid);
             match(p, T_HEREDOC_STRING);
             free(heredocid); /* clean up memory of this string */
+            heredocid = NULL;
         }
 
         /* clear heredoc index */
@@ -661,6 +663,7 @@ assignment(parser_state *p) {
             p->curtoken = read_heredoc(p->lexer, heredocid);
             match(p, T_HEREDOC_STRING);
             free(heredocid); /* clean up */
+            heredocid = NULL;
             break;
         }
         default: /* general case for 'expression binop expression' */
