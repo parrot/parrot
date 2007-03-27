@@ -99,6 +99,7 @@ Make a clone of the iterator.
         PMC * const key = PMC_struct_val(SELF);
         PMC *res = pmc_new_init(INTERP, SELF->vtable->base_type, PMC_pmc_val(SELF));
         PMC_struct_val(res) = VTABLE_clone(interp, key);
+        return res;
     }
 
 /*
@@ -298,15 +299,16 @@ Reset the Iterator. C<value> must be one of
         /* reset iterator on aggregate */
         agg = (PMC*) PMC_pmc_val(SELF);
         if (agg->vtable->base_type == enum_class_Slice) {
-            /* its an xrange serving as its own aggregate */
+            /* it's an xrange serving as its own aggregate */
             PMC_struct_val(SELF) =
                 VTABLE_nextkey_keyed(INTERP, agg, NULL, value);
         }
         else {
-            if (!PMC_struct_val(SELF)) {
-                PMC_struct_val(SELF) = key_new(INTERP);
-            }
-            key = PMC_struct_val(SELF);
+            if (!PMC_struct_val(SELF))
+                key = key_new(INTERP);
+            else
+                key = PMC_struct_val(SELF);
+
             PMC_struct_val(SELF) =
                 VTABLE_nextkey_keyed(INTERP, key, agg, value);
         }
@@ -408,7 +410,7 @@ the next one.
 =item C<void* invoke(void* next)>
 
 Return the next element of the aggregate. The return type may depend on
-the aggregate. If there are no more items in the aggregate I1 .. I4 are
+the aggregate. If there are no more items in the aggregate, I1 .. I4 are
 zero.
 
 See F<docs/pdds/pdd03_calling_conventions.pod>.
