@@ -587,6 +587,7 @@ static int
 is_op(char *word) {
     if (strcmp(word, "add") == 0) return 1; /* FIX */
     if (strcmp(word, "print") == 0) return 1;
+    if (strcmp(word, "new") == 0) return 1;
     return 0;
 }
 
@@ -720,6 +721,7 @@ static token
 read_token(lexer_state *lexer) {
     char c;
     int ok = 1;
+    int count;
 
     /* before reading a new token, first clear the buffer */
     clear_buffer(lexer);
@@ -792,24 +794,42 @@ is indicated explicitly.
 =cut
 
 */
-        /* now start checking for real tokens */
+        /* now start checking for real tokens */        
         switch(c) {
             case 'P':
-                read_digits(lexer);
-                return T_PASM_PREG;
+                count = read_digits(lexer);
+                buffer_char(lexer, c);
+                c = read_char(lexer->curfile);
+                if (count > 0 && isspace(c) ) return T_PASM_PREG;
+                //else unread_char(lexer->curfile);
+                break;
             case 'S':
-                read_digits(lexer);
-                return T_PASM_SREG;
+                count = read_digits(lexer);
+                buffer_char(lexer, c);
+                c = read_char(lexer->curfile);
+                if (count > 0 && isspace(c) ) return T_PASM_SREG;
+                //else unread_char(lexer->curfile);
+                break;
             case 'I':
-                read_digits(lexer);
-                return T_PASM_IREG;
+                count = read_digits(lexer);
+                buffer_char(lexer, c);
+                c = read_char(lexer->curfile);
+                if (count > 0 && isspace(c) ) return T_PASM_IREG;
+                //else unread_char(lexer->curfile);
+                break;
             case 'N':
-                read_digits(lexer);
-                return T_PASM_NREG;
-            default:
+                count = read_digits(lexer);
+                buffer_char(lexer, c);
+                c = read_char(lexer->curfile);
+                if (count > 0 && isspace(c) ) return T_PASM_NREG;
+                //else unread_char(lexer->curfile);                    
+                break;
+            default:                
                 break; /* continue below */
         }
 
+
+        
         /* it was not a PASM register */
 
 /*
@@ -1543,3 +1563,4 @@ main(int argc, char **argv)
  * End:
  * vim: expandtab shiftwidth=4:
  */
+

@@ -265,6 +265,7 @@ expression(parser_state *p) {
         case T_PASM_NREG: case T_NREG:
         case T_PASM_IREG: case T_IREG:
         case T_PASM_SREG: case T_SREG:
+        case T_MACRO_IDENT:
             exprtok = p->curtoken;
             next(p);
             break;
@@ -588,6 +589,7 @@ arith_expression(parser_state *p) {
                     | heredocstring
                     | methodcall
                     | 'null'
+                    | PARROT_OP [ expression { ',' expression } ]
                     )
 
   unop       -> '-' | '!' | '~'
@@ -643,6 +645,16 @@ assignment(parser_state *p) {
         case T_NULL:
             next(p);
             break;
+        case T_PARROT_OP:
+            next(p);
+            if (p->curtoken != T_NEWLINE) {
+                expression(p);
+                while (p->curtoken == T_COMMA) {
+                    next(p);
+                    expression(p);            
+                }
+            }            
+            break;            
         case T_HEREDOC_ID: { /* parse heredoc string */
             char *heredocid = clone_string(get_current_token(p->lexer));
             /* read_heredoc() returns a special token */
