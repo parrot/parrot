@@ -1231,9 +1231,14 @@ set_retval_p(Parrot_Interp interp, int sig_ret, parrot_context_t *ctx)
  */
 static void
 commit_last_arg(Interp *interp, int index, int cur, opcode_t *n_regs_used, int seen_arrow,
-        PMC **sigs, opcode_t **indexes, parrot_context_t *ctx, va_list *list)
+        PMC **sigs, opcode_t **indexes, parrot_context_t *ctx, PMC *pmc, va_list *list)
 {
     int reg_offset = 0;
+
+    /* invocant already commited, just return */
+    if ( seen_arrow == 0 && index == 0 && pmc )
+        return;
+
     /* calculate arg's register offset */
     switch (cur & PARROT_ARG_TYPE_MASK) { /* calc reg offset */
         case PARROT_ARG_INTVAL:   reg_offset = n_regs_used[seen_arrow * 4 + REGNO_INT]++; break;
@@ -1340,6 +1345,12 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
     va_list list;
     va_start(list, signature);
 
+    /* account for passing invocant in-band */
+    if (pmc) {
+        arg_ret_cnt[seen_arrow]++;
+        max_regs[REGNO_PMC]++;
+    }
+
     /* first loop through signature to get sizing info */
     for ( x = signature; *x != '\0'; x++ ) {
         /* detect -> separator */
@@ -1385,6 +1396,15 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
 
     /* second loop through signature to build all index and arg_flag
      * loop also assigns args(up to the ->) to registers */
+    
+    /* account for passing invocant in-band */
+    if (pmc) {
+        indexes[0][0] = 0;
+        VTABLE_set_integer_keyed_int(interp, sigs[0], 0, PARROT_ARG_PMC);
+        CTX_REG_PMC(ctx, 0) = pmc;
+        index = 0;
+    }
+
     index = -1;
     seen_arrow = 0;
     for (x = signature; *x != '\0'; x++ ) {
@@ -1397,7 +1417,7 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
 
             if (index >= 0) {
               commit_last_arg(interp, index, cur, n_regs_used, seen_arrow, sigs, indexes, ctx,
-                      &list);
+                      pmc, &list);
             }
 
             /* reset parsing state so we can now handle results */
@@ -1412,8 +1432,8 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
         /* parse arg type */
         else if (isupper(*x)) {
             if (index >= 0) {
-              commit_last_arg(interp, index, cur, n_regs_used, seen_arrow, sigs, indexes, ctx,
-                      &list);
+              commit_last_arg(interp, index, cur, n_regs_used, seen_arrow, sigs, indexes, ctx, 
+                      pmc, &list);
             }
             index++;
 
@@ -1444,7 +1464,7 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
     }
     if (index >= 0) {
         commit_last_arg(interp, index, cur, n_regs_used, seen_arrow, sigs, indexes, ctx,
-                &list);
+                pmc, &list);
     }
 
     /* code from PCCINVOKE impl in PCCMETHOD.pm */
