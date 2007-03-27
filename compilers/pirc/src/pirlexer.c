@@ -379,6 +379,23 @@ buffer_char(lexer_state *lexer, char c) {
     *lexer->charptr++ = c;
 }
 
+
+/*
+
+=item unbuffer_char()
+
+Remove the last added character from the buffer.
+
+=cut
+
+*/
+static void
+unbuffer_char(lexer_state *lexer) {
+    --lexer->charptr;
+    *lexer->charptr = '\0';
+}
+
+
 /*
 
 =item read_char()
@@ -794,43 +811,57 @@ is indicated explicitly.
 =cut
 
 */
-        /* now start checking for real tokens */        
+        /* now start checking for real tokens */
         switch(c) {
             case 'P':
-                count = read_digits(lexer);
-                buffer_char(lexer, c);
-                c = read_char(lexer->curfile);
-                if (count > 0 && isspace(c) ) return T_PASM_PREG;
-                //else unread_char(lexer->curfile);
+                buffer_char(lexer, c);              /* buffer 'P'                          */
+                count = read_digits(lexer);         /* read as many digits as you can      */
+                c = read_char(lexer->curfile);      /* read next, this is not a digit      */
+                if (count > 0 && !isalnum(c) ) {    /* only if the #read digits > 0     .. */
+                    unread_char(lexer->curfile);    /* .. and current char is not alnum .. */
+                    return T_PASM_PREG;             /* put back last read char, and ..     */
+                }                                   /* return token for register.          */
                 break;
             case 'S':
-                count = read_digits(lexer);
                 buffer_char(lexer, c);
+                count = read_digits(lexer);
+
                 c = read_char(lexer->curfile);
-                if (count > 0 && isspace(c) ) return T_PASM_SREG;
-                //else unread_char(lexer->curfile);
+                if (count > 0 && !isalnum(c) ) {
+                    unread_char(lexer->curfile);
+                    return T_PASM_SREG;
+                }
                 break;
             case 'I':
-                count = read_digits(lexer);
                 buffer_char(lexer, c);
+                count = read_digits(lexer);
                 c = read_char(lexer->curfile);
-                if (count > 0 && isspace(c) ) return T_PASM_IREG;
-                //else unread_char(lexer->curfile);
+                if (count > 0 && !isalnum(c) ) {
+                    unread_char(lexer->curfile);
+                    return T_PASM_IREG;
+                }
                 break;
             case 'N':
-                count = read_digits(lexer);
                 buffer_char(lexer, c);
+                count = read_digits(lexer);
                 c = read_char(lexer->curfile);
-                if (count > 0 && isspace(c) ) return T_PASM_NREG;
-                //else unread_char(lexer->curfile);                    
+                if (count > 0 && !isalnum(c) ) {
+                    unread_char(lexer->curfile);
+                    return T_PASM_NREG;
+                }
                 break;
-            default:                
+            default:
                 break; /* continue below */
         }
 
 
-        
-        /* it was not a PASM register */
+
+        /* it was not a PASM register. In case of the letters [S|N|I|P] and possibly
+         * some digits after that, those are already stored in the token buffer. That's
+         * no problem, just continue from there. Apparently this is an identifier, so
+         * it will match the rest of the identifier characters in the first if-block to
+         * come.
+         */
 
 /*
 
@@ -1315,6 +1346,12 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
             if (tmp == T_NOT_FOUND) return T_ERROR;
             else return tmp;
         }
+        else if (isspace(c) && (lexer->charptr > lexer->token_chars) ) {
+            /* we read a register letter, but nothing more, then current char. is
+             * a space. Check if token buffer is not empty (then charptr > token_chars pointer)
+             * if not empty, it's an identifier */
+            return T_IDENTIFIER;
+        }
         else {
             fprintf(stderr, "BUG IN LEXER: Unknown character: %c", c);
             fprintf(stderr, "Was parsing file: '%s'\n", lexer->curfile->filename);
@@ -1322,12 +1359,10 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 printf("FATAL: end of file passed!\n");
             }
             exit(1);
-
-
         }
     }
 
-    fprintf(stderr, "THIS SHOULD NEVER HAPPEN\n");
+    /* it is impossible to come here, but just keep the compiler happy: */
     return T_ERROR;
 
 }
@@ -1507,7 +1542,8 @@ close_include_file(lexer_state *lexer) {
         switch_buffer(lexer);
     }
     else { /* no more buffers. */
-        fprintf(stderr, "FATAL: attempt to close file '%s' without any open files left\n", lexer->curfile->filename);
+        fprintf(stderr, "FATAL: attempt to close file '%s' without any open files left\n",
+                lexer->curfile->filename);
     }
 }
 
