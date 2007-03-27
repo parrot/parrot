@@ -266,8 +266,8 @@ Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj /*NN*/, char *nptr,
     extern PARROT_API char **Parrot_exec_rel_addr;
     extern PARROT_API int Parrot_exec_rel_count;
 
-    new_relloc = mem_sys_realloc(obj->text_rellocation_table,
-        (size_t)(obj->text_rellocation_count + 1)
+    new_relloc = (Parrot_exec_rellocation_t *)mem_sys_realloc(
+        obj->text_rellocation_table, (size_t)(obj->text_rellocation_count + 1)
             * sizeof (Parrot_exec_rellocation_t));
     obj->text_rellocation_table = new_relloc;
     new_relloc = &obj->text_rellocation_table[obj->text_rellocation_count++];

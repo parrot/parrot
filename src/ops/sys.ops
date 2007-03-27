@@ -297,7 +297,7 @@ inline op sleep(in INT) {
       real_exception(interp, next, NEG_SLEEP,
         "Cannot go back in time");
   }
-  next = Parrot_sleep_on_event(interp, (FLOATVAL) $1, next);
+  next = (opcode_t *)Parrot_sleep_on_event(interp, (FLOATVAL) $1, next);
   goto ADDRESS(next);
 }
 
@@ -307,7 +307,7 @@ inline op sleep(in NUM) {
       real_exception(interp, next, NEG_SLEEP,
         "Cannot go back in time");
   }
-  next = Parrot_sleep_on_event(interp, $1, next);
+  next = (opcode_t *)Parrot_sleep_on_event(interp, $1, next);
   goto ADDRESS(next);
 }
 

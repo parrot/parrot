@@ -320,11 +320,11 @@ Parrot_register_charset_converter(Interp *interp,
 
             nc = left->n_converters++;
             if (nc) {
-                left->to_converters = mem_sys_realloc(left->to_converters,
-                        sizeof (To_converter) * (nc + 1));
+                left->to_converters = (To_converter *)mem_sys_realloc(
+                        left->to_converters, sizeof (To_converter) * (nc + 1));
             }
             else
-                left->to_converters = mem_sys_allocate(sizeof (To_converter));
+                left->to_converters = (To_converter *)mem_sys_allocate(sizeof (To_converter));
             left->to_converters[nc].to = rhs;
             left->to_converters[nc].func = func;
         }

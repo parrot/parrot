@@ -60,7 +60,7 @@ op callmethodcc(invar PMC, in STR) :object_base {
         "Method '%Ss' not found", meth);
   }
   interp->current_object = object;
-  interp->current_cont = NEED_CONTINUATION;
+  interp->current_cont = (PMC *)NEED_CONTINUATION;
   dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
   goto ADDRESS(dest);
 }
@@ -76,7 +76,7 @@ op callmethodcc(invar PMC, invar PMC) :object_base {
 
   next = expr NEXT();
   interp->current_object = object;
-  interp->current_cont = NEED_CONTINUATION;
+  interp->current_cont = (PMC *)NEED_CONTINUATION;
   dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
   goto ADDRESS(dest);
 }
