@@ -755,7 +755,7 @@ Parrot_destroy_header_pools(Interp *interp)
 Parrot_merge_header_pools(Interp *dest_interp, Interp *source_interp)>
 
 Merge the header pools of C<source_interp> into those of C<dest_interp>.
-(Used to deal with shared objects left after interpreter destruction.
+(Used to deal with shared objects left after interpreter destruction.)
 
 =cut
 */
@@ -773,7 +773,7 @@ static void fix_pmc_syncs(Interp *dest_interp,
 
         for (i = nm = 0; i < cur_arena->used; i++) {
             if (PObj_on_free_list_TEST(b))
-                ; /* if its on free list, do nothing */
+                ; /* if it's on free list, do nothing */
             else {
                 if (PObj_is_PMC_TEST(b)) {
                     PMC *p = (PMC *)b;
