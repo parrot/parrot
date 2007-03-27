@@ -1318,7 +1318,7 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
 {
 #define PCC_ARG_MAX 1024
     /* variables from PCCINVOKE impl in PCCMETHOD.pm */
-    INTVAL n_regs_used[] = { 0, 0, 0, 0 }; /* INSP */
+    INTVAL n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 }; /* args INSP, returns INSP */
     opcode_t arg_indexes[PCC_ARG_MAX];
     opcode_t result_indexes[PCC_ARG_MAX];
     PMC* args_sig = pmc_new(interp, enum_class_FixedIntegerArray);
