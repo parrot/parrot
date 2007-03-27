@@ -249,7 +249,7 @@ $returns_accessors
         return_indexes = (opcode_t *) temp_return_indexes;
     }
     return_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
-        string_from_const_cstring(interp, $returns_flags, 0), PObj_constant_FLAG);
+        string_from_const_cstring(interp, $returns_flags, 0), 0);
     $goto_string
     /*END PRETURN $returns */
 END
@@ -372,7 +372,7 @@ sub rewrite_pccmethod {
     opcode_t *current_args;
     PMC* _type = pmc_new(interp, enum_class_FixedIntegerArray);
     PMC* param_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
-        string_from_const_cstring(interp, $params_flags, 0), PObj_constant_FLAG);
+        string_from_const_cstring(interp, $params_flags, 0), 0);
     PMC* return_sig = PMCNULL;
     parrot_context_t *caller_ctx = CONTEXT(interp->ctx);
     PMC* ret_cont = new_ret_continuation_pmc(interp, NULL);
@@ -495,9 +495,9 @@ sub rewrite_pccinvoke {
       opcode_t result_indexes[] = { $result_indexes };
       PMC* _type = pmc_new(interp, enum_class_FixedIntegerArray);
       PMC* args_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
-          string_from_const_cstring(interp, $arg_flags, 0), PObj_constant_FLAG);
+          string_from_const_cstring(interp, $arg_flags, 0), 0);
       PMC* results_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
-          string_from_const_cstring(interp, $result_flags, 0), PObj_constant_FLAG);
+          string_from_const_cstring(interp, $result_flags, 0), 0);
       PMC* ret_cont = new_ret_continuation_pmc(interp, NULL);
       parrot_context_t *ctx = Parrot_push_context(interp, n_regs_used);
       PMC* pccinvoke_meth;
