@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -92,7 +92,6 @@ ok 2 - source() with args sets source namespace
 ok 3 - source() with too many args fails
 ok 4 - source() with non-namespace arg throws exception
 OUT
-# TODO test passing non-namespace pmc
 
 
 pir_output_is( <<'CODE', <<'OUT', 'destination' );
@@ -146,7 +145,6 @@ ok 2 - destination() with args sets destination namespace
 ok 3 - destination() with too many args fails
 ok 4 - destination() with non-namespace arg throws exception
 OUT
-# TODO test passing non-namespace pmc
 
 
 pir_output_is( <<'CODE', <<'OUT', 'globals' );
@@ -221,8 +219,7 @@ ok 5 - globals() with too many args fails
 OUT
 
 
-## TODO add_global
-pir_output_is( <<'CODE', <<'OUT', 'globals' );
+pir_output_is( <<'CODE', <<'OUT', 'add_global' );
 .sub 'test' :main
     $P0 = new .Exporter
 
@@ -263,16 +260,37 @@ pir_output_is( <<'CODE', <<'OUT', 'globals' );
     print 'not '
   ok_3:
     say 'ok 3 - add_global() with args adds string to globals array (again)'
+
+    push_eh ok_4
+    $P0.'globals'($P99, $P98)
+    clear_eh
+
+    print 'not '
+  ok_4:
+    say 'ok 4 - add_global() with too many args fails'
+
 .end
 CODE
 ok 1 - add_global() with no args does nothing
 ok 2 - add_global() with args adds string to globals array
 ok 3 - add_global() with args adds string to globals array (again)
+ok 4 - add_global() with too many args fails
 OUT
 
 ## TODO import
+pir_output_is( <<'CODE', <<'OUT', 'import' );
+.sub 'test' :main
+    $P0 = new .Exporter
 
+    $P0.'import'()
+    say 'ok 1 - import() with no args does nothing'
 
+.end
+CODE
+ok 1 - import() with no args does nothing
+OUT
+
+# Parrot_free_context
 
 
 # Local Variables:

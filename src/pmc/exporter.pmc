@@ -176,25 +176,45 @@ Import C<globals> from the C<src> namespace to the C<dest> namespace.
 
 */
 
-    PCCMETHOD void import(PMC *dest, PMC *src, PMC *globals) {
+    PCCMETHOD void import(PMC *dest :optional :named["destination"], int got_dest :opt_flag,
+            PMC *src :optional :named["source"], int got_src :opt_flag,
+            PMC *globals :optional :named["globals"], int got_globals :opt_flag) {
+/*
+ * notes:
+ * passed params override current values, so set them before using them
+ * check if any values are null before using them, and throw if so
+ * for each global,
+ *   find global in source namespace, throw exception if not found
+ *   find global in destination namespace, throw warning if found
+ *   store global in destination namespace
+ */
+
         Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
-        int size_globals;
+        int copy_of_globals;
+
+        if (got_src)
+            PCCINVOKE(interp, SELF, "source", PMC *src);
+        if (got_dest)
+            PCCINVOKE(interp, SELF, "destination", PMC *dest);
+        if (got_globals)
+            PCCINVOKE(interp, SELF, "globals", PMC *globals);
 
         if (exp->globals == PMCNULL) {
             real_exception(interp, NULL, 0, "no globals to import");
+            return;
         }
-        else if (exp->ns_src == PMCNULL) {
+        if (exp->ns_src == PMCNULL) {
             real_exception(interp, NULL, 0, "source namespace not set");
+            return;
         }
-        else if (exp->ns_dest == PMCNULL) {
+        if (exp->ns_dest == PMCNULL) {
             real_exception(interp, NULL, 0, "destination namespace not set");
+            return;
         }
-        else {
-            size_globals = VTABLE_get_integer(interp, exp->globals);
-            if (!size_globals)
-                return;
-            /* TODO for each global, look up in source and alias to dest */
-        }
+
+        copy_of_globals = VTABLE_get_integer(interp, exp->globals);
+        return;
+        /* TODO for each global, look up in source and alias to dest */
     }
 
 /*
