@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 =head1 NAME
 
@@ -222,7 +222,53 @@ OUT
 
 
 ## TODO add_global
+pir_output_is( <<'CODE', <<'OUT', 'globals' );
+.sub 'test' :main
+    $P0 = new .Exporter
 
+    $P0.'add_global'()
+    $P1 = $P0.'globals'()
+    $I0 = does $P1, 'array'
+    unless $I0 goto nok_1
+    $I0 = $P1
+    unless $I0 == 0 goto nok_1
+    goto ok_1
+  nok_1:
+    print 'not '
+  ok_1:
+    say 'ok 1 - add_global() with no args does nothing'
+
+    $P0.'add_global'('foo')
+    $P1 = $P0.'globals'()
+    $I0 = $P1
+    unless $I0 == 1 goto nok_2
+    $S0 = $P1[0]
+    unless $S0 == 'foo' goto nok_2
+    goto ok_2
+  nok_2:
+    print 'not '
+  ok_2:
+    say 'ok 2 - add_global() with args adds string to globals array'
+
+    $P0.'add_global'('bar')
+    $P1 = $P0.'globals'()
+    $I0 = $P1
+    unless $I0 == 2 goto nok_3
+    $S0 = $P1[0]
+    unless $S0 == 'foo' goto nok_3
+    $S0 = $P1[1]
+    unless $S0 == 'bar' goto nok_3
+    goto ok_3
+  nok_3:
+    print 'not '
+  ok_3:
+    say 'ok 3 - add_global() with args adds string to globals array (again)'
+.end
+CODE
+ok 1 - add_global() with no args does nothing
+ok 2 - add_global() with args adds string to globals array
+ok 3 - add_global() with args adds string to globals array (again)
+OUT
 
 ## TODO import
 
