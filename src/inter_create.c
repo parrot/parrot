@@ -8,7 +8,7 @@ src/inter_create.c - Parrot Interpreter Creation and Destruction
 
 =head1 DESCRIPTION
 
-Create or destroy a Parrot interpreter.c
+Create or destroy a Parrot interpreter
 
 =head2 Functions
 
@@ -394,7 +394,7 @@ Parrot_really_destroy(Interp *interp, int exit_code, void *arg)
     mem_sys_free(interp->arena_base);
     interp->arena_base = NULL;
     /* cache structure */
-    mem_sys_free(interp->caches);
+    destroy_object_cache(interp);
     /* packfile */
 
     if (!Interp_flags_TEST(interp, PARROT_EXTERN_CODE_FLAG))  {

@@ -1181,7 +1181,7 @@ interpreter, and name of the method. Don't use a possible method cache.
 
 =item void Parrot_invalidate_method_cache(Interp *, STRING *class)
 
-Clear method cache for the given class. If class is NULL caches for
+Clear method cache for the given class. If class is NULL, caches for
 all classes are invalidated.
 
 =cut
@@ -1201,6 +1201,19 @@ init_object_cache(Interp *interp)
     Caches * const mc = interp->caches =
         mem_sys_allocate_zeroed(sizeof (*mc));
     SET_NULL(mc->idx);
+}
+
+void
+destroy_object_cache(Interp *interp)
+{
+    UINTVAL i;
+    Caches * const mc = interp->caches;
+
+    for (i = 0; i < mc->mc_size; i++) {
+        if (mc->idx[i])
+            mem_sys_free(mc->idx[i]);
+    }
+    mem_sys_free(mc);
 }
 
 #define TBL_SIZE_MASK 0x1ff   /* x bits 2..10 */
