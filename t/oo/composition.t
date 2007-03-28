@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -292,6 +292,92 @@ Snake!
 ok 4 - called method from role that wasn't aliased
 Aliased badger!
 ok 5 - called method from role that was aliased
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'role that does a role' );
+.sub 'test' :main
+    .local pmc PHB, Manage, FirePeople
+    
+    FirePeople = new Role
+    $P0 = find_global 'fire'
+    FirePeople.'add_method'("fire", $P0)
+    
+    Manage = new Role
+    $P0 = find_global 'give_payrise'
+    FirePeople.'add_method'("give_payrise", $P0)
+    Manage.'add_role'(FirePeople)
+    print "ok 1 - adding one role to another happens\n"
+    
+    PHB = new Class
+    PHB.'add_role'(Manage)
+    print "ok 2 - added one rule that does another role to the class\n"
+    
+    $P0 = PHB.'new'()
+    $P0.give_payrise()
+    print "ok 3 - called method from direct role\n"
+
+    $P0.fire()
+    print "ok 4 - called method from indirect role\n"
+.end
+
+.sub fire
+    print "You're FIRED!\n"
+.end
+.sub give_payrise
+    print "You all get a pay rise of 0.0005%.\n"
+.end
+CODE
+ok 1 - adding one role to another happens
+ok 2 - added one rule that does another role to the class
+You all get a pay rise of 0.0005%.
+ok 3 - called method from direct role
+You're FIRED!
+ok 4 - called method from indirect role
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'conflict from indirect role' );
+.sub 'test' :main
+    .local pmc BurninatorBoss, Manage, FirePeople, Burninator
+    
+    FirePeople = new Role
+    $P0 = find_global 'fire'
+    FirePeople.'add_method'("fire", $P0)
+    
+    Manage = new Role
+    $P0 = find_global 'give_payrise'
+    FirePeople.'add_method'("give_payrise", $P0)
+    Manage.'add_role'(FirePeople)
+    
+    Burninator = new Role
+    $P0 = find_global 'fire2'
+    Burninator.'add_method'("fire", $P0)
+    print "ok 1 - all roles created\n"
+
+    BurninatorBoss = new Class
+    BurninatorBoss.'add_role'(Manage)
+    print "ok 2 - added first role with indirect role\n"
+
+    push_eh OK_3
+    BurninatorBoss.'add_role'(Burninator)
+    print "not "
+    clear_eh
+OK_3:
+    print "ok 3 - second role conflicts with method from indirect role\n"
+.end
+
+.sub fire
+    print "You're FIRED!\n"
+.end
+.sub fire2
+    print "BURNINATION!\n"
+.end
+.sub give_payrise
+    print "You all get a pay rise of 0.0005%.\n"
+.end
+CODE
+ok 1 - all roles created
+ok 2 - added first role with indirect role
+ok 3 - second role conflicts with method from indirect role
 OUT
 
 # Local Variables:

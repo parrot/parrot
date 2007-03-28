@@ -1846,6 +1846,159 @@ PMC* Parrot_ComputeMRO_C3(Interp *interp, PMC *class)
 
 /*
 
+=item C<void Parrot_ComposeRole(Interp *interp, PMC *role, 
+                        PMC *without, int got_without,
+                        PMC *alias, int got_alias,
+                        PMC *methods_hash, PMC *roles_list)>
+
+Used by the Class and Object PMCs internally to compose a role into either of
+them. The C<role> parameter is the role that we are composing into the class
+or role. C<methods_hash> is the hash of method names to invokable PMCs that
+contains the methods the class or role has. C<roles_list> is the list of roles
+the the class or method does.
+
+The C<role> parameter is only dealt with by its external interface. Whether
+this routine is usable by any other object system implemented in Parrot very
+much depends on how closely the role composition semantics they want are to
+the default implementation.
+
+=cut
+
+*/
+
+void Parrot_ComposeRole(Interp *interp, PMC *role, 
+                        PMC *without, int got_without,
+                        PMC *alias, int got_alias,
+                        PMC *methods_hash, PMC *roles_list)
+{
+    PMC *methods;
+    PMC *methods_iter;
+    PMC *roles_of_role;
+    PMC *proposed_add_methods;
+    int i, j, roles_count, roles_of_role_count;
+
+    /* Check we have not already composed the role; if so, just ignore it. */
+    roles_count = VTABLE_elements(interp, roles_list);
+    for (i = 0; i < roles_count; i++) {
+        if (VTABLE_get_pmc_keyed_int(interp, roles_list, i) == role)
+            return;
+    }
+
+    /* Get the methods from the role. */
+    Parrot_PCCINVOKE(interp, role, string_from_const_cstring(interp, "methods", 0),
+        "->P", &methods);
+    if (PMC_IS_NULL(methods))
+        return;
+
+    /* We need to check for conflicts before we do the composition. We
+     * put each method that would be OK to add into a proposal list, and
+     * bail out right away if we find a problem. */
+    proposed_add_methods = pmc_new(interp, enum_class_Hash);
+    methods_iter = VTABLE_get_iter(interp, methods);
+    while (VTABLE_get_bool(interp, methods_iter)) {
+        /* Get current method and its name. */
+        PMC *method_name_pmc = VTABLE_shift_pmc(interp, methods_iter);
+        STRING *method_name = VTABLE_get_string(interp, method_name_pmc);
+        PMC *cur_method = VTABLE_get_pmc_keyed(interp, methods, method_name_pmc);
+
+        /* Need to find the name we'll check for a conflict on. */
+        STRING *check_name = method_name;
+
+        /* Ignore if it's in the exclude list. */
+        if (got_without) {
+            int without_count = VTABLE_elements(interp, without);
+            for (i = 0; i < without_count; i++) {
+                STRING *check = VTABLE_get_string_keyed_int(interp, without, i);
+                if (string_equal(interp, check, method_name) == 0) {
+                    check_name = NULL;
+                    break;
+                }
+            }
+        }
+
+        /* If we're not in the exclude list, now see if we've an alias. */
+        if (check_name != NULL && got_alias) {
+            if (VTABLE_exists_keyed_str(interp, alias, method_name))
+                check_name = VTABLE_get_string_keyed_str(interp, alias, method_name);
+        }
+
+        /* If we weren't excluded... */
+        if (check_name != NULL) {
+            /* Is there a method with this name already in the class?
+             * XXX TODO: multi-method handling. */
+            if (VTABLE_exists_keyed_str(interp, methods_hash, check_name)) {
+                /* Conflicts with something already in the class. */
+                if (check_name == method_name)
+                    real_exception(interp, NULL, ROLE_COMPOSITOIN_METH_CONFLICT,
+                        "A conflict occurred during role composition due to method '%S'.",
+                        method_name);
+                else
+                    real_exception(interp, NULL, ROLE_COMPOSITOIN_METH_CONFLICT,
+                        "A conflict occurred during role composition due to the aliasing of '%S' to '%S'.",
+                        method_name, check_name);
+                return;
+            }
+
+            /* What about a conflict with ourslef? */
+            if (VTABLE_exists_keyed_str(interp, proposed_add_methods, check_name)) {
+                /* If it's due to aliasing, say so. Otherwise, something
+                 * very weird is going on. */
+                if (check_name != method_name)
+                    real_exception(interp, NULL, ROLE_COMPOSITOIN_METH_CONFLICT,
+                        "A conflict occurred during role composition; '%S' was aliased to '%S', but the role already has a '%S'.",
+                        method_name, check_name, check_name);
+                else
+                    real_exception(interp, NULL, ROLE_COMPOSITOIN_METH_CONFLICT,
+                        "A conflict occurred during role composition; the method '%S' from the role managed to conflict with itself somehow.",
+                        method_name);
+                return;
+            }
+
+            /* If we got here, no conflicts! Add it to the "to compose" list. */
+            VTABLE_set_pmc_keyed_str(interp, proposed_add_methods, check_name, cur_method);
+        }
+    }
+
+    /* If we get here, we detected no conflicts. Go ahead and compose the methods. */
+    methods_iter = VTABLE_get_iter(interp, proposed_add_methods);
+    while (VTABLE_get_bool(interp, methods_iter)) {
+        /* Get current method and its name. */
+        PMC *method_name_pmc = VTABLE_shift_pmc(interp, methods_iter);
+        STRING *method_name = VTABLE_get_string(interp, method_name_pmc);
+        PMC *cur_method = VTABLE_get_pmc_keyed(interp, proposed_add_methods,
+            method_name_pmc);
+
+        /* Add it to the methods of the class. */
+        VTABLE_set_pmc_keyed_str(interp, methods_hash, method_name,
+            cur_method);
+    }
+
+    /* Add this role to the roles list. */
+    VTABLE_push_pmc(interp, roles_list, role);
+    roles_count++;
+
+    /* As a result of composing this role, we will also now do the roles
+     * that it did itself. Note that we already have the correct methods
+     * as roles "flatten" the methods they get from other roles into their
+     * own method list. */
+    Parrot_PCCINVOKE(interp, role, string_from_const_cstring(interp, "roles", 0),
+        "->P", &roles_of_role);
+    roles_of_role_count = VTABLE_elements(interp, roles_of_role);
+    for (i = 0; i < roles_of_role_count; i++) {
+        /* Only add if we don't already have it in the list. */
+        PMC *cur_role = VTABLE_get_pmc_keyed_int(interp, roles_of_role, i);
+        for (j = 0; j < roles_count; j++) {
+            if (VTABLE_get_pmc_keyed_int(interp, roles_list, j) == cur_role) {
+                /* We ain't be havin' it. */
+                VTABLE_push_pmc(interp, roles_list, cur_role);
+            }   
+        }
+    }
+}
+
+
+/*
+
 =back
 
 =head1 SEE ALSO

@@ -106,6 +106,11 @@ PARROT_API PMC *Parrot_find_vtable_meth(Interp* interp, PMC *pmc, STRING *meth);
 
 PARROT_API PMC* Parrot_ComputeMRO_C3(Interp *interp, PMC *class);
 
+PARROT_API void Parrot_ComposeRole(Interp *interp, PMC *role, 
+                                   PMC *without, int got_without,
+                                   PMC *alias, int got_alias,
+                                   PMC *methods_hash, PMC *roles_list);
+
 #endif /* PARROT_OBJECTS_H_GUARD */
 
 /*

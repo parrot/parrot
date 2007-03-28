@@ -277,6 +277,21 @@ Adds the given sub PMC as a method with the given name.
         }
     }
 
+/*
+
+=item C<void add_role(PMC* role, PMC* without :optional :named["without"], PMC* alias :optional :named["alias"])>
+
+Compose the given role into this one, using the given exclusions and aliases.
+
+=cut
+
+*/
+    PCCMETHOD void add_role(PMC* role, PMC* without :optional :named["without"], int got_without :opt_flag, PMC* alias :optional :named["alias"], int got_alias :opt_flag) {
+        Parrot_Role *role_info = PARROT_ROLE(SELF);
+        Parrot_ComposeRole(interp, role, without, got_without, alias, got_alias,
+                           role_info->methods, role_info->roles);
+    }
+
 } /* END pmclass */
 
 /*
