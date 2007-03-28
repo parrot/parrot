@@ -236,6 +236,43 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
         goto handled_expression
     no_array_elem_1:
 
+    $P0 = node['concat_expression']
+    if null $P0 goto no_concat_expression
+        .local pmc past_string, concat_tail, concat_tail_iter
+        past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+        concat_tail = $P0['concat_tail']
+        if null concat_tail goto no_concat_tail
+            .local pmc past_prev, cnode 
+            concat_tail_iter = new .Iterator, concat_tail
+            iter_loop_concat:
+                unless concat_tail_iter goto iter_end_concat
+                .local pmc cnode
+                cnode = shift concat_tail_iter
+                past_string = tree.'get'('past', cnode, 'Plumhead::Grammar::expression')
+                past_prev = past
+
+                .local string op
+                op = cnode['CONCAT_OP']
+                if op != '.' goto not_concat
+                    op = '~'
+                not_concat:
+                op = 'infix:' . op 
+                past = new 'PAST::Op'
+                past.init( past_prev, past_string, 'name' => op )
+                goto iter_loop_concat
+            iter_end_concat:
+            goto handled_expression
+        no_concat_tail:
+            past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+            goto handled_expression
+    no_concat_expression:
+
+    $P0 = node['string']
+    if null $P0 goto no_string
+        past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
+        goto handled_expression
+    no_string:
+
     $P0 = node['DOUBLEQUOTE_STRING']
     if null $P0 goto no_DOUBLEQUOTE_STRING
         past = tree.'get'('past', $P0, 'Plumhead::Grammar::DOUBLEQUOTE_STRING')
@@ -296,8 +333,8 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
         if null adding_tail goto handled_expression
             .local pmc past_prev, cnode 
             adding_tail_iter = new .Iterator, adding_tail
-            iter_loop:
-                unless adding_tail_iter goto iter_end
+            iter_loop_adding:
+                unless adding_tail_iter goto iter_end_adding
                 .local pmc cnode
                 cnode = shift adding_tail_iter
                 past_mult = tree.'get'('past', cnode, 'Plumhead::Grammar::expression')
@@ -311,8 +348,8 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
                 add_op = 'infix:' . add_op 
                 past = new 'PAST::Op'
                 past.init( past_prev, past_mult, 'name' => add_op, 'pirop' => pirop )
-                goto iter_loop
-            iter_end:
+                goto iter_loop_adding
+            iter_end_adding:
             goto handled_expression
     no_adding_expression:
 

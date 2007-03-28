@@ -228,6 +228,15 @@
     .return ($I0)
 .end
 
+.sub 'infix:~'
+    .param string a
+    .param string b
+
+    $S0 = concat a, b
+
+    .return ($S0)
+.end
+
 .sub 'error_reporting'
   .return()
 .end

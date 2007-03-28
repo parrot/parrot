@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 # core Perl modules
-use Test::More     tests => 14;
+use Test::More     tests => 16;
 
 # Parrot modules
 use Parrot::Test;
@@ -167,6 +167,24 @@ language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'no semicolon be
 <?php
 echo 'Hello, ';
 echo "World!\n"
+?>
+END_CODE
+Hello, World!
+END_EXPECTED
+
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'concatenation of two strings' );
+<?php
+echo 'Hello, ' . "World!\n"
+?>
+END_CODE
+Hello, World!
+END_EXPECTED
+
+
+language_output_is( 'Plumhead', <<'END_CODE', <<'END_EXPECTED', 'concatenation of four strings' );
+<?php
+echo 'Hell' . 'o, ' . 'World!' . "\n"
 ?>
 END_CODE
 Hello, World!

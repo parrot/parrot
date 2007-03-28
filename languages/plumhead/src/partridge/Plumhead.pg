@@ -28,6 +28,7 @@ token NUMBER                  { ( \d+ )? <'.'> \d+ }
 
 token UNARY_MINUS             { \- }
 token UNARY_PLUS              { \+ }
+token CONCAT_OP               { \. }
 token ADD_OP                  { \+ | \- }
 token MUL_OP                  { \* | / | % }
 token BITWISE_OP              { <'|'>  | <'&'> | <'^'> }
@@ -60,8 +61,7 @@ token inline_sea              { <?CODE_END> <SEA_empty_allowed> <?CODE_START> }
 rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ( ; | <?before: \? > | $ ) }
 rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ( ; | <?before: \? > | $ ) }
 
-token expression              {   <DOUBLEQUOTE_STRING>
-                                | <SINGLEQUOTE_STRING>
+token expression              {   <concat_expression>
                                 | <bitwise_expression>
                                 | <array_elem>
                                 | <var>
@@ -70,6 +70,10 @@ token expression              {   <DOUBLEQUOTE_STRING>
 rule  array_elem              { <VAR_NAME> <'['> <array_key> <']'> }
 rule  array_key               { <expression>  }
 rule  var                     { <VAR_NAME> }
+
+rule concat_expression        { <string> <concat_tail>* }
+rule string                   { <DOUBLEQUOTE_STRING> | <SINGLEQUOTE_STRING> }
+rule concat_tail              { <CONCAT_OP> <string> }
 
 rule bitwise_expression       { <adding_expression> <bitwise_tail>? }
 
