@@ -173,7 +173,7 @@ extern void open_include_file(struct lexer_state *lexer);
 extern void close_include_file(struct lexer_state *lexer);
 
 /* get the characters of the current token */
-extern char * const get_current_token(struct lexer_state *s);
+extern char * const get_current_token(struct lexer_state const *s);
 
 /* print some text from the buffer in the neighbourhood of the current token */
 extern void print_error_context(struct lexer_state *s);

@@ -2083,12 +2083,6 @@ Remove functions for short statements, and put in the matching into the switch()
 Skip first token of statements if it's sure that the token has already been checked by the caller. No need
 to match 'goto' again, if it was already checked in compilation_unit().
 
-=item *
-
-Add a 'token category'. For instance, when parsing a binary operator, you're just interested if it actually is
-a binary op. The lexer can set the token category to "binop", and set token to T_PLUS, etc. This prevents
-big switch statements. Also, we still have access to the actual binary operator (through token), so semantic
-analysis can continue.
 
 =back
 

@@ -295,7 +295,7 @@ return a constant pointer to the current token buffer
 
 */
 char * const
-get_current_token(lexer_state *s) {    
+get_current_token(lexer_state const *s) {    
     assert(s->token_chars);
     return s->token_chars;
 }
@@ -747,8 +747,8 @@ Reads a token from the current file buffer.
 =cut
 
 */
-static token
-read_token(lexer_state *lexer) {
+token
+next_token(lexer_state *lexer) {
     int ok    = 1;
     int count = 0;
 
@@ -1556,23 +1556,7 @@ close_include_file(lexer_state *lexer) {
 }
 
 
-/*
 
-=item next_token()
-
-Calls read_token() for the next token.
-
-XXX NOTE: There used to be some checks in this function. If this doesn't prove
-to be necessary, we can rename read_token() to next_token().
-
-=cut
-
-*/
-token
-next_token(lexer_state *lexer) {
-    token t = read_token(lexer);
-    return t;
-}
 
 /*
 

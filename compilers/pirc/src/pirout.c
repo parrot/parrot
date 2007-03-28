@@ -10,7 +10,7 @@
  */
 void
 pirout(struct parser_state *p) {
-    struct lexer_state *l = get_lexer(p);
+    struct lexer_state const *l = get_lexer(p);
     token t = get_token(p);
 
     switch (t) {
