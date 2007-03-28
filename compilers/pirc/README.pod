@@ -27,6 +27,15 @@ I hardcoded the "print" op, so you can compile:
 On the other hand, most of the "sugar" that PIR adds to Parrot assembly
 syntax has been implemented, and can be parsed successfully.
 
+For more documentation, please run:
+ 
+ pod2html src/pirparser.c > doc/pirparser.html
+ pod2html src/pirlexer.c  > doc/pirlexer.html
+ 
+This will generate the documentation in HTML format. The documentation of
+pirparser.c contains the grammar that is accepted by PIRC. The documentation
+of pirlexer.c contains the lexical specifiction as accepted by PIRC.
+
 
 =head1 ISSUES
 

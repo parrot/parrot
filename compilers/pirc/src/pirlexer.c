@@ -17,10 +17,10 @@ pirlexer.c - lexical analysis for Parrot Intermediate Representation
 #include <assert.h>
 
 
-/* end of file marker. Just use "EOF" (defined as -1) */                                                                                                 
-#define EOF_MARKER          -1 
+/* end of file marker. Just use "EOF" (defined as -1) */
+#define EOF_MARKER          -1
 /* number of characters being displayed in syntax errors */
-#define ERROR_CONTEXT_SIZE  30  
+#define ERROR_CONTEXT_SIZE  30
 
 
 /*
@@ -32,36 +32,42 @@ dictionary contains *all* keywords, directives, flags and
 other (descriptions of) tokens that are recognized by the
 lexer.
 
-XXX NOTE:
-The several 'groups' of words (will be) are separated by NULL
-entries; this way, we can later optimize the search, by
-just looking in a particular subsection ("while the iterator
-is not null"), so you don't have to look into a section
-that is not of interest. (not implemented right now)
-
- global
- goto
- if
- int
- n_operators
- null
- num
- pmc
- string
- unless
+  global    goto
+  if        n_operators
+  int       null
+  num       pmc
+  string    unless
 
 
 =head1 DIRECTIVES
 
 The following are PIR directives.
 
-XXX TODO
+  .arg               .const      .constant    .emit             .end                  
+  .endnamespace      .endm       .eom         .get_results      .global               
+  .globalconst       .HLL        .HLL_map     .include          .invocant             
+  .lex               .loadlib    .local       .macro            .meth_call            
+  .namespace         .nci_call   .param       .pcc_begin        .pcc_begin_return     
+  .pcc_begin_yield   .pcc_call   .pcc_end     .pcc_end_return   .pcc_end_yield        
+  .pcc_sub           .pragma     .result      .return           .sub                  
+  .sym               .yield      
+
 
 =head1 FLAGS
 
-The following are flags for subroutines and parameters/arguments.
+The following are flags for subroutines:
 
-TODO: put the dictionary into a hash table (maybe a Hash PMC?).
+  :anon     :immediate   :init        :lex         :load        :main        
+  :method   :multi       :outer       :postcomp    :vtable      :named       
+  
+The following are flags for parameters/arguments.
+
+  :opt_flag    
+  :optional    
+  :slurpy      
+  :flat        
+  :unique_reg  
+
 
 =cut
 
@@ -77,7 +83,7 @@ static char const * dictionary[] = {
     "pmc",                      /* T_PMC                    */
     "string",                   /* T_STRING                 */
     "unless",                   /* T_UNLESS                 */
-   /* NULL,  */                 /* make sure we stop looking after normal keywords */
+   /* NULL,  */                 /*                          */
     ".arg",                     /* T_ARG                    */
     ".const",                   /* T_CONST,                 */
     ".constant",                /* T_CONSTANT,              */
@@ -280,9 +286,9 @@ Get the spelling of a keyword based on the specified token.
 
 */
 char const *
-find_keyword(token t) {    
+find_keyword(token t) {
     assert((t >= 0) && (t <= MAX_TOKEN));
-    return dictionary[t];    
+    return dictionary[t];
 }
 
 /*
@@ -295,7 +301,7 @@ return a constant pointer to the current token buffer
 
 */
 char * const
-get_current_token(lexer_state const *s) {    
+get_current_token(lexer_state const *s) {
     assert(s->token_chars);
     return s->token_chars;
 }
@@ -353,8 +359,8 @@ print_error_context(struct lexer_state *s) {
     while (start < end ) {
         /* print tab characters as spaces to make the "^" indicator fit nicely */
         if (*start == '\t') fprintf(stderr, " ");
-        else fprintf(stderr, "%c", *start);            
-        ++start;            
+        else fprintf(stderr, "%c", *start);
+        ++start;
     }
     /* print an indicator like "^" on the next line */
     fprintf(stderr, "\n%*s\n", s->curfile->linepos - 1, "^");
@@ -380,22 +386,6 @@ static void
 buffer_char(lexer_state *lexer, char c) {
     /* put c into *lexer->charptr and increment the pointer */
     *lexer->charptr++ = c;
-}
-
-
-/*
-
-=item unbuffer_char()
-
-Remove the last added character from the buffer.
-
-=cut
-
-*/
-static void
-unbuffer_char(lexer_state *lexer) {
-    --lexer->charptr;
-    *lexer->charptr = '\0';
 }
 
 
@@ -474,32 +464,7 @@ clear_buffer(lexer_state *lexer) {
     lexer->charptr = lexer->token_chars;
 }
 
-/*
 
-=item clone_string()
-
-clone a string. Copy the characters of src into dest
-and return dest.
-
-=cut
-
-*/
-char *
-clone_string(char const * src) {
-    int srclen;
-    char * dest, *ptr;
-    
-    assert(src != NULL);
-    srclen = strlen(src);
-    /* dest is used as an iterator, ptr - still pointing to the beginning
-     * of the string - is returned 
-     */    
-    dest = ptr = (char *)calloc(srclen + 1, sizeof(char));
-    while(*src) {
-        *dest++ = *src++;
-    }
-    return ptr;
-}
 
 /*
 
@@ -517,12 +482,12 @@ read_file(char const * filename) {
     FILE *fileptr         = NULL;
     file_buffer *filebuff = NULL;
     struct stat filestatus;
-    
-    
+
+
     assert(filename != NULL);
-    
+
     filebuff = (file_buffer *)malloc(sizeof(file_buffer));
-        
+
     if (filebuff == NULL) {
         fprintf(stderr, "Error in read_file(): failed to allocate memory for file buffer\n");
         exit(1);
@@ -541,7 +506,7 @@ read_file(char const * filename) {
     /* allocate memory for this file. Reserve 1 more byte to store the EOF marker */
     stat(filename, &filestatus);
     filebuff->filesize = filestatus.st_size;
-    
+
     /* printf("file size: %ld\n", filebuff->filesize); */
 
     filebuff->buffer = (char *)calloc(filebuff->filesize + 1, sizeof(char));
@@ -682,13 +647,13 @@ to be processed after this.
 */
 static void
 switch_buffer(lexer_state *lexer) {
-    file_buffer *tmp = NULL;        
-    
-    assert(lexer->curfile->prevbuffer != NULL);            
+    file_buffer *tmp = NULL;
+
+    assert(lexer->curfile->prevbuffer != NULL);
     /* destroy this buffer, set 'buf' to its previous buffer */
     tmp            = lexer->curfile;
     lexer->curfile = lexer->curfile->prevbuffer;
-    destroy_buffer(tmp);            
+    destroy_buffer(tmp);
 }
 
 
@@ -706,7 +671,7 @@ static int
 read_digits(lexer_state *lexer) {
     int count = 0;
     char c    = read_char(lexer->curfile);
-    
+
     while ( isdigit(c) ) {
         buffer_char(lexer, c);
         c = read_char(lexer->curfile);
@@ -734,9 +699,214 @@ update_line(lexer_state *lexer) {
 
 }
 
+
+
+
 /*
 
-=item read_token()
+=back
+
+=head1 LEXER API
+
+=over 4
+
+=item read_heredoc()
+
+Reads heredoc text up to the specified heredoc label.
+Returns either T_HEREDOC_STRING if successful, or T_EOF.
+The heredoc string is stored in the token buffer.
+
+=cut
+
+*/
+token
+read_heredoc(lexer_state *lexer, char *heredoc_label) {
+    char *heredoc_iter = heredoc_label;
+    char c;
+
+    clear_buffer(lexer);
+    c = read_char(lexer->curfile);
+
+    /* safe guard; never give a NULL argument! */
+    if (heredoc_label == NULL) return 0;
+
+    while (c != EOF_MARKER) { /* never read beyond end of file */
+
+        if (is_start_of_line(lexer->curfile) == 1) {
+            /* is this the start of a line ? */
+
+            /* try to match the heredoc label */
+            while (c == *heredoc_iter) {
+                heredoc_iter++;                 /* next heredoc char. */
+                c = read_char(lexer->curfile);  /* next input char. */
+                buffer_char(lexer, c);          /* of course store the heredoc */
+            }
+
+            /* the loop broke, but why? */
+            if (*heredoc_iter == '\0' && isspace(c)) { /* loop broke because heredoc label was fully iterated; success! */
+                unread_char(lexer->curfile); /* we read 1 char too many; put back last read character */
+                return T_HEREDOC_STRING;   /* return success */
+            }
+        }
+
+        /* not successfully iterated heredoc label, get next char to try next */
+        c = read_char(lexer->curfile);
+
+        /* reset for next attempt to match */
+        heredoc_iter = heredoc_label;
+    }
+
+    /* failure, tried to find the heredoc label, but got EOF first */
+    return T_EOF;
+}
+
+
+/*
+
+=item read_macro()
+
+Just skip all tokens until we find ".endm" (or end of file)
+Later this can be improved.
+
+=cut
+
+*/
+token
+read_macro(lexer_state *lexer) {
+    token t;
+    do {
+        t = next_token(lexer);
+    }
+    while ((t != T_ENDM) && (t != T_EOF));
+    return t; /* return either T_ENDM or T_EOF */
+}
+
+/*
+
+=item new_lexer()
+
+Constructor for the lexer.
+
+=cut
+
+*/
+lexer_state *
+new_lexer(char const * filename) {
+    lexer_state *lexer = (lexer_state *)malloc(sizeof(lexer_state));
+    if (lexer == NULL) {
+        fprintf(stderr, "Error in new_lexer(): failed to allocate memory for lexer\n");
+        exit(1);
+    }
+
+    /* max. token length is 128 for now */
+    lexer->token_chars = (char *)calloc(128, sizeof(char));
+    lexer->charptr = lexer->token_chars;
+    lexer->curfile = NULL;
+
+    /*lexer->interp = Parrot_new(NULL);
+    */
+
+    /* read the first file */
+    do_include_file(lexer, filename);
+    return lexer;
+}
+
+/*
+
+=item destroy_lexer()
+
+Destructor for lexer.
+
+=cut
+
+*/
+void
+destroy_lexer(lexer_state *lexer) {
+    /* destroy the buffers */
+    file_buffer *buf = lexer->curfile;
+    while (buf) {
+        file_buffer *tmp = buf; /* store current */
+        buf = tmp->prevbuffer; /* get 'prevbuffer' */
+        destroy_buffer(tmp);   /* destroy current */
+    }
+    free(lexer->token_chars);
+    free(lexer);
+}
+
+
+/*
+
+=item clone_string()
+
+clone a string. Copy the characters of src into dest
+and return dest.
+
+=cut
+
+*/
+char *
+clone_string(char const * src) {
+    int srclen;
+    char * dest, *ptr;
+
+    assert(src != NULL);
+    srclen = strlen(src);
+    /* dest is used as an iterator, ptr - still pointing to the beginning
+     * of the string - is returned
+     */
+    dest = ptr = (char *)calloc(srclen + 1, sizeof(char));
+    while(*src) {
+        *dest++ = *src++;
+    }
+    return ptr;
+}
+
+/*
+
+=item include_file()
+
+This function takes a quoted string, to be found
+the current token, and removes the quotes.
+Then the file is included through do_include_file().
+
+=cut
+
+*/
+void
+open_include_file(lexer_state *lexer) {
+    char *filename = lexer->token_chars;
+    int len = strlen(filename);
+
+    /* make sure it's a string */
+    assert((filename[0] == '"' && filename[len - 1] == '"')
+           || (filename[0] == '\'' && filename[len -1] == '\''));
+
+    filename[len - 1] = '\0'; /* remove last quote */
+    ++filename; /* skip first quote */
+    do_include_file(lexer, filename);
+}
+
+/*
+
+=item close_file()
+
+Opposite of include_file(), it sets the current file in the lexer
+to the 'including' file (found through the 'prevbuffer' pointer).
+
+=cut
+
+*/
+void
+close_include_file(lexer_state *lexer) {
+    assert(lexer->curfile->prevbuffer);
+    switch_buffer(lexer);
+}
+
+
+
+/*
+
+=item next_token()
 
 Reads a token from the current file buffer.
 
@@ -757,7 +927,7 @@ next_token(lexer_state *lexer) {
 
     while (ok) {
         char c; /* holds the "current" character */
-        
+
         /* read the first character of the next token */
         c = read_char(lexer->curfile);
 
@@ -898,7 +1068,7 @@ is indicated explicitly.
 
   STRING-CONSTANT -> ' <characters> ' | " <characters> "
 
-  INT-CONSTANT    -> DIGIT+
+  INT-CONSTANT    -> DIGIT+ | 0 [xX] DIGIT+ | 0 [bB] DIGIT+
 
   NUM-CONSTANT    -> DIGIT+ '.' DIGIT*
 
@@ -1366,7 +1536,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
             return T_IDENTIFIER;
         }
         else {
-            
+
             fprintf(stderr, "BUG IN LEXER: Unknown character: %c", c);
             fprintf(stderr, "Was parsing file: '%s'\n", lexer->curfile->filename);
             if (lexer->curfile->curchar >= lexer->curfile->buffer+lexer->curfile->filesize) {
@@ -1382,208 +1552,16 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
 }
 
 
-/*
-
-
-
-=head1 LEXER API
-
-=over 4
-
-
-=item read_heredoc()
-
-Reads heredoc text up to the specified heredoc label.
-Returns either T_HEREDOC_STRING if successful, or T_EOF.
-The heredoc string is stored in the token buffer.
-
-=cut
-
-*/
-token
-read_heredoc(lexer_state *lexer, char *heredoc_label) {
-    char *heredoc_iter = heredoc_label;
-    char c;
-
-    clear_buffer(lexer);
-    c = read_char(lexer->curfile);
-
-    /* safe guard; never give a NULL argument! */
-    if (heredoc_label == NULL) return 0;
-
-    while (c != EOF_MARKER) { /* never read beyond end of file */
-
-        if (is_start_of_line(lexer->curfile) == 1) {
-            /* is this the start of a line ? */
-
-            /* try to match the heredoc label */
-            while (c == *heredoc_iter) {
-                heredoc_iter++;                 /* next heredoc char. */
-                c = read_char(lexer->curfile);  /* next input char. */
-                buffer_char(lexer, c);          /* of course store the heredoc */
-            }
-
-            /* the loop broke, but why? */
-            if (*heredoc_iter == '\0' && isspace(c)) { /* loop broke because heredoc label was fully iterated; success! */
-                unread_char(lexer->curfile); /* we read 1 char too many; put back last read character */
-                return T_HEREDOC_STRING;   /* return success */
-            }
-        }
-
-        /* not successfully iterated heredoc label, get next char to try next */
-        c = read_char(lexer->curfile);
-
-        /* reset for next attempt to match */
-        heredoc_iter = heredoc_label;
-    }
-
-    /* failure, tried to find the heredoc label, but got EOF first */
-    return T_EOF;
-}
-
-
-/*
-
-=item read_macro()
-
-Just skip all tokens until we find ".endm" (or end of file)
-Later this can be improved.
-
-=cut
-
-*/
-token
-read_macro(lexer_state *lexer) {
-    token t;
-    do {
-        t = next_token(lexer);
-    }
-    while ((t != T_ENDM) && (t != T_EOF));
-    return t; /* return either T_ENDM or T_EOF */
-}
-
-/*
-
-=item new_lexer()
-
-Constructor for the lexer.
-
-=cut
-
-*/
-lexer_state *
-new_lexer(char const * filename) {
-    lexer_state *lexer = (lexer_state *)malloc(sizeof(lexer_state));
-    if (lexer == NULL) {
-        fprintf(stderr, "Error in new_lexer(): failed to allocate memory for lexer\n");
-        exit(1);
-    }
-
-    /* max. token length is 128 for now */
-    lexer->token_chars = (char *)calloc(128, sizeof(char));
-    lexer->charptr = lexer->token_chars;
-    lexer->curfile = NULL;
-
-    /*lexer->interp = Parrot_new(NULL);
-    */
-
-    /* read the first file */
-    do_include_file(lexer, filename);
-    return lexer;
-}
-
-/*
-
-=item destroy_lexer()
-
-Destructor for lexer.
-
-=cut
-
-*/
-void
-destroy_lexer(lexer_state *lexer) {
-    /* destroy the buffers */
-    file_buffer *buf = lexer->curfile;
-    while (buf) {
-        file_buffer *tmp = buf; /* store current */
-        buf = tmp->prevbuffer; /* get 'prevbuffer' */
-        destroy_buffer(tmp);   /* destroy current */
-    }
-    free(lexer->token_chars);
-    free(lexer);
-}
-
-/*
-
-=item include_file()
-
-This function takes a quoted string, to be found
-the current token, and removes the quotes.
-Then the file is included through do_include_file().
-
-=cut
-
-*/
-void
-open_include_file(lexer_state *lexer) {
-    char *filename = lexer->token_chars;
-    int len = strlen(filename);
-
-    /* make sure it's a string */    
-    assert((filename[0] == '"' && filename[len - 1] == '"') 
-           || (filename[0] == '\'' && filename[len -1] == '\''));
-
-    filename[len - 1] = '\0'; /* remove last quote */
-    ++filename; /* skip first quote */
-    do_include_file(lexer, filename);
-}
-
-/*
-
-=item close_file()
-
-Opposite of include_file(), it sets the current file in the lexer
-to the 'including' file (found through the 'prevbuffer' pointer).
-
-=cut
-
-*/
-void
-close_include_file(lexer_state *lexer) {    
-    assert(lexer->curfile->prevbuffer);
-    switch_buffer(lexer);    
-}
-
 
 
 
 /*
-
-=pod
-
-=back
 
 =cut
 
 */
 
-/*
-int
-main(int argc, char **argv)
-{
-    lexer_state *lexer = new_lexer(argv[1]);
 
-    char c = read_char(lexer->curfile);
-    while (c != EOF_MARKER) {
-        printf("%c", c);
-        c = read_char(lexer->curfile);
-    }
-    return 0;
-}
-
-
-*/
 
 /*
  * Local variables:
