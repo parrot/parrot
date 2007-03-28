@@ -648,6 +648,7 @@ This method is intended to be used by the Object PMC.
             if (VTABLE_exists_keyed_str(interp, class_info->methods, name)) {
                 /* Found it! */
                 found = VTABLE_get_pmc_keyed_str(interp, class_info->methods, name);
+                break;
             }
         }
 
