@@ -41,7 +41,7 @@ ok 2 - isa $P0, 'Exporter'
 OUT
 
 
-pir_output_is( <<'CODE', <<'OUT', 'source', todo => 'broken' );
+pir_output_is( <<'CODE', <<'OUT', 'source' );
 .sub 'test' :main
     new $P0, .Exporter
     $P1 = $P0.'source'()
@@ -72,16 +72,30 @@ pir_output_is( <<'CODE', <<'OUT', 'source', todo => 'broken' );
   ok_3:
     say 'ok 3 - source() with too many args fails'
 
+    push_eh ok_4
+    $P0.'source'('foo')
+    clear_eh
+    print 'not '
+
+  ok_4:
+    say 'ok 4 - source() with non-namespace arg throws exception'
+.end
+
+
+# TODO replace with make_namespace, when implemented
+.namespace ['Eponymous']
+.sub 'Eponymous' :anon
 .end
 CODE
 ok 1 - source() with no args returns source namespace, which is empty at first
 ok 2 - source() with args sets source namespace
 ok 3 - source() with too many args fails
+ok 4 - source() with non-namespace arg throws exception
 OUT
 # TODO test passing non-namespace pmc
 
 
-pir_output_is( <<'CODE', <<'OUT', 'destination', todo => 'broken' );
+pir_output_is( <<'CODE', <<'OUT', 'destination' );
 .sub 'test' :main
     new $P0, .Exporter
     $P1 = $P0.'destination'()
@@ -112,6 +126,13 @@ pir_output_is( <<'CODE', <<'OUT', 'destination', todo => 'broken' );
   ok_3:
     say 'ok 3 - destination() with too many args fails'
 
+    push_eh ok_4
+    $P0.'destination'('foo')
+    clear_eh
+    print 'not '
+
+  ok_4:
+    say 'ok 4 - destination() with non-namespace arg throws exception'
 .end
 
 
@@ -123,6 +144,7 @@ CODE
 ok 1 - destination() with no args returns destination namespace, which is empty at first
 ok 2 - destination() with args sets destination namespace
 ok 3 - destination() with too many args fails
+ok 4 - destination() with non-namespace arg throws exception
 OUT
 # TODO test passing non-namespace pmc
 

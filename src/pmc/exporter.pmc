@@ -71,15 +71,21 @@ otherwise returns the value.
 
     PCCMETHOD void source(PMC *src :optional, int got_src :opt_flag) {
         Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
-        PMC *ret_ns_src;
 
         /* TODO deal with non-namespace pmcs */
         if (got_src) {
-            exp->ns_src = VTABLE_clone(interp, src);
+            if (src->vtable->base_type != enum_class_NameSpace) {
+                real_exception(interp, NULL, 0,
+                        "source must be a NameSpace PMC");
+                return;
+            }
+
+            exp->ns_src = src;
         }
         else {
-            ret_ns_src = VTABLE_clone(interp, exp->ns_src);
-            PCCRETURN(PMC *ret_ns_src);
+            PMC *tmp_ns_src;
+            tmp_ns_src = exp->ns_src;
+            PCCRETURN(PMC *tmp_ns_src);
         }
     }
 
@@ -97,15 +103,20 @@ otherwise returns the value.
 
     PCCMETHOD void destination(PMC *dest :optional, int got_dest :opt_flag) {
         Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
-        PMC *ret_ns_dest;
 
         /* TODO deal with non-namespace pmcs */
         if (got_dest) {
-            exp->ns_dest = VTABLE_clone(interp, dest);
+            if (dest->vtable->base_type != enum_class_NameSpace) {
+                real_exception(interp, NULL, 0,
+                        "destination must be a NameSpace PMC");
+                return;
+            }
+            exp->ns_dest = dest;
         }
         else {
-            ret_ns_dest = VTABLE_clone(interp, exp->ns_dest);
-            PCCRETURN(PMC *ret_ns_dest);
+            PMC *tmp_ns_dest;
+            tmp_ns_dest = exp->ns_dest;
+            PCCRETURN(PMC *tmp_ns_dest);
         }
     }
 
@@ -146,10 +157,12 @@ Add C<global> to the array of globals.
 
 */
 
-    PCCMETHOD void add_global(PMC *global) {
+    PCCMETHOD void add_global(PMC *global :optional, int has_global :opt_flag) {
         Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
-        VTABLE_push_string(interp, exp->globals,
-                VTABLE_get_string(interp, global));
+        if (has_global) {
+            VTABLE_push_string(interp, exp->globals,
+                    VTABLE_get_string(interp, global));
+        }
     }
 
 
