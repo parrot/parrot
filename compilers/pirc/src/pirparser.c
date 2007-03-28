@@ -640,9 +640,9 @@ assignment(parser_state *p) {
                     break;
             }
             break;
-        case T_GLOBAL: /* x = global 'i' */
+        case T_GLOBAL: /* x = global string_value */
             next(p);
-            stringconstant(p);
+            string_value(p);
             break;
         case T_NULL:
             next(p);
@@ -653,10 +653,10 @@ assignment(parser_state *p) {
                 expression(p);
                 while (p->curtoken == T_COMMA) {
                     next(p);
-                    expression(p);            
+                    expression(p);
                 }
-            }            
-            break;            
+            }
+            break;
         case T_HEREDOC_ID: { /* parse heredoc string */
             char *heredocid = clone_string(get_current_token(p->lexer));
             /* read_heredoc() returns a special token */
@@ -1352,6 +1352,22 @@ get_results_instruction(parser_state *p) {
 
 /*
 
+=item string_value()
+
+  string_value -> SREG | PASM_SREG | stringconstant
+
+=cut
+
+*/
+static void
+string_value(parser_state *p) {
+    /* also allow string registers */
+    if (p->curtoken == T_SREG || p->curtoken == T_PASM_SREG) next(p);
+    else stringconstant(p);
+}
+
+/*
+
 =item global_assignment()
 
 Only PMCs can be stored as globals, so only PMC registers and identifiers
@@ -1365,7 +1381,7 @@ are allowed. Currently no check is done on the type of the identifier
 static void
 global_assignment(parser_state *p) {
     match(p, T_GLOBAL);
-    stringconstant(p);
+    string_value(p);
     match(p, T_ASSIGN);
 
     switch (p->curtoken) {
@@ -1719,7 +1735,10 @@ parameters(parser_state *p) {
 */
 static void
 sub_definition(parser_state *p) {
-    match(p, T_SUB);
+    /* either '.sub' or '.pcc_sub'. This kind of optimization (just skipping)
+     * can be done more often, if we're sure the token has already been checked for.
+     */
+    next(p);
 
     if (p->curtoken == T_IDENTIFIER) match(p, T_IDENTIFIER);
     else stringconstant(p);
@@ -2042,6 +2061,32 @@ TOP(parser_state *p) {
 
 
 /*
+
+=back
+
+=head1 POSSIBLE FUTURE OPTIMIZATIONS
+
+=over 4
+
+=item *
+
+Use #define's to inline short functions that are called often (such as next(), match())
+
+=item *
+
+Remove functions for short statements, and put in the matching into the switch() for compilation_unit.
+
+=item *
+
+Skip first token of statements if it's sure that the token has already been checked by the caller. No need
+to match 'goto' again, if it was already checked in compilation_unit().
+
+=item *
+
+Add a 'token category'. For instance, when parsing a binary operator, you're just interested if it actually is
+a binary op. The lexer can set the token category to "binop", and set token to T_PLUS, etc. This prevents
+big switch statements. Also, we still have access to the actual binary operator (through token), so semantic
+analysis can continue.
 
 =back
 
