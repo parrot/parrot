@@ -286,7 +286,13 @@ simple string value alone won't cut it. We need to take a key there too? }}
 
 =item add_method
 
-Adds a method to the class.
+Adds a method to the class. It takes a simple string name and a method
+PMC. If the method already exists (and isn't a Multi) it will replace
+the method with the new method and throw a warning.
+
+It also takes slurpy named parameters to flag whether the method is a
+vtable method, and whether its anonymous (no named entry as a method,
+only as a vtable). 
 
 =item methods
 
