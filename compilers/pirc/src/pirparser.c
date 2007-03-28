@@ -300,6 +300,22 @@ stringconstant(parser_state *p) {
 
 /*
 
+=item string_value()
+
+  string_value -> SREG | PASM_SREG | stringconstant
+
+=cut
+
+*/
+static void
+string_value(parser_state *p) {
+    /* also allow string registers */
+    if (p->curtoken == T_SREG || p->curtoken == T_PASM_SREG) next(p);
+    else stringconstant(p);
+}
+
+/*
+
 =item method()
 
   method -> IDENTIFIER | stringconstant
@@ -1350,21 +1366,7 @@ get_results_instruction(parser_state *p) {
     match(p, T_NEWLINE);
 }
 
-/*
 
-=item string_value()
-
-  string_value -> SREG | PASM_SREG | stringconstant
-
-=cut
-
-*/
-static void
-string_value(parser_state *p) {
-    /* also allow string registers */
-    if (p->curtoken == T_SREG || p->curtoken == T_PASM_SREG) next(p);
-    else stringconstant(p);
-}
 
 /*
 
