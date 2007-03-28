@@ -348,6 +348,7 @@ Destroys the IO PMC, flushing and closing as necessary.
             else {
                 PIO_close(INTERP, SELF);
             }
+            PIO_destroy(interp, SELF);
         }
     }
 
