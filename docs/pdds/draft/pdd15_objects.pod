@@ -470,12 +470,17 @@ a simple string value for type.
 
 =item roles
 
-An accessor for the roles composed into the role. It returns an Array of
-all roles as PMC objects. The accessor is read-only.
+An accessor for the roles composed into the role. It returns an Array of all
+roles as PMC objects. If any roles that were composed into this one were
+themselves made up of a composition of other roles, the roles they were made
+up of will also be included in the value returned by this accesor. However,
+no role will be mentioned more than once. The accessor is read-only.
 
 =item add_role
 
-Adds a single role to the role. It takes a simple string name.
+Adds a single role to the role. It takes an instance of the Role PMC as a
+required positional parameter, and the optional named parameters C<without>
+and C<alias>; see L<Role Conflict Resolution> for more details.
 
 =item add_method
 
@@ -490,7 +495,9 @@ only as a vtable).
 =item methods
 
 An accessor for the methods of the role. It returns a Hash of all methods,
-with a key of the method name and a value of an invokable PMC.
+with a key of the method name and a value of an invokable PMC. The list will
+include methods added through composing other roles into this role. The
+accessor is read-only.
 
 =back
 
