@@ -53,7 +53,7 @@ make_local_copy(Parrot_Interp interp, Parrot_Interp from, PMC *original)>
 
 Create a local copy of the PMC if necessary. (No copy is made if it
 is marked shared.) This includes workarounds for Parrot_clone() not
-doing the Right Thign with subroutines (specifically, code segments
+doing the Right Thing with subroutines (specifically, code segments
 aren't preserved and it is difficult to do so so long as
 Parrot_clone() depends on freezing).
 
@@ -899,6 +899,7 @@ pt_suspend_one_for_gc(Parrot_Interp interp) {
 pt_suspend_all_for_gc(Parrot_Interp interp)>
 
 Get all threads to perform a GC run.
+
 =cut
 
 */
@@ -1000,7 +1001,7 @@ pt_suspend_self_for_gc(Parrot_Interp interp)
     }
     UNLOCK(interpreter_array_mutex);
 
-    /* mark and sweep our world -- latter callbacks will keep
+    /* mark and sweep our world -- later callbacks will keep
      * it sync'd
      */
     Parrot_dod_ms_run(interp, DOD_trace_stack_FLAG);
@@ -1123,9 +1124,12 @@ void
 pt_join_threads(Parrot_Interp interp)
 {
     size_t i;
+    Shared_gc_info *info = get_pool(interp);
+    if (info)
+        mem_sys_free(info);
 
     /*
-     * if no threads where started - fine
+     * if no threads were started - fine
      */
     LOCK(interpreter_array_mutex);
     if (n_interpreters <= 1) {
@@ -1336,7 +1340,7 @@ or not.
 
 TODO - Have a count of shared PMCs and check it during DOD.
 
-TODO - Evaluate, if a interpreter lock is cheaper, when C<dod_mark_ptr>
+TODO - Evaluate if a interpreter lock is cheaper when C<dod_mark_ptr>
 is updated.
 
 =cut
