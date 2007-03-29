@@ -38,28 +38,33 @@ class C<type>.
 void Parrot_NCI_make_raw_nci(Interp *interp, PMC *method, void *func);
 
 void
-enter_nci_method(Parrot_Interp interp, const int type, void *func, const char *name, const char *proto)
+enter_nci_method(Parrot_Interp interp, const int type, void *func,
+        const char *name, const char *proto)
 {
     PMC * const method = pmc_new(interp, enum_class_NCI);
     /* create call func */
     VTABLE_set_pointer_keyed_str(interp, method,
-            string_make(interp, proto, strlen(proto), NULL, PObj_constant_FLAG|PObj_external_FLAG),
+            string_make(interp, proto, strlen(proto), NULL,
+                PObj_constant_FLAG|PObj_external_FLAG),
             func);
     /* insert it into namespace */
     VTABLE_set_pmc_keyed_str(interp, interp->vtables[type]->_namespace,
-            string_make(interp, name, strlen(name), NULL, PObj_constant_FLAG|PObj_external_FLAG),
+            string_make(interp, name, strlen(name), NULL,
+                PObj_constant_FLAG|PObj_external_FLAG),
             method);
 }
 
 void
-register_raw_nci_method_in_ns(Parrot_Interp interp, const int type, void *func, const char *name)
+register_raw_nci_method_in_ns(Parrot_Interp interp, const int type, void *func,
+        const char *name)
 {
     PMC * const method = pmc_new(interp, enum_class_NCI);
     /* setup call func */
     Parrot_NCI_make_raw_nci(interp, method, func);
     /* insert it into namespace */
     VTABLE_set_pmc_keyed_str(interp, interp->vtables[type]->_namespace,
-            string_make(interp, name, strlen(name), NULL, PObj_constant_FLAG|PObj_external_FLAG),
+            string_make(interp, name, strlen(name), NULL,
+                PObj_constant_FLAG|PObj_external_FLAG),
             method);
 }
 

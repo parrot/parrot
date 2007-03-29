@@ -64,7 +64,8 @@ argument is not a PMC* but the C<classname> STRING.
             PMC* class_meta;
             PMC* class_string;
             PMC* attributes = pmc_new(interp, enum_class_ResizablePMCArray);
-            const char *attribute_names[] = { "name", "namespace", "_parrotclass", "attributes", "methods", "superclasses" };
+            const char *attribute_names[] = { "name", "namespace", "_parrotclass",
+                "attributes", "methods", "superclasses" };
 
             for (i=0; i<6; i++) {
                 PMC* attribute = pmc_new(interp, enum_class_SMOP_Attribute);
@@ -78,12 +79,17 @@ argument is not a PMC* but the C<classname> STRING.
 
             (PMC* class_meta) = PCCINVOKE(interp, class, "new");
             class_string = pmc_new(interp, enum_class_String);
-            VTABLE_set_string_native(interp, class_string, string_from_const_cstring(interp, "Class", 0));
-            VTABLE_set_attr_str(interp, class_meta, string_from_const_cstring(interp, attribute_names[0], 0), class_string);
-            VTABLE_set_attr_str(interp, class_meta, string_from_const_cstring(interp, attribute_names[2], 0), class);
+            VTABLE_set_string_native(interp, class_string,
+                    string_from_const_cstring(interp, "Class", 0));
+            VTABLE_set_attr_str(interp, class_meta,
+                    string_from_const_cstring(interp, attribute_names[0], 0), class_string);
+            VTABLE_set_attr_str(interp, class_meta,
+                    string_from_const_cstring(interp, attribute_names[2], 0), class);
             VTABLE_init(interp,class_meta);
-            VTABLE_set_attr_str(interp, class_meta, string_from_const_cstring(interp, attribute_names[3], 0), attributes);
-            Parrot_store_global_n(interp, interp->root_namespace, string_from_const_cstring(interp, "class_object", 0), class_meta);
+            VTABLE_set_attr_str(interp, class_meta,
+                    string_from_const_cstring(interp, attribute_names[3], 0), attributes);
+            Parrot_store_global_n(interp, interp->root_namespace,
+                    string_from_const_cstring(interp, "class_object", 0), class_meta);
     }
 
 
@@ -132,8 +138,10 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
 
     PCCMETHOD void name(PMC *name :optional, int got_name :opt_flag) {
         if (got_name) {
-            Parrot_store_global_n(interp, interp->root_namespace, string_from_const_cstring(interp, "class_object", 0), name);
-            VTABLE_set_attr_str(interp, SELF, string_from_const_cstring(interp, "namespace",0), CONTEXT(interp->ctx)->current_namespace);
+            Parrot_store_global_n(interp, interp->root_namespace,
+                    string_from_const_cstring(interp, "class_object", 0), name);
+            VTABLE_set_attr_str(interp, SELF, string_from_const_cstring(interp, "namespace",0),
+                    CONTEXT(interp->ctx)->current_namespace);
         }
     }
 
@@ -166,9 +174,11 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
         PCCRETURN(PMC *rv)
     }
 
-    PCCMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
+    PCCMETHOD void add_attribute(STRING *attribute_name,
+            STRING* attribute_type :optional, int got_type :opt_flag) {
         PMC *attributes;
-        PMC *new_attribute = pmc_new(interp, pmc_type(interp, string_from_const_cstring(interp, "SMOP_Attribute", 0)));
+        PMC *new_attribute = pmc_new(interp, pmc_type(interp,
+                    string_from_const_cstring(interp, "SMOP_Attribute", 0)));
 
         PCCINVOKE(interp, pmc, "name", STRING* attribute_name);
         PCCINVOKE(interp, SELF, "class", PMC* SELF);

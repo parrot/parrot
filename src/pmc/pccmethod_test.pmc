@@ -64,7 +64,8 @@ Marks the hash as live.
     {
         STRING* kevin = string_from_cstring(interp, "KEVIN", 0);
         PIO_printf(interp, "test_method2\n");
-        PIO_printf(interp, "%d, %d, %Ss %Ss\n", a1, a1o, VTABLE_name(interp, slurpy_pos), VTABLE_get_repr(interp,slurpy_pos));
+        PIO_printf(interp, "%d, %d, %Ss %Ss\n", a1, a1o, VTABLE_name(interp, slurpy_pos),
+                VTABLE_get_repr(interp,slurpy_pos));
 
         PCCRETURN(int 1000, STRING* kevin);
     }
@@ -73,7 +74,8 @@ Marks the hash as live.
         PIO_printf(interp, "test_method3\n");
         PIO_printf(interp, "%Ps, %Ps\n", a1, a2);
     }
-    PCCMETHOD void test_method4( int george :optional, int g_f :opt_flag, PMC *slurpy_pos :slurpy, PMC *slurpy_named :slurpy :named )
+    PCCMETHOD void test_method4( int george :optional, int g_f :opt_flag, PMC *slurpy_pos :slurpy,
+            PMC *slurpy_named :slurpy :named )
     {
         PIO_printf(interp, "test_method4\n");
     }

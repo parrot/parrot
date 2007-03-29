@@ -854,7 +854,8 @@ Parrot_process_args(Interp *interp, struct call_state *st, arg_pass_t param_or_r
          */
         if (!(state & CALL_STATE_NAMED_x)) {
             if (!(state & CALL_STATE_SLURP) &&
-                    (st->dest.sig & (PARROT_ARG_SLURPY_ARRAY|PARROT_ARG_NAME)) == PARROT_ARG_SLURPY_ARRAY) {
+                    (st->dest.sig & (PARROT_ARG_SLURPY_ARRAY|PARROT_ARG_NAME))
+                    == PARROT_ARG_SLURPY_ARRAY) {
                 /* create dest slurp array */
                 idx = st->dest.u.op.pc[st->dest.i];
                 assert(idx >= 0);
@@ -1117,7 +1118,8 @@ parrot_pass_args_fromc(Interp *interp, const char *sig,
 }
 
 int
-set_retval_util(Parrot_Interp interp, const char *sig, parrot_context_t *ctx, struct call_state *st)
+set_retval_util(Parrot_Interp interp, const char *sig, parrot_context_t *ctx,
+        struct call_state *st)
 {
     opcode_t *src_pc = interp->current_returns;
     int todo = Parrot_init_arg_op(interp, ctx, src_pc, &st->src);
@@ -1226,8 +1228,8 @@ set_retval_p(Parrot_Interp interp, int sig_ret, parrot_context_t *ctx)
 }
 
 /*
- * commit_last_arg is called by Parrot_PCCINVOKE when it reaches the end of each arg in the arg
- * signature.  see Parrot_PCCINVOKE for signature syntax.
+ * commit_last_arg is called by Parrot_PCCINVOKE when it reaches the end of each arg
+ * in the arg signature.  see Parrot_PCCINVOKE for signature syntax.
  */
 static void
 commit_last_arg(Interp *interp, int index, int cur, opcode_t *n_regs_used, int seen_arrow,
@@ -1241,10 +1243,14 @@ commit_last_arg(Interp *interp, int index, int cur, opcode_t *n_regs_used, int s
 
     /* calculate arg's register offset */
     switch (cur & PARROT_ARG_TYPE_MASK) { /* calc reg offset */
-        case PARROT_ARG_INTVAL:   reg_offset = n_regs_used[seen_arrow * 4 + REGNO_INT]++; break;
-        case PARROT_ARG_FLOATVAL: reg_offset = n_regs_used[seen_arrow * 4 + REGNO_NUM]++; break;
-        case PARROT_ARG_STRING:   reg_offset = n_regs_used[seen_arrow * 4 + REGNO_STR]++; break;
-        case PARROT_ARG_PMC :     reg_offset = n_regs_used[seen_arrow * 4 + REGNO_PMC]++; break;
+        case PARROT_ARG_INTVAL:
+            reg_offset = n_regs_used[seen_arrow * 4 + REGNO_INT]++; break;
+        case PARROT_ARG_FLOATVAL:
+            reg_offset = n_regs_used[seen_arrow * 4 + REGNO_NUM]++; break;
+        case PARROT_ARG_STRING:
+            reg_offset = n_regs_used[seen_arrow * 4 + REGNO_STR]++; break;
+        case PARROT_ARG_PMC :
+            reg_offset = n_regs_used[seen_arrow * 4 + REGNO_PMC]++; break;
         default:
                   real_exception(interp, NULL, E_IndexError,
                           "Parrot_PCCINVOKE: invalid reg type");
@@ -1258,10 +1264,14 @@ commit_last_arg(Interp *interp, int index, int cur, opcode_t *n_regs_used, int s
     /* perform the arg accessor function, assigning the arg to its corresponding register */
     if (!seen_arrow) {
         switch (cur & PARROT_ARG_TYPE_MASK) {
-            case PARROT_ARG_INTVAL:   CTX_REG_INT(ctx, reg_offset) = va_arg(*list, INTVAL); break;
-            case PARROT_ARG_FLOATVAL: CTX_REG_NUM(ctx, reg_offset) = va_arg(*list, FLOATVAL); break;
-            case PARROT_ARG_STRING:   CTX_REG_STR(ctx, reg_offset) = va_arg(*list, STRING*); break;
-            case PARROT_ARG_PMC :     CTX_REG_PMC(ctx, reg_offset) = va_arg(*list, PMC*); break;
+            case PARROT_ARG_INTVAL:
+                CTX_REG_INT(ctx, reg_offset) = va_arg(*list, INTVAL); break;
+            case PARROT_ARG_FLOATVAL:
+                CTX_REG_NUM(ctx, reg_offset) = va_arg(*list, FLOATVAL); break;
+            case PARROT_ARG_STRING:
+                CTX_REG_STR(ctx, reg_offset) = va_arg(*list, STRING*); break;
+            case PARROT_ARG_PMC:
+                CTX_REG_PMC(ctx, reg_offset) = va_arg(*list, PMC*); break;
             default:
                       real_exception(interp, NULL, E_IndexError,
                           "Parrot_PCCINVOKE: invalid reg type");

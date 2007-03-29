@@ -221,11 +221,16 @@ PackFile_Constant_dump(Interp *interp, struct PackFile_ConstTable *ct,
                         switch (sub->namespace_name->vtable->base_type) {
                             case enum_class_String:
                                 namespace_description = string_from_cstring(interp, "'", 1);
-                                namespace_description = string_append(interp, namespace_description, PMC_str_val(sub->namespace_name));
-                                namespace_description = string_append(interp, namespace_description, string_from_cstring(interp, "'", 1));
+                                namespace_description = string_append(interp,
+                                        namespace_description,
+                                        PMC_str_val(sub->namespace_name));
+                                namespace_description = string_append(interp,
+                                        namespace_description,
+                                        string_from_cstring(interp, "'", 1));
                                 break;
                             case enum_class_Key:
-                                namespace_description = key_set_to_string(interp, sub->namespace_name);
+                                namespace_description =
+                                    key_set_to_string(interp, sub->namespace_name);
                                 break;
                             default:
                                 namespace_description = sub->namespace_name->vtable->whoami;
@@ -258,7 +263,8 @@ PackFile_Constant_dump(Interp *interp, struct PackFile_ConstTable *ct,
                             );
                     break;
                 default:
-                    PIO_printf(interp, "\tno dump info for PMC %ld %Ss\n", pmc->vtable->base_type, pmc->vtable->whoami);
+                    PIO_printf(interp, "\tno dump info for PMC %ld %Ss\n",
+                            pmc->vtable->base_type, pmc->vtable->whoami);
                     PIO_printf(interp, "\tclass => %Ss,\n", pmc->vtable->whoami);
             }
         }

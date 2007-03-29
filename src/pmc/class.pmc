@@ -241,7 +241,8 @@ Add an attribute to the class. Requires a name and, optionally, a type.
 =cut
 
 */
-    PCCMETHOD void add_attribute(STRING *attribute_name, STRING* attribute_type :optional, int got_type :opt_flag) {
+    PCCMETHOD void add_attribute(STRING *attribute_name,
+            STRING* attribute_type :optional, int got_type :opt_flag) {
         Parrot_Class *class = PARROT_CLASS(SELF);
         PMC *new_attribute = pmc_new(interp, enum_class_Hash);
 
@@ -460,14 +461,17 @@ Return the roles array PMC.
 
 /*
 
-=item C<void add_role(PMC* role, PMC* without :optional :named["without"], PMC* alias :optional :named["alias"])>
+=item C<void add_role(PMC* role, PMC* without :optional :named["without"],
+PMC* alias :optional :named["alias"])>
 
 Compose a role into a class with the given exclusions and aliases.
 
 =cut
 
 */
-    PCCMETHOD void add_role(PMC* role, PMC* without :optional :named["without"], int got_without :opt_flag, PMC* alias :optional :named["alias"], int got_alias :opt_flag) {
+    PCCMETHOD void add_role(PMC* role,
+            PMC* without :optional :named["without"], int got_without :opt_flag,
+            PMC* alias :optional :named["alias"],     int got_alias :opt_flag) {
         Parrot_Class *class = PARROT_CLASS(SELF);
         Parrot_ComposeRole(interp, role, without, got_without, alias, got_alias,
                            class->methods, class->roles);
