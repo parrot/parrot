@@ -101,7 +101,17 @@ void
 destroy_context(Interp *interp)
 {
     int slot;
+    struct Parrot_Context *context, *prev;
 
+    /* clear active contexts all the way back to the initial context */
+    context = CONTEXT(interp->ctx);
+    while (context) {
+        prev    = context->caller_ctx;
+        mem_sys_free(context);
+        context = prev;
+    }
+
+    /* clear freed contexts */
     for (slot = 0; slot < interp->ctx_mem.n_free_slots; ++slot) {
         void *ptr = interp->ctx_mem.free_list[slot];
         while (ptr) {
@@ -144,7 +154,7 @@ Cleanup dead context memory. Called by the garbage collector.
 =item C<parrot_context_t* Parrot_alloc_context(Interp *, INTVAL *n_regs_used)>
 
 Allocate a new context and set the context pointer. Please note that
-the register usage C<n_regs_used> is not copied, just the pointer is
+the register usage C<n_regs_used> is not copied; just the pointer is
 stored.  The function returns the new context.
 
 =item C<parrot_context_t* Parrot_push_context(Interp *, INTVAL *n_regs_used)>
@@ -163,7 +173,7 @@ Mark the context as possible threshold.
 =item C<void Parrot_free_context(Interp *, parrot_context_t *ctxp, int re_use)>
 
 Free the context. If C<re_use> is true, this function is called by a
-return continuation invoke, else from the destructur of a continuation.
+return continuation invoke, else from the destructor of a continuation.
 
 =item C<void Parrot_pop_context(Interp *)>
 
@@ -316,7 +326,7 @@ Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used)
 
     /*
      * TODO (OPT) if we allocate a new context due to a self-recursive call
-     *      create a spezialized version that just uses caller's size
+     *      create a specialized version that just uses caller's size
      */
     const size_t size_n = sizeof (FLOATVAL) * n_regs_used[REGNO_NUM];
     const size_t size_nip = size_n +
@@ -423,7 +433,7 @@ Parrot_set_context_threshold(Interp *interp, parrot_context_t *ctxp)
 =item C<void
 setup_register_stacks(Interp *)>
 
-Sets up the register stacks.
+Set up the register stacks.
 
 =item C<void Parrot_push_regs(Interp *)>
 
@@ -509,7 +519,7 @@ Parrot_pop_regs(Interp *interp)
 =item C<void
 mark_register_stack(Parrot_Interp interp, Stack_Chunk_t* stack)>
 
-Marks the register stack and it's registers as live.
+Marks the register stack and its registers as live.
 
 =cut
 
