@@ -1847,7 +1847,7 @@ PMC* Parrot_ComputeMRO_C3(Interp *interp, PMC *class)
 
 /*
 
-=item C<void Parrot_ComposeRole(Interp *interp, PMC *role, 
+=item C<void Parrot_ComposeRole(Interp *interp, PMC *role,
                         PMC *without, int got_without,
                         PMC *alias, int got_alias,
                         PMC *methods_hash, PMC *roles_list)>
@@ -1867,7 +1867,7 @@ the default implementation.
 
 */
 
-void Parrot_ComposeRole(Interp *interp, PMC *role, 
+void Parrot_ComposeRole(Interp *interp, PMC *role,
                         PMC *without, int got_without,
                         PMC *alias, int got_alias,
                         PMC *methods_hash, PMC *roles_list)
@@ -1992,7 +1992,7 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
             if (VTABLE_get_pmc_keyed_int(interp, roles_list, j) == cur_role) {
                 /* We ain't be havin' it. */
                 VTABLE_push_pmc(interp, roles_list, cur_role);
-            }   
+            }
         }
     }
 }

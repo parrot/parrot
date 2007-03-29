@@ -43,30 +43,30 @@ lexer.
 
 The following are PIR directives.
 
-  .arg               .const      .constant    .emit             .end                  
-  .endnamespace      .endm       .eom         .get_results      .global               
-  .globalconst       .HLL        .HLL_map     .include          .invocant             
-  .lex               .loadlib    .local       .macro            .meth_call            
-  .namespace         .nci_call   .param       .pcc_begin        .pcc_begin_return     
-  .pcc_begin_yield   .pcc_call   .pcc_end     .pcc_end_return   .pcc_end_yield        
-  .pcc_sub           .pragma     .result      .return           .sub                  
-  .sym               .yield      
+  .arg               .const      .constant    .emit             .end
+  .endnamespace      .endm       .eom         .get_results      .global
+  .globalconst       .HLL        .HLL_map     .include          .invocant
+  .lex               .loadlib    .local       .macro            .meth_call
+  .namespace         .nci_call   .param       .pcc_begin        .pcc_begin_return
+  .pcc_begin_yield   .pcc_call   .pcc_end     .pcc_end_return   .pcc_end_yield
+  .pcc_sub           .pragma     .result      .return           .sub
+  .sym               .yield
 
 
 =head1 FLAGS
 
 The following are flags for subroutines:
 
-  :anon     :immediate   :init        :lex         :load        :main        
-  :method   :multi       :outer       :postcomp    :vtable      :named       
-  
+  :anon     :immediate   :init        :lex         :load        :main
+  :method   :multi       :outer       :postcomp    :vtable      :named
+
 The following are flags for parameters/arguments.
 
-  :opt_flag    
-  :optional    
-  :slurpy      
-  :flat        
-  :unique_reg  
+  :opt_flag
+  :optional
+  :slurpy
+  :flat
+  :unique_reg
 
 
 =cut
