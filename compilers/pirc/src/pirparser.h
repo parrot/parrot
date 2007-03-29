@@ -1,7 +1,7 @@
 #ifndef __PIRPARSER_H
-  #define __PIRPARSER_H
+#  define __PIRPARSER_H
 
-  #include "pirlexer.h"
+#  include "pirlexer.h"
 
 /* hide internals; definition in pirparser.c */
 struct parser_state;
