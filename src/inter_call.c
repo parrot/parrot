@@ -1396,7 +1396,7 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
 
     /* second loop through signature to build all index and arg_flag
      * loop also assigns args(up to the ->) to registers */
-    
+
     /* account for passing invocant in-band */
     if (pmc) {
         indexes[0][0] = 0;
@@ -1432,7 +1432,7 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
         /* parse arg type */
         else if (isupper(*x)) {
             if (index >= 0) {
-              commit_last_arg(interp, index, cur, n_regs_used, seen_arrow, sigs, indexes, ctx, 
+              commit_last_arg(interp, index, cur, n_regs_used, seen_arrow, sigs, indexes, ctx,
                       pmc, &list);
             }
             index++;
