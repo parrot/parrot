@@ -15,7 +15,8 @@ The procedure below describes how to manage the list of Parrot committers.
 
 =head2 Instructions the new committer must follow
 
-This procedure must be performed by the new committer before the Metacommitter can add commit rights.
+This procedure must be performed by the new committer before
+the Metacommitter can add commit rights.
 
 =over 4
 
@@ -25,17 +26,22 @@ Create a bitcard.org id with the username you'd like to use
 
 =item 2
 
-Login to L<http://rt.perl.org/rt3/> with the id, so the user name is available in RT for assigning tickets, and so it is registered in the list of users eligible for parrot commit bit
+Login to L<http://rt.perl.org/rt3/> with the id, so the user name is available
+in RT for assigning tickets, and so it is registered in the list of users
+eligible for parrot commit bit
 
 =item 3
 
-Login to L<https://auth.perl.org/> with the same bitcard id, select the "Your account" (L<https://auth.perl.org/auth/account>) link, and set a password. This will be the password used with svn.
+Login to L<https://auth.perl.org/> with the same bitcard id, select the
+"Your account" (L<https://auth.perl.org/auth/account>) link, and set a
+password. This will be the password used with svn.
 
 =back
 
 =head2 Instructions for the Metacommitter
 
-The new committer must perform the above procedure before the Metacommitter can add commit rights.
+The new committer must perform the above procedure before
+the Metacommitter can add commit rights.
 
 =over 4
 
@@ -45,15 +51,18 @@ Login to RT at L<http://rt.perl.org/rt3/>
 
 =item 2
 
-Navigate to the Parrot Commit group, L<http://rt.perl.org/rt3/Admin/Groups/Members.html?id=178234>
+Navigate to the Parrot Commit group,
+L<http://rt.perl.org/rt3/Admin/Groups/Members.html?id=178234>
 
 =item 3
 
-Select the username from the "Add members" listbox, and select "Modify Members" button
+Select the username from the "Add members" listbox, and select
+"Modify Members" button
 
 =back
 
-Congratulate the new member publicly by sending an email to parrot-porters@perl.org, and copying the new committer.
+Congratulate the new member publicly by sending an email to
+parrot-porters@perl.org, and copying the new committer.
 
 =head2 To manage the list of Metacommitters
 
@@ -63,7 +72,8 @@ Only existing Metacommitters can perform this activity.
 
 =item 1
 
-navigate to L<http://rt.perl.org/rt3/Admin/Groups/Members.html?id=178219> and add/remove users as desired.
+navigate to L<http://rt.perl.org/rt3/Admin/Groups/Members.html?id=178219>
+and add/remove users as desired.
 
 =back
 
