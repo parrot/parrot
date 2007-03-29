@@ -10,7 +10,7 @@ that took place can be found at
 L<http://www.parrotcode.org/misc/parrotsketch-logs/irclog.parrotsketch-200611/irclog.parrotsketch.20061112>.
 
 This summary has been compiled from these sources,
-and from conversations notrecorded.
+and from other conversations that were not recorded.
 
 
 =head2 List of problems and proposed solutions for PMCs:
