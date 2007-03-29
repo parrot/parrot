@@ -612,6 +612,26 @@ free_internal_exception(Interp *interp)
     interp->exc_free_list = e;
 }
 
+void
+destroy_exception_list(Interp *interp)
+{
+    really_destroy_exception_list(interp->exceptions);
+    really_destroy_exception_list(interp->exc_free_list);
+}
+
+void
+really_destroy_exception_list(Parrot_exception *e)
+{
+    Parrot_exception *prev;
+
+    while (e != NULL)
+    {
+        prev = e->prev;
+        mem_sys_free(e);
+        e    = prev;
+    }
+}
+
 /*
 
 =item C<void

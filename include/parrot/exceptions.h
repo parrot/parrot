@@ -193,6 +193,10 @@ PARROT_API void Parrot_push_mark(Interp *, INTVAL mark);
 PARROT_API void Parrot_pop_mark(Interp *, INTVAL mark);
 PARROT_API void Parrot_push_action(Interp *, PMC *sub);
 
+/* global cleanup */
+void Parrot_destroy_exception_list(Interp *interp);
+void Parrot_really_destroy_exception_list(Parrot_exception *e);
+
 #endif /* PARROT_EXCEPTIONS_H_GUARD */
 
 /*
