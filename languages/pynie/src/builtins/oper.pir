@@ -151,6 +151,13 @@ src/builtins/oper.pir - operators
     print "\n"
 .end
 
+.sub 'infix:**'
+    .param num a
+    .param num b
+    $N0 = pow a, b
+    .return($N0)
+.end
+
 =back
 
 =head1 AUTHOR
