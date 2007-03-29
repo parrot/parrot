@@ -2627,12 +2627,8 @@ PackFile_FixupTable_clear(Interp *interp, struct PackFile_FixupTable *self)
     }
 
     for (i = 0; i < self->fixup_count; i++) {
-        switch (self->fixups[i]->type) {
-            case enum_fixup_label:
-                mem_sys_free(self->fixups[i]->name);
-                self->fixups[i]->name = NULL;
-                break;
-        }
+        mem_sys_free(self->fixups[i]->name);
+        self->fixups[i]->name = NULL;
         mem_sys_free(self->fixups[i]);
         self->fixups[i] = NULL;
     }
