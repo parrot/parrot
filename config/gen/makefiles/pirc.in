@@ -79,7 +79,8 @@ clean:
     
 
 realclean: clean
-	$(RM_RF) Makefile
-	$(RM_RF) pirc$(EXE)
+	$(RM_RF) \
+    $(STICKY_FILES) \
+    pirc$(EXE)
 
 distclean: realclean

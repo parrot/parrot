@@ -183,6 +183,7 @@ GEN_MAKEFILES = \
     compilers/past/Makefile \
     compilers/past-pm/Makefile \
     compilers/pge/Makefile \
+    compilers/pirc/Makefile \
     compilers/tge/Makefile \
     compilers/bcg/Makefile \
     compilers/json/Makefile \
