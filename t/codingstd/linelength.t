@@ -16,7 +16,8 @@ t/codingstd/linelength.t - Test code lines length
 
 =head1 DESCRIPTION
 
-Tests all source files for the limit of C<n> columns.
+Tests source files for the line length limit as defined in F<PDD07>.
+Only some languages files are checked.
 
 =head1 SEE ALSO
 
@@ -31,13 +32,15 @@ our $columns = 100;
 
 use lib qw( . lib ../lib ../../lib );
 
+use File::Spec;
 use Test::More tests => 1;
 use Parrot::Config;
 use ExtUtils::Manifest qw( maniread );
 
-diag "finding source files, this may take a while.";
 
-our %check_language = map { $_ => 1; } qw{
+# a list of languages where we want to test line length
+our $include_languages = {};
+$include_languages->{$_} = 1 for qw{
     APL
     WMLScript
     amber
@@ -53,27 +56,29 @@ our %check_language = map { $_ => 1; } qw{
 # XXX this should really be using src_dir instead of build_dir but it
 # doesn't exist (yet)
 my $build_dir    = $PConfig{build_dir};
-my $manifest     = maniread("$build_dir/MANIFEST");
-my $manifest_gen = maniread("$build_dir/MANIFEST.generated");
+my $manifest     = maniread(File::Spec->catfile($build_dir, 'MANIFEST'));
 
-# Read some extra exceptions
+
+# skip files listed in the __DATA__ section
+my $skip_files = {};
 while (<DATA>) {
     next if m{^#};
     next if m{^\s*$};
     chomp;
-    $manifest_gen->{$_}++;
+    $skip_files->{$_}++;
 }
 
 # find the files that we need to check
 my @files = @ARGV ? @ARGV : source_files();
 
+
 # check all the files and keep a list of those failing
 my @lines_too_long;
 foreach my $file (@files) {
-    if ( check($file) ) {
-        push @lines_too_long, $file . "\n";
-    }
+    push @lines_too_long => "$file\n"
+        if line_too_long($file);
 }
+
 
 ## L<PDD07/Code Formatting/"Source line width is limited to 100 characters">
 ok( !scalar(@lines_too_long), 'Line length ok' )
@@ -81,43 +86,41 @@ ok( !scalar(@lines_too_long), 'Line length ok' )
         . scalar @lines_too_long
         . " files:\n@lines_too_long" );
 
+
+
 exit;
 
-sub check {
+
+
+sub line_too_long {
     my $file = shift;
 
-    my $ok = 1;
-
     open my $fh, '<', $file or die "Can't open file '$file'";
-    while ( $ok && ( my $line = <$fh> ) ) {
+    while ( my $line = <$fh> ) {
         chomp $line;
-        $ok = 0 if length($line) > $columns;
+        return 1
+            if length($line) > $columns;
     }
-    close $fh;
-
-    return !$ok;
+    return;
 }
+
 
 sub source_files {
     my @files;
     foreach my $file ( sort keys(%$manifest) ) {
-        my $full_path = "$build_dir/$file";
+        my $full_path = File::Spec->catfile($build_dir, $file);
 
         # skip binary files (including .pbc files)
         next if -B $full_path;
 
-        # skip missing MANIFEST.generated files
-        next unless -e $full_path;
-        next if exists( $manifest_gen->{$file} );
+        # skip files specified in __DATA__ section
+        next if exists( $skip_files->{$file} );
 
-        # I could make this other way, but this way is more flexible
-        next if ( $full_path =~ m{^$build_dir/languages/([^/]+)/}
-            && !$check_language{$1} );
+        # skip languages files, unless specifically included above
+        next if $file =~ m{^languages/([^/]+)/} && !$include_languages->{$1};
 
-        push @files, $full_path if $file =~ m{\.c$};
-        push @files, $full_path if $file =~ m{\.pmc$};
-        push @files, $full_path if $file =~ m{\.ops$};
-        push @files, $full_path if $file =~ m{\.pod$};
+        push @files => $full_path
+            if $file =~ m{\.(c|pmc|ops|pod)$};
     }
     return @files;
 }
@@ -131,18 +134,21 @@ sub source_files {
 
 __DATA__
 # Lex and Bison generated
-compilers/imcc/imclexer.c
-compilers/imcc/imcparser.c
 compilers/ast/astlexer.c
 compilers/ast/astparser.c
+compilers/imcc/imclexer.c
+compilers/imcc/imcparser.c
+compilers/pirc/src/pirlexer.c
+compilers/pirc/src/pirparser.c
 # Generators with big strings
-tools/dev/mk_inno.pl
 tools/build/jit2c.pl
 tools/build/nativecall.pl
 tools/dev/lib_deps.pl
+tools/dev/mk_inno.pl
 tools/dev/parrot_coverage.pl
 # these ones include a big URL
 cage/todo.pod
+docs/dev/pmc_object_design_meeting_notes.pod
 docs/gettingstarted.pod
 docs/glossary.pod
 languages/LANGUAGES.STATUS.pod
