@@ -241,7 +241,7 @@ L<http://bugs6.perl.org/>. If you have trouble logging in try username C<guest>
 with password C<guest>.
 
 A Parrot Bug Summary page is also generated and can be viewed here
-L<http://rt.perl.org/rt3/NoAuth/parrot/Overview.html>
+L<https://rt.perl.org/rt3/NoAuth/parrot/Overview.html>
 
 A list of all the unresolved patches is at
 L<http://www.parrotcode.org/openpatches.html>

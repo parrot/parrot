@@ -134,7 +134,7 @@ Currently things are handled by deleg_pmc.pmc and default.pmc. Unfortunately,
 it appears that calls to vtable entries in default.pmc take place before
 delegation to a superclass. Patrick proposes that this be switched somehow;
 e.g, inheritance should be preferred over default vtable entries.
-See L<http://rt.perl.org/rt3//Ticket/Display.html?id=39329>.
+See L<https://rt.perl.org/rt3//Ticket/Display.html?id=39329>.
 
 B<Recommendation>: Inherit from default.pmc unless you have a parent. Always
 check inheritance when dispatching, if necessary. Chip will look specifically

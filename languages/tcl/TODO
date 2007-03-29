@@ -1,9 +1,9 @@
-All TODO items should be documented in RT (http://rt.perl.org/) 
+All TODO items should be documented in RT (https://rt.perl.org/) 
 or the test suite (t/*.t)
 
 A listing of all RT TODO items is available at:
 
- http://rt.perl.org/rt3/NoAuth/parrot/List.html?Field=Lang&Value=tcl
+ https://rt.perl.org/rt3/NoAuth/parrot/List.html?Field=Lang&Value=tcl
 
 To add TODOs to this list (which is powered by RT), send an email to
 

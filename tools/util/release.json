@@ -13,7 +13,7 @@
     "bugday.day"       : "Saturday",
     "bugday.date"      : "17 March 2007",
 
-    "rt.root"          : "http://rt.perl.org/rt3/",
+    "rt.root"          : "https://rt.perl.org/rt3/",
     "rt.tracking"      : "Ticket/Display.html?id=41581",
     "rt.saved_search"  : "http://xrl.us/u9y2",
 

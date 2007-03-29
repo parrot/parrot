@@ -27,7 +27,7 @@ More tests are welcome.
 
 =head1 SEE ALSO
 
-L<http://rt.perl.org/rt3/Ticket/Display.html?id=31197>
+L<https://rt.perl.org/rt3/Ticket/Display.html?id=31197>
 
 =cut
 

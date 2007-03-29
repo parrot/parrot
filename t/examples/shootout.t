@@ -47,7 +47,7 @@ http://shootout.alioth.debian.org/sandbox/
 
 #40064: [TODO] shootout example testing in Parrot RT
 
-L<"http://rt.perl.org/rt3/Public/Bug/Display.html?id=40064">
+L<"https://rt.perl.org/rt3/Public/Bug/Display.html?id=40064">
 
 =cut
 

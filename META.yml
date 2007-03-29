@@ -33,5 +33,5 @@ no_index:
         - Parrot::Configure
 resources:
     homepage: http://parrotcode.org/
-    bugtracker: http://rt.perl.org/rt3/
+    bugtracker: https://rt.perl.org/rt3/
 generated_by: Humans
