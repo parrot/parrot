@@ -9,6 +9,7 @@ use lib qw(. lib ../lib ../../lib);
 
 use Fatal qw(open);
 use File::Find;
+use File::Spec;
 use Test::More;
 use Parrot::Config qw{%PConfig};
 use Parrot::Distribution;
@@ -61,7 +62,8 @@ if ( !@ARGV ) {
     @files = map { $_->path } $DIST->get_perl_language_files();
 
     # Skip any language files...
-    @files = grep { !m{$PConfig{build_dir}/languages/} } @files;
+    my $languages_dir = File::Spec->catdir($PConfig{build_dir}, 'languages');
+    @files = grep { !m{\Q$languages_dir\E} } @files;
 }
 else {
 
