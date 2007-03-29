@@ -1213,6 +1213,7 @@ destroy_object_cache(Interp *interp)
         if (mc->idx[i])
             mem_sys_free(mc->idx[i]);
     }
+    mem_sys_free(mc->idx);
     mem_sys_free(mc);
 }
 
