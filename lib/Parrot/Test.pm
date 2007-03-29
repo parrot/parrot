@@ -271,7 +271,13 @@ sub run_command {
     }
 
     # Execute all commands
-    system($_ ) for ( @{$command} );
+    # [#42161] [BUG] Parrot::Test throws "Can't spawn" warning on windows
+    # ...if a system call returns a negative value
+    # removed exec warnings to prevent this warning from messing up test results
+    {
+        no warnings 'exec';
+        system($_ ) for ( @{$command} );
+    }
 
     if ($chdir) {
         chdir $orig_dir;
