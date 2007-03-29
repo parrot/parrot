@@ -1551,18 +1551,6 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
 
 }
 
-
-
-
-
-/*
-
-=cut
-
-*/
-
-
-
 /*
  * Local variables:
  *   c-file-style: "parrot"
