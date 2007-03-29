@@ -83,7 +83,7 @@ foreach my $file (@files) {
 }
 
 my $bad_files = join( "\n", @failed );
-is( $bad_files, q{} );    # only ok if everything passed
+is( $bad_files, q{}, 'Pod syntax correct' );    # only ok if everything passed
 
 # Pulled from Test::Pod
 sub file_pod_ok {
