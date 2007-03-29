@@ -19,7 +19,7 @@
 .const int STDIN = 0
 
 .sub _ansi_setup
-	$P0=new .PerlArray
+	$P0=new .ResizablePMCArray
 	$P0[0]= BLACK
 	$P0[1]= BLUE
 	$P0[2]= GREEN
@@ -30,7 +30,7 @@
 	$P0[7]= WHITE
 	store_global "ANSI_fgcolors", $P0
 
-	$P0=new .PerlArray
+	$P0=new .ResizablePMCArray
 	$P0[0]= BLACK
 	$P0[1]= BLUE
 	$P0[2]= GREEN
@@ -49,7 +49,7 @@
 	$P0[15]= 8
 	store_global "ANSI_bgcolors", $P0
 
-	$P0=new .PerlHash
+	$P0=new .Hash
 	$P0["value"]=0
 	store_global "scankey", $P0
 .end
@@ -182,7 +182,7 @@ ANSI_BG:
 	#invoke		# nmode=fcntl(0, F_SETFL, mode | O_NONBLOCK)
 	fcntl(STDIN, F_SETFL, $I7)
 
-	$P0=new .PerlHash
+	$P0=new .Hash
 	$P0["value"]= old_value
 	store_global "fcntl_mode", $P0
 .end

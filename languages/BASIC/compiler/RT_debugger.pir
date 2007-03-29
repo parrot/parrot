@@ -1,4 +1,4 @@
-.sub _DEBUGGER_STOP_FOR_REAL	# void Debugger_stop(int line, PerlHash local_values)
+.sub _DEBUGGER_STOP_FOR_REAL	# void Debugger_stop(int line, Hash local_values)
 	.param int line
 	.param pmc locals
 	find_global $P25, "DEBUGGER"
@@ -104,7 +104,7 @@ DEBUGGER_DELWATCH:
 	branch DEBUGGER_COMMAND
 
 DEBUGGER_DELALLWATCH:
-	$P0=new PerlArray
+	$P0=new .ResizablePMCArray
 	set $P25["watch"], $P0
 	print "All watches cleared.\n"
 	branch DEBUGGER_COMMAND

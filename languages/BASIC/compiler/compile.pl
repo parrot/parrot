@@ -4,8 +4,6 @@
 # First tokenize the input stream into:
 #          @tokens and @tokdsc
 # Then compile.
-use strict;
-use warnings;
 use Getopt::Std;
 use vars qw( @tokens @tokdsc);
 use vars qw(%code %options @basic %common);
@@ -173,7 +171,7 @@ END_PIR
                 exists \$I0, \$P1[\$S0]
                 eq \$I0, 0, DEBUGGER_DONE        # This breakpoint doesn't exist
         DEBUGGER_STOP:
-                \$P1=new .PerlHash
+                \$P1=new .Hash
 @debdecl                .arg \$P1
                 .arg debline
                 _DEBUGGER_STOP_FOR_REAL()
@@ -186,7 +184,7 @@ if ($debug) {
     print CODE<<FOO;
 .sub _DEBUG_INIT
         saveall
-        \$P0=new .PerlArray
+        \$P0=new .ResizablePMCArray
         find_global \$P1, "DEBUGGER"
 FOO
     foreach ( 0 .. @main::basic - 1 ) {
@@ -197,9 +195,9 @@ FOO
     print CODE<<FOO;
         \$P1["code"]= \$P0
         \$P1["step"]= 1   # Turn on stepping mode
-        \$P0=new .PerlHash
+        \$P0=new .Hash
         \$P1["break"]= \$P0  # Breakpoints
-        \$P0=new .PerlArray
+        \$P0=new .ResizablePMCArray
         \$P1["watch"]= \$P0  # Watch
         store_global "DEBUGGER", \$P1
 .end

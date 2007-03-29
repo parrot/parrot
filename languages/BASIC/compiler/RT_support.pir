@@ -24,7 +24,7 @@
 #	print "Out of data"
 #	branch GEN_ERROR
 
-.sub _READ		# PerlArray READ(void)
+.sub _READ		# ResizablePMCArray READ(void)
 	.local pmc READDATA
 	.local int READPOINTER
 	find_global READDATA, "READDATA"

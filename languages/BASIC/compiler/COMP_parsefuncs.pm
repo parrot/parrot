@@ -1,9 +1,6 @@
 # Aux. functions needed by the parser.  (For cleanliness)
 #
 
-use strict;
-use warnings;
-
 use vars qw( %usertypes );
 use vars qw( %arrays );
 use vars qw( $funcname $subname );
@@ -708,9 +705,9 @@ GL
     print CODE<<CASE_SETUP;
         goto CASE_${jump}_FIN
 CASE_${jump}_${incase}:
-        new P12, .PerlArray   # OR
-        new P13, .PerlArray   # TO
-        new P14, .PerlArray   # Operators.  Op first, then value
+        new P12, .ResizablePMCArray   # OR
+        new P13, .ResizablePMCArray   # TO
+        new P14, .ResizablePMCArray   # Operators.  Op first, then value
 CASE_SETUP
     my ( $ors, $tos, $ops ) = ( 0, 0, 0 );
     while (1) {
@@ -1008,11 +1005,11 @@ sub parse_type {
     $usertypes{$typename} = [@types];
     print CODE <<TYPE;
         # Type definition for $typename
-        new P0, .PerlArray
+        new P0, .ResizablePMCArray
 TYPE
     foreach (@types) {
         print CODE<<ADDT;
-        new P1, .PerlHash
+        new P1, .Hash
         P1["name"]= '$_->[0]'
         P1["type"]= '$_->[1]'
         push P0, P1
@@ -1026,13 +1023,13 @@ ADDT
 DIM_$typename:
         #print "Dimensioning $typename\\n"
         pushp
-        P2= .PerlHash
+        P2= .Hash
 TYPEE
     foreach (@types) {
         my %val = ( INT => 0, FLO => '0.0', STRING => '""' );
         if ( $_->[2] ne "USER" ) {
             print CODE<<NOTUSER;
-        new P1, .PerlHash
+        new P1, .Hash
         P1["name"]= '$_->[0]'
         P1["type"]= '$_->[2]'
         P1["value"]= $val{$_->[2]}
@@ -1041,7 +1038,7 @@ NOTUSER
         }
         else {
             print CODE<<USERTYPE;
-        new P1, .PerlHash
+        new P1, .Hash
         P1["name"]= '$_->[0]'
         P1["type"]= "USER"
         bsr DIM_$_->[1]
@@ -1060,14 +1057,14 @@ USERTYPE
 COPY_$typename:                 # Source in P6 Dest in P1 (don't trash P0)
         #print "--Copying a $typename\\n"
         pushp                   # Makes an internal mess of P2, P3, P4, P5, P6 (popped)
-        new P3, .PerlHash       # Uses S0, I0, N0
+        new P3, .Hash       # Uses S0, I0, N0
 FINDIM
 
     foreach (@types) {
         my %val = ( INT => 'I0', FLO => 'N0', STRING => 'S0' );
         if ( $_->[2] ne "USER" ) {
             print CODE<<NOTUSER;
-        new P2, .PerlHash
+        new P2, .Hash
         P2["name"]= '$_->[0]'
         P2["type"]= '$_->[2]'
         P4= P6["storage"]
@@ -1082,7 +1079,7 @@ NOTUSER
         }
         else {
             print CODE<<USER;
-        new P2, .PerlHash
+        new P2, .Hash
         P2["name"]= '$_->[0]'
         P2["type"]= "USER"
         P5= P6          # Remember where we were...
@@ -1124,7 +1121,7 @@ ANOTHERDIM:
         P1= P10[I25]
         P2= P1["USER"]
         bsr DIM_$type
-        P1 = new .PerlHash
+        P1 = new .Hash
         P1["_type"]= '$type'
         P1["type"]= "USER"
         P1["storage"]= P0
@@ -1183,9 +1180,9 @@ DIMTYPE
         #print STDERR "Marking ${var}${seg}\n";
         push @{ $code{$seg}->{code} }, <<DIMARR;
         # Set aside storage for Array $var
-        \$P0 = new .PerlHash
-        \$P2 = new .PerlArray
-        \$P3 = new .PerlHash
+        \$P0 = new .Hash
+        \$P2 = new .ResizablePMCArray
+        \$P3 = new .Hash
         \$P3["index"]=\$P2
         \$P3["hash"]=\$P0
         find_global \$P1, "BASICARR"
@@ -1395,7 +1392,7 @@ EOH
             #print STDERR "Marking ${_}${seg}\n";
             $arrays{"${_}${seg}"} = 1;
             push @{ $code{$seg}->{code} }, <<PUSHARR;
-        .param PerlHash array_$englishname
+        .param pmc array_$englishname
         find_global \$P1, "BASICARR"
         \$P1["${_}$seg"]= array_$englishname
         store_global "BASICARR", \$P1

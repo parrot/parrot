@@ -1,8 +1,5 @@
 #! perl
 
-use strict;
-use warnings;
-
 my ( $cur, $next, $afternext, $curtok );
 my $stmts = 0;
 

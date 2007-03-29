@@ -1,7 +1,5 @@
 #! perl
 
-use strict;
-use warnings;
 use constant VERSION => 2.3;
 
 use constant PREV => 2;

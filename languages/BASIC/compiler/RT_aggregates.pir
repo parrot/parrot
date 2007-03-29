@@ -41,7 +41,7 @@ ARR_END:
         noop
 .end
 
-			# void ARRAY_ASSIGN_N(string array, PerlArray rhs, int keycount[, string|float keys])
+			# void ARRAY_ASSIGN_N(string array, ResizablePMCArray rhs, int keycount[, string|float keys])
 			# void ARRAY_ASSIGN_N(string array, string rhs, int keycount[, string|float keys])
 .sub _ARRAY_ASSIGN	# void ARRAY_ASSIGN_N(string array, float rhs, int keycount[, string|float keys])
 	.param string array
@@ -118,7 +118,7 @@ ASSIGN_ERR:
 	end
 
 END_ASSIGN:
-	# Temporary, needed only until PerlHash->keys() gets implemented
+	# Temporary, needed only until Hash->keys() gets implemented
 	find_global BASICARR, "BASICARR"
 	$P1 = BASICARR[array]
 	$P0 = $P1["index"]
@@ -138,7 +138,7 @@ E_A2:
 REALEND:
 	noop
 .end
-# This gets a *lot* easier when PerlHash->keys() gets implemented
+# This gets a *lot* easier when Hash->keys() gets implemented
 .sub _ARRAY_KEYS	# void ARRAY_KEYS(string source, string target)
 	.param string source
 	.param string target

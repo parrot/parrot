@@ -16,7 +16,7 @@ I can't test this on windows, and it's currently broken. Please fix it.
 	set I5, -10
 	invoke
 	store_global "Win32Inputhandle", P5
-	$P0= new .PerlHash
+	$P0= new .Hash
 	store_global "Win32console", $P0
 	_WIN32_CONSOLE_INFO()
 .end
@@ -52,7 +52,7 @@ I can't test this on windows, and it's currently broken. Please fix it.
 .end
 .sub _UMS_GET_SHORT		# int value ums_get_short(int offset, ManagedStruct buf)
 	.param int offset
-	.param ManagedStruct buf
+	.param pmc buf
 	set $I2, buf[offset]
 	inc offset
 	set $I3, buf[offset]

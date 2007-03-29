@@ -4,9 +4,6 @@
 #
 #
 
-use strict;
-use warnings;
-
 $tn = 0;
 while (1) {
     {

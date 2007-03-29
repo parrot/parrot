@@ -1,7 +1,4 @@
 #! perl
-use strict;
-use warnings;
-no warnings 'once';
 $parpath = '../../../';
 
 unlink "_test.pbc";
