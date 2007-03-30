@@ -27,6 +27,25 @@ it's still kinda code that looks good.
 Skip first token of statements if it's sure that the token has already been checked by the caller. No need
 to match 'goto' again, if it was already checked in compilation_unit().
 
+=item *
+
+Maybe use compilers/bcg for back-end, if that would fit well.
+
+=item *
+
+Clean up grammar after discussion.
+ - For instance, why have :postcomp and :immediate, having same meaning?, and
+ - why ".sub" and ".pcc_sub"?
+ - why "object" as type? Why custom names as type, such as '.local Array x' --
+   this is not needed, and makes the code look more like a HLL. Just stick
+   to 'pmc', which works fine.
+ - why allow an optional comma between sub pragmas? param pragmas don't have that
+   so remove this opt. comma as well for consistency.
+ - unify '.sym' and '.local'. Just allow one, and think of something else for
+   local labels in macros.
+ - Decide on dot-prefix: either .Integer or Integer, but not both.
+   same for strings: .Integer, Integer or "Integer"?
+
 =back
 
 
@@ -54,7 +73,7 @@ The parser_state structure has the following fields:
     token    curtoken;               -- the current token as returned by the lexer
     char    *heredoc_ids[10];        -- array for holding heredoc arguments. XXX Limited to 10 currently XXX
     unsigned heredoc_index;          -- index to keep track of heredoc ids in the array
-    unsigned parse_errors;           -- parse_errors
+    unsigned parse_errors;           -- counter for parse_errors
  }
 
 =cut
@@ -1338,7 +1357,7 @@ multi_result_invocation(parser_state *p) {
     target_list(p);
     match(p, T_ASSIGN);
 
-    switch(p->curtoken) { /* TODO: REFACTOR */
+    switch(p->curtoken) {
         case T_IDENTIFIER: /* target_list '=' subcall */
         case T_PASM_PREG:
         case T_PREG:

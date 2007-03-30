@@ -719,9 +719,8 @@ read_digits(lexer_state *lexer) {
 
 =item update_line()
 
-Updates the line number in the lexer, and adjusts the
-error_context pointer, to show a bit of surrounding code
-when an error occurs.
+Updates the line number in the lexer, and resets
+the line position pointer.
 
 =cut
 
