@@ -17,6 +17,7 @@ token DOUBLEQUOTE_STRING      { " <-["]>* " }
 token SINGLEQUOTE_STRING      { ' <-[']>* ' }
 token ECHO                    { <'echo'> }
 token VAR_DUMP                { <'var_dump'> }
+token PHP_SAPI_NAME           { <'php_sapi_name'> }
 token PAREN_OPEN              { \( }
 token PAREN_CLOSE             { \) }
 
@@ -44,13 +45,12 @@ rule  code                    { <?CODE_START> <statement>* <?CODE_END>? }
 
 rule relational_expression    { <expression> <rel_op_clause>? }
 
-rule statement                {
-    <ECHO> <expression>  ( ; | <?before: \? > | $ )
-  | <VAR_DUMP> <?PAREN_OPEN>  <expression> <?PAREN_CLOSE> ( ; | <?before: \? > | $ )
-  | <IF> <?PAREN_OPEN> <relational_expression> <?PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
-  | <inline_sea> 
-  | <scalar_assign>
-  | <array_assign>
+rule statement                { <ECHO> ( <expression> | <PHP_SAPI_NAME> <?PAREN_OPEN> <?PAREN_CLOSE> )  ( ; | <?before: \? > | $ )
+                              | <VAR_DUMP> <?PAREN_OPEN>  <expression> <?PAREN_CLOSE> ( ; | <?before: \? > | $ )
+                              | <IF> <?PAREN_OPEN> <relational_expression> <?PAREN_CLOSE> \{ <statement>* \} <else_clause>? 
+                              | <inline_sea> 
+                              | <scalar_assign>
+                              | <array_assign>
                               }
 
 rule else_clause              { <?ELSE> \{ <statement>* \} }
@@ -82,7 +82,7 @@ rule adding_expression        { <multiplying_expression> <adding_tail>* }
 
 rule adding_tail              { <ADD_OP> <multiplying_expression> }
 
-# TODO: this gets precedence  wrong
+# TODO: this gets precedence wrong, see adding_expression
 rule multiplying_expression   { <unary_expression> <multiplicand>? }
 
 rule multiplicand             { <MUL_OP> <multiplying_expression> }
@@ -95,4 +95,3 @@ rule postfix_expression       { <NUMBER>
                               | <array_elem>
                               | <var>
                               }
-

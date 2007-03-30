@@ -91,14 +91,26 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
 
                  $P1 = cnode['ECHO']
                  if null $P1 goto no_echo
-                     $P2 = cnode['expression']
-                     if null $P2 goto iter_loop
+                     $P3  = cnode[0]
+                     $P2 = $P3['expression']
+                     if null $P2 goto no_expression_in_echo
                          past_expression = tree.'get'('past', $P2, 'Plumhead::Grammar::expression')
                          if null past_expression goto iter_loop
                          past_echo = new 'PAST::Op'
                          past_echo.'init'( past_expression, 'node'=> node, 'name' => 'print' )  
                          past.'push'(past_echo)
                          goto iter_loop
+                     no_expression_in_echo:
+                     $P2 = $P3['PHP_SAPI_NAME']
+                     if null $P2 goto no_php_sapi_name_in_echo
+                         past_expression = tree.'get'('past', $P3, 'Plumhead::Grammar::expression')
+                         if null past_expression goto iter_loop
+                         past_echo = new 'PAST::Op'
+                         past_echo.'init'( past_expression, 'node'=> node, 'name' => 'print' )  
+                         past.'push'(past_echo)
+                         goto iter_loop
+                     no_php_sapi_name_in_echo:
+                     goto iter_loop
                  no_echo:
 
                  $P1 = cnode['VAR_DUMP']
@@ -420,6 +432,13 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
         past.'init'( 'name' => var, 'viviself' => '.Undef', 'islvalue' => 1 )                              
         goto handled_expression
     no_var_name:
+
+    $P0 = node['PHP_SAPI_NAME']
+    if null $P0 goto no_php_sapi_name
+        past = new 'PAST::Op'
+        past.'init'( 'node'=> node, 'name' => 'php_sapi_name' )  
+        goto handled_expression
+    no_php_sapi_name:
 
     handled_expression:
 
