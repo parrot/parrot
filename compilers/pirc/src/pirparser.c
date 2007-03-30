@@ -72,6 +72,7 @@ Clean up and exit the program normally.
 void
 exit_parser(parser_state *p) {
     destroy_lexer(p->lexer);
+    p->lexer = NULL;
     free(p);
     p = NULL;
     exit(0);
@@ -167,7 +168,7 @@ syntax_error(parser_state *p, int numargs, ...) {
     long line = get_current_line(p->lexer);
     char const *file = get_current_file(p->lexer);
 
-    fprintf(stderr, "syntax error in file '%s', line %ld: ", file, line);
+    fprintf(stderr, "\nsyntax error in file '%s', line %ld: ", file, line);
 
     va_start(arg_ptr, numargs);
     for (count = 0; count < numargs; count++) {
@@ -176,7 +177,7 @@ syntax_error(parser_state *p, int numargs, ...) {
     }
     va_end(arg_ptr);
 
-    fprintf(stderr, "\n");
+    fprintf(stderr, "\n\n");
 
     /* only show context on first error */
     if (p->parse_errors == 0) print_error_context(p->lexer);
@@ -382,7 +383,7 @@ type(parser_state *p) {
 
 =item key()
 
-  key -> unop expression | '..' expression | expression [ '..' [ expression ] ]
+  key -> '-' expression | '..' expression | expression [ '..' [ expression ] ]
 
 =cut
 
@@ -391,10 +392,6 @@ static void
 key(parser_state *p) {
     switch (p->curtoken) {
         case T_MINUS:
-        /*
-        case T_BXOR:
-        case T_NOT:
-        */
         case T_DOTDOT: /* key -> '..' expression */
             next(p);
             expression(p);
@@ -517,7 +514,7 @@ arguments(parser_state *p) {
         syntax_error(p, 1, "'\\n' expected");
     }
 
-    /* check whehter there are any heredocs to be parsed */
+    /* check whether there are any heredocs to be parsed */
     if ( p->heredoc_index > 0) {
         unsigned i;
         for (i = 0; i < p->heredoc_index; i++) {
@@ -1090,7 +1087,7 @@ param_flags(parser_state *p) {
                 break;
             /* if none of the above, error! */
             default:
-                syntax_error(p, 2, "syntax error: parameter flag or newline expected, but got ", find_keyword(p->curtoken));
+                syntax_error(p, 2, "parameter flag or newline expected, but got ", find_keyword(p->curtoken));
                 ok = 0; /* stop loop */
                 break;
         }
@@ -1411,7 +1408,11 @@ global_assignment(parser_state *p) {
 */
 static void
 parrot_instruction(parser_state *p) {
-    match(p, T_PARROT_OP); /* XXX for now, parse as many arguments as necessary */
+    match(p, T_PARROT_OP);
+    /* XXX for now, parse as many arguments as necessary,
+     * don't know how to handle this. Just try and create the call to the
+     * instruction and wait for run-time error?
+     */
     while (p->curtoken != T_NEWLINE) {
         expression(p);
         if (p->curtoken == T_COMMA) next(p);
