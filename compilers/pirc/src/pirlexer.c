@@ -4,6 +4,39 @@
 
 pirlexer.c - lexical analysis for Parrot Intermediate Representation
 
+=head1 THOUGHTS FOR LATER
+
+=over 4
+
+=item *
+
+Implement dictionary as hashtable, which will be MUCH faster
+
+=item *
+
+Remove limit of 128 characters for identifier length
+
+=item *
+
+Optimize small functions (using #define to inline) and optimize by 'smarter'
+implementation (where appropiate). I'm doing a lot of stuff in read_char(),
+which might slow down things.
+
+=item *
+
+TODO: implement POD parsing
+
+=item *
+
+Place and remove checks for EOF where appropiate, they are scattered throughout
+the code. Clean that up.
+
+=item *
+
+Check for 'correct' use of data types (unsigned etc.)
+
+=back
+
 =cut
 
 */

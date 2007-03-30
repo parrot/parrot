@@ -4,6 +4,32 @@
 
 pirparser.c - parser for Parrot Intermediate Representation
 
+=head1 THOUGHTS FOR LATER
+
+=over 4
+
+=item *
+
+Remove limit of 10 heredoc arguments
+
+=item *
+
+Add error correcting stuff, so parsing can continue after simple errors.
+
+=item *
+
+Maybe use #define's to implement small functions. Effectively, these routines
+will be inlined in compilation_unit() or instruction(), but when using #define's
+it's still kinda code that looks good.
+
+=item *
+
+Skip first token of statements if it's sure that the token has already been checked by the caller. No need
+to match 'goto' again, if it was already checked in compilation_unit().
+
+=back
+
+
 =cut
 
 */
@@ -591,6 +617,30 @@ arith_expression(parser_state *p) {
     }
 }
 
+/*
+
+=item parrot_instruction
+
+  parrot_instruction -> PARROT_OP [ expression {',' expression } ] '\n'
+
+=cut
+
+*/
+static void
+parrot_instruction(parser_state *p) {
+    match(p, T_PARROT_OP);
+    /* XXX for now, parse as many arguments as necessary,
+     * don't know how to handle this. Just try and create the call to the
+     * instruction and wait for run-time error?
+     */
+    while (p->curtoken != T_NEWLINE) {
+        expression(p);
+        if (p->curtoken == T_COMMA) next(p);
+        else break;
+    }
+    match(p, T_NEWLINE);
+}
+
 
 /*
 
@@ -661,14 +711,7 @@ assignment(parser_state *p) {
             next(p);
             break;
         case T_PARROT_OP:
-            next(p);
-            if (p->curtoken != T_NEWLINE) {
-                expression(p);
-                while (p->curtoken == T_COMMA) {
-                    next(p);
-                    expression(p);
-                }
-            }
+            parrot_instruction(p);
             break;
         case T_HEREDOC_ID: { /* parse heredoc string */
             char *heredocid = clone_string(get_current_token(p->lexer));
@@ -1397,29 +1440,7 @@ global_assignment(parser_state *p) {
     match(p, T_NEWLINE);
 }
 
-/*
 
-=item parrot_instruction
-
-  parrot_instruction -> PARROT_OP [ expression {',' expression } ] '\n'
-
-=cut
-
-*/
-static void
-parrot_instruction(parser_state *p) {
-    match(p, T_PARROT_OP);
-    /* XXX for now, parse as many arguments as necessary,
-     * don't know how to handle this. Just try and create the call to the
-     * instruction and wait for run-time error?
-     */
-    while (p->curtoken != T_NEWLINE) {
-        expression(p);
-        if (p->curtoken == T_COMMA) next(p);
-        else break;
-    }
-    match(p, T_NEWLINE);
-}
 
 
 /*
@@ -2067,25 +2088,6 @@ TOP(parser_state *p) {
 
 =back
 
-=head1 POSSIBLE FUTURE OPTIMIZATIONS
-
-=over 4
-
-=item *
-
-Use #define's to inline short functions that are called often (such as next(), match())
-
-=item *
-
-Remove functions for short statements, and put in the matching into the switch() for compilation_unit.
-
-=item *
-
-Skip first token of statements if it's sure that the token has already been checked by the caller. No need
-to match 'goto' again, if it was already checked in compilation_unit().
-
-
-=back
 
 =cut
 
