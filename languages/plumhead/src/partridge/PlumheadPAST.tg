@@ -203,17 +203,25 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     .local pmc past
 
+    .local pmc dummy_1, dummy_2
+    .local pmc past_prev, cnode 
+    .local pmc past_expression_1
+    .local pmc past_key, past_var_name
+    .local pmc tail, tail_0, tail_iter, past_tail_0
+    .local pmc past_mult, past_string, past_adding
+    .local pmc past_unary, multiplicand, multiplicand_0, past_multiplicand_0
+    .local pmc past_expression
+
+    .local string op, pirop, val, var
+
     $P0 = node['expression']
     if null $P0 goto no_expression_1
-        .local pmc dummy_1, dummy_2
         dummy_1 = node['array_elem']
         unless null dummy_1 goto no_expression_1
         dummy_2 = node['VAR_NAME']
         if null dummy_2 goto no_var_name_1
-            .local string var
             var = dummy_1
             past = new 'PAST::Var'
-            .local pmc past_expression_1
             past_expression_1 = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
             past.'init'( past_expression_1, 'name' => var, 'viviself' => '.Hash', 'islvalue' => 1 )
             goto handled_expression
@@ -226,33 +234,27 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
     if null $P0 goto no_array_elem_1
         $P1 = $P0['VAR_NAME']
         $P2 = $P0['array_key']
-        .local string var
         var = $P1
-        .local pmc past_key, past_var_name
         past_var_name = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
         past_var_name.'attr'('viviself', '.Hash', 1 )
         past_key      = tree.'get'('past', $P2, 'Plumhead::Grammar::expression')
         past = new 'PAST::Var'
-        past.'init'( past_var_name, past_key, 'scope' => 'keyed', 'viviself' => '.Undef', 'islvalue' => 1 )                              
+        past.'init'( past_var_name, past_key, 'scope' => 'keyed', 'viviself' => '.Undef', 'islvalue' => 1 )
         goto handled_expression
     no_array_elem_1:
 
     $P0 = node['concat_expression']
     if null $P0 goto no_concat_expression
-        .local pmc past_string, concat_tail, concat_tail_iter
         past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
-        concat_tail = $P0['concat_tail']
-        if null concat_tail goto no_concat_tail
-            .local pmc past_prev, cnode 
-            concat_tail_iter = new .Iterator, concat_tail
+        tail = $P0['concat_tail']
+        if null tail goto no_concat_tail
+            tail_iter = new .Iterator, tail
             iter_loop_concat:
-                unless concat_tail_iter goto iter_end_concat
-                .local pmc cnode
-                cnode = shift concat_tail_iter
+                unless tail_iter goto iter_end_concat
+                cnode = shift tail_iter
                 past_string = tree.'get'('past', cnode, 'Plumhead::Grammar::expression')
                 past_prev = past
 
-                .local string op
                 op = cnode['CONCAT_OP']
                 if op != '.' goto not_concat
                     op = '~'
@@ -276,37 +278,43 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     $P0 = node['DOUBLEQUOTE_STRING']
     if null $P0 goto no_DOUBLEQUOTE_STRING
-        past = tree.'get'('past', $P0, 'Plumhead::Grammar::DOUBLEQUOTE_STRING')
+        past = new 'PAST::Val'                             
+        val = node
+        past.'init'( 'name' => val, 'vtype' => '.Undef' )                              
         goto handled_expression
     no_DOUBLEQUOTE_STRING:
 
     $P0 = node['SINGLEQUOTE_STRING']
     if null $P0 goto no_SINGLEQUOTE_STRING
-        past = tree.'get'('past', $P0, 'Plumhead::Grammar::SINGLEQUOTE_STRING')
+        past = new 'PAST::Val'                             
+        val = node
+        past.'init'( 'name' => val, 'vtype' => '.Undef' )                              
         goto handled_expression
     no_SINGLEQUOTE_STRING:
 
     $P0 = node['NUMBER']
     if null $P0 goto no_NUMBER
-        past = tree.'get'('past', $P0, 'Plumhead::Grammar::NUMBER')
+        past = new 'PAST::Val'                             
+        val = node
+        past.'init'( 'name' => val, 'vtype' => '.Float', 'ctype' => 'n+' )                              
         goto handled_expression
     no_NUMBER:
 
     $P0 = node['INTEGER']
     if null $P0 goto no_INTEGER
-        past = tree.'get'('past', $P0, 'Plumhead::Grammar::INTEGER')
+        past = new 'PAST::Val'                             
+        val = node
+        past.'init'( 'name' => val, 'vtype' => '.Integer', 'ctype' => 'i+' )                              
         goto handled_expression
     no_INTEGER:
 
     $P0 = node['bitwise_expression']
     if null $P0 goto no_bitwise_expression
-        .local pmc past_adding, bitwise_tail, bitwise_tail_0, past_bitwise_tail_0
-        bitwise_tail = $P0['bitwise_tail']
-        if null bitwise_tail goto no_bitwise_tail
+        tail = $P0['bitwise_tail']
+        if null tail goto no_bitwise_tail
             past_adding = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
-            bitwise_tail_0 = bitwise_tail[0]
-            .local string op
-            op = bitwise_tail_0['BITWISE_OP']
+            tail_0 = tail[0]
+            op = tail_0['BITWISE_OP']
             if op != '&' goto not_and
                 op = '+&'
             not_and:
@@ -317,9 +325,9 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
                 op = '+^'
             not_xor:
             op = 'infix:' . op 
-            past_bitwise_tail_0 = tree.'get'('past', bitwise_tail_0, 'Plumhead::Grammar::expression')
+            past_tail_0 = tree.'get'('past', tail_0, 'Plumhead::Grammar::expression')
             past = new 'PAST::Op'
-            past.init( past_adding, past_bitwise_tail_0, 'name' => op )
+            past.init( past_adding, past_tail_0, 'name' => op )
             goto handled_expression
         no_bitwise_tail:
         past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
@@ -328,27 +336,23 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     $P0 = node['adding_expression']
     if null $P0 goto no_adding_expression
-        .local pmc adding_tail_iter, past_mult, past_prev, adding_tail 
         past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
-        adding_tail = $P0['adding_tail']
-        if null adding_tail goto handled_expression
-            .local pmc past_prev, cnode 
-            adding_tail_iter = new .Iterator, adding_tail
+        tail = $P0['adding_tail']
+        if null tail goto handled_expression
+            tail_iter = new .Iterator, tail
             iter_loop_adding:
-                unless adding_tail_iter goto iter_end_adding
-                .local pmc cnode
-                cnode = shift adding_tail_iter
+                unless tail_iter goto iter_end_adding
+                cnode = shift tail_iter
                 past_mult = tree.'get'('past', cnode, 'Plumhead::Grammar::expression')
                 past_prev = past
-                .local string add_op, pirop
                 pirop = 'n_add'
-                add_op = cnode['ADD_OP']
-                if add_op != '-' goto not_minus
+                op = cnode['ADD_OP']
+                if op != '-' goto not_minus
                     pirop = 'n_sub'
                 not_minus:
-                add_op = 'infix:' . add_op 
+                op = 'infix:' . op 
                 past = new 'PAST::Op'
-                past.init( past_prev, past_mult, 'name' => add_op, 'pirop' => pirop )
+                past.init( past_prev, past_mult, 'name' => op, 'pirop' => pirop )
                 goto iter_loop_adding
             iter_end_adding:
             goto handled_expression
@@ -356,24 +360,22 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     $P0 = node['multiplying_expression']
     if null $P0 goto no_multiplying_expression
-        .local pmc past_unary, multiplicand, multiplicand_0, past_multiplicand_0
         multiplicand = $P0['multiplicand']
         if null multiplicand goto no_multiplicand
             past_unary = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
             multiplicand_0 = multiplicand[0]
-            .local string mul_op, pirop
             pirop = 'n_mul'
-            mul_op = multiplicand_0['MUL_OP']
-            if mul_op != '/' goto not_div
+            op = multiplicand_0['MUL_OP']
+            if op != '/' goto not_div
                 pirop = 'n_div'
             not_div:
-            if mul_op != '%' goto not_mod
+            if op != '%' goto not_mod
                 pirop = 'n_mod'
             not_mod:
-            mul_op = 'infix:' . mul_op 
+            op = 'infix:' . op 
             past_multiplicand_0 = tree.'get'('past', multiplicand_0, 'Plumhead::Grammar::expression')
             past = new 'PAST::Op'
-            past.init( past_unary, past_multiplicand_0, 'name' => mul_op, 'pirop' => pirop )
+            past.init( past_unary, past_multiplicand_0, 'name' => op, 'pirop' => pirop )
             goto handled_expression
         no_multiplicand:
         past = tree.'get'('past', $P0, 'Plumhead::Grammar::expression')
@@ -387,7 +389,6 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
             $P2 = $P0['UNARY_MINUS']
             if null $P2 goto no_minus
                 past = new 'PAST::Op'
-                .local pmc past_expression
                 past_expression = tree.'get'('past', $P1, 'Plumhead::Grammar::expression')
                 past.init( past_expression, 'node' => $P0, 'name' => 'prefix:-' )
                 goto handled_expression
@@ -415,7 +416,6 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     $P0 = node['VAR_NAME']
     if null $P0 goto no_var_name
-        .local string var
         var = $P0
         past = new 'PAST::Var'
         past.'init'( 'name' => var, 'viviself' => '.Undef', 'islvalue' => 1 )                              
@@ -433,50 +433,3 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
 
     .return (past)
 }
-
-
-transform past (Plumhead::Grammar::DOUBLEQUOTE_STRING) :language('PIR') {
-
-    .local pmc past
-    past= new 'PAST::Val'                             
-    .local string val
-    val = node
-    .local pmc code_string
-    past.'init'( 'name' => val, 'vtype' => '.Undef' )                              
-
-    .return (past)
-}
-
-
-transform past (Plumhead::Grammar::SINGLEQUOTE_STRING) :language('PIR') {
-
-    .local pmc past
-    past = new 'PAST::Val'                             
-    .local string val
-    val = node
-    .local pmc code_string
-    past.'init'( 'name' => val, 'vtype' => '.Undef' )                              
-
-    .return (past)
-}
-
-transform past (Plumhead::Grammar::NUMBER) :language('PIR') {
-
-    .local pmc past
-    past = new 'PAST::Val'                             
-    .local string val
-    val = node
-    past.'init'( 'name' => val, 'vtype' => '.Float', 'ctype' => 'n+' )                              
-    .return (past)
-}
-
-transform past (Plumhead::Grammar::INTEGER) :language('PIR') {
-
-    .local pmc past
-    past = new 'PAST::Val'                             
-    .local string val
-    val = node
-    past.'init'( 'name' => val, 'vtype' => '.Integer', 'ctype' => 'i+' )                              
-    .return (past)
-}
-
