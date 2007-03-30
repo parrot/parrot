@@ -574,7 +574,8 @@ do_include_file(lexer_state *lexer, char const * filename) {
 
 =item is_op()
 
-TODO: FIX THIS
+TODO: check whether 'word' is an op. How does IMCC handle this?
+Is there an API call that checks for this?
 
 Function to check if the specified id is a Parrot op.
 Dynamically loaded op libraries need to be considered as well.
@@ -584,7 +585,7 @@ Dynamically loaded op libraries need to be considered as well.
 */
 static int
 is_op(char *word) {
-    if (strcmp(word, "add") == 0) return 1; /* FIX */
+    if (strcmp(word, "add") == 0) return 1; /* hardcoded some, to give an idea */
     if (strcmp(word, "print") == 0) return 1;
     if (strcmp(word, "new") == 0) return 1;
     return 0;
