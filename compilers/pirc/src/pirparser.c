@@ -59,6 +59,7 @@ Clean up grammar after discussion.
 
 #include "pirout.h" /* for test output */
 #include "pastout.h" /* experimental output of PAST */
+#include "no_output.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -168,6 +169,9 @@ new_parser(char const * filename, outputtype output) {
     p->heredoc_index = 0;
     
     switch (output) {
+        case OUTPUT_NONE:
+            p->vtable = init_none_vtable();
+            break;
         case OUTPUT_PIR:
             p->vtable = init_pir_vtable();
             break;
@@ -1811,7 +1815,6 @@ sub_definition(parser_state *p) {
     emit_sub_start(p);    
     
     sub_flags(p);
-
     match(p, T_NEWLINE);
     parameters(p);
     instructions(p);

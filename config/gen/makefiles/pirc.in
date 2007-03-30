@@ -36,11 +36,15 @@ SOURCES = src/pirmain.c \
   src/pirout.c \
   src/pirout.h \
   src/pastout.c \
-  src/pastout.h
+  src/pastout.h \
+  src/no_output.c \
+  src/no_output.h \
+  src/pirvtable.h 
 
 
-pirc: pirmain$(O) pirparser$(O) pirlexer$(O) pirout$(O) pastout$(O)
-	$(CC) -o pirc$(EXE) pirmain$(O) pirparser$(O) pirlexer$(O) pirout$(O) pastout$(O)
+pirc: pirmain$(O) pirparser$(O) pirlexer$(O) pirout$(O) pastout$(O) no_output$(O)
+	$(CC) -o pirc$(EXE) pirmain$(O) pirparser$(O) pirlexer$(O) pirout$(O) pastout$(O) \
+	 no_output$(O)
 
 pirmain$(O): src/pirmain.c src/pirparser.h
 	$(CC) $(CFLAGS) -c src/pirmain.c
@@ -56,6 +60,9 @@ pirout$(O): src/pirout.c src/pirout.h
 
 pastout$(O): src/pastout.c src/pastout.h
 	$(CC) $(CFLAGS) -c src/pastout.c
+
+no_output$(O): src/no_output.c src/no_output.h
+	$(CC) $(CFLAGS) -c src/no_output.c
 
 # This is a listing of all targets, that are meant to be called by users
 help:

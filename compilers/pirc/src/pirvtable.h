@@ -13,10 +13,13 @@ typedef struct pirvtable {
 	
 } pirvtable;
 
-/* #defines for cleaner invocation syntax */
 
-#  define emit_sub_start(P)    (*p->vtable->sub_start)(P)
-#  define emit_sub_end(P)      (*p->vtable->sub_end)  (P)
+
+/* #defines for cleaner invocation syntax */
+#  define emit_sub_start(P)    (*P->vtable->sub_start)(P)
+#  define emit_sub_end(P)    (*P->vtable->sub_end)  (P)
+
+
 
 #endif
 
