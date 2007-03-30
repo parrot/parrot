@@ -15,9 +15,10 @@ also designed to act as an interpreter.
 
 =head2 Why did you call it "Parrot"?
 
-The name "Parrot" started with Simon Cozens's L<April Fool's Joke|
-http://www.perl.com/pub/a/2001/04/01/parrot.htm> where Larry Wall and Guido
-van Rossum announced the merger of the Perl and Python languages.
+The name "Parrot" started with Simon Cozens's 
+L<April Fool's Joke|http://www.perl.com/pub/a/2001/04/01/parrot.htm>
+where Larry Wall and Guido van Rossum announced the merger of the Perl 
+and Python languages.
 
 A year later, when we were looking for a name for our virtual machine that
 could run both Perl and Python, it seemed like a perfect fit.
