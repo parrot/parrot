@@ -8,11 +8,31 @@ src/pmc/exporter.pmc - Export globals from one namespace to another
 
 =head1 DESCRIPTION
 
-Exports globals from one namespace to another
+Exports globals from one namespace to another.
 
-=head2 Functions
+Exporter is not derived from any other PMC, and does not provide any
+standard interface--its inteface consists solely of non-vtable methods.
+
+=head2 Structure
+
+The Exporter PMC structure (C<Parrot_Exporter>) consists of three items:
 
 =over 4
+
+=item C<ns_src>
+
+The source namespace -- a NameSpace PMC.
+An empty PMC of this type is allocated upon initialization.
+
+=item C<ns_dest>
+
+The destination namespace -- a NameSpace PMC.
+An empty PMC of this type is allocated upon initialization.
+
+=item C<globals>
+
+The globals to export -- a ResizableStringArray.
+An empty PMC of this type is allocated during initialization.
 
 =cut
 
@@ -22,11 +42,23 @@ Exports globals from one namespace to another
 #define PARROT_EXPORTER(e) ((Parrot_Exporter *) PMC_data(e))
 
 typedef struct Parrot_Exporter {
-    PMC *ns_src;         /* The source NameSpace PMC */
-    PMC *ns_dest;        /* The destination NameSpace PMC */
-    PMC *globals;        /* The globals to export - a ResizableStringArray */
+    PMC *ns_src;
+    PMC *ns_dest;
+    PMC *globals;
 } Parrot_Exporter;
 
+
+/*
+
+=back
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 pmclass Exporter
     need_ext {
@@ -45,7 +77,7 @@ Instantiates an Exporter.
     void init() {
         Parrot_Exporter *exp = NULL;
 
-        /* Custom DOD mark and destory. */
+        /* Set flags for custom DOD mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 
@@ -60,10 +92,54 @@ Instantiates an Exporter.
 
 /*
 
-=item C<void source(PMC *src)>
+=item C<void destroy()>
 
-Accessor for the source NameSpace object. Sets the value if C<src> is passed,
-otherwise returns the value.
+Free the object's underlying struct.
+
+=cut
+
+*/
+
+    void destroy() {
+            mem_sys_free(PMC_data(SELF));
+    }
+
+
+/*
+
+=item C<void mark()>
+
+Mark referenced strings and PMCs in the structure as live.
+
+=cut
+
+*/
+
+    void mark() {
+        Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
+        if (exp->ns_src)
+            pobject_lives(interp, (PObj*)exp->ns_src);
+        if (exp->ns_dest)
+            pobject_lives(interp, (PObj*)exp->ns_dest);
+        if (exp->globals)
+            pobject_lives(interp, (PObj*)exp->globals);
+    }
+
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<PCCMETHOD void
+    source(PMC *src :optional, int got_src :opt_flag)>
+
+Accessor for the source NameSpace object (C<ns_src>.)
+Sets the value if C<src> is passed, otherwise returns the value.
+Throws an exception if a non-NameSpace PMC is passed.
 
 =cut
 
@@ -92,10 +168,12 @@ otherwise returns the value.
 
 /*
 
-=item C<void destination(PMC *dest)>
+=item C<PCCMETHOD void
+    destination(PMC *dest :optional, int got_dest :opt_flag)>
 
-Accessor for the destination NameSpace object. Sets the value if C<dest> is passed,
-otherwise returns the value.
+Accessor for the destination NameSpace object (C<ns_dest>.)
+Sets the value if C<dest> is passed, otherwise returns the value.
+Throws an exception if a non-NameSpace PMC is passed.
 
 =cut
 
@@ -123,10 +201,15 @@ otherwise returns the value.
 
 /*
 
-=item C<PMC *globals(void)>
+=item C<PCCMETHOD void
+    globals(PMC *glb_array :optional, int got_glb_array :opt_flag)>
 
-Accessor for the array of globals to export. Sets the array if C<glb_array>
-is passed, otherwise returns the value.
+Accessor for the array of globals to export (C<globals>.)
+Sets the array if C<glb_array> is passed, otherwise returns the value.
+
+TODO: need to add some type checking code.
+
+TODO: does not deal with non-array PMCs yet.
 
 =cut
 
@@ -149,9 +232,11 @@ is passed, otherwise returns the value.
 
 /*
 
-=item C<void add_global(PMC *global)>
+=item C<PCCMETHOD void
+    add_global(PMC *global :optional, int has_global :opt_flag)>
 
-Add C<global> to the array of globals.
+Add C<global> to the array of globals (C<globals>.)
+Sets the array if C<glb_array> is passed, otherwise does nothing.
 
 =cut
 
@@ -168,9 +253,15 @@ Add C<global> to the array of globals.
 
 /*
 
-=item C<void import(PMC *dest, PMC *src, PMC *globals)>
+=item C<PCCMETHOD void
+    import(PMC *dest :optional :named["destination"], int got_dest :opt_flag,
+        PMC *src :optional :named["source"],      int got_src :opt_flag,
+        PMC *globals :optional :named["globals"], int got_globals :opt_flag)>
 
 Import C<globals> from the C<src> namespace to the C<dest> namespace.
+If C<src>, C<dest>, or C<globals> are passed, they will override
+the current value.
+Throws an exception upon error.
 
 =cut
 
@@ -181,8 +272,6 @@ Import C<globals> from the C<src> namespace to the C<dest> namespace.
             PMC *globals :optional :named["globals"], int got_globals :opt_flag) {
 /*
  * notes:
- * passed params override current values, so set them before using them
- * check if any values are null before using them, and throw if so
  * for each global,
  *   find global in source namespace, throw exception if not found
  *   find global in destination namespace, throw warning if found
@@ -217,39 +306,6 @@ Import C<globals> from the C<src> namespace to the C<dest> namespace.
         /* TODO for each global, look up in source and alias to dest */
     }
 
-/*
-
-=item C<void destory()>
-
-Free the object's underlying struct.
-
-=cut
-
-*/
-    void destroy() {
-            mem_sys_free(PMC_data(SELF));
-    }
-
-
-/*
-
-=item C<void mark()>
-
-Mark any referenced strings and PMCs.
-
-=cut
-
-*/
-    void mark() {
-        Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
-        if (exp->ns_src)
-            pobject_lives(interp, (PObj*)exp->ns_src);
-        if (exp->ns_dest)
-            pobject_lives(interp, (PObj*)exp->ns_dest);
-        if (exp->globals)
-            pobject_lives(interp, (PObj*)exp->globals);
-    }
-
 
 }
 
@@ -259,7 +315,7 @@ Mark any referenced strings and PMCs.
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd17_basic_types.pod>.
+F<docs/pdds/pdd17_basic_types.pod>, F<docs/pdds/pdd21_namespaces.pod>.
 
 =cut
 
