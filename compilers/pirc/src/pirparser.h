@@ -17,6 +17,9 @@ typedef enum outputtypes {
 		
 } outputtype; 
 
+
+
+
 /* parser constructor */
 extern struct parser_state *new_parser(char const * filename, outputtype type);
 
