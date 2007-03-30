@@ -14,6 +14,7 @@ init_none_vtable(void) {
 	
 	vtable->sub_start = none;
 	vtable->sub_end   = none;
+	vtable->name      = none;
 	
 	return vtable;
 }

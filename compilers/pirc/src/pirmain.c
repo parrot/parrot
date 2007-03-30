@@ -19,7 +19,7 @@ main(int argc, char **argv) {
 
 
     /* create a new parser, specifying the file name */
-    p = new_parser(argv[1], OUTPUT_NONE);
+    p = new_parser(argv[1], OUTPUT_PAST);
 
     /* start parsing */
     TOP(p);

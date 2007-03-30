@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <malloc.h>
 
-/* 
+/*
 
 =head1 API
 
@@ -25,7 +25,7 @@ pirout(struct parser_state *p) {
 
     /*fprintf(stderr, "pirout:\n");
     */
-    
+
     switch (t) {
         case T_RPAREN:            /* HACK */
             fprintf(stderr, ")"); /* and print newline as well, nec. for macros */
@@ -55,6 +55,11 @@ pirout(struct parser_state *p) {
 
 }
 
+static void
+pir_name(struct parser_state *p, char *name) {
+    fprintf(stderr, " %s ", name);
+}
+
 
 /*
 
@@ -69,10 +74,11 @@ then this vtable is set into the parser_state struct.
 pirvtable *
 init_pir_vtable(void) {
     pirvtable *vtable = (pirvtable *)malloc(sizeof(pirvtable));
-    
+
     vtable->sub_start = pirout;
     vtable->sub_end   = pirout;
-    
+    vtable->name      = pir_name;
+
     return vtable;
 }
 

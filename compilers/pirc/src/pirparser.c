@@ -55,11 +55,13 @@ Clean up grammar after discussion.
 
 #include "pirlexer.h"
 #include "pirparser.h"
-#include "pirvtable.h"
 
-#include "pirout.h" /* for test output */
-#include "pastout.h" /* experimental output of PAST */
-#include "no_output.h"
+/* output stuff */
+#include "pirvtable.h"
+#include "pirout.h"    /* for PIR output  */
+#include "pastout.h"   /* for PAST output */
+#include "no_output.h" /* guess what...   */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -73,11 +75,12 @@ Clean up grammar after discussion.
 The parser_state structure has the following fields:
 
  typedef struct parser_state {
-    struct   lexer_state *lexer;     -- the lexer
-    token    curtoken;               -- the current token as returned by the lexer
-    char    *heredoc_ids[10];        -- array for holding heredoc arguments. XXX Limited to 10 currently XXX
-    unsigned heredoc_index;          -- index to keep track of heredoc ids in the array
-    unsigned parse_errors;           -- counter for parse_errors
+    struct     lexer_state *lexer;     -- the lexer
+    token      curtoken;               -- the current token as returned by the lexer
+    char      *heredoc_ids[10];        -- array for holding heredoc arguments. XXX Limited to 10 currently XXX
+    unsigned   heredoc_index;          -- index to keep track of heredoc ids in the array
+    unsigned   parse_errors;           -- counter for parse_errors
+    pirvtable *vtable;                 -- vtable holding pointers for output
  }
 
 =cut
@@ -85,13 +88,13 @@ The parser_state structure has the following fields:
 */
 
 typedef struct parser_state {
-    struct   lexer_state *lexer;
-    token    curtoken;
-    char    *heredoc_ids[10];
-    unsigned heredoc_index;
-    unsigned parse_errors;
+    struct     lexer_state *lexer;
+    token      curtoken;
+    char      *heredoc_ids[10];
+    unsigned   heredoc_index;
+    unsigned   parse_errors;
     pirvtable *vtable;
-    
+
 } parser_state;
 
 
@@ -101,7 +104,7 @@ typedef struct parser_state {
 
 /* call next() to get the next token from the lexer */ /* NOTE: it's calling pirout() */
 
-#define next(P) P->curtoken = next_token(P->lexer) 
+#define next(P) P->curtoken = next_token(P->lexer)
 
 /*
 #define next(P) do { pirout(P); P->curtoken = next_token(P->lexer); } while(0)
@@ -167,7 +170,8 @@ new_parser(char const * filename, outputtype output) {
     p->curtoken      = next_token(p->lexer);
     p->parse_errors  = 0;
     p->heredoc_index = 0;
-    
+
+    /* based on the output type, create the appropiate vtable */
     switch (output) {
         case OUTPUT_NONE:
             p->vtable = init_none_vtable();
@@ -177,12 +181,12 @@ new_parser(char const * filename, outputtype output) {
             break;
         case OUTPUT_PAST:
             p->vtable = init_past_vtable();
-            break;            
+            break;
         default:
             fprintf(stderr, "Unknown output type specified\n");
             exit(1);
     }
-    
+
     return p;
 }
 
@@ -1806,23 +1810,30 @@ sub_definition(parser_state *p) {
     /* either '.sub' or '.pcc_sub'. This kind of optimization (just skipping)
      * can be done more often, if we're sure the token has already been checked for.
      */
+
+    /* call emit method */
+    emit_sub_start(p);
+
     next(p);
 
-    if (p->curtoken == T_IDENTIFIER) match(p, T_IDENTIFIER);
-    else stringconstant(p);
-        
-    /* call emit method */    
-    emit_sub_start(p);    
-    
+    if (p->curtoken == T_IDENTIFIER) {
+        emit_name(p, get_current_token(p->lexer));
+        match(p, T_IDENTIFIER);
+    }
+    else {
+        emit_name(p, get_current_token(p->lexer));
+        stringconstant(p);
+    }
+
     sub_flags(p);
     match(p, T_NEWLINE);
     parameters(p);
     instructions(p);
     match(p, T_END);
-    
+
     /* call emit method */
     emit_sub_end(p);
-    
+
 }
 
 /*
