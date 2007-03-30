@@ -52,7 +52,7 @@ to the current namespace.
     void init() {
         Parrot_Role *role = NULL;
 
-        /* Custom DOD mark and destory. */
+        /* Custom DOD mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 

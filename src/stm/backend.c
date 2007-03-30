@@ -1331,7 +1331,7 @@ void Parrot_STM_mark_extracted(Interp *interp, void *saved_log_data) {
 }
 
 /*
-=item C<void Parrot_STM_destory_extracted(Interp *interp, void *saved_log_data)>
+=item C<void Parrot_STM_destroy_extracted(Interp *interp, void *saved_log_data)>
 
 Free memory associated with an extracted transaction log.
 

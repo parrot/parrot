@@ -42,7 +42,7 @@ Instantiates an object of the given class.
     void init_pmc(PMC* class) {
         Parrot_Object *obj = NULL;
 
-        /* Custom DOD mark and destory. */
+        /* Custom DOD mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 
@@ -55,7 +55,7 @@ Instantiates an object of the given class.
 
 /*
 
-=item C<void destory()>
+=item C<void destroy()>
 
 Free the object's underlying struct.
 
