@@ -61,10 +61,8 @@ token inline_sea              { <?CODE_END> <SEA_empty_allowed> <?CODE_START> }
 rule  scalar_assign           { <var> <ASSIGN_OP> <expression> ( ; | <?before: \? > | $ ) }
 rule  array_assign            { <array_elem> <ASSIGN_OP> <expression> ( ; | <?before: \? > | $ ) }
 
-token expression              {   <concat_expression>
-                                | <bitwise_expression>
-                                | <array_elem>
-                                | <var>
+token expression              { <concat_expression>
+                              | <bitwise_expression>
                               }
 
 rule  array_elem              { <VAR_NAME> <'['> <array_key> <']'> }
@@ -91,5 +89,10 @@ rule multiplicand             { <MUL_OP> <multiplying_expression> }
 
 rule unary_expression         { <UNARY_MINUS>? <postfix_expression> }
 
-rule postfix_expression       { <NUMBER> | <INTEGER> | <?PAREN_OPEN> <expression> <?PAREN_CLOSE> }
+rule postfix_expression       { <NUMBER>
+                              | <INTEGER>
+                              | <?PAREN_OPEN> <expression> <?PAREN_CLOSE>
+                              | <array_elem>
+                              | <var>
+                              }
 
