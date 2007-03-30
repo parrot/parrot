@@ -111,6 +111,12 @@ union parrot_context_t;
 #define NEED_CONTINUATION ((PMC *)1)
 
 /*
+ * maximum sub recursion depth
+ */
+
+#define RECURSION_LIMIT 1000
+
+/*
  * Sub and Closure share a Parrot_sub structure.
  * Closures have additionally an 'outer_ctx'
  */

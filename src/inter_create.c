@@ -123,7 +123,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     interp->resume_flag = RESUME_INITIAL;
     /* main is called as a Sub too - this will get depth 0 then */
     CONTEXT(interp->ctx)->recursion_depth = -1;
-    interp->recursion_limit = 1000;
+    interp->recursion_limit = RECURSION_LIMIT;
 
     /* Must initialize flags here so the GC_DEBUG stuff is available before
      * mem_setup_allocator() is called. */
