@@ -52,7 +52,7 @@ mark_context(Interp *interp, parrot_context_t* ctx)
      * and GC the continuation
      */
     obj = (PObj*)interp->current_cont;
-    if (obj && obj != NEED_CONTINUATION)
+    if (obj && obj != (PObj*)NEED_CONTINUATION)
         pobject_lives(interp, obj);
     obj = (PObj*)ctx->current_cont;
     if (obj && !PObj_live_TEST(obj))

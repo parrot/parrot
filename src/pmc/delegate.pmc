@@ -199,7 +199,7 @@ useful defaults and don't throw exceptions.
 
 /*
 
-=item C<void *invoke(void *next)>
+=item C<opcode_t *invoke(void *next)>
 
 Invokes a subroutine.
 
@@ -207,7 +207,7 @@ Invokes a subroutine.
 
 */
 
-    void* invoke(void *next) {
+    opcode_t* invoke(void *next) {
         STRING *meth = CONST_STRING(interp, "__invoke");
         STRING *meth_v = CONST_STRING(interp, "invoke");
         PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);

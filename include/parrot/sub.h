@@ -108,7 +108,7 @@ union parrot_context_t;
  * a flag to signal a Sub that a new RetContinuation should be created
  */
 
-#define NEED_CONTINUATION ((void*)1)
+#define NEED_CONTINUATION ((PMC *)1)
 
 /*
  * Sub and Closure share a Parrot_sub structure.

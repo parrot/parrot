@@ -33,7 +33,7 @@ Bind the object C<obj> to this call instance.
 
 Return the bound object.
 
-=item C<void *invoke(void *next)>
+=item C<opcode_t *invoke(void *next)>
 
 Calls the associated C method, returning C<*next>.
 
@@ -55,7 +55,7 @@ Set the bound object live.
         return PMC_pmc_val(SELF);
     }
 
-    void* invoke(void * next) {
+    opcode_t* invoke(void * next) {
         if (PObj_get_FLAGS(SELF) & PObj_private0_FLAG) {
             /* bound multi sub
              * XXX maybe create separate PMC class

@@ -279,7 +279,7 @@ Create a new complex PMC with passed arguments according to pdd03.
 
 /*
 
-=item C<void* invoke(void* next)>
+=item C<opcode_t* invoke(void* next)>
 
 Pythonic object constructor. SELF is a Complex Class object. Return a new
 C<complex> object according to 2.1. Built-in Functions.
@@ -287,7 +287,7 @@ C<complex> object according to 2.1. Built-in Functions.
 =cut
 
 */
-    void* invoke(void* next) {
+    opcode_t* invoke(void* next) {
         int argcP = REG_INT(3);
         PMC *res = pmc_new(INTERP, enum_class_Complex);
         if (argcP == 1) {

@@ -82,7 +82,7 @@ Initializes the exception handler.
         return result;
     }
 
-    void* invoke(void* ex) {
+    opcode_t* invoke(void* ex) {
         struct Parrot_cont * cc = PMC_cont(SELF);
         PMC *exception = ex;
         parrot_context_t *ex_ctx;

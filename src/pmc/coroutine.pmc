@@ -120,7 +120,7 @@ Clone the couroutine.
 
 /*
 
-=item C<void *invoke(void *next)>
+=item C<opcode_t *invoke(void *next)>
 
 Swaps the "context".
 
@@ -128,7 +128,7 @@ Swaps the "context".
 
 */
 
-    void* invoke(void* next) {
+    opcode_t* invoke(void* next) {
         struct Parrot_coro * co = PMC_coro(SELF);
         parrot_context_t *caller_ctx;
         struct PackFile_ByteCode *wanted_seg;

@@ -57,7 +57,7 @@ pmclass MultiSub extends ResizablePMCArray need_ext does array {
                 "attempt to set non Sub PMC");
     }
 
-    void* invoke(void *next) {
+    opcode_t* invoke(void *next) {
         PMC *list = Parrot_mmd_sort_candidate_list(interp, SELF);
         PMC *func = PMCNULL;
         if (!PMC_IS_NULL(list))

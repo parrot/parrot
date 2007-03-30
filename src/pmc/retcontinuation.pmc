@@ -74,7 +74,7 @@ the GC gets at them.
     }
 /*
 
-=item C<void *invoke(void *next)>
+=item C<opcode_t *invoke(void *next)>
 
 Transfers control to the calling context, and frees the current context.
 
@@ -82,7 +82,7 @@ Transfers control to the calling context, and frees the current context.
 
 */
 
-    void* invoke(void* next) {
+    opcode_t* invoke(void* next) {
         struct Parrot_cont * cc = PMC_cont(SELF);
         parrot_context_t *from_ctx = cc->from_ctx;
         struct PackFile_ByteCode * const seg = cc->seg;

@@ -217,7 +217,7 @@ Returns whether the subroutine is defined.
 
 /*
 
-=item C<void *invoke(void *next)>
+=item C<opcode_t *invoke(void *next)>
 
 Restores the "context" of the interpreter and returns the branch
 destination to continue execution.
@@ -226,7 +226,7 @@ destination to continue execution.
 
 */
 
-    void* invoke(void* next) {
+    opcode_t* invoke(void* next) {
         struct Parrot_cont * cc = PMC_cont(SELF);
         Stack_Chunk_t *stack_target = cc->dynamic_state;
         Stack_Chunk_t *corresponding_target;

@@ -284,7 +284,7 @@ Returns the thread id of the interpreter.
 
 /*
 
-=item C<void *invoke(void *next)>
+=item C<opcode_t *invoke(void *next)>
 
 Runs the interpreter's byte code.
 
@@ -292,7 +292,7 @@ Runs the interpreter's byte code.
 
 */
 
-    void* invoke(void* next) {
+    opcode_t* invoke(void* next) {
         Interp * new_interp =
             (Interp *)PMC_data(SELF);
         /*

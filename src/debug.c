@@ -1973,6 +1973,13 @@ PDB_eval(Interp *interp, const char *command)
     struct PackFile *eval_pf;
     struct PackFile_ByteCode *old_cs;
 
+    /*
+    The replacement code is almost certainly wrong. The previous
+    code is almost certainly wrong as well. Obviously, the
+    Parrot debugger needs some love.
+    */
+
+#if 0
     eval_pf = PDB_compile(interp, command);
 
     if (eval_pf) {
@@ -1982,11 +1989,17 @@ PDB_eval(Interp *interp, const char *command)
         Parrot_switch_to_cs(interp, old_cs, 1);
        /* TODO destroy packfile */
     }
+#endif
+
+    run = PDB_compile(interp, command);
+    if (run) {
+        DO_OP(run,interp);
+    }
 }
 
 /*
 
-=item C<struct PackFile *
+=item C<opcode_t *
 PDB_compile(Interp *interp, const char *command)>
 
 Compiles instructions with the PASM compiler.
@@ -2000,12 +2013,12 @@ which generates a malloced string.
 
 */
 
-struct PackFile *
+opcode_t *
 PDB_compile(Interp *interp, const char *command)
 {
     STRING *buf;
     const char *end = "\nend\n";
-    PMC * compiler, *code;
+    PMC * compiler;
     STRING *key = const_string(interp, "PASM");
     PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interp,
             interp->iglobals, IGLOBALS_COMPREG_HASH);
@@ -2017,8 +2030,7 @@ PDB_compile(Interp *interp, const char *command)
     }
     buf = Parrot_sprintf_c(interp, "%s%s", command, end);
 
-    code = VTABLE_invoke(interp, compiler, buf);
-    return PMC_struct_val(code);
+    return VTABLE_invoke(interp, compiler, buf);
 }
 
 /*

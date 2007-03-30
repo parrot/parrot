@@ -140,7 +140,7 @@ Returns whether the NCI is defined.
 
 /*
 
-=item C<void *invoke(void *next)>
+=item C<opcode_t *invoke(void *next)>
 
 Calls the associated C function, returning C<*next>. If
 the invocant is a class, the PMC arguments are
@@ -150,7 +150,7 @@ shifted down.
 
 */
 
-    void* invoke(void * next) {
+    opcode_t* invoke(void * next) {
         typedef INTVAL(*nci_sub_t)(Interp * , PMC * );
         nci_sub_t func = PObj_flag_TEST(private2, SELF)
             ? (nci_sub_t) PMC_struct_val(SELF)

@@ -25,7 +25,7 @@ pmclass Compiler extends NCI need_ext {
 
 /*
 
-=item C<void *invoke(void *code_ptr)>
+=item C<opcode_t *invoke(void *code_ptr)>
 
 Compiles the source code starting at C<code_ptr> and returns a new
 C<Eval> PMC with a new PackFile attached.
@@ -34,7 +34,7 @@ C<Eval> PMC with a new PackFile attached.
 
 */
 
-    void* invoke(void * code_ptr) {
+    opcode_t* invoke(void * code_ptr) {
         return SUPER(code_ptr);
     }
 }

@@ -386,6 +386,7 @@ sub find_type {
         'void'     => 'void',
         'UINTVAL'  => 'Parrot_Int',
         'size_t'   => 'size_t',
+        'opcode_t*'  => 'Parrot_Opcode*',
     );
 
     die "Unknown type $type\n" unless exists $typemap{$type};

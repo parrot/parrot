@@ -124,7 +124,7 @@ pmclass Eval extends Sub need_ext {
     }
 /*
 
-=item C<void *invoke(void *next)>
+=item C<opcode_t *invoke(void *next)>
 
 Invokes the first subroutine in the eval code.
 
@@ -132,7 +132,7 @@ Invokes the first subroutine in the eval code.
 
 */
 
-    void* invoke(void *next) {
+    opcode_t* invoke(void *next) {
         PMC *sub = SELF.get_pmc_keyed_int(0);
         return VTABLE_invoke(INTERP, sub, next);
     }

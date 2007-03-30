@@ -311,7 +311,7 @@ Sets the PMC associated with C<key> to C<*value>.
 
 /*
 
-=item C<void *invoke(void *next)>
+=item C<opcode_t *invoke(void *next)>
 
 Adds the timer to the event queue.
 
@@ -319,7 +319,7 @@ Adds the timer to the event queue.
 
 */
 
-    void* invoke(void *next) {
+    opcode_t* invoke(void *next) {
         add_timer(INTERP, SELF);
         return next;
     }

@@ -84,7 +84,7 @@ Invokes the closure.
         sub->start_offs = addr -  sub->seg->base.data;
     }
 
-    void* invoke(void* next) {
+    opcode_t* invoke(void* next) {
         struct Parrot_sub * sub = PMC_sub(SELF);
         PMC *cont, *outer_sub;
 
