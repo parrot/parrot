@@ -1,10 +1,10 @@
 #ifndef __PIROUT_H
 #  define __PIROUT_H
 
+/* predeclare */
+struct pirvtable;
 
-#  include "pirparser.h"
-
-extern void pirout(struct parser_state *parser);
+extern struct pirvtable *init_pir_vtable(void);
 
 #endif
 

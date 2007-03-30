@@ -2,17 +2,30 @@
 #include "pirlexer.h"
 #include "pirparser.h"
 #include <stdio.h>
+#include <malloc.h>
 
-/* pirout()
- *
- * Prints the current token from the specified parser.
- * NOT COMPLETE YET, and no fancy output as well...
- */
-void
+/* 
+
+=head1 API
+
+=over 4
+
+=item pirout()
+
+Prints the current token from the specified parser.
+NOT COMPLETE YET, and no fancy output as well...
+
+=cut
+
+*/
+static void
 pirout(struct parser_state *p) {
     struct lexer_state const *l = get_lexer(p);
     token t = get_token(p);
 
+    /*fprintf(stderr, "pirout:\n");
+    */
+    
     switch (t) {
         case T_RPAREN:            /* HACK */
             fprintf(stderr, ")"); /* and print newline as well, nec. for macros */
@@ -41,6 +54,37 @@ pirout(struct parser_state *p) {
     }
 
 }
+
+
+/*
+
+=item init_pir_vtable()
+
+Creates a vtable for the PIR emitting module, and
+then this vtable is set into the parser_state struct.
+
+=cut
+
+*/
+pirvtable *
+init_pir_vtable(void) {
+    pirvtable *vtable = (pirvtable *)malloc(sizeof(pirvtable));
+    
+    vtable->sub_start = pirout;
+    vtable->sub_end   = pirout;
+    
+    return vtable;
+}
+
+
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

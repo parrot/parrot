@@ -55,7 +55,10 @@ Clean up grammar after discussion.
 
 #include "pirlexer.h"
 #include "pirparser.h"
+#include "pirvtable.h"
+
 #include "pirout.h" /* for test output */
+#include "pastout.h" /* experimental output of PAST */
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -86,7 +89,8 @@ typedef struct parser_state {
     char    *heredoc_ids[10];
     unsigned heredoc_index;
     unsigned parse_errors;
-
+    pirvtable *vtable;
+    
 } parser_state;
 
 
@@ -96,9 +100,11 @@ typedef struct parser_state {
 
 /* call next() to get the next token from the lexer */ /* NOTE: it's calling pirout() */
 
-/* #define next(P) P->curtoken = next_token(P->lexer) */
+#define next(P) P->curtoken = next_token(P->lexer) 
 
+/*
 #define next(P) do { pirout(P); P->curtoken = next_token(P->lexer); } while(0)
+*/
 
 
 /*
@@ -122,6 +128,8 @@ exit_parser(parser_state *p) {
     p = NULL;
     exit(0);
 }
+
+
 
 /*
 
@@ -147,7 +155,7 @@ constructor for a parser_state object.
 
 */
 parser_state *
-new_parser(char const * filename) {
+new_parser(char const * filename, outputtype output) {
     parser_state *p = (parser_state *)malloc(sizeof(parser_state));
 
     if (p == NULL) {
@@ -158,6 +166,19 @@ new_parser(char const * filename) {
     p->curtoken      = next_token(p->lexer);
     p->parse_errors  = 0;
     p->heredoc_index = 0;
+    
+    switch (output) {
+        case OUTPUT_PIR:
+            p->vtable = init_pir_vtable();
+            break;
+        case OUTPUT_PAST:
+            p->vtable = init_past_vtable();
+            break;            
+        default:
+            fprintf(stderr, "Unknown output type specified\n");
+            exit(1);
+    }
+    
     return p;
 }
 
@@ -1785,13 +1806,20 @@ sub_definition(parser_state *p) {
 
     if (p->curtoken == T_IDENTIFIER) match(p, T_IDENTIFIER);
     else stringconstant(p);
-
+        
+    /* call emit method */    
+    emit_sub_start(p);    
+    
     sub_flags(p);
 
     match(p, T_NEWLINE);
     parameters(p);
     instructions(p);
     match(p, T_END);
+    
+    /* call emit method */
+    emit_sub_end(p);
+    
 }
 
 /*
