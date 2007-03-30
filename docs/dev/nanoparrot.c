@@ -118,7 +118,7 @@ run(Interp *interpreter, opcode_t *pc) \
 #  define ENDDISPATCH
 #  define CASE(function) \
 static opcode_t * \
-function (opcode_t *pc, Interp *interpreter) \
+function(opcode_t *pc, Interp *interpreter) \
 { \
 
 #  define NEXT return pc; }
@@ -138,11 +138,11 @@ run(Interp *interpreter, opcode_t *pc)
     for (;;) { \
         printf("PC %2d %s\n", pc - interpreter->code->byte_code, \
                 interpreter->op_info[*pc]); \
-        switch(*pc) {
+        switch (*pc) {
 #    else
 #      define DISPATCH \
     for (;;) { \
-        switch(*pc) {
+        switch (*pc) {
 #    endif
 
 #    define CASE(x)         case OP_ ## x:
@@ -219,12 +219,12 @@ init(Interp *interpreter, opcode_t *prog)
     /*
      * create 1 register frame
      */
-    interpreter->bp = calloc(NUM_REGISTERS, sizeof(struct Reg));
+    interpreter->bp = calloc(NUM_REGISTERS, sizeof (struct Reg));
     /*
      * and some space for opcodes
      */
-    interpreter->op_func = malloc(OP_MAX * sizeof(void*));
-    interpreter->op_info = malloc(OP_MAX * sizeof(char*));
+    interpreter->op_func = malloc(OP_MAX * sizeof (void*));
+    interpreter->op_info = malloc(OP_MAX * sizeof (char*));
     /*
      * define opcode function and opcode info
      */
@@ -238,14 +238,14 @@ init(Interp *interpreter, opcode_t *prog)
     /*
      * the "packfile"
      */
-    interpreter->code = malloc(sizeof(struct pf));
+    interpreter->code = malloc(sizeof (struct pf));
     interpreter->code->byte_code = prog;
 
     /*
      * create a simplified constant table
      */
 #define N_CONSTS 4
-    interpreter->code->const_table = malloc(N_CONSTS * sizeof(char*));
+    interpreter->code->const_table = malloc(N_CONSTS * sizeof (char*));
     interpreter->code->const_table[0] = "\n";
     interpreter->code->const_table[1] = "done\n";
     interpreter->code->const_table[2] = "error\n";
@@ -278,7 +278,7 @@ main(int argc, char *argv[]) {
           OP_print_sc, 3,       /* L1: print "usage...\n" */
           OP_end                /* end */
         };
-    Interp *interpreter = malloc(sizeof(Interp));
+    Interp *interpreter = malloc(sizeof (Interp));
 
     prog = usage;
     if (argc > 1) {
