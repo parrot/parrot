@@ -113,7 +113,7 @@ Marks the string as live.
 
 */
     void mark () {
-        if(PMC_str_val(SELF))
+        if (PMC_str_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_str_val(SELF));
     }
 
