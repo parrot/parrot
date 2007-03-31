@@ -1493,6 +1493,7 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
     interp->current_object = pmc;
     interp->current_cont = NEED_CONTINUATION;
     ctx->current_cont = ret_cont;
+    PMC_cont(ret_cont)->from_ctx = ctx;
     pccinvoke_meth = VTABLE_find_method(interp, pmc, method_name);
     if (!pccinvoke_meth) {
         real_exception(interp, NULL, METH_NOT_FOUND, "Method '%Ss' not found", method_name);

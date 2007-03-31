@@ -380,6 +380,7 @@ sub rewrite_pccmethod {
     PMC* ccont = caller_ctx->current_cont;
 
     ctx->current_cont = ret_cont;
+    PMC_cont(ret_cont)->from_ctx = ctx;
 
     current_args = interp->current_args;
     interp->current_args = NULL;
@@ -518,6 +519,7 @@ $arg_accessors
       interp->current_object = $invocant;
       interp->current_cont = NEED_CONTINUATION;
       ctx->current_cont = ret_cont;
+      PMC_cont(ret_cont)->from_ctx = ctx;
       pccinvoke_meth = VTABLE_find_method(interp, $invocant, $method_name);
       if (!pccinvoke_meth) {
           real_exception(interp, NULL, METH_NOT_FOUND, "Method '%Ss' not found", $method_name);
