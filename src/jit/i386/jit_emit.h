@@ -205,13 +205,13 @@ emit_r_X(char *pc, int reg_opcode, int base, int i, int scale, long disp)
     if (base == emit_EBP) {
     /* modrm disp */
         if (i == emit_None) {
-            *(pc++) = (char) (emit_is8bit(disp) ? emit_Mod_b01 : emit_Mod_b10 )
+            *(pc++) = (char) (emit_is8bit(disp) ? emit_Mod_b01 : emit_Mod_b10)
                 | reg_opcode | emit_reg_rm(emit_EBP);
             return emit_disp8_32(pc, disp);
         }
         /* modrm sib disp */
         else {
-            *(pc++) = (char) (emit_is8bit(disp) ? emit_Mod_b01 : emit_Mod_b10 )
+            *(pc++) = (char) (emit_is8bit(disp) ? emit_Mod_b01 : emit_Mod_b10)
                 | reg_opcode | emit_b100;
             emit_sib(pc++, scale, i, base);
             return emit_disp8_32(pc, disp);
@@ -220,7 +220,7 @@ emit_r_X(char *pc, int reg_opcode, int base, int i, int scale, long disp)
 
     /* modrm sib disp */
     if (base == emit_ESP) {
-        *(pc++) = (char) (emit_is8bit(disp) ? emit_Mod_b01 : emit_Mod_b10 )
+        *(pc++) = (char) (emit_is8bit(disp) ? emit_Mod_b01 : emit_Mod_b10)
                 | reg_opcode | emit_rm_b100;
         emit_sib(pc++, scale, i, emit_ESP);
         return emit_disp8_32(pc, disp);
@@ -239,7 +239,7 @@ emit_r_X(char *pc, int reg_opcode, int base, int i, int scale, long disp)
     /* Ok, everything should be more regular here */
     *(pc++) = (char) (disp == 0 ? emit_Mod_b00 :
               (emit_is8bit(disp) ?
-               emit_Mod_b01 : emit_Mod_b10) ) |
+               emit_Mod_b01 : emit_Mod_b10)) |
                reg_opcode |
                (!base || (scale && i) ? emit_rm_b100 : emit_reg_rm(base));
 
@@ -2271,7 +2271,7 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
        jit_info->native_ptr, f); \
        emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
 /* emit a call to a vtable func
- * $X->vtable(interp, $X [, $Y...] )
+ * $X->vtable(interp, $X [, $Y...])
  */
 #  define MAP(i) jit_info->optimizer->map_branch[jit_info->op_i + (i)]
 
@@ -2965,8 +2965,7 @@ jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp *interp, int skip)
         emitm_movl_r_m(NATIVECODE, reg_info->map_I[i], emit_ESP,
                             emit_None, 1,
                             (used_n * sizeof (FLOATVAL) +
-                             i      * sizeof (INTVAL))
-                            );
+                             i      * sizeof (INTVAL)));
     }
     for (i = 0; i < used_n; ++i) {
         if (reg_info->map_F[i] == skip)
@@ -2995,8 +2994,7 @@ jit_restore_regs_call(Parrot_jit_info_t *jit_info, Interp *interp,
         emitm_movl_m_r(NATIVECODE, reg_info->map_I[i], emit_ESP,
                             emit_None, 1,
                             (used_n * sizeof (FLOATVAL) +
-                             i      * sizeof (INTVAL))
-                            );
+                             i      * sizeof (INTVAL)));
     }
     for (i = 0; i < used_n; ++i) {
         if (reg_info->map_F[i] == skip)
@@ -3133,8 +3131,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp *interp,
                             emitm_movl_m_r(NATIVECODE, params_map, emit_ESP,
                                     emit_None, 1,
                                     (used_n * sizeof (FLOATVAL) +
-                                     j  * sizeof (INTVAL))
-                                    );
+                                     j  * sizeof (INTVAL)));
                             break;
                         }
                     }
@@ -3200,7 +3197,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp *interp,
  */
 
 #  define jit_emit_noop(pc) do { \
-     switch ( ((unsigned long) pc) & 3) { \
+     switch (((unsigned long) pc) & 3) { \
        case 1: *pc++ = (char) 0x8d; *pc++ = (char) 0x76; *pc++ = (char) 0x00; break; \
        case 2: *pc++ = (char) 0x89; *pc++ = (char) 0xf6; break; \
        case 3: *pc++ = (char) 0x90; break; \

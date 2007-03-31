@@ -35,7 +35,7 @@ typedef enum {
     BP   = r13,         /* register base pointer (peristent) */
     OP_MAP = r14,       /* cached op_map (persistent) */
     CODE_START = r15,   /* cached code begint (persistent) */
-    INTERP = r16,       /* cached interpreter register (persistent( */
+    INTERP = r16,       /* cached interpreter register (persistent) */
     r17,
     ...
     r31
@@ -203,7 +203,7 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 /*
  * release stack frame end exit see core.jit
  */
-static void Parrot_end_jit(Parrot_jit_info_t *, Interp * );
+static void Parrot_end_jit(Parrot_jit_info_t *, Interp *);
 
 #  undef Parrot_jit_restart_op
 /*

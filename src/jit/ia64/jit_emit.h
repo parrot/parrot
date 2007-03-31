@@ -109,7 +109,7 @@ enum {
     pc = loadinst(pc, ((long)((imm64 >> 22) & (long)0x1fffffffffff)), IT_L); \
     it = ((long)6 << 37) | \
         ((long)((imm64 >> 63) & 0x1)     << 36) | \
-        ((long)((imm64 >> 7 ) & 0x1ff)     << 27) | \
+        ((long)((imm64 >> 7) & 0x1ff)     << 27) | \
         ((long)((imm64 >> 21) & 0x1)     << 21) | \
         ((long)((imm64 >> 16) & 0x1f)     << 22) | \
         ((long)((imm64           & 0x7f))     << 13) | \
@@ -760,8 +760,7 @@ ia64_sync_cache (void *_start, void *_end)
         "srlz.i\n"
         ";;\n"
         :
-        : "r" ((long)_sync)
-        );
+        : "r" ((long)_sync));
     }
 }
 

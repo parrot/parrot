@@ -832,7 +832,7 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
     jit_emit_branch_to_opcode(jit_info->native_ptr, r3);
 }
 
-static void Parrot_end_jit(Parrot_jit_info_t *, Interp * );
+static void Parrot_end_jit(Parrot_jit_info_t *, Interp *);
 
 #  undef Parrot_jit_restart_op
 /* Parrot_jit_restart_op is based on the i386 version */
@@ -1081,7 +1081,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     jit_emit_mflr(jit_info->native_ptr, r0);
     jit_emit_stmw(jit_info->native_ptr, r13, -PPC_JIT_GP_REGISTER_SAVE_SPACE, r1);
 
-    for ( i = 1; i <= 18; ++i )
+    for (i = 1; i <= 18; ++i)
     {
         jit_emit_stfd(jit_info->native_ptr, (i + 13), (-PPC_JIT_GP_REGISTER_SAVE_SPACE - i*8), r1);
     }
@@ -1223,14 +1223,14 @@ jit_mov_mr_offs(Parrot_jit_info_t *jit_info, int base, INTVAL offs, int reg)
 static void
 jit_mov_rm_offs(Parrot_jit_info_t *jit_info, int reg, int base, INTVAL offs)
 {
-    jit_emit_mov_rm_i( jit_info->native_ptr, reg, offs);
+    jit_emit_mov_rm_i(jit_info->native_ptr, reg, offs);
 }
 
 /* move reg to mem (i.e. numreg) */
 static void
 jit_mov_mr_n_offs(Parrot_jit_info_t * jit_info, int base, INTVAL offs, int reg)
 {
-    jit_emit_mov_mr_n( jit_info->native_ptr, offs, reg);
+    jit_emit_mov_mr_n(jit_info->native_ptr, offs, reg);
     jit_info->prev_op = 0;
 }
 
@@ -1306,8 +1306,7 @@ ppc_flush_line(char *_sync)
     __asm__ __volatile__ (
     "dcbf 0,%0"
     :
-    : "r" ((long)_sync)
-    );
+    : "r" ((long)_sync));
 }
 
 void
