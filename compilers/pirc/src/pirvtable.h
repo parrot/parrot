@@ -17,6 +17,8 @@ typedef struct pirvtable {
 	void (* end)         (struct parser_state *p);
 	void (* param_start) (struct parser_state *p);
 	void (* param_end)   (struct parser_state *p);
+	void (* type)        (struct parser_state *p, char *type);
+
 
 } pirvtable;
 
@@ -32,6 +34,7 @@ typedef struct pirvtable {
 #  define emit_end(P)               (*P->vtable->end)        (P)
 #  define emit_param_start(P)       (*P->vtable->param_start)(P)
 #  define emit_param_end(P)         (*P->vtable->param_end)  (P)
+#  define emit_type(P,T)            (*P->vtable->type)       (P,T)
 
 extern pirvtable *new_pirvtable(void);
 

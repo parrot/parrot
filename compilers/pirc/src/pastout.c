@@ -120,6 +120,11 @@ past_param(struct parser_state *p) {
     fprintf(OUT, "%*s<scope> => \"parameter\"\n", indent, " ");
 }
 
+static void
+past_type(struct parser_state *p, char *type) {
+    fprintf(OUT, "%*s<type> => \"%s\"\n", indent, " ", type);
+}
+
 
 /*
 
@@ -145,6 +150,8 @@ init_past_vtable(void) {
     vtable->end          = past_close;
     vtable->param_start  = past_param;
     vtable->param_end    = past_close;
+    vtable->type         = past_type;
+
     return vtable;
 }
 

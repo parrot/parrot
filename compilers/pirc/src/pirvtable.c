@@ -79,6 +79,7 @@ new_pirvtable(void) {
     vtable->end         = not_implemented;
     vtable->param_start = not_implemented;
     vtable->param_end   = not_implemented;
+    vtable->type        = not_implemented;
 
     return vtable;
 }

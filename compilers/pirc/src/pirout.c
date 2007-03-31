@@ -84,6 +84,11 @@ pir_param(struct parser_state *p) {
     fprintf(OUT, "\t.param ");
 }
 
+static void
+pir_type(struct parser_state *p, char *type) {
+    fprintf(OUT, "%s", type);
+}
+
 /*
 
 =item init_pir_vtable()
@@ -105,6 +110,7 @@ init_pir_vtable(void) {
     vtable->stmts_start = pir_newline;
     vtable->param_start = pir_param;
     vtable->param_end   = pir_newline;
+    vtable->type        = pir_type;
 
     return vtable;
 }

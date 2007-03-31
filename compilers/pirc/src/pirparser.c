@@ -1757,20 +1757,34 @@ parameters(parser_state *p) {
             case T_NUM:
             case T_PMC:
             case T_STRING:
-                type(p);
+                emit_type(p, get_current_token(p->lexer));
+                /* type(p); -- we know what it is; just skip it! */
+                next(p);
+
+                /* Maybe combine these 2 statements into an 'identifier'() function? */
                 emit_name(p, get_current_token(p->lexer));
                 match(p, T_IDENTIFIER);
                 param_flags(p);
                 break;
             case T_PREG:
-            case T_NREG:
-            case T_SREG:
-            case T_IREG:
             case T_PASM_PREG:
+                next(p);
+                emit_type(p, "pmc");
+                break;
+            case T_NREG:
             case T_PASM_NREG:
+                next(p);
+                emit_type(p, "num");
+                break;
+            case T_SREG:
             case T_PASM_SREG:
+                next(p);
+                emit_type(p, "string");
+                break;
+            case T_IREG:
             case T_PASM_IREG:
                 next(p);
+                emit_type(p, "int");
                 break;
             default:
                 syntax_error(p, 1, "type or register expected");
