@@ -72,14 +72,12 @@ find_or_die(Interp *interp, PMC *pmc, STRING *meth) {
                 string_to_cstring(interp, meth),
                 string_to_cstring(interp, PMC_str_val(
                         get_attrib_num((SLOTTYPE *)PMC_data(class),
-                            PCD_CLASS_NAME)))
-                );
+                            PCD_CLASS_NAME))));
         }
         else {
             real_exception(interp, NULL, E_LookupError,
                 "Can't find method '%s' - erroneous PMC",
-                string_to_cstring(interp, meth)
-                );
+                string_to_cstring(interp, meth));
         }
     }
     return returnPMC;

@@ -188,7 +188,7 @@ Returns the integer value of the element at index C<key>.
             real_exception(INTERP, NULL, E_IndexError,
                 "FixedBooleanArray: index out of bounds!");
 
-        return (sd[key/BITS_PER_CHAR] & ( 1 << ( key % BITS_PER_CHAR ))) ? 1:0;
+        return (sd[key/BITS_PER_CHAR] & (1 << (key % BITS_PER_CHAR))) ? 1:0;
     }
 
 /*
@@ -338,11 +338,11 @@ Sets the integer value of the element at index C<key> to C<value>.
             real_exception(INTERP, NULL, E_IndexError,
                 "FixedBooleanArray: index out of bounds!");
 
-        if ( value ) {
-            sd[key/BITS_PER_CHAR] |= ( 1 << ( key % BITS_PER_CHAR ) );
+        if (value) {
+            sd[key/BITS_PER_CHAR] |= (1 << (key % BITS_PER_CHAR));
         }
         else {
-            sd[key/BITS_PER_CHAR] &= ( ~ ( 1 << ( key % BITS_PER_CHAR ) ) );
+            sd[key/BITS_PER_CHAR] &= (~ (1 << (key % BITS_PER_CHAR)));
         }
     }
 
@@ -373,7 +373,7 @@ C<value>.
 */
 
     void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        DYNSELF.set_integer_keyed_int(key, ( value ? 1 : 0 ));
+        DYNSELF.set_integer_keyed_int(key, (value ? 1 : 0));
     }
 
 /*

@@ -183,11 +183,11 @@ Sets the value of the string to the integer C<value>.
 */
 
     void set_integer_native(INTVAL value) {
-        DYNSELF.set_string_native( string_from_int(INTERP, value) );
+        DYNSELF.set_string_native(string_from_int(INTERP, value));
     }
 
     void set_bool(INTVAL value) {
-        DYNSELF.set_string_native( string_from_int(INTERP, value) );
+        DYNSELF.set_string_native(string_from_int(INTERP, value));
     }
 
 /*
@@ -201,7 +201,7 @@ Sets the value of the string to the floating-point C<value>.
 */
 
     void set_number_native(FLOATVAL value) {
-        DYNSELF.set_string_native( string_from_num(INTERP, value) );
+        DYNSELF.set_string_native(string_from_num(INTERP, value));
     }
 
 
@@ -261,7 +261,7 @@ the specified C<PMC>.
 
 */
     void set_pmc(PMC* value) {
-        DYNSELF.set_string_native( VTABLE_get_string(INTERP, value) );
+        DYNSELF.set_string_native(VTABLE_get_string(INTERP, value));
     }
 
 /*
@@ -476,8 +476,7 @@ class and their strings are aliases of the same internal string.
         STRING *v = VTABLE_get_string(INTERP, value);
         return (INTVAL)(
                 value->vtable == SELF->vtable &&
-                s == v
-            );
+                s == v);
     }
 
 /*
@@ -580,7 +579,7 @@ numbers count from the end.
     INTVAL exists_keyed(PMC* key) {
         INTVAL n = string_length(INTERP, VTABLE_get_string(INTERP, SELF));
         INTVAL k = VTABLE_get_integer(INTERP, key);
-        return (INTVAL)( (k>=0 && k<=n) || (k<0 && -k<=n) );
+        return (INTVAL)((k>=0 && k<=n) || (k<0 && -k<=n));
     }
 
 /*
@@ -799,7 +798,7 @@ Used to unarchive the string.
         IMAGE_IO *io = info->image_io;
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
-            DYNSELF.set_string_native( io->vtable->shift_string(INTERP, io) );
+            DYNSELF.set_string_native(io->vtable->shift_string(INTERP, io));
     }
 /*
 

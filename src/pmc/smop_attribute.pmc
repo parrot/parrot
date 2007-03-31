@@ -90,11 +90,11 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
 */
     PCCMETHOD void name(PMC *name :optional, int got_name :opt_flag) {
         STRING *name_attr = NULL;
-        if ( got_name ) {
+        if (got_name) {
             SMOP_attr(SELF)->name = VTABLE_get_string(interp, name);
         }
         name_attr = SMOP_attr(SELF)->name;
-        PCCRETURN( STRING *name_attr );
+        PCCRETURN(STRING *name_attr);
     }
 /*
 
@@ -107,11 +107,11 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
 */
     PCCMETHOD void class(PMC *class :optional, int got_class :opt_flag) {
         PMC *class_attr = NULL;
-        if ( got_class ) {
+        if (got_class) {
             SMOP_attr(SELF)->class_ = class;
         }
         class_attr = SMOP_attr(SELF)->class_;
-        PCCRETURN( PMC *class_attr );
+        PCCRETURN(PMC *class_attr);
     }
 /*
 
@@ -124,11 +124,11 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
 */
     PCCMETHOD void type(PMC *type :optional, int got_type :opt_flag) {
         STRING *type_string = NULL;
-        if ( got_type ) {
+        if (got_type) {
             SMOP_attr(SELF)->type_ = VTABLE_get_string(interp, type);
         }
         type_string = SMOP_attr(SELF)->type_;
-        PCCRETURN( STRING *type_string );
+        PCCRETURN(STRING *type_string);
     }
 }
 

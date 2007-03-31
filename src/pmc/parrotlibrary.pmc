@@ -95,7 +95,7 @@ Returns whether a library has been successfully loaded.
 */
 
     INTVAL get_bool() {
-        return ( PMC_data(SELF) != NULL );
+        return (PMC_data(SELF) != NULL);
     }
 
 /*

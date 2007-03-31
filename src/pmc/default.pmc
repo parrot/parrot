@@ -181,8 +181,7 @@ static PMC*
 check_get_std_props(Interp *interp, PMC *self, STRING *key) {
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
         &&!string_compare(interp, key,
-                          string_from_cstring(interp, "_ro", 3))
-        ) {
+                          string_from_cstring(interp, "_ro", 3))) {
         PMC *ret_val;
         ret_val = pmc_new(interp, enum_class_Integer);
         PMC_int_val(ret_val) = 1;

@@ -34,10 +34,10 @@ TODO: PMCs extending Hash should probably register themselves.
 
 */
 
-static PMC* get_integer_pmc(Interp *interp, INTVAL base_type ) {
+static PMC* get_integer_pmc(Interp *interp, INTVAL base_type) {
 
     return pmc_new(interp,
-                   Parrot_get_ctx_HLL_type(interp, enum_class_Integer) );
+                   Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
 }
 
 
@@ -53,10 +53,10 @@ TODO: PMCs extending Hash should probably register themselves.
 
 */
 
-static PMC * get_number_pmc(Interp *interp, INTVAL base_type ) {
+static PMC * get_number_pmc(Interp *interp, INTVAL base_type) {
 
     return pmc_new(interp,
-                   Parrot_get_ctx_HLL_type(interp, enum_class_Float) );
+                   Parrot_get_ctx_HLL_type(interp, enum_class_Float));
 }
 
 /*
@@ -71,10 +71,10 @@ TODO: PMCs extending Hash should probably register themselves.
 
 */
 
-static PMC * get_string_pmc(Interp *interp, INTVAL base_type ) {
+static PMC * get_string_pmc(Interp *interp, INTVAL base_type) {
 
     return pmc_new(interp,
-                   Parrot_get_ctx_HLL_type(interp, enum_class_String) );
+                   Parrot_get_ctx_HLL_type(interp, enum_class_String));
 }
 
 
@@ -604,7 +604,7 @@ Returns whether the hash is the same as C<*other>.
 */
 
     INTVAL is_same(PMC* other) {
-        return (INTVAL)( other->vtable == SELF->vtable &&
+        return (INTVAL)(other->vtable == SELF->vtable &&
             PMC_struct_val(other) == PMC_struct_val(SELF));
     }
 
@@ -902,7 +902,7 @@ Returns whether the value for C<*key> is defined.
         if (key == NULL)
             return VTABLE_defined(INTERP, (PMC*)b->value);
         else
-            return VTABLE_defined_keyed( INTERP, (PMC*)b->value, key);
+            return VTABLE_defined_keyed(INTERP, (PMC*)b->value, key);
     }
 
 /*

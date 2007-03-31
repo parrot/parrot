@@ -47,7 +47,7 @@ pmclass STMVar is_shared need_ext no_ro {
 
     void init_pmc(PMC* value) {
         PMC_struct_val(SELF) = NULL;
-        if (   value->vtable->base_type == enum_class_STMRef
+        if (value->vtable->base_type == enum_class_STMRef
             || value->vtable->base_type == enum_class_STMVar) {
             PMC_struct_val(SELF) = PMC_struct_val(value);
         }

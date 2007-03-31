@@ -1168,7 +1168,7 @@ Concatenate the string C<value> in place.
 
     void i_concatenate_str(STRING* value) {
         STRING* s = DYNSELF.get_string();
-        DYNSELF.set_string_native( string_append(INTERP, s, value));
+        DYNSELF.set_string_native(string_append(INTERP, s, value));
     }
 
 /*

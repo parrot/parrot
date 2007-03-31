@@ -102,7 +102,7 @@ bigint_get_string(Interp *interp, PMC *self, int base) {
 
 static double
 bigint_get_double(Interp *interp, PMC *self) {
-    return mpz_get_d( BN(self));
+    return mpz_get_d(BN(self));
 }
 
 static void

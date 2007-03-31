@@ -24,7 +24,7 @@ really slowing down the bytecode execution.
 static void
 show_backtrace(int ret, void *interp)
 {
-    PDB_backtrace( (Interp*)interp );
+    PDB_backtrace((Interp*)interp);
 }
 
 pmclass Null singleton {

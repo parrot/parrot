@@ -121,7 +121,7 @@ Resizes the array to C<size> elements.
         newASize = (size / MIN_ALLOC + 1) * MIN_ALLOC;
 
         /* Nothing allocated yet */
-        if ( ! PMC_data(SELF) ) {
+        if (! PMC_data(SELF)) {
             PMC_data(SELF) = mem_sys_allocate_zeroed(newASize);
         }
         else {
@@ -191,8 +191,7 @@ beginning.
             Parrot_UInt1 * const sdNew = mem_sys_allocate_zeroed(
                 ((PMC_int_val2(SELF) / MIN_ALLOC) * MIN_ALLOC)
                 + PMC_int_val(SELF)
-                + ((PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC)
-            );
+                + ((PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC));
             mem_sys_memmove(sdNew, sdOld + PMC_int_val2(SELF),
                 PMC_int_val(SELF));
             mem_sys_free(sdOld);
@@ -238,8 +237,7 @@ Removes and returns the first element.
             Parrot_UInt1 * const sdNew = mem_sys_allocate_zeroed(
                 ((PMC_int_val2(SELF) / MIN_ALLOC) * MIN_ALLOC)
                 + PMC_int_val(SELF)
-                + ((PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC)
-            );
+                + ((PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC));
             mem_sys_memmove(sdNew, sdOld + PMC_int_val2(SELF),
                 PMC_int_val(SELF));
             mem_sys_free(sdOld);

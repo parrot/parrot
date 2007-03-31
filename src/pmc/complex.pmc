@@ -81,7 +81,7 @@ complex_parse_string(Interp* interp,
         /* end of string; we only have a real part */
         second_num_length = 0;
     }
-    else if ( (*t == 'i' || *t == 'j') && *(t+1) == 0 ) {
+    else if ((*t == 'i' || *t == 'j') && *(t+1) == 0) {
         /* there is only an imaginary part, so the first number was
             actually the imaginary part */
         second_num_length = first_num_length;
@@ -115,7 +115,7 @@ complex_parse_string(Interp* interp,
             if (*t == ' ') t++; /* allow for one more optional space */
 
             /* verify that the string ends properly */
-            if ( (*t != 'i' && *t != 'j') || (*(t+1) != 0) ) {
+            if ((*t != 'i' && *t != 'j') || (*(t+1) != 0)) {
                 /* imaginary part does not end in 'i' or 'j' */
                 real_exception(interp, NULL, E_ValueError,
                     "Complex: malformed string");
@@ -1042,8 +1042,7 @@ Compares the complex number with C<value> and returns true if they are equal.
 MMD_Complex: {
             return (INTVAL)(
                     RE(SELF) == RE(value) &&
-                    IM(SELF) == IM(value)
-                );
+                    IM(SELF) == IM(value));
         }
 MMD_DEFAULT: {
             if (IM(SELF) != 0.0)

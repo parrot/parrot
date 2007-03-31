@@ -24,7 +24,7 @@ static int
 is_hash_iter(PMC *agg, PMC *key)
 {
     if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) ==
-        KEY_hash_iterator_FLAGS )
+        KEY_hash_iterator_FLAGS)
         return 1;
     return 0;
 }
@@ -62,7 +62,7 @@ Creates and returns a clone of the key.
         PMC *p;
 
         PObj_custom_mark_SET(dest);
-        for (; key ; ) {
+        for (; key ;) {
             switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
                 case KEY_integer_FLAG:
                 case KEY_integer_FLAG|KEY_register_FLAG:
