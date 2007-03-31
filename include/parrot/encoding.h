@@ -34,7 +34,7 @@ typedef UINTVAL (*encoding_bytes_t)(Interp*, STRING *src);
 
 struct string_iterator_t;       /* s. parrot/string.h */
 
-typedef void    (*encoding_iter_init_t)(Interp *, STRING *src,
+typedef void (*encoding_iter_init_t)(Interp *, STRING *src,
         struct string_iterator_t *);
 
 struct _encoding {

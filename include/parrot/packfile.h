@@ -56,7 +56,7 @@ struct PackFile_Segment;
 
 typedef struct PackFile_Segment * (*PackFile_Segment_new_func_t)
     (Interp *, struct PackFile *, const char *, int add);
-typedef void   (*PackFile_Segment_destroy_func_t) (Interp *,
+typedef void (*PackFile_Segment_destroy_func_t) (Interp *,
         struct PackFile_Segment *);
 typedef size_t (*PackFile_Segment_packed_size_func_t)(Interp *,
         struct PackFile_Segment *);
@@ -64,7 +64,7 @@ typedef opcode_t * (*PackFile_Segment_pack_func_t) (Interp *,
         struct PackFile_Segment *, opcode_t *dest);
 typedef opcode_t * (*PackFile_Segment_unpack_func_t) (Interp *,
         struct PackFile_Segment *, opcode_t *packed);
-typedef void  (*PackFile_Segment_dump_func_t) (Interp *,
+typedef void (*PackFile_Segment_dump_func_t) (Interp *,
         struct PackFile_Segment *);
 
 struct PackFile_funcs {
