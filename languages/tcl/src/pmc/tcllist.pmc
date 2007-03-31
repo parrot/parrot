@@ -61,7 +61,7 @@ Returns the list as a string
 
 */
 
-    STRING* get_string () {
+    STRING* get_string() {
         PMC *listToString, *namespace;
         STRING *_tcl_namespace, *sub, *value;
 
@@ -74,8 +74,7 @@ Returns the list as a string
 
         CONTEXT(INTERP->ctx)->constants =
           PMC_sub(listToString)->seg->const_table->constants;
-        value        = Parrot_runops_fromc_args
-                         (INTERP, listToString, "SP", SELF);
+        value = Parrot_runops_fromc_args(INTERP, listToString, "SP", SELF);
         return value;
     }
 
@@ -89,7 +88,7 @@ An alias to assign_pmc to make other things happy before set_pmc is removed.
 
 */
 
-    void set_pmc (PMC *other) {
+    void set_pmc(PMC *other) {
         VTABLE_assign_pmc(INTERP, SELF, other);
     }
 
@@ -105,7 +104,7 @@ Copy the contents of other to self.
 
 */
 
-    void assign_pmc (PMC *other) {
+    void assign_pmc(PMC *other) {
         STRING *array  = string_from_const_cstring(INTERP, "array", 5);
         STRING *string = string_from_const_cstring(INTERP, "String", 6);
         STRING *undef  = string_from_const_cstring(INTERP, "Undef", 5);

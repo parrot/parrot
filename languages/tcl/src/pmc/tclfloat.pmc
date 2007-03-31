@@ -23,7 +23,7 @@ pmclass TclFloat
     maps    Float
 {
 
-    STRING* get_string () {
+    STRING* get_string() {
         UINTVAL buflen;
         int check_flag;
         STRING *buff;

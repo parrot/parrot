@@ -20,8 +20,8 @@ tcl.ops
 A dynamic opcode library for tcl on parrot that provides a few opcodes
 that simplify PIR generation for tclPIR generation for tcl
 
-BUGS: pull out the TCL_ constants, as well as the code slot (#9) and the
-message slot (#0)
+BUGS: pull out the TCL_ constants, as well as the code slot(#9) and the
+message slot(#0)
 
 =cut
 

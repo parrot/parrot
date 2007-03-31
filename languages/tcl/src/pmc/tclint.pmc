@@ -25,7 +25,7 @@ pmclass TclInt
      * MMD Override:
      *   TclInt shouldn't automatically promote division to float.
      */
-    PMC* divide (PMC* value, PMC* dest) {
+    PMC* divide(PMC* value, PMC* dest) {
       MMD_TclInt: {
         INTVAL n = PMC_int_val(SELF);
         INTVAL d = PMC_int_val(value);

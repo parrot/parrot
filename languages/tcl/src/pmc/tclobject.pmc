@@ -37,7 +37,7 @@ pmclass TclObject dynpmc group tcl_group {
         }
     }
 
-    void morph (INTVAL type) {
+    void morph(INTVAL type) {
         if (SELF->vtable->base_type == type)
             return;
         switch (type) {
@@ -54,17 +54,17 @@ pmclass TclObject dynpmc group tcl_group {
         pmc_reuse(INTERP, SELF, type, 0);
     }
 
-    void set_integer_native (INTVAL value) {
+    void set_integer_native(INTVAL value) {
         DYNSELF.morph(dynpmc_TclInt);
         PMC_int_val(SELF) = value;
     }
 
-    void set_number_native (FLOATVAL value) {
+    void set_number_native(FLOATVAL value) {
         DYNSELF.morph(dynpmc_TclFloat);
         PMC_num_val(SELF) = value;
     }
 
-    void set_string_native (STRING* value) {
+    void set_string_native(STRING* value) {
         DYNSELF.morph(dynpmc_TclString);
         PMC_str_val(SELF) = string_copy(INTERP, value);
     }

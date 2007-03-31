@@ -58,7 +58,7 @@ binary_scan_number_field(Interp *interp, char field, char *binstr, int *_pos, in
             break;
         /* a double */
         case 'd':
-            len = sizeof(double)/sizeof(char);
+            len = sizeof (double)/sizeof (char);
             if (pos + len > length)
                 break;
             d     = (double *)(binstr + pos);
@@ -68,7 +68,7 @@ binary_scan_number_field(Interp *interp, char field, char *binstr, int *_pos, in
             break;
         /* a float */
         case 'f':
-            len = sizeof(float)/sizeof(char);
+            len = sizeof (float)/sizeof (char);
             if (pos + len > length)
                 break;
             f     = (float *)(binstr + pos);
@@ -78,7 +78,7 @@ binary_scan_number_field(Interp *interp, char field, char *binstr, int *_pos, in
             break;
         /* a native int */
         case 'n':
-            len = sizeof(int)/sizeof(char);
+            len = sizeof (int)/sizeof (char);
             if (pos + len > length)
                 break;
             n     = (int *)(binstr + pos);
@@ -302,19 +302,19 @@ binary_format_number_field(Interp *interp, char field, STRING *binstr, PMC *valu
         /* a double */
         case 'd':
             d      = (double)VTABLE_get_number(interp, value);
-            len    = sizeof(double)/sizeof(char);
+            len    = sizeof (double)/sizeof (char);
             binstr = string_concat(interp, binstr, string_from_cstring(interp, &d, len), 0);
             break;
         /* a float */
         case 'f':
             f      = (float)VTABLE_get_number(interp, value);
-            len    = sizeof(float)/sizeof(char);
+            len    = sizeof (float)/sizeof (char);
             binstr = string_concat(interp, binstr, string_from_cstring(interp, &f, len), 0);
             break;
         /* a native integer */
         case 'n':
             n      = (int)VTABLE_get_integer(interp, value);
-            len    = sizeof(int)/sizeof(char);
+            len    = sizeof (int)/sizeof (char);
             binstr = string_concat(interp, binstr, string_from_cstring(interp, &n, len), 0);
             break;
     }
