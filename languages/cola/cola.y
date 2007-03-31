@@ -154,11 +154,11 @@ namespace_scope_start:
     NAMESPACE qualified_name
         {
             Symbol *n, *t, *last = current_namespace;
-            if(lookup_type_symbol($2)) {
+            if (lookup_type_symbol($2)) {
                 printf("Error, redefinition of [%s]\n", $2->name);
                 exit(0);
             }
-            for(n = split(".", $2->name); n; n = n->tnext) {
+            for (n = split(".", $2->name); n; n = n->tnext) {
                 n->kind = $2->kind;
                 t = mk_namespace_symbol(n);
                 store_symbol(last->table, t);
@@ -183,7 +183,7 @@ namespace_body:
     '{' using_directives namespace_member_decls '}'
         {
             $$ = $2;
-            if($3)
+            if ($3)
                 unshift_ast(&($$), $3);
         }
     ;
@@ -194,7 +194,7 @@ namespace_member_decls: /*NULL*/
         namespace_member_decls namespace_member_decl
         {
             $$ = $1;
-            if($2)
+            if ($2)
                 unshift_ast(&($$), $2);
         }
     ;
@@ -297,7 +297,7 @@ decl_statement:
             store_symbol(current_symbol_table, $3);
             $$ = new_statement(ASTT_CONSTANT_DECL, NULL, NULL);
             $$->typename = $2;
-            if(lookup_symbol_in_tab(current_symbol_table, $$->sym->name)) {
+            if (lookup_symbol_in_tab(current_symbol_table, $$->sym->name)) {
                     printf("Warning: declaration of '%s' shadows previous instance.\n",
                             $$->sym->name);
             }
@@ -308,11 +308,11 @@ local_var_decl:
     type var_declarators
         {
             AST * decl;
-            if($1 == NULL) {
+            if ($1 == NULL) {
                 printf("Internal compiler error: local_var_decl: type is NULL\n");
                 abort();
             }
-            for(decl=$2; decl; decl = decl->next) {
+            for (decl=$2; decl; decl = decl->next) {
 #if DEBUG
                 fprintf(stderr, "local_var: [%s] typename [%s]\n",
                         decl->arg1->sym->name, $1->name);
@@ -327,11 +327,11 @@ field_decl:
     opt_modifiers type var_declarators ';'
         {
             AST * decl;
-            if($2 == NULL) {
+            if ($2 == NULL) {
                 printf("Internal compiler error: field_decl: type is NULL\n");
                 abort();
             }
-            for(decl=$3; decl; decl = decl->next) {
+            for (decl=$3; decl; decl = decl->next) {
 #if DEBUG
                 fprintf(stderr, "field: [%s] typename [%s]\n",
                         decl->arg1->sym->name, $2->name);
@@ -396,9 +396,9 @@ method_header:
              * We can store these at parse time.
              */
             store_symbol(current_symbol_table, $$->sym);
-            if($1 & MOD_STATIC) {
-                if(!strcmp($3->name, "Main")) {
-                    if(main_method)
+            if ($1 & MOD_STATIC) {
+                if (!strcmp($3->name, "Main")) {
+                    if (main_method)
                         fprintf(stderr,
                         "Warning: multiple definitions of a static Main()\n");
                     main_method = $3;
@@ -418,9 +418,9 @@ method_header:
              * We can store these at parse time.
              */
             store_symbol(current_symbol_table, $$->sym);
-            if($1 & MOD_STATIC) {
-                if(!strcmp($3->name, "Main")) {
-                    if(main_method)
+            if ($1 & MOD_STATIC) {
+                if (!strcmp($3->name, "Main")) {
+                    if (main_method)
                         fprintf(stderr,
                         "Warning: multiple definitions of a static Main()\n");
                     main_method = $3;
@@ -481,7 +481,7 @@ block:
     '{' block_scope statement_list '}'
         {
             $$ = $3;
-            if($$) {
+            if ($$) {
                 $$->vars = pop_scope();
             }
             else {
@@ -617,7 +617,7 @@ for_statement:
     FOR '(' statement_expr ';' boolean_expr ';' statement_expr ')'
     embedded_statement
         {
-            if($3 == NULL) {
+            if ($3 == NULL) {
                 printf("for_statement: NULL init statement\n");
                 exit(0);
             }
@@ -803,7 +803,7 @@ unary_expr:
 method_call:
     primary_expr '(' arg_list ')'
         {
-            if($1->asttype != ASTT_IDENTIFIER) {
+            if ($1->asttype != ASTT_IDENTIFIER) {
                 fprintf(stderr, "Error (line %d), method call must be a simple name or member access.\n", line);
                 exit(0);
             }
@@ -988,8 +988,8 @@ int main(int argc, char * argv[])
 {
     fprintf(stderr, "Cola - Copyright (C) 2002 Melvin Smith <melvins@us.ibm.com>\n");
     fprintf(stderr, "colac version %s\n\n", COLA_VERSION);
-    if(argc > 1) {
-        if(!(yyin = fopen(argv[1], "r")))    {
+    if (argc > 1) {
+        if (!(yyin = fopen(argv[1], "r")))    {
             printf( "Error reading source file %s.\n", argv[1] );
             exit(0);
         }
@@ -1040,7 +1040,7 @@ int main(int argc, char * argv[])
 
     fprintf(stderr, "Pass 4: Code generation...\n");
 
-    if(ast_start) {
+    if (ast_start) {
         gen_ast(ast_start);
     }
 
