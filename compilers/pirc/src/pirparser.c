@@ -1681,37 +1681,29 @@ sub_flags(parser_state *p) {
     while (ok || wantmore) {
         switch(p->curtoken) {
             case T_ANON_FLAG:
-                next(p);
-                break;
             case T_INIT_FLAG:
-                next(p);
-                break;
             case T_LOAD_FLAG:
-                next(p);
-                break;
             case T_MAIN_FLAG:
-                next(p);
-                break;
             case T_METHOD_FLAG:
-                next(p);
-                break;
             case T_LEX_FLAG:
+            case T_POSTCOMP_FLAG:    /* :postcomp and :immediate are the same */
+            case T_IMMEDIATE_FLAG:
+                emit_sub_flag(p, p->curtoken);
                 next(p);
                 break;
             case T_OUTER_FLAG:
-            case T_VTABLE_FLAG:
+            case T_VTABLE_FLAG: {
+                token flag = p->curtoken; /* store the flag for the emit() to come */
                 next(p);
                 match(p, T_LPAREN);
+                emit_sub_flag_arg(p, flag, get_current_token(p->lexer));
                 stringconstant(p);
                 match(p, T_RPAREN);
                 break;
+            }
             case T_MULTI_FLAG:
                 next(p);
                 multi_type_list(p);
-                break;
-            case T_POSTCOMP_FLAG:    /* :postcomp and :immediate are the same */
-            case T_IMMEDIATE_FLAG:
-                next(p);
                 break;
             case T_NEWLINE:
                 ok = 0; /* stop loop; wantmore is always cleared, so loop will stop */

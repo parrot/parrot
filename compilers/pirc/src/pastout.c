@@ -125,6 +125,17 @@ past_type(struct parser_state *p, char *type) {
     fprintf(OUT, "%*s<type> => \"%s\"\n", indent, " ", type);
 }
 
+static void
+past_subflag(struct parser_state *p, int flag) {
+    /* fprintf(OUT, "%*s<???> => \"%s\"\n", indent, " ", type);
+    */
+}
+
+static void
+past_subflagarg(struct parser_state *p, int flag, char *arg) {
+    /*fprintf(OUT, "%*s<type> => \"%s\"\n", indent, " ", type);
+    */
+}
 
 /*
 
@@ -150,7 +161,9 @@ init_past_vtable(void) {
     vtable->end          = past_close;
     vtable->param_start  = past_param;
     vtable->param_end    = past_close;
-    vtable->type         = past_type;
+    vtable->type         = past_type; 
+    vtable->sub_flag     = past_subflag;
+    vtable->sub_flag_arg = past_subflagarg;
 
     return vtable;
 }

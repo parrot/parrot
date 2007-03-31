@@ -89,6 +89,15 @@ pir_type(struct parser_state *p, char *type) {
     fprintf(OUT, "%s", type);
 }
 
+static void
+pir_subflag(struct parser_state *p, int flag) {
+    fprintf(OUT, "%s ", find_keyword(flag));
+}
+
+static void
+pir_subflagarg(struct parser_state *p, int flag, char *arg) {
+    fprintf(OUT, "%s(%s) ", find_keyword(flag), arg);
+}
 /*
 
 =item init_pir_vtable()
@@ -104,14 +113,16 @@ init_pir_vtable(void) {
     pirvtable *vtable = new_pirvtable();
 
     /* override the methods that are needed for PIR output */
-    vtable->sub_start   = pir_sub;
-    vtable->sub_end     = pir_end;
-    vtable->name        = pir_name;
-    vtable->stmts_start = pir_newline;
-    vtable->param_start = pir_param;
-    vtable->param_end   = pir_newline;
-    vtable->type        = pir_type;
-
+    vtable->sub_start    = pir_sub;
+    vtable->sub_end      = pir_end;
+    vtable->name         = pir_name;
+    vtable->stmts_start  = pir_newline;
+    vtable->param_start  = pir_param;
+    vtable->param_end    = pir_newline;
+    vtable->type         = pir_type;
+    vtable->sub_flag     = pir_subflag;
+    vtable->sub_flag_arg = pir_subflagarg;
+    
     return vtable;
 }
 
