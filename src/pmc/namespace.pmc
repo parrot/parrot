@@ -16,7 +16,7 @@ These are the vtable functions for the namespace PMC.
                            var/sub or a namespace, of a FixedPMCarray
                            of 2 PMCs (namespace, sub/var) slots
   PMC_pmc_val          ... parent namespace
-  PMC_data             ... name STRING of this namespace part
+  PMC_data             ... Namespace information struct (name, class/role)
 
 =head2 Functions
 
@@ -48,6 +48,18 @@ enum {
 
 #define FPA_is_ns_ext PObj_private0_FLAG
 
+
+/* We store extra information about the namespace in a struct, which we will
+ * hang off the PMC_data slot. */
+typedef struct Parrot_NSInfo {
+    STRING *name; /* Name of this namespace part. */
+    PMC *class;   /* The class or role attached to this namespace. */
+} Parrot_NSInfo;
+
+/* Macro for easy access to the namespcae info. */
+#define PARROT_NSINFO(o) ((Parrot_NSInfo *) PMC_data(o))
+
+
 pmclass NameSpace extends Hash does hash need_ext no_ro {
 
 /*
@@ -64,7 +76,7 @@ other fields.
     void init() {
         SUPER();                        /* _struct_val := Hash */
         PMC_pmc_val(SELF) = NULL;       /* parent */
-        PMC_data(SELF)    = NULL;       /* namespace name */
+        PMC_data(SELF)    = mem_sys_allocate_zeroed(sizeof(Parrot_NSInfo));
     }
 
 /*
@@ -77,11 +89,27 @@ Marks the namespace as live.
 
 */
     void mark() {
+        Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
         SUPER();
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj*)PMC_pmc_val(SELF));
-        if (PMC_data(SELF))
-            pobject_lives(INTERP, (PObj*)PMC_data(SELF));
+        if (nsinfo->name)
+            pobject_lives(INTERP, (PObj*)nsinfo->name);
+        if (nsinfo->class)
+            pobject_lives(INTERP, (PObj*)nsinfo->class);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Frees the namespace info struct.
+
+=cut
+
+*/
+    void destroy() {
+        mem_sys_free(PARROT_NSINFO(SELF));
     }
 
 /*
@@ -145,8 +173,9 @@ a NameSpace or a var, the NameSpace is returned.
 
         if (val_is_NS) {
             /* TODO - this hack needs to go */
+            Parrot_NSInfo *nsinfo = PARROT_NSINFO(value);
             PMC_pmc_val(value) = SELF;  /* set parent */
-            PMC_data(value)    = key;   /* and name */
+            nsinfo->name       = key;   /* and name */
 
             if (new_tuple) {
                 VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns,
@@ -288,7 +317,8 @@ Return the name of this namespace part.
 */
 
     STRING* get_string() {
-        return PMC_data(SELF);
+        Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
+        return nsinfo->name;
     }
 
 /*
@@ -378,7 +408,8 @@ Returns the name of the namespace as an array of strings.
         ar = pmc_new(INTERP, enum_class_ResizableStringArray);
         ns = SELF;
         while (ns) {
-            VTABLE_unshift_string(INTERP, ar, PMC_data(ns));
+            Parrot_NSInfo *nsinfo = PARROT_NSINFO(ns);
+            VTABLE_unshift_string(INTERP, ar, nsinfo->name);
             ns = PMC_pmc_val(ns);
         }
 
