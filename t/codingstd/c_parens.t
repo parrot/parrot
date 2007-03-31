@@ -64,11 +64,11 @@ sub check_parens {
             $buf = <$fh>;
         }
         $buf =~ s{ (?:
-                       (?: ' (?: \\\\ | \\' | [^'] )* ' )  # remove ' string
-                     | (?: " (?: \\\\ | \\" | [^"] )* " )  # remove " string
-                     | /\* .*? \*/                         # remove C comment
+                       (?: (') (?: \\\\ | \\' | [^'] )* (') ) # remove ' string
+                     | (?: (") (?: \\\\ | \\" | [^"] )* (") ) # remove " string
+                     | /(\*) .*? (\*)/                        # remove C comment
                    )
-                }{}gsx;
+                }{defined $1 ? "$1$2" : defined $3 ? "$3$4" : "$5$6"}egsx;
 
         if ( $buf =~ m{ ( (?<!\w) (?:$keywords) (?: \( | \ \s+ \( ) ) }x ) {
             push @keyword_paren => "$path: $1\n";
