@@ -202,7 +202,7 @@ static Instruction *
 iINDEXFETCH(Interp *interp, IMC_Unit * unit, SymReg * r0, SymReg * r1,
             SymReg * r2)
 {
-    if(r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
+    if (r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
         SymReg * r3 = mk_const(interp, str_dup("1"), 'I');
         return MK_I(interp, unit, "substr %s, %s, %s, 1", 4, r0, r1, r2, r3);
     }
@@ -218,7 +218,7 @@ static Instruction *
 iINDEXSET(Interp *interp, IMC_Unit * unit,
           SymReg * r0, SymReg * r1, SymReg * r2)
 {
-    if(r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
+    if (r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
         SymReg * r3 = mk_const(interp, str_dup("1"), 'I');
         MK_I(interp, unit, "substr %s, %s, %s, %s", 4, r0, r1,r3, r2);
     }
@@ -296,10 +296,10 @@ begin_return_or_yield(Interp *interp, int yield)
     Instruction *i, *ins;
     char name[128];
     ins = IMCC_INFO(interp)->cur_unit->instructions;
-    if(!ins || !ins->r[0] || !(ins->r[0]->type & VT_PCC_SUB))
+    if (!ins || !ins->r[0] || !(ins->r[0]->type & VT_PCC_SUB))
         IMCC_fataly(interp, E_SyntaxError,
                     "yield or return directive outside pcc subroutine\n");
-    if(yield)
+    if (yield)
        ins->r[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
     sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d",
             IMCC_INTERNAL_CHAR, IMCC_INFO(interp)->cnr++);
@@ -873,7 +873,7 @@ pcc_arg:
 
 pcc_results:
      /* empty */                       {  $$ = 0; }
-   | pcc_results pcc_result '\n'       {  if($2) add_pcc_result(IMCC_INFO(interp)->cur_call, $2); }
+   | pcc_results pcc_result '\n'       {  if ($2) add_pcc_result(IMCC_INFO(interp)->cur_call, $2); }
    ;
 
 pcc_result:
@@ -929,10 +929,10 @@ pcc_ret:
 pcc_returns:
      /* empty */   {  $$ = 0; }
    | pcc_returns '\n'      {
-       if($1) add_pcc_return(IMCC_INFO(interp)->sr_return, $1);
+       if ($1) add_pcc_return(IMCC_INFO(interp)->sr_return, $1);
    }
    | pcc_returns pcc_return '\n'      {
-       if($2) add_pcc_return(IMCC_INFO(interp)->sr_return, $2);
+       if ($2) add_pcc_return(IMCC_INFO(interp)->sr_return, $2);
    }
    ;
 
@@ -1076,7 +1076,7 @@ labeled_inst:
    | LOCAL           { is_def=1; } type id_list
      {
          IdList* l = $4;
-         while(l) {
+         while (l) {
              IdList* l1;
              if (l->unique_reg)
                  mk_ident_ur(interp, l->id, $3);
