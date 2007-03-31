@@ -754,7 +754,7 @@ check_named(Interp *interp, struct call_state *st, const char *action)
 
         /* verify that a name exists */
         INTVAL sig = st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i);
-        if(sig & PARROT_ARG_NAME)
+        if (sig & PARROT_ARG_NAME)
         {
             INTVAL arg_sig;
             int last_name_pos;
@@ -772,7 +772,7 @@ check_named(Interp *interp, struct call_state *st, const char *action)
             /* if this named arg is already filled, continue*/
             if (st->named_done & (1 << n_named)) {
                 arg_sig = st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i+1);
-                if(arg_sig & PARROT_ARG_OPT_FLAG)
+                if (arg_sig & PARROT_ARG_OPT_FLAG)
                     i++; /* skip associated opt flag arg as well */
                 continue;
             }
@@ -782,7 +782,7 @@ check_named(Interp *interp, struct call_state *st, const char *action)
                 store_arg(st, idx);
 
                 arg_sig = st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i+1);
-                if(arg_sig & PARROT_ARG_OPT_FLAG) {
+                if (arg_sig & PARROT_ARG_OPT_FLAG) {
                     i++;
                     idx = st->dest.u.op.pc[i];
                     CTX_REG_INT(st->dest.ctx, idx) = 0;
