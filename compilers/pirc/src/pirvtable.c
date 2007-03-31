@@ -18,6 +18,7 @@ implement all vtable methods for correct behaviour.
 #include "pirparser.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 
 
 
@@ -66,7 +67,9 @@ new_pirvtable(void) {
         exit(1);
     }
 
-    /* set all entries to 'default' by default */
+    /* set all entries to 'default' by default. This way, another output module
+     * only needs to override the entries that are interesting for that module.
+     */
     vtable->initialize  = not_implemented;
     vtable->name        = not_implemented;
     vtable->sub_start   = not_implemented;
@@ -74,6 +77,8 @@ new_pirvtable(void) {
     vtable->stmts_start = not_implemented;
     vtable->stmts_end   = not_implemented;
     vtable->end         = not_implemented;
+    vtable->param_start = not_implemented;
+    vtable->param_end   = not_implemented;
 
     return vtable;
 }

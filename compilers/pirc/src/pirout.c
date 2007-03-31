@@ -75,8 +75,13 @@ pir_end(struct parser_state *p) {
 }
 
 static void
-pir_newline(struct parser_state *p, ...) {
+pir_newline(struct parser_state *p) {
     fprintf(OUT, "\n");
+}
+
+static void
+pir_param(struct parser_state *p) {
+    fprintf(OUT, "\t.param ");
 }
 
 /*
@@ -98,6 +103,8 @@ init_pir_vtable(void) {
     vtable->sub_end     = pir_end;
     vtable->name        = pir_name;
     vtable->stmts_start = pir_newline;
+    vtable->param_start = pir_param;
+    vtable->param_end   = pir_newline;
 
     return vtable;
 }

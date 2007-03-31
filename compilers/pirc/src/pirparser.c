@@ -1751,12 +1751,14 @@ static void
 parameters(parser_state *p) {
     while (p->curtoken == T_PARAM) {
         next(p); /* skip '.param */
+        emit_param_start(p);
         switch (p->curtoken) {
             case T_INT:
             case T_NUM:
             case T_PMC:
             case T_STRING:
                 type(p);
+                emit_name(p, get_current_token(p->lexer));
                 match(p, T_IDENTIFIER);
                 param_flags(p);
                 break;
@@ -1775,6 +1777,7 @@ parameters(parser_state *p) {
                 break;
         }
         match(p, T_NEWLINE);
+        emit_param_end(p);
     }
 }
 
@@ -1793,11 +1796,11 @@ sub_definition(parser_state *p) {
     emit_sub_start(p, "", get_current_filepos(p->lexer));
     next(p); /* skip '.sub' or '.pcc_sub' */
 
-    switch (p->curtoken) {
+    switch (p->curtoken) { /* subname -> IDENTIFIER | SINGLE_QUOTED_STRING | DOUBLE_QUOTED_STRING */
         case T_IDENTIFIER:
         case T_DOUBLE_QUOTED_STRING:
         case T_SINGLE_QUOTED_STRING:
-            emit_name(p, get_current_token(p->lexer)); /* emit the name */
+            emit_name(p, get_current_token(p->lexer)); /* emit the subname */
             next(p); /* and get next token */
             break;
         default:
@@ -1807,9 +1810,8 @@ sub_definition(parser_state *p) {
 
     sub_flags(p);
     match(p, T_NEWLINE);
-
-    parameters(p);
     emit_stmts_start(p); /* open stmts block */
+    parameters(p);
     instructions(p);
     emit_stmts_end(p);  /* close stmts block */
     match(p, T_END);

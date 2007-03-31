@@ -108,9 +108,18 @@ Opens a PAST::Stmts node.
 */
 static void
 past_stmts(struct parser_state *p) {
-    fprintf(OUT, "%*s[%d] => PMC 'PAST::Stmts'\n", indent, " ", 0); /* fix array index */
+    fprintf(OUT, "%*s[%d] => PMC 'PAST::Stmts'  {\n", indent, " ", 0); /* fix array index */
     indent();
 }
+
+
+static void
+past_param(struct parser_state *p) {
+    fprintf(OUT, "%*sFIXTHIS => PMC 'PAST::Var'  {\n", indent, " ");
+    indent();
+    fprintf(OUT, "%*s<scope> => \"parameter\"\n", indent, " ");
+}
+
 
 /*
 
@@ -126,7 +135,7 @@ pirvtable *
 init_past_vtable(void) {
     pirvtable *vtable = new_pirvtable();
 
-    /* set function pointers */
+    /* override vtable methods */
     vtable->initialize   = past_init;
     vtable->sub_start    = past_block;
     vtable->sub_end      = past_close;
@@ -134,7 +143,8 @@ init_past_vtable(void) {
     vtable->stmts_start  = past_stmts;
     vtable->stmts_end    = past_close;
     vtable->end          = past_close;
-
+    vtable->param_start  = past_param;
+    vtable->param_end    = past_close;
     return vtable;
 }
 

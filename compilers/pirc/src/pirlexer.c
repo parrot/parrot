@@ -424,7 +424,7 @@ print_error_context(struct lexer_state *s) {
         ++start;
     }
     /* print an indicator like "^" on the next line */
-    fprintf(stderr, "\n%*s\n", s->curfile->linepos - 1, "^");
+    fprintf(stderr, "\n%*s\n", s->curfile->linepos, "^");
 }
 
 
@@ -774,7 +774,7 @@ update_line(lexer_state *lexer) {
 =item read_heredoc()
 
 Reads heredoc text up to the specified heredoc label.
-Returns either T_HEREDOC_STRING if successful, or T_EOF.
+Returns either T_HEREDOC_STRING if successful, or T_EOF (if encountered).
 The heredoc string is stored in the token buffer.
 
 =cut
@@ -859,7 +859,7 @@ new_lexer(char const * filename) {
         exit(1);
     }
 
-    /* max. token length is 128 for now */
+    /* max. token length is 128 for now. XXX this should be fixed later */
     lexer->token_chars = (char *)calloc(128, sizeof(char));
     lexer->charptr = lexer->token_chars;
     lexer->curfile = NULL;
@@ -900,7 +900,8 @@ destroy_lexer(lexer_state *lexer) {
 =item clone_string()
 
 clone a string. Copy the characters of src into dest
-and return dest.
+and return dest. Memory allocation is done by this function, keeping
+this function's client code simple. Please free() the memory after usage!
 
 =cut
 
