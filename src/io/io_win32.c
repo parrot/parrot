@@ -169,7 +169,7 @@ PIO_win32_init(Interp *interp, ParrotIOLayer *layer)
      */
     ret = WSAStartup(2, &sockinfo);
     if (ret != 0) {
-        fprintf( stderr, "WSAStartup failed!!\n ErrorCode=%i\n\n",
+        fprintf(stderr, "WSAStartup failed!!\n ErrorCode=%i\n\n",
                   WSAGetLastError());
         return -4;
     }

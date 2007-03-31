@@ -233,7 +233,7 @@ PIO_destroy(Interp *interp, PMC *pmc)
 #endif
     if ((io->stack->flags & PIO_L_LAYER_COPIED)) {
         ParrotIOLayer *p, *down;
-        for (p = io->stack; p; ) {
+        for (p = io->stack; p;) {
             /* if top got copied, all have to be malloced */
             assert(p->flags & PIO_L_LAYER_COPIED);
             down = p->down;
@@ -331,7 +331,7 @@ PIO_finish(Interp *interp)
      * destruction into two parts (again).
      */
     for (i = 0 ; i < PIO_NR_OPEN; i++) {
-        if ( (pmc = interp->piodata->table[i]) ) {
+        if ((pmc = interp->piodata->table[i])) {
             layer = PMC_struct_val(pmc);
             io = PMC_data(pmc);
             PIO_close_down(interp, layer, io);
@@ -341,7 +341,7 @@ PIO_finish(Interp *interp)
     /*
      * TODO free IO of std-handles
      */
-    for (layer = interp->piodata->default_stack; layer; ) {
+    for (layer = interp->piodata->default_stack; layer;) {
         down = layer->down;
         if (layer->api->Delete)
             (*layer->api->Delete) (layer);

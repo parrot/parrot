@@ -1066,7 +1066,7 @@ PIO_unix_pipe(Interp *interp, ParrotIOLayer *l, const char *cmd, int flags)
             /* the other end is writing - we read from the pipe */
             close(STDIN_FILENO);
             close(fds[1]);
-            if ( dup(fds[0]) != STDIN_FILENO) {
+            if (dup(fds[0]) != STDIN_FILENO) {
                 exit(0);
             }
         }
@@ -1075,8 +1075,8 @@ PIO_unix_pipe(Interp *interp, ParrotIOLayer *l, const char *cmd, int flags)
             close(STDIN_FILENO);
             close(STDOUT_FILENO);
             close(STDERR_FILENO);
-            if ( dup(fds[0]) != STDIN_FILENO || dup(fds[1]) != STDOUT_FILENO
-                    || dup(fds[1]) != STDERR_FILENO )
+            if (dup(fds[0]) != STDIN_FILENO || dup(fds[1]) != STDOUT_FILENO
+                    || dup(fds[1]) != STDERR_FILENO)
             {
                 exit(0);
             }
