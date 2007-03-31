@@ -253,7 +253,7 @@ pmclass PugsCapture extends PugsAny
         parrot_mark_hash(INTERP, siva_hash(SELF));
     if (siva_ary(SELF))
         list_mark(INTERP, siva_ary(SELF));
-    if(PMC_str_val(SELF))
+    if (PMC_str_val(SELF))
         pobject_lives(INTERP, (PObj *)siva_str(SELF));
 
   }
