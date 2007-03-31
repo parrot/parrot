@@ -368,7 +368,7 @@ this rule.  Be prepared to justify your choices to a jury of your peers.
 
 =head3 Pass only C<unsigned char> to C<isxxx()> and C<toxxx()>
 
-Pass only values in the range of C<unsigend char> (and the special value -1,
+Pass only values in the range of C<unsigned char> (and the special value -1,
 a.k.a. C<EOF>) to the isxxx() and toxxx() library functions.  Passing signed
 characters to these functions is a very common error and leads to incorrect
 behavior at best and crashes at worst.  And under most of the compilers Parrot
@@ -399,8 +399,8 @@ const to the right of the C<*>, to indicate that the pointer should not
 be modified.
 
     Wango * const w = get_current_wango();
-    w->min = 0;
-    w->max = 14;
+    w->min  = 0;
+    w->max  = 14;
     w->name = "Ted";
 
 This prevents you from modifying C<w> inadvertantly.
@@ -562,7 +562,7 @@ to extensions and embeddings.
 =item foo.h
 
 This contains all the declarations needed for external users of that API (and
-nothing more), ie it defines the API. It is permissible for the API to include
+nothing more), i.e. it defines the API. It is permissible for the API to include
 different or extra functionality when used by other parts of the core, compared
 with its use in extensions and embeddings. In this case, the extra stuff within
 the file is enabled by testing for the macro C<PERL_IN_CORE>.
@@ -714,10 +714,10 @@ e.g. C<PERL_USE_STDIO>, C<USE_MULTIPLICITY>.
 =item *
 
 A macro that may declare stuff and thus needs to be at the start of a block
-should be prefixed with C<DECL_>, e.g. C<DECL_SAVE_STACK>. Note that macros which
-implicitly declare and then use variables are strongly discouraged, unless it
-is essential for portability or extensibility. The following are in decreasing
-preference style-wise, but increasing preference extensibility-wise.
+should be prefixed with C<DECL_>, e.g. C<DECL_SAVE_STACK>. Note that macros
+which implicitly declare and then use variables are strongly discouraged,
+unless it is essential for portability or extensibility. The following are in
+decreasing preference style-wise, but increasing preference extensibility-wise.
 
     { Stack sp = GETSTACK;  x = POPSTACK(sp) ... /* sp is an auto variable */
     { DECL_STACK(sp);  x = POPSTACK(sp); ... /* sp may or may not be auto */
@@ -1004,7 +1004,7 @@ for example, all files under a given directory.
 
 =head1 REFERENCES
 
-The section on coding style is based on Perl5's F<Porting/patching.pod> by
+The section on coding style is based on Perl 5's F<Porting/patching.pod> by
 Daniel Grisinger. The section on naming conventions grew from some suggestions
 by Paolo Molaro <lupus@lettere.unipd.it>. Other snippets came from various
 P5Pers.
