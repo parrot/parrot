@@ -295,7 +295,7 @@ my @valid_opts = qw(ask bindir cage cc ccflags ccwarn cgoto cxx datadir
     jitcapable ld ldflags lex libdir libexecdir libs link linkflags
     localstatedir m maintainer mandir miniparrot nomanicheck oldincludedir
     opcode ops optimize parrot_is_shared pmc prefix profile sbindir
-    sharedstatedir step sysconfdir verbose verbose-step=N version without-gdbm
+    sharedstatedir step sysconfdir verbose verbose-step version without-gdbm
     without-gmp without-icu yacc);
 
 my %args;
