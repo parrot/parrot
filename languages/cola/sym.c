@@ -415,7 +415,7 @@ Symbol * lookup_symbol(const char * name) {
 #if DEBUG
     fprintf(stderr, "lookup_symbol: %s split to (%s,...)\n", name, list->name);
 #endif
-    for (ns = current_namespace; ns; ) {
+    for (ns = current_namespace; ns;) {
 #if DEBUG
         fprintf(stderr, "lookup_symbol: searching namespace[%s] for [%s]\n", ns->name, list->name);
 #endif

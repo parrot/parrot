@@ -79,7 +79,7 @@ Type * lookup_type(const char * name) {
         s = lookup_symbol_in_tab(ns->table, name);
         if (s != NULL) {
             if (s->kind != TYPE) {
-                fprintf(stderr, "lookup_type(%s) : Error, symbol not a type\n", name );
+                fprintf(stderr, "lookup_type(%s) : Error, symbol not a type\n", name);
                 abort();
             }
 #if DEBUG
