@@ -7,15 +7,15 @@ grammar Plumhead::PAST::Grammar is TGE::Grammar;
 
 transform past (ROOT) :language('PIR') {
 
-    node = node['program']
+    .local pmc node_program
+    .local pmc past_program
+    node_program = node['program']
+    past_program = tree.'get'('past', node_program, 'Plumhead::Grammar::program')
+
     .local pmc past
     past = new 'PAST::Block'
-    past.'init'( 'node' => node, 'name'=>'plumhead' )
+    past.'init'( past_program, 'node' => node, 'name'=>'plumhead' )
     
-    .local pmc past_program
-    past_program = tree.'get'('past', node, 'Plumhead::Grammar::program')
-    past.'push'(past_program)
-
     .return (past)
 }
 
@@ -37,7 +37,7 @@ transform past (Plumhead::Grammar::program) :language('PIR') {
 
         $P1 = cnode['SEA']
         if null $P1 goto no_SEA
-            past_sea = tree.'get'('past', $P1, 'Plumhead::Grammar::SEA')
+            past_sea = tree.'get'('past', cnode, 'Plumhead::Grammar::expression')
             past.'push'(past_sea)
         no_SEA:
 
@@ -50,25 +50,6 @@ transform past (Plumhead::Grammar::program) :language('PIR') {
         goto iter_loop
 
     iter_end:
-
-    .return (past)
-}
-
-transform past (Plumhead::Grammar::SEA) :language('PIR') {
-
-    .local string val
-    val = node
-    .local pmc code_string
-    code_string = new 'PGE::CodeString'
-    ( val ) = code_string.'escape'( val )
-
-    .local pmc past_val
-    past_val = new 'PAST::Val'                             
-    past_val.'init'( 'name' => val, 'vtype' => '.Undef' )                              
-
-    .local pmc past                                                  
-    past = new 'PAST::Op'
-    past.'init'( past_val, 'node'=> node, 'pirop' => 'print' )  
 
     .return (past)
 }
@@ -159,7 +140,7 @@ transform past (Plumhead::Grammar::code) :language('PIR') {
                  $P1 = cnode['inline_sea']
                  if null $P1 goto no_inline_sea
                      $P2 = $P1['SEA_empty_allowed']
-                     past_sea = tree.'get'('past', $P2, 'Plumhead::Grammar::SEA')
+                     past_sea = tree.'get'('past', $P1, 'Plumhead::Grammar::expression')
                      past.'push'(past_sea)
                      goto iter_loop
                  no_inline_sea:
@@ -211,6 +192,8 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
     .local pmc past_mult, past_string, past_adding
     .local pmc past_unary, multiplicand, multiplicand_0, past_multiplicand_0
     .local pmc past_expression
+    .local pmc code_string
+    .local pmc past_val
 
     .local string op, pirop, val, var
 
@@ -428,6 +411,24 @@ transform past (Plumhead::Grammar::expression) :language('PIR') {
         past.'init'( 'node'=> node, 'name' => 'php_sapi_name' )  
         goto handled_expression
     no_php_sapi_name:
+
+    $P0 = node['SEA']
+    unless null $P0 goto SEA
+    $P0 = node['SEA_empty_allowed']
+    if null $P0 goto no_SEA
+    SEA:
+        val = $P0
+        code_string = new 'PGE::CodeString'
+        ( val ) = code_string.'escape'( val )
+        past_val = new 'PAST::Val'                             
+        past_val.'init'( 'name' => val, 'vtype' => '.Undef' )                              
+
+        past = new 'PAST::Op'
+        past.'init'( past_val, 'node'=> node, 'pirop' => 'print' )  
+        goto handled_expression
+    no_SEA:
+
+    .return (past)
 
     handled_expression:
 
