@@ -349,7 +349,7 @@ op subclass(out PMC, in STR, in PMC) :object_classes {
   opcode_t *next = expr NEXT();
   if (PMC_IS_NULL(class)) {
     real_exception(interp, next, NO_CLASS, "Class '%s' doesn't exist",
-                string_to_cstring( interp, $2 ));
+                string_to_cstring(interp, $2));
   }
   $1 = VTABLE_subclass(interp, class, $3);
   goto ADDRESS(next);
@@ -368,7 +368,7 @@ inline op getclass(out PMC, in STR) :object_classes {
   opcode_t *next = expr NEXT();
   if (PMC_IS_NULL(class)) {
     real_exception(interp, next, NO_CLASS, "Class '%s' doesn't exist",
-                string_to_cstring( interp, $2 ));
+                string_to_cstring(interp, $2));
   }
   else
     $1 = class;

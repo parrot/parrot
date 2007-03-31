@@ -90,7 +90,7 @@ inline op gcd(out INT, in NUM, in NUM) :advanced_math {
   FLOATVAL temp2 = $2 < 0.0 ? -$2 : $2;
   FLOATVAL temp3 = $3 < 0.0 ? -$3 : $3;
   while (temp3 != 0) {
-    q = floor( (FLOATVAL)temp2/temp3 );
+    q = floor((FLOATVAL)temp2/temp3);
     c = temp2 - temp3*q;
     temp2 = temp3;
     temp3 = c;
@@ -137,24 +137,24 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
     yk = ykp1;
   }
   $1 = r1;
-  $2 = (INTVAL)( xk * pow( -1, n ) );
-  $3 = (INTVAL)( yk * pow( -1, n+1 ) );
+  $2 = (INTVAL)(xk * pow(-1, n));
+  $3 = (INTVAL)(yk * pow(-1, n+1));
 
   x = $2 * $4;
   y = $3 * $5;
 
   /* correct the sign (can be wrong because we used abs($4) and abs($5) */
-  if ( x + y == r1 ) {
+  if (x + y == r1) {
     /* no correction necessary */
   }
-  else if ( x + y == -r1 ) {
+  else if (x + y == -r1) {
     $2 = -$2;
     $3 = -$3;
   }
-  else if ( x - y == r1 ) {
+  else if (x - y == r1) {
     $3 = -$3;
   }
-  else if ( -x + y == r1 ) {
+  else if (-x + y == r1) {
     $2 = -$2;
   }
 

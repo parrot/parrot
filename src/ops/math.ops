@@ -157,12 +157,12 @@ Create new $1 as the absolute of $2.
 =cut
 
 inline op abs(inout INT) :base_core {
-  $1 = abs( $1 );
+  $1 = abs($1);
   goto NEXT();
 }
 
 inline op abs(inout NUM) :base_core {
-  $1 = fabs( $1 );
+  $1 = fabs($1);
   goto NEXT();
 }
 
@@ -475,7 +475,7 @@ Set $1 to the smallest integral value greater than or equal to $2.
 =cut
 
 inline op ceil(inout NUM) :base_core {
-  $1 = ceil( $1 );
+  $1 = ceil($1);
   goto NEXT();
 }
 
@@ -504,7 +504,7 @@ Set $1 to the largest integral value less than or equal to $2.
 =cut
 
 inline op floor(inout NUM) :base_core {
-  $1 = floor( $1 );
+  $1 = floor($1);
   goto NEXT();
 }
 
@@ -1027,7 +1027,7 @@ inline op gcd(out INT, in INT, in INT) :advanced_math {
  if (a==0) { $1=b; goto NEXT(); }
  if (b==0) { $1=a; goto NEXT(); }
 
- while ( !((a | b) & 1) ) {
+ while (!((a | b) & 1)) {
    a>>=1;
    b>>=1;
    p++;
@@ -1062,7 +1062,7 @@ inline op lcm(out INT, in INT, in INT) :advanced_math {
 
  if (a==0 || b==0) { $1=0; goto NEXT(); }
 
- while ( !((a | b) & 1) ) {
+ while (!((a | b) & 1)) {
    a>>=1;
    b>>=1;
    p++;

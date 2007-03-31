@@ -87,7 +87,7 @@ Don't use.
 
 Internal opcode to prederef opcodes on the fly.
 Don't use.
-(Must be op #6, CORE_OPS_prederef__ ).
+(Must be op #6, CORE_OPS_prederef__).
 
 =item B<reserved>(inconst INT)
 
@@ -656,7 +656,7 @@ inline op set_addr(invar PMC, labelconst INT) {
 }
 
 inline op set_addr(invar PMC, labelvar INT) {
-    $1->vtable->set_pointer(interp, $1, (void* )$2);
+    $1->vtable->set_pointer(interp, $1, (void*)$2);
     goto NEXT();
 }
 

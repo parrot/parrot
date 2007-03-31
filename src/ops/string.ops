@@ -347,8 +347,7 @@ inline op sprintf(out STR, in STR, invar PMC) :base_core {
 inline op sprintf(out PMC, invar PMC, invar PMC) :base_core {
     $1->vtable->set_string_native(interp, $1,
         Parrot_psprintf(interp,
-                       $2->vtable->get_string(interp, $2), $3)
-    );
+                       $2->vtable->get_string(interp, $2), $3));
     goto NEXT();
 }
 
