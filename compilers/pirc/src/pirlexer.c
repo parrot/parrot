@@ -688,7 +688,7 @@ check_dictionary(lexer_state *lexer, char const *dictionary[]) {
     int index = 0;
     char const * word = dictionary[index];
     /* check all words in dictionary; if equal, return its token enum value */
-    while(word) {
+    while (word) {
         if (strcmp(word, lexer->token_chars) == 0) return index;
         word = dictionary[++index];
     }
@@ -917,7 +917,7 @@ clone_string(char const * src) {
      * of the string - is returned
      */
     dest = ptr = (char *)calloc(srclen + 1, sizeof(char));
-    while(*src) {
+    while (*src) {
         *dest++ = *src++;
     }
     return ptr;
@@ -1057,7 +1057,7 @@ is indicated explicitly.
 
 */
         /* now start checking for real tokens */
-        switch(c) {
+        switch (c) {
             case 'P':
                 buffer_char(lexer, c);              /* buffer 'P'                          */
                 count = read_digits(lexer);         /* read as many digits as you can      */
@@ -1253,7 +1253,7 @@ is indicated explicitly.
             c = read_char(lexer->curfile);
             if (c == EOF_MARKER) return T_EOF;
 
-            switch(c) {
+            switch (c) {
                 case 'P': regtype = T_PREG; break;
                 case 'N': regtype = T_NREG; break;
                 case 'S': regtype = T_SREG; break;
@@ -1302,7 +1302,7 @@ is indicated explicitly.
 =cut
 
 */
-        switch(c) {
+        switch (c) {
             case '(': buffer_char(lexer, c); return T_LPAREN;
             case ')': buffer_char(lexer, c); return T_RPAREN;
             case '[': buffer_char(lexer, c); return T_LBRACKET;
@@ -1348,7 +1348,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         /* check for possible multi-character special tokens */
         if (c == '*') {
             c = read_char(lexer->curfile);
-            switch(c) {
+            switch (c) {
                 case '*': return T_POWER;        /* *= */
                 case '=': return T_POWER_ASSIGN; /* **= */
                 case EOF_MARKER: return T_EOF;
@@ -1359,7 +1359,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         }
         else if (c == '%') {
             c = read_char(lexer->curfile);
-            switch(c) {
+            switch (c) {
                 case '=': return T_MODULO_ASSIGN; /* %= */
                 case EOF_MARKER: return T_EOF;
                 default:
@@ -1369,7 +1369,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         }
         else if (c == '/') {
             c = read_char(lexer->curfile);
-            switch(c) {
+            switch (c) {
                 case '/':
                     c = read_char(lexer->curfile);
                     if (c == '=') {
@@ -1389,7 +1389,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         }
         else if (c == '+') {
             c = read_char(lexer->curfile);
-            switch(c) {
+            switch (c) {
                 case '=': return T_PLUS_ASSIGN; /* += */
                 case EOF_MARKER: return T_EOF;
                 default:
@@ -1399,7 +1399,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         }
         else if (c == '-') {
             c = read_char(lexer->curfile);
-            switch(c) {
+            switch (c) {
                 case '>': return T_PTR;         /* -> */
                 case '=': return T_MINUS_ASSIGN; /* -= */
                 case EOF_MARKER: return T_EOF;
@@ -1410,7 +1410,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         }
         else if (c == '!') {
             c = read_char(lexer->curfile);
-            switch(c) {
+            switch (c) {
                 case '=': return T_NE;              /* != */
                 case EOF_MARKER: return T_EOF;
                 default:                            /* ! */
@@ -1420,7 +1420,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         }
         else if (c == '=') {
             c = read_char(lexer->curfile);
-            switch(c) {
+            switch (c) {
                 case '>': return T_ARROW;          /* => */
                 case '=': return T_EQ;             /* == */
                 case EOF_MARKER: return T_EOF;
@@ -1431,7 +1431,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         }
         else if (c == '>') {
             c = read_char(lexer->curfile);
-            switch(c) {
+            switch (c) {
                 case '>':
                     c = read_char(lexer->curfile);
                     if (c == '>') { /* >>> */
@@ -1460,7 +1460,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         }
         else if (c == '<') {
             c = read_char(lexer->curfile);
-            switch(c) {
+            switch (c) {
                 case '=': return T_LE; /* <= */
                 case '<': /* <<? */
                     c = read_char(lexer->curfile);
@@ -1491,7 +1491,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         }
         else if (c == '~') {
             c = read_char(lexer->curfile);
-            switch(c) {
+            switch (c) {
                 case '~': return T_XOR;             /* ~~ */
                 case '=': return T_BXOR_ASSIGN;     /* ~= */
                 case EOF_MARKER: return T_EOF;
@@ -1502,7 +1502,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         }
         else if (c == '&') {
             c = read_char(lexer->curfile);
-            switch(c) {
+            switch (c) {
                 case '&': return T_AND;             /* && */
                 case '=': return T_BAND_ASSIGN;     /* &= */
                 case EOF_MARKER: return T_EOF;
@@ -1513,7 +1513,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         }
         else if (c == '|') {
             c = read_char(lexer->curfile);
-            switch(c) {
+            switch (c) {
                 case '|': return T_OR;              /* || */
                 case '=': return T_BOR_ASSIGN;      /* |= */
                 case EOF_MARKER: return T_EOF;

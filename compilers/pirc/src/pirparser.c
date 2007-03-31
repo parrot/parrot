@@ -403,7 +403,7 @@ method(parser_state *p) {
 */
 static void
 target(parser_state *p) {
-    switch(p->curtoken) {
+    switch (p->curtoken) {
         case T_PASM_PREG: case T_PREG: case T_PASM_IREG: case T_IREG:
         case T_PASM_NREG: case T_NREG: case T_PASM_SREG: case T_SREG:
         case T_IDENTIFIER:
@@ -426,7 +426,7 @@ target(parser_state *p) {
 */
 static void
 type(parser_state *p) {
-    switch(p->curtoken) {
+    switch (p->curtoken) {
         case T_INT:
         case T_NUM:
         case T_PMC:
@@ -481,7 +481,7 @@ static void
 keylist(parser_state *p) {
     match(p, T_LBRACKET); /* skip '[' */
     key(p);
-    while(p->curtoken == T_SEMICOLON || p->curtoken == T_COMMA) {
+    while (p->curtoken == T_SEMICOLON || p->curtoken == T_COMMA) {
         next(p); /* skip ';' or ',' */
         key(p);
     }
@@ -626,7 +626,7 @@ just return.
 */
 static void
 arith_expression(parser_state *p) {
-    switch(p->curtoken) {
+    switch (p->curtoken) {
         case T_PLUS:
         case T_MINUS:
         case T_DIVIDE:
@@ -708,7 +708,7 @@ static void
 assignment(parser_state *p) {
     match(p, T_ASSIGN);
 
-    switch(p->curtoken) {
+    switch (p->curtoken) {
         case T_NOT:
         case T_MINUS:
         case T_BXOR:  /* '~' used as binary 'not' op */
@@ -881,7 +881,7 @@ local_id_list(parser_state *p) {
     match(p, T_IDENTIFIER);
     if (p->curtoken == T_UNIQUE_REG_FLAG) next(p);
 
-    while(p->curtoken == T_COMMA) {
+    while (p->curtoken == T_COMMA) {
         next(p); /* skip comma */
         match(p, T_IDENTIFIER);
 
@@ -974,7 +974,7 @@ static void
 conditional_expression(parser_state *p) {
     expression(p);
 
-    switch(p->curtoken) { /* optional */
+    switch (p->curtoken) { /* optional */
         case T_GE: case T_GT: case T_EQ:
         case T_NE: case T_LT: case T_LE:
             next(p); /* skip comparison op */
@@ -1048,7 +1048,7 @@ if_statement(parser_state *p) {
 */
 static void
 const_definition(parser_state *p) {
-    switch(p->curtoken) {
+    switch (p->curtoken) {
         case T_INT:
             next(p);
             match(p, T_IDENTIFIER);
@@ -1149,7 +1149,7 @@ param_flags(parser_state *p) {
     int ok = 1;
     while (ok) {
         /* if the current token is a flag, parse it */
-        switch(p->curtoken) {
+        switch (p->curtoken) {
             case T_SLURPY_FLAG:
             case T_UNIQUE_REG_FLAG:
             case T_OPTIONAL_FLAG:
@@ -1206,7 +1206,7 @@ long_invocation(parser_state *p) {
         match(p, T_NEWLINE);
     }
 
-    switch(p->curtoken) {
+    switch (p->curtoken) {
         case T_PCC_CALL: /* ... '.pcc_call' target '\n' ... */
         case T_NCI_CALL: /* ... '.nci_call' target '\n' ... */
             next(p);
@@ -1302,7 +1302,7 @@ static void
 target_statement(parser_state *p) {
     target(p);
 
-    switch(p->curtoken) {
+    switch (p->curtoken) {
         case T_ASSIGN:   /* target '=' expression */
             assignment(p);
             break;
@@ -1358,7 +1358,7 @@ static void
 target_list(parser_state *p) {
     match(p, T_LPAREN);
     target(p);
-    while(p->curtoken == T_COMMA) {
+    while (p->curtoken == T_COMMA) {
         next(p);
         target(p);
         param_flags(p);
@@ -1380,7 +1380,7 @@ multi_result_invocation(parser_state *p) {
     target_list(p);
     match(p, T_ASSIGN);
 
-    switch(p->curtoken) {
+    switch (p->curtoken) {
         case T_IDENTIFIER: /* target_list '=' subcall */
         case T_PASM_PREG:
         case T_PREG:
@@ -1691,7 +1691,7 @@ sub_flags(parser_state *p) {
     int wantmore = 0; /* flag that is set when a ',' is parsed */
 
     while (ok || wantmore) {
-        switch(p->curtoken) {
+        switch (p->curtoken) {
             case T_ANON_FLAG:
             case T_INIT_FLAG:
             case T_LOAD_FLAG:
