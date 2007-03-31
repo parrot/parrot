@@ -10,7 +10,7 @@ pmclass Int64 dynpmc group dotnet_runtime {
     /* Instance initialization. We need a custom destroy. */
     void init()
     {
-        struct dotnet_int64 *i = mem_sys_allocate(sizeof(struct dotnet_int64));
+        struct dotnet_int64 *i = mem_sys_allocate(sizeof (struct dotnet_int64));
         PObj_active_destroy_SET(SELF);
         PMC_struct_val(SELF) = i;
         i->x = 0;

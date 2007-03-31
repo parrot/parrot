@@ -38,8 +38,7 @@ static void destroy_dotnet_assembly(struct dotnet_assembly *ass)
 /* This creates a new dotnet_assembly structure and sets the filename. */
 static struct dotnet_assembly* new_dotnet_assembly(STRING *s)
 {
-    struct dotnet_assembly *ass = mem_sys_allocate_zeroed(
-        sizeof(struct dotnet_assembly));
+    struct dotnet_assembly *ass = mem_sys_allocate_zeroed(sizeof (struct dotnet_assembly));
     ass->filename = s;
     return ass;
 }
@@ -689,7 +688,7 @@ static PMC* make_bytecode_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly 
 
     /* Create new PMC, underlying struct and tie 'em together. */
     PMC *bc = pmc_new(INTERP, dynclass_DotNetBytecode);
-    struct dotnet_bytecode *bytecode = mem_sys_allocate_zeroed(sizeof(struct dotnet_bytecode));
+    struct dotnet_bytecode *bytecode = mem_sys_allocate_zeroed(sizeof (struct dotnet_bytecode));
     PMC_struct_val(bc) = bytecode;
 
     /* Resolve RVA to file position. */
@@ -796,7 +795,7 @@ static PMC* make_bytecode_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly 
                         /* Create PMC, underlying struct and tie 'em together. */
                         PMC *eh = pmc_new(INTERP, dynclass_DotNetEH);
                         struct dotnet_eh *handler =
-                            mem_sys_allocate_zeroed(sizeof(struct dotnet_eh));
+                            mem_sys_allocate_zeroed(sizeof (struct dotnet_eh));
                         PMC_struct_val(eh) = handler;
 
                         /* Read data and stash it in the struct. */
@@ -834,7 +833,7 @@ static PMC* make_bytecode_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly 
                         /* Create PMC, underlying struct and tie 'em together. */
                         PMC *eh = pmc_new(INTERP, dynclass_DotNetEH);
                         struct dotnet_eh *handler =
-                            mem_sys_allocate_zeroed(sizeof(struct dotnet_eh));
+                            mem_sys_allocate_zeroed(sizeof (struct dotnet_eh));
                         PMC_struct_val(eh) = handler;
 
                         /* Read data and stash it in the struct. */
@@ -890,7 +889,7 @@ static PMC* make_param_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *as
 
     /* Create new PMC, underlying struct and tie 'em together. */
     PMC *p = pmc_new(INTERP, dynclass_DotNetParamMetadata);
-    struct dotnet_param *param = mem_sys_allocate_zeroed(sizeof(struct dotnet_param));
+    struct dotnet_param *param = mem_sys_allocate_zeroed(sizeof (struct dotnet_param));
     PMC_struct_val(p) = param;
 
     /* Sanity check. */
@@ -938,7 +937,7 @@ static PMC* make_field_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *as
 
     /* Create new PMC, underlying struct and tie 'em together. */
     PMC *f = pmc_new(INTERP, dynclass_DotNetFieldMetadata);
-    struct dotnet_field *field = mem_sys_allocate_zeroed(sizeof(struct dotnet_field));
+    struct dotnet_field *field = mem_sys_allocate_zeroed(sizeof (struct dotnet_field));
     PMC_struct_val(f) = field;
 
     /* Sanity check. */
@@ -1001,7 +1000,7 @@ static PMC* make_method_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *a
 
     /* Create new PMC, underlying struct and tie 'em together. */
     PMC *m = pmc_new(INTERP, dynclass_DotNetMethodMetadata);
-    struct dotnet_method *method = mem_sys_allocate_zeroed(sizeof(struct dotnet_method));
+    struct dotnet_method *method = mem_sys_allocate_zeroed(sizeof (struct dotnet_method));
     PMC_struct_val(m) = method;
 
     /* Sanity check. */
@@ -1182,7 +1181,7 @@ static PMC* make_class_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *as
 
     /*  Create new PMC, underlying struct and tie 'em together. */
     PMC *c = pmc_new(INTERP, dynclass_DotNetClassMetadata);
-    struct dotnet_class *type = mem_sys_allocate_zeroed(sizeof(struct dotnet_class));
+    struct dotnet_class *type = mem_sys_allocate_zeroed(sizeof (struct dotnet_class));
     PMC_struct_val(c) = type;
 
     /* Sanity check. */
@@ -1347,7 +1346,7 @@ static PMC* make_typeref_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *
 
     /*  Create new PMC, underlying struct and tie 'em together. */
     PMC *tr = pmc_new(INTERP, dynclass_DotNetTypeRefMetadata);
-    struct dotnet_typeref *typeref = mem_sys_allocate_zeroed(sizeof(struct dotnet_typeref));
+    struct dotnet_typeref *typeref = mem_sys_allocate_zeroed(sizeof (struct dotnet_typeref));
     PMC_struct_val(tr) = typeref;
 
     /* Sanity check. */
@@ -1415,7 +1414,7 @@ static PMC* make_memberref_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly
 
     /*  Create new PMC, underlying struct and tie 'em together. */
     PMC *mr = pmc_new(INTERP, dynclass_DotNetMemberRefMetadata);
-    struct dotnet_memberref *memberref = mem_sys_allocate_zeroed(sizeof(struct dotnet_memberref));
+    struct dotnet_memberref *memberref = mem_sys_allocate_zeroed(sizeof (struct dotnet_memberref));
     PMC_struct_val(mr) = memberref;
 
     /* Sanity check. */
@@ -1487,7 +1486,7 @@ static PMC* make_assemblyref_pmc(Interp *INTERP, PMC *self, struct dotnet_assemb
     /*  Create new PMC, underlying struct and tie 'em together. */
     PMC *ar = pmc_new(INTERP, dynclass_DotNetAssemblyRefMetadata);
     struct dotnet_assemblyref *assemblyref =
-        mem_sys_allocate_zeroed(sizeof(struct dotnet_assemblyref));
+        mem_sys_allocate_zeroed(sizeof (struct dotnet_assemblyref));
     PMC_struct_val(ar) = assemblyref;
 
     /* Sanity check. */

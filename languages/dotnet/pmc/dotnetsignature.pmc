@@ -47,7 +47,7 @@ pmclass DotNetSignature dynpmc group dotnet {
         else
         {
             /* No; need to allocate a new structure. */
-            sig = mem_sys_allocate_zeroed(sizeof(struct dotnet_signature));
+            sig = mem_sys_allocate_zeroed(sizeof (struct dotnet_signature));
             PMC_struct_val(SELF) = sig;
         }
 

@@ -89,7 +89,7 @@ inline op net_div_un(out PMC, invar PMC, invar PMC) :base_core {
     if ($2->vtable->isa(interp, $2,
         string_from_const_cstring(interp, "UInt64", 0)))
     {
-        struct dotnet_uint64* i = mem_sys_allocate(sizeof(struct dotnet_uint64));
+        struct dotnet_uint64* i = mem_sys_allocate(sizeof (struct dotnet_uint64));
         struct dotnet_uint64 *i1 = PMC_struct_val($2);
         struct dotnet_uint64 *i2 = PMC_struct_val($3);
         $1 = pmc_new(interp, pmc_type(interp,
@@ -117,7 +117,7 @@ inline op net_rem_un(out PMC, invar PMC, invar PMC) :base_core {
     if ($2->vtable->isa(interp, $2,
         string_from_const_cstring(interp, "UInt64", 0)))
     {
-        struct dotnet_uint64* i = mem_sys_allocate(sizeof(struct dotnet_uint64));
+        struct dotnet_uint64* i = mem_sys_allocate(sizeof (struct dotnet_uint64));
         struct dotnet_uint64 *i1 = PMC_struct_val($2);
         struct dotnet_uint64 *i2 = PMC_struct_val($3);
         $1 = pmc_new(interp, pmc_type(interp,
@@ -166,7 +166,7 @@ inline op net_add_ovf(out PMC, invar PMC, invar PMC) :base_core {
         }
         else
         {
-            struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
+            struct dotnet_int64* i = mem_sys_allocate(sizeof (struct dotnet_int64));
             $1 = pmc_new(interp, pmc_type(interp,
                 string_from_const_cstring(interp, "Int64", 0)));
             PMC_struct_val($1) = i;
@@ -221,7 +221,7 @@ inline op net_add_ovf_un(out PMC, invar PMC, invar PMC) :base_core {
         }
         else
         {
-            struct dotnet_uint64* i = mem_sys_allocate(sizeof(struct dotnet_uint64));
+            struct dotnet_uint64* i = mem_sys_allocate(sizeof (struct dotnet_uint64));
             $1 = pmc_new(interp, pmc_type(interp,
                 string_from_const_cstring(interp, "UInt64", 0)));
             PMC_struct_val($1) = i;
@@ -276,7 +276,7 @@ inline op net_sub_ovf(out PMC, invar PMC, invar PMC) :base_core {
         }
         else
         {
-            struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
+            struct dotnet_int64* i = mem_sys_allocate(sizeof (struct dotnet_int64));
             $1 = pmc_new(interp, pmc_type(interp,
                 string_from_const_cstring(interp, "Int64", 0)));
             PMC_struct_val($1) = i;
@@ -331,7 +331,7 @@ inline op net_sub_ovf_un(out PMC, invar PMC, invar PMC) :base_core {
         }
         else
         {
-            struct dotnet_uint64* i = mem_sys_allocate(sizeof(struct dotnet_uint64));
+            struct dotnet_uint64* i = mem_sys_allocate(sizeof (struct dotnet_uint64));
             $1 = pmc_new(interp, pmc_type(interp,
                 string_from_const_cstring(interp, "UInt64", 0)));
             PMC_struct_val($1) = i;
@@ -386,7 +386,7 @@ inline op net_mul_ovf(out PMC, invar PMC, invar PMC) :base_core {
         }
         else
         {
-            struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
+            struct dotnet_int64* i = mem_sys_allocate(sizeof (struct dotnet_int64));
             $1 = pmc_new(interp, pmc_type(interp,
                 string_from_const_cstring(interp, "Int64", 0)));
             PMC_struct_val($1) = i;
@@ -441,7 +441,7 @@ inline op net_mul_ovf_un(out PMC, invar PMC, invar PMC) :base_core {
         }
         else
         {
-            struct dotnet_uint64* i = mem_sys_allocate(sizeof(struct dotnet_uint64));
+            struct dotnet_uint64* i = mem_sys_allocate(sizeof (struct dotnet_uint64));
             $1 = pmc_new(interp, pmc_type(interp,
                 string_from_const_cstring(interp, "UInt64", 0)));
             PMC_struct_val($1) = i;
@@ -854,7 +854,7 @@ inline op net_conv_u4(out INT, invar PMC) :base_core {
 inline op net_conv_i8(out PMC, in INT) :base_core {
     PMC* i8 = pmc_new(interp, pmc_type(interp,
               string_from_const_cstring(interp, "Int64", 0)));
-    struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
+    struct dotnet_int64* i = mem_sys_allocate(sizeof (struct dotnet_int64));
     PMC_struct_val(i8) = i;
         i->x = $2;
     $1 = i8;
@@ -864,7 +864,7 @@ inline op net_conv_i8(out PMC, in INT) :base_core {
 inline op net_conv_i8(out PMC, in NUM) :base_core {
     PMC* i8 = pmc_new(interp, pmc_type(interp,
               string_from_const_cstring(interp, "Int64", 0)));
-    struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
+    struct dotnet_int64* i = mem_sys_allocate(sizeof (struct dotnet_int64));
     PMC_struct_val(i8) = i;
         i->x = (HUGEINTVAL) $2;
     $1 = i8;
@@ -874,7 +874,7 @@ inline op net_conv_i8(out PMC, in NUM) :base_core {
 inline op net_conv_u8(out PMC, in INT) :base_core {
     PMC* u8 = pmc_new(interp, pmc_type(interp,
               string_from_const_cstring(interp, "UInt64", 0)));
-    struct dotnet_uint64* ui = mem_sys_allocate(sizeof(struct dotnet_uint64));
+    struct dotnet_uint64* ui = mem_sys_allocate(sizeof (struct dotnet_uint64));
     PMC_struct_val(u8) = ui;
         ui->x = $2;
     $1 = u8;
@@ -884,7 +884,7 @@ inline op net_conv_u8(out PMC, in INT) :base_core {
 inline op net_conv_u8(out PMC, in NUM) :base_core {
     PMC* u8 = pmc_new(interp, pmc_type(interp,
               string_from_const_cstring(interp, "UInt64", 0)));
-    struct dotnet_uint64* ui = mem_sys_allocate(sizeof(struct dotnet_uint64));
+    struct dotnet_uint64* ui = mem_sys_allocate(sizeof (struct dotnet_uint64));
     PMC_struct_val(u8) = ui;
         ui->x = (UHUGEINTVAL) $2;
     $1 = u8;
@@ -1623,7 +1623,7 @@ inline op net_conv_ovf_i8(out PMC, in NUM) :base_core {
     }
     else
     {
-        struct dotnet_int64* i = mem_sys_allocate(sizeof(struct dotnet_int64));
+        struct dotnet_int64* i = mem_sys_allocate(sizeof (struct dotnet_int64));
         $1 = pmc_new(interp, pmc_type(interp,
             string_from_const_cstring(interp, "Int64", 0)));
         PMC_struct_val($1) = i;
@@ -1641,7 +1641,7 @@ inline op net_conv_ovf_u8(out PMC, in NUM) :base_core {
     }
     else
     {
-        struct dotnet_uint64* i = mem_sys_allocate(sizeof(struct dotnet_uint64));
+        struct dotnet_uint64* i = mem_sys_allocate(sizeof (struct dotnet_uint64));
         $1 = pmc_new(interp, pmc_type(interp,
             string_from_const_cstring(interp, "UInt64", 0)));
         PMC_struct_val($1) = i;
@@ -1688,7 +1688,7 @@ inline op net_ldelema(out PMC, invar PMC, in INT) :base_core {
     PMC* mp = pmc_new(interp, pmc_type(interp,
               string_from_const_cstring(interp, "ManagedPointer", 0)));
     struct dotnet_managed_ptr* managed_ptr = mem_sys_allocate(
-        sizeof(struct dotnet_managed_ptr));
+        sizeof (struct dotnet_managed_ptr));
     PMC_struct_val(mp) = managed_ptr;
 
     /* Stash away array details inside the pointer struct. */
@@ -1706,7 +1706,7 @@ inline op net_ldelema(out PMC, invar PMC, invar PMC) :base_core {
     PMC* mp = pmc_new(interp, pmc_type(interp,
               string_from_const_cstring(interp, "ManagedPointer", 0)));
     struct dotnet_managed_ptr* managed_ptr = mem_sys_allocate(
-        sizeof(struct dotnet_managed_ptr));
+        sizeof (struct dotnet_managed_ptr));
     PMC_struct_val(mp) = managed_ptr;
 
     /* Stash away array details inside the pointer struct. */
@@ -1724,7 +1724,7 @@ inline op net_ldflda(out PMC, invar PMC, in STR) :base_core {
     PMC* mp = pmc_new(interp, pmc_type(interp,
               string_from_const_cstring(interp, "ManagedPointer", 0)));
     struct dotnet_managed_ptr* managed_ptr = mem_sys_allocate(
-        sizeof(struct dotnet_managed_ptr));
+        sizeof (struct dotnet_managed_ptr));
     PMC_struct_val(mp) = managed_ptr;
 
     /* Stash away field details inside the pointer struct. */
@@ -1742,7 +1742,7 @@ inline op net_reg_ptr(out PMC, in INT) :base_core {
     PMC* mp = pmc_new(interp, pmc_type(interp,
               string_from_const_cstring(interp, "ManagedPointer", 0)));
     struct dotnet_managed_ptr* managed_ptr = mem_sys_allocate(
-        sizeof(struct dotnet_managed_ptr));
+        sizeof (struct dotnet_managed_ptr));
     PMC_struct_val(mp) = managed_ptr;
 
     /* Set up the pointer to the register. */
@@ -1761,7 +1761,7 @@ inline op net_reg_ptr(out PMC, in NUM) :base_core {
     PMC* mp = pmc_new(interp, pmc_type(interp,
               string_from_const_cstring(interp, "ManagedPointer", 0)));
     struct dotnet_managed_ptr* managed_ptr = mem_sys_allocate(
-        sizeof(struct dotnet_managed_ptr));
+        sizeof (struct dotnet_managed_ptr));
     PMC_struct_val(mp) = managed_ptr;
 
     /* Set up the pointer to the register. */
@@ -1780,7 +1780,7 @@ inline op net_reg_ptr(out PMC, invar PMC) :base_core {
     PMC* mp = pmc_new(interp, pmc_type(interp,
               string_from_const_cstring(interp, "ManagedPointer", 0)));
     struct dotnet_managed_ptr* managed_ptr = mem_sys_allocate(
-        sizeof(struct dotnet_managed_ptr));
+        sizeof (struct dotnet_managed_ptr));
     PMC_struct_val(mp) = managed_ptr;
 
     /* Set up the pointer to the register. */
@@ -1799,7 +1799,7 @@ inline op net_pmc_ptr(out PMC, invar PMC) :base_core {
     PMC* mp = pmc_new(interp, pmc_type(interp,
               string_from_const_cstring(interp, "ManagedPointer", 0)));
     struct dotnet_managed_ptr* managed_ptr = mem_sys_allocate(
-        sizeof(struct dotnet_managed_ptr));
+        sizeof (struct dotnet_managed_ptr));
     PMC_struct_val(mp) = managed_ptr;
 
     /* Set up the pointer to the PMC. */
