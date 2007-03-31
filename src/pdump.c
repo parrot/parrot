@@ -261,14 +261,14 @@ main(int argc, char **argv)
             exit(1);
         }
         PackFile_pack(interp, interp->code->base.pf, pack);
-        if (strcmp (file, "-") == 0)
+        if (strcmp(file, "-") == 0)
             fp = stdout;
         else if ((fp = fopen(file, "wb")) == 0) {
             printf("Couldn't open %s\n", file);
             exit(1);
         }
 
-        if ((1 != fwrite(pack, size, 1, fp)) ) {
+        if ((1 != fwrite(pack, size, 1, fp))) {
             printf("Couldn't write %s\n", file);
             exit(1);
         }

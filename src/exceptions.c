@@ -718,7 +718,7 @@ real_exception(Interp *interp, void *ret_addr,
                 "real_exception (severity:%d error:%d): %Ss\n"
                 "likely reason: argument count mismatch in main "
                 "(more than 1 param)\n",
-                EXCEPT_error, exitcode, msg );
+                EXCEPT_error, exitcode, msg);
         /* [what if exitcode is a multiple of 256?] */
         exit(exitcode);
     }
@@ -728,7 +728,7 @@ real_exception(Interp *interp, void *ret_addr,
     the_exception->resume = ret_addr;
     if (Interp_debug_TEST(interp, PARROT_BACKTRACE_DEBUG_FLAG)) {
         PIO_eprintf(interp, "real_exception (severity:%d error:%d): %Ss\n",
-            EXCEPT_error, exitcode, msg );
+            EXCEPT_error, exitcode, msg);
         PDB_backtrace(interp);
     }
     /*

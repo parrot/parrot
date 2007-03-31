@@ -939,7 +939,7 @@ process_events(QUEUE* event_q)
     QUEUE_ENTRY *entry;
     parrot_event* event;
 
-    while (( entry = peek_entry(event_q))) {
+    while ((entry = peek_entry(event_q))) {
         /*
          * one or more entries arrived - we hold the mutex again
          * so we have to use the nonsyc_pop_entry to pop off event entries
@@ -1036,7 +1036,7 @@ event_thread(void *data)
             /* do a_timedwait for entry */
             struct timespec abs_time;
             FLOATVAL when;
-            event = (parrot_event* )entry->data;
+            event = (parrot_event*)entry->data;
             when = event->u.timer_event.abs_time;
             abs_time.tv_sec = (time_t) when;
             abs_time.tv_nsec = (long)((when - abs_time.tv_sec)*1000.0f)
@@ -1107,7 +1107,7 @@ wait_for_wakeup(Parrot_Interp interp, void *next)
 
     while (interp->sleeping) {
         entry = wait_for_entry(tq);
-        event = (parrot_event* )entry->data;
+        event = (parrot_event*)entry->data;
         mem_sys_free(entry);
         edebug((stderr, "got ev %s head : %p\n", et(event), tq->head));
         next = do_event(interp, event, next);
@@ -1247,8 +1247,7 @@ do_event(Parrot_Interp interp, parrot_event* event, void *next)
                     event->u.io_event.handler,
                     "vPP",
                     event->u.io_event.pio,
-                    event->u.io_event.user_data
-                    );
+                    event->u.io_event.user_data);
             break;
         case EVENT_TYPE_SLEEP:
             interp->sleeping = 0;
@@ -1291,7 +1290,7 @@ Parrot_do_handle_events(Parrot_Interp interp, int restore, void *next)
         return next;
     while (peek_entry(tq)) {
         entry = pop_entry(tq);
-        event = (parrot_event* )entry->data;
+        event = (parrot_event*)entry->data;
         mem_sys_free(entry);
         next = do_event(interp, event, next);
     }

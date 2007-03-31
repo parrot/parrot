@@ -170,7 +170,7 @@ push_ascii_string(Parrot_Interp interp, IMAGE_IO *io, STRING *s)
     UINTVAL idx = 0;
 
     /* temporary--write out in UTF-8 */
-    for ( idx = 0; idx < length; ++idx ) {
+    for (idx = 0; idx < length; ++idx) {
         *cursor++ = (unsigned char)string_index(interp, s, idx);
     }
 
@@ -405,7 +405,7 @@ push_opcode_number(Parrot_Interp interp, IMAGE_IO *io, FLOATVAL v)
     const size_t used = s->bufused;
 
     op_check_size(interp, s, len);
-    PF_store_number( (opcode_t *)((ptrcast_t)s->strstart + used), &v);
+    PF_store_number((opcode_t *)((ptrcast_t)s->strstart + used), &v);
     s->bufused += len;
     s->strlen += len;
 }
@@ -429,7 +429,7 @@ push_opcode_string(Parrot_Interp interp, IMAGE_IO *io, STRING* v)
     const size_t used = s->bufused;
 
     op_check_size(interp, s, len);
-    PF_store_string( (opcode_t *)((ptrcast_t)s->strstart + used), v);
+    PF_store_string((opcode_t *)((ptrcast_t)s->strstart + used), v);
     s->bufused += len;
     s->strlen += len;
 }
@@ -810,14 +810,14 @@ thaw_pmc(Parrot_Interp interp, visit_info *info,
 
     info->extra_flags = EXTRA_IS_NULL;
     n = io->vtable->shift_pmc(interp, io);
-    if ( ((UINTVAL) n & 3) == 3) {
+    if (((UINTVAL) n & 3) == 3) {
         /* pmc has extra data */
         info->extra_flags = io->vtable->shift_integer(interp, io);
     }
-    else if ( (UINTVAL) n & 1) {     /* seen PMCs have bit 0 set */
+    else if ((UINTVAL) n & 1) {     /* seen PMCs have bit 0 set */
         seen = 1;
     }
-    else if ( (UINTVAL) n & 2) { /* prev PMC was same type */
+    else if ((UINTVAL) n & 2) { /* prev PMC was same type */
         *type = info->last_type;
     }
     else {                       /* type follows */
@@ -1297,7 +1297,7 @@ visit_loop_todo_list(Parrot_Interp interp, PMC *current,
      * can't cache upper limit, visit may append items
      */
 again:
-    for (; (int)list_length(interp, todo); ) {
+    for (; (int)list_length(interp, todo);) {
         current = *(PMC**)list_shift(interp, todo, enum_type_PMC);
         VTABLE_visit(interp, current, info);
         if (thawing) {

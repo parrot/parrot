@@ -78,7 +78,7 @@ main(int argc, char * argv[])
     if (!PackFile_unpack(interp, pf, (opcode_t *)(&program_code),
         sizeof (&program_code)))
     {
-        printf( "Can't unpack.\n" );
+        printf("Can't unpack.\n");
         return 1;
     }
     Parrot_loadbc(interp, pf);

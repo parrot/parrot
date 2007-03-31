@@ -82,7 +82,7 @@ to_unicode(Interp *interp, STRING *src, STRING *dest)
         for (offs = 0; offs < src->strlen; ++offs) {
             c = ENCODING_GET_BYTE(interp, src, offs);
             if (iter.bytepos >= PObj_buflen(dest) - 4) {
-                UINTVAL need = (UINTVAL)( (src->strlen - offs) * 1.5 );
+                UINTVAL need = (UINTVAL)((src->strlen - offs) * 1.5);
                 if (need < 16)
                     need = 16;
                 Parrot_reallocate_string(interp, dest,

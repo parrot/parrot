@@ -2027,10 +2027,10 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 
 /* Ptr to next physical malloc_chunk. */
-#define next_chunk(p) ((mchunkptr)( ((char*)(p)) + ((p)->size & ~PREV_INUSE) ))
+#define next_chunk(p) ((mchunkptr)(((char*)(p)) + ((p)->size & ~PREV_INUSE)))
 
 /* Ptr to previous physical malloc_chunk */
-#define prev_chunk(p) ((mchunkptr)( ((char*)(p)) - ((p)->prev_size) ))
+#define prev_chunk(p) ((mchunkptr)(((char*)(p)) - ((p)->prev_size)))
 
 /* Treat space at ptr + offset as a chunk */
 #define chunk_at_offset(p, s)  ((mchunkptr)(((char*)(p)) + (s)))
@@ -3234,7 +3234,7 @@ static Void_t* sYSMALLOc(nb, av) INTERNAL_SIZE_T nb; mstate av;
             intentional. We need the fencepost, even if old_top otherwise gets
             lost.
           */
-          chunk_at_offset(old_top, old_size          )->size =
+          chunk_at_offset(old_top, old_size)->size =
             SIZE_SZ|PREV_INUSE;
 
           chunk_at_offset(old_top, old_size + SIZE_SZ)->size =
@@ -3414,7 +3414,7 @@ Void_t* mALLOc(size_t bytes)
 
   if ((CHUNK_SIZE_T)(nb) <= (CHUNK_SIZE_T)(av->max_fast)) {
     fb = &(av->fastbins[(fastbin_index(nb))]);
-    if ( (victim = *fb) != 0) {
+    if ((victim = *fb) != 0) {
       *fb = victim->fd;
       check_remalloced_chunk(victim, nb);
       return chunk2mem(victim);
@@ -3433,7 +3433,7 @@ Void_t* mALLOc(size_t bytes)
     idx = smallbin_index(nb);
     bin = bin_at(av,idx);
 
-    if ( (victim = last(bin)) != bin) {
+    if ((victim = last(bin)) != bin) {
       bck = victim->bk;
       set_inuse_bit_at_offset(victim, nb);
       bin->bk = bck;
@@ -3469,7 +3469,7 @@ Void_t* mALLOc(size_t bytes)
     chunks are placed in bins.
   */
 
-  while ( (victim = unsorted_chunks(av)->bk) != unsorted_chunks(av)) {
+  while ((victim = unsorted_chunks(av)->bk) != unsorted_chunks(av)) {
     bck = victim->bk;
     size = chunksize(victim);
 
@@ -3612,7 +3612,7 @@ Void_t* mALLOc(size_t bytes)
       do {
         if (++block >= BINMAPSIZE)  /* out of bins */
           goto use_top;
-      } while ( (map = av->binmap[block]) == 0);
+      } while ((map = av->binmap[block]) == 0);
 
       bin = bin_at(av, (block << BINMAPSHIFT));
       bit = 1;
@@ -3925,7 +3925,7 @@ static void malloc_consolidate(av) mstate av;
     maxfb = &(av->fastbins[fastbin_index(av->max_fast)]);
     fb = &(av->fastbins[0]);
     do {
-      if ( (p = *fb) != 0) {
+      if ((p = *fb) != 0) {
         *fb = 0;
 
         do {
@@ -3969,7 +3969,7 @@ static void malloc_consolidate(av) mstate av;
             av->top = p;
           }
 
-        } while ( (p = nextp) != 0);
+        } while ((p = nextp) != 0);
 
       }
     } while (fb++ != maxfb);

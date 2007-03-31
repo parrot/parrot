@@ -709,7 +709,7 @@ pbc_merge_write(Interp *interp, struct PackFile *pf, const char *filename)
         PIO_eprintf(interp, "PBC Merge: Couldn't open %s\n", filename);
         Parrot_exit(interp, 1);
     }
-    if ((1 != fwrite(pack, size, 1, fp)) ) {
+    if ((1 != fwrite(pack, size, 1, fp))) {
         PIO_eprintf(interp, "PBC Merge: Couldn't write %s\n", filename);
         Parrot_exit(interp, 1);
     }

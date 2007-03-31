@@ -175,10 +175,10 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* undefined globals are errors by default */
     PARROT_ERRORS_on(interp, PARROT_ERRORS_GLOBALS_FLAG);
     /* param count mismatch is an error by default */
-    PARROT_ERRORS_on(interp, PARROT_ERRORS_PARAM_COUNT_FLAG );
+    PARROT_ERRORS_on(interp, PARROT_ERRORS_PARAM_COUNT_FLAG);
 #if 0
     /* TODO not yet - too many test failures */
-    PARROT_ERRORS_on(interp, PARROT_ERRORS_RESULT_COUNT_FLAG );
+    PARROT_ERRORS_on(interp, PARROT_ERRORS_RESULT_COUNT_FLAG);
 #endif
 
     /* allocate stack chunk cache */
@@ -447,7 +447,7 @@ Parrot_really_destroy(Interp *interp, int exit_code, void *arg)
         if (!interp->thread_data || (
                     interp->thread_data &&
                     (interp->thread_data->state & THREAD_STATE_JOINED))) {
-            if (interp->thread_data ) {
+            if (interp->thread_data) {
                 mem_sys_free(interp->thread_data);
                 interp->thread_data = NULL;
             }

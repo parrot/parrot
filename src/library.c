@@ -170,7 +170,7 @@ static const char win32_path_separator = '\\';
    Converts a path with forward slashes to one with backward slashes.
 */
 static void
-cnv_to_win32_filesep ( STRING *path ) {
+cnv_to_win32_filesep (STRING *path) {
     char* cnv;
 
     assert(path->encoding == Parrot_fixed_8_encoding_ptr ||
@@ -183,7 +183,7 @@ cnv_to_win32_filesep ( STRING *path ) {
 #endif
 
 static STRING*
-path_finalize(Interp *interp, STRING *path )
+path_finalize(Interp *interp, STRING *path)
 {
 
     /* TODO create a string API that just does that
@@ -198,7 +198,7 @@ path_finalize(Interp *interp, STRING *path )
     path->strlen--;
 
 #ifdef WIN32
-    cnv_to_win32_filesep( path );
+    cnv_to_win32_filesep(path);
 #endif
 
     return path;
@@ -211,12 +211,12 @@ path_finalize(Interp *interp, STRING *path )
  */
 
 static STRING*
-path_guarantee_trailing_separator(Interp *interp, STRING *path )
+path_guarantee_trailing_separator(Interp *interp, STRING *path)
 {
     STRING *path_separator_string = string_chr(interp, path_separator);
 
     /* make sure the path has a trailing slash before appending the file */
-    if ( string_index(interp, path , path->strlen - 1)
+    if (string_index(interp, path , path->strlen - 1)
          != string_index(interp, path_separator_string, 0))
         path = string_append(interp, path , path_separator_string);
 
@@ -230,9 +230,9 @@ path_guarantee_trailing_separator(Interp *interp, STRING *path )
  */
 
 static STRING*
-path_append(Interp *interp, STRING *l_path, STRING *r_path )
+path_append(Interp *interp, STRING *l_path, STRING *r_path)
 {
-    l_path = path_guarantee_trailing_separator(interp, l_path );
+    l_path = path_guarantee_trailing_separator(interp, l_path);
     l_path = string_append(interp, l_path , r_path);
 
     return l_path;
@@ -245,12 +245,12 @@ path_append(Interp *interp, STRING *l_path, STRING *r_path )
  */
 
 static STRING*
-path_concat(Interp *interp, STRING *l_path, STRING *r_path )
+path_concat(Interp *interp, STRING *l_path, STRING *r_path)
 {
     STRING* join;
 
     join = string_copy(interp, l_path);
-    join = path_guarantee_trailing_separator(interp, join );
+    join = path_guarantee_trailing_separator(interp, join);
     join = string_append(interp, join , r_path);
 
     return join;
@@ -305,20 +305,20 @@ Parrot_locate_runtime_file_str(Interp *interp, STRING *file,
         path = VTABLE_get_string_keyed_int(interp, paths, i);
         if (string_length(interp, prefix) &&
            !is_abs_path(interp,path)) {
-            full_name = path_concat(interp, prefix , path );
+            full_name = path_concat(interp, prefix , path);
         }
         else
             full_name = string_copy(interp, path);
 
-        full_name = path_append(interp, full_name , file );
+        full_name = path_append(interp, full_name , file);
 
-        full_name = path_finalize(interp, full_name );
+        full_name = path_finalize(interp, full_name);
         if (Parrot_stat_info_intval(interp, full_name, STAT_EXISTS)) {
             return full_name;
         }
     }
 
-    full_name = path_finalize( interp, file );
+    full_name = path_finalize(interp, file);
     if (Parrot_stat_info_intval(interp, full_name, STAT_EXISTS)) {
         return full_name;
     }
@@ -427,12 +427,12 @@ parrot_split_path_ext(Interp* interp, STRING *in,
     pos_dot = CHARSET_RINDEX(interp, in, dot, len);
 
     /* XXX directory parrot-0.4.1 or such */
-    if (pos_dot != -1 && isdigit( ((char*)in->strstart)[pos_dot+1]))
+    if (pos_dot != -1 && isdigit(((char*)in->strstart)[pos_dot+1]))
         pos_dot = -1;
 
     ++pos_dot;
     ++pos_sl;
-    if (pos_sl && pos_dot ) {
+    if (pos_sl && pos_dot) {
         stem = string_substr(interp, in, pos_sl, pos_dot - pos_sl - 1,
                 NULL, 0);
         *wo_ext = string_substr(interp, in, 0, pos_dot - 1, NULL, 0);

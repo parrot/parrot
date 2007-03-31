@@ -162,7 +162,7 @@ nci_fff(float l1, float l2) {
 }
 
 int
-nci_i( void ) {
+nci_i(void) {
    return nci_dlvar_int;
 }
 
@@ -490,7 +490,7 @@ int int_cb_D4 = -55555;
 void
 nci_cb_D4(cb_D4_func times_ten, void* user_data) {
     int cnt;
-    for ( cnt = 0; cnt < 9; cnt++ )
+    for (cnt = 0; cnt < 9; cnt++)
     {
         (times_ten)(user_data, &int_cb_D4);
         int_cb_D4++;
@@ -502,10 +502,10 @@ nci_cb_D4(cb_D4_func times_ten, void* user_data) {
 void
 nci_pip(int count, Rect_Like *rects) {
     int i;
-    printf( "Count: %d\n", count);
+    printf("Count: %d\n", count);
     for (i = 0; i < 4; ++i)
         printf("X: %d\nY: %d\nW: %d\nH: %d\n",
-        rects[i].x, rects[i].y, rects[i].w, rects[i].h );
+        rects[i].x, rects[i].y, rects[i].w, rects[i].h);
 }
 
 int
@@ -513,7 +513,7 @@ nci_i33(int *double_me, int *triple_me) {
     *double_me *= 2;
     *triple_me *= 3;
 
-    return ( *double_me + *triple_me );
+    return (*double_me + *triple_me);
 }
 
 void
@@ -551,12 +551,12 @@ nci_pii(int fac1, int fac2) {
 
 
 void
-nci_v( ) {
+nci_v() {
     nci_dlvar_int *= 10;
 }
 
 void
-nci_vv( void ) {
+nci_vv(void) {
     nci_dlvar_int *= 3;
 }
 

@@ -208,13 +208,13 @@ do_prederef(void **pc_prederef, Parrot_Interp interp, int type)
             size_t nb = interp->code->base.size / 16;
             if (nb < 8)
                 nb = (size_t)8;
-            pi->branches = mem_sys_allocate( sizeof (Prederef_branch) * nb);
+            pi->branches = mem_sys_allocate(sizeof (Prederef_branch) * nb);
             pi->n_allocated = nb;
             pi->n_branches = 0;
         }
         else if (pi->n_branches >= pi->n_allocated) {
             pi->n_allocated = (size_t) (pi->n_allocated * 1.5);
-            pi->branches = mem_sys_realloc( pi->branches,
+            pi->branches = mem_sys_realloc(pi->branches,
                     sizeof (Prederef_branch) * pi->n_allocated);
         }
         pi->branches[pi->n_branches].offs = offset;
@@ -374,12 +374,12 @@ init_prederef(Interp *interp, int which)
         CONTEXT(interp->ctx)->pred_offset = pc - (opcode_t*)temp;
 
         /* fill with the prederef__ opcode function */
-        if (which == PARROT_SWITCH_CORE || which == PARROT_SWITCH_JIT_CORE )
+        if (which == PARROT_SWITCH_CORE || which == PARROT_SWITCH_JIT_CORE)
             pred_func = (void*) CORE_OPS_prederef__;
         else
             pred_func = ((void **)
                     interp->op_lib->op_func_table)[CORE_OPS_prederef__];
-        for (i = n_pics = 0; i < N; ) {
+        for (i = n_pics = 0; i < N;) {
             opinfo = &interp->op_info_table[*pc];
             temp[i] = pred_func;
             n = opinfo->op_count;
@@ -530,7 +530,7 @@ prepare_for_run(Parrot_Interp interp)
 }
 
 #ifdef PARROT_EXEC_OS_AIX
-extern void* aix_get_toc( );
+extern void* aix_get_toc();
 #endif
 
 /*
@@ -557,7 +557,7 @@ runops_jit(Interp *interp, opcode_t *pc)
 
     /* r2 (TOC) needs to point back here so we can return from non-JIT
        functions */
-    ptrgl_t.toc = aix_get_toc( );
+    ptrgl_t.toc = aix_get_toc();
 
     ((jit_f) D2FPTR(&ptrgl_t)) (interp, pc);
 #  else

@@ -73,7 +73,7 @@ to the previous values and the allocated register memory is discarded.
 #define CTX_ALLOC_SIZE 0x20000
 
 #define ALIGNED_CTX_SIZE (((sizeof (struct Parrot_Context) + NUMVAL_SIZE - 1) \
-        / NUMVAL_SIZE) * NUMVAL_SIZE )
+        / NUMVAL_SIZE) * NUMVAL_SIZE)
 
 /*
 

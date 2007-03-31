@@ -421,7 +421,7 @@ Parrot_single_subclass(Interp *interp, PMC *base_class,
         STRING *child_class_name = Parrot_sprintf_c(interp,
                 "%c%canon_%d", 0, 0, ++anon_count);
         name = pmc_new(interp, enum_class_String);
-        VTABLE_set_string_native(interp, name, child_class_name );
+        VTABLE_set_string_native(interp, name, child_class_name);
     }
     /*
      * ParrotClass is the baseclass anyway, so build just a new class
@@ -746,7 +746,7 @@ get_init_meth(Interp *interp, PMC *class,
         return NULL;
     meth = VTABLE_get_string(interp, prop);
 #else
-    if ( !(props = PMC_metadata(class)))
+    if (!(props = PMC_metadata(class)))
         return NULL;
     b = parrot_hash_get_bucket(interp,
                 (Hash*) PMC_struct_val(props), prop_str);
@@ -1233,7 +1233,7 @@ invalidate_type_caches(Interp *interp, UINTVAL type)
         return;
     for (i = 0; i < TBL_SIZE; ++i) {
         Meth_cache_entry *e;
-        for (e = mc->idx[type][i]; e; ) {
+        for (e = mc->idx[type][i]; e;) {
             Meth_cache_entry * const next = e->next;
             mem_sys_free(e);
             e = next;
@@ -1312,7 +1312,7 @@ Parrot_find_method_with_cache(Interp *interp, PMC *class,
     }
     mc = interp->caches;
     type = class->vtable->base_type;
-    bits = (((UINTVAL) method_name->strstart ) >> 2) & TBL_SIZE_MASK;
+    bits = (((UINTVAL) method_name->strstart) >> 2) & TBL_SIZE_MASK;
     if (type >= mc->mc_size) {
         if (mc->idx) {
             mc->idx = mem_sys_realloc(mc->idx, sizeof (UINTVAL*) * (type + 1));

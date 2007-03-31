@@ -29,8 +29,8 @@ typedef struct Parrot_jit_fixup {
     char                        skip;
     char                        dummy[3]; /* For alignment ??? XXX */
     union {                               /* What has to align with what? */
-        opcode_t                opcode;
-        void                    (*fptr)(void);
+        opcode_t opcode;
+        void (*fptr)(void);
     } param;
 
     Parrot_jit_fixup_ptr        next;

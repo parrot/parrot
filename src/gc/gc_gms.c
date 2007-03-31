@@ -449,7 +449,7 @@ gc_gms_get_free_object(Interp *interp,
     pool->free_list = hdr->next;
     hdr->gen = pool->last_gen;
     ptr = GMSH_to_PObj(hdr);
-    PObj_flags_SETTO( (PObj*) ptr, 0);
+    PObj_flags_SETTO((PObj*) ptr, 0);
     return ptr;
 }
 
@@ -1121,7 +1121,7 @@ trace_children_cb(Interp *interp, struct Small_Object_Pool *pool,
     UINTVAL bits;
     INTVAL i;
 
-    for (h = pool->gray; h != pool->white; ) {
+    for (h = pool->gray; h != pool->white;) {
         current = (PMC*)GMSH_to_PObj(h);
         if (lazy_dod && arena_base->num_early_PMCs_seen >=
                 arena_base->num_early_DOD_PMCs) {

@@ -63,7 +63,7 @@ Support for writing a very short quine.
 =cut
 
 op q() {
-    PIO_printf(interp, ".loadlib \"myops_ops\"\nq\n" );
+    PIO_printf(interp, ".loadlib \"myops_ops\"\nq\n");
     HALT();
 }
 

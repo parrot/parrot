@@ -154,7 +154,7 @@ parrot_PIC_destroy(Interp *interp, struct PackFile_ByteCode *cs)
 {
     Parrot_PIC_store *store;
 
-    for (store = cs->pic_store; store; ) {
+    for (store = cs->pic_store; store;) {
         Parrot_PIC_store * const prev = store->prev;
         mem_sys_free(store);
         store = prev;

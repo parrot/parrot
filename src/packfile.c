@@ -95,7 +95,7 @@ static struct PackFile_Constant **find_constants(Interp*,
 
 #define ROUND_16(val) (((val) & 0xf) ? 16 - ((val) & 0xf) : 0)
 #define ALIGN_16(st, cursor) \
-    (cursor) += ROUND_16( (char *)(cursor) - (char *)(st) )/sizeof(opcode_t)
+    (cursor) += ROUND_16((char *)(cursor) - (char *)(st))/sizeof (opcode_t)
 
 /*
 
@@ -555,7 +555,7 @@ PackFile_unpack(Interp *interp, struct PackFile *self,
      * Map the header on top of the buffer later when we are sure
      * we have alignment done right.
      */
-    cursor = packed + PACKFILE_HEADER_BYTES/sizeof(opcode_t);
+    cursor = packed + PACKFILE_HEADER_BYTES/sizeof (opcode_t);
     memcpy(header, packed, PACKFILE_HEADER_BYTES);
 
     if (header->wordsize != 4 && header->wordsize != 8) {
@@ -590,7 +590,7 @@ PackFile_unpack(Interp *interp, struct PackFile *self,
     }
 
     /* check the fingerprint */
-    if (!PackFile_check_fingerprint (header->pad)) {
+    if (!PackFile_check_fingerprint(header->pad)) {
         PIO_eprintf(NULL, "PackFile_unpack: Bytecode not valid for this "
                     "interpreter: fingerprint mismatch\n");
         return 0;
@@ -1083,7 +1083,7 @@ default_dump(Parrot_Interp interp, struct PackFile_Segment *self)
     if (i % 8)
         PIO_printf(interp, "\n %04x:  ", (int) i);
 
-    for ( ; i < (self->data ? self->size :
+    for (; i < (self->data ? self->size :
             self->file_offset + self->op_count); i++) {
         if (i % 8 == 0) {
             PIO_printf(interp, "\n %04x:  ", (int) i);
@@ -2212,7 +2212,7 @@ pf_debug_dump(Parrot_Interp interp, struct PackFile_Segment *self)
     if (j % 8)
         PIO_printf(interp, "\n %04x:  ", (int) j);
 
-    for ( ; j < (self->data ? self->size :
+    for (; j < (self->data ? self->size :
             self->file_offset + self->op_count); j++) {
         if (j % 8 == 0) {
             PIO_printf(interp, "\n %04x:  ", (int) j);
@@ -3515,7 +3515,7 @@ Parrot_load_bytecode(Interp *interp, STRING *file_str)
     VTABLE_set_string_keyed_str(interp, is_loaded_hash,
             wo_ext, path);
     filename = string_to_cstring(interp, path);
-    if ( file_type == PARROT_RUNTIME_FT_PBC) {
+    if (file_type == PARROT_RUNTIME_FT_PBC) {
         PackFile_append_pbc(interp, filename);
     }
     else {

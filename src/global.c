@@ -39,7 +39,7 @@ static PMC * internal_ns_keyed(Interp *interp, PMC *base_ns, PMC *pmc_key,
 {
     PMC *ns, *sub_ns;
     INTVAL i, n;
-    static const INTVAL max_intval = (INTVAL)( (~(UINTVAL)0) >> 1); /*2s comp*/
+    static const INTVAL max_intval = (INTVAL)((~(UINTVAL)0) >> 1); /*2s comp*/
 
     ns = base_ns;
 
@@ -486,7 +486,7 @@ store_sub_in_multi(Parrot_Interp interp, PMC *sub, PMC *ns)
         VTABLE_push_pmc(interp, multisub, sub);
 
     c_meth = string_to_cstring(interp, subname);
-    if ( (func_nr = Parrot_MMD_method_idx(interp, c_meth))  >= 0) {
+    if ((func_nr = Parrot_MMD_method_idx(interp, c_meth))  >= 0) {
         Parrot_mmd_rebuild_table(interp, -1, func_nr);
     }
     string_cstring_free(c_meth);
@@ -508,7 +508,7 @@ Parrot_store_sub_in_namespace(Parrot_Interp interp, PMC *sub)
     PMC_sub(sub)->namespace_stash = ns;
 
     /* store a :multi sub */
-    if (!PMC_IS_NULL( PMC_sub(sub)->multi_signature) )
+    if (!PMC_IS_NULL(PMC_sub(sub)->multi_signature))
         store_sub_in_multi(interp, sub, ns);
     /* store other subs (as long as they're not :anon) */
     else if (!(PObj_get_FLAGS(sub) & SUB_FLAG_PF_ANON)) {

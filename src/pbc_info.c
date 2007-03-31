@@ -60,7 +60,7 @@ the directory using PackFile_map_segments() and iter().
 */
 
 int
-main(int argc, char * argv[] )
+main(int argc, char * argv[])
 {
     struct PackFile *pf;
     Interp *interp;

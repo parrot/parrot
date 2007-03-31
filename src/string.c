@@ -1033,8 +1033,7 @@ string_replace(Interp *interp, STRING *src,
             offset >= 0 &&
             (UINTVAL)offset < src->strlen &&
             length == 1 &&
-            rep->strlen == 1
-            ) {
+            rep->strlen == 1) {
         if (PObj_is_cowed_TESTALL(src)) {
             Parrot_unmake_COW(interp, src);
         }
@@ -1297,7 +1296,7 @@ do { \
     restype *dp = (restype *)res->strstart; \
     size_t len = minlen; \
  \
-    for ( ; len ; ++curr1, ++curr2, ++dp, --len) \
+    for (; len ; ++curr1, ++curr2, ++dp, --len) \
         *dp = *curr1 & *curr2; \
 } while (0)
 
@@ -1389,7 +1388,7 @@ do { \
     dp = (restype *)res->strstart; \
     _index = 0; \
  \
-    for ( ; _index < maxlen ; ++curr1, ++curr2, ++dp, ++_index) { \
+    for (; _index < maxlen ; ++curr1, ++curr2, ++dp, ++_index) { \
         if (_index < length1) { \
             if (_index < length2) \
                 *dp = *curr1 op *curr2; \
@@ -1547,7 +1546,7 @@ do { \
         size_t length = s->strlen; \
         Parrot_UInt1 *dp = (Parrot_UInt1 *)res->strstart; \
  \
-        for ( ; length ; --length, ++dp, ++curr) \
+        for (; length ; --length, ++dp, ++curr) \
             *dp = 0xFF & ~ *curr; \
     } \
 } while (0)

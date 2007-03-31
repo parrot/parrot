@@ -1012,11 +1012,10 @@ PMC *Parrot_STM_read(Interp *interp, Parrot_STM_PMC_handle handle) {
 }
 
 static int safe_to_clone(Interp *interp, PMC *original) {
-    if (    original->vtable->base_type == enum_class_Integer
+    if (original->vtable->base_type == enum_class_Integer
         ||  original->vtable->base_type == enum_class_Float
         ||  original->vtable->base_type == enum_class_BigInt
-        ||  original->vtable->base_type == enum_class_IntList
-        )
+        ||  original->vtable->base_type == enum_class_IntList)
         return 1;
     else
         return 0;

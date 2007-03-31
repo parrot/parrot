@@ -42,11 +42,11 @@ typedef unsigned long utf32_t;
   ((((high) - UNICODE_HIGH_SURROGATE_FIRST) << UNICODE_HIGH_SURROGATE_SHIFT) + \
     ((low) - UNICODE_LOW_SURROGATE_FIRST) + 0x10000u)
 
-#define UNISKIP(uv) ( (uv) < 0x80    ? 1 : \
+#define UNISKIP(uv) ((uv) < 0x80    ? 1 : \
                       (uv) < 0x800   ? 2 : \
-                      (uv) < 0x10000 ? 3 : 4 )
+                      (uv) < 0x10000 ? 3 : 4)
 
-#define UTF16SKIP(s) ( UNICODE_IS_HIGH_SURROGATE(*(s)) ? 2 : 1 )
+#define UTF16SKIP(s) (UNICODE_IS_HIGH_SURROGATE(*(s)) ? 2 : 1)
 
 /*
 

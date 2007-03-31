@@ -449,7 +449,7 @@ PDB_next(Interp *interp, const char *command)
     pdb->state &= ~PDB_STOPPED;
 
     /* Execute */
-    for ( ; n && pdb->cur_opcode; n--)
+    for (; n && pdb->cur_opcode; n--)
         DO_OP(pdb->cur_opcode, pdb->debugee);
 
     /* Set the stopped flag */
@@ -496,7 +496,7 @@ PDB_trace(Interp *interp,
     pdb->state &= ~PDB_STOPPED;
 
     debugee = pdb->debugee;
-    for ( ; n && pdb->cur_opcode; n--) {
+    for (; n && pdb->cur_opcode; n--) {
         trace_op(debugee,
                 debugee->code->base.data,
                 debugee->code->base.data +
@@ -1284,7 +1284,7 @@ PDB_escape(const char *string, INTVAL length)
 
     fill = new = (char *)mem_sys_allocate(length * 2 + 1);
 
-    for ( ; string < end; string++) {
+    for (; string < end; string++) {
         switch (*string) {
             case '\0':
                 *(fill++) = '\\';
@@ -1339,7 +1339,7 @@ PDB_unescape(char *string)
     char *fill;
     int i, l = 0;
 
-    for ( ; *string; string++) {
+    for (; *string; string++) {
         l++;
         if (*string == '\\') {
             switch (string[1]) {

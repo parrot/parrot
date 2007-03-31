@@ -61,7 +61,7 @@ string_set_data_directory(const char *dir)
     }
 #else
     internal_exception(ICU_ERROR,
-        "string_set_data_directory: parrot compiled without ICU support" );
+        "string_set_data_directory: parrot compiled without ICU support");
 #endif
 }
 
@@ -152,7 +152,7 @@ string_fill_from_buffer(Interp *interp, const void *buffer,
     string_compute_strlen(interp, s);
 #else
     internal_exception(ICU_ERROR,
-        "string_fill_from_buffer: parrot compiled without ICU support" );
+        "string_fill_from_buffer: parrot compiled without ICU support");
 #endif
 }
 

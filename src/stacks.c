@@ -150,7 +150,7 @@ stack_entry(Interp *interp, Stack_Chunk_t *stack /*NN*/, INTVAL depth)
         offset = (size_t)depth;
     }
     chunk = stack;          /* Start at top */
-    while ( offset) {
+    while (offset) {
         if (chunk == chunk->prev)
             break;
         --offset;

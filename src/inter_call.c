@@ -1010,7 +1010,7 @@ Parrot_process_args(Interp *interp, struct call_state *st, arg_pass_t param_or_r
 void
 Parrot_convert_arg(Interp *interp, struct call_state *st)
 {
-#define END_OF_ARGS(x) (x.i >= x.n )
+#define END_OF_ARGS(x) (x.i >= x.n)
     /* if END OF SRC or DEST ARGS, no need to convert */
     if ((END_OF_ARGS(st->src) || END_OF_ARGS(st->dest)))
         return;
@@ -1238,7 +1238,7 @@ commit_last_arg(Interp *interp, int index, int cur, opcode_t *n_regs_used, int s
     int reg_offset = 0;
 
     /* invocant already commited, just return */
-    if ( seen_arrow == 0 && index == 0 && pmc )
+    if (seen_arrow == 0 && index == 0 && pmc)
         return;
 
     /* calculate arg's register offset */
@@ -1324,7 +1324,7 @@ invokes a PMC method
 */
 
 void
-Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *signature, ... )
+Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *signature, ...)
 {
 #define PCC_ARG_MAX 1024
     /* variables from PCCINVOKE impl in PCCMETHOD.pm */
@@ -1362,7 +1362,7 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
     }
 
     /* first loop through signature to get sizing info */
-    for ( x = signature; *x != '\0'; x++ ) {
+    for (x = signature; *x != '\0'; x++) {
         /* detect -> separator */
         if (*x == '-') {
             seen_arrow = 1 ;
@@ -1385,10 +1385,10 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
     }
 
     /* calculate max reg types needed for both args and results */
-    n_regs_used[0] = MAX( max_regs[0], max_regs[4] );
-    n_regs_used[1] = MAX( max_regs[1], max_regs[5] );
-    n_regs_used[2] = MAX( max_regs[2], max_regs[6] );
-    n_regs_used[3] = MAX( max_regs[3], max_regs[7] );
+    n_regs_used[0] = MAX(max_regs[0], max_regs[4]);
+    n_regs_used[1] = MAX(max_regs[1], max_regs[5]);
+    n_regs_used[2] = MAX(max_regs[2], max_regs[6]);
+    n_regs_used[3] = MAX(max_regs[3], max_regs[7]);
 
     /* initialize arg and return sig FIAs with collected info */
     if (arg_ret_cnt[0] > 0)
@@ -1417,7 +1417,7 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
 
     index = -1;
     seen_arrow = 0;
-    for (x = signature; *x != '\0'; x++ ) {
+    for (x = signature; *x != '\0'; x++) {
         /* detect -> separator */
         if (*x == '-') {
             x++; /* skip '>' */
@@ -1506,7 +1506,7 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
      * assigning the corresponding registers to the result variables */
     index = 0;
     seen_arrow = 1;
-    for (x=ret_x; *x != '\0'; x++ ) {
+    for (x=ret_x; *x != '\0'; x++) {
         if (isupper(*x)) {
             INTVAL *tmpINTVAL;
             FLOATVAL *tmpFLOATVAL;

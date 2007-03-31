@@ -708,7 +708,7 @@ do_sprintf:
                                 size_t tclen = strlen(tc);
                                 size_t j;
                                 for (j = 0; j < tclen; j++) {
-                                    if (   (tc[j] == 'e' || tc[j] == 'E')
+                                    if ((tc[j] == 'e' || tc[j] == 'E')
                                         && (tc[j+1] == '+' || tc[j+1] == '-')
                                         && tc[j+2] == '0'
                                         && isdigit((unsigned char)tc[j+3])

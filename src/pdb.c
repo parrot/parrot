@@ -151,7 +151,7 @@ main(int argc, char *argv[])
     Parrot_block_GC(interp);
     imcc_init(interp);
 
-    do_yylex_init( interp, &yyscanner );
+    do_yylex_init(interp, &yyscanner);
 
     if (argc < 2) {
         fprintf(stderr, "Usage: pdb programfile [program-options]\n");

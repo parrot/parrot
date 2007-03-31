@@ -210,8 +210,7 @@ PackFile_Constant_dump(Interp *interp, struct PackFile_ConstTable *ct,
                             "\telements => %Ss,\n",
                             pmc->vtable->whoami,
                             n,
-                            out_buffer
-                            );
+                            out_buffer);
                     }
                     break;
                 case enum_class_Sub:
@@ -251,16 +250,14 @@ PackFile_Constant_dump(Interp *interp, struct PackFile_ConstTable *ct,
                             sub->end_offs,
                             sub->name,
                             namespace_description,
-                            sub->HLL_id
-                            );
+                            sub->HLL_id);
                     break;
                 case enum_class_FixedIntegerArray:
                     PIO_printf(interp,
                             "\tclass => %Ss,\n"
                             "\trepr => '%Ss'\n",
                             pmc->vtable->whoami,
-                            VTABLE_get_repr(interp, pmc)
-                            );
+                            VTABLE_get_repr(interp, pmc));
                     break;
                 default:
                     PIO_printf(interp, "\tno dump info for PMC %ld %Ss\n",

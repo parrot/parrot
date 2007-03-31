@@ -215,7 +215,7 @@ _erand48(_rand_buf buf)
 {
     FLOATVAL r;
     next_rand(buf);
-    r = (( buf[0] / 65536.0 + buf[1] ) / 65536.0 + buf[2]) / 65536.0;
+    r = ((buf[0] / 65536.0 + buf[1]) / 65536.0 + buf[2]) / 65536.0;
     return r;
 }
 
@@ -423,8 +423,8 @@ C<how_random> is ignored.
 INTVAL
 Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random)
 {
-    return (INTVAL)( from + ((double)(to - from))
-                     * Parrot_float_rand(how_random) );
+    return (INTVAL)(from + ((double)(to - from))
+                     * Parrot_float_rand(how_random));
 }
 
 /*
@@ -682,12 +682,12 @@ rec_climb_back_and_mark(int node_index, parrot_prm_context* c) {
     pred = c->src_regs[node_index];
     pred_index = c->reg_to_index[pred];
 
-    if ( pred_index < 0 ) { /* pred has no predecessor */
+    if (pred_index < 0) { /* pred has no predecessor */
         move_reg(pred, node, c);
     }
     else { /* pred has a predecessor, so may be processed */
         src = c->backup[pred_index];
-        if (  src < 0 ) { /* not visited */
+        if (src < 0) { /* not visited */
             move_reg(pred, node, c);
             c->backup[pred_index] = node; /* marks pred*/
             rec_climb_back_and_mark(pred_index, c);
@@ -728,7 +728,7 @@ process_cycle_without_exit(int node_index, parrot_prm_context* c) {
     if (NULL != c->mov_alt)
         alt = c->mov_alt(c->interp, c->dest_regs[node_index], pred, c->info);
 
-    if ( 0 == alt ) { /* use temp reg */
+    if (0 == alt) { /* use temp reg */
         move_reg(c->dest_regs[node_index],c->temp_reg, c);
         c->backup[node_index] = c->temp_reg;
     } else
@@ -870,12 +870,12 @@ Parrot_register_move(Interp *interp, int n_regs,
     /* count the nb of successors for each reg index */
     for (i = 0; i < n_regs; i++) {
         index = reg_to_index[ src_regs[i] ];
-        if ( index >= 0 ) /* not interested in the wells that have no preds */
+        if (index >= 0) /* not interested in the wells that have no preds */
             nb_succ[ index ]++;
     }
     /* process each well if any */
     for (i = 0; i < n_regs; i++) {
-        if ( 0 == nb_succ[i] ) { /* a well */
+        if (0 == nb_succ[i]) { /* a well */
             rec_climb_back_and_mark(i, &c);
         }
     }
@@ -883,7 +883,7 @@ Parrot_register_move(Interp *interp, int n_regs,
     /* process remaining dest registers not processed */
     /* remaining nodes are members of cycles without exits */
     for (i = 0; i < n_regs; i++) {
-        if ( 0 < nb_succ[i] && 0 > backup[i] ) { /* not a well nor visited*/
+        if (0 < nb_succ[i] && 0 > backup[i]) { /* not a well nor visited*/
             process_cycle_without_exit(i, &c);
         }
     }

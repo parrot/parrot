@@ -159,8 +159,7 @@ write_types(FILE *stabs, Interp *interp)
                 BIT_OFFSET(STRING, obj.u._b._buflen), BIT_SIZE(size_t),
                 BIT_OFFSET(STRING, obj.flags), BIT_SIZE(UINTVAL),
                 BIT_OFFSET(STRING, bufused), BIT_SIZE(UINTVAL),
-                BIT_OFFSET(STRING, strstart), BIT_SIZE(void*)
-                );
+                BIT_OFFSET(STRING, strstart), BIT_SIZE(void*));
 
     fprintf(stabs, ".stabs \"PMCType:T(0,%d)=e", i++);
     for (j = 0; j < interp->n_vtable_max; ++j) {
@@ -193,22 +192,19 @@ write_types(FILE *stabs, Interp *interp)
                 ";\""
                 "," N_LSYM ",0,0,0\n", i + 1, (int)(sizeof (pobj_t)),
                 i + 2, BIT_OFFSET(pobj_t, u), BIT_SIZE(UnionVal),
-                BIT_OFFSET(pobj_t, flags), BIT_SIZE(Parrot_UInt)
-                );
+                BIT_OFFSET(pobj_t, flags), BIT_SIZE(Parrot_UInt));
     fprintf(stabs, ".stabs \"UnionVal:T(0,%d)=u%d"
                 "int_val:(0,12),%d,%d;"
                 "pmc_val:*(0,%d),%d,%d;"
                 ";\""
                 "," N_LSYM ",0,0,0\n", i + 2, BYTE_SIZE(UnionVal),
                 BIT_OFFSET(UnionVal, _i._int_val), BIT_SIZE(INTVAL),
-                i, BIT_OFFSET(UnionVal, _ptrs._pmc_val), BIT_SIZE(void*)
-                );
+                i, BIT_OFFSET(UnionVal, _ptrs._pmc_val), BIT_SIZE(void*));
     fprintf(stabs, ".stabs \"VTABLE:T(0,%d)=s%d"
                 "base_type:(0,%d),%d,%d;"
                 ";\""
                 "," N_LSYM ",0,0,0\n", i + 3, BYTE_SIZE(UnionVal),
-                i - 1, BIT_OFFSET(VTABLE, base_type), BIT_SIZE(INTVAL)
-                );
+                i - 1, BIT_OFFSET(VTABLE, base_type), BIT_SIZE(INTVAL));
     i += 4;
 
 }

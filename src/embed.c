@@ -433,7 +433,7 @@ void
 Parrot_loadbc(Interp *interp, struct PackFile *pf)
 {
     if (pf == NULL) {
-        PIO_eprintf(interp, "Invalid packfile\n" );
+        PIO_eprintf(interp, "Invalid packfile\n");
         return;
     }
     interp->initial_pf = pf;
@@ -629,8 +629,7 @@ print_profile(Interp *interp, int status, void *p)
                         op_name(interp, k),
                         n,
                         t,
-                        (FLOATVAL)(t * 1000.0 / (FLOATVAL)n)
-                        );
+                        (FLOATVAL)(t * 1000.0 / (FLOATVAL)n));
             }
         }
 
@@ -639,8 +638,7 @@ print_profile(Interp *interp, int status, void *p)
                 "-",
                 call_count,
                 sum_time,
-                (FLOATVAL)(sum_time * 1000.0 / (FLOATVAL)call_count)
-                );
+                (FLOATVAL)(sum_time * 1000.0 / (FLOATVAL)call_count));
     }
 }
 

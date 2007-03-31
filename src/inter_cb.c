@@ -223,7 +223,7 @@ callback_CD(Parrot_Interp interp, void *external_data, PMC *user_data)
      *    - if no, and that's always safe, post a CALLBACK_EVENT
      */
 
-    if ( synchronous ) {
+    if (synchronous) {
         /*
          * just call the sub
          */

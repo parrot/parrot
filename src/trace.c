@@ -76,7 +76,7 @@ trace_pmc_dump(Interp *interp, PMC* pmc)
         STRING * const name = trace_class_name(interp, pmc);
         PIO_eprintf(debugger, "Class=%Ss:PMC(%#p)", name, pmc);
     }
-    else if ( pmc->vtable->base_type == enum_class_String) {
+    else if (pmc->vtable->base_type == enum_class_String) {
         STRING * const s = VTABLE_get_string(interp, pmc);
         if (!s)
             PIO_eprintf(debugger, "%S=PMC(%#p Str:(NULL))",
@@ -284,8 +284,7 @@ trace_op_dump(Interp *interp, opcode_t *code_start,
                     type != PARROT_ARG_KC &&
                     type != PARROT_ARG_KIC &&
                     type != PARROT_ARG_KI &&
-                    type != PARROT_ARG_K
-               ) {
+                    type != PARROT_ARG_K) {
                 len += PIO_eprintf(debugger, ", ");
             }
             switch (type) {
