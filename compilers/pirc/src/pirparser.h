@@ -7,17 +7,9 @@
 /* hide internals; definition in pirparser.c */
 struct parser_state;
 
-/* define output type: what kind of semantic routines
- * should be called in the parser?
- */
-typedef enum outputtypes {
-    OUTPUT_NONE,    /* do nothing  */
-    OUTPUT_PIR,     /* output PIR  */
-    OUTPUT_PAST     /* output PAST */
-} outputtype;
 
 /* parser constructor */
-extern struct parser_state *new_parser(char const * filename, outputtype type);
+extern struct parser_state *new_parser(char const * filename, pirvtable *vtable);
 
 /* entry function for the parser */
 extern void TOP(struct parser_state *p);

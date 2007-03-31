@@ -181,6 +181,12 @@ extern void print_error_context(struct lexer_state *s);
 /* get the current line number */
 extern long get_current_line(struct lexer_state *s);
 
+/* get the current line position */
+extern unsigned short get_current_linepos(struct lexer_state *s);
+
+/* get current file position */
+extern long get_current_filepos(struct lexer_state *s);
+
 /* get the name of the current file being scanned */
 extern char * const get_current_file(struct lexer_state *s);
 

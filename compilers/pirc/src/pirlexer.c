@@ -368,6 +368,34 @@ get_current_line(struct lexer_state *s) {
     return s->curfile->line;
 }
 
+/*
+
+=item get_current_linepos()
+
+Returns the current line position (i.o.w., how many characters
+have been read on the current line?)
+
+=cut
+
+*/
+unsigned short
+get_current_linepos(struct lexer_state *s) {
+    return s->curfile->linepos;
+}
+
+/*
+
+=item get_current_filepos()
+
+Returns the number of charactars read in the current file so far.
+
+=cut
+
+*/
+long
+get_current_filepos(struct lexer_state *s) {
+    return (s->curfile->curchar - s->curfile->buffer);
+}
 
 /*
 

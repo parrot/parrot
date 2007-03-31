@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <malloc.h>
 
+
+#define OUT stderr
+
 /*
 
 =head1 API
@@ -57,9 +60,24 @@ pirout(struct parser_state *p) {
 
 static void
 pir_name(struct parser_state *p, char *name) {
-    fprintf(stderr, " %s ", name);
+    fprintf(OUT, " %s ", name);
 }
 
+static void
+pir_sub(struct parser_state *p, char *source, int pos) {
+    fprintf(OUT, "#character position %d\n", pos);
+    fprintf(OUT, ".sub");
+}
+
+static void
+pir_end(struct parser_state *p) {
+    fprintf(OUT, ".end\n");
+}
+
+static void
+pir_newline(struct parser_state *p, ...) {
+    fprintf(OUT, "\n");
+}
 
 /*
 
@@ -73,11 +91,13 @@ then this vtable is set into the parser_state struct.
 */
 pirvtable *
 init_pir_vtable(void) {
-    pirvtable *vtable = (pirvtable *)malloc(sizeof(pirvtable));
+    pirvtable *vtable = new_pirvtable();
 
-    vtable->sub_start = pirout;
-    vtable->sub_end   = pirout;
-    vtable->name      = pir_name;
+    /* override the methods that are needed for PIR output */
+    vtable->sub_start   = pir_sub;
+    vtable->sub_end     = pir_end;
+    vtable->name        = pir_name;
+    vtable->stmts_start = pir_newline;
 
     return vtable;
 }

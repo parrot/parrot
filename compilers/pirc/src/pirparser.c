@@ -57,10 +57,7 @@ Clean up grammar after discussion.
 #include "pirparser.h"
 
 /* output stuff */
-#include "pirvtable.h"
-#include "pirout.h"    /* for PIR output  */
-#include "pastout.h"   /* for PAST output */
-#include "no_output.h" /* guess what...   */
+#include "pirvtable.h" /* vtable definition */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -80,7 +77,7 @@ The parser_state structure has the following fields:
     char      *heredoc_ids[10];        -- array for holding heredoc arguments. XXX Limited to 10 currently XXX
     unsigned   heredoc_index;          -- index to keep track of heredoc ids in the array
     unsigned   parse_errors;           -- counter for parse_errors
-    pirvtable *vtable;                 -- vtable holding pointers for output
+    pirvtable *vtable;                 -- vtable holding pointers for output routines
  }
 
 =cut
@@ -102,13 +99,9 @@ typedef struct parser_state {
 #define MAX_ERRORS  10
 
 
-/* call next() to get the next token from the lexer */ /* NOTE: it's calling pirout() */
-
+/* call next() to get the next token from the lexer */
 #define next(P) P->curtoken = next_token(P->lexer)
 
-/*
-#define next(P) do { pirout(P); P->curtoken = next_token(P->lexer); } while(0)
-*/
 
 
 /*
@@ -153,13 +146,17 @@ get_parse_errors(parser_state *p) {
 
 =item new_parser()
 
-constructor for a parser_state object.
+constructor for a parser_state object. The specified filename
+is parsed. The semantic actions in vtable are called at certain
+points in the code. The vtable is constructed in the parser's
+client code.
 
 =cut
 
 */
 parser_state *
-new_parser(char const * filename, outputtype output) {
+new_parser(char const * filename, pirvtable *vtable) {
+
     parser_state *p = (parser_state *)malloc(sizeof(parser_state));
 
     if (p == NULL) {
@@ -170,22 +167,7 @@ new_parser(char const * filename, outputtype output) {
     p->curtoken      = next_token(p->lexer);
     p->parse_errors  = 0;
     p->heredoc_index = 0;
-
-    /* based on the output type, create the appropiate vtable */
-    switch (output) {
-        case OUTPUT_NONE:
-            p->vtable = init_none_vtable();
-            break;
-        case OUTPUT_PIR:
-            p->vtable = init_pir_vtable();
-            break;
-        case OUTPUT_PAST:
-            p->vtable = init_past_vtable();
-            break;
-        default:
-            fprintf(stderr, "Unknown output type specified\n");
-            exit(1);
-    }
+    p->vtable        = vtable;
 
     return p;
 }
@@ -1807,31 +1789,32 @@ parameters(parser_state *p) {
 */
 static void
 sub_definition(parser_state *p) {
-    /* either '.sub' or '.pcc_sub'. This kind of optimization (just skipping)
-     * can be done more often, if we're sure the token has already been checked for.
-     */
-
     /* call emit method */
-    emit_sub_start(p);
+    emit_sub_start(p, "", get_current_filepos(p->lexer));
+    next(p); /* skip '.sub' or '.pcc_sub' */
 
-    next(p);
-
-    if (p->curtoken == T_IDENTIFIER) {
-        emit_name(p, get_current_token(p->lexer));
-        match(p, T_IDENTIFIER);
-    }
-    else {
-        emit_name(p, get_current_token(p->lexer));
-        stringconstant(p);
+    switch (p->curtoken) {
+        case T_IDENTIFIER:
+        case T_DOUBLE_QUOTED_STRING:
+        case T_SINGLE_QUOTED_STRING:
+            emit_name(p, get_current_token(p->lexer)); /* emit the name */
+            next(p); /* and get next token */
+            break;
+        default:
+            syntax_error(p, 1, "sub identifier expected");
+            break;
     }
 
     sub_flags(p);
     match(p, T_NEWLINE);
+
     parameters(p);
+    emit_stmts_start(p); /* open stmts block */
     instructions(p);
+    emit_stmts_end(p);  /* close stmts block */
     match(p, T_END);
 
-    /* call emit method */
+    /* call emit method to close sub*/
     emit_sub_end(p);
 
 }
@@ -2114,12 +2097,16 @@ program(parser_state *p) {
     /* the file may have some initial newlines; eat them */
     if (p->curtoken == T_NEWLINE) next(p);
 
+    emit_init(p); /* initialize emitter */
+
     compilation_unit(p);
 
     while (p->curtoken != T_EOF ) {
         match(p, T_NEWLINE);
         compilation_unit(p);
     }
+
+    emit_end(p); /* close down emitter */
 }
 
 /*
