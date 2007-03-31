@@ -7,34 +7,29 @@ struct parser_state;
  * routines.
  */
 typedef struct pirvtable {
-
-	void (* initialize)  (struct parser_state *p);
-	void (* sub_start)   (struct parser_state *p, char *source, int pos);
-	void (* sub_end)     (struct parser_state *p);
-	void (* name)        (struct parser_state *p, char *name);
-	void (* stmts_start) (struct parser_state *p);
-	void (* stmts_end)   (struct parser_state *p);
-	void (* end)         (struct parser_state *p);
-	void (* param_start) (struct parser_state *p);
-	void (* param_end)   (struct parser_state *p);
-	void (* type)        (struct parser_state *p, char *type);
-	void (* sub_flag)    (struct parser_state *p, int flag);
-	void (* sub_flag_arg)(struct parser_state *p, int flag, char *arg);
-	void (* op_start)    (struct parser_state *p, char *op);
-	void (* op_end)    (struct parser_state *p);
-	void (* expression)  (struct parser_state *p, char *expr);
-	void (* next_expr)   (struct parser_state *p);
-
-
+    void (* initialize)  (struct parser_state *p);
+    void (* sub_start)   (struct parser_state *p, char *source, int pos);
+    void (* sub_end)     (struct parser_state *p);
+    void (* name)        (struct parser_state *p, char *name);
+    void (* stmts_start) (struct parser_state *p);
+    void (* stmts_end)   (struct parser_state *p);
+    void (* end)         (struct parser_state *p);
+    void (* param_start) (struct parser_state *p);
+    void (* param_end)   (struct parser_state *p);
+    void (* type)        (struct parser_state *p, char *type);
+    void (* sub_flag)    (struct parser_state *p, int flag);
+    void (* sub_flag_arg)(struct parser_state *p, int flag, char *arg);
+    void (* op_start)    (struct parser_state *p, char *op);
+    void (* op_end)      (struct parser_state *p);
+    void (* expression)  (struct parser_state *p, char *expr);
+    void (* next_expr)   (struct parser_state *p);
 } pirvtable;
-
-
 
 /* #defines for cleaner invocation syntax */
 #  define emit_init(P)              (*P->vtable->initialize)  (P)
 #  define emit_sub_start(P,S,L)     (*P->vtable->sub_start)   (P,S,L)
-#  define emit_sub_end(P)      		(*P->vtable->sub_end)     (P)
-#  define emit_name(P,N)       		(*P->vtable->name)        (P,N)
+#  define emit_sub_end(P)           (*P->vtable->sub_end)     (P)
+#  define emit_name(P,N)            (*P->vtable->name)        (P,N)
 #  define emit_stmts_start(P)       (*P->vtable->stmts_start) (P)
 #  define emit_stmts_end(P)         (*P->vtable->stmts_end)   (P)
 #  define emit_end(P)               (*P->vtable->end)         (P)
@@ -50,10 +45,7 @@ typedef struct pirvtable {
 
 extern pirvtable *new_pirvtable(void);
 
-
 #endif
-
-
 
 /*
  * Local variables:
@@ -61,4 +53,3 @@ extern pirvtable *new_pirvtable(void);
  * End:
  * vim: expandtab shiftwidth=4:
  */
-
