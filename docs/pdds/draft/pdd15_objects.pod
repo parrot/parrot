@@ -282,7 +282,13 @@ containing the attribute's metadata. The accessor is read-only.
 
 Adds a single attribute to the class. It takes a simple string name and,
 optionally, a simple string value for type. {{ Conjectural: Actually, the
-simple string value alone won't cut it. We need to take a key there too? }}
+simple string value alone won't cut it. We need to take a key there too?
+Answer: No, just the string name of the type. Types are not classes, they just
+perform a C<does> operation.}}
+
+If the class has already been instantiated, adding a new attribute triggers the
+creation of a new class, replacing the old class. See L<Classes, Namespaces,
+and the Class Registry>.
 
 =item add_method
 
@@ -568,6 +574,14 @@ Create a new base class named Sy, and put the PMC for it in Px
 
 Create a new class, named Sz, which has Py as its immediate parent.
 
+=item get_class
+
+  $P1 = get_class $S2
+  $P1 = get_class $P2
+
+Retrieve a class object for the class identified by the string name in $S2, or
+by the PMC key in $P2.
+
 =item addparent Px, Py
 
 Add class Py to the end of the list of immediate parents of class Px. Adds any
@@ -604,13 +618,6 @@ Instantiate a brand new class, based on the metadata in Py, named Sz.
 
 To make this work all PMCs must have the following vtable entries. They may,
 for non-objects, throw an exception.
-
-The catalog metadata for objects is considered to be attributes on the class,
-so to get the offset for a class for an object, you fetch the object's class
-then look up the offset attribute from it. (The class attributes are detailed
-later) This is safe in general, since the only code reasonably querying a
-class' attribute list is the class code itself, and if a class doesn't know
-whether it's a Class-style class or not you've got bigger problems.
 
 =over 4
 
@@ -685,30 +692,36 @@ and modifications of existing classes) should be transparent as well.
 
 {{ Conjectural:
 
-When a role is added to a class, we try to compose it right away, and flag up
-any conflicts that are detected. A conflict occurs if two roles try to supply
-a method of the same name (but see the note on multi-methods below). High
-level languaes will provide varying facilities to deal with this, and Parrot
-provides the primitives to implement them.
+When a role is added to a class, we try to compose it right away, and throw an
+exception on any conflicts that are detected. A conflict occurs if two roles
+try to supply a method of the same name (but see the note on multi-methods
+below). High level languaes will provide varying facilities to deal with this,
+and Parrot provides the primitives to implement them.
+
+When declaring a class, you can optionally supply an array of method names that
+will be supplied by the composed class because of a conflict in the roles. This
+is done using the named parameter C<resolve>. This feature supports composition
+conflict resolution in languages such as Perl 6.
 
 When adding a role to a class, you can optionally supply an array of method
-names from the role to exclude from the composition process. This is done
-using the named parameter C<without>. It is not an error to list a method name
-in this array that the role does not have. This makes it possible to implement
-languages that provide for explicit exclusions on a role-by-role basis as well
-as Perl 6, which can supply an array of all method names in the class (since
-writing a method in the class resolves any conflicts between methods of the
-same name from roles, and automatically overrides it).
+names from the role to exclude from the composition process. This is done using
+the named parameter C<exclude>. It is not an error to list a method name in
+this array that the role does not have. This makes it possible to implement
+languages that provide for explicit exclusions on a role-by-role basis.
 
-The second primitive is aliasing. When adding a role to a class, the optional
-C<alias> named parameter can be supplied, with a value of a hash of strings to
-strings. The key of this hash is a method name in the role, and the value is
-the name we should give it when we compose it in to the class. This will allow
-Parrot to support languages that allow resolution of conflicts in this form.
+When adding a role to a class, you can optionally specify that specific methods
+are to be aliased to different names within the class. This is done with the
+optional C<alias> named parameter. The parameter takes hash of strings, where
+the key is a method name in the role, and the value is the name it will have in
+to the class. (This is also sometimes used for conflict resolution.)
 
-It is fine to use both C<without> and C<alias> with a single role. However,
-placing a method name in the exclude list and also aliasing it has undefined
-behaviour.
+If you C<alias> a method, it won't automatically C<exclude> the original name
+from the role.  You can also explicitly C<exclude> the method name, if you want
+a proper renaming of the method.  A C<resolve> at the class level will
+automatically C<exclude> all methods of that name from any role composed into
+the class. You can C<alias> the method if you want to call it from the composed
+class. (You might use this if you want the resolving method to be able to call
+either of the conflicting methods from two composed roles.)
 
 If a method in a role is a MultiSub PMC and there is either no method of that
 name yet OR what is in the method slot with that name is also a MultiSub PMC,
@@ -743,7 +756,7 @@ To create a class C<Foo> with the parents C<A> and C<B>, the code would be:
 
 Adding the attributes C<a> and C<b> to the new class C<Foo>:
 
-  newclass $P0, "Foo"
+  $P0 = newclass "Foo"
   addattribute $P0, "a"   # This is offset 0 + classoffset
   addattribute $P0, "b"   # This is offset 1 + classoffset
 
@@ -753,8 +766,8 @@ Assuming we want an object of class C<Foo>:
 
   .local pmc FooClass
   .local pmc MyObject
-  find_class FooClass, "Foo"
-  new MyObject, FooClass
+  FooClass = get_class "Foo"
+  MyObject = new FooClass
 
 =head2 Calling a method on an object
 
@@ -855,6 +868,11 @@ routine, and is not necessary for normal objects.
 Called when the object is destroyed. This method is only called if the PMC is
 marked as having an active finalizer.
 
+=item clone
+
+Create an (anonymous) clone of the class. Unset the instantiated flag on the
+new class.
+
 =item getprop
 
 =item setprop
@@ -874,8 +892,6 @@ marked as having an active finalizer.
 =item subtype
 
 =item name
-
-=item clone
 
 =item find_method
 
