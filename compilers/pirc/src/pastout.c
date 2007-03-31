@@ -137,6 +137,25 @@ past_subflagarg(struct parser_state *p, int flag, char *arg) {
     */
 }
 
+static void
+past_op(struct parser_state *p, char *op) {
+    fprintf(OUT, "%*sFIXME => PMC 'PAST::Op'  {\n", indent, " ");
+    indent();
+    fprintf(OUT, "%*s<pirop> => \"%s\"\n", indent, " ", op);
+
+}
+
+static void
+past_expr(struct parser_state *p, char *expr) {
+    fprintf(OUT, "%*s[%d] => \"%s\"\n", indent, " ", 0, expr); /* fix index */
+}
+
+static void
+past_next(struct parser_state *p) {
+    /* increment index */
+}
+
+
 /*
 
 =item init_past_vtable()
@@ -161,9 +180,13 @@ init_past_vtable(void) {
     vtable->end          = past_close;
     vtable->param_start  = past_param;
     vtable->param_end    = past_close;
-    vtable->type         = past_type; 
+    vtable->type         = past_type;
     vtable->sub_flag     = past_subflag;
     vtable->sub_flag_arg = past_subflagarg;
+    vtable->op_start     = past_op;
+    vtable->expression   = past_expr;
+    vtable->op_end       = past_close;
+    vtable->next_expr    = past_next;
 
     return vtable;
 }

@@ -98,6 +98,22 @@ static void
 pir_subflagarg(struct parser_state *p, int flag, char *arg) {
     fprintf(OUT, "%s(%s) ", find_keyword(flag), arg);
 }
+
+static void
+pir_expr(struct parser_state *p, char *expr) {
+    fprintf(OUT, "%s ", expr);
+}
+
+static void
+pir_op(struct parser_state *p, char *op) {
+    fprintf(OUT, "%s ", op);
+}
+
+static void
+pir_comma(struct parser_state *p) {
+    fprintf(OUT, ", ");
+}
+
 /*
 
 =item init_pir_vtable()
@@ -122,7 +138,11 @@ init_pir_vtable(void) {
     vtable->type         = pir_type;
     vtable->sub_flag     = pir_subflag;
     vtable->sub_flag_arg = pir_subflagarg;
-    
+    vtable->op_start     = pir_op;
+    vtable->op_end       = pir_newline;
+    vtable->expression   = pir_expr;
+    vtable->next_expr    = pir_comma;
+
     return vtable;
 }
 

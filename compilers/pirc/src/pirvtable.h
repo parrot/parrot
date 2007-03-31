@@ -20,6 +20,10 @@ typedef struct pirvtable {
 	void (* type)        (struct parser_state *p, char *type);
 	void (* sub_flag)    (struct parser_state *p, int flag);
 	void (* sub_flag_arg)(struct parser_state *p, int flag, char *arg);
+	void (* op_start)    (struct parser_state *p, char *op);
+	void (* op_end)    (struct parser_state *p);
+	void (* expression)  (struct parser_state *p, char *expr);
+	void (* next_expr)   (struct parser_state *p);
 
 
 } pirvtable;
@@ -39,7 +43,10 @@ typedef struct pirvtable {
 #  define emit_type(P,T)            (*P->vtable->type)        (P,T)
 #  define emit_sub_flag(P,F)        (*P->vtable->sub_flag)    (P,F)
 #  define emit_sub_flag_arg(P,F,A)  (*P->vtable->sub_flag_arg)(P,F,A)
-
+#  define emit_op_start(P,O)        (*P->vtable->op_start)    (P,O)
+#  define emit_op_end(P)            (*P->vtable->op_end)      (P)
+#  define emit_expr(P,E)            (*P->vtable->expression)  (P,E)
+#  define emit_next_expr(P)         (*P->vtable->next_expr)   (P)
 
 extern pirvtable *new_pirvtable(void);
 
@@ -54,3 +61,4 @@ extern pirvtable *new_pirvtable(void);
  * End:
  * vim: expandtab shiftwidth=4:
  */
+

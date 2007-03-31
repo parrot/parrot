@@ -82,6 +82,10 @@ new_pirvtable(void) {
     vtable->type         = not_implemented;
     vtable->sub_flag     = not_implemented;
     vtable->sub_flag_arg = not_implemented;
+    vtable->expression   = not_implemented;
+    vtable->next_expr    = not_implemented;
+    vtable->op_start     = not_implemented;
+    vtable->op_end       = not_implemented;
 
     return vtable;
 }

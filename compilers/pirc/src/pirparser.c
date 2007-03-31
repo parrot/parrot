@@ -325,6 +325,10 @@ expression(parser_state *p) {
         case T_PASM_SREG: case T_SREG:
         case T_MACRO_IDENT:
             exprtok = p->curtoken;
+
+            /* emit the expression */
+            emit_expr(p, get_current_token(p->lexer));
+
             next(p);
             break;
         default:
@@ -658,6 +662,9 @@ arith_expression(parser_state *p) {
 */
 static void
 parrot_instruction(parser_state *p) {
+    /* emit the op */
+    emit_op_start(p, get_current_token(p->lexer));
+
     match(p, T_PARROT_OP);
     /* XXX for now, parse as many arguments as necessary,
      * don't know how to handle this. Just try and create the call to the
@@ -665,9 +672,14 @@ parrot_instruction(parser_state *p) {
      */
     while (p->curtoken != T_NEWLINE) {
         expression(p);
-        if (p->curtoken == T_COMMA) next(p);
+        if (p->curtoken == T_COMMA) {
+            emit_next_expr(p);
+            next(p);
+        }
         else break;
     }
+
+    emit_op_end(p);
     match(p, T_NEWLINE);
 }
 
