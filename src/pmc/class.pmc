@@ -375,7 +375,7 @@ parameter list.
             /* Get name and value. */
             STRING *attr_name = VTABLE_shift_string(interp, iter);
             PMC *attr_value = VTABLE_get_pmc_keyed_str(interp, args, attr_name);
-            
+
             /* Set the attribute. */
             VTABLE_set_attr_str(interp, obj, attr_name, attr_value);
         }
