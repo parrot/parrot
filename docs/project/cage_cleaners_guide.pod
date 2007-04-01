@@ -308,6 +308,13 @@ If you can make it run, great!  Make it a TODO test instead.
 
 If neither, please report your findings so that everyone can decide what to do.
 
+=head1 Helpful configuration files
+
+There is an example C<.subversion/config> file in
+F<editor/subversion_config> which is useful in automatically setting the
+appropriate Subversion properties relevant to Parrot on addition of new
+files.
+
 =head1 AUTHOR
 
 Paul Cochrane a.k.a. ptc; original document by Andy Lester
