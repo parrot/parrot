@@ -434,8 +434,8 @@ sub _run_command {
     local *OLDERR if $err;
 
     # Save the old filehandles; we must not let them get closed.
-    open OLDOUT, ">&", "STDOUT" or die "Can't save     stdout" if $out;
-    open OLDERR, ">&", "STDERR" or die "Can't save     stderr" if $err;
+    open OLDOUT, ">&STDOUT" or die "Can't save     stdout" if $out;
+    open OLDERR, ">&STDERR" or die "Can't save     stderr" if $err;
 
     open STDOUT, ">", "$out" or die "Can't redirect stdout" if $out;
     open STDERR, ">$err" or die "Can't redirect stderr" if $err;
@@ -446,8 +446,8 @@ sub _run_command {
     close STDOUT or die "Can't close    stdout" if $out;
     close STDERR or die "Can't close    stderr" if $err;
 
-    open STDOUT, ">&", "OLDOUT" or die "Can't restore  stdout" if $out;
-    open STDERR, ">&", "OLDERR" or die "Can't restore  stderr" if $err;
+    open STDOUT, ">&OLDOUT" or die "Can't restore  stdout" if $out;
+    open STDERR, ">&OLDERR" or die "Can't restore  stderr" if $err;
 
     if ($verbose) {
         foreach ( $out, $err ) {
@@ -581,7 +581,7 @@ sub capture_output {
     my $command = join ' ', @_;
 
     # disable STDERR
-    open OLDERR, ">&", "STDERR";
+    open OLDERR, ">&STDERR";
     open STDERR, ">", "test.err";
 
     my $output = `$command`;
@@ -589,7 +589,7 @@ sub capture_output {
 
     # reenable STDERR
     close STDERR;
-    open STDERR, ">&", "OLDERR";
+    open STDERR, ">&OLDERR";
 
     # slurp stderr
     my $out_err = _slurp('./test.err');
