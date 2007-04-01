@@ -1898,9 +1898,8 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
     methods_iter = VTABLE_get_iter(interp, methods);
     while (VTABLE_get_bool(interp, methods_iter)) {
         /* Get current method and its name. */
-        PMC *method_name_pmc = VTABLE_shift_pmc(interp, methods_iter);
-        STRING *method_name = VTABLE_get_string(interp, method_name_pmc);
-        PMC *cur_method = VTABLE_get_pmc_keyed(interp, methods, method_name_pmc);
+        STRING *method_name = VTABLE_shift_string(interp, methods_iter);
+        PMC *cur_method = VTABLE_get_pmc_keyed_str(interp, methods, method_name);
 
         /* Need to find the name we'll check for a conflict on. */
         STRING *check_name = method_name;
@@ -1967,10 +1966,9 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
     methods_iter = VTABLE_get_iter(interp, proposed_add_methods);
     while (VTABLE_get_bool(interp, methods_iter)) {
         /* Get current method and its name. */
-        PMC *method_name_pmc = VTABLE_shift_pmc(interp, methods_iter);
-        STRING *method_name = VTABLE_get_string(interp, method_name_pmc);
-        PMC *cur_method = VTABLE_get_pmc_keyed(interp, proposed_add_methods,
-            method_name_pmc);
+        STRING *method_name = VTABLE_shift_string(interp, methods_iter);
+        PMC *cur_method = VTABLE_get_pmc_keyed_str(interp, proposed_add_methods,
+            method_name);
 
         /* Add it to the methods of the class. */
         VTABLE_set_pmc_keyed_str(interp, methods_hash, method_name,

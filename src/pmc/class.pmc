@@ -90,8 +90,8 @@ pmclass Class need_ext {
             /* Iterate over the attributes. */
             while (VTABLE_get_bool(interp, iter)) {
                 /* Get attribute. */
-                PMC *cur_attrib = VTABLE_get_pmc_keyed(interp, attribs,
-                    VTABLE_shift_pmc(interp, iter));
+                PMC *cur_attrib = VTABLE_get_pmc_keyed_str(interp, attribs,
+                    VTABLE_shift_string(interp, iter));
                 STRING *attrib_name;
                 STRING *full_key = string_copy(interp, fq_class);
 
@@ -373,8 +373,7 @@ parameter list.
         iter = VTABLE_get_iter(interp, args);
         while (VTABLE_get_bool(interp, iter)) {
             /* Get name and value. */
-            STRING *attr_name = VTABLE_get_string(interp,
-                VTABLE_shift_pmc(interp, iter));
+            STRING *attr_name = VTABLE_shift_string(interp, iter);
             PMC *attr_value = VTABLE_get_pmc_keyed_str(interp, args, attr_name);
             
             /* Set the attribute. */
