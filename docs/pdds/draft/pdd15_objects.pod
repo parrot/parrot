@@ -132,7 +132,7 @@ and moving the object to it is allowable)
 =head1 IMPLEMENTATION
 
 There are four pieces to the object implementation. There are the PMCs for the
-classes and objects, the opcodes the engine uses to do objecty things, the
+classes, roles, and objects, the opcodes the engine uses to do objecty things, the
 specific vtable methods used to perform those objecty things, and the
 supporting code provided by the interpreter engine to do the heavy lifting.
 
@@ -143,7 +143,7 @@ For example, Parrot permits multiple inheritance, and will not stop code that
 adds a new parent to an existing class. If a language doesn't allow for
 multiple inheritance it must not emit code which would add multiple parents to
 a class. (Parrot may, at some point, allow imposition of runtime restrictions
-on a class, but currently it doesn't)
+on a class, but currently it doesn't.)
 
 
 =head2 Class PMC API
@@ -182,9 +182,9 @@ An array PMC of the immediate parent classes
 =item 3
 
 A cached array of all parent PMCs, in search order (this is an optional
-optimization, and can be calculated from the class's rules of
-inheritance, the list of immediate parent classes, and the parent
-classes' rules of inheritance)
+optimization, and can be calculated from the class's rules of inheritance,
+the list of immediate parent classes, and the parent classes' rules of
+inheritance)
 
 =item 4
 
@@ -266,34 +266,40 @@ argument it only returns the current value of the name attribute.
 
 =item new
 
-    obj = class.'new'( 'myattrib' => "Foo" )
+    $P1 = $P2.new( 'myattrib' => "Foo" )
 
-Create a new instance object from the class object. It takes an
-optional, slurpy, named list of attributes and values to initialize the
-object. Passing attribute names that weren't declared in the class is an
-error.
+Create a new instance object from the class object. It takes an optional,
+slurpy, named list of attributes and values to initialize the object.
+Passing attribute names that weren't declared in the class is an error.
+
+=item add_attribute
+
+  $P1.add_attribute($S2, $S3)
+  $P1.add_attribute($S2, $P3)
+
+Adds a single attribute to the class. It takes a simple string name and,
+optionally, a simple string value or key specifying a type name. (A type
+name just checks C<does>, and doesn't necessarily correspond to a class or
+role namespace.)
+
+If the class has already been instantiated, adding a new attribute triggers
+the creation of a new class, replacing the old class. See L<Classes,
+Namespaces, and the Class Registry>.
 
 =item attributes
+
+  $P1 = $P2.attributes()
 
 An accessor for the attributes of the class. It returns the a Hash of
 all attributes, with a key of the attribute name and a value of a Hash
 containing the attribute's metadata. The accessor is read-only.
 
-=item add_attribute
-
-Adds a single attribute to the class. It takes a simple string name and,
-optionally, a simple string value or key specifying a type name. (A type name
-just checks C<does>, and doesn't necessarily correspond to a class or role
-name.)
-
-If the class has already been instantiated, adding a new attribute triggers the
-creation of a new class, replacing the old class. See L<Classes, Namespaces,
-and the Class Registry>.
-
 =item add_method
 
+  $P1.add_method($S2, $P3)
+
 Adds a method to the class. It takes a simple string name and a method
-PMC. If the method already exists (and isn't a Multi) it will replace
+PMC.  If the method already exists (and isn't a Multi) it will replace
 the method with the new method and throw a warning.
 
 It also takes slurpy named parameters to flag whether the method is a
@@ -302,62 +308,100 @@ only as a vtable).
 
 =item methods
 
-An accessor for the methods of the class. It returns a Hash of all methods,
-with a key of the method name and a value of an invokable PMC. Note that the
-methods list includes any methods that were composed into the class from
-roles.
+  $P1 = $P2.methods()
+
+An accessor for the methods of the class. It returns a Hash of all
+methods, with a key of the method name and a value of an invokable PMC.
+Note that the methods list includes any methods that were composed into
+the class from roles.
+
+=item add_parent
+
+  $P1.add_parent($S2, $P3)
+
+Adds a single parent to the class. It takes an instance of the Class PMC.
 
 =item parents
+
+  $P1 = $P2.parents()
 
 An accessor for the parents of the class. It returns an Array of all
 parents. The accessor is read-only.
 
-=item add_parent
-
-Adds a single parent to the class. It takes an instance of the Class PMC.
-
 =item roles
+
+  $P1 = $P2.roles()
 
 An accessor for the roles of the class. It returns an Array of all
 roles. The accessor is read-only.
 
 =item add_role
 
+  $P1.add_role($P2, [named])
+
 Adds a single role to the class. It takes an instance of the Role PMC as a
-required positional parameter, and the optional named parameters C<without>
+required positional parameter, and the optional named parameters C<exclude>
 and C<alias>; see L<Role Conflict Resolution> for more details.
+
+=item isa
+
+  $I1 = $P2.isa($S3)
+
+Returns true if the class passed in as a parameter is in the inheritance
+hierarchy of the class (this is not the same as the inheritance
+hierarchy of objects instantiated from the class), false otherwise.
+
+=item can
+
+  $I1 = $P2.can($S3)
+
+Returns true if the class object can perform the requested method, false
+otherwise.
+
+=item does
+
+  $I1 = $P2.does($S3)
+
+Returns true if the object in question implements the role, class, type,
+or behavior passed in, false otherwise.
 
 =back
 
 =head3 Classes, Namespaces, and the Class Registry
 
-[Stream-of-consciousness to be cleaned up later]
-The class registry has a much diminished role in this implementation.
-Its only responsibility is maintaining a mapping of unique IDs to class
-objects throughout the system. (We may eventually be able to eliminate the
-registry altogether.) It can't be used for looking up classes by name,
-because it's possible to have multiple classes with the same name in the
-same namespace. (When you extend an existing class, it actually creates
-a new class, that replaces the old class in the Namespace, but the old
-class can't be thrown away if it has objects instantiated in it. The old
-objects still point to the old class and do their method resolution and
-attribute lookup through that class. If a class hasn't been
-instantiated, adding a method doesn't create a new class. If it has been
-instantiated, it creates a new class the first time it's extended,
-and then doesn't create a new class until it is instantiated again.) The
-class registry needs to have names removed entirely (it doesn't care
-about names anymore).  Low-level PMC types also need entries in the
-namespace hierarchy.
+
+Extending an existing class that has been instantiated creates a new
+class object that replaces the old class object in the Namespace.
+However, the old class object must be kept, as the old objects still
+point to it and do their method resolution and attribute lookup through
+that class object. 
+
+If a class hasn't been instantiated, adding a method or attribute only
+modifies the existing class object instead of creating a new class
+object. Extending a class that has been instantiated only causes the
+creation of a new class object the first time it's extended.  After
+that, methods and attributes added to it will only modify the existing
+class object until it is instantiated again.
 
 The Namespace always points to the most current incarnation of the
-class. All the class objects that nominally exist in a namespace point
-to that namespace object.
+class. All the class objects that belong to a particular namespace store
+a pointer to that Namespace object. They keep that pointer even if the
+Namespace object no longer stores a pointer to them.
+
+Since any given class name may have multiple corresponding class
+objects, the class registry has a much diminished role in this
+implementation. Its only responsibility is maintaining a mapping of
+unique IDs to class objects throughout the system.  It can't be used for
+looking up classes by name, because it's possible to have multiple
+classes with the same name in the same namespace. The class registry may
+need to have names removed (since it doesn't care about names anymore).
+Low-level PMC types will also need entries in the namespace hierarchy.
+We may eventually be able to eliminate the registry of class IDs
+altogether.
 
 A class can be garbage collected when it has no instantiatated objects
-and no Namespace object referencing it. When a class is garbage
-collected, it should remove itself from the registry.
-
-A class object responds to C<isa>, C<can>, and C<does>.
+and no Namespace object referencing it (to mark it as live). When a
+class is garbage collected, it should remove itself from the registry.
 
 
 =head2 Object PMC API
@@ -397,7 +441,6 @@ class. They do have vtable methods providing access to certain low-level
 information about the object, method call functionality, etc. See the
 sections below on L<Objects> and L<Vtables>.
 
-[stream-of-consciousness again]
 In addition to a value type, objects can have a container type. The
 container type can't be stored in the object itself, because a single
 object may live within multiple containers. So, the container type (when
@@ -413,8 +456,8 @@ In a static language like C#.Net:
   o1.x; # retrieves A's attribute
   o2.x; # retrieves B's attribute
 
-  o1.foo(); # call's B's method
-  o2.foo(); # call's B's method
+  o1.foo(); # calls B's method
+  o2.foo(); # calls B's method
 
 
 =head2 Role PMC API
@@ -465,16 +508,30 @@ methods and vtable methods from the previous class.
 
 =item attributes
 
+  $P1 = $P2.attributes()
+
 An accessor for the attributes of the role. It returns the Hash of all
 attributes, with a key of the attribute name, and a value of the
 attribute's metadata (a Hash).  The accessor is read-only.
 
 =item add_attribute
 
+  $P1.add_attribute($S2, $S3)
+
 Adds a single attribute to the role. It takes a simple string name, and
 a simple string value for type.
 
+=item add_role
+
+  $P1.add_role($P2, [named])
+
+Adds a single role to the role. It takes an instance of the Role PMC as a
+required positional parameter, and the optional named parameters C<exclude>
+and C<alias>; see L<Role Conflict Resolution> for more details.
+
 =item roles
+
+  $P1 = $P2.roles()
 
 An accessor for the roles composed into the role. It returns an Array of all
 roles as PMC objects. If any roles that were composed into this one were
@@ -482,13 +539,9 @@ themselves made up of a composition of other roles, the roles they were made
 up of will also be included in the value returned by this accesor. However,
 no role will be mentioned more than once. The accessor is read-only.
 
-=item add_role
-
-Adds a single role to the role. It takes an instance of the Role PMC as a
-required positional parameter, and the optional named parameters C<without>
-and C<alias>; see L<Role Conflict Resolution> for more details.
-
 =item add_method
+
+  $P1.add_method($S2, $P3)
 
 Adds a method to the role. It takes a simple string name and a method
 PMC. If the method already exists (and isn't a Multi) it will replace
@@ -500,6 +553,8 @@ only as a vtable).
 
 =item methods
 
+  $P1 = $P2.methods()
+
 An accessor for the methods of the role. It returns a Hash of all methods,
 with a key of the method name and a value of an invokable PMC. The list will
 include methods added through composing other roles into this role. The
@@ -507,117 +562,159 @@ accessor is read-only.
 
 =back
 
+=head3 Role Conflict Resolution
+
+When a role is added to a class, we try to compose it right away, and
+throw an exception on any conflicts that are detected. A conflict occurs
+if two roles try to supply a method of the same name (but see the note
+on multi-methods below). High level languaes will provide varying
+facilities to deal with this, and Parrot provides the primitives to
+implement them.
+
+When declaring a composed class, you can optionally supply an array of
+method names that will be supplied by the class because of a conflict in
+its roles.  This is done using the named parameter C<resolve>. This
+feature supports composition conflict resolution in languages such as
+Perl 6.
+
+When adding a role to a class, you can optionally supply an array of
+method names from the role to exclude from the composition process. This
+is done using the named parameter C<exclude>. It is not an error to list
+a method name in this array that the role does not have. This makes it
+possible to implement languages that provide for explicit exclusions on
+a role-by-role basis.
+
+When adding a role to a class, you can optionally specify that specific
+methods are to be aliased to different names within the class. This is
+done with the optional C<alias> named parameter. The parameter takes
+hash of strings, where the key is a method name in the role, and the
+value is the name it will have in to the class. (This is also sometimes
+used for conflict resolution.)
+
+If you C<alias> a method, it won't automatically C<exclude> the original
+name from the role.  You can also explicitly C<exclude> the method name,
+if you want a proper renaming of the method.  A C<resolve> at the class
+level will automatically C<exclude> all methods of that name from any
+role composed into the class. You can C<alias> the method if you want to
+call it from the composed class. (You might use this if you want the
+resolving method to be able to call either of the conflicting methods
+from two composed roles.)
+
+If a method in a role is a MultiSub PMC and there is either no method of
+that name yet OR what is in the method slot with that name is also a
+MultiSub PMC, there will be no error. Instead, the multi-methods from
+the role will be added to the multi-methods of the MultiSub PMC already
+in the class. Any attempt to combine a multi with a non-multi will
+result in an error.
 
 =head2 Opcodes
 
-The following ops are provided to deal with objects. Please note that method
-calls are governed by Parrot's calling conventions, and as such objects, method
-PMCs, return continuations, and parameters must be in the right places, though
-some ops will put parameters where they need to go.
+The following ops are provided to deal with objects. Please note that
+method calls are governed by Parrot's calling conventions, and as such
+objects, method PMCs, return continuations, and parameters must be in
+the right places, though some ops will put parameters where they need to
+go.
 
 =over 4
 
-=item classoffset Ix, Py, Sz [deprecated]
+=item getattribute
 
-Returns the offset of the first attribute for class Sz in object Py.
+  $P1 = getattribute $P2, $S3
 
-=item getattribute Px, Py, Iz [deprecated]
+Get the attribute with the fully qualified name $S3 from object $P2 and
+put it in $P1.
 
-Returns attribute Iz of object Py and puts it in Px. Note that the attribute
-number is an absolute offset.
+=item setattribute
 
-=item getattribute Px, Py, Sz
+  setattribute $P1, $S2, $P3
 
-Get the attribute with the fully qualified name Sz from object Py and put it in
-Px.
-
-=item setattribute Px, Iy, Pz
-
-Set the attribute Iy of object Px to Pz. Note that this op stores the B<actual>
-PMC rather than a copy, and so if the PMC's value is subsequently changed, the
-value of the attribute will also change.
-
-=item setattribute Px, Sy, Pz
-
-Set the attribute of object Px with the fully qualified name Sy to Pz
+Set the attribute of object $P1 with the fully qualified name $S2 to $P3
 
 =item callmethod
 
-=item callmethod Sz
+  callmethod
+  callmethod $S1
 
-Call a method. If the method name is provided, we find the PMC for the named
-method and put it in the sub/method slot. If no name is provided we assume that
-all the calling conventions have already been set up and the method PMC is
-already in the proper place.
+Call a method. If the method name is provided in $S1, we find the PMC
+for the named method and put it in the sub/method slot. If no name is
+provided we assume that all the calling conventions have already been
+set up and the method PMC is already in the proper place.
 
 =item callmethodcc
 
-=item callmethodcc Sx
+  callmethodcc $S1
 
-Make a method call, automatically generating a return continuation. If a method
-name is passed in we look up the method PMC for the object and put it in the
-method slot. If a method name isn't provided then we assume that things are
-already properly set up.
+Make a method call, automatically generating a return continuation. If a
+method name is passed in we look up the method PMC for the object and
+put it in the method slot. If a method name isn't provided then we
+assume that things are already properly set up.
 
-=item tailcallmethod (Unimplemented) [deprecated]
+=item newclass
 
-=item tailcallmethod Sx (Unimplemented) [deprecated]
+  $P1 = newclass $S2
 
-Make a tailcall to method Sx. If no method name is given, we assume everything
-is already set up properly.
-
-=item newclass Px, Sy
-
-Create a new base class named Sy, and put the PMC for it in Px
+Create a new base class named $S2, and put the PMC for it in $P1
 
 =item subclass Px, Py, Sz
 
-Create a new class, named Sz, which has Py as its immediate parent.
+  $P1 = subclass $P2, $S3
+
+Create a new class, named $S3, which has $P2 as its immediate parent.
 
 =item get_class
 
   $P1 = get_class $S2
   $P1 = get_class $P2
 
-Retrieve a class object for the class identified by the string name in $S2, or
-by the PMC key in $P2.
+Retrieve a class object for the class identified by the string name in
+$S2, or by the PMC key in $P2.
 
-=item addparent Px, Py
+=item addparent
 
-Add class Py to the end of the list of immediate parents of class Px. Adds any
-attributes of Py (and its parent classes) that aren't already in Px.
+  addparent $P1, $P2
 
-=item removeparent Px, Py (Unimplemented)
+Add class $P2 to the end of the list of immediate parents of class $P1.
+Adds any attributes of $P2 (and its parent classes) that aren't already
+in $P1.
 
-Remove class Py from the parent list of Px. All parent classes of Py which
-aren't parent classes of what remains of Px's parent list are removed, as are
-their attributes.
+=item removeparent
 
-=item addattribute Px, Sy
+  removeparent $P1, $P2
 
-Add attribute Sy to class Px. This will add the attribute slot to all objects
-of class Px and children of class Px, with a default value of C<Null>.
+Remove class $P2 from the parent list of $P1. All parent classes of $P2
+which aren't parent classes of what remains of $P1's parent list are
+removed, as are their attributes.
 
-=item removeattribute Px, Sy (Unimplemented)
+=item addattribute
 
-Remove the attribute Sy from class Px, all objects of class Px, and all objects
-of a child of class Px.
+  addattribute $P1, $S2
+
+Add attribute $S2 to class or role $P1. This will add the attribute slot
+to all objects of class $P1, classes that inherit from class $P1, or
+classes that compose the role $P1, with a default value of C<Null>.
+
+=item removeattribute
+
+  removeattribute $P1, $S2
+
+Remove the attribute $S2 from class or role $P1. This will not remove
+the attribute from any objects that have already been instantiated, but
+it will be absent from all future objects of class $P1, of classes that
+inherit from class $P1, or of classes that compose the role $P1.
 
 =item addrole Px, Py
 
-Add role Py to the end of the list of roles of class Px. Adds any
-attributes of Py that aren't already in Px.
+  addrole $P1, $P2
 
-=item instantiate Px, Py, Sz (Unimplemented) [deprecated]
-
-Instantiate a brand new class, based on the metadata in Py, named Sz.
+Add role $P2 to the end of the list of roles of class or role $P1. Adds
+any methods and attributes of $P2 that aren't already in $P1.
 
 =back
 
 =head2 Vtables
 
-To make this work all PMCs must have the following vtable entries. They may,
-for non-objects, throw an exception.
+To make this work all Classes need the following vtable entries. They
+may, for non-objects, throw an exception.
 
 =over 4
 
@@ -651,17 +748,9 @@ Returns true or false if the object can perform the requested method.
 Returns true or false to note whether the object in question implements the
 interface passed in.
 
-=item get_attr(INTVAL) [deprecated]
-
-Returns the attribute at the passed-in offset for the object.
-
 =item get_attr(STRING*)
 
 Returns the attribute with the fully qualified name for the object.
-
-=item set_attr(INTVAL, PMC *) [deprecated]
-
-Sets the attribute for the passed-in offset to the passed-in PMC value
 
 =item set_attr(STRING*, PMC *)
 
@@ -671,12 +760,29 @@ Set the attribute with the fully qualified name for the object.
 
 Returns the class PMC for the object.
 
+=item clone
+
+Create an (anonymous) clone of the class. Unset the instantiated flag on the
+new class.
+
 =back
 
 Currently Parrot only supports mutating a class' metainformation for
 Class classes. This is a restriction which will be lifted at some point
 soon.
 
+=head2 Vtable Overloading
+
+Classes may override the vtable methods, allowing objects of a class to
+behave like a primitive PMC. To use these properly at a low-level
+requires a good working knowledge of the way Parrot works--generally for
+higher-level languages the language compiler or runtime will provide
+easier-to-use wrappers. These methods are all prototyped, and take a
+single fixed argument list, and return at most a single value.
+
+To override a vtable method, either add the :vtable to the declaration
+of the method, or pass a named, slurpy parameter "vtable" into the
+C<add_method> method on a class or role.
 
 =head2 What The Bytecode Sees
 
@@ -688,48 +794,6 @@ use of objects, though most class activity (including creation of subclasses
 and modifications of existing classes) should be transparent as well.
 
 
-=head2 Role Conflict Resolution
-
-{{ Conjectural:
-
-When a role is added to a class, we try to compose it right away, and throw an
-exception on any conflicts that are detected. A conflict occurs if two roles
-try to supply a method of the same name (but see the note on multi-methods
-below). High level languaes will provide varying facilities to deal with this,
-and Parrot provides the primitives to implement them.
-
-When declaring a composed class, you can optionally supply an array of method
-names that will be supplied by the class because of a conflict in its roles.
-This is done using the named parameter C<resolve>. This feature supports
-composition conflict resolution in languages such as Perl 6.
-
-When adding a role to a class, you can optionally supply an array of method
-names from the role to exclude from the composition process. This is done using
-the named parameter C<exclude>. It is not an error to list a method name in
-this array that the role does not have. This makes it possible to implement
-languages that provide for explicit exclusions on a role-by-role basis.
-
-When adding a role to a class, you can optionally specify that specific methods
-are to be aliased to different names within the class. This is done with the
-optional C<alias> named parameter. The parameter takes hash of strings, where
-the key is a method name in the role, and the value is the name it will have in
-to the class. (This is also sometimes used for conflict resolution.)
-
-If you C<alias> a method, it won't automatically C<exclude> the original name
-from the role.  You can also explicitly C<exclude> the method name, if you want
-a proper renaming of the method.  A C<resolve> at the class level will
-automatically C<exclude> all methods of that name from any role composed into
-the class. You can C<alias> the method if you want to call it from the composed
-class. (You might use this if you want the resolving method to be able to call
-either of the conflicting methods from two composed roles.)
-
-If a method in a role is a MultiSub PMC and there is either no method of that
-name yet OR what is in the method slot with that name is also a MultiSub PMC,
-there will be no error. Instead, the multi-methods from the role will be added
-to the multi-methods of the MultiSub PMC already in the class. Any attempt to
-combine a multi with a non-multi will result in an error.
-
-}}
 
 
 =head1 EXAMPLES
@@ -794,8 +858,8 @@ With named access:
 
 =head1 Explanations
 
-To get a new class, you can do a C<newclass>, which creates a new class with no
-parents besides Parrot's default super-ish parent class.
+To get a new class, you can do a C<newclass>, which creates a new class
+with no parents besides Parrot's default super-ish parent class.
 
 To get a new child class, you have two potential options:
 
@@ -814,416 +878,14 @@ When adding in extra parents in a multiple-inheritance scenario, subclass the
 first class in the immediate parent list then use the C<addparent> op to add in
 the rest of the immediate parents.
 
-=head2 VTABLE OVERLOADING
-
-Classes may override the vtable methods, allowing objects of a class to behave
-like a primitive PMC. Each vtable slot has a corresponding named method that
-Parrot looks for in your class hierarchy when an object is used in a primitive
-context.
-
-To use these properly at a low-level requires a good working knowledge of the
-way Parrot works--generally for higher-level languages the language compiler or
-runtime will provide easier-to-use wrappers. These methods are all prototyped,
-and take a single fixed argument list, and return at most a single value.
-
-While vtable methods I<may> take a continuation, those continuations may I<not>
-escape the vtable method's execution. This is due to the way that vtable
-methods are called by the interpreter--once a vtable method is exited any
-continuation taken within it is no longer valid and may not be used.
-
-Note that any class method that wishes to use Parrot's multi-method dispatch
-system may do so. This is, in fact, encouraged, though it is not required. In
-the absence of explicit multimethod dispatch, a left-side wins scheme is used.
-
-The following list details the raw method names:
-
-=over 4
-
-=item init
-
-Called when the object is first created.
-
-=item init_pmc
-
-Alternative entry point called when object is first created.  Accepts a PMC
-parameter used to initialize the given object.  Interpretation of the PMC is
-PMC-specific.
-
-NOTE: It is strongly suggested that init_pmc(PMCNULL) be equivalent to
-init(), though there will of necessity be exceptions.
-
-=item morph
-
-=item mark
-
-Called when the DOD is tracing live PMCs. If this method is called then the
-code must mark all strings and PMCs that it contains as live, otherwise they
-may be collected.
-
-This method is only called if the PMC is flagged as having a special mark
-routine, and is not necessary for normal objects.
-
-=item destroy
-
-Called when the object is destroyed. This method is only called if the PMC is
-marked as having an active finalizer.
-
-=item clone
-
-Create an (anonymous) clone of the class. Unset the instantiated flag on the
-new class.
-
-=item getprop
-
-=item setprop
-
-=item delprop
-
-=item getprops
-
-=item type
-
-=item type_keyed
-
-=item type_keyed_int
-
-=item type_keyed_str
-
-=item subtype
-
-=item name
-
-=item find_method
-
-=item get_integer
-
-Return the integer value of the object
-
-=item get_integer_keyed
-
-=item get_integer_keyed_int
-
-=item get_integer_keyed_str
-
-=item get_number
-
-Return the floating-point value of the object
-
-=item get_number_keyed
-
-=item get_number_keyed_int
-
-=item get_number_keyed_str
-
-=item get_bignum
-
-Return the extended precision numeric value of the PMC
-
-=item get_string
-
-Return the string value of the PMC
-
-=item get_string_keyed
-
-=item get_string_keyed_int
-
-=item get_string_keyed_str
-
-=item get_bool
-
-Return the true/false value of the PMC
-
-=item get_bool_keyed
-
-=item get_bool_keyed_int
-
-=item get_bool_keyed_str
-
-=item get_pmc
-
-Return the PMC for this PMC.
-
-=item get_pmc_keyed
-
-=item get_pmc_keyed_int
-
-=item get_pmc_keyed_str
-
-=item get_pointer
-
-=item get_pointer_keyed
-
-=item get_pointer_keyed_int
-
-=item get_pointer_keyed_str
-
-=item set_integer_native
-
-Set the integer value of this PMC
-
-=item set_integer_same
-
-=item set_integer_keyed
-
-=item set_integer_keyed_int
-
-=item set_integer_keyed_str
-
-=item set_number_native
-
-Set the floating-point value of this PMC
-
-=item set_number_same
-
-=item set_number_keyed
-
-=item set_number_keyed_int
-
-=item set_number_keyed_str
-
-=item set_bignum_int
-
-Set the extended-precision value of this PMC
-
-=item set_string_native
-
-Set the string value of this PMC
-
-=item set_string_same
-
-=item set_string_keyed
-
-=item set_string_keyed_int
-
-=item set_string_keyed_str
-
-=item set_bool
-
-Set the true/false value of this PMC
-
-=item assign_pmc
-
-Set the value to the value of the passed in
-
-=item set_pmc
-
-Make the PMC refer to the PMC passed in
-
-=item set_pmc_keyed
-
-=item set_pmc_keyed_int
-
-=item set_pmc_keyed_str
-
-=item set_pointer
-
-=item set_pointer_keyed
-
-=item set_pointer_keyed_int
-
-=item set_pointer_keyed_str
-
-=item elements
-
-Return the number of elements in the PMC, if the PMC is treated as an
-aggregate.
-
-=item pop_integer
-
-=item pop_float
-
-=item pop_string
-
-=item pop_pmc
-
-=item push_integer
-
-=item push_float
-
-=item push_string
-
-=item push_pmc
-
-=item shift_integer
-
-=item shift_float
-
-=item shift_string
-
-=item shift_pmc
-
-=item unshift_integer
-
-=item unshift_float
-
-=item unshift_string
-
-=item unshift_pmc
-
-=item splice
-
-=item add
-
-=item add_int
-
-=item add_float
-
-=item subtract
-
-=item subtract_int
-
-=item subtract_float
-
-=item multiply
-
-=item multiply_int
-
-=item multiply_float
-
-=item divide
-
-=item divide_int
-
-=item divide_float
-
-=item modulus
-
-=item modulus_int
-
-=item modulus_float
-
-=item cmodulus
-
-=item cmodulus_int
-
-=item cmodulus_float
-
-=item neg
-
-=item bitwise_or
-
-=item bitwise_or_int
-
-=item bitwise_and
-
-=item bitwise_and_int
-
-=item bitwise_xor
-
-=item bitwise_xor_int
-
-=item bitwise_ors
-
-=item bitwise_ors_str
-
-=item bitwise_ands
-
-=item bitwise_ands_str
-
-=item bitwise_xors
-
-=item bitwise_xors_str
-
-=item bitwise_not
-
-=item bitwise_shl
-
-=item bitwise_shl_int
-
-=item bitwise_shr
-
-=item bitwise_shr_int
-
-=item concatenate
-
-=item concatenate_native
-
-=item is_equal
-
-=item is_same
-
-=item cmp
-
-=item cmp_num
-
-=item cmp_string
-
-=item logical_or
-
-=item logical_and
-
-=item logical_xor
-
-=item logical_not
-
-=item repeat
-
-=item repeat_int
-
-=item increment
-
-=item decrement
-
-=item exists_keyed
-
-=item exists_keyed_int
-
-=item exists_keyed_str
-
-=item defined
-
-=item defined_keyed
-
-=item defined_keyed_int
-
-=item defined_keyed_str
-
-=item delete_keyed
-
-=item delete_keyed_int
-
-=item delete_keyed_str
-
-=item nextkey_keyed
-
-=item nextkey_keyed_int
-
-=item nextkey_keyed_str
-
-=item substr
-
-=item substr_str
-
-=item invoke
-
-=item can
-
-=item does
-
-=item isa
-
-=item freeze
-
-=item thaw
-
-=item thawfinish
-
-=item visit
-
-=item share
-
-=back
-
 =head1 LANGUAGE NOTES
 
-This PDD is due an overhaul. This requirements section is for language
-implementers to list the OO-related needs of their language in so as to aid
-that.
+Notes on some of the OO-related needs of various languages.
 
 =head2 PMCS
 
-Ruby: Just like small talk, everything is an object.  I'm hoping to be able to 
-implement core Ruby classes(String, Array, Hash, Module, etc)  something like this.
+Ruby: Just like Smalltalk, everything is an object.  I'm hoping to be able to 
+implement core Ruby classes (String, Array, Hash, Module, etc)  something like this.
 
 ParrotClass
     |
@@ -1357,9 +1019,14 @@ method names that should be delegated to a particular object.
 =head2 Prototype-based OO
 
 Prototype-based OO has no classes. All objects are cloned from existing
-objects and modified. Requires lightweight singleton creation, without a
-needing separate class for every instance object. (Self, JavaScript, and
-Io are examples of prototype-based 00.)
+objects and modified. Requires lightweight singleton creation, without
+needing a separate class for every instance object. (Self, JavaScript, and
+Io are examples of prototype-based 00.) An example from Io:
+
+  Dog := Object clone # The Dog object is a clone of Object
+  Dog tail := "long"  # it has an attribute 'tail' with the value 'long'
+  Dog bark := method("yap" print) # It has a method 'bark'
+  Dog bark  # call the method 'bark', printing 'yap'
 
 =head1 QUESTIONS
 
@@ -1370,6 +1037,10 @@ Should we have a super or next opcode?
 =head2 Interaction with PMCs
 
 The interaction between objects and PMCs is currently underspecified.
+
+{{ Question: Does anyone remember what this note was about? Was it the
+problem of high-level objects that inherit from low-level PMC objects?
+}}
 
 
 
