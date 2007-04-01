@@ -155,6 +155,38 @@ Walks the MRO of the class and finds the method with the given name.
         return method;
     }
 
+/*
+
+=item C<PMC* get_class()>
+
+Get the class PMC representing the class that this object is an instance of.
+
+=cut
+
+*/
+    PMC* get_class()
+    {
+        Parrot_Object *obj = PARROT_OBJECT(SELF);
+        return obj->class;
+    }
+
+/*
+
+=item C<INTVAL can(STRING *method_name)>
+
+Returns 0 if the class does not have a method with the given name and a
+non-zero value if it does.
+
+=cut
+
+*/
+    INTVAL can(STRING *method_name)
+    {
+        /* Just use find_method and see it if finds anything. */
+        PMC *method = VTABLE_find_method(interp, SELF, method_name);
+        return PMC_IS_NULL(method);
+    }
+
 }
 
 /*
