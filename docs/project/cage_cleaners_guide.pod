@@ -308,12 +308,41 @@ If you can make it run, great!  Make it a TODO test instead.
 
 If neither, please report your findings so that everyone can decide what to do.
 
-=head1 Helpful configuration files
+=head1 Handy configuration tips
+
+=head2 Subversion configuration and automatic properties
 
 There is an example C<.subversion/config> file in
 F<editor/subversion_config> which is useful in automatically setting the
 appropriate Subversion properties relevant to Parrot on addition of new
 files.
+
+=head2 Displaying trailing whitespace in vim and emacs
+
+=head3 Vim
+
+Add this to your C<.vimrc>:
+
+    set list
+    set listchars=trail:-,tab:\.\ 
+
+B<NOTE>: there is a space character after the last backslash.  It is very 
+important!
+
+Contributed by Jerry Gay <jerry dot gay at gmail dot com>.
+
+=head3 Emacs
+
+Add this to your C<.emacs>:
+
+    (setq-default show-trailing-whitespace t)
+
+Emacs 22 users can highlight tabs like this:
+
+    (global-hi-lock-mode 1)
+    (highlight-regexp "\t")
+
+Contributed by Eric Hanchrow <offby1 at blarg dot net>.
 
 =head1 AUTHOR
 
