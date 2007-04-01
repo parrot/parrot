@@ -142,17 +142,9 @@ Use the given loader flags for shared libraries
 
 Specify which lexer to use.
 
-=item C<--flex_required=X.Y.Z>
-
-Override the minimum acceptable flex version.
-
 =item C<--yacc=(parser)>
 
 Specify which parser to use.
-
-=item C<--bison_required=X.Y>
-
-Override the minimum acceptable bison version.
 
 =item C<--define=val1[,val2]>
 
