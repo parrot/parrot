@@ -322,6 +322,10 @@ Perl source files must end with this coda:
     # End:
     # vim: expandtab shiftwidth=4:
 
+B<Exception>: Files with C<__END__> or C<__DATA__> blocks do not require the
+coda.  This is at least until there is some consensus as to how solve the
+issue of using editor hints in files with such blocks.
+
 =item *
 
 PIR source files should end with this coda:
