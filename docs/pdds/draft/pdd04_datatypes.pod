@@ -199,6 +199,382 @@ running on top of Parrot. For instance, a Perl 5 C<SV> will map onto one (or
 more) types of PMC, while particular Python datatypes will map onto different
 types of PMC.
 
+=head2 VTABLE OVERLOADING
+
+PMCs may declare vtable methods. The following list details the raw method names:
+
+=over 4
+
+=item init
+
+Called when an object is first created.
+
+=item init_pmc
+
+Alternative entry point called when an object is first created.  Accepts a PMC
+parameter used to initialize the given object.  Interpretation of the PMC is
+PMC-specific.
+
+NOTE: It is strongly suggested that init_pmc(PMCNULL) be equivalent to
+init(), though there will of necessity be exceptions.
+
+=item morph
+
+=item mark
+
+Called when the DOD is tracing live PMCs. If this method is called then the
+code must mark all strings and PMCs that it contains as live, otherwise they
+may be collected.
+
+This method is only called if the PMC is flagged as having a special mark
+routine, and is not necessary for normal objects.
+
+=item destroy
+
+Called when the PMC is destroyed. This method is only called if the PMC is
+marked as having an active finalizer.
+
+=item clone
+
+Clone a PMC.
+
+=item getprop
+
+=item setprop
+
+=item delprop
+
+=item getprops
+
+=item type
+
+=item type_keyed
+
+=item type_keyed_int
+
+=item type_keyed_str
+
+=item subtype
+
+=item name
+
+=item find_method
+
+=item get_integer
+
+Return the integer value of the object
+
+=item get_integer_keyed
+
+=item get_integer_keyed_int
+
+=item get_integer_keyed_str
+
+=item get_number
+
+Return the floating-point value of the object
+
+=item get_number_keyed
+
+=item get_number_keyed_int
+
+=item get_number_keyed_str
+
+=item get_bignum
+
+Return the extended precision numeric value of the PMC
+
+=item get_string
+
+Return the string value of the PMC
+
+=item get_string_keyed
+
+=item get_string_keyed_int
+
+=item get_string_keyed_str
+
+=item get_bool
+
+Return the true/false value of the PMC
+
+=item get_bool_keyed
+
+=item get_bool_keyed_int
+
+=item get_bool_keyed_str
+
+=item get_pmc
+
+Return the PMC for this PMC.
+
+=item get_pmc_keyed
+
+=item get_pmc_keyed_int
+
+=item get_pmc_keyed_str
+
+=item get_pointer
+
+=item get_pointer_keyed
+
+=item get_pointer_keyed_int
+
+=item get_pointer_keyed_str
+
+=item set_integer_native
+
+Set the integer value of this PMC
+
+=item set_integer_same
+
+=item set_integer_keyed
+
+=item set_integer_keyed_int
+
+=item set_integer_keyed_str
+
+=item set_number_native
+
+Set the floating-point value of this PMC
+
+=item set_number_same
+
+=item set_number_keyed
+
+=item set_number_keyed_int
+
+=item set_number_keyed_str
+
+=item set_bignum_int
+
+Set the extended-precision value of this PMC
+
+=item set_string_native
+
+Set the string value of this PMC
+
+=item set_string_same
+
+=item set_string_keyed
+
+=item set_string_keyed_int
+
+=item set_string_keyed_str
+
+=item set_bool
+
+Set the true/false value of this PMC
+
+=item assign_pmc
+
+Set the value to the value of the passed in
+
+=item set_pmc
+
+Make the PMC refer to the PMC passed in
+
+=item set_pmc_keyed
+
+=item set_pmc_keyed_int
+
+=item set_pmc_keyed_str
+
+=item set_pointer
+
+=item set_pointer_keyed
+
+=item set_pointer_keyed_int
+
+=item set_pointer_keyed_str
+
+=item elements
+
+Return the number of elements in the PMC, if the PMC is treated as an
+aggregate.
+
+=item pop_integer
+
+=item pop_float
+
+=item pop_string
+
+=item pop_pmc
+
+=item push_integer
+
+=item push_float
+
+=item push_string
+
+=item push_pmc
+
+=item shift_integer
+
+=item shift_float
+
+=item shift_string
+
+=item shift_pmc
+
+=item unshift_integer
+
+=item unshift_float
+
+=item unshift_string
+
+=item unshift_pmc
+
+=item splice
+
+=item add
+
+=item add_int
+
+=item add_float
+
+=item subtract
+
+=item subtract_int
+
+=item subtract_float
+
+=item multiply
+
+=item multiply_int
+
+=item multiply_float
+
+=item divide
+
+=item divide_int
+
+=item divide_float
+
+=item modulus
+
+=item modulus_int
+
+=item modulus_float
+
+=item cmodulus
+
+=item cmodulus_int
+
+=item cmodulus_float
+
+=item neg
+
+=item bitwise_or
+
+=item bitwise_or_int
+
+=item bitwise_and
+
+=item bitwise_and_int
+
+=item bitwise_xor
+
+=item bitwise_xor_int
+
+=item bitwise_ors
+
+=item bitwise_ors_str
+
+=item bitwise_ands
+
+=item bitwise_ands_str
+
+=item bitwise_xors
+
+=item bitwise_xors_str
+
+=item bitwise_not
+
+=item bitwise_shl
+
+=item bitwise_shl_int
+
+=item bitwise_shr
+
+=item bitwise_shr_int
+
+=item concatenate
+
+=item concatenate_native
+
+=item is_equal
+
+=item is_same
+
+=item cmp
+
+=item cmp_num
+
+=item cmp_string
+
+=item logical_or
+
+=item logical_and
+
+=item logical_xor
+
+=item logical_not
+
+=item repeat
+
+=item repeat_int
+
+=item increment
+
+=item decrement
+
+=item exists_keyed
+
+=item exists_keyed_int
+
+=item exists_keyed_str
+
+=item defined
+
+=item defined_keyed
+
+=item defined_keyed_int
+
+=item defined_keyed_str
+
+=item dtem delete_keyed_str
+
+=item nextkey_keyed
+
+=item nextkey_keyed_itr_str
+
+=item invoke
+
+=item can
+
+=item does
+
+=item isa
+
+=item fsh
+
+=item visit
+
+=item share
+
+=item add_method
+
+=item add_attribute
+
+=item add_parent
+
+=item add_role
+
+=back
+
+
+
 =head1 ATTACHMENTS
 
 None.
