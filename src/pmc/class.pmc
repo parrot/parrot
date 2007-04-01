@@ -338,9 +338,10 @@ specified will be linked to this class.
 
 /*
 
-=item C<void new()>
+=item C<void new(PMC *args :slurpy :named)>
 
-Creates an instance of the object.
+Creates an instance of the object. Initializes any attributes specified in the
+parameter list.
 
 =cut
 
@@ -348,6 +349,7 @@ Creates an instance of the object.
     PCCMETHOD void new(PMC *args :slurpy :named) {
         Parrot_Class *class = PARROT_CLASS(SELF);
         PMC *obj;
+        PMC *iter;
 
         /* If we've not been instantiated before... */
         if (!class->instantiated) {
@@ -367,7 +369,17 @@ Creates an instance of the object.
         /* Create object. */
         obj = pmc_new_init(interp, enum_class_Object, SELF);
 
-        /* XXX Call constructor with the supplied arguments? */
+        /* Initialize attributes with the supplied values. */
+        iter = VTABLE_get_iter(interp, args);
+        while (VTABLE_get_bool(interp, iter)) {
+            /* Get name and value. */
+            STRING *attr_name = VTABLE_get_string(interp,
+                VTABLE_shift_pmc(interp, iter));
+            PMC *attr_value = VTABLE_get_pmc_keyed_str(interp, args, attr_name);
+            
+            /* Set the attribute. */
+            VTABLE_set_attr_str(interp, obj, attr_name, attr_value);
+        }
 
         PCCRETURN(PMC *obj)
      }

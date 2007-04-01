@@ -91,7 +91,7 @@ ok 3 - name() with too many args fails
 OUT
 
 # L<PDD15/Class PMC API/=item new>
-pir_output_is( <<'CODE', <<'OUT', 'new' );
+pir_output_is( <<'CODE', <<'OUT', 'new', todo => ':slurpy :named bug' );
 .sub 'test' :main
     new $P0, .Class
     $P1 = $P0.'new'()
@@ -100,20 +100,31 @@ pir_output_is( <<'CODE', <<'OUT', 'new' );
     print 'not '
   ok_1:
     say 'ok 1 - new() with no args returns an object'
-
+    
+    push_eh ok_2
     $P1 = $P0.'new'('abc' => '123' )
-    $I0 = isa $P1, 'Object'
-    if $I0 goto ok_2
+    clear_eh
     print 'not '
   ok_2:
-    say 'ok 2 - new() with args returns an object'
+    say 'ok 2 - new with non-attribute key fails'
+
+    $P0 = new .Class
+    $P0.'add_attribute'('foo')
+    $P0.'add_attribute'('bar')
+    $P1 = $P0.'new'('foo' => 1, 'bar' => 2)
+    $P2 = getattribute $P1, 'foo'
+    say $P2
+    $P2 = getattribute $P1, 'bar'
+    say $P2
+    say 'ok 3 - new with key/value pairs sets attributes'
 .end
 CODE
 ok 1 - new() with no args returns an object
-ok 2 - new() with args returns an object
+ok 2 - new() with non-attribute key fails
+1
+2
+ok 3 - new with key/value pairs sets attributes
 OUT
-## test what's set in the object by .'new'() in t/pmc/object.t
-## XXX Second test here should probably fail if the class has no abc attribute
 
 # L<PDD15/Class PMC API/=item attributes>
 pir_output_is( <<'CODE', <<'OUT', 'attributes' );
