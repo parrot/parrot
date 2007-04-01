@@ -175,7 +175,7 @@ sub runstep {
         PATCH   => $main::parrot_version[2],
         DEVEL   => ( -e 'DEVELOPING' ? '-devel' : '' ),
 
-        configdate => scalar localtime,
+        configdate => scalar gmtime() . " GMT",
         PQ         => "'",
         dquote     => "\\\"",
 
