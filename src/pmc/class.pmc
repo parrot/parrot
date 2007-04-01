@@ -461,7 +461,7 @@ Return the roles array PMC.
 
 /*
 
-=item C<void add_role(PMC* role, PMC* without :optional :named["without"],
+=item C<void add_role(PMC* role, PMC* exclude :optional :named["exclude"],
 PMC* alias :optional :named["alias"])>
 
 Compose a role into a class with the given exclusions and aliases.
@@ -470,10 +470,10 @@ Compose a role into a class with the given exclusions and aliases.
 
 */
     PCCMETHOD void add_role(PMC* role,
-            PMC* without :optional :named["without"], int got_without :opt_flag,
+            PMC* exclude :optional :named["exclude"], int got_exclude :opt_flag,
             PMC* alias :optional :named["alias"],     int got_alias :opt_flag) {
         Parrot_Class *class = PARROT_CLASS(SELF);
-        Parrot_ComposeRole(interp, role, without, got_without, alias, got_alias,
+        Parrot_ComposeRole(interp, role, exclude, got_exclude, alias, got_alias,
                            class->methods, class->roles);
     }
 

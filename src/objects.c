@@ -1848,7 +1848,7 @@ PMC* Parrot_ComputeMRO_C3(Interp *interp, PMC *class)
 /*
 
 =item C<void Parrot_ComposeRole(Interp *interp, PMC *role,
-                        PMC *without, int got_without,
+                        PMC *exclude, int got_exclude,
                         PMC *alias, int got_alias,
                         PMC *methods_hash, PMC *roles_list)>
 
@@ -1868,7 +1868,7 @@ the default implementation.
 */
 
 void Parrot_ComposeRole(Interp *interp, PMC *role,
-                        PMC *without, int got_without,
+                        PMC *exclude, int got_exclude,
                         PMC *alias, int got_alias,
                         PMC *methods_hash, PMC *roles_list)
 {
@@ -1906,10 +1906,10 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
         STRING *check_name = method_name;
 
         /* Ignore if it's in the exclude list. */
-        if (got_without) {
-            int without_count = VTABLE_elements(interp, without);
-            for (i = 0; i < without_count; i++) {
-                STRING *check = VTABLE_get_string_keyed_int(interp, without, i);
+        if (got_exclude) {
+            int exclude_count = VTABLE_elements(interp, exclude);
+            for (i = 0; i < exclude_count; i++) {
+                STRING *check = VTABLE_get_string_keyed_int(interp, exclude, i);
                 if (string_equal(interp, check, method_name) == 0) {
                     check_name = NULL;
                     break;

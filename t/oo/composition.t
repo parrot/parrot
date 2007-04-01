@@ -216,7 +216,7 @@ pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by exclusion' );
     $P0.'add_method'("snake", $P2)
     $P3 = new ResizableStringArray
     push $P3, "badger"
-    $P1.'add_role'($P0, 'without' => $P3)
+    $P1.'add_role'($P0, 'exclude' => $P3)
     print "ok 2 - composition worked due to exclusion\n"
 
     $P2 = $P1.'new'()
