@@ -188,7 +188,8 @@ classes' rules of inheritance)
 
 =item 4
 
-An array PMC of the composed roles
+An array PMC of the composed roles (these are Role PMCs, not string names of
+roles).
 
 =item 5
 
@@ -281,10 +282,9 @@ containing the attribute's metadata. The accessor is read-only.
 =item add_attribute
 
 Adds a single attribute to the class. It takes a simple string name and,
-optionally, a simple string value for type. {{ Conjectural: Actually, the
-simple string value alone won't cut it. We need to take a key there too?
-Answer: No, just the string name of the type. Types are not classes, they just
-perform a C<does> operation.}}
+optionally, a simple string value or key specifying a type name. (A type name
+just checks C<does>, and doesn't necessarily correspond to a class or role
+name.)
 
 If the class has already been instantiated, adding a new attribute triggers the
 creation of a new class, replacing the old class. See L<Classes, Namespaces,
@@ -521,7 +521,7 @@ some ops will put parameters where they need to go.
 
 Returns the offset of the first attribute for class Sz in object Py.
 
-=item getattribute Px, Py, Iz
+=item getattribute Px, Py, Iz [deprecated]
 
 Returns attribute Iz of object Py and puts it in Px. Note that the attribute
 number is an absolute offset.
@@ -698,10 +698,10 @@ try to supply a method of the same name (but see the note on multi-methods
 below). High level languaes will provide varying facilities to deal with this,
 and Parrot provides the primitives to implement them.
 
-When declaring a class, you can optionally supply an array of method names that
-will be supplied by the composed class because of a conflict in the roles. This
-is done using the named parameter C<resolve>. This feature supports composition
-conflict resolution in languages such as Perl 6.
+When declaring a composed class, you can optionally supply an array of method
+names that will be supplied by the class because of a conflict in its roles.
+This is done using the named parameter C<resolve>. This feature supports
+composition conflict resolution in languages such as Perl 6.
 
 When adding a role to a class, you can optionally supply an array of method
 names from the role to exclude from the composition process. This is done using
@@ -757,8 +757,8 @@ To create a class C<Foo> with the parents C<A> and C<B>, the code would be:
 Adding the attributes C<a> and C<b> to the new class C<Foo>:
 
   $P0 = newclass "Foo"
-  addattribute $P0, "a"   # This is offset 0 + classoffset
-  addattribute $P0, "b"   # This is offset 1 + classoffset
+  addattribute $P0, "a"
+  addattribute $P0, "b"
 
 =head2 Instantiating an object
 
