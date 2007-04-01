@@ -123,6 +123,15 @@ if ( !keys %policies ) {
         'Subroutines::RequireFinalReturn'                 => 1,
     );
 
+    # Add Perl::Critic::Bangs if it exists
+    eval { require Perl::Critic::Bangs; };
+    if ( $@ ) {
+        diag "Perl::Critic::Bangs not installed: not testing for TODO items in code";
+    }
+    else {
+        $policies{'Bangs::ProhibitFlagComments'} = 1;
+    }
+
     # Give a diag to let users know if this is doing anything, how to repeat.
     eval { require Perl::Tidy; };
     if ( !$@ ) {
