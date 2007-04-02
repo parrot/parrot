@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -15,7 +15,7 @@ use ExtUtils::Manifest qw( maniread );
 
 =head1 NAME
 
-t/distro/file_metadata.t - verify file metadata matches expectations
+t/distro/file_metadata.t - verify that file metadata matches expectations
 
 =head1 SYNOPSIS
 
@@ -57,9 +57,9 @@ TEST_MIME: {
     my @failed      = verify_attributes( $test, $expected, 0, $mime_types, \@test_files );
 
     if (@failed) {
-        my $failure = join " ($expected)\n", @failed;
-        $failure = "\n" . $failure . " ($expected)\n";
-        is( $failure, "", $test );
+        my $failure
+            = join q{},  "Set $test with:\n", map { " $cmd ps $test '$expected' $_;\n" } @failed;
+        is( $failure, '', $test );
     }
     else {
         pass($test);
@@ -78,7 +78,6 @@ KEYWORD_EXP: {
         if ( !defined( $mime_types->{$file} )
             || $mime_types->{$file} =~ qr{^text/plain} )
         {
-
             push @plain_files, $file;
         }
     }
@@ -90,9 +89,9 @@ KEYWORD_EXP: {
     my @failed = verify_attributes( $test, $expected, 1, $keywords );
 
     if (@failed) {
-        my $failure = join " ($expected)\n", @failed;
-        $failure = "\n" . $failure . " ($expected)\n";
-        is( $failure, "", $test );
+        my $failure
+            = join q{},  "Set $test with:\n", map { " $cmd ps $test '$expected' $_;\n" } @failed;
+        is( $failure, '', $test );
     }
     else {
         pass($test);
@@ -138,9 +137,9 @@ NATIVE_EOL_STYLE: {
     my @failed = verify_attributes( $test, $expected, 1, $keywords );
 
     if (@failed) {
-        my $failure = join " ($expected)\n", @failed;
-        $failure = "\n" . $failure . " ($expected)\n";
-        is( $failure, "", $test_name );
+        my $failure
+            = join q{},  "Set $test with:\n", map { " $cmd ps $test '$expected' $_;\n" } @failed;
+        is( $failure, '', $test_name );
     }
     else {
         pass($test_name);
@@ -169,9 +168,9 @@ LF_EOL_STYLE: {
     my @failed = verify_attributes( $test, $expected, 1, $keywords );
 
     if (@failed) {
-        my $failure = join " ($expected)\n", @failed;
-        $failure = "\n" . $failure . " ($expected)\n";
-        is( $failure, "", $test_name );
+        my $failure
+            = join q{},  "Set $test with:\n", map { " $cmd ps $test '$expected' $_;\n" } @failed;
+        is( $failure, '', $test_name );
     }
     else {
         pass($test_name);
@@ -222,8 +221,6 @@ BEGIN {
     }
     else { plan tests => 4 }
 }
-
-exit;
 
 #
 # Given a list, a count, and a sub, process that list count elements
