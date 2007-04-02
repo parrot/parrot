@@ -278,6 +278,7 @@ Passing attribute names that weren't declared in the class is an error.
 
 =item add_attribute
 
+  $P1.add_attribute($S2)
   $P1.add_attribute($S2, $S3)
   $P1.add_attribute($S2, $P3)
 
@@ -525,10 +526,14 @@ attribute's metadata (a Hash).  The accessor is read-only.
 
 =item add_attribute
 
+  $P1.add_attribute($S2)
   $P1.add_attribute($S2, $S3)
+  $P1.add_attribute($S2, $P3)
 
 Adds a single attribute to the role. It takes a simple string name, and
-a simple string value for type.
+optionally, a simple string value or key specifying a type name. (A type
+name just checks C<does>, and doesn't necessarily correspond to a class
+or role namespace.)
 
 =item add_role
 
@@ -701,10 +706,14 @@ removed, as are their attributes.
 =item addattribute
 
   addattribute $P1, $S2
+  addattribute $P1, $S2, $S3
+  addattribute $P1, $S2, $P3
 
 Add attribute $S2 to class or role $P1. This will add the attribute slot
 to all objects of class $P1, classes that inherit from class $P1, or
-classes that compose the role $P1, with a default value of C<Null>.
+classes that compose the role $P1, with a default value of C<Null>.  It
+optionally takes a simple string value or key specifying a type of the
+attribute.
 
 =item removeattribute
 
