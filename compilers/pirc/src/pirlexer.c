@@ -104,6 +104,13 @@ The following are flags for parameters/arguments.
 
 =cut
 
+
+Note w.r.t. dictionary:
+
+Make sure that the spelling can /only/ be a single word if it is a keyword
+(or directive etc.). If it is a description, make sure the word cannot occurr
+as such, for instance, by using an embedded space.
+
 */
 static char const * dictionary[] = {
     "global",                   /* T_GLOBAL,                */

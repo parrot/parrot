@@ -547,21 +547,6 @@ argument_list(parser_state *p) {
 
 }
 
-/*
-
-=item
-
-  global_definition -> '.global' IDENTIFIER
-
-=cut
-
-*/
-static void
-global_definition(parser_state *p) {
-    match(p, T_GLOBAL_DECL);
-    match(p, T_IDENTIFIER);
-}
-
 
 /*
 
@@ -679,7 +664,6 @@ arith_expression(parser_state *p) {
 */
 static void
 parrot_instruction(parser_state *p) {
-    /* emit the op */
     emit_op_start(p, get_current_token(p->lexer));
 
     match(p, T_PARROT_OP);
@@ -706,14 +690,14 @@ parrot_instruction(parser_state *p) {
 =item
 
   assignment -> '=' ( unop expression
-                    | expression [binop expression]
+                    | expression arith_expr
                     | target ( keylist | [ '->' method ] arguments )
                     | STRINGC arguments
                     | 'global' STRINGC
                     | heredocstring
                     | methodcall
                     | 'null'
-                    | PARROT_OP [ expression { ',' expression } ]
+                    | parrot_instruction
                     )
 
   unop       -> '-' | '!' | '~'
@@ -728,7 +712,7 @@ assignment(parser_state *p) {
     switch (p->curtoken) {
         case T_NOT:
         case T_MINUS:
-        case T_BXOR:  /* '~' used as binary 'not' op */
+        case T_BXOR:  /* '~' used as 'bnot' op */
             next(p);
             expression(p);
             break;
@@ -1499,7 +1483,7 @@ macro_expansion(parser_state *p) {
 
 =item
 
-  get_results_instr -> '.get_results' '(' target_list ')' '\n'
+  get_results_instr -> '.get_results' target_list '\n'
 
 =cut
 
@@ -1556,7 +1540,9 @@ global_assignment(parser_state *p) {
 
 =item
 
-  instruction -> {LABEL '\n'} instr
+  instructions -> {instruction}
+
+  instruction  -> {LABEL '\n'} instr
 
   instr -> if_statement
          | unless_statement
@@ -1683,6 +1669,21 @@ instructions(parser_state *p) {
     }
 }
 
+
+/*
+
+=item
+
+  global_definition -> '.global' IDENTIFIER
+
+=cut
+
+*/
+static void
+global_definition(parser_state *p) {
+    match(p, T_GLOBAL_DECL);
+    match(p, T_IDENTIFIER);
+}
 
 /*
 
@@ -1830,8 +1831,6 @@ parameters(parser_state *p) {
                 emit_type(p, get_current_token(p->lexer));
                 /* type(p); -- we know what it is; just skip it! */
                 next(p);
-
-                /* Maybe combine these 2 statements into an 'identifier'() function? */
                 emit_name(p, get_current_token(p->lexer));
                 match(p, T_IDENTIFIER);
                 param_flags(p);
@@ -1869,7 +1868,7 @@ parameters(parser_state *p) {
 
 =item
 
-  sub_definition -> '.sub' (IDENTIFIER | STRINGC) subflags '\n' parameters body '.end'
+  sub_definition -> '.sub' (IDENTIFIER | STRINGC) subflags '\n' parameters instructions '.end'
 
 =cut
 
