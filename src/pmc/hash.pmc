@@ -582,8 +582,7 @@ Returns the PMC value for the element at C<*key>.
             default:
                 keystr = make_hash_key(INTERP, key);
         }
-        b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        keystr);
+        b = parrot_hash_get_bucket(INTERP, hash, keystr);
         if (b == NULL) {
             return PMCNULL;
         }

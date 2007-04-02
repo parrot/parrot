@@ -505,7 +505,7 @@ the next one.
         PMC * const key = PMC_struct_val(SELF);
         PMC * const agg = PMC_pmc_val(SELF);
         PMC *ret;
-        if (key_integer(INTERP, key) == -1) {
+        if (PMC_int_val(key) == -1) {
             real_exception(INTERP, NULL, E_StopIteration, "StopIteration");
             return NULL;
         }
