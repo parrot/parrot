@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 =head1 NAME
 
@@ -292,6 +292,62 @@ Snake!
 ok 4 - called method from role that wasn't aliased
 Aliased badger!
 ok 5 - called method from role that was aliased
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by resolve' );
+.sub 'test' :main
+    $P0 = new Role
+    $P1 = new Class
+
+    $P3 = new ResizableStringArray
+    push $P3, "badger"
+    $P1.resolve($P3)
+    print "ok 1 - set resolve list\n"
+
+    $P4 = $P1.resolve()
+    $S0 = $P4[0]
+    if $S0 == "badger" goto ok_2
+    print "not "
+ok_2:
+    print "ok 2 - got resolve list and it matched\n"
+
+    $P2 = find_global "badger"
+    $P1.'add_method'("badger", $P2)
+    print "ok 3 - class has a method\n"
+
+    $P2 = find_global "badger2"
+    $P0.'add_method'("badger", $P2)
+    $P2 = find_global "snake"
+    $P0.'add_method'("snake", $P2)
+    $P1.'add_role'($P0)
+    print "ok 4 - composition worked due to resolve\n"
+
+    $P2 = $P1.'new'()
+    $P2.'badger'()
+    print "ok 5 - called method from class\n"
+
+    $P2.'snake'()
+    print "ok 6 - called method from role that wasn't resolved\n"
+.end
+
+.sub badger :method
+    print "Badger!\n"
+.end
+.sub badger2 :method
+    print "Oops, wrong badger.\n"
+.end
+.sub snake :method
+    print "Snake!\n"
+.end
+CODE
+ok 1 - set resolve list
+ok 2 - got resolve list and it matched
+ok 3 - class has a method
+ok 4 - composition worked due to resolve
+Badger!
+ok 5 - called method from class
+Snake!
+ok 6 - called method from role that wasn't resolved
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'role that does a role' );
