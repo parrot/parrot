@@ -259,6 +259,8 @@ Class PMCs also have the "I am a class" flag set on them.
 
 =item name
 
+    $P1 = $P2.name( $S3 )
+
 The accessor for the name attribute. With no argument, it simply returns
 the current value for name. When passed an argument, it sets the name of
 the class, and also sets the association with a namespace. With no
@@ -652,10 +654,12 @@ assume that things are already properly set up.
 =item newclass
 
   $P1 = newclass $S2
+  $P1 = newclass $S2, $P3
 
-Create a new base class named $S2, and put the PMC for it in $P1
+Create a new base class named $S2, and put the PMC for it in $P1. You may
+optionally pass a hash of initialization parameters for the class in $P3.
 
-=item subclass Px, Py, Sz
+=item subclass
 
   $P1 = subclass $P2, $S3
 
@@ -831,7 +835,7 @@ Assuming we want an object of class C<Foo>:
   .local pmc FooClass
   .local pmc MyObject
   FooClass = get_class "Foo"
-  MyObject = new FooClass
+  MyObject = FooClass.new()
 
 =head2 Calling a method on an object
 
