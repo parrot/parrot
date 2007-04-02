@@ -119,13 +119,15 @@ method calls)
 
 =item - Objects can fetch their class
 
+=item - Objects can get an attribute by name
+
+=item - Objects can set an attribute by name
+
 =item - Objects can be subclassed (note that objects may not necessarily
 be able to have their classes changed arbitrarily, but making a subclass
 and moving the object to it is allowable)
 
-=item - Objects can get an attribute by name
-
-=item - Objects can set an attribute by name
+=item - High-level objects can subclass low-level PMCs
 
 =back
 
@@ -345,6 +347,12 @@ Adds a single role to the class. It takes an instance of the Role PMC as a
 required positional parameter, and the optional named parameters C<exclude>
 and C<alias>; see L<Role Conflict Resolution> for more details.
 
+=item subclass
+
+  $P1 = $P2.subclass($S3)
+
+Create a subclass of $P2 with name $S3 and return it in $P1.
+
 =item isa
 
   $I1 = $P2.isa($S3)
@@ -404,7 +412,6 @@ altogether.
 A class can be garbage collected when it has no instantiatated objects
 and no Namespace object referencing it (to mark it as live). When a
 class is garbage collected, it should remove itself from the registry.
-
 
 =head2 Object PMC API
 
@@ -574,7 +581,7 @@ facilities to deal with this, and Parrot provides the primitives to
 implement them.
 
 When declaring a composed class, you can optionally supply an array of
-method names that will be supplied by the class because of a conflict in
+method names that will be defined by the class to resolve a conflict in
 its roles.  This is done using the named parameter C<resolve>. This
 feature supports composition conflict resolution in languages such as
 Perl 6.
@@ -663,7 +670,9 @@ optionally pass a hash of initialization parameters for the class in $P3.
 
   $P1 = subclass $P2, $S3
 
-Create a new class, named $S3, which has $P2 as its immediate parent.
+Create a new class, named $S3, which has $P2 as its immediate parent. $P2 may
+be either another high-level class based on the Class PMC, or it may be a
+low-level PMC such as C<Integer> or C<ResizablePMCArray>.
 
 =item get_class
 
@@ -1036,17 +1045,7 @@ Io are examples of prototype-based 00.) An example from Io:
 
 Should we have a super or next opcode?
 
-=head1 NOTES
-
-=head2 Interaction with PMCs
-
-The interaction between objects and PMCs is currently underspecified.
-
-{{ Question: Does anyone remember what this note was about? Was it the
-problem of high-level objects that inherit from low-level PMC objects?
-}}
-
-
+{{ Shouldn't that be a super or next method call instead? }}
 
 =head2 Translation
 

@@ -199,7 +199,7 @@ running on top of Parrot. For instance, a Perl 5 C<SV> will map onto one (or
 more) types of PMC, while particular Python datatypes will map onto different
 types of PMC.
 
-=head2 VTABLE OVERLOADING
+=head2 Vtable Overloading
 
 PMCs may declare vtable methods. The following list details the raw method names:
 
@@ -573,6 +573,11 @@ aggregate.
 
 =back
 
+
+=head2 Interaction between PMCs and high-level objects
+
+{{ Address the problem of high-level objects inheriting from low-level PMCs,
+and any structural changes to low-level PMCs that might require. }}
 
 
 =head1 ATTACHMENTS
