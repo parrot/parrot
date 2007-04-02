@@ -224,8 +224,7 @@ static char const * dictionary[] = {
     "label identifier",         /* T_LABEL,                 */
     "'\\n'",                    /* T_NEWLINE,               */
     "=",                        /* T_ASSIGN,                */
-    "\"string\"",               /* T_DOUBLE_QUOTED_STRING,  */
-    "'string'",                 /* T_SINGLE_QUOTED_STRING,  */
+    "string constant",          /* T_STRING_CONSTANT,       */
     "'literal'",                /* T_LITERAL,               */
     "invocant id",              /* T_INVOCANT_IDENT,        */
     "'error'",                  /* T_ERROR,                 */
@@ -1555,7 +1554,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
             }
             while (c != '"');
 
-            return T_DOUBLE_QUOTED_STRING;
+            return T_STRING_CONSTANT;
         }
         else if (c == '\'') {
             buffer_char(lexer, c);
@@ -1572,7 +1571,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
             }
             while (c != '\'');
 
-            return T_SINGLE_QUOTED_STRING;
+            return T_STRING_CONSTANT;
         }
         else if (c == ':') { /* read flags */
             token tmp;

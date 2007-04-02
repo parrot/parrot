@@ -120,8 +120,7 @@ typedef enum tokens {
     T_LABEL,                            /* "label identifier",        */
     T_NEWLINE,                          /* "'\\n'",                   */
     T_ASSIGN,                           /* "=",                       */
-    T_DOUBLE_QUOTED_STRING,             /* "\"string\"",              */
-    T_SINGLE_QUOTED_STRING,             /* "'string'",                */
+    T_STRING_CONSTANT,                  /* "string constant",         */    
     T_LITERAL,                          /* "'literal'",               */
     T_INVOCANT_IDENT,                   /* "invocant id",             */
     T_ERROR,                            /* "'error'",                 */

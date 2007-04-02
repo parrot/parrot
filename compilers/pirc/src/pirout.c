@@ -37,8 +37,7 @@ pirout(struct parser_state *p) {
             break;
         case T_INTEGER_CONSTANT:
         case T_NUMBER_CONSTANT:
-        case T_DOUBLE_QUOTED_STRING:
-        case T_SINGLE_QUOTED_STRING:
+        case T_STRING_CONSTANT:
         case T_PARROT_OP:
         case T_IDENTIFIER:
         case T_PASM_PREG:
