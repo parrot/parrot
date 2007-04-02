@@ -157,7 +157,8 @@ ok 1 - attributes() returns a Hash
 ok 2 - New Class PMC has no attributes
 ok 3 - attributes() is read-only accessor
 OUT
-## Q: what attributes the base Class have by default?
+## Q: what attributes does the base Class have by default?
+## A: it has no attributes by default
 
 # L<PDD15/Class PMC API/=item add_attribute>
 pir_output_is( <<'CODE', <<'OUT', 'add_attribute');
@@ -203,6 +204,9 @@ ok 3 - add_attribute() with valid args adds an attribute
 ok 4 - add_attribute() with existing attribute name fails
 OUT
 ## Q: should adding an attribute with an invalid type name fail?
+## A: since type compatibility checks does, you could specify a type
+# that isn't registered as a class/role. So, no, I don't think it should try to
+# validate types.
 
 ## NOTE i think this belongs in the Object PMC tests
 # L<PDD15/Class PMC API>
@@ -250,6 +254,9 @@ ok 1 - parents() returns a ResizablePMCArray
 OUT
 ## NOTE test that accessor is read-only
 ## NOTE figure out what parents the base Class has by default (if any)
+## A: It has no parents by default. (Note, the parents stored in the 'parents'
+# attribute aren't the parents of Class, they're the parents of the class object
+# that is an instance of Class.)
 
 ## TODO add_parent
 
@@ -269,6 +276,7 @@ ok 1 - roles() returns a ResizablePMCArray
 OUT
 ## NOTE test that accessor is read-only
 ## NOTE figure out what roles the base Class has by default (if any)
+# A: None. See comment for parents().
 
 ## TODO add_role
 
