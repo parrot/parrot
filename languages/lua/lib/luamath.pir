@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -66,46 +66,57 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     _register($P1, _math)
 
     .const .Sub _math_abs = '_math_abs'
+    _math_abs.'setfenv'(_lua__GLOBAL)
     set $P1, 'abs'
     _math[$P1] = _math_abs
 
     .const .Sub _math_acos = '_math_acos'
+    _math_acos.'setfenv'(_lua__GLOBAL)
     set $P1, 'acos'
     _math[$P1] = _math_acos
 
     .const .Sub _math_asin = '_math_asin'
+    _math_asin.'setfenv'(_lua__GLOBAL)
     set $P1, 'asin'
     _math[$P1] = _math_asin
 
     .const .Sub _math_atan = '_math_atan'
+    _math_atan.'setfenv'(_lua__GLOBAL)
     set $P1, 'atan'
     _math[$P1] = _math_atan
 
     .const .Sub _math_atan2 = '_math_atan2'
+    _math_atan2.'setfenv'(_lua__GLOBAL)
     set $P1, 'atan2'
     _math[$P1] = _math_atan2
 
     .const .Sub _math_ceil = '_math_ceil'
+    _math_ceil.'setfenv'(_lua__GLOBAL)
     set $P1, 'ceil'
     _math[$P1] = _math_ceil
 
     .const .Sub _math_cos = '_math_cos'
+    _math_cos.'setfenv'(_lua__GLOBAL)
     set $P1, 'cos'
     _math[$P1] = _math_cos
 
     .const .Sub _math_deg = '_math_deg'
+    _math_deg.'setfenv'(_lua__GLOBAL)
     set $P1, 'deg'
     _math[$P1] = _math_deg
 
     .const .Sub _math_exp = '_math_exp'
+    _math_exp.'setfenv'(_lua__GLOBAL)
     set $P1, 'exp'
     _math[$P1] = _math_exp
 
     .const .Sub _math_floor = '_math_floor'
+    _math_floor.'setfenv'(_lua__GLOBAL)
     set $P1, 'floor'
     _math[$P1] = _math_floor
 
     .const .Sub _math_fmod = '_math_fmod'
+    _math_fmod.'setfenv'(_lua__GLOBAL)
     set $P1, 'fmod'
     _math[$P1] = _math_fmod
 
@@ -114,58 +125,72 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     _math[$P1] = _math_fmod
 
     .const .Sub _math_frexp = '_math_frexp'
+    _math_frexp.'setfenv'(_lua__GLOBAL)
     set $P1, 'frexp'
     _math[$P1] = _math_frexp
 
     .const .Sub _math_ldexp = '_math_ldexp'
+    _math_ldexp.'setfenv'(_lua__GLOBAL)
     set $P1, 'ldexp'
     _math[$P1] = _math_ldexp
 
     .const .Sub _math_log = '_math_log'
+    _math_log.'setfenv'(_lua__GLOBAL)
     set $P1, 'log'
     _math[$P1] = _math_log
 
     .const .Sub _math_log10 = '_math_log10'
+    _math_log10.'setfenv'(_lua__GLOBAL)
     set $P1, 'log10'
     _math[$P1] = _math_log10
 
     .const .Sub _math_max = '_math_max'
+    _math_max.'setfenv'(_lua__GLOBAL)
     set $P1, 'max'
     _math[$P1] = _math_max
 
     .const .Sub _math_min = '_math_min'
+    _math_min.'setfenv'(_lua__GLOBAL)
     set $P1, 'min'
     _math[$P1] = _math_min
 
     .const .Sub _math_modf = '_math_modf'
+    _math_modf.'setfenv'(_lua__GLOBAL)
     set $P1, 'modf'
     _math[$P1] = _math_modf
 
     .const .Sub _math_pow = '_math_pow'
+    _math_pow.'setfenv'(_lua__GLOBAL)
     set $P1, 'pow'
     _math[$P1] = _math_pow
 
     .const .Sub _math_rad = '_math_rad'
+    _math_rad.'setfenv'(_lua__GLOBAL)
     set $P1, 'rad'
     _math[$P1] = _math_rad
 
     .const .Sub _math_random = '_math_random'
+    _math_random.'setfenv'(_lua__GLOBAL)
     set $P1, 'random'
     _math[$P1] = _math_random
 
     .const .Sub _math_randomseed = '_math_randomseed'
+    _math_randomseed.'setfenv'(_lua__GLOBAL)
     set $P1, 'randomseed'
     _math[$P1] = _math_randomseed
 
     .const .Sub _math_sin = '_math_sin'
+    _math_sin.'setfenv'(_lua__GLOBAL)
     set $P1, 'sin'
     _math[$P1] = _math_sin
 
     .const .Sub _math_sqrt = '_math_sqrt'
+    _math_sqrt.'setfenv'(_lua__GLOBAL)
     set $P1, 'sqrt'
     _math[$P1] = _math_sqrt
 
     .const .Sub _math_tan = '_math_tan'
+    _math_tan.'setfenv'(_lua__GLOBAL)
     set $P1, 'tan'
     _math[$P1] = _math_tan
 

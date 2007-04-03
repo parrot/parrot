@@ -13,6 +13,8 @@ package pirVisitor;
         my ($fh) = @_;
         $self->{fh}       = $fh;
         $self->{prologue} = q{
+.include 'interpinfo.pasm'
+
 .HLL 'Lua', 'lua_group'
 
 .sub '__start' :main
@@ -43,7 +45,12 @@ L2:
   load_bytecode 'languages/lua/lib/luaos.pbc'
   load_bytecode 'languages/lua/lib/luadebug.pbc'
   load_bytecode 'languages/lua/lib/luaperl.pbc'
-  _main($P0 :flat)
+
+  .const .Sub main = '_main'
+  .local pmc env
+  env = get_global '_G'
+  main.'setfenv'(env)
+  main($P0 :flat)
 .end
 
 .sub '__onload' :anon :init
@@ -119,11 +126,11 @@ L2:
         return;
     }
 
-    sub visitGetGlobalOp {
+    sub visitInterpInfoOp {
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  $op->{result}->{symbol} = get_global '$op->{arg1}'\n";
+        print {$FH} "  $op->{result}->{symbol} = interpinfo $op->{arg1}\n";
         return;
     }
 
@@ -213,26 +220,29 @@ L2:
             $first = 0;
         }
         print {$FH} ")\n";
+        delete $self->{getfenv};
         return;
     }
 
     sub visitCallMethOp {
         my $self = shift;
         my ($op) = @_;
+        if ( $op->{arg1} eq 'getfenv') {
+            return if ( exists $self->{getfenv} );
+            $self->{getfenv} = 1;
+        }
         my $FH   = $self->{fh};
         print {$FH} "  ";
         if ( exists $op->{result} and scalar( @{ $op->{result} } ) ) {
-            print {$FH} "(";
+            print {$FH} "(" if ( scalar( @{ $op->{result} } ) > 1 );
             my $first = 1;
             foreach ( @{ $op->{result} } ) {
                 print {$FH} ", " unless ($first);
                 print {$FH} "$_->{symbol}";
-                if ( exists $_->{pragma} and $_->{pragma} eq 'multi' ) {
-                    print {$FH} " :slurpy";
-                }
                 $first = 0;
             }
-            print {$FH} ") = ";
+            print {$FH} ")" if ( scalar( @{ $op->{result} } ) > 1 );
+            print {$FH} " = ";
         }
         my @args = @{ $op->{arg2} };
         my $obj  = shift @args;
@@ -321,6 +331,7 @@ L2:
         my ($op) = @_;
         my $FH   = $self->{fh};
         print {$FH} "$op->{arg1}->{symbol}:\n";
+        delete $self->{getfenv};
         return;
     }
 
@@ -333,6 +344,7 @@ L2:
             print {$FH} " :outer($dir->{outer})";
         }
         print {$FH} "\n";
+        delete $self->{getfenv};
         return;
     }
 

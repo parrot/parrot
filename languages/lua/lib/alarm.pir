@@ -33,6 +33,7 @@ The library exports a single function: alarm(s,[f]).
     new $P1, .LuaString
 
     .const .Sub _alarm = '_alarm'
+    _alarm.'setfenv'(_lua__GLOBAL)
     set $P1, 'alarm'
     _lua__GLOBAL[$P1] = _alarm
 

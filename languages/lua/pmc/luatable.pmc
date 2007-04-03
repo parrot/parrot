@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2006, The Perl Foundation.
+Copyright (C) 2005-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -70,8 +70,7 @@ static PMC* _get(Interp* interp, PMC *obj, PMC* key)
     STRING* keystr = _make_key(interp, key);
     PMC* pair = parrot_hash_get(interp, hash, keystr);
     if (pair != NULL) {
-        PMC* value = PMC_pmc_val(pair);
-        return VTABLE_clone(interp, value);
+        return PMC_pmc_val(pair);
     }
     else {
         return NULL;
@@ -483,9 +482,9 @@ MMD_DEFAULT: {
             PMC *retval, *key, *value;
             retval = pmc_new(INTERP, enum_class_Array);
             VTABLE_set_integer_native(INTERP, retval, 2);
-            key = VTABLE_clone(INTERP, (PMC*)(PMC_struct_val(pair)));
+            key = (PMC*)(PMC_struct_val(pair));
             VTABLE_set_pmc_keyed_int(INTERP, retval, 0, key);
-            value = VTABLE_clone(INTERP, PMC_pmc_val(pair));
+            value = PMC_pmc_val(pair);
             VTABLE_set_pmc_keyed_int(INTERP, retval, 1, value);
             return retval;
         }

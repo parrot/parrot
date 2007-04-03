@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -39,26 +39,32 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
     _register($P1, _coroutine)
 
     .const .Sub _coroutine_create = '_coroutine_create'
+    _coroutine_create.'setfenv'(_lua__GLOBAL)
     set $P1, 'create'
     _coroutine[$P1] = _coroutine_create
 
     .const .Sub _coroutine_resume = '_coroutine_resume'
+    _coroutine_resume.'setfenv'(_lua__GLOBAL)
     set $P1, 'resume'
     _coroutine[$P1] = _coroutine_resume
 
     .const .Sub _coroutine_running = '_coroutine_running'
+    _coroutine_running.'setfenv'(_lua__GLOBAL)
     set $P1, 'running'
     _coroutine[$P1] = _coroutine_running
 
     .const .Sub _coroutine_status = '_coroutine_status'
+    _coroutine_status.'setfenv'(_lua__GLOBAL)
     set $P1, 'status'
     _coroutine[$P1] = _coroutine_status
 
     .const .Sub _coroutine_wrap = '_coroutine_wrap'
+    _coroutine_wrap.'setfenv'(_lua__GLOBAL)
     set $P1, 'wrap'
     _coroutine[$P1] = _coroutine_wrap
 
     .const .Sub _coroutine_yield = '_coroutine_yield'
+    _coroutine_yield.'setfenv'(_lua__GLOBAL)
     set $P1, 'yield'
     _coroutine[$P1] = _coroutine_yield
 

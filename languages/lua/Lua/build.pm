@@ -30,24 +30,37 @@ sub new_fct {
     return new defn( $idf, 'fct' );
 }
 
-sub get_global {
+sub get_environ {
     my ($parser) = @_;
     my @opcodes = ();
-    unless ( $parser->YYData->{_G} ) {
-        $parser->YYData->{_G} = new_tmp( $parser, 'pmc' );
+    my $env = new defn( 'env', 'tmp', 'pmc' );
+    unless ($parser->YYData->{sub}) {
+        my $sub = new_tmp( $parser, 'pmc' );
         push @opcodes, new LocalDir(
             $parser,
             'prolog' => 1,
-            'result' => $parser->YYData->{_G},
+            'result' => $sub,
         );
-        push @opcodes, new GetGlobalOp(
+        push @opcodes, new InterpInfoOp(
             $parser,
             'prolog' => 1,
-            'result' => $parser->YYData->{_G},
-            'arg1'   => '_G',
+            'result' => $sub,
+            'arg1'   => '.INTERPINFO_CURRENT_SUB',
         );
+        push @opcodes, new LocalDir(
+            $parser,
+            'prolog' => 1,
+            'result' => $env,
+        );
+        $parser->YYData->{sub} = $sub;
     }
-    return [ $parser->YYData->{_G}, \@opcodes ];
+    push @opcodes, new CallMethOp(
+        $parser,
+        'result' => [ $env ],
+        'arg1'   => 'getfenv',
+        'arg2'   => [ $parser->YYData->{sub} ],
+    );
+    return [ $env, \@opcodes ];
 }
 
 sub get_cond {
@@ -66,8 +79,8 @@ sub PushScopeF {
     my ($parser) = @_;
 
     PushScope($parser);
-    push @{ $parser->YYData->{scope} }, $parser->YYData->{_G};
-    $parser->YYData->{_G} = undef;
+    push @{ $parser->YYData->{scope} }, $parser->YYData->{sub};
+    $parser->YYData->{sub} = undef;
     unshift @{ $parser->YYData->{scopef} }, $parser->YYData->{symbtab_cst};
     $parser->YYData->{symbtab_cst} = new SymbTabConst($parser);
     unshift @{ $parser->YYData->{scopef} }, $parser->YYData->{scope};
@@ -91,8 +104,8 @@ sub PopScopeF {
     $parser->YYData->{scope} = $scope;
     my $symbtab = shift @{ $parser->YYData->{scopef} };
     $parser->YYData->{symbtab_cst} = $symbtab;
-    my $g = pop @{ $parser->YYData->{scope} };
-    $parser->YYData->{_G} = $g;
+    my $sub = pop @{ $parser->YYData->{scope} };
+    $parser->YYData->{sub} = $sub;
 ##    warn "PopScopeF\n";
     PopScope($parser);
     return;
@@ -392,11 +405,11 @@ sub BuildVariable {
             else {
 
                 # global variable
-                my $global = get_global($parser);
-                push @opcodes, @{ $global->[1] };
+                my $env = get_environ($parser);
+                push @opcodes, @{ $env->[1] };
                 my $key = BuildLiteral( $parser, $idf, 'key' );
                 push @opcodes, @{ $key->[1] };
-                my $result = $global->[0];
+                my $result = $env->[0];
                 foreach my $key2 ( @{$var} ) {
                     my $result2 = new_tmp( $parser, 'pmc' );
                     push @opcodes, new LocalDir( $parser, 'result' => $result2, );
@@ -520,8 +533,8 @@ sub BuildCallVariable {
                 );
             }
             else {
-                my $global = get_global($parser);
-                push @opcodes, @{ $global->[1] };
+                my $env = get_environ($parser);
+                push @opcodes, @{ $env->[1] };
                 my $key = BuildLiteral( $parser, $idf, 'key' );
                 push @opcodes, @{ $key->[1] };
                 $result = new_tmp( $parser, 'pmc' );
@@ -529,7 +542,7 @@ sub BuildCallVariable {
                 push @opcodes, new KeyedGetOp(
                     $parser,
                     'result' => $result,
-                    'arg1'   => $global->[0],
+                    'arg1'   => $env->[0],
                     'arg2'   => $key->[0],
                 );
             }
@@ -1292,6 +1305,13 @@ sub BuildFunctionBody {
         $parser,
         'result' => $result,
         'arg1'   => $fct,
+    );
+    my $env = get_environ($parser);
+    push @opcodes1, @{ $env->[1] };
+    push @opcodes1, new CallMethOp(
+        $parser,
+        'arg1'   => 'setfenv',
+        'arg2'   => [ $result, $env->[0] ],
     );
     return [ $result, \@opcodes1 ];
 }

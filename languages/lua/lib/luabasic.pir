@@ -77,102 +77,127 @@ interpreter version. The current contents of this variable is C<"Lua 5.1">.
 =cut
 
     .const .Sub _lua_assert = '_lua_assert'
+    _lua_assert.'setfenv'(_lua__GLOBAL)
     set $P1, 'assert'
     _lua__GLOBAL[$P1] = _lua_assert
 
     .const .Sub _lua_collectgarbage = '_lua_collectgarbage'
+    _lua_collectgarbage.'setfenv'(_lua__GLOBAL)
     set $P1, 'collectgarbage'
     _lua__GLOBAL[$P1] = _lua_collectgarbage
 
     .const .Sub _lua_dofile = '_lua_dofile'
+    _lua_dofile.'setfenv'(_lua__GLOBAL)
     set $P1, 'dofile'
     _lua__GLOBAL[$P1] = _lua_dofile
 
     .const .Sub _lua_error = '_lua_error'
+    _lua_error.'setfenv'(_lua__GLOBAL)
     set $P1, 'error'
     _lua__GLOBAL[$P1] = _lua_error
 
     .const .Sub _lua_getfenv = '_lua_getfenv'
+    _lua_getfenv.'setfenv'(_lua__GLOBAL)
     set $P1, 'getfenv'
     _lua__GLOBAL[$P1] = _lua_getfenv
 
     .const .Sub _lua_getmetatable = '_lua_getmetatable'
+    _lua_getmetatable.'setfenv'(_lua__GLOBAL)
     set $P1, 'getmetatable'
     _lua__GLOBAL[$P1] = _lua_getmetatable
 
     .const .Sub _lua_ipairs = '_lua_ipairs'
+    _lua_ipairs.'setfenv'(_lua__GLOBAL)
     set $P1, 'ipairs'
     _lua__GLOBAL[$P1] = _lua_ipairs
 
     .const .Sub _lua_load = '_lua_load'
+    _lua_load.'setfenv'(_lua__GLOBAL)
     set $P1, 'load'
     _lua__GLOBAL[$P1] = _lua_load
 
     .const .Sub _lua_loadfile = '_lua_loadfile'
+    _lua_loadfile.'setfenv'(_lua__GLOBAL)
     set $P1, 'loadfile'
     _lua__GLOBAL[$P1] = _lua_loadfile
 
     .const .Sub _lua_loadstring = '_lua_loadstring'
+    _lua_loadstring.'setfenv'(_lua__GLOBAL)
     set $P1, 'loadstring'
     _lua__GLOBAL[$P1] = _lua_loadstring
 
     .const .Sub _lua_next = '_lua_next'
+    _lua_next.'setfenv'(_lua__GLOBAL)
     set $P1, 'next'
     _lua__GLOBAL[$P1] = _lua_next
 
     .const .Sub _lua_pairs = '_lua_pairs'
+    _lua_pairs.'setfenv'(_lua__GLOBAL)
     set $P1, 'pairs'
     _lua__GLOBAL[$P1] = _lua_pairs
 
     .const .Sub _lua_pcall = '_lua_pcall'
+    _lua_pcall.'setfenv'(_lua__GLOBAL)
     set $P1, 'pcall'
     _lua__GLOBAL[$P1] = _lua_pcall
 
     .const .Sub _lua_print = '_lua_print'
+    _lua_print.'setfenv'(_lua__GLOBAL)
     set $P1, 'print'
     _lua__GLOBAL[$P1] = _lua_print
 
     .const .Sub _lua_rawequal = '_lua_rawequal'
+    _lua_rawequal.'setfenv'(_lua__GLOBAL)
     set $P1, 'rawequal'
     _lua__GLOBAL[$P1] = _lua_rawequal
 
     .const .Sub _lua_rawget = '_lua_rawget'
+    _lua_rawget.'setfenv'(_lua__GLOBAL)
     set $P1, 'rawget'
     _lua__GLOBAL[$P1] = _lua_rawget
 
     .const .Sub _lua_rawset = '_lua_rawset'
+    _lua_rawset.'setfenv'(_lua__GLOBAL)
     set $P1, 'rawset'
     _lua__GLOBAL[$P1] = _lua_rawset
 
     .const .Sub _lua_select = '_lua_select'
+    _lua_select.'setfenv'(_lua__GLOBAL)
     set $P1, 'select'
     _lua__GLOBAL[$P1] = _lua_select
 
     .const .Sub _lua_setfenv = '_lua_setfenv'
+    _lua_setfenv.'setfenv'(_lua__GLOBAL)
     set $P1, 'setfenv'
     _lua__GLOBAL[$P1] = _lua_setfenv
 
     .const .Sub _lua_setmetatable = '_lua_setmetatable'
+    _lua_setmetatable.'setfenv'(_lua__GLOBAL)
     set $P1, 'setmetatable'
     _lua__GLOBAL[$P1] = _lua_setmetatable
 
     .const .Sub _lua_tonumber = '_lua_tonumber'
+    _lua_tonumber.'setfenv'(_lua__GLOBAL)
     set $P1, 'tonumber'
     _lua__GLOBAL[$P1] = _lua_tonumber
 
     .const .Sub _lua_tostring = '_lua_tostring'
+    _lua_tostring.'setfenv'(_lua__GLOBAL)
     set $P1, 'tostring'
     _lua__GLOBAL[$P1] = _lua_tostring
 
     .const .Sub _lua_type = '_lua_type'
+    _lua_type.'setfenv'(_lua__GLOBAL)
     set $P1, 'type'
     _lua__GLOBAL[$P1] = _lua_type
 
     .const .Sub _lua_unpack = '_lua_unpack'
+    _lua_unpack.'setfenv'(_lua__GLOBAL)
     set $P1, 'unpack'
     _lua__GLOBAL[$P1] = _lua_unpack
 
     .const .Sub _lua_xpcall = '_lua_xpcall'
+    _lua_xpcall.'setfenv'(_lua__GLOBAL)
     set $P1, 'xpcall'
     _lua__GLOBAL[$P1] = _lua_xpcall
 
@@ -370,14 +395,47 @@ function or a number that specifies the function at that stack level: Level
 function, or if C<f> is 0, C<getfenv> returns the global environment. The
 default for C<f> is 1.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub '_lua_getfenv' :anon
-    not_implemented()
+    .param pmc f :optional
+    .local pmc ret
+    if null f goto L1
+    .const .LuaNumber zero = '0'
+    if f == zero goto L2
+L1:
+    f = getfunc(f)
+    $I0 = isa f, 'LuaClosure'
+    if $I0 goto L3
+L2:
+    ret = get_global '_G'
+    .return (ret)
+L3:
+    .return getfenv(f)
 .end
 
+.sub 'getfunc' :anon
+    .param pmc f
+    if null f goto L1
+    $I0 = isa f, 'LuaFunction'
+    if $I0 goto L2
+    $I0 = isa f, 'LuaClosure'
+    if $I0 goto L2
+L1:
+    .local int level
+    level = optint(f, 1)
+    if level >= 0 goto L3
+    error("level must be non-negative")
+L3:
+    $P0 = getinterp
+    inc level
+    push_eh _handler
+    f = $P0['sub'; level]
+L2:
+    .return (f)
+_handler:
+    error("invalid level")
+.end
 
 =item C<getmetatable (object)>
 
@@ -768,15 +826,28 @@ function or a number that specifies the function at that stack level: Level
 As a special case, when C<f> is 0 C<setfenv> changes the environment of the
 running thread. In this case, C<setfenv> returns no values.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE.
 
 =cut
 
 .sub '_lua_setfenv' :anon
     .param pmc f :optional
     .param pmc table :optional
+    .const .LuaNumber zero = '0'
     checktype(table, 'table')
+    unless f == zero goto L1
+    # change environment of current thread
     not_implemented()
+    .return ()
+L1:
+    f = getfunc(f)
+    $I0 = isa f, 'LuaFunction'
+    if $I0 goto L2
+    $I0 = setfenv(f, table)
+    unless $I0 goto L2
+    .return (f)
+L2:
+    error("'setfenv' cannot change environment of given object")
 .end
 
 

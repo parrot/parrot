@@ -29,10 +29,12 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     new $P1, .LuaString
 
     .const .Sub _lua_module = '_lua_module'
+    _lua_module.'setfenv'(_lua__GLOBAL)
     set $P1, 'module'
     _lua__GLOBAL[$P1] = _lua_module
 
     .const .Sub _lua_require = '_lua_require'
+    _lua_require.'setfenv'(_lua__GLOBAL)
     set $P1, 'require'
     _lua__GLOBAL[$P1] = _lua_require
 
@@ -44,6 +46,7 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     _register($P1, _package)
 
     .const .Sub _package_loadlib = '_package_loadlib'
+    _package_loadlib.'setfenv'(_lua__GLOBAL)
     set $P1, 'loadlib'
     _package[$P1] = _package_loadlib
 
@@ -51,6 +54,7 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     _lua__GLOBAL[$P1] = _package_loadlib
 
     .const .Sub _package_seeall = '_package_seeall'
+    _package_seeall.'setfenv'(_lua__GLOBAL)
     set $P1, 'seeall'
     _package[$P1] = _package_seeall
 
@@ -325,8 +329,6 @@ in field C<c> of field C<b> of global C<a>.
 This function may receive optional I<options> after the module name, where
 each option is a function to be applied over the module.
 
-STILL INCOMPLETE (see setfenv).
-
 =cut
 
 .sub '_lua_module' :anon
@@ -358,6 +360,7 @@ L1:
     set $P1, '_NAME'
     $P0 = m[$P1]
     $I0 = isa $P0, 'LuaNil'
+    # is table an initialized module?
     unless $I0 goto L3
     # no; initialize it
     m[$P1] = name
@@ -381,7 +384,9 @@ L5:
 L4:
     m[$P1] = name
 L3:
-    # setfenv(1, m)
+    $P2 = getinterp
+    $P3 = $P2['sub'; 1]
+    setfenv($P3, m)
 L6:
     unless options goto L7
     $P0 = shift options

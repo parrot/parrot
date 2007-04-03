@@ -48,26 +48,32 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
     _register($P1, _string)
 
     .const .Sub _string_byte = '_string_byte'
+    _string_byte.'setfenv'(_lua__GLOBAL)
     set $P1, 'byte'
     _string[$P1] = _string_byte
 
     .const .Sub _string_char = '_string_char'
+    _string_char.'setfenv'(_lua__GLOBAL)
     set $P1, 'char'
     _string[$P1] = _string_char
 
     .const .Sub _string_dump = '_string_dump'
+    _string_dump.'setfenv'(_lua__GLOBAL)
     set $P1, 'dump'
     _string[$P1] = _string_dump
 
     .const .Sub _string_find = '_string_find'
+    _string_find.'setfenv'(_lua__GLOBAL)
     set $P1, 'find'
     _string[$P1] = _string_find
 
     .const .Sub _string_format = '_string_format'
+    _string_format.'setfenv'(_lua__GLOBAL)
     set $P1, 'format'
     _string[$P1] = _string_format
 
     .const .Sub _string_gmatch = '_string_gmatch'
+    _string_gmatch.'setfenv'(_lua__GLOBAL)
     set $P1, 'gmatch'
     _string[$P1] = _string_gmatch
 
@@ -76,34 +82,42 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
     _string[$P1] = _string_gmatch
 
     .const .Sub _string_gsub = '_string_gsub'
+    _string_gsub.'setfenv'(_lua__GLOBAL)
     set $P1, 'gsub'
     _string[$P1] = _string_gsub
 
     .const .Sub _string_len = '_string_len'
+    _string_len.'setfenv'(_lua__GLOBAL)
     set $P1, 'len'
     _string[$P1] = _string_len
 
     .const .Sub _string_lower = '_string_lower'
+    _string_lower.'setfenv'(_lua__GLOBAL)
     set $P1, 'lower'
     _string[$P1] = _string_lower
 
     .const .Sub _string_match = '_string_match'
+    _string_match.'setfenv'(_lua__GLOBAL)
     set $P1, 'match'
     _string[$P1] = _string_match
 
     .const .Sub _string_rep = '_string_rep'
+    _string_rep.'setfenv'(_lua__GLOBAL)
     set $P1, 'rep'
     _string[$P1] = _string_rep
 
     .const .Sub _string_reverse = '_string_reverse'
+    _string_reverse.'setfenv'(_lua__GLOBAL)
     set $P1, 'reverse'
     _string[$P1] = _string_reverse
 
     .const .Sub _string_sub = '_string_sub'
+    _string_sub.'setfenv'(_lua__GLOBAL)
     set $P1, 'sub'
     _string[$P1] = _string_sub
 
     .const .Sub _string_upper = '_string_upper'
+    _string_upper.'setfenv'(_lua__GLOBAL)
     set $P1, 'upper'
     _string[$P1] = _string_upper
 
@@ -631,7 +645,8 @@ table:
     .local pmc rulesub
     rulesub = regex_comp($S2)
     .lex 'upvar_rulesub', rulesub
-    .lex 'upvar_s', s
+    $P0 = clone s
+    .lex 'upvar_s', $P0
     .const .Sub gmatch_aux = 'gmatch_aux'
     ret = newclosure gmatch_aux
     .return (ret)

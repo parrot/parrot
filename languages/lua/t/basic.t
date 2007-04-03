@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 54;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function assert' );
@@ -124,6 +124,35 @@ dofile('foo.lua')
 CODE
 /\?/
 OUTPUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'function getfenv' );
+local function f () end
+
+print(type(getfenv(0)))
+assert(getfenv(0) == _G)
+assert(getfenv(1) == _G)
+assert(getfenv() == _G)
+print(type(getfenv(f)))
+assert(getfenv(f) == _G)
+print(type(getfenv(print)))
+assert(getfenv(print) == _G)
+CODE
+table
+table
+table
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'function getfenv (negative)' );
+print(getfenv(-3))
+CODE
+/level must be non-negative/
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'function getfenv (too depth)' );
+print(getfenv(12))
+CODE
+/invalid level/
+OUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function ipairs' );
 a = {"a","b","c"}
@@ -387,6 +416,92 @@ print(select(0,"a","b","c"))
 CODE
 /index out of range/
 OUTPUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'function setfenv' );
+t = {}
+function f () end
+
+assert(setfenv(f, t) == f)
+print(type(getfenv(f)))
+assert(getfenv(f) == t)
+CODE
+table
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'function setfenv' );
+a = 1
+setfenv(1, {g = _G})
+g.print(a)
+g.print(g.a)
+CODE
+nil
+1
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'function setfenv' );
+a = 1
+local newgt = {}        -- create new environment
+setmetatable(newgt, {__index = _G})
+setfenv(1, newgt)       -- set it
+print(a)
+a = 10
+print(a)
+print(_G.a)
+_G.a = 20
+print(_G.a)
+CODE
+1
+10
+1
+20
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'function setfenv' );
+function factory ()
+    return function ()
+               return a    -- "global" a
+           end
+end
+
+a = 3
+f1 = factory()
+f2 = factory()
+print(f1())
+print(f2())
+setfenv(f1, {a = 10})
+print(f1())
+print(f2())
+CODE
+3
+3
+10
+3
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'function setfenv (negative)' );
+setfenv(-3, {})
+CODE
+/level must be non-negative/
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'function setfenv (too depth)' );
+print(setfenv(12, {}))
+CODE
+/invalid level/
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'function setfenv (bad arg)' );
+t = {}
+setfenv(t, t)
+CODE
+/number expected, got table/
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'function setfenv (forbidden)' );
+setfenv(print, {})
+CODE
+/'setfenv' cannot change environment of given object/
+OUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function type' );
 print(type("Hello world"))

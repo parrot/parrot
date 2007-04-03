@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -42,39 +42,48 @@ See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
     _register($P1, _table)
 
     .const .Sub _table_concat = '_table_concat'
+    _table_concat.'setfenv'(_lua__GLOBAL)
     set $P1, 'concat'
     _table[$P1] = _table_concat
 
     .const .Sub _table_foreach = '_table_foreach'
+    _table_foreach.'setfenv'(_lua__GLOBAL)
     set $P1, 'foreach'
     _table[$P1] = _table_foreach
 
     .const .Sub _table_foreachi = '_table_foreachi'
+    _table_foreachi.'setfenv'(_lua__GLOBAL)
     set $P1, 'foreachi'
     _table[$P1] = _table_foreachi
 
     # LUA_COMPAT_GETN
     .const .Sub _table_getn = '_table_getn'
+    _table_getn.'setfenv'(_lua__GLOBAL)
     set $P1, 'getn'
     _table[$P1] = _table_getn
 
     .const .Sub _table_insert = '_table_insert'
+    _table_insert.'setfenv'(_lua__GLOBAL)
     set $P1, 'insert'
     _table[$P1] = _table_insert
 
     .const .Sub _table_maxn = '_table_maxn'
+    _table_maxn.'setfenv'(_lua__GLOBAL)
     set $P1, 'maxn'
     _table[$P1] = _table_maxn
 
     .const .Sub _table_remove = '_table_remove'
+    _table_remove.'setfenv'(_lua__GLOBAL)
     set $P1, 'remove'
     _table[$P1] = _table_remove
 
     .const .Sub _table_setn = '_table_setn'
+    _table_setn.'setfenv'(_lua__GLOBAL)
     set $P1, 'setn'
     _table[$P1] = _table_setn
 
     .const .Sub _table_sort = '_table_sort'
+    _table_sort.'setfenv'(_lua__GLOBAL)
     set $P1, 'sort'
     _table[$P1] = _table_sort
 

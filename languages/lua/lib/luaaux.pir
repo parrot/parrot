@@ -211,6 +211,24 @@ L5:
 .end
 
 
+=item C<getfenv (o)>
+
+=cut
+
+.sub 'getfenv'
+    .param pmc o
+    .local pmc ret
+    if null o goto L1
+    $I0 = can o, 'getfenv'
+    unless $I0 goto L1
+    ret = o.'getfenv'()
+    .return (ret)
+L1:
+    new ret, .LuaNil
+    .return (ret)
+.end
+
+
 =item C<gsub (src, pat, repl)>
 
 =cut
@@ -248,6 +266,9 @@ L2:
     lua_comp = compreg 'Lua'
     push_eh _handler
     $P0 = lua_comp.'compile'(buff)
+    .local pmc env
+    env = get_global '_G'
+    $P0.'setfenv'(env)
     .return ($P0)
 _handler:
     .get_results ($P0, $S0)
@@ -278,6 +299,9 @@ L4:
     lua_comp = compreg 'Lua'
     push_eh _handler
     $P0 = lua_comp.'compile'($S0)
+    .local pmc env
+    env = get_global '_G'
+    $P0.'setfenv'(env)
     .return ($P0)
 _handler:
     .get_results ($P0, $S0)
@@ -383,6 +407,23 @@ L0:
     _lua__REGISTRY = global '_REGISTRY'
     $P0 = _lua__REGISTRY[_loaded]
     $P0[libname] = lib
+.end
+
+
+=item C<setfenv (o, table)>
+
+=cut
+
+.sub 'setfenv'
+    .param pmc o
+    .param pmc table
+    if null o goto L1
+    $I0 = can o, 'setfenv'
+    unless $I0 goto L1
+    o.'setfenv'(table)
+    .return (1)
+L1:
+    .return (0)
 .end
 
 

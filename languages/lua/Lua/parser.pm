@@ -3813,7 +3813,9 @@ sub Run {
 sub Generate {
     my $parser = shift;
 
-    my %outer;
+    my %outer = (
+        '_main' => '__start'
+    );
     foreach my $fct ( @{ $parser->YYData->{functs} } ) {
         my $curr;
         foreach my $op ( @{$fct} ) {
@@ -3822,7 +3824,7 @@ sub Generate {
                 if ( exists $outer{$curr} ) {
                     $op->{outer} = $outer{$curr};
                 }
-                elsif ( $curr ne '_main' ) {
+                else {
                     warn "INTERNAL ERROR: no outer for '$curr'\n";
                 }
             }

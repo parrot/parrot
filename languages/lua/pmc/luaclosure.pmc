@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2006, The Perl Foundation.
+Copyright (C) 2006-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -26,6 +26,7 @@ See also: F<languages/lua/pmc/luafunction.pmc>
 
 static STRING *luafunction_name;
 extern INTVAL dynpmc_LuaBoolean;
+extern INTVAL dynpmc_LuaNil;
 
 
 pmclass LuaClosure
@@ -34,6 +35,7 @@ pmclass LuaClosure
     does scalar
     does sub
     dynpmc
+    need_ext
     group lua_group
     hll Lua
     maps Closure {
@@ -57,6 +59,30 @@ Return the string "function".
 */
     STRING* name () {
         return luafunction_name;
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+=cut
+
+*/
+    PMC* clone() {
+        struct Parrot_sub * sub;
+        PMC* const ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        /*
+         * we have to mark it ourselves
+         */
+        PObj_custom_mark_destroy_SETALL(ret);
+        sub = mem_sys_allocate(sizeof (struct Parrot_sub));
+        /* first set the sub struct, string_copy may cause GC */
+        PMC_struct_val(ret) = sub;
+        PMC_pmc_val(ret) = NULL;
+        memcpy(sub, PMC_sub(SELF), sizeof (struct Parrot_sub));
+        sub->name = string_copy(INTERP, sub->name);
+        PMC_metadata(ret) = PMC_metadata(SELF);
+        return ret;
     }
 
 /*
@@ -95,6 +121,21 @@ MMD_DEFAULT: {
 
 =over 4
 
+=item C<PMC *getfenv()>
+
+=cut
+
+*/
+    METHOD PMC* getfenv() {
+        PMC *retval = PMC_metadata(SELF);
+        if (retval != NULL)
+            return retval;
+        else
+            return pmc_new(INTERP, dynpmc_LuaNil);
+    }
+
+/*
+
 =item C<PMC* rawequal (PMC* value)>
 
 =cut
@@ -111,6 +152,17 @@ MMD_DEFAULT: {
         else
             PMC_int_val(retval) = 0;
         return retval;
+    }
+
+/*
+
+=item C<void setfenv(PMC *env)>
+
+=cut
+
+*/
+    METHOD void setfenv(PMC *env) {
+        PMC_metadata(SELF) = env;
     }
 
 }
