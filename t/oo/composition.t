@@ -245,7 +245,7 @@ Snake!
 ok 4 - called method from role that wasn't excluded
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by aliasing' );
+pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by aliasing and exclude' );
 .sub 'test' :main
     $P0 = new Role
     $P1 = new Class
@@ -260,8 +260,10 @@ pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by aliasing' );
     $P0.'add_method'("snake", $P2)
     $P3 = new Hash
     $P3["badger"] = "role_badger"
-    $P1.'add_role'($P0, 'alias' => $P3)
-    print "ok 2 - composition worked due to aliasing\n"
+    $P4 = new ResizableStringArray
+    $P4[0] = "badger"
+    $P1.'add_role'($P0, 'alias' => $P3, 'exclude' => $P4)
+    print "ok 2 - composition worked due to aliasing and exclude\n"
 
     $P2 = $P1.'new'()
     $P2.'badger'()
@@ -285,7 +287,7 @@ pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by aliasing' );
 .end
 CODE
 ok 1 - class has a method
-ok 2 - composition worked due to aliasing
+ok 2 - composition worked due to aliasing and exclude
 Badger!
 ok 3 - called method from class
 Snake!
