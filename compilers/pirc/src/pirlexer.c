@@ -14,10 +14,6 @@ Implement dictionary as hashtable, which will be MUCH faster
 
 =item *
 
-Remove limit of 128 characters for identifier length
-
-=item *
-
 Optimize small functions (using #define to inline) and optimize by 'smarter'
 implementation (where appropiate). I'm doing a lot of stuff in read_char(),
 which might slow down things.
@@ -54,7 +50,8 @@ Check for 'correct' use of data types (unsigned etc.)
 #define EOF_MARKER          -1
 /* number of characters being displayed in syntax errors */
 #define ERROR_CONTEXT_SIZE  30
-
+/* max. token length is 128 for now. */
+#define MAX_ID_LENGTH       128
 
 /*
 
@@ -848,6 +845,8 @@ read_macro(lexer_state *lexer) {
     return t; /* return either T_ENDM or T_EOF */
 }
 
+
+
 /*
 
 =item new_lexer()
@@ -865,8 +864,8 @@ new_lexer(char const * filename) {
         exit(1);
     }
 
-    /* max. token length is 128 for now. XXX this should be fixed later */
-    lexer->token_chars = (char *)calloc(128, sizeof(char));
+    
+    lexer->token_chars = (char *)calloc(MAX_ID_LENGTH, sizeof(char));
     lexer->charptr = lexer->token_chars;
     lexer->curfile = NULL;
 

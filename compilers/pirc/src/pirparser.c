@@ -9,7 +9,6 @@ pirparser.c - parser for Parrot Intermediate Representation
 =over 4
 
 =item *
-
 Remove limit of 10 heredoc arguments
 
 =item *
@@ -110,7 +109,7 @@ typedef struct parser_state {
 
 =over 4
 
-=item void exit_parser()
+=item * void exit_parser()
 
 Clean up and exit the program normally.
 
@@ -130,7 +129,7 @@ exit_parser(parser_state *p) {
 
 /*
 
-=item get_parse_errors()
+=item * get_parse_errors()
 
 return the number of parse errors.
 
@@ -144,7 +143,7 @@ get_parse_errors(parser_state *p) {
 
 /*
 
-=item new_parser()
+=item * new_parser()
 
 constructor for a parser_state object. The specified filename
 is parsed. The semantic actions in vtable are called at certain
@@ -174,7 +173,7 @@ new_parser(char const * filename, pirvtable *vtable) {
 
 /*
 
-=item struct lexer_state const *get_lexer()
+=item * struct lexer_state const *get_lexer()
 
 returns the specified parser's lexer
 
@@ -188,7 +187,7 @@ get_lexer(parser_state *p) {
 
 /*
 
-=item token get_token()
+=item * token get_token()
 
 returns the specified parser's current token
 
@@ -208,7 +207,7 @@ token get_token(parser_state *p) {
 
 =over 4
 
-=item static void syntax_error()
+=item * static void syntax_error()
 
 Handle all syntax error through this function.
 numargs is the number of variable arguments.
@@ -249,7 +248,7 @@ syntax_error(parser_state *p, int numargs, ...) {
 
 /*
 
-=item static void match()
+=item * static void match()
 
 checks whether the current token is the same
 as the expected token. If so, all is ok, and the
@@ -313,7 +312,7 @@ The following conventions are used:
 
 =over 4
 
-=item
+=item *
 
   expression -> ( IDENTIFIER | INTC | NUMC | STRINGC | register )
 
@@ -353,7 +352,7 @@ expression(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   string_value -> SREG | PASM_SREG | STRINGC
 
@@ -378,7 +377,7 @@ string_value(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   method -> IDENTIFIER | STRINGC
 
@@ -395,7 +394,7 @@ method(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   target   -> register | IDENTIFIER
 
@@ -418,7 +417,7 @@ target(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   type -> 'int' | 'num' | 'pmc' | 'string'
 
@@ -452,7 +451,7 @@ type(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   key -> '-' expression | '..' expression | expression [ '..' [ expression ] ]
 
@@ -481,7 +480,7 @@ key(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   keylist -> '[' key { (';'|',') key } ']'
 
@@ -501,7 +500,7 @@ keylist(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   argument -> HEREDOCID | expression | STRINGC '=>' expression
 
@@ -529,7 +528,7 @@ argument(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   argument_list -> argument { ',' argument }
 
@@ -550,7 +549,7 @@ argument_list(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   arguments         -> '(' [argument_list] ')' heredoc_arguments
 
@@ -593,7 +592,7 @@ arguments(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   methodcall -> INVOCANT_IDENT method arguments
 
@@ -610,7 +609,7 @@ methodcall(parser_state *p) {
 
 /*
 
-=item
+=item *
 
 
 
@@ -655,7 +654,7 @@ arith_expression(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   parrot_instruction -> PARROT_OP [ expression {',' expression } ] '\n'
 
@@ -679,15 +678,15 @@ parrot_instruction(parser_state *p) {
         }
         else break;
     }
-
-    emit_op_end(p);
+    
     match(p, T_NEWLINE);
+    emit_op_end(p);
 }
 
 
 /*
 
-=item
+=item *
 
   assignment -> '=' ( unop expression
                     | expression arith_expr
@@ -776,7 +775,7 @@ assignment(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   return_statement -> '.return' ( arguments | target ['->' method] arguments | methodcall ) '\n'
 
@@ -809,7 +808,7 @@ return_statement(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   yield_statement -> '.yield' arguments '\n'
 
@@ -827,7 +826,7 @@ yield_statement(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   close_ns -> '.endnamespace' IDENTIFIER '\n'
 
@@ -846,7 +845,7 @@ close_ns(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   open_ns -> '.namespace' IDENTIFIER '\n'
 
@@ -866,7 +865,7 @@ open_ns(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   local_id_list -> IDENTIFIER [':unique_reg'] { ',' IDENTIFIER [':unique_reg'] }
 
@@ -896,7 +895,7 @@ local_id_list(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   declaration_list -> type local_id_list '\n'
 
@@ -914,7 +913,7 @@ declaration_list(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   sym_declaration -> '.sym' declaration_list
 
@@ -930,7 +929,7 @@ sym_declaration(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   local_declaration -> '.local' declaration_list
 
@@ -948,7 +947,7 @@ local_declaration(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   lex_declaration -> '.lex' STRINGC ',' target '\n'
 
@@ -957,18 +956,22 @@ local_declaration(parser_state *p) {
 */
 static void
 lex_declaration(parser_state *p) {
+    emit_op_start(p, ".lex");
     match(p, T_LEX);
+    emit_expr(p, get_current_token(p->lexer));
     match(p, T_STRING_CONSTANT);
+    emit_next_expr(p);
     match(p, T_COMMA);
     target(p);
     match(p, T_NEWLINE);
+    emit_op_end(p);
 }
 
 
 
 /*
 
-=item
+=item *
 
   conditional_expression -> expression [cond_op expression]
 
@@ -997,7 +1000,7 @@ conditional_expression(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   jump_statement -> 'goto' IDENTIFIER '\n'
 
@@ -1015,7 +1018,7 @@ jump_statement(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   goto_statement -> jump_statement
 
@@ -1031,7 +1034,7 @@ goto_statement(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   unless_statement -> 'unless' (['null'] expression | conditional_expression) jump_statement
 
@@ -1056,7 +1059,7 @@ unless_statement(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   if_statement -> 'if' (['null'] expression | conditional_expression) jump_statement
 
@@ -1081,7 +1084,7 @@ if_statement(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   const_definition -> 'int' IDENTIFIER '=' INTC
                     | 'num' IDENTIFIER '=' NUMC
@@ -1124,7 +1127,7 @@ const_definition(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   arg_flags -> ':flat' | ':named' [ '(' STRINGC ')' ]
 
@@ -1155,7 +1158,7 @@ arg_flags(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   param_flags -> ':slurpy'
                | ':named'['(' STRINGC ')']
@@ -1203,7 +1206,7 @@ param_flags(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   long-invocation -> '.pcc_begin' '\n'
                      { '.arg' expression arg_flags }
@@ -1279,7 +1282,7 @@ long_invocation(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   long_return_statement -> '.pcc_begin_return' '\n'
                            { '.return' expression '\n' }
@@ -1305,7 +1308,7 @@ long_return_statement(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   long_yield_statement -> '.pcc_begin_yield' '\n'
                           { '.yield' expression '\n' }
@@ -1332,7 +1335,7 @@ long_yield_statement(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   target_statement -> target ( '=' assignment
                              | augmented_op expression
@@ -1397,7 +1400,7 @@ target_statement(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   target_list -> '(' target param_flags {',' target param_flags } ')'
 
@@ -1418,7 +1421,7 @@ target_list(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   multi-result-invocation -> target_list '=' (subcall | methodcall)
 
@@ -1450,7 +1453,7 @@ multi_result_invocation(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   macro_expansion -> MACRO_IDENT [ '(' [ expression { ',' expression } ')' ] '\n'
 
@@ -1481,7 +1484,7 @@ macro_expansion(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   get_results_instr -> '.get_results' target_list '\n'
 
@@ -1501,7 +1504,7 @@ get_results_instruction(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   global_assignment -> 'global' string_value '=' (IDENTIFIER|PREG) '\n'
 
@@ -1538,7 +1541,7 @@ global_assignment(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   instructions -> {instruction}
 
@@ -1672,7 +1675,7 @@ instructions(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   global_definition -> '.global' IDENTIFIER
 
@@ -1687,7 +1690,7 @@ global_definition(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   multi-type-list -> '(' [multi-type {',' multi-type } ] ')'
 
@@ -1733,7 +1736,7 @@ multi_type_list(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   sub_flags -> [sub_flag { [','] sub_flag } ]
 
@@ -1811,7 +1814,7 @@ sub_flags(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   parameters -> { '.param' (register | type IDENTIFIER) [param_flag] '\n' }
 
@@ -1866,7 +1869,7 @@ parameters(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   sub_definition -> '.sub' (IDENTIFIER | STRINGC) subflags '\n' parameters instructions '.end'
 
@@ -1905,7 +1908,7 @@ sub_definition(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   emit_block -> '.emit' '\n' {parrot_instruction} ['\n'] '.eom'
 
@@ -1929,7 +1932,7 @@ emit_block(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   macro_parameters -> [ '(' [ id {',' id} ] ')' ]
 
@@ -1953,7 +1956,7 @@ macro_parameters(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   '.macro' IDENTIFIER parameters '\n' macro_body '.endm'
 
@@ -1979,7 +1982,7 @@ macro_definition(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   include -> '.include' STRINGC
 
@@ -2013,7 +2016,7 @@ include(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   pragma -> '.pragma' 'n_operators' INTC
 
@@ -2030,7 +2033,7 @@ pragma(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   hll_specifier -> '.HLL' STRINGC ',' STRINGC
 
@@ -2047,7 +2050,7 @@ hll_specifier(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   hll_mapping -> '.HLL_map' INTC ',' INTC
 
@@ -2063,7 +2066,7 @@ hll_mapping(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   namespace_declaration -> '.namespace' [ '[' STRINGC { (','|';') STRINGC ']' ]
 
@@ -2087,7 +2090,7 @@ namespace_declaration(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   loadlib -> '.loadlib' STRINGC
 
@@ -2102,7 +2105,7 @@ loadlib(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   compilation_unit -> global_definition
                     | sub_definition
@@ -2166,7 +2169,7 @@ compilation_unit(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   program -> {'\n'} compilation_unit { '\n' compilation_unit }
 
@@ -2192,7 +2195,7 @@ program(parser_state *p) {
 
 /*
 
-=item
+=item *
 
   TOP -> program EOF
 
