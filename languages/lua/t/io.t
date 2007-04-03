@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 38;
 use Test::More;
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'io.stdin' );
@@ -361,6 +361,23 @@ f:close()
 CODE
 true
 OUTPUT
+
+SKIP:
+{
+skip('only with Parrot', 1) if (exists $ENV{PARROT_LUA_TEST_PROG});
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:__gc' );
+function inner ()
+    local f = io.open("file.out")
+end
+
+inner()
+print("end")
+CODE
+end
+closing file for you.
+OUTPUT
+}
 
 # Local Variables:
 #   mode: cperl

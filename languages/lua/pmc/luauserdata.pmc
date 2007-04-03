@@ -22,7 +22,6 @@ the Lua C<Userdata> type.
 #include "parrot/parrot.h"
 
 static STRING *luauserdata_name;
-extern STRING *lua_metatable;
 extern INTVAL dynpmc_LuaBoolean;
 extern INTVAL dynpmc_LuaNil;
 extern INTVAL dynpmc_LuaString;
@@ -35,6 +34,7 @@ pmclass LuaUserdata
     extends LuaAny
     does scalar
     dynpmc
+    need_ext
     group lua_group
     hll Lua {
 
@@ -57,6 +57,7 @@ Initializes the userdata.
 */
     void init () {
         PMC_pmc_val(SELF) = NULL;
+        PMC_metadata(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -84,14 +85,10 @@ Call finalizer and free the userdata.
 
 */
     void destroy () {
-        /* printf("userdata destroy\n"); */
-#if 0
-        /* FIXME : crash because metatable is already freed */
         PMC* meth = find_meth(INTERP, SELF, "__gc");
         if (meth != NULL) {
             (void)Parrot_runops_fromc_args(INTERP, meth, "vP", SELF);
         }
-#endif
         if (PMC_pmc_val(SELF)) {
             PMC_pmc_val(SELF) = NULL;
         }
@@ -225,8 +222,8 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* get_metatable() {
-        PMC *retval = VTABLE_getprop(INTERP, SELF, lua_metatable);
-        if (retval != NULL && retval->vtable->base_type == dynpmc_LuaTable)
+        PMC *retval = PMC_metadata(SELF);
+        if (retval != NULL)
             return retval;
         else
             return pmc_new(INTERP, dynpmc_LuaNil);
@@ -258,10 +255,10 @@ MMD_DEFAULT: {
 */
     METHOD void set_metatable(PMC *meta) {
         if (dynpmc_LuaNil == meta->vtable->base_type) {
-            VTABLE_delprop(INTERP, SELF, lua_metatable);
+            PMC_metadata(SELF) = NULL;
         }
         else {
-            VTABLE_setprop(INTERP, SELF, lua_metatable, meta);
+            PMC_metadata(SELF) = meta;
         }
     }
 

@@ -25,7 +25,6 @@ Now, Lua 5.0 uses a hybrid data structure with a Hash part and an Array part.
 #include "parrot/parrot.h"
 
 static STRING *luatable_name;
-extern STRING *lua_metatable;
 extern INTVAL dynpmc_LuaBoolean;
 extern INTVAL dynpmc_LuaClosure;
 extern INTVAL dynpmc_LuaFunction;
@@ -91,6 +90,7 @@ pmclass LuaTable
     extends LuaAny
     does hash
     dynpmc
+    need_ext
     group lua_group
     hll Lua {
 
@@ -113,6 +113,7 @@ Initializes the instance.
 */
     void init () {
         PMC_struct_val(SELF) = NULL;
+        PMC_metadata(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
         parrot_new_pmc_hash(INTERP, SELF);
     }
@@ -413,8 +414,8 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* get_metatable() {
-        PMC* retval = VTABLE_getprop(INTERP, SELF, lua_metatable);
-        if (retval != NULL && retval->vtable->base_type == dynpmc_LuaTable)
+        PMC* retval = PMC_metadata(SELF);
+        if (retval != NULL)
             return retval;
         else
             return pmc_new(INTERP, dynpmc_LuaNil);
@@ -542,10 +543,10 @@ MMD_DEFAULT: {
 */
     METHOD void set_metatable(PMC *meta) {
         if (dynpmc_LuaNil == meta->vtable->base_type) {
-            VTABLE_delprop(INTERP, SELF, lua_metatable);
+            PMC_metadata(SELF) = NULL;
         }
         else {
-            VTABLE_setprop(INTERP, SELF, lua_metatable, meta);
+            PMC_metadata(SELF) = meta;
         }
     }
 

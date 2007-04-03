@@ -1024,11 +1024,14 @@ L2:
     # ignore closed files and standard files
     if null f goto L1
     $P0 = getstdin
-    if $P0 == f goto L1
+    $I0 = issame $P0, f
+    if $I0 goto L1
     $P0 = getstdout
-    if $P0 == f goto L1
+    $I0 = issame $P0, f
+    if $I0 goto L1
     $P0 = getstderr
-    if $P0 == f goto L1
+    $I0 = issame $P0, f
+    if $I0 goto L1
     print "closing file for you.\n"
     aux_close(self)
 L1:
