@@ -1946,7 +1946,7 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
         if (got_alias && VTABLE_exists_keyed_str(interp, alias, method_name)) {
             /* Got one. Get name to alias it to. */
             STRING *alias_name = VTABLE_get_string_keyed_str(interp, alias, method_name);
-            
+
             /* Is there a method with this name already in the class?
              * XXX TODO: multi-method handling. */
             if (VTABLE_exists_keyed_str(interp, methods_hash, alias_name)) {
