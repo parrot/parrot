@@ -5,6 +5,7 @@
 #include <malloc.h>
 
 
+
 #define OUT stderr
 
 /*
@@ -80,7 +81,7 @@ pir_newline(struct parser_state *p) {
 
 static void
 pir_param(struct parser_state *p) {
-    fprintf(OUT, "\t.param ");
+    fprintf(OUT, "  .param ");
 }
 
 static void
@@ -89,13 +90,8 @@ pir_type(struct parser_state *p, char *type) {
 }
 
 static void
-pir_subflag(struct parser_state *p, int flag) {
-    fprintf(OUT, "%s ", find_keyword(flag));
-}
-
-static void
-pir_subflagarg(struct parser_state *p, int flag, char *arg) {
-    fprintf(OUT, "%s(%s) ", find_keyword(flag), arg);
+pir_sub_flag(struct parser_state *p, int flag) {    
+    fprintf(OUT, "%s ", find_keyword(flag));           
 }
 
 static void
@@ -105,12 +101,33 @@ pir_expr(struct parser_state *p, char *expr) {
 
 static void
 pir_op(struct parser_state *p, char *op) {
-    fprintf(OUT, "%s ", op);
+    fprintf(OUT, "  %s ", op);
 }
 
 static void
 pir_comma(struct parser_state *p) {
     fprintf(OUT, ", ");
+}
+
+static void
+pir_list_start(struct parser_state *p) {
+    fprintf(OUT, "(");
+}
+
+static void
+pir_list_end(struct parser_state *p) {
+    fprintf(OUT, ")");
+}
+
+static void
+pir_sub_flag_start(struct parser_state *p) {
+    fprintf(OUT, "");
+}
+
+
+static void
+pir_sub_flag_end(struct parser_state *p) {
+    fprintf(OUT, "\n");
 }
 
 /*
@@ -128,20 +145,24 @@ init_pir_vtable(void) {
     pirvtable *vtable = new_pirvtable();
 
     /* override the methods that are needed for PIR output */
-    vtable->sub_start    = pir_sub;
-    vtable->sub_end      = pir_end;
-    vtable->name         = pir_name;
-    vtable->stmts_start  = pir_newline;
-    vtable->param_start  = pir_param;
-    vtable->param_end    = pir_newline;
-    vtable->type         = pir_type;
-    vtable->sub_flag     = pir_subflag;
-    vtable->sub_flag_arg = pir_subflagarg;
-    vtable->op_start     = pir_op;
-    vtable->op_end       = pir_newline;
-    vtable->expression   = pir_expr;
-    vtable->next_expr    = pir_comma;
-
+    vtable->sub_start      = pir_sub;
+    vtable->sub_end        = pir_end;
+    vtable->name           = pir_name;
+    vtable->stmts_start    = pir_newline;
+    vtable->param_start    = pir_param;
+    vtable->param_end      = pir_newline;
+    vtable->type           = pir_type;
+    vtable->sub_flag       = pir_sub_flag;
+    vtable->op_start       = pir_op;
+    vtable->op_end         = pir_newline;
+    vtable->expression     = pir_expr;
+    vtable->next_expr      = pir_comma;
+    vtable->list_start     = pir_list_start;
+    vtable->list_end       = pir_list_end;
+    vtable->sub_flag_start = pir_sub_flag_start;
+    vtable->sub_flag_end   = pir_sub_flag_end;
+    
+    
     return vtable;
 }
 

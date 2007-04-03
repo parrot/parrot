@@ -131,11 +131,6 @@ past_subflag(struct parser_state *p, int flag) {
     */
 }
 
-static void
-past_subflagarg(struct parser_state *p, int flag, char *arg) {
-    /*fprintf(OUT, "%*s<type> => \"%s\"\n", indent, " ", type);
-    */
-}
 
 static void
 past_op(struct parser_state *p, char *op) {
@@ -181,8 +176,7 @@ init_past_vtable(void) {
     vtable->param_start  = past_param;
     vtable->param_end    = past_close;
     vtable->type         = past_type;
-    vtable->sub_flag     = past_subflag;
-    vtable->sub_flag_arg = past_subflagarg;
+    vtable->sub_flag     = past_subflag;    
     vtable->op_start     = past_op;
     vtable->expression   = past_expr;
     vtable->op_end       = past_close;

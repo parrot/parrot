@@ -70,26 +70,26 @@ new_pirvtable(void) {
     /* set all entries to 'default' by default. This way, another output module
      * only needs to override the entries that are interesting for that module.
      */
-    vtable->initialize   = not_implemented;
-    vtable->name         = not_implemented;
-    vtable->sub_start    = not_implemented;
-    vtable->sub_end      = not_implemented;
-    vtable->stmts_start  = not_implemented;
-    vtable->stmts_end    = not_implemented;
-    vtable->end          = not_implemented;
-    vtable->param_start  = not_implemented;
-    vtable->param_end    = not_implemented;
-    vtable->type         = not_implemented;
-    vtable->sub_flag     = not_implemented;
-    vtable->sub_flag_arg = not_implemented;
-    vtable->expression   = not_implemented;
-    vtable->next_expr    = not_implemented;
-    vtable->op_start     = not_implemented;
-    vtable->op_end       = not_implemented;
-    vtable->list_start   = not_implemented;
-    vtable->list_end     = not_implemented;
-
-
+    vtable->initialize     = not_implemented;
+    vtable->name           = not_implemented;
+    vtable->sub_start      = not_implemented;
+    vtable->sub_end        = not_implemented;
+    vtable->stmts_start    = not_implemented;
+    vtable->stmts_end      = not_implemented;
+    vtable->end            = not_implemented;
+    vtable->param_start    = not_implemented;
+    vtable->param_end      = not_implemented;
+    vtable->type           = not_implemented;
+    vtable->sub_flag       = not_implemented;    
+    vtable->expression     = not_implemented;
+    vtable->next_expr      = not_implemented;
+    vtable->op_start       = not_implemented;
+    vtable->op_end         = not_implemented;
+    vtable->list_start     = not_implemented;
+    vtable->list_end       = not_implemented;
+    vtable->sub_flag_start = not_implemented;
+    vtable->sub_flag_end   = not_implemented;
+    
     return vtable;
 }
 

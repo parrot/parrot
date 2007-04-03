@@ -1703,11 +1703,14 @@ static void
 multi_type_list(parser_state *p) {
     int wantmore = 1;
 
+    emit_list_start(p);
+    
     match(p, T_LPAREN);
     while (wantmore) {
         switch (p->curtoken) {
             case T_IDENTIFIER:
             case T_STRING_CONSTANT:
+                emit_expr(p, get_current_token(p->lexer));
                 next(p);
                 break;
             case T_LBRACKET:
@@ -1717,6 +1720,7 @@ multi_type_list(parser_state *p) {
             case T_NUM:
             case T_PMC:
             case T_STRING:
+                emit_type(p, get_current_token(p->lexer));
                 next(p);
                 break;
             case T_RPAREN: /* ')', so stop parsing this list */
@@ -1728,10 +1732,14 @@ multi_type_list(parser_state *p) {
                 break;
         }
 
-        if (p->curtoken == T_COMMA) next(p);
+        if (p->curtoken == T_COMMA) {
+            emit_next_expr(p);
+            next(p);
+        }
         else wantmore = 0; /* no comma, so quit loop */
     }
     match(p, T_RPAREN);
+    emit_list_end(p);
 }
 
 /*
@@ -1760,6 +1768,8 @@ sub_flags(parser_state *p) {
     int ok = 1;
     int wantmore = 0; /* flag that is set when a ',' is parsed */
 
+    emit_sub_flag_start(p);
+        
     while (ok || wantmore) {
         switch (p->curtoken) {
             case T_ANON_FLAG:
@@ -1775,15 +1785,18 @@ sub_flags(parser_state *p) {
                 break;
             case T_OUTER_FLAG:
             case T_VTABLE_FLAG: {
-                token flag = p->curtoken; /* store the flag for the emit() to come */
+                emit_sub_flag(p, p->curtoken);                
                 next(p);
-                match(p, T_LPAREN);
-                emit_sub_flag_arg(p, flag, get_current_token(p->lexer));
+                emit_list_start(p);
+                match(p, T_LPAREN);                
+                emit_expr(p, get_current_token(p->lexer));                
                 match(p, T_STRING_CONSTANT);
+                emit_list_end(p);
                 match(p, T_RPAREN);
                 break;
             }
             case T_MULTI_FLAG:
+                emit_sub_flag(p, p->curtoken);
                 next(p);
                 multi_type_list(p);
                 break;
@@ -1807,6 +1820,8 @@ sub_flags(parser_state *p) {
             wantmore = 1;  /* after the optional comma we expect another sub flag */
         }
     }
+        
+    emit_sub_flag_end(p);
 }
 
 
@@ -1894,9 +1909,9 @@ sub_definition(parser_state *p) {
     }
 
     sub_flags(p);
-    match(p, T_NEWLINE);
-    emit_stmts_start(p); /* open stmts block */
+    match(p, T_NEWLINE);    
     parameters(p);
+    emit_stmts_start(p); /* open stmts block */
     instructions(p);
     emit_stmts_end(p);  /* close stmts block */
     match(p, T_END);
