@@ -864,7 +864,6 @@ new_lexer(char const * filename) {
         exit(1);
     }
 
-    
     lexer->token_chars = (char *)calloc(MAX_ID_LENGTH, sizeof(char));
     lexer->charptr = lexer->token_chars;
     lexer->curfile = NULL;

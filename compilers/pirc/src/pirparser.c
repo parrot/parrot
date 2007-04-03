@@ -678,7 +678,7 @@ parrot_instruction(parser_state *p) {
         }
         else break;
     }
-    
+
     match(p, T_NEWLINE);
     emit_op_end(p);
 }
