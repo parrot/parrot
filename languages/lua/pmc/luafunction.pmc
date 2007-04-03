@@ -70,18 +70,7 @@ Return the string "function".
 
 */
     PMC* clone() {
-        struct Parrot_sub * sub;
-        PMC* const ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        /*
-         * we have to mark it ourselves
-         */
-        PObj_custom_mark_destroy_SETALL(ret);
-        sub = mem_sys_allocate(sizeof (struct Parrot_sub));
-        /* first set the sub struct, string_copy may cause GC */
-        PMC_struct_val(ret) = sub;
-        PMC_pmc_val(ret) = NULL;
-        memcpy(sub, PMC_sub(SELF), sizeof (struct Parrot_sub));
-        sub->name = string_copy(INTERP, sub->name);
+        PMC* ret = SUPER();
         PMC_metadata(ret) = PMC_metadata(SELF);
         return ret;
     }
