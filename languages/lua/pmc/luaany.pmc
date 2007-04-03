@@ -226,7 +226,7 @@ Throws an exception.
 =cut
 
 */
-    void* invoke(void* next) {
+    opcode_t* invoke(void* next) {
         PMC *meth = find_meth(INTERP, SELF, "__call");
         if (meth != NULL) {
             /* fix me */
