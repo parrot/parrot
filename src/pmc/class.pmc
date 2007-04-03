@@ -66,53 +66,52 @@ static STRING* get_fq_classname(Parrot_Interp interp, Parrot_Class *class_info) 
     return fq_class;
 }
 
+/* This function builds the attribute index (table to map class name and
+ * attribute name to an index) for the current class. */
+static void build_attrib_index(Parrot_Interp interp, PMC *self) {
+    Parrot_Class *class = PARROT_CLASS(self);
+    int num_classes = VTABLE_elements(interp, class->all_parents);
+    int i;
+    int cur_index = 0;
+    PMC *table = pmc_new(interp, enum_class_Hash);
 
-pmclass Class need_ext {
-    /* This function builds the attribute index (table to map class name and
-     * attribute name to an index) for the current class. Note: we have to
-     * make this a method so we can use PCCINVOKE for now. XXX Fix that. */
-    METHOD void build_attrib_index() {
-        Parrot_Class *class = PARROT_CLASS(SELF);
-        int num_classes = VTABLE_elements(interp, class->all_parents);
-        int i;
-        int cur_index = 0;
-        PMC *table = pmc_new(interp, enum_class_Hash);
+    /* We will go over the list of all parents to construct the table. */
+    for (i = 0; i < num_classes; i++) {
+       /* Get the class and its attribute metadata hash. */
+        PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, class->all_parents, i);
+        Parrot_Class *class_info = PARROT_CLASS(cur_class);
+        PMC *attribs = class_info->attrib_metadata;
+        PMC *iter = VTABLE_get_iter(interp, attribs);
 
-        /* We will go over the list of all parents to construct the table. */
-        for (i = 0; i < num_classes; i++) {
-           /* Get the class and its attribute metadata hash. */
-            PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, class->all_parents, i);
-            Parrot_Class *class_info = PARROT_CLASS(cur_class);
-            PMC *attribs = class_info->attrib_metadata;
-            PMC *iter = VTABLE_get_iter(interp, attribs);
+        /* Build a string representing the fully qualified class name. */
+        STRING *fq_class = get_fq_classname(interp, class_info);
 
-            /* Build a string representing the fully qualified class name. */
-            STRING *fq_class = get_fq_classname(interp, class_info);
+        /* Iterate over the attributes. */
+        while (VTABLE_get_bool(interp, iter)) {
+            /* Get attribute. */
+            PMC *cur_attrib = VTABLE_get_pmc_keyed_str(interp, attribs,
+                VTABLE_shift_string(interp, iter));
+            STRING *attrib_name;
+            STRING *full_key = string_copy(interp, fq_class);
 
-            /* Iterate over the attributes. */
-            while (VTABLE_get_bool(interp, iter)) {
-                /* Get attribute. */
-                PMC *cur_attrib = VTABLE_get_pmc_keyed_str(interp, attribs,
-                    VTABLE_shift_string(interp, iter));
-                STRING *attrib_name;
-                STRING *full_key = string_copy(interp, fq_class);
+            /* Get attribute name and append it to the key. */
+            attrib_name = VTABLE_get_string_keyed_str(interp, cur_attrib,
+                string_from_const_cstring(interp, "name", 0));
+            full_key = string_append(interp, full_key, attrib_name);
 
-                /* Get attribute name and append it to the key. */
-                attrib_name = VTABLE_get_string_keyed_str(interp, cur_attrib,
-                    CONST_STRING(interp, "name"));
-                full_key = string_append(interp, full_key, attrib_name);
-
-                /* Insert into hash, along with index. */
-                VTABLE_set_integer_keyed_str(interp, table, full_key, cur_index);
-                cur_index++;
-            }
+            /* Insert into hash, along with index. */
+            VTABLE_set_integer_keyed_str(interp, table, full_key, cur_index);
+            cur_index++;
         }
-
-        /* Store built table and invalidate cache. */
-        class->attrib_index = table;
-        class->attrib_cache = pmc_new(interp, enum_class_Hash);
     }
 
+    /* Store built table and invalidate cache. */
+    class->attrib_index = table;
+    class->attrib_cache = pmc_new(interp, enum_class_Hash);
+}
+
+
+pmclass Class need_ext {
 /*
 
 =item C<void init()>
@@ -399,7 +398,7 @@ parameter list.
             class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
 
             /* Build attributes index. */
-            Parrot_Class_build_attrib_index(interp, SELF);
+            build_attrib_index(interp, SELF);
             if (PMC_IS_NULL(class->attrib_index))
                 return;
         }
