@@ -57,7 +57,7 @@ Current Method Body
 
 =head3 C<rewrite_pccinvoke($self, $method, $body)>
 
-B<Purpose:>  Parse and Build a PINVOKE Call.
+B<Purpose:>  Parse and Build a PCCINVOKE Call.
 
 B<Arguments:>
 
@@ -100,11 +100,11 @@ use constant PARROT_ARG_OPTIONAL => 0x080;
 use constant PARROT_ARG_OPT_FLAG => 0x100;                     # /* prev optional was set */
 use constant PARROT_ARG_NAME     => 0x200;                     # /* this String is an arg name */
 
-=head3 
+=head3
     regtype to argtype conversion hash
 =cut
 
-our $reg_type_info = { 
+our $reg_type_info = {
     # s is string, ss is short string, at is arg type
     +(REGNO_INT) => { s => "INTVAL",   ss => "INT", at => PARROT_ARG_INTVAL,   },
     +(REGNO_NUM) => { s => "FLOATVAL", ss => "NUM", at => PARROT_ARG_FLOATVAL, },
@@ -151,7 +151,7 @@ sub rtrim($) {
   }
 
 =cut
-   
+
 sub parse_adverb_attributes {
     my $adverb_string = shift;
     my %result;
@@ -172,7 +172,7 @@ sub convert_type_string_to_reg_type {
 
 sub gen_arg_flags {
     my ($param)     = @_;
-    
+
     return PARROT_ARG_INTVAL | PARROT_ARG_OPT_FLAG  if exists $param->{attrs}->{opt_flag};
 
     my $flag = $reg_type_info->{ $param->{type} }->{at};
@@ -236,10 +236,10 @@ sub rewrite_PCCRETURNs {
         my $file        = '"' . __FILE__ . '"';
         my $lineno1     = __LINE__ + 2;
         my $lineno2     = __LINE__ + 7;
-        my $replacement = 
+        my $replacement =
 <<END;
 #line $lineno1 $file
-    /*BEGIN PRETURN $returns */
+    /*BEGIN PCCRETURN $returns */
     /*BEGIN GENERATED ACCESSORS */
 $returns_accessors
 #line $lineno2 $file
@@ -251,7 +251,7 @@ $returns_accessors
     return_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
         string_from_const_cstring(interp, $returns_flags, 0), 0);
     $goto_string
-    /*END PRETURN $returns */
+    /*END PCCRETURN $returns */
 END
         $$body =~ s/\Q$1\E/$replacement/;
     }
@@ -345,7 +345,7 @@ sub rewrite_pccmethod {
 
     # parse pccmethod parameters, then unshift the a PMC arg for the invocant
     my $linear_args = parse_p_args_string( $self->{parameters} );
-    unshift @$linear_args, 
+    unshift @$linear_args,
     {
         type  => convert_type_string_to_reg_type('PMC'),
         name  => 'pmc',
@@ -362,7 +362,7 @@ sub rewrite_pccmethod {
 
     my $file     = '"' . __FILE__ . '"';
     my $lineno   = __LINE__ + 5;
-    my $PRE_STUB = 
+    my $PRE_STUB =
 <<END;
 {
 #line $lineno $file
@@ -452,7 +452,7 @@ sub rewrite_pccinvoke {
       (
       \( ([^\(]*) \)   #results
       \s*              #optional whitespace
-      =                #results equals PCCONVOKE invocation
+      =                #results equals PCCINVOKE invocation
       )?               #results are optional
       \s*              #optional whitespace
       PCCINVOKE         #method name
@@ -465,14 +465,14 @@ sub rewrite_pccinvoke {
 
     while ( $$body and $$body =~ m/$signature_re/ ) {
         my ($match, $result_clause, $results, $parameters) = ( $1, $2, $3, $4 );
-        
+
         #optional results portion of pccinvoke statement
         my ( $result_n_regs_used, $result_indexes, $result_flags, $result_accessors )
             = ( defined $results) ? process_pccmethod_args( parse_p_args_string( $results ), 'result')
             : ( [ 0, 0, 0, 0 ], "0", "\"\"", "" );
 
         #parameters portion of pccinvoke statement
-        my ($interp, $invocant, $method_name, $arguments) 
+        my ($interp, $invocant, $method_name, $arguments)
             = map { $_ = trim($_) } split( /,/, $parameters, 4 );
         $arguments = "PMC* $invocant" . ( $arguments ? ", $arguments" : "" );
         my ( $args_n_regs_used, $arg_indexes, $arg_flags, $arg_accessors, $named_names ) =
@@ -485,10 +485,10 @@ sub rewrite_pccinvoke {
         my $file   = '"' . __FILE__ . '"';
         my $lineno = __LINE__ + 8;
 
-        my $replacement .= 
+        my $replacement .=
 <<END;
 
-    /*BEGIN PCCONVOKE $invocant */
+    /*BEGIN PCCINVOKE $invocant */
 #line $lineno $file
     {
       INTVAL n_regs_used[] = { $n_regs_used };
@@ -515,7 +515,7 @@ sub rewrite_pccinvoke {
 $named_names
 
 $arg_accessors
-      
+
       interp->current_object = $invocant;
       interp->current_cont = NEED_CONTINUATION;
       ctx->current_cont = ret_cont;
@@ -523,7 +523,7 @@ $arg_accessors
       pccinvoke_meth = VTABLE_find_method(interp, $invocant, $method_name);
       if (!pccinvoke_meth) {
           real_exception(interp, NULL, METH_NOT_FOUND, "Method '%Ss' not found", $method_name);
-      } 
+      }
       else {
           VTABLE_invoke(interp, pccinvoke_meth, NULL);
       }
@@ -538,9 +538,9 @@ $result_accessors
       interp->args_signature = save_args_signature;
       interp->current_object = save_current_object;
     }
-    /*END PCCONVOKE $method_name */
+    /*END PCCINVOKE $method_name */
 END
-    
+
         $$body =~ s/\Q$match\E/$replacement/;
     }
 }
