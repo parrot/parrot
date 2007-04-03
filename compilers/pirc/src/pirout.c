@@ -90,8 +90,8 @@ pir_type(struct parser_state *p, char *type) {
 }
 
 static void
-pir_sub_flag(struct parser_state *p, int flag) {    
-    fprintf(OUT, "%s ", find_keyword(flag));           
+pir_sub_flag(struct parser_state *p, int flag) {
+    fprintf(OUT, "%s ", find_keyword(flag));
 }
 
 static void
@@ -161,10 +161,12 @@ init_pir_vtable(void) {
     vtable->list_end       = pir_list_end;
     vtable->sub_flag_start = pir_sub_flag_start;
     vtable->sub_flag_end   = pir_sub_flag_end;
-    
-    
+
+
     return vtable;
 }
+
+
 
 
 

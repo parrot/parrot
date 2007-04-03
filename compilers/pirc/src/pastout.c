@@ -176,7 +176,7 @@ init_past_vtable(void) {
     vtable->param_start  = past_param;
     vtable->param_end    = past_close;
     vtable->type         = past_type;
-    vtable->sub_flag     = past_subflag;    
+    vtable->sub_flag     = past_subflag;
     vtable->op_start     = past_op;
     vtable->expression   = past_expr;
     vtable->op_end       = past_close;
@@ -184,6 +184,8 @@ init_past_vtable(void) {
 
     return vtable;
 }
+
+
 
 /*
 

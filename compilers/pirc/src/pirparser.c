@@ -1704,7 +1704,7 @@ multi_type_list(parser_state *p) {
     int wantmore = 1;
 
     emit_list_start(p);
-    
+
     match(p, T_LPAREN);
     while (wantmore) {
         switch (p->curtoken) {
@@ -1769,7 +1769,7 @@ sub_flags(parser_state *p) {
     int wantmore = 0; /* flag that is set when a ',' is parsed */
 
     emit_sub_flag_start(p);
-        
+
     while (ok || wantmore) {
         switch (p->curtoken) {
             case T_ANON_FLAG:
@@ -1785,11 +1785,11 @@ sub_flags(parser_state *p) {
                 break;
             case T_OUTER_FLAG:
             case T_VTABLE_FLAG: {
-                emit_sub_flag(p, p->curtoken);                
+                emit_sub_flag(p, p->curtoken);
                 next(p);
                 emit_list_start(p);
-                match(p, T_LPAREN);                
-                emit_expr(p, get_current_token(p->lexer));                
+                match(p, T_LPAREN);
+                emit_expr(p, get_current_token(p->lexer));
                 match(p, T_STRING_CONSTANT);
                 emit_list_end(p);
                 match(p, T_RPAREN);
@@ -1820,7 +1820,7 @@ sub_flags(parser_state *p) {
             wantmore = 1;  /* after the optional comma we expect another sub flag */
         }
     }
-        
+
     emit_sub_flag_end(p);
 }
 
@@ -1909,7 +1909,7 @@ sub_definition(parser_state *p) {
     }
 
     sub_flags(p);
-    match(p, T_NEWLINE);    
+    match(p, T_NEWLINE);
     parameters(p);
     emit_stmts_start(p); /* open stmts block */
     instructions(p);
@@ -2117,6 +2117,7 @@ loadlib(parser_state *p) {
     match(p, T_LOADLIB);
     match(p, T_STRING_CONSTANT);
 }
+
 
 /*
 
