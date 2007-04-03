@@ -139,12 +139,12 @@ representation that depends on the host system and on the current locale
 
 .sub '_os_date' :anon
     .param pmc format :optional
-    .param pmc time :optional
+    .param pmc time_ :optional
     .local pmc ret
     .local int t
     $S1 = optstring(format, '%c')
     $I0 = time
-    t = optint(time, $I0)
+    t = optint(time_, $I0)
     $S0 = substr $S1, 0, 1
     unless $S0 == '!' goto L1
     $P0 = decodetime t

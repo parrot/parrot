@@ -61,8 +61,7 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function alarm (repeat)' )
 require "alarm"
 
 function myalarm()
-    --print("in alarm!",os.date"%T",a,math.floor(100*a/N).."%")
-    print("in alarm!",a,math.floor(100*a/N).."%")
+    print("in alarm!",os.date"%H:%M:%S",a,math.floor(100*a/N).."%")
     alarm(1)
 end
 
@@ -78,7 +77,7 @@ end
 print(a)
 print"bye"
 CODE
-/^hello\n(in alarm!\t\d+\t\d+%\n)+100000\nbye/gm
+/^hello\n(in alarm!\t\d\d:\d\d:\d\d\t\d+\t\d+%\n)+100000\nbye/gm
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function alarm (bad delay)' );
