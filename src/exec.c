@@ -69,7 +69,7 @@ Parrot_exec(Interp *interp, opcode_t *pc,
     extern PARROT_API int Parrot_exec_rel_count;
 
     Parrot_exec_objfile_t * const obj =
-        mem_sys_allocate_zeroed(sizeof (Parrot_exec_objfile_t));
+        mem_allocate_zeroed_typed(Parrot_exec_objfile_t);
     exec_init(obj);
     Parrot_exec_rel_addr = (char **)mem_sys_allocate_zeroed(4 * sizeof (char *));
     obj->bytecode_header_size =
@@ -206,7 +206,7 @@ Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj /*NN*/,
         Parrot_exec_symbol_t *new_symbol;
 
         symbol_number = obj->symbol_count;
-        new_symbol = mem_sys_realloc(obj->symbol_table,
+        new_symbol = (Parrot_exec_symbol_t *)mem_sys_realloc(obj->symbol_table,
             (size_t)(obj->symbol_count + 1) * sizeof (Parrot_exec_symbol_t));
         obj->symbol_table = new_symbol;
 

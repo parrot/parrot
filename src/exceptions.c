@@ -317,7 +317,7 @@ pop_exception(Interp *interp)
     struct Parrot_cont * cc;
 
     PMC * const handler
-        = stack_peek(interp, interp->dynamic_env, &type);
+        = (PMC *)stack_peek(interp, interp->dynamic_env, &type);
 
     if (! handler
             || type != STACK_ENTRY_PMC
@@ -378,7 +378,7 @@ push_new_c_exception_handler(Interp *interp, Parrot_exception *jb)
 
 /*
 
-=item C<void *
+=item C<opcode_t *
 throw_exception(Interp *interp, PMC *exception, void *dest)>
 
 Throw the exception.
@@ -387,10 +387,10 @@ Throw the exception.
 
 */
 
-void *
+opcode_t *
 throw_exception(Interp *interp, PMC *exception, void *dest)
 {
-    void *address;
+    opcode_t *address;
 
     PMC * const handler = find_exception_handler(interp, exception);
     if (!handler)
@@ -409,7 +409,7 @@ throw_exception(Interp *interp, PMC *exception, void *dest)
 
 /*
 
-=item C<void *
+=item C<opcode_t *
 rethrow_exception(Interp *interp, PMC *exception)>
 
 Rethrow the exception.
@@ -418,11 +418,11 @@ Rethrow the exception.
 
 */
 
-void *
+opcode_t *
 rethrow_exception(Interp *interp, PMC *exception)
 {
     PMC *handler;
-    void *address;
+    opcode_t *address;
 
     if (exception->vtable->base_type != enum_class_Exception)
         PANIC("Illegal rethrow");
@@ -585,7 +585,7 @@ new_internal_exception(Interp *interp)
         interp->exc_free_list = the_exception->prev;
     }
     else
-        the_exception = mem_sys_allocate(sizeof (*the_exception));
+        the_exception = mem_allocate_typed(Parrot_exception);
     the_exception->prev = interp->exceptions;
     the_exception->resume = NULL;
     the_exception->msg = NULL;
@@ -749,7 +749,7 @@ void
 Parrot_init_exceptions(Interp *interp) {
     int i;
 
-    interp->exception_list = mem_sys_allocate(
+    interp->exception_list = (PMC **)mem_sys_allocate(
             sizeof (PMC*) * (E_LAST_PYTHON_E + 1));
     for (i = 0; i <= E_LAST_PYTHON_E; ++i) {
         PMC * const ex = pmc_new(interp, enum_class_Exception);

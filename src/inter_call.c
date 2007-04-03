@@ -348,7 +348,8 @@ Parrot_fetch_arg(Interp *interp, struct call_state *st)
             PMC *elem;
             if (st->key) {
                 st->src.slurp_i++;
-                st->name = parrot_hash_get_idx(interp, PMC_struct_val(st->src.slurp), st->key);
+                st->name = (STRING *)parrot_hash_get_idx(interp,
+                               (Hash *)PMC_struct_val(st->src.slurp), st->key);
                 assert(st->name);
                 elem = VTABLE_get_pmc_keyed_str(interp, st->src.slurp, st->name);
             }

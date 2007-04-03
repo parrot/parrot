@@ -62,7 +62,7 @@ static All_charsets *all_charsets;
 CHARSET *
 Parrot_new_charset(Interp *interp)
 {
-    return mem_sys_allocate(sizeof (CHARSET));
+    return mem_allocate_typed(CHARSET);
 }
 
 void
@@ -184,10 +184,10 @@ register_charset(Interp *interp, const char *charsetname,
      * loading of charsets from inside threads
      */
     if (!n)
-        all_charsets->set = mem_sys_allocate(sizeof (One_charset));
+        all_charsets->set = mem_allocate_typed(One_charset);
     else
-        all_charsets->set = mem_sys_realloc(all_charsets->set, (n + 1) *
-                sizeof (One_charset));
+        all_charsets->set = (One_charset *)mem_sys_realloc(all_charsets->set,
+                (n + 1) * sizeof (One_charset));
     all_charsets->n_charsets++;
     all_charsets->set[n].charset = charset;
     all_charsets->set[n].name = const_string(interp, charsetname);
@@ -219,7 +219,7 @@ Parrot_register_charset(Interp *interp, const char *charsetname,
         CHARSET *charset)
 {
     if (!all_charsets) {
-        all_charsets = mem_sys_allocate(sizeof (All_charsets));
+        all_charsets = mem_allocate_typed(All_charsets);
         all_charsets->n_charsets = 0;
         all_charsets->set = NULL;
     }

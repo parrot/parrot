@@ -208,13 +208,14 @@ do_prederef(void **pc_prederef, Parrot_Interp interp, int type)
             size_t nb = interp->code->base.size / 16;
             if (nb < 8)
                 nb = (size_t)8;
-            pi->branches = mem_sys_allocate(sizeof (Prederef_branch) * nb);
+            pi->branches = (Prederef_branch *)mem_sys_allocate(
+                               sizeof (Prederef_branch) * nb);
             pi->n_allocated = nb;
             pi->n_branches = 0;
         }
         else if (pi->n_branches >= pi->n_allocated) {
             pi->n_allocated = (size_t) (pi->n_allocated * 1.5);
-            pi->branches = mem_sys_realloc(pi->branches,
+            pi->branches = (Prederef_branch *)mem_sys_realloc(pi->branches,
                     sizeof (Prederef_branch) * pi->n_allocated);
         }
         pi->branches[pi->n_branches].offs = offset;
@@ -448,7 +449,7 @@ exec_init_prederef(Interp *interp, void *prederef_arena)
 
     if (!interp->code->prederef.code) {
         size_t N = interp->code->base.size;
-        void **temp = prederef_arena;
+        void **temp = (void **)prederef_arena;
         opcode_t *pc = interp->code->base.data;
 
         interp->code->prederef.code = temp;
@@ -815,7 +816,8 @@ Parrot_setup_event_func_ptrs(Parrot_Interp interp)
         return;
     /* function or CG core - prepare func_table */
     if (!interp->evc_func_table) {
-        interp->evc_func_table = mem_sys_allocate(sizeof (void *) * n);
+        interp->evc_func_table = (op_func_t *)mem_sys_allocate(
+                                     sizeof (op_func_t) * n);
         for (i = 0; i < n; ++i)
             interp->evc_func_table[i] = (op_func_t)
                 D2FPTR(((void**)lib->op_func_table)[CORE_OPS_check_events__]);
@@ -874,10 +876,10 @@ dynop_register(Parrot_Interp interp, PMC* lib_pmc)
     }
 
     if (!interp->all_op_libs)
-        interp->all_op_libs = mem_sys_allocate(
+        interp->all_op_libs = (op_lib_t **)mem_sys_allocate(
                 sizeof (op_lib_t *) * (interp->n_libs + 1));
     else
-        interp->all_op_libs = mem_sys_realloc(interp->all_op_libs,
+        interp->all_op_libs = (op_lib_t **)mem_sys_realloc(interp->all_op_libs,
                 sizeof (op_lib_t *) * (interp->n_libs + 1));
 
     init_func = get_op_lib_init(0, 0, lib_pmc);
@@ -905,20 +907,20 @@ dynop_register(Parrot_Interp interp, PMC* lib_pmc)
     core = PARROT_CORE_OPLIB_INIT(1);
 
     assert(interp->op_count == core->op_count);
-    new_evc_func_table = mem__sys_realloc(interp->evc_func_table,
-            sizeof (void *) * n_tot);
+    new_evc_func_table = (op_func_t *)mem__sys_realloc(interp->evc_func_table,
+            sizeof (op_func_t) * n_tot);
     if (core->flags & OP_FUNC_IS_ALLOCATED) {
-        new_func_table = mem_sys_realloc(core->op_func_table,
-                sizeof (void *) * n_tot);
-        new_info_table = mem_sys_realloc(core->op_info_table,
+        new_func_table = (op_func_t *)mem_sys_realloc(core->op_func_table,
+                sizeof (op_func_t) * n_tot);
+        new_info_table = (op_info_t *)mem_sys_realloc(core->op_info_table,
                 sizeof (op_info_t) * n_tot);
     }
     else {
         /*
          * allocate new op_func and info tables
          */
-        new_func_table = mem_sys_allocate(sizeof (void *) * n_tot);
-        new_info_table = mem_sys_allocate(sizeof (op_info_t) * n_tot);
+        new_func_table = (op_func_t *)mem_sys_allocate(sizeof (op_func_t) * n_tot);
+        new_info_table = (op_info_t *)mem_sys_allocate(sizeof (op_info_t) * n_tot);
         /* copy old */
         for (i = 0; i < n_old; ++i) {
             new_func_table[i] = interp->op_func_table[i];
@@ -975,7 +977,7 @@ dynop_register_xx(Parrot_Interp interp, PMC* lib_pmc,
         size_t n_old, size_t n_new, oplib_init_f init_func)
 {
     op_lib_t *cg_lib, *new_lib;
-    void **ops_addr = NULL;
+    op_func_t *ops_addr = NULL;
     size_t i, n_tot;
 #if 0
     /* related to CG and CGP ops issue below */
@@ -988,14 +990,14 @@ dynop_register_xx(Parrot_Interp interp, PMC* lib_pmc,
     cg_lib = init_func(1);
 
     if (cg_lib->flags & OP_FUNC_IS_ALLOCATED) {
-        ops_addr = mem_sys_realloc(cg_lib->op_func_table,
-                n_tot * sizeof (void *));
+        ops_addr = (op_func_t *)mem_sys_realloc(cg_lib->op_func_table,
+                n_tot * sizeof (op_func_t));
     }
     else {
-        ops_addr = mem_sys_allocate(n_tot * sizeof (void *));
+        ops_addr = (op_func_t *)mem_sys_allocate(n_tot * sizeof (op_func_t));
         cg_lib->flags = OP_FUNC_IS_ALLOCATED;
         for (i = 0; i < n_old; ++i)
-            ops_addr[i] = ((void **)cg_lib->op_func_table)[i];
+            ops_addr[i] = cg_lib->op_func_table[i];
     }
     /*
      * XXX running CG and CGP ops currently works only via the wrapper
@@ -1031,8 +1033,8 @@ dynop_register_xx(Parrot_Interp interp, PMC* lib_pmc,
         new_init_func = get_op_lib_init(0, 0, lib_variant);
         new_lib = new_init_func(1);
         for (i = n_old; i < n_tot; ++i)
-            ops_addr[i] = ((void **)new_lib->op_func_table)[i - n_old];
-        new_lib->op_func_table = (void *) ops_addr;
+            ops_addr[i] = (new_lib->op_func_table)[i - n_old];
+        new_lib->op_func_table = ops_addr;
         new_lib->op_count = n_tot;
         new_init_func((long) ops_addr);
     }
@@ -1040,7 +1042,7 @@ dynop_register_xx(Parrot_Interp interp, PMC* lib_pmc,
         /* if not install wrappers */
         /* fill new entries with the wrapper op */
         for (i = n_old; i < n_tot; ++i)
-            ops_addr[i] = ((void **)cg_lib->op_func_table)[CORE_OPS_wrapper__];
+            ops_addr[i] = (cg_lib->op_func_table)[CORE_OPS_wrapper__];
     }
     /*
      * if we are running this core, update event check ops
@@ -1048,13 +1050,13 @@ dynop_register_xx(Parrot_Interp interp, PMC* lib_pmc,
     if ((int)interp->run_core == cg_lib->core_type) {
         for (i = n_old; i < n_tot; ++i)
             interp->evc_func_table[i] =
-                (op_func_t)D2FPTR(ops_addr[CORE_OPS_check_events__]);
-        interp->save_func_table = (void *) ops_addr;
+                (op_func_t)ops_addr[CORE_OPS_check_events__];
+        interp->save_func_table = ops_addr;
     }
     /*
      * tell the cg_core about the new jump table
      */
-    cg_lib->op_func_table = (void *) ops_addr;
+    cg_lib->op_func_table = ops_addr;
     cg_lib->op_count = n_tot;
     init_func((long) ops_addr);
 }
@@ -1082,7 +1084,7 @@ dynop_register_switch(Parrot_Interp interp, PMC* lib_pmc,
 /*
 
 =item C<static void
-notify_func_table(Parrot_Interp interp, void* table, int on)>
+notify_func_table(Parrot_Interp interp, op_func_t* table, int on)>
 
 Tell the interpreter's running core about the new function table.
 
@@ -1091,7 +1093,7 @@ Tell the interpreter's running core about the new function table.
 */
 
 static void
-notify_func_table(Parrot_Interp interp, void* table, int on)
+notify_func_table(Parrot_Interp interp, op_func_t* table, int on)
 {
     oplib_init_f init_func = get_op_lib_init(1, interp->run_core, NULL);
     op_lib_t *lib = init_func(1);

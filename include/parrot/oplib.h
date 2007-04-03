@@ -31,7 +31,7 @@ typedef struct {
     int      patch_version;
     size_t      op_count;
     op_info_t * op_info_table;
-    void *      op_func_table;
+    op_func_t * op_func_table;
     int (*op_code)(const char * name, int full);
 } op_lib_t;
 

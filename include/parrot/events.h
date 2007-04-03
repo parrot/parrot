@@ -78,8 +78,8 @@ PARROT_API void Parrot_schedule_event(Parrot_Interp, parrot_event*);
 PARROT_API void Parrot_schedule_interp_event(Parrot_Interp, parrot_event*);
 PARROT_API void Parrot_schedule_interp_qentry(Parrot_Interp, struct QUEUE_ENTRY* entry);
 
-#define CHECK_EVENTS(i, n)  Parrot_do_check_events(i, n)
-#define HANDLE_EVENTS(i, n) Parrot_do_handle_events(i, 1, n)
+#define CHECK_EVENTS(i, n)  (opcode_t *)Parrot_do_check_events(i, n)
+#define HANDLE_EVENTS(i, n) (opcode_t *)Parrot_do_handle_events(i, 1, n)
 
 PARROT_API void Parrot_init_signals(void);
 PARROT_API void Parrot_init_events(Parrot_Interp);

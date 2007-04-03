@@ -169,8 +169,8 @@ typedef struct parrot_exception_t Parrot_exception;
  */
 PARROT_API void push_exception(Parrot_Interp, PMC *);
 PARROT_API void pop_exception(Parrot_Interp);
-PARROT_API void * throw_exception(Parrot_Interp, PMC *, void *);
-PARROT_API void * rethrow_exception(Parrot_Interp, PMC *);
+PARROT_API opcode_t * throw_exception(Parrot_Interp, PMC *, void *);
+PARROT_API opcode_t * rethrow_exception(Parrot_Interp, PMC *);
 
 PARROT_API size_t handle_exception(Parrot_Interp);
 

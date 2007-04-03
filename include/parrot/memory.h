@@ -41,6 +41,9 @@ void mem_setup_allocator(Interp *);
 #define mem_sys_memcopy memcpy
 #define mem_sys_memmove memmove
 
+#define mem_allocate_typed(type)    (type *)mem_sys_allocate(sizeof(type))
+#define mem_allocate_zeroed_typed(type) (type *)mem_sys_allocate_zeroed(sizeof(type))
+
 #endif /* PARROT_MEMORY_H_GUARD */
 
 /*
