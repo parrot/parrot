@@ -670,7 +670,7 @@ arith_expression(parser_state *p) {
 
 =item *
 
-  parrot_instruction -> PARROT_OP [ expression {',' expression } ] '\n'
+  parrot_instruction -> PARROT_OP [ expression {',' expression } ]
 
 =cut
 
@@ -693,7 +693,6 @@ parrot_instruction(parser_state *p) {
         else break;
     }
 
-    match(p, T_NEWLINE);
     emit_op_end(p);
 }
 
@@ -732,13 +731,18 @@ assignment(parser_state *p) {
         case T_INVOCANT_IDENT: /* method call */
             methodcall(p);
             break;
-        case T_STRING_CONSTANT: { /* "foo"() */
-            char *invokable = clone_string(get_current_token(p->lexer));
-            emit_invocation_start(p);
-            emit_invokable(p, invokable);
+        case T_STRING_CONSTANT: {
+            char *str = clone_string(get_current_token(p->lexer));
             next(p);
-            arguments(p);
-            emit_invocation_end(p);
+            if (p->curtoken == T_LPAREN) { /* "foo"() */
+                emit_invocation_start(p);
+                emit_invokable(p, str);
+                arguments(p);
+                emit_invocation_end(p);
+            }
+            else { /* target '=' STRINGC */
+                emit_expr(p, str);
+            }
             break;
         }
         case T_IDENTIFIER:
@@ -1239,7 +1243,7 @@ param_flags(parser_state *p) {
                 }
                 break;
             /* however, if the current token is a comma or ')', then quit parsing flags */
-            case T_COMMA:
+            case T_COMMA: /* huh? */
             case T_RPAREN:
             case T_NEWLINE:
                 ok = 0; /* stop loop */
@@ -1761,6 +1765,7 @@ instructions(parser_state *p) {
                 break;
             case T_PARROT_OP: /* parrot instructions */
                 parrot_instruction(p);
+                match(p, T_NEWLINE);
                 break;
             case T_NULL: /* 'null' is a PIR keyword, but also an instruction. */
                 next(p);
