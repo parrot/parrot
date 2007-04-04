@@ -298,7 +298,6 @@ Throws an exception upon error.
             PMC *globals :optional :named["globals"], int got_globals :opt_flag) {
 
         Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
-        int copy_of_globals;
         PMC *ns_src, *ns_dest, *ns_globals;
 
         if (got_src)
@@ -321,7 +320,6 @@ Throws an exception upon error.
         ns_dest    = exp->ns_dest;
         ns_globals = exp->globals;
 
-        copy_of_globals = VTABLE_get_integer(interp, exp->globals);
         PCCINVOKE(interp, ns_src, "export_to", PMC *ns_dest, PMC *ns_globals);
         return;
     }
