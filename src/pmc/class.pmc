@@ -218,67 +218,41 @@ Mark any referenced strings and PMCs.
             pobject_lives(interp, (PObj*)class->resolve);
     }
 
-
 /*
 
-=item C<void attributes()>
+=item C<void add_method(STRING *name, PMC *sub)>
 
-Return a hash where the keys are attribute names and the values are hashes
-providing a set of key/value pairs describing the attribute.
+Adds the given sub PMC as a method with the given name.
 
 =cut
 
 */
-    PCCMETHOD void attributes() {
+    void add_method(STRING *name, PMC *sub)
+    {
         Parrot_Class *class = PARROT_CLASS(SELF);
-        PMC *ret_attrib_metadata = VTABLE_clone(interp, class->attrib_metadata);
-        PCCRETURN(PMC *ret_attrib_metadata);
-    }
 
-
-/*
-
-=item C<void add_attribute()>
-
-Add an attribute to the class. Requires a name and, optionally, a type.
-
-=cut
-
-*/
-    PCCMETHOD void add_attribute(STRING *attribute_name,
-            STRING* attribute_type :optional, int got_type :opt_flag) {
-        Parrot_Class *class = PARROT_CLASS(SELF);
-        PMC *new_attribute = pmc_new(interp, enum_class_Hash);
-
-        /* If we've been instantiated already, need a new class. */
-        if (class->instantiated) {
-            /* XXX Unimplemented! */
+        /* If we have already added a method with this name... */
+        if (VTABLE_exists_keyed_str(interp, class->methods, name)) {
+            /* XXX Need to handle multi methods here. */
             real_exception(interp, NULL, E_NotImplementedError,
-                "Modifications to already instantiated classes not allowed yet.");
+                "A method of this name already exists. It may have been supplied by a role.");
         }
-
-        /* If we've already got an attribute of this name, it's an error. */
-        if (VTABLE_exists_keyed_str(interp, class->attrib_metadata, attribute_name)) {
-            real_exception(interp, NULL, INVALID_OPERATION,
-                "An attribute of this name already exists.");
-            return;
+        else {
+            /* Enter it into the table. */
+            VTABLE_set_pmc_keyed_str(interp, class->methods, name, sub);
         }
-
-        /* Set name and type. */
-        VTABLE_set_string_keyed_str(interp, new_attribute,
-            CONST_STRING(interp, "name"), attribute_name);
-        if (got_type) {
-            VTABLE_set_string_keyed_str(interp, new_attribute,
-                CONST_STRING(interp, "type"), attribute_type);
-        }
-
-        /* Enter the attribute in the attributes array. */
-        VTABLE_set_pmc_keyed_str(interp, class->attrib_metadata, attribute_name, new_attribute);
     }
+
+
+    /* **********************************************************************
+    /* Below here are non-vtable methods that eventually will go in a role
+     * that is composed into here to optionally give a nice interface from
+     * PIR (ParrotClass isa Class does ClassMethods or something like this).
+     * **********************************************************************/
 
 /*
 
-=item C<void name()>
+=item C<void name(STRING *name :optional, int got_name :opt_flag)>
 
 Sets the name of the class.
 
@@ -300,7 +274,7 @@ Sets the name of the class.
 
 /*
 
-=item C<void namespace()>
+=item C<void namespace(PMC *namespace :optional, int got_name :opt_flag)>
 
 With a parameter, sets the namespace for the class. Expects a fully
 qualified namespace to be specified as a key. If you already have linked another
@@ -423,6 +397,91 @@ parameter list.
         PCCRETURN(PMC *obj)
      }
 
+/*
+
+=item C<void attributes()>
+
+Return a hash where the keys are attribute names and the values are hashes
+providing a set of key/value pairs describing the attribute.
+
+=cut
+
+*/
+    PCCMETHOD void attributes() {
+        Parrot_Class *class = PARROT_CLASS(SELF);
+        PMC *ret_attrib_metadata = VTABLE_clone(interp, class->attrib_metadata);
+        PCCRETURN(PMC *ret_attrib_metadata);
+    }
+
+/*
+
+=item C<void add_attribute()>
+
+Add an attribute to the class. Requires a name and, optionally, a type.
+
+=cut
+
+*/
+    PCCMETHOD void add_attribute(STRING *attribute_name,
+            STRING* attribute_type :optional, int got_type :opt_flag) {
+        Parrot_Class *class = PARROT_CLASS(SELF);
+        PMC *new_attribute = pmc_new(interp, enum_class_Hash);
+
+        /* If we've been instantiated already, need a new class. */
+        if (class->instantiated) {
+            /* XXX Unimplemented! */
+            real_exception(interp, NULL, E_NotImplementedError,
+                "Modifications to already instantiated classes not allowed yet.");
+        }
+
+        /* If we've already got an attribute of this name, it's an error. */
+        if (VTABLE_exists_keyed_str(interp, class->attrib_metadata, attribute_name)) {
+            real_exception(interp, NULL, INVALID_OPERATION,
+                "An attribute of this name already exists.");
+            return;
+        }
+
+        /* Set name and type. */
+        VTABLE_set_string_keyed_str(interp, new_attribute,
+            CONST_STRING(interp, "name"), attribute_name);
+        if (got_type) {
+            VTABLE_set_string_keyed_str(interp, new_attribute,
+                CONST_STRING(interp, "type"), attribute_type);
+        }
+
+        /* Enter the attribute in the attributes array. */
+        VTABLE_set_pmc_keyed_str(interp, class->attrib_metadata, attribute_name, new_attribute);
+    }
+
+/*
+
+=item C<void methods()>
+
+Return a hash where the keys are method names and the values are methods.
+
+=cut
+
+*/
+    PCCMETHOD void methods() {
+        Parrot_Class *class = PARROT_CLASS(SELF);
+        PMC *ret_methods = VTABLE_clone(interp, class->methods);
+        PCCRETURN(PMC *ret_methods);
+    }
+
+/*
+
+=item C<void add_method(STRING *name, PMC *sub)>
+
+Adds the given sub PMC as a method with the given name. Delegates to the
+C<add_method> vtable method.
+
+=cut
+
+*/
+    PCCMETHOD void add_method(STRING *name, PMC *sub)
+    {
+        VTABLE_add_method(interp, SELF, name, sub);
+    }
 
 /*
 
@@ -468,31 +527,6 @@ Return the parents array PMC.
 
         /* Add to the list of our immediate parents. */
         VTABLE_push_pmc(interp, class->parents, parent);
-    }
-
-/*
-
-=item C<void add_method(STRING *name, PMC *sub)>
-
-Adds the given sub PMC as a method with the given name.
-
-=cut
-
-*/
-    PCCMETHOD void add_method(STRING *name, PMC *sub)
-    {
-        Parrot_Class *class = PARROT_CLASS(SELF);
-
-        /* If we have already added a method with this name... */
-        if (VTABLE_exists_keyed_str(interp, class->methods, name)) {
-            /* XXX Need to handle multi methods here. */
-            real_exception(interp, NULL, E_NotImplementedError,
-                "A method of this name already exists. It may have been supplied by a role.");
-        }
-        else {
-            /* Enter it into the table. */
-            VTABLE_set_pmc_keyed_str(interp, class->methods, name, sub);
-        }
     }
 
 /*
