@@ -104,7 +104,6 @@ my @unified_testable_languages
               m4
               ook
               parrot_compiler
-              pheme
               PIR
               plumhead
               punie
