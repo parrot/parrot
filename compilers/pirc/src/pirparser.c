@@ -386,8 +386,16 @@ string_value(parser_state *p) {
 */
 static void
 method(parser_state *p) {
-    if (p->curtoken == T_IDENTIFIER) next(p);
-    else match(p, T_STRING_CONSTANT);
+    switch (p->curtoken) {
+        case T_IDENTIFIER:
+        case T_STRING_CONSTANT:
+            emit_method_name(p, get_current_token(p->lexer));
+            next(p);
+            break;
+        default:
+            syntax_error(p, 1, "method identifier expected");
+            break;
+    }
 }
 
 
@@ -407,6 +415,7 @@ target(parser_state *p) {
         case T_PASM_PREG: case T_PREG: case T_PASM_IREG: case T_IREG:
         case T_PASM_NREG: case T_NREG: case T_PASM_SREG: case T_SREG:
         case T_IDENTIFIER:
+            emit_target(p, get_current_token(p->lexer));
             next(p);
             break;
         default:
@@ -428,19 +437,10 @@ static void
 type(parser_state *p) {
     switch (p->curtoken) {
         case T_INT:
-            emit_type(p, "int");
-            next(p);
-            break;
         case T_NUM:
-            emit_type(p, "num");
-            next(p);
-            break;
         case T_PMC:
-            emit_type(p, "pmc");
-            next(p);
-            break;
         case T_STRING:
-            emit_type(p, "string");
+            emit_type(p, get_current_token(p->lexer));
             next(p);
             break;
         default:
@@ -560,6 +560,7 @@ argument_list(parser_state *p) {
 */
 static void
 arguments(parser_state *p) {
+    emit_args_start(p);
     match(p, T_LPAREN);
     if (p->curtoken != T_RPAREN) argument_list(p);
     match(p, T_RPAREN);
@@ -587,6 +588,7 @@ arguments(parser_state *p) {
         /* clear heredoc index */
         p->heredoc_index = 0;
     }
+    emit_args_end(p);
 }
 
 
@@ -601,9 +603,12 @@ arguments(parser_state *p) {
 */
 static void
 methodcall(parser_state *p) {
+    emit_invocation_start(p);
+    emit_invocant(p, get_current_token(p->lexer));
     match(p, T_INVOCANT_IDENT);
     method(p);
     arguments(p);
+    emit_invocation_end(p);
 }
 
 
@@ -718,32 +723,47 @@ assignment(parser_state *p) {
         case T_INVOCANT_IDENT: /* method call */
             methodcall(p);
             break;
-        case T_STRING_CONSTANT: /* "foo"() */
+        case T_STRING_CONSTANT: { /* "foo"() */
+            char *invokable = clone_string(get_current_token(p->lexer));
+            emit_invocation_start(p);
+            emit_invokable(p, invokable);
             next(p);
             arguments(p);
+            emit_invocation_end(p);
             break;
+        }
         case T_IDENTIFIER:
         case T_PREG:
-        case T_PASM_PREG:
+        case T_PASM_PREG: {
+            char *obj = clone_string(get_current_token(p->lexer)); /* save it for now */
             next(p);
 
             switch (p->curtoken) {
                 case T_LPAREN:  /* function call; foo() */
+                    emit_invocation_start(p);
+                    emit_invokable(p, obj);
                     arguments(p);
+                    emit_invocation_end(p);
                     break;
                 case T_PTR: /* method call; foo '->' method arguments */
+                    emit_invocation_start(p);
+                    emit_invocant(p, obj);
                     next(p);
                     method(p);
                     arguments(p);
+                    emit_invocation_end(p);
                     break;
                 case T_LBRACKET: /* target '=' target '[' expression ']' */
+                    emit_target(p, obj);
                     keylist(p);
                     break;
                 default: /* expression with a PMC target/id as first operand */
+                    emit_expr(p, obj);
                     arith_expression(p);
                     break;
             }
             break;
+        }
         case T_GLOBAL: /* x = global string_value */
             next(p);
             string_value(p);
@@ -1096,37 +1116,38 @@ if_statement(parser_state *p) {
 */
 static void
 const_definition(parser_state *p) {
-    switch (p->curtoken) {
+    token type = p->curtoken; /* save type for check later */
+    switch (type) {
         case T_INT:
-            emit_type(p, "int");
-            next(p);
-            match(p, T_IDENTIFIER);
-            match(p, T_ASSIGN);
-            match(p, T_INTEGER_CONSTANT);
-            break;
         case T_NUM:
-            emit_type(p, "num");
-            next(p);
-            match(p, T_IDENTIFIER);
-            match(p, T_ASSIGN);
-            match(p, T_NUMBER_CONSTANT);
-            break;
         case T_STRING:
-            emit_type(p, "string");
+        case T_PMC:
+            emit_type(p, get_current_token(p->lexer));
             next(p);
-            match(p, T_IDENTIFIER);
-            match(p, T_ASSIGN);
-            match(p, T_STRING_CONSTANT);
-            break;
-        case T_PMC: /* both string and PMC have strings as constants */
-            emit_type(p, "pmc");
-            next(p);
-            match(p, T_IDENTIFIER);
-            match(p, T_ASSIGN);
-            match(p, T_STRING_CONSTANT);
             break;
         default:
             syntax_error(p, 1, "type expected");
+            break;
+    }
+
+    match(p, T_IDENTIFIER);
+    match(p, T_ASSIGN);
+
+    /* parse a literal of the type according to the parsed type keyword */
+    emit_expr(p, get_current_token(p->lexer)); /* emit the literal */
+    switch (type) {
+        case T_INT:
+            match(p, T_INTEGER_CONSTANT);
+            break;
+        case T_NUM:
+            match(p, T_NUMBER_CONSTANT);
+            break;
+        case T_STRING: /* both string and PMC have strings as constants */
+        case T_PMC:
+            match(p, T_STRING_CONSTANT);
+            break;
+        default:
+            syntax_error(p, 2, find_keyword(type), "expected");
             break;
     }
 }
@@ -1232,16 +1253,22 @@ static void
 long_invocation(parser_state *p) {
     int more_results = 1; /* flag for while loop */
 
+    emit_invocation_start(p);
+
     match(p, T_PCC_BEGIN);  /* '.pcc_begin '\n' ... */
     match(p, T_NEWLINE);
 
+    /* arguments */
+    emit_args_start(p);
     while (p->curtoken == T_ARG) { /* ... { '.arg' expr [flag] '\n' } ... */
         next(p);
         expression(p);
         arg_flags(p);
         match(p, T_NEWLINE);
     }
+    emit_args_end(p);
 
+    /* the invocant and/or sub to be called */
     switch (p->curtoken) {
         case T_PCC_CALL: /* ... '.pcc_call' target '\n' ... */
         case T_NCI_CALL: /* ... '.nci_call' target '\n' ... */
@@ -1262,7 +1289,9 @@ long_invocation(parser_state *p) {
             break;
     }
 
-
+    /* results */
+    /*emit_results_start(p);
+    */
     while (more_results) {
         switch (p->curtoken) {
             case T_LOCAL:
@@ -1274,7 +1303,7 @@ long_invocation(parser_state *p) {
                 param_flags(p);
                 match(p, T_NEWLINE);
                 break;
-            case T_PCC_END:
+            case T_PCC_END: /* we encountered '.pcc_end', so stop looking for more results */
                 more_results = 0; /* no more results, break loop */
                 break;
             default:
@@ -1285,9 +1314,12 @@ long_invocation(parser_state *p) {
                 break;
         }
     }
-
+    /*emit_results_end(p);
+    */
     match(p, T_PCC_END); /* '.pcc_end' '\n' */
     match(p, T_NEWLINE);
+
+    emit_invocation_end(p);
 }
 
 
@@ -1315,6 +1347,7 @@ long_return_statement(parser_state *p) {
     }
     match(p, T_PCC_END_RETURN); /* ... '.pcc_end_return' '\n' */
     match(p, T_NEWLINE);
+    emit_op_end(p);
 }
 
 /*
@@ -1368,6 +1401,7 @@ target_statement(parser_state *p) {
 
     switch (p->curtoken) {
         case T_ASSIGN:   /* target '=' expression */
+
             assignment(p);
             break;
         case T_PLUS_ASSIGN: /* target '+=' simple_expr '\n' (and '-=' etc.) */
@@ -1434,13 +1468,16 @@ target_list(parser_state *p) {
 
 =item *
 
-  multi-result-invocation -> target_list '=' (subcall | methodcall)
+  multi-result-invocation -> target_list '=' (invokable arguments | methodcall)) '\n'
+
+  invokable -> IDENTIFIER | PREG | STRINGC
 
 =cut
 
 */
 static void
 multi_result_invocation(parser_state *p) {
+    emit_invocation_start(p);
     target_list(p);
     match(p, T_ASSIGN);
 
@@ -1448,18 +1485,22 @@ multi_result_invocation(parser_state *p) {
         case T_IDENTIFIER: /* target_list '=' subcall */
         case T_PASM_PREG:
         case T_PREG:
+        case T_STRING_CONSTANT: {
+            char *invokable = clone_string(get_current_token(p->lexer));
+            emit_invokable(p, invokable);
             next(p);
             arguments(p);
-            match(p, T_NEWLINE);
             break;
+        }
         case T_INVOCANT_IDENT: /* target_list '=' methodcall */
             methodcall(p);
-            match(p, T_NEWLINE);
             break;
         default:
             syntax_error(p, 1, "sub or method invocation expected");
             break;
     }
+    match(p, T_NEWLINE);
+    emit_invocation_end(p);
 }
 
 /*
@@ -1571,6 +1612,7 @@ global_assignment(parser_state *p) {
          | yield_statement
          | macro_expansion
          | target_statement
+         | STRINGC arguments
          | methodcall
          | long_invocation
          | long_return_statement
@@ -1647,6 +1689,15 @@ instructions(parser_state *p) {
             case T_PASM_SREG: case T_SREG: case T_PASM_IREG: case T_IREG:
                 target_statement(p);
                 break;
+            case T_STRING_CONSTANT: {
+                char *invokable = clone_string(get_current_token(p->lexer));
+                emit_invocation_start(p);
+                emit_invokable(p, invokable);
+                next(p);
+                arguments(p);
+                emit_invocation_end(p);
+                break;
+            }
             case T_INVOCANT_IDENT:  /* dot attached to identifier, like 'id.' */
                 methodcall(p);
                 match(p, T_NEWLINE);
@@ -1862,8 +1913,7 @@ parameters(parser_state *p) {
             case T_PMC:
             case T_STRING:
                 emit_type(p, get_current_token(p->lexer));
-                /* type(p); -- we know what it is; just skip it! */
-                next(p);
+                next(p); /*we know what it is; just skip it! */
                 emit_name(p, get_current_token(p->lexer));
                 match(p, T_IDENTIFIER);
                 param_flags(p);

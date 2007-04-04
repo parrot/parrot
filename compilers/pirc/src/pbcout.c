@@ -2,7 +2,12 @@
 
 =head1 NAME
 
-pbcout.c - Back-end for emitting PBC. Not implemented.
+pbcout.c - Back-end for emitting PBC.
+
+
+XXX Not implemented XXX
+
+IIUC, the PBC format is not yet fixed.
 
 =cut
 

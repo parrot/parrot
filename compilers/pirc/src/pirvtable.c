@@ -69,26 +69,34 @@ new_pirvtable(void) {
     /* set all entries to 'default' by default. This way, another output module
      * only needs to override the entries that are interesting for that module.
      */
-    vtable->initialize     = not_implemented;
-    vtable->destroy        = not_implemented; /* destructor; highly recommended to implement! */
-    vtable->name           = not_implemented;
-    vtable->sub_start      = not_implemented;
-    vtable->sub_end        = not_implemented;
-    vtable->stmts_start    = not_implemented;
-    vtable->stmts_end      = not_implemented;
-    vtable->end            = not_implemented;
-    vtable->param_start    = not_implemented;
-    vtable->param_end      = not_implemented;
-    vtable->type           = not_implemented;
-    vtable->sub_flag       = not_implemented;
-    vtable->expression     = not_implemented;
-    vtable->next_expr      = not_implemented;
-    vtable->op_start       = not_implemented;
-    vtable->op_end         = not_implemented;
-    vtable->list_start     = not_implemented;
-    vtable->list_end       = not_implemented;
-    vtable->sub_flag_start = not_implemented;
-    vtable->sub_flag_end   = not_implemented;
+    vtable->initialize       = not_implemented;
+    vtable->destroy          = not_implemented; /* destructor; highly recommended to implement! */
+    vtable->name             = not_implemented;
+    vtable->sub_start        = not_implemented;
+    vtable->sub_end          = not_implemented;
+    vtable->stmts_start      = not_implemented;
+    vtable->stmts_end        = not_implemented;
+    vtable->end              = not_implemented;
+    vtable->param_start      = not_implemented;
+    vtable->param_end        = not_implemented;
+    vtable->type             = not_implemented;
+    vtable->sub_flag         = not_implemented;
+    vtable->expression       = not_implemented;
+    vtable->next_expr        = not_implemented;
+    vtable->op_start         = not_implemented;
+    vtable->op_end           = not_implemented;
+    vtable->list_start       = not_implemented;
+    vtable->list_end         = not_implemented;
+    vtable->sub_flag_start   = not_implemented;
+    vtable->sub_flag_end     = not_implemented;
+    vtable->method_name      = not_implemented;
+    vtable->invocant         = not_implemented;
+    vtable->args_start       = not_implemented;
+    vtable->args_end         = not_implemented;
+    vtable->target           = not_implemented;
+    vtable->invokable        = not_implemented;
+    vtable->invocation_start = not_implemented;
+    vtable->invocation_end   = not_implemented;
 
     /* set data to NULL, it's initialized in the backend module */
     vtable->data           = NULL;

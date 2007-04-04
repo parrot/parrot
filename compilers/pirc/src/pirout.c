@@ -1,3 +1,12 @@
+/*
+
+=head1 NAME
+
+pirout.c - Back-end for outputting PIR.
+
+=cut
+
+*/
 #include "pirout.h"
 #include "pirvtable.h"
 #include "pirlexer.h"
@@ -102,6 +111,11 @@ static void
 pir_destroy(emit_data *data) {
     free(data);
     data = NULL;
+}
+
+static void
+pir_begin_return(emit_data *data) {
+    fprintf(OUT, " ");
 }
 
 /*
