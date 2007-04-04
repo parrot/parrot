@@ -6,7 +6,7 @@ use lib 'parrot_compiler/lib';
 use FindBin;
 use lib "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../../lib";
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 8;
 use Test::More;
 
 # Execute 'Hello World' in PASM and PIR  
@@ -70,13 +70,5 @@ TODO:
   local $TODO = 'generating PASM from PIR is not supported';
   $ENV{TEST_PROG_ARGS} = 'parrot_compiler.pasm --language=PIR';
   language_output_is( 'ParrotCompiler', $code{PIR}, $out{PIR},
-                      $ENV{TEST_PROG_ARGS} );
-};
-
-TODO:
-{
-  local $TODO = 'generating PASM from PIR is not supported';
-  $ENV{TEST_PROG_ARGS} = 'parrot_compiler.pasm --language=PAST';
-  language_output_is( 'ParrotCompiler', $code{PAST}, $out{PAST},
                       $ENV{TEST_PROG_ARGS} );
 };
