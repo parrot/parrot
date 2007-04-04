@@ -269,7 +269,7 @@ OUT
 
 
 ## TODO import
-pir_output_like( <<'CODE', <<'OUT', 'import - no args' );
+pir_output_like( <<'CODE', <<'OUT', 'import - no args', todo => 'not yet implemented' );
 .sub 'test' :main
     $P0 = new .Exporter
 
@@ -278,7 +278,7 @@ pir_output_like( <<'CODE', <<'OUT', 'import - no args' );
 
 .end
 CODE
-/^no globals to import\n/
+/^source namespace not set\n/
 OUT
 
 
