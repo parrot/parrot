@@ -31,6 +31,7 @@ SOURCES = PGE.pir \
   PGE/Match.pir \
   PGE/Regex.pir \
   PGE/P6Regex.pir \
+  PGE/Perl6Regex.pir \
   PGE/OPTable.pir \
   PGE/P5Regex.pir \
   PGE/builtins.pg \

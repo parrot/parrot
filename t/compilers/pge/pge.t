@@ -93,7 +93,7 @@ ok
 OUT
 
 ## compiler registration
-for my $compiler (qw/ PGE::P6Regex PGE::P5Regex PGE::Glob /) {
+for my $compiler (qw/ PGE::Perl6Regex PGE::P6Regex PGE::P5Regex PGE::Glob /) {
     pir_output_is( <<"CODE". $POST, <<OUT, 'compreg "$compiler"' );
 .sub 'main' :main
         load_bytecode 'PGE.pbc'

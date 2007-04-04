@@ -1,14 +1,14 @@
 =head1 TITLE
 
-P6Regex - compiler and parser for Perl 6 regex
+Perl6Regex - compiler and parser for Perl 6 regex
 
 =over 4
 
-=item C<compile_p6regex(PMC source, PMC adverbs :slurpy :named)>
+=item C<compile_perl6regex(PMC source, PMC adverbs :slurpy :named)>
 
 Return the result of compiling C<source> according to Perl 6
 regex syntax and the associated C<adverbs>.  Normally this
-function is obtained using C<compreg 'PGE::P6Regex'> instead
+function is obtained using C<compreg 'PGE::Perl6Regex'> instead
 of calling it directly.
 
 Returns the compiled regular expression.  If a C<target>
@@ -18,9 +18,9 @@ or the resulting PIR code (target='PIR').
 
 =cut
 
-.namespace [ 'PGE::P6Regex' ]
+.namespace [ 'PGE::Perl6Regex' ]
 
-.sub 'compile_p6regex'
+.sub 'compile_perl6regex'
     .param pmc source
     .param pmc args            :slurpy
     .param pmc adverbs         :slurpy :named
@@ -91,7 +91,7 @@ or the resulting PIR code (target='PIR').
 
   parse:
     ##   Let's parse the source as a regex
-    $P0 = get_hll_global ['PGE::Grammar'], 'regex'
+    $P0 = get_global 'regex'
     match = $P0(source, adverbs :flat :named)
     if target != 'parse' goto check
     .return (match)
@@ -111,7 +111,7 @@ or the resulting PIR code (target='PIR').
     pad = clone adverbs
     $P0 = new .Hash
     pad['lexscope'] = $P0
-    exp = exp.'p6exp'(pad)
+    exp = exp.'perl6exp'(pad)
 
     .return exp.'compile'(adverbs :flat :named)
 .end
@@ -120,13 +120,9 @@ or the resulting PIR code (target='PIR').
 =item C<regex(PMC mob, PMC adverbs :slurpy :named)>
 
 Parses a regex according to Perl 6 regex syntax, and returns 
-the corresponding parse tree.  This is installed as a C<< <regex> >> 
-rule in C<PGE::Grammar>, so one can call it from another regex to 
-parse valid Perl 6 regular expressions.
+the corresponding parse tree.  
 
 =cut
-
-.namespace [ 'PGE::Grammar' ]
 
 .sub 'regex'
     .param pmc mob
@@ -135,8 +131,8 @@ parse valid Perl 6 regular expressions.
     .local string stop
     .local pmc stopstack, optable, match
 
-    stopstack = get_hll_global ['PGE::P6Regex'], '@!stopstack'
-    optable = get_hll_global ['PGE::P6Regex'], '$optable'
+    stopstack = get_global '@!stopstack'
+    optable = get_global '$optable'
 
     stop = adverbs['stop']
     push stopstack, stop
@@ -148,17 +144,20 @@ parse valid Perl 6 regular expressions.
 
 =item C<onload()>
 
-Initializes the P6Regex parser and other data structures
+Initializes the Perl6Regex parser and other data structures
 needed for compiling regexes.
 
 =cut
 
 .include 'cclass.pasm'
 
-.namespace [ 'PGE::P6Regex' ]
+.namespace [ 'PGE::Perl6Regex' ]
 
 .sub '__onload' :load
     .local pmc optable
+
+    $P0 = subclass 'PGE::Exp::Subrule', 'PGE::Exp::WS'
+    $P0 = subclass 'PGE::Exp', 'PGE::Exp::Alias'
 
     optable = new 'PGE::OPTable'
     set_global '$optable', optable
@@ -201,7 +200,7 @@ needed for compiling regexes.
     optable.newtok('term:<![', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
     $P0 = get_global 'parse_quoted_literal'
-    optable.newtok("term:<'",  'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.newtok("term:'",  'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
     optable.newtok('term:::',  'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Cut')
     optable.newtok('term::::', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Cut')
@@ -251,16 +250,16 @@ needed for compiling regexes.
 
     # Create and store closure preprocessors in %closure_pp
     $P0 = new .Hash
-    set_hll_global ['PGE::P6Regex'], '%closure_pp', $P0
-    $P1 = get_hll_global ['PGE::P6Regex'], 'PIR_closure'
+    set_hll_global ['PGE::Perl6Regex'], '%closure_pp', $P0
+    $P1 = get_hll_global ['PGE::Perl6Regex'], 'PIR_closure'
     $P0["PIR"] = $P1
 
     # Create an array for holding stop tokens
     $P0 = new .ResizablePMCArray
-    set_hll_global ['PGE::P6Regex'], '@!stopstack', $P0
+    set_hll_global ['PGE::Perl6Regex'], '@!stopstack', $P0
 
-    $P0 = get_global 'compile_p6regex'
-    compreg 'PGE::P6Regex', $P0
+    $P0 = get_global 'compile_perl6regex'
+    compreg 'PGE::Perl6Regex', $P0
     .return ()
 .end
 
@@ -285,7 +284,7 @@ Return a failed match if the stoptoken is found.
     lastpos = length target
 
     .local string stop
-    $P0 = get_hll_global ['PGE::P6Regex'], '@!stopstack'
+    $P0 = get_hll_global ['PGE::Perl6Regex'], '@!stopstack'
     stop = $P0[-1]
 
     .local string initchar
@@ -714,7 +713,7 @@ Parses a subrule token.
     inc pos
     mpos = pos
     .local pmc regex
-    regex = get_hll_global ['PGE::Grammar'], 'regex'
+    regex = get_global 'regex'
     $P1 = regex(mob, 'stop'=>'>')
     unless $P1 goto end
     $S0 = $P1
@@ -906,7 +905,7 @@ Extract an enumerated character list.
     parse_error(mob, pos, "Error parsing enumerated character class")
     goto end
   err_hyphen:
-    parse_error(mob, pos, "Unescaped '-' in charlist (use '..' or '\-')")
+    parse_error(mob, pos, "Unescaped '-' in charlist (use '..' or '\\-')")
     goto end
   err_close:
     parse_error(mob, pos, "Missing close '>' or ']>' in enumerated character class")
@@ -917,7 +916,7 @@ Extract an enumerated character list.
 
 =item C<parse_quoted_literal>
 
-Parses <'...'> literals.
+Parses '...' literals.
 
 =cut
 
@@ -927,14 +926,13 @@ Parses <'...'> literals.
     .local string target
     (mob, target, pos) = mob.newfrom(0, 'PGE::Exp::Literal')
     lastpos = length target
-    lastpos -= 2
+    lastpos -= 1
     .local string lit
     lit = ''
   literal_iter:
     if pos > lastpos goto literal_error
-    $S0 = substr target, pos, 2
-    if $S0 == "'>" goto literal_end
     $S0 = substr target, pos, 1
+    if $S0 == "'" goto literal_end
     if $S0 != "\\" goto literal_add
     inc pos
     $S0 = substr target, pos, 1
@@ -943,12 +941,12 @@ Parses <'...'> literals.
     lit .= $S0
     goto literal_iter
   literal_end:
-    pos += 2
+    inc pos
     mob.'result_object'(lit)
     mob.'to'(pos)
     .return (mob)
   literal_error:
-    parse_error(mob, pos, "No closing '> in quoted literal")
+    parse_error(mob, pos, "No closing ' in quoted literal")
     .return (mob)
 .end
 
@@ -1036,7 +1034,7 @@ Parse a modifier.
     $P0 = getattribute mob, '$.pos'
     $P0 = pos
     $P0 = new .Exception
-    $S0 = 'p6rule parse error: '
+    $S0 = 'perl6regex parse error: '
     $S0 .= message
     $S0 .= ' at offset '
     $S1 = pos
@@ -1057,7 +1055,7 @@ Parse a modifier.
 
 .namespace [ 'PGE::Exp' ]
 
-.sub 'p6exp' :method
+.sub 'perl6exp' :method
     .param pmc pad
     .return (self)
 .end
@@ -1065,7 +1063,7 @@ Parse a modifier.
 
 .namespace [ 'PGE::Exp::Literal' ]
 
-.sub 'p6exp' :method
+.sub 'perl6exp' :method
     .param pmc pad
     $I0 = pad['ignorecase']
     self['ignorecase'] = $I0
@@ -1075,7 +1073,7 @@ Parse a modifier.
 
 .namespace [ 'PGE::Exp::Concat' ]
 
-.sub 'p6exp' :method
+.sub 'perl6exp' :method
     .param pmc pad
 
     .local pmc array, exp
@@ -1088,7 +1086,7 @@ Parse a modifier.
     if i >= n goto iter_end
     exp = self[i]
     inc i
-    exp = exp.p6exp(pad)
+    exp = exp.'perl6exp'(pad)
     if null exp goto iter_loop
     self[j] = exp
     inc j
@@ -1105,7 +1103,7 @@ Parse a modifier.
 
 .namespace [ 'PGE::Exp::Quant' ]
 
-.sub 'p6exp' :method
+.sub 'perl6exp' :method
     .param pmc pad
 
     $I0 = exists self['backtrack']
@@ -1122,7 +1120,7 @@ Parse a modifier.
     pad['isarray'] = 1
     exp0 = self[0]
     exp0['isquant'] = 1
-    exp0 = exp0.p6exp(pad)
+    exp0 = exp0.'perl6exp'(pad)
     self[0] = exp0
     pad['isarray'] = isarray
     .return (self)
@@ -1131,7 +1129,7 @@ Parse a modifier.
 
 .namespace [ 'PGE::Exp::Group' ]
 
-.sub 'p6exp' :method
+.sub 'perl6exp' :method
     .param pmc pad
     .local pmc exp0
 
@@ -1145,7 +1143,7 @@ Parse a modifier.
   backtrack_done:
 
     exp0 = self[0]
-    exp0 = exp0.p6exp(pad)
+    exp0 = exp0.'perl6exp'(pad)
     self[0] = exp0
     .return (self)
 .end
@@ -1153,7 +1151,7 @@ Parse a modifier.
 
 .namespace [ 'PGE::Exp::CGroup' ]
 
-.sub 'p6exp' :method
+.sub 'perl6exp' :method
     .param pmc pad
     .local pmc exp
 
@@ -1214,7 +1212,7 @@ Parse a modifier.
     $P0 = new .Hash
     pad['lexscope'] = $P0
     exp = self[0]
-    exp = exp.'p6exp'(pad)
+    exp = exp.'perl6exp'(pad)
     self[0] = exp
     pad['lexscope'] = lexscope
     pad['isarray'] = padarray
@@ -1223,7 +1221,7 @@ Parse a modifier.
 
   unscoped:
     exp = self[0]
-    exp = exp.'p6exp'(pad)
+    exp = exp.'perl6exp'(pad)
     self[0] = exp
   end:
     .return (self)
@@ -1232,7 +1230,7 @@ Parse a modifier.
 
 .namespace [ 'PGE::Exp::Subrule' ]
 
-.sub 'p6exp' :method
+.sub 'perl6exp' :method
     .param pmc pad
 
     $I0 = self['isquant']
@@ -1273,7 +1271,7 @@ Parse a modifier.
 
 .namespace [ 'PGE::Exp::WS' ]
 
-.sub 'p6exp' :method 
+.sub 'perl6exp' :method 
     .param pmc pad
 
     $I0 = pad['sigspace']
@@ -1289,7 +1287,7 @@ Parse a modifier.
 
 .namespace [ 'PGE::Exp::Alt' ]
 
-.sub 'p6exp' :method
+.sub 'perl6exp' :method
     .param pmc pad
 
     .local pmc exp0, exp1
@@ -1300,14 +1298,14 @@ Parse a modifier.
     ##   reduce and return it.
     $I0 = defined self[1]
     if $I0 goto with_rhs
-    .return exp0.'p6exp'(pad)
+    .return exp0.'perl6exp'(pad)
   with_rhs:
 
     ##   if lhs is whitespace, then this is a prefix-alt and
     ##   we ignore it (by simply returning its rhs)
     $I0 = isa exp0, 'PGE::Exp::WS'
     if $I0 == 0 goto with_lhs
-    .return exp1.'p6exp'(pad)
+    .return exp1.'perl6exp'(pad)
   with_lhs:
 
     .local pmc lexscope, savescope, iter
@@ -1322,13 +1320,13 @@ Parse a modifier.
     goto iter_loop
   iter_end:
     $I0 = pad['subpats']
-    exp0 = exp0.p6exp(pad)
+    exp0 = exp0.'perl6exp'(pad)
     self[0] = exp0
 
     $I1 = pad['subpats']
     pad['subpats'] = $I0
     pad['lexscope'] = savescope
-    exp1 = exp1.'p6exp'(pad)
+    exp1 = exp1.'perl6exp'(pad)
     self[1] = exp1
     $I0 = pad['subpats']
     if $I0 >= $I1 goto end
@@ -1340,7 +1338,7 @@ Parse a modifier.
 
 .namespace [ 'PGE::Exp::Alias' ]
 
-.sub 'p6exp' :method
+.sub 'perl6exp' :method
     .param pmc pad
     .local string cname
     .local pmc exp0, exp1
@@ -1377,21 +1375,21 @@ Parse a modifier.
     cexp['isscope'] = 0
     cexp['iscapture'] = 1
     cexp['cname'] = cname
-    cexp = cexp.p6exp(pad)
+    cexp = cexp.'perl6exp'(pad)
     .return (cexp)
 
   make_alias:
     exp1['cname'] = cname
     exp1['iscapture'] = 1
   end:
-    exp1 = exp1.p6exp(pad)
+    exp1 = exp1.'perl6exp'(pad)
     .return (exp1)
 .end
 
 
 .namespace [ 'PGE::Exp::Modifier' ]
 
-.sub 'p6exp' :method
+.sub 'perl6exp' :method
     .param pmc pad
     .local string key
     .local string value
@@ -1412,7 +1410,7 @@ Parse a modifier.
     pad[key] = value
     .local pmc exp
     exp = self[0]
-    exp = exp.p6exp(pad)
+    exp = exp.'perl6exp'(pad)
     self[0] = exp
     pad[key] = $P0
     .return (exp)
@@ -1420,13 +1418,13 @@ Parse a modifier.
 
 .namespace [ 'PGE::Exp::Conj' ]
 
-.sub 'p6exp' :method
+.sub 'perl6exp' :method
     .param pmc pad
     $P0 = self[0]
-    $P0 = $P0.p6exp(pad)
+    $P0 = $P0.'perl6exp'(pad)
     self[0] = $P0
     $P1 = self[1]
-    $P1 = $P1.p6exp(pad)
+    $P1 = $P1.'perl6exp'(pad)
     self[1] = $P1
     .return (self)
 .end
@@ -1434,7 +1432,7 @@ Parse a modifier.
 
 .namespace [ 'PGE::Exp::Closure' ]
 
-.sub 'p6exp' :method
+.sub 'perl6exp' :method
     .param pmc pad
     .local string lang
     .local pmc closure_pp
@@ -1442,7 +1440,7 @@ Parse a modifier.
     lang = pad['lang']
     self['lang'] = lang
     # see if we need to do any pre-processing of the closure
-    closure_pp = get_hll_global ['PGE::P6Regex'], '%closure_pp'
+    closure_pp = get_hll_global ['PGE::Perl6Regex'], '%closure_pp'
     $I0 = defined closure_pp[lang]
     if $I0 == 0 goto end
     closure_fn = closure_pp[lang]
@@ -1468,7 +1466,7 @@ already present.
 =back
 =cut
 
-.namespace [ 'PGE::P6Regex' ]
+.namespace [ 'PGE::Perl6Regex' ]
 
 .sub 'PIR_closure'
     .param string code
@@ -1483,7 +1481,7 @@ already present.
 
 .namespace [ 'PGE::Exp::Cut' ]
 
-.sub 'p6exp' :method
+.sub 'perl6exp' :method
     .param pmc pad
     $S0 = self
     if $S0 == ':::' goto cut_rule
