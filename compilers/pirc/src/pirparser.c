@@ -265,23 +265,35 @@ match(parser_state *p, token expected) {
     }
     else {
         if (p->curtoken == T_EOF) { /* no characters have been read, so nothing to display */
-            syntax_error(p, 3 , "expected ", find_keyword(expected), " but got end of file");
+            syntax_error(p, 3 , "expected '", find_keyword(expected), "' but got end of file");
             exit_parser(p);     /* no use to continue when having read end of file */
         }
         else { /* 'normal' error; not end of file yet */
-            syntax_error(p, 4, "expected ", find_keyword(expected), " but got: ", find_keyword(p->curtoken));
+            syntax_error(p, 4, "expected '", find_keyword(expected), "' but got: ", find_keyword(p->curtoken));
 
-            /* Try to reduce errors; skip tokens up to ".end" and
-             * try to continue with the next subroutine, if any
+            /* XXX
+            * exiting here right away gives a much nicer error report. Suggestion for later: try to read tokens
+            * up to end of line where syntax_error() is called, at >that< point, we know what the next token should
+            * be, probably making it possible to continue without too many errors.
+            */
+            exit_parser(p);
+
+            /* Try to reduce errors; skip tokens up to the end of line and
+             * try to continue with the next line, if any
              */
+
+            /*
             do {
                 next(p);
             }
-            while (p->curtoken != T_END && p->curtoken != T_EOF);
+            while (p->curtoken != T_NEWLINE && p->curtoken != T_EOF);
+            */
 
             /* loop broke, see what happened: */
-            if (p->curtoken == T_END) next(p);
-            else exit_parser(p); /* we got T_EOF; clean up and go home */
+            /*
+            if (p->curtoken == T_NEWLINE) next(p);
+            else exit_parser(p); */ /* we got T_EOF; clean up and go home */
+
 
         }
     }
@@ -334,11 +346,9 @@ expression(parser_state *p) {
         case T_PASM_IREG: case T_IREG:
         case T_PASM_SREG: case T_SREG:
         case T_MACRO_IDENT:
-            exprtok = p->curtoken;
-
+            exprtok = p->curtoken; /* store current token type to return */
             /* emit the expression */
             emit_expr(p, get_current_token(p->lexer));
-
             next(p);
             break;
         default:
@@ -361,12 +371,11 @@ expression(parser_state *p) {
 */
 static void
 string_value(parser_state *p) {
-    /* also allow string registers */
+    /* also allow string registers, but /no/ identifiers! */
     switch (p->curtoken) {
         case T_SREG:
         case T_PASM_SREG:
         case T_STRING_CONSTANT:
-        /* case T_IDENTIFIER: string variable? */
             next(p);
             break;
         default:
@@ -797,7 +806,11 @@ assignment(parser_state *p) {
 
 =item *
 
-  return_statement -> '.return' ( arguments | target ['->' method] arguments | methodcall ) '\n'
+  return_statement -> '.return' ( arguments
+                                | target ['->' method] arguments
+                                | methodcall
+                                )
+                                '\n'
 
 =cut
 
@@ -887,7 +900,9 @@ open_ns(parser_state *p) {
 
 =item *
 
-  local_id_list -> IDENTIFIER [':unique_reg'] { ',' IDENTIFIER [':unique_reg'] }
+  local_id_list -> local_id { ',' local_id }
+
+  local_id  -> IDENTIFIER [':unique_reg']
 
 =cut
 
@@ -897,7 +912,10 @@ local_id_list(parser_state *p) {
     emit_expr(p, get_current_token(p->lexer));
     match(p, T_IDENTIFIER);
 
-    if (p->curtoken == T_UNIQUE_REG_FLAG) next(p);
+    /* process the flag, if any */
+    if (p->curtoken == T_UNIQUE_REG_FLAG) {
+        next(p);
+    }
 
     while (p->curtoken == T_COMMA) {
         next(p); /* skip comma */
@@ -995,7 +1013,7 @@ lex_declaration(parser_state *p) {
 
   conditional_expression -> expression [cond_op expression]
 
-  cond_op                -> '>' | '>=' | '<' | '<=' | '==' | '!='
+  cond_op -> '>' | '>=' | '<' | '<=' | '==' | '!='
 
 =cut
 
@@ -1240,9 +1258,36 @@ param_flags(parser_state *p) {
 
 =item *
 
+  invokable -> IDENTIFIER | PREG
+
+=cut
+
+*/
+static void
+invocant(parser_state *p) {
+    switch (p->curtoken) {
+        case T_IDENTIFIER:
+        case T_PREG:
+        case T_PASM_PREG:
+            emit_invokable(p, get_current_token(p->lexer));
+            next(p);
+            break;
+        default:
+            syntax_error(p, 1, "invokable object expected");
+            break;
+    }
+}
+
+/*
+
+=item *
+
   long-invocation -> '.pcc_begin' '\n'
                      { '.arg' expression arg_flags }
-                     ('.pcc_call'|'.nci_call'|'.meth_call')
+                     ( '.pcc_call'|'.nci_call') invocant '\n'
+                     | '.invocant' invocant '\n'
+                       '.meth_call' method '\n'
+                     )
                      { (local_declaration| '.result' target '\n') }
                      '.pcc_end' '\n'
 
@@ -1255,12 +1300,12 @@ long_invocation(parser_state *p) {
 
     emit_invocation_start(p);
 
-    match(p, T_PCC_BEGIN);  /* '.pcc_begin '\n' ... */
+    match(p, T_PCC_BEGIN);               /* '.pcc_begin '\n' */
     match(p, T_NEWLINE);
 
     /* arguments */
     emit_args_start(p);
-    while (p->curtoken == T_ARG) { /* ... { '.arg' expr [flag] '\n' } ... */
+    while (p->curtoken == T_ARG) {      /* { '.arg' expr [flag] '\n' } */
         next(p);
         expression(p);
         arg_flags(p);
@@ -1270,18 +1315,18 @@ long_invocation(parser_state *p) {
 
     /* the invocant and/or sub to be called */
     switch (p->curtoken) {
-        case T_PCC_CALL: /* ... '.pcc_call' target '\n' ... */
-        case T_NCI_CALL: /* ... '.nci_call' target '\n' ... */
+        case T_PCC_CALL:                /* '.pcc_call' invocant '\n' */
+        case T_NCI_CALL:                /* '.nci_call' invocant '\n' */
             next(p);
-            target(p);
+            invocant(p);
             match(p, T_NEWLINE);
             break;
-        case T_INVOCANT: /* '.invocant' target '\n' */
+        case T_INVOCANT:                /* '.invocant' invocant '\n' */
             next(p);
-            target(p);
+            invocant(p);
             match(p, T_NEWLINE);
-            match(p, T_METH_CALL); /* .meth_call target '\n' */
-            target(p);
+            match(p, T_METH_CALL);      /* .meth_call method '\n' */
+            method(p);
             match(p, T_NEWLINE);
             break;
         default:
@@ -1468,7 +1513,7 @@ target_list(parser_state *p) {
 
 =item *
 
-  multi-result-invocation -> target_list '=' (invokable arguments | methodcall)) '\n'
+  multi-result-invocation -> target_list '=' (invokable arguments | methodcall) '\n'
 
   invokable -> IDENTIFIER | PREG | STRINGC
 
@@ -1851,13 +1896,13 @@ sub_flags(parser_state *p) {
                 break;
             case T_OUTER_FLAG:
             case T_VTABLE_FLAG: {
-                emit_sub_flag(p, p->curtoken);
+                emit_sub_flag(p, p->curtoken); /* emit current flag */
                 next(p);
-                emit_list_start(p);
+                emit_list_start(p); /* start a list of flag arguments -- needed? only 1 arg.. */
                 match(p, T_LPAREN);
                 emit_expr(p, get_current_token(p->lexer));
                 match(p, T_STRING_CONSTANT);
-                emit_list_end(p);
+                emit_list_end(p); /* close list of arguments -- needed? */
                 match(p, T_RPAREN);
                 break;
             }
