@@ -255,7 +255,105 @@ new class next time they access the old class?)
 
 Class PMCs also have the "I am a class" flag set on them.
 
-=head3 Methods
+=head2 Class Vtable Entries
+
+To make this work all Classes need the following vtable entries.
+
+=over 4
+
+=item new()
+
+Instantiate a new object from the class.
+
+=item clone()
+
+Create an (anonymous) clone of the class. Unset the instantiated flag on the
+new class.
+
+=item add_method(string *, method *)
+
+Add a method to the class.
+
+=item add_attribute(string *, key *)
+
+Add an attribute to the class.
+
+=item add_parent(class *)
+
+Add a parent to the class.
+
+=item add_role(role *)
+
+Add a role to the class.
+
+=item find_method(string *)
+
+Returns the PMC for the named method. If no method of this name exists, nor can
+be constructed, returns a Null PMC.
+
+Note that for languages which support default fallback methods, such as Perl
+5's AUTOLOAD, this would be the place to return it if a normal lookup fails.
+
+Since the method list and vtable method list are stored in the class
+PMC, method finding is a lookup on the class object and not a lookup in
+the namespace. (This could be handled automatically whenever a class is
+associated with a namespace.) Just adding a sub to a namespace will not
+automatically make it a method of the class, you have to call add_method
+too.
+
+=item isa(class *)
+
+Returns true or false if the class passed in as a parameter is in the
+inheritance hierarchy of the object. {{This should also support type
+names and namespace names as a parameter, not just class objects.}}
+
+=item can(string *)
+
+Returns true or false if the class can perform the requested method.
+(Including with an AUTOLOAD)
+
+=item does(class *)
+
+Returns true or false to note whether the class in question implements the
+interface passed in.
+
+=item inspect()
+
+Return a data structure of all information relevant to introspection on
+the class.
+
+=item inspect_str(string *)
+
+Return a PMC Hash, Array, String, Integer, or Number value with
+introspection information corresponding to the requested string name.
+This may be overridden to report information about the internals of a
+class that aren't actually true (useful for mocking). It can also be
+used for straight introspection capabilities even when a particular
+class is using keyed access to act like a hash or array or attribute
+access to act as an object.
+
+=item remove_attribute(string *)
+
+Remove an attribute from the class.
+
+=item remove_parent(string *)
+
+Remove a parent from the class.
+
+=item remove_role(string *)
+
+Remove a role from the class.
+
+=back
+
+Currently Parrot only supports mutating a class' metainformation for
+Class classes. This is a restriction which will be lifted at some point
+soon.
+
+=head3 Class Methods
+
+These methods are just syntactic sugar for the vtable methods. They are
+not included in the Class PMC by default, but added to Class as a role.
 
 =over 4
 
@@ -322,7 +420,7 @@ the class from roles.
 
 =item add_parent
 
-  $P1.add_parent($S2, $P3)
+  $P1.add_parent($P3)
 
 Adds a single parent to the class. It takes an instance of the Class PMC.
 
@@ -469,6 +567,65 @@ In a static language like C#.Net:
   o1.foo(); # calls B's method
   o2.foo(); # calls B's method
 
+=head3 Object Vtable Entries
+
+All Objects need the following vtable entries.
+
+=over 4
+
+=item find_method(string *)
+
+Returns the PMC for the named method. If no method of this name exists,
+nor can be constructed, returns a Null PMC. This only passes the method
+search on to the object's class.
+
+=item isa(class *)
+
+Returns true or false if the class passed in as a parameter is in the
+inheritance hierarchy of the object.
+
+=item can(string *)
+
+Returns true or false if the object can perform the requested method.
+(Including with an AUTOLOAD)
+
+=item does(class *)
+
+Returns true or false to note whether the object in question implements the
+interface passed in.
+
+=item get_attr(STRING*)
+
+Returns the attribute with the fully qualified name for the object.
+
+=item set_attr(STRING*, PMC *)
+
+Set the attribute with the fully qualified name for the object.
+
+=item get_class
+
+Returns the class PMC for the object.
+
+=item clone
+
+Create a clone of the object.
+
+=item inspect()
+
+Return a data structure of all information relevant to introspection on
+the object.
+
+=item inspect_str(string *)
+
+Return a PMC Hash, Array, String, Integer, or Number value of
+introspection information corresponding to the requested string name
+(such as 'parents'). This may be overridden to report information about
+the internals of an object that aren't actually true (useful for
+mocking). It can also be used for straight introspection capabilities
+even when a particular object is using keyed access (to act like a hash
+or array) or attribute access.
+
+=back
 
 =head2 Role PMC API
 
@@ -501,7 +658,68 @@ role they're associated with.
 
 =back
 
+=head2 Role Vtable Entries
+
+All Roles need the following vtable entries.
+
+=over 4
+
+=item add_method(string *, method *)
+
+Add a method to the role.
+
+=item add_attribute(string *, key *)
+
+Add an attribute to the role.
+
+=item add_role(role *)
+
+Add a role to the role.
+
+=item find_method(string *)
+
+Returns the PMC for the named method. If no method of this name exists,
+nor can be constructed, returns a Null PMC.
+
+=item can(string *)
+
+Returns true or false if the role can perform the requested method.
+(Including with an AUTOLOAD)
+
+=item does(class *)
+
+Returns true or false to note whether the role in question implements the
+interface passed in.
+
+=item clone
+
+Create an (anonymous) clone of the role.
+
+=item inspect()
+
+Return a data structure of all information relevant to introspection on
+the role.
+
+=item inspect_str(string *)
+
+Return a PMC Hash, Array, String, Integer, or Number value of
+introspection information corresponding to the requested string name
+(such as 'parents').
+
+=item remove_attribute(string *)
+
+Remove an attribute from the role.
+
+=item remove_role(string *)
+
+Remove a role from the role.
+
+=back
+
 =head3 Methods
+
+These methods are just syntactic sugar for the vtable methods. They are
+not included in the Role PMC by default, but added to Role as a role.
 
 =over 4
 
@@ -732,66 +950,6 @@ Add role $P2 to the end of the list of roles of class or role $P1. Adds
 any methods and attributes of $P2 that aren't already in $P1.
 
 =back
-
-=head2 Vtables
-
-To make this work all Classes need the following vtable entries. They
-may, for non-objects, throw an exception.
-
-=over 4
-
-=item find_method(string *)
-
-Returns the PMC for the named method. If no method of this name exists, nor can
-be constructed, returns a Null PMC.
-
-Note that for languages which support default fallback methods, such as Perl
-5's AUTOLOAD, this would be the place to return it if a normal lookup fails.
-
-Since the method list and vtable method list are stored in the class
-PMC, method finding is a lookup on the class object and not a lookups in
-the namespace. (This could be handled automatically whenever a class is
-associated with a namespace.) Just adding a sub to a namespace will not
-automatically make it a method of the class, you have to call add_method
-too.
-
-=item isa(class *)
-
-Returns true or false if the class passed in as a parameter is in the
-inheritance hierarchy of the object.
-
-=item can(string *)
-
-Returns true or false if the object can perform the requested method.
-(Including with an AUTOLOAD)
-
-=item does(class *)
-
-Returns true or false to note whether the object in question implements the
-interface passed in.
-
-=item get_attr(STRING*)
-
-Returns the attribute with the fully qualified name for the object.
-
-=item set_attr(STRING*, PMC *)
-
-Set the attribute with the fully qualified name for the object.
-
-=item get_class
-
-Returns the class PMC for the object.
-
-=item clone
-
-Create an (anonymous) clone of the class. Unset the instantiated flag on the
-new class.
-
-=back
-
-Currently Parrot only supports mutating a class' metainformation for
-Class classes. This is a restriction which will be lifted at some point
-soon.
 
 =head2 Vtable Overloading
 
