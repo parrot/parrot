@@ -415,7 +415,7 @@ sub proto {
     return $ret;
 }
 
-=item C<rewrite_nci_method($class, $method, $super, $super_table)>
+=item C<rewrite_nci_method($self, $class, $method, $super, $super_table)>
 
 Rewrites the method body performing the various macro substitutions for
 nci method bodies (see F<tools/build/pmc2c.pl>).
@@ -423,9 +423,9 @@ nci method bodies (see F<tools/build/pmc2c.pl>).
 =cut
 
 sub rewrite_nci_method {
-    my ( $class, $method ) = @_;
+    my ( $self, $class, $method ) = @_;
 
-    local $_ = $_[2];
+    local $_ = $_[3];
 
     # Rewrite SELF -> pmc, INTERP -> interp
     s/\bSELF\b/pmc/g;
@@ -434,7 +434,7 @@ sub rewrite_nci_method {
     return $_;
 }
 
-=item C<rewrite_vtable_method($class, $method, $super, $super_table)>
+=item C<rewrite_vtable_method($self, $class, $method, $super, $super_table)>
 
 Rewrites the method body performing the various macro substitutions for
 vtable method bodies (see F<tools/build/pmc2c.pl>).
@@ -442,8 +442,8 @@ vtable method bodies (see F<tools/build/pmc2c.pl>).
 =cut
 
 sub rewrite_vtable_method {
-    my ( $class, $method, $super, $super_table ) = @_;
-    local $_ = $_[4];
+    my ( $self, $class, $method, $super, $super_table ) = @_;
+    local $_ = $_[5];
 
     # Rewrite method body
     my $supertype = "enum_class_$super";
@@ -483,13 +483,17 @@ sub rewrite_vtable_method {
       \.\bSELF\b            # Macro SELF
       \.(\w+)           # other_method
       \(\s*(.*?)\)      # capture argument list
-     /"Parrot_${1}_$2(" . full_arguments($3) . ')'/xeg;
+     /"Parrot_${1}" . 
+      ($self->is_vtable_method($2) ? "" : "_nci") .
+      "_$2(" . full_arguments($3) . ')'/xeg;
 
     # Rewrite SELF.other_method(args...)
     s/\bSELF\b              # Macro SELF
       \.(\w+)           # other_method
       \(\s*(.*?)\)      # capture argument list
-     /"Parrot_${class}_$1(".full_arguments($2).")"/xeg;
+     /"Parrot_${class}" .
+      ($self->is_vtable_method($1) ? "" : "_nci") .
+      "_$1(" . full_arguments($2) . ")"/xeg;
 
     # Rewrite SELF -> pmc, INTERP -> interp
     s/\bSELF\b/pmc/g;
@@ -522,10 +526,10 @@ sub body {
 
     my $total_body;
     if ( $method->{loc} eq 'vtable' ) {
-        $total_body = rewrite_vtable_method( $classname, $meth, $super, $self->{super}, $body );
+        $total_body = $self->rewrite_vtable_method( $classname, $meth, $super, $self->{super}, $body );
     }
     else {
-        $total_body = rewrite_nci_method( $classname, $meth, $body );
+        $total_body = $self->rewrite_nci_method( $classname, $meth, $body );
     }
     Parrot::Pmc2c::PCCMETHOD::rewrite_pccinvoke( $method, \$total_body );
 
@@ -1174,6 +1178,14 @@ sub implements_vtable {
     return 1 if exists $self->{has_method}{$meth};
     my $n = $self->{vtable}{has_method}{$meth};
     return $self->{vtable}{methods}[$n]{mmd} =~ /MMD/ ? 0 : 1;
+}
+
+sub is_vtable_method {
+    my ( $self, $meth ) = @_;
+    foreach my $entry ( @{ $self->{vtable}{methods} } ) {
+        return 1 if $entry->{meth} eq $meth;
+    }
+    return 0;
 }
 
 =back
