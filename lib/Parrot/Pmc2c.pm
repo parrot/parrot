@@ -972,22 +972,24 @@ EOC
     foreach my $method ( @{ $self->{methods} } ) {
         next unless $method->{loc} eq 'nci';
         my $proto = proto( $method->{type}, $method->{parameters} );
+        my $symbol_name = defined $method->{symbol} ?
+            $method->{symbol} : $method->{meth};
         if ( exists $method->{pre_block} ) {
             $cout .= <<"EOC";
         register_raw_nci_method_in_ns(interp, entry,
-            F2DPTR(Parrot_${classname}_$method->{meth}), "$method->{meth}");
+            F2DPTR(Parrot_${classname}_$method->{meth}), "$symbol_name");
 EOC
         }
         else {
             $cout .= <<"EOC";
         enter_nci_method(interp, entry,
                 F2DPTR(Parrot_${classname}_$method->{meth}),
-                "$method->{meth}", "$proto");
+                "$symbol_name", "$proto");
 EOC
         }
         if ( $method->{attrs}{write} ) {
             $cout .= <<"EOC";
-        Parrot_mark_method_writes(interp, entry, "$method->{meth}");
+        Parrot_mark_method_writes(interp, entry, "$symbol_name");
 EOC
         }
     }

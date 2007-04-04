@@ -35,7 +35,7 @@ class C<type>.
 =cut
 
 */
-void Parrot_NCI_make_raw_nci(Interp *interp, PMC *method, void *func);
+void Parrot_NCI_nci_make_raw_nci(Interp *interp, PMC *method, void *func);
 
 void
 enter_nci_method(Parrot_Interp interp, const int type, void *func,
@@ -60,7 +60,7 @@ register_raw_nci_method_in_ns(Parrot_Interp interp, const int type, void *func,
 {
     PMC * const method = pmc_new(interp, enum_class_NCI);
     /* setup call func */
-    Parrot_NCI_make_raw_nci(interp, method, func);
+    Parrot_NCI_nci_make_raw_nci(interp, method, func);
     /* insert it into namespace */
     VTABLE_set_pmc_keyed_str(interp, interp->vtables[type]->_namespace,
             string_make(interp, name, strlen(name), NULL,

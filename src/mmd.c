@@ -1176,7 +1176,7 @@ distance_cmp(Interp *interp, INTVAL a, INTVAL b)
     return da > db ? 1 : da < db ? -1 : 0;
 }
 
-extern void Parrot_FixedPMCArray_sort(Interp* , PMC* pmc, PMC *cmp_func);
+extern void Parrot_FixedPMCArray_nci_sort(Interp* , PMC* pmc, PMC *cmp_func);
 
 /*
 
@@ -1359,7 +1359,7 @@ mmd_sort_candidates(Interp *interp, PMC *arg_tuple, PMC *cl)
     /*
      * sort it
      */
-    Parrot_FixedPMCArray_sort(interp, sort, nci);
+    Parrot_FixedPMCArray_nci_sort(interp, sort, nci);
     /*
      * now helper has a sorted list of indices in the upper 16 bits
      * fill helper with sorted candidates

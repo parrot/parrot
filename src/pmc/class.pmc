@@ -49,7 +49,7 @@ static STRING* get_fq_classname(Parrot_Interp interp, Parrot_Class *class_info) 
     if (!PMC_IS_NULL(class_info->namespace)) {
         /* If we have a namespace name, make a key from it's name. */
         /* XXX BAD AND WRONG! Need to call get_name method properly! */
-        PMC *fq_name = Parrot_NameSpace_get_name(interp, class_info->namespace);
+        PMC *fq_name = Parrot_NameSpace_nci_get_name(interp, class_info->namespace);
         int elements = VTABLE_elements(interp, fq_name);
         int j;
         for (j = 0; j < elements; j++) {

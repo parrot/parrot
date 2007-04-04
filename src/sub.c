@@ -270,7 +270,7 @@ Return namespace, name, and location of subroutine.
 /* XXX use method lookup - create interface
  *                         see also pbc.c
  */
-extern PMC* Parrot_NameSpace_get_name(Interp *interp, PMC* pmc);
+extern PMC* Parrot_NameSpace_nci_get_name(Interp *interp, PMC* pmc);
 
 STRING*
 Parrot_full_sub_name(Interp *interp, PMC* sub)
@@ -290,7 +290,7 @@ Parrot_full_sub_name(Interp *interp, PMC* sub)
         STRING *j;
 
         Parrot_block_DOD(interp);
-        ns_array = Parrot_NameSpace_get_name(interp, s->namespace_stash);
+        ns_array = Parrot_NameSpace_nci_get_name(interp, s->namespace_stash);
         if (s->name) {
             VTABLE_push_string(interp, ns_array, s->name);
         }
