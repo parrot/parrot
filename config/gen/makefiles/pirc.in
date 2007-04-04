@@ -43,8 +43,8 @@ SOURCES	= src/pirmain.c	\
   src/jsonout.h
 
 
-pirc: pirmain$(O) pirparser$(O)	pirlexer$(O) pirout$(O)	pastout$(O)	pirvtable$(O) jsonout$(O)
-	$(CC) -o pirc$(EXE)	pirmain$(O)	pirparser$(O) pirlexer$(O) pirout$(O) pastout$(O) pirvtable$(O) jsonout$(O)
+pirc: pirmain$(O) pirparser$(O)	pirlexer$(O) pirout$(O)	pastout$(O)	pirvtable$(O) jsonout$(O) pbcout$(O)
+	$(CC) -o pirc$(EXE)	pirmain$(O)	pirparser$(O) pirlexer$(O) pirout$(O) pastout$(O) pirvtable$(O) jsonout$(O) pbcout$(O)
 
 pirmain$(O): src/pirmain.c src/pirparser.h
 	$(CC) $(CFLAGS)	-c src/pirmain.c
@@ -60,6 +60,9 @@ pirout$(O):	src/pirout.c src/pirout.h
 
 pastout$(O): src/pastout.c src/pastout.h
 	$(CC) $(CFLAGS)	-c src/pastout.c
+
+pbcout$(O): src/pbcout.c src/pbcout.h
+	$(CC) $(CFLAGS)	-c src/pbcout.c
 
 pirvtable$(O): src/pirvtable.c src/pirvtable.h
 	$(CC) $(CFLAGS)	-c src/pirvtable.c

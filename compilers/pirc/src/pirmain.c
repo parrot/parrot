@@ -14,6 +14,7 @@ pirmain.c - Main file for PIR Compiler PIRC.
 #include "pastout.h"   /* for PAST output */
 #include "pirvtable.h" /* vtable api      */
 #include "jsonout.h"   /* for json output */
+#include "pbcout.h"    /* for PBC output  */
 
 
 
@@ -33,8 +34,8 @@ typedef enum outputtypes {
         OUTPUT_NONE,    /* do nothing  */
         OUTPUT_PIR,     /* output PIR  */
         OUTPUT_PAST,    /* output PAST */
-        OUTPUT_JSON     /* output JSON */
-/* future: OUTPUT_PBC  for outputting PBC files */
+        OUTPUT_JSON,    /* output JSON */
+        OUTPUT_PBC      /* output PBC  */
 
 } outputtype;
 
@@ -53,13 +54,15 @@ typedef enum outputtypes {
 static void
 print_help(void) {
     fprintf(stderr, "Usage: pirc [options] <file>\n");
-    fprintf(stderr, "\toptions:\n");
+    fprintf(stderr, "\tGeneral:\n");
     fprintf(stderr, "\t-d  debug messages (not implemented yet)\n");
     fprintf(stderr, "\t-h  print this help message\n");
     fprintf(stderr, "\t-v  verbose (not implemented yet)\n");
+    fprintf(stderr, "\n\tOutput:\n");
     fprintf(stderr, "\t-r  print PIR output\n");
     fprintf(stderr, "\t-p  print PAST output\n");
     fprintf(stderr, "\t-j  print JSON output\n");
+    fprintf(stderr, "\t-b  print PBC output (not implemented)\n");
     fprintf(stderr, "\n");
 }
 
@@ -110,6 +113,9 @@ main(int argc, char **argv) {
             case 'j':
                 output = OUTPUT_JSON;
                 break;
+            case 'b':
+                output = OUTPUT_PBC;
+                break;
             default:
                 fprintf(stderr, "Unknown option: '%c'\n", opt);
                 print_help();
@@ -140,6 +146,9 @@ main(int argc, char **argv) {
             break;
         case OUTPUT_JSON:
             vtable = init_json_vtable();
+            break;
+        case OUTPUT_PBC:
+            vtable = init_pbc_vtable();
             break;
         default:
             fprintf(stderr, "Unknown output type specified\n");

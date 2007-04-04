@@ -1,10 +1,20 @@
 #include "pirout.h"
+#include "pirvtable.h"
 #include "pirlexer.h"
-#include "pirparser.h"
 #include <stdio.h>
 #include <malloc.h>
+#include <malloc.h>
+#include <stdlib.h>
 
 
+/* Private declaration of emit_data.
+ *
+ *
+ */
+typedef struct emit_data {
+    int indent;
+
+} emit_data;
 
 #define OUT stderr
 
@@ -12,122 +22,86 @@
 
 =head1 API
 
-=over 4
-
-=item pirout()
-
-Prints the current token from the specified parser.
-NOT COMPLETE YET, and no fancy output as well...
-
 =cut
 
 */
-static void
-pirout(struct parser_state *p) {
-    struct lexer_state const *l = get_lexer(p);
-    token t = get_token(p);
-
-    /*fprintf(stderr, "pirout:\n");
-    */
-
-    switch (t) {
-        case T_RPAREN:            /* HACK */
-            fprintf(stderr, ")"); /* and print newline as well, nec. for macros */
-        case T_NEWLINE:
-            fprintf(stderr, "\n");
-            break;
-        case T_INTEGER_CONSTANT:
-        case T_NUMBER_CONSTANT:
-        case T_STRING_CONSTANT:
-        case T_PARROT_OP:
-        case T_IDENTIFIER:
-        case T_PASM_PREG:
-        case T_PASM_NREG:
-        case T_PASM_IREG:
-        case T_PASM_SREG:
-        case T_PREG:
-        case T_NREG:
-        case T_SREG:
-        case T_IREG:
-            fprintf(stderr, " %s ", get_current_token(l));
-            break;
-        default:
-            fprintf(stderr, "%s ", find_keyword(t));
-            break;
-    }
-
-}
 
 static void
-pir_name(struct parser_state *p, char *name) {
+pir_name(struct emit_data *data, char *name) {
     fprintf(OUT, " %s ", name);
 }
 
 static void
-pir_sub(struct parser_state *p, char *source, int pos) {
+pir_sub(struct emit_data *data, char *source, int pos) {
     fprintf(OUT, "#character position %d\n", pos);
     fprintf(OUT, ".sub");
 }
 
 static void
-pir_end(struct parser_state *p) {
+pir_end(struct emit_data *data) {
     fprintf(OUT, ".end\n");
 }
 
 static void
-pir_newline(struct parser_state *p) {
+pir_newline(struct emit_data *data) {
     fprintf(OUT, "\n");
 }
 
 static void
-pir_param(struct parser_state *p) {
+pir_param(struct emit_data *data) {
     fprintf(OUT, "  .param ");
 }
 
 static void
-pir_type(struct parser_state *p, char *type) {
+pir_type(struct emit_data *data, char *type) {
     fprintf(OUT, "%s", type);
 }
 
 static void
-pir_sub_flag(struct parser_state *p, int flag) {
+pir_sub_flag(struct emit_data *data, int flag) {
     fprintf(OUT, "%s ", find_keyword(flag));
 }
 
 static void
-pir_expr(struct parser_state *p, char *expr) {
+pir_expr(struct emit_data *data, char *expr) {
     fprintf(OUT, "%s ", expr);
 }
 
 static void
-pir_op(struct parser_state *p, char *op) {
+pir_op(struct emit_data *data, char *op) {
     fprintf(OUT, "  %s ", op);
 }
 
 static void
-pir_comma(struct parser_state *p) {
+pir_comma(struct emit_data *data) {
     fprintf(OUT, ", ");
 }
 
 static void
-pir_list_start(struct parser_state *p) {
+pir_list_start(struct emit_data *data) {
     fprintf(OUT, "(");
 }
 
 static void
-pir_list_end(struct parser_state *p) {
+pir_list_end(struct emit_data *data) {
     fprintf(OUT, ")");
 }
 
 static void
-pir_sub_flag_start(struct parser_state *p) {
+pir_sub_flag_start(struct emit_data *data) {
     fprintf(OUT, "");
 }
 
 
 static void
-pir_sub_flag_end(struct parser_state *p) {
+pir_sub_flag_end(struct emit_data *data) {
     fprintf(OUT, "\n");
+}
+
+static void
+pir_destroy(emit_data *data) {
+    free(data);
+    data = NULL;
 }
 
 /*
@@ -140,11 +114,12 @@ then this vtable is set into the parser_state struct.
 =cut
 
 */
-pirvtable *
+struct pirvtable *
 init_pir_vtable(void) {
     pirvtable *vtable = new_pirvtable();
 
     /* override the methods that are needed for PIR output */
+    vtable->destroy        = pir_destroy;
     vtable->sub_start      = pir_sub;
     vtable->sub_end        = pir_end;
     vtable->name           = pir_name;
@@ -162,7 +137,11 @@ init_pir_vtable(void) {
     vtable->sub_flag_start = pir_sub_flag_start;
     vtable->sub_flag_end   = pir_sub_flag_end;
 
-
+    vtable->data = (emit_data *)malloc(sizeof(emit_data));
+    if (vtable->data == NULL) {
+        fprintf(stderr, "Failed to allocate memory for vtable data\n");
+        exit(1);
+    }
     return vtable;
 }
 

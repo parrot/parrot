@@ -13,19 +13,29 @@ Initial.
 */
 
 #include "pastout.h"
-#include "pirparser.h"
+#include "pirvtable.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <malloc.h>
 
 /* keep outputfile possibility easy */
 #define OUT         stderr
 #define INDENT      4
 
-/* this is not threadsafe, fix this later */
-static int indent = 0;
 
-/* for easy indenting/dedenting */
-#define indent()    indent += INDENT
-#define dedent()    indent -= INDENT
+#define indent(D)    D->indent += INDENT
+#define dedent(D)    D->indent -= INDENT
+
+
+/* Private declaration of emit_data.
+ *
+ *
+ */
+typedef struct emit_data {
+    int indent;
+
+} emit_data;
+
 
 /*
 
@@ -41,9 +51,9 @@ Prints initializing PAST: ["past" => PMC 'PAST::Block' {]
 
 */
 static void
-past_init(struct parser_state *p) {
+past_init(struct emit_data *data) {
     fprintf(OUT, "\"past\" => PMC 'PAST::Block'  {\n");
-    indent();
+    indent(data);
 }
 
 /*
@@ -56,11 +66,11 @@ Prints PAST for a block, including <source> and <pos> attributes.
 
 */
 static void
-past_block(struct parser_state *p, char *source, int pos) {
-    fprintf(OUT, "%*sPMC 'PAST::Block'  {\n", indent, " ");
-    indent();
-    fprintf(OUT, "%*s<source> => \"%s\"\n", indent, " ", source);
-    fprintf(OUT, "%*s<pos> => %d\n", indent, " ", pos);
+past_block(struct emit_data *data, char *source, int pos) {
+    fprintf(OUT, "%*sPMC 'PAST::Block'  {\n", data->indent, " ");
+    indent(data);
+    fprintf(OUT, "%*s<source> => \"%s\"\n", data->indent, " ", source);
+    fprintf(OUT, "%*s<pos> => %d\n", data->indent, " ", pos);
 }
 
 /*
@@ -74,12 +84,12 @@ indention level is decremented.
 
 */
 static void
-past_close(struct parser_state *p) {
-    dedent();
+past_close(struct emit_data *data) {
+    dedent(data);
     /* check for indent == 0, if so, then print no space, this is
      * so otherwise a single space is printed.
      */
-    fprintf(OUT, "%*s}\n", indent, (indent == 0) ? "" : " ");
+    fprintf(OUT, "%*s}\n", data->indent, (data->indent == 0) ? "" : " ");
 
 }
 
@@ -93,8 +103,8 @@ Prints a PAST <name> entry.
 
 */
 static void
-past_name(struct parser_state *p, char *name) {
-    fprintf(OUT, "%*s<name> => \"%s\"\n", indent, " ", name);
+past_name(struct emit_data *data, char *name) {
+    fprintf(OUT, "%*s<name> => \"%s\"\n", data->indent, " ", name);
 }
 
 /*
@@ -107,50 +117,54 @@ Opens a PAST::Stmts node.
 
 */
 static void
-past_stmts(struct parser_state *p) {
-    fprintf(OUT, "%*s[%d] => PMC 'PAST::Stmts'  {\n", indent, " ", 0); /* fix array index */
-    indent();
+past_stmts(struct emit_data *data) {
+    fprintf(OUT, "%*s[%d] => PMC 'PAST::Stmts'  {\n", data->indent, " ", 0); /* fix array index */
+    indent(data);
 }
 
 
 static void
-past_param(struct parser_state *p) {
-    fprintf(OUT, "%*sFIXTHIS => PMC 'PAST::Var'  {\n", indent, " ");
-    indent();
-    fprintf(OUT, "%*s<scope> => \"parameter\"\n", indent, " ");
+past_param(struct emit_data *data) {
+    fprintf(OUT, "%*sFIXTHIS => PMC 'PAST::Var'  {\n", data->indent, " ");
+    indent(data);
+    fprintf(OUT, "%*s<scope> => \"parameter\"\n", data->indent, " ");
 }
 
 static void
-past_type(struct parser_state *p, char *type) {
-    fprintf(OUT, "%*s<type> => \"%s\"\n", indent, " ", type);
+past_type(struct emit_data *data, char *type) {
+    fprintf(OUT, "%*s<type> => \"%s\"\n", data->indent, " ", type);
 }
 
 static void
-past_subflag(struct parser_state *p, int flag) {
-    /* fprintf(OUT, "%*s<???> => \"%s\"\n", indent, " ", type);
+past_subflag(struct emit_data *data, int flag) {
+    /* fprintf(OUT, "%*s<???> => \"%s\"\n", data->indent, " ", type);
     */
 }
 
 
 static void
-past_op(struct parser_state *p, char *op) {
-    fprintf(OUT, "%*sFIXME => PMC 'PAST::Op'  {\n", indent, " ");
-    indent();
-    fprintf(OUT, "%*s<pirop> => \"%s\"\n", indent, " ", op);
+past_op(struct emit_data *data, char *op) {
+    fprintf(OUT, "%*sFIXME => PMC 'PAST::Op'  {\n", data->indent, " ");
+    indent(data);
+    fprintf(OUT, "%*s<pirop> => \"%s\"\n", data->indent, " ", op);
 
 }
 
 static void
-past_expr(struct parser_state *p, char *expr) {
-    fprintf(OUT, "%*s[%d] => \"%s\"\n", indent, " ", 0, expr); /* fix index */
+past_expr(struct emit_data *data, char *expr) {
+    fprintf(OUT, "%*s[%d] => \"%s\"\n", data->indent, " ", 0, expr); /* fix index */
 }
 
 static void
-past_next(struct parser_state *p) {
+past_next(struct emit_data *data) {
     /* increment index */
 }
 
-
+static void
+past_destroy(emit_data *data) {
+    free(data);
+    data = NULL;
+}
 /*
 
 =item init_past_vtable()
@@ -167,6 +181,7 @@ init_past_vtable(void) {
 
     /* override vtable methods */
     vtable->initialize   = past_init;
+    vtable->destroy      = past_destroy;
     vtable->sub_start    = past_block;
     vtable->sub_end      = past_close;
     vtable->name         = past_name;
@@ -181,6 +196,13 @@ init_past_vtable(void) {
     vtable->expression   = past_expr;
     vtable->op_end       = past_close;
     vtable->next_expr    = past_next;
+
+    vtable->data = (emit_data *)malloc(sizeof(emit_data));
+    if (vtable->data == NULL) {
+        fprintf(stderr, "Failed to allocate memory for vtable data\n");
+        exit(1);
+    }
+    vtable->data->indent = 0;
 
     return vtable;
 }

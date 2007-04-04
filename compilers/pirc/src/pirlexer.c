@@ -893,9 +893,12 @@ destroy_lexer(lexer_state *lexer) {
         file_buffer *tmp = buf; /* store current */
         buf = tmp->prevbuffer; /* get 'prevbuffer' */
         destroy_buffer(tmp);   /* destroy current */
+        tmp = NULL;
     }
     free(lexer->token_chars);
+    lexer->token_chars = NULL;
     free(lexer);
+    lexer = NULL;
 }
 
 

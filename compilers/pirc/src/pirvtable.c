@@ -15,7 +15,6 @@ implement all vtable methods for correct behaviour.
 
 */
 #include "pirvtable.h"
-#include "pirparser.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -39,7 +38,7 @@ many args a method has.
 
 */
 static void
-not_implemented(struct parser_state *p, ...) {
+not_implemented(struct emit_data *data, ...) {
     /* do nothing */
 }
 
@@ -71,6 +70,7 @@ new_pirvtable(void) {
      * only needs to override the entries that are interesting for that module.
      */
     vtable->initialize     = not_implemented;
+    vtable->destroy        = not_implemented; /* destructor; highly recommended to implement! */
     vtable->name           = not_implemented;
     vtable->sub_start      = not_implemented;
     vtable->sub_end        = not_implemented;
@@ -90,7 +90,31 @@ new_pirvtable(void) {
     vtable->sub_flag_start = not_implemented;
     vtable->sub_flag_end   = not_implemented;
 
+    /* set data to NULL, it's initialized in the backend module */
+    vtable->data           = NULL;
+
     return vtable;
+}
+
+/*
+
+=item destroy_pirvtable()
+
+Destructor for the pirvtable. It first calls the custome destructor
+of the emit_data structure, which is private to each of the back-ends
+(so we don't know what memory is allocated for that, only the back-ends
+know).
+
+=cut
+
+*/
+void
+destroy_pirvtable(pirvtable *vtable) {
+    /* call custom destructor of the backend */
+    (*vtable->destroy)(vtable->data);
+    /* free the vtable memory */
+    free(vtable);
+    vtable = NULL;
 }
 
 /*

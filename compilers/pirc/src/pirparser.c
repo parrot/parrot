@@ -118,8 +118,8 @@ Clean up and exit the program normally.
 */
 void
 exit_parser(parser_state *p) {
-    destroy_lexer(p->lexer);
-    p->lexer = NULL;
+    emit_destroy(p); /* call destructor for emit_data */
+    destroy_lexer(p->lexer); /* destroy the lexer */
     free(p);
     p = NULL;
     exit(0);
@@ -1098,19 +1098,28 @@ static void
 const_definition(parser_state *p) {
     switch (p->curtoken) {
         case T_INT:
+            emit_type(p, "int");
             next(p);
             match(p, T_IDENTIFIER);
             match(p, T_ASSIGN);
             match(p, T_INTEGER_CONSTANT);
             break;
         case T_NUM:
+            emit_type(p, "num");
             next(p);
             match(p, T_IDENTIFIER);
             match(p, T_ASSIGN);
             match(p, T_NUMBER_CONSTANT);
             break;
-        case T_STRING: /* both string and PMC have strings as constants */
-        case T_PMC:
+        case T_STRING:
+            emit_type(p, "string");
+            next(p);
+            match(p, T_IDENTIFIER);
+            match(p, T_ASSIGN);
+            match(p, T_STRING_CONSTANT);
+            break;
+        case T_PMC: /* both string and PMC have strings as constants */
+            emit_type(p, "pmc");
             next(p);
             match(p, T_IDENTIFIER);
             match(p, T_ASSIGN);
@@ -1172,6 +1181,7 @@ arg_flags(parser_state *p) {
 static void
 param_flags(parser_state *p) {
     int ok = 1;
+    emit_list_start(p);
     while (ok) {
         /* if the current token is a flag, parse it */
         switch (p->curtoken) {
@@ -1202,6 +1212,7 @@ param_flags(parser_state *p) {
                 break;
         }
     }
+    emit_list_end(p);
 }
 
 /*
@@ -1575,6 +1586,9 @@ global_assignment(parser_state *p) {
 static void
 instructions(parser_state *p) {
     int ok = 1;
+
+    emit_stmts_start(p); /* open stmts block */
+
     while (ok) {
 
         /* instruction -> {LABEL:} instr */
@@ -1646,7 +1660,7 @@ instructions(parser_state *p) {
             case T_PCC_BEGIN_YIELD:
                 long_yield_statement(p);
                 break;
-            case T_LPAREN: /* '(' target_list ')' '=' subcall */
+            case T_LPAREN: /* target_list '=' subcall */
                 multi_result_invocation(p);
                 break;
             case T_PARROT_OP: /* parrot instructions */
@@ -1670,6 +1684,7 @@ instructions(parser_state *p) {
                 break;
         }
     }
+    emit_stmts_end(p);  /* close stmts block */
 }
 
 
@@ -1911,9 +1926,7 @@ sub_definition(parser_state *p) {
     sub_flags(p);
     match(p, T_NEWLINE);
     parameters(p);
-    emit_stmts_start(p); /* open stmts block */
     instructions(p);
-    emit_stmts_end(p);  /* close stmts block */
     match(p, T_END);
 
     /* call emit method to close sub*/
