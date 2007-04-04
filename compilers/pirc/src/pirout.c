@@ -106,6 +106,8 @@ pir_destroy(emit_data *data) {
 
 /*
 
+=over 4
+
 =item init_pir_vtable()
 
 Creates a vtable for the PIR emitting module, and
