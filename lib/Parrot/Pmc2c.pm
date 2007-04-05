@@ -357,12 +357,13 @@ Prepends C<INTERP, SELF> to C<$args>.
 
 sub full_arguments {
     my $args = shift;
+    my $obj = shift || 'SELF';
 
     if ( $args =~ m/\S/ ) {
-        return "INTERP, SELF, $args";
+        return "INTERP, $obj, $args";
     }
     else {
-        return "INTERP, SELF";
+        return "INTERP, $obj";
     }
 }
 
@@ -427,6 +428,14 @@ sub rewrite_nci_method {
 
     local $_ = $_[3];
 
+    # Rewrite SELF.other_method(args...)
+    s/\bSELF\b              # Macro SELF
+      \.(\w+)           # other_method
+      \(\s*(.*?)\)      # capture argument list
+     /"Parrot_${class}" .
+      ($self->is_vtable_method($1) ? "" : "_nci") .
+      "_$1(" . full_arguments($2) . ")"/xeg;
+
     # Rewrite SELF -> pmc, INTERP -> interp
     s/\bSELF\b/pmc/g;
     s/\bINTERP\b/interp/g;
@@ -483,9 +492,18 @@ sub rewrite_vtable_method {
       \.\bSELF\b            # Macro SELF
       \.(\w+)           # other_method
       \(\s*(.*?)\)      # capture argument list
-     /"Parrot_${1}" . 
+     /"Parrot_${1}" .
       ($self->is_vtable_method($2) ? "" : "_nci") .
       "_$2(" . full_arguments($3) . ')'/xeg;
+
+    # Rewrite OtherClass.object.other_method(args...)
+    s/(\w+)             # OtherClass
+      \.\b(\w+)\b       # any object
+      \.(\w+)           # other_method
+      \(\s*(.*?)\)      # capture argument list
+     /"Parrot_${1}" .
+      ($self->is_vtable_method($3) ? "" : "_nci") .
+      "_$3(" . full_arguments($4, $2) . ')'/xeg;
 
     # Rewrite SELF.other_method(args...)
     s/\bSELF\b              # Macro SELF
