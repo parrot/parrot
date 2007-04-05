@@ -9,9 +9,6 @@ pirparser.c - parser for Parrot Intermediate Representation
 =over 4
 
 =item *
-Remove limit of 10 heredoc arguments
-
-=item *
 
 Add error correcting stuff, so parsing can continue after simple errors.
 
@@ -19,12 +16,12 @@ Add error correcting stuff, so parsing can continue after simple errors.
 
 Maybe use #define's to implement small functions. Effectively, these routines
 will be inlined in compilation_unit() or instruction(), but when using #define's
-it's still kinda code that looks good.
+it's still code that looks good.
 
 =item *
 
-Skip first token of statements if it's sure that the token has already been checked by the caller. No need
-to match 'goto' again, if it was already checked in compilation_unit().
+Skip first token of statements if it's sure that the token has already been checked by the caller.
+For instance, no need to match 'goto' again, if it was already checked in compilation_unit().
 
 =item *
 
@@ -33,17 +30,24 @@ Maybe use compilers/bcg for back-end, if that would fit well.
 =item *
 
 Clean up grammar after discussion.
- - For instance, why have :postcomp and :immediate, having same meaning?, and
- - why ".sub" and ".pcc_sub"?
- - why "object" as type? Why custom names as type, such as '.local Array x' --
-   this is not needed, and makes the code look more like a HLL. Just stick
-   to 'pmc', which works fine.
- - why allow an optional comma between sub pragmas? param pragmas don't have that
-   so remove this opt. comma as well for consistency.
- - unify '.sym' and '.local'. Just allow one, and think of something else for
-   local labels in macros.
- - Decide on dot-prefix: either .Integer or Integer, but not both.
-   same for strings: .Integer, Integer or "Integer"?
+
+=over 4
+
+=item + For instance, why have :postcomp and :immediate, having same meaning?, and why ".sub" and ".pcc_sub"?
+
+=item + why "object" as type? Why custom names as type, such as '.local Array x' --
+        this is not needed, and makes the code look more like a HLL. Just stick to 'pmc', which works fine.
+
+=item + why allow an optional comma between sub pragmas? param pragmas don't have that
+        so remove this opt. comma as well for consistency.
+
+=item + unify '.sym' and '.local'. Just allow one, and think of something else for local labels in macros.
+
+=item + Decide on dot-prefix: either .Integer or Integer, but not both.
+
+=item + same for strings: .Integer, Integer or "Integer"?
+
+=back
 
 =back
 
@@ -54,10 +58,7 @@ Clean up grammar after discussion.
 
 #include "pirlexer.h"
 #include "pirparser.h"
-
-/* output stuff */
 #include "pirvtable.h" /* vtable definition */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -86,7 +87,8 @@ The parser_state structure has the following fields:
 typedef struct parser_state {
     struct     lexer_state *lexer;
     token      curtoken;
-    char      *heredoc_ids[10];
+    char     **heredoc_ids;
+    size_t     heredoc_ids_size;
     unsigned   heredoc_index;
     unsigned   parse_errors;
     pirvtable *vtable;
@@ -95,8 +97,9 @@ typedef struct parser_state {
 
 
 /* quit after 10 errors to prevent too many errors */
-#define MAX_ERRORS  10
+#define MAX_ERRORS          10
 
+#define MAX_HEREDOC_ARGS    10
 
 /* call next() to get the next token from the lexer */
 #define next(P) P->curtoken = next_token(P->lexer)
@@ -120,6 +123,8 @@ void
 exit_parser(parser_state *p) {
     emit_destroy(p); /* call destructor for emit_data */
     destroy_lexer(p->lexer); /* destroy the lexer */
+    free(p->heredoc_ids);
+    p->heredoc_ids = NULL;
     free(p);
     p = NULL;
     exit(0);
@@ -168,6 +173,9 @@ new_parser(char const * filename, pirvtable *vtable) {
     p->heredoc_index = 0;
     p->vtable        = vtable;
 
+    /* allocate array to store heredoc arguments */
+    p->heredoc_ids      = (char **)calloc(MAX_HEREDOC_ARGS, sizeof(char *));
+    p->heredoc_ids_size = MAX_HEREDOC_ARGS;
     return p;
 }
 
@@ -206,6 +214,35 @@ token get_token(parser_state *p) {
 =head1 HELPER FUNCTIONS
 
 =over 4
+
+=item * static void resize_heredoc_args()
+
+Reallocate memory for the array holding heredoc arguments. If needed, the array is resized
+to twice its previous size. So, initially it's MAX_HEREDOC_ARGS, after the first resize(),
+it's 2 times MAX_HEREDOC_ARGS, after the second time it's 2 * 2 * MAX_HEREDOC_ARGS, etc.
+
+=cut
+
+*/
+static void
+resize_heredoc_args(parser_state *p) {
+    /* allocate a new buffer*/
+    char **newbuffer = (char **)calloc(p->heredoc_ids_size << 1, sizeof(char **));
+    if (newbuffer == NULL) {
+        fprintf(stderr, "Failed to reallocate memory for heredoc arguments\n");
+    }
+    else {
+        unsigned i; /* copy all contents of old array into new array */
+        for (i = 0; i < p->heredoc_index; i++)
+            newbuffer[i] = p->heredoc_ids[i];
+
+        /* free old memory and store new buffer in parser_state structure */
+        free(p->heredoc_ids);
+        p->heredoc_ids = newbuffer;
+    }
+}
+
+/*
 
 =item * static void syntax_error()
 
@@ -520,6 +557,12 @@ static void
 argument(parser_state *p) {
     /* argument -> heredoc_ident | expression */
     if (p->curtoken == T_HEREDOC_ID) { /* heredoc argument */
+
+        /* check for enough space; if not, resize to make space */
+        if (p->heredoc_index == p->heredoc_ids_size) {
+            resize_heredoc_args(p);
+        }
+
         p->heredoc_ids[p->heredoc_index++] = clone_string(get_current_token(p->lexer));
         next(p);
     }
@@ -734,25 +777,25 @@ assignment(parser_state *p) {
         case T_STRING_CONSTANT: {
             char *str = clone_string(get_current_token(p->lexer));
             next(p);
-            if (p->curtoken == T_LPAREN) { /* "foo"() */
+            if (p->curtoken == T_LPAREN) { /* is it a function call? "foo"() */
                 emit_invocation_start(p);
                 emit_invokable(p, str);
                 arguments(p);
                 emit_invocation_end(p);
             }
-            else { /* target '=' STRINGC */
+            else { /* no, it's a simple assignment; target '=' STRINGC */
                 emit_expr(p, str);
             }
             break;
         }
-        case T_IDENTIFIER:
+        case T_IDENTIFIER: /* target */
         case T_PREG:
         case T_PASM_PREG: {
             char *obj = clone_string(get_current_token(p->lexer)); /* save it for now */
             next(p);
 
             switch (p->curtoken) {
-                case T_LPAREN:  /* function call; foo() */
+                case T_LPAREN:  /* target arguments; function call; foo() */
                     emit_invocation_start(p);
                     emit_invokable(p, obj);
                     arguments(p);
@@ -832,7 +875,7 @@ return_statement(parser_state *p) {
             break;
         default: /* '.return' target ['->' method] arguments */
             target(p);
-            if (p->curtoken == T_PTR) {
+            if (p->curtoken == T_PTR) { /* optional '->' method */
                 next(p);
                 method(p);
             }
@@ -2038,7 +2081,7 @@ sub_definition(parser_state *p) {
 
 =item *
 
-  emit_block -> '.emit' '\n' {parrot_instruction} ['\n'] '.eom'
+  emit_block -> '.emit' '\n' { parrot_instruction '\n' } '.eom'
 
 =cut
 
@@ -2051,9 +2094,8 @@ emit_block(parser_state *p) {
 
     while (p->curtoken == T_PARROT_OP) {
         parrot_instruction(p);
+        match(p, T_NEWLINE);
     }
-
-    if (p->curtoken == T_NEWLINE) next(p);
 
     match(p, T_EOM);
 }
@@ -2340,6 +2382,8 @@ TOP(parser_state *p) {
     if (p->curtoken != T_EOF) {
         syntax_error(p, 3, "end of file expected in file '", get_current_file(p->lexer), "'\n");
     }
+
+    resize_heredoc_args(p);
 }
 
 
