@@ -9,7 +9,8 @@ src/pmc/exporter.pmc - Export globals from one namespace to another
 =head1 DESCRIPTION
 
 Exports globals from one namespace to another. Exporter always uses
-the typed namespace interface, as outlined in B<PDD21>.
+the typed namespace interface, as outlined in
+F<docs/pdds/pdd21_namespaces.pod>.
 
 Exporter is not derived from any other PMC, and does not provide any
 standard interface--its inteface consists solely of non-vtable methods.
@@ -330,6 +331,11 @@ Throws an exception upon error.
 /*
 
 =back
+
+=head1 STABILITY
+
+Unstable. This PMC is under active development; major portions of the
+interface have not yet been completed.
 
 =head1 SEE ALSO
 
