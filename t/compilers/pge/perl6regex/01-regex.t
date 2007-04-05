@@ -77,7 +77,7 @@ Description of the test.
     push test_files, 'rx_charclass'
     # push test_files, 'rx_subrules'
     # push test_files, 'rx_lookarounds'
-    # push test_files, 'rx_captures'
+    push test_files, 'rx_captures'
     # push test_files, 'rx_modifiers'
 
     .local pmc interp     # a handle to our interpreter object.
@@ -141,6 +141,7 @@ Description of the test.
   next_test:
     skiptest = 0
     todotest = 0
+    trace 0
 
     # loop over the file, one at a time.
   loop:
@@ -167,9 +168,21 @@ Description of the test.
     reason = substr test_line, $I0, $I1
 
     # determine skip/todo
-    $S0 = substr test_line, 0, 7
-    skiptest = iseq $S0, '# skip '
-    todotest = iseq $S0, '# todo '
+    $P0 = split ' ', test_line
+    $S0 = $P0[1]
+    if $S0 == 'skip' goto comment_skip
+    if $S0 == 'todo' goto comment_todo
+    if $S0 == 'trace' goto comment_trace
+    goto loop
+  comment_skip:
+    skiptest = 1
+    goto loop
+  comment_todo:
+    todotest = 1
+    goto loop
+  comment_trace:
+    $I0 = reason
+    trace $I0
     goto loop
 
   parse_test:
@@ -422,9 +435,6 @@ bad_digit:
 .sub backslash_escape
     .param string target
 
-    .local int x_pos         # position in string of last \x escape..
-               x_pos = 0 
-
   target1:
     $I0 = index target, '\n'
     if $I0 == -1 goto target2
@@ -451,9 +461,9 @@ bad_digit:
     substr target, $I0, 2, "\f"
     goto target5
   target6:
-    # handle \xHH, hex escape. 
+    # handle \xHH, hex escape.
 
-    $I0 = index target, '\x', x_pos
+    $I0 = index target, '\x'
     if $I0 == -1 goto target7
 
     $I1 = $I0 + 2
