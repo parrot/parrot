@@ -283,7 +283,7 @@ MMD_LuaNumber: {
             return dest;
         }
 MMD_LuaString: {
-            PMC* n = Parrot_LuaString_nci_tonumber(INTERP, value);
+            PMC* n = LuaString.value.tonumber();
             if (n->vtable->base_type == dynpmc_LuaNumber) {
                 return Parrot_LuaNumber_add_LuaNumber(INTERP, SELF, n, dest);
             }
@@ -324,7 +324,7 @@ MMD_LuaNumber: {
                 DYNSELF.get_number() + VTABLE_get_number(INTERP, value));
         }
 MMD_LuaString: {
-            PMC* n = Parrot_LuaString_nci_tonumber(INTERP, value);
+            PMC* n = LuaString.value.tonumber();
             if (n->vtable->base_type == dynpmc_LuaNumber) {
                 Parrot_LuaNumber_i_add_LuaNumber(INTERP, SELF, n);
             }
@@ -366,7 +366,7 @@ MMD_LuaNumber: {
             return dest;
         }
 MMD_LuaString: {
-            PMC* n = Parrot_LuaString_nci_tonumber(INTERP, value);
+            PMC* n = LuaString.value.tonumber();
             if (n->vtable->base_type == dynpmc_LuaNumber) {
                 return Parrot_LuaNumber_subtract_LuaNumber(INTERP, SELF,
                                                            n, dest);
@@ -408,7 +408,7 @@ MMD_LuaNumber: {
                 DYNSELF.get_number() - VTABLE_get_number(INTERP, value));
         }
 MMD_LuaString: {
-            PMC* n = Parrot_LuaString_nci_tonumber(INTERP, value);
+            PMC* n = LuaString.value.tonumber();
             if (n->vtable->base_type == dynpmc_LuaNumber) {
                 Parrot_LuaNumber_i_subtract_LuaNumber(INTERP, SELF, n);
             }
@@ -450,7 +450,7 @@ MMD_LuaNumber: {
             return dest;
         }
 MMD_LuaString: {
-            PMC* n = Parrot_LuaString_nci_tonumber(INTERP, value);
+            PMC* n = LuaString.value.tonumber();
             if (n->vtable->base_type == dynpmc_LuaNumber) {
                 return Parrot_LuaNumber_multiply_LuaNumber(INTERP, SELF,
                                                            n, dest);
@@ -492,7 +492,7 @@ MMD_LuaNumber: {
                 DYNSELF.get_number() * VTABLE_get_number(INTERP, value));
         }
 MMD_LuaString: {
-            PMC* n = Parrot_LuaString_nci_tonumber(INTERP, value);
+            PMC* n = LuaString.value.tonumber();
             if (n->vtable->base_type == dynpmc_LuaNumber) {
                 Parrot_LuaNumber_i_multiply_LuaNumber(INTERP, SELF, n);
             }
@@ -534,7 +534,7 @@ MMD_LuaNumber: {
             return dest;
         }
 MMD_LuaString: {
-            PMC* n = Parrot_LuaString_nci_tonumber(INTERP, value);
+            PMC* n = LuaString.value.tonumber();
             if (n->vtable->base_type == dynpmc_LuaNumber) {
                 return Parrot_LuaNumber_divide_LuaNumber(INTERP, SELF,
                                                          n, dest);
@@ -576,7 +576,7 @@ MMD_LuaNumber: {
                 DYNSELF.get_number() / VTABLE_get_number(INTERP, value));
         }
 MMD_LuaString: {
-            PMC* n = Parrot_LuaString_nci_tonumber(INTERP, value);
+            PMC* n = LuaString.value.tonumber();
             if (n->vtable->base_type == dynpmc_LuaNumber) {
                 Parrot_LuaNumber_i_divide_LuaNumber(INTERP, SELF, n);
             }
@@ -620,7 +620,7 @@ MMD_LuaNumber: {
             return dest;
         }
 MMD_LuaString: {
-            PMC* n = Parrot_LuaString_nci_tonumber(INTERP, value);
+            PMC* n = LuaString.value.tonumber();
             if (n->vtable->base_type == dynpmc_LuaNumber) {
                 return Parrot_LuaNumber_modulus_LuaNumber(INTERP, SELF,
                                                           n, dest);
@@ -664,7 +664,7 @@ MMD_LuaNumber: {
             VTABLE_set_number_native(INTERP, SELF, a - floor(a/b)*b);
         }
 MMD_LuaString: {
-            PMC* n = Parrot_LuaString_nci_tonumber(INTERP, value);
+            PMC* n = LuaString.value.tonumber();
             if (n->vtable->base_type == dynpmc_LuaNumber) {
                 Parrot_LuaNumber_i_modulus_LuaNumber(INTERP, SELF, n);
             }
@@ -706,7 +706,7 @@ MMD_LuaNumber: {
             return dest;
         }
 MMD_LuaString: {
-            PMC* n = Parrot_LuaString_nci_tonumber(INTERP, value);
+            PMC* n = LuaString.value.tonumber();
             if (n->vtable->base_type == dynpmc_LuaNumber) {
                 return Parrot_LuaNumber_pow_LuaNumber(INTERP, SELF, n, dest);
             }
@@ -747,7 +747,7 @@ MMD_LuaNumber: {
                   pow(DYNSELF.get_number(), VTABLE_get_number(INTERP, value)));
         }
 MMD_LuaString: {
-            PMC* n = Parrot_LuaString_nci_tonumber(INTERP, value);
+            PMC* n = LuaString.value.tonumber();
             if (n->vtable->base_type == dynpmc_LuaNumber) {
                 Parrot_LuaNumber_i_pow_LuaNumber(INTERP, SELF, n);
             }

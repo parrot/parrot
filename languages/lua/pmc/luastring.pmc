@@ -206,7 +206,7 @@ Sets the value of the string to that of the specified C<string>.
     PMC* neg (PMC * dest) {
         PMC* n = SELF.tonumber();
         if (n->vtable->base_type == dynpmc_LuaNumber) {
-            return Parrot_LuaNumber_neg(INTERP, n, dest);
+            return LuaNumber.n.neg(dest);
         }
         else {
             real_exception(INTERP, NULL, ILL_INHERIT,
@@ -226,7 +226,7 @@ Sets the value of the string to that of the specified C<string>.
     void i_neg() {
         PMC* n = SELF.tonumber();
         if (n->vtable->base_type == dynpmc_LuaNumber) {
-            Parrot_LuaNumber_i_neg(INTERP, n);
+            LuaNumber.n.i_neg();
         }
         else {
             real_exception(INTERP, NULL, ILL_INHERIT,
