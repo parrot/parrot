@@ -75,7 +75,7 @@ Description of the test.
     push test_files, 'rx_metachars'
     push test_files, 'rx_backtrack'
     push test_files, 'rx_charclass'
-    # push test_files, 'rx_subrules'
+    push test_files, 'rx_subrules'
     push test_files, 'rx_lookarounds'
     push test_files, 'rx_captures'
     push test_files, 'rx_modifiers'
