@@ -1,0 +1,46 @@
+## lookarounds
+<before .d> a.		abacad		/mob: <ad @ 4>/			lookahead <before>
+<before c> ....		abacad		n				lookahead <before>
+<before> .		abcd		n				null <before>
+<!before ..b> aa	aabaaa		/mob: <aa @ 3>/			negated lookahead
+# todo :pugs<feature>
+<after a>b		ab		y				lookbehind <after>
+<after a>b		cb		n				lookbehind <after>
+<after a>b		b		n				lookbehind <after>
+# todo :pugs<feature>
+<!after c>b		ab		y				lookbehind <!after>
+<!after c>b		cb		n				lookbehind <!after>
+# todo :pugs<feature>
+<!after c>b		b		y				lookbehind <!after>
+<!after <[cd]>>b	dbcb		n				lookbehind <!after>
+# todo :pugs<feature>
+<!after <[cd]>><[ab]>	dbaacb		y				lookbehind <!after>
+<!after c|d>b		dbcb		n				lookbehind <!after>
+# todo :pugs<feature>
+<!after c|d><[ab]>	dbaacb		y				lookbehind <!after>
+# todo :pugs<feature>
+<!after cd><[ab]>	cbaccb		y				lookbehind <!after>
+# todo :pugs<feature>
+$ <after ^a>		a		y				lookbehind <after>
+# todo :pugs<feature>
+<after x+>y		axxbxxyc	y				lookbehind <after>
+<[a..z]>+		az		y				metasyntax with leading + (<+...>)
+<+[a..z]>+		az		y				metasyntax with leading + (<+...>)
+<+alpha>+		az		y				metasyntax with leading + (<+...>)
+
+<null>			''		y		null pattern (<null>)
+^ <null>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<null>: < @ 0>/	null pattern (<null>)
+<null> $	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<null>: < @ 65>/	null pattern (<null>)
+abc <null> def	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	y			null pattern (<null>)
+x | y | <null>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	y			null pattern (<null>)
+x | y | <?null>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	y			null pattern (<null>)
+
+a[b}		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/rule error/	mismatched close
+
+c <before .d>		abacad		/mob: <c @ 3>/				one character and lookahead <before>
+.* <before .d>		abacad		/mob: <abac @ 0>/			multiple characters and lookahead <before>
+.* <before .\<>		abaca<d		/mob: <abac @ 0>/			multiple characters and lookahead <before> with a '<'
+.* <before \<>		aba<ca<d		/mob: <aba<ca @ 0>/		greedy any character and lookahead <before> with a '<'
+.*? <before \<>		aba<ca<d		/mob: <aba @ 0>/		non-greedy any character and lookahead <before> with a '<'
+
+## vim: noexpandtab tabstop=4 shiftwidth=4

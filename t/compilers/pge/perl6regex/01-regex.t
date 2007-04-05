@@ -76,9 +76,9 @@ Description of the test.
     push test_files, 'rx_backtrack'
     push test_files, 'rx_charclass'
     # push test_files, 'rx_subrules'
-    # push test_files, 'rx_lookarounds'
+    push test_files, 'rx_lookarounds'
     push test_files, 'rx_captures'
-    # push test_files, 'rx_modifiers'
+    push test_files, 'rx_modifiers'
 
     .local pmc interp     # a handle to our interpreter object.
                interp = getinterp
