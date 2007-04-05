@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2006, The Perl Foundation.
+Copyright (C) 2006-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -246,7 +246,7 @@ MMD_WmlsBoolean: {
             return dest;
         }
 MMD_WmlsString: {
-            PMC * trans = Parrot_WmlsString_parseFloat(INTERP, value);
+            PMC * trans = WmlsString.value.parseFloat();
             if (trans->vtable->base_type == dynpmc_WmlsFloat) {
                 FLOATVAL result = DYNSELF.get_number()
                                 - VTABLE_get_number(INTERP, trans);
@@ -278,7 +278,7 @@ MMD_WmlsBoolean: {
             DYNSELF.set_number_native(result);
         }
 MMD_WmlsString: {
-            PMC * trans = Parrot_WmlsString_parseFloat(INTERP, value);
+            PMC * trans = WmlsString.value.parseFloat();
             if (trans->vtable->base_type == dynpmc_WmlsFloat) {
                 FLOATVAL result = DYNSELF.get_number()
                                 - VTABLE_get_number(INTERP, trans);
@@ -325,7 +325,7 @@ MMD_WmlsBoolean: {
             return dest;
         }
 MMD_WmlsString: {
-            PMC * trans = Parrot_WmlsString_parseFloat(INTERP, value);
+            PMC * trans = WmlsString.value.parseFloat();
             if (trans->vtable->base_type == dynpmc_WmlsFloat) {
                 FLOATVAL result = DYNSELF.get_number()
                                 * VTABLE_get_number(INTERP, trans);
@@ -357,7 +357,7 @@ MMD_WmlsBoolean: {
             DYNSELF.set_number_native(result);
         }
 MMD_WmlsString: {
-            PMC * trans = Parrot_WmlsString_parseFloat(INTERP, value);
+            PMC * trans = WmlsString.value.parseFloat();
             if (trans->vtable->base_type == dynpmc_WmlsFloat) {
                 FLOATVAL result = DYNSELF.get_number()
                                 * VTABLE_get_number(INTERP, trans);
@@ -413,7 +413,7 @@ MMD_WmlsBoolean: {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
         }
 MMD_WmlsString: {
-            PMC * trans = Parrot_WmlsString_parseFloat(INTERP, value);
+            PMC * trans = WmlsString.value.parseFloat();
             if (trans->vtable->base_type == dynpmc_WmlsFloat) {
                 FLOATVAL d = VTABLE_get_number(INTERP, trans);
                 if (d != 0.0) {
@@ -462,7 +462,7 @@ MMD_WmlsBoolean: {
             }
         }
 MMD_WmlsString: {
-            PMC * trans = Parrot_WmlsString_parseFloat(INTERP, value);
+            PMC * trans = WmlsString.value.parseFloat();
             if (trans->vtable->base_type == dynpmc_WmlsFloat) {
                 FLOATVAL d = VTABLE_get_number(INTERP, trans);
                 if (d != 0.0) {
