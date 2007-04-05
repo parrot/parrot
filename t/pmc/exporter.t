@@ -98,10 +98,16 @@ pir_output_is( <<'CODE', <<'OUT', 'destination' );
 .sub 'test' :main
     new $P0, .Exporter
     $P1 = $P0.'destination'()
-    if $P1 == '' goto ok_1
+    unless null $P1 goto ok_1
     print 'not '
   ok_1:
-    say 'ok 1 - destination() with no args returns destination namespace, which is empty at first'
+    say 'ok 1 - destination() with no args returns destination namespace'
+
+    $P99 = get_namespace
+    if $P1 == $P99 goto ok_2
+    print 'not '
+  ok_2:
+    say 'ok 2 - ...which is current namespace at first'
 
     # get a NameSpace PMC for testing
     # TODO replace with make_namespace, when implemented
@@ -110,28 +116,28 @@ pir_output_is( <<'CODE', <<'OUT', 'destination' );
 
     $P0.'destination'(ns)
     $P1 = $P0.'destination'()
-    if $P1 == 'Eponymous' goto ok_2
+    if $P1 == 'Eponymous' goto ok_3
     print 'not '
-  ok_2:
-    say 'ok 2 - destination() with args sets destination namespace'
+  ok_3:
+    say 'ok 3 - destination() with args sets destination namespace'
 
     $P1 = clone ns
 
-    push_eh ok_3
+    push_eh ok_4
     $P0.'destination'(ns, $P1)
     clear_eh
 
     print 'not '
-  ok_3:
-    say 'ok 3 - destination() with too many args fails'
+  ok_4:
+    say 'ok 4 - destination() with too many args fails'
 
-    push_eh ok_4
+    push_eh ok_5
     $P0.'destination'('foo')
     clear_eh
     print 'not '
 
-  ok_4:
-    say 'ok 4 - destination() with non-namespace arg throws exception'
+  ok_5:
+    say 'ok 5 - destination() with non-namespace arg throws exception'
 .end
 
 
@@ -140,10 +146,11 @@ pir_output_is( <<'CODE', <<'OUT', 'destination' );
 .sub 'Eponymous' :anon
 .end
 CODE
-ok 1 - destination() with no args returns destination namespace, which is empty at first
-ok 2 - destination() with args sets destination namespace
-ok 3 - destination() with too many args fails
-ok 4 - destination() with non-namespace arg throws exception
+ok 1 - destination() with no args returns destination namespace
+ok 2 - ...which is current namespace at first
+ok 3 - destination() with args sets destination namespace
+ok 4 - destination() with too many args fails
+ok 5 - destination() with non-namespace arg throws exception
 OUT
 
 

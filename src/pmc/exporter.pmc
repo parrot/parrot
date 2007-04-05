@@ -29,7 +29,7 @@ An empty PMC of this type is allocated upon initialization.
 =item C<ns_dest>
 
 The destination namespace -- a NameSpace PMC.
-An empty PMC of this type is allocated upon initialization.
+A PMC representing the current namespace is allocated upon initialization.
 
 =item C<globals>
 
@@ -86,7 +86,7 @@ Instantiates an Exporter.
         /* Set up the object. */
         exp = mem_sys_allocate_zeroed(sizeof (Parrot_Exporter));
         exp->ns_src  = pmc_new(interp, enum_class_NameSpace);
-        exp->ns_dest = pmc_new(interp, enum_class_NameSpace);
+        exp->ns_dest = CONTEXT(interp->ctx)->current_namespace;
         exp->globals = PMCNULL;
         PMC_data(SELF) = exp;
     }
@@ -211,8 +211,6 @@ Sets the array if C<glb> is passed, otherwise returns the value.
 If C<glb> is a String, it is split on ascii whitespace.
 If C<glb> is a FixedStringArray, it is cloned and set.
 
-TODO: get MMD working
-
 =cut
 
 */
@@ -220,24 +218,19 @@ TODO: get MMD working
     PCCMETHOD void globals(PMC *glb :optional, int got_glb :opt_flag) {
         Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
         PMC *ret_globals;
+        STRING *s_str = CONST_STRING(interp, "String");
+        STRING *s_fsa = CONST_STRING(interp, "FixedStringArray");
 
         if (got_glb) {
-            if (PMC_IS_NULL(glb)) {
+            if (PMC_IS_NULL(glb))
                 exp->globals = PMCNULL;
-            }
-            else {
-/* xxx_MMD_FixedStringArray: { */
-                exp->globals = VTABLE_clone(interp, glb);
-/*                          }
-xxx_MMD_String: {
+            else if (VTABLE_isa(interp, glb, s_str))
                 exp->globals = string_split(interp, ' ', glb);
-            }
-xxx_MMD_DEFAULT: {
+            else if (VTABLE_isa(interp, glb, s_fsa))
+                exp->globals = VTABLE_clone(interp, glb);
+            else
                  real_exception(interp, NULL, 0,
-                         "unrecognized type in MMD dispatch");
-             }
-*/
-            }
+                     "Invalid type %d in globals()", glb->vtable->base_type);
          }
          else {
             if (PMC_IS_NULL(exp->globals)) {
@@ -257,7 +250,7 @@ xxx_MMD_DEFAULT: {
     add_global(PMC *global :optional, int has_global :opt_flag)>
 
 Add C<global> to the array of globals (C<globals>.)
-Sets the array if C<glb_array> is passed, otherwise does nothing.
+Sets the array if C<global> is passed, otherwise does nothing.
 
 =cut
 
