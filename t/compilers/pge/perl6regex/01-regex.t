@@ -58,6 +58,7 @@ Description of the test.
     load_bytecode 'Test/Builder.pir'
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Dumper.pbc'
+    load_bytecode 'String/Utils.pbc'
     .include "iglobals.pasm"
 
     # Variable declarations, initializations
@@ -71,7 +72,7 @@ Description of the test.
                test_files = new 'ResizablePMCArray'
 
     # populate the list of test files
-    # push test_files, 'rx_metachars'
+    push test_files, 'rx_metachars'
     push test_files, 'rx_backtrack'
     push test_files, 'rx_charclass'
     # push test_files, 'rx_subrules'
@@ -455,15 +456,12 @@ bad_digit:
     $I0 = index target, '\x', x_pos
     if $I0 == -1 goto target7
 
-    $I1 = length target
-    $I2 = $I0 + 2
-
-    if $I2 > $I1 goto target7
-    $S0 = substr target, $I2, 2
-    $S1 = hex_chr($S0)
-    substr target, $I0, 4, $S1
-
-    inc x_pos
+    $I1 = $I0 + 2
+    $P0 = get_hll_global ['String';'Utils'], 'convert_digits_to_string'
+    ($S0, $I2) = $P0(target, 'x', $I1)
+    $S3 = substr target, $I1, $I2
+    $I2 += 2
+    substr target, $I0, $I2, $S0
     goto target6
   target7:
     .return (target)

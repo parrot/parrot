@@ -54,12 +54,13 @@
 '... --- ...'		...---...	n	literal match (\')
 # todo :pugs<feature>
 'ab\'>cd'		ab'>cd		y	literal match with quote
-'ab\\cd'		ab\x5ccd	y	literal match with backslash
+'ab\\yz'		ab\x5cyz	y	literal match with backslash
 'ab"cd'			ab"cd		y	literal match with quote
 # todo :pugs<feature>
-'ab\\cd'		ab\x5ccd	y	literal match with backslash
+'ab\\yz'		ab\x5cyz	y	literal match with backslash
 # todo :pugs<feature> :pge<feature>
 "... --- ..."		... --- ...	y	literal match (\")
+# todo :pugs<feature> :pge<feature>
 "... --- ..."		...---...	n	literal match (\")
 # todo :pugs<feature> :pge<feature>
 "ab<\">cd"		ab<">cd		y	literal match with quote

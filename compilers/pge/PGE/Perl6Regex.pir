@@ -165,6 +165,12 @@ needed for compiling regexes.
     $P0 = get_global 'parse_term'
     optable.newtok('term:',    'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
 
+    $P0 = get_global 'parse_term_ws'
+    optable.newtok('term:#',   'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+
+    $P0 = get_global 'parse_term_backslash'
+    optable.newtok("term:\\",  'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+
     optable.newtok('term:^',   'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
     optable.newtok('term:^^',  'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
     optable.newtok('term:$$',  'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
@@ -287,7 +293,6 @@ Return a failed match if the stoptoken is found.
     $P0 = get_hll_global ['PGE::Perl6Regex'], '@!stopstack'
     stop = $P0[-1]
 
-    .local string initchar
     $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
     if $I0 goto term_ws
     $I0 = length stop
@@ -295,104 +300,24 @@ Return a failed match if the stoptoken is found.
     $S0 = substr target, pos, $I0
     if $S0 == stop goto end_noterm
   not_stop:
-    initchar = substr target, pos, 1
-    $I0 = index '<>[](){}:*?+|&^$.', initchar
-    if $I0 >= 0 goto end_noterm
-    inc pos
-    if initchar == '#' goto term_ws
-    if initchar != "\\" goto term_literal
+    ##   find length of word character sequence
+    .local int litlen
+    $I0 = find_not_cclass .CCLASS_WORD, target, pos, lastpos
+    litlen = $I0 - pos
 
-  term_backslash:
-    $I0 = is_cclass .CCLASS_NUMERIC, target, pos
-    if $I0 goto err_backslash_digit
-    initchar = substr target, pos, 1
-    .local int isnegated
-    isnegated = is_cclass .CCLASS_UPPERCASE, target, pos
-    inc pos
-    $S0 = initchar
-    $I0 = index "ABCDEFGHIJKLMNOPQRSTUVWXYZ", $S0
-    if $I0 < 0 goto term_backslash_1
-    $S0 = substr "abcdefghijklmnopqrstuvwxyz", $I0, 1
-  term_backslash_1:  
-    if $S0 == 'x' goto term_backslash_x            # \x.. \X..
-    if $S0 == 'o' goto term_backslash_o            # \o.. \O..
-    $P0 = get_global '%esclist'
-    $I0 = exists $P0[$S0]
-    if $I0 == 0 goto term_literal
-    initchar = $P0[$S0]
-    if isnegated goto term_charlist
-    $I0 = length initchar
-    if $I0 < 2 goto term_literal
-  term_charlist:
-    (mob, $P99, $P99, $P0) = mob.newfrom(0, 'PGE::Exp::EnumCharList')
-    mob.'result_object'(initchar)
-    mob['isnegated'] = isnegated
-    $P0 = pos
-    .return (mob)
+    ##   if we didn't find any, return no term
+    if litlen == 0 goto end_noterm
 
-  term_backslash_o:
-    .local int base
-    base = 8
-    goto term_bx0
-  term_backslash_x:
-    base = 16
-  term_bx0:
-    $I0 = 0
-    $S0 = substr target, pos, 1
-    $I2 = index "[{(<", $S0
-    if $I2 < 0 goto term_bx1
-    $S2 = substr "]})>", $I0
-    inc pos
-  term_bx1:
-    $S0 = substr target, pos, 1
-    $I1 = index "0123456789abcdef0123456789ABCDEF", $S0
-    if $I1 < 0 goto term_bx2
-    $I1 = $I1 % 16
-    if $I1 >= base goto term_bx2
-    $I0 *= base
-    $I0 += $I1
-    inc pos
-    goto term_bx1
-  term_bx2:
-    initchar = chr $I0
-    if $I2 < 0 goto term_bx3
-    $S0 = substr target, pos, 1
-    if $S0 != $S2 goto err_backslash_close
-    inc pos
-  term_bx3:
-    if isnegated goto term_charlist                # \X[...], \000
-    # goto term_literal                            # \x[...], \000
-
-  term_literal:
-    .local int litstart, litlen
-    .local string delim
-    litstart = pos
-    litlen = 0
-    delim = "<>[](){}:*?+\\|&#^$"
-    $S0 = substr stop, 0, 1
-    delim .= $S0
-  term_literal_loop:
-    if pos >= lastpos goto term_literal_end
-    $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
-    if $I0 goto term_literal_end
-    $S0 = substr target, pos, 1
-    $I0 = index delim, $S0
-    if $I0 >= 0 goto term_literal_end
-    inc pos
-    inc litlen
-    goto term_literal_loop
-  term_literal_end:
-    ##   for a multi-char literal, we don't eat the last chararacter
+    ##   for multi-char unquoted literals, leave the last character
     ##   in case it's quantified (it gets processed as a subsequent term)
-    if litlen < 1 goto term_literal_one
-    dec pos
-  term_literal_one:
-    $I0 = pos - litstart
-    $S0 = substr target, litstart, $I0
-    $S0 = concat initchar, $S0
-    (mob, $S99, $P99, $P0) = mob.newfrom(0, 'PGE::Exp::Literal')
+    if litlen < 2 goto term_literal
+    dec litlen
+  term_literal:
+    $S0 = substr target, pos, litlen
+    pos += litlen
+    (mob, $S99, $P99, $P0) = mob.'newfrom'(0, 'PGE::Exp::Literal')
     mob.'result_object'($S0)
-    $P0 = pos
+    mob.'to'(pos)
     .return (mob)
 
   term_ws:
@@ -401,15 +326,108 @@ Return a failed match if the stoptoken is found.
   end_noterm:
     (mob) = mob.newfrom(0, 'PGE::Exp::Literal')
     .return (mob)
-
-  err_backslash_digit:
-    parse_error(mob, pos, "\\1 and \\012 illegal, use $1, \\o012, or \\x0a")
-    .return (mob)
-
-  err_backslash_close:
-    parse_error(mob, pos, "Missing close bracket for \\x..")
 .end
 
+
+=item C<parse_term_backslash(mob [, adverbs :slurpy :named])>
+
+Parses terms beginning with backslash.
+
+=cut
+
+.sub 'parse_term_backslash'
+    .param pmc mob
+    .param pmc adverbs         :slurpy :named
+
+    .local string target
+    .local int pos, lastpos
+    $P0 = getattribute mob, '$.target'
+    target = $P0
+    $P0 = getattribute mob, '$.pos'
+    pos = $P0
+    lastpos = length target
+
+    .local string initchar
+    initchar = substr target, pos, 1
+    $I0 = is_cclass .CCLASS_WORD, initchar, 0
+    if $I0 goto term_metachar
+  quoted_metachar:
+    inc pos
+    (mob, $S99, $P99, $P0) = mob.'newfrom'(0, 'PGE::Exp::Literal')
+    mob.'result_object'(initchar)
+    mob.'to'(pos)
+    .return (mob)
+
+  term_metachar:
+    .local int isnegated
+    isnegated = is_cclass .CCLASS_UPPERCASE, initchar, 0
+    $S0 = downcase initchar
+    if $S0 == 'x' goto scan_xdo
+    if $S0 == 'o' goto scan_xdo
+    $P0 = get_global '%esclist'
+    $I0 = exists $P0[$S0]
+    if $I0 == 0 goto err_reserved_metachar
+    inc pos
+    .local string charlist
+    charlist = $P0[$S0]
+    if isnegated goto term_charlist
+    $I0 = length charlist
+    if $I0 > 1 goto term_charlist
+
+  term_literal:
+    (mob, $S99, $P99, $P0) = mob.'newfrom'(0, 'PGE::Exp::Literal')
+    mob.'result_object'(charlist)
+    mob.'to'(pos)
+    .return (mob)
+
+  term_charlist:
+    (mob, $S99, $P99, $P0) = mob.'newfrom'(0, 'PGE::Exp::EnumCharList')
+    mob.'result_object'(charlist)
+    mob['isnegated'] = isnegated
+    mob.'to'(pos)
+    .return (mob)
+
+  scan_xdo:
+    inc pos
+    .local int base, decnum, isbracketed
+    charlist = ''
+    base = index '        o d     x', $S0
+    decnum = 0
+    $S0 = substr target, pos, 1
+    isbracketed = iseq $S0, '['
+    pos += isbracketed
+  scan_xdo_char_loop:
+    $S0 = substr target, pos, 1
+    $I0 = index '0123456789abcdef', $S0
+    if $I0 < 0 goto scan_xdo_char_end
+    if $I0 >= base goto scan_xdo_char_end
+    decnum *= base
+    decnum += $I0
+    inc pos
+    goto scan_xdo_char_loop
+  scan_xdo_char_end:
+    $S1 = chr decnum
+    concat charlist, $S1
+    unless isbracketed goto scan_xdo_end
+    if $S0 == ']' goto scan_xdo_end
+    if $S0 != ',' goto err_bracketed
+    if isnegated goto err_negated_brackets
+    inc pos
+    decnum = 0
+    goto scan_xdo_char_loop
+  scan_xdo_end:
+    pos += isbracketed
+    if isnegated goto term_charlist
+    goto term_literal
+
+  err_reserved_metachar:
+    parse_error(mob, pos, 'Alphanumeric metacharacters are reserved')
+  err_bracketed:
+    parse_error(mob, pos, 'Invalid digit in \\x[...] or \\o[...]')
+  err_negated_brackets:
+    parse_error(mob, pos, 'Cannot use comma in \\X[...] or \\O[...]')
+.end
+    
 
 =item C<parse_term_ws(PMC mob)>
 

@@ -1,0 +1,238 @@
+##   Metacharacter tests
+.			a		y	dot (.)
+.			\n		y	dot (.)
+.			''		n	dot (.)
+a\s+f			abcdef		n	whitespace (\s)
+ab\s+cdef		ab  cdef	y	whitespace (\s)
+a\S+f			abcdef		y	not whitespace (\S)
+a\S+f			ab cdef		n	not whitespace (\S)
+^ abc			abcdef		y	start and end of string (^)
+^ abc			abc\ndef	y	start and end of string (^)
+^ abc			def\nabc	n	start and end of string (^)
+def \n ^ abc		def\nabc	n	start and end of string (^)
+def $			abcdef		y	start and end of string ($)
+def $			abc\ndef	y	start and end of string ($)
+def $			def\nabc	n	start and end of string ($)
+def $ \n abc		def\nabc	n	start and end of string (^)
+abc \n $		abc\n		y	end of string ($)
+abc $			abc\n		n	end of string ($)
+<<def			abc-def		y	left word boundary, beginning of word
+<<bc			abc-def		n	left word boundary, mid-word
+c<<			abc-def		n	left word boundary, end of word
+<<abc			abc-def		y	left word boundary, BOS
+def<<			abc-def		n	left word boundary, EOS
+<<			-------		n	left word boundary, no word chars
+>>def			abc-def		n	right word boundary, beginning of word
+>>bc			abc-def		n	right word boundary, mid-word
+c>>			abc-def		y	right word boundary, end of word
+>>abc			abc-def		n	right word boundary, BOS
+def>>			abc-def		y	right word boundary, EOS
+>>			-------		n	right word boundary, no word chars
+
+c \n d			abc\ndef	y	logical newline (\n)
+# todo :pugs<feature>
+c \n d			abc\rdef	y	logical newline matches \r
+c \n+ d			abc\n\ndef	y	logical newline quantified
+a\n+f			abcdef		n	logical newline (\n)
+c \n d			abc\n\rdef	n	logical newline matches \n\r
+# todo :pugs<feature>
+c \n d			abc\r\ndef	y	logical newline matches \r\n
+b \n c			abc\ndef	n	logical newline (\n)
+\N			a		y	not logical newline (\N)
+a \N c			abc		y	not logical newline (\N)
+\N			''		n	not logical newline (\N)
+c \N d			abc\ndef	n	not logical newline (\N)
+c \N d			abc\rdef	n	not logical newline (\N)
+c \N+ d			abc\n\ndef	n	not logical newline (\N)
+a\N+f			abcdef		y	not logical newline (\N)
+c \N d			abc\n\rdef	n	not logical newline (\N)
+c \N d			abc\r\ndef	n	not logical newline (\N)
+b \N \n			abc\ndef	y	not logical newline (\N)
+\Aabc			Aabc		/reserved/	retired metachars (\A)
+\Aabc			abc\ndef	/reserved/	retired metachars (\A)
+abc\Z			abcZ		/reserved/	retired metachars (\Z)
+abc\Z			abc\ndef	/reserved/	retired metachars (\Z)
+abc\z			abcz		/reserved/	retired metachars (\z)
+def\z			abc\ndef	/reserved/	retired metachars (\z)
+abc # def		abc#def		y	comments (#)
+abc # xyz		abc#def		y	comments (#)
+abc # def \n \$		abc#def		y	comments (#)
+abc \# def		abc#def		y	comments (#)
+abc \# xyz		abc#def		n	comments (#)
+^ abc \# def $		abc#def		y	comments (#)
+^^ abc \n ^^ def	abc\ndef	y	line beginnings and endings (^^)
+# todo :pugs<feature>
+^^ abc \n ^^ def \n ^^	abc\ndef\n	n	line beginnings and endings (^^)
+^^ \n			\n		y	line beginnings and endings (^^)
+# todo :pugs<feature>
+\n ^^			\n		n	line beginnings and endings (^^)
+abc $$ \n def $$	abc\ndef	y	line beginnings and endings ($$)
+# todo :pugs<feature>
+abc $$ \n def $$ \n $$	abc\ndef\n	n	line beginnings and endings ($$)
+$$ \n			\n		y	line beginnings and endings ($$)
+# todo :pugs<feature>
+\n $$			\n		n	line beginnings and endings ($$)
+<[a..d]> | <[b..e]>	c		y	alternation (|)
+<[a..d]> | <[d..e]>	c		y	alternation (|)
+<[a..b]> | <[b..e]>	c		y	alternation (|)
+<[a..b]> | <[d..e]>	c		n	alternation (|)
+<[a..d]>+ | <[b..e]>+	bcd		y	alternation (|)
+^ [ <[a..d]>+ | <[b..e]>+ ] $	bcd		y	alternation (|)
+^ [ <[a..c]>+ | <[b..e]>+ ] $	bcd		y	alternation (|)
+^ [ <[a..d]>+ | <[c..e]>+ ] $	bcd		y	alternation (|)
+b|			bcd		/rule error/	alternation (|) - null right arg illegal
+|b			bcd		y	alternation (|) - null left arg ignored
+|			bcd		/rule error/	alternation (|) - null both args illegal
+\|			|		y	alternation (|) - literal must be escaped
+|			|		/rule error/	alternation (|) - literal must be escaped
+# todo :pugs<feature>
+<[a..d]> & <[b..e]>	c		y	conjunction (&)
+<[a..d]> & <[d..e]>	c		n	conjunction (&)
+<[a..b]> & <[b..e]>	c		n	conjunction (&)
+<[a..b]> & <[d..e]>	c		n	conjunction (&)
+# todo :pugs<feature>
+<[a..d]>+ & <[b..e]>+	bcd		y	conjunction (&)
+# todo :pugs<feature>
+^ [ <[a..d]>+ & <[b..e]>+ ] $	bcd		y	conjunction (&)
+# todo :pugs<feature>
+<[a..c]>+ & <[b..e]>+	bcd		y	conjunction (&)
+# todo :pugs<feature>
+<[a..d]>+ & <[c..e]>+	bcd		y	conjunction (&)
+b&			bcd		/rule error/	conjunction (&) - null right arg illegal
+&b			bcd		/rule error/	conjunction (&) - null left arg illegal
+&			bcd		/rule error/	conjunction (&) - null both args illegal
+\&			&		y	conjunction (&) - literal must be escaped
+&			&		/rule error/	conjunction (&) - literal must be escaped
+# todo :pge<leading |>
+a&|b			a&|b		/rule error/	alternation and conjunction (&|) - parse error
+a|&b			a|&b		/rule error/	alternation and conjunction (|&) - parse error
+|d|b			abc		y	leading alternation ignored
+ |d|b			abc		y	leading alternation ignored
+|d |b			abc		y	leading alternation ignored
+ | d | b		abc		y	leading alternation ignored
+# todo :pugs<feature> :pge<feature>
+ b |  | d		abc		n	null pattern invalid
+\pabc			pabc		/reserved/	retired metachars (\p)
+\p{InConsonant}		a		/reserved/	retired metachars (\p)
+\Pabc			Pabc		/reserved/	retired metachars (\P)
+\P{InConsonant}		a		/reserved/	retired metachars (\P)
+\Labc\E			LabcE		/reserved/	retired metachars (\L...\E)
+\LABC\E			abc		/reserved/	retired metachars (\L...\E)
+\Uabc\E			UabcE		/reserved/	retired metachars (\U...\E)
+\Uabc\E			ABC		/reserved/	retired metachars (\U...\E)
+\Qabc\E			QabcE		/reserved/	retired metachars (\Q...\E)
+\Qabc d?\E		abc d		/reserved/	retired metachars (\Q...\E)
+\Gabc			Gabc		/reserved/	retired metachars (\G)
+\1abc			1abc		/reserved/	retired metachars (\1)
+# todo :pugs<feature>
+^ \s+ $			\x0009\x0020\x00a0\x000a\x000b\x000c\x000d\x0085	y	0-255 whitespace (\s)
+# todo :pugs<feature>
+^ \h+ $			\x0009\x0020\x00a0	y	0-255 horizontal whitespace (\h)
+^ \V+ $			\x0009\x0020\x00a0	y	0-255 horizontal whitespace (\V)
+# todo :pugs<feature>
+^ \v+ $			\x000a\x000b\x000c\x000d\x0085	y	0-255 vertical whitespace (\v)
+^ \h+ $			\x000a\x000b\x000c\x000d\x0085	n	0-255 horizontal whitespace (\h)
+^ \v+ $			\x0009\x0020\x00a0	n	0-255 vertical whitespace (\v)
+# todo :pugs<feature>
+^ \s+ $			\x1680\x180e\x2000\x2001\x2002\x2003\x2004\x2005\x2006\x2007\x2008\x2008\x2009\x200a\x202f\x205f\x3000	y	unicode whitespace (\s)
+# todo :pugs<feature>
+^ \h+ $			\x1680\x180e\x2000\x2001\x2002\x2003\x2004\x2005\x2006\x2007\x2008\x2008\x2009\x200a\x202f\x205f\x3000	y	unicode whitespace (\h)
+^ \V+ $			\x1680\x180e\x2000\x2001\x2002\x2003\x2004\x2005\x2006\x2007\x2008\x2008\x2009\x200a\x202f\x205f\x3000	y	unicode whitespace (\V)
+^ \v+ $			\x1680\x180e\x2000\x2001\x2002\x2003\x2004\x2005\x2006\x2007\x2008\x2008\x2009\x200a\x202f\x205f\x3000	n	unicode whitespace (\v)
+c \t d			abc\tdef	y	horizontal tab (\t)
+c \t+ d			abc\t\tdef	y	horizontal tab (\t)
+a \t+ f			abcdef		n	horizontal tab (\t)
+b \t c			abc\tdef	n	horizontal tab (\t)
+\T			a		y	not horizontal tab (\T)
+a \T c			abc		y	not horizontal tab (\T)
+\T			''		n	not horizontal tab (\T)
+c \T d			abc\tdef	n	not horizontal tab (\T)
+c \T+ d			abc\t\tdef	n	not horizontal tab (\T)
+a \T+ f			abcdef		y	not horizontal tab (\T)
+c \r d			abc\rdef	y	return (\r)
+c \r+ d			abc\r\rdef	y	return (\r)
+a \r+ f			abcdef		n	return (\r)
+b \r c			abc\rdef	n	return (\r)
+\R			a		y	not return (\R)
+a \R c			abc		y	not return (\R)
+\R			''		n	not return (\R)
+c \R d			abc\rdef	n	not return (\R)
+c \R+ d			abc\r\rdef	n	not return (\R)
+a \R+ f			abcdef		y	not return (\R)
+c \f d			abc\fdef	y	formfeed (\f)
+c \f+ d			abc\f\fdef	y	formfeed (\f)
+a \f+ f			abcdef		n	formfeed (\f)
+b \f c			abc\fdef	n	formfeed (\f)
+\F			a		y	not formfeed (\F)
+a \F c			abc		y	not formfeed (\F)
+\F			''		n	not formfeed (\F)
+c \F d			abc\fdef	n	not formfeed (\F)
+c \F+ d			abc\f\fdef	n	not formfeed (\F)
+a \F+ f			abcdef		y	not formfeed (\F)
+# todo :pugs<feature>
+c \e d			abc\edef	y	escape (\e)
+# todo :pugs<feature>
+c \e+ d			abc\e\edef	y	escape (\e)
+a \e+ f			abcdef		n	escape (\e)
+b \e c			abc\edef	n	escape (\e)
+\E			a		y	not escape (\E)
+a \E c			abc		y	not escape (\E)
+\E			''		n	not escape (\E)
+# todo :pugs<feature>
+c \E d			abc\edef	n	not escape (\E)
+# todo :pugs<feature>
+c \E+ d			abc\e\edef	n	not escape (\E)
+a \E+ f			abcdef		y	not escape (\E)
+c \x0021 d		abc!def	y	hex (\x)
+c \x0021+ d		abc!!def	y	hex (\x)
+a \x0021+ f		abcdef		n	hex (\x)
+b \x0021 c		abc!def		n	hex (\x)
+c \x[0021] d		abc!def		y	hex (\x[])
+c \x[0021]+ d		abc!!def	y	hex (\x[])
+c \x[21,21] d		abc!!def	y	hex (\x[])
+a \x[0021]+ f		abcdef		n	hex (\x[])
+b \x[0021] c		abc!def		n	hex (\x[])
+\X0021			a		y	not hex (\X)
+a \X0021 c		abc		y	not hex (\X)
+\X0021			''		n	not hex (\X)
+c \X0021 d		abc!def		n	not hex (\X)
+c \X0021+ d		abc!!def	n	not hex (\X)
+a \X0021+ f		abcdef		y	not hex (\X)
+\X[0021]		a		y	not hex (\X[])
+a \X[0021] c		abc		y	not hex (\X[])
+\X[0021]		''		n	not hex (\X[])
+c \X[0021] d		abc!def		n	not hex (\X[])
+c \X[0021]+ d		abc!!def	n	not hex (\X[])
+a \X[0021]+ f		abcdef		y	not hex (\X[])
+c \o041 d		abc!def		y	octal (\o)
+c \o41+ d		abc!!def	y	octal (\o)
+a \o41+ f		abcdef		n	octal (\o)
+b \o41 c		abc!def		n	octal (\o)
+c \o[41] d		abc!def		y	octal (\o[])
+c \o[41]+ d		abc!!def	y	octal (\o[])
+# todo :pugs<feature>
+c \o[41,41] d		abc!!def	y	octal (\o[])
+a \o[41]+ f		abcdef		n	octal (\o[])
+b \o[41] c		abc!def		n	octal (\o[])
+\O41			a		y	not octal (\O)
+a \O41 c		abc		y	not octal (\O)
+\O41			''		n	not octal (\O)
+c \O41 d		abc!def		n	not octal (\O)
+c \O41+ d		abc!!def	n	not octal (\O)
+a \O41+ f		abcdef		y	not octal (\O)
+\O[41]			a		y	not octal (\O[])
+a \O[41] c		abc		y	not octal (\O[])
+\O[41]			''		n	not octal (\O[])
+c \O[41] d		abc!def		n	not octal (\O[])
+c \O[41]+ d		abc!!def	n	not octal (\O[])
+a \O[41]+ f		abcdef		y	not octal (\O[])
+a\w+f			a=[ *f		n	word character
+a\w+f			abcdef		y	word character
+a\W+f			a&%- f		y	not word character
+a\W+f			abcdef		n	not word character
+a\d+f			abcdef		n	digit
+ab\d+cdef		ab42cdef	y	digit
+a\D+f			abcdef		y	not digit
+a\D+f			ab0cdef		n	not digit
+
+## vim: noexpandtab tabstop=4 shiftwidth=4
