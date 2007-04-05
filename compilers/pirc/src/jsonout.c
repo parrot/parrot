@@ -255,3 +255,11 @@ init_json_vtable(void) {
     return vtable;
 }
 
+
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
