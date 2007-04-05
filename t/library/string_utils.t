@@ -12,7 +12,7 @@ t/library/string_utils.t  -- Tests for String/Utils.pbc
 
 =cut
 
-.const string TESTS = '24'
+.const string TESTS = '29'
 
 .sub main :main
     load_bytecode 'Test/Builder.pir'
@@ -31,34 +31,41 @@ t/library/string_utils.t  -- Tests for String/Utils.pbc
     $I0 = istrue $P0
     test.'ok'($I0, 'loaded chomp')
 
-    $P0 = get_hll_global ['String';'Utils'], 'convert_radix'
+    $P0 = get_hll_global ['String';'Utils'], 'convert_string_to_int'
     $I0 = istrue $P0
-    test.'ok'($I0, 'loaded radix')
+    test.'ok'($I0, 'loaded convert_string_to_int')
+
+    test_radix(''       , 'x', 0, 0     , 0, 'null string')
+    test_radix('nothing', 'x', 0, 0     , 0, 'no leading digits')
 
     # \x conversions
-    test_radix('41'     , 'x', 0, 'A'   , 2, '\x41')
-    test_radix('42G'    , 'x', 0, 'B'   , 2, '\x42')
-    test_radix('[41]'   , 'x', 0, 'A'   , 4, '\x[41]')
-    test_radix('[41,42]', 'x', 0, 'AB'  , 7, '\x[41,42]')
-    test_radix('0a'     , 'x', 0, "\n"  , 2, '\x0a')
-    test_radix('000a'   , 'x', 0, "\n"  , 4, '\x000a')
-    test_radix('ab0aX'  , 'x', 2, "\n"  , 2, 'pos offset')
-    test_radix('0A'     , 'x', 0, "\n"  , 2, '\x0a')
-    test_radix('000A'   , 'x', 0, "\n"  , 4, '\x000a')
-    test_radix('AB0AX'  , 'x', 2, "\n"  , 2, 'pos offset')
-    test_radix('[41,42]', 'x', 1, 'A'   , 2, 'pos offset')
-    test_radix('[41,42]', 'x', 4, 'B'   , 2, 'pos offset')
+    test_radix('41'     , 'x', 0, 65    , 2, 'x41')
+    test_radix('42G'    , 'x', 0, 66    , 2, 'x42G')
+    test_radix('0a'     , 'x', 0, 10    , 2, 'x0a')
+    test_radix('000a'   , 'x', 0, 10    , 4, 'x000a')
+    test_radix('abcd'   , 'x', 0, 0xabcd, 4, 'xabcd')
+    test_radix('ab0aX'  , 'x', 2, 10    , 2, 'pos offset')
+    test_radix('0A'     , 'x', 0, 10    , 2, 'x0A')
+    test_radix('000A'   , 'x', 0, 10    , 4, 'x000A')
+    test_radix('ABCD'   , 'x', 0, 0xabcd, 4, 'xABCD')
+    test_radix('AB0AX'  , 'x', 2, 10    , 2, 'pos offset')
 
     # \o conversions
-    test_radix('41'     , 'o', 0, '!'   , 2, '\o41')
-    test_radix('428'    , 'o', 0, '"'   , 2, '\o42')
-    test_radix('[41]'   , 'o', 0, '!'   , 4, '\o[41]')
-    test_radix('[41,42]', 'o', 0, '!"'  , 7, '\o[41,42]')
-    test_radix('012'    , 'o', 0, "\n"  , 3, '\o012')
-    test_radix('00012'  , 'o', 0, "\n"  , 5, '\o00012')
-    test_radix('12012'  , 'o', 2, "\n"  , 3, 'pos offset')
-    test_radix('[41,42]', 'o', 1, '!'   , 2, 'pos offset')
-    test_radix('[41,42]', 'o', 4, '"'   , 2, 'pos offset')
+    test_radix('41'     , 'o', 0, 33    , 2, 'o41')
+    test_radix('42G'    , 'o', 0, 34    , 2, 'o42G')
+    test_radix('12'     , 'o', 0, 10    , 2, 'o12')
+    test_radix('0012'   , 'o', 0, 10    , 4, 'o0012')
+    test_radix('1238'   , 'o', 0, 83    , 3, 'o1238')
+    test_radix('1212X'  , 'o', 2, 10    , 2, 'pos offset')
+
+    test_radix_digits('41'        , 'x', 0, 'A' , 2, '\x41')
+    test_radix_digits('41XYZ'     , 'x', 0, 'A' , 2, '\x41')
+    test_radix_digits('[41,42]'   , 'x', 0, 'AB', 7, '\x[41,42]')
+    test_radix_digits('[41,42]XYZ', 'x', 0, 'AB', 7, '\x[41,42]')
+    test_radix_digits('[41,42]'   , 'x', 1, 'A' , 2, '\x41')
+    test_radix_digits('[41,42]'   , 'x', 4, 'B',  2, '\x42')
+    test_radix_digits('2000'      , 'x', 0, unicode:"\u2000", 4, '\x2000')
+    test_radix_digits('1680'      , 'x', 0, unicode:"\u1680", 4, '\x1680')
 .end
 
 
@@ -66,17 +73,17 @@ t/library/string_utils.t  -- Tests for String/Utils.pbc
     .param string source
     .param string radix
     .param int pos
-    .param string target
+    .param int target
     .param int len
     .param string description
     .param string todo         :named('todo') :optional
     .param int has_todo        :opt_flag
 
-    .local pmc convert_radix
-    .local string t_target
-    .local int t_len, ok_target, ok_len, ok
-    convert_radix = get_hll_global ['String';'Utils'], 'convert_radix'
-    (t_target, t_len) = convert_radix(source, radix, pos)
+    .local pmc convert
+    convert = get_hll_global ['String';'Utils'], 'convert_string_to_int'
+
+    .local int t_target, t_len, ok_target, ok_len, ok
+    (t_target, t_len) = convert(source, radix, pos)
 
     ok_target = iseq t_target, target
     ok_len    = iseq t_len, len
@@ -93,4 +100,34 @@ t/library/string_utils.t  -- Tests for String/Utils.pbc
     .return ()
 .end
 
+.sub test_radix_digits
+    .param string source
+    .param string radix
+    .param int pos
+    .param int target
+    .param int len
+    .param string description
+    .param string todo         :named('todo') :optional
+    .param int has_todo        :opt_flag
+
+    .local pmc convert
+    convert = get_hll_global ['String';'Utils'], 'convert_digits_to_string'
+
+    .local int t_target, t_len, ok_target, ok_len, ok
+    (t_target, t_len) = convert(source, radix, pos)
+
+    ok_target = iseq t_target, target
+    ok_len    = iseq t_len, len
+    ok = and ok_target, ok_len
+
+    .local pmc test
+    test = get_global '$test'
+
+    if has_todo goto todo_test
+    test.'ok'(ok, description)
+    .return ()
+  todo_test:
+    test.'todo'(ok, description, todo)
+    .return ()
+.end
 
