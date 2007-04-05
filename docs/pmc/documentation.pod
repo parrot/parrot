@@ -1,0 +1,128 @@
+=head1 Overview
+
+This document describes guidelines for writing documentation for PMCs.
+All core PMCs B<must> be documented using the format outlined here.
+We encourage other PMC developers to follow these practices, too.
+
+Follow all documentation guidelines in F<docs/pdds/pdd07_codingstd.pod>.
+
+=over
+
+=item NAME
+
+Required. Specify the filename relative to the Parrot root, followed by
+a brief description of the PMC's intent.
+
+ =head1 NAME
+
+ src/pmc/exporter.pmc - Export globals from one namespace to another
+
+=item DESCRIPTION
+
+Required. A verbose description of the PMC's intent, mentioning the major
+use cases. Include links to spec/design documentation or other related
+files. Describe the interface (what this PMC inherits from, and what
+interfaces it provides) -- a description of the information contained
+in the C<pmclass> declaration.
+
+ =head1 DESCRIPTION
+
+ Exports globals from one namespace to another. Exporter always uses
+ the typed namespace interface, as outlined in
+ F<docs/pdds/pdd21_namespaces.pod>.
+
+ Exporter is not derived from any other PMC, and does not provide any
+ standard interface--its inteface consists solely of non-vtable methods.
+
+The B<DESCRIPTION> section is further broken down as follows:
+
+=over 4
+
+=item Structure
+
+Describe the underlying structure of the PMC. Often this information
+has been contained in source comments. It should be formalized and made
+available to others by converting it to POD. Mention initialization and
+finalization behavior.
+
+ =head2 Structure
+
+ The Exporter PMC structure (C<Parrot_Exporter>) consists of three items:
+
+ =over 4
+
+ =item C<ns_src>
+
+ The source namespace -- a NameSpace PMC.
+ An empty PMC of this type is allocated upon initialization.
+
+ =item C<ns_dest>
+
+ The destination namespace -- a NameSpace PMC.
+ An empty PMC of this type is allocated upon initialization.
+
+ =item C<globals>
+
+ The globals to export -- a ResizableStringArray.
+ A Null PMC is allocated during initialization.
+
+=item Functions
+
+Required. Group all PMC functions together in the source, and describe them
+individually.
+
+ =head2 Functions
+
+ =over 4
+
+ =item C<void init()>
+
+ Instantiates an Exporter.
+
+etc.
+
+=item Methods
+
+Required. Group all PMC methods together (VTABLE or otherwise,)
+and describe function, expected parameters, and return values.
+
+ =head2 Methods
+
+ =over 4
+
+ =item C<PCCMETHOD void
+ import(PMC *dest :optional :named["destination"], int got_dest :opt_flag,
+ PMC *src :optional :named["source"], int got_src :opt_flag,
+ PMC *globals :optional :named["globals"], int got_globals :opt_flag)>
+
+ Import C<globals> from the C<src> namespace to the C<dest> namespace.
+ If C<src>, C<dest>, or C<globals> are passed, they will override
+ the current value.
+ C<import> follows the semantics of the C<export_to> method
+ of the C<NameSpace> PMC. in particular, if a NULL value is passed
+ for C<globals>, the default set of items will be imported.
+ Throws an exception upon error.
+
+=back
+
+=item STABILITY
+
+Required. List the stability of this PMC, as classified in
+F<docs/stability.pod>.
+
+=item SEE ALSO
+
+Recommended. List related documentation.
+
+ =head1 SEE ALSO
+
+ F<docs/pdds/pdd17_basic_types.pod>, F<docs/pdds/pdd21_namespaces.pod>.
+
+=back
+
+=item STABILITY
+
+Unstable. This is a draft document, which must be reviewed and accepted by the Project Team.
+
+=cut
+
