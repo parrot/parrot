@@ -120,7 +120,7 @@ Recommended. List related documentation.
 
 =back
 
-=item STABILITY
+=head1 STABILITY
 
 Unstable. This is a draft document, which must be reviewed and accepted by the Project Team.
 
