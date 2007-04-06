@@ -261,7 +261,7 @@ Extending an existing class that has been instantiated creates a new
 class object that replaces the old class object in the Namespace.
 However, the old class object must be kept, as the old objects still
 point to it and do their method resolution and attribute lookup through
-that class object. 
+that class object.
 
 If a class hasn't been instantiated, adding a method or attribute only
 modifies the existing class object instead of creating a new class
@@ -444,7 +444,7 @@ the method with the new method and throw a warning.
 
 It also takes slurpy named parameters to flag whether the method is a
 vtable method, and whether its anonymous (no named entry as a method,
-only as a vtable). 
+only as a vtable).
 
 =item methods
 
@@ -561,7 +561,7 @@ In a static language like C#.Net:
   B isa A
   A o1 = new B();
   B o2 = new B();
-  
+
   o1.x; # retrieves A's attribute
   o2.x; # retrieves B's attribute
 
@@ -782,7 +782,7 @@ the method with the new method and throw a warning.
 
 It also takes slurpy named parameters to flag whether the method is a
 vtable method, and whether its anonymous (no named entry as a method,
-only as a vtable). 
+only as a vtable).
 
 =item methods
 
@@ -800,7 +800,7 @@ accessor is read-only.
 When a role is added to a class, we try to compose it right away, and
 throw an exception on any conflicts that are detected. A conflict occurs
 if two roles try to supply a method of the same name (but see the note
-on multi-methods below). High level languaes will provide varying
+on multi-methods below). High level languages will provide varying
 facilities to deal with this, and Parrot provides the primitives to
 implement them.
 
@@ -1086,7 +1086,7 @@ Notes on some of the OO-related needs of various languages.
 
 =head2 PMCS
 
-Ruby: Just like Smalltalk, everything is an object.  I'm hoping to be able to 
+Ruby: Just like Smalltalk, everything is an object.  I'm hoping to be able to
 implement core Ruby classes (String, Array, Hash, Module, etc)  something like this.
 
 ParrotClass
@@ -1216,7 +1216,7 @@ method matched" fallback method that the compiler fills out to implement the
 delegation.
 
 Perl 6: Delegation support is highly flexible, even allowing a regex to match
-method names that should be delegated to a particular object. 
+method names that should be delegated to a particular object.
 
 =head2 Prototype-based OO
 
