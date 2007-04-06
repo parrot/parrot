@@ -43,14 +43,9 @@ Clean up grammar after discussion.
 
 =item + unify '.sym' and '.local'. Just allow one, and think of something else for local labels in macros.
 
-=item + Decide on dot-prefix: either .Integer or Integer, but not both.
-
-=item + same for strings: .Integer, Integer or "Integer"?
-
 =back
 
 =back
-
 
 =cut
 
@@ -67,7 +62,7 @@ Clean up grammar after discussion.
 
 /*
 
-=head1 INTERNALS
+=head1 PARSER INTERNALS
 
 The parser_state structure has the following fields:
 
@@ -359,6 +354,8 @@ The following conventions are used:
 
 =head2 Grammar rules
 
+=head3 Expressions
+
 =over 4
 
 =item *
@@ -645,6 +642,12 @@ arguments(parser_state *p) {
 
 
 /*
+
+=back
+
+=head3 Statements
+
+=over 4
 
 =item *
 
@@ -1224,7 +1227,9 @@ const_definition(parser_state *p) {
 
 =item *
 
-  arg_flags -> ':flat' | ':named' [ '(' STRINGC ')' ]
+  arg_flags -> { arg_flag }
+
+  arg_flag -> ':flat' | ':named' [ '(' STRINGC ')' ]
 
 =cut
 
@@ -1255,11 +1260,13 @@ arg_flags(parser_state *p) {
 
 =item *
 
-  param_flags -> ':slurpy'
-               | ':named'['(' STRINGC ')']
-               | ':unique_reg'
-               | ':optional'
-               | ':opt_flag'
+  param_flags -> { param_flag }
+
+  param_flag -> ':slurpy'
+              | ':named'['(' STRINGC ')']
+              | ':unique_reg'
+              | ':optional'
+              | ':opt_flag'
 
 =cut
 
@@ -1476,7 +1483,7 @@ long_yield_statement(parser_state *p) {
   target_statement -> target ( '=' assignment
                              | augmented_op expression
                              | keylist '=' expression
-                             | '->' (STRINGC|IDENTIFIER) arguments
+                             | '->' method arguments
                              | arguments
                              )
                              '\n'
@@ -1833,6 +1840,12 @@ instructions(parser_state *p) {
 
 
 /*
+
+=back
+
+=head3 Compilation Units
+
+=over 4
 
 =item *
 
