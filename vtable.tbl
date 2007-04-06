@@ -341,21 +341,38 @@ INTVAL does(STRING* method)
 
 INTVAL isa(STRING* _class)
 
-PMC* subclass(PMC* name)
-
 PMC* get_attr(INTVAL idx)
 PMC* get_attr_str(STRING* idx)
 void set_attr(INTVAL idx, PMC* value) :write
 void set_attr_str(STRING* idx, PMC* value) :write
 
 PMC* get_class()
-void add_parent(PMC* parent) :write
-void become_parent(PMC* class)
 INTVAL class_type()
-void add_method(STRING* method, PMC* sub_pmc) :write
-void remove_method(STRING* method) :write
+
+void add_parent(PMC* parent) :write
+void remove_parent(PMC* parent) :write
+
+void add_role(PMC* role) :write
+void remove_role(PMC* role) :write
+
+void add_attribute(STRING* name, PMC* type) :write
+void remove_attribute(STRING* name) :write
+
+void add_method(STRING* method_name, PMC* sub_pmc) :write
+void remove_method(STRING* method_name) :write
+
+PMC* inspect()
+PMC* inspect_str(STRING* what)
+
+## Unspecified
 PMC* new_singleton()
+## Unspecified
 PMC* get_anonymous_subclass()
+
+## Deprecated
+void become_parent(PMC* class)
+## Deprecated
+PMC* subclass(PMC* name)
 
 void freeze(visit_info* info)
 void thaw  (visit_info* info) :write
