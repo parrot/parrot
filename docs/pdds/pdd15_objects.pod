@@ -1084,12 +1084,12 @@ the rest of the immediate parents.
 
 Notes on some of the OO-related needs of various languages.
 
-=head2 PMCS
+=head2 PMCs
 
 Ruby: Just like Smalltalk, everything is an object.  I'm hoping to be able to
 implement core Ruby classes (String, Array, Hash, Module, etc)  something like this.
 
-ParrotClass
+ ParrotClass
     |
  RubyClass   String
     |         |
