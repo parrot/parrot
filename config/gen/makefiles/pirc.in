@@ -97,7 +97,7 @@ help:
 	@echo ""
 
 
-docs: src/pirlexer.c src/pirparser.c
+docs: src/pirlexer.c src/pirparser.c doc/design.pod
 	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirlexer.c > doc/pirlexer.html
 	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirparser.c > doc/pirparser.html
 	pod2html --css=http://www.parrotcode.org/css/perl.css doc/design.pod > doc/design.html
