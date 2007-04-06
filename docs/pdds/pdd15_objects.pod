@@ -286,7 +286,7 @@ Low-level PMC types will also need entries in the namespace hierarchy.
 We may eventually be able to eliminate the registry of class IDs
 altogether.
 
-A class can be garbage collected when it has no instantiatated objects
+A class can be garbage collected when it has no instantiated objects
 and no Namespace object referencing it (to mark it as live). When a
 class is garbage collected, it should remove itself from the registry.
 
