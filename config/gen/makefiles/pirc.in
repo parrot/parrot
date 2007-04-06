@@ -104,6 +104,9 @@ docs: src/pirlexer.c src/pirparser.c doc/design.pod
 
 test: all
 	cd t && prove && cd ..
+	podchecker src/pirparser.c \
+	src/pirlexer.c \
+	doc/design.pod
 
 
 testclean:
@@ -118,6 +121,7 @@ clean:
 realclean: clean
 	$(RM_RF) \
 	$(STICKY_FILES)	\
-	pirc$(EXE)
+	pirc$(EXE) \
+	doc/*.html
 
 distclean: realclean
