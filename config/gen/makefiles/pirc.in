@@ -79,6 +79,10 @@ help:
 	@echo ""
 	@echo "	 all:				pirc"
 	@echo "						This is	the	default."
+	@echo ""
+	@echo "Documentation:"
+	@echo "  docs:              Generate html documentation in doc directory"
+	@echo ""
 	@echo "Testing:"
 	@echo "	 test:				Run	the	test suite."
 	@echo "	 testclean:			Clean up test results."
@@ -92,6 +96,11 @@ help:
 	@echo "	 help:				Print this help	message."
 	@echo ""
 
+
+docs: src/pirlexer.c src/pirparser.c
+	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirlexer.c > doc/pirlexer.html
+	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirparser.c > doc/pirparser.html
+	pod2html --css=http://www.parrotcode.org/css/perl.css doc/design.pod > doc/design.html
 
 test: all
 	cd t && prove && cd ..
