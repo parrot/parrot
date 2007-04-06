@@ -220,6 +220,45 @@ Mark any referenced strings and PMCs.
 
 /*
 
+=item C<void add_attribute(STRING *name, PMC *type)>
+
+Adds the given attribute with an optional type.
+
+=cut
+
+*/
+    void add_attribute(STRING *name, PMC *type)
+    {
+        Parrot_Class *class = PARROT_CLASS(SELF);
+        PMC *new_attribute = pmc_new(interp, enum_class_Hash);
+
+        /* If we've been instantiated already, need a new class. */
+        if (class->instantiated) {
+            /* XXX Unimplemented! */
+            real_exception(interp, NULL, E_NotImplementedError,
+                "Modifications to already instantiated classes not allowed yet.");
+        }
+
+        /* If we've already got an attribute of this name, it's an error. */
+        if (VTABLE_exists_keyed_str(interp, class->attrib_metadata, name)) {
+            real_exception(interp, NULL, INVALID_OPERATION,
+                "An attribute of this name already exists.");
+        }
+
+        /* Set name and type. */
+        VTABLE_set_string_keyed_str(interp, new_attribute,
+            CONST_STRING(interp, "name"), name);
+        if (!PMC_IS_NULL(type)) {
+            VTABLE_set_pmc_keyed_str(interp, new_attribute,
+                CONST_STRING(interp, "type"), type);
+        }
+
+        /* Enter the attribute in the attributes array. */
+        VTABLE_set_pmc_keyed_str(interp, class->attrib_metadata, name, new_attribute);
+    }
+
+/*
+
 =item C<void add_method(STRING *name, PMC *sub)>
 
 Adds the given sub PMC as a method with the given name.
@@ -241,6 +280,109 @@ Adds the given sub PMC as a method with the given name.
             /* Enter it into the table. */
             VTABLE_set_pmc_keyed_str(interp, class->methods, name, sub);
         }
+    }
+
+/*
+
+=item C<void add_parent(PMC *parent)>
+
+Adds the supplied PMC to the list of parents for the class.
+
+=cut
+
+*/
+    void add_parent(PMC *parent)
+    {
+        Parrot_Class *class = PARROT_CLASS(SELF);
+
+        /* If we've been instantiated already, need a new class. */
+        if (class->instantiated) {
+            /* XXX Unimplemented! */
+            real_exception(interp, NULL, E_NotImplementedError,
+                "Modifications to already instantiated classes not allowed yet.");
+            return;
+        }
+
+        /* Ensure it really is a class. */
+        if (!PObj_is_class_TEST(parent)) {
+            real_exception(interp, NULL, E_TypeError,
+                "You can only add a class as a parent to another class.");
+            return;
+        }
+
+        /* XXX Check we don't already have this parent. */
+
+        /* Add to the list of our immediate parents. */
+        VTABLE_push_pmc(interp, class->parents, parent);
+    }
+
+/*
+
+=item C<void add_role(PMC *role)>
+
+Adds the supplied PMC to the list of roles for the class, provided there are
+no conflicts.
+
+=cut
+
+*/
+    void add_role(PMC *role)
+    {
+        Parrot_Class *class = PARROT_CLASS(SELF);
+
+        /* Do the composition. */
+        Parrot_ComposeRole(interp, role, PMCNULL, 0, PMCNULL, 0,
+                           class->methods, class->roles);
+    }
+
+/*
+
+=item C<PMC* inspect_str(STRING *what)>
+
+Provides introspection of a specific piece of information about the class. The
+available information is:
+
+=over 4
+
+=item attributes - Hash keyed on attribute name, value is hash describing it
+
+=item methods - Hash keyed on method name, value is an invokable PMC. Includes
+methods composed in from roles.
+
+=item roles - Array of Role PMCs. Includes roles done by the roles that were
+composed into this class.
+
+=item parents - Array of Class PMCs representing the direct parents of this
+class.
+
+=cut
+
+*/
+    PMC* inspect_str(STRING *what)
+    {
+        Parrot_Class *class = PARROT_CLASS(SELF);
+
+        /* What should we return? */
+        PMC *found;
+        if (string_equal(interp, what, CONST_STRING(interp, "attributes")) == 0) {
+            found = class->attrib_metadata;
+        }
+        else if (string_equal(interp, what, CONST_STRING(interp, "methods")) == 0) {
+            found = class->methods;
+        }
+        else if (string_equal(interp, what, CONST_STRING(interp, "parents")) == 0) {
+            found = class->parents;
+        }
+        else if (string_equal(interp, what, CONST_STRING(interp, "roles")) == 0) {
+            found = class->roles;
+        }
+        else {
+            real_exception(interp, NULL, INVALID_OPERATION,
+                "Unknown introspection value '%S'", what);
+        }
+
+        /* Clone and return. */
+        return VTABLE_clone(interp, found);
     }
 
 
@@ -408,8 +550,8 @@ providing a set of key/value pairs describing the attribute.
 
 */
     PCCMETHOD void attributes() {
-        Parrot_Class *class = PARROT_CLASS(SELF);
-        PMC *ret_attrib_metadata = VTABLE_clone(interp, class->attrib_metadata);
+        PMC *ret_attrib_metadata = VTABLE_inspect_str(interp, SELF, 
+            CONST_STRING(interp, "attributes"));
         PCCRETURN(PMC *ret_attrib_metadata);
     }
 
@@ -423,34 +565,9 @@ Add an attribute to the class. Requires a name and, optionally, a type.
 
 */
     PCCMETHOD void add_attribute(STRING *attribute_name,
-            STRING* attribute_type :optional, int got_type :opt_flag) {
-        Parrot_Class *class = PARROT_CLASS(SELF);
-        PMC *new_attribute = pmc_new(interp, enum_class_Hash);
-
-        /* If we've been instantiated already, need a new class. */
-        if (class->instantiated) {
-            /* XXX Unimplemented! */
-            real_exception(interp, NULL, E_NotImplementedError,
-                "Modifications to already instantiated classes not allowed yet.");
-        }
-
-        /* If we've already got an attribute of this name, it's an error. */
-        if (VTABLE_exists_keyed_str(interp, class->attrib_metadata, attribute_name)) {
-            real_exception(interp, NULL, INVALID_OPERATION,
-                "An attribute of this name already exists.");
-            return;
-        }
-
-        /* Set name and type. */
-        VTABLE_set_string_keyed_str(interp, new_attribute,
-            CONST_STRING(interp, "name"), attribute_name);
-        if (got_type) {
-            VTABLE_set_string_keyed_str(interp, new_attribute,
-                CONST_STRING(interp, "type"), attribute_type);
-        }
-
-        /* Enter the attribute in the attributes array. */
-        VTABLE_set_pmc_keyed_str(interp, class->attrib_metadata, attribute_name, new_attribute);
+            PMC* attribute_type :optional, int got_type :opt_flag) {
+        VTABLE_add_attribute(interp, SELF, attribute_name,
+            got_type ? attribute_type : PMCNULL);
     }
 
 /*
@@ -463,8 +580,8 @@ Return a hash where the keys are method names and the values are methods.
 
 */
     PCCMETHOD void methods() {
-        Parrot_Class *class = PARROT_CLASS(SELF);
-        PMC *ret_methods = VTABLE_clone(interp, class->methods);
+        PMC *ret_methods = VTABLE_inspect_str(interp, SELF,
+            CONST_STRING(interp, "methods"));
         PCCRETURN(PMC *ret_methods);
     }
 
@@ -493,8 +610,8 @@ Return the parents array PMC.
 
 */
     PCCMETHOD void parents() {
-        Parrot_Class *class = PARROT_CLASS(SELF);
-        PMC *ret_parents = VTABLE_clone(interp, class->parents);
+        PMC *ret_parents = VTABLE_inspect_str(interp, SELF,
+            CONST_STRING(interp, "parents"));
         PCCRETURN(PMC *ret_parents);
     }
 
@@ -502,31 +619,13 @@ Return the parents array PMC.
 
 =item C<void add_parent(PMC *parent)>
 
-Return the parents array PMC.
+Adds the supplied PMC to the list of parents for the class.
 
 =cut
 
 */
     PCCMETHOD void add_parent(PMC *parent) {
-        Parrot_Class *class = PARROT_CLASS(SELF);
-
-        /* If we've been instantiated already, need a new class. */
-        if (class->instantiated) {
-            /* XXX Unimplemented! */
-            real_exception(interp, NULL, E_NotImplementedError,
-                "Modifications to already instantiated classes not allowed yet.");
-            return;
-        }
-
-        /* Ensure it really is a class. */
-        if (!PObj_is_class_TEST(parent)) {
-            real_exception(interp, NULL, E_TypeError,
-                "You can only add a class as a parent to another class.");
-            return;
-        }
-
-        /* Add to the list of our immediate parents. */
-        VTABLE_push_pmc(interp, class->parents, parent);
+        VTABLE_add_parent(interp, SELF, parent);
     }
 
 /*
@@ -539,8 +638,8 @@ Return the roles array PMC.
 
 */
     PCCMETHOD void roles() {
-        Parrot_Class *class = PARROT_CLASS(SELF);
-        PMC *ret_roles = VTABLE_clone(interp, class->roles);
+        PMC *ret_roles = VTABLE_inspect_str(interp, SELF,
+            CONST_STRING(interp, "roles"));
         PCCRETURN(PMC *ret_roles);
     }
 
