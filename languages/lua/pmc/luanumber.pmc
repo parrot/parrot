@@ -204,8 +204,8 @@ Returns a Parrot string representation of the number.
 
 */
     void set_string_native (STRING *value) {
-        VTABLE_morph(INTERP, SELF, dynpmc_LuaString);
-        VTABLE_set_string_native(INTERP, SELF, value);
+        SELF.morph(dynpmc_LuaString);
+        DYNSELF.set_string_native(value);
     }
 
 /*
@@ -242,7 +242,7 @@ Decrements the number.
 
 */
     PMC* neg (PMC * dest) {
-        FLOATVAL a = - DYNSELF.get_number();
+        FLOATVAL a = - SELF.get_number();
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_number_native(INTERP, dest, a);
@@ -257,8 +257,8 @@ Decrements the number.
 
 */
     void i_neg () {
-        FLOATVAL a = - DYNSELF.get_number();
-        VTABLE_set_number_native(INTERP, SELF, a);
+        FLOATVAL a = - SELF.get_number();
+        SELF.set_number_native(a);
     }
 
 /*
@@ -279,7 +279,7 @@ MMD_LuaNumber: {
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             VTABLE_set_number_native(INTERP, dest,
-                    DYNSELF.get_number() + VTABLE_get_number(INTERP, value));
+                    SELF.get_number() + VTABLE_get_number(INTERP, value));
             return dest;
         }
 MMD_LuaString: {
@@ -320,8 +320,9 @@ MMD_DEFAULT: {
 */
     void i_add (PMC* value) {
 MMD_LuaNumber: {
-            VTABLE_set_number_native(INTERP, SELF,
-                DYNSELF.get_number() + VTABLE_get_number(INTERP, value));
+            FLOATVAL n = SELF.get_number()
+                         + VTABLE_get_number(INTERP, value);
+            SELF.set_number_native(n);
         }
 MMD_LuaString: {
             PMC* n = LuaString.value.tonumber();
@@ -362,7 +363,7 @@ MMD_LuaNumber: {
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             VTABLE_set_number_native(INTERP, dest,
-                    DYNSELF.get_number() - VTABLE_get_number(INTERP, value));
+                    SELF.get_number() - VTABLE_get_number(INTERP, value));
             return dest;
         }
 MMD_LuaString: {
@@ -404,8 +405,9 @@ MMD_DEFAULT: {
 */
     void i_subtract (PMC* value) {
 MMD_LuaNumber: {
-            VTABLE_set_number_native(INTERP, SELF,
-                DYNSELF.get_number() - VTABLE_get_number(INTERP, value));
+            FLOATVAL n = SELF.get_number()
+                         - VTABLE_get_number(INTERP, value);
+            SELF.set_number_native(n);
         }
 MMD_LuaString: {
             PMC* n = LuaString.value.tonumber();
@@ -446,7 +448,7 @@ MMD_LuaNumber: {
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             VTABLE_set_number_native(INTERP, dest,
-                    DYNSELF.get_number() * VTABLE_get_number(INTERP, value));
+                    SELF.get_number() * VTABLE_get_number(INTERP, value));
             return dest;
         }
 MMD_LuaString: {
@@ -488,8 +490,9 @@ MMD_DEFAULT: {
 */
     void i_multiply (PMC* value) {
 MMD_LuaNumber: {
-            VTABLE_set_number_native(INTERP, SELF,
-                DYNSELF.get_number() * VTABLE_get_number(INTERP, value));
+            FLOATVAL n = SELF.get_number()
+                         * VTABLE_get_number(INTERP, value);
+            SELF.set_number_native(n);
         }
 MMD_LuaString: {
             PMC* n = LuaString.value.tonumber();
@@ -530,7 +533,7 @@ MMD_LuaNumber: {
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             VTABLE_set_number_native(INTERP, dest,
-                    DYNSELF.get_number() / VTABLE_get_number(INTERP, value));
+                    SELF.get_number() / VTABLE_get_number(INTERP, value));
             return dest;
         }
 MMD_LuaString: {
@@ -572,8 +575,9 @@ MMD_DEFAULT: {
 */
     void i_divide (PMC* value) {
 MMD_LuaNumber: {
-            VTABLE_set_number_native(INTERP, SELF,
-                DYNSELF.get_number() / VTABLE_get_number(INTERP, value));
+            FLOATVAL n = SELF.get_number()
+                         / VTABLE_get_number(INTERP, value);
+            SELF.set_number_native(n);
         }
 MMD_LuaString: {
             PMC* n = LuaString.value.tonumber();
@@ -611,7 +615,7 @@ MMD_DEFAULT: {
 */
     PMC* modulus (PMC* value, PMC* dest) {
 MMD_LuaNumber: {
-            FLOATVAL a = DYNSELF.get_number();
+            FLOATVAL a = SELF.get_number();
             FLOATVAL b = VTABLE_get_number(INTERP, value);
 
             if (!dest)
@@ -658,10 +662,10 @@ MMD_DEFAULT: {
 */
     void i_modulus (PMC* value) {
 MMD_LuaNumber: {
-            FLOATVAL a = DYNSELF.get_number();
+            FLOATVAL a = SELF.get_number();
             FLOATVAL b = VTABLE_get_number(INTERP, value);
 
-            VTABLE_set_number_native(INTERP, SELF, a - floor(a/b)*b);
+            SELF.set_number_native(a - floor(a/b)*b);
         }
 MMD_LuaString: {
             PMC* n = LuaString.value.tonumber();
@@ -702,7 +706,7 @@ MMD_LuaNumber: {
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
             VTABLE_set_number_native(INTERP, dest,
-                  pow(DYNSELF.get_number(), VTABLE_get_number(INTERP, value)));
+                  pow(SELF.get_number(), VTABLE_get_number(INTERP, value)));
             return dest;
         }
 MMD_LuaString: {
@@ -743,8 +747,9 @@ MMD_DEFAULT: {
 */
     void i_pow (PMC* value) {
 MMD_LuaNumber: {
-            VTABLE_set_number_native(INTERP, SELF,
-                  pow(DYNSELF.get_number(), VTABLE_get_number(INTERP, value)));
+            FLOATVAL n = pow(SELF.get_number(),
+                             VTABLE_get_number(INTERP, value));
+            SELF.set_number_native(n);
         }
 MMD_LuaString: {
             PMC* n = LuaString.value.tonumber();
@@ -820,7 +825,7 @@ MMD_DEFAULT: {
     PMC* concatenate (PMC* value,  PMC* dest) {
 MMD_LuaNumber: {
             STRING* s = string_concat(INTERP,
-                DYNSELF.get_string(),
+                SELF.get_string(),
                 VTABLE_get_string(INTERP, value), 0);
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
@@ -829,7 +834,7 @@ MMD_LuaNumber: {
         }
 MMD_LuaString: {
             STRING* s = string_concat(INTERP,
-                DYNSELF.get_string(),
+                SELF.get_string(),
                 VTABLE_get_string(INTERP, value), 0);
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
@@ -862,14 +867,14 @@ MMD_DEFAULT: {
 */
     void i_concatenate (PMC* value) {
 MMD_LuaNumber: {
-            STRING* s = DYNSELF.get_string();
+            STRING* s = SELF.get_string();
             STRING* v = VTABLE_get_string(INTERP, value);
-            DYNSELF.set_string_native(string_append(INTERP, s, v));
+            SELF.set_string_native(string_append(INTERP, s, v));
         }
 MMD_LuaString: {
-            STRING* s = DYNSELF.get_string();
+            STRING* s = SELF.get_string();
             STRING* v = VTABLE_get_string(INTERP, value);
-            DYNSELF.set_string_native(string_append(INTERP, s, v));
+            SELF.set_string_native(string_append(INTERP, s, v));
         }
 MMD_DEFAULT: {
             PMC *meth = find_meth(INTERP, value, "__concat");
@@ -922,7 +927,7 @@ MMD_DEFAULT: {
     METHOD PMC* tonumber() {
         PMC *retval;
 
-        retval = VTABLE_clone(INTERP, SELF);
+        retval = SELF.clone();
         return retval;
     }
 

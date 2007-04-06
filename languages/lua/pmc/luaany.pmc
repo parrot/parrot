@@ -559,7 +559,7 @@ Throws an exception.
         }
         real_exception(INTERP, NULL, ILL_INHERIT,
                 "attempt to get length of a %s value",
-                string_to_cstring(INTERP, VTABLE_name(INTERP, SELF)));
+                string_to_cstring(INTERP, DYNSELF.name()));
         return NULL;
     }
 
@@ -599,7 +599,7 @@ Common implementation (use C<__tostring> or C<get_string>).
         }
         else {
             retval = pmc_new(INTERP, dynpmc_LuaString);
-            PMC_str_val(retval) = VTABLE_get_string(INTERP, SELF);
+            PMC_str_val(retval) = DYNSELF.get_string();
         }
         return retval;
     }

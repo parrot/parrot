@@ -167,8 +167,8 @@ Return the string "string".
 
 */
     void set_number_native(FLOATVAL value) {
-        VTABLE_morph(INTERP, SELF, dynpmc_LuaNumber);
-        VTABLE_set_number_native(INTERP, SELF, value);
+        SELF.morph(dynpmc_LuaNumber);
+        DYNSELF.set_number_native(value);
     }
 
 /*
@@ -179,8 +179,8 @@ Return the string "string".
 
 */
     void set_number_native (FLOATVAL value) {
-        VTABLE_morph(INTERP, SELF, dynpmc_LuaNumber);
-        VTABLE_set_number_native(INTERP, SELF, value);
+        SELF.morph(dynpmc_LuaNumber);
+        DYNSELF.set_number_native(value);
     }
 
 /*
@@ -921,7 +921,7 @@ MMD_DEFAULT: {
     PMC* concatenate (PMC* value,  PMC* dest) {
 MMD_LuaNumber: {
             STRING* s = string_concat(INTERP,
-                DYNSELF.get_string(),
+                SELF.get_string(),
                 VTABLE_get_string(INTERP, value), 0);
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
@@ -930,7 +930,7 @@ MMD_LuaNumber: {
         }
 MMD_LuaString: {
             STRING* s = string_concat(INTERP,
-                DYNSELF.get_string(),
+                SELF.get_string(),
                 VTABLE_get_string(INTERP, value), 0);
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
@@ -963,14 +963,14 @@ MMD_DEFAULT: {
 */
     void i_concatenate (PMC* value) {
 MMD_LuaNumber: {
-            STRING* s = DYNSELF.get_string();
+            STRING* s = SELF.get_string();
             STRING* v = VTABLE_get_string(INTERP, value);
-            DYNSELF.set_string_native(string_append(INTERP, s, v));
+            SELF.set_string_native(string_append(INTERP, s, v));
         }
 MMD_LuaString: {
-            STRING* s = DYNSELF.get_string();
+            STRING* s = SELF.get_string();
             STRING* v = VTABLE_get_string(INTERP, value);
-            DYNSELF.set_string_native(string_append(INTERP, s, v));
+            SELF.set_string_native(string_append(INTERP, s, v));
         }
 MMD_DEFAULT: {
             PMC *meth = find_meth(INTERP, value, "__concat");
@@ -1021,7 +1021,7 @@ MMD_DEFAULT: {
         PMC *retval;
 
         retval = pmc_new(INTERP, dynpmc_LuaNumber);
-        PMC_num_val(retval) = VTABLE_elements(INTERP, SELF);
+        PMC_num_val(retval) = SELF.elements();
         return retval;
     }
 
@@ -1058,7 +1058,7 @@ MMD_DEFAULT: {
         char *s1;
         char *s2;
 
-        rep = VTABLE_get_string(INTERP, SELF);
+        rep = SELF.get_string();
         s1 = string_to_cstring(INTERP, rep);
         d = strtod(s1, &s2);
         if (s1 != s2) {  /* at least one valid digit? */
@@ -1088,7 +1088,7 @@ MMD_DEFAULT: {
         char *s1;
         char *s2;
 
-        rep = VTABLE_get_string(INTERP, SELF);
+        rep = SELF.get_string();
         s1 = string_to_cstring(INTERP, rep);
         n = strtoul(s1, &s2, base);
         if (s1 != s2) {  /* at least one valid digit? */
