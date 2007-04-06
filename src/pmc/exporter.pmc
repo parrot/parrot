@@ -219,14 +219,16 @@ If C<glb> is a FixedStringArray, it is cloned and set.
         Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
         PMC *ret_globals;
         STRING *s_str = CONST_STRING(interp, "String");
-        STRING *s_fsa = CONST_STRING(interp, "FixedStringArray");
+        STRING *s_arr = CONST_STRING(interp, "array");
 
         if (got_glb) {
             if (PMC_IS_NULL(glb))
                 exp->globals = PMCNULL;
             else if (VTABLE_isa(interp, glb, s_str))
-                exp->globals = string_split(interp, ' ', glb);
-            else if (VTABLE_isa(interp, glb, s_fsa))
+                exp->globals = string_split(interp,
+                        CONST_STRING(interp, " "),
+                        VTABLE_get_string(interp, glb));
+            else if (VTABLE_does(interp, glb, s_arr))
                 exp->globals = VTABLE_clone(interp, glb);
             else
                  real_exception(interp, NULL, 0,
