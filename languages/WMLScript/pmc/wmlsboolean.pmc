@@ -105,10 +105,10 @@ Return the string "true" or "false".
 
 */
     void increment () {
-        const INTVAL a = VTABLE_get_integer(INTERP, SELF);
-        VTABLE_morph(INTERP, SELF, dynpmc_WmlsInteger);
-        VTABLE_set_integer_native(INTERP, SELF, a);
-        VTABLE_increment(INTERP, SELF);
+        const INTVAL a = DYNSELF.get_integer();
+        DYNSELF.morph(dynpmc_WmlsInteger);
+        DYNSELF.set_integer_native(a);
+        DYNSELF.increment();
     }
 
 /*
@@ -119,10 +119,10 @@ Return the string "true" or "false".
 
 */
     void decrement () {
-        const INTVAL a = VTABLE_get_integer(INTERP, SELF);
-        VTABLE_morph(INTERP, SELF, dynpmc_WmlsInteger);
-        VTABLE_set_integer_native(INTERP, SELF, a);
-        VTABLE_decrement(INTERP, SELF);
+        const INTVAL a = DYNSELF.get_integer();
+        DYNSELF.morph(dynpmc_WmlsInteger);
+        DYNSELF.set_integer_native(a);
+        DYNSELF.decrement();
     }
 
 /*

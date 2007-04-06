@@ -62,19 +62,19 @@ pmclass WmlsString
     void increment () {
         PMC * trans = SELF.parseNumber();
         if      (trans->vtable->base_type == dynpmc_WmlsInvalid) {
-            VTABLE_morph(INTERP, SELF, dynpmc_WmlsInvalid);
+            DYNSELF.morph(dynpmc_WmlsInvalid);
         }
         else if (trans->vtable->base_type == dynpmc_WmlsInteger) {
             const INTVAL a = VTABLE_get_integer(INTERP, trans);
-            VTABLE_morph(INTERP, SELF, dynpmc_WmlsInteger);
-            VTABLE_set_integer_native(INTERP, SELF, a);
+            DYNSELF.morph(dynpmc_WmlsInteger);
+            DYNSELF.set_integer_native(a);
         }
         else if (trans->vtable->base_type == dynpmc_WmlsFloat) {
             const FLOATVAL a = VTABLE_get_number(INTERP, trans);
-            VTABLE_morph(INTERP, SELF, dynpmc_WmlsFloat);
-            VTABLE_set_number_native(INTERP, SELF, a);
+            DYNSELF.morph(dynpmc_WmlsFloat);
+            DYNSELF.set_number_native(a);
         }
-        VTABLE_increment(INTERP, SELF);
+        DYNSELF.increment();
     }
 
 /*
@@ -87,19 +87,19 @@ pmclass WmlsString
     void decrement () {
         PMC * trans = SELF.parseNumber();
         if      (trans->vtable->base_type == dynpmc_WmlsInvalid) {
-            VTABLE_morph(INTERP, SELF, dynpmc_WmlsInvalid);
+            DYNSELF.morph(dynpmc_WmlsInvalid);
         }
         else if (trans->vtable->base_type == dynpmc_WmlsInteger) {
             const INTVAL a = VTABLE_get_integer(INTERP, trans);
-            VTABLE_morph(INTERP, SELF, dynpmc_WmlsInteger);
-            VTABLE_set_integer_native(INTERP, SELF, a);
+            DYNSELF.morph(dynpmc_WmlsInteger);
+            DYNSELF.set_integer_native(a);
         }
         else if (trans->vtable->base_type == dynpmc_WmlsFloat) {
             const FLOATVAL a = VTABLE_get_number(INTERP, trans);
-            VTABLE_morph(INTERP, SELF, dynpmc_WmlsFloat);
-            VTABLE_set_number_native(INTERP, SELF, a);
+            DYNSELF.morph(dynpmc_WmlsFloat);
+            DYNSELF.set_number_native(a);
         }
-        VTABLE_decrement(INTERP, SELF);
+        DYNSELF.decrement();
     }
 
 /*
@@ -1564,7 +1564,7 @@ MMD_DEFAULT: {
         char *s1;
         char *s2;
 
-        rep = VTABLE_get_string(INTERP, SELF);
+        rep = DYNSELF.get_string();
         s1 = string_to_cstring(INTERP, rep);
         d = strtol(s1, &s2, 10);
         if ( s1 != s2 && (*s2 == '\0' || isspace(*s2)) ) {
@@ -1588,7 +1588,7 @@ MMD_DEFAULT: {
         char *s1;
         char *s2;
 
-        rep = VTABLE_get_string(INTERP, SELF);
+        rep = DYNSELF.get_string();
         s1 = string_to_cstring(INTERP, rep);
         d = strtod(s1, &s2);
         if ( s1 != s2 && (*s2 == '\0' || isspace(*s2)) ) {
