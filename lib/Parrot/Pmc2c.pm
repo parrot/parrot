@@ -428,6 +428,12 @@ sub rewrite_nci_method {
 
     local $_ = $_[3];
 
+    # Rewrite DYNSELF.other_method(args...)
+    s/\bDYNSELF\b           # Macro: DYNSELF
+      \.(\w+)           # other_method
+      \(\s*(.*?)\)      # capture argument list
+     /"pmc->vtable->$1(" . full_arguments($2) . ')'/xeg;
+
     # Rewrite SELF.other_method(args...)
     s/\bSELF\b              # Macro SELF
       \.(\w+)           # other_method
