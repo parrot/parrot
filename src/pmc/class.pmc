@@ -344,6 +344,10 @@ available information is:
 
 =over 4
 
+=item name - String PMC containing the name of the class
+
+=item namespce - NameSpace PMC of the the namespace attached to the class
+
 =item attributes - Hash keyed on attribute name, value is hash describing it
 
 =item methods - Hash keyed on method name, value is an invokable PMC. Includes
@@ -364,7 +368,14 @@ class.
 
         /* What should we return? */
         PMC *found;
-        if (string_equal(interp, what, CONST_STRING(interp, "attributes")) == 0) {
+        if (string_equal(interp, what, CONST_STRING(interp, "name")) == 0) {
+            found = pmc_new(interp, enum_class_String);
+            VTABLE_set_string_native(interp, found, class->name);
+        }
+        else if (string_equal(interp, what, CONST_STRING(interp, "namespace")) == 0) {
+            found = class->namespace;
+        }
+        else if (string_equal(interp, what, CONST_STRING(interp, "attributes")) == 0) {
             found = class->attrib_metadata;
         }
         else if (string_equal(interp, what, CONST_STRING(interp, "methods")) == 0) {
@@ -385,6 +396,33 @@ class.
         return VTABLE_clone(interp, found);
     }
 
+/*
+
+=item C<PMC* inspect()>
+
+Returns a Hash describing the class, with key/value pairs as described in
+inspect_str.
+
+*/
+    PMC* inspect()
+    {
+        /* Create a hash, then use inspect_str to get all of the data to
+         * fill it up with. */
+        PMC *metadata = pmc_new(interp, enum_class_Hash);
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "name"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "name")));
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "namespace"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "namespace")));
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "attributes"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "attributes")));
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "methods"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "methods")));
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "parents"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "parents")));
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "roles"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "roles")));
+        return metadata;
+    }
 
     /* **********************************************************************
     /* Below here are non-vtable methods that eventually will go in a role
