@@ -342,22 +342,35 @@ no conflicts.
 Provides introspection of a specific piece of information about the class. The
 available information is:
 
-=over 4
+=over 8
 
-=item name - String PMC containing the name of the class
+=item name
 
-=item namespce - NameSpace PMC of the the namespace attached to the class
+String PMC containing the name of the class
 
-=item attributes - Hash keyed on attribute name, value is hash describing it
+=item namespce
 
-=item methods - Hash keyed on method name, value is an invokable PMC. Includes
-methods composed in from roles.
+NameSpace PMC of the the namespace attached to the class
 
-=item roles - Array of Role PMCs. Includes roles done by the roles that were
-composed into this class.
+=item attributes
 
-=item parents - Array of Class PMCs representing the direct parents of this
-class.
+Hash keyed on attribute name, value is hash describing it
+
+=item methods
+
+Hash keyed on method name, value is an invokable PMC. Includes methods composed
+in from roles.
+
+=item roles
+
+Array of Role PMCs. Includes roles done by the roles that were composed into
+this class.
+
+=item parents
+
+Array of Class PMCs representing the direct parents of this class.
+
+=back
 
 =cut
 
@@ -403,6 +416,8 @@ class.
 Returns a Hash describing the class, with key/value pairs as described in
 inspect_str.
 
+=cut
+
 */
     PMC* inspect()
     {
@@ -425,7 +440,7 @@ inspect_str.
     }
 
     /* **********************************************************************
-    /* Below here are non-vtable methods that eventually will go in a role
+     * Below here are non-vtable methods that eventually will go in a role
      * that is composed into here to optionally give a nice interface from
      * PIR (ParrotClass isa Class does ClassMethods or something like this).
      * **********************************************************************/
@@ -806,8 +821,6 @@ This method is intended to be used by the Object PMC.
 } /* END pmclass */
 
 /*
-
-=back
 
 =back
 
