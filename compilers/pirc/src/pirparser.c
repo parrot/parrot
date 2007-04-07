@@ -60,6 +60,7 @@ Clean up grammar after discussion.
 #include <stdarg.h>
 #include <string.h>
 
+
 /*
 
 =head1 PARSER INTERNALS
@@ -69,7 +70,7 @@ The parser_state structure has the following fields:
  typedef struct parser_state {
     struct     lexer_state *lexer;     -- the lexer
     token      curtoken;               -- the current token as returned by the lexer
-    char      *heredoc_ids[10];        -- array for holding heredoc arguments. XXX Limited to 10 currently XXX
+    char     **heredoc_ids;            -- array for holding heredoc arguments. XXX Limited to 10 currently XXX
     unsigned   heredoc_index;          -- index to keep track of heredoc ids in the array
     unsigned   parse_errors;           -- counter for parse_errors
     pirvtable *vtable;                 -- vtable holding pointers for output routines
@@ -87,6 +88,8 @@ typedef struct parser_state {
     unsigned   heredoc_index;
     unsigned   parse_errors;
     pirvtable *vtable;
+
+    /* Parrot_Interp interp; */
 
 } parser_state;
 
@@ -1318,7 +1321,7 @@ param_flags(parser_state *p) {
 
 */
 static void
-invocant(parser_state *p) {
+invokable(parser_state *p) {
     switch (p->curtoken) {
         case T_IDENTIFIER:
         case T_PREG:
@@ -1338,7 +1341,7 @@ invocant(parser_state *p) {
 
   long-invocation -> '.pcc_begin' '\n'
                      { '.arg' expression arg_flags }
-                     ( '.pcc_call'|'.nci_call') invocant '\n'
+                     ( '.pcc_call'|'.nci_call') invokable '\n'
                      | '.invocant' invocant '\n'
                        '.meth_call' method '\n'
                      )
@@ -1369,15 +1372,15 @@ long_invocation(parser_state *p) {
 
     /* the invocant and/or sub to be called */
     switch (p->curtoken) {
-        case T_PCC_CALL:                /* '.pcc_call' invocant '\n' */
-        case T_NCI_CALL:                /* '.nci_call' invocant '\n' */
+        case T_PCC_CALL:                /* '.pcc_call' invokable '\n' */
+        case T_NCI_CALL:                /* '.nci_call' invokable '\n' */
             next(p);
-            invocant(p);
+            invokable(p);
             match(p, T_NEWLINE);
             break;
         case T_INVOCANT:                /* '.invocant' invocant '\n' */
             next(p);
-            invocant(p);
+            invokable(p);
             match(p, T_NEWLINE);
             match(p, T_METH_CALL);      /* .meth_call method '\n' */
             method(p);

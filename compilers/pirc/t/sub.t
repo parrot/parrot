@@ -23,8 +23,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "sub with flags" );
 .sub test :main, :load, :init
 .end
 
-.sub myAdd :vtable('add')
-.end
 
 .sub X :anon
 .end
@@ -34,6 +32,9 @@ OUTPUT
 
 
 pir_output_is( <<'CODE', <<'OUTPUT', "parameters" );
+.sub main
+.end
+
 .sub test
 	.param int i
 	.param num n
@@ -44,6 +45,8 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "parameters and flags" );
+.sub main
+.end
 .sub test
 	.param int i :optional
 	.param int o :opt_flag
