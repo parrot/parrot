@@ -447,6 +447,17 @@ inline op removeparent(invar PMC, invar PMC) :object_classes {
     goto NEXT();
 }
 
+=item B<addrole>(invar PMC, invar PMC)
+
+Compose the role $2 into $1.
+
+=cut
+
+inline op addrole(invar PMC, invar PMC) :object_classes {
+    VTABLE_add_role(interp, $1, $2);
+    goto NEXT();
+}
+
 =item B<addattribute>(invar PMC, in STR)
 
 Add the attribute named $2 to the class $1.
