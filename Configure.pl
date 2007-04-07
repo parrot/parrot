@@ -263,6 +263,10 @@ use English qw( -no_match_vars );
 use Parrot::BuildUtil;
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
+use Parrot::Configure::Messages qw(
+    print_introduction
+    print_conclusion
+);
 
 # These globals are accessed in config/init/defaults.pm
 our $parrot_version = Parrot::BuildUtil::parrot_version();
@@ -290,18 +294,8 @@ exit unless defined $args;
 
 my %args = %$args;
 
-print <<"END";
-Parrot Version $parrot_version Configure 2.0
-Copyright (C) 2001-2007, The Perl Foundation.
-
-Hello, I'm Configure. My job is to poke and prod your system to figure out
-how to build Parrot. The process is completely automated, unless you passed in
-the `--ask' flag on the command line, in which case it'll prompt you for a few
-pieces of info.
-
-Since you're running this program, you obviously have Perl 5--I'll be pulling
-some defaults from its configuration.
-END
+# from Parrot::Configure::Messages
+print_introduction($parrot_version);
 
 # EDIT HERE TO ADD NEW TESTS
 my @steps = qw(
@@ -386,20 +380,9 @@ else {
 }
 
 # tell users what to do next
-my $make = $conf->data->get('make');
 
-print <<"END";
-
-Okay, we're done!
-
-You can now use `$make' to build your Parrot.
-(NOTE: do not use `$make -j <n>'!)
-After that, you can use `$make test' to run the test suite.
-
-Happy Hacking,
-        The Parrot Team
-
-END
+# from Parrot::Configure::Messages
+print_conclusion($conf->data->get('make'));
 
 exit(0);
 
