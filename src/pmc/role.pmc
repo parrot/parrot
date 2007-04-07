@@ -115,49 +115,162 @@ Mark any referenced strings and PMCs.
             pobject_lives(interp, (PObj*)role->attrib_metadata);
     }
 
-
 /*
 
-=item C<void attributes()>
+=item C<void add_attribute(STRING *name, PMC *type)>
 
-Return a hash where the keys are attribute names and the values are hashes
-providing a set of key/value pairs describing the attribute.
+Adds the given attribute with an optional type.
 
 =cut
 
 */
-    PCCMETHOD void attributes() {
-        Parrot_Role *role = PARROT_ROLE(SELF);
-        PMC *ret_attrib_metadata = VTABLE_clone(interp, role->attrib_metadata);
-        PCCRETURN(PMC *ret_attrib_metadata);
-    }
-
-
-/*
-
-=item C<void add_attribute()>
-
-Add an attribute to the role. Requires a name and, optionally, a type.
-
-=cut
-
-*/
-    PCCMETHOD void add_attribute(STRING *attribute_name,
-            STRING* attribute_type :optional, int got_type :opt_flag) {
+    void add_attribute(STRING *name, PMC *type)
+    {
         Parrot_Role *role = PARROT_ROLE(SELF);
         PMC *new_attribute = pmc_new(interp, enum_class_Hash);
 
         /* Set name and type. */
         VTABLE_set_string_keyed_str(interp, new_attribute,
-            CONST_STRING(interp, "name"), attribute_name);
-        if (got_type) {
-            VTABLE_set_string_keyed_str(interp, new_attribute,
-                CONST_STRING(interp, "type"), attribute_type);
+            CONST_STRING(interp, "name"), name);
+        if (!PMC_IS_NULL(type)) {
+            VTABLE_set_pmc_keyed_str(interp, new_attribute,
+                CONST_STRING(interp, "type"), type);
         }
 
         /* Enter the attribute in the attributes array. */
-        VTABLE_set_pmc_keyed_str(interp, role->attrib_metadata, attribute_name, new_attribute);
+        VTABLE_set_pmc_keyed_str(interp, role->attrib_metadata, name, new_attribute);
     }
+
+/*
+
+=item C<void add_method(STRING *name, PMC *sub)>
+
+Adds the given sub PMC as a method with the given name.
+
+=cut
+
+*/
+    void add_method(STRING *name, PMC *sub)
+    {
+        Parrot_Role *role = PARROT_ROLE(SELF);
+
+        /* If we have already added a method with this name... */
+        if (VTABLE_exists_keyed_str(interp, role->methods, name)) {
+            /* XXX Need to handle multi methods here. */
+            real_exception(interp, NULL, E_NotImplementedError,
+                "Currently, adding multiple methods of the same name is not supported.");
+        }
+        else {
+            /* Enter it into the table. */
+            VTABLE_set_pmc_keyed_str(interp, role->methods, name, sub);
+        }
+    }
+
+/*
+
+=item C<void add_role(PMC *role)>
+
+Composes the supplied Role PMC into this role, provided there are no
+conflicts.
+
+=cut
+
+*/
+    void add_role(PMC *role)
+    {
+        Parrot_Role *this_role = PARROT_ROLE(SELF);
+
+        /* Do the composition. */
+        Parrot_ComposeRole(interp, role, PMCNULL, 0, PMCNULL, 0,
+                           this_role->methods, this_role->roles);
+    }
+
+/*
+
+=item C<PMC* inspect_str(STRING *what)>
+
+Provides introspection of a specific piece of information about the role. The
+available information is:
+
+=over 4
+
+=item name - String PMC containing the name of the role
+
+=item namespce - NameSpace PMC of the the namespace attached to the role
+
+=item attributes - Hash keyed on attribute name, value is hash describing it
+
+=item methods - Hash keyed on method name, value is an invokable PMC. Includes
+methods composed in from roles.
+
+=item roles - Array of Role PMCs. Includes roles done by the roles that were
+composed into this role.
+
+=cut
+
+*/
+    PMC* inspect_str(STRING *what)
+    {
+        Parrot_Role *role = PARROT_ROLE(SELF);
+
+        /* What should we return? */
+        PMC *found;
+        if (string_equal(interp, what, CONST_STRING(interp, "name")) == 0) {
+            found = pmc_new(interp, enum_class_String);
+            VTABLE_set_string_native(interp, found, role->name);
+        }
+        else if (string_equal(interp, what, CONST_STRING(interp, "namespace")) == 0) {
+            found = role->namespace;
+        }
+        else if (string_equal(interp, what, CONST_STRING(interp, "attributes")) == 0) {
+            found = role->attrib_metadata;
+        }
+        else if (string_equal(interp, what, CONST_STRING(interp, "methods")) == 0) {
+            found = role->methods;
+        }
+        else if (string_equal(interp, what, CONST_STRING(interp, "roles")) == 0) {
+            found = role->roles;
+        }
+        else {
+            real_exception(interp, NULL, INVALID_OPERATION,
+                "Unknown introspection value '%S'", what);
+        }
+
+        /* Clone and return. */
+        return VTABLE_clone(interp, found);
+    }
+
+/*
+
+=item C<PMC* inspect()>
+
+Returns a Hash describing the role, with key/value pairs as described in
+inspect_str.
+
+*/
+    PMC* inspect()
+    {
+        /* Create a hash, then use inspect_str to get all of the data to
+         * fill it up with. */
+        PMC *metadata = pmc_new(interp, enum_class_Hash);
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "name"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "name")));
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "namespace"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "namespace")));
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "attributes"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "attributes")));
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "methods"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "methods")));
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "roles"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "roles")));
+        return metadata;
+    }
+
+    /* **********************************************************************
+    /* Below here are non-vtable methods that eventually will go in a role
+     * that is composed into here to optionally give a nice interface from
+     * PIR (ParrotRole isa Role does RoleMethods or something like this).
+     * **********************************************************************/
 
 /*
 
@@ -225,17 +338,34 @@ specified will be linked to this role.
 
 /*
 
-=item C<void roles()>
+=item C<void attributes()>
 
-Return the roles array PMC.
+Return a hash where the keys are attribute names and the values are hashes
+providing a set of key/value pairs describing the attribute.
 
 =cut
 
 */
-    PCCMETHOD void roles() {
-        Parrot_Role *role = PARROT_ROLE(SELF);
-        PMC *ret_roles = VTABLE_clone(interp, role->roles);
-        PCCRETURN(PMC *ret_roles);
+    PCCMETHOD void attributes() {
+        PMC *ret_attrib_metadata = VTABLE_inspect_str(interp, SELF,
+            CONST_STRING(interp, "attributes"));
+        PCCRETURN(PMC *ret_attrib_metadata);
+    }
+
+
+/*
+
+=item C<void add_attribute()>
+
+Add an attribute to the role. Requires a name and, optionally, a type.
+
+=cut
+
+*/
+    PCCMETHOD void add_attribute(STRING *attribute_name,
+            PMC* attribute_type :optional, int got_type :opt_flag) {
+        VTABLE_add_attribute(interp, SELF, attribute_name,
+            got_type ? attribute_type : PMCNULL);
     }
 
 /*
@@ -248,8 +378,8 @@ Return a hash where the keys are method names and the values are methods.
 
 */
     PCCMETHOD void methods() {
-        Parrot_Role *role = PARROT_ROLE(SELF);
-        PMC *ret_methods = VTABLE_clone(interp, role->methods);
+        PMC *ret_methods = VTABLE_inspect_str(interp, SELF,
+            CONST_STRING(interp, "methods"));
         PCCRETURN(PMC *ret_methods);
     }
 
@@ -264,18 +394,22 @@ Adds the given sub PMC as a method with the given name.
 */
     PCCMETHOD void add_method(STRING *name, PMC *sub)
     {
-        Parrot_Role *role = PARROT_ROLE(SELF);
+        VTABLE_add_method(interp, SELF, name, sub);
+    }
 
-        /* If we have already added a method with this name... */
-        if (VTABLE_exists_keyed_str(interp, role->methods, name)) {
-            /* XXX Need to handle multi methods here. */
-            real_exception(interp, NULL, E_NotImplementedError,
-                "Currently, adding multiple methods of the same name is not supported.");
-        }
-        else {
-            /* Enter it into the table. */
-            VTABLE_set_pmc_keyed_str(interp, role->methods, name, sub);
-        }
+/*
+
+=item C<void roles()>
+
+Return the roles array PMC.
+
+=cut
+
+*/
+    PCCMETHOD void roles() {
+        PMC *ret_roles = VTABLE_inspect_str(interp, SELF,
+            CONST_STRING(interp, "roles"));
+        PCCRETURN(PMC *ret_roles);
     }
 
 /*
