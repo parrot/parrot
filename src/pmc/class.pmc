@@ -550,7 +550,7 @@ providing a set of key/value pairs describing the attribute.
 
 */
     PCCMETHOD void attributes() {
-        PMC *ret_attrib_metadata = VTABLE_inspect_str(interp, SELF, 
+        PMC *ret_attrib_metadata = VTABLE_inspect_str(interp, SELF,
             CONST_STRING(interp, "attributes"));
         PCCRETURN(PMC *ret_attrib_metadata);
     }
@@ -768,6 +768,8 @@ This method is intended to be used by the Object PMC.
 } /* END pmclass */
 
 /*
+
+=back
 
 =back
 
