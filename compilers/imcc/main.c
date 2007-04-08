@@ -112,7 +112,7 @@ help(void)
 
 
 static void
-imcc_version(Interp *interp)
+Parrot_version(Interp *interp)
 {
     int rev = PARROT_REVISION;
     printf("This is parrot version " PARROT_VERSION);
@@ -277,7 +277,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 exit(0);
                 break;
             case 'V':
-                imcc_version(interp);
+                Parrot_version(interp);
                 break;
             case 'r':
                 ++run_pbc;
