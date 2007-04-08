@@ -137,6 +137,7 @@ proto infix:|| is looser('infix:&&') is assoc('left')
 
 proto infix:= is looser('infix:||')
     is past('assign')
+    is lvalue(1)
     {...}
 
 proto 'infix:,' is looser('infix:=') is assoc('list')

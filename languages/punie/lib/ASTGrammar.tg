@@ -275,7 +275,9 @@ transform past (PunieGrammar::oexpr) :language('PIR') {
 transform past (PunieGrammar::variable) :language('PIR') {
     .local pmc result
     result = new 'PAST::Var'
-    result.'init'('node'=>node, 'viviself'=>'.Undef')
+    .local int islvalue
+    islvalue = node['islvalue']
+    result.'init'('node'=>node, 'viviself'=>'.Undef', 'islvalue' => islvalue)
     .local string sigil
     .local string name
     sigil = node['sigil']
@@ -436,6 +438,11 @@ transform op (expr) :language('PIR') {
       result.'push'($P3)
       goto iter_loop
   iter_end:
+
+    unless islvalue goto notlvalue
+    $P4 = result[0]
+    $P4.'islvalue'(islvalue)
+  notlvalue:
 
     .return (result)
 }

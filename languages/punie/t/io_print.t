@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 use Test::More;
 
 language_output_is( 'punie', <<'EOC', '1', 'printing one' );
@@ -79,6 +79,13 @@ print 1 - 2, "\n", 7 - 1, "\n";
 CODE
 -1
 6
+OUT
+
+language_output_is( 'punie', <<'CODE', <<'OUT', 'printing a variable' );
+$x = 1;
+print $x, "\n";
+CODE
+1
 OUT
 
 TODO: {
