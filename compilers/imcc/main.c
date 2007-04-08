@@ -320,25 +320,15 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                     IMCC_INFO(interp)->optimizer_level |= OPT_SUB;
 
                 IMCC_INFO(interp)->allocator = IMCC_GRAPH_ALLOCATOR;
-#if 0
                 /* currently not ok due to different register allocation */
                 if (strchr(optimizer_opt, 'j')) {
-                    int one = 1;
-                    optimizer_level |= (OPT_J | OPT_PASM);
-                    Parrot_setflag(interp, PARROT_JIT_FLAG, &one);
+                    SET_CORE(PARROT_JIT_CORE);
                 }
-#endif
                 if (strchr(optimizer_opt, '1')) {
                     IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
                 }
                 if (strchr(optimizer_opt, '2')) {
-                    /* FIXME -O2 is borken */
-#if 1
-                    IMCC_INFO(interp)->optimizer_level |=
-                        (OPT_PRE | OPT_CFG);
-#else
-                    IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
-#endif
+                    IMCC_INFO(interp)->optimizer_level |= (OPT_PRE | OPT_CFG);
                 }
                 if (strchr(optimizer_opt, 't')) {
                     SET_CORE(PARROT_SWITCH_CORE);

@@ -7,9 +7,6 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Test tests => 6;
 
-#SKIP: {
-#  skip("-O2 disabled", 5);
-
 # these tests are run with -O2 by TestCompiler and show
 # generated PASM code for various optimizations at level 2
 
@@ -151,8 +148,6 @@ _main:
   print 15
   end
 OUT
-
-#}
 
 # Local Variables:
 #   mode: cperl
