@@ -22,16 +22,14 @@ BEGIN {
 use Test::More tests => 14;
 use Carp;
 use Cwd;
-use lib ("$main::topdir/t/tools/ops2pmutils/testlib");
-use_ok("Capture");
-
+use_ok("Parrot::IO::Capture::Mini");
 use_ok( 'Parrot::Ops2pm::Auxiliary', qw| Usage getoptions | );
 
 ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 my $cwd = cwd();
 my ( $msg, $tie, @lines );
 {
-    $tie = tie *STDERR, "Capture" or croak "Unable to tie";
+    $tie = tie *STDERR, "Parrot::IO::Capture::Mini" or croak "Unable to tie";
     Usage();
     $msg = $tie->READLINE;
     untie *STDERR or croak "Unable to untie";

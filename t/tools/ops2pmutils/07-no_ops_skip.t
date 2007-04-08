@@ -21,7 +21,6 @@ BEGIN {
 }
 use Test::More tests => 14;
 use Cwd;
-use Data::Dumper;
 use File::Copy;
 use File::Temp (qw| tempdir |);
 

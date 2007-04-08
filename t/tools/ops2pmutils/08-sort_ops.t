@@ -20,14 +20,13 @@ BEGIN {
     unshift @INC, qq{$topdir/lib};
 }
 use Test::More tests => 91;
+use Carp;
 use Cwd;
-use Data::Dumper;
 use File::Copy;
 use File::Temp (qw| tempdir |);
-use lib        ("$main::topdir/t/tools/ops2pmutils/testlib");
-use_ok("Capture");
 
 use_ok('Parrot::Ops2pm::Utils');
+use_ok("Parrot::IO::Capture::Mini");
 
 use constant NUM_FILE  => "src/ops/ops.num";
 use constant SKIP_FILE => "src/ops/ops.skip";
@@ -168,7 +167,8 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
         ok( -f $skip,                   "ops.skip located after renumbering" );
 
         my $msg;
-        my $tie = tie *STDERR, "Capture";
+        my $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
+            or croak "Unable to tie";
         ok( defined $tie, "tie established for testing" );
         ok( $self->sort_ops(), "sort_ops returned successfully" );
         $msg = $tie->READLINE;
@@ -226,7 +226,8 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
         ok( -f $skip,                   "ops.skip located after renumbering" );
 
         my $msg;
-        my $tie = tie *STDERR, "Capture";
+        my $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
+            or croak "Unable to tie";
         ok( defined $tie, "tie established for testing" );
         ok( $self->sort_ops(), "sort_ops returned successfully" );
         $msg = $tie->READLINE;
@@ -286,7 +287,8 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
         ok( -f $skip,                   "ops.skip located after renumbering" );
 
         my $msg;
-        my $tie = tie *STDERR, "Capture";
+        my $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
+            or croak "Unable to tie";
         ok( defined $tie, "tie established for testing" );
         ok( $self->sort_ops(), "sort_ops returned successfully" );
         $msg = $tie->READLINE;

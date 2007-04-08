@@ -25,8 +25,8 @@ use Cwd;
 use File::Copy;
 use File::Temp (qw| tempdir |);
 use_ok('Parrot::Ops2pm::Utils');
-use lib ("$main::topdir/t/tools/ops2cutils/testlib");
 use_ok("Parrot::IO::Capture::Mini");
+use lib ("$main::topdir/t/tools/ops2cutils/testlib");
 use_ok( "GenerateCore", qw| generate_core | );
 
 my @srcopsfiles = qw( src/ops/core.ops src/ops/bit.ops src/ops/cmp.ops

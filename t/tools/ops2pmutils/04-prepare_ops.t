@@ -20,14 +20,13 @@ BEGIN {
     unshift @INC, qq{$topdir/lib};
 }
 use Test::More tests => 72;
-use Data::Dumper;
+use Carp;
 use File::Copy;
 use File::Temp (qw| tempdir |);
 use IO::File;
-use lib ("$main::topdir/t/tools/ops2pmutils/testlib");
-use_ok("Capture");
 
 use_ok('Parrot::Ops2pm::Utils');
+use_ok("Parrot::IO::Capture::Mini");
 
 ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 
@@ -112,7 +111,7 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
     isa_ok( $self, q{Parrot::Ops2pm::Utils} );
 
     my $msg;
-    my $tie = tie *STDERR, "Capture";
+    my $tie = tie *STDERR, "Parrot::IO::Capture::Mini" or croak "Unable to tie";
     ok( defined $tie, "tie established for testing" );
     ok( $self->prepare_ops, "prepare_ops() returned successfully" );
     $msg = $tie->READLINE;
