@@ -29,7 +29,7 @@ static void
 usage(FILE* fp)
 {
     fprintf(fp,
-            "parrot -[abcCEfgGhjprStvVwy.] [-d [FLAGS]] "
+            "parrot -[abcCEfgGhjprStvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
             "[-O [level]] [-o FILE] <file>\n");
 }
 
@@ -59,7 +59,7 @@ help_debug(void)
     "    0010    thread debugging\n"
     "    0020    eval/compile\n"
     "    0040    fill I, N registers with garbage\n"
-    "    0080    show, when a context is destroyed\n"
+    "    0080    show when a context is destroyed\n"
     "\n"
     "--trace -t [Flags] ...\n"
     "    0001    opcodes\n"
@@ -185,7 +185,7 @@ static struct longopt_opt_decl options[] = {
 };
 
 static int
-is_all_hex_digitis(const char *s)
+is_all_hex_digits(const char *s)
 {
     for (; *s; s++)
         if (!isxdigit(*s))
@@ -214,7 +214,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 SET_FLAG(PARROT_PROFILE_FLAG);
                 break;
             case 't':
-                if (opt.opt_arg && is_all_hex_digitis(opt.opt_arg)) {
+                if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
                     SET_TRACE(strtoul(opt.opt_arg, 0, 16));
                 }
                 else
@@ -236,7 +236,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 SET_CORE(PARROT_CGOTO_CORE);
                 break;
             case 'd':
-                if (opt.opt_arg && is_all_hex_digitis(opt.opt_arg)) {
+                if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
                     IMCC_INFO(interp)->debug = strtoul(opt.opt_arg, 0, 16);
                 }
                 else {
@@ -244,7 +244,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 }
                 break;
             case 'D':
-                if (opt.opt_arg && is_all_hex_digitis(opt.opt_arg)) {
+                if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
                     SET_DEBUG(strtoul(opt.opt_arg, 0, 16));
                 }
                 else
@@ -397,7 +397,7 @@ do_pre_process(Parrot_Interp interp)
     YYSTYPE val;
     void *yyscanner;
 
-    do_yylex_init( interp, &yyscanner);
+    do_yylex_init(interp, &yyscanner);
 
     IMCC_push_parser_state(interp);
     while ((c = yylex(&val, yyscanner, interp))) {
@@ -488,11 +488,11 @@ do_pre_process(Parrot_Interp interp)
             case ADV_ARROW:     printf("=>");break;
 
             default:
-                     if (c < 255)
-                         printf("%c", c);
-                     else
-                         printf("%s ", val.s);
-                     break;
+                if (c < 255)
+                    printf("%c", c);
+                else
+                    printf("%s ", val.s);
+                break;
         }
     }
 }
@@ -513,7 +513,7 @@ main(int argc, char * argv[])
 
     interp = Parrot_new(NULL);
 
-    do_yylex_init( interp, &yyscanner);
+    do_yylex_init(interp, &yyscanner);
 
     Parrot_block_DOD(interp);
     Parrot_block_GC(interp);
