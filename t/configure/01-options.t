@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 32;
+use Test::More tests => 33;
 use Carp;
 use lib ("lib");
 use_ok('Parrot::Configure::Options', qw|
@@ -30,6 +30,8 @@ use_ok("Parrot::IO::Capture::Mini");
 
 
 my %valid;
+my $badoption = q{samsonanddelilah};
+
 %valid = map {$_, 1} get_valid_options();
 ok(scalar keys %valid, "non-zero quantity of valid options found");
 ok(defined $valid{debugging}, "debugging option found");
@@ -37,6 +39,7 @@ ok(defined $valid{maintainer}, "maintainer option found");
 ok(defined $valid{help}, "help option found");
 ok(defined $valid{version}, "version option found");
 ok(defined $valid{verbose}, "verbose option found");
+ok(! defined $valid{$badoption}, "invalid option not found");
 
 open my $FH, "$main::topdir/Configure.pl"
     or croak "Unable to open handle to Configure.pl";
@@ -133,7 +136,6 @@ $args = process_options( {
 ok(defined $args,
     "process_options() returned successfully when options were specified");
 
-my $badoption = q{samsonanddelilah};
 eval {
     $args = process_options( {
         argv            => [ qq<--${badoption}=72> ],
