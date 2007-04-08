@@ -7,7 +7,6 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use English qw( -no_match_vars );
 use File::Find qw( find );
 use File::Basename qw( fileparse );
 use File::Spec::Functions qw( catdir catfile );
@@ -52,7 +51,7 @@ PMC: {
 
     my ( $pmc_miss, $test_miss ) = list_diff( \@pmc_files, \@test_files );
 
-    local $LIST_SEPARATOR = "\n\t";
+    local $" = "\n\t";
 
 TODO: {
         local $TODO = "not yet implemented";

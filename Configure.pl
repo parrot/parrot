@@ -259,7 +259,6 @@ use strict;
 use warnings;
 use lib 'lib';
 
-use English qw( -no_match_vars );
 use Parrot::BuildUtil;
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
@@ -272,7 +271,7 @@ use Parrot::Configure::Messages qw(
 our $parrot_version = Parrot::BuildUtil::parrot_version();
 our @parrot_version = Parrot::BuildUtil::parrot_version();
 
-$OUTPUT_AUTOFLUSH = 1;
+$| = 1;
 
 # Install Option text was taken from:
 #

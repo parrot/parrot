@@ -206,6 +206,8 @@ methods composed in from roles.
 =item roles - Array of Role PMCs. Includes roles done by the roles that were
 composed into this role.
 
+=back
+
 =cut
 
 */

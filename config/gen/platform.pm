@@ -19,7 +19,6 @@ use warnings;
 use base qw(Parrot::Configure::Step::Base);
 
 use Config;
-use English qw( -no_match_vars );
 
 use Parrot::Configure::Step qw(copy_if_diff);
 
@@ -30,7 +29,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $verbose  = $conf->options->get('verbose');
-    my $platform = lc $OSNAME;
+    my $platform = lc $^O;
 
     $platform = "ansi"  if defined( $conf->options->get('miniparrot') );
     $platform = "win32" if $platform =~ /^msys/;

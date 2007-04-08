@@ -91,7 +91,6 @@ use lib qw( . lib ../lib ../../lib );
 
 use Getopt::Std;
 use Test::Harness();
-use English qw( -no_match_vars );
 use Parrot::Config qw/%PConfig/;
 
 
@@ -204,8 +203,8 @@ elsif (!$html) {
         require Test::TAP::HTMLMatrix;
         require Test::TAP::Model::Visual;
     };
-    die "You must have Test::TAP::HTMLMatrix installed.\n\n$EVAL_ERROR"
-        if $EVAL_ERROR;
+    die "You must have Test::TAP::HTMLMatrix installed.\n\n$@"
+        if $@;
 
     ## FIXME: ###
     # This is a temporary solution until Test::TAP::Model version
