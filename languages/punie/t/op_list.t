@@ -3,8 +3,17 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 use Test::More;
+
+language_output_is( 'punie', <<'EOC', <<'OUT', 'op.list' );
+@foo = (1, 2, 3, 4);
+print $foo[0], "\n";
+print $foo[3], "\n";
+EOC
+1
+4
+OUT
 
 TODO: {
     local $TODO = 'unimplemented feature';

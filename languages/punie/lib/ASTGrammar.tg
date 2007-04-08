@@ -273,23 +273,45 @@ transform past (PunieGrammar::oexpr) :language('PIR') {
 }
 
 transform past (PunieGrammar::variable) :language('PIR') {
-    .local pmc result
-    result = new 'PAST::Var'
+    .local string sigil, word, name, key, pirtype, scope
     .local int islvalue
     islvalue = node['islvalue']
-    result.'init'('node'=>node, 'viviself'=>'.Undef', 'islvalue' => islvalue)
-    .local string sigil
-    .local string name
-    sigil = node['sigil']
-    $S1 = node['word']
-    name = sigil . $S1
+    sigil = node['sigil';0]
+    word = node['word']
+    key = node['key';0;'KEY']
+    scope = 'global'
 
-    result.'name'(name)
-    result.'scope'('global')
+   if key == '{' goto hash_var
+   if key == '[' goto array_var
+   if sigil == '$' goto scalar_var
+   if sigil == '@' goto array_var
+  hash_var:
+     sigil = '%' # partridge can't handle globs, so we force the sigil
+     pirtype = ".Hash"
+     goto have_container_type
+  scalar_var:
+     pirtype = ".Undef"
+     goto have_container_type
+  array_var:
+     sigil = '@' # partridge can't handle globs, so we force the sigil
+     pirtype = ".ResizablePMCArray"
+  have_container_type:
 
-#    unless sigil == '$' goto not_scalar
-#      result.'vartype'('scalar')
-  not_scalar:
+    .local pmc result, var_node, key_val
+    name = sigil . word
+    var_node = new 'PAST::Var'
+    var_node.'init'('node'=>node,'name'=>name,'viviself'=>pirtype,'scope'=>scope,'islvalue'=>islvalue)
+
+    result = var_node
+
+    unless key goto not_keyed
+    $P1 = node['key';0;'expr']
+    if null $P1 goto not_keyed
+    key_val = tree.'get'('past', $P1, 'PunieGrammar::expr')
+
+    result = new 'PAST::Var'
+    result = result.'init'(var_node, key_val, 'node'=>node, 'scope'=>'keyed', 'viviself'=>'.Undef', 'islvalue'=>islvalue)
+  not_keyed:
 
     .return (result)
 }
@@ -439,13 +461,28 @@ transform op (expr) :language('PIR') {
       goto iter_loop
   iter_end:
 
-    unless islvalue goto notlvalue
-    $P4 = result[0]
-    $P4.'islvalue'(islvalue)
-  notlvalue:
+    tree.'get'('islvalue', result, 'PAST::Var')
 
     .return (result)
 }
+
+# The attribute 'islvalue' is inherited down the tree
+transform islvalue (PAST::Var) :language('PIR') {
+    .local pmc child
+    .local string islvalue
+    islvalue = node.'islvalue'()
+    unless islvalue goto notlvalue
+    child = node[0]
+    $I0 = defined child
+    unless $I0 goto notlvalue
+    $S1 = typeof child
+    unless $S1 == 'PAST::Var' goto notlvalue
+    child.'islvalue'(islvalue)
+    tree.'get'('islvalue', child) # recurse downward
+  notlvalue:
+    .return ()
+}
+
 
 transform term (expr) :language('PIR') {
     .local pmc result

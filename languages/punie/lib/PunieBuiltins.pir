@@ -143,3 +143,8 @@
   iter_end:
     .return (1)
 .end
+
+.sub 'infix:,'
+    .param pmc args            :slurpy
+    .return (args)
+.end
