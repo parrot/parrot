@@ -21,16 +21,21 @@ Initial.
 /* keep outputfile possibility easy */
 #define OUT         stderr
 #define INDENT      4
+#define indent(D)   D->indent += INDENT
+#define dedent(D)   D->indent -= INDENT
 
 
-#define indent(D)    D->indent += INDENT
-#define dedent(D)    D->indent -= INDENT
+/*
 
+=head1 DATA STRUCTURE
 
-/* Private declaration of emit_data.
- *
- *
- */
+The PAST back-end implements the C<emit_data> data structure.
+Currently, only a single data member is used, to control the
+indention.
+
+=cut
+
+*/
 typedef struct emit_data {
     int indent;
 
@@ -109,7 +114,7 @@ past_name(struct emit_data *data, char *name) {
 
 /*
 
-=item past_init()
+=item past_stmts()
 
 Opens a PAST::Stmts node.
 
@@ -122,7 +127,15 @@ past_stmts(struct emit_data *data) {
     indent(data);
 }
 
+/*
 
+=item past_param()
+
+Generates a PAST::Var node and set its scope attribute to "parameter".
+
+=cut
+
+*/
 static void
 past_param(struct emit_data *data) {
     fprintf(OUT, "%*sFIXTHIS => PMC 'PAST::Var'  {\n", data->indent, " ");
@@ -130,11 +143,29 @@ past_param(struct emit_data *data) {
     fprintf(OUT, "%*s<scope> => \"parameter\"\n", data->indent, " ");
 }
 
+/*
+
+=item past_type()
+
+
+
+=cut
+
+*/
 static void
 past_type(struct emit_data *data, char *type) {
     fprintf(OUT, "%*s<type> => \"%s\"\n", data->indent, " ", type);
 }
 
+/*
+
+=item past_subflag()
+
+
+
+=cut
+
+*/
 static void
 past_subflag(struct emit_data *data, int flag) {
     /* fprintf(OUT, "%*s<???> => \"%s\"\n", data->indent, " ", type);
@@ -142,6 +173,15 @@ past_subflag(struct emit_data *data, int flag) {
 }
 
 
+/*
+
+=item past_op()
+
+
+
+=cut
+
+*/
 static void
 past_op(struct emit_data *data, char *op) {
     fprintf(OUT, "%*sFIXME => PMC 'PAST::Op'  {\n", data->indent, " ");
@@ -150,16 +190,43 @@ past_op(struct emit_data *data, char *op) {
 
 }
 
+/*
+
+=item past_expr()
+
+
+
+=cut
+
+*/
 static void
 past_expr(struct emit_data *data, char *expr) {
     fprintf(OUT, "%*s[%d] => \"%s\"\n", data->indent, " ", 0, expr); /* fix index */
 }
 
+/*
+
+=item past_next()
+
+
+
+=cut
+
+*/
 static void
 past_next(struct emit_data *data) {
     /* increment index */
 }
 
+/*
+
+=item past_destroy()
+
+
+
+=cut
+
+*/
 static void
 past_destroy(emit_data *data) {
     free(data);

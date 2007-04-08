@@ -29,7 +29,8 @@ the code. Clean that up.
 
 =item *
 
-Check for 'correct' use of data types (unsigned etc.)
+Check for 'correct' use of data types (unsigned etc.) (should characters be stored
+in C<char>s or C<int>s?
 
 =back
 
@@ -260,25 +261,63 @@ static char const * dictionary[] = {
 
 =head2 file_buffer structure
 
-Structure that represents a file.
-It contains the filename, a buffer for the file contents,
-a read pointer, the filesize, the current line number,
-and a pointer to the previous buffer. If any, the
-prevbuffer points to the structure of the file that
-.include'd this file.
+Structure that represents a file. Its layout is shown below. First, it contains the filename
+of the file that is represented by this buffer. Then, the buffer is an array that holds the
+complete file contents. This is done for efficiency (instead of reading character by character
+from disk). The C<curchar> acts like a cursor, that points to the current character.
+The field C<filesize> contains the size of the file counted in bytes, C<line> keeps track of
+the current line number, and C<linepos> counts the number of characters since the last newline
+character. The field C<lastchar> stores the previous character (so the character I<before> the
+character pointed to by C<curchar>. This field is used to decide whether the previous character
+was a newline. If so, then C<curchar> is at the start of a line (needed for Heredoc delimiters).
+
+The field C<prevbuffer> points to another file_buffer; if the current file was C<.include>d,
+then C<prevbuffer> points to the file_buffer that represents the including file. An example:
+
+ $ cat main.pir
+
+ .include "util.pir"
+
+ .sub main
+ # ...
+ .end
+
+ $ cat util.pir
+
+ .sub foo
+ # ...
+ .end
+
+In this case, when parsing the file C<main.pir>, C<prevbuffer> is NULL, because this file was
+not included. Then, when the file C<util.pir> is included, a new file_buffer is created for that
+file, and C<prevbuffer> is set to the file_buffer representing C<main.pir>.
+
+The file_buffer structure is shown below:
+
+ typedef struct file_buffer {
+     char     *filename;              -- the name of this file
+     char     *buffer;                -- buffer holding contents of this file
+     char     *curchar;               -- pointer to the current char.
+     unsigned  filesize;              -- size of this file in bytes
+     unsigned  long line;             -- line number
+     unsigned  short linepos;         -- position on the current line
+     char      lastchar;              -- the previous character that was read.
+     struct file_buffer *prevbuffer;  -- pointer to 'including' file if any
+
+ } file_buffer;
 
 =cut
 
 */
 typedef struct file_buffer {
-    char     *filename;              /* the name of this file                 */
-    char     *buffer;                /* buffer holding contents of this file  */
-    char     *curchar;               /* pointer to the current char.          */
-    unsigned  filesize;              /* size of this file in bytes            */
-    unsigned  long line;             /* line number                           */
-    unsigned  short linepos;         /* position on the current line          */
-    char      lastchar;              /* the previous character that was read. */
-    struct file_buffer *prevbuffer;  /* pointer to 'including' file if any    */
+    char     *filename;
+    char     *buffer;
+    char     *curchar;
+    unsigned  filesize;
+    unsigned  long line;
+    unsigned  short linepos;
+    char      lastchar;
+    struct file_buffer *prevbuffer;
 
 } file_buffer;
 

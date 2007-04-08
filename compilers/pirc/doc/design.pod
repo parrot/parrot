@@ -192,11 +192,13 @@ src/pirout.{c,h} - back-end that implements the vtable methods to output PIR
 
 =item *
 
-src/pastout.{c,h} - back-end that implements the vtable methods to output PAST (in Data::Dumper format)
+src/pastout.{c,h} - back-end that implements the vtable methods to output PAST
+(in Data::Dumper format)
 
 =item *
 
-src/pbcout.{c,h} - dummy back-end for PBC. This file only creates a vtable, but no implementation yet.
+src/pbcout.{c,h} - dummy back-end for PBC. This file only creates a vtable,
+but no implementation yet.
 
 =item *
 
