@@ -190,7 +190,7 @@ op find_type(out INT, in STR) {
 
 op find_type(out INT, in PMC) {
 
-    /* KLUDGE ALERT - XXX FIXME - THIS LOGIC SHOULD BE IN pmc_type_p() */
+    /* RT#42350 KLUDGE ALERT: THIS LOGIC SHOULD BE IN pmc_type_p() */
 
     INTVAL n;
 
