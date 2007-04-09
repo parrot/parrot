@@ -303,11 +303,11 @@ Throws an exception upon error.
         if (got_globals)
             PCCINVOKE(interp, SELF, "globals", PMC *globals);
 
-        if (exp->ns_src == PMCNULL) {
+        if (PMC_IS_NULL(exp->ns_src)) {
             real_exception(interp, NULL, 0, "source namespace not set");
             return;
         }
-        if (exp->ns_dest == PMCNULL) {
+        if (PMC_IS_NULL(exp->ns_dest)) {
             real_exception(interp, NULL, 0, "destination namespace not set");
             return;
         }

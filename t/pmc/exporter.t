@@ -281,7 +281,7 @@ pir_output_like( <<'CODE', <<'OUT', 'import - no args', todo => 'not yet impleme
     $P0 = new .Exporter
 
     $P0.'import'()
-    say 'ok 1 - import() with no args does nothing'
+    say 'ok 1 - import() with no args throws an exception'
 
 .end
 CODE
