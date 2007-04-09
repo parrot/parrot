@@ -67,3 +67,9 @@
 	store_global 'Pheme', 'diag',      diag
 	store_global 'Pheme', 'is_deeply', is_deeply
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

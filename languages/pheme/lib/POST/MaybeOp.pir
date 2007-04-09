@@ -88,3 +88,9 @@ POST::MaybeOp is a literal value in the OST. It is a subclass of POST::Node.
     $P2 = getattribute self, 'tmpvar'
     .return( $P2 )
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

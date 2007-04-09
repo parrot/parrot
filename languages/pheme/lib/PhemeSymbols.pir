@@ -434,3 +434,9 @@
 	result = new cons_type
 	.return( result )
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

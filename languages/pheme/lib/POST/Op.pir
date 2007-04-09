@@ -79,3 +79,9 @@ POST::Node.
     op_name = getattribute self, 'op'
     .return( op_name )
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
