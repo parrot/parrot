@@ -168,7 +168,7 @@ SP              [ ]
             valp->s = IMCC_INFO(interp)->heredoc_content;
             yy_pop_state(yyscanner);
             yy_scan_string(IMCC_INFO(interp)->frames->heredoc_rest, yyscanner);
-            return(STRINGC); /* XXX delete quotes, -> emit, pbc */
+            return(STRINGC); /* RT#42382 delete quotes, -> emit, pbc */
         }
         else
         {
@@ -497,7 +497,7 @@ SP              [ ]
 
 <*>{STRINGCONSTANT} {
     valp->s = str_dup(yytext);
-        return(STRINGC); /* XXX delete quotes, -> emit, pbc */
+        return(STRINGC); /* RT#42382 delete quotes, -> emit, pbc */
     }
 
 <*>"<<"{STRINGCONSTANT} {
@@ -681,7 +681,7 @@ destroy_frame (struct macro_frame_t *frame, void *yyscanner)
         mem_sys_free(frame->heredoc_rest);
     else
         ret = frame->s.line;
-    /* FIXME if frame->s.file was allocated free it */
+    /* RT#42383 if frame->s.file was allocated free it */
 
     mem_sys_free(frame);
 
@@ -953,7 +953,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name, void *yyscanner)
         /* When an error occurs, then report it as being in a macro */
         frame->is_macro = 1;
         /* remember macro name for error reporting
-        TODO check that all the .file text is malloced / freed
+        RT#42384 check that all the .file text is malloced / freed
         */
         frame->s.file = str_dup(name);
         /* whitespace can be savely ignored */

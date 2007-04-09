@@ -43,7 +43,7 @@
 /*
  * Some convenient vars
  */
-/* FIXME: Remove this global variable... */
+/* RT#42385: Remove this global variable... */
 /* SymReg *cur_namespace;  ugly hack for mk_address */
 
 /*
