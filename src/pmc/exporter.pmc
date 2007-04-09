@@ -317,7 +317,6 @@ Throws an exception upon error.
         ns_globals = exp->globals;
 
         PCCINVOKE(interp, ns_src, "export_to", PMC *ns_dest, PMC *ns_globals);
-        return;
     }
 
 
