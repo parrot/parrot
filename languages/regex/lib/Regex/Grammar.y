@@ -85,13 +85,13 @@ rule : '&' rulename '=' regex
          $tree = $tree->{args}->[0];
      }
      my $op = op('rule' => [ $name, $tree, 1 + $::paren ]);
-     $::paren = 0; # FIXME!
+     $::paren = 0; # RT#42393!
      return $op;
    }
      | regex
    {
      my $op = op('rule' => [ 'default', $_[1], 1 + $::paren ]);
-     $::paren = 0; # FIXME!
+     $::paren = 0; # RT#42393!
      return $op;
    }
 ;
