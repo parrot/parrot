@@ -596,9 +596,18 @@ is an array of (string) names to be exported.
     METHOD void export_to(PMC* dest, PMC* what) {
         INTVAL i, n;
 
-        n = VTABLE_elements(INTERP, what);
-        if (!n)
+        if (PMC_IS_NULL(dest)) {
+            real_exception(interp, NULL, 0,
+                    "destination namespace not specified");
             return;
+        }
+        if (PMC_IS_NULL(what) || !VTABLE_elements(interp, what)) {
+            real_exception(interp, NULL, 0,
+                    "exporting default object set not yet specified");
+            return;
+        }
+
+        n = VTABLE_elements(INTERP, what);
         for (i = 0; i < n; ++i) {
             STRING *name;
             PMC *el;
