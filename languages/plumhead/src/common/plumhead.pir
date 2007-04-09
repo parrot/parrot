@@ -260,8 +260,6 @@ n_deb:
 
 .include 'src/partridge/PlumheadPAST_gen.pir'
 
-# vim: ft=imc sw=4:
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
