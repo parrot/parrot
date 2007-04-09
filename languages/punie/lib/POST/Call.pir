@@ -33,3 +33,9 @@ conventions) in the OST. It is a subclass of Node.
     push $P1, 'children'
     .return ($P1)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -68,3 +68,9 @@ it under the same terms as Parrot.
 Allison Randal <allison@perl.org>
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

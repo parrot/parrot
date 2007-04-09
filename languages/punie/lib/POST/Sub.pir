@@ -41,3 +41,9 @@ Node.
     .param int passed_attribute   :opt_flag
     .return self.'accessor'('attribute', attribute, passed_attribute)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

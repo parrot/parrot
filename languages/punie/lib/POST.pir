@@ -29,3 +29,9 @@ for the opcode syntax tree nodes created by the Punie compiler.
 .end
 
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

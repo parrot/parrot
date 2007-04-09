@@ -26,3 +26,9 @@ POST::Ops is a subclass of Node.
     .param int passed_tmpvar   :opt_flag
     .return self.'accessor'('tmpvar', tmpvar, passed_tmpvar)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
