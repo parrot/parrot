@@ -56,3 +56,9 @@ loop:   buffer = read file, 65536
         goto loop
 done:   .return(result)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

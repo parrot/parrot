@@ -61,3 +61,9 @@ badness3:
         print "succeeded?! (should not have)\n"
         end
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
