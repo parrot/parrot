@@ -157,3 +157,9 @@ L<http://www.cliff.biffle.org/esoterica/hq9plus.html>
 
     .return( accumulator )
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
