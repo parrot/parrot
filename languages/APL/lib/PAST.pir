@@ -183,3 +183,9 @@ This is free software; you may redistribute it and/or modify
 it under the same terms as Parrot.
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
