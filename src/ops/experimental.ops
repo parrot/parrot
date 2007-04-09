@@ -483,7 +483,7 @@ inline op new(out PMC, invar PMC) :object_classes {
 
 =item B<add_io_event>(invar PMC, invar PMC, invar PMC, inconst INT)
 
-Call the sub $2 for PIO $1 with user data $3 on ready state of $4. 
+Call the sub $2 for PIO $1 with user data $3 on ready state of $4.
 RT#42376 The only handled $4 = IO_THR_MSG_ADD_SELECT_RD aka 2 for now.
 
 =cut
