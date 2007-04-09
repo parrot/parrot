@@ -30,7 +30,7 @@ help:
 	@echo ""
 
 test: all
-	cd $(TOOL_DIR); prove -r t/compilers/json
+	cd $(TOOL_DIR) && prove -r t/compilers/json
 
 testclean:
 	$(RM_RF) "../../t/compilers/json/*.pir" \
