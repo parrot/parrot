@@ -136,8 +136,6 @@ it under the same terms as Parrot.
 
 =cut
 
-## vim: expandtab sw=4
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
