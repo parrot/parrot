@@ -543,6 +543,7 @@ Debug function to show the rest of the current buffer.
 */
 static void
 print_buffer(lexer_state *lexer) {
+    fprintf(stderr, "token buffer: [%s]\n", lexer->token_chars);
     fprintf(stderr, "Rest of buffer of file '%s'\n", lexer->curfile->filename);
     fprintf(stderr, "[%s]", lexer->curfile->curchar);
 }
@@ -1186,6 +1187,8 @@ is indicated explicitly.
 =cut
 
 */
+
+
         if (isalpha(c) || c == '_' ) {  /* check for identifier, op, invocant or label */
             do {
                 buffer_char(lexer, c);
@@ -1255,23 +1258,16 @@ is indicated explicitly.
             buffer_char(lexer, c);
             c = read_char(lexer->curfile);
 
-            if (isdigit(c)) { /* integer or float */
-                do {
-                    buffer_char(lexer, c);
-                    c = read_char(lexer->curfile);
-                }
-                while (isdigit(c));
+            while (isdigit(c)) {
+                buffer_char(lexer, c);
+                c = read_char(lexer->curfile);
+            }
 
-                /* it is a different char, either '.', ' ' or something else */
-                if (c == '.') { /* floating point number */
-                    buffer_char(lexer, c);
-                    read_digits(lexer);
-                    return T_NUMBER_CONSTANT;
-                }
-                else {
-                    unread_char(lexer->curfile); /* put back last read char. */
-                    return T_INTEGER_CONSTANT;
-                }
+            /* it is a different char, either '.', ' ' or something else */
+            if (c == '.') { /* floating point number */
+                buffer_char(lexer, c);
+                read_digits(lexer);
+                return T_NUMBER_CONSTANT;
             }
             else if (c == 'b' || c == 'B') { /* 0b<digit>+ or 0B<digit>+ */
                 buffer_char(lexer, c);

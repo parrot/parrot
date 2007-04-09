@@ -21,6 +21,22 @@ jsonout.c - JSON backend for PIRC
 #define dedent(D)    D->indent -= INDENT
 
 
+/*
+
+=head1 JSON BACK END INTERNALS
+
+
+
+=cut
+
+
+Structure target holds names of C<target>s so they can be emitted later.
+This is necessary in cases like: "(a,b,c) = foo(1,2,3)", where a, b and c
+are targets. This might prove not to be necessary later, as I haven't thought
+out this back-end completely. It's a bit of trial and error, how to fill in
+the vtable methods efficiently.
+
+*/
 typedef struct target {
     char *name;
     struct target *next;
@@ -32,14 +48,26 @@ typedef struct target {
  *
  */
 typedef struct emit_data {
-    FILE *outfile;
-    int indent;
+    FILE *outfile; /* output file */
+    int indent; /* keep track of indention */
+    /* has the first item in a list already been emitted? If so, we need a comma as separator */
     int need_comma;
-    struct target *targets;
+    struct target *targets; /* list of targets for temp. storage */
 
 } emit_data;
 
-/* helper methods */
+
+/*
+
+=head1 HELPER METHODS
+
+
+=cut
+
+*/
+
+
+
 target *
 new_target(char *name) {
     target *t = (target *)malloc(sizeof(target));
@@ -54,7 +82,13 @@ add_target(emit_data *data, target *t) {
     data->targets = t;
 }
 
-/* Implementation of methods */
+/*
+
+=head1 VTABLE METHODS
+
+=cut
+
+*/
 
 static void
 json_init(emit_data *data) {
