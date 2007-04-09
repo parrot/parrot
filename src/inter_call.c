@@ -59,7 +59,11 @@ Initialize the return value passing state C<call_state> for the given NCI signat
 int
 Parrot_init_arg_nci(Interp *interp, struct call_state *st, const char *sig)
 {
-    Parrot_init_arg_op(interp, CONTEXT(interp->ctx), interp->current_args, &st->src);
+    if (PMC_IS_NULL(interp->args_signature))
+        Parrot_init_arg_op(interp, CONTEXT(interp->ctx), interp->current_args, &st->src);
+    else
+        Parrot_init_arg_indexes_and_sig_pmc(interp, CONTEXT(interp->ctx),
+            interp->current_args, interp->args_signature, &st->src);
     Parrot_init_arg_sig(interp, CONTEXT(interp->ctx), sig, NULL, &st->dest);
     return 1;
 }
