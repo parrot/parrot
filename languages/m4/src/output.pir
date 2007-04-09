@@ -28,3 +28,9 @@ TODO: Support for sync lines.
 
   print text
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

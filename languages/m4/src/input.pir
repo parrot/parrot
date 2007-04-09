@@ -234,3 +234,9 @@ Uses regular expressions for finding tokens.
 
   .return ( token_type, token_data )
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

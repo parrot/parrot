@@ -253,3 +253,9 @@ NO_MORE_ARGS:
 NOT_A_ARGUMENT_LIST:
   state['stack';'input';0;'string'] = input_string
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

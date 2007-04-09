@@ -875,3 +875,9 @@ A placeholder for unimplemented functions.
 
   .return ( 'not implemented yet' )
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
