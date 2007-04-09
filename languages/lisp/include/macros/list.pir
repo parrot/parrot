@@ -164,3 +164,9 @@ Creates a two element list containing A and B, placing the result in R.
 .endm
 
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

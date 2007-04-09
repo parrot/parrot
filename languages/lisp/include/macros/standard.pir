@@ -97,3 +97,9 @@ Sets R to true (the TRUE symbol).
   .S._set_package(.P)
   .S._set_special(_specialp)
 .endm
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

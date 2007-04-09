@@ -110,3 +110,9 @@ DEBUGGER:
 .include "validate.pir"
 .include "cl.pir"
 .include "internals.pir"
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

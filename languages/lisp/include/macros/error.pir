@@ -27,3 +27,9 @@
   sprintf _errmsgs, .M, _errargp
   _error(.T, _errmsgs)  
 .endm
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

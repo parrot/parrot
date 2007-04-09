@@ -102,3 +102,9 @@ Asserts that list A is composed of an even number of elements, branching to B on
 
 .local $DONE:
 .endm
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

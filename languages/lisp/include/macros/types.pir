@@ -131,3 +131,9 @@ Create a new macro object with label L, placing the result in F.
    setattribute .F, "LispMacro\0body", _func
 .endm
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
