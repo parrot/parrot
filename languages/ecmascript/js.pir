@@ -32,3 +32,9 @@ bytecode (actually to PIR, at first).
     
     print "Hello World from JS\n"
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
