@@ -91,3 +91,9 @@ LOOP2:  eq offset, $I6, END2
 	branch LOOP2
 END2:   noop
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

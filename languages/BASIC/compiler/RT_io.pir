@@ -176,3 +176,9 @@ CHOMPOK:.return(line)
 #ERR_BADF:
 #	print "File descriptor is incorrect"
 #	branch GEN_ERROR
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

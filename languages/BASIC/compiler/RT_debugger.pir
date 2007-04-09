@@ -202,3 +202,9 @@ DEBUGGER_DONE:
 	store_global "DEBUGGER", $P25
 	ret
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

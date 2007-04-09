@@ -97,3 +97,9 @@ END:	noop
 NOTWIN: _TERMIO_INKEY()
 END:	noop
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
