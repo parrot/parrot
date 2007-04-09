@@ -42,7 +42,7 @@ inline op saveall() :base_core {
    * restart NEXT() reloads cached base pointers, and works with
    * arbitrary branch opcodes too. While it's a bit of overkill,
    * we don't have an opcode annotation to reload just the base pointers
-   * TODO OPTIMIZE later
+   * RT#42369 OPTIMIZE later
    */
   restart NEXT();
 }
