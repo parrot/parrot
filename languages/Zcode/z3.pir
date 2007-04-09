@@ -49,3 +49,9 @@ Compile z3 to PIR and run it.
   zm."stats"()
   zm."translate"()
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
