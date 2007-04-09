@@ -68,3 +68,9 @@ parse.pir - Parsing support subroutines for [expr]
 
     .return syntax_error(mob, msg, adverbs)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

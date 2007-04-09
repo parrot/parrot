@@ -43,3 +43,9 @@ var_end:
 bad_args:
   tcl_error 'wrong # args: should be "lassign list varName ?varName ...?"'
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

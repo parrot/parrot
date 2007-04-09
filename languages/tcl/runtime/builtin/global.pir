@@ -47,3 +47,9 @@ done:
 badargs:
   tcl_error 'wrong # args: should be "global varName ?varName ...?"'
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

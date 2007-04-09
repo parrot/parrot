@@ -18,3 +18,9 @@ bad_args:
   tcl_error 'wrong # args: should be "after option ?arg arg ...?"'
 .end
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

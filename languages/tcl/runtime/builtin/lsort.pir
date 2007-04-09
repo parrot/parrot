@@ -295,3 +295,9 @@ decreasing:
   $I0 = cmp_num s2, s1
   .return ($I0)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

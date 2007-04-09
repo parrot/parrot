@@ -110,3 +110,9 @@ Utility macro to simplify generating output during debug cycles.
   load_bytecode 'PGE/Dumper.pbc'
   _dumper(.dingus)
 .endm
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

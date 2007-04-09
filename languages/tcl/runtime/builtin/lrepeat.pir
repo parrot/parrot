@@ -50,3 +50,9 @@ must_have_count:
 bad_args:
   tcl_error 'wrong # args: should be "lrepeat positiveCount value ?value ...?"'
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

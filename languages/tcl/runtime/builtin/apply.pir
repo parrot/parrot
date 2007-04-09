@@ -31,3 +31,9 @@ bad_lambda:
 no_args:
   tcl_error 'wrong # args: should be "apply lambdaExpr ?arg1 arg2 ...?"' 
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

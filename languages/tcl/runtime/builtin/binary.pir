@@ -93,3 +93,9 @@ end:
 bad_args:
     tcl_error 'wrong # args: should be "binary scan value formatString ?varName varName ...?"'
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -40,3 +40,9 @@
     tcl_error 'wrong # args: should be "close channelId"'
 
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

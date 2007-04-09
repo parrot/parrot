@@ -227,3 +227,9 @@ odd_args:
   list = __stringToList(str)
   .return __listToDict(list)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

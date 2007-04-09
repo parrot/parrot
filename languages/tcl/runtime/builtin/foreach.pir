@@ -131,3 +131,9 @@ bad_args:
 bad_varlist:
   tcl_error 'foreach varlist is empty'
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -61,3 +61,9 @@ doesnt_contain_elem:
     $S0 = "list doesn't contain element " . $S0
     tcl_error $S0
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

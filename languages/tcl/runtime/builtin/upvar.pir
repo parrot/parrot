@@ -111,3 +111,9 @@ bad_args:
   tcl_error 'wrong # args: should be "upvar ?level? otherVar localVar ?otherVar localVar ...?"'
 .end
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

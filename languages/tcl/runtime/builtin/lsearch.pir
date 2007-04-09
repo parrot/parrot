@@ -120,3 +120,9 @@ done:
 bad_args:
   tcl_error 'wrong # args: should be "lsearch ?options? list pattern"'
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

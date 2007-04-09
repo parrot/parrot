@@ -118,3 +118,9 @@ bad_args:
 bad_args:
   tcl_error 'wrong # args: should be "encoding system ?encoding?"'
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

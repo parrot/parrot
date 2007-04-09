@@ -162,3 +162,9 @@ bad_flag:
   $S1 .= '": must be -exact, -glob, -indexvar, -matchvar, -nocase, -regexp, or --'
   tcl_error $S1
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

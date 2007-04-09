@@ -14,3 +14,9 @@ A convenience: we need these return codes in many different bytecode files.
  .const int VALUE_SLOT    = 0 # _message
  .const int SEVERITY_SLOT = 2 # _severity
  .const int CODE_SLOT     = 9 # tcl return code.
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

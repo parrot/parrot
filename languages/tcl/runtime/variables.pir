@@ -414,3 +414,9 @@ global_not_undef:
   ns[name] = value
   .return(value)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

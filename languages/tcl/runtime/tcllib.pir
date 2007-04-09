@@ -287,3 +287,9 @@ env_loop_done:
   $P1 = script($S0)
   $P1()
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

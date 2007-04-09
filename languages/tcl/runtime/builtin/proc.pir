@@ -306,3 +306,9 @@ too_many_fields:
 error:
   tcl_error 'wrong # args: should be "proc name args body"'
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

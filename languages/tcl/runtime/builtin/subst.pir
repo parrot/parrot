@@ -126,3 +126,9 @@ badswitch:
     $S0 .= '": must be -nobackslashes, -nocommands, or -novariables'
     tcl_error $S0
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -270,3 +270,9 @@ Generate PIR code which can be used to generate our value
 
    .return compiler(argnum, value)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

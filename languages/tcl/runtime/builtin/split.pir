@@ -98,3 +98,9 @@ empty_done:
 bad_args:
   tcl_error 'wrong # args: should be "split string ?splitChars?"'
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

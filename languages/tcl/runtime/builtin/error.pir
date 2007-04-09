@@ -49,3 +49,9 @@ finish:
 badargs:
   tcl_error 'wrong # args: should be "error message ?errorInfo? ?errorCode?"'
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -729,3 +729,9 @@ is_string:
 is_string:
     tcl_error "argument to math function didn't have numeric value"
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -47,3 +47,9 @@ file_error:
 error:
   tcl_error 'wrong # args: should be "open fileName ?access? ?permissions?"'
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

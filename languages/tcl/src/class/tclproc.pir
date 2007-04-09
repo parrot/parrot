@@ -31,3 +31,9 @@ Define the attributes required for the class.
   # Should combine this with 'args' for P6-style args..
   addattribute $P1, 'defaults'
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

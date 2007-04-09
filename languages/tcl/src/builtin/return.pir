@@ -31,3 +31,9 @@ noargs:
   pir_code = "tcl_return \"\"\n"
   .return(pir_code)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
