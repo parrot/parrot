@@ -648,3 +648,9 @@ LOOP_END:
     ns_key = concat "]"
     .return(ns_key)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

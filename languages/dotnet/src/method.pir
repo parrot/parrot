@@ -507,3 +507,9 @@ NO_NS:
 DONE:
     .return (pclass, pclass_ns)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

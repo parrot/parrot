@@ -178,3 +178,9 @@ RULE5:
 DONE:
     .return(pir_output, stack0, stack1)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
