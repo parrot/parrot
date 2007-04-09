@@ -632,6 +632,38 @@ Return the parent NameSpace or PMCNULL, if none.
         return PMC_pmc_val(SELF) ? PMC_pmc_val(SELF) : PMCNULL;
     }
 
+/*
+
+=item C<METHOD PMC* get_class()>
+
+Returns the class or role PMC that is associated with this namespace.
+
+=cut
+
+*/
+
+    METHOD PMC* get_class()
+    {
+        Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
+        return nsinfo->class;
+    }
+
+/*
+
+=item C<METHOD void set_class(PMC *class_or_role)>
+
+Sets the class or role PMC that is associated with this namespace.
+
+=cut
+
+*/
+
+    METHOD set_class(PMC *class_or_role)
+    {
+        Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
+        nsinfo->class = class_or_role;
+    }
+
 }
 /*
 

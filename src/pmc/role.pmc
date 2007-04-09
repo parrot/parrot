@@ -313,6 +313,31 @@ specified will be linked to this role.
         PMC *ret_namespace = NULL;
 
         if (got_name) {
+            /* If namespace is a key or a string, need to look it up. */
+            switch (namespace->vtable->base_type) {
+                case enum_class_NameSpace:
+                    /* It's fine, don't need to do anything. */
+                    break;
+                case enum_class_Key:
+                    /* Look it up relative to HLL base. */
+                    namespace = Parrot_get_namespace_keyed(interp, 
+                        interp->HLL_namespace, namespace);
+                    if (PMC_IS_NULL(namespace))
+                        real_exception(interp, NULL, E_NameError, "Namespace cannot be found");
+                    break;
+                case enum_class_String:
+                    /* Look it up relative to current namespace. */
+                    namespace = Parrot_get_namespace_keyed_str(interp, 
+                        CONTEXT(interp->ctx)->current_namespace,
+                        VTABLE_get_string(interp, namespace));
+                    if (PMC_IS_NULL(namespace))
+                        real_exception(interp, NULL, E_NameError, "Namespace cannot be found");
+                    break;
+                default:
+                    /* Don't know what to do with it. */
+                    real_exception(interp, NULL, E_NameError, "Namespace must be a key");
+            }
+
             /* Check namespace is a key. */
             if (namespace->vtable->base_type != enum_class_Key)
             {
@@ -324,14 +349,18 @@ specified will be linked to this role.
                role any more. */
             if (role->namespace)
             {
-                /* XXX */
+                PMC *role_ns = role->namespace;
+                PCCINVOKE(interp, role_ns, "set_class", PMC* PMCNULL);
             }
 
             /* Set namespace. */
             role->namespace = Parrot_get_namespace_keyed(interp,
                 interp->HLL_namespace, namespace);
 
-            /* XXX Link namespace to this role; currently missing slot for that. */
+            /* Link namespace to this role. */
+            PCCINVOKE(interp, namespace, "set_class", PMC* SELF);
+
+            /* XXX Get methods from the namespace we were linked to. */
         }
 
         ret_namespace = role->namespace;
