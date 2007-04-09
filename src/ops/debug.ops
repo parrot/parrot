@@ -82,7 +82,7 @@ called set a breakpoint.
 When you re run/continue the program begin debugged it will pay
 no attention to the debug ops.
 
-TODO: clone the interpreter to allow people to play into the
+RT#42377: clone the interpreter to allow people to play into the
 debugger and then continue the normal execution of the program.
 
 =cut
@@ -100,7 +100,7 @@ op debug_break() :base_debug {
             command = interp->pdb->cur_command;
             PDB_run_command(interp,command);
         }
-        /* FIXME this is not ok */
+        /* RT#42378 this is not ok */
         exit(0);
     }
     interp->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
@@ -123,7 +123,7 @@ op debug_print() :base_debug {
         PIO_eprintf(interp, "debug_print is disabled\n");
 #else
         /*
-         * XXX adjust register layout
+         * RT#42379 register layout
          */
         PDB_print_int(interp, &interp->int_reg, -1);
         PDB_print_num(interp, &interp->num_reg, -1);

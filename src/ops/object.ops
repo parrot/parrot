@@ -72,7 +72,7 @@ op callmethodcc(invar PMC, invar PMC) :object_base {
 
   object = $1;
   method_pmc = $2;
-  /* XXX should we check if object.can(method) */
+  /* RT#42371 should we check if object.can(method) */
 
   next = expr NEXT();
   interp->current_object = object;
@@ -233,7 +233,7 @@ inline op newclass(out PMC, in PMC) :object_classes {
 
 =item B<subclass>(out PMC, invar PMC, in PMC)
 
-KLUDGE ALERT - OPCODE NAME SHOULD DIFFER FROM BELOW - XXX FIXME
+RT#42372 KLUDGE ALERT - OPCODE NAME SHOULD DIFFER FROM BELOW
 
 Create a new class, put in $1, that is a subclass of $2.  $3, if available
 and not null, is the name of the new class--if not, the subclass is an
@@ -270,7 +270,7 @@ inline op subclass(out PMC, invar PMC, in PMC) :object_classes {
 
 =item B<subclass>(out PMC, in STR, in PMC)
 
-KLUDGE ALERT - OPCODE NAME SHOULD DIFFER FROM ABOVE - XXX FIXME
+RT#42372 KLUDGE ALERT - OPCODE NAME SHOULD DIFFER FROM ABOVE
 
 Create a new class, put in $1, that is a subclass of the class named $2.
 $3, if available and not null, is the name of the new class--if not, the
