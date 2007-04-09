@@ -244,3 +244,9 @@ it under the same terms as Parrot.
 Kevin Tew <kevintew@tewk.com>
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
