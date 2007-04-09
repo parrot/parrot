@@ -529,7 +529,6 @@ not_num:
 .end
 
 .include "library/dumper.pir"
-# vim: ft=imc sw=4:
 
 # Local Variables:
 #   mode: pir
