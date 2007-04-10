@@ -1626,8 +1626,8 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         }
         else {
 
-            fprintf(stderr, "BUG IN LEXER: Unknown character: '%c' (ascii: %u) "
-                            "at character position %d.\n", c, (unsigned)c,
+            fprintf(stderr, "BUG IN LEXER: Unknown character: '%c' (ascii: %d) "
+                            "at character position %d.\n", c, (int)c,
                             get_current_filepos(lexer));
             fprintf(stderr, "Was parsing file: '%s'\n", lexer->curfile->filename);
             if (lexer->curfile->curchar >= lexer->curfile->buffer+lexer->curfile->filesize) {
