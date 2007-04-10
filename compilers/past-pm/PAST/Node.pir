@@ -387,6 +387,21 @@ Otherwise, the node refers to a lexical variable from an outer scope.
     .return self.'attr'('ismy', value, has_value)
 .end
 
+=item isslurpy([flag])
+
+Get/set the node's C<isslurpy> attribute (for parameter variables) to C<flag>.
+A true value of C<isslurpy> indicates that the parameter variable given by this
+node is to be created as a slurpy parameter (consuming all remaining arguments
+passed in).
+
+=cut
+
+.sub 'isslurpy' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('isslurpy', value, has_value)
+.end
+
 
 =item viviself([type])
 
