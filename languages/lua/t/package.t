@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 use Test::More;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function module' );
@@ -124,14 +124,27 @@ CODE
 1234
 OUTPUT
 
-TODO:
-{
-    local $TODO = 'need setfenv';
+TODO: {
+    local $TODO = 'require calls the loader with a single argument: modname';
+
+unlink('../foo.lua') if ( -f '../foo.lua' );
+open $X, '>', '../foo.lua';
+print {$X} 'print(...)';
+close $X;
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require (arg)' );
+require "foo"
+CODE
+foo
+OUTPUT
+}
 
 unlink('../complex.lua') if ( -f '../complex.lua' );
 open $X, '>', '../complex.lua';
 print {$X} << 'CODE';
-module(...)
+-- print("complex.lua", ...)
+-- module(...)
+module("complex")
 
 function new (r, i) return {r=r, i=i} end
 
@@ -168,7 +181,6 @@ print(complex.i.r, complex.i.i)
 CODE
 0	1
 OUTPUT
-}
 
 SKIP:
 {

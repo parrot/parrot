@@ -40,7 +40,7 @@ CODE
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.date' );
-print(os.date("!%c", 0))
+print(os.date("!%d/%m/%y %H:%M:%S", 0))
 CODE
 01/01/70 00:00:00
 OUTPUT

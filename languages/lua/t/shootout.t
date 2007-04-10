@@ -58,9 +58,14 @@ language_output_is( 'lua', $code, $out, 'partial-sums', params => '25000');
 #       Generate and write random DNA sequences
 #
 
+TODO:
+{
+    local $TODO = 'broken';
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'fasta.lua-2.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'fasta-output.txt' ));
 language_output_is( 'lua', $code, $out, 'fasta', params => '1000' );
+}
 
 #
 #   pidigits
