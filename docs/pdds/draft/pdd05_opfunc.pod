@@ -13,6 +13,8 @@ called by the Parrot interpreter.
 {{ NOTE: this PDD is only loosely connected to the current state of
 Parrot. }}
 
+{{ NOTE: standardize on underscores or no underscores? }}
+
 =head1 DESCRIPTION
 
 The opcode functions are the workhorse of the Parrot engine. They control
