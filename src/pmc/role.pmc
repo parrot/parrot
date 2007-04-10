@@ -320,14 +320,14 @@ specified will be linked to this role.
                     break;
                 case enum_class_Key:
                     /* Look it up relative to HLL base. */
-                    namespace = Parrot_get_namespace_keyed(interp, 
+                    namespace = Parrot_get_namespace_keyed(interp,
                         interp->HLL_namespace, namespace);
                     if (PMC_IS_NULL(namespace))
                         real_exception(interp, NULL, E_NameError, "Namespace cannot be found");
                     break;
                 case enum_class_String:
                     /* Look it up relative to current namespace. */
-                    namespace = Parrot_get_namespace_keyed_str(interp, 
+                    namespace = Parrot_get_namespace_keyed_str(interp,
                         CONTEXT(interp->ctx)->current_namespace,
                         VTABLE_get_string(interp, namespace));
                     if (PMC_IS_NULL(namespace))
