@@ -373,6 +373,10 @@ access to act as an object.
 
 Remove an attribute from the class.
 
+=item remove_method(string *)
+
+Remove a method from the class.
+
 =item remove_parent(string *)
 
 Remove a parent from the class.
@@ -402,6 +406,12 @@ The accessor for the name attribute. With no argument, it simply returns
 the current value for name. When passed an argument, it sets the name of
 the class, and also sets the association with a namespace. With no
 argument it only returns the current value of the name attribute.
+
+=item namespace
+
+    $P1 = $P2.namespace()
+
+Retrieve the namespace object associated with the class.
 
 =item new
 
@@ -718,13 +728,18 @@ introspection information corresponding to the requested string name
 
 Remove an attribute from the role.
 
+=item remove_method(string *)
+
+Remove a method from the role.
+
+
 =item remove_role(string *)
 
 Remove a role from the role.
 
 =back
 
-=head3 Methods
+=head3 Role Methods
 
 These methods are just syntactic sugar for the vtable methods. They are
 not included in the Role PMC by default, but added to Role as a role.
@@ -733,14 +748,17 @@ not included in the Role PMC by default, but added to Role as a role.
 
 =item name
 
+    $P1 = $P2.name( $S3 )
+
 The accessor for the name attribute. With no argument, it simply returns
 the current value for name. When passed an argument, it sets the name of
 the role, and also sets the association with a namespace.
 
-When you associate a class with a namespace, it pulls in all of the
-methods and vtable methods held within that namespace.  And when
-replacing one class with another in the association, it removes any
-methods and vtable methods from the previous class.
+=item namespace
+
+    $P1 = $P2.namespace()
+
+Retrieve the namespace object associated with the role.
 
 =item attributes
 
@@ -1038,8 +1056,8 @@ To create a new class C<Foo> which has no parent classes:
 
 To create a class C<Foo> with the parents C<A> and C<B>, the code would be:
 
-   getclass $P0, "A"
-   getclass $P1, "B"
+   get_class $P0, "A"
+   get_class $P1, "B"
    subclass $P2, $P0, "Foo"
    addparent $P2, $P1
 
