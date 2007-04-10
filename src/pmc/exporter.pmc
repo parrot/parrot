@@ -24,7 +24,7 @@ The Exporter PMC structure (C<Parrot_Exporter>) consists of three items:
 =item C<ns_src>
 
 The source namespace -- a NameSpace PMC.
-An empty PMC of this type is allocated upon initialization.
+A Null PMC is allocated during initialization.
 
 =item C<ns_dest>
 
@@ -85,7 +85,7 @@ Instantiates an Exporter.
 
         /* Set up the object. */
         exp = mem_sys_allocate_zeroed(sizeof (Parrot_Exporter));
-        exp->ns_src  = pmc_new(interp, enum_class_NameSpace);
+        exp->ns_src  = PMCNULL;
         exp->ns_dest = CONTEXT(interp->ctx)->current_namespace;
         exp->globals = PMCNULL;
         PMC_data(SELF) = exp;
@@ -150,7 +150,6 @@ Throws an exception if a non-NameSpace PMC is passed.
     PCCMETHOD void source(PMC *src :optional, int got_src :opt_flag) {
         Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
 
-        /* TODO deal with non-namespace pmcs */
         if (got_src) {
             if (src->vtable->base_type != enum_class_NameSpace) {
                 real_exception(interp, NULL, 0,
@@ -184,7 +183,6 @@ Throws an exception if a non-NameSpace PMC is passed.
     PCCMETHOD void destination(PMC *dest :optional, int got_dest :opt_flag) {
         Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
 
-        /* TODO deal with non-namespace pmcs */
         if (got_dest) {
             if (dest->vtable->base_type != enum_class_NameSpace) {
                 real_exception(interp, NULL, 0,
