@@ -64,20 +64,35 @@ typedef struct emit_data {
 
 =head1 HELPER METHODS
 
+=over 4
 
 =cut
 
 */
 
 
+/*
 
-target *
+=item new_target()
+
+=cut
+
+*/
+static target *
 new_target(char *name) {
     target *t = (target *)malloc(sizeof(target));
     t->name = name;
     t->next = NULL;
     return t;
 }
+
+/*
+
+=item add_target()
+
+=cut
+
+*/
 
 static void
 add_target(emit_data *data, target *t) {
@@ -87,7 +102,11 @@ add_target(emit_data *data, target *t) {
 
 /*
 
+=back
+
 =head1 VTABLE METHODS
+
+=over 4
 
 =cut
 
@@ -286,7 +305,11 @@ json_invocation_end(emit_data *data) {
 
 /*
 
+=item json_destroy()
+
 Destructor for emit_data structure
+
+=cut
 
 */
 static void
@@ -349,7 +372,13 @@ init_json_vtable(void) {
     return vtable;
 }
 
+/*
 
+=back
+
+=cut
+
+*/
 
 
 
