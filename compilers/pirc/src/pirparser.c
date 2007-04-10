@@ -2400,8 +2400,6 @@ TOP(parser_state *p) {
     if (p->curtoken != T_EOF) {
         syntax_error(p, 3, "end of file expected in file '", get_current_file(p->lexer), "'\n");
     }
-
-    resize_heredoc_args(p);
 }
 
 
