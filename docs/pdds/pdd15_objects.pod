@@ -511,6 +511,13 @@ otherwise.
 Returns true if the object in question implements the role, class, type,
 or behavior passed in, false otherwise.
 
+=item inspect
+
+  $P1 = $P2.inspect()
+  $P1 = $P2.inspect($S3)
+
+Return introspection information for the class.
+
 =back
 
 =head2 Object PMC API
@@ -793,6 +800,13 @@ with a key of the method name and a value of an invokable PMC. The list will
 include methods added through composing other roles into this role. The
 accessor is read-only.
 
+=item inspect
+
+  $P1 = $P2.inspect()
+  $P1 = $P2.inspect($S3)
+
+Return introspection information for the role.
+
 =back
 
 =head3 Role Conflict Resolution
@@ -964,12 +978,23 @@ the attribute from any objects that have already been instantiated, but
 it will be absent from all future objects of class $P1, of classes that
 inherit from class $P1, or of classes that compose the role $P1.
 
-=item addrole Px, Py
+=item addrole
 
   addrole $P1, $P2
 
 Add role $P2 to the end of the list of roles of class or role $P1. Adds
 any methods and attributes of $P2 that aren't already in $P1.
+
+=item inspect
+
+  $P1 = inspect $P2
+  $P1 = inspect $P2, $S3
+
+Return introspection information for the PMC.  Without the optional string
+argument, return a data structure of all information relevant to introspection.
+With the optional string argument, return a PMC Hash, Array, String, Integer,
+or Number value with introspection information corresponding to the requested
+string name.
 
 =back
 
