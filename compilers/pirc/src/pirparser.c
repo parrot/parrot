@@ -54,6 +54,7 @@ Clean up grammar after discussion.
 #include "pirlexer.h"
 #include "pirparser.h"
 #include "pirvtable.h" /* vtable definition */
+#include "pirutil.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>

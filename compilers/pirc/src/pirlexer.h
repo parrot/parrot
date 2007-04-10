@@ -189,9 +189,6 @@ extern long get_current_filepos(struct lexer_state *s);
 /* get the name of the current file being scanned */
 extern char * const get_current_file(struct lexer_state *s);
 
-/* clone the specified string; *do* free the allocated memory yourself */
-extern char *clone_string(char const * src);
-
 /* read a heredoc 'token': everything up to and including the heredoc label */
 extern token read_heredoc(struct lexer_state *lexer, char *heredoc_label);
 

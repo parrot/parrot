@@ -4,7 +4,7 @@
 # test .HLL statement
 .HLL "PIRC", "pircgroup"
 
-
+.global x
 
 .sub main
 # test local declarations

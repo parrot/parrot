@@ -4,6 +4,14 @@
 
 jsonout.c - JSON backend for PIRC
 
+=head1 DESCRIPTION
+
+Each vtable method is implemented by a private (static) function.
+This back-end emits a JSON representation of the source. Although JSON
+is quite a simple format, it is not very trivial to emit it. Due to some
+householding code, it isn't very straightforward (indention and commas).
+Some refactoring would be in order, once this back-end is finished.
+
 =cut
 
 */
@@ -50,7 +58,8 @@ typedef struct target {
  *
  */
 typedef struct emit_data {
-    FILE *outfile; /* output file */
+    FILE *outfile; /* output file -- XXX TODO: get filename from -o option in pirmain.c */
+
     int indent; /* keep track of indention */
     /* has the first item in a list already been emitted? If so, we need a comma as separator */
     int need_comma;

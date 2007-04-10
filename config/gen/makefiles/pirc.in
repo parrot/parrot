@@ -34,11 +34,12 @@ SOURCES	= src/pirmain.c	\
   src/pirout.c \
   src/pastout.c	\
   src/pirvtable.c \
-  src/jsonout.c
+  src/jsonout.c \
+  src/pirutil.c
 
 
-pirc: pirmain$(O) pirparser$(O)	pirlexer$(O) pirout$(O)	pastout$(O)	pirvtable$(O) jsonout$(O) pbcout$(O)
-	$(CC) -o pirc$(EXE)	pirmain$(O)	pirparser$(O) pirlexer$(O) pirout$(O) pastout$(O) pirvtable$(O) jsonout$(O) pbcout$(O)
+pirc: pirmain$(O) pirparser$(O)	pirlexer$(O) pirout$(O)	pastout$(O)	pirvtable$(O) jsonout$(O) pbcout$(O) pirutil$(O)
+	$(CC) -o pirc$(EXE)	pirmain$(O)	pirparser$(O) pirlexer$(O) pirout$(O) pastout$(O) pirvtable$(O) jsonout$(O) pbcout$(O) pirutil$(O)
 
 pirmain$(O): src/pirmain.c src/pirparser.h
 	$(CC) $(CFLAGS)	-c src/pirmain.c
@@ -64,6 +65,8 @@ pirvtable$(O): src/pirvtable.c src/pirvtable.h
 jsonout$(O): src/jsonout.c src/jsonout.h
 	$(CC) $(CFLAGS)	-c src/jsonout.c
 
+pirutil$(O): src/pirutil.c src/pirutil.h
+	$(CC) $(CFLAGS) -c src/pirutil.c
 
 
 # This is a	listing	of all targets,	that are meant to be called	by users
@@ -98,6 +101,7 @@ docs: src/pirlexer.c src/pirparser.c doc/design.pod
 	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirout.c > doc/pirout.html
 	pod2html --css=http://www.parrotcode.org/css/perl.css src/jsonout.c > doc/jsonout.html
 	pod2html --css=http://www.parrotcode.org/css/perl.css src/pastout.c > doc/pastout.html
+	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirutil.c > doc/pirutil.html
 	pod2html --css=http://www.parrotcode.org/css/perl.css doc/design.pod > doc/design.html
 	pod2html --css=http://www.parrotcode.org/css/perl.css README.pod > doc/README.html
 

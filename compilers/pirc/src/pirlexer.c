@@ -38,6 +38,7 @@ in C<char>s or C<int>s?
 
 */
 #include "pirlexer.h"
+#include "pirutil.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
@@ -942,33 +943,7 @@ destroy_lexer(lexer_state *lexer) {
 }
 
 
-/*
 
-=item clone_string()
-
-clone a string. Copy the characters of src into dest
-and return dest. Memory allocation is done by this function, keeping
-this function's client code simple. Please free() the memory after usage!
-
-=cut
-
-*/
-char *
-clone_string(char const * src) {
-    int srclen;
-    char * dest, *ptr;
-
-    assert(src != NULL);
-    srclen = strlen(src);
-    /* dest is used as an iterator, ptr - still pointing to the beginning
-     * of the string - is returned
-     */
-    dest = ptr = (char *)calloc(srclen + 1, sizeof(char));
-    while (*src) {
-        *dest++ = *src++;
-    }
-    return ptr;
-}
 
 /*
 

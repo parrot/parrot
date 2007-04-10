@@ -100,7 +100,7 @@ new_pirvtable(void) {
     vtable->invocation_end   = not_implemented;
 
     /* set data to NULL, it's initialized in the backend module */
-    vtable->data           = NULL;
+    vtable->data = NULL;
 
     return vtable;
 }
