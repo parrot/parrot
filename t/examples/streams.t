@@ -225,6 +225,12 @@ read:[  102 ]
 read:[  103 Copyright (C) 2004, The Perl Foundation.]
 read:[  104 ]
 read:[  105 =cut]
+read:[  106 ]
+read:[  107 # Local Variables:]
+read:[  108 #   mode: pir]
+read:[  109 #   fill-column: 100]
+read:[  110 # End:]
+read:[  111 # vim: expandtab shiftwidth=4:]
 EXP_FILELINES
 
         'ParrotIO.pir' => <<'EXP_PARROTIO',
@@ -251,7 +257,9 @@ read:[nd\n.end\n\n=head1 AUTHOR\n\nJens Rieks E<lt>parrot at ]
 read:[jensbeimsurfen dot deE<gt> is the author\nand maint]
 read:[ainer.\nPlease send patches and suggestions to the ]
 read:[Perl 6 Internals mailing list.\n\n=head1 COPYRIGHT\n\n]
-read:[Copyright (C) 2004, The Perl Foundation.\n\n=cut\n]
+read:[Copyright (C) 2004, The Perl Foundation.\n\n=cut\n\n# ]
+read:[Local Variables:\n#   mode: pir\n#   fill-column: 10]
+read:[0\n# End:\n# vim: expandtab shiftwidth=4:\n]
 EXP_PARROTIO
     },
 );
