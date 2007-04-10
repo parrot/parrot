@@ -24,6 +24,11 @@ TODO: implement POD parsing
 
 =item *
 
+TODO: read input files a few blocks a time, instead of the whole file at once.
+This is to prevent failure when compiling 100M files.
+
+=item *
+
 Place and remove checks for EOF where appropiate, they are scattered throughout
 the code. Clean that up.
 
@@ -1611,12 +1616,19 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         else if (isspace(c) && (lexer->charptr > lexer->token_chars) ) {
             /* we read a register letter, but nothing more, then current char. is
              * a space. Check if token buffer is not empty (then charptr > token_chars pointer)
-             * if not empty, it's an identifier */
+             * if not empty, it's an identifier (of only a single letter):
+             * one of the following: 'S', 'N', 'I', 'P'.
+             */
             return T_IDENTIFIER;
+        }
+        else if (c == 0) { /* this is necessary since svn properties on input files */
+            return T_EOF;
         }
         else {
 
-            fprintf(stderr, "BUG IN LEXER: Unknown character: %c", c);
+            fprintf(stderr, "BUG IN LEXER: Unknown character: '%c' (ascii: %u) "
+                            "at character position %d.\n", c, (unsigned)c,
+                            get_current_filepos(lexer));
             fprintf(stderr, "Was parsing file: '%s'\n", lexer->curfile->filename);
             if (lexer->curfile->curchar >= lexer->curfile->buffer+lexer->curfile->filesize) {
                 printf("FATAL: end of file passed!\n");
