@@ -145,11 +145,11 @@ the GNU General Public License or the Artistic License for more details.\n\n");
 #define SET_TRACE(flag)  Parrot_set_trace(interp, flag)
 #define SET_CORE(core)   interp->run_core |= core
 
-#define OPT_GC_DEBUG     128
-#define OPT_DESTROY_FLAG 129
-#define OPT_HELP_DEBUG   130
-#define OPT_PBC_OUTPUT   131
-#define OPT_RUNTIME_PREFIX  132
+#define OPT_GC_DEBUG       128
+#define OPT_DESTROY_FLAG   129
+#define OPT_HELP_DEBUG     130
+#define OPT_PBC_OUTPUT     131
+#define OPT_RUNTIME_PREFIX 132
 
 static struct longopt_opt_decl options[] = {
     { '.', '.', (OPTION_flags)0, { "--wait" } },
@@ -160,7 +160,8 @@ static struct longopt_opt_decl options[] = {
     { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
     { 'S', 'S', (OPTION_flags)0, { "--switched-core" } },
     { 'V', 'V', (OPTION_flags)0, { "--version" } },
-    { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,   { "--leak-test", "--destroy-at-end" } },
+    { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
+                                 { "--leak-test", "--destroy-at-end" } },
     { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
     { 'a', 'a', (OPTION_flags)0, { "--pasm" } },
     { 'b', 'b', (OPTION_flags)0, { "--bounds-checks", "--slow-core" } },
@@ -349,7 +350,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 SET_FLAG(PARROT_DESTROY_FLAG);
                 break;
             default:
-                IMCC_fatal_standalone(interp, 1, "main: Invalid flag '%s' used."
+                internal_exception(1, "main: Invalid flag '%s' used."
                         "\n\nhelp: parrot -h\n", (*argv)[0]);
         }
     }
@@ -481,6 +482,7 @@ do_pre_process(Parrot_Interp interp)
                 break;
         }
     }
+    yylex_destroy(&yyscanner);
 }
 
 static void
@@ -509,40 +511,18 @@ imcc_get_optimization_description(Interp *interp, int opt_level, char *opt_desc)
     return;
 }
 
-int
-main(int argc, char * argv[])
+static int
+imcc_initialize(Interp *interp)
 {
-    struct PackFile *pf;
-    int obj_file;
-    char *sourcefile;
-    const char *output_file;
-    Interp *interp;
-    void *yyscanner;
-    STRING *executable_name;
-    PMC *executable_name_pmc;
-
-    Parrot_set_config_hash();
-
-    interp = Parrot_new(NULL);
+    yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
 
     do_yylex_init(interp, &yyscanner);
 
     Parrot_block_DOD(interp);
     Parrot_block_GC(interp);
 
+    IMCC_INFO(interp)->yyscanner = yyscanner;
     IMCC_INFO(interp)->allocator = IMCC_VANILLA_ALLOCATOR;
-
-    /* We parse the arguments, but first store away the name of the Parrot
-       executable, since parsing destroys that and we want to make it
-       available. */
-    executable_name = string_from_cstring(interp, argv[0], 0);
-    executable_name_pmc = pmc_new(interp, enum_class_String);
-    VTABLE_set_string_native(interp, executable_name_pmc, executable_name);
-    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,
-        executable_name_pmc);
-
-    sourcefile = parseflags(interp, &argc, &argv);
-    output_file = interp->output_file;
 
     /* Default optimization level is zero; see optimizer.c, imc.h */
     if (!IMCC_INFO(interp)->optimizer_level) {
@@ -554,6 +534,74 @@ main(int argc, char * argv[])
         IMCC_INFO(interp)->optimizer_level = OPT_PRE;
 #endif
     }
+
+    return 1;
+}
+
+static void
+imcc_run_pbc(Interp *interp, int obj_file, const char *output_file,
+             int argc, char * argv[])
+{
+    if (IMCC_INFO(interp)->imcc_warn)
+        PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
+    else
+        PARROT_WARNINGS_off(interp, PARROT_WARNINGS_ALL_FLAG);
+
+    if (!IMCC_INFO(interp)->gc_off) {
+        Parrot_unblock_DOD(interp);
+        Parrot_unblock_GC(interp);
+    }
+
+    if (obj_file)
+        IMCC_info(interp, 1, "Writing %s\n", output_file);
+    else
+        IMCC_info(interp, 1, "Running...\n");
+
+    /* runs :init functions */
+    PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+
+    /* XXX no return value :-( */
+    Parrot_runcode(interp, argc, argv);
+}
+
+static void
+imcc_write_pbc(Interp *interp, const char *output_file)
+{
+    size_t    size;
+    opcode_t *packed;
+    FILE     *fp;
+
+    IMCC_info(interp, 1, "Writing %s\n", output_file);
+
+    size = PackFile_pack_size(interp, interp->code->base.pf) *
+        sizeof (opcode_t);
+    IMCC_info(interp, 1, "packed code %d bytes\n", size);
+    packed = (opcode_t*) mem_sys_allocate(size);
+    PackFile_pack(interp, interp->code->base.pf, packed);
+    if (strcmp(output_file, "-") == 0)
+        fp = stdout;
+    else if ((fp = fopen(output_file, "wb")) == 0)
+        IMCC_fatal_standalone(interp, E_IOError,
+            "Couldn't open %s\n", output_file);
+
+    if ((1 != fwrite(packed, size, 1, fp)))
+        IMCC_fatal_standalone(interp, E_IOError,
+            "Couldn't write %s\n", output_file);
+    fclose(fp);
+    IMCC_info(interp, 1, "%s written.\n", output_file);
+    free(packed);
+}
+
+static int
+imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
+{
+    struct PackFile *pf;
+    int              obj_file;
+    const char      *output_file;
+    yyscan_t         yyscanner;
+
+    yyscanner   = IMCC_INFO(interp)->yyscanner;
+    output_file = interp->output_file;
 
     /* Read in the source and determine whether it's Parrot bytecode,
        PASM or a Parrot abstract syntax tree (PAST) file. If it isn't
@@ -568,7 +616,7 @@ main(int argc, char * argv[])
         char *ext;
         ext = strrchr(sourcefile, '.');
         if (ext && strcmp(ext, ".pbc") == 0) {
-            load_pbc = 1;
+            load_pbc  = 1;
             write_pbc = 0;
         }
         else if (!load_pbc) {
@@ -586,6 +634,7 @@ main(int argc, char * argv[])
         do_pre_process(interp);
         Parrot_destroy(interp);
         yylex_destroy(yyscanner);
+        IMCC_INFO(interp)->yyscanner = NULL;
         Parrot_exit(interp, 0);
     }
 
@@ -599,10 +648,10 @@ main(int argc, char * argv[])
         }
         else if (ext && strcmp(ext, PARROT_OBJ_EXT) == 0) {
 #if EXEC_CAPABLE
-            load_pbc = 1;
+            load_pbc  = 1;
             write_pbc = 0;
-            run_pbc = 1;
-            obj_file = 1;
+            run_pbc   = 1;
+            obj_file  = 1;
             Parrot_set_run_core(interp, PARROT_EXEC_CORE);
 #else
             IMCC_fatal_standalone(interp, 1, "main: can't produce object file");
@@ -626,14 +675,13 @@ main(int argc, char * argv[])
     if (load_pbc) {
         pf = Parrot_readbc(interp, sourcefile);
         if (!pf)
-            IMCC_fatal_standalone(interp, 1,
-                "main: Packfile loading failed\n");
+            IMCC_fatal_standalone(interp, 1, "main: Packfile loading failed\n");
         Parrot_loadbc(interp, pf);
     }
     else {
         /* Otherwise, we need to compile our input to bytecode. */
-        int  per_pbc    = (write_pbc | run_pbc) != 0;
-        int  opt_level  = IMCC_INFO(interp)->optimizer_level;
+        int per_pbc   = (write_pbc | run_pbc) != 0;
+        int opt_level = IMCC_INFO(interp)->optimizer_level;
 
         /* Shouldn't be more than five, but five extra is cheap */
         char opt_desc[10];
@@ -643,7 +691,7 @@ main(int argc, char * argv[])
         IMCC_info(interp, 1, "using optimization '-O%s' (%x) \n",
                   opt_desc, opt_level);
 
-        pf             = PackFile_new(interp, 0);
+        pf            = PackFile_new(interp, 0);
         Parrot_loadbc(interp, pf);
 
         IMCC_push_parser_state(interp);
@@ -656,12 +704,9 @@ main(int argc, char * argv[])
         IMCC_INFO(interp)->state->pasm_file = pasm_file;
         IMCC_TRY(IMCC_INFO(interp)->jump_buf,
                  IMCC_INFO(interp)->error_code) {
-            int retval;
-            retval = yyparse(yyscanner, (void *) interp);
-            if (retval) {
-                /* fprintf(stderr, "** Parsing failed **\n"); */
+            if (yyparse(yyscanner, (void *) interp))
                 exit(1);
-            }
+
             imc_compile_all_units(interp);
         }
         IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
@@ -692,30 +737,8 @@ main(int argc, char * argv[])
     }
 
     /* Produce a PBC output file, if one was requested */
-    if (write_pbc) {
-        size_t size;
-        opcode_t *packed;
-        FILE *fp;
-        IMCC_info(interp, 1, "Writing %s\n", output_file);
-
-        size = PackFile_pack_size(interp, interp->code->base.pf) *
-            sizeof (opcode_t);
-        IMCC_info(interp, 1, "packed code %d bytes\n", size);
-        packed = (opcode_t*) mem_sys_allocate(size);
-        PackFile_pack(interp, interp->code->base.pf, packed);
-        if (strcmp(output_file, "-") == 0)
-            fp = stdout;
-        else if ((fp = fopen(output_file, "wb")) == 0)
-            IMCC_fatal_standalone(interp, E_IOError,
-                "Couldn't open %s\n", output_file);
-
-        if ((1 != fwrite(packed, size, 1, fp)))
-            IMCC_fatal_standalone(interp, E_IOError,
-                "Couldn't write %s\n", output_file);
-        fclose(fp);
-        IMCC_info(interp, 1, "%s written.\n", output_file);
-        free(packed);
-    }
+    if (write_pbc)
+        imcc_write_pbc(interp, output_file);
 
     /* If necessary, load the file written above */
     if (run_pbc == 2 && write_pbc && strcmp(output_file, "-")) {
@@ -729,34 +752,46 @@ main(int argc, char * argv[])
     }
 
     /* Run the bytecode */
-    if (run_pbc) {
+    if (run_pbc)
+        imcc_run_pbc(interp, obj_file, output_file, argc, argv);
 
-        if (IMCC_INFO(interp)->imcc_warn)
-            PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
-        else
-            PARROT_WARNINGS_off(interp, PARROT_WARNINGS_ALL_FLAG);
-        if (!IMCC_INFO(interp)->gc_off) {
-            Parrot_unblock_DOD(interp);
-            Parrot_unblock_GC(interp);
-        }
-        if (obj_file)
-            IMCC_info(interp, 1, "Writing %s\n", output_file);
-        else
-            IMCC_info(interp, 1, "Running...\n");
+    yylex_destroy(yyscanner);
+    IMCC_INFO(interp)->yyscanner = NULL;
+    return 0;
+}
 
-        /* runs :init functions */
-        PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+int
+main(int argc, char * argv[])
+{
+    char    *sourcefile;
+    Interp  *interp;
+    STRING  *executable_name;
+    PMC     *executable_name_pmc;
+    int      status;
 
-        Parrot_runcode(interp, argc, argv);
-        /* XXX no return value :-( */
-    }
+    Parrot_set_config_hash();
+
+    interp     = Parrot_new(NULL);
+    if (!imcc_initialize(interp))
+        internal_exception(1, "Could not initialize IMCC\n");
+
+    /* We parse the arguments, but first store away the name of the Parrot
+       executable, since parsing destroys that and we want to make it
+       available. */
+    executable_name     = string_from_cstring(interp, argv[0], 0);
+    executable_name_pmc = pmc_new(interp, enum_class_String);
+    VTABLE_set_string_native(interp, executable_name_pmc, executable_name);
+    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,
+        executable_name_pmc);
+
+    sourcefile = parseflags(interp, &argc, &argv);
+    status     = imcc_run(interp, sourcefile, argc, argv);
 
     /* Clean-up after ourselves */
     Parrot_destroy(interp);
-    yylex_destroy(yyscanner);
     Parrot_exit(interp, 0);
 
-    return 0;
+    return status;
 }
 
 

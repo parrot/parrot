@@ -237,6 +237,7 @@ typedef struct _imc_info_t {
     int cnr;
     int nargs;
     int in_slice;
+    void *yyscanner;
 } imc_info_t;
 
 #define IMCC_INFO(i) (((Parrot_Interp)(i))->imc_info)
