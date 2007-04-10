@@ -2348,7 +2348,9 @@ compilation_unit(parser_state *p) {
             hll_mapping(p);
             break;
         default:
-            syntax_error(p, 1, "compilation unit expected");
+            /* there may be newline tokens if there are comments between compilation units;
+             * just break; any syntax errors will be reported in program().
+             */
             break;
     }
 }
