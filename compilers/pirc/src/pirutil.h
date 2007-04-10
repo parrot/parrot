@@ -1,16 +1,11 @@
 #ifndef __PIRUTIL_H
 #  define __PIRUTIL_H
 
-
-
 /* command argument switches */
 typedef enum pirc_flags {
-        PIRC_VERBOSE     = 1,
-        PIRC_DEBUG       = 2,
-
+    PIRC_VERBOSE     = 1,
+    PIRC_DEBUG       = 2,
 } pirc_flag;
-
-
 
 extern void printverbose(char *message);
 
@@ -23,10 +18,7 @@ extern char *clone_string(char const *str);
 #  define debug(P,S)    if (P->flags & PIRC_DEBUG)   printdebug(S)
 */
 
-
 #endif
-
-
 
 /*
  * Local variables:
