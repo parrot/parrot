@@ -876,7 +876,7 @@ they match.
     INTVAL is_equal (PMC* value) {
 MMD_LuaString: {
             STRING *s = PMC_str_val(SELF);
-            STRING *v = VTABLE_get_string(INTERP, value);
+            STRING *v = LuaString.value.get_string();
             return (INTVAL)(0 == string_equal(INTERP, s, v));
         }
 MMD_DEFAULT: {
@@ -900,7 +900,7 @@ Throws an exception unless C<value> is a LuaString.
     INTVAL cmp (PMC* value) {
 MMD_LuaString: {
             STRING *s = PMC_str_val(SELF);
-            STRING *v = VTABLE_get_string(INTERP, value);
+            STRING *v = LuaString.value.get_string();
             return string_compare(INTERP, s, v);
         }
 MMD_DEFAULT: {
@@ -922,19 +922,19 @@ MMD_DEFAULT: {
 MMD_LuaNumber: {
             STRING* s = string_concat(INTERP,
                 SELF.get_string(),
-                VTABLE_get_string(INTERP, value), 0);
-            if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
-                VTABLE_set_string_native(INTERP, dest, s);
+                LuaNumber.value.get_string(), 0);
+            if (NULL == dest)
+                dest = pmc_new(INTERP, dynpmc_LuaString);
+            VTABLE_set_string_native(INTERP, dest, s);
             return dest;
         }
 MMD_LuaString: {
             STRING* s = string_concat(INTERP,
                 SELF.get_string(),
-                VTABLE_get_string(INTERP, value), 0);
-            if (!dest)
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
-                VTABLE_set_string_native(INTERP, dest, s);
+                LuaString.value.get_string(), 0);
+            if (NULL == dest)
+                dest = pmc_new(INTERP, dynpmc_LuaString);
+            VTABLE_set_string_native(INTERP, dest, s);
             return dest;
         }
 MMD_DEFAULT: {
@@ -964,12 +964,12 @@ MMD_DEFAULT: {
     void i_concatenate (PMC* value) {
 MMD_LuaNumber: {
             STRING* s = SELF.get_string();
-            STRING* v = VTABLE_get_string(INTERP, value);
+            STRING* v = LuaNumber.value.get_string();
             SELF.set_string_native(string_append(INTERP, s, v));
         }
 MMD_LuaString: {
             STRING* s = SELF.get_string();
-            STRING* v = VTABLE_get_string(INTERP, value);
+            STRING* v = LuaString.value.get_string();
             SELF.set_string_native(string_append(INTERP, s, v));
         }
 MMD_DEFAULT: {

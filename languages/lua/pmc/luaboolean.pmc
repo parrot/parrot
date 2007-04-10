@@ -232,8 +232,7 @@ Used to unarchive the boolean.
 */
     INTVAL is_equal (PMC* value) {
 MMD_LuaBoolean: {
-            return (INTVAL)(PMC_int_val(SELF) ==
-                VTABLE_get_integer(INTERP, value));
+            return (INTVAL)(PMC_int_val(SELF) == PMC_int_val(value));
         }
 MMD_DEFAULT: {
             return (INTVAL)0;
