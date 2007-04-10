@@ -1,6 +1,34 @@
 # $Id$
 
+New in 0.4.11
+
+- Compilers:
+ + IMCC: added documentation for C-based Parrot Calling Conventions,
+   refactorings and bug fixes
+ + PGE: new perl6regex front end reflecting recent S05 syntax changes
+ + PIRC: new prototype PIR parser
+- Languages:
+ + Updated Lua, PHP ("Plumhead"), BASIC, pynie
+- Design:
+ + PDD15 "Objects" - details added, and draft approved
+- Documentation:
+ + Added guidelines for PMC documentation
+- Implementation:
+ + PDD15 implementation is largely complete, including role-based composition,
+   introspection, and C3 method resolution order
+ + new Exporter PMC for importing globals between namespaces
+ + new string utilities for radix conversion
+- Build:
+ + Refactorings and improvements in test coverage for 'Configure.pl'
+- Misc:
+ + many bugfixes, enhancements, and code cleanup
+ + added example subversion config file
+ + extended support for gcc, icc, and other compilers
+ + extended support for Solaris and other platforms
+
+
 New in 0.4.10
+
 - Compilers:
  + IMCC: Parrot calling conventions now available between two C PMCs (PMINVOKE)
  + PGE: Match object improvements
