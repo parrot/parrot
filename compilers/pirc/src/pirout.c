@@ -81,10 +81,6 @@ pir_op(struct emit_data *data, char *op) {
     fprintf(OUT, "  %s ", op);
 }
 
-static void
-pir_comma(struct emit_data *data) {
-    fprintf(OUT, ", ");
-}
 
 static void
 pir_list_start(struct emit_data *data) {
@@ -147,7 +143,6 @@ init_pir_vtable(void) {
     vtable->op_start       = pir_op;
     vtable->op_end         = pir_newline;
     vtable->expression     = pir_expr;
-    vtable->next_expr      = pir_comma;
     vtable->list_start     = pir_list_start;
     vtable->list_end       = pir_list_end;
     vtable->sub_flag_start = pir_sub_flag_start;

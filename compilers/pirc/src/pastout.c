@@ -206,20 +206,6 @@ past_expr(struct emit_data *data, char *expr) {
 
 /*
 
-=item past_next()
-
-
-
-=cut
-
-*/
-static void
-past_next(struct emit_data *data) {
-    /* increment index */
-}
-
-/*
-
 =item past_destroy()
 
 
@@ -262,7 +248,6 @@ init_past_vtable(void) {
     vtable->op_start     = past_op;
     vtable->expression   = past_expr;
     vtable->op_end       = past_close;
-    vtable->next_expr    = past_next;
 
     vtable->data = (emit_data *)malloc(sizeof(emit_data));
     if (vtable->data == NULL) {

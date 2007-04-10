@@ -736,7 +736,6 @@ parrot_instruction(parser_state *p) {
     while (p->curtoken != T_NEWLINE) {
         expression(p);
         if (p->curtoken == T_COMMA) {
-            emit_next_expr(p);
             next(p);
         }
         else break;
@@ -972,7 +971,6 @@ local_id_list(parser_state *p) {
 
     while (p->curtoken == T_COMMA) {
         next(p); /* skip comma */
-        emit_next_expr(p);
 
         emit_expr(p, get_current_token(p->lexer));
         match(p, T_IDENTIFIER);
@@ -1051,7 +1049,6 @@ lex_declaration(parser_state *p) {
     match(p, T_LEX);
     emit_expr(p, get_current_token(p->lexer));
     match(p, T_STRING_CONSTANT);
-    emit_next_expr(p);
     match(p, T_COMMA);
     target(p);
     match(p, T_NEWLINE);
@@ -1144,7 +1141,6 @@ unless_statement(parser_state *p) {
         emit_op_start(p, "unless");
         conditional_expression(p);
     }
-    emit_next_expr(p); /* indicate there's another expression coming */
     jump_statement(p);
 }
 
@@ -1169,7 +1165,6 @@ if_statement(parser_state *p) {
         emit_op_start(p, "if");
         conditional_expression(p);
     }
-    emit_next_expr(p); /* indicate there's another expression coming */
     jump_statement(p);
 }
 
@@ -1908,7 +1903,6 @@ multi_type_list(parser_state *p) {
         }
 
         if (p->curtoken == T_COMMA) {
-            emit_next_expr(p);
             next(p);
         }
         else wantmore = 0; /* no comma, so quit loop */

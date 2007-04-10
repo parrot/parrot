@@ -26,7 +26,6 @@ typedef struct pirvtable {
     void (* op_start)        (struct emit_data *data, char *op);
     void (* op_end)          (struct emit_data *data);
     void (* expression)      (struct emit_data *data, char *expr);
-    void (* next_expr)       (struct emit_data *data);
     void (* list_start)      (struct emit_data *data);
     void (* list_end)        (struct emit_data *data);
     void (* sub_flag_start)  (struct emit_data *data);
@@ -61,7 +60,6 @@ typedef struct pirvtable {
 #  define emit_op_start(P,O)       (*P->vtable->op_start)         (P->vtable->data, O)
 #  define emit_op_end(P)           (*P->vtable->op_end)           (P->vtable->data)
 #  define emit_expr(P,E)           (*P->vtable->expression)       (P->vtable->data, E)
-#  define emit_next_expr(P)        (*P->vtable->next_expr)        (P->vtable->data)
 #  define emit_list_start(P)       (*P->vtable->list_start)       (P->vtable->data)
 #  define emit_list_end(P)         (*P->vtable->list_end)         (P->vtable->data)
 #  define emit_method_name(P,N)    (*P->vtable->method_name)      (P->vtable->data, N)
