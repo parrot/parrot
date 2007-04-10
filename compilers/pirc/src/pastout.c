@@ -71,10 +71,18 @@ Prints PAST for a block, including <source> and <pos> attributes.
 
 */
 static void
-past_block(struct emit_data *data, char *source, int pos) {
+past_block(struct emit_data *data) {
     fprintf(OUT, "%*sPMC 'PAST::Block'  {\n", data->indent, " ");
     indent(data);
+}
+
+static void
+past_source(emit_data *data, char *source) {
     fprintf(OUT, "%*s<source> => \"%s\"\n", data->indent, " ", source);
+}
+
+static void
+past_position(emit_data *data, int pos) {
     fprintf(OUT, "%*s<pos> => %d\n", data->indent, " ", pos);
 }
 
@@ -235,6 +243,8 @@ init_past_vtable(void) {
     /* override vtable methods */
     vtable->initialize   = past_init;
     vtable->destroy      = past_destroy;
+    vtable->source       = past_source;
+    vtable->position     = past_position;
     vtable->sub_start    = past_block;
     vtable->sub_end      = past_close;
     vtable->name         = past_name;

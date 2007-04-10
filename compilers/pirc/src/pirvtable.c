@@ -71,6 +71,8 @@ new_pirvtable(void) {
      */
     vtable->initialize       = not_implemented;
     vtable->destroy          = not_implemented; /* destructor; highly recommended to implement! */
+    vtable->source           = not_implemented;
+    vtable->position         = not_implemented;
     vtable->name             = not_implemented;
     vtable->sub_start        = not_implemented;
     vtable->sub_end          = not_implemented;

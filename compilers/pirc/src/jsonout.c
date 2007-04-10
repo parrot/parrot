@@ -132,15 +132,22 @@ json_end(emit_data *data) {
 }
 
 static void
-json_sub_start(emit_data *data, char *source, int pos) {
+json_sub_start(emit_data *data) {
     if (data->need_comma) print_comma(data);
     fprintf(OUT, "%*s{ \"sub\" :\n", data->indent, " ");
     indent(data);
 
     fprintf(OUT, "%*s{\n", data->indent, " ");
     indent(data);
+}
 
+static void
+json_source(emit_data *data, char *source) {
     fprintf(OUT, "%*s{ \"source\" : \"%s\" },\n", data->indent, " ", source);
+}
+
+static void
+json_position(emit_data *data, int pos) {
     fprintf(OUT, "%*s{ \"pos\" : %d },\n", data->indent, " ", pos);
 }
 
@@ -335,6 +342,8 @@ init_json_vtable(void) {
     /* set vtable methods to the appropiate implementation */
     vtable->initialize       = json_init;
     vtable->destroy          = json_destroy;
+    vtable->source           = json_source;
+    vtable->position         = json_position;
     vtable->sub_start        = json_sub_start;
     vtable->sub_end          = json_sub_end;
     vtable->end              = json_end;

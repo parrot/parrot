@@ -41,8 +41,7 @@ pir_name(struct emit_data *data, char *name) {
 }
 
 static void
-pir_sub(struct emit_data *data, char *source, int pos) {
-    fprintf(OUT, "#character position %d\n", pos);
+pir_sub(struct emit_data *data) {
     fprintf(OUT, ".sub");
 }
 

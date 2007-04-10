@@ -2062,7 +2062,7 @@ parameters(parser_state *p) {
 static void
 sub_definition(parser_state *p) {
     /* call emit method */
-    emit_sub_start(p, "", get_current_filepos(p->lexer));
+    emit_sub_start(p);
     next(p); /* skip '.sub' or '.pcc_sub' */
 
     switch (p->curtoken) { /* subname -> IDENTIFIER | STRINGC */
