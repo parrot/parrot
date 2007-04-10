@@ -67,3 +67,9 @@ error:
     print "Error: top_scope_stack is empty"
     end
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

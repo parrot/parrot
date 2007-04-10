@@ -360,3 +360,9 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 .gen_accessor('rescue_stmt')
 .gen_dumplist('name try_stmt rescue_stmt')
 
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

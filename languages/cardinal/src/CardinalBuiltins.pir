@@ -137,3 +137,9 @@
     $P1 = $I1
     .return($P1)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

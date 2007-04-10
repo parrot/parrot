@@ -40,5 +40,8 @@ src/builtins/ranges.pir - Ruby range constructors
 
 =cut
 
-
-## vim: expandtab sw=4
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
