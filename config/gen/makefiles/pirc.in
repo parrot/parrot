@@ -108,13 +108,8 @@ test: all
 	README.pod
 
 
-testclean:
-	$(RM_F) t\\*.pir
-
-
 clean:
-	$(RM_RF) *$(O) \
-	t\\*.pir
+	$(RM_RF) *$(O)
 
 
 realclean: clean
