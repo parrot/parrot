@@ -23,7 +23,6 @@
 #include "parser.h"
 
 static int load_pbc, run_pbc, write_pbc, pre_process, pasm_file;
-static char optimizer_opt[20];
 
 static void
 usage(FILE* fp)
@@ -198,7 +197,7 @@ static char *
 parseflags(Parrot_Interp interp, int *argc, char **argv[])
 {
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
-    int status;
+    int   status;
     if (*argc == 1) {
         usage(stderr);
         exit(1);
@@ -307,30 +306,27 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
 
             case 'O':
-                if (opt.opt_arg) {
-                    strncpy(optimizer_opt, opt.opt_arg, sizeof (optimizer_opt));
-                    optimizer_opt[sizeof (optimizer_opt)-1] = '\0';
+                if (!opt.opt_arg) {
+                    IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
+                    break;
                 }
-                else {
-                    strcpy(optimizer_opt, "1");
-                }
-                if (strchr(optimizer_opt, 'p'))
+                if (strchr(opt.opt_arg, 'p'))
                     IMCC_INFO(interp)->optimizer_level |= OPT_PASM;
-                if (strchr(optimizer_opt, 'c'))
+                if (strchr(opt.opt_arg, 'c'))
                     IMCC_INFO(interp)->optimizer_level |= OPT_SUB;
 
                 IMCC_INFO(interp)->allocator = IMCC_GRAPH_ALLOCATOR;
                 /* currently not ok due to different register allocation */
-                if (strchr(optimizer_opt, 'j')) {
+                if (strchr(opt.opt_arg, 'j')) {
                     SET_CORE(PARROT_JIT_CORE);
                 }
-                if (strchr(optimizer_opt, '1')) {
+                if (strchr(opt.opt_arg, '1')) {
                     IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
                 }
-                if (strchr(optimizer_opt, '2')) {
+                if (strchr(opt.opt_arg, '2')) {
                     IMCC_INFO(interp)->optimizer_level |= (OPT_PRE | OPT_CFG);
                 }
-                if (strchr(optimizer_opt, 't')) {
+                if (strchr(opt.opt_arg, 't')) {
                     SET_CORE(PARROT_SWITCH_CORE);
 #ifdef HAVE_COMPUTED_GOTO
                     SET_CORE(PARROT_CGP_CORE);
@@ -487,6 +483,32 @@ do_pre_process(Parrot_Interp interp)
     }
 }
 
+static void
+imcc_get_optimization_description(Interp *interp, int opt_level, char *opt_desc)
+{
+    int i = 0;
+
+    if (opt_level & (OPT_PRE | OPT_CFG))
+            opt_desc[i++] = '2';
+    else
+        if (opt_level & OPT_PRE)
+            opt_desc[i++] = '1';
+
+    if (opt_level & OPT_PASM)
+        opt_desc[i++] = 'p';
+    if (opt_level & OPT_SUB)
+        opt_desc[i++] = 'c';
+
+    if (interp->run_core & PARROT_JIT_CORE)
+        opt_desc[i++] = 'j';
+
+    if (interp->run_core & PARROT_SWITCH_CORE)
+        opt_desc[i++] = 't';
+
+    opt_desc[i++] = '\0';
+    return;
+}
+
 int
 main(int argc, char * argv[])
 {
@@ -523,14 +545,12 @@ main(int argc, char * argv[])
     output_file = interp->output_file;
 
     /* Default optimization level is zero; see optimizer.c, imc.h */
-    if (!*optimizer_opt) {
+    if (!IMCC_INFO(interp)->optimizer_level) {
 #if 1
-        strcpy(optimizer_opt, "0");
         IMCC_INFO(interp)->optimizer_level = 0;
 #else
         /* won't even make with this: something with Data::Dumper and
          * set_i_p_i*/
-        strcpy(optimizer_opt, "1");
         IMCC_INFO(interp)->optimizer_level = OPT_PRE;
 #endif
     }
@@ -612,10 +632,18 @@ main(int argc, char * argv[])
     }
     else {
         /* Otherwise, we need to compile our input to bytecode. */
-        int per_pbc = (write_pbc | run_pbc) != 0;
-        IMCC_info(interp, 1, "using optimization '%s' (%x) \n", optimizer_opt,
-                IMCC_INFO(interp)->optimizer_level);
-        pf = PackFile_new(interp, 0);
+        int  per_pbc    = (write_pbc | run_pbc) != 0;
+        int  opt_level  = IMCC_INFO(interp)->optimizer_level;
+
+        /* Shouldn't be more than five, but five extra is cheap */
+        char opt_desc[10];
+
+        imcc_get_optimization_description(interp, opt_level, opt_desc);
+
+        IMCC_info(interp, 1, "using optimization '-O%s' (%x) \n",
+                  opt_desc, opt_level);
+
+        pf             = PackFile_new(interp, 0);
         Parrot_loadbc(interp, pf);
 
         IMCC_push_parser_state(interp);
