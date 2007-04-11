@@ -131,7 +131,7 @@ pass("Completed all tests in $0");
 
 sub create_test_file {
     my $filename = shift;
-    open my $FH, ">$filename" or die "Unable to create test file: $!";
+    open my $FH, '>', $filename or die "Unable to create test file: $!";
     close $FH or die "Unable to close test file: $!";
     return 1;
 }
