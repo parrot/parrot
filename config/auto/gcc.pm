@@ -54,7 +54,7 @@ sub runstep {
     my $major = $gnuc{__GNUC__};
     my $minor = $gnuc{__GNUC_MINOR__};
     my $intel = $gnuc{__INTEL_COMPILER};
-    
+
     if (defined $intel || ! defined $major) {
         print " (no) " if $verbose;
         $self->set_result('no');
