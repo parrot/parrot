@@ -191,8 +191,24 @@ the name and the value. If the value is omitted, it's assumed to be 1. The
 options C<--help> and C<--version> are built in to Configure; any others are
 defined by steps.
 
-If you add a new option, don't forget to add it to this documentation and the
-C<--help> listing in F<Configure.pl>.
+Command-line arguments are now processed by C<process_options()>, a subroutine exported by
+L<Parrot::Configure::Options>.
+If you add a new option, don't forget to add it to this documentation and to
+two locations in F<lib/Parrot/Configure/Options.pm>:
+
+=over 4
+
+=item *
+
+the list of valid command-line arguments in
+C<Parrot::Configure::Options::get_valid_options()>; and
+
+=item *
+
+the description of command-line arguments found in
+C<Parrot::Configure::Options::print_help()>.
+
+=back
 
 Arguments passed to F<Configure.pl> are held in a L<Parrot::Configure::Data>
 object stored inside the L<Parrot::Configure> object.  The options data object
