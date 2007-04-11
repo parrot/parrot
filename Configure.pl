@@ -283,12 +283,14 @@ $| = 1;
 # warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 # from Parrot::Configure::Options
-my $args = process_options( {
-    argv            => [ @ARGV ],
-    script          => $0,
-    parrot_version  => $parrot_version,
-    svnid           => '$Id$',
-} );
+my $args = process_options(
+    {
+        argv           => [@ARGV],
+        script         => $0,
+        parrot_version => $parrot_version,
+        svnid          => '$Id$',
+    }
+);
 exit unless defined $args;
 
 my %args = %$args;
@@ -381,7 +383,7 @@ else {
 # tell users what to do next
 
 # from Parrot::Configure::Messages
-print_conclusion($conf->data->get('make'));
+print_conclusion( $conf->data->get('make') );
 
 exit(0);
 
