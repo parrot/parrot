@@ -11,8 +11,6 @@ pirout.c - Back-end for outputting PIR.
 #include "pirvtable.h"
 #include "pirlexer.h"
 #include <stdio.h>
-#include <malloc.h>
-#include <malloc.h>
 #include <stdlib.h>
 
 

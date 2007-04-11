@@ -46,7 +46,6 @@ in C<char>s or C<int>s?
 #include "pirutil.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <malloc.h>
 #include <sys/stat.h>
 #include <ctype.h>
 #include <string.h>
@@ -1122,9 +1121,9 @@ is indicated explicitly.
 
   STRING-CONSTANT -> ' <characters> ' | " <characters> "
 
-  INT-CONSTANT    -> DIGIT+ | 0 [xX] DIGIT+ | 0 [bB] DIGIT+
+  INT-CONSTANT    -> [-] DIGIT+ | 0 [xX] DIGIT+ | 0 [bB] DIGIT+
 
-  NUM-CONSTANT    -> DIGIT+ '.' DIGIT*
+  NUM-CONSTANT    -> [-] DIGIT+ '.' DIGIT*
 
   DIGIT           -> [0-9]
 

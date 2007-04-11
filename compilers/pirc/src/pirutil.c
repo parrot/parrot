@@ -10,7 +10,6 @@ pirutil.c - various utility functions
 #include "pirutil.h"
 #include <assert.h>
 #include <string.h>
-#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -77,11 +76,7 @@ printdebug(char *message) {
 
 
 
-
-
-
-
-
+/* Array holding all parrot ops */
 static char const *parrot_ops[] = {
         "yield",
         "xor",
@@ -419,6 +414,9 @@ is_op(char *id) {
     int index = 0;
 
     assert(id != NULL);
+
+    /* very inefficient implementation, but for now it works */
+    /* suggestions: hashtable, binary search */
 
     while (iter != NULL) {
         if (strcmp(iter, id) == 0)

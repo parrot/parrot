@@ -19,7 +19,6 @@ Some refactoring would be in order, once this back-end is finished.
 #include "pirvtable.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <malloc.h>
 #include <stdarg.h>
 
 #define OUT             stdout

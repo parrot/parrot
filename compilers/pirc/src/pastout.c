@@ -16,7 +16,7 @@ Initial.
 #include "pirvtable.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <malloc.h>
+
 
 /* keep outputfile possibility easy */
 #define OUT         stderr

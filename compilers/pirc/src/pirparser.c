@@ -71,7 +71,7 @@ The parser_state structure has the following fields:
  typedef struct parser_state {
     struct     lexer_state *lexer;     -- the lexer
     token      curtoken;               -- the current token as returned by the lexer
-    char     **heredoc_ids;            -- array for holding heredoc arguments. XXX Limited to 10 currently XXX
+    char     **heredoc_ids;            -- array for holding heredoc arguments
     unsigned   heredoc_index;          -- index to keep track of heredoc ids in the array
     unsigned   parse_errors;           -- counter for parse_errors
     pirvtable *vtable;                 -- vtable holding pointers for output routines
@@ -383,7 +383,6 @@ expression(parser_state *p) {
         case T_PASM_NREG: case T_NREG:
         case T_PASM_IREG: case T_IREG:
         case T_PASM_SREG: case T_SREG:
-        case T_MACRO_IDENT:
             exprtok = p->curtoken; /* store current token type to return */
             /* emit the expression */
             emit_expr(p, get_current_token(p->lexer));
@@ -560,28 +559,6 @@ keylist(parser_state *p) {
 */
 static void
 arg_flags(parser_state *p) {
-    while (p->curtoken != T_NEWLINE) {
-        switch (p->curtoken) {
-            case T_FLAT_FLAG:
-                next(p);
-                break;
-            case T_NAMED_FLAG:
-                next(p);
-                if (p->curtoken == T_LPAREN) {
-                    next(p);
-                    match(p, T_STRING_CONSTANT);
-                    match(p, T_RPAREN);
-                }
-                break;
-            default:
-                syntax_error(p, 1, "':flat' or ':named' flag expected");
-                break;
-        }
-    }
-}
-
-static void
-inline_arg_flags(parser_state *p) {
     int ok = 1;
     while (ok) {
         switch (p->curtoken) {
@@ -596,18 +573,26 @@ inline_arg_flags(parser_state *p) {
                     match(p, T_RPAREN);
                 }
                 break;
+            case T_NEWLINE: /* for long-invocation */
+            case T_COMMA:   /* for short-invocation, comma inmplies next argument */
+            case T_RPAREN:  /* for short-invocation, last argument with flags */
+                ok = 0; /* stop loop */
+                break;
             default:
-                ok = 0; /* quit loop */
+                ok = 0; /* stop loop */
+                syntax_error(p, 1, "':flat' or ':named' flag expected");
                 break;
         }
     }
 }
 
+
+
 /*
 
 =item *
 
-  argument -> HEREDOCID | expression | STRINGC '=>' expression
+  argument -> HEREDOCID | expression arg_flags | STRINGC ('=>' expression | arg_flags)
 
 =cut
 
@@ -625,7 +610,7 @@ argument(parser_state *p) {
         p->heredoc_ids[p->heredoc_index++] = clone_string(get_current_token(p->lexer));
         next(p);
     }
-    else { /* argument -> expression | STRINGC '=>' expression */
+    else { /* argument -> expression [arg_flags] | STRINGC ( '=>' expression | arg_flags )*/
         token exprtok = expression(p);
         /* allow for "stringc '=>' expression" */
         if (exprtok == T_STRING_CONSTANT) {
@@ -633,12 +618,12 @@ argument(parser_state *p) {
                 next(p);
                 expression(p);
             }
-            else {
-                inline_arg_flags(p);
+            else { /* a string argument can take arg_flags as well */
+                arg_flags(p);
             }
         }
-        else {
-            inline_arg_flags(p);
+        else { /* it was an expression (but not a stringc), may take arg_flags */
+            arg_flags(p);
         }
     }
 }
@@ -668,7 +653,7 @@ argument_list(parser_state *p) {
 
 =item *
 
-  arguments         -> '(' [argument_list] ')' heredoc_arguments
+  arguments -> '(' [argument_list] ')' heredoc_arguments
 
   heredoc_arugments -> { HEREDOC_STRING }
 
@@ -702,7 +687,8 @@ arguments(parser_state *p) {
             heredocid = NULL;
         }
 
-        /* clear heredoc index */
+        /* clear heredoc index, next time the first
+         * heredoc arg is stored at location 0 again */
         p->heredoc_index = 0;
     }
     emit_args_end(p);
@@ -1330,14 +1316,15 @@ param_flags(parser_state *p) {
                 }
                 break;
             /* however, if the current token is a comma or ')', then quit parsing flags */
-            case T_COMMA: /* huh? */
+            case T_COMMA:
             case T_RPAREN:
             case T_NEWLINE:
                 ok = 0; /* stop loop */
                 break;
             /* if none of the above, error! */
             default:
-                syntax_error(p, 2, "parameter flag or newline expected, but got ", find_keyword(p->curtoken));
+                syntax_error(p, 2, "parameter flag or newline expected, but got ",
+                             find_keyword(p->curtoken));
                 ok = 0; /* stop loop */
                 break;
         }
