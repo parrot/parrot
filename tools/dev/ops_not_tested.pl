@@ -33,7 +33,7 @@ use Parrot::OpLib::core;
 my @dirs = @ARGV ? @ARGV : 't/';
 
 my $make        = $PConfig{make};
-my $disassemble = $PConfig{build_dir} . $PConfig {slash} .'disassemble' . $PConfig{exe};
+my $disassemble = $PConfig{build_dir} . $PConfig{slash} . 'disassemble' . $PConfig{exe};
 
 # First of all we need the disassemble program
 system( $make, $disassemble ) == 0
