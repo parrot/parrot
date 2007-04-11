@@ -76,7 +76,7 @@ other fields.
     void init() {
         SUPER();                        /* _struct_val := Hash */
         PMC_pmc_val(SELF) = NULL;       /* parent */
-        PMC_data(SELF)    = mem_sys_allocate_zeroed(sizeof(Parrot_NSInfo));
+        PMC_data(SELF)    = mem_allocate_zeroed_typed(Parrot_NSInfo);
     }
 
 /*
@@ -109,6 +109,7 @@ Frees the namespace info struct.
 
 */
     void destroy() {
+        SUPER();
         mem_sys_free(PARROT_NSINFO(SELF));
     }
 
