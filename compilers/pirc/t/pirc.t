@@ -16,6 +16,7 @@ my @files;
 
 # calculate number of tests:
 BEGIN {
+
     # test all files in current directory
     my $dir = ".";
 
@@ -28,8 +29,6 @@ BEGIN {
 
 }
 
-
-
 # set number of tests to be run
 use Parrot::Test tests => $numtests;
 
@@ -37,16 +36,14 @@ use Parrot::Test tests => $numtests;
 my $count = 1;
 
 foreach my $file (@files) {
+
     # skip this file
     next if $file eq "./pirc.t";
     my $cmd = "../pirc $file";
     run_command($cmd);
-    ok($count, "");
+    ok( $count, "" );
     $count++;
 }
-
-
-
 
 # Local Variables:
 #   mode: cperl
