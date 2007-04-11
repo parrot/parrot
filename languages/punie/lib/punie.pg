@@ -16,7 +16,7 @@ token line {
 
 rule label { [<word>\:]? }
 
-token word { \w[\w|\d]* }
+token word { [\w|_][\w|\d|_]* }
 
 rule subroutine { sub <word> <block> }
 

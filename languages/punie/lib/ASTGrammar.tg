@@ -376,8 +376,15 @@ transform past (PunieGrammar::subroutine) :language('PIR') {
 
     .local string name
     name = node['word']
-
     result.'init'('node'=>node, 'name'=> name, 'blocktype'=>'sub')
+
+    # Set up the parameter (Punie only has one, a slurpy @_)
+    .local pmc parameter, symbol
+    .local string param_name
+    param_name = '@_'
+
+    parameter = result.'new'('PAST::Var','node'=>node,'name'=>param_name,'scope'=>'parameter','isslurpy'=>1)
+    result.'push'(parameter)
 
     .local pmc child
     $P1 = node['block'; 'lineseq']
@@ -393,7 +400,7 @@ transform past (PunieGrammar::subcall) :language('PIR') {
     $S1 = node['word']
     result.'name'($S1)
 
-    $P1 = node['expr']
+    $P1 = node['expr';0]
     if null $P1 goto return_result
     $P2 = tree.get('past', $P1, 'PunieGrammar::expr')
     $S0 = $P2.'name'()
