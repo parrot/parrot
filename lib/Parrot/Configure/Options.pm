@@ -67,6 +67,7 @@ sub print_version_info {
     my $argsref = shift;
     print "Parrot Version $argsref->{parrot_version} Configure 2.0\n";
     print "$argsref->{svnid}\n";
+    return 1;
 }
 
 sub print_help {
@@ -187,6 +188,7 @@ Install Options:
     --mandir=DIR            man documentation [PREFIX/man]
 
 EOT
+    return 1;
 }
 
 1;

@@ -25,6 +25,7 @@ pieces of info.
 Since you're running this program, you obviously have Perl 5--I'll be pulling
 some defaults from its configuration.
 END
+    return 1;
 }
 
 sub print_conclusion {
@@ -41,6 +42,7 @@ Happy Hacking,
         The Parrot Team
 
 END
+    return 1;
 }
 
 1;
