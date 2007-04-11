@@ -59,7 +59,7 @@ EOF
 sub makefiles {
     my ( $self, $conf ) = @_;
 
-    genfile( 'config/gen/makefiles/root.in'         => 'Makefile' );
+    genfile( 'config/gen/makefiles/root.in' => 'Makefile' );
 
     genfile(
         'config/gen/makefiles/ext.in' => 'ext/Makefile',
@@ -69,8 +69,8 @@ sub makefiles {
     );
     genfile(
         'config/gen/makefiles/parrot_embed.in' => 'ext/Parrot-Embed/Makefile.PL',
-        replace_slashes                     => 0,
-        conditioned_lines                   => 1
+        replace_slashes                        => 0,
+        conditioned_lines                      => 1
     );
 
     genfile( 'config/gen/makefiles/past.in'      => 'compilers/past/Makefile' );

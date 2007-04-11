@@ -55,7 +55,7 @@ sub runstep {
     my $minor = $gnuc{__GNUC_MINOR__};
     my $intel = $gnuc{__INTEL_COMPILER};
 
-    if (defined $intel || ! defined $major) {
+    if ( defined $intel || !defined $major ) {
         print " (no) " if $verbose;
         $self->set_result('no');
         $conf->data->set( gccversion => undef );
