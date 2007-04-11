@@ -694,15 +694,16 @@ sub parse_pmc {
             $class_init = $method_hash;
         }
         else {
+
             # Name-mangle NCI methods to avoid conflict with vtable methods.
             if ($flag) {
-                $method_hash->{loc} = "nci" ;
-                $method_hash->{meth} = "nci_$methodname";
+                $method_hash->{loc}    = "nci";
+                $method_hash->{meth}   = "nci_$methodname";
                 $method_hash->{symbol} = $methodname;
             }
 
             # name => method idx mapping
-            $meth_hash{$method_hash->{meth}} = scalar @methods;
+            $meth_hash{ $method_hash->{meth} } = scalar @methods;
 
             $method_hash->{mmds} = [ ( $methodblock =~ /MMD_(\w+):/g ) ];
             push @methods, $method_hash;

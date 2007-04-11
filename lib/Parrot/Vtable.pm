@@ -378,15 +378,15 @@ sub find_type {
     my $type = shift;
 
     my %typemap = (
-        'STRING*'  => 'Parrot_STRING',
-        'void*'    => 'void*',
-        'INTVAL'   => 'Parrot_Int',
-        'PMC*'     => 'Parrot_PMC',
-        'FLOATVAL' => 'Parrot_Float',
-        'void'     => 'void',
-        'UINTVAL'  => 'Parrot_Int',
-        'size_t'   => 'size_t',
-        'opcode_t*'  => 'Parrot_Opcode*',
+        'STRING*'   => 'Parrot_STRING',
+        'void*'     => 'void*',
+        'INTVAL'    => 'Parrot_Int',
+        'PMC*'      => 'Parrot_PMC',
+        'FLOATVAL'  => 'Parrot_Float',
+        'void'      => 'void',
+        'UINTVAL'   => 'Parrot_Int',
+        'size_t'    => 'size_t',
+        'opcode_t*' => 'Parrot_Opcode*',
     );
 
     die "Unknown type $type\n" unless exists $typemap{$type};

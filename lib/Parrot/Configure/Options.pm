@@ -10,14 +10,14 @@ our @EXPORT_OK = qw(
 );
 
 sub get_valid_options {
-    return  qw(ask bindir cage cc ccflags ccwarn cgoto cxx datadir
-    debugging define exec-prefix execcapable floatval gc help icu-config
-    icudatadir icuheaders icushared includedir infodir inline intval
-    jitcapable ld ldflags lex libdir libexecdir libs link linkflags
-    localstatedir m maintainer mandir miniparrot nomanicheck oldincludedir
-    opcode ops optimize parrot_is_shared pmc prefix profile sbindir
-    sharedstatedir step sysconfdir verbose verbose-step version without-gdbm
-    without-gmp without-icu yacc);
+    return qw(ask bindir cage cc ccflags ccwarn cgoto cxx datadir
+        debugging define exec-prefix execcapable floatval gc help icu-config
+        icudatadir icuheaders icushared includedir infodir inline intval
+        jitcapable ld ldflags lex libdir libexecdir libs link linkflags
+        localstatedir m maintainer mandir miniparrot nomanicheck oldincludedir
+        opcode ops optimize parrot_is_shared pmc prefix profile sbindir
+        sharedstatedir step sysconfdir verbose verbose-step version without-gdbm
+        without-gmp without-icu yacc);
 }
 
 sub process_options {
@@ -32,7 +32,7 @@ sub process_options {
     die "Must provide argument 'svnid'"
         unless $optionsref->{svnid};
     my %args;
-    for (@{$optionsref->{argv}}) {
+    for ( @{ $optionsref->{argv} } ) {
         my ( $key, $value ) = m/--([-\w]+)(?:=(.*))?/;
         $key   = 'help' unless defined $key;
         $value = 1      unless defined $value;
@@ -42,12 +42,12 @@ sub process_options {
         }
 
         for ($key) {
-            if ($key =~ m/version/) {
+            if ( $key =~ m/version/ ) {
                 print_version_info($optionsref);
                 return;
             }
 
-            if ($key =~ m/help/) {
+            if ( $key =~ m/help/ ) {
                 print_help($optionsref);
                 return;
             }
@@ -187,7 +187,7 @@ Install Options:
     --mandir=DIR            man documentation [PREFIX/man]
 
 EOT
-};
+}
 
 1;
 

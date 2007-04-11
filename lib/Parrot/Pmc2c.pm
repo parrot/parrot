@@ -550,7 +550,8 @@ sub body {
 
     my $total_body;
     if ( $method->{loc} eq 'vtable' ) {
-        $total_body = $self->rewrite_vtable_method( $classname, $meth, $super, $self->{super}, $body );
+        $total_body =
+            $self->rewrite_vtable_method( $classname, $meth, $super, $self->{super}, $body );
     }
     else {
         $total_body = $self->rewrite_nci_method( $classname, $meth, $body );
@@ -1000,8 +1001,7 @@ EOC
     foreach my $method ( @{ $self->{methods} } ) {
         next unless $method->{loc} eq 'nci';
         my $proto = proto( $method->{type}, $method->{parameters} );
-        my $symbol_name = defined $method->{symbol} ?
-            $method->{symbol} : $method->{meth};
+        my $symbol_name = defined $method->{symbol} ? $method->{symbol} : $method->{meth};
         if ( exists $method->{pre_block} ) {
             $cout .= <<"EOC";
         register_raw_nci_method_in_ns(interp, entry,

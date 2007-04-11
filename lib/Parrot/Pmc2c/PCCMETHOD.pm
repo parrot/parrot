@@ -7,7 +7,6 @@ use warnings;
 use Data::Dumper;
 use Carp qw(longmess croak);
 
-
 =pod
 
 $SIG{__WARN__} = sub {
@@ -105,13 +104,13 @@ use constant PARROT_ARG_NAME     => 0x200;                     # /* this String 
 =cut
 
 our $reg_type_info = {
-    # s is string, ss is short string, at is arg type
-    +(REGNO_INT) => { s => "INTVAL",   ss => "INT", at => PARROT_ARG_INTVAL,   },
-    +(REGNO_NUM) => { s => "FLOATVAL", ss => "NUM", at => PARROT_ARG_FLOATVAL, },
-    +(REGNO_STR) => { s => "STRING*",  ss => "STR", at => PARROT_ARG_STRING,   },
-    +(REGNO_PMC) => { s => "PMC*",     ss => "PMC", at => PARROT_ARG_PMC,      },
-};
 
+    # s is string, ss is short string, at is arg type
+    +(REGNO_INT) => { s => "INTVAL",   ss => "INT", at => PARROT_ARG_INTVAL, },
+    +(REGNO_NUM) => { s => "FLOATVAL", ss => "NUM", at => PARROT_ARG_FLOATVAL, },
+    +(REGNO_STR) => { s => "STRING*",  ss => "STR", at => PARROT_ARG_STRING, },
+    +(REGNO_PMC) => { s => "PMC*",     ss => "PMC", at => PARROT_ARG_PMC, },
+};
 
 # Declare the subroutines
 sub trim($);
@@ -163,33 +162,33 @@ sub parse_adverb_attributes {
 
 sub convert_type_string_to_reg_type {
     ($_) = @_;
-    return REGNO_INT if /INTVAL|int/i ;
-    return REGNO_NUM if /FLOATVAL|double/i ;
-    return REGNO_STR if /STRING/i ;
-    return REGNO_PMC if /PMC/i ;
+    return REGNO_INT if /INTVAL|int/i;
+    return REGNO_NUM if /FLOATVAL|double/i;
+    return REGNO_STR if /STRING/i;
+    return REGNO_PMC if /PMC/i;
     croak "$_ not recognized as INTVAL, FLOATVAL, STRING, or PMC";
 }
 
 sub gen_arg_flags {
-    my ($param)     = @_;
+    my ($param) = @_;
 
-    return PARROT_ARG_INTVAL | PARROT_ARG_OPT_FLAG  if exists $param->{attrs}->{opt_flag};
+    return PARROT_ARG_INTVAL | PARROT_ARG_OPT_FLAG if exists $param->{attrs}->{opt_flag};
 
     my $flag = $reg_type_info->{ $param->{type} }->{at};
-    $flag |= PARROT_ARG_CONSTANT      if exists $param->{attrs}->{constant};
-    $flag |= PARROT_ARG_OPTIONAL      if exists $param->{attrs}->{optional};
-    $flag |= PARROT_ARG_FLATTEN       if exists $param->{attrs}->{flatten};
-    $flag |= PARROT_ARG_SLURPY_ARRAY  if exists $param->{attrs}->{slurpy};
-    $flag |= PARROT_ARG_NAME          if exists $param->{attrs}->{name};
-    $flag |= PARROT_ARG_NAME          if exists $param->{attrs}->{named};
+    $flag |= PARROT_ARG_CONSTANT     if exists $param->{attrs}->{constant};
+    $flag |= PARROT_ARG_OPTIONAL     if exists $param->{attrs}->{optional};
+    $flag |= PARROT_ARG_FLATTEN      if exists $param->{attrs}->{flatten};
+    $flag |= PARROT_ARG_SLURPY_ARRAY if exists $param->{attrs}->{slurpy};
+    $flag |= PARROT_ARG_NAME         if exists $param->{attrs}->{name};
+    $flag |= PARROT_ARG_NAME         if exists $param->{attrs}->{named};
     return $flag;
 }
 
 sub gen_arg_accessor {
     my ( $arg, $arg_type ) = @_;
     my ( $name, $reg_type, $index ) = ( $arg->{name}, $arg->{type}, $arg->{index} );
-    my $tis = $reg_type_info->{$reg_type}->{s}; #reg_type_info string
-    my $tiss = $reg_type_info->{$reg_type}->{ss}; #reg_type_info short string
+    my $tis  = $reg_type_info->{$reg_type}->{s};     #reg_type_info string
+    my $tiss = $reg_type_info->{$reg_type}->{ss};    #reg_type_info short string
 
     if ( 'arg' eq $arg_type ) {
         return "    $tis $name = CTX_REG_$tiss(ctx, $index);\n";
@@ -200,7 +199,7 @@ sub gen_arg_accessor {
     elsif ( 'name' eq $arg_type ) {
         return "    CTX_REG_$tiss(ctx, $index) = string_from_const_cstring(interp, $name, 0);\n";
     }
-    else { #$arg_type eq 'param' or $arg_type eq 'return'
+    else {                                           #$arg_type eq 'param' or $arg_type eq 'return'
         return "    CTX_REG_$tiss(ctx, $index) = $name;\n";
     }
 }
@@ -213,8 +212,8 @@ Rewrites the method body performing the various macro substitutions for PCCRETUR
 
 sub rewrite_PCCRETURNs {
     my ( $self, $body ) = @_;
-    my $method_name = $self->{meth};
-    my $regs_used = [];
+    my $method_name  = $self->{meth};
+    my $regs_used    = [];
     my $signature_re = qr{
       (PCCRETURN         #method name
       \s*              #optional whitespace
@@ -227,17 +226,16 @@ sub rewrite_PCCRETURNs {
     }
 
     while ( $$body and $$body =~ m/$signature_re/ ) {
-        my ($match, $returns) = ( $1, $2 );
+        my ( $match, $returns ) = ( $1, $2 );
         my $goto_string = "goto ${method_name}_returns;";
         my ( $returns_n_regs_used, $returns_indexes, $returns_flags, $returns_accessors ) =
-            process_pccmethod_args( parse_p_args_string( $returns ), 'return' );
+            process_pccmethod_args( parse_p_args_string($returns), 'return' );
 
         push @$regs_used, $returns_n_regs_used;
         my $file        = '"' . __FILE__ . '"';
         my $lineno1     = __LINE__ + 2;
         my $lineno2     = __LINE__ + 7;
-        my $replacement =
-<<END;
+        my $replacement = <<END;
 #line $lineno1 $file
     /*BEGIN PCCRETURN $returns */
     /*BEGIN GENERATED ACCESSORS */
@@ -278,17 +276,17 @@ sub parse_p_args_string {
 sub is_named {
     my ($arg) = @_;
     while ( my ( $k, $v ) = each( %{ $arg->{attrs} } ) ) {
-            return ( 1, $1 ) if ( $k =~ /named\[(.*)\]/ );
+        return ( 1, $1 ) if ( $k =~ /named\[(.*)\]/ );
     }
     return ( 0, '' );
 }
 
 sub process_pccmethod_args {
     my ( $linear_args, $arg_type ) = @_;
-    my $n_regs_used_a  = [ 0, 0, 0, 0 ];       # INT, FLOAT, STRING, PMC
-    my $args           = [ [], [], [], [] ];   # actual INT, FLOAT, STRING, PMC arg stuctures
-    my $args_indexes_a = [];                   # arg index into the interpreter context
-    my $args_flags_a   = [];                   # arg flags
+    my $n_regs_used_a = [ 0, 0, 0, 0 ];    # INT, FLOAT, STRING, PMC
+    my $args           = [ [], [], [], [] ];    # actual INT, FLOAT, STRING, PMC arg stuctures
+    my $args_indexes_a = [];                    # arg index into the interpreter context
+    my $args_flags_a   = [];                    # arg flags
     my $args_accessors = "";
     my $named_names    = "";
 
@@ -305,14 +303,14 @@ sub process_pccmethod_args {
             push @{ $args->[ +(REGNO_STR) ] }, $argn;
             $argn->{index} = $n_regs_used_a->[ +(REGNO_STR) ]++;
             push @$args_indexes_a, $argn->{index};
-            push @$args_flags_a, PARROT_ARG_STRING | PARROT_ARG_NAME;
+            push @$args_flags_a,   PARROT_ARG_STRING | PARROT_ARG_NAME;
             $named_names .= gen_arg_accessor( $argn, 'name' );
         }
 
         push @{ $args->[ $arg->{type} ] }, $arg;
         $arg->{index} = $n_regs_used_a->[ $arg->{type} ]++;
         push @$args_indexes_a, $arg->{index};
-        push @$args_flags_a, gen_arg_flags($arg);
+        push @$args_flags_a,   gen_arg_flags($arg);
         $args_accessors .= gen_arg_accessor( $arg, $arg_type );
     }
 
@@ -346,24 +344,23 @@ sub rewrite_pccmethod {
     # parse pccmethod parameters, then unshift the a PMC arg for the invocant
     my $linear_args = parse_p_args_string( $self->{parameters} );
     unshift @$linear_args,
-    {
+        {
         type  => convert_type_string_to_reg_type('PMC'),
         name  => 'pmc',
         attrs => parse_adverb_attributes(':object')
-    };
+        };
 
     my ( $params_n_regs_used, $params_indexes, $params_flags, $params_accessors, $named_names ) =
-    process_pccmethod_args( $linear_args, 'arg' );
+        process_pccmethod_args( $linear_args, 'arg' );
 
-    my $n_regs  = rewrite_PCCRETURNs( $self, \$self->{body} );
+    my $n_regs = rewrite_PCCRETURNs( $self, \$self->{body} );
     rewrite_pccinvoke( $self->{meth}, \$self->{body} );
     unshift @$n_regs, $params_n_regs_used;
     my $n_regs_used = find_max_regs($n_regs);
 
     my $file     = '"' . __FILE__ . '"';
     my $lineno   = __LINE__ + 5;
-    my $PRE_STUB =
-<<END;
+    my $PRE_STUB = <<END;
 {
 #line $lineno $file
     INTVAL n_regs_used[] = { $n_regs_used };
@@ -462,31 +459,31 @@ sub rewrite_pccinvoke {
       )
     }sx;
 
-
     while ( $$body and $$body =~ m/$signature_re/ ) {
-        my ($match, $result_clause, $results, $parameters) = ( $1, $2, $3, $4 );
+        my ( $match, $result_clause, $results, $parameters ) = ( $1, $2, $3, $4 );
 
         #optional results portion of pccinvoke statement
-        my ( $result_n_regs_used, $result_indexes, $result_flags, $result_accessors )
-            = ( defined $results) ? process_pccmethod_args( parse_p_args_string( $results ), 'result')
+        my ( $result_n_regs_used, $result_indexes, $result_flags, $result_accessors ) =
+            ( defined $results )
+            ? process_pccmethod_args( parse_p_args_string($results), 'result' )
             : ( [ 0, 0, 0, 0 ], "0", "\"\"", "" );
 
         #parameters portion of pccinvoke statement
-        my ($interp, $invocant, $method_name, $arguments)
-            = map { $_ = trim($_) } split( /,/, $parameters, 4 );
+        my ( $interp, $invocant, $method_name, $arguments ) =
+            map { $_ = trim($_) } split( /,/, $parameters, 4 );
         $arguments = "PMC* $invocant" . ( $arguments ? ", $arguments" : "" );
         my ( $args_n_regs_used, $arg_indexes, $arg_flags, $arg_accessors, $named_names ) =
-           process_pccmethod_args( parse_p_args_string( $arguments ), 'param' );
+            process_pccmethod_args( parse_p_args_string($arguments), 'param' );
 
-        my $n_regs_used = find_max_regs( [$result_n_regs_used, $args_n_regs_used ] );
+        my $n_regs_used = find_max_regs( [ $result_n_regs_used, $args_n_regs_used ] );
 
-        $method_name = "string_from_const_cstring(interp, $method_name, 0)" if isquoted($method_name);
+        $method_name = "string_from_const_cstring(interp, $method_name, 0)"
+            if isquoted($method_name);
 
         my $file   = '"' . __FILE__ . '"';
         my $lineno = __LINE__ + 8;
 
-        my $replacement .=
-<<END;
+        my $replacement .= <<END;
 
     /*BEGIN PCCINVOKE $invocant */
 #line $lineno $file
