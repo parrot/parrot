@@ -42,7 +42,7 @@ Parrot_get_vtable_index(Interp *interp, const char *name)
 {
     int i;
     const char *meth;
-    for (i = 0; (meth = Parrot_vtable_slot_names[i]); ++i) {
+    for (i = 0; (meth = Parrot_vtable_slot_names[i]) != NULL; ++i) {
         if (!*meth)
             continue;
         /* XXX slot_names still have __ in front */
@@ -309,7 +309,7 @@ create_deleg_pmc_vtable(Interp *interp, PMC *class,
     memset(&meth_str, 0, sizeof (meth_str));
     meth_str.encoding = Parrot_fixed_8_encoding_ptr;
     meth_str.charset = Parrot_default_charset_ptr;
-    for (i = 0; (meth = Parrot_vtable_slot_names[i]); ++i) {
+    for (i = 0; (meth = Parrot_vtable_slot_names[i]) != NULL; ++i) {
         if (!*meth)
             continue;
         meth_str.strstart = const_cast(meth);
@@ -746,7 +746,8 @@ get_init_meth(Interp *interp, PMC *class,
         return NULL;
     meth = VTABLE_get_string(interp, prop);
 #else
-    if (!(props = PMC_metadata(class)))
+    props = PMC_metadata(class);
+    if (!props)
         return NULL;
     b = parrot_hash_get_bucket(interp,
                 (Hash*) PMC_struct_val(props), prop_str);

@@ -235,7 +235,7 @@ find_exception_handler(Interp *interp, PMC *exception)
     message = VTABLE_get_string_keyed_int(interp, exception, 0);
     /* [TODO: replace quadratic search with something linear, hopefully without
        trashing abstraction layers.  -- rgr, 17-Sep-06.] */
-    while ((e = stack_entry(interp, interp->dynamic_env, depth))) {
+    while ((e = stack_entry(interp, interp->dynamic_env, depth)) != NULL) {
         if (e->entry_type == STACK_ENTRY_PMC) {
             handler = UVal_pmc(e->entry);
             if (handler && handler->vtable->base_type ==

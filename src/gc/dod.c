@@ -253,11 +253,11 @@ Parrot_dod_trace_root(Interp *interp, int trace_stack)
      * get created as constant PMCs.
      */
     for (i = 1; i < (unsigned int)interp->n_vtable_max; i++) {
-        VTABLE *vtable;
+        VTABLE *vtable = interp->vtables[i];
         /*
          * XXX dynpmc groups have empty slots for abstract objects
          */
-        if ((vtable = interp->vtables[i])) {
+        if (vtable) {
 #if 0
             if (vtable->class)
                 pobject_lives(interp, (PObj *)vtable->class);

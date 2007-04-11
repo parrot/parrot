@@ -528,6 +528,7 @@ string_primary_encoding_for_representation(Interp *interp,
             return NULL;
             break;
     }
+    return NULL;
 }
 
 /*

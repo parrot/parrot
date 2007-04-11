@@ -939,7 +939,7 @@ process_events(QUEUE* event_q)
     QUEUE_ENTRY *entry;
     parrot_event* event;
 
-    while ((entry = peek_entry(event_q))) {
+    while ((entry = peek_entry(event_q)) != NULL) {
         /*
          * one or more entries arrived - we hold the mutex again
          * so we have to use the nonsyc_pop_entry to pop off event entries

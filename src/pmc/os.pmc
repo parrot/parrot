@@ -19,9 +19,12 @@ files and directories.
 
 */
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 #  include <direct.h>
 #  include <io.h>
+#elif defined(__BORLANDC__)
+#  include <dir.h>
+#  include <dirent.h>
 #else
 #  include <dirent.h>
 #endif
