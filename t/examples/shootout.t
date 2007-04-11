@@ -87,7 +87,7 @@ foreach my $script (@shootouts) {
         # Remove any plain -C option.
         $args =~ s/(^|\s)-C(\s|$)/$1$2/;
         # Remove any extra Cs still floating around
-        $args =~ s/C//; 
+        $args =~ s/C//;
     }
 
     # look for input files

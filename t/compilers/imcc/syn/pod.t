@@ -60,7 +60,7 @@ print FOO <<'ENDF';
 we don't cut out!!!
 
 ENDF
-close FOO;  
+close FOO;
 
 SKIP: {
        skip("Closing out of pod from included files", 1);
