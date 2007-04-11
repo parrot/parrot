@@ -57,8 +57,8 @@ TEST_MIME: {
     my @failed      = verify_attributes( $test, $expected, 0, $mime_types, \@test_files );
 
     if (@failed) {
-        my $failure
-            = join q{},  "Set $test with:\n", map { " $cmd ps $test '$expected' $_;\n" } @failed;
+        my $failure = join q{}, "Set $test with:\n",
+            map { " $cmd ps $test '$expected' $_;\n" } @failed;
         is( $failure, '', $test );
     }
     else {
@@ -89,8 +89,8 @@ KEYWORD_EXP: {
     my @failed = verify_attributes( $test, $expected, 1, $keywords );
 
     if (@failed) {
-        my $failure
-            = join q{},  "Set $test with:\n", map { " $cmd ps $test '$expected' $_;\n" } @failed;
+        my $failure = join q{}, "Set $test with:\n",
+            map { " $cmd ps $test '$expected' $_;\n" } @failed;
         is( $failure, '', $test );
     }
     else {
@@ -137,8 +137,8 @@ NATIVE_EOL_STYLE: {
     my @failed = verify_attributes( $test, $expected, 1, $keywords );
 
     if (@failed) {
-        my $failure
-            = join q{},  "Set $test with:\n", map { " $cmd ps $test '$expected' $_;\n" } @failed;
+        my $failure = join q{}, "Set $test with:\n",
+            map { " $cmd ps $test '$expected' $_;\n" } @failed;
         is( $failure, '', $test_name );
     }
     else {
@@ -168,8 +168,8 @@ LF_EOL_STYLE: {
     my @failed = verify_attributes( $test, $expected, 1, $keywords );
 
     if (@failed) {
-        my $failure
-            = join q{},  "Set $test with:\n", map { " $cmd ps $test '$expected' $_;\n" } @failed;
+        my $failure = join q{}, "Set $test with:\n",
+            map { " $cmd ps $test '$expected' $_;\n" } @failed;
         is( $failure, '', $test_name );
     }
     else {
