@@ -42,15 +42,22 @@ OUTPUT
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function alarm' );
 require "alarm"
 
-function myalarm()
+function myalarm ()
     print("in alarm!")
+end
+
+local function delay (d)
+    local s = os.time()
+    local e = s
+    while (os.difftime(e, s) < d) do
+        e = os.time()
+    end
 end
 
 print("hello")
 alarm(2, myalarm)
 alarm(2)
-local s = 0
-for i = 1, 1000000 do s = s + i end
+delay(3)
 CODE
 hello
 in alarm!
