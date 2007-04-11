@@ -232,12 +232,14 @@ resize_heredoc_args(parser_state *p) {
     }
     else {
         unsigned i; /* copy all contents of old array into new array */
-        for (i = 0; i < p->heredoc_index; i++)
+        for (i = 0; i < p->heredoc_index; i++) {
             newbuffer[i] = p->heredoc_ids[i];
+        }
 
         /* free old memory and store new buffer in parser_state structure */
         free(p->heredoc_ids);
         p->heredoc_ids = newbuffer;
+        p->heredoc_ids_size <<= 1; /* set the new size to twice its old size */
     }
 }
 
@@ -259,8 +261,10 @@ syntax_error(parser_state *p, int numargs, ...) {
     long line = get_current_line(p->lexer);
     char const *file = get_current_file(p->lexer);
 
+    /* general message */
     fprintf(stderr, "\nsyntax error in file '%s', line %ld: ", file, line);
 
+    /* print all arguments; they should all be of type "char *"! */
     va_start(arg_ptr, numargs);
     for (count = 0; count < numargs; count++) {
         char *arg = va_arg(arg_ptr, char *);
@@ -275,7 +279,7 @@ syntax_error(parser_state *p, int numargs, ...) {
 
     p->parse_errors++;
 
-
+    /* if there are too many errors, report that and bail out */
     if (p->parse_errors > MAX_ERRORS) {
         fprintf(stderr, "Too many errors; fix some first\n");
         exit_parser(p);
@@ -1720,7 +1724,7 @@ global_assignment(parser_state *p) {
 
   instructions -> {instruction}
 
-  instruction  -> {LABEL '\n'} instr
+  instruction  -> {LABEL ['\n']} instr
 
   instr -> if_statement
          | unless_statement
@@ -1760,7 +1764,6 @@ instructions(parser_state *p) {
         while (p->curtoken == T_LABEL) {
             next(p);
             if (p->curtoken == T_NEWLINE) next(p); /* and continue loop */
-            else break; /* break loop */
         }
 
         switch (p->curtoken) {
