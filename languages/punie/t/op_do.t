@@ -31,7 +31,7 @@ CODE
 ok 10
 OUT
 
-language_output_is( 'punie', <<'CODE', <<'OUT', 'sub call with no arguments' );
+language_output_is( 'punie', <<'CODE', <<'OUT', 'sub call with one argument' );
 sub foobar {
     $x = $_[0];
     print $x, "\n";
