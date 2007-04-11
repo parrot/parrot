@@ -216,7 +216,7 @@ pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by exclusion' );
     $P0.'add_method'("snake", $P2)
     $P3 = new ResizableStringArray
     push $P3, "badger"
-    $P1.'add_role'($P0, 'exclude' => $P3)
+    $P1.'add_role'($P0, 'exclude_method' => $P3)
     print "ok 2 - composition worked due to exclusion\n"
 
     $P2 = $P1.'new'()
@@ -262,7 +262,7 @@ pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by aliasing and exclude' 
     $P3["badger"] = "role_badger"
     $P4 = new ResizableStringArray
     $P4[0] = "badger"
-    $P1.'add_role'($P0, 'alias' => $P3, 'exclude' => $P4)
+    $P1.'add_role'($P0, 'alias_method' => $P3, 'exclude_method' => $P4)
     print "ok 2 - composition worked due to aliasing and exclude\n"
 
     $P2 = $P1.'new'()
@@ -303,10 +303,10 @@ pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by resolve' );
 
     $P3 = new ResizableStringArray
     push $P3, "badger"
-    $P1.resolve($P3)
+    $P1.resolve_method($P3)
     print "ok 1 - set resolve list\n"
 
-    $P4 = $P1.resolve()
+    $P4 = $P1.resolve_method()
     $S0 = $P4[0]
     if $S0 == "badger" goto ok_2
     print "not "

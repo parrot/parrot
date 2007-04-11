@@ -454,10 +454,13 @@ Compose the given role into this one, using the given exclusions and aliases.
 
 */
     PCCMETHOD void add_role(PMC* role,
-            PMC* exclude :optional :named["exclude"], int got_exclude :opt_flag,
-            PMC* alias :optional :named["alias"], int got_alias :opt_flag) {
+            PMC* exclude_method :optional :named["exclude_method"],
+            int got_exclude_method :opt_flag,
+            PMC* alias_method :optional :named["alias_method"],
+            int got_alias_method :opt_flag) {
         Parrot_Role *role_info = PARROT_ROLE(SELF);
-        Parrot_ComposeRole(interp, role, exclude, got_exclude, alias, got_alias,
+        Parrot_ComposeRole(interp, role, exclude_method, got_exclude_method,
+                           alias_method, got_alias_method,
                            role_info->methods, role_info->roles);
     }
 

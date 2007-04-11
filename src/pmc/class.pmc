@@ -37,7 +37,7 @@ typedef struct Parrot_Class {
     PMC *attrib_metadata; /* Hash of attributes in this class to hashes of metadata. */
     PMC *attrib_index;    /* Lookup table for attributes in this and parents. */
     PMC *attrib_cache;    /* Cache of visible attrib names to indexes. */
-    PMC *resolve;         /* List of method names the class provides to resolve
+    PMC *resolve_method;  /* List of method names the class provides to resolve
                            * conflicts with methods from roles. */
 } Parrot_Class;
 
@@ -150,7 +150,7 @@ the current namespace.
         class->attrib_metadata = pmc_new(interp, enum_class_Hash);
         class->attrib_index = PMCNULL;
         class->attrib_cache = PMCNULL;
-        class->resolve = pmc_new(interp, enum_class_ResizablePMCArray);
+        class->resolve_method = pmc_new(interp, enum_class_ResizablePMCArray);
 
         /* We put ourself on the all parents list. */
         VTABLE_push_pmc(interp, class->all_parents, SELF);
@@ -214,8 +214,8 @@ Mark any referenced strings and PMCs.
             pobject_lives(interp, (PObj*)class->attrib_index);
         if (class->attrib_cache)
             pobject_lives(interp, (PObj*)class->attrib_cache);
-        if (class->resolve)
-            pobject_lives(interp, (PObj*)class->resolve);
+        if (class->resolve_method)
+            pobject_lives(interp, (PObj*)class->resolve_method);
     }
 
 /*
@@ -533,7 +533,7 @@ specified will be linked to this class.
 
 /*
 
-=item C<void resolve()>
+=item C<void resolve_method()>
 
 Sets the list of method names that the class provides to resolve conflicts in
 methods from roles. When called with no parameter, returns the list.
@@ -541,16 +541,16 @@ methods from roles. When called with no parameter, returns the list.
 =cut
 
 */
-    PCCMETHOD void resolve(PMC *resolve_list :optional, int got_list :opt_flag) {
+    PCCMETHOD void resolve_method(PMC *resolve_list :optional, int got_list :opt_flag) {
         Parrot_Class *class = PARROT_CLASS(SELF);
         PMC *ret_list = NULL;
 
         if (got_list) {
             /* Store list. */
-            class->resolve = resolve_list;
+            class->resolve_method = resolve_list;
         }
 
-        ret_list = class->resolve;
+        ret_list = class->resolve_method;
         PCCRETURN(PMC *ret_list);
     }
 
@@ -572,11 +572,11 @@ parameter list.
         /* If we've not been instantiated before... */
         if (!class->instantiated) {
             /* Check that we have all methods listed in resolve list. */
-            int resolve_count = VTABLE_elements(interp, class->resolve);
+            int resolve_count = VTABLE_elements(interp, class->resolve_method);
             int i;
             for (i = 0; i < resolve_count; i++) {
                 STRING *check_meth = VTABLE_get_string_keyed_int(interp,
-                    class->resolve, i);
+                    class->resolve_method, i);
                 if (!VTABLE_exists_keyed_str(interp, class->methods, check_meth)) {
                     real_exception(interp, NULL, METH_NOT_FOUND,
                         "The method '%S' was named in the resolve list, but not supplied",
@@ -729,31 +729,34 @@ Compose a role into a class with the given exclusions and aliases.
 
 */
     PCCMETHOD void add_role(PMC* role,
-            PMC* exclude :optional :named["exclude"], int got_exclude :opt_flag,
-            PMC* alias :optional :named["alias"],     int got_alias :opt_flag) {
+            PMC* exclude_method :optional :named["exclude_method"], 
+            int got_exclude_method :opt_flag,
+            PMC* alias_method :optional :named["alias_method"],
+            int got_alias_method :opt_flag) {
         Parrot_Class *class = PARROT_CLASS(SELF);
 
         /* Add everything on the resolve list to the exclude list; if we have
          * no exclude list, pass along the resolve list in its place if it has
          * any methods listed in it. */
-        if (!got_exclude) {
-            if (VTABLE_elements(interp, class->resolve) != 0) {
-                exclude = class->resolve;
-                got_exclude = 1;
+        if (!got_exclude_method) {
+            if (VTABLE_elements(interp, class->resolve_method) != 0) {
+                exclude_method = class->resolve_method;
+                got_exclude_method = 1;
             }
         }
         else {
-            int resolve_count = VTABLE_elements(interp, class->resolve);
+            int resolve_count = VTABLE_elements(interp, class->resolve_method);
             int i;
             for (i = 0; i < resolve_count; i++) {
                 STRING *meth_name = VTABLE_get_string_keyed_int(interp,
-                    class->resolve, i);
-                VTABLE_push_string(interp, exclude, meth_name);
+                    class->resolve_method, i);
+                VTABLE_push_string(interp, exclude_method, meth_name);
             }
         }
 
         /* Do the composition. */
-        Parrot_ComposeRole(interp, role, exclude, got_exclude, alias, got_alias,
+        Parrot_ComposeRole(interp, role, exclude_method, got_exclude_method, 
+                           alias_method, got_alias_method,
                            class->methods, class->roles);
     }
 
