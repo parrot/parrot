@@ -16,15 +16,16 @@
 	.local pmc exports, curr_namespace, test_namespace
 	curr_namespace = get_namespace
 	test_namespace = get_namespace [ "Test::More" ]
-	exports = split " ", "ok is diag like skip is_deeply isa_ok"
+	exports = split " ", "ok is diag like skip todo is_deeply isa_ok"
 	test_namespace.export_to(curr_namespace, exports)
 
 	test_namespace = get_namespace [ "Test::Builder::Tester" ]
 	exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
 	test_namespace.export_to(curr_namespace, exports)
 
-	plan( 53 )
+	plan( 58 )
 	test_skip()
+	test_todo()
 	test_ok()
 	test_is()
 	test_like()
@@ -351,6 +352,33 @@
 	test_out( 'ok 7 #skip skipped' )
 	skip()
 	test_test( 'skip()' )
+.end
+
+.sub test_todo
+
+    .local pmc test
+    test = new 'Test::Builder'
+
+    test_out( 'ok 8 # TODO passing test' )
+    test.'todo'( 1, 'passing test', 'todo reason' )
+    test_test( 'todo test should pass, marked as TODO' )
+
+    test_out( 'not ok 9 # TODO failing test' )
+    test.'todo'( 0, 'failing test', 'todo reason' )
+    test_test( 'todo test should fail, marked as TODO' )
+
+    test_out( 'ok 10 # TODO passing test' )
+    todo( 1, 'passing test', 'todo reason' )
+    test_test( 'todo test should pass, marked as TODO' )
+
+    test_out( 'not ok 11 # TODO failing test' )
+    todo( 0, 'failing test', 'todo reason' )
+    test_test( 'todo test should fail, marked as TODO' )
+
+    test_out( 'not ok 12 # TODO' )
+    todo( 0 )
+    test_test( 'todo test with no description or reason' )
+
 .end
 
 .sub test_isa_ok

@@ -37,6 +37,8 @@ Test::More - Parrot extension for testing modules
     is_deeply( some_deep_pmc, another_deep_pmc, 'deep structure comparison' )
 
     like( 'foo', 'f o**{2}', 'passing regex compare with diagnostic' )
+    skip(1, 'reason for skipping')
+    todo(0, 'this is a failed test', 'reason for todo')
 
     $P0 = getclass "Squirrel"
     $P0.new()
@@ -771,6 +773,23 @@ actually skipped.  Arguments are optional.
     .local pmc test
     find_global test, 'Test::More', '_test'
     test.'skip'()
+.end
+
+=item C<todo( passed, description, reason )>
+
+Records a test as pass or fail (like C<ok>, but marks it as TODO so it always
+appears as a success. This also records the optional C<description> of the test
+and the C<reason> you have marked it as TODO.
+
+=cut
+
+.sub todo
+    .param pmc args :slurpy
+
+    .local pmc test
+    find_global test, 'Test::More', '_test'
+
+    test.todo( args :flat )
 .end
 
 =item C<isa_ok( object, class_name, object_name )>
