@@ -42,7 +42,7 @@ ok( defined $valid{version},     "version option found" );
 ok( defined $valid{verbose},     "verbose option found" );
 ok( !defined $valid{$badoption}, "invalid option not found" );
 
-open my $FH, "$main::topdir/Configure.pl"
+open my $FH, '<', "$main::topdir/Configure.pl"
     or croak "Unable to open handle to Configure.pl";
 my $bigstr;
 {
