@@ -80,7 +80,7 @@ and a message introducing the Parrot configuration process.
 
 =item * Arguments
 
-One argument:  String holding the Parrot version number (currently supplied by 
+One argument:  String holding the Parrot version number (currently supplied by
 C<Parrot::BuildUtil::parrot_version()>).
 
 =item * Return Value

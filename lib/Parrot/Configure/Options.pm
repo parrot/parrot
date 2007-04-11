@@ -36,17 +36,17 @@ sub process_options {
         my ( $key, $value ) = m/--([-\w]+)(?:=(.*))?/;
         $key   = 'help' unless defined $key;
         $value = 1      unless defined $value;
-    
+
         unless ( grep $key eq $_, @valid_opts ) {
             die qq/Invalid option $key. See "perl Configure.pl --help" for valid options\n/;
         }
-    
+
         for ($key) {
             if ($key =~ m/version/) {
                 print_version_info($optionsref);
                 return;
             }
-    
+
             if ($key =~ m/help/) {
                 print_help($optionsref);
                 return;
@@ -54,7 +54,7 @@ sub process_options {
             $args{$key} = $value;
         }
     }
-    
+
     $args{debugging} = 1
         unless ( ( exists $args{debugging} ) && !$args{debugging} );
     $args{maintainer} = 1 if defined $args{lex} or defined $args{yacc};
@@ -205,7 +205,7 @@ Parrot::Configure::Options - Process command-line options to F<Configure.pl>
         argv            => [ @ARGV ],
         script          => $0,
         parrot_version  => $parrot_version,
-        svnid           => 
+        svnid           =>
             '$Id$',
     } );
 
@@ -213,7 +213,7 @@ Parrot::Configure::Options - Process command-line options to F<Configure.pl>
 
 =head1 DESCRIPTION
 
-Parrot::Configure::Options exports on demand two subroutines:  
+Parrot::Configure::Options exports on demand two subroutines:
 C<process_options()>, which processes the command-line options provided to
 F<Configure.pl>; and C<get_valid_options()>, which returns the list of
 currently valid options.
@@ -246,7 +246,7 @@ One argument:  Reference to a hash holding the following key-value pairs:
     script          : Perl's $0:  the calling program;
                       defaults to 'Configure.pl'
     parrot_version  : string holding Parrot version number
-                      (currently supplied by 
+                      (currently supplied by
                       Parrot::BuildUtil::parrot_version())
     svnid           : string holding Subversion Id string
 

@@ -703,10 +703,10 @@ sub gen_manifest_skip {
         # directories only...
         -d $_
     } map {
-        # extract directory component, if any 
+        # extract directory component, if any
         my $dir = ( File::Spec->splitpath($_) )[1];
     } map {
-        # strip off any .svn components. 
+        # strip off any .svn components.
         # (lets us match dirs with no versioned files)
         s/\.svn.*//;
         $_;
@@ -728,7 +728,7 @@ sub gen_manifest_skip {
     foreach my $pattern ( @patterns_list ) {
 
         next if $pattern =~ m/^\s*$/;
-        
+
         if ($pattern =~ s/^(.*?) - //) {
             $dir = $1;
             if ($dir eq ".") {
