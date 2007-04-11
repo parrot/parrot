@@ -545,6 +545,64 @@ keylist(parser_state *p) {
     match(p, T_RBRACKET); /* match closing ']' */
 }
 
+
+
+/*
+
+=item *
+
+  arg_flags -> { arg_flag }
+
+  arg_flag -> ':flat' | ':named' [ '(' STRINGC ')' ]
+
+=cut
+
+*/
+static void
+arg_flags(parser_state *p) {
+    while (p->curtoken != T_NEWLINE) {
+        switch (p->curtoken) {
+            case T_FLAT_FLAG:
+                next(p);
+                break;
+            case T_NAMED_FLAG:
+                next(p);
+                if (p->curtoken == T_LPAREN) {
+                    next(p);
+                    match(p, T_STRING_CONSTANT);
+                    match(p, T_RPAREN);
+                }
+                break;
+            default:
+                syntax_error(p, 1, "':flat' or ':named' flag expected");
+                break;
+        }
+    }
+}
+
+static void
+inline_arg_flags(parser_state *p) {
+    int ok = 1;
+    while (ok) {
+        switch (p->curtoken) {
+            case T_FLAT_FLAG:
+                next(p);
+                break;
+            case T_NAMED_FLAG:
+                next(p);
+                if (p->curtoken == T_LPAREN) {
+                    next(p);
+                    match(p, T_STRING_CONSTANT);
+                    match(p, T_RPAREN);
+                }
+                break;
+            default:
+                ok = 0; /* quit loop */
+                break;
+        }
+    }
+}
+
 /*
 
 =item *
@@ -575,6 +633,12 @@ argument(parser_state *p) {
                 next(p);
                 expression(p);
             }
+            else {
+                inline_arg_flags(p);
+            }
+        }
+        else {
+            inline_arg_flags(p);
         }
     }
 }
@@ -735,11 +799,20 @@ parrot_instruction(parser_state *p) {
      * instruction and wait for run-time error?
      */
     while (p->curtoken != T_NEWLINE) {
+
+        /* XXX for now, just skip ANYTHING until a newline. This is so we can handle
+         * "delete obj[bla] etc.
+         */
+        next(p);
+
+        /*
         expression(p);
+
         if (p->curtoken == T_COMMA) {
             next(p);
         }
         else break;
+        */
     }
 
     emit_op_end(p);
@@ -1219,41 +1292,6 @@ const_definition(parser_state *p) {
     }
 }
 
-
-
-
-/*
-
-=item *
-
-  arg_flags -> { arg_flag }
-
-  arg_flag -> ':flat' | ':named' [ '(' STRINGC ')' ]
-
-=cut
-
-*/
-static void
-arg_flags(parser_state *p) {
-    while (p->curtoken != T_NEWLINE) {
-        switch (p->curtoken) {
-            case T_FLAT_FLAG:
-                next(p);
-                break;
-            case T_NAMED_FLAG:
-                next(p);
-                if (p->curtoken == T_LPAREN) {
-                    next(p);
-                    match(p, T_STRING_CONSTANT);
-                    match(p, T_RPAREN);
-                }
-                break;
-            default:
-                syntax_error(p, 1, "':flat' or ':named' flag expected");
-                break;
-        }
-    }
-}
 
 /*
 

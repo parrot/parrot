@@ -18,6 +18,9 @@ extern char *clone_string(char const *str);
 #  define debug(P,S)    if (P->flags & PIRC_DEBUG)   printdebug(S)
 */
 
+
+extern int is_op(char *id);
+
 #endif
 
 /*

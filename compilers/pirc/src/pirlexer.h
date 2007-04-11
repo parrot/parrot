@@ -141,8 +141,12 @@ typedef enum tokens {
     T_LSHIFT_ASSIGN,                    /* "<<=",                     */
     T_HEREDOC_ID,                       /* "heredoc id",              */
     T_HEREDOC_STRING,                   /* "heredoc string",          */
-    T_PARROT_OP                         /* "parrot op",               */
-                                            /* NULL                       */
+    T_PARROT_OP,                        /* "parrot op",               */
+    T_UNICODE,                          /* "unicode:",                */
+    T_ASCII,							/* "ascii:",                  */
+    T_BINARY,						    /* "binary:",                 */
+    T_ISO_8859_1						/* "iso-8859-1:"              */
+    /* NULL                                                           */
 } token;
 
 /* Make sure MAX_TOKEN is the last enum value from enum token {} */

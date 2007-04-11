@@ -106,6 +106,15 @@ The following are flags for parameters/arguments.
   :unique_reg
 
 
+=head1 STRING ENCODINGS
+
+The following are string encoding specifiers:
+
+  ascii:
+  binary:
+  iso-8859-1:
+  unicode:
+
 =cut
 
 
@@ -257,6 +266,10 @@ static char const * dictionary[] = {
     "heredoc id",               /* T_HEREDOC_ID,            */
     "heredoc string",           /* T_HEREDOC_STRING,        */
     "parrot op",                /* T_PARROT_OP              */
+    "unicode:",                 /* T_UNICODE                */
+    "ascii:",                   /* T_ASCII                  */
+    "binary:",                  /* T_BINARY                 */
+    "iso-8859-1:",              /* T_ISO_8859_1             */
     NULL                        /*                          */
 };
 
@@ -682,26 +695,6 @@ do_include_file(lexer_state *lexer, char const * filename) {
 }
 
 
-/*
-
-=item is_op()
-
-TODO: check whether 'word' is an op. How does IMCC handle this?
-Is there an API call that checks for this?
-
-Function to check if the specified id is a Parrot op.
-Dynamically loaded op libraries need to be considered as well.
-
-=cut
-
-*/
-static int
-is_op(char *word) {
-    if (strcmp(word, "add") == 0) return 1; /* hardcoded some, to give an idea */
-    if (strcmp(word, "print") == 0) return 1;
-    if (strcmp(word, "new") == 0) return 1;
-    return 0;
-}
 
 
 /*
@@ -811,6 +804,35 @@ update_line(lexer_state *lexer) {
 
 }
 
+
+/*
+
+=item read_string()
+
+Read a quoted string.
+
+=cut
+
+*/
+static token
+read_string(lexer_state *lexer, char delimiter) {
+    char c;
+    buffer_char(lexer, delimiter); /* buffer first delimiter */
+    do {
+        c = read_char(lexer->curfile);
+        if (c == '\n') {
+            fprintf(stderr, "Possibly a run-away string on line %ld\n", lexer->curfile->line);
+            buffer_char(lexer, delimiter); /* try to fix it */
+            update_line(lexer);
+            return T_ERROR;
+        }
+        if (c == EOF_MARKER) return T_EOF;
+        buffer_char(lexer, c);
+    }
+    while (c != delimiter);
+
+    return T_STRING_CONSTANT;
+}
 
 
 
@@ -1117,9 +1139,9 @@ is indicated explicitly.
             if (c == 'P' || c == 'I' || c == 'N' || c == 'S') {
                 int count;
                 char regtype = c; /* store register type for later */
-                buffer_char(lexer, c);
-                count = read_digits(lexer);
-                c = read_char(lexer->curfile);
+                buffer_char(lexer, c); /* store current char. */
+                count = read_digits(lexer); /* read digits and count how many */
+                c = read_char(lexer->curfile); /* the last one was not a digit, re-read it */
 
                 /* only if the current char is not an alpha and we just read a number of digits,
                  * can this be a pasm register. */
@@ -1150,8 +1172,17 @@ is indicated explicitly.
 
             /* we got some kind of an identifier, maybe it's a label, invocant, etc */
             if (c == ':') { /* label -> IDENT':' */
+                token tmp;
                 buffer_char(lexer, c);
-                return T_LABEL;
+
+                /* it might be a string encoding specifier */
+                tmp = check_dictionary(lexer, dictionary);
+
+                if (tmp == T_NOT_FOUND) return T_LABEL;
+                else {
+                    c = read_char(lexer->curfile); /* this should be a quote char. */
+                    return read_string(lexer, c);
+                }
             }
             else if (c == '.') { /* invocant_id -> IDENT'.' */
                 return T_INVOCANT_IDENT;
@@ -1256,7 +1287,7 @@ is indicated explicitly.
                     c = read_char(lexer->curfile);
                     if (c == EOF_MARKER) return T_EOF;
 
-                    while (isalnum(c)) { /* this is all part of the label name */
+                    while (isalnum(c) || c == '_') { /* this is all part of the label name */
                         buffer_char(lexer, c);
                         c = read_char(lexer->curfile);
                         if (c == EOF_MARKER) return T_EOF;
@@ -1266,8 +1297,9 @@ is indicated explicitly.
                     if (c == ':') {
                         return T_MACRO_LABEL;
                     }
-                    else { /* $ ??? */
+                    else { /* $ ??? unexpected, put it back */
                         unread_char(lexer->curfile);
+                        fprintf(stderr, "Unknown token starting with '$'\n");
                         return T_ERROR;
                     }
             }
@@ -1275,11 +1307,24 @@ is indicated explicitly.
             buffer_char(lexer, c);
 
             numdigits = read_digits(lexer);
+
+            /* read next char, maybe a dot? */
+            c = read_char(lexer->curfile);
+
             if (numdigits == 0) {
+                unread_char(lexer->curfile);
                 fprintf(stderr, "digits expected (line %d)\n", lexer->curfile->line);
                 return T_ERROR;
             }
-            return regtype; /* return register */
+
+            if (c == '.') { /* $P0. and friends */
+                buffer_char(lexer, c);
+                return T_INVOCANT_IDENT;
+            }
+            else { /* just a simple pir reg $P0 */
+                unread_char(lexer->curfile);
+                return regtype; /* return register */
+            }
         }
 
 
@@ -1398,8 +1443,26 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 case '=': return T_MINUS_ASSIGN; /* -= */
                 case EOF_MARKER: return T_EOF;
                 default:
-                    unread_char(lexer->curfile);
-                    return T_MINUS;
+
+                    /* TODO: refactor this number reading code, it's also somewhere else */
+
+                    if (isdigit(c)) { /* handle negative numbers here */
+                        int count = read_digits(lexer);
+                        c = read_char(lexer->curfile);
+                        if (c == '.') {
+                            buffer_char(lexer, c);
+                            read_digits(lexer);
+                            return T_NUMBER_CONSTANT;
+                        }
+                        else {
+                            unread_char(lexer->curfile);
+                            return T_INTEGER_CONSTANT;
+                        }
+                    }
+                    else { /* no negative number, just a minus sign */
+                        unread_char(lexer->curfile);
+                        return T_MINUS;
+                    }
             }
         }
         else if (c == '!') {
@@ -1526,7 +1589,6 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 if (c == '\n') update_line(lexer);
                 else if (c == EOF_MARKER) return T_EOF;
             }
-            /* while ( c == ' ' || c == '\t' || c == '\n' || c == '\r');  */
             while (isspace(c));
 
             /* the last read char. was not space/newline, put it back */
@@ -1535,38 +1597,10 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
             return T_NEWLINE;
         }
         else if (c == '"') {
-            buffer_char(lexer, c);
-            do {
-                c = read_char(lexer->curfile);
-                if (c == '\n') {
-                    fprintf(stderr, "Possibly a run-away string on line %ld\n", lexer->curfile->line);
-                    buffer_char(lexer, '"'); /* try to fix it */
-                    update_line(lexer);
-                    return T_ERROR;
-                }
-                if (c == EOF_MARKER) return T_EOF;
-                buffer_char(lexer, c);
-            }
-            while (c != '"');
-
-            return T_STRING_CONSTANT;
+            return read_string(lexer, c);
         }
         else if (c == '\'') {
-            buffer_char(lexer, c);
-            do {
-                c = read_char(lexer->curfile);
-                if (c == '\n') {
-                    fprintf(stderr, "Possibly a run-away string on line %ld\n", lexer->curfile->line);
-                    buffer_char(lexer, '"'); /* try to fix it */
-                    update_line(lexer);
-                    return T_ERROR;
-                }
-                if (c == EOF_MARKER) return T_EOF;
-                buffer_char(lexer, c);
-            }
-            while (c != '\'');
-
-            return T_STRING_CONSTANT;
+            return read_string(lexer, c);
         }
         else if (c == ':') { /* read flags */
             token tmp;
@@ -1576,13 +1610,16 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 c = read_char(lexer->curfile);
                 if (c == EOF_MARKER) return T_EOF;
             }
-            while ( isalnum(c) );
+            while ( isalnum(c) || c == '_' );
 
             unread_char(lexer->curfile); /* push back last character not needed */
             tmp = check_dictionary(lexer, dictionary);
 
             /* if not found, then no valid flag found */
-            if (tmp == T_NOT_FOUND) return T_ERROR;
+            if (tmp == T_NOT_FOUND) {
+                fprintf(stderr, "invalid flag: '%s'\n", lexer->token_chars);
+                return T_ERROR;
+            }
             else return tmp;
         }
         else if (c == 0) { /* this is necessary since svn properties on input files */
