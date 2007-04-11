@@ -550,8 +550,10 @@ Debug function to show the rest of the current buffer.
 static void
 print_buffer(lexer_state *lexer) {
     fprintf(stderr, "token buffer: [%s]\n", lexer->token_chars);
+    /*
     fprintf(stderr, "Rest of buffer of file '%s'\n", lexer->curfile->filename);
     fprintf(stderr, "[%s]", lexer->curfile->curchar);
+    */
 }
 
 
@@ -1080,65 +1082,6 @@ is indicated explicitly.
 
   PASM-IREG       -> 'I' DIGIT+
 
-=cut
-
-*/
-        /* now start checking for real tokens */
-        switch (c) {
-            case 'P':
-                buffer_char(lexer, c);              /* buffer 'P'                          */
-                count = read_digits(lexer);         /* read as many digits as you can      */
-                c = read_char(lexer->curfile);      /* read next, this is not a digit      */
-                if (count > 0 && !isalnum(c) ) {    /* only if the #read digits > 0     .. */
-                    unread_char(lexer->curfile);    /* .. and current char is not alnum .. */
-                    return T_PASM_PREG;             /* put back last read char, and ..     */
-                }                                   /* return token for register.          */
-                break;
-            case 'S':
-                buffer_char(lexer, c);
-                count = read_digits(lexer);
-
-                c = read_char(lexer->curfile);
-                if (count > 0 && !isalnum(c) ) {
-                    unread_char(lexer->curfile);
-                    return T_PASM_SREG;
-                }
-                break;
-            case 'I':
-                buffer_char(lexer, c);
-                count = read_digits(lexer);
-                c = read_char(lexer->curfile);
-                if (count > 0 && !isalnum(c) ) {
-                    unread_char(lexer->curfile);
-                    return T_PASM_IREG;
-                }
-                break;
-            case 'N':
-                buffer_char(lexer, c);
-                count = read_digits(lexer);
-                c = read_char(lexer->curfile);
-                if (count > 0 && !isalnum(c) ) {
-                    unread_char(lexer->curfile);
-                    return T_PASM_NREG;
-                }
-                break;
-            default:
-                break; /* continue below */
-        }
-
-
-
-        /* it was not a PASM register. In case of the letters [S|N|I|P] and possibly
-         * some digits after that, those are already stored in the token buffer. That's
-         * no problem, just continue from there. Apparently this is an identifier, so
-         * it will match the rest of the identifier characters in the first if-block to
-         * come.
-         */
-
-/*
-
-=pod
-
   IDENT           -> [a-zA-Z_][a-zA-Z_0-9]*
 
   LABEL           -> IDENT ':'
@@ -1168,15 +1111,44 @@ is indicated explicitly.
 
 */
 
-
         if (isalpha(c) || c == '_' ) {  /* check for identifier, op, invocant or label */
-            do {
+
+            /* handle pasm registers */
+            if (c == 'P' || c == 'I' || c == 'N' || c == 'S') {
+                int count;
+                char regtype = c; /* store register type for later */
+                buffer_char(lexer, c);
+                count = read_digits(lexer);
+                c = read_char(lexer->curfile);
+
+                /* only if the current char is not an alpha and we just read a number of digits,
+                 * can this be a pasm register. */
+                if (count > 0 && !isalpha(c)) {
+                    if (c != '.') {
+                        /* last char was not a dot, so this is not an invocant */
+                        unread_char(lexer->curfile);
+                        /* check for the register type */
+                        if (regtype == 'P') return T_PREG;
+                        if (regtype == 'N') return T_NREG;
+                        if (regtype == 'S') return T_SREG;
+                        if (regtype == 'I') return T_IREG;
+                    }
+                    else {
+                        return T_INVOCANT; /* like 'P.' */
+                    }
+                }
+                /* else it is not a pasm register and not a single letter invocant */
+            }
+
+            /* it was not a pasm register or a single-letter invocant */
+
+            while (isalnum(c) || c == '_') {
                 buffer_char(lexer, c);
                 c = read_char(lexer->curfile);
                 if (c == EOF_MARKER) break;
             }
-            while ( isalnum(c) || c == '_');
 
+            /* we got some kind of an identifier, maybe it's a label, invocant, etc */
             if (c == ':') { /* label -> IDENT':' */
                 buffer_char(lexer, c);
                 return T_LABEL;
@@ -1612,14 +1584,6 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
             /* if not found, then no valid flag found */
             if (tmp == T_NOT_FOUND) return T_ERROR;
             else return tmp;
-        }
-        else if (isspace(c) && (lexer->charptr > lexer->token_chars) ) {
-            /* we read a register letter, but nothing more, then current char. is
-             * a space. Check if token buffer is not empty (then charptr > token_chars pointer)
-             * if not empty, it's an identifier (of only a single letter):
-             * one of the following: 'S', 'N', 'I', 'P'.
-             */
-            return T_IDENTIFIER;
         }
         else if (c == 0) { /* this is necessary since svn properties on input files */
             return T_EOF;

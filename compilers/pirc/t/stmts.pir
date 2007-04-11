@@ -29,6 +29,23 @@ Y:
 Z:
 # test simple function call
     foo(1,2,3)
+    .local pmc x, a, b, c
+    x = foo(1, 2, 3)
+    (a, b, c) = foo()
+    $P0 = foo()
+    P0 = foo()
+    $S0 = foo()
+    S0 = foo()
+    $I0 = foo()
+    I0 = foo()
+    $N0 = foo()
+    N0 = foo()
+
+    .local pmc I
+    .local int P, S, N
+    I = P.bar()
+    N = S.'bar'()
+
 
 .end
 #
