@@ -84,8 +84,10 @@ foreach my $script (@shootouts) {
     }
     unless ( $PConfig{cg_flag} =~ /HAVE/ ) {
         $args =~ s/-Cj/-j/;
+
         # Remove any plain -C option.
         $args =~ s/(^|\s)-C(\s|$)/$1$2/;
+
         # Remove any extra Cs still floating around
         $args =~ s/C//;
     }

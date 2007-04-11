@@ -33,8 +33,7 @@ test_method3
 10, 20
 OUT
 
-pir_output_is(
-    <<'CODE', <<'OUT', 'optional args and multiple returns' );
+pir_output_is( <<'CODE', <<'OUT', 'optional args and multiple returns' );
 .sub main :main
   $P0 = new 'PCCMETHOD_Test'
   $P0.'test_method0'(1)

@@ -37,7 +37,6 @@ use Test::More tests => 1;
 use Parrot::Config;
 use ExtUtils::Manifest qw( maniread );
 
-
 # a list of languages where we want to test line length
 our $include_languages = {};
 $include_languages->{$_} = 1 for qw{
@@ -55,9 +54,8 @@ $include_languages->{$_} = 1 for qw{
 
 # XXX this should really be using src_dir instead of build_dir but it
 # doesn't exist (yet)
-my $build_dir    = $PConfig{build_dir};
-my $manifest     = maniread(File::Spec->catfile($build_dir, 'MANIFEST'));
-
+my $build_dir = $PConfig{build_dir};
+my $manifest = maniread( File::Spec->catfile( $build_dir, 'MANIFEST' ) );
 
 # skip files listed in the __DATA__ section
 my $skip_files = {};
@@ -71,7 +69,6 @@ while (<DATA>) {
 # find the files that we need to check
 my @files = @ARGV ? @ARGV : source_files();
 
-
 # check all the files and keep a list of those failing
 my @lines_too_long;
 foreach my $file (@files) {
@@ -79,18 +76,13 @@ foreach my $file (@files) {
         if line_too_long($file);
 }
 
-
 ## L<PDD07/Code Formatting/"Source line width is limited to 100 characters">
 ok( !scalar(@lines_too_long), 'Line length ok' )
     or diag( "Lines longer than coding standard limit in "
         . scalar @lines_too_long
         . " files:\n@lines_too_long" );
 
-
-
 exit;
-
-
 
 sub line_too_long {
     my $file = shift;
@@ -104,11 +96,10 @@ sub line_too_long {
     return;
 }
 
-
 sub source_files {
     my @files;
     foreach my $file ( sort keys(%$manifest) ) {
-        my $full_path = File::Spec->catfile($build_dir, $file);
+        my $full_path = File::Spec->catfile( $build_dir, $file );
 
         # skip binary files (including .pbc files)
         next if -B $full_path;

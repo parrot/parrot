@@ -328,8 +328,9 @@ OUTPUT
 
 SKIP: {
     skip "Tests seem to fail on big endian machines with icu", 2 if $PConfig{byteorder} eq '4321';
-# Tests for .CCLASS_NUMERIC
-pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_NUMERIC in unicode" );
+
+    # Tests for .CCLASS_NUMERIC
+    pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_NUMERIC in unicode" );
 .sub main
     .include 'cclass.pasm'
     .local string s
@@ -355,9 +356,9 @@ CODE
 1102269
 OUTPUT
 
-# Concatenate unicode: with iso-8859-1; RT #39930 if no icu
-pir_output_is(
-    <<'CODE', <<"OUTPUT", "Concat unicode with iso-8859-1", $PConfig{has_icu} ? () : ( todo => 'RT #39930' ) );
+    # Concatenate unicode: with iso-8859-1; RT #39930 if no icu
+    pir_output_is(
+        <<'CODE', <<"OUTPUT", "Concat unicode with iso-8859-1", $PConfig{has_icu} ? () : ( todo => 'RT #39930' ) );
 .sub main
     $S0 = unicode:"A"
     $S1 = ascii:"B"

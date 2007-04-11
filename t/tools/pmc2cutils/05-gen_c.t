@@ -283,10 +283,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = (
-        "$main::topdir/src/pmc/default.pmc",
-        "$main::topdir/src/pmc/class.pmc",
-    );
+    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/class.pmc", );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {

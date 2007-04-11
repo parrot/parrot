@@ -21,49 +21,47 @@ BEGIN {
 }
 use Test::More tests => 10;
 use Carp;
-use_ok('Parrot::Configure::Messages', qw|
-    print_introduction
-    print_conclusion
-| );
+use_ok(
+    'Parrot::Configure::Messages', qw|
+        print_introduction
+        print_conclusion
+        |
+);
 use_ok("Parrot::IO::Capture::Mini");
 
 my $parrot_version = '0.4.10';
-my $make_version = 'gnu make';
+my $make_version   = 'gnu make';
 
 {
-    my ($tie, $rv, $msg);
+    my ( $tie, $rv, $msg );
     $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
+        or croak "Unable to tie";
     $rv = print_introduction($parrot_version);
-    ok($rv, "print_introduction() returned true");
+    ok( $rv, "print_introduction() returned true" );
     $msg = $tie->READLINE;
 
     # Following test is definitive.
-    like($msg, qr/$parrot_version/,
-        "Message included Parrot version number supplied as argument");
+    like( $msg, qr/$parrot_version/,
+        "Message included Parrot version number supplied as argument" );
 
     # Following tests are NOT definitive.  They will break if content of
     # strings printed by function is changed.
-    like($msg, qr/Parrot\sVersion/i,
-        "Message included string 'Parrot version'");
-    like($msg, qr/Configure/i,
-        "Message included string 'Configure'");
-    like($msg, qr/Copyright/i,
-        "Message included copyright notice");
+    like( $msg, qr/Parrot\sVersion/i, "Message included string 'Parrot version'" );
+    like( $msg, qr/Configure/i,       "Message included string 'Configure'" );
+    like( $msg, qr/Copyright/i,       "Message included copyright notice" );
     undef $tie;
 }
 
 {
-    my ($tie, $rv, $msg);
+    my ( $tie, $rv, $msg );
     $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
+        or croak "Unable to tie";
     $rv = print_conclusion($make_version);
-    ok($rv, "print_conclusion() returned true");
+    ok( $rv, "print_conclusion() returned true" );
     $msg = $tie->READLINE;
 
     # Following test is definitive.
-    like($msg, qr/$make_version/,
-        "Message included make version supplied as argument");
+    like( $msg, qr/$make_version/, "Message included make version supplied as argument" );
 
     undef $tie;
 }

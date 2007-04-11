@@ -657,7 +657,6 @@ ok
 OUTPUT
 }
 
-
 open $S, '>', "$temp_b.pir" or die "Can't write $temp_b.pir";
 print $S <<'EOF';
 .HLL 'B', ''
@@ -667,8 +666,7 @@ print $S <<'EOF';
 EOF
 close $S;
 
-
-pir_output_like(<<'CODE', <<'OUTPUT', 'export_to() with null destination throws exception');
+pir_output_like( <<'CODE', <<'OUTPUT', 'export_to() with null destination throws exception' );
 .sub 'test' :main
     .local pmc nsa, nsb, ar
 
@@ -686,8 +684,8 @@ CODE
 /^destination namespace not specified\n/
 OUTPUT
 
-
-pir_output_like(<<'CODE', <<'OUTPUT', 'export_to() with null array exports default boject set !!!UNSPECIFIED!!!');
+pir_output_like(
+    <<'CODE', <<'OUTPUT', 'export_to() with null array exports default boject set !!!UNSPECIFIED!!!' );
 .sub 'test' :main
     .local pmc nsa, nsb, ar
 
@@ -704,8 +702,8 @@ CODE
 /^exporting default object set not yet specified\n/
 OUTPUT
 
-
-pir_output_like(<<'CODE', <<'OUTPUT', 'export_to() with empty array exports default boject set !!!UNSPECIFIED!!!');
+pir_output_like(
+    <<'CODE', <<'OUTPUT', 'export_to() with empty array exports default boject set !!!UNSPECIFIED!!!' );
 .sub 'test' :main
     .local pmc nsa, nsb, ar
 
@@ -721,7 +719,6 @@ pir_output_like(<<'CODE', <<'OUTPUT', 'export_to() with empty array exports defa
 CODE
 /^exporting default object set not yet specified\n/
 OUTPUT
-
 
 pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success" );
 .HLL 'A', ''

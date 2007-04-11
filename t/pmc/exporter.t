@@ -40,7 +40,6 @@ ok 1 - $P0 = new .Exporter
 ok 2 - isa $P0, 'Exporter'
 OUT
 
-
 pir_output_is( <<'CODE', <<'OUT', 'source' );
 .sub 'test' :main
     new $P0, .Exporter
@@ -92,7 +91,6 @@ ok 2 - source() with args sets source namespace
 ok 3 - source() with too many args fails
 ok 4 - source() with non-namespace arg throws exception
 OUT
-
 
 pir_output_is( <<'CODE', <<'OUT', 'destination' );
 .sub 'test' :main
@@ -152,7 +150,6 @@ ok 3 - destination() with args sets destination namespace
 ok 4 - destination() with too many args fails
 ok 5 - destination() with non-namespace arg throws exception
 OUT
-
 
 pir_output_is( <<'CODE', <<'OUT', 'globals' );
 .sub 'test' :main
@@ -220,7 +217,6 @@ ok 3 - globals() with args sets globals array (array with two values)
 ok 4 - globals() with too many args fails
 OUT
 
-
 pir_output_is( <<'CODE', <<'OUT', 'add_global' );
 .sub 'test' :main
     $P0 = new .Exporter
@@ -274,7 +270,6 @@ ok 3 - add_global() with args adds string to globals array (again)
 ok 4 - add_global() with too many args fails
 OUT
 
-
 ## TODO import
 pir_output_like( <<'CODE', <<'OUT', 'import - no args' );
 .sub 'test' :main
@@ -287,7 +282,6 @@ pir_output_like( <<'CODE', <<'OUT', 'import - no args' );
 CODE
 /^source namespace not set\n/
 OUT
-
 
 pir_output_is( <<'CODE', <<'OUT', 'import - same source and destination namespaces' );
 .sub 'test' :main
@@ -315,7 +309,6 @@ CODE
 ok 1
 OUT
 
-
 pir_output_is( <<'CODE', <<'OUT', 'import - globals as string' );
 .sub 'test' :main
     load_bytecode 'Test/More.pir'
@@ -332,7 +325,6 @@ CODE
 1..1
 ok 1
 OUT
-
 
 pir_output_is( <<'CODE', <<'OUT', 'import - globals as array' );
 .sub 'test' :main
@@ -353,7 +345,6 @@ CODE
 1..1
 ok 1
 OUT
-
 
 pir_output_is( <<'CODE', <<'OUT', 'import - globals with destination' );
 .sub 'test' :main
@@ -382,7 +373,6 @@ CODE
 1..1
 ok 1
 OUT
-
 
 # Local Variables:
 #   mode: cperl

@@ -161,7 +161,7 @@ OUT
 ## A: it has no attributes by default
 
 # L<PDD15/Class PMC API/=item add_attribute>
-pir_output_is( <<'CODE', <<'OUT', 'add_attribute');
+pir_output_is( <<'CODE', <<'OUT', 'add_attribute' );
 .sub 'test' :main
     new $P0, .Class
 

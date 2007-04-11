@@ -90,7 +90,7 @@ sub file_pod_ok {
     my $file    = shift;
     my $checker = Pod::Simple->new;
 
-    $checker->output_string( \my $trash );    # Ignore any output
+    $checker->output_string( \my $trash );      # Ignore any output
     $checker->parse_file($file);
 
     return !$checker->any_errata_seen;

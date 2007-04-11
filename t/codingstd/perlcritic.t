@@ -62,7 +62,7 @@ if ( !@ARGV ) {
     @files = map { $_->path } $DIST->get_perl_language_files();
 
     # Skip any language files...
-    my $languages_dir = File::Spec->catdir($PConfig{build_dir}, 'languages');
+    my $languages_dir = File::Spec->catdir( $PConfig{build_dir}, 'languages' );
     @files = grep { !m{\Q$languages_dir\E} } @files;
 }
 else {
@@ -125,7 +125,7 @@ if ( !keys %policies ) {
 
     # Add Perl::Critic::Bangs if it exists
     eval { require Perl::Critic::Bangs; };
-    if ( $@ ) {
+    if ($@) {
         diag "Perl::Critic::Bangs not installed: not testing for TODO items in code";
     }
     else {

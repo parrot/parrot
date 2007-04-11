@@ -63,8 +63,8 @@ ENDF
 close FOO;
 
 SKIP: {
-       skip("Closing out of pod from included files", 1);
-pir_output_is( <<'CODE', <<'OUT', "simple pod" );
+    skip( "Closing out of pod from included files", 1 );
+    pir_output_is( <<'CODE', <<'OUT', "simple pod" );
 .include "include.tempfile"
 .sub test :main
     print "pass\n"
@@ -76,8 +76,6 @@ OUT
 }
 
 unlink("macro.tempfile");
-
-
 
 # Local Variables:
 #   mode: cperl

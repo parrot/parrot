@@ -1363,7 +1363,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "clone of partly-advanced iterator");
+pir_output_is( <<'CODE', <<'OUTPUT', "clone of partly-advanced iterator" );
 .sub main :main
     .local pmc ar, i1, i2
     .local Integer temp
