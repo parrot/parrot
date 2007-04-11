@@ -729,7 +729,7 @@ Compose a role into a class with the given exclusions and aliases.
 
 */
     PCCMETHOD void add_role(PMC* role,
-            PMC* exclude_method :optional :named["exclude_method"], 
+            PMC* exclude_method :optional :named["exclude_method"],
             int got_exclude_method :opt_flag,
             PMC* alias_method :optional :named["alias_method"],
             int got_alias_method :opt_flag) {
@@ -755,7 +755,7 @@ Compose a role into a class with the given exclusions and aliases.
         }
 
         /* Do the composition. */
-        Parrot_ComposeRole(interp, role, exclude_method, got_exclude_method, 
+        Parrot_ComposeRole(interp, role, exclude_method, got_exclude_method,
                            alias_method, got_alias_method,
                            class->methods, class->roles);
     }
