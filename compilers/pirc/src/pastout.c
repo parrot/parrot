@@ -70,12 +70,9 @@ Prints initializing PAST: ["past" => PMC 'PAST::Block' {]
 */
 static void
 past_init(struct emit_data *data) {
-    data->file = fopen(data->outputfile, "w");
 
-    if (data->file == NULL) {
-        fprintf(stderr, "Failed to open file '%s'\n", data->outputfile);
-        exit(1);
-    }
+    if (data->outputfile) data->file = open_file(data->outputfile, "w");
+    else data->file = stdout;
 
     fprintf(data->file, "\"past\" => PMC 'PAST::Block'  {\n");
     indent(data);
@@ -243,7 +240,7 @@ past_expr(struct emit_data *data, char *expr) {
 */
 static void
 past_destroy(emit_data *data) {
-    fclose(data->file);
+    if (data->outputfile) fclose(data->file);
     free(data);
     data = NULL;
 }

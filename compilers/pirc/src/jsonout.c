@@ -146,7 +146,9 @@ json_start_object(emit_data *data) {
 
 static void
 json_init(emit_data *data) {
-    data->file = open_file(data->outputfile, "w");
+    if (data->outputfile) data->file = open_file(data->outputfile, "w");
+    else data->file = stdout;
+
     fprintf(data->file, "{\n");
     indent(data);
 }
@@ -348,7 +350,7 @@ Destructor for emit_data structure
 */
 static void
 json_destroy(emit_data *data) {
-    fclose(data->file);
+    if (data->outputfile) fclose(data->file);
     free(data);
     data = NULL;
 }

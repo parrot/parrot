@@ -110,7 +110,7 @@ Close the output file, free the emit_data structure.
 */
 static void
 pir_destroy(emit_data *data) {
-    fclose(data->file);
+    if (data->outputfile) fclose(data->file);
     free(data);
     data = NULL;
 }
@@ -122,7 +122,8 @@ pir_begin_return(emit_data *data) {
 
 static void
 pir_init(emit_data *data) {
-    data->file = open_file(data->outputfile, "w");
+    if (data->outputfile) data->file = open_file(data->outputfile, "w");
+    else data->file = stdout;
 }
 
 
