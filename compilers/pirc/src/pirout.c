@@ -15,6 +15,13 @@ pirout.c - Back-end for outputting PIR.
 #include <stdlib.h>
 
 
+
+typedef struct target {
+    char *name;
+    struct target *next;
+
+} target;
+
 /* Private declaration of emit_data.
  *
  *
@@ -22,11 +29,50 @@ pirout.c - Back-end for outputting PIR.
 typedef struct emit_data {
     char *outputfile;
     FILE *file;
+    int need_comma;
+    target *targets;
 
 } emit_data;
 
 
+#define print_comma(D)  fprintf(data->file, ", ")
 
+
+
+
+
+/*
+
+=over 4
+
+=item new_target()
+
+=cut
+
+*/
+static target *
+new_target(char *name) {
+    target *t = (target *)malloc(sizeof(target));
+    t->name = clone_string(name);
+    t->next = NULL;
+    return t;
+}
+
+/*
+
+=item add_target()
+
+=cut
+
+=back
+
+*/
+
+static void
+add_target(emit_data *data, target *t) {
+    t->next = data->targets;
+    data->targets = t;
+}
 
 /*
 
@@ -38,17 +84,21 @@ typedef struct emit_data {
 
 static void
 pir_name(struct emit_data *data, char *name) {
-    fprintf(data->file, " %s ", name);
+    if (data->need_comma) print_comma(data);
+    fprintf(data->file, "%s", name);
+    data->need_comma = 1;
 }
 
 static void
 pir_sub(struct emit_data *data) {
-    fprintf(data->file, ".sub");
+    fprintf(data->file, "\n.sub ");
+    data->need_comma = 0;
 }
 
 static void
 pir_end(struct emit_data *data) {
     fprintf(data->file, ".end\n");
+    data->need_comma = 0;
 }
 
 static void
@@ -63,7 +113,8 @@ pir_param(struct emit_data *data) {
 
 static void
 pir_type(struct emit_data *data, char *type) {
-    fprintf(data->file, "%s", type);
+    fprintf(data->file, "%s ", type);
+    data->need_comma = 0;
 }
 
 static void
@@ -79,17 +130,20 @@ pir_expr(struct emit_data *data, char *expr) {
 static void
 pir_op(struct emit_data *data, char *op) {
     fprintf(data->file, "  %s ", op);
+    data->need_comma = 0;
 }
 
 
 static void
 pir_list_start(struct emit_data *data) {
     fprintf(data->file, "(");
+    data->need_comma = 0;
 }
 
 static void
 pir_list_end(struct emit_data *data) {
     fprintf(data->file, ")");
+    data->need_comma = 0;
 }
 
 static void
@@ -116,6 +170,11 @@ pir_destroy(emit_data *data) {
 }
 
 static void
+pir_target(emit_data *data, char *target) {
+    add_target(data, new_target(target));
+}
+
+static void
 pir_begin_return(emit_data *data) {
     fprintf(data->file, " ");
 }
@@ -126,6 +185,52 @@ pir_init(emit_data *data) {
     else data->file = stdout;
 }
 
+/* print the list of targets stored in emit_data. This is done recursively,
+ * and from the end of the list to the front. This is because the items are
+ * added at the front, and the order need to be restored. This also allows
+ * for freeing any resources.
+ */
+static void
+print_target(emit_data *data, target *t) {
+    if (t->next) print_target(data, t->next);
+    fprintf(data->file, "%s", t->name);
+
+    /* name was a cloned string, free it again! */
+    /*
+    free(t->name);
+    t->name = NULL;
+    */
+
+}
+
+static void
+pir_assign(emit_data *data) {
+    target *t = data->targets;
+    /* XXX does not work correctly yet.
+    print_target(data, t);
+    */
+    fprintf(data->file, " = ");
+}
+
+static void
+pir_assign_start(emit_data *data) {
+    fprintf(data->file, "  ");
+}
+
+static void
+pir_assign_end(emit_data *data) {
+    fprintf(data->file, "\n");
+}
+
+static void
+pir_comp_op(emit_data *data, char *op) {
+    fprintf(data->file, " %s ", op);
+}
+
+static void
+pir_bin_op(emit_data *data, char *op) {
+    fprintf(data->file, " %s ", op);
+}
 
 /*
 
@@ -162,6 +267,13 @@ init_pir_vtable(char *outputfile) {
     vtable->list_end       = pir_list_end;
     vtable->sub_flag_start = pir_sub_flag_start;
     vtable->sub_flag_end   = pir_sub_flag_end;
+    vtable->assign         = pir_assign;
+    vtable->assign_start   = pir_assign_start;
+    vtable->assign_end     = pir_assign_end;
+    vtable->target         = pir_target;
+
+    vtable->binary_op      = pir_bin_op;
+    vtable->comparison_op  = pir_comp_op;
 
     vtable->data = (emit_data *)malloc(sizeof(emit_data));
     if (vtable->data == NULL) {
@@ -170,6 +282,7 @@ init_pir_vtable(char *outputfile) {
     }
 
     vtable->data->outputfile = outputfile;
+    vtable->data->targets = NULL;
 
     return vtable;
 }

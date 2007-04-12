@@ -193,6 +193,8 @@ json_sub_end(emit_data *data) {
 static void
 json_name(emit_data *data, char *name) {
     fprintf(data->file, "%*s{ \"name\" : \"%s\" }\n", data->indent, " ", name);
+    data->need_comma = 1;
+
 }
 
 static void
@@ -206,7 +208,7 @@ json_stmts_start(emit_data *data) {
 
 static void
 json_param_start(emit_data *data) {
-    fprintf(data->file, "%*s\"parameters\" :\n", data->indent, " ");
+    fprintf(data->file, "%*s{ \"parameters\" :\n", data->indent, " ");
     indent(data);
     fprintf(data->file, "%*s[\n", data->indent, " ");
     indent(data);
@@ -215,6 +217,7 @@ json_param_start(emit_data *data) {
 
 static void
 json_sub_flag_start(emit_data *data) {
+    if (data->need_comma) print_comma(data);
     fprintf(data->file, "%*s{ \"subflags\" :\n", data->indent, " ");
     indent(data);
     fprintf(data->file, "%*s[\n", data->indent, " ");
@@ -384,7 +387,7 @@ init_json_vtable(char *outputfile) {
     vtable->op_start         = json_op_start;
     vtable->op_end           = json_op_end;
     vtable->param_start      = json_param_start;
-    vtable->param_end        = json_list_end;
+    vtable->param_end        = json_stmts_end;
     vtable->sub_flag_start   = json_sub_flag_start;
     vtable->sub_flag_end     = json_sub_flag_end;
     vtable->list_start       = json_list_start;

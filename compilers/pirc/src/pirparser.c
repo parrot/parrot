@@ -566,6 +566,9 @@ keylist(parser_state *p) {
 static void
 arg_flags(parser_state *p) {
     int ok = 1;
+
+    emit_list_start(p);
+
     while (ok) {
         switch (p->curtoken) {
             case T_FLAT_FLAG:
@@ -590,6 +593,8 @@ arg_flags(parser_state *p) {
                 break;
         }
     }
+
+    emit_list_end(p);
 }
 
 
@@ -764,6 +769,7 @@ arith_expression(parser_state *p) {
         case T_LOG_RSHIFT:
         case T_LSHIFT:
         case T_CONCAT: /* yeah I know, it's not arithmetic */
+            emit_binary_op(p, find_keyword(p->curtoken));
             next(p);
             expression(p);
             break;
@@ -795,16 +801,8 @@ parrot_instruction(parser_state *p) {
         /* XXX for now, just skip ANYTHING until a newline. This is so we can handle
          * "delete obj[bla] etc.
          */
+        emit_expr(p, get_current_token(p->lexer));
         next(p);
-
-        /*
-        expression(p);
-
-        if (p->curtoken == T_COMMA) {
-            next(p);
-        }
-        else break;
-        */
     }
 
     emit_op_end(p);
@@ -833,7 +831,9 @@ parrot_instruction(parser_state *p) {
 */
 static void
 assignment(parser_state *p) {
+    emit_assign_start(p); /* should this be here?? */
     match(p, T_ASSIGN);
+    emit_assign(p);
 
     switch (p->curtoken) {
         case T_NOT:
@@ -915,6 +915,7 @@ assignment(parser_state *p) {
             arith_expression(p);
             break;
     }
+    emit_assign_end(p);
 }
 
 
@@ -1027,7 +1028,7 @@ open_ns(parser_state *p) {
 */
 static void
 local_id_list(parser_state *p) {
-    emit_expr(p, get_current_token(p->lexer));
+    emit_name(p, get_current_token(p->lexer));
     match(p, T_IDENTIFIER);
 
     /* process the flag, if any */
@@ -1038,7 +1039,7 @@ local_id_list(parser_state *p) {
     while (p->curtoken == T_COMMA) {
         next(p); /* skip comma */
 
-        emit_expr(p, get_current_token(p->lexer));
+        emit_name(p, get_current_token(p->lexer));
         match(p, T_IDENTIFIER);
 
         /* parse optional :unique_reg flag */
@@ -1141,6 +1142,7 @@ conditional_expression(parser_state *p) {
     switch (p->curtoken) { /* optional */
         case T_GE: case T_GT: case T_EQ:
         case T_NE: case T_LT: case T_LE:
+            emit_comparison_op(p, find_keyword(p->curtoken));
             next(p); /* skip comparison op */
             expression(p);
             break;
@@ -1530,7 +1532,6 @@ target_statement(parser_state *p) {
 
     switch (p->curtoken) {
         case T_ASSIGN:   /* target '=' expression */
-
             assignment(p);
             break;
         case T_PLUS_ASSIGN: /* target '+=' simple_expr '\n' (and '-=' etc.) */

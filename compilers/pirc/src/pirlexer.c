@@ -1045,14 +1045,11 @@ next_token(lexer_state *lexer) {
         if (isspace(c) && (c != '\n')) continue;
 
         /* skip pod */
-        /* FIX
-        while ((c == '=') && is_start_of_line(lexer->curfile)) {
-             c = read_char(lexer->curfile);
-        }
-        XXX */
+
+        /* FIX PARSING OF POD; kinda hard :-( */
 
 
-        /* skip comments */
+
 
 /*
 
@@ -1067,6 +1064,7 @@ POD comments are not yet supported.
 =cut
 
 */
+        /* skip comments */
         if (c == '#') {
             /* eat comments up to but not including newline */
             do {

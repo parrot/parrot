@@ -4,7 +4,12 @@
 /* predeclaration; the actual definition is left to the back-end(s) */
 struct emit_data;
 
+/* NOTE: when adding a vtable method:
+ 1. add it to the pirvtable structure;
+ 2. add an 'emit_' macro below;
+ 3. initialize the new method to "not_implemented", in pirvtable.c;
 
+*/
 
 /* vtable that contains function pointers for emit
  * routines, and a pointer to some data. The definition of the
@@ -56,6 +61,14 @@ typedef struct pirvtable {
     void (* invocation_start)(struct emit_data *data);
     void (* invocation_end)  (struct emit_data *data);
 
+    /* assignments */
+    void (* assign_start)    (struct emit_data *data);
+    void (* assign)          (struct emit_data *data);
+    void (* assign_end)      (struct emit_data *data);
+
+    void (* binary_op)       (struct emit_data *data, char *op);
+    void (* comparison_op)   (struct emit_data *data, char *op);
+
     /* finalizer (not destructor, that only should be called to free resources */
     void (* end)             (struct emit_data *data);
 
@@ -98,6 +111,13 @@ typedef struct pirvtable {
 #  define emit_invokable(P,S)      (*P->vtable->invokable)        (P->vtable->data, S)
 #  define emit_invocation_start(P) (*P->vtable->invocation_start) (P->vtable->data)
 #  define emit_invocation_end(P)   (*P->vtable->invocation_end)   (P->vtable->data)
+
+#  define emit_assign_start(P)     (*P->vtable->assign_start)     (P->vtable->data)
+#  define emit_assign_end(P)       (*P->vtable->assign_end)       (P->vtable->data)
+#  define emit_assign(P)           (*P->vtable->assign)           (P->vtable->data)
+
+#  define emit_comparison_op(P,O)  (*P->vtable->comparison_op)    (P->vtable->data, O)
+#  define emit_binary_op(P,O)      (*P->vtable->binary_op)        (P->vtable->data, O)
 
 /* constructor */
 extern pirvtable *new_pirvtable(void);

@@ -143,9 +143,9 @@ typedef enum tokens {
     T_HEREDOC_STRING,                   /* "heredoc string",          */
     T_PARROT_OP,                        /* "parrot op",               */
     T_UNICODE,                          /* "unicode:",                */
-    T_ASCII,							/* "ascii:",                  */
-    T_BINARY,						    /* "binary:",                 */
-    T_ISO_8859_1						/* "iso-8859-1:"              */
+    T_ASCII,                            /* "ascii:",                  */
+    T_BINARY,                           /* "binary:",                 */
+    T_ISO_8859_1                        /* "iso-8859-1:"              */
     /* NULL                                                           */
 } token;
 

@@ -98,6 +98,12 @@ new_pirvtable(void) {
     vtable->invokable        = not_implemented;
     vtable->invocation_start = not_implemented;
     vtable->invocation_end   = not_implemented;
+    vtable->assign_start     = not_implemented;
+    vtable->assign_end       = not_implemented;
+    vtable->assign           = not_implemented;
+    vtable->comparison_op    = not_implemented;
+    vtable->binary_op        = not_implemented;
+
 
     /* set data to NULL, it's initialized in the backend module */
     vtable->data = NULL;

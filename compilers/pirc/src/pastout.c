@@ -35,6 +35,7 @@ indention.
 */
 typedef struct emit_data {
     int indent;
+    int index;
     char *outputfile;
     FILE *file;
 
@@ -148,7 +149,7 @@ Opens a PAST::Stmts node.
 */
 static void
 past_stmts(struct emit_data *data) {
-    fprintf(data->file, "%*s[%d] => PMC 'PAST::Stmts'  {\n", data->indent, " ", 0); /* fix array index */
+    fprintf(data->file, "%*s[%d] => PMC 'PAST::Stmts'  {\n", data->indent, " ", data->index++);
     indent(data);
 }
 
@@ -226,14 +227,14 @@ past_op(struct emit_data *data, char *op) {
 */
 static void
 past_expr(struct emit_data *data, char *expr) {
-    fprintf(data->file, "%*s[%d] => \"%s\"\n", data->indent, " ", 0, expr); /* fix index */
+    fprintf(data->file, "%*s[%d] => \"%s\"\n", data->indent, " ", data->index++, expr); /* fix index */
 }
 
 /*
 
 =item past_destroy()
 
-
+Destructor, close the outputfile if any, and free the emit_data structure.
 
 =cut
 
@@ -285,6 +286,7 @@ init_past_vtable(char *outputfile) {
     }
     vtable->data->indent = 0;
     vtable->data->outputfile = outputfile;
+    vtable->data->index = 0;
 
     return vtable;
 }

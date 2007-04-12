@@ -98,7 +98,7 @@ printdebug(char *message) {
 
 
 /* Array holding all parrot ops */
-static char *parrot_ops[] = {
+static char const *parrot_ops[] = {
         "yield",
         "xor",
         "warningson",
