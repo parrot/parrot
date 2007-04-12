@@ -8,6 +8,7 @@ pirout.c - Back-end for outputting PIR.
 
 */
 #include "pirout.h"
+#include "pirutil.h"
 #include "pirvtable.h"
 #include "pirlexer.h"
 #include <stdio.h>
@@ -19,11 +20,13 @@ pirout.c - Back-end for outputting PIR.
  *
  */
 typedef struct emit_data {
-    int indent;
+    char *outputfile;
+    FILE *file;
 
 } emit_data;
 
-#define OUT stderr
+
+
 
 /*
 
@@ -35,81 +38,93 @@ typedef struct emit_data {
 
 static void
 pir_name(struct emit_data *data, char *name) {
-    fprintf(OUT, " %s ", name);
+    fprintf(data->file, " %s ", name);
 }
 
 static void
 pir_sub(struct emit_data *data) {
-    fprintf(OUT, ".sub");
+    fprintf(data->file, ".sub");
 }
 
 static void
 pir_end(struct emit_data *data) {
-    fprintf(OUT, ".end\n");
+    fprintf(data->file, ".end\n");
 }
 
 static void
 pir_newline(struct emit_data *data) {
-    fprintf(OUT, "\n");
+    fprintf(data->file, "\n");
 }
 
 static void
 pir_param(struct emit_data *data) {
-    fprintf(OUT, "  .param ");
+    fprintf(data->file, "  .param ");
 }
 
 static void
 pir_type(struct emit_data *data, char *type) {
-    fprintf(OUT, "%s", type);
+    fprintf(data->file, "%s", type);
 }
 
 static void
 pir_sub_flag(struct emit_data *data, int flag) {
-    fprintf(OUT, "%s ", find_keyword(flag));
+    fprintf(data->file, "%s ", find_keyword(flag));
 }
 
 static void
 pir_expr(struct emit_data *data, char *expr) {
-    fprintf(OUT, "%s ", expr);
+    fprintf(data->file, "%s ", expr);
 }
 
 static void
 pir_op(struct emit_data *data, char *op) {
-    fprintf(OUT, "  %s ", op);
+    fprintf(data->file, "  %s ", op);
 }
 
 
 static void
 pir_list_start(struct emit_data *data) {
-    fprintf(OUT, "(");
+    fprintf(data->file, "(");
 }
 
 static void
 pir_list_end(struct emit_data *data) {
-    fprintf(OUT, ")");
+    fprintf(data->file, ")");
 }
 
 static void
 pir_sub_flag_start(struct emit_data *data) {
-    fprintf(OUT, "");
+    fprintf(data->file, "");
 }
 
 
 static void
 pir_sub_flag_end(struct emit_data *data) {
-    fprintf(OUT, "\n");
+    fprintf(data->file, "\n");
 }
 
+/*
+
+Close the output file, free the emit_data structure.
+
+*/
 static void
 pir_destroy(emit_data *data) {
+    fclose(data->file);
     free(data);
     data = NULL;
 }
 
 static void
 pir_begin_return(emit_data *data) {
-    fprintf(OUT, " ");
+    fprintf(data->file, " ");
 }
+
+static void
+pir_init(emit_data *data) {
+    data->file = open_file(data->outputfile, "w");
+}
+
 
 /*
 
@@ -124,10 +139,12 @@ then this vtable is set into the parser_state struct.
 
 */
 struct pirvtable *
-init_pir_vtable(void) {
+init_pir_vtable(char *outputfile) {
+
     pirvtable *vtable = new_pirvtable();
 
     /* override the methods that are needed for PIR output */
+    vtable->initialize     = pir_init;
     vtable->destroy        = pir_destroy;
     vtable->sub_start      = pir_sub;
     vtable->sub_end        = pir_end;
@@ -150,6 +167,9 @@ init_pir_vtable(void) {
         fprintf(stderr, "Failed to allocate memory for vtable data\n");
         exit(1);
     }
+
+    vtable->data->outputfile = outputfile;
+
     return vtable;
 }
 

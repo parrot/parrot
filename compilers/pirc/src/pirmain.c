@@ -143,22 +143,21 @@ main(int argc, char **argv) {
             vtable = new_pirvtable();
             break;
         case OUTPUT_PIR:
-            vtable = init_pir_vtable();
+            vtable = init_pir_vtable(outputfile);
             break;
         case OUTPUT_PAST:
-            vtable = init_past_vtable();
+            vtable = init_past_vtable(outputfile);
             break;
         case OUTPUT_JSON:
-            vtable = init_json_vtable();
+            vtable = init_json_vtable(outputfile);
             break;
         case OUTPUT_PBC:
-            vtable = init_pbc_vtable();
+            vtable = init_pbc_vtable(outputfile);
             break;
         default:
             fprintf(stderr, "Unknown output type specified\n");
             exit(1);
     }
-
 
     /* create a new parser, specifying the file name and the vtable */
     p = new_parser(argv[0], vtable);

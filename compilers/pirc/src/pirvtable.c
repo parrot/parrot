@@ -58,6 +58,7 @@ Constructor for a pir vtable. All entries are set to "not_implemented" function.
 */
 pirvtable *
 new_pirvtable(void) {
+
     pirvtable *vtable = (pirvtable *)malloc(sizeof(pirvtable));
 
     if (vtable == NULL) {

@@ -9,6 +9,8 @@ XXX Not implemented XXX
 
 IIUC, the PBC format is not yet fixed.
 
+If compilers/bcg works, connect the vtable methods to those api calls.
+
 =cut
 
 */
@@ -17,7 +19,7 @@ IIUC, the PBC format is not yet fixed.
 
 
 pirvtable *
-init_pbc_vtable(void) {
+init_pbc_vtable(char *outputfile) {
     pirvtable *vtable = new_pirvtable();
 
     return vtable;

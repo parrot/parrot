@@ -2,8 +2,7 @@
 #  define __PBCOUT_H
 
 
-
-extern struct pirvtable *init_pbc_vtable(void);
+extern struct pirvtable *init_pbc_vtable(char *outputfile);
 
 #endif
 

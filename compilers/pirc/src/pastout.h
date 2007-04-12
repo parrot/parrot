@@ -4,7 +4,7 @@
 /* predeclare */
 struct pirvtable;
 
-extern struct pirvtable *init_past_vtable(void);
+extern struct pirvtable *init_past_vtable(char *outputfile);
 
 #endif
 

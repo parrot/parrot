@@ -4,7 +4,7 @@
 /* predeclare */
 struct pirvtable;
 
-extern struct pirvtable *init_json_vtable(void);
+extern struct pirvtable *init_json_vtable(char *outputfile);
 
 #endif
 

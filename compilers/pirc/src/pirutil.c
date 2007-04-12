@@ -45,6 +45,27 @@ clone_string(char const * src) {
     return ptr;
 }
 
+/*
+
+=item open_file(char *filename, char *mode)
+
+Open the file C<filename> in mode C<mode>. If this fails, an error message
+is printed, and the program is terminated.
+
+=cut
+
+*/
+FILE *
+open_file(char *filename, char *mode) {
+    FILE *file = fopen(filename, mode);
+
+    if (file == NULL) {
+        fprintf(stderr, "Failed to open file '%s' in mode '%s'\nTerminating\n", filename, mode);
+        exit(1);
+    }
+
+    return file;
+}
 
 /*
 

@@ -17,18 +17,20 @@ Some refactoring would be in order, once this back-end is finished.
 */
 #include "jsonout.h"
 #include "pirvtable.h"
+#include "pirutil.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 
-#define OUT             stdout
-#define INDENT          4
 
-/* make it look like a function call */
-#define indent(D)       D->indent += INDENT
-#define dedent(D)       D->indent -= INDENT
 
-#define print_comma(D)  fprintf(OUT, "%*s,\n", data->indent, " ");
+static const int INDENT = 4;
+
+
+#define print_comma(D)  fprintf(data->file, "%*s,\n", data->indent, " ");
+
+
+
 
 /*
 
@@ -57,7 +59,9 @@ typedef struct target {
  *
  */
 typedef struct emit_data {
-    FILE *outfile; /* output file -- XXX TODO: get filename from -o option in pirmain.c */
+    /* output file */
+    FILE *file;
+    char *outputfile;
 
     int indent; /* keep track of indention */
     /* has the first item in a list already been emitted? If so, we need a comma as separator */
@@ -77,6 +81,20 @@ typedef struct emit_data {
 =cut
 
 */
+
+/* increase the indention level */
+static int
+indent(emit_data *data) {
+    data->indent += INDENT;
+    return data->indent;
+}
+
+/* decreate the indention level */
+static int
+dedent(emit_data *data) {
+    data->indent -= INDENT;
+    return data->indent;
+}
 
 
 /*
@@ -122,13 +140,14 @@ add_target(emit_data *data, target *t) {
 
 static void
 json_start_object(emit_data *data) {
-    fprintf(OUT, "%*s{\n", data->indent, data->indent ? " " : "");
+    fprintf(data->file, "%*s{\n", data->indent, data->indent ? " " : "");
     indent(data);
 }
 
 static void
 json_init(emit_data *data) {
-    fprintf(OUT, "{\n");
+    data->file = open_file(data->outputfile, "w");
+    fprintf(data->file, "{\n");
     indent(data);
 }
 
@@ -136,67 +155,67 @@ json_init(emit_data *data) {
 static void
 json_end(emit_data *data) {
     dedent(data);
-    fprintf(OUT, "%*s}\n", data->indent, (data->indent == 0) ? "" : " ");
+    fprintf(data->file, "%*s}\n", data->indent, (data->indent == 0) ? "" : " ");
 }
 
 static void
 json_sub_start(emit_data *data) {
     if (data->need_comma) print_comma(data);
-    fprintf(OUT, "%*s{ \"sub\" :\n", data->indent, " ");
+    fprintf(data->file, "%*s{ \"sub\" :\n", data->indent, " ");
     indent(data);
 
-    fprintf(OUT, "%*s{\n", data->indent, " ");
+    fprintf(data->file, "%*s{\n", data->indent, " ");
     indent(data);
 }
 
 static void
 json_source(emit_data *data, char *source) {
-    fprintf(OUT, "%*s{ \"source\" : \"%s\" },\n", data->indent, " ", source);
+    fprintf(data->file, "%*s{ \"source\" : \"%s\" },\n", data->indent, " ", source);
 }
 
 static void
 json_position(emit_data *data, int pos) {
-    fprintf(OUT, "%*s{ \"pos\" : %d },\n", data->indent, " ", pos);
+    fprintf(data->file, "%*s{ \"pos\" : %d },\n", data->indent, " ", pos);
 }
 
 static void
 json_sub_end(emit_data *data) {
     dedent(data);
-    fprintf(OUT, "%*s}\n", data->indent, " ");
+    fprintf(data->file, "%*s}\n", data->indent, " ");
 
     dedent(data);
-    fprintf(OUT, "%*s}\n", data->indent, " ");
+    fprintf(data->file, "%*s}\n", data->indent, " ");
     data->need_comma = 1;
 }
 
 static void
 json_name(emit_data *data, char *name) {
-    fprintf(OUT, "%*s{ \"name\" : \"%s\" }\n", data->indent, " ", name);
+    fprintf(data->file, "%*s{ \"name\" : \"%s\" }\n", data->indent, " ", name);
 }
 
 static void
 json_stmts_start(emit_data *data) {
-    fprintf(OUT, "%*s{ \"instructions\" :\n", data->indent, " ");
+    fprintf(data->file, "%*s{ \"instructions\" :\n", data->indent, " ");
     indent(data);
-    fprintf(OUT, "%*s[\n", data->indent, " ");
+    fprintf(data->file, "%*s[\n", data->indent, " ");
     indent(data);
     data->need_comma = 0;
 }
 
 static void
 json_param_start(emit_data *data) {
-    fprintf(OUT, "%*s\"parameters\" :\n", data->indent, " ");
+    fprintf(data->file, "%*s\"parameters\" :\n", data->indent, " ");
     indent(data);
-    fprintf(OUT, "%*s[\n", data->indent, " ");
+    fprintf(data->file, "%*s[\n", data->indent, " ");
     indent(data);
     data->need_comma = 0;
 }
 
 static void
 json_sub_flag_start(emit_data *data) {
-    fprintf(OUT, "%*s{ \"subflags\" :\n", data->indent, " ");
+    fprintf(data->file, "%*s{ \"subflags\" :\n", data->indent, " ");
     indent(data);
-    fprintf(OUT, "%*s[\n", data->indent, " ");
+    fprintf(data->file, "%*s[\n", data->indent, " ");
     indent(data);
     data->need_comma = 0;
 }
@@ -204,20 +223,20 @@ json_sub_flag_start(emit_data *data) {
 static void
 json_sub_flag_end(emit_data *data) {
     dedent(data);
-    fprintf(OUT, "%*s]\n", data->indent, " ");
+    fprintf(data->file, "%*s]\n", data->indent, " ");
     dedent(data);
-    fprintf(OUT, "%*s},\n", data->indent, " ");
+    fprintf(data->file, "%*s},\n", data->indent, " ");
 }
 
 static void
 json_sub_flag(emit_data *data, int flag) {
     if (data->need_comma) print_comma(data);
-    fprintf(OUT, "%*s{ \"subflag\" : \"%s\" }\n", data->indent, " ", "TODO");
+    fprintf(data->file, "%*s{ \"subflag\" : \"%s\" }\n", data->indent, " ", "TODO");
 }
 
 static void
 json_list_start(emit_data *data) {
-    fprintf(OUT, "%*s[", data->indent, " ");
+    fprintf(data->file, "%*s[", data->indent, " ");
     indent(data);
     data->need_comma = 0;
 }
@@ -225,40 +244,40 @@ json_list_start(emit_data *data) {
 static void
 json_list_end(emit_data *data) {
     dedent(data);
-    fprintf(OUT, "%*s]\n", data->indent, " ");
+    fprintf(data->file, "%*s]\n", data->indent, " ");
 }
 
 static void
 json_stmts_end(emit_data *data) {
     dedent(data);
-    fprintf(OUT, "%*s]\n", data->indent, " ");
+    fprintf(data->file, "%*s]\n", data->indent, " ");
     dedent(data);
-    fprintf(OUT, "%*s}\n", data->indent, " ");
+    fprintf(data->file, "%*s}\n", data->indent, " ");
 }
 
 static void
 json_op_start(emit_data *data, char *op) {
     if (data->need_comma) print_comma(data);
-    fprintf(OUT, "%*s{ \"op\" : \"%s\" },\n", data->indent, " ", op);
-    fprintf(OUT, "%*s{ \"operands\" :\n", data->indent, " ");
+    fprintf(data->file, "%*s{ \"op\" : \"%s\" },\n", data->indent, " ", op);
+    fprintf(data->file, "%*s{ \"operands\" :\n", data->indent, " ");
     indent(data);
-    fprintf(OUT, "%*s[\n", data->indent, " ");
+    fprintf(data->file, "%*s[\n", data->indent, " ");
     indent(data);
 }
 
 static void
 json_op_end(emit_data *data) {
     dedent(data);
-    fprintf(OUT, "%*s]\n", data->indent, " ");
+    fprintf(data->file, "%*s]\n", data->indent, " ");
     dedent(data);
-    fprintf(OUT, "%*s}\n", data->indent, " ");
+    fprintf(data->file, "%*s}\n", data->indent, " ");
 
 }
 
 static void
 json_expr(emit_data *data, char *expr) {
     if (data->need_comma) print_comma(data);
-    fprintf(OUT, "%*s{ \"expr\" : \"%s\" }\n", data->indent, " ", expr);
+    fprintf(data->file, "%*s{ \"expr\" : \"%s\" }\n", data->indent, " ", expr);
     data->need_comma = 1;
 }
 
@@ -267,28 +286,28 @@ json_expr(emit_data *data, char *expr) {
 
 static void
 json_method(emit_data *data, char *name) {
-    fprintf(OUT, "%*s{ \"method\" : \"%s\" }\n", data->indent, " ", name);
+    fprintf(data->file, "%*s{ \"method\" : \"%s\" }\n", data->indent, " ", name);
 }
 
 static void
 json_invocant(emit_data *data, char *invocant) {
-    fprintf(OUT, "%*s{ \"invocant\" : \"%s\" }\n", data->indent, " ", invocant);
+    fprintf(data->file, "%*s{ \"invocant\" : \"%s\" }\n", data->indent, " ", invocant);
 }
 
 static void
 json_args_start(emit_data *data) {
-    fprintf(OUT, "%*s{ \"arguments\" :\n", data->indent, " ");
+    fprintf(data->file, "%*s{ \"arguments\" :\n", data->indent, " ");
     indent(data);
-    fprintf(OUT, "%*s[\n", data->indent, " ");
+    fprintf(data->file, "%*s[\n", data->indent, " ");
     indent(data);
 }
 
 static void
 json_args_end(emit_data *data) {
     dedent(data);
-    fprintf(OUT, "%*s]\n", data->indent, " ");
+    fprintf(data->file, "%*s]\n", data->indent, " ");
     dedent(data);
-    fprintf(OUT, "%*s}\n", data->indent, " ");
+    fprintf(data->file, "%*s}\n", data->indent, " ");
 }
 
 
@@ -302,19 +321,19 @@ json_target(emit_data *data, char *name) {
 
 static void
 json_invokable(emit_data *data, char *invokable) {
-    fprintf(OUT, "%*s{ \"invokable\" : \"%s\" }\n", data->indent, " ", invokable);
+    fprintf(data->file, "%*s{ \"invokable\" : \"%s\" }\n", data->indent, " ", invokable);
 }
 
 static void
 json_invocation_start(emit_data *data) {
-    fprintf(OUT, "%*s{ \"invocation\" :\n%*s{\n", data->indent, " ", data->indent, " ");
+    fprintf(data->file, "%*s{ \"invocation\" :\n%*s{\n", data->indent, " ", data->indent, " ");
     indent(data);
 }
 
 static void
 json_invocation_end(emit_data *data) {
     dedent(data);
-    fprintf(OUT, "%*s}\n", data->indent, " ");
+    fprintf(data->file, "%*s}\n", data->indent, " ");
 }
 
 
@@ -329,6 +348,7 @@ Destructor for emit_data structure
 */
 static void
 json_destroy(emit_data *data) {
+    fclose(data->file);
     free(data);
     data = NULL;
 }
@@ -344,7 +364,7 @@ assigned a function address that implements that method.
 
 */
 pirvtable *
-init_json_vtable(void) {
+init_json_vtable(char *outputfile) {
     pirvtable *vtable = new_pirvtable();
 
     /* set vtable methods to the appropiate implementation */
@@ -383,8 +403,9 @@ init_json_vtable(void) {
         exit(1);
     }
     vtable->data->indent = 0;
+    vtable->data->outputfile = outputfile;
 
-    /* vtable->next_expr   = json_next; */
+
 
     return vtable;
 }

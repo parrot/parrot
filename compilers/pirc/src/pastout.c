@@ -14,15 +14,12 @@ Initial.
 
 #include "pastout.h"
 #include "pirvtable.h"
+#include "pirutil.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-
-/* keep outputfile possibility easy */
-#define OUT         stderr
-#define INDENT      4
-#define indent(D)   D->indent += INDENT
-#define dedent(D)   D->indent -= INDENT
+/* number of spaces for 1 indention level */
+static const int INDENT = 4;
 
 
 /*
@@ -38,9 +35,25 @@ indention.
 */
 typedef struct emit_data {
     int indent;
+    char *outputfile;
+    FILE *file;
 
 } emit_data;
 
+
+/* increase the indention level */
+static int
+indent(emit_data *data) {
+    data->indent += INDENT;
+    return data->indent;
+}
+
+/* decreate the indention level */
+static int
+dedent(emit_data *data) {
+    data->indent -= INDENT;
+    return data->indent;
+}
 
 /*
 
@@ -57,7 +70,14 @@ Prints initializing PAST: ["past" => PMC 'PAST::Block' {]
 */
 static void
 past_init(struct emit_data *data) {
-    fprintf(OUT, "\"past\" => PMC 'PAST::Block'  {\n");
+    data->file = fopen(data->outputfile, "w");
+
+    if (data->file == NULL) {
+        fprintf(stderr, "Failed to open file '%s'\n", data->outputfile);
+        exit(1);
+    }
+
+    fprintf(data->file, "\"past\" => PMC 'PAST::Block'  {\n");
     indent(data);
 }
 
@@ -72,18 +92,18 @@ Prints PAST for a block, including <source> and <pos> attributes.
 */
 static void
 past_block(struct emit_data *data) {
-    fprintf(OUT, "%*sPMC 'PAST::Block'  {\n", data->indent, " ");
+    fprintf(data->file, "%*sPMC 'PAST::Block'  {\n", data->indent, " ");
     indent(data);
 }
 
 static void
 past_source(emit_data *data, char *source) {
-    fprintf(OUT, "%*s<source> => \"%s\"\n", data->indent, " ", source);
+    fprintf(data->file, "%*s<source> => \"%s\"\n", data->indent, " ", source);
 }
 
 static void
 past_position(emit_data *data, int pos) {
-    fprintf(OUT, "%*s<pos> => %d\n", data->indent, " ", pos);
+    fprintf(data->file, "%*s<pos> => %d\n", data->indent, " ", pos);
 }
 
 /*
@@ -102,7 +122,7 @@ past_close(struct emit_data *data) {
     /* check for indent == 0, if so, then print no space, this is
      * so otherwise a single space is printed.
      */
-    fprintf(OUT, "%*s}\n", data->indent, (data->indent == 0) ? "" : " ");
+    fprintf(data->file, "%*s}\n", data->indent, (data->indent == 0) ? "" : " ");
 
 }
 
@@ -117,7 +137,7 @@ Prints a PAST <name> entry.
 */
 static void
 past_name(struct emit_data *data, char *name) {
-    fprintf(OUT, "%*s<name> => \"%s\"\n", data->indent, " ", name);
+    fprintf(data->file, "%*s<name> => \"%s\"\n", data->indent, " ", name);
 }
 
 /*
@@ -131,7 +151,7 @@ Opens a PAST::Stmts node.
 */
 static void
 past_stmts(struct emit_data *data) {
-    fprintf(OUT, "%*s[%d] => PMC 'PAST::Stmts'  {\n", data->indent, " ", 0); /* fix array index */
+    fprintf(data->file, "%*s[%d] => PMC 'PAST::Stmts'  {\n", data->indent, " ", 0); /* fix array index */
     indent(data);
 }
 
@@ -146,9 +166,9 @@ Generates a PAST::Var node and set its scope attribute to "parameter".
 */
 static void
 past_param(struct emit_data *data) {
-    fprintf(OUT, "%*sFIXTHIS => PMC 'PAST::Var'  {\n", data->indent, " ");
+    fprintf(data->file, "%*sFIXTHIS => PMC 'PAST::Var'  {\n", data->indent, " ");
     indent(data);
-    fprintf(OUT, "%*s<scope> => \"parameter\"\n", data->indent, " ");
+    fprintf(data->file, "%*s<scope> => \"parameter\"\n", data->indent, " ");
 }
 
 /*
@@ -162,7 +182,7 @@ past_param(struct emit_data *data) {
 */
 static void
 past_type(struct emit_data *data, char *type) {
-    fprintf(OUT, "%*s<type> => \"%s\"\n", data->indent, " ", type);
+    fprintf(data->file, "%*s<type> => \"%s\"\n", data->indent, " ", type);
 }
 
 /*
@@ -176,7 +196,7 @@ past_type(struct emit_data *data, char *type) {
 */
 static void
 past_subflag(struct emit_data *data, int flag) {
-    /* fprintf(OUT, "%*s<???> => \"%s\"\n", data->indent, " ", type);
+    /* fprintf(data->file, "%*s<???> => \"%s\"\n", data->indent, " ", type);
     */
 }
 
@@ -192,9 +212,9 @@ past_subflag(struct emit_data *data, int flag) {
 */
 static void
 past_op(struct emit_data *data, char *op) {
-    fprintf(OUT, "%*sFIXME => PMC 'PAST::Op'  {\n", data->indent, " ");
+    fprintf(data->file, "%*sFIXME => PMC 'PAST::Op'  {\n", data->indent, " ");
     indent(data);
-    fprintf(OUT, "%*s<pirop> => \"%s\"\n", data->indent, " ", op);
+    fprintf(data->file, "%*s<pirop> => \"%s\"\n", data->indent, " ", op);
 
 }
 
@@ -209,7 +229,7 @@ past_op(struct emit_data *data, char *op) {
 */
 static void
 past_expr(struct emit_data *data, char *expr) {
-    fprintf(OUT, "%*s[%d] => \"%s\"\n", data->indent, " ", 0, expr); /* fix index */
+    fprintf(data->file, "%*s[%d] => \"%s\"\n", data->indent, " ", 0, expr); /* fix index */
 }
 
 /*
@@ -223,6 +243,7 @@ past_expr(struct emit_data *data, char *expr) {
 */
 static void
 past_destroy(emit_data *data) {
+    fclose(data->file);
     free(data);
     data = NULL;
 }
@@ -237,7 +258,7 @@ then this vtable is set into the parser_state struct.
 
 */
 pirvtable *
-init_past_vtable(void) {
+init_past_vtable(char *outputfile) {
     pirvtable *vtable = new_pirvtable();
 
     /* override vtable methods */
@@ -265,6 +286,7 @@ init_past_vtable(void) {
         exit(1);
     }
     vtable->data->indent = 0;
+    vtable->data->outputfile = outputfile;
 
     return vtable;
 }

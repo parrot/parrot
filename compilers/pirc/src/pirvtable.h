@@ -1,16 +1,17 @@
 #ifndef __VTABLE_H
 #  define __VTABLE_H
 
-struct parser_state;
-
+/* predeclaration; the actual definition is left to the back-end(s) */
 struct emit_data;
+
+
 
 /* vtable that contains function pointers for emit
  * routines, and a pointer to some data. The definition of the
  * 'emit_data' structure is left to each back-end separately.
  */
 typedef struct pirvtable {
-    struct emit_data         *data; /* keep data here; where to store else? */
+    struct emit_data         *data; /* keep data here */
 
     /* initializer and destructor */
     void (* initialize)      (struct emit_data *data);
@@ -98,8 +99,10 @@ typedef struct pirvtable {
 #  define emit_invocation_start(P) (*P->vtable->invocation_start) (P->vtable->data)
 #  define emit_invocation_end(P)   (*P->vtable->invocation_end)   (P->vtable->data)
 
+/* constructor */
 extern pirvtable *new_pirvtable(void);
 
+/* destructor */
 extern void destroy_pirvtable(pirvtable *vtable);
 
 
