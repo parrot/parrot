@@ -69,6 +69,10 @@ typedef struct pirvtable {
     void (* binary_op)       (struct emit_data *data, char *op);
     void (* comparison_op)   (struct emit_data *data, char *op);
 
+    /* function results */
+    void (* results_start)   (struct emit_data *data);
+    void (* results_end)     (struct emit_data *data);
+
     /* finalizer (not destructor, that only should be called to free resources */
     void (* end)             (struct emit_data *data);
 
@@ -115,6 +119,9 @@ typedef struct pirvtable {
 #  define emit_assign_start(P)     (*P->vtable->assign_start)     (P->vtable->data)
 #  define emit_assign_end(P)       (*P->vtable->assign_end)       (P->vtable->data)
 #  define emit_assign(P)           (*P->vtable->assign)           (P->vtable->data)
+
+#  define emit_results_start(P)    (*P->vtable->results_start)    (P->vtable->data)
+#  define emit_results_end(P)      (*P->vtable->results_end)      (P->vtable->data)
 
 #  define emit_comparison_op(P,O)  (*P->vtable->comparison_op)    (P->vtable->data, O)
 #  define emit_binary_op(P,O)      (*P->vtable->binary_op)        (P->vtable->data, O)

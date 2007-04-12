@@ -29,7 +29,7 @@ implement all vtable methods for correct behaviour.
 =item not_implemented()
 
 Default entry that is set to all vtable entries. If a particular vtable entry is invoked,
-but was never implemented, this method is called. This is usefule, because not all output
+but was never implemented, this method is called. This is usefulS, because not all output
 type need all vtable methods. The variable arguments are necessary, you never know how
 many args a method has.
 
@@ -103,7 +103,8 @@ new_pirvtable(void) {
     vtable->assign           = not_implemented;
     vtable->comparison_op    = not_implemented;
     vtable->binary_op        = not_implemented;
-
+    vtable->results_start    = not_implemented;
+    vtable->results_end      = not_implemented;
 
     /* set data to NULL, it's initialized in the backend module */
     vtable->data = NULL;

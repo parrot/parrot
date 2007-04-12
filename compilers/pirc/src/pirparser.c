@@ -1374,7 +1374,7 @@ invokable(parser_state *p) {
                      | '.invocant' invocant '\n'
                        '.meth_call' method '\n'
                      )
-                     { (local_declaration| '.result' target '\n') }
+                     { (local_declaration | '.result' target param_flags '\n') }
                      '.pcc_end' '\n'
 
 =cut
@@ -1421,14 +1421,14 @@ long_invocation(parser_state *p) {
     }
 
     /* results */
-    /*emit_results_start(p);
-    */
+    emit_results_start(p);
+
     while (more_results) {
         switch (p->curtoken) {
             case T_LOCAL:
                 local_declaration(p);
                 break;
-            case T_RESULT: /* '.result' target '\n' */
+            case T_RESULT: /* '.result' target param_flags '\n' */
                 next(p);
                 target(p);
                 param_flags(p);
@@ -1445,8 +1445,8 @@ long_invocation(parser_state *p) {
                 break;
         }
     }
-    /*emit_results_end(p);
-    */
+    emit_results_end(p);
+
     match(p, T_PCC_END); /* '.pcc_end' '\n' */
     match(p, T_NEWLINE);
 
@@ -1459,7 +1459,7 @@ long_invocation(parser_state *p) {
 =item *
 
   long_return_statement -> '.pcc_begin_return' '\n'
-                           { '.return' expression '\n' }
+                           { '.return' expression arg_flags '\n' }
                            '.pcc_end_return' '\n'
 
 =cut
@@ -1474,6 +1474,7 @@ long_return_statement(parser_state *p) {
     while (p->curtoken == T_RETURN) { /* ... { '.return' simple_expr '\n' } ...*/
         next(p); /* skip .return */
         expression(p);
+        arg_flags(p);
         match(p, T_NEWLINE);
     }
     match(p, T_PCC_END_RETURN); /* ... '.pcc_end_return' '\n' */
@@ -1486,7 +1487,7 @@ long_return_statement(parser_state *p) {
 =item *
 
   long_yield_statement -> '.pcc_begin_yield' '\n'
-                          { '.yield' expression '\n' }
+                          { '.return' expression arg_flags '\n' }
                           '.pcc_end_yield' '\n'
 
 =cut
@@ -1498,9 +1499,10 @@ long_yield_statement(parser_state *p) {
     match(p, T_PCC_BEGIN_YIELD);
     match(p, T_NEWLINE);
 
-    while (p->curtoken == T_YIELD) { /* { '.yield' expr '\n' } */
+    while (p->curtoken == T_RETURN) { /* { '.return expr arg_flags '\n' } */
         next(p); /* skip .yield */
         expression(p);
+        arg_flags(p);
         match(p, T_NEWLINE);
     }
     match(p, T_PCC_END_YIELD); /* '.pcc_end_yield' '\n' */
