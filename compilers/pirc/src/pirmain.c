@@ -9,13 +9,13 @@ pirmain.c - Main file for PIR Compiler PIRC.
 */
 #include <stdio.h>
 #include <stdlib.h>
-#include "pirparser.h"
-#include "pirout.h"    /* for PIR output  */
-#include "pastout.h"   /* for PAST output */
-#include "pirvtable.h" /* vtable api      */
-#include "jsonout.h"   /* for json output */
-#include "pbcout.h"    /* for PBC output  */
-#include "pirutil.h"
+#include "pirparser.h" /* the parser        */
+#include "pirout.h"    /* for PIR output    */
+#include "pastout.h"   /* for PAST output   */
+#include "pirvtable.h" /* vtable api        */
+#include "jsonout.h"   /* for json output   */
+#include "pbcout.h"    /* for PBC output    */
+#include "pirutil.h"   /* utility functions */
 
 
 /* define output type: what kind of semantic routines
@@ -112,13 +112,18 @@ main(int argc, char **argv) {
                 output = OUTPUT_PBC;
                 break;
             case 'o':
-                argv++; /* next argument */
-                argc--;
-                /* store a pointer to the output file name, it's there during the
-                 * whole program's lifetime, as it's an argument to main(), so no need
-                 * to clone the string
-                 */
-                outputfile = argv[0];
+                if (argc > 0) {
+                    argv++; /* next argument */
+                    argc--;
+                    /* store a pointer to the output file name, it's there during the
+                     * whole program's lifetime, as it's an argument to main(), so no need
+                     * to clone the string
+                     */
+                    outputfile = argv[0];
+                }
+                else {
+                    print_help();
+                }
                 break;
             default:
                 fprintf(stderr, "Unknown option: '%c'\n", opt);
