@@ -266,6 +266,7 @@ use Parrot::Configure::Messages qw(
     print_introduction
     print_conclusion
 );
+use Parrot::Configure::Step::List qw( get_steps_list );
 
 # These globals are accessed in config/init/defaults.pm
 our $parrot_version = Parrot::BuildUtil::parrot_version();
@@ -298,66 +299,6 @@ my %args = %$args;
 # from Parrot::Configure::Messages
 print_introduction($parrot_version);
 
-# EDIT HERE TO ADD NEW TESTS
-my @steps = qw(
-    init::manifest
-    init::defaults
-    init::install
-    init::miniparrot
-    init::hints
-    init::headers
-    inter::progs
-    inter::make
-    inter::lex
-    inter::yacc
-    auto::gcc
-    auto::msvc
-    init::optimize
-    inter::shlibs
-    inter::libparrot
-    inter::charset
-    inter::encoding
-    inter::types
-    inter::ops
-    inter::pmc
-    auto::alignptrs
-    auto::headers
-    auto::sizes
-    auto::byteorder
-    auto::va_ptr
-    auto::pack
-    auto::format
-    auto::isreg
-    auto::jit
-    gen::cpu
-    auto::funcptr
-    auto::cgoto
-    auto::inline
-    auto::gc
-    auto::memalign
-    auto::signal
-    auto::socklen_t
-    auto::env
-    auto::aio
-    auto::gmp
-    auto::readline
-    auto::gdbm
-    auto::snprintf
-    auto::perldoc
-    auto::python
-    auto::m4
-    auto::cpu
-    gen::icu
-    gen::revision
-    gen::config_h
-    gen::core_pmcs
-    gen::parrot_include
-    gen::languages
-    gen::makefiles
-    gen::platform
-    gen::config_pm
-);
-
 my $conf = Parrot::Configure->new;
 {
 
@@ -365,7 +306,10 @@ my $conf = Parrot::Configure->new;
     no warnings qw(once);
     $Parrot::Configure::Step::conf = $conf;
 }
-$conf->add_steps(@steps);
+
+# from Parrot::Configure::Step::List
+$conf->add_steps(get_steps_list());
+
 $conf->options->set(%args);
 
 if ( exists $args{step} ) {
