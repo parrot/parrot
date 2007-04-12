@@ -84,7 +84,7 @@ main(int argc, char **argv) {
     while (argc-- > 0) {
         char opt;
 
-        if (argv[0][0] != '-') break; /* stop if there's only a '-' */
+        if (argv[0][0] != '-') break; /* stop if there's not a '-' */
         else opt = argv[0][1];   /* get the option letter */
 
         switch (opt) {
@@ -146,6 +146,10 @@ main(int argc, char **argv) {
         case OUTPUT_NONE:
             /* just create an empty vtable, the default implementation does nothing */
             vtable = new_pirvtable();
+
+            if (outputfile != NULL) /* if the user did specify an output file, this doesn't make sense */
+                fprintf(stderr, "No output specified: output file will be ignored\n");
+
             break;
         case OUTPUT_PIR:
             vtable = init_pir_vtable(outputfile);
@@ -181,8 +185,6 @@ main(int argc, char **argv) {
     else {
         fprintf(stderr, "\nparsed successfully.\n");
     }
-
-    if (outputfile != NULL) printf("outputfile written to: '%s'\n", outputfile);
 
     /* clean up and exit */
     exit_parser(p);
