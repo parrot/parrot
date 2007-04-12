@@ -104,6 +104,8 @@ typedef struct parser_state {
 #define next(P) P->curtoken = next_token(P->lexer)
 
 
+/* forward declaration; program is called by include. */
+static void program(parser_state *p);
 
 /*
 
@@ -2189,6 +2191,7 @@ macro_definition(parser_state *p) {
     match(p, T_ENDM);
 }
 
+
 /*
 
 =item *
@@ -2215,7 +2218,8 @@ include(parser_state *p) {
         open_include_file(p->lexer);
         next(p);
 
-        TOP(p); /* go parse it */
+        program(p); /* go parse it, don't call TOP() which initializes the emitter */
+
         /* switch back to other file that included the one above */
         close_include_file(p->lexer);
         next(p); /* get next token from this file */
@@ -2383,7 +2387,7 @@ compilation_unit(parser_state *p) {
 
 =item *
 
-  program -> {'\n'} compilation_unit { '\n' compilation_unit }
+  program -> {'\n'} compilation_unit { '\n' compilation_unit } EOF
 
 =cut
 
@@ -2393,8 +2397,6 @@ program(parser_state *p) {
     /* the file may have some initial newlines; eat them */
     if (p->curtoken == T_NEWLINE) next(p);
 
-    emit_init(p); /* initialize emitter */
-
     compilation_unit(p);
 
     while (p->curtoken != T_EOF ) {
@@ -2402,14 +2404,17 @@ program(parser_state *p) {
         compilation_unit(p);
     }
 
-    emit_end(p); /* close down emitter */
+    /* do NOT match T_EOF; match() tries to read the next token instead, do a manual check. */
+    if (p->curtoken != T_EOF) {
+        syntax_error(p, 3, "end of file expected in file '", get_current_file(p->lexer), "'\n");
+    }
 }
 
 /*
 
 =item *
 
-  TOP -> program EOF
+  TOP -> program
 
 =cut
 
@@ -2417,12 +2422,9 @@ program(parser_state *p) {
 void
 TOP(parser_state *p) {
     /* file -> program EOF */
+    emit_init(p); /* initialize emitter */
     program(p);
-
-    /* do NOT match T_EOF; match() tries to read the next token instead, do a manual check. */
-    if (p->curtoken != T_EOF) {
-        syntax_error(p, 3, "end of file expected in file '", get_current_file(p->lexer), "'\n");
-    }
+    emit_end(p); /* close down emitter */
 }
 
 

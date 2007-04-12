@@ -77,7 +77,7 @@ printdebug(char *message) {
 
 
 /* Array holding all parrot ops */
-static char const *parrot_ops[] = {
+static char *parrot_ops[] = {
         "yield",
         "xor",
         "warningson",
@@ -413,8 +413,6 @@ is_op(char *id) {
     char const *iter = parrot_ops[0];
     int index = 0;
 
-    assert(id != NULL);
-
     /* very inefficient implementation, but for now it works */
     /* suggestions: hashtable, binary search */
 
@@ -424,6 +422,7 @@ is_op(char *id) {
 
         iter = parrot_ops[++index];
     }
+
 
     return 0;
 }

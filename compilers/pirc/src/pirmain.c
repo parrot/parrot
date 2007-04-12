@@ -46,14 +46,15 @@ static void
 print_help(void) {
     fprintf(stderr, "Usage: pirc [options] <file>\n");
     fprintf(stderr, "\tGeneral:\n");
-    fprintf(stderr, "\t-d  debug messages\n");
-    fprintf(stderr, "\t-h  print this help message\n");
-    fprintf(stderr, "\t-v  verbose\n");
+    fprintf(stderr, "\t-d         debug messages\n");
+    fprintf(stderr, "\t-h         print this help message\n");
+    fprintf(stderr, "\t-v         verbose\n");
     fprintf(stderr, "\n\tOutput:\n");
-    fprintf(stderr, "\t-r  print PIR output\n");
-    fprintf(stderr, "\t-p  print PAST output\n");
-    fprintf(stderr, "\t-j  print JSON output\n");
-    fprintf(stderr, "\t-b  print PBC output (not implemented)\n");
+    fprintf(stderr, "\t-r         PIR output\n");
+    fprintf(stderr, "\t-p         PAST output\n");
+    fprintf(stderr, "\t-j         JSON output\n");
+    fprintf(stderr, "\t-b         PBC output (not implemented)\n");
+    fprintf(stderr, "\t-o <file>  save output to <file>\n");
     fprintf(stderr, "\n");
 }
 
@@ -73,6 +74,7 @@ main(int argc, char **argv) {
     pirvtable *vtable      = NULL;        /* create a vtable for semantic actions */
     int flags              = 0;           /* argument parsing */
     outputtype output      = OUTPUT_NONE; /* what kind of output? */
+    char *outputfile       = NULL;        /* output file */
 
     /* skip program name */
     argv++;
@@ -108,6 +110,15 @@ main(int argc, char **argv) {
                 break;
             case 'b':
                 output = OUTPUT_PBC;
+                break;
+            case 'o':
+                argv++; /* next argument */
+                argc--;
+                /* store a pointer to the output file name, it's there during the
+                 * whole program's lifetime, as it's an argument to main(), so no need
+                 * to clone the string
+                 */
+                outputfile = argv[0];
                 break;
             default:
                 fprintf(stderr, "Unknown option: '%c'\n", opt);
@@ -166,6 +177,8 @@ main(int argc, char **argv) {
     else {
         fprintf(stderr, "\nparsed successfully.\n");
     }
+
+    if (outputfile != NULL) printf("outputfile written to: '%s'\n", outputfile);
 
     /* clean up and exit */
     exit_parser(p);
