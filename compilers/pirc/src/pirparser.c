@@ -1749,7 +1749,7 @@ global_assignment(parser_state *p) {
          | long_invocation
          | long_return_statement
          | long_yield_statement
-         | NULL var
+         | 'null' var
          | get_results_instruction
          | global_assignment
          | '\n'
