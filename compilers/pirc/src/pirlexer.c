@@ -620,12 +620,7 @@ read_file(char const * filename) {
     filebuff->filename = clone_string(filename);
     /*fprintf(stderr, "Opening file '%s'\n", filebuff->filename); */
 
-    fileptr = fopen(filename, "r");
-
-    if (fileptr == NULL) {
-        fprintf(stderr, "Error in read_file(): failed to open file '%s'\n", filename);
-        exit(1);
-    }
+    fileptr = open_file(filename, "r");
 
     /* allocate memory for this file. Reserve 1 more byte to store the EOF marker */
     stat(filename, &filestatus);

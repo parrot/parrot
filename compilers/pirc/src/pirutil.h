@@ -20,7 +20,7 @@ extern char *clone_string(char const *str);
 
 extern int is_op(char *id);
 
-extern FILE *open_file(char *filename, char *mode);
+extern FILE *open_file(char const *filename, char const *mode);
 
 
 /* where do we leave the flags?

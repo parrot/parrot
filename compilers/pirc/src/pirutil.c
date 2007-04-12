@@ -56,7 +56,7 @@ is printed, and the program is terminated.
 
 */
 FILE *
-open_file(char *filename, char *mode) {
+open_file(char const *filename, char const *mode) {
     FILE *file = fopen(filename, mode);
 
     if (file == NULL) {
