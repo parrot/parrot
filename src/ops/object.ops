@@ -565,11 +565,35 @@ op removedoes(invar PMC, in STR) :object_classes {
     goto NEXT();
 }
 
+###############################################################################
+
+=item B<inspect>(out PMC, in PMC)
+
+Sets $1 to a PMC hash of all introspection data available for $2, keyed on
+name.
+
+=item B<inspect>(out PMC, in PMC, in STR)
+
+Sets $1 to a PMC Hash, Array, String, Integer, or Number value with
+introspection information corresponding to the requested string name.
+
+=cut
+
+inline op inspect(out PMC, in PMC) :object_classes {
+  $1 = VTABLE_inspect(interp, $2);
+  goto NEXT();
+}
+
+inline op inspect(out PMC, in PMC, in STR) :object_classes {
+  $1 = VTABLE_inspect_str(interp, $2, $3);
+  goto NEXT();
+}
+
 =back
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2004, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 
 =head1 LICENSE
 

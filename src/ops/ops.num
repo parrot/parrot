@@ -1225,3 +1225,9 @@ stm_wait_ic                    1194
 stm_abort                      1195
 stm_depth_i                    1196
 addrole_p_p                    1197
+inspect_p_p                    1198
+inspect_p_pc                   1199
+inspect_p_p_s                  1200
+inspect_p_pc_s                 1201
+inspect_p_p_sc                 1202
+inspect_p_pc_sc                1203
