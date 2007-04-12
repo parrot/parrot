@@ -11,8 +11,8 @@ YAPP = yapp
 
 all : lib/Regex/Grammar.pm regex-compiler.pbc
 
-lib/Regex/Grammar.pm : lib/Regex/Grammar.y
-	$(YAPP) -s -m Regex::Grammar -o $@ lib/Regex/Grammar.y
+lib/Regex/Grammar.pm : lib/Regex/Grammar.yp
+	$(YAPP) -s -m Regex::Grammar -o $@ lib/Regex/Grammar.yp
 
 regex-compiler.pbc : regex-compiler.pir
 	$(PARROT) -o regex-compiler.pbc regex-compiler.pir
