@@ -134,8 +134,9 @@ create_initial_context(Interp *interp)
      */
 #define INITIAL_FREE_SLOTS 8
     interp->ctx_mem.n_free_slots = INITIAL_FREE_SLOTS;
-    interp->ctx_mem.free_list =
-        mem_sys_allocate(INITIAL_FREE_SLOTS * sizeof (void *));
+    interp->ctx_mem.free_list    =
+        (void **)mem_sys_allocate(INITIAL_FREE_SLOTS * sizeof (void *));
+
     for (i = 0; i < INITIAL_FREE_SLOTS; ++i)
         interp->ctx_mem.free_list[i] = NULL;
     /*
@@ -280,13 +281,15 @@ Parrot_dup_context(Interp *interp, struct Parrot_Context *old)
         interp->ctx_mem.free_list[slot] = *(void **) ptr;
     }
     else {
-        ptr = mem_sys_allocate(reg_alloc + ALIGNED_CTX_SIZE);
+        ptr = (void *)mem_sys_allocate(reg_alloc + ALIGNED_CTX_SIZE);
     }
-    CONTEXT(interp->ctx) = ctx = ptr;
-    ctx->regs_mem_size = reg_alloc;
-    ctx->n_regs_used = old->n_regs_used;
-    diff = (long*)ctx - (long*)old;
-    interp->ctx.bp.regs_i += diff;
+    CONTEXT(interp->ctx) = ctx = (struct Parrot_Context *)ptr;
+
+    ctx->regs_mem_size   = reg_alloc;
+    ctx->n_regs_used     = old->n_regs_used;
+    diff                 = (long*)ctx - (long*)old;
+
+    interp->ctx.bp.regs_i    += diff;
     interp->ctx.bp_ps.regs_s += diff;
     init_context(interp, ctx, old);
     return ctx;
@@ -342,8 +345,9 @@ Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used)
         const int n = slot + 1;
         int i;
 
-        interp->ctx_mem.free_list = mem_sys_realloc(
+        interp->ctx_mem.free_list = (void **)mem_sys_realloc(
                 interp->ctx_mem.free_list, n * sizeof (void*));
+
         for (i = interp->ctx_mem.n_free_slots; i < n; ++i)
             interp->ctx_mem.free_list[i] = NULL;
         interp->ctx_mem.n_free_slots = n;
@@ -366,9 +370,11 @@ Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used)
         fprintf(stderr, "[alloc ctx %p]\n", ptr);
     }
 #endif
-    CONTEXT(interp->ctx) = ctx = ptr;
-    ctx->regs_mem_size = reg_alloc;
-    ctx->n_regs_used = n_regs_used;
+    CONTEXT(interp->ctx) = ctx = (struct Parrot_Context *)ptr;
+
+    ctx->regs_mem_size   = reg_alloc;
+    ctx->n_regs_used     = n_regs_used;
+
     /* regs start past the context */
     p = (void *) ((char *)ptr + ALIGNED_CTX_SIZE);
     /* ctx.bp points to I0, which has Nx at left */
@@ -471,23 +477,24 @@ Parrot_push_regs(Interp *interp)
     size_t size_nip, size_nips;
     void *ptr;
 
-    parrot_context_t * const ctx = CONTEXT(interp->ctx);
+    parrot_context_t * const ctx     = CONTEXT(interp->ctx);
     Stack_Chunk_t **   const chunk_p = &ctx->reg_stack;
-    save_regs_t *      const save_r = stack_prepare_push(interp, chunk_p);
+    save_regs_t *      const save_r  =
+        (save_regs_t *)stack_prepare_push(interp, chunk_p);
 
     save_r->old_bp_ni.regs_i = ctx->bp.regs_i;
     save_r->old_bp_ps.regs_s = ctx->bp_ps.regs_s;
-    save_r->n_regs_str = ctx->n_regs_used[REGNO_STR];
-    save_r->n_regs_pmc = ctx->n_regs_used[REGNO_PMC];
+    save_r->n_regs_str       = ctx->n_regs_used[REGNO_STR];
+    save_r->n_regs_pmc       = ctx->n_regs_used[REGNO_PMC];
 
-    size_nip = _SIZEOF_NUMS + _SIZEOF_INTS + _SIZEOF_PMCS;
+    size_nip  = _SIZEOF_NUMS + _SIZEOF_INTS + _SIZEOF_PMCS;
     size_nips = size_nip + _SIZEOF_STRS;
-    ptr = mem_sys_allocate(size_nips);
+    ptr       = mem_sys_allocate(size_nips);
     memcpy(ptr, (char*)ctx->bp.regs_i - _SIZEOF_NUMS, size_nips);
     interp->ctx.bp_ps.regs_s = ctx->bp_ps.regs_s =
-        save_r->bp_ps.regs_s = (void*) ((char*) ptr + size_nip);
+        save_r->bp_ps.regs_s = (STRING **) ((char*) ptr + size_nip);
     interp->ctx.bp.regs_i = ctx->bp.regs_i =
-        (void*) ((char*) ptr + _SIZEOF_NUMS);
+        (INTVAL *) ((char*) ptr + _SIZEOF_NUMS);
     chunk = *chunk_p;
     PObj_bufstart(chunk) = ptr;
     PObj_buflen  (chunk) = size_nips;
@@ -497,10 +504,11 @@ Parrot_push_regs(Interp *interp)
 void
 Parrot_pop_regs(Interp *interp)
 {
-    parrot_context_t * const ctx = CONTEXT(interp->ctx);
+    parrot_context_t * const ctx     = CONTEXT(interp->ctx);
     Stack_Chunk_t **   const chunk_p = &ctx->reg_stack;
-    Stack_Chunk_t *    const chunk = *chunk_p;
-    save_regs_t *      const save_r = stack_prepare_pop(interp, chunk_p);
+    Stack_Chunk_t *    const chunk   = *chunk_p;
+    save_regs_t *      const save_r  =
+        (save_regs_t *)stack_prepare_pop(interp, chunk_p);
 
     /* restore register base pointers */
     interp->ctx.bp.regs_i    = ctx->bp.regs_i    =

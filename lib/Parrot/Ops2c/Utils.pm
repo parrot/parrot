@@ -843,18 +843,19 @@ static size_t hash_str(const char * str) {
 }
 
 static void store_op(op_info_t *info, int full) {
-    HOP * const p = mem_sys_allocate(sizeof(HOP));
+    HOP * const p     = mem_allocate_typed(HOP);
     const size_t hidx =
         hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
-    p->info = info;
-    p->next = hop[hidx];
+
+    p->info   = info;
+    p->next   = hop[hidx];
     hop[hidx] = p;
 }
 static int get_op(const char * name, int full) {
     HOP * p;
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
     if (!hop) {
-        hop = mem_sys_allocate_zeroed(OP_HASH_SIZE * sizeof(HOP*));
+        hop = (HOP **)mem_sys_allocate_zeroed(OP_HASH_SIZE * sizeof(HOP*));
         hop_init();
     }
     for (p = hop[hidx]; p; p = p->next) {
