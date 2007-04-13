@@ -1325,6 +1325,9 @@ microseconds.
 INTVAL
 PIO_poll(Interp *interp, PMC *pmc, INTVAL which, INTVAL sec, INTVAL usec)
 {
+    if (pmc == PMCNULL) {
+        real_exception(interp, NULL, E_ValueError, "Can't poll NULL pmc");
+    }
     ParrotIOLayer * const l = PMC_struct_val(pmc);
     ParrotIO * const io = PMC_data0(pmc);
     return PIO_poll_down(interp, l, io, which, sec, usec);
