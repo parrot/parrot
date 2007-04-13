@@ -59,7 +59,7 @@ my %type_for_suffix = (
     'dev'          => 'Development documentation',
     'dump'         => 'Dump file',
     'el'           => 'eMacs Lisp code',
-    'exp'          => 'Perl6 expected parse tree',
+    'exp'          => 'Perl 6 expected parse tree',
     'flag'         => 'Some kind of IMCC file',
     'generated'    => 'MANIFEST generated file',
     'h'            => 'C header',
@@ -74,7 +74,7 @@ my %type_for_suffix = (
     'o'            => 'Compiled file',
     'ook'          => 'Ook! code',
     'ops'          => 'Parrot opcode file',
-    'p6'           => 'Perl6 code',
+    'p6'           => 'Perl 6 code',
     'pasm'         => 'Parrot assembly code',
     'pbc'          => 'Parrot bytecode',
     'pl'           => 'Perl script',
@@ -335,7 +335,7 @@ sub title {
     my $text = $self->read;
 
     return ''
-        unless $text =~ /^=head1\s+(?:NAME|TITLE|TITEL)\s*[\n\r]+([^\n\r]+)/smo;
+        unless $text =~ /^=head1\s+(?:NAME|TITLE)\s*[\n\r]+([^\n\r]+)/smo;
 
     $text = $1;
 

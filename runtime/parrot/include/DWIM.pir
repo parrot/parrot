@@ -243,7 +243,7 @@ err_open:
     exit 1
 ok:				# fall through to caller/includer
 
-=head1 TITEL
+=head1 TITLE
 
 Parrot::DWIM - Parrot's confusing opcodes made easy.
 

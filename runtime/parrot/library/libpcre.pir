@@ -1,7 +1,7 @@
 # Copyright (C) 2004-2006, The Perl Foundation.
 # $Id$
 
-=head1 TITEL
+=head1 TITLE
 
 libpcre.pir - NCI interface to Perl-Compatible Regular Expression library
 
