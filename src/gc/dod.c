@@ -49,7 +49,7 @@ Mark a special PMC. If it has a C<PMC_EXT> structure, append or prepend
 the C<next_for_GC> pointer; otherwise, do the custom mark directly.
 
 This should really be inline, so if inline isn't available, it would
-be better if it was a macro.
+be better if it were a macro.
 
 =cut
 
@@ -65,7 +65,7 @@ mark_special(Parrot_Interp interp, PMC* obj)
      * If the object is shared, we have to use the arena and dod
      * pointers of the originating interpreter.
      *
-     * We are possibly changing other interpreter's data here, so
+     * We are possibly changing another interpreter's data here, so
      * the mark phase of DOD must run only on one interpreter of a pool
      * at a time. However, freeing of unused objects can be done in
      * parallel.
@@ -196,7 +196,7 @@ GC.
 =item C<int
 Parrot_dod_trace_root(Interp *interp, int trace_stack)>
 
-Trace the root set. Returns 0 if its a lazy DOD run and all objects
+Trace the root set. Returns 0 if it's a lazy DOD run and all objects
 that need timely destruction were found.
 
 C<trace_stack> can have these values:
@@ -227,7 +227,7 @@ Parrot_dod_trace_root(Interp *interp, int trace_stack)
     }
     if (interp->profile)
         Parrot_dod_profile_start(interp);
-    /* We have to start somewhere, the interpreter globals is a good place */
+    /* We have to start somewhere; the interpreter globals is a good place */
     if (!arena_base->dod_mark_start) {
         arena_base->dod_mark_start = arena_base->dod_mark_ptr =
             interp->iglobals;
@@ -552,9 +552,9 @@ Parrot_dod_sweep(Interp *interp,
 
         for (i = nm = 0; i < cur_arena->used; i++) {
             if (PObj_on_free_list_TEST(b))
-                ; /* if its on free list, do nothing */
+                ; /* if it's on free list, do nothing */
             else if (PObj_live_TEST(b)) {
-                /* its live */
+                /* it's live */
                 total_used++;
                 PObj_live_CLEAR(b);
                 PObj_get_FLAGS(b) &= ~PObj_custom_GC_FLAG;
@@ -629,7 +629,7 @@ Parrot_dod_sweep(Interp *interp,
                 else {
 #ifdef GC_IS_MALLOC
                     /* free allocated space at (int*)bufstart - 1,
-                     * but not if it is used COW or external
+                     * but not if it used COW or is external
                      */
                     if (PObj_bufstart(b) &&
                             !PObj_is_external_or_free_TESTALL(b)) {
