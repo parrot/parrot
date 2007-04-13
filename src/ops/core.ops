@@ -107,7 +107,7 @@ inline op noop() :base_core {
 inline op cpu_ret() {
 #ifdef __GNUC__
 #  ifdef I386
-    asm("ret");
+    __asm__("ret");
 #  endif
 #endif
     goto NEXT();
