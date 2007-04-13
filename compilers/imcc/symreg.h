@@ -143,7 +143,7 @@ typedef enum {
     P_LOAD           = SUB_FLAG_PF_LOAD,      /* 1<<5 0x20 - private5 */
     P_IMMEDIATE      = SUB_FLAG_PF_IMMEDIATE, /* 1<<6 0x40 - private6 */
     P_POSTCOMP       = SUB_FLAG_PF_POSTCOMP,  /* 1<<7 0x80 - private7 */
-    P_INIT           = SUB_COMP_FLAG_PF_INIT, /* 1<<10 0x400 - 10 */
+    P_INIT           = SUB_COMP_FLAG_PF_INIT  /* 1<<10 0x400 - 10 */
 } pragma_enum_t;
 
 typedef enum {

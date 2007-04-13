@@ -108,7 +108,7 @@ struct call_state {
 
 typedef enum arg_pass_t {
     PARROT_PASS_PARAMS          = 0x00,
-    PARROT_PASS_RESULTS         = 0x01,
+    PARROT_PASS_RESULTS         = 0x01
 } arg_pass_t;
 
 PARROT_API int Parrot_init_arg_indexes_and_sig_pmc(Interp *interp, parrot_context_t *ctx,
