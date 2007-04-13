@@ -8,12 +8,77 @@ src/pmc/class.pmc - defines a class
 
 =head1 DESCRIPTION
 
-This class implements the basic Parrot class PMC, used for describing a
-class.
+This class implements the Class PMC, as outlined in
+F<docs/pdds/pdd15_objects.pod>.
 
-=head2 Functions
+Class is not derived from any other PMC.
+
+=head2 Structure
+
+The Role PMC structure (C<Parrot_Role>) consists of five items:
 
 =over 4
+
+=item C<name>
+
+The name of the class -- a STRING.
+An empty STRING is allocated during initialization.
+
+=item C<namespace>
+
+The namespace the class is associated with, if any.
+A Null PMC is allocated during initialization.
+
+=item C<instantiated>
+
+A flag denoting whether this class has been instantiated since last modification.
+A native integer with value zero is allocated during initialization.
+
+=item C<parents>
+
+An array of immediate parent classes.
+An empty ResizablePMCArray PMC is allocated during initialization.
+
+=item C<all_parents>
+
+A cached array of ourself and all parent classes, in MRO order.
+A ResizablePMCArray PMC is allocated during initialization,
+and is populated with the current class.
+
+=item C<roles>
+
+An array of the roles this class has been composed from.
+An empty ResizablePMCArray PMC is allocated during initialization.
+
+=item C<methods>
+
+A directory of method names and method bodies this class provides.
+An empty Hash PMC is allocated during initialization.
+
+=item C<vtable_methods>
+
+A directory of vtable method names and method bodies this class overrides.
+An empty Hash PMC is allocated during initialization.
+
+=item C<attrib_metadata>
+
+A directory of attribute names and attribute metadata this class contains.
+An empty Hash PMC is allocated during initialization.
+
+=item C<attrib_index>
+
+A lookup table for attributes in this class and parents.
+A Null PMC is allocated during initialization.
+
+=item C<attrib_cache>
+
+A cache of visible attribute names to attribute indexes.
+A Null PMC is allocated during initialization.
+
+=item C<resolve_method>
+
+A list of method names the class provides used for name conflict resolution.
+An empty ResizablePMCArray PMC is allocated during initialization.
 
 =cut
 
@@ -66,6 +131,7 @@ static STRING* get_fq_classname(Parrot_Interp interp, Parrot_Class *class_info) 
     return fq_class;
 }
 
+
 /* This function builds the attribute index (table to map class name and
  * attribute name to an index) for the current class. */
 static void build_attrib_index(Parrot_Interp interp, PMC *self) {
@@ -111,18 +177,33 @@ static void build_attrib_index(Parrot_Interp interp, PMC *self) {
 }
 
 
-pmclass Class need_ext {
+/*
+
+=back
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+pmclass Class
+    need_ext {
+
+
 /*
 
 =item C<void init()>
 
-Initializes the class.
+Initializes a Class PMC.
 
 =item C<void init_pmc(PMC *name)>
 
-The actual class creation code, called from C<newclass> opcode. The C<init>
-argument should stringify to the C<classname>. The class will be attatched to
-the current namespace.
+The actual class creation code, called from C<newclass> opcode.
+The C<init> argument must stringify to the name of the class.
+The class is attatched to the current namespace.
 
 =cut
 
@@ -131,31 +212,32 @@ the current namespace.
     void init() {
         Parrot_Class *class = NULL;
 
-        /* Custom DOD mark and destroy. */
+        /* Set flags for custom DOD mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 
         /* We are a class. */
         PObj_is_class_SET(SELF);
 
-        /* Init the class object. */
-        class = mem_sys_allocate_zeroed(sizeof(Parrot_Class));
-        class->name = CONST_STRING(interp, "");
-        class->namespace = PMCNULL;
-        class->parents = pmc_new(interp, enum_class_ResizablePMCArray);
-        class->all_parents = pmc_new(interp, enum_class_ResizablePMCArray);
-        class->roles = pmc_new(interp, enum_class_ResizablePMCArray);
-        class->methods = pmc_new(interp, enum_class_Hash);
-        class->vtable_methods = pmc_new(interp, enum_class_Hash);
+        /* Set up the object. */
+        class                  = mem_sys_allocate_zeroed(sizeof(Parrot_Class));
+        class->name            = CONST_STRING(interp, "");
+        class->namespace       = PMCNULL;
+        class->instantiated    = 0;
+        class->parents         = pmc_new(interp, enum_class_ResizablePMCArray);
+        class->all_parents     = pmc_new(interp, enum_class_ResizablePMCArray);
+        class->roles           = pmc_new(interp, enum_class_ResizablePMCArray);
+        class->methods         = pmc_new(interp, enum_class_Hash);
+        class->vtable_methods  = pmc_new(interp, enum_class_Hash);
         class->attrib_metadata = pmc_new(interp, enum_class_Hash);
-        class->attrib_index = PMCNULL;
-        class->attrib_cache = PMCNULL;
-        class->resolve_method = pmc_new(interp, enum_class_ResizablePMCArray);
+        class->attrib_index    = PMCNULL;
+        class->attrib_cache    = PMCNULL;
+        class->resolve_method  = pmc_new(interp, enum_class_ResizablePMCArray);
 
         /* We put ourself on the all parents list. */
         VTABLE_push_pmc(interp, class->all_parents, SELF);
 
-        PMC_data(SELF) = class;
+        PMC_data(SELF)         = class;
     }
 
     void init_pmc(PMC* name) {
@@ -165,33 +247,38 @@ the current namespace.
         SELF.init();
 
         /* Set name and namespace. */
-        class = PARROT_CLASS(SELF);
-        class->name = VTABLE_get_string(interp, name);
+        class            = PARROT_CLASS(SELF);
+        if (!PMC_IS_NULL(name))
+            class->name  = VTABLE_get_string(interp, name);
         class->namespace = CONTEXT(interp->ctx)->current_namespace;
     }
+
 
 /*
 
 =item C<void destroy()>
 
-Free the memory associated with the underlying struct.
+Free the memory associated with the object's underlying struct.
 
 =cut
 
 */
+
     void destroy() {
             mem_sys_free(PMC_data(SELF));
     }
+
 
 /*
 
 =item C<void mark()>
 
-Mark any referenced strings and PMCs.
+Mark any referenced strings and PMCs in the structure as live.
 
 =cut
 
 */
+
     void mark() {
         Parrot_Class *class = PARROT_CLASS(SELF);
         if (class->name)
@@ -218,15 +305,20 @@ Mark any referenced strings and PMCs.
             pobject_lives(interp, (PObj*)class->resolve_method);
     }
 
+
 /*
 
 =item C<void add_attribute(STRING *name, PMC *type)>
 
-Adds the given attribute with an optional type.
+Adds the given attribute (C<name>) with an optional C<type>.
+Creates a new class if the current class has been instantiated.
+Enters the attribute in the C<attributes> array.
+Returns an error if an attribute of C<name> already exists.
 
 =cut
 
 */
+
     void add_attribute(STRING *name, PMC *type)
     {
         Parrot_Class *class = PARROT_CLASS(SELF);

@@ -8,11 +8,41 @@ src/pmc/role.pmc - Role - defines a role
 
 =head1 DESCRIPTION
 
-This class implements the basic Parrot role PMC, for defining a role.
+This class implements the Role PMC, a unit of class composition as outlined in
+F<docs/pdds/pdd15_objects.pod>.
 
-=head2 Functions
+Role is not derived from any other PMC.
+
+=head2 Structure
+
+The Role PMC structure (C<Parrot_Role>) consists of five items:
 
 =over 4
+
+=item C<name>
+
+The name of the role -- a STRING.
+An empty STRING is allocated during initialization.
+
+=item C<namespace>
+
+The namespace the role is associated with, if any.
+A Null PMC is allocated during initialization.
+
+=item C<roles>
+
+The list of roles from which this role is composed, if any.
+An empty ResizablePMCArray is allocated during initialization.
+
+=item C<methods>
+
+The directory of method names and methods this role implements.
+An empty Hash PMC is allocated during initialization.
+
+=item C<attrib_metadata>
+
+The directory of attribute names and attribute metadata this role contains.
+An empty Hash PMC is allocated during initialization.
 
 =cut
 
@@ -20,7 +50,6 @@ This class implements the basic Parrot role PMC, for defining a role.
 
 #include "parrot/parrot.h"
 #define PARROT_ROLE(o) ((Parrot_Role *) PMC_data(o))
-
 
 /* This is the underlying structure of this PMC. */
 typedef struct Parrot_Role {
@@ -32,18 +61,33 @@ typedef struct Parrot_Role {
 } Parrot_Role;
 
 
-pmclass Role need_ext {
+/*
+
+=back
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+pmclass Role
+    need_ext {
+
+
 /*
 
 =item C<void init()>
 
-Initializes the role.
+Initializes a Role PMC.
 
 =item C<void init_pmc(PMC *name)>
 
-The actual role creation code, called from C<newrole> opcode. The C<init>
-argument should stringify to the name of the role. The role will be attatched
-to the current namespace.
+The actual role creation code, called from C<newrole> opcode.
+The C<init> argument must stringify to the name of the role.
+The role is attatched to the current namespace.
 
 =cut
 
@@ -52,55 +96,61 @@ to the current namespace.
     void init() {
         Parrot_Role *role = NULL;
 
-        /* Custom DOD mark and destroy. */
+        /* Set flags for custom DOD mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 
-        /* Init the role object. */
-        role = mem_sys_allocate_zeroed(sizeof(Parrot_Role));
-        role->name = CONST_STRING(interp, "");
-        role->namespace = PMCNULL;
-        role->roles = pmc_new(interp, enum_class_ResizablePMCArray);
-        role->methods = pmc_new(interp, enum_class_Hash);
+        /* Set up the object. */
+        role                  = mem_sys_allocate_zeroed(sizeof (Parrot_Role));
+        role->name            = CONST_STRING(interp, "");
+        role->namespace       = PMCNULL;
+        role->roles           = pmc_new(interp, enum_class_ResizablePMCArray);
+        role->methods         = pmc_new(interp, enum_class_Hash);
         role->attrib_metadata = pmc_new(interp, enum_class_Hash);
-
-        PMC_data(SELF) = role;
+        PMC_data(SELF)        = role;
     }
 
     void init_pmc(PMC* name) {
         Parrot_Role *role = NULL;
+        STRING *s_name;
 
         /* Set up the role. */
         SELF.init();
 
+
         /* Set name and namespace. */
-        role = PARROT_ROLE(SELF);
-        role->name = VTABLE_get_string(interp, name);
+        role            = PARROT_ROLE(SELF);
+        if (!PMC_IS_NULL(name))
+            role->name  = VTABLE_get_string(interp, name);
         role->namespace = CONTEXT(interp->ctx)->current_namespace;
     }
+
 
 /*
 
 =item C<void destroy()>
 
-Free the memory associated with the underlying struct.
+Free the memory associated with the object's underlying struct.
 
 =cut
 
 */
+
     void destroy() {
             mem_sys_free(PMC_data(SELF));
     }
+
 
 /*
 
 =item C<void mark()>
 
-Mark any referenced strings and PMCs.
+Mark referenced strings and PMCs in the structure as live.
 
 =cut
 
 */
+
     void mark() {
         Parrot_Role *role = PARROT_ROLE(SELF);
         if (role->name)
@@ -115,17 +165,19 @@ Mark any referenced strings and PMCs.
             pobject_lives(interp, (PObj*)role->attrib_metadata);
     }
 
+
 /*
 
 =item C<void add_attribute(STRING *name, PMC *type)>
 
 Adds the given attribute with an optional type.
+Enters the attribute in the C<attributes> array.
 
 =cut
 
 */
-    void add_attribute(STRING *name, PMC *type)
-    {
+
+    void add_attribute(STRING *name, PMC *type) {
         Parrot_Role *role = PARROT_ROLE(SELF);
         PMC *new_attribute = pmc_new(interp, enum_class_Hash);
 
@@ -141,6 +193,7 @@ Adds the given attribute with an optional type.
         VTABLE_set_pmc_keyed_str(interp, role->attrib_metadata, name, new_attribute);
     }
 
+
 /*
 
 =item C<void add_method(STRING *name, PMC *sub)>
@@ -150,8 +203,8 @@ Adds the given sub PMC as a method with the given name.
 =cut
 
 */
-    void add_method(STRING *name, PMC *sub)
-    {
+
+    void add_method(STRING *name, PMC *sub) {
         Parrot_Role *role = PARROT_ROLE(SELF);
 
         /* If we have already added a method with this name... */
@@ -166,6 +219,7 @@ Adds the given sub PMC as a method with the given name.
         }
     }
 
+
 /*
 
 =item C<void add_role(PMC *role)>
@@ -176,18 +230,19 @@ conflicts.
 =cut
 
 */
-    void add_role(PMC *role)
-    {
+
+    void add_role(PMC *role) {
         Parrot_Role *this_role = PARROT_ROLE(SELF);
 
         /* Do the composition. */
         Parrot_ComposeRole(interp, role, PMCNULL, 0, PMCNULL, 0,
-                           this_role->methods, this_role->roles);
+               this_role->methods, this_role->roles);
     }
+
 
 /*
 
-=item C<PMC* inspect_str(STRING *what)>
+=item C<PMC *inspect_str(STRING *what)>
 
 Provides introspection of a specific piece of information about the role. The
 available information is:
@@ -211,8 +266,8 @@ composed into this role.
 =cut
 
 */
-    PMC* inspect_str(STRING *what)
-    {
+
+    PMC* inspect_str(STRING *what) {
         Parrot_Role *role = PARROT_ROLE(SELF);
 
         /* What should we return? */
@@ -242,16 +297,19 @@ composed into this role.
         return VTABLE_clone(interp, found);
     }
 
+
 /*
 
-=item C<PMC* inspect()>
+=item C<PMC *inspect()>
 
 Returns a Hash describing the role, with key/value pairs as described in
 inspect_str.
 
+=cut
+
 */
-    PMC* inspect()
-    {
+
+    PMC* inspect() {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
         PMC *metadata = pmc_new(interp, enum_class_Hash);
@@ -268,21 +326,30 @@ inspect_str.
         return metadata;
     }
 
-    /* **********************************************************************
-    /* Below here are non-vtable methods that eventually will go in a role
+    /*
+     * Below here are non-vtable methods that eventually will go in a role
      * that is composed into here to optionally give a nice interface from
      * PIR (ParrotRole isa Role does RoleMethods or something like this).
-     * **********************************************************************/
+     */
+
 
 /*
 
-=item C<void name()>
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<PCCMETHOD void
+    name(STRING *name :optional, int got_name :opt_flag)>
 
 Sets the name of the role.
 
 =cut
 
 */
+
     PCCMETHOD void name(STRING *name :optional, int got_name :opt_flag) {
         Parrot_Role *role = PARROT_ROLE(SELF);
         STRING *ret_name = NULL;
@@ -296,9 +363,11 @@ Sets the name of the role.
         PCCRETURN(STRING *ret_name);
     }
 
+
 /*
 
-=item C<void namespace()>
+=item C<PCCMETHOD void
+    namespace(PMC *namespace :optional, int got_name :opt_flag)>
 
 With a parameter, sets the namespace for the role. Expects a fully
 qualified namespace to be specified as a key. If you already have linked another
@@ -308,6 +377,7 @@ specified will be linked to this role.
 =cut
 
 */
+
     PCCMETHOD void namespace(PMC *namespace :optional, int got_name :opt_flag) {
         Parrot_Role *role = PARROT_ROLE(SELF);
         PMC *ret_namespace = NULL;
@@ -339,16 +409,14 @@ specified will be linked to this role.
             }
 
             /* Check namespace is a key. */
-            if (namespace->vtable->base_type != enum_class_Key)
-            {
+            if (namespace->vtable->base_type != enum_class_Key) {
                 real_exception(interp, NULL, E_NameError, "Namespace must be a key");
                 return;
             }
 
             /* If we already have a namespace, it shouldn't refer to the
                role any more. */
-            if (role->namespace)
-            {
+            if (role->namespace) {
                 PMC *role_ns = role->namespace;
                 PCCINVOKE(interp, role_ns, "set_class", PMC* PMCNULL);
             }
@@ -367,9 +435,11 @@ specified will be linked to this role.
         PCCRETURN(PMC *ret_namespace);
     }
 
+
 /*
 
-=item C<void attributes()>
+=item C<PCCMETHOD void
+    attributes()>
 
 Return a hash where the keys are attribute names and the values are hashes
 providing a set of key/value pairs describing the attribute.
@@ -386,7 +456,9 @@ providing a set of key/value pairs describing the attribute.
 
 /*
 
-=item C<void add_attribute()>
+=item C<PCCMETHOD void
+    add_attribute(STRING *attribute_name,
+            PMC* attribute_type :optional, int got_type :opt_flag)>
 
 Add an attribute to the role. Requires a name and, optionally, a type.
 
@@ -399,9 +471,11 @@ Add an attribute to the role. Requires a name and, optionally, a type.
             got_type ? attribute_type : PMCNULL);
     }
 
+
 /*
 
-=item C<void methods()>
+=item C<PCCMETHOD void
+    methods()>
 
 Return a hash where the keys are method names and the values are methods.
 
@@ -410,27 +484,30 @@ Return a hash where the keys are method names and the values are methods.
 */
     PCCMETHOD void methods() {
         PMC *ret_methods = VTABLE_inspect_str(interp, SELF,
-            CONST_STRING(interp, "methods"));
+                CONST_STRING(interp, "methods"));
         PCCRETURN(PMC *ret_methods);
     }
 
+
 /*
 
-=item C<void add_method(STRING *name, PMC *sub)>
+=item C<PCCMETHOD void
+    add_method(STRING *name, PMC *sub)>
 
 Adds the given sub PMC as a method with the given name.
 
 =cut
 
 */
-    PCCMETHOD void add_method(STRING *name, PMC *sub)
-    {
+    PCCMETHOD void add_method(STRING *name, PMC *sub) {
         VTABLE_add_method(interp, SELF, name, sub);
     }
 
+
 /*
 
-=item C<void roles()>
+=item C<PCCMETHOD void
+    roles()>
 
 Return the roles array PMC.
 
@@ -443,10 +520,15 @@ Return the roles array PMC.
         PCCRETURN(PMC *ret_roles);
     }
 
+
 /*
 
-=item C<void add_role(PMC* role, PMC* exclude :optional :named["exclude"],
-PMC* alias :optional :named["alias"])>
+=item C<PCCMETHOD void
+    add_role(PMC* role,
+            PMC* exclude_method :optional :named["exclude_method"],
+            int got_exclude_method :opt_flag,
+            PMC* alias_method :optional :named["alias_method"],
+            int got_alias_method :opt_flag)>
 
 Compose the given role into this one, using the given exclusions and aliases.
 
@@ -464,11 +546,17 @@ Compose the given role into this one, using the given exclusions and aliases.
                            role_info->methods, role_info->roles);
     }
 
-} /* END pmclass */
+} /* end pmclass Role */
+
 
 /*
 
 =back
+
+=head1 STABILITY
+
+Unstable. This PMC is under active development; major portions of the
+interface have not yet been completed.
 
 =head1 SEE ALSO
 
