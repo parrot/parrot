@@ -307,7 +307,7 @@ sub print_head {
  * helper funcs - get argument n
  */
 static INTVAL
-get_nci_I(Interp *interp, struct call_state *st, int n)
+get_nci_I(Interp *interp, call_state *st, int n)
 {
     if (n >= st->src.n) {
         real_exception(interp, NULL, E_ValueError,
@@ -319,7 +319,7 @@ get_nci_I(Interp *interp, struct call_state *st, int n)
 }
 
 static FLOATVAL
-get_nci_N(Interp *interp, struct call_state *st, int n)
+get_nci_N(Interp *interp, call_state *st, int n)
 {
     if (n >= st->src.n) {
         real_exception(interp, NULL, E_ValueError,
@@ -331,9 +331,9 @@ get_nci_N(Interp *interp, struct call_state *st, int n)
 }
 
 static STRING*
-get_nci_S(Interp *interp, struct call_state *st, int n)
+get_nci_S(Interp *interp, call_state *st, int n)
 {
-    /* TODO or act like below? */ 
+    /* TODO or act like below? */
     if (n >= st->src.n) {
         real_exception(interp, NULL, E_ValueError,
                     "too few arguments passed to NCI function");
@@ -344,7 +344,7 @@ get_nci_S(Interp *interp, struct call_state *st, int n)
 }
 
 static PMC*
-get_nci_P(Interp *interp, struct call_state *st, int n)
+get_nci_P(Interp *interp, call_state *st, int n)
 {
     /*
      * exessive args are passed as NULL
@@ -367,7 +367,7 @@ get_nci_P(Interp *interp, struct call_state *st, int n)
  * set return value
  */
 static void
-set_nci_I(Interp *interp, struct call_state *st, INTVAL val)
+set_nci_I(Interp *interp, call_state *st, INTVAL val)
 {
     Parrot_init_ret_nci(interp, st, "I");
     UVal_int(st->val) = val;
@@ -376,7 +376,7 @@ set_nci_I(Interp *interp, struct call_state *st, INTVAL val)
 }
 
 static void
-set_nci_N(Interp *interp, struct call_state *st, FLOATVAL val)
+set_nci_N(Interp *interp, call_state *st, FLOATVAL val)
 {
     Parrot_init_ret_nci(interp, st, "N");
     UVal_num(st->val) = val;
@@ -385,7 +385,7 @@ set_nci_N(Interp *interp, struct call_state *st, FLOATVAL val)
 }
 
 static void
-set_nci_S(Interp *interp, struct call_state *st, STRING *val)
+set_nci_S(Interp *interp, call_state *st, STRING *val)
 {
     Parrot_init_ret_nci(interp, st, "S");
     UVal_str(st->val) = val;
@@ -394,7 +394,7 @@ set_nci_S(Interp *interp, struct call_state *st, STRING *val)
 }
 
 static void
-set_nci_P(Interp *interp, struct call_state *st, PMC* val)
+set_nci_P(Interp *interp, call_state *st, PMC* val)
 {
     Parrot_init_ret_nci(interp, st, "P");
     UVal_pmc(st->val) = val;
@@ -524,7 +524,7 @@ sub print_function {
     $other_decl ||= "";
 
     $other_decl .= join( "\n    ", @{$temps_ref} );
-    my $call_state      = 'struct call_state st;';
+    my $call_state      = 'call_state st;';
     my $extra_preamble  = join( "\n    ", @{$extra_preamble_ref} );
     my $extra_postamble = join( "\n    ", @{$extra_postamble_ref} );
     my $return_data =
