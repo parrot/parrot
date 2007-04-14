@@ -177,6 +177,94 @@ static void build_attrib_index(Parrot_Interp interp, PMC *self) {
 }
 
 
+/* Takes a hash and initializes the class based on it. */
+static void init_class_from_hash(Parrot_Interp interp, PMC *self, PMC *info)
+{
+    Parrot_Class *class = PARROT_CLASS(self);
+    int have_name, have_ns;
+    PMC *old_ns;
+
+    /* Ensure we actually have some initialization info. */
+    if (PMC_IS_NULL(info))
+        return;
+
+    /* Check if we have a name and/or a namespace. */
+    have_name = VTABLE_exists_keyed_str(interp, info,
+        string_from_const_cstring(interp, "name", 0));
+    have_ns = VTABLE_exists_keyed_str(interp, info,
+        string_from_const_cstring(interp, "namespace", 0));
+
+    /* Take a copy of the current namespace the class is attached to. */
+    old_ns = class->namespace;
+
+    /* Otherwise, let's roll! If we have a namespace and a name, set both. */
+    if (have_name && have_ns) {
+        /* If we weren't passed a NameSpace PMC, assume it's something we have
+         * to look one up with and do so. */
+        PMC *namespace = VTABLE_get_pmc_keyed_str(interp, info,
+            string_from_const_cstring(interp, "namespace", 0));
+        if (!VTABLE_isa(interp, namespace, string_from_const_cstring(interp, "NameSpace", 0)))
+            namespace = Parrot_make_namespace_autobase(interp, namespace);
+
+        /* If we get something null back it's an error; otherwise, store it. */
+        if (!PMC_IS_NULL(namespace))
+            class->namespace = namespace;
+        else
+            real_exception(interp, NULL, E_NameError, "Namespace not found");
+
+        /* Set a (string) name. */
+        class->name = VTABLE_get_string_keyed_str(interp, info,
+            string_from_const_cstring(interp, "name", 0));
+    }
+
+    /* Otherwise, we may just have a name. */
+    else if (have_name) {
+        /* Set the name. */
+        class->name = VTABLE_get_string_keyed_str(interp, info,
+            string_from_const_cstring(interp, "name", 0));
+
+        /* Namespace is nested in the current namespace and with the name of
+         * the class. */
+        class->namespace = Parrot_make_namespace_keyed_str(interp,
+            CONTEXT(interp->ctx)->current_namespace, class->name);
+    }
+
+    /* Otherwise, we may just have a namespace. */
+    else if (have_ns) {
+        /* If we weren't passed a NameSpace PMC, assume it's something we have
+         * to look one up with and do so. */
+        PMC *namespace = VTABLE_get_pmc_keyed_str(interp, info,
+            string_from_const_cstring(interp, "namespace", 0));
+        if (!VTABLE_isa(interp, namespace, string_from_const_cstring(interp, "NameSpace", 0)))
+            namespace = Parrot_make_namespace_autobase(interp, namespace);
+
+        /* If we get something null back it's an error; otherwise, store it. */
+        if (!PMC_IS_NULL(namespace))
+            class->namespace = namespace;
+        else
+            real_exception(interp, NULL, E_NameError, "Namespace not found");
+
+        /* Name is that of the most nested part of the namespace. */
+        class->name = VTABLE_get_string(interp, namespace);
+    }
+
+    /* If we were attached to a namespce and are now attached to a new one,
+     * need to unset ourselves in the old namespace. */
+    if (!PMC_IS_NULL(old_ns) && class->namespace != old_ns)
+        Parrot_PCCINVOKE(interp, old_ns,
+            string_from_const_cstring(interp, "set_class", 0),
+            "P->", PMCNULL);
+
+    /* Link namespace to this class, if there is one. */
+    if (!PMC_IS_NULL(class->namespace))
+        Parrot_PCCINVOKE(interp, class->namespace,
+            string_from_const_cstring(interp, "set_class", 0),
+            "P->", self);
+
+    /* XXX TODO: initialize resolve, parents, roles, attributes, methods. */
+}
+
+
 /*
 
 =back
@@ -240,17 +328,14 @@ The class is attatched to the current namespace.
         PMC_data(SELF)         = class;
     }
 
-    void init_pmc(PMC* name) {
+    void init_pmc(PMC* init_data) {
         Parrot_Class *class = NULL;
 
         /* Set up the object. */
         SELF.init();
-
-        /* Set name and namespace. */
-        class            = PARROT_CLASS(SELF);
-        if (!PMC_IS_NULL(name))
-            class->name  = VTABLE_get_string(interp, name);
-        class->namespace = CONTEXT(interp->ctx)->current_namespace;
+        
+        /* Initialize the class with the supplied data. */
+        init_class_from_hash(interp, SELF, init_data);
     }
 
 
@@ -478,7 +563,8 @@ Array of Class PMCs representing the direct parents of this class.
             VTABLE_set_string_native(interp, found, class->name);
         }
         else if (string_equal(interp, what, CONST_STRING(interp, "namespace")) == 0) {
-            found = class->namespace;
+            /* Should not clone this. */
+            return class->namespace;
         }
         else if (string_equal(interp, what, CONST_STRING(interp, "attributes")) == 0) {
             found = class->attrib_metadata;
@@ -561,66 +647,17 @@ Sets the name of the class.
 
 /*
 
-=item C<void namespace(PMC *namespace :optional, int got_name :opt_flag)>
+=item C<void namespace()>
 
-With a parameter, sets the namespace for the class. Expects a fully
-qualified namespace to be specified as a key. If you already have linked another
-namespace with this class, this link will be broken and the new namespace
-specified will be linked to this class.
+Gets the namespace that this class is attached to.
 
 =cut
 
 */
     PCCMETHOD void namespace(PMC *namespace :optional, int got_name :opt_flag) {
         Parrot_Class *class = PARROT_CLASS(SELF);
-        PMC *ret_namespace = NULL;
-
-        if (got_name) {
-            /* If namespace is a key or a string, need to look it up. */
-            switch (namespace->vtable->base_type) {
-                case enum_class_NameSpace:
-                    /* It's fine, don't need to do anything. */
-                    break;
-                case enum_class_Key:
-                    /* Look it up relative to HLL base. */
-                    namespace = Parrot_get_namespace_keyed(interp,
-                        interp->HLL_namespace, namespace);
-                    if (PMC_IS_NULL(namespace))
-                        real_exception(interp, NULL, E_NameError, "Namespace cannot be found");
-                    break;
-                case enum_class_String:
-                    /* Look it up relative to current namespace. */
-                    namespace = Parrot_get_namespace_keyed_str(interp,
-                        CONTEXT(interp->ctx)->current_namespace,
-                        VTABLE_get_string(interp, namespace));
-                    if (PMC_IS_NULL(namespace))
-                        real_exception(interp, NULL, E_NameError, "Namespace cannot be found");
-                    break;
-                default:
-                    /* Don't know what to do with it. */
-                    real_exception(interp, NULL, E_NameError, "Namespace must be a key");
-            }
-
-            /* If we already have a namespace, it shouldn't refer to the
-               class any more. */
-            if (class->namespace)
-            {
-                PMC *class_ns = class->namespace;
-                PCCINVOKE(interp, class_ns, "set_class", PMC* PMCNULL);
-            }
-
-            /* Set namespace. */
-            class->namespace = Parrot_get_namespace_keyed(interp,
-                interp->HLL_namespace, namespace);
-
-            /* Link namespace to this class. */
-            PCCINVOKE(interp, namespace, "set_class", PMC* SELF);
-
-            /* XXX Get methods from the namespace we were linked to. */
-        }
-
-        ret_namespace = class->namespace;
-        PCCRETURN(PMC *ret_namespace);
+        PMC *ret_namespace = class->namespace;
+        PCCRETURN(PMC *ret_namespace);        
     }
 
 /*
