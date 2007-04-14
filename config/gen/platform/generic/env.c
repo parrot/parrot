@@ -6,6 +6,9 @@
 ** Parrot_setenv()
 */
 
+#include <stdlib.h>
+#include <string.h>
+
 void
 Parrot_setenv(const char *name, const char *value)
 {

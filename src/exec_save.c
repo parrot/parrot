@@ -21,6 +21,7 @@ Save the C<Parrot_exec_objfile_t> to the native format.
 #include <parrot/parrot.h>
 #include "parrot/exec.h"
 #include "exec_save.h"
+#include <strings.h>
 
 static void save_zero(FILE *fp);
 static void save_int(FILE *fp, int i);

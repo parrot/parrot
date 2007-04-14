@@ -196,7 +196,7 @@ static void
 push_ascii_pmc(Parrot_Interp interp, IMAGE_IO *io, const PMC* v)
 {
     char buffer[128];
-    sprintf(buffer, "%p ", v);
+    sprintf(buffer, "%p ", (const void *)v);
     str_append(interp, io->image, buffer, strlen(buffer));
 }
 

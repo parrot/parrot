@@ -509,7 +509,7 @@ op tell(out INT, out INT, invar PMC) :base_io {
   if ($3) {
     PIOOFF_T pos;
     pos = PIO_tell(interp, $3);
-    $1 = (INTVAL)(pos >> 32);
+    $1 = (INTVAL)(pos >> 31);
     $2 = (INTVAL)(pos & 0xffffffff);
   }
   goto NEXT();
