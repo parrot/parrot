@@ -546,6 +546,28 @@ Compose the given role into this one, using the given exclusions and aliases.
                            role_info->methods, role_info->roles);
     }
 
+/*
+
+=item C<void inspect(STRING *what :optional)>
+
+Gets all introspection data for the role or, if the optional string
+parameter is supplied, a particular item of introspection data.
+
+=cut
+
+*/
+    PCCMETHOD void inspect(STRING *what :optional, int got_what :opt_flag) {
+        PMC *found;
+
+        /* Just delegate to the appropriate vtable method. */
+        if (got_what)
+            found = VTABLE_inspect_str(interp, SELF, what);
+        else
+            found = VTABLE_inspect(interp, SELF);
+
+        PCCRETURN(PMC *found);
+    }
+
 } /* end pmclass Role */
 
 

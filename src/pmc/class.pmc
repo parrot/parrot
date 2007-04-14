@@ -854,6 +854,28 @@ Compose a role into a class with the given exclusions and aliases.
 
 /*
 
+=item C<void inspect(STRING *what :optional)>
+
+Gets all introspection data for the class or, if the optional string
+parameter is supplied, a particular item of introspection data.
+
+=cut
+
+*/
+    PCCMETHOD void inspect(STRING *what :optional, int got_what :opt_flag) {
+        PMC *found;
+
+        /* Just delegate to the appropriate vtable method. */
+        if (got_what)
+            found = VTABLE_inspect_str(interp, SELF, what);
+        else
+            found = VTABLE_inspect(interp, SELF);
+
+        PCCRETURN(PMC *found);
+    }
+
+/*
+
 =item C<void _get_attrib_index()>
 
 This finds the index of an attribute in an object's attribute store and
