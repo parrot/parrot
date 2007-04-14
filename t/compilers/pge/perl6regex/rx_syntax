@@ -26,3 +26,5 @@
 [a|?]		abcdef		/Quantifier follows nothing/	bare ? after |
 [a| ?]		abcdef		/Quantifier follows nothing/	bare ? after |+sp
 
+		abcdef		/Null pattern illegal/		null pattern
+  		abcdef		/Null pattern illegal/		ws null pattern

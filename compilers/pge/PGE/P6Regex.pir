@@ -93,6 +93,7 @@ or the resulting PIR code (target='PIR').
     ##   Let's parse the source as a regex
     $P0 = get_hll_global ['PGE::Grammar'], 'regex'
     match = $P0(source, adverbs :flat :named)
+    if source == '' goto err_null
     if target != 'parse' goto check
     .return (match)
 
@@ -112,8 +113,12 @@ or the resulting PIR code (target='PIR').
     $P0 = new .Hash
     pad['lexscope'] = $P0
     exp = exp.'p6exp'(pad)
-
+    if null exp goto err_null
     .return exp.'compile'(adverbs :flat :named)
+
+  err_null:
+    $I0 = match.'from'()
+    'parse_error'(match, $I0, 'Null pattern illegal')
 .end
 
 

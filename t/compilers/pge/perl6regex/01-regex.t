@@ -320,7 +320,6 @@ Description of the test.
     if tab_number >= $I0 goto bad_line
     pattern     = $P1[tab_number]
     inc tab_number
-    if pattern == '' goto get_pattern
   get_target:
     if tab_number >= $I0 goto bad_line
     target      = $P1[tab_number]
