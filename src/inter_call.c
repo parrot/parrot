@@ -1411,17 +1411,18 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
 
     /* second loop through signature to build all index and arg_flag
      * loop also assigns args(up to the ->) to registers */
+    index = -1;
+    seen_arrow = 0;
 
     /* account for passing invocant in-band */
     if (pmc) {
         indexes[0][0] = 0;
         VTABLE_set_integer_keyed_int(interp, sigs[0], 0, PARROT_ARG_PMC);
         CTX_REG_PMC(ctx, 0) = pmc;
+        n_regs_used[seen_arrow * 4 + REGNO_PMC]++;
         index = 0;
     }
 
-    index = -1;
-    seen_arrow = 0;
     for (x = signature; *x != '\0'; x++) {
         /* detect -> separator */
         if (*x == '-') {
