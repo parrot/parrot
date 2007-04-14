@@ -1231,3 +1231,7 @@ inspect_p_p_s                  1200
 inspect_p_pc_s                 1201
 inspect_p_p_sc                 1202
 inspect_p_pc_sc                1203
+get_class_p_s                  1204
+get_class_p_sc                 1205
+get_class_p_p                  1206
+get_class_p_pc                 1207
