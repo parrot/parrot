@@ -54,50 +54,48 @@ F<src/packdump.c>.
 /*
 
 static void
-const_dump(Interp *interp, struct PackFile_Segment *segp)
+const_dump(Interp *interp, PackFile_Segment *segp)
 
 Dump the constant table.
 
 */
 
 static void
-const_dump(Interp *interp, struct PackFile_Segment *segp)
+const_dump(Interp *interp, PackFile_Segment *segp)
 {
     PIO_printf(interp, "%s => [\n", segp->name);
-    PackFile_ConstTable_dump(interp,
-            (struct PackFile_ConstTable *)segp);
+    PackFile_ConstTable_dump(interp, (PackFile_ConstTable *)segp);
     PIO_printf(interp, "],\n");
 }
 
 /*
 
 static void
-fixup_dump(Interp *interp, struct PackFile_Segment *segp)
+fixup_dump(Interp *interp, PackFile_Segment *segp)
 
 Dump the fixup table.
 
 */
 
 static void
-fixup_dump(Interp *interp, struct PackFile_Segment *segp)
+fixup_dump(Interp *interp, PackFile_Segment *segp)
 {
     PIO_printf(interp, "%s => [\n", segp->name);
-    PackFile_Fixup_dump(interp,
-            (struct PackFile_FixupTable *)segp);
+    PackFile_Fixup_dump(interp, (PackFile_FixupTable *)segp);
     PIO_printf(interp, "],\n");
 }
 
 /*
 
 static void
-disas_dump(Interp *interp, struct PackFile_Segment *self)
+disas_dump(Interp *interp, PackFile_Segment *self)
 
 Disassemble and dump.
 
 */
 
 static void
-disas_dump(Interp *interp, struct PackFile_Segment *self)
+disas_dump(Interp *interp, PackFile_Segment *self)
 {
     opcode_t *pc;
     size_t i, n;
@@ -124,14 +122,14 @@ disas_dump(Interp *interp, struct PackFile_Segment *self)
 /*
 
 static void
-PackFile_header_dump(Interp *interp, struct PackFile *pf)
+PackFile_header_dump(Interp *interp, PackFile *pf)
 
 Dump the header.
 
 */
 
 static void
-PackFile_header_dump(Interp *interp, struct PackFile *pf)
+PackFile_header_dump(Interp *interp, PackFile *pf)
 {
     PIO_printf(interp, "HEADER => [\n");
     PIO_printf(interp, "\twordsize  = %d", pf->header->wordsize);
@@ -197,7 +195,7 @@ The run loop. Process the command-line arguments and dump accordingly.
 int
 main(int argc, char **argv)
 {
-    struct PackFile *pf;
+    PackFile *pf;
     Interp *interp;
     int terse = 0;
     int disas = 0;

@@ -280,7 +280,7 @@ Parrot_jit_debug_stabs(Interp *interp)
     size_t i;
     int line;
     opcode_t lc;
-    struct PackFile_Debug *debug;
+    PackFile_Debug *debug;
 
     if (interp->code->debugs) {
         char *ext;

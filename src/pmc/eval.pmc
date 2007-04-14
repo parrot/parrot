@@ -25,9 +25,9 @@ static void
 clear_fixups(Interp *interp, parrot_sub_t sub_data)
 {
     opcode_t i, ci;
-    struct PackFile_ByteCode *seg;
-    struct PackFile_FixupTable *ft;
-    struct PackFile_ConstTable *ct;
+    PackFile_ByteCode *seg;
+    PackFile_FixupTable *ft;
+    PackFile_ConstTable *ct;
     PMC *sub;
 
     seg = sub_data->seg;
@@ -58,9 +58,9 @@ static PMC*
 get_sub(Interp *interp, PMC* self, int idx)
 {
     opcode_t i, n, ci;
-    struct PackFile_ByteCode *seg;
-    struct PackFile_FixupTable *ft;
-    struct PackFile_ConstTable *ct;
+    PackFile_ByteCode *seg;
+    PackFile_FixupTable *ft;
+    PackFile_ConstTable *ct;
     PMC *sub;
 
     seg = PMC_sub(self)->seg;
@@ -89,9 +89,9 @@ static void
 mark_subs(Interp *interp, PMC* self)
 {
     opcode_t i, ci;
-    struct PackFile_ByteCode *seg;
-    struct PackFile_FixupTable *ft;
-    struct PackFile_ConstTable *ct;
+    PackFile_ByteCode *seg;
+    PackFile_FixupTable *ft;
+    PackFile_ConstTable *ct;
     PMC *sub;
 
     seg = PMC_sub(self)->seg;
@@ -154,8 +154,8 @@ Invokes the first subroutine in the eval code.
          *        to be alive and destroy isn't called.
          */
         parrot_sub_t sub_data;
-        struct PackFile_Segment *seg;
-        struct PackFile_ByteCode *cur_cs;
+        PackFile_Segment *seg;
+        PackFile_ByteCode *cur_cs;
 
         sub_data = PMC_sub(SELF);
 
@@ -167,15 +167,15 @@ Invokes the first subroutine in the eval code.
             return;
 
         /* TODO create PF API, move it there */
-        seg = (struct PackFile_Segment *)cur_cs->const_table;
+        seg = (PackFile_Segment *)cur_cs->const_table;
         if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
         }
-        seg = (struct PackFile_Segment *)cur_cs->debugs;
+        seg = (PackFile_Segment *)cur_cs->debugs;
         if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
         }
-        seg = (struct PackFile_Segment *)cur_cs->fixups;
+        seg = (PackFile_Segment *)cur_cs->fixups;
         if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
             cur_cs->fixups = NULL;
@@ -184,7 +184,7 @@ Invokes the first subroutine in the eval code.
         if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
         }
-        seg = (struct PackFile_Segment *)cur_cs;
+        seg = (PackFile_Segment *)cur_cs;
         PackFile_Segment_destroy(INTERP, seg);
         sub_data->seg = NULL;
         PMC_struct_val(SELF) = NULL;
@@ -208,26 +208,25 @@ for writing to disc and later loading via C<load_bytecode>.
 
     STRING* get_string() {
         STRING *res;
-        struct PackFile *pf;
+        PackFile *pf;
         size_t size, aligned_size;
-        struct PackFile_ByteCode *seg;
+        PackFile_ByteCode *seg;
 
         pf = PackFile_new(INTERP, 0);
         seg = PMC_sub(SELF)->seg;
-        PackFile_add_segment(INTERP, &pf->directory,
-                (struct PackFile_Segment *)seg);
+        PackFile_add_segment(INTERP, &pf->directory, (PackFile_Segment *)seg);
         if (seg->const_table)
             PackFile_add_segment(INTERP, &pf->directory,
-                    (struct PackFile_Segment *)seg->const_table);
+                    (PackFile_Segment *)seg->const_table);
         if (seg->debugs)
             PackFile_add_segment(INTERP, &pf->directory,
-                    (struct PackFile_Segment *)seg->debugs);
+                    (PackFile_Segment *)seg->debugs);
         if (seg->fixups)
             PackFile_add_segment(INTERP, &pf->directory,
-                    (struct PackFile_Segment *)seg->fixups);
+                    (PackFile_Segment *)seg->fixups);
         if (seg->pic_index)
             PackFile_add_segment(INTERP, &pf->directory,
-                    (struct PackFile_Segment *)seg->pic_index);
+                    (PackFile_Segment *)seg->pic_index);
         size = PackFile_pack_size(INTERP, pf) * sizeof (opcode_t);
         /*
          * work around packfile bug:
@@ -299,10 +298,10 @@ Unarchives the code.
 
     void thaw(visit_info *info) {
         IMAGE_IO *io = info->image_io;
-        struct PackFile *pf;
+        PackFile *pf;
         STRING *packed;
         size_t i;
-        struct PackFile_Segment *seg;
+        PackFile_Segment *seg;
         struct Parrot_sub * sub;
 
         packed = io->vtable->shift_string(INTERP, io);
@@ -316,7 +315,7 @@ Unarchives the code.
         for (i = 0; i < pf->directory.num_segments; ++i) {
             seg = pf->directory.segments[i];
             if (seg->type == PF_BYTEC_SEG) {
-                PMC_sub(SELF)->seg = (struct PackFile_ByteCode *)seg;
+                PMC_sub(SELF)->seg = (PackFile_ByteCode *)seg;
                 break;
             }
         }

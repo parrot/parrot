@@ -49,7 +49,7 @@ main(int argc, char * argv[])
 {
     /* long *             opp; */
     Interp *           interp;
-    struct PackFile *  pf;
+    PackFile *  pf;
     opcode_t *         code_start;
     extern char *      program_code;
     /* extern long        opcode_map; */
@@ -58,8 +58,8 @@ main(int argc, char * argv[])
     extern void *      exec_prederef_code;
 #endif
     /* extern int        Parrot_exec_run; */
-    /* extern struct PackFile_Constant *exec_const_table; */
-    /* extern struct PackFile_Constant const_table; */
+    /* extern PackFile_Constant *exec_const_table; */
+    /* extern PackFile_Constant const_table; */
     extern Interp interpre;
 
     /* s. exec.c */

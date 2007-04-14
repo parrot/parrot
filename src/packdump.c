@@ -28,18 +28,15 @@ This is only used by the PBC dumper C<pdump>.
 ** For now just remove some warnings
 */
 
-void PackFile_ConstTable_dump(Interp *,
-                                     struct PackFile_ConstTable *);
-static void PackFile_Constant_dump(Interp *, struct PackFile_ConstTable *ct,
-                                   struct PackFile_Constant *);
-void PackFile_Fixup_dump(Interp *,
-                         struct PackFile_FixupTable *ft);
+void PackFile_ConstTable_dump(Interp *, PackFile_ConstTable *);
+static void PackFile_Constant_dump(Interp *, PackFile_ConstTable *ct,
+                                   PackFile_Constant *);
+void PackFile_Fixup_dump(Interp *, PackFile_FixupTable *ft);
 
 /*
 
 =item C<void
-PackFile_ConstTable_dump(Interp *interp,
-                         struct PackFile_ConstTable *self)>
+PackFile_ConstTable_dump(Interp *interp, PackFile_ConstTable *self)>
 
 Dumps the constant table C<self>.
 
@@ -48,8 +45,7 @@ Dumps the constant table C<self>.
 */
 
 void
-PackFile_ConstTable_dump(Interp *interp,
-                         struct PackFile_ConstTable *self)
+PackFile_ConstTable_dump(Interp *interp, PackFile_ConstTable *self)
 {
     opcode_t i;
 
@@ -62,8 +58,8 @@ PackFile_ConstTable_dump(Interp *interp,
 /*
 
 =item C<void
-PackFile_Constant_dump(Interp *interp, struct PackFile_ConstTable *ct
-                       struct PackFile_Constant *self)>
+PackFile_Constant_dump(Interp *interp, PackFile_ConstTable *ct,
+                       PackFile_Constant *self)>
 
 Dumps the constant C<self>.
 
@@ -72,14 +68,14 @@ Dumps the constant C<self>.
 */
 
 void
-PackFile_Constant_dump(Interp *interp, struct PackFile_ConstTable *ct,
-                       struct PackFile_Constant *self)
+PackFile_Constant_dump(Interp *interp, PackFile_ConstTable *ct,
+                       PackFile_Constant *self)
 {
     struct PMC *key;
     size_t i;
     size_t ct_index;
     opcode_t slice_bits;
-    struct PackFile_Constant *detail;
+    PackFile_Constant *detail;
 
     switch (self->type) {
 
@@ -277,8 +273,7 @@ PackFile_Constant_dump(Interp *interp, struct PackFile_ConstTable *ct,
 /*
 
 =item C<void
-PackFile_Fixup_dump(Interp *interp,
-                    struct PackFile_FixupTable *ft)>
+PackFile_Fixup_dump(Interp *interp, PackFile_FixupTable *ft)>
 
 Dumps the fix-up table C<ft>.
 
@@ -287,8 +282,7 @@ Dumps the fix-up table C<ft>.
 */
 
 void
-PackFile_Fixup_dump(Interp *interp,
-                    struct PackFile_FixupTable *ft)
+PackFile_Fixup_dump(Interp *interp, PackFile_FixupTable *ft)
 {
     opcode_t i;
 

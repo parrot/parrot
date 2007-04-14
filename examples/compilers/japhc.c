@@ -63,8 +63,7 @@ unescape(char *string)
 
 /* add constant string to constant_table */
 static int
-add_const_str(Parrot_Interp interpreter,
-        struct PackFile_ConstTable *consts, char *str)
+add_const_str(Parrot_Interp interpreter, PackFile_ConstTable *consts, char *str)
 {
     int k, l;
     char *o;
@@ -93,10 +92,10 @@ add_const_str(Parrot_Interp interpreter,
     k = ++consts->const_count;
     if (consts->constants == NULL)
         consts->constants = mem_sys_allocate(
-                k * sizeof (struct PackFile_Constant *));
+                k * sizeof (PackFile_Constant *));
     else
         consts->constants = mem_sys_realloc(consts->constants,
-                k * sizeof (struct PackFile_Constant *));
+                k * sizeof (PackFile_Constant *));
 
     /* Allocate a new constant */
     consts->constants[--k] = PackFile_Constant_new(interpreter);
@@ -113,8 +112,8 @@ add_const_str(Parrot_Interp interpreter,
 PMC*
 japh_compiler(Parrot_Interp interpreter, const char *program)
 {
-    struct PackFile_ByteCode *cur_cs, *old_cs;
-    struct PackFile_ConstTable *consts;
+    PackFile_ByteCode *cur_cs, *old_cs;
+    PackFile_ConstTable *consts;
     opcode_t* pc;
     const char *p;
     PMC *sub;

@@ -26,7 +26,7 @@ over the main directory.
 
 /*
 
-=item C<static INTVAL iter(Interp*, struct PackFile_Segment *seg, void
+=item C<static INTVAL iter(Interp*, PackFile_Segment *seg, void
  *user_data)>
 
 This function is passed the callback to PackFile_map_segments() to print out
@@ -37,13 +37,12 @@ the name of each segment in the directory.
 */
 
 static INTVAL
-iter(Interp* interp,
-                struct PackFile_Segment *seg, void *user_data)
+iter(Interp* interp, PackFile_Segment *seg, void *user_data)
 {
     int ident = (int)user_data;
     printf("%*.0s%s\n", ident, "", seg->name);
     if (seg->type == PF_DIR_SEG)
-        PackFile_map_segments(interp, (struct PackFile_Directory*)seg,
+        PackFile_map_segments(interp, (PackFile_Directory*)seg,
                 iter, (void*)(ident+2));
     return 0;
 }
@@ -62,9 +61,9 @@ the directory using PackFile_map_segments() and iter().
 int
 main(int argc, char * argv[])
 {
-    struct PackFile *pf;
+    PackFile *pf;
     Interp *interp;
-    struct PackFile_Segment *seg;
+    PackFile_Segment *seg;
 
     interp = Parrot_new(NULL);
 
@@ -76,7 +75,7 @@ main(int argc, char * argv[])
     seg = PackFile_Segment_new_seg(interp,
                     &pf->directory, PF_DIR_SEG, "dir2", 1);
     seg = PackFile_Segment_new_seg(interp,
-                    (struct PackFile_Directory*)seg, PF_BYTEC_SEG, "code", 1);
+                    (PackFile_Directory*)seg, PF_BYTEC_SEG, "code", 1);
     seg = PackFile_Segment_new_seg(interp,
                     &pf->directory, PF_DIR_SEG, "dir3", 1);
 

@@ -69,7 +69,7 @@ static void
 insert_fixup_targets(Interp* interp, char *branch,
         size_t limit)
 {
-    struct PackFile_FixupTable *ft = interp->code->fixups;
+    PackFile_FixupTable *ft = interp->code->fixups;
     int i;
 
     if (!ft)
@@ -991,7 +991,7 @@ optimize_jit(Interp *interp,
 optimize_imcc_jit(Interp *interp,
             Parrot_jit_info_t *jit_info,
             opcode_t *code_start, opcode_t *code_end,
-            struct PackFile_Segment *jit_seg)>
+            PackFile_Segment *jit_seg)>
 
 Generate optimizer stuff from the C<_JIT> section in the packfile.
 
@@ -1003,7 +1003,7 @@ static void
 optimize_imcc_jit(Interp *interp,
             Parrot_jit_info_t *jit_info,
              opcode_t *code_start, opcode_t *code_end,
-             struct PackFile_Segment *jit_seg)
+             PackFile_Segment *jit_seg)
 {
     Parrot_jit_optimizer_t *optimizer;
     size_t size, i, typ, n;
@@ -1288,9 +1288,9 @@ Parrot_destroy_jit(void *ptr)
 static void
 set_reg_usage(Interp *interp, opcode_t *pc)
 {
-    struct PackFile_ByteCode *seg;
-    struct PackFile_FixupTable *ft;
-    struct PackFile_ConstTable *ct;
+    PackFile_ByteCode *seg;
+    PackFile_FixupTable *ft;
+    PackFile_ConstTable *ct;
     PMC *sub_pmc;
     parrot_sub_t sub;
     int i, ci;
@@ -1358,7 +1358,7 @@ parrot_build_asm(Interp *interp,
     Parrot_jit_info_t *jit_info = NULL;
     opcode_t cur_opcode_byte, *cur_op;
     Parrot_jit_optimizer_section_ptr cur_section;
-    struct PackFile_Segment *jit_seg;
+    PackFile_Segment *jit_seg;
     INTVAL *  n_regs_used;        /* INSP in PBC */
     /* XXX
      * no longer referenced due to disabled code below

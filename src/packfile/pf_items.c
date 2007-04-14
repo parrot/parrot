@@ -269,7 +269,7 @@ fetch_op_le_8(unsigned char *b)
 /*
 
 =item C<opcode_t
-PF_fetch_opcode(struct PackFile *pf, opcode_t **stream)>
+PF_fetch_opcode(PackFile *pf, opcode_t **stream)>
 
 Fetch an C<opcode_t> from the stream, converting byteorder if needed.
 
@@ -278,7 +278,7 @@ Fetch an C<opcode_t> from the stream, converting byteorder if needed.
 */
 
 opcode_t
-PF_fetch_opcode(struct PackFile *pf, opcode_t **stream) {
+PF_fetch_opcode(PackFile *pf, opcode_t **stream) {
     opcode_t o;
     if (!pf || !pf->fetch_op)
         return *(*stream)++;
@@ -329,7 +329,7 @@ PF_size_opcode(void)
 /*
 
 =item C<INTVAL
-PF_fetch_integer(struct PackFile *pf, opcode_t **stream)>
+PF_fetch_integer(PackFile *pf, opcode_t **stream)>
 
 Fetch an C<INTVAL> from the stream, converting byteorder if needed.
 
@@ -341,7 +341,7 @@ C<INTVAL> size in the PackFile header.
 */
 
 INTVAL
-PF_fetch_integer(struct PackFile *pf, opcode_t **stream) {
+PF_fetch_integer(PackFile *pf, opcode_t **stream) {
     INTVAL i;
     if (!pf || pf->fetch_iv == NULL)
         return *(*stream)++;
@@ -393,7 +393,7 @@ PF_size_integer(void)
 /*
 
 =item C<FLOATVAL
-PF_fetch_number(struct PackFile *pf, opcode_t **stream)>
+PF_fetch_number(PackFile *pf, opcode_t **stream)>
 
 Fetch a C<FLOATVAL> from the stream, converting byteorder if needed.
 Then advance stream pointer by amount of packfile float size.
@@ -403,7 +403,7 @@ Then advance stream pointer by amount of packfile float size.
 */
 
 FLOATVAL
-PF_fetch_number(struct PackFile *pf, opcode_t **stream) {
+PF_fetch_number(PackFile *pf, opcode_t **stream) {
     /* When we have alignment all squared away we don't need
      * to use memcpy() for native byteorder.
      */
@@ -477,7 +477,7 @@ PF_size_number(void)
 /*
 
 =item C<STRING *
-PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)>
+PF_fetch_string(Parrot_Interp interp, PackFile *pf, opcode_t **cursor)>
 
 Fetch a C<STRING> from bytecode and return a new C<STRING>.
 
@@ -494,7 +494,7 @@ Opcode format is:
 */
 
 STRING *
-PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
+PF_fetch_string(Parrot_Interp interp, PackFile *pf, opcode_t **cursor)
 {
     UINTVAL flags;
     opcode_t charset_nr;
@@ -622,7 +622,7 @@ PF_size_string(STRING *s)
 /*
 
 =item C<char *
-PF_fetch_cstring(struct PackFile *pf, opcode_t **cursor)>
+PF_fetch_cstring(PackFile *pf, opcode_t **cursor)>
 
 Fetch a cstring from bytecode and return an allocated copy
 
@@ -631,7 +631,7 @@ Fetch a cstring from bytecode and return an allocated copy
 */
 
 char *
-PF_fetch_cstring(struct PackFile *pf, opcode_t **cursor)
+PF_fetch_cstring(PackFile *pf, opcode_t **cursor)
 {
     size_t str_len = strlen ((char *)(*cursor)) + 1;
     char *p = mem_sys_allocate(str_len);
@@ -688,7 +688,7 @@ PF_size_cstring(const char *s)
 /*
 
 =item C<void
-PackFile_assign_transforms(struct PackFile *pf)>
+PackFile_assign_transforms(PackFile *pf)>
 
 Assign transform functions to vtable.
 
@@ -697,7 +697,7 @@ Assign transform functions to vtable.
 */
 
 void
-PackFile_assign_transforms(struct PackFile *pf)
+PackFile_assign_transforms(PackFile *pf)
 {
     int need_endianize = pf->header->byteorder != PARROT_BIGENDIAN;
     int need_wordsize  = pf->header->wordsize != sizeof (opcode_t);

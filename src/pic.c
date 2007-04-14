@@ -105,15 +105,14 @@ extern void Parrot_Integer_i_subtract_Integer(Interp* , PMC* pmc, PMC* value);
 
 /*
 
-=item C<void parrot_PIC_alloc_store(Interp *,
-                                    struct PackFile_ByteCode *, size_t n);>
+=item C<void parrot_PIC_alloc_store(Interp *, PackFile_ByteCode *, size_t n);>
 
 Initialize the PIC storage for the given code segment with the capacitiy of
 holding at least C<n> MIC entries. The PIC_store itself, room for C<n> MICs and
 some space for PICs is allocated as one piece. MICs are returned from the start
 of usable memory, PICs from the rear.
 
-=item C<void parrot_PIC_destroy(Interp *, struct PackFile_ByteCode *);>
+=item C<void parrot_PIC_destroy(Interp *, PackFile_ByteCode *);>
 
 Free memory for the PIC storage.
 
@@ -122,8 +121,7 @@ Free memory for the PIC storage.
 */
 
 void
-parrot_PIC_alloc_store(Interp *interp,
-        struct PackFile_ByteCode *cs, size_t n)
+parrot_PIC_alloc_store(Interp *interp, PackFile_ByteCode *cs, size_t n)
 {
     size_t size, poly;
     Parrot_PIC_store *store;
@@ -150,7 +148,7 @@ parrot_PIC_alloc_store(Interp *interp,
 }
 
 void
-parrot_PIC_destroy(Interp *interp, struct PackFile_ByteCode *cs)
+parrot_PIC_destroy(Interp *interp, PackFile_ByteCode *cs)
 {
     Parrot_PIC_store *store;
 
@@ -545,7 +543,7 @@ parrot_PIC_prederef(Interp *interp, opcode_t op, void **pc_pred, int core)
     Parrot_MIC *mic = NULL;
 
     if (parrot_PIC_op_is_cached(interp, op)) {
-        struct PackFile_ByteCode *cs = interp->code;
+        PackFile_ByteCode *cs = interp->code;
         size_t n = cur_opcode - (opcode_t*)cs->prederef.code;
         /*
          * pic_index is half the size of the code

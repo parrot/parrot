@@ -357,7 +357,7 @@ Parrot_Context_info(Interp *interp, parrot_context_t *ctx,
         size_t offs = info->pc;
         size_t i, n;
         opcode_t *pc = sub->seg->base.data;
-        struct PackFile_Debug *debug = sub->seg->debugs;
+        PackFile_Debug *debug = sub->seg->debugs;
         if (!debug)
             return 0;
         for (i = n = 0; n < sub->seg->base.size; i++) {

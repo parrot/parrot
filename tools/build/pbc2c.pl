@@ -231,8 +231,8 @@ END_C
 int
 main(int argc, char **argv) {
     int dummy_var;
-    Interp *     interpreter;
-    struct PackFile *          pf;
+    Interp   *interpreter;
+    PackFile *pf;
     INTVAL i;
     PMC *userargv;
 

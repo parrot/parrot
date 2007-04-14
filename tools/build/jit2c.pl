@@ -302,7 +302,7 @@ END_C
 }
 else {
     print $JITCPU <<'END_C';
-#define CONST(i) (int *)(jit_info->cur_op[i] * sizeof(struct PackFile_Constant) + offsetof(struct PackFile_Constant, u))
+#define CONST(i) (int *)(jit_info->cur_op[i] * sizeof(PackFile_Constant) + offsetof(PackFile_Constant, u))
 #define RCONST(i) interp->code->const_table->constants[jit_info->cur_op[i]]
 #define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, jit_info->native_ptr, f); \
     emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
@@ -311,7 +311,7 @@ END_C
 }
 if ( $cpuarch eq 'ppc' && $genfile ne 'src/jit_cpu.c' ) {
     print $JITCPU
-        "#define ECONST(i) (int *)(jit_info->cur_op[i] * sizeof(struct PackFile_Constant) + 8)\n";
+        "#define ECONST(i) (int *)(jit_info->cur_op[i] * sizeof(PackFile_Constant) + 8)\n";
 }
 
 my %core_ops = readjit("src/jit/$cpuarch/core.jit");

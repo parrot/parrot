@@ -30,12 +30,12 @@ contiguous region of memory.
 #define TRACE_PACKFILE_PMC 0
 
 /* XXX This should be in an external file */
-extern struct PackFile_Directory *directory_new(Interp*, struct PackFile *pf);
+extern PackFile_Directory *directory_new(Interp *interp, PackFile *pf);
 
 /*
 
 =item C<opcode_t
-PackFile_pack_size(Interp*, struct PackFile *self)>
+PackFile_pack_size(Interp *interp, PackFile *self)>
 
 Description.
 
@@ -44,18 +44,17 @@ Description.
 */
 
 opcode_t
-PackFile_pack_size(Interp *interp, struct PackFile *self)
+PackFile_pack_size(Interp *interp, PackFile *self)
 {
     opcode_t size;
-    struct PackFile_Directory * const dir = &self->directory;
+    PackFile_Directory * const dir = &self->directory;
 
     size = PACKFILE_HEADER_BYTES / sizeof (opcode_t);
 
     size += 4; /* magic + opcode type + directory type + pad */
 
     dir->base.file_offset = size;
-    size += PackFile_Segment_packed_size(interp,
-            (struct PackFile_Segment *) dir);
+    size += PackFile_Segment_packed_size(interp, (PackFile_Segment *) dir);
 
     return size;
 }
@@ -63,7 +62,7 @@ PackFile_pack_size(Interp *interp, struct PackFile *self)
 /*
 
 =item C<void
-PackFile_pack(Interp*, struct PackFile *self, opcode_t *cursor)>
+PackFile_pack(Interp*, PackFile *self, opcode_t *cursor)>
 
 Pack the PackFile into a contiguous region of memory.
 
@@ -80,13 +79,13 @@ Other pack routines are in F<src/packfile.c>.
 */
 
 void
-PackFile_pack(Interp *interp, struct PackFile *self, opcode_t *cursor)
+PackFile_pack(Interp *interp, PackFile *self, opcode_t *cursor)
 {
     opcode_t *ret;
 
     size_t size;
-    struct PackFile_Directory * const dir = &self->directory;
-    struct PackFile_Segment *seg;
+    PackFile_Directory * const dir = &self->directory;
+    PackFile_Segment *seg;
 
     self->src = cursor;
 
@@ -99,7 +98,7 @@ PackFile_pack(Interp *interp, struct PackFile *self, opcode_t *cursor)
     *cursor++ = 0;                      /* pad */
 
     /* pack the directory */
-    seg = (struct PackFile_Segment *) dir;
+    seg = (PackFile_Segment *) dir;
     /* dir size */
     size = seg->op_count;
     ret = PackFile_Segment_pack(interp, seg, cursor);
@@ -112,7 +111,7 @@ PackFile_pack(Interp *interp, struct PackFile *self, opcode_t *cursor)
 /*
 
 =item C<size_t
-PackFile_ConstTable_pack_size(struct PackFile_Segment *seg)>
+PackFile_ConstTable_pack_size(PackFile_Segment *seg)>
 
 Determine the size of the buffer needed in order to pack the PackFile
 constant table into a contiguous region of memory.
@@ -122,10 +121,10 @@ constant table into a contiguous region of memory.
 */
 
 size_t
-PackFile_ConstTable_pack_size(Interp *interp, struct PackFile_Segment *seg)
+PackFile_ConstTable_pack_size(Interp *interp, PackFile_Segment *seg)
 {
     opcode_t i;
-    struct PackFile_ConstTable* const self = (struct PackFile_ConstTable *) seg;
+    PackFile_ConstTable* const self = (PackFile_ConstTable *) seg;
     size_t size = 1;    /* const_count */
 
     for (i = 0; i < self->const_count; i++)
@@ -135,8 +134,7 @@ PackFile_ConstTable_pack_size(Interp *interp, struct PackFile_Segment *seg)
 
 /*
 
-=item C<opcode_t *PackFile_ConstTable_pack(Interp *,
-                                           struct PackFile_Segment *seg,
+=item C<opcode_t *PackFile_ConstTable_pack(Interp *, PackFile_Segment *seg,
                                            opcode_t *cursor)>
 
 Pack the PackFile ConstTable into a contiguous region of memory.
@@ -153,9 +151,9 @@ C<PackFile_ConstTable_pack()>
 
 opcode_t *
 PackFile_ConstTable_pack(Interp *interp,
-        struct PackFile_Segment *seg, opcode_t *cursor)
+        PackFile_Segment *seg, opcode_t *cursor)
 {
-    struct PackFile_ConstTable * const self = (struct PackFile_ConstTable *)seg;
+    PackFile_ConstTable * const self = (PackFile_ConstTable *)seg;
     opcode_t i;
 
     *cursor++ = self->const_count;
@@ -180,7 +178,8 @@ constant is in constant table, so we have to search for it.
 */
 
 int
-PackFile_find_in_const(Interp *interp, struct PackFile_ConstTable *ct, PMC *key, int type)
+PackFile_find_in_const(Interp *interp, PackFile_ConstTable *ct, PMC *key,
+                       int type)
 {
     int i;
     for (i = 0; i < ct->const_count; i++)
@@ -198,8 +197,8 @@ PackFile_find_in_const(Interp *interp, struct PackFile_ConstTable *ct, PMC *key,
 /*
 
 =item C<opcode_t *
-PackFile_Constant_pack(Interp*, struct PackFile_ConstTable * const_table,
-                       struct PackFile_Constant *self, opcode_t *cursor)>
+PackFile_Constant_pack(Interp*, PackFile_ConstTable * const_table,
+                       PackFile_Constant *self, opcode_t *cursor)>
 
 Pack a PackFile Constant into a contiguous region of memory.
 
@@ -217,8 +216,8 @@ The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 */
 
 opcode_t *
-PackFile_Constant_pack(Interp* interp, struct PackFile_ConstTable * const_table,
-        struct PackFile_Constant *self, opcode_t *cursor)
+PackFile_Constant_pack(Interp* interp, PackFile_ConstTable * const_table,
+        PackFile_Constant *self, opcode_t *cursor)
 {
     struct PMC *key;
     size_t i;

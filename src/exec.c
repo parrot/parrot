@@ -87,7 +87,7 @@ Parrot_exec(Interp *interp, opcode_t *pc,
         sizeof (opcode_t *));
     /* const_table */
     add_data_member(obj, NULL, interp->code->const_table->const_count *
-        sizeof (struct PackFile_Constant));
+        sizeof (PackFile_Constant));
 #ifdef JIT_CGP
     /* prederef_code */
     j = (int)cgp_core;

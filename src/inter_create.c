@@ -206,7 +206,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     SET_NULL_P(interp->evc_func_table, op_func_t *);
     SET_NULL_P(interp->save_func_table, op_func_t *);
 
-    SET_NULL_P(interp->code, struct PackFile *);
+    SET_NULL_P(interp->code, PackFile *);
     SET_NULL_P(interp->profile, ProfData *);
 
     /* null out the root set registry */
@@ -398,7 +398,7 @@ Parrot_really_destroy(Interp *interp, int exit_code, void *arg)
     /* packfile */
 
     if (!Interp_flags_TEST(interp, PARROT_EXTERN_CODE_FLAG))  {
-        struct PackFile *pf = interp->initial_pf;
+        PackFile *pf = interp->initial_pf;
         if (pf)
             PackFile_destroy(interp, pf);
     }

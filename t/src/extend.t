@@ -440,7 +440,7 @@ main(int argc, char* argv[])
 static opcode_t*
 the_test(Parrot_Interp interp, opcode_t *cur_op, opcode_t *start)
 {
-    struct PackFile *pf;
+    PackFile *pf;
     PMC *sub, *arg;
     STRING *name;
 
@@ -514,7 +514,7 @@ main(int argc, char* argv[])
 static opcode_t*
 the_test(Parrot_Interp interp, opcode_t *cur_op, opcode_t *start)
 {
-    struct PackFile *pf;
+    PackFile *pf;
     PMC *sub;
     STRING *name;
     Parrot_exception jb;

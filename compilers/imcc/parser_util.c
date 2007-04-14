@@ -593,7 +593,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
      * save old cs, make new
      */
     char name[64];
-    struct PackFile_ByteCode *old_cs, *new_cs;
+    PackFile_ByteCode *old_cs, *new_cs;
     PMC *sub=NULL;
     parrot_sub_t sub_data;
     struct _imc_info_t *imc_info = NULL;
@@ -759,7 +759,7 @@ static void *
 imcc_compile_file(Parrot_Interp interp, const char *fullname,
                    STRING **error_message)
 {
-    struct PackFile_ByteCode *cs_save = interp->code, *cs=NULL;
+    PackFile_ByteCode *cs_save = interp->code, *cs=NULL;
     char *ext;
     FILE *fp;
     struct _imc_info_t *imc_info = NULL;

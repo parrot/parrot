@@ -81,11 +81,11 @@ int
 main(int margc, char *margv[])
 {
     Parrot_Interp interp;
-    struct PackFile *pf;
+    PackFile *pf;
     int argc = 1;
     char *argv[] = { "test", NULL };
 
-    struct PackFile_Segment *seg;
+    PackFile_Segment *seg;
 
     /* Interpreter set-up */
     interp = Parrot_new(NULL);
@@ -163,11 +163,11 @@ int
 main(int margc, char *margv[])
 {
     Parrot_Interp interp;
-    struct PackFile *pf;
+    PackFile *pf;
     int argc = 1;
     char *argv[] = { "test", NULL };
 
-    struct PackFile_Segment *seg;
+    PackFile_Segment *seg;
 
     /* Interpreter set-up */
     interp = Parrot_new(NULL);
@@ -253,11 +253,11 @@ int
 main(int margc, char *margv[])
 {
     Parrot_Interp interp;
-    struct PackFile *pf;
+    PackFile *pf;
     int argc = 1;
     char *argv[] = { "test", NULL };
 
-    struct PackFile_Segment *seg;
+    PackFile_Segment *seg;
 
     /* Interpreter set-up */
     interp = Parrot_new(NULL);
@@ -344,11 +344,11 @@ int
 main(int margc, char *margv[])
 {
     Parrot_Interp interp;
-    struct PackFile *pf;
+    PackFile *pf;
     int argc = 1;
     char *argv[] = { "test", NULL };
 
-    struct PackFile_Segment *seg;
+    PackFile_Segment *seg;
 
     /* Interpreter set-up */
     interp = Parrot_new(NULL);
@@ -435,11 +435,11 @@ int
 main(int margc, char *margv[])
 {
     Parrot_Interp interp;
-    struct PackFile *pf;
+    PackFile *pf;
     int argc = 1;
     char *argv[] = { "test", NULL };
 
-    struct PackFile_Segment *seg;
+    PackFile_Segment *seg;
 
     /* Interpreter set-up */
     interp = Parrot_new(NULL);
@@ -525,11 +525,11 @@ int
 main(int margc, char *margv[])
 {
     Parrot_Interp interp;
-    struct PackFile *pf;
+    PackFile *pf;
     int argc = 1;
     char *argv[] = { "test", NULL };
 
-    struct PackFile_Segment *seg;
+    PackFile_Segment *seg;
 
     /* Interpreter set-up */
     interp = Parrot_new(NULL);

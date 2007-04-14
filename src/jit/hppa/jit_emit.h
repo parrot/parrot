@@ -483,7 +483,7 @@ Parrot_emit_jump_to_ret(Parrot_jit_info_t *jit_info,
     emit_ldw(jit_info->native_ptr, BASE, CIR,
         (offsetof(Interp, code)));
     emit_ldw(jit_info->native_ptr, CIR, ISR2,
-    (offsetof(struct PackFile_Segment, data)));
+    (offsetof(PackFile_Segment, data)));
     jit_emit_sub_rrr(jit_info->native_ptr, CIR, RET0, ISR2);
     /*
      * now we have the offset of the ins in CIR

@@ -140,8 +140,8 @@ Invokes the closure.
         struct Parrot_sub * sub = PMC_sub(SELF);
         PMC *outer;
         opcode_t i, ci;
-        struct PackFile_FixupTable *ft;
-        struct PackFile_ConstTable *ct;
+        PackFile_FixupTable *ft;
+        PackFile_ConstTable *ct;
 
         /*
          * XXX TODO

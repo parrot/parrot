@@ -370,14 +370,14 @@ enum  {JIT_BRANCH, JIT_CALL30 };
 /* Load op_map address */
 #  define jit_emit_load_op_map(pc, code) \
     emitm_ld_i(jit_info->native_ptr, code,                                         \
-        offsetof(struct PackFile_ByteCode, jit_info), XSR1);                       \
+        offsetof(PackFile_ByteCode, jit_info), XSR1);                       \
     emitm_ld_i(jit_info->native_ptr, XSR1,                                         \
       (offsetof(Parrot_jit_arena_t, op_map) + offsetof(Parrot_jit_info_t, arena)), \
       Parrot_jit_opmap);
 
 /* Construct the starting address of the byte code (code start) */
 #  define jit_emit_load_code_start(pc, code) \
-    emitm_ld_i(jit_info->native_ptr, code, offsetof(struct PackFile_Segment, data), \
+    emitm_ld_i(jit_info->native_ptr, code, offsetof(PackFile_Segment, data), \
                XSR1);
 
 /* Generate a jump to a bytecode address in reg_num

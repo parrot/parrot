@@ -595,7 +595,7 @@ imcc_write_pbc(Interp *interp, const char *output_file)
 static int
 imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
 {
-    struct PackFile *pf;
+    PackFile *pf;
     int              obj_file;
     const char      *output_file;
     yyscan_t         yyscanner;

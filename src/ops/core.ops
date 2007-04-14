@@ -185,7 +185,7 @@ Intersegment branch to location in fixup table named $1.
 
 inline op branch_cs (in STR) :base_loop,check_event {
     char * const label = string_to_cstring(interp, $1);
-    struct PackFile_FixupEntry *fe = PackFile_find_fixup_entry(interp,
+    PackFile_FixupEntry *fe = PackFile_find_fixup_entry(interp,
             enum_fixup_label, label);
     if (!fe)
         internal_exception(1, "branch_cs: fixup for '%s' not found", label);

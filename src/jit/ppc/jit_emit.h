@@ -661,13 +661,13 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
 
 #  define jit_emit_load_op_map(pc) \
     jit_emit_lwz(pc, ISR1, offsetof(Interp, code), r16); \
-    jit_emit_lwz(pc, ISR1, offsetof(struct PackFile_ByteCode, jit_info), ISR1); \
+    jit_emit_lwz(pc, ISR1, offsetof(PackFile_ByteCode, jit_info), ISR1); \
     jit_emit_lwz(pc, r14, (offsetof(Parrot_jit_arena_t, op_map) + \
                            offsetof(Parrot_jit_info_t, arena)), ISR1)
 
 #  define jit_emit_load_code_start(pc) \
     jit_emit_lwz(pc, ISR1, offsetof(Interp, code), r16); \
-    jit_emit_lwz(pc, r15,  offsetof(struct PackFile_Segment, data), ISR1)
+    jit_emit_lwz(pc, r15,  offsetof(PackFile_Segment, data), ISR1)
 
 #  define jit_emit_branch_to_opcode(pc, D) \
     jit_emit_lwz(pc, r13, offsetof(Interp, ctx.bp), r16); \
@@ -961,7 +961,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp * interpreter,
 {
     PMC *sig_args, *sig_params, *sig_result;
     INTVAL *sig_bits, sig, i, n;
-    struct PackFile_Constant ** constants;
+    PackFile_Constant ** constants;
     opcode_t *params, *result;
     char params_map;
     int skip, used_n;

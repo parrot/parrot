@@ -131,7 +131,7 @@ Swaps the "context".
     opcode_t* invoke(void* next) {
         struct Parrot_coro * co = PMC_coro(SELF);
         parrot_context_t *caller_ctx;
-        struct PackFile_ByteCode *wanted_seg;
+        PackFile_ByteCode *wanted_seg;
         struct Stack_Chunk *state;
         opcode_t * dest = co->address;
         parrot_context_t *ctx;

@@ -44,8 +44,8 @@ struct subs {
 
 /* subs are kept per code segment */
 struct cs_t {
-    struct PackFile_ByteCode *seg;      /* bytecode segment */
-    struct PackFile_Segment *jit_info;  /* bblocks, register usage */
+    PackFile_ByteCode *seg;      /* bytecode segment */
+    PackFile_Segment *jit_info;  /* bblocks, register usage */
     struct subs *subs;                  /* current sub data */
     struct subs *first;                 /* first sub of code segment */
     struct cs_t *prev;                  /* previous code segment */
@@ -485,7 +485,7 @@ mk_multi_sig(Interp* interp, SymReg *r)
     STRING *sig;
     PMC *multi_sig, *sig_pmc;
     struct pcc_sub_t *pcc_sub;
-    struct PackFile_ConstTable *ct;
+    PackFile_ConstTable *ct;
 
     pcc_sub = r->pcc_sub;
     multi_sig = pmc_new(interp, enum_class_FixedPMCArray);
@@ -527,7 +527,7 @@ create_lexinfo(Interp *interp, IMC_Unit *unit, PMC *sub, int need_lex)
     int i, k;
     SymReg * r;
     SymHash *hsh;
-    struct PackFile_Constant **constants;
+    PackFile_Constant **constants;
     STRING *lex_name;
     STRING *decl_lex;
     PMC *decl_lex_meth, *lex_info_class;
@@ -642,11 +642,11 @@ add_const_pmc_sub(Interp *interp, SymReg *r,
     PMC *ns_pmc;
     PMC *sub_pmc;
     struct Parrot_sub *sub;
-    struct PackFile_Constant *pfc;
+    PackFile_Constant *pfc;
     SymReg *ns;
     int ns_const = -1;
     char *real_name;
-    struct PackFile_ConstTable *ct;
+    PackFile_ConstTable *ct;
     IMC_Unit *unit;
     STRING *vtable_name;
     char *c_name;
@@ -777,12 +777,12 @@ add_const_key(Interp *interp, opcode_t key[],
 {
     int k;
     SymReg *r;
-    struct PackFile_Constant *pfc;
+    PackFile_Constant *pfc;
     opcode_t *rc;
 
     if ( (r = _get_sym(&globals.cs->key_consts, s_key)) != 0)
         return r->color;
-    pfc = malloc(sizeof (struct PackFile_Constant));
+    pfc = malloc(sizeof (PackFile_Constant));
     rc = PackFile_Constant_unpack_key(interp,
             interp->code->const_table, pfc, key);
     if (!rc)
@@ -1162,7 +1162,7 @@ e_pbc_emit(Interp *interp, void *param, IMC_Unit * unit, Instruction * ins)
     op_info_t *op_info;
     int op, i;
     /* XXX move these statics into IMCC_INFO */
-    static struct PackFile_Debug *debug_seg;
+    static PackFile_Debug *debug_seg;
     static int ins_line;
     static opcode_t * pc, npc;
     /* XXX end */

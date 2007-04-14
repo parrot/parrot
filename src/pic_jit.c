@@ -102,8 +102,8 @@ jit_can_compile_sub(Interp *interp, PMC *sub)
 
 
 static int
-args_match_params(Interp *interp, PMC *sig_args,
-        struct PackFile_ByteCode *seg, opcode_t *start)
+args_match_params(Interp *interp, PMC *sig_args, PackFile_ByteCode *seg,
+    opcode_t *start)
 {
     PMC *sig_params;
     int n, type;
@@ -192,8 +192,7 @@ call_is_safe(Interp *interp, PMC *sub, opcode_t **set_args)
 }
 
 static int
-ops_jittable(Interp *interp, PMC *sub, PMC *sig_results,
-        struct PackFile_ByteCode *seg,
+ops_jittable(Interp *interp, PMC *sub, PMC *sig_results, PackFile_ByteCode *seg,
         opcode_t *pc, opcode_t *end, int *flags)
 {
     while (pc < end) {

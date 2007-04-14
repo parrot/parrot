@@ -1970,8 +1970,8 @@ void
 PDB_eval(Interp *interp, const char *command)
 {
     opcode_t *run;
-    struct PackFile *eval_pf;
-    struct PackFile_ByteCode *old_cs;
+    PackFile *eval_pf;
+    PackFile_ByteCode *old_cs;
 
     /*
     The replacement code is almost certainly wrong. The previous
@@ -2054,11 +2054,11 @@ PDB_extend_const_table(Interp *interp)
     if (interp->code->const_table->constants) {
         interp->code->const_table->constants =
             mem_sys_realloc(interp->code->const_table->constants,
-                            k * sizeof (struct PackFile_Constant *));
+                            k * sizeof (PackFile_Constant *));
     }
     else {
         interp->code->const_table->constants =
-            mem_sys_allocate(k * sizeof (struct PackFile_Constant *));
+            mem_sys_allocate(k * sizeof (PackFile_Constant *));
     }
 
     /* Allocate a new constant */

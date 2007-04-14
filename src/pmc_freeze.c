@@ -669,7 +669,7 @@ static void
 ft_init(Parrot_Interp interp, visit_info *info)
 {
     STRING *s = info->image;
-    struct PackFile *pf;
+    PackFile *pf;
 
     info->image_io = mem_sys_allocate(sizeof (IMAGE_IO));
     info->image_io->image = s = info->image;

@@ -977,7 +977,7 @@ mmd_arg_tuple_func(Interp *interp)
     PMC* arg_tuple, *arg;
     PMC* args_array;    /* from recent set_args opcode */
     opcode_t *args_op;
-    struct PackFile_Constant **constants;
+    PackFile_Constant **constants;
 
     /*
      * if there is no signature e.g. because of
