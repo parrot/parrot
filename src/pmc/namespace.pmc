@@ -635,7 +635,7 @@ Return the parent NameSpace or PMCNULL, if none.
 
 /*
 
-=item C<METHOD PMC* get_class()>
+=item C<PCCMETHOD PMC* get_class()>
 
 Returns the class or role PMC that is associated with this namespace.
 
@@ -643,15 +643,16 @@ Returns the class or role PMC that is associated with this namespace.
 
 */
 
-    METHOD PMC* get_class()
+    PCCMETHOD void get_class()
     {
         Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
-        return nsinfo->class;
+        PMC *ret_class = nsinfo->class;
+        PCCRETURN(PMC *ret_class);
     }
 
 /*
 
-=item C<METHOD void set_class(PMC *class_or_role)>
+=item C<PCCMETHOD void set_class(PMC *class_or_role)>
 
 Sets the class or role PMC that is associated with this namespace.
 
@@ -659,7 +660,7 @@ Sets the class or role PMC that is associated with this namespace.
 
 */
 
-    METHOD set_class(PMC *class_or_role)
+    PCCMETHOD void set_class(PMC *class_or_role)
     {
         Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
         nsinfo->class = class_or_role;
