@@ -1,0 +1,28 @@
+##  syntax errors
+
+{{		abcdef		/Missing closing braces/	unterminated closure
+\1		abcdef		/reserved/			back references
+\x[		abcdef		/Missing close bracket/		unterminated \x[..]
+\X[		abcdef		/Missing close bracket/		unterminated \X[..]
+
+* abc		abcdef		/Quantifier follows nothing/	bare * at start
+  * abc		abcdef		/Quantifier follows nothing/	bare * after ws
+[*|a]		abcdef		/Quantifier follows nothing/	bare * after [
+[ *|a]		abcdef		/Quantifier follows nothing/	bare * after [+sp
+[a|*]		abcdef		/Quantifier follows nothing/	bare * after |
+[a| *]		abcdef		/Quantifier follows nothing/	bare * after |+sp
+
++ abc		abcdef		/Quantifier follows nothing/	bare + at start
+  + abc		abcdef		/Quantifier follows nothing/	bare + after ws
+[+|a]		abcdef		/Quantifier follows nothing/	bare + after [
+[ +|a]		abcdef		/Quantifier follows nothing/	bare + after [+sp
+[a|+]		abcdef		/Quantifier follows nothing/	bare + after |
+[a| +]		abcdef		/Quantifier follows nothing/	bare + after |+sp
+
+? abc		abcdef		/Quantifier follows nothing/	bare ? at start
+  ? abc		abcdef		/Quantifier follows nothing/	bare ? after ws
+[?|a]		abcdef		/Quantifier follows nothing/	bare ? after [
+[ ?|a]		abcdef		/Quantifier follows nothing/	bare ? after [+sp
+[a|?]		abcdef		/Quantifier follows nothing/	bare ? after |
+[a| ?]		abcdef		/Quantifier follows nothing/	bare ? after |+sp
+

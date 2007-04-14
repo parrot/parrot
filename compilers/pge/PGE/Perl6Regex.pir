@@ -410,6 +410,7 @@ Parses terms beginning with backslash.
     concat charlist, $S1
     unless isbracketed goto scan_xdo_end
     if $S0 == ']' goto scan_xdo_end
+    if $S0 == '' goto err_missing_bracket
     if $S0 != ',' goto err_bracketed
     if isnegated goto err_negated_brackets
     inc pos
@@ -422,6 +423,8 @@ Parses terms beginning with backslash.
 
   err_reserved_metachar:
     parse_error(mob, pos, 'Alphanumeric metacharacters are reserved')
+  err_missing_bracket:
+    parse_error(mob, pos, 'Missing close bracket for \\x[...] or \\o[...]')
   err_bracketed:
     parse_error(mob, pos, 'Invalid digit in \\x[...] or \\o[...]')
   err_negated_brackets:

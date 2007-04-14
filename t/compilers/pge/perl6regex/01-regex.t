@@ -79,6 +79,7 @@ Description of the test.
     push test_files, 'rx_lookarounds'
     push test_files, 'rx_captures'
     push test_files, 'rx_modifiers'
+    push test_files, 'rx_syntax'
 
     .local pmc interp     # a handle to our interpreter object.
                interp = getinterp
