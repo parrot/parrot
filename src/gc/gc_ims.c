@@ -406,18 +406,18 @@ static void parrot_gc_ims_run(Interp *interp, int flags);
 /*
 
 =item C<static void gc_ims_add_free_object(Interp *interp,
-        struct Small_Object_Pool *pool, void *to_add)>
+        Small_Object_Pool *pool, void *to_add)>
 
 Add object C<to_add> to the free_list in the given pool.
 C<pool->num_free_objects> has to be updated by the caller.
 
 =item C<static void *
-gc_ims_get_free_object(Interp *, struct Small_Object_Pool *pool)>
+gc_ims_get_free_object(Interp *, Small_Object_Pool *pool)>
 
 Get a new object off the free_list in the given pool.
 
 =item C<static void
-gc_ims_alloc_objects(Interp *, struct Small_Object_Pool *pool)>
+gc_ims_alloc_objects(Interp *, Small_Object_Pool *pool)>
 
 Allocate new objects for the given pool.
 
@@ -426,15 +426,14 @@ Allocate new objects for the given pool.
 */
 
 static void
-gc_ims_add_free_object(Interp *interp,
-        struct Small_Object_Pool *pool, void *to_add)
+gc_ims_add_free_object(Interp *interp, Small_Object_Pool *pool, void *to_add)
 {
     *(void **)to_add = pool->free_list;
-    pool->free_list = to_add;
+    pool->free_list  = to_add;
 #if ! DISABLE_GC_DEBUG
     if (GC_DEBUG(interp)) {
         if (pool == interp->arena_base->pmc_pool) {
-            PMC *p = to_add;
+            PMC *p    = (PMC *)to_add;
             p->vtable = interp->vtables[enum_class_Null];
         }
     }
@@ -443,15 +442,14 @@ gc_ims_add_free_object(Interp *interp,
 
 
 static void *
-gc_ims_get_free_object(Interp *interp,
-        struct Small_Object_Pool *pool)
+gc_ims_get_free_object(Interp *interp, Small_Object_Pool *pool)
 {
     PObj *ptr;
-    struct Arenas *arena_base;
+    Arenas *arena_base;
     Gc_ims_private *g_ims;
 
     arena_base = interp->arena_base;
-    g_ims = arena_base->gc_private;
+    g_ims      = (Gc_ims_private *)arena_base->gc_private;
     if (++g_ims->allocations >= g_ims->alloc_trigger) {
         g_ims->allocations = 0;
         parrot_gc_ims_run_increment(interp);
@@ -459,7 +457,7 @@ gc_ims_get_free_object(Interp *interp,
     /* if we don't have any objects */
     if (!pool->free_list)
         (*pool->alloc_objects) (interp, pool);
-    ptr = pool->free_list;
+    ptr             = (PObj *)pool->free_list;
     pool->free_list = *(void **)ptr;
     /*
      * buffers are born black, PMCs not yet?
@@ -472,17 +470,17 @@ gc_ims_get_free_object(Interp *interp,
 }
 
 static void
-gc_ims_alloc_objects(Interp *interp,
-        struct Small_Object_Pool *pool)
+gc_ims_alloc_objects(Interp *interp, Small_Object_Pool *pool)
 {
-    struct Small_Object_Arena *new_arena;
+    Small_Object_Arena *new_arena;
     size_t size;
     UINTVAL start, end;
 
-    pool->objects_per_alloc = ALLOCATION_BLOCK_SIZE / pool->object_size;
+    pool->objects_per_alloc  = ALLOCATION_BLOCK_SIZE / pool->object_size;
+
     /* Setup memory for the new objects */
-    new_arena = mem_sys_allocate(sizeof (struct Small_Object_Arena));
-    size = ALLOCATION_BLOCK_SIZE;
+    new_arena                = mem_allocate_typed(Small_Object_Arena);
+    size                     = ALLOCATION_BLOCK_SIZE;
     new_arena->start_objects = mem_sys_allocate(size);
 
     Parrot_append_arena_in_pool(interp, pool, new_arena, size);
@@ -493,7 +491,7 @@ gc_ims_alloc_objects(Interp *interp,
 }
 
 static void
-gc_ims_pool_init(Interp *interp, struct Small_Object_Pool *pool)
+gc_ims_pool_init(Interp *interp, Small_Object_Pool *pool)
 {
     pool->add_free_object = gc_ims_add_free_object;
     pool->get_free_object = gc_ims_get_free_object;
@@ -504,7 +502,7 @@ gc_ims_pool_init(Interp *interp, struct Small_Object_Pool *pool)
 static void
 parrot_gc_ims_deinit(Interp* interp)
 {
-    struct Arenas *arena_base;
+    Arenas *arena_base;
 
     arena_base = interp->arena_base;
     mem_sys_free(arena_base->gc_private);
@@ -527,7 +525,7 @@ C<more_objects_fn>.
 void
 Parrot_gc_ims_init(Interp* interp)
 {
-    struct Arenas *arena_base;
+    Arenas *arena_base;
 
     arena_base = interp->arena_base;
     arena_base->gc_private = mem_sys_allocate_zeroed(sizeof (Gc_ims_private));
@@ -558,7 +556,7 @@ static void
 parrot_gc_ims_reinit(Interp* interp)
 {
     Gc_ims_private *g_ims;
-    struct Arenas *arena_base;
+    Arenas *arena_base;
 
     arena_base = interp->arena_base;
     arena_base->lazy_dod = 0;
@@ -569,7 +567,7 @@ parrot_gc_ims_reinit(Interp* interp)
      */
     Parrot_dod_trace_root(interp, 0);
 
-    g_ims = arena_base->gc_private;
+    g_ims        = (Gc_ims_private *)arena_base->gc_private;
     g_ims->state = GC_IMS_MARKING;
 
 }
@@ -592,12 +590,12 @@ parrot_gc_ims_mark(Interp* interp)
 {
     Gc_ims_private *g_ims;
     size_t todo;
-    struct Arenas *arena_base;
+    Arenas *arena_base;
     double work_factor;
     PMC *next;
 
-    arena_base = interp->arena_base;
-    g_ims = arena_base->gc_private;
+    arena_base = (Arenas *)interp->arena_base;
+    g_ims      = (Gc_ims_private *)arena_base->gc_private;
     /*
      * use statistics from the previous run
      */
@@ -631,8 +629,7 @@ TODO split work per pool.
 */
 
 static int
-sweep_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
-        void *arg)
+sweep_cb(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
 {
     int *n_obj = (int *) arg;
 
@@ -646,12 +643,12 @@ sweep_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
 static void
 parrot_gc_ims_sweep(Interp* interp)
 {
-    struct Arenas *arena_base = interp->arena_base;
+    Arenas *arena_base = interp->arena_base;
     Gc_ims_private *g_ims;
     size_t n_objects;
 
     IMS_DEBUG((stderr, "\nSWEEP\n"));
-    g_ims = arena_base->gc_private;
+    g_ims = (Gc_ims_private *)arena_base->gc_private;
     /*
      * as we are now gonna kill objects, make sure that we
      * have traced the current stack
@@ -696,13 +693,12 @@ parrot_gc_ims_collect(Interp* interp, int check_only)
 #else
 
 static int
-collect_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
-        void *arg)
+collect_cb(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
 {
     int check_only = (int)(INTVAL)arg;
-    struct Memory_Pool *mem_pool;
+    Memory_Pool *mem_pool;
     /*
-     * check if there is an associate memory pool
+     * check if there is an associated memory pool
      */
     mem_pool = pool->mem_pool;
     if (!mem_pool)
@@ -735,14 +731,14 @@ collect_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
 static int
 parrot_gc_ims_collect(Interp* interp, INTVAL check_only)
 {
-    struct Arenas *arena_base = interp->arena_base;
+    Arenas *arena_base = interp->arena_base;
     Gc_ims_private *g_ims;
     int ret;
 
     if (!check_only && interp->profile)
         Parrot_dod_profile_start(interp);
-    g_ims = arena_base->gc_private;
-    ret = Parrot_forall_header_pools(interp, POOL_BUFFER,
+    g_ims = (Gc_ims_private *)arena_base->gc_private;
+    ret   = Parrot_forall_header_pools(interp, POOL_BUFFER,
             (void*)check_only, collect_cb);
     if (ret)
         return ret;
@@ -769,8 +765,8 @@ allocation.
 static void
 parrot_gc_ims_run_increment(Interp* interp)
 {
-    struct Arenas *arena_base = interp->arena_base;
-    Gc_ims_private *g_ims = arena_base->gc_private;
+    Arenas *arena_base    = interp->arena_base;
+    Gc_ims_private *g_ims = (Gc_ims_private *)arena_base->gc_private;
 
     if (arena_base->DOD_block_level || g_ims->state == GC_IMS_DEAD) {
         return;
@@ -847,13 +843,12 @@ static void
 parrot_gc_ims_run(Interp *interp, int flags)
 {
     int lazy;
-    struct Arenas *arena_base = interp->arena_base;
-    Gc_ims_private *g_ims = arena_base->gc_private;
+    Arenas *arena_base    = interp->arena_base;
+    Gc_ims_private *g_ims = (Gc_ims_private *)arena_base->gc_private;
 
     if (arena_base->DOD_block_level || g_ims->state == GC_IMS_DEAD) {
         return;
     }
-    g_ims = arena_base->gc_private;
 
     if (flags & DOD_finish_FLAG) {
         /*

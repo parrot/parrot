@@ -185,7 +185,7 @@ Initializes the allocator.
 void
 mem_setup_allocator(Interp *interp)
 {
-    interp->arena_base = mem_sys_allocate_zeroed(sizeof (struct Arenas));
+    interp->arena_base = mem_allocate_zeroed_typed(Arenas);
     SET_NULL(interp->arena_base->sized_header_pools);
 
 #if PARROT_GC_MS

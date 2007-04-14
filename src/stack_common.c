@@ -84,7 +84,7 @@ Get a new chunk either from the freelist or allocate one.
 Stack_Chunk_t *cst_new_stack_chunk(Parrot_Interp interp,
                                    const Stack_Chunk_t *chunk /*NN*/)
 {
-    struct Small_Object_Pool * const pool =
+    Small_Object_Pool * const pool =
         get_bufferlike_pool(interp, chunk->size);
     Stack_Chunk_t * const new_chunk = pool->get_free_object(interp, pool);
 

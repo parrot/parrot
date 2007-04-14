@@ -109,7 +109,7 @@ static opcode_t *
 runops_trace_core(Interp *interp, opcode_t *pc)
 {
     static size_t dod, gc;
-    struct Arenas *arena_base = interp->arena_base;
+    Arenas *arena_base = interp->arena_base;
     Interp *debugger;
     PMC* pio;
 

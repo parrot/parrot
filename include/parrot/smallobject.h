@@ -3,13 +3,13 @@
 
 #  include "parrot/parrot.h"
 
-struct Small_Object_Arena {
+typedef struct Small_Object_Arena {
     size_t used;
     size_t total_objects;
     struct Small_Object_Arena *prev;
     struct Small_Object_Arena *next;
     void *start_objects;
-};
+} Small_Object_Arena;
 
 
 struct Small_Object_Pool;
@@ -77,8 +77,8 @@ typedef struct _gc_gms_gen {
 #endif
 
 /* Tracked resource pool */
-struct Small_Object_Pool {
-    struct Small_Object_Arena *last_Arena;
+typedef struct Small_Object_Pool {
+    Small_Object_Arena *last_Arena;
     /* Size in bytes of an individual pool item. This size may include
      * a GC-system specific GC header.
      * See the macros below.
@@ -97,7 +97,7 @@ struct Small_Object_Pool {
     alloc_objects_fn_type       more_objects;
     /* gets and removes a free object from the pool's free list */
     /* allocates more objects */
-    void *mem_pool;
+    struct Memory_Pool *mem_pool;
     size_t start_arena_memory;
     size_t end_arena_memory;
     const char *name;
@@ -113,7 +113,7 @@ struct Small_Object_Pool {
     struct _gc_gms_gen *last_gen;
 
 #endif
-};
+} Small_Object_Pool;
 
 /*
  * macros used in arena scan code to convert from object pointers
@@ -143,9 +143,9 @@ struct Small_Object_Pool * new_small_object_pool(Interp *,
 int Parrot_is_const_pmc(Parrot_Interp, PMC *);
 
 void Parrot_append_arena_in_pool(Interp *, struct Small_Object_Pool *pool,
-    struct Small_Object_Arena *new_arena, size_t size);
+    Small_Object_Arena *new_arena, size_t size);
 void Parrot_add_to_free_list(Interp *, struct Small_Object_Pool *pool,
-        struct Small_Object_Arena *arena, UINTVAL start, UINTVAL end);
+        Small_Object_Arena *arena, UINTVAL start, UINTVAL end);
 
 void Parrot_small_object_pool_merge(Interp *dest_interp,
         struct Small_Object_Pool *dest, struct Small_Object_Pool *source);

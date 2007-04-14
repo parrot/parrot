@@ -175,14 +175,14 @@ typedef struct {
  * static forward defs
  */
 static void gc_gms_add_free_object(Interp *,
-        struct Small_Object_Pool *pool, void *to_add);
-static void * gc_gms_get_free_object(Interp *, struct Small_Object_Pool *);
-static void gc_gms_alloc_objects(Interp *, struct Small_Object_Pool *);
-static void gc_gms_more_objects(Interp *, struct Small_Object_Pool *);
-static void gc_gms_init_gen(Interp *, struct Small_Object_Pool *);
+        Small_Object_Pool *pool, void *to_add);
+static void * gc_gms_get_free_object(Interp *, Small_Object_Pool *);
+static void gc_gms_alloc_objects(Interp *, Small_Object_Pool *);
+static void gc_gms_more_objects(Interp *, Small_Object_Pool *);
+static void gc_gms_init_gen(Interp *, Small_Object_Pool *);
 static void parrot_gc_gms_run(Interp *, int flags);
 #  if GC_GMS_DEBUG
-static void gms_debug_verify(Interp *, struct Small_Object_Pool *pool,
+static void gms_debug_verify(Interp *, Small_Object_Pool *pool,
         const char *action);
 #  endif
 /*
@@ -197,7 +197,7 @@ static void gms_debug_verify(Interp *, struct Small_Object_Pool *pool,
 
 Free used resources.
 
-=item C<static void gc_gms_pool_init(Interp *, struct Small_Object_Pool *pool)>
+=item C<static void gc_gms_pool_init(Interp *, Small_Object_Pool *pool)>
 
 Initialize pool variables. This function must set the pool function pointers
 for C<add_free_object>, C<get_free_object>, C<alloc_objects>, and
@@ -216,7 +216,7 @@ creation of memory pools.
 static void
 parrot_gc_gms_deinit(Interp* interp)
 {
-    struct Arenas *arena_base;
+    Arenas *arena_base;
 
     arena_base = interp->arena_base;
     /*
@@ -227,7 +227,7 @@ parrot_gc_gms_deinit(Interp* interp)
 }
 
 static void
-gc_gms_pool_init(Interp *interp, struct Small_Object_Pool *pool)
+gc_gms_pool_init(Interp *interp, Small_Object_Pool *pool)
 {
     pool->add_free_object = gc_gms_add_free_object;
     pool->get_free_object = gc_gms_get_free_object;
@@ -244,8 +244,8 @@ gc_gms_pool_init(Interp *interp, struct Small_Object_Pool *pool)
 void
 Parrot_gc_gms_init(Interp* interp)
 {
-    struct Arenas *arena_base;
-    struct Small_Object_Pool *pool;
+    Arenas *arena_base;
+    Small_Object_Pool *pool;
 
     arena_base = interp->arena_base;
     arena_base->gc_private = mem_sys_allocate_zeroed(sizeof (Gc_gms_private));
@@ -267,24 +267,20 @@ Parrot_gc_gms_init(Interp* interp)
 
 =over 4
 
-=item C<static void gc_gms_add_free_object(Interp *,
-                                           struct Small_Object_Pool *pool,
+=item C<static void gc_gms_add_free_object(Interp *, Small_Object_Pool *pool,
                                            void *to_add)>
 
 Unused. White (dead) objects are added in a bunch to the free_list.
 
-=item C<static void * gc_gms_get_free_object(Interp *,
-                                             struct Small_Object_Pool *pool)>
+=item C<static void * gc_gms_get_free_object(Interp *, Small_Object_Pool *pool)>
 
 Get a new object off the free_list in the given pool.
 
-=item C<static void gc_gms_alloc_objects(Interp *,
-                                         struct Small_Object_Pool *pool)>
+=item C<static void gc_gms_alloc_objects(Interp *, Small_Object_Pool *pool)>
 
 Allocate new objects for the given pool.
 
-=item C<static void gc_gms_more_objects(Interp *,
-                                        struct Small_Object_Pool *pool)>
+=item C<static void gc_gms_more_objects(Interp *, Small_Object_Pool *pool)>
 
 Run a GC cycle or allocate new objects for the given pool.
 
@@ -293,8 +289,7 @@ Run a GC cycle or allocate new objects for the given pool.
 */
 
 static void
-gc_gms_add_free_object(Interp *interp,
-        struct Small_Object_Pool *pool, void *to_add)
+gc_gms_add_free_object(Interp *interp, Small_Object_Pool *pool, void *to_add)
 {
     internal_exception(1, "gms abuse");
 }
@@ -338,8 +333,8 @@ gc_gms_add_free_object(Interp *interp,
 
 static void
 gc_gms_chain_objects(Interp *interp,
-        struct Small_Object_Pool *pool,
-        struct Small_Object_Arena *new_arena,
+        Small_Object_Pool *pool,
+        Small_Object_Arena *new_arena,
         size_t real_size)
 {
     Gc_gms_hdr *p, *next, *prev, *marker;
@@ -386,15 +381,14 @@ gc_gms_chain_objects(Interp *interp,
 }
 
 static void
-gc_gms_alloc_objects(Interp *interp,
-        struct Small_Object_Pool *pool)
+gc_gms_alloc_objects(Interp *interp, Small_Object_Pool *pool)
 {
-    struct Small_Object_Arena *new_arena;
+    Small_Object_Arena *new_arena;
     size_t size, real_size;
 
 
     real_size = pool->object_size;
-    new_arena = mem_internal_allocate(sizeof (struct Small_Object_Arena));
+    new_arena = mem_internal_allocate(sizeof (Small_Object_Arena));
     size = real_size * pool->objects_per_alloc;
     new_arena->start_objects = mem_internal_allocate(size);
     /* insert arena in list */
@@ -412,10 +406,9 @@ gc_gms_alloc_objects(Interp *interp,
 }
 
 static void
-gc_gms_more_objects(Interp *interp,
-        struct Small_Object_Pool *pool)
+gc_gms_more_objects(Interp *interp, Small_Object_Pool *pool)
 {
-    struct Small_Object_Arena *arena;
+    Small_Object_Arena *arena;
     if (pool->skip)
         pool->skip = 0;
     else if (pool->last_Arena) {
@@ -435,8 +428,7 @@ gc_gms_more_objects(Interp *interp,
  */
 
 static void *
-gc_gms_get_free_object(Interp *interp,
-        struct Small_Object_Pool *pool)
+gc_gms_get_free_object(Interp *interp, Small_Object_Pool *pool)
 {
     PObj *ptr;
     Gc_gms_hdr *hdr;
@@ -461,13 +453,12 @@ gc_gms_get_free_object(Interp *interp,
 
 =over 4
 
-=item C<static Gc_gms_gen * gc_gms_create_gen(Interp *,
-                                              struct Small_Object_Pool *pool,
+=item C<static Gc_gms_gen * gc_gms_create_gen(Interp *, Small_Object_Pool *pool,
                                               size_t gen_no)>
 
 Create a generation structure for the given generation number.
 
-=item C<static void gc_gms_init_gen(Interp *, struct Small_Object_Pool *pool)>
+=item C<static void gc_gms_init_gen(Interp *, Small_Object_Pool *pool)>
 
 Initalize the generation system by creating the first two generations.
 
@@ -495,8 +486,7 @@ Initalize the generation system by creating the first two generations.
  */
 
 static Gc_gms_gen *
-gc_gms_create_gen(Interp *interp,
-        struct Small_Object_Pool *pool, size_t gen_no)
+gc_gms_create_gen(Interp *interp, Small_Object_Pool *pool, size_t gen_no)
 {
     Gc_gms_gen *gen;
 
@@ -512,8 +502,7 @@ gc_gms_create_gen(Interp *interp,
 }
 
 static void
-gc_gms_init_gen(Interp *interp,
-        struct Small_Object_Pool *pool)
+gc_gms_init_gen(Interp *interp, Small_Object_Pool *pool)
 {
     Gc_gms_private *gmsp;
     /*
@@ -548,7 +537,7 @@ static Gc_gms_gen *
 gc_gms_find_gen(Interp *interp, Gc_gms_hdr *h, UINTVAL gen_no)
 {
     Gc_gms_gen *gen;
-    struct Small_Object_Pool *pool;
+    Small_Object_Pool *pool;
     UINTVAL i;
 
     pool = h->gen->pool;
@@ -576,7 +565,7 @@ gc_gms_promote(Interp *interp, Gc_gms_hdr *h, UINTVAL gen_no)
 {
     Gc_gms_gen *gen;
     Gc_gms_hdr *prev, *next;
-    struct Small_Object_Pool *pool;
+    Small_Object_Pool *pool;
 
     pool = h->gen->pool;
     /* unsnap from current generation */
@@ -714,7 +703,7 @@ typedef struct {
 } Gc_gms_plan;
 
 static void
-gc_gms_merge_gen(Interp *interp, struct Small_Object_Pool *pool,
+gc_gms_merge_gen(Interp *interp, Small_Object_Pool *pool,
         int flag, Gc_gms_plan *plan)
 {
     Gc_gms_gen *gen, *prev;
@@ -739,7 +728,7 @@ gc_gms_merge_gen(Interp *interp, struct Small_Object_Pool *pool,
 }
 
 static void
-gc_gms_use_gen(Interp *interp, struct Small_Object_Pool *pool,
+gc_gms_use_gen(Interp *interp, Small_Object_Pool *pool,
         int flag, Gc_gms_plan *plan)
 {
     Gc_gms_gen *gen, *prev;
@@ -765,8 +754,7 @@ gc_gms_use_gen(Interp *interp, struct Small_Object_Pool *pool,
 }
 
 static int
-set_gen_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
-        void *arg)
+set_gen_cb(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
 {
     Gc_gms_plan *plan = (Gc_gms_plan *)arg;
 
@@ -873,7 +861,7 @@ Set the white header C<h> to black.
 static void
 gc_gms_setto_gray(Interp *interp, Gc_gms_hdr *h, int priority)
 {
-    struct Small_Object_Pool *pool;
+    Small_Object_Pool *pool;
     Gc_gms_hdr *next, *prev;
 
     pool = h->gen->pool;
@@ -940,7 +928,7 @@ gc_gms_setto_gray(Interp *interp, Gc_gms_hdr *h, int priority)
 static void
 gc_gms_setto_black(Interp *interp, Gc_gms_hdr *h, int priority)
 {
-    struct Small_Object_Pool *pool;
+    Small_Object_Pool *pool;
     Gc_gms_hdr *next, *prev;
 
     pool = h->gen->pool;
@@ -1032,8 +1020,7 @@ parrot_gc_gms_pobject_lives(Interp* interp, PObj *obj)
 }
 
 static int
-init_mark_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
-        void *arg)
+init_mark_cb(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
 {
     pool->gray = pool->black = pool->black_fin = pool->white;
 #  if GC_GMS_DEBUG
@@ -1045,7 +1032,7 @@ init_mark_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
 static void
 gc_gms_init_mark(Interp *interp)
 {
-    struct Arenas *arena_base = interp->arena_base;
+    Arenas *arena_base = interp->arena_base;
 
     arena_base->dod_trace_ptr = NULL;
     arena_base->dod_mark_start = NULL;
@@ -1056,8 +1043,7 @@ gc_gms_init_mark(Interp *interp)
 }
 
 static int
-trace_igp_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
-        void *arg)
+trace_igp_cb(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
 {
     Gc_gms_gen *gen;
     Gc_gms_hdr_list *igp;
@@ -1110,10 +1096,9 @@ gc_gms_trace_root(Interp *interp, int trace_stack)
 */
 
 static int
-trace_children_cb(Interp *interp, struct Small_Object_Pool *pool,
-        int flag, void *arg)
+trace_children_cb(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
 {
-    struct Arenas *arena_base = interp->arena_base;
+    Arenas *arena_base = interp->arena_base;
     int lazy_dod = arena_base->lazy_dod;
     UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
     Gc_gms_hdr *h;
@@ -1176,11 +1161,10 @@ gc_gms_trace_children(Interp *interp)
  * TODO put these in front of the pool at pool->white_fin
  */
 static int
-sweep_cb_pmc(Interp *interp, struct Small_Object_Pool *pool,
-        int flag, void *arg)
+sweep_cb_pmc(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
 {
     Gc_gms_hdr *h;
-    struct Arenas *arena_base = interp->arena_base;
+    Arenas *arena_base = interp->arena_base;
 
     /* TODO object stats */
 
@@ -1194,7 +1178,7 @@ sweep_cb_pmc(Interp *interp, struct Small_Object_Pool *pool,
             /* if the PMC has a PMC_EXT structure,
              * return it to the pool
              */
-            struct Small_Object_Pool *ext_pool = arena_base->pmc_ext_pool;
+            Small_Object_Pool *ext_pool = arena_base->pmc_ext_pool;
             ext_pool->add_free_object(interp, ext_pool, obj->pmc_ext);
         }
 
@@ -1204,8 +1188,7 @@ sweep_cb_pmc(Interp *interp, struct Small_Object_Pool *pool,
 }
 
 static int
-sweep_cb_buf(Interp *interp, struct Small_Object_Pool *pool,
-        int flag, void *arg)
+sweep_cb_buf(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
 {
     Gc_gms_hdr *h;
 
@@ -1245,11 +1228,11 @@ sweep_cb_buf(Interp *interp, struct Small_Object_Pool *pool,
              */
             if (pool->mem_pool) {
                 if (!PObj_COW_TEST(obj)) {
-                    ((struct Memory_Pool *)
+                    ((Memory_Pool *)
                      pool->mem_pool)->guaranteed_reclaimable +=
                         PObj_buflen(obj);
                 }
-                ((struct Memory_Pool *)
+                ((Memory_Pool *)
                  pool->mem_pool)->possibly_reclaimable +=
                     PObj_buflen(obj);
             }
@@ -1269,8 +1252,7 @@ gc_gms_sweep(Interp *interp)
 }
 
 static int
-end_cycle_cb(Interp *interp, struct Small_Object_Pool *pool,
-        int flag, void *arg)
+end_cycle_cb(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
 {
     Gc_gms_hdr *h;
     /*
@@ -1314,7 +1296,7 @@ static void
 parrot_gc_gms_run(Interp *interp, int flags)
 {
     int lazy;
-    struct Arenas *arena_base = interp->arena_base;
+    Arenas *arena_base = interp->arena_base;
     Gc_gms_private *g_gms;
 
     if (arena_base->DOD_block_level) {
@@ -1323,7 +1305,7 @@ parrot_gc_gms_run(Interp *interp, int flags)
     ++arena_base->DOD_block_level;
     g_gms = arena_base->gc_private;
     if (flags & DOD_finish_FLAG) {
-        struct Small_Object_Pool *pool;
+        Small_Object_Pool *pool;
 
         pool = arena_base->pmc_pool;
         pool->white = pool->marker.next;
@@ -1355,8 +1337,7 @@ parrot_gc_gms_run(Interp *interp, int flags)
 
 #  if GC_GMS_DEBUG
 static void
-gms_debug_verify(Interp *interp, struct Small_Object_Pool *pool,
-        const char *action)
+gms_debug_verify(Interp *interp, Small_Object_Pool *pool, const char *action)
 {
     Gc_gms_hdr *h, *next;
     int bf, gf, wf, ff;

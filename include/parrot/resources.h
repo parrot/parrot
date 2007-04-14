@@ -15,17 +15,17 @@
 
 #include "parrot/parrot.h"
 
-struct Memory_Block {
+typedef struct Memory_Block {
     size_t free;
     size_t size;
     struct Memory_Block *prev;
     struct Memory_Block *next;
     char *start;
     char *top;
-};
+} Memory_Block;
 
-struct Memory_Pool {
-    struct Memory_Block *top_block;
+typedef struct Memory_Pool {
+    Memory_Block *top_block;
     void (*compact)(Interp *, struct Memory_Pool *);
     size_t minimum_block_size;
     size_t total_allocated; /* total bytes allocated to this pool */
@@ -33,7 +33,7 @@ struct Memory_Pool {
     size_t possibly_reclaimable;     /* bytes that can possibly be reclaimed
                                       * (above plus COW-freed bytes) */
     FLOATVAL reclaim_factor; /* minimum percentage we will reclaim */
-};
+} Memory_Pool;
 
 
 
@@ -54,9 +54,9 @@ int Parrot_in_memory_pool(Interp *interp, void *bufstart);
 
 void Parrot_go_collect(Interp *);
 
-struct Arenas {
-    struct Memory_Pool *memory_pool;
-    struct Memory_Pool *constant_string_pool;
+typedef struct Arenas {
+    Memory_Pool *memory_pool;
+    Memory_Pool *constant_string_pool;
     struct Small_Object_Pool *string_header_pool;
     struct Small_Object_Pool *pmc_pool;
     struct Small_Object_Pool *pmc_ext_pool;
@@ -114,7 +114,7 @@ struct Arenas {
      * private data for the GC subsystem
      */
     void *  gc_private;         /* gc subsystem data */
-};
+} Arenas;
 
 /* &gen_from_enum(interpinfo.pasm) prefix(INTERPINFO_) */
 

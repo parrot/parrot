@@ -37,8 +37,7 @@ Handles getting of various headers, and pool creation.
 =over 4
 
 =item C<static void *
-get_free_buffer(Interp *interp,
-        struct Small_Object_Pool *pool)>
+get_free_buffer(Interp *interp, Small_Object_Pool *pool)>
 
 Gets a free C<Buffer> from C<pool> and returns it. Memory is cleared.
 
@@ -47,8 +46,7 @@ Gets a free C<Buffer> from C<pool> and returns it. Memory is cleared.
 */
 
 static void *
-get_free_buffer(Interp *interp,
-        struct Small_Object_Pool *pool)
+get_free_buffer(Interp *interp, Small_Object_Pool *pool)
 {
     PObj *buffer = pool->get_free_object(interp, pool);
 
@@ -70,8 +68,7 @@ get_free_buffer(Interp *interp,
 
 =over 4
 
-=item C<struct Small_Object_Pool *
-new_pmc_pool(Interp *interp)>
+=item C<Small_Object_Pool * new_pmc_pool(Interp *interp)>
 
 Creates an new pool for PMCs and returns it.
 
@@ -79,11 +76,10 @@ Creates an new pool for PMCs and returns it.
 
 */
 
-struct Small_Object_Pool *
-new_pmc_pool(Interp *interp)
+Small_Object_Pool * new_pmc_pool(Interp *interp)
 {
     int num_headers = PMC_HEADERS_PER_ALLOC;
-    struct Small_Object_Pool *pmc_pool =
+    Small_Object_Pool *pmc_pool =
         new_small_object_pool(interp, sizeof (PMC), num_headers);
 
     pmc_pool->mem_pool = NULL;
@@ -93,9 +89,8 @@ new_pmc_pool(Interp *interp)
 
 /*
 
-=item C<struct Small_Object_Pool *
-new_bufferlike_pool(Interp *interp,
-        size_t actual_buffer_size)>
+=item C<Small_Object_Pool *
+new_bufferlike_pool(Interp *interp, size_t actual_buffer_size)>
 
 Creates a new pool for buffer-like structures. Usually you would need
 C<make_bufferlike_pool()>.
@@ -104,14 +99,14 @@ C<make_bufferlike_pool()>.
 
 */
 
-struct Small_Object_Pool *
+Small_Object_Pool *
 new_bufferlike_pool(Interp *interp,
         size_t actual_buffer_size)
 {
     int num_headers = BUFFER_HEADERS_PER_ALLOC;
     size_t buffer_size =
             (actual_buffer_size + sizeof (void *) - 1) & ~(sizeof (void *) - 1);
-    struct Small_Object_Pool *pool =
+    Small_Object_Pool *pool =
             new_small_object_pool(interp, buffer_size, num_headers);
 
     pool->mem_pool = interp->arena_base->memory_pool;
@@ -121,7 +116,7 @@ new_bufferlike_pool(Interp *interp,
 
 /*
 
-=item C<struct Small_Object_Pool *
+=item C<Small_Object_Pool *
 new_buffer_pool(Interp *interp)>
 
 Non-constant strings and plain Buffers are in the sized header pools.
@@ -130,7 +125,7 @@ Non-constant strings and plain Buffers are in the sized header pools.
 
 */
 
-struct Small_Object_Pool *
+Small_Object_Pool *
 new_buffer_pool(Interp *interp)
 {
     return make_bufferlike_pool(interp, sizeof (Buffer));
@@ -138,7 +133,7 @@ new_buffer_pool(Interp *interp)
 
 /*
 
-=item C<struct Small_Object_Pool *
+=item C<Small_Object_Pool *
 new_string_pool(Interp *interp, INTVAL constant)>
 
 Creates a new pool for C<STRINGS> and returns it.
@@ -147,10 +142,10 @@ Creates a new pool for C<STRINGS> and returns it.
 
 */
 
-struct Small_Object_Pool *
+Small_Object_Pool *
 new_string_pool(Interp *interp, INTVAL constant)
 {
-    struct Small_Object_Pool *pool;
+    Small_Object_Pool *pool;
     if (constant) {
         pool = new_bufferlike_pool(interp, sizeof (STRING));
         pool->mem_pool = interp->arena_base->constant_string_pool;
@@ -163,7 +158,7 @@ new_string_pool(Interp *interp, INTVAL constant)
 
 /*
 
-=item C<struct Small_Object_Pool *
+=item C<Small_Object_Pool *
 make_bufferlike_pool(Interp *interp, size_t buffer_size)>
 
 Make and return a bufferlike header pool.
@@ -172,12 +167,12 @@ Make and return a bufferlike header pool.
 
 */
 
-struct Small_Object_Pool *
+Small_Object_Pool *
 make_bufferlike_pool(Interp *interp, size_t buffer_size)
 {
     UINTVAL idx;
     UINTVAL num_old = interp->arena_base->num_sized;
-    struct Small_Object_Pool **sized_pools =
+    Small_Object_Pool **sized_pools =
             interp->arena_base->sized_header_pools;
 
     idx = (buffer_size - sizeof (Buffer)) / sizeof (void *);
@@ -202,7 +197,7 @@ make_bufferlike_pool(Interp *interp, size_t buffer_size)
 
 /*
 
-=item C<struct Small_Object_Pool *
+=item C<Small_Object_Pool *
 get_bufferlike_pool(Interp *interp, size_t buffer_size)>
 
 Return a bufferlike header pool, it must exist.
@@ -211,10 +206,10 @@ Return a bufferlike header pool, it must exist.
 
 */
 
-struct Small_Object_Pool *
+Small_Object_Pool *
 get_bufferlike_pool(Interp *interp, size_t buffer_size)
 {
-    struct Small_Object_Pool **sized_pools =
+    Small_Object_Pool **sized_pools =
             interp->arena_base->sized_header_pools;
 
     return sized_pools[ (buffer_size - sizeof (Buffer)) / sizeof (void *) ];
@@ -236,7 +231,7 @@ static PMC_EXT * new_pmc_ext(Parrot_Interp);
 PMC *
 new_pmc_header(Interp *interp, UINTVAL flags)
 {
-    struct Small_Object_Pool *pool;
+    Small_Object_Pool *pool;
     PMC *pmc;
 
     pool = flags & PObj_constant_FLAG ?
@@ -275,7 +270,7 @@ Creates a new C<PMC_EXT> and returns it.
 static PMC_EXT *
 new_pmc_ext(Interp *interp)
 {
-    struct Small_Object_Pool *pool = interp->arena_base->pmc_ext_pool;
+    Small_Object_Pool *pool = interp->arena_base->pmc_ext_pool;
     void *ptr;
     /*
      * can't use normal get_free_object--PMC_EXT doesn't have flags
@@ -394,7 +389,7 @@ Creates and returns a new buffer-like header.
 void *
 new_bufferlike_header(Interp *interp, size_t size)
 {
-    struct Small_Object_Pool *pool;
+    Small_Object_Pool *pool;
 
     pool = get_bufferlike_pool(interp, size);
 
@@ -417,7 +412,7 @@ get_max_buffer_address(Interp *interp)
 {
     UINTVAL i;
     size_t max = 0;
-    struct Arenas *arena_base = interp->arena_base;
+    Arenas *arena_base = interp->arena_base;
 
     for (i = 0; i < arena_base->num_sized; i++) {
         if (arena_base->sized_header_pools[i]) {
@@ -444,7 +439,7 @@ size_t
 get_min_buffer_address(Interp *interp)
 {
     UINTVAL i;
-    struct Arenas *arena_base = interp->arena_base;
+    Arenas *arena_base = interp->arena_base;
     size_t min = (size_t) -1;
 
     for (i = 0; i < arena_base->num_sized; i++) {
@@ -506,7 +501,7 @@ int
 is_buffer_ptr(Interp *interp, void *ptr)
 {
     UINTVAL i;
-    struct Arenas *arena_base = interp->arena_base;;
+    Arenas *arena_base = interp->arena_base;;
 
     for (i = 0; i < arena_base->num_sized; i++) {
         if (arena_base->sized_header_pools[i] &&
@@ -551,7 +546,7 @@ Initialize the pools for the tracked resources.
 void
 Parrot_initialize_header_pools(Interp *interp)
 {
-    struct Arenas *arena_base;
+    Arenas *arena_base;
 
     arena_base = interp->arena_base;
     /* Init the constant string header pool */
@@ -633,8 +628,8 @@ int
 Parrot_forall_header_pools(Interp *interp, int flag, void *arg,
         pool_iter_fn func)
 {
-    struct Small_Object_Pool *pool;
-    struct Arenas *arena_base;
+    Small_Object_Pool *pool;
+    Arenas *arena_base;
     int ret_val, i;
 
     arena_base = interp->arena_base;
@@ -681,9 +676,9 @@ Destroys the header pools.
 */
 
 static void
-free_pool(Interp *interp, struct Small_Object_Pool *pool)
+free_pool(Interp *interp, Small_Object_Pool *pool)
 {
-    struct Small_Object_Arena *cur_arena, *next;
+    Small_Object_Arena *cur_arena, *next;
     for (cur_arena = pool->last_Arena; cur_arena;) {
         next = cur_arena->prev;
         mem_internal_free(cur_arena->start_objects);
@@ -694,7 +689,7 @@ free_pool(Interp *interp, struct Small_Object_Pool *pool)
 }
 
 static int
-sweep_cb_buf(Interp *interp, struct Small_Object_Pool *pool, int flag,
+sweep_cb_buf(Interp *interp, Small_Object_Pool *pool, int flag,
         void *arg)
 {
     int pass = (int)(INTVAL)arg;
@@ -715,7 +710,7 @@ sweep_cb_buf(Interp *interp, struct Small_Object_Pool *pool, int flag,
 }
 
 static int
-sweep_cb_pmc(Interp *interp, struct Small_Object_Pool *pool, int flag,
+sweep_cb_pmc(Interp *interp, Small_Object_Pool *pool, int flag,
         void *arg)
 {
     Parrot_dod_sweep(interp, pool);
@@ -760,10 +755,9 @@ Merge the header pools of C<source_interp> into those of C<dest_interp>.
 =cut
 */
 
-static void fix_pmc_syncs(Interp *dest_interp,
-        struct Small_Object_Pool *pool) {
+static void fix_pmc_syncs(Interp *dest_interp, Small_Object_Pool *pool) {
     /* XXX largely copied from dod_sweep */
-    struct Small_Object_Arena *cur_arena;
+    Small_Object_Arena *cur_arena;
     UINTVAL object_size = pool->object_size;
     size_t i;
     size_t nm;
@@ -796,8 +790,8 @@ static void fix_pmc_syncs(Interp *dest_interp,
 
 void
 Parrot_merge_header_pools(Interp *dest_interp, Interp *source_interp) {
-    struct Arenas *dest_arena;
-    struct Arenas *source_arena;
+    Arenas *dest_arena;
+    Arenas *source_arena;
     UINTVAL i;
 
     dest_arena = dest_interp->arena_base;

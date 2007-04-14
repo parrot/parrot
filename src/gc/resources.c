@@ -26,14 +26,14 @@ src/resources.c - Allocate and deallocate tracked resources
 #define RESOURCE_DEBUG 0
 #define RESOURCE_DEBUG_SIZE 1000000
 
-typedef void (*compact_f) (Interp *, struct Memory_Pool *);
+typedef void (*compact_f) (Interp *, Memory_Pool *);
 static void* aligned_mem(Buffer *buffer, char *mem);
 
 /*
 
 =item C<static void *
 alloc_new_block(Interp *interp,
-        size_t size, struct Memory_Pool *pool, const char *why)>
+        size_t size, Memory_Pool *pool, const char *why)>
 
 Allocate a new memory block. We allocate the larger of however much was
 asked for or the default size, whichever's larger. The given text is
@@ -44,10 +44,9 @@ used for debugging.
 */
 
 static void *
-alloc_new_block(Interp *interp,
-        size_t size, struct Memory_Pool *pool, const char *why)
+alloc_new_block(Interp *interp, size_t size, Memory_Pool *pool, const char *why)
 {
-    struct Memory_Block *new_block;
+    Memory_Block *new_block;
 
     const size_t alloc_size = (size > pool->minimum_block_size)
             ? size : pool->minimum_block_size;
@@ -59,8 +58,8 @@ alloc_new_block(Interp *interp,
 #endif
 
     /* Allocate a new block. Header info's on the front */
-    new_block = mem_internal_allocate_zeroed(sizeof (struct Memory_Block) +
-            alloc_size);
+    new_block = (Memory_Block *)mem_internal_allocate_zeroed(
+        sizeof (Memory_Block) + alloc_size);
     if (!new_block) {
         fprintf(stderr, "out of mem allocsize = %d\n", (int)alloc_size);
         exit(1);
@@ -70,7 +69,7 @@ alloc_new_block(Interp *interp,
     new_block->free = alloc_size;
     new_block->size = alloc_size;
     SET_NULL(new_block->next);
-    new_block->start = (char *)new_block + sizeof (struct Memory_Block);
+    new_block->start = (char *)new_block + sizeof (Memory_Block);
     new_block->top = new_block->start;
 
     /* Note that we've allocated it */
@@ -91,7 +90,7 @@ alloc_new_block(Interp *interp,
 /*
 
 =item C<static void *
-mem_allocate(Interp *, size_t size, struct Memory_Pool *pool)>
+mem_allocate(Interp *, size_t size, Memory_Pool *pool)>
 
 Allocates memory for headers.
 
@@ -127,10 +126,10 @@ Buffer memory layout:
 */
 
 
-static char *
-mem_allocate(Interp *interp, size_t size, struct Memory_Pool *pool)
+static void *
+mem_allocate(Interp *interp, size_t size, Memory_Pool *pool)
 {
-    char *return_val;
+    void *return_val;
 
     /* we always should have one block at least */
     assert(pool->top_block);
@@ -218,7 +217,7 @@ debug_print_buf(Interp *interp, const PObj *b)
 =over
 
 =item C<static void
-compact_pool(Interp *interp, struct Memory_Pool *pool)>
+compact_pool(Interp *interp, Memory_Pool *pool)>
 
 Compact the buffer pool.
 
@@ -227,14 +226,14 @@ Compact the buffer pool.
 */
 
 static void
-compact_pool(Interp *interp, struct Memory_Pool *pool)
+compact_pool(Interp *interp, Memory_Pool *pool)
 {
     UINTVAL total_size;
-    struct Memory_Block *new_block;     /* A pointer to our working block */
+    Memory_Block *new_block;     /* A pointer to our working block */
     char *cur_spot;             /* Where we're currently copying to */
-    struct Arenas * const arena_base = interp->arena_base;
-    struct Small_Object_Arena *cur_buffer_arena;
-    struct Small_Object_Pool *header_pool;
+    Arenas * const arena_base = interp->arena_base;
+    Small_Object_Arena *cur_buffer_arena;
+    Small_Object_Pool *header_pool;
     INTVAL j;
     UINTVAL object_size;
     INTVAL *ref_count = NULL;
@@ -255,7 +254,7 @@ compact_pool(Interp *interp, struct Memory_Pool *pool)
     /* total-reclaimable == currently used. Add a minimum block to the current
      * amount, so we can avoid having to allocate it in the future. */
     {
-        struct Memory_Block *cur_block;
+        Memory_Block *cur_block;
 
         total_size = 0;
         cur_block = pool->top_block;
@@ -294,7 +293,7 @@ compact_pool(Interp *interp, struct Memory_Pool *pool)
 #endif
 
     /* Snag a block big enough for everything */
-    new_block = alloc_new_block(interp, total_size, pool,
+    new_block = (Memory_Block *)alloc_new_block(interp, total_size, pool,
             "inside compact");
 
     /* Start at the beginning */
@@ -314,7 +313,8 @@ compact_pool(Interp *interp, struct Memory_Pool *pool)
             Buffer *b;
             UINTVAL i;
 
-            b = ARENA_to_PObj(cur_buffer_arena->start_objects);
+            b = (Buffer *)ARENA_to_PObj(cur_buffer_arena->start_objects);
+
             for (i = 0; i < cur_buffer_arena->used; i++) {
                 /* ! (on_free_list | constant | external | sysmem) */
                 if (PObj_buflen(b) && PObj_is_movable_TESTALL(b)) {
@@ -404,7 +404,7 @@ compact_pool(Interp *interp, struct Memory_Pool *pool)
     /* Now we're done. We're already on the pool's free list, so let us be the
      * only one on the free list and free the rest */
     {
-        struct Memory_Block *cur_block, *next_block;
+        Memory_Block *cur_block, *next_block;
 
         assert(new_block == pool->top_block);
         cur_block = new_block->prev;
@@ -489,8 +489,8 @@ aligned_string_size(STRING *buffer, size_t len)
 /* XXX FIXME used for hack in string.c*/
 int
 Parrot_in_memory_pool(Interp *interp, void *bufstart) {
-    struct Memory_Pool * const pool = interp->arena_base->memory_pool;
-    struct Memory_Block *cur_block;
+    Memory_Pool * const pool = interp->arena_base->memory_pool;
+    Memory_Block *cur_block;
     cur_block = pool->top_block;
     while (cur_block) {
         if ((char *)bufstart >= cur_block->start &&
@@ -529,7 +529,7 @@ Parrot_reallocate(Interp *interp, Buffer *buffer, size_t tosize)
 {
     size_t copysize;
     void *mem;
-    struct Memory_Pool * const pool = interp->arena_base->memory_pool;
+    Memory_Pool * const pool = interp->arena_base->memory_pool;
     size_t new_size, needed, old_size;
 
     /*
@@ -596,7 +596,7 @@ Parrot_reallocate_string(Interp *interp, STRING *str, size_t tosize)
     char *mem, *oldmem;
     size_t new_size, needed, old_size;
 
-    struct Memory_Pool * const pool =
+    Memory_Pool * const pool =
         PObj_constant_TEST(str)
             ? interp->arena_base->constant_string_pool
             : interp->arena_base->memory_pool;
@@ -635,8 +635,8 @@ Parrot_reallocate_string(Interp *interp, STRING *str, size_t tosize)
     mem += sizeof (void*);
 
     /* copy mem from strstart, *not* bufstart */
-    oldmem = str->strstart;
-    str->strstart = PObj_bufstart(str) = mem;
+    oldmem           = str->strstart;
+    str->strstart    = PObj_bufstart(str) = mem;
     PObj_buflen(str) = new_size - sizeof (void*);
 
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
@@ -715,7 +715,7 @@ void
 Parrot_allocate_string(Interp *interp, STRING *str, size_t size)
 {
     size_t new_size;
-    struct Memory_Pool *pool;
+    Memory_Pool *pool;
     char *mem;
 
     PObj_buflen(str) = 0;
@@ -733,7 +733,7 @@ Parrot_allocate_string(Interp *interp, STRING *str, size_t size)
 
 /*
 
-=item C<static struct Memory_Pool *
+=item C<static Memory_Pool *
 new_memory_pool(size_t min_block, compact_f compact)>
 
 Create a new memory pool.
@@ -742,11 +742,11 @@ Create a new memory pool.
 
 */
 
-static struct Memory_Pool *
+static Memory_Pool *
 new_memory_pool(size_t min_block, compact_f compact)
 {
-    struct Memory_Pool * const pool =
-        mem_internal_allocate(sizeof (struct Memory_Pool));
+    Memory_Pool * const pool =
+        (Memory_Pool *)mem_internal_allocate(sizeof (Memory_Pool));
 
     if (pool) {
         pool->top_block = NULL;
@@ -775,7 +775,7 @@ Initialize the managed memory pools.
 void
 Parrot_initialize_memory_pools(Interp *interp)
 {
-    struct Arenas * const arena_base = interp->arena_base;
+    Arenas * const arena_base = interp->arena_base;
 
     arena_base->memory_pool = new_memory_pool(POOL_SIZE, &compact_pool);
     alloc_new_block(interp, POOL_SIZE, arena_base->memory_pool, "init");
@@ -804,14 +804,14 @@ Parrot_destroy_memory_pools(Interp *interp)
     int i;
 
     for (i = 0; i < 2; i++) {
-        struct Memory_Pool * const pool = i ?
+        Memory_Pool * const pool = i ?
                 interp->arena_base->constant_string_pool :
                 interp->arena_base->memory_pool;
-        struct Memory_Block *cur_block;
+        Memory_Block *cur_block;
 
         cur_block = pool->top_block;
         while (cur_block) {
-            struct Memory_Block * const next_block = cur_block->prev;
+            Memory_Block * const next_block = cur_block->prev;
             mem_internal_free(cur_block);
             cur_block = next_block;
         }
@@ -831,10 +831,10 @@ Merge the memory pools of C<source_interp> into C<dest_interp>.
 
 */
 
-static void merge_pools(struct Memory_Pool *dest, struct Memory_Pool *source)
+static void merge_pools(Memory_Pool *dest, Memory_Pool *source)
 {
-    struct Memory_Block *cur_block;
-    struct Memory_Block *next_block;
+    Memory_Block *cur_block;
+    Memory_Block *next_block;
 
     cur_block = source->top_block;
     while (cur_block) {

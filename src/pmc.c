@@ -127,7 +127,7 @@ pmc_reuse(Interp *interp, PMC *pmc, INTVAL new_type,
             /* if the PMC has a PMC_EXT structure,
              * return it to the pool/arena
              */
-            struct Small_Object_Pool * const ext_pool =
+            Small_Object_Pool * const ext_pool =
                 interp->arena_base->pmc_ext_pool;
             if (PObj_is_PMC_shared_TEST(pmc) && PMC_sync(pmc)) {
                 MUTEX_DESTROY(PMC_sync(pmc)->pmc_lock);
@@ -450,7 +450,7 @@ create_class_pmc(Interp *interp, INTVAL type)
          * return it to the pool/arena
          * we don't need it - basically only the vtable is important
          */
-        struct Small_Object_Pool * const ext_pool =
+        Small_Object_Pool * const ext_pool =
             interp->arena_base->pmc_ext_pool;
         if (PMC_sync(class))
             mem_internal_free(PMC_sync(class));

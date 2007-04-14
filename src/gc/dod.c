@@ -59,7 +59,7 @@ static void
 mark_special(Parrot_Interp interp, PMC* obj)
 {
     int hi_prio;
-    struct Arenas *arena_base;
+    Arenas *arena_base;
 
     /*
      * If the object is shared, we have to use the arena and dod
@@ -213,7 +213,7 @@ int
 Parrot_dod_trace_root(Interp *interp, int trace_stack)
 {
 
-    struct Arenas *arena_base = interp->arena_base;
+    Arenas *arena_base = interp->arena_base;
     parrot_context_t *ctx;
 
     /*
@@ -335,7 +335,7 @@ int
 Parrot_dod_trace_children(Interp *interp, size_t how_many)
 {
     PMC *next;
-    struct Arenas * const arena_base = interp->arena_base;
+    Arenas * const arena_base = interp->arena_base;
     INTVAL i = 0;
     const UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
     PMC *current = arena_base->dod_mark_start;
@@ -383,7 +383,7 @@ Parrot_dod_trace_children(Interp *interp, size_t how_many)
         if (bits) {
             if (bits == PObj_data_is_PMC_array_FLAG) {
                 /* malloced array of PMCs */
-                PMC **data = PMC_data(current);
+                PMC **data = PMC_data_typed(current, PMC **);
 
                 if (data) {
                     for (i = 0; i < PMC_int_val(current); i++) {
@@ -421,8 +421,7 @@ Parrot_dod_trace_children(Interp *interp, size_t how_many)
 /*
 
 =item C<void
-clear_cow(Interp *interp, struct Small_Object_Pool *pool,
-        int cleanup)>
+clear_cow(Interp *interp, Small_Object_Pool *pool, int cleanup)>
 
 Clear the COW ref count.
 
@@ -431,11 +430,10 @@ Clear the COW ref count.
 */
 
 void
-clear_cow(Interp *interp, struct Small_Object_Pool *pool,
-        int cleanup)
+clear_cow(Interp *interp, Small_Object_Pool *pool, int cleanup)
 {
     const UINTVAL object_size = pool->object_size;
-    struct Small_Object_Arena *cur_arena;
+    Small_Object_Arena *cur_arena;
 
     /* clear refcount for COWable objects. */
     for (cur_arena = pool->last_Arena;
@@ -469,8 +467,7 @@ clear_cow(Interp *interp, struct Small_Object_Pool *pool,
 /*
 
 =item C<void
-used_cow(Interp *interp, struct Small_Object_Pool *pool,
-        int cleanup)>
+used_cow(Interp *interp, Small_Object_Pool *pool, int cleanup)>
 
 Find other users of COW's C<bufstart>.
 
@@ -479,10 +476,10 @@ Find other users of COW's C<bufstart>.
 */
 
 void
-used_cow(Interp *interp, struct Small_Object_Pool *pool, int cleanup)
+used_cow(Interp *interp, Small_Object_Pool *pool, int cleanup)
 {
     UINTVAL object_size = pool->object_size;
-    struct Small_Object_Arena *cur_arena;
+    Small_Object_Arena *cur_arena;
 
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
@@ -510,8 +507,7 @@ used_cow(Interp *interp, struct Small_Object_Pool *pool, int cleanup)
 /*
 
 =item C<void
-Parrot_dod_sweep(Interp *interp,
-        struct Small_Object_Pool *pool)>
+Parrot_dod_sweep(Interp *interp, Small_Object_Pool *pool)>
 
 Put any buffers/PMCs that are now unused onto the pool's free list. If
 C<GC_IS_MALLOC>, bufstart gets freed too, if possible. Avoid buffers that
@@ -522,11 +518,10 @@ are immune from collection (i.e. constant).
 */
 
 void
-Parrot_dod_sweep(Interp *interp,
-        struct Small_Object_Pool *pool)
+Parrot_dod_sweep(Interp *interp, Small_Object_Pool *pool)
 {
-    struct Arenas *arena_base = interp->arena_base;
-    struct Small_Object_Arena *cur_arena;
+    Arenas *arena_base = interp->arena_base;
+    Small_Object_Arena *cur_arena;
     UINTVAL i, total_used = 0;
     UINTVAL object_size = pool->object_size;
     size_t nm;
@@ -548,7 +543,7 @@ Parrot_dod_sweep(Interp *interp,
     /* Run through all the buffer header pools and mark */
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
-        Buffer *b = cur_arena->start_objects;
+        Buffer *b = (Buffer *)cur_arena->start_objects;
 
         for (i = nm = 0; i < cur_arena->used; i++) {
             if (PObj_on_free_list_TEST(b))
@@ -600,7 +595,7 @@ Parrot_dod_sweep(Interp *interp,
                         /* if the PMC has a PMC_EXT structure,
                          * return it to the pool/arena
                          */
-                        struct Small_Object_Pool *ext_pool =
+                        Small_Object_Pool *ext_pool =
                             arena_base->pmc_ext_pool;
                         if (PObj_is_PMC_shared_TEST(p) && PMC_sync(p)) {
                             MUTEX_DESTROY(PMC_sync(p)->pmc_lock);
@@ -614,9 +609,9 @@ Parrot_dod_sweep(Interp *interp,
                     /*
                      * invalidate the PMC
                      */
-                    p->vtable = (void*)0xdeadbeef;
-                    PMC_pmc_val(p) = (void*)0xdeadbeef;
-                    p->pmc_ext = (void*)0xdeadbeef;
+                    p->vtable      = (VTABLE *)0xdeadbeef;
+                    PMC_pmc_val(p) = (PMC *)0xdeadbeef;
+                    p->pmc_ext     = (PMC_EXT *)0xdeadbeef;
 #endif
                 }
                 /* else object is a buffer(like) */
@@ -649,11 +644,11 @@ Parrot_dod_sweep(Interp *interp,
                      */
                     if (pool->mem_pool) {
                         if (!PObj_COW_TEST(b)) {
-                            ((struct Memory_Pool *)
+                            ((Memory_Pool *)
                              pool->mem_pool)->guaranteed_reclaimable +=
                                 PObj_buflen(b);
                         }
-                        ((struct Memory_Pool *)
+                        ((Memory_Pool *)
                          pool->mem_pool)->possibly_reclaimable +=
                             PObj_buflen(b);
                     }
@@ -786,14 +781,13 @@ Run through all PMC arenas and clear live bits.
 */
 
 static void
-clear_live_bits(Parrot_Interp interp,
-        struct Small_Object_Pool * const pool) {
-    struct Small_Object_Arena *arena;
+clear_live_bits(Parrot_Interp interp, Small_Object_Pool * const pool) {
+    Small_Object_Arena *arena;
     UINTVAL i;
     const UINTVAL object_size = pool->object_size;
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        Buffer *b = arena->start_objects;
+        Buffer *b = (Buffer *)arena->start_objects;
         for (i = 0; i < arena->used; i++) {
             PObj_live_CLEAR(b);
             b = (Buffer *)((char *)b + object_size);
@@ -805,7 +799,7 @@ clear_live_bits(Parrot_Interp interp,
 void
 Parrot_dod_clear_live_bits(Parrot_Interp interp)
 {
-    struct Small_Object_Pool * const pool = interp->arena_base->pmc_pool;
+    Small_Object_Pool * const pool = interp->arena_base->pmc_pool;
     clear_live_bits(interp, pool);
 }
 
@@ -886,7 +880,7 @@ Prepare for a mark & sweep DOD run.
 void
 Parrot_dod_ms_run_init(Interp *interp)
 {
-    struct Arenas * const arena_base = interp->arena_base;
+    Arenas * const arena_base = interp->arena_base;
 
     arena_base->dod_trace_ptr = NULL;
     arena_base->dod_mark_start = NULL;
@@ -895,8 +889,7 @@ Parrot_dod_ms_run_init(Interp *interp)
 }
 
 static int
-sweep_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
-        void *arg)
+sweep_cb(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
 {
     int * const total_free = (int *) arg;
 #ifdef GC_IS_MALLOC
@@ -917,7 +910,7 @@ sweep_cb(Interp *interp, struct Small_Object_Pool *pool, int flag,
 void
 Parrot_dod_ms_run(Interp *interp, int flags)
 {
-    struct Arenas *arena_base = interp->arena_base;
+    Arenas *arena_base = interp->arena_base;
     /* XXX these should go into the interpreter */
     int total_free = 0;
 

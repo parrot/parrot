@@ -575,8 +575,7 @@ pmc_add_ext(Parrot_Interp interp, PMC *pmc)
 /*
 
 =item C<static void
-cleanup_next_for_GC_pool(Parrot_Interp interp,
-    struct Small_Object_Pool *pool)>
+cleanup_next_for_GC_pool(Parrot_Interp interp, Small_Object_Pool *pool)>
 
 Sets all the C<next_for_GC> pointers to C<NULL>.
 
@@ -585,10 +584,9 @@ Sets all the C<next_for_GC> pointers to C<NULL>.
 */
 
 static void
-cleanup_next_for_GC_pool(Parrot_Interp interp,
-    struct Small_Object_Pool *pool)
+cleanup_next_for_GC_pool(Parrot_Interp interp, Small_Object_Pool *pool)
 {
-    struct Small_Object_Arena *arena;
+    Small_Object_Arena *arena;
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
         PMC *p = arena->start_objects;
@@ -999,8 +997,8 @@ static UINTVAL
 id_from_pmc(Parrot_Interp interp, PMC* pmc)
 {
     UINTVAL id = 1;     /* first PMC in first arena */
-    struct Small_Object_Arena *arena;
-    struct Small_Object_Pool *pool;
+    Small_Object_Arena *arena;
+    Small_Object_Pool *pool;
     ptrdiff_t ptr_diff;
 
     pmc = (PMC*)PObj_to_ARENA(pmc);

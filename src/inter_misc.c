@@ -213,7 +213,7 @@ interpinfo(Interp *interp, INTVAL what)
 {
     INTVAL ret = 0;
     int j;
-    struct Arenas *arena_base = interp->arena_base;
+    Arenas *arena_base = interp->arena_base;
 
     switch (what) {
         case TOTAL_MEM_ALLOC:
@@ -240,7 +240,7 @@ interpinfo(Interp *interp, INTVAL what)
         case ACTIVE_BUFFERS:
             ret = 0;
             for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-                struct Small_Object_Pool * const header_pool =
+                Small_Object_Pool * const header_pool =
                     arena_base->sized_header_pools[j];
                 if (header_pool)
                     ret += header_pool->total_objects -
@@ -253,7 +253,7 @@ interpinfo(Interp *interp, INTVAL what)
         case TOTAL_BUFFERS:
             ret = 0;
             for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-                struct Small_Object_Pool * const header_pool =
+                Small_Object_Pool * const header_pool =
                     arena_base->sized_header_pools[j];
                 if (header_pool)
                     ret += header_pool->total_objects;
