@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 =head1 NAME
 
@@ -279,6 +279,41 @@ OUT
 # A: None. See comment for parents().
 
 ## TODO add_role
+
+# L<PDD15/Class PMC API/=item inspect>
+pir_output_is( <<'CODE', <<'OUT', 'inspect PCCMETHOD' );
+.sub 'test' :main
+    $P0 = new 'Class'
+    $P0.name('foo')
+    $P0.add_attribute('a')
+
+    $P1 = $P0.inspect()
+    print "ok 1 - inspect with no args called\n"
+    
+    $I0 = elements $P1
+    if $I0 == 6 goto ok_2
+    print "not "
+ok_2:
+    print "ok 2 - returned hash had correct number of elements\n"
+
+    $P1 = $P0.inspect('name')
+    say $P1
+    print "ok 3 - inspect('name')\n"
+    
+    $P1 = $P0.inspect('attributes')
+    $I0 = elements $P1
+    if $I0 == 1 goto ok_4
+    print "not "
+ok_4:
+    print "ok 4 - inspect('attributes')\n"
+.end
+CODE
+ok 1 - inspect with no args called
+ok 2 - returned hash had correct number of elements
+foo
+ok 3 - inspect('name')
+ok 4 - inspect('attributes')
+OUT
 
 # Local Variables:
 #   mode: cperl
