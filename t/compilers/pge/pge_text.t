@@ -11,7 +11,7 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/p6regex/text_brk.t - PGE::Text::bracketed tests
+t/compilers/pge/pge_text.t - PGE::Text tests
 
 =head1 DESCRIPTION
 
