@@ -41,7 +41,7 @@ ok 1 - addrole op executed
 ok 2 - addrole op actually added the role
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'inspect_p_p', todo => 'inspect vtable method for class broke' );
+pir_output_is( <<'CODE', <<'OUT', 'inspect_p_p' );
 .sub 'test' :main
     $P0 = new 'Class'
 

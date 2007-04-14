@@ -294,7 +294,7 @@ composed into this role.
         }
 
         /* Clone and return. */
-        return VTABLE_clone(interp, found);
+        return PMC_IS_NULL(found) ? PMCNULL : VTABLE_clone(interp, found);
     }
 
 

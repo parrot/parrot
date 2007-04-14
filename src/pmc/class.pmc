@@ -498,7 +498,7 @@ Array of Class PMCs representing the direct parents of this class.
         }
 
         /* Clone and return. */
-        return VTABLE_clone(interp, found);
+        return PMC_IS_NULL(found) ? PMCNULL : VTABLE_clone(interp, found);
     }
 
 /*
