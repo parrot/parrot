@@ -412,13 +412,13 @@ inline op get_class(out PMC, in STR) :object_classes {
   if (!PMC_IS_NULL(ns))
       Parrot_PCCINVOKE(interp, ns,
           string_from_const_cstring(interp, "get_class", 0), "->P", &class);
-  
+
   /* If class is not found, throw an exception; otherwise, put it in $1. */
   if (PMC_IS_NULL(class))
       real_exception(interp, next, NO_CLASS, "Class '%Ss' doesn't exist", $2);
   else
       $1 = class;
-  
+
   goto ADDRESS(next);
 }
 
@@ -432,7 +432,7 @@ inline op get_class(out PMC, in PMC) :object_classes {
   if (!PMC_IS_NULL(ns))
       Parrot_PCCINVOKE(interp, ns,
           string_from_const_cstring(interp, "get_class", 0), "->P", &class);
-  
+
   /* If class is not found, throw an exception; otherwise, put it in $1. */
   if (PMC_IS_NULL(class)) {
       STRING *name = readable_name(interp, $2);
@@ -441,7 +441,7 @@ inline op get_class(out PMC, in PMC) :object_classes {
   else {
       $1 = class;
   }
-  
+
   goto ADDRESS(next);
 }
 
