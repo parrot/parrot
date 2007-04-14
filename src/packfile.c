@@ -36,62 +36,47 @@ structure of the frozen bytecode.
 /*
 ** Static functions
 */
-static void segment_init(Interp*, struct PackFile_Segment *self,
-                          struct PackFile *pf,
-                          const char* name);
+static void segment_init(Interp*, PackFile_Segment *self, PackFile *pf,
+                          const char *name);
 
-static void default_destroy(Interp*, struct PackFile_Segment *self);
-static size_t default_packed_size(Interp*,
-                                   const struct PackFile_Segment *self);
-static opcode_t * default_pack(Interp*, const struct PackFile_Segment *self,
+static void default_destroy(Interp*, PackFile_Segment *self);
+static size_t default_packed_size(Interp*, const PackFile_Segment *self);
+static opcode_t * default_pack(Interp*, const PackFile_Segment *self,
                                 opcode_t *dest);
-static opcode_t * default_unpack(Interp *,
-                                  struct PackFile_Segment *self,
+static opcode_t * default_unpack(Interp *, PackFile_Segment *self,
                                   opcode_t *dest);
-static void default_dump(Interp *,
-                          struct PackFile_Segment *self);
+static void default_dump(Interp *, PackFile_Segment *self);
 
-static struct PackFile_Segment *directory_new(Interp*, struct PackFile *,
-                                               const char *, int);
-static void directory_destroy(Interp*, struct PackFile_Segment *self);
-static size_t directory_packed_size(Interp*, struct PackFile_Segment *self);
-static opcode_t * directory_pack(Interp*, struct PackFile_Segment *,
-                                  opcode_t *dest);
-static opcode_t * directory_unpack(Interp *,
-                                    struct PackFile_Segment *,
+static PackFile_Segment *directory_new(Interp*, PackFile *, const char *, int);
+static void directory_destroy(Interp*, PackFile_Segment *self);
+static size_t directory_packed_size(Interp*, PackFile_Segment *self);
+static opcode_t * directory_pack(Interp*, PackFile_Segment *, opcode_t *dest);
+static opcode_t * directory_unpack(Interp *, PackFile_Segment *,
                                     opcode_t *cursor);
-static void directory_dump(Interp *, struct PackFile_Segment *);
+static void directory_dump(Interp *, PackFile_Segment *);
 
-static struct PackFile_Segment *fixup_new(Interp*, struct PackFile *,
+static PackFile_Segment *fixup_new(Interp*, PackFile *, const char *, int);
+static size_t fixup_packed_size(Interp*, PackFile_Segment *self);
+static opcode_t * fixup_pack(Interp*, PackFile_Segment *self, opcode_t *dest);
+static opcode_t * fixup_unpack(Interp *, PackFile_Segment *, opcode_t *cursor);
+static void fixup_destroy(Interp*, PackFile_Segment *self);
+
+static PackFile_Segment *const_new(Interp*, PackFile *, const char *, int);
+static void const_destroy(Interp*, PackFile_Segment *self);
+
+static PackFile_Segment *byte_code_new(Interp*, PackFile *pf,
         const char *, int);
-static size_t fixup_packed_size(Interp*, struct PackFile_Segment *self);
-static opcode_t * fixup_pack(Interp*, struct PackFile_Segment * self,
-        opcode_t *dest);
-static opcode_t * fixup_unpack(Interp *,
-        struct PackFile_Segment*, opcode_t *cursor);
-static void fixup_destroy(Interp*, struct PackFile_Segment *self);
+static void byte_code_destroy(Interp*, PackFile_Segment *self);
+static INTVAL pf_register_standard_funcs(Interp*, PackFile *pf);
 
-static struct PackFile_Segment *const_new(Interp*, struct PackFile *,
-        const char *, int);
-static void const_destroy(Interp*, struct PackFile_Segment *self);
+static PackFile_Segment * pf_debug_new(Interp*, PackFile *, const char *, int);
+static size_t pf_debug_packed_size(Interp*, PackFile_Segment *self);
+static opcode_t * pf_debug_pack(Interp*, PackFile_Segment *self, opcode_t *);
+static void pf_debug_dump(Interp *, PackFile_Segment *);
+static opcode_t * pf_debug_unpack(Interp *, PackFile_Segment *self, opcode_t *);
+static void pf_debug_destroy(Interp*, PackFile_Segment *self);
 
-static struct PackFile_Segment *byte_code_new(Interp*, struct PackFile *pf,
-        const char *, int);
-static void byte_code_destroy(Interp*, struct PackFile_Segment *self);
-static INTVAL pf_register_standard_funcs(Interp*, struct PackFile *pf);
-
-static struct PackFile_Segment * pf_debug_new(Interp*, struct PackFile *,
-        const char *, int);
-static size_t pf_debug_packed_size(Interp*, struct PackFile_Segment *self);
-static opcode_t * pf_debug_pack(Interp*, struct PackFile_Segment *self,
-        opcode_t *);
-static void pf_debug_dump(Interp *, struct PackFile_Segment *);
-static opcode_t * pf_debug_unpack(Interp *,
-        struct PackFile_Segment *self, opcode_t *);
-static void pf_debug_destroy(Interp*, struct PackFile_Segment *self);
-
-static struct PackFile_Constant **find_constants(Interp*,
-                                                 struct PackFile_ConstTable *);
+static PackFile_Constant **find_constants(Interp *, PackFile_ConstTable *);
 
 #define ROUND_16(val) (((val) & 0xf) ? 16 - ((val) & 0xf) : 0)
 #define ALIGN_16(st, cursor) \
@@ -100,7 +85,7 @@ static struct PackFile_Constant **find_constants(Interp*,
 /*
 
 =item C<void
-PackFile_destroy(struct PackFile *pf)>
+PackFile_destroy(PackFile *pf)>
 
 Delete a C<PackFile>.
 
@@ -109,7 +94,7 @@ Delete a C<PackFile>.
 */
 
 void
-PackFile_destroy(Interp *interp, struct PackFile *pf)
+PackFile_destroy(Interp *interp, PackFile *pf)
 {
     if (!pf) {
         PIO_eprintf(NULL, "PackFile_destroy: pf == NULL!\n");
@@ -159,7 +144,7 @@ PackFile_check_segment_size(opcode_t segment_size, const char *debug)
 /*
 
 =item C<static void
-make_code_pointers(struct PackFile_Segment *seg)>
+make_code_pointers(PackFile_Segment *seg)>
 
 Make compat/shorthand pointers.
 
@@ -170,25 +155,25 @@ The first segments read are the default segments.
 */
 
 static void
-make_code_pointers(struct PackFile_Segment *seg)
+make_code_pointers(PackFile_Segment *seg)
 {
-    struct PackFile * const pf = seg->pf;
+    PackFile * const pf = seg->pf;
 
     switch (seg->type) {
         case PF_BYTEC_SEG:
             if (!pf->cur_cs) {
-                pf->cur_cs = (struct PackFile_ByteCode*)seg;
+                pf->cur_cs = (PackFile_ByteCode *)seg;
             }
             break;
         case PF_FIXUP_SEG:
             if (!pf->cur_cs->fixups) {
-                pf->cur_cs->fixups = (struct PackFile_FixupTable *)seg;
+                pf->cur_cs->fixups = (PackFile_FixupTable *)seg;
                 pf->cur_cs->fixups->code = pf->cur_cs;
             }
             break;
         case PF_CONST_SEG:
             if (!pf->cur_cs->const_table) {
-                pf->cur_cs->const_table = (struct PackFile_ConstTable*)seg;
+                pf->cur_cs->const_table = (PackFile_ConstTable *)seg;
                 pf->cur_cs->const_table->code = pf->cur_cs;
             }
         case PF_UNKNOWN_SEG:
@@ -196,7 +181,7 @@ make_code_pointers(struct PackFile_Segment *seg)
                 pf->cur_cs->pic_index = seg;
             break;
         case PF_DEBUG_SEG:
-            pf->cur_cs->debugs = (struct PackFile_Debug*)seg;
+            pf->cur_cs->debugs = (PackFile_Debug *)seg;
             pf->cur_cs->debugs->code = pf->cur_cs;
             break;
         default:
@@ -251,7 +236,7 @@ sub_pragma(Parrot_Interp interp, int action, PMC *sub_pmc)
 
 /*
 
-=item C<static PMC* run_sub(Parrot_Interp interp, PMC* sub_pmc)>
+=item C<static PMC* run_sub(Parrot_Interp interp, PMC *sub_pmc)>
 
 Run the B<sub_pmc> due its B<:load>, B<:immediate>, ... pragma
 
@@ -260,7 +245,7 @@ Run the B<sub_pmc> due its B<:load>, B<:immediate>, ... pragma
 */
 
 static PMC*
-run_sub(Parrot_Interp interp, PMC* sub_pmc)
+run_sub(Parrot_Interp interp, PMC *sub_pmc)
 {
     const Parrot_Run_core_t old = interp->run_core;
     PMC *retval;
@@ -270,20 +255,22 @@ run_sub(Parrot_Interp interp, PMC* sub_pmc)
      * PackFile which isn't worth the effort - probably
      */
     if (interp->run_core != PARROT_CGOTO_CORE  &&
-            interp->run_core != PARROT_SLOW_CORE  &&
-            interp->run_core != PARROT_FAST_CORE)
-        interp->run_core = PARROT_FAST_CORE;
-    CONTEXT(interp->ctx)->constants =
-        interp->code->const_table->constants;
-    retval = Parrot_runops_fromc_args(interp, sub_pmc, "P");
+        interp->run_core != PARROT_SLOW_CORE  &&
+        interp->run_core != PARROT_FAST_CORE)
+            interp->run_core = PARROT_FAST_CORE;
+
+    CONTEXT(interp->ctx)->constants = interp->code->const_table->constants;
+
+    retval           = (PMC *)Parrot_runops_fromc_args(interp, sub_pmc, "P");
     interp->run_core = old;
+
     return retval;
 }
 
 /*
 
 =item <static PMC*
-do_1_sub_pragma(Parrot_Interp interp, struct PackFile *self, int action)>
+do_1_sub_pragma(Parrot_Interp interp, PackFile *self, int action)>
 
 Run autoloaded or immediate bytecode, mark MAIN subroutine entry
 
@@ -292,7 +279,7 @@ Run autoloaded or immediate bytecode, mark MAIN subroutine entry
 */
 
 static PMC*
-do_1_sub_pragma(Parrot_Interp interp, PMC* sub_pmc, int action)
+do_1_sub_pragma(Parrot_Interp interp, PMC *sub_pmc, int action)
 {
 
     size_t start_offs;
@@ -377,10 +364,10 @@ do_1_sub_pragma(Parrot_Interp interp, PMC* sub_pmc, int action)
  * a property isn't constructed const so we have to mark them
  */
 static void
-mark_1_seg(Parrot_Interp interp, struct PackFile_ConstTable *ct)
+mark_1_seg(Parrot_Interp interp, PackFile_ConstTable *ct)
 {
     opcode_t i;
-    struct PackFile_Constant **constants;
+    PackFile_Constant **constants;
 
     constants = find_constants(interp, ct);
     for (i = 0; i < ct->const_count; i++) {
@@ -396,15 +383,14 @@ mark_1_seg(Parrot_Interp interp, struct PackFile_ConstTable *ct)
 }
 
 static INTVAL
-find_const_iter(Interp* interp,
-        struct PackFile_Segment *seg, void *user_data)
+find_const_iter(Interp *interp, PackFile_Segment *seg, void *user_data)
 {
     if (seg->type == PF_DIR_SEG) {
-        PackFile_map_segments(interp, (struct PackFile_Directory*)seg,
+        PackFile_map_segments(interp, (PackFile_Directory *)seg,
                 find_const_iter, user_data);
     }
     else if (seg->type == PF_CONST_SEG) {
-        mark_1_seg(interp, (struct PackFile_ConstTable *)seg);
+        mark_1_seg(interp, (PackFile_ConstTable *)seg);
     }
     return 0;
 }
@@ -412,9 +398,9 @@ find_const_iter(Interp* interp,
 void
 mark_const_subs(Parrot_Interp interp)
 {
-    struct PackFile_Directory *dir;
+    PackFile_Directory *dir;
 
-    struct PackFile * const self = interp->initial_pf;
+    PackFile * const self = interp->initial_pf;
     if (!self)
         return;
     /*
@@ -430,8 +416,8 @@ mark_const_subs(Parrot_Interp interp)
 /*
 
 =item C<static void
-do_sub_pragmas(Interp *interp, struct PackFile_Bytecode *self,
-   int action, PMC *eval_pmc)>
+do_sub_pragmas(Interp *interp, PackFile_Bytecode *self, int action,
+    PMC *eval_pmc)>
 
 B<action> is one of
 B<PBC_PBC>, B<PBC_LOADED>, B<PBC_INIT>, or B<PBC_MAIN>. Also store the C<eval_pmc>
@@ -442,13 +428,13 @@ in the sub structure, so that the eval PMC is kept alive be living subs.
 */
 
 void
-do_sub_pragmas(Interp *interp, struct PackFile_ByteCode *self,
+do_sub_pragmas(Interp *interp, PackFile_ByteCode *self,
         int action, PMC *eval_pmc)
 {
     opcode_t i;
     PMC *sub_pmc, *result;
-    struct PackFile_FixupTable *ft = self->fixups;
-    struct PackFile_ConstTable *ct = self->const_table;
+    PackFile_FixupTable *ft = self->fixups;
+    PackFile_ConstTable *ct = self->const_table;
 
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PackFile: do_sub_pragmas (action=%d)\n", action);
@@ -496,8 +482,8 @@ do_sub_pragmas(Interp *interp, struct PackFile_ByteCode *self,
 /*
 
 =item C<opcode_t
-PackFile_unpack(Interp *interp, struct PackFile *self,
-                opcode_t *packed, size_t packed_size)>
+PackFile_unpack(Interp *interp, PackFile *self, opcode_t *packed,
+    size_t packed_size)>
 
 Unpack a C<PackFile> from a block of memory. The format is:
 
@@ -538,10 +524,10 @@ Returns size of unpacked if everything is OK, else zero (0).
 */
 
 opcode_t
-PackFile_unpack(Interp *interp, struct PackFile *self,
-                opcode_t *packed, size_t packed_size)
+PackFile_unpack(Interp *interp, PackFile *self, opcode_t *packed,
+    size_t packed_size)
 {
-    struct PackFile_Header *header = self->header;
+    PackFile_Header *header = self->header;
     opcode_t *cursor;
 
     if (!self) {
@@ -676,7 +662,7 @@ PackFile_unpack(Interp *interp, struct PackFile *self,
 /*
 
 =item C<INTVAL
-PackFile_map_segments(Interp*, struct PackFile_Directory *dir,
+PackFile_map_segments(Interp*, PackFile_Directory *dir,
                        PackFile_map_segments_func_t callback,
                        void *user_data)>
 
@@ -691,7 +677,7 @@ and this value is returned.
 */
 
 INTVAL
-PackFile_map_segments(Interp* interp, struct PackFile_Directory *dir,
+PackFile_map_segments(Interp *interp, PackFile_Directory *dir,
                        PackFile_map_segments_func_t callback,
                        void *user_data)
 {
@@ -709,8 +695,7 @@ PackFile_map_segments(Interp* interp, struct PackFile_Directory *dir,
 /*
 
 =item C<INTVAL
-PackFile_add_segment(struct PackFile_Directory *dir,
-        struct PackFile_Segment *seg)>
+PackFile_add_segment(PackFile_Directory *dir, PackFile_Segment *seg)>
 
 Adds the Segment C<seg> to the directory C<dir> The PackFile becomes the
 owner of the segment; that means its getting destroyed, when the
@@ -721,19 +706,18 @@ packfile gets destroyed.
 */
 
 INTVAL
-PackFile_add_segment(Interp* interp, struct PackFile_Directory *dir,
-        struct PackFile_Segment *seg)
+PackFile_add_segment(Interp *interp, PackFile_Directory *dir,
+        PackFile_Segment *seg)
 {
-
     if (dir->segments) {
         dir->segments =
-            mem_sys_realloc(dir->segments,
-                    sizeof (struct PackFile_Segment *) *
+            (PackFile_Segment **)mem_sys_realloc(dir->segments,
+                    sizeof (PackFile_Segment *) *
                     (dir->num_segments+1));
     }
     else {
-        dir->segments = mem_sys_allocate(sizeof (struct PackFile_Segment *) *
-                (dir->num_segments+1));
+        dir->segments = (PackFile_Segment **)mem_sys_allocate(
+                sizeof (PackFile_Segment *) * (dir->num_segments+1));
     }
     dir->segments[dir->num_segments] = seg;
     dir->num_segments++;
@@ -744,9 +728,9 @@ PackFile_add_segment(Interp* interp, struct PackFile_Directory *dir,
 
 /*
 
-=item C<struct PackFile_Segment *
-PackFile_find_segment(Interp *, struct PackFile_Directory *dir,
-                       const char *name, int sub_dir)>
+=item C<PackFile_Segment *
+PackFile_find_segment(Interp *, PackFile_Directory *dir, const char *name,
+                      int sub_dir)>
 
 Finds the segment with the name C<name> in the C<PackFile_Directory> if
 C<sub_dir> is true, directories are searched recursively The segment is
@@ -756,22 +740,22 @@ returned, but its still owned by the C<PackFile>.
 
 */
 
-struct PackFile_Segment *
-PackFile_find_segment(Interp *interp,
-        struct PackFile_Directory *dir, const char *name, int sub_dir)
+PackFile_Segment *
+PackFile_find_segment(Interp *interp, PackFile_Directory *dir,
+    const char *name, int sub_dir)
 {
     size_t i;
 
     if (!dir)
         return NULL;
     for (i=0; i < dir->num_segments; i++) {
-        struct PackFile_Segment *seg = dir->segments[i];
+        PackFile_Segment *seg = dir->segments[i];
         if (seg && strcmp(seg->name, name) == 0) {
             return seg;
         }
         if (sub_dir && seg->type == PF_DIR_SEG) {
             seg = PackFile_find_segment(interp,
-                    (struct PackFile_Directory *)seg, name, sub_dir);
+                    (PackFile_Directory *)seg, name, sub_dir);
             if (seg)
                 return seg;
         }
@@ -782,8 +766,8 @@ PackFile_find_segment(Interp *interp,
 
 /*
 
-=item C<struct PackFile_Segment *
-PackFile_remove_segment_by_name(Interp *, struct PackFile_Directory *dir,
+=item C<PackFile_Segment *
+PackFile_remove_segment_by_name(Interp *, PackFile_Directory *dir,
                                  const char *name)>
 
 Finds and removes the segment with name C<name> in the
@@ -794,21 +778,21 @@ the user.
 
 */
 
-struct PackFile_Segment *
-PackFile_remove_segment_by_name(Interp* interp,
-        struct PackFile_Directory *dir, const char *name)
+PackFile_Segment *
+PackFile_remove_segment_by_name(Interp *interp, PackFile_Directory *dir,
+                                const char *name)
 {
     size_t i;
 
     for (i=0; i < dir->num_segments; i++) {
-        struct PackFile_Segment * const seg = dir->segments[i];
+        PackFile_Segment * const seg = dir->segments[i];
         if (strcmp(seg->name, name) == 0) {
             dir->num_segments--;
             if (i != dir->num_segments) {
                 /* We're not the last segment, so we need to move things */
                 memmove(&dir->segments[i], &dir->segments[i+1],
                        (dir->num_segments - i) *
-                       sizeof (struct PackFile_Segment *));
+                       sizeof (PackFile_Segment *));
             }
             return seg;
         }
@@ -826,7 +810,7 @@ PackFile_remove_segment_by_name(Interp* interp,
 =over 4
 
 =item C<static void
-PackFile_set_header(struct PackFile *self)>
+PackFile_set_header(PackFile *self)>
 
 Fill a C<PackFile> header with system specific data.
 
@@ -835,7 +819,7 @@ Fill a C<PackFile> header with system specific data.
 */
 
 static void
-PackFile_set_header(struct PackFile *self)
+PackFile_set_header(PackFile *self)
 {
     self->header->wordsize = sizeof (opcode_t);
     self->header->byteorder = PARROT_BIGENDIAN;
@@ -852,7 +836,7 @@ PackFile_set_header(struct PackFile *self)
 
 /*
 
-=item C<struct PackFile *
+=item C<PackFile *
 PackFile_new(Interp*, INTVAL is_mapped)>
 
 Allocate a new empty C<PackFile> and setup the directory.
@@ -899,11 +883,10 @@ A Segment Header has these entries:
 
 */
 
-struct PackFile *
-PackFile_new(Interp* interp, INTVAL is_mapped)
+PackFile *
+PackFile_new(Interp *interp, INTVAL is_mapped)
 {
-    struct PackFile * const pf =
-        mem_sys_allocate_zeroed(sizeof (struct PackFile));
+    PackFile * const pf = mem_allocate_zeroed_typed(PackFile);
 
     if (!pf) {
         PIO_eprintf(NULL, "PackFile_new: Unable to allocate!\n");
@@ -911,8 +894,7 @@ PackFile_new(Interp* interp, INTVAL is_mapped)
     }
     pf->is_mmap_ped = is_mapped;
 
-    pf->header =
-        mem_sys_allocate_zeroed(sizeof (struct PackFile_Header));
+    pf->header = mem_allocate_zeroed_typed(PackFile_Header);
     if (!pf->header) {
         PIO_eprintf(NULL, "PackFile_new: Unable to allocate header!\n");
         PackFile_destroy(interp, pf);
@@ -928,7 +910,7 @@ PackFile_new(Interp* interp, INTVAL is_mapped)
     pf_register_standard_funcs(interp, pf);
     /* create the master directory, all subirs go there */
     pf->directory.base.pf = pf;
-    pf->dirp = (struct PackFile_Directory *)
+    pf->dirp = (PackFile_Directory *)
         PackFile_Segment_new_seg(interp, &pf->directory,
             PF_DIR_SEG, DIRECTORY_SEGMENT_NAME, 0);
     pf->directory = *pf->dirp;
@@ -940,7 +922,7 @@ PackFile_new(Interp* interp, INTVAL is_mapped)
 
 /*
 
-=item C<struct PackFile * PackFile_new_dummy(Interp*, const char *name)>
+=item C<PackFile * PackFile_new_dummy(Interp*, const char *name)>
 
 Create a new (initial) dummy PackFile. This is needed, if the interpreter
 doesn't load any bytecode, but is using Parrot_compile_string.
@@ -949,10 +931,10 @@ doesn't load any bytecode, but is using Parrot_compile_string.
 
 */
 
-struct PackFile *
-PackFile_new_dummy(Interp* interp, const char *name)
+PackFile *
+PackFile_new_dummy(Interp *interp, const char *name)
 {
-    struct PackFile *pf;
+    PackFile *pf;
 
     pf = PackFile_new(interp, 0);
     interp->initial_pf = pf;
@@ -963,9 +945,8 @@ PackFile_new_dummy(Interp* interp, const char *name)
 
 /*
 
-=item C<INTVAL PackFile_funcs_register(Interp*, struct PackFile *pf,
-                                       UINTVAL type,
-                                       struct PackFile_funcs funcs)>
+=item C<INTVAL PackFile_funcs_register(Interp*, PackFile *pf, UINTVAL type,
+                                       PackFile_funcs funcs)>
 
 Register the C<pack>/C<unpack>/... functions for a packfile type.
 
@@ -974,8 +955,8 @@ Register the C<pack>/C<unpack>/... functions for a packfile type.
 */
 
 INTVAL
-PackFile_funcs_register(Interp* interp,
-        struct PackFile *pf, UINTVAL type, struct PackFile_funcs funcs)
+PackFile_funcs_register(Interp *interp, PackFile *pf, UINTVAL type,
+                        PackFile_funcs funcs)
 {
     /* TODO dynamic registering */
     pf->PackFuncs[type] = funcs;
@@ -984,8 +965,8 @@ PackFile_funcs_register(Interp* interp,
 
 /*
 
-=item C<static opcode_t * default_unpack(Interp *interp,
-        struct PackFile_Segment *self, opcode_t *cursor)>
+=item C<static opcode_t * default_unpack(Interp *interp, PackFile_Segment *self,
+                                         opcode_t *cursor)>
 
 The default unpack function.
 
@@ -994,8 +975,7 @@ The default unpack function.
 */
 
 static opcode_t *
-default_unpack(Interp *interp,
-        struct PackFile_Segment *self, opcode_t *cursor)
+default_unpack(Interp *interp, PackFile_Segment *self, opcode_t *cursor)
 {
     if (self->pf->header->dir_format) {
         self->op_count = PF_fetch_opcode(self->pf, &cursor);
@@ -1015,7 +995,7 @@ default_unpack(Interp *interp,
         return cursor;
     }
     /* else allocate mem */
-    self->data = mem_sys_allocate(self->size * sizeof (opcode_t));
+    self->data = (opcode_t *)mem_sys_allocate(self->size * sizeof (opcode_t));
 
     if (!self->data) {
         PIO_eprintf(NULL,
@@ -1044,7 +1024,7 @@ default_unpack(Interp *interp,
 /*
 
 =item C<void
-default_dump_header(Parrot_Interp interp, struct PackFile_Segment *self)>
+default_dump_header(Parrot_Interp interp, PackFile_Segment *self)>
 
 The default dump header function.
 
@@ -1053,7 +1033,7 @@ The default dump header function.
 */
 
 void
-default_dump_header(Parrot_Interp interp, struct PackFile_Segment *self)
+default_dump_header(Parrot_Interp interp, PackFile_Segment *self)
 {
     PIO_printf(interp, "%s => [ # offs 0x%x(%d)",
             self->name, (int)self->file_offset, (int)self->file_offset);
@@ -1065,7 +1045,7 @@ default_dump_header(Parrot_Interp interp, struct PackFile_Segment *self)
 /*
 
 =item C<static void
-default_dump(Parrot_Interp interp, struct PackFile_Segment *self)>
+default_dump(Parrot_Interp interp, PackFile_Segment *self)>
 
 The default dump function.
 
@@ -1074,7 +1054,7 @@ The default dump function.
 */
 
 static void
-default_dump(Parrot_Interp interp, struct PackFile_Segment *self)
+default_dump(Parrot_Interp interp, PackFile_Segment *self)
 {
     size_t i;
 
@@ -1097,7 +1077,7 @@ default_dump(Parrot_Interp interp, struct PackFile_Segment *self)
 /*
 
 =item C<static INTVAL
-pf_register_standard_funcs(Interp*, struct PackFile *pf)>
+pf_register_standard_funcs(Interp*, PackFile *pf)>
 
 Called from within C<PackFile_new()> register the standard functions.
 
@@ -1106,9 +1086,9 @@ Called from within C<PackFile_new()> register the standard functions.
 */
 
 static INTVAL
-pf_register_standard_funcs(Interp* interp, struct PackFile *pf)
+pf_register_standard_funcs(Interp *interp, PackFile *pf)
 {
-    struct PackFile_funcs dirf = {
+    PackFile_funcs dirf = {
         directory_new,
         directory_destroy,
         directory_packed_size,
@@ -1116,7 +1096,7 @@ pf_register_standard_funcs(Interp* interp, struct PackFile *pf)
         directory_unpack,
         directory_dump
     };
-    struct PackFile_funcs defaultf = {
+    PackFile_funcs defaultf = {
         PackFile_Segment_new,
         (PackFile_Segment_destroy_func_t) NULLfunc,
         (PackFile_Segment_packed_size_func_t) NULLfunc,
@@ -1124,7 +1104,7 @@ pf_register_standard_funcs(Interp* interp, struct PackFile *pf)
         (PackFile_Segment_unpack_func_t) NULLfunc,
         default_dump
     };
-    struct PackFile_funcs fixupf = {
+    PackFile_funcs fixupf = {
         fixup_new,
         fixup_destroy,
         fixup_packed_size,
@@ -1132,7 +1112,7 @@ pf_register_standard_funcs(Interp* interp, struct PackFile *pf)
         fixup_unpack,
         default_dump
     };
-    struct PackFile_funcs constf = {
+    PackFile_funcs constf = {
         const_new,
         const_destroy,
         PackFile_ConstTable_pack_size,
@@ -1140,7 +1120,7 @@ pf_register_standard_funcs(Interp* interp, struct PackFile *pf)
         PackFile_ConstTable_unpack,
         default_dump
     };
-    struct PackFile_funcs bytef = {
+    PackFile_funcs bytef = {
         byte_code_new,
         byte_code_destroy,
         (PackFile_Segment_packed_size_func_t) NULLfunc,
@@ -1148,7 +1128,7 @@ pf_register_standard_funcs(Interp* interp, struct PackFile *pf)
         (PackFile_Segment_unpack_func_t) NULLfunc,
         default_dump
     };
-    struct PackFile_funcs debugf = {
+    PackFile_funcs debugf = {
         pf_debug_new,
         pf_debug_destroy,
         pf_debug_packed_size,
@@ -1167,8 +1147,8 @@ pf_register_standard_funcs(Interp* interp, struct PackFile *pf)
 
 /*
 
-=item C<struct PackFile_Segment *
-PackFile_Segment_new_seg(Interp*, struct PackFile_Directory *dir, UINTVAL type,
+=item C<PackFile_Segment *
+PackFile_Segment_new_seg(Interp*, PackFile_Directory *dir, UINTVAL type,
         const char *name, int add)>
 
 Create a new segment.
@@ -1177,14 +1157,13 @@ Create a new segment.
 
 */
 
-struct PackFile_Segment *
-PackFile_Segment_new_seg(Interp* interp,
-        struct PackFile_Directory *dir, UINTVAL type,
-        const char *name, int add)
+PackFile_Segment *
+PackFile_Segment_new_seg(Interp *interp, PackFile_Directory *dir, UINTVAL type,
+                         const char *name, int add)
 {
-    struct PackFile * const pf = dir->base.pf;
+    PackFile * const pf = dir->base.pf;
     PackFile_Segment_new_func_t f = pf->PackFuncs[type].new_seg;
-    struct PackFile_Segment * const seg = (f)(interp, pf, name, add);
+    PackFile_Segment * const seg = (f)(interp, pf, name, add);
     segment_init (interp, seg, pf, name);
     seg->type = type;
     if (add)
@@ -1192,14 +1171,14 @@ PackFile_Segment_new_seg(Interp* interp,
     return seg;
 }
 
-static struct PackFile_Segment *
-create_seg(Interp *interp, struct PackFile_Directory *dir,
-        pack_file_types t, const char *name, const char *file_name, int add)
+static PackFile_Segment *
+create_seg(Interp *interp, PackFile_Directory *dir, pack_file_types t,
+           const char *name, const char *file_name, int add)
 {
-    struct PackFile_Segment *seg;
+    PackFile_Segment *seg;
 
     const size_t len = strlen(name) + strlen(file_name) + 2;
-    char * const buf = malloc(len);
+    char * const buf = (char * const)malloc(len);
 
     sprintf(buf, "%s_%s", name, file_name);
     seg = PackFile_Segment_new_seg(interp, dir, t, buf, add);
@@ -1209,7 +1188,7 @@ create_seg(Interp *interp, struct PackFile_Directory *dir,
 
 /*
 
-=item C<struct PackFile_ByteCode *
+=item C<PackFile_ByteCode *
 PF_create_default_segs(Interp*, const char *file_name, int add)>
 
 Create bytecode, constant, and fixup segment for C<file_nam>. If C<add>
@@ -1220,23 +1199,23 @@ adding the segments to the directory.
 
 */
 
-struct PackFile_ByteCode *
-PF_create_default_segs(Interp* interp, const char *file_name, int add)
+PackFile_ByteCode *
+PF_create_default_segs(Interp *interp, const char *file_name, int add)
 {
-    struct PackFile * const pf = interp->initial_pf;
-    struct PackFile_Segment *seg =
+    PackFile * const pf   = interp->initial_pf;
+    PackFile_Segment *seg =
         create_seg(interp, &pf->directory,
             PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME, file_name, add);
-    struct PackFile_ByteCode * const cur_cs = (struct PackFile_ByteCode*)seg;
+    PackFile_ByteCode * const cur_cs = (PackFile_ByteCode *)seg;
 
     seg = create_seg(interp, &pf->directory,
             PF_FIXUP_SEG, FIXUP_TABLE_SEGMENT_NAME, file_name, add);
-    cur_cs->fixups = (struct PackFile_FixupTable *)seg;
+    cur_cs->fixups = (PackFile_FixupTable *)seg;
     cur_cs->fixups->code = cur_cs;
 
     seg = create_seg(interp, &pf->directory,
             PF_CONST_SEG, CONSTANT_SEGMENT_NAME, file_name, add);
-    cur_cs->const_table = (struct PackFile_ConstTable*) seg;
+    cur_cs->const_table = (PackFile_ConstTable *) seg;
     cur_cs->const_table->code = cur_cs;
 
     seg = create_seg(interp, &pf->directory,
@@ -1248,14 +1227,14 @@ PF_create_default_segs(Interp* interp, const char *file_name, int add)
 /*
 
 =item C<void
-PackFile_Segment_destroy(Interp *, struct PackFile_Segment * self)>
+PackFile_Segment_destroy(Interp *, PackFile_Segment *self)>
 
 =cut
 
 */
 
 void
-PackFile_Segment_destroy(Interp *interp, struct PackFile_Segment * self)
+PackFile_Segment_destroy(Interp *interp, PackFile_Segment *self)
 {
     PackFile_Segment_destroy_func_t f =
         self->pf->PackFuncs[self->type].destroy;
@@ -1267,15 +1246,14 @@ PackFile_Segment_destroy(Interp *interp, struct PackFile_Segment * self)
 /*
 
 =item C<size_t
-PackFile_Segment_packed_size(Interp*, struct PackFile_Segment * self)>
+PackFile_Segment_packed_size(Interp*, PackFile_Segment *self)>
 
 =cut
 
 */
 
 size_t
-PackFile_Segment_packed_size(Interp* interp,
-        struct PackFile_Segment * self)
+PackFile_Segment_packed_size(Interp *interp, PackFile_Segment *self)
 {
     size_t size = default_packed_size(interp, self);
     PackFile_Segment_packed_size_func_t f =
@@ -1291,16 +1269,14 @@ PackFile_Segment_packed_size(Interp* interp,
 /*
 
 =item C<opcode_t *
-PackFile_Segment_pack(Interp*, struct PackFile_Segment * self,
-                      opcode_t *cursor)>
+PackFile_Segment_pack(Interp*, PackFile_Segment *self, opcode_t *cursor)>
 
 =cut
 
 */
 
 opcode_t *
-PackFile_Segment_pack(Interp* interp,
-        struct PackFile_Segment * self, opcode_t *cursor)
+PackFile_Segment_pack(Interp *interp, PackFile_Segment *self, opcode_t *cursor)
 {
     PackFile_Segment_pack_func_t f =
         self->pf->PackFuncs[self->type].pack;
@@ -1319,8 +1295,8 @@ PackFile_Segment_pack(Interp* interp,
 /*
 
 =item C<opcode_t *
-PackFile_Segment_unpack(Interp *interp,
-        struct PackFile_Segment * self, opcode_t *cursor)>
+PackFile_Segment_unpack(Interp *interp, PackFile_Segment *self,
+                        opcode_t *cursor)>
 
 All all these functions call the related C<default_*> function.
 
@@ -1331,8 +1307,8 @@ If a special is defined this gets called after.
 */
 
 opcode_t *
-PackFile_Segment_unpack(Interp *interp,
-        struct PackFile_Segment * self, opcode_t *cursor)
+PackFile_Segment_unpack(Interp *interp, PackFile_Segment *self,
+                        opcode_t *cursor)
 {
     PackFile_Segment_unpack_func_t f =
         self->pf->PackFuncs[self->type].unpack;
@@ -1352,8 +1328,7 @@ PackFile_Segment_unpack(Interp *interp,
 /*
 
 =item C<void
-PackFile_Segment_dump(Interp *interp,
-        struct PackFile_Segment *self)>
+PackFile_Segment_dump(Interp *interp, PackFile_Segment *self)>
 
 Dumps the segment C<self>.
 
@@ -1362,8 +1337,7 @@ Dumps the segment C<self>.
 */
 
 void
-PackFile_Segment_dump(Interp *interp,
-        struct PackFile_Segment *self)
+PackFile_Segment_dump(Interp *interp, PackFile_Segment *self)
 {
     self->pf->PackFuncs[self->type].dump(interp, self);
 }
@@ -1376,8 +1350,8 @@ PackFile_Segment_dump(Interp *interp,
 
 =over 4
 
-=item C<static struct PackFile_Segment *
-directory_new(Interp*, struct PackFile *pf, const char *name, int add)>
+=item C<static PackFile_Segment *
+directory_new(Interp*, PackFile *pf, const char *name, int add)>
 
 Returns a new C<PackFile_Directory> cast as a C<PackFile_Segment>.
 
@@ -1385,24 +1359,21 @@ Returns a new C<PackFile_Directory> cast as a C<PackFile_Segment>.
 
 */
 
-static struct PackFile_Segment *
-directory_new(Interp* interp, struct PackFile *pf,
-        const char *name, int add)
+static PackFile_Segment *
+directory_new(Interp *interp, PackFile *pf, const char *name, int add)
 {
-    struct PackFile_Directory * const dir =
-        mem_sys_allocate(sizeof (struct PackFile_Directory));
+    PackFile_Directory * const dir = mem_allocate_typed(PackFile_Directory);
 
     dir->num_segments = 0;
     dir->segments = NULL;
 
-    return (struct PackFile_Segment *)dir;
+    return (PackFile_Segment *)dir;
 }
 
 /*
 
 =item C<static void
-directory_dump(Interp *interp,
-                struct PackFile_Segment *self)>
+directory_dump(Interp *interp, PackFile_Segment *self)>
 
 Dumps the directory C<self>.
 
@@ -1411,15 +1382,15 @@ Dumps the directory C<self>.
 */
 
 static void
-directory_dump(Interp *interp, struct PackFile_Segment *self)
+directory_dump(Interp *interp, PackFile_Segment *self)
 {
-    struct PackFile_Directory * const dir = (struct PackFile_Directory *) self;
+    PackFile_Directory * const dir = (PackFile_Directory *) self;
     size_t i;
 
     default_dump_header(interp, self);
     PIO_printf(interp, "\n\t# %d segments\n", dir->num_segments);
     for (i=0; i < dir->num_segments; i++) {
-        struct PackFile_Segment *seg = dir->segments[i];
+        PackFile_Segment *seg = dir->segments[i];
         PIO_printf(interp,
                 "\ttype %d\t%s\t", (int)seg->type, seg->name);
         PIO_printf(interp,
@@ -1430,7 +1401,7 @@ directory_dump(Interp *interp, struct PackFile_Segment *self)
     }
     PIO_printf(interp, "]\n");
     for (i=0; i < dir->num_segments; i++) {
-        struct PackFile_Segment * const seg = dir->segments[i];
+        PackFile_Segment * const seg = dir->segments[i];
         PackFile_Segment_dump(interp, seg);
     }
 }
@@ -1438,8 +1409,7 @@ directory_dump(Interp *interp, struct PackFile_Segment *self)
 /*
 
 =item C<static opcode_t *
-directory_unpack(Interp *interp,
-        struct PackFile_Segment *segp, opcode_t * cursor)>
+directory_unpack(Interp *interp, PackFile_Segment *segp, opcode_t *cursor)>
 
 Unpacks the directory.
 
@@ -1448,29 +1418,25 @@ Unpacks the directory.
 */
 
 static opcode_t *
-directory_unpack(Interp *interp,
-        struct PackFile_Segment *segp, opcode_t * cursor)
+directory_unpack(Interp *interp, PackFile_Segment *segp, opcode_t *cursor)
 {
     size_t i;
-    struct PackFile_Directory * const dir = (struct PackFile_Directory *) segp;
-    struct PackFile * const pf = dir->base.pf;
+    PackFile_Directory * const dir = (PackFile_Directory *) segp;
+    PackFile * const pf = dir->base.pf;
     opcode_t *pos;
 
     dir->num_segments = PF_fetch_opcode(pf, &cursor);
     if (dir->segments) {
-        dir->segments =
-            mem_sys_realloc (dir->segments,
-                             sizeof (struct PackFile_Segment *) *
-                             dir->num_segments);
+        dir->segments = (PackFile_Segment **)mem_sys_realloc(dir->segments,
+                             sizeof (PackFile_Segment *) * dir->num_segments);
     }
     else {
-        dir->segments =
-            mem_sys_allocate(sizeof (struct PackFile_Segment *) *
-                             dir->num_segments);
+        dir->segments = (PackFile_Segment **)mem_sys_allocate(
+                sizeof (PackFile_Segment *) * dir->num_segments);
     }
 
     for (i=0; i < dir->num_segments; i++) {
-        struct PackFile_Segment *seg;
+        PackFile_Segment *seg;
         size_t tmp;
         UINTVAL type;
         char *name;
@@ -1513,7 +1479,7 @@ directory_unpack(Interp *interp,
                      (int)tmp, (int)seg->file_offset);
         }
         if (i) {
-            struct PackFile_Segment *last = dir->segments[i-1];
+            PackFile_Segment *last = dir->segments[i-1];
             if (last->file_offset + last->op_count != seg->file_offset) {
                 fprintf(stderr, "%s: sections are not back to back\n",
                         "section");
@@ -1565,7 +1531,7 @@ directory_unpack(Interp *interp,
 /*
 
 =item C<static void
-directory_destroy(Interp*, struct PackFile_Segment *self)>
+directory_destroy(Interp*, PackFile_Segment *self)>
 
 Destroys the directory.
 
@@ -1574,9 +1540,9 @@ Destroys the directory.
 */
 
 static void
-directory_destroy(Interp* interp, struct PackFile_Segment *self)
+directory_destroy(Interp *interp, PackFile_Segment *self)
 {
-    struct PackFile_Directory *dir = (struct PackFile_Directory *)self;
+    PackFile_Directory *dir = (PackFile_Directory *)self;
     size_t i;
 
     for (i = 0; i < dir->num_segments; i++) {
@@ -1591,7 +1557,7 @@ directory_destroy(Interp* interp, struct PackFile_Segment *self)
 /*
 
 =item C<static void
-sort_segs(Interp*, struct PackFile_Directory *dir)>
+sort_segs(Interp*, PackFile_Directory *dir)>
 
 Sorts the segments in C<dir>.
 
@@ -1600,15 +1566,15 @@ Sorts the segments in C<dir>.
 */
 
 static void
-sort_segs(Interp* interp, struct PackFile_Directory *dir)
+sort_segs(Interp *interp, PackFile_Directory *dir)
 {
     const size_t num_segs = dir->num_segments;
 
-    struct PackFile_Segment *seg = dir->segments[0];
+    PackFile_Segment *seg = dir->segments[0];
     if (seg->type != PF_BYTEC_SEG) {
         size_t i;
         for (i = 1; i < num_segs; i++) {
-            struct PackFile_Segment * const s2 = dir->segments[i];
+            PackFile_Segment * const s2 = dir->segments[i];
             if (s2->type == PF_BYTEC_SEG) {
                 dir->segments[0] = s2;
                 dir->segments[i] = seg;
@@ -1620,7 +1586,7 @@ sort_segs(Interp* interp, struct PackFile_Directory *dir)
     if (seg->type != PF_FIXUP_SEG) {
         size_t i;
         for (i = 2; i < num_segs; i++) {
-            struct PackFile_Segment * const s2 = dir->segments[i];
+            PackFile_Segment * const s2 = dir->segments[i];
             if (s2->type == PF_FIXUP_SEG) {
                 dir->segments[1] = s2;
                 dir->segments[i] = seg;
@@ -1633,7 +1599,7 @@ sort_segs(Interp* interp, struct PackFile_Directory *dir)
 /*
 
 =item C<static size_t
-directory_packed_size(Interp*, struct PackFile_Segment *self)>
+directory_packed_size(Interp*, PackFile_Segment *self)>
 
 Returns the size of the directory minus the value returned by
 C<default_packed_size()>.
@@ -1643,9 +1609,9 @@ C<default_packed_size()>.
 */
 
 static size_t
-directory_packed_size(Interp* interp, struct PackFile_Segment *self)
+directory_packed_size(Interp *interp, PackFile_Segment *self)
 {
-    struct PackFile_Directory * const dir = (struct PackFile_Directory *)self;
+    PackFile_Directory * const dir = (PackFile_Directory *)self;
     const size_t align = 16/sizeof (opcode_t);
     size_t size, i, seg_size;
 
@@ -1673,7 +1639,7 @@ directory_packed_size(Interp* interp, struct PackFile_Segment *self)
 /*
 
 =item C<static opcode_t *
-directory_pack(Interp*, struct PackFile_Segment *self, opcode_t *cursor)>
+directory_pack(Interp*, PackFile_Segment *self, opcode_t *cursor)>
 
 Packs the directory C<self>.
 
@@ -1682,10 +1648,9 @@ Packs the directory C<self>.
 */
 
 static opcode_t *
-directory_pack(Interp* interp, struct PackFile_Segment *self,
-        opcode_t *cursor)
+directory_pack(Interp *interp, PackFile_Segment *self, opcode_t *cursor)
 {
-    struct PackFile_Directory *dir = (struct PackFile_Directory *)self;
+    PackFile_Directory *dir = (PackFile_Directory *)self;
     size_t i;
     size_t align;
     const size_t num_segs = dir->num_segments;
@@ -1693,7 +1658,7 @@ directory_pack(Interp* interp, struct PackFile_Segment *self,
     *cursor++ = num_segs;
 
     for (i = 0; i < num_segs; i++) {
-        const struct PackFile_Segment * const seg = dir->segments[i];
+        const PackFile_Segment * const seg = dir->segments[i];
         *cursor++ = seg->type;
         cursor = PF_store_cstring(cursor, seg->name);
         *cursor++ = seg->file_offset;
@@ -1704,7 +1669,7 @@ directory_pack(Interp* interp, struct PackFile_Segment *self,
         cursor += align - (cursor - self->pf->src) % align;
     /* now pack all segments into new format */
     for (i = 0; i < dir->num_segments; i++) {
-        struct PackFile_Segment * const seg = dir->segments[i];
+        PackFile_Segment * const seg = dir->segments[i];
         const size_t size = seg->op_count;
 
         PackFile_Segment_pack(interp, seg, cursor);
@@ -1735,9 +1700,7 @@ directory_pack(Interp* interp, struct PackFile_Segment *self,
 =over 4
 
 =item C<static void
-segment_init(Interp*, struct PackFile_Segment *self,
-              struct PackFile *pf,
-              const char *name)>
+segment_init(Interp*, PackFile_Segment *self, PackFile *pf, const char *name)>
 
 Initializes the segment C<self>.
 
@@ -1746,26 +1709,26 @@ Initializes the segment C<self>.
 */
 
 static void
-segment_init(Interp* interp, struct PackFile_Segment *self,
-              struct PackFile *pf,
-              const char *name)
+segment_init(Interp *interp, PackFile_Segment *self, PackFile *pf,
+             const char *name)
 {
-    self->pf = pf;
-    self->type = PF_UNKNOWN_SEG;
+    self->pf          = pf;
+    self->type        = PF_UNKNOWN_SEG;
     self->file_offset = 0;
-    self->op_count = 0;
-    self->itype = 0;
-    self->size = 0;
-    self->data = NULL;
-    self->id = 0;
-    self->name = mem_sys_allocate(strlen(name) + 1);
+    self->op_count    = 0;
+    self->itype       = 0;
+    self->size        = 0;
+    self->data        = NULL;
+    self->id          = 0;
+    self->name        = (char *)mem_sys_allocate(strlen(name) + 1);
+
     strcpy(self->name, name);
 }
 
 /*
 
-=item C<struct PackFile_Segment *
-PackFile_Segment_new(Interp*, struct PackFile *pf, const char *name, int add)>
+=item C<PackFile_Segment *
+PackFile_Segment_new(Interp*, PackFile *pf, const char *name, int add)>
 
 Create a new default section.
 
@@ -1773,12 +1736,10 @@ Create a new default section.
 
 */
 
-struct PackFile_Segment *
-PackFile_Segment_new(Interp* interp,
-        struct PackFile *pf, const char *name, int add)
+PackFile_Segment *
+PackFile_Segment_new(Interp *interp, PackFile *pf, const char *name, int add)
 {
-    struct PackFile_Segment * const seg =
-        mem_sys_allocate(sizeof (struct PackFile_Segment));
+    PackFile_Segment * const seg = mem_allocate_typed(PackFile_Segment);
 
     return seg;
 }
@@ -1795,7 +1756,7 @@ and can read a block of C<opcode_t> data.
 =over 4
 
 =item C<static void
-default_destroy(Interp*, struct PackFile_Segment *self)>
+default_destroy(Interp*, PackFile_Segment *self)>
 
 The default destroy function.
 
@@ -1804,7 +1765,7 @@ The default destroy function.
 */
 
 static void
-default_destroy(Interp* interp, struct PackFile_Segment *self)
+default_destroy(Interp *interp, PackFile_Segment *self)
 {
     if (!self->pf->is_mmap_ped && self->data) {
         mem_sys_free(self->data);
@@ -1820,7 +1781,7 @@ default_destroy(Interp* interp, struct PackFile_Segment *self)
 /*
 
 =item C<static size_t
-default_packed_size(Interp*, struct PackFile_Segment *self)>
+default_packed_size(Interp*, PackFile_Segment *self)>
 
 Returns the default size of the segment C<self>.
 
@@ -1829,7 +1790,7 @@ Returns the default size of the segment C<self>.
 */
 
 static size_t
-default_packed_size(Interp* interp, const struct PackFile_Segment *self)
+default_packed_size(Interp *interp, const PackFile_Segment *self)
 {
     /* op_count, itype, id, size */
     /* XXX There should be a constant defining this 4, and why */
@@ -1840,8 +1801,7 @@ default_packed_size(Interp* interp, const struct PackFile_Segment *self)
 /*
 
 =item C<static opcode_t *
-default_pack(Interp*, struct PackFile_Segment *self,
-              opcode_t *dest)>
+default_pack(Interp*, PackFile_Segment *self, opcode_t *dest)>
 
 Performs the default pack.
 
@@ -1850,8 +1810,8 @@ Performs the default pack.
 */
 
 static opcode_t *
-default_pack(Interp* interp, const struct PackFile_Segment *self,
-              opcode_t *dest)
+default_pack(Interp *interp, const PackFile_Segment *self,
+             opcode_t *dest)
 {
     *dest++ = self->op_count;
     *dest++ = self->itype;
@@ -1874,7 +1834,7 @@ extern void Parrot_destroy_jit(void *ptr);
 =over 4
 
 =item C<static void
-byte_code_destroy(Interp*, struct PackFile_Segment *self)>
+byte_code_destroy(Interp*, PackFile_Segment *self)>
 
 Destroys the C<PackFile_ByteCode> segment C<self>.
 
@@ -1883,10 +1843,9 @@ Destroys the C<PackFile_ByteCode> segment C<self>.
 */
 
 static void
-byte_code_destroy(Interp* interp, struct PackFile_Segment *self)
+byte_code_destroy(Interp *interp, PackFile_Segment *self)
 {
-    struct PackFile_ByteCode * const byte_code =
-        (struct PackFile_ByteCode *)self;
+    PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
 
 #ifdef HAS_JIT
     Parrot_destroy_jit(byte_code->jit_info);
@@ -1908,8 +1867,8 @@ byte_code_destroy(Interp* interp, struct PackFile_Segment *self)
 
 /*
 
-=item C<static struct PackFile_Segment *
-byte_code_new(Interp*, struct PackFile *pf, const char * name, int add)>
+=item C<static PackFile_Segment *
+byte_code_new(Interp*, PackFile *pf, const char *name, int add)>
 
 New C<PackFile_ByteCode> segment.
 
@@ -1919,25 +1878,23 @@ C<pf> and C<add> are ignored.
 
 */
 
-static struct PackFile_Segment *
-byte_code_new(Interp* interp, struct PackFile *pf,
-        const char * name, int add)
+static PackFile_Segment *
+byte_code_new(Interp *interp, PackFile *pf, const char *name, int add)
 {
-    struct PackFile_ByteCode *byte_code =
-        mem_sys_allocate(sizeof (struct PackFile_ByteCode));
+    PackFile_ByteCode *byte_code    = mem_allocate_typed(PackFile_ByteCode);
 
-    byte_code->base.dir = NULL;
-
-    byte_code->prederef.code = NULL;
-    byte_code->prederef.branches = NULL;
+    byte_code->base.dir             = NULL;
+    byte_code->prederef.code        = NULL;
+    byte_code->prederef.branches    = NULL;
     byte_code->prederef.n_allocated = 0;
-    byte_code->jit_info = NULL;
-    byte_code->debugs = NULL;
-    byte_code->const_table = NULL;
-    byte_code->fixups = NULL;
-    byte_code->pic_index = NULL;
-    byte_code->pic_store = NULL;
-    return (struct PackFile_Segment *) byte_code;
+    byte_code->jit_info             = NULL;
+    byte_code->debugs               = NULL;
+    byte_code->const_table          = NULL;
+    byte_code->fixups               = NULL;
+    byte_code->pic_index            = NULL;
+    byte_code->pic_store            = NULL;
+
+    return (PackFile_Segment *) byte_code;
 }
 
 /*
@@ -1949,7 +1906,7 @@ byte_code_new(Interp* interp, struct PackFile *pf,
 =over 4
 
 =item C<static void
-pf_debug_destroy(Interp*, struct PackFile_Segment *self)>
+pf_debug_destroy(Interp*, PackFile_Segment *self)>
 
 Destroys the C<PackFile_Debug> segment C<self>.
 
@@ -1958,9 +1915,9 @@ Destroys the C<PackFile_Debug> segment C<self>.
 */
 
 static void
-pf_debug_destroy(Interp* interp, struct PackFile_Segment *self)
+pf_debug_destroy(Interp *interp, PackFile_Segment *self)
 {
-    struct PackFile_Debug * const debug = (struct PackFile_Debug *) self;
+    PackFile_Debug * const debug = (PackFile_Debug *) self;
     int i;
 
     /* Free each mapping. */
@@ -1975,8 +1932,8 @@ pf_debug_destroy(Interp* interp, struct PackFile_Segment *self)
 
 /*
 
-=item C<static struct PackFile_Segment *
-pf_debug_new(Interp*, struct PackFile *pf, const char * name, int add)>
+=item C<static PackFile_Segment *
+pf_debug_new(Interp *, PackFile *pf, const char *name, int add)>
 
 Returns a new C<PackFile_Debug> segment.
 
@@ -1986,25 +1943,23 @@ C<pf> and C<add> ignored.
 
 */
 
-static struct PackFile_Segment *
-pf_debug_new(Interp* interp, struct PackFile *pf,
-        const char * name, int add)
+static PackFile_Segment *
+pf_debug_new(Interp *interp, PackFile *pf, const char *name, int add)
 {
-    struct PackFile_Debug * const debug =
-        mem_sys_allocate(sizeof (struct PackFile_Debug));
+    PackFile_Debug * const debug = mem_allocate_typed(PackFile_Debug);
 
-    debug->code  = NULL;
-    debug->mappings = mem_sys_allocate(sizeof (Parrot_Pointer));
-    debug->mappings[0] = NULL;
-    debug->num_mappings = 0;
+    debug->code                  = NULL;
+    debug->mappings              = mem_allocate_typed(PackFile_DebugMapping *);
+    debug->mappings[0]           = NULL;
+    debug->num_mappings          = 0;
 
-    return (struct PackFile_Segment *)debug;
+    return (PackFile_Segment *)debug;
 }
 
 /*
 
 =item C<static size_t
-pf_debug_packed_size (Interp*, struct PackFile_Segment *self)>
+pf_debug_packed_size (Interp*, PackFile_Segment *self)>
 
 Returns the size of the C<PackFile_Debug> segment's filename in
 C<opcode_t> units.
@@ -2014,9 +1969,9 @@ C<opcode_t> units.
 */
 
 static size_t
-pf_debug_packed_size(Interp* interp, struct PackFile_Segment *self)
+pf_debug_packed_size(Interp *interp, PackFile_Segment *self)
 {
-    struct PackFile_Debug * const debug = (struct PackFile_Debug *) self;
+    PackFile_Debug * const debug = (PackFile_Debug *)self;
     int size = 0;
     int i;
 
@@ -2045,7 +2000,7 @@ pf_debug_packed_size(Interp* interp, struct PackFile_Segment *self)
 /*
 
 =item C<static opcode_t *
-pf_debug_pack(Interp*, struct PackFile_Segment *self, opcode_t *cursor)>
+pf_debug_pack(Interp*, PackFile_Segment *self, opcode_t *cursor)>
 
 Pack the debug segment.
 
@@ -2054,10 +2009,9 @@ Pack the debug segment.
 */
 
 static opcode_t *
-pf_debug_pack(Interp* interp, struct PackFile_Segment *self,
-        opcode_t *cursor)
+pf_debug_pack(Interp *interp, PackFile_Segment *self, opcode_t *cursor)
 {
-    struct PackFile_Debug * const debug = (struct PackFile_Debug *) self;
+    PackFile_Debug * const debug = (PackFile_Debug *)self;
     int i;
 
     /* Store number of mappings. */
@@ -2088,8 +2042,7 @@ pf_debug_pack(Interp* interp, struct PackFile_Segment *self,
 /*
 
 =item C<static opcode_t *
-pf_debug_unpack(Interp *interp,
-        struct PackFile_Segment *self, opcode_t *cursor)>
+pf_debug_unpack(Interp *interp, PackFile_Segment *self, opcode_t *cursor)>
 
 Unpack a debug segment into a PackFile_Debug structure.
 
@@ -2098,11 +2051,10 @@ Unpack a debug segment into a PackFile_Debug structure.
 */
 
 static opcode_t *
-pf_debug_unpack(Interp *interp,
-        struct PackFile_Segment *self, opcode_t *cursor)
+pf_debug_unpack(Interp *interp, PackFile_Segment *self, opcode_t *cursor)
 {
-    struct PackFile_Debug * const debug = (struct PackFile_Debug *) self;
-    struct PackFile_ByteCode *code;
+    PackFile_Debug * const debug = (PackFile_Debug *)self;
+    PackFile_ByteCode *code;
     int i;
 
     /* For some reason, we store the source file name in the segment
@@ -2116,14 +2068,13 @@ pf_debug_unpack(Interp *interp,
     debug->num_mappings = PF_fetch_opcode(self->pf, &cursor);
 
     /* Allocate space for mappings vector. */
-    debug->mappings = mem_sys_allocate(sizeof (Parrot_Pointer) *
-                                       (debug->num_mappings + 1));
+    debug->mappings = (PackFile_DebugMapping **)mem_sys_allocate(
+        sizeof (PackFile_DebugMapping *) * (debug->num_mappings + 1));
 
     /* Read in each mapping. */
     for (i = 0; i < debug->num_mappings; i++) {
         /* Allocate struct and get offset and mapping type. */
-        debug->mappings[i] =
-            mem_sys_allocate(sizeof (struct PackFile_DebugMapping));
+        debug->mappings[i] = mem_allocate_typed(PackFile_DebugMapping);
         debug->mappings[i]->offset = PF_fetch_opcode(self->pf, &cursor);
         debug->mappings[i]->mapping_type = PF_fetch_opcode(self->pf, &cursor);
 
@@ -2149,7 +2100,7 @@ pf_debug_unpack(Interp *interp,
     code_name = strdup(debug->base.name);
     str_len = strlen(code_name);
     code_name[str_len - 3] = 0;
-    code = (struct PackFile_ByteCode *)PackFile_find_segment(interp,
+    code = (PackFile_ByteCode *)PackFile_find_segment(interp,
             self->dir, code_name, 0);
     if (!code || code->base.type != PF_BYTEC_SEG)
         internal_exception(1, "Code '%s' not found for debug segment '%s'\n",
@@ -2164,7 +2115,7 @@ pf_debug_unpack(Interp *interp,
 /*
 
 =item C<static void
-pf_debug_dump(Interp *interp, struct PackFile_Segment *self)>
+pf_debug_dump(Interp *interp, PackFile_Segment *self)>
 
 Dumps a debug segment to a human readable form.
 
@@ -2173,11 +2124,11 @@ Dumps a debug segment to a human readable form.
 */
 
 static void
-pf_debug_dump(Parrot_Interp interp, struct PackFile_Segment *self)
+pf_debug_dump(Parrot_Interp interp, PackFile_Segment *self)
 {
     opcode_t i;
-    size_t j;
-    struct PackFile_Debug * const debug = (struct PackFile_Debug *) self;
+    size_t   j;
+    PackFile_Debug * const debug = (PackFile_Debug *)self;
     char *filename;
 
     default_dump_header(interp, self);
@@ -2225,9 +2176,8 @@ pf_debug_dump(Parrot_Interp interp, struct PackFile_Segment *self)
 
 /*
 
-=item C<struct PackFile_Debug *
-Parrot_new_debug_seg(Interp *interp,
-        struct PackFile_ByteCode *cs, size_t size)>
+=item C<PackFile_Debug *
+Parrot_new_debug_seg(Interp *interp, PackFile_ByteCode *cs, size_t size)>
 
 Create and append (or resize) a new debug seg for a code segment.
 
@@ -2235,30 +2185,29 @@ Create and append (or resize) a new debug seg for a code segment.
 
 */
 
-struct PackFile_Debug *
-Parrot_new_debug_seg(Interp *interp,
-        struct PackFile_ByteCode *cs, size_t size)
+PackFile_Debug *
+Parrot_new_debug_seg(Interp *interp, PackFile_ByteCode *cs, size_t size)
 {
-    struct PackFile_Debug *debug;
+    PackFile_Debug *debug;
 
     if (cs->debugs) {    /* it exists already, resize it */
         debug = cs->debugs;
-        debug->base.data = mem_sys_realloc(debug->base.data, size *
+        debug->base.data = (opcode_t *)mem_sys_realloc(debug->base.data, size *
                 sizeof (opcode_t));
     }
     else {              /* create one */
         const size_t len = strlen(cs->base.name) + 4;
-        char * const name = mem_sys_allocate(len);
+        char * const name = (char * const)mem_sys_allocate(len);
 
         sprintf(name, "%s_DB", cs->base.name);
         if (interp->code && interp->code->base.dir) {
-            debug = (struct PackFile_Debug *)
+            debug = (PackFile_Debug *)
                 PackFile_Segment_new_seg(interp,
                 interp->code->base.dir, PF_DEBUG_SEG, name, 1);
         }
         else {
             /* used by eval - don't register the segment */
-            debug = (struct PackFile_Debug *)
+            debug = (PackFile_Debug *)
                 PackFile_Segment_new_seg(interp,
                 cs->base.dir ?  cs->base.dir :
                     &interp->initial_pf->directory,
@@ -2266,9 +2215,10 @@ Parrot_new_debug_seg(Interp *interp,
         }
         mem_sys_free(name);
 
-        debug->base.data = mem_sys_allocate(size * sizeof (opcode_t));
+        debug->base.data    = (opcode_t *)mem_sys_allocate(size *
+            sizeof (opcode_t));
         debug->num_mappings = 0;
-        debug->mappings = mem_sys_allocate(1);
+        debug->mappings     = mem_allocate_typed(PackFile_DebugMapping *);
 
         debug->code = cs;
         cs->debugs = debug;
@@ -2280,8 +2230,7 @@ Parrot_new_debug_seg(Interp *interp,
 /*
 
 =item c<void
-Parrot_debug_add_mapping(Interp *interp,
-                         struct PackFile_Debug *debug,
+Parrot_debug_add_mapping(Interp *interp, PackFile_Debug *debug,
                          opcode_t offset, int mapping_type,
                          const char *filename, int source_seg)>
 
@@ -2295,19 +2244,18 @@ number of the source segment in question).
 
 */
 void
-Parrot_debug_add_mapping(Interp *interp,
-                         struct PackFile_Debug *debug,
+Parrot_debug_add_mapping(Interp *interp, PackFile_Debug *debug,
                          opcode_t offset, int mapping_type,
                          const char *filename, int source_seg)
 {
-    struct PackFile_DebugMapping *mapping;
-    struct PackFile_ConstTable * const ct = debug->code->const_table;
-    struct PackFile_Constant *fnconst;
+    PackFile_DebugMapping *mapping;
+    PackFile_ConstTable * const ct = debug->code->const_table;
+    PackFile_Constant *fnconst;
     int insert_pos = 0;
 
     /* Allocate space for the extra entry. */
-    debug->mappings = mem_sys_realloc(debug->mappings,
-        sizeof (Parrot_Pointer) * (debug->num_mappings + 1));
+    debug->mappings = (PackFile_DebugMapping **)mem_sys_realloc(debug->mappings,
+        sizeof (PackFile_DebugMapping *) * (debug->num_mappings + 1));
 
     /* Can it just go on the end? */
     if (debug->num_mappings == 0 ||
@@ -2329,9 +2277,10 @@ Parrot_debug_add_mapping(Interp *interp,
     }
 
     /* Set up new entry and insert it. */
-    mapping = mem_sys_allocate(sizeof (struct PackFile_DebugMapping));
-    mapping->offset = offset;
+    mapping               = mem_allocate_typed(PackFile_DebugMapping);
+    mapping->offset       = offset;
     mapping->mapping_type = mapping_type;
+
     switch (mapping_type) {
         case PF_DEBUGMAPPINGTYPE_NONE:
             break;
@@ -2339,11 +2288,12 @@ Parrot_debug_add_mapping(Interp *interp,
             /* Need to put filename in constants table. */
             ct->const_count = ct->const_count + 1;
             if (ct->constants)
-                ct->constants = mem_sys_realloc(ct->constants,
-                    ct->const_count * sizeof (Parrot_Pointer));
+                ct->constants = (PackFile_Constant **)mem_sys_realloc(
+                    ct->constants, ct->const_count *
+                        sizeof (PackFile_Constant *));
             else
-                ct->constants = mem_sys_allocate(
-                    ct->const_count * sizeof (Parrot_Pointer));
+                ct->constants = (PackFile_Constant **)mem_sys_allocate(
+                    ct->const_count * sizeof (PackFile_Constant *));
             fnconst = PackFile_Constant_new(interp);
             fnconst->type = PFC_STRING;
             fnconst->u.string = string_make_direct(interp, filename,
@@ -2362,8 +2312,7 @@ Parrot_debug_add_mapping(Interp *interp,
 
 /*
 =item C<STRING*
-Parrot_debug_pc_to_filename(Interp *interp,
-        struct PackFile_Debug *debug, opcode_t pc)>
+Parrot_debug_pc_to_filename(Interp *interp, PackFile_Debug *debug, opcode_t pc)>
 
 Take a position in the bytecode and return the filename of the source for
 that position.
@@ -2373,8 +2322,7 @@ that position.
 */
 
 STRING *
-Parrot_debug_pc_to_filename(Interp *interp,
-        struct PackFile_Debug *debug, opcode_t pc)
+Parrot_debug_pc_to_filename(Interp *interp, PackFile_Debug *debug, opcode_t pc)
 {
     /* Look through mappings until we find one that maps the passed
        bytecode offset. */
@@ -2418,7 +2366,7 @@ Switch to byte code segment number C<seg>.
 void
 Parrot_switch_to_cs_by_nr(Interp *interp, opcode_t seg)
 {
-    struct PackFile_Directory * const dir = interp->code->base.dir;
+    PackFile_Directory * const dir = interp->code->base.dir;
     const size_t num_segs = dir->num_segments;
     size_t i;
     opcode_t n;
@@ -2427,7 +2375,7 @@ Parrot_switch_to_cs_by_nr(Interp *interp, opcode_t seg)
     for (i = n = 0; i < num_segs; i++) {
         if (dir->segments[i]->type == PF_BYTEC_SEG) {
             if (n == seg) {
-                Parrot_switch_to_cs(interp, (struct PackFile_ByteCode *)
+                Parrot_switch_to_cs(interp, (PackFile_ByteCode *)
                         dir->segments[i], 1);
                 return;
             }
@@ -2439,9 +2387,8 @@ Parrot_switch_to_cs_by_nr(Interp *interp, opcode_t seg)
 
 /*
 
-=item C<struct PackFile_ByteCode *
-Parrot_switch_to_cs(Interp *interp,
-    struct PackFile_ByteCode *new_cs, int really)>
+=item C<PackFile_ByteCode *
+Parrot_switch_to_cs(Interp *interp, PackFile_ByteCode *new_cs, int really)>
 
 Switch to a byte code segment C<new_cs>, returning the old segment.
 
@@ -2449,11 +2396,10 @@ Switch to a byte code segment C<new_cs>, returning the old segment.
 
 */
 
-struct PackFile_ByteCode *
-Parrot_switch_to_cs(Interp *interp,
-    struct PackFile_ByteCode *new_cs, int really)
+PackFile_ByteCode *
+Parrot_switch_to_cs(Interp *interp, PackFile_ByteCode *new_cs, int really)
 {
-    struct PackFile_ByteCode * const cur_cs = interp->code;
+    PackFile_ByteCode * const cur_cs = interp->code;
 
     if (!new_cs) {
         internal_exception(NO_PREV_CS, "No code segment to switch to\n");
@@ -2482,7 +2428,7 @@ Parrot_switch_to_cs(Interp *interp,
 /*
 
 =item C<static PackFile_Constant **
-find_constants(Interp *interp, struct PackFile_ConstTable *ct)>
+find_constants(Interp *interp, PackFile_ConstTable *ct)>
 
 Find the constant table associated with a thread. For now, we need to copy
 constant tables because some entries aren't really constant; e.g.
@@ -2492,16 +2438,16 @@ subroutines need to reference namespace pointers.
 
 */
 
-static struct PackFile_Constant *
-clone_constant(Interp *interp, struct PackFile_Constant *old_const) {
+static PackFile_Constant *
+clone_constant(Interp *interp, PackFile_Constant *old_const) {
     STRING * const _sub = interp->vtables[enum_class_Sub]->whoami;
 
     if (old_const->type == PFC_PMC
             && VTABLE_isa(interp, old_const->u.key, _sub)) {
-        struct PackFile_Constant *ret;
+        PackFile_Constant *ret;
         PMC *old_sub;
         PMC *new_sub;
-        ret = mem_sys_allocate(sizeof (struct PackFile_Constant));
+        ret = mem_allocate_typed(PackFile_Constant);
 
         ret->type = old_const->type;
 
@@ -2521,38 +2467,36 @@ clone_constant(Interp *interp, struct PackFile_Constant *old_const) {
     }
 }
 
-static struct PackFile_Constant **
-find_constants(Interp *interp, struct PackFile_ConstTable *ct) {
+static PackFile_Constant **
+find_constants(Interp *interp, PackFile_ConstTable *ct) {
     if (!n_interpreters || !interp->thread_data ||
             interp->thread_data->tid == 0) {
         return ct->constants;
     }
     else {
         Hash *tables;
-        struct PackFile_Constant **new_consts;
+        PackFile_Constant **new_consts;
 
         assert(interp->thread_data);
 
         if (!interp->thread_data->const_tables) {
-            interp->thread_data->const_tables =
-                mem_sys_allocate(sizeof (Hash));
+            interp->thread_data->const_tables = mem_allocate_typed(Hash);
             parrot_new_pointer_hash(interp,
                                     &interp->thread_data->const_tables);
         }
 
-        tables = interp->thread_data->const_tables;
-
-        new_consts = parrot_hash_get(interp, tables, ct);
+        tables     = interp->thread_data->const_tables;
+        new_consts = (PackFile_Constant **)parrot_hash_get(interp, tables, ct);
 
         if (!new_consts) {
             /* need to construct it */
-            struct PackFile_Constant **old_consts;
+            PackFile_Constant **old_consts;
             INTVAL i;
             INTVAL const num_consts = ct->const_count;
 
             old_consts = ct->constants;
-            new_consts =
-                mem_sys_allocate(sizeof (struct PackFile_Constant*)*num_consts);
+            new_consts = (PackFile_Constant **)mem_sys_allocate(
+                sizeof (PackFile_Constant *) * num_consts);
 
             for (i = 0; i < num_consts; ++i) {
                 new_consts[i] = clone_constant(interp, old_consts[i]);
@@ -2582,11 +2526,14 @@ Parrot_destroy_constants(Interp *interp) {
     for (i = 0; i <= hash->mask; ++i) {
         HashBucket *bucket = hash->bi[i];
         while (bucket) {
-            struct PackFile_ConstTable *const table = bucket->key;
-            struct PackFile_Constant **const orig_consts = table->constants;
-            struct PackFile_Constant **const consts = bucket->value;
-            INTVAL const const_count = table->const_count;
+            PackFile_ConstTable * const table      =
+                (PackFile_ConstTable * const)bucket->key;
+            PackFile_Constant ** const orig_consts = table->constants;
+            PackFile_Constant ** const consts      =
+                (PackFile_Constant **) bucket->value;
+            INTVAL const const_count               = table->const_count;
             INTVAL i;
+
             for (i = 0; i < const_count; ++i) {
                 if (consts[i] != orig_consts[i]) {
                     mem_sys_free(consts[i]);
@@ -2609,7 +2556,7 @@ Parrot_destroy_constants(Interp *interp) {
 =over 4
 
 =item C<void
-PackFile_FixupTable_clear(Interp *, struct PackFile_FixupTable *self)>
+PackFile_FixupTable_clear(Interp *, PackFile_FixupTable *self)>
 
 Clear a PackFile FixupTable.
 
@@ -2618,7 +2565,7 @@ Clear a PackFile FixupTable.
 */
 
 void
-PackFile_FixupTable_clear(Interp *interp, struct PackFile_FixupTable *self)
+PackFile_FixupTable_clear(Interp *interp, PackFile_FixupTable *self)
 {
     opcode_t i;
     if (!self) {
@@ -2647,7 +2594,7 @@ PackFile_FixupTable_clear(Interp *interp, struct PackFile_FixupTable *self)
 /*
 
 =item C<static void
-fixup_destroy(Interp*, struct PackFile_Segment *self)>
+fixup_destroy(Interp*, PackFile_Segment *self)>
 
 Just calls C<PackFile_FixupTable_clear()> with C<self>.
 
@@ -2656,16 +2603,16 @@ Just calls C<PackFile_FixupTable_clear()> with C<self>.
 */
 
 static void
-fixup_destroy(Interp* interp, struct PackFile_Segment *self)
+fixup_destroy(Interp *interp, PackFile_Segment *self)
 {
-    struct PackFile_FixupTable * const ft = (struct PackFile_FixupTable *) self;
+    PackFile_FixupTable * const ft = (PackFile_FixupTable *)self;
     PackFile_FixupTable_clear(interp, ft);
 }
 
 /*
 
 =item C<static size_t
-fixup_packed_size(Interp*, struct PackFile_Segment *self)>
+fixup_packed_size(Interp*, PackFile_Segment *self)>
 
 I<What does this do?>
 
@@ -2674,9 +2621,9 @@ I<What does this do?>
 */
 
 static size_t
-fixup_packed_size(Interp* interp, struct PackFile_Segment *self)
+fixup_packed_size(Interp *interp, PackFile_Segment *self)
 {
-    struct PackFile_FixupTable * const ft = (struct PackFile_FixupTable *) self;
+    PackFile_FixupTable * const ft = (PackFile_FixupTable *)self;
     size_t size;
     opcode_t i;
 
@@ -2702,7 +2649,7 @@ fixup_packed_size(Interp* interp, struct PackFile_Segment *self)
 /*
 
 =item C<static opcode_t *
-fixup_pack(Interp*, struct PackFile_Segment *self, opcode_t *cursor)>
+fixup_pack(Interp*, PackFile_Segment *self, opcode_t *cursor)>
 
 I<What does this do?>
 
@@ -2711,9 +2658,9 @@ I<What does this do?>
 */
 
 static opcode_t *
-fixup_pack(Interp* interp, struct PackFile_Segment *self, opcode_t *cursor)
+fixup_pack(Interp *interp, PackFile_Segment *self, opcode_t *cursor)
 {
-    struct PackFile_FixupTable * const ft = (struct PackFile_FixupTable *) self;
+    PackFile_FixupTable * const ft = (PackFile_FixupTable *)self;
     opcode_t i;
 
     *cursor++ = ft->fixup_count;
@@ -2737,8 +2684,8 @@ fixup_pack(Interp* interp, struct PackFile_Segment *self, opcode_t *cursor)
 
 /*
 
-=item C<static struct PackFile_Segment *
-fixup_new(Interp*, struct PackFile *pf, const char *name, int add)>
+=item C<static PackFile_Segment *
+fixup_new(Interp*, PackFile *pf, const char *name, int add)>
 
 Returns a new C<PackFile_FixupTable> segment.
 
@@ -2746,22 +2693,21 @@ Returns a new C<PackFile_FixupTable> segment.
 
 */
 
-static struct PackFile_Segment *
-fixup_new(Interp* interp, struct PackFile *pf, const char *name, int add)
+static PackFile_Segment *
+fixup_new(Interp *interp, PackFile *pf, const char *name, int add)
 {
-    struct PackFile_FixupTable * const fixup =
-        mem_sys_allocate(sizeof (struct PackFile_FixupTable));
+    PackFile_FixupTable * const fixup = mem_allocate_typed(PackFile_FixupTable);
 
-    fixup->fixup_count = 0;
-    fixup->fixups = NULL;
-    return (struct PackFile_Segment*) fixup;
+    fixup->fixup_count                = 0;
+    fixup->fixups                     = NULL;
+
+    return (PackFile_Segment *) fixup;
 }
 
 /*
 
 =item C<static opcode_t *
-fixup_unpack(Interp *interp,
-        struct PackFile_Segment *seg, opcode_t *cursor)>
+fixup_unpack(Interp *interp, PackFile_Segment *seg, opcode_t *cursor)>
 
 Unpack a PackFile FixupTable from a block of memory.
 
@@ -2772,12 +2718,11 @@ Returns one (1) if everything is OK, else zero (0).
 */
 
 static opcode_t *
-fixup_unpack(Interp *interp,
-        struct PackFile_Segment *seg, opcode_t *cursor)
+fixup_unpack(Interp *interp, PackFile_Segment *seg, opcode_t *cursor)
 {
     opcode_t i;
-    struct PackFile * pf;
-    struct PackFile_FixupTable * const self = (struct PackFile_FixupTable *)seg;
+    PackFile *pf;
+    PackFile_FixupTable * const self = (PackFile_FixupTable *)seg;
 
     if (!self) {
         PIO_eprintf(interp, "PackFile_FixupTable_unpack: self == NULL!\n");
@@ -2790,8 +2735,8 @@ fixup_unpack(Interp *interp,
     self->fixup_count = PF_fetch_opcode(pf, &cursor);
 
     if (self->fixup_count) {
-        self->fixups = mem_sys_allocate_zeroed(self->fixup_count *
-                sizeof (struct PackFile_FixupEntry *));
+        self->fixups = (PackFile_FixupEntry **)mem_sys_allocate_zeroed(
+            self->fixup_count * sizeof (PackFile_FixupEntry *));
 
         if (!self->fixups) {
             PIO_eprintf(interp,
@@ -2803,9 +2748,9 @@ fixup_unpack(Interp *interp,
     }
 
     for (i = 0; i < self->fixup_count; i++) {
-        struct PackFile_FixupEntry * const entry =
+        PackFile_FixupEntry * const entry =
             self->fixups[i] =
-            mem_sys_allocate(sizeof (struct PackFile_FixupEntry));
+            mem_allocate_typed(PackFile_FixupEntry);
         self->fixups[i]->type = PF_fetch_opcode(pf, &cursor);
         switch (self->fixups[i]->type) {
             case enum_fixup_label:
@@ -2841,11 +2786,11 @@ void
 PackFile_FixupTable_new_entry(Interp *interp,
         char *label, enum_fixup_t type, opcode_t offs)
 {
-    struct PackFile_FixupTable *self = interp->code->fixups;
+    PackFile_FixupTable *self = interp->code->fixups;
     opcode_t i;
 
     if (!self) {
-        self = (struct PackFile_FixupTable  *) PackFile_Segment_new_seg(
+        self = (PackFile_FixupTable *) PackFile_Segment_new_seg(
                 interp,
                 interp->code->base.dir, PF_FIXUP_SEG,
                 FIXUP_TABLE_SEGMENT_NAME, 1);
@@ -2855,17 +2800,15 @@ PackFile_FixupTable_new_entry(Interp *interp,
     i = self->fixup_count;
     self->fixup_count++;
     if (self->fixups) {
-        self->fixups =
-            mem_sys_realloc(self->fixups, self->fixup_count *
-                            sizeof (struct PackFile_FixupEntry *));
+        self->fixups = (PackFile_FixupEntry **)mem_sys_realloc(
+            self->fixups, self->fixup_count * sizeof (PackFile_FixupEntry *));
     }
-    else {
-        self->fixups =
-            mem_sys_allocate(sizeof (struct PackFile_FixupEntry *));
-    }
-    self->fixups[i] = mem_sys_allocate(sizeof (struct PackFile_FixupEntry));
+    else
+        self->fixups = mem_allocate_typed(PackFile_FixupEntry *);
+
+    self->fixups[i]       = mem_allocate_typed(PackFile_FixupEntry);
     self->fixups[i]->type = type;
-    self->fixups[i]->name = mem_sys_allocate(strlen(label) + 1);
+    self->fixups[i]->name = (char *)mem_sys_allocate(strlen(label) + 1);
     strcpy(self->fixups[i]->name, label);
     self->fixups[i]->offset = offs;
     self->fixups[i]->seg = self->code;
@@ -2873,9 +2816,8 @@ PackFile_FixupTable_new_entry(Interp *interp,
 
 /*
 
-=item C<static struct PackFile_FixupEntry *
-find_fixup(struct PackFile_FixupTable *ft, enum_fixup_t type,
-        const char *name)>
+=item C<static PackFile_FixupEntry *
+find_fixup(PackFile_FixupTable *ft, enum_fixup_t type, const char *name)>
 
 Finds the fix-up entry for C<name> and returns it.
 
@@ -2883,9 +2825,8 @@ Finds the fix-up entry for C<name> and returns it.
 
 */
 
-static struct PackFile_FixupEntry *
-find_fixup(struct PackFile_FixupTable *ft, enum_fixup_t type,
-        const char * name)
+static PackFile_FixupEntry *
+find_fixup(PackFile_FixupTable *ft, enum_fixup_t type, const char *name)
 {
     opcode_t i;
     for (i = 0; i < ft->fixup_count; i++) {
@@ -2901,7 +2842,7 @@ find_fixup(struct PackFile_FixupTable *ft, enum_fixup_t type,
 /*
 
 =item C<static INTVAL
-find_fixup_iter(Interp*, struct PackFile_Segment *seg, void *user_data)>
+find_fixup_iter(Interp*, PackFile_Segment *seg, void *user_data)>
 
 I<What does this do?>
 
@@ -2910,18 +2851,17 @@ I<What does this do?>
 */
 
 static INTVAL
-find_fixup_iter(Interp* interp, struct PackFile_Segment *seg,
-        void *user_data)
+find_fixup_iter(Interp *interp, PackFile_Segment *seg, void *user_data)
 {
     if (seg->type == PF_DIR_SEG) {
-        if (PackFile_map_segments(interp, (struct PackFile_Directory*)seg,
+        if (PackFile_map_segments(interp, (PackFile_Directory *)seg,
                 find_fixup_iter, user_data))
             return 1;
     }
     else if (seg->type == PF_FIXUP_SEG) {
-        struct PackFile_FixupEntry ** const e = user_data;
-        struct PackFile_FixupEntry * const fe = find_fixup(
-                (struct PackFile_FixupTable *) seg, (*e)->type, (*e)->name);
+        PackFile_FixupEntry ** const e = (PackFile_FixupEntry **)user_data;
+        PackFile_FixupEntry * const fe = (PackFile_FixupEntry * const)find_fixup(
+                (PackFile_FixupTable *) seg, (*e)->type, (*e)->name);
         if (fe) {
             *e = fe;
             return 1;
@@ -2932,9 +2872,8 @@ find_fixup_iter(Interp* interp, struct PackFile_Segment *seg,
 
 /*
 
-=item C<struct PackFile_FixupEntry *
-PackFile_find_fixup_entry(Interp *interp, enum_fixup_t type,
-        char * name)>
+=item C<PackFile_FixupEntry *
+PackFile_find_fixup_entry(Interp *interp, enum_fixup_t type, char *name)>
 
 I<What does this do?>
 
@@ -2942,13 +2881,12 @@ I<What does this do?>
 
 */
 
-struct PackFile_FixupEntry *
-PackFile_find_fixup_entry(Interp *interp, enum_fixup_t type,
-        char * name)
+PackFile_FixupEntry *
+PackFile_find_fixup_entry(Interp *interp, enum_fixup_t type, char *name)
 {
     /* TODO make a hash of all fixups */
-    struct PackFile_Directory *dir = interp->code->base.dir;
-    struct PackFile_FixupEntry *ep, e;
+    PackFile_Directory *dir = interp->code->base.dir;
+    PackFile_FixupEntry *ep, e;
     int found;
 
     e.type = type;
@@ -2968,7 +2906,7 @@ PackFile_find_fixup_entry(Interp *interp, enum_fixup_t type,
 =over 4
 
 =item C<void
-PackFile_ConstTable_clear(Interp*, struct PackFile_ConstTable *self)>
+PackFile_ConstTable_clear(Interp*, PackFile_ConstTable *self)>
 
 Clear the C<PackFile_ConstTable> C<self>.
 
@@ -2977,7 +2915,7 @@ Clear the C<PackFile_ConstTable> C<self>.
 */
 
 void
-PackFile_ConstTable_clear(Interp* interp, struct PackFile_ConstTable *self)
+PackFile_ConstTable_clear(Interp *interp, PackFile_ConstTable *self)
 {
     opcode_t i;
 
@@ -2997,15 +2935,14 @@ PackFile_ConstTable_clear(Interp* interp, struct PackFile_ConstTable *self)
 }
 
 #if EXEC_CAPABLE
-struct PackFile_Constant *exec_const_table;
+PackFile_Constant *exec_const_table;
 #endif
 
 /*
 
 =item C<opcode_t *
-PackFile_ConstTable_unpack(Interp *interp,
-        struct PackFile_Segment *seg,
-        opcode_t *cursor)>
+PackFile_ConstTable_unpack(Interp *interp, PackFile_Segment *seg,
+                           opcode_t *cursor)>
 
 Unpack a PackFile ConstTable from a block of memory. The format is:
 
@@ -3019,13 +2956,12 @@ Returns cursor if everything is OK, else zero (0).
 */
 
 opcode_t *
-PackFile_ConstTable_unpack(Interp *interp,
-        struct PackFile_Segment *seg,
-        opcode_t *cursor)
+PackFile_ConstTable_unpack(Interp *interp, PackFile_Segment *seg,
+                           opcode_t *cursor)
 {
     opcode_t i;
-    struct PackFile_ConstTable * const self = (struct PackFile_ConstTable *)seg;
-    struct PackFile * const pf = seg->pf;
+    PackFile_ConstTable * const self = (PackFile_ConstTable *)seg;
+    PackFile * const pf              = seg->pf;
 #if EXEC_CAPABLE
     extern int Parrot_exec_run;
 #endif
@@ -3044,8 +2980,8 @@ PackFile_ConstTable_unpack(Interp *interp,
         return cursor;
     }
 
-    self->constants = mem_sys_allocate_zeroed(self->const_count *
-            sizeof (struct PackFile_Constant *));
+    self->constants = (PackFile_Constant **)mem_sys_allocate_zeroed(
+        self->const_count * sizeof (PackFile_Constant *));
 
     if (!self->constants) {
         PIO_eprintf(interp,
@@ -3076,8 +3012,8 @@ PackFile_ConstTable_unpack(Interp *interp,
 
 /*
 
-=item C<static struct PackFile_Segment *
-const_new(Interp*, struct PackFile *pf, const char *name, int add)>
+=item C<static PackFile_Segment *
+const_new(Interp*, PackFile *pf, const char *name, int add)>
 
 Returns a new C<PackFile_ConstTable> segment.
 
@@ -3085,23 +3021,23 @@ Returns a new C<PackFile_ConstTable> segment.
 
 */
 
-static struct PackFile_Segment *
-const_new(Interp *interp, struct PackFile *pf, const char *name, int add)
+static PackFile_Segment *
+const_new(Interp *interp, PackFile *pf, const char *name, int add)
 {
-    struct PackFile_ConstTable *const_table;
+    PackFile_ConstTable *const_table;
 
-    const_table = mem_sys_allocate(sizeof (struct PackFile_ConstTable));
+    const_table = mem_allocate_typed(PackFile_ConstTable);
 
     const_table->const_count = 0;
     const_table->constants = NULL;
 
-    return (struct PackFile_Segment *)const_table;
+    return (PackFile_Segment *)const_table;
 }
 
 /*
 
 =item C<static void
-const_destroy(Interp*, struct PackFile_Segment *self)>
+const_destroy(Interp*, PackFile_Segment *self)>
 
 Destroys the C<PackFile_ConstTable> C<self>.
 
@@ -3110,9 +3046,9 @@ Destroys the C<PackFile_ConstTable> C<self>.
 */
 
 static void
-const_destroy(Interp *interp, struct PackFile_Segment *self)
+const_destroy(Interp *interp, PackFile_Segment *self)
 {
-    struct PackFile_ConstTable * const ct = (struct PackFile_ConstTable *)self;
+    PackFile_ConstTable * const ct = (PackFile_ConstTable *)self;
 
     PackFile_ConstTable_clear(interp, ct);
 }
@@ -3125,7 +3061,7 @@ const_destroy(Interp *interp, struct PackFile_Segment *self)
 
 =over 4
 
-=item C<struct PackFile_Constant *
+=item C<PackFile_Constant *
 PackFile_Constant_new(Interp*)>
 
 Allocate a new empty PackFile Constant.
@@ -3136,11 +3072,11 @@ This is only here so we can make a new one and then do an unpack.
 
 */
 
-struct PackFile_Constant *
+PackFile_Constant *
 PackFile_Constant_new(Interp *interp)
 {
-    struct PackFile_Constant * const self =
-        mem_sys_allocate_zeroed(sizeof (struct PackFile_Constant));
+    PackFile_Constant * const self =
+        mem_allocate_zeroed_typed(PackFile_Constant);
 
     self->type = PFC_NONE;
 
@@ -3150,7 +3086,7 @@ PackFile_Constant_new(Interp *interp)
 /*
 
 =item C<void
-PackFile_Constant_destroy(Interp*, struct PackFile_Constant *self)>
+PackFile_Constant_destroy(Interp*, PackFile_Constant *self)>
 
 Delete the C<PackFile_Constant> C<self>.
 
@@ -3161,7 +3097,7 @@ Don't delete C<PMC>s or C<STRING>s, they are destroyed via DOD/GC.
 */
 
 void
-PackFile_Constant_destroy(Interp *interp, struct PackFile_Constant *self)
+PackFile_Constant_destroy(Interp *interp, PackFile_Constant *self)
 {
     mem_sys_free(self);
 }
@@ -3169,7 +3105,7 @@ PackFile_Constant_destroy(Interp *interp, struct PackFile_Constant *self)
 /*
 
 =item C<size_t
-PackFile_Constant_pack_size(Interp*, struct PackFile_Constant *self)>
+PackFile_Constant_pack_size(Interp*, PackFile_Constant *self)>
 
 Determine the size of the buffer needed in order to pack the PackFile
 Constant into a contiguous region of memory.
@@ -3179,7 +3115,7 @@ Constant into a contiguous region of memory.
 */
 
 size_t
-PackFile_Constant_pack_size(Interp *interp, struct PackFile_Constant *self)
+PackFile_Constant_pack_size(Interp *interp, PackFile_Constant *self)
 {
     size_t packed_size;
     PMC *component;
@@ -3199,7 +3135,7 @@ PackFile_Constant_pack_size(Interp *interp, struct PackFile_Constant *self)
             packed_size = 1;
 
             for (component = self->u.key; component;
-                    component = PMC_data(component))
+                    component = (PMC *)PMC_data(component))
                 packed_size += 2;
             break;
 
@@ -3230,8 +3166,8 @@ PackFile_Constant_pack_size(Interp *interp, struct PackFile_Constant *self)
 
 =item C<opcode_t *
 PackFile_Constant_unpack(Interp *interp,
-                         struct PackFile_ConstTable *constt,
-                         struct PackFile_Constant *self, opcode_t *cursor)>
+                         PackFile_ConstTable *constt,
+                         PackFile_Constant *self, opcode_t *cursor)>
 
 Unpack a PackFile Constant from a block of memory. The format is:
 
@@ -3246,10 +3182,10 @@ Returns cursor if everything is OK, else zero (0).
 
 opcode_t *
 PackFile_Constant_unpack(Interp *interp,
-                         struct PackFile_ConstTable *constt,
-                         struct PackFile_Constant *self, opcode_t *cursor)
+                         PackFile_ConstTable *constt,
+                         PackFile_Constant *self, opcode_t *cursor)
 {
-    struct PackFile * const pf = constt->base.pf;
+    PackFile * const pf = constt->base.pf;
     const opcode_t type = PF_fetch_opcode(pf, &cursor);
 
 /* #define TRACE_PACKFILE 1 */
@@ -3290,10 +3226,8 @@ PackFile_Constant_unpack(Interp *interp,
 /*
 
 =item C<opcode_t *
-PackFile_Constant_unpack_pmc(Interp *interp,
-                         struct PackFile_ConstTable *constt,
-                         struct PackFile_Constant *self,
-                         opcode_t *cursor)>
+PackFile_Constant_unpack_pmc(Interp *interp, PackFile_ConstTable *constt,
+                         PackFile_Constant *self, opcode_t *cursor)>
 
 Unpack a constant PMC.
 
@@ -3302,19 +3236,17 @@ Unpack a constant PMC.
 */
 
 opcode_t *
-PackFile_Constant_unpack_pmc(Interp *interp,
-                         struct PackFile_ConstTable *constt,
-                         struct PackFile_Constant *self,
-                         opcode_t *cursor)
+PackFile_Constant_unpack_pmc(Interp *interp, PackFile_ConstTable *constt,
+                             PackFile_Constant *self, opcode_t *cursor)
 {
-    struct PackFile * const pf = constt->base.pf;
+    PackFile * const pf = constt->base.pf;
     STRING *image, *_sub;
     PMC *pmc;
 
     /*
      * thawing the PMC needs the real packfile in place
      */
-    struct PackFile_ByteCode * const cs_save = interp->code;
+    PackFile_ByteCode * const cs_save = interp->code;
     interp->code = pf->cur_cs;
 
     image = PF_fetch_string(interp, pf, &cursor);
@@ -3349,10 +3281,8 @@ PackFile_Constant_unpack_pmc(Interp *interp,
 /*
 
 =item C<opcode_t *
-PackFile_Constant_unpack_key(Interp *interp,
-                             struct PackFile_ConstTable *constt,
-                             struct PackFile_Constant *self,
-                             opcode_t *cursor)>
+PackFile_Constant_unpack_key(Interp *interp, PackFile_ConstTable *constt,
+                             PackFile_Constant *self, opcode_t *cursor)>
 
 Unpack a PackFile Constant from a block of memory. The format consists
 of a sequence of key atoms, each with the following format:
@@ -3367,15 +3297,13 @@ Returns cursor if everything is OK, else zero (0).
 */
 
 opcode_t *
-PackFile_Constant_unpack_key(Interp *interp,
-                             struct PackFile_ConstTable *constt,
-                             struct PackFile_Constant *self,
-                             opcode_t *cursor)
+PackFile_Constant_unpack_key(Interp *interp, PackFile_ConstTable *constt,
+                             PackFile_Constant *self, opcode_t *cursor)
 {
     PMC *head;
     PMC *tail;
     opcode_t type, op, slice_bits;
-    struct PackFile * const pf = constt->base.pf;
+    PackFile * const pf = constt->base.pf;
     int pmc_enum = enum_class_Key;
 
     INTVAL components = (INTVAL)PF_fetch_opcode(pf, &cursor);
@@ -3391,7 +3319,7 @@ PackFile_Constant_unpack_key(Interp *interp,
         if (tail) {
             PMC_data(tail)
                 = constant_pmc_new_noinit(interp, pmc_enum);
-            tail = PMC_data(tail);
+            tail = (PMC *)PMC_data(tail);
         }
         else {
             head = tail = constant_pmc_new_noinit(interp, pmc_enum);
@@ -3443,7 +3371,7 @@ PackFile_Constant_unpack_key(Interp *interp,
 
 /*
 
-=item C<static struct PackFile *
+=item C<static PackFile *
 PackFile_append_pbc(Interp *interp, const char *filename)>
 
 Read a PBC and append it to the current directory
@@ -3453,10 +3381,10 @@ Fixup sub addresses in newly loaded bytecode and run :load subs.
 
 */
 
-static struct PackFile *
+static PackFile *
 PackFile_append_pbc(Interp *interp, const char *filename)
 {
-    struct PackFile * const pf = Parrot_readbc(interp, filename);
+    PackFile * const pf = Parrot_readbc(interp, filename);
     if (!pf)
         return NULL;
     PackFile_add_segment(interp, &interp->initial_pf->directory,
@@ -3520,7 +3448,8 @@ Parrot_load_bytecode(Interp *interp, STRING *file_str)
     }
     else {
         STRING *err;
-        struct PackFile_ByteCode * const cs = IMCC_compile_file_s(interp,
+        PackFile_ByteCode * const cs =
+            (PackFile_ByteCode * const)IMCC_compile_file_s(interp,
                 filename, &err);
         if (cs) {
             do_sub_pragmas(interp, cs, PBC_LOADED, NULL);
