@@ -189,6 +189,7 @@ Invokes the first subroutine in the eval code.
         sub_data->seg = NULL;
         PMC_struct_val(SELF) = NULL;
         mem_sys_free(sub_data);
+        SUPER();
     }
 
     void mark() {

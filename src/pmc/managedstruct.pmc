@@ -35,8 +35,8 @@ Initializes an empty struct.
 */
 
     void init() {
-        SUPER();
         PObj_active_destroy_SET(SELF);
+        PMC_pmc_val(SELF) = NULL;
         PMC_int_val(SELF) = 0;
     }
 
@@ -66,9 +66,8 @@ Destroys the struct, freeing the allocated memory.
 */
 
     void destroy() {
-        if (PMC_data(SELF)) {
+        if (PMC_data(SELF))
             mem_sys_free(PMC_data(SELF));
-        }
     }
 
 /*

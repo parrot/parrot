@@ -145,6 +145,7 @@ or at least a detection if the referred PMC is already destroyed.
             VTABLE_destroy(INTERP, ref);
         if (PMC_sync(SELF)->owner != INTERP)
             PANIC("SharedRef destroyed by wrong interpreter");
+        SUPER();
     }
 }
 

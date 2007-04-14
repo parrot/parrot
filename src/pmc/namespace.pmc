@@ -109,8 +109,8 @@ Frees the namespace info struct.
 
 */
     void destroy() {
-        SUPER();
         mem_sys_free(PARROT_NSINFO(SELF));
+        SUPER();
     }
 
 /*
