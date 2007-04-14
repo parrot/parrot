@@ -83,7 +83,9 @@ Parrot_find_vtable_meth(Interp* interp, PMC *pmc, STRING *meth) {
             key = VTABLE_nextkey_keyed(interp, key_new(interp), ns,
                 ITERATE_FROM_START);
             for (j = 0; j < k; ++j) {
-                STRING *ns_key = parrot_hash_get_idx(interp, PMC_struct_val(ns), key);
+                STRING *ns_key =
+                    (STRING *)parrot_hash_get_idx(interp,
+                        (Hash *)PMC_struct_val(ns), key);
                 PMC *res = VTABLE_get_pmc_keyed_str(interp, ns, ns_key);
                 if (res->vtable->base_type == enum_class_Sub &&
                         PMC_sub(res)->vtable_index == vtable_index)
@@ -120,8 +122,8 @@ fail_if_exist(Interp *interp, PMC *name)
     INTVAL type;
 
     PMC * const classname_hash = interp->class_hash;
-    PMC * type_pmc = VTABLE_get_pointer_keyed(interp,
-            classname_hash, name);
+    PMC * type_pmc             = (PMC *)VTABLE_get_pointer_keyed(interp,
+                                        classname_hash, name);
     if (PMC_IS_NULL(type_pmc) ||
             type_pmc->vtable->base_type == enum_class_NameSpace)
         type = 0;
@@ -183,12 +185,12 @@ rebuild_attrib_stuff(Interp *interp, PMC *class)
     PMC * const orig_class = class;
 #endif
 
-    /* attrib count isn't set yet, a GC causedd by concat could
+    /* attrib count isn't set yet, a GC caused by concat could
      * corrupt data under construction
      */
     Parrot_block_DOD(interp);
 
-    class_slots = PMC_data(class);
+    class_slots      = PMC_data_typed(class, SLOTTYPE *);
     attr_offset_hash = pmc_new(interp, enum_class_Hash);
     set_attrib_num(class, class_slots, PCD_ATTRIBUTES, attr_offset_hash);
 
@@ -207,8 +209,8 @@ rebuild_attrib_stuff(Interp *interp, PMC *class)
             continue;
         }
 
-        class_slots = PMC_data(class);
-        classname = VTABLE_get_string(interp,
+        class_slots = PMC_data_typed(class, SLOTTYPE *);
+        classname   = VTABLE_get_string(interp,
                     get_attrib_num(class_slots, PCD_CLASS_NAME));
         attribs = get_attrib_num(class_slots, PCD_CLASS_ATTRIBUTES);
         attr_count = VTABLE_elements(interp, attribs);
@@ -297,7 +299,8 @@ create_deleg_pmc_vtable(Interp *interp, PMC *class,
 
     PMC * const vtable_pmc = get_attrib_num((SLOTTYPE*)PMC_data(class),
                                             PCD_OBJECT_VTABLE);
-    VTABLE * const vtable           = PMC_struct_val(vtable_pmc);
+    VTABLE * const vtable           =
+        (VTABLE * const)PMC_struct_val(vtable_pmc);
     VTABLE * const ro_vtable        = vtable->ro_variant_vtable;
     VTABLE * const deleg_pmc_vtable =
         interp->vtables[enum_class_deleg_pmc];
@@ -432,10 +435,12 @@ Parrot_single_subclass(Interp *interp, PMC *base_class,
     parent_is_class = PObj_is_class_TEST(base_class);
 
     child_class = pmc_new(interp, enum_class_ParrotClass);
+
     /* Hang an array off the data pointer */
     set_attrib_array_size(child_class, PCD_MAX);
-    child_class_array = PMC_data(child_class);
+    child_class_array = PMC_data_typed(child_class, SLOTTYPE *);
     set_attrib_flags(child_class);
+
     /* We will have five entries in this array */
 
     /* We have the same number of attributes as our parent */
@@ -524,7 +529,7 @@ Parrot_new_class(Interp *interp, PMC *class, PMC *name)
 
     /* Hang an array off the data pointer, empty of course */
     set_attrib_array_size(class, PCD_MAX);
-    class_array = PMC_data(class);
+    class_array = PMC_data_typed(class, SLOTTYPE *);
     /* set_attrib_flags(class); init does it */
 
     /* Our parent class array has nothing in it */
@@ -700,9 +705,9 @@ parrot_class_register(Interp *interp, PMC *name,
      * a ParrotObject vtable
      */
     if (parent && PObj_is_class_TEST(parent)) {
-        vtable_pmc =
-            get_attrib_num((SLOTTYPE*)PMC_data(parent), PCD_OBJECT_VTABLE);
-        parent_vtable = PMC_struct_val(vtable_pmc);
+        vtable_pmc    =
+            get_attrib_num((SLOTTYPE *)PMC_data(parent), PCD_OBJECT_VTABLE);
+        parent_vtable = (VTABLE *)PMC_struct_val(vtable_pmc);
     }
     else
         parent_vtable = interp->vtables[enum_class_ParrotObject];
@@ -815,9 +820,9 @@ do_initcall(Interp *interp, PMC* class, PMC *object, PMC *init)
             if (!PObj_is_class_TEST(next_parent)) {
                 continue;
             }
-            attr = pmc_new_noinit(interp,
+            attr     = pmc_new_noinit(interp,
                     parent_class->vtable->base_type);
-            obj_data = PMC_data(object);
+            obj_data = PMC_data_typed(object, SLOTTYPE *);
             set_attrib_num(object, obj_data, 0, attr);
             VTABLE_init(interp, attr);
             continue;
@@ -906,7 +911,7 @@ instantiate_object(Interp *interp, PMC *object, PMC *init)
      */
     PMC * const vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(class),
                                             PCD_OBJECT_VTABLE);
-    object->vtable = PMC_struct_val(vtable_pmc);
+    object->vtable         = (VTABLE *)PMC_struct_val(vtable_pmc);
 
     /* Grab the attribute count from the class */
     attrib_count = CLASS_ATTRIB_COUNT(class);
@@ -914,7 +919,7 @@ instantiate_object(Interp *interp, PMC *object, PMC *init)
     /* Build the array that hangs off the new object */
     /* First presize it */
     set_attrib_array_size(object, attrib_count);
-    new_object_array = PMC_data(object);
+    new_object_array = PMC_data_typed(object, SLOTTYPE *);
 
     /* fill with PMCNULL, so that access doesn't segfault */
     for (i = 0; i < attrib_count; ++i)
@@ -1199,8 +1204,7 @@ mark_object_cache(Interp *interp)
 void
 init_object_cache(Interp *interp)
 {
-    Caches * const mc = interp->caches =
-        mem_sys_allocate_zeroed(sizeof (*mc));
+    Caches * const mc = interp->caches = mem_allocate_zeroed_typed(Caches);
     SET_NULL(mc->idx);
 }
 
@@ -1316,17 +1320,21 @@ Parrot_find_method_with_cache(Interp *interp, PMC *class,
     bits = (((UINTVAL) method_name->strstart) >> 2) & TBL_SIZE_MASK;
     if (type >= mc->mc_size) {
         if (mc->idx) {
-            mc->idx = mem_sys_realloc(mc->idx, sizeof (UINTVAL*) * (type + 1));
+            mc->idx = (Meth_cache_entry ***)mem_sys_realloc(mc->idx,
+                sizeof (Meth_cache_entry ***) * (type + 1));
         }
         else {
-            mc->idx = mem_sys_allocate(sizeof (UINTVAL*) * (type + 1));
+            mc->idx = (Meth_cache_entry ***)mem_sys_allocate(
+                sizeof (Meth_cache_entry ***) * (type + 1));
         }
         for (i = mc->mc_size; i <= type; ++i)
             mc->idx[i] = NULL;
         mc->mc_size = type + 1;
     }
     if (!mc->idx[type]) {
-        mc->idx[type] = mem_sys_allocate(sizeof (Meth_cache_entry*) * TBL_SIZE);
+        mc->idx[type] = (Meth_cache_entry **)mem_sys_allocate(
+            sizeof (Meth_cache_entry *) * TBL_SIZE);
+
         for (i = 0; i < TBL_SIZE; ++i)
             mc->idx[type][i] = NULL;
     }
@@ -1339,7 +1347,7 @@ Parrot_find_method_with_cache(Interp *interp, PMC *class,
     if (!e) {
         PMC * const found = find_method_direct(interp, class, method_name);
         /* when here no or no correct entry was at [bits] */
-        e = mem_sys_allocate(sizeof (Meth_cache_entry));
+        e = mem_allocate_typed(Meth_cache_entry);
         if (old)
             old->next = e;
         else
@@ -1365,7 +1373,7 @@ debug_trace_find_meth(Interp *interp, PMC *class, STRING *name, PMC *sub)
     if (!Interp_trace_TEST(interp, PARROT_TRACE_FIND_METH_FLAG))
         return;
     if (PObj_is_class_TEST(class)) {
-        SLOTTYPE * const class_array = PMC_data(class);
+        SLOTTYPE * const class_array = PMC_data_typed(class, SLOTTYPE *);
         PMC *const class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
         class_name = PMC_str_val(class_name_pmc);
     }
@@ -1520,7 +1528,7 @@ Parrot_get_attrib_by_num(Interp *interp, PMC *object, INTVAL attrib)
      * their is no need for checking object being a valid
      * object PMC
      */
-    SLOTTYPE * const attrib_array = PMC_data(object);
+    SLOTTYPE * const attrib_array = PMC_data_typed(object, SLOTTYPE *);
     const INTVAL attrib_count = PMC_int_val(object);
 
     if (attrib >= attrib_count || attrib < 0) {
@@ -1614,7 +1622,7 @@ void
 Parrot_set_attrib_by_num(Interp *interp, PMC *object,
         INTVAL attrib, PMC *value)
 {
-    SLOTTYPE * const attrib_array = PMC_data(object);
+    SLOTTYPE * const attrib_array = PMC_data_typed(object, SLOTTYPE *);
     const INTVAL attrib_count = PMC_int_val(object);
 
     if (attrib >= attrib_count || attrib < 0) {
