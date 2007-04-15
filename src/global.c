@@ -185,7 +185,8 @@ Parrot_make_namespace_autobase(Interp *interp, PMC *key)
     if (VTABLE_isa(interp, key, string_from_const_cstring(interp, "String", 0)))
         base_ns = CONTEXT(interp->ctx)->current_namespace;
     else
-        base_ns = interp->HLL_namespace;
+        base_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
+            CONTEXT(interp->ctx)->current_HLL);
     return Parrot_make_namespace_keyed(interp, base_ns, key);
 }
 
@@ -196,7 +197,8 @@ Parrot_get_namespace_autobase(Interp *interp, PMC *key)
     if (VTABLE_isa(interp, key, string_from_const_cstring(interp, "String", 0)))
         base_ns = CONTEXT(interp->ctx)->current_namespace;
     else
-        base_ns = interp->HLL_namespace;
+        base_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
+            CONTEXT(interp->ctx)->current_HLL);
     return Parrot_get_namespace_keyed(interp, base_ns, key);
 }
 

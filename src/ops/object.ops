@@ -430,7 +430,7 @@ inline op get_class(out PMC, in PMC) :object_classes {
    * the supplied namespace PMC. */
   PMC *ns;
   if (!VTABLE_isa(interp, $2, string_from_const_cstring(interp, "NameSpace", 0)))
-      ns = Parrot_make_namespace_autobase(interp, $2);
+      ns = Parrot_get_namespace_autobase(interp, $2);
   else
       ns = $2;
 
