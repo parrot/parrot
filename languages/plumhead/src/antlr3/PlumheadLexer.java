@@ -1,4 +1,4 @@
-// $ANTLR 3.0b6 src/antlr3/Plumhead.g 2007-03-04 12:53:40
+// $ANTLR 3.0b6 src/antlr3/Plumhead.g 2007-04-15 14:14:36
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -799,7 +799,7 @@ public class PlumheadLexer extends Lexer {
 
                 switch (alt7) {
             	case 1 :
-            	    // src/antlr3/Plumhead.g:48:42: '0' .. '9'
+            	    // src/antlr3/Plumhead.g:48:43: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
