@@ -617,6 +617,65 @@ inspect_str.
         return metadata;
     }
 
+/*
+
+=item C<PMC* clone()>
+
+Returns an anonymous copy of the class (with no name and no link to a
+namespace). Unsets the instantiated flag, allowing modifications.
+
+=cut
+
+*/
+
+    PMC* clone()
+    {
+        Parrot_Class *class = PARROT_CLASS(SELF);
+
+        /* Create the new class PMC, of the same type of this one (we may
+         * have been subclassed). */
+        PMC *copy = pmc_new(interp, SELF->vtable->base_type);
+
+        /* Clone parents, roles, methods, attributes and resolve data. We do
+         * not copy name/namespace related stuff (need anonymous clone) or
+         * stuff that gets computed on the first instantiation. */
+        Parrot_Class *new_class = PARROT_CLASS(copy);
+        new_class->parents = VTABLE_clone(interp, class->parents);
+        new_class->roles = VTABLE_clone(interp, class->roles);
+        new_class->methods = VTABLE_clone(interp, class->methods);
+        new_class->vtable_methods = VTABLE_clone(interp, class->vtable_methods);
+        new_class->attrib_metadata = VTABLE_clone(interp, class->attrib_metadata);
+        new_class->resolve_method = VTABLE_clone(interp, class->resolve_method);
+
+        /* Return cloned class. */
+        return copy;
+    }
+
+/*
+
+=item C<PMC* clone_pmc(PMC *args)>
+
+Makes a copy of the class, then modifies or adds to it based upon the contents
+of the supplied initialization data. If a new name or namespace is not supplied
+in C<args> then the cloned class will be anonymous. The instantiated flag is
+unset to allow further modifications.
+
+=cut
+
+*/
+
+    PMC* clone_pmc(PMC *args)
+    {
+        /* Do the standard clone. */
+        PMC *copy = DYNSELF.clone();
+
+        /* Initialize it with the supplied arguments. */
+        init_class_from_hash(interp, copy, args);
+
+        /* Return cloned class. */
+        return copy;
+    }
+
     /* **********************************************************************
      * Below here are non-vtable methods that eventually will go in a role
      * that is composed into here to optionally give a nice interface from

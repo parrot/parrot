@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 12;
 
 =head1 NAME
 
@@ -313,6 +313,95 @@ ok 2 - returned hash had correct number of elements
 foo
 ok 3 - inspect('name')
 ok 4 - inspect('attributes')
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'clone' );
+.sub 'test' :main
+    $P0 = new 'Hash'
+    $P0['name'] = 'Monkey'
+    $P1 = new 'Class', $P0
+    $P1.add_attribute('banana')
+    $P2 = $P1.'new'()
+    print "ok 1 - created class Monkey and instantiated it\n"
+    
+    $P3 = clone $P1
+    print "ok 2 - cloned class Monkey\n"
+
+    $S1 = $P3.'inspect'('name')
+    if $S1 == "" goto ok_3
+    print "not "
+ok_3:
+    print "ok 3 - name is empty\n"
+
+    $P4 = $P3.'inspect'('namespace')
+    if null $P4 goto ok_4
+    print "not "
+ok_4:
+    print "ok 4 - namespace is null\n"
+
+    $P4 = $P3.'inspect'('attributes')
+    $I0 = elements $P4
+    if $I0 == 1 goto ok_5
+    print "not "
+ok_5:
+    print "ok 5 - attribute survived cloning\n"
+
+    $P3.add_attribute('jungle')
+    print "ok 6 - can modify cloned class\n"
+.end
+CODE
+ok 1 - created class Monkey and instantiated it
+ok 2 - cloned class Monkey
+ok 3 - name is empty
+ok 4 - namespace is null
+ok 5 - attribute survived cloning
+ok 6 - can modify cloned class
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'clone_pmc' );
+.sub 'test' :main
+    $P0 = new 'Hash'
+    $P0['name'] = 'Monkey'
+    $P1 = new 'Class', $P0
+    $P1.add_attribute('banana')
+    $P2 = $P1.'new'()
+    print "ok 1 - created class Monkey and instantiated it\n"
+    
+    $P0 = new 'Hash'
+    $P0['name'] = 'Mandrill'
+    $P3 = clone $P1, $P0
+    print "ok 2 - cloned class Monkey with Hash argument\n"
+
+    $S1 = $P3.'inspect'('name')
+    if $S1 == "Mandrill" goto ok_3
+    print "not "
+ok_3:
+    print "ok 3 - name is new one set in the Hash\n"
+
+    $P4 = $P3.'inspect'('namespace')
+    $S1 = $P4
+    if $S1 == 'Mandrill' goto ok_4
+    print "not "
+ok_4:
+    print "ok 4 - namespace is Mandrill too\n"
+
+    $P4 = $P3.'inspect'('attributes')
+    $I0 = elements $P4
+    if $I0 == 1 goto ok_5
+    print "not "
+ok_5:
+    print "ok 5 - attribute survived cloning\n"
+
+    $P3.add_attribute('jungle')
+    print "ok 6 - can modify cloned class\n"
+.end
+CODE
+ok 1 - created class Monkey and instantiated it
+ok 2 - cloned class Monkey with Hash argument
+ok 3 - name is new one set in the Hash
+ok 4 - namespace is Mandrill too
+ok 5 - attribute survived cloning
+ok 6 - can modify cloned class
 OUT
 
 # Local Variables:
