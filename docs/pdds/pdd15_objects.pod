@@ -957,7 +957,12 @@ low-level PMC such as C<Integer> or C<ResizablePMCArray>.
   $P1 = get_class $P2
 
 Retrieve a class object for the class identified by the string name in
-$S2, or by the PMC key in $P2.
+$S2, or by the PMC key or namespace object in $P2.
+
+A string name looks for the class in a namespace with that name nested in the
+currently selected namespace. Passing in a namespace object looks for the class
+in that namespace object. A key looks for the class in the namespace identified
+by the multilevel key relative to the currently selected HLL.
 
 =item addparent
 
