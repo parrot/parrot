@@ -18,7 +18,7 @@ help:
 	@echo "Following targets are available for the user:"
 	@echo ""
 	@echo "Building:"
-	@echo "  all:               Build plumhead.pbc
+	@echo "  all:               Build plumhead.pbc"
 	@echo "                     with support for variant 'Plumhead partridge'."
 	@echo "                     This is the default."
 	@echo "  build              Same as 'all'."
