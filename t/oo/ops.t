@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 5;
 
 =head1 NAME
 
@@ -80,6 +80,83 @@ CODE
 foo
 ok 1 - inspect_p_p_s with $3='name'
 ok 2 - inspect_p_p_s with $3='attributes'
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'get_class_p_s' );
+.sub main :main
+    $P0 = new 'Hash'
+    $P4 = new 'String'
+    $P4 = 'Monkey'
+    $P0['name'] = $P4
+    
+    $P1 = new 'Class', $P0
+    print "ok 1 - created new class named Monkey\n"
+    
+    push_eh nok_2
+    $P2 = get_class 'Monkey'
+    clear_eh
+    goto ok_2
+nok_2:
+    print "not "
+ok_2:
+    print "ok 2 - get_class found a class\n"
+    
+    $P3 = $P2.'inspect'('name')
+    print $P3
+    print "\nok 3 - got name of found class\n"
+.end
+CODE
+ok 1 - created new class named Monkey
+ok 2 - get_class found a class
+Monkey
+ok 3 - got name of found class
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'get_class_p_p' );
+.sub main :main
+    $P0 = new 'Hash'
+    $P4 = new 'String'
+    $P4 = 'Monkey'
+    $P0['name'] = $P4
+    
+    $P1 = new 'Class', $P0
+    print "ok 1 - created new class named Monkey\n"
+    
+    push_eh nok_2
+    $P2 = get_class [ 'Monkey' ]
+    clear_eh
+    goto ok_2
+nok_2:
+    print "not "
+ok_2:
+    print "ok 2 - get_class with a Key found a class\n"
+    
+    $P3 = $P2.'inspect'('name')
+    print $P3
+    print "\nok 3 - got name of found class\n"
+
+    push_eh nok_4
+    $P3 = get_namespace [ 'Monkey' ]
+    $P2 = get_class $P3
+    clear_eh
+    goto ok_4
+nok_4:
+    print "not "
+ok_4:
+    print "ok 4 - get_class with a NameSpace found a class\n"
+    
+    $P3 = $P2.'inspect'('name')
+    print $P3
+    print "\nok 5 - got name of found class\n"
+.end
+CODE
+ok 1 - created new class named Monkey
+ok 2 - get_class with a Key found a class
+Monkey
+ok 3 - got name of found class
+ok 4 - get_class with a NameSpace found a class
+Monkey
+ok 5 - got name of found class
 OUT
 
 # Local Variables:
