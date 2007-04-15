@@ -22,6 +22,36 @@ Parrot has a number of core PMC types that all programs can guarantee will be
 available to them. (With the possible exception of Parrot programs executing on
 an embedded device or other restricted environment)
 
+=head1 QUESTIONS
+
+=over 4
+
+=item *
+
+Where should c-level role implementations live? In src/pmc? What naming
+convention should we use for the files? Singleton role goes to rsingleton.pmc?
+
+=item *
+
+Should we create a pmrole keyword like pmclass? And pmr2c to translate them to
+C? How different are classes and roles at the PMC level?
+
+=item *
+
+<particle> pmclass needs a keyword to specify what roles a class is composed
+from.  We're already using 'does', but in an ad hoc way, from what I can see in
+the little docs there are about 'does'.
+
+=item *
+
+<particle> Do c-level roles have custom flags like PMCs? Class PMC has a custom
+flag for 'instantiated', right now it uses a full int, which I think is a waste
+of space. <allison> 8 bits is pretty limited, and IIRC we've already run into
+the limitation. This runs back to Leo's proposal to make PMCs a little more
+flexible, so we wouldn't have to hold all PMCs to the same 8 bits
+
+=back
+
 =head1 IMPLEMENTATION
 
 =head2 Scalar types
