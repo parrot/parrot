@@ -525,6 +525,18 @@ inline op clone(out PMC, invar PMC) :base_mem {
   goto NEXT();
 }
 
+
+=item B<clone>(out PMC, invar PMC, in PMC)
+
+Makes a copy of the PMC in $2 and puts it in $1, using the arguments in $3.
+
+=cut
+
+inline op clone(out PMC, invar PMC, in PMC) :base_mem {
+  $1 = VTABLE_clone_pmc(interp, $2, $3);
+  goto NEXT();
+}
+
 =back
 
 =cut

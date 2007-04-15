@@ -32,6 +32,7 @@ UINTVAL subtype(INTVAL type)
 STRING* name()
 
 PMC* clone()
+PMC* clone_pmc(PMC* args)
 
 PMC* find_method(STRING* method_name)
 

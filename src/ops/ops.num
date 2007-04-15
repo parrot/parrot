@@ -1235,3 +1235,5 @@ get_class_p_s                  1204
 get_class_p_sc                 1205
 get_class_p_p                  1206
 get_class_p_pc                 1207
+clone_p_p_p                    1208
+clone_p_p_pc                   1209
