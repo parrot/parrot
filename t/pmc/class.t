@@ -83,11 +83,17 @@ pir_output_is( <<'CODE', <<'OUT', 'name' );
   ok_3:
     say 'ok 3 - name() with too many args fails'
 
+    $P1 = $P0.'namespace'()
+    if $P1 == 'Alex' goto ok_4
+    print 'not '
+ok_4:
+    say 'ok 4 - name() with args sets namespace too'
 .end
 CODE
 ok 1 - name() with no args returns class name, which is empty at first
 ok 2 - name() with args sets class name
 ok 3 - name() with too many args fails
+ok 4 - name() with args sets namespace too
 OUT
 
 # L<PDD15/Class PMC API/=item new>

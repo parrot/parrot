@@ -760,8 +760,12 @@ Sets the name of the class.
         STRING *ret_name = NULL;
 
         if (got_name) {
-            /* Set class name. */
-            class->name = name;
+            /* We'll build a hash just containing the name, then give this to
+             * init_class_from_hash - saves some code duplication. */
+            PMC *naming_hash = pmc_new(interp, enum_class_Hash);
+            VTABLE_set_string_keyed_str(interp, naming_hash,
+                CONST_STRING(interp, "name"), name);
+            init_class_from_hash(interp, SELF, naming_hash);
         }
 
         ret_name = class->name;
