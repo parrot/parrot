@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 60;
+use Parrot::Test tests => 61;
 use Parrot::Config qw(%PConfig);
 
 =head1 NAME
@@ -2449,6 +2449,87 @@ pir_output_is( << 'CODE', << 'OUTPUT', "conversion I <-> P" );
 .end
 CODE
 42
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'nested structs should be independent', todo => 'RT #31292' );
+.include 'datatypes.pasm'
+
+.sub 'test' :main
+    .local string library_name
+    library_name = 'libnci_test'
+
+    .local pmc libnci_test
+    libnci_test = loadlib library_name
+
+    .local pmc types
+    types = new .OrderedHash
+    types['y'] = .DATATYPE_INT
+    push types, 0
+    push types, 0
+
+    .local pmc nested
+    nested = new .ManagedStruct, types
+
+    .local pmc outer
+    outer = make_outer_struct( nested )
+    outer[ 'x' ] = 0
+    outer[ 'nested'; 'y' ] = 0
+
+    .local pmc nci_func
+    nci_func = dlfunc libnci_test, 'nci_vpii', 'vpii'
+
+    nci_func( outer, 1, 100 )
+    print_values( outer )
+
+    .local pmc other
+    other = make_outer_struct( nested )
+
+    # autovivify the nested hash
+    other[ 'nested'; 'y' ] = 1
+    nci_func( other, 2, 200 )
+
+    print_values( outer )
+.end
+
+.sub 'print_values'
+    .param pmc outer
+
+    .local int x, y
+    x = outer['x']
+    y = outer[ 'nested'; 'y' ]
+    print "X: "
+    print x
+    print "\nY: "
+    print y
+    print "\n"
+.end
+
+.sub 'make_outer_struct'
+    .param pmc nested
+
+    .local pmc types
+    types        = new .OrderedHash
+    types[ 'x' ] = .DATATYPE_INT
+    push types, 0
+    push types, 0
+    types[ 'nested' ] = .DATATYPE_STRUCT_PTR
+
+    .local pmc struct_ptr
+    struct_ptr = types[-1]
+    setprop struct_ptr, '_struct', nested
+    push types, 0
+    push types, 0
+
+    .local pmc outer
+    outer = new .ManagedStruct, types
+
+    .return( outer )
+.end
+CODE
+X: 1
+Y: 100
+X: 1
+Y: 100
 OUTPUT
 
 # Local Variables:
