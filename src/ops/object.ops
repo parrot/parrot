@@ -426,9 +426,15 @@ inline op get_class(out PMC, in PMC) :object_classes {
   PMC *class = PMCNULL;
   opcode_t *next = expr NEXT();
 
-  /* Look up a namespace and if we find it, get the class associated with it,
-   * if any. */
-  PMC *ns = Parrot_get_namespace_keyed(interp, interp->HLL_namespace, $2);
+  /* If we were not passed a namespace PMC, look it up, otherwise just use
+   * the supplied namespace PMC. */
+  PMC *ns;
+  if (!VTABLE_isa(interp, $2, string_from_const_cstring(interp, "NameSpace", 0)))
+      ns = Parrot_make_namespace_autobase(interp, $2);
+  else
+      ns = $2;
+
+  /* If we have got a namespace, get the class associated with it, if any. */
   if (!PMC_IS_NULL(ns))
       Parrot_PCCINVOKE(interp, ns,
           string_from_const_cstring(interp, "get_class", 0), "->P", &class);
