@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 55;
+use Parrot::Test tests => 56;
 use Parrot::Config;
 
 =head1 NAME
@@ -582,6 +582,24 @@ pir_output_is( <<'CODE', <<'OUTPUT', "HLL and vars" );
 .end
 CODE
 3.14
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "HLL and namespace directives" );
+.HLL '_Tcl', ''
+.namespace ['Foo'; 'Bar']
+
+.HLL 'Tcl', ''
+
+.sub main :main
+  $P0 = get_namespace
+  $P1 = $P0.'get_name'()
+  $S0 = join "::", $P1
+  print $S0
+  print "\n"
+  end
+.end
+CODE
+tcl
 OUTPUT
 
 {

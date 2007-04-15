@@ -524,6 +524,7 @@ hll_def: HLL STRINGC COMMA STRINGC
             hll_lib =  string_unescape_cstring(interp, $4 + 1, '"', NULL);
             CONTEXT(((Interp*)interp)->ctx)->current_HLL =
                 Parrot_register_HLL(interp, hll_name, hll_lib);
+            IMCC_INFO(interp)->cur_namespace = NULL;
             $$ = 0;
          }
    | HLL_MAP INTC COMMA INTC
