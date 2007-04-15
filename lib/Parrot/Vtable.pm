@@ -148,28 +148,28 @@ sub vtbl_struct {
 
     $struct = <<"EOF";
 typedef enum {
-    VTABLE_IS_CONST_FLAG = 0x01,
-    VTABLE_HAS_CONST_TOO = 0x02,
-    VTABLE_PMC_NEEDS_EXT = 0x04,
-    VTABLE_DATA_IS_PMC   = 0x08,
-    VTABLE_PMC_IS_SINGLETON = 0x10,
-    VTABLE_IS_SHARED_FLAG   = 0x20,
-    VTABLE_IS_CONST_PMC_FLAG = 0x40,
-    VTABLE_HAS_READONLY_FLAG = 0x80,
-    VTABLE_IS_READONLY_FLAG = 0x100
+    VTABLE_IS_CONST_FLAG     = 0x001,
+    VTABLE_HAS_CONST_TOO     = 0x002,
+    VTABLE_PMC_NEEDS_EXT     = 0x004,
+    VTABLE_DATA_IS_PMC       = 0x008,
+    VTABLE_PMC_IS_SINGLETON  = 0x010,
+    VTABLE_IS_SHARED_FLAG    = 0x020,
+    VTABLE_IS_CONST_PMC_FLAG = 0x040,
+    VTABLE_HAS_READONLY_FLAG = 0x080,
+    VTABLE_IS_READONLY_FLAG  = 0x100
 } vtable_flags_t;
 
-struct _vtable {
-    PMC * _namespace;        /* Pointer to namespace for this class */
-    INTVAL base_type;        /* 'type' value for MMD */
-    STRING* whoami;          /* Name of class this vtable is for */
-    UINTVAL flags;           /* Flags. Duh */
-    STRING* does_str;        /* space-separated list of interfaces */
-    STRING* isa_str;         /* space-separated list of classes */
-    PMC *class;              /* for PMCs: a PMC of that type
-                                for objects: the class PMC */
-    PMC *mro;                /* array PMC of [class, parents ... ] */
-    struct _vtable *ro_variant_vtable; /* A varient of this vtable with the
+typedef struct _vtable {
+    PMC    *_namespace;     /* Pointer to namespace for this class */
+    INTVAL  base_type;      /* 'type' value for MMD */
+    STRING *whoami;         /* Name of class this vtable is for */
+    UINTVAL flags;          /* Flags. Duh */
+    STRING *does_str;       /* space-separated list of interfaces */
+    STRING *isa_str;        /* space-separated list of classes */
+    PMC    *class;          /* for PMCs: a PMC of that type
+                               for objects: the class PMC */
+    PMC    *mro;            /* array PMC of [class, parents ... ] */
+    struct _vtable *ro_variant_vtable; /* A variant of this vtable with the
                                    opposite IS_READONLY flag */
     /* Vtable Functions */
 
@@ -179,7 +179,7 @@ EOF
         $struct .= "    $entry->[1]_method_t $entry->[1];\n";
     }
 
-    $struct .= "};\n";
+    $struct .= "} _vtable;\n";
 
     return $struct;
 }

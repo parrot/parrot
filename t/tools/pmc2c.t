@@ -101,7 +101,7 @@ END_PMC
 void
 Parrot_a_class_init(Parrot_Interp interp, int entry, int pass)
 {
-    const struct _vtable temp_base_vtable = {
+    const VTABLE temp_base_vtable = {
 END_C
 
 pmc2c_output_like( <<'END_PMC', <<'END_C', 'comment passthrough' );
@@ -136,7 +136,7 @@ END_C
 pmc2c_output_like( <<'END_PMC', <<'END_C', 'need_ext' );
 pmclass a need_ext { }
 END_PMC
-    const struct _vtable temp_base_vtable = {
+    const VTABLE temp_base_vtable = {
         NULL, /* namespace */
         enum_class_a, /* base_type */
         NULL, /* whoami */
@@ -149,7 +149,7 @@ END_PMC
 void
 Parrot_a_class_init(Parrot_Interp interp, int entry, int pass)
 {
-    const struct _vtable temp_base_vtable = {
+    const VTABLE temp_base_vtable = {
         NULL, /* namespace */
         enum_class_a, /* base_type */
         NULL, /* whoami */
@@ -162,7 +162,7 @@ END_PMC
 void
 Parrot_Consta_class_init(Parrot_Interp interp, int entry, int pass)
 {
-    const struct _vtable temp_base_vtable = {
+    const VTABLE temp_base_vtable = {
         NULL, /* namespace */
         enum_class_Consta, /* base_type */
         NULL, /* whoami */

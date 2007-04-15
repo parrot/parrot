@@ -849,7 +849,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     int    idx, pi, i;
     size_t offset;
 
-    offset  = offsetof(struct _vtable, init);
+    offset  = offsetof(VTABLE, init);
     offset += nvtable * sizeof (void *);
 
     for (idx = 1; idx <= n; idx++) {
@@ -1107,7 +1107,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
                      Interp *interp)
 {
     void *igniter = (void (*)(void))pmc_new_noinit;
-    size_t offset = offsetof(struct _vtable, init);
+    size_t offset = offsetof(VTABLE, init);
 
     int p1 = *(jit_info->cur_op + 1);
     int i2 = *(jit_info->cur_op + 2);

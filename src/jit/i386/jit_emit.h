@@ -2450,7 +2450,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     char *L4 = NULL;
 
     /* get the offset of the first vtable func */
-    offset = offsetof(struct _vtable, init);
+    offset = offsetof(VTABLE, init);
     offset += nvtable * sizeof (void *);
     op = *jit_info->cur_op;
     if (op == PARROT_OP_set_i_p_ki) {
@@ -2770,7 +2770,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
 {
     int p1, i2;
     op_info_t *op_info = &interp->op_info_table[*jit_info->cur_op];
-    size_t offset = offsetof(struct _vtable, init);
+    size_t offset = offsetof(VTABLE, init);
     extern PARROT_API char **Parrot_exec_rel_addr;
     extern PARROT_API int Parrot_exec_rel_count;
 

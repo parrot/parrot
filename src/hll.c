@@ -112,8 +112,7 @@ new_hll_entry(Interp *interp)
 }
 
 INTVAL
-Parrot_register_HLL(Interp *interp,
-        STRING *hll_name, STRING *hll_lib)
+Parrot_register_HLL(Interp *interp, STRING *hll_name, STRING *hll_lib)
 {
     PMC *entry, *name, *type_hash, *ns_hash, *hll_info;
     INTVAL idx;

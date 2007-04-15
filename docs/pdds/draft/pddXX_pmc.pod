@@ -49,7 +49,7 @@ attributes.
   +---------------+
 
   #define THE_PMC \
-    struct _vtable* vtable; \
+    VTABLE *vtable; \
     UINTVAL flags
 
 An Integer Value PMC could be defined with:

@@ -836,7 +836,7 @@ sub vtable_decl {
     my $enum_name = $self->{flags}{dynpmc} ? -1 : "enum_class_$classname";
     my $methlist = join( ",\n        ", @$methods );
     $cout .= <<ENDOFCODE;
-    const struct _vtable $name = {
+    const VTABLE $name = {
         NULL, /* namespace */
         $enum_name, /* base_type */
         NULL, /* whoami */
@@ -916,12 +916,12 @@ EOC
         /*
          * create vtable - clone it - we have to set a few items
          */
-        struct _vtable *vt_clone =
+        VTABLE *vt_clone =
             Parrot_clone_vtable(interp, &temp_base_vtable);
 EOC
     for my $k ( keys %extra_vt ) {
         $cout .= <<"EOC";
-        struct _vtable *vt_${k}_clone =
+        VTABLE *vt_${k}_clone =
             Parrot_clone_vtable(interp, &temp_${k}_vtable);
 EOC
     }
