@@ -183,6 +183,7 @@ static void init_class_from_hash(Parrot_Interp interp, PMC *self, PMC *info)
     Parrot_Class *class = PARROT_CLASS(self);
     int have_name, have_ns;
     PMC *old_ns;
+    int i;
 
     /* Ensure we actually have some initialization info. */
     if (PMC_IS_NULL(info))
@@ -260,8 +261,71 @@ static void init_class_from_hash(Parrot_Interp interp, PMC *self, PMC *info)
         Parrot_PCCINVOKE(interp, class->namespace,
             string_from_const_cstring(interp, "set_class", 0),
             "P->", self);
+    
+    /* Initialize resolve_method. */
+    if (VTABLE_exists_keyed_str(interp, info,
+        string_from_const_cstring(interp, "resolve_method", 0))) {
+        /* Set it. */
+        class->resolve_method = VTABLE_get_pmc_keyed_str(interp, info,
+            string_from_const_cstring(interp, "resolve_method", 0));
+    }
 
-    /* XXX TODO: initialize resolve, parents, roles, attributes, methods. */
+    /* Initialize parents, if we have any. */
+    if (VTABLE_exists_keyed_str(interp, info,
+        string_from_const_cstring(interp, "parents", 0))) {
+        /* Loop over parents array and add them. */
+        PMC *parent_list = VTABLE_get_pmc_keyed_str(interp, info,
+            string_from_const_cstring(interp, "parents", 0));
+        int parent_count = VTABLE_elements(interp, parent_list);
+        for (i = 0; i < parent_count; i++) {
+            PMC *parent = VTABLE_get_pmc_keyed_int(interp, parent_list, i);
+            VTABLE_add_parent(interp, self, parent);
+        }
+    }
+
+    /* Initialize roles, if we have any. */
+    if (VTABLE_exists_keyed_str(interp, info,
+        string_from_const_cstring(interp, "roles", 0))) {
+        /* Loop over roles array and compose them. */
+        PMC *role_list = VTABLE_get_pmc_keyed_str(interp, info,
+            string_from_const_cstring(interp, "roles", 0));
+        int role_count = VTABLE_elements(interp, role_list);
+        for (i = 0; i < role_count; i++) {
+            PMC *role = VTABLE_get_pmc_keyed_int(interp, role_list, i);
+            VTABLE_add_role(interp, self, role);
+        }
+    }
+
+    /* Initialize attributes, if we have any. */
+    if (VTABLE_exists_keyed_str(interp, info,
+        string_from_const_cstring(interp, "attributes", 0))) {
+        /* Loop over attributes array and add them. */
+        PMC *attrib_name_list = VTABLE_get_pmc_keyed_str(interp, info,
+            string_from_const_cstring(interp, "attributes", 0));
+        int attrib_count = VTABLE_elements(interp, attrib_name_list);
+        for (i = 0; i < attrib_count; i++) {
+            STRING *attrib_name = VTABLE_get_string_keyed_int(interp,
+                attrib_name_list, i);
+            VTABLE_add_attribute(interp, self, attrib_name, PMCNULL);
+        }
+    }
+
+    /* Initialize methods. */
+    if (VTABLE_exists_keyed_str(interp, info,
+        string_from_const_cstring(interp, "methods", 0))) {
+        /* Get the methods hash. */
+        PMC *methods = VTABLE_get_pmc_keyed_str(interp, info,
+            string_from_const_cstring(interp, "methods", 0));
+
+        /* Iterate over the list of methods. */
+        PMC *iter = VTABLE_get_iter(interp, methods);
+        while (VTABLE_get_bool(interp, iter)) {
+            /* Add the method. */
+            STRING *method_name = VTABLE_shift_string(interp, iter);
+            PMC *method_pmc = VTABLE_get_pmc_keyed_str(interp, methods, method_name);
+            VTABLE_add_method(interp, self, method_name, method_pmc);
+        }
+    }
 }
 
 

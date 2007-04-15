@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 
 =head1 NAME
 
@@ -402,6 +402,56 @@ ok 3 - name is new one set in the Hash
 ok 4 - namespace is Mandrill too
 ok 5 - attribute survived cloning
 ok 6 - can modify cloned class
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'new with initialization hash' );
+.sub 'test' :main
+    $P0 = new 'Hash'
+
+    # We'll have some attributes...
+    $P1 = new 'ResizablePMCArray'
+    $P1[0] = 'x'
+    $P1[1] = 'y'
+    $P0['attributes'] = $P1
+
+    # And a method.
+    $P1 = new 'Hash'
+    $P2 = find_global 'add'
+    $P1['add'] = $P2
+    $P0['methods'] = $P1
+
+    $P1 = new 'Class', $P0
+    print "ok 1 - created new class with attributes and methods supplied\n"
+
+    # Instantiate and try setting each attribute.
+    $P2 = $P1.'new'()
+    $P3 = new 'Integer'
+    $P3 = 37
+    setattribute $P2, 'x', $P3
+    print "ok 2 - set first attribute\n"
+    $P3 = new 'Integer'
+    $P3 = 5
+    setattribute $P2, 'y', $P3
+    print "ok 3 - set second attribute\n"
+    
+    # Call method.
+    $P3 = $P2.add()
+    print $P3
+    print "\nok 4 - called method\n"
+.end
+.sub add :method
+    $P0 = getattribute self, "x"
+    $P1 = getattribute self, "y"
+    $P2 = new 'Integer'
+    $P2 = $P0 + $P1
+    .return($P2)
+.end
+CODE
+ok 1 - created new class with attributes and methods supplied
+ok 2 - set first attribute
+ok 3 - set second attribute
+42
+ok 4 - called method
 OUT
 
 # Local Variables:
