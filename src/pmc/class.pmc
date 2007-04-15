@@ -333,7 +333,7 @@ The class is attatched to the current namespace.
 
         /* Set up the object. */
         SELF.init();
-        
+
         /* Initialize the class with the supplied data. */
         init_class_from_hash(interp, SELF, init_data);
     }
@@ -657,7 +657,7 @@ Gets the namespace that this class is attached to.
     PCCMETHOD void namespace(PMC *namespace :optional, int got_name :opt_flag) {
         Parrot_Class *class = PARROT_CLASS(SELF);
         PMC *ret_namespace = class->namespace;
-        PCCRETURN(PMC *ret_namespace);        
+        PCCRETURN(PMC *ret_namespace);
     }
 
 /*
