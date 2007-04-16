@@ -89,7 +89,7 @@ An empty ResizablePMCArray PMC is allocated during initialization.
 #include "classobject.h"
 
 /* Build a string representing the fully qualified class name. */
-static STRING* get_fq_classname(Parrot_Interp interp, Parrot_Class *class_info) {
+STRING* Parrot_Class_get_fq_classname(Parrot_Interp interp, Parrot_Class *class_info) {
     STRING *fq_class = string_from_cstring(interp, "", 0);
     STRING *seperator = string_from_const_cstring(interp, "::", 0);
     if (!PMC_IS_NULL(class_info->namespace)) {
@@ -131,7 +131,7 @@ static void build_attrib_index(Parrot_Interp interp, PMC *self) {
         PMC *iter = VTABLE_get_iter(interp, attribs);
 
         /* Build a string representing the fully qualified class name. */
-        STRING *fq_class = get_fq_classname(interp, class_info);
+        STRING *fq_class = Parrot_Class_get_fq_classname(interp, class_info);
 
         /* Iterate over the attributes. */
         while (VTABLE_get_bool(interp, iter)) {
@@ -1018,90 +1018,6 @@ parameter is supplied, a particular item of introspection data.
 
         PCCRETURN(PMC *found);
     }
-
-/*
-
-=item C<void _get_attrib_index()>
-
-This finds the index of an attribute in an object's attribute store and
-returns it. Returns -1 if the attribute does not exist. This method exists
-solely for the use of the Object PMC or any PMCs derived from it; the index
-will be useless anyway, since only the Object knows what to do with it.
-
-=cut
-
-*/
-    PCCMETHOD void _get_attrib_index(STRING *name) {
-        Parrot_Class *class = PARROT_CLASS(SELF);
-
-        /* If we can't find the attribute, we hand back -1. */
-        int index = -1;
-
-        /* First see if we can find it in the cache. */
-        if (VTABLE_exists_keyed_str(interp, class->attrib_cache, name)) {
-            /* Yay! We got a cache hit! */
-            index = VTABLE_get_integer_keyed_str(interp, class->attrib_cache, name);
-        }
-        else {
-            /* No hit. We need to walk up the list of parents to try and find the
-             * attribute. */
-            int num_classes = VTABLE_elements(interp, class->all_parents);
-            int i;
-            for (i = 0; i < num_classes; i++) {
-                /* Get the class and its attribute metadata hash. */
-                PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, class->all_parents, i);
-                Parrot_Class *class_info = PARROT_CLASS(cur_class);
-
-                /* Build a string representing the fully qualified attribute name. */
-                STRING *fq_name = get_fq_classname(interp, class_info);
-                fq_name = string_append(interp, fq_name, name);
-
-                /* Look up. */
-                if (VTABLE_exists_keyed_str(interp, class->attrib_index, fq_name)) {
-                    /* Found it. Get value, cache it and we're done. */
-                    index = VTABLE_get_integer_keyed_str(interp, class->attrib_index, fq_name);
-                    VTABLE_set_integer_keyed_str(interp, class->attrib_cache, name, index);
-                    break;
-                }
-            }
-        }
-
-        PCCRETURN(int index);
-    }
-
-/*
-
-=item C<void _get_method_pmc(STRING *name)>
-
-This walks the method resolution order and tries to locate a method of the
-give name. Returns the first one it finds, or NULL if no method is found.
-This method is intended to be used by the Object PMC.
-
-=cut
-
-*/
-    PCCMETHOD void _get_method_pmc(STRING *name) {
-        Parrot_Class *class = PARROT_CLASS(SELF);
-
-        /* Walk and search. */
-        PMC *found = NULL;
-        int num_classes = VTABLE_elements(interp, class->all_parents);
-        int i;
-        for (i = 0; i < num_classes; i++) {
-            /* Get the class and see if it has the method. */
-            PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, class->all_parents, i);
-            Parrot_Class *class_info = PARROT_CLASS(cur_class);
-            if (VTABLE_exists_keyed_str(interp, class_info->methods, name)) {
-                /* Found it! */
-                found = VTABLE_get_pmc_keyed_str(interp, class_info->methods, name);
-                break;
-            }
-        }
-
-        PCCRETURN(PMC *found);
-    }
-
-
 } /* END pmclass */
 
 /*

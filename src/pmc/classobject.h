@@ -39,6 +39,8 @@ typedef struct Parrot_Object {
 /* Macro to access underlying structure of an Object PMC. */
 #define PARROT_OBJECT(o) ((Parrot_Object *) PMC_data(o))
 
+/* Fully qualified class name generation; defined in Class, used by Object. */
+STRING* Parrot_Class_get_fq_classname(Parrot_Interp interp, Parrot_Class *class_info);
 
 #endif /* PARROT_CLASSOBJECT_GUARD */
 
