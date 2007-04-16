@@ -190,6 +190,8 @@ These libraries are loaded dynamically with the Lua function C<require>.
 
 =item * alarm library F<languages/lua/lib/alarm.pir>
 
+=item * Lua File System library F<languages/lua/lib/lfs.pir>
+
 =back
 
 =head1 Next Milestones
