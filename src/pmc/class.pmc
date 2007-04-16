@@ -86,26 +86,7 @@ An empty ResizablePMCArray PMC is allocated during initialization.
 
 #include "parrot/parrot.h"
 #include "pmc_namespace.h"
-#define PARROT_CLASS(o) ((Parrot_Class *) PMC_data(o))
-
-
-/* This is the underlying structure of this PMC. */
-typedef struct Parrot_Class {
-    STRING *name;         /* The name of the class. */
-    PMC *namespace;       /* The namespace it's linked to, if any. */
-    int instantiated;     /* Any instantiations since last modification? */
-    PMC *parents;         /* Immediate parent classes. */
-    PMC *all_parents;     /* Cached list of ourself and all parents, in MRO order. */
-    PMC *roles;           /* An array of roles. */
-    PMC *methods;         /* Hash of method names to methods in this class. */
-    PMC *vtable_methods;  /* Hash of Parrot v-table methods we override. */
-    PMC *attrib_metadata; /* Hash of attributes in this class to hashes of metadata. */
-    PMC *attrib_index;    /* Lookup table for attributes in this and parents. */
-    PMC *attrib_cache;    /* Cache of visible attrib names to indexes. */
-    PMC *resolve_method;  /* List of method names the class provides to resolve
-                           * conflicts with methods from roles. */
-} Parrot_Class;
-
+#include "classobject.h"
 
 /* Build a string representing the fully qualified class name. */
 static STRING* get_fq_classname(Parrot_Interp interp, Parrot_Class *class_info) {
@@ -750,7 +731,7 @@ unset to allow further modifications.
 
 =item C<void name(STRING *name :optional, int got_name :opt_flag)>
 
-Sets the name of the class.
+Sets the name of the class, and updates the namespace accoringly.
 
 =cut
 

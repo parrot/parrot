@@ -19,13 +19,7 @@ Implements an instance of a class.
 */
 
 #include "parrot/parrot.h"
-#define PARROT_OBJECT(o) ((Parrot_Object *) PMC_data(o))
-
-typedef struct Parrot_Object {
-    PMC *class;          /* The class this is an instance of. */
-    PMC *attrib_store;   /* The attributes store - a resizable PMC array. */
-} Parrot_Object;
-
+#include "classobject.h"
 
 pmclass Object need_ext {
 
