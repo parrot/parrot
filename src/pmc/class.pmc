@@ -261,7 +261,7 @@ static void init_class_from_hash(Parrot_Interp interp, PMC *self, PMC *info)
         Parrot_PCCINVOKE(interp, class->namespace,
             string_from_const_cstring(interp, "set_class", 0),
             "P->", self);
-    
+
     /* Initialize resolve_method. */
     if (VTABLE_exists_keyed_str(interp, info,
         string_from_const_cstring(interp, "resolve_method", 0))) {

@@ -530,7 +530,17 @@ Add the attribute named $2 to the class $1.
 =cut
 
 inline op addattribute(invar PMC, in STR) :object_classes {
-    Parrot_add_attribute(interp, $1, $2);
+    STRING *class_name  = string_from_const_cstring(interp, "Class", 0);
+    STRING *pclass_name = string_from_const_cstring(interp, "ParrotClass", 0);
+
+    if (VTABLE_isa(interp, $1, class_name))
+        VTABLE_add_attribute(interp, $1, $2, PMCNULL);
+    else if (VTABLE_isa(interp, $1, pclass_name))
+        Parrot_add_attribute(interp, $1, $2);
+    else
+        real_exception(interp, NULL, INVALID_OPERATION,
+            "Cannot add attribute to non-class" );
+
     goto NEXT();
 }
 

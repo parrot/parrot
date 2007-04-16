@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -47,7 +47,7 @@ pir_output_is( <<'CODE', <<'OUT', 'inspect_p_p' );
 
     $P1 = inspect $P0
     print "ok 1 - inspect_p_p op executed\n"
-    
+
     $I0 = elements $P1
     if $I0 == 6 goto ok_2
     print "not "
@@ -68,7 +68,7 @@ pir_output_is( <<'CODE', <<'OUT', 'inspect_p_p_s' );
     $P1 = inspect $P0, 'name'
     say $P1
     print "ok 1 - inspect_p_p_s with $3='name'\n"
-    
+
     $P1 = inspect $P0, 'attributes'
     $I0 = elements $P1
     if $I0 == 1 goto ok_2
@@ -88,10 +88,10 @@ pir_output_is( <<'CODE', <<'OUT', 'get_class_p_s' );
     $P4 = new 'String'
     $P4 = 'Monkey'
     $P0['name'] = $P4
-    
+
     $P1 = new 'Class', $P0
     print "ok 1 - created new class named Monkey\n"
-    
+
     push_eh nok_2
     $P2 = get_class 'Monkey'
     clear_eh
@@ -100,7 +100,7 @@ nok_2:
     print "not "
 ok_2:
     print "ok 2 - get_class found a class\n"
-    
+
     $P3 = $P2.'inspect'('name')
     print $P3
     print "\nok 3 - got name of found class\n"
@@ -118,10 +118,10 @@ pir_output_is( <<'CODE', <<'OUT', 'get_class_p_p' );
     $P4 = new 'String'
     $P4 = 'Monkey'
     $P0['name'] = $P4
-    
+
     $P1 = new 'Class', $P0
     print "ok 1 - created new class named Monkey\n"
-    
+
     push_eh nok_2
     $P2 = get_class [ 'Monkey' ]
     clear_eh
@@ -130,7 +130,7 @@ nok_2:
     print "not "
 ok_2:
     print "ok 2 - get_class with a Key found a class\n"
-    
+
     $P3 = $P2.'inspect'('name')
     print $P3
     print "\nok 3 - got name of found class\n"
@@ -144,7 +144,7 @@ nok_4:
     print "not "
 ok_4:
     print "ok 4 - get_class with a NameSpace found a class\n"
-    
+
     $P3 = $P2.'inspect'('name')
     print $P3
     print "\nok 5 - got name of found class\n"
@@ -157,6 +157,31 @@ ok 3 - got name of found class
 ok 4 - get_class with a NameSpace found a class
 Monkey
 ok 5 - got name of found class
+OUT
+
+pir_output_like( <<'CODE', <<'OUT', 'addattribute_p_s' );
+.sub main :main
+    $P0 = new 'Class'
+    addattribute $P0, 'foo'
+
+    $P1 = $P0.'new'()
+
+    $P2 = new 'Integer'
+    $P2 = 100
+    setattribute $P1, 'foo', $P2
+    getattribute $P2, $P1, 'foo'
+
+    print $P2
+    print "\n"
+
+    $P0 = new 'Hash'
+    addattribute $P0, 'oops'
+    print "Not here!\n"
+.end
+CODE
+/100
+Cannot add attribute to non-class
+current instr\.: 'main'/
 OUT
 
 # Local Variables:
