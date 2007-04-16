@@ -66,26 +66,33 @@ pmclass Object need_ext {
 
 /*
 
-=item C<void init_pmc(PMC *class)>
+=item C<void init()>
 
-Instantiates an object of the given class.
+Raises an exception; you can only instantiate objects from a class.
 
 =cut
 
 */
 
-    void init_pmc(PMC* class) {
-        Parrot_Object *obj = NULL;
+    void init() {
+        real_exception(interp, NULL, INVALID_OPERATION,
+                "Object must be created by a class.");
+    }
 
-        /* Custom DOD mark and destroy. */
-        PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
+/*
 
-        /* Set up the object. */
-        obj = mem_sys_allocate_zeroed(sizeof(Parrot_Object));
-        obj->class = class;
-        obj->attrib_store = pmc_new(interp, enum_class_ResizablePMCArray);
-        PMC_data(SELF) = obj;
+
+=item C<void init_pmc(PMC *class)>
+
+Raises an exception; you can only instantiate objects from a class.
+
+=cut
+
+*/
+
+    void init_pmc(PMC* worreva) {
+        real_exception(interp, NULL, INVALID_OPERATION,
+                "Object must be created by a class.");
     }
 
 /*

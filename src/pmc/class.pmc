@@ -805,6 +805,7 @@ parameter list.
         Parrot_Class *class = PARROT_CLASS(SELF);
         PMC *obj;
         PMC *iter;
+        Parrot_Object *obj_guts = NULL;
 
         /* If we've not been instantiated before... */
         if (!class->instantiated) {
@@ -835,7 +836,18 @@ parameter list.
         class->instantiated = 1;
 
         /* Create object. */
-        obj = pmc_new_init(interp, enum_class_Object, SELF);
+        obj = pmc_new_noinit(interp, enum_class_Object);
+
+        /* Set custom DOD mark and destroy on the object. */
+        PObj_custom_mark_SET(obj);
+        PObj_active_destroy_SET(obj);
+
+        /* Initialize the object's underlying structure, pointing it to this
+         * class. */
+        obj_guts = mem_sys_allocate_zeroed(sizeof(Parrot_Object));
+        obj_guts->class = SELF;
+        obj_guts->attrib_store = pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC_data(obj) = obj_guts;
 
         /* Initialize attributes with the supplied values. */
         iter = VTABLE_get_iter(interp, args);

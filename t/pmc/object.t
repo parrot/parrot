@@ -26,18 +26,15 @@ Tests the Object PMC.
 # TODO fix smartlinks once this is specced
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    $P0 = new .Object
-    say 'ok 1 - $P0 = new .Object'
-
-    $I0 = isa $P0, 'Object'
-    if $I0 goto ok_2
-    print 'not '
-  ok_2:
-    say "ok 2 - isa $P0, 'Object'"
+    push_eh ok_1
+    $P0 = new 'Object'
+    clear_eh
+    print "not "
+ok_1:
+    say "ok 1 - $P0 = new 'Object' throws exception"
 .end
 CODE
-ok 1 - $P0 = new .Object
-ok 2 - isa $P0, 'Object'
+ok 1 - $P0 = new 'Object' throws exception
 OUT
 
 ## TODO add more tests as this is documented and implemented
