@@ -31,15 +31,32 @@ Tests the Role PMC.
 
     test_namespace."export_to"(curr_namespace, exports)
 
-    plan(2)
+    plan(5)
 
     
-    $P0 = new .Role
+    $P0 = new 'Role'
     ok(1, 'Role type exists') # or we've already died.
 
 
     $I0 = isa $P0, 'Role'
     is($I0, 1, 'isa Role')
+
+
+    $P0 = new 'Hash'
+    $P0['name'] = 'Wob'
+    $P1 = new 'Role', $P0
+    ok(1, 'Created a Role initialized with a Hash')
+
+    $P2 = $P1.inspect('name')
+    $S0 = $P2
+    $I0 = $S0 == 'Wob'
+    ok($I0, 'Role name was set correctly')
+
+
+    $P2 = $P1.inspect('namespace')
+    $S0 = $P2
+    $I0 = $S0 == 'Wob'
+    ok($I0, 'Role namespace was set correctly')
 .end
 
 ## TODO add more tests as this is documented and implemented
