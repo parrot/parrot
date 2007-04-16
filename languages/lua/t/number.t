@@ -211,7 +211,7 @@ OUT
 language_output_like( 'lua', <<'CODE', <<'OUT', '1 .. true' );
 print(1 .. true)
 CODE
-/attempt to concatenate a boolean value/
+/attempt to concatenate a \w+ value/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '1.0 == 1' );
