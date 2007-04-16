@@ -184,7 +184,7 @@ non-zero value if it does.
     {
         /* Just use find_method and see it if finds anything. */
         PMC *method = VTABLE_find_method(interp, SELF, method_name);
-        return PMC_IS_NULL(method);
+        return !PMC_IS_NULL(method);
     }
 
 }
