@@ -25,7 +25,8 @@ The C<ResizableBooleanArray PMC> extends the C<FixedBooleanArray PMC>.
 
 
 #define BITS_PER_CHAR 8
-#define MIN_ALLOC 8 * BITS_PER_CHAR
+/* MIN_ALLOC is BITS_PER_CHAR * 8 */
+#define MIN_ALLOC 64
 
 pmclass ResizableBooleanArray extends FixedBooleanArray need_ext does array {
 
@@ -107,26 +108,31 @@ Resizes the array to C<size> elements.
 */
 
     void set_integer_native(INTVAL size) {
-        INTVAL newASize;
-        const INTVAL currSize = PMC_int_val(SELF) - PMC_int_val2(SELF);
+        INTVAL newallocbits, curallocbits, memsize;
+        const INTVAL cursize = PMC_int_val(SELF) - PMC_int_val2(SELF);
+
 
         /* We are already at the requested size. Yay */
-        if (size == currSize)
+        if (size == cursize)
             return;
+
 
         if (size < 0)
             real_exception(interp, NULL, E_IndexError,
                 "ResizableBooleanArray: Can't resize!");
 
-        newASize = (size / MIN_ALLOC + 1) * MIN_ALLOC;
+        newallocbits = (size / MIN_ALLOC + 1) * MIN_ALLOC;
+        curallocbits = (cursize / MIN_ALLOC + 1) * MIN_ALLOC;
+        memsize = newallocbits / BITS_PER_CHAR;
 
         /* Nothing allocated yet */
         if (! PMC_data(SELF)) {
-            PMC_data(SELF) = mem_sys_allocate_zeroed(newASize);
+            PMC_data(SELF) = mem_sys_allocate_zeroed(memsize);
         }
-        else {
+        /* The size is different, but and doesn't fit within the current allocation */
+        else if (newallocbits != curallocbits) {
             Parrot_UInt1 * const sd = PMC_data(SELF);
-            PMC_data(SELF) = mem_sys_realloc(sd, newASize);
+            PMC_data(SELF) = mem_sys_realloc(sd, memsize);
         }
 
         PMC_int_val2(SELF) = 0;
