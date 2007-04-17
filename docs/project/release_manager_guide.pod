@@ -79,7 +79,8 @@ Make sure everything works:
 
  $ make realclean
  $ perl Configure.pl ...
- $ make -s all world fulltest # Note that fulltest runs separate harnesses..
+ $ make -s all world fulltest html
+ # Note that fulltest runs separate harnesses..
 
 =back
 
