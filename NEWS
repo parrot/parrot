@@ -19,6 +19,8 @@ New in 0.4.11
    introspection, and C3 method resolution order
  + new Exporter PMC for importing globals between namespaces
  + new string utilities for radix conversion
+ + PCCINVOKE and Parrot_PCCINVOKE allow calling using the full Parrot Calling
+   Conventions from PMCs and C code respectively
 - Build:
  + Refactorings and improvements in test coverage for 'Configure.pl'
 - Misc:
