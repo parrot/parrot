@@ -235,10 +235,10 @@ of releases across multiple release managers. Each release manager takes
 one release in a 6 month rotation. Releases are scheduled for the 3rd
 Tuesday of the month.
 
- - Jan 16th (0.4.8), Jerry Gay (particle)
- - Feb 20th (0.4.9), Patrick Michaud (pmichaud)
- - Mar 20th, Will Coleda (Coke)
- - Apr 17th, Matt Diephouse (mdiep)
+ - Jan 16th (0.4.8)  Jerry Gay (particle)
+ - Feb 20th (0.4.9)  Patrick Michaud (pmichaud)
+ - Mar 20th (0.4.10) Will Coleda (Coke)
+ - Apr 17th (0.4.11) Matt Diephouse (mdiep)
  - May 15th, chromatic
  - Jun 19th, Allison Randal
  - Jul 17th, Jerry Gay (particle)
