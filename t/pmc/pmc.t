@@ -115,7 +115,7 @@ my $checkTypes;
 while ( my ( $type, $id ) = each %pmc_types ) {
     next if grep { $type eq $_ } qw/
         Null Iterator Enumerate Ref STMRef SharedRef ParrotObject ParrotThread
-        deleg_pmc BigInt LexInfo LexPad Slice
+        deleg_pmc BigInt LexInfo LexPad Slice Object
         /;    # these need an initializer
     my $set_ro = ( $type =~ /^Const\w+/ ) ? <<EOPASM : '';
     new P10, .Integer
