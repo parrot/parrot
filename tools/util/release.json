@@ -1,9 +1,9 @@
 {
-    "release.version"  : "0.4.10",
-    "release.name"     : "The Release Formerly Known as \"Prince\"",
+    "release.version"  : "0.4.11",
+    "release.name"     : "Tax Bird",
     "release.day"      : "Tuesday",
-    "release.date"     : "20 March 2007",
-    "release.nextdate" : "17 April 2007",
+    "release.date"     : "17 April 2007",
+    "release.nextdate" : "15 May 2007",
 
     "web.root"         : "http://parrotcode.org/",
     "web.source"       : "source.html",
@@ -11,7 +11,7 @@
     "web.repository"   : "https://svn.perl.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "17 March 2007",
+    "bugday.date"      : "12 May 2007",
 
     "rt.root"          : "https://rt.perl.org/rt3/",
     "rt.tracking"      : "Ticket/Display.html?id=41581",
