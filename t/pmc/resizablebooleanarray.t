@@ -420,42 +420,72 @@ pir_output_is( << 'CODE', << 'OUTPUT', "unshift and shift" );
        .local int elements
 
        i= 1
-       pmc_arr= new ResizableBooleanArray
+       pmc_arr = new ResizableBooleanArray
 
+       # No elements are set
        print_num_elements( pmc_arr )
 
+       # Set two of the first three elements
+       pmc_arr[0] = 1
+       pmc_arr[2] = 1
+       print_num_elements( pmc_arr )
+
+       # Unshift a "1"  element on
        unshift pmc_arr, i
        print i
        print_num_elements( pmc_arr )
 
+       # Unshift a "0"  element on
        unshift pmc_arr, 0
        print 0
        print_num_elements( pmc_arr )
 
-       print_num_elements( pmc_arr )
-
+       # Shift an element off
        i_elem= shift pmc_arr
        print i_elem
        print_num_elements( pmc_arr )
 
+       # Shift an element off
        i_elem= shift pmc_arr
        print i_elem
        print_num_elements( pmc_arr )
 
-    pmc_arr = 62
-    unshift pmc_arr, 0
-    unshift pmc_arr, 1
-    unshift pmc_arr, 0
-    unshift pmc_arr, 1
-    i_elem = shift pmc_arr
-    i_elem = shift pmc_arr
-    i_elem = shift pmc_arr
-    print i_elem
-    print_num_elements(pmc_arr)
+       # Resize the array
+       pmc_arr = 62
+       print_num_elements(pmc_arr)
 
-    # Set same size array is currently
-    pmc_arr = 63
-    print_num_elements(pmc_arr)
+       # Unshift 4 elements on
+       unshift pmc_arr, 1
+       unshift pmc_arr, 1
+       unshift pmc_arr, 0
+       unshift pmc_arr, 1
+       print_num_elements(pmc_arr)
+
+       # Shift 3 elements off
+       i_elem = shift pmc_arr
+       i_elem = shift pmc_arr
+       i_elem = shift pmc_arr
+       print i_elem
+       print_num_elements(pmc_arr)
+
+       # Set same size array is currently
+       pmc_arr = 63
+       print_num_elements(pmc_arr)
+
+       # Set 101th element
+       pmc_arr[100] = 1
+       print_num_elements(pmc_arr)
+
+       # Shift off 99 elements
+      .local int counter
+      counter = 98
+shift_loop:
+       i_elem = shift pmc_arr
+       dec counter
+       if counter > 0 goto shift_loop
+
+       print i_elem
+       print_num_elements(pmc_arr)
 .end
 
 .sub print_num_elements
@@ -465,18 +495,43 @@ pir_output_is( << 'CODE', << 'OUTPUT', "unshift and shift" );
        print '['
        print elements
        print "]\n"
+       $I0 = pmc_arr[0]
+       print $I0
+       print ', '
+       $I0 = pmc_arr[1]
+       print $I0
+       print ', '
+       $I0 = pmc_arr[2]
+       print $I0
+       print "\n"
        .return()
 .end
 
 CODE
 [0]
-1[1]
-0[2]
-[2]
-0[1]
-1[0]
+0, 0, 0
+[3]
+1, 0, 1
+1[4]
+1, 1, 0
+0[5]
+0, 1, 1
+0[4]
+1, 1, 0
+1[3]
+1, 0, 1
+[62]
+1, 0, 1
+[66]
+1, 0, 1
 1[63]
+1, 1, 0
 [63]
+1, 1, 0
+[101]
+1, 1, 0
+0[3]
+0, 0, 1
 OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', "shift bounds checking" );
@@ -772,11 +827,11 @@ OUTPUT
        set I10, 100
        set I0, 0
        # push some values at start
-lp1:
+loop1:
     mod I5, I0, 2
        push P0, I5
        inc I0
-       lt I0, I10, lp1
+       lt I0, I10, loop1
 
        # create sparse
        set I0, 100000
@@ -785,12 +840,12 @@ lp1:
        #set P0[I0], I1
        set P0[I0], I5
        inc I1
-lp2:
+loop2:
        # push some values after hole
     mod I5, I1, 2
        push P0, I5
        inc I1
-       le I1, 1100, lp2
+       le I1, 1100, loop2
        dec I1
 
        set I3, P0

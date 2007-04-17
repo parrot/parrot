@@ -58,13 +58,12 @@ Returns the integer value of the element at index C<key>.
                     "ResizableBooleanArray: index out of bounds!");
         }
 
-        /* Adjust key for the current head position */
-        key += PMC_int_val2(SELF);
-
-        if (key >= PMC_int_val(SELF))
+        /* Check if key is greater than allocated size */
+        INTVAL offsetkey = key + PMC_int_val2(SELF);
+        if (offsetkey >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
-        return SUPER(key);
+        return SUPER(offsetkey);
     }
 
 /*
@@ -88,13 +87,12 @@ Sets the integer value of the element at index C<key> to C<value>.
                     "ResizableBooleanArray: index out of bounds!");
         }
 
-        /* Adjust key for the current head position */
-        key += PMC_int_val2(SELF);
-
-        if (key >= PMC_int_val(SELF))
+        /* Check if key is greater than allocated size */
+        INTVAL offsetkey = key + PMC_int_val2(SELF);
+        if (offsetkey >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
-        SUPER(key, value);
+        SUPER(offsetkey, value);
     }
 
 /*
@@ -108,12 +106,15 @@ Resizes the array to C<size> elements.
 */
 
     void set_integer_native(INTVAL size) {
-        INTVAL newallocbits, curallocbits, memsize;
-        const INTVAL cursize = PMC_int_val(SELF) - PMC_int_val2(SELF);
+        INTVAL newsize, newallocbits, curallocbits, memsize;
+        const INTVAL cursize = PMC_int_val(SELF);
+
+        /* Size respects any existing head position offset from unshift */
+        newsize = size + PMC_int_val2(SELF);
 
 
         /* We are already at the requested size. Yay */
-        if (size == cursize)
+        if (newsize == cursize)
             return;
 
 
@@ -121,7 +122,7 @@ Resizes the array to C<size> elements.
             real_exception(interp, NULL, E_IndexError,
                 "ResizableBooleanArray: Can't resize!");
 
-        newallocbits = (size / MIN_ALLOC + 1) * MIN_ALLOC;
+        newallocbits = (newsize / MIN_ALLOC + 1) * MIN_ALLOC;
         curallocbits = (cursize / MIN_ALLOC + 1) * MIN_ALLOC;
         memsize = newallocbits / BITS_PER_CHAR;
 
@@ -129,14 +130,13 @@ Resizes the array to C<size> elements.
         if (! PMC_data(SELF)) {
             PMC_data(SELF) = mem_sys_allocate_zeroed(memsize);
         }
-        /* The size is different, but and doesn't fit within the current allocation */
+        /* The size is different, and doesn't fit within the current allocation */
         else if (newallocbits != curallocbits) {
             Parrot_UInt1 * const sd = PMC_data(SELF);
             PMC_data(SELF) = mem_sys_realloc(sd, memsize);
         }
 
-        PMC_int_val2(SELF) = 0;
-        PMC_int_val(SELF) = size;
+        PMC_int_val(SELF) = newsize;
     }
 
 /*
@@ -191,19 +191,31 @@ beginning.
 */
 
     void unshift_integer(INTVAL value) {
-        /* If int_val2 is smaller than 0, size this thing up */
+        /* If the current head position offset is 0, size this thing up by one
+         * allocation unit */
         if (PMC_int_val2(SELF) <= 0) {
             Parrot_UInt1 * const sdOld = PMC_data(SELF);
-            Parrot_UInt1 * const sdNew = mem_sys_allocate_zeroed(
-                ((PMC_int_val2(SELF) / MIN_ALLOC) * MIN_ALLOC)
-                + PMC_int_val(SELF)
-                + ((PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC));
-            mem_sys_memmove(sdNew, sdOld + PMC_int_val2(SELF),
-                PMC_int_val(SELF));
-            mem_sys_free(sdOld);
+
+            /* Allocate an extra allocation unit of space in new array */
+            INTVAL oldbitalloc, oldmemsize, newbitalloc, newmemsize;
+            newbitalloc = ((PMC_int_val(SELF) + MIN_ALLOC) / MIN_ALLOC + 1) * MIN_ALLOC;
+            newmemsize = newbitalloc / BITS_PER_CHAR;
+            Parrot_UInt1 * const sdNew = mem_sys_allocate_zeroed(newmemsize);
+
+            /* Copy contents of old array to new array, moving the head
+             * position forward by one allocation unit (in bytes). */
+            oldbitalloc = (PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC;
+            oldmemsize = oldbitalloc / BITS_PER_CHAR;
+            mem_sys_memmove(sdNew + (MIN_ALLOC / BITS_PER_CHAR), sdOld, oldmemsize);
+            
+            /* Replace old array with new array, and free old array */
             PMC_data(SELF) = sdNew;
+            mem_sys_free(sdOld);
+
+            /* Added one allocation unit to the head position offset */
             PMC_int_val2(SELF) += MIN_ALLOC;
-            PMC_int_val(SELF) += MIN_ALLOC;
+            PMC_int_val(SELF)  += MIN_ALLOC;
+
         }
 
         /* Move the head position */
@@ -236,18 +248,28 @@ Removes and returns the first element.
         /* Move the head position */
         PMC_int_val2(SELF)++;
 
-        /* If int_val2 is bigger than our allocation unit size, size
-            this thing down */
+        /* If the head position offset is greater than our allocation unit
+         * size, size this thing down */
         if (PMC_int_val2(SELF) >= MIN_ALLOC) {
+            /* Allocate one allocation unit less of space in new array */
+            INTVAL oldbitalloc, oldmemsize, newbitalloc, newmemsize;
+            newbitalloc = ((PMC_int_val(SELF) - MIN_ALLOC) / MIN_ALLOC + 1) * MIN_ALLOC;
+            newmemsize = newbitalloc / BITS_PER_CHAR;
+            Parrot_UInt1 * const sdNew = mem_sys_allocate_zeroed(newmemsize);
+
+            /* Copy contents of old array to new array, move the head position
+             * offset back by one allocation unit (in bytes) */
             Parrot_UInt1 * const sdOld = PMC_data(SELF);
-            Parrot_UInt1 * const sdNew = mem_sys_allocate_zeroed(
-                ((PMC_int_val2(SELF) / MIN_ALLOC) * MIN_ALLOC)
-                + PMC_int_val(SELF)
-                + ((PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC));
-            mem_sys_memmove(sdNew, sdOld + PMC_int_val2(SELF),
-                PMC_int_val(SELF));
-            mem_sys_free(sdOld);
+            mem_sys_memmove(sdNew, sdOld + (MIN_ALLOC / BITS_PER_CHAR), newmemsize);
+            
+            /* Replace old array with new array, and free old array */
             PMC_data(SELF) = sdNew;
+            mem_sys_free(sdOld);
+
+            /* Removed one allocation unit from the head position offset */
+            PMC_int_val2(SELF) -= MIN_ALLOC;
+            PMC_int_val(SELF)  -= MIN_ALLOC;
+
         }
 
         return value;
