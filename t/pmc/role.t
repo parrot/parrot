@@ -33,7 +33,7 @@ Tests the Role PMC.
 
     plan(5)
 
-    
+
     $P0 = new 'Role'
     ok(1, 'Role type exists') # or we've already died.
 

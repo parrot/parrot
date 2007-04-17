@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 
 =head1 NAME
 
@@ -492,6 +492,65 @@ CODE
 Is a Class
 Not a Hash
 Not a Foo
+OUT
+
+# L<PDD15/Class PMC API/=item does>
+pir_output_is( <<'CODE', <<'OUT', 'does()' );
+.sub 'test' :main
+    .local pmc attrs
+    attrs = new 'Hash'
+
+    .local pmc red, green, blue
+    attrs['name'] = 'Red'
+    red           = new 'Role', attrs
+
+    attrs['name'] = 'Green'
+    green         = new 'Role', attrs
+
+    attrs['name'] = 'Blue'
+    blue          = new 'Role', attrs
+
+    green.'add_role'( blue )
+
+    .local pmc color
+    color = new 'Class'
+
+    test_does( color, 'Red' )
+
+    color.'add_role'( red )
+    test_does( color, 'Red' )
+
+    color.'add_role'( green )
+    test_does( color, 'Green' )
+    test_does( color, 'Blue' )
+
+    test_does( color, 'Class' )
+.end
+
+.sub 'test_does'
+    .param pmc    obj
+    .param string role_name
+
+    $I0 = obj.'does'( role_name )
+    if $I0 goto does_role
+    print "Doesn't "
+    print role_name
+    print "\n"
+    .return()
+
+  does_role:
+    print "Does "
+    print role_name
+    print "\n"
+
+    .return()
+.end
+CODE
+Doesn't Red
+Does Red
+Does Green
+Does Blue
+Does Class
 OUT
 
 # Local Variables:
