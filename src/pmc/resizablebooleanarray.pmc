@@ -48,6 +48,7 @@ Returns the integer value of the element at index C<key>.
 */
 
     INTVAL get_integer_keyed_int(INTVAL key) {
+        INTVAL offsetkey;
         /* Try to make negative index into a real index */
         if (key < 0) {
             key = SELF.elements() + key;
@@ -59,7 +60,7 @@ Returns the integer value of the element at index C<key>.
         }
 
         /* Check if key is greater than allocated size */
-        INTVAL offsetkey = key + PMC_int_val2(SELF);
+        offsetkey = key + PMC_int_val2(SELF);
         if (offsetkey >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
@@ -207,9 +208,10 @@ beginning.
 
             /* Allocate an extra allocation unit of space in new array */
             INTVAL oldbitalloc, oldmemsize, newbitalloc, newmemsize;
+            Parrot_UInt1 * sdNew = NULL;
             newbitalloc = ((PMC_int_val(SELF) + MIN_ALLOC) / MIN_ALLOC + 1) * MIN_ALLOC;
             newmemsize = newbitalloc / BITS_PER_CHAR;
-            Parrot_UInt1 * const sdNew = mem_sys_allocate_zeroed(newmemsize);
+            sdNew = mem_sys_allocate_zeroed(newmemsize);
 
             /* Copy contents of old array to new array, moving the head
              * position forward by one allocation unit (in bytes). */
@@ -262,13 +264,15 @@ Removes and returns the first element.
         if (PMC_int_val2(SELF) >= MIN_ALLOC) {
             /* Allocate one allocation unit less of space in new array */
             INTVAL oldbitalloc, oldmemsize, newbitalloc, newmemsize;
+            Parrot_UInt1 * sdNew = NULL;
+            Parrot_UInt1 * sdOld = NULL;
             newbitalloc = ((PMC_int_val(SELF) - MIN_ALLOC) / MIN_ALLOC + 1) * MIN_ALLOC;
             newmemsize = newbitalloc / BITS_PER_CHAR;
-            Parrot_UInt1 * const sdNew = mem_sys_allocate_zeroed(newmemsize);
+            sdNew = mem_sys_allocate_zeroed(newmemsize);
 
             /* Copy contents of old array to new array, move the head position
              * offset back by one allocation unit (in bytes) */
-            Parrot_UInt1 * const sdOld = PMC_data(SELF);
+            sdOld = PMC_data(SELF);
             mem_sys_memmove(sdNew, sdOld + (MIN_ALLOC / BITS_PER_CHAR), newmemsize);
 
             /* Replace old array with new array, and free old array */
