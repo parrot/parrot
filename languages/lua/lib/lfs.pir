@@ -205,14 +205,33 @@ Changes the current working directory to the given C<path>.
 
 Returns C<true> in case of success or C<nil> plus an error string.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub '_lfs_chdir' :anon
     .param pmc path :optional
+    .local pmc ret
     $S1 = checkstring(path)
-    not_implemented()
+    $S0 = $S1
+    new $P0, .OS
+    push_eh _handler
+    $P0.'chdir'($S1)
+    new ret, .LuaBoolean
+    set ret, 1
+    .return (ret)
+_handler:
+    .local pmc nil
+    .local pmc msg
+    .local pmc e
+    .local string s
+    .get_results (e, s)
+    new nil, .LuaNil
+    new msg, .LuaString
+    $S0 = concat "Unable to change working directory to '", $S0
+    $S0 = concat "'\n"
+    $S0 = concat s
+    $S0 = concat "\n"
+    set msg, $S0
+    .return (nil, msg)
 .end
 
 
@@ -221,12 +240,26 @@ NOT YET IMPLEMENTED.
 Returns a string with the current working directory or C<nil> plus an error
 string.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub '_lfs_currentdir' :anon
-    not_implemented()
+    .local pmc ret
+    new $P0, .OS
+    push_eh _handler
+    $S0 = $P0.'cwd'()
+    new ret, .LuaString
+    set ret, $S0
+    .return (ret)
+_handler:
+    .local pmc nil
+    .local pmc msg
+    .local pmc e
+    .local string s
+    .get_results (e, s)
+    new nil, .LuaNil
+    new msg, .LuaString
+    set msg, s
+    .return (nil, msg)
 .end
 
 
@@ -282,14 +315,30 @@ Creates a new directory. The argument is the name of the new directory.
 Returns C<true> if the operation was successful; in case of error, it returns
 C<nil> plus an error string.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub '_lfs_mkdir' :anon
     .param pmc dirname :optional
+    .local pmc ret
     $S1 = checkstring(dirname)
-    not_implemented()
+    $S0 = $S1
+    new $P0, .OS
+    push_eh _handler
+    $I1 = 0o775
+    $P0.'mkdir'($S1, $I1)
+    new ret, .LuaBoolean
+    set ret, 1
+    .return (ret)
+_handler:
+    .local pmc nil
+    .local pmc msg
+    .local pmc e
+    .local string s
+    .get_results (e, s)
+    new nil, .LuaNil
+    new msg, .LuaString
+    set msg, s
+    .return (nil, msg)
 .end
 
 
@@ -300,14 +349,29 @@ Removes an existing directory. The argument is the name of the directory.
 Returns C<true> if the operation was successful; in case of error, it returns
 C<nil> plus an error string.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub '_lfs_rmdir' :anon
     .param pmc dirname :optional
+    .local pmc ret
     $S1 = checkstring(dirname)
-    not_implemented()
+    $S0 = $S1
+    new $P0, .OS
+    push_eh _handler
+    $P0.'rm'($S1)
+    new ret, .LuaBoolean
+    set ret, 1
+    .return (ret)
+_handler:
+    .local pmc nil
+    .local pmc msg
+    .local pmc e
+    .local string s
+    .get_results (e, s)
+    new nil, .LuaNil
+    new msg, .LuaString
+    set msg, s
+    .return (nil, msg)
 .end
 
 

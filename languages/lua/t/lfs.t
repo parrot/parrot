@@ -22,15 +22,11 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test;
+use Parrot::Test tests => 9;
 use Test::More;
-
-if ( exists $ENV{PARROT_LUA_TEST_PROG} ) {
-    plan skip_all => "parrot only";
-}
-else {
-    plan tests => 1;
-}
+use Cwd;
+use File::Basename;
+use File::Spec;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'require lfs' );
 require "lfs"
@@ -40,6 +36,91 @@ CODE
 table
 LuaFileSystem 1.2
 OUTPUT
+
+my $cwd = dirname(File::Spec->canonpath(getcwd));
+language_output_is( 'lua', << 'CODE', << "OUTPUT", 'function lfs.currentdir' );
+require "lfs"
+print(lfs.currentdir())
+CODE
+$cwd
+OUTPUT
+
+my $upcwd = File::Spec->catfile($cwd, 'src');
+language_output_is( 'lua', << 'CODE', << "OUTPUT", 'function lfs.chdir' );
+require "lfs"
+print(lfs.chdir("src"))
+print(lfs.currentdir())
+print(lfs.chdir(".."))
+print(lfs.currentdir())
+CODE
+true
+$upcwd
+true
+$cwd
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function lfs.chdir' );
+require "lfs"
+r, msg = lfs.chdir("bad_dir")
+print(r)
+print(msg)
+CODE
+nil
+Unable to change working directory to 'bad_dir'
+No such file or directory
+
+OUTPUT
+
+my $xpto = File::Spec->catfile($cwd, 'xpto');
+language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.mkdir' );
+require "lfs"
+print(lfs.mkdir("xpto"))
+print(lfs.chdir("xpto"))
+print(lfs.currentdir())
+print(lfs.chdir(".."))
+print(lfs.currentdir())
+CODE
+true
+true
+$xpto
+true
+$cwd
+OUT
+
+rmdir '../xpto' if (-d '../xpto');
+
+language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.mkdir' );
+require "lfs"
+r, msg = lfs.mkdir("xptoo/xptoo")
+print(r)
+print(msg)
+CODE
+nil
+No such file or directory
+OUT
+
+mkdir '../xpto' unless -d '../xpto';
+
+language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.mkdir' );
+require "lfs"
+print(lfs.rmdir("xpto"))
+CODE
+true
+OUT
+
+ok( !-d $xpto, "Test that rm removed the directory" );
+rmdir '../xpto' if (-d '../xpto');
+
+language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.mkdir' );
+require "lfs"
+r, msg = lfs.rmdir("xpto")
+print(r)
+print(msg)
+CODE
+nil
+No such file or directory
+OUT
+
 
 # Local Variables:
 #   mode: cperl
