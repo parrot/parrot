@@ -202,8 +202,28 @@ L3:
     ret[$P1] = $P2
     .return (ret)
 L4:
+    .local string b
+    .local int idx
+    b = ''
+    idx = 0
+    $I1 = length $S1
     new $P1, .Lua
-    ret = $P1.'strftime'($S1, $P0)
+L5:
+    unless idx < $I1 goto L6
+    $S0 = substr $S1, idx, 1
+    if $S0 != '%' goto L7
+    inc idx
+    if idx == $I1 goto L7
+    $S0 = substr $S1, idx, 1
+    $S2 = '%' . $S0
+    $S0 = $P1.'strftime'($S2, $P0)
+L7:
+    b .= $S0
+    inc idx
+    goto L5
+L6:
+    new ret, .LuaString
+    set ret, b
     .return (ret)
 .end
 

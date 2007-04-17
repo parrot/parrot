@@ -119,15 +119,16 @@ information see F<src/pmc.c>.
 
 /*
 
-=item C<PMC* strftime(STRING* fmt, PMC* tm)>
+=item C<STRING* strftime(STRING* fmt, PMC* tm)>
 
 =cut
 
 */
-    METHOD PMC* strftime(STRING* fmt, PMC* tm) {
+    METHOD STRING* strftime(STRING* fmt, PMC* tm) {
         PMC *retval = NULL;
         struct tm stm;
-        char b[256];
+        char b[200];
+        size_t reslen;
         const char *s = string_to_cstring(INTERP, fmt);
 
         stm.tm_sec   = VTABLE_get_integer_keyed_int(INTERP, tm, 0);
@@ -140,18 +141,8 @@ information see F<src/pmc.c>.
         stm.tm_yday  = VTABLE_get_integer_keyed_int(INTERP, tm, 7);
         stm.tm_isdst = VTABLE_get_integer_keyed_int(INTERP, tm, 8);
 
-        if (strftime(b, sizeof b, s, &stm)) {
-            retval = pmc_new(INTERP, dynpmc_LuaString);
-            VTABLE_set_string_native(INTERP, retval,
-                                     string_from_cstring(INTERP, b, 0));
-        }
-        else {
-            PMC* func = Parrot_find_global_cur(INTERP,
-                                               const_string(INTERP, "error"));
-            STRING* msg = const_string(INTERP, "'date' format too long");
-            (void)Parrot_runops_fromc_args(INTERP, func, "vS", msg);
-        }
-        return retval;
+        reslen = strftime(b, sizeof b, s, &stm);
+        return string_from_cstring(INTERP, b, reslen);
     }
 
 }

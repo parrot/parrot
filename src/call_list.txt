@@ -338,7 +338,7 @@ v      JOI
 
 # Make lua stop panic'ing.
 P      JOI
-P      JOSP
+S      JOSP
 
 # ParrotThread creation
 i      JOP@

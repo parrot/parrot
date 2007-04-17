@@ -404,7 +404,7 @@ default for C<f> is 1.
     .const .LuaNumber zero = '0'
     if f == zero goto L2
 L1:
-    f = getfunc(f)
+    f = getfunc(f, 1)
     $I0 = isa f, 'LuaClosure'
     if $I0 goto L3
 L2:
@@ -416,6 +416,7 @@ L3:
 
 .sub 'getfunc' :anon
     .param pmc f
+    .param int opt
     if null f goto L1
     $I0 = isa f, 'LuaFunction'
     if $I0 goto L2
@@ -423,10 +424,15 @@ L3:
     if $I0 goto L2
 L1:
     .local int level
+    unless opt goto L3
     level = optint(f, 1)
-    if level >= 0 goto L3
-    error("level must be non-negative")
+    goto L4
 L3:
+    level = checknumber(f)
+L4:
+    if level >= 0 goto L5
+    error("level must be non-negative")
+L5:
     $P0 = getinterp
     inc level
     push_eh _handler
@@ -840,7 +846,7 @@ STILL INCOMPLETE.
     not_implemented()
     .return ()
 L1:
-    f = getfunc(f)
+    f = getfunc(f, 0)
     $I0 = isa f, 'LuaFunction'
     if $I0 goto L2
     $I0 = setfenv(f, table)
