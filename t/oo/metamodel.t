@@ -25,7 +25,7 @@ Tests the metamodel for the OO implementation.
     exports = split " ", "plan ok is isa_ok skip todo"
     test_namespace.export_to(curr_namespace, exports)
 
-    plan( 11 )
+    plan( 12 )
 
     .local pmc class, init_args1
     init_args1 = new 'Hash'
@@ -33,14 +33,10 @@ Tests the metamodel for the OO implementation.
 
     class = new "Class", init_args1
     isa_ok(class, "Class", "created class isa Class")
-    $S1 = class.name()
-    $I0 = iseq $S1, "Dog"
-    todo($I0, "created a new class via Class", "apparently new on Class ignores name")
-#    is($P1, "Dog", "created a new class via Class")
-    $S1 = class.name()
-    $I0 = iseq $S1, "Dog"
-    todo($I0, "Class accessor doesn't destroy value", "apparently new on Class ignores name")
-#    is($P1, "Dog", "Class accessor doesn't destroy value")
+    $P1 = class.name()
+    is($P1, "Dog", "created a new class via Class")
+    $P1 = class.name()
+    is($P1, "Dog", "Class accessor doesn't destroy value")
 
     class.'add_attribute'('bark')
     class.'add_attribute'('ear')
@@ -64,9 +60,9 @@ Tests the metamodel for the OO implementation.
   end_tail_attrib_test:
 
 
-#    $P0 = get_class 'Dog'
-#    $I0 = issame $P0, class
-#    todo($I0, "get_class can find the class", "not implemented")
+    $P0 = get_class 'Dog'
+    $I0 = issame $P0, class
+    ok($I0, "get_class can find the class")
 
     $P0 = class.'new'( 'bark' => "Wooof", 'tail' => 'long' )
     $P1 = getattribute $P0, "tail"
