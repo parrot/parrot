@@ -142,7 +142,6 @@ sub new {
             $self->c_item(
                 '',
                 'pairs'   => ['register'],
-                'headers' => ['regfuncs']
             ),
             $self->c_item(
                 '',

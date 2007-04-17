@@ -54,7 +54,7 @@ sub new {
             $self->new_item( 'Where to find or put things that need doing in Parrot.', 'TODO' ),
             $self->new_item(
 'This is a description of the steps someone should follow when they have to prepare a new version for release.',
-                'RELEASE_INSTRUCTIONS'
+                'docs/project/release_manager_guide.pod'
             ),
         ),
         $self->new_group(
