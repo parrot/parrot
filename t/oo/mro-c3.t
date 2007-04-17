@@ -108,7 +108,7 @@ pir_output_is( <<'CODE', <<'OUT', 'multiple inheritance' );
     $P0 = find_global 'testB'
     B.'add_method'("foo", $P0)
     B.'add_method'("bar", $P0)
-    
+
     C = new .Class
     C.'add_parent'(B)
     C.'add_parent'(A)
@@ -159,7 +159,7 @@ pir_output_is( <<'CODE', <<'OUT', 'diamond inheritance' );
     $P0 = find_global 'testC'
     C.'add_method'("foo", $P0)
     C.'add_method'("bar", $P0)
-    
+
     D = new .Class
     D.'add_parent'(C)
     D.'add_parent'(B)

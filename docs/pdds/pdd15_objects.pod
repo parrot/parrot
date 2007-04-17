@@ -503,9 +503,9 @@ Create a subclass of $P2 with name $S3 and return it in $P1.
 
   $I1 = $P2.isa($S3)
 
-Returns true if the class passed in as a parameter is in the inheritance
-hierarchy of the class (this is not the same as the inheritance
-hierarchy of objects instantiated from the class), false otherwise.
+Returns true if the class name passed in as a parameter is in the inheritance
+hierarchy of the class (this is not the same as the inheritance hierarchy of
+objects instantiated from the class), false otherwise.
 
 =item can
 

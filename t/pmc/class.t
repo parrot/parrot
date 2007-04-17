@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 
 =head1 NAME
 
@@ -106,7 +106,7 @@ pir_output_is( <<'CODE', <<'OUT', 'new' );
     print 'not '
   ok_1:
     say 'ok 1 - new() with no args returns an object'
-    
+
     push_eh ok_2
     $P1 = $P0.'new'('abc' => '123' )
     clear_eh
@@ -295,7 +295,7 @@ pir_output_is( <<'CODE', <<'OUT', 'inspect PCCMETHOD' );
 
     $P1 = $P0.inspect()
     print "ok 1 - inspect with no args called\n"
-    
+
     $I0 = elements $P1
     if $I0 == 6 goto ok_2
     print "not "
@@ -305,7 +305,7 @@ ok_2:
     $P1 = $P0.inspect('name')
     say $P1
     print "ok 3 - inspect('name')\n"
-    
+
     $P1 = $P0.inspect('attributes')
     $I0 = elements $P1
     if $I0 == 1 goto ok_4
@@ -329,7 +329,7 @@ pir_output_is( <<'CODE', <<'OUT', 'clone' );
     $P1.add_attribute('banana')
     $P2 = $P1.'new'()
     print "ok 1 - created class Monkey and instantiated it\n"
-    
+
     $P3 = clone $P1
     print "ok 2 - cloned class Monkey\n"
 
@@ -372,7 +372,7 @@ pir_output_is( <<'CODE', <<'OUT', 'clone_pmc' );
     $P1.add_attribute('banana')
     $P2 = $P1.'new'()
     print "ok 1 - created class Monkey and instantiated it\n"
-    
+
     $P0 = new 'Hash'
     $P0['name'] = 'Mandrill'
     $P3 = clone $P1, $P0
@@ -439,7 +439,7 @@ pir_output_is( <<'CODE', <<'OUT', 'new with initialization hash' );
     $P3 = 5
     setattribute $P2, 'y', $P3
     print "ok 3 - set second attribute\n"
-    
+
     # Call method.
     $P3 = $P2.add()
     print $P3
@@ -458,6 +458,40 @@ ok 2 - set first attribute
 ok 3 - set second attribute
 42
 ok 4 - called method
+OUT
+
+# L<PDD15/Class PMC API/=item isa>
+pir_output_is( <<'CODE', <<'OUT', 'isa()' );
+.sub 'test' :main
+    new $P0, .Class
+
+    test_isa( $P0, 'Class' )
+    test_isa( $P0, 'Hash' )
+    test_isa( $P0, 'Foo' )
+.end
+
+.sub 'test_isa'
+    .param pmc    obj
+    .param string class
+
+    $I0 = obj.'isa'( class )
+    if $I0 goto is_class
+    print "Not a "
+    print class
+    print "\n"
+    .return()
+
+  is_class:
+    print "Is a "
+    print class
+    print "\n"
+
+    .return()
+.end
+CODE
+Is a Class
+Not a Hash
+Not a Foo
 OUT
 
 # Local Variables:

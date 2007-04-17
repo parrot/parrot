@@ -30,7 +30,7 @@ Tests the metamodel for the OO implementation.
     .local pmc class, init_args1
     init_args1 = new 'Hash'
     init_args1['name'] = 'Dog'
-  
+
     class = new "Class", init_args1
     isa_ok(class, "Class", "created class isa Class")
     $S1 = class.name()
@@ -105,7 +105,7 @@ NEXT:
   unless got_value goto get_attr
   setattribute self, attrib, value
 get_attr:
-  .local pmc rv 
+  .local pmc rv
   rv = getattribute self, attrib
   .return(rv)
 .end

@@ -93,7 +93,7 @@ STRING* Parrot_Class_get_fq_classname(Parrot_Interp interp, Parrot_Class *class_
     STRING *fq_class = string_from_cstring(interp, "", 0);
     STRING *seperator = string_from_const_cstring(interp, "::", 0);
     if (!PMC_IS_NULL(class_info->namespace)) {
-        /* If we have a namespace name, make a key from it's name. */
+        /* If we have a namespace name, make a key from its name. */
         /* XXX BAD AND WRONG! Need to call get_name method properly! */
         PMC *fq_name = Parrot_NameSpace_nci_get_name(interp, class_info->namespace);
         int elements = VTABLE_elements(interp, fq_name);
@@ -1029,6 +1029,22 @@ parameter is supplied, a particular item of introspection data.
             found = VTABLE_inspect(interp, SELF);
 
         PCCRETURN(PMC *found);
+    }
+
+/*
+
+=item C<void isa(STRING *class_name)>
+
+Returns true if this object is or derives from the class named in
+C<class_name>, false otherwise.
+
+=cut
+
+*/
+    PCCMETHOD void isa(STRING *class_name) {
+        INTVAL isa = VTABLE_isa(interp, SELF, class_name);
+
+        PCCRETURN(INTVAL isa);
     }
 } /* END pmclass */
 

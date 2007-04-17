@@ -26,7 +26,7 @@ pir_output_is( <<'CODE', <<'OUT', 'role with no methods' );
 .sub 'test' :main
     $P0 = new Role
     $P1 = new Class
-    
+
     $P1.'add_role'($P0)
     print "ok 1 - added role\n"
 
@@ -36,7 +36,7 @@ pir_output_is( <<'CODE', <<'OUT', 'role with no methods' );
     print "not "
 OK_2:
     print "ok 2 - roles list has the role\n"
-    
+
     $P2 = $P1.'new'()
     print "ok 3 - instantiated class with composed role\n"
 .end
@@ -54,7 +54,7 @@ pir_output_is( <<'CODE', <<'OUT', 'role with one method, no methods in class' );
     $P2 = find_global "badger"
     $P0.'add_method'("badger", $P2)
     print "ok 1 - added method to a role\n"
-    
+
     $P1.'add_role'($P0)
     print "ok 2 - composed role into the class\n"
 
@@ -64,7 +64,7 @@ pir_output_is( <<'CODE', <<'OUT', 'role with one method, no methods in class' );
     print "not "
 OK_3:
     print "ok 3 - roles list has the role\n"
-    
+
     $P2 = $P1.'new'()
     print "ok 4 - instantiated class with composed role\n"
 
@@ -355,21 +355,21 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'role that does a role' );
 .sub 'test' :main
     .local pmc PHB, Manage, FirePeople
-    
+
     FirePeople = new Role
     $P0 = find_global 'fire'
     FirePeople.'add_method'("fire", $P0)
-    
+
     Manage = new Role
     $P0 = find_global 'give_payrise'
     FirePeople.'add_method'("give_payrise", $P0)
     Manage.'add_role'(FirePeople)
     print "ok 1 - adding one role to another happens\n"
-    
+
     PHB = new Class
     PHB.'add_role'(Manage)
     print "ok 2 - added one rule that does another role to the class\n"
-    
+
     $P0 = PHB.'new'()
     $P0.give_payrise()
     print "ok 3 - called method from direct role\n"
@@ -396,16 +396,16 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'conflict from indirect role' );
 .sub 'test' :main
     .local pmc BurninatorBoss, Manage, FirePeople, Burninator
-    
+
     FirePeople = new Role
     $P0 = find_global 'fire'
     FirePeople.'add_method'("fire", $P0)
-    
+
     Manage = new Role
     $P0 = find_global 'give_payrise'
     FirePeople.'add_method'("give_payrise", $P0)
     Manage.'add_role'(FirePeople)
-    
+
     Burninator = new Role
     $P0 = find_global 'fire2'
     Burninator.'add_method'("fire", $P0)
