@@ -363,34 +363,37 @@ sub rewrite_pccmethod {
     my $PRE_STUB = <<END;
 {
 #line $lineno $file
-    INTVAL n_regs_used[] = { $n_regs_used };
+    INTVAL   n_regs_used[]   = { $n_regs_used };
     opcode_t param_indexes[] = { $params_indexes };
     opcode_t *return_indexes;
     opcode_t *current_args;
-    PMC* _type = pmc_new(interp, enum_class_FixedIntegerArray);
-    PMC* param_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
+    PMC* _type      = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC* param_sig  = Parrot_FixedIntegerArray_new_from_string(interp, _type,
         string_from_const_cstring(interp, $params_flags, 0), 0);
-    PMC* return_sig = PMCNULL;
-    parrot_context_t *caller_ctx = CONTEXT(interp->ctx);
-    PMC* ret_cont = new_ret_continuation_pmc(interp, NULL);
-    parrot_context_t *ctx = Parrot_push_context(interp, n_regs_used);
-    PMC* ccont = caller_ctx->current_cont;
 
-    ctx->current_cont = ret_cont;
+    PMC* return_sig              = PMCNULL;
+
+    parrot_context_t *caller_ctx = CONTEXT(interp->ctx);
+    PMC* ret_cont                = new_ret_continuation_pmc(interp, NULL);
+    parrot_context_t *ctx        = Parrot_push_context(interp, n_regs_used);
+    PMC* ccont                   = caller_ctx->current_cont;
+
+    ctx->current_cont            = ret_cont;
     PMC_cont(ret_cont)->from_ctx = ctx;
 
-    current_args = interp->current_args;
-    interp->current_args = NULL;
+    current_args                 = interp->current_args;
+    interp->current_args         = NULL;
 
 $named_names
 
-    interp->params_signature = param_sig;
-    parrot_pass_args(interp, caller_ctx, ctx, current_args, param_indexes, PARROT_PASS_PARAMS);
+    interp->params_signature     = param_sig;
+    parrot_pass_args(interp, caller_ctx, ctx, current_args, param_indexes,
+        PARROT_PASS_PARAMS);
 
     if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
         PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
         --ctx->recursion_depth;
-        ctx->caller_ctx = caller_ctx->caller_ctx;
+        ctx->caller_ctx      = caller_ctx->caller_ctx;
         Parrot_free_context(interp, caller_ctx, 0);
         interp->current_args = NULL;
     }
@@ -398,7 +401,7 @@ $named_names
     {
 $params_accessors
 
-    /* BEGIN PMEHTOD BODY */
+    /* BEGIN PMETHOD BODY */
 END
 
     my $method_returns = $self->{meth} . "_returns:";
@@ -407,7 +410,7 @@ END
 
 #line $lineno $file
     goto no_return;
-    /* END PMEHTOD BODY */
+    /* END PMETHOD BODY */
 
 $method_returns
 
@@ -421,9 +424,9 @@ $method_returns
         }
 
         interp->returns_signature = return_sig;
-        parrot_pass_args(interp, ctx, caller_ctx, return_indexes, caller_ctx->current_results, PARROT_PASS_RESULTS);
+        parrot_pass_args(interp, ctx, caller_ctx, return_indexes,
+            caller_ctx->current_results, PARROT_PASS_RESULTS);
     }
-
 
     /* END PARAMS SCOPE */
     }
@@ -452,7 +455,7 @@ sub rewrite_pccinvoke {
       =                #results equals PCCINVOKE invocation
       )?               #results are optional
       \s*              #optional whitespace
-      PCCINVOKE         #method name
+      PCCINVOKE        #method name
       \s*              #optional whitespace
       \( ([^\(]*) \)   #parameters
       ;?               #optional semicolon
@@ -488,42 +491,44 @@ sub rewrite_pccinvoke {
     /*BEGIN PCCINVOKE $invocant */
 #line $lineno $file
     {
-      INTVAL n_regs_used[] = { $n_regs_used };
-      opcode_t arg_indexes[] = { $arg_indexes };
+      INTVAL   n_regs_used[]    = { $n_regs_used };
+      opcode_t arg_indexes[]    = { $arg_indexes };
       opcode_t result_indexes[] = { $result_indexes };
-      PMC* _type = pmc_new(interp, enum_class_FixedIntegerArray);
-      PMC* args_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
-          string_from_const_cstring(interp, $arg_flags, 0), 0);
-      PMC* results_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
-          string_from_const_cstring(interp, $result_flags, 0), 0);
-      PMC* ret_cont = new_ret_continuation_pmc(interp, NULL);
+      PMC* _type                = pmc_new(interp, enum_class_FixedIntegerArray);
+
+      PMC* args_sig         = Parrot_FixedIntegerArray_new_from_string(interp,
+            _type, string_from_const_cstring(interp, $arg_flags, 0), 0);
+      PMC* results_sig      = Parrot_FixedIntegerArray_new_from_string(interp,
+            _type, string_from_const_cstring(interp, $result_flags, 0), 0);
+      PMC* ret_cont         = new_ret_continuation_pmc(interp, NULL);
+
       parrot_context_t *ctx = Parrot_push_context(interp, n_regs_used);
       PMC* pccinvoke_meth;
 
       opcode_t* save_current_args = interp->current_args;
-      PMC* save_args_signature = interp->args_signature;
-      PMC* save_current_object = interp->current_object;
+      PMC* save_args_signature    = interp->args_signature;
+      PMC* save_current_object    = interp->current_object;
 
-      interp->current_args = arg_indexes;
-      interp->args_signature = args_sig;
-      ctx->current_results = result_indexes;
-      ctx->results_signature = results_sig;
+      interp->current_args        = arg_indexes;
+      interp->args_signature      = args_sig;
+      ctx->current_results        = result_indexes;
+      ctx->results_signature      = results_sig;
 
 $named_names
 
 $arg_accessors
 
-      interp->current_object = $invocant;
-      interp->current_cont = NEED_CONTINUATION;
-      ctx->current_cont = ret_cont;
+      interp->current_object       = $invocant;
+      interp->current_cont         = NEED_CONTINUATION;
+      ctx->current_cont            = ret_cont;
       PMC_cont(ret_cont)->from_ctx = ctx;
+
       pccinvoke_meth = VTABLE_find_method(interp, $invocant, $method_name);
-      if (!pccinvoke_meth) {
-          real_exception(interp, NULL, METH_NOT_FOUND, "Method '%Ss' not found", $method_name);
-      }
-      else {
+      if (!pccinvoke_meth)
+          real_exception(interp, NULL, METH_NOT_FOUND,
+            "Method '%Ss' not found", $method_name);
+      else
           VTABLE_invoke(interp, pccinvoke_meth, NULL);
-      }
 
 $result_accessors
 
@@ -531,7 +536,8 @@ $result_accessors
       PObj_live_CLEAR(args_sig);
       PObj_live_CLEAR(results_sig);
       Parrot_pop_context(interp);
-      interp->current_args = save_current_args;
+
+      interp->current_args   = save_current_args;
       interp->args_signature = save_args_signature;
       interp->current_object = save_current_object;
     }

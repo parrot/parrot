@@ -13,7 +13,7 @@ the typed namespace interface, as outlined in
 F<docs/pdds/pdd21_namespaces.pod>.
 
 Exporter is not derived from any other PMC, and does not provide any
-standard interface--its inteface consists solely of non-vtable methods.
+standard interface--its interface consists solely of non-vtable methods.
 
 =head2 Structure
 
