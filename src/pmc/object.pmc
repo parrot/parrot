@@ -137,7 +137,7 @@ of the given name walking up the inheritance tree.
 */
     PMC* get_attr_str(STRING *name) {
         Parrot_Object *obj = PARROT_OBJECT(SELF);
-        
+
         /* Look up the index. */
         INTVAL index = get_attrib_index(interp, obj->class, name);
 
@@ -163,7 +163,7 @@ of the given name walking up the inheritance tree.
 */
     void set_attr_str(STRING* name, PMC* value) {
         Parrot_Object *obj = PARROT_OBJECT(SELF);
-        
+
         /* Look up the index. */
         INTVAL index = get_attrib_index(interp, obj->class, name);
 
@@ -204,7 +204,7 @@ Walks the MRO of the class and finds the method with the given name.
                 break;
             }
         }
-        
+
         /* Return the method that was found, if any. */
         return method;
     }

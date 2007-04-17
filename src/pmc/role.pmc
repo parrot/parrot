@@ -495,7 +495,7 @@ Sets the name of the role, and updates the namespace accoringly.
 
 /*
 
-=item C<PCCMETHOD void 
+=item C<PCCMETHOD void
     namespace()>
 
 Gets the namespace associated with this role, if any.
