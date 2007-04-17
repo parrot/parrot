@@ -790,10 +790,8 @@ ok 1
 ok 2
 OUTPUT
 
-TODO: {
-    local $TODO = "this is broken";
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', "check for zeroedness" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "check for zeroedness" );
     new P0, .ResizableBooleanArray
     set I0, 0
 lp1:
@@ -822,7 +820,7 @@ CODE
 ok
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', "pop into sparse" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "pop into sparse" );
     new P0, .ResizableBooleanArray
        set I10, 100
        set I0, 0
@@ -893,6 +891,9 @@ err:
 CODE
 ok
 OUTPUT
+
+TODO: {
+    local $TODO = "this is broken";
 
     pasm_output_is( <<'CODE', <<'OUTPUT', "clone" );
     new P0, .ResizableBooleanArray
