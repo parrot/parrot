@@ -43,6 +43,36 @@ There are several variants of some of the above ops; all are deprecated,
 and are replaced by the ops {set,get}_[hll,root]_global. See also
 http://www.parrotcode.org/docs/ops/var.html.
 
+Additionally, the following (unimplemented) ops are going to be removed:
+
+=over 4
+
+=item adddoes
+
+=item removedoes
+
+=item singleton
+
+=back
+
+
+=head1 Deprecated vtable methods
+
+The following vtable methods are deprecated:
+
+=over 4
+
+=item void become_parent(PMC* class)
+
+=item PMC* subclass(PMC* name)
+
+=item PMC* get_anonymous_subclass()
+
+=item PMC* new_singleton()
+
+=back
+
+
 =head1 FUTURE changes
 
 Not yet deprecated, but it's recommended to use the new syntax and
