@@ -10,11 +10,11 @@ src/hash.c - Hash table
 
 A hashtable contains an array of bucket indexes. Buckets are nodes in a
 linked list, each containing a C<void *> key and value. During hash
-creation the types of key and value as well as appropriate compare and
+creation, the types of key and value as well as appropriate compare and
 hashing functions can be set.
 
 This hash implementation uses just one piece of malloced memory. The
-C<< hash->bs >> bucket store points this regions.
+C<< hash->bs >> bucket store points to this region.
 
 This hash doesn't move during GC, therefore a lot of the old caveats
 don't apply.
@@ -65,20 +65,18 @@ key_hash_STRING(Interp *interp, void *value, size_t seed)
 /*
 
 =item C<static int
-STRING_compare(Parrot_Interp interp, void *a, void *b)>
+STRING_compare(Parrot_Interp interp, void *hash_key, void *bucket_key)>
 
-Compares the two strings, return 0 if they are identical.
-
-C<a> is the search key, C<b> is the bucket key.
+Compares the two strings, returning 0 if they are identical.
 
 =cut
 
 */
 
 static int
-STRING_compare(Parrot_Interp interp, void *a, void *b)
+STRING_compare(Parrot_Interp interp, void *search_key, void *bucket_key)
 {
-    return string_equal(interp, (STRING *)a, (STRING *) b);
+    return string_equal(interp, (STRING *)search_key, (STRING *)bucket_key);
 }
 
 /*
@@ -98,20 +96,20 @@ pointer_compare(Parrot_Interp interp, void *a, void *b) {
 }
 
 /*
+
 =item C<static size_t
 key_hash_pointer(Interp *interp, void *value, size_t seed)>
 
 Returns a hashvalue for a pointer.
 
 =cut
+
 */
 
 static size_t
 key_hash_pointer(Interp *interp, void *value, size_t seed) {
     return ((size_t) value) ^ seed;
 }
-
-
 
 /*
 
@@ -671,8 +669,6 @@ parrot_new_pointer_hash(Interp *interp, Hash **hptr)
                         pointer_compare, key_hash_pointer);
 }
 
-
-
 /*
 
 =item C<PMC* Parrot_new_INTVAL_hash(Interp *interp, UINTVAL flags)>
@@ -683,6 +679,7 @@ C<PObj_constant_FLAG> or 0.
 =cut
 
 */
+
 PMC*
 Parrot_new_INTVAL_hash(Interp *interp, UINTVAL flags)
 {
@@ -697,6 +694,7 @@ Parrot_new_INTVAL_hash(Interp *interp, UINTVAL flags)
     PObj_active_destroy_SET(h);
     return h;
 }
+
 /*
 
 =item C<INTVAL
