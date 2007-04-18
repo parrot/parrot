@@ -76,7 +76,7 @@ sub check_parens {
         if ( $buf =~ m{ ( (?<!\w) (?!(?:$keywords)\W) \w+ \s+ \( ) }x ) {
             push @non_keyword_paren => "$path: $1\n";
         }
-        if ( $buf =~ m{ ( \( \s+ | \s+ \) ) }x ) {
+        if ( $buf =~ m{ ( \( [ \t]+ [^\n] | [^\n] [ \t]+ \) ) }x ) {
             push @space_between_parens => "$path: $1\n";
         }
     }
