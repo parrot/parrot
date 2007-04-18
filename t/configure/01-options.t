@@ -9,7 +9,7 @@ use warnings;
 BEGIN {
     use FindBin qw($Bin);
     use Cwd qw(cwd realpath);
-    realpath($Bin) =~ m{^(.*\/parrot)\/[^/]*\/[^/]*\/[^/]*$};
+    realpath($Bin) =~ m{^(.*\/parrot)\/.*$};
     our $topdir = $1;
     if ( defined $topdir ) {
         print "\nOK:  Parrot top directory located\n";
@@ -43,13 +43,13 @@ ok( defined $valid{verbose},     "verbose option found" );
 ok( !defined $valid{$badoption}, "invalid option not found" );
 
 open my $FH, '<', "$main::topdir/Configure.pl"
-    or croak "Unable to open handle to Configure.pl";
+    or croak "Unable to open handle to $main::topdir/Configure.pl:  $!";
 my $bigstr;
 {
     local $/ = undef;
     $bigstr = <$FH>;
 }
-close $FH or croak "Unable to close handle to Configure.pl";
+close $FH or croak "Unable to close handle to Configure.pl:  $!";
 
 # Ignore any POD I have moved to an __END__ block.
 $bigstr =~ s/__END__.*//s;
