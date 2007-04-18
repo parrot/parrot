@@ -87,7 +87,7 @@ L1:
     unless $I0 goto L0
     .return ($P0)
 L0:
-    tag_error($S0, "number")
+    typerror($S0, "number")
 .end
 
 
@@ -140,7 +140,7 @@ L1:
     val = arg.'tostring'()
     .return (val)
 L0:
-    tag_error($S0, "string")
+    typerror($S0, "string")
 .end
 
 
@@ -157,7 +157,33 @@ L0:
     if $S0 != type goto L0
     .return ()
 L0:
-    tag_error($S0, type)
+    typerror($S0, type)
+.end
+
+
+=item C<checkudata (arg, type)>
+
+=cut
+
+.sub 'checkudata'
+    .param pmc arg
+    .param string type
+    $S0 = "no value"
+    if null arg goto L0
+    $S0 = typeof arg
+    $I0 = isa arg, 'LuaUserdata'
+    unless $I0 goto L0
+    .local pmc _lua__REGISTRY
+    .local pmc key
+    _lua__REGISTRY = global '_REGISTRY'
+    new key, .LuaString
+    set key, type
+    $P0 = _lua__REGISTRY[key]
+    $P1 = arg.'get_metatable'()
+    unless $P0 == $P1 goto L0
+    .return ()
+L0:
+    typerror($S0, type)
 .end
 
 
@@ -427,11 +453,11 @@ L1:
 .end
 
 
-=item C<tag_error (got, expec)>
+=item C<typerror (got, expec)>
 
 =cut
 
-.sub 'tag_error'
+.sub 'typerror'
     .param string got
     .param string expec
     $S0 = expec

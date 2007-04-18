@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 12;
 use Test::More;
 use Cwd;
 use File::Basename;
@@ -87,6 +87,16 @@ true
 $cwd
 OUT
 
+language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.dir' );
+require "lfs"
+for file in lfs.dir("xpto") do
+    print(file)
+end
+CODE
+.
+..
+OUT
+
 rmdir '../xpto' if (-d '../xpto');
 
 language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.mkdir' );
@@ -97,6 +107,13 @@ print(msg)
 CODE
 nil
 No such file or directory
+OUT
+
+language_output_like( 'lua', <<'CODE', <<"OUT", 'function lfs.dir' );
+require "lfs"
+lfs.dir("xptoo")
+CODE
+/cannot open xptoo: No such file or directory/
 OUT
 
 mkdir '../xpto' unless -d '../xpto';
@@ -119,6 +136,21 @@ print(msg)
 CODE
 nil
 No such file or directory
+OUT
+
+unlink('../file.txt') if ( -f '../file.txt' );
+open my $X, '>', '../file.txt';
+binmode $X, ':raw';
+print {$X} "file with text\n";
+close $X;
+
+language_output_like( 'lua', <<'CODE', <<"OUT", 'function lfs.lock (closed)' );
+require "lfs"
+f = io.open("file.txt")
+f:close()
+lfs.lock(f)
+CODE
+/lock: closed file/
 OUT
 
 

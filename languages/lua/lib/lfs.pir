@@ -110,8 +110,14 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
 
 .sub 'check_file' :anon
     .param pmc fh
+    .param string funcname
     .local pmc ret
-    ret = getattribute fh, 'data'
+    checkudata(fh, 'ParrotIO')
+    ret =  getattribute fh, 'data'
+    unless null ret goto L1
+    $S0 = concat funcname, ": closed file"
+    error($S0)
+L1:
     .return (ret)
 .end
 
@@ -269,14 +275,41 @@ Lua iterator over the entries of a given directory. Each time the iterator is
 called it returns a string with an entry of the directory; C<nil> is returned
 when there is no more entries. Raises an error if C<path> is not a directory.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub '_lfs_dir' :anon
     .param pmc path :optional
+    .local pmc ret
     $S1 = checkstring(path)
-    not_implemented()
+    $S0 = $S1
+    new $P0, .OS
+    push_eh _handler
+    $P1 = $P0.'readdir'($S1)
+    .lex 'upvar_dir', $P1
+    .const .Sub dir_aux = 'dir_aux'
+    ret = newclosure dir_aux
+    .return (ret)
+_handler:
+    .local pmc e
+    .local string s
+    .get_results (e, s)
+    $S0 = concat "cannot open ", $S0
+    $S0 = concat ": "
+    $S0 = concat s
+    error($S0)
+.end
+
+.sub 'dir_aux' :anon :lex :outer(_lfs_dir)
+    .local pmc ret
+    $P1 = find_lex 'upvar_dir'
+    unless $P1 goto L1
+    $S1 = shift $P1
+    new ret, .LuaString
+    set ret, $S1
+    .return (ret)
+L1:
+    new ret, .LuaNil
+    .return (ret)
 .end
 
 
@@ -300,7 +333,7 @@ NOT YET IMPLEMENTED.
     .param pmc mode :optional
     .param pmc start :optional
     .param pmc length :optional
-    $P1 = check_file(filehandle)
+    $P1 = check_file(filehandle, 'lock')
     $S2 = checkstring(mode)
     $I3 = optint(start, 0)
     $I4 = optint(length, 0)
@@ -321,7 +354,6 @@ C<nil> plus an error string.
     .param pmc dirname :optional
     .local pmc ret
     $S1 = checkstring(dirname)
-    $S0 = $S1
     new $P0, .OS
     push_eh _handler
     $I1 = 0o775
@@ -355,7 +387,6 @@ C<nil> plus an error string.
     .param pmc dirname :optional
     .local pmc ret
     $S1 = checkstring(dirname)
-    $S0 = $S1
     new $P0, .OS
     push_eh _handler
     $P0.'rm'($S1)
@@ -419,7 +450,7 @@ NOT YET IMPLEMENTED.
     .param pmc filehandle :optional
     .param pmc start :optional
     .param pmc length :optional
-    $P1 = check_file(filehandle)
+    $P1 = check_file(filehandle, 'unlock')
     $I2 = optint(start, 0)
     $I3 = optint(length, 0)
     not_implemented()
