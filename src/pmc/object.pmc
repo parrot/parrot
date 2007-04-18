@@ -119,8 +119,8 @@ Mark any referenced strings and PMCs.
 */
     void mark() {
         Parrot_Object *obj = PARROT_OBJECT(SELF);
-        if (obj->class)
-            pobject_lives(interp, (PObj*)obj->class);
+        if (obj->_class)
+            pobject_lives(interp, (PObj*)obj->_class);
         if (obj->attrib_store)
             pobject_lives(interp, (PObj*)obj->attrib_store);
     }
@@ -139,7 +139,7 @@ of the given name walking up the inheritance tree.
         Parrot_Object *obj = PARROT_OBJECT(SELF);
 
         /* Look up the index. */
-        INTVAL index = get_attrib_index(interp, obj->class, name);
+        INTVAL index = get_attrib_index(interp, obj->_class, name);
 
         /* If lookup failed, exception. */
         if (index == -1) {
@@ -165,7 +165,7 @@ of the given name walking up the inheritance tree.
         Parrot_Object *obj = PARROT_OBJECT(SELF);
 
         /* Look up the index. */
-        INTVAL index = get_attrib_index(interp, obj->class, name);
+        INTVAL index = get_attrib_index(interp, obj->_class, name);
 
         /* If lookup failed, exception. */
         if (index == -1) {
@@ -188,7 +188,7 @@ Walks the MRO of the class and finds the method with the given name.
     PMC* find_method(STRING *name)
     {
         Parrot_Object *obj = PARROT_OBJECT(SELF);
-        Parrot_Class *class = PARROT_CLASS(obj->class);
+        Parrot_Class *class = PARROT_CLASS(obj->_class);
         PMC *method = PMCNULL;
 
         /* Walk and search. One day, we'll use the cache first. */
@@ -221,7 +221,7 @@ Get the class PMC representing the class that this object is an instance of.
     PMC* get_class()
     {
         Parrot_Object *obj = PARROT_OBJECT(SELF);
-        return obj->class;
+        return obj->_class;
     }
 
 /*

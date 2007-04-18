@@ -197,8 +197,8 @@ inline op isa(out INT, invar PMC, in STR) :object_base {
 }
 
 inline op isa(out INT, invar PMC, in PMC) :object_base {
-    PMC *class = Parrot_class_lookup_p(interp, $3);
-    $1 = Parrot_object_isa(interp, $2, class);
+    PMC *_class = Parrot_class_lookup_p(interp, $3);
+    $1 = Parrot_object_isa(interp, $2, _class);
     goto NEXT();
 }
 
@@ -279,79 +279,79 @@ subclass is an anonymous subclass.
 =cut
 
 op subclass(out PMC, inconst PMC) :object_classes {
-  PMC *class = Parrot_class_lookup_p(interp, $2);
+  PMC *_class = Parrot_class_lookup_p(interp, $2);
   opcode_t *next = expr NEXT();
-  if (PMC_IS_NULL(class)) {
+  if (PMC_IS_NULL(_class)) {
     STRING *name = readable_name(interp, $2);
     real_exception(interp, next, NO_CLASS,
                 "Class '%Ss' doesn't exist", name);
   }
-  $1 = VTABLE_subclass(interp, class, PMCNULL);
+  $1 = VTABLE_subclass(interp, _class, PMCNULL);
   goto ADDRESS(next);
 }
 
 op subclass(out PMC, in STR) :object_classes {
-  PMC *class = Parrot_class_lookup(interp, $2);
+  PMC *_class = Parrot_class_lookup(interp, $2);
   opcode_t *next = expr NEXT();
-  if (PMC_IS_NULL(class)) {
+  if (PMC_IS_NULL(_class)) {
     real_exception(interp, next, NO_CLASS,
                 "Class '%Ss' doesn't exist", $2);
   }
-  $1 = VTABLE_subclass(interp, class, PMCNULL);
+  $1 = VTABLE_subclass(interp, _class, PMCNULL);
   goto ADDRESS(next);
 }
 
 
 op subclass(out PMC, inconst PMC, in STR) :object_classes {
-  PMC *class = Parrot_class_lookup_p(interp, $2);
+  PMC *_class = Parrot_class_lookup_p(interp, $2);
   PMC *subname_p;
   opcode_t *next = expr NEXT();
-  if (PMC_IS_NULL(class)) {
+  if (PMC_IS_NULL(_class)) {
     STRING *name = readable_name(interp, $2);
     real_exception(interp, next, NO_CLASS,
                 "Class '%Ss' doesn't exist", name);
   }
   subname_p = pmc_new(interp, enum_class_String);
   VTABLE_set_string_native(interp, subname_p, $3);
-  $1 = VTABLE_subclass(interp, class, subname_p);
+  $1 = VTABLE_subclass(interp, _class, subname_p);
   goto NEXT();
 }
 
 op subclass(out PMC, in STR, in STR) :object_classes {
-  PMC *class = Parrot_class_lookup(interp, $2);
+  PMC *_class = Parrot_class_lookup(interp, $2);
   PMC *subname_p;
   opcode_t *next = expr NEXT();
-  if (PMC_IS_NULL(class)) {
+  if (PMC_IS_NULL(_class)) {
     real_exception(interp, next, NO_CLASS,
                 "Class '%Ss' doesn't exist", $2);
   }
   subname_p = pmc_new(interp, enum_class_String);
   VTABLE_set_string_native(interp, subname_p, $3);
-  $1 = VTABLE_subclass(interp, class, subname_p);
+  $1 = VTABLE_subclass(interp, _class, subname_p);
   goto ADDRESS(next);
 }
 
 
 op subclass(out PMC, inconst PMC, in PMC) :object_classes {
-  PMC *class = Parrot_class_lookup_p(interp, $2);
+  PMC *_class = Parrot_class_lookup_p(interp, $2);
   opcode_t *next = expr NEXT();
-  if (PMC_IS_NULL(class)) {
+  if (PMC_IS_NULL(_class)) {
     STRING *name = readable_name(interp, $2);
     real_exception(interp, next, NO_CLASS,
                 "Class '%Ss' doesn't exist", name);
   }
-  $1 = VTABLE_subclass(interp, class, $3);
+  $1 = VTABLE_subclass(interp, _class, $3);
   goto ADDRESS(next);
 }
 
 op subclass(out PMC, in STR, in PMC) :object_classes {
-  PMC *class = Parrot_class_lookup(interp, $2);
+  PMC *_class = Parrot_class_lookup(interp, $2);
   opcode_t *next = expr NEXT();
-  if (PMC_IS_NULL(class)) {
+  if (PMC_IS_NULL(_class)) {
     real_exception(interp, next, NO_CLASS, "Class '%s' doesn't exist",
                 string_to_cstring(interp, $2));
   }
-  $1 = VTABLE_subclass(interp, class, $3);
+  $1 = VTABLE_subclass(interp, _class, $3);
   goto ADDRESS(next);
 }
 
@@ -367,27 +367,27 @@ system.
 =cut
 
 inline op getclass(out PMC, in STR) :object_classes {
-  PMC *class = Parrot_class_lookup(interp, $2);
+  PMC *_class = Parrot_class_lookup(interp, $2);
   opcode_t *next = expr NEXT();
-  if (PMC_IS_NULL(class)) {
+  if (PMC_IS_NULL(_class)) {
     real_exception(interp, next, NO_CLASS, "Class '%s' doesn't exist",
                 string_to_cstring(interp, $2));
   }
   else
-    $1 = class;
+    $1 = _class;
   goto ADDRESS(next);
 }
 
 inline op getclass(out PMC, in PMC) :object_classes {
-  PMC *class = Parrot_class_lookup_p(interp, $2);
+  PMC *_class = Parrot_class_lookup_p(interp, $2);
   opcode_t *next = expr NEXT();
-  if (PMC_IS_NULL(class)) {
+  if (PMC_IS_NULL(_class)) {
     STRING *name = readable_name(interp, $2);
     real_exception(interp, next, NO_CLASS,
          "Class '%Ss' doesn't exist", name);
   }
   else
-    $1 = class;
+    $1 = _class;
   goto ADDRESS(next);
 }
 
@@ -402,7 +402,7 @@ Find the PMC for a class, by string name or by key.
 =cut
 
 inline op get_class(out PMC, in STR) :object_classes {
-  PMC *class = PMCNULL;
+  PMC *_class = PMCNULL;
   opcode_t *next = expr NEXT();
 
   /* Look up a namespace with the given name within the current
@@ -411,19 +411,19 @@ inline op get_class(out PMC, in STR) :object_classes {
       CONTEXT(interp->ctx)->current_namespace, $2);
   if (!PMC_IS_NULL(ns))
       Parrot_PCCINVOKE(interp, ns,
-          string_from_const_cstring(interp, "get_class", 0), "->P", &class);
+          string_from_const_cstring(interp, "get_class", 0), "->P", &_class);
 
   /* If class is not found, throw an exception; otherwise, put it in $1. */
-  if (PMC_IS_NULL(class))
+  if (PMC_IS_NULL(_class))
       real_exception(interp, next, NO_CLASS, "Class '%Ss' doesn't exist", $2);
   else
-      $1 = class;
+      $1 = _class;
 
   goto ADDRESS(next);
 }
 
 inline op get_class(out PMC, in PMC) :object_classes {
-  PMC *class = PMCNULL;
+  PMC *_class = PMCNULL;
   opcode_t *next = expr NEXT();
 
   /* If we were not passed a namespace PMC, look it up, otherwise just use
@@ -437,18 +437,20 @@ inline op get_class(out PMC, in PMC) :object_classes {
   /* If we have got a namespace, get the class associated with it, if any. */
   if (!PMC_IS_NULL(ns))
       Parrot_PCCINVOKE(interp, ns,
-          string_from_const_cstring(interp, "get_class", 0), "->P", &class);
+          string_from_const_cstring(interp, "get_class", 0), "->P", &_class);
 
   /* If class is not found, throw an exception; otherwise, put it in $1. */
-  if (PMC_IS_NULL(class)) {
+  if (PMC_IS_NULL(_class)) {
       STRING *name = readable_name(interp, $2);
       real_exception(interp, next, NO_CLASS, "Class '%Ss' doesn't exist", name);
   }
   else {
-      $1 = class;
+      $1 = _class;
   }
 
   goto ADDRESS(next);
+  /* Shouldn't be reached */
+  return NULL;
 }
 
 ###############################################################################

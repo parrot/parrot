@@ -303,7 +303,7 @@ PIO_buf_flush(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)
         to_write = io->b.next - io->b.startb;
 
         /* Flush to next layer */
-        fake.strstart = io->b.startb;
+        fake.strstart = (char *)io->b.startb;
         fake.bufused = to_write;
         wrote = PIO_write_down(interp, PIO_DOWNLAYER(l), io, &fake);
         if (wrote == (long)to_write) {
@@ -345,7 +345,7 @@ PIO_buf_fill_readbuf(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
     size_t got;
     PIOOFF_T pos = io->fpos;
     STRING fake, *s;
-    fake.strstart = b->startb;
+    fake.strstart = (char *)b->startb;
     fake.bufused  = b->size;
     s = &fake;
 
@@ -410,7 +410,7 @@ PIO_buf_read(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
     if (!s->strstart) {
         Parrot_allocate_string(interp, s, len);
     }
-    out_buf = s->strstart;
+    out_buf = (unsigned char *)s->strstart;
     /* read Data from buffer */
     if (b->flags & PIO_BF_READBUF) {
         const size_t avail = b->endb - b->next;
@@ -446,7 +446,7 @@ PIO_buf_read(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
             STRING fake;
             STRING *sf = &fake;
 
-            fake.strstart = out_buf;
+            fake.strstart = (char *)out_buf;
             fake.bufused  = len;
             got = PIO_read_down(interp, PIO_DOWNLAYER(l), io, &sf);
             s->strlen = s->bufused = current + got;

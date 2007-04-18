@@ -14,7 +14,7 @@ PMC* new_from_string(STRING* rep, INTVAL flags)
 void morph(INTVAL type) :write
 void mark()
 void destroy()
-PMC* namespace()
+PMC* pmc_namespace()
 
 # XXX FIXME should this be marked as writing?
 PMC* getprop(STRING* key)
@@ -371,7 +371,7 @@ PMC* new_singleton()
 PMC* get_anonymous_subclass()
 
 ## Deprecated
-void become_parent(PMC* class)
+void become_parent(PMC* _class)
 ## Deprecated
 PMC* subclass(PMC* name)
 

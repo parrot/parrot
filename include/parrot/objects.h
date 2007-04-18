@@ -55,7 +55,7 @@ PARROT_API PMC *Parrot_find_class_fallback(Parrot_Interp, STRING *, INTVAL);
 PARROT_API void Parrot_set_class_constructor(Parrot_Interp, STRING *, INTVAL, STRING *);
 PARROT_API void Parrot_set_class_destructor(Parrot_Interp, STRING *, INTVAL, STRING *);
 PARROT_API void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
-PARROT_API void Parrot_invalidate_method_cache(Interp*, STRING *class, STRING *meth);
+PARROT_API void Parrot_invalidate_method_cache(Interp*, STRING *_class, STRING *meth);
 PARROT_API STRING *readable_name(Parrot_Interp, PMC *);
 PARROT_API int Parrot_get_vtable_index(Interp *, const char *name);
 PARROT_API PMC *Parrot_find_vtable_meth(Interp* interp, PMC *pmc, STRING *meth);
@@ -95,16 +95,16 @@ PARROT_API PMC *Parrot_find_vtable_meth(Interp* interp, PMC *pmc, STRING *meth);
 
 #  define CLASS_ATTRIB_COUNT(cl) PMC_int_val2(cl)
 #  define SET_CLASS(arr, obj, cl) \
-       obj->vtable->class = cl
+       obj->vtable->pmc_class = cl
 #  define GET_CLASS(arr, obj) \
-       obj->vtable->class
+       obj->vtable->pmc_class
 
 
 /* ************************************************************************ */
 /* ********* BELOW HERE IS NEW PPD15 IMPLEMENTATION RELATED STUFF ********* */
 /* ************************************************************************ */
 
-PARROT_API PMC* Parrot_ComputeMRO_C3(Interp *interp, PMC *class);
+PARROT_API PMC* Parrot_ComputeMRO_C3(Interp *interp, PMC *_class);
 
 PARROT_API void Parrot_ComposeRole(Interp *interp, PMC *role,
                                    PMC *without, int got_without,

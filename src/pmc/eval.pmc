@@ -252,7 +252,7 @@ for writing to disc and later loading via C<load_bytecode>.
            See RT #40410 for example of the problem (note on line that
            segfaults, it is *cursor that is pointing to dealloced memory). */
         Parrot_block_DOD(INTERP);
-        PackFile_pack(INTERP, pf, res->strstart);
+        PackFile_pack(INTERP, pf, (opcode_t *)res->strstart);
         Parrot_unblock_DOD(INTERP);
         /* now remove all segments from directory again and destroy
          * the packfile
@@ -309,7 +309,8 @@ Unarchives the code.
         SUPER(info);
         sub = PMC_sub(SELF);
         pf = PackFile_new(INTERP, 0);
-        if (!PackFile_unpack(INTERP, pf, packed->strstart, packed->strlen))
+        if (!PackFile_unpack(INTERP, pf, (opcode_t *)packed->strstart,
+                packed->strlen))
             real_exception(INTERP, NULL, E_IOError,
                     "couldn't unpack packfile");
         do_sub_pragmas(INTERP, pf->cur_cs, PBC_PBC, SELF);

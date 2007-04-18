@@ -13,7 +13,7 @@
 /* Class PMC's underlying struct. */
 typedef struct Parrot_Class {
     STRING *name;         /* The name of the class. */
-    PMC *namespace;       /* The namespace it's linked to, if any. */
+    PMC *_namespace;      /* The namespace it's linked to, if any. */
     int instantiated;     /* Any instantiations since last modification? */
     PMC *parents;         /* Immediate parent classes. */
     PMC *all_parents;     /* Cached list of ourself and all parents, in MRO order. */
@@ -32,7 +32,7 @@ typedef struct Parrot_Class {
 
 /* Object PMC's underlying struct. */
 typedef struct Parrot_Object {
-    PMC *class;          /* The class this is an instance of. */
+    PMC *_class;          /* The class this is an instance of. */
     PMC *attrib_store;   /* The attributes store - a resizable PMC array. */
 } Parrot_Object;
 

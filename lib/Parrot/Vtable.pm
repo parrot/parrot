@@ -166,7 +166,7 @@ typedef struct _vtable {
     UINTVAL flags;          /* Flags. Duh */
     STRING *does_str;       /* space-separated list of interfaces */
     STRING *isa_str;        /* space-separated list of classes */
-    PMC    *class;          /* for PMCs: a PMC of that type
+    PMC    *pmc_class;      /* for PMCs: a PMC of that type
                                for objects: the class PMC */
     PMC    *mro;            /* array PMC of [class, parents ... ] */
     struct _vtable *ro_variant_vtable; /* A variant of this vtable with the

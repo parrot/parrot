@@ -434,38 +434,38 @@ create_class_pmc(Interp *interp, INTVAL type)
      *
      * create a constant PMC
      */
-    PMC * const class = get_new_pmc_header(interp, type,
+    PMC * const _class = get_new_pmc_header(interp, type,
                                            PObj_constant_FLAG);
     /* If we are a second thread, we may get the same object as the
      * original because we have a singleton. Just set the singleton to
      * be our class object, but don't mess with its vtable.
      */
     if ((interp->vtables[type]->flags & VTABLE_PMC_IS_SINGLETON)
-        && (class == class->vtable->class)) {
-        interp->vtables[type]->class = class;
-        return class;
+        && (_class == _class->vtable->pmc_class)) {
+        interp->vtables[type]->pmc_class = _class;
+        return _class;
     }
-    if (PObj_is_PMC_EXT_TEST(class)) {
+    if (PObj_is_PMC_EXT_TEST(_class)) {
         /* if the PMC has a PMC_EXT structure,
          * return it to the pool/arena
          * we don't need it - basically only the vtable is important
          */
         Small_Object_Pool * const ext_pool =
             interp->arena_base->pmc_ext_pool;
-        if (PMC_sync(class))
-            mem_internal_free(PMC_sync(class));
-        ext_pool->add_free_object(interp, ext_pool, class->pmc_ext);
+        if (PMC_sync(_class))
+            mem_internal_free(PMC_sync(_class));
+        ext_pool->add_free_object(interp, ext_pool, _class->pmc_ext);
     }
-    class->pmc_ext = NULL;
-    DOD_flag_CLEAR(is_special_PMC, class);
-    PMC_pmc_val(class)   = (void*)0xdeadbeef;
-    PMC_struct_val(class)= (void*)0xdeadbeef;
+    _class->pmc_ext = NULL;
+    DOD_flag_CLEAR(is_special_PMC, _class);
+    PMC_pmc_val(_class)   = (void*)0xdeadbeef;
+    PMC_struct_val(_class)= (void*)0xdeadbeef;
 
-    PObj_is_PMC_shared_CLEAR(class);
+    PObj_is_PMC_shared_CLEAR(_class);
 
-    interp->vtables[type]->class = class;
+    interp->vtables[type]->pmc_class = _class;
 
-    return class;
+    return _class;
 }
 
 /*
@@ -484,7 +484,7 @@ Parrot_create_mro(Interp *interp, INTVAL type)
     VTABLE *vtable;
     STRING *class_name, *isa;
     INTVAL pos, parent_type, total;
-    PMC *class, *mro;
+    PMC *_class, *mro;
     PMC *ns;
 
     vtable = interp->vtables[type];
@@ -516,11 +516,11 @@ Parrot_create_mro(Interp *interp, INTVAL type)
                     CONTEXT(interp->ctx)->current_namespace,
                     class_name, ns);
         }
-        class = vtable->class;
-        if (!class) {
-            class = create_class_pmc(interp, parent_type);
+        _class = vtable->pmc_class;
+        if (!_class) {
+            _class = create_class_pmc(interp, parent_type);
         }
-        VTABLE_push_pmc(interp, mro, class);
+        VTABLE_push_pmc(interp, mro, _class);
         if (pos >= total)
             break;
         len = string_str_index(interp, isa,

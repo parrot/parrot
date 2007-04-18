@@ -112,11 +112,11 @@ PARROT_API void string_upcase_inplace(Interp *, STRING *);
 PARROT_API void string_downcase_inplace(Interp *, STRING *);
 PARROT_API void string_titlecase_inplace(Interp *, STRING *);
 
-PARROT_API INTVAL Parrot_string_is_cclass(Interp *, PARROT_CCLASS_FLAGS,
+PARROT_API INTVAL Parrot_string_is_cclass(Interp *, INTVAL,
         STRING *, UINTVAL offset);
-PARROT_API INTVAL Parrot_string_find_cclass(Interp *, PARROT_CCLASS_FLAGS,
+PARROT_API INTVAL Parrot_string_find_cclass(Interp *, INTVAL,
         STRING *, UINTVAL offset, UINTVAL count);
-PARROT_API INTVAL Parrot_string_find_not_cclass(Interp *, PARROT_CCLASS_FLAGS,
+PARROT_API INTVAL Parrot_string_find_not_cclass(Interp *, INTVAL,
         STRING *, UINTVAL offset, UINTVAL count);
 PARROT_API INTVAL Parrot_string_is_whitespace(Interp *, STRING *, INTVAL offset);
 PARROT_API INTVAL Parrot_string_is_digit(Interp *, STRING *, INTVAL offset);

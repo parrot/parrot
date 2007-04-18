@@ -679,7 +679,7 @@ consists entirely of matching characters, set $1 to (offset + count).
 =cut
 
 inline op find_not_cclass(out INT, in INT, in STR, in INT, in INT) {
-  $1 = Parrot_string_find_not_cclass(interp, $2, $3, $4, $5);
+$1 = Parrot_string_find_not_cclass(interp, $2, $3, $4, $5);
   goto NEXT();
 }
 

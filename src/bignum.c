@@ -199,7 +199,7 @@ int BN_isubtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
                  BN_CONTEXT *context);
 int BN_align(PINTD_ BIGNUM* one, BIGNUM* two);
 INTVAL BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except,
-                   char *msg);
+                   const char *msg);
 int BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context);
 
 /*
@@ -582,7 +582,7 @@ continue.  If context specifies that death occurs, then so be it.
 */
 
 INTVAL
-BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg) {
+BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, const char *msg) {
     /* See extended standard for details */
     switch (except) {
     case BN_CONVERSION_OVERFLOW :
@@ -693,7 +693,7 @@ BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg) {
 /*
 
 =item C<void
-BN_exception(PINTD_ BN_EXCEPTIONS exception, char* message)>
+BN_exception(PINTD_ BN_EXCEPTIONS exception, const char* message)>
 
 Throw `exception'. Should be accessed via a C<BN_EXCEPT> macro, this
 version is provided until Parrot exceptions are sorted out properly.
@@ -703,7 +703,7 @@ version is provided until Parrot exceptions are sorted out properly.
 */
 
 void
-BN_exception(PINTD_ BN_EXCEPTIONS exception, char* message) {
+BN_exception(PINTD_ BN_EXCEPTIONS exception, const char* message) {
     printf("Exception %d %s\n", exception, message);
     exit(0);
 }

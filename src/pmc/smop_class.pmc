@@ -60,7 +60,7 @@ argument is not a PMC* but the C<classname> STRING.
     METHOD void class_init_2()
     {
             int i;
-            PMC* class = pmc_new(interp, enum_class_SMOP_Class);
+            PMC* _class = pmc_new(interp, enum_class_SMOP_Class);
             PMC* class_meta;
             PMC* class_string;
             PMC* attributes = pmc_new(interp, enum_class_ResizablePMCArray);
@@ -71,20 +71,20 @@ argument is not a PMC* but the C<classname> STRING.
                 PMC* attribute = pmc_new(interp, enum_class_SMOP_Attribute);
                 STRING *attrib_name = string_from_const_cstring(interp, attribute_names[i], 0);
                 PCCINVOKE(interp, attribute, "name", STRING* attrib_name);
-                PCCINVOKE(interp, attribute, "class", PMC* class);
+                PCCINVOKE(interp, attribute, "class", PMC* _class);
                 VTABLE_push_pmc(interp, attributes, attribute);
             }
 
             /* we sidestep the MetaModel bootstrap problem by building the MetaClass manually */
 
-            (PMC* class_meta) = PCCINVOKE(interp, class, "new");
+            (PMC* class_meta) = PCCINVOKE(interp, _class, "new");
             class_string = pmc_new(interp, enum_class_String);
             VTABLE_set_string_native(interp, class_string,
                     string_from_const_cstring(interp, "Class", 0));
             VTABLE_set_attr_str(interp, class_meta,
                     string_from_const_cstring(interp, attribute_names[0], 0), class_string);
             VTABLE_set_attr_str(interp, class_meta,
-                    string_from_const_cstring(interp, attribute_names[2], 0), class);
+                    string_from_const_cstring(interp, attribute_names[2], 0), _class);
             VTABLE_init(interp,class_meta);
             VTABLE_set_attr_str(interp, class_meta,
                     string_from_const_cstring(interp, attribute_names[3], 0), attributes);

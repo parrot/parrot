@@ -77,10 +77,10 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, Parrot_clone_flags flags)
 
         last_remove = s->n_vtable_max;
         for (i = s->n_vtable_max - 1; i >= start; --i) {
-            if (s->vtables[i] && s->vtables[i]->class &&
-                PObj_is_class_TEST(s->vtables[i]->class)) {
+            if (s->vtables[i] && s->vtables[i]->pmc_class &&
+                PObj_is_class_TEST(s->vtables[i]->pmc_class)) {
                 STRING *class_name;
-                class_name = VTABLE_name(s, s->vtables[i]->class);
+                class_name = VTABLE_name(s, s->vtables[i]->pmc_class);
                 assert(VTABLE_exists_keyed_str(d, d->class_hash, class_name));
                 VTABLE_delete_keyed_str(d, d->class_hash, class_name);
                 if (last_remove == i + 1) {
@@ -107,12 +107,12 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, Parrot_clone_flags flags)
     }
     if (flags & PARROT_CLONE_CLASSES) {
         INTVAL i;        for (i = 0; i < s->n_vtable_max; ++i) {
-            if (s->vtables[i] && s->vtables[i]->class &&
-                    PObj_is_class_TEST(s->vtables[i]->class)) {
+            if (s->vtables[i] && s->vtables[i]->pmc_class &&
+                    PObj_is_class_TEST(s->vtables[i]->pmc_class)) {
                 /* Cloning the class into the new interpreter ought
                  * to be sufficient to instantiate the class.
                  */
-                (void) Parrot_clone(d, s->vtables[i]->class);
+                (void) Parrot_clone(d, s->vtables[i]->pmc_class);
             }
         }
     }

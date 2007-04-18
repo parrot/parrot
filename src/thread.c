@@ -167,7 +167,7 @@ PMC *pt_shared_fixup(Parrot_Interp interp, PMC *pmc) {
         PMC *vtable_cache;
 
         /* keep the original vtable from going away... */
-        vtable_cache = ((PMC**)PMC_data(pmc->vtable->class))[PCD_OBJECT_VTABLE];
+        vtable_cache = ((PMC**)PMC_data(pmc->vtable->pmc_class))[PCD_OBJECT_VTABLE];
         assert(vtable_cache->vtable->base_type == enum_class_VtableCache);
         add_pmc_sync(interp, vtable_cache);
         PObj_is_PMC_shared_SET(vtable_cache);
@@ -176,7 +176,7 @@ PMC *pt_shared_fixup(Parrot_Interp interp, PMC *pmc) {
         LOCK_INTERPRETER(master);
         type_num = pmc->vtable->base_type;
         SET_CLASS((SLOTTYPE*) PMC_data(pmc), pmc,
-                  master->vtables[type_num]->class);
+                  master->vtables[type_num]->pmc_class);
         UNLOCK_INTERPRETER(master);
     }
     else {

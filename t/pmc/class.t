@@ -83,7 +83,7 @@ pir_output_is( <<'CODE', <<'OUT', 'name' );
   ok_3:
     say 'ok 3 - name() with too many args fails'
 
-    $P1 = $P0.'namespace'()
+    $P1 = $P0.'pmc_namespace'()
     if $P1 == 'Alex' goto ok_4
     print 'not '
 ok_4:

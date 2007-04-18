@@ -181,7 +181,7 @@ PARROT_API void rethrow_c_exception(Parrot_Interp interp);
 /*
  * internal exception handling
  */
-PARROT_API void do_exception(Parrot_Interp, exception_severity severity, long error);
+PARROT_API void do_exception(Parrot_Interp, INTVAL severity, long error);
 PARROT_API void new_internal_exception(Parrot_Interp);
 PARROT_API void free_internal_exception(Parrot_Interp);
 

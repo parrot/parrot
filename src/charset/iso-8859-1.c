@@ -142,7 +142,7 @@ upcase(Interp *interp, STRING *source_string)
     }
 
     Parrot_unmake_COW(interp, source_string);
-    buffer = source_string->strstart;
+    buffer = (unsigned char *)source_string->strstart;
     for (offset = 0; offset < source_string->strlen; offset++) {
         unsigned int c = buffer[offset]; /* XXX use encoding ? */
         if (c >= 0xe0 && c != 0xf7)
@@ -162,7 +162,7 @@ downcase(Interp *interp, STRING *source_string)
         return;
     }
     Parrot_unmake_COW(interp, source_string);
-    buffer = source_string->strstart;
+    buffer = (unsigned char *)source_string->strstart;
     for (offset = 0; offset < source_string->strlen; offset++) {
         unsigned int c = buffer[offset];
         if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
@@ -184,7 +184,7 @@ titlecase(Interp *interp, STRING *source_string)
         return;
     }
     Parrot_unmake_COW(interp, source_string);
-    buffer = source_string->strstart;
+    buffer = (unsigned char *)source_string->strstart;
     c = buffer[0];
     if (c >= 0xe0 && c != 0xf7)
         c &= ~0x20;
@@ -212,7 +212,7 @@ upcase_first(Interp *interp, STRING *source_string)
         return;
     }
     Parrot_unmake_COW(interp, source_string);
-    buffer = source_string->strstart;
+    buffer = (unsigned char *)source_string->strstart;
     c = buffer[0];
     if (c >= 0xe0 && c != 0xf7)
         c &= ~0x20;
@@ -231,7 +231,7 @@ downcase_first(Interp *interp, STRING *source_string)
         return;
     }
     Parrot_unmake_COW(interp, source_string);
-    buffer = source_string->strstart;
+    buffer = (unsigned char *)source_string->strstart;
     c = buffer[0];
     if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
         c &= ~0x20;

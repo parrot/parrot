@@ -661,7 +661,7 @@ Parrot_PMC Parrot_PMC_new(Parrot_INTERP interp, Parrot_Int type) {
 
 /*
 
-=item C<Parrot_Int Parrot_PMC_typenum(Parrot_INTERP interp, const char *class)>
+=item C<Parrot_Int Parrot_PMC_typenum(Parrot_INTERP interp, const char *_class)>
 
 Returns the internal identifier that represents the named class.
 
@@ -669,10 +669,10 @@ Returns the internal identifier that represents the named class.
 
 */
 
-Parrot_Int Parrot_PMC_typenum(Parrot_INTERP interp, const char *class) {
+Parrot_Int Parrot_PMC_typenum(Parrot_INTERP interp, const char *_class) {
     Parrot_Int retval;
     PARROT_CALLIN_START(interp);
-    retval = pmc_type(interp, string_from_cstring(interp, class, 0));
+    retval = pmc_type(interp, string_from_cstring(interp, _class, 0));
     PARROT_CALLIN_END(interp);
     return retval;
 }

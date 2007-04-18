@@ -263,10 +263,10 @@ sub init {
         #
         # Note that this trick won't work if the singleton inherits from something else
         # (because the MRO will still be shared).
-        unless ( $self->implements('namespace') or $self->{super}{'namespace'} ne 'default' ) {
+        unless ( $self->implements('pmc_namespace') or $self->{super}{'pmc_namespace'} ne 'default' ) {
             push @{ $self->{methods} },
                 {
-                meth       => 'namespace',
+                meth       => 'pmc_namespace',
                 parameters => '',
                 body       => '{ return INTERP->vtables[SELF->vtable->base_type]->_namespace; }',
                 loc        => 'vtable',
@@ -275,7 +275,7 @@ sub init {
                 line       => 1,
                 attrs      => {},
                 };
-            $self->{has_method}{namespace} = $#{ $self->{methods} };
+            $self->{has_method}{pmc_namespace} = $#{ $self->{methods} };
         }
     }
 

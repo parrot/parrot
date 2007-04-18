@@ -120,9 +120,9 @@ inline op check_events() :base_core {
 }
 
 inline op check_events__() :internal {
-    opcode_t *this = CUR_OPCODE;
-    this = HANDLE_EVENTS(interp, this);
-    goto ADDRESS(this);   /* force this being a branch op */
+    opcode_t *_this = CUR_OPCODE;
+    _this = HANDLE_EVENTS(interp, _this);
+    goto ADDRESS(_this);   /* force this being a branch op */
 }
 
 inline op wrapper__() :internal {
@@ -132,13 +132,13 @@ inline op wrapper__() :internal {
 }
 
 inline op prederef__() :internal {
-    opcode_t *this = CUR_OPCODE;
+    opcode_t *_this = CUR_OPCODE;
     if (interp->run_core & PARROT_CGOTO_CORE) {
         /* must be CGP then - check for events in not yet prederefed code */
-        this = CHECK_EVENTS(interp, this);
+        _this = CHECK_EVENTS(interp, _this);
     }
     do_prederef((void**)cur_opcode, interp, op_lib.core_type);
-    goto ADDRESS(this); /* force this being a branch op */
+    goto ADDRESS(_this); /* force this being a branch op */
 }
 
 inline op reserved(inconst INT) {
@@ -498,35 +498,35 @@ to the elements of the signature array.
 
 
 op set_args(inconst PMC) {
-    opcode_t * const this = CUR_OPCODE;
+    opcode_t * const _this = CUR_OPCODE;
     PMC * const signature = $1;
     INTVAL argc;
 
     /* for now just point to the opcode */
-    interp->current_args = this;
+    interp->current_args = _this;
     argc = SIG_ELEMS(signature);
     goto OFFSET(argc + 2);
 }
 
 op get_results(inconst PMC) {
-    opcode_t * const this = CUR_OPCODE;
+    opcode_t * const _this = CUR_OPCODE;
     PMC * const signature = $1;
     INTVAL argc;
 
-    CONTEXT(interp->ctx)->current_results = this;
+    CONTEXT(interp->ctx)->current_results = _this;
     argc = SIG_ELEMS(signature);
     goto OFFSET(argc + 2);
 }
 
 op get_params(inconst PMC) {
-    opcode_t * const this = CUR_OPCODE;
+    opcode_t * const _this = CUR_OPCODE;
     parrot_context_t *caller_ctx, *ctx;
     PMC * ccont;
     PMC * const signature = $1;
     INTVAL argc;
     opcode_t *src_indexes, *dst_indexes;
 
-    interp->current_params = this;
+    interp->current_params = _this;
     ctx = CONTEXT(interp->ctx);
     ccont = ctx->current_cont;
 
@@ -553,14 +553,14 @@ op get_params(inconst PMC) {
 }
 
 op set_returns(inconst PMC) {
-    opcode_t * const this = CUR_OPCODE;
+    opcode_t * const _this = CUR_OPCODE;
     parrot_context_t *ctx;
     PMC *ccont;
     PMC *signature = $1;
     INTVAL argc;
     opcode_t *src_indexes, *dest_indexes;
 
-    interp->current_returns = this;
+    interp->current_returns = _this;
     ctx = CONTEXT(interp->ctx);
     ccont = ctx->current_cont;
 

@@ -331,7 +331,7 @@ to_encoding(Interp *interp, STRING *src, STRING *dest)
     }
     else {
         Parrot_reallocate_string(interp, dest, src_len);
-        p = dest->strstart;
+        p = (unsigned char *)dest->strstart;
     }
     if (src->charset == Parrot_ascii_charset_ptr) {
         for (dest_len = 0; dest_len < src_len; ++dest_len) {
@@ -354,7 +354,7 @@ to_encoding(Interp *interp, STRING *src, STRING *dest)
                 else {
                     result->bufused = dest_pos;
                     Parrot_reallocate_string(interp, dest, dest_len);
-                    p = dest->strstart;
+                    p = (unsigned char *)dest->strstart;
                 }
             }
 
@@ -397,7 +397,7 @@ set_codepoint(Interp *interp, STRING *src,
 static UINTVAL
 get_byte(Interp *interp, const STRING *src, UINTVAL offset)
 {
-    unsigned char *contents = src->strstart;
+    unsigned char *contents = (unsigned char *)src->strstart;
     if (offset >= src->bufused) {
 /*        internal_exception(0,
                 "get_byte past the end of the buffer (%i of %i)",
@@ -415,7 +415,7 @@ set_byte(Interp *interp, const STRING *src,
     if (offset >= src->bufused) {
         internal_exception(0, "set_byte past the end of the buffer");
     }
-    contents = src->strstart;
+    contents = (unsigned char *)src->strstart;
     contents[offset] = (unsigned char)byte;
 }
 

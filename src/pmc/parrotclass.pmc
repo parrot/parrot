@@ -291,7 +291,7 @@ Create the class from the thawed parents and attributes array.
                 if (!PObj_is_class_TEST(parent_class)) {
                     assert(!parent_not_class);
                     parent_not_class++;
-                    parent_class = parent_class->vtable->class;
+                    parent_class = parent_class->vtable->pmc_class;
                 }
                 Parrot_add_parent(INTERP, class, parent_class);
             }

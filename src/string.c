@@ -2028,7 +2028,7 @@ string_escape_string_delimited(Interp *interp,
             Parrot_fixed_8_encoding_ptr, Parrot_ascii_charset_ptr, 0);
     /* more work TODO */
     ENCODING_ITER_INIT(interp, src, &iter);
-    dp = result->strstart;
+    dp = (unsigned char *)result->strstart;
     for (i = 0; len > 0; --len) {
         UINTVAL c = iter.get_and_advance(interp, &iter);
         if (c < 0x7f) {
@@ -2038,7 +2038,7 @@ string_escape_string_delimited(Interp *interp,
                 charlen += len * 2 + 16;
                 Parrot_reallocate_string(interp, result, charlen);
                 /* start can change */
-                dp = result->strstart;
+                dp = (unsigned char *)result->strstart;
             }
             switch (c) {
                 case '\\':
@@ -2094,7 +2094,7 @@ string_escape_string_delimited(Interp *interp,
         i += hex->strlen;
         /* and usable len */
         charlen = PObj_buflen(result);
-        dp = result->strstart;
+        dp = (unsigned char *)result->strstart;
         assert(i < charlen);
     }
     result->bufused = result->strlen = i;
@@ -2360,8 +2360,7 @@ character classes. Returns 0 otherwise, or if the string is empty or NULL.
 */
 
 INTVAL
-Parrot_string_is_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
-                        STRING *s, UINTVAL offset)
+Parrot_string_is_cclass(Interp *interp, INTVAL flags, STRING *s, UINTVAL offset)
 {
     if (!string_length(interp, s))
         return 0;
@@ -2369,8 +2368,8 @@ Parrot_string_is_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
 }
 
 INTVAL
-Parrot_string_find_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
-                          STRING *s, UINTVAL offset, UINTVAL count)
+Parrot_string_find_cclass(Interp *interp, INTVAL flags, STRING *s,
+                          UINTVAL offset, UINTVAL count)
 {
     if (!s)
         return -1;
@@ -2378,8 +2377,8 @@ Parrot_string_find_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
 }
 
 INTVAL
-Parrot_string_find_not_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
-                              STRING *s, UINTVAL offset, UINTVAL count)
+Parrot_string_find_not_cclass(Interp *interp, INTVAL flags, STRING *s,
+                              UINTVAL offset, UINTVAL count)
 {
     if (!s)
         return -1;

@@ -167,7 +167,7 @@ set_codepoint(Interp *interp, STRING *src,
 static UINTVAL
 get_byte(Interp *interp, const STRING *src, UINTVAL offset)
 {
-    unsigned char *contents = src->strstart;
+    unsigned char *contents = (unsigned char *)src->strstart;
     if (offset >= src->bufused) {
 /*        internal_exception(0,
                 "get_byte past the end of the buffer (%i of %i)",
@@ -185,7 +185,7 @@ set_byte(Interp *interp, const STRING *src,
     if (offset >= src->bufused) {
         internal_exception(0, "set_byte past the end of the buffer");
     }
-    contents = src->strstart;
+    contents = (unsigned char *)src->strstart;
     contents[offset] = (unsigned char)byte;
 }
 

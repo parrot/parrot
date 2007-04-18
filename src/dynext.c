@@ -124,7 +124,7 @@ static STRING * get_path(Interp *interp, STRING *lib, void **handle,
                                                      PARROT_LIB_DYN_EXTS);
 
     if (lib == NULL) {
-        *handle = Parrot_dlopen(NULL);
+        *handle = Parrot_dlopen((char *)NULL);
         if (*handle) {
             return string_from_const_cstring(interp, "", 0);
         }
@@ -178,7 +178,7 @@ static STRING * get_path(Interp *interp, STRING *lib, void **handle,
     full_name = Parrot_locate_runtime_file_str(interp, lib,
             PARROT_RUNTIME_FT_DYNEXT);
     if (full_name) {
-        *handle = Parrot_dlopen(full_name->strstart);
+        *handle = Parrot_dlopen((char *)full_name->strstart);
         if (*handle) {
             return full_name;
         }
@@ -288,7 +288,7 @@ static PMC *run_init_lib(Interp *interp, void *handle,
         string_cstring_free(cinit_func_name);
     }
     else {
-        load_func = (void *)NULL;
+        load_func = NULL;
         init_func = NULL;
     }
 
@@ -331,7 +331,7 @@ STRING *clone_string_into(Interp *d, Interp *s, PMC *value) {
 static PMC *make_string_pmc(Interp *interp, STRING *string) {
     PMC *ret;
     ret = VTABLE_new_from_string(interp,
-        interp->vtables[enum_class_String]->class,
+        interp->vtables[enum_class_String]->pmc_class,
         string, PObj_constant_FLAG);
     return ret;
 }
@@ -373,10 +373,10 @@ Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc) {
         if (d->n_libs != s->n_libs) {
             INTVAL i;
             if (d->all_op_libs)
-                d->all_op_libs = mem_sys_realloc(d->all_op_libs,
+                d->all_op_libs = (op_lib_t **)mem_sys_realloc(d->all_op_libs,
                     sizeof (op_lib_t *) * s->n_libs);
             else
-                d->all_op_libs = mem_sys_allocate(sizeof (op_lib_t *) *
+                d->all_op_libs = (op_lib_t **)mem_sys_allocate(sizeof (op_lib_t *) *
                     s->n_libs);
             for (i = d->n_libs; i < s->n_libs; ++i)
                 d->all_op_libs[i] = s->all_op_libs[i];

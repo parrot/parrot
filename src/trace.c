@@ -72,7 +72,7 @@ trace_pmc_dump(Interp *interp, PMC* pmc)
     if (PObj_on_free_list_TEST(pmc)) {
         PIO_eprintf(debugger, "**************** PMC is on free list *****\n");
     }
-    if (pmc->vtable->class == pmc) {
+    if (pmc->vtable->pmc_class == pmc) {
         STRING * const name = trace_class_name(interp, pmc);
         PIO_eprintf(debugger, "Class=%Ss:PMC(%#p)", name, pmc);
     }

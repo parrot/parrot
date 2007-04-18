@@ -325,7 +325,7 @@ again:
                 break;
             chunk_size = 1024;
             program_code =
-                mem_sys_realloc(program_code, program_size + chunk_size);
+                (char *)mem_sys_realloc(program_code, program_size + chunk_size);
 
             if (!program_code) {
                 PIO_eprintf(interp,
@@ -358,7 +358,7 @@ again:
         }
 
         program_code =
-            mmap(0, program_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
+            (char *)mmap(0, program_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
 
         if (program_code == (void *)MAP_FAILED) {
             Parrot_warn(interp, PARROT_WARNINGS_IO_FLAG,

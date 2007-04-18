@@ -29,7 +29,7 @@ typedef struct _builtin {
     const char *signature;      /* e.g. PP */
     const char *c_ns;           /* namespace */
     STRING *meth_name;          /* internal name e.g. '__cos' */
-    STRING *namespace;          /* same */
+    STRING *_namespace;          /* same */
 } Builtins;
 
 #define N_BUILTINS (int)(sizeof (builtins) / sizeof (builtins[0]))
@@ -116,7 +116,7 @@ Parrot_init_builtins(Interp *interp)
         builtins[i].meth_name = const_string(interp,
                 builtins[i].c_name);
 #endif
-        builtins[i].namespace = const_string(interp,
+        builtins[i]._namespace = const_string(interp,
                 builtins[i].c_ns);
     }
 }
@@ -250,7 +250,7 @@ Parrot_find_builtin(Interp *interp, STRING *func)
                                     func);
     else
         return Parrot_find_global_s(interp,
-                                    builtins[i].namespace,
+                                    builtins[i]._namespace,
                                     builtins[i].meth_name);
 }
 

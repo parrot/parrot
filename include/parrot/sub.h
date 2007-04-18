@@ -102,8 +102,6 @@ typedef enum {
 #define Sub_comp_INIT_SET(o) Sub_comp_flag_SET(PF_INIT, o)
 #define Sub_comp_INIT_CLEAR(o) Sub_comp_flag_CLEAR(PF_INIT, o)
 
-union parrot_context_t;
-
 /*
  * a flag to signal a Sub that a new RetContinuation should be created
  */
@@ -157,7 +155,7 @@ typedef struct Parrot_coro {
     size_t   end_offs;
 
     INTVAL   HLL_id;             /* see src/hll.c XXX or per segment? */
-    PMC      *namespace;         /* where this Sub is in - this is either
+    PMC      *_namespace;        /* where this Sub is in - this is either
                                   * a String or a [Key] and describes
                                   * the relative path in the NameSpace
                                   */

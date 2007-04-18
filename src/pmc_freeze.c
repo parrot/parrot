@@ -1430,7 +1430,7 @@ run_thaw(Parrot_Interp interp, STRING* image, visit_enum_type what)
      */
     LVALUE_CAST(char *, image->strstart) -= bufused;
     image->bufused = bufused;
-    assert(image->strstart >= PObj_bufstart(image));
+    assert(image->strstart >= (char *)PObj_bufstart(image));
 
     if (dod_block) {
         Parrot_unblock_DOD(interp);

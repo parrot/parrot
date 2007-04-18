@@ -256,7 +256,7 @@ a Key PMC that you can use with "new", for example.
 
 op classname(out PMC, invar PMC) :object_base {
     PMC *ns = Parrot_NameSpace_nci_get_name(interp,
-                                    VTABLE_namespace(interp, $2));
+                                    VTABLE_pmc_namespace(interp, $2));
     if (PMC_IS_NULL(ns) || VTABLE_elements(interp, ns) < 2)
     {
         real_exception(interp, NULL, NO_CLASS,
@@ -354,7 +354,7 @@ op getclass(out PMC, in INT) {
     if (typ < 1 || typ >= interp->n_vtable_max)
         real_exception(interp, NULL, E_ValueError,
                 "type number out of range");
-    $1 = interp->vtables[typ]->class;
+    $1 = interp->vtables[typ]->pmc_class;
     goto NEXT();
 }
 
@@ -369,13 +369,13 @@ OR IF YOU NEED THIS (OR INSTANTIATE), TELL CHIP
 =cut
 
 op new(out PMC, in INT, in STR) {
-  PMC *class;
+  PMC *_class;
   if ($2 <= 0 || $2 >= interp->n_vtable_max) {
     real_exception(interp, 0, NO_CLASS,
                    "Illegal PMC enum (%d) in new", (int)$2);
   }
-  class = interp->vtables[$2]->class;
-  $1 = VTABLE_new_from_string(interp, class, $3, 0);
+  _class = interp->vtables[$2]->pmc_class;
+  $1 = VTABLE_new_from_string(interp, _class, $3, 0);
   goto NEXT();
 }
 
@@ -392,7 +392,7 @@ OR IF YOU NEED IT, TELL CHIP
 
 op instantiate(out PMC) {
   opcode_t* arg_op;
-  PMC *sig, *class;
+  PMC *sig, *_class;
   int typ;
 
   arg_op = interp->current_args;
@@ -413,18 +413,18 @@ op instantiate(out PMC) {
               real_exception(interp, NULL, E_ValueError,
                       "Illegal PMC enum (%d) in instantiate", typ);
           }
-          class = interp->vtables[typ]->class;
+          _class = interp->vtables[typ]->pmc_class;
           break;
       case PARROT_ARG_P:
-          class = REG_PMC(arg_op[2]);
+          _class = REG_PMC(arg_op[2]);
           break;
       default:
           internal_exception(UNIMPLEMENTED,
                   "uninplement class argument in instantiate");
-          class = NULL; /* just for cc */
+          _class = NULL; /* just for cc */
           break;
   }
-  $1 = VTABLE_instantiate(interp, class, sig);
+  $1 = VTABLE_instantiate(interp, _class, sig);
   interp->current_args = NULL;
   goto NEXT();
 }

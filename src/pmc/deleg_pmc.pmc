@@ -79,7 +79,7 @@ pmclass deleg_pmc no_ro {
         return SUPER(method_name);
     }
 
-    PMC* namespace() {
+    PMC* pmc_namespace() {
         return SELF->vtable->_namespace;
     }
 

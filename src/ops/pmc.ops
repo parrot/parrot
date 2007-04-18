@@ -79,45 +79,45 @@ op new(out PMC, in INT, in PMC) {
 }
 
 op new(out PMC, inconst STR) {
-    STRING *class = $2;
-    INTVAL type = pmc_type(interp, class);
+    STRING *_class = $2;
+    INTVAL type = pmc_type(interp, _class);
     if (!type)
-        type = pmc_type(interp, class);
+        type = pmc_type(interp, _class);
     if (type <= 0)
         real_exception(interp, NULL, NO_CLASS,
-            "Class '%Ss' not found", class);
+            "Class '%Ss' not found", _class);
   $1 = pmc_new(interp, type);
   goto NEXT();
 }
 
 op new(out PMC, inconst STR, in PMC) {
-    STRING *class = $2;
-    INTVAL type = pmc_type(interp, class);
+    STRING *_class = $2;
+    INTVAL type = pmc_type(interp, _class);
     if (!type)
-        type = pmc_type(interp, class);
+        type = pmc_type(interp, _class);
     if (type <= 0)
         real_exception(interp, NULL, NO_CLASS,
-            "Class '%Ss' not found", class);
+            "Class '%Ss' not found", _class);
     $1 = pmc_new_init(interp, type, $3);
     goto NEXT();
 }
 
 inline op new(out PMC, inconst PMC) :object_classes {
-    PMC *class = $2;
-    INTVAL type = pmc_type_p(interp, class);
+    PMC *_class = $2;
+    INTVAL type = pmc_type_p(interp, _class);
     if (type <= 0)
         real_exception(interp, NULL, NO_CLASS,
-            "Class '%Ss' not found", readable_name(interp, class));
+            "Class '%Ss' not found", readable_name(interp, _class));
     $1 = pmc_new(interp, type);
     goto NEXT();
 }
 
 op new(out PMC, inconst PMC, in PMC) {
-    PMC *class = $2;
-    INTVAL type = pmc_type_p(interp, class);
+    PMC *_class = $2;
+    INTVAL type = pmc_type_p(interp, _class);
     if (type <= 0)
         real_exception(interp, NULL, NO_CLASS,
-            "Class '%Ss' not found", readable_name(interp, class));
+            "Class '%Ss' not found", readable_name(interp, _class));
     $1 = pmc_new_init(interp, type, $3);
     goto NEXT();
 }
@@ -201,15 +201,15 @@ op find_type(out INT, in PMC) {
     else if ((n = VTABLE_elements(interp, $2)) <= 0)
         $1 = 0;
     else {
-        PMC *class = interp->class_hash;
+        PMC *_class = interp->class_hash;
         INTVAL i;
         for (i = 0; i < n; ++i) {
             STRING *part = VTABLE_get_string_keyed_int(interp, $2, i);
-            class = VTABLE_get_pmc_keyed_str(interp, class, part);
-            if (PMC_IS_NULL(class))
+            _class = VTABLE_get_pmc_keyed_str(interp, _class, part);
+            if (PMC_IS_NULL(_class))
                 break;
         }
-        $1 = PMC_IS_NULL(class) ? 0 : PMC_int_val(class);
+        $1 = PMC_IS_NULL(_class) ? 0 : PMC_int_val(_class);
     }
     goto NEXT();
 }

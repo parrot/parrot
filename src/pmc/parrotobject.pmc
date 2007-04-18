@@ -94,12 +94,12 @@ TODO
          */
         if ((UINTVAL)SELF->vtable == 0xdeadbeef)
             return;
-        class = SELF->vtable->class;
+        class = SELF->vtable->pmc_class;
         if ((UINTVAL)class->vtable == 0xdeadbeef)
             return;
         if (PObj_get_FLAGS(SELF) & PObj_need_finalize_FLAG) {
             fin = CONST_STRING(INTERP, "__finalize");
-            ns = VTABLE_namespace(interp, class);
+            ns = VTABLE_pmc_namespace(interp, class);
             meth = VTABLE_get_pmc_keyed_str(interp, ns, fin);
             if (!PMC_IS_NULL(meth)) {
                 /*
@@ -247,7 +247,7 @@ Return the class of this object.
                  */
                 int type_num = SELF->vtable->base_type;
 
-                return INTERP->vtables[type_num]->class;
+                return INTERP->vtables[type_num]->pmc_class;
             }
          }
         return (PMC*) Parrot_run_meth_fromc_args(interp, sub,
@@ -581,7 +581,7 @@ it's just SUPER aka the default implementation.
          */
         {
             PMC *new_class;
-            new_class = ret->vtable->class;
+            new_class = ret->vtable->pmc_class;
             assert(new_class);
             assert(ret->vtable->share_ro == Parrot_ParrotObject_share_ro);
             SET_CLASS((SLOTTYPE *) PMC_data(ret), ret, new_class);
@@ -618,7 +618,7 @@ Used to unarchive the object.
         class_data = (PMC **)PMC_data(SELF);
 
         /* 1) visit class */
-        pos = &SELF->vtable->class;
+        pos = &SELF->vtable->pmc_class;
         info->thaw_ptr = pos;
         (info->visit_pmc_now)(INTERP, *pos, info);
 
@@ -646,8 +646,8 @@ Used to unarchive the object.
     }
 
     void thawfinish(visit_info *info) {
-        PMC *class = SELF->vtable->class;
-        PMC *vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(class),
+        PMC *_class = SELF->vtable->pmc_class;
+        PMC *vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(_class),
                 PCD_OBJECT_VTABLE);
         SELF->vtable = PMC_struct_val(vtable_pmc);
         set_attrib_flags(SELF);

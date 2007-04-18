@@ -15,7 +15,7 @@ sub prederef {
     PMC *real_pmc;
     Parrot_STM_PMC_handle handle;
 
-    assert(pmc->vtable->class != pmc);
+    assert(pmc->vtable->pmc_class != pmc);
 
     handle = PMC_struct_val(pmc);
 EOC

@@ -35,9 +35,9 @@ Return datatype C<enum> for C<STRING*> typename.
 */
 
 INTVAL
-Parrot_get_datatype_enum(Interp *interp, STRING *typename)
+Parrot_get_datatype_enum(Interp *interp, STRING *_typename)
 {
-    char *type = string_to_cstring(interp, typename);
+    char *type = string_to_cstring(interp, _typename);
     int i;
 
     for (i = enum_first_type; i < enum_last_type; i++) {

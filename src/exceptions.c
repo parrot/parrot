@@ -121,7 +121,7 @@ describe them as well.\n\n");
     fprintf(stderr, "Architecture: %s\n", PARROT_ARCHNAME);
     fprintf(stderr, "JIT Capable : %s\n", JIT_CAPABLE ? "Yes" : "No");
     if (interp)
-        fprintf(stderr, "Interp Flags: %#x\n", interp->flags);
+        fprintf(stderr, "Interp Flags: %#x\n", (unsigned int)interp->flags);
     else
         fprintf(stderr, "Interp Flags: (no interpreter)\n");
     fprintf(stderr, "Exceptions  : %s\n", "(missing from core)");
@@ -646,8 +646,7 @@ execution then resumes.
 
 */
 void
-do_exception(Interp *interp,
-        exception_severity severity, long error)
+do_exception(Interp *interp, INTVAL severity, long error)
 {
     Parrot_exception * const the_exception = interp->exceptions;
 

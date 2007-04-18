@@ -94,7 +94,7 @@ Find the method for C<*name> in the parent class of the bound object.
     }
 
     PMC* find_method(STRING* name) {
-        PMC *mro, *class;
+        PMC *mro, *_class;
 
         PMC * const obj = PMC_pmc_val(SELF);
         if (PMC_IS_NULL(obj)) {
@@ -103,8 +103,8 @@ Find the method for C<*name> in the parent class of the bound object.
         }
         interp->current_object = obj;
         mro = obj->vtable->mro;
-        class = VTABLE_get_pmc_keyed_int(INTERP, mro, 1);
-        return VTABLE_find_method(INTERP, class, name);
+        _class = VTABLE_get_pmc_keyed_int(INTERP, mro, 1);
+        return VTABLE_find_method(INTERP, _class, name);
     }
 }
 

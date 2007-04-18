@@ -95,7 +95,7 @@ to_ascii(Interp *interp, STRING *src, STRING *dest)
         /* the string can't grow - replace inplace */
         dest = src;
     }
-    p = dest->strstart;
+    p = (unsigned char *)dest->strstart;
     ENCODING_ITER_INIT(interp, src, &iter);
     for (offs = 0; offs < len; ++offs) {
         c = iter.get_and_advance(interp, &iter);
