@@ -371,6 +371,7 @@ IMCC_O_FILES = \
     $(IMCC_DIR)/imcparser$(O) \
     $(IMCC_DIR)/imclexer$(O) \
     $(IMCC_DIR)/imc$(O) \
+    $(IMCC_DIR)/main$(O) \
     $(IMCC_DIR)/symreg$(O) \
     $(IMCC_DIR)/instructions$(O) \
     $(IMCC_DIR)/cfg$(O) \
@@ -425,6 +426,7 @@ INTERP_O_FILES = \
     $(SRC_DIR)/inter_run$(O)  \
     $(SRC_DIR)/gc/register$(O) \
     $(SRC_DIR)/gc/memory$(O) \
+    $(SRC_DIR)/main$(O) \
     $(SRC_DIR)/objects$(O) \
     $(SRC_DIR)/packfile$(O) \
     $(SRC_DIR)/stacks$(O) \
@@ -1081,6 +1083,8 @@ $(IO_DIR)/io_string$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 $(IO_DIR)/io_passdown$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
 $(SRC_DIR)/gc/memory$(O) : $(GENERAL_H_FILES)
+
+$(SRC_DIR)/main$(O) : $(SRC_DIR)/main.c $(GENERAL_H_FILES)
 
 $(SRC_DIR)/pic$(O) : $(GENERAL_H_FILES)
 

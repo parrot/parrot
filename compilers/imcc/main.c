@@ -24,6 +24,11 @@
 
 static int load_pbc, run_pbc, write_pbc, pre_process, pasm_file;
 
+char * parseflags(Interp *interp, int *argc, char **argv[]);
+int    imcc_initialize(Interp *interp);
+int    imcc_run(Interp *interp, const char *sourcefile, int argc,
+                char * argv[]);
+
 static void
 usage(FILE* fp)
 {
@@ -194,7 +199,7 @@ is_all_hex_digits(const char *s)
 }
 
 /* most stolen from test_main.c */
-static char *
+char *
 parseflags(Parrot_Interp interp, int *argc, char **argv[])
 {
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
@@ -511,7 +516,7 @@ imcc_get_optimization_description(Interp *interp, int opt_level, char *opt_desc)
     return;
 }
 
-static int
+int
 imcc_initialize(Interp *interp)
 {
     yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
@@ -592,7 +597,7 @@ imcc_write_pbc(Interp *interp, const char *output_file)
     free(packed);
 }
 
-static int
+int
 imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
 {
     PackFile *pf;
@@ -759,41 +764,6 @@ imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
     IMCC_INFO(interp)->yyscanner = NULL;
     return 0;
 }
-
-int
-main(int argc, char * argv[])
-{
-    char    *sourcefile;
-    Interp  *interp;
-    STRING  *executable_name;
-    PMC     *executable_name_pmc;
-    int      status;
-
-    Parrot_set_config_hash();
-
-    interp     = Parrot_new(NULL);
-    if (!imcc_initialize(interp))
-        internal_exception(1, "Could not initialize IMCC\n");
-
-    /* We parse the arguments, but first store away the name of the Parrot
-       executable, since parsing destroys that and we want to make it
-       available. */
-    executable_name     = string_from_cstring(interp, argv[0], 0);
-    executable_name_pmc = pmc_new(interp, enum_class_String);
-    VTABLE_set_string_native(interp, executable_name_pmc, executable_name);
-    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,
-        executable_name_pmc);
-
-    sourcefile = parseflags(interp, &argc, &argv);
-    status     = imcc_run(interp, sourcefile, argc, argv);
-
-    /* Clean-up after ourselves */
-    Parrot_destroy(interp);
-    Parrot_exit(interp, 0);
-
-    return status;
-}
-
 
 /*
  * Local variables:

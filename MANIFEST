@@ -771,6 +771,7 @@ include/parrot/global_setup.h                               [main]include
 include/parrot/hash.h                                       [main]include
 include/parrot/headers.h                                    [main]include
 include/parrot/hll.h                                        [main]include
+include/parrot/imcc.h                                       [main]include
 include/parrot/inter_call.h                                 [main]include
 include/parrot/interpreter.h                                [main]include
 include/parrot/intlist.h                                    [main]include
@@ -2544,6 +2545,7 @@ src/list.c                                                  []
 src/longopt.c                                               []
 src/malloc-trace.c                                          []
 src/malloc.c                                                []
+src/main.c                                                  []
 src/misc.c                                                  []
 src/mmd.c                                                   []
 src/nci_test.c                                              []
