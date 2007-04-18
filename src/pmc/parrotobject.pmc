@@ -29,12 +29,12 @@ F<src/objects.c>, at least for right now.
 /* XXX duplicated from delegate.pmc */
 static PMC *
 find_meth(Interp* interp, PMC *pmc, STRING *meth) {
-    PMC *class = pmc;
+    PMC *_class = pmc;
 
     if (PObj_is_object_TEST(pmc)) {
-        class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
+        _class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
     }
-    return Parrot_find_method_with_cache(interp, class, meth);
+    return Parrot_find_method_with_cache(interp, _class, meth);
 }
 
 pmclass ParrotObject extends ParrotClass need_ext {
@@ -86,7 +86,7 @@ TODO
 */
 
     void destroy() {
-        PMC* class;
+        PMC* _class;
         PMC* meth, *ns;
         STRING* fin;
 
@@ -94,12 +94,12 @@ TODO
          */
         if ((UINTVAL)SELF->vtable == 0xdeadbeef)
             return;
-        class = SELF->vtable->pmc_class;
-        if ((UINTVAL)class->vtable == 0xdeadbeef)
+        _class = SELF->vtable->pmc_class;
+        if ((UINTVAL)_class->vtable == 0xdeadbeef)
             return;
         if (PObj_get_FLAGS(SELF) & PObj_need_finalize_FLAG) {
             fin = CONST_STRING(INTERP, "__finalize");
-            ns = VTABLE_pmc_namespace(interp, class);
+            ns = VTABLE_pmc_namespace(interp, _class);
             meth = VTABLE_get_pmc_keyed_str(interp, ns, fin);
             if (!PMC_IS_NULL(meth)) {
                 /*
@@ -127,8 +127,8 @@ XXX - this is bad and should go
 */
 
     STRING* name() {
-        PMC *class = VTABLE_get_class(INTERP, SELF);
-        return VTABLE_name(INTERP, class);
+        PMC *_class = VTABLE_get_class(INTERP, SELF);
+        return VTABLE_name(INTERP, _class);
     }
 
 
@@ -163,14 +163,14 @@ Return the class of this object.
 */
 
     PMC* find_method(STRING* name) {
-        PMC *class = VTABLE_get_class(INTERP, SELF);
+        PMC *_class = VTABLE_get_class(INTERP, SELF);
         STRING *meth = CONST_STRING(interp, "__find_method");
         STRING *meth_v = CONST_STRING(interp, "find_method");
         PMC *sub = Parrot_find_vtable_meth(interp, SELF, meth_v);
         if (PMC_IS_NULL(sub))
             sub = find_meth(interp, SELF, meth);
         if (PMC_IS_NULL(sub))
-            return VTABLE_find_method(INTERP, class, name);
+            return VTABLE_find_method(INTERP, _class, name);
         return (PMC*) Parrot_run_meth_fromc_args(interp, sub,
             SELF, meth, "PS", name);
     }

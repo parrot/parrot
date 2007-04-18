@@ -1225,7 +1225,7 @@ Recursively make the array read-only and shared.
 
 */
     PMC* share_ro() {
-        PMC *true;
+        PMC *_true;
         PMC *ret;
 
         /* prevent infinite recursion */
@@ -1234,13 +1234,13 @@ Recursively make the array read-only and shared.
                            "something that already is shared");
         }
 
-        true = pmc_new(INTERP, enum_class_Integer);
-        VTABLE_set_integer_native(INTERP, true, 1);
+        _true = pmc_new(INTERP, enum_class_Integer);
+        VTABLE_set_integer_native(INTERP, _true, 1);
 
         ret = pt_shared_fixup(INTERP, SELF);
 
         /* first set readonly */
-        VTABLE_setprop(INTERP, ret, const_string(INTERP, "_ro"), true);
+        VTABLE_setprop(INTERP, ret, const_string(INTERP, "_ro"), _true);
 
         /* XXX do something that deals better with sparse lists */
         {

@@ -108,11 +108,11 @@ Returns whether the class is or inherits from C<*classname>.
 */
 
     INTVAL isa(STRING* classname) {
-        PMC *class;
+        PMC *_class;
         if (SUPER(classname))
             return 1;
-        class = Parrot_class_lookup(INTERP, classname);
-        return Parrot_object_isa(INTERP, SELF, class);
+        _class = Parrot_class_lookup(INTERP, classname);
+        return Parrot_object_isa(INTERP, SELF, _class);
     }
 
 
@@ -265,13 +265,13 @@ Create the class from the thawed parents and attributes array.
 
     void thawfinish(visit_info *info) {
         INTVAL i, n, nold;
-        PMC * class;
+        PMC *_class;
         PMC *parents, *attribs, *old;
         PMC **class_data;
         int parent_not_class = 0;
 
-        class = SELF;
-        class_data = (PMC**)(PMC_data(class));
+        _class = SELF;
+        class_data = (PMC**)(PMC_data(_class));
 
         old = class_data[PCD_PARENTS];
         nold = VTABLE_elements(INTERP, old);
@@ -293,7 +293,7 @@ Create the class from the thawed parents and attributes array.
                     parent_not_class++;
                     parent_class = parent_class->vtable->pmc_class;
                 }
-                Parrot_add_parent(INTERP, class, parent_class);
+                Parrot_add_parent(INTERP, _class, parent_class);
             }
         }
         /*
@@ -317,7 +317,7 @@ Create the class from the thawed parents and attributes array.
              * Parrot_add_parent() and must be first
              */
             for (i = parent_not_class ? 1 : 0; i < n; ++i) {
-                Parrot_add_attribute(INTERP, class,
+                Parrot_add_attribute(INTERP, _class,
                         VTABLE_get_string_keyed_int(INTERP, attribs, i));
             }
         }
@@ -336,11 +336,11 @@ Returns the array of parents for this class.
 */
 
     METHOD PMC* get_parents() {
-        PMC * class;
+        PMC *_class;
         PMC **class_data;
 
-        class      = SELF;
-        class_data = (PMC**)(PMC_data(class));
+        _class     = SELF;
+        class_data = (PMC**)(PMC_data(_class));
         return class_data[PCD_PARENTS];
     }
 

@@ -629,22 +629,22 @@ Replace the string at C<key> with the chr of C<value>.
     }
 /*
 
-=item C<void replace(STRING* orig, STRING* new)>
+=item C<void replace(STRING* orig, STRING* _new)>
 
-Replace every occurrence of C<orig> with C<new>.
+Replace every occurrence of C<orig> with C<_new>.
 
 =cut
 
 */
 
-    METHOD void replace(STRING* orig, STRING* new) {
+    METHOD void replace(STRING* orig, STRING* _new) {
         INTVAL i  = 0;
         INTVAL old_len = string_length(INTERP, orig);
-        INTVAL new_len = string_length(INTERP, new);
+        INTVAL new_len = string_length(INTERP, _new);
         STRING *s = VTABLE_get_string(INTERP, SELF);
 
         while (-1 != (i = string_str_index(INTERP, s, orig, i))) {
-            (void)string_replace(INTERP, s, i, old_len, new, NULL);
+            (void)string_replace(INTERP, s, i, old_len, _new, NULL);
             i += new_len;
         }
         VTABLE_set_string_native(INTERP, SELF, s);

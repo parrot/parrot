@@ -310,16 +310,16 @@ find_global_label(char *name, struct subs *sym, int *pc)
     *pc = 0;
     for (s = globals.cs->first; s; s = s->next) {
 #if 0
-        fprintf(stderr, "namespace %s\n", s->unit->namespace ?
-                s->unit->namespace->name : "(null");
+        fprintf(stderr, "namespace %s\n", s->unit->_namespace ?
+                s->unit->_namespace->name : "(null");
 #endif
         r = s->unit->instructions->r[0];
         /* if names and namespaces are matching - ok */
         if (r && !strcmp(r->name, name) &&
-                    ((sym->unit->namespace && s->unit->namespace &&
-                     !strcmp(sym->unit->namespace->name,
-                         s->unit->namespace->name))
-                    || (!sym->unit->namespace && !s->unit->namespace))) {
+                    ((sym->unit->_namespace && s->unit->_namespace &&
+                     !strcmp(sym->unit->_namespace->name,
+                         s->unit->_namespace->name))
+                    || (!sym->unit->_namespace && !s->unit->_namespace))) {
             return s;
         }
         *pc += s->size;
@@ -654,8 +654,8 @@ add_const_pmc_sub(Interp *interp, SymReg *r,
 
     unit = globals.cs->subs->unit;
 
-    if (unit->namespace) {
-        ns = unit->namespace->reg;
+    if (unit->_namespace) {
+        ns = unit->_namespace->reg;
         IMCC_debug(interp, DEBUG_PBC_CONST,
                 "name space const = %d ns name '%s'\n",
                 ns->color, ns->name);
@@ -950,7 +950,7 @@ static void
 make_pmc_const(Interp *interp, SymReg *r)
 {
     STRING *s;
-    PMC *p, *class;
+    PMC *p, *_class;
     int k;
 
     if (*r->name == '"')
@@ -960,8 +960,8 @@ make_pmc_const(Interp *interp, SymReg *r)
         s = string_unescape_cstring(interp, r->name + 1, '\'', NULL);
     else
         s = string_unescape_cstring(interp, r->name, 0, NULL);
-    class = interp->vtables[r->pmc_type]->pmc_class;
-    p = VTABLE_new_from_string(interp, class, s, PObj_constant_FLAG);
+    _class = interp->vtables[r->pmc_type]->pmc_class;
+    p = VTABLE_new_from_string(interp, _class, s, PObj_constant_FLAG);
     /* append PMC constant */
     k = PDB_extend_const_table(interp);
     interp->code->const_table->constants[k]->type = PFC_PMC;

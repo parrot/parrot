@@ -933,13 +933,13 @@ be greyed or the aggregate must be rescanned - by greying it.
 
 
 void
-Parrot_dod_ims_wb(Interp* interp, PMC *agg, PMC *new)
+Parrot_dod_ims_wb(Interp* interp, PMC *agg, PMC *_new)
 {
 #if DOD_IMS_GREY_NEW
     IMS_DEBUG((stderr, "%d agg %p mark %p\n",
                 ((Gc_ims_private *)interp->arena_base->
-                gc_private)->state, agg, new));
-    pobject_lives(interp, (PObj*)new);
+                gc_private)->state, agg, _new));
+    pobject_lives(interp, (PObj*)_new);
 #else
     PObj_get_FLAGS(agg) &= ~ (PObj_live_FLAG|PObj_custom_GC_FLAG);
     pobject_lives(interp, (PObj*)agg);

@@ -206,7 +206,7 @@ sub runstep {
                 . "-Wvariadic-macros "
                 . "-Wno-discard-qual "
                 . "-Wno-pointer-sign ",
-            4.1 => "",
+            4.1 => "-Wc++-compat",
             4.2 => "",
 
             # -Wsequence-point is part of -Wall

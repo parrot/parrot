@@ -40,12 +40,12 @@ Finds and returns the delegated method with string C<name>.
 
 static PMC *
 find_meth(Interp *interp, PMC *pmc, STRING *meth) {
-    PMC *class = pmc;
+    PMC *_class = pmc;
 
     if (PObj_is_object_TEST(pmc)) {
-        class = GET_CLASS(PMC_data(pmc), pmc);
+        _class = GET_CLASS(PMC_data(pmc), pmc);
     }
-    return Parrot_find_method_with_cache(interp, class, meth);
+    return Parrot_find_method_with_cache(interp, _class, meth);
 }
 
 /*
@@ -64,14 +64,14 @@ static PMC *
 find_or_die(Interp *interp, PMC *pmc, STRING *meth) {
     PMC *returnPMC = find_meth(interp, pmc, meth);
     if (PMC_IS_NULL(returnPMC)) {
-        PMC *class = pmc;
+        PMC *_class = pmc;
         if (PObj_is_object_TEST(pmc)) {
-            class = GET_CLASS(PMC_data(pmc), pmc);
+            _class = GET_CLASS(PMC_data(pmc), pmc);
             real_exception(interp, NULL, E_LookupError,
                 "Can't find method '%s' for object '%s'",
                 string_to_cstring(interp, meth),
                 string_to_cstring(interp, PMC_str_val(
-                        get_attrib_num((SLOTTYPE *)PMC_data(class),
+                        get_attrib_num((SLOTTYPE *)PMC_data(_class),
                             PCD_CLASS_NAME))));
         }
         else {
@@ -105,15 +105,15 @@ is true then an exception will be raised if the method is not found.
 */
 
 static void
-noarg_noreturn(Interp *interp, PMC *obj, PMC* class,
+noarg_noreturn(Interp *interp, PMC *obj, PMC* _class,
         const char *name, int die)
 {
     STRING *meth = const_string(interp, name);
     STRING *meth_v = const_string(interp, name + 2);
-    PMC *method = Parrot_find_vtable_meth(interp, class, meth);
+    PMC *method = Parrot_find_vtable_meth(interp, _class, meth);
     if (PMC_IS_NULL(method))
-        method = die ? find_or_die(interp, class, meth) :
-            find_meth(interp, class, meth);
+        method = die ? find_or_die(interp, _class, meth) :
+            find_meth(interp, _class, meth);
     if (PMC_IS_NULL(method)) {
         if (Interp_trace_TEST(interp, PARROT_TRACE_FIND_METH_FLAG)) {
             PIO_eprintf(interp, "# not found\n");
@@ -153,8 +153,8 @@ useful defaults and don't throw exceptions.
         noarg_noreturn(INTERP, SELF, SELF, PARROT_VTABLE_INIT_METHNAME, 0);
     }
 
-    void init_pmc(PMC* class) {
-        noarg_noreturn(INTERP, SELF, class, PARROT_VTABLE_INIT_METHNAME, 0);
+    void init_pmc(PMC* _class) {
+        noarg_noreturn(INTERP, SELF, _class, PARROT_VTABLE_INIT_METHNAME, 0);
     }
 
     void destroy() {

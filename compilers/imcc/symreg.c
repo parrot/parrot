@@ -19,16 +19,16 @@ void
 push_namespace(char * name)
 {
     Namespace * ns = (Namespace *) malloc(sizeof (*ns));
-    ns->parent = namespace;
+    ns->parent = _namespace;
     ns->name = name;
     ns->idents = NULL;
-    namespace = ns;
+    _namespace = ns;
 }
 
 void
 pop_namespace(char * name)
 {
-    Namespace * ns = namespace;
+    Namespace * ns = _namespace;
     if (ns == NULL) {
         fprintf(stderr, "pop() on empty namespace stack\n");
         abort();
@@ -46,7 +46,7 @@ pop_namespace(char * name)
         free(ident);
     }
 
-    namespace = ns->parent;
+    _namespace = ns->parent;
     free(ns);
 }
 
@@ -160,13 +160,13 @@ add_namespace(Parrot_Interp interp, IMC_Unit *unit)
 
     if (!ns)
         return;
-    if (unit->namespace)
+    if (unit->_namespace)
         return;
-    if (unit->prev && unit->prev->namespace == ns)
-        unit->namespace = ns;
+    if (unit->prev && unit->prev->_namespace == ns)
+        unit->_namespace = ns;
     else {
         g = dup_sym(ns);
-        unit->namespace = g;
+        unit->_namespace = g;
         g->reg = ns;
         g->type = VT_CONSTP;
         if (! (r = _get_sym(&IMCC_INFO(interp)->ghash, g->name)) ||
@@ -269,21 +269,21 @@ _mk_fullname(Namespace * ns, const char * name)
 char *
 mk_fullname(const char * name)
 {
-    return _mk_fullname(namespace, name);
+    return _mk_fullname(_namespace, name);
 }
 
 /* Makes a new identifier */
 SymReg *
 mk_ident(Interp *interp, char * name, int t)
 {
-    char * fullname = _mk_fullname(namespace, name);
+    char * fullname = _mk_fullname(_namespace, name);
     Identifier * ident;
     SymReg * r;
-    if (namespace) {
+    if (_namespace) {
         ident = calloc(1, sizeof (struct ident_t));
         ident->name = fullname;
-        ident->next = namespace->idents;
-        namespace->idents = ident;
+        ident->next = _namespace->idents;
+        _namespace->idents = ident;
     }
     r = mk_symreg(interp, fullname, t);
     r->type = VTIDENTIFIER;
@@ -565,10 +565,10 @@ mk_label_address(Interp *interp, char * name)
 SymReg *
 dup_sym(SymReg *r)
 {
-    SymReg * new = mem_sys_allocate(sizeof (SymReg));
-    memcpy(new, r, sizeof (SymReg));
-    new->name = str_dup(r->name);
-    return new;
+    SymReg * new_sym = mem_allocate_typed(SymReg);
+    memcpy(new_sym, r, sizeof (SymReg));
+    new_sym->name = str_dup(r->name);
+    return new_sym;
 }
 
 SymReg *
@@ -789,7 +789,7 @@ SymReg *
 find_sym(Interp *interp, const char * name)
 {
     if (IMCC_INFO(interp)->cur_unit)
-        return _find_sym(interp, namespace, &IMCC_INFO(interp)->cur_unit->hash, name);
+        return _find_sym(interp, _namespace, &IMCC_INFO(interp)->cur_unit->hash, name);
     return NULL;
 }
 

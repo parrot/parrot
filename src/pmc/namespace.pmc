@@ -343,14 +343,14 @@ an invalid type exception if C<namespace> is not a NameSpace PMC or subclass.
 
 */
 
-    METHOD void add_namespace(STRING *name, PMC *namespace) {
+    METHOD void add_namespace(STRING *name, PMC *_namespace) {
         STRING *s_ns = CONST_STRING(INTERP, "NameSpace");
-        if (!VTABLE_isa(INTERP, namespace, s_ns))
+        if (!VTABLE_isa(INTERP, _namespace, s_ns))
             real_exception(INTERP, NULL, E_TypeError,
                 "Invalid type %d in add_namespace()",
-                namespace->vtable->base_type);
+                _namespace->vtable->base_type);
 
-        VTABLE_set_pmc_keyed_str(INTERP, SELF, name, namespace);
+        VTABLE_set_pmc_keyed_str(INTERP, SELF, name, _namespace);
         return;
     }
 

@@ -24,24 +24,24 @@ Implements an instance of a class.
 /* This finds the index of an attribute in an object's attribute store and
  * returns it. Returns -1 if the attribute does not exist. */
 static INTVAL get_attrib_index(Parrot_Interp interp, PMC *self, STRING *name) {
-    Parrot_Class *class = PARROT_CLASS(self);
+    Parrot_Class *_class = PARROT_CLASS(self);
 
     /* If we can't find the attribute, we hand back -1. */
     INTVAL index = -1;
 
     /* First see if we can find it in the cache. */
-    if (VTABLE_exists_keyed_str(interp, class->attrib_cache, name)) {
+    if (VTABLE_exists_keyed_str(interp, _class->attrib_cache, name)) {
         /* Yay! We got a cache hit! */
-        index = VTABLE_get_integer_keyed_str(interp, class->attrib_cache, name);
+        index = VTABLE_get_integer_keyed_str(interp, _class->attrib_cache, name);
     }
     else {
         /* No hit. We need to walk up the list of parents to try and find the
          * attribute. */
-        int num_classes = VTABLE_elements(interp, class->all_parents);
+        int num_classes = VTABLE_elements(interp, _class->all_parents);
         int i;
         for (i = 0; i < num_classes; i++) {
             /* Get the class and its attribute metadata hash. */
-            PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, class->all_parents, i);
+            PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
             Parrot_Class *class_info = PARROT_CLASS(cur_class);
 
             /* Build a string representing the fully qualified attribute name. */
@@ -49,10 +49,10 @@ static INTVAL get_attrib_index(Parrot_Interp interp, PMC *self, STRING *name) {
             fq_name = string_append(interp, fq_name, name);
 
             /* Look up. */
-            if (VTABLE_exists_keyed_str(interp, class->attrib_index, fq_name)) {
+            if (VTABLE_exists_keyed_str(interp, _class->attrib_index, fq_name)) {
                 /* Found it. Get value, cache it and we're done. */
-                index = VTABLE_get_integer_keyed_str(interp, class->attrib_index, fq_name);
-                VTABLE_set_integer_keyed_str(interp, class->attrib_cache, name, index);
+                index = VTABLE_get_integer_keyed_str(interp, _class->attrib_index, fq_name);
+                VTABLE_set_integer_keyed_str(interp, _class->attrib_cache, name, index);
                 break;
             }
         }
@@ -188,15 +188,15 @@ Walks the MRO of the class and finds the method with the given name.
     PMC* find_method(STRING *name)
     {
         Parrot_Object *obj = PARROT_OBJECT(SELF);
-        Parrot_Class *class = PARROT_CLASS(obj->_class);
+        Parrot_Class *_class = PARROT_CLASS(obj->_class);
         PMC *method = PMCNULL;
 
         /* Walk and search. One day, we'll use the cache first. */
-        int num_classes = VTABLE_elements(interp, class->all_parents);
+        int num_classes = VTABLE_elements(interp, _class->all_parents);
         int i;
         for (i = 0; i < num_classes; i++) {
             /* Get the class and see if it has the method. */
-            PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, class->all_parents, i);
+            PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
             Parrot_Class *class_info = PARROT_CLASS(cur_class);
             if (VTABLE_exists_keyed_str(interp, class_info->methods, name)) {
                 /* Found it! */

@@ -898,7 +898,7 @@ Returns whether the PMC "does" perform C<*interface>.
 
 /*
 
-=item C<INTVAL isa(STRING *class)>
+=item C<INTVAL isa(STRING *_class)>
 
 Returns whether the PMC "isa" C<*class>.
 
@@ -906,9 +906,9 @@ Returns whether the PMC "isa" C<*class>.
 
 */
 
-    INTVAL isa(STRING* class) {
+    INTVAL isa(STRING* _class) {
         /* TODO FIXME - walk mro */
-        return does_isa(INTERP, class, SELF->vtable->isa_str);
+        return does_isa(INTERP, _class, SELF->vtable->isa_str);
     }
 
 /*

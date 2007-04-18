@@ -779,15 +779,15 @@ methods from roles. When called with no parameter, returns the list.
 
 */
     PCCMETHOD void resolve_method(PMC *resolve_list :optional, int got_list :opt_flag) {
-        Parrot_Class *class = PARROT_CLASS(SELF);
+        Parrot_Class *_class = PARROT_CLASS(SELF);
         PMC *ret_list = NULL;
 
         if (got_list) {
             /* Store list. */
-            class->resolve_method = resolve_list;
+            _class->resolve_method = resolve_list;
         }
 
-        ret_list = class->resolve_method;
+        ret_list = _class->resolve_method;
         PCCRETURN(PMC *ret_list);
     }
 
@@ -802,20 +802,20 @@ parameter list.
 
 */
     PCCMETHOD void new(PMC *args :slurpy :named) {
-        Parrot_Class *class = PARROT_CLASS(SELF);
+        Parrot_Class *_class = PARROT_CLASS(SELF);
         PMC *obj;
         PMC *iter;
         Parrot_Object *obj_guts = NULL;
 
         /* If we've not been instantiated before... */
-        if (!class->instantiated) {
+        if (!_class->instantiated) {
             /* Check that we have all methods listed in resolve list. */
-            int resolve_count = VTABLE_elements(interp, class->resolve_method);
+            int resolve_count = VTABLE_elements(interp, _class->resolve_method);
             int i;
             for (i = 0; i < resolve_count; i++) {
                 STRING *check_meth = VTABLE_get_string_keyed_int(interp,
-                    class->resolve_method, i);
-                if (!VTABLE_exists_keyed_str(interp, class->methods, check_meth)) {
+                    _class->resolve_method, i);
+                if (!VTABLE_exists_keyed_str(interp, _class->methods, check_meth)) {
                     real_exception(interp, NULL, METH_NOT_FOUND,
                         "The method '%S' was named in the resolve list, but not supplied",
                         check_meth);
@@ -824,16 +824,16 @@ parameter list.
 
             /* Build full parents list.
              * XXX Need pluggable MRO, for now always do C3. */
-            class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
+            _class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
 
             /* Build attributes index. */
             build_attrib_index(interp, SELF);
-            if (PMC_IS_NULL(class->attrib_index))
+            if (PMC_IS_NULL(_class->attrib_index))
                 return;
         }
 
         /* Set instantiated flag. */
-        class->instantiated = 1;
+        _class->instantiated = 1;
 
         /* Create object. */
         obj = pmc_new_noinit(interp, enum_class_Object);
@@ -982,23 +982,23 @@ Compose a role into a class with the given exclusions and aliases.
             int got_exclude_method :opt_flag,
             PMC* alias_method :optional :named["alias_method"],
             int got_alias_method :opt_flag) {
-        Parrot_Class *class = PARROT_CLASS(SELF);
+        Parrot_Class *_class = PARROT_CLASS(SELF);
 
         /* Add everything on the resolve list to the exclude list; if we have
          * no exclude list, pass along the resolve list in its place if it has
          * any methods listed in it. */
         if (!got_exclude_method) {
-            if (VTABLE_elements(interp, class->resolve_method) != 0) {
-                exclude_method = class->resolve_method;
+            if (VTABLE_elements(interp, _class->resolve_method) != 0) {
+                exclude_method = _class->resolve_method;
                 got_exclude_method = 1;
             }
         }
         else {
-            int resolve_count = VTABLE_elements(interp, class->resolve_method);
+            int resolve_count = VTABLE_elements(interp, _class->resolve_method);
             int i;
             for (i = 0; i < resolve_count; i++) {
                 STRING *meth_name = VTABLE_get_string_keyed_int(interp,
-                    class->resolve_method, i);
+                    _class->resolve_method, i);
                 VTABLE_push_string(interp, exclude_method, meth_name);
             }
         }
@@ -1006,7 +1006,7 @@ Compose a role into a class with the given exclusions and aliases.
         /* Do the composition. */
         Parrot_ComposeRole(interp, role, exclude_method, got_exclude_method,
                            alias_method, got_alias_method,
-                           class->methods, class->roles);
+                           _class->methods, _class->roles);
     }
 
 /*

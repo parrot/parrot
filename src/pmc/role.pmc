@@ -54,7 +54,7 @@ An empty Hash PMC is allocated during initialization.
 /* This is the underlying structure of this PMC. */
 typedef struct Parrot_Role {
     STRING *name;         /* The name of the role. */
-    PMC *namespace;       /* The namespace it's linked to, if any. */
+    PMC *_namespace;      /* The namespace it's linked to, if any. */
     PMC *roles;           /* Any roles that this role is composed from. */
     PMC *methods;         /* Hash of method names to methods in this role. */
     PMC *attrib_metadata; /* Hash of attributes in this role to hashes of metadata. */
@@ -80,21 +80,21 @@ static void init_role_from_hash(Parrot_Interp interp, PMC *self, PMC *info)
         string_from_const_cstring(interp, "namespace", 0));
 
     /* Take a copy of the current namespace the role is attached to. */
-    old_ns = role->namespace;
+    old_ns = role->_namespace;
 
     /* Let's roll (no pun intended!) If we have a namespace and a name,
      * set both. */
     if (have_name && have_ns) {
         /* If we weren't passed a NameSpace PMC, assume it's something we have
          * to look one up with and do so. */
-        PMC *namespace = VTABLE_get_pmc_keyed_str(interp, info,
+        PMC *_namespace = VTABLE_get_pmc_keyed_str(interp, info,
             string_from_const_cstring(interp, "namespace", 0));
-        if (!VTABLE_isa(interp, namespace, string_from_const_cstring(interp, "NameSpace", 0)))
-            namespace = Parrot_make_namespace_autobase(interp, namespace);
+        if (!VTABLE_isa(interp, _namespace, string_from_const_cstring(interp, "NameSpace", 0)))
+            _namespace = Parrot_make_namespace_autobase(interp, _namespace);
 
         /* If we get something null back it's an error; otherwise, store it. */
-        if (!PMC_IS_NULL(namespace))
-            role->namespace = namespace;
+        if (!PMC_IS_NULL(_namespace))
+            role->_namespace = _namespace;
         else
             real_exception(interp, NULL, E_NameError, "Namespace not found");
 
@@ -111,7 +111,7 @@ static void init_role_from_hash(Parrot_Interp interp, PMC *self, PMC *info)
 
         /* Namespace is nested in the current namespace and with the name of
          * the role. */
-        role->namespace = Parrot_make_namespace_keyed_str(interp,
+        role->_namespace = Parrot_make_namespace_keyed_str(interp,
             CONTEXT(interp->ctx)->current_namespace, role->name);
     }
 
@@ -119,31 +119,31 @@ static void init_role_from_hash(Parrot_Interp interp, PMC *self, PMC *info)
     else if (have_ns) {
         /* If we weren't passed a NameSpace PMC, assume it's something we have
          * to look one up with and do so. */
-        PMC *namespace = VTABLE_get_pmc_keyed_str(interp, info,
+        PMC *_namespace = VTABLE_get_pmc_keyed_str(interp, info,
             string_from_const_cstring(interp, "namespace", 0));
-        if (!VTABLE_isa(interp, namespace, string_from_const_cstring(interp, "NameSpace", 0)))
-            namespace = Parrot_make_namespace_autobase(interp, namespace);
+        if (!VTABLE_isa(interp, _namespace, string_from_const_cstring(interp, "NameSpace", 0)))
+            _namespace = Parrot_make_namespace_autobase(interp, _namespace);
 
         /* If we get something null back it's an error; otherwise, store it. */
-        if (!PMC_IS_NULL(namespace))
-            role->namespace = namespace;
+        if (!PMC_IS_NULL(_namespace))
+            role->_namespace = _namespace;
         else
             real_exception(interp, NULL, E_NameError, "Namespace not found");
 
         /* Name is that of the most nested part of the namespace. */
-        role->name = VTABLE_get_string(interp, namespace);
+        role->name = VTABLE_get_string(interp, _namespace);
     }
 
     /* If we were attached to a namespce and are now attached to a new one,
      * need to unset ourselves in the old namespace. */
-    if (!PMC_IS_NULL(old_ns) && role->namespace != old_ns)
+    if (!PMC_IS_NULL(old_ns) && role->_namespace != old_ns)
         Parrot_PCCINVOKE(interp, old_ns,
             string_from_const_cstring(interp, "set_class", 0),
             "P->", PMCNULL);
 
     /* Link namespace to this role, if there is one. */
-    if (!PMC_IS_NULL(role->namespace))
-        Parrot_PCCINVOKE(interp, role->namespace,
+    if (!PMC_IS_NULL(role->_namespace))
+        Parrot_PCCINVOKE(interp, role->_namespace,
             string_from_const_cstring(interp, "set_class", 0),
             "P->", self);
 
@@ -234,7 +234,7 @@ C<init_data>.
         /* Set up the object. */
         role                  = mem_sys_allocate_zeroed(sizeof (Parrot_Role));
         role->name            = CONST_STRING(interp, "");
-        role->namespace       = PMCNULL;
+        role->_namespace      = PMCNULL;
         role->roles           = pmc_new(interp, enum_class_ResizablePMCArray);
         role->methods         = pmc_new(interp, enum_class_Hash);
         role->attrib_metadata = pmc_new(interp, enum_class_Hash);
@@ -279,8 +279,8 @@ Mark referenced strings and PMCs in the structure as live.
         Parrot_Role *role = PARROT_ROLE(SELF);
         if (role->name)
             pobject_lives(interp, (PObj*)role->name);
-        if (role->namespace)
-            pobject_lives(interp, (PObj*)role->namespace);
+        if (role->_namespace)
+            pobject_lives(interp, (PObj*)role->_namespace);
         if (role->roles)
             pobject_lives(interp, (PObj*)role->roles);
         if (role->methods)
@@ -402,7 +402,7 @@ composed into this role.
         }
         else if (string_equal(interp, what, CONST_STRING(interp, "namespace")) == 0) {
             /* Don't clone the namespace, as it's not part of our state. */
-            return role->namespace;
+            return role->_namespace;
         }
         else if (string_equal(interp, what, CONST_STRING(interp, "attributes")) == 0) {
             found = role->attrib_metadata;
@@ -496,7 +496,7 @@ Sets the name of the role, and updates the namespace accoringly.
 /*
 
 =item C<PCCMETHOD void
-    namespace()>
+    pmc_namespace()>
 
 Gets the namespace associated with this role, if any.
 
@@ -504,9 +504,9 @@ Gets the namespace associated with this role, if any.
 
 */
 
-    PCCMETHOD void namespace() {
+    PCCMETHOD void pmc_namespace() {
         Parrot_Role *role = PARROT_ROLE(SELF);
-        PMC *ret_namespace = role->namespace;
+        PMC *ret_namespace = role->_namespace;
         PCCRETURN(PMC *ret_namespace);
     }
 

@@ -48,14 +48,14 @@ Class method to construct an Integer according to passed arguments.
     }
 
     PMC* instantiate(PMC* sig) {
-        PMC * const class = REG_PMC(2);
+        PMC * const _class = REG_PMC(2);
         const int argcP = REG_INT(3);
         const int argcS = REG_INT(2);
 
         return PMCNULL; /* XXX This looks wrong, since we skip all the
                          * following code */
 
-        SELF = pmc_new(INTERP, class->vtable->base_type);
+        SELF = pmc_new(INTERP, _class->vtable->base_type);
         if (argcS == 1 && argcP == 1) {
             PMC_struct_val(SELF) = REG_STR(5);
             PObj_key_is_string_SET(SELF);

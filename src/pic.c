@@ -556,15 +556,15 @@ parrot_PIC_prederef(Interp *interp, opcode_t op, void **pc_pred, int core)
     switch (op) {
         case PARROT_OP_new_p_sc:
             {
-                STRING *class;
+                STRING *_class;
                 INTVAL type;
-                class = (STRING *)cur_opcode[2];
-                type = pmc_type(interp, class);
+                _class = (STRING *)cur_opcode[2];
+                type = pmc_type(interp, _class);
                 if (!type)
-                    type = pmc_type(interp, class);
+                    type = pmc_type(interp, _class);
                 if (type <= 0)
                     real_exception(interp, NULL, NO_CLASS,
-                            "Class '%Ss' not found", class);
+                            "Class '%Ss' not found", _class);
                 pc_pred[2] = (void*)type;
                 op = PARROT_OP_new_p_ic;
             }

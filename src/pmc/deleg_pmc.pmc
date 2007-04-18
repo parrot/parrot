@@ -39,7 +39,7 @@ pmclass deleg_pmc no_ro {
     void init() {
     }
 
-    void init_pmc(PMC* class) {
+    void init_pmc(PMC* _class) {
     }
 
     void mark() {
