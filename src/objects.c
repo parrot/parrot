@@ -1931,7 +1931,7 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
              * XXX TODO: multi-method handling. */
             if (VTABLE_exists_keyed_str(interp, methods_hash, method_name)) {
                 /* Conflicts with something already in the class. */
-                real_exception(interp, NULL, ROLE_COMPOSITOIN_METH_CONFLICT,
+                real_exception(interp, NULL, ROLE_COMPOSITION_METH_CONFLICT,
                     "A conflict occurred during role composition due to method '%S'.",
                     method_name);
                 return;
@@ -1940,7 +1940,7 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
             /* What about a conflict with ourslef? */
             if (VTABLE_exists_keyed_str(interp, proposed_add_methods, method_name)) {
                 /* Something very weird is going on. */
-                real_exception(interp, NULL, ROLE_COMPOSITOIN_METH_CONFLICT,
+                real_exception(interp, NULL, ROLE_COMPOSITION_METH_CONFLICT,
                     "A conflict occurred during role composition;"
                     " the method '%S' from the role managed to conflict with itself somehow.",
                     method_name);
@@ -1960,7 +1960,7 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
              * XXX TODO: multi-method handling. */
             if (VTABLE_exists_keyed_str(interp, methods_hash, alias_name)) {
                 /* Conflicts with something already in the class. */
-                real_exception(interp, NULL, ROLE_COMPOSITOIN_METH_CONFLICT,
+                real_exception(interp, NULL, ROLE_COMPOSITION_METH_CONFLICT,
                     "A conflict occurred during role composition"
                     " due to the aliasing of '%S' to '%S'.",
                     method_name, alias_name);
@@ -1969,7 +1969,7 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
 
             /* What about a conflict with ourslef? */
             if (VTABLE_exists_keyed_str(interp, proposed_add_methods, alias_name)) {
-                real_exception(interp, NULL, ROLE_COMPOSITOIN_METH_CONFLICT,
+                real_exception(interp, NULL, ROLE_COMPOSITION_METH_CONFLICT,
                     "A conflict occurred during role composition"
                     " due to the aliasing of '%S' to '%S' (role already has"
                     " a method '%S').",

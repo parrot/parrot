@@ -132,7 +132,7 @@ typedef enum {
         INTERNAL_NOT_IMPLEMENTED,
         ERR_OVERFLOW,
         LOSSY_CONVERSION,
-        ROLE_COMPOSITOIN_METH_CONFLICT
+        ROLE_COMPOSITION_METH_CONFLICT
 } exception_type_enum;
 
 /* &end_gen */
@@ -140,19 +140,20 @@ typedef enum {
 /* &gen_from_enum(except_severity.pasm) subst(s/(\w+)/uc($1)/e) */
 
 typedef enum {
-    EXCEPT_normal = 0,
+    EXCEPT_normal  = 0,
     EXCEPT_warning = 1,
-    EXCEPT_error = 2,
-    EXCEPT_severe = 3,
-    EXCEPT_fatal = 4,
-    EXCEPT_doomed = 5,
-    EXCEPT_exit = 6
+    EXCEPT_error   = 2,
+    EXCEPT_severe  = 3,
+    EXCEPT_fatal   = 4,
+    EXCEPT_doomed  = 5,
+    EXCEPT_exit    = 6
 } exception_severity;
 
 /* &end_gen */
 
-/* Right now there's nothing special for the jump buffer, but there might be one later, so we wrap it in a struct so that we can expand it later */
-struct parrot_exception_t {
+/* Right now there's nothing special for the jump buffer, but there might be
+ * one later, so we wrap it in a struct so that we can expand it later */
+typedef struct parrot_exception_t {
     Parrot_jump_buff destination;       /* jmp_buf */
     exception_severity severity;        /* s. above */
     long error;                         /* exception_type_enum */
@@ -161,9 +162,8 @@ struct parrot_exception_t {
     struct parrot_exception_t *prev;    /* interpreters handler stack */
     long language;                      /* what is this? */
     long system;                        /* what is this? */
-};
+} Parrot_exception;
 
-typedef struct parrot_exception_t Parrot_exception;
 /*
  * user level exception handling
  */
