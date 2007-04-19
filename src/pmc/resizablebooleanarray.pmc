@@ -25,8 +25,14 @@ The C<ResizableBooleanArray PMC> extends the C<FixedBooleanArray PMC>.
 
 
 #define BITS_PER_CHAR 8
-/* MIN_ALLOC is BITS_PER_CHAR * 8 */
+/* MIN_ALLOC is 8 * BITS_PER_CHAR */
 #define MIN_ALLOC 64
+
+/* Round a given size in bits to the nearest allocation unit, then convert it
+ * to bytes. */
+#define ROUND_BYTES(size) (((size) / MIN_ALLOC + 1) * MIN_ALLOC / BITS_PER_CHAR)
+/* Convert a size in bits to a size in bytes */
+#define BITS_TO_BYTES(size) ((size) / BITS_PER_CHAR)
 
 pmclass ResizableBooleanArray extends FixedBooleanArray need_ext does array {
 
@@ -113,7 +119,7 @@ Resizes the array to C<size> elements.
         INTVAL newsize = size + PMC_int_val2(SELF);
         INTVAL oldsize = PMC_int_val(SELF);
 
-        INTVAL new_bitsize, new_bytesize, old_bitsize, old_bytesize;
+        INTVAL new_bytesize, old_bytesize;
 
         /* We are already at the requested size. Yay */
         if (newsize == oldsize)
@@ -127,10 +133,8 @@ Resizes the array to C<size> elements.
         PMC_int_val(SELF) = newsize;
 
         /* convert sizes to bytes */
-        new_bitsize  = (newsize / MIN_ALLOC + 1) * MIN_ALLOC;
-        old_bitsize  = (oldsize / MIN_ALLOC + 1) * MIN_ALLOC;
-        new_bytesize = new_bitsize / BITS_PER_CHAR;
-        old_bytesize = old_bitsize / BITS_PER_CHAR;
+        new_bytesize  = ROUND_BYTES(newsize);
+        old_bytesize  = ROUND_BYTES(oldsize);
 
         /* Nothing allocated yet */
         if (! PMC_data(SELF))
@@ -138,7 +142,7 @@ Resizes the array to C<size> elements.
 
         /* The size is different, and doesn't fit within the current
          * allocation */
-        else if (new_bitsize != old_bitsize) {
+        else if (new_bytesize != old_bytesize) {
             Parrot_UInt1 * old_store = PMC_data(SELF);
             Parrot_UInt1 * new_store = mem_sys_allocate_zeroed(newsize);
             INTVAL         copy_size = new_bytesize < old_bytesize ? new_bytesize : old_bytesize;
@@ -207,17 +211,15 @@ beginning.
             Parrot_UInt1 * const sdOld = PMC_data(SELF);
 
             /* Allocate an extra allocation unit of space in new array */
-            INTVAL oldbitalloc, oldmemsize, newbitalloc, newmemsize;
+            INTVAL oldmemsize, newmemsize;
             Parrot_UInt1 * sdNew = NULL;
-            newbitalloc = ((PMC_int_val(SELF) + MIN_ALLOC) / MIN_ALLOC + 1) * MIN_ALLOC;
-            newmemsize = newbitalloc / BITS_PER_CHAR;
+            newmemsize = ROUND_BYTES(PMC_int_val(SELF) + MIN_ALLOC);
             sdNew = mem_sys_allocate_zeroed(newmemsize);
 
             /* Copy contents of old array to new array, moving the head
              * position forward by one allocation unit (in bytes). */
-            oldbitalloc = (PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC;
-            oldmemsize = oldbitalloc / BITS_PER_CHAR;
-            mem_sys_memmove(sdNew + (MIN_ALLOC / BITS_PER_CHAR), sdOld, oldmemsize);
+            oldmemsize = ROUND_BYTES(PMC_int_val(SELF));
+            mem_sys_memmove(sdNew + (BITS_TO_BYTES(MIN_ALLOC)), sdOld, oldmemsize);
 
             /* Replace old array with new array, and free old array */
             PMC_data(SELF) = sdNew;
@@ -263,17 +265,16 @@ Removes and returns the first element.
          * size, size this thing down */
         if (PMC_int_val2(SELF) >= MIN_ALLOC) {
             /* Allocate one allocation unit less of space in new array */
-            INTVAL oldbitalloc, oldmemsize, newbitalloc, newmemsize;
+            INTVAL newmemsize;
             Parrot_UInt1 * sdNew = NULL;
             Parrot_UInt1 * sdOld = NULL;
-            newbitalloc = ((PMC_int_val(SELF) - MIN_ALLOC) / MIN_ALLOC + 1) * MIN_ALLOC;
-            newmemsize = newbitalloc / BITS_PER_CHAR;
+            newmemsize = ROUND_BYTES(PMC_int_val(SELF) - MIN_ALLOC);
             sdNew = mem_sys_allocate_zeroed(newmemsize);
 
             /* Copy contents of old array to new array, move the head position
              * offset back by one allocation unit (in bytes) */
             sdOld = PMC_data(SELF);
-            mem_sys_memmove(sdNew, sdOld + (MIN_ALLOC / BITS_PER_CHAR), newmemsize);
+            mem_sys_memmove(sdNew, sdOld + (BITS_TO_BYTES(MIN_ALLOC)), newmemsize);
 
             /* Replace old array with new array, and free old array */
             PMC_data(SELF) = sdNew;
@@ -339,7 +340,7 @@ Used to archive the string.
 
         IMAGE_IO * const io = info->image_io;
         STRING *s;
-        const INTVAL size = (PMC_int_val(SELF) / MIN_ALLOC + 1) * MIN_ALLOC / BITS_PER_CHAR;
+        const INTVAL size = ROUND_BYTES(PMC_int_val(SELF));
 
         io->vtable->push_integer(INTERP, io, PMC_int_val2(SELF));
         io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
