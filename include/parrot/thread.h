@@ -16,6 +16,7 @@
 #  include "parrot/parrot.h"
 
 #  define PARROT_HAS_THREADS 1
+#  include "parrot/atomic.h"
 
 #ifndef PARROT_SYNC_PRIMITIVES_DEFINED
 
@@ -143,8 +144,13 @@ typedef enum {
     THREAD_GC_STAGE_SWEEP = THREAD_GC_STAGE_NONE
 } thread_gc_stage_enum;
 
-typedef struct _Shared_gc_info Shared_gc_info;
+typedef struct _Shared_gc_info {
+    thread_gc_stage_enum  gc_stage;
+    Parrot_cond           gc_cond;
+    int                   num_reached;
 
+    Parrot_atomic_integer gc_block_level;
+} Shared_gc_info;
 
 /* TODO use thread pools instead */
 VAR_SCOPE Shared_gc_info *shared_gc_info;
