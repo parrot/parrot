@@ -75,7 +75,7 @@ pass
 OUT
 }
 
-unlink("macro.tempfile");
+unlink('macro.tempfile', 'include.tempfile');
 
 # Local Variables:
 #   mode: cperl
