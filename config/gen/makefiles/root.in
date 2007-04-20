@@ -426,7 +426,6 @@ INTERP_O_FILES = \
     $(SRC_DIR)/inter_run$(O)  \
     $(SRC_DIR)/gc/register$(O) \
     $(SRC_DIR)/gc/memory$(O) \
-    $(SRC_DIR)/main$(O) \
     $(SRC_DIR)/objects$(O) \
     $(SRC_DIR)/packfile$(O) \
     $(SRC_DIR)/stacks$(O) \
@@ -762,25 +761,25 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
 	@echo Invoking Parrot to generate runtime/parrot/include/config.fpmc --cross your fingers
 	$(MINIPARROT) config_lib.pasm > $@
 
-$(PARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+$(PARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/parrot_config$(O) \
     $(MINIPARROT)
 	$(LINK) @ld_out@$@ \
-    $(IMCC_DIR)/main$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC) \
+    $(SRC_DIR)/main$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC) \
     $(SRC_DIR)/parrot_config$(O)
 #
 # TODO build the real miniparrot
 #
-$(MINIPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+$(MINIPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
-	$(LINK) @ld_out@$@ $(IMCC_DIR)/main$(O) \
+	$(LINK) @ld_out@$@ $(SRC_DIR)/main$(O) \
     @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(SRC_DIR)/null_config$(O)
 
-$(INSTALLABLEPARROT) : $(IMCC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+$(INSTALLABLEPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/install_config$(O) \
     $(PARROT)
 	$(LINK) @ld_out@$@ \
-    $(IMCC_DIR)/main$(O) \
+    $(SRC_DIR)/main$(O) \
     $(ALL_PARROT_LIBS) $(LINKFLAGS) $(SRC_DIR)/install_config$(O)
 
 $(SRC_DIR)/parrot_config.c :  runtime/parrot/include/config.fpmc \

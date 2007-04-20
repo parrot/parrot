@@ -9,8 +9,6 @@
  *
  */
 
-#define PARROT_IN_EXTENSION
-
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,15 +17,11 @@
 #include "imc.h"
 #include "parrot/embed.h"
 #include "parrot/longopt.h"
+#include "parrot/imcc.h"
 #include "pbc.h"
 #include "parser.h"
 
 static int load_pbc, run_pbc, write_pbc, pre_process, pasm_file;
-
-char * parseflags(Interp *interp, int *argc, char **argv[]);
-int    imcc_initialize(Interp *interp);
-int    imcc_run(Interp *interp, const char *sourcefile, int argc,
-                char * argv[]);
 
 static void
 usage(FILE* fp)
