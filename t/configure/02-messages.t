@@ -5,22 +5,9 @@
 
 use strict;
 use warnings;
-
-BEGIN {
-    use FindBin qw($Bin);
-    use Cwd qw(cwd realpath);
-    realpath($Bin) =~ m{^(.*\/parrot)\/.*$};
-    our $topdir = $1;
-    if ( defined $topdir ) {
-        print "\nOK:  Parrot top directory located\n";
-    }
-    else {
-        $topdir = realpath($Bin) . "/../..";
-    }
-    unshift @INC, qq{$topdir/lib};
-}
-use Test::More tests => 10;
 use Carp;
+use Test::More tests => 10;
+use lib qw( . lib ../lib ../../lib );
 use_ok(
     'Parrot::Configure::Messages', qw|
         print_introduction
