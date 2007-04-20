@@ -9,24 +9,16 @@ use warnings;
 BEGIN {
     use FindBin qw($Bin);
     use Cwd qw(cwd realpath);
-    realpath($Bin) =~ m{^(.*\/parrot)\/.*$};
-    our $topdir = $1;
-    if ( defined $topdir ) {
-        print "\nOK:  Parrot top directory located\n";
-    }
-    else {
-        $topdir = realpath($Bin) . "/../..";
-    }
+    our $topdir = realpath($Bin) . "/../..";
     unshift @INC, qq{$topdir/lib};
 }
 use Test::More tests => 33;
 use Carp;
-use lib ("lib");
 use_ok(
     'Parrot::Configure::Options', qw|
         process_options
         get_valid_options
-        |
+    |
 );
 use_ok("Parrot::IO::Capture::Mini");
 
