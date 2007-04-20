@@ -1333,12 +1333,13 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
 {
 #define PCC_ARG_MAX 1024
     /* variables from PCCINVOKE impl in PCCMETHOD.pm */
-    INTVAL n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 }; /* args INSP, returns INSP */
+    /* args INSP, returns INSP */
+    INTVAL n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     opcode_t arg_indexes[PCC_ARG_MAX];
     opcode_t result_indexes[PCC_ARG_MAX];
-    PMC* args_sig = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC* args_sig    = pmc_new(interp, enum_class_FixedIntegerArray);
     PMC* results_sig = pmc_new(interp, enum_class_FixedIntegerArray);
-    PMC* ret_cont = new_ret_continuation_pmc(interp, NULL);
+    PMC* ret_cont    = new_ret_continuation_pmc(interp, NULL);
     parrot_context_t *ctx;
     PMC* pccinvoke_meth;
 
@@ -1347,18 +1348,31 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
     PMC* save_current_object;
 
     /* temporary state vars for building PCC index and PCC signature arrays. */
-    opcode_t *indexes[2] = { arg_indexes, result_indexes };
-    PMC *sigs[2] = { args_sig, results_sig };
-    int arg_ret_cnt[2] = { 0, 0 }; /* # of arg args, # of result args */
-    int max_regs[8] = { 0, 0, 0, 0, 0, 0, 0, 0 }; /* INSP args, INSP results */
-    int seen_arrow = 0;
+
+    /* arg_indexes, result_indexes */
+    opcode_t *indexes[2];
+
+    /* args_sig, results_sig */
+    PMC *sigs[2];
+
+    /* # of arg args, # of result args */
+    int arg_ret_cnt[2] = { 0, 0 };
+
+    /* INSP args, INSP results */
+    int max_regs[8]    = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    int seen_arrow     = 0;
     const char *x;
     const char *ret_x;
     int index = -1;
-    int cur = 0;
+    int cur   =  0;
 
     va_list list;
     va_start(list, signature);
+
+    indexes[0] = arg_indexes;
+    indexes[1] = result_indexes;
+    sigs[0]    = args_sig;
+    sigs[1]    = results_sig;
 
     /* account for passing invocant in-band */
     if (pmc) {
