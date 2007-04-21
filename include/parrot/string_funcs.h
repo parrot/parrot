@@ -83,7 +83,7 @@ PARROT_API STRING *string_from_const_cstring(Interp *, const void *, UINTVAL);
 PARROT_API STRING *const_string(Interp *, const char *buffer)
         __attribute__nonnull__(2);
 PARROT_API char *string_to_cstring(Interp *, STRING *);
-PARROT_API void string_cstring_free(void *);
+PARROT_API void string_cstring_free(char *);
 PARROT_API void string_pin(Interp *, STRING *);
 PARROT_API void string_unpin(Interp *, STRING *);
 PARROT_API STRING *string_bitwise_and(Interp *interp, STRING *s1,

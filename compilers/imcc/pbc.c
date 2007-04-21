@@ -737,8 +737,10 @@ add_const_pmc_sub(Interp *interp, SymReg *r,
             vtable_name = sub->name;
 
         /* Check this is a valid vtable method to override. */
-        c_name = string_to_cstring(interp, vtable_name);
+        c_name       = string_to_cstring(interp, vtable_name);
         vtable_index = Parrot_get_vtable_index(interp, c_name);
+        string_cstring_free(c_name);
+
         if (vtable_index == -1) {
             IMCC_fatal(interp, 1,
                 "'%s' is not a v-table method, but was used with :vtable.\n",

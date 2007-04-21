@@ -54,15 +54,17 @@ Parrot_get_vtable_index(Interp *interp, const char *name)
 
 PMC*
 Parrot_find_vtable_meth(Interp* interp, PMC *pmc, STRING *meth) {
-    PMC *_class = pmc;
-    PMC *ns = NULL;
-    PMC *mro;
-    PMC *key;
+    PMC  *_class = pmc;
+    PMC  *ns     = NULL;
+    PMC  *mro;
+    PMC  *key;
+    char *slot_name;
     INTVAL i, n, j, k;
 
     /* Get index in Parrot_vtable_slot_names[]. */
-    int vtable_index = Parrot_get_vtable_index(interp,
-        string_to_cstring(interp, meth));
+    slot_name        = string_to_cstring(interp, meth);
+    int vtable_index = Parrot_get_vtable_index(interp, slot_name);
+    string_cstring_free(slot_name);
     if (vtable_index == -1)
       return NULL;
 

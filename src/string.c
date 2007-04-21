@@ -1880,9 +1880,9 @@ sorts of leak potential otherwise.
 */
 
 void
-string_cstring_free(void *ptr)
+string_cstring_free(char *p)
 {
-    mem_sys_free(ptr);
+    mem_sys_free(p);
 }
 
 /*
