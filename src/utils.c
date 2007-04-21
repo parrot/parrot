@@ -512,6 +512,8 @@ the new array, and the last (extra) element is set to 0.
 
 Currently unused.
 
+Note that you need to free this array with C<Parrot_destroy_cpa()>.
+
 =cut
 
 */

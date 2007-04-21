@@ -506,10 +506,13 @@ does not delete the PMC.
         if (ns == PMCNULL)
             return;
 
-        if (!VTABLE_isa(INTERP, ns, s_ns))
+        if (!VTABLE_isa(INTERP, ns, s_ns)) {
+            char *item_name = string_to_cstring(INTERP, name);
             real_exception(INTERP, NULL, E_TypeError,
                 "Invalid type %d for '%s' in del_namespace()",
-                ns->vtable->base_type, string_to_cstring(INTERP, name));
+                ns->vtable->base_type, item_name);
+            string_cstring_free(item_name);
+        }
 
         parrot_hash_delete(INTERP, hash, name);
     }
@@ -536,10 +539,13 @@ delete the PMC.
         if (sub == PMCNULL)
             return;
 
-        if (!VTABLE_isa(INTERP, sub, s_sub))
+        if (!VTABLE_isa(INTERP, sub, s_sub)) {
+            char *item_name = string_to_cstring(INTERP, name);
             real_exception(INTERP, NULL, E_TypeError,
                 "Invalid type %d for '%s' in del_sub()",
-                sub->vtable->base_type, string_to_cstring(INTERP, name));
+                sub->vtable->base_type, item_name);
+            string_cstring_free(item_name);
+        }
 
         parrot_hash_delete(INTERP, hash, name);
     }

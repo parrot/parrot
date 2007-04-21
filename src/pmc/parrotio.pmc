@@ -64,11 +64,16 @@ Opens the file with the given mode, using the given IO layer.
         const char *c_file, *c_mode, *c_layer;
         PMC *pio;
 
-        c_file = string_to_cstring(INTERP, file);
-        c_mode = string_to_cstring(INTERP, mode);
+        c_file  = string_to_cstring(INTERP, file);
+        c_mode  = string_to_cstring(INTERP, mode);
         c_layer = string_to_cstring(INTERP, layer);
-        l = PIO_get_layer(INTERP, c_layer);
-        pio = PIO_open(INTERP, l, c_file, c_mode);
+        l       = PIO_get_layer(INTERP, c_layer);
+        pio     = PIO_open(INTERP, l, c_file, c_mode);
+
+        string_cstring_free(c_file);
+        string_cstring_free(c_mode);
+        string_cstring_free(c_layer);
+
         if (!pio || !PMC_struct_val(pio))
             return pmc_new(INTERP, enum_class_Undef);
         if (l) {

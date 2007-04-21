@@ -2147,7 +2147,7 @@ pf_debug_dump(Parrot_Interp interp, PackFile_Segment *self)
                 filename = string_to_cstring(interp, PF_CONST(debug->code,
                            debug->mappings[i]->u.filename)->u.string);
                 PIO_printf(interp, "        FILENAME => %s\n", filename);
-                free(filename);
+                string_cstring_free(filename);
                 break;
             case PF_DEBUGMAPPINGTYPE_SOURCESEG:
                 PIO_printf(interp, "        MAPPINGTYPE => SOURCESEG,\n");

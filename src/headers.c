@@ -746,6 +746,7 @@ Parrot_destroy_header_pools(Interp *interp)
 }
 
 /*
+
 =item C<void
 Parrot_merge_header_pools(Interp *dest_interp, Interp *source_interp)>
 
@@ -753,6 +754,7 @@ Merge the header pools of C<source_interp> into those of C<dest_interp>.
 (Used to deal with shared objects left after interpreter destruction.)
 
 =cut
+
 */
 
 static void fix_pmc_syncs(Interp *dest_interp, Small_Object_Pool *pool) {

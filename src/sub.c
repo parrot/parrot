@@ -391,12 +391,18 @@ Parrot_Context_infostr(Interp *interp, parrot_context_t *ctx)
 
     Parrot_block_DOD(interp);
     if (Parrot_Context_info(interp, ctx, &info)) {
-        res = Parrot_sprintf_c(interp,
+        char *file = (char *)info.file;
+        res        = Parrot_sprintf_c(interp,
             "%s '%Ss' pc %d (%s:%d)", msg,
-            info.fullname, info.pc, info.file, info.line);
+            info.fullname, info.pc, file, info.line);
+
+        /* free the non-constant string, but not the constant one */
+        if (strncmp( "(unknown file)", file, 14 ) < 0 )
+            string_cstring_free(file);
     }
     else
         res = NULL;
+
     Parrot_unblock_DOD(interp);
     return res;
 }

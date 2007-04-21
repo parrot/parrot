@@ -501,6 +501,10 @@ thrown.
         int ret;
 
         ret = rename(coldpath, cnewpath);
+
+        string_cstring_free(coldpath);
+        string_cstring_free(cnewpath);
+
         if (ret < 0)
         {
             char *errmsg = strerror(errno) ;

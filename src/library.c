@@ -263,7 +263,7 @@ path_concat(Interp *interp, STRING *l_path, STRING *r_path)
 
 Locate the full path for C<file_name> and the given file type(s). If
 successful, returns a C-string allocated with C<string_to_cstring> or
-NULL otherwise.
+NULL otherwise.  Remember to free the string with C<string_cstring_free()>.
 
 =item C<STRING* Parrot_locate_runtime_file_str(Interp *, STRING  *file_name,
         enum_runtime_ft type)>
@@ -347,8 +347,9 @@ Parrot_locate_runtime_file(Interp *interp, const char *file_name,
 
 =item C<const char* Parrot_get_runtime_prefix(Interp *, STRING **prefix_str)>
 
-If C<prefix_str> is not NULL, set it to the prefix, else
-return a malloced c-string for the runtime prefix.
+If C<prefix_str> is not NULL, set it to the prefix, else return a malloced
+c-string for the runtime prefix.  Remember to free the string with
+C<string_cstring_free()>.
 
 =cut
 

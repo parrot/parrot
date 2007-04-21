@@ -130,8 +130,11 @@ This method is called to generate byte code for start subroutine.
 
         bcg_info = (BCG_info*) PMC_struct_val(SELF);
         BCG_TRY(bcg_info) {
-            BCG_start_sub(bcg_info, string_to_cstring(INTERP, subName),
-                string_to_cstring(INTERP, pragma));
+            char *name_str   = string_to_cstring(INTERP, subName);
+            char *pragma_str = string_to_cstring(INTERP, pragma).
+            BCG_start_sub(bcg_info, name_str, pragma_str);
+            string_cstring_free(name_str);
+            string_cstring_free(pragma_str);
         }
         BCG_CATCH(BCG_EXCEPTION) {
              real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
@@ -176,7 +179,9 @@ This method generates code for a subroutine call.
 
         bcg_info = (BCG_info*) PMC_struct_val(SELF);
         BCG_TRY(bcg_info) {
-            BCG_start_call(bcg_info, string_to_cstring(INTERP, subName));
+            char *name_str = string_to_cstring(INTERP, subName);
+            BCG_start_call(bcg_info, name_str);
+            string_cstring_free(name_str);
         }
         BCG_CATCH(BCG_EXCEPTION) {
              real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
@@ -222,7 +227,9 @@ This method generates code for an opertion.
 
         bcg_info = (BCG_info*) PMC_struct_val(SELF);
         BCG_TRY(bcg_info) {
-            BCG_start_op(bcg_info, string_to_cstring(INTERP, op));
+            char *op_name = string_to_cstring(INTERP, op);
+            BCG_start_op(bcg_info, op_name);
+            string_cstring_free(op_name);
         }
         BCG_CATCH(BCG_EXCEPTION) {
              real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
@@ -265,18 +272,26 @@ This method generates bytecode for a variable.
     METHOD void val(STRING *value, STRING *type)
     {
         BCG_info *bcg_info;
-        char data_type;
+        char      data_type;
+        char     *type_str = string_to_cstring(INTERP, type);
+        char     *val_str  = string_to_cstring(INTERP, value);
 
-        data_type = get_data_type_from_cstring(INTERP,
-                                            string_to_cstring(INTERP, type));
-        bcg_info = (BCG_info*) PMC_struct_val(SELF);
+        data_type = get_data_type_from_cstring(INTERP, type_str);
+        bcg_info  = (BCG_info*) PMC_struct_val(SELF);
+
+        string_cstring_free(type_str);
+
         BCG_TRY(bcg_info) {
-            BCG_val(bcg_info, string_to_cstring(INTERP, value), data_type);
+            BCG_val(bcg_info, val_str, data_type);
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+            string_cstring_free(val_str);
+            real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
         }
         BCG_END_TRY;
+
+        if (val_str)
+            string_cstring_free(val_str);
     }
 
 /*
@@ -291,18 +306,25 @@ This method generates bytecode for a constant.
     METHOD void var(STRING *varName, STRING *type)
     {
         BCG_info *bcg_info;
-        char data_type;
+        char      data_type;
+        char     *type_str = string_to_cstring(INTERP, type);
+        char     *name_str = string_to_cstring(INTERP, varName);
 
-        data_type = get_data_type_from_cstring(INTERP,
-                                            string_to_cstring(INTERP, type));
-        bcg_info = (BCG_info*) PMC_struct_val(SELF);
+        data_type = get_data_type_from_cstring(INTERP, type_str);
+        bcg_info  = (BCG_info*) PMC_struct_val(SELF);
+        string_cstring_free(type_str);
+
         BCG_TRY(bcg_info) {
-            BCG_var(bcg_info, string_to_cstring(INTERP, varName), data_type);
+            BCG_var(bcg_info, name_str, data_type);
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+            string_cstring_free(name_str);
+            real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
         }
         BCG_END_TRY;
+
+        if (name_str)
+            string_cstring_free(name_str);
     }
 
 /*
@@ -317,15 +339,20 @@ This method generates bytecode for label.
     METHOD void label(STRING *label)
     {
         BCG_info *bcg_info;
+        char     *label_str = string_to_cstring(INTERP, label);
 
         bcg_info = (BCG_info*) PMC_struct_val(SELF);
         BCG_TRY(bcg_info) {
-            BCG_label(bcg_info, string_to_cstring(INTERP, label));
+            BCG_label(bcg_info, label_str);
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+            string_cstring_free(label_str);
+            real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
         }
         BCG_END_TRY;
+
+        if (label_str)
+            string_cstring_free(label_str);
     }
 
 

@@ -64,21 +64,23 @@ static PMC *
 find_or_die(Interp *interp, PMC *pmc, STRING *meth) {
     PMC *returnPMC = find_meth(interp, pmc, meth);
     if (PMC_IS_NULL(returnPMC)) {
-        PMC *_class = pmc;
+        PMC  *_class    = pmc;
+        char *meth_name = string_to_cstring(interp, meth);
         if (PObj_is_object_TEST(pmc)) {
+            char *obj_name  = string_to_cstring(interp, PMC_str_val(
+                        get_attrib_num((SLOTTYPE *)PMC_data(_class),
+                            PCD_CLASS_NAME)));
             _class = GET_CLASS(PMC_data(pmc), pmc);
             real_exception(interp, NULL, E_LookupError,
-                "Can't find method '%s' for object '%s'",
-                string_to_cstring(interp, meth),
-                string_to_cstring(interp, PMC_str_val(
-                        get_attrib_num((SLOTTYPE *)PMC_data(_class),
-                            PCD_CLASS_NAME))));
+                "Can't find method '%s' for object '%s'", meth_name, obj_name);
+            string_cstring_free(obj_name);
         }
         else {
             real_exception(interp, NULL, E_LookupError,
                 "Can't find method '%s' - erroneous PMC",
                 string_to_cstring(interp, meth));
         }
+        string_cstring_free(meth_name);
     }
     return returnPMC;
 }

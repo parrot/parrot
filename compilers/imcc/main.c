@@ -709,19 +709,23 @@ imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
             imc_compile_all_units(interp);
         }
         IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
+            char *error_str = string_to_cstring(interp,
+                    IMCC_INFO(interp)->error_message);
+
             IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;
-            fprintf(stderr,"error:imcc:%s",
-                    string_to_cstring(interp,
-                    IMCC_INFO(interp)->error_message));
+            fprintf(stderr,"error:imcc:%s", error_str);
             IMCC_print_inc(interp);
+            string_cstring_free(error_str);
             Parrot_exit(interp, IMCC_FATAL_EXCEPTION);
         }
         IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
+            char *error_str = string_to_cstring(interp,
+                    IMCC_INFO(interp)->error_message);
+
             IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
-            fprintf(stderr,"error:imcc:%s",
-                    string_to_cstring(interp,
-                    IMCC_INFO(interp)->error_message));
+            fprintf(stderr,"error:imcc:%s", error_str);
             IMCC_print_inc(interp);
+            string_cstring_free(error_str);
             Parrot_exit(interp, IMCC_FATALY_EXCEPTION);
         }
         IMCC_END_TRY;

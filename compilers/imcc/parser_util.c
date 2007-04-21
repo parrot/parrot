@@ -728,12 +728,14 @@ PMC *
 imcc_compile_pasm_ex(Parrot_Interp interp, const char *s)
 {
     STRING *error_message;
-    PMC *sub;
+    PMC    *sub;
+    char   *error_str;
 
     sub = imcc_compile(interp, s, 1, &error_message);
     if (sub == NULL ) {
-        real_exception(interp, NULL, E_Exception,
-              string_to_cstring(interp, error_message));
+        error_str = string_to_cstring(interp, error_message);
+        real_exception(interp, NULL, E_Exception, error_str);
+        string_cstring_free(error_str);
     }
     return sub;
 }
@@ -742,12 +744,14 @@ PMC *
 imcc_compile_pir_ex(Parrot_Interp interp, const char *s)
 {
     STRING *error_message;
-    PMC *sub;
+    PMC    *sub;
+    char   *error_str;
 
     sub = imcc_compile(interp, s, 0, &error_message);
     if (sub == NULL) {
-        real_exception(interp, NULL, E_Exception,
-              string_to_cstring(interp, error_message));
+        error_str = string_to_cstring(interp, error_message);
+        real_exception(interp, NULL, E_Exception, error_str);
+        string_cstring_free(error_str);
     }
     return sub;
 }

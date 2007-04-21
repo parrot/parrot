@@ -300,6 +300,8 @@ Parrot_jit_debug_stabs(Interp *interp)
         else if (!ext) /* EVAL_n */
             file = string_append(interp, file,
                     string_make(interp, ".", 1, NULL, PObj_external_FLAG));
+
+        string_cstring_free(src);
     }
     else {
         /* chop pbc */
@@ -307,11 +309,11 @@ Parrot_jit_debug_stabs(Interp *interp)
         pasmfile = debug_file(interp, file, "pasm");
     }
     stabsfile = debug_file(interp, file, "stabs.s");
-    ofile = debug_file(interp, file, "o");
+    ofile     = debug_file(interp, file, "o");
     {
         char *temp = string_to_cstring(interp,stabsfile);
-        stabs = fopen(temp, "w");
-        free(temp);
+        stabs      = fopen(temp, "w");
+        string_cstring_free(temp);
     }
     if (stabs == NULL)
         return;
@@ -321,7 +323,7 @@ Parrot_jit_debug_stabs(Interp *interp)
         /* filename info */
         fprintf(stabs, ".data\n.text\n");       /* darwin wants it */
         fprintf(stabs, ".stabs \"%s\"," N_SO ",0,0,0\n",temp);
-        free(temp);
+        string_cstring_free(temp);
     }
     /* jit_func start addr */
     fprintf(stabs, ".stabs \"jit_func:F(0,1)\"," N_FUN ",0,1,%p\n",
@@ -364,7 +366,7 @@ Parrot_jit_debug_stabs(Interp *interp)
     {
         char *temp = string_to_cstring(interp, cmd);
         system(temp);
-        free(temp);
+        string_cstring_free(temp);
     }
 }
 

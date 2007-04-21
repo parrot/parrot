@@ -270,9 +270,12 @@ PMC in $1.
 op find_method(out PMC, invar PMC, in STR) {
     opcode_t * resume = expr NEXT();
     $1 = $2->vtable->find_method(interp, $2, $3);
-    if (!$1 || !VTABLE_defined(interp, $1))
+    if (!$1 || !VTABLE_defined(interp, $1)) {
+        char *method_name = string_to_cstring(interp, $3);
         real_exception(interp, resume, METH_NOT_FOUND,
-            "Method '%s' not found", string_to_cstring(interp, $3));
+            "Method '%s' not found", method_name);
+        string_cstring_free(method_name);
+    }
     restart ADDRESS(resume);
 }
 
