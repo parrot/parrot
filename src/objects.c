@@ -59,11 +59,12 @@ Parrot_find_vtable_meth(Interp* interp, PMC *pmc, STRING *meth) {
     PMC  *mro;
     PMC  *key;
     char *slot_name;
+    int vtable_index;
     INTVAL i, n, j, k;
 
     /* Get index in Parrot_vtable_slot_names[]. */
     slot_name        = string_to_cstring(interp, meth);
-    int vtable_index = Parrot_get_vtable_index(interp, slot_name);
+    vtable_index     = Parrot_get_vtable_index(interp, slot_name);
     string_cstring_free(slot_name);
     if (vtable_index == -1)
       return NULL;
