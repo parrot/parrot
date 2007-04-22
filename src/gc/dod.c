@@ -400,8 +400,10 @@ Parrot_dod_trace_children(Interp *interp, size_t how_many)
             }
         }
 
+        /* this value may be null */
         next = PMC_next_for_GC(current);
-        if (next == current)
+
+        if (next && next == current)
             break;
         if (--how_many == 0) {
             current = next;
