@@ -61,7 +61,7 @@ Load a Parrot source file for the current program.
 =cut
 
 op debug_load(inconst STR) :base_debug {
-    const char *f;
+    char *f;
 
     if (!(interp->pdb->state & PDB_BREAK)) {
         f = string_to_cstring(interp,($1));
