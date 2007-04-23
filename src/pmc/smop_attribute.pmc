@@ -1,17 +1,17 @@
 /*
-Copyright (C) 2001-2005, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
 
-src/pmc/smop_class.pmc - SMOP Class
+src/pmc/smop_attribute.pmc - SMOP Attribute
 
 =head1 DESCRIPTION
 
-This class, smop_class, implements the class class of the simple meta
+This class, SMOP_Attribute, implements the attribute class of the simple meta
 object protocol.
 
-=head2 Functions
+=head2 Methods
 
 =over 4
 
@@ -30,13 +30,13 @@ typedef struct SMOP_Attribute {
 
 static void smop_init(Interp *interp, PMC *self) {
     SMOP_Attribute *smop = NULL;
-    /* turn on marking of the class_data array */
-    PObj_data_is_PMC_array_SET(self);
-    /* turn on custom destruction since our PMC* array is dynamically allocated */
+
+    /* turn on custom destruction since our PMC* array is dynamically allocated
+     */
     PObj_active_destroy_SET(self);
 
-    PMC_data(self) = mem_sys_allocate_zeroed(sizeof(SMOP_Attribute));
-    smop = SMOP_attr(self);
+    PMC_data(self) = mem_allocate_zeroed_typed(SMOP_Attribute);
+    smop           = SMOP_attr(self);
 }
 
 
@@ -75,7 +75,10 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
 
 */
     void destroy() {
+        if (PMC_data(SELF)) {
             mem_sys_free(PMC_data(SELF));
+            PMC_data(SELF) = NULL;
+        }
     }
 
 
