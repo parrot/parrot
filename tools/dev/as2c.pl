@@ -1,14 +1,29 @@
 #! perl
+
+# $Id$
+
+=head1 NAME
+
+as2c.pl - convert gas assember listing to i386 code array
+
+=head1 DESCRIPTION
+
+The plan behind of as2c.pl is to create compiler independent
+machine code for an architecture. Code in e.g. masm, gas, nasm syntax
+doesn't fit all compilers. Therefore as2c.pl translates gas syntax to a
+bytestring, which is then used as the asm code.
+
+as2c.pl is used very rarely. Once the code is generated and
+checked in, there's usually no need to change it later.
+
+=cut
+
 use strict;
 use warnings;
 
-# convert gas assember listing to i386 code array
-# creates also a test file
-
-my ( $src, $func, $out, $cmd );
-
-$src = $ARGV[0];
-$cmd = "cc -c $src.c -Wall -O3 -fomit-frame-pointer -DNDEBUG -Wa,-a > $src.s";
+my $src = $ARGV[0];
+my $cmd = "cc -c $src.c -Wall -O3 -fomit-frame-pointer -DNDEBUG -Wa,-a > $src.s";
+my ( $func );
 
 print_header($src);
 create_s($cmd);
