@@ -76,6 +76,21 @@ to the previous values and the allocated register memory is discarded.
         / NUMVAL_SIZE) * NUMVAL_SIZE)
 
 /*
+ * Round register allocation size up to the nearest multiple of 8. A
+ * granularity of 8 is arbitrary, it could have been some bigger power of 2. A
+ * "slot" is an index into the free_list array. Each slot in free_list has a
+ * linked list of pointers to already allocated contexts available for (re)use.
+ * The slot where an available context is stored corresponds to the size of the
+ * context.
+ */
+
+#define SLOT_CHUNK_SIZE 8
+
+#define ROUND_ALLOC_SIZE(size) ((((size) + SLOT_CHUNK_SIZE - 1) \
+        / SLOT_CHUNK_SIZE) * SLOT_CHUNK_SIZE)
+#define CALCULATE_SLOT_NUM(size) ((size) / SLOT_CHUNK_SIZE)
+
+/*
 
 =item C<static void new_context_mem(Interp *, context_mem *ctx_mem)>
 
@@ -129,9 +144,8 @@ create_initial_context(Interp *interp)
     int i;
     static INTVAL num_regs[] ={32,32,32,32};
 
-    /*
-     * create some initial free_list slots
-     */
+    /* Create some initial free_list slots. */
+
 #define INITIAL_FREE_SLOTS 8
     interp->ctx_mem.n_free_slots = INITIAL_FREE_SLOTS;
     interp->ctx_mem.free_list    =
@@ -274,7 +288,7 @@ Parrot_dup_context(Interp *interp, struct Parrot_Context *old)
     struct Parrot_Context *ctx;
 
     const size_t reg_alloc = old->regs_mem_size;
-    const int slot = reg_alloc >> 3;
+    const int slot = CALCULATE_SLOT_NUM(reg_alloc);
     void * ptr = interp->ctx_mem.free_list[slot];
 
     if (ptr) {
@@ -322,13 +336,6 @@ Parrot_pop_context(Interp *interp)
 }
 
 
-#define SLOT_CHUNK_SIZE 8
-
-/* Round register allocation size up to the nearest multiple of 8. A
- * granularity of 8 is arbitrary, it could have been some bigger power of 2. */
-#define CALCULATE_SLOT(all_regs_size) ((all_regs_size + SLOT_CHUNK_SIZE - 1) / SLOT_CHUNK_SIZE)
-#define CALCULATE_ALLOC_SIZE(all_regs_size) (((all_regs_size + SLOT_CHUNK_SIZE - 1) / SLOT_CHUNK_SIZE) * SLOT_CHUNK_SIZE)
-
 struct Parrot_Context *
 Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used)
 {
@@ -347,27 +354,40 @@ Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used)
     const size_t size_nip = size_n + size_i + size_p;
     const size_t all_regs_size  = size_n + size_i + size_p + size_s;
 
-    const int slot = CALCULATE_SLOT(all_regs_size);
-    const size_t reg_alloc = CALCULATE_ALLOC_SIZE(all_regs_size);
+    const size_t reg_alloc = ROUND_ALLOC_SIZE(all_regs_size);
+    const int slot = CALCULATE_SLOT_NUM(reg_alloc);
 
-
-    /* alloc more slots if needed */
+    /*
+     * If slot is beyond the end of the allocated list, extend the list to
+     * allocate more slots.
+     */
     if (slot >= interp->ctx_mem.n_free_slots) {
-        const int n = slot + 1;
+        const int extend_size = slot + 1;
         int i;
 
         interp->ctx_mem.free_list = (void **)mem_sys_realloc(
-                interp->ctx_mem.free_list, n * sizeof (void*));
+                interp->ctx_mem.free_list, extend_size * sizeof (void*));
 
-        for (i = interp->ctx_mem.n_free_slots; i < n; ++i)
+        for (i = interp->ctx_mem.n_free_slots; i < extend_size; ++i)
             interp->ctx_mem.free_list[i] = NULL;
-        interp->ctx_mem.n_free_slots = n;
+        interp->ctx_mem.n_free_slots = extend_size;
     }
 
-    /* pop new ctx from free list, else alloc ctx if needed */
+    /*
+     * The free_list contains a linked list of pointers for each size (slot
+     * index). Pop off an available context of the desired size from free_list.
+     * If no contexts of the desired size are available, allocate a new one.
+     */
     ptr = interp->ctx_mem.free_list[slot];
     old = CONTEXT(interp->ctx);
     if (ptr) {
+        /*
+         * Store the next pointer from the linked list for this size (slot
+         * index) in free_list. On "*(void **) ptr", C won't dereference a void
+         * * pointer (untyped), so type cast ptr to void** (a dereference-able
+         * type) then dereference it to get a void*. Store the dereferenced
+         * value (the next pointer in the linked list) in free_list.
+         */
         interp->ctx_mem.free_list[slot] = *(void **) ptr;
     }
     else {
@@ -428,7 +448,7 @@ Parrot_free_context(Interp *interp, parrot_context_t *ctxp, int re_use)
         }
 #endif
         ptr = ctxp;
-        slot = ctxp->regs_mem_size >> 3;
+        slot = CALCULATE_SLOT_NUM(ctxp->regs_mem_size);
 
         assert(slot < interp->ctx_mem.n_free_slots);
         *(void **)ptr = interp->ctx_mem.free_list[slot];
