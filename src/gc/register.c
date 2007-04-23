@@ -324,6 +324,8 @@ Parrot_pop_context(Interp *interp)
 
 #define SLOT_CHUNK_SIZE 8
 
+/* Round register allocation size up to the nearest multiple of 8. A
+ * granularity of 8 is arbitrary, it could have been some bigger power of 2. */
 #define CALCULATE_SLOT(all_regs_size) ((all_regs_size + SLOT_CHUNK_SIZE - 1) / SLOT_CHUNK_SIZE)
 #define CALCULATE_ALLOC_SIZE(all_regs_size) (((all_regs_size + SLOT_CHUNK_SIZE - 1) / SLOT_CHUNK_SIZE) * SLOT_CHUNK_SIZE)
 
