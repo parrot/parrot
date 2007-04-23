@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 15;
 use Test::More;
 use Cwd;
 use File::Basename;
@@ -143,6 +143,37 @@ open my $X, '>', '../file.txt';
 binmode $X, ':raw';
 print {$X} "file with text\n";
 close $X;
+
+language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.attributes' );
+require "lfs"
+attr = lfs.attributes("file.txt")
+print(type(attr))
+print(attr.mode)
+print(attr.size)
+CODE
+table
+file
+15
+OUT
+
+language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.attributes' );
+require "lfs"
+print(lfs.attributes("file.txt", "mode"))
+print(lfs.attributes("file.txt", "size"))
+CODE
+file
+15
+OUT
+
+language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.attributes (no file)' );
+require "lfs"
+r, msg = lfs.attributes("no_file.txt")
+print(r)
+print(msg)
+CODE
+nil
+cannot obtain information from file `no_file.txt'
+OUT
 
 language_output_like( 'lua', <<'CODE', <<"OUT", 'function lfs.lock (closed)' );
 require "lfs"

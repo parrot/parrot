@@ -193,15 +193,254 @@ optimal file system I/O blocksize; (Unix only)
 
 =back
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub '_lfs_attributes' :anon
     .param pmc filepath :optional
     .param pmc aname :optional
+    .local pmc ret
+    .local pmc members
+    .local pmc opts
     $S1 = checkstring(filepath)
-    not_implemented()
+    $S0 = $S1
+    new opts, .FixedStringArray
+    set opts, 13
+    opts[0] = 'mode'
+    opts[1] = 'dev'
+    opts[2] = 'ino'
+    opts[3] = 'nlink'
+    opts[4] = 'uid'
+    opts[5] = 'gid'
+    opts[6] = 'rdev'
+    opts[7] = 'access'
+    opts[8] = 'modification'
+    opts[9] = 'change'
+    opts[10] = 'size'
+    opts[11] = 'blocks'
+    opts[12] = 'blksize'
+    new members, .FixedPMCArray
+    set members, 13
+    .const .Sub st_mode = 'st_mode'
+    members[0] = st_mode
+    .const .Sub st_dev = 'st_dev'
+    members[1] = st_dev
+    .const .Sub st_ino = 'st_ino'
+    members[2] = st_ino
+    .const .Sub st_nlink = 'st_nlink'
+    members[3] = st_nlink
+    .const .Sub st_uid = 'st_uid'
+    members[4] = st_uid
+    .const .Sub st_gid = 'st_gid'
+    members[5] = st_gid
+    .const .Sub st_rdev = 'st_rdev'
+    members[6] = st_rdev
+    .const .Sub st_atime = 'st_atime'
+    members[7] = st_atime
+    .const .Sub st_mtime = 'st_mtime'
+    members[8] = st_mtime
+    .const .Sub st_ctime = 'st_ctime'
+    members[9] = st_ctime
+    .const .Sub st_size = 'st_size'
+    members[10] = st_size
+    .const .Sub st_blocks = 'st_blocks'
+    members[11] = st_blocks
+    .const .Sub st_blksize = 'st_blksize'
+    members[12] = st_blksize
+    new $P0, .OS
+    push_eh _handler
+    $P1 = $P0.'stat'($S1)
+    clear_eh
+    if null aname goto L1
+    $I0 = isa aname, 'LuaString'
+    unless $I0 goto L2
+    $S2 = aname
+    $I2 = checkoption($S2, opts)
+    $P2 = members[$I2]
+    ret = $P2($P1)
+    .return (ret)
+L2:
+    $I0 = isa aname, 'LuaTable'
+    unless $I0 goto L1
+    ret = aname
+    goto L3
+L1:
+    new ret, .LuaTable
+L3:
+    new $P2, .LuaString
+    $I0 = 0
+L4:
+    unless $I0 < 13 goto L5
+    $P3 = members[$I0]
+    $P4 = $P3($P1)
+    $S2 = opts[$I0]
+    set $P2, $S2
+    ret[$P2] = $P4
+    inc $I0
+    goto L4
+L5:
+    .return (ret)
+_handler:
+    .local pmc nil
+    .local pmc msg
+    new nil, .LuaNil
+    new msg, .LuaString
+    $S0 = concat "cannot obtain information from file `", $S0
+    $S0 = concat "'"
+    set msg, $S0
+    .return (nil, msg)
+.end
+
+.sub st_dev :anon
+    .param pmc st
+    $I0 = st[0]
+    new $P0, .LuaNumber
+    set $P0, $I0
+    .return ($P0)
+.end
+
+.sub st_ino :anon
+    .param pmc st
+    $I0 = st[1]
+    new $P0, .LuaNumber
+    set $P0, $I0
+    .return ($P0)
+.end
+
+.const int S_IFIFO  = 0x1000    # named pipe (fifo)
+.const int S_IFCHR  = 0x2000    # character special
+.const int S_IFDIR  = 0x4000    # directory
+.const int S_IFBLK  = 0x6000    # block special
+.const int S_IFREG  = 0x8000    # regular
+.const int S_IFLNK  = 0xA000    # symbolic link
+.const int S_IFSOCK = 0xC000    # socket
+
+.const int S_IFMT   = 0xF000    # type of file mask
+
+.sub st_mode :anon
+    .param pmc st
+    $I0 = st[2]
+    $I0 &= S_IFMT
+    new $P0, .LuaString
+    unless $I0 == S_IFREG goto L1
+    set $P0, 'file'
+    .return ($P0)
+L1:
+    unless $I0 == S_IFDIR goto L2
+    set $P0, 'dir'
+    .return ($P0)
+L2:
+    unless $I0 == S_IFLNK goto L3
+    set $P0, 'link'
+    .return ($P0)
+L3:
+    unless $I0 == S_IFSOCK goto L4
+    set $P0, 'socket'
+    .return ($P0)
+L4:
+    unless $I0 == S_IFIFO goto L5
+    set $P0, 'named pipe'
+    .return ($P0)
+L5:
+    unless $I0 == S_IFCHR goto L6
+    set $P0, 'char device'
+    .return ($P0)
+L6:
+    unless $I0 == S_IFBLK goto L7
+    set $P0, 'block device'
+    .return ($P0)
+L7:
+    set $P0, 'other'
+    .return ($P0)
+.end
+
+.sub st_nlink :anon
+    .param pmc st
+    $I0 = st[3]
+    new $P0, .LuaNumber
+    set $P0, $I0
+    .return ($P0)
+.end
+
+.sub st_uid :anon
+    .param pmc st
+    $I0 = st[4]
+    new $P0, .LuaNumber
+    set $P0, $I0
+    .return ($P0)
+.end
+
+.sub st_gid :anon
+    .param pmc st
+    $I0 = st[5]
+    new $P0, .LuaNumber
+    set $P0, $I0
+    .return ($P0)
+.end
+
+.sub st_rdev :anon
+    .param pmc st
+    $I0 = st[6]
+    new $P0, .LuaNumber
+    set $P0, $I0
+    .return ($P0)
+.end
+
+.sub st_size :anon
+    .param pmc st
+    $I0 = st[7]
+    new $P0, .LuaNumber
+    set $P0, $I0
+    .return ($P0)
+.end
+
+.sub st_atime :anon
+    .param pmc st
+    $I0 = st[8]
+    new $P0, .LuaNumber
+    set $P0, $I0
+    .return ($P0)
+.end
+
+.sub st_mtime :anon
+    .param pmc st
+    $I0 = st[9]
+    new $P0, .LuaNumber
+    set $P0, $I0
+    .return ($P0)
+.end
+
+.sub st_ctime :anon
+    .param pmc st
+    $I0 = st[10]
+    new $P0, .LuaNumber
+    set $P0, $I0
+    .return ($P0)
+.end
+
+.sub st_blksize :anon
+    .param pmc st
+    $I0 = exists st[11]
+    unless $I0 goto L1
+    $I0 = st[11]
+    new $P0, .LuaNumber
+    set $P0, $I0
+    .return ($P0)
+L1:
+    new $P0, .LuaNil
+    .return ($P0)
+.end
+
+.sub st_blocks :anon
+    .param pmc st
+    $I0 = exists st[12]
+    unless $I0 goto L1
+    $I0 = st[12]
+    new $P0, .LuaNumber
+    set $P0, $I0
+    .return ($P0)
+L1:
+    new $P0, .LuaNil
+    .return ($P0)
 .end
 
 
