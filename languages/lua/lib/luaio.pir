@@ -40,6 +40,9 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
 #    print "init Lua I/O\n"
 
+    .local pmc _file
+    _file = createmeta()
+
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = global '_G'
     new $P1, .LuaString
@@ -106,17 +109,29 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     set $P1, 'write'
     _io[$P1] = _io_write
 
+
+    .local pmc _lua__ENVIRON
+    _lua__ENVIRON = new .LuaTable
+    global '_ENVIRON' = _lua__ENVIRON
+
     .const .Sub _io_fclose = '_io_fclose'
     _io_fclose.'setfenv'(_lua__GLOBAL)
     set $P1, '__close'
-    _io[$P1] = _io_fclose
+    _lua__ENVIRON[$P1] = _io_fclose
 
-    #
-    #    File
-    #
+    createstdfiles(_file, _io, _lua__ENVIRON)
+
+.end
+
+
+.sub 'createmeta' :anon
+    .local pmc _lua__GLOBAL
+    _lua__GLOBAL = global '_G'
 
     .local pmc _file
     _file = newmetatable('ParrotIO')
+
+    new $P1, .LuaString
     set $P1, '__index'
     _file[$P1] = _file
 
@@ -165,41 +180,45 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     set $P1, '__tostring'
     _file[$P1] = _file__tostring
 
-    #
-    #    Standard Files
-    #
+    .return (_file)
+.end
 
-    .local pmc _lua__ENVIRON
-    _lua__ENVIRON = global '_ENVIRON'
+
+.const int IO_INPUT = 1
+.const int IO_OUTPUT = 2
+
+
+.sub 'createstdfiles' :anon
+    .param pmc mt
+    .param pmc io
+    .param pmc env
+    new $P1, .LuaString
     new $P3, .LuaNumber
 
     set $P1, 'stdin'
     $P2 = getstdin
     new $P0, .LuaUserdata
     setattribute $P0, 'data', $P2
-    $P0.'set_metatable'(_file)
-    _io[$P1] = $P0
-    set $P3, 0
-    _lua__ENVIRON[$P3] = $P0
+    $P0.'set_metatable'(mt)
+    io[$P1] = $P0
+    set $P3, IO_INPUT
+    env[$P3] = $P0
 
     set $P1, 'stdout'
     $P2 = getstdout
     new $P0, .LuaUserdata
     setattribute $P0, 'data', $P2
-    $P0.'set_metatable'(_file)
-    _io[$P1] = $P0
-    set $P3, 1
-    _lua__ENVIRON[$P3] = $P0
+    $P0.'set_metatable'(mt)
+    io[$P1] = $P0
+    set $P3, IO_OUTPUT
+    env[$P3] = $P0
 
     set $P1, 'stderr'
     $P2 = getstderr
     new $P0, .LuaUserdata
     setattribute $P0, 'data', $P2
-    $P0.'set_metatable'(_file)
-    _io[$P1] = $P0
-    set $P3, 2
-    _lua__ENVIRON[$P3] = $P0
-
+    $P0.'set_metatable'(mt)
+    io[$P1] = $P0
 .end
 
 
@@ -366,7 +385,7 @@ L2:
     ret = getattribute file, 'data'
     .return (ret)
 L1:
-    tag_error($S0, 'file')
+    typerror($S0, 'file')
 .end
 
 .sub 'tofile' :anon
@@ -382,10 +401,8 @@ L1:
 .sub 'aux_close' :anon
     .param pmc file
     # TODO: getfenv
-    $P0 = global '_G'
+    $P0 = global '_ENVIRON'
     new $P1, .LuaString
-    set $P1, 'io'
-    $P0 = $P0[$P1]
     set $P1, '__close'
     $P0 = $P0[$P1]
     .return $P0(file)
@@ -430,7 +447,7 @@ file.
     .param pmc file
     .local pmc ret
     unless null file goto L1
-    file = getiofile(1)
+    file = getiofile(IO_OUTPUT)
 L1:
     tofile(file)
     .return aux_close(file)
@@ -446,7 +463,7 @@ Equivalent to C<file:flush> over the default output file.
 .sub '_io_flush' :anon
     .local pmc file
     .const .LuaString key = 'flush'
-    file = getiofile(1)
+    file = getiofile(IO_OUTPUT)
     $P0 = file[key]
     .return $P0(file)
 .end
@@ -478,14 +495,14 @@ error code.
 L3:
     $P0 = newfile()
     setattribute $P0, 'data', f
-    setiofile(0, $P0)
+    setiofile(IO_INPUT, $P0)
     goto L1
 L2:
     tofile(file)
-    setiofile(0, file)
+    setiofile(IO_INPUT, file)
     goto L1
 L1:
-    .return getiofile(0)
+    .return getiofile(IO_INPUT)
 .end
 
 
@@ -512,7 +529,7 @@ input file. In this case it does not close the file when the loop ends.
     .local pmc file
     .local pmc f
     unless null filename goto L1
-    file = getiofile(0)
+    file = getiofile(IO_INPUT)
     .return _file_lines(file)
 L1:
     $S1 = checkstring(filename)
@@ -614,13 +631,13 @@ Similar to C<io.input>, but operates over the default output file.
 L3:
     $P0 = newfile()
     setattribute $P0, 'data', f
-    setiofile(1, $P0)
+    setiofile(IO_OUTPUT, $P0)
     goto L1
 L2:
     tofile(file)
-    setiofile(1, file)
+    setiofile(IO_OUTPUT, file)
 L1:
-    .return getiofile(1)
+    .return getiofile(IO_OUTPUT)
 .end
 
 
@@ -651,7 +668,7 @@ Equivalent to C<io.input():read>.
     .param pmc argv :slurpy
     .local pmc file
     .const .LuaString key = 'read'
-    file = getiofile(0)
+    file = getiofile(IO_INPUT)
     $P0 = file[key]
     .return $P0(file, argv :flat)
 .end
@@ -717,7 +734,7 @@ Equivalent to C<io.output():write>.
     .param pmc argv :slurpy
     .local pmc file
     .const .LuaString key = 'write'
-    file = getiofile(1)
+    file = getiofile(IO_OUTPUT)
     $P0 = file[key]
     .return $P0(file, argv :flat)
 .end

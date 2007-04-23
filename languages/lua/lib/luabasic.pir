@@ -29,10 +29,6 @@ See "Lua 5.1 Reference Manual", section 5.1 "Basic Functions".
     _lua__REGISTRY = new .LuaTable
     global '_REGISTRY' = _lua__REGISTRY
 
-    .local pmc _lua__ENVIRON
-    _lua__ENVIRON = new .LuaTable
-    global '_ENVIRON' = _lua__ENVIRON
-
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = new .LuaTable
     global '_G' = _lua__GLOBAL

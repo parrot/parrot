@@ -387,7 +387,7 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     .local pmc dmax
     argc = argv
     unless argc == 0 goto L0
-    tag_error("no value", 'number')
+    typerror("no value", 'number')
 L0:
     $P0 = argv[0]
     dmax = checknumber($P0)
@@ -414,7 +414,7 @@ L3:
     .local pmc dmin
     argc = argv
     unless argc == 0 goto L0
-    tag_error("no value", 'number')
+    typerror("no value", 'number')
 L0:
     $P0 = argv[0]
     dmin = checknumber($P0)
