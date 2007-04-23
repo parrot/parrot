@@ -321,6 +321,12 @@ Parrot_pop_context(Interp *interp)
     interp->ctx.bp_ps = old->bp_ps;
 }
 
+
+#define SLOT_CHUNK_SIZE 8
+
+#define CALCULATE_SLOT(all_regs_size) ((all_regs_size + SLOT_CHUNK_SIZE - 1) / SLOT_CHUNK_SIZE)
+#define CALCULATE_ALLOC_SIZE(all_regs_size) (((all_regs_size + SLOT_CHUNK_SIZE - 1) / SLOT_CHUNK_SIZE) * SLOT_CHUNK_SIZE)
+
 struct Parrot_Context *
 Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used)
 {
@@ -331,16 +337,19 @@ Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used)
      * TODO (OPT) if we allocate a new context due to a self-recursive call
      *      create a specialized version that just uses caller's size
      */
+    const size_t size_i = sizeof (INTVAL)   * n_regs_used[REGNO_INT];
     const size_t size_n = sizeof (FLOATVAL) * n_regs_used[REGNO_NUM];
-    const size_t size_nip = size_n +
-        sizeof (INTVAL) *   n_regs_used[REGNO_INT] +
-        sizeof (PMC*) *     n_regs_used[REGNO_PMC];
-    size_t reg_alloc = size_nip +
-        sizeof (STRING*) *  n_regs_used[REGNO_STR];
+    const size_t size_s = sizeof (STRING*)  * n_regs_used[REGNO_STR];
+    const size_t size_p = sizeof (PMC*)     * n_regs_used[REGNO_PMC];
 
-    const int slot = (reg_alloc + 7) >> 3;
-    reg_alloc = slot << 3;
+    const size_t size_nip = size_n + size_i + size_p;
+    const size_t all_regs_size  = size_n + size_i + size_p + size_s;
 
+    const int slot = CALCULATE_SLOT(all_regs_size);
+    const size_t reg_alloc = CALCULATE_ALLOC_SIZE(all_regs_size);
+
+
+    /* alloc more slots if needed */
     if (slot >= interp->ctx_mem.n_free_slots) {
         const int n = slot + 1;
         int i;
@@ -353,6 +362,7 @@ Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used)
         interp->ctx_mem.n_free_slots = n;
     }
 
+    /* pop new ctx from free list, else alloc ctx if needed */
     ptr = interp->ctx_mem.free_list[slot];
     old = CONTEXT(interp->ctx);
     if (ptr) {
@@ -365,11 +375,13 @@ Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used)
         else
             ptr = mem_sys_allocate_zeroed(to_alloc);
     }
+
 #if CTX_LEAK_DEBUG
     if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
         fprintf(stderr, "[alloc ctx %p]\n", ptr);
     }
 #endif
+
     CONTEXT(interp->ctx) = ctx = (struct Parrot_Context *)ptr;
 
     ctx->regs_mem_size   = reg_alloc;
@@ -377,9 +389,9 @@ Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used)
 
     /* regs start past the context */
     p = (void *) ((char *)ptr + ALIGNED_CTX_SIZE);
-    /* ctx.bp points to I0, which has Nx at left */
+    /* ctx.bp points to I0, which has Nx on the left */
     interp->ctx.bp.regs_i = (INTVAL*)((char*)p + size_n);
-    /* this points to S0 */
+    /* ctx.bp_ps points to S0, which has Px on the left */
     interp->ctx.bp_ps.regs_s = (STRING**)((char*)p + size_nip);
     init_context(interp, ctx, old);
     return ctx;
