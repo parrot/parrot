@@ -125,9 +125,6 @@ Note that not all types are valid as return types.
 
 =head2 Example NCI call
 
-Most of the function parameters are reasonably self-evident. Some, however,
-merit additional explanation.
-
 This section describes the simplest example for NCI possible. To every NCI
 invocation, there are two parts: the native function to be invoked, and the
 PIR code to do the invocation.
