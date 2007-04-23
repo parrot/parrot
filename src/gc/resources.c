@@ -26,8 +26,10 @@ src/resources.c - Allocate and deallocate tracked resources
 #define RESOURCE_DEBUG 0
 #define RESOURCE_DEBUG_SIZE 1000000
 
+#define POOL_SIZE 65536 * 2
+
 typedef void (*compact_f) (Interp *, Memory_Pool *);
-static void* aligned_mem(Buffer *buffer, char *mem);
+static char * aligned_mem(Buffer *buffer, char *mem);
 
 /*
 
@@ -35,9 +37,8 @@ static void* aligned_mem(Buffer *buffer, char *mem);
 alloc_new_block(Interp *interp,
         size_t size, Memory_Pool *pool, const char *why)>
 
-Allocate a new memory block. We allocate the larger of however much was
-asked for or the default size, whichever's larger. The given text is
-used for debugging.
+Allocate a new memory block. We allocate the larger of the requested size or
+the default size.  The given text is used for debugging.
 
 =cut
 
@@ -50,6 +51,7 @@ alloc_new_block(Interp *interp, size_t size, Memory_Pool *pool, const char *why)
 
     const size_t alloc_size = (size > pool->minimum_block_size)
             ? size : pool->minimum_block_size;
+
 #if RESOURCE_DEBUG
     fprintf(stderr, "new_block (%s) size %u -> %u\n",
         why, size, alloc_size);
@@ -60,28 +62,30 @@ alloc_new_block(Interp *interp, size_t size, Memory_Pool *pool, const char *why)
     /* Allocate a new block. Header info's on the front */
     new_block = (Memory_Block *)mem_internal_allocate_zeroed(
         sizeof (Memory_Block) + alloc_size);
+
     if (!new_block) {
         fprintf(stderr, "out of mem allocsize = %d\n", (int)alloc_size);
         exit(1);
-        return NULL;
     }
 
-    new_block->free = alloc_size;
-    new_block->size = alloc_size;
+    new_block->free  = alloc_size;
+    new_block->size  = alloc_size;
+
     SET_NULL(new_block->next);
     new_block->start = (char *)new_block + sizeof (Memory_Block);
-    new_block->top = new_block->start;
+    new_block->top   = new_block->start;
 
     /* Note that we've allocated it */
     interp->arena_base->memory_allocated += alloc_size;
 
     /* If this is for a public pool, add it to the list */
     new_block->prev = pool->top_block;
+
     /* If we're not first, then tack us on the list */
-    if (pool->top_block) {
+    if (pool->top_block)
         pool->top_block->next = new_block;
-    }
-    pool->top_block = new_block;
+
+    pool->top_block        = new_block;
     pool->total_allocated += alloc_size;
 
     return new_block;
@@ -125,7 +129,6 @@ Buffer memory layout:
 
 */
 
-
 static void *
 mem_allocate(Interp *interp, size_t size, Memory_Pool *pool)
 {
@@ -133,6 +136,7 @@ mem_allocate(Interp *interp, size_t size, Memory_Pool *pool)
 
     /* we always should have one block at least */
     assert(pool->top_block);
+
     /* If not enough room, try to find some */
     if (pool->top_block->free < size) {
         /*
@@ -156,7 +160,7 @@ mem_allocate(Interp *interp, size_t size, Memory_Pool *pool)
 #endif
         }
         if (pool->top_block->free < size) {
-            if (pool->minimum_block_size < 65536*16)
+            if (pool->minimum_block_size < 65536 * 16)
                 pool->minimum_block_size *= 2;
             /*
              * TODO - Big blocks
@@ -165,19 +169,22 @@ mem_allocate(Interp *interp, size_t size, Memory_Pool *pool)
              * And don't set big blocks as the top_block.
              */
             alloc_new_block(interp, size, pool, "compact failed");
+
             interp->arena_base->mem_allocs_since_last_collect++;
+
             if (pool->top_block->free < size) {
                 fprintf(stderr, "out of mem\n");
                 exit(1);
-                return NULL;
             }
         }
     }
+
     /* TODO inline the fast path */
-    return_val = pool->top_block->top;
-    pool->top_block->top += size;
+    return_val             = pool->top_block->top;
+    pool->top_block->top  += size;
     pool->top_block->free -= size;
-    return (void *)return_val;
+
+    return return_val;
 }
 
 #if RESOURCE_DEBUG
@@ -189,13 +196,15 @@ buffer_location(Interp *interp, const PObj *b)
     static char reg[10];
 
     parrot_context_t* const ctx = CONTEXT(interp->ctx);
+
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
-        PObj * const obj = (PObj*) CTX_REG_STR(ctx, i);
+        PObj * const obj = (PObj *) CTX_REG_STR(ctx, i);
         if (obj == b) {
             sprintf(reg, "S%d", i);
             return reg;
         }
     }
+
     return s;
 }
 
@@ -228,36 +237,40 @@ Compact the buffer pool.
 static void
 compact_pool(Interp *interp, Memory_Pool *pool)
 {
-    UINTVAL total_size;
+    INTVAL        j;
+    UINTVAL       object_size;
+    UINTVAL       total_size;
+
     Memory_Block *new_block;     /* A pointer to our working block */
-    char *cur_spot;             /* Where we're currently copying to */
-    Arenas * const arena_base = interp->arena_base;
+    char         *cur_spot;      /* Where we're currently copying to */
+
     Small_Object_Arena *cur_buffer_arena;
-    Small_Object_Pool *header_pool;
-    INTVAL j;
-    UINTVAL object_size;
-    INTVAL *ref_count = NULL;
+    Small_Object_Pool  *header_pool;
+    INTVAL             *ref_count  = NULL;
+    Arenas * const      arena_base = interp->arena_base;
 
     /* Bail if we're blocked */
-    if (arena_base->GC_block_level) {
+    if (arena_base->GC_block_level)
         return;
-    }
+
     ++arena_base->GC_block_level;
+
     if (interp->profile)
         Parrot_dod_profile_start(interp);
 
     /* We're collecting */
-    arena_base->mem_allocs_since_last_collect = 0;
+    arena_base->mem_allocs_since_last_collect    = 0;
     arena_base->header_allocs_since_last_collect = 0;
     arena_base->collect_runs++;
 
-    /* total-reclaimable == currently used. Add a minimum block to the current
-     * amount, so we can avoid having to allocate it in the future. */
+    /* total - reclaimable == currently used. Add a minimum block to the
+     * current amount, so we can avoid having to allocate it in the future. */
     {
         Memory_Block *cur_block;
 
         total_size = 0;
-        cur_block = pool->top_block;
+        cur_block  = pool->top_block;
+
         while (cur_block) {
             /*
              * TODO - Big blocks
@@ -266,9 +279,9 @@ compact_pool(Interp *interp, Memory_Pool *pool)
              * block with total_size. This is more than suboptimal, if
              * the block has just one live item from a big allocation.
              *
-             * But currently it's not known, if the buffer memory is alive
+             * But currently it's unknown if the buffer memory is alive
              * as the live bits are in Buffer headers. We have to run the
-             * compaction loop below to check liveness. OTOH is this
+             * compaction loop below to check liveness. OTOH if this
              * compaction is running through all the buffer headers, there
              * is no relation to the block.
              *
@@ -277,7 +290,7 @@ compact_pool(Interp *interp, Memory_Pool *pool)
              * problem easily.
              */
             total_size += cur_block->size - cur_block->free;
-            cur_block = cur_block->prev;
+            cur_block   = cur_block->prev;
         }
     }
     /*
@@ -297,11 +310,12 @@ compact_pool(Interp *interp, Memory_Pool *pool)
             "inside compact");
 
     /* Start at the beginning */
-    cur_spot = new_block->start;
+    cur_spot  = new_block->start;
 
     /* Run through all the Buffer header pools and copy */
     for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
         header_pool = arena_base->sized_header_pools[j];
+
         if (header_pool == NULL)
             continue;
 
@@ -320,33 +334,35 @@ compact_pool(Interp *interp, Memory_Pool *pool)
                 if (PObj_buflen(b) && PObj_is_movable_TESTALL(b)) {
                     ptrdiff_t offset = 0;
 #if RESOURCE_DEBUG
-                    if (PObj_buflen(b) >= RESOURCE_DEBUG_SIZE) {
+                    if (PObj_buflen(b) >= RESOURCE_DEBUG_SIZE)
                         debug_print_buf(interp, b);
-                    }
 #endif
 
                     /* we can't perform the math all the time, because
                      * strstart might be in unallocated memory */
                     if (PObj_is_COWable_TEST(b)) {
                         ref_count = ((INTVAL*) PObj_bufstart(b)) - 1;
+
                         if (PObj_is_string_TEST(b)) {
                             offset = (ptrdiff_t)((STRING *)b)->strstart -
                                 (ptrdiff_t)PObj_bufstart(b);
                         }
                     }
+
                     /* buffer has already been moved; just change the header */
                     if (PObj_COW_TEST(b) && *ref_count & Buffer_moved_FLAG) {
                         /* Find out who else references our data */
                         Buffer *hdr = *(Buffer **)(PObj_bufstart(b));
 
                         assert(PObj_is_COWable_TEST(b));
+
                         /* Make sure they know that we own it too */
                         PObj_COW_SET(hdr);
-                        /* TODO incr ref_count, after fixing string
-                         * too */
-                        /* Now make sure we point to where the other guy
-                         * does */
+
+                        /* TODO incr ref_count, after fixing string too
+                         * Now make sure we point to where the other guy does */
                         PObj_bufstart(b) = PObj_bufstart(hdr);
+
                         /* And if we're a string, update strstart */
                         /* Somewhat of a hack, but if we get per-pool
                          * collections, it should help ease the pain */
@@ -357,20 +373,26 @@ compact_pool(Interp *interp, Memory_Pool *pool)
                     }
                     else {
                         cur_spot = aligned_mem(b, cur_spot);
+
                         if (PObj_is_COWable_TEST(b)) {
                             INTVAL *new_ref_count = ((INTVAL*) cur_spot) - 1;
-                            *new_ref_count = 2;
+                            *new_ref_count        = 2;
                         }
+
                         /* Copy our memory to the new pool */
                         memcpy(cur_spot, PObj_bufstart(b), PObj_buflen(b));
+
                         /* If we're COW */
                         if (PObj_COW_TEST(b)) {
                             assert(PObj_is_COWable_TEST(b));
+
                             /* Let the old buffer know how to find us */
                             *(Buffer **)(PObj_bufstart(b)) = b;
+
                             /* No guarantees that our data is still COW, so
                              * assume not, and let the above code fix-up */
                             PObj_COW_CLEAR(b);
+
                             /* Finally, let the tail know that we've moved, so
                              * that any other references can know to look for
                              * us and not re-copy */
@@ -463,7 +485,7 @@ aligned_size(Buffer *buffer, size_t len)
     return len;
 }
 
-static void*
+static char *
 aligned_mem(Buffer *buffer, char *mem)
 {
     if (PObj_is_COWable_TEST(buffer))
@@ -528,7 +550,7 @@ void
 Parrot_reallocate(Interp *interp, Buffer *buffer, size_t tosize)
 {
     size_t copysize;
-    void *mem;
+    char  *mem;
     Memory_Pool * const pool = interp->arena_base->memory_pool;
     size_t new_size, needed, old_size;
 
@@ -562,7 +584,7 @@ Parrot_reallocate(Interp *interp, Buffer *buffer, size_t tosize)
         pool->guaranteed_reclaimable += copysize;
     }
     pool->possibly_reclaimable += copysize;
-    mem = mem_allocate(interp, new_size, pool);
+    mem = (char *)mem_allocate(interp, new_size, pool);
     mem = aligned_mem(buffer, mem);
 
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
@@ -631,13 +653,14 @@ Parrot_reallocate_string(Interp *interp, STRING *str, size_t tosize)
     }
     pool->possibly_reclaimable += PObj_buflen(str);
 
-    mem = mem_allocate(interp, new_size, pool);
+    mem = (char *)mem_allocate(interp, new_size, pool);
     mem += sizeof (void*);
 
     /* copy mem from strstart, *not* bufstart */
-    oldmem           = str->strstart;
-    str->strstart    = PObj_bufstart(str) = mem;
-    PObj_buflen(str) = new_size - sizeof (void*);
+    oldmem             = str->strstart;
+    PObj_bufstart(str) = (void *)mem;
+    str->strstart      = mem;
+    PObj_buflen(str)   = new_size - sizeof (void*);
 
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
      * those bugs, this can be removed which would make things cheaper */
@@ -688,8 +711,8 @@ Parrot_allocate_aligned(Interp *interp, Buffer *buffer, size_t size)
     PObj_buflen(buffer) = 0;
     PObj_bufstart(buffer) = NULL;
     new_size = aligned_size(buffer, size);
-    mem = mem_allocate(interp, new_size,
-            interp->arena_base->memory_pool);
+    mem = (char *)mem_allocate(interp, new_size,
+        interp->arena_base->memory_pool);
     mem = aligned_mem(buffer, mem);
     PObj_bufstart(buffer) = mem;
     if (PObj_is_COWable_TEST(buffer))
@@ -714,21 +737,23 @@ is B<not> changed.
 void
 Parrot_allocate_string(Interp *interp, STRING *str, size_t size)
 {
-    size_t new_size;
+    size_t       new_size;
     Memory_Pool *pool;
-    char *mem;
+    char        *mem;
 
-    PObj_buflen(str) = 0;
+    PObj_buflen(str)   = 0;
     PObj_bufstart(str) = NULL;
 
-    pool = PObj_constant_TEST(str)
-            ? interp->arena_base->constant_string_pool
-            : interp->arena_base->memory_pool;
+    pool     = PObj_constant_TEST(str)
+                ? interp->arena_base->constant_string_pool
+                : interp->arena_base->memory_pool;
+
     new_size = aligned_string_size(str, size);
-    mem = mem_allocate(interp, new_size, pool);
-    mem += sizeof (void*);
+    mem      = (char *)mem_allocate(interp, new_size, pool);
+    mem     += sizeof (void*);
+
     PObj_bufstart(str) =  str->strstart = mem;
-    PObj_buflen(str) = new_size - sizeof (void*);
+    PObj_buflen(str)   = new_size - sizeof (void*);
 }
 
 /*
@@ -745,18 +770,18 @@ Create a new memory pool.
 static Memory_Pool *
 new_memory_pool(size_t min_block, compact_f compact)
 {
-    Memory_Pool * const pool =
-        (Memory_Pool *)mem_internal_allocate(sizeof (Memory_Pool));
+    Memory_Pool * const pool = mem_internal_allocate_typed(Memory_Pool);
 
     if (pool) {
-        pool->top_block = NULL;
-        pool->compact = compact;
-        pool->minimum_block_size = min_block;
-        pool->total_allocated = 0;
+        pool->top_block              = NULL;
+        pool->compact                = compact;
+        pool->minimum_block_size     = min_block;
+        pool->total_allocated        = 0;
         pool->guaranteed_reclaimable = 0;
-        pool->possibly_reclaimable = 0;
-        pool->reclaim_factor = RECLAMATION_FACTOR;
+        pool->possibly_reclaimable   = 0;
+        pool->reclaim_factor         = RECLAMATION_FACTOR;
     }
+
     return pool;
 }
 
@@ -771,18 +796,18 @@ Initialize the managed memory pools.
 
 */
 
-#define POOL_SIZE 65536*2
 void
 Parrot_initialize_memory_pools(Interp *interp)
 {
     Arenas * const arena_base = interp->arena_base;
 
-    arena_base->memory_pool = new_memory_pool(POOL_SIZE, &compact_pool);
+    arena_base->memory_pool   = new_memory_pool(POOL_SIZE, &compact_pool);
     alloc_new_block(interp, POOL_SIZE, arena_base->memory_pool, "init");
 
     /* Constant strings - not compacted */
     arena_base->constant_string_pool =
         new_memory_pool(POOL_SIZE, (compact_f)NULLfunc);
+
     alloc_new_block(interp, POOL_SIZE,
                     arena_base->constant_string_pool, "init");
 }
@@ -810,6 +835,7 @@ Parrot_destroy_memory_pools(Interp *interp)
         Memory_Block *cur_block;
 
         cur_block = pool->top_block;
+
         while (cur_block) {
             Memory_Block * const next_block = cur_block->prev;
             mem_internal_free(cur_block);
@@ -837,25 +863,30 @@ static void merge_pools(Memory_Pool *dest, Memory_Pool *source)
     Memory_Block *next_block;
 
     cur_block = source->top_block;
+
     while (cur_block) {
         next_block = cur_block->prev;
+
         if (cur_block->free == cur_block->size) {
             mem_internal_free(cur_block);
         }
         else {
-            cur_block->next = NULL;
-            cur_block->prev = dest->top_block;
-            dest->top_block = cur_block;
+            cur_block->next        = NULL;
+            cur_block->prev        = dest->top_block;
+
+            dest->top_block        = cur_block;
             dest->total_allocated += cur_block->size;
         }
         cur_block = next_block;
     }
-    dest->guaranteed_reclaimable += source->guaranteed_reclaimable;
-    dest->possibly_reclaimable += dest->possibly_reclaimable;
 
-    source->top_block = NULL;
-    source->total_allocated = source->guaranteed_reclaimable =
-        source->possibly_reclaimable = 0;
+    dest->guaranteed_reclaimable += source->guaranteed_reclaimable;
+    dest->possibly_reclaimable   += dest->possibly_reclaimable;
+
+    source->top_block              = NULL;
+    source->total_allocated        = 0;
+    source->possibly_reclaimable   = 0;
+    source->guaranteed_reclaimable = 0;
 }
 
 void
@@ -863,6 +894,7 @@ Parrot_merge_memory_pools(Interp *dest_interp, Interp *source_interp)
 {
     merge_pools(dest_interp->arena_base->constant_string_pool,
                 source_interp->arena_base->constant_string_pool);
+
     merge_pools(dest_interp->arena_base->memory_pool,
                 source_interp->arena_base->memory_pool);
 }
@@ -882,7 +914,6 @@ Initial version by Dan on 2001.10.2.
 =cut
 
 */
-
 
 /*
  * Local variables:

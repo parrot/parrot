@@ -23,9 +23,14 @@ PARROT_API void mem_sys_free(void *);
 
 void *mem__internal_allocate(size_t, const char *, int);
 #define mem_internal_allocate(x) mem__internal_allocate(x, __FILE__, __LINE__)
+#define mem_internal_allocate_typed(t) \
+    (t *)mem__internal_allocate(sizeof (t), __FILE__, __LINE__)
 
 void *mem__internal_allocate_zeroed(size_t, const char *, int);
-#define mem_internal_allocate_zeroed(x) mem__internal_allocate_zeroed(x, __FILE__, __LINE__)
+#define mem_internal_allocate_zeroed(x) mem__internal_allocate_zeroed(x, \
+    __FILE__, __LINE__)
+#define mem_internal_allocate_zeroed_typed(t) \
+    (t *)mem__internal_allocate_zeroed(sizeof (t), __FILE__, __LINE__)
 
 void *mem__internal_realloc(void *, size_t, const char *, int);
 #define mem_internal_realloc(x, y) mem__internal_realloc(x, y, __FILE__, __LINE__)
