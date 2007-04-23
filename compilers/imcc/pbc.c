@@ -637,20 +637,20 @@ static int
 add_const_pmc_sub(Interp *interp, SymReg *r,
         int offs, int end)
 {
-    int i, k;
-    INTVAL type;
-    PMC *ns_pmc;
-    PMC *sub_pmc;
-    struct Parrot_sub *sub;
-    PackFile_Constant *pfc;
-    SymReg *ns;
-    int ns_const = -1;
-    char *real_name;
+    int                  i, k;
+    int                  ns_const = -1;
+    INTVAL               type;
+    INTVAL               vtable_index;
+    char                *real_name;
+    char                *c_name;
+    IMC_Unit            *unit;
+    PMC                 *ns_pmc;
+    PMC                 *sub_pmc;
+    struct Parrot_sub   *sub;
+    PackFile_Constant   *pfc;
     PackFile_ConstTable *ct;
-    IMC_Unit *unit;
-    STRING *vtable_name;
-    char *c_name;
-    int vtable_index;
+    SymReg              *ns;
+    STRING              *vtable_name;
 
     unit = globals.cs->subs->unit;
 
@@ -737,8 +737,8 @@ add_const_pmc_sub(Interp *interp, SymReg *r,
             vtable_name = sub->name;
 
         /* Check this is a valid vtable method to override. */
+        vtable_index = Parrot_get_vtable_index(interp, vtable_name);
         c_name       = string_to_cstring(interp, vtable_name);
-        vtable_index = Parrot_get_vtable_index(interp, c_name);
 
         if (vtable_index == -1) {
             IMCC_fatal(interp, 1,
@@ -751,17 +751,18 @@ add_const_pmc_sub(Interp *interp, SymReg *r,
         sub->vtable_index = vtable_index;
     }
 
-    pfc->type = PFC_PMC;
-    pfc->u.key = sub_pmc;
+    pfc->type     = PFC_PMC;
+    pfc->u.key    = sub_pmc;
     unit->sub_pmc = sub_pmc;
+
     IMCC_debug(interp, DEBUG_PBC_CONST,
             "add_const_pmc_sub '%s' flags %d color %d (%s) "
             "lex_info %s :outer(%s)\n",
             r->name, r->pcc_sub->pragma, k,
-            (char*) sub_pmc->vtable->whoami->strstart,
+            (char *) sub_pmc->vtable->whoami->strstart,
             sub->lex_info ? "yes" : "no",
             sub->outer_sub ?
-                (char*)PMC_sub(sub->outer_sub)->name->strstart :
+                (char *)PMC_sub(sub->outer_sub)->name->strstart :
                 "*none*"
             );
     /*

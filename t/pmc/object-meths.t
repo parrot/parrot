@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 44;
 
 =head1 NAME
 
@@ -705,6 +705,28 @@ Bar
 bar_init
 in sub
 done
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "constructor - vtable override" );
+.sub main :main
+  $P0 = newclass 'Foo'
+  $P1 = subclass 'Foo', 'Bar'
+  $P2 = new 'Bar'
+.end
+
+.namespace ['Foo']
+.sub init :vtable :method
+  print "foo init\n"
+.end
+
+.namespace ['Bar']
+.sub init :vtable :method
+  print "bar init\n"
+.end
+
+CODE
+foo init
+bar init
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "same method name in two namespaces" );

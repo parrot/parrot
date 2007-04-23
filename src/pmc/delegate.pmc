@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003, The Perl Foundation.
+Copyright (C) 2003-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -20,109 +20,36 @@ Almost all methods are auto-generated in lib/Parrot/Pmc2c.pm
 
 */
 
-
 #include "parrot/parrot.h"
 #include "delegate.str"
 #include <assert.h>
 
-
 /*
 
-=item C<static PMC *
-find_meth(Interp *interp, PMC *pmc, STRING *name)>
-
-Finds and returns the delegated method with string C<name>.
-
-=cut
-
-*/
-
-
-static PMC *
-find_meth(Interp *interp, PMC *pmc, STRING *meth) {
-    PMC *_class = pmc;
-
-    if (PObj_is_object_TEST(pmc)) {
-        _class = GET_CLASS(PMC_data(pmc), pmc);
-    }
-    return Parrot_find_method_with_cache(interp, _class, meth);
-}
-
-/*
-
-=item C<static PMC *
-find_or_die(Interp *interp, PMC *pmc, STRING *name)>
-
-Returns the result of calling C<find_meth()> with the arguments, raising
-an exception if no method is found.
-
-=cut
-
-*/
-
-static PMC *
-find_or_die(Interp *interp, PMC *pmc, STRING *meth) {
-    PMC *returnPMC = find_meth(interp, pmc, meth);
-    if (PMC_IS_NULL(returnPMC)) {
-        PMC  *_class    = pmc;
-        char *meth_name = string_to_cstring(interp, meth);
-        if (PObj_is_object_TEST(pmc)) {
-            char *obj_name  = string_to_cstring(interp, PMC_str_val(
-                        get_attrib_num((SLOTTYPE *)PMC_data(_class),
-                            PCD_CLASS_NAME)));
-            _class = GET_CLASS(PMC_data(pmc), pmc);
-            real_exception(interp, NULL, E_LookupError,
-                "Can't find method '%s' for object '%s'", meth_name, obj_name);
-            string_cstring_free(obj_name);
-        }
-        else {
-            real_exception(interp, NULL, E_LookupError,
-                "Can't find method '%s' - erroneous PMC",
-                string_to_cstring(interp, meth));
-        }
-        string_cstring_free(meth_name);
-    }
-    return returnPMC;
-}
-
-/*
-
-=back
-
-All these functions to run code can leak a full parrot register file, as
+All these functions to run code can leak a full Parrot register file, as
 well as potentially permanently unroot some PMCs or strings, if the
 vtable method throws an exception. It really ought be caught rather than
 let flow through.
 
-=over 4
-
-=item C<PARROT_INLINE static void
-noarg_noreturn(Interp *interp, PMC *obj, const char *meth, int die)>
-
-Calls the delegated method with no arguments or return value. If C<die>
-is true then an exception will be raised if the method is not found.
-
-=cut
-
 */
 
 static void
-noarg_noreturn(Interp *interp, PMC *obj, PMC* _class,
-        const char *name, int die)
+vtable_meth_not_found(Interp *interp, PMC *pmc, const char *meth)
 {
-    STRING *meth = const_string(interp, name);
-    STRING *meth_v = const_string(interp, name + 2);
-    PMC *method = Parrot_find_vtable_meth(interp, _class, meth);
-    if (PMC_IS_NULL(method))
-        method = die ? find_or_die(interp, _class, meth) :
-            find_meth(interp, _class, meth);
-    if (PMC_IS_NULL(method)) {
-        if (Interp_trace_TEST(interp, PARROT_TRACE_FIND_METH_FLAG)) {
-            PIO_eprintf(interp, "# not found\n");
-        }
-        return;
-    }
-    Parrot_run_meth_fromc(interp, method, obj, meth);
+    char *_class;
+
+    if (PObj_is_class_TEST(pmc))
+        _class = string_to_cstring(interp, PMC_str_val(
+            get_attrib_num(
+                (SLOTTYPE *)PMC_data(GET_CLASS(PMC_data(pmc), pmc)),
+                    PCD_CLASS_NAME)));
+    else
+        _class = string_to_cstring(interp, pmc->vtable->whoami);
+
+    real_exception(interp, NULL, E_LookupError,
+        "Can't find vtable method '%s' in class '%s'", meth, _class);
+
+    string_cstring_free(_class);
 }
 
 pmclass delegate {
@@ -134,10 +61,6 @@ pmclass delegate {
 =head2 Methods
 
 =over 4
-
-=item C<void init()>
-
-Calls the delegated C<__init()> method if it exists.
 
 =item C<PMC* instantiate(PMC* sig)>
 
@@ -152,11 +75,25 @@ useful defaults and don't throw exceptions.
 */
 
     void init() {
-        noarg_noreturn(INTERP, SELF, SELF, PARROT_VTABLE_INIT_METHNAME, 0);
+        STRING *meth = CONST_STRING(interp, "init");
+        PMC *sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
+        if (!PMC_IS_NULL(sub))
+            Parrot_run_meth_fromc(interp, sub, SELF, meth);
     }
 
-    void init_pmc(PMC* _class) {
-        noarg_noreturn(INTERP, SELF, _class, PARROT_VTABLE_INIT_METHNAME, 0);
+    void init_pmc(PMC* initializer) {
+        STRING *meth = CONST_STRING(interp, "init_pmc");
+        PMC *sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
+        if (!PMC_IS_NULL(sub))
+            Parrot_run_meth_fromc_args(interp, sub, pmc, meth, "vP", initializer);
+    }
+
+    PMC* instantiate(PMC* sig) {
+        STRING *meth = CONST_STRING(interp, "instantiate");
+        PMC *sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
+        if (PMC_IS_NULL(sub))
+            return SUPER(sig);
+        return (PMC*) Parrot_run_meth_fromc(INTERP, sub, SELF, meth);
     }
 
     void destroy() {
@@ -165,20 +102,6 @@ useful defaults and don't throw exceptions.
 
     void mark() {
         /* don't delegate mark */
-    }
-
-    PMC* instantiate(PMC* sig) {
-        STRING *meth = const_string(INTERP,
-                PARROT_VTABLE_INSTANTIATE_METHNAME);
-        PMC *sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(INTERP, SELF, meth);
-
-        if (PMC_IS_NULL(sub)) {
-            /* run default fallback that constructs an empty object */
-            return SUPER(sig);
-        }
-        return (PMC*) Parrot_run_meth_fromc(INTERP, sub, SELF, meth);
     }
 
     void add_method(STRING *method_name, PMC *sub_pmc) {
@@ -208,11 +131,10 @@ Invokes a subroutine.
 */
 
     opcode_t* invoke(void *next) {
-        STRING *meth = CONST_STRING(interp, "__invoke");
-        STRING *meth_v = CONST_STRING(interp, "invoke");
-        PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
+        STRING *meth = CONST_STRING(interp, "invoke");
+        PMC *sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
         if (PMC_IS_NULL(sub))
-            sub = find_or_die(interp, pmc, meth);
+            vtable_meth_not_found(INTERP, SELF, "invoke");
         INTERP->current_object = SELF;
         return VTABLE_invoke(interp, sub, next);
     }

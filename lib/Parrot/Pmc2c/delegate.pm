@@ -52,19 +52,6 @@ sub signature {
     return join '', @types;
 }
 
-=item C<gen_ret($type)>
-
-Generate the C code for a C<return> statement.
-
-=cut
-
-sub gen_ret {
-    my ( $self, $type ) = @_;
-
-    #return "ret_val = *($1*) " if ($type =~ /((?:INT|FLOAT)VAL)/);
-    return "ret_val = ($type) ";
-}
-
 =item C<body($method, $line, $out_name)>
 
 Returns the C code for the method body. C<$line> is used to accumulate
@@ -95,42 +82,29 @@ sub body {
     $arg = ", " . join( ' ', @args ) if @args;
     my $sig = $self->signature($parameters);
     $sig = $self->trans( $method->{type} ) . $sig;
-    my $ret      = '';
-    my $ret_def  = '';
-    my $func_ret = '(void) ';
+    my $func_ret = '';
     my $ret_type = '';
 
     if ( $method->{type} ne 'void' ) {
         my $type = $method->{type};
-        $ret_def  = "$type ret_val;";
-        $func_ret = $self->gen_ret( $method->{type} );
-        $ret      = "return ret_val;";
+        $func_ret = "return ($type)";
         if ( $type !~ /\*/ ) {
             $ret_type = "_ret" . lc substr $type, 0, 1;
             $ret_type = "_reti" if $ret_type eq '_retu';
         }
     }
-    my $umeth         = uc $meth;
-    my $delegate_meth = "PARROT_VTABLE_${umeth}_METHNAME";
 
     # I think that these will be out by one - NWC
     my $l = $self->line_directive( $line, "delegate.c" );
     my $cout = <<EOC;
 $l
-${decl} {
-EOC
-    $cout .= "    $ret_def\n" if $ret_def;
-    $cout .= <<EOC;
-    STRING *meth = CONST_STRING(interp, "__$meth");
-    STRING *meth_v = CONST_STRING(interp, "$meth");
-    PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
+${decl}{
+    STRING *meth = CONST_STRING(interp, "$meth");
+    PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth);
     if (PMC_IS_NULL(sub))
-        sub = find_or_die(interp, pmc, meth);
+        vtable_meth_not_found(interp, pmc, "$meth");
     ${func_ret}Parrot_run_meth_fromc_args$ret_type(interp, sub,
         pmc, meth, "$sig"$arg);
-EOC
-    $cout .= "    $ret\n" if $ret;
-    $cout .= <<EOC;
 }
 
 EOC

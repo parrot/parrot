@@ -26,17 +26,6 @@ F<src/objects.c>, at least for right now.
 #include "parrot/parrot.h"
 #include "pmc_deleg_pmc.h"
 
-/* XXX duplicated from delegate.pmc */
-static PMC *
-find_meth(Interp* interp, PMC *pmc, STRING *meth) {
-    PMC *_class = pmc;
-
-    if (PObj_is_object_TEST(pmc)) {
-        _class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
-    }
-    return Parrot_find_method_with_cache(interp, _class, meth);
-}
-
 pmclass ParrotObject extends ParrotClass need_ext {
 
 /*
@@ -162,96 +151,79 @@ Return the class of this object.
 
 */
 
-    PMC* find_method(STRING* name) {
-        PMC *_class = VTABLE_get_class(INTERP, SELF);
-        STRING *meth = CONST_STRING(interp, "__find_method");
-        STRING *meth_v = CONST_STRING(interp, "find_method");
-        PMC *sub = Parrot_find_vtable_meth(interp, SELF, meth_v);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, SELF, meth);
+    PMC* find_method(STRING *name) {
+        STRING *meth   = CONST_STRING(interp, "find_method");
+        PMC    *_class = VTABLE_get_class(INTERP, SELF);
+        PMC    *sub    = Parrot_find_vtable_meth(interp, SELF, meth);
+
         if (PMC_IS_NULL(sub))
             return VTABLE_find_method(INTERP, _class, name);
-        return (PMC*) Parrot_run_meth_fromc_args(interp, sub,
+        return (PMC *) Parrot_run_meth_fromc_args(interp, sub,
             SELF, meth, "PS", name);
     }
 
     PMC* get_attr(INTVAL idx) {
-        STRING *meth = CONST_STRING(interp, "__get_attr");
-        STRING *meth_v = CONST_STRING(interp, "get_attr");
-        PMC *sub = Parrot_find_vtable_meth(interp, SELF, meth_v);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, SELF, meth);
+        STRING *meth = CONST_STRING(interp, "get_attr");
+        PMC    *sub  = Parrot_find_vtable_meth(interp, SELF, meth);
+
         if (PMC_IS_NULL(sub))
             return Parrot_get_attrib_by_num(INTERP, SELF, idx);
-        return (PMC*) Parrot_run_meth_fromc_args(interp, sub,
+        return (PMC *) Parrot_run_meth_fromc_args(interp, sub,
             SELF, meth, "PI", idx);
     }
 
-    PMC* get_attr_str(STRING* idx) {
-        STRING *meth = CONST_STRING(interp, "__get_attr_str");
-        STRING *meth_v = CONST_STRING(interp, "get_attr_str");
-        PMC *sub = Parrot_find_vtable_meth(interp, SELF, meth_v);
-        PMC* r;
+    PMC* get_attr_str(STRING *idx) {
+        STRING *meth = CONST_STRING(interp, "get_attr_str");
+        PMC    *sub  = Parrot_find_vtable_meth(interp, SELF, meth);
+
         if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, SELF, meth);
-        if (PMC_IS_NULL(sub))
-            r = Parrot_get_attrib_by_str(INTERP, SELF, idx);
-        else r = (PMC*) Parrot_run_meth_fromc_args(interp, sub,
+            return Parrot_get_attrib_by_str(INTERP, SELF, idx);
+
+        return (PMC *) Parrot_run_meth_fromc_args(interp, sub,
             SELF, meth, "PS", idx);
-        return r;
     }
 
-    void set_attr(INTVAL idx, PMC* value) {
-        STRING *meth = CONST_STRING(interp, "__set_attr");
-        STRING *meth_v = CONST_STRING(interp, "set_attr");
-        PMC *sub = Parrot_find_vtable_meth(interp, SELF, meth_v);
+    void set_attr(INTVAL idx, PMC *value) {
+        STRING *meth = CONST_STRING(interp, "set_attr");
+        PMC    *sub  = Parrot_find_vtable_meth(interp, SELF, meth);
+
         if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, SELF, meth);
-        if (PMC_IS_NULL(sub)) {
             Parrot_set_attrib_by_num(INTERP, SELF, idx, value);
-            return;
-        }
-        (PMC*) Parrot_run_meth_fromc_args(interp, sub,
-            SELF, meth, "vIP", idx, value);
+        else
+            Parrot_run_meth_fromc_args(interp, sub, SELF, meth,
+                "vIP", idx, value);
     }
 
-    void set_attr_str(STRING* idx, PMC* value) {
-        STRING *meth = CONST_STRING(interp, "__set_attr_str");
-        STRING *meth_v = CONST_STRING(interp, "set_attr_str");
-        PMC *sub = Parrot_find_vtable_meth(interp, SELF, meth_v);
+    void set_attr_str(STRING *idx, PMC *value) {
+        STRING *meth = CONST_STRING(interp, "set_attr_str");
+        PMC    *sub  = Parrot_find_vtable_meth(interp, SELF, meth);
+
         if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, SELF, meth);
-        if (PMC_IS_NULL(sub)) {
             Parrot_set_attrib_by_str(INTERP, SELF, idx, value);
-            return;
-        }
-        (PMC*) Parrot_run_meth_fromc_args(interp, sub,
-            SELF, meth, "vSP", idx, value);
+        else
+            Parrot_run_meth_fromc_args(interp, sub, SELF, meth,
+                "vSP", idx, value);
     }
 
     PMC* get_class() {
-        STRING *meth = CONST_STRING(interp, "__get_class");
-        STRING *meth_v = CONST_STRING(interp, "get_class");
-        PMC *sub = Parrot_find_vtable_meth(interp, SELF, meth_v);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, SELF, meth);
+        STRING *meth = CONST_STRING(interp, "get_class");
+        PMC    *sub  = Parrot_find_vtable_meth(interp, SELF, meth);
+        int     type_num;
+
         if (PMC_IS_NULL(sub)) {
-            if (!PObj_is_PMC_shared_TEST(SELF)) {
+            if (!PObj_is_PMC_shared_TEST(SELF))
                 return GET_CLASS(PMC_data(SELF), SELF);
-            }
             else {
                 /* get the class object for this interpreter */
                 /* XXX this is rather a hack, it is, however, necessary:
                  * otherwise we will be accessing the wrong interpreter's
                  * namespace
                  */
-                int type_num = SELF->vtable->base_type;
-
+                type_num = SELF->vtable->base_type;
                 return INTERP->vtables[type_num]->pmc_class;
             }
-         }
-        return (PMC*) Parrot_run_meth_fromc_args(interp, sub,
-            SELF, meth, "P");
+        }
+        return (PMC *) Parrot_run_meth_fromc_args(interp, sub, SELF, meth, "P");
     }
 
 /*
@@ -290,267 +262,261 @@ it's just SUPER aka the default implementation.
 */
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-        STRING *meth = CONST_STRING(interp, "__get_integer_keyed_int");
-        STRING *meth_v = CONST_STRING(interp, "get_integer_keyed_int");
-        PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, pmc, meth);
-        if (sub) {
-            return Parrot_run_meth_fromc_args_reti(interp, sub,
-                                              pmc, meth, "II", key);
-        }
-        else {
+        STRING *meth = CONST_STRING(INTERP, "get_integer_keyed_int");
+        PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
+
+        if (PMC_IS_NULL(sub)) {
             PMC *mro = SELF->vtable->mro;
+
             if (VTABLE_elements(INTERP, mro) == 1)
                 return SUPER(key);
             else {
-                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,
+                    SELF->vtable->mro, 1);
+
                 if (PObj_is_class_TEST(parent))
                     return SUPER(key);
-                else
-                    return deleg_pmc.SUPER(key);
+
+                return deleg_pmc.SUPER(key);
             }
         }
+        return Parrot_run_meth_fromc_args_reti(INTERP, sub,
+                                               pmc, meth, "II", key);
     }
 
     FLOATVAL get_number_keyed_int(INTVAL key) {
-        STRING *meth = CONST_STRING(interp, "__get_number_keyed_int");
-        STRING *meth_v = CONST_STRING(interp, "get_number_keyed_int");
-        PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, pmc, meth);
-        if (sub) {
-            return Parrot_run_meth_fromc_args_retf(interp, sub,
-                                              pmc, meth, "NI", key);
-        }
-        else {
+        STRING *meth = CONST_STRING(INTERP, "get_number_keyed_int");
+        PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
+
+        if (PMC_IS_NULL(sub)) {
             PMC *mro = SELF->vtable->mro;
+
             if (VTABLE_elements(INTERP, mro) == 1)
                 return SUPER(key);
             else {
-                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,
+                    SELF->vtable->mro, 1);
+
                 if (PObj_is_class_TEST(parent))
                     return SUPER(key);
-                else
-                    return deleg_pmc.SUPER(key);
+
+                return deleg_pmc.SUPER(key);
             }
         }
+        return Parrot_run_meth_fromc_args_retf(INTERP, sub,
+                                               pmc, meth, "NI", key);
     }
 
     STRING* get_string_keyed_int(INTVAL key) {
-        STRING *meth = CONST_STRING(interp, "__get_string_keyed_int");
-        STRING *meth_v = CONST_STRING(interp, "get_string_keyed_int");
-        PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, pmc, meth);
-        if (sub) {
-            return Parrot_run_meth_fromc_args(interp, sub,
-                                              pmc, meth, "SI", key);
-        }
-        else {
+        STRING *meth = CONST_STRING(INTERP, "get_string_keyed_int");
+        PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
+
+        if (PMC_IS_NULL(sub)) {
             PMC *mro = SELF->vtable->mro;
+
             if (VTABLE_elements(INTERP, mro) == 1)
                 return SUPER(key);
             else {
-                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,
+                    SELF->vtable->mro, 1);
+
                 if (PObj_is_class_TEST(parent))
                     return SUPER(key);
-                else
-                    return deleg_pmc.SUPER(key);
+
+                return deleg_pmc.SUPER(key);
             }
         }
+        return (STRING*)Parrot_run_meth_fromc_args(INTERP, sub,
+                                                   pmc, meth, "SI", key);
     }
 
     PMC* get_pmc_keyed_int(INTVAL key) {
-        STRING *meth = CONST_STRING(interp, "__get_pmc_keyed_int");
-        STRING *meth_v = CONST_STRING(interp, "get_pmc_keyed_int");
-        PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, pmc, meth);
-        if (sub) {
-            return Parrot_run_meth_fromc_args(interp, sub,
-                                              pmc, meth, "PI", key);
-        }
-        else {
+        STRING *meth = CONST_STRING(INTERP, "get_pmc_keyed_int");
+        PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
+
+        if (PMC_IS_NULL(sub)) {
             PMC *mro = SELF->vtable->mro;
+
             if (VTABLE_elements(INTERP, mro) == 1)
                 return SUPER(key);
             else {
-                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,
+                    SELF->vtable->mro, 1);
+
                 if (PObj_is_class_TEST(parent))
                     return SUPER(key);
-                else
-                    return deleg_pmc.SUPER(key);
+
+                return deleg_pmc.SUPER(key);
             }
         }
+        return (PMC*)Parrot_run_meth_fromc_args(INTERP, sub,
+                                                pmc, meth, "PI", key);
     }
 
     void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        STRING *meth = CONST_STRING(interp, "__set_integer_keyed_int");
-        STRING *meth_v = CONST_STRING(interp, "set_integer_keyed_int");
-        PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, pmc, meth);
-        if (sub) {
-            (void) Parrot_run_meth_fromc_args(interp, sub,
-                    pmc, meth, "vII", key, value);
-        }
-        else {
+        STRING *meth = CONST_STRING(INTERP, "set_integer_keyed_int");
+        PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
+
+        if (PMC_IS_NULL(sub)) {
             PMC *mro = SELF->vtable->mro;
+
             if (VTABLE_elements(INTERP, mro) == 1)
                 SUPER(key, value);
             else {
-                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,
+                    SELF->vtable->mro, 1);
+
                 if (PObj_is_class_TEST(parent))
                     SUPER(key, value);
                 else
                     deleg_pmc.SUPER(key, value);
             }
         }
+        else
+            Parrot_run_meth_fromc_args(INTERP, sub,
+                                       pmc, meth, "vII", key, value);
     }
 
     void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        STRING *meth = CONST_STRING(interp, "__set_number_keyed_int");
-        STRING *meth_v = CONST_STRING(interp, "set_number_keyed_int");
-        PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, pmc, meth);
-        if (sub) {
-            (void) Parrot_run_meth_fromc_args(interp, sub,
-                                              pmc, meth, "vIN", key, value);
-        }
-        else {
+        STRING *meth = CONST_STRING(INTERP, "set_number_keyed_int");
+        PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
+
+        if (PMC_IS_NULL(sub)) {
             PMC *mro = SELF->vtable->mro;
+
             if (VTABLE_elements(INTERP, mro) == 1)
                 SUPER(key, value);
             else {
-                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,
+                    SELF->vtable->mro, 1);
+
                 if (PObj_is_class_TEST(parent))
                     SUPER(key, value);
                 else
                     deleg_pmc.SUPER(key, value);
             }
         }
+        else
+            Parrot_run_meth_fromc_args(INTERP, sub,
+                                       pmc, meth, "vIN", key, value);
     }
 
     void set_string_keyed_int(INTVAL key, STRING* value) {
-        STRING *meth = CONST_STRING(interp, "__set_string_keyed_int");
-        STRING *meth_v = CONST_STRING(interp, "set_string_keyed_int");
-        PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, pmc, meth);
-        if (sub) {
-            (void) Parrot_run_meth_fromc_args(interp, sub,
-                                              pmc, meth, "vIS", key, value);
-        }
-        else {
+        STRING *meth = CONST_STRING(INTERP, "set_string_keyed_int");
+        PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
+
+        if (PMC_IS_NULL(sub)) {
             PMC *mro = SELF->vtable->mro;
+
             if (VTABLE_elements(INTERP, mro) == 1)
                 SUPER(key, value);
             else {
-                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,
+                    SELF->vtable->mro, 1);
+
                 if (PObj_is_class_TEST(parent))
                     SUPER(key, value);
                 else
                     deleg_pmc.SUPER(key, value);
             }
         }
+        else
+            Parrot_run_meth_fromc_args(INTERP, sub,
+                                       pmc, meth, "vIS", key, value);
     }
 
     void set_pmc_keyed_int(INTVAL key, PMC* value) {
-        STRING *meth = CONST_STRING(interp, "__set_pmc_keyed_int");
-        STRING *meth_v = CONST_STRING(interp, "set_pmc_keyed_int");
-        PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, pmc, meth);
-        if (sub) {
-            (void) Parrot_run_meth_fromc_args(interp, sub,
-                                              pmc, meth, "vIP", key, value);
-        }
-        else {
+        STRING *meth = CONST_STRING(INTERP, "set_pmc_keyed_int");
+        PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
+
+        if (PMC_IS_NULL(sub)) {
             PMC *mro = SELF->vtable->mro;
+
             if (VTABLE_elements(INTERP, mro) == 1)
                 SUPER(key, value);
             else {
-                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,
+                    SELF->vtable->mro, 1);
+
                 if (PObj_is_class_TEST(parent))
                     SUPER(key, value);
                 else
                     deleg_pmc.SUPER(key, value);
             }
         }
+        else
+            Parrot_run_meth_fromc_args(INTERP, sub,
+                                       pmc, meth, "vIP", key, value);
     }
 
     void delete_keyed_int(INTVAL key) {
-        STRING *meth = CONST_STRING(interp, "__delete_keyed_int");
-        STRING *meth_v = CONST_STRING(interp, "delete_keyed_int");
-        PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, pmc, meth);
-        if (sub) {
-            (void) Parrot_run_meth_fromc_args(interp, sub,
-                                              pmc, meth, "vI", key);
-        }
-        else {
+        STRING *meth = CONST_STRING(INTERP, "delete_keyed_int");
+        PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
+
+        if (PMC_IS_NULL(sub)) {
             PMC *mro = SELF->vtable->mro;
+
             if (VTABLE_elements(INTERP, mro) == 1)
                 SUPER(key);
             else {
-                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,
+                    SELF->vtable->mro, 1);
+
                 if (PObj_is_class_TEST(parent))
                     SUPER(key);
                 else
                     deleg_pmc.SUPER(key);
             }
         }
+        else
+            Parrot_run_meth_fromc_args(INTERP, sub,
+                                       pmc, meth, "vI", key);
     }
 
     INTVAL defined_keyed_int(INTVAL key) {
-        STRING *meth = CONST_STRING(interp, "__defined_keyed_int");
-        STRING *meth_v = CONST_STRING(interp, "defined_keyed_int");
-        PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, pmc, meth);
-        if (sub) {
-            return Parrot_run_meth_fromc_args_reti(interp, sub,
-                                              pmc, meth, "II", key);
-        }
-        else {
+        STRING *meth = CONST_STRING(INTERP, "defined_keyed_int");
+        PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
+
+        if (PMC_IS_NULL(sub)) {
             PMC *mro = SELF->vtable->mro;
+
             if (VTABLE_elements(INTERP, mro) == 1)
                 return SUPER(key);
             else {
-                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,
+                    SELF->vtable->mro, 1);
+
                 if (PObj_is_class_TEST(parent))
                     return SUPER(key);
-                else
-                    return deleg_pmc.SUPER(key);
+
+                return deleg_pmc.SUPER(key);
             }
         }
+        return Parrot_run_meth_fromc_args_reti(INTERP, sub,
+                                               pmc, meth, "II", key);
     }
 
     INTVAL exists_keyed_int(INTVAL key) {
-        STRING *meth = CONST_STRING(interp, "__exists_keyed_int");
-        STRING *meth_v = CONST_STRING(interp, "exists_keyed_int");
-        PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth_v);
-        if (PMC_IS_NULL(sub))
-            sub = find_meth(interp, pmc, meth);
-        if (sub) {
-            return Parrot_run_meth_fromc_args_reti(interp, sub,
-                                              pmc, meth, "II", key);
-        }
-        else {
+        STRING *meth = CONST_STRING(INTERP, "exists_keyed_int");
+        PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
+
+        if (PMC_IS_NULL(sub)) {
             PMC *mro = SELF->vtable->mro;
+
             if (VTABLE_elements(INTERP, mro) == 1)
                 return SUPER(key);
             else {
-                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,SELF->vtable->mro, 1);
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,
+                    SELF->vtable->mro, 1);
+
                 if (PObj_is_class_TEST(parent))
                     return SUPER(key);
-                else
-                    return deleg_pmc.SUPER(key);
+
+                return deleg_pmc.SUPER(key);
             }
         }
+        return Parrot_run_meth_fromc_args_reti(INTERP, sub,
+                                               pmc, meth, "II", key);
     }
 
     PMC* share_ro() {
@@ -562,14 +528,14 @@ it's just SUPER aka the default implementation.
         if (PObj_is_PMC_shared_TEST(SELF))
             return SELF;
 
-        ret = pt_shared_fixup(INTERP, SELF);
+        ret  = pt_shared_fixup(INTERP, SELF);
         true = pmc_new(INTERP, enum_class_Integer);
+
         VTABLE_set_integer_native(INTERP, true, 1);
         VTABLE_setprop(INTERP, ret, CONST_STRING(interp, "_ro"), true);
         PObj_is_PMC_shared_SET(SELF);
 
-        n = PMC_int_val(ret);
-
+        n    = PMC_int_val(ret);
         data = (PMC **) PMC_data(ret);
 
         for (i = 0; i < n; ++i)
