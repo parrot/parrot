@@ -1,4 +1,4 @@
-#!parrot
+#! parrot
 # Copyright (C) 2001-2005, The Perl Foundation.
 # $Id$
 
@@ -28,11 +28,12 @@ Tests random number generation
 
     test_namespace."export_to"(curr_namespace, exports)
 
-    plan(1)
+    plan(2)
 
     new P0, .Random
+    ok(1, 'Instantiated .Random')
     set I0, P0
-    ok(1, 'Called random just fine')
+    ok(1, 'Got (unknown) random int')
 .end
 
 # Local Variables:
