@@ -364,7 +364,7 @@ C<languages/forth>
 
 =item Description
 
-A joke language. See http://en.wikipedia.org/wiki/HQ9+
+A joke language. See http://www.cliff.biffle.org/esoterica/hq9plus.html
 
 =item Status
 
