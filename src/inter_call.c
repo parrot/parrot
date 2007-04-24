@@ -844,6 +844,8 @@ Parrot_process_args(Interp *interp, call_state *st, arg_pass_t param_or_result)
 {
     int has_arg, n_named;
     int err_check = 1;
+    call_state_item *src, *dest;
+
     const char *action = (param_or_result == PARROT_PASS_RESULTS) ? "results" : "params";
 
     /* Check if we should be throwing errors. This can be configured separately
@@ -859,8 +861,8 @@ Parrot_process_args(Interp *interp, call_state *st, arg_pass_t param_or_result)
 
     init_call_stats(st);
 
-    call_state_item *src  = &st->src;
-    call_state_item *dest = &st->dest;
+    src  = &st->src;
+    dest = &st->dest;
 
     /*
      * 1st: Positional non-:slurpy
