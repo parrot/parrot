@@ -744,6 +744,13 @@ Parrot_allocate_string(Interp *interp, STRING *str, size_t size)
     PObj_buflen(str)   = 0;
     PObj_bufstart(str) = NULL;
 
+    /* there's no sense in allocating zero memory, when the overhead of
+     * allocating a string is one pointer; this can fill the pools in an
+     * uncompactable way.  See RT #42320.
+     */
+    if (size == 0)
+        return;
+
     pool     = PObj_constant_TEST(str)
                 ? interp->arena_base->constant_string_pool
                 : interp->arena_base->memory_pool;
