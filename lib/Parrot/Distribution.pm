@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -32,7 +32,6 @@ package Parrot::Distribution;
 use strict;
 use warnings;
 
-use Cwd;
 use ExtUtils::Manifest;
 use File::Spec;
 use Parrot::Configure::Step qw(capture_output);
@@ -60,7 +59,9 @@ sub new {
     my ($class) = @_;
 
     return $dist if defined $dist;
+
     my $self = bless {}, $class;
+
     return $self->_initialize;
 }
 
@@ -100,6 +101,7 @@ sub _initialize {
 
 sub _croak {
     my ( $self, @message ) = @_;
+
     require Carp;
     Carp::croak(@message);
 }
@@ -383,7 +385,7 @@ sub get_perl_language_files {
     }
 
     # return only those files which aren't exempt
-    return grep { !$self->is_perl_exemption($_) } @perl_files;
+    return grep { ! $self->is_perl_exemption($_) } @perl_files;
 }
 
 =item C<is_perl_exemption()>
@@ -401,9 +403,6 @@ any external modules Parrot might have.
     sub is_perl_exemption {
         my ( $self, $file ) = @_;
 
-        # RT#41611: write a test to make sure these files don't get picked up
-        # again...  i.e. a test of is_perl_exemption
-
         $exemptions ||= $self->get_perl_exemption_regexp();
 
         return $file->path =~ $exemptions;
@@ -419,9 +418,9 @@ coding-standard-exempt Perl files within Parrot
 
 sub get_perl_exemption_regexp {
     my $self = shift;
-    my $cwd  = cwd();
 
-    my @paths = map { File::Spec->catdir( $cwd, File::Spec->canonpath($_) ) } qw{
+    my $parrot_dir  = $self->path();
+    my @paths = map { File::Spec->catdir( $parrot_dir, File::Spec->canonpath($_) ) } qw{
         languages/lua/Lua/parser.pm
         languages/regex/lib/Regex/Grammar.pm
         lib/Class/
@@ -434,7 +433,8 @@ sub get_perl_exemption_regexp {
         lib/Text/
     };
 
-    my $regex = join '|', map { quotemeta } @paths;
+    my $regex = join '|', map { quotemeta $_ } @paths;
+
     return qr/^$regex/;
 }
 
@@ -763,6 +763,7 @@ values are the comments.
 
 sub generated_files {
     my $self      = shift;
+
     my $generated = ExtUtils::Manifest::maniread('MANIFEST.generated');
     my $path      = $dist->path();
 
