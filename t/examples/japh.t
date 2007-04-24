@@ -38,7 +38,6 @@ Get the TODO JAPHs working or decide that they are not suitable for testing.
 my %todo = (
     1  => 'deleted, opcode "pack" is gone',
     2  => 'deleted, opcode "pack" is gone',
-    4  => 'namespace has changed',
     9  => 'P1 is no longer special',
     10 => 'core dump',
     11 => 'opcode "pack" is gone, other reasons',
