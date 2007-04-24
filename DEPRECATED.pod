@@ -9,6 +9,17 @@ http://xrl.us/jc4u
  /me giggles
  -- Chip Salzenberg
 
+=head1 Deprecated C APIs
+
+=over 4
+
+=item enter_nci_method
+
+This function is being renamed to register_nci_method. The original name was
+confusing (see #40801).
+
+=back
+
 =head1 Deprecated methods
 
 =over 4

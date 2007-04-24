@@ -26,8 +26,8 @@ NCI function setup, C<interpinfo>, and C<sysinfo> opcodes.
 /*
 
 =item C<void
-enter_nci_method(Parrot_Interp interp, int type,
-        void *func, const char *name, const char *proto)>
+register_nci_method(Parrot_Interp interp, int type,
+                    void *func, const char *name, const char *proto)>
 
 Create an entry in the C<nci_method_table> for the given NCI method of PMC
 class C<type>.
@@ -39,7 +39,14 @@ void Parrot_NCI_nci_make_raw_nci(Interp *interp, PMC *method, void *func);
 
 void
 enter_nci_method(Parrot_Interp interp, const int type, void *func,
-        const char *name, const char *proto)
+                const char *name, const char *proto)
+{
+    register_nci_method(interp, type, func, name, proto);
+}
+
+void
+register_nci_method(Parrot_Interp interp, const int type, void *func,
+                    const char *name, const char *proto)
 {
     PMC * const method = pmc_new(interp, enum_class_NCI);
     /* create call func */

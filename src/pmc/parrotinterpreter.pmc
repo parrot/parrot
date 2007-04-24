@@ -184,12 +184,12 @@ Class initialization.
             /*
              * TODO unify and fix signatures
              */
-            enter_nci_method(INTERP, typ,
+            register_nci_method(INTERP, typ,
                     F2DPTR(pt_thread_yield), "yield", "v");
             /*
              * misc functions
              */
-            enter_nci_method(INTERP, typ,
+            register_nci_method(INTERP, typ,
                     F2DPTR(recursion_limit), "recursion_limit", "iJOi");
         }
 

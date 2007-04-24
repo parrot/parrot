@@ -26,7 +26,7 @@ pmclass Iterator no_ro {
         if (pass) {
             /* Make the shift_pmc vtable function available as
              * a method named "next" */
-            enter_nci_method(INTERP, enum_class_Iterator,
+            register_nci_method(INTERP, enum_class_Iterator,
                     F2DPTR(Parrot_Iterator_shift_pmc), "next", "PJO");
         }
     }

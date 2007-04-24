@@ -1010,7 +1010,7 @@ EOC
         }
         else {
             $cout .= <<"EOC";
-        enter_nci_method(interp, entry,
+        register_nci_method(interp, entry,
                 F2DPTR(Parrot_${classname}_$method->{meth}),
                 "$symbol_name", "$proto");
 EOC
