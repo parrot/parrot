@@ -15,7 +15,7 @@
 #if !defined(ATOMIC_GCC_PCC_H_GAURD)
 #  define ATOMIC_GCC_PCC_H_GAURD
 
-typedef struct {
+typedef struct Parrot_atomic_pointer {
     void * volatile val;
 } Parrot_atomic_pointer;
 
@@ -81,7 +81,7 @@ inline static long parrot_ppc_add(volatile long *val, long what)
 
 #  define PARROT_ATOMIC_PTR_DESTROY(a)
 
-typedef struct {
+typedef struct Parrot_atomic_integer {
     volatile long val;
 } Parrot_atomic_integer;
 

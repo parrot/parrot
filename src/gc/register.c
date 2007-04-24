@@ -487,7 +487,7 @@ Restore all registers from register stack.
 
 */
 
-typedef struct {
+typedef struct save_regs_t {
     Regs_ni  old_bp_ni;   /* restoreall just resets ptrs */
     Regs_ps  old_bp_ps;
     Regs_ps  bp_ps;       /* pushed regs need DOD marking */

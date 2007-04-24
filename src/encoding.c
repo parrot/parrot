@@ -25,12 +25,12 @@ ENCODING *Parrot_utf8_encoding_ptr;
 ENCODING *Parrot_ucs2_encoding_ptr;
 ENCODING *Parrot_utf16_encoding_ptr;
 
-typedef struct {
+typedef struct One_encoding {
     ENCODING *encoding;
     STRING  *name;
 } One_encoding;
 
-typedef struct {
+typedef struct All_encodings {
     int n_encodings;
     One_encoding *enc;
 } All_encodings;

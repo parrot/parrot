@@ -58,25 +58,25 @@
 #  define RTYPE_FUNC  3   /* Function */
 #  define RTYPE_DATA1 4   /* 2nd. rellocation for RISC machines */
 
-typedef struct {
+typedef struct Parrot_exec_symbol_t {
     int                                                 offset_list;
     int                                                 type;
     int                                                 value;
     const char                                         *symbol;
 } Parrot_exec_symbol_t;
 
-typedef struct {
+typedef struct Parrot_exec_rellocation_t {
     int                                                 offset;
     short                                               symbol_number;
     int                                                 type;
 } Parrot_exec_rellocation_t;
 
-typedef struct {
+typedef struct Parrot_exec_section_t {
     char                                               *code;
     int                                                 size;
 } Parrot_exec_section_t;
 
-typedef struct {
+typedef struct Parrot_exec_objfile_t {
     Parrot_exec_section_t                               text;
     Parrot_exec_section_t                               data;
     Parrot_exec_section_t                               bss;

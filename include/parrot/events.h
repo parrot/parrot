@@ -33,7 +33,7 @@ typedef enum {
 /*
  * any timer event has 2 time fields in front
  */
-typedef struct {
+typedef struct parrot_timer_event {
     FLOATVAL                    abs_time;
     FLOATVAL                    interval;
     int                         repeat; /* 0 = once, -1 = forever */
@@ -48,19 +48,19 @@ typedef enum {
     EV_IO_SELECT_WR             /* rd is ready for write */
 } parrot_io_event_enum;
 
-typedef struct {
+typedef struct parrot_io_event {
     parrot_io_event_enum        action; /* read, write, ... */
     PMC*                        pio;
     PMC*                        handler;
     PMC*                        user_data;
 } parrot_io_event;
 
-typedef struct {
+typedef struct _call_back_info {
     PMC*                        cbi;    /* callback info */
     void*                       external_data;
 } _call_back_info;
 
-typedef struct {
+typedef struct parrot_event {
     parrot_event_type_enum      type;
     Parrot_Interp               interp;
     /* event_func_t                event_func; unused */

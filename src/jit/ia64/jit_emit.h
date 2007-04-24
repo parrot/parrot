@@ -23,7 +23,7 @@ long it = 0;
 int inst_size = 0;
 int inst_tmpl = 0;
 
-typedef struct {
+typedef struct  inst_tmp_t {
     char    tmplt;
     char    used;
     unsigned long    inst1;

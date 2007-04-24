@@ -39,19 +39,19 @@ CHARSET *Parrot_ascii_charset_ptr;
  * all registered charsets are collected in one global structure
  */
 
-typedef struct {
+typedef struct To_converter {
     CHARSET *to;
     charset_converter_t func;
 } To_converter;
 
-typedef struct {
+typedef struct One_charset {
     CHARSET *charset;
     STRING  *name;
     int n_converters;
     To_converter *to_converters;
 } One_charset;
 
-typedef struct {
+typedef struct All_charsets {
     int n_charsets;
     One_charset *set;
 } All_charsets;

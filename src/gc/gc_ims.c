@@ -388,7 +388,7 @@ typedef enum {          /* these states have to be in execution order */
 
 } gc_ims_state_enum;
 
-typedef struct {
+typedef struct Gc_ims_private {
     gc_ims_state_enum   state;
     size_t      allocations;    /* get_free_object count */
     size_t      alloc_trigger;  /* after this number of allocations a gc

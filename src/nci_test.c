@@ -36,16 +36,16 @@ The name of a test function is usually 'nci_<signature>'. E.g. the function
 
 /* Declarations of structs */
 
-typedef struct {
+typedef struct Nested {
     int y;
 } Nested;
 
-typedef struct {
+typedef struct Outer {
     int x;
     Nested *nested;
 } Outer;
 
-typedef struct {
+typedef struct Rect_Like {
     int x, y;
     int w, h;
 } Rect_Like;

@@ -65,7 +65,7 @@ enum {
  *  fixups:         List of fixupes.
  */
 
-typedef struct {
+typedef struct Parrot_jit_arena_t {
     char                            *start;
     ptrdiff_t                        size;
     Parrot_jit_opmap_t              *op_map;
@@ -102,7 +102,7 @@ typedef struct Parrot_jit_optimizer_section *Parrot_jit_optimizer_section_ptr;
  *  reg_dir:        If the register needs to be loaded or saved.
  *  registers_used: count of used registers
  */
-typedef struct {
+typedef struct Parrot_jit_register_usage_t {
     int                                 reg_count[NUM_REGISTERS];
     unsigned int                        reg_usage[NUM_REGISTERS];
     char                                reg_dir[NUM_REGISTERS];
@@ -142,7 +142,7 @@ typedef struct Parrot_jit_optimizer_section {
  *  has_unpredictable_jump: XXX need to define how to handle this.
  */
 
-typedef struct {
+typedef struct Parrot_jit_optimizer_t {
     Parrot_jit_optimizer_section_t  *sections;
     Parrot_jit_optimizer_section_t  *cur_section;
     char                            *map_branch;
@@ -155,7 +155,7 @@ typedef struct {
  *      Constants pool information.
  *
  */
-typedef struct {
+typedef struct Parrot_jit_constant_pool_t {
     long                             frames_used;
     long                             cur_used;
     char                            *cur_const;
@@ -187,7 +187,7 @@ typedef enum {
  *  constant_pool:  The constant pool information.
  */
 
-typedef struct {
+typedef struct Parrot_jit_info_t {
     opcode_t                        *prev_op;
     opcode_t                        *cur_op;
     opcode_t                         op_i;
@@ -221,7 +221,7 @@ typedef void (*jit_fn_t)(Parrot_jit_info_t *jit_info,
  *                  also used for vtable functions, extcall is #of vtable func
  */
 
-typedef struct {
+typedef struct Parrot_jit_fn_info_t {
     jit_fn_t                        fn;
     int                            extcall;
 } Parrot_jit_fn_info_t;
@@ -268,7 +268,7 @@ void Parrot_jit_emit_mov_rm_offs(
  */
 typedef void (*jit_arch_f)(Parrot_jit_info_t *, Interp *);
 
-typedef struct {
+typedef struct jit_arch_regs {
     /*
      * begin function - emit ABI call prologue
      */

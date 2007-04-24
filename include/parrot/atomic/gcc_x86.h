@@ -15,11 +15,11 @@
 #if !defined(PARROT_ATOMIC_GCC_X86_H_GAURD)
 #  define PARROT_ATOMIC_GCC_X86_H_GAURD
 
-typedef struct {
+typedef struct Parrot_atomic_pointer {
     void *volatile val;
 } Parrot_atomic_pointer;
 
-typedef struct {
+typedef struct Parrot_atomic_integer {
     volatile long val;
 } Parrot_atomic_integer;
 

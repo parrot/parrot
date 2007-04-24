@@ -164,7 +164,7 @@ A chained list of headers used e.g. for the IGP list.
  */
 #  define GC_GMS_DEBUG 0
 
-typedef struct {
+typedef struct Gc_gms_private {
     UINTVAL current_gen_no;             /* the nursery generation number */
 } Gc_gms_private;
 
@@ -697,7 +697,7 @@ parrot_gc_gms_wb_key(Interp *interp, PMC *agg,
     gc_gms_promote(interp, nh, ah->gen->gen_no);
 }
 
-typedef struct {
+typedef struct Gc_gms_plan {
     int merge_gen;
     int gen_no;
 } Gc_gms_plan;

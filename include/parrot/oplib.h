@@ -21,7 +21,7 @@
 ** op_lib_t
 */
 
-typedef struct {
+typedef struct op_lib_t {
     const char *name;
     const char *suffix;
     int      core_type;

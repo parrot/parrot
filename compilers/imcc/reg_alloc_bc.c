@@ -44,13 +44,13 @@ static int interferes(Interp*, IMC_Unit *, SymReg * r0, SymReg * r1);
 static void compute_spilling_costs(Parrot_Interp, IMC_Unit *);
 
 /***************** New graph algorithm stuff *********************/
-typedef struct {
+typedef struct node {
     int deg;     /* degree of node (# neighbors) */
     int col;     /* color assigned to this node */
     int id;      /* original index */
     char in;     /* boolean, indicating if removed yet */
 } node;
-typedef struct {
+typedef struct graph {
     int n;       /* number of nodes */
     int k;       /* maximum color used in graph (0 means uncolored) */
     node* V;     /* array of nodes */

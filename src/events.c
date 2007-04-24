@@ -106,7 +106,7 @@ static int pipe_fds[2];
 /*
  * a structure to communicate with the io_thread
  */
-typedef struct {
+typedef struct io_thread_msg {
     io_thread_msg_type command;
     parrot_event *ev;
 } io_thread_msg;
@@ -657,7 +657,7 @@ the wait sets.
 */
 
 #ifndef WIN32
-typedef struct {
+typedef struct pending_io_events {
     int n;
     int alloced;
     parrot_event **events;

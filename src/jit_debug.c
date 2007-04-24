@@ -85,7 +85,7 @@ void Parrot_jit_debug(Interp* interp);
 #  define BYTE_SIZE(t) ((int)sizeof (t))
 #  define BIT_OFFSET(str, field) ((int)(offsetof(str, field) * 8))
 
-typedef struct {
+typedef struct BaseTypes {
     const char *name;
     const char *spec;
 } BaseTypes;

@@ -24,7 +24,7 @@ extern int parrot_sparc_cas32(Parrot_UInt4 *value, Parrot_UInt4 old, Parrot_UInt
 extern int parrot_sparc_cas64(INTVAL *value, INTVAL old, INTVAL new);
 #  endif
 
-typedef struct {
+typedef struct Parrot_atomic_pointer {
     void * volatile val;
 } Parrot_atomic_pointer;
 
@@ -50,7 +50,7 @@ typedef struct {
 
 #  define PARROT_ATOMIC_PTR_DESTROY(a)
 
-typedef struct {
+typedef struct Parrot_atomic_integer {
     volatile Parrot_Int4 val;
 } Parrot_atomic_integer;
 

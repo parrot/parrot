@@ -16,15 +16,15 @@
 #include "parrot/config.h"
 
 typedef union UnionVal {
-    struct {                                  /* One Buffer structure */
+    struct _b {                                  /* One Buffer structure */
         void *     _bufstart;
         size_t     _buflen;
     } _b;
-    struct {                                  /* or two pointers, both are defines */
+    struct _ptrs {                                  /* or two pointers, both are defines */
         DPOINTER * _struct_val;
         PMC *      _pmc_val;
     } _ptrs;
-    struct {
+    struct _i {
         INTVAL _int_val;                      /* or 2 intvals */
         INTVAL _int_val2;
     } _i;

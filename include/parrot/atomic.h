@@ -32,7 +32,7 @@
 #    include "parrot/atomic/fallback.h"
 #  endif
 #else
-typedef struct {
+typedef struct Parrot_atomic_pointer {
     void *val;
 } Parrot_atomic_pointer;
 

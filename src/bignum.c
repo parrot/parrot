@@ -170,7 +170,8 @@ typedef enum {   /* Indicate to idivide when to stop */
     BN_DIV_REMAIN
 } BN_DIV_ENUM;
 
-typedef struct { /* Used to restore INTENT(IN) arguments to functions */
+/* Used to restore INTENT(IN) arguments to functions */
+typedef struct BN_SAVE_PREC {
     BIGNUM one;
     BIGNUM two;
 } BN_SAVE_PREC;

@@ -42,10 +42,12 @@ for my $file (@files) {
     open my $fh, '<', $path
         or die "Cannot open '$path' for reading: $!\n";
 
-    my $count;
+    my $count   = 0;
     my $message = qq<  $path:>;
     while (<$fh>) {
-        next unless /\bstruct\s+{/;
+        # we're only interested in lines with structs
+        next unless /\btypedef\s+struct\s+{/;
+
         $count++;
         $message .= " $.";
     }

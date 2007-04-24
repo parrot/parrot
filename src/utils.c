@@ -23,7 +23,7 @@ Opcode helper functions that don't really fit elsewhere.
 #include "parrot/parrot.h"
 
 /* Parrot_register_move companion functions i and data */
-typedef struct {
+typedef struct parrot_prm_context {
     unsigned char *dest_regs;
     unsigned char *src_regs;
     unsigned char temp_reg;

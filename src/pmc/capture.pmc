@@ -20,7 +20,7 @@ These are the vtable functions for the Capture PMC.
 
 #include "parrot/parrot.h"
 
-typedef struct {
+typedef struct Capture_data {
     PMC *array;                /* array component */
     PMC *hash;                 /* hash component */
 } Capture_data;

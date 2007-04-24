@@ -72,7 +72,7 @@ typedef void **(*op_func_prederef_t)(void **, Interp *);
 ** its op function (since we may not be using op functions).
 */
 
-typedef struct {
+typedef struct op_info_t {
     /* op_type_t type; unused */
     const char *name;
     const char *full_name;

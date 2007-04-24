@@ -68,7 +68,7 @@ typedef UINTVAL BN_NIB;
  nibs == 3, digits == 14
 */
 
-typedef struct {
+typedef struct parrot_bignum_t {
     BN_NIB* buffer; /* string of nibbles */
     UINTVAL nibs;   /* nibs allocated, in sizeof(BN_NIB) */
     UINTVAL flags;  /* private flags store: 001 Inf,  010 qNAN, 110 sNAN */
@@ -100,7 +100,7 @@ typedef enum {
     BN_F_UNDERFLOW = 64
 } parrot_bignum_context_flags;
 
-typedef struct {
+typedef struct parrot_bignum_context {
     INTVAL precision;     /* number of digs to retain */
     INTVAL elimit;        /* maximum exponent allowed */
     BN_ROUNDING rounding; /* rounding type to perform */

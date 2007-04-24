@@ -14,12 +14,12 @@
 #if !defined(PARROT_ATOMIC_FALLBACK_H_GAURD)
 #  define PARROT_ATOMIC_FALLBACK_H_GAURD
 
-typedef struct {
+typedef struct Parrot_atomic_pointer {
     void *val;
     Parrot_mutex lock;
 } Parrot_atomic_pointer;
 
-typedef struct {
+typedef struct Parrot_atomic_integer {
     INTVAL val;
     Parrot_mutex lock;
 } Parrot_atomic_integer;

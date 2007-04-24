@@ -15,7 +15,7 @@
 
 #ifdef PARROT_IN_CORE
 
-typedef struct {
+typedef struct RUnion {
     INTVAL i;
     STRING *s;
 } RUnion;
