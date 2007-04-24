@@ -370,36 +370,44 @@ static void
 set_nci_I(Interp *interp, call_state *st, INTVAL val)
 {
     Parrot_init_ret_nci(interp, st, "I");
-    UVal_int(st->val) = val;
-    Parrot_convert_arg(interp, st);
-    Parrot_store_arg(interp, st);
+    if (st->dest.i < st->dest.n) {
+        UVal_int(st->val) = val;
+        Parrot_convert_arg(interp, st);
+        Parrot_store_arg(interp, st);
+    }
 }
 
 static void
 set_nci_N(Interp *interp, call_state *st, FLOATVAL val)
 {
     Parrot_init_ret_nci(interp, st, "N");
-    UVal_num(st->val) = val;
-    Parrot_convert_arg(interp, st);
-    Parrot_store_arg(interp, st);
+    if (st->dest.i < st->dest.n) {
+        UVal_num(st->val) = val;
+        Parrot_convert_arg(interp, st);
+        Parrot_store_arg(interp, st);
+    }
 }
 
 static void
 set_nci_S(Interp *interp, call_state *st, STRING *val)
 {
     Parrot_init_ret_nci(interp, st, "S");
-    UVal_str(st->val) = val;
-    Parrot_convert_arg(interp, st);
-    Parrot_store_arg(interp, st);
+    if (st->dest.i < st->dest.n) {
+        UVal_str(st->val) = val;
+        Parrot_convert_arg(interp, st);
+        Parrot_store_arg(interp, st);
+    }
 }
 
 static void
 set_nci_P(Interp *interp, call_state *st, PMC* val)
 {
     Parrot_init_ret_nci(interp, st, "P");
-    UVal_pmc(st->val) = val;
-    Parrot_convert_arg(interp, st);
-    Parrot_store_arg(interp, st);
+    if (st->dest.i < st->dest.n) {
+        UVal_pmc(st->val) = val;
+        Parrot_convert_arg(interp, st);
+        Parrot_store_arg(interp, st);
+    }
 }
 
 /* All our static functions that call in various ways. Yes, terribly

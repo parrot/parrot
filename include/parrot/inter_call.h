@@ -6,9 +6,11 @@
  *  Data Structure and Algorithms:
  *     Call argument handling.
  *  History:
- *     Initial version by leo on on 2005/07/22
+ *     Initial version by leo on 2005/07/22
+ *     Major changes by mdiep in April 2007
  *  Notes:
  *  References:
+ *     pdd03 - Calling Conventions
  */
 
 #if !defined(PARROT_INTER_CALL_H_GUARD)
@@ -17,60 +19,14 @@
 enum call_state_mode {
     /* arg processing states
      *       <src>_<dest>           sd  nibbles    */
-    CALL_STATE_POS_POS          = 0x00,
-    CALL_STATE_OPT              = 0x01,  /* dest only */
-    CALL_STATE_SLURP            = 0x02,  /* dest only */
-    CALL_STATE_NAMED_x          = 0x40,
-    CALL_STATE_END_x            = 0x80,
-    CALL_STATE_x_NAMED          = 0x04,
-    CALL_STATE_x_END            = 0x08,
-    CALL_STATE_POS_POS_OPT      = CALL_STATE_OPT,
-    CALL_STATE_POS_POS_SLURP    = CALL_STATE_SLURP,
-    CALL_STATE_POS_NAMED        = CALL_STATE_x_NAMED,
-    CALL_STATE_POS_NAMED_OPT    = CALL_STATE_POS_NAMED|CALL_STATE_OPT,
-    CALL_STATE_POS_END          = CALL_STATE_x_END,
-    CALL_STATE_NAMED_POS        = CALL_STATE_NAMED_x,
-    CALL_STATE_NAMED_POS_OPT    = CALL_STATE_NAMED_x|CALL_STATE_OPT,
-    CALL_STATE_NAMED_POS_SLURP  = CALL_STATE_NAMED_x|CALL_STATE_SLURP,
-    CALL_STATE_NAMED_NAMED      = CALL_STATE_NAMED_x|CALL_STATE_x_NAMED,
-    CALL_STATE_NAMED_NAMED_OPT  = CALL_STATE_NAMED_NAMED|CALL_STATE_OPT,
-    CALL_STATE_NAMED_NAMED_SLURP= CALL_STATE_NAMED_NAMED|CALL_STATE_SLURP,
-    CALL_STATE_END_POS_OPT      = CALL_STATE_END_x|CALL_STATE_OPT,
-    CALL_STATE_END_NAMED_NAMED  = CALL_STATE_END_x|CALL_STATE_NAMED_NAMED,
-    CALL_STATE_END_POS_NAMED    = CALL_STATE_END_x|CALL_STATE_POS_NAMED,
-    CALL_STATE_END_NAMED_OPT    = CALL_STATE_END_x|CALL_STATE_POS_NAMED_OPT,
-    CALL_STATE_END_END          = CALL_STATE_END_x|CALL_STATE_x_END,
-    CALL_STATE_MASK             = 0xff,
 
     CALL_STATE_SIG        =  0x100,     /* runops, nci */
     CALL_STATE_OP         =  0x200,     /* get_, set_ ops */
     CALL_S_D_MASK         =  0x300,     /* src/dest mask */
 
-    CALL_STATE_FLATTEN    =  0x400,     /* flatten src */
-    CALL_STATE_NEXT_ARG   =  0x800
+    CALL_STATE_FLATTEN    =  0x400      /* flatten src */
 
 };
-
-#define CALL_STATE_x_ISSET(o, x) (o & CALL_STATE_ ## x)
-#define CALL_STATE_x_SET(o, x) (o |= CALL_STATE_ ## x)
-#define CALL_STATE_x_UNSET(o, x) (o &= ~CALL_STATE_ ## x)
-
-#define CALL_STATE_MASK_MASK(o)       (CALL_STATE_X_ISSET(o, MASK))
-#define CALL_STATE_SIG_ISSET(o)       (CALL_STATE_X_ISSET(o, SIG))
-#define CALL_STATE_OP_ISSET(o)        (CALL_STATE_X_ISSET(o, OP))
-#define CALL_S_D_MASK_MASK(o)         (o & CALL_S_D_MASK)
-#define CALL_STATE_FLATTEN_ISSET(o)   (CALL_STATE_X_ISSET(o, FLATTEN))
-#define CALL_STATE_NEXT_ARG_ISSET(o)  (CALL_STATE_X_ISSET(o, NEXT_ARG))
-
-#define CALL_STATE_SIG_SET(o)       (CALL_STATE_X_SET(o, SIG))
-#define CALL_STATE_OP_SET(o)        (CALL_STATE_X_SET(o, OP))
-#define CALL_STATE_FLATTEN_SET(o)   (CALL_STATE_X_SET(o, FLATTEN))
-#define CALL_STATE_NEXT_ARG_SET(o)  (CALL_STATE_X_SET(o, NEXT_ARG))
-
-#define CALL_STATE_SIG_UNSET(o)       (CALL_STATE_X_UNSET(o, SIG))
-#define CALL_STATE_OP_UNSET(o)        (CALL_STATE_X_UNSET(o, OP))
-#define CALL_STATE_FLATTEN_UNSET(o)   (CALL_STATE_X_UNSET(o, FLATTEN))
-#define CALL_STATE_NEXT_ARG_UNSET(o)  (CALL_STATE_X_UNSET(o, NEXT_ARG))
 
 typedef struct call_state_item {
     int mode;       /* from_sig, from_set_ops, flatten ...*/
@@ -85,6 +41,7 @@ typedef struct call_state_item {
         } op;
     } u;
     parrot_context_t *ctx;
+    INTVAL used;
     INTVAL i;
     INTVAL n;
     INTVAL sig;

@@ -2373,7 +2373,7 @@ CODE
 /positional inside named args at position 2/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "unexpected positional arg", todo => 'unimplemented' );
+pir_output_like( <<'CODE', <<'OUTPUT', "unexpected positional arg" );
 .sub 'main'
     'foo'('abc', 'def'=>1, 'ghi', 'jkl'=>1)
 .end
@@ -2386,8 +2386,7 @@ CODE
 /positional inside named args at position 3/
 OUTPUT
 
-pir_output_is(
-    <<'CODE', <<'OUTPUT', "RT #40490 - flat/slurpy named arguments", todo => 'unimplemented' );
+pir_output_is( <<'CODE', <<'OUTPUT', "RT #40490 - flat/slurpy named arguments" );
 .sub 'main' :main
         .local pmc args
         args = new .Hash

@@ -347,7 +347,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - mixed" );
     end
 .pcc_sub Integer_bxor_Intval:
     # the destination is optional, depending on the infix op used
-    get_params "(0,0,0x20,0x40)", P5, I5, P6, I7
+    get_params "(0,0,0x80,0x100)", P5, I5, P6, I7
     print "ok\n"
     set I10, P5
     bxor I11, I10, I5

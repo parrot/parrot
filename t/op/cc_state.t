@@ -64,8 +64,7 @@ pcc_ok( { params => ".param pmc abc :optional" }, 'G3: optional param may be emp
 
 pcc_ok(
     { params => ".param pmc abc :optional :slurpy" },
-    'G4: optional slurpy param may be empty',
-    todo => 'cc processor state missing',
+    'G4: optional slurpy param may be empty'
 );
 
 pcc_like(
