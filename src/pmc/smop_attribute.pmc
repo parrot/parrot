@@ -29,14 +29,11 @@ typedef struct SMOP_Attribute {
 } SMOP_Attribute;
 
 static void smop_init(Interp *interp, PMC *self) {
-    SMOP_Attribute *smop = NULL;
-
     /* turn on custom destruction since our PMC* array is dynamically allocated
      */
     PObj_active_destroy_SET(self);
 
     PMC_data(self) = mem_allocate_zeroed_typed(SMOP_Attribute);
-    smop           = SMOP_attr(self);
 }
 
 
