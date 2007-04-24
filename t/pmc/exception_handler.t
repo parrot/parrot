@@ -1,17 +1,10 @@
-#!perl
-# Copyright (C) 2006, The Perl Foundation.
+#! parrot
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 1;
 
 =head1 NAME
 
 t/pmc/exception_handler.t - test Exception_Handler PMC
-
 
 =head1 SYNOPSIS
 
@@ -23,14 +16,23 @@ Tests the Exception_Handler PMC.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'new' );
-.sub 'test' :main
+.sub main :main
+    # load this library
+    load_bytecode 'library/Test/More.pir'
+
+    # get the testing functions
+    .local pmc exports, curr_namespace, test_namespace
+    curr_namespace = get_namespace
+    test_namespace = get_namespace [ "Test::More" ]
+    exports = split " ", "plan diag ok is is_deeply like isa_ok"
+
+    test_namespace."export_to"(curr_namespace, exports)
+
+    plan(1)
+
     new P0, .Exception_Handler
-    print "ok 1\n"
+    ok(1, 'Instantiated .Exception_Handler')
 .end
-CODE
-ok 1
-OUT
 
 # Local Variables:
 #   mode: cperl
