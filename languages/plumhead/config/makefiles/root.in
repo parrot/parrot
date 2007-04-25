@@ -53,16 +53,20 @@ help:
 	@echo "Only for maintainer:"
 	@echo "  maintain:          Maintainance for 'Plumhead antlr3'"
 	@echo "                     The other variants need no maintainance."
-	@echo "  maintain-antlr3:   Generate Java runtime files with ANTLR 3"
+	@echo "  maintain-antlr3:   Generate Java source files with ANTLR 3"
+	@echo "  maintain-yacc:     Generate C source files with lex and yacc"
 	@echo ""
 
-maintain: maintain-antlr3
+maintain: maintain-antlr3 maintain-yacc
 
 maintain-antlr3: src/antlr3/Plumhead.g src/antlr3/GenPastPir.g
 	@echo 'Be sure to set CLASSPATH first, see docs/antlr3.pod'
 	java org.antlr.Tool src/antlr3/Plumhead.g
 	java org.antlr.Tool -lib src/antlr3 src/antlr3/GenPastPir.g
 
+maintain-yacc: src/yacc/plumhead.y src/yacc/plumhead.l
+	$(LEX) src/yacc/plumhead.l
+	$(YACC) -d src/yacc/plumhead.y
 
 build:           build-partridge
 
@@ -74,7 +78,10 @@ build-partridge: build-common
 
 build-phc:       build-common
 
-build-yacc:      build-common
+build-yacc:      build-common src/yacc/plumhead_yacc
+
+src/yacc/plumhead_yacc: lex.yy.c y.tab.c 
+	$(CC) lex.yy.c y.tab.c -o src/yacc/plumhead_yacc
 
 build-perl5re:   build-common
 

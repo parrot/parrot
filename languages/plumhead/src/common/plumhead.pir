@@ -153,7 +153,7 @@ VARIANT_PHC:
 VARIANT_YACC:
     err_msg = 'Creating PAST with lex and yacc'
     # Do it with YACC
-    cmd = 'perl5.9.5 languages/plumhead/src/perl5re/gen_past_pir.pl '
+    cmd = 'languages/plumhead/src/yacc/plumhead_yacc <'
     concat cmd, php_source_fn
     concat cmd, '> plumhead_past.pir'
     ret = spawnw cmd
