@@ -349,6 +349,9 @@ This is to exclude automatically generated C-language files Parrot might have.
             languages/cola/lexer.c
             languages/cola/parser.c
             languages/cola/parser.h
+            languages/plumhead/lex.yy.c
+            languages/plumhead/y.tab.c
+            languages/plumhead/y.tab.h
             } unless @exemptions;
 
         $file->path =~ /\Q$_\E$/ && return 1 for @exemptions;
