@@ -27,8 +27,21 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 39;
 use Test::More;
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io environment' );
+assert(getfenv(io.lines) == _G)
+local env = debug.getfenv(io.lines)
+print(type(env.__close))
+assert(env[1] == io.stdin)
+assert(env[2] == io.stdout)
+env = debug.getfenv(io.popen)
+print(type(env.__close))
+CODE
+function
+function
+OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'io.stdin' );
 print(io.stdin)
