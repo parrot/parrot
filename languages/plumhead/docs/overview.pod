@@ -24,6 +24,8 @@ strategies of PHP on Parrot.
 
 =item partridge - Parrot compiler toolchain, started
 
+=item yacc      - with lex and yacc, planned
+
 =item perl5re   - Perl5.10 regexes, planned
 
 =back
@@ -42,7 +44,11 @@ xsltproc and phc need to be in PATH.
 
 =item antlr3
 
-java.
+ANTLR3 generating Java code.
+
+=item yacc
+
+lex and yacc, or flex and bison
 
 =item perl5re
 

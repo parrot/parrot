@@ -10,4 +10,5 @@
 - Implement var_dump()
 - Subclass OrderedHash for PlumheadArray
 - Add another variant 'perl5regex', using Perl 5.10 (ir)regular expressions
+- Add another variant 'yacc'
 - distinguish between subs and keywords

@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-# possible values are qw( phc antlr3 partridge perl5re );
+# possible values are qw( phc antlr3 partridge yacc perl5re );
 my $variant = $ENV{PLUMHEAD_VARIANT} || 'partridge';
 exec './parrot', 'languages/plumhead/plumhead.pbc', "--variant=$variant", @ARGV;
 

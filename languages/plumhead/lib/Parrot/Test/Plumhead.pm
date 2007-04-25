@@ -14,6 +14,7 @@ use Parrot::Test::Plumhead::PHP;
 use Parrot::Test::Plumhead::Phc;
 use Parrot::Test::Plumhead::Antlr3;
 use Parrot::Test::Plumhead::Partridge;
+use Parrot::Test::Plumhead::Yacc;
 use Parrot::Test::Plumhead::Perl5re;
 
 =head1 NAME

@@ -28,6 +28,7 @@ help:
 	@echo "                     Current this has nothing to do."
 	@echo "  build-antlr3       Build support for variant 'Plumhead antlr3'."
 	@echo "                     Needs javac and a proper CLASSPATH."
+	@echo "  build-yacc         Build support for variant 'Plumhead yacc'."
 	@echo "  build-perl5re      Build support for variant 'Plumhead perl5re'."
 	@echo "                     Currently nothing to do. Perl 5.9.x needed."
 	@echo ""
@@ -38,6 +39,7 @@ help:
 	@echo "  test-phc:          Run the test suite for 'Plumhead phc'."
 	@echo "  test-antlr3:       Run the test suite for 'Plumhead antlr3'."
 	@echo "  test-partridge:    Run the test suite for 'Plumhead partridge'."
+	@echo "  test-yacc:         Run the test suite for 'Plumhead yacc'."
 	@echo "  test-perl5re:      Run the test suite for 'Plumhead perl5re'."
 	@echo ""
 	@echo "Cleaning:"
@@ -64,13 +66,15 @@ maintain-antlr3: src/antlr3/Plumhead.g src/antlr3/GenPastPir.g
 
 build:           build-partridge
 
-build-all:       build-partridge build-phc build-antlr3 build-perl5re
+build-all:       build-partridge build-phc build-antlr3 build-yacc build-perl5re
 
 build-common:    src/common/plumheadlib.pbc plumhead.pbc
 
 build-partridge: build-common
 
 build-phc:       build-common
+
+build-yacc:      build-common
 
 build-perl5re:   build-common
 
@@ -105,6 +109,9 @@ test-antlr3:
 
 test-partridge:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-partridge
+
+test-yacc:
+	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-yacc
 
 test-perl5re:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-perl5re
