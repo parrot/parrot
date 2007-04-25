@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 use Math::Trig qw( tan sec atan asin acos asec cosh sinh tanh sech );
 
 =head1 NAME
@@ -398,12 +398,6 @@ EQ15:   print "ok 15\\n"
         .fp_eq   (N4, 0.000000, EQ16)
         print "not "
 EQ16:   print "ok 16\\n"
-
-        atan N4, -0.0, -0.0
-        .fp_eq   (N4, -3.1415926, EQ17)
-        print "not "
-        print N4
-EQ17:   print "ok 17\\n"
         end
 CODE
 ok 1
@@ -422,7 +416,18 @@ ok 13
 ok 14
 ok 15
 ok 16
-ok 17
+OUTPUT
+
+pasm_output_is( <<"CODE", <<'OUTPUT', 'atan, part 2' );
+@{[ $fp_equality_macro ]}
+        atan N4, -0.0, -0.0
+        .fp_eq   (N4, -3.1415926, EQ1)
+        print "not "
+        print N4
+EQ1:    print "ok 1\\n"
+        end
+CODE
+ok 1
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "log2" );
