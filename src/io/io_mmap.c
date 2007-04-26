@@ -82,7 +82,7 @@ PIO_mmap_open(Interp *interp, ParrotIOLayer *layer,
         status = fstat(io->fd, &statbuf);
         file_size = statbuf.st_size;
         /* TODO verify flags */
-        io->b.startb = mmap(0, file_size, PROT_READ, MAP_SHARED, io->fd, 0);
+        io->b.startb = (unsigned char *)mmap(0, file_size, PROT_READ, MAP_SHARED, io->fd, 0);
         io->b.size = (size_t)file_size;  /* XXX */
         io->b.endb = io->b.startb + io->b.size;
         io->b.flags |= PIO_BF_MMAP;

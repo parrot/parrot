@@ -475,7 +475,7 @@ Parrot_make_la(Interp *interp, PMC *array) {
        to actually have an array, even if the inbound array is
        completely empty
     */
-    long * const out_array = mem_sys_allocate((sizeof (long)) * (arraylen + 1));
+    long * const out_array = (long *)mem_sys_allocate((sizeof (long)) * (arraylen + 1));
     out_array[arraylen] = 0;
     /*    printf("Long array has %i elements\n", arraylen);*/
     for (cur = 0; cur < arraylen; cur++) {
@@ -528,7 +528,7 @@ Parrot_make_cpa(Interp *interp, PMC *array) {
        to actually have an array, even if the inbound array is
        completely empty
     */
-    char ** const out_array = mem_sys_allocate((sizeof (char *))
+    char ** const out_array = (char **)mem_sys_allocate((sizeof (char *))
                                                * (arraylen + 1));
     out_array[arraylen] = 0;
 

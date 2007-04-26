@@ -137,7 +137,7 @@ parrot_PIC_alloc_store(Interp *interp, PackFile_ByteCode *cs, size_t n)
         poly = 2 * sizeof (Parrot_PIC);
     size = n * sizeof (Parrot_MIC) + poly + sizeof (Parrot_PIC_store);
 
-    store = mem_sys_allocate_zeroed(size);
+    store = (Parrot_PIC_store *)mem_sys_allocate_zeroed(size);
     SET_NULL_P(store->prev, Parrot_PIC_store*);
     cs->pic_store = store;
 
@@ -212,7 +212,7 @@ parrot_PIC_alloc_pic(Interp *interp)
             (size_t)(store->n_mics * POLYMORPHIC) * sizeof (Parrot_PIC);
         if (size == 0)
             size = 2 * sizeof (Parrot_PIC);
-        new_store = mem_sys_allocate_zeroed(size + sizeof (Parrot_PIC_store));
+        new_store = (Parrot_PIC_store *)mem_sys_allocate_zeroed(size + sizeof (Parrot_PIC_store));
         new_store->prev = store;
         interp->code->pic_store = new_store;
 

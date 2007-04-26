@@ -845,7 +845,7 @@ Translate ascii string C<src> with entries from C<trans_table>.
         if (src->charset != Parrot_ascii_charset_ptr)
             real_exception(interp, NULL, INVALID_ENCODING,
                 "Can't translate non-ascii");
-        p = src->strstart;
+        p = (unsigned char *)src->strstart;
         /* TODO verify trans table */
         tr_data = PMC_data(table);    /* XXX */
         for (i = 0; i < len; ++i, ++p) {
@@ -876,7 +876,7 @@ Reverse the ascii STRING C<src> in place.
         if (src->charset != Parrot_ascii_charset_ptr)
             real_exception(interp, NULL, INVALID_ENCODING,
                 "Can't reverse non-ascii");
-        p = src->strstart;
+        p = (unsigned char *)src->strstart;
         for (i = 0, --len; i < len; ++i, --len) {
             ch = p[len];
             p[len] = p[i];
@@ -908,7 +908,7 @@ Checks if the ascii STRING C<str> is just an integer.
                 "Can't is_integer non-ascii");
 
         i = 0;
-        p = src->strstart;
+        p = (unsigned char *)src->strstart;
 
         if (p[i] == '-' || p[i] == '+' ||
             (p[i] >= '0' && p[i] <= '9')) {

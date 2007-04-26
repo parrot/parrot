@@ -146,7 +146,7 @@ Swaps the "context".
              */
             ccont = INTERP->current_cont;
             if (ccont == NEED_CONTINUATION) {
-                ccont = new_ret_continuation_pmc(interp, next);
+                ccont = (PMC *)new_ret_continuation_pmc(interp, next);
             }
             if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
                 real_exception(INTERP, NULL, E_Exception,
@@ -226,7 +226,7 @@ Swaps the "context".
 
         /* toggle address */
         dest = co->address;
-        co->address = next;
+        co->address = (opcode_t *)next;
         if (INTERP->code != wanted_seg) {
             Parrot_switch_to_cs(INTERP, wanted_seg, 1);
         }

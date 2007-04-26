@@ -414,7 +414,7 @@ key_next(Interp *interp, PMC *key)
 {
     if (!key->pmc_ext)
         return NULL;
-    return PMC_data(key);
+    return (PMC *)PMC_data(key);
 }
 
 /*
@@ -439,7 +439,7 @@ key_append(Interp *interp, PMC *key1, PMC *key2)
     PMC *tail = key1;
 
     while (PMC_data(tail)) {
-        tail = PMC_data(tail);
+        tail = (PMC *)PMC_data(tail);
     }
 
     PMC_data(tail) = key2;
@@ -496,7 +496,7 @@ key_set_to_string(Interp *interp, PMC *key)
     STRING *quote = string_from_cstring(interp, "'", 1);
     STRING *value = string_from_cstring(interp, "[ ", 2);
 
-    for (; key; key = PMC_data(key)) {
+    for (; key; key = (PMC *)PMC_data(key)) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
                 string_append(interp, value, string_from_int(interp, PMC_int_val(key)));

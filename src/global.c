@@ -228,7 +228,7 @@ Parrot_get_global(Interp *interp, PMC *ns, STRING *globalname)
     if (PMC_IS_NULL(ns))
         return PMCNULL;
 
-    return VTABLE_get_pointer_keyed_str(interp, ns, globalname);
+    return (PMC *)VTABLE_get_pointer_keyed_str(interp, ns, globalname);
 }
 
 void
@@ -293,7 +293,7 @@ Parrot_find_global_n(Interp *interp, PMC *ns, STRING *globalname)
          * distinguishes 'get_pmc_keyed' from 'get_pointer_keyed';
          * the former is for NS and the latter is for non-NS.
          */
-        res = VTABLE_get_pointer_keyed_str(interp, ns, globalname);
+        res = (PMC *)VTABLE_get_pointer_keyed_str(interp, ns, globalname);
     }
 
     return PMC_IS_NULL(res) ? NULL : res;

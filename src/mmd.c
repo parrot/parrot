@@ -539,12 +539,12 @@ mmd_add_function(Interp *interp,
     if (func_nr >= (INTVAL)interp->n_binop_mmd_funcs) {
         if (interp->binop_mmd_funcs) {
             interp->binop_mmd_funcs =
-                mem_sys_realloc(interp->binop_mmd_funcs,
+                (MMD_table *)mem_sys_realloc(interp->binop_mmd_funcs,
                                 (func_nr + 1) * sizeof (MMD_table));
         }
         else {
             interp->binop_mmd_funcs =
-                mem_sys_allocate((func_nr + 1) * sizeof (MMD_table));
+                (MMD_table *)mem_sys_allocate((func_nr + 1) * sizeof (MMD_table));
         }
 
         for (i = interp->n_binop_mmd_funcs; i <= func_nr; ++i)  {
@@ -594,7 +594,7 @@ mmd_expand_x(Interp *interp, INTVAL func_nr, INTVAL new_x)
 
     /* First, fill in the whole new table with the default function
        pointer. We only really need to do the new part, but... */
-    new_table = mem_sys_allocate(sizeof (funcptr_t) * y * new_x);
+    new_table = (funcptr_t *)mem_sys_allocate(sizeof (funcptr_t) * y * new_x);
     for (i = 0; i < y * new_x; i++) {
         new_table[i] = NULL;
     }
@@ -644,7 +644,7 @@ mmd_expand_y(Interp *interp, INTVAL func_nr, INTVAL new_y)
 
     /* First, fill in the whole new table with the default function
        pointer. We only really need to do the new part, but... */
-    new_table = mem_sys_allocate(sizeof (funcptr_t) * x * new_y);
+    new_table = (funcptr_t *)mem_sys_allocate(sizeof (funcptr_t) * x * new_y);
     for (i = 0; i < x * new_y; i++) {
         new_table[i] = NULL;
     }
@@ -1345,7 +1345,7 @@ mmd_sort_candidates(Interp *interp, PMC *arg_tuple, PMC *cl)
      */
     sort = pmc_new(interp, enum_class_FixedIntegerArray);
     VTABLE_set_integer_native(interp, sort, n);
-    helper = PMC_data(sort);
+    helper = (INTVAL *)PMC_data(sort);
     for (i = 0; i < n; ++i) {
         pmc = VTABLE_get_pmc_keyed_int(interp, cl, i);
         d = mmd_distance(interp, pmc, arg_tuple);
@@ -1364,7 +1364,7 @@ mmd_sort_candidates(Interp *interp, PMC *arg_tuple, PMC *cl)
      * now helper has a sorted list of indices in the upper 16 bits
      * fill helper with sorted candidates
      */
-    data = PMC_data(cl);
+    data = (PMC **)PMC_data(cl);
     for (i = 0; i < n; ++i) {
         INTVAL idx = helper[i] >> 16;
         /*

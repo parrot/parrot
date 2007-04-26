@@ -72,7 +72,7 @@ find_vtable_meth_ns(Interp *interp, PMC *ns, INTVAL vtable_index)
     int j;
 
     for (j = 0; j < k; ++j) {
-        STRING *ns_key = parrot_hash_get_idx(interp, PMC_struct_val(ns), key);
+        STRING *ns_key = (STRING *)parrot_hash_get_idx(interp, (Hash *)PMC_struct_val(ns), key);
         PMC    *res    = VTABLE_get_pmc_keyed_str(interp, ns, ns_key);
 
         /* success if matching vtable index or double-underscored name */
@@ -314,7 +314,7 @@ create_deleg_pmc_vtable(Interp *interp, PMC *_class,
             continue;
 
         /* strip underscores from method name */
-        meth_str.strstart = const_cast(meth + 2);
+        meth_str.strstart = (char *)const_cast(meth + 2);
         meth_str.strlen   = meth_str.bufused = strlen(meth) - 2;
         meth_str.hashval  = 0;
 

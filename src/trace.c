@@ -42,7 +42,7 @@ trace_class_name(Interp *interp, PMC* pmc)
 {
     STRING *class_name;
     if (PObj_is_class_TEST(pmc)) {
-        SLOTTYPE * const class_array = PMC_data(pmc);
+        SLOTTYPE * const class_array = (SLOTTYPE *)PMC_data(pmc);
         PMC * const class_name_pmc = get_attrib_num(class_array,
                                                     PCD_CLASS_NAME);
         class_name = PMC_str_val(class_name_pmc);
@@ -200,7 +200,7 @@ trace_key_dump(Interp *interp, PMC *key)
         }
 
         if (key) {
-            key = PMC_data(key);
+            key = (PMC *)PMC_data(key);
             if (key)
                 len += PIO_eprintf(debugger, ";");
         }

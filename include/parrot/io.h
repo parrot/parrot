@@ -170,7 +170,7 @@ PARROT_API extern PMC *PIO_fdopen(Interp *, ParrotIOLayer *, PIOHANDLE, const ch
 PARROT_API extern INTVAL PIO_close(Interp *, PMC *);
 PARROT_API extern void PIO_flush(Interp *, PMC *);
 PARROT_API extern STRING *PIO_reads(Interp *, PMC *, size_t);
-PARROT_API extern INTVAL PIO_read(Interp *, PMC *, void *, size_t);
+PARROT_API extern INTVAL PIO_read(Interp *, PMC *, char *, size_t);
 PARROT_API extern INTVAL PIO_write(Interp *, PMC *, const void *, size_t);
 PARROT_API extern INTVAL PIO_setbuf(Interp *, PMC *, size_t);
 PARROT_API extern INTVAL PIO_setlinebuf(Interp *, PMC *);

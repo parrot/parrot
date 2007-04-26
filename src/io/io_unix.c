@@ -519,7 +519,7 @@ PIO_unix_write(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
     size_t bytes;
     size_t to_write;
     const char *ptr;
-    void *buffer = s->strstart;
+    char *buffer = s->strstart;
     size_t len = s->bufused;
 
     UNUSED(interp);
@@ -675,7 +675,7 @@ PIO_sockaddr_in(Interp *interp, unsigned short port, STRING * addr)
     sa.sin_family = family;
     sa.sin_port = htons(port);
 
-    return string_make(interp, &sa, sizeof (struct sockaddr_in),
+    return string_make(interp, (char *)&sa, sizeof (struct sockaddr_in),
             "binary", 0);
 }
 

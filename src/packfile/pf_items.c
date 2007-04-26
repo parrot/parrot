@@ -521,7 +521,7 @@ PF_fetch_string(Parrot_Interp interp, PackFile *pf, opcode_t **cursor)
 
 
     charset_name = Parrot_charset_c_name(interp, charset_nr);
-    s = string_make(interp, *cursor, size, charset_name, flags);
+    s = string_make(interp, (char *)*cursor, size, charset_name, flags);
 
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PF_fetch_string(): string is: ");
@@ -634,7 +634,7 @@ char *
 PF_fetch_cstring(PackFile *pf, opcode_t **cursor)
 {
     size_t str_len = strlen ((char *)(*cursor)) + 1;
-    char *p = mem_sys_allocate(str_len);
+    char *p = (char *)mem_sys_allocate(str_len);
 
     if (p) {
         int wordsize = pf->header->wordsize;

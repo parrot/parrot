@@ -57,7 +57,7 @@ typedef struct parrot_io_event {
 
 typedef struct _call_back_info {
     PMC*                        cbi;    /* callback info */
-    void*                       external_data;
+    char*                       external_data;
 } _call_back_info;
 
 typedef struct parrot_event {
@@ -94,8 +94,8 @@ PARROT_API void Parrot_new_suspend_for_gc_event(Parrot_Interp);
 PARROT_API void disable_event_checking(Parrot_Interp);
 PARROT_API void enable_event_checking(Parrot_Interp);
 
-PARROT_API void Parrot_new_cb_event(Parrot_Interp, PMC* cbi, void*ext);
-PARROT_API void Parrot_run_callback(Parrot_Interp, PMC* cbi, void*ext);
+PARROT_API void Parrot_new_cb_event(Parrot_Interp, PMC* cbi, char *ext);
+PARROT_API void Parrot_run_callback(Parrot_Interp, PMC* cbi, char *ext);
 
 PARROT_API void Parrot_kill_event_loop(void);
 PARROT_API void* Parrot_sleep_on_event(Parrot_Interp, FLOATVAL t, void* next);

@@ -243,12 +243,12 @@ PackFile_Constant_pack(Interp* interp, PackFile_ConstTable * const_table,
         break;
 
     case PFC_KEY:
-        for (i = 0, key = self->u.key; key; key = PMC_data(key), i++)
+        for (i = 0, key = self->u.key; key; key = (PMC *)PMC_data(key), i++)
             ;
         /* number of key components */
         *cursor++ = i;
         /* and now type / value per component */
-        for (key = self->u.key; key; key = PMC_data(key)) {
+        for (key = self->u.key; key; key = (PMC *)PMC_data(key)) {
             opcode_t type = PObj_get_FLAGS(key);
             slice_bits = 0;
             if ((type & (KEY_start_slice_FLAG|KEY_inf_slice_FLAG)) ==

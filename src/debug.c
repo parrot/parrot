@@ -1545,7 +1545,7 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
                     dest[size++] = '?';
                     break;
                 }
-                k = PMC_data(k);
+                k = (PMC *)PMC_data(k);
                 if (k) dest[size++] = ';';
             }
             dest[size++] = ']';
@@ -1624,7 +1624,7 @@ PDB_disassemble(Interp *interp, const char *command)
         if (space < default_size) {
             alloced += default_size;
             space += default_size;
-            pfile->source = mem_sys_realloc(pfile->source, alloced);
+            pfile->source = (char *)mem_sys_realloc(pfile->source, alloced);
         }
 
         size = PDB_disassemble_op(interp, pfile->source + pfile->size,
@@ -1810,7 +1810,7 @@ PDB_load_source(Interp *interp, const char *command)
     while ((c = fgetc(file)) != EOF) {
         /* Grow it */
         if (++size == 1024) {
-            pfile->source = mem_sys_realloc(pfile->source,
+            pfile->source = (char *)mem_sys_realloc(pfile->source,
                                             (size_t)pfile->size + 1024);
             size = 0;
         }
@@ -2053,12 +2053,12 @@ PDB_extend_const_table(Interp *interp)
     k = ++interp->code->const_table->const_count;
     if (interp->code->const_table->constants) {
         interp->code->const_table->constants =
-            mem_sys_realloc(interp->code->const_table->constants,
+            (PackFile_Constant **)mem_sys_realloc(interp->code->const_table->constants,
                             k * sizeof (PackFile_Constant *));
     }
     else {
         interp->code->const_table->constants =
-            mem_sys_allocate(k * sizeof (PackFile_Constant *));
+            (PackFile_Constant **)mem_sys_allocate(k * sizeof (PackFile_Constant *));
     }
 
     /* Allocate a new constant */
@@ -2491,7 +2491,7 @@ GDB_B(Interp *interp, char *s) {
 
         if (!gdb_bps) {
             nr = 0;
-            newbreak = mem_sys_allocate(sizeof (PDB_breakpoint_t));
+            newbreak = mem_allocate_typed(PDB_breakpoint_t);
             newbreak->prev = NULL;
             newbreak->next = NULL;
             gdb_bps = newbreak;
@@ -2505,7 +2505,7 @@ GDB_B(Interp *interp, char *s) {
                     break;
             }
             ++nr;
-            newbreak = mem_sys_allocate(sizeof (PDB_breakpoint_t));
+            newbreak = mem_allocate_typed(PDB_breakpoint_t);
             newbreak->prev = bp;
             newbreak->next = NULL;
             bp->next = newbreak;

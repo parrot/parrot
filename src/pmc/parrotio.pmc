@@ -61,7 +61,7 @@ Opens the file with the given mode, using the given IO layer.
 
     METHOD PMC* open(STRING* file, STRING *mode, STRING* layer) {
         ParrotIOLayer *l;
-        const char *c_file, *c_mode, *c_layer;
+        char *c_file, *c_mode, *c_layer;
         PMC *pio;
 
         c_file  = string_to_cstring(INTERP, file);
@@ -77,7 +77,7 @@ Opens the file with the given mode, using the given IO layer.
         if (!pio || !PMC_struct_val(pio))
             return pmc_new(INTERP, enum_class_Undef);
         if (l) {
-            ParrotIO *io = PMC_data(pio);
+            ParrotIO *io = (ParrotIO *)PMC_data(pio);
             int is_mmap = strcmp(c_layer, "mmap") == 0;
             /*
              * XXX move this into the layer
@@ -152,7 +152,7 @@ SYNOPSIS
 */
 
     METHOD INTVAL set_readline_interactive(INTVAL on) {
-        ParrotIO *io = PMC_data(SELF);
+        ParrotIO *io = (ParrotIO *)PMC_data(SELF);
 #ifdef PARROT_HAS_READLINE
         INTVAL flag;
 #endif
@@ -175,7 +175,7 @@ SYNOPSIS
     }
 
     METHOD PMC* readline(STRING* prompt) {
-        ParrotIO *io = PMC_data(SELF);
+        ParrotIO *io = (ParrotIO *)PMC_data(SELF);
         PMC *pmc_res = NULL;
         STRING *res = NULL;
         UINTVAL len;
@@ -344,7 +344,7 @@ Destroys the IO PMC, flushing and closing as necessary.
 */
 
     void destroy() {
-        ParrotIO *io = PMC_data(SELF);
+        ParrotIO *io = (ParrotIO *)PMC_data(SELF);
         if (io) {
             /* shared filehandles will only get flushed */
             if (io->flags & PIO_F_SHARED) {
@@ -404,7 +404,7 @@ non-existent layers, returns an empty string.
 */
 
     STRING* get_string_keyed_int(INTVAL n) {
-        ParrotIO *io = PMC_data(SELF);
+        ParrotIO *io = (ParrotIO *)PMC_data(SELF);
         ParrotIOLayer *layer;
         if (!io)
             return const_string(INTERP, "");

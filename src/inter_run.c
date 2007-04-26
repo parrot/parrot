@@ -223,7 +223,7 @@ If registers a PMC return values, it is returned.
 
 /*
 
-=item C<void *
+=item C<PMC *
 Parrot_runops_fromc_args(Parrot_Interp interp, PMC *sub,
         const char *sig, ...)>
 
@@ -293,7 +293,7 @@ Parrot_run_meth_fromc(Parrot_Interp interp,
     return set_retval(interp, 0, ctx);
 }
 
-void *
+PMC *
 Parrot_runops_fromc_args(Parrot_Interp interp, PMC *sub,
         const char *sig, ...)
 {
@@ -303,7 +303,7 @@ Parrot_runops_fromc_args(Parrot_Interp interp, PMC *sub,
     va_start(args, sig);
     ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
     va_end(args);
-    return set_retval(interp, *sig, ctx);
+    return (PMC *)set_retval(interp, *sig, ctx);
 }
 
 void *

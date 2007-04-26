@@ -178,7 +178,7 @@ typedef struct PackFile_ConstTable {
 typedef struct PackFile_ByteCode {
     PackFile_Segment       base;
     Prederef               prederef;    /* The predereferenced code and info */
-    void                  *jit_info;    /* JITs data */
+    struct Parrot_jit_info_t     *jit_info;    /* JITs data */
     Parrot_PIC_store      *pic_store;   /* PIC storage */
     PackFile_Segment      *pic_index;   /* segment of indices into store */
     struct PackFile_Debug *debugs;

@@ -353,14 +353,14 @@ thread_func(void *arg)
     PMC             *sub_arg;
     PMC * const      self    = (PMC*) arg;
     PMC             *ret_val = NULL;
-    Parrot_Interp    interp  = PMC_data(self);
+    Parrot_Interp    interp  = (Parrot_Interp)PMC_data(self);
 
     Parrot_block_DOD(interp);
     Parrot_block_GC(interp);
 
     /* need to set it here because argument passing can trigger GC */
     interp->lo_var_ptr = &lo_var_ptr;
-    sub                = PMC_struct_val(self);
+    sub                = (PMC *)PMC_struct_val(self);
     sub_arg            = PMC_pmc_val(self);
 
     if (setjmp(exp.destination)) {
@@ -551,7 +551,7 @@ pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub, PMC *arg)
 {
     PMC *old_dest_interp;
     PMC *parent;
-    Parrot_Interp interpreter = PMC_data(dest_interp);
+    Parrot_Interp interpreter = (Parrot_Interp)PMC_data(dest_interp);
 
     Parrot_block_GC(interpreter);
     Parrot_block_DOD(interpreter);
@@ -583,7 +583,7 @@ pt_thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub, PMC *arg)
      * TODO check if thread flags are consistent
      */
     if (interp->flags & PARROT_THR_COPY_INTERP)
-        clone_interpreter(interpreter, PMC_data(parent), PARROT_CLONE_DEFAULT);
+        clone_interpreter(interpreter, (Parrot_Interp)PMC_data(parent), PARROT_CLONE_DEFAULT);
     /*
      * TODO thread pools
      */
@@ -1070,7 +1070,7 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
          !(interp->thread_data->state & THREAD_STATE_NOT_STARTED)) ||
             interp->thread_data->state == THREAD_STATE_FINISHED) {
         void *raw_retval = NULL;
-        PMC  *retval;
+        PMC *retval;
 
         interp->thread_data->state |= THREAD_STATE_JOINED;
 
@@ -1082,7 +1082,7 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
         UNLOCK(interpreter_array_mutex);
         JOIN(interp->thread_data->thread, raw_retval);
 
-        retval = raw_retval;
+        retval = (PMC *)raw_retval;
         /*
          * we need to push a cleanup handler here: if cloning
          * of the retval fails (e.g. it's a NULLPMC) this lock
@@ -1320,7 +1320,7 @@ pt_add_to_interpreters(Parrot_Interp interp, Parrot_Interp new_interp)
         interpreter_array[0] = interp;
         n_interpreters       = 1;
 
-        shared_gc_info       = mem_sys_allocate_zeroed(sizeof(*shared_gc_info));
+        shared_gc_info = (Shared_gc_info *)mem_sys_allocate_zeroed(sizeof(*shared_gc_info));
         COND_INIT(shared_gc_info->gc_cond);
         PARROT_ATOMIC_INT_INIT(shared_gc_info->gc_block_level);
         PARROT_ATOMIC_INT_SET(shared_gc_info->gc_block_level, 0);
@@ -1335,7 +1335,7 @@ pt_add_to_interpreters(Parrot_Interp interp, Parrot_Interp new_interp)
     }
 
 
-    new_interp->thread_data = mem_sys_allocate_zeroed(sizeof (Thread_data));
+    new_interp->thread_data = mem_allocate_zeroed_typed(Thread_data);
     INTERPRETER_LOCK_INIT(new_interp);
     running_threads++;
     if (Interp_debug_TEST(interp, PARROT_THREAD_DEBUG_FLAG))
@@ -1353,7 +1353,7 @@ pt_add_to_interpreters(Parrot_Interp interp, Parrot_Interp new_interp)
     }
 
     /* need to resize */
-    interpreter_array = mem_sys_realloc(interpreter_array,
+    interpreter_array = (Interp **)mem_sys_realloc(interpreter_array,
             (n_interpreters + 1) * sizeof (Interp *));
 
     interpreter_array[n_interpreters] = new_interp;

@@ -1375,7 +1375,7 @@ parrot_build_asm(Interp *interp,
     int needs_fs;       /* fetch/store */
 
     jit_info = interp->code->jit_info =
-            mem_sys_allocate(sizeof (Parrot_jit_info_t));
+            mem_allocate_typed(Parrot_jit_info_t);
 
     jit_info->flags     = jit_type & JIT_CODE_RECURSIVE;
     jit_type &= ~ JIT_CODE_RECURSIVE;
@@ -1452,7 +1452,7 @@ parrot_build_asm(Interp *interp,
     if ((size_t)jit_info->arena.map_size * 10 > (size_t)jit_info->arena.size)
         jit_info->arena.size = jit_info->arena.map_size * 10;
     jit_info->native_ptr = jit_info->arena.start =
-        mem_alloc_executable((size_t)jit_info->arena.size);
+        (char *)mem_alloc_executable((size_t)jit_info->arena.size);
 #  if EXEC_CAPABLE
     if (obj)
         jit_info->objfile->text.code = jit_info->arena.start;
@@ -1527,7 +1527,7 @@ parrot_build_asm(Interp *interp,
 #if REQUIRES_CONSTANT_POOL
                 Parrot_jit_extend_arena(jit_info);
 #else
-                new_arena = mem_realloc_executable(jit_info->arena.start,
+                new_arena = (char *)mem_realloc_executable(jit_info->arena.start,
                         (size_t)jit_info->arena.size * 2);
                 jit_info->arena.size *= 2;
                 jit_info->native_ptr = new_arena +
@@ -1728,7 +1728,7 @@ Parrot_jit_newfixup(Parrot_jit_info_t *jit_info)
 {
     Parrot_jit_fixup_t *fixup;
 
-    fixup = mem_sys_allocate_zeroed(sizeof (*fixup));
+    fixup = mem_allocate_zeroed_typed(Parrot_jit_fixup_t);
 
     /* Insert fixup at the head of the list */
     fixup->next = jit_info->arena.fixups;

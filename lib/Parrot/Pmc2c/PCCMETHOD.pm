@@ -480,7 +480,7 @@ sub rewrite_pccinvoke {
 
         my $n_regs_used = find_max_regs( [ $result_n_regs_used, $args_n_regs_used ] );
 
-        $method_name = "string_from_const_cstring(interp, $method_name, 0)"
+        $method_name = "string_from_const_cstring(interp, (const char *) $method_name, 0)"
             if isquoted($method_name);
 
         my $file   = '"' . __FILE__ . '"';

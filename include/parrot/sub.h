@@ -200,7 +200,7 @@ struct Parrot_Context_info {
     STRING* nsname;
     STRING* fullname;
     int pc;
-    const char *file;
+    char *file;
     int line;
     opcode_t *address;
 };

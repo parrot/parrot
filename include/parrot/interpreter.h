@@ -472,7 +472,7 @@ PARROT_API STRING*interpinfo_s(Interp *interp, INTVAL what);
 void runops(Interp *, size_t offset);
 void runops_int(Interp *, size_t offset);
 PARROT_API parrot_context_t* Parrot_runops_fromc(Interp *, PMC *sub);
-PARROT_API void* Parrot_runops_fromc_args(Interp *, PMC *sub, const char *sig, ...);
+PARROT_API PMC* Parrot_runops_fromc_args(Interp *, PMC *sub, const char *sig, ...);
 PARROT_API void* Parrot_runops_fromc_args_event(Interp *, PMC *sub, const char *sig, ...);
 PARROT_API INTVAL Parrot_runops_fromc_args_reti(Interp *, PMC *, const char *, ...);
 PARROT_API FLOATVAL Parrot_runops_fromc_args_retf(Interp *, PMC *, const char *, ...);
@@ -497,8 +497,8 @@ PARROT_API INTVAL Parrot_run_meth_fromc_arglist_reti(Interp *, PMC *sub,
 PARROT_API FLOATVAL Parrot_run_meth_fromc_arglist_retf(Interp *, PMC *sub,
         PMC* obj, STRING *meth, const char *signature, va_list);
 
-PARROT_API void Parrot_callback_C(void *external_data, PMC *callback_info);
-PARROT_API void Parrot_callback_D(PMC *callback_info, void *external_data);
+PARROT_API void Parrot_callback_C(char *external_data, PMC *callback_info);
+PARROT_API void Parrot_callback_D(PMC *callback_info, char *external_data);
 PARROT_API PMC* Parrot_make_cb(Interp *interp, PMC* sub, PMC* user_data,
         STRING* cb_signature);
 

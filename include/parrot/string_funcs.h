@@ -58,9 +58,9 @@ PARROT_API STRING *string_from_num(Interp *, FLOATVAL f);
 PARROT_API STRING *string_grow(Interp *, STRING *s, INTVAL addlen);
 PARROT_API const char* string_primary_encoding_for_representation(Interp *,
         parrot_string_representation_t representation);
-PARROT_API STRING *string_make(Interp *interp, const void *buffer,
+PARROT_API STRING *string_make(Interp *interp, const char *buffer,
         UINTVAL len, const char *charset_name, UINTVAL flags);
-PARROT_API STRING *string_make_direct(Interp *interp, const void *buffer,
+PARROT_API STRING *string_make_direct(Interp *interp, const char *buffer,
         UINTVAL len, ENCODING *encoding, CHARSET *charset, UINTVAL flags);
 PARROT_API STRING * string_make_empty(Interp *interp,
         parrot_string_representation_t representation,
@@ -78,8 +78,8 @@ PARROT_API void *string_pointer_to_index(Interp *, const STRING *s, UINTVAL idx)
 PARROT_API INTVAL string_index(Interp *, const STRING *, UINTVAL idx);
 PARROT_API INTVAL string_str_index(Interp *interp, const STRING *s,
         const STRING *s2, INTVAL start);
-PARROT_API STRING *string_from_cstring(Interp *, const void *, UINTVAL);
-PARROT_API STRING *string_from_const_cstring(Interp *, const void *, UINTVAL);
+PARROT_API STRING *string_from_cstring(Interp *, const char *, UINTVAL);
+PARROT_API STRING *string_from_const_cstring(Interp *, const char *, UINTVAL);
 PARROT_API STRING *const_string(Interp *, const char *buffer)
         __attribute__nonnull__(2);
 PARROT_API char *string_to_cstring(Interp *, STRING *);

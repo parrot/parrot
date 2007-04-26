@@ -267,7 +267,7 @@ Parrot_register_HLL_type(Interp *interp, INTVAL hll_id,
     assert(!PMC_IS_NULL(entry));
     type_hash = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
     assert(!PMC_IS_NULL(type_hash));
-    hash = PMC_struct_val(type_hash);
+    hash = (Hash *)PMC_struct_val(type_hash);
     parrot_hash_put(interp, hash, (void*)core_type, (void*)hll_type);
     END_WRITE_HLL_INFO(interp, hll_info);
 }
@@ -298,7 +298,7 @@ Parrot_get_HLL_type(Interp *interp, INTVAL hll_id, INTVAL core_type)
     type_hash = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
     if (PMC_IS_NULL(type_hash))
         return core_type;
-    hash = PMC_struct_val(type_hash);
+    hash = (Hash *)PMC_struct_val(type_hash);
     if (!hash->entries)
         return core_type;
     b = parrot_hash_get_bucket(interp, hash, (void*)core_type);

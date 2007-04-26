@@ -63,7 +63,7 @@ Stack_Chunk_t * register_new_stack(Interp *interp,
     item_size &= ~7;    /* round up to 8 so that the chunk is aligned at
                            the same size - the aligned MMX memcpy needs it */
     make_bufferlike_pool(interp, item_size);
-    chunk = new_bufferlike_header(interp, item_size);
+    chunk = (Stack_Chunk_t *)new_bufferlike_header(interp, item_size);
     chunk->prev = chunk;        /* mark the top of the stack */
     chunk->name = name;
     chunk->size = item_size;    /* TODO store the pool instead the size */
@@ -86,7 +86,7 @@ Stack_Chunk_t *cst_new_stack_chunk(Parrot_Interp interp,
 {
     Small_Object_Pool * const pool =
         get_bufferlike_pool(interp, chunk->size);
-    Stack_Chunk_t * const new_chunk = pool->get_free_object(interp, pool);
+    Stack_Chunk_t * const new_chunk = (Stack_Chunk_t *)pool->get_free_object(interp, pool);
 
     PObj_bufstart(new_chunk) = NULL;
     PObj_buflen(new_chunk) = 0;

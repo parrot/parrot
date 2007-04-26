@@ -119,7 +119,7 @@ Parrot_make_cb(Parrot_Interp interp, PMC* sub, PMC* user_data,
 
 /*
 
-=item C<static void verify_CD(void *external_data, PMC *user_data)>
+=item C<static void verify_CD(char *external_data, PMC *user_data)>
 
 Verify user_data PMC then continue with callback_CD
 
@@ -127,10 +127,10 @@ Verify user_data PMC then continue with callback_CD
 
 */
 
-static void callback_CD(Parrot_Interp, void *, PMC *user_data);
+static void callback_CD(Parrot_Interp, char *, PMC *user_data);
 
 static void
-verify_CD(void *external_data, PMC *user_data)
+verify_CD(char *external_data, PMC *user_data)
 {
     Parrot_Interp interp = NULL;
     size_t i;
@@ -194,7 +194,7 @@ Common callback function handler. See pdd16.
 */
 
 static void
-callback_CD(Parrot_Interp interp, void *external_data, PMC *user_data)
+callback_CD(Parrot_Interp interp, char *external_data, PMC *user_data)
 {
 
     PMC *passed_interp;       /* the interp that originated the CB */
@@ -257,7 +257,7 @@ necessary items in its properties.
 
 void
 Parrot_run_callback(Parrot_Interp interp,
-                    PMC* user_data, void* external_data)
+                    PMC* user_data, char* external_data)
 {
     PMC *    signature;
     PMC *    sub;
@@ -351,13 +351,13 @@ NCI callback functions. See pdd16.
 */
 
 void
-Parrot_callback_C(void *external_data, PMC *user_data)
+Parrot_callback_C(char *external_data, PMC *user_data)
 {
     verify_CD(external_data, user_data);
 }
 
 void
-Parrot_callback_D(PMC *user_data, void *external_data)
+Parrot_callback_D(PMC *user_data, char *external_data)
 {
     verify_CD(external_data, user_data);
 }

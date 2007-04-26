@@ -362,7 +362,7 @@ Initializes the queue, setting C<prio> as the queue's priority.
 QUEUE*
 queue_init(UINTVAL prio)
 {
-    QUEUE * const queue = mem_sys_allocate(sizeof (QUEUE));
+    QUEUE * const queue = mem_allocate_typed(QUEUE);
     queue->head = queue->tail = NULL;
     queue->max_prio = prio;
     COND_INIT(queue->queue_condition);

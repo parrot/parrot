@@ -76,7 +76,7 @@ parrot_set_config_hash_interpreter(Interp* interp)
     {
         STRING *config_string =
             string_make_direct(interp,
-                               parrot_config_stored, parrot_config_size_stored,
+                               (const char *)parrot_config_stored, parrot_config_size_stored,
                                PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
                                PObj_external_FLAG|PObj_constant_FLAG);
 

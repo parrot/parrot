@@ -165,7 +165,7 @@ static void
 push_ascii_string(Parrot_Interp interp, IMAGE_IO *io, STRING *s)
 {
     const UINTVAL length = string_length(interp, s);
-    char * const buffer = malloc(4*length);
+    char * const buffer = (char *)malloc(4*length);
     char *cursor = buffer;
     UINTVAL idx = 0;
 
@@ -589,7 +589,7 @@ cleanup_next_for_GC_pool(Parrot_Interp interp, Small_Object_Pool *pool)
     Small_Object_Arena *arena;
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        PMC *p = arena->start_objects;
+        PMC *p = (PMC *)arena->start_objects;
         UINTVAL i;
 
         for (i = 0; i < arena->used; i++) {
@@ -669,7 +669,7 @@ ft_init(Parrot_Interp interp, visit_info *info)
     STRING *s = info->image;
     PackFile *pf;
 
-    info->image_io = mem_sys_allocate(sizeof (IMAGE_IO));
+    info->image_io = mem_allocate_typed(IMAGE_IO);
     info->image_io->image = s = info->image;
 #if FREEZE_ASCII
     info->image_io->vtable = &ascii_funcs;
@@ -931,7 +931,7 @@ do_thaw(Parrot_Interp interp, PMC* pmc, visit_info *info)
         return;
     }
 
-    pos = list_get(interp, PMC_data(info->id_list), id, enum_type_PMC);
+    pos = (PMC **)list_get(interp, (List *)PMC_data(info->id_list), id, enum_type_PMC);
     if (pos == (void*)-1)
         pos = NULL;
     else if (pos) {
@@ -974,7 +974,7 @@ do_thaw(Parrot_Interp interp, PMC* pmc, visit_info *info)
 
     VTABLE_thaw(interp, pmc, info);
     if (info->extra_flags == EXTRA_CLASS_EXISTS) {
-        pmc = info->extra;
+        pmc = (PMC *)info->extra;
         info->extra = NULL;
         info->extra_flags = 0;
     }
@@ -986,10 +986,10 @@ do_thaw(Parrot_Interp interp, PMC* pmc, visit_info *info)
         }
         *info->thaw_ptr = pmc;
     }
-    list_assign(interp, PMC_data(info->id_list), id, pmc, enum_type_PMC);
+    list_assign(interp, (List *)PMC_data(info->id_list), id, pmc, enum_type_PMC);
     /* remember nested aggregates depth first */
     if (pmc->pmc_ext)
-        list_unshift(interp, PMC_data(info->todo), pmc, enum_type_PMC);
+        list_unshift(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
 }
 
 
@@ -1108,7 +1108,7 @@ Remembers the PMC to be processed later.
 static void
 add_pmc_todo_list(Parrot_Interp interp, PMC *pmc, visit_info *info)
 {
-    list_push(interp, PMC_data(info->todo), pmc, enum_type_PMC);
+    list_push(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
 }
 
 /*
@@ -1130,7 +1130,7 @@ todo_list_seen(Parrot_Interp interp, PMC *pmc, visit_info *info,
         UINTVAL *id)
 {
     HashBucket * const b =
-        parrot_hash_get_bucket(interp, PMC_struct_val(info->seen), pmc);
+        parrot_hash_get_bucket(interp, (Hash *)PMC_struct_val(info->seen), pmc);
 
     if (b) {
         *id = (UINTVAL) b->value;
@@ -1139,10 +1139,10 @@ todo_list_seen(Parrot_Interp interp, PMC *pmc, visit_info *info,
 
     info->id += 4;      /* next id to freeze */
     *id = info->id;
-    parrot_hash_put(interp, PMC_struct_val(info->seen), pmc, (void*)*id);
+    parrot_hash_put(interp, (Hash *)PMC_struct_val(info->seen), pmc, (void*)*id);
     /* remember containers */
     if (pmc->pmc_ext)
-        list_unshift(interp, PMC_data(info->todo), pmc, enum_type_PMC);
+        list_unshift(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
     return 0;
 }
 
@@ -1274,7 +1274,7 @@ static void
 visit_loop_todo_list(Parrot_Interp interp, PMC *current,
         visit_info *info)
 {
-    List *todo = PMC_data(info->todo);
+    List *todo = (List *)PMC_data(info->todo);
     PMC *finish_list_pmc;
     int i, n;
     List *finish_list = NULL;   /* gcc -O3 warning */
@@ -1287,7 +1287,7 @@ visit_loop_todo_list(Parrot_Interp interp, PMC *current,
          * create a list that contains PMCs that need thawfinish
          */
         finish_list_pmc = pmc_new(interp, enum_class_Array);
-        finish_list = PMC_data(finish_list_pmc);
+        finish_list = (List *)PMC_data(finish_list_pmc);
     }
 
     (info->visit_pmc_now)(interp, current, info);

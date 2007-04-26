@@ -48,7 +48,7 @@ Gets a free C<Buffer> from C<pool> and returns it. Memory is cleared.
 static void *
 get_free_buffer(Interp *interp, Small_Object_Pool *pool)
 {
-    PObj *buffer = pool->get_free_object(interp, pool);
+    PObj *buffer = (PObj *)pool->get_free_object(interp, pool);
 
     /* don't mess around with flags */
     PObj_bufstart(buffer) = NULL;
@@ -180,7 +180,7 @@ make_bufferlike_pool(Interp *interp, size_t buffer_size)
     /* Expand the array of sized resource pools, if necessary */
     if (num_old <= idx) {
         UINTVAL num_new = idx + 1;
-        sized_pools = mem_internal_realloc(sized_pools,
+        sized_pools = (Small_Object_Pool **)mem_internal_realloc(sized_pools,
                                            num_new * sizeof (void *));
         memset(sized_pools + num_old, 0, sizeof (void *) * (num_new - num_old));
 
@@ -237,7 +237,7 @@ new_pmc_header(Interp *interp, UINTVAL flags)
     pool = flags & PObj_constant_FLAG ?
         interp->arena_base->constant_pmc_pool :
         interp->arena_base->pmc_pool;
-    pmc = pool->get_free_object(interp, pool);
+    pmc = (PMC *)pool->get_free_object(interp, pool);
     /* clear flags, set is_PMC_FLAG */
     if (flags & PObj_is_PMC_EXT_FLAG) {
         flags |= PObj_is_special_PMC_FLAG;
@@ -271,14 +271,14 @@ static PMC_EXT *
 new_pmc_ext(Interp *interp)
 {
     Small_Object_Pool *pool = interp->arena_base->pmc_ext_pool;
-    void *ptr;
+    PMC_EXT *ptr;
     /*
      * can't use normal get_free_object--PMC_EXT doesn't have flags
      * it isn't a Buffer
      */
     if (!pool->free_list)
         (*pool->more_objects) (interp, pool);
-    ptr = pool->free_list;
+    ptr = (PMC_EXT *)pool->free_list;
     pool->free_list = *(void **)ptr;
     memset(ptr, 0, sizeof (PMC_EXT));
     return ptr;
@@ -328,7 +328,7 @@ add_pmc_sync(Interp *interp, PMC *pmc)
     if (!PObj_is_PMC_EXT_TEST(pmc)) {
         add_pmc_ext(interp, pmc);
     }
-    PMC_sync(pmc) = mem_internal_allocate(sizeof (*PMC_sync(pmc)));
+    PMC_sync(pmc) = (struct _Sync *)mem_internal_allocate(sizeof (*PMC_sync(pmc)));
     PMC_sync(pmc)->owner = interp;
     MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
 }
@@ -347,8 +347,7 @@ Returns a new C<STRING> header.
 STRING *
 new_string_header(Interp *interp, UINTVAL flags)
 {
-    STRING *string;
-    string = get_free_buffer(interp, (flags & PObj_constant_FLAG)
+    STRING *string = (STRING *)get_free_buffer(interp, (flags & PObj_constant_FLAG)
             ? interp->arena_base->constant_string_header_pool :
             interp->arena_base->string_header_pool);
     PObj_get_FLAGS(string) |= flags | PObj_is_string_FLAG|PObj_is_COWable_FLAG;
@@ -370,7 +369,7 @@ Creates and returns a new C<Buffer>.
 Buffer *
 new_buffer_header(Interp *interp)
 {
-    return get_free_buffer(interp,
+    return (Buffer *)get_free_buffer(interp,
             interp->arena_base->buffer_header_pool);
 }
 
@@ -765,7 +764,7 @@ static void fix_pmc_syncs(Interp *dest_interp, Small_Object_Pool *pool) {
     size_t nm;
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
-        Buffer *b = cur_arena->start_objects;
+        Buffer *b = (Buffer *)cur_arena->start_objects;
 
         for (i = nm = 0; i < cur_arena->used; i++) {
             if (PObj_on_free_list_TEST(b))

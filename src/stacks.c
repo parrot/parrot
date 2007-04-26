@@ -246,7 +246,7 @@ void
 stack_push(Interp *interp, Stack_Chunk_t **stack_p /*NN*/,
            void *thing, Stack_entry_type type, Stack_cleanup_method cleanup)
 {
-    Stack_Entry_t *entry = stack_prepare_push(interp, stack_p);
+    Stack_Entry_t *entry = (Stack_Entry_t *)stack_prepare_push(interp, stack_p);
 
     /* Remember the type */
     entry->entry_type = type;
@@ -295,7 +295,7 @@ void *
 stack_pop(Interp *interp, Stack_Chunk_t **stack_p /*NN*/,
           void *where, Stack_entry_type type)
 {
-    Stack_Entry_t * const entry = stack_prepare_pop(interp, stack_p);
+    Stack_Entry_t * const entry = (Stack_Entry_t *)stack_prepare_pop(interp, stack_p);
 
     /* Types of 0 mean we don't care */
     if (type && entry->entry_type != type) {

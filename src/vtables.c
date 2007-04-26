@@ -32,7 +32,7 @@ Creates and returns a pointer to the new C<VTABLE>.
 VTABLE *
 Parrot_new_vtable(Parrot_Interp interp)
 {
-    return mem_sys_allocate_zeroed(sizeof (VTABLE));
+    return mem_allocate_zeroed_typed(VTABLE);
 }
 
 /*
@@ -53,7 +53,7 @@ Destroys C<*vtable>.
 VTABLE *
 Parrot_clone_vtable(Parrot_Interp interp, const VTABLE *base_vtable)
 {
-    VTABLE * const new_vtable = mem_sys_allocate(sizeof (VTABLE));
+    VTABLE * const new_vtable = mem_allocate_typed(VTABLE);
     if (new_vtable) {
         memcpy(new_vtable, base_vtable, sizeof (VTABLE));
     }
@@ -78,7 +78,7 @@ void
 parrot_alloc_vtables(Interp *interp)
 {
     interp->vtables =
-        mem_sys_allocate_zeroed(sizeof (VTABLE *) * PARROT_MAX_CLASSES);
+        (VTABLE **)mem_sys_allocate_zeroed(sizeof (VTABLE *) * PARROT_MAX_CLASSES);
     interp->n_vtable_max = enum_class_core_max;
     interp->n_vtable_alloced = PARROT_MAX_CLASSES;
 }
@@ -92,7 +92,7 @@ parrot_realloc_vtables(Interp *interp)
     const INTVAL new_max = interp->n_vtable_alloced + 16;
     const INTVAL new_size = new_max * sizeof (VTABLE *);
     INTVAL i;
-    interp->vtables = mem_sys_realloc(interp->vtables, new_size);
+    interp->vtables = (VTABLE **)mem_sys_realloc(interp->vtables, new_size);
     /* Should set all the empty slots to the null PMC's
        vtable pointer */
     for (i = interp->n_vtable_max; i < new_max; ++i)

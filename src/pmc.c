@@ -191,7 +191,7 @@ get_new_pmc_header(Interp *interp, INTVAL base_type, UINTVAL flags)
          *
          * - singletons are created in the constant pmc pool
          */
-        pmc = (vtable->get_pointer)(interp, NULL);
+        pmc = (PMC *)(vtable->get_pointer)(interp, NULL);
         /* LOCK */
         if (!pmc) {
             pmc = new_pmc_header(interp, PObj_constant_FLAG);
@@ -404,7 +404,7 @@ pmc_type(Interp* interp, STRING *name)
     PMC * const classname_hash = interp->class_hash;
     PMC *item;
 
-    item = VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
+    item = (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
     /* nested namespace with same name */
     if (item->vtable->base_type == enum_class_NameSpace)
         return 0;
@@ -419,7 +419,7 @@ pmc_type_p(Interp* interp, PMC *name)
     PMC * const classname_hash = interp->class_hash;
     PMC *item;
 
-    item = VTABLE_get_pointer_keyed(interp, classname_hash, name);
+    item = (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
     if (!PMC_IS_NULL(item))
         return PMC_int_val((PMC*) item);
     return 0;
@@ -458,7 +458,7 @@ create_class_pmc(Interp *interp, INTVAL type)
     }
     _class->pmc_ext = NULL;
     DOD_flag_CLEAR(is_special_PMC, _class);
-    PMC_pmc_val(_class)   = (void*)0xdeadbeef;
+    PMC_pmc_val(_class)   = (PMC *)0xdeadbeef;
     PMC_struct_val(_class)= (void*)0xdeadbeef;
 
     PObj_is_PMC_shared_CLEAR(_class);

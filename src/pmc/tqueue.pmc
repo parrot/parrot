@@ -176,7 +176,7 @@ Adds the thread C<*item> to the end of the queue.
 */
 
     void push_pmc(PMC *item) {
-        QUEUE_ENTRY* entry = mem_sys_allocate(sizeof (QUEUE_ENTRY));
+        QUEUE_ENTRY* entry = mem_allocate_typed(QUEUE_ENTRY);
         QUEUE *queue = PMC_data(SELF);
 
         /*
