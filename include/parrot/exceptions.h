@@ -155,7 +155,7 @@ typedef enum {
  * one later, so we wrap it in a struct so that we can expand it later */
 typedef struct parrot_exception_t {
     Parrot_jump_buff destination;       /* jmp_buf */
-    exception_severity severity;        /* s. above */
+    INTVAL severity;                    /* s. above */
     long error;                         /* exception_type_enum */
     STRING *msg;                        /* may be NULL */
     void *resume;                       /* opcode_t* for resume or NULL */

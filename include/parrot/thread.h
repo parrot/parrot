@@ -86,7 +86,7 @@ typedef enum {
  */
 typedef struct _Thread_data {
     Parrot_thread       thread;         /* pthread_t or such */
-    thread_state_enum   state;
+    INTVAL              state;
     int                 wants_shared_gc; /* therad is trying to
                                             do a shared GC run */
     UINTVAL             tid;            /* 0.. n-1 idx in interp array */

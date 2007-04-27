@@ -310,7 +310,7 @@ Parrot_Context_info(Interp *interp, parrot_context_t *ctx,
     struct Parrot_sub *sub;
 
     /* set file/line/pc defaults */
-    info->file = (const char *) "(unknown file)";
+    info->file = (char *) "(unknown file)";
     info->line = -1;
     info->pc = -1;
     info->nsname = NULL;

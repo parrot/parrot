@@ -107,7 +107,7 @@ static int pipe_fds[2];
  * a structure to communicate with the io_thread
  */
 typedef struct io_thread_msg {
-    io_thread_msg_type command;
+    INTVAL command;
     parrot_event *ev;
 } io_thread_msg;
 

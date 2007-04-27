@@ -306,11 +306,9 @@ Enters the attribute in the C<attributes> array.
         PMC *new_attribute = pmc_new(interp, enum_class_Hash);
 
         /* Set name and type. */
-        VTABLE_set_string_keyed_str(interp, new_attribute,
-            CONST_STRING(interp, "name"), name);
+        VTABLE_set_string_keyed_str(interp, new_attribute, CONST_STRING(interp, "name"), name);
         if (!PMC_IS_NULL(type)) {
-            VTABLE_set_pmc_keyed_str(interp, new_attribute,
-                CONST_STRING(interp, "type"), type);
+            VTABLE_set_pmc_keyed_str(interp, new_attribute, CONST_STRING(interp, "type"), type);
         }
 
         /* Enter the attribute in the attributes array. */
@@ -483,8 +481,7 @@ Sets the name of the role, and updates the namespace accoringly.
             /* We'll build a hash just containing the name, then give this to
              * init_role_from_hash - saves some code duplication. */
             PMC *naming_hash = pmc_new(interp, enum_class_Hash);
-            VTABLE_set_string_keyed_str(interp, naming_hash,
-                CONST_STRING(interp, "name"), name);
+            VTABLE_set_string_keyed_str(interp, naming_hash, CONST_STRING(interp, "name"), name);
             init_role_from_hash(interp, SELF, naming_hash);
         }
 
@@ -523,8 +520,7 @@ providing a set of key/value pairs describing the attribute.
 
 */
     PCCMETHOD void attributes() {
-        PMC *ret_attrib_metadata = VTABLE_inspect_str(interp, SELF,
-            CONST_STRING(interp, "attributes"));
+        PMC *ret_attrib_metadata = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "attributes"));
         PCCRETURN(PMC *ret_attrib_metadata);
     }
 
@@ -558,8 +554,7 @@ Return a hash where the keys are method names and the values are methods.
 
 */
     PCCMETHOD void methods() {
-        PMC *ret_methods = VTABLE_inspect_str(interp, SELF,
-                CONST_STRING(interp, "methods"));
+        PMC *ret_methods = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "methods"));
         PCCRETURN(PMC *ret_methods);
     }
 
@@ -590,8 +585,7 @@ Return the roles array PMC.
 
 */
     PCCMETHOD void roles() {
-        PMC *ret_roles = VTABLE_inspect_str(interp, SELF,
-            CONST_STRING(interp, "roles"));
+        PMC *ret_roles = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "roles"));
         PCCRETURN(PMC *ret_roles);
     }
 

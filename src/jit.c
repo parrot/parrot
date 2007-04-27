@@ -1351,7 +1351,7 @@ file.
 Parrot_jit_info_t *
 parrot_build_asm(Interp *interp,
           opcode_t *code_start, opcode_t *code_end,
-          void *objfile, enum_jit_code_type jit_type)
+          void *objfile, INTVAL jit_type)
 {
     UINTVAL i;
     char *new_arena;

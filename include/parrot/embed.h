@@ -28,9 +28,9 @@ PARROT_API Parrot_Interp Parrot_new(Parrot_Interp parent);
 PARROT_API void Parrot_init(Parrot_Interp);
 PARROT_API void Parrot_init_stacktop(Parrot_Interp, void *);
 
-PARROT_API void Parrot_set_flag(Parrot_Interp, Parrot_Interp_flag);
-PARROT_API void Parrot_clear_flag(Parrot_Interp, Parrot_Interp_flag);
-PARROT_API Parrot_Int Parrot_test_flag(Parrot_Interp, Parrot_Interp_flag);
+PARROT_API void Parrot_set_flag(Parrot_Interp, Parrot_Int);
+PARROT_API void Parrot_clear_flag(Parrot_Interp, Parrot_Int);
+PARROT_API Parrot_Int Parrot_test_flag(Parrot_Interp, Parrot_Int);
 
 PARROT_API void Parrot_set_trace(Parrot_Interp, Parrot_UInt);
 PARROT_API void Parrot_clear_trace(Parrot_Interp, Parrot_UInt);
@@ -56,7 +56,7 @@ PARROT_API void Parrot_runcode(Parrot_Interp, int argc, char *argv[]);
 
 PARROT_API void Parrot_destroy(Parrot_Interp);
 
-PARROT_API Parrot_Opcode * Parrot_debug(Parrot_Interp, Parrot_Opcode* pc);
+PARROT_API Parrot_Opcode * Parrot_debug(Parrot_Interp, Parrot_Opcode *pc);
 
 PARROT_API void Parrot_disassemble(Parrot_Interp);
 

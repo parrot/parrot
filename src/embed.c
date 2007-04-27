@@ -97,7 +97,7 @@ Parrot_init_stacktop(Interp *interp, void *stack_top)
 
 /*
 
-=item C<void Parrot_set_flag(Interp *interp, Parrot_Interp_flag flag)>
+=item C<void Parrot_set_flag(Interp *interp, INTVAL flag)>
 
 Sets a flag in the interpreter specified by C<flag>, any of
 C<PARROT_BOUNDS_FLAG>, or C<PARROT_PROFILE_FLAG> to enable profiling, and
@@ -119,7 +119,7 @@ Set a trace flag: C<PARROT_TRACE_FLAG>
 */
 
 void
-Parrot_set_flag(Interp *interp, Parrot_Interp_flag flag)
+Parrot_set_flag(Interp *interp, INTVAL flag)
 {
     /* These two macros (from interpreter.h) do exactly what they look like. */
 
@@ -150,7 +150,7 @@ Parrot_set_trace(Interp *interp, UINTVAL flag)
 
 /*
 
-=item C<void Parrot_clear_flag(Interp *, Parrot_Interp_flag flag)>
+=item C<void Parrot_clear_flag(Interp *, INTVAL flag)>
 
 =item C<void Parrot_clear_debug(Interp *, UINTVAL flag)>
 
@@ -163,7 +163,7 @@ Clears a flag in the interpreter.
 */
 
 void
-Parrot_clear_flag(Parrot_Interp interp, Parrot_Interp_flag flag)
+Parrot_clear_flag(Parrot_Interp interp, INTVAL flag)
 {
     Interp_flags_CLEAR(interp, flag);
 }
@@ -183,7 +183,7 @@ Parrot_clear_trace(Interp *interp, UINTVAL flag)
 /*
 
 =item C<Parrot_Int
-Parrot_test_flag(Interp*, Parrot_Interp_flag flag)>
+Parrot_test_flag(Interp*, INTVAL flag)>
 
 =item C<UINTVAL
 Parrot_test_debug(Interp*, UINTVAL flag)>
@@ -198,7 +198,7 @@ Test the interpreter flags specified in C<flag>.
 */
 
 Parrot_Int
-Parrot_test_flag(Interp* interp, Parrot_Interp_flag flag)
+Parrot_test_flag(Interp* interp, INTVAL flag)
 {
     return Interp_flags_TEST(interp, flag);
 }

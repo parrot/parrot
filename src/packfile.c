@@ -247,7 +247,7 @@ Run the B<sub_pmc> due its B<:load>, B<:immediate>, ... pragma
 static PMC*
 run_sub(Parrot_Interp interp, PMC *sub_pmc)
 {
-    const Parrot_Run_core_t old = interp->run_core;
+    const INTVAL old = interp->run_core;
     PMC *retval;
 
     /*
@@ -1178,7 +1178,7 @@ create_seg(Interp *interp, PackFile_Directory *dir, pack_file_types t,
     PackFile_Segment *seg;
 
     const size_t len = strlen(name) + strlen(file_name) + 2;
-    char * const buf = (char * const)malloc(len);
+    char * const buf = (char *)malloc(len);
 
     sprintf(buf, "%s_%s", name, file_name);
     seg = PackFile_Segment_new_seg(interp, dir, t, buf, add);
@@ -2197,7 +2197,7 @@ Parrot_new_debug_seg(Interp *interp, PackFile_ByteCode *cs, size_t size)
     }
     else {              /* create one */
         const size_t len = strlen(cs->base.name) + 4;
-        char * const name = (char * const)mem_sys_allocate(len);
+        char * const name = (char *)mem_sys_allocate(len);
 
         sprintf(name, "%s_DB", cs->base.name);
         if (interp->code && interp->code->base.dir) {
@@ -2527,7 +2527,7 @@ Parrot_destroy_constants(Interp *interp) {
         HashBucket *bucket = hash->bi[i];
         while (bucket) {
             PackFile_ConstTable * const table      =
-                (PackFile_ConstTable * const)bucket->key;
+                (PackFile_ConstTable *)bucket->key;
             PackFile_Constant ** const orig_consts = table->constants;
             PackFile_Constant ** const consts      =
                 (PackFile_Constant **) bucket->value;
@@ -2784,7 +2784,7 @@ I<What does this do?>
 
 void
 PackFile_FixupTable_new_entry(Interp *interp,
-        char *label, enum_fixup_t type, opcode_t offs)
+        char *label, INTVAL type, opcode_t offs)
 {
     PackFile_FixupTable *self = interp->code->fixups;
     opcode_t i;
@@ -2817,7 +2817,7 @@ PackFile_FixupTable_new_entry(Interp *interp,
 /*
 
 =item C<static PackFile_FixupEntry *
-find_fixup(PackFile_FixupTable *ft, enum_fixup_t type, const char *name)>
+find_fixup(PackFile_FixupTable *ft, INTVAL type, const char *name)>
 
 Finds the fix-up entry for C<name> and returns it.
 
@@ -2826,7 +2826,7 @@ Finds the fix-up entry for C<name> and returns it.
 */
 
 static PackFile_FixupEntry *
-find_fixup(PackFile_FixupTable *ft, enum_fixup_t type, const char *name)
+find_fixup(PackFile_FixupTable *ft, INTVAL type, const char *name)
 {
     opcode_t i;
     for (i = 0; i < ft->fixup_count; i++) {
@@ -2860,7 +2860,7 @@ find_fixup_iter(Interp *interp, PackFile_Segment *seg, void *user_data)
     }
     else if (seg->type == PF_FIXUP_SEG) {
         PackFile_FixupEntry ** const e = (PackFile_FixupEntry **)user_data;
-        PackFile_FixupEntry * const fe = (PackFile_FixupEntry * const)find_fixup(
+        PackFile_FixupEntry * const fe = (PackFile_FixupEntry *)find_fixup(
                 (PackFile_FixupTable *) seg, (*e)->type, (*e)->name);
         if (fe) {
             *e = fe;
@@ -2873,7 +2873,7 @@ find_fixup_iter(Interp *interp, PackFile_Segment *seg, void *user_data)
 /*
 
 =item C<PackFile_FixupEntry *
-PackFile_find_fixup_entry(Interp *interp, enum_fixup_t type, char *name)>
+PackFile_find_fixup_entry(Interp *interp, int type, char *name)>
 
 I<What does this do?>
 
@@ -2882,7 +2882,7 @@ I<What does this do?>
 */
 
 PackFile_FixupEntry *
-PackFile_find_fixup_entry(Interp *interp, enum_fixup_t type, char *name)
+PackFile_find_fixup_entry(Interp *interp, INTVAL type, char *name)
 {
     /* TODO make a hash of all fixups */
     PackFile_Directory *dir = interp->code->base.dir;
@@ -3449,7 +3449,7 @@ Parrot_load_bytecode(Interp *interp, STRING *file_str)
     else {
         STRING *err;
         PackFile_ByteCode * const cs =
-            (PackFile_ByteCode * const)IMCC_compile_file_s(interp,
+            (PackFile_ByteCode *)IMCC_compile_file_s(interp,
                 filename, &err);
         if (cs) {
             do_sub_pragmas(interp, cs, PBC_LOADED, NULL);

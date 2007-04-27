@@ -319,10 +319,10 @@ PARROT_API void PackFile_Fixup_dump(Interp *, PackFile_FixupTable *ft);
 
 /* create new fixup entry */
 PARROT_API void PackFile_FixupTable_new_entry(Interp *, char *label,
-                enum_fixup_t, opcode_t offs);
+                INTVAL, opcode_t offs);
 /* find entry */
 PARROT_API PackFile_FixupEntry * PackFile_find_fixup_entry(Interp *,
-        enum_fixup_t type, char *);
+        INTVAL type, char *);
 
 /*
 ** PackFile_ByteCode Functions:

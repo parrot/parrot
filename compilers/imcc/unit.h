@@ -28,7 +28,7 @@ struct imcc_ostat {
 } ;
 
 typedef struct _IMC_Unit {
-    IMC_Unit_Type type;
+    INTVAL type;
     Instruction * instructions;
     Instruction * last_ins;
     SymHash hash;

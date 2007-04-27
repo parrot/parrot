@@ -16,12 +16,13 @@
 #if !defined(PARROT_CHARSET_TABLES_H_GUARD)
 #define PARROT_CHARSET_TABLES_H_GUARD
 #include "parrot/cclass.h"
+#include "parrot/parrot.h"
 #define WHITESPACE  enum_cclass_whitespace
 #define WORDCHAR    enum_cclass_word
 #define PUNCTUATION enum_cclass_punctuation
 #define DIGIT       enum_cclass_numeric
-extern const PARROT_CCLASS_FLAGS Parrot_ascii_typetable[256];
-extern const PARROT_CCLASS_FLAGS Parrot_iso_8859_1_typetable[256];
+extern const INTVAL Parrot_ascii_typetable[256];
+extern const INTVAL Parrot_iso_8859_1_typetable[256];
 #endif /* PARROT_CHARSET_TABLES_H_GUARD */
 
 /*

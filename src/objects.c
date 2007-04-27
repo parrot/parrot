@@ -297,7 +297,7 @@ create_deleg_pmc_vtable(Interp *interp, PMC *_class,
     PMC * const vtable_pmc = get_attrib_num((SLOTTYPE*)PMC_data(_class),
                                             PCD_OBJECT_VTABLE);
     VTABLE * const vtable           =
-        (VTABLE * const)PMC_struct_val(vtable_pmc);
+        (VTABLE *)PMC_struct_val(vtable_pmc);
     VTABLE * const ro_vtable        = vtable->ro_variant_vtable;
     VTABLE * const deleg_pmc_vtable =
         interp->vtables[enum_class_deleg_pmc];

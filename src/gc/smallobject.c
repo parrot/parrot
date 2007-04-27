@@ -301,7 +301,7 @@ new_small_object_pool(Interp *interp,
         size_t object_size, size_t objects_per_alloc)
 {
     Small_Object_Pool * const pool =
-        (Small_Object_Pool * const)mem_internal_allocate_zeroed(
+        (Small_Object_Pool *)mem_internal_allocate_zeroed(
             sizeof (Small_Object_Pool));
 
     SET_NULL(pool->last_Arena);

@@ -195,7 +195,7 @@ typedef struct Parrot_jit_info_t {
     Parrot_jit_arena_t               arena;
     Parrot_jit_optimizer_t          *optimizer;
     Parrot_jit_constant_pool_t      *constant_pool;
-    enum_jit_code_type              code_type;
+    INTVAL                          code_type;
     int                             flags;
     const struct jit_arch_info_t    *arch_info;
     int                              n_args;
@@ -314,7 +314,7 @@ const jit_arch_info * Parrot_jit_init(Interp *);
 Parrot_jit_info_t *
 parrot_build_asm(Interp *interp,
                 opcode_t *code_start, opcode_t *code_end,
-                void *objfile, enum_jit_code_type);
+                void *objfile, INTVAL);
 /*
  * NCI interface
  */

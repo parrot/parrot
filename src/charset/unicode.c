@@ -362,7 +362,7 @@ validate(Interp *interp, STRING *src)
 }
 
 static int
-u_iscclass(Interp *interp, UINTVAL codepoint, PARROT_CCLASS_FLAGS flags)
+u_iscclass(Interp *interp, UINTVAL codepoint, INTVAL flags)
 {
 #if PARROT_HAS_ICU
             /* XXX which one
@@ -429,7 +429,7 @@ u_iscclass(Interp *interp, UINTVAL codepoint, PARROT_CCLASS_FLAGS flags)
 }
 
 static INTVAL
-is_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
+is_cclass(Interp *interp, INTVAL flags,
           STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
@@ -444,7 +444,7 @@ is_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
 }
 
 static INTVAL
-find_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
+find_cclass(Interp *interp, INTVAL flags,
             STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
@@ -469,7 +469,7 @@ find_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
 }
 
 static INTVAL
-find_not_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
+find_not_cclass(Interp *interp, INTVAL flags,
                 STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;

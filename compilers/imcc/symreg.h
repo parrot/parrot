@@ -58,8 +58,8 @@ enum USAGE {
 
 typedef struct _SymReg {
     char * name;
-    enum VARTYPE type;       /* Variable type */
-    enum USAGE usage;        /* s. USAGE above */
+    INTVAL type;             /* Variable type */
+    INTVAL usage;            /* s. USAGE above */
     int set;                 /* Which register set/file it belongs to */
     int want_regno;          /* wanted register number */
     INTVAL color;            /* Color: parrot register number
@@ -162,7 +162,7 @@ struct pcc_sub_t {
     int nret;
     SymReg ** multi;
     int nmulti;
-    pragma_enum_t pragma;
+    INTVAL pragma;
     int calls_a_sub;
     int flags;    /* isNCI, isTAIL_CALL */
     int label;

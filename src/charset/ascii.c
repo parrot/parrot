@@ -355,8 +355,7 @@ string_from_codepoint(Interp *interp, UINTVAL codepoint)
 }
 
 static INTVAL
-is_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
-        STRING *source_string, UINTVAL offset)
+is_cclass(Interp *interp, INTVAL flags, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
 
@@ -372,8 +371,8 @@ is_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
 }
 
 static INTVAL
-find_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
-            STRING *source_string, UINTVAL offset, UINTVAL count)
+find_cclass(Interp *interp, INTVAL flags, STRING *source_string,
+            UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
@@ -391,8 +390,8 @@ find_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
 }
 
 static INTVAL
-find_not_cclass(Interp *interp, PARROT_CCLASS_FLAGS flags,
-                STRING *source_string, UINTVAL offset, UINTVAL count)
+find_not_cclass(Interp *interp, INTVAL flags, STRING *source_string,
+                UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
     UINTVAL end = offset + count;

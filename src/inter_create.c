@@ -78,7 +78,7 @@ setup_default_compreg(Parrot_Interp interp)
 /*
 
 =item C<Parrot_Interp
-make_interpreter(Parrot_Interp parent, Interp_flags flags)>
+make_interpreter(Parrot_Interp parent, INTVAL flags)>
 
 Create the Parrot interpreter. Allocate memory and clear the registers.
 
@@ -89,7 +89,7 @@ Create the Parrot interpreter. Allocate memory and clear the registers.
 void Parrot_really_destroy(Interp *, int exit_code, void *);
 
 Parrot_Interp
-make_interpreter(Parrot_Interp parent, Interp_flags flags)
+make_interpreter(Parrot_Interp parent, INTVAL flags)
 {
     Interp *interp;
 #if EXEC_CAPABLE

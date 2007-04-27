@@ -141,9 +141,9 @@ PARROT_API STRING *Parrot_psprintf(Interp *interp, STRING *pat,
     typedef struct spfinfo_t {
         UINTVAL width;
         UINTVAL prec;
-        FLAG flags;
-        TYPE type;
-        PHASE phase;
+        INTVAL flags;
+        INTVAL type;
+        INTVAL phase;
     } *SpfInfo;
 
     /* SPRINTF ARGUMENT OBJECT */
