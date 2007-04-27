@@ -205,7 +205,7 @@ Returns the PMC value of the element at index C<key>.
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
         data = PMC_data(SELF);
-        if (data[key] == PMCNULL)
+        if ( PMC_IS_NULL(data[key]) )
             data[key] = pmc_new(INTERP, enum_class_Undef);
         return data[key];
     }

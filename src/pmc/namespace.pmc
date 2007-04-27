@@ -503,7 +503,7 @@ does not delete the PMC.
         PMC    *ns   = parrot_hash_get(INTERP, hash, name);
         STRING *s_ns = CONST_STRING(INTERP, "NameSpace");
 
-        if (ns == PMCNULL)
+        if ( PMC_IS_NULL(ns) )
             return;
 
         if (!VTABLE_isa(INTERP, ns, s_ns)) {
@@ -536,7 +536,7 @@ delete the PMC.
         PMC    *sub   = parrot_hash_get(INTERP, hash, name);
         STRING *s_sub = CONST_STRING(INTERP, "Sub");
 
-        if (sub == PMCNULL)
+        if ( PMC_IS_NULL(sub) )
             return;
 
         if (!VTABLE_isa(INTERP, sub, s_sub)) {

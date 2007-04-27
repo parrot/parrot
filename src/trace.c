@@ -61,7 +61,7 @@ trace_pmc_dump(Interp *interp, PMC* pmc)
         PIO_eprintf(debugger, "(null)");
         return;
     }
-    if (pmc == PMCNULL)  {
+    if ( PMC_IS_NULL(pmc) )  {
         PIO_eprintf(debugger, "PMCNULL");
         return;
     }
