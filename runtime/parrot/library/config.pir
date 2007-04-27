@@ -43,10 +43,13 @@ undefined values) is undefined, and may be rather funky.
 
 =cut
 
+.include "interpinfo.pasm"
+
 .pcc_sub _config
     .local pmc CONF
-    # XXX: this works only if parrot is run from its root directory
-    .const string conf_file = "runtime/parrot/include/config.fpmc"
+    .local string conf_file
+    conf_file = interpinfo .INTERPINFO_RUNTIME_PREFIX
+    conf_file .= "/runtime/parrot/include/config.fpmc"
 
     open CONF, conf_file, "<"
     $I0 = defined CONF

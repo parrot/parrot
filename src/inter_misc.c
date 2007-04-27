@@ -340,6 +340,12 @@ interpinfo_s(Interp *interp, INTVAL what)
             mem_sys_free(fullname_c);
             return basename;
 
+        case RUNTIME_PREFIX:
+            fullname_c = Parrot_get_runtime_prefix(interp, NULL);
+            fullname = string_from_cstring(interp, fullname_c, 0);
+            mem_sys_free(fullname_c);
+            return fullname;
+
         default:        /* or a warning only? */
             internal_exception(UNIMPLEMENTED,
                     "illegal argument in interpinfo");

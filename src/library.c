@@ -345,7 +345,7 @@ Parrot_locate_runtime_file(Interp *interp, const char *file_name,
 }
 /*
 
-=item C<const char* Parrot_get_runtime_prefix(Interp *, STRING **prefix_str)>
+=item C<char* Parrot_get_runtime_prefix(Interp *, STRING **prefix_str)>
 
 If C<prefix_str> is not NULL, set it to the prefix, else return a malloced
 c-string for the runtime prefix.  Remember to free the string with
@@ -355,7 +355,7 @@ C<string_cstring_free()>.
 
 */
 
-const char*
+char*
 Parrot_get_runtime_prefix(Interp *interp, STRING **prefix_str)
 {
     STRING *s, *key;

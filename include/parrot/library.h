@@ -38,7 +38,7 @@ PARROT_API char* Parrot_locate_runtime_file(Interp *, const char *file_name,
 PARROT_API STRING* Parrot_locate_runtime_file_str(Interp *, STRING *file_name,
         enum_runtime_ft);
 
-PARROT_API const char* Parrot_get_runtime_prefix(Interp *, STRING **prefix);
+PARROT_API char* Parrot_get_runtime_prefix(Interp *, STRING **prefix);
 void parrot_init_library_paths(Interp *);
 STRING * parrot_split_path_ext(Interp* , STRING *in,
         STRING **wo_ext, STRING **ext);
