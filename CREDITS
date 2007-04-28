@@ -501,6 +501,10 @@ D: Original Perl6 compiler
 
 N: Sebastian Riedel
 
+N: Shawn M Moore
+D: Cage cleaner
+E: sartak@gmail.com
+
 N: Simon Cozens
 D: Release pumpking for 0.0.1-0.0.4
 

@@ -72,25 +72,26 @@ my @files = @ARGV ? @ARGV : source_files();
 # check all the files and keep a list of those failing
 my @lines_too_long;
 foreach my $file (@files) {
-    push @lines_too_long => "$file\n"
-        if line_too_long($file);
+    my $lineinfo = first_long_line($file) or next;
+    push @lines_too_long => "$lineinfo\n";
 }
 
 ## L<PDD07/Code Formatting/"Source line width is limited to 100 characters">
 ok( !scalar(@lines_too_long), 'Line length ok' )
-    or diag( "Lines longer than coding standard limit in "
+    or diag( "Lines longer than coding standard limit ($columns columns) in "
         . scalar @lines_too_long
         . " files:\n@lines_too_long" );
 
 exit;
 
-sub line_too_long {
+sub first_long_line {
     my $file = shift;
 
     open my $fh, '<', $file or die "Can't open file '$file'";
     while ( my $line = <$fh> ) {
         chomp $line;
-        return 1
+        $line =~ s/\t/' ' x (1 + length($`) % 8)/eg; # expand \t
+        return sprintf '%s:%d: %d cols', $file, $., length($line)
             if length($line) > $columns;
     }
     return;
