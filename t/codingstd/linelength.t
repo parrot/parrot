@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -16,8 +16,8 @@ t/codingstd/linelength.t - Test code lines length
 
 =head1 DESCRIPTION
 
-Tests source files for the line length limit as defined in F<PDD07>.
-Only some languages files are checked.
+Tests source files for the line length limit as defined in F<pdd07_codingstd.pod>.
+Only files for some language implementations are checked.
 
 =head1 SEE ALSO
 
@@ -28,7 +28,7 @@ L<docs/pdds/pdd07_codingstd.pod>
 use strict;
 use warnings;
 
-our $columns = 100;
+my $num_col_limit = 100;
 
 use lib qw( . lib ../lib ../../lib );
 
@@ -38,19 +38,19 @@ use Parrot::Config;
 use ExtUtils::Manifest qw( maniread );
 
 # a list of languages where we want to test line length
-our $include_languages = {};
-$include_languages->{$_} = 1 for qw{
-    APL
-    WMLScript
-    amber
-    cardinal
-    dotnet
-    lua
-    perl6
-    pugs
-    python
-    tcl
-};
+my %lang_is_checked = map { $_ => 1 } 
+                          qw{ APL
+                              WMLScript
+                              amber
+                              cardinal
+                              dotnet
+                              lua
+                              perl6
+                              pugs
+                              python
+                              plumhead
+                              tcl
+                            };
 
 # XXX this should really be using src_dir instead of build_dir but it
 # doesn't exist (yet)
@@ -58,12 +58,12 @@ my $build_dir = $PConfig{build_dir};
 my $manifest = maniread( File::Spec->catfile( $build_dir, 'MANIFEST' ) );
 
 # skip files listed in the __DATA__ section
-my $skip_files = {};
+my %skip_files;
 while (<DATA>) {
     next if m{^#};
     next if m{^\s*$};
     chomp;
-    $skip_files->{$_}++;
+    $skip_files{$_}++;
 }
 
 # find the files that we need to check
@@ -71,20 +71,19 @@ my @files = @ARGV ? @ARGV : source_files();
 
 # check all the files and keep a list of those failing
 my @lines_too_long;
-foreach my $file (@files) {
-    my $lineinfo = first_long_line($file) or next;
-    push @lines_too_long => "$lineinfo\n";
+foreach ( @files ) {
+    my $lineinfo = info_for_first_long_line($_);
+    next unless $lineinfo;
+    push @lines_too_long => $lineinfo;
 }
 
 ## L<PDD07/Code Formatting/"Source line width is limited to 100 characters">
-ok( !scalar(@lines_too_long), 'Line length ok' )
-    or diag( "Lines longer than coding standard limit ($columns columns) in "
-        . scalar @lines_too_long
-        . " files:\n@lines_too_long" );
+ok( ! @lines_too_long, 'Line length ok' )
+    or diag( "Lines longer than coding standard limit ($num_col_limit columns) in "
+        . scalar @lines_too_long . " files:\n"
+        . join( "\n", @lines_too_long ) );
 
-exit;
-
-sub first_long_line {
+sub info_for_first_long_line {
     my $file = shift;
 
     open my $fh, '<', $file or die "Can't open file '$file'";
@@ -92,7 +91,7 @@ sub first_long_line {
         chomp $line;
         $line =~ s/\t/' ' x (1 + length($`) % 8)/eg; # expand \t
         return sprintf '%s:%d: %d cols', $file, $., length($line)
-            if length($line) > $columns;
+            if length($line) > $num_col_limit;
     }
     return;
 }
@@ -106,10 +105,10 @@ sub source_files {
         next if -B $full_path;
 
         # skip files specified in __DATA__ section
-        next if exists( $skip_files->{$file} );
+        next if exists $skip_files{$file};
 
         # skip languages files, unless specifically included above
-        next if $file =~ m{^languages/([^/]+)/} && !$include_languages->{$1};
+        next if $file =~ m{^languages/([^/]+)/} && ! $lang_is_checked{$1};
 
         push @files => $full_path
             if $file =~ m{\.(c|pmc|ops|pod)$};
@@ -132,6 +131,7 @@ compilers/imcc/imclexer.c
 compilers/imcc/imcparser.c
 compilers/pirc/src/pirlexer.c
 compilers/pirc/src/pirparser.c
+languages/plumhead/lex.yy.c
 # Generators with big strings
 tools/build/jit2c.pl
 tools/build/nativecall.pl
