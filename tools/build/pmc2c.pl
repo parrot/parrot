@@ -20,7 +20,6 @@ GetOptions(
     "dump"      => \$action{dump},
     "c|gen-c"   => \$action{gen_c},
     "tree"      => \$action{tree},
-    "no-body"   => \$opt{nobody},
     "no-lines"  => \$opt{nolines},
     "debug+"    => \$opt{debug},
     "verbose+"  => \$opt{verbose},
@@ -115,9 +114,6 @@ Increase verbose level
 
 Omit source line info
 
-=item C<--no-body>
-
-Emit an empty body in the dump. This may be useful for debugging.
 
 =item C<--include=/path/to/pmc>
 
@@ -331,11 +327,9 @@ reused.
 
 =cut
 
-__END__
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-# %opt = map { $_ => 0 } qw(nobody nolines debug verbose);

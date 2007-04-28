@@ -80,7 +80,7 @@ sub new {
     unshift @{ $allargsref->{include} },
         ( ".", "$FindBin::Bin/../..", "$FindBin::Bin/../../src/pmc/" );
 
-    foreach my $opt qw(nobody nolines debug verbose) {
+    foreach my $opt qw(nolines debug verbose) {
         if ( !defined $allargsref->{opt}{$opt} ) {
             $allargsref->{opt}{$opt} = 0;
         }
@@ -669,7 +669,6 @@ sub parse_pmc {
         my ( $flag, $type, $methodname, $parameters ) = ( $2, $3, $4, $5 );
         my $attrs = parse_method_attrs($6);
         my ( $methodblock, $remainder_part ) = extract_balanced($classblock);
-        $methodblock = "" if $opt->{nobody};
 
         my $method_hash = {
             meth       => $methodname,
@@ -686,7 +685,7 @@ sub parse_pmc {
             $flags_ref->{need_fia_header} = 1;
         }
 
-        if ( $methodblock and $methodblock =~ /PCCINVOKE/ ) {
+        if ( $methodblock =~ /PCCINVOKE/ ) {
             $flags_ref->{need_fia_header} = 1;
         }
 
