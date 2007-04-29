@@ -680,7 +680,7 @@ END_C
         print $fh @{ $self->{op_func_table} };
 
         print $fh <<END_C;
-  (op_func$self->{suffix}_t)0  /* NULL function pointer */
+  (op_func$self->{suffix}_t *)0  /* NULL function pointer */
 };
 
 
