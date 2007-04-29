@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,9 @@ config/auto/jit - JIT Capability
 =head1 DESCRIPTION
 
 Determines the CPU architecture, the operating system, and whether there is JIT
-capability available.
+capability available.  Use the C<--jitcapable> and C<--execcapable> options to
+override the default value calculated specifically for your CPU architecture
+and operating system.
 
 =cut
 
