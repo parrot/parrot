@@ -59,9 +59,6 @@ Stack_Chunk_t * register_new_stack(Interp *interp,
     Stack_Chunk_t *chunk;
 
     item_size += offsetof(Stack_Chunk_t, u.data);
-    item_size += 7;
-    item_size &= ~7;    /* round up to 8 so that the chunk is aligned at
-                           the same size - the aligned MMX memcpy needs it */
     make_bufferlike_pool(interp, item_size);
     chunk = (Stack_Chunk_t *)new_bufferlike_header(interp, item_size);
     chunk->prev = chunk;        /* mark the top of the stack */

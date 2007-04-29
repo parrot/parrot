@@ -29,13 +29,11 @@ typedef struct Stack_Chunk {
     int size;
     const char * name;
     struct Stack_Chunk *prev;
-#if ! DISABLE_GC_DEBUG && defined(I386)
-    void * dummy;   /* force 8 byte align for mmx and sse moves */
-#endif
-    union { /* force appropriate alignment of 'data' */
+    union { /* force appropriate alignment of 'data'.  If alignment
+               is necessary, assume double is good enough.  27-04-2007. */
         void *data;
-#ifndef I386
-        double d_dummy;         /* align double values on stack */
+#if PARROT_PTR_ALIGNMENT > 1
+        double d_dummy;
 #endif
     } u;
 } Stack_Chunk_t;
