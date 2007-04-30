@@ -1346,7 +1346,7 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
     int max_regs[8]    = { 0, 0, 0, 0, 0, 0, 0, 0 };
     int seen_arrow     = 0;
     const char *x;
-    const char *ret_x;
+    const char *ret_x  = NULL;
     int index = -1;
     int cur   =  0;
 

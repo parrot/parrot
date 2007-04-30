@@ -780,7 +780,8 @@ remove_queued_suspend_gc(Parrot_Interp interp) {
     cur = queue->head;
 
     while (cur) {
-        ev = cur->data;
+        ev   = (parrot_event *)cur->data;
+
         if (ev->type == EVENT_TYPE_SUSPEND_FOR_GC)
             break;
 

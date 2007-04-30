@@ -204,11 +204,12 @@ nosync_insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)
         return;
     }
 
-    prev = NULL;
-    event = entry->data;
+    prev     = NULL;
+    event    = (parrot_event *)entry->data;
     abs_time = event->u.timer_event.abs_time;
+
     while (cur && cur->type == QUEUE_ENTRY_TYPE_TIMED_EVENT) {
-        const parrot_event * const cur_event = cur->data;
+        const parrot_event * const cur_event = (parrot_event *)cur->data;
         if (abs_time > cur_event->u.timer_event.abs_time) {
             prev = cur;
             cur = cur->next;
