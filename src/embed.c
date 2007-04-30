@@ -858,25 +858,24 @@ This is used by the Parrot disassembler.
 void
 Parrot_disassemble(Interp *interp)
 {
-    PDB_t *pdb;
+    char       *c;
+    PDB_t      *pdb             = mem_allocate_zeroed_typed(PDB_t);
     PDB_line_t *line;
-    char *c;
-    int op_code_seq_num = 0;
-    int debugs;
-    int num_mappings;
-    int curr_mapping = 0;
+    int         debugs;
+    int         num_mappings    = 0;
+    int         curr_mapping    = 0;
+    int         op_code_seq_num = 0;
 
-    pdb = (PDB_t *)mem_sys_allocate_zeroed(sizeof (PDB_t));
-
-    interp->pdb = pdb;
+    interp->pdb     = pdb;
     pdb->cur_opcode = interp->code->base.data;
 
     PDB_disassemble(interp, NULL);
-    line = pdb->file->line;
 
+    line   = pdb->file->line;
     debugs = (interp->code->debugs != NULL);
 
     PIO_printf(interp, "%12s-%12s", "Seq_Op_Num", "Relative-PC");
+
     if ( debugs ) {
         PIO_printf(interp, " %6s:\n","SrcLn#");
         num_mappings = interp->code->debugs->num_mappings;
@@ -884,8 +883,13 @@ Parrot_disassemble(Interp *interp)
     else {
         PIO_printf(interp, "\n");
     }
+
     while (line->next) {
-        /* PIO_printf(interp, "%i < %i %i == %i \n", curr_mapping, num_mappings, op_code_seq_num, interp->code->debugs->mappings[curr_mapping]->offset); */
+
+        /* PIO_printf(interp, "%i < %i %i == %i \n", curr_mapping,
+         * num_mappings, op_code_seq_num,
+         * interp->code->debugs->mappings[curr_mapping]->offset); */
+
         if (debugs && curr_mapping < num_mappings)
         {
             if ( op_code_seq_num == interp->code->debugs->mappings[curr_mapping]->offset)
@@ -897,23 +901,26 @@ Parrot_disassemble(Interp *interp)
         }
 
         PIO_printf(interp, "%012i-%012i", op_code_seq_num, line->opcode - interp->code->base.data);
-        if ( debugs ) {
+
+        if ( debugs )
             PIO_printf(interp, " %06i: \t",interp->code->debugs->base.data[op_code_seq_num]);
-        }
-        else {
+        else
             PIO_printf(interp, "\t");
-        }
 
         /* If it has a label print it */
         if (line->label)
             PIO_printf(interp, "L%li:\t", line->label->number);
+
         c = pdb->file->source + line->source_offset;
+
         while (*c != '\n' && c)
             PIO_printf(interp, "%c", *(c++));
+
         PIO_printf(interp, "\n");
         line = line->next;
         op_code_seq_num++;
     }
+
     return;
 }
 
