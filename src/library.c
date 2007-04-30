@@ -176,7 +176,8 @@ cnv_to_win32_filesep (STRING *path) {
     assert(path->encoding == Parrot_fixed_8_encoding_ptr ||
         path->encoding == Parrot_utf8_encoding_ptr);
 
-    while ((cnv = strchr(path->strstart, path_separator)) != NULL)
+    cnv = path->strstart;
+    while ((cnv = strchr(cnv, path_separator)) != NULL)
         *cnv = win32_path_separator;
 }
 
