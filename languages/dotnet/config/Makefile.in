@@ -75,9 +75,11 @@ src/it.pbc : src/translation.rules build/translator.pl build/SRM/Stack.pm \
 	  --output src/it.pir
 	$(PARROT) -o src/it.pbc src/it.pir
 
-src/builtins.pbc : src/internal.methods build/builtins.pl
-	$(PERL) build/builtins.pl src/internal.methods --output src/builtins.pir
+src/builtins.pbc : src/builtins.pir
 	$(PARROT) -o src/builtins.pbc src/builtins.pir
+
+src/builtins.pir : src/internal.methods build/builtins.pl
+	$(PERL) build/builtins.pl src/internal.methods --output src/builtins.pir
 
 src/translib.pbc : src/it.pbc src/builtins.pbc $(TRAN_PBC)
 	$(PBCMERGE) -o src/translib.pbc $(TRAN_PBC) src/it.pbc src/builtins.pbc
