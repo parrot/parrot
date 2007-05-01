@@ -23,15 +23,15 @@ _LIB_VERSION_TYPE _LIB_VERSION = _IEEE_;
 PARROT_API extern int
 Parrot_signbit(double x)
 {
-   union {
-       double d;
-       int i[2];
-   } u;
-   u.d = x;
+    union {
+        double d;
+        int i[2];
+    } u;
+    u.d = x;
 #  if PARROT_BIGENDIAN
-   return u.i[0] < 0;
+    return u.i[0] < 0;
 #  else
-   return u.i[1] < 0;
+    return u.i[1] < 0;
 #  endif
 }
 #endif
@@ -40,12 +40,12 @@ Parrot_signbit(double x)
 int
 Parrot_signbit_l(long double x)
 {
-   union {
-       long double d;
-       int i[3];
-   } u;
-   u.d = x;
-   return u.i[2] < 0;
+    union {
+        long double d;
+        int i[3];
+    } u;
+    u.d = x;
+    return u.i[2] < 0;
 }
 #endif
 

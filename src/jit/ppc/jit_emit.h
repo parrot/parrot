@@ -845,7 +845,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
     Parrot_jit_normal_op(jit_info, interpreter);
     /* test return value; if zero (e.g after trace), return from JIT */
     jit_emit_cmp_ri(jit_info->native_ptr, r3, 0);
-     /* remember PC */
+    /* remember PC */
     jmp_ptr = jit_info->native_ptr;
     /* emit jump past exit code, dummy offset */
     _emit_bc(jit_info->native_ptr, BNE, 0, 0, 0);

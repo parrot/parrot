@@ -902,7 +902,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 emitm_or_i(jit_info->native_ptr, XSR1, emitm_lo10(SC_addr), XSR1);
 
                 emitm_ld_i(jit_info->native_ptr, XSR1, 0, emitm_o(rdx));
-              break;
+                break;
             case PARROT_ARG_KC:
             case PARROT_ARG_PC:
 #    define KC_addr &interp->code->const_table->constants[pi]->u.key
@@ -910,7 +910,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 emitm_or_i(jit_info->native_ptr, XSR1, emitm_lo10(KC_addr), XSR1);
 
                 emitm_ld_i(jit_info->native_ptr, XSR1, 0, emitm_o(rdx));
-              break;
+                break;
             default:
                 internal_exception(1,
                         "jit_vtable_n_op: unimp type %d, arg %d vtable %d",

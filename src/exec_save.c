@@ -65,7 +65,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     header.a_drsize = obj->data_rellocation_count
         * sizeof (struct relocation_info);
     save_struct(fp, &header, sizeof (struct exec));
-   /* Text */
+    /* Text */
     for (i = 0; i < obj->text.size; i++)
         fprintf(fp, "%c", obj->text.code[i]);
     /* Data */

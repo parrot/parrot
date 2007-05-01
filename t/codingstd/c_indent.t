@@ -56,11 +56,24 @@ sub check_indent {
         @source = <$fh>;
 
         my @stack;
-        my $line = 0;
-        my $f    = undef;
+        my $line           = 0;
+        my $f              = undef;
+        my $prev_last_char = '';
+        my $last_char      = '';
+        my $in_comment     = 0;
+
         foreach (@source) {
             $line++;
             next unless defined $_;
+            chomp;
+
+            $prev_last_char = $last_char;
+            $last_char = substr($_, -1, 1);
+
+            # ignore multi-line comments (except the first line)
+            $in_comment = 0, next if $in_comment && m{\*/} && $' !~ m{/\*};
+            next if $in_comment;
+            $in_comment = 1 if m{/\*} && $' !~ m{\*/};
 
             ## preprocessor scan
             if (/^\s*\#(\s*)(ifndef|ifdef|if)\s+(.*)/) {
@@ -113,6 +126,7 @@ sub check_indent {
                         . ( join ' > ', @stack ) . "\n";
                     $pp_failed{"$path\n"} = 1;
                 }
+                next;
             }
 
             ## c source scan
@@ -144,13 +158,25 @@ sub check_indent {
                     my ($indent) = /^(\s*)/;
                     if ( length($indent) != 4 ) {
                         push @c_indent => "$path:$line\n"
-                            . "apparent non-4 space indenting ("
+                            . "    apparent non-4 space indenting ("
                             . length($indent)
-                            . " spaces)";
+                            . " spaces)\n";
                         $c_failed{"$path\n"} = 1;
                     }
                 }
                 $f = undef;
+            }
+
+            my ($indent) = /^(\s+)/ or next;
+            $indent = length($indent);
+
+            if ($indent % 4 && !$in_comment && $prev_last_char eq ';')
+            {
+                push @c_indent => "$path:$line\n"
+                    . "    apparent non-4 space indenting ($indent space"
+                    . ($indent == 1 ? '' : 's')
+                    . ")\n";
+                $c_failed{"$path\n"} = 1;
             }
         }
     }

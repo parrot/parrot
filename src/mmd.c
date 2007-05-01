@@ -151,8 +151,8 @@ get_mmd_dispatch_type(Interp *interp, INTVAL func_nr, INTVAL left_type,
         return func;
     }
     else if (!is_pmc_ptr(interp, F2DPTR(func_))) {
-      *is_pmc = 0;
-      return func;
+        *is_pmc = 0;
+        return func;
     }
 #endif
     return func_;
