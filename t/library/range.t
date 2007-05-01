@@ -30,7 +30,7 @@ Tests the Range class.
 
     load_bytecode 'Range.pir' # XXX eventually convert to pbc.
 
-    plan(46)
+    plan(47)
 
     # XXX Convert this to the PDD15 way of creating an object
     # at the same time you specify the attributes...
@@ -41,7 +41,7 @@ Tests the Range class.
     test_4() # 5 tests
     test_5() # 5 tests
     test_6() # 5 tests
-    test_7() # 4 tests
+    test_7() # 5 tests
     test_8() # 6 tests
     test_9() # 6 tests
 .end
