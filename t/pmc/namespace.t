@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 56;
+use Parrot::Test tests => 59;
 use Parrot::Config;
 
 =head1 NAME
@@ -703,7 +703,7 @@ CODE
 OUTPUT
 
 pir_output_like(
-    <<'CODE', <<'OUTPUT', 'export_to() with null array exports default boject set !!!UNSPECIFIED!!!' );
+    <<'CODE', <<'OUTPUT', 'export_to() with null exports default object set !!!UNSPECIFIED!!!' );
 .sub 'test' :main
     .local pmc nsa, nsb, ar
 
@@ -717,11 +717,11 @@ pir_output_like(
 .sub 'foo'
 .end
 CODE
-/^exporting default object set not yet specified\n/
+/^exporting default object set not yet implemented\n/
 OUTPUT
 
 pir_output_like(
-    <<'CODE', <<'OUTPUT', 'export_to() with empty array exports default boject set !!!UNSPECIFIED!!!' );
+    <<'CODE', <<'OUTPUT', 'export_to() with empty array exports default object set !!!UNSPECIFIED!!!' );
 .sub 'test' :main
     .local pmc nsa, nsb, ar
 
@@ -735,10 +735,28 @@ pir_output_like(
 .sub 'foo'
 .end
 CODE
-/^exporting default object set not yet specified\n/
+/^exporting default object set not yet implemented\n/
 OUTPUT
 
-pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success" );
+pir_output_like(
+    <<'CODE', <<'OUTPUT', 'export_to() with empty hash exports default object set !!!UNSPECIFIED!!!' );
+.sub 'test' :main
+    .local pmc nsa, nsb, ar
+
+    ar = new .Hash
+    nsa = get_namespace
+    nsb = get_namespace ['B']
+    nsb.'export_to'(nsa, ar)
+.end
+
+.namespace ['B']
+.sub 'foo'
+.end
+CODE
+/^exporting default object set not yet implemented\n/
+OUTPUT
+
+pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with array" );
 .HLL 'A', ''
 .sub main :main
     a_foo()
@@ -759,6 +777,54 @@ pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success" );
 CODE
 a_foo
 b_foo
+OUTPUT
+
+pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with hash (empty value)" );
+.HLL 'A', ''
+.sub main :main
+    a_foo()
+    load_bytecode "$temp_b.pir"
+    .local pmc nsr, nsa, nsb, ar
+    ar = new .Hash
+    ar["b_foo"] = ""
+    nsr = get_root_namespace
+    nsa = nsr['a']
+    nsb = nsr['b']
+    nsb."export_to"(nsa, ar)
+    b_foo()
+.end
+
+.sub a_foo
+    print "a_foo\\n"
+.end
+CODE
+a_foo
+b_foo
+OUTPUT
+
+pir_output_like( <<"CODE", <<'OUTPUT', "export_to -- success with hash (and value)" );
+.HLL 'A', ''
+.sub main :main
+    a_foo()
+    load_bytecode "$temp_b.pir"
+    .local pmc nsr, nsa, nsb, ar
+    ar = new .Hash
+    ar["b_foo"] = "c_foo"
+    nsr = get_root_namespace
+    nsa = nsr['a']
+    nsb = nsr['b']
+    nsb."export_to"(nsa, ar)
+    c_foo()
+    b_foo()
+.end
+
+.sub a_foo
+    print "a_foo\\n"
+.end
+CODE
+/^a_foo
+b_foo
+Null PMC access in invoke\(\)/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get_parent" );

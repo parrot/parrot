@@ -593,35 +593,101 @@ to retrieve symbols, if a NameSpace with the same name exists.
 
 =item C<METHOD void export_to(PMC* dest, PMC* what)>
 
-Export items from this NameSpace into the C<dest> NameSpace. C<what>
-is an array of (string) names to be exported.
+Export items from this NameSpace into the C<dest> NameSpace. The items to
+export are named in C<what>, which may be an array of strings, a hash, or null.
+If C<what> is an array of strings, interpretation of items in an array follows
+the conventions of the source (exporting) namespace.
+If C<what> is a hash, the keys correspond to the names in the source namespace,
+and the values correspond to the names in the destination namespace.
+if a hash value is null or an empty string, the name in the hash key is used.
+A null C<what> requests the 'default' set of items.
+Any other type passed in C<what> throws an exception.
+
+NOTE: exporting 'default' set of items is not yet implemented.
 
 =cut
 
 */
 
     METHOD void export_to(PMC* dest, PMC* what) {
-        INTVAL i, n;
+        STRING *s_hash  = CONST_STRING(interp, "hash");
+        STRING *s_array = CONST_STRING(interp, "array");
 
         if (PMC_IS_NULL(dest)) {
             real_exception(interp, NULL, 0,
                     "destination namespace not specified");
             return;
         }
+
         if (PMC_IS_NULL(what) || !VTABLE_elements(interp, what)) {
             real_exception(interp, NULL, 0,
-                    "exporting default object set not yet specified");
+                    "exporting default object set not yet implemented");
             return;
         }
 
-        n = VTABLE_elements(INTERP, what);
-        for (i = 0; i < n; ++i) {
-            STRING *name;
-            PMC *el;
+        /* if "what" does "hash", we extract string key/value pairs,
+         * lookup the object with the name specified in the key,
+         * and export it with the name specified as value. */
+        if (VTABLE_does(INTERP, what, s_hash)) {
+            PMC * const  iter = VTABLE_get_iter(interp, what);
+            const INTVAL n    = VTABLE_elements(interp, what);
+            INTVAL       i;
 
-            name = VTABLE_get_string_keyed_int(INTERP, what, i);
-            el = VTABLE_get_pmc_keyed_str(INTERP, SELF, name);
-            VTABLE_set_pmc_keyed_str(INTERP, dest, name, el);
+            for (i = 0; i < n; ++i) {
+                STRING *src_name;
+                STRING *dest_name;
+                PMC    *object;
+
+                src_name = VTABLE_shift_string(interp, iter);
+                if (STRING_IS_NULL(src_name) || STRING_IS_EMPTY(src_name)) {
+                    real_exception(interp, NULL, 0, "source object name not specified");
+                    return;
+                }
+
+                dest_name = VTABLE_get_string_keyed_str(interp, what, src_name);
+                if (STRING_IS_NULL(dest_name) || STRING_IS_EMPTY(dest_name)) {
+                    dest_name = src_name;
+                }
+
+                object = VTABLE_get_pmc_keyed_str(interp, SELF, src_name);
+                if (PMC_IS_NULL(object)) {
+                    real_exception(interp, NULL, 0,
+                            "object '%s' not found in current namespace",
+                            string_to_cstring(interp, src_name));
+                    return;
+                }
+
+                VTABLE_set_pmc_keyed_str(interp, dest, dest_name, object);
+            }
+        }
+        else if (VTABLE_does(INTERP, what, s_array)) {
+            const INTVAL n = VTABLE_elements(interp, what);
+            INTVAL i;
+
+            for (i = 0; i < n; ++i) {
+                STRING *name;
+                PMC    *object;
+
+                name = VTABLE_get_string_keyed_int(interp, what, i);
+                if (STRING_IS_NULL(name) || STRING_IS_EMPTY(name)) {
+                    real_exception(interp, NULL, 0, "object name not specified");
+                    return;
+                }
+
+                object = VTABLE_get_pmc_keyed_str(interp, SELF, name);
+                if (PMC_IS_NULL(object)) {
+                    real_exception(interp, NULL, 0,
+                            "object '%s' not found in current namespace",
+                            string_to_cstring(interp, name));
+                    return;
+                }
+
+                VTABLE_set_pmc_keyed_str(interp, dest, name, object);
+            }
+        }
+        else {
+            real_exception(interp, NULL, 0,
+                    "can't handle argument of type %s", what->vtable->base_type);
         }
     }
 

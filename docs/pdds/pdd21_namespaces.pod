@@ -214,9 +214,14 @@ consider not exporting variables at all, but that's a style issue.)
     $P1.export_to($P2, $P3)
 
 Export items from the namespace $P1 into the namespace $P2.  The items to
-export are named in the array $P3; a null $P3 requests the 'default' set of
-items.  The interpretation of the array in $P3 always follows the conventions
-of the source (exporting) namespace.
+export are named in $P3, which may be an array of strings, a hash, or null.
+If $P3 is an array of strings, interpretation of items in an array follows
+the conventions of the source (exporting) namespace.
+If $P3 is a hash, the keys correspond to the names in the source namespace,
+and the values correspond to the names in the destination namespace.
+if a hash value is null or an empty string, the name in the hash key is used.
+A null $P3 requests the 'default' set of items.
+Any other type passed in $P3 throws an exception.
 
 The base Parrot namespace export_to() function interprets item names as
 literals -- no wildcards or other special meaning.  There is no default list
