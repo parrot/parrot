@@ -446,6 +446,10 @@ PARROT_API extern PMC * PMCNULL;   /* Holds single Null PMC */
 #  define PMC_IS_NULL(p)  ((p) == PMCNULL)
 #endif /* PARROT_CATCH_NULL */
 
+
+#define STRING_IS_NULL(s) ((s) == NULL)
+#define STRING_IS_EMPTY(s) !(int)(s)->strlen
+
 /* &gen_from_def(sysinfo.pasm) prefix(SYSINFO_) */
 
 #define PARROT_INTSIZE               1
