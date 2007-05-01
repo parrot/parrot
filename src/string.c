@@ -416,7 +416,7 @@ string_append(Interp *interp,
     }
 
     /* Is A real? */
-    if (a == NULL)
+    if (a == NULL || PObj_bufstart(a) == NULL)
         return string_copy(interp, b);
 
     saneify_string(a);
