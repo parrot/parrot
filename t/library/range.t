@@ -30,7 +30,7 @@ Tests the Range class.
 
     load_bytecode 'Range.pir' # XXX eventually convert to pbc.
 
-    plan(68)
+    plan(78)
 
     # XXX Convert this to the PDD15 way of creating an object
     # at the same time you specify the attributes...
@@ -47,6 +47,8 @@ Tests the Range class.
     test_10() # 7 tests
     test_11() # 7 tests
     test_12() # 7 tests
+    test_13() # 5 tests
+    test_14() # 5 tests
 .end
 
 .sub 'test_1' 
@@ -457,6 +459,59 @@ finally:
 finally:
     .return()
 .end
+
+.sub 'test_13' 
+    .local string test_desc
+    test_desc = "1..4, vtable shift, all varieties"
+
+    $P0 = new 'Range'
+    $P1 = new 'Integer'
+    $P1 = 1
+    setattribute $P0, 'from', $P1
+    $P1 = new 'Integer'
+    $P1 = 4
+    setattribute $P0, 'to', $P1
+    ok(1, test_desc)
+
+    $P1 = shift $P0
+    is($P1, 1, '13 - 1st')
+    $I0 = shift $P0
+    is($I0, 2, '13 - 2nd')
+    $N0 = shift $P0
+    is($N0, 3.0, '13 - 3rd')
+    $S0 = shift $P0
+    is($S0, "4", '13 - 4th')
+
+finally:
+    .return()
+.end
+
+.sub 'test_14' 
+    .local string test_desc
+    test_desc = "1..4, vtable pop, all varieties"
+
+    $P0 = new 'Range'
+    $P1 = new 'Integer'
+    $P1 = 1
+    setattribute $P0, 'from', $P1
+    $P1 = new 'Integer'
+    $P1 = 4
+    setattribute $P0, 'to', $P1
+    ok(1, test_desc)
+
+    $P1 = pop $P0
+    is($P1, 4, '14 - 1st')
+    $I0 = pop $P0
+    is($I0, 3, '14 - 2nd')
+    $N0 = pop $P0
+    is($N0, 2.0, '14 - 3rd')
+    $S0 = pop $P0
+    is($S0, "1", '14 - 4th')
+
+finally:
+    .return()
+.end
+
 
 # Local Variables:
 #   mode: cperl

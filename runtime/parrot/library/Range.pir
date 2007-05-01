@@ -149,7 +149,7 @@ Throw an exception if we're out of values.
 
 =cut
 
-.sub shift :method
+.sub 'shift' :vtable('shift_pmc') :method
   .exhausted_check()
 
   .local pmc exhausted, from, to, by
@@ -172,6 +172,25 @@ done:
   .return (from)
 .end
 
+# RT#42430
+# :method is only specified on the shift_* vtables for self.
+
+# Wrappers for the shift_pmc vtable - rely on autoboxing.
+.sub 'shift_integer' :vtable :method
+  $P0 = shift self
+  .return ($P0)
+.end
+
+.sub 'shift_float' :vtable :method
+  $P0 = shift self
+  .return ($P0)
+.end
+
+.sub 'shift_string' :vtable :method 
+  $P0 = shift self
+  .return ($P0)
+.end
+
 =head2 pop
 
 pop a value off the "end" of the range.
@@ -180,7 +199,7 @@ Throw an exception if we're out of values.
 
 =cut
 
-.sub pop :method
+.sub 'pop' :vtable('pop_pmc') :method
   .exhausted_check()
   # can we pull a number off the end?
   # return it.
@@ -203,6 +222,26 @@ exhaust:
 done:
   .return (to)
 .end
+
+# RT#42430
+# :method is only specified on the shift_* vtables for self.
+
+# Wrappers for the shift_pmc vtable - rely on autoboxing.
+.sub 'pop_integer' :vtable :method
+  $P0 = pop self
+  .return ($P0)
+.end
+
+.sub 'pop_float' :vtable :method
+  $P0 = pop self
+  .return ($P0)
+.end
+
+.sub 'pop_string' :vtable :method 
+  $P0 = pop self
+  .return ($P0)
+.end
+
 
 =head2
 
