@@ -25,7 +25,6 @@
    but that would be really annoying */
 #if defined(PARROT_IN_CORE)
 
-#define Parrot_INTERP Interp *
 #define Parrot_STRING STRING *
 #define Parrot_PMC PMC *
 #define Parrot_Language Parrot_Int
@@ -43,7 +42,6 @@
 
 #else
 
-typedef void * Parrot_INTERP;
 typedef void * Parrot_STRING;
 typedef void * Parrot_PMC;
 typedef Parrot_Int Parrot_Language;
@@ -57,74 +55,73 @@ typedef const void * Parrot_VTABLE;
 
 #include "parrot/extend_vtable.h" /* the auto-generated prototypes    */
 
-Parrot_VTABLE Parrot_get_vtable(Parrot_INTERP, Parrot_Int);
-Parrot_PMC Parrot_PMC_get_pmc_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
-Parrot_STRING Parrot_PMC_get_string_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
-void *Parrot_PMC_get_pointer_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
-Parrot_Int Parrot_PMC_get_intval(Parrot_INTERP, Parrot_PMC);
-Parrot_Int Parrot_PMC_get_intval_pmckey(Parrot_INTERP, Parrot_PMC, Parrot_PMC);
-Parrot_Int Parrot_PMC_get_intval_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
-Parrot_Float Parrot_PMC_get_numval(Parrot_INTERP, Parrot_PMC);
-Parrot_Float Parrot_PMC_get_numval_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
-PARROT_API char *Parrot_PMC_get_cstring(Parrot_INTERP, Parrot_PMC);
-char *Parrot_PMC_get_cstring_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
-char *Parrot_PMC_get_cstringn(Parrot_INTERP, Parrot_PMC, Parrot_Int *);
-char *Parrot_PMC_get_cstringn_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int *, Parrot_Int);
+Parrot_VTABLE Parrot_get_vtable(Parrot_Interp, Parrot_Int);
+Parrot_PMC Parrot_PMC_get_pmc_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int);
+Parrot_STRING Parrot_PMC_get_string_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int);
+void *Parrot_PMC_get_pointer_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int);
+Parrot_Int Parrot_PMC_get_intval(Parrot_Interp, Parrot_PMC);
+Parrot_Int Parrot_PMC_get_intval_pmckey(Parrot_Interp, Parrot_PMC, Parrot_PMC);
+Parrot_Int Parrot_PMC_get_intval_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int);
+Parrot_Float Parrot_PMC_get_numval(Parrot_Interp, Parrot_PMC);
+Parrot_Float Parrot_PMC_get_numval_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int);
+PARROT_API char *Parrot_PMC_get_cstring(Parrot_Interp, Parrot_PMC);
+char *Parrot_PMC_get_cstring_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int);
+char *Parrot_PMC_get_cstringn(Parrot_Interp, Parrot_PMC, Parrot_Int *);
+char *Parrot_PMC_get_cstringn_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int *, Parrot_Int);
 
-void Parrot_PMC_set_vtable(Parrot_INTERP, Parrot_PMC, Parrot_VTABLE);
-void Parrot_PMC_set_pmc_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int, Parrot_PMC);
-void Parrot_PMC_set_pmc_pmckey(Parrot_INTERP, Parrot_PMC, Parrot_PMC, Parrot_PMC);
-void Parrot_PMC_set_string(Parrot_INTERP, Parrot_PMC, Parrot_STRING);
-void Parrot_PMC_set_string_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int, Parrot_STRING);
-void Parrot_PMC_set_pointer_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int, void *);
-void Parrot_PMC_set_cstring(Parrot_INTERP, Parrot_PMC, const char *);
-void Parrot_PMC_set_cstring_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int, const char *);
-void Parrot_PMC_set_cstringn(Parrot_INTERP, Parrot_PMC, const char *, Parrot_Int);
-void Parrot_PMC_set_cstringn_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int, const char *, Parrot_Int);
-void Parrot_PMC_set_intval(Parrot_INTERP, Parrot_PMC, Parrot_Int);
-void Parrot_PMC_set_intval_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int, Parrot_Int);
-void Parrot_PMC_set_numval(Parrot_INTERP, Parrot_PMC, Parrot_Float);
-void Parrot_PMC_set_numval_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int, Parrot_Float);
-void Parrot_PMC_push_intval(Parrot_INTERP, Parrot_PMC, Parrot_Int);
-void Parrot_PMC_push_numval(Parrot_INTERP, Parrot_PMC, Parrot_Float);
-void Parrot_PMC_delete_pmckey(Parrot_INTERP, Parrot_PMC, Parrot_PMC);
+void Parrot_PMC_set_vtable(Parrot_Interp, Parrot_PMC, Parrot_VTABLE);
+void Parrot_PMC_set_pmc_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int, Parrot_PMC);
+void Parrot_PMC_set_pmc_pmckey(Parrot_Interp, Parrot_PMC, Parrot_PMC, Parrot_PMC);
+void Parrot_PMC_set_string(Parrot_Interp, Parrot_PMC, Parrot_STRING);
+void Parrot_PMC_set_string_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int, Parrot_STRING);
+void Parrot_PMC_set_pointer_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int, void *);
+void Parrot_PMC_set_cstring(Parrot_Interp, Parrot_PMC, const char *);
+void Parrot_PMC_set_cstring_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int, const char *);
+void Parrot_PMC_set_cstringn(Parrot_Interp, Parrot_PMC, const char *, Parrot_Int);
+void Parrot_PMC_set_cstringn_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int, const char *, Parrot_Int);
+void Parrot_PMC_set_intval(Parrot_Interp, Parrot_PMC, Parrot_Int);
+void Parrot_PMC_set_intval_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int, Parrot_Int);
+void Parrot_PMC_set_numval(Parrot_Interp, Parrot_PMC, Parrot_Float);
+void Parrot_PMC_set_numval_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int, Parrot_Float);
+void Parrot_PMC_push_intval(Parrot_Interp, Parrot_PMC, Parrot_Int);
+void Parrot_PMC_push_numval(Parrot_Interp, Parrot_PMC, Parrot_Float);
+void Parrot_PMC_delete_pmckey(Parrot_Interp, Parrot_PMC, Parrot_PMC);
 
-Parrot_PMC Parrot_PMC_new(Parrot_INTERP, Parrot_Int);
+Parrot_PMC Parrot_PMC_new(Parrot_Interp, Parrot_Int);
 Parrot_PMC Parrot_PMC_null(void);
-PARROT_API Parrot_Int Parrot_PMC_typenum(Parrot_INTERP, const char *);
+PARROT_API Parrot_Int Parrot_PMC_typenum(Parrot_Interp, const char *);
 
 void Parrot_free_cstring(char *);
 
-PARROT_API void * Parrot_call_sub(Parrot_INTERP, Parrot_PMC, const char *, ...);
-Parrot_Int    Parrot_call_sub_ret_int(Parrot_INTERP, Parrot_PMC,
+PARROT_API void * Parrot_call_sub(Parrot_Interp, Parrot_PMC, const char *, ...);
+Parrot_Int    Parrot_call_sub_ret_int(Parrot_Interp, Parrot_PMC,
                     const char *, ...);
-Parrot_Float  Parrot_call_sub_ret_float(Parrot_INTERP, Parrot_PMC,
+Parrot_Float  Parrot_call_sub_ret_float(Parrot_Interp, Parrot_PMC,
                     const char *, ...);
-void *        Parrot_call_method(Parrot_INTERP, Parrot_PMC,
+void *        Parrot_call_method(Parrot_Interp, Parrot_PMC,
                     Parrot_PMC, Parrot_STRING, const char *, ...);
-Parrot_Int    Parrot_call_method_ret_int(Parrot_INTERP, Parrot_PMC,
+Parrot_Int    Parrot_call_method_ret_int(Parrot_Interp, Parrot_PMC,
                     Parrot_PMC, Parrot_STRING, const char *, ...);
-Parrot_Float  Parrot_call_method_ret_float(Parrot_INTERP, Parrot_PMC,
+Parrot_Float  Parrot_call_method_ret_float(Parrot_Interp, Parrot_PMC,
                     Parrot_PMC, Parrot_STRING, const char *, ...);
 
-Parrot_Int    Parrot_get_intreg(Parrot_INTERP, Parrot_Int);
-Parrot_Float  Parrot_get_numreg(Parrot_INTERP, Parrot_Int);
-Parrot_STRING Parrot_get_strreg(Parrot_INTERP, Parrot_Int);
-Parrot_PMC    Parrot_get_pmcreg(Parrot_INTERP, Parrot_Int);
+Parrot_Int    Parrot_get_intreg(Parrot_Interp, Parrot_Int);
+Parrot_Float  Parrot_get_numreg(Parrot_Interp, Parrot_Int);
+Parrot_STRING Parrot_get_strreg(Parrot_Interp, Parrot_Int);
+Parrot_PMC    Parrot_get_pmcreg(Parrot_Interp, Parrot_Int);
 
-void Parrot_set_intreg(Parrot_INTERP, Parrot_Int, Parrot_Int);
-void Parrot_set_numreg(Parrot_INTERP, Parrot_Int, Parrot_Float);
-void Parrot_set_strreg(Parrot_INTERP, Parrot_Int, Parrot_STRING);
-void Parrot_set_pmcreg(Parrot_INTERP, Parrot_Int, Parrot_PMC);
+void Parrot_set_intreg(Parrot_Interp, Parrot_Int, Parrot_Int);
+void Parrot_set_numreg(Parrot_Interp, Parrot_Int, Parrot_Float);
+void Parrot_set_strreg(Parrot_Interp, Parrot_Int, Parrot_STRING);
+void Parrot_set_pmcreg(Parrot_Interp, Parrot_Int, Parrot_PMC);
 
-Parrot_STRING Parrot_new_string(Parrot_INTERP, char *, int, const char * const, Parrot_Int);
+Parrot_STRING Parrot_new_string(Parrot_Interp, char *, int, const char * const, Parrot_Int);
 
-Parrot_Language Parrot_find_language(Parrot_INTERP, char*);
+Parrot_Language Parrot_find_language(Parrot_Interp, char*);
 
-PARROT_API void Parrot_register_pmc(Parrot_INTERP, Parrot_PMC);
-PARROT_API void Parrot_unregister_pmc(Parrot_INTERP, Parrot_PMC);
-Parrot_PMC Parrot_get_dod_registry(Parrot_INTERP);
-
+PARROT_API void Parrot_register_pmc(Parrot_Interp, Parrot_PMC);
+PARROT_API void Parrot_unregister_pmc(Parrot_Interp, Parrot_PMC);
+Parrot_PMC Parrot_get_dod_registry(Parrot_Interp);
 
 #endif /* PARROT_EXTEND_H_GUARD */
 

@@ -35,7 +35,7 @@ typedef struct call_state_item {
             void *ap;   /* a ptr to va_list */
             const char *sig;
         } sig;
-        struct op {
+        struct {
             opcode_t *pc;
             PMC *signature;
         } op;
