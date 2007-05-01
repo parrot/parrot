@@ -31,7 +31,7 @@ enum call_state_mode {
 typedef struct call_state_item {
     int mode;       /* from_sig, from_set_ops, flatten ...*/
     union {
-        struct sig {
+        struct {
             void *ap;   /* a ptr to va_list */
             const char *sig;
         } sig;
