@@ -174,7 +174,7 @@ sub check_indent {
             #
             # The indentation of the previous line is not considered.
             # Check sanity by verifying that the indentation of the current line
-            # is divisible by four. 
+            # is divisible by four.
             if ($indent % 4 && !$in_comment && $prev_last_char eq ';')
             {
                 push @c_indent => "$path:$line\n"

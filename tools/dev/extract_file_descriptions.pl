@@ -1,8 +1,6 @@
 #! perl
-################################################################################
 # Copyright (C) 2001-2003, The Perl Foundation.
 # $Id$
-################################################################################
 
 =head1 NAME
 
@@ -61,8 +59,6 @@ handling;
 
 =cut
 
-################################################################################
-
 use strict;
 use warnings;
 use Regexp::Common qw/comment/;
@@ -114,6 +110,7 @@ if (1) {
 
 sub describe_file {
     my ($path) = @_;
+
     my $info = {};
     $info->{path} = $path;
     my $text = `cat $info->{path}`;
@@ -129,6 +126,7 @@ sub describe_file {
 
 sub describe_misc_file {
     my ( $info, $text ) = @_;
+
     my $top = $text;
     clip_excess_lines( $top, 15 );
     $top =~ s/^ {0,1}(\S)/  $1/mg;    # minimum indent
@@ -138,6 +136,7 @@ sub describe_misc_file {
 
 sub describe_perl_file {
     my ( $info, $text ) = @_;
+
     my $desc;
     if ( $text =~ /^\#/ ) {           # perl file (or sh)
         my ($comment) = $text =~ /^(\#[^\n]*\n( *\n)?(\#[^\n]*\n)*)/s;
@@ -183,6 +182,7 @@ sub describe_perl_file {
 
 sub describe_c_file {
     my ( $info, $text ) = @_;
+
     my $comment_is_at_beginning = $text =~ /^\/\*/;
     my ($first_comment) = $text =~ /($RE{comment}{C})/;
     ($first_comment) = $text =~ /(($RE{comment}{'C++'}\s*)+)/
@@ -253,7 +253,7 @@ sub clip_excess_lines {
     my $cnt = defined $_[1] ? $_[1] : 20;
     $_[0]        =~ s/(([^\n]*\n){0,$cnt}).*/$1   [...]\n/s
         if $_[0] =~ tr/\n/\n/ > $cnt;
-    return undef;
+    return;
 }
 
 # Local Variables:

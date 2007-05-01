@@ -38,7 +38,7 @@ use Parrot::Config;
 use ExtUtils::Manifest qw( maniread );
 
 # a list of languages where we want to test line length
-my %lang_is_checked = map { $_ => 1 } 
+my %lang_is_checked = map { $_ => 1 }
                           qw{ APL
                               WMLScript
                               amber
