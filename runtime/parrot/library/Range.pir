@@ -1,11 +1,16 @@
 =head1 Range
 
-http://perlcabal.org/syn/S03.html#Range_semantics
+Based on the Range object described in S03:
+L<http://perlcabal.org/syn/S03.html#Range_semantics>
 
 =cut
 
 .HLL 'parrot', ''
 .namespace [ 'Range' ]
+
+=head1 macros
+
+=cut
 
 .macro exhausted_check()
   .sym pmc exhausted
@@ -25,45 +30,73 @@ http://perlcabal.org/syn/S03.html#Range_semantics
   setattribute self, 'exhausted', exhausted
 .endm
 
+=head1 :load
 
-.sub __class_init :anon :load
+Create the class, with attributes, when this PBC is loaded.
+
+=cut
+
+.sub class_init :anon :load
 
   $P1 = newclass 'Range'
 
   addattribute $P1, 'from'
   addattribute $P1, 'to'
   addattribute $P1, 'by'
-  addattribute $P1, 'reversed'
   addattribute $P1, 'exhausted'
 .end
 
-# XXX :method is only specified here so we can get 'self'
+# RT#42430
+# :method is only specified here so we can get 'self'
+
+=head1 :vtable
+
+=head2 init
+
+Set some defaults for our attributes.
+
+=cut
+
 .sub 'init' :vtable :method
   $P1 = new 'Integer'
   $P1 = 1
   setattribute self, 'by', $P1
   $P1 = new 'Boolean'
   $P1 = 0
-  setattribute self, 'reversed', $P1
-  $P1 = new 'Boolean'
-  $P1 = 0
   setattribute self, 'exhausted', $P1
 .end
 
+=head1 :method
 
-# XXX handle reversed.
+=head2 get_from
+
+Return the from attribute
+
+=cut
+
 .sub get_from :method
   .local pmc from
   from = getattribute self, 'from'
   .return (from)
 .end
 
-# XXX handle reversed.
+=head2 get_to
+
+Return the to attribute
+
+=cut
+
 .sub get_to :method
   .local pmc to
   to = getattribute self, 'to'
   .return (to)
 .end
+
+=head2 get_min
+
+Return the min attribute
+
+=cut
 
 # XXX handle reversed.
 .sub get_min :method
@@ -72,12 +105,24 @@ http://perlcabal.org/syn/S03.html#Range_semantics
   .return (from)
 .end
 
+=head2 get_max
+
+Return the max attribute
+
+=cut
+
 # XXX handle reversed.
 .sub get_max :method
   .local pmc to
   to = getattribute self, 'to'
   .return (to)
 .end
+
+=head2 get_minmax
+
+Return the min and max attributes as a 2 element list.
+
+=cut
 
 .sub get_minmax :method
   $P1 = new .Array
@@ -90,6 +135,14 @@ http://perlcabal.org/syn/S03.html#Range_semantics
   .return ($P1) 
 .end
 
+=head2 shift
+
+shift a value off the "front" of the range.
+
+Throw an exception if we're out of values.
+
+=cut
+
 .sub shift :method
   .exhausted_check()
 
@@ -97,14 +150,29 @@ http://perlcabal.org/syn/S03.html#Range_semantics
   from = getattribute self, 'from'
   to   = getattribute self, 'to'
   by   = getattribute self, 'by'
+
   $P0 = clone from
   $P0 += by
   setattribute self, 'from', $P0
+
+  if by < 0 goto neg
   if $P0 <= to goto done
+  goto exhaust
+neg:
+  if $P0 >= to goto done 
+exhaust:
   .exhausted()
 done:
   .return (from)
 .end
+
+=head2 pop
+
+pop a value off the "end" of the range.
+
+Throw an exception if we're out of values.
+
+=cut
 
 .sub pop :method
   .exhausted_check()
@@ -118,17 +186,34 @@ done:
   $P0 = clone to
   $P0 -= by
   setattribute self, 'to', $P0
-  if $P0 >= from goto done
+
+  if by < 0 goto neg
+  if $P0 >= from goto done 
+  goto exhaust
+neg:
+  if $P0 <= from goto done
+exhaust:
   .exhausted()
 done:
   .return (to)
 .end
 
+=head2
+
+Reverse the direction of the range.
+
+=cut
+
 .sub reverse :method
-  .local pmc reversed
-  reversed = getattribute self, 'reversed'
-  reversed = not reversed
-  setattribute self, 'reversed', reversed
+  .local pmc from, to, by
+  from = getattribute self, 'from'
+  to   = getattribute self, 'to'
+  setattribute self, 'from', to
+  setattribute self, 'to',   from
+
+  by = getattribute self, 'by'
+  by = neg by
+  setattribute self, 'by', by
   .return(self)
 .end
 
