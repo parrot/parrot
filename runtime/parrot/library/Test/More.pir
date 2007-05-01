@@ -818,7 +818,7 @@ Bad input: "C<test that the return from Foo is correct type>"
     description = "The object"
     unless got_name goto keep_default
     description = object_name
-  keep_default:	
+  keep_default:
     diagnostic = description
     description .= " isa "
     $S0 = class_name
@@ -834,7 +834,7 @@ Bad input: "C<test that the return from Foo is correct type>"
     $S2 = typeof thingy
     diagnostic .= $S2
     test.'diag'(diagnostic)
-out:	
+  out:
 .end
 
 .sub _make_diagnostic
