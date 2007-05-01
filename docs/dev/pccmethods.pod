@@ -1,23 +1,22 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
 
-docs/dev/pccmethods.pod - PCCMETHOD and PCCINVOKE
+docs/dev/pccmethods.pod - Parrot Calling Conventions in C
 
 =head1 OVERVIEW
 
-A C<PCCMETHOD> is a method in a PMC that takes parameters using the Parrot
-Calling Conventions. By contrast, a standard C<METHOD> or a vtable method in
-a PMC uses the standard C calling conventions, which are somewhat more limited.
+A C<PCCMETHOD> is a PMC method that follows Parrot Calling Conventions
+(a.k.a. PCC). This allows PIR code to call PMC methods using slurpy, named,
+and other types of arguments as specified in F<PDD03>. This offers flexibility
+not found in a PMC C<METHOD> or a vtable method using C calling conventions.
 
 C<PCCINVOKE> is used to call a method using the Parrot Calling Conventions.
 It uses the standard find_method/invoke approach that the callmethodcc opcode
-would.
-
-You can use C<PCCINVOKE> in any PMC method (including v-table methods), even
-if they are not C<PCCMETHOD>s. Usefully, you can call methods that are not
-implemented with C<PCCMETHOD> too.
+would. You can use C<PCCINVOKE> in any PMC method (including v-table methods),
+even if they are not C<PCCMETHOD>s. You can call methods that are not
+implemented with C<PCCMETHOD>, too.
 
 
 =head1 SYNTAX
@@ -25,10 +24,11 @@ implemented with C<PCCMETHOD> too.
 =head2 PCCMETHOD
 
 To declare that a method in a PMC should take arguments using the Parrot
-Calling Conventions, prefix its name with the keyword C<PCCMETHOD>. Where you
-would put the C parameter list, put a PCC parameter list. You should always
-use the void return type where you would write the C return type - the
-signature of the return is specified inside the method using C<PCCRETURN>.
+Calling Conventions, prefix its name with the keyword C<PCCMETHOD>.
+Where you would put the C parameter list, put a PCC parameter list.
+You must always use the void return type for C<PCCMETHOD>s -- the true
+signature of the return is specified inside the method using C<PCCRETURN>,
+described below.
 
   PCCMETHOD void PlayRandomSong() {
       ...
@@ -57,15 +57,16 @@ To call a method on an object using the Parrot Calling Conventions, use
 C<PCCINVOKE>. This takes 3 arguments, followed by the signature of the call
 and the arguments as specified in the L<Parameter List Syntax> section.
 
+The first three arguments, in order, are:
+
 =over 4
 
-=item The first argument is the current interpreter; use the INTERP macro in a
-PMC.
+=item The current interpreter; use C<interp> in a PMC.
 
-=item The second argument is the object to call the method on.
+=item The object to call the method on. Use the C<SELF> macro for the
+      current PMC.
 
-=item The third argument is the name of the method to call, between double
-quotes.
+=item The double-quoted name of the method to call.
 
 =back
 
@@ -74,11 +75,13 @@ call and in parentheses.
 
 For example:
 
-  PCCINVOKE(INTERP, monkey, "eat", PMC* banana);
+  PCCINVOKE(interp, monkey, "eat", PMC* banana);
 
-  (PMC *pooh) = PCCINVOKE(INTERP, monkey, "excrete");
+  (PMC *pooh) = PCCINVOKE(interp, monkey, "excrete");
 
-  (PMC *status, INTVAL count) = PCCINVOKE(INTERP, player, "PlaySong", artist, title);
+  (PMC *status, INTVAL count) = PCCINVOKE(interp, player, "PlaySong", artist, title);
+
+  PCCINVOKE(interp, SELF, value :named("key") :optional)
 
 
 =head2 Parameter List Syntax
@@ -86,17 +89,22 @@ For example:
 The syntax for a PCC parameter list is a comma separated list of zero or more
 parameters. Each parameter takes the form:
 
-    { INTVAL | NUMVAL | STRING* | PMC* } NAME [ ADVERBS ]
+  { INTVAL | NUMVAL | STRING* | PMC* } NAME [ ADVERBS ]
 
 That is, a register type, followed by a name, optionally followed by one or
 more flags specified as adverbs. The list of supported adverbs is listed in
-L<PDD3>, the calling conventions design document.
+F<docs/pdds/pdd03_calling_conventions.pod>, the calling conventions design
+document.
 
-Note that in line with the Parrot code standards, you should write:
+Note that unlike PIR, single quotes B<cannot> be used to quote values
+in C-based PCC calls.
+
+Also note that in line with the Parrot code standards, you should put the
+pointer symbol next to the variable,
 
   PMC *param :optional
 
-Instead of
+not next to the type.
 
   PMC* param :optional
 
