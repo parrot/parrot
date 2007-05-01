@@ -573,7 +573,6 @@ found_ins:
  *
  */
 extern void* yy_scan_string(const char *);
-/* extern SymReg *cur_namespace; -- s. imcc.y */
 
 
 int

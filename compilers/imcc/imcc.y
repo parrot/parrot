@@ -5,7 +5,7 @@
  * Intermediate Code Compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
- * Copyright (C) 2002-2006, The Perl Foundation.
+ * Copyright (C) 2002-2007, The Perl Foundation.
  *
  * Grammar for the parser.
  *
@@ -39,12 +39,6 @@
  * polymorphic.
  */
 
-
-/*
- * Some convenient vars
- */
-/* RT#42385: Remove this global variable... */
-/* SymReg *cur_namespace;  ugly hack for mk_address */
 
 /*
  * MK_I: build and emitb instruction by INS

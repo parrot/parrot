@@ -352,12 +352,6 @@
 
 
 /*
- * Some convenient vars
- */
-/* RT#42385: Remove this global variable... */
-/* SymReg *cur_namespace;  ugly hack for mk_address */
-
-/*
  * MK_I: build and emitb instruction by INS
  *
  * fmt may contain:

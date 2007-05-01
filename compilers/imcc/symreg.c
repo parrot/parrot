@@ -400,8 +400,6 @@ mk_const(Interp *interp, char * name, int t)
     return _mk_const(h, name, t);
 }
 
-/*extern SymReg *cur_namespace; -- ugly hack for mk_address */
-
 /*
  * add namespace to sub if any
  * */
