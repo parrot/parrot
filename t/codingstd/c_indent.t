@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -32,11 +32,11 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
-my $DIST = Parrot::Distribution->new;
-my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
+my $DIST = Parrot::Distribution->new();
+my @files = @ARGV ? @ARGV : map { $_->path() } $DIST->get_c_language_files();
 
 #foreach my $file ( @files ) {
-#    print $file->path(), "\n";
+#    print $file, "\n";
 #}
 #exit;
 
@@ -48,9 +48,8 @@ sub check_indent {
     my ( @pp_indent, @c_indent );
     my ( %pp_failed, %c_failed );
 
-    foreach my $file (@_) {
+    foreach my $path (@_) {
         my @source;
-        my $path = @ARGV ? $file : $file->path();
         open my $fh, '<', $path
             or die "Can not open '$path' for reading!\n";
         @source = <$fh>;
@@ -170,6 +169,12 @@ sub check_indent {
             my ($indent) = /^(\s+)/ or next;
             $indent = length($indent);
 
+            # Ignore the indentation of the current line if that
+            # previous line's last character was anything but a ;.
+            #
+            # The indentation of the previous line is not considered.
+            # Check sanity by verifying that the indentation of the current line
+            # is divisible by four. 
             if ($indent % 4 && !$in_comment && $prev_last_char eq ';')
             {
                 push @c_indent => "$path:$line\n"
