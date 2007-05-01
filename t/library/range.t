@@ -30,7 +30,7 @@ Tests the Range class.
 
     load_bytecode 'Range.pir' # XXX eventually convert to pbc.
 
-    plan(47)
+    plan(68)
 
     # XXX Convert this to the PDD15 way of creating an object
     # at the same time you specify the attributes...
@@ -44,6 +44,9 @@ Tests the Range class.
     test_7() # 5 tests
     test_8() # 6 tests
     test_9() # 6 tests
+    test_10() # 7 tests
+    test_11() # 7 tests
+    test_12() # 7 tests
 .end
 
 .sub 'test_1' 
@@ -358,6 +361,102 @@ finally:
     .return()
 .end
 
+.sub 'test_10' 
+    .local string test_desc
+    test_desc = "1..3, get attributes..."
+
+    $P0 = new 'Range'
+    $P1 = new 'Integer'
+    $P1 = 1
+    setattribute $P0, 'from', $P1
+    $P1 = new 'Integer'
+    $P1 = 3
+    setattribute $P0, 'to', $P1
+    ok(1, test_desc)
+
+    $I0 = $P0.'get_from'()
+    is($I0, 1, '10 - from')
+    $I0 = $P0.'get_to'()
+    is($I0, 3, '10 - to')
+    $I0 = $P0.'get_min'()
+    is($I0, 1, '10 - min')
+    $I0 = $P0.'get_max'()
+    is($I0, 3, '10 - max')
+    $P0 = $P0.'get_minmax'()
+    $I0 = $P0[0]
+    is($I0, 1, '10 - min of minmax')
+    $I0 = $P0[1]
+    is($I0, 3, '10 - max of minmax')
+
+finally:
+    .return()
+.end
+
+.sub 'test_11' 
+    .local string test_desc
+    test_desc = "3..1:by(-1), get attributes"
+
+    $P0 = new 'Range'
+    $P1 = new 'Integer'
+    $P1 = 3
+    setattribute $P0, 'from', $P1
+    $P1 = new 'Integer'
+    $P1 = 1
+    setattribute $P0, 'to', $P1
+    $P1 = new 'Integer'
+    $P1 = -1
+    setattribute $P0, 'by', $P1
+    ok(1, test_desc)
+
+    $I0 = $P0.'get_from'()
+    is($I0, 3, '11 - from')
+    $I0 = $P0.'get_to'()
+    is($I0, 1, '11 - to')
+    $I0 = $P0.'get_min'()
+    is($I0, 1, '11 - min')
+    $I0 = $P0.'get_max'()
+    is($I0, 3, '11 - max')
+    $P0 = $P0.'get_minmax'()
+    $I0 = $P0[0]
+    is($I0, 1, '11 - min of minmax')
+    $I0 = $P0[1]
+    is($I0, 3, '11 - max of minmax')
+
+finally:
+    .return()
+.end
+
+.sub 'test_12' 
+    .local string test_desc
+    test_desc = "1..3, reverse, get attributes"
+
+    $P0 = new 'Range'
+    $P1 = new 'Integer'
+    $P1 = 1
+    setattribute $P0, 'from', $P1
+    $P1 = new 'Integer'
+    $P1 = 3
+    setattribute $P0, 'to', $P1
+    $P0.'reverse'()
+    ok(1, test_desc)
+
+    $I0 = $P0.'get_from'()
+    is($I0, 3, '11 - from')
+    $I0 = $P0.'get_to'()
+    is($I0, 1, '11 - to')
+    $I0 = $P0.'get_min'()
+    is($I0, 1, '11 - min')
+    $I0 = $P0.'get_max'()
+    is($I0, 3, '11 - max')
+    $P0 = $P0.'get_minmax'()
+    $I0 = $P0[0]
+    is($I0, 1, '11 - min of minmax')
+    $I0 = $P0[1]
+    is($I0, 3, '11 - max of minmax')
+
+finally:
+    .return()
+.end
 
 # Local Variables:
 #   mode: cperl

@@ -98,10 +98,13 @@ Return the min attribute
 
 =cut
 
-# XXX handle reversed.
 .sub get_min :method
-  .local pmc from
+  .local pmc from, to
   from = getattribute self, 'from'
+  to   = getattribute self, 'to'
+  if from < to goto use_from
+  .return (to)
+use_from:
   .return (from)
 .end
 
@@ -111,11 +114,14 @@ Return the max attribute
 
 =cut
 
-# XXX handle reversed.
 .sub get_max :method
-  .local pmc to
-  to = getattribute self, 'to'
+  .local pmc from, to
+  from = getattribute self, 'from'
+  to   = getattribute self, 'to'
+  if from > to goto use_from
   .return (to)
+use_from:
+  .return (from)
 .end
 
 =head2 get_minmax
