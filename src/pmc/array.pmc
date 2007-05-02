@@ -1250,7 +1250,7 @@ Recursively make the array read-only and shared.
             for (i = 0; i < max; ++i) {
                 PMC *value;
 
-                value = list_get(INTERP, PMC_data_typed(ret, List *),
+                value = (PMC *)list_get(INTERP, PMC_data_typed(ret, List *),
                                  i, enum_type_PMC);
 
                 if (!PMC_IS_NULL(value)) {

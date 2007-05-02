@@ -123,16 +123,15 @@ Initializes the thread.
 */
 
     void init() {
-        /*
-         * protect interpreter creation and list handling
-         */
+        /* protect interpreter creation and list handling */
         LOCK(interpreter_array_mutex);
+
         SUPER();
-        pt_add_to_interpreters(INTERP, PMC_data(SELF));
+        pt_add_to_interpreters(INTERP, PMC_data_typed(SELF, Parrot_Interp));
+
         UNLOCK(interpreter_array_mutex);
-        /*
-         * can't allow DOD runs for now
-         */
+
+        /* can't allow DOD runs for now */
         stop_GC(INTERP, PMC_data_typed(SELF, Parrot_Interp));
     }
 
@@ -154,10 +153,9 @@ Create a new thread by cloning the passed interpreter.
                                PMC_data_typed(SELF, Parrot_Interp));
 
         UNLOCK(interpreter_array_mutex);
-        /*
-         * can't allow DOD runs for now
-         */
-        stop_GC(INTERP, PMC_data(SELF));
+
+        /* can't allow DOD runs for now */
+        stop_GC(INTERP, PMC_data_typed(SELF, Parrot_Interp));
     }
 }
 

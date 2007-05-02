@@ -192,7 +192,8 @@ Adds C<value> to the start of the list.
 */
 
     void unshift_integer(INTVAL value) {
-        intlist_unshift(INTERP, (IntList**) &PMC_struct_val(SELF), value);
+        IntList **list = (IntList **)PMC_struct_val(SELF);
+        intlist_unshift(INTERP, list, value);
     }
 
 /*
@@ -206,7 +207,8 @@ Removes and returns the first element in the list.
 */
 
     INTVAL shift_integer() {
-        return intlist_shift(INTERP, (IntList**) &PMC_struct_val(SELF));
+        IntList **list = (IntList **)PMC_struct_val(SELF);
+        return intlist_shift(INTERP, list);
     }
 
     void splice(PMC* value, INTVAL offset, INTVAL count) {

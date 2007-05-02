@@ -513,11 +513,14 @@ Used to unarchive the string.
         INTVAL i, n;
         STRING **data;
         SUPER(info);
+
         if (info->extra_flags == EXTRA_IS_NULL) {
             DYNSELF.init();
-            n = io->vtable->shift_integer(INTERP, io);
+
+            n    = io->vtable->shift_integer(INTERP, io);
             DYNSELF.set_integer_native(n);
-            data = PMC_data(SELF);
+            data = PMC_data_typed(SELF, STRING **);
+
             for (i = 0; i < n; ++i)
                 data[i] = io->vtable->shift_string(INTERP, io);
         }

@@ -73,7 +73,7 @@ bigint_get_self(Interp *interp, PMC *self) {
 
 static void
 bigint_set_self(Interp *interp, PMC *self, BIGNUM *value) {
-    mpz_set(BN(self), value);
+    mpz_set(BN(self), (mpz_srcptr)value);
 }
 
 static long

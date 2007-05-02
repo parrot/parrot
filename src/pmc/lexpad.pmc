@@ -105,7 +105,7 @@ Return the LexInfo PMC, if any or a Null PMC.
     PMC* get_pmc_keyed_str(STRING* name) {
         PMC              *info = PMC_pmc_val(SELF);
         Hash             *hash = (Hash *)PMC_struct_val(info);
-        parrot_context_t *ctx  = PMC_struct_val(SELF);
+        parrot_context_t *ctx  = (parrot_context_t *)PMC_struct_val(SELF);
         HashBucket       *b    = parrot_hash_get_bucket(INTERP, hash, name);
         INTVAL            regno;
 
@@ -125,7 +125,7 @@ Return the LexInfo PMC, if any or a Null PMC.
     void set_pmc_keyed_str(STRING *name, PMC *value) {
         PMC              *info  = PMC_pmc_val(SELF);
         Hash             *hash  = (Hash *)PMC_struct_val(info);
-        parrot_context_t *ctx   = PMC_struct_val(SELF);
+        parrot_context_t *ctx   = (parrot_context_t *)PMC_struct_val(SELF);
         HashBucket       *b     = parrot_hash_get_bucket(INTERP, hash, name);
         INTVAL            regno;
 

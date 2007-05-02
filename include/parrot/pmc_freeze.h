@@ -68,7 +68,7 @@ typedef struct _visit_info {
     INTVAL              what;
     STRING*             image;
     PMC*                mark_ptr;
-    PMC**               thaw_ptr;       /* where to thaw aa new PMC */
+    PMC**               thaw_ptr;       /* where to thaw a new PMC */
     PMC*                container;      /* when thawing aggregate items */
     INTVAL              last_type;
     PMC*                seen;           /* seen hash */

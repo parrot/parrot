@@ -58,7 +58,7 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
 
     PMC* get_pmc_keyed_int(INTVAL idx) {
         INTVAL      n;
-        Hash       *h = PMC_struct_val(SELF);
+        Hash       *h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
 
         n = h->entries;
@@ -115,7 +115,7 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
 
     STRING* get_string_keyed_int(INTVAL idx) {
         INTVAL      n;
-        Hash       *h = PMC_struct_val(SELF);
+        Hash       *h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
 
         n = h->entries;
@@ -169,7 +169,7 @@ Returns the integer value associated with C<key>.
 
     INTVAL get_integer_keyed_int(INTVAL idx) {
         INTVAL      n;
-        Hash       *h = PMC_struct_val(SELF);
+        Hash       *h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
 
         n = h->entries;
@@ -229,7 +229,7 @@ Returns the floating-point value for the element at C<key>.
 
     FLOATVAL get_number_keyed_int(INTVAL idx) {
         INTVAL      n;
-        Hash       *h = PMC_struct_val(SELF);
+        Hash       *h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
 
         n = h->entries;
@@ -293,7 +293,7 @@ The created key = "\1idx".
     void set_pmc_keyed_int(INTVAL idx, PMC *val) {
         STRING     *key, *fmt;
         INTVAL      n;
-        Hash       *h = PMC_struct_val(SELF);
+        Hash       *h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
 
         n = h->entries;
@@ -388,7 +388,7 @@ The created key = "\1idx".
 
     INTVAL exists_keyed_int(INTVAL idx) {
         INTVAL      n;
-        Hash       *h = PMC_struct_val(SELF);
+        Hash       *h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
 
         n = h->entries;
@@ -411,9 +411,9 @@ The created key = "\1idx".
         PMC *item, *next;
 
         if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-            Hash *h = PMC_struct_val(SELF);
-            INTVAL n, idx;
+            Hash       *h = (Hash *)PMC_struct_val(SELF);
             HashBucket *b;
+            INTVAL      n, idx;
 
             idx = key_integer(INTERP, key);
             n   = h->entries;
@@ -429,7 +429,7 @@ The created key = "\1idx".
             if (!b->key)
                 return 0;
 
-            item = b->value;
+            item = (PMC *)b->value;
             next = key_next(INTERP, key);
 
             if (!next)
@@ -443,7 +443,7 @@ The created key = "\1idx".
     }
 
     INTVAL exists_keyed_str(STRING* key) {
-        Hash       *h = PMC_struct_val(SELF);
+        Hash       *h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b = parrot_hash_get_bucket(INTERP, h, key);
 
         if (b && b->key)
@@ -472,7 +472,7 @@ The created key = "\1idx".
             Hash       *h;
             HashBucket *b;
 
-            h   = PMC_struct_val(SELF);
+            h   = (Hash *)PMC_struct_val(SELF);
             idx = key_integer(INTERP, key);
             n   = h->entries;
 
@@ -488,7 +488,7 @@ The created key = "\1idx".
             if (!b->key)
                 return 0;
 
-            item = b->value;
+            item = (PMC *)b->value;
             next = key_next(INTERP, key);
 
             if (!next)
@@ -502,7 +502,7 @@ The created key = "\1idx".
 
     INTVAL defined_keyed_int(INTVAL idx) {
         INTVAL      n;
-        Hash       *h = PMC_struct_val(SELF);
+        Hash       *h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
 
         n = h->entries;
@@ -560,7 +560,7 @@ Deletes the key C<*key> from the hash.
 
     void delete_keyed_int(INTVAL idx) {
         INTVAL      n;
-        Hash       *h = PMC_struct_val(SELF);
+        Hash       *h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
 
         n = h->entries;
@@ -578,7 +578,7 @@ Deletes the key C<*key> from the hash.
     }
 
     void delete_keyed_str(STRING *key) {
-        Hash       *h = PMC_struct_val(SELF);
+        Hash       *h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b = parrot_hash_get_bucket(INTERP, h, key);
 
         if (b)
@@ -598,7 +598,7 @@ the clone via integers has different indices, if items were deleted.
 
     PMC* clone() {
         PMC        *dest;
-        Hash       *hash = PMC_struct_val(SELF);
+        Hash       *hash = (Hash *)PMC_struct_val(SELF);
         Hash       *h_dest;
         HashBucket *b;
         UINTVAL     i;
@@ -609,7 +609,7 @@ the clone via integers has different indices, if items were deleted.
         parrot_new_pmc_hash_x(INTERP, dest, hash->entry_type,
                 hash->key_type, hash->compare, hash->hash_val);
 
-        h_dest = PMC_struct_val(dest);
+        h_dest = (Hash *)PMC_struct_val(dest);
 
         for (i = 0; i <= hash->mask; i++) {
             b   = hash->bs + i;
@@ -648,7 +648,7 @@ preserve key/value order.
     void visit(visit_info *info) {
         UINTVAL     i;
         HashBucket *b;
-        void       *key;
+        STRING     *key;
         IMAGE_IO   *io   = info->image_io;
         Hash       *hash = (Hash *)PMC_struct_val(SELF);
 
@@ -664,13 +664,13 @@ preserve key/value order.
             case VISIT_FREEZE_AT_DESTRUCT:
                 for (i = 0; i <= hash->mask; i++) {
                     b   = hash->bs + i;
-                    key = b->key;
+                    key = (STRING *)b->key;
 
                     if (!key)
                         continue;
 
                     io->vtable->push_string(interp, io, key);
-                    (info->visit_pmc_now)(interp, b->value, info);
+                    (info->visit_pmc_now)(interp, (PMC *)b->value, info);
                 }
                 break;
             default:

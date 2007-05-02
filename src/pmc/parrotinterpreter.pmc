@@ -293,7 +293,7 @@ Returns the thread id of the interpreter.
 
     */
 
-        opcode_t* invoke(void* next) {
+        opcode_t* invoke(void *next) {
             Interp * new_interp =
                 (Interp *)PMC_data(SELF);
             /*
@@ -310,7 +310,8 @@ Returns the thread id of the interpreter.
             /* calculate offset and run */
             runops(new_interp, (opcode_t *)PMC_struct_val(SELF) -
                 (opcode_t *)interp->code->base.data);
-            return next;
+
+            return (opcode_t *)next;
         }
 
     /*
@@ -655,7 +656,7 @@ Finish thawing.
     }
 
     METHOD void run_gc() {
-        Parrot_do_dod_run(PMC_data(SELF), 0);
+        Parrot_do_dod_run(PMC_data_typed(SELF, Parrot_Interp), 0);
     }
 }
 

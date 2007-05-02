@@ -424,16 +424,18 @@ of the array.
 */
 
     void unshift_string(STRING *value) {
-        STRING **data;
-        INTVAL size, i;
+        STRING **data = PMC_data_typed(SELF, STRING **);
+        INTVAL   size = PMC_int_val(SELF);
+        INTVAL   i;
 
-        size = PMC_int_val(SELF);
-        data = (STRING**)PMC_data(SELF);
 
         DYNSELF.set_integer_native(size + 1);
-        data = PMC_data(SELF);
+
+        data = PMC_data_typed(SELF, STRING **);
+
         for (i = size; i; --i)
             data[i] = data[i - 1];
+
         DYNSELF.set_string_keyed_int(0, value);
     }
 
@@ -507,13 +509,13 @@ Converts C<key> to a PMC key and calls C<delete_keyed()> with it.
 */
 
     void delete_keyed_int(INTVAL key) {
-        STRING **data;
-        INTVAL size, i;
-        size = PMC_int_val(SELF);
+        STRING **data = PMC_data_typed(SELF, STRING **);
+        INTVAL   size = PMC_int_val(SELF);
+        INTVAL   i;
 
-        data = PMC_data(SELF);
         for (i = key; i < size - 1; ++i)
             data[i] = data[i + 1];
+
         DYNSELF.set_integer_native(size - 1);
     }
 
@@ -527,15 +529,15 @@ Removes the element at C<*key>.
 
 */
 
-    void delete_keyed(PMC* key) {
-        STRING **data;
-        INTVAL size, idx, i;
-        size = PMC_int_val(SELF);
-        idx = key_integer(INTERP, key);
+    void delete_keyed(PMC *key) {
+        INTVAL   idx  = key_integer(INTERP, key);
+        STRING **data = PMC_data_typed(SELF, STRING **);
+        INTVAL   size = PMC_int_val(SELF);
+        INTVAL   i;
 
-        data = PMC_data(SELF);
         for (i = idx; i < size - 1; ++i)
             data[i] = data[i + 1];
+
         DYNSELF.set_integer_native(size - 1);
     }
 
