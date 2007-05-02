@@ -378,7 +378,7 @@ sub find_type {
     my $type = shift;
 
     my %typemap = (
-        'STRING*'   => 'Parrot_STRING',
+        'STRING*'   => 'Parrot_String',
         'void*'     => 'void*',
         'INTVAL'    => 'Parrot_Int',
         'PMC*'      => 'Parrot_PMC',

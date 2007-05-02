@@ -114,8 +114,8 @@ find_global( interp, global, ... )
 PREINIT:
 	Parrot_Interp  real_interp;
 	SV            *namespace;
-	Parrot_STRING  p_namespace;
-	Parrot_STRING  p_global;
+	Parrot_String  p_namespace;
+	Parrot_String  p_global;
 	Parrot_PMC     pmc;
 CODE:
 	if ( items < 2 || items > 3 )
@@ -181,7 +181,7 @@ PREINIT:
 	Parrot_PMC    pmc_actual;
 	Parrot_PMC    out_pmc;
 	Parrot_Interp interp;
-	Parrot_STRING arg_string;
+	Parrot_String arg_string;
 CODE:
 	pmc_actual = pmc->pmc;
 	interp     = get_interp( pmc->interp );

@@ -63,7 +63,7 @@ can.
 
 /*
 
-=item C<Parrot_STRING
+=item C<Parrot_String
 Parrot_PMC_get_string_intkey(Parrot_Interp interp, Parrot_PMC pmc,
                              Parrot_Int key)>
 
@@ -73,9 +73,9 @@ Return the integer keyed string value of the passed-in PMC
 
 */
 
-Parrot_STRING Parrot_PMC_get_string_intkey(Parrot_Interp interp,
+Parrot_String Parrot_PMC_get_string_intkey(Parrot_Interp interp,
                                            Parrot_PMC pmc, Parrot_Int key) {
-    Parrot_STRING retval;
+    Parrot_String retval;
     PARROT_CALLIN_START(interp);
     retval = VTABLE_get_string_keyed_int(interp, pmc, key);
     PARROT_CALLIN_END(interp);
@@ -343,7 +343,7 @@ Parrot_PMC_get_cstringn_intkey(Parrot_Interp interp, Parrot_PMC pmc,
 
 =item C<void
 Parrot_PMC_set_string(Parrot_Interp interp, Parrot_PMC pmc,
-                      Parrot_STRING value)>
+                      Parrot_String value)>
 
 Assign the passed-in Parrot string to the passed-in PMC.
 
@@ -353,7 +353,7 @@ Assign the passed-in Parrot string to the passed-in PMC.
 
 void
 Parrot_PMC_set_string(Parrot_Interp interp, Parrot_PMC pmc,
-                      Parrot_STRING value) {
+                      Parrot_String value) {
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_native(interp, pmc, value);
     PARROT_CALLIN_END(interp);
@@ -363,7 +363,7 @@ Parrot_PMC_set_string(Parrot_Interp interp, Parrot_PMC pmc,
 
 =item C<void
 Parrot_PMC_set_string_intkey(Parrot_Interp interp, Parrot_PMC pmc,
-                              Parrot_Int key, Parrot_STRING value)>
+                              Parrot_Int key, Parrot_String value)>
 
 Assign the passed-in Parrot string to the passed-in PMC.
 
@@ -373,7 +373,7 @@ Assign the passed-in Parrot string to the passed-in PMC.
 
 void
 Parrot_PMC_set_string_intkey(Parrot_Interp interp, Parrot_PMC pmc,
-                                  Parrot_Int key, Parrot_STRING value)
+                                  Parrot_Int key, Parrot_String value)
 {
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_keyed_int(interp, pmc, key, value);
@@ -743,7 +743,7 @@ Signature chars are:
     v ... void return
     I ... Parrot_Int
     N ... Parrot_Float
-    S ... Parrot_STRING
+    S ... Parrot_String
     P ... Parrot_PMC
 
 =item C<Parrot_Int>
@@ -820,14 +820,14 @@ Parrot_call_sub_ret_float(Parrot_Interp interp, Parrot_PMC sub,
 /*
 
 =item C<void* Parrot_call_method(Parrot_Interp interp, Parrot_PMC sub,
-        Parrot_PMC object, Parrot_STRING method, const char *signature, ...)>
+        Parrot_PMC object, Parrot_String method, const char *signature, ...)>
 
 =item C<Parrot_Int Parrot_call_method_ret_int(Parrot_Interp interp,
-    Parrot_PMC sub, Parrot_PMC object, Parrot_STRING method,
+    Parrot_PMC sub, Parrot_PMC object, Parrot_String method,
     const char *signature, ...)>
 
 =item C<Parrot_Float Parrot_call_method_ret_float(Parrot_Interp interp,
-    Parrot_PMC sub, Parrot_PMC object, Parrot_STRING method,
+    Parrot_PMC sub, Parrot_PMC object, Parrot_String method,
     const char *signature, ...)>
 
 Call a parrot method for the given object.
@@ -838,7 +838,7 @@ Call a parrot method for the given object.
 
 void *
 Parrot_call_method(Parrot_Interp interp, Parrot_PMC sub, Parrot_PMC obj,
-                        Parrot_STRING method, const char *signature, ...)
+                        Parrot_String method, const char *signature, ...)
 {
     void *result;
     va_list ap;
@@ -854,7 +854,7 @@ Parrot_call_method(Parrot_Interp interp, Parrot_PMC sub, Parrot_PMC obj,
 
 Parrot_Int
 Parrot_call_method_ret_int(Parrot_Interp interp, Parrot_PMC sub,
-        Parrot_PMC obj, Parrot_STRING method, const char *signature, ...)
+        Parrot_PMC obj, Parrot_String method, const char *signature, ...)
 {
     Parrot_Int result;
     va_list ap;
@@ -870,7 +870,7 @@ Parrot_call_method_ret_int(Parrot_Interp interp, Parrot_PMC sub,
 
 Parrot_Float
 Parrot_call_method_ret_float(Parrot_Interp interp, Parrot_PMC sub,
-        Parrot_PMC obj, Parrot_STRING method, const char *signature, ...)
+        Parrot_PMC obj, Parrot_String method, const char *signature, ...)
 {
     Parrot_Float result;
     va_list ap;
@@ -920,7 +920,7 @@ Parrot_get_numreg(Parrot_Interp interp, Parrot_Int regnum)
 
 /*
 
-=item C<Parrot_STRING
+=item C<Parrot_String
 Parrot_get_strreg(Parrot_Interp interp, Parrot_Int regnum)>
 
 Return the value of a string register.
@@ -929,7 +929,7 @@ Return the value of a string register.
 
 */
 
-Parrot_STRING
+Parrot_String
 Parrot_get_strreg(Parrot_Interp interp, Parrot_Int regnum)
 {
     return REG_STR(regnum);
@@ -994,7 +994,7 @@ Parrot_set_numreg(Parrot_Interp interp, Parrot_Int regnum,
 
 =item C<void
 Parrot_set_strreg(Parrot_Interp interp, Parrot_Int regnum,
-                  Parrot_STRING value)>
+                  Parrot_String value)>
 
 Set the value of an S register.
 
@@ -1004,7 +1004,7 @@ Set the value of an S register.
 
 void
 Parrot_set_strreg(Parrot_Interp interp, Parrot_Int regnum,
-                  Parrot_STRING value)
+                  Parrot_String value)
 {
     REG_STR(regnum) = value;
 }
@@ -1033,7 +1033,7 @@ Parrot_set_pmcreg(Parrot_Interp interp, Parrot_Int regnum,
  */
 /*
 
-=item C<Parrot_STRING Parrot_new_string(Parrot_Interp interp,
+=item C<Parrot_String Parrot_new_string(Parrot_Interp interp,
                                 char *buffer, int length,
                                 const char * const encoding_name,
                                 Parrot_Int flags)>
@@ -1047,13 +1047,13 @@ A copy of the buffer is made.
 
 */
 
-Parrot_STRING
+Parrot_String
 Parrot_new_string(Parrot_Interp interp,
                                 char *buffer, int length,
                                 const char * const encoding_name,
                                 Parrot_Int flags)
 {
-    Parrot_STRING retval;
+    Parrot_String retval;
     PARROT_CALLIN_START(interp);
     retval = string_make(interp, buffer, length, encoding_name, flags);
     PARROT_CALLIN_END(interp);

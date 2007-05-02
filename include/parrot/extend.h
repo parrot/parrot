@@ -25,7 +25,7 @@
    but that would be really annoying */
 #if defined(PARROT_IN_CORE)
 
-#define Parrot_STRING STRING *
+#define Parrot_String STRING *
 #define Parrot_PMC PMC *
 #define Parrot_Language Parrot_Int
 #define Parrot_VTABLE VTABLE *
@@ -42,7 +42,7 @@
 
 #else
 
-typedef void * Parrot_STRING;
+typedef void * Parrot_String;
 typedef void * Parrot_PMC;
 typedef Parrot_Int Parrot_Language;
 typedef void * Parrot_Encoding;
@@ -57,7 +57,7 @@ typedef const void * Parrot_VTABLE;
 
 Parrot_VTABLE Parrot_get_vtable(Parrot_Interp, Parrot_Int);
 Parrot_PMC Parrot_PMC_get_pmc_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int);
-Parrot_STRING Parrot_PMC_get_string_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int);
+Parrot_String Parrot_PMC_get_string_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int);
 void *Parrot_PMC_get_pointer_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int);
 Parrot_Int Parrot_PMC_get_intval(Parrot_Interp, Parrot_PMC);
 Parrot_Int Parrot_PMC_get_intval_pmckey(Parrot_Interp, Parrot_PMC, Parrot_PMC);
@@ -72,8 +72,8 @@ char *Parrot_PMC_get_cstringn_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int *, Pa
 void Parrot_PMC_set_vtable(Parrot_Interp, Parrot_PMC, Parrot_VTABLE);
 void Parrot_PMC_set_pmc_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int, Parrot_PMC);
 void Parrot_PMC_set_pmc_pmckey(Parrot_Interp, Parrot_PMC, Parrot_PMC, Parrot_PMC);
-void Parrot_PMC_set_string(Parrot_Interp, Parrot_PMC, Parrot_STRING);
-void Parrot_PMC_set_string_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int, Parrot_STRING);
+void Parrot_PMC_set_string(Parrot_Interp, Parrot_PMC, Parrot_String);
+void Parrot_PMC_set_string_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int, Parrot_String);
 void Parrot_PMC_set_pointer_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int, void *);
 void Parrot_PMC_set_cstring(Parrot_Interp, Parrot_PMC, const char *);
 void Parrot_PMC_set_cstring_intkey(Parrot_Interp, Parrot_PMC, Parrot_Int, const char *);
@@ -99,23 +99,23 @@ Parrot_Int    Parrot_call_sub_ret_int(Parrot_Interp, Parrot_PMC,
 Parrot_Float  Parrot_call_sub_ret_float(Parrot_Interp, Parrot_PMC,
                     const char *, ...);
 void *        Parrot_call_method(Parrot_Interp, Parrot_PMC,
-                    Parrot_PMC, Parrot_STRING, const char *, ...);
+                    Parrot_PMC, Parrot_String, const char *, ...);
 Parrot_Int    Parrot_call_method_ret_int(Parrot_Interp, Parrot_PMC,
-                    Parrot_PMC, Parrot_STRING, const char *, ...);
+                    Parrot_PMC, Parrot_String, const char *, ...);
 Parrot_Float  Parrot_call_method_ret_float(Parrot_Interp, Parrot_PMC,
-                    Parrot_PMC, Parrot_STRING, const char *, ...);
+                    Parrot_PMC, Parrot_String, const char *, ...);
 
 Parrot_Int    Parrot_get_intreg(Parrot_Interp, Parrot_Int);
 Parrot_Float  Parrot_get_numreg(Parrot_Interp, Parrot_Int);
-Parrot_STRING Parrot_get_strreg(Parrot_Interp, Parrot_Int);
+Parrot_String Parrot_get_strreg(Parrot_Interp, Parrot_Int);
 Parrot_PMC    Parrot_get_pmcreg(Parrot_Interp, Parrot_Int);
 
 void Parrot_set_intreg(Parrot_Interp, Parrot_Int, Parrot_Int);
 void Parrot_set_numreg(Parrot_Interp, Parrot_Int, Parrot_Float);
-void Parrot_set_strreg(Parrot_Interp, Parrot_Int, Parrot_STRING);
+void Parrot_set_strreg(Parrot_Interp, Parrot_Int, Parrot_String);
 void Parrot_set_pmcreg(Parrot_Interp, Parrot_Int, Parrot_PMC);
 
-Parrot_STRING Parrot_new_string(Parrot_Interp, char *, int, const char * const, Parrot_Int);
+Parrot_String Parrot_new_string(Parrot_Interp, char *, int, const char * const, Parrot_Int);
 
 Parrot_Language Parrot_find_language(Parrot_Interp, char*);
 

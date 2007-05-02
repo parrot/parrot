@@ -90,8 +90,8 @@ EOC
 PARROT_DYNEXT_EXPORT extern Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_Interp interp); /* don't warn */
 Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_Interp interp)
 {
-    Parrot_STRING whoami;
-    Parrot_PMC pmc;
+    Parrot_String whoami;
+    Parrot_PMC    pmc;
 EOC
     while ( my ( $class, $info ) = each %classes ) {
         next if $info->{flags}->{noinit};

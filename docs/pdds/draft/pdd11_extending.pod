@@ -50,11 +50,11 @@ result in Parrot throwing an exception.
 
 =item C<Parrot_PMC_get_string(interp, pmc)>
 
-Returns a Parrot_STRING that represents the string value of the PMC.
+Returns a Parrot_String that represents the string value of the PMC.
 
 =item C<Parrot_PMC_get_string_intkey(interp, pmc, Parrot_Int key)>
 
-Keyed version of C<Parrot_PMC_get_string>. Returns a Parrot_STRING 
+Keyed version of C<Parrot_PMC_get_string>. Returns a Parrot_String
 representing the string value of whatever is stored at the element of the  PMC
 indexed by C<key>.
 
@@ -125,14 +125,14 @@ C<key>. Stores the length of the string in C<len>.
 Returns the PMC stored at the element of the passed-in PMC that is  indexed by
 C<key>.
 
-=item C<Parrot_PMC_set_string(interp, pmc, Parrot_STRING value)>
+=item C<Parrot_PMC_set_string(interp, pmc, Parrot_String value)>
 
-Assign the passed-in Parrot_STRING to the passed-in PMC.
+Assign the passed-in Parrot_String to the passed-in PMC.
 
-=item C<Parrot_PMC_set_string_intkey(interp, 
-pmc, Parrot_STRING value, Parrot_Int key)>
+=item C<Parrot_PMC_set_string_intkey(interp,
+pmc, Parrot_String value, Parrot_Int key)>
 
-Keyed version of C<Parrot_PMC_set_string>. Assigns C<value> to the PMC stored 
+Keyed version of C<Parrot_PMC_set_string>. Assigns C<value> to the PMC stored
 at element <key> of the passed-in PMC.
 
 =item C<Parrot_PMC_set_pointer(interp, pmc, void *value)>
@@ -141,7 +141,7 @@ Assign the passed-in pointer to the passed-in PMC.
 
 =item C<Parrot_PMC_set_pointer_intkey(interp, pmc, void *value, Parrot_Int key)>
 
-Keyed version of C<Parrot_PMC_set_pointer>. Assigns C<value> to the PMC stored 
+Keyed version of C<Parrot_PMC_set_pointer>. Assigns C<value> to the PMC stored
 at element <key> of the passed-in PMC.
 
 =item C<Parrot_PMC_set_pmc_intkey(interp, pmc, Parrot_PMC value,
@@ -153,62 +153,62 @@ Assigns C<value> to the PMC stored at element <key> of the passed-in PMC.
 
 Assign the passed-in Parrot integer to the passed-in PMC.
 
-=item C<Parrot_PMC_set_intval_intkey(interp, 
+=item C<Parrot_PMC_set_intval_intkey(interp,
 pmc, Parrot_Int value, Parrot_Int key)>
 
-Keyed version of C<Parrot_PMC_set_intval>. Assigns C<value> to the PMC stored 
+Keyed version of C<Parrot_PMC_set_intval>. Assigns C<value> to the PMC stored
 at element <key> of the passed-in PMC.
 
 =item C<Parrot_PMC_set_numval(interp, pmc, Parrot_Float value)>
 
 Assign the passed-in Parrot number to the passed-in PMC.
 
-=item C<Parrot_PMC_set_numval_intkey(interp, 
+=item C<Parrot_PMC_set_numval_intkey(interp,
 pmc, Parrot_Float value, Parrot_Int key)>
 
-Keyed version of C<Parrot_PMC_set_numval>. Assigns C<value> to the PMC stored 
+Keyed version of C<Parrot_PMC_set_numval>. Assigns C<value> to the PMC stored
 at element <key> of the passed-in PMC.
 
 =item C<Parrot_PMC_set_cstring(interp, pmc, const char *value)>
 
-Convert the passed-in null-terminated C string to a Parrot_STRING and assign it
+Convert the passed-in null-terminated C string to a Parrot_String and assign it
 to the passed-in PMC.
 
-=item C<Parrot_PMC_set_cstring_intkey(interp, 
+=item C<Parrot_PMC_set_cstring_intkey(interp,
 pmc, const char *value, Parrot_Int key)>
 
-Keyed version of C<Parrot_PMC_set_cstring>. Converts C<value> to a 
-Parrot_STRING and assigns it to the PMC stored at element <key> of the 
+Keyed version of C<Parrot_PMC_set_cstring>. Converts C<value> to a
+Parrot_String and assigns it to the PMC stored at element <key> of the
 passed-in PMC.
 
-=item C<Parrot_PMC_set_cstringn(interp, 
+=item C<Parrot_PMC_set_cstringn(interp,
 pmc, const char *value, Parrot_Int length)>
 
-Convert the passed-in null-terminated C string to a Parrot_STRING of length
+Convert the passed-in null-terminated C string to a Parrot_String of length
 C<length> and assign it to the passed-in PMC. If C<value> is longer than
 C<length>, then only the first C<length> characters will be converted. If
-C<value> is shorter than C<length>, then the extra characters in the 
-Parrot_STRING should be assumed to contain garbage.
+C<value> is shorter than C<length>, then the extra characters in the
+Parrot_String should be assumed to contain garbage.
 
-=item C<Parrot_PMC_set_cstringn_intkey(interp, 
+=item C<Parrot_PMC_set_cstringn_intkey(interp,
 pmc, const char *value, Parrot_int length, Parrot_Int key)>
 
 Keyed version of C<Parrot_PMC_set_cstringn>. Converts the first C<length>
-characters of C<value> to a Parrot_STRING and assigns the resulting string to
+characters of C<value> to a Parrot_String and assigns the resulting string to
 the PMC stored at element <key> of the passed-in PMC.
 
 =back
 
 =head2 Creation and destruction
 
-Functions used to create and destroy PMCs, Parrot_STRINGs, etc.
+Functions used to create and destroy PMCs, Parrot_Strings, etc.
 
 =over 4
 
 =item C<Parrot_PMC_new(interp, Parrot_Int typenum)>
 
-Creates and returns a new PMC. C<typenum> is an integer identifier that 
-specifies the type of PMC required. The C<typenum> corresponding to a 
+Creates and returns a new PMC. C<typenum> is an integer identifier that
+specifies the type of PMC required. The C<typenum> corresponding to a
 particular PMC class name can be found using C<Parrot_PMC_typenum>.
 
 =item C<Parrot_PMC_typenum(interp, const char* class)>
@@ -220,8 +220,8 @@ C<class>.
 
 Returns the special C<NULL> PMC.
 
-=item C<Parrot_new_string(interp, 
-char *buffer, int length, Parrot_Encoding encoding, 
+=item C<Parrot_new_string(interp,
+char *buffer, int length, Parrot_Encoding encoding,
 Parrot_CharType charset, Parrot_Language language, Parrot_Int flags)>
 
 Create a new Parrot string from a passed-in buffer. If the C<encoding>,
@@ -280,8 +280,8 @@ Calls a Parrot subroutine, with C<argcount> PMC parameters. This function sets
 up Parrot's registers in line with the Parrot calling conventions; see
 L<pdd03_calling_conventions.pod> for more details.
 
-=item C<Parrot_call_method(interp, 
-Parrot_PMC sub, Parrot_STRING method, Parrot_Int argcount, ...)>
+=item C<Parrot_call_method(interp,
+Parrot_PMC sub, Parrot_String method, Parrot_Int argcount, ...)>
 
 Calls a Parrot method named C<method> with C<argcount> PMC parameters. NB. This
 is not yet implemented and may change.
@@ -338,12 +338,12 @@ F<docs/glossary.pod>
 
 =head2 CURRENT
 
-    Maintainer: 
+    Maintainer:
     Class: Internals
     PDD Number: 11
     Version: 1.0
     Status: Developing
-    Last Modified: February 20, 2004 
+    Last Modified: February 20, 2004
     PDD Format: 1
     Language: English
 

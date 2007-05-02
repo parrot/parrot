@@ -100,7 +100,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot_new_string" );
 int
 main(int argc, char* argv[]) {
     Parrot_Interp interp;
-    Parrot_STRING output;
+    Parrot_String output;
 
     /* Interpreter set-up */
     interp = Parrot_new(NULL);
@@ -127,7 +127,7 @@ int
 main(int argc, char* argv[]) {
     Parrot_Interp interp;
     Parrot_Int parrot_reg;
-    Parrot_STRING value, new_value;
+    Parrot_String value, new_value;
 
     /* Interpreter set-up */
     interp = Parrot_new(NULL);
@@ -298,7 +298,7 @@ int
 main(int argc, char* argv[]) {
     Parrot_Interp interp;
     Parrot_Int type;
-    Parrot_STRING value, new_value;
+    Parrot_String value, new_value;
     Parrot_PMC testpmc;
 
     /* Interpreter set-up */

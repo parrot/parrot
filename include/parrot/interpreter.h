@@ -104,9 +104,14 @@ typedef enum {
 
 struct parrot_interp_t;
 
-typedef struct parrot_interp_t *Parrot_Interp;
-
 #if defined(PARROT_IN_CORE)
+
+#define Parrot_String   STRING *
+#define Parrot_PMC      PMC *
+#define Parrot_Language Parrot_Int
+#define Parrot_Vtable struct _vtable*
+
+typedef struct parrot_interp_t *Parrot_Interp;
 
 typedef Parrot_Interp_flag Interp_flags;
 typedef Parrot_Run_core_t Run_Cores;
@@ -545,6 +550,9 @@ PARROT_API void Parrot_mark_method_writes(Interp *, int type, const char *name);
 void Parrot_setup_event_func_ptrs(Parrot_Interp interp);
 
 #else
+
+struct Parrot_Interp_;
+typedef struct Parrot_Interp_ *Parrot_Interp;
 
 typedef void * *(*native_func_t)(Parrot_Interp interp,
                                  void *cur_opcode,
