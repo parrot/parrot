@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -48,13 +48,12 @@ use Test::Harness();
 my $language = 'lua';
 
 my $opt_files;
-my ($use_orig_lua, $use_monkey, $use_lua2pir, $use_testlex);
+my ($use_orig_lua, $use_monkey, $use_lua2pir);
 GetOptions(
     'files' => \$opt_files,
     'use-lua' => \$use_orig_lua,
     'use-monkey' => \$use_monkey,
     'use-lua2pir' => \$use_lua2pir,
-    'use-testlex' => \$use_testlex,
 );
 
 if ( $opt_files ) {
@@ -102,9 +101,6 @@ else {
     }
     elsif ($use_lua2pir) {
         $ENV{PARROT_LUA_TEST_PROG} = 'lua2pir';
-    }
-    elsif ($use_testlex) {
-        $ENV{PARROT_LUA_TEST_PROG} = 'test_lex';
     }
     else {
         $ENV{PARROT_LUA_TEST_PROG} = q{};

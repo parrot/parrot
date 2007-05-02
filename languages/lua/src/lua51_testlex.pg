@@ -30,6 +30,30 @@ rule token {
         | <punctuator>
 }
 
+token keyword {
+        | and
+        | break
+        | do
+        | elseif
+        | else
+        | end
+        | false
+        | for
+        | function
+        | if
+        | in
+        | local
+        | nil
+        | not
+        | or
+        | repeat
+        | return
+        | then
+        | true
+        | until
+        | while
+}
+
 token punctuator {
         | \+
         | \-

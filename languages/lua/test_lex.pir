@@ -34,8 +34,6 @@ C<test_lex> is a dumper for Lua 5.1 lexicography.
     # import Lua::Grammar::* into Lua::TestLex
     $P0 = get_hll_global ['Lua::Grammar'], 'name'
     set_hll_global ['Lua::TestLex'], 'Name', $P0
-    $P0 = get_hll_global ['Lua::Grammar'], 'keyword'
-    set_hll_global ['Lua::TestLex'], 'keyword', $P0
     $P0 = get_hll_global ['Lua::Grammar'], 'string'
     set_hll_global ['Lua::TestLex'], 'String', $P0
     $P0 = get_hll_global ['Lua::Grammar'], 'number'

@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 package Parrot::Test::Lua;
@@ -72,11 +72,6 @@ foreach my $func ( keys %language_test_map ) {
                 "luac languages/${lang_fn}",
                 "l2p -o languages/${pir_fn} > nul",
                 "$self->{parrot} languages/${pir_fn}",
-            );
-        }
-        elsif ( $lua_test eq 'test_lex' ) {
-            @test_prog = (
-                "$self->{parrot} languages/lua/test_lex.pir languages/${lang_fn}",
             );
         }
         else {

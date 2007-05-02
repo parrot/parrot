@@ -121,6 +121,62 @@ Some grammar routines are handly written in PIR.
 .end
 
 
+=item C<name>
+
+ident but not keywords
+
+=cut
+
+.sub 'name'
+    .param pmc mob
+    .param pmc params :slurpy
+
+    $P0 = get_hll_global ['PGE::Match'], 'ident'
+    mob = $P0(mob)
+
+    unless mob goto L1
+    .local pmc kw
+    kw = get_hll_global 'keyword'
+    unless null kw goto L2
+    kw = _const_keyword()
+    set_hll_global 'keyword', kw
+L2:
+    $S0 = mob.'text'()
+    $I0 = exists kw[$S0]
+    unless $I0 goto L1
+    mob.'next'()
+L1:
+    .return (mob)
+.end
+
+.sub _const_keyword :anon
+    .local pmc kw
+    new kw, .Hash
+    kw['and'] = 1
+    kw['break'] = 1
+    kw['do'] = 1
+    kw['else'] = 1
+    kw['elseif'] = 1
+    kw['end'] = 1
+    kw['false'] = 1
+    kw['for'] = 1
+    kw['function'] = 1
+    kw['if'] = 1
+    kw['in'] = 1
+    kw['local'] = 1
+    kw['nil'] = 1
+    kw['not'] = 1
+    kw['or'] = 1
+    kw['repeat'] = 1
+    kw['return'] = 1
+    kw['then'] = 1
+    kw['true'] = 1
+    kw['until'] = 1
+    kw['while'] = 1
+    .return (kw)
+.end
+
+
 =item C<quoted_literal>
 
 =cut

@@ -56,12 +56,6 @@ L6:
     tree.get('past', $P1, 'Lua::TestLex::keyword')
 
 L7:
-    $I0 = defined $P0['ws']
-    unless $I0 goto L8
-    $P1 = $P0['ws']
-    tree.get('past', $P1, 'Lua::TestLex::ws')
-
-L8:
     goto L1
 L2:
     .return (node)
@@ -107,10 +101,6 @@ transform past (Lua::TestLex::Number) :language('PIR') {
     print "Number:\t"
     print node
     print "\n"
-}
-
-transform past (Lua::TestLex::ws) :language('PIR') {
-    print "ws\n"
 }
 
 =head1 AUTHOR
