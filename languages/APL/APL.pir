@@ -9,8 +9,8 @@ Run from the command line:
     $ parrot APL.pbc file.apl                      # execute stmts in file.apl
     $ parrot APL.pbc                               # interactive mode
 
-    $ parrot APL.pbc --target=paarse [file.apl]    # display parse tree
-    $ parrot APL.pbc --target=PAST [file.apl]      # display AST
+    $ parrot APL.pbc --target=parse [file.apl]     # display parse tree
+    $ parrot APL.pbc --target=PAST  [file.apl]     # display AST
 
 Run from another Parrot program:
 
