@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 59;
+use Parrot::Test tests => 60;
 use Parrot::Config;
 
 =head1 NAME
@@ -1648,6 +1648,22 @@ pir_output_is( <<"CODE", <<'OUTPUT', 'del_var()' );
 .namespace [ 'Parent'; 'Child' ]
 
 CODE
+OUTPUT
+
+pir_output_like( <<'CODE', <<'OUTPUT', 'overriding find_method()' );
+.sub 'main' :main
+    $P0 = newclass 'Override'
+    $P1 = new 'Override'
+    $P2 = find_method $P1, 'foo'
+.end
+
+.namespace [ 'Override' ]
+
+.sub 'find_method' :vtable
+    say "Finding method"
+.end
+CODE
+/Finding method/
 OUTPUT
 
 # Local Variables:
