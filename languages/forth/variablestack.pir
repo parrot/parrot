@@ -10,7 +10,7 @@
     addattribute class, '$next'
 .end
 
-.sub __init :method
+.sub init :vtable :method
     .local pmc stack, cell
     stack = new .ResizableIntegerArray
     cell  = new .Integer
@@ -20,7 +20,7 @@
     setattribute self, '$next',  cell
 .end
 
-.sub __get_integer :method
+.sub get_integer :vtable :method
     .local pmc next
     next = getattribute self, '$next'
     $I0  = next
@@ -28,7 +28,7 @@
     .return($I0)
 .end
 
-.sub __get_pmc_keyed_int :method
+.sub get_pmc_keyed_int :vtable :method
     .param int key
     .local pmc stack
     stack = getattribute self, '@stack'
@@ -37,7 +37,7 @@
     .return($P0)
 .end
 
-.sub __set_pmc_keyed_int :method
+.sub set_pmc_keyed_int :vtable :method
     .param int key
     .param pmc value
 

@@ -31,7 +31,7 @@
 .end
 
 
-.sub '__get_bool' :method
+.sub 'get_bool' :vtable :method
     .local string code
     .local pmc pos
     pos  = getattribute self, '$pos'
@@ -53,7 +53,7 @@ false:
     .return(0)
 .end
 
-.sub '__shift_pmc' :method
+.sub 'shift_pmc' :vtable :method
     .local pmc token, pos
     .local string code, str
     null token

@@ -185,7 +185,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "vanishing return continuation in method call
 .end
 
 .namespace ["Foo"]
-.sub __init :method
+.sub init :vtable :method
     print "init\n"
     sweep 1
     new P6, .String

@@ -98,7 +98,7 @@ Creates the Specs and notOptStop attribute, interal stuff.
 
 =cut
 
-.sub __init :method
+.sub init :vtable :method
     $P0 = new .ResizablePMCArray
     setattribute self, "Specs", $P0
     $P0 = new .Boolean
@@ -375,7 +375,7 @@ A long option of "foo" is set to C<.String>, with "optarg" set to a true value.
 
 =cut
 
-.sub "__push_string" :method
+.sub "push_string" :vtable :method
     .param string format
     .local string key, type, long, short
     $P0 = self."add"()
@@ -570,7 +570,7 @@ Set the defaults to all our attributes, more internal stuff.  Sets the default
 
 =cut
 
-.sub __init :method
+.sub init :vtable :method
     $P0 = new .String
     $P0 = ''
     setattribute self, "name", $P0

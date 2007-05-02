@@ -43,7 +43,7 @@ END:
 
 .namespace ["Stream::Lines"]
 
-.sub __init :method
+.sub init :vtable :method
     .local pmc temp
 
     classoffset $I0, self, "Stream::Lines"

@@ -36,7 +36,7 @@ version until the Capture PMC is working properly.
 .end
 
 
-.sub '__push_pmc' :method
+.sub 'push_pmc' :vtable :method
     .param pmc val
     $P0 = self.'get_array'()
     push $P0, val
@@ -44,7 +44,7 @@ version until the Capture PMC is working properly.
 .end
 
 
-.sub '__get_string_keyed_int' :method
+.sub 'get_string_keyed_int' :vtable :method
     .param int key
     $S0 = ''
     $P0 = getattribute self, '@!array'
@@ -55,7 +55,7 @@ version until the Capture PMC is working properly.
 .end
 
 
-.sub '__get_pmc_keyed_int' :method
+.sub 'get_pmc_keyed_int' :vtable :method
     .param int key
     $P0 = getattribute self, '@!array'
     if null $P0 goto end
@@ -65,7 +65,7 @@ version until the Capture PMC is working properly.
 .end
 
 
-.sub '__set_pmc_keyed_int' :method
+.sub 'set_pmc_keyed_int' :vtable :method
     .param int key
     .param pmc val
     $P0 = self.'get_array'()

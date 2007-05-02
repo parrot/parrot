@@ -118,7 +118,7 @@ is none and 255 is the maximum possible.
 	.return()
 .end
 
-.sub __get_integer :method
+.sub get_integer :vtable :method
 	.local pmc color
 	color = self.'color'()
 

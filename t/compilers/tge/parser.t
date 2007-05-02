@@ -46,8 +46,7 @@ GRAMMAR
     print "matched start rule\n"
 
     # Verify the match
-    $I0 = match.__get_bool()
-    unless $I0 goto match_fail           # if match fails stop
+    unless match goto match_fail           # if match fails stop
     print "parse succeeded\n"
     goto cleanup
 

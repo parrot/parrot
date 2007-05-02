@@ -98,12 +98,12 @@ Object initializer. Takes a C<PGconn> structure.
 
 =cut
 
-.sub __init_pmc :method
+.sub init_pmc :vtable :method
     .param pmc con
     setattribute self, 'con', con
 .end
 
-.sub __get_bool :method
+.sub get_bool :vtable :method
     .local pmc con
     con = getattribute self, 'con'
     $I0 = typeof con
@@ -301,7 +301,7 @@ Object initializer. Takes a C<PGresult> structure.
 
 =cut
 
-.sub __init_pmc :method
+.sub init_pmc :vtable :method
     .param pmc res
     setattribute self, 'res', res
     need_finalize self

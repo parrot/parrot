@@ -229,7 +229,7 @@ vers_ok:
 
 .namespace ["ZComp"]
 
-.sub "__init" :method
+.sub "init" :vtable :method
   $P0 = new Hash
   setattribute self, "ZComp\0labels", $P0
   $P0 = new Hash

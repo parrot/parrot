@@ -72,7 +72,7 @@ Initializes a new C<PAST::Node> object.
 
 =cut
 
-.sub __init :method
+.sub init :vtable :method
     $P0 = new .String
     $P1 = new .Integer
     $P2 = new .ResizablePMCArray

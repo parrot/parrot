@@ -365,14 +365,14 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUT', "latin1 namespace, global" );
 .namespace [ iso-8859-1:"François" ]
 
-.sub '__init'
+.sub 'test'
     print "latin1 namespaces are fun\n"
 .end
 
 .namespace
 
 .sub 'main' :main
-    $P0 = find_global iso-8859-1:"François", '__init'
+    $P0 = find_global iso-8859-1:"François", 'test'
     $P0()
 .end
 CODE
@@ -382,14 +382,14 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "unicode namespace, global" );
 .namespace [ unicode:"Fran\xe7ois" ]
 
-.sub '__init'
+.sub 'test'
     print "unicode namespaces are fun\n"
 .end
 
 .namespace
 
 .sub 'main' :main
-    $P0 = find_global unicode:"Fran\xe7ois", '__init'
+    $P0 = find_global unicode:"Fran\xe7ois", 'test'
     $P0()
 .end
 CODE

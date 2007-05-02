@@ -74,7 +74,7 @@ This module defines the following public functions:
 	addattribute tbto_class, 'diagnostics'
 .end
 
-.sub __init :method
+.sub init :vtable :method
 	.local int offset
 	classoffset offset, self, 'Test::Builder::Tester::Output'
 

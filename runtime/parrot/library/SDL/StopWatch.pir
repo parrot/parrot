@@ -58,7 +58,7 @@ The stopwatch will be drawn onto the specified screen.
 
 =cut
 
-.sub __init :method
+.sub init :vtable :method
     .param pmc screen
 
     $I0 = classoffset self, 'SDL::StopWatch'

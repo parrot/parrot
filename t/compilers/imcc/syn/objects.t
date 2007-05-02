@@ -135,17 +135,17 @@ pir_output_is( <<'CODE', <<'OUT', "initializer" );
 .end
 
 .namespace ["Foo"]
-.sub __init :method
+.sub init :vtable :method
     print "foo_init\n"
 .end
 
 .namespace ["Bar"]
-.sub __init :method
+.sub init :vtable :method
     print "bar_init\n"
 .end
 
 .namespace ["Baz"]
-.sub __init :method
+.sub init :vtable :method
     print "baz_init\n"
 .end
 

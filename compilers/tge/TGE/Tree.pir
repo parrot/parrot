@@ -37,7 +37,7 @@ constructor parameters.
 
 =cut
 
-.sub __init :method
+.sub init :vtable :method
     $P0 = new .Hash
     $P1 = new .Hash
     $P2 = new .Undef

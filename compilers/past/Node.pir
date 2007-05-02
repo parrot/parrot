@@ -20,7 +20,7 @@ All PAST and POST nodes subclass from this base type.
 .end
 
 
-.sub __init :method
+.sub init :vtable :method
     $P1 = new .Undef
     $P2 = new .Integer
     $P3 = new .ResizablePMCArray
@@ -125,13 +125,13 @@ it:
 
 =cut
 
-.sub '__elements' :method
+.sub 'elements' :vtable :method
     $P1 = getattribute self, 'children'
     $I1 = elements $P1
     .return ($I1)
 .end
 
-.sub '__get_bool' :method
+.sub 'get_bool' :vtable :method
 	.return( 1 )
 .end
 
@@ -145,14 +145,14 @@ the node object.
 
 =cut
 
-.sub '__get_pmc_keyed_int' :method
+.sub 'get_pmc_keyed_int' :vtable :method
     .param int key
     $P0 = getattribute self, 'children'
     $P0 = $P0[key]
     .return ($P0)
 .end
 
-.sub '__set_pmc_keyed_int' :method
+.sub 'set_pmc_keyed_int' :vtable :method
     .param int key
     .param pmc val
     $P0 = getattribute self, 'children'

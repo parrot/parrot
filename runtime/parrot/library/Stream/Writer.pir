@@ -77,7 +77,7 @@ END:
     status = 0
 .end
 
-.sub __init :method
+.sub init :vtable :method
     .local pmc status
 
     new status, .Integer
@@ -87,7 +87,7 @@ END:
     setattribute self, $I0, status
 .end
 
-.sub __set_pmc :method
+.sub set_pmc :vtable :method
     .param pmc source
     .local pmc status
 

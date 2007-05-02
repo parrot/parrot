@@ -42,7 +42,7 @@ by C<attrname> based on C<has_value>.
 
 .include 'cclass.pasm'
 
-.sub '__init' :method
+.sub 'init' :vtable :method
     $P0 = split ' ', 'parse past post pir run'
     setattribute self, '@stages', $P0
 .end

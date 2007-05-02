@@ -62,7 +62,7 @@ END:
 
 =cut
 
-.sub __init :method
+.sub init :vtable :method
     .local pmc temp
 
     classoffset $I0, self, "Stream::Replay"
@@ -78,7 +78,7 @@ END:
 
 =cut
 
-.sub __set_pmc :method
+.sub set_pmc :vtable :method
     .param pmc val
     .local pmc buffer
     
@@ -152,7 +152,7 @@ END:
 
 =cut
 
-.sub __clone :method
+.sub clone :vtable :method
     .local pmc ret
     .local pmc temp
 
@@ -172,7 +172,7 @@ END:
 
 .namespace ["Stream::Replay::Buffer"]
 
-.sub __init :method
+.sub init :vtable :method
     .local pmc temp
     
     classoffset $I0, self, "Stream::Replay::Buffer"

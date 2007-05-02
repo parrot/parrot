@@ -41,7 +41,7 @@ END:
 
 .namespace ["Stream::ParrotIO"]
 
-.sub __init :method
+.sub init :vtable :method
     self."blockSize"( 50 )
 .end
 

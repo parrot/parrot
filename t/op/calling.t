@@ -999,7 +999,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing" );
     print " "
     print s
 .end
-.sub __get_string :method
+.sub get_string :vtable :method
     $S0 = typeof self
     .return ($S0)
 .end
@@ -1022,13 +1022,13 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing - 2" );
     print $S0
 .end
 .namespace ["Foo"]
-.sub __get_string :method
+.sub get_string :vtable :method
     $S0 = typeof self
     print $S0
     print " "
     .return ("ok 1\n")
 .end
-.sub __get_string_keyed_int :method
+.sub get_string_keyed_int :vtable :method
     .param int key
     $S0 = "ok "
     $S1 = key
@@ -1055,7 +1055,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing - 3" );
     .return (arg) # force conversion to string
 .end
 .namespace ["Foo"]
-.sub __get_string :method
+.sub get_string :vtable :method
     $S0 = typeof self
     print $S0
     print " "
@@ -1422,7 +1422,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "clone_key_arg" );
 # values because in the called sub frame the original refered
 # registers just don't exist              #' for vim
 
-.sub __set_integer_keyed :method
+.sub set_integer_keyed :vtable :method
     .param pmc key
     .param int val
     print key             # print first key
@@ -1681,7 +1681,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "call evaled vtable code" );
     .local pmc cl, o
     cl = newclass "Foo"
     s  = ".namespace ['Foo']\n"
-    s .= ".sub __get_integer_keyed_int :method\n"
+    s .= ".sub get_integer_keyed_int :vtable :method\n"
     s .= ".param int i\n"
     s .= "i += 5\n"
     s .= ".return(i)\n"

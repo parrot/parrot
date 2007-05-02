@@ -93,7 +93,7 @@ the same state.
 .sub __fake_init :method
 .end
 
-.sub __init :method
+.sub init :vtable :method
 	.local pmc args
 	.local pmc output
 	.local pmc testplan
@@ -104,7 +104,7 @@ the same state.
 	self.'_assign_args'( output, testplan, results )
 .end
 
-.sub __init_pmc :method
+.sub init_pmc :vtable :method
     .param pmc args
 	.local pmc output
 	.local pmc testplan

@@ -72,7 +72,7 @@ Adds (or replaces) a syntactic category's defaults.
 .end
 
 
-.sub "__init" :method
+.sub "init" :vtable :method
     .local pmc tokentable, keytable, klentable
     tokentable = self
     keytable = new .Hash

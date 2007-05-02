@@ -41,7 +41,7 @@ TBD
 END:
 .end
 
-.sub __init :method
+.sub init :vtable :method
     .local pmc close
 
     # call our own close
@@ -53,7 +53,7 @@ END:
 
 =cut
 
-.sub __set_pmc :method
+.sub set_pmc :vtable :method
     .param pmc source
 
     classoffset $I0, self, "Stream::Base"

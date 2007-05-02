@@ -54,7 +54,7 @@ END:
 
 .namespace ["Stream::Combiner"]
 
-.sub __init :method
+.sub init :vtable :method
 
     .const .Sub temp = "_default_combiner"
     self."combiner"( temp )
@@ -92,7 +92,7 @@ You can call assign several times to assign several sources to the stream.
 
 =cut
 
-.sub __set_pmc :method
+.sub set_pmc :vtable :method
     .param pmc arg
     .local pmc source
 

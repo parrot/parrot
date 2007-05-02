@@ -379,7 +379,7 @@ Returns 1 if this object successfully matched the target string,
 
 =cut
 
-.sub '__get_bool' :method
+.sub 'get_bool' :vtable :method
     $P1 = getattribute self, '$.pos'
     $I0 = $P1
     $I1 = isge $I0, 0
@@ -392,7 +392,7 @@ Returns the integer value of this match.
 
 =cut
 
-.sub '__get_integer' :method
+.sub 'get_integer' :vtable :method
     $I0 = self.'result_object'()
     .return ($I0)
 .end
@@ -403,7 +403,7 @@ Returns the numeric value of this match.
 
 =cut
 
-.sub '__get_number' :method
+.sub 'get_number' :vtable :method
     $N0 = self.'result_object'()
     .return ($N0)
 .end
@@ -414,7 +414,7 @@ Returns the portion of the target string matched by this object.
 
 =cut
 
-.sub '__get_string' :method
+.sub 'get_string' :vtable :method
     $S0 = self.'result_object'()
     .return ($S0)
 .end
@@ -427,7 +427,7 @@ matches, a space seperated list of matches is returned.
 
 =cut
 
-.sub '__get_string_keyed_int' :method
+.sub 'get_string_keyed_int' :vtable :method
 	.param int key
     $P0 = getattribute self, '@!capt'
 	$S0 = ''
@@ -446,7 +446,7 @@ objects depending on the rule.
 
 =cut
 
-.sub '__get_pmc_keyed_int' :method
+.sub 'get_pmc_keyed_int' :vtable :method
     .param int key
     $P0 = getattribute self, '@!capt'
     if_null $P0, get_1
@@ -455,7 +455,7 @@ objects depending on the rule.
     .return ($P0)
 .end
 
-.sub '__set_pmc_keyed_int' :method
+.sub 'set_pmc_keyed_int' :vtable :method
     .param int key
     .param pmc val
     .local pmc capt
@@ -467,14 +467,14 @@ objects depending on the rule.
     capt[key] = val
 .end
 
-.sub '__delete_keyed_int' :method
+.sub 'delete_keyed_int' :vtable :method
     .param int key
     .local pmc capt
     capt = getattribute self, '@!capt'
     delete capt[key]
 .end
 
-.sub '__defined_keyed_int' :method
+.sub 'defined_keyed_int' :vtable :method
     .param int key
     .local pmc capt
     $I0 = 0
@@ -485,7 +485,7 @@ objects depending on the rule.
     .return ($I0)
 .end
 
-.sub '__push_pmc' :method
+.sub 'push_pmc' :vtable :method
     .param pmc val
     .local pmc capt
     capt = getattribute self, '@!capt'

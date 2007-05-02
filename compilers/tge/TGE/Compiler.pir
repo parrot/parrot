@@ -33,8 +33,7 @@ structure.
     start_rule = find_global "TGE::Parser", "start"
     match = start_rule(source, 'grammar'=>'TGE::Parser')
     # Verify the parse
-    $I0 = match.__get_bool()
-    unless $I0 goto err_parse    # if parse fails, stop
+    unless match goto err_parse    # if parse fails, stop
 #        say 'parse succeeded'
 #        say 'Match tree dump:'
 #        load_bytecode "dumper.pbc"
@@ -55,7 +54,7 @@ structure.
     end
 .end
 
-.sub __init :method
+.sub init :vtable :method
     self.add_rule("ROOT",       "result", ".", "ROOT_result")
     self.add_rule("statements", "result", ".", "statements_result")
     self.add_rule("statement",  "result", ".", "statement_result")
@@ -315,7 +314,7 @@ loop_start:
           goto loop_start
 loop_end:
 
-    outstring .= "\n.sub __init :method\n"
+    outstring .= "\n.sub init :vtable :method\n"
     outstring .= header_string
     outstring .= "\n.end\n"
 

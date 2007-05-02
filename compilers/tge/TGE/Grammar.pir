@@ -32,7 +32,7 @@ of TGE::Rule objects, which are the semantics defined by the grammar.
 
 =cut
 
-.sub __init :method
+.sub init :vtable :method
     $P1 = new .ResizablePMCArray
     setattribute self, 'rules', $P1
     $P2 = new .Hash

@@ -548,12 +548,12 @@ catch:
 .namespace ['Foo']
 
 .sub load
-        $P0 = newclass 'Foo'
+    $P0 = newclass 'Foo'
 .end
 
-.sub __get_string :method
-        $P0 = new .Exception
-        throw $P0
+.sub get_string :vtable :method
+    $P0 = new .Exception
+    throw $P0
 .end
 CODE
 caught

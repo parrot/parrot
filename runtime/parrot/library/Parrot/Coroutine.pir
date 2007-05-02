@@ -120,7 +120,7 @@ Given a sub, it initializes a new C<Parrot::Coroutine> object.
 
 =cut
 
-.sub __init_pmc :method
+.sub init_pmc :vtable :method
 	.param pmc sub
 
 	## [should complain if sub is not a sub or closure.  -- rgr, 8-Oct-06.]
@@ -132,7 +132,7 @@ Given a sub, it initializes a new C<Parrot::Coroutine> object.
 .end
 
 ## [it would be nice to include a pointer value.  -- rgr, 8-Oct-06.]
-.sub __get_string :method
+.sub get_string :vtable :method
 	$S0 = '<Parrot::Coroutine ?>'
 	.return ($S0)
 .end

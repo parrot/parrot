@@ -121,7 +121,7 @@ Redirect to and serve files from F<docs/html>.
 
 =cut
 
-.sub __init :method
+.sub init_pmc :vtable :method
     .param pmc args
 
     .local pmc active
@@ -216,7 +216,7 @@ initialization went ok.
 
 =cut
 
-.sub '__get_bool' :method
+.sub 'get_bool' :vtable :method
     $P0 = getattribute self, 'socket'
     $I0 = istrue $P0
     .return ($I0)
@@ -506,13 +506,13 @@ A class abstracting client connections.
 
 =over
 
-=item __init(pio)
+=item init_pmc(pio)
 
 Create a new connection object with the given socket pio.
 
 =cut
 
-.sub __init :method
+.sub init_pmc :vtable :method
     .param pmc sock
     setattribute self, 'socket', sock
     $P0 = new .Boolean
@@ -928,7 +928,7 @@ attributes of the Message object.
 
 =cut
 
-.sub __init :method
+.sub init :vtable :method
     $P0 = new .OrderedHash
     setattribute self, 'headers', $P0
     $P0 = new .String
@@ -1033,7 +1033,7 @@ no_get:
     .return ('')
 .end
 
-.sub __get_bool :method
+.sub get_bool :vtable :method
     .local pmc hdrs
     hdrs = self.'headers'()
     $I0 = elements hdrs

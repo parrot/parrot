@@ -9,32 +9,32 @@
     addattribute class, '@cstack'
 .end
 
-.sub __init :method
+.sub init :vtable :method
     .local pmc cstack
     cstack = new .ResizableStringArray
     setattribute self, '@cstack', cstack
 .end
 
-.sub __elements :method
+.sub elements :vtable :method
     $P0 = getattribute self, '@cstack'
     $I0 = elements $P0
     .return($I0)
 .end
 
-.sub __get_bool :method
+.sub get_bool :vtable :method
     $P0 = getattribute self, '@cstack'
     $I0 = elements $P0
     .return($I0)
 .end
 
-.sub __get_string_keyed_int :method
+.sub get_string_keyed_int :vtable :method
     .param int key
     $P0 = getattribute self, '@cstack'
     $S0 = $P0[key]
     .return($S0)
 .end
 
-.sub __pop_string :method
+.sub pop_string :vtable :method
     .local pmc cstack
     cstack = getattribute self, '@cstack'
 
@@ -48,7 +48,7 @@ rstack:
     .return("pop stack")
 .end
 
-.sub __push_string :method
+.sub push_string :vtable :method
     .param string elem
 
     .local pmc cstack

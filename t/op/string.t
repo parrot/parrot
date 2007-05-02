@@ -2653,7 +2653,7 @@ a
 a--b
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'join: __get_string returns a null string' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'join: get_string returns a null string' );
 
 .sub _main
     newclass P0, "Foo"
@@ -2675,7 +2675,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'join: __get_string returns a null string' 
 
 .namespace ["Foo"]
 
-.sub __get_string :method
+.sub get_string :vtable :method
     .local string ret
 
     null ret
