@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -87,13 +87,15 @@ Opens the file with the given mode, using the given IO layer.
                 if (!strcmp(l->name, "buf"))
                     l = l->down;
                 /* XXX layer is stored twice - which is used when */
-                io->stack = PMC_struct_val(pio) = l;
+                io->stack           = l;
+                PMC_struct_val(pio) = l;
                 /* push the layer */
                 PIO_push_layer_str(INTERP, pio, layer);
             }
             else {
                 l = interp->piodata->default_stack;
-                io->stack = PMC_struct_val(pio) = l;
+                io->stack           = l;
+                PMC_struct_val(pio) = l;
             }
         }
         /* XXX leaks as in ops/io.ops: open */

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -287,14 +287,16 @@ C<complex> object according to 2.1. Built-in Functions.
 =cut
 
 */
-    opcode_t* invoke(void* next) {
+    opcode_t* invoke(void *next) {
         int argcP = REG_INT(3);
-        PMC *res = pmc_new(INTERP, enum_class_Complex);
+        PMC *res  = pmc_new(INTERP, enum_class_Complex);
+
         if (argcP == 1) {
-            PMC *arg = REG_PMC(5);
-            if (arg->vtable->base_type == enum_class_String) {
+            PMC *arg;
+            arg = REG_PMC(5);
+
+            if (arg->vtable->base_type == enum_class_String)
                 VTABLE_set_string_native(INTERP, res, PMC_str_val(arg));
-            }
             else
                 RE(res) = VTABLE_get_number(INTERP, arg);
         }
@@ -302,8 +304,9 @@ C<complex> object according to 2.1. Built-in Functions.
             RE(res) = VTABLE_get_number(INTERP, REG_PMC(5));
             IM(res) = VTABLE_get_number(INTERP, REG_PMC(6));
         }
+
         REG_PMC(5) = res;
-        return next;
+        return (opcode_t *)next;
     }
 
 /*

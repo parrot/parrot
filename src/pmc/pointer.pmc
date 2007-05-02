@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -128,14 +128,14 @@ Returns the pointer value as a Parrot string.
 */
 
     STRING* get_string() {
-        STRING* ret;
-        char *target=mem_sys_allocate(64);
+        STRING *ret;
+        char   *target = (char *)mem_sys_allocate(64);
 
         /* XXX Dangerous if you have a 196-bit system or above
         (and if you do, you have too comfortable a life and
         deserve to be tormented by coredumps). */
         sprintf(target, "Pointer=0x%p", PMC_data(SELF));
-        ret=string_make(INTERP, target, strlen(target), "iso-8859-1", 0);
+        ret = string_make(INTERP, target, strlen(target), "iso-8859-1", 0);
 
         mem_sys_free(target);
         return ret;

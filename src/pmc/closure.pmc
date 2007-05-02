@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -80,16 +80,16 @@ Invokes the closure.
 
     void set_pointer(void* value) {
         struct Parrot_sub * sub = PMC_sub(SELF);
-        opcode_t *addr = value;
+        opcode_t *addr = (opcode_t *)value;
         sub->start_offs = addr -  sub->seg->base.data;
     }
 
-    opcode_t* invoke(void* next) {
-        struct Parrot_sub * sub = PMC_sub(SELF);
+    opcode_t* invoke(void *in_next) {
+        struct Parrot_sub *sub = PMC_sub(SELF);
         PMC *cont, *outer_sub;
+        opcode_t *next         = SUPER(in_next);
+        outer_sub              = sub->outer_sub;
 
-        next = SUPER(next);
-        outer_sub = sub->outer_sub;
         if (sub->outer_ctx) {
             /* during newclosure, outer's ctx was stored in
              * sub->outer_ctx
@@ -124,12 +124,15 @@ Invokes the closure.
                  * exception
                  */
                 INTERP->current_cont = NEED_CONTINUATION;
+
                 (void)VTABLE_invoke(INTERP, sub->outer_sub, next);
-                caller = CONTEXT(INTERP->ctx);
-                cont = caller->current_cont;
-                cont->vtable = interp->vtables[enum_class_Continuation];
-                sub->outer_ctx = sub->ctx->outer_ctx = caller;
+
+                caller               = CONTEXT(INTERP->ctx);
+                cont                 = caller->current_cont;
+                cont->vtable         = interp->vtables[enum_class_Continuation];
+                sub->outer_ctx       = sub->ctx->outer_ctx = caller;
                 caller->ref_count++;
+
                 (void)VTABLE_invoke(INTERP, cont, next);
             }
         }

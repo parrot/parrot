@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -210,16 +210,16 @@ Invokes the subroutine.
 
 */
 
-    opcode_t* invoke(void* next) {
-        struct Parrot_sub * sub = PMC_sub(SELF);
-        parrot_context_t *caller_ctx;
+    opcode_t* invoke(void *next) {
+        struct Parrot_sub     *sub = PMC_sub(SELF);
+        parrot_context_t      *caller_ctx;
         struct Parrot_Context *context;
-        PMC *ccont;
-        opcode_t *pc;
+        PMC                   *ccont;
+        opcode_t              *pc;
 
-        if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
+        if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
             print_sub_name(INTERP, SELF);
-        }
+
         /*
          * A remark WRT tail calls
          *
@@ -242,15 +242,16 @@ Invokes the subroutine.
          * immediately after argument passing.
          *
          */
-        pc = sub->seg->base.data + sub->start_offs;
-        caller_ctx = CONTEXT(INTERP->ctx);
-        ccont = INTERP->current_cont;
+        pc                   = sub->seg->base.data + sub->start_offs;
+        caller_ctx           = CONTEXT(INTERP->ctx);
+        ccont                = INTERP->current_cont;
         INTERP->current_cont = NULL;
-        if (ccont == NEED_CONTINUATION) {
-            ccont = new_ret_continuation_pmc(interp, next);
-        }
+
+        if (ccont == NEED_CONTINUATION)
+            ccont = new_ret_continuation_pmc(interp, (opcode_t *)next);
 
         assert(!PMC_IS_NULL(ccont));
+
         /*
          * plain subroutine call
          * create new context, place it in interpreter
@@ -261,25 +262,25 @@ Invokes the subroutine.
             context = Parrot_dup_context(INTERP, caller_ctx);
         else
 #endif
-            context = Parrot_alloc_context(INTERP, sub->n_regs_used);
-        context->current_sub = SELF;
-        context->caller_ctx = caller_ctx;
-        context->current_pc = pc;
+        context               = Parrot_alloc_context(INTERP, sub->n_regs_used);
+        context->current_sub  = SELF;
+        context->caller_ctx   = caller_ctx;
+        context->current_pc   = pc;
         context->current_cont = ccont;
+
         /* check recursion/call depth */
         if (++context->recursion_depth >
                 INTERP->recursion_limit) {
             real_exception(INTERP, next, E_RuntimeError,
                     "maximum recursion depth exceeded");
         }
-        /*
-         * and copy set context variables
-         */
+
+        /* and copy set context variables */
         PMC_cont(ccont)->from_ctx = context;
-        /*
-         * set context of the sub
-         */
+
+        /* set context of the sub */
         sub->ctx = context;
+
         if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
             /* don't destroy context */
             ccont->vtable = interp->vtables[enum_class_Continuation];
@@ -290,7 +291,8 @@ Invokes the subroutine.
             context->current_object = INTERP->current_object;
             INTERP->current_object = NULL;
         }
-        context->current_HLL = sub->HLL_id;
+
+        context->current_HLL       = sub->HLL_id;
         context->current_namespace = sub->namespace_stash;
 
         /* create pad if needed
@@ -304,21 +306,26 @@ Invokes the subroutine.
                     sub->lex_info);
             VTABLE_set_pointer(INTERP, context->lex_pad, context);
         }
+
         /* switch code segment if needed */
-        if (INTERP->code != sub->seg) {
+        if (INTERP->code != sub->seg)
             Parrot_switch_to_cs(INTERP, sub->seg, 1);
-        }
+
         if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
             if (!(*pc == PARROT_OP_get_params_pc ||
                         (*pc == PARROT_OP_push_eh_ic &&
                          pc[2] == PARROT_OP_get_params_pc))) {
+
                 /* TODO keep it or resize it */
                 --context->recursion_depth;
+
                 PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
-                context->caller_ctx = caller_ctx->caller_ctx;
+                context->caller_ctx    = caller_ctx->caller_ctx;
+
                 Parrot_free_context(INTERP, caller_ctx, 1);
             }
         }
+
         return pc;
     }
 
@@ -333,18 +340,19 @@ Creates and returns a clone of the subroutine.
 */
 
     PMC* clone() {
-        struct Parrot_sub * sub;
-        PMC* const ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        /*
-         * we have to mark it ourselves
-         */
+        struct Parrot_sub *sub;
+        PMC * const ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+
+        /* we have to mark it ourselves */
         PObj_custom_mark_destroy_SETALL(ret);
-        sub = mem_sys_allocate(sizeof (struct Parrot_sub));
+        sub = mem_allocate_typed(struct Parrot_sub);
+
         /* first set the sub struct, string_copy may cause GC */
         PMC_struct_val(ret) = sub;
-        PMC_pmc_val(ret) = NULL;
+        PMC_pmc_val(ret)    = NULL;
         memcpy(sub, PMC_sub(SELF), sizeof (struct Parrot_sub));
-        sub->name = string_copy(INTERP, sub->name);
+        sub->name           = string_copy(INTERP, sub->name);
+
         return ret;
     }
 

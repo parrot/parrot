@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2006, The Perl Foundation.
+Copyright (C) 2005-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -62,7 +62,8 @@ Find the method for C<*name> in the parent class of the bound object.
 */
 
     void init() {
-        PMC_pmc_val(SELF) = PMC_struct_val(SELF) = PMCNULL;
+        PMC_pmc_val(SELF)    = PMCNULL;
+        PMC_struct_val(SELF) = PMCNULL;
     }
 
     void init_pmc(PMC *obj) {

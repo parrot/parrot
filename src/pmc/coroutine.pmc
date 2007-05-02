@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -108,13 +108,18 @@ Clone the couroutine.
 
     PMC* clone() {
         struct Parrot_coro * sub;
-        PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC* ret            = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+
         PObj_custom_mark_destroy_SETALL(ret);
-        sub = mem_sys_allocate(sizeof (struct Parrot_coro));
+
+        sub                 = mem_allocate_typed(struct Parrot_coro);
         PMC_struct_val(ret) = sub;
-        PMC_pmc_val(ret) = NULL;
+        PMC_pmc_val(ret)    = NULL;
+
         memcpy(sub, PMC_sub(SELF), sizeof (struct Parrot_coro));
-        sub->name = string_copy(INTERP, sub->name);
+
+        sub->name           = string_copy(INTERP, sub->name);
+
         return ret;
     }
 
@@ -128,46 +133,47 @@ Swaps the "context".
 
 */
 
-    opcode_t* invoke(void* next) {
-        struct Parrot_coro * co = PMC_coro(SELF);
-        parrot_context_t *caller_ctx;
-        PackFile_ByteCode *wanted_seg;
+    opcode_t* invoke(void *next) {
+        parrot_context_t   *caller_ctx;
+        PackFile_ByteCode  *wanted_seg;
         struct Stack_Chunk *state;
-        opcode_t * dest = co->address;
-        parrot_context_t *ctx;
-        PMC *ccont;
+        parrot_context_t   *ctx;
+        PMC                *ccont;
+        struct Parrot_coro *co   = PMC_coro(SELF);
+        opcode_t           *dest = co->address;
 
-        if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG)) {
+        if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
             print_sub_name(INTERP, SELF);
-        }
+
         if (!co->ctx) {
             /* TODO factor out common code with Sub.invoke
              *      and inherit it
              */
             ccont = INTERP->current_cont;
-            if (ccont == NEED_CONTINUATION) {
-                ccont = (PMC *)new_ret_continuation_pmc(interp, next);
-            }
-            if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
+            if (ccont == NEED_CONTINUATION)
+                ccont = (PMC *)new_ret_continuation_pmc(interp,
+                                                       (opcode_t *)next);
+
+            if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL)
                 real_exception(INTERP, NULL, E_Exception,
                         "tail call to coro not allowed");
-            }
+
             caller_ctx = CONTEXT(INTERP->ctx);
-            /*
-             * first time set current sub, cont, object
-             */
+
+            /* first time set current sub, cont, object */
             Parrot_alloc_context(INTERP, co->n_regs_used);
-            co->ctx = ctx = CONTEXT(INTERP->ctx);
-            co->dynamic_state = interp->dynamic_env;
-            ctx->caller_ctx = caller_ctx;
+
+            co->ctx                   = ctx = CONTEXT(INTERP->ctx);
+            co->dynamic_state         = interp->dynamic_env;
+            ctx->caller_ctx           = caller_ctx;
             PMC_cont(ccont)->from_ctx = ctx;
-            ctx->current_sub = SELF;
-            ctx->current_HLL = co->HLL_id;
-            ctx->current_namespace = co->namespace_stash;
-            ctx->current_cont = ccont;
-            ctx->current_object = NULL;
-            INTERP->current_object = NULL;
-            INTERP->current_cont = NULL;
+            ctx->current_sub          = SELF;
+            ctx->current_HLL          = co->HLL_id;
+            ctx->current_namespace    = co->namespace_stash;
+            ctx->current_cont         = ccont;
+            ctx->current_object       = NULL;
+            INTERP->current_object    = NULL;
+            INTERP->current_cont      = NULL;
 
             /* create pad if needed */
             if (!PMC_IS_NULL(co->lex_info)) {
@@ -179,34 +185,39 @@ Swaps the "context".
             }
 
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
-            wanted_seg = co->seg;
-            co->caller_seg = INTERP->code;
-            co->address = co->seg->base.data + co->start_offs;
+            wanted_seg            = co->seg;
+            co->caller_seg        = INTERP->code;
+            co->address           = co->seg->base.data + co->start_offs;
         }
+
         /* if calling the Coro we need the segment of the Coro */
         else if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
-            wanted_seg = co->seg;
+            wanted_seg            = co->seg;
+
             /* remember segment of caller */
-            co->caller_seg = INTERP->code;
-            ctx = co->ctx;
+            co->caller_seg        = INTERP->code;
+            ctx                   = co->ctx;
+
             /* and the recent call context */
-            ccont = ctx->current_cont;
-            ctx->caller_ctx = PMC_cont(ccont)->to_ctx = CONTEXT(INTERP->ctx);
+            ccont                 = ctx->current_cont;
+            ctx->caller_ctx       = PMC_cont(ccont)->to_ctx = CONTEXT(INTERP->ctx);
             /* set context to coro context */
-            state = interp->dynamic_env;
-            interp->dynamic_env = co->dynamic_state;
-            co->dynamic_state = state;
-            CONTEXT(INTERP->ctx) = ctx;
-            INTERP->ctx.bp = ctx->bp;
-            INTERP->ctx.bp_ps = ctx->bp_ps;
+            state                 = interp->dynamic_env;
+            interp->dynamic_env   = co->dynamic_state;
+            co->dynamic_state     = state;
+            CONTEXT(INTERP->ctx)  = ctx;
+            INTERP->ctx.bp        = ctx->bp;
+            INTERP->ctx.bp_ps     = ctx->bp_ps;
         }
         else {
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
             /* switch back to last remembered code seg and context */
-            wanted_seg = co->caller_seg;
-            ccont = co->ctx->current_cont;
-            ctx = PMC_cont(ccont)->to_ctx;
+
+            wanted_seg            = co->caller_seg;
+            ccont                 = co->ctx->current_cont;
+            ctx                   = PMC_cont(ccont)->to_ctx;
+
             if (! ctx) {
                 /* This still isn't quite right, but it beats segfaulting.  See
                    the "Call an exited coroutine" case in t/pmc/coroutine.t; the
@@ -216,20 +227,22 @@ Swaps the "context".
                 real_exception(INTERP, NULL, E_Exception,
                                "Cannot resume dead coroutine.");
             }
-            state = interp->dynamic_env;
-            interp->dynamic_env = co->dynamic_state;
-            co->dynamic_state = state;
+
+            state                = interp->dynamic_env;
+            interp->dynamic_env  = co->dynamic_state;
+            co->dynamic_state    = state;
             CONTEXT(INTERP->ctx) = ctx;
-            INTERP->ctx.bp = ctx->bp;
-            INTERP->ctx.bp_ps = ctx->bp_ps;
+            INTERP->ctx.bp       = ctx->bp;
+            INTERP->ctx.bp_ps    = ctx->bp_ps;
         }
 
         /* toggle address */
-        dest = co->address;
+        dest        = co->address;
         co->address = (opcode_t *)next;
-        if (INTERP->code != wanted_seg) {
+
+        if (INTERP->code != wanted_seg)
             Parrot_switch_to_cs(INTERP, wanted_seg, 1);
-        }
+
         return dest;
     }
 

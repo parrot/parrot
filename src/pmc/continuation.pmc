@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -168,16 +168,16 @@ dynamic state, and the descriptor address for any returned values.
 
 */
 
-    void set_pointer(void* value) {
-        opcode_t *pos = value;
-        struct Parrot_cont * cc = PMC_cont(SELF);
+    void set_pointer(void *value) {
+        opcode_t           *pos = (opcode_t *)value;
+        struct Parrot_cont *cc  = PMC_cont(SELF);
 
-        cc->address = value;
+        cc->address       = (opcode_t *)value;
         cc->dynamic_state = INTERP->dynamic_env;
-        cc->runloop_id = INTERP->current_runloop_id;
-        if (pos && *pos == PARROT_OP_get_results_pc) {
+        cc->runloop_id    = INTERP->current_runloop_id;
+
+        if (pos && *pos == PARROT_OP_get_results_pc)
             cc->current_results = pos;
-        }
         else
             cc->current_results = NULL;
     }

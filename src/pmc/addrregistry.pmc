@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005, The Perl Foundation.
+Copyright (C) 2005-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -90,7 +90,7 @@ Marks the hash as live.
 
     void mark() {
         if (PMC_struct_val(SELF))
-            parrot_mark_hash(INTERP, PMC_struct_val(SELF));
+            parrot_mark_hash(INTERP, (Hash *)PMC_struct_val(SELF));
     }
 
 /*
@@ -113,21 +113,21 @@ Returns true if the hash size is not zero.
 */
 
     INTVAL get_integer_keyed(PMC* key) {
-        Hash *hash = PMC_struct_val(SELF);
-        HashBucket *b;
+        Hash       *hash = (Hash *)PMC_struct_val(SELF);
+        HashBucket *b    = parrot_hash_get_bucket(INTERP, hash, key);
 
-        b = parrot_hash_get_bucket(INTERP, hash, key);
         if (b == NULL)
             return 0;
+
         return (INTVAL) b->value;
     }
 
     INTVAL elements() {
-        return parrot_hash_size(INTERP, PMC_struct_val(SELF));
+        return parrot_hash_size(INTERP, (Hash *)PMC_struct_val(SELF));
     }
 
     INTVAL get_bool() {
-        return parrot_hash_size(INTERP, PMC_struct_val(SELF)) != 0;
+        return parrot_hash_size(INTERP, (Hash *)PMC_struct_val(SELF)) != 0;
     }
 /*
 
@@ -195,13 +195,14 @@ If called from iteration, return the key PMC, else PMCNULL is returned.
         return Parrot_Hash_get_iter(INTERP, SELF);
     }
 
-    PMC* get_pmc_keyed(PMC* key) {
-        Hash *hash = PMC_struct_val(SELF);
+    PMC* get_pmc_keyed(PMC *key) {
+        Hash *hash = (Hash *)PMC_struct_val(SELF);
 
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) ==
                 KEY_hash_iterator_FLAGS) {
-            return parrot_hash_get_idx(INTERP, hash, key);
+            return (PMC *)parrot_hash_get_idx(INTERP, hash, key);
         }
+
         return PMCNULL;
     }
 }

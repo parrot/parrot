@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003, The Perl Foundation.
+Copyright (C) 2003-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -847,7 +847,8 @@ Translate ascii string C<src> with entries from C<trans_table>.
                 "Can't translate non-ascii");
         p = (unsigned char *)src->strstart;
         /* TODO verify trans table */
-        tr_data = PMC_data(table);    /* XXX */
+
+        tr_data = PMC_data_typed(table, INTVAL *);    /* XXX */
         for (i = 0; i < len; ++i, ++p) {
             ch = *p;
             ch = (unsigned char)tr_data[ch];

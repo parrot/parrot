@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -64,7 +64,8 @@ static INTVAL do_thread_run(Interp *interp, PMC *thread,
     INTVAL tid;
 
     tid = VTABLE_get_integer(interp, thread);
-    clone_interpreter(PMC_data(thread), interp, clone_flags);
+    clone_interpreter(PMC_data_typed(thread, Parrot_Interp),
+                      interp, clone_flags);
     interp->flags &= ~PARROT_THR_COPY_INTERP; /* XXX */
     pt_thread_run(interp, thread, sub, args);
 
@@ -132,7 +133,7 @@ Initializes the thread.
         /*
          * can't allow DOD runs for now
          */
-        stop_GC(INTERP, PMC_data(SELF));
+        stop_GC(INTERP, PMC_data_typed(SELF, Parrot_Interp));
     }
 
 /*
@@ -148,7 +149,10 @@ Create a new thread by cloning the passed interpreter.
     void init_pmc(PMC *parent) {
         LOCK(interpreter_array_mutex);
         SUPER(parent);
-        pt_add_to_interpreters(PMC_data(parent), PMC_data(SELF));
+
+        pt_add_to_interpreters(PMC_data_typed(parent, Parrot_Interp),
+                               PMC_data_typed(SELF, Parrot_Interp));
+
         UNLOCK(interpreter_array_mutex);
         /*
          * can't allow DOD runs for now

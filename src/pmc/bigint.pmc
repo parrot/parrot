@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -96,7 +96,7 @@ bigint_get_bool(Interp *interp, PMC *self) {
 static char *
 bigint_get_string(Interp *interp, PMC *self, int base) {
     size_t n = mpz_sizeinbase(BN(self), base) + 2;
-    char *s = mem_sys_allocate(n);
+    char  *s  = (char *)mem_sys_allocate(n);
     return mpz_get_str(s, base, BN(self));
 }
 

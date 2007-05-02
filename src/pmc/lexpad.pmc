@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005, The Perl Foundation.
+Copyright (C) 2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -71,14 +71,14 @@ lexical doesn't exist.
 Set the lexical with the given name to value. If the lexical name
 doesn't exist, it is created.
 
-=item C<METHOD PMC* get_lexinfo()>
+=item C<METHOD PMC *get_lexinfo()>
 
 Return the LexInfo PMC, if any or a Null PMC.
 
 =cut
 
 */
-    void init_pmc(PMC* lexinfo) {
+    void init_pmc(PMC *lexinfo) {
         PMC_pmc_val(SELF) = lexinfo;
     }
 
@@ -88,7 +88,7 @@ Return the LexInfo PMC, if any or a Null PMC.
 
     INTVAL elements() {
         PMC *info = PMC_pmc_val(SELF);
-        return parrot_hash_size(INTERP, PMC_struct_val(info));
+        return parrot_hash_size(INTERP, (Hash *)PMC_struct_val(info));
     }
 
     INTVAL exists_keyed_str(STRING* name) {
@@ -97,42 +97,47 @@ Return the LexInfo PMC, if any or a Null PMC.
             (Hash*) PMC_struct_val(info), name) != 0;
     }
 
-    INTVAL exists_keyed(PMC* name) {
+    INTVAL exists_keyed(PMC *name) {
         STRING *s = key_string(INTERP, name);
         return SELF.exists_keyed_str(s);
     }
 
     PMC* get_pmc_keyed_str(STRING* name) {
-        PMC *info = PMC_pmc_val(SELF);
-        Hash *hash = PMC_struct_val(info);
-        parrot_context_t *ctx = PMC_struct_val(SELF);
-        HashBucket *b = parrot_hash_get_bucket(INTERP, hash, name);
-        INTVAL regno;
+        PMC              *info = PMC_pmc_val(SELF);
+        Hash             *hash = (Hash *)PMC_struct_val(info);
+        parrot_context_t *ctx  = PMC_struct_val(SELF);
+        HashBucket       *b    = parrot_hash_get_bucket(INTERP, hash, name);
+        INTVAL            regno;
+
         if (!b)
             return NULL;
+
         regno = (INTVAL) b->value;
+
         return CTX_REG_PMC(ctx, regno);
     }
 
-    PMC* get_pmc_keyed(PMC* name) {
+    PMC* get_pmc_keyed(PMC *name) {
         STRING *s = key_string(INTERP, name);
         return SELF.get_pmc_keyed_str(s);
     }
 
-    void set_pmc_keyed_str(STRING* name, PMC* value) {
-        PMC *info = PMC_pmc_val(SELF);
-        Hash *hash = PMC_struct_val(info);
-        parrot_context_t *ctx = PMC_struct_val(SELF);
-        HashBucket *b = parrot_hash_get_bucket(INTERP, hash, name);
-        INTVAL regno;
+    void set_pmc_keyed_str(STRING *name, PMC *value) {
+        PMC              *info  = PMC_pmc_val(SELF);
+        Hash             *hash  = (Hash *)PMC_struct_val(info);
+        parrot_context_t *ctx   = PMC_struct_val(SELF);
+        HashBucket       *b     = parrot_hash_get_bucket(INTERP, hash, name);
+        INTVAL            regno;
+
         if (!b)
             real_exception(interp, NULL, LEX_NOT_FOUND,
                     "Lexical '%Ss' not found", name);
-        regno = (INTVAL) b->value;
+
+        regno                   = (INTVAL) b->value;
         CTX_REG_PMC(ctx, regno) = value;
     }
 
-    void set_pmc_keyed(PMC* name, PMC* value) {
+    void set_pmc_keyed(PMC *name, PMC *value) {
         STRING *s = key_string(INTERP, name);
         SELF.set_pmc_keyed_str(s, value);
     }

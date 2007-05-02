@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -46,8 +46,8 @@ Overrides the default to do nothing.
         return PMCNULL;
     }
 
-    void set_pointer(void* p) {
-        PMCNULL = p;
+    void set_pointer(void *p) {
+        PMCNULL = (PMC *)p;
     }
 
     INTVAL does(STRING* what) {

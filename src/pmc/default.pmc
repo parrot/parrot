@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -942,38 +942,47 @@ Look for NCI methods and properties.
         return SELF;
     }
 
-    PMC* get_attr_str(STRING* name) {
-        PMC *p = NULL;
-        HashBucket* b;
-        /* lets look for props first
+    PMC* get_attr_str(STRING *name) {
+        PMC        *p = NULL;
+        HashBucket *b;
+
+        /* let's look for props first
          * XXX do we need that in the default object system?
          */
         if (SELF->pmc_ext && PMC_metadata(SELF)) {
              b = parrot_hash_get_bucket(INTERP, (Hash*) PMC_metadata(SELF),
                                         name);
              if (b)
-                 p = b->value;
+                 p = (PMC *)b->value;
         }
-        if (PMC_IS_NULL(p)) {
-            /* may be NCI? */
+
+        /* may be NCI? */
+        if (PMC_IS_NULL(p))
             p = VTABLE_find_method(INTERP, SELF, name);
-        }
+
         if (PMC_IS_NULL(p)) {
             /* TODO AttributeError */
         }
         else if (VTABLE_isa(INTERP, p, CONST_STRING(INTERP, "NCI"))) {
-            PMC *bound_meth = VTABLE_clone(INTERP, p);
+            PMC *bound_meth;
+
+            bound_meth         = VTABLE_clone(INTERP, p);
             bound_meth->vtable = interp->vtables[enum_class_Bound_NCI];
             VTABLE_set_pmc(INTERP, bound_meth, SELF);
+
             return bound_meth;
         }
         else if (p->vtable->base_type == enum_class_MultiSub) {
-            PMC *bound_meth = pmc_new(INTERP, enum_class_Bound_NCI);
+            PMC *bound_meth;
+
+            bound_meth                  = pmc_new(INTERP, enum_class_Bound_NCI);
             VTABLE_set_pmc(INTERP, bound_meth, SELF);
-            PMC_struct_val(bound_meth) = p;
+            PMC_struct_val(bound_meth)  = p;
             PObj_get_FLAGS(bound_meth) |= PObj_private0_FLAG;
+
             return bound_meth;
         }
+
         /* TODO bound user functions */
         return p;
     }

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -82,12 +82,12 @@ Transfers control to the calling context, and frees the current context.
 
 */
 
-    opcode_t* invoke(void* next) {
-        struct Parrot_cont * cc = PMC_cont(SELF);
-        parrot_context_t *from_ctx = cc->from_ctx;
+    opcode_t* invoke(void *in_next) {
+        struct Parrot_cont *cc        = PMC_cont(SELF);
+        parrot_context_t   *from_ctx  = cc->from_ctx;
         PackFile_ByteCode * const seg = cc->seg;
+        opcode_t *next                = SUPER(in_next);
 
-        next = SUPER(next);
         Parrot_free_context(INTERP, from_ctx, 1);
 #ifdef NDEBUG
         /* the continuation is dead - delete and destroy it */
@@ -111,9 +111,9 @@ Transfers control to the calling context, and frees the current context.
          */
         cc->to_ctx = NULL;
 #endif
-        if (INTERP->code != seg) {
+        if (INTERP->code != seg)
             Parrot_switch_to_cs(INTERP, seg, 1);
-        }
+
         return next;
     }
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -433,13 +433,17 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
     }
 
     void thawfinish(visit_info *info) {
-        PMC *key = SELF, *next;
+        PMC *key = SELF;
+        PMC *next;
+
         while (1) {
-            next = PMC_data(key);
+            next = (PMC *)PMC_data(key);
+
             if (PMC_IS_NULL(next)) {
                 PMC_data(key) = NULL;
                 break;
             }
+
             key = next;
         }
     }

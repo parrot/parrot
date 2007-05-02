@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -612,10 +612,11 @@ Used to unarchive the object.
     }
 
     void thawfinish(visit_info *info) {
-        PMC *_class = SELF->vtable->pmc_class;
+        PMC *_class     = SELF->vtable->pmc_class;
         PMC *vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(_class),
                 PCD_OBJECT_VTABLE);
-        SELF->vtable = PMC_struct_val(vtable_pmc);
+        SELF->vtable    = (VTABLE *)PMC_struct_val(vtable_pmc);
+
         set_attrib_flags(SELF);
         PObj_is_object_SET(SELF);
     }
