@@ -431,7 +431,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "addattribute subclass - same name" );
     print_newline
 .end
 .namespace ['Bar']
-.sub __init :method
+.sub init :vtable :method
     $P0 = new .String
     $P0 = 'Foo.i'
     setattribute self, "Foo\0i", $P0
@@ -1399,7 +1399,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - methods" );
 .end
 
 .namespace ["MyInt"]
-.sub __get_integer :method
+.sub get_integer :vtable :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1407,7 +1407,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - methods" );
    .return $I0
    .pcc_end_return
 .end
-.sub __get_string :method
+.sub get_string :vtable :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1454,7 +1454,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - mmd methods" );
 .end
 
 .namespace ["MyInt"]
-.sub __get_string :method
+.sub get_string :vtable :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1549,7 +1549,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 1" );
 .end
 
 .namespace ["MyInt"]
-.sub __get_integer :method
+.sub get_integer :vtable :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1557,7 +1557,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 1" );
    .return $I0
    .pcc_end_return
 .end
-.sub __get_string :method
+.sub get_string :vtable :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1615,7 +1615,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 2" );
 .namespace ["MyInt2"]
 # subclassing methods from MyInt is ok
 # this one changes the value a bit
-.sub __get_integer :method
+.sub get_integer :vtable :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1625,7 +1625,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 2" );
    .pcc_end_return
 .end
 .namespace ["MyInt"]
-.sub __get_integer :method
+.sub get_integer :vtable :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1633,7 +1633,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 2" );
    .return $I0
    .pcc_end_return
 .end
-.sub __get_string :method
+.sub get_string :vtable :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1689,7 +1689,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 3" );
 .end
 
 .namespace ["MyInt2"]
-.sub __get_integer :method
+.sub get_integer :vtable :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1697,7 +1697,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 3" );
    .return $I0
    .pcc_end_return
 .end
-.sub __get_string :method
+.sub get_string :vtable :method
    $I0 = classoffset self, "MyInt"
    $P0 = getattribute self, $I0
    $I0 = $P0
@@ -1814,7 +1814,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "namespace vs name" );
     print "ok 2\n"
 .end
 .namespace [ "Foo" ]
-.sub __get_string :method
+.sub get_string :vtable :method
     .return("ok 1\n")
 .end
 .sub Foo
@@ -1949,13 +1949,13 @@ pir_output_is( <<'CODE', <<'OUTPUT', "init with and w/o arg" );
 .end
 
 .namespace ["Foo"]
-.sub __init_pmc :method
+.sub init_pmc :vtable :method
     .param pmc args
     $P0 = args['a']
     setattribute self, 'a', $P0
     .return()
 .end
-.sub __init :method
+.sub init :vtable :method
     $P0 = new .String
     $P0 = "ok 1\n"
     setattribute self, 'a', $P0
@@ -2013,7 +2013,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "new keyed" );
     print "ok\n"
 .end
 .namespace ['Foo';'Bar']
-.sub __init :method
+.sub init :vtable :method
     print "__init\n"
 .end
 CODE
@@ -2031,11 +2031,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "new keyed 2" );
     print "ok\n"
 .end
 .namespace ['Foo';'Bar']
-.sub __init :method
+.sub init :vtable :method
     print "__init Bar\n"
 .end
 .namespace ['Foo';'Baz']
-.sub __init :method
+.sub init :vtable :method
     print "__init Baz\n"
 .end
 
@@ -2057,16 +2057,16 @@ pir_output_is( <<'CODE', <<'OUTPUT', "new keyed 3" );
     print "ok\n"
 .end
 .namespace ['Foo';'Bar']
-.sub __init :method
+.sub init :vtable :method
     print "__init Bar\n"
 .end
 .namespace ['Foo';'Baz']
-.sub __init :method
+.sub init :vtable :method
     print "__init Baz\n"
 .end
 
 .namespace ['Foo']
-.sub __init :method
+.sub init :vtable :method
     print "__init Foo\n"
 .end
 CODE
@@ -2092,11 +2092,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "subclass keyed" );
     print "ok 2\n"
 .end
 .namespace ['Perl6'; 'PAST'; 'Stmt']
-.sub __init :method
+.sub init :vtable :method
     print "__init Stmt\n"
 .end
 .namespace ['Perl6'; 'PAST'; 'Sub']
-.sub __init :method
+.sub init :vtable :method
     print "__init Sub\n"
 .end
 CODE
@@ -2157,11 +2157,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "new nested ordering" );
     print "ok\n"
 .end
 .namespace ['Foo']
-.sub __init :method
+.sub init :vtable :method
     print "__init Foo\n"
 .end
 .namespace ['Foo';'Bar']
-.sub __init :method
+.sub init :vtable :method
     print "__init Bar\n"
 .end
 CODE
@@ -2186,7 +2186,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "vtable override once removed (#39056)" );
 
 .namespace [ 'Bar' ]
 
-.sub '__get_string' :method
+.sub 'get_string' :vtable :method
     $S0 = 'ok bar'
     .return ($S0)
 .end
@@ -2204,7 +2204,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "super __init called twice (#39081)" );
 
 .namespace [ 'Foo' ]
 
-.sub '__init' :method
+.sub 'init' :vtable :method
     say "foo constructor"
     .return ()
 .end

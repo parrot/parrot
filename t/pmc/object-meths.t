@@ -799,7 +799,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys" 
 
 .namespace ["Foo"]
 
-.sub __get_integer_keyed :method
+.sub get_integer_keyed :vtable :method
     .param pmc key
     print "Key = "
     print key
@@ -829,7 +829,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys -
 
 .namespace ["Foo"]
 
-.sub __get_integer_keyed :method
+.sub get_integer_keyed :vtable :method
     .param pmc key
     $S0 = "bar"
     print "Key = "
@@ -953,7 +953,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "kind of a super" );
 .end
 
 .namespace ["MyString"]
-.sub __set_string_native :method
+.sub set_string_native :vtable :method
     .param string s
     classoffset $I0, self, "MyString"
     $P0 = getattribute self, $I0
@@ -1136,47 +1136,47 @@ pir_output_is( <<'CODE', <<'OUTPUT', "delegate keyed_int" );
 
 .namespace ["MyClass"]
 
-.sub __set_integer_keyed_int :method
+.sub set_integer_keyed_int :vtable :method
     .param int key
     .param int val
     print "ikey\n"
 .end
 
-.sub __set_integer_keyed :method
+.sub set_integer_keyed :vtable :method
     .param string key
     .param int val
     print "skey\n"
 .end
 
-.sub __delete_keyed_int :method
+.sub delete_keyed_int :vtable :method
     .param int key
     print "del_ikey\n"
 .end
 
-.sub __delete_keyed :method
+.sub delete_keyed :vtable :method
     .param string key
     print "del_skey\n"
 .end
 
-.sub __defined_keyed_int :method
+.sub defined_keyed_int :vtable :method
     .param int key
     print "def_ikey\n"
     .return (0)
 .end
 
-.sub __defined_keyed :method
+.sub defined_keyed :vtable :method
     .param string key
     print "def_skey\n"
     .return (0)
 .end
 
-.sub __exists_keyed_int :method
+.sub exists_keyed_int :vtable :method
     .param int key
     print "exists_ikey\n"
     .return (0)
 .end
 
-.sub __exists_keyed :method
+.sub exists_keyed :vtable :method
     .param string key
     print "exists_skey\n"
     .return (0)
@@ -1245,7 +1245,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "delegate keyed_int PMC derived - inherit" 
 
 .namespace ["MyClass"]
 
-.sub __get_integer_keyed_int :method
+.sub get_integer_keyed_int :vtable :method
     .param int key
     print "ikey\n"
     .local pmc ar

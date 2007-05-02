@@ -1095,26 +1095,26 @@ pir_output_is( <<'CODE', <<'OUTPUT', "use a core func for an object" );
     print "\n"
 .end
 .namespace ["AInt"]
-.sub __init :method
+.sub init :vtable :method
     $P0 = new Integer
     setattribute self, ".i", $P0
 .end
-.sub __set_integer_native :method
+.sub set_integer_native :vtable :method
     .param int i
     $P0 = getattribute self, ".i"
     $P0 = i
 .end
-.sub __set_number_native :method
+.sub set_number_native :vtable :method
     .param float f
     $P0 = getattribute self, ".i"
     $P0 = f
 .end
-.sub __get_string :method
+.sub get_string :vtable :method
     $P0 = getattribute self, ".i"
     $S0 = $P0
     .return ($S0)
 .end
-.sub __get_number :method
+.sub get_number :vtable :method
     $P0 = getattribute self, ".i"
     $N0 = $P0
     .return ($N0)

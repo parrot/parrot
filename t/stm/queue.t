@@ -47,7 +47,7 @@ my $library = <<'CODE';
 done:
 .end
 
-.sub __init_pmc :method
+.sub init_pmc :vtable :method
     .param int length
 
     .local pmc tmpint
@@ -178,7 +178,7 @@ do_ret:
     .return (ret)
 .end
 
-.sub __clone :method
+.sub clone :vtable :method
     .local pmc result
     .local pmc length
 

@@ -351,7 +351,7 @@ my $queue_test = <<'CODE';
 done:
 .end
 
-.sub __init_pmc :method
+.sub init_pmc :vtable :method
     .param int length
 
     .local pmc tmpint

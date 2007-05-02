@@ -161,7 +161,7 @@ __DATA__
     addattribute class, 'next'
 .end
 
-.sub __init :method
+.sub init :vtable :method
     $P1 = new Undef
 
     setattribute self, 'value', $P1
@@ -231,7 +231,7 @@ __DATA__
     addattribute class, 'tail'
 .end
 
-.sub __init :method
+.sub init :vtable :method
     $P1 = new Undef
     $P2 = new STMVar, $P1
     setattribute self, 'head', $P2

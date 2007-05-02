@@ -151,18 +151,18 @@ pir_output_is( <<'CODE', <<'OUT', ':vtable inheritance from core classes' );
 
 .namespace [ 'Foo' ]
 
-.sub '__get_string' :method
-    .return('Foo::__get_string')
+.sub 'get_string' :vtable :method
+    .return('Foo::get_string')
 .end
 
 
 .namespace [ 'Bar' ]
 
-.sub 'get_string' :method :vtable
+.sub 'get_string' :vtable :method
     .return('Bar::get_string')
 .end
 CODE
-Foo::__get_string
+Foo::get_string
 Bar::get_string
 OUT
 
@@ -237,7 +237,7 @@ OUT
 pir_output_like( <<'CODE', <<'OUT', 'RT#41732' );
 .namespace ['Foo']
 
-.sub __invoke
+.sub invoke :vtable
   .param pmc a
   say 'hi'
 .end
