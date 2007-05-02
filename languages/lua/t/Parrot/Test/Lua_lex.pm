@@ -1,5 +1,5 @@
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: Lua_lex.pm $
+# $Id$
 
 package Parrot::Test::Lua_lex;
 
