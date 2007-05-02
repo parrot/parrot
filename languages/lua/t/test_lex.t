@@ -35,7 +35,6 @@ Name:	print
 punct:	(
 String:	hello
 punct:	)
-"past" => PMC 'Lua::TestLex' { ... }
 OUT
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'keyword' );
@@ -82,7 +81,6 @@ keyword:	then
 keyword:	true
 keyword:	until
 keyword:	while
-"past" => PMC 'Lua::TestLex' { ... }
 OUT
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'not keyword' );
@@ -91,7 +89,6 @@ doit        -- not do
 CODE
 Name:	format
 Name:	doit
-"past" => PMC 'Lua::TestLex' { ... }
 OUT
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'string' );
@@ -105,7 +102,6 @@ String:	alo
 123"
 String:	alo
 123"
-"past" => PMC 'Lua::TestLex' { ... }
 OUT
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'long string' );
@@ -119,7 +115,6 @@ LongString:	alo
 123"
 LongString:	alo
 123"
-"past" => PMC 'Lua::TestLex' { ... }
 OUT
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'number' );
@@ -140,7 +135,6 @@ Number:	0.31416E1
 Number:	.31416E+1
 Number:	0xff
 Number:	0x56
-"past" => PMC 'Lua::TestLex' { ... }
 OUT
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'comment' );
@@ -150,7 +144,6 @@ language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'comment' );
 CODE
 Number:	1
 Number:	2
-"past" => PMC 'Lua::TestLex' { ... }
 OUT
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'long comment' );
@@ -163,7 +156,6 @@ long comment
 ]===]
 CODE
 Number:	1
-"past" => PMC 'Lua::TestLex' { ... }
 OUT
 
 # Local Variables:
