@@ -140,9 +140,9 @@ ICU Options:
    --icu-config=/path/to/icu-config
                         Location of the script used for ICU autodetection.
                         You just need to specify this option if icu-config
-                        is not in you PATH.
+                        is not in your PATH.
 
-   --icu-config=none    can be used to disable the autodetection feature.
+   --icu-config=none    Can be used to disable the autodetection feature.
                         It will also be disabled if you specify any other
                         of the following ICU options.
 
@@ -161,9 +161,9 @@ Other Options (may not be implemented):
 
 Install Options:
 
-    --prefix=PREFIX         install architecture-independent files in PREFIX
+    --prefix=PREFIX         Install architecture-independent files in PREFIX
                             [/usr/local]
-    --exec-prefix=EPREFIX   install architecture-dependent files in EPREFIX
+    --exec-prefix=EPREFIX   Install architecture-dependent files in EPREFIX
                             [PREFIX]
 
     By default, `make install' will install all the files in
@@ -174,18 +174,18 @@ Install Options:
     For better control, use the options below.
 
     Fine tuning of the installation directories:
-    --bindir=DIR            user executables [EPREFIX/bin]
-    --sbindir=DIR           system admin executables [EPREFIX/sbin]
-    --libexecdir=DIR        program executables [EPREFIX/libexec]
+    --bindir=DIR          user executables [EPREFIX/bin]
+    --sbindir=DIR         system admin executables [EPREFIX/sbin]
+    --libexecdir=DIR      program executables [EPREFIX/libexec]
     --datadir=DIR         read-only architecture-independent data [PREFIX/share]
-    --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
-    --sharedstatedir=DIR   modifiable architecture-independent data [PREFIX/com]
-    --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
-    --libdir=DIR            object code libraries [EPREFIX/lib]
-    --includedir=DIR        C header files [PREFIX/include]
-    --oldincludedir=DIR     C header files for non-gcc [/usr/include]
-    --infodir=DIR           info documentation [PREFIX/info]
-    --mandir=DIR            man documentation [PREFIX/man]
+    --sysconfdir=DIR      read-only single-machine data [PREFIX/etc]
+    --sharedstatedir=DIR  modifiable architecture-independent data [PREFIX/com]
+    --localstatedir=DIR   modifiable single-machine data [PREFIX/var]
+    --libdir=DIR          object code libraries [EPREFIX/lib]
+    --includedir=DIR      C header files [PREFIX/include]
+    --oldincludedir=DIR   C header files for non-gcc [/usr/include]
+    --infodir=DIR         info documentation [PREFIX/info]
+    --mandir=DIR          man documentation [PREFIX/man]
 
 EOT
     return 1;
