@@ -1,8 +1,13 @@
+# Copyright (C) 2006-2007, The Perl Foundation.
+# $Id$
+
 =head1 NAME
 
-lua.pg - a Lua grammar in PGE
+lua.pg - a Lua 5.1 grammar in PGE
 
-=head1 GRAMMAR RULES
+=head1 DESCRIPTION
+
+=head2 GRAMMAR RULES
 
 The grammar rules are according to the original Lua parser as defined lparser.c
 in the lua distribution.
@@ -178,7 +183,7 @@ rule simple_expression {
 }
 
 
-=head1 EXPRESSIONS
+=head2 EXPRESSIONS
 
 Operator precedence is implemented using an optable.
 
@@ -217,7 +222,7 @@ proto 'infix:and'   is looser('infix:<')        { ... }
 proto 'infix:or'    is looser('infix:and')      { ... }
 
 
-=head1 HELPER RULES
+=head2 HELPER RULES
 
 Helper rules will match a specific token, otherwise a syntax error is generated.
 These rules make the grammar more readable, so the calls to syntax_error() are
@@ -266,9 +271,9 @@ rule closeparen {
 }
 
 
-=head1 TOKENS
+=head2 TOKENS
 
-=head2 Name
+=head3 Name
 
 an identifier MUST start on a word boundary. If the \b is removed,
 this is allowed: a=1b=2, which of course should be an error.
@@ -280,7 +285,7 @@ token name {
 }
 
 
-=head2 Strings
+=head3 Strings
 
 A string can be either a single-quoted, double-quoted or a long string.
 Long strings are parsed using a custom parsing method.
@@ -308,7 +313,7 @@ token ws {
     ]*
 }
 
-=head2 Keywords
+=head3 Keywords
 
 Lua keywords may B<not> be used as identifiers. To make sure the longest
 identifier is matched, so that identifiers that B<start> with a keyword
@@ -325,4 +330,10 @@ token keyword {
   | <'return'>   | <'then'>   | <'true'>  | <'until'>
   | <'while'>    ] \b
 }
+
+=head1 AUTHORS
+
+Klaas-Jan Stol <parrotcode@gmail.com>
+
+=cut
 

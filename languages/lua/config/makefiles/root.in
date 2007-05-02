@@ -78,8 +78,8 @@ src/lua51_testlex_gen.pir: src/lua51_testlex.pg
 src/dumplex_gen.pir: src/dumplex.tg
 	$(TGE) --output=src/dumplex_gen.pir src/dumplex.tg
 
-src/lua51_grammar_gen.pir: src/lua.pg
-	$(PGE) --output=src/lua51_grammar_gen.pir src/lua.pg
+src/lua51_grammar_gen.pir: src/lua51.pg
+	$(PGE) --output=src/lua51_grammar_gen.pir src/lua51.pg
 
 src/ASTGrammar.pir: src/ASTGrammar.tg
 	$(TGE) --output=src/ASTGrammar.pir src/ASTGrammar.tg

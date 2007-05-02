@@ -1,6 +1,18 @@
 # Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
+=head1 NAME
+
+src/dumplex.tg - a grammar for testing lexico
+
+=head1 DESCRIPTION
+
+Just print node.
+
+Used by F<languages/lua/test_lex.pir>.
+
+=cut
+
 grammar Lua::DumpLex is TGE::Grammar;
 
 transform past (ROOT) :language('PIR') {
@@ -100,4 +112,10 @@ transform past (Lua::TestLex::Number) :language('PIR') {
 transform past (Lua::TestLex::ws) :language('PIR') {
     print "ws\n"
 }
+
+=head1 AUTHOR
+
+Francois Perrad
+
+=cut
 

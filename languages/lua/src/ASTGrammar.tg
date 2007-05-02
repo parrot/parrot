@@ -1,3 +1,15 @@
+# Copyright (C) 2006-2007, The Perl Foundation.
+# $Id$
+
+=head1 NAME
+
+ASTGrammar.tg - A grammar for transforming the output of a PGE parse into
+an abstract syntax tree.
+
+=head1 DESCRIPTION
+
+
+=cut
 
 grammar Lua::PAST::Grammar is TGE::Grammar;
 
@@ -461,4 +473,10 @@ transform past (Lua::Grammar::string) :language('PIR') {
   error:
     printerr "Unknown string\n"
 }
+
+=head1 AUTHORS
+
+Klaas-Jan Stol <parrotcode@gmail.com>
+
+=cut
 
