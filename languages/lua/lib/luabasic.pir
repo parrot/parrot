@@ -269,17 +269,8 @@ STILL INCOMPLETE (see gc).
     .param pmc opt :optional
     .param pmc arg :optional
     .local pmc ret
-    new $P0, .FixedStringArray
-    set $P0, 7
-    $P0[0] = 'stop'
-    $P0[1] = 'restart'
-    $P0[2] = 'collect'
-    $P0[3] = 'count'
-    $P0[4] = 'step'
-    $P0[5] = 'setpause'
-    $P0[6] = 'setstepmul'
     $S1 = optstring(opt, 'collect')
-    $I1 = checkoption($S1, $P0)
+    checkoption($S1, 'stop restart collect count step setpause setstepmul')
     $I2 = optint(arg, 0)
     $N0 = gc($S1, $I2)
     unless $S1 == 'step' goto L1

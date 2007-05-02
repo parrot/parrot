@@ -951,17 +951,11 @@ position to the end of the file, and returns its size.
 .sub '_file_seek' :method :anon
     .param pmc whence :optional
     .param pmc offset :optional
-    .local pmc modenames
     .local pmc f
     .local pmc ret
     tofile(self)
-    new modenames, .FixedStringArray
-    set modenames, 3
-    modenames[0] = 'set'
-    modenames[1] = 'cur'
-    modenames[2] = 'end'
     $S1 = optstring(whence, 'cur')
-    $I1 = checkoption($S1, modenames)
+    $I1 = checkoption($S1, 'set cur end')
     $I2 = optint(offset, 0)
     f = getattribute self, 'data'
     seek f, $I2, $I1
@@ -1004,18 +998,12 @@ NOT YET IMPLEMENTED.
 .sub '_file_setvbuf' :method :anon
     .param pmc mode :optional
     .param pmc size :optional
-    .local pmc modenames
     .local pmc mode
     .local pmc f
     .local pmc ret
     tofile(self)
-    new modenames, .FixedStringArray
-    set modenames, 3
-    modenames[0] = 'no'
-    modenames[1] = 'full'
-    modenames[2] = 'line'
     $S1 = checkstring(mode)
-    $I1 = checkoption($S1, modenames)
+    $I1 = checkoption($S1, 'no full line')
     $I2 = optint(size, 512)     # LUAL_BUFFERSIZE
     new mode, .FixedIntegerArray
     set mode, 3

@@ -399,18 +399,9 @@ NOT YET IMPLEMENTED (no setlocale).
 .sub '_os_setlocale' :anon
     .param pmc locale :optional
     .param pmc category :optional
-    .local pmc catnames
     $S1 = optstring(locale, '')
-    new catnames, .FixedStringArray
-    set catnames, 6
-    catnames[0] = 'all'
-    catnames[1] = 'collate'
-    catnames[2] = 'ctype'
-    catnames[3] = 'monetary'
-    catnames[4] = 'numeric'
-    catnames[5] = 'time'
     $S2 = optstring(category, 'all')
-    $I2 = checkoption($S2, catnames)
+    $I2 = checkoption($S2, 'all collate ctype monetary numeric time')
     not_implemented()
 .end
 

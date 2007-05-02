@@ -97,24 +97,23 @@ L0:
 
 .sub 'checkoption'
     .param string name
-    .param pmc options
+    .param string options
     .local int i
-    .local int n
     i = 0
-    n = options
+    $P1 = split ' ', options
 L1:
-    unless i < n goto L2
-    $S0 = options[i]
+    unless $P1 goto L2
+    $S0 = shift $P1
     unless $S0 == name goto L3
     .return (i)
 L3:
     inc i
     goto L1
 L2:
-    $S1 = "invalid option '"
-    concat $S1, name
-    concat $S1, "'"
-    argerror($S1)
+    $S0 = "invalid option '"
+    concat $S0, name
+    concat $S0, "'"
+    argerror($S0)
 .end
 
 

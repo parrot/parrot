@@ -22,31 +22,31 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 17;
 use Test::More;
 use Cwd;
 use File::Basename;
 use File::Spec;
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'require lfs' );
+language_output_is( 'lua', << 'CODE', << 'OUT', 'require lfs' );
 require "lfs"
 print(type(lfs))
 print(lfs._VERSION)
 CODE
 table
 LuaFileSystem 1.2
-OUTPUT
+OUT
 
 my $cwd = dirname(File::Spec->canonpath(getcwd));
-language_output_is( 'lua', << 'CODE', << "OUTPUT", 'function lfs.currentdir' );
+language_output_is( 'lua', << 'CODE', << "OUT", 'function lfs.currentdir' );
 require "lfs"
 print(lfs.currentdir())
 CODE
 $cwd
-OUTPUT
+OUT
 
 my $upcwd = File::Spec->catfile($cwd, 'src');
-language_output_is( 'lua', << 'CODE', << "OUTPUT", 'function lfs.chdir' );
+language_output_is( 'lua', << 'CODE', << "OUT", 'function lfs.chdir' );
 require "lfs"
 print(lfs.chdir("src"))
 print(lfs.currentdir())
@@ -57,9 +57,9 @@ true
 $upcwd
 true
 $cwd
-OUTPUT
+OUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function lfs.chdir' );
+language_output_is( 'lua', << 'CODE', << 'OUT', 'function lfs.chdir' );
 require "lfs"
 r, msg = lfs.chdir("bad_dir")
 print(r)
@@ -69,7 +69,7 @@ nil
 Unable to change working directory to 'bad_dir'
 No such file or directory
 
-OUTPUT
+OUT
 
 my $xpto = File::Spec->catfile($cwd, 'xpto');
 language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.mkdir' );
@@ -87,7 +87,7 @@ true
 $cwd
 OUT
 
-language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.dir' );
+language_output_is( 'lua', <<'CODE', <<'OUT', 'function lfs.dir' );
 require "lfs"
 for file in lfs.dir("xpto") do
     print(file)
@@ -99,7 +99,7 @@ OUT
 
 rmdir '../xpto' if (-d '../xpto');
 
-language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.mkdir' );
+language_output_is( 'lua', <<'CODE', <<'OUT', 'function lfs.mkdir' );
 require "lfs"
 r, msg = lfs.mkdir("xptoo/xptoo")
 print(r)
@@ -109,7 +109,7 @@ nil
 No such file or directory
 OUT
 
-language_output_like( 'lua', <<'CODE', <<"OUT", 'function lfs.dir' );
+language_output_like( 'lua', <<'CODE', <<'OUT', 'function lfs.dir' );
 require "lfs"
 lfs.dir("xptoo")
 CODE
@@ -118,7 +118,7 @@ OUT
 
 mkdir '../xpto' unless -d '../xpto';
 
-language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.mkdir' );
+language_output_is( 'lua', <<'CODE', <<'OUT', 'function lfs.mkdir' );
 require "lfs"
 print(lfs.rmdir("xpto"))
 CODE
@@ -128,7 +128,7 @@ OUT
 ok( !-d $xpto, "Test that rm removed the directory" );
 rmdir '../xpto' if (-d '../xpto');
 
-language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.mkdir' );
+language_output_is( 'lua', <<'CODE', <<'OUT', 'function lfs.mkdir' );
 require "lfs"
 r, msg = lfs.rmdir("xpto")
 print(r)
@@ -144,7 +144,7 @@ binmode $X, ':raw';
 print {$X} "file with text\n";
 close $X;
 
-language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.attributes' );
+language_output_is( 'lua', <<'CODE', <<'OUT', 'function lfs.attributes' );
 require "lfs"
 attr = lfs.attributes("file.txt")
 print(type(attr))
@@ -156,7 +156,18 @@ file
 15
 OUT
 
+my $nb = ($^O eq 'MSWin32') ? 11 : 13;
 language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.attributes' );
+require "lfs"
+attr = lfs.attributes("file.txt")
+local nb = 0
+for k in pairs(attr) do nb = nb + 1 end
+print(nb)
+CODE
+$nb
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'function lfs.attributes' );
 require "lfs"
 print(lfs.attributes("file.txt", "mode"))
 print(lfs.attributes("file.txt", "size"))
@@ -165,7 +176,19 @@ file
 15
 OUT
 
-language_output_is( 'lua', <<'CODE', <<"OUT", 'function lfs.attributes (no file)' );
+SKIP:
+{
+skip('only with Parrot', 1) if (exists $ENV{PARROT_LUA_TEST_PROG});
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'function lfs.attributes (invalid)' );
+require "lfs"
+print(lfs.attributes("file.txt", "bad"))
+CODE
+/invalid option 'bad'/
+OUT
+}
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'function lfs.attributes (no file)' );
 require "lfs"
 r, msg = lfs.attributes("no_file.txt")
 print(r)
@@ -175,7 +198,7 @@ nil
 cannot obtain information from file `no_file.txt'
 OUT
 
-language_output_like( 'lua', <<'CODE', <<"OUT", 'function lfs.lock (closed)' );
+language_output_like( 'lua', <<'CODE', <<'OUT', 'function lfs.lock (closed)' );
 require "lfs"
 f = io.open("file.txt")
 f:close()

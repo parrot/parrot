@@ -200,52 +200,35 @@ optimal file system I/O blocksize; (Unix only)
     .param pmc aname :optional
     .local pmc ret
     .local pmc members
-    .local pmc opts
     $S1 = checkstring(filepath)
     $S0 = $S1
-    new opts, .FixedStringArray
-    set opts, 13
-    opts[0] = 'mode'
-    opts[1] = 'dev'
-    opts[2] = 'ino'
-    opts[3] = 'nlink'
-    opts[4] = 'uid'
-    opts[5] = 'gid'
-    opts[6] = 'rdev'
-    opts[7] = 'access'
-    opts[8] = 'modification'
-    opts[9] = 'change'
-    opts[10] = 'size'
-    opts[11] = 'blocks'
-    opts[12] = 'blksize'
-    new members, .FixedPMCArray
-    set members, 13
+    new members, .Hash
     .const .Sub st_mode = 'st_mode'
-    members[0] = st_mode
+    members['mode'] = st_mode
     .const .Sub st_dev = 'st_dev'
-    members[1] = st_dev
+    members['dev'] = st_dev
     .const .Sub st_ino = 'st_ino'
-    members[2] = st_ino
+    members['ino'] = st_ino
     .const .Sub st_nlink = 'st_nlink'
-    members[3] = st_nlink
+    members['nlink'] = st_nlink
     .const .Sub st_uid = 'st_uid'
-    members[4] = st_uid
+    members['uid'] = st_uid
     .const .Sub st_gid = 'st_gid'
-    members[5] = st_gid
+    members['gid'] = st_gid
     .const .Sub st_rdev = 'st_rdev'
-    members[6] = st_rdev
+    members['rdev'] = st_rdev
     .const .Sub st_atime = 'st_atime'
-    members[7] = st_atime
+    members['access'] = st_atime
     .const .Sub st_mtime = 'st_mtime'
-    members[8] = st_mtime
+    members['modification'] = st_mtime
     .const .Sub st_ctime = 'st_ctime'
-    members[9] = st_ctime
+    members['change'] = st_ctime
     .const .Sub st_size = 'st_size'
-    members[10] = st_size
+    members['size'] = st_size
     .const .Sub st_blocks = 'st_blocks'
-    members[11] = st_blocks
+    members['blocks'] = st_blocks
     .const .Sub st_blksize = 'st_blksize'
-    members[12] = st_blksize
+    members['blksize'] = st_blksize
     new $P0, .OS
     push_eh _handler
     $P1 = $P0.'stat'($S1)
@@ -254,30 +237,32 @@ optimal file system I/O blocksize; (Unix only)
     $I0 = isa aname, 'LuaString'
     unless $I0 goto L2
     $S2 = aname
-    $I2 = checkoption($S2, opts)
-    $P2 = members[$I2]
+    $P2 = members[$S2]
+    unless null $P2 goto L3
+    checkoption($S2, '')
+L3:
     ret = $P2($P1)
     .return (ret)
 L2:
     $I0 = isa aname, 'LuaTable'
     unless $I0 goto L1
     ret = aname
-    goto L3
+    goto L4
 L1:
     new ret, .LuaTable
-L3:
-    new $P2, .LuaString
-    $I0 = 0
 L4:
-    unless $I0 < 13 goto L5
-    $P3 = members[$I0]
-    $P4 = $P3($P1)
-    $S2 = opts[$I0]
-    set $P2, $S2
-    ret[$P2] = $P4
-    inc $I0
-    goto L4
+    .local pmc iter
+    new iter, .Iterator, members
+    new $P2, .LuaString
 L5:
+    unless iter goto L6
+    $S2 = shift iter
+    set $P2, $S2
+    $P3 = members[$S2]
+    $P4 = $P3($P1)
+    ret[$P2] = $P4
+    goto L5
+L6:
     .return (ret)
 _handler:
     .local pmc nil
