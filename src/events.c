@@ -67,7 +67,7 @@ et(parrot_event* e)
 /* forward defs */
 static void* event_thread(void *data);
 static void* io_thread(void *data);
-static void* do_event(Parrot_Interp, parrot_event *, void *);
+static opcode_t * do_event(Parrot_Interp, parrot_event *, opcode_t *);
 static void stop_io_thread(void);
 static void schedule_signal_event(int signum);
 void Parrot_schedule_broadcast_qentry(QUEUE_ENTRY *entry);
@@ -1079,8 +1079,8 @@ event_thread(void *data)
 
 =over 4
 
-=item C<static void*
-wait_for_wakeup(Parrot_Interp interp, void *next)>
+=item C<static opcode_t *
+wait_for_wakeup(Parrot_Interp interp, opcode_t *next)>
 
 Sleep on the event queue condition. If an event arrives, the event
 is processed. Terminate the loop if sleeping is finished.
@@ -1089,18 +1089,20 @@ is processed. Terminate the loop if sleeping is finished.
 
 */
 
-static void*
-wait_for_wakeup(Parrot_Interp interp, void *next)
+static opcode_t *
+wait_for_wakeup(Parrot_Interp interp, opcode_t *next)
 {
-    QUEUE_ENTRY *entry;
-    parrot_event* event;
-    QUEUE * tq = interp->task_queue;
+    QUEUE_ENTRY  *entry;
+    parrot_event *event;
+    QUEUE        *tq = interp->task_queue;
+
     interp->sleeping = 1;
+
     /*
-     * event handler likes callbacks or timers are run as normal code
-     * so inside such an even handler function another event might get
+     * event handler like callbacks or timers are run as normal code
+     * so inside such an event handler function, another event might get
      * handled, which is good (higher priority events can interrupt
-     * other event handler) OTOH we must ensure that all state changes
+     * other event handler).  OTOH we must ensure that all state changes
      * are done in do_event and we should probably suspend nested
      * event handlers sometimes
      *
@@ -1115,16 +1117,17 @@ wait_for_wakeup(Parrot_Interp interp, void *next)
         event = (parrot_event*)entry->data;
         mem_sys_free(entry);
         edebug((stderr, "got ev %s head : %p\n", et(event), tq->head));
-        next = do_event(interp, event, next);
+        next  = do_event(interp, event, next);
     }
+
     edebug((stderr, "woke up\n"));
     return next;
 }
 
 /*
 
-=item C<void*
-Parrot_sleep_on_event(Parrot_Interp interp, FLOATVAL t, void* next)>
+=item C<opcode_t *
+Parrot_sleep_on_event(Parrot_Interp interp, FLOATVAL t, opcode_t *next)>
 
 Go to sleep. This is called from the C<sleep> opcode.
 
@@ -1132,8 +1135,8 @@ Go to sleep. This is called from the C<sleep> opcode.
 
 */
 
-void*
-Parrot_sleep_on_event(Parrot_Interp interp, FLOATVAL t, void* next)
+opcode_t *
+Parrot_sleep_on_event(Parrot_Interp interp, FLOATVAL t, opcode_t *next)
 {
 #if PARROT_HAS_THREADS
 
@@ -1164,7 +1167,7 @@ Parrot_sleep_on_event(Parrot_Interp interp, FLOATVAL t, void* next)
 =over 4
 
 =item C<void*
-Parrot_do_check_events(Parrot_Interp interp, void *next)>
+Parrot_do_check_events(Parrot_Interp interp, opcode_t *next)>
 
 Explicitly C<sync> called by the check_event opcode from run loops.
 
@@ -1172,11 +1175,12 @@ Explicitly C<sync> called by the check_event opcode from run loops.
 
 */
 
-void*
-Parrot_do_check_events(Parrot_Interp interp, void *next)
+opcode_t *
+Parrot_do_check_events(Parrot_Interp interp, opcode_t *next)
 {
     if (peek_entry(interp->task_queue))
         return Parrot_do_handle_events(interp, 0, next);
+
     return next;
 }
 
@@ -1213,8 +1217,8 @@ event_to_exception(Parrot_Interp interp, parrot_event* event)
 
 /*
 
-=item C<static void*
-do_event(Parrot_Interp interp, parrot_event* event, void *next)>
+=item C<static opcode_t *
+do_event(Parrot_Interp interp, parrot_event* event, opcode_t *next)>
 
 Run user code or such.
 
@@ -1222,8 +1226,8 @@ Run user code or such.
 
 */
 
-static void*
-do_event(Parrot_Interp interp, parrot_event* event, void *next)
+static opcode_t *
+do_event(Parrot_Interp interp, parrot_event* event, opcode_t *next)
 {
     edebug((stderr, "do_event %s\n", et(event)));
     switch (event->type) {
@@ -1271,8 +1275,8 @@ do_event(Parrot_Interp interp, parrot_event* event, void *next)
 
 /*
 
-=item C<void *
-Parrot_do_handle_events(Parrot_Interp interp, int restore, void *next)>
+=item C<opcode_t *
+Parrot_do_handle_events(Parrot_Interp interp, int restore, opcode_t *next)>
 
 Called by the C<check_event__> opcode from run loops or from above. When
 called from the C<check_events__> opcode, we have to restore the
@@ -1282,23 +1286,26 @@ C<op_func_table>.
 
 */
 
-void *
-Parrot_do_handle_events(Parrot_Interp interp, int restore, void *next)
+opcode_t *
+Parrot_do_handle_events(Parrot_Interp interp, int restore, opcode_t *next)
 {
-    QUEUE_ENTRY *entry;
-    parrot_event* event;
-    QUEUE * tq = interp->task_queue;
+    QUEUE_ENTRY  *entry;
+    parrot_event *event;
+    QUEUE        *tq = interp->task_queue;
 
     if (restore)
         disable_event_checking(interp);
+
     if (!peek_entry(tq))
         return next;
+
     while (peek_entry(tq)) {
         entry = pop_entry(tq);
         event = (parrot_event*)entry->data;
         mem_sys_free(entry);
-        next = do_event(interp, event, next);
+        next  = do_event(interp, event, next);
     }
+
     return next;
 }
 

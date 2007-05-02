@@ -83,8 +83,8 @@ PARROT_API void Parrot_schedule_interp_qentry(Parrot_Interp, struct QUEUE_ENTRY*
 
 PARROT_API void Parrot_init_signals(void);
 PARROT_API void Parrot_init_events(Parrot_Interp);
-PARROT_API void* Parrot_do_check_events(Parrot_Interp, void*);
-PARROT_API void* Parrot_do_handle_events(Parrot_Interp, int, void*);
+PARROT_API opcode_t * Parrot_do_check_events(Parrot_Interp, opcode_t *);
+PARROT_API opcode_t * Parrot_do_handle_events(Parrot_Interp, int, opcode_t *);
 
 PARROT_API void Parrot_new_timer_event(Parrot_Interp, PMC*, FLOATVAL,
         FLOATVAL, int, PMC*, parrot_event_type_enum);
@@ -98,7 +98,8 @@ PARROT_API void Parrot_new_cb_event(Parrot_Interp, PMC* cbi, char *ext);
 PARROT_API void Parrot_run_callback(Parrot_Interp, PMC* cbi, char *ext);
 
 PARROT_API void Parrot_kill_event_loop(void);
-PARROT_API void* Parrot_sleep_on_event(Parrot_Interp, FLOATVAL t, void* next);
+PARROT_API opcode_t * Parrot_sleep_on_event(Parrot_Interp, FLOATVAL t,
+                                                           opcode_t *next);
 
 /* &gen_from_enum(io_thr_msg.pasm) */
 typedef enum {
