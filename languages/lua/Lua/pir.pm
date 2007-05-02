@@ -24,6 +24,7 @@ package pirVisitor;
   $P0 = new .Array
   set $P0, $I0
   $I1 = 0
+  push_eh root_exception_handler
 L1:
   unless $I1 < $I0 goto L2
   $S0 = shift args
@@ -50,7 +51,22 @@ L2:
   .local pmc env
   env = get_global '_G'
   main.'setfenv'(env)
-  main($P0 :flat)
+  .return main($P0 :flat)
+
+root_exception_handler:
+  .include 'except_severity.pasm'
+  .local int severity
+  get_results '(0, 0)', $P0, $S0
+  severity = $P0[2]
+  if severity == .EXCEPT_EXIT goto lua_exited
+  $S1 = $P0[0]
+  $S0 = "Unhandled exception: "
+  $S0 .= $S1
+  $S0 .= "\n"
+  printerr $S0
+  exit 1
+lua_exited:
+  rethrow $P0
 .end
 
 .sub '__onload' :anon :init
