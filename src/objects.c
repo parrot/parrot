@@ -143,7 +143,6 @@ readable_name(Interp *interp, PMC *name)
 static void
 fail_if_exist(Interp *interp, PMC *name)
 {
-    STRING *class_name;
     INTVAL type;
 
     PMC * const classname_hash = interp->class_hash;
@@ -154,9 +153,10 @@ fail_if_exist(Interp *interp, PMC *name)
         type = 0;
     else
         type = VTABLE_get_integer(interp, type_pmc);
-    /* TODO get printable name */
-    class_name = VTABLE_get_string(interp, name);
+
     if (type > enum_type_undef) {
+        /* TODO get printable name */
+        STRING *class_name = VTABLE_get_string(interp, name);
         real_exception(interp, NULL, INVALID_OPERATION,
                 "Class %Ss already registered!\n", class_name);
     }
@@ -651,7 +651,6 @@ parrot_class_register(Interp *interp, PMC *name,
      * The child class PMC gets the vtable of its parent class or
      * a ParrotClass vtable
      */
-    parent_vtable = new_class->vtable;
     if (parent && PObj_is_class_TEST(parent))
         parent_vtable = parent->vtable;
     else
