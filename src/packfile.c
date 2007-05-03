@@ -2830,7 +2830,7 @@ find_fixup(PackFile_FixupTable *ft, INTVAL type, const char *name)
 {
     opcode_t i;
     for (i = 0; i < ft->fixup_count; i++) {
-        if ((enum_fixup_t)ft->fixups[i]->type == type &&
+        if ((INTVAL)((enum_fixup_t)ft->fixups[i]->type) == type &&
                 !strcmp(ft->fixups[i]->name, name)) {
             ft->fixups[i]->seg = ft->code;
             return ft->fixups[i];

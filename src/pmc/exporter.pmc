@@ -84,7 +84,7 @@ Initializes an Exporter PMC.
         PObj_active_destroy_SET(SELF);
 
         /* Set up the object. */
-        exp            = mem_sys_allocate_zeroed(sizeof (Parrot_Exporter));
+        exp            = mem_allocate_zeroed_typed(Parrot_Exporter);
         exp->ns_src    = PMCNULL;
         exp->ns_dest   = CONTEXT(interp->ctx)->current_namespace;
         exp->globals   = PMCNULL;

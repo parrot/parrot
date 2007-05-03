@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2005, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -39,12 +39,14 @@ typedef INTVAL(*sort_func_t)(Interp *, void*, void*);
 static INTVAL
 COMPARE(Interp *interp, void *a, void *b, PMC *cmp)
 {
-    if (!cmp)
-        return mmd_dispatch_i_pp(interp, a, b, MMD_CMP);
+    if (PMC_IS_NULL(cmp))
+        return mmd_dispatch_i_pp(interp, (PMC *)a, (PMC *)b, MMD_CMP);
+
     if (cmp->vtable->base_type == enum_class_NCI) {
         sort_func_t f = (sort_func_t)D2FPTR(PMC_struct_val(cmp));
         return f(interp, a, b);
     }
+
     return Parrot_runops_fromc_args_reti(interp, cmp, "IPP", a, b);
 }
 
@@ -85,7 +87,7 @@ pmclass FixedPMCArray need_ext does array {
 
 /*
 
-=item C<METHOD void sort(PMC* cmp_func)>
+=item C<METHOD void sort(PMC *cmp_func)>
 
 Sort this array, optionally using the provided cmp_func
 
@@ -94,15 +96,12 @@ Sort this array, optionally using the provided cmp_func
 */
 
 METHOD void sort(PMC *cmp_func) {
-    UINTVAL n;
+    UINTVAL n = (UINTVAL) PMC_int_val(SELF);
 
-
-    n = (UINTVAL) PMC_int_val(SELF);
     if (n <= 1)
         return;
-    if (PMC_IS_NULL(cmp_func))
-        cmp_func = NULL;
-    quicksort(interp, PMC_data(SELF), n, cmp_func);
+
+    quicksort(interp, PMC_data_typed(SELF, void **), n, cmp_func);
 }
 
 /*

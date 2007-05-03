@@ -143,9 +143,11 @@ Resizes the array to C<size> elements.
         /* The size is different, and doesn't fit within the current
          * allocation */
         else if (new_bytesize != old_bytesize) {
-            Parrot_UInt1 * old_store = PMC_data(SELF);
-            Parrot_UInt1 * new_store = mem_sys_allocate_zeroed(newsize);
-            INTVAL         copy_size = new_bytesize < old_bytesize ? new_bytesize : old_bytesize;
+            Parrot_UInt1 * old_store = PMC_data_typed(SELF, Parrot_UInt1 *);
+            Parrot_UInt1 * new_store =
+                (Parrot_UInt1 *)mem_sys_allocate_zeroed(newsize);
+            INTVAL         copy_size =
+                new_bytesize < old_bytesize ? new_bytesize : old_bytesize;
 
             /* Replace old array with new array, and free old array */
             PMC_data(SELF) = mem_sys_memmove(new_store, old_store, copy_size);
@@ -208,13 +210,14 @@ beginning.
         /* If the current head position offset is 0, size this thing up by one
          * allocation unit */
         if (PMC_int_val2(SELF) <= 0) {
-            Parrot_UInt1 * const sdOld = PMC_data(SELF);
+            Parrot_UInt1 * const sdOld = PMC_data_typed(SELF, Parrot_UInt1 *);
 
             /* Allocate an extra allocation unit of space in new array */
             INTVAL oldmemsize, newmemsize;
-            Parrot_UInt1 * sdNew = NULL;
-            newmemsize = ROUND_BYTES(PMC_int_val(SELF) + MIN_ALLOC);
-            sdNew = mem_sys_allocate_zeroed(newmemsize);
+            Parrot_UInt1 *sdNew = NULL;
+            newmemsize          = ROUND_BYTES(PMC_int_val(SELF) + MIN_ALLOC);
+            sdNew               =
+                (Parrot_UInt1 *)mem_sys_allocate_zeroed(newmemsize);
 
             /* Copy contents of old array to new array, moving the head
              * position forward by one allocation unit (in bytes). */
@@ -266,14 +269,15 @@ Removes and returns the first element.
         if (PMC_int_val2(SELF) >= MIN_ALLOC) {
             /* Allocate one allocation unit less of space in new array */
             INTVAL newmemsize;
-            Parrot_UInt1 * sdNew = NULL;
-            Parrot_UInt1 * sdOld = NULL;
-            newmemsize = ROUND_BYTES(PMC_int_val(SELF) - MIN_ALLOC);
-            sdNew = mem_sys_allocate_zeroed(newmemsize);
+            Parrot_UInt1 *sdNew = NULL;
+            Parrot_UInt1 *sdOld = NULL;
+            newmemsize          = ROUND_BYTES(PMC_int_val(SELF) - MIN_ALLOC);
+            sdNew               =
+                (Parrot_UInt1 *)mem_sys_allocate_zeroed(newmemsize);
 
             /* Copy contents of old array to new array, move the head position
              * offset back by one allocation unit (in bytes) */
-            sdOld = PMC_data(SELF);
+            sdOld = PMC_data_typed(SELF, Parrot_UInt1 *);
             mem_sys_memmove(sdNew, sdOld + (BITS_TO_BYTES(MIN_ALLOC)), newmemsize);
 
             /* Replace old array with new array, and free old array */
@@ -344,7 +348,7 @@ Used to archive the string.
 
         io->vtable->push_integer(INTERP, io, PMC_int_val2(SELF));
         io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
-        s = string_from_cstring(INTERP, PMC_data(SELF), size);
+        s = string_from_cstring(INTERP, PMC_data_typed(SELF, char *), size);
         io->vtable->push_string(INTERP, io, s);
     }
 

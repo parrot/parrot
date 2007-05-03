@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2005, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -182,7 +182,7 @@ Returns the integer value of the element at index C<key>.
 */
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-        Parrot_UInt1 *sd = PMC_data(SELF);
+        Parrot_UInt1 *sd = PMC_data_typed(SELF, Parrot_UInt1 *);
 
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
@@ -332,18 +332,16 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        Parrot_UInt1 *sd = PMC_data(SELF);
+        Parrot_UInt1 *sd = PMC_data_typed(SELF, Parrot_UInt1 *);
 
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
                 "FixedBooleanArray: index out of bounds!");
 
-        if (value) {
+        if (value)
             sd[key/BITS_PER_CHAR] |= (1 << (key % BITS_PER_CHAR));
-        }
-        else {
+        else
             sd[key/BITS_PER_CHAR] &= (~ (1 << (key % BITS_PER_CHAR)));
-        }
     }
 
 /*
@@ -495,11 +493,12 @@ Used to archive the string.
 */
     void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
-        STRING *s;
+        STRING   *s;
+
         io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
         s = string_from_cstring(INTERP,
-                                PMC_data(SELF),
-                                PMC_int_val2(SELF)/BITS_PER_CHAR);
+                                PMC_data_typed(SELF, char *),
+                                PMC_int_val2(SELF) / BITS_PER_CHAR);
         io->vtable->push_string(INTERP, io, s);
     }
 
@@ -537,7 +536,7 @@ sets them all to false.
 */
 
     METHOD void fill(INTVAL fill) {
-        Parrot_UInt1 *sd = PMC_data(SELF);
+        Parrot_UInt1 *sd = PMC_data_typed(SELF, Parrot_UInt1 *);
         INTVAL j;
         j = PMC_int_val(SELF) / BITS_PER_CHAR + 1;
         if (fill)

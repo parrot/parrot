@@ -232,7 +232,7 @@ C<init_data>.
         PObj_active_destroy_SET(SELF);
 
         /* Set up the object. */
-        role                  = mem_sys_allocate_zeroed(sizeof (Parrot_Role));
+        role                  = mem_allocate_zeroed_typed(Parrot_Role);
         role->name            = CONST_STRING(interp, "");
         role->_namespace      = PMCNULL;
         role->roles           = pmc_new(interp, enum_class_ResizablePMCArray);
@@ -390,10 +390,11 @@ composed into this role.
 */
 
     PMC* inspect_str(STRING *what) {
-        Parrot_Role *role = PARROT_ROLE(SELF);
+        Parrot_Role *role  = PARROT_ROLE(SELF);
 
         /* What should we return? */
-        PMC *found;
+        PMC         *found = PMCNULL;
+
         if (string_equal(interp, what, CONST_STRING(interp, "name")) == 0) {
             found = pmc_new(interp, enum_class_String);
             VTABLE_set_string_native(interp, found, role->name);

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005, The Perl Foundation.
+Copyright (C) 2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -25,14 +25,14 @@ These are the vtable functions for the lexinfo PMC.
 static size_t
 key_hash_STRING(Interp *interp, void *value, size_t seed)
 {
-    STRING *s = value;
+    STRING *s = (STRING *)value;
 
-    if (s->hashval) {
+    if (s->hashval)
         return s->hashval;
-    }
 
     return string_hash(interp, s, seed);
 }
+
 /*
  * LexInfo contains a constant Hash with constant string
  * keys and integer indices - no marking and no pmc_ext
@@ -95,12 +95,12 @@ Returns the number of elements in the LexInfo hash.
 
 */
 
-    METHOD void declare_lex_preg(STRING* name, INTVAL preg) {
-        parrot_hash_put(INTERP, PMC_struct_val(SELF), name, (void*)preg);
+    METHOD void declare_lex_preg(STRING *name, INTVAL preg) {
+        parrot_hash_put(INTERP, (Hash*)PMC_struct_val(SELF), name, (void*)preg);
     }
 
     INTVAL elements() {
-        return parrot_hash_size(INTERP, PMC_struct_val(SELF));
+        return parrot_hash_size(INTERP, (Hash *)PMC_struct_val(SELF));
     }
 
 /*
@@ -140,7 +140,7 @@ The implementation of the Hash PMC is called.
              * TODO create hash with needed types in the first place
              */
             SELF.init_pmc(NULL);
-            hash = PMC_struct_val(SELF);
+            hash          = (Hash *)PMC_struct_val(SELF);
             hash->entries = elems;
         }
         else {

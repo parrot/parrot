@@ -199,14 +199,19 @@ Returns the PMC value of the element at index C<key>.
 
         if (key < 0)
             key += PMC_int_val(SELF);
+
         if (key < 0)
             real_exception(INTERP, NULL, E_IndexError,
                 "ResizablePMCArray: index out of bounds!");
+
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
-        data = PMC_data(SELF);
+
+        data = PMC_data_typed(SELF, PMC **);
+
         if ( PMC_IS_NULL(data[key]) )
             data[key] = pmc_new(INTERP, enum_class_Undef);
+
         return data[key];
     }
 
@@ -247,13 +252,14 @@ If key is a slice, do a splice as set that item.
     }
 
     void delete_keyed(PMC* key) {
-        PMC **data;
-        INTVAL idx = key_integer(INTERP, key);
-        INTVAL i;
-        INTVAL n = PMC_int_val(SELF);
-        data = PMC_data(SELF);
+        INTVAL  i;
+        INTVAL  idx  = key_integer(INTERP, key);
+        INTVAL  n    = PMC_int_val(SELF);
+        PMC   **data = PMC_data_typed(SELF, PMC **);
+
         for (i = idx; i < n - 1; ++i)
             data[i] = data[i + 1];
+
         PMC_int_val(SELF)--;
     }
 
@@ -615,18 +621,18 @@ Append the other array to this array.
                 other->vtable->base_type == enum_class_FixedPMCArray) {
             PMC **other_data, **this_data;
 
-            other_data = PMC_data(other);
-            this_data =  PMC_data(SELF);
-            for (i = 0; i < m; ++i) {
+            other_data = PMC_data_typed(other, PMC **);
+            this_data  = PMC_data_typed(SELF, PMC **);
+
+            for (i = 0; i < m; ++i)
                 this_data[n + i] = other_data[i];
-            }
         }
         else {
             PMC **this_data;
-            this_data = PMC_data(SELF);
-            for (i = 0; i < m; ++i) {
+            this_data = PMC_data_typed(SELF, PMC **);
+
+            for (i = 0; i < m; ++i)
                 this_data[n + i] = VTABLE_get_pmc_keyed_int(INTERP, other, i);
-            }
         }
     }
 /*

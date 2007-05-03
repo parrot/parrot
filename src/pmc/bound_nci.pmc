@@ -55,22 +55,23 @@ Set the bound object live.
         return PMC_pmc_val(SELF);
     }
 
-    opcode_t* invoke(void * next) {
+    opcode_t* invoke(void *next) {
         if (PObj_get_FLAGS(SELF) & PObj_private0_FLAG) {
             /* bound multi sub
              * XXX maybe create separate PMC class
              * see also src/pmc/default.pmc:get_attr_str()
              * */
-            PMC *multi = PMC_struct_val(SELF);
-            next = VTABLE_invoke(INTERP, multi, next);
+            PMC *multi = (PMC *)PMC_struct_val(SELF);
+            next       = VTABLE_invoke(INTERP, multi, next);
         }
         else {
-            PMC *p2 = REG_PMC(2);
+            PMC *p2                = REG_PMC(2);
             INTERP->current_object = REG_PMC(2) = PMC_pmc_val(SELF);
             SUPER(next);
-            REG_PMC(2) = p2;
+            REG_PMC(2)             = p2;
         }
-        return next;
+
+        return (opcode_t *)next;
     }
 
     void mark() {

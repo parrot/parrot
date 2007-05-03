@@ -600,7 +600,8 @@ Array of Class PMCs representing the direct parents of this class.
         Parrot_Class *_class = PARROT_CLASS(SELF);
 
         /* What should we return? */
-        PMC *found;
+        PMC          *found  = PMCNULL;
+
         if (string_equal(interp, what, CONST_STRING(interp, "name")) == 0) {
             found = pmc_new(interp, enum_class_String);
             VTABLE_set_string_native(interp, found, _class->name);

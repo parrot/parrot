@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -52,15 +52,17 @@ structures.
 static void
 set_slice_start(Interp *interp, PMC *self, PMC *key, PMC *agg)
 {
-    parrot_range_t *range = mem_sys_allocate(sizeof *range);
+    parrot_range_t *range = mem_allocate_typed(parrot_range_t);
 
-    PMC_struct_val(self) = range;
+    PMC_struct_val(self)  = range;
+
 next_range:
-    range->next = NULL;
+    range->next           = NULL;
     RVal_int(range->step) = 1;
 
     if (key_type(interp, key) & KEY_integer_FLAG) {
         range->type = enum_type_INTVAL;
+
         /* integer key */
         if ((PObj_get_FLAGS(key) &
                     (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) ==
@@ -94,21 +96,26 @@ next_range:
             }
             else {
                 /* must have end in next key */
-                key = PMC_data(key);
+                key = PMC_data_typed(key, PMC *);
+
                 if (!key)
                     internal_exception(1, "no end range specified");
+
                 RVal_int(range->end) = key_integer(interp, key);
             }
         }
+
         if (agg->vtable->base_type == enum_class_Slice)
             --RVal_int(range->end);
         RVal_int(range->cur) = RVal_int(range->start);
+
 range_end:
-        key = PMC_data(key);
+        key = PMC_data_typed(key, PMC *);
+
         if (key) {
-            parrot_range_t *n = mem_sys_allocate(sizeof *range);
-            range->next = n;
-            range = n;
+            parrot_range_t *n = mem_allocate_typed(parrot_range_t);
+            range->next       = n;
+            range             = n;
             goto next_range;
         }
         return;
@@ -135,9 +142,11 @@ range_end:
         }
         else {
             /* must have end in next key */
-            key = PMC_data(key);
+            key = PMC_data_typed(key, PMC *);
+
             if (!key)
                 internal_exception(1, "no end range specified");
+
             RVal_str(range->end) = key_string(interp, key);
         }
         goto range_end;
@@ -151,9 +160,11 @@ range_end:
 static void
 set_slice_next(Interp *interp, PMC *self, PMC *agg)
 {
-    parrot_range_t *r = PMC_struct_val(self);
+    parrot_range_t *r = (parrot_range_t *)PMC_struct_val(self);
+
     if (!r || (INTVAL) r == -1)
         real_exception(interp, NULL, E_StopIteration, "StopIteration");
+
     if (r->type == enum_type_INTVAL) {
         RVal_int(r->cur) += RVal_int(r->step);
         if (RVal_int(r->step) > 0) {
@@ -162,20 +173,22 @@ set_slice_next(Interp *interp, PMC *self, PMC *agg)
 next_range:
                 n = r->next;
                 mem_sys_free(r);
+
                 PMC_struct_val(self) = n;
+
                 if (!n)
                     PMC_int_val(self) = -1;
             }
         }
         else {
-            if (RVal_int(r->cur) < RVal_int(r->end)) {
+            if (RVal_int(r->cur) < RVal_int(r->end))
                 goto next_range;
-            }
         }
     }
     else {
         STRING *cur = RVal_str(r->cur);
         STRING *end = RVal_str(r->end);
+
         if (string_compare(interp, cur, end) < 0)
             RVal_str(r->cur) = string_increment(interp, cur);
         else
@@ -195,7 +208,7 @@ pmclass Slice need_ext extends Key {
             pobject_lives(INTERP, (PObj*) PMC_pmc_val(SELF));
     }
 
-    void init_pmc(PMC* key) {
+    void init_pmc(PMC *key) {
         SELF.init();
         /* that's actually the KEY_number_FLAG - but I can't hardly
          * imagine that we get keyed by FLOATVAL slices on
@@ -207,10 +220,13 @@ pmclass Slice need_ext extends Key {
     }
 
     void destroy() {
-        parrot_range_t *r = PMC_struct_val(SELF), *n;
+        parrot_range_t *r = (parrot_range_t *)PMC_struct_val(SELF);
+        parrot_range_t *n;
+
         /* iteration ended - all is freed */
         if ((INTVAL) r == -1)
             return;
+
         while (r) {
             n = r->next;
             mem_sys_free(r);
@@ -238,14 +254,17 @@ Get the next string key from the current slice range.
 */
 
     INTVAL get_integer() {
-        parrot_range_t *r = PMC_struct_val(SELF);
+        parrot_range_t *r = (parrot_range_t *)PMC_struct_val(SELF);
+
         if (!r || (INTVAL) r == -1)
             real_exception(INTERP, NULL, E_StopIteration, "StopIteration");
+
         return RVal_int(r->cur);
     }
 
     STRING* get_string() {
-        parrot_range_t *r = PMC_struct_val(SELF);
+        parrot_range_t *r = (parrot_range_t *)PMC_struct_val(SELF);
+
         return RVal_str(r->cur);
     }
 
@@ -282,7 +301,7 @@ This is used for implementing Pythons xrange()
     }
 
     INTVAL elements() {
-        parrot_range_t *r = PMC_struct_val(SELF);
+        parrot_range_t *r = (parrot_range_t *)PMC_struct_val(SELF);
         /* only start .. end supported so:
          * TODO check flags somewhere
          * */
@@ -290,25 +309,26 @@ This is used for implementing Pythons xrange()
         return n;
     }
 
-    INTVAL get_integer_keyed(PMC* key) {
-        parrot_range_t *r = PMC_struct_val(key);
+    INTVAL get_integer_keyed(PMC *key) {
+        parrot_range_t *r = (parrot_range_t *)PMC_struct_val(key);
         return RVal_int(r->cur);
     }
 
-    STRING* get_string_keyed(PMC* key) {
+    STRING* get_string_keyed(PMC *key) {
         INTVAL v = VTABLE_get_integer(INTERP, key);
         return string_from_int(INTERP, v);
     }
 
-    PMC* get_pmc_keyed(PMC* key) {
-        parrot_range_t *r = PMC_struct_val(key);
-        PMC *res = PMC_pmc_val(SELF);
-        PMC_int_val(res) = RVal_int(r->cur);
+    PMC* get_pmc_keyed(PMC *key) {
+        parrot_range_t *r = (parrot_range_t *)PMC_struct_val(key);
+        PMC *res          = PMC_pmc_val(SELF);
+        PMC_int_val(res)  = RVal_int(r->cur);
+
         return res;
     }
 /*
 
-=item C<PMC* nextkey_keyed(PMC* agg, INTVAL what)>
+=item C<PMC* nextkey_keyed(PMC *agg, INTVAL what)>
 
 Prepare slice PMC SELF for iteration over the passed aggregate or
 advance to next position in the range, depending on what.
@@ -316,7 +336,7 @@ advance to next position in the range, depending on what.
 =cut
 
 */
-    PMC* nextkey_keyed(PMC* agg, INTVAL what) {
+    PMC* nextkey_keyed(PMC *agg, INTVAL what) {
         PMC *ret = SELF;
 
         switch (what) {

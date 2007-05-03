@@ -243,8 +243,8 @@ $returns_accessors
 #line $lineno2 $file
     /*END GENERATED ACCESSORS */
     {
-        int temp_return_indexes[] = { $returns_indexes };
-        return_indexes = (opcode_t *) temp_return_indexes;
+        opcode_t temp_return_indexes[] = { $returns_indexes };
+        return_indexes = temp_return_indexes;
     }
     return_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
         string_from_const_cstring(interp, $returns_flags, 0), 0);
