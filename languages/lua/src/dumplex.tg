@@ -71,6 +71,7 @@ L4:
     arg = tree.get('past', $P1, 'Lua::TestLex::punctuator')
     goto L9
 L5:
+    internal_error('unknown token')
 L9:
     past.'push'(arg)
     .return (past)

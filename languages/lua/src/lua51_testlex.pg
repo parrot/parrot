@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-src/lua51_testlex.tg - a grammar for testing lexico
+src/lua51_testlex.pg - a grammar for testing lexico
 
 =head1 DESCRIPTION
 

@@ -15,7 +15,21 @@ test_lex -- A dumper for Lua 5.1 lexicography
 
 =head1 DESCRIPTION
 
-C<test_lex> is a dumper for Lua 5.1 lexicography.
+This compiler extends C<HLLCompiler>
+(see F<runtime/parrot/library/Parrot/HLLCompiler.pir>)
+
+This compiler defines the following stages:
+
+=over 4
+
+=item * parse F<languages/lua/src/lua51_testlex.pg>
+
+=item * past  F<languages/lua/src/dumplex.tg>
+
+=back
+
+and imports many definitions from the full Lua compiler
+(F<languages/lua/src/lua51.pir>).
 
 =cut
 
@@ -51,10 +65,15 @@ C<test_lex> is a dumper for Lua 5.1 lexicography.
     set_hll_global ['Lua::TestLex'], 'long_string', $P0
     $P0 = get_hll_global ['Lua::Grammar'], 'long_comment'
     set_hll_global ['Lua::TestLex'], 'long_comment', $P0
+
+    # import Lua::PAST::Grammar::internal_error into Lua::DumpLex
+    $P0 = get_hll_global ['Lua::PAST::Grammar'], 'internal_error'
+    set_hll_global ['Lua::DumpLex'], 'internal_error', $P0
 .end
 
 .sub 'main' :main
     .param pmc args
+    load_bytecode 'PGE/Dumper.pbc'
     $P0 = compreg 'LuaTestLex'
     $P0.'command_line'(args)
 .end

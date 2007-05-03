@@ -85,8 +85,7 @@ transform past (Lua::Grammar::last_statement) :language('PIR') {
     .return (past)
 
   no_stat:
-    printerr "no last statement\n"
-    exit 1
+    internal_error("no last statement")
 }
 
 transform past (Lua::Grammar::if_stat) :language('PIR') {
@@ -265,8 +264,7 @@ transform past (Lua::Grammar::assignment) :language('PIR') {
     if null $P0 goto more_expr
     .return tree.'get'('past', $P0, 'Lua::Grammar::expression_list')
   more_expr:
-    printerr "Not implemented\n"
-    exit 1
+    internal_error("Not implemented")
 
 }
 
@@ -366,9 +364,9 @@ transform past (Lua::Grammar::expression_list) :language('PIR') {
   iter_end:
     .return (past)
   error:
-    printerr "null access in expr list\n"
-    exit 1
+    internal_error("null access in expr list")
 }
+
 transform past (Lua::Grammar::expression) :language('PIR') {
     $P0 = node['expr']
     .return tree.'get'('past', $P0, 'Lua::Grammar::expr')
@@ -471,7 +469,7 @@ transform past (Lua::Grammar::string) :language('PIR') {
     result.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S0)
     .return (result)
   error:
-    printerr "Unknown string\n"
+    internal_error("Unknown string")
 }
 
 =head1 AUTHORS

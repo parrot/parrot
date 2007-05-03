@@ -285,13 +285,6 @@ token string {
 }
 
 
-token number {
-  |  0 <[Xx]> <xdigit>+
-  | [ <digit>+ [ \. <digit>* ]? | \. <digit>+ ]
-    [ <[Ee]> <[+\-]>? <digit>+ ]?
-}
-
-
 token ws {
     [ \s+
     | <'--'> <long_comment>
