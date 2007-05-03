@@ -22,12 +22,16 @@ use base qw(Parrot::Configure::Step::Base);
 use Config;
 use FindBin;    # see build_dir
 use Parrot::Configure::Step;
+use Parrot::BuildUtil;
 use Cwd qw(abs_path);
 use File::Spec;
 
 $description = q{Setting up Configure's default values};
 
 @args = qw(debugging optimize profile verbose m);
+
+my $parrot_version = Parrot::BuildUtil::parrot_version();
+my @parrot_version = Parrot::BuildUtil::parrot_version();
 
 sub runstep {
     my ( $self, $conf ) = @_;
@@ -169,10 +173,10 @@ sub runstep {
         lns   => $Config{lns},                          # soft link
         slash => '/',
 
-        VERSION => $main::parrot_version,
-        MAJOR   => $main::parrot_version[0],
-        MINOR   => $main::parrot_version[1],
-        PATCH   => $main::parrot_version[2],
+        VERSION => $parrot_version,
+        MAJOR   => $parrot_version[0],
+        MINOR   => $parrot_version[1],
+        PATCH   => $parrot_version[2],
         DEVEL   => ( -e 'DEVELOPING' ? '-devel' : '' ),
 
         configdate => scalar gmtime() . " GMT",

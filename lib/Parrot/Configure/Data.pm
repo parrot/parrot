@@ -177,7 +177,7 @@ Accepts no arguments.
 
 sub slurp() {
     my $self = shift;
-    my $res  = eval "no strict; use Parrot::Config; \\%PConfig";
+    my $res  = eval "no strict; use Parrot::Config::Generated; \\%PConfig";
 
     if ( not defined $res ) {
         die "You cannot use --step until you have completed the full configure process\n";

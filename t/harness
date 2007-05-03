@@ -153,7 +153,7 @@ $ENV{TEST_PROG_ARGS} = $args;
 
 # Pass in a list of tests to run on the command line, else run all the tests.
 my @default_tests = map {glob "t/$_/*.t"} qw(
-    configure compilers/imcc/* op pmc native_pbc dynpmc dynoplibs
+    configure postconfigure compilers/imcc/* op pmc native_pbc dynpmc dynoplibs
     compilers/past compilers/pge compilers/pge/p5regex compilers/pge/p6regex
     compilers/tge compilers/json library examples run src tools perl doc stm
 );

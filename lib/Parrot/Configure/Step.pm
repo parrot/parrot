@@ -33,9 +33,10 @@ use File::Basename qw( basename );
 use File::Copy ();
 use File::Spec;
 use File::Which;
+use lib ("lib");
+use Parrot::Configure;
 
-# XXX $conf is a temporary hack
-our $conf;
+my $conf = Parrot::Configure->new();
 
 our @EXPORT    = ();
 our @EXPORT_OK = qw(prompt genfile copy_if_diff move_if_diff integrate

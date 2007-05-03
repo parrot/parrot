@@ -257,6 +257,8 @@ F<lib/Parrot/Configure/Step.pm>, F<docs/configuration.pod>
 use 5.006_001;
 use strict;
 use warnings;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
 use lib 'lib';
 
 use Parrot::BuildUtil;
@@ -268,11 +270,9 @@ use Parrot::Configure::Messages qw(
 );
 use Parrot::Configure::Step::List qw( get_steps_list );
 
-# These globals are accessed in config/init/defaults.pm
-our $parrot_version = Parrot::BuildUtil::parrot_version();
-our @parrot_version = Parrot::BuildUtil::parrot_version();
+my $parrot_version = Parrot::BuildUtil::parrot_version();
 
-$| = 1;
+$| = 1; # $OUTPUT_AUTOFLUSH = 1;
 
 # Install Option text was taken from:
 #
@@ -284,14 +284,12 @@ $| = 1;
 # warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 # from Parrot::Configure::Options
-my $args = process_options(
-    {
-        argv           => [@ARGV],
-        script         => $0,
-        parrot_version => $parrot_version,
-        svnid          => '$Id$',
-    }
-);
+my $args = process_options( {
+    argv            => [ @ARGV ],
+    script          => $0,
+    parrot_version  => $parrot_version,
+    svnid           => '$Id$',
+} );
 exit unless defined $args;
 
 my %args = %$args;
@@ -300,36 +298,34 @@ my %args = %$args;
 print_introduction($parrot_version);
 
 my $conf = Parrot::Configure->new;
-{
-
-    # RT#41201 $Parrot::Configure::Step::conf is a temporary hack
-    no warnings qw(once);
-    $Parrot::Configure::Step::conf = $conf;
-}
 
 # from Parrot::Configure::Step::List
 $conf->add_steps(get_steps_list());
 
+# from Parrot::Configure::Data
 $conf->options->set(%args);
 
 if ( exists $args{step} ) {
+    # from Parrot::Configure::Data
     $conf->data()->slurp();
+    # from Parrot::Configure
     $conf->runstep( $args{step} );
     print "\n";
-    exit(0);
 }
 else {
-
     # Run the actual steps
+    # from Parrot::Configure
     $conf->runsteps or exit(1);
 }
 
 # tell users what to do next
-
 # from Parrot::Configure::Messages
-print_conclusion( $conf->data->get('make') );
+print_conclusion($conf->data->get('make'));
 
 exit(0);
+
+################### DOCUMENTATION ###################
+
 
 # Local Variables:
 #   mode: cperl
@@ -337,3 +333,4 @@ exit(0);
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
+
