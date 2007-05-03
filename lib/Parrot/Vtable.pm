@@ -77,6 +77,7 @@ sub parse_vtable {
 
     my $file   = defined $_[0] ? shift() : 'vtable.tbl';
     my $vtable = [];
+    my $mmd    = [];
     my $fh     = FileHandle->new( $file, O_RDONLY )
         or die "Can't open $file for reading: $!\n";
     my $section = 'MAIN';
@@ -99,16 +100,24 @@ sub parse_vtable {
         (?:\s+(MMD_\w+))?\s*($attrs_re)$/x
             )
         {
-            my $mmd = defined $4 ? $4 : -1;
+            my $mmdop = defined $4 ? $4 : -1;
 
-            push @{$vtable}, [ $1, $2, $3, $section, $mmd, parse_attrs( $5, $default_attrs ) ];
+            my $entry = [ $1, $2, $3, $section, $mmdop, parse_attrs( $5, $default_attrs ) ];
+            if (defined $4) {
+                push @{$mmd}, $entry;
+            }
+            else {
+                push @{$vtable}, $entry;
+            }
         }
         else {
             die "Syntax error at $file line " . $fh->input_line_number() . "\n";
         }
     }
-
-    return $vtable;
+    
+    # We probably should sort on insert, but this is easier for now. And it's
+    # compile time, so it's not all that important.
+    return [@$mmd, sort { $a->[1] cmp $b->[1] } @$vtable];
 }
 
 =item C<vtbl_defs($vtable)>
@@ -252,8 +261,10 @@ static const char * const Parrot_vtable_slot_names[] = {
 
     /* Vtable Functions */
 EOM
+    my $num_vtable_funcs = 0;
     for my $entry ( @{$vtable} ) {
         next if ( $entry->[4] =~ /MMD_/ );
+        $num_vtable_funcs++;
         $macros .= <<"EOM";
         \"__$entry->[1]\",
 EOM
@@ -261,6 +272,8 @@ EOM
     $macros .= <<"EOM";
     NULL
 };
+
+#define NUM_VTABLE_FUNCTIONS $num_vtable_funcs
 
 #endif /* PARROT_IN_OBJECTS_C */
 

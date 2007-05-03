@@ -40,20 +40,32 @@ Return index if C<name> is a valid vtable slot name.
 INTVAL
 Parrot_get_vtable_index(Interp *interp, STRING *name)
 {
-    const char  *meth_c;
-    char        *name_c = string_to_cstring(interp, name);
-    INTVAL       i;
+    char *name_c = string_to_cstring(interp, name);
 
-    for (i = 0; (meth_c = Parrot_vtable_slot_names[i]); ++i) {
-        /* some of the first vtable slots don't have names */
-        if (!*meth_c)
-            continue;
+    INTVAL low  = 0;
+    INTVAL high = NUM_VTABLE_FUNCTIONS - 1;
 
+    /* some of the first "slots" don't have names. skip 'em. */
+    while (!Parrot_vtable_slot_names[low]) {
+        low++;
+        high++;
+    }
+
+    while (low <= high) {
+        INTVAL i = (low + high) / 2;
+
+        const char *meth_c = Parrot_vtable_slot_names[i];
         /* XXX slot_names still have __ in front */
-        if (strcmp(name_c, meth_c + 2) == 0) {
+        int cmp = strcmp(name_c, meth_c + 2);
+
+        if (!cmp) {
             string_cstring_free(name_c);
             return i;
         }
+        else if (cmp > 0)
+            low = i + 1;
+        else
+            high = i - 1;
     }
 
     string_cstring_free(name_c);
