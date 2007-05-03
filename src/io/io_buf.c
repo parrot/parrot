@@ -87,10 +87,12 @@ PIO_buf_init(Interp *interp, ParrotIOLayer *layer)
 {
     if (PIO_STDOUT(interp))
         PIO_buf_setlinebuf(interp, layer,
-                           PMC_data(PIO_STDOUT(interp)));
+                           PMC_data_typed(PIO_STDOUT(interp), ParrotIO *));
+
     if (PIO_STDIN(interp))
-        PIO_buf_setbuf(interp, layer, PMC_data(PIO_STDIN(interp)),
-                         PIO_UNBOUND);
+        PIO_buf_setbuf(interp, layer,
+            PMC_data_typed(PIO_STDIN(interp), ParrotIO *), PIO_UNBOUND);
+
     return 0;
 }
 
@@ -146,7 +148,7 @@ static INTVAL
 PIO_buf_setbuf(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
 {
     ParrotIOLayer * const l = layer ? layer : io->stack;
-    ParrotIOBuf * const b = &io->b;
+    ParrotIOBuf   * const b = &io->b;
 
     /* If there is a buffer, make sure we flush before
      * dinking around with the buffer.
@@ -173,7 +175,7 @@ PIO_buf_setbuf(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, size_t bufsiz
     }
 
     if (b->size > 0) {
-        b->startb = b->next = mem_sys_allocate(b->size);
+        b->startb = b->next = (unsigned char *)mem_sys_allocate(b->size);
         b->flags |= PIO_BF_MALLOC;
     }
     else

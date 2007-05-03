@@ -39,16 +39,16 @@ will be copied to the new instance.
 ParrotIOLayer *
 PIO_base_new_layer(ParrotIOLayer *proto)
 {
-    ParrotIOLayer * const new_layer = mem_sys_allocate(sizeof (ParrotIOLayer));
+    ParrotIOLayer * const new_layer = mem_allocate_typed(ParrotIOLayer);
 
     /*
      * XXX use managed memory here ?
      */
     if (proto) {
         /* FIXME: Flag here to indicate whether to free strings */
-        new_layer->name = proto->name;
+        new_layer->name  = proto->name;
         new_layer->flags = proto->flags;
-        new_layer->api = proto->api;
+        new_layer->api   = proto->api;
     }
     else {
         new_layer->name = NULL;
@@ -99,18 +99,20 @@ Push a layer onto an IO object (C<*pmc>).
 INTVAL
 PIO_push_layer(Interp *interp,  PMC *pmc, ParrotIOLayer *layer)
 {
-
     if (layer == NULL)
         return -1;
+
     if (!PMC_IS_NULL(pmc)) {
-        ParrotIOLayer *t;
-        ParrotIO * const io = PMC_data(pmc);
+        ParrotIOLayer    *t;
+        ParrotIO * const io = PMC_data_typed(pmc, ParrotIO *);
+
         if (!io)
             return -1;
-        if (io->stack == NULL && (layer->flags & PIO_L_TERMINAL) == 0) {
-            /* Error( 1st layer must be terminal) */
+
+        /* Error( 1st layer must be terminal) */
+        if (io->stack == NULL && (layer->flags & PIO_L_TERMINAL) == 0)
             return -1;
-        }
+
         /* Check and see if this layer already is on stack
          * This is a internals sanity check not a user level
          * check, at least until I fix copy-on-write stacks.
@@ -120,18 +122,20 @@ PIO_push_layer(Interp *interp,  PMC *pmc, ParrotIOLayer *layer)
             if (t == layer)
                 return -1;
         }
-        /*
-         * if this is a global layer create a copy first
-         */
-        if (!(io->stack->flags & PIO_L_LAYER_COPIED)) {
+
+        /* if this is a global layer create a copy first */
+        if (!(io->stack->flags & PIO_L_LAYER_COPIED))
             io->stack = PIO_copy_stack(io->stack);
-        }
 
         layer->down = io->stack;
+
         if (io->stack)
             io->stack->up = layer;
+
         io->stack = layer;
+
         PMC_struct_val(pmc) = layer;
+
         if (layer->api->Pushed)
             (*layer->api->Pushed) (layer, io);
     }
@@ -205,40 +209,46 @@ popped layer. The layer gets freed.
 ParrotIOLayer *
 PIO_pop_layer(Interp *interp, PMC *pmc)
 {
-    ParrotIO * const io = PMC_data(pmc);
+    ParrotIO * const io = PMC_data_typed(pmc, ParrotIO *);
 
     if (!PMC_IS_NULL(pmc)) {
         ParrotIOLayer *layer;
+
         if (!io)
             return 0;
-        /*
-         * if this is a global layer create a copy first
-         */
-        if (!(io->stack->flags & PIO_L_LAYER_COPIED)) {
+
+        /* if this is a global layer create a copy first */
+        if (!(io->stack->flags & PIO_L_LAYER_COPIED))
             io->stack = PIO_copy_stack(io->stack);
-        }
+
         layer = io->stack;
+
         if (layer) {
-            io->stack = layer->down;
+            io->stack           = layer->down;
             PMC_struct_val(pmc) = io->stack;
-            io->stack->up = 0;
-            layer->up = 0;
-            layer->down = 0;
+            io->stack->up       = 0;
+            layer->up           = 0;
+            layer->down         = 0;
+
             if (layer->api->Popped)
                 (*layer->api->Popped) (layer, io);
+
             return layer;
         }
+
         return layer;
     }
     /* Null io object - use default stack */
     else {
-        ParrotIOData * const d = interp->piodata;
+        ParrotIOData  * const d     = interp->piodata;
         ParrotIOLayer * const layer = d->default_stack;
+
         if (layer) {
-            d->default_stack = layer->down;
+            d->default_stack     = layer->down;
             d->default_stack->up = NULL;
-            layer->up = 0;
-            layer->down = 0;
+            layer->up            = 0;
+            layer->down          = 0;
+
             return layer;
         }
     }
