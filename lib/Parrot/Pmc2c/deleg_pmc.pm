@@ -51,12 +51,13 @@ sub body {
     my $decl = $self->decl( $self->{class}, $method, 0 );
 
     # I think that these will be out by one - NWC
-    my $l = $self->line_directive( $line, "ref.c" );
+    my $l = $self->line_directive( $line + 1, "\L$self->{class}.c" );
     return <<EOC;
 $l
 $decl {
-    SLOTTYPE *attrib_array = PMC_data(pmc);
-    PMC *attr = get_attrib_num(attrib_array, 0);
+    SLOTTYPE *attrib_array = PMC_data_typed(pmc, SLOTTYPE *);
+    PMC      *attr         = get_attrib_num(attrib_array, 0);
+
     $ret
 }
 

@@ -49,7 +49,7 @@ sub body {
     my $ret = gen_ret($method);
 
     # I think that these will be out by one - NWC
-    my $l = $self->line_directive( $line, "null.c" );
+    my $l = $self->line_directive( $line, "\L$self->{class}.c" );
     my $output = <<EOC;
 $l
 ${decl} {

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ src/pmc/deleg_pmc.pmc - Delegate PMC
 
 =head1 DESCRIPTION
 
-Delegate functions to the PMC in attribute slote #0.
+Delegate functions to the PMC in attribute slot #0.
 
 Almost all methods are auto-generated in lib/Parrot/Pmc2c.pm
 
@@ -55,11 +55,13 @@ pmclass deleg_pmc no_ro {
     }
 
     PMC* clone() {
-        PMC* res = pmc_new(INTERP, SELF->vtable->base_type);
-        INTVAL i;
-        SLOTTYPE *attrib_array = PMC_data(res);
+        PMC      *res          = pmc_new(INTERP, SELF->vtable->base_type);
+        SLOTTYPE *attrib_array = PMC_data_typed(res, SLOTTYPE *);
+        INTVAL    i;
+
         for (i = 0; i < PMC_int_val(SELF); ++i)
             attrib_array[i] = VTABLE_clone(INTERP, attrib_array[i]);
+
         return res;
     }
 

@@ -12,12 +12,12 @@ sub prederef {
     my $name = $method->{meth};
     my $code = '';
     $code .= <<'EOC';
-    PMC *real_pmc;
+PMC *real_pmc;
     Parrot_STM_PMC_handle handle;
 
     assert(pmc->vtable->pmc_class != pmc);
 
-    handle = PMC_struct_val(pmc);
+    handle   = (Parrot_STM_PMC_handle)PMC_struct_val(pmc);
 EOC
     if ( $self->does_write($name) ) {    # XXX is this good enough?
         $code .= <<'EOC';

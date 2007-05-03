@@ -95,7 +95,7 @@ sub body {
     }
 
     # I think that these will be out by one - NWC
-    my $l = $self->line_directive( $line, "delegate.c" );
+    my $l = $self->line_directive( $line, "\L$self->{class}.c" );
     # [Leave the space between "${decl}" and the "{"; otherwise Perl 5.8.0
     # thinks this is a hashref.  -- rgr, 29-Apr-07.]
     my $cout = <<EOC;

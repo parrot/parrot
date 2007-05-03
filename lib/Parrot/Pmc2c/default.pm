@@ -53,7 +53,7 @@ sub body {
     }
 
     # I think that these will be out by one - NWC
-    my $l = $self->line_directive( $line, "default.c" );
+    my $l = $self->line_directive( $line, "\L$self->{class}.c" );
     my $cout = <<EOC;
 $l
 ${decl}\{

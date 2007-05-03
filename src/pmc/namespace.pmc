@@ -143,14 +143,15 @@ a NameSpace or a var, the NameSpace is returned.
 
     void set_pmc_keyed_str(STRING *key, PMC *value) {
         const int val_is_NS = value->vtable->base_type == enum_class_NameSpace;
-        HashBucket *b =
+        PMC        *new_tuple = NULL;
+        HashBucket *b         =
             parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
-        PMC *new_tuple = NULL;
 
         if (!b)
             SUPER(key, value);
         else {
-            PMC *old = b->value;
+            PMC *old = (PMC *)b->value;
+
             if ((old->vtable->base_type == enum_class_NameSpace) == val_is_NS) {
                 /* simple ns or simple var/sub changed */
                 SUPER(key, value);
@@ -165,8 +166,10 @@ a NameSpace or a var, the NameSpace is returned.
             else {
                 /* creat new tuple */
                 new_tuple = pmc_new(INTERP, enum_class_FixedPMCArray);
+
                 /* flag it as special */
                 PObj_get_FLAGS(new_tuple) |= FPA_is_ns_ext;
+
                 /* for a fully typed namespace, we'd need 3 or 4 */
                 VTABLE_set_integer_native(INTERP, new_tuple, NS_max_slots);
             }
@@ -175,14 +178,14 @@ a NameSpace or a var, the NameSpace is returned.
         if (val_is_NS) {
             /* TODO - this hack needs to go */
             Parrot_NSInfo *nsinfo = PARROT_NSINFO(value);
-            PMC_pmc_val(value) = SELF;  /* set parent */
-            nsinfo->name       = key;   /* and name */
+            PMC_pmc_val(value)    = SELF;  /* set parent */
+            nsinfo->name          = key;   /* and name */
 
             if (new_tuple) {
                 VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns,
                                          value);
                 VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_var_sub,
-                                         b->value);
+                                         (PMC *)b->value);
                 b->value = new_tuple;
                 /* distinction from a plain FPA, which doesn't extend the
                  * namespace storage
@@ -190,7 +193,8 @@ a NameSpace or a var, the NameSpace is returned.
             }
         }
         else if (new_tuple) {
-            VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns, b->value);
+            VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns,
+                (PMC *)b->value);
             VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_var_sub, value);
             b->value = new_tuple;
         }
@@ -220,13 +224,16 @@ a NameSpace or a var, the NameSpace is returned.
         real_exception(INTERP, NULL, E_NameError, "Invalid namespace key");
     }
 
-    PMC* get_pmc_keyed_str(STRING* key) {
-        PMC *ns = parrot_hash_get(INTERP, (Hash*) PMC_struct_val(SELF), key);
+    PMC* get_pmc_keyed_str(STRING *key) {
+        PMC *ns = (PMC *)parrot_hash_get(INTERP, (Hash *)PMC_struct_val(SELF),
+                                         key);
         if (!ns)
             return PMCNULL;
+
         if ((PObj_get_FLAGS(ns) & FPA_is_ns_ext) &&
                 ns->vtable->base_type == enum_class_FixedPMCArray)
             ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_ns);
+
         return ns;
     }
 
@@ -271,13 +278,16 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
 
 */
 
-    void* get_pointer_keyed_str(STRING* key) {
-        PMC *ns = parrot_hash_get(INTERP, (Hash*) PMC_struct_val(SELF), key);
+    void* get_pointer_keyed_str(STRING *key) {
+        PMC *ns = (PMC *)parrot_hash_get(INTERP, (Hash *)PMC_struct_val(SELF),
+                                        key);
         if (!ns)
             return PMCNULL;
+
         if ((PObj_get_FLAGS(ns) & FPA_is_ns_ext) &&
                 ns->vtable->base_type == enum_class_FixedPMCArray)
             ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_var_sub);
+
         return ns;
     }
 
@@ -431,7 +441,8 @@ Return the namespace with the given name.
 
     METHOD PMC* find_namespace(STRING* key) {
         STRING *s_ns = CONST_STRING(INTERP, "NameSpace");
-        PMC *ns = parrot_hash_get(INTERP, (Hash*) PMC_struct_val(SELF), key);
+        PMC    *ns   = (PMC *)parrot_hash_get(INTERP,
+                                (Hash *)PMC_struct_val(SELF), key);
 
         if (!ns)
             return PMCNULL;
@@ -445,7 +456,7 @@ Return the namespace with the given name.
 
 /*
 
-=item C<METHOD PMC* find_sub(STRING* name)>
+=item C<METHOD PMC* find_sub(STRING *name)>
 
 Return the Sub PMC with the given name.
 
@@ -453,9 +464,10 @@ Return the Sub PMC with the given name.
 
 */
 
-    METHOD PMC* find_sub(STRING* key) {
+    METHOD PMC* find_sub(STRING *key) {
         STRING *s_sub = CONST_STRING(INTERP, "Sub");
-        PMC *sub = parrot_hash_get(INTERP, (Hash*) PMC_struct_val(SELF), key);
+        PMC    *sub   = (PMC *)parrot_hash_get(INTERP,
+                            (Hash *)PMC_struct_val(SELF), key);
 
         if (!sub)
             return PMCNULL;
@@ -469,7 +481,7 @@ Return the Sub PMC with the given name.
 
 /*
 
-=item C<METHOD PMC* find_var(STRING* name)>
+=item C<METHOD PMC* find_var(STRING *name)>
 
 Return the PMC with the given name.
 
@@ -477,8 +489,9 @@ Return the PMC with the given name.
 
 */
 
-    METHOD PMC* find_var(STRING* key) {
-        PMC *val = parrot_hash_get(INTERP, (Hash*) PMC_struct_val(SELF), key);
+    METHOD PMC* find_var(STRING *key) {
+        PMC *val = (PMC *)parrot_hash_get(INTERP,
+                    (Hash *)PMC_struct_val(SELF), key);
 
         if (!val)
             return PMCNULL;
@@ -488,7 +501,7 @@ Return the PMC with the given name.
 
 /*
 
-=item C<METHOD PMC* del_namespace(STRING* name)>
+=item C<METHOD PMC* del_namespace(STRING *name)>
 
 Deletes the contained NameSpace PMC with the given name.  Throws an invalid
 type exception if the item to delete is not a NameSpace PMC or subclass, and
@@ -498,9 +511,9 @@ does not delete the PMC.
 
 */
 
-    METHOD void del_namespace(STRING* name) {
-        Hash   *hash = (Hash *) PMC_struct_val(SELF);
-        PMC    *ns   = parrot_hash_get(INTERP, hash, name);
+    METHOD void del_namespace(STRING *name) {
+        Hash   *hash = (Hash *)PMC_struct_val(SELF);
+        PMC    *ns   = (PMC  *)parrot_hash_get(INTERP, hash, name);
         STRING *s_ns = CONST_STRING(INTERP, "NameSpace");
 
         if ( PMC_IS_NULL(ns) )
@@ -521,7 +534,7 @@ does not delete the PMC.
 
 /*
 
-=item C<METHOD PMC* del_sub(STRING* name)>
+=item C<METHOD PMC* del_sub(STRING *name)>
 
 Deletes the contained Sub PMC with the given name.  Throws an invalid type
 exception if the item to delete is not a Sub PMC or subclass, and does not
@@ -531,9 +544,9 @@ delete the PMC.
 
 */
 
-    METHOD void del_sub(STRING* name) {
-        Hash   *hash  = (Hash *) PMC_struct_val(SELF);
-        PMC    *sub   = parrot_hash_get(INTERP, hash, name);
+    METHOD void del_sub(STRING *name) {
+        Hash   *hash  = (Hash *)PMC_struct_val(SELF);
+        PMC    *sub   = (PMC  *)parrot_hash_get(INTERP, hash, name);
         STRING *s_sub = CONST_STRING(INTERP, "Sub");
 
         if ( PMC_IS_NULL(sub) )
@@ -575,17 +588,21 @@ to retrieve symbols, if a NameSpace with the same name exists.
 
 */
 
-    METHOD PMC* get_sym(STRING* key) {
-        PMC *ns = parrot_hash_get(INTERP, (Hash*) PMC_struct_val(SELF), key);
+    METHOD PMC* get_sym(STRING *key) {
+        PMC *ns = (PMC *)parrot_hash_get(INTERP,
+            (Hash *)PMC_struct_val(SELF), key);
+
         if (!ns)
             return PMCNULL;
-        if (ns->vtable == SELF->vtable) {
-            /* it's a NameSpace */
+
+        /* it's a NameSpace */
+        if (ns->vtable == SELF->vtable)
             return PMCNULL;
-        }
+
         if ((PObj_get_FLAGS(ns) & FPA_is_ns_ext) &&
                 ns->vtable->base_type == enum_class_FixedPMCArray)
             ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_var_sub);
+
         return ns;
     }
 

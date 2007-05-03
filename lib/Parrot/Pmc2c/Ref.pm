@@ -53,7 +53,7 @@ delegated methods. Defualt is PMC_pmc_val(pmc)
 
 sub raw_deref {
     my ( $self, $method ) = @_;
-    return 'PMC_pmc_val(pmc)';
+    return '(PMC *)PMC_pmc_val(pmc)';
 }
 
 =item C<body($method, $line, $out_name)>

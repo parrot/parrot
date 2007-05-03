@@ -158,39 +158,51 @@ Check if two Pairs hold the same keys and values.
 
 */
 
-    INTVAL is_equal(PMC* value) {
+    INTVAL is_equal(PMC *value) {
         STRING *s1, *s2;
         PMC *k1, *k2, *p1, *p2;
+
         if (value->vtable->base_type != SELF->vtable->base_type)
             return 0;
-        s1 = PMC_struct_val(SELF);
-        s2 = PMC_struct_val(value);
+
+        s1 = (STRING *)PMC_struct_val(SELF);
+        s2 = (STRING *)PMC_struct_val(value);
+
         if (PObj_key_is_string_TEST(SELF) && PObj_key_is_string_TEST(value)) {
             if (string_equal(INTERP, s1, s2))
                 return 0;
         }
+
         if (PObj_key_is_string_TEST(SELF)) {
-            k1 = pmc_new(INTERP, enum_class_String);
-            PMC_str_val(k1) = PMC_struct_val(SELF);
+            k1              = pmc_new(INTERP, enum_class_String);
+            PMC_str_val(k1) = (STRING *)PMC_struct_val(SELF);
         }
         else
-            k1 = PMC_struct_val(SELF);
+            k1 = (PMC *)PMC_struct_val(SELF);
+
         if (PObj_key_is_string_TEST(value)) {
-            k2 = pmc_new(INTERP, enum_class_String);
-            PMC_str_val(k2) = PMC_struct_val(value);
+            k2              = pmc_new(INTERP, enum_class_String);
+            PMC_str_val(k2) = (STRING *)PMC_struct_val(value);
         }
+
         else
-            k2 = PMC_struct_val(value);
+            k2 = (PMC *)PMC_struct_val(value);
+
         if (!mmd_dispatch_i_pp(INTERP, k1, k2, MMD_EQ))
             return 0;
+
         p1 = PMC_pmc_val(SELF);
         p2 = PMC_pmc_val(value);
+
         if (!p1 && !p2)
             return 1;
+
         if (p1 || p2)
             return 0;
+
         if (!mmd_dispatch_i_pp(INTERP, p1, p2, MMD_EQ))
             return 0;
+
         return 1;
     }
 
@@ -217,16 +229,18 @@ Used to unarchive the Pair.
 
         io->vtable->push_integer(INTERP, io, PObj_key_is_string_TEST(SELF));
         if (PObj_key_is_string_TEST(SELF)) {
-            io->vtable->push_string(INTERP, io, PMC_struct_val(SELF));
+            io->vtable->push_string(INTERP, io, (STRING *)PMC_struct_val(SELF));
         }
         else {
             PMC ** const temp_pos = (PMC**)&PMC_struct_val(SELF);
-            info->thaw_ptr = temp_pos;
+            info->thaw_ptr        = temp_pos;
             (info->visit_pmc_now)(INTERP, *temp_pos, info);
         }
-        pos = &PMC_pmc_val(SELF);
+        pos            = &PMC_pmc_val(SELF);
         info->thaw_ptr = pos;
+
         (info->visit_pmc_now)(INTERP, *pos, info);
+
         SUPER(info);
     }
 
@@ -235,7 +249,7 @@ Used to unarchive the Pair.
         SUPER(info);
         io->vtable->push_integer(INTERP, io, PObj_key_is_string_TEST(SELF));
         if (PObj_key_is_string_TEST(SELF)) {
-            io->vtable->push_string(INTERP, io, PMC_struct_val(SELF));
+            io->vtable->push_string(INTERP, io, (STRING *)PMC_struct_val(SELF));
         }
     }
 
@@ -273,12 +287,14 @@ Return the key, the value, or a tuple of (key, value) respectively.
 
     METHOD PMC* key() {
         if (PObj_key_is_string_TEST(SELF)) {
-            PMC * const k = pmc_new(INTERP,
+            PMC * const k  = pmc_new(INTERP,
                 Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
-            PMC_str_val(k) = PMC_struct_val(SELF);
+
+            PMC_str_val(k) = (STRING *)PMC_struct_val(SELF);
+
             return k;
         }
-        return PMC_struct_val(SELF);
+        return (PMC *)PMC_struct_val(SELF);
     }
 
     METHOD PMC* value() {
@@ -289,9 +305,11 @@ Return the key, the value, or a tuple of (key, value) respectively.
             Parrot_get_ctx_HLL_type(INTERP, enum_class_FixedPMCArray));
         VTABLE_set_integer_native(INTERP, t, 2);
         if (PObj_key_is_string_TEST(SELF))
-            VTABLE_set_string_keyed_int(INTERP, t, 0, PMC_struct_val(SELF));
+            VTABLE_set_string_keyed_int(INTERP, t, 0,
+                (STRING *)PMC_struct_val(SELF));
         else
-            VTABLE_set_pmc_keyed_int(INTERP, t, 0, PMC_struct_val(SELF));
+            VTABLE_set_pmc_keyed_int(INTERP, t, 0, (PMC *)PMC_struct_val(SELF));
+
         VTABLE_set_pmc_keyed_int(INTERP, t, 1, PMC_pmc_val(SELF));
         return t;
     }
