@@ -452,9 +452,9 @@ Adds a method to the class. It takes a simple string name and a method
 PMC.  If the method already exists (and isn't a Multi) it will replace
 the method with the new method and throw a warning.
 
-It also takes slurpy named parameters to flag whether the method is a
-vtable function, and whether its anonymous (no named entry as a method,
-only as a vtable).
+It also takes named parameters to flag whether the method is a vtable
+function, and whether it is anonymous (no named entry as a method, only
+as a vtable).
 
 =item methods
 
@@ -1030,8 +1030,8 @@ higher-level languages the language compiler or runtime will provide
 easier-to-use wrappers. These methods are all prototyped, and take a
 single fixed argument list, and return at most a single value.
 
-To override a vtable function, either add the :vtable to the declaration
-of the method, or pass a named, slurpy parameter "vtable" into the
+To override a vtable function, either add the :vtable pragma to the
+declaration of the method, or pass a named parameter "vtable" into the
 C<add_method> method on a class or role.
 
 =head2 What The Bytecode Sees
