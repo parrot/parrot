@@ -14,24 +14,26 @@ package pirVisitor;
         $self->{fh}       = $fh;
         $self->{prologue} = q{
 .include 'interpinfo.pasm'
+.include 'except_severity.pasm'
 
 .HLL 'Lua', 'lua_group'
 
 .sub '__start' :main
   .param pmc args
-  $S0 = shift args
-  $I0 = args
-  $P0 = new .Array
-  set $P0, $I0
-  $I1 = 0
-  push_eh root_exception_handler
+  .local string progname
+  progname = shift args
+  $I1 = args
+  $P1 = new .Array
+  set $P1, $I1
+  $I0 = 0
+  push_eh _handler
 L1:
-  unless $I1 < $I0 goto L2
+  unless $I0 < $I1 goto L2
   $S0 = shift args
-  $P1 = new .LuaString
-  set $P1, $S0
-  $P0[$I1] = $P1
-  inc $I1
+  $P0 = new .LuaString
+  set $P0, $S0
+  $P1[$I0] = $P0
+  inc $I0
   goto L1
 L2:
 #  print "start Lua\n"
@@ -48,25 +50,32 @@ L2:
   load_bytecode 'languages/lua/lib/luaperl.pbc'
 
   .const .Sub main = '_main'
-  .local pmc env
-  env = get_global '_G'
-  main.'setfenv'(env)
-  .return main($P0 :flat)
+  $P0 = get_global '_G'
+  main.'setfenv'($P0)
+  .return main($P1 :flat)
 
-root_exception_handler:
-  .include 'except_severity.pasm'
+_handler:
+  .local pmc ex
+  .local string msg
+  .get_results (ex, msg)
   .local int severity
-  get_results '(0, 0)', $P0, $S0
-  severity = $P0[2]
-  if severity == .EXCEPT_EXIT goto lua_exited
-  $S1 = $P0[0]
-  $S0 = "Unhandled exception: "
+  severity = ex[2]
+  if severity == .EXCEPT_EXIT goto L3
+  .local int lineno
+  $S0 = 'lua: '
+  $S0 .= progname
+  $S0 .= ':'
+  lineno = 0        # TODO: source lineno
+  $S1 = lineno
   $S0 .= $S1
-  $S0 .= "\n"
+  $S0 .= ': '
+  $S0 .= msg
+  $S0 .= "\nstack traceback:\n"
+  $S0 .= "\tTODO\n"
   printerr $S0
   exit 1
-lua_exited:
-  rethrow $P0
+L3:
+  rethrow ex
 .end
 
 .sub '__onload' :anon :init
