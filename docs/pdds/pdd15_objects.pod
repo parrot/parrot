@@ -135,7 +135,7 @@ and moving the object to it is allowable)
 
 There are four pieces to the object implementation. There are the PMCs for the
 classes, roles, and objects, the opcodes the engine uses to do objecty things, the
-specific vtable methods used to perform those objecty things, and the
+specific vtable functions used to perform those objecty things, and the
 supporting code provided by the interpreter engine to do the heavy lifting.
 
 Parrot, in general, doesn't restrict operations on objects and classes. If a
@@ -331,7 +331,7 @@ be constructed, returns a Null PMC.
 Note that for languages which support default fallback methods, such as Perl
 5's AUTOLOAD, this would be the place to return it if a normal lookup fails.
 
-Since the method list and vtable method list are stored in the class
+Since the method list and vtable function list are stored in the class
 PMC, method finding is a lookup on the class object and not a lookup in
 the namespace. (This could be handled automatically whenever a class is
 associated with a namespace.) Just adding a sub to a namespace will not
@@ -393,7 +393,7 @@ soon.
 
 =head3 Class Methods
 
-These methods are just syntactic sugar for the vtable methods. They are
+These methods are just syntactic sugar for the vtable functions. They are
 not included in the Class PMC by default, but added to Class as a role.
 
 =over 4
@@ -453,7 +453,7 @@ PMC.  If the method already exists (and isn't a Multi) it will replace
 the method with the new method and throw a warning.
 
 It also takes slurpy named parameters to flag whether the method is a
-vtable method, and whether its anonymous (no named entry as a method,
+vtable function, and whether its anonymous (no named entry as a method,
 only as a vtable).
 
 =item methods
@@ -563,7 +563,7 @@ by traversing the inheritance hierarchy.
 Object PMCs have the "I am an object" flag set on them.
 
 Object PMCs have no methods aside from those defined in their associated
-class. They do have vtable methods providing access to certain low-level
+class. They do have vtable functions providing access to certain low-level
 information about the object, method call functionality, etc. See the
 sections below on L<Objects> and L<Vtables>.
 
@@ -741,7 +741,7 @@ Remove a role from the role.
 
 =head3 Role Methods
 
-These methods are just syntactic sugar for the vtable methods. They are
+These methods are just syntactic sugar for the vtable functions. They are
 not included in the Role PMC by default, but added to Role as a role.
 
 =over 4
@@ -806,7 +806,7 @@ PMC. If the method already exists (and isn't a Multi) it will replace
 the method with the new method and throw a warning.
 
 It also takes slurpy named parameters to flag whether the method is a
-vtable method, and whether its anonymous (no named entry as a method,
+vtable function, and whether its anonymous (no named entry as a method,
 only as a vtable).
 
 =item methods
@@ -1023,14 +1023,14 @@ string name.
 
 =head2 Vtable Overloading
 
-Classes may override the vtable methods, allowing objects of a class to
+Classes may override the vtable functions, allowing objects of a class to
 behave like a primitive PMC. To use these properly at a low-level
 requires a good working knowledge of the way Parrot works--generally for
 higher-level languages the language compiler or runtime will provide
 easier-to-use wrappers. These methods are all prototyped, and take a
 single fixed argument list, and return at most a single value.
 
-To override a vtable method, either add the :vtable to the declaration
+To override a vtable function, either add the :vtable to the declaration
 of the method, or pass a named, slurpy parameter "vtable" into the
 C<add_method> method on a class or role.
 
