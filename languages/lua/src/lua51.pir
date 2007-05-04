@@ -56,6 +56,9 @@ Used by F<languages/lua/luac.pir>.
 
 Some grammar routines are handly written in PIR.
 
+See "Lua 5.1 Reference Manual", section 2.1 "Lexical Conventions",
+L<http://www.lua.org/manual/5.1/manual.html#2.1>.
+
 =over 4
 
 =item C<warning (message)>
@@ -132,6 +135,25 @@ L1:
 
 =item C<name>
 
+I<Names> (also called I<identifiers>) in Lua can be any string of letters,
+digits, and underscores, not beginning with a digit. This coincides with the
+definition of names in most languages. (The definition of letter depends on
+the current locale: any character considered alphabetic by the current locale
+can be used in an identifier.) Identifiers are used to name variables and
+table fields.
+
+The following keywords are reserved and cannot be used as names:
+
+     and       break     do        else      elseif
+     end       false     for       function  if
+     in        local     nil       not       or
+     repeat    return    then      true      until     while
+
+Lua is a case-sensitive language: C<and> is a reserved word, but C<And> and
+C<AND> are two different, valid names. As a convention, names starting with
+an underscore followed by uppercase letters (such as C<_VERSION>) are reserved
+for internal global variables used by Lua.
+
 =cut
 
 .include 'cclass.pasm'
@@ -199,6 +221,12 @@ L2:
 
 
 =item C<number>
+
+A I<numerical constant> may be written with an optional decimal part and an
+optional decimal exponent. Lua also accepts integer hexadecimal constants,
+by prefixing them with C<0x>. Examples of valid numerical constants are
+
+     3   3.0   3.1416   314.16e-2   0.31416E1   0xff   0x56
 
 =cut
 
@@ -320,6 +348,25 @@ L2:
 
 =item C<quoted_literal>
 
+I<Literal strings> can be delimited by matching single or double quotes,
+and can contain the following C-like escape sequences: C<'\a'> (bell),
+C<'\b'> (backspace), C<'\f'> (form feed), C<'\n'> (newline), C<'\r'>
+(carriage return), C<'\t'> (horizontal tab), C<'\v'> (vertical tab),
+C<'\\'> (backslash), C<'\"'> (quotation mark [double quote]),
+and C<'\''> (apostrophe [single quote]). Moreover, a backslash followed by
+a real newline results in a newline in the string. A character in a string
+may also be specified by its numerical value using the escape sequence C<\ddd>,
+where I<ddd> is a sequence of up to three decimal digits. (Note that if a
+numerical escape is to be followed by a digit, it must be expressed using
+exactly three digits.) Strings in Lua may contain any 8-bit value, including
+embedded zeros, which can be specified as C<'\0'>.
+
+To put a double (single) quote, a newline, a backslash, or an embedded zero
+inside a literal string enclosed by double (single) quotes you must use an
+escape sequence. Any other character may be directly inserted into the literal.
+(Some control characters may cause problems for the file system, but Lua has
+no problem with them.)
+
 =cut
 
 .sub 'quoted_literal'
@@ -399,6 +446,32 @@ CONCAT:
 
 =item C<long_string>
 
+Literal strings can also be defined using a long format enclosed by
+I<long brackets>. We define an I<opening long bracket of level n> as an
+opening square bracket followed by I<n> equal signs followed by another
+opening square bracket. So, an opening long bracket of level 0 is written
+as C<[[>, an opening long bracket of level 1 is written as C<[=[>, and so on.
+A I<closing long bracket> is defined similarly; for instance, a closing long
+bracket of level 4 is written as C<]====]>. A long string starts with an
+opening long bracket of any level and ends at the first closing long bracket
+of the same level. Literals in this bracketed form may run for several lines,
+do not interpret any escape sequences, and ignore long brackets of any other
+level. They may contain anything except a closing bracket of the proper level.
+
+For convenience, when the opening long bracket is immediately followed by
+a newline, the newline is not included in the string. As an example, in
+a system using ASCII (in which C<'a'> is coded as 97, newline is coded as 10,
+and C<'1'> is coded as 49), the five literals below denote the same string:
+
+     a = 'alo\n123"'
+     a = "alo\n123\""
+     a = '\97lo\10\04923"'
+     a = [[alo
+     123"]]
+     a = [==[
+     alo
+     123"]==]
+
 =cut
 
 .sub 'long_string'
@@ -477,6 +550,12 @@ END:
 
 
 =item C<long_comment>
+
+A I<comment> starts with a double hyphen (C<-->) anywhere outside a string.
+If the text immediately after C<--> is not an opening long bracket,
+the comment is a I<short comment>, which runs until the end of the line.
+Otherwise, it is a I<long comment>, which runs until the corresponding closing
+long bracket. Long comments are frequently used to disable code temporarily.
 
 =cut
 
