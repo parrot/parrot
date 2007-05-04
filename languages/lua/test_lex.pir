@@ -45,20 +45,18 @@ and imports many definitions from the full Lua compiler
     $P0.'commandline_banner'($S0)
     $P0.'commandline_prompt'('> ')
 
-    # import PGE::Util::die into Lua::TestLex
-    $P0 = get_hll_global ['PGE::Util'], 'die'
-    set_hll_global ['Lua::TestLex'], 'die', $P0
-
     # import Lua::Grammar::* into Lua::TestLex
-    $P0 = get_hll_global ['Lua::Grammar'], 'name'
-    set_hll_global ['Lua::TestLex'], 'Name', $P0
     $P0 = get_hll_global ['Lua::Grammar'], 'string'
     set_hll_global ['Lua::TestLex'], 'String', $P0
-    $P0 = get_hll_global ['Lua::Grammar'], 'number'
-    set_hll_global ['Lua::TestLex'], 'Number', $P0
     $P0 = get_hll_global ['Lua::Grammar'], 'ws'
     set_hll_global ['Lua::TestLex'], 'ws', $P0
 
+    $P0 = get_hll_global ['Lua::Grammar'], 'syntax_error'
+    set_hll_global ['Lua::TestLex'], 'die', $P0
+    $P0 = get_hll_global ['Lua::Grammar'], 'name'
+    set_hll_global ['Lua::TestLex'], 'Name', $P0
+    $P0 = get_hll_global ['Lua::Grammar'], 'number'
+    set_hll_global ['Lua::TestLex'], 'Number', $P0
     $P0 = get_hll_global ['Lua::Grammar'], 'quoted_literal'
     set_hll_global ['Lua::TestLex'], 'quoted_literal', $P0
     $P0 = get_hll_global ['Lua::Grammar'], 'long_string'

@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 21;
 use Test::More;
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'hello' );
@@ -35,6 +35,19 @@ Name:	print
 punct:	(
 String:	hello
 punct:	)
+OUT
+
+language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'name' );
+i       j       i10     _ij     _
+aSomewhatLongName       _INPUT
+CODE
+Name:	i
+Name:	j
+Name:	i10
+Name:	_ij
+Name:	_
+Name:	aSomewhatLongName
+Name:	_INPUT
 OUT
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'keyword' );
@@ -104,6 +117,18 @@ String:	alo
 123"
 OUT
 
+language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'unfinished string' );
+print "unfinished string
+CODE
+/^\w+\.\w+:1: unfinished string near '"?unfinished string'/
+OUT
+
+language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'string with escape sequence too large' );
+print "escape\333sequence"
+CODE
+/^\w+\.\w+:1: escape sequence too large near '"?escape/
+OUT
+
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'long string' );
 [[alo
 123"]]
@@ -115,6 +140,26 @@ LongString:	alo
 123"
 LongString:	alo
 123"
+OUT
+
+language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'invalid long string delimiter' );
+print [===+ string ]===]
+CODE
+/^\w+\.\w+:1: invalid long string delimiter near '\[==='/
+OUT
+
+language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'unfinished string' );
+print [[unfinished long string
+
+CODE
+/^\w+\.\w+:1: unfinished long string/
+OUT
+
+language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'nested long string' );
+print [[ long string [[ nested ]] ]]
+
+CODE
+/^\w+\.\w+:1: nesting of \[\[\.\.\.\]\] is deprecated near '\[\[ long string \[\['/
 OUT
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'number' );
@@ -137,6 +182,24 @@ Number:	0xff
 Number:	0x56
 OUT
 
+language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'malformed number' );
+0x1Bh
+CODE
+/^\w+\.\w+:1: malformed number near '0x1Bh'/
+OUT
+
+language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'malformed number' );
+1.2.34
+CODE
+/^\w+\.\w+:1: malformed number near '1.2.34'/
+OUT
+
+language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'malformed number' );
+.2A
+CODE
+/^\w+\.\w+:1: malformed number near '.2A'/
+OUT
+
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'comment' );
 -- comment
 1   -- comment
@@ -148,15 +211,49 @@ OUT
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'long comment' );
 --[[
-long comment
+    long comment
 ]]
 1
 --[===[
-long comment
+    long comment
 ]===]
 CODE
 Number:	1
 OUT
+
+language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'not long comment' );
+--[[
+    no action (comment)
+--]]
+1
+---[[
+    active
+--]]
+CODE
+Number:	1
+Name:	active
+OUT
+
+language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'unfinished long comment' );
+ --[[unfinished long comment
+
+CODE
+/^\w+\.\w+:1: unfinished long comment/
+OUT
+
+language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'nested long comment' );
+--[[ long comment [[ nested ]] ]]
+
+CODE
+/^\w+\.\w+:1: nesting of \[\[\.\.\.\]\] is deprecated near '\[\[ long comment \[\['/
+OUT
+
+language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'syntax error' );
+!!
+CODE
+/^\w+\.\w+:1: syntax error/
+OUT
+
 
 # Local Variables:
 #   mode: cperl

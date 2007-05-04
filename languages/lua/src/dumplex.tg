@@ -7,13 +7,22 @@ src/dumplex.tg - a grammar for testing lexico
 
 =head1 DESCRIPTION
 
-Just print node.
+Just emits code that prints terminal nodes.
 
 Used by F<languages/lua/test_lex.pir>.
 
 =cut
 
 grammar Lua::DumpLex is TGE::Grammar;
+
+
+=head2 Functions
+
+=over 4
+
+=item C<transform past (ROOT)>
+
+=cut
 
 transform past (ROOT) :language('PIR') {
     .local pmc past
@@ -36,6 +45,11 @@ L1:
     past.'push'(past_stmts)
     .return (past)
 }
+
+
+=item C<transform past (Lua::TestLex::token)>
+
+=cut
 
 transform past (Lua::TestLex::token) :language('PIR') {
     .local pmc past, arg
@@ -77,6 +91,11 @@ L9:
     .return (past)
 }
 
+
+=item C<transform past (Lua::TestLex::keyword)>
+
+=cut
+
 transform past (Lua::TestLex::keyword) :language('PIR') {
     .local pmc past
     new past, 'PAST::Val'
@@ -85,6 +104,11 @@ transform past (Lua::TestLex::keyword) :language('PIR') {
     past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S0, 'ctype'=>'s~')
     .return (past)
 }
+
+
+=item C<transform past (Lua::TestLex::punctuator)>
+
+=cut
 
 transform past (Lua::TestLex::punctuator) :language('PIR') {
     .local pmc past
@@ -95,6 +119,11 @@ transform past (Lua::TestLex::punctuator) :language('PIR') {
     .return (past)
 }
 
+
+=item C<transform past (Lua::TestLex::Name)>
+
+=cut
+
 transform past (Lua::TestLex::Name) :language('PIR') {
     .local pmc past
     new past, 'PAST::Val'
@@ -104,6 +133,11 @@ transform past (Lua::TestLex::Name) :language('PIR') {
     .return (past)
 }
 
+
+=item C<transform past (Lua::TestLex::String)>
+
+=cut
+
 transform past (Lua::TestLex::String) :language('PIR') {
     .local pmc past
     new past, 'PAST::Val'
@@ -112,17 +146,25 @@ transform past (Lua::TestLex::String) :language('PIR') {
     $P0 = node['quoted_literal']
     $S0 = $P0
     $S0 = concat "String:\t", $S0
-    goto L2
+    goto L9
 L1:
     $I0 = defined node['long_string']
     unless $I0 goto L2
     $P0 = node['long_string']
     $S0 = $P0
     $S0 = concat "LongString:\t", $S0
+    goto L9
 L2:
+    internal_error('unknown string')
+L9:
     past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S0, 'ctype'=>'s~')
     .return (past)
 }
+
+
+=item C<transform past (Lua::TestLex::Number)>
+
+=cut
 
 transform past (Lua::TestLex::Number) :language('PIR') {
     .local pmc past
@@ -132,6 +174,8 @@ transform past (Lua::TestLex::Number) :language('PIR') {
     past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S0, 'ctype'=>'s~')
     .return (past)
 }
+
+=back
 
 =head1 AUTHOR
 

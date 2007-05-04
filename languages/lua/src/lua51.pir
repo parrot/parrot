@@ -87,45 +87,21 @@ Some grammar routines are handly written in PIR.
 .end
 
 
-=item C<syntax_error (message)>
+=item C<syntax_error (match, [message])>
 
 =cut
 
 .sub 'syntax_error'
-    .param pmc self
-    .param string message
-
-    $P0 = get_hll_global ['PGE::Util'], 'line_number'
-    if null $P0 goto NO_LINE_NR_METHOD
-    $I0 = self.$P0()
-
-    # line_number() starts counting at line 0, so increment:
-    inc $I0
-
-    printerr "Syntax error (line "
-    printerr $I0
-    printerr "): "
-    printerr message
-    printerr "\n\n"
-
-    # increment parse errors
-    .local pmc errs
-    errs = get_root_global 'errors'
-    inc errs
-
-    .return()
-
-  NO_LINE_NR_METHOD:
-    printerr "can't find PGE::Util::line_number"
-    exit 1
+    .param pmc mob
+    .param string message :optional
+    unless null message goto L1
+    message = 'syntax error'
+L1:
+    lexerror(mob, message)
 .end
 
 
-=item C<lexerror (message)>
-
-=cut
-
-.sub 'lexerror'
+.sub 'lexerror' :anon
     .param pmc mob
     .param string message
     .local int lineno
@@ -141,10 +117,12 @@ Some grammar routines are handly written in PIR.
     $S0 .= $S1
     $S0 .= ': '
     $S0 .= message
-    $S0 .= " near '"
     $S1 = mob.'text'()
+    if $S1 == '' goto L1
+    $S0 .= " near '"
     $S0 .= $S1
     $S0 .= "'"
+L1:
     .local pmc ex
     ex = new .Exception
     ex['_message'] = $S0
@@ -290,7 +268,7 @@ L1:
 .end
 
 
-.sub 'read_numeral'
+.sub 'read_numeral' :anon
     .param pmc mob
     .param pmc adverbs         :slurpy :named
     .local string target
@@ -360,6 +338,7 @@ L2:
     literal = ''
 LOOP:
     if pos < lastpos goto L1
+    mpos = pos
     lexerror(mob, "unfinished string")
 L1:
     $S0 = substr target, pos, 1
@@ -370,6 +349,7 @@ L1:
 L2:
     $I0 = index "\n\r", $S0
     if $I0 < 0 goto L3
+    mpos = pos
     lexerror(mob, "unfinished string")
 L3:
     if $S0 != "\\" goto CONCAT
@@ -405,6 +385,7 @@ L6:
     dec pos
 L7:
     if $I0 < 256 goto L8
+    mpos = pos
     lexerror(mob, "escape sequence too large")
 L8:
     $S0 = chr $I0
@@ -439,6 +420,7 @@ CONCAT:
     (pos, sep) = _skip_sep(target, pos, '[')
     if sep >= 0 goto L1
     if sep == -1 goto END
+    mpos = pos
     lexerror(mob, "invalid long string delimiter")
 L1:
     inc pos
@@ -459,6 +441,8 @@ L3:
     inc pos
     $S0 = substr target, pos, 1
     if $S0 != '[' goto L5
+    inc pos
+    mpos = pos
     lexerror(mob, "nesting of [[...]] is deprecated")
 L5:
     dec pos
@@ -532,6 +516,8 @@ L3:
     inc pos
     $S0 = substr target, pos, 1
     if $S0 != '[' goto L5
+    inc pos
+    mpos = pos
     lexerror(mob, "nesting of [[...]] is deprecated")
 L5:
     dec pos
