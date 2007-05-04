@@ -21,11 +21,12 @@ name is the same as the basename of the step's F<.pm> file; for example, if
 F<foo.pm> uses F<bar_c.in>, F<bar_c.in> should be in a directory called F<foo>;
 the full path might be F<config/auto/foo/bar_c.in>.
 
-Generally, when adding a new test you should add a new step unless a test
-I<clearly> belongs in a current step. For example, if we added a new
-user-configurable type called C<FOOVAL>, you should add the test for its size
-in F<config/auto/sizes.pm>; however, if you were testing what dynaloading
-capabilities are available, you should create a new step.
+Generally, when adding a new component to the configuration process you should
+add a new step unless that component I<clearly> belongs in a current step. For
+example, if you added a new user-configurable type called C<FOOVAL>, you would
+add the code used to determine its size in F<config/auto/sizes.pm>.  However,
+if you were determining what dynaloading capabilities are available, you would
+create a new step.
 
 =head2 Initialization Steps
 
@@ -93,10 +94,10 @@ and then calling its L<Parrot::Configure/runsteps> method.
 
 New steps should be added in one of the three folders mentioned above.
 
-All steps are really classes; they each exist in a unique namespace.  The
-namespace used depends on the tests relative path in the source tree minus sans
-the F<config> prefix.  For example, the step F<config/init/defaults.pm> uses
-the C<init::defaults> namespace.
+All steps are really classes; each exists in a unique namespace.  The
+namespace used depends on the step's relative path in the source tree sans the
+F<config> prefix.  For example, the step F<config/init/defaults.pm> uses the
+C<init::defaults> namespace.
 
 They should define the following methods:
 
