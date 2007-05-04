@@ -66,7 +66,7 @@ parse.pir - Parsing support subroutines for [expr]
     msg .= '" requires a preceding $ if '
     msg .= "it's a variable or function arguments if it's a function"
 
-    .return syntax_error(mob, msg, adverbs)
+    syntax_error(mob, msg, 'adverbs' => adverbs)
 .end
 
 # Local Variables:
