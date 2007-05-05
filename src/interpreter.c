@@ -481,8 +481,9 @@ init_jit(Interp *interp, opcode_t *pc)
         return ((Parrot_jit_info_t *)interp->code->jit_info)->arena.start;
 
     code_start = interp->code->base.data;
-    code_size = interp->code->base.size;
-    code_end = code_start + code_size;
+    code_size  = interp->code->base.size;
+    code_end   = code_start + code_size;
+
 #  if defined HAVE_COMPUTED_GOTO && PARROT_I386_JIT_CGP
 #    ifdef __GNUC__
 #      ifdef PARROT_I386
@@ -494,6 +495,7 @@ init_jit(Interp *interp, opcode_t *pc)
     interp->code->jit_info =
         jit_info = parrot_build_asm(interp, code_start, code_end,
             NULL, JIT_CODE_FILE);
+
     return jit_info->arena.start;
 #else
     return NULL;
@@ -718,8 +720,7 @@ runops_int(Interp *interp, size_t offset)
                 if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
                     core = runops_profile_core;
                     if (interp->profile == NULL) {
-                        interp->profile = (RunProfile *)
-                            mem_sys_allocate_zeroed(sizeof (RunProfile));
+                        interp->profile = mem_allocate_zeroed_typed(RunProfile);
                         interp->profile->data = (ProfData *)
                             mem_sys_allocate_zeroed((interp->op_count +
                                         PARROT_PROF_EXTRA) * sizeof (ProfData));
@@ -784,8 +785,6 @@ runops_int(Interp *interp, size_t offset)
         }
     }
 }
-
-
 
 /*
 

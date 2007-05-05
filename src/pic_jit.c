@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2006, The Perl Foundation.
+Copyright (C) 2006-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -68,9 +68,11 @@ static opcode_t *
 pic_test_func(Interp *interp, INTVAL *sig_bits, void **args)
 {
     INTVAL * const result = (INTVAL*) args[0];
-    const INTVAL i = (INTVAL) args[1];
-    const INTVAL j = (INTVAL) args[2];
+    INTVAL   const i      = (INTVAL) args[1];
+    INTVAL   const j      = (INTVAL) args[2];
+
     *result = i + j;
+
     return args[3];
 }
 #  endif
@@ -80,23 +82,27 @@ jit_can_compile_sub(Interp *interp, PMC *sub)
 {
     const jit_arch_info * const info = Parrot_jit_init(interp);
     const jit_arch_regs * const regs = info->regs + JIT_CODE_SUB_REGS_ONLY;
-    INTVAL * const n_regs_used = PMC_sub(sub)->n_regs_used;
+    INTVAL * const n_regs_used       = PMC_sub(sub)->n_regs_used;
 
     /* if the sub is using more regs than the arch has
      * we don't JIT it at all
      */
     if (n_regs_used[REGNO_INT] > regs->n_mapped_I)
         return 0;
+
     if (n_regs_used[REGNO_NUM] > regs->n_mapped_F)
         return 0;
+
     /* if the Sub is using S regs, we can't JIT it yet */
     if (n_regs_used[REGNO_STR])
         return 0;
+
     /* if the Sub is using more than 1 P reg, we can't JIT it yet
      * the P reg could be a (recursive) call to a sub
      */
     if (n_regs_used[REGNO_PMC] > 1)
         return 0;
+
     return 1;
 }
 
@@ -110,55 +116,58 @@ args_match_params(Interp *interp, PMC *sig_args, PackFile_ByteCode *seg,
 
     if (*start != PARROT_OP_get_params_pc)
         return 0;
+
     sig_params = seg->const_table->constants[start[1]]->u.key;
+
     /* verify that we actually can pass arguments */
     ASSERT_SIG_PMC(sig_params);
 
     n = parrot_pic_check_sig(interp, sig_args, sig_params, &type);
-    if (n == -1) {
-        /* arg count mismatch */
+
+    /* arg count mismatch */
+    if (n == -1)
         return 0;
-    }
-    if (!n) {
-        /* no args - this would be safe, if the JIT code could already
-         * deal with no args
-         * TODO
-         */
+
+    /* no args - this would be safe, if the JIT code could already
+    * deal with no args
+    * TODO
+    */
+    if (!n)
         return 0;
-    }
-    type &= ~PARROT_ARG_CONSTANT;
-    switch (type) {
+
+    switch (type & ~PARROT_ARG_CONSTANT) {
         case PARROT_ARG_INTVAL:
         case PARROT_ARG_FLOATVAL:
             return 1;
+        default:
+            return 0;
     }
-    return 0;
 }
 
 static int
 returns_match_results(Interp *interp, PMC *sig_ret, PMC *sig_result)
 {
     int type;
-
     const int n = parrot_pic_check_sig(interp, sig_ret, sig_result, &type);
-    if (n == -1) {
-        /* arg count mismatch */
+
+    /* arg count mismatch */
+    if (n == -1)
         return 0;
-    }
-    if (!n) {
-        /* no args - this would be safe, if the JIT code could already
-         * deal with no args
-         * TODO
-         */
+
+    /* no args - this would be safe, if the JIT code could already
+     * deal with no args
+     * TODO
+     */
+    if (!n)
         return 0;
-    }
-    type &= ~PARROT_ARG_CONSTANT;
-    switch (type) {
+
+    switch (type & ~PARROT_ARG_CONSTANT ) {
         case PARROT_ARG_INTVAL:
         case PARROT_ARG_FLOATVAL:
             return 1;
+        default:
+            return 0;
     }
-    return 0;
 }
 
 static int
@@ -166,28 +175,36 @@ call_is_safe(Interp *interp, PMC *sub, opcode_t **set_args)
 {
     PMC *called, *sig_results;
 
-    opcode_t * pc = *set_args;
+    opcode_t * pc        = *set_args;
     PMC * const sig_args =
         PMC_sub(sub)->seg->const_table->constants[pc[1]]->u.key;
 
     /* ignore the signature for now */
     pc += 2 + SIG_ELEMS(sig_args);
+
     if (*pc != PARROT_OP_set_p_pc)
        return 0;
+
     called = PMC_sub(sub)->seg->const_table->constants[pc[2]]->u.key;
-    if (called != sub) {
-        /* we can JIT just recursive subs for now */
+
+    /* we can JIT just recursive subs for now */
+    if (called != sub)
         return 0;
-    }
+
     pc += 3;
+
     if (*pc != PARROT_OP_get_results_pc)
         return 0;
-    sig_results = PMC_sub(sub)->seg->const_table->constants[pc[1]]->u.key;
-    pc += 2 + SIG_ELEMS(sig_results);
+
+    sig_results  = PMC_sub(sub)->seg->const_table->constants[pc[1]]->u.key;
+    pc          += 2 + SIG_ELEMS(sig_results);
+
     if (*pc != PARROT_OP_invokecc_p)
         return 0;
-    pc += 2;
-    *set_args = pc;
+
+    pc        += 2;
+    *set_args  = pc;
+
     return 1;
 }
 
@@ -195,15 +212,17 @@ static int
 ops_jittable(Interp *interp, PMC *sub, PMC *sig_results, PackFile_ByteCode *seg,
         opcode_t *pc, opcode_t *end, int *flags)
 {
+    int        op;
+    op_info_t *op_info;
+    int        n;
+
     while (pc < end) {
-        /*
-         * some special opcodes, which are handled, but not marked
-         * as JITtable
-         */
-        const int op = *pc;
-        op_info_t * const op_info = interp->op_info_table + op;
-        int n = op_info->op_count;
+        /* special opcodes which are handled, but not marked as JITtable */
         int i;
+
+        op      = *pc;
+        op_info = interp->op_info_table + op;
+        n       = op_info->op_count;
 
         switch (op) {
             case PARROT_OP_returncc:
@@ -212,7 +231,8 @@ ops_jittable(Interp *interp, PMC *sub, PMC *sig_results, PackFile_ByteCode *seg,
                 break;
             case PARROT_OP_set_returns_pc:
                 {
-                PMC * const sig_ret = seg->const_table->constants[pc[1]]->u.key;
+                PMC *sig_ret;
+                sig_ret = seg->const_table->constants[pc[1]]->u.key;
                 if (!returns_match_results(interp, sig_ret, sig_results))
                     return 0;
                 }
@@ -225,10 +245,9 @@ ops_jittable(Interp *interp, PMC *sub, PMC *sig_results, PackFile_ByteCode *seg,
                 *flags |= JIT_CODE_RECURSIVE;
                 continue;
             default:
-                if (op_jit[op].extcall != 0) {
-                    /* non-jitted or JITted vtable */
+                /* non-jitted or JITted vtable */
+                if (op_jit[op].extcall != 0)
                     return 0;
-                }
                 break;
         }
         /*
@@ -274,11 +293,12 @@ parrot_pic_is_safe_to_jit(Interp *interp, PMC *sub,
      */
     if (!jit_can_compile_sub(interp, sub))
         return 0;
+
     /*
      * 2) check if get_params is matching set_args
      */
 
-    base = PMC_sub(sub)->seg->base.data;
+    base  = PMC_sub(sub)->seg->base.data;
     start = base + PMC_sub(sub)->start_offs;
     end   = base + PMC_sub(sub)->end_offs;
 
@@ -307,17 +327,17 @@ parrot_pic_JIT_sub(Interp *interp, PMC *sub, int flags)
     /*
      * create JIT code - just a test
      */
-    opcode_t * const base =  PMC_sub(sub)->seg->base.data;
+    opcode_t * const base  = PMC_sub(sub)->seg->base.data;
     opcode_t * const start = base + PMC_sub(sub)->start_offs;
     opcode_t * const end   = base + PMC_sub(sub)->end_offs;
     /* TODO pass Sub */
 
-    Parrot_jit_info_t * jit_info =
-        parrot_build_asm(interp,
-                         start, end, NULL,
-                         JIT_CODE_SUB_REGS_ONLY | flags);
+    Parrot_jit_info_t * jit_info = parrot_build_asm(interp,
+                         start, end, NULL, JIT_CODE_SUB_REGS_ONLY | flags);
+
     if (!jit_info)
         return NULLfunc;
+
     return (funcptr_t) jit_info->arena.start;
 #  endif
 }
@@ -341,7 +361,6 @@ parrot_pic_JIT_sub(Interp *interp, PMC *sub, int flags) {
 
 #endif     /* HAS_JIT */
 
-
 /*
 
 =back
@@ -358,7 +377,6 @@ F<include/parrot/pic.h>, F<ops/pic.ops>
 =cut
 
 */
-
 
 /*
  * Local variables:
