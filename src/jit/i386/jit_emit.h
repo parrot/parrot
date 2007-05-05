@@ -2438,31 +2438,34 @@ static void
 Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 Interp *interp, int n, int *args)
 {
-    int nvtable = op_jit[*jit_info->cur_op].extcall;
-    size_t offset;
+    int        nvtable = op_jit[*jit_info->cur_op].extcall;
+    size_t     offset;
     op_info_t *op_info = &interp->op_info_table[*jit_info->cur_op];
-    int pi;
-    int idx, i, op;
-    int st = 0;         /* stack pop correction */
-    extern PARROT_API char **Parrot_exec_rel_addr;
-    extern PARROT_API int Parrot_exec_rel_count;
+    int        pi;
+    int        idx, i, op;
+    int        st      = 0;         /* stack pop correction */
+    char      *L4      = NULL;
 
-    char *L4 = NULL;
+    extern PARROT_API char **Parrot_exec_rel_addr;
+    extern PARROT_API int    Parrot_exec_rel_count;
 
     /* get the offset of the first vtable func */
-    offset = offsetof(VTABLE, init);
+    offset  = offsetof(VTABLE, absolute);
     offset += nvtable * sizeof (void *);
-    op = *jit_info->cur_op;
+    op      = *jit_info->cur_op;
+
     if (op == PARROT_OP_set_i_p_ki) {
         L4 = jit_set_i_p_ki(jit_info, interp, offset);
     }
     else if (op == PARROT_OP_set_p_ki_i) {
         L4 = jit_set_p_ki_i(jit_info, interp, offset);
     }
+
     /* get params $i, 0 is opcode */
     for (idx = n; idx > 0; idx--) {
-        i = args[idx-1];
+        i  = args[idx-1];
         pi = *(jit_info->cur_op + i);
+
         switch (op_info->types[i - 1]) {
             case PARROT_ARG_S:
                 emitm_movl_m_r(jit_info->native_ptr,
@@ -2497,9 +2500,8 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 break;
             case PARROT_ARG_N:
                 /* push num on st(0) */
-                if (MAP(i)) {
+                if (MAP(i))
                     emitm_fld(jit_info->native_ptr, MAP(i));
-                }
                 else
                     jit_emit_fload_mb_n(jit_info->native_ptr,
                             emit_EBX, REG_OFFS_NUM(pi));
@@ -2570,9 +2572,11 @@ store:
                 break;
         }
     }
+
     /* push interpreter */
     Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_ECX);
     emitm_pushl_r(jit_info->native_ptr, emit_ECX);
+
     if (L4) {
         emitm_callr(jit_info->native_ptr, emit_ESI);
     }
@@ -2583,12 +2587,15 @@ store:
         /* call *(offset)eax */
         emitm_callm(jit_info->native_ptr, emit_EAX, emit_None, emit_None, offset);
     }
+
     emitm_addb_i_r(jit_info->native_ptr,
             st + sizeof (void *) * (n + 1), emit_ESP);
+
     /* L4: */
     if (L4)
         L4[1] = jit_info->native_ptr - L4 - 2;
 }
+
 static void
 Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
                      Interp *interp)

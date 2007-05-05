@@ -849,7 +849,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     int    idx, pi, i;
     size_t offset;
 
-    offset  = offsetof(VTABLE, init);
+    offset  = offsetof(VTABLE, absolute);
     offset += nvtable * sizeof (void *);
 
     for (idx = 1; idx <= n; idx++) {
