@@ -164,7 +164,7 @@ SWITCH_RELOAD:
     _reg_base = (char*)interp->ctx.bp.regs_i;
     do {
 SWITCH_AGAIN:
-    cur_opcode = CHECK_EVENTS(interp, cur_opcode);
+    cur_opcode = CHECK_EVENTS(interp, *cur_opcode);
     if (!cur_opcode)
         break;
     switch (*(opcode_t*)cur_opcode) {
