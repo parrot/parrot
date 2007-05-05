@@ -177,32 +177,32 @@ A link to the class's associated namespace
 
 A "have I been instantiated since I was last modified" flag
 
-=item 2
+=item 3
 
 An array PMC of the immediate parent classes
 
-=item 3
+=item 4
 
 A cached array of all parent PMCs, in search order (this is an optional
 optimization, and can be calculated from the class's rules of inheritance,
 the list of immediate parent classes, and the parent classes' rules of
 inheritance)
 
-=item 4
+=item 5
 
 An array PMC of the composed roles (these are Role PMCs, not string names of
 roles).
 
-=item 5
+=item 6
 
 A hash PMC of the methods defined in the class or composed into the
 class
 
-=item 6
+=item 7
 
 A hash PMC of the overloaded PMC vtable entries for the class.
 
-=item 7
+=item 8
 
 The class attribute metadata hash. Keys are the attribute names and the
 values are a hash of attribute characteristics, including name, type, the
@@ -210,7 +210,7 @@ class they're associated with and any flags (for example, private). Note
 that this only stores metadata for the attributes defined in this class,
 and not for attributes inherited from its parents.
 
-=item 8
+=item 9
 
 The full attribute lookup table. This associates attribute names with an
 index into the object's attribute storage (an array). It includes all
@@ -220,7 +220,7 @@ name of the class where the attribute is defined, along with the
 attribute name. The value is an index into the per-object attribute
 store.
 
-=item 9
+=item 10
 
 The attribute cache. While the attribute lookup table defines every
 attribute, whether it is visible or not with the current method
