@@ -7,28 +7,36 @@ lib/Parrot/BuildUtil.pm - Utilities for building Parrot
 
 =head1 DESCRIPTION
 
-For now only a sub for getting the current version.
-
-=head2 Functions
-
-=over 4
+For now, this package contains only one subroutine:  C<parrot_version()>.
+This subroutine is not exported and so must be requested with a fully
+qualified path.
 
 =cut
 
 package Parrot::BuildUtil;
-
 use strict;
 use warnings;
 
+=head2 SUBROUTINES
+
+=over 4
+
 =item C<parrot_version()>
 
-Determine the current version number for Parrot from the VERSION file
-and return it.
+Determines the current version number for Parrot from the VERSION file
+and returns it in a context-appropriate manner.
+
+    $parrot_version = Parrot::BuildUtil::parrot_version();
+    # $parrot_version is '0.4.11'
+
+    @parrot_version = Parrot::BuildUtil::parrot_version();
+    # @parrot_version is (0, 4, 11)
+
+=back
 
 =cut
 
 # cache for repeated calls
-# XXX this could be in BEGIN block
 my ( $parrot_version, @parrot_version );
 
 sub parrot_version {
@@ -38,10 +46,9 @@ sub parrot_version {
 
     # Obtain the official version number from the VERSION file.
     open my $VERSION, '<', 'VERSION' or die "Could not open VERSION file!";
-    $parrot_version = <$VERSION>;
+    chomp( $parrot_version = <$VERSION> );
     close $VERSION;
 
-    chomp $parrot_version;
     $parrot_version =~ s/\s+//g;
     @parrot_version = split( /\./, $parrot_version );
 
@@ -53,29 +60,22 @@ sub parrot_version {
         die "Too many components to VERSION file contents: '$parrot_version' (should be 3 or 4)!";
     }
 
-    foreach (@parrot_version) {
-        die "Illegal version component: '$_' in VERSION file!" unless m/^[1-9]*\w*$/;
+    foreach my $component (@parrot_version) {
+        die "Illegal version component: '$component' in VERSION file!"
+            unless $component =~ m/^\d+$/;
     }
 
-    if ( @parrot_version == 4 ) {
-
-        #    $parrot_version[2] = $parrot_version[2] . "_" . $parrot_version[3];
-        $#parrot_version = 3;
-    }
     $parrot_version = join( '.', @parrot_version );
-
     return wantarray ? @parrot_version : $parrot_version;
 }
 
-=back
+1;
 
 =head1 AUTHOR
 
-Gregor N. Purdy
+Gregor N. Purdy.  Revised by James E Keenan.
 
 =cut
-
-1;
 
 # Local Variables:
 #   mode: cperl
