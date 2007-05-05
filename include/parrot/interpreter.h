@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_INTERPRETER_H_GUARD)
+#ifndef PARROT_INTERPRETER_H_GUARD
 #define PARROT_INTERPRETER_H_GUARD
 
 /* These should be visible to embedders. */

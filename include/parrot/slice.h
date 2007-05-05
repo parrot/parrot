@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_SLICE_H_GUARD)
+#ifndef PARROT_SLICE_H_GUARD
 #define PARROT_SLICE_H_GUARD
 
 #ifdef PARROT_IN_CORE

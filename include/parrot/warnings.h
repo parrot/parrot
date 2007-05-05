@@ -1,4 +1,4 @@
-#if !defined(PARROT_WARNINGS_H_GUARD)
+#ifndef PARROT_WARNINGS_H_GUARD
 #define PARROT_WARNINGS_H_GUARD
 
 /* These should be visible to embedders. */

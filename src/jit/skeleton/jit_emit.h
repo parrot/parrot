@@ -6,7 +6,7 @@
  * $Id$
  */
 
-#if !defined(PARROT_PPC_JIT_EMIT_H_GUARD)
+#ifndef PARROT_PPC_JIT_EMIT_H_GUARD
 #  define PARROT_PPC_JIT_EMIT_H_GUARD
 
 #  include <unistd.h>

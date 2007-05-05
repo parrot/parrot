@@ -15,7 +15,7 @@
    Programs embedding parrot should include <parrot/embed.h>.
 */
 
-#if !defined(PARROT_PARROT_H_GUARD)
+#ifndef PARROT_PARROT_H_GUARD
 #define PARROT_PARROT_H_GUARD
 
 #if defined(INSIDE_GLOBAL_SETUP)

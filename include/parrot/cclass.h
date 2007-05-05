@@ -5,7 +5,7 @@
 *   Parrot character classes
 */
 
-#if !defined(PARROT_CCLASS_H_GUARD)
+#ifndef PARROT_CCLASS_H_GUARD
 #define PARROT_CCLASS_H_GUARD
 
 /* &gen_from_enum(cclass.pasm) subst(s/enum_cclass_(\w+)/uc("CCLASS_$1")/e) */

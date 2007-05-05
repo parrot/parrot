@@ -11,7 +11,7 @@
  * References:
  */
 
-#if !defined(PARROT_MIPS_JIT_EMIT_H_GUARD)
+#ifndef PARROT_MIPS_JIT_EMIT_H_GUARD
 #  define PARROT_MIPS_JIT_EMIT_H_GUARD
 
 #  define BASE_REG s0

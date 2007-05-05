@@ -17,7 +17,7 @@
  *  References: misc.c, spf_vtable.c, spf_render.c
  */
 
-#if !defined(PARROT_MISC_H_GUARD)
+#ifndef PARROT_MISC_H_GUARD
 #define PARROT_MISC_H_GUARD
 
 #include "parrot/parrot.h"

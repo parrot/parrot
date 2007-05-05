@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_CHARSET_BINARY_H_GUARD)
+#ifndef PARROT_CHARSET_BINARY_H_GUARD
 #define PARROT_CHARSET_BINARY_H_GUARD
 
 CHARSET *Parrot_charset_binary_init(Interp *);

@@ -12,7 +12,7 @@
  *  References:
  */
 
-#if !defined(PARROT_INTLIST_H_GUARD)
+#ifndef PARROT_INTLIST_H_GUARD
 #define PARROT_INTLIST_H_GUARD
 
 #include "parrot/parrot.h"

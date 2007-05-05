@@ -26,7 +26,7 @@ print $OUT $header, <<'EOF';
 /*
 Copyright (C) 2005-2007, The Perl Foundation.
 */
-#if !defined(PARROT_EXTEND_VTABLE_H_GUARD)
+#ifndef PARROT_EXTEND_VTABLE_H_GUARD
 #define PARROT_EXTEND_VTABLE_H_GUARD
 
 /* Need size_t  */
@@ -38,7 +38,7 @@ print $OUT $protos;
 
 print $OUT <<'EOF';
 
-#endif
+#endif /* PARROT_EXTEND_VTABLE_H_GUARD */
 EOF
 
 # append the C code coda

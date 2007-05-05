@@ -12,7 +12,7 @@
  *      extend.c, docs/pdds/pdd11_extending.pod.
  */
 
-#if !defined(PARROT_EXTEND_H_GUARD)
+#ifndef PARROT_EXTEND_H_GUARD
 #define PARROT_EXTEND_H_GUARD
 
 #include "parrot/config.h"      /* PARROT_VERSION, PARROT_JIT_CAPABLE... */

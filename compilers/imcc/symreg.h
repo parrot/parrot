@@ -1,4 +1,4 @@
-#if !defined(PARROT_IMCC_SYMREG_H_GUARD)
+#ifndef PARROT_IMCC_SYMREG_H_GUARD
 #define PARROT_IMCC_SYMREG_H_GUARD
 
 /* types */

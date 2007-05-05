@@ -22,7 +22,7 @@ Some ideas from AT&T SFIO.
 
 */
 
-#if !defined(PARROT_IO_PRIVATE_H_GUARD)
+#ifndef PARROT_IO_PRIVATE_H_GUARD
 #define PARROT_IO_PRIVATE_H_GUARD
 
 #define PARROT_IN_IO 1

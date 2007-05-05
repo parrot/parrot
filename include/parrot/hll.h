@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_HLL_H_GUARD)
+#ifndef PARROT_HLL_H_GUARD
 #define PARROT_HLL_H_GUARD
 
 /* this invalid HLL type means "no HLL" when passed to the below functions */

@@ -11,7 +11,7 @@
  */
 
 
-#if !defined(PARROT_ATOMIC_H_GUARD)
+#ifndef PARROT_ATOMIC_H_GUARD
 #  define PARROT_ATOMIC_H_GUARD
 
 #  include "parrot/has_header.h"

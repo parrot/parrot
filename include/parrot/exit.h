@@ -11,7 +11,7 @@
  *      exit.c
  */
 
-#if !defined(PARROT_EXIT_H_GUARD)
+#ifndef PARROT_EXIT_H_GUARD
 #define PARROT_EXIT_H_GUARD
 
 #include "parrot/compiler.h"    /* compiler capabilities */

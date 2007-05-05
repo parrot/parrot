@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_OBJECTS_H_GUARD)
+#ifndef PARROT_OBJECTS_H_GUARD
 #define PARROT_OBJECTS_H_GUARD
 
 #include "parrot/parrot.h"

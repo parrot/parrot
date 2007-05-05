@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_LIBRARY_H_GUARD)
+#ifndef PARROT_LIBRARY_H_GUARD
 #define PARROT_LIBRARY_H_GUARD
 
 typedef enum {

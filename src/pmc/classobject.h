@@ -7,7 +7,7 @@
 ** documented interface.
 */
 
-#if !defined(PARROT_CLASSOBJECT_H_GUARD)
+#ifndef PARROT_CLASSOBJECT_H_GUARD
 #  define PARROT_CLASSOBJECT_GUARD
 
 /* Class PMC's underlying struct. */

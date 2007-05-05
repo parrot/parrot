@@ -1,5 +1,5 @@
-#ifndef __PIRUTIL_H
-#  define __PIRUTIL_H
+#ifndef PARROT_PIRC_PIRUTIL_H_GUARD
+#  define PARROT_PIRC_PIRUTIL_H_GUARD
 
 
 #  include <stdio.h>
@@ -31,7 +31,7 @@ extern FILE *open_file(char const *filename, char const *mode);
 
 
 
-#endif
+#endif /* PARROT_PIRC_PIRUTIL_H_GUARD */
 
 /*
  * Local variables:

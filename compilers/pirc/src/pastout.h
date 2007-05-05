@@ -1,12 +1,12 @@
-#ifndef __PASTOUT_H
-#  define __PASTOUT_H
+#ifndef PARROT_PIRC_PASTOUT_H_GUARD
+#  define PARROT_PIRC_PASTOUT_H_GUARD
 
 /* predeclare */
 struct pirvtable;
 
 extern struct pirvtable *init_past_vtable(char *outputfile);
 
-#endif
+#endif /* PARROT_PIRC_PASTOUT_H_GUARD */
 
 /*
  * Local variables:

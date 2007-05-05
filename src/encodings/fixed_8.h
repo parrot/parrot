@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_ENCODING_FIXED_8_H_GUARD)
+#ifndef PARROT_ENCODING_FIXED_8_H_GUARD
 #define PARROT_ENCODING_FIXED_8_H_GUARD
 
 static UINTVAL get_codepoint(Interp *interp, const STRING *source_string, UINTVAL offset);

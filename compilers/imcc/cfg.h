@@ -2,7 +2,7 @@
 /* Data structures: */
 
 /* Two-way linked list of predecessors and successors */
-#if !defined(PARROT_CFG_H_GUARD)
+#ifndef PARROT_CFG_H_GUARD
 #define PARROT_CFG_H_GUARD
 
 typedef struct _edge {

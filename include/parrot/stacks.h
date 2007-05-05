@@ -10,7 +10,7 @@
  *  References: See also enums.h
  */
 
-#if !defined(PARROT_STACKS_H_GUARD)
+#ifndef PARROT_STACKS_H_GUARD
 #define PARROT_STACKS_H_GUARD
 
 #include "parrot/parrot.h"

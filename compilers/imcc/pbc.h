@@ -1,4 +1,4 @@
-#if !defined(PARROT_IMCC_PBC_H_GUARD)
+#ifndef PARROT_IMCC_PBC_H_GUARD
 #define PARROT_IMCC_PBC_H_GUARD
 
 int e_pbc_open(Interp *, void *);

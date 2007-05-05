@@ -1,6 +1,6 @@
 /* $Id$ */
 
-#if !defined(PARROT_IMCC_IMC_H_GUARD)
+#ifndef PARROT_IMCC_IMC_H_GUARD
 #define PARROT_IMCC_IMC_H_GUARD
 
 #include <stdio.h>

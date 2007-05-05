@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_EVENTS_H_GUARD)
+#ifndef PARROT_EVENTS_H_GUARD
 #define PARROT_EVENTS_H_GUARD
 
 typedef void* (*event_func_t)(Parrot_Interp, void*);

@@ -1,10 +1,10 @@
-#ifndef __PBCOUT_H
-#  define __PBCOUT_H
+#ifndef PARROT_PIRC_PBCOUT_H_GUARD
+#  define PARROT_PIRC_PBCOUT_H_GUARD
 
 
 extern struct pirvtable *init_pbc_vtable(char *outputfile);
 
-#endif
+#endif /* PARROT_PIRC_PBCOUT_H_GUARD */
 
 
 /*

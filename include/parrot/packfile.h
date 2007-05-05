@@ -7,7 +7,7 @@
 *   (Do endian conversion and wordsize transforms on the fly.)
 */
 
-#if !defined(PARROT_PACKFILE_H_GUARD)
+#ifndef PARROT_PACKFILE_H_GUARD
 #define PARROT_PACKFILE_H_GUARD
 
 #include <parrot/parrot.h>

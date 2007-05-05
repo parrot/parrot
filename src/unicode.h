@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_UNICODE_H_GUARD)
+#ifndef PARROT_UNICODE_H_GUARD
 #define PARROT_UNICODE_H_GUARD
 
 typedef unsigned char utf8_t;

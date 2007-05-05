@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_ENCODING_UTF8_H_GUARD)
+#ifndef PARROT_ENCODING_UTF8_H_GUARD
 #define PARROT_ENCODING_UTF8_H_GUARD
 
 ENCODING *Parrot_encoding_utf8_init(Interp *);

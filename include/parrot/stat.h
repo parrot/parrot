@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_STAT_H_GUARD)
+#ifndef PARROT_STAT_H_GUARD
 #define PARROT_STAT_H_GUARD
 
 #include "parrot/config.h"

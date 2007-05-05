@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_REGISTER_H_GUARD)
+#ifndef PARROT_REGISTER_H_GUARD
 #define PARROT_REGISTER_H_GUARD
 
 #include "parrot/string.h"

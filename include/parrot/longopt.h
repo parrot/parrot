@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_LONGOPT_H_GUARD)
+#ifndef PARROT_LONGOPT_H_GUARD
 #define PARROT_LONGOPT_H_GUARD
 
 /* I use a char* here because this needs to be easily statically

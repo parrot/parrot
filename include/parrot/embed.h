@@ -12,7 +12,7 @@
  *      embed.c, docs/embed.pod.
  */
 
-#if !defined(PARROT_EMBED_H_GUARD)
+#ifndef PARROT_EMBED_H_GUARD
 #define PARROT_EMBED_H_GUARD
 
 #include "parrot/compiler.h"    /* compiler capabilities */

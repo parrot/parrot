@@ -1,9 +1,9 @@
-#if !defined(PARROT_STM_WAITLIST_H_GAURD)
-#  define PARROT_STM_WAITLIST_H_GAURD
+#ifndef PARROT_STM_WAITLIST_H_GUARD
+#define PARROT_STM_WAITLIST_H_GUARD
 
-#  include <parrot/atomic.h>
+#include <parrot/atomic.h>
 
-#  define WAITLIST_DEBUG 0
+#define WAITLIST_DEBUG 0
 
 struct waitlist_entry {
     /* next entry in the waitlist */
@@ -37,9 +37,9 @@ struct waitlist_thread_data {
     struct waitlist_entry **entries;
     size_t entry_count;
     size_t used_entries;
-#  if WAITLIST_DEBUG
+#if WAITLIST_DEBUG
     Interp *interp;
-#  endif
+#endif
 };
 
 typedef struct waitlist_head STM_waitlist;
@@ -52,7 +52,7 @@ void Parrot_STM_waitlist_remove_all(Parrot_Interp);
 void Parrot_STM_waitlist_wait(Parrot_Interp);
 void Parrot_STM_waitlist_destroy_thread(Parrot_Interp);
 
-#endif
+#endif /* PARROT_STM_WAITLIST_H_GUARD */
 
 /*
  * Local variables:

@@ -33,7 +33,7 @@
  *
  */
 
-#if !defined(PARROT_ALPHA_JIT_EMIT_H_GUARD)
+#ifndef PARROT_ALPHA_JIT_EMIT_H_GUARD
 #  define PARROT_ALPHA_JIT_EMIT_H_GUARD
 
 typedef enum {

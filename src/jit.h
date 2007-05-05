@@ -4,7 +4,7 @@
  * $Id$
  */
 
-#if !defined(PARROT_JIT_H_GUARD)
+#ifndef PARROT_JIT_H_GUARD
 #define PARROT_JIT_H_GUARD
 
 typedef void (*jit_f)(Interp *interp, opcode_t *pc);

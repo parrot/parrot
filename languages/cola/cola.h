@@ -8,8 +8,8 @@
  * The giant, hulking header file.
  */
 
-#ifndef _COLA_H
-#  define _COLA_H
+#ifndef PARROT_LANGUAGES_COLA_H_GUARD
+#  define PARROT_LANGUAGES_COLA_H_GUARD
 
 #  define COLA_VERSION "0.0.11.1"
 
@@ -393,7 +393,7 @@ int                 op_inverse(int);
 
 extern long         line;
 
-#endif
+#endif /* PARROT_LANGUAGES_COLA_H_GUARD */
 
 /*
  * Local variables:

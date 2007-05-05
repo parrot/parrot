@@ -1,4 +1,4 @@
-#if !defined(PARROT_IMCC_OPTIMIZER_H_GUARD)
+#ifndef PARROT_IMCC_OPTIMIZER_H_GUARD
 #define PARROT_IMCC_OPTIMIZER_H_GUARD
 int pre_optimize(Interp *, IMC_Unit *);
 int cfg_optimize(Interp *, IMC_Unit *);

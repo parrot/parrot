@@ -157,7 +157,7 @@
      CONCAT = 373,
      POINTY = 374
    };
-#endif
+#endif /* YYTOKENTYPE */
 /* Tokens.  */
 #define LOW_PREC 258
 #define PARAM 259
@@ -296,7 +296,7 @@ typedef union YYSTYPE
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
-#endif
+#endif /* !YYSTYPE && !YYSTYPE_IS_DECLARED */
 
 
 

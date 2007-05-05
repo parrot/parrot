@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_RUNOPS_CORES_H_GUARD)
+#ifndef PARROT_RUNOPS_CORES_H_GUARD
 #define PARROT_RUNOPS_CORES_H_GUARD
 
 #include "parrot/parrot.h"

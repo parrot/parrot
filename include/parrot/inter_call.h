@@ -13,7 +13,7 @@
  *     pdd03 - Calling Conventions
  */
 
-#if !defined(PARROT_INTER_CALL_H_GUARD)
+#ifndef PARROT_INTER_CALL_H_GUARD
 #define PARROT_INTER_CALL_H_GUARD
 
 enum call_state_mode {

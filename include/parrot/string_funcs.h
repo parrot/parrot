@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_STRING_FUNCS_H_GUARD)
+#ifndef PARROT_STRING_FUNCS_H_GUARD
 #define PARROT_STRING_FUNCS_H_GUARD
 
 #include "parrot/compiler.h"

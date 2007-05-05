@@ -1,4 +1,4 @@
-#if !defined(PARROT_SMALLOBJECT_H_GUARD)
+#ifndef PARROT_SMALLOBJECT_H_GUARD
 #  define PARROT_SMALLOBJECT_H_GUARD
 
 #  include "parrot/parrot.h"
@@ -74,7 +74,7 @@ typedef struct _gc_gms_gen {
     struct _gc_gms_gen *next;
 } Gc_gms_gen;
 
-#endif
+#endif /* PARROT_GC_GMS */
 
 /* Tracked resource pool */
 typedef struct Small_Object_Pool {

@@ -1,16 +1,16 @@
-#if !defined(PARROT_STM_INTERNAL_H_GAURD)
-#  define PARROT_STM_INTERNAL_H_GAURD
+#ifndef PARROT_STM_INTERNAL_H_GUARD
+#define PARROT_STM_INTERNAL_H_GUARD
 
-#  include <parrot/parrot.h>
-#  include <parrot/stm/backend.h>
-#  include "stm_waitlist.h"
+#include <parrot/parrot.h>
+#include <parrot/stm/backend.h>
+#include "stm_waitlist.h"
 
-#  if STM_PROFILE
+#if STM_PROFILE
 
-#    define CYCLE_BUCKETS 20
-#    define TIME_BUCKETS 20
-#    define PROFILE(log) log->profile
-#    define PROFILE_WAIT(log, time, cycles) \
+#  define CYCLE_BUCKETS 20
+#  define TIME_BUCKETS 20
+#  define PROFILE(log) log->profile
+#  define PROFILE_WAIT(log, time, cycles) \
       do { \
           FLOATVAL the_time = (time); \
           int time_bucket = ceil(the_time * 200.0); \
@@ -37,11 +37,11 @@
           } \
       } while (0)
 
-#    define PROFILE_TRIED_COMMIT(log) \
+#  define PROFILE_TRIED_COMMIT(log) \
       ++PROFILE(log).attempted_commits
-#    define PROFILE_FAILED_COMMIT(log) \
+#  define PROFILE_FAILED_COMMIT(log) \
       ++PROFILE(log).failed_commits
-#    define PROFILE_ABORTED(profile) \
+#  define PROFILE_ABORTED(profile) \
       ++PROFILE(log).num_aborts
 
 struct STM_profile_data {
@@ -56,15 +56,15 @@ struct STM_profile_data {
     long total_wait_cycles;
 };
 
-#  else
+#else
 
-#    define PROFILE(x)
-#    define PROFILE_TRIED_COMMIT(x)
-#    define PROFILE_FAILED_COMMIT(x)
-#    define PROFILE_ABORTED(x)
-#    define PROFILE_WAIT(x,y,z)
+#  define PROFILE(x)
+#  define PROFILE_TRIED_COMMIT(x)
+#  define PROFILE_FAILED_COMMIT(x)
+#  define PROFILE_ABORTED(x)
+#  define PROFILE_WAIT(x,y,z)
 
-#  endif
+#endif
 
 struct Parrot_STM_PMC_handle_data {
     Buffer buf;
@@ -100,9 +100,9 @@ enum {
     STM_STATUS_INVALID = 3
 };
 
-#  define STM_START_RECORDS 32
+#define STM_START_RECORDS 32
 
-#  define STM_MAX_TX_DEPTH 32 /* TODO: remove limitation */
+#define STM_MAX_TX_DEPTH 32 /* TODO: remove limitation */
 
 struct STM_tx_log_sub;
 
@@ -120,9 +120,9 @@ struct STM_tx_log_sub {
 struct STM_tx_log {
     int depth;
 
-#  if STM_PROFILE
+#if STM_PROFILE
     struct STM_profile_data profile;
-#  endif
+#endif
 
     STM_tx_log_sub inner[STM_MAX_TX_DEPTH];
 
@@ -147,7 +147,7 @@ typedef struct STM_saved_tx_log STM_saved_tx_log;
 
 STM_tx_log *Parrot_STM_tx_log_get(Interp *interp);
 
-#endif
+#endif /* PARROT_STM_INTERNAL_H_GUARD */
 
 /*
  * Local variables:

@@ -766,7 +766,7 @@ ia64_sync_cache (void *_start, void *_end)
 
 #  endif
 
-#endif
+#endif /* !JIT_EMIT */
 
 /*
  * Local variables:

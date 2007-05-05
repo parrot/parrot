@@ -1,5 +1,5 @@
-#ifndef __PIRLEXER_H
-#  define __PIRLEXER_H
+#ifndef PARROT_PIRC_PIRLEXER_H_GUARD
+#  define PARROT_PIRC_PIRLEXER_H_GUARD
 
 typedef enum tokens {
     T_GLOBAL,                           /* "global"                   */
@@ -202,7 +202,7 @@ extern token read_macro(struct lexer_state *lexer);
 /* get the spelling of a keyword */
 extern char const * find_keyword(token t);
 
-#endif
+#endif /* PARROT_PIRC_PIRLEXER_H_GUARD */
 
 /*
  * Local variables:

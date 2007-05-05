@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_PMC_H_GUARD)
+#ifndef PARROT_PMC_H_GUARD
 #define PARROT_PMC_H_GUARD
 
 #include "parrot/core_pmcs.h"

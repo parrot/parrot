@@ -8,7 +8,7 @@
  *  References:
  */
 
-#if !defined(PARROT_ENUMS_H_GUARD)
+#ifndef PARROT_ENUMS_H_GUARD
 #define PARROT_ENUMS_H_GUARD
 
 typedef enum {

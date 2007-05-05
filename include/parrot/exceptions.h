@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_EXCEPTIONS_H_GUARD)
+#ifndef PARROT_EXCEPTIONS_H_GUARD
 #define PARROT_EXCEPTIONS_H_GUARD
 
 #include "parrot/compiler.h"

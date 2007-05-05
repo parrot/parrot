@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_CACHES_H_GUARD)
+#ifndef PARROT_CACHES_H_GUARD
 #define PARROT_CACHES_H_GUARD
 
 #define DISABLE_METH_CACHE 0

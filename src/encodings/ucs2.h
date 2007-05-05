@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_ENCODING_UCS2_H_GUARD)
+#ifndef PARROT_ENCODING_UCS2_H_GUARD
 #define PARROT_ENCODING_UCS2_H_GUARD
 
 ENCODING *Parrot_encoding_ucs2_init(Interp *);

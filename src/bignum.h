@@ -25,7 +25,7 @@ L<https://rt.perl.org/rt3/Ticket/Display.html?id=36330>
 
 */
 
-#if !defined(PARROT_TYPES_BIGNUM_H_GUARD)
+#ifndef PARROT_TYPES_BIGNUM_H_GUARD
 #define PARROT_TYPES_BIGNUM_H_GUARD
 
 /* Stuff to be parrot-like in source, even if not being used in parrot */

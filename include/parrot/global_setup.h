@@ -11,7 +11,7 @@
  *  References:
  */
 
-#if !defined(PARROT_GLOBAL_SETUP_H_GUARD)
+#ifndef PARROT_GLOBAL_SETUP_H_GUARD
 #define PARROT_GLOBAL_SETUP_H_GUARD
 
 #include "parrot/config.h"

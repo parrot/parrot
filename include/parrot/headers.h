@@ -11,7 +11,7 @@
  *  References:
  */
 
-#if !defined(PARROT_HEADERS_H_GUARD)
+#ifndef PARROT_HEADERS_H_GUARD
 #define PARROT_HEADERS_H_GUARD
 
 #include "parrot/parrot.h"

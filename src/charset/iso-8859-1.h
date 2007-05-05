@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_CHARSET_ISO_8859_1_H_GUARD)
+#ifndef PARROT_CHARSET_ISO_8859_1_H_GUARD
 #define PARROT_CHARSET_ISO_8859_1_H_GUARD
 
 STRING *charset_cvt_iso_8859_1_to_ascii(Interp *, STRING *src, STRING *dest);

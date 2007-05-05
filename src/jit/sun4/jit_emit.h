@@ -6,7 +6,7 @@
 ** $Id$
 **/
 
-#if !defined(PARROT_SUN4_JIT_EMIT_H_GUARD)
+#ifndef PARROT_SUN4_JIT_EMIT_H_GUARD
 #  define PARROT_SUN4_JIT_EMIT_H_GUARD
 
 /*

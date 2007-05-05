@@ -13,7 +13,7 @@
  *  References:
  */
 
-#if !defined(PARROT_CHARSET_TABLES_H_GUARD)
+#ifndef PARROT_CHARSET_TABLES_H_GUARD
 #define PARROT_CHARSET_TABLES_H_GUARD
 #include "parrot/cclass.h"
 #include "parrot/parrot.h"

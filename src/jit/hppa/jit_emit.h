@@ -6,6 +6,10 @@
  * $Id$
  */
 
+#ifndef PARROT_HPPA_JIT_EMIT_H_GUARD
+#define PARROT_HPPA_JIT_EMIT_H_GUARD
+
+
 /*
  *      r0          Zero
  *      r26         Argument 1
@@ -769,7 +773,9 @@ Parrot_jit_init(Interp *interpreter)
 
 #  endif
 
-#endif
+#endif /* !JIT_EMIT */
+
+#endif /* PARROT_HPPA_JIT_EMIT_H_GUARD */
 
 /*
  * Local variables:

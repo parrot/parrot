@@ -6,7 +6,7 @@
  *     defines compiler capabilities
  */
 
-#if !defined(PARROT_COMPILER_H_GUARD)
+#ifndef PARROT_COMPILER_H_GUARD
 #define PARROT_COMPILER_H_GUARD
 
 /*

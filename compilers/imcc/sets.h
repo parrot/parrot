@@ -1,4 +1,4 @@
-#if !defined(PARROT_IMCC_SETS_H_GUARD)
+#ifndef PARROT_IMCC_SETS_H_GUARD
 #define PARROT_IMCC_SETS_H_GUARD
 
 typedef struct _Set {

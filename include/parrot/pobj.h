@@ -10,7 +10,7 @@
  *  References: memory_internals.pod
  */
 
-#if !defined(PARROT_POBJ_H_GUARD)
+#ifndef PARROT_POBJ_H_GUARD
 #define PARROT_POBJ_H_GUARD
 
 #include "parrot/config.h"

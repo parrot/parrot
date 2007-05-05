@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_PIC_H_GUARD)
+#ifndef PARROT_PIC_H_GUARD
 #define PARROT_PIC_H_GUARD
 
 /*

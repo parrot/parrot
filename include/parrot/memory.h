@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_MEMORY_H_GUARD)
+#ifndef PARROT_MEMORY_H_GUARD
 #define PARROT_MEMORY_H_GUARD
 #include <assert.h>
 PARROT_API void *mem_sys_allocate(size_t);

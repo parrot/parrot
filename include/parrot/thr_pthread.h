@@ -13,7 +13,7 @@
  *  References:
  */
 
-#if !defined(PARROT_THR_PTHREAD_H_GUARD)
+#ifndef PARROT_THR_PTHREAD_H_GUARD
 #define PARROT_THR_PTHREAD_H_GUARD
 
 #  include <pthread.h>

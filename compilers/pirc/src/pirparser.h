@@ -1,5 +1,5 @@
-#ifndef __PIRPARSER_H
-#  define __PIRPARSER_H
+#ifndef PARROT_PIRC_PIRPARSER_H_GUARD
+#  define PARROT_PIRC_PIRPARSER_H_GUARD
 
 #  include "pirlexer.h"
 #  include "pirvtable.h"
@@ -24,7 +24,7 @@ extern struct lexer_state const *get_lexer(struct parser_state *p);
 
 extern token get_token(struct parser_state *p);
 
-#endif
+#endif /* PARROT_PIRC_PIRPARSER_H_GUARD */
 
 /*
  * Local variables:

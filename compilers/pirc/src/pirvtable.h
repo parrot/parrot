@@ -1,5 +1,5 @@
-#ifndef __VTABLE_H
-#  define __VTABLE_H
+#ifndef PARROT_PIRC_PIRVTABLE_H_GUARD
+#  define PARROT_PIRC_PIRVTABLE_H_GUARD
 
 /* predeclaration; the actual definition is left to the back-end(s) */
 struct emit_data;
@@ -133,7 +133,7 @@ extern pirvtable *new_pirvtable(void);
 extern void destroy_pirvtable(pirvtable *vtable);
 
 
-#endif
+#endif /* PARROT_PIRC_PIRVTABLE_H_GUARD */
 
 /*
  * Local variables:

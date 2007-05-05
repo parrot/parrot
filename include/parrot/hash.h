@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_HASH_H_GUARD)
+#ifndef PARROT_HASH_H_GUARD
 #define PARROT_HASH_H_GUARD
 
 /* Prototypes */

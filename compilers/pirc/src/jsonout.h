@@ -1,12 +1,12 @@
-#ifndef __JSONOUT_H
-#  define __JSONOUT_H
+#ifndef PARROT_PIRC_JSONOUT_H_GUARD
+#  define PARROT_PIRC_JSONOUT_H_GUARD
 
 /* predeclare */
 struct pirvtable;
 
 extern struct pirvtable *init_json_vtable(char *outputfile);
 
-#endif
+#endif /* PARROT_PIRC_JSONOUT_H_GUARD */
 
 
 /*

@@ -1171,7 +1171,7 @@ EOH
     $hout .= $self->{ro}->hdecls()           if ( $self->{ro} );
     $hout .= <<"EOH";
 
-#endif
+#endif /* PARROT_PMC_${name}_H_GUARD */
 
 EOH
     $hout .= c_code_coda();

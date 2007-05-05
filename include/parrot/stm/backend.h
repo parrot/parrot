@@ -1,15 +1,15 @@
-#if !defined(PARROT_STM_BACKEND_H_GAURD)
-#  define PARROT_STM_BACKEND_H_GAURD
+#ifndef PARROT_STM_BACKEND_H_GUARD
+#  define PARROT_STM_BACKEND_H_GUARD
 
 #  include <parrot/parrot.h>
 
 #  define STM_PROFILE 0
 
-#  if STM_PROFILE
+#if STM_PROFILE
 void Parrot_STM_merge_profile(Interp *dest, Interp *source);
 
 void Parrot_STM_dump_profile(Interp *);
-#  endif
+#endif
 
 struct Parrot_STM_PMC_handle_data;
 
@@ -53,7 +53,7 @@ void Parrot_STM_mark_extracted(Interp *interp, void *);
 
 void Parrot_STM_destroy_extracted(Interp *interp, void *);
 
-#endif
+#endif /* PARROT_STM_BACKEND_H_GUARD */
 
 /*
  * Local variables:

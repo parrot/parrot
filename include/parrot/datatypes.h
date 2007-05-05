@@ -12,7 +12,7 @@
  *     Though appending a type and a name should be safe.
  */
 
-#if !defined(PARROT_DATATYPES_H_GUARD)
+#ifndef PARROT_DATATYPES_H_GUARD
 #define PARROT_DATATYPES_H_GUARD
 
 /* &gen_from_enum(datatypes.pasm) subst(s/enum_type_(\w+)/uc("DATATYPE_$1")/e) */

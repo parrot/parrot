@@ -10,7 +10,7 @@
  *  References:
  */
 
-#if !defined(PARROT_VTABLES_H_GUARD)
+#ifndef PARROT_VTABLES_H_GUARD
 #define PARROT_VTABLES_H_GUARD
 
 PARROT_API VTABLE *Parrot_new_vtable(Interp*);

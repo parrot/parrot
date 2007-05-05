@@ -11,7 +11,7 @@
 
 #include "parrot/parrot.h"
 
-#if !defined(PARROT_LIST_H_GUARD)
+#ifndef PARROT_LIST_H_GUARD
 #define PARROT_LIST_H_GUARD
 
 typedef struct List_chunk {

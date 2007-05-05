@@ -5,7 +5,7 @@
 *   Parrot dynamic extensions
 */
 
-#if !defined(PARROT_DYNEXT_H_GUARD)
+#ifndef PARROT_DYNEXT_H_GUARD
 #define PARROT_DYNEXT_H_GUARD
 
 /* dynamic lib/oplib/PMC loading */

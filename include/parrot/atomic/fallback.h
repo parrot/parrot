@@ -11,8 +11,8 @@
  *  References:
  */
 
-#if !defined(PARROT_ATOMIC_FALLBACK_H_GAURD)
-#  define PARROT_ATOMIC_FALLBACK_H_GAURD
+#ifndef PARROT_ATOMIC_FALLBACK_H_GUARD
+#  define PARROT_ATOMIC_FALLBACK_H_GUARD
 
 typedef struct Parrot_atomic_pointer {
     void *val;
@@ -115,7 +115,7 @@ typedef struct Parrot_atomic_integer {
         MUTEX_DESTROY((a).lock); \
     } while (0)
 
-#endif
+#endif /* PARROT_ATOMIC_FALLBACK_H_GUARD */
 
 /*
  * Local variables:
