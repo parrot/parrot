@@ -267,13 +267,23 @@ static void
 bigint_bitwise_shl_bigint_int(Interp *interp, PMC* self,
                               INTVAL value, PMC *dest)
 {
-    mpz_mul_2exp(BN(dest), BN(self), value);
+    /* The third args to mpz_mul_2exp and mpz_tdiv_q_2exp are unsigned, so we
+       need to do something sensible with negative values. */
+    if (value >= 0)
+        mpz_mul_2exp(BN(dest), BN(self), value);
+    else
+        mpz_tdiv_q_2exp(BN(dest), BN(self), -value);
 }
 static void
 bigint_bitwise_shr_bigint_int(Interp *interp, PMC* self,
                               INTVAL value, PMC *dest)
 {
-    mpz_tdiv_q_2exp(BN(dest), BN(self), value);
+    /* The third args to mpz_mul_2exp and mpz_tdiv_q_2exp are unsigned, so we
+       need to do something sensible with negative values. */
+    if (value >= 0)
+        mpz_tdiv_q_2exp(BN(dest), BN(self), value);
+    else
+        mpz_mul_2exp(BN(dest), BN(self), -value);
 }
 
 #else /* ifdef PARROT_HAS_GMP */
