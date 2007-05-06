@@ -688,6 +688,7 @@ sub delete_html_docs {
 =item C<gen_manifest_skip>
 
 Query the svn:ignore property and generate the lines for MANIFEST.SKIP.
+Used in F<t/distro/manifest_skip.t>.
 
 =cut
 

@@ -33,13 +33,13 @@ SKIP:
 {
 
     # check that MANIFEST.SKIP is in sync with svn:ignore
-    # A new MANIFEST.SKIP can be generated with tools/dev/gen_manifest_skip.pl
+    # A new MANIFEST.SKIP can be generated with tools/dev/mk_manifest_and_skip.pl
 
     diag "Collecting svn:ignore properties...";
 
     my $dist = Parrot::Distribution->new();
     my @from_svn = grep { $_ && $_ !~ m/^#/ } @{ $dist->gen_manifest_skip() };
-    unshift @from_svn, '\B\.svn\b', '^debian$', '^debian/';    # added in gen_manifest_skip.pl
+    unshift @from_svn, '\B\.svn\b', '^debian$', '^debian/';    # added in mk_manifest_and_skip.pl
     open my $manifest_skip_fh, '<', $manifest_skip;
     my @from_manifest_skip = grep { $_ ne "\n" && $_ !~ m/^#/ } <$manifest_skip_fh>;
     close $manifest_skip_fh;

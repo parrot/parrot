@@ -85,7 +85,6 @@ sub new {
             $self->new_item( '', 'tools/build/parrot_config_c.pl' ),
             $self->new_item( '', 'tools/build/pmc2c.pl' ),
             $self->new_item( '', 'tools/build/revision_c.pl' ),
-            $self->new_item( '', 'tools/dev/gen_manifest_skip.pl' ),
             $self->new_item( '', 'tools/dev/install_files.pl' ),
             $self->new_item( '', 'tools/dev/mk_manifests.pl' ),
             $self->new_item( '', 'tools/dev/mk_manifest_and_skip.pl' ),
