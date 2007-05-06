@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -114,7 +114,7 @@ sub parse_vtable {
             die "Syntax error at $file line " . $fh->input_line_number() . "\n";
         }
     }
-    
+
     # We probably should sort on insert, but this is easier for now. And it's
     # compile time, so it's not all that important.
     return [@$mmd, sort { $a->[1] cmp $b->[1] } @$vtable];

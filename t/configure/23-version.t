@@ -35,7 +35,7 @@ my $errstr;
     is($pv, q{0.4.11}, "Correct version number returned in scalar context");
     is_deeply(\@pv, [ 0, 4, 11 ],
         "Correct version number returned in scalar context");
-    
+
     $pv = Parrot::BuildUtil::parrot_version();
     @pv = Parrot::BuildUtil::parrot_version();
     is($pv, q{0.4.11}, "Correct version number returned in scalar context");

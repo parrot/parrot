@@ -35,7 +35,7 @@ my $errstr;
     is_deeply(\@pv, [ 0, 4, 11 ],
         "Correct version number returned in scalar context");
     is($pv, q{0.4.11}, "Correct version number returned in scalar context");
-    
+
     ok(chdir $cwd, "Able to change back to directory after testing");
 }
 

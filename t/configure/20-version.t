@@ -34,7 +34,7 @@ my $errstr;
     };
     like($@, qr/Too few components to VERSION file contents/,
         "Correctly detected too few components in version number");
-    
+
     ok(chdir $cwd, "Able to change back to directory after testing");
 }
 pass("Completed all tests in $0");

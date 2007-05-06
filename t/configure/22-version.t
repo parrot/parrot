@@ -34,7 +34,7 @@ my $errstr;
     };
     like($@, qr/Illegal version component: 'tomboy'/,
         "Correctly detected non-numeric component in version number");
-    
+
     ok(chdir $cwd, "Able to change back to directory after testing");
 }
 

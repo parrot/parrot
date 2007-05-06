@@ -65,7 +65,7 @@ foreach my $k (@confsteps) {
     $nontaskcount++ unless $k->isa("Parrot::Configure::Task");
 }
 is($nontaskcount, 0, "Each step is a Parrot::Configure::Task object");
-is($confsteps[0]->step, $step, 
+is($confsteps[0]->step, $step,
     "'step' element of Parrot::Configure::Task struct identified");
 is(ref($confsteps[0]->params), 'ARRAY',
     "'params' element of Parrot::Configure::Task struct is array ref");
