@@ -903,13 +903,13 @@ Parrot_disassemble(Interp *interp)
         PIO_printf(interp, "%012i-%012i", op_code_seq_num, line->opcode - interp->code->base.data);
 
         if ( debugs )
-            PIO_printf(interp, " %06i: \t",interp->code->debugs->base.data[op_code_seq_num]);
-        else
-            PIO_printf(interp, "\t");
+            PIO_printf(interp, " %06i: ",interp->code->debugs->base.data[op_code_seq_num]);
 
         /* If it has a label print it */
         if (line->label)
             PIO_printf(interp, "L%li:\t", line->label->number);
+        else
+            PIO_printf(interp, "\t");
 
         c = pdb->file->source + line->source_offset;
 
