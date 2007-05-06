@@ -18,7 +18,7 @@ my ($current, $config);
 # Case 2:  DEVELOPING's non-existence is faked;  Parrot::Config available. #'
 my $cwd = cwd();
 my $reason =
-    'Either file DEVELOPING does not exist or configuration has not completed (as evidenced by non-existence of Parrot::Config::Generated'
+    'Either file DEVELOPING does not exist or configuration has not completed (as evidenced by non-existence of Parrot::Config::Generated';
 
 SKIP: {
     skip $reason, 12 if (
