@@ -241,7 +241,7 @@ path_append(Interp *interp, STRING *l_path, STRING *r_path)
 
 /*
   binary path arguments. A new string is created
-  that is the concatentation of the two path components
+  that is the concatenation of the two path components
   with a path-separator.
  */
 
@@ -345,7 +345,7 @@ NULL otherwise.  Remember to free the string with C<string_cstring_free()>.
 Like above but use and return STRINGs. If successful, the returned STRING
 is 0-terminated so that C<result-E<gt>strstart> is usable as B<const char*>
 c-string for C library functions like fopen(3).
-This is the prefered API function.
+This is the preferred API function.
 
 The C<enum_runtime_ft type> is one or more of the types defined in
 F<include/parrot/library.h>.
