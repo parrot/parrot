@@ -32,17 +32,12 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
-my $DIST = Parrot::Distribution->new();
-my @files = @ARGV ? @ARGV : map { $_->path() } $DIST->get_c_language_files();
-
-#foreach my $file ( @files ) {
-#    print $file, "\n";
-#}
-#exit;
+my @files = @ARGV ?
+                @ARGV
+                :
+                map { $_->path() } Parrot::Distribution->new()->get_c_language_files();
 
 check_indent(@files);
-
-exit;
 
 sub check_indent {
     my ( @pp_indent, @c_indent );
@@ -54,15 +49,15 @@ sub check_indent {
             or die "Can not open '$path' for reading!\n";
         @source = <$fh>;
 
-        my @stack;
-        my $line           = 0;
+        my @stack;                   # for tracking indention level
+        my $line_cnt       = 0;
         my $f              = undef;
         my $prev_last_char = '';
         my $last_char      = '';
         my $in_comment     = 0;
 
         foreach (@source) {
-            $line++;
+            $line_cnt++;
             next unless defined $_;
             chomp;
 
@@ -75,12 +70,16 @@ sub check_indent {
             $in_comment = 1 if m{/\*} && $' !~ m{\*/};
 
             ## preprocessor scan
-            if (/^\s*\#(\s*)(ifndef|ifdef|if)\s+(.*)/) {
-                next if (/PARROT_IN_CORE|_GUARD/);
+            if ( m/ ^ \s* \# 
+                    (\s*)
+                    ( ifndef | ifdef | if )
+                    \s+(.*)
+                  /x ) {
+                next if ( m/PARROT_IN_CORE|_GUARD/ );
 
-                my $indent = "  " x (@stack);
+                my $indent = q{  } x @stack;
                 if ( $1 ne $indent ) {
-                    push @pp_indent => "$path:$line\n"
+                    push @pp_indent => "$path:$line_cnt\n"
                         . "     got: $_"
                         . "expected: #$indent$2 $3'\n";
                     $pp_failed{"$path\n"} = 1;
@@ -88,13 +87,16 @@ sub check_indent {
                 push @stack, "#$2 $3";
                 next;
             }
-            if (/^\s*\#(\s*)(else|elif)/) {
+            if ( m/ ^ \s* \#
+                    (\s*)
+                    ( else | elif )
+                  /x ) {
 
                 # stay where we are, but indenting should be
                 # back even with the opening brace.
-                my $indent = "  " x ( @stack - 1 );
+                my $indent = q{  } x ( @stack - 1 );
                 if ( $1 ne $indent ) {
-                    push @pp_indent => "$path:$line\n"
+                    push @pp_indent => "$path:$line_cnt\n"
                         . "     got: $_"
                         . "expected: #$indent$2 -- it's inside of "
                         . ( join ' > ', @stack ) . "\n";
@@ -102,10 +104,13 @@ sub check_indent {
                 }
                 next;
             }
-            if (/^\s*\#(\s*)(endif)/) {
-                my $indent = "  " x ( @stack - 1 );
+            if ( m/ ^ \s* \#
+                    (\s*)
+                    (endif)
+                  /x ) {
+                my $indent = q{  } x ( @stack - 1 );
                 if ( $1 ne $indent ) {
-                    push @pp_indent => "$path:$line\n"
+                    push @pp_indent => "$path:$line_cnt\n"
                         . "     got: $_"
                         . "expected: #$indent$2 --  it's inside of "
                         . ( join ' > ', @stack ) . "\n";
@@ -116,10 +121,13 @@ sub check_indent {
             }
             next unless @stack;
 
-            if (/^\s*\#(\s*)(.*)/) {
-                my $indent = "  " x (@stack);
+            if ( m/ ^ \s* \#
+                    (\s*)
+                    (.*)
+                  /x ) {
+                my $indent = q{  } x (@stack);
                 if ( $1 ne $indent ) {
-                    push @pp_indent => "$path:$line\n"
+                    push @pp_indent => "$path:$line_cnt\n"
                         . "     got: $_"
                         . "expected: #$indent$2 -- it's inside of "
                         . ( join ' > ', @stack ) . "\n";
@@ -156,7 +164,7 @@ sub check_indent {
                     # in other words)
                     my ($indent) = /^(\s*)/;
                     if ( length($indent) != 4 ) {
-                        push @c_indent => "$path:$line\n"
+                        push @c_indent => "$path:$line_cnt\n"
                             . "    apparent non-4 space indenting ("
                             . length($indent)
                             . " spaces)\n";
@@ -177,7 +185,7 @@ sub check_indent {
             # is divisible by four.
             if ($indent % 4 && !$in_comment && $prev_last_char eq ';')
             {
-                push @c_indent => "$path:$line\n"
+                push @c_indent => "$path:$line_cnt\n"
                     . "    apparent non-4 space indenting ($indent space"
                     . ($indent == 1 ? '' : 's')
                     . ")\n";
