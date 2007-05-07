@@ -3436,7 +3436,7 @@ Parrot_load_bytecode(Interp *interp, STRING *file_str)
     path = Parrot_locate_runtime_file_str(interp, file_str, file_type);
     if (!path) {
         real_exception(interp, NULL, E_LibraryNotLoadedError,
-                "Couldn't find file '%Ss'", file_str);
+                "\"load_bytecode\" couldn't find file '%Ss'", file_str);
         return;
     }
     /* remember wo_ext => full_path mapping */
