@@ -20,6 +20,60 @@ These are the vtable functions for the scalar base PMC class
 
 #include "parrot/parrot.h"
 
+extern PMC *
+Parrot_BigInt_bitwise_shl_int(Interp *interp, PMC* pmc, INTVAL value, PMC* dest);
+
+static PMC *
+bitwise_left_shift_internal(Interp *interp, PMC *self,
+                            PMC *dest, INTVAL shift_amount)
+{
+    /* This handles both left and right shifts; the sign of shift_amount
+       controls the direction, shifting left if positive and right if negative.
+       If we get an error (which can only happen for left shifts) and
+       PARROT_ERRORS_OVERFLOW_FLAG is set, then we throw an error, else the
+       destination is promoted to a BigInt before shifting.  If dest == self,
+       then the shift is done in place.  */
+    INTVAL base = VTABLE_get_integer(interp, self);
+    INTVAL result;
+    int overflow_p = 0;
+
+    /* Compute the shift. */
+    if (shift_amount >= 0) {
+        /* Left shift. */
+        result = base << shift_amount;
+        overflow_p = (result >> shift_amount) != base;
+    }
+    else {
+        /* Right shift.  By definition, this can never overflow. */
+        result = base >> -shift_amount;
+    }
+
+    /* Store the result. */
+    if (! overflow_p) {
+        if (!dest)
+            dest = pmc_new(interp, self->vtable->base_type);
+        VTABLE_set_integer_native(interp, dest, result);
+    }
+    else if (PARROT_ERRORS_test(interp, PARROT_ERRORS_OVERFLOW_FLAG)) {
+        real_exception(interp, NULL, ERR_OVERFLOW, "Integer overflow");
+    }
+    else {
+        /* Overflow; must promote dest to BigInt, and do a BigInt shift. */
+        if (dest)
+            VTABLE_morph(interp, dest, enum_class_BigInt);
+        else {
+            /* Arguably, we should throw an error here if dest == self and self
+             * is not a numeric type.  However, that would require a firmer
+             * definition of "numeric type."
+             */
+            dest = pmc_new(interp, enum_class_BigInt);
+        }
+        VTABLE_set_integer_native(interp, dest, base);
+        Parrot_BigInt_bitwise_shl_int(interp, dest, shift_amount, dest);
+    }
+    return dest;
+}
+
 pmclass scalar abstract noinit {
 
 /*
@@ -966,49 +1020,38 @@ Returns in C<*dest> the bitwise negation of the scalar and C<value>.
 =item C<PMC* bitwise_shr_int(INTVAL value, PMC *dest)>
 
 Returns in C<*dest> the arithmetic shift right of the scalar by C<value>.
+A negative C<value> shifts left.
+The destination may become a C<BigInt> as a result (but only if the shift amount
+is less than zero).
 
 =item C<void i_bitwise_shr(PMC *value)>
 
 =item C<void i_bitwise_shr_int(INTVAL value)>
 
-Inplace shift right.
+Inplace shift right.  A negative C<value> shifts left.
+SELF may become a C<BigInt> as a result (but only if the shift amount is less
+than zero).
 
 =cut
 
 */
 
     PMC* bitwise_shr(PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, value);
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_integer_native(INTERP, dest, result);
-        return dest;
+        return bitwise_left_shift_internal(INTERP, SELF, dest,
+                                           -VTABLE_get_integer(INTERP, value));
     }
 
     PMC* bitwise_shr_int(INTVAL value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer() >> value;
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_integer_native(INTERP, dest, result);
-        return dest;
+        return bitwise_left_shift_internal(INTERP, SELF, dest, -value);
     }
 
     void i_bitwise_shr(PMC* value) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer() >> VTABLE_get_integer(INTERP, value);
-        DYNSELF.set_integer_native(result);
+        bitwise_left_shift_internal(INTERP, SELF, SELF,
+                                    -VTABLE_get_integer(INTERP, value));
     }
 
     void i_bitwise_shr_int(INTVAL value) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer() >> value;
-        DYNSELF.set_integer_native(result);
+        bitwise_left_shift_internal(INTERP, SELF, SELF, -value);
     }
 
 /*
@@ -1071,50 +1114,36 @@ Inplace shift right.
 
 =item C<PMC* bitwise_shl_int(INTVAL value, PMC *dest)>
 
-Returns in C<*dest> the shift left of the scalar by C<*value>.
+Returns in C<*dest> the shift left of the scalar by C<*value>.  A negative
+C<value> shifts right.  The destination may become a C<BigInt> as a result.
 
 =item C<void i_bitwise_shl(PMC *value)>
 
 =item C<void i_bitwise_shl_int(INTVAL value)>
 
-Inplace shift left.
+Inplace shift left.  A negative C<value> shifts right.  SELF may become a
+C<BigInt> as a result.
 
 =cut
 
 */
 
     PMC* bitwise_shl(PMC* value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer() << VTABLE_get_integer(INTERP, value);
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_integer_native(INTERP, dest, result);
-        return dest;
+        return bitwise_left_shift_internal(INTERP, SELF, dest,
+                                           VTABLE_get_integer(INTERP, value));
     }
 
     PMC* bitwise_shl_int(INTVAL value, PMC* dest) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer() << value;
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_integer_native(INTERP, dest, result);
-        return dest;
+        return bitwise_left_shift_internal(INTERP, SELF, dest, value);
     }
 
     void i_bitwise_shl(PMC* value) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer() << VTABLE_get_integer(INTERP, value);
-        DYNSELF.set_integer_native(result);
+        bitwise_left_shift_internal(INTERP, SELF, SELF,
+                                    VTABLE_get_integer(INTERP, value));
     }
 
     void i_bitwise_shl_int(INTVAL value) {
-        INTVAL result;
-
-        result = DYNSELF.get_integer() << value;
-        DYNSELF.set_integer_native(result);
+        bitwise_left_shift_internal(INTERP, SELF, SELF, value);
     }
 
 /*

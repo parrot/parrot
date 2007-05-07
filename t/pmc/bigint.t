@@ -25,7 +25,7 @@ Tests the BigInt PMC.
 =cut
 
 if ( $PConfig{gmp} ) {
-    plan tests => 40;
+    plan tests => 43;
 }
 else {
     plan skip_all => "No BigInt Lib configured";
@@ -831,6 +831,107 @@ CODE
 2
 100000000000
 100000000000
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', "shl_int and i_shl_int promote Integer to Bigint");
+.sub main :main
+   new $P0, .Integer
+   set $P0, 1000001
+   new $P1, .Integer
+   set $P1, 10
+   new $P2, .Integer
+   ## shift by 10 bits . . .
+   shl $P2, $P0, $P1
+   $S2 = typeof $P2
+   print $S2
+   print ' '
+   say $P2
+   ## then by 20 bits . . .
+   $P1 = 20
+   new $P3, .Integer
+   $P3 = 1000001
+   shl $P3, $P0, $P1
+   $S2 = typeof $P3
+   print $S2
+   print ' '
+   say $P3
+   ## then by another 20 bits (total 30) in place.
+   shl $P2, $P2, $P1
+   $S2 = typeof $P2
+   print $S2
+   print ' '
+   say $P2
+.end
+CODE
+Integer 1024001024
+BigInt 1048577048576
+BigInt 1073742897741824
+OUT
+
+pir_output_like( <<'CODE', <<'OUT', "shl_int throws an error when promotion is disabled");
+.include "errors.pasm"
+.sub main :main
+   errorson .PARROT_ERRORS_OVERFLOW_FLAG
+   new $P0, .Integer
+   set $P0, 1000001
+   new $P1, .Integer
+   set $P1, 10
+   new $P2, .Integer
+   ## shift by 10 bits . . .
+   shl $P2, $P0, $P1
+   $S2 = typeof $P2
+   print $S2
+   print ' '
+   say $P2
+   ## then by 20 bits . . .
+   $P1 = 20
+   new $P3, .Integer
+   $P3 = 1000001
+   shl $P3, $P0, $P1
+   $S2 = typeof $P3
+   print $S2
+   print ' '
+   say $P3
+.end
+CODE
+/Integer 1024001024
+Integer overflow
+current instr/
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', "shr_int and i_shr_int with a neg shift promote Integer to Bigint");
+.sub main :main
+   new $P0, .Integer
+   set $P0, 1000001
+   new $P1, .Integer
+   set $P1, -10
+   new $P2, .Integer
+   ## shift by 10 bits . . .
+   shr $P2, $P0, $P1
+   $S2 = typeof $P2
+   print $S2
+   print ' '
+   say $P2
+   ## then by 20 bits . . .
+   $P1 = -20
+   new $P3, .Integer
+   $P3 = 1000001
+   shr $P3, $P0, $P1
+   $S2 = typeof $P3
+   print $S2
+   print ' '
+   say $P3
+   ## then by another 20 bits (total 30) in place.
+   shr $P2, $P2, $P1
+   $S2 = typeof $P2
+   print $S2
+   print ' '
+   say $P2
+.end
+CODE
+Integer 1024001024
+BigInt 1048577048576
+BigInt 1073742897741824
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "shr_bigint" );
