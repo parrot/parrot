@@ -1,6 +1,8 @@
+# $Id$
 
 .sub _VALIDATE_TOKEN
   .param string token
+
   .local string pkgname
   .local string symname
   .local pmc package
@@ -64,9 +66,10 @@ DONE:
 
 .sub _IS_INTEGER
   .param string token
-  .param int retv
-  .param int ndig
-  .param int idx
+
+  .local int retv
+  .local int ndig
+  .local int idx
 
   ndig = 0
   idx  = 0
@@ -103,8 +106,9 @@ DONE:
 
 .sub _IS_FLOAT
   .param string token
-  .param int retv
-  .param int idx
+
+  .local int retv
+  .local int idx
 
   idx  = 0
 
@@ -144,39 +148,9 @@ DONE:
   .return(retv)
 .end
 
-.sub _is_keyword
-  .param string token
-  .param int retv
-  .param int idx
-
-  idx  = 0
-
-COLON:
-  rx_literal token, idx, ':', FAIL	# check the initial ':' character
-  goto NAME
-
-NAME:
-  rx_is_w token, idx, EOS		# check that we're not whitespace 
-  goto NAME
-
-EOS:					# check to see if we're at string end
-  rx_zwa_atend token, idx, FAIL
-  goto MATCH
-
-MATCH:
-  retv = 1
-  goto DONE
-
-FAIL:
-  retv = 0
-  goto DONE
-
-DONE:
-  .return(retv)
-.end
-
 .sub _IS_QUALIFIED
   .param string token
+
   .local string package
   .local string symbol
   .local string vchar
