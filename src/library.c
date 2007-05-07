@@ -303,7 +303,7 @@ try_bytecode_extensions (Interp *interp, STRING* path )
     int guess;
 
     /*
-      first try the path without guessing to ensure compatibility with 
+      first try the path without guessing to ensure compatibility with
       existing code.
      */
 
