@@ -43,12 +43,15 @@ foreach my $file (@files) {
     open my $fh, '<', $path
         or die "Cannot open '$path' for reading: $!\n";
 
+    my $line = 1;
+
     # search each line for leading tabs
     while (<$fh>) {
         if ( $_ =~ m/^ *\t/ ) {
-            push @tabs => "$path\n";
-            last;
+            push @tabs => "$path:$line\n";
         }
+
+	$line++;
     }
     close $fh;
 }
@@ -56,7 +59,7 @@ foreach my $file (@files) {
 ## L<PDD07/Code Formatting/"Indentation must consist only of spaces">
 ok( !scalar(@tabs), "tabs in leading whitespace" )
     or diag(
-    "Found tab in leading whitespace in " . scalar(@tabs) . " files.  Files affected:\n@tabs" );
+    "Found tab in leading whitespace " . scalar(@tabs) . " instances.  Lines found:\n@tabs" );
 
 # Local Variables:
 #   mode: cperl
