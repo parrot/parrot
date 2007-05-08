@@ -256,22 +256,24 @@ declarations.
 
 =item *
 
-Header files must be wrapped with guard macros, which must have a PARROT_,
-followed by some unique and descriptive text identifying the header file, and
-be followed with a _GUARD suffix.  The matching #endif must have the guard
+Header files must be wrapped with guard macros to prevent header redefinition.
+The guard macro must begin with C<PARROT_>, followed by unique and descriptive
+text identifying the header file (usually the directory path and filename,)
+and end with a C<_GUARD> suffix.  The matching C<#endif> must have the guard
 macro name in a comment, to prevent confusion.  For example, a file named
-parrot/foo.h might look like:
+F<parrot/foo.h> might look like:
 
     #ifndef PARROT_FOO_H_GUARD
-    #  define PARROT_FOO_H_GUARD
-    
-    #  include "parrot/config.h"
-    #  ifdef PARROT_HAS_FEATURE_FOO
+    #define PARROT_FOO_H_GUARD
+
+    #include "parrot/config.h"
+    #ifdef PARROT_HAS_FEATURE_FOO
+    #  define FOO_TYPE bar
     typedef struct foo {
-    	...
+        ...
     } foo_t;
-    #  endif /* PARROT_HAS_FEATURE_FOO */
-   
+    #endif /* PARROT_HAS_FEATURE_FOO */
+
     #endif /* PARROT_FOO_H_GUARD */
 
 =back
