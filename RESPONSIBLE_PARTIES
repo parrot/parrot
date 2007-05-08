@@ -33,10 +33,10 @@ Metacommitter                   Allison Randal
 Committers
 ----------
 
-Core Developer                  Leopold Toetsch (incl. JIT x86, ppc)
+Core Developer                  -
                                 Jonathan Worthington (bytecode format/loader)
 
-Compiler Developer              Leopold Toetsch (IMCC)
+Compiler Developer              -
                                 Vishal Soni (BCG, IMCC)
                                 Patrick Michaud (PGE, PAST-pm, TGE)
                                 Allison Randal (TGE)
