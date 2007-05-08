@@ -51,7 +51,7 @@ foreach my $file (@files) {
             push @tabs => "$path:$line\n";
         }
 
-	$line++;
+        $line++;
     }
     close $fh;
 }
