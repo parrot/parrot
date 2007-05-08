@@ -27,6 +27,7 @@ Release Manager                 Jerry Gay
 Metacommitter                   Allison Randal
                                 Chip Salzenberg
                                 Jerry Gay
+                                Will Coleda
                                 Jesse Vincent
 
 
@@ -35,6 +36,13 @@ Committers
 
 Core Developer                  -
                                 Jonathan Worthington (bytecode format/loader)
+                                Matt Diephouse
+                                Bernhard Schmalhofer
+                                Kevin Tew
+                                Bob Rogers
+                                Nuno Carvalho
+                                chromatic
+                                Allison Randal
 
 Compiler Developer              -
                                 Vishal Soni (BCG, IMCC)
