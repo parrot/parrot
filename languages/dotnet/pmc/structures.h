@@ -1,3 +1,6 @@
+#ifndef PARROT_DOTNET_PMC_STRUCTURES_H_GUARD
+#define PARROT_DOTNET_PMC_STRUCTURES_H_GUARD
+
 /* Some structures relating to the .NET CLI files and metadata PMCs. */
 
 /* This structure describes a loaded .NET assembly. */
@@ -267,6 +270,8 @@ struct dotnet_uint64
 {
     UHUGEINTVAL x;
 };
+
+#endif /* PARROT_DOTNET_PMC_STRUCTURES_H_GUARD */
 
 /*
  * Local variables:

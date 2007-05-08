@@ -1,3 +1,6 @@
+#ifndef PARROT_DOTNET_PMC_TABLEINFO_H_GUARD
+#define PARROT_DOTNET_PMC_TABLEINFO_H_GUARD
+
 /* Metadata table information. */
 
 /* Table name => number mappings */
@@ -200,6 +203,7 @@
 
 #define Table_TypeSpec_RL(ass)          (ass->blobs_ptr_size)
 
+#endif /* PARROT_DOTNET_PMC_TABLEINFO_H_GUARD */
 
 /*
  * Local variables:
