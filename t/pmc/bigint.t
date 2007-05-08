@@ -833,7 +833,9 @@ CODE
 100000000000
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "shl_int and i_shl_int promote Integer to Bigint");
+pir_output_like( <<'CODE', <<'OUT', "shl_int and i_shl_int promote Integer to Bigint");
+## The result on the second line is a BigInt on 32-bit systems and still an
+## Integer on 64-bit systems.
 .sub main :main
    new $P0, .Integer
    set $P0, 1000001
@@ -855,17 +857,19 @@ pir_output_is( <<'CODE', <<'OUT', "shl_int and i_shl_int promote Integer to Bigi
    print $S2
    print ' '
    say $P3
-   ## then by another 20 bits (total 30) in place.
-   shl $P2, $P2, $P1
-   $S2 = typeof $P2
+   ## then by another 40 bits (total 60) in place.
+   $P1 = 40
+   shl $P3, $P3, $P1
+   $S2 = typeof $P3
    print $S2
    print ' '
-   say $P2
+   say $P3
 .end
 CODE
-Integer 1024001024
-BigInt 1048577048576
-BigInt 1073742897741824
+/Integer 1024001024
+(Integer|BigInt) 1048577048576
+BigInt 1152922657528351582846976
+/
 OUT
 
 pir_output_like( <<'CODE', <<'OUT', "shl_int throws an error when promotion is disabled");
@@ -883,11 +887,10 @@ pir_output_like( <<'CODE', <<'OUT', "shl_int throws an error when promotion is d
    print $S2
    print ' '
    say $P2
-   ## then by 20 bits . . .
-   $P1 = 20
-   new $P3, .Integer
-   $P3 = 1000001
-   shl $P3, $P0, $P1
+   ## then by 60 bits.
+   $P1 = 60
+   $P0 = 1000001
+   n_shl $P3, $P0, $P1
    $S2 = typeof $P3
    print $S2
    print ' '
@@ -912,17 +915,9 @@ pir_output_is( <<'CODE', <<'OUT', "shr_int and i_shr_int with a neg shift promot
    print $S2
    print ' '
    say $P2
-   ## then by 20 bits . . .
-   $P1 = -20
-   new $P3, .Integer
-   $P3 = 1000001
-   shr $P3, $P0, $P1
-   $S2 = typeof $P3
-   print $S2
-   print ' '
-   say $P3
-   ## then by another 20 bits (total 30) in place.
-   shr $P2, $P2, $P1
+   ## then by another 50 bits (total 60) in place.
+   $P1 = -50
+   shr $P2, $P1
    $S2 = typeof $P2
    print $S2
    print ' '
@@ -930,8 +925,7 @@ pir_output_is( <<'CODE', <<'OUT', "shr_int and i_shr_int with a neg shift promot
 .end
 CODE
 Integer 1024001024
-BigInt 1048577048576
-BigInt 1073742897741824
+BigInt 1152922657528351582846976
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "shr_bigint" );
