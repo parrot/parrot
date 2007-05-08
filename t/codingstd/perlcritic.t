@@ -195,7 +195,7 @@ foreach my $policy ( sort keys %violations ) {
     ok( !@violations, $policy )
         or diag( "Policy: $policy failed in "
             . scalar @violations
-            . " files:\n"
+            . " instances:\n"
             . join( "\n", @violations ) );
 }
 
