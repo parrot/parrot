@@ -1,3 +1,6 @@
+#ifndef PARROT_JIT_IA64_JIT_EMIT_H_GUARD
+#define PARROT_JIT_IA64_JIT_EMIT_H_GUARD
+
 /*
  * jit_emit.h
  *
@@ -767,6 +770,8 @@ ia64_sync_cache (void *_start, void *_end)
 #  endif
 
 #endif /* !JIT_EMIT */
+
+#endif /* PARROT_JIT_IA64_JIT_EMIT_H_GUARD */
 
 /*
  * Local variables:

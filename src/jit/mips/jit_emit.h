@@ -12,7 +12,7 @@
  */
 
 #ifndef PARROT_MIPS_JIT_EMIT_H_GUARD
-#  define PARROT_MIPS_JIT_EMIT_H_GUARD
+#define PARROT_MIPS_JIT_EMIT_H_GUARD
 
 #  define BASE_REG s0
 #  define Parrot_jit_emit_get_base_reg_no(pc) BASE_REG

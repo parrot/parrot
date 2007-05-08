@@ -12,7 +12,7 @@
  */
 
 #ifndef PARROT_EXEC_SAVE_H_GUARD
-#  define PARROT_EXEC_SAVE_H_GUARD
+#define PARROT_EXEC_SAVE_H_GUARD
 
 void Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file);
 

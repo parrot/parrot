@@ -8,7 +8,7 @@
 */
 
 #ifndef PARROT_CLASSOBJECT_H_GUARD
-#  define PARROT_CLASSOBJECT_GUARD
+#define PARROT_CLASSOBJECT_H_GUARD
 
 /* Class PMC's underlying struct. */
 typedef struct Parrot_Class {
@@ -42,7 +42,7 @@ typedef struct Parrot_Object {
 /* Fully qualified class name generation; defined in Class, used by Object. */
 STRING* Parrot_Class_get_fq_classname(Parrot_Interp interp, Parrot_Class *class_info);
 
-#endif /* PARROT_CLASSOBJECT_GUARD */
+#endif /* PARROT_CLASSOBJECT_H_GUARD */
 
 
 /*

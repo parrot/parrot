@@ -12,7 +12,7 @@
  */
 
 #ifndef PARROT_PPC_EXEC_DEP_H_GUARD
-#  define PARROT_PPC_EXEC_DEP_H_GUARD
+#define PARROT_PPC_EXEC_DEP_H_GUARD
 
 #ifdef JIT_CGP
 

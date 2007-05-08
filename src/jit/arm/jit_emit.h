@@ -6,8 +6,8 @@
  * $Id$
  */
 
-#if !defined(PARROT_ARM_JIT_EMIT_H_GUARD)
-#  define PARROT_ARM_JIT_EMIT_H_GUARD
+#ifndef PARROT_ARM_JIT_EMIT_H_GUARD
+#define PARROT_ARM_JIT_EMIT_H_GUARD
 
 #ifdef ARM
 #  ifdef __linux
