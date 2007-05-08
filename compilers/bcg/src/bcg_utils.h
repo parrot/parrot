@@ -1,5 +1,5 @@
-#ifndef PARROT_BCG_UTILS_H
-#  define PARROT_BCG_UTILS_H
+#ifndef PARROT_BCG_UTILS_H_GUARD
+#define PARROT_BCG_UTILS_H_GUARD
 
 #  include "bcg.h"
 
@@ -12,7 +12,7 @@ void bcg_hash_put(BCG_info * bcg_info, bcg_hash * hash, char *key,
                   void *value);
 void *bcg_hash_get(BCG_info * bcg_info, bcg_hash * hash, char *key);
 
-#endif /* PARROT_BCG_UTILS_H */
+#endif /* PARROT_BCG_UTILS_H_GUARD */
 
 /*
  * Local variables:

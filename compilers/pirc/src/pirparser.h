@@ -1,5 +1,5 @@
 #ifndef PARROT_PIRC_PIRPARSER_H_GUARD
-#  define PARROT_PIRC_PIRPARSER_H_GUARD
+#define PARROT_PIRC_PIRPARSER_H_GUARD
 
 #  include "pirlexer.h"
 #  include "pirvtable.h"

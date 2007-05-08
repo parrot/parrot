@@ -1,5 +1,5 @@
 #ifndef PARROT_PIRC_PIRVTABLE_H_GUARD
-#  define PARROT_PIRC_PIRVTABLE_H_GUARD
+#define PARROT_PIRC_PIRVTABLE_H_GUARD
 
 /* predeclaration; the actual definition is left to the back-end(s) */
 struct emit_data;

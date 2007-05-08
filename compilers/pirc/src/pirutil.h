@@ -1,5 +1,5 @@
 #ifndef PARROT_PIRC_PIRUTIL_H_GUARD
-#  define PARROT_PIRC_PIRUTIL_H_GUARD
+#define PARROT_PIRC_PIRUTIL_H_GUARD
 
 
 #  include <stdio.h>

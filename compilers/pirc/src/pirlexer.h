@@ -1,5 +1,5 @@
 #ifndef PARROT_PIRC_PIRLEXER_H_GUARD
-#  define PARROT_PIRC_PIRLEXER_H_GUARD
+#define PARROT_PIRC_PIRLEXER_H_GUARD
 
 typedef enum tokens {
     T_GLOBAL,                           /* "global"                   */
