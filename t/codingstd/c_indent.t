@@ -70,7 +70,7 @@ sub check_indent {
             $in_comment = 1 if m{/\*} && $' !~ m{\*/};
 
             ## preprocessor scan
-            if ( m/ ^ \s* \# 
+            if ( m/ ^ \s* \#
                     (\s*)
                     ( ifndef | ifdef | if )
                     \s+(.*)
