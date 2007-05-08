@@ -215,7 +215,7 @@ CODE
 
 # test rename
 SKIP: {
-    open FILE, "> ____some_test_file";
+    open FILE, ">", "____some_test_file";
     close FILE;
     pir_output_is( <<'CODE', <<"OUT", 'Test OS.rename' );
 .sub main :main
