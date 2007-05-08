@@ -1,6 +1,9 @@
+#ifndef PARROT_PLATFORM_WIN32_THREADS_H_GUARD
+#define PARROT_PLATFORM_WIN32_THREADS_H_GUARD
 
 #include "parrot/thr_windows.h"
 
+#endif /* PARROT_PLATFORM_WIN32_THREADS_H_GUARD */
 
 /*
  * Local variables:

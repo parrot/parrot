@@ -1,3 +1,5 @@
+#ifndef PARROT_PLATFORM_GENERIC_MATH_H_GUARD
+#define PARROT_PLATFORM_GENERIC_MATH_H_GUARD
 /*
  * math related stuff
  */
@@ -19,6 +21,8 @@
 #endif
 
 #define Parrot_is_nzero(x) ((x) == 0.0 && signbit(x))
+
+#endif /* PARROT_PLATFORM_GENERIC_MATH_H_GUARD */
 
 /*
  * Local variables:

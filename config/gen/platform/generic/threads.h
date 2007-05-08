@@ -1,3 +1,5 @@
+#ifndef PARROT_PLATFORM_GENERIC_THREADS_H_GUARD
+#define PARROT_PLATFORM_GENERIC_THREADS_H_GUARD
 /*
  * POSIX threading stuff
  */
@@ -12,6 +14,8 @@
 #    define YIELD sched_yield()
 #  endif
 #endif
+
+#endif /* PARROT_PLATFORM_GENERIC_THREADS_H_GUARD */
 
 /*
  * Local variables:

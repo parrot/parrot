@@ -1,3 +1,6 @@
+#ifndef PARROT_PLATFORM_WIN32_MISC_H_GUARD
+#define PARROT_PLATFORM_WIN32_MISC_H_GUARD
+
 #define PARROT_HAS_PLATFORM_INIT_CODE
 
 void Parrot_platform_init_code(void);
@@ -12,6 +15,8 @@ void Parrot_platform_init_code(void);
 #  pragma warning( disable: 4505 ) /* disables 'unreferenced local function has
                                   * been removed' warnings in header files */
 #endif /* defined(_MSC_VER) */
+
+#endif /* PARROT_PLATFORM_WIN32_MISC_H_GUARD */
 
 /*
  * Local variables:
