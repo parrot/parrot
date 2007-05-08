@@ -458,10 +458,6 @@ clear_cow(Parrot_Interp interp, Small_Object_Pool *pool, int cleanup)
                     /* clear COWed external FLAG */
                     PObj_external_CLEAR(b);
 
-                    /* the real external flag */
-                    if (PObj_bufstart_external_TEST(b))
-                        PObj_external_SET(b);
-
                     /* if cleanup (Parrot_destroy) constants are dead too */
                     PObj_constant_CLEAR(b);
                     PObj_live_CLEAR(b);

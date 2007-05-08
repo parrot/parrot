@@ -286,9 +286,6 @@ typedef enum PObj_enum {
 #define PObj_external_SET(o) PObj_flag_SET(external, o)
 #define PObj_external_CLEAR(o) PObj_flag_CLEAR(external, o)
 
-#define PObj_bufstart_external_TEST(o) PObj_flag_TEST(bufstart_external, o)
-#define PObj_bufstart_external_SET(o) PObj_flag_SET(bufstart_external, o)
-
 #define PObj_report_TEST(o) PObj_flag_TEST(report, o)
 #define PObj_report_SET(o) PObj_flag_SET(report, o)
 #define PObj_report_CLEAR(o) PObj_flag_CLEAR(report, o)
