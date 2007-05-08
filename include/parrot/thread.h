@@ -11,7 +11,7 @@
  */
 
 #ifndef PARROT_THREAD_H_GUARD
-#  define PARROT_THREAD_H_GUARD
+#define PARROT_THREAD_H_GUARD
 
 #  include "parrot/parrot.h"
 

@@ -12,8 +12,8 @@
  *  References:
  */
 
-#ifndef ATOMIC_GCC_PCC_H_GUARD
-#  define ATOMIC_GCC_PCC_H_GUARD
+#ifndef PARROT_ATOMIC_GCC_PCC_H_GUARD
+#define PARROT_ATOMIC_GCC_PCC_H_GUARD
 
 typedef struct Parrot_atomic_pointer {
     void * volatile val;
@@ -115,7 +115,7 @@ typedef struct Parrot_atomic_integer {
         result = parrot_ppc_add(&(a).val, -1); \
     } while (0)
 
-#endif /* ATOMIC_GCC_PCC_H_GUARD */
+#endif /* PARROT_ATOMIC_GCC_PCC_H_GUARD */
 
 /*
  * Local variables:

@@ -11,9 +11,10 @@
  * References:
  */
 
+#ifndef PARROT_EXEC_H_GUARD
+#define PARROT_EXEC_H_GUARD
+
 #if EXEC_CAPABLE
-#  if !defined(PARROT_EXEC_H_GUARD)
-#  define PARROT_EXEC_H_GUARD
 
 #  if PARROT_EXEC_OS_OPENBSD
 #    ifdef PARROT_OPENBSD_ELF
@@ -113,8 +114,9 @@ void Parrot_exec_emit_mov_rm(Interp *interp, int reg, char *mem);
 void Parrot_exec_emit_mov_rm_n(Interp *interp, int reg, char *mem);
 /* HEADERIZER END: src/exec.c */
 
-#endif /* PARROT_EXEC_H_GUARD */
 #endif /* EXEC_CAPABLE */
+
+#endif /* PARROT_EXEC_H_GUARD */
 
 /*
  * Local variables:

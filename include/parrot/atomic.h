@@ -12,7 +12,7 @@
 
 
 #ifndef PARROT_ATOMIC_H_GUARD
-#  define PARROT_ATOMIC_H_GUARD
+#define PARROT_ATOMIC_H_GUARD
 
 #  include "parrot/has_header.h"
 #  include "parrot/thread.h"

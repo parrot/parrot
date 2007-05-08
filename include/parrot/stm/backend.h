@@ -1,5 +1,5 @@
 #ifndef PARROT_STM_BACKEND_H_GUARD
-#  define PARROT_STM_BACKEND_H_GUARD
+#define PARROT_STM_BACKEND_H_GUARD
 
 #  include <parrot/parrot.h>
 

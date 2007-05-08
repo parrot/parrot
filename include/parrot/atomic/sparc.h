@@ -12,8 +12,8 @@
  *  References:
  */
 
-#ifndef ATOMIC_SPARC_H_GUARD
-#define ATOMIC_SPARC_H_GUARD
+#ifndef PARROT_ATOMIC_SPARC_H_GUARD
+#define PARROT_ATOMIC_SPARC_H_GUARD
 
 extern int parrot_sparc_cas32(Parrot_UInt4 *value, Parrot_UInt4 old, Parrot_UInt4 new);
 /* NB cas64 _will_ be broken when PTR_SIZE == 4 */
@@ -83,7 +83,7 @@ typedef struct Parrot_atomic_integer {
 #define PARROT_ATOMIC_INT_DEC(result, a) parrot_sparc_atomic_int_add(result, a, -1)
 #define PARROT_ATOMIC_INT_INC(result, a) parrot_sparc_atomic_int_add(result, a,  1)
 
-#endif /* ATOMIC_SPARC_H_GUARD */
+#endif /* PARROT_ATOMIC_SPARC_H_GUARD */
 
 /*
  * Local variables:

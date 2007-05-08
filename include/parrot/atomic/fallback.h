@@ -12,7 +12,7 @@
  */
 
 #ifndef PARROT_ATOMIC_FALLBACK_H_GUARD
-#  define PARROT_ATOMIC_FALLBACK_H_GUARD
+#define PARROT_ATOMIC_FALLBACK_H_GUARD
 
 typedef struct Parrot_atomic_pointer {
     void *val;

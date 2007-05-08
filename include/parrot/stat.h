@@ -45,7 +45,7 @@ PARROT_API INTVAL Parrot_stat_info_intval(Parrot_Interp, STRING *, INTVAL);
 PARROT_API INTVAL Parrot_fstat_info_intval(Parrot_Interp, INTVAL, INTVAL);
 PARROT_API FLOATVAL Parrot_stat_info_floatval(Parrot_Interp, STRING *, INTVAL);
 
-#endif /* PARROT_STRING_H_GUARD */
+#endif /* PARROT_STAT_H_GUARD */
 
 /*
  * Local variables:
