@@ -375,12 +375,56 @@ The class is attatched to the current namespace.
 
     void init_pmc(PMC* init_data) {
         Parrot_Class *_class = NULL;
+        PMC *arg;
+        INTVAL arg_type = VTABLE_type(interp, init_data);
 
         /* Set up the object. */
         SELF.init();
 
+        /* fast attempt to determine init_data type */
+        switch (arg_type)
+        {
+            case enum_class_String:
+                {
+                  STRING *nameStr = CONST_STRING(interp, "name");
+                  arg = pmc_new(interp, enum_class_Hash);
+                  VTABLE_set_pmc_keyed_str(interp, arg, nameStr, init_data);
+                }
+                break;
+            case enum_class_Key:
+                {
+                  STRING *nameStr = CONST_STRING(interp, "namespace");
+                  arg = pmc_new(interp, enum_class_Hash);
+                  VTABLE_set_pmc_keyed_str(interp, arg, nameStr, init_data);
+                }
+                break;
+            case enum_class_Hash:
+                arg = init_data;
+                break;
+
+            /* slow attempt to determine init_data type */
+            default:
+                if (VTABLE_isa(interp, init_data, CONST_STRING(interp, "String"))) {
+                    STRING *nameStr = CONST_STRING(interp, "name");
+                    arg = pmc_new(interp, enum_class_Hash);
+                    VTABLE_set_pmc_keyed_str(interp, arg, nameStr, init_data);
+                }
+                else if (VTABLE_isa(interp, init_data, CONST_STRING(interp, "Key"))) {
+                    STRING *nameStr = CONST_STRING(interp, "namespace");
+                    arg = pmc_new(interp, enum_class_Hash);
+                    VTABLE_set_pmc_keyed_str(interp, arg, nameStr, init_data);
+                }
+                if (VTABLE_isa(interp, init_data, CONST_STRING(interp, "Hash"))) {
+                    arg = init_data;
+                }
+                else {
+                    return;
+                }
+                break;
+        }
+
         /* Initialize the class with the supplied data. */
-        init_class_from_hash(interp, SELF, init_data);
+        init_class_from_hash(interp, SELF, arg);
     }
 
 

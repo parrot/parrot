@@ -525,6 +525,31 @@ op runinterp(invar PMC, in PMC) {
     goto NEXT();
 }
 
+########################################
+
+=item B<newpdd15class>(out PMC, in STR)
+
+Creates a new Parrot-style class, named $2, and puts the new PMC for it
+into $1.
+
+=item B<newpdd15class>(out PMC, in PMC)
+
+Create a new Parrot-style class, with the hierarchical name given in $2.
+
+=cut
+
+inline op newpdd15class(out PMC, in STR) :object_classes {
+  PMC *name = pmc_new(interp, enum_class_String);
+  VTABLE_set_string_native(interp, name, $2);
+  $1 = pmc_new_init(interp, enum_class_Class, name);
+  goto NEXT();
+}
+
+inline op newpdd15class(out PMC, in PMC) :object_classes {
+    $1 = pmc_new_init(interp, enum_class_Class, $2);
+    goto NEXT();
+}
+
 =back
 
 =head1 COPYRIGHT
@@ -537,6 +562,7 @@ This program is free software. It is subject to the same license
 as the Parrot interp itself.
 
 =cut
+
 
 /*
  * Local variables:
