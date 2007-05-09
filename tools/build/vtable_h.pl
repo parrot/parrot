@@ -42,7 +42,7 @@ print $OUT <<'EOF';
 ** This file is generated automatically from 'vtable.tbl' by vtable_h.pl
 */
 
-#if !defined(PARROT_VTABLE_H_GUARD)
+#ifndef PARROT_VTABLE_H_GUARD
 #define PARROT_VTABLE_H_GUARD
 
 #include "parrot/parrot.h"
@@ -61,10 +61,10 @@ print $OUT vtbl_struct($vtable);
 
 print $OUT vtbl_macros($vtable);
 
-print $OUT "\n#endif\n";
-
-# append the C code coda
+# append the guard suffix and C code coda
 print $OUT <<"EOC";
+
+#endif /* PARROT_VTABLE_H_GUARD */
 
 /*
  * Local variables:

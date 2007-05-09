@@ -161,6 +161,9 @@ sub create_c_include {
  *
  */
 
+#ifndef PARROT_SRC_STRING_PRIVATE_CSTRING_H_GUARD
+#define PARROT_SRC_STRING_PRIVATE_CSTRING_H_GUARD
+
 static const struct _cstrings {
     UINTVAL len;
     Parrot_UInt4 hash_val;
@@ -181,6 +184,8 @@ HEADER
 
     # append the C code coda
     print $OUT <<HEADER;
+
+#endif /* PARROT_SRC_STRING_PRIVATE_CSTRING_H_GUARD */
 
 /*
  * Local variables:
