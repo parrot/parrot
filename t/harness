@@ -169,6 +169,7 @@ push @default_tests, @distro_tests;
 # append them to the list of default tests
 my @coding_std_tests = map { "t/codingstd/$_" } qw(
     c_code_coda.t 
+    c_header_guards.t
     c_indent.t
     c_struct.t
     cppcomments.t 
