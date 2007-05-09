@@ -48,7 +48,6 @@ SKIP: {
     $config = $Parrot::Revision::config;
     use warnings;
     like($config, qr/^\d+$/, "current revision is all numeric");
-#    isnt($current, $config, "current and config differ");
     ok(chdir $cwd, "Able to change back to directory after testing");
 }
 

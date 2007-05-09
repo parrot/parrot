@@ -29,7 +29,6 @@ SKIP: {
     like($current, qr/^\d+$/, "current revision is all numeric");
     $config = $Parrot::Revision::config;
     like($config, qr/^\d+$/, "current revision is all numeric");
-#    is($current, $config, "current and config are identical");
 } # end SKIP block
 
 pass("Completed all tests in $0");
