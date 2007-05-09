@@ -447,8 +447,8 @@ sub _run_command {
     close STDOUT or die "Can't close    stdout" if $out;
     close STDERR or die "Can't close    stderr" if $err;
 
-    open STDOUT, ">&OLDOUT" or die "Can't restore  stdout" if $out;
-    open STDERR, ">&OLDERR" or die "Can't restore  stderr" if $err;
+    open STDOUT, ">&", \*OLDOUT or die "Can't restore  stdout" if $out;
+    open STDERR, ">&", \*OLDERR or die "Can't restore  stderr" if $err;
 
     if ($verbose) {
         foreach ( $out, $err ) {
@@ -590,7 +590,7 @@ sub capture_output {
 
     # reenable STDERR
     close STDERR;
-    open STDERR, ">&OLDERR";
+    open STDERR, ">&", \*OLDERR;
 
     # slurp stderr
     my $out_err = _slurp('./test.err');
