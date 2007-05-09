@@ -14,19 +14,16 @@ package pirVisitor;
         $self->{fh}       = $fh;
         $self->{prologue} = q{
 .include 'interpinfo.pasm'
-.include 'except_severity.pasm'
 
 .HLL 'Lua', 'lua_group'
 
 .sub '__start' :main
   .param pmc args
-  .local string progname
-  progname = shift args
+  $S0 = shift args
   $I1 = args
   $P1 = new .Array
   set $P1, $I1
   $I0 = 0
-  push_eh _handler
 L1:
   unless $I0 < $I1 goto L2
   $S0 = shift args
@@ -49,50 +46,10 @@ L2:
   load_bytecode 'languages/lua/lib/luadebug.pbc'
   load_bytecode 'languages/lua/lib/luaperl.pbc'
 
-  .const .Sub _action = '_action'
-  $P0 = newclosure _action
-  pushaction $P0
-  .local pmc traceback
-  .lex 'traceback', traceback
-  new traceback, .LuaString
-  .local pmc where
-  .lex 'where', where
-  new where, .LuaString
-
   .const .Sub main = '_main'
   $P0 = get_global '_G'
   main.'setfenv'($P0)
-  .return main($P1 :flat)
-
-_handler:
-  .local pmc ex
-  .local string msg
-  .get_results (ex, msg)
-  .local int severity
-  severity = ex[2]
-  if severity == .EXCEPT_EXIT goto L3
-  .local int lineno
-  $S0 = 'lua: '
-  $S1 = where
-  $S0 .= $S1
-  $S0 .= ' '
-  $S0 .= msg
-  $S0 .= "\n"
-  printerr $S0
-  printerr traceback
-  exit 1
-L3:
-  rethrow ex
-.end
-
-.sub '_action' :anon :outer(__start)
-  $P0 = new .Lua
-  $S0 = $P0.'traceback'(1)
-  $P1 = find_lex 'traceback'
-  set $P1, $S0
-  $S0 = $P0.'where'()
-  $P1 = find_lex 'where'
-  set $P1, $S0
+  docall(main, $P1 :flat)
 .end
 
 .sub '__onload' :anon :init

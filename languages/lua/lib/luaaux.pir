@@ -467,6 +467,62 @@ L3:
 .end
 
 
+=item C<docall (f, arg)>
+
+=cut
+
+.include 'except_severity.pasm'
+
+.sub 'docall'
+    .param pmc f
+    .param pmc vararg :slurpy
+    push_eh _handler
+    .const .Sub _traceback = 'traceback'
+    $P0 = newclosure _traceback
+    pushaction $P0
+    .local pmc traceback
+    .lex 'traceback', traceback
+    new traceback, .LuaString
+    .local pmc where
+    .lex 'where', where
+    new where, .LuaString
+    f(vararg :flat)
+    .return ()
+_handler:
+    .local pmc ex
+    .local string msg
+    .get_results (ex, msg)
+    .local int severity
+    severity = ex[2]
+    if severity == .EXCEPT_EXIT goto L1
+    .local int lineno
+    $S0 = 'lua: '
+    $S1 = where
+    $S0 .= $S1
+    $S0 .= ' '
+    $S0 .= msg
+    $S0 .= "\n"
+    printerr $S0
+    printerr traceback
+    .return ()
+L1:
+    rethrow ex
+.end
+
+.sub 'traceback' :anon :outer(docall)
+    .param int flag
+    unless flag == 1 goto L1
+    $P0 = new .Lua
+    $S0 = $P0.'traceback'(1)
+    $P1 = find_lex 'traceback'
+    set $P1, $S0
+    $S0 = $P0.'where'()
+    $P1 = find_lex 'where'
+    set $P1, $S0
+L1:
+.end
+
+
 =item C<mkarg (argv)>
 
 Support variable number of arguments function call.
