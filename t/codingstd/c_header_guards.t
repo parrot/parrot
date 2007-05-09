@@ -38,7 +38,19 @@ L<docs/pdds/pdd07_codingstd.pod>
 =cut
 
 my $DIST = Parrot::Distribution->new();
-my @files = @ARGV ? @ARGV : map { $_->path() } $DIST->c_header_files();
+my @files;
+if(@ARGV) {
+    @files = @ARGV;
+} else {
+    my %files = map { $_->path() => 1 } $DIST->c_header_files();
+    my $href = $DIST->generated_files();
+    foreach my $file (keys %$href) {
+        if($file =~ /\.h$/) {
+            $files{$file} = 1 if -f $file;
+        }
+    }
+    @files = sort keys %files;
+}
 
 check_header_guards(@files);
 
@@ -71,11 +83,17 @@ L:          foreach my $line (@source) {
             $line =~ s/^ //;
 
             if($line =~ m{ifndef (PARROT_.+_GUARD)$}) {
+                # allow include/parrot/platform.h to have redundant guards;
+                # it contains verbatim copies of other header files (which
+                # have their own guards).
+                next L if(defined($ifndef) && $ifndef eq 'PARROT_PLATFORM_H_GUARD');
+
                 # check for multiple guards in the same file
                 $redundants{$file} = $1 if defined $ifndef;
+
                 # check for the same guard-name in multiple files
                 $collisions{$file} = $guardnames{$1}
-                    if exists $guardnames{1};
+                    if exists $guardnames{$1};
 
                 $ifndef = $1;
                 $guardnames{$1} = $file;
@@ -97,24 +115,28 @@ L:          foreach my $line (@source) {
         $missing_comment{$file} = 1 unless defined $endif;
     }
 
+TODO: {
+    local $TODO = "Need to account for headers copied between subdirs";
+
     ok(!(scalar %collisions), "identical PARROT_*_GUARD macro names used in headers");
-    diag("collisions: " . join(", ", %collisions))
+    diag("collisions: \n" . join(", \n", %collisions))
         if scalar keys %collisions;
+};
 
     ok(!(scalar %redundants), "multiple PARROT_*_GUARD macros found in headers");
-    diag("redundants: " . join(", ", keys %redundants))
+    diag("redundants: \n" . join(", \n", keys %redundants))
         if scalar keys %redundants;
 
     ok(!(scalar %missing_guard), "missing or misspelled PARROT_*_GUARD ifndef in headers");
-    diag("missing guard: " . join(", ", sort keys %missing_guard))
+    diag("missing guard: \n" . join(", \n", sort keys %missing_guard))
         if scalar keys %missing_guard;
 
     ok(!(scalar %missing_define), "missing or misspelled PARROT_*_GUARD define in headers");
-    diag("missing define: " . join(", ", sort keys %missing_define))
+    diag("missing define: \n" . join(", \n", sort keys %missing_define))
         if scalar keys %missing_define;
 
     ok(!(scalar %missing_comment), "missing or misspelled PARROT_*_GUARD comment after the endif in headers");
-    diag("missing endif comment: " . join(", ", sort keys %missing_comment))
+    diag("missing endif comment: \n" . join(", \n", sort keys %missing_comment))
         if scalar keys %missing_comment;
 
     return 0;
