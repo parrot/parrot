@@ -317,7 +317,7 @@ EOM
     NULL
 };
 
-#endif
+#endif /* PARROT_IN_OBJECTS_C */
 EOM
 
     $macros;

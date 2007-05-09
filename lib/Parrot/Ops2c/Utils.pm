@@ -6,6 +6,7 @@ use warnings;
 use lib ("lib/");
 use Parrot::OpLib::core;
 use Parrot::OpsFile;
+use File::Spec;
 
 =head1 NAME
 
@@ -283,9 +284,13 @@ sub print_c_header_file {
     open my $HEADER, '>', $self->{header}
         or die "ops2c.pl: Cannot open header file '$self->{header}' for writing: $!!\n";
 
+    $self->_print_guard_prefix($HEADER);
+
     $self->_print_preamble_header($HEADER);
 
     $self->_print_run_core_func_decl_header($HEADER);
+
+    $self->_print_guard_suffix($HEADER);
 
     _print_coda($HEADER);
 
@@ -323,6 +328,38 @@ sub _print_run_core_func_decl_header {
     else {
         return;
     }
+}
+
+# given a headerfile name like "include/parrot/oplib/core_ops.h", this
+# returns a string like "PARROT_OPLIB_CORE_OPS_H_GUARD"
+sub _generate_guard_macro_name {
+    my $self = shift;
+    my $fn = $$self{header};
+    $fn =~ s/\.h$//;
+    my @path = File::Spec->splitdir($fn);
+    shift @path if $path[0] eq 'include';
+    shift @path if $path[0] eq 'parrot';
+    return uc(join('_', 'parrot', @path, 'h', 'guard'));
+    
+}
+
+sub _print_guard_prefix {
+    my ($self, $fh) = @_;
+    my $guardname = $self->_generate_guard_macro_name();
+    print $fh <<END_C;
+#ifndef $guardname
+#define $guardname
+
+END_C
+}
+
+sub _print_guard_suffix {
+    my ($self, $fh) = @_;
+    my $guardname = $self->_generate_guard_macro_name();
+    print $fh <<END_C;
+
+#endif /* $guardname */
+END_C
 }
 
 sub _print_coda {

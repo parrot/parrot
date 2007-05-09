@@ -611,7 +611,7 @@ END_C
     print $OUT <<END_C;
 } parrot_opcode_enums;
 
-#endif
+#endif /* PARROT_OPS_H_GUARD */
 
 END_C
 
