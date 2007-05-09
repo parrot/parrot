@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -45,7 +45,7 @@ setmetatable(t, mt)
 assert(getmetatable(t) == "not your business")
 setmetatable(t, {})
 CODE
-/cannot change a protected metatable/
+/^[^:]+: [^:]+:\d+: cannot change a protected metatable\nstack traceback:\n/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'metatable for string' );
@@ -104,7 +104,7 @@ setmetatable(t, t.mt)
 t.mt.__tostring = "not a function"
 print(tostring(t))
 CODE
-/attempt to call a string value/
+/^[^:]+:( [^:]+:\d+:)? attempt to call a string value\nstack traceback:\n/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'cplx __add' );
@@ -780,7 +780,7 @@ days = readOnly{"Sunday", "Monday", "Tuesday", "Wednesday",
 
 days[2] = "Noday"
 CODE
-/attempt to update a read-only table/
+/^[^:]+: [^:]+:\d+: attempt to update a read-only table\nstack traceback:\n/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'declaring global variables' );
@@ -795,7 +795,7 @@ setmetatable(_G, {
 
 a = 1
 CODE
-/attempt to write to undeclared variable a/
+/^[^:]+: [^:]+:\d+: attempt to write to undeclared variable a\nstack traceback:\n/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'declaring global variables' );

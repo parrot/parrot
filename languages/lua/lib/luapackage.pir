@@ -12,7 +12,8 @@ modules in Lua. It exports two of its functions directly in the global
 environment: C<require> and C<module>. Everything else is exported in a
 table C<package>.
 
-See "Lua 5.1 Reference Manual", section 5.3 "Modules".
+See "Lua 5.1 Reference Manual", section 5.3 "Modules",
+L<http://www.lua.org/manual/5.1/manual.html#5.3>.
 
 =cut
 
@@ -28,12 +29,12 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     _lua__GLOBAL = global '_G'
     new $P1, .LuaString
 
-    .const .Sub _lua_module = '_lua_module'
+    .const .Sub _lua_module = 'module'
     _lua_module.'setfenv'(_lua__GLOBAL)
     set $P1, 'module'
     _lua__GLOBAL[$P1] = _lua_module
 
-    .const .Sub _lua_require = '_lua_require'
+    .const .Sub _lua_require = 'require'
     _lua_require.'setfenv'(_lua__GLOBAL)
     set $P1, 'require'
     _lua__GLOBAL[$P1] = _lua_require
@@ -43,9 +44,9 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     set $P1, 'package'
     _lua__GLOBAL[$P1] = _package
 
-    _register($P1, _package)
+    lua_register($P1, _package)
 
-    .const .Sub _package_loadlib = '_package_loadlib'
+    .const .Sub _package_loadlib = 'loadlib'
     _package_loadlib.'setfenv'(_lua__GLOBAL)
     set $P1, 'loadlib'
     _package[$P1] = _package_loadlib
@@ -53,7 +54,7 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     # LUA_COMPAT_LOADLIB
     _lua__GLOBAL[$P1] = _package_loadlib
 
-    .const .Sub _package_seeall = '_package_seeall'
+    .const .Sub _package_seeall = 'seeall'
     _package_seeall.'setfenv'(_lua__GLOBAL)
     set $P1, 'seeall'
     _package[$P1] = _package_seeall
@@ -109,8 +110,8 @@ See "Lua 5.1 Reference Manual", section 5.3 "Modules".
     $S0 = default
     goto L2
 L1:
-    $S0 = gsub($S0, ';;', ';,;')
-    $S0 = gsub($S0, ',', default)
+    $S0 = lua_gsub($S0, ';;', ';,;')
+    $S0 = lua_gsub($S0, ',', default)
 L2:
     new $P0, .LuaString
     set $P0, $S0
@@ -120,7 +121,7 @@ L2:
 .sub 'findfile' :anon
     .param string name
     .param string pname
-    name = gsub(name, '.', '/')
+    name = lua_gsub(name, '.', '/')
     $P0 = global '_G'
     new $P1, .LuaString
     set $P1, 'package'
@@ -132,7 +133,7 @@ L2:
     $S0 = "'package."
     $S0 .= pname
     $S0 .= "' must be a string"
-    error($S0)
+    lua_error($S0)
 L1:
     .local string path
     .local string tmpl
@@ -144,7 +145,7 @@ L2:
     (path, tmpl) = nexttemplate(path)
     if tmpl == '' goto L3
     .local string filename
-    filename = gsub(tmpl, '?', name)
+    filename = lua_gsub(tmpl, '?', name)
     $I0 = stat filename, 0
     unless $I0 goto L4
     .return (filename)
@@ -193,19 +194,19 @@ L4:
     $S0 .= filename
     $S0 .= "':\n\t"
     $S0 .= msg
-    error($S0)
+    lua_error($S0)
 .end
 
 .sub 'loader_Lua' :anon
     .param pmc name :optional
     .local string filename
-    $S1 = checkstring(name)
+    $S1 = lua_checkstring(1, name)
     (filename, $P0) = findfile($S1, 'path')
     unless filename == '' goto L1
     # library not found in this path
     .return ($P0)
 L1:
-    ($P0, $S0) = loadfile(filename)
+    ($P0, $S0) = lua_loadfile(filename)
     unless null $P0 goto L2
     loaderror($S1, filename, $S0)
 L2:
@@ -217,7 +218,7 @@ L2:
     .param pmc name :optional
     .local string funcname
     .local string filename
-    $S1 = checkstring(name)
+    $S1 = lua_checkstring(1, name)
     (filename, $P0) = findfile($S1, 'pbcpath')
     unless filename == '' goto L1
     # library not found in this path
@@ -236,7 +237,7 @@ L2:
     .param pmc name :optional
     .local string funcname
     .local string filename
-    $S1 = checkstring(name)
+    $S1 = lua_checkstring(1, name)
     $I0 = index $S1, '.'
     unless $I0 < 0 goto L1
     new $P0, .LuaString
@@ -281,7 +282,7 @@ L1:
 
 .sub 'loader_preload' :anon
     .param pmc name :optional
-    $S1 = checkstring(name)
+    $S1 = lua_checkstring(1, name)
     $P0 = global '_G'
     new $P1, .LuaString
     set $P1, 'package'
@@ -290,7 +291,7 @@ L1:
     $P0 = $P0[$P1]
     $I0 = isa $P0, 'LuaTable'
     if $I0 goto L1
-    error("'package.preload' must be a table")
+    lua_error("'package.preload' must be a table")
 L1:
     $P0 = $P0[name]
     $I0 = isa $P0, 'LuaNil'
@@ -331,11 +332,11 @@ each option is a function to be applied over the module.
 
 =cut
 
-.sub '_lua_module' :anon
+.sub 'module' :anon
     .param pmc name :optional
     .param pmc options :slurpy
     .local pmc m
-    $S1 = checkstring(name)
+    $S1 = lua_checkstring(1, name)
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = global '_REGISTRY'
     new $P1, .LuaString
@@ -347,12 +348,12 @@ each option is a function to be applied over the module.
     if $I0 goto L1
     # try global variable (and create one if it does not exist)
     $P0 = global '_G'
-    m = findtable($P0, $S1)
+    m = lua_findtable($P0, $S1)
     unless null m goto L2
     $S0 = "name conflict for module '"
     $S0 .= $S1
     $S0 .= "'"
-    error($S0)
+    lua_error($S0)
 L2:
     _LOADED[name] = m
 L1:
@@ -386,7 +387,7 @@ L4:
 L3:
     $P2 = getinterp
     $P3 = $P2['sub'; 1]
-    setfenv($P3, m)
+    lua_setfenv($P3, m)
 L6:
     unless options goto L7
     $P0 = shift options
@@ -416,10 +417,10 @@ any loader for the module, then C<require> signals an error.
 
 =cut
 
-.sub '_lua_require' :anon
+.sub 'require' :anon
     .param pmc modname :optional
     .local pmc ret
-    $S1 = checkstring(modname)
+    $S1 = lua_checkstring(1, modname)
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = global '_REGISTRY'
     new $P1, .LuaString
@@ -434,7 +435,7 @@ any loader for the module, then C<require> signals an error.
     $S0 = "loop or previous error loading module '"
     $S0 .= $S1
     $S0 .= "'"
-    error($S0)
+    lua_error($S0)
 L2:
     # package is already loaded
     .return (ret)
@@ -460,7 +461,7 @@ L3:
     $S0 .= "' not found:"
     $S1 = msg
     $S0 .= $S1
-    error($S0)
+    lua_error($S0)
 L4:
     new $P1, .LuaNil
     $P1 = $P0(modname)  # call it
@@ -524,7 +525,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_package_loadlib' :anon
+.sub 'loadlib' :anon
     not_implemented()
 .end
 
@@ -569,10 +570,10 @@ environment. To be used as an option to function C<module>.
 
 =cut
 
-.sub '_package_seeall' :anon
+.sub 'seeall' :anon
     .param pmc module :optional
     .local pmc mt
-    checktype(module, 'table')
+    lua_checktype(1, module, 'table')
     mt = module.'get_metatable'()
     $I0 = isa mt, 'LuaNil'
     unless $I0 goto L1

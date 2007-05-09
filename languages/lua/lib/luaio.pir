@@ -15,7 +15,7 @@ are over those default files. The second style uses explicit file descriptors.
 When using implicit file descriptors, all operations are supplied by table
 C<io>. When using explicit file descriptors, the operation C<io.open> returns
 a file descriptor and then all operations are supplied as methods by the file
-descriptor.
+descriptor (see F<languages/lua/lib/luafile.pir>).
 
 The table C<io> also provides three predefined file descriptors with their
 usual meanings from C: C<io.stdin>, C<io.stdout>, and C<io.stderr>.
@@ -24,7 +24,8 @@ Unless otherwise stated, all I/O functions return B<nil> on failure (plus an
 error message as a second result) and some value different from B<nil> on
 success.
 
-See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
+See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities",
+L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
 =head2 Functions
 
@@ -37,6 +38,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 .sub 'init_io' :load :anon
 
     load_bytecode 'languages/lua/lib/luabasic.pbc'
+    load_bytecode 'languages/lua/lib/luafile.pbc'
 
 #    print "init Lua I/O\n"
 
@@ -58,59 +60,59 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     set $P1, 'io'
     _lua__GLOBAL[$P1] = _io
 
-    _register($P1, _io)
+    lua_register($P1, _io)
 
-    .const .Sub _io_close = '_io_close'
+    .const .Sub _io_close = 'close'
     _io_close.'setfenv'(_io_env)
     set $P1, 'close'
     _io[$P1] = _io_close
 
-    .const .Sub _io_flush = '_io_flush'
+    .const .Sub _io_flush = 'flush'
     _io_flush.'setfenv'(_io_env)
     set $P1, 'flush'
     _io[$P1] = _io_flush
 
-    .const .Sub _io_input = '_io_input'
+    .const .Sub _io_input = 'input'
     _io_input.'setfenv'(_io_env)
     set $P1, 'input'
     _io[$P1] = _io_input
 
-    .const .Sub _io_lines = '_io_lines'
+    .const .Sub _io_lines = 'lines'
     _io_lines.'setfenv'(_io_env)
     set $P1, 'lines'
     _io[$P1] = _io_lines
 
-    .const .Sub _io_open = '_io_open'
+    .const .Sub _io_open = 'open'
     _io_open.'setfenv'(_io_env)
     set $P1, 'open'
     _io[$P1] = _io_open
 
-    .const .Sub _io_output = '_io_output'
+    .const .Sub _io_output = 'output'
     _io_output.'setfenv'(_io_env)
     set $P1, 'output'
     _io[$P1] = _io_output
 
-    .const .Sub _io_popen = '_io_popen'
+    .const .Sub _io_popen = 'popen'
     _io_popen.'setfenv'(_popen_env)
     set $P1, 'popen'
     _io[$P1] = _io_popen
 
-    .const .Sub _io_read = '_io_read'
+    .const .Sub _io_read = 'read'
     _io_read.'setfenv'(_io_env)
     set $P1, 'read'
     _io[$P1] = _io_read
 
-    .const .Sub _io_tmpfile = '_io_tmpfile'
+    .const .Sub _io_tmpfile = 'tmpfile'
     _io_tmpfile.'setfenv'(_io_env)
     set $P1, 'tmpfile'
     _io[$P1] = _io_tmpfile
 
-    .const .Sub _io_type = '_io_type'
+    .const .Sub _io_type = 'type'
     _io_type.'setfenv'(_io_env)
     set $P1, 'type'
     _io[$P1] = _io_type
 
-    .const .Sub _io_write = '_io_write'
+    .const .Sub _io_write = 'write'
     _io_write.'setfenv'(_io_env)
     set $P1, 'write'
     _io[$P1] = _io_write
@@ -120,7 +122,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
 
 
     # set default close function
-    .const .Sub _io_fclose = '_io_fclose'
+    .const .Sub _io_fclose = 'fclose'
     _io_fclose.'setfenv'(_io_env)
     set $P1, '__close'
     _io_env[$P1] = _io_fclose
@@ -129,69 +131,11 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     createstdfiles(_file, _io, _io_env)
 
     # environment for 'popen'
-    .const .Sub _io_pclose = '_io_pclose'
+    .const .Sub _io_pclose = 'pclose'
     _io_pclose.'setfenv'(_io_env)
     set $P1, '__close'
     _popen_env[$P1] = _io_pclose
 
-.end
-
-
-.sub 'createmeta' :anon
-    .param pmc env
-    .local pmc _file
-    _file = newmetatable('ParrotIO')
-
-    new $P1, .LuaString
-    set $P1, '__index'
-    _file[$P1] = _file
-
-    .const .Sub _file_close = '_io_close'
-    _file_close.'setfenv'(env)
-    set $P1, 'close'
-    _file[$P1] = _file_close
-
-    .const .Sub _file_flush = '_file_flush'
-    _file_flush.'setfenv'(env)
-    set $P1, 'flush'
-    _file[$P1] = _file_flush
-
-    .const .Sub _file_lines = '_file_lines'
-    _file_lines.'setfenv'(env)
-    set $P1, 'lines'
-    _file[$P1] = _file_lines
-
-    .const .Sub _file_read = '_file_read'
-    _file_read.'setfenv'(env)
-    set $P1, 'read'
-    _file[$P1] = _file_read
-
-    .const .Sub _file_seek = '_file_seek'
-    _file_seek.'setfenv'(env)
-    set $P1, 'seek'
-    _file[$P1] = _file_seek
-
-    .const .Sub _file_setvbuf = '_file_setvbuf'
-    _file_setvbuf.'setfenv'(env)
-    set $P1, 'setvbuf'
-    _file[$P1] = _file_setvbuf
-
-    .const .Sub _file_write = '_file_write'
-    _file_write.'setfenv'(env)
-    set $P1, 'write'
-    _file[$P1] = _file_write
-
-    .const .Sub _file__gc = '_file__gc'
-    _file__gc.'setfenv'(env)
-    set $P1, '__gc'
-    _file[$P1] = _file__gc
-
-    .const .Sub _file__tostring = '_file__tostring'
-    _file__tostring.'setfenv'(env)
-    set $P1, '__tostring'
-    _file[$P1] = _file__tostring
-
-    .return (_file)
 .end
 
 
@@ -240,7 +184,7 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     .local pmc file
     $P0 = getinterp
     $P1 = $P0['sub'; 1]
-    env = getfenv($P1)
+    env = lua_getfenv($P1)
     new io, .LuaNumber
     set io, findex
     file = env[io]
@@ -253,30 +197,30 @@ See "Lua 5.1 Reference Manual", section 5.7 "Input and Ouput Facilities".
     .local string ret
     unless mode == 'r' goto L1
     ret = '<'
-    goto L0
+    goto L9
 L1:
     unless mode == 'w' goto L2
     ret = '>'
-    goto L0
+    goto L9
 L2:
     unless mode == 'a' goto L3
     ret = '>>'
-    goto L0
+    goto L9
 L3:
     unless mode == 'r+' goto L4
     ret = '+<'
-    goto L0
+    goto L9
 L4:
     unless mode == 'w+' goto L5
     ret = '+>'
-    goto L0
+    goto L9
 L5:
     unless mode == 'a+' goto L6
     ret = '+>>'
-    goto L0
+    goto L9
 L6:
     ret = ''
-L0:
+L9:
     .return (ret)
 .end
 
@@ -294,7 +238,7 @@ L0:
 .end
 
 
-.sub 'read_chars' :anon
+.sub 'read_chars'
     .param pmc f
     .param int n
     .local pmc ret
@@ -310,7 +254,7 @@ L2:
 .end
 
 
-.sub 'read_line' :anon
+.sub 'read_line'
     .param pmc f
     .local pmc ret
     $S0 = readline f
@@ -327,7 +271,7 @@ L2:
 
 .include 'cclass.pasm'
 
-.sub 'read_number' :anon
+.sub 'read_number'
     .param pmc f
     .local pmc ret
 L1:
@@ -361,14 +305,14 @@ L4:
     .local pmc io
     $P0 = getinterp
     $P1 = $P0['sub'; 1]
-    env = getfenv($P1)
+    env = lua_getfenv($P1)
     new io, .LuaNumber
     set io, findex
     env[io] = file
 .end
 
 
-.sub 'test_eof' :anon
+.sub 'test_eof'
     .param pmc f
     .local pmc ret
     $I1 = isfalse f
@@ -383,7 +327,7 @@ L2:
 .end
 
 
-.sub 'topfile' :anon
+.sub 'topfile'
     .param pmc file
     .local pmc mt
     .local pmc mt_file
@@ -400,32 +344,32 @@ L2:
     ret = getattribute file, 'data'
     .return (ret)
 L1:
-    typerror($S0, 'file')
+    lua_typerror(1, $S0, 'file')
 .end
 
-.sub 'tofile' :anon
+.sub 'tofile'
     .param pmc file
     .local pmc f
     f = topfile(file)
     if null f goto L1
     .return (f)
 L1:
-    error("attempt to use a closed file")
+    lua_error("attempt to use a closed file")
 .end
 
-.sub 'aux_close' :anon
+.sub 'aux_close'
     .param pmc file
     .local pmc env
     $P0 = getinterp
     $P1 = $P0['sub'; 1]
-    env = getfenv($P1)
+    env = lua_getfenv($P1)
     new $P1, .LuaString
     set $P1, '__close'
     $P0 = env[$P1]
     .return $P0(file)
 .end
 
-.sub 'aux_lines' :anon :lex
+.sub 'aux_lines' :lex
     .param pmc file
     .param pmc toclose
     .local pmc ret
@@ -460,7 +404,7 @@ file.
 
 =cut
 
-.sub '_io_close' :anon
+.sub 'close' :anon
     .param pmc file
     .local pmc ret
     unless null file goto L1
@@ -478,7 +422,7 @@ Equivalent to C<file:flush> over the default output file.
 
 =cut
 
-.sub '_io_flush' :anon
+.sub 'flush' :anon
     .local pmc file
     .const .LuaString key = 'flush'
     file = getiofile(IO_OUTPUT)
@@ -499,7 +443,7 @@ error code.
 
 =cut
 
-.sub '_io_input' :anon
+.sub 'input' :anon
     .param pmc file :optional
     .local pmc f
     .local pmc ret
@@ -510,7 +454,7 @@ error code.
     $S1 = file
     f = open $S1, '<'
     unless null f goto L3
-    argerror(file)
+    lua_argerror(1, file)
 L3:
     $P0 = newfile()
     setattribute $P0, 'data', f
@@ -544,18 +488,20 @@ input file. In this case it does not close the file when the loop ends.
 
 =cut
 
-.sub '_io_lines' :anon
+.sub 'lines' :anon
     .param pmc filename :optional
     .local pmc file
     .local pmc f
     unless null filename goto L1
+    .const .LuaString key = 'lines'
     file = getiofile(IO_INPUT)
-    .return _file_lines(file)
+    $P0 = file[key]
+    .return $P0(file)
 L1:
-    $S1 = checkstring(filename)
+    $S1 = lua_checkstring(1, filename)
     f = open $S1, '<'
     unless null f goto L2
-    argerror($S1)
+    lua_argerror(1, $S1)
 L2:
     file = newfile()
     setattribute file, 'data', f
@@ -605,16 +551,16 @@ in the standard C function C<fopen>.
 
 =cut
 
-.sub '_io_open' :anon
+.sub 'open' :anon
     .param pmc filename :optional
     .param pmc mode :optional
     .local pmc f
     .local pmc ret
-    $S1 = checkstring(filename)
-    $S2 = optstring(mode, 'r')
-    $S3 = getmode($S2)
-    if $S3 == '' goto L1
-    f = open $S1, $S3
+    $S1 = lua_checkstring(1, filename)
+    $S2 = lua_optstring(2, mode, 'r')
+    $S0 = getmode($S2)
+    if $S0 == '' goto L1
+    f = open $S1, $S0
     unless f goto L1
     ret = newfile()
     setattribute ret, 'data', f
@@ -637,7 +583,7 @@ Similar to C<io.input>, but operates over the default output file.
 
 =cut
 
-.sub '_io_output' :anon
+.sub 'output' :anon
     .param pmc file :optional
     .local pmc f
     .local pmc ret
@@ -648,7 +594,7 @@ Similar to C<io.input>, but operates over the default output file.
     $S1 = file
     f = open $S1, '>'
     unless null f goto L3
-    argerror(file)
+    lua_argerror(1, file)
 L3:
     $P0 = newfile()
     setattribute $P0, 'data', f
@@ -675,15 +621,15 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_io_popen' :anon
+.sub 'popen' :anon
     .param pmc prog :optional
     .param pmc mode :optional
-    $S1 = checkstring(prog)
-    $S2 = optstring(mode, 'r')
+    $S1 = lua_checkstring(1, prog)
+    $S2 = lua_optstring(2, mode, 'r')
     not_implemented()
 .end
 
-.sub '_io_pclose' :anon
+.sub 'pclose' :anon
     .param pmc file
     not_implemented()
 .end
@@ -695,7 +641,7 @@ Equivalent to C<io.input():read>.
 
 =cut
 
-.sub '_io_read' :anon
+.sub 'read' :anon
     .param pmc argv :slurpy
     .local pmc file
     .const .LuaString key = 'read'
@@ -714,7 +660,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_io_tmpfile' :anon
+.sub 'tmpfile' :anon
     not_implemented()
 .end
 
@@ -727,13 +673,13 @@ handle, and B<nil> if C<obj> is not a file handle.
 
 =cut
 
-.sub '_io_type' :anon
+.sub 'type' :anon
     .param pmc obj :optional
     .local pmc mt
     .local pmc mt_file
     .local pmc f
     .local pmc ret
-    checkany(obj)
+    lua_checkany(1, obj)
     mt = obj.'get_metatable'()
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = global '_REGISTRY'
@@ -761,7 +707,7 @@ Equivalent to C<io.output():write>.
 
 =cut
 
-.sub '_io_write' :anon
+.sub 'write' :anon
     .param pmc argv :slurpy
     .local pmc file
     .const .LuaString key = 'write'
@@ -771,297 +717,7 @@ Equivalent to C<io.output():write>.
 .end
 
 
-=item C<file:close ()>
-
-Closes C<file>. Note that files are automatically closed when their handles
-are garbage collected, but that takes an unpredictable amount of time to happen.
-
-=cut
-
-
-=item C<file:flush ()>
-
-Saves any written data to C<file>.
-
-=cut
-
-.sub '_file_flush' :method :anon
-    .local pmc f
-    .local pmc ret
-    f = tofile(self)
-    f.'flush'()
-    new ret, .LuaBoolean
-    set ret, 1
-    .return (ret)
-.end
-
-
-=item C<file:lines ()>
-
-Returns an iterator function that, each time it is called, returns a new line
-from the file. Therefore, the construction
-
-    for line in file:lines() do ... end
-
-will iterate over all lines of the file. (Unlike C<io.lines>, this function
-does not close the file when the loop ends.)
-
-=cut
-
-.sub '_file_lines' :method :anon
-    tofile(self)
-    .return aux_lines(self, 0)
-.end
-
-
-=item C<file:read (format1, ...)>
-
-Reads the file C<file>, according to the given formats, which specify what to
-read. For each format, the function returns a string (or a number) with the
-characters read, or B<nil> if it cannot read data with the specified format.
-When called without formats, it uses a default format that reads the entire
-next line (see below).
-
-The available formats are
-
-=over 4
-
-=item B<"*n">
-
-reads a number; this is the only format that returns a number
-instead of a string.
-
-=item B<"*a">
-
-reads the whole file, starting at the current position. On end
-of file, it returns the empty string.
-
-=item B<"*l">
-
-reads the next line (skipping the end of line), returning B<nil>
-on end of file. This is the default format.
-
-=item B<number>
-
-reads a string with up to that number of characters, returning
-B<nil> on end of file. If number is zero, it reads nothing and returns an
-empty string, or B<nil> on end of file.
-
-=back
-
-=cut
-
-.sub '_file_read' :method :anon
-    .param pmc formats :slurpy
-    .local pmc ret
-    .local pmc f
-    tofile(self)
-    f = getattribute self, 'data'
-    if formats, L1
-    .return read_line(f)
-L1:
-    .local int narg
-    .local int i
-    .local pmc format
-    narg = formats
-    new ret, .FixedPMCArray
-    set ret, narg
-    i = 0
-L2:
-    unless i < narg goto L3
-    format = formats[i]
-    $I0 = isa format, 'LuaNumber'
-    unless $I0 goto L4
-    .local int l
-    l = format
-    unless l == 0 goto L5
-    $P0 = test_eof(f)
-    ret[i] = $P0
-    goto L6
-L5:
-    $P0 = read_chars(f, l)
-    ret[i] = $P0
-    goto L6
-L4:
-    $S0 = checkstring(format)
-    $I0 = index $S0, '*n'
-    unless $I0 == 0 goto L7
-    # number
-    $P0 = read_number(f)
-    ret[i] = $P0
-    goto L6
-L7:
-    $I0 = index $S0, '*l'
-    unless $I0 == 0 goto L8
-    # line
-    $P0 = read_line(f)
-    ret[i] = $P0
-    goto L6
-L8:
-    $I0 = index $S0, '*a'
-    unless $I0 == 0 goto L9
-    # file
-    $P0 = read_chars(f, 65535)
-    ret[i] = $P0
-    goto L6
-L9:
-    argerror("invalid format")
-L6:
-    inc i
-    goto L2
-L3:
-    .return (ret :flat)
-.end
-
-
-=item C<file:seek ([whence] [, offset])>
-
-Sets and gets the file position, measured from the beginning of the file, to
-the position given by C<offset> plus a base specified by the string C<whence>,
-as follows:
-
-=over 4
-
-=item B<"set">
-
-base is position 0 (beginning of the file);
-
-=item B<"cur">
-
-base is current position;
-
-=item B<"end">
-
-base is end of file;
-
-=back
-
-In case of success, function C<seek> returns the final file position, measured
-in bytes from the beginning of the file. If this function fails, it returns
-B<nil>, plus a string describing the error.
-
-The default value for C<whence> is C<"cur">, and for C<offset> is 0.
-Therefore, the call C<file:seek()> returns the current file position, without
-changing it; the call C<file:seek("set")> sets the position to the beginning
-of the file (and returns 0); and the call C<file:seek("end")> sets the
-position to the end of the file, and returns its size.
-
-=cut
-
-.sub '_file_seek' :method :anon
-    .param pmc whence :optional
-    .param pmc offset :optional
-    .local pmc f
-    .local pmc ret
-    tofile(self)
-    $S1 = optstring(whence, 'cur')
-    $I1 = checkoption($S1, 'set cur end')
-    $I2 = optint(offset, 0)
-    f = getattribute self, 'data'
-    seek f, $I2, $I1
-    $I0 = tell f
-    new ret, .LuaNumber
-    set ret, $I0
-    .return (ret)
-.end
-
-
-=item C<file:setvbuf (mode [, size])>
-
-Sets the buffering mode for an output file. There are three available modes:
-
-=over 4
-
-=item B<"no">
-
-no buffering; the result of any output operation appears immediately.
-
-=item B<"full">
-
-full buffering; output operation is performed only when the
-buffer is full (or when you explicitly flush the file).
-
-=item B<"line">
-
-line buffering; output is buffered until a newline is output
-or there is any input from some special files (such as a terminal device).
-
-=back
-
-For the last two cases, sizes specifies the size of the buffer, in bytes.
-The default is an appropriate size.
-
-NOT YET IMPLEMENTED.
-
-=cut
-
-.sub '_file_setvbuf' :method :anon
-    .param pmc mode :optional
-    .param pmc size :optional
-    .local pmc mode
-    .local pmc f
-    .local pmc ret
-    tofile(self)
-    $S1 = checkstring(mode)
-    $I1 = checkoption($S1, 'no full line')
-    $I2 = optint(size, 512)     # LUAL_BUFFERSIZE
-    new mode, .FixedIntegerArray
-    set mode, 3
-    mode[0] = 0     # PIO_NONBUF
-    mode[1] = 2     # PIO_FULLBUF
-    mode[2] = 1     # PIO_LINEBUF
-    f = getattribute self, 'data'
-    $I0 = mode[$I1]
-    # not_implemented
-    f.'buffer_type'($I0)
-    if $I1 == 0 goto L1
-    f.'buffer_size'($I2)
-L1:
-    new ret, .LuaBoolean
-    set ret, 1
-    .return (ret)
-.end
-
-
-=item C<file:write (value1, ...)>
-
-Writes the value of each of its arguments to the filehandle C<file>. The
-arguments must be strings or numbers. To write other values, use C<tostring>
-or C<string.format> before write.
-
-=cut
-
-.sub '_file_write' :method :anon
-    .param pmc argv :slurpy
-    .local pmc ret
-    .local int argc
-    .local int i
-    .local pmc f
-    tofile(self)
-    f = getattribute self, 'data'
-    argc = argv
-    i = 0
-L1:
-    if i >= argc goto L2
-    $P0 = argv[i]
-    $I0 = isa $P0, 'LuaNumber'
-    unless $I0 goto L3
-    print f, $P0
-    goto L4
-L3:
-    $S0 = checkstring($P0)
-    print f, $S0
-L4:
-    inc i
-    goto L1
-L2:
-    new ret, .LuaBoolean
-    set ret, 1
-    .return (ret)
-.end
-
-
-.sub '_io_fclose' :anon
+.sub 'fclose' :anon
     .param pmc file
     .local pmc f
     .local pmc ret
@@ -1071,47 +727,6 @@ L2:
     setattribute file, 'data', f
     new ret, .LuaBoolean
     set ret, 1
-    .return (ret)
-.end
-
-
-.sub '_file__gc' :method :anon
-    .local pmc f
-    f = topfile(self)
-    # ignore closed files and standard files
-    if null f goto L1
-    $P0 = getstdin
-    $I0 = issame $P0, f
-    if $I0 goto L1
-    $P0 = getstdout
-    $I0 = issame $P0, f
-    if $I0 goto L1
-    $P0 = getstderr
-    $I0 = issame $P0, f
-    if $I0 goto L1
-    print "closing file for you.\n"
-    aux_close(self)
-L1:
-    .return ()
-.end
-
-
-.sub '_file__tostring' :method :anon
-    .local pmc f
-    .local pmc ret
-    f = topfile(self)
-    new ret, .LuaString
-    if f goto L1
-    $S0 = "file (closed)"
-    goto L2
-L1:
-    $S0 = "file ("
-    $S1 = self
-    $S1 = substr $S1, 10, 8
-    concat $S0, $S1
-    concat $S0, ")"
-L2:
-    set ret, $S0
     .return (ret)
 .end
 

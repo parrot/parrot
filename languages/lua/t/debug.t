@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'debug.getfenv' );
@@ -54,6 +54,15 @@ CODE
 nil
 OUT
 
+language_output_is( 'lua', <<'CODE', <<'OUT', 'debug.getregistry' );
+local reg = debug.getregistry()
+print(type(reg))
+print(type(reg._LOADED))
+CODE
+table
+table
+OUT
+
 language_output_is( 'lua', <<'CODE', <<'OUT', 'debug.setfenv' );
 t = {}
 function f () end
@@ -73,7 +82,7 @@ language_output_like( 'lua', <<'CODE', <<'OUT', 'debug.setfenv (forbidden)' );
 t = {}
 debug.setfenv(t, t)
 CODE
-/'setfenv' cannot change environment of given object/
+/^[^:]+: [^:]+:\d+: 'setfenv' cannot change environment of given object\nstack traceback:\n/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'debug.setmetatable' );

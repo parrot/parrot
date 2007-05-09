@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -39,7 +39,7 @@ OUT
 language_output_like( 'lua', <<'CODE', <<'OUT', 'version' );
 print(_VERSION)
 CODE
-/Lua 5\.1/
+/^Lua 5\.1/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'factorial (recursive)' );

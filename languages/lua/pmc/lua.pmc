@@ -26,6 +26,27 @@ extern INTVAL dynpmc_LuaString;
 
 static PMC * Lua_PMC;
 
+static STRING*
+context_infostr(Interp *interp, parrot_context_t *ctx)
+{
+    struct Parrot_Context_info info;
+    STRING *res = NULL;
+
+    Parrot_block_DOD(interp);
+    if (Parrot_Context_info(interp, ctx, &info)) {
+        char *file = info.file;
+        res = Parrot_sprintf_c(interp, "\t%s:%d in function '%Ss'\n",
+                                       file, info.line, info.fullname);
+
+        /* free the non-constant string, but not the constant one */
+        if (strncmp( "(unknown file)", file, 14 ) < 0 )
+            string_cstring_free(file);
+    }
+    Parrot_unblock_DOD(interp);
+
+    return res;
+}
+
 
 pmclass Lua
     singleton
@@ -50,6 +71,45 @@ information see F<src/pmc.c>.
 
     void set_pointer(void* ptr) {
         Lua_PMC = (PMC*) ptr;
+    }
+
+/*
+
+=item C<STRING* caller()>
+
+=cut
+
+*/
+    METHOD STRING* caller() {
+        parrot_context_t *ctx = CONTEXT(INTERP->ctx);
+
+        /* backtrace: follow the continuation chain */
+        while (1) {
+            PMC *cont;
+            if (PMC_metadata(ctx->current_sub) != NULL) {
+                struct Parrot_Context_info info;
+                Parrot_block_DOD(INTERP);
+                if (Parrot_Context_info(INTERP, ctx, &info)) {
+                    /* free the non-constant string, but not the constant one */
+                    if (strncmp( "(unknown file)", info.file, 14 ) < 0 )
+                        string_cstring_free(info.file);
+
+                    Parrot_unblock_DOD(INTERP);
+                    return info.fullname;
+                }
+                Parrot_unblock_DOD(INTERP);
+                break;
+            }
+
+            cont = ctx->current_cont;
+            if (!cont)
+                break;
+            ctx = PMC_cont(cont)->to_ctx;
+            if (!ctx)
+                break;
+        }
+
+        return const_string(INTERP, "?");
     }
 
 /*
@@ -125,7 +185,6 @@ information see F<src/pmc.c>.
 
 */
     METHOD STRING* strftime(STRING* fmt, PMC* tm) {
-        PMC *retval = NULL;
         struct tm stm;
         char b[200];
         size_t reslen;
@@ -143,6 +202,88 @@ information see F<src/pmc.c>.
 
         reslen = strftime(b, sizeof b, s, &stm);
         return string_from_cstring(INTERP, b, reslen);
+    }
+
+/*
+
+=item C<STRING* traceback(INTVAL level)>
+
+=cut
+
+*/
+    METHOD STRING* traceback(INTVAL level) {
+        STRING *bt;
+        STRING *str;
+        parrot_context_t *ctx;
+
+        bt = string_from_cstring(INTERP, "stack traceback:\n", 0);
+        /* information about the current sub */
+        ctx = CONTEXT(INTERP->ctx);
+
+        if (level == 0) {
+            str = context_infostr(INTERP, ctx);
+            bt = string_append(INTERP, bt, str);
+        }
+
+        /* backtrace: follow the continuation chain */
+        while (1) {
+            PMC *cont = ctx->current_cont;
+            if (!cont)
+                break;
+            ctx = PMC_cont(cont)->to_ctx;
+            if (!ctx)
+                break;
+
+            str = context_infostr(INTERP, ctx);
+            if (!str)
+                break;
+            bt = string_append(INTERP, bt, str);
+        }
+
+        return bt;
+    }
+
+/*
+
+=item C<STRING* where()>
+
+=cut
+
+*/
+    METHOD STRING* where() {
+        parrot_context_t *ctx = CONTEXT(INTERP->ctx);
+
+        /* backtrace: follow the continuation chain */
+        while (1) {
+            PMC *cont;
+            PMC *sub = ctx->current_sub;
+            if ( PMC_metadata(sub) != NULL
+              && VTABLE_isa(INTERP, sub, const_string(INTERP, "LuaClosure")) ) {
+                struct Parrot_Context_info info;
+                Parrot_block_DOD(INTERP);
+                if (Parrot_Context_info(INTERP, ctx, &info)) {
+                    STRING* res = Parrot_sprintf_c(INTERP, "%s:%d:",
+                                                   info.file, info.line);
+                    /* free the non-constant string, but not the constant one */
+                    if (strncmp( "(unknown file)", info.file, 14 ) < 0 )
+                        string_cstring_free(info.file);
+
+                    Parrot_unblock_DOD(INTERP);
+                    return res;
+                }
+                Parrot_unblock_DOD(INTERP);
+                break;
+            }
+
+            cont = ctx->current_cont;
+            if (!cont)
+                break;
+            ctx = PMC_cont(cont)->to_ctx;
+            if (!ctx)
+                break;
+        }
+
+        return const_string(INTERP, "_._:0:");
     }
 
 }

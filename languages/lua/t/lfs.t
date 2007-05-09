@@ -113,7 +113,7 @@ language_output_like( 'lua', <<'CODE', <<'OUT', 'function lfs.dir' );
 require "lfs"
 lfs.dir("xptoo")
 CODE
-/cannot open xptoo: No such file or directory/
+/^[^:]+: [^:]+:\d+: cannot open xptoo: No such file or directory\nstack traceback:\n/
 OUT
 
 mkdir '../xpto' unless -d '../xpto';
@@ -184,7 +184,7 @@ language_output_like( 'lua', <<'CODE', <<'OUT', 'function lfs.attributes (invali
 require "lfs"
 print(lfs.attributes("file.txt", "bad"))
 CODE
-/invalid option 'bad'/
+/^[^:]+: [^:]+:\d+: bad argument #2 to 'attributes' \(invalid option 'bad'\)\nstack traceback:\n/
 OUT
 }
 
@@ -204,7 +204,7 @@ f = io.open("file.txt")
 f:close()
 lfs.lock(f)
 CODE
-/lock: closed file/
+/^[^:]+: [^:]+:\d+: lock: closed file\nstack traceback:\n/
 OUT
 
 

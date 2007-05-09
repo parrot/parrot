@@ -10,7 +10,8 @@ lib/luacoroutine.pir - Lua Coroutine Library
 The operations related to coroutines comprise a sub-library of the basic
 library and come inside the table C<coroutine>.
 
-See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
+See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation",
+L<http://www.lua.org/manual/5.1/manual.html#5.2>.
 
 =head2 Functions
 
@@ -36,34 +37,34 @@ See "Lua 5.1 Reference Manual", section 5.2 "Coroutine Manipulation".
     set $P1, 'coroutine'
     _lua__GLOBAL[$P1] = _coroutine
 
-    _register($P1, _coroutine)
+    lua_register($P1, _coroutine)
 
-    .const .Sub _coroutine_create = '_coroutine_create'
+    .const .Sub _coroutine_create = 'create'
     _coroutine_create.'setfenv'(_lua__GLOBAL)
     set $P1, 'create'
     _coroutine[$P1] = _coroutine_create
 
-    .const .Sub _coroutine_resume = '_coroutine_resume'
+    .const .Sub _coroutine_resume = 'resume'
     _coroutine_resume.'setfenv'(_lua__GLOBAL)
     set $P1, 'resume'
     _coroutine[$P1] = _coroutine_resume
 
-    .const .Sub _coroutine_running = '_coroutine_running'
+    .const .Sub _coroutine_running = 'running'
     _coroutine_running.'setfenv'(_lua__GLOBAL)
     set $P1, 'running'
     _coroutine[$P1] = _coroutine_running
 
-    .const .Sub _coroutine_status = '_coroutine_status'
+    .const .Sub _coroutine_status = 'status'
     _coroutine_status.'setfenv'(_lua__GLOBAL)
     set $P1, 'status'
     _coroutine[$P1] = _coroutine_status
 
-    .const .Sub _coroutine_wrap = '_coroutine_wrap'
+    .const .Sub _coroutine_wrap = 'wrap'
     _coroutine_wrap.'setfenv'(_lua__GLOBAL)
     set $P1, 'wrap'
     _coroutine[$P1] = _coroutine_wrap
 
-    .const .Sub _coroutine_yield = '_coroutine_yield'
+    .const .Sub _coroutine_yield = 'yield'
     _coroutine_yield.'setfenv'(_lua__GLOBAL)
     set $P1, 'yield'
     _coroutine[$P1] = _coroutine_yield
@@ -80,13 +81,13 @@ Returns this new coroutine, an object with type C<"thread">.
 
 =cut
 
-.sub '_coroutine_create' :anon
+.sub 'create' :anon
     .param pmc f :optional
     .local pmc ret
-    checktype(f, 'function')
+    lua_checktype(1, f, 'function')
     $I0 = isa f, 'LuaClosure'
     if $I0 goto L1
-    argerror('Lua function expected')
+    lua_argerror(1, 'Lua function expected')
 L1:
     ret = new .LuaThread, f
     .return (ret)
@@ -107,12 +108,12 @@ C<resume> returns B<false> plus the error message.
 
 =cut
 
-.sub '_coroutine_resume' :anon
+.sub 'resume' :anon
     .param pmc co :optional
     .param pmc argv :slurpy
     .local pmc ret
     .local pmc status
-    checktype(co, 'thread')
+    lua_checktype(1, co, 'thread')
     ($I0, ret :slurpy) = auxresume(co, argv :flat)
     new status, .LuaBoolean
     set status, $I0
@@ -156,7 +157,7 @@ Returns the running coroutine, or B<nil> when called by the main thread.
 
 =cut
 
-.sub '_coroutine_running' :anon
+.sub 'running' :anon
     .local pmc co_stack
     .local pmc ret
     co_stack = global '_COROUTINE_STACK'
@@ -185,10 +186,10 @@ STILL INCOMPLETE.
 
 =cut
 
-.sub '_coroutine_status' :anon
+.sub 'status' :anon
     .param pmc co :optional
     .local pmc ret
-    checktype(co, 'thread')
+    lua_checktype(1, co, 'thread')
     new ret, .LuaString
     $P0 = getattribute co, 'co'
     $P1 = getattribute $P0, 'state'
@@ -211,19 +212,19 @@ case of error, propagates the error.
 
 =cut
 
-.sub '_coroutine_wrap' :anon :lex
+.sub 'wrap' :anon :lex
     .param pmc f :optional
     .param pmc argv :slurpy
     .local pmc ret
     .local pmc co
     .lex 'upvar_co', co
-    co = _coroutine_create(f)
+    co = create(f)
     .const .Sub auxwrap = 'auxwrap'
     ret = newclosure auxwrap
     .return (ret)
 .end
 
-.sub 'auxwrap' :anon :lex :outer(_coroutine_wrap)
+.sub 'auxwrap' :anon :lex :outer(wrap)
     .param pmc argv :slurpy
     .local pmc co
     .local pmc ret
@@ -233,7 +234,7 @@ case of error, propagates the error.
     .return (ret :flat)
 L1:
     $S0 = ret[0]
-    error($S0)
+    lua_error($S0)
 .end
 
 =item C<coroutine.yield ([val1, ..., valn])>
@@ -244,7 +245,7 @@ Any arguments to C<yield> are passed as extra results to C<resume>.
 
 =cut
 
-.sub '_coroutine_yield' :anon
+.sub 'yield' :anon
     .param pmc argv :slurpy
     .local pmc ret
     .local pmc co

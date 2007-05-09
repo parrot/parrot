@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -34,13 +34,13 @@ use Test::More;
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'variable pi' );
 print(math.pi)
 CODE
-/3\.14/
+/^3\.14/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'variable huge' );
 print(math.huge)
 CODE
-/(inf|1.#INF)/
+/^(inf|1.#INF)/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function abs' );
@@ -61,25 +61,25 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function acos' );
 print(math.acos(0.5))
 CODE
-/1\.047/
+/^1\.047/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function asin' );
 print(math.asin(0.5))
 CODE
-/0\.523/
+/^0\.523/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function atan' );
 print(math.atan(0.5))
 CODE
-/\.463/
+/^0\.463/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function atan2' );
 print(math.atan2(1, 2))
 CODE
-/\.463/
+/^0\.463/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function ceil' );
@@ -105,7 +105,7 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function exp' );
 print(math.exp(1.0))
 CODE
-/2\.718/
+/^2\.718/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function floor' );
@@ -139,19 +139,19 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function log' );
 print(math.log(47))
 CODE
-/3\.85/
+/^3\.85/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function log10' );
 print(math.log10(47))
 CODE
-/1\.672/
+/^1\.672/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function max 0' );
 print(math.max())
 CODE
-/number expected/
+/^[^:]+: [^:]+:\d+: bad argument #1 to 'max' \(number expected, got no value\)\nstack traceback:\n/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function max' );
@@ -167,7 +167,7 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function min 0' );
 print(math.min())
 CODE
-/number expected/
+/^[^:]+: [^:]+:\d+: bad argument #1 to 'min' \(number expected, got no value\)\nstack traceback:\n/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function min' );
@@ -195,7 +195,7 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function rad' );
 print(math.rad(180))
 CODE
-/3\.14/
+/^3\.14/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function random no arg' );
@@ -219,7 +219,7 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function random too many arg' );
 print(math.random(1, 2, 3))
 CODE
-/wrong number of arguments/
+/^[^:]+: [^:]+:\d+: wrong number of arguments\nstack traceback:\n/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function randomseed' );
@@ -242,7 +242,7 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function sqrt' );
 print(math.sqrt(2))
 CODE
-/1\.414/
+/^1\.414/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function tan' );

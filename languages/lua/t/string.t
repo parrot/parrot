@@ -51,7 +51,7 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'metatable' );
 print(getmetatable("ABC"))
 CODE
-/table: (0[Xx])?[0-9A-Fa-f]+/
+/^table: (0[Xx])?[0-9A-Fa-f]+/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'method s:byte' );
@@ -141,37 +141,37 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (too few arg)' );
 print(string.format("%s %s", 1))
 CODE
-/string expected, got no value/
+/^[^:]+: [^:]+:\d+: bad argument #3 to 'format' \(string expected, got no value\)\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (bad arg)' );
 print(string.format("%d", 'toto'))
 CODE
-/number expected, got string/
+/^[^:]+: [^:]+:\d+: bad argument #2 to 'format' \(number expected, got string\)\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (invalid option)' );
 print(string.format("%k", 'toto'))
 CODE
-/invalid option '%k' to 'format'/
+/^[^:]+: [^:]+:\d+: invalid option '%k' to 'format'\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (invalid format)' );
 print(string.format("%------s", 'toto'))
 CODE
-/invalid format \(repeated flags\)/
+/^[^:]+: [^:]+:\d+: invalid format \(repeated flags\)\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (invalid format)' );
 print(string.format("pi = %.123f", math.pi))
 CODE
-/invalid format \(width or precision too long\)/
+/^[^:]+: [^:]+:\d+: invalid format \(width or precision too long\)\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (invalid format)' );
 print(string.format("% 123s", 'toto'))
 CODE
-/invalid format \(width or precision too long\)/
+/^[^:]+: [^:]+:\d+: invalid format \(width or precision too long\)\nstack traceback:\n/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.gmatch' );
@@ -308,13 +308,13 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub (invalid index)' );
 x = string.gsub("hello world", "(%w+)", "%2 %2")
 CODE
-/invalid capture index/
+/^[^:]+: [^:]+:\d+: invalid capture index\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub (bad type)' );
 x = string.gsub("hello world", "(%w+)", true)
 CODE
-/string\/function\/table expected/
+/^[^:]+: [^:]+:\d+: bad argument #3 to 'gsub' \(string\/function\/table expected\)\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub (invalid value)' );
@@ -325,7 +325,7 @@ end
 name = "Lua"; status= true
 print(expand("$name is $status, isn't it?"))
 CODE
-/invalid replacement value \(a boolean\)/
+/^[^:]+: [^:]+:\d+: invalid replacement value \(a boolean\)\nstack traceback:\n/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function string.len' );

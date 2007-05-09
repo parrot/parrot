@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -68,7 +68,7 @@ co = coroutine.create(function ()
 
 print(co)
 CODE
-/thread: (0[Xx])?[0-9A-Fa-f]+/
+/^thread: (0[Xx])?[0-9A-Fa-f]+/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'basics' );

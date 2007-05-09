@@ -16,86 +16,72 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .HLL 'Lua', 'lua_group'
 
 
-=item C<argerror (extramsg)>
+=item C<lua_argerror (narg, extramsg)>
 
 =cut
 
-.sub 'argerror'
+.sub 'lua_argerror'
+    .param int narg
     .param string extramsg
-    error(extramsg)
+    $S1 = narg
+    $S0 = "bad argument #" . $S1
+    $S0 .= " to '"
+    new $P0, .Lua
+    $S1 = $P0.'caller'()
+    $S0 .= $S1
+    $S0 .= "' ("
+    $S0 .= extramsg
+    $S0 .= ")"
+    lua_error($S0)
 .end
 
 
-=item C<checkany (arg)>
+=item C<lua_checkany (narg, arg)>
 
 =cut
 
-.sub 'checkany'
+.sub 'lua_checkany'
+    .param int narg
     .param pmc arg
     unless null arg goto L1
-    argerror("value expected")
+    lua_argerror(narg, "value expected")
 L1:
 .end
 
 
-=item C<checkforloop (start, limit, step)>
+=item C<lua_checknumber (narg, arg)>
 
 =cut
 
-.sub 'checkforloop'
-    .param pmc start
-    .param pmc limit
-    .param pmc step
-    .local pmc ret_start
-    ret_start = start.'tonumber'()
-    if ret_start goto L1
-    error("'for' initial value must be a number")
-L1:
-    .local pmc ret_limit
-    ret_limit = limit.'tonumber'()
-    if ret_limit goto L2
-    error("'for' limit must be a number")
-L2:
-    .local pmc ret_step
-    ret_step = step.'tonumber'()
-    if ret_step goto L3
-    error("'for' step must be a number")
-L3:
-    .return (ret_start, ret_limit, ret_step)
-.end
-
-
-=item C<checknumber (arg)>
-
-=cut
-
-.sub 'checknumber'
+.sub 'lua_checknumber'
+    .param int narg
     .param pmc arg
     $S0 = "no value"
-    if null arg goto L0
+    if null arg goto L1
     $S1 = typeof arg
-    if $S1 == 'Undef' goto L0
+    if $S1 == 'Undef' goto L1
     $S0 = $S1
     $I0 = isa arg, 'LuaNumber'
-    unless $I0 goto L1
+    unless $I0 goto L2
     .return (arg)
-L1:
+L2:
     $I0 = isa arg, 'LuaString'
-    unless $I0 goto L0
+    unless $I0 goto L1
     $P0 = arg.'tonumber'()
     $I0 = isa $P0, 'LuaNumber'
-    unless $I0 goto L0
+    unless $I0 goto L1
     .return ($P0)
-L0:
-    typerror($S0, "number")
+L1:
+    lua_typerror(narg, $S0, "number")
 .end
 
 
-=item C<checkoption (val, options)>
+=item C<lua_checkoption (narg, val, options)>
 
 =cut
 
-.sub 'checkoption'
+.sub 'lua_checkoption'
+    .param int narg
     .param string name
     .param string options
     .local int i
@@ -113,65 +99,68 @@ L2:
     $S0 = "invalid option '"
     concat $S0, name
     concat $S0, "'"
-    argerror($S0)
+    lua_argerror(narg, $S0)
 .end
 
 
-=item C<checkstring (arg)>
+=item C<lua_checkstring (narg, arg)>
 
 =cut
 
-.sub 'checkstring'
+.sub 'lua_checkstring'
+    .param int narg
     .param pmc arg
     .local pmc val
     $S0 = "no value"
-    if null arg goto L0
+    if null arg goto L1
     $S1 = typeof arg
-    if $S1 == 'Undef' goto L0
+    if $S1 == 'Undef' goto L1
     $S0 = $S1
     $I0 = isa arg, 'LuaString'
-    unless $I0 goto L1
+    unless $I0 goto L2
     val = arg
     .return (val)
-L1:
+L2:
     $I0 = isa arg, 'LuaNumber'
-    unless $I0 goto L0
+    unless $I0 goto L1
     val = arg.'tostring'()
     .return (val)
-L0:
-    typerror($S0, "string")
+L1:
+    lua_typerror(narg, $S0, "string")
 .end
 
 
-=item C<checktype (arg, type)>
+=item C<lua_checktype (narg, arg, type)>
 
 =cut
 
-.sub 'checktype'
+.sub 'lua_checktype'
+    .param int narg
     .param pmc arg
     .param string type
     $S0 = "no value"
-    if null arg goto L0
+    if null arg goto L1
     $S0 = typeof arg
-    if $S0 != type goto L0
+    if $S0 != type goto L1
     .return ()
-L0:
-    typerror($S0, type)
+L1:
+    lua_typerror(narg, $S0, type)
 .end
 
 
-=item C<checkudata (arg, type)>
+=item C<lua_checkudata (narg, arg, type)>
 
 =cut
 
-.sub 'checkudata'
+.sub 'lua_checkudata'
+    .param int narg
     .param pmc arg
     .param string type
     $S0 = "no value"
-    if null arg goto L0
+    if null arg goto L1
     $S0 = typeof arg
     $I0 = isa arg, 'LuaUserdata'
-    unless $I0 goto L0
+    unless $I0 goto L1
     .local pmc _lua__REGISTRY
     .local pmc key
     _lua__REGISTRY = global '_REGISTRY'
@@ -179,18 +168,18 @@ L0:
     set key, type
     $P0 = _lua__REGISTRY[key]
     $P1 = arg.'get_metatable'()
-    unless $P0 == $P1 goto L0
+    unless $P0 == $P1 goto L1
     .return ()
-L0:
-    typerror($S0, type)
+L1:
+    lua_typerror(narg, $S0, type)
 .end
 
 
-=item C<error (message)>
+=item C<lua_error (message)>
 
 =cut
 
-.sub 'error'
+.sub 'lua_error'
     .param string message
     .local pmc ex
     ex = new .Exception
@@ -199,11 +188,11 @@ L0:
 .end
 
 
-=item C<findtable (t, fname)>
+=item C<lua_findtable (t, fname)>
 
 =cut
 
-.sub 'findtable'
+.sub 'lua_findtable'
     .param pmc t
     .param string fname
     new $P1, .LuaString
@@ -236,11 +225,11 @@ L5:
 .end
 
 
-=item C<getfenv (o)>
+=item C<lua_getfenv (o)>
 
 =cut
 
-.sub 'getfenv'
+.sub 'lua_getfenv'
     .param pmc o
     .local pmc ret
     if null o goto L1
@@ -254,11 +243,11 @@ L1:
 .end
 
 
-=item C<gsub (src, pat, repl)>
+=item C<lua_gsub (src, pat, repl)>
 
 =cut
 
-.sub 'gsub'
+.sub 'lua_gsub'
     .param string src
     .param string pat
     .param string repl
@@ -280,11 +269,11 @@ L2:
 .end
 
 
-=item C<loadbuffer (buff, name)>
+=item C<lua_loadbuffer (buff, name)>
 
 =cut
 
-.sub 'loadbuffer'
+.sub 'lua_loadbuffer'
     .param string buff
     .param string chunkname
     .local pmc lua_comp
@@ -302,11 +291,11 @@ _handler:
 .end
 
 
-=item C<loadfile (filename)>
+=item C<lua_loadfile (filename)>
 
 =cut
 
-.sub 'loadfile'
+.sub 'lua_loadfile'
     .param string filename
     .local pmc f
     unless filename == '' goto L1
@@ -343,23 +332,11 @@ L5:
 .end
 
 
-=item C<mkarg (argv)>
-
-Support variable number of arguments function call.
+=item C<lua_newmetatable (tname)>
 
 =cut
 
-.sub 'mkarg'
-    .param pmc argv
-    .return (argv :flat)
-.end
-
-
-=item C<newmetatable (tname)>
-
-=cut
-
-.sub 'newmetatable'
+.sub 'lua_newmetatable'
     .param string tname
     .local pmc _lua__REGISTRY
     .local pmc ret
@@ -376,55 +353,45 @@ L1:
 .end
 
 
-=item C<not_implemented ()>
+=item C<lua_optint (narg, arg)>
 
 =cut
 
-.sub 'not_implemented'
-    .local pmc ex
-    ex = new .Exception
-    ex['_message'] =  "not implemented"
-    throw ex
-.end
-
-
-=item C<optint (arg)>
-
-=cut
-
-.sub 'optint'
+.sub 'lua_optint'
+    .param int narg
     .param pmc arg
     .param int default
-    if null arg goto L0
-    unless arg goto L0
-    $I1 = checknumber(arg)
+    if null arg goto L1
+    unless arg goto L1
+    $I1 = lua_checknumber(narg, arg)
     .return ($I1)
-L0:
+L1:
     .return (default)
 .end
 
 
-=item C<optstring (arg)>
+=item C<lua_optstring (narg, arg)>
 
 =cut
 
-.sub 'optstring'
+.sub 'lua_optstring'
+    .param int narg
     .param pmc arg
     .param string default
-    if null arg goto L0
-    unless arg goto L0
+    if null arg goto L1
+    unless arg goto L1
     $S0 = arg
     .return ($S0)
-L0:
+L1:
     .return (default)
 .end
 
 
-=item C<_register (libname, lib)>
+=item C<lua_register (libname, lib)>
 
 =cut
 
-.sub '_register'
+.sub 'lua_register'
     .param pmc libname
     .param pmc lib
     .const .LuaString _loaded = '_LOADED'
@@ -435,11 +402,11 @@ L0:
 .end
 
 
-=item C<setfenv (o, table)>
+=item C<lua_setfenv (o, table)>
 
 =cut
 
-.sub 'setfenv'
+.sub 'lua_setfenv'
     .param pmc o
     .param pmc table
     if null o goto L1
@@ -452,17 +419,75 @@ L1:
 .end
 
 
-=item C<typerror (got, expec)>
+=item C<lua_typerror (narg, got, expec)>
 
 =cut
 
-.sub 'typerror'
+.sub 'lua_typerror'
+    .param int narg
     .param string got
     .param string expec
     $S0 = expec
     concat $S0, " expected, got "
     concat $S0, got
-    argerror($S0)
+    lua_argerror(narg, $S0)
+.end
+
+
+=back
+
+=head2 Others functions
+
+=over 4
+
+=item C<checkforloop (start, limit, step)>
+
+=cut
+
+.sub 'checkforloop'
+    .param pmc start
+    .param pmc limit
+    .param pmc step
+    .local pmc ret_start
+    ret_start = start.'tonumber'()
+    if ret_start goto L1
+    lua_error("'for' initial value must be a number")
+L1:
+    .local pmc ret_limit
+    ret_limit = limit.'tonumber'()
+    if ret_limit goto L2
+    lua_error("'for' limit must be a number")
+L2:
+    .local pmc ret_step
+    ret_step = step.'tonumber'()
+    if ret_step goto L3
+    lua_error("'for' step must be a number")
+L3:
+    .return (ret_start, ret_limit, ret_step)
+.end
+
+
+=item C<mkarg (argv)>
+
+Support variable number of arguments function call.
+
+=cut
+
+.sub 'mkarg'
+    .param pmc argv
+    .return (argv :flat)
+.end
+
+
+=item C<not_implemented ()>
+
+=cut
+
+.sub 'not_implemented'
+    .local pmc ex
+    ex = new .Exception
+    ex['_message'] =  "not implemented"
+    throw ex
 .end
 
 

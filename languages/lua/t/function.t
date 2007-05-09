@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -200,7 +200,7 @@ function f()
     print "after"
 end
 CODE
-/no loop to break/
+/^[^:]+: [^:]+:\d+: no loop to break/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'tail call' );

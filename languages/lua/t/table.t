@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -56,14 +56,14 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function concat (out of ra
 t = {"a","b","c","d","e"}
 print(table.concat(t,",",2,7))
 CODE
-/table contains non-strings/
+/^[^:]+: [^:]+:\d+: bad argument #1 to 'concat' \(table contains non-strings\)\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function concat (non-string)' );
 t = {"a","b",true,"d","e"}
 print(table.concat(t,","))
 CODE
-/table contains non-strings/
+/^[^:]+: [^:]+:\d+: bad argument #1 to 'concat' \(table contains non-strings\)\nstack traceback:\n/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function foreach (array)' );
@@ -182,7 +182,7 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function setn' );
 a = {}
 table.setn(a, 10000)
 CODE
-/'setn' is obsolete/
+/^[^:]+: [^:]+:\d+: 'setn' is obsolete\nstack traceback:\n/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function sort' );

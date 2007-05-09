@@ -19,7 +19,8 @@ compromise otherwise secure code.
 
 All functions in this library are provided inside the C<debug> table.
 
-See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
+See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library",
+L<http://www.lua.org/manual/5.1/manual.html#5.9>.
 
 =head2 Functions
 
@@ -44,74 +45,74 @@ See "Lua 5.1 Reference Manual", section 5.9 "The Debug Library".
     set $P1, 'debug'
     _lua__GLOBAL[$P1] = _debug
 
-    _register($P1, _debug)
+    lua_register($P1, _debug)
 
-    .const .Sub _debug_debug = '_debug_debug'
+    .const .Sub _debug_debug = 'debug'
     _debug_debug.'setfenv'(_lua__GLOBAL)
     set $P1, 'debug'
     _debug[$P1] = _debug_debug
 
-    .const .Sub _debug_getfenv = '_debug_getfenv'
+    .const .Sub _debug_getfenv = 'getfenv'
     _debug_getfenv.'setfenv'(_lua__GLOBAL)
     set $P1, 'getfenv'
     _debug[$P1] = _debug_getfenv
 
-    .const .Sub _debug_gethook = '_debug_gethook'
+    .const .Sub _debug_gethook = 'gethook'
     _debug_gethook.'setfenv'(_lua__GLOBAL)
     set $P1, 'gethook'
     _debug[$P1] = _debug_gethook
 
-    .const .Sub _debug_getinfo = '_debug_getinfo'
+    .const .Sub _debug_getinfo = 'getinfo'
     _debug_getinfo.'setfenv'(_lua__GLOBAL)
     set $P1, 'getinfo'
     _debug[$P1] = _debug_getinfo
 
-    .const .Sub _debug_getlocal = '_debug_getlocal'
+    .const .Sub _debug_getlocal = 'getlocal'
     _debug_getlocal.'setfenv'(_lua__GLOBAL)
     set $P1, 'getlocal'
     _debug[$P1] = _debug_getlocal
 
-    .const .Sub _debug_getmetatable = '_debug_getmetatable'
+    .const .Sub _debug_getmetatable = 'getmetatable'
     _debug_getmetatable.'setfenv'(_lua__GLOBAL)
     set $P1, 'getmetatable'
     _debug[$P1] = _debug_getmetatable
 
-    .const .Sub _debug_getregistry = '_debug_getregistry'
+    .const .Sub _debug_getregistry = 'getregistry'
     _debug_getregistry.'setfenv'(_lua__GLOBAL)
     set $P1, 'getregistry'
     _debug[$P1] = _debug_getregistry
 
-    .const .Sub _debug_getupvalue = '_debug_getupvalue'
+    .const .Sub _debug_getupvalue = 'getupvalue'
     _debug_getupvalue.'setfenv'(_lua__GLOBAL)
     set $P1, 'getupvalue'
     _debug[$P1] = _debug_getupvalue
 
-    .const .Sub _debug_setfenv = '_debug_setfenv'
+    .const .Sub _debug_setfenv = 'setfenv'
     _debug_setfenv.'setfenv'(_lua__GLOBAL)
     set $P1, 'setfenv'
     _debug[$P1] = _debug_setfenv
 
-    .const .Sub _debug_sethook = '_debug_sethook'
+    .const .Sub _debug_sethook = 'sethook'
     _debug_sethook.'setfenv'(_lua__GLOBAL)
     set $P1, 'sethook'
     _debug[$P1] = _debug_sethook
 
-    .const .Sub _debug_setlocal = '_debug_setlocal'
+    .const .Sub _debug_setlocal = 'setlocal'
     _debug_setlocal.'setfenv'(_lua__GLOBAL)
     set $P1, 'setlocal'
     _debug[$P1] = _debug_setlocal
 
-    .const .Sub _debug_setmetatable = '_debug_setmetatable'
+    .const .Sub _debug_setmetatable = 'setmetatable'
     _debug_setmetatable.'setfenv'(_lua__GLOBAL)
     set $P1, 'setmetatable'
     _debug[$P1] = _debug_setmetatable
 
-    .const .Sub _debug_setupvalue = '_debug_setupvalue'
+    .const .Sub _debug_setupvalue = 'setupvalue'
     _debug_setupvalue.'setfenv'(_lua__GLOBAL)
     set $P1, 'setupvalue'
     _debug[$P1] = _debug_setupvalue
 
-    .const .Sub _debug_traceback = '_debug_traceback'
+    .const .Sub _debug_traceback = 'traceback'
     _debug_traceback.'setfenv'(_lua__GLOBAL)
     set $P1, 'traceback'
     _debug[$P1] = _debug_traceback
@@ -129,12 +130,35 @@ so that the caller continues its execution.
 Note that commands for C<debug.debug> are not lexically nested within any
 function, and so have no direct access to local variables.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
-.sub '_debug_debug' :anon
-    not_implemented()
+.sub 'debug' :anon
+    .local string buffer
+    .local pmc stdin
+    stdin = getstdin
+L1:
+    printerr 'lua_debug> '
+    buffer = readline stdin
+    if buffer == '' goto L2
+    $I0 = index buffer, "cont"
+    if $I0 == 0 goto L2
+    ($P0, $S0) = lua_loadbuffer(buffer, '=(debug command)')
+    unless null $P0 goto L3
+    printerr $S0
+    printerr "\n"
+    goto L1
+L3:
+    push_eh _handler
+    $P0()
+    goto L1
+_handler:
+    .local pmc e
+    .local string msg
+    .get_results (e, msg)
+    printerr msg
+    printerr "\n"
+    goto L1
+L2:
 .end
 
 
@@ -144,9 +168,9 @@ Returns the environment of object C<o>.
 
 =cut
 
-.sub '_debug_getfenv' :anon
+.sub 'getfenv' :anon
     .param pmc o :optional
-    .return getfenv(o)
+    .return lua_getfenv(o)
 .end
 
 
@@ -160,7 +184,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_debug_gethook' :anon
+.sub 'gethook' :anon
     not_implemented()
 .end
 
@@ -188,7 +212,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_debug_getinfo' :anon
+.sub 'getinfo' :anon
     not_implemented()
 .end
 
@@ -209,7 +233,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_debug_getlocal' :anon
+.sub 'getlocal' :anon
     not_implemented()
 .end
 
@@ -221,10 +245,10 @@ metatable.
 
 =cut
 
-.sub '_debug_getmetatable' :anon
+.sub 'getmetatable' :anon
     .param pmc obj :optional
     .local pmc ret
-    checkany(obj)
+    lua_checkany(1, obj)
     ret = obj.'get_metatable'()
     .return (ret)
 .end
@@ -234,12 +258,12 @@ metatable.
 
 Returns the registry table.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
-.sub '_debug_getregistry' :anon
-    not_implemented()
+.sub 'getregistry' :anon
+    .local pmc ret
+    ret = global '_REGISTRY'
+    .return (ret)
 .end
 
 
@@ -253,7 +277,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_debug_getupvalue' :anon
+.sub 'getupvalue' :anon
     not_implemented()
 .end
 
@@ -264,15 +288,15 @@ Sets the environment of the given C<object> to the given C<table>.
 
 =cut
 
-.sub '_debug_setfenv' :anon
+.sub 'setfenv' :anon
     .param pmc o :optional
     .param pmc table :optional
-    checktype(table, 'table')
-    $I0 = setfenv(o, table)
+    lua_checktype(2, table, 'table')
+    $I0 = lua_setfenv(o, table)
     unless $I0 goto L1
     .return (o)
 L1:
-    error("'setfenv' cannot change environment of given object")
+    lua_error("'setfenv' cannot change environment of given object")
 .end
 
 
@@ -315,7 +339,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_debug_sethook' :anon
+.sub 'sethook' :anon
     not_implemented()
 .end
 
@@ -333,7 +357,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_debug_setlocal' :anon
+.sub 'setlocal' :anon
     not_implemented()
 .end
 
@@ -345,19 +369,19 @@ be B<nil>).
 
 =cut
 
-.sub '_debug_setmetatable' :anon
+.sub 'setmetatable' :anon
     .param pmc table :optional
     .param pmc metatable :optional
     .local pmc ret
-    checktype(table, 'table')
-    if null metatable goto L0
+    lua_checktype(1, table, 'table')
+    if null metatable goto L1
     $I0 = isa metatable, 'LuaNil'
-    if $I0 goto L1
+    if $I0 goto L2
     $I0 = isa metatable, 'LuaTable'
-    if $I0 goto L1
-L0:
-    argerror("nil or table expected")
+    if $I0 goto L2
 L1:
+    lua_argerror(2, "nil or table expected")
+L2:
     table.'set_metatable'(metatable)
     new ret, .LuaBoolean
     set ret, 1
@@ -375,23 +399,33 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_debug_setupvalue' :anon
+.sub 'setupvalue' :anon
     not_implemented()
 .end
 
 
-=item C<debug.traceback ([message])>
+=item C<debug.traceback ([message] [, level])>
 
 Returns a string with a traceback of the call stack. An optional C<message>
 string is appended at the beginning of the traceback. This function is
 typically used with C<xpcall> to produce better error messages.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE (see traceback in lua.pmc).
 
 =cut
 
-.sub '_debug_traceback' :anon
-    not_implemented()
+.sub 'traceback' :anon
+    .param pmc message :optional
+    .param pmc level :optional
+    .param pmc ret
+    $S1 = optstring(message, '')
+    $I2 = optint(level, 1)
+    new $P0, .Lua
+    $S0 = $P0.'traceback'($I2)
+    $S1 .= $S0
+    new ret, .LuaString
+    set ret, $S1
+    .return (ret)
 .end
 
 

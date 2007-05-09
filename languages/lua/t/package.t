@@ -95,7 +95,7 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function require (no module)' );
 require "no_module"
 CODE
-/module 'no_module' not found:\n/
+/^[^:]+: [^:]+:\d+: module 'no_module' not found:\n(\t.*\n)+stack traceback:\n/
 OUTPUT
 
 unlink('../foo.lua') if ( -f '../foo.lua' );
@@ -106,7 +106,7 @@ close $X;
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function require (syntax error)');
 require "foo"
 CODE
-/error loading module 'foo' from file '.*foo.lua':\n/
+/[^:]+: error loading module 'foo' from file '.*foo.lua':\n/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require & package.preload' );

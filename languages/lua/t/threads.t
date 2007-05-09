@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -26,14 +26,14 @@ language_output_like( 'lua', <<'CODE', <<'OUT', '- co' );
 co = coroutine.create(function () return 1 end)
 print(- co)
 CODE
-/attempt to perform arithmetic on/
+/^[^:]+: [^:]+:\d+: attempt to perform arithmetic on/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', '# co' );
 co = coroutine.create(function () return 1 end)
 print(# co)
 CODE
-/attempt to get length of/
+/^[^:]+: [^:]+:\d+: attempt to get length of/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'not co' );
@@ -47,49 +47,49 @@ language_output_like( 'lua', <<'CODE', <<'OUT', 'co + 10' );
 co = coroutine.create(function () return 1 end)
 print(co + 10)
 CODE
-/attempt to perform arithmetic on/
+/^[^:]+: [^:]+:\d+: attempt to perform arithmetic on/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'co - 2' );
 co = coroutine.create(function () return 1 end)
 print(co - 2)
 CODE
-/attempt to perform arithmetic on/
+/^[^:]+: [^:]+:\d+: attempt to perform arithmetic on/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'co * 3.14' );
 co = coroutine.create(function () return 1 end)
 print(co * 3.14)
 CODE
-/attempt to perform arithmetic on/
+/^[^:]+: [^:]+:\d+: attempt to perform arithmetic on/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'co / -7' );
 co = coroutine.create(function () return 1 end)
 print(co / -7)
 CODE
-/attempt to perform arithmetic on/
+/^[^:]+: [^:]+:\d+: attempt to perform arithmetic on/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'co % 4' );
 co = coroutine.create(function () return 1 end)
 print(co % 4)
 CODE
-/attempt to perform arithmetic on/
+/^[^:]+: [^:]+:\d+: attempt to perform arithmetic on/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'co ^ 3' );
 co = coroutine.create(function () return 1 end)
 print(co ^ 3)
 CODE
-/attempt to perform arithmetic on/
+/^[^:]+: [^:]+:\d+: attempt to perform arithmetic on/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'co .. "end"' );
 co = coroutine.create(function () return 1 end)
 print(co .. "end")
 CODE
-/attempt to concatenate/
+/^[^:]+: [^:]+:\d+: attempt to concatenate/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'co == co' );
@@ -126,7 +126,7 @@ co1 = coroutine.create(function () return 1 end)
 co2 = coroutine.create(function () return 2 end)
 print(co1 < co2)
 CODE
-/attempt to compare two thread values/
+/^[^:]+: [^:]+:\d+: attempt to compare two thread values\nstack traceback:\n/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'co1 <= co2' );
@@ -134,7 +134,7 @@ co1 = coroutine.create(function () return 1 end)
 co2 = coroutine.create(function () return 2 end)
 print(co1 <= co2)
 CODE
-/attempt to compare two thread values/
+/^[^:]+: [^:]+:\d+: attempt to compare two thread values\nstack traceback:\n/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'co1 > co2' );
@@ -142,7 +142,7 @@ co1 = coroutine.create(function () return 1 end)
 co2 = coroutine.create(function () return 2 end)
 print(co1 > co2)
 CODE
-/attempt to compare two thread values/
+/^[^:]+: [^:]+:\d+: attempt to compare two thread values\nstack traceback:\n/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'co1 >= co2' );
@@ -150,49 +150,49 @@ co1 = coroutine.create(function () return 1 end)
 co2 = coroutine.create(function () return 2 end)
 print(co1 >= co2)
 CODE
-/attempt to compare two thread values/
+/^[^:]+: [^:]+:\d+: attempt to compare two thread values\nstack traceback:\n/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'co < 0' );
 co = coroutine.create(function () return 1 end)
 print(co < 0)
 CODE
-/attempt to compare \w+ with \w+/
+/^[^:]+: [^:]+:\d+: attempt to compare \w+ with \w+\nstack traceback:\n/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'co <= 0' );
 co = coroutine.create(function () return 1 end)
 print(co <= 0)
 CODE
-/attempt to compare \w+ with \w+/
+/^[^:]+: [^:]+:\d+: attempt to compare \w+ with \w+\nstack traceback:\n/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'co > 0' );
 co = coroutine.create(function () return 1 end)
 print(co > 0)
 CODE
-/attempt to compare \w+ with \w+/
+/^[^:]+: [^:]+:\d+: attempt to compare \w+ with \w+\nstack traceback:\n/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'co >= 0' );
 co = coroutine.create(function () return 1 end)
 print(co >= 0)
 CODE
-/attempt to compare \w+ with \w+/
+/^[^:]+: [^:]+:\d+: attempt to compare \w+ with \w+\nstack traceback:\n/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'get_pmc_keyed' );
 a = coroutine.create(function () return 1 end)
 print(a[1])
 CODE
-/attempt to index/
+/^[^:]+: [^:]+:\d+: attempt to index/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'set_pmc_keyed' );
 a = coroutine.create(function () return 1 end)
 a[1] = 1
 CODE
-/attempt to index/
+/^[^:]+: [^:]+:\d+: attempt to index/
 OUT
 
 # Local Variables:

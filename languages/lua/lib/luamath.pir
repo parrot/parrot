@@ -42,7 +42,8 @@ I<l> and I<u>, C<math.random> returns a pseudo-random integer in the range
 I<[l,u]>. The C<math.randomseed> function sets a "seed" for the pseudo-random
 generator: Equal seeds produce equal sequences of numbers.
 
-See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
+See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions",
+L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 =cut
 
@@ -63,59 +64,59 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     set $P1, 'math'
     _lua__GLOBAL[$P1] = _math
 
-    _register($P1, _math)
+    lua_register($P1, _math)
 
-    .const .Sub _math_abs = '_math_abs'
+    .const .Sub _math_abs = 'abs'
     _math_abs.'setfenv'(_lua__GLOBAL)
     set $P1, 'abs'
     _math[$P1] = _math_abs
 
-    .const .Sub _math_acos = '_math_acos'
+    .const .Sub _math_acos = 'acos'
     _math_acos.'setfenv'(_lua__GLOBAL)
     set $P1, 'acos'
     _math[$P1] = _math_acos
 
-    .const .Sub _math_asin = '_math_asin'
+    .const .Sub _math_asin = 'asin'
     _math_asin.'setfenv'(_lua__GLOBAL)
     set $P1, 'asin'
     _math[$P1] = _math_asin
 
-    .const .Sub _math_atan = '_math_atan'
+    .const .Sub _math_atan = 'atan'
     _math_atan.'setfenv'(_lua__GLOBAL)
     set $P1, 'atan'
     _math[$P1] = _math_atan
 
-    .const .Sub _math_atan2 = '_math_atan2'
+    .const .Sub _math_atan2 = 'atan2'
     _math_atan2.'setfenv'(_lua__GLOBAL)
     set $P1, 'atan2'
     _math[$P1] = _math_atan2
 
-    .const .Sub _math_ceil = '_math_ceil'
+    .const .Sub _math_ceil = 'ceil'
     _math_ceil.'setfenv'(_lua__GLOBAL)
     set $P1, 'ceil'
     _math[$P1] = _math_ceil
 
-    .const .Sub _math_cos = '_math_cos'
+    .const .Sub _math_cos = 'cos'
     _math_cos.'setfenv'(_lua__GLOBAL)
     set $P1, 'cos'
     _math[$P1] = _math_cos
 
-    .const .Sub _math_deg = '_math_deg'
+    .const .Sub _math_deg = 'deg'
     _math_deg.'setfenv'(_lua__GLOBAL)
     set $P1, 'deg'
     _math[$P1] = _math_deg
 
-    .const .Sub _math_exp = '_math_exp'
+    .const .Sub _math_exp = 'exp'
     _math_exp.'setfenv'(_lua__GLOBAL)
     set $P1, 'exp'
     _math[$P1] = _math_exp
 
-    .const .Sub _math_floor = '_math_floor'
+    .const .Sub _math_floor = 'floor'
     _math_floor.'setfenv'(_lua__GLOBAL)
     set $P1, 'floor'
     _math[$P1] = _math_floor
 
-    .const .Sub _math_fmod = '_math_fmod'
+    .const .Sub _math_fmod = 'fmod'
     _math_fmod.'setfenv'(_lua__GLOBAL)
     set $P1, 'fmod'
     _math[$P1] = _math_fmod
@@ -124,72 +125,72 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
     set $P1, 'mod'
     _math[$P1] = _math_fmod
 
-    .const .Sub _math_frexp = '_math_frexp'
+    .const .Sub _math_frexp = 'frexp'
     _math_frexp.'setfenv'(_lua__GLOBAL)
     set $P1, 'frexp'
     _math[$P1] = _math_frexp
 
-    .const .Sub _math_ldexp = '_math_ldexp'
+    .const .Sub _math_ldexp = 'ldexp'
     _math_ldexp.'setfenv'(_lua__GLOBAL)
     set $P1, 'ldexp'
     _math[$P1] = _math_ldexp
 
-    .const .Sub _math_log = '_math_log'
+    .const .Sub _math_log = 'log'
     _math_log.'setfenv'(_lua__GLOBAL)
     set $P1, 'log'
     _math[$P1] = _math_log
 
-    .const .Sub _math_log10 = '_math_log10'
+    .const .Sub _math_log10 = 'log10'
     _math_log10.'setfenv'(_lua__GLOBAL)
     set $P1, 'log10'
     _math[$P1] = _math_log10
 
-    .const .Sub _math_max = '_math_max'
+    .const .Sub _math_max = 'max'
     _math_max.'setfenv'(_lua__GLOBAL)
     set $P1, 'max'
     _math[$P1] = _math_max
 
-    .const .Sub _math_min = '_math_min'
+    .const .Sub _math_min = 'min'
     _math_min.'setfenv'(_lua__GLOBAL)
     set $P1, 'min'
     _math[$P1] = _math_min
 
-    .const .Sub _math_modf = '_math_modf'
+    .const .Sub _math_modf = 'modf'
     _math_modf.'setfenv'(_lua__GLOBAL)
     set $P1, 'modf'
     _math[$P1] = _math_modf
 
-    .const .Sub _math_pow = '_math_pow'
+    .const .Sub _math_pow = 'pow'
     _math_pow.'setfenv'(_lua__GLOBAL)
     set $P1, 'pow'
     _math[$P1] = _math_pow
 
-    .const .Sub _math_rad = '_math_rad'
+    .const .Sub _math_rad = 'rad'
     _math_rad.'setfenv'(_lua__GLOBAL)
     set $P1, 'rad'
     _math[$P1] = _math_rad
 
-    .const .Sub _math_random = '_math_random'
+    .const .Sub _math_random = 'random'
     _math_random.'setfenv'(_lua__GLOBAL)
     set $P1, 'random'
     _math[$P1] = _math_random
 
-    .const .Sub _math_randomseed = '_math_randomseed'
+    .const .Sub _math_randomseed = 'randomseed'
     _math_randomseed.'setfenv'(_lua__GLOBAL)
     set $P1, 'randomseed'
     _math[$P1] = _math_randomseed
 
-    .const .Sub _math_sin = '_math_sin'
+    .const .Sub _math_sin = 'sin'
     _math_sin.'setfenv'(_lua__GLOBAL)
     set $P1, 'sin'
     _math[$P1] = _math_sin
 
-    .const .Sub _math_sqrt = '_math_sqrt'
+    .const .Sub _math_sqrt = 'sqrt'
     _math_sqrt.'setfenv'(_lua__GLOBAL)
     set $P1, 'sqrt'
     _math[$P1] = _math_sqrt
 
-    .const .Sub _math_tan = '_math_tan'
+    .const .Sub _math_tan = 'tan'
     _math_tan.'setfenv'(_lua__GLOBAL)
     set $P1, 'tan'
     _math[$P1] = _math_tan
@@ -210,266 +211,264 @@ See "Lua 5.1 Reference Manual", section 5.6 "Mathematical Functions".
 .end
 
 
-.sub '_math_abs' :anon
+.sub 'abs' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = abs $N0
+    $N1 = lua_checknumber(1, x)
+    $N0 = abs $N1
     new ret, .LuaNumber
-    set ret, $N1
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_acos' :anon
+.sub 'acos' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = acos $N0
+    $N1 = lua_checknumber(1, x)
+    $N0 = acos $N1
     new ret, .LuaNumber
-    set ret, $N1
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_asin' :anon
+.sub 'asin' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = asin $N0
+    $N1 = lua_checknumber(1, x)
+    $N0 = asin $N1
     new ret, .LuaNumber
-    set ret, $N1
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_atan' :anon
+.sub 'atan' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = atan $N0
+    $N1 = lua_checknumber(1, x)
+    $N0 = atan $N1
     new ret, .LuaNumber
-    set ret, $N1
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_atan2' :anon
+.sub 'atan2' :anon
     .param pmc y :optional
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(y)
-    $N1 = checknumber(x)
-    $N2 = atan $N0, $N1
+    $N1 = lua_checknumber(1, y)
+    $N2 = lua_checknumber(2, x)
+    $N0 = atan $N1, $N2
     new ret, .LuaNumber
-    set ret, $N2
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_ceil' :anon
+.sub 'ceil' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = ceil $N0
+    $N1 = lua_checknumber(1, x)
+    $N0 = ceil $N1
     new ret, .LuaNumber
-    set ret, $N1
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_cos' :anon
+.sub 'cos' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = cos $N0
+    $N1 = lua_checknumber(1, x)
+    $N0 = cos $N1
     new ret, .LuaNumber
-    set ret, $N1
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_deg' :anon
+.sub 'deg' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = 3.14159265358979323846 / 180.0
-    $N2 = $N0 / $N1
+    $N1 = lua_checknumber(1, x)
+    $N0 = 3.14159265358979323846 / 180.0
+    $N0 = $N1 / $N0
     new ret, .LuaNumber
-    set ret, $N2
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_exp' :anon
+.sub 'exp' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = exp $N0
+    $N1 = lua_checknumber(1, x)
+    $N0 = exp $N1
     new ret, .LuaNumber
-    set ret, $N1
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_floor' :anon
+.sub 'floor' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = floor $N0
+    $N1 = lua_checknumber(1, x)
+    $N0 = floor $N1
     new ret, .LuaNumber
-    set ret, $N1
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_fmod' :anon
+.sub 'fmod' :anon
     .param pmc x :optional
     .param pmc y :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = checknumber(y)
-    $N2 = cmod $N0, $N1
+    $N1 = lua_checknumber(1, x)
+    $N2 = lua_checknumber(1, y)
+    $N0 = cmod $N1, $N2
     new ret, .LuaNumber
-    set ret, $N2
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_frexp' :anon
+.sub 'frexp' :anon
     .param pmc x :optional
     .local pmc ret
-    checknumber(x)
+    lua_checknumber(1, x)
     new $P0, .Lua
     ret = $P0.'frexp'(x)
     .return (ret :flat)
 .end
 
 
-.sub '_math_ldexp' :anon
+.sub 'ldexp' :anon
     .param pmc x :optional
     .param pmc nexp :optional
     .local pmc ret
-    checknumber(x)
-    checknumber(nexp)
+    lua_checknumber(1, x)
+    lua_checknumber(2, nexp)
     new $P0, .Lua
     ret = $P0.'ldexp'(x, nexp)
     .return (ret)
 .end
 
 
-.sub '_math_log' :anon
+.sub 'log' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = ln $N0
+    $N1 = lua_checknumber(1, x)
+    $N0 = ln $N1
     new ret, .LuaNumber
-    set ret, $N1
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_log10' :anon
+.sub 'log10' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = log10 $N0
+    $N1 = lua_checknumber(1, x)
+    $N0 = log10 $N1
     new ret, .LuaNumber
-    set ret, $N1
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_max' :anon
+.sub 'max' :anon
     .param pmc argv :slurpy
     .local int argc
     .local int i
     .local pmc dmax
     argc = argv
-    unless argc == 0 goto L0
-    typerror("no value", 'number')
-L0:
-    $P0 = argv[0]
-    dmax = checknumber($P0)
-    i = 1
+    unless argc == 0 goto L1
+    lua_typerror(1, "no value", 'number')
 L1:
+    $P0 = argv[0]
+    i = 1
+    dmax = lua_checknumber(i, $P0)
+L2:
     if i >= argc goto L3
     $P0 = argv[i]
-    $P1 = checknumber($P0)
+    inc i
+    $P1 = lua_checknumber(i, $P0)
     if dmax > $P1 goto L2
     dmax = $P1
-L2:
-    inc i
-    goto L1
+    goto L2
 L3:
     $P0 = clone dmax
     .return ($P0)
 .end
 
 
-.sub '_math_min' :anon
+.sub 'min' :anon
     .param pmc argv :slurpy
     .local int argc
     .local int i
     .local pmc dmin
     argc = argv
-    unless argc == 0 goto L0
-    typerror("no value", 'number')
-L0:
-    $P0 = argv[0]
-    dmin = checknumber($P0)
-    i = 1
+    unless argc == 0 goto L1
+    lua_typerror(1, "no value", 'number')
 L1:
+    $P0 = argv[0]
+    i = 1
+    dmin = lua_checknumber(i, $P0)
+L2:
     if i >= argc goto L3
     $P0 = argv[i]
-    $P1 = checknumber($P0)
+    inc i
+    $P1 = lua_checknumber(i, $P0)
     if dmin < $P1 goto L2
     dmin = $P1
-L2:
-    inc i
-    goto L1
+    goto L2
 L3:
     $P0 = clone dmin
     .return ($P0)
 .end
 
 
-.sub '_math_modf' :anon
+.sub 'modf' :anon
     .param pmc x :optional
     .local pmc ret
-    checknumber(x)
+    lua_checknumber(1, x)
     new $P0, .Lua
-    ret = $P0."modf"(x)
+    ret = $P0.'modf'(x)
     .return (ret :flat)
 .end
 
 
-.sub '_math_pow' :anon
+.sub 'pow' :anon
     .param pmc x :optional
     .param pmc y :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = checknumber(y)
-    $N2 = pow $N0, $N1
+    $N1 = lua_checknumber(1, x)
+    $N2 = lua_checknumber(2, y)
+    $N0 = pow $N1, $N2
     new ret, .LuaNumber
-    set ret, $N2
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_rad' :anon
+.sub 'rad' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = 3.14159265358979323846 / 180.0
-    $N2 = $N0 * $N1
+    $N1 = lua_checknumber(1, x)
+    $N0 = 3.14159265358979323846 / 180.0
+    $N0 = $N1 * $N0
     new ret, .LuaNumber
-    set ret, $N2
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_random' :anon
+.sub 'random' :anon
     .param pmc arg1 :optional
     .param pmc arg2 :optional
     .param pmc extra :slurpy
@@ -484,7 +483,7 @@ L3:
     goto L2
 L1:
     unless null arg2 goto L3
-    u = checknumber(arg1)
+    u = lua_checknumber(1, arg1)
     unless 1 <= u goto L4
     mul $N0, u
     $I0 = floor $N0
@@ -493,8 +492,8 @@ L1:
     goto L2
 L3:
     if extra goto L5
-    l = checknumber(arg1)
-    u = checknumber(arg2)
+    l = lua_checknumber(1, arg1)
+    u = lua_checknumber(2, arg2)
     unless l <= u goto L4
     $I0 = u - l
     inc $I0
@@ -504,51 +503,51 @@ L3:
     set ret, $I0
     goto L2
 L4:
-    argerror("interval is empty")
+    lua_argerror(1, "interval is empty")
 L5:
-    error("wrong number of arguments")
+    lua_error("wrong number of arguments")
 L2:
     .return (ret)
 .end
 
 
-.sub '_math_randomseed' :anon
+.sub 'randomseed' :anon
     .param pmc seed :optional
-    $I0 = checknumber(seed)
+    $I1 = lua_checknumber(1, seed)
     new $P0, .Random
-    set $P0, $I0
+    set $P0, $I1
 .end
 
 
-.sub '_math_sin' :anon
+.sub 'sin' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = sin $N0
+    $N1 = lua_checknumber(1, x)
+    $N0 = sin $N1
     new ret, .LuaNumber
-    set ret, $N1
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_sqrt' :anon
+.sub 'sqrt' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = sqrt $N0
+    $N1 = lua_checknumber(1, x)
+    $N0 = sqrt $N1
     new ret, .LuaNumber
-    set ret, $N1
+    set ret, $N0
     .return (ret)
 .end
 
 
-.sub '_math_tan' :anon
+.sub 'tan' :anon
     .param pmc x :optional
     .local pmc ret
-    $N0 = checknumber(x)
-    $N1 = tan $N0
+    $N1 = lua_checknumber(1, x)
+    $N0 = tan $N1
     new ret, .LuaNumber
-    set ret, $N1
+    set ret, $N0
     .return (ret)
 .end
 

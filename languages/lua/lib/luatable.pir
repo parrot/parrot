@@ -14,7 +14,8 @@ Most functions in the table library assume that the table represents an
 array or a list. For these functions, when we talk about the "length" of a
 table we mean the result of the length operator.
 
-See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
+See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation",
+L<http://www.lua.org/manual/5.1/manual.html#5.5>.
 
 =head2 Functions
 
@@ -39,50 +40,50 @@ See "Lua 5.1 Reference Manual", section 5.5 "Table Manipulation".
     set $P1, 'table'
     _lua__GLOBAL[$P1] = _table
 
-    _register($P1, _table)
+    lua_register($P1, _table)
 
-    .const .Sub _table_concat = '_table_concat'
+    .const .Sub _table_concat = 'concat'
     _table_concat.'setfenv'(_lua__GLOBAL)
     set $P1, 'concat'
     _table[$P1] = _table_concat
 
-    .const .Sub _table_foreach = '_table_foreach'
+    .const .Sub _table_foreach = 'foreach'
     _table_foreach.'setfenv'(_lua__GLOBAL)
     set $P1, 'foreach'
     _table[$P1] = _table_foreach
 
-    .const .Sub _table_foreachi = '_table_foreachi'
+    .const .Sub _table_foreachi = 'foreachi'
     _table_foreachi.'setfenv'(_lua__GLOBAL)
     set $P1, 'foreachi'
     _table[$P1] = _table_foreachi
 
     # LUA_COMPAT_GETN
-    .const .Sub _table_getn = '_table_getn'
+    .const .Sub _table_getn = 'getn'
     _table_getn.'setfenv'(_lua__GLOBAL)
     set $P1, 'getn'
     _table[$P1] = _table_getn
 
-    .const .Sub _table_insert = '_table_insert'
+    .const .Sub _table_insert = 'insert'
     _table_insert.'setfenv'(_lua__GLOBAL)
     set $P1, 'insert'
     _table[$P1] = _table_insert
 
-    .const .Sub _table_maxn = '_table_maxn'
+    .const .Sub _table_maxn = 'maxn'
     _table_maxn.'setfenv'(_lua__GLOBAL)
     set $P1, 'maxn'
     _table[$P1] = _table_maxn
 
-    .const .Sub _table_remove = '_table_remove'
+    .const .Sub _table_remove = 'remove'
     _table_remove.'setfenv'(_lua__GLOBAL)
     set $P1, 'remove'
     _table[$P1] = _table_remove
 
-    .const .Sub _table_setn = '_table_setn'
+    .const .Sub _table_setn = 'setn'
     _table_setn.'setfenv'(_lua__GLOBAL)
     set $P1, 'setn'
     _table[$P1] = _table_setn
 
-    .const .Sub _table_sort = '_table_sort'
+    .const .Sub _table_sort = 'sort'
     _table_sort.'setfenv'(_lua__GLOBAL)
     set $P1, 'sort'
     _table[$P1] = _table_sort
@@ -100,7 +101,7 @@ Returns C<table[i]..sep..table[i+1] ... sep..table[j]>. The default value for
 
 =cut
 
-.sub '_table_concat' :anon
+.sub 'concat' :anon
     .param pmc table :optional
     .param pmc sep :optional
     .param pmc i :optional
@@ -109,11 +110,11 @@ Returns C<table[i]..sep..table[i+1] ... sep..table[j]>. The default value for
     .local pmc value
     .local string ret
     .local int last
-    $S2 = optstring(sep, '')
-    checktype(table, 'table')
-    $I3 = optint(i, 1)
+    $S2 = lua_optstring(2, sep, '')
+    lua_checktype(1, table, 'table')
+    $I3 = lua_optint(3, i, 1)
     $I0 = table.'len'()
-    last = optint(j, $I0)
+    last = lua_optint(4, j, $I0)
     ret = ''
     new idx, .LuaNumber
 L1:
@@ -124,7 +125,7 @@ L1:
     if $I0 goto L3
     $I0 = isa value, 'LuaNumber'
     if $I0 goto L3
-    argerror("table contains non-strings")
+    lua_argerror(1, "table contains non-strings")
 L3:
     $S0 = value
     concat ret, $S0
@@ -153,14 +154,14 @@ B<DEPRECATED>
 
 =cut
 
-.sub '_table_foreach' :anon
+.sub 'foreach' :anon
     .param pmc table :optional
     .param pmc f :optional
     .local pmc idx
     .local pmc value
     .local pmc ret
-    checktype(table, 'table')
-    checktype(f, 'function')
+    lua_checktype(1, table, 'table')
+    lua_checktype(2, f, 'function')
     new idx, .LuaNil
 L1:
     $P0 = table.'next'(idx)
@@ -188,7 +189,7 @@ B<DEPRECATED>
 
 =cut
 
-.sub '_table_foreachi' :anon
+.sub 'foreachi' :anon
     .param pmc table :optional
     .param pmc f :optional
     .local pmc idx
@@ -196,8 +197,8 @@ B<DEPRECATED>
     .local pmc ret
     .local int i
     .local int n
-    checktype(table, 'table')
-    checktype(f, 'function')
+    lua_checktype(1, table, 'table')
+    lua_checktype(2, f, 'function')
     n = table.'len'()
     i = 0
     new idx, .LuaNumber
@@ -223,10 +224,10 @@ B<DEPRECATED>
 
 =cut
 
-.sub '_table_getn' :anon
+.sub 'getn' :anon
     .param pmc table :optional
     .local pmc ret
-    checktype(table, 'table')
+    lua_checktype(1, table, 'table')
     ret = table.'len'()
     .return (ret)
 .end
@@ -241,7 +242,7 @@ inserts C<x> at the end of table C<t>.
 
 =cut
 
-.sub '_table_insert' :anon
+.sub 'insert' :anon
     .param pmc table :optional
     .param pmc arg2 :optional
     .param pmc arg3 :optional
@@ -250,7 +251,7 @@ inserts C<x> at the end of table C<t>.
     .local int e
     .local int pos
     new idx, .LuaNumber
-    checktype(table, 'table')
+    lua_checktype(1, table, 'table')
     e = table.'len'()
     inc e
     unless null arg3 goto L1
@@ -258,7 +259,7 @@ inserts C<x> at the end of table C<t>.
     value = arg2
     goto L2
 L1:
-    pos = checknumber(arg2)
+    pos = lua_checknumber(2, arg2)
     unless pos > e goto L3
     e = pos
 L3:
@@ -285,11 +286,11 @@ does a linear traversal of the whole table.)
 
 =cut
 
-.sub '_table_maxn' :anon
+.sub 'maxn' :anon
     .param pmc table :optional
     .local pmc idx
     .local pmc max
-    checktype(table, 'table')
+    lua_checktype(1, table, 'table')
     new max, .LuaNumber
     set max, 0
     new idx, .LuaNil
@@ -317,16 +318,16 @@ table C<t>.
 
 =cut
 
-.sub '_table_remove' :anon
+.sub 'remove' :anon
     .param pmc table :optional
     .param pmc pos :optional
     .local pmc idx
     .local pmc ret
     .local int e
     .local int ipos
-    checktype(table, 'table')
+    lua_checktype(1, table, 'table')
     e = table.'len'()
-    ipos = optint(pos, e)
+    ipos = lua_optint(2, pos, e)
     unless e <= 0 goto L1
     # table is `empty'
     new ret, .LuaNil
@@ -357,11 +358,11 @@ B<OBSOLETE>
 
 =cut
 
-.sub '_table_setn' :anon
+.sub 'setn' :anon
     .param pmc table :optional
     .param pmc n :optional
-    checktype(table, 'table')
-    error("'setn' is obsolete")
+    lua_checktype(1, table, 'table')
+    lua_error("'setn' is obsolete")
 .end
 
 
@@ -379,16 +380,16 @@ the given order may have their relative positions changed by the sort.
 
 =cut
 
-.sub '_table_sort' :anon
+.sub 'sort' :anon
     .param pmc table :optional
     .param pmc comp :optional
     .local int n
-    checktype(table, 'table')
+    lua_checktype(1, table, 'table')
     n = table.'len'()
     if null comp goto L1
     $I0 = isa comp, 'LuaNil'
     if $I0 goto L1
-    checktype(comp, 'function')
+    lua_checktype(2, comp, 'function')
 L1:
     auxsort(table, comp, 1, n)
 .end
@@ -459,7 +460,7 @@ L6: # invariant: a[l..i] <= P <= a[j..u]
     $I0 = sort_comp(comp, $P2, $P1)
     unless $I0 goto L7
     unless i > u goto L6
-    error("invalid order function for sorting")
+    lua_error("invalid order function for sorting")
     goto L6
 L7:
     # repeat --j until a[j] <= P
@@ -469,7 +470,7 @@ L7:
     $I0 = sort_comp(comp, $P1, $P3)
     unless $I0 goto L8
     unless j < l goto L7
-    error("invalid order function for sorting")
+    lua_error("invalid order function for sorting")
     goto L7
 L8:
     if j < i goto L9
@@ -505,7 +506,7 @@ L11:
 L2:
 .end
 
-.sub sort_comp
+.sub 'sort_comp' :anon
     .param pmc comp
     .param pmc a
     .param pmc b

@@ -49,6 +49,7 @@ LIB_PBCS = \
  $(LIBPATH)/luatable.pbc \
  $(LIBPATH)/luamath.pbc \
  $(LIBPATH)/luaio.pbc \
+ $(LIBPATH)/luafile.pbc \
  $(LIBPATH)/luaos.pbc \
  $(LIBPATH)/luadebug.pbc \
  $(LIBPATH)/alarm.pbc \
@@ -126,6 +127,9 @@ $(LIBPATH)/luamath.pbc: $(LIBPATH)/luamath.pir
 
 $(LIBPATH)/luaio.pbc: $(LIBPATH)/luaio.pir
 	$(PARROT) --output=$(LIBPATH)/luaio.pbc $(LIBPATH)/luaio.pir
+
+$(LIBPATH)/luafile.pbc: $(LIBPATH)/luafile.pir
+	$(PARROT) --output=$(LIBPATH)/luafile.pbc $(LIBPATH)/luafile.pir
 
 $(LIBPATH)/luaos.pbc: $(LIBPATH)/luaos.pir
 	$(PARROT) --output=$(LIBPATH)/luaos.pbc $(LIBPATH)/luaos.pir

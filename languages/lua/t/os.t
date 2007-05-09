@@ -48,7 +48,7 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.date' );
 print(os.date("%H:%M:%S"))
 CODE
-/\d\d:\d\d:\d\d/
+/^\d\d:\d\d:\d\d/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.difftime' );
@@ -147,19 +147,19 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time' );
 print(os.time())
 CODE
-/\d+/
+/^\d+/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time' );
 print(os.time(nil))
 CODE
-/\d+/
+/^\d+/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time (missing field)' );
 print(os.time({}))
 CODE
-/field 'day' missing in date table/
+/^[^:]+: [^:]+:\d+: field 'day' missing in date table\nstack traceback:\n/
 OUTPUT
 
 # Local Variables:

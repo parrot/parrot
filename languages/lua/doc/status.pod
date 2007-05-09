@@ -161,7 +161,7 @@ Lua 5.1 defines the following standard libraries:
 
 =item * mathematical functions F<languages/lua/lib/luamath.pir>
 
-=item * input and output F<languages/lua/lib/luaio.pir>
+=item * input and output F<languages/lua/lib/luaio.pir>, F<languages/lua/lib/luafile.pir>
 
 =item * operating system facilities F<languages/lua/lib/luaos.pir>
 

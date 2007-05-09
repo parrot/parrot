@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -128,7 +128,7 @@ for i = first(), limit(), step() do
     print(i)
 end
 CODE
-/for' limit must be a number/
+/^[^:]+: [^:]+:\d+: 'for' limit must be a number\nstack traceback:\n/
 OUT
 
 # Local Variables:

@@ -20,7 +20,8 @@ the metatable itself. Therefore, you can use the string functions in
 object-oriented style. For instance, C<string.byte(s, i)> can be written as
 C<s:byte(i)>.
 
-See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
+See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation",
+L<http://www.lua.org/manual/5.1/manual.html#5.4>.
 
 =head2 Functions
 
@@ -45,34 +46,34 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
     set $P1, 'string'
     _lua__GLOBAL[$P1] = _string
 
-    _register($P1, _string)
+    lua_register($P1, _string)
 
-    .const .Sub _string_byte = '_string_byte'
+    .const .Sub _string_byte = 'byte'
     _string_byte.'setfenv'(_lua__GLOBAL)
     set $P1, 'byte'
     _string[$P1] = _string_byte
 
-    .const .Sub _string_char = '_string_char'
+    .const .Sub _string_char = 'char'
     _string_char.'setfenv'(_lua__GLOBAL)
     set $P1, 'char'
     _string[$P1] = _string_char
 
-    .const .Sub _string_dump = '_string_dump'
+    .const .Sub _string_dump = 'dump'
     _string_dump.'setfenv'(_lua__GLOBAL)
     set $P1, 'dump'
     _string[$P1] = _string_dump
 
-    .const .Sub _string_find = '_string_find'
+    .const .Sub _string_find = 'find'
     _string_find.'setfenv'(_lua__GLOBAL)
     set $P1, 'find'
     _string[$P1] = _string_find
 
-    .const .Sub _string_format = '_string_format'
+    .const .Sub _string_format = 'format'
     _string_format.'setfenv'(_lua__GLOBAL)
     set $P1, 'format'
     _string[$P1] = _string_format
 
-    .const .Sub _string_gmatch = '_string_gmatch'
+    .const .Sub _string_gmatch = 'gmatch'
     _string_gmatch.'setfenv'(_lua__GLOBAL)
     set $P1, 'gmatch'
     _string[$P1] = _string_gmatch
@@ -81,42 +82,42 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
     set $P1, 'gfind'
     _string[$P1] = _string_gmatch
 
-    .const .Sub _string_gsub = '_string_gsub'
+    .const .Sub _string_gsub = 'gsub'
     _string_gsub.'setfenv'(_lua__GLOBAL)
     set $P1, 'gsub'
     _string[$P1] = _string_gsub
 
-    .const .Sub _string_len = '_string_len'
+    .const .Sub _string_len = 'len'
     _string_len.'setfenv'(_lua__GLOBAL)
     set $P1, 'len'
     _string[$P1] = _string_len
 
-    .const .Sub _string_lower = '_string_lower'
+    .const .Sub _string_lower = 'lower'
     _string_lower.'setfenv'(_lua__GLOBAL)
     set $P1, 'lower'
     _string[$P1] = _string_lower
 
-    .const .Sub _string_match = '_string_match'
+    .const .Sub _string_match = 'match'
     _string_match.'setfenv'(_lua__GLOBAL)
     set $P1, 'match'
     _string[$P1] = _string_match
 
-    .const .Sub _string_rep = '_string_rep'
+    .const .Sub _string_rep = 'rep'
     _string_rep.'setfenv'(_lua__GLOBAL)
     set $P1, 'rep'
     _string[$P1] = _string_rep
 
-    .const .Sub _string_reverse = '_string_reverse'
+    .const .Sub _string_reverse = 'reverse'
     _string_reverse.'setfenv'(_lua__GLOBAL)
     set $P1, 'reverse'
     _string[$P1] = _string_reverse
 
-    .const .Sub _string_sub = '_string_sub'
+    .const .Sub _string_sub = 'sub'
     _string_sub.'setfenv'(_lua__GLOBAL)
     set $P1, 'sub'
     _string[$P1] = _string_sub
 
-    .const .Sub _string_upper = '_string_upper'
+    .const .Sub _string_upper = 'upper'
     _string_upper.'setfenv'(_lua__GLOBAL)
     set $P1, 'upper'
     _string[$P1] = _string_upper
@@ -137,10 +138,10 @@ See "Lua 5.1 Reference Manual", section 5.4 "String Manipulation".
 .sub 'posrelat' :anon
     .param int pos
     .param int len
-    if pos >= 0 goto L0
+    if pos >= 0 goto L1
     pos = len + pos
     inc pos
-L0:
+L1:
     .return (pos)
 .end
 
@@ -154,28 +155,28 @@ Note that numerical codes are not necessarily portable across platforms.
 
 =cut
 
-.sub '_string_byte' :anon
+.sub 'byte' :anon
     .param pmc s :optional
     .param pmc i :optional
     .param pmc j :optional
-    $S0 = checkstring(s)
+    $S1 = lua_checkstring(1, s)
     .local int l
-    l = length $S0
+    l = length $S1
     .local int posi
-    posi = optint(i, 1)
+    posi = lua_optint(2, i, 1)
     posi = posrelat(posi, l)
     .local int pose
-    pose = optint(j, posi)
+    pose = lua_optint(3, j, posi)
     pose = posrelat(pose, l)
-    unless posi <= 0 goto L0
+    unless posi <= 0 goto L1
     posi = 1
-L0:
-    unless pose > l goto L1
-    pose = l
 L1:
-    unless posi > pose goto L2
-    .return ()
+    unless pose > l goto L2
+    pose = l
 L2:
+    unless posi > pose goto L3
+    .return ()
+L3:
     .local int n
     n = pose - posi
     inc n
@@ -184,17 +185,17 @@ L2:
     set ret, n
     .local int i
     i = 0
-L3:
-    unless i < n goto L4
+L4:
+    unless i < n goto L5
     $I0 = posi + i
     dec $I0
-    $I1 = ord $S0, $I0
+    $I1 = ord $S1, $I0
     new $P0, .LuaNumber
     set $P0, $I1
     ret[i] = $P0
     inc i
-    goto L3
-L4:
+    goto L4
+L5:
     .return (ret :flat)
 .end
 
@@ -209,7 +210,7 @@ Note that numerical codes are not necessarily portable across platforms.
 
 =cut
 
-.sub '_string_char' :anon
+.sub 'char' :anon
     .param pmc argv :slurpy
     .local pmc ret
     .local int argc
@@ -224,10 +225,10 @@ Note that numerical codes are not necessarily portable across platforms.
 L1:
     if i >= argc goto L2
     curr = argv[i]
-    c = checknumber(curr)
+    inc i
+    c = lua_checknumber(i, curr)
     s = chr c
     b = concat b, s
-    inc i
     goto L1
 L2:
     new ret, .LuaString
@@ -246,9 +247,9 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_string_dump' :anon
+.sub 'dump' :anon
     .param pmc function :optional
-    checktype(function, 'function')
+    lua_checktype(1, function, 'function')
     not_implemented()
 .end
 
@@ -269,7 +270,7 @@ are also returned, after the two indices.
 
 =cut
 
-.sub '_string_find' :anon
+.sub 'find' :anon
     .param pmc argv :slurpy
     .return str_find_aux(1, argv :flat)
 .end
@@ -280,11 +281,11 @@ are also returned, after the two indices.
     .param pmc pattern :optional
     .param pmc init :optional
     .param pmc plain :optional
-    $S1 = checkstring(s)
+    $S1 = lua_checkstring(1, s)
     $I1 = length $S1
-    $S2 = checkstring(pattern)
+    $S2 = lua_checkstring(2, pattern)
     $I2 = length $S2
-    $I3 = optint(init, 1)
+    $I3 = lua_optint(3, init, 1)
     $I3 = posrelat($I3, $I1)
     dec $I3
     unless $I3 < 0 goto L1
@@ -434,14 +435,15 @@ This function does not accept string values containing embedded zeros.
 
 =cut
 
-.sub '_string_format' :anon
+.sub 'format' :anon
     .param pmc formatstring :optional
     .param pmc argv :slurpy
     .local string strfrmt
     .local string b
     .local int arg
     .local int idx
-    strfrmt = checkstring(formatstring)
+    .local int narg
+    strfrmt = lua_checkstring(1, formatstring)
     $I1 = length strfrmt
     b = ''
     arg = 0
@@ -469,32 +471,37 @@ L4:
     (idx, form) = scanformat(strfrmt, idx)
     $S0 = substr strfrmt, idx, 1
     unless $S0 == 'c' goto L5
-    $I0 = checknumber($P0)
+    narg = arg + 1
+    $I0 = lua_checknumber(narg, $P0)
     $P1[0] = $I0
     buff = sprintf form, $P1
     goto L6
 L5:
     $I0 = index 'diouxX', $S0
     unless $I0 >= 0 goto L7
-    $I0 = checknumber($P0)
+    narg = arg + 1
+    $I0 = lua_checknumber(narg, $P0)
     $P1[0] = $I0
     buff = sprintf form, $P1
     goto L6
 L7:
     $I0 = index 'eEfgG', $S0
     unless $I0 >= 0 goto L8
-    $N0 = checknumber($P0)
+    narg = arg + 1
+    $N0 = lua_checknumber(narg, $P0)
     $P1[0] = $N0
     buff = sprintf form, $P1
     goto L6
 L8:
     unless $S0 == 'q' goto L9
-    $S0 = checkstring($P0)
+    narg = arg + 1
+    $S0 = lua_checkstring(narg, $P0)
     buff = quoted($S0)
     goto L6
 L9:
     unless $S0 == 's' goto L10
-    buff = checkstring($P0)
+    narg = arg + 1
+    buff = lua_checkstring(narg, $P0)
     $I0 = index form, '.'
     if $I0 >= 0 goto L11
     $I0 = length $S0
@@ -507,7 +514,7 @@ L11:
 L10:
     $S1 = "invalid option '%" . $S0
     $S1 .= "' to 'format'"
-    error($S1)
+    lua_error($S1)
 L6:
     b .= buff
     inc idx
@@ -538,7 +545,7 @@ L1:
 L2:
     $I0 = idx - start
     unless $I0 > 5 goto L3
-    error("invalid format (repeated flags)")
+    lua_error("invalid format (repeated flags)")
 L3:
     $S0 = substr strfrmt, idx, 1
     $I0 = index digits, $S0
@@ -565,7 +572,7 @@ L6:
     $S0 = substr strfrmt, idx, 1
     $I0 = index digits, $S0
     unless $I0 >= 0 goto L8
-    error("invalid format (width or precision too long)")
+    lua_error("invalid format (width or precision too long)")
 L8:
     .local string form
     $I0 = idx - start
@@ -634,12 +641,12 @@ table:
 
 =cut
 
-.sub '_string_gmatch' :anon :lex
+.sub 'gmatch' :anon :lex
     .param pmc s :optional
     .param pmc pattern :optional
     .local pmc ret
-    checkstring(s)
-    $S2 = checkstring(pattern)
+    lua_checkstring(1, s)
+    $S2 = lua_checkstring(2, pattern)
     .local pmc regex_comp
     regex_comp = compreg 'PGE::LuaRegex'
     .local pmc rulesub
@@ -652,7 +659,7 @@ table:
     .return (ret)
 .end
 
-.sub 'gmatch_aux' :anon :lex :outer(_string_gmatch)
+.sub 'gmatch_aux' :anon :lex :outer(gmatch)
     .local pmc s
     .local pmc rulesub
     .local pmc match
@@ -696,17 +703,17 @@ is replaced.
 
 =cut
 
-.sub '_string_gsub' :anon
+.sub 'gsub' :anon
     .param pmc s :optional
     .param pmc pat :optional
     .param pmc repl :optional
     .param pmc max :optional
     .local string src
-    src = checkstring(s)
+    src = lua_checkstring(1, s)
     $I1 = length src
-    $S2 = checkstring(pat)
+    $S2 = lua_checkstring(2, pat)
     $I0 = $I1 + 1
-    $I4 = optint(max, $I0)
+    $I4 = lua_optint(4, max, $I0)
     .local int anchor
     anchor = 0
     $S0 = substr $S2, 0, 1
@@ -771,7 +778,7 @@ L4:
     $P1 = repl[$P0]
     goto L5
 L6:
-    error("string/function/table expected")
+    lua_argerror(3, "string/function/table expected")
 L5:
     if $P1 goto L7  # nil or false?
     # keep original text
@@ -790,7 +797,7 @@ L7:
     $S1 = typeof $P1
     $S0 .= $S1
     $S0 .= ")"
-    error($S0)
+    lua_error($S0)
 L8:
     $S1 = b
     $I0 = match.'from'()
@@ -860,7 +867,7 @@ L3:
     set $P0, $S0
     .return ($P0)
 L1:
-    error("invalid capture index")
+    lua_error("invalid capture index")
 .end
 
 =item C<string.len (s)>
@@ -870,11 +877,11 @@ Embedded zeros are counted, so C<"a\000b\000c"> has length 5.
 
 =cut
 
-.sub '_string_len' :anon
+.sub 'len' :anon
     .param pmc s :optional
     .local pmc ret
-    $S0 = checkstring(s)
-    $I0 = length $S0
+    $S1 = lua_checkstring(1, s)
+    $I0 = length $S1
     new ret, .LuaNumber
     set ret, $I0
     .return (ret)
@@ -889,13 +896,13 @@ of what is an uppercase letter depends on the current locale.
 
 =cut
 
-.sub '_string_lower' :anon
+.sub 'lower' :anon
     .param pmc s :optional
     .local pmc ret
-    $S0 = checkstring(s)
-    downcase $S0
+    $S1 = lua_checkstring(1, s)
+    downcase $S1
     new ret, .LuaString
-    set ret, $S0
+    set ret, $S1
     .return (ret)
 .end
 
@@ -910,7 +917,7 @@ start the search; its default value is 1 and may be negative.
 
 =cut
 
-.sub '_string_match' :anon
+.sub 'match' :anon
     .param pmc argv :slurpy
     .return str_find_aux(0, argv :flat)
 .end
@@ -922,18 +929,18 @@ Returns a string that is the concatenation of C<n> copies of the string C<s>.
 
 =cut
 
-.sub '_string_rep' :anon
+.sub 'rep' :anon
     .param pmc s :optional
     .param pmc n
     .local pmc ret
-    $S0 = checkstring(s)
-    $I0 = checknumber(n)
-    if $I0 >= 0 goto L0
-    $I0 = 0
-L0:
-    $S1 = repeat $S0, $I0
+    $S1 = lua_checkstring(1, s)
+    $I2 = lua_checknumber(2, n)
+    if $I2 >= 0 goto L1
+    $I2 = 0
+L1:
+    $S0 = repeat $S1, $I2
     new ret, .LuaString
-    set ret, $S1
+    set ret, $S0
     .return (ret)
 .end
 
@@ -944,14 +951,14 @@ Returns a string that is the string C<s> reversed.
 
 =cut
 
-.sub '_string_reverse' :anon
+.sub 'reverse' :anon
     .param pmc s :optional
     .local pmc ret
-    $S0 = checkstring(s)
+    $S1 = lua_checkstring(1, s)
     $I0 = 0
-    $I1 = length $S0
+    $I1 = length $S1
     dec $I1
-    $P0 = split '', $S0
+    $P0 = split '', $S1
 L1:
     unless $I0 < $I1 goto L2
     $S2 = $P0[$I0]
@@ -962,9 +969,9 @@ L1:
     dec $I1
     goto L1
 L2:
-    $S1 = join '', $P0
+    $S0 = join '', $P0
     new ret, .LuaString
-    set ret, $S1
+    set ret, $S0
     .return (ret)
 .end
 
@@ -979,33 +986,33 @@ C<string.sub(s, -i)> returns a suffix of C<s> with length C<i>.
 
 =cut
 
-.sub '_string_sub' :anon
+.sub 'sub' :anon
     .param pmc s :optional
     .param pmc i :optional
     .param pmc j :optional
     .local pmc ret
-    $S0 = checkstring(s)
-    $I0 = length $S0
-    $I1 = checknumber(i)
-    $I1 = posrelat($I1, $I0)
-    $I2 = optint(j, -1)
-    $I2 = posrelat($I2, $I0)
-    unless $I1 < 1 goto L0
-    $I1 = 1
-L0:
-    unless $I2 > $I0 goto L1
-    $I2 = $I0
+    $S1 = lua_checkstring(1, s)
+    $I1 = length $S1
+    $I2 = lua_checknumber(2, i)
+    $I2 = posrelat($I2, $I1)
+    $I3 = lua_optint(2, j, -1)
+    $I3 = posrelat($I3, $I1)
+    unless $I2 < 1 goto L1
+    $I2 = 1
 L1:
-    unless $I1 <= $I2 goto L2
-    dec $I1
-    $I2 -= $I1
-    $S1 = substr $S0, $I1, $I2
-    goto L3
+    unless $I3 > $I1 goto L2
+    $I3 = $I1
 L2:
-    $S1 = ''
+    unless $I2 <= $I3 goto L3
+    dec $I2
+    $I3 -= $I2
+    $S0 = substr $S1, $I2, $I3
+    goto L4
 L3:
+    $S0 = ''
+L4:
     new ret, .LuaString
-    set ret, $S1
+    set ret, $S0
     .return (ret)
 .end
 
@@ -1018,13 +1025,13 @@ of what is a lowercase letter depends on the current locale.
 
 =cut
 
-.sub '_string_upper' :anon
+.sub 'upper' :anon
     .param pmc s :optional
     .local pmc ret
-    $S0 = checkstring(s)
-    upcase $S0
+    $S1 = lua_checkstring(1, s)
+    upcase $S1
     new ret, .LuaString
-    set ret, $S0
+    set ret, $S1
     .return (ret)
 .end
 

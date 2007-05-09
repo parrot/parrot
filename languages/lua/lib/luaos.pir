@@ -9,7 +9,8 @@ lib/luaos.pir - Lua Operating System Library
 
 This library is implemented through table C<os>.
 
-See "Lua 5.1 Reference Manual", section 5.8 "Operating System Facilities".
+See "Lua 5.1 Reference Manual", section 5.8 "Operating System Facilities",
+L<http://www.lua.org/manual/5.1/manual.html#5.8>.
 
 =head2 Functions
 
@@ -34,59 +35,59 @@ See "Lua 5.1 Reference Manual", section 5.8 "Operating System Facilities".
     set $P1, 'os'
     _lua__GLOBAL[$P1] = _os
 
-    _register($P1, _os)
+    lua_register($P1, _os)
 
-    .const .Sub _os_clock = '_os_clock'
+    .const .Sub _os_clock = 'clock'
     _os_clock.'setfenv'(_lua__GLOBAL)
     set $P1, 'clock'
     _os[$P1] = _os_clock
 
-    .const .Sub _os_date = '_os_date'
+    .const .Sub _os_date = 'date'
     _os_date.'setfenv'(_lua__GLOBAL)
     set $P1, 'date'
     _os[$P1] = _os_date
 
-    .const .Sub _os_difftime = '_os_difftime'
+    .const .Sub _os_difftime = 'difftime'
     _os_difftime.'setfenv'(_lua__GLOBAL)
     set $P1, 'difftime'
     _os[$P1] = _os_difftime
 
-    .const .Sub _os_execute = '_os_execute'
+    .const .Sub _os_execute = 'execute'
     _os_execute.'setfenv'(_lua__GLOBAL)
     set $P1, 'execute'
     _os[$P1] = _os_execute
 
-    .const .Sub _os_exit = '_os_exit'
+    .const .Sub _os_exit = 'exit'
     _os_exit.'setfenv'(_lua__GLOBAL)
     set $P1, 'exit'
     _os[$P1] = _os_exit
 
-    .const .Sub _os_getenv = '_os_getenv'
+    .const .Sub _os_getenv = 'getenv'
     _os_getenv.'setfenv'(_lua__GLOBAL)
     set $P1, 'getenv'
     _os[$P1] = _os_getenv
 
-    .const .Sub _os_remove = '_os_remove'
+    .const .Sub _os_remove = 'remove'
     _os_remove.'setfenv'(_lua__GLOBAL)
     set $P1, 'remove'
     _os[$P1] = _os_remove
 
-    .const .Sub _os_rename = '_os_rename'
+    .const .Sub _os_rename = 'rename'
     _os_rename.'setfenv'(_lua__GLOBAL)
     set $P1, 'rename'
     _os[$P1] = _os_rename
 
-    .const .Sub _os_setlocale = '_os_setlocale'
+    .const .Sub _os_setlocale = 'setlocale'
     _os_setlocale.'setfenv'(_lua__GLOBAL)
     set $P1, 'setlocale'
     _os[$P1] = _os_setlocale
 
-    .const .Sub _os_time = '_os_time'
+    .const .Sub _os_time = 'time'
     _os_time.'setfenv'(_lua__GLOBAL)
     set $P1, 'time'
     _os[$P1] = _os_time
 
-    .const .Sub _os_tmpname = '_os_tmpname'
+    .const .Sub _os_tmpname = 'tmpname'
     _os_tmpname.'setfenv'(_lua__GLOBAL)
     set $P1, 'tmpname'
     _os[$P1] = _os_tmpname
@@ -103,7 +104,7 @@ NOT YET IMPLEMENTED (no clock).
 
 =cut
 
-.sub '_os_clock' :anon
+.sub 'clock' :anon
     .local pmc ret
     new ret, .LuaNumber
     not_implemented()
@@ -137,14 +138,14 @@ representation that depends on the host system and on the current locale
 
 .include 'tm.pasm'
 
-.sub '_os_date' :anon
+.sub 'date' :anon
     .param pmc format :optional
     .param pmc time_ :optional
     .local pmc ret
     .local int t
-    $S1 = optstring(format, '%c')
+    $S1 = lua_optstring(1, format, '%c')
     $I0 = time
-    t = optint(time_, $I0)
+    t = lua_optint(2, time_, $I0)
     $S0 = substr $S1, 0, 1
     unless $S0 == '!' goto L1
     $P0 = decodetime t
@@ -235,12 +236,12 @@ Windows, and some other systems, this value is exactly C<t2-t1>.
 
 =cut
 
-.sub '_os_difftime' :anon
+.sub 'difftime' :anon
     .param pmc t2 :optional
     .param pmc t1 :optional
     .local pmc ret
-    $I2 = checknumber(t2)
-    $I1 = optint(t1, 0)
+    $I2 = lua_checknumber(1, t2)
+    $I1 = lua_optint(2, t1, 0)
     $I0 = $I2 - $I1
     new ret, .LuaNumber
     set ret, $I0
@@ -261,10 +262,10 @@ shell is available and zero otherwise.
 
 =cut
 
-.sub '_os_execute' :anon
+.sub 'execute' :anon
     .param pmc command :optional
     .local pmc ret
-    $S1 = optstring(command, '')
+    $S1 = lua_optstring(1, command, '')
     unless $S1 == '' goto L1
     $I0 = 1
     goto L2
@@ -285,9 +286,9 @@ program. The default value for C<code> is the success code.
 
 =cut
 
-.sub '_os_exit' :anon
+.sub 'exit' :anon
     .param pmc code :optional
-    $I1 = optint(code, 0)
+    $I1 = lua_optint(1, code, 0)
     exit $I1
 .end
 
@@ -299,16 +300,16 @@ if the variable is not defined.
 
 =cut
 
-.sub '_os_getenv' :anon
+.sub 'getenv' :anon
     .param pmc varname :optional
     .local pmc ret
-    $S1 = checkstring(varname)
+    $S1 = lua_checkstring(1, varname)
     new $P0, .Env
     $S0 = $P0[$S1]
-    if $S0 goto L0
+    if $S0 goto L1
     new ret, .LuaNil
     .return (ret)
-L0:
+L1:
     new ret, .LuaString
     set ret, $S0
     .return (ret)
@@ -323,10 +324,10 @@ describing the error.
 
 =cut
 
-.sub '_os_remove' :anon
+.sub 'remove' :anon
     .param pmc filename :optional
     .local pmc ret
-    $S1 = checkstring(filename)
+    $S1 = lua_checkstring(1, filename)
     $S0 = $S1
     new $P0, .OS
     push_eh _handler
@@ -356,13 +357,13 @@ fails, it returns B<nil>, plus a string describing the error.
 
 =cut
 
-.sub '_os_rename' :anon
+.sub 'rename' :anon
     .param pmc oldname :optional
     .param pmc newname :optional
     .local pmc ret
-    $S1 = checkstring(oldname)
+    $S1 = lua_checkstring(1, oldname)
     $S0 = $S1
-    $S2 = checkstring(newname)
+    $S2 = lua_checkstring(2, newname)
     new $P0, .OS
     push_eh _handler
     $P0.'rename'($S1, $S2)
@@ -396,12 +397,12 @@ NOT YET IMPLEMENTED (no setlocale).
 
 =cut
 
-.sub '_os_setlocale' :anon
+.sub 'setlocale' :anon
     .param pmc locale :optional
     .param pmc category :optional
-    $S1 = optstring(locale, '')
-    $S2 = optstring(category, 'all')
-    $I2 = checkoption($S2, 'all collate ctype monetary numeric time')
+    $S1 = lua_optstring(1, locale, '')
+    $S2 = lua_optstring(2, category, 'all')
+    $I2 = lua_checkoption(2, $S2, 'all collate ctype monetary numeric time')
     not_implemented()
 .end
 
@@ -423,19 +424,19 @@ STILL INCOMPLETE (no mktime).
 
 =cut
 
-.sub '_os_time' :anon
+.sub 'time' :anon
     .param pmc table :optional
     .local pmc ret
-    if null table goto L0
+    if null table goto L1
     $I0 = isa table, 'LuaNil'
-    unless $I0 goto L1
-L0:
+    unless $I0 goto L2
+L1:
     $I0 = time
     new ret, .LuaNumber
     set ret, $I0
     .return (ret)
-L1:
-    checktype(table, 'table')
+L2:
+    lua_checktype(1, table, 'table')
     $I1 = getfield(table, 'sec', 0)
     $I2 = getfield(table, 'min', 0)
     $I3 = getfield(table, 'hour', 12)
@@ -466,7 +467,7 @@ L1:
     $S0 = "field '"
     $S0 .= key
     $S0 .= "' missing in date table"
-    error($S0)
+    lua_error($S0)
 L3:
     ret = d
 L2:
@@ -501,7 +502,7 @@ NOT YET IMPLEMENTED (no tmpname).
 
 =cut
 
-.sub '_os_tmpname' :anon
+.sub 'tmpname' :anon
     .local pmc ret
     new ret, .LuaString
     not_implemented()

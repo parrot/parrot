@@ -43,49 +43,49 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
     set $P1, 'lfs'
     _lua__GLOBAL[$P1] = _lfs
 
-    _register($P1, _lfs)
+    lua_register($P1, _lfs)
 
-    .const .Sub _lfs_attributes = '_lfs_attributes'
+    .const .Sub _lfs_attributes = 'attributes'
     _lfs_attributes.'setfenv'(_lua__GLOBAL)
     set $P1, 'attributes'
     _lfs[$P1] = _lfs_attributes
 
-    .const .Sub _lfs_chdir = '_lfs_chdir'
+    .const .Sub _lfs_chdir = 'chdir'
     _lfs_chdir.'setfenv'(_lua__GLOBAL)
     set $P1, 'chdir'
     _lfs[$P1] = _lfs_chdir
 
-    .const .Sub _lfs_currentdir = '_lfs_currentdir'
+    .const .Sub _lfs_currentdir = 'currentdir'
     _lfs_currentdir.'setfenv'(_lua__GLOBAL)
     set $P1, 'currentdir'
     _lfs[$P1] = _lfs_currentdir
 
-    .const .Sub _lfs_dir = '_lfs_dir'
+    .const .Sub _lfs_dir = 'dir'
     _lfs_dir.'setfenv'(_lua__GLOBAL)
     set $P1, 'dir'
     _lfs[$P1] = _lfs_dir
 
-    .const .Sub _lfs_lock = '_lfs_lock'
+    .const .Sub _lfs_lock = 'lock'
     _lfs_lock.'setfenv'(_lua__GLOBAL)
     set $P1, 'lock'
     _lfs[$P1] = _lfs_lock
 
-    .const .Sub _lfs_mkdir = '_lfs_mkdir'
+    .const .Sub _lfs_mkdir = 'mkdir'
     _lfs_mkdir.'setfenv'(_lua__GLOBAL)
     set $P1, 'mkdir'
     _lfs[$P1] = _lfs_mkdir
 
-    .const .Sub _lfs_rmdir = '_lfs_rmdir'
+    .const .Sub _lfs_rmdir = 'rmdir'
     _lfs_rmdir.'setfenv'(_lua__GLOBAL)
     set $P1, 'rmdir'
     _lfs[$P1] = _lfs_rmdir
 
-    .const .Sub _lfs_touch = '_lfs_touch'
+    .const .Sub _lfs_touch = 'touch'
     _lfs_touch.'setfenv'(_lua__GLOBAL)
     set $P1, 'touch'
     _lfs[$P1] = _lfs_touch
 
-    .const .Sub _lfs_unlock = '_lfs_unlock'
+    .const .Sub _lfs_unlock = 'unlock'
     _lfs_unlock.'setfenv'(_lua__GLOBAL)
     set $P1, 'unlock'
     _lfs[$P1] = _lfs_unlock
@@ -109,14 +109,15 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
 .end
 
 .sub 'check_file' :anon
+    .param int narg
     .param pmc fh
     .param string funcname
     .local pmc ret
-    checkudata(fh, 'ParrotIO')
+    lua_checkudata(narg, fh, 'ParrotIO')
     ret =  getattribute fh, 'data'
     unless null ret goto L1
     $S0 = concat funcname, ": closed file"
-    error($S0)
+    lua_error($S0)
 L1:
     .return (ret)
 .end
@@ -195,12 +196,12 @@ optimal file system I/O blocksize; (Unix only)
 
 =cut
 
-.sub '_lfs_attributes' :anon
+.sub 'attributes' :anon
     .param pmc filepath :optional
     .param pmc aname :optional
     .local pmc ret
     .local pmc members
-    $S1 = checkstring(filepath)
+    $S1 = lua_checkstring(1, filepath)
     $S0 = $S1
     new members, .Hash
     .const .Sub st_mode = 'st_mode'
@@ -239,7 +240,7 @@ optimal file system I/O blocksize; (Unix only)
     $S2 = aname
     $P2 = members[$S2]
     unless null $P2 goto L3
-    checkoption($S2, '')
+    lua_checkoption(2, $S2, '')
 L3:
     ret = $P2($P1)
     .return (ret)
@@ -275,7 +276,7 @@ _handler:
     .return (nil, msg)
 .end
 
-.sub st_dev :anon
+.sub 'st_dev' :anon
     .param pmc st
     $I0 = st[0]
     new $P0, .LuaNumber
@@ -283,7 +284,7 @@ _handler:
     .return ($P0)
 .end
 
-.sub st_ino :anon
+.sub 'st_ino' :anon
     .param pmc st
     $I0 = st[1]
     new $P0, .LuaNumber
@@ -301,7 +302,7 @@ _handler:
 
 .const int S_IFMT   = 0xF000    # type of file mask
 
-.sub st_mode :anon
+.sub 'st_mode' :anon
     .param pmc st
     $I0 = st[2]
     $I0 &= S_IFMT
@@ -338,7 +339,7 @@ L7:
     .return ($P0)
 .end
 
-.sub st_nlink :anon
+.sub 'st_nlink' :anon
     .param pmc st
     $I0 = st[3]
     new $P0, .LuaNumber
@@ -346,7 +347,7 @@ L7:
     .return ($P0)
 .end
 
-.sub st_uid :anon
+.sub 'st_uid' :anon
     .param pmc st
     $I0 = st[4]
     new $P0, .LuaNumber
@@ -354,7 +355,7 @@ L7:
     .return ($P0)
 .end
 
-.sub st_gid :anon
+.sub 'st_gid' :anon
     .param pmc st
     $I0 = st[5]
     new $P0, .LuaNumber
@@ -362,7 +363,7 @@ L7:
     .return ($P0)
 .end
 
-.sub st_rdev :anon
+.sub 'st_rdev' :anon
     .param pmc st
     $I0 = st[6]
     new $P0, .LuaNumber
@@ -370,7 +371,7 @@ L7:
     .return ($P0)
 .end
 
-.sub st_size :anon
+.sub 'st_size' :anon
     .param pmc st
     $I0 = st[7]
     new $P0, .LuaNumber
@@ -378,7 +379,7 @@ L7:
     .return ($P0)
 .end
 
-.sub st_atime :anon
+.sub 'st_atime' :anon
     .param pmc st
     $I0 = st[8]
     new $P0, .LuaNumber
@@ -386,7 +387,7 @@ L7:
     .return ($P0)
 .end
 
-.sub st_mtime :anon
+.sub 'st_mtime' :anon
     .param pmc st
     $I0 = st[9]
     new $P0, .LuaNumber
@@ -394,7 +395,7 @@ L7:
     .return ($P0)
 .end
 
-.sub st_ctime :anon
+.sub 'st_ctime' :anon
     .param pmc st
     $I0 = st[10]
     new $P0, .LuaNumber
@@ -402,7 +403,7 @@ L7:
     .return ($P0)
 .end
 
-.sub st_blksize :anon
+.sub 'st_blksize' :anon
     .param pmc st
     $I0 = exists st[11]
     unless $I0 goto L1
@@ -415,7 +416,7 @@ L1:
     .return ($P0)
 .end
 
-.sub st_blocks :anon
+.sub 'st_blocks' :anon
     .param pmc st
     $I0 = exists st[12]
     unless $I0 goto L1
@@ -437,10 +438,10 @@ Returns C<true> in case of success or C<nil> plus an error string.
 
 =cut
 
-.sub '_lfs_chdir' :anon
+.sub 'chdir' :anon
     .param pmc path :optional
     .local pmc ret
-    $S1 = checkstring(path)
+    $S1 = lua_checkstring(1, path)
     $S0 = $S1
     new $P0, .OS
     push_eh _handler
@@ -472,7 +473,7 @@ string.
 
 =cut
 
-.sub '_lfs_currentdir' :anon
+.sub 'currentdir' :anon
     .local pmc ret
     new $P0, .OS
     push_eh _handler
@@ -501,10 +502,10 @@ when there is no more entries. Raises an error if C<path> is not a directory.
 
 =cut
 
-.sub '_lfs_dir' :anon
+.sub 'dir' :anon
     .param pmc path :optional
     .local pmc ret
-    $S1 = checkstring(path)
+    $S1 = lua_checkstring(1, path)
     $S0 = $S1
     new $P0, .OS
     push_eh _handler
@@ -520,10 +521,10 @@ _handler:
     $S0 = concat "cannot open ", $S0
     $S0 = concat ": "
     $S0 = concat s
-    error($S0)
+    lua_error($S0)
 .end
 
-.sub 'dir_aux' :anon :lex :outer(_lfs_dir)
+.sub 'dir_aux' :anon :lex :outer(dir)
     .local pmc ret
     $P1 = find_lex 'upvar_dir'
     unless $P1 goto L1
@@ -552,15 +553,15 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_lfs_lock' :anon
+.sub 'lock' :anon
     .param pmc filehandle :optional
     .param pmc mode :optional
     .param pmc start :optional
     .param pmc length :optional
-    $P1 = check_file(filehandle, 'lock')
-    $S2 = checkstring(mode)
-    $I3 = optint(start, 0)
-    $I4 = optint(length, 0)
+    $P1 = check_file(1, filehandle, 'lock')
+    $S2 = lua_checkstring(2, mode)
+    $I3 = lua_optint(3, start, 0)
+    $I4 = lua_optint(4, length, 0)
     not_implemented()
 .end
 
@@ -574,10 +575,10 @@ C<nil> plus an error string.
 
 =cut
 
-.sub '_lfs_mkdir' :anon
+.sub 'mkdir' :anon
     .param pmc dirname :optional
     .local pmc ret
-    $S1 = checkstring(dirname)
+    $S1 = lua_checkstring(1, dirname)
     new $P0, .OS
     push_eh _handler
     $I1 = 0o775
@@ -607,10 +608,10 @@ C<nil> plus an error string.
 
 =cut
 
-.sub '_lfs_rmdir' :anon
+.sub 'rmdir' :anon
     .param pmc dirname :optional
     .local pmc ret
-    $S1 = checkstring(dirname)
+    $S1 = lua_checkstring(1, dirname)
     new $P0, .OS
     push_eh _handler
     $P0.'rm'($S1)
@@ -647,11 +648,11 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_lfs_touch' :anon
+.sub 'touch' :anon
     .param pmc filepath :optional
     .param pmc atime :optional
     .param pmc mtime :optional
-    $S1 = checkstring(filepath)
+    $S1 = lua_checkstring(1, filepath)
     not_implemented()
 .end
 
@@ -670,13 +671,13 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub '_lfs_unlock' :anon
+.sub 'unlock' :anon
     .param pmc filehandle :optional
     .param pmc start :optional
     .param pmc length :optional
-    $P1 = check_file(filehandle, 'unlock')
-    $I2 = optint(start, 0)
-    $I3 = optint(length, 0)
+    $P1 = check_file(1, filehandle, 'unlock')
+    $I2 = lua_optint(2, start, 0)
+    $I3 = lua_optint(3, length, 0)
     not_implemented()
 .end
 
