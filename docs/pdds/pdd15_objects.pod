@@ -331,7 +331,7 @@ be constructed, returns a Null PMC.
 Note that for languages which support default fallback methods, such as Perl
 5's AUTOLOAD, this would be the place to return it if a normal lookup fails.
 
-Since the method list and vtable function list are stored in the class
+Since the method list and vtable override list are stored in the class
 PMC, method finding is a lookup on the class object and not a lookup in
 the namespace. (This could be handled automatically whenever a class is
 associated with a namespace.) Just adding a sub to a namespace will not
@@ -453,7 +453,7 @@ PMC.  If the method already exists (and isn't a Multi) it will replace
 the method with the new method and throw a warning.
 
 It also takes named parameters to flag whether the method is a vtable
-function, and whether it is anonymous (no named entry as a method, only
+override, and whether it is anonymous (no named entry as a method, only
 as a vtable).
 
 =item methods
@@ -806,7 +806,7 @@ PMC. If the method already exists (and isn't a Multi) it will replace
 the method with the new method and throw a warning.
 
 It also takes slurpy named parameters to flag whether the method is a
-vtable function, and whether its anonymous (no named entry as a method,
+vtable override, and whether its anonymous (no named entry as a method,
 only as a vtable).
 
 =item methods
