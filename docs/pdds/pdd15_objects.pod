@@ -1021,7 +1021,38 @@ string name.
 
 =back
 
-=head2 Vtable Overloading
+=head2 PIR Class Definitions
+
+PIR provides some syntactic sugar for declaring classes.
+
+=over 4
+
+=item :method
+
+  .sub custom_method :method
+    # ...
+  .end
+
+Flags the code entity as a method.
+
+=item :vtable
+
+  .sub get_integer :vtable
+    # ...
+  .end
+
+Flags the code entity as a vtable override.
+
+=back
+
+:method and :vtable can be combined to indicate that a particular code entity
+is callable both as a method and as a vtable override.
+
+If the class object has not yet been created at the point when the PIR subs are
+compiled, the methods and vtable overrides are temporarily stored in the
+associated namespace.
+
+=head2 Vtable Overriding
 
 Classes may override the vtable functions, allowing objects of a class to
 behave like a primitive PMC. To use these properly at a low-level
