@@ -56,6 +56,9 @@ sub runstep {
 ** This file is generated automatically by Configure.pl
 */
 
+#ifndef PARROT_HAS_HEADER_H_GUARD
+#define PARROT_HAS_HEADER_H_GUARD
+
 /*
  * i_(\\w+) header includes
  */
@@ -119,8 +122,10 @@ EOF
         }
     }
 
-    # append the C code coda
+    # append the guard endif and C code coda
     print {$HH} <<EOF;
+
+#endif /* PARROT_HAS_HEADER_H_GUARD */
 
 /*
  * Local variables:

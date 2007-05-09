@@ -3,7 +3,7 @@
  */
 
 
-#if !defined(PARROT_FEATURE_H_GUARD)
+#ifndef PARROT_FEATURE_H_GUARD
 #define PARROT_FEATURE_H_GUARD
 
 #perl - all below here gets evaled by perl, OUT is the filehandle
@@ -149,7 +149,7 @@ END_PRINT
 print OUT <<'END_PRINT';
 
 
-#endif
+#endif /* PARROT_FEATURE_H_GUARD */
 END_PRINT
 
 print OUT <<"END_PRINT";
