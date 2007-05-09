@@ -6,8 +6,8 @@
  * $Id$
  */
 
-#ifndef PARROT_PPC_JIT_EMIT_H_GUARD
-#define PARROT_PPC_JIT_EMIT_H_GUARD
+#ifndef PARROT_JIT_SKELETON_JIT_EMIT_H_GUARD
+#define PARROT_JIT_SKELETON_JIT_EMIT_H_GUARD
 
 #  include <unistd.h>
 #  include <limits.h>
@@ -357,7 +357,7 @@ Parrot_jit_init(Interp *interp)
 
 
 #endif /* JIT_EMIT == 0 */
-#endif /* PARROT_PPC_JIT_EMIT_H_GUARD */
+#endif /* PARROT_JIT_SKELETON_JIT_EMIT_H_GUARD */
 
 
 /*
