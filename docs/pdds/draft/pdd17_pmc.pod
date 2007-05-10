@@ -58,6 +58,8 @@ of space. <allison> 8 bits is pretty limited, and IIRC we've already run into
 the limitation. This runs back to Leo's proposal to make PMCs a little more
 flexible, so we wouldn't have to hold all PMCs to the same 8 bits
 
+=back
+
 =head1 DESCRIPTION
 
 =over 4
@@ -976,6 +978,8 @@ same PMC as I<self>; in that case optimizations may be made.
 =back
 
 =head3 Code Vtable Functions
+
+=over 4
 
 =item invoke
 
