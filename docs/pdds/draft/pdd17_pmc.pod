@@ -1,26 +1,34 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
 
-docs/pdds/pdd17_basic_types.pod - Parrot's Core PMC types
-
-{{ NOTE: could use a better name to differentiate it from PDD 04
-datatypes. Possibly pdd17_core_pmcs.pod. }}
-
-=head1 ABSTRACT
-
-This PDD documents the core Parrot PMC types and their behavior.
+docs/pdds/pdd17_pmc.pod - Parrot Magic Cookies
 
 =head1 VERSION
 
 $Revision$
 
+=head1 ABSTRACT
+
+This PDD describes the internal structure and behavior of the Parrot Magic
+Cookie (PMC) data type. 
+
+
 =head1 DESCRIPTION
 
-Parrot has a number of core PMC types that all programs can guarantee will be
-available to them. (With the possible exception of Parrot programs executing on
-an embedded device or other restricted environment)
+PMCs implement all internal data types more complex than a simple integer,
+float, or string, and also the data types of high-level languages.  Nothing
+outside the core of Parrot (in fact, nothing outside the data type's vtable
+routines) should infer anything about a PMC (hence the Magic part).
+
+This does mean, though, that you need to either know
+what functions are available and what they do, or have some method of finding
+out. 
+
+It's faster if you know which vtable entry does what, so that's the method
+parrot uses.
+
 
 =head1 QUESTIONS
 
@@ -50,11 +58,977 @@ of space. <allison> 8 bits is pretty limited, and IIRC we've already run into
 the limitation. This runs back to Leo's proposal to make PMCs a little more
 flexible, so we wouldn't have to hold all PMCs to the same 8 bits
 
+=head1 DESCRIPTION
+
+=over 4
+
+=item - High-level objects can subclass low-level PMCs
+
 =back
 
 =head1 IMPLEMENTATION
 
-=head2 Scalar types
+=head2 Internal structure
+
+All PMCs have the form:
+
+    struct PMC {
+        pobj_t obj;
+        VTABLE *vtable;
+ #if ! PMC_DATA_IN_EXT
+        DPOINTER *data;
+ #endif
+        struct PMC_EXT *pmc_ext;
+    };
+
+where C<obj> is a pointer to an C<pobj_t> structure:
+
+    typedef struct pobj_t {
+        UnionVal u;
+        Parrot_UInt flags;
+ #if ! DISABLE_GC_DEBUG
+        UINTVAL _pobj_version;
+ #endif
+    } pobj_t;
+
+and where:
+
+    typedef union UnionVal {
+        struct {
+            void * _bufstart;
+            size_t _buflen;
+        } _b;
+        struct {
+            DPOINTER* _struct_val;
+            PMC* _pmc_val;
+        } _ptrs;
+        INTVAL _int_val;
+        FLOATVAL _num_val;
+        struct parrot_string_t * _string_val;
+    } UnionVal;
+
+C<u> holds data associated with the PMC. This can be in the form of an  integer
+value, a floating-point value, a string value, or a pointer  to other data.
+C<u> may be empty, since the PMC structure also provides a more general data
+pointer, but is useful for PMCs which hold only a single piece of data (e.g.
+C<PerlInts>).
+
+C<flags> holds a set of flags associated with the PMC; these are documented  in
+F<include/parrot/pobj.h>, and are generally only used within the Parrot 
+internals.
+
+C<_pobj_version> is only used for debugging Parrot's garbage collector. It is
+documented elsewhere (well, it will be once we get around to doing that...).
+
+C<vtable> holds a pointer to the B<vtable> associated with the PMC. This points
+to a set of functions, with interfaces described in
+F<docs/pdds/pdd02_vtables.pod> that implement the basic behaviour of the PMC
+(i.e. how it behaves under addition, subtraction, cloning etc.)
+
+C<data> (if present) holds a pointer to any additional data associated  with
+the PMC. This may be NULL.
+
+C<pmc_ext> points to an extended PMC structure. This has the form:
+
+    struct PMC_EXT {
+ #if PMC_DATA_IN_EXT
+        DPOINTER *data;
+ #endif
+        PMC *_metadata;
+        struct _Sync *_synchronize;
+        PMC *_next_for_GC;
+    };
+
+C<data> is a generic data pointer, as described above.
+
+C<_metadata> holds internal PMC metadata. The specification for this has not
+yet been finalized.
+
+C<_synchronize> is for access synchronization between shared PMCs.
+
+C<_next_for_GC> determines the next PMC in the 'used' list during dead object 
+detection in the GC.
+
+PMCs are not required to have a C<PMC_EXT> structure (i.e. C<pmc_ext> can be
+null).
+
+PMCs are used to implement the basic data types of the high level languages
+running on top of Parrot. For instance, a Perl 5 C<SV> will map onto one (or
+more) types of PMC, while particular Python datatypes will map onto different
+types of PMC.
+
+=head2 Vtable Functions
+
+Vtables decouple the interface and implementation of various object functions. 
+The actual vtable structure contains pointers to functions that implement the
+methods for that particular PMC.  All pointers must point to valid functions
+with appropriate prototypes.
+
+In C code, the first parameter to any vtable routine is the current
+interpreter. The second parameter is the PMC itself.
+
+The following list details each of the vtable methods, their prototypes, and
+their behavior.
+
+=head3 Core Vtable Functions
+
+=over 4
+
+=item void init(INTERP, PMC* self)
+
+Called when a PMC is first instantiated. It takes an unused PMC parameter and
+turns it into a PMC of the appropriate class.
+
+=item void init_pmc(INTERP, PMC* self, PMC* initializer)
+
+Alternative entry point called when a PMC is first instantiated.  Accepts a PMC
+parameter used to initialize the given object.  Interpretation of the PMC
+initializer is left open, each PMC is free to choose its own implemention. A
+NULL value passed as the initializer parameter is allowed.
+
+NOTE: It is strongly suggested that init_pmc(PMCNULL) be equivalent to
+init(), though there will of necessity be exceptions.
+
+=item void morph(INTERP, PMC* self, INTVAL type)
+
+Turn the PMC into a PMC of type I<type>. If the morphing can't be done in any
+reasonable way -- for instance if an integer is asked to turn into an Array --
+then the PMC is first destroyed, then recreated as an empty PMC of the new
+type.
+
+This method is primarily used when the interpreter has need of coercing a PMC
+to a particular type, and isn't meant as a general purpose casting tool.
+Compilers should only emit valid morphing operations.
+
+=item void mark(INTERP, PMC* self)
+
+Called when the DOD is tracing live PMCs. If this method is called then the
+code must mark all strings and PMCs that it contains as live, otherwise they
+may be collected.
+
+This method is only called if the DOD has detected that this PMC is both alive
+and has a custom mark routine as indicated by the custom mark PMC flag.  (Most
+normal PMCs don't need a custom mark routine.)
+
+If a PMC has this flag set, then it is responsible for marking all buffers and
+PMCs under its control as alive. If it does not, those PMCs or buffers may be
+collected later. This method does I<not> have to call the C<mark> method on any
+PMCs it marks--the DOD system takes care of that. (So no need to recurse into
+aggregate PMCs or anything of the sort).
+
+This method may allocate no memory from Parrot, nor may it alter Parrot's
+internal structures. It should have no side-effects from the C level either.
+This routine may not throw an exception.
+
+=item void destroy(INTERP, PMC* self)
+
+Called when the PMC is destroyed. This method is called by the DOD when it
+determines that a PMC is dead and that the PMC has marked itself as having a
+destroy method (an active finalizer).
+
+When this method finishes, the PMC will be marked as dead. As such you should
+make sure that you don't leave any references to it in any Parrot structure
+by the end of the method.
+
+This method may not throw an exception. It will be ignored if it does.
+
+=item PMC* clone(INTERP, PMC* self)
+
+Return a clone of a PMC.
+
+=item defined
+
+=back
+
+=head3 Accessors
+
+=over 4
+
+=item PMC* getprop(INTERP, PMC* self, STRING* key)
+
+Return the value from the property hash of I<self> keyed by I<key>. The key
+should not be NULL.
+
+=item void setprop(INTERP, PMC* self, STRING* key, PMC* value)
+
+Set the value in the property hash of I<self> that is keyed by I<key> to the
+value of I<value>. The key should not be NULL.
+
+=item void delprop(INTERP, PMC* self, STRING* key)
+
+Delete the value from the property hash of I<self> keyed by I<key>. The key
+should not be NULL.
+
+=item PMC* getprops(INTERP, PMC* self)
+
+Return the entire property hash for I<self>.
+
+=item INTVAL type(INTERP, PMC* self)
+
+Return the type of the PMC. Type is a unique number associated with the PMC when
+the PMC's class is loaded. Negative numbers are considered
+interpreter-specific, non-public types.
+
+=item UINTVAL subtype(INTERP, PMC* self, INTVAL type) [deprecated]
+
+Return the subtype of a PMC. (Note that this may be unimplemented, and may go
+away). This is intended to return information about the PMC--what type of
+number or string it is, whether it's a scalar, hash, array, or list, and
+suchlike things.
+
+[This can be adequately handled by C<does> and C<inspect>.]
+
+=item STRING* name(INTERP, PMC* self)
+
+Return the name of the class for the PMC.
+
+=item get_integer
+
+  INTVAL get_integer(INTERP, PMC* self)
+
+Return the native integer value of the PMC.
+
+=item get_number
+
+  FLOATVAL get_number(INTERP, PMC* self)
+
+Return the native floating-point value of the PMC.
+
+=item get_bignum
+
+  PMC* get_bignum(INTERP, PMC* self)
+
+Return the extended precision numeric value of the PMC as a new bignum PMC.
+
+=item get_string
+
+  STRING* get_string(INTERP, PMC* self)
+
+Return the native string value of the PMC. This may be in any encoding, chosen
+by the PMC.
+
+=item get_bool
+
+  INTVAL get_bool(INTERP, PMC* self)
+
+Return the true/false value of the PMC (the constant TRUE or the constant
+FALSE). The definition of truth for a given PMC will depend on the type of the
+PMC. For a scalar, it may be as simple as returning false when the PMC has a
+value 0 or "", and returning true when the PMC has any other value.
+
+=item get_pmc
+
+  PMC* get_pmc(INTERP, PMC* self)
+
+Return the PMC value for this PMC. This is useful in circumstances where the
+thing being accessed may return something other than its own value. For
+example, an array might return a reference to itself. Any PMC may return a
+value different from the PMC that C<get_pmc> is being called on.
+
+=item set_integer_native
+
+  void set_integer_native(INTERP, PMC* self, INTVAL value)
+
+Set the integer value of this PMC from a native integer value (integer
+register/constant).
+
+=item set_integer_same
+
+  void set_integer_same(INTERP, PMC* self, PMC* value)
+
+Set the value of this PMC from the integer value of another PMC. The value PMC
+is guaranteed to be of the same type as the I<self> PMC, so optimizations may
+be made.
+
+=item set_number_native
+
+  void set_number_native(INTERP, PMC* self, FLOATVAL value)
+
+Set the value of this PMC from a native floating-point value (float
+register/constant).
+
+=item set_number_same
+
+  void set_number_same(INTERP, PMC* self, PMC* value)
+
+Set the value of this PMC from the floating-point value another PMC. The value
+PMC is guaranteed to be of the same type as the I<self> PMC, so optimizations
+may be made.
+
+=item get_pointer
+
+  void* get_pointer(INTERP, PMC* self)
+
+Returns a pointer value for the PMC. Useful for PMCs that hold pointers to
+arbitrary data. The details of the data (type, location etc.) depend on the
+PMC.
+
+=item set_bignum_int
+
+  void set_bignum_int(INTERP, PMC* self, INTVAL value)
+
+Morph the PMC to a BIGNUM PMC, and set the extended-precision value from a
+native integer.
+
+=item set_string_native
+
+  void set_string_native(INTERP, PMC* self, STRING* value)
+
+Set the value of this PMC from a native string value (string
+register/constant).
+
+=item assign_string_native
+
+  void assign_string_native(INTERP, PMC* self, STRING* value)
+
+Set the value of this PMC to a copied native string value (string
+register/constant).
+
+=item set_string_same
+
+  void set_string_same(INTERP, PMC* self, PMC* value)
+
+Set the value of this PMC from the string value of another PMC. The value PMC
+is guaranteed to be of the same type as the I<self> PMC, so optimizations may
+be made.
+
+=item set_bool
+
+  void set_bool(INTERP, PMC* self, INTVAL value)
+
+Set the boolean state of the PMC to TRUE if the native integer value passed in
+is TRUE, or FALSE if the value is FALSE. The definition of truth is left open
+to the particular PMC. For a scalar, it may be as simple as setting false when
+a 0 value is passed in, and seting true when any other value is passed in.
+
+=item assign_pmc
+
+  void assign_pmc(INTERP, PMC* self, PMC* value)
+
+Set the value of the PMC in I<self> to the value of the PMC in I<value> by
+copying the value.
+
+=item set_pmc
+
+  void set_pmc(INTERP, PMC* self, PMC* value)
+
+Make the PMC in I<self> refer to the PMC passed as I<value>.
+
+=item set_pointer
+
+  void set_pointer(INTERP, PMC* self, void* value)
+
+Set the pointer value of the PMC Useful for PMCs that hold pointers to
+arbitrary data. The details of the data (type, location etc.) depend on the
+PMC.
+
+=back
+
+=head3 Aggregate Vtable Functions
+
+Many of the following functions have a *_keyed form, a *_keyed_int form, and a
+*_keyed_str form. The keyed forms take a PMC*, INTVAL, or STRING* key as a
+parameter. The PMC* parameter is NULL if there is no key for that
+PMC; this means that that argument is unkeyed.
+
+In some cases, the caller must provide a non-NULL key.  Those cases are
+explicitly stated below.  In the other cases, you may have to implement the
+keyed vtable functions and check for a NULL I<self> key even if you are
+implementing a non-aggregate type.  If the I<self> key is non-NULL and the PMC
+class is a non-aggregate type, the _keyed_* methods should throw an exception.
+
+If you do not implement the *_keyed_int and *_keyed_str functions, the default
+will convert the INTVAL or STRING* into a key PMC* and call the corresponding
+*_keyed functions.
+
+=over 4
+
+=item elements
+
+  INTVAL elements(INTERP, PMC* self)
+
+Return the number of elements in the PMC.
+
+=item get_integer_keyed
+
+  INTVAL get_integer_keyed(INTERP, PMC* self, PMC* key)
+
+Return the integer value for the element indexed by a PMC key.  The key is
+guaranteed not to be NULL for this function.
+
+=item get_integer_keyed_int
+
+  INTVAL get_integer_keyed_int(INTERP, PMC* self, INTVAL key)
+
+Return the integer value for the element indexed by an integer key.  The key is
+guaranteed not to be NULL for this function.
+
+=item get_integer_keyed_str
+
+  INTVAL get_integer_keyed_str(INTERP, PMC* self, STRING* key)
+
+Return the integer value for the element indexed by a string key.  The key is
+guaranteed not to be NULL for this function.
+
+=item get_number_keyed
+
+  FLOATVAL get_number_keyed(INTERP, PMC* self, PMC* key)
+
+Return the native floating-point value for the element indexed by a PMC key.
+The key is guaranteed not to be NULL for this function.
+
+=item get_number_keyed_int
+
+  FLOATVAL get_number_keyed_int(INTERP, PMC* self, INTVAL key)
+
+Return the native floating-point value for the element indexed by an integer
+key. The key is guaranteed not to be NULL for this function.
+
+=item get_number_keyed_str
+
+Return the native floating-point value for the element indexed by a string key.
+The key is guaranteed not to be NULL for this function.
+
+=item get_string_keyed
+
+  STRING* get_string_keyed(INTERP, PMC* self, PMC* key)
+
+Return the string value for the element indexed by a PMC key.
+The key is guaranteed not to be NULL for this function.
+
+=item get_string_keyed_int
+
+  STRING* get_string_keyed_int(INTERP, PMC* self, INTVAL key)
+
+Return the string value for the element indexed by an integer key.
+The key is guaranteed not to be NULL for this function.
+
+=item get_string_keyed_str
+
+  STRING* get_string_keyed_str(INTERP, PMC* self, STRING* key)
+
+Return the string value for the element indexed by a string key.
+The key is guaranteed not to be NULL for this function.
+
+=item get_bool_keyed
+
+Return the boolean value for the element indexed by a PMC key.
+
+=item get_bool_keyed_int
+
+Return the boolean value for the element indexed by an integer key.
+
+=item get_bool_keyed_str
+
+Return the boolean value for the element indexed by a string key.
+
+=item get_pmc_keyed
+
+  PMC* get_pmc_keyed(INTERP, PMC* self, PMC* key)
+
+Return the PMC value for the element indexed by a PMC key.
+The key is guaranteed not to be NULL for this function.
+
+=item get_pmc_keyed_int
+
+  PMC* get_pmc_keyed_int(INTERP, PMC* self, INTVAL key)
+
+Return the PMC value for the element indexed by an integer key.
+The key is guaranteed not to be NULL for this function.
+
+=item get_pmc_keyed_str
+
+  PMC* get_pmc_keyed_str(INTERP, PMC* self, STRING* key)
+
+Return the PMC value for the element indexed by a string key.
+The key is guaranteed not to be NULL for this function.
+
+=item get_pointer_keyed
+
+  void* get_pointer_keyed(INTERP, PMC* self, PMC* key)
+
+Return the pointer value for the element indexed by a PMC key. The details of
+the data (type, location etc.) depend on the PMC.
+
+=item get_pointer_keyed_int
+
+  void* get_pointer_keyed_int(INTERP, PMC* self, INTVAL key)
+
+Return the pointer value for the element indexed by an integer key. The
+details of the data (type, location etc.) depend on the PMC.
+
+=item get_pointer_keyed_str
+
+  void* get_pointer_keyed_str(INTERP, PMC* self, STRING* key)
+
+Return the pointer value for the element indexed by a string key. The details
+of the data (type, location etc.) depend on the PMC.
+
+=item set_integer_keyed
+
+  void set_integer_keyed(INTERP, PMC* self, PMC* key, INTVAL value)
+
+Set the integer value of the element indexed by a PMC key. The key is
+guaranteed not to be NULL for this function.
+
+=item set_integer_keyed_int
+
+  void set_integer_keyed_int(INTERP, PMC* self, INTVAL key, INTVAL value)
+
+Set the integer value of the element indexed by an integer key. The key is
+guaranteed not to be NULL for this function.
+
+=item set_integer_keyed_str
+
+  void set_integer_keyed_str(INTERP, PMC* self, STRING* key, INTVAL value)
+
+Set the integer value of the element indexed by a string key. The key is
+guaranteed not to be NULL for this function.
+
+=item set_number_keyed
+
+  void set_number_keyed(INTERP, PMC* self, PMC* key, FLOATVAL value)
+
+Set the floating-point value of the element indexed by a PMC key. The key is
+guaranteed not to be NULL for this function.
+
+=item set_number_keyed_int
+
+  void set_number_keyed_int(INTERP, PMC* self, INTVAL key, FLOATVAL value)
+
+Set the floating-point value of the element indexed by an integer key. The key
+is guaranteed not to be NULL for this function.
+
+=item set_number_keyed_str
+
+  void set_number_keyed_str(INTERP, PMC* self, STRING* key, FLOATVAL value)
+
+Set the floating-point value of the element indexed by a string key. The key
+is guaranteed not to be NULL for this function.
+
+=item set_string_keyed
+
+  void set_string_keyed(INTERP, PMC* self, PMC* key, STRING* value)
+
+Set the string value of the element indexed by a PMC key.  The key is
+guaranteed not to be NULL for this function.
+
+=item set_string_keyed_int
+
+  void set_string_keyed_int(INTERP, PMC* self, INTVAL key, STRING* value)
+
+Set the string value of the element indexed by an integer key.  The key is
+guaranteed not to be NULL for this function.
+
+=item set_string_keyed_str
+
+  void set_string_keyed_str(INTERP, PMC* self, STRING* key, STRING* value)
+
+Set the string value of the element indexed by a string key.  The key is
+guaranteed not to be NULL for this function.
+
+=item set_pmc_keyed
+
+  void set_pmc_keyed(INTERP, PMC* self, PMC* key, PMC* value)
+
+Set the value of the element indexed by a PMC key, by copying the value of
+another PMC.
+
+=item set_pmc_keyed_int
+
+  void set_pmc_keyed_int(INTERP, PMC* self, INTVAL key, PMC* value)
+
+Set the PMC value of the element indexed by an integer key, by copying the
+value of another PMC.
+
+=item set_pmc_keyed_str
+
+  void set_pmc_keyed_str(INTERP, PMC* self, STRING* key, PMC* value)
+
+Set the PMC value of the element indexed by a string key, by copying the value
+of another PMC.
+
+=item set_pointer_keyed
+
+  void set_pointer_keyed(INTERP, PMC* self, PMC* key, void* value)
+
+Set the pointer value of the element indexed by a PMC key.
+
+=item set_pointer_keyed_int
+
+  void set_pointer_keyed_int(INTERP, PMC* self, INTVAL key, void* value)
+
+Set the pointer value of the element indexed by an integer key.
+
+=item set_pointer_keyed_str
+
+  void set_pointer_keyed_str(INTERP, PMC* self, STRING* key, void* value)
+
+Set the pointer value of the element indexed by a string key.
+
+=item INTVAL type_keyed(INTERP, PMC* self, PMC* key)
+
+Return the type number of the PMC indexed by a PMC key.  The I<key> parameter
+is guaranteed not to be NULL for this method.
+
+=item INTVAL type_keyed_int(INTERP, PMC* self, INTVAL key)
+
+Return the type number of the PMC indexed by an integer key.  The I<key>
+parameter is guaranteed not to be NULL for this method.
+
+=item INTVAL type_keyed_str(INTERP, PMC* self, STRING* key)
+
+Return the type number of the PMC indexed by a string key.  The I<key>
+parameter is guaranteed not to be NULL for this method.
+
+=item pop_integer
+
+  INTVAL pop_integer(INTERP, PMC* self)
+
+Return the integer value of the last item on the list, removing that item.
+
+=item pop_float
+
+  FLOATVAL pop_float(INTERP, PMC* self)
+
+Return the floating-point value of the last item on the list, removing that
+item.
+
+=item pop_string
+
+  STRING* pop_string(INTERP, PMC* self)
+
+Return the string value of the last item on the list, removing that item.
+
+=item pop_pmc
+
+  PMC* pop_pmc(INTERP, PMC* self)
+
+Return the PMC value of the last item on the list, removing that item.
+
+=item push_integer
+
+  void push_integer(INTERP, PMC* self, INTVAL value)
+
+Add the passed in integer value to the end of the list.
+
+=item push_float
+
+  void push_float(INTERP, PMC* self, FLOATVAL value)
+
+Add the passed in floating-point number to the end of the list.
+
+=item push_string
+
+  void push_string(INTERP, PMC* self, STRING* value)
+
+Add the passed in string to the end of the list.
+
+=item push_pmc
+
+  void push_pmc(INTERP, PMC* self, PMC* value)
+
+Add the passed in PMC to the end of the list.
+
+=item shift_integer
+
+  INTVAL shift_integer(INTERP, PMC* self)
+
+Return the integer value of the first item on the list, removing that item.
+
+=item shift_float
+
+  FLOATVAL shift_float(INTERP, PMC* self)
+
+Return the floating-point value of the first item on the list, removing that
+item.
+
+=item shift_string
+
+  STRING* shift_string(INTERP, PMC* self)
+
+Return the string value of the first item on the list, removing that item.
+
+=item shift_pmc
+
+  PMC* shift_pmc(INTERP, PMC* self)
+
+Return the PMC value of the first item on the list, removing that item.
+
+=item unshift_integer
+
+  void unshift_integer(INTERP, PMC* self, INTVAL value)
+
+Add the passed in integer value to the beginning of the list.
+
+=item unshift_float
+
+  void unshift_float(INTERP, PMC* self, FLOATVAL value)
+
+Add the passed in floating-point number to the beginning of the list.
+
+=item unshift_string
+
+  void unshift_string(INTERP, PMC* self, STRING* value)
+
+Add the passed in string to the beginning of the list.
+
+=item unshift_pmc
+
+  void unshift_pmc(INTERP, PMC* self, PMC* value)
+
+Add the passed in PMC to the beginning of the list.
+
+=item splice
+
+=item void splice(INTERP, PMC* self, PMC* value, INTVAL offset, INTVAL count)
+
+Replace the I<count> PMCs at offset I<offset> from the beginning of I<self>
+with the PMCs in the aggregate I<value>.
+
+=item exists_keyed
+
+=item exists_keyed_int
+
+=item exists_keyed_str
+
+=item defined_keyed
+
+=item defined_keyed_int
+
+=item defined_keyed_str
+
+=item dtem delete_keyed_str
+
+=item nextkey_keyed
+
+=item nextkey_keyed_itr_str
+
+=back
+
+=head3 Math Vtable Functions
+
+=over 4
+
+=item add
+
+  void add(INTERP, PMC* self, PMC* value, PMC* dest)
+  void add_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  void add_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
+
+Add the value of I<self> to the value of a PMC, native integer, or native
+floating-point number and store the result in a PMC I<dest>. Note that I<dest>
+may be the same PMC as I<self>; in that case optimizations may be made.
+
+=item subtract
+
+  PMC* subtract(INTERP, PMC* self, PMC* value, PMC* dest)
+  PMC* subtract_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  PMC* subtract_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
+
+Subtract the value of a PMC, native integer, or native floating-point number
+from a PMC and store the result in I<dest>. If I<dest> is NULL create a result
+PMC of an appropriate type.  Note that I<dest> may be the same PMC as I<self>;
+in that case optimizations may be made.
+
+=item i_subtract
+
+  void i_subtract(INTERP, PMC* self, PMC* value)
+  void i_subtract_int(INTERP, PMC* self, INTVAL value)
+  void i_subtract_float(INTERP, PMC* self, FLOATVAL value)
+
+Inplace operation: subtract a PMC, native integer, or native floating-point
+number from the value of a PMC and store the result back in the same PMC.
+
+=item increment
+
+=item decrement
+
+=item multiply
+
+  void multiply(INTERP, PMC* self, PMC* value, PMC* dest)
+  void multiply_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  void multiply_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
+
+Multiply a PMC, native integer, or floating-point value by the value of the PMC
+I<self> and store the result in the I<dest> PMC. Note that I<dest> may be the
+same PMC as I<self>; in that case optimizations may be made.
+
+=item divide
+
+  void divide(INTERP, PMC* self, PMC* value, PMC* dest)
+  void divide_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  void divide_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
+
+Divide the value of the I<self> PMC by a PMC, native integer, or native
+floating-point number and store the result in I<dest>.  Note that I<dest> may
+be the same PMC as I<self>; in that case optimizations may be made.
+
+=item modulus
+
+  void modulus(INTERP, PMC* self, PMC* value, PMC* dest)
+  void modulus_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  void modulus_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
+
+Divide the value of the I<self> PMC by the value of a PMC, native integer, or
+native floating-point number and store the remainder in I<dest>.  Note that
+I<dest> may be the same PMC as I<self>; in that case optimizations may be made.
+
+=item cmodulus
+
+  void cmodulus(INTERP, PMC* self, PMC* value, PMC* dest)
+  void cmodulus_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  void cmodulus_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
+
+Divide the value of the I<self> PMC by the value of a PMC, native integer, or
+native floating-point number and store the remainder in I<dest>.  Note that
+I<dest> may be the same PMC as I<self>; in that case optimizations may be made.
+
+Note that C<modulus> uses Knuth's "corrected mod" algorithm, as implemented in
+F<src/utils.c>, while C<cmodulus> uses the C-style fmod function.
+
+=item neg
+
+  void neg(INTERP, PMC* self, PMC* dest)
+
+Negate the sign of I<self> and store the result in I<dest>. Note that I<self>
+and I<dest> may refer to the same PMC, in which case optimizations may be
+made.
+
+=back
+
+=head3 Logical Vtable Functions
+
+=over 4
+
+=item bitwise_or
+
+  void bitwise_or(INTERP, PMC* self, PMC* value, PMC* dest)
+  void bitwise_or_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+
+Calculate the bitwise-OR of the value of the I<self> PMC and the value of a PMC
+or native integer and store the result in I<dest>. Note that I<dest> may be the
+same PMC as I<self>; in that case optimizations may be made.
+[Question: what happens when the I<self> and I<value> PMCs aren't integers?]
+
+=item bitwise_and
+
+=item bitwise_and_int
+
+=item bitwise_xor
+
+=item bitwise_xor_int
+
+=item bitwise_ors
+
+=item bitwise_ors_str
+
+=item bitwise_ands
+
+=item bitwise_ands_str
+
+=item bitwise_xors
+
+=item bitwise_xors_str
+
+=item bitwise_not
+
+=item bitwise_shl
+
+=item bitwise_shl_int
+
+=item bitwise_shr
+
+=item bitwise_shr_int
+
+=item is_equal
+
+=item is_same
+
+=item cmp
+
+=item cmp_num
+
+=item cmp_string
+
+=item logical_or
+
+=item logical_and
+
+=item logical_xor
+
+=item logical_not
+
+=back
+
+=head3 String Vtable Functions
+
+=over 4
+
+=item concatenate
+
+=item concatenate_native
+
+=item repeat
+
+=item repeat_int
+
+=back
+
+=head3 Code Vtable Functions
+
+=item invoke
+
+=item fsh
+
+=item visit
+
+=item share
+
+=back
+
+=head3 Class/Object Vtable Functions
+
+=over 4
+
+=item can
+
+=item does
+
+=item isa
+
+=item add_method
+
+=item add_attribute
+
+=item add_parent
+
+=item add_role
+
+=item PMC* find_method(INTERP, PMC* self, STRING* method_name)
+
+Return a subroutine PMC for the passed method name. This subroutine PMC may be
+cached, so the method I<must> return an equivalent sub PMC each time, or be
+capable of dealing with the returned sub PMCs being reused. [Why should it be
+cached? Can you turn off caching? What if you want to override find_method to
+generate methods on the fly?]
+
+
+=back
+
+
+=head2 Interaction between PMCs and high-level objects
+
+{{ Address the problem of high-level objects inheriting from low-level PMCs,
+and any structural changes to low-level PMCs that might require. }}
+
+=head2 Core PMCs
+
+Parrot has a number of core PMC types that all programs can guarantee will be
+available to them. (With the possible exception of Parrot programs executing on
+an embedded device or other restricted environment)
+
+=head3 Scalar types
 
 =over 4
 
@@ -87,7 +1061,7 @@ exception if exact math is enabled.
 
 =item Float
 
-The PMC wrapper for Parrot's low-level floating point type. Always a float,
+The PMC wrapper for Parrot's low-level floating-point type. Always a float,
 with other types autoconverted to a float when stored into this PMC.
 
 The boolean value for a Float is false if exactly zero, otherwise true.
@@ -176,7 +1150,7 @@ this? }}
 
 =back
 
-=head2 Array types
+=head3 Array types
 
 Note that for the following types you can set the size of the array by using
 the VTABLE_set_integer_native() method. Assigning an integer to the array as a
@@ -238,7 +1212,7 @@ A dynamically sized array which holds only String values.
 
 =back
 
-=head2 Hash types
+=head3 Hash types
 
 =over 4
 
@@ -271,7 +1245,7 @@ collection.
 
 =back
 
-=head2 Subroutine types
+=head3 Subroutine types
 
 =over 4
 
@@ -308,31 +1282,17 @@ A subroutine implementing a language compiler. (Derived from NCI.)
 
 =back
 
-=head2 Binary Math operations
+=head1 ATTACHMENTS
 
-{{ NOTE: this section is barely a stub, and not particularly useful. I
-suggest deleting it. Any objections? }}
-
-The following is a list of what should happen with the basic types when used in
-a binary math operation:
-
-=over 4
-
-=item Integer x Integer
-
-The operation is an integer.
-
-=back 
-
-=head1 LANGUAGE NOTES
+None.
 
 =head1 FOOTNOTES
 
-List of footnotes to the text.
+None.
 
 =head1 REFERENCES
 
-  src/pmc/*.pmc
+None.
 
 =cut
 
