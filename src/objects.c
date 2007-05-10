@@ -1192,8 +1192,7 @@ Parrot_new_method_cache(Interp *interp) {
 /*
 
 =item C<PMC *
-Parrot_find_method_with_cache(Interp *interp, PMC *_class,
-                              STRING *method_name)>
+Parrot_find_method_with_cache(Interp *interp, PMC *_class, STRING *method_name)>
 
 Find a method PMC for a named method, given the class PMC, current
 interp, and name of the method.
@@ -1204,8 +1203,7 @@ we've got that bit working. For now it unconditionally goes and looks up
 the name in the global stash.
 
 =item C<PMC *
-Parrot_find_method_direct(Interp *interp, PMC *_class,
-                              STRING *method_name)>
+Parrot_find_method_direct(Interp *interp, PMC *_class, STRING *method_name)>
 
 Find a method PMC for a named method, given the class PMC, current
 interpreter, and name of the method. Don't use a possible method cache.
@@ -1219,7 +1217,7 @@ all classes are invalidated.
 
 */
 
-static PMC* find_method_direct(Interp*, PMC *, STRING*);
+static PMC* find_method_direct_1(Interp*, PMC *, STRING*);
 
 void
 mark_object_cache(Interp *interp) {
@@ -1313,7 +1311,15 @@ Parrot_invalidate_method_cache(Interp *interp, STRING *_class, STRING *meth)
 PMC *
 Parrot_find_method_direct(Interp *interp, PMC *_class, STRING *method_name)
 {
-    return find_method_direct(interp, _class, method_name);
+    PMC * const found = find_method_direct_1(interp, _class, method_name);
+    STRING * s1, *s2;
+    if (found)
+        return found;
+    s1 = CONST_STRING(interp, "__get_string");
+    s2 = CONST_STRING(interp, "__get_repr");
+    if (string_equal(interp, method_name, s1) == 0)
+        return find_method_direct_1(interp, _class, s2);
+    return NULL;
 }
 
 PMC *
@@ -1329,12 +1335,12 @@ Parrot_find_method_with_cache(Interp *interp, PMC *_class, STRING *method_name)
     assert(method_name != 0);
 
 #if DISABLE_METH_CACHE
-    return find_method_direct(interp, _class, method_name);
+    return Parrot_find_method_direct(interp, _class, method_name);
 #endif
 
     is_const = PObj_constant_TEST(method_name);
     if (!is_const) {
-        return find_method_direct(interp, _class, method_name);
+        return Parrot_find_method_direct(interp, _class, method_name);
     }
     mc = interp->caches;
     type = _class->vtable->base_type;
@@ -1366,7 +1372,7 @@ Parrot_find_method_with_cache(Interp *interp, PMC *_class, STRING *method_name)
         e = e->next;
     }
     if (!e) {
-        PMC * const found = find_method_direct(interp, _class, method_name);
+        PMC * const found = Parrot_find_method_direct(interp, _class, method_name);
         /* when here no or no correct entry was at [bits] */
         e = mem_allocate_typed(Meth_cache_entry);
         if (old)
@@ -1438,21 +1444,6 @@ find_method_direct_1(Interp *interp, PMC *_class,
         }
     }
     TRACE_FM(interp, _class, method_name, NULL);
-    return NULL;
-}
-
-static PMC *
-find_method_direct(Interp *interp, PMC *_class,
-                              STRING *method_name)
-{
-    PMC * const found = find_method_direct_1(interp, _class, method_name);
-    STRING * s1, *s2;
-    if (found)
-        return found;
-    s1 = CONST_STRING(interp, "__get_string");
-    s2 = CONST_STRING(interp, "__get_repr");
-    if (string_equal(interp, method_name, s1) == 0)
-        return find_method_direct_1(interp, _class, s2);
     return NULL;
 }
 
