@@ -49,8 +49,8 @@ BEGIN {
 
 plan tests => 1;
 
-# XXX this should really be using src_dir insetad of build_dir but it
-# doesn't exist (yet)
+# XXX this should really be using src_dir instead of build_dir but it
+# does not exist (yet)
 my $build_dir    = $PConfig{build_dir};
 my $manifest     = maniread("$build_dir/MANIFEST");
 my $manifest_gen = maniread("$build_dir/MANIFEST.generated");
