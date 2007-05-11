@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -60,8 +60,6 @@ my $cwd = cwd();
     mkdir qq{$tdir/include};
     mkdir qq{$tdir/include/parrot};
 
-    #    mkdir qq{$tdir/include/parrot/oplib};
-
     my $o2p = Parrot::Ops2pm::Utils->new(
         {
             argv   => [@opsfiles],
@@ -96,6 +94,7 @@ my $cwd = cwd();
         ok( defined $self,
             "Constructor correctly returned even though include/parrot/oplib had to be created" );
     }
+    ok( chdir($cwd), "returned to starting directory" );
 }
 
 pass("Completed all tests in $0");
