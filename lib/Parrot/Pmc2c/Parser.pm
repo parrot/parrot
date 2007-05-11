@@ -1,5 +1,5 @@
 # Copyright (C) 2004-2006, The Perl Foundation.
-# $Id: Pmc2cMain.pm 18352 2007-04-28 19:47:02Z jkeenan $
+# $Id$
 package Parrot::Pmc2c::Parser;
 use strict;
 use warnings;
