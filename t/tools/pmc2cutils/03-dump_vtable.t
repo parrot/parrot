@@ -20,7 +20,7 @@ BEGIN {
     unshift @INC, qq{$topdir/lib};
 }
 use Test::More tests => 12;
-use_ok('Parrot::Pmc2c::Utils');
+use_ok('Parrot::Pmc2c::Pmc2cMain');
 use_ok('File::Basename');
 use_ok( 'File::Temp', qw| tempdir | );
 use Data::Dumper;
@@ -36,7 +36,7 @@ my $cwd;
     my $tdir1 = tempdir( CLEANUP => 1 );
     ok( chdir $tdir1, 'changed to temp directory for testing' );
 
-    $self = Parrot::Pmc2c::Utils->new(
+    $self = Parrot::Pmc2c::Pmc2cMain->new(
         {
             include => \@include,
             opt     => \%opt,
@@ -58,7 +58,7 @@ my $cwd;
     ok( chdir $tdir2, 'changed to temp directory for testing' );
 
     %opt = ( verbose => 1 );
-    $self = Parrot::Pmc2c::Utils->new(
+    $self = Parrot::Pmc2c::Pmc2cMain->new(
         {
             include => \@include,
             opt     => \%opt,
@@ -84,7 +84,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-03-dump_vtable.t - test C<Parrot::Pmc2c::Utils::dump_vtable()>
+03-dump_vtable.t - test C<Parrot::Pmc2c::Pmc2cMain::dump_vtable()>
 
 =head1 SYNOPSIS
 
@@ -93,11 +93,11 @@ pass("Completed all tests in $0");
 =head1 DESCRIPTION
 
 The files in this directory test the publicly callable methods of
-F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality
+F<lib/Parrot/Pmc2c/Pmc2cMain.pm>.  By doing so, they test the functionality
 of the F<pmc2c.pl> utility.  That functionality has largely been extracted
-into the methods of F<Utils.pm>.
+into the methods of F<Pmc2cMain.pm>.
 
-F<03-dump_vtable.t> tests the C<Parrot::Pmc2c::Utils::dump_vtable()> method.
+F<03-dump_vtable.t> tests the C<Parrot::Pmc2c::Pmc2cMain::dump_vtable()> method.
 F<make> calls this method when it calls in C<tools/build/pmc2c.pl --vtable>.
 
 When all of F<pmc2c.pl>'s functionality was contained within that program,

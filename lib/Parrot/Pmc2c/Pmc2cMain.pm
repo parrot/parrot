@@ -1,29 +1,29 @@
 # Copyright (C) 2004-2006, The Perl Foundation.
 # $Id$
-package Parrot::Pmc2c::Utils;
+package Parrot::Pmc2c::Pmc2cMain;
 use strict;
 use warnings;
 use FindBin;
 use Data::Dumper;
 use Parrot::Vtable;
 use Parrot::Pmc2c::Library;
-use Parrot::Pmc2c::UtilFunctions qw(count_newlines);
 use Parrot::Pmc2c::PCCMETHOD;
+use Parrot::Pmc2c::Parser qw(parse_pmc);
 use Cwd qw(cwd realpath);
 use File::Basename;
 use Carp;
 
 =head1 NAME
 
-Parrot::Pmc2c::Utils - Functions called within F<tools/build/pmc2c.pl>
+Parrot::Pmc2c::Pmc2cMain - Functions called within F<tools/build/pmc2c.pl>
 
 =head1 SYNOPSIS
 
-    use Parrot::Pmc2c::Utils;
+    use Parrot::Pmc2c::Pmc2cMain;
 
 =head1 DESCRIPTION
 
-Parrot::Pmc2c::Utils holds subroutines called within F<tools/build/pmc2c.pl>.
+Parrot::Pmc2c::Pmc2cMain holds subroutines called within F<tools/build/pmc2c.pl>.
 
 =cut
 
@@ -33,13 +33,13 @@ Parrot::Pmc2c::Utils holds subroutines called within F<tools/build/pmc2c.pl>.
 
 =head3 C<new()>
 
-    $self = Parrot::Pmc2c::Utils->new( {
+    $self = Parrot::Pmc2c::Pmc2cMain->new( {
         include => \@include,
         opt     => \%opt,
         args    => \@args,
     } );
 
-B<Purpose:>  Parrot::Pmc2c::Utils constructor.
+B<Purpose:>  Parrot::Pmc2c::Pmc2cMain constructor.
 
 B<Arguments:>  Reference to a hash holding 3 required keys:
 
@@ -61,14 +61,14 @@ C<@ARGV> remaining after options processing.
 
 =back
 
-B<Return Values:>  Parrot::Pmc2c::Utils object.  Will C<die> with error
+B<Return Values:>  Parrot::Pmc2c::Pmc2cMain object.  Will C<die> with error
 message if arguments are defective.
 
 =cut
 
 sub new {
     my ( $class, $allargsref ) = @_;
-    die "Must pass a hash ref to Parrot::Pmc2c::Utils::new"
+    die "Must pass a hash ref to Parrot::Pmc2c::Pmc2cMain::new"
         unless ref($allargsref) eq q{HASH};
     die "Must have key 'include' which is a reference to an array of directories"
         unless ( defined $allargsref->{include} and ref( $allargsref->{include} ) eq q{ARRAY} );
@@ -206,7 +206,7 @@ definition of this function.  Defaults to C<0> if not specified.
 =item * files
 
 Optional.  Reference to an array holding a list of files.  If not supplied, the
-value of the C<args> key in C<Parrot::Pmc2c::Utils::new()> will be used.
+value of the C<args> key in C<Parrot::Pmc2c::Pmc2cMain::new()> will be used.
 (This is used for the recursive call.)
 
 =back
@@ -348,7 +348,7 @@ C<arg> key (which can be found in the directories listed in the C<include> key).
 A C<'*.pmc'> glob may also be passed to emulate a proper shell in the presence
 of a dumb one.
 
-    $self = Parrot::Pmc2c::Utils->new( {
+    $self = Parrot::Pmc2c::Pmc2cMain->new( {
         include => \@include,
         opt     => \%opt,
         args    => [ ( q{*.pmc} ) ],
@@ -366,7 +366,6 @@ F<pmc2c.pl>.
 
 sub dump_pmc {
     my $self    = shift;
-    my $include = $self->{include};
     my @files   = @{ $self->{args} };
     my $opt     = $self->{opt};
 
@@ -377,56 +376,40 @@ sub dump_pmc {
 
     # make sure that a default.dump will always be created if it doesn't
     # already exist; do so by adding default.pmc to list of files for dumping
-    unless ( -e qq{./src/pmc/default.dump} ) {
-        unshift @files, qq{./src/pmc/default.pmc};
-    }
+    unshift @files, qq{./src/pmc/default.pmc} unless ( -e qq{./src/pmc/default.dump} );
 
     my $all;
     for my $file (@files) {
-        my ( $class, $result ) = $self->find_and_parse_pmc($file);
-        $result->{file} = $file;
-        $all->{$class} = $result;
+        $file =~ s/\.\w+$/.pmc/;
+        $file = $self->find_file( $file, 1 );
+
+        #slurp file contents
+        my $fh = open_file( "<", $file );
+        my $contents = do { local $/; <$fh> };
+        close $fh;
+
+        my $parsed_pmc = parse_pmc( $contents, $opt );
+        $parsed_pmc->{file} = $file;
+        $all->{$parsed_pmc->{class}} = $parsed_pmc;
     }
 
-    $all->{default} = $self->read_dump("default.pmc")
-        if not $all->{default};
+    $all->{default} = $self->read_dump("default.pmc") if not $all->{default};
 
     my $vt = $self->read_dump("vtable.pmc");
 
-    foreach my $e ( @{ $vt->{methods} } ) {
-        my $meth = $e->{meth};
-        $all->{default}->{super}{$meth} = 'default';
+    foreach my $entry ( @{ $vt->{methods} } ) {
+        my $method_name = $entry->{meth};
+        $all->{default}->{super}{$method_name} = 'default';
     }
 
-DO_A_DUMP: foreach my $name ( keys %{$all} ) {
-        my $file     = $all->{$name}->{file};
-        my $dumpfile = $file;
+    foreach my $name ( keys %{$all} ) {
+        my $dumpfile = $all->{$name}->{file};
         $dumpfile =~ s/\.\w+$/.dump/;
-
         my $existing = $self->find_file($dumpfile);
 
-        # Am confused about what's intended here.  If the .dump file is OLDER
-        # than the corresponding .pmc file (e.g., if it's some .dump file from
-        # an earlier run of 'make'), shouldn't it be overwritten so that we
-        # have an up-to-date .dump file?
-        if ( defined $existing && dump_is_newer($existing) ) {
-            if ( $dumpfile =~ /default\.dump$/ ) {
-
-                # don't overwrite default.dump
-                # skip all preparations for dumping
-                next DO_A_DUMP;
-            }
-            else {
-
-                # overwrite anything else
-                # continue with preparations for dumping
-                # And what good is assigning the name of the existing dump file to
-                # that of the newly-to-be-created dumpfile.  Wouldn't they have the
-                # same name in any case?  (Or are we dealing with the possibility that
-                # find_file() will return a file of the same basename but in a
-                # different directory?  Is that a real possibility?)
-                $dumpfile = $existing;
-            }
+        if ( $dumpfile =~ /default\.dump$/ && defined $existing && dump_is_newer($existing) ) {
+           # don't overwrite default.dump skip all preparations for dumping
+           next;
         }
 
         $all = $self->gen_parent_list( $name, $all );
@@ -434,6 +417,7 @@ DO_A_DUMP: foreach my $name ( keys %{$all} ) {
         my $class = gen_super_meths( $name, $all, $vt );
         my $Dumper = Data::Dumper->new( [$class], ['class'] );
         $Dumper->Indent(1);
+
         my $fh = open_file( ">", $dumpfile );
         print $fh $Dumper->Dump;
         close $fh;
@@ -443,43 +427,10 @@ DO_A_DUMP: foreach my $name ( keys %{$all} ) {
 
 =head2 Non-Public Methods
 
-These functions are expressed as methods called on the Parrot::Pmc2c::Utils
+These functions are expressed as methods called on the Parrot::Pmc2c::Pmc2cMain
 object, but only because they make use of data stored in that object.  They
 are called within the publicly available methods described above and are not
 intended to be publicly callable.
-
-=head3 C<find_and_parse_pmc()>
-
-    ($class, $result) = $self->find_and_parse_pmc($file);
-
-B<Purpose:>  Returns the class structure from C<$file> for a F<.dump> file.
-
-B<Arguments:>  String holding a file name.  The file is one of those provided
-by the C<arg> key of the constructor.
-
-B<Return Values:>  C<find_and_parse_pmc()> internally calls C<parse_pmc> and directly
-returns the latter's list of two return values:  a string holding a classname
-and a reference to a hash holding the class's attributes.
-
-B<Comments:>  Called internally by C<dump_pmc()>.  Formerly called
-C<dump_1_pmc()>; name was changed because this function doesn't actually do
-any 'dumping' in the sense of using Data::Dumper to print the contents of a
-variable.  Rather, it is a step called by C<dump_pmc()> to prepare for dumping.
-
-=cut
-
-sub find_and_parse_pmc {
-    my ( $self, $file ) = @_;
-    my $opt = $self->{opt};
-    $file =~ s/\.\w+$/.pmc/;
-    $file = $self->find_file( $file, 1 );
-
-    my $fh = open_file( "<", $file );
-    my $contents = do { local $/; <$fh> };
-    close $fh;
-    my ( $classname, $attributesref ) = parse_pmc( $contents, $opt );
-    return ( $classname, $attributesref );
-}
 
 =head3 C<gen_parent_list()>
 
@@ -511,28 +462,33 @@ B<Comments:>  Called within C<dump_pmc()>.
 =cut
 
 sub gen_parent_list {
-    my ( $self, $name, $all ) = @_;
-    my $class = $all->{$name};
+    my ( $self, $pmc_name, $all ) = @_;
+    my $pmc_class = $all->{$pmc_name};
 
     # An interesting construction:  note below that in the course of processing
     # @todo, new elements can be pushed on to it.  So it's not necessarily
     # exhausted when $n is shifted off it.
-    my @todo = ($name);
+    my @todo = ($pmc_name);
     while (@todo) {
-        my $n   = shift @todo;
-        my $sub = $all->{$n};
-        next if $n eq 'default';
+        my $current_pmc_name  = shift @todo;
+        next if $current_pmc_name eq 'default';
+        my $current_pmc = $all->{$current_pmc_name};
 
-        my %parent_hash = %{ $sub->{flags}{extends} };
-        my @parents =
-            sort { $parent_hash{$a} <=> $parent_hash{$b} } keys %parent_hash;
-        for my $parent (@parents) {
-            $all->{$parent} = $self->read_dump( lc("$parent.pmc") )
-                if not $all->{$parent};
+        #generate list of parent_names and sort by extends order
+        my %parent_hash = %{ $current_pmc->{flags}{extends} };
+        my @parent_names = sort { $parent_hash{$a} <=> $parent_hash{$b} } keys %parent_hash;
 
-            $class->{has_parent}{$parent} = { %{ $all->{$parent}{has_method} } };
-            push @todo, $parent;
-            push @{ $class->{parents} }, $parent;
+        for my $parent_name (@parent_names) {
+            #load $parent_name into $all
+            $all->{$parent_name} = 
+                $self->read_dump( lc("$parent_name.pmc") ) if not $all->{$parent_name};
+
+            #add parent's has_method hash to pmc_class' has_parent hash
+            $pmc_class->{has_parent}{$parent_name} = { %{ $all->{$parent_name}{has_method} } };
+            #add parent_name to parents lists
+            push @{ $pmc_class->{parents} }, $parent_name;
+            #add parent_name to recursion list.
+            push @todo, $parent_name;
         }
     }
     return $all;
@@ -579,303 +535,12 @@ and C<dump_pmc()>.
 sub open_file {
     my ( $direction, $filename, $verbose ) = @_;
 
-    my $action =
-          ( $direction eq "<" )  ? "Reading"
-        : ( $direction eq ">>" ) ? "Appending"
-        :                          "Writing";
+    my $actions_descriptions = { '<' => 'Reading', '>>' => "Appending", '>' => "Writing" };
+    my $action = $actions_descriptions->{$direction} || "Unknown";
 
     print "$action $filename\n" if $verbose;
     open my $fh, $direction, $filename or die "$action $filename: $!\n";
     return $fh;
-}
-
-=head3 C<parse_pmc()>
-
-    ($classname, $attributesref)  = parse_pmc($contents, $opt);
-
-B<Purpose:>  Parse PMC code and return the class name and a hash ref of
-attributes.
-
-B<Arguments:>  List of two arguments:
-
-=over 4
-
-=item *
-
-Code reference holding results of parsing PMC code found in file provided
-as argument to C<find_and_parse_pmc()>.
-
-=item *
-
-The hash reference which is the value of the C<opt> key provided to constructor.
-
-=back
-
-B<Return Values:>  List of two elements:
-
-=over 4
-
-=item *
-
-String holding a classname.
-
-=item *
-
-Reference to a hash of the class's attributes.  Keys:
-
-    pre
-    flags
-    methods
-    post
-    class
-    has_method
-
-=back
-
-B<Comments:>  Called internally by C<find_and_parse_pmc()>.
-
-=cut
-
-sub parse_pmc {
-    my ( $code, $opt ) = @_;
-
-    my ( $pre, $classname, $flags_ref ) = parse_flags( \$code );
-    my ( $classblock, $post ) = extract_balanced($code);
-
-    my $lineno = 1 + count_newlines($pre);
-    $classblock = substr( $classblock, 1, -1 );    # trim out the { }
-
-    my ( @methods, %meth_hash, $class_init );
-    my $signature_re = qr{
-    ^
-    (?:                 #blank spaces and comments and spurious semicolons
-      [;\n\s]*
-      (?:/\*.*?\*/)?    # C-like comments
-    )*
-
-    ((?:PCC)?METHOD\s+)?        #method flag
-
-    (\w+\**)            #type
-      \s+
-        (\w+)           #method name
-      \s*
-        \( ([^\(]*) \)  #parameters
-    \s*
-    ((?::(\w+)\s*)*)    #method attrs
-    }sx;
-
-    while ( $classblock =~ s/($signature_re)// ) {
-        $lineno += count_newlines($1);
-        my ( $flag, $type, $methodname, $parameters ) = ( $2, $3, $4, $5 );
-        my $attrs = parse_method_attrs($6);
-        my ( $methodblock, $remainder_part ) = extract_balanced($classblock);
-
-        my $method_hash = {
-            meth       => $methodname,
-            body       => $methodblock,
-            line       => $lineno,
-            type       => $type,
-            parameters => $parameters,
-            loc        => "vtable",
-            attrs      => $attrs,
-        };
-
-        if ( $flag and $flag =~ /PCCMETHOD/ ) {
-            Parrot::Pmc2c::PCCMETHOD::rewrite_pccmethod($method_hash);
-            $flags_ref->{need_fia_header} = 1;
-        }
-
-        if ( $methodblock =~ /PCCINVOKE/ ) {
-            $flags_ref->{need_fia_header} = 1;
-        }
-
-        if ( $methodname eq 'class_init' ) {
-            $class_init = $method_hash;
-        }
-        else {
-
-            # Name-mangle NCI methods to avoid conflict with vtable methods.
-            if ($flag) {
-                $method_hash->{loc}    = "nci";
-                $method_hash->{meth}   = "nci_$methodname";
-                $method_hash->{symbol} = $methodname;
-            }
-
-            # name => method idx mapping
-            $meth_hash{ $method_hash->{meth} } = scalar @methods;
-
-            $method_hash->{mmds} = [ ( $methodblock =~ /MMD_(\w+):/g ) ];
-            push @methods, $method_hash;
-        }
-
-        $classblock = $remainder_part;
-        $lineno += count_newlines($methodblock);
-    }
-
-    if ($class_init) {
-        $meth_hash{'class_init'} = scalar @methods;
-        push @methods, $class_init;
-    }
-    return $classname,
-        {
-        pre        => $pre,
-        flags      => $flags_ref,
-        methods    => \@methods,
-        post       => $post,
-        class      => $classname,
-        has_method => \%meth_hash,
-        };
-}
-
-=head3 C<parse_flags()>
-
-    ($pre, $classname, $flags_ref)   = parse_flags(\$code);
-
-B<Purpose:>  Extract a class signature from the code ref.
-
-B<Argument:>  De-reference the code ref which was the first argument
-provided to C<parse_pmc()>.
-
-B<Return Values:>  List of three elements:
-
-=over 4
-
-=item *
-
-the code found before the class signature;
-
-=item *
-
-the name of the class; and
-
-=item *
-
-a hash ref containing the flags associated with the class (such as
-C<extends> and C<does>).
-
-=back
-
-B<Comments:>  Called internally by C<parse_pmc()>.
-
-=cut
-
-sub parse_flags {
-    my $c = shift;
-
-    $$c =~ s/^(.*?^\s*)pmclass ([\w]*)//ms;
-    my ( $pre, $classname ) = ( $1, $2 );
-
-    # flags that have values passed with them
-    my %has_value = map { $_ => 1 } qw(does extends group lib hll maps);
-
-    my ( %flags, $parent_nr );
-
-    # look through the pmc declaration header for flags such as noinit
-    while ( $$c =~ s/^\s*(\w+)//s ) {
-        my $flag = $1;
-        if ( $has_value{$flag} ) {
-            $$c =~ s/^\s+(\w+)//s
-                or die "Parser error: no value for '$flag'";
-
-            $flags{$flag}{$1} = $flag eq 'extends' ? ++$parent_nr : 1;
-        }
-        else {
-            $flags{$flag} = 1;
-        }
-    }
-
-    # setup some defaults
-    if ( $classname ne 'default' ) {
-        $flags{extends}{default} = 1 unless $flags{extends};
-        $flags{does}{scalar}     = 1 unless $flags{does};
-    }
-
-    return $pre, $classname, \%flags;
-}
-
-=head3 C<extract_balanced()>
-
-    ($classblock, $post) = extract_balanced($code);
-
-B<Purpose:>  Remove a balanced C<{}> construct from the beginning of C<$code>.
-Return it and the remaining code.
-
-B<Argument:>  The code ref which was the first argument provided to
-C<parse_pmc()>.
-
-B<Return Values:>  List of two elements:
-
-=over 4
-
-=item *
-
-String beginning with C<{> and ending with C<}>.  In between is found C code
-where the comments hold strings of Perl comments written in POD.
-
-=item *
-
-String holding the balance of the code.  Same style as first element, but
-without the braces.
-
-=back
-
-B<Comments:>  Called twice within C<parse_pmc()>.  Will die with error message
-C<Badly balanced> if not balanced.
-
-=cut
-
-sub extract_balanced {
-    my $code    = shift;
-    my $balance = 0;
-
-    $code =~ s/^\s+//;
-
-    # create a copy and remove strings and comments so that
-    # unbalanced {} can be used in them in PMCs, being careful to
-    # preserve string length.
-    local $_ = $code;
-    s[
-        ( ' (?: \\. | [^'] )* '     # remove ' strings
-        | " (?: \\. | [^"] )* "     # remove " strings
-        | /\* .*? \*/ )             # remove C comments
-    ]
-    [ "-" x length $1 ]sexg;
-
-    /^\{/ or die "bad block open: ", substr( $code, 0, 10 ), "...";
-
-    while (/ (\{) | (\}) /gx) {
-        if ($1) {
-            $balance++;
-        }
-        else {    # $2
-            $balance--;
-            return substr( $code, 0, pos, "" ), $code
-                if not $balance;
-        }
-    }
-    die "Badly balanced" if $balance;
-    return;
-}
-
-=head3 C<parse_method_attrs()>
-
-    $attrs = parse_method_attrs($method_attributes);
-
-B<Purpose:>  Parse a list of method attributes and return a hash ref of them.
-
-B<Arguments:>  String captured from regular expression.
-
-B<Return Values:>  Reference to hash of attribute values.
-
-B<Comments:>  Called within C<parse_pmc()>.
-
-=cut
-
-sub parse_method_attrs {
-    my $flags = shift;
-    my %result;
-    ++$result{$1} while $flags =~ /:(\w+)/g;
-    return \%result;
 }
 
 =head3 C<dump_is_newer()>
@@ -1023,10 +688,8 @@ sub inherit_attrs {
     if ( ( $super_attrs->{read} or $super_attrs->{write} )
         and not( $attrs->{read} or $attrs->{write} ) )
     {
-        $attrs->{read} = $super_attrs->{read}
-            if exists $super_attrs->{read};
-        $attrs->{write} = $super_attrs->{write}
-            if exists $super_attrs->{write};
+        $attrs->{read} = $super_attrs->{read} if exists $super_attrs->{read};
+        $attrs->{write} = $super_attrs->{write} if exists $super_attrs->{write};
     }
     return $class;
 }
@@ -1034,7 +697,7 @@ sub inherit_attrs {
 =head1 AUTHOR
 
 Leopold Toetsch wrote F<pmc2c.pl>.  It was cleaned up by Matt Diephouse.
-James E Keenan extracted the subroutines into F<lib/Parrot/Pmc2c/Utils.pm> and
+James E Keenan extracted the subroutines into F<lib/Parrot/Pmc2c/Pmc2cMain.pm> and
 wrote the accompanying test suite.
 
 =head1 SEE ALSO

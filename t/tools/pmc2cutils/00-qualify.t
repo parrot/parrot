@@ -8,7 +8,7 @@ use warnings;
 use Test::More tests => 10;
 use FindBin;
 use lib ( "$FindBin::Bin/../..", "$FindBin::Bin/../../lib", "$FindBin::Bin/../../../lib", );
-use_ok('Parrot::Pmc2c::Utils');
+use_ok('Parrot::Pmc2c::Pmc2cMain');
 
 ok( -f "$FindBin::Bin/../../../Makefile",          "Makefile located" );
 ok( -f "$FindBin::Bin/../../../myconfig",          "myconfig located" );
@@ -47,7 +47,7 @@ my $message = <<END_OF_MESSAGE;
 
 
 The files in this directory test the publicly callable methods of
-Parrot::Pmc2c::Utils.  By doing so, they test the functionality
+Parrot::Pmc2c::Pmc2cMain.  By doing so, they test the functionality
 of the pmc2c.pl utility.
 
 Since pmc2c.pl is invoked many times during 'make', tests of its
@@ -59,7 +59,7 @@ that point in the build process, but some will necessarily fail
 if 'make' has already been executed.  Hence, they should not be
 included in the set of tests run by 'make test'.
 
-In short, these are tests of Parrot::Pmc2c::Utils but are *not*
+In short, these are tests of Parrot::Pmc2c::Pmc2cMain but are *not*
 tests of Parrot itself.
 
 END_OF_MESSAGE
@@ -79,9 +79,9 @@ pass("Completed all tests in $0");
 =head1 DESCRIPTION
 
 The files in this directory test the publicly callable methods of
-F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality
+F<lib/Parrot/Pmc2c/Pmc2cMain.pm>.  By doing so, they test the functionality
 of the F<pmc2c.pl> utility.  That functionality has largely been extracted
-into the methods of F<Utils.pm>.
+into the methods of F<Pmc2cMain.pm>.
 
 Since F<pmc2c.pl> is invoked during C<make>, tests of its functionality can
 give meaningful results only if they take into consideration the status of the

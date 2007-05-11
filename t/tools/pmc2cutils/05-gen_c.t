@@ -24,7 +24,7 @@ use File::Basename;
 use File::Copy;
 use FindBin;
 use Data::Dumper;
-use_ok('Parrot::Pmc2c::Utils');
+use_ok('Parrot::Pmc2c::Pmc2cMain');
 use_ok('Cwd');
 use_ok( 'File::Temp', qw| tempdir | );
 
@@ -57,14 +57,14 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     my @include = ( $tdir, $temppmcdir, @include_orig );
 
     @args = ( qq{$temppmcdir/default.pmc}, );
-    $self = Parrot::Pmc2c::Utils->new(
+    $self = Parrot::Pmc2c::Pmc2cMain->new(
         {
             include => \@include,
             opt     => \%opt,
             args    => [@args],
         }
     );
-    isa_ok( $self, q{Parrot::Pmc2c::Utils} );
+    isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
     $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
@@ -98,14 +98,14 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     my @include = ( $tdir, $temppmcdir, @include_orig );
 
     @args = ( qq{$temppmcdir/default.pmc}, qq{$temppmcdir/array.pmc}, );
-    $self = Parrot::Pmc2c::Utils->new(
+    $self = Parrot::Pmc2c::Pmc2cMain->new(
         {
             include => \@include,
             opt     => \%opt,
             args    => [@args],
         }
     );
-    isa_ok( $self, q{Parrot::Pmc2c::Utils} );
+    isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
     $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
@@ -141,14 +141,14 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 
     @args = ( qq{$temppmcdir/default.pmc}, );
     my %opt = ( debug => 1 );
-    $self = Parrot::Pmc2c::Utils->new(
+    $self = Parrot::Pmc2c::Pmc2cMain->new(
         {
             include => \@include,
             opt     => \%opt,
             args    => [@args],
         }
     );
-    isa_ok( $self, q{Parrot::Pmc2c::Utils} );
+    isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
     $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
@@ -190,14 +190,14 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 
     @args = ( qq{$temppmcdir/default.pmc}, );
     my %opt = ( debug => 2, verbose => 1 );
-    $self = Parrot::Pmc2c::Utils->new(
+    $self = Parrot::Pmc2c::Pmc2cMain->new(
         {
             include => \@include,
             opt     => \%opt,
             args    => [@args],
         }
     );
-    isa_ok( $self, q{Parrot::Pmc2c::Utils} );
+    isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
 
     my ( $fh, $msg, $rv );
     {
@@ -251,14 +251,14 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     my @include = ( $tdir, $temppmcdir, @include_orig );
 
     @args = ( qq{$temppmcdir/default.pmc}, qq{$temppmcdir/array.pmc}, );
-    $self = Parrot::Pmc2c::Utils->new(
+    $self = Parrot::Pmc2c::Pmc2cMain->new(
         {
             include => \@include,
             opt     => \%opt,
             args    => [@args],
         }
     );
-    isa_ok( $self, q{Parrot::Pmc2c::Utils} );
+    isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
     $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
@@ -295,14 +295,14 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     my @include = ( $tdir, $temppmcdir, @include_orig );
 
     @args = ( qq{$temppmcdir/default.pmc}, qq{$temppmcdir/class.pmc}, );
-    $self = Parrot::Pmc2c::Utils->new(
+    $self = Parrot::Pmc2c::Pmc2cMain->new(
         {
             include => \@include,
             opt     => \%opt,
             args    => [@args],
         }
     );
-    isa_ok( $self, q{Parrot::Pmc2c::Utils} );
+    isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
     $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
@@ -322,7 +322,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-05-gen_c.t - test C<Parrot::Pmc2c::Utils::gen_c()>
+05-gen_c.t - test C<Parrot::Pmc2c::Pmc2cMain::gen_c()>
 
 =head1 SYNOPSIS
 
@@ -331,11 +331,11 @@ pass("Completed all tests in $0");
 =head1 DESCRIPTION
 
 The files in this directory test the publicly callable methods of
-F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality
+F<lib/Parrot/Pmc2c/Pmc2cMain.pm>.  By doing so, they test the functionality
 of the F<pmc2c.pl> utility.  That functionality has largely been extracted
-into the methods of F<Utils.pm>.
+into the methods of F<Pmc2cMain.pm>.
 
-F<05-gen_c.t> tests the C<Parrot::Pmc2c::Utils::gen_c()> method.
+F<05-gen_c.t> tests the C<Parrot::Pmc2c::Pmc2cMain::gen_c()> method.
 F<make> calls this method when it calls in C<tools/build/pmc2c.pl --c>.
 
 So as not to pollute the Parrot build directories with files created

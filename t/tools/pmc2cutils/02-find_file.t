@@ -20,14 +20,14 @@ BEGIN {
     unshift @INC, qq{$topdir/lib};
 }
 use Test::More tests => 7;
-use_ok('Parrot::Pmc2c::Utils');
+use_ok('Parrot::Pmc2c::Pmc2cMain');
 
 my ( %opt, @include, @args );
 my $self;
 
 my $pmcdir = qq{$main::topdir/src/pmc};
 @include = ($pmcdir);
-$self    = Parrot::Pmc2c::Utils->new(
+$self    = Parrot::Pmc2c::Pmc2cMain->new(
     {
         include => \@include,
         opt     => \%opt,
@@ -65,7 +65,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-02-find_file.t - test C<Parrot::Pmc2c::Utils::find_file()>
+02-find_file.t - test C<Parrot::Pmc2c::Pmc2cMain::find_file()>
 
 =head1 SYNOPSIS
 
@@ -74,11 +74,11 @@ pass("Completed all tests in $0");
 =head1 DESCRIPTION
 
 The files in this directory test the publicly callable methods of
-F<lib/Parrot/Pmc2c/Utils.pm>.  By doing so, they test the functionality
+F<lib/Parrot/Pmc2c/Pmc2cMain.pm>.  By doing so, they test the functionality
 of the F<pmc2c.pl> utility.  That functionality has largely been extracted
-into the methods of F<Utils.pm>.
+into the methods of F<Pmc2cMain.pm>.
 
-F<02-find_file.t> tests C<Parrot::Pmc2c::Utils::find_file()>, which is
+F<02-find_file.t> tests C<Parrot::Pmc2c::Pmc2cMain::find_file()>, which is
 called within other Parrot::Pmc2c::Util methods.  The tests assume a certain
 file structure in the Parrot tarball; they may no longer be valid if that
 structure changes in the future.

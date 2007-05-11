@@ -17,8 +17,7 @@ $SIG{__WARN__} = sub {
 
 =head1 NAME
 
-Parrot::Pmc2c::Utils::PCCMETHOD - Parses and preps PMC PCCMETHOD
-  called from F<Parrot:Pmc2c::Utils>
+Parrot::Pmc2c::PCCMETHOD - Parses and preps PMC PCCMETHOD called from F<Parrot:Pmc2c::Pmc2cMain>
 
 =head1 SYNOPSIS
 
@@ -26,7 +25,7 @@ Parrot::Pmc2c::Utils::PCCMETHOD - Parses and preps PMC PCCMETHOD
 
 =head1 DESCRIPTION
 
-Parrot::Pmc2c::PCCMETHOD - Parses and preps PMC PCCMETHOD called from F<Parrot:Pmc2c::Utils>
+Parrot::Pmc2c::PCCMETHOD - Parses and preps PMC PCCMETHOD called from F<Parrot:Pmc2c::Pmc2cMain>
 
 =cut
 

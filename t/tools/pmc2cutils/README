@@ -2,7 +2,7 @@
 # $Id$
 README for directory t/tools/pmc2cutils/
 
-This directory contains test code for Parrot::Pmc2c::Utils, a Perl5
+This directory contains test code for Parrot::Pmc2c::Pmc2cMain, a Perl5
 module whose publicly callable methods and other subroutines supply
 functionality for Parrot build tool 'pmc2c.pl'.
 
@@ -15,7 +15,7 @@ that point in the build process, but some will necessarily fail
 if 'make' has already been executed.  Hence, they should not be
 included in the set of tests run by 'make test'.
 
-In short, these are tests of Parrot::Pmc2c::Utils but are *not*
+In short, these are tests of Parrot::Pmc2c::Pmc2cMain but are *not*
 tests of Parrot itself.
 
 

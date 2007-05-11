@@ -152,7 +152,7 @@ src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \\
 \t\tlib/Parrot/Pmc2c/Ref.pm         lib/Parrot/Pmc2c/SharedRef.pm \\
 \t\tlib/Parrot/Pmc2c/Standard.pm    lib/Parrot/Pmc2c/UtilFunctions.pm \\
 \t\tlib/Parrot/Pmc2c/delegate.pm    lib/Parrot/Pmc2c/Null.pm \\
-\t\tlib/Parrot/Pmc2c/StandardRO.pm  lib/Parrot/Pmc2c/Utils.pm \\
+\t\tlib/Parrot/Pmc2c/StandardRO.pm  lib/Parrot/Pmc2c/Pmc2cMain.pm \\
 \t\tlib/Parrot/Pmc2c/deleg_pmc.pm   lib/Parrot/Pmc2c/PCCMETHOD.pm  \\
 \t\tlib/Parrot/Pmc2c/StandardConst.pm
 \t\$(PMC2CD) src/pmc/$pmc.pmc 
