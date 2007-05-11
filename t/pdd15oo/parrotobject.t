@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: parrotobject.t 18397 2007-05-02 16:29:23Z mdiep $
+# $Id$
 
 use strict;
 use warnings;

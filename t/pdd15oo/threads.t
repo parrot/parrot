@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2001-2005, The Perl Foundation.
-# $Id: threads.t 17673 2007-03-21 03:08:59Z coke $
+# $Id$
 
 use strict;
 use warnings;

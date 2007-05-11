@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2005-2006, The Perl Foundation.
-# $Id: grammar.t 17577 2007-03-17 22:51:14Z paultcochrane $
+# $Id$
 
 use strict;
 use warnings;

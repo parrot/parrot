@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2001-2006, The Perl Foundation.
-# $Id: freeze.t 16171 2006-12-17 19:06:36Z paultcochrane $
+# $Id$
 
 use strict;
 use warnings;

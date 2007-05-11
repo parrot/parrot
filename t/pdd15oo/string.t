@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2001-2006, The Perl Foundation.
-# $Id: string.t 18401 2007-05-02 22:49:45Z mdiep $
+# $Id$
 
 use strict;
 use warnings;

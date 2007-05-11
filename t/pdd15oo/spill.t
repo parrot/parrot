@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2001-2005, The Perl Foundation.
-# $Id: spill.t 16244 2006-12-25 22:14:04Z paultcochrane $
+# $Id$
 
 use strict;
 use warnings;

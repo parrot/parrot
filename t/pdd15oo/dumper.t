@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2001-2006, The Perl Foundation.
-# $Id: dumper.t 17575 2007-03-17 22:49:07Z paultcochrane $
+# $Id$
 
 use strict;
 use warnings;

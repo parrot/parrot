@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2001-2005, The Perl Foundation.
-# $Id: object-mro.t 17366 2007-03-06 15:44:14Z mdiep $
+# $Id$
 
 use strict;
 use warnings;

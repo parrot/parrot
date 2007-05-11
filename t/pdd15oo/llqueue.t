@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2006 The Perl Foundation.
-# $Id: llqueue.t 18397 2007-05-02 16:29:23Z mdiep $
+# $Id$
 use warnings;
 use strict;
 use lib qw( . lib ../lib ../../lib );

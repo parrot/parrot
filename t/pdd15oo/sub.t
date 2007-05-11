@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2001-2006, The Perl Foundation.
-# $Id: sub.t 17577 2007-03-17 22:51:14Z paultcochrane $
+# $Id$
 
 use strict;
 use warnings;
