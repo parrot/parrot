@@ -25,7 +25,7 @@ Tests the BigInt PMC.
 =cut
 
 if ( $PConfig{gmp} ) {
-    plan tests => 43;
+    plan tests => 44;
 }
 else {
     plan skip_all => "No BigInt Lib configured";
@@ -900,6 +900,25 @@ CODE
 /Integer 1024001024
 Integer overflow
 current instr/
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', "shl_int by 64 bits also promotes to Bigint");
+## The C << and >> ops take the right arg modulo the word size in bits (at least
+## on all the systems I have available), so both 32- and 64-bit systems treat
+## shifting by 64 bits as shifting by zero.
+.sub main :main
+   new $P0, .Integer
+   set $P0, 1000001
+   new $P1, .Integer
+   set $P1, 64
+   n_shl $P2, $P0, $P1
+   $S2 = typeof $P2
+   print $S2
+   print ' '
+   say $P2
+.end
+CODE
+BigInt 18446762520453625325551616
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "shr_int and i_shr_int with a neg shift promote Integer to Bigint");

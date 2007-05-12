@@ -38,14 +38,22 @@ bitwise_left_shift_internal(Interp *interp, PMC *self,
     int overflow_p = 0;
 
     /* Compute the shift. */
-    if (shift_amount >= 0) {
+    if (shift_amount >= 8*INTVAL_SIZE) {
+        /* Extreme left shift; no need to do an integer shift first. */
+        overflow_p = 1;
+    }
+    else if (shift_amount >= 0) {
         /* Left shift. */
         result = base << shift_amount;
         overflow_p = (result >> shift_amount) != base;
     }
-    else {
+    else if (shift_amount > -8*INTVAL_SIZE) {
         /* Right shift.  By definition, this can never overflow. */
         result = base >> -shift_amount;
+    }
+    else {
+        /* Extreme right shift. */
+        result = 0;
     }
 
     /* Store the result. */
