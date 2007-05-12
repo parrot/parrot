@@ -1,3 +1,6 @@
+# $Id$
+
+# Setup some commands
 RM_F = @rm_f@
 PERL = @perl@
 PARROT = ../../parrot@exe@
@@ -5,13 +8,16 @@ PARROT = ../../parrot@exe@
 all: build
 
 test: build
-	$(PARROT) -r lisp.pbc t/test.l
+	$(PERL) -Ilib -I../../lib t/harness
 
 build: lisp.pir
 	$(PARROT) -o lisp.pbc lisp.pir
 
-clean:
+clean: testclean
 	$(RM_F) core "*.pbc" "*~"
+
+testclean:
+	$(RM_F) t/*.out t/*.l
 
 realclean: clean
 	$(RM_F) Makefile
