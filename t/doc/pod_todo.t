@@ -55,7 +55,7 @@ BEGIN {
     }
 }
 
-plan tests => 1;
+plan skip_all => 'Pod TODO tests not required in default test harness';  #  tests => 1;
 
 # XXX this should really be using src_dir insetad of build_dir but it
 # doesn't exist (yet)
