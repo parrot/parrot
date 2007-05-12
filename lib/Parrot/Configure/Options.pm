@@ -16,8 +16,8 @@ sub get_valid_options {
         jitcapable ld ldflags lex libdir libexecdir libs link linkflags
         localstatedir m maintainer mandir miniparrot nomanicheck oldincludedir
         opcode ops optimize parrot_is_shared pmc prefix profile sbindir
-        sharedstatedir step sysconfdir verbose verbose-step version without-gdbm
-        without-gmp without-icu yacc);
+        sharedstatedir step sysconfdir test verbose verbose-step version 
+        without-gdbm without-gmp without-icu yacc);
 }
 
 sub process_options {
@@ -88,6 +88,11 @@ General Options:
                         Execute a single configure step
 
    --ask                Have Configure ask for commonly-changed info
+   --test=configure     Run tests of configuration tools before configuring
+   --test=build         Run tests of build tools after configuring but before
+                        calling 'make'
+   --test               Run configuration tools tests, configure, then run
+                        build tools tests
 
 Compile Options:
 

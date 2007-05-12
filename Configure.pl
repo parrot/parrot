@@ -60,6 +60,33 @@ execute a single configure step
 
 This turns on the user prompts.
 
+=item C<--test>
+
+Run certain tests along with F<Configure.pl>:
+
+=over 4
+
+=item C<--test=configure>
+
+Run tests found in F<t/configure/> I<before> beginning configuration.  These
+tests demonstrate that Parrot's configuration tools will work properly once
+configuration has begun.
+
+=item C<--test=build>
+
+Run tests found in F<t/postconfigure/>, F<t/tools/pmc2cutils/>,
+F<t/tools/ops2cutils/> and F<t/tools/ops2pmutils/> I<after> configuration has
+completed.  These tests demonstrate (a) that certain of Parrot's configuration
+tools are working properly post-configuration; and (b) that certain of
+Parrot's build tools will work properly once you call F<make>.
+
+=item C<--test>
+
+Run the tests described in C<--test=configure>, conduct configuration, then
+run the tests described in C<--test=build>.
+
+=back
+
 =back
 
 Compile Options
@@ -264,6 +291,7 @@ use lib 'lib';
 use Parrot::BuildUtil;
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
+use Parrot::Configure::Options::Test;
 use Parrot::Configure::Messages qw(
     print_introduction
     print_conclusion
@@ -292,7 +320,10 @@ my $args = process_options( {
 } );
 exit unless defined $args;
 
-my %args = %$args;
+my $opttest = Parrot::Configure::Options::Test->new($args);
+# configuration tests will only be run if you requested them 
+# as command-line option
+$opttest->run_configure_tests();
 
 # from Parrot::Configure::Messages
 print_introduction($parrot_version);
@@ -302,6 +333,7 @@ my $conf = Parrot::Configure->new;
 # from Parrot::Configure::Step::List
 $conf->add_steps(get_steps_list());
 
+my %args = %$args;
 # from Parrot::Configure::Data
 $conf->options->set(%args);
 
@@ -319,6 +351,18 @@ else {
 }
 
 # tell users what to do next
+#if ($run_build_tests) {
+#    print "\n\n";
+#    print "As you requested, I will now run some tests of the build tools.\n\n";
+#    system(qq{prove t/postconfigure/*.t t/tools/pmc2cutils/*.t t/tools/ops2cutils/*.t t/tools/ops2pmutils/*.t})
+#        and die "Unable to execute post-configuration and build tools tests";
+#}
+
+
+# build tests will only be run if you requested them 
+# as command-line option
+$opttest->run_build_tests();
+
 # from Parrot::Configure::Messages
 print_conclusion($conf->data->get('make'));
 
