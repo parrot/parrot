@@ -111,9 +111,9 @@ Create a new function object with label L, placing the result in F.
   .sym pmc _func
 
    .F = new "LispFunction"
-   newsub _func, .Sub, .L
+   # VALID_IN_PARROT_0_2_0 newsub _func, .Sub, .L
 
-   setattribute .F, "LispFunction\0body", _func
+   # VALID_IN_PARROT_0_2_0 setattribute .F, "LispFunction\0body", .L
 .endm
 
 =head1 .MACRO(F,L)

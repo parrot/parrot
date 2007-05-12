@@ -72,15 +72,18 @@ FUNCTION_LOOP:
 
 FUNCTION_CALL:
   _FUNCTION_CALL(function,funcargs)
-  goto DONE
+  # VALID_IN_PARROT_0_2_0 goto DONE
+  .return(retv)
 
 FUNCTION_NOT_FOUND:
   .ERROR_1("undefined-function", "%s is not a function name", symbol)
-  goto DONE
+  # VALID_IN_PARROT_0_2_0 goto DONE
+  .return(retv)
 
 ERROR_NARGS:
   .ERROR_0("program-error", "wrong number of arguments to EVAL")
-  goto DONE
+  # VALID_IN_PARROT_0_2_0 goto DONE
+  .return(retv)
 
 SPECIAL_FORMS:
   # Special forms aren't subject to normal evaluation rules - keep the
@@ -100,7 +103,7 @@ MACRO_FORM:
    macroexp = macrosym._get_value()		# Get the expander function
   .ASSERT_TYPE_AND_BRANCH(macroexp, "function", MACRO_NOT_INITIALIZED)
 
-   peek_pad macroenv				# Get current lexical scope
+   # VALID_IN_PARROT_0_2_0  peek_pad macroenv				# Get current lexical scope
 
   .LIST_3(funcargs, symbol, body, macroenv)
    retv = _FUNCTION_CALL(macroexp, funcargs)    # Call the macroexpand hook
@@ -108,7 +111,8 @@ MACRO_FORM:
   .LIST_1(macroarg, retv)
   _eval(macroarg)
 
-  goto DONE
+  # VALID_IN_PARROT_0_2_0 goto DONE
+  .return(retv)
 
 SYMBOL:
   symbol = form
@@ -138,35 +142,39 @@ CHECK_VALUE:
   unless found goto SYMBOL_NOT_FOUND
 
 DONE_SYMBOL:
-  argcP = 1					# One value returned
-  P5 = retv					# Return value
-
-  goto DONE
+  # VALID_IN_PARROT_0_2_0 argcP = 1					# One value returned
+  # VALID_IN_PARROT_0_2_0 P5 = retv					# Return value
+  # VALID_IN_PARROT_0_2_0 
+  # VALID_IN_PARROT_0_2_0 goto DONE
+  .return(retv)
 
 SYMBOL_NOT_FOUND:
   .ERROR_1("unbound-variable", "variable %s has no value", form)
-  goto DONE
+  # VALID_IN_PARROT_0_2_0 goto DONE
+  .return(retv)
 
 SELF_EVALUATING_OBJECT:
   # Object is a primitive type (ie. a string, integer or float).
   retv = form
+  # VALID_IN_PARROT_0_2_0 argcP = 1					# One value returned
+  # VALID_IN_PARROT_0_2_0 P5 = retv					# Return value
 
-  argcP = 1					# One value returned
-  P5 = retv					# Return value
-
-  goto DONE
+  # VALID_IN_PARROT_0_2_0 goto DONE
+  .return(retv)
 
 MACRO_NOT_INITIALIZED:
   .ERROR_0("internal","the macro system has not been initialized")
-  goto DONE
+# VALID_IN_PARROT_0_2_0   goto DONE
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 DONE:
+# VALID_IN_PARROT_0_2_0   is_prototyped = 0				# Nonprototyped return
+# VALID_IN_PARROT_0_2_0   argcI = 0					# No integer values returned
+# VALID_IN_PARROT_0_2_0   argcN = 0					# No float values returned
+# VALID_IN_PARROT_0_2_0   argcS = 0					# No string values returned
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0   returncc					# Call the return continuation
 
-DONE:
-  is_prototyped = 0				# Nonprototyped return
-  argcI = 0					# No integer values returned
-  argcN = 0					# No float values returned
-  argcS = 0					# No string values returned
-
-  returncc					# Call the return continuation
+  .return()
 .end
 
 # Local Variables:

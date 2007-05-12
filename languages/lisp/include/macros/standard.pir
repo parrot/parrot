@@ -40,13 +40,13 @@ Sets R to true (the TRUE symbol).
 
 .macro SPECIAL_FORM (S,P,N,L)
   .sym pmc _specialformp
-  .sym pmc _funcp
+  # VALID_IN_PARROT_0_2_0 .sym pmc _funcp
   .sym pmc _namep
 
-  newsub _funcp, .Sub, .L
+  # VALID_IN_PARROT_0_2_0 newsub _funcp, .Sub, .L
 
   _specialformp = new "LispSpecialForm"
-  _specialformp._set_body(_funcp)
+  # VALID_IN_PARROT_0_2_0 _specialformp._set_body(.L)
 
   _namep = new "LispString"
   _namep = .N

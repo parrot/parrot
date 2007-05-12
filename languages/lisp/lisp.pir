@@ -21,12 +21,32 @@
   .local int argc
   .local int res
 
+
+    load_bytecode "PGE.pbc"               # Parrot Grammar engine
+ 
+    # compile a couble of regexes that are needed in validate.pir
+    .local pmc p6rule
+    p6rule = compreg "PGE::P6Regex"
+
+    .local pmc is_integer
+    is_integer = p6rule( "^<[+\-]>?\d+<'.'>?$" ) 
+    set_global 'is_integer', is_integer
+
+    .local pmc is_float
+    is_float = p6rule( "^<[+-]>?\d+<'.'>\d+$" ) 
+    set_global 'is_float', is_float
+
+    .local pmc is_qualified
+    # todo keyword, split into qualifier, package and symbol
+    is_qualified = p6rule( "^<[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]>*::<[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]>*" ) 
+    set_global 'is_qualified', is_qualified
+
    _init_types()			# Initialize all the type classes.
 
    _init_cl()				# Initialize the built-in functions in
    _init_system()			# the SYSTEM and COMMON-LISP packages.
 
-   new_pad 0				# Create the null lexical environment.
+    # VALID_IN_PARROT_0_2_0  new_pad 0                            # Create the null lexical environment.
 
 
   .STRING(name, "lisp/bootstrap.l")	# Load the lisp bootstrap file.
@@ -57,9 +77,10 @@ REP_LOOP:
    retv = _read(args)
 
   .LIST_1(args, retv)			# Eval!
-   retv = _eval(args)
+   # VALID_IN_PARROT_0_2_0 retv = _eval(args)
 
-   foldup retv
+   # VALID_IN_PARROT_0_2_0 foldup retv
+  ( retv :slurpy) = _eval(args)
 
   .local int nretv
    nretv = retv

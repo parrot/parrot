@@ -11,10 +11,16 @@
   .local int flag
   .local pmc nil
 
-  flag = _IS_INTEGER(token)		# attempt to parse token as an integer
+  # VALID_IN_PARROT_0_2_0 flag = _IS_INTEGER(token)		# attempt to parse token as an integer
+  .local pmc is_integer
+  is_integer = get_global 'is_integer'
+  flag = is_integer(token)		# attempt to parse token as an integer
   if flag goto INTEGER
 
-  flag = _IS_FLOAT(token)		# attempt to parse token as a float
+  # VALID_IN_PARROT_0_2_0 flag = _IS_FLOAT(token)		# attempt to parse token as a float
+  .local pmc is_float
+  is_float = get_global 'is_float'
+  flag = is_float(token)		# attempt to parse token as a float
   if flag goto FLOAT
 
   goto QUALIFIED_SYMBOL			# else interpret it as a symbol
@@ -28,7 +34,10 @@ FLOAT:
   goto DONE
 
 QUALIFIED_SYMBOL:
-  (flag,pkgname,symname) = _IS_QUALIFIED(token)
+  # VALID_IN_PARROT_0_2_0 (flag,pkgname,symname) = _IS_QUALIFIED(token)
+  .local pmc is_qualified
+  is_qualified = get_global 'is_qualified'
+  (flag,pkgname,symname) = is_qualified(token)
   if flag != 1 goto SYMBOL
 
   retv = _LOOKUP_GLOBAL(pkgname, symname)
@@ -64,163 +73,163 @@ DONE:
   .return(retv)
 .end
 
-.sub _IS_INTEGER
-  .param string token
-
-  .local int retv
-  .local int ndig
-  .local int idx
-
-  ndig = 0
-  idx  = 0
-
-SIGNS:
-  rx_oneof token, idx, '+-', DIGIT	# check for +/- signs (optional)
-  goto DIGIT
-
-DIGIT:					# ensure the rest is all digits
-  rx_is_d token, idx, DECIMAL
-  ndig = ndig + 1
-  goto DIGIT
-
-DECIMAL:
-  rx_literal token, idx, '.', EOS	# Check for an optional decimal point
-  goto EOS
-
-EOS:					# check to see if we're at string end
-  rx_zwa_atend token, idx, FAIL
-  goto MATCH
-
-MATCH:
-  if ndig == 0 goto FAIL		# ensure we had at least one digit
-  retv = 1
-  goto DONE
-
-FAIL:
-  retv = 0
-  goto DONE
-
-DONE:
-  .return(retv)
-.end
-
-.sub _IS_FLOAT
-  .param string token
-
-  .local int retv
-  .local int idx
-
-  idx  = 0
-
-SIGNS:
-  rx_oneof token, idx, '+-', PREDIGITS	# check for +/- signs (optional)
-  goto PREDIGITS
-
-PREDIGITS:				# check for pre-decimal digits
-  rx_is_d token, idx, DECIMAL
-  goto PREDIGITS
-
-DECIMAL:
-  rx_literal token, idx, '.', FAIL	# check for a decimal point
-  goto POSTDIGIT
-
-POSTDIGIT:
-  rx_is_d token, idx, FAIL		# check for at least one required digit
-  goto POSTDIGITS
-
-POSTDIGITS:				# check for option post-decimal digits
-  rx_is_d token, idx, EOS
-  goto POSTDIGITS
-
-EOS:					# check to see if we're at string end
-  rx_zwa_atend token, idx, FAIL
-  goto MATCH
-
-MATCH:
-  retv = 1
-  goto DONE
-
-FAIL:
-  retv = 0
-  goto DONE
-
-DONE:
-  .return(retv)
-.end
-
-.sub _IS_QUALIFIED
-  .param string token
-
-  .local string package
-  .local string symbol
-  .local string vchar
-  .local int retv
-  .local int idx1
-  .local int idx2
-  .local int idx3
-  .local int type
-
-  vchar = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$%&*<=>?@^_~-./+"
-  idx1   = 0
-
-PACKAGE:
-  rx_oneof token, idx1, vchar, COLON
-  goto PACKAGE
-
-COLON:
-  idx2 = idx1				# Index of last valid symbol character
-
-  rx_literal token, idx1, ':', FAIL	# If we don't have this -> not qualified
-
-  idx3 = idx1				# Start of symbol character
-  type = 0				# External symbol
-
-  rx_literal token, idx1, ':', SYMBOL	# If we don't have this -> not external
-
-  idx3 = idx1				# Start of symbol character
-  type = 1				# Internal symbol
-
-  goto SYMBOL
-
-SYMBOL:
-  rx_oneof token, idx1, vchar, EOS
-  goto SYMBOL
-
-EOS:
-  rx_zwa_atend token, idx1, FAIL	# check to see if we're at string end
-  goto MATCH
-
-KEYWORD:
-  package = "KEYWORD"
-  goto KEYWORD_RETURN
-
-MATCH:
-  idx3 = idx3
-
-KEYWORD_CHECK1:
-  if idx2 != 0 goto NOT_KEYWORD
-  if idx3 <= 2 goto KEYWORD
-  goto NOT_KEYWORD
-
-NOT_KEYWORD:
-  substr package, token, 0, idx2
-
-KEYWORD_RETURN:
-  substr symbol, token, idx3, idx1
-
-  retv = 1
-  goto DONE
-
-FAIL:
-  package = ""
-  symbol = ""
-  type = 0
-  retv = 0
-  goto DONE
-
-DONE:
-  .return(retv,package,symbol,type)
-.end
+# VALID_IN_PARROT_0_2_0 .sub _IS_INTEGER
+# VALID_IN_PARROT_0_2_0   .param string token
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0   .local int retv
+# VALID_IN_PARROT_0_2_0   .local int ndig
+# VALID_IN_PARROT_0_2_0   .local int idx
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0   ndig = 0
+# VALID_IN_PARROT_0_2_0   idx  = 0
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 SIGNS:
+# VALID_IN_PARROT_0_2_0   rx_oneof token, idx, '+-', DIGIT	# check for +/- signs (optional)
+# VALID_IN_PARROT_0_2_0   goto DIGIT
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 DIGIT:					# ensure the rest is all digits
+# VALID_IN_PARROT_0_2_0   rx_is_d token, idx, DECIMAL
+# VALID_IN_PARROT_0_2_0   ndig = ndig + 1
+# VALID_IN_PARROT_0_2_0   goto DIGIT
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 DECIMAL:
+# VALID_IN_PARROT_0_2_0   rx_literal token, idx, '.', EOS	# Check for an optional decimal point
+# VALID_IN_PARROT_0_2_0   goto EOS
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 EOS:					# check to see if we're at string end
+# VALID_IN_PARROT_0_2_0   rx_zwa_atend token, idx, FAIL
+# VALID_IN_PARROT_0_2_0   goto MATCH
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 MATCH:
+# VALID_IN_PARROT_0_2_0   if ndig == 0 goto FAIL		# ensure we had at least one digit
+# VALID_IN_PARROT_0_2_0   retv = 1
+# VALID_IN_PARROT_0_2_0   goto DONE
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 FAIL:
+# VALID_IN_PARROT_0_2_0   retv = 0
+# VALID_IN_PARROT_0_2_0   goto DONE
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 DONE:
+# VALID_IN_PARROT_0_2_0   .return(retv)
+# VALID_IN_PARROT_0_2_0 .end
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 .sub _IS_FLOAT
+# VALID_IN_PARROT_0_2_0   .param string token
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0   .local int retv
+# VALID_IN_PARROT_0_2_0   .local int idx
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0   idx  = 0
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 SIGNS:
+# VALID_IN_PARROT_0_2_0   rx_oneof token, idx, '+-', PREDIGITS	# check for +/- signs (optional)
+# VALID_IN_PARROT_0_2_0   goto PREDIGITS
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 PREDIGITS:				# check for pre-decimal digits
+# VALID_IN_PARROT_0_2_0   rx_is_d token, idx, DECIMAL
+# VALID_IN_PARROT_0_2_0   goto PREDIGITS
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 DECIMAL:
+# VALID_IN_PARROT_0_2_0   rx_literal token, idx, '.', FAIL	# check for a decimal point
+# VALID_IN_PARROT_0_2_0   goto POSTDIGIT
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 POSTDIGIT:
+# VALID_IN_PARROT_0_2_0   rx_is_d token, idx, FAIL		# check for at least one required digit
+# VALID_IN_PARROT_0_2_0   goto POSTDIGITS
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 POSTDIGITS:				# check for option post-decimal digits
+# VALID_IN_PARROT_0_2_0   rx_is_d token, idx, EOS
+# VALID_IN_PARROT_0_2_0   goto POSTDIGITS
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 EOS:					# check to see if we're at string end
+# VALID_IN_PARROT_0_2_0   rx_zwa_atend token, idx, FAIL
+# VALID_IN_PARROT_0_2_0   goto MATCH
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 MATCH:
+# VALID_IN_PARROT_0_2_0   retv = 1
+# VALID_IN_PARROT_0_2_0   goto DONE
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 FAIL:
+# VALID_IN_PARROT_0_2_0   retv = 0
+# VALID_IN_PARROT_0_2_0   goto DONE
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 DONE:
+# VALID_IN_PARROT_0_2_0   .return(retv)
+# VALID_IN_PARROT_0_2_0 .end
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 .sub _IS_QUALIFIED
+# VALID_IN_PARROT_0_2_0   .param string token
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0   .local string package
+# VALID_IN_PARROT_0_2_0   .local string symbol
+# VALID_IN_PARROT_0_2_0   .local string vchar
+# VALID_IN_PARROT_0_2_0   .local int retv
+# VALID_IN_PARROT_0_2_0   .local int idx1
+# VALID_IN_PARROT_0_2_0   .local int idx2
+# VALID_IN_PARROT_0_2_0   .local int idx3
+# VALID_IN_PARROT_0_2_0   .local int type
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0   vchar = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$%&*<=>?@^_~-./+"
+# VALID_IN_PARROT_0_2_0   idx1   = 0
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 PACKAGE:
+# VALID_IN_PARROT_0_2_0   rx_oneof token, idx1, vchar, COLON
+# VALID_IN_PARROT_0_2_0   goto PACKAGE
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 COLON:
+# VALID_IN_PARROT_0_2_0   idx2 = idx1				# Index of last valid symbol character
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0   rx_literal token, idx1, ':', FAIL	# If we don't have this -> not qualified
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0   idx3 = idx1				# Start of symbol character
+# VALID_IN_PARROT_0_2_0   type = 0				# External symbol
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0   rx_literal token, idx1, ':', SYMBOL	# If we don't have this -> not external
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0   idx3 = idx1				# Start of symbol character
+# VALID_IN_PARROT_0_2_0   type = 1				# Internal symbol
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0   goto SYMBOL
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 SYMBOL:
+# VALID_IN_PARROT_0_2_0   rx_oneof token, idx1, vchar, EOS
+# VALID_IN_PARROT_0_2_0   goto SYMBOL
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 EOS:
+# VALID_IN_PARROT_0_2_0   rx_zwa_atend token, idx1, FAIL	# check to see if we're at string end
+# VALID_IN_PARROT_0_2_0   goto MATCH
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 KEYWORD:
+# VALID_IN_PARROT_0_2_0   package = "KEYWORD"
+# VALID_IN_PARROT_0_2_0   goto KEYWORD_RETURN
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 MATCH:
+# VALID_IN_PARROT_0_2_0   idx3 = idx3
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 KEYWORD_CHECK1:
+# VALID_IN_PARROT_0_2_0   if idx2 != 0 goto NOT_KEYWORD
+# VALID_IN_PARROT_0_2_0   if idx3 <= 2 goto KEYWORD
+# VALID_IN_PARROT_0_2_0   goto NOT_KEYWORD
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 NOT_KEYWORD:
+# VALID_IN_PARROT_0_2_0   substr package, token, 0, idx2
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 KEYWORD_RETURN:
+# VALID_IN_PARROT_0_2_0   substr symbol, token, idx3, idx1
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0   retv = 1
+# VALID_IN_PARROT_0_2_0   goto DONE
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 FAIL:
+# VALID_IN_PARROT_0_2_0   package = ""
+# VALID_IN_PARROT_0_2_0   symbol = ""
+# VALID_IN_PARROT_0_2_0   type = 0
+# VALID_IN_PARROT_0_2_0   retv = 0
+# VALID_IN_PARROT_0_2_0   goto DONE
+# VALID_IN_PARROT_0_2_0 
+# VALID_IN_PARROT_0_2_0 DONE:
+# VALID_IN_PARROT_0_2_0   .return(retv,package,symbol,type)
+# VALID_IN_PARROT_0_2_0 .end
 
 # Local Variables:
 #   mode: pir

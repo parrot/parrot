@@ -114,7 +114,8 @@ DONE:
 
   symname = symbol._get_name_as_string()
 
-  store_lex -1, symname, symbol
+  # VALID_IN_PARROT_0_2_0 store_lex -1, symname, symbol
+  store_lex symname, symbol
 .end
 
 
@@ -142,7 +143,8 @@ DONE:
    goto DONE
 
 DONE:
-   store_lex -1, symname, symbol
+   # VALID_IN_PARROT_0_2_0 store_lex -1, symname, symbol
+   store_lex symname, symbol
 
   .return(symbol)
 .end
@@ -221,6 +223,7 @@ DONE:
 .sub _FUNCTION_CALL
   .param pmc function
   .param pmc args
+
   .local string type
   .local pmc proto
   .local pmc scope
@@ -249,11 +252,11 @@ INTERPRETED_FUNCTION:
   goto CALL_FUNCTION
 
 CALL_FUNCTION:
-  pushtopp				# Save the upper registers
-  invokecc				# Call the closure
-  poptopp				# Restore the upper registers
+  # VALID_IN_PARROT_0_2_0 pushtopp				# Save the upper registers
+  # VALID_IN_PARROT_0_2_0 invokecc				# Call the closure
+  # VALID_IN_PARROT_0_2_0 poptopp				# Restore the upper registers
 
-  returncc
+  # VALID_IN_PARROT_0_2_0 returncc
 .end
 
 .sub _IS_SPECIAL
@@ -362,7 +365,7 @@ CLOSURE_START:
    clargsptr = clargs
    clprotptr = clprot
 
-   new_pad -1
+   # VALID_IN_PARROT_0_2_0  new_pad -1
 
    goto CLOSURE_ARGS
 
@@ -392,18 +395,18 @@ CLOSURE_BODY:
   .LIST_1(clearg, clbody)
    clretv = _eval(clearg)
 
-   pop_pad
+   # VALID_IN_PARROT_0_2_0  pop_pad
 
    goto CLOSURE_DONE
 
 CLOSURE_TOO_FEW_ARGS:
-   pop_pad
+   # VALID_IN_PARROT_0_2_0  pop_pad
 
   .ERROR_0("program-error", "Too few arguments given to LAMBDA")
    goto CLOSURE_DONE
 
 CLOSURE_TOO_MANY_ARGS:
-   pop_pad
+   # VALID_IN_PARROT_0_2_0  pop_pad
 
   .ERROR_0("program-error", "Too many arguments given to LAMBDA")
    goto CLOSURE_DONE

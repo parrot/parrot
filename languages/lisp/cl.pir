@@ -161,11 +161,12 @@ ERROR_NONLIST:
    goto DONE
 
 DONE:
-   argcI = 0					# No integer values returned
-   argcN = 0					# No float values returned
-   argcS = 0					# No string values returned
+   # VALID_IN_PARROT_0_2_0 argcI = 0					# No integer values returned
+   # VALID_IN_PARROT_0_2_0 argcN = 0					# No float values returned
+   # VALID_IN_PARROT_0_2_0 argcS = 0					# No string values returned
 
-   returncc					# Call the return continuation
+   # VALID_IN_PARROT_0_2_0 returncc					# Call the return continuation
+   .return()					# Call the return continuation
 .end
 
 .sub _atom
@@ -602,7 +603,7 @@ DONE:
   .local int nvar
   .local int i
 
-   new_pad -1					# Create new lexical scope
+   # VALID_IN_PARROT_0_2_0 new_pad -1					# Create new lexical scope
 
   .ASSERT_MINIMUM_LENGTH(args, 1, ERROR_NARGS)
 
@@ -640,7 +641,8 @@ INIT_LIST_LOOP:
   .CAR(form, lptr)				# Get the next init form
 
   .ASSERT_TYPE_AND_BRANCH(form, "list", ERROR_BAD_SPEC)
-  .ASSERT_LENGTH(form, 2, ERROR_BADSPEC)	# Ensure a valid init form
+  # VALID_IN_PARROT_0_2_0 .ASSERT_LENGTH(form, 2, ERROR_BADSPEC)	# Ensure a valid init form
+  .ASSERT_LENGTH(form, 2, ERROR_BAD_SPEC)	# Ensure a valid init form
 
   .CAR(symbol, form)				# The symbol we're assigning to
   .SECOND(value, form)				# The value being assigned
@@ -720,7 +722,7 @@ CLEANUP_HANDLER:
    goto CLEANUP					# and clean up before rethrow
 
 CLEANUP:
-   pop_pad					# Pop off the lexical scope
+   # VALID_IN_PARROT_0_2_0    pop_pad					# Pop off the lexical scope
 
    nvar = dynvars
    i = 0
@@ -747,7 +749,8 @@ CLEANUP_RETHROW:
    goto DONE
 
 
-ERROR_BADSPEC:
+# VALID_IN_PARROT_0_2_0 ERROR_BADSPEC:
+ERROR_BAD_SPEC:
   .ERROR_1("program-error", "illegal variable specification %s", form)
    goto CLEANUP
 
@@ -1100,14 +1103,15 @@ DONE_OVERFLOW:
    goto DONE
 
 DONE:
-   is_prototyped = 0				# Set up return registers
+   # VALID_IN_PARROT_0_2_0  is_prototyped = 0				# Set up return registers
 
-   argcI = 0
-   argcN = 0
-   argcP = llen
-   argcS = 0
+   # VALID_IN_PARROT_0_2_0  argcI = 0
+   # VALID_IN_PARROT_0_2_0  argcN = 0
+   # VALID_IN_PARROT_0_2_0  argcP = llen
+   # VALID_IN_PARROT_0_2_0  argcS = 0
 
-   returncc
+   # VALID_IN_PARROT_0_2_0 returncc
+   .return()
 .end
 
 .sub _add

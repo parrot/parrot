@@ -10,6 +10,7 @@
   .local pmc stream
   .local string token
   .local pmc retv
+  .local int nretv
 
   .ASSERT_LENGTH(args,1,ERROR_NARGS)  # We should have received one argument -
 				      # the input stream to read from.
@@ -55,9 +56,13 @@ STEP_4:
   .STRING(mchar, char)
 
   .LIST_2(margs, istream, mchar)           # Create a list of args to pass in
-   retv = _FUNCTION_CALL(macro, margs)         # Call the readmacro
+   # VALID_IN_PARROT_0_2_0 retv = _FUNCTION_CALL(macro, margs)         # Call the readmacro
 
-   if argcP == 0 goto STEP_1
+   # VALID_IN_PARROT_0_2_0 if argcP == 0 goto STEP_1
+   (retv :slurpy) = _FUNCTION_CALL(macro, margs)         # Call the readmacro
+   
+   nretv = retv
+   if nretv == 0 goto STEP_1
    goto DONE
 
 STEP_5:
@@ -179,6 +184,7 @@ DONE:
   .local pmc stream
   .local pmc symbol
   .local pmc tretv
+  .local pmc ntretv
   .local pmc retv
   .local pmc lptr
   .local int ordv
@@ -260,7 +266,9 @@ CALL_MACRO:
 
    tretv = _FUNCTION_CALL(macro, margs)   # Call the readmacro
 
-   if argcP == 0 goto LOOP                # If macro is NULL, start loop again
+   # VALID_IN_PARROT_0_2_0 if argcP == 0 goto LOOP                # If macro is NULL, start loop again
+   ntretv = tretv
+   if ntretv == 0 goto LOOP               # If macro is NULL, start loop again
    goto APPEND_TO_LIST                    # else add the return value to list
 
 DELIMIT_CHAR:                             # We've hit the delimter char -

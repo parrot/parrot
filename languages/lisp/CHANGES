@@ -1,3 +1,6 @@
+Changes for version 0.4.12
+--------------------------
+  * Make languages/lisp compile again, as it was broken due to changes in Parrot
 
 Changes for version 0.1.2
 -------------------------
