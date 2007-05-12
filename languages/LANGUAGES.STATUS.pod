@@ -2,12 +2,12 @@
 
 =head1 What's this?
 
-Language implementations that target parrot are listed here.
+Most language implementations that target parrot are listed here.
 At least the implementations that live in the 'languages' directory
 of the parrot repository should be covered.
 
 No author information is given here. This is because maintainers 
-should be tracked in the languages/*/MAINTAINER files, and we
+should be tracked in the respective languages/*/MAINTAINER files, and we
 don't want to repeat ourselves.
 
 For current status of some languages see also http://smoke.parrotcode.org/smoke/.
@@ -297,11 +297,11 @@ Aspires to implement a significant subset of the Common Lisp language.
 
 =item Status
 
-broken due to recent deprecations
+Broken due to changes in Parrot after Parrot 0.2.0.
 
 =item Last verified with parrot version
 
-0.1.2
+0.2.0
 
 =item Location
 
