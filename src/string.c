@@ -206,7 +206,7 @@ string_set(Interp *interp, STRING *dest /*NN*/, STRING *src)
     /* TODO create string_free API for reusing string headers */
 #ifdef GC_IS_MALLOC
         if (!PObj_is_cowed_TESTALL(dest) && PObj_bufstart(dest)) {
-            mem_sys_free((INTVAL*)PObj_bufstart(dest) - 1);
+            mem_sys_free(PObj_bufallocstart(dest));
         }
 #endif
         dest = Parrot_reuse_COW_reference(interp, src, dest);

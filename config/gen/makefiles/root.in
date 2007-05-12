@@ -1014,6 +1014,8 @@ $(SRC_DIR)/gc/gc_gms$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/gc/resources$(O) : $(GENERAL_H_FILES)
 
+$(SRC_DIR)/gc/res_lea$(O) : $(GENERAL_H_FILES)
+
 $(SRC_DIR)/headers$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/hll$(O) : $(GENERAL_H_FILES)

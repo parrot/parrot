@@ -115,57 +115,70 @@ xrealloc(void *p, size_t size)
 =item C<void
 Parrot_reallocate(Interp *interp, Buffer *from, size_t tosize)>
 
-COWable objects (strings or Buffers) use an INTVAL at C<bufstart> for
-refcounting in DOD. C<bufstart> is incremented by that C<INTVAL>.
+COWable objects (strings or Buffers) use an INTVAL before C<bufstart> for
+refcounting in DOD.
 
 =cut
 
 */
 
 void
-Parrot_reallocate(Interp *interp, Buffer *from, size_t tosize)
+Parrot_reallocate(Interp *interp, Buffer *buffer, size_t tosize)
 {
-    Buffer * const buffer = from;
     const size_t oldlen = PObj_buflen(buffer);
-    void *p;
+    Buffer_alloc_unit *p;
 
     if (!PObj_bufstart(buffer)) {
-        p = 1 + (INTVAL *)xcalloc(1, sizeof (INTVAL) + tosize);
+        Parrot_allocate_aligned(interp, buffer, tosize);
+        /* The previous version zeroed the memory here, but I'm not
+           sure why. */
+        memset(PObj_bufstart(buffer), 0, tosize);
     }
     else {
         if (!tosize) {    /* realloc(3) does free, if tosize == 0 here */
             return;    /* do nothing */
         }
-        p = 1 + (INTVAL *)xrealloc((INTVAL *)PObj_bufstart(buffer) - 1,
-                                   sizeof (INTVAL) + tosize);
+        p = (Buffer_alloc_unit *) xrealloc(PObj_bufallocstart(buffer),
+                                           Buffer_alloc_offset + tosize);
         if (tosize > oldlen)
-            memset(p + oldlen, 0, tosize - oldlen);
+            memset((char *)p->buffer + oldlen, 0, tosize - oldlen);
+        PObj_bufstart(buffer) = p->buffer;
+        PObj_buflen(buffer) = tosize;
     }
-    PObj_bufstart(buffer) = p;
-    PObj_buflen(buffer) = tosize;
 }
+
 
 /*
 
 =item C<void
 Parrot_allocate(Interp *interp, Buffer *buffer, size_t size)>
 
-Allocates and returns the required memory. C<size> is the number of
-bytes of memory required.
+Allocate buffer memory for the given Buffer pointer. The C<size>
+has to be a multiple of the word size.
+C<PObj_buflen> will be set to exactly the given C<size>.
+See the comments and diagram in resources.c.
+
+This was never called anyway, so it isn't implemented here.
+
+=item C<void
+Parrot_allocate_aligned(Interp *interp, Buffer *buffer, size_t size)>
+
+Like above, except the address of the buffer is guaranteed to be
+suitably aligned for holding anything contained in UnionVal
+(such as FLOATVAL).
 
 =cut
 
 */
 
 void
-Parrot_allocate(Interp *interp, Buffer *buffer, size_t size)
+Parrot_allocate_aligned(Interp *interp, Buffer *buffer, size_t size)
 {
-    Buffer * const b = buffer;
-    void * const p = xmalloc(sizeof (INTVAL) + size);
-
-    *(INTVAL *)p = 0;
-    PObj_bufstart(b) = 1 + (INTVAL *)p;
-    PObj_buflen(b) = size;
+    Buffer_alloc_unit *p;
+    p = (Buffer_alloc_unit *) xmalloc(Buffer_alloc_offset + size);
+    p->ref_count = 0;
+    PObj_bufstart(buffer) = p->buffer;
+    PObj_buflen(buffer) = size;
 }
 
 /*
@@ -183,16 +196,17 @@ number of bytes memory required.
 void
 Parrot_reallocate_string(Interp *interp, STRING *str, size_t tosize)
 {
-    if (!PObj_bufstart(str))
+    const size_t oldlen = PObj_buflen(str);
+    Buffer_alloc_unit *p;
+
+    if (!PObj_bufstart(str)) {
         Parrot_allocate_string(interp, str, tosize);
+    }
     else if (tosize) {
-        const size_t pad = BUFFER_ALIGNMENT - 1;
-        void *p;
-        tosize = ((tosize + pad + sizeof (INTVAL)) & ~pad);
-        p = xrealloc((char *)((INTVAL*)PObj_bufstart(str) - 1), tosize);
-        PObj_bufstart(str) = str->strstart = (char *)p + sizeof (INTVAL);
-        /* usable size at bufstart */
-        PObj_buflen(str) = tosize - sizeof (INTVAL);
+        p = (Buffer_alloc_unit *) xrealloc(PObj_bufallocstart(str),
+                                           Buffer_alloc_offset + tosize);
+        PObj_bufstart(str) = str->strstart = (char *) p->buffer;
+        PObj_buflen(str) = tosize;
     }
 }
 
@@ -211,14 +225,11 @@ number bytes of memory required.
 void
 Parrot_allocate_string(Interp *interp, STRING *str, size_t size)
 {
-    void *p;
-    const size_t pad = BUFFER_ALIGNMENT - 1;
-
-    size = ((size + pad + sizeof (INTVAL)) & ~pad);
-    p = xcalloc(1, size);
-    *(INTVAL*)p = 0;
-    PObj_bufstart(str) = str->strstart = (char *)p + sizeof (INTVAL);
-    PObj_buflen(str) = size - sizeof (INTVAL);
+    Buffer_alloc_unit *p;
+    p = (Buffer_alloc_unit *) xcalloc(Buffer_alloc_offset + size, 1);
+    p->ref_count = 0;
+    PObj_bufstart(str) = str->strstart = (char *) p->buffer;
+    PObj_buflen(str) = size;
 }
 
 /*
@@ -234,6 +245,21 @@ Does nothing.
 
 void
 Parrot_initialize_memory_pools(Interp *interp)
+{
+}
+
+/*
+
+=item C<void
+Parrot_merge_memory_pools(Interp *dest, Interp *source)>
+
+Does nothing.
+
+=cut
+
+*/
+void
+Parrot_merge_memory_pools(Interp *dest, Interp *source)
 {
 }
 

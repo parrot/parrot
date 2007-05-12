@@ -465,7 +465,7 @@ clear_cow(Parrot_Interp interp, Small_Object_Pool *pool, int cleanup)
 
                 if (PObj_COW_TEST(b) && PObj_bufstart(b) &&
                         !PObj_external_TEST(b)) {
-                    INTVAL * const refcount = (INTVAL *) PObj_bufstart(b) - 1;
+                    INTVAL * const refcount = PObj_bufrefcountptr(b);
                     *refcount               = 0;
                 }
             }
@@ -503,7 +503,7 @@ used_cow(Parrot_Interp interp, Small_Object_Pool *pool, int cleanup)
                     PObj_bufstart(b) &&
                    !PObj_external_TEST(b)) {
 
-                INTVAL * const refcount = (INTVAL *) PObj_bufstart(b) - 1;
+                INTVAL * const refcount = PObj_bufrefcountptr(b);
 
                 /* mark users of this bufstart by incrementing refcount */
                 if (PObj_live_TEST(b))
