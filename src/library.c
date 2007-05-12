@@ -24,53 +24,6 @@ This file contains a C function to access parrot's bytecode library functions.
 #include "library.str"
 
 /*
-  load_prefer is a toggle to prefer either the most low level form of a module
-  (compiled) or the highest level form of a module.
-
-  Users will typically want the compiled versions. This is also the perl5
-  behavior as well.
-
-  Developers who don't like to run a clean target inbetween changes can set the
-  environment variable PARROT_PREFER_SOURCE (value does not matter).
-
-  If a value for PARROT_PREFER_SOURCE is honored it should be a path spec of
-  directories for which source will be loaded over compiled objects.
- */
-
-#define COMPILE_FIRST 0
-#define SOURCE_FIRST 1
-
-static int load_prefer = COMPILE_FIRST;
-
-static int
-query_load_prefer ( Interp* interp ) {
-    int free_it;
-    char *env;
-
-    env = Parrot_getenv("PARROT_PREFER_SOURCE", &free_it);
-
-    if (env) {
-        if (free_it)
-            free(env);
-
-        return 1;
-    }
-
-    return 0;
-}
-
-/*
-  extension guessing init to catch a ride with
-  parrot_init_library_paths on the init path.
- */
-
-static void
-init_extension_guessing(Interp* interp) {
-    if( query_load_prefer(interp) )
-        load_prefer = SOURCE_FIRST;
-}
-
-/*
 
 =item C<void parrot_init_library_paths(Interp *)>
 
@@ -105,8 +58,6 @@ parrot_init_library_paths(Interp *interp)
 {
     PMC *iglobals, *lib_paths, *paths;
     STRING *entry;
-
-    init_extension_guessing(interp);
 
     iglobals = interp->iglobals;
     /* create the lib_paths array */
@@ -362,30 +313,18 @@ try_bytecode_extensions (Interp *interp, STRING* path )
         return result;
 
     /*
-      Start guessing now. With load_prefer defaulting to COMPILE_FIRST
-      it tries the most compiled form first. With load_prefer set to
-      SOURCE_FIRST it will try the highest level source first.
+      start guessing now. this version tries to find the lowest form of the
+      code, starting with bytecode and working up to PIR. note the atypical
+      loop control. This is so the array can easily be processed in reverse.
      */
 
-    if ( COMPILE_FIRST == load_prefer ) {
-        for( guess = 0 ; guess <= LOAD_EXT_CODE_LAST ; guess++ ) {
-            with_ext = string_copy(interp, path);
-            with_ext = string_append(interp,
-                                     with_ext, const_string(interp, load_ext_code[guess]));
+    for( guess = 0 ; guess <= LOAD_EXT_CODE_LAST ; guess++ ) {
+        with_ext = string_copy(interp, path);
+        with_ext = string_append(interp,
+                                 with_ext, const_string(interp, load_ext_code[guess]));
 
-            if ( (result = try_load_path(interp, with_ext)) )
-                return result;
-        }
-    }
-    else {
-        for( guess = LOAD_EXT_CODE_LAST ; guess >= 0 ; guess-- ) {
-            with_ext = string_copy(interp, path);
-            with_ext = string_append(interp,
-                                     with_ext, const_string(interp, load_ext_code[guess]));
-
-            if ( (result = try_load_path(interp, with_ext)) )
-                return result;
-        }
+        if ( (result = try_load_path(interp, with_ext)) )
+            return result;
     }
 
     return NULL;
