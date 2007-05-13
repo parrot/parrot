@@ -1,3 +1,4 @@
+# $Id$
 
 .macro ERROR_0(T,M)
   _error(.T, .M)

@@ -1,3 +1,4 @@
+# $Id$
 
 .sub _init_cl
   .local pmc function
@@ -16,20 +17,20 @@
    store_global "PACKAGES", "COMMON-LISP", package
    store_global "PACKAGES", "CL", package
 
-   t = package._intern_symbol("T")			# Create the T symbol, T meaning true
+   t = package._intern_symbol("T")                      # Create the T symbol, T meaning true
    t._set_value(t)
    t._set_package(package)
    t._set_special(t)
 
-   store_global "SYMBOLS", "T", t			# Quick alias to T, T meaning true
+   store_global "SYMBOLS", "T", t                       # Quick alias to T, T meaning true
    t = symbol
 
-   symbol = package._intern_symbol("NIL")		# Create the T symbol
+   symbol = package._intern_symbol("NIL")               # Create the NIL symbol
    symbol._set_value(symbol)
    symbol._set_package(package)
    symbol._set_special(t)
 
-   store_global "SYMBOLS", "NIL", symbol		# Quick alias to NIL
+   store_global "SYMBOLS", "NIL", symbol                # Quick alias to NIL
 
   .INTEGER(value,1)
   .DEFVAR(symbol, package, "*GENSYM-COUNTER*", value)
@@ -142,8 +143,8 @@ FUNCTION:
    goto DONE
 
 SYMBOL:
-   func = car._get_function()			# Get the function from symbol
-   if_null func, INVALID_FUNCTION_NAME		# Throw an error if undefined
+   func = car._get_function()                   # Get the function from symbol
+   if_null func, INVALID_FUNCTION_NAME          # Throw an error if undefined
 
    _FUNCTION_CALL(func,cdr)
    goto DONE
@@ -161,12 +162,12 @@ ERROR_NONLIST:
    goto DONE
 
 DONE:
-   # VALID_IN_PARROT_0_2_0 argcI = 0					# No integer values returned
-   # VALID_IN_PARROT_0_2_0 argcN = 0					# No float values returned
-   # VALID_IN_PARROT_0_2_0 argcS = 0					# No string values returned
+   # VALID_IN_PARROT_0_2_0 argcI = 0                                    # No integer values returned
+   # VALID_IN_PARROT_0_2_0 argcN = 0                                    # No float values returned
+   # VALID_IN_PARROT_0_2_0 argcS = 0                                    # No string values returned
 
-   # VALID_IN_PARROT_0_2_0 returncc					# Call the return continuation
-   .return()					# Call the return continuation
+   # VALID_IN_PARROT_0_2_0 returncc                                     # Call the return continuation
+   .return()                                   # Call the return continuation
 .end
 
 .sub _atom
@@ -179,8 +180,8 @@ DONE:
 
   .CAR(a, args)
 
-   typeof type, a				# An atom is anything that is
-   if type != "LispCons" goto ATOM		# not a cons.
+   typeof type, a                             # An atom is anything that is
+   if type != "LispCons" goto ATOM            # not a cons.
    goto CONS
 
 ATOM:
@@ -379,32 +380,32 @@ DONE:
 
    typeof type, form
 
-   if type == "LispSymbol" goto SYMBOL		# Retrieve function from symbol
+   if type == "LispSymbol" goto SYMBOL          # Retrieve function from symbol
 
-   test = _IS_ORDINARY_LAMBDA_LIST(form)	# Check if it's a lambda form
-   if test goto LAMBDA_FORM			# and build a closure if so
+   test = _IS_ORDINARY_LAMBDA_LIST(form)        # Check if it's a lambda form
+   if test goto LAMBDA_FORM                     # and build a closure if so
 
    goto INVALID_FUNCTION_NAME
 
 SYMBOL:
-   symname = form._get_name_as_string()		# Retrieve the symbols name
+   symname = form._get_name_as_string()         # Retrieve the symbols name
 
-   package = form._get_package()		# Retrieve the symbols package name
+   package = form._get_package()                # Retrieve the symbols package name
    pkgname = package._get_name_as_string()
 
-   symbol = _LOOKUP_GLOBAL(pkgname, symname)	# Lookup the symbol
+   symbol = _LOOKUP_GLOBAL(pkgname, symname)    # Lookup the symbol
 
-   defined found, symbol			# Ensure the symbol was found in
-   unless found goto FUNCTION_NOT_FOUND		# the global namespace
+   defined found, symbol                        # Ensure the symbol was found in
+   unless found goto FUNCTION_NOT_FOUND         # the global namespace
 
-   retv = symbol._get_function()		# Ensure the symbol had a function
-   defined found, symbol			# defined
+   retv = symbol._get_function()                # Ensure the symbol had a function
+   defined found, symbol                        # defined
    unless found goto FUNCTION_NOT_FOUND
 
    goto DONE
 
 LAMBDA_FORM:
-   retv = _MAKE_LAMBDA(form)			# Create a closure object
+   retv = _MAKE_LAMBDA(form)                    # Create a closure object
    goto DONE
 
 INVALID_FUNCTION_NAME:
@@ -490,13 +491,13 @@ DONE:
 
   .ASSERT_LENGTH_BETWEEN(args, 2, 3, ERROR_NARGS)
 
-  .CAR(form, args)			# Get the test form
+  .CAR(form, args)                      # Get the test form
 
   .LIST_1(earg,form)
-   retv = _eval(earg)			# Evaluate the test form.
+   retv = _eval(earg)                   # Evaluate the test form.
 
-  .NULL(retv, ELSE_CLAUSE)		# If test was false, goto else clause
-   goto THEN_CLAUSE			#else goto then clause
+  .NULL(retv, ELSE_CLAUSE)              # If test was false, goto else clause
+   goto THEN_CLAUSE                     #else goto then clause
 
 THEN_CLAUSE:
   .SECOND(form, args)
@@ -603,30 +604,30 @@ DONE:
   .local int nvar
   .local int i
 
-   # VALID_IN_PARROT_0_2_0 new_pad -1					# Create new lexical scope
+   # VALID_IN_PARROT_0_2_0 new_pad -1                    # Create new lexical scope
 
   .ASSERT_MINIMUM_LENGTH(args, 1, ERROR_NARGS)
 
-  .CAR(init, args)				# The variable bindings
-  .CDR(body, args)				# The form to evaluate
+  .CAR(init, args)                              # The variable bindings
+  .CDR(body, args)                              # The form to evaluate
 
-   keyvals = new ResizablePMCArray		# List for holding init values
-   dynvars = new ResizablePMCArray		# List for holding dynamic vars
+   keyvals = new ResizablePMCArray              # List for holding init values
+   dynvars = new ResizablePMCArray              # List for holding dynamic vars
    null error
 
-  .NIL(retv)					# Initialize return value
+  .NIL(retv)                                    # Initialize return value
 
-   push_eh CLEANUP_HANDLER			# Set a handler for cleanup
+   push_eh CLEANUP_HANDLER                      # Set a handler for cleanup
 
-INIT_FORM:					# Process the init form
+INIT_FORM:                                      # Process the init form
    typeof type, init
    if type == "LispSymbol" goto INIT_SYMBOL
    if type == "LispCons"   goto INIT_LIST
    goto EVAL_BODY
 
 INIT_SYMBOL:
-   null value					# Init form was just a symbol -
-   push keyvals, init				# no value is assigned to it.
+   null value                                   # Init form was just a symbol -
+   push keyvals, init                           # no value is assigned to it.
    push keyvals, value
 
    goto BIND_VARS
@@ -638,22 +639,22 @@ INIT_LIST:
 INIT_LIST_LOOP:
   .NULL(lptr, INIT_LIST_DONE)
 
-  .CAR(form, lptr)				# Get the next init form
+  .CAR(form, lptr)                              # Get the next init form
 
   .ASSERT_TYPE_AND_BRANCH(form, "list", ERROR_BAD_SPEC)
-  # VALID_IN_PARROT_0_2_0 .ASSERT_LENGTH(form, 2, ERROR_BADSPEC)	# Ensure a valid init form
-  .ASSERT_LENGTH(form, 2, ERROR_BAD_SPEC)	# Ensure a valid init form
+  # VALID_IN_PARROT_0_2_0 .ASSERT_LENGTH(form, 2, ERROR_BADSPEC)                # Ensure a valid init form
+  .ASSERT_LENGTH(form, 2, ERROR_BAD_SPEC)       # Ensure a valid init form
 
-  .CAR(symbol, form)				# The symbol we're assigning to
-  .SECOND(value, form)				# The value being assigned
+  .CAR(symbol, form)                            # The symbol we're assigning to
+  .SECOND(value, form)                          # The value being assigned
 
   .ASSERT_TYPE_AND_BRANCH(symbol, "symbol", ERROR_BAD_SPEC)
 
-  .LIST_1(fargs, value)				# Put value into an arg list
-   value = _eval(fargs)				# Evaluate it
+  .LIST_1(fargs, value)                         # Put value into an arg list
+   value = _eval(fargs)                         # Evaluate it
 
-   push keyvals, symbol				# Push symbol onto key/val list
-   push keyvals, value				# Push value onto key/val list
+   push keyvals, symbol                         # Push symbol onto key/val list
+   push keyvals, value                          # Push value onto key/val list
 
   .CDR(lptr, lptr)
    goto INIT_LIST_LOOP
@@ -670,9 +671,9 @@ BIND_VARS:
 BIND_LOOP:
    if i >= nvar goto BIND_DONE
 
-   symbol = keyvals[i]				# Pop symbol of key/val list
+   symbol = keyvals[i]                          # Pop symbol of key/val list
    inc i
-   value  = keyvals[i]				# Pop value of key/val list
+   value  = keyvals[i]                          # Pop value of key/val list
 
    name = symbol._get_name_as_string()
    test = _IS_SPECIAL(symbol)
@@ -681,17 +682,17 @@ BIND_LOOP:
    goto BIND_DYNAMIC
 
 BIND_LEXICAL:
-   symbol = _LEXICAL_SYMBOL(name, value)	# Create a new lexical symbol
+   symbol = _LEXICAL_SYMBOL(name, value)        # Create a new lexical symbol
    inc i
    goto BIND_LOOP
 
 BIND_DYNAMIC:
-   package = symbol._get_package()		# Get dynamic symbols package
+   package = symbol._get_package()              # Get dynamic symbols package
 
-   symbol = package._shadow_symbol(name)	# Shadow the symbol
-   symbol._set_value(value)			# Set the new value
+   symbol = package._shadow_symbol(name)        # Shadow the symbol
+   symbol._set_value(value)                     # Set the new value
 
-   push dynvars, symbol				# Keep around for tracking
+   push dynvars, symbol                         # Keep around for tracking
 
    inc i
    goto BIND_LOOP
@@ -701,16 +702,16 @@ BIND_DONE:
 
 
 EVAL_BODY:
-   lptr = body					# Set pointer to the body form
+   lptr = body                                  # Set pointer to the body form
 
-EVAL_LOOP:					# Evaluate each form in order
+EVAL_LOOP:                                      # Evaluate each form in order
   .NULL(lptr, EVAL_DONE)
 
-  .CAR(form, lptr)				# Get the next form in the body
-  .LIST_1(fargs, form)				# Put it into an arg list
-   retv = _eval(fargs)				# Evaluate it
+  .CAR(form, lptr)                              # Get the next form in the body
+  .LIST_1(fargs, form)                          # Put it into an arg list
+   retv = _eval(fargs)                          # Evaluate it
 
-  .CDR(lptr, lptr)				# Get a pointer to next form
+  .CDR(lptr, lptr)                              # Get a pointer to next form
    goto EVAL_LOOP
 
 EVAL_DONE:
@@ -718,11 +719,11 @@ EVAL_DONE:
 
 
 CLEANUP_HANDLER:
-   error = P5					# Caught an exception - save it
-   goto CLEANUP					# and clean up before rethrow
+   error = P5                                   # Caught an exception - save it
+   goto CLEANUP                                 # and clean up before rethrow
 
 CLEANUP:
-   # VALID_IN_PARROT_0_2_0    pop_pad					# Pop off the lexical scope
+   # VALID_IN_PARROT_0_2_0    pop_pad                       # Pop off the lexical scope
 
    nvar = dynvars
    i = 0
@@ -730,18 +731,18 @@ CLEANUP:
 CLEANUP_LOOP:
    if i >= nvar goto CLEANUP_DONE
 
-   symbol  = dynvars[i]				# Symbol to be unshadowed
+   symbol  = dynvars[i]                         # Symbol to be unshadowed
    name    = symbol._get_name_as_string()
    package = symbol._get_package()
 
-   package._unshadow_symbol(name)		# Unshadow the symbol
+   package._unshadow_symbol(name)               # Unshadow the symbol
 
    inc i
    goto CLEANUP_LOOP
 
 CLEANUP_DONE:
-   if_null error, DONE				# Rethrow an exception if we
-   rethrow error				# need to
+   if_null error, DONE                          # Rethrow an exception if we
+   rethrow error                                # need to
    goto DONE
 
 CLEANUP_RETHROW:
@@ -762,9 +763,9 @@ DONE:
   .return(retv)
 .end
 
-.sub _print			# This is just a temporary stand-in - it
-  .param pmc args		# doesn't have near enough the amount of
-  .local string strval		# functionality required.
+.sub _print                     # This is just a temporary stand-in - it
+  .param pmc args               # doesn't have near enough the amount of
+  .local string strval          # functionality required.
   .local pmc retv
   .local pmc obj
 
@@ -801,12 +802,12 @@ DONE:
 FORM_LOOP:
   .NULL(lptr, DONE)
 
-  .CAR(eform, lptr)			# Create the arg list for eval
+  .CAR(eform, lptr)                     # Create the arg list for eval
   .LIST_1(eargs, eform)
 
-   retv = _eval(eargs)			# Evaluate form in list
+   retv = _eval(eargs)                  # Evaluate form in list
 
-  .CDR(lptr, lptr)			# Point to next form
+  .CDR(lptr, lptr)                      # Point to next form
   goto FORM_LOOP
 
 DONE:
@@ -856,7 +857,7 @@ DONE:
 
   .ASSERT_TYPE(cons, "cons")
 
-   cons[0] = val				# Replace the car with val
+   cons[0] = val                          # Replace the car with val
    goto DONE
 
 ERROR_NARGS:
@@ -877,9 +878,9 @@ DONE:
   .CAR(cons, args)
   .SECOND(val, args)
 
-  .ASSERT_TYPE(cons, "cons")			# Ensure first arg is a cons
+  .ASSERT_TYPE(cons, "cons")              # Ensure first arg is a cons
 
-   cons[1] = val				# Replace the cdr with val
+   cons[1] = val                          # Replace the cdr with val
    goto DONE
 
 ERROR_NARGS:
@@ -902,25 +903,25 @@ DONE:
 
   .ASSERT_EVEN_LENGTH(args, ERROR_NARGS)
 
-   lptr = args					# Pointer to the arguments
-  .NIL(retv)					# Initialize return value
+   lptr = args                                  # Pointer to the arguments
+  .NIL(retv)                                    # Initialize return value
 
 LOOP:
-  .NULL(lptr, DONE)				# If we're at the EOL goto DONE
+  .NULL(lptr, DONE)                             # If we're at the EOL goto DONE
 
-  .CAR(symbol, lptr)				# Get the variable to assign to
-  .SECOND(value, lptr)				# Get the value being assigned
+  .CAR(symbol, lptr)                            # Get the variable to assign to
+  .SECOND(value, lptr)                          # Get the value being assigned
 
-  .ASSERT_TYPE(symbol, "symbol")		# Ensure variable is a symbol
+  .ASSERT_TYPE(symbol, "symbol")                # Ensure variable is a symbol
 
-   name = symbol._get_name_as_string()		# Get the symbols name
-   lexical = _LOOKUP_LEXICAL(name)		# Look for it in lexical env
+   name = symbol._get_name_as_string()          # Get the symbols name
+   lexical = _LOOKUP_LEXICAL(name)              # Look for it in lexical env
    if_null lexical, SET_SYMBOL_VALUE
 
-   symbol = lexical				# Lexical variable was found
+   symbol = lexical                             # Lexical variable was found
 
 SET_SYMBOL_VALUE:
-  .LIST_1(earg, value)				# Evaluate the value form
+  .LIST_1(earg, value)                          # Evaluate the value form
    retv = _eval(earg)
 
    symbol._set_value(retv)
@@ -1028,9 +1029,9 @@ DONE:
   .local int size
   .local int llen
 
-   llen = _LIST_LENGTH(args)			# Get # values we're returning
+   llen = _LIST_LENGTH(args)                    # Get # values we're returning
 
-   P16 = args					# Pointer to argument list
+   P16 = args                                   # Pointer to argument list
 
    if llen == 0 goto DONE
 
@@ -1078,32 +1079,32 @@ DONE:
    P16 = P16[1]
    if llen == 11 goto DONE
 
-   size = llen - 11				# Size of the overflow array
+   size = llen - 11                             # Size of the overflow array
 
-   P3 = new Array				# Allocate overflow array
+   P3 = new Array                               # Allocate overflow array
    P3 = size
 
   .local pmc elem
   .local int indx
 
-   indx = 0					# Initial index into overflow
+   indx = 0                                     # Initial index into overflow
 OVERFLOW_LOOP:
    if indx == size goto DONE_OVERFLOW
 
    elem = P16[0]
  
-   P3[indx] = elem				# Set next overflow element
+   P3[indx] = elem                              # Set next overflow element
    inc indx
 
-   P16 = P16[1]					# Set next element in list
+   P16 = P16[1]                                 # Set next element in list
    goto OVERFLOW_LOOP
 
 DONE_OVERFLOW:
-   llen = 11					# Only report # retv's in regs
+   llen = 11                                    # Only report # retv's in regs
    goto DONE
 
 DONE:
-   # VALID_IN_PARROT_0_2_0  is_prototyped = 0				# Set up return registers
+   # VALID_IN_PARROT_0_2_0  is_prototyped = 0                             # Set up return registers
 
    # VALID_IN_PARROT_0_2_0  argcI = 0
    # VALID_IN_PARROT_0_2_0  argcN = 0
@@ -1120,17 +1121,17 @@ DONE:
   .local pmc targ
   .local pmc retv
 
-  .INTEGER(retv, "0")				# + with no args should give 0
+  .INTEGER(retv, "0")                           # + with no args should give 0
 
    lptr = args
 
 LOOP:
   .NULL(lptr, DONE)
 
-  .CAR(targ,lptr)				# Get the next arg and ensure
-  .ASSERT_TYPE(targ, "number")			# it is numeric.
+  .CAR(targ,lptr)                               # Get the next arg and ensure
+  .ASSERT_TYPE(targ, "number")                  # it is numeric.
 
-   retv = retv + targ				# Add to the running total.
+   retv = retv + targ                           # Add to the running total.
 
   .CDR(lptr,lptr)
    goto LOOP
@@ -1148,27 +1149,27 @@ DONE:
 
   .ASSERT_MINIMUM_LENGTH(args,1,ERROR_NARGS)
 
-  .CAR(retv,args)				# Get the first argument and
-  .ASSERT_TYPE(retv, "number")			# ensure it is numeric.
+  .CAR(retv,args)                               # Get the first argument and
+  .ASSERT_TYPE(retv, "number")                  # ensure it is numeric.
 
-  .CDR(lptr,args)				# Get a pointer to rest of args
-   narg = 1					# Number of args encountered
+  .CDR(lptr,args)                               # Get a pointer to rest of args
+   narg = 1                                     # Number of args encountered
 
 LOOP:
   .NULL(lptr,DONE_LOOP)
 
-  .CAR(targ, lptr)				# Get the next arg and ensure
-  .ASSERT_TYPE(targ, "number")			# it is numeric.
+  .CAR(targ, lptr)                              # Get the next arg and ensure
+  .ASSERT_TYPE(targ, "number")                  # it is numeric.
 
-   retv = retv - targ				# Subtract from running total.
+   retv = retv - targ                           # Subtract from running total.
 
   .CDR(lptr,lptr)
-   inc narg					# Increment # args processed
+   inc narg                                     # Increment # args processed
    goto LOOP
 
 DONE_LOOP:
-   if narg > 1 goto DONE			# If we only had one arg return
-   neg retv					# its negative value
+   if narg > 1 goto DONE                        # If we only had one arg return
+   neg retv                                     # its negative value
    goto DONE
 
 ERROR_NARGS:
@@ -1185,17 +1186,17 @@ DONE:
   .local pmc targ
   .local pmc retv
 
-  .INTEGER(retv, "1")				# + with no args should give 0
+  .INTEGER(retv, "1")                           # + with no args should give 0
 
    lptr = args
 
 LOOP:
   .NULL(lptr,DONE)
 
-  .CAR(targ,lptr)				# Get the next arg and ensure
-  .ASSERT_TYPE(targ, "number")			# it is numeric.
+  .CAR(targ,lptr)                               # Get the next arg and ensure
+  .ASSERT_TYPE(targ, "number")                  # it is numeric.
 
-   retv = retv * targ				# Multiply the running total.
+   retv = retv * targ                           # Multiply the running product.
 
   .CDR(lptr,lptr)
    goto LOOP
@@ -1213,27 +1214,27 @@ DONE:
 
   .ASSERT_MINIMUM_LENGTH(args,1,ERROR_NARGS)
 
-  .CAR(retv,args)				# Get the first argument and
-  .ASSERT_TYPE(retv, "number")			# ensure it is numeric.
+  .CAR(retv,args)                               # Get the first argument and
+  .ASSERT_TYPE(retv, "number")                  # ensure it is numeric.
 
-  .CDR(lptr,args)				# Get a pointer to rest of args
-   narg = 1					# Number of args encountered
+  .CDR(lptr,args)                               # Get a pointer to rest of args
+   narg = 1                                     # Number of args encountered
 
 LOOP:
   .NULL(lptr,DONE_LOOP)
 
-  .CAR(targ,lptr)				# Get the next arg and ensure
-  .ASSERT_TYPE(targ, "number")			# it is numeric.
+  .CAR(targ,lptr)                               # Get the next arg and ensure
+  .ASSERT_TYPE(targ, "number")                  # it is numeric.
 
-   retv = retv / targ				# Divide the running total.
+   retv = retv / targ                           # Divide the running total.
 
   .CDR(lptr,lptr)
-   inc narg					# Increment # args processed
+   inc narg                                     # Increment # args processed
    goto LOOP
 
 DONE_LOOP:
-   if narg > 1 goto DONE		       # If we only had one arg, return
-  .INTEGER(targ, 1)			       # its inverse
+   if narg > 1 goto DONE                        # If we only had one arg, return
+  .INTEGER(targ, 1)                             # its inverse
    retv = targ / retv
    goto DONE
 
@@ -1256,12 +1257,12 @@ DONE:
   .CAR(numb,args)
   .SECOND(div,args)
 
-  .ASSERT_TYPE(numb, "number")			# Ensure both of the args are
-  .ASSERT_TYPE(div,  "number")			# numeric.
+  .ASSERT_TYPE(numb, "number")                  # Ensure both of the args are
+  .ASSERT_TYPE(div,  "number")                  # numeric.
   
   .INTEGER(retv,0)
 
-   mod retv, numb, div				# Compute the modulus
+   mod retv, numb, div                          # Compute the modulus
    goto DONE
 
 ERROR_NARGS:
@@ -1281,18 +1282,18 @@ DONE:
 
   .ASSERT_MINIMUM_LENGTH(args, 1, ERROR_NARGS)
 
-  .CAR(arg1, args)				# Get the first argument and
-  .ASSERT_TYPE(arg1, "number")			# ensure it is numeric.
+  .CAR(arg1, args)                              # Get the first argument and
+  .ASSERT_TYPE(arg1, "number")                  # ensure it is numeric.
 
-  .CDR(lptr,args)				# Get a pointer to rest of args
+  .CDR(lptr,args)                               # Get a pointer to rest of args
 
   .TRUE(retv)
 
 LOOP:
   .NULL(lptr, DONE)
 
-  .CAR(arg2, lptr)				# Get the next arg and ensure
-  .ASSERT_TYPE(arg2, "number")			# it is numeric.
+  .CAR(arg2, lptr)                              # Get the next arg and ensure
+  .ASSERT_TYPE(arg2, "number")                  # it is numeric.
 
    if arg1 != arg2 goto NOT_EQUAL
 

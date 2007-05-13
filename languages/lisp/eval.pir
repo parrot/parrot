@@ -1,3 +1,4 @@
+# $Id$
 
 .sub _eval
   .param pmc args
@@ -56,17 +57,17 @@ FUNCTION_FORM:
   funcptr = body
 
 FUNCTION_LOOP:
-  .NULL(funcptr, FUNCTION_CALL)		# Call the function if no args left.
+  .NULL(funcptr, FUNCTION_CALL)         # Call the function if no args left.
 
-  .CAR(funcarg, funcptr)		# Pop the next arg off the list.
+  .CAR(funcarg, funcptr)                # Pop the next arg off the list.
 
-  .local pmc evalarg			# Evaluate the argument.
+  .local pmc evalarg                    # Evaluate the argument.
   .LIST_1(evalarg, funcarg)
   funcarg = _eval(evalarg)
 
   .APPEND(funcargs,funcargs,funcarg)    # Add the result to the args list.
 
-  .CDR(funcptr,funcptr)			# Move to the next arg in the list.
+  .CDR(funcptr,funcptr)                 # Move to the next arg in the list.
 
   goto FUNCTION_LOOP
 
@@ -100,10 +101,10 @@ MACRO_FORM:
    macrosym = _LOOKUP_SYMBOL("*MACROEXPAND-HOOK*")
    if_null macrosym, MACRO_NOT_INITIALIZED
 
-   macroexp = macrosym._get_value()		# Get the expander function
+   macroexp = macrosym._get_value()             # Get the expander function
   .ASSERT_TYPE_AND_BRANCH(macroexp, "function", MACRO_NOT_INITIALIZED)
 
-   # VALID_IN_PARROT_0_2_0  peek_pad macroenv				# Get current lexical scope
+   # VALID_IN_PARROT_0_2_0  peek_pad macroenv                           # Get current lexical scope
 
   .LIST_3(funcargs, symbol, body, macroenv)
    retv = _FUNCTION_CALL(macroexp, funcargs)    # Call the macroexpand hook
@@ -118,8 +119,8 @@ SYMBOL:
   symbol = form
   symname = symbol._get_name_as_string()
 
-  special = _IS_SPECIAL(symbol)			# Check if we're a dynamic
-  if special == 0 goto LEXICAL_SYMBOL		# variable
+  special = _IS_SPECIAL(symbol)                 # Check if we're a dynamic
+  if special == 0 goto LEXICAL_SYMBOL           # variable
   goto DYNAMIC_SYMBOL
 
 DYNAMIC_SYMBOL:
@@ -130,20 +131,20 @@ DYNAMIC_SYMBOL:
   goto CHECK_VALUE
 
 LEXICAL_SYMBOL:
-  retv = _LOOKUP_LEXICAL(symname)		# Check for a lexical shadow
-  if_null retv, CHECK_VALUE			# If not found, assume global
-  symbol = retv					# Use the lexical value
+  retv = _LOOKUP_LEXICAL(symname)               # Check for a lexical shadow
+  if_null retv, CHECK_VALUE                     # If not found, assume global
+  symbol = retv                                 # Use the lexical value
   goto CHECK_VALUE
 
 CHECK_VALUE:
-  retv = symbol._get_value()			# Check for symbol's value
+  retv = symbol._get_value()                    # Check for symbol's value
 
   defined found, retv
   unless found goto SYMBOL_NOT_FOUND
 
 DONE_SYMBOL:
-  # VALID_IN_PARROT_0_2_0 argcP = 1					# One value returned
-  # VALID_IN_PARROT_0_2_0 P5 = retv					# Return value
+  # VALID_IN_PARROT_0_2_0 argcP = 1                                # One value returned
+  # VALID_IN_PARROT_0_2_0 P5 = retv                                # Return value
   # VALID_IN_PARROT_0_2_0 
   # VALID_IN_PARROT_0_2_0 goto DONE
   .return(retv)
@@ -156,8 +157,8 @@ SYMBOL_NOT_FOUND:
 SELF_EVALUATING_OBJECT:
   # Object is a primitive type (ie. a string, integer or float).
   retv = form
-  # VALID_IN_PARROT_0_2_0 argcP = 1					# One value returned
-  # VALID_IN_PARROT_0_2_0 P5 = retv					# Return value
+  # VALID_IN_PARROT_0_2_0 argcP = 1                                # One value returned
+  # VALID_IN_PARROT_0_2_0 P5 = retv                                # Return value
 
   # VALID_IN_PARROT_0_2_0 goto DONE
   .return(retv)
@@ -167,12 +168,12 @@ MACRO_NOT_INITIALIZED:
 # VALID_IN_PARROT_0_2_0   goto DONE
 # VALID_IN_PARROT_0_2_0 
 # VALID_IN_PARROT_0_2_0 DONE:
-# VALID_IN_PARROT_0_2_0   is_prototyped = 0				# Nonprototyped return
-# VALID_IN_PARROT_0_2_0   argcI = 0					# No integer values returned
-# VALID_IN_PARROT_0_2_0   argcN = 0					# No float values returned
-# VALID_IN_PARROT_0_2_0   argcS = 0					# No string values returned
+# VALID_IN_PARROT_0_2_0   is_prototyped = 0                        # Nonprototyped return
+# VALID_IN_PARROT_0_2_0   argcI = 0                                # No integer values returned
+# VALID_IN_PARROT_0_2_0   argcN = 0                                # No float values returned
+# VALID_IN_PARROT_0_2_0   argcS = 0                                # No string values returned
 # VALID_IN_PARROT_0_2_0 
-# VALID_IN_PARROT_0_2_0   returncc					# Call the return continuation
+# VALID_IN_PARROT_0_2_0   returncc                                 # Call the return continuation
 
   .return()
 .end

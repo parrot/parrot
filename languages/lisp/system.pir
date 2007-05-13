@@ -1,3 +1,4 @@
+# $Id$
 
 .sub _init_system
   .local pmc function
@@ -125,7 +126,7 @@ DONE:
   .ASSERT_TYPE(hash, "hash")
   .ASSERT_TYPE(key, "string")
 
-   keys = key					# Convert the key to a string
+   keys = key                                      # Convert the key to a string
    val = hash[keys]
 
    typeof type, val

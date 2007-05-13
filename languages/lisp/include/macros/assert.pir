@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 ASSERT_TYPE(A,T)
 
 Asserts that A is of type T, throwing a error of type "type-error" on failure
@@ -45,9 +47,9 @@ Asserts that list A is of length L, branching to B on failure.
 .macro ASSERT_LENGTH(A,L,B)
   .sym int _leni
 
-   _leni = _LIST_LENGTH(.A)			# Get the length of the lsit
-   if _leni == .L goto .$DONE			# Branch on success
-   goto .B					# Branch on failure
+   _leni = _LIST_LENGTH(.A)                     # Get the length of the list
+   if _leni == .L goto .$DONE                   # Branch on success
+   goto .B                                      # Branch on failure
 
 .local $DONE:
 .endm
@@ -61,9 +63,9 @@ Asserts that list A is at least of length L, branching to B on failure.
 .macro ASSERT_MINIMUM_LENGTH(A,L,B)
   .sym int _leni
 
-   _leni = _LIST_LENGTH(.A)			# Get the length of the lsit
-   if _leni >= .L goto .$DONE			# Branch on success
-   goto .B					# Branch on failure
+   _leni = _LIST_LENGTH(.A)                     # Get the length of the list
+   if _leni >= .L goto .$DONE                   # Branch on success
+   goto .B                                      # Branch on failure
 
 .local $DONE:
 .endm
@@ -77,10 +79,10 @@ Asserts that list A is at least of length L and at most of length M, branching t
 .macro ASSERT_LENGTH_BETWEEN(A,L,M,B)
   .sym int _leni
 
-   _leni = _LIST_LENGTH(.A)			# Get the length of the lsit
-   if _leni >= .L goto .$DONE			# Branch on success (min bound)
-   if _leni <= .M goto .$DONE			# Branch on success (max bound)
-   goto .B					# Branch on failure
+   _leni = _LIST_LENGTH(.A)                     # Get the length of the list
+   if _leni >= .L goto .$DONE                   # Branch on success (min bound)
+   if _leni <= .M goto .$DONE                   # Branch on success (max bound)
+   goto .B                                      # Branch on failure
 
 .local $DONE:
 .endm
@@ -95,10 +97,10 @@ Asserts that list A is composed of an even number of elements, branching to B on
   .sym int _leni
   .sym int _modi
 
-   _leni = _LIST_LENGTH(.A)			# Get the length of the lsit
+   _leni = _LIST_LENGTH(.A)                     # Get the length of the list
    mod _modi, _leni, 2
-   if _modi == 0 goto .$DONE			# Branch on success
-   goto .B					# Branch on failure
+   if _modi == 0 goto .$DONE                    # Branch on success
+   goto .B                                      # Branch on failure
 
 .local $DONE:
 .endm

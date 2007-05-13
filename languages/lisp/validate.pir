@@ -11,26 +11,26 @@
   .local int flag
   .local pmc nil
 
-  # VALID_IN_PARROT_0_2_0 flag = _IS_INTEGER(token)		# attempt to parse token as an integer
+  # VALID_IN_PARROT_0_2_0 flag = _IS_INTEGER(token)
   .local pmc is_integer
   is_integer = get_global 'is_integer'
-  flag = is_integer(token)		# attempt to parse token as an integer
+  flag = is_integer(token)                                      # attempt to parse token as an integer
   if flag goto INTEGER
 
-  # VALID_IN_PARROT_0_2_0 flag = _IS_FLOAT(token)		# attempt to parse token as a float
+  # VALID_IN_PARROT_0_2_0 flag = _IS_FLOAT(token) 
   .local pmc is_float
   is_float = get_global 'is_float'
-  flag = is_float(token)		# attempt to parse token as a float
+  flag = is_float(token)                                        # attempt to parse token as a float
   if flag goto FLOAT
 
-  goto QUALIFIED_SYMBOL			# else interpret it as a symbol
+  goto QUALIFIED_SYMBOL                                         # else interpret it as a symbol
 
 INTEGER:
-  .INTEGER(retv,token)			# create a LispInteger object
+  .INTEGER(retv,token)                                          # create a LispInteger object
   goto DONE
 
 FLOAT:
-  .FLOAT(retv,token)			# create a ListFloat object
+  .FLOAT(retv,token)                                            # create a ListFloat object
   goto DONE
 
 QUALIFIED_SYMBOL:
@@ -48,19 +48,19 @@ SYMBOL:
   symbol = _LOOKUP_GLOBAL("COMMON-LISP", "*PACKAGE*")
   if_null symbol, PACKAGE_NOT_FOUND
 
-  package = symbol._get_value()		# Get the current package
+  package = symbol._get_value()                 # Get the current package
   if_null package, PACKAGE_NOT_FOUND
 
   pkgname = package._get_name_as_string()
   symname = token
 
   retv = _LOOKUP_GLOBAL(pkgname, symname)
-  if_null retv, SYMBOL_NOT_FOUND		# If not found, intern a new symbol
+  if_null retv, SYMBOL_NOT_FOUND                # If not found, intern a new symbol
 
   goto DONE
 
 SYMBOL_NOT_FOUND:
-  null nil				# Intern a new global symbol
+  null nil                                      # Intern a new global symbol
   retv = _GLOBAL_SYMBOL(pkgname, symname, nil, nil)
 
   goto DONE
@@ -84,24 +84,24 @@ DONE:
 # VALID_IN_PARROT_0_2_0   idx  = 0
 # VALID_IN_PARROT_0_2_0 
 # VALID_IN_PARROT_0_2_0 SIGNS:
-# VALID_IN_PARROT_0_2_0   rx_oneof token, idx, '+-', DIGIT	# check for +/- signs (optional)
+# VALID_IN_PARROT_0_2_0   rx_oneof token, idx, '+-', DIGIT      # check for +/- signs (optional)
 # VALID_IN_PARROT_0_2_0   goto DIGIT
 # VALID_IN_PARROT_0_2_0 
-# VALID_IN_PARROT_0_2_0 DIGIT:					# ensure the rest is all digits
+# VALID_IN_PARROT_0_2_0 DIGIT:                                  # ensure the rest is all digits
 # VALID_IN_PARROT_0_2_0   rx_is_d token, idx, DECIMAL
 # VALID_IN_PARROT_0_2_0   ndig = ndig + 1
 # VALID_IN_PARROT_0_2_0   goto DIGIT
 # VALID_IN_PARROT_0_2_0 
 # VALID_IN_PARROT_0_2_0 DECIMAL:
-# VALID_IN_PARROT_0_2_0   rx_literal token, idx, '.', EOS	# Check for an optional decimal point
+# VALID_IN_PARROT_0_2_0   rx_literal token, idx, '.', EOS       # Check for an optional decimal point
 # VALID_IN_PARROT_0_2_0   goto EOS
 # VALID_IN_PARROT_0_2_0 
-# VALID_IN_PARROT_0_2_0 EOS:					# check to see if we're at string end
+# VALID_IN_PARROT_0_2_0 EOS:                                    # check to see if we're at string end
 # VALID_IN_PARROT_0_2_0   rx_zwa_atend token, idx, FAIL
 # VALID_IN_PARROT_0_2_0   goto MATCH
 # VALID_IN_PARROT_0_2_0 
 # VALID_IN_PARROT_0_2_0 MATCH:
-# VALID_IN_PARROT_0_2_0   if ndig == 0 goto FAIL		# ensure we had at least one digit
+# VALID_IN_PARROT_0_2_0   if ndig == 0 goto FAIL                # ensure we had at least one digit
 # VALID_IN_PARROT_0_2_0   retv = 1
 # VALID_IN_PARROT_0_2_0   goto DONE
 # VALID_IN_PARROT_0_2_0 
@@ -122,26 +122,26 @@ DONE:
 # VALID_IN_PARROT_0_2_0   idx  = 0
 # VALID_IN_PARROT_0_2_0 
 # VALID_IN_PARROT_0_2_0 SIGNS:
-# VALID_IN_PARROT_0_2_0   rx_oneof token, idx, '+-', PREDIGITS	# check for +/- signs (optional)
+# VALID_IN_PARROT_0_2_0   rx_oneof token, idx, '+-', PREDIGITS  # check for +/- signs (optional)
 # VALID_IN_PARROT_0_2_0   goto PREDIGITS
 # VALID_IN_PARROT_0_2_0 
-# VALID_IN_PARROT_0_2_0 PREDIGITS:				# check for pre-decimal digits
+# VALID_IN_PARROT_0_2_0 PREDIGITS:                              # check for pre-decimal digits
 # VALID_IN_PARROT_0_2_0   rx_is_d token, idx, DECIMAL
 # VALID_IN_PARROT_0_2_0   goto PREDIGITS
 # VALID_IN_PARROT_0_2_0 
 # VALID_IN_PARROT_0_2_0 DECIMAL:
-# VALID_IN_PARROT_0_2_0   rx_literal token, idx, '.', FAIL	# check for a decimal point
+# VALID_IN_PARROT_0_2_0   rx_literal token, idx, '.', FAIL      # check for a decimal point
 # VALID_IN_PARROT_0_2_0   goto POSTDIGIT
 # VALID_IN_PARROT_0_2_0 
 # VALID_IN_PARROT_0_2_0 POSTDIGIT:
-# VALID_IN_PARROT_0_2_0   rx_is_d token, idx, FAIL		# check for at least one required digit
+# VALID_IN_PARROT_0_2_0   rx_is_d token, idx, FAIL              # check for at least one required digit
 # VALID_IN_PARROT_0_2_0   goto POSTDIGITS
 # VALID_IN_PARROT_0_2_0 
-# VALID_IN_PARROT_0_2_0 POSTDIGITS:				# check for option post-decimal digits
+# VALID_IN_PARROT_0_2_0 POSTDIGITS:                             # check for option post-decimal digits
 # VALID_IN_PARROT_0_2_0   rx_is_d token, idx, EOS
 # VALID_IN_PARROT_0_2_0   goto POSTDIGITS
 # VALID_IN_PARROT_0_2_0 
-# VALID_IN_PARROT_0_2_0 EOS:					# check to see if we're at string end
+# VALID_IN_PARROT_0_2_0 EOS:                                    # check to see if we're at string end
 # VALID_IN_PARROT_0_2_0   rx_zwa_atend token, idx, FAIL
 # VALID_IN_PARROT_0_2_0   goto MATCH
 # VALID_IN_PARROT_0_2_0 
@@ -177,17 +177,17 @@ DONE:
 # VALID_IN_PARROT_0_2_0   goto PACKAGE
 # VALID_IN_PARROT_0_2_0 
 # VALID_IN_PARROT_0_2_0 COLON:
-# VALID_IN_PARROT_0_2_0   idx2 = idx1				# Index of last valid symbol character
+# VALID_IN_PARROT_0_2_0   idx2 = idx1                           # Index of last valid symbol character
 # VALID_IN_PARROT_0_2_0 
-# VALID_IN_PARROT_0_2_0   rx_literal token, idx1, ':', FAIL	# If we don't have this -> not qualified
+# VALID_IN_PARROT_0_2_0   rx_literal token, idx1, ':', FAIL     # If we don't have this -> not qualified
 # VALID_IN_PARROT_0_2_0 
-# VALID_IN_PARROT_0_2_0   idx3 = idx1				# Start of symbol character
-# VALID_IN_PARROT_0_2_0   type = 0				# External symbol
+# VALID_IN_PARROT_0_2_0   idx3 = idx1                           # Start of symbol character
+# VALID_IN_PARROT_0_2_0   type = 0                              # External symbol
 # VALID_IN_PARROT_0_2_0 
-# VALID_IN_PARROT_0_2_0   rx_literal token, idx1, ':', SYMBOL	# If we don't have this -> not external
+# VALID_IN_PARROT_0_2_0   rx_literal token, idx1, ':', SYMBOL   # If we don't have this -> not external
 # VALID_IN_PARROT_0_2_0 
-# VALID_IN_PARROT_0_2_0   idx3 = idx1				# Start of symbol character
-# VALID_IN_PARROT_0_2_0   type = 1				# Internal symbol
+# VALID_IN_PARROT_0_2_0   idx3 = idx1                           # Start of symbol character
+# VALID_IN_PARROT_0_2_0   type = 1                              # Internal symbol
 # VALID_IN_PARROT_0_2_0 
 # VALID_IN_PARROT_0_2_0   goto SYMBOL
 # VALID_IN_PARROT_0_2_0 
@@ -196,7 +196,7 @@ DONE:
 # VALID_IN_PARROT_0_2_0   goto SYMBOL
 # VALID_IN_PARROT_0_2_0 
 # VALID_IN_PARROT_0_2_0 EOS:
-# VALID_IN_PARROT_0_2_0   rx_zwa_atend token, idx1, FAIL	# check to see if we're at string end
+# VALID_IN_PARROT_0_2_0   rx_zwa_atend token, idx1, FAIL        # check to see if we're at string end
 # VALID_IN_PARROT_0_2_0   goto MATCH
 # VALID_IN_PARROT_0_2_0 
 # VALID_IN_PARROT_0_2_0 KEYWORD:

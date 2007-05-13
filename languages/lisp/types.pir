@@ -1,3 +1,4 @@
+# $Id$
 
 .sub _init_types
   .local pmc class

@@ -10,11 +10,11 @@
   .local pmc package
   .local pmc retv
 
-  upcase pkgname, pkgname			# Convert names to all upcase
+  upcase pkgname, pkgname                       # Convert names to all upcase
   upcase symname, symname
 
-  push_eh PACKAGE_NOT_FOUND			# Set an error handler
-  find_global package, "PACKAGES", pkgname	# Look for the package
+  push_eh PACKAGE_NOT_FOUND                     # Set an error handler
+  find_global package, "PACKAGES", pkgname      # Look for the package
   clear_eh
 
   retv = package._lookup_symbol(symname)        # Lookup the symbol
@@ -38,13 +38,13 @@ DONE:
   .param string symname
   .local pmc retv
 
-  push_eh LEXICAL_NOT_FOUND			# Set an error handler
-  find_lex retv, symname			# Look for the lexical symbol
+  push_eh LEXICAL_NOT_FOUND                     # Set an error handler
+  find_lex retv, symname                        # Look for the lexical symbol
   clear_eh
 
   goto DONE
 
-LEXICAL_NOT_FOUND:				# Return null if not found
+LEXICAL_NOT_FOUND:                              # Return null if not found
   null retv
   goto DONE
 
@@ -134,10 +134,10 @@ DONE:
    symbol = _LOOKUP_GLOBAL("COMMON-LISP", "*PACKAGE*")
    package = symbol._get_value()
 
-   symbol = _SYMBOL(symname)			# Create a new symbol
-   symbol._set_package(package)			# Set the home package
+   symbol = _SYMBOL(symname)                    # Create a new symbol
+   symbol._set_package(package)                 # Set the home package
 
-   defined test, value				# Set a value if provided
+   defined test, value                          # Set a value if provided
    if test == 0 goto DONE
 
    symbol._set_value(value)
@@ -193,15 +193,15 @@ DONE:
   clear_eh
 
   symbol = package._intern_symbol(symname)
-  symbol._set_package(package)			# Set the home package
+  symbol._set_package(package)                  # Set the home package
 
-  defined test, value				# Set a value if provided
+  defined test, value                           # Set a value if provided
   if test == 0 goto FUNCTION
 
   symbol._set_value(value)
   goto FUNCTION
 
-FUNCTION:					# Set a function if provided
+FUNCTION:                                       # Set a function if provided
   defined test, function
   if test == 0 goto DONE
 
@@ -233,29 +233,29 @@ DONE:
   proto = function._get_args()
   body  = function._get_body()
 
-  typeof type, body			# Get the function type
+  typeof type, body                     # Get the function type
 
   if type == "Sub" goto COMPILED_FUNCTION
   goto INTERPRETED_FUNCTION
 
 COMPILED_FUNCTION:
-  set_args "0", args			# First argument
+  set_args "0", args                    # First argument
   goto CALL_FUNCTION
 
 INTERPRETED_FUNCTION:
   scope = function._get_scope()
 
-  					# 1st arg - the code to evaluate
-  					# 2nd arg - the arg prototype
-  					# 3rd arg - the args to evaluate
-  					# The closure
+                                        # 1st arg - the code to evaluate
+                                        # 2nd arg - the arg prototype
+                                        # 3rd arg - the args to evaluate
+                                        # The closure
   set_args "0,0,0", body, proto, args
   goto CALL_FUNCTION
 
 CALL_FUNCTION:
-  # VALID_IN_PARROT_0_2_0 pushtopp				# Save the upper registers
-  # VALID_IN_PARROT_0_2_0 invokecc				# Call the closure
-  # VALID_IN_PARROT_0_2_0 poptopp				# Restore the upper registers
+  # VALID_IN_PARROT_0_2_0 pushtopp                            # Save the upper registers
+  # VALID_IN_PARROT_0_2_0 invokecc                            # Call the closure
+  # VALID_IN_PARROT_0_2_0 poptopp                            # Restore the upper registers
 
   # VALID_IN_PARROT_0_2_0 returncc
 .end
@@ -290,10 +290,10 @@ DONE:
   .local int test
   .local int retv
 
-  .CAR(symbol,form)		# Ensure first element is a LAMBDA
+  .CAR(symbol,form)             # Ensure first element is a LAMBDA
   if symbol != "LAMBDA" goto NON_LAMBDA_LIST
 
-  .SECOND(args,form)		# Ensure second element is a lambda-list
+  .SECOND(args,form)            # Ensure second element is a lambda-list
   .ASSERT_TYPE_AND_BRANCH(args, "list", MISSING_LAMBDA_LIST)
   goto LAMBDA_LIST
 
@@ -330,15 +330,15 @@ DONE:
 ARG_LOOP:
   .NULL(lptr, SETUP_CLOSURE)
 
-  .CAR(symbol, lptr)				# Ensure all the arguments are
-  .ASSERT_TYPE(symbol, "symbol")		# symbol types.
+  .CAR(symbol, lptr)                            # Ensure all the arguments are
+  .ASSERT_TYPE(symbol, "symbol")                # symbol types.
 
   .CDR(lptr, lptr)
    goto ARG_LOOP
 
 SETUP_CLOSURE:
-   closure = new .Closure			# Capture the scope the closure
-   set_addr closure, CLOSURE_START		# will later be run in
+   closure = new .Closure                       # Capture the scope the closure
+   set_addr closure, CLOSURE_START              # will later be run in
 
    retv = new "LispFunction"
 
@@ -374,11 +374,11 @@ CLOSURE_ARGS:
   .NULL(clprotptr, CLOSURE_CHECK_ARGS)
   .NULL(clargsptr, CLOSURE_TOO_FEW_ARGS)
 
-  .CAR(clval, clargsptr)			# The lexical value
-  .CAR(clarg, clprotptr)			# The lexical arg prototype
+  .CAR(clval, clargsptr)                        # The lexical value
+  .CAR(clarg, clprotptr)                        # The lexical arg prototype
 
    clsymname = clarg._get_name_as_string()
-   clsym = _LEXICAL_SYMBOL(clsymname, clval)	# Create a new lexical symbol
+   clsym = _LEXICAL_SYMBOL(clsymname, clval)    # Create a new lexical symbol
 
   .CDR(clargsptr, clargsptr)
   .CDR(clprotptr, clprotptr)
@@ -386,8 +386,8 @@ CLOSURE_ARGS:
    goto CLOSURE_ARGS
 
 CLOSURE_CHECK_ARGS:
-  .NULL(clargsptr, CLOSURE_BODY)		# Ensure we didn't have too
-   goto CLOSURE_TOO_MANY_ARGS			# many args
+  .NULL(clargsptr, CLOSURE_BODY)                # Ensure we didn't have too
+   goto CLOSURE_TOO_MANY_ARGS                   # many args
 
 CLOSURE_BODY:
   .local pmc clearg
