@@ -1,3 +1,4 @@
+# $Id$
 
 =head1 _LOOKUP_GLOBAL(pkgname, symname)
 
@@ -419,25 +420,25 @@ DONE:
 .end
 
 .sub _LIST_LENGTH
-  .param pmc args
-  .param int rlen
-  .local pmc lptr
-  .local int alen
+    .param pmc args
 
-   lptr = args
-   alen = 0
-  .sym pmc _nilp
+    .local pmc lptr
+     lptr = args
 
-  .NIL(_nilp)
-
+    .local int alen
+     alen = 0
+    .local pmc _nilp
+  
+    .NIL(_nilp)
+  
 LOOP:
-  eq_addr lptr, _nilp, DONE
-   inc alen
-  .CDR(lptr, lptr)
-   goto LOOP
-
+    eq_addr lptr, _nilp, DONE
+    inc alen
+    .CDR(lptr, lptr)
+    goto LOOP
+  
 DONE:
-  .return(alen)
+    .return(alen)
 .end
 
 .sub _IS_TYPE
