@@ -16,12 +16,12 @@
    store_global "PACKAGES", "COMMON-LISP", package
    store_global "PACKAGES", "CL", package
 
-   t = package._intern_symbol("T")			# Create the T symbol
+   t = package._intern_symbol("T")			# Create the T symbol, T meaning true
    t._set_value(t)
    t._set_package(package)
    t._set_special(t)
 
-   store_global "SYMBOLS", "T", t			# Quick alias to T
+   store_global "SYMBOLS", "T", t			# Quick alias to T, T meaning true
    t = symbol
 
    symbol = package._intern_symbol("NIL")		# Create the T symbol

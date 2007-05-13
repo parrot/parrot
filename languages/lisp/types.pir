@@ -377,36 +377,35 @@ DONE:
 .end
 
 .sub _intern_symbol :method
-  .param string name
-  .local string type
-  .local pmc symbol
-  .local pmc status
-  .local pmc stack
-  .local pmc hash
-  .local int top
+    .param string name
 
-   getattribute hash, self,  "LispPackage\0internal"
-   stack = hash[name]
+    # the attribute internal has been set up in _init_types
+    .local pmc internal
+    getattribute internal, self,  "LispPackage\0internal"
 
-   typeof type, stack
-   if type != "None" goto DONE
+    # stack for the name is not known to exist
+    .local pmc stack
+    stack = internal[name]
+    unless_null stack, RETURN_SYMBOL
+        # _dumper( self, "self" )
+        # _dumper( name, "name" )
+        # _dumper( internal, "internal" )
+        # _dumper( stack, "stack" )
 
-   symbol = _SYMBOL(name)
+        .local pmc new_symbol
+        new_symbol = _SYMBOL(name)
 
-   stack = new ResizablePMCArray
-   push stack, symbol
+        stack = new ResizablePMCArray
+        push stack, new_symbol
+        internal[name] = stack
 
-   hash[name] = stack
+    goto RETURN_SYMBOL
 
-   goto DONE
+RETURN_SYMBOL:
+    .local pmc symbol
+    symbol = stack[-1]
 
-DONE:
-   top = stack
-   top = top - 1
-
-   symbol = stack[top]
-
-  .return(symbol)
+   .return(symbol)
 .end
 
 .sub _get_name :method
