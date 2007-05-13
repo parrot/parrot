@@ -29,11 +29,11 @@
     p6rule = compreg "PGE::P6Regex"
 
     .local pmc is_integer
-    is_integer = p6rule( "^<[+\-]>?\d+<'.'>?$" ) 
+    is_integer = p6rule( '^<[+\-]>?\d+\.?$' ) 
     set_global 'is_integer', is_integer
 
     .local pmc is_float
-    is_float = p6rule( "^<[+-]>?\d+<'.'>\d+$" ) 
+    is_float = p6rule( '^<[+\-]>?\d+\.\d+$' ) 
     set_global 'is_float', is_float
 
     .local pmc is_qualified
