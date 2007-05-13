@@ -28,11 +28,9 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $revision = $Parrot::Revision::current;
-    my $entries  = $Parrot::Revision::svn_entries;
 
     $conf->data->set(
         revision    => $revision,
-        SVN_ENTRIES => $entries
     );
 
     if ( $revision >= 1 ) {
