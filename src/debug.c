@@ -2399,7 +2399,7 @@ PDB_backtrace(Interp *interp)
 
     /* backtrace: follow the continuation chain */
     while (1) {
-        parrot_cont_t sub_cont;
+        Parrot_cont *sub_cont;
         sub = ctx->current_cont;
         if (!sub)
             break;

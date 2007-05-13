@@ -596,7 +596,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
     char name[64];
     PackFile_ByteCode *old_cs, *new_cs;
     PMC *sub=NULL;
-    parrot_sub_t sub_data;
+    Parrot_sub *sub_data;
     struct _imc_info_t *imc_info = NULL;
     struct parser_state_t *next;
     DECL_CONST_CAST;

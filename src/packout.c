@@ -219,7 +219,7 @@ opcode_t *
 PackFile_Constant_pack(Interp* interp, PackFile_ConstTable * const_table,
         PackFile_Constant *self, opcode_t *cursor)
 {
-    struct PMC *key;
+    PMC *key;
     size_t i;
     opcode_t slice_bits;
     STRING *image;

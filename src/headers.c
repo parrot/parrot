@@ -328,7 +328,7 @@ add_pmc_sync(Interp *interp, PMC *pmc)
     if (!PObj_is_PMC_EXT_TEST(pmc)) {
         add_pmc_ext(interp, pmc);
     }
-    PMC_sync(pmc) = (struct _Sync *)mem_internal_allocate(sizeof (*PMC_sync(pmc)));
+    PMC_sync(pmc) = (Sync *)mem_internal_allocate(sizeof (*PMC_sync(pmc)));
     PMC_sync(pmc)->owner = interp;
     MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
 }
@@ -571,7 +571,7 @@ Parrot_initialize_header_pools(Interp *interp)
 
     /* pmc extension buffer */
     arena_base->pmc_ext_pool =
-        new_small_object_pool(interp, sizeof (struct PMC_EXT), 1024);
+        new_small_object_pool(interp, sizeof (PMC_EXT), 1024);
     /*
      * pmc_ext isn't a managed item. If a PMC has a pmc_ext structure
      * it is returned to the pool instantly - the structure is never

@@ -418,7 +418,7 @@ get_entry_type(Interp *interp, Stack_Entry_t *entry /*NN*/)
 
 =item C<void
 Parrot_dump_dynamic_environment(Interp *interp,
-                                struct Stack_Chunk *dynamic_env)>
+                                Stack_Chunk_t *dynamic_env)>
 
 Print a representation of the dynamic stack to the standard error (using
 C<PIO_eprintf>).  This is used only temporarily for debugging.
@@ -429,7 +429,7 @@ C<PIO_eprintf>).  This is used only temporarily for debugging.
 
 void
 Parrot_dump_dynamic_environment(Interp *interp,
-                                struct Stack_Chunk *dynamic_env)
+                                Stack_Chunk_t *dynamic_env)
 {
     int height = (int) stack_height(interp, dynamic_env);
 

@@ -283,7 +283,7 @@ do_1_sub_pragma(Parrot_Interp interp, PMC *sub_pmc, int action)
 {
 
     size_t start_offs;
-    struct Parrot_sub * const sub = PMC_sub(sub_pmc);
+    Parrot_sub const * sub = PMC_sub(sub_pmc);
     PMC *result;
     void *lo_var_ptr;
 

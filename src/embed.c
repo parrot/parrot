@@ -671,7 +671,7 @@ set_current_sub(Interp *interp)
     PackFile_ByteCode *cur_cs;
     PackFile_FixupTable *ft;
     PackFile_ConstTable *ct;
-    struct Parrot_sub *sub;
+    Parrot_sub *sub;
     PMC *sub_pmc;
     opcode_t *code_start;
     size_t offs;

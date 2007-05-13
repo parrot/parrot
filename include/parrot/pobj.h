@@ -149,7 +149,7 @@ struct PMC {
 
 struct _Sync;   /* forward decl */
 
-struct PMC_EXT {
+typedef struct PMC_EXT {
 #if PMC_DATA_IN_EXT
     DPOINTER *data;
 #endif /* PMC_DATA_IN_EXT */
@@ -177,9 +177,7 @@ struct PMC_EXT {
        stuff, which'd merit an extra dereference when setting, but let
        us memset the actual GC data in a big block
     */
-};
-
-typedef struct PMC_EXT PMC_EXT;
+} PMC_EXT;
 
 #ifdef NDEBUG
 #  define PMC_ext_checked(pmc)             (pmc)->pmc_ext

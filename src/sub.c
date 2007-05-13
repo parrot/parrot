@@ -77,7 +77,7 @@ mark_context(Interp *interp, parrot_context_t* ctx)
 
 /*
 
-=item C<struct Parrot_sub *
+=item C<Parrot_sub *
 new_sub(Interp *interp)>
 
 Returns a new C<Parrot_sub>.
@@ -86,19 +86,18 @@ Returns a new C<Parrot_sub>.
 
 */
 
-struct Parrot_sub *
+Parrot_sub *
 new_sub(Interp *interp)
 {
     /* Using system memory until I figure out GC issues */
-    struct Parrot_sub * const newsub =
-        mem_allocate_zeroed_typed(struct Parrot_sub);
-    newsub->seg = interp->code;
+    Parrot_sub * const newsub = mem_allocate_zeroed_typed(Parrot_sub);
+    newsub->seg               = interp->code;
     return newsub;
 }
 
 /*
 
-=item C<struct Parrot_sub *
+=item C<Parrot_sub *
 new_closure(Interp *interp)>
 
 Returns a new C<Parrot_sub> with its own sctatchpad.
@@ -109,16 +108,16 @@ XXX: Need to document semantics in detail.
 
 */
 
-struct Parrot_sub *
+Parrot_sub *
 new_closure(Interp *interp)
 {
-    struct Parrot_sub * const newsub = new_sub(interp);
+    Parrot_sub * const newsub = new_sub(interp);
     return newsub;
 }
 /*
 
-=item C<struct Parrot_cont *
-new_continuation(Interp *interp, struct Parrot_cont *to)>
+=item C<Parrot_cont *
+new_continuation(Interp *interp, Parrot_cont *to)>
 
 Returns a new C<Parrot_cont> to the context of C<to> with its own copy of the
 current interpreter context.  If C<to> is C<NULL>, then the C<to_ctx> is set
@@ -128,14 +127,11 @@ to the current context.
 
 */
 
-
-struct Parrot_cont *
-new_continuation(Interp *interp, struct Parrot_cont *to)
+Parrot_cont *
+new_continuation(Interp *interp, Parrot_cont *to)
 {
-    struct Parrot_cont * const cc =
-        mem_allocate_typed(struct Parrot_cont);
-    struct Parrot_Context * const to_ctx =
-        to ? to->to_ctx : CONTEXT(interp->ctx);
+    Parrot_cont    * const cc     = mem_allocate_typed(Parrot_cont);
+    Parrot_Context * const to_ctx = to ? to->to_ctx : CONTEXT(interp->ctx);
 
     cc->to_ctx = to_ctx;
     cc->from_ctx = CONTEXT(interp->ctx);
@@ -156,7 +152,7 @@ new_continuation(Interp *interp, struct Parrot_cont *to)
 
 /*
 
-=item C<struct Parrot_cont *
+=item C<Parrot_cont *
 new_ret_continuation(Interp *interp)>
 
 Returns a new C<Parrot_cont> pointing to the current context.
@@ -165,11 +161,10 @@ Returns a new C<Parrot_cont> pointing to the current context.
 
 */
 
-struct Parrot_cont *
+Parrot_cont *
 new_ret_continuation(Interp *interp)
 {
-    struct Parrot_cont * const cc =
-        mem_allocate_typed(struct Parrot_cont);
+    Parrot_cont * const cc = mem_allocate_typed(Parrot_cont);
     cc->to_ctx = CONTEXT(interp->ctx);
     cc->from_ctx = NULL;    /* filled in during a call */
     cc->dynamic_state = NULL;
@@ -182,7 +177,7 @@ new_ret_continuation(Interp *interp)
 
 /*
 
-=item C<struct Parrot_coro *
+=item C<Parrot_coro *
 new_coroutine(Interp *interp)>
 
 Returns a new C<Parrot_coro>.
@@ -193,11 +188,10 @@ XXX: Need to document semantics in detail.
 
 */
 
-struct Parrot_coro *
+Parrot_coro *
 new_coroutine(Interp *interp)
 {
-    struct Parrot_coro * const co =
-        mem_allocate_zeroed_typed(struct Parrot_coro);
+    Parrot_coro * const co = mem_allocate_zeroed_typed(Parrot_coro);
 
     co->seg = interp->code;
     co->ctx = NULL;
@@ -238,7 +232,7 @@ Make true Continuation from all RetContinuations up the call chain.
 void
 invalidate_retc_context(Interp *interp, PMC *cont)
 {
-    struct Parrot_Context *ctx = PMC_cont(cont)->from_ctx;
+    Parrot_Context *ctx = PMC_cont(cont)->from_ctx;
 
     Parrot_set_context_threshold(interp, ctx);
     while (1) {
@@ -275,7 +269,7 @@ extern PMC* Parrot_NameSpace_nci_get_name(Interp *interp, PMC* pmc);
 STRING*
 Parrot_full_sub_name(Interp *interp, PMC* sub)
 {
-    struct Parrot_sub * s;
+    Parrot_sub * s;
     STRING *res;
 
 
@@ -304,10 +298,10 @@ Parrot_full_sub_name(Interp *interp, PMC* sub)
 }
 
 int
-Parrot_Context_info(Interp *interp, parrot_context_t *ctx,
-                    struct Parrot_Context_info *info)
+Parrot_Context_get_info(Interp *interp, parrot_context_t *ctx,
+                    Parrot_Context_info *info)
 {
-    struct Parrot_sub *sub;
+    Parrot_sub *sub;
 
     /* set file/line/pc defaults */
     info->file = (char *) "(unknown file)";
@@ -326,7 +320,7 @@ Parrot_Context_info(Interp *interp, parrot_context_t *ctx,
         return 0;
     }
 
-    /* fetch struct Parrot_sub of the current sub in the given context */
+    /* fetch Parrot_sub of the current sub in the given context */
     if (!VTABLE_isa(interp, ctx->current_sub,
                     const_string(interp, "Sub")))
         return 1;
@@ -383,14 +377,14 @@ Parrot_Context_info(Interp *interp, parrot_context_t *ctx,
 STRING*
 Parrot_Context_infostr(Interp *interp, parrot_context_t *ctx)
 {
-    struct Parrot_Context_info info;
+    Parrot_Context_info info;
     const char* const msg = (CONTEXT(interp->ctx) == ctx) ?
         "current instr.:":
         "called from Sub";
     STRING *res;
 
     Parrot_block_DOD(interp);
-    if (Parrot_Context_info(interp, ctx, &info)) {
+    if (Parrot_Context_get_info(interp, ctx, &info)) {
         char *file = info.file;
         res        = Parrot_sprintf_c(interp,
             "%s '%Ss' pc %d (%s:%d)", msg,
@@ -451,7 +445,7 @@ PMC*
 parrot_new_closure(Interp *interp, PMC *sub_pmc)
 {
     PMC *clos_pmc;
-    struct Parrot_sub *clos, *sub;
+    Parrot_sub *clos, *sub;
     PMC *cont;
     parrot_context_t *ctx;
 

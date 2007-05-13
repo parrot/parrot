@@ -39,7 +39,7 @@ segments from the input PBC files.
 
 
 /* This struct describes an input file. */
-struct pbc_merge_input
+typedef struct pbc_merge_input
 {
     char    *filename;      /* Filename of the input file. */
     PackFile *pf;  /* The loaded packfile. */
@@ -47,8 +47,7 @@ struct pbc_merge_input
                              bytecode. */
     opcode_t const_start;   /* Where the const table is located in the merged
                              one. */
-};
-
+} pbc_merge_input;
 
 /*
 
@@ -158,7 +157,7 @@ pbc_merge_loadpbc(Interp *interp, char *fullname)
 /*
 
 static PackFile_ByteCode*
-pbc_merge_bytecode(Interp *interp, struct pbc_merge_input **inputs,
+pbc_merge_bytecode(Interp *interp, pbc_merge_input **inputs,
                    int num_inputs, PackFile *pf)
 
 This function merges the bytecode from the input packfiles, storing the
@@ -166,7 +165,7 @@ offsets that each bit of bytecode now exists at.
 
 */
 static PackFile_ByteCode*
-pbc_merge_bytecode(Interp *interp, struct pbc_merge_input **inputs,
+pbc_merge_bytecode(Interp *interp, pbc_merge_input **inputs,
                    int num_inputs, PackFile *pf)
 {
     PackFile_ByteCode *bc_seg;
@@ -225,14 +224,14 @@ pbc_merge_bytecode(Interp *interp, struct pbc_merge_input **inputs,
 /*
 
 static PackFile_ConstTable*
-pbc_merge_constants(Interp *interp, struct pbc_merge_input **inputs,
+pbc_merge_constants(Interp *interp, pbc_merge_input **inputs,
                     int num_inputs, PackFile *pf, PackFile_ByteCode *bc)
 
 This function merges the constants tables from the input PBC files.
 
 */
 static PackFile_ConstTable*
-pbc_merge_constants(Interp *interp, struct pbc_merge_input **inputs,
+pbc_merge_constants(Interp *interp, pbc_merge_input **inputs,
                     int num_inputs, PackFile *pf, PackFile_ByteCode *bc)
 {
     PackFile_ConstTable *const_seg;
@@ -297,7 +296,7 @@ pbc_merge_constants(Interp *interp, struct pbc_merge_input **inputs,
             /* If it's a sub PMC, need to deal with offsets. */
             if (copy->type == PFC_PMC)
             {
-                struct Parrot_sub *sub;
+                Parrot_sub *sub;
                 switch (copy->u.key->vtable->base_type) {
                     case enum_class_Sub:
                     case enum_class_Closure:
@@ -327,14 +326,14 @@ pbc_merge_constants(Interp *interp, struct pbc_merge_input **inputs,
 /*
 
 static void
-pbc_merge_fixups(Interp *interp, struct pbc_merge_input **inputs,
+pbc_merge_fixups(Interp *interp, pbc_merge_input **inputs,
                  int num_inputs, PackFile *pf, PackFile_ByteCode *bc)
 
 This function merges the fixups tables from the input PBC files.
 
 */
 static void
-pbc_merge_fixups(Interp *interp, struct pbc_merge_input **inputs,
+pbc_merge_fixups(Interp *interp, pbc_merge_input **inputs,
                  int num_inputs, PackFile *pf, PackFile_ByteCode *bc)
 {
     PackFile_FixupTable *fixup_seg;
@@ -429,14 +428,14 @@ pbc_merge_fixups(Interp *interp, struct pbc_merge_input **inputs,
 /*
 
 static void
-pbc_merge_debugs(Interp *interp, struct pbc_merge_input **inputs,
+pbc_merge_debugs(Interp *interp, pbc_merge_input **inputs,
                  int num_inputs, PackFile *pf, PackFile_ByteCode *bc)
 
 This function merges the debug segments from the input PBC files.
 
 */
 static void
-pbc_merge_debugs(Interp *interp, struct pbc_merge_input **inputs,
+pbc_merge_debugs(Interp *interp, pbc_merge_input **inputs,
                  int num_inputs, PackFile *pf, PackFile_ByteCode *bc)
 {
     PackFile_Debug *debug_seg;
@@ -501,7 +500,7 @@ pbc_merge_debugs(Interp *interp, struct pbc_merge_input **inputs,
 /*
 
 static void
-pbc_merge_pic_index(Interp *interp, struct pbc_merge_input **inputs,
+pbc_merge_pic_index(Interp *interp, pbc_merge_input **inputs,
                  int num_inputs, PackFile *pf, PackFile_ByteCode *bc)
 
 This function merges the pic_index segments from the input PBC files.
@@ -509,7 +508,7 @@ This function merges the pic_index segments from the input PBC files.
 */
 
 static void
-pbc_merge_pic_index(Interp *interp, struct pbc_merge_input **inputs,
+pbc_merge_pic_index(Interp *interp, pbc_merge_input **inputs,
                  int num_inputs, PackFile *pf, PackFile_ByteCode *bc)
 {
     int i;
@@ -550,7 +549,7 @@ pbc_merge_pic_index(Interp *interp, struct pbc_merge_input **inputs,
 /*
 
 static void
-pbc_merge_ctpointers(Interp *interp, struct pbc_merge_input **inputs,
+pbc_merge_ctpointers(Interp *interp, pbc_merge_input **inputs,
                      int num_inputs, PackFile *pf, PackFile_ByteCode *bc,
                      PackFile_ConstTable *ct)
 
@@ -559,7 +558,7 @@ bytecode.
 
 */
 static void
-pbc_merge_ctpointers(Interp *interp, struct pbc_merge_input **inputs,
+pbc_merge_ctpointers(Interp *interp, pbc_merge_input **inputs,
                      int num_inputs, PackFile *pf, PackFile_ByteCode *bc,
                      PackFile_ConstTable *ct)
 {
@@ -635,14 +634,14 @@ pbc_merge_ctpointers(Interp *interp, struct pbc_merge_input **inputs,
 /*
 
 static PackFile*
-pbc_merge_begin(Interp *interp, struct pbc_merge_input **inputs,
+pbc_merge_begin(Interp *interp, pbc_merge_input **inputs,
                 int num_inputs)
 
 This is the function that drives PBC merging process.
 
 */
 static PackFile*
-pbc_merge_begin(Interp *interp, struct pbc_merge_input **inputs,
+pbc_merge_begin(Interp *interp, pbc_merge_input **inputs,
                 int num_inputs)
 {
     PackFile            *merged;
@@ -733,7 +732,7 @@ main(int argc, char **argv)
 {
     Interp *interp;
     int status;
-    struct pbc_merge_input** input_files;
+    pbc_merge_input** input_files;
     PackFile *merged;
     int i;
     const char *output_file     = NULL;
@@ -769,13 +768,13 @@ main(int argc, char **argv)
 
     /* Load each packfile that we are to merge and set up an input
        structure for each of them. */
-    input_files = (struct pbc_merge_input **)mem_sys_allocate(
+    input_files = (pbc_merge_input **)mem_sys_allocate(
         argc * sizeof (Parrot_Pointer));
 
     for (i = 0; i < argc; i++)
     {
         /* Allocate a struct. */
-        input_files[i] = mem_allocate_typed(struct pbc_merge_input);
+        input_files[i] = mem_allocate_typed(pbc_merge_input);
 
         /* Set filename */
         input_files[i]->filename = *argv;

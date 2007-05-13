@@ -142,9 +142,9 @@ typedef struct Parrot_sub {
 
     /* - end common */
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
-} * parrot_sub_t;
+} Parrot_sub;
 
-#define PMC_sub(pmc) ((parrot_sub_t)PMC_struct_val(pmc))
+#define PMC_sub(pmc) ((Parrot_sub *)PMC_struct_val(pmc))
 
 /* the first entries must match Parrot_sub, so we can cast
  * these two to the other type
@@ -176,9 +176,9 @@ typedef struct Parrot_coro {
     struct PackFile_ByteCode *caller_seg;  /* bytecode segment */
     opcode_t *address;           /* next address to run - toggled each time */
     struct Stack_Chunk *dynamic_state; /* next dynamic state */
-} * parrot_coro_t;
+} Parrot_coro;
 
-#define PMC_coro(pmc) ((parrot_coro_t)PMC_struct_val(pmc))
+#define PMC_coro(pmc) ((Parrot_coro *)PMC_struct_val(pmc))
 
 typedef struct Parrot_cont {
     /* continuation destination */
@@ -191,11 +191,11 @@ typedef struct Parrot_cont {
     opcode_t *current_results;       /* ptr into code with get_results opcode
                                         full continuation only */
     int runloop_id;                  /* id of the creating runloop. */
-} * parrot_cont_t;
+} Parrot_cont;
 
-#define PMC_cont(pmc) ((parrot_cont_t)PMC_struct_val(pmc))
+#define PMC_cont(pmc) ((Parrot_cont *)PMC_struct_val(pmc))
 
-struct Parrot_Context_info {
+typedef struct Parrot_Context_info {
     STRING* subname;
     STRING* nsname;
     STRING* fullname;
@@ -203,7 +203,7 @@ struct Parrot_Context_info {
     char *file;
     int line;
     opcode_t *address;
-};
+} Parrot_Context_info;
 
 struct Parrot_sub * new_sub(Interp * interp);
 struct Parrot_sub * new_closure(Interp * interp);
@@ -218,7 +218,7 @@ void mark_context(Interp *, parrot_context_t *);
 void invalidate_retc_context(Interp *interp, PMC *cont);
 
 PARROT_API STRING* Parrot_full_sub_name(Interp *interp, PMC* sub);
-PARROT_API int Parrot_Context_info(Interp *interp, parrot_context_t *, struct Parrot_Context_info *);
+PARROT_API int Parrot_Context_get_info(Interp *interp, parrot_context_t *, Parrot_Context_info *);
 PARROT_API STRING* Parrot_Context_infostr(Interp *interp, parrot_context_t *);
 
 PARROT_API PMC* Parrot_find_pad(Interp*, STRING *lex_name, parrot_context_t *);

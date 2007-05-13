@@ -1865,7 +1865,7 @@ string_to_cstring(Interp *interp, STRING * s)
     }
     p = (char *)mem_sys_allocate(s->bufused + 1);
     memcpy(p, s->strstart, s->bufused);
-    p[s->bufused] = 0;
+    p[s->bufused] = '\0';
     return p;
 }
 

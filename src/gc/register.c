@@ -438,7 +438,8 @@ Parrot_free_context(Interp *interp, parrot_context_t *ctxp, int re_use)
 #ifndef NDEBUG
         if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
             /* can't probably PIO_eprintf here */
-            parrot_sub_t doomed = PMC_sub(ctxp->current_sub);
+            Parrot_sub *doomed;
+            doomed = PMC_sub(ctxp->current_sub);
 
             fprintf(stderr, "[free  ctx %p of sub '%s']\n",
                     (void *)ctxp,

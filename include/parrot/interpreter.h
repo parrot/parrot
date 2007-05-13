@@ -240,6 +240,8 @@ typedef struct Parrot_Context {
     size_t pred_offset;
 } parrot_context_t;
 
+typedef parrot_context_t Parrot_Context;
+
 struct _Thread_data;    /* in thread.h */
 struct _Caches;         /* caches .h */
 

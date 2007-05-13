@@ -313,8 +313,8 @@ Pops the topmost exception handler off the stack.
 void
 pop_exception(Interp *interp)
 {
-    Stack_entry_type type;
-    struct Parrot_cont * cc;
+    Stack_entry_type  type;
+    Parrot_cont      *cc;
 
     PMC * const handler
         = (PMC *)stack_peek(interp, interp->dynamic_env, &type);

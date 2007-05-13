@@ -22,7 +22,7 @@ evaluation and execution.
 #include "parrot/parrot.h"
 
 static void
-clear_fixups(Interp *interp, parrot_sub_t sub_data)
+clear_fixups(Interp *interp, Parrot_sub *sub_data)
 {
     opcode_t i, ci;
     PackFile_ByteCode *seg;
@@ -116,7 +116,7 @@ mark_subs(Interp *interp, PMC* self)
 pmclass Eval extends Sub need_ext {
 
     void init() {
-        parrot_sub_t sub_data;
+        Parrot_sub *sub_data;
         SUPER();
         sub_data = PMC_sub(SELF);
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -153,7 +153,7 @@ Invokes the first subroutine in the eval code.
          * OTOH - if the global exists - this eval pmc ought
          *        to be alive and destroy isn't called.
          */
-        parrot_sub_t sub_data;
+        Parrot_sub *sub_data;
         PackFile_Segment *seg;
         PackFile_ByteCode *cur_cs;
 

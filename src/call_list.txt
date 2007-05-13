@@ -425,3 +425,7 @@ v t	#  void mysql_debug(const char *debug)
 
 # win32
 l lttl
+
+i pip
+i piS
+S i

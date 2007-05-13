@@ -71,7 +71,7 @@ void
 PackFile_Constant_dump(Interp *interp, PackFile_ConstTable *ct,
                        PackFile_Constant *self)
 {
-    struct PMC *key;
+    PMC *key;
     size_t i;
     size_t ct_index;
     opcode_t slice_bits;
@@ -181,7 +181,7 @@ PackFile_Constant_dump(Interp *interp, PackFile_ConstTable *ct,
         PIO_printf(interp, "    [ 'PFC_PMC', {\n");
         {
             PMC *pmc = self->u.key;
-            parrot_sub_t sub;
+            Parrot_sub *sub;
             STRING *a_key = const_string(interp, "(keyed)");
             STRING *null = const_string(interp, "(null)");
             STRING *namespace_description;

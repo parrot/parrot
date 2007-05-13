@@ -72,15 +72,14 @@ Parrot_init_arg_nci(Interp *interp, call_state *st, const char *sig)
 int
 Parrot_init_ret_nci(Interp *interp, call_state *st, const char *sig)
 {
-    struct Parrot_Context *ctx = CONTEXT(interp->ctx);
-    PMC *current_cont = ctx->current_cont;
+    Parrot_Context *ctx          = CONTEXT(interp->ctx);
+    PMC            *current_cont = ctx->current_cont;
     /*
      * if this NCI call was a taicall, return results to caller's get_results
      * this also means that we pass the caller's register base pointer
      */
-    if (SUB_FLAG_TAILCALL_ISSET(current_cont)) {
+    if (SUB_FLAG_TAILCALL_ISSET(current_cont))
         ctx = PMC_cont(current_cont)->to_ctx;
-    }
 
     /* TODO simplify all */
     Parrot_init_arg_sig(interp, CONTEXT(interp->ctx), sig, NULL, &st->src);

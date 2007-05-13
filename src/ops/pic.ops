@@ -192,7 +192,7 @@ inline op pic_set_returns__(inconst PMC) :pic {
     opcode_t *dest_pc;
     void **dest_pred;
     parrot_context_t *caller_ctx, *ctx;
-    parrot_cont_t cc;
+    Parrot_cont *cc;
     int n;
 
     ctx = CONTEXT(interp->ctx);

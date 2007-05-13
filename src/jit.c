@@ -1292,7 +1292,7 @@ set_reg_usage(Interp *interp, opcode_t *pc)
     PackFile_FixupTable *ft;
     PackFile_ConstTable *ct;
     PMC *sub_pmc;
-    parrot_sub_t sub;
+    Parrot_sub *sub;
     int i, ci;
     size_t offs;
 

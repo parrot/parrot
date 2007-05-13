@@ -33,7 +33,7 @@ context_infostr(Interp *interp, parrot_context_t *ctx)
     STRING *res = NULL;
 
     Parrot_block_DOD(interp);
-    if (Parrot_Context_info(interp, ctx, &info)) {
+    if (Parrot_Context_get_info(interp, ctx, &info)) {
         char *file = info.file;
         res = Parrot_sprintf_c(interp, "\t%s:%d in function '%Ss'\n",
                                        file, info.line, info.fullname);
@@ -89,7 +89,7 @@ information see F<src/pmc.c>.
             if (PMC_metadata(ctx->current_sub) != NULL) {
                 struct Parrot_Context_info info;
                 Parrot_block_DOD(INTERP);
-                if (Parrot_Context_info(INTERP, ctx, &info)) {
+                if (Parrot_Context_get_info(INTERP, ctx, &info)) {
                     /* free the non-constant string, but not the constant one */
                     if (strncmp( "(unknown file)", info.file, 14 ) < 0 )
                         string_cstring_free(info.file);
@@ -261,7 +261,7 @@ information see F<src/pmc.c>.
               && VTABLE_isa(INTERP, sub, const_string(INTERP, "LuaClosure")) ) {
                 struct Parrot_Context_info info;
                 Parrot_block_DOD(INTERP);
-                if (Parrot_Context_info(INTERP, ctx, &info)) {
+                if (Parrot_Context_get_info(INTERP, ctx, &info)) {
                     STRING* res = Parrot_sprintf_c(INTERP, "%s:%d:",
                                                    info.file, info.line);
                     /* free the non-constant string, but not the constant one */

@@ -117,7 +117,7 @@ japh_compiler(Parrot_Interp interpreter, const char *program)
     opcode_t* pc;
     const char *p;
     PMC *sub;
-    parrot_sub_t sub_data;
+    Parrot_sub *sub_data;
 
 #define CODE_SIZE 128
     cdebug((stderr, "japh_compiler '%s'\n", program));
