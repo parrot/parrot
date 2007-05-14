@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 60;
+use Parrot::Test tests => 61;
 use Parrot::Config;
 
 =head1 NAME
@@ -787,6 +787,30 @@ pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with hash (empty valu
     .local pmc nsr, nsa, nsb, ar
     ar = new .Hash
     ar["b_foo"] = ""
+    nsr = get_root_namespace
+    nsa = nsr['a']
+    nsb = nsr['b']
+    nsb."export_to"(nsa, ar)
+    b_foo()
+.end
+
+.sub a_foo
+    print "a_foo\\n"
+.end
+CODE
+a_foo
+b_foo
+OUTPUT
+
+pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with hash (null value)" );
+.HLL 'A', ''
+.sub main :main
+    a_foo()
+    load_bytecode "$temp_b.pir"
+    .local pmc nsr, nsa, nsb, ar, nul
+    nul = new .Null
+    ar  = new .Hash
+    ar["b_foo"] = nul
     nsr = get_root_namespace
     nsa = nsr['a']
     nsb = nsr['b']

@@ -661,9 +661,14 @@ NOTE: exporting 'default' set of items is not yet implemented.
                     return;
                 }
 
-                dest_name = VTABLE_get_string_keyed_str(interp, what, src_name);
-                if (STRING_IS_NULL(dest_name) || STRING_IS_EMPTY(dest_name)) {
+                if (PMC_IS_NULL(VTABLE_get_pmc_keyed_str(interp, what, src_name))) {
                     dest_name = src_name;
+                }
+                else {
+                    dest_name = VTABLE_get_string_keyed_str(interp, what, src_name);
+                    if (STRING_IS_NULL(dest_name) || STRING_IS_EMPTY(dest_name)) {
+                        dest_name = src_name;
+                    }
                 }
 
                 object = VTABLE_get_pmc_keyed_str(interp, SELF, src_name);
