@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 
 =head1 NAME
 
@@ -195,7 +195,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'RT#41733 - Execution ends after returning from invoke' );
 .namespace ['Foo']
 
-.sub invoke :vtable
+.sub invoke :method :vtable
 say "you invoked me!"
 .return()
 .end
@@ -214,7 +214,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'params/returns from overridden invoke' );
 .namespace ['Foo']
 
-.sub invoke :vtable
+.sub invoke :method :vtable
   .param int a
   print a
   print "\n"
@@ -237,7 +237,7 @@ OUT
 pir_error_output_like( <<'CODE', <<'OUT', 'RT#41732' );
 .namespace ['Foo']
 
-.sub invoke :vtable
+.sub invoke :method :vtable
   .param pmc a
   say 'hi'
 .end
@@ -248,7 +248,46 @@ pir_error_output_like( <<'CODE', <<'OUT', 'RT#41732' );
     $P1()
 .end
 CODE
-/1 params expected/
+/2 params expected/
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'overridden invoke in parent class' );
+.sub main :main
+  $P0 = newclass "FooParent"
+  $P2 = subclass "FooParent", "Foo"
+  $P1 = new "Foo"
+  say "before"
+  $P1("bar", "baa")
+  say "after"
+.end
+
+.namespace ["FooParent"]
+.sub 'invoke' :method :vtable
+  .param pmc bar
+  .param pmc baa
+  say bar
+  say baa
+  $I0 = defined self
+  if $I0 goto is_defined
+    say "self not defined"
+  is_defined:
+  $S1 = typeof self
+  say $S1
+  self.'baz'()
+  say "inside"
+.end
+
+.sub 'baz' :method
+  say "baz"
+.end
+CODE
+before
+bar
+baa
+Foo
+baz
+inside
+after
 OUT
 
 # '

@@ -557,6 +557,59 @@ it's just SUPER aka the default implementation.
 
 /*
 
+=item C<opcode_t *invoke(void *next)>
+
+Invokes the current object as a subroutine.
+
+=cut
+
+*/
+
+    opcode_t* invoke(void* next) {
+        STRING *meth = CONST_STRING(INTERP, "invoke");
+        PMC    *sub  = Parrot_find_vtable_meth(INTERP, SELF, meth);
+        opcode_t* save_current_args;
+
+        if (PMC_IS_NULL(sub)) {
+            PMC *mro = SELF->vtable->mro;
+
+            if (VTABLE_elements(INTERP, mro) == 1)
+                return SUPER(next);
+            else {
+                PMC *parent = VTABLE_get_pmc_keyed_int(INTERP,
+                    SELF->vtable->mro, 1);
+
+                if (PObj_is_class_TEST(parent))
+                    return SUPER(next);
+
+                return deleg_pmc.SUPER(next);
+            }
+        }
+
+        /* Since invoke() is a normal method, 'self' must be passed as the
+         * first argument, but because this looks like a non-method call in
+         * PIR, the args signature doesn't have it, so we have to get the
+         * args signature and unshift 'self' onto it. */
+        PMC *old_sig = CONTEXT(interp->ctx)->constants[*(interp->current_args+1)]->u.key;
+        INTVAL sig_len = VTABLE_elements(interp, old_sig) + 1;
+        int i;
+
+        PMC *meth_sig = pmc_new(interp, enum_class_FixedIntegerArray);
+        VTABLE_set_integer_native(interp, meth_sig, sig_len);
+
+        VTABLE_set_integer_keyed_int(interp, meth_sig, 0, PARROT_ARG_PMC | PARROT_ARG_INVOCANT);
+        CTX_REG_PMC(CONTEXT(interp->ctx), 0) = SELF;
+        for ( i = 1; i < sig_len; i++ )
+            VTABLE_set_integer_keyed_int(interp, meth_sig, i, VTABLE_get_integer_keyed_int(interp, old_sig, i-1));
+
+        interp->args_signature = meth_sig;
+        interp->current_args++;
+
+        INTERP->current_object = SELF;
+        return VTABLE_invoke(interp, sub, next);
+    }
+/*
+
 =item C<void visit(visit_info *info)>
 
 This is used by freeze/thaw to visit the contents of the object.
