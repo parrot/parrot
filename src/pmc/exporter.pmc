@@ -6,6 +6,24 @@ $Id$
 
 src/pmc/exporter.pmc - Export globals from one namespace to another
 
+=head1 SYNOPSIS
+
+You can use Exporter in PIR to import subs from a library. At its simplest:
+
+ .sub main :main
+     load_bytecode 'Test/More.pir'
+     .local pmc exporter, test_ns
+     test_ns = get_namespace ['Test::More']
+     exporter = new 'Exporter'
+     exporter.'import'( test_ns :named('source'), 'plan ok' :named('globals') )
+     plan(1)
+     ok(1, 'exporter has imported the requested functions')
+ .end
+
+Fancier options exist which allow you to import to an alternate namespace,
+or export globals so they can be called using a different name. See
+F<t/pmc/exporter.t> for examples.
+
 =head1 DESCRIPTION
 
 Exports globals from one namespace to another. Exporter always uses
@@ -13,7 +31,7 @@ the typed namespace interface, as outlined in
 F<docs/pdds/pdd21_namespaces.pod>.
 
 Exporter is not derived from any other PMC, and does not provide any
-standard interface--its interface consists solely of non-vtable methods.
+vtable interface--its interface consists solely of non-vtable methods.
 
 =head2 Structure
 
@@ -33,7 +51,7 @@ A PMC representing the current namespace is allocated upon initialization.
 
 =item C<globals>
 
-The globals to export -- a ResizableStringArray.
+The globals to export -- a PMC that implements the hash interface, or Null.
 A Null PMC is allocated during initialization.
 
 =cut
@@ -156,7 +174,6 @@ Throws an exception if a non-NameSpace PMC is passed.
                         "source must be a NameSpace PMC");
                 return;
             }
-
             exp->ns_src = src;
         }
         else {
@@ -204,66 +221,77 @@ Throws an exception if a non-NameSpace PMC is passed.
 =item C<PCCMETHOD void
     globals(PMC *glb :optional, int got_glb :opt_flag)>
 
-Accessor for the array of globals to export (C<globals>.)
-Sets the array if C<glb> is passed, otherwise returns the value.
-If C<glb> is a String, it is split on ascii whitespace.
-If C<glb> is a FixedStringArray, it is cloned and set.
+Accessor for the globals to export (C<globals>.)
+Sets the value if C<glb> is passed, otherwise returns the value.
+If C<glb> is a String, it is split on ascii whitespace, and each array member
+is added as a hash key.
+If C<glb> implements the array interface, each member is added as a hash key.
+if C<glb> implements the hash interface, it is assigned to Exporter's
+C<globals> attribute.
+Throws an exception if an unknown PMC type is passed.
 
 =cut
 
 */
 
     PCCMETHOD void globals(PMC *glb :optional, int got_glb :opt_flag) {
-        Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
-        PMC *ret_globals;
-        STRING *s_str = CONST_STRING(interp, "String");
-        STRING *s_arr = CONST_STRING(interp, "array");
+        Parrot_Exporter *exp    = PARROT_EXPORTER(SELF);
+        PMC             *ret_globals;
+        STRING          *s_str  = CONST_STRING(interp, "String");
+        STRING          *s_arr  = CONST_STRING(interp, "array");
+        STRING          *s_hash = CONST_STRING(interp, "hash");
 
         if (got_glb) {
-            if (PMC_IS_NULL(glb))
-                exp->globals = PMCNULL;
-            else if (VTABLE_isa(interp, glb, s_str))
-                exp->globals = string_split(interp,
-                        CONST_STRING(interp, " "),
-                        VTABLE_get_string(interp, glb));
-            else if (VTABLE_does(interp, glb, s_arr))
-                exp->globals = VTABLE_clone(interp, glb);
-            else
-                 real_exception(interp, NULL, 0,
-                     "Invalid type %d in globals()", glb->vtable->base_type);
+            STRING * const s_empty      = CONST_STRING(interp, "");
+            PMC           *temp_globals = pmc_new(interp, enum_class_Hash);
+
+            if (PMC_IS_NULL(glb)) {
+                temp_globals = PMCNULL;
+            }
+            else if (VTABLE_isa(interp, glb, s_str) || (VTABLE_does(interp, glb, s_arr))) {
+                PMC    *glb_array;
+                INTVAL n, i;
+
+                if (VTABLE_isa(interp, glb, s_str))
+                    glb_array = string_split(interp,
+                            CONST_STRING(interp, " "),
+                            VTABLE_get_string(interp, glb));
+                else
+                    glb_array = glb;
+
+                n = VTABLE_elements(interp, glb_array);
+
+                if (n == 0)
+                    temp_globals = PMCNULL;
+
+                for(i = 0; i < n; i++) {
+                    STRING * const item = VTABLE_get_string_keyed_int(interp, glb_array, i);
+                    VTABLE_set_string_keyed_str(interp, temp_globals, item, s_empty);
+                }
+            }
+            else if (VTABLE_does(interp, glb, s_hash)) {
+                if (VTABLE_elements(interp, glb) == 0)
+                    temp_globals = PMCNULL;
+                else
+                    temp_globals = glb;
+            }
+            else {
+                real_exception(interp, NULL, 0,
+                    "Invalid type %d in globals()", glb->vtable->base_type);
+                return;
+            }
+
+            exp->globals = temp_globals;
          }
          else {
             if (PMC_IS_NULL(exp->globals)) {
                 PCCRETURN(PMC *PMCNULL);
             }
             else {
-                ret_globals = VTABLE_clone(interp, exp->globals);
-                PCCRETURN(PMC *ret_globals);
+                PMC *tmp_globals;
+                tmp_globals = exp->globals;
+                PCCRETURN(PMC *tmp_globals);
             }
-        }
-    }
-
-
-/*
-
-=item C<PCCMETHOD void
-    add_global(PMC *global :optional, int has_global :opt_flag)>
-
-Add C<global> to the array of globals (C<globals>.)
-Sets the array if C<global> is passed, otherwise does nothing.
-
-=cut
-
-*/
-
-    PCCMETHOD void add_global(PMC *global :optional, int has_global :opt_flag) {
-        Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
-        if (has_global) {
-            if (PMC_IS_NULL(exp->globals))
-                exp->globals = pmc_new(interp, enum_class_ResizableStringArray);
-
-            VTABLE_push_string(interp, exp->globals,
-                    VTABLE_get_string(interp, global));
         }
     }
 
@@ -272,12 +300,11 @@ Sets the array if C<global> is passed, otherwise does nothing.
 
 =item C<PCCMETHOD void
     import(PMC *dest :optional :named["destination"], int got_dest :opt_flag,
-        PMC *src :optional :named["source"],      int got_src :opt_flag,
+        PMC *src     :optional :named["source"],  int got_src :opt_flag,
         PMC *globals :optional :named["globals"], int got_globals :opt_flag)>
 
 Import C<globals> from the C<src> namespace to the C<dest> namespace.
-If C<src>, C<dest>, or C<globals> are passed, they will override
-the current value.
+If C<src>, C<dest>, or C<globals> are passed, they override the current value.
 C<import> follows the semantics of the C<export_to> method
 of the C<NameSpace> PMC. in particular, if a NULL value is passed
 for C<globals>, the default set of items will be imported.
@@ -288,7 +315,7 @@ Throws an exception upon error.
 */
 
     PCCMETHOD void import(PMC *dest :optional :named["destination"], int got_dest :opt_flag,
-            PMC *src :optional :named["source"], int got_src :opt_flag,
+            PMC *src     :optional :named["source"],  int got_src :opt_flag,
             PMC *globals :optional :named["globals"], int got_globals :opt_flag) {
 
         Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
