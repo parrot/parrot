@@ -565,10 +565,10 @@ Invokes the current object as a subroutine.
 
 */
 
-    opcode_t* invoke(void* next) {
+    opcode_t *invoke(void* next) {
         STRING *meth = CONST_STRING(INTERP, "invoke");
         PMC    *sub  = Parrot_find_vtable_meth(INTERP, SELF, meth);
-        opcode_t* save_current_args;
+        opcode_t *save_current_args;
 
         if (PMC_IS_NULL(sub)) {
             PMC *mro = SELF->vtable->mro;
