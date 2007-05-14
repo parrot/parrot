@@ -7,7 +7,7 @@ use warnings;
 
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More tests => 19;
+use Test::More qw(no_plan); # tests => 20;
 
 use File::Basename qw(basename dirname);
 use File::Temp 0.13 qw/tempfile/;
@@ -24,7 +24,7 @@ t/configure/step.t - tests Parrot::Configure::Step
 
 =head1 DESCRIPTION
 
-Regressions tests for the L<Parrote::Configure::Step> module.
+Regression tests for the L<Parrote::Configure::Step> module.
 
 =cut
 
@@ -42,6 +42,7 @@ is( integrate( undef, undef ), undef, "integrate(undef, undef)" );
 is( integrate( undef, 1 ),     1,     "integrate(undef, 1)" );
 is( integrate( 1,     undef ), 1,     "integrate(1, undef)" );
 is( integrate( 1,     2 ),     2,     "integrate(1, 1)" );
+is( integrate( 1, q{ }), 1, 'integrate(1, [empty string])' );
 
 # reopn STDIN to test prompt()
 
@@ -51,8 +52,23 @@ is( integrate( 1,     2 ),     2,     "integrate(1, 1)" );
     my ( $tmpfile, $fname ) = tempfile( UNLINK => 1 );
     print $tmpfile "foo" x 1000;
     $tmpfile->flush;
-    is( Parrot::Configure::Step::file_checksum("$fname"),
+    is( Parrot::Configure::Step::file_checksum($fname),
         '324000', "file_checksum() returns correct checksum" );
+}
+
+{
+    my ( $tmpfile, $fname ) = tempfile( UNLINK => 1 );
+    my $str = 'Do not print this line';
+    print $tmpfile "foo" x 500;
+    print $tmpfile "\n";
+    print $tmpfile "$str\n";
+    print $tmpfile "foo" x 500;
+    $tmpfile->flush;
+    my $ignore_pattern = qr/$str/;
+    my $csum = Parrot::Configure::Step::file_checksum(
+        $fname, $ignore_pattern
+    );
+    is( $csum, '324010', "file_checksum() returns correct checksum" );
 }
 
 # copy_if_diff()
@@ -63,9 +79,22 @@ is( integrate( 1,     2 ),     2,     "integrate(1, 1)" );
     print $fromfile "foo" x 1000;
     $fromfile->flush;
 
-    ok( copy_if_diff( "$fromfname", "$tofname" ), "copy_if_diff() true return status" );
-    is( Parrot::Configure::Step::file_checksum("$tofname"),
+    ok( copy_if_diff( $fromfname, $tofname ),
+        "copy_if_diff() true return status" );
+    is( Parrot::Configure::Step::file_checksum($tofname),
         '324000', "copy_if_diff() copied differing files" );
+}
+
+{
+    my ( $fromfile, $fromfname ) = tempfile( UNLINK => 1 );
+    my ( $tofile,   $tofname )   = tempfile( UNLINK => 1 );
+    print $fromfile "foo" x 1000;
+    $fromfile->flush;
+    print $tofile "foo" x 1000;
+    $tofile->flush;
+
+    ok (! defined(copy_if_diff( $fromfname, $tofname )),
+        "copy_if_diff() true return undef" );
 }
 
 # move_if_diff()
@@ -85,14 +114,15 @@ is( integrate( 1,     2 ),     2,     "integrate(1, 1)" );
     $fromfile->close();
     $tofile->close();
 
-    ok( move_if_diff( "$fromfname", "$tofname" ), "move_if_diff() true return status" );
-    ok( !-e "$fromfname", "move_if_diff() moved differing file" );
+    ok( move_if_diff( $fromfname, $tofname ),
+        "move_if_diff() true return status" );
+    ok( !-e $fromfname, "move_if_diff() moved differing file" );
 
     # redirect STDERR for the test below
     close *STDERR;
     open *STDERR, '<', $redir;
 
-    ok( -e "$tofname", "move_if_diff() moved differing file" );
+    ok( -e $tofname, "move_if_diff() moved differing file" );
 
     # restore STDERR
     close *STDERR;
@@ -123,9 +153,9 @@ is( integrate( 1,     2 ),     2,     "integrate(1, 1)" );
     $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;
     my ( $tmpfile, $fname ) = tempfile(%tf_params);
 
-    local $ENV{PATH} = dirname("$fname");
-    chmod 0777, "$fname";
-    my $prog = basename("$fname");
+    local $ENV{PATH} = dirname($fname);
+    chmod 0777, $fname;
+    my $prog = basename($fname);
 
     is( check_progs($prog), $prog, "check_progs() returns the proper program" )
 }
@@ -135,9 +165,9 @@ is( integrate( 1,     2 ),     2,     "integrate(1, 1)" );
     $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;
     my ( $tmpfile, $fname ) = tempfile(%tf_params);
 
-    local $ENV{PATH} = dirname("$fname");
-    chmod 0777, "$fname";
-    my $prog = basename("$fname");
+    local $ENV{PATH} = dirname($fname);
+    chmod 0777, $fname;
+    my $prog = basename($fname);
 
     is( check_progs( [$prog] ),
         $prog, "check_progs() returns the proper program when passed an array ref" )
