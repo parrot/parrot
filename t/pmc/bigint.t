@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -872,7 +872,7 @@ BigInt 1152922657528351582846976
 /
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', "shl_int throws an error when promotion is disabled");
+pir_error_output_like( <<'CODE', <<'OUT', "shl_int throws an error when promotion is disabled");
 .include "errors.pasm"
 .sub main :main
    errorson .PARROT_ERRORS_OVERFLOW_FLAG

@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -79,14 +79,14 @@ starting
 ending
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "illegal min newpmc" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "illegal min newpmc" );
     new P0, 0
     end
 CODE
 /Illegal PMC enum \(0\) in new/
 OUTPUT
 
-pasm_output_like( <<"CODE", <<'OUTPUT', "illegal max newpmc" );
+pasm_error_output_like( <<"CODE", <<'OUTPUT', "illegal max newpmc" );
     new P0, $max_pmc
     end
 CODE
@@ -169,7 +169,7 @@ CODE
 /All names and ids ok/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', 'find_method' );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', 'find_method' );
     new P1, .Integer
     find_method P0, P1, "no_such_meth"
     end
@@ -177,7 +177,7 @@ CODE
 /Method 'no_such_meth' not found/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "new with a native type" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "new with a native type" );
         new P1, .INTVAL
     print "never\n"
     end

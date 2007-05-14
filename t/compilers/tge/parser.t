@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -63,7 +63,7 @@ matched start rule
 parse succeeded
 OUT
 
-pir_output_like( <<'CODE', qr/Syntax error at line 4, near "transform "/, "parse failure" );
+pir_error_output_like( <<'CODE', qr/Syntax error at line 4, near "transform "/, "parse failure" );
 
 .sub _main :main
     load_bytecode "compilers/tge/TGE.pir"

@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -72,7 +72,12 @@ for my $c_args ( 0 .. 1 ) {
                 my $testhead = create_test_header( $c_args, $c_results, $c_params, $c_returns, );
 
                 ## execute tests
-                pir_output_like( $testbody, "/$expbody/", $testhead );
+                if ($expbody eq "ok\n") {
+                    pir_output_like( $testbody, "/$expbody/", $testhead );
+                }
+                else {
+                    pir_error_output_like( $testbody, "/$expbody/", $testhead );
+                }
             }
         }
     }

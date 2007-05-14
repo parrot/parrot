@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -40,7 +40,7 @@ ok 2
 OUT
 
 ##############################
-pir_output_like( <<'CODE', <<'OUT', "illegal label" );
+pir_error_output_like( <<'CODE', <<'OUT', "illegal label");
 .sub bogus
          bsr _function
          print "never\n"

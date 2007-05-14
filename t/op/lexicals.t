@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -310,7 +310,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', ':outer parsing - missing :outer' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', ':outer parsing - missing :outer' );
 .sub main
     print "ok\n"
 .end
@@ -818,7 +818,7 @@ bar: 13014
 bar: 46
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUT', 'closure 8' );
+pir_error_output_like( <<'CODE', <<'OUT', 'closure 8' );
 
 # p6 example from pmichaud
 # { my $x = 5;  { print $x; my $x = 4; print $x; } }
@@ -845,7 +845,7 @@ CODE
 /Null PMC access/
 OUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', 'get non existing' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'get non existing' );
 .sub "main" :main
     .lex 'a', $P0
     foo()
@@ -1011,7 +1011,7 @@ CODE
 110
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', 'package-scoped closure 4 - autoclose' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'package-scoped closure 4 - autoclose' );
 #     sub f ($x) { 
 #         sub g () { print $x }; 
 #     } 

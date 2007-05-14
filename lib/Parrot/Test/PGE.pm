@@ -111,6 +111,20 @@ sub p6rule_like {
     goto &Parrot::Test::pir_output_like;
 }
 
+=item C<p6rule_error_like($target, $pattern, $expected, $description, @todo)>
+
+Like C<p6rule_like()>, but expects Parrot/PGE to exit with an error.
+
+=cut
+
+sub p6rule_error_like {
+    my ( $target, $pattern ) = ( shift, shift );
+
+    unshift @_ => Parrot::Test::PGE::_generate_pir_for( $target, $pattern, 1 );
+
+    goto &Parrot::Test::pir_error_output_like;
+}
+
 =item C<p6rule_throws($pattern, $expected, $description, @todo)>
 
 Compiles the Perl 6 pattern, catching any thrown exceptions.  The test

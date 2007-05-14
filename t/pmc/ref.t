@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -149,7 +149,7 @@ String
 hello
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "deref SharedRef" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "deref SharedRef" );
     new P2, .Integer
     new P1, .SharedRef, P2
     print "ok 1\n"

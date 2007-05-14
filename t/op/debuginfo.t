@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -37,7 +37,7 @@ CODE
 \d/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - Null PMC access" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - Null PMC access");
 .sub main
     print "ok 1\n"
     a()
@@ -78,7 +78,7 @@ called from Sub 'a' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - method not found" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - method not found");
 .namespace ["Test1"]
 .sub main
     print "ok 1\n"
@@ -101,7 +101,7 @@ current instr.: 'parrot;Test1;foo' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'parrot;Test1;main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - fetch of unknown lexical" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - fetch of unknown lexical");
 .namespace ["Test2"]
 .sub main
     print "ok 1\n"
@@ -126,7 +126,7 @@ OUTPUT
 # other run-loops report 998
 # TODO investigate this after interpreter strtup is done
 # see also TODO in src/embed.c
-pir_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - recursion 1" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - recursion 1" );
 .sub main
     main()
 .end
@@ -137,7 +137,7 @@ called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)
 \.\.\. call repeated 1000 times/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - recursion 2" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - recursion 2");
 .sub main
     rec(91)
 .end

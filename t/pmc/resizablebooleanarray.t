@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -402,7 +402,7 @@ CODE
 1[63]
 OUTPUT
 
-pir_output_like( << 'CODE', << 'OUTPUT', "pop bounds checking" );
+pir_error_output_like( << 'CODE', << 'OUTPUT', "pop bounds checking" );
 .sub 'test' :main
        P0 = new .ResizableBooleanArray
        pop I0, P0
@@ -534,7 +534,7 @@ CODE
 0, 0, 1
 OUTPUT
 
-pir_output_like( << 'CODE', << 'OUTPUT', "shift bounds checking" );
+pir_error_output_like( << 'CODE', << 'OUTPUT', "shift bounds checking" );
 .sub 'test' :main
        P0 = new .ResizableBooleanArray
        shift I0, P0

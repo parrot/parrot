@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -85,7 +85,7 @@ start
 done
 OUTPUT
 
-pasm_output_like( <<CODE, <<OUT , "sleep" );
+pasm_error_output_like( <<CODE, <<OUT , "sleep" );
         sleep   -1
         end
 CODE

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -123,7 +123,7 @@ Bar
 Baz
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "getclass" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "getclass" );
     newclass P1, "Foo"
     getclass P2, "Foo"
     classname S2, P2
@@ -462,7 +462,7 @@ CODE
 /\d+/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "classoffset: invalid parent class" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "classoffset: invalid parent class" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -473,7 +473,7 @@ CODE
 /Class not parent of object/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "classoffset: non-object argument" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "classoffset: non-object argument" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, .Undef
@@ -534,7 +534,7 @@ CODE
 Value
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "setting non-existent attribute" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "setting non-existent attribute" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -547,7 +547,7 @@ CODE
 /No such attribute/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "setting non-existent by name" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "setting non-existent by name" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -559,7 +559,7 @@ CODE
 /No such attribute 'Foo\\0no_such'/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "getting NULL attribute" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "getting NULL attribute" );
     newclass P1, "Foo"
     addattribute P1, "i"
     find_type I0, "Foo"
@@ -572,7 +572,7 @@ CODE
 /Null PMC access/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "setting non-existent attribute - 1" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "setting non-existent attribute - 1" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -586,7 +586,7 @@ CODE
 /No such attribute/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "getting non-existent attribute" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "getting non-existent attribute" );
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
@@ -1170,7 +1170,7 @@ CODE
 Taurus
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "addparent exceptions #1" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "addparent exceptions #1" );
     newclass P0, "Astronomical Object"
     new P1, .String
     set P1, "Not a class"
@@ -1182,7 +1182,7 @@ OUTPUT
 
 # '
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "addparent exceptions #2" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "addparent exceptions #2" );
     new P0, .Hash
     newclass P1, "Trashcan"
     addparent P0, P1
@@ -1207,7 +1207,7 @@ CODE
 City
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "subclassing a non-existent class" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "subclassing a non-existent class" );
     subclass P1, "Character", "Nemo"
     print "Uh-oh...\n"
     end
@@ -1216,7 +1216,7 @@ CODE
 OUTPUT
 
 # '
-pasm_output_like( <<'CODE', <<'OUTPUT', "anon. subclass of non-existent class" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "anon. subclass of non-existent class" );
     subclass P1, "Character"
     print "Uh-oh...\n"
     end
@@ -1306,7 +1306,7 @@ foo i
 bar j
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "addattribute duplicate" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "addattribute duplicate" );
     newclass P1, "Foo"
     addattribute P1, "i"
     addattribute P1, "j"
@@ -1827,7 +1827,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "Wrong way to create new objects" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "Wrong way to create new objects" );
     new P0, .ParrotObject
     end
 CODE

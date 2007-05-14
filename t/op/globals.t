@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -35,7 +35,7 @@ pasm_output_is( <<'CODE', '12', "set/get" );
         end
 CODE
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "get null global" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "get null global" );
        null S0
        get_global P1, S0
        end
@@ -103,7 +103,7 @@ pasm_output_is( <<'CODE', '12', "Fetch and store" );
         end
 CODE
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "Find null global" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "Find null global" );
        null S0
        find_global P1, S0
        end

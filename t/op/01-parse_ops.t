@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -39,6 +39,36 @@ my $object_map = {
     sc  => q<'foo'>,
 };
 
+my %parse_errors = map { $_ => 1 } qw(
+    abs
+    bnot
+    bnots
+    ceil
+    defined
+    delete
+    downcase
+    eq
+    exists
+    floor
+    ge
+    get_hll_namespace
+    get_namespace
+    get_root_namespace
+    gt
+    le
+    lt
+    ne
+    neg
+    not
+    print
+    set
+    slice
+    titlecase
+    typeof
+    upcase
+    yield
+);
+
 my %cmds;
 
 ## extract the register types from each opcode
@@ -62,12 +92,18 @@ for my $op (@$Parrot::OpLib::core::ops) {
 plan tests => scalar keys %cmds;
 
 for my $cmd ( sort keys %cmds ) {
-    pasm_output_like(
-        ## retrieve the test commands, and trick imcc to parse only
+    my @args = (
+        ## retrieve the test commands, and trick IMCC to parse only
         join( $/ => 'end', sort( keys %{ $cmds{$cmd} } ), '' ),
         qr/^(?!error:imcc:syntax error,)/,
-        "parsing: $cmd",
-    );
+        "parsing: $cmd" );
+
+    if ($parse_errors{ $cmd }) {
+        pasm_error_output_like( @args )
+    }
+    else {
+        pasm_output_like( @args );
+    }
 }
 
 # Local Variables:

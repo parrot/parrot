@@ -9,7 +9,7 @@ use Parrot::Config;
 use Parrot::Test tests => 4;
 
 # 1 ##########################
-pir_output_like( <<'CODE', <<'OUT', "register names with one letter only are invalid" );
+pir_error_output_like( <<'CODE', <<'OUT', "register names with one letter only are invalid" );
 .sub main :main
     print $S
 .end
@@ -18,7 +18,7 @@ CODE
 OUT
 
 # 2 ##########################
-pir_output_like( <<'CODE', <<'OUT', "register names with one letter only are invalid" );
+pir_error_output_like( <<'CODE', <<'OUT', "register names with one letter only are invalid" );
 .sub main :main
     $I = 5
 .end
@@ -27,7 +27,7 @@ CODE
 OUT
 
 # 3 ##########################
-pir_output_like( <<'CODE', <<'OUT', "register names with numbers only are invalid" );
+pir_error_output_like( <<'CODE', <<'OUT', "register names with numbers only are invalid" );
 .sub main :main
     print $2
 .end
@@ -36,7 +36,7 @@ CODE
 OUT
 
 # 4 ##########################
-pir_output_like( <<'CODE', <<'OUT', "register names with more than letter are invalid" );
+pir_error_output_like( <<'CODE', <<'OUT', "register names with more than letter are invalid" );
 .sub main :main
     print $str
 .end

@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -706,7 +706,7 @@ sub json_isnt {
     $code =~ s{("|\\)}{\\$1}g;
     $code =~ s{\n}{\\n}g;
 
-    return pir_output_like( <<"END_PIR", qr/not a valid JSON value/, $reason, %args );
+    return pir_error_output_like( <<"END_PIR", qr/not a valid JSON value/, $reason, %args );
 
 .sub test :main
     load_bytecode 'compilers/json/JSON.pbc'

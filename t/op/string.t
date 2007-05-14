@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -259,8 +259,8 @@ A string of length 21
 length
 OUTPUT
 
-# This asks for substring it shouldn't be allowed...
-pasm_output_like( <<'CODE', <<'OUTPUT', 'substr OOB' );
+# This asks for substring that shouldn't be allowed...
+pasm_error_output_like( <<'CODE', <<'OUTPUT', 'substr OOB' );
 	set	S0, "A string of length 21"
 	set I0, -99
 	set I1, 6
@@ -270,8 +270,8 @@ CODE
 /^Cannot take substr outside string/
 OUTPUT
 
-# This asks for substring it shouldn't be allowed...
-pasm_output_like( <<'CODE', <<'OUTPUT', 'substr OOB' );
+# This asks for substring that shouldn't be allowed...
+pasm_error_output_like( <<'CODE', <<'OUTPUT', 'substr OOB' );
 	set S0, "A string of length 21"
 	set I0, 99
 	set I1, 6
@@ -381,7 +381,7 @@ xyz
 
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', '5 arg substr, offset past end of string' );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', '5 arg substr, offset past end of string' );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, 12, 3, S1
@@ -447,7 +447,7 @@ xyz
 fghi
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', '5 arg substr, -ve offset out of string' );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', '5 arg substr, -ve offset out of string' );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, -12, 4, S1
@@ -517,7 +517,7 @@ pasm_output_is( <<'CODE', 'PH', '3-arg substr' );
   end
 CODE
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "substr, +ve offset, zero-length string" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "substr, +ve offset, zero-length string" );
   set S0, ""
   substr S1, S0, 10, 3
   print S1
@@ -536,7 +536,7 @@ CODE
 _
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "substr, offset -1, zero-length string" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "substr, offset -1, zero-length string" );
   set S0, ""
   substr S1, S0, -1, 1
   print S1
@@ -545,7 +545,7 @@ CODE
 /Cannot take substr outside string/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "substr, -ve offset, zero-length string" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "substr, -ve offset, zero-length string" );
   set S0, ""
   substr S1, S0, -10, 5
   print S1
@@ -1015,7 +1015,7 @@ CODE
 foo
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', '2-param ord, empty string' );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', '2-param ord, empty string' );
 	ord I0,""
 	print I0
 	end
@@ -1023,7 +1023,7 @@ CODE
 /^Cannot get character of empty string/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', '2-param ord, empty string register' );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', '2-param ord, empty string register' );
 	ord I0,S0
 	print I0
 	end
@@ -1031,7 +1031,7 @@ CODE
 /^Cannot get character of empty string/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', '3-param ord, empty string' );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, empty string' );
 	ord I0,"",0
 	print I0
 	end
@@ -1039,7 +1039,7 @@ CODE
 /^Cannot get character of empty string/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', '3-param ord, empty string register' );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, empty string register' );
 	ord I0,S0,0
 	print I0
 	end
@@ -1092,7 +1092,7 @@ pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string registe
 	end
 CODE
 
-pasm_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string' );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string' );
 	ord I0,"ab",2
 	print I0
 	end
@@ -1100,7 +1100,7 @@ CODE
 /^Cannot get character past end of string/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string' );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string' );
 	set S0,"ab"
 	ord I0,S0,2
 	print I0
@@ -1135,7 +1135,7 @@ pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string registe
 	end
 CODE
 
-pasm_output_like(
+pasm_error_output_like(
     <<'CODE', <<'OUTPUT', '3-param ord, multi-character string register, from end, OOB' );
 	set S0,"ab"
 	ord I0,S0,-3
@@ -1274,7 +1274,7 @@ XXXXXXXXXXXX
 >< done
 OUTPUT
 
-pasm_output_is( <<'CODE', "Cannot repeat with negative arg\n", 'repeat OOB' );
+pasm_error_output_is( <<'CODE', "Cannot repeat with negative arg\n", 'repeat OOB' );
 	repeat S0, "japh", -1
 	end
 CODE
@@ -2789,7 +2789,7 @@ pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string registe
 	end
 CODE
 
-pasm_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string, I' );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string, I' );
 	set I1, 2
 	ord I0,"ab",I1
 	print I0
@@ -2798,7 +2798,7 @@ CODE
 /^Cannot get character past end of string/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string, I' );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string, I' );
 	set I1, 2
 	set S0,"ab"
 	ord I0,S0,I1
@@ -2838,7 +2838,7 @@ pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string registe
 	end
 CODE
 
-pasm_output_like(
+pasm_error_output_like(
     <<'CODE', <<'OUTPUT', '3-param ord, multi-character string register, from end, OOB, I' );
 	set I1, -3
 	set S0,"ab"

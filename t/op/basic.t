@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -220,7 +220,7 @@ my $CODE = '
 
 #.namespace';    # no \n at end of file
 
-pir_output_like( $CODE, <<'OUTPUT', "end of line handling" );
+pir_error_output_like( $CODE, <<'OUTPUT', "end of line handling" );
 /unexpected/
 OUTPUT
 

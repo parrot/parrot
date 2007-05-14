@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -257,19 +257,19 @@ ResizablePMCArray
 Hash
 OUTPUT
 
-pir_output_like( $PRE . <<'CODE'. $POST, <<'OUT', 'get_integer not implemented' );
+pir_error_output_like( $PRE . <<'CODE'. $POST, <<'OUT', 'get_integer not implemented' );
     I0 = capt
 CODE
 /get_integer\(\) not implemented in class 'Capture'/
 OUT
 
-pir_output_like( $PRE . <<'CODE'. $POST, <<'OUT', 'get_string not implemented' );
+pir_error_output_like( $PRE . <<'CODE'. $POST, <<'OUT', 'get_string not implemented' );
     S0 = capt
 CODE
 /get_string\(\) not implemented in class 'Capture'/
 OUT
 
-pir_output_like( $PRE . <<'CODE'. $POST, <<'OUT', 'get_number not implemented' );
+pir_error_output_like( $PRE . <<'CODE'. $POST, <<'OUT', 'get_number not implemented' );
     N0 = capt
 CODE
 /get_number\(\) not implemented in class 'Capture'/

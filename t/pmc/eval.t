@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -517,7 +517,7 @@ print $TEMP <<PIR;
 PIR
 close $TEMP;
 
-pir_output_like( <<'CODE', <<'OUTPUT', "compile err in load_bytecode" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "compile err in load_bytecode" );
 .sub main :main
      load_bytecode "temp.pir"
      print "never\n"

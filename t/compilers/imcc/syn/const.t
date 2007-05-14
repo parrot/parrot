@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -272,7 +272,7 @@ CODE
 abc\tdef
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', 'PIR heredoc: rejects unquoted terminator' );
+pir_error_output_like( <<'CODE', <<'OUT', 'PIR heredoc: rejects unquoted terminator');
 .sub 'main' :main
     $S0 = <<Jabberwocky
 "Beware the Jabberwock, my son!
@@ -286,7 +286,7 @@ CODE
 /^error:imcc:syntax error, unexpected SHIFT_LEFT.*/
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', "PIR heredoc: rejects inline heredoc" );
+pir_error_output_like( <<'CODE', <<'OUT', "PIR heredoc: rejects inline heredoc");
 .sub 'main' :main
     $S0 .= <<Jabberwocky
 He took his vorpal sword in hand:
@@ -301,7 +301,7 @@ CODE
 /^error:imcc:syntax error, unexpected SHIFT_LEFT.*/
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', "PIR heredoc: rejects null terminator" );
+pir_error_output_like( <<'CODE', <<'OUT', "PIR heredoc: rejects null terminator");
 .sub 'main' :main
     $S0 = <<
 And, as in uffish thought he stood,
@@ -315,7 +315,7 @@ CODE
 /^error:imcc:syntax error, unexpected SHIFT_LEFT.*/
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', "PIR heredoc: rejects terminator with spaces" );
+pir_error_output_like( <<'CODE', <<'OUT', "PIR heredoc: rejects terminator with spaces");
 .sub 'main' :main
     $S0 = << "terminator with spaces"
 One, two! One, two! And through and through
@@ -365,7 +365,7 @@ All mimsy were the borogoves,
   And the mome raths outgrabe.
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', "PIR heredoc: rejects interpolated terminator" );
+pir_error_output_like( <<'CODE', <<'OUT', "PIR heredoc: rejects interpolated terminator");
 .sub 'main' :main
     $S1 = 'e_e_cummings'
     $S0 = <<$S1
@@ -418,7 +418,7 @@ CODE
 The line above is empty.
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', "PIR heredoc: line numbers" );
+pir_error_output_like( <<'CODE', <<'OUT', "PIR heredoc: line numbers");
 .sub main :main
     .local string s
     .local pmc nil
@@ -540,7 +540,7 @@ line 10
 line 2
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', "heredoc not eol 2 - nested" );
+pir_error_output_like( <<'CODE', <<'OUT', "heredoc not eol 2 - nested");
 .sub main :main
     cat(<<"H1", <<"H2")
 line 1

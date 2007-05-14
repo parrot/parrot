@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -283,7 +283,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - new result" );
 
     new P1, .Integer
     set P1, 3
-    n_bxor P9, P1, 2	# create new result
+    n_bxor P9, P1, 2    # create new result
     print P9
     print "\n"
     end
@@ -311,7 +311,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - existing result" );
     new P0, .Integer
     new P1, .Integer
     set P1, 3
-    bxor P0, P1, 2	# use result
+    bxor P0, P1, 2    # use result
     print P0
     print "\n"
     end
@@ -341,7 +341,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - mixed" );
     bxor P0, P1, 2      # reuse destination
     print P0
     print "\n"
-    n_bxor P9, P1, 2	# create new result
+    n_bxor P9, P1, 2    # create new result
     print P9
     print "\n"
     end
@@ -406,54 +406,54 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "MMD second arg int/float dispatch" );
 .sub foo :multi(_, Integer)
-	.param pmc first
-	.param pmc second
-	print "(_, Int) method:  "
-	print first
-	print ', '
-	print second
-	print "\n"
+    .param pmc first
+    .param pmc second
+    print "(_, Int) method:  "
+    print first
+    print ', '
+    print second
+    print "\n"
 .end
 .sub foo :multi(_, Float)
-	.param pmc first
-	.param pmc second
-	print "(_, Float) method:  "
-	print first
-	print ', '
-	print second
-	print "\n"
+    .param pmc first
+    .param pmc second
+    print "(_, Float) method:  "
+    print first
+    print ', '
+    print second
+    print "\n"
 .end
 .sub main :main
-	$P0 = new .Float
-	$P0 = 9.5
-	foo(1, $P0)
-	$P1 = new .Integer
-	$P1 = 3
-	foo(1, $P1)
+    $P0 = new .Float
+    $P0 = 9.5
+    foo(1, $P0)
+    $P1 = new .Integer
+    $P1 = 3
+    foo(1, $P1)
 .end
 CODE
 (_, Float) method:  1, 9.5
 (_, Int) method:  1, 3
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', "MMD single method, dispatch failure" );
+pir_error_output_like( <<'CODE', <<'OUT', "MMD single method, dispatch failure" );
 ## Compare this to the previous example.
 .sub foo :multi(_, Float)
-	.param pmc first
-	.param pmc second
-	print "(_, Float) method:  "
-	print first
-	print ', '
-	print second
-	print "\n"
+    .param pmc first
+    .param pmc second
+    print "(_, Float) method:  "
+    print first
+    print ', '
+    print second
+    print "\n"
 .end
 .sub main :main
-	$P0 = new .Float
-	$P0 = 9.5
-	foo(1, $P0)
-	$P1 = new .Integer
-	$P1 = 3
-	foo(1, $P1)
+    $P0 = new .Float
+    $P0 = 9.5
+    foo(1, $P0)
+    $P1 = new .Integer
+    $P1 = 3
+    foo(1, $P1)
 .end
 CODE
 /\A\(_, Float\) method:  1, 9\.5

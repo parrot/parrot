@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -161,7 +161,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
         new P0, .Array
         set P0, 1
 
@@ -173,7 +173,7 @@ CODE
 current instr/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
         new P0, .Array
         set P0, 1
 

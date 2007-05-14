@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -430,7 +430,7 @@ CODE
 hello 42 again 47.110000
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too few" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too few" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
@@ -462,7 +462,7 @@ CODE
 /too many arguments passed/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - force get_params" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - force get_params" );
 .macro no_params
     get_params '()'
 .endm
@@ -479,7 +479,7 @@ CODE
 /too many arguments passed/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
@@ -544,7 +544,7 @@ hello
 ok
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
@@ -1175,7 +1175,7 @@ CODE
 1 2 3 2
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "too many args via :flat" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "too many args via :flat" );
 .sub _fn1
     .param int arg1
     .param int arg2
@@ -1209,7 +1209,7 @@ CODE
 /too many arguments passed \(5\) - 4 params expected/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "too few args via :flat" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "too few args via :flat" );
 .sub _fn1
     .param int arg1
     .param int arg2
@@ -2017,7 +2017,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "named => pos passing" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "named => pos passing" );
 .sub main :main
         foo( "b" => 10 , "a" => 20)
         print "never\n"
@@ -2151,7 +2151,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "param .. 'a' => v :named('foo')" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "param .. 'a' => v :named('foo')" );
 .sub main :main
         foo( "b" => 10, "a" => 20)
         print "never\n"
@@ -2166,7 +2166,7 @@ CODE
 /Named parameter with more than one name/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "param .. 'a' => v :named('foo')" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "param .. 'a' => v :named('foo')" );
 .sub main :main
         foo( "b" => 10, "a" => 20)
         print "never\n"
@@ -2197,7 +2197,7 @@ CODE
 1120
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - missing named" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - missing named" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
@@ -2217,7 +2217,7 @@ CODE
 /too few arguments/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - missing named" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - missing named" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
@@ -2237,7 +2237,7 @@ CODE
 /too few arguments/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - too many named" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - too many named" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
@@ -2257,7 +2257,7 @@ CODE
 /too many/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - duplicate named" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - duplicate named" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
@@ -2360,7 +2360,7 @@ CODE
 2626
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "unexpected positional arg" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "unexpected positional arg" );
 .sub 'main'
     'foo'('abc', 'def', 'ghi'=>1)
 .end
@@ -2373,7 +2373,7 @@ CODE
 /positional inside named args at position 2/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "unexpected positional arg" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "unexpected positional arg" );
 .sub 'main'
     'foo'('abc', 'def'=>1, 'ghi', 'jkl'=>1)
 .end

@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 # Test some basic pasm errors, not pir
@@ -13,7 +13,7 @@ use Parrot::Test tests => 1;
 
 # I am not sure if it is really important to support this, but at
 # least, we should not segfault when it happens :->
-pasm_output_like( "print \"Hi\\n\"", <<'OUT', "No new line at end of file" );
+pasm_error_output_like( "print \"Hi\\n\"", <<'OUT', "No new line at end of file");
 /^error:imcc:syntax error, unexpected EOM, expecting '\\n'/
 OUT
 

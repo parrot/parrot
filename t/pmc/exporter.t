@@ -271,7 +271,7 @@ ok 4 - add_global() with too many args fails
 OUT
 
 ## TODO import
-pir_output_like( <<'CODE', <<'OUT', 'import - no args' );
+pir_error_output_like( <<'CODE', <<'OUT', 'import - no args' );
 .sub 'test' :main
     $P0 = new .Exporter
 

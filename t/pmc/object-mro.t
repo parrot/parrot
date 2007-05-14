@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -302,7 +302,7 @@ OUTPUT
 
 # ... now some tests which fail to compose the class
 
-pir_output_like( <<'CODE', <<'OUTPUT', "mro error 1" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "mro error 1" );
 #
 # example take from: http://www.python.org/2.3/mro.html
 #

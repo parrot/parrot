@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -157,7 +157,7 @@ CODE
 -13+2i
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "Malformed string: real part" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "Malformed string: real part" );
     new P0, .Complex
     set P0, "q + 3i"
     end
@@ -165,7 +165,7 @@ CODE
 /Complex: malformed string/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "Malformed string: imaginary part" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "Malformed string: imaginary part" );
     new P0, .Complex
     set P0, "1 + ij"
     end
@@ -173,7 +173,7 @@ CODE
 /Complex: malformed string/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "Malformed string: missing +/-" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "Malformed string: missing +/-" );
     new P0, .Complex
     set P0, "1 * i"
 CODE
@@ -530,7 +530,7 @@ N0 N1 N2 OK
 1
 OUTPUT
 
-pasm_output_like( <<"CODE", <<'OUTPUT', "get keyed: invalid string key" );
+pasm_error_output_like( <<"CODE", <<'OUTPUT', "get keyed: invalid string key" );
     new P0, .Complex
     set P0, "5 + 3.5i"
     set N0, P0["Foo"]
@@ -539,7 +539,7 @@ CODE
 /Complex: key is neither 'real' or 'imag'/
 OUTPUT
 
-pasm_output_like( <<"CODE", <<'OUTPUT', "get keyed: invalid numeric key" );
+pasm_error_output_like( <<"CODE", <<'OUTPUT', "get keyed: invalid numeric key" );
     new P0, .Complex
     set P0, "5 + 3.5i"
     set N0, P0[2]
@@ -597,7 +597,7 @@ CODE
 0.5+6i
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "set keyed: invalid key" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "set keyed: invalid key" );
     new P0, .Complex
     set P0[2], 12.5
     end

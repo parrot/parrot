@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -20,7 +20,7 @@ t/library/pge_util.t - Parrot Grammar Engine tests of utility rules
 =cut
 
 my $str = "How will this\nstring choose\nto explode?\n\nTest";
-p6rule_like(
+p6rule_error_like(
     $str,
     'expl <PGE::Util::die: kaboom>',
     qr/^kaboom at line 3, near "ode\?\\n\\n/, "die"

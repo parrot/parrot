@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -22,7 +22,7 @@ Tests PMC object methods.
 
 =cut
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "callmethod - unknown method" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethod - unknown method" );
     newclass P2, "Foo"
     set S0, "nada"
     callmethodcc P2, S0
@@ -32,7 +32,7 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "callmethod (STR) - unknown method" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethod (STR) - unknown method" );
     newclass P2, "Foo"
     set S1, "nada"
     callmethod P2, S1, P1
@@ -42,7 +42,7 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "callmethodcc - unknown method" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc - unknown method" );
     newclass P2, "Foo"
     set S0, "nada"
     callmethodcc P2, S0
@@ -52,7 +52,7 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "callmethodcc (STR) - unknown method" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc (STR) - unknown method" );
     newclass P2, "Foo"
     set S1, "nada"
     callmethodcc P2, S1
@@ -498,7 +498,7 @@ in meth
 back
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "find_method - unknown method" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "find_method - unknown method" );
     newclass P2, "Foo"
     set S0, "nada"
     find_method P0, P2, S0

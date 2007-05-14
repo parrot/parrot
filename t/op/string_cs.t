@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -62,7 +62,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "find_charset - not existing" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "find_charset - not existing" );
     find_charset I0, "no_such"
     end
 CODE
@@ -279,7 +279,7 @@ abc
 iso-8859-1
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "trans_charset_s_i - lossy" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "trans_charset_s_i - lossy" );
     set S1, iso-8859-1:"abcä"
     find_charset I0, "ascii"
     trans_charset S1, I0

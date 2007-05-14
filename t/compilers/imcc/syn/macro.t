@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -232,7 +232,7 @@ CODE
 10
 OUTPUT
 
-pir_output_like( <<'CODE', <<OUTPUT, "too few params" );
+pir_error_output_like( <<'CODE', <<OUTPUT, "too few params");
 .sub test :main
 .macro M(A, B)
     print .A
@@ -245,7 +245,7 @@ CODE
 /Macro 'M' requires 2 arguments, but 1 given/
 OUTPUT
 
-pir_output_like( <<'CODE', <<OUTPUT, "too many params" );
+pir_error_output_like( <<'CODE', <<OUTPUT, "too many params");
 .sub test :main
 .macro M(A, B)
     print .A
@@ -271,7 +271,7 @@ CODE
 fine
 OUTPUT
 
-pir_output_like( <<'CODE', <<OUTPUT, "macro name is no ident" );
+pir_error_output_like( <<'CODE', <<OUTPUT, "macro name is no ident");
 .sub test :main
 .macro 42(A, B)
     print .A
@@ -284,7 +284,7 @@ CODE
 /Macro names must be identifiers/
 OUTPUT
 
-pir_output_like( <<'CODE', <<OUTPUT, "unterminated macro" );
+pir_error_output_like( <<'CODE', <<OUTPUT, "unterminated macro");
 .sub test :main
 .macro M(
 
@@ -293,7 +293,7 @@ CODE
 /End of file reached/
 OUTPUT
 
-pir_output_like( <<'CODE', <<OUTPUT, "unterminated macro 2" );
+pir_error_output_like( <<'CODE', <<OUTPUT, "unterminated macro 2");
 .sub test :main
 .macro M(A, B)
   print .A
@@ -304,7 +304,7 @@ CODE
 /End of file reached/
 OUTPUT
 
-pir_output_like( <<'CODE', <<OUTPUT, "ill param def" );
+pir_error_output_like( <<'CODE', <<OUTPUT, "ill param def");
 .sub test :main
 .macro M(A, B
   print .A
@@ -315,7 +315,7 @@ CODE
 /Parameter definition in 'M' must be IDENT/
 OUTPUT
 
-pir_output_like( <<'CODE', <<OUTPUT, "no params" );
+pir_error_output_like( <<'CODE', <<OUTPUT, "no params");
 .sub test :main
 .macro M(A, B)
     print .A
@@ -328,7 +328,7 @@ CODE
 /Macro 'M' needs 2 arguments/
 OUTPUT
 
-pir_output_like( <<'CODE', <<OUTPUT, "unknown macro" );
+pir_error_output_like( <<'CODE', <<OUTPUT, "unknown macro");
 .sub test :main
 .macro M(A, B)
     print .A
@@ -341,7 +341,7 @@ CODE
 /(unknown macro|unexpected DOT)/
 OUTPUT
 
-pir_output_like( <<'CODE', <<OUTPUT, "unexpected IDENTIFIER" );
+pir_error_output_like( <<'CODE', <<OUTPUT, "unexpected IDENTIFIER");
 .sub test :main
 .macro M()
     this gives a parse error
@@ -353,7 +353,7 @@ CODE
 /error, unexpected IDENTIFIER/
 OUTPUT
 
-pir_output_like( <<'CODE', <<OUTPUT, "unknown macro" );
+pir_error_output_like( <<'CODE', <<OUTPUT, "unknown macro");
 .sub test :main
 .macro M(A)
     .arg .A

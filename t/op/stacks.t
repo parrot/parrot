@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -294,7 +294,7 @@ CODE
 43
 OUTPUT
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'rotate up by more than stack size' );
+pasm_error_output_is( <<"CODE", <<'OUTPUT', 'rotate up by more than stack size');
     set I0, 1
     save I0
     set I0, 2
@@ -305,7 +305,7 @@ CODE
 Stack too shallow!
 OUTPUT
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'rotate down by more than stack size' );
+pasm_error_output_is( <<"CODE", <<'OUTPUT', 'rotate down by more than stack size');
     set I0, 1
     save I0
     set I0, 2
@@ -448,7 +448,7 @@ starting
 done
 OUTPUT
 
-pasm_output_is( <<CODE, <<OUTPUT, "entrytype, beyond stack depth" );
+pasm_error_output_is( <<CODE, <<OUTPUT, "entrytype, beyond stack depth" );
         save    12
         print   "ready\\n"
         entrytype       I0, 1

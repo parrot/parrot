@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -1092,7 +1092,7 @@ CODE
 1.414214
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "div_n_n by zero" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "div_n_n by zero" );
         set N0, 0
         set N1, 10
         div N1, N0
@@ -1101,7 +1101,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "div_n_nc by zero" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "div_n_nc by zero" );
         set N1, 10
         div N1, 0
         end
@@ -1109,14 +1109,14 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "div_n_nc_nc by zero" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "div_n_nc_nc by zero" );
         div N1, 0, 0
         end
 CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "div_n_n_n by zero" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "div_n_n_n by zero" );
         set N0, 0
         set N1, 10
         div N2, N1, N0
@@ -1125,7 +1125,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "div_n_nc_n by zero" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "div_n_nc_n by zero" );
         set N0, 0
         div N2, 10, N0
         end
@@ -1133,7 +1133,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "div_n_n_nc by zero" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "div_n_n_nc by zero" );
         set N1, 10
         div N2, N1, 0
         end
@@ -1141,7 +1141,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "fdiv_n_n by zero" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "fdiv_n_n by zero" );
         set N0, 0
         set N1, 10
         fdiv N1, N0
@@ -1150,7 +1150,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "fdiv_n_nc by zero" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "fdiv_n_nc by zero" );
         set N1, 10
         fdiv N1, 0
         end
@@ -1158,7 +1158,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "fdiv_n_n_n by zero" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "fdiv_n_n_n by zero" );
         set N0, 0
         set N1, 10
         fdiv N2, N1, N0
@@ -1167,7 +1167,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "fdiv_n_nc_n by zero" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "fdiv_n_nc_n by zero" );
         set N0, 0
         fdiv N2, 10, N0
         end
@@ -1175,7 +1175,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "fdiv_n_n_nc by zero" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "fdiv_n_n_nc by zero" );
         set N1, 10
         fdiv N2, N1, 0
         end
@@ -1183,7 +1183,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "cmod_n_n_n by zero" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "cmod_n_n_n by zero" );
         set N0, 0
         set N1, 10
         cmod N2, N1, N0
@@ -1192,7 +1192,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "cmod_n_nc_n by zero" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "cmod_n_nc_n by zero" );
         set N0, 0
         cmod N2, 10, N0
         end
@@ -1200,7 +1200,7 @@ CODE
 /.*Divide by zero.*/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "cmod_n_n_nc by zero" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "cmod_n_n_nc by zero" );
         set N1, 10
         cmod N2, N1, 0
         end

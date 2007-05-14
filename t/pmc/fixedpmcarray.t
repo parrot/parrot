@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -86,7 +86,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)" );
     new P0, .FixedPMCArray
 
     set I0,P0
@@ -192,7 +192,7 @@ OUTPUT
 
 # TODO: Rewrite these properly when we have exceptions
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
         new P0, .FixedPMCArray
         set P0, 1
 
@@ -204,7 +204,7 @@ CODE
 current instr\.:/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
         new P0, .FixedPMCArray
         set P0, 1
 
@@ -387,7 +387,7 @@ CODE
 0
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "Getting unitialized elements" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "Getting unitialized elements" );
 
 .sub main :main
     .local pmc arr1

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -24,45 +24,45 @@ out-of-bounds test. Checks INT and PMC keys.
 =cut
 
 my $fp_equality_macro = <<'ENDOFMACRO';
-.macro fp_eq (	J, K, L )
-	save	N0
-	save	N1
-	save	N2
+.macro fp_eq (    J, K, L )
+    save    N0
+    save    N1
+    save    N2
 
-	set	N0, .J
-	set	N1, .K
-	sub	N2, N1,N0
-	abs	N2, N2
-	gt	N2, 0.000001, .$FPEQNOK
+    set    N0, .J
+    set    N1, .K
+    sub    N2, N1,N0
+    abs    N2, N2
+    gt    N2, 0.000001, .$FPEQNOK
 
-	restore N2
-	restore	N1
-	restore	N0
-	branch	.L
+    restore N2
+    restore    N1
+    restore    N0
+    branch    .L
 .local $FPEQNOK:
-	restore N2
-	restore	N1
-	restore	N0
+    restore N2
+    restore    N1
+    restore    N0
 .endm
-.macro fp_ne(	J,K,L)
-	save	N0
-	save	N1
-	save	N2
+.macro fp_ne(    J,K,L)
+    save    N0
+    save    N1
+    save    N2
 
-	set	N0, .J
-	set	N1, .K
-	sub	N2, N1,N0
-	abs	N2, N2
-	lt	N2, 0.000001, .$FPNENOK
+    set    N0, .J
+    set    N1, .K
+    sub    N2, N1,N0
+    abs    N2, N2
+    lt    N2, 0.000001, .$FPNENOK
 
-	restore	N2
-	restore	N1
-	restore	N0
-	branch	.L
+    restore    N2
+    restore    N1
+    restore    N0
+    branch    .L
 .local $FPNENOK:
-	restore	N2
-	restore	N1
-	restore	N0
+    restore    N2
+    restore    N1
+    restore    N0
 .endm
 ENDOFMACRO
 
@@ -75,36 +75,36 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-	new P0,.ResizableFloatArray
+    new P0,.ResizableFloatArray
 
-	set I0,P0
-	eq I0,0,OK_1
-	print "not "
-OK_1:	print "ok 1\n"
+    set I0,P0
+    eq I0,0,OK_1
+    print "not "
+OK_1:    print "ok 1\n"
 
-	set P0,1
-	set I0,P0
-	eq I0,1,OK_2
-	print "not "
-OK_2:	print "ok 2\n"
+    set P0,1
+    set I0,P0
+    eq I0,1,OK_2
+    print "not "
+OK_2:    print "ok 2\n"
 
-	set P0,5
-	set I0,P0
-	eq I0,5,OK_3
-	print "not "
-OK_3:	print "ok 3\n"
+    set P0,5
+    set I0,P0
+    eq I0,5,OK_3
+    print "not "
+OK_3:    print "ok 3\n"
 
-	set P0,9
-	set I0,P0
-	eq I0,9,OK_4
-	print "not "
-OK_4:	print "ok 4\n"
+    set P0,9
+    set I0,P0
+    eq I0,9,OK_4
+    print "not "
+OK_4:    print "ok 4\n"
 
-	set P0,7
-	set I0,P0
-	eq I0,7,OK_5
-	print "not "
-OK_5:	print "ok 5\n"
+    set P0,7
+    set I0,P0
+    eq I0,7,OK_5
+    print "not "
+OK_5:    print "ok 5\n"
 
         end
 CODE
@@ -115,8 +115,8 @@ ok 4
 ok 5
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "Setting negative array size" );
-	new P0, .ResizableFloatArray
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting negative array size" );
+    new P0, .ResizableFloatArray
         set P0, -100
         end
 CODE
@@ -127,25 +127,25 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
         new P0, .ResizableFloatArray
         set P0, 1
 
-	set P0[0],-7
-	set I0,P0[0]
-	eq I0,-7,OK_1
-	print "not "
-OK_1:	print "ok 1\n"
+    set P0[0],-7
+    set I0,P0[0]
+    eq I0,-7,OK_1
+    print "not "
+OK_1:    print "ok 1\n"
 
-	set P0[0],3.7
-	set N0,P0[0]
-	eq N0,3.7,OK_2
-	print "not "
-OK_2:	print "ok 2\n"
+    set P0[0],3.7
+    set N0,P0[0]
+    eq N0,3.7,OK_2
+    print "not "
+OK_2:    print "ok 2\n"
 
-	set P0[0],"17.2"
-	set S0,P0[0]
-	eq S0,"17.2",OK_3
-	print "not "
-OK_3:	print "ok 3\n"
+    set P0[0],"17.2"
+    set S0,P0[0]
+    eq S0,"17.2",OK_3
+    print "not "
+OK_3:    print "ok 3\n"
 
-	end
+    end
 CODE
 ok 1
 ok 2
@@ -155,25 +155,25 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
         new P0, .ResizableFloatArray
 
-	set P0[1], -7
-	set I0, P0[1]
-	eq I0,-7,OK_1
-	print "not "
-OK_1:	print "ok 1\n"
+    set P0[1], -7
+    set I0, P0[1]
+    eq I0,-7,OK_1
+    print "not "
+OK_1:    print "ok 1\n"
 
-	set P0[1], 3.7
-	set N0, P0[1]
-	eq N0,3.7,OK_2
-	print "not "
-OK_2:	print "ok 2\n"
+    set P0[1], 3.7
+    set N0, P0[1]
+    eq N0,3.7,OK_2
+    print "not "
+OK_2:    print "ok 2\n"
 
-	set P0[1],"17.1"
-	set S0, P0[1]
-	eq S0,"17.1",OK_3
-	print "not "
-OK_3:	print "ok 3\n"
+    set P0[1],"17.1"
+    set S0, P0[1]
+    eq S0,"17.1",OK_3
+    print "not "
+OK_3:    print "ok 3\n"
 
-	end
+    end
 CODE
 ok 1
 ok 2
@@ -186,10 +186,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
         new P0, .ResizableFloatArray
         set P0, 1
 
-	set P0[1], -7
-	print "ok 1\n"
+    set P0[1], -7
+    print "ok 1\n"
 
-	end
+    end
 CODE
 ok 1
 OUTPUT
@@ -198,9 +198,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
         new P0, .ResizableFloatArray
         set P0, 1
 
-	set I0, P0[1]
-	print "ok 1\n"
-	end
+    set I0, P0[1]
+    print "ok 1\n"
+    end
 CODE
 ok 1
 OUTPUT
@@ -403,7 +403,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', 'pop from empty array' );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', 'pop from empty array' );
      new P0, .ResizableFloatArray
      pop N0, P0
      end

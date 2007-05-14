@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -152,7 +152,7 @@ ok 4
 ok 5
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \u' );
+pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \u' );
     set S0, "x\uy"
     print "never\n"
     end
@@ -160,7 +160,7 @@ CODE
 /Illegal escape sequence in/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \u123' );
+pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \u123' );
     set S0, "x\u123y"
     print "never\n"
     end
@@ -168,7 +168,7 @@ CODE
 /Illegal escape sequence in/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \U123' );
+pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \U123' );
     set S0, "x\U123y"
     print "never\n"
     end
@@ -176,7 +176,7 @@ CODE
 /Illegal escape sequence in/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, 'illegal \x' );
+pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \x' );
     set S0, "x\xy"
     print "never\n"
     end
@@ -210,7 +210,7 @@ CODE
 \xc2\xab
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "UTF8 literals - illegal" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "UTF8 literals - illegal" );
     set S0, utf8:unicode:"\xf2\xab"
     length I0, S0
     print I0
@@ -222,7 +222,7 @@ CODE
 /Malformed UTF-8 string/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<OUTPUT, "UTF8 as malformed ascii" );
+pasm_error_output_like( <<'CODE', <<OUTPUT, "UTF8 as malformed ascii" );
     set S0, ascii:"«"
     length I0, S0
     print I0

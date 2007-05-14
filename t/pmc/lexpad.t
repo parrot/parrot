@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -23,7 +23,7 @@ Tests the LexPad PMC.
 
 =cut
 
-pir_output_like( <<'CODE', <<'OUT', 'new' );
+pir_error_output_like( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     new P0, .LexPad
     print "ok 1\n"

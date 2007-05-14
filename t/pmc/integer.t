@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -366,7 +366,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "get_as_base() bounds check" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "get_as_base() bounds check" );
 .sub main :main
     $P0 = new .Integer
     $P0 = 42
@@ -381,7 +381,7 @@ CODE
 .*/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "get_as_base() bounds check" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "get_as_base() bounds check" );
 .sub main :main
     $P0 = new .Integer
     $P0 = 42

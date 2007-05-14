@@ -47,7 +47,7 @@ pcc_like(
 #);
 
 ## G
-pcc_like(
+pcc_error_like(
     { params => ".param pmc abc" },
     '/too few arguments passed \(0\) - 1 params expected/',
     'G1: argument underflow: required param',
@@ -67,13 +67,13 @@ pcc_ok(
     'G4: optional slurpy param may be empty'
 );
 
-pcc_like(
+pcc_error_like(
     { params => ".param pmc abc :named('x')" },
     '/too few arguments passed - missing required named arg \'x\'/',
     'G5: argument underflow: named required param',
 );
 
-pcc_like(
+pcc_error_like(
     { params => ".param pmc abc :named('x') :slurpy" },
     '/too few arguments passed - missing required named arg \'x\'/',
     'G6: argument underflow: named required slurpy param',
@@ -104,6 +104,13 @@ sub pcc_like {
     my ( $o, $exp, $desc, %todo ) = @_;
     my $test = create(%$o);
     pir_output_like( $test, $exp, $desc, %todo )
+        or !exists $todo{todo} && diag $test;
+}
+
+sub pcc_error_like {
+    my ( $o, $exp, $desc, %todo ) = @_;
+    my $test = create(%$o);
+    pir_error_output_like( $test, $exp, $desc, %todo )
         or !exists $todo{todo} && diag $test;
 }
 

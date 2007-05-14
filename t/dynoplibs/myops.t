@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -48,7 +48,7 @@ CODE
 fortytwo
 OUTPUT
 
-pir_output_like( << 'CODE', << 'OUTPUT', "hcf" );
+pir_error_output_like( << 'CODE', << 'OUTPUT', "hcf" );
 .loadlib "myops_ops"
 .sub main :main
     print "neither here\n"

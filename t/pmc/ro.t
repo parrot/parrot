@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006 The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -40,7 +40,7 @@ my $library = <<'CODE';
 .end
 CODE
 
-pir_output_unlike( $library . <<'CODE', <<'OUTPUT', "Integer set read-only is not writable" );
+pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "Integer set read-only is not writable" );
 .sub main :main
     .local pmc foo
 
@@ -95,7 +95,7 @@ CODE
 42
 OUTPUT
 
-pir_output_unlike( <<"CODE", <<'OUTPUT', "PerlInteger" );
+pir_error_output_unlike( <<"CODE", <<'OUTPUT', "PerlInteger" );
 $library
 .sub main :main
     .local pmc foo
@@ -127,7 +127,7 @@ CODE
 Integer
 OUTPUT
 
-pir_output_unlike( $library . <<'CODE', <<'OUTPUT', "Integer add" );
+pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "Integer add" );
 .sub main :main
     .local pmc foo
 
@@ -142,7 +142,7 @@ CODE
 /NOT OKAY/
 OUTPUT
 
-pir_output_unlike( $library . <<'CODE', <<'OUTPUT', "Complex i_add" );
+pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "Complex i_add" );
 .sub main :main
     .local pmc foo
     
@@ -198,13 +198,13 @@ CODE
                 pir_output_is( $code, "reached end\n", "ROTest (read-only/okay) ($test)" );
             }
             else {
-                pir_output_isnt( $code, "reached end\n", "ROTest (read-only/fail) ($test)" );
+                pir_error_output_isnt( $code, "reached end\n", "ROTest (read-only/fail) ($test)" );
             }
         }
     }
 }
 
-pir_output_unlike( $library . <<'CODE', <<'OUTPUT', "ResizablePMCArray (non-recursive part)" );
+pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "ResizablePMCArray (non-recursive part)" );
 .sub main :main
     .local pmc foo
     .local pmc three
@@ -229,7 +229,7 @@ CODE
 /NOT OKAY/
 OUTPUT
 
-pir_output_unlike( $library . <<'CODE', <<'OUTPUT', "Objects" );
+pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "Objects" );
 .sub main :main
     .local pmc fooclass
     .local pmc foo

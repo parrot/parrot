@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -560,7 +560,7 @@ ok 1
 Hello Parrot!
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', '32bit seek: exception' );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', '32bit seek: exception' );
        open P0, "temp.file", ">"
        seek P0, -1, 0
        print "error!\n"
@@ -569,7 +569,7 @@ CODE
 /seek failed \(32bit\)/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', '64bit seek: exception' );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', '64bit seek: exception' );
        open P0, "temp.file", ">"
        seek P0, -1, -1, 0
        print "error!\n"
@@ -903,7 +903,7 @@ unlink("temp.file");
 SKIP: {
     skip 'broken on windows', 1 if $^O eq 'MSWin32';
 
-    pir_output_like( <<'CODE', <<"OUTPUT", "stat failed" );
+    pir_error_output_like( <<'CODE', <<"OUTPUT", "stat failed" );
 .sub main :main
     .local pmc pio
     .local int len

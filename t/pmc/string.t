@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -620,7 +620,7 @@ This test is a test
 This is a test
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "Out-of-bounds substr, +ve offset" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "Out-of-bounds substr, +ve offset" );
         new P0, .String
         set P0, "Woburn"
         substr S0, P0, 123, 22
@@ -629,7 +629,7 @@ CODE
 /^Cannot take substr outside string/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "Out-of-bounds substr, -ve offset" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "Out-of-bounds substr, -ve offset" );
         new P0, .String
         set P0, "Woburn"
         substr S0, P0, -123, 22
@@ -1327,7 +1327,7 @@ CODE
 9
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "to_int 2" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "to_int 2" );
 .sub 'main' :main
     .local pmc s
     s = new .String
@@ -1339,7 +1339,7 @@ CODE
 /invalid conversion to int - bad char 3/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "to_int 3" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "to_int 3" );
 .sub 'main' :main
     .local pmc s
     s = new .String

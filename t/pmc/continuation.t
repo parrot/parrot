@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -135,7 +135,7 @@ unwinding
 continuation called.
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', 'continuation action context' );
+pir_error_output_like( <<'CODE', <<'OUT', 'continuation action context' );
 ## this makes sure that returning via the continuation causes the action to be
 ## invoked in the right dynamic context (i.e. without the error handler).
 .sub test_cont_action :main
