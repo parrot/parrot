@@ -236,7 +236,6 @@ Throws an exception if an unknown PMC type is passed.
 
     PCCMETHOD void globals(PMC *glb :optional, int got_glb :opt_flag) {
         Parrot_Exporter *exp    = PARROT_EXPORTER(SELF);
-        PMC             *ret_globals;
         STRING          *s_str  = CONST_STRING(interp, "String");
         STRING          *s_arr  = CONST_STRING(interp, "array");
         STRING          *s_hash = CONST_STRING(interp, "hash");

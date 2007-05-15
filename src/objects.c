@@ -123,8 +123,8 @@ PMC*
 Parrot_find_vtable_meth(Interp* interp, PMC *pmc, STRING *meth)
 {
     PMC  *_class = pmc;
-    INTVAL i, n, j, k;
-    PMC  *ns, *mro, *key, *self_class;
+    INTVAL i, n;
+    PMC  *ns, *mro, *self_class;
 
     /* Get index in Parrot_vtable_slot_names[]. */
     INTVAL vtable_index = Parrot_get_vtable_index(interp, meth);

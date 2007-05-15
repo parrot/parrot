@@ -1983,8 +1983,10 @@ void
 PDB_eval(Interp *interp, const char *command)
 {
     opcode_t *run;
+#if 0
     PackFile *eval_pf;
     PackFile_ByteCode *old_cs;
+#endif
 
     /*
     The replacement code is almost certainly wrong. The previous

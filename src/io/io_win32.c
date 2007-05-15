@@ -554,7 +554,7 @@ PIO_sockaddr_in(Interp *interp, unsigned short port, STRING * addr)
 
     sa.sin_port = htons(port);
 
-    return string_make(interp, &sa, sizeof (struct sockaddr), "binary", 0);
+    return string_make(interp, (char *)&sa, sizeof (struct sockaddr), "binary", 0);
 }
 
 
