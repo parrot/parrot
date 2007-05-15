@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -101,7 +101,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
     end
 .end
 CODE
-/userdata: [0-9A-Fa-f]{8}/
+/^userdata: [0-9A-Fa-f]{8}/
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
@@ -184,7 +184,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
     print "\n"
 .end
 CODE
-/userdata: [0-9A-Fa-f]{8}\nuserdata: [0-9A-Fa-f]{8}\nstring/
+/^userdata: [0-9A-Fa-f]{8}\nuserdata: [0-9A-Fa-f]{8}\nstring/
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -98,7 +98,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
     end
 .end
 CODE
-/table: [0-9A-Fa-f]{8}/
+/^table: [0-9A-Fa-f]{8}/
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
@@ -177,7 +177,7 @@ value2
 nil
 OUTPUT
 
-pir_output_like( << 'CODE', << 'OUTPUT', 'check key nil' );
+pir_error_output_like( << 'CODE', << 'OUTPUT', 'check key nil' );
 .sub _main
     loadlib $P0, 'lua_group'
     find_type $I0, 'LuaTable'
@@ -194,7 +194,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check key nil' );
     end
 .end
 CODE
-/table index is nil/
+/^table index is nil/
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check deletion by assignment of nil' );
@@ -268,7 +268,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
     print "\n"
 .end
 CODE
-/table: [0-9A-Fa-f]{8}\ntable: [0-9A-Fa-f]{8}\nstring/
+/^table: [0-9A-Fa-f]{8}\ntable: [0-9A-Fa-f]{8}\nstring/
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );

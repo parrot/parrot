@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -33,7 +33,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
     .const .Sub F1 = 'f1'
     find_type $I0, 'LuaThread'
     .local pmc pmc1
-    pmc1 = new $I0, F1 
+    pmc1 = new $I0, F1
     .local int bool1
     bool1 = isa pmc1, 'scalar'
     print bool1
@@ -66,7 +66,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
     .const .Sub F1 = 'f1'
     find_type $I0, 'LuaThread'
     .local pmc pmc1
-    pmc1 = new $I0, F1 
+    pmc1 = new $I0, F1
     .local string str1
     str1 = classname pmc1
     print str1
@@ -95,7 +95,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
     .const .Sub F1 = 'f1'
     find_type $I0, 'LuaThread'
     .local pmc pmc1
-    pmc1 = new $I0, F1 
+    pmc1 = new $I0, F1
     print pmc1
     print "\n"
     end
@@ -105,7 +105,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
     end
 .end
 CODE
-/thread: [0-9A-Fa-f]{8}/
+/^thread: [0-9A-Fa-f]{8}/
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
@@ -118,7 +118,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
     .const .Sub F1 = 'f1'
     find_type $I0, 'LuaThread'
     .local pmc pmc1
-    pmc1 = new $I0, F1 
+    pmc1 = new $I0, F1
     .local int bool1
     bool1 = istrue pmc1
     print bool1
@@ -145,7 +145,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
     .const .Sub F1 = 'f1'
     find_type $I0, 'LuaThread'
     .local pmc pmc1
-    pmc1 = new $I0, F1 
+    pmc1 = new $I0, F1
     .local pmc pmc2
     pmc2 = new .LuaBoolean
     pmc2 = not pmc1
@@ -175,7 +175,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .sub _main
     .const .Sub F1 = 'f1'
     .local pmc pmc1
-    pmc1 = new .LuaThread, F1 
+    pmc1 = new .LuaThread, F1
     .local int bool1
     bool1 = isa pmc1, 'LuaThread'
     print bool1
@@ -199,7 +199,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
 .sub '_main'
     .const .Sub F1 = 'f1'
     .local pmc pmc1
-    pmc1 = new .LuaThread, F1 
+    pmc1 = new .LuaThread, F1
     print pmc1
     print "\n"
     $P0 = pmc1.'tostring'()
@@ -215,7 +215,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
     end
 .end
 CODE
-/thread: [0-9A-Fa-f]{8}\nthread: [0-9A-Fa-f]{8}\nstring/
+/^thread: [0-9A-Fa-f]{8}\nthread: [0-9A-Fa-f]{8}\nstring/
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
@@ -227,7 +227,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .sub '_main'
     .const .Sub F1 = 'f1'
     .local pmc pmc1
-    pmc1 = new .LuaThread, F1 
+    pmc1 = new .LuaThread, F1
     $P0 = pmc1.'tonumber'()
     print $P0
     print "\n"
@@ -245,7 +245,7 @@ nil
 nil
 OUTPUT
 
-pir_output_like( << 'CODE', << 'OUTPUT', 'check __add' );
+pir_error_output_like( << 'CODE', << 'OUTPUT', 'check __add' );
 .HLL 'Lua', 'lua_group'
 .sub '__start' :main
     load_bytecode 'Parrot/Coroutine.pbc'
@@ -255,7 +255,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check __add' );
     .const .LuaNumber cst1 = '3.14'
     .const .Sub F1 = 'f1'
     .local pmc pmc1
-    pmc1 = new .LuaThread, F1 
+    pmc1 = new .LuaThread, F1
     $P0 = add pmc1, cst1
     end
 .end
@@ -264,7 +264,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check __add' );
     end
 .end
 CODE
-/attempt to perform arithmetic on a thread value/
+/^attempt to perform arithmetic on a thread value/
 OUTPUT
 
 # Local Variables:
