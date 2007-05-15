@@ -34,7 +34,7 @@ tru64-alpha-compaq_c6.5       8   ?    ?    ?     Y   ?   Y    Y/2   ?  20060203
 win32-x86-cygwin_1.5.21           -    -    -     -   -   -    -     -  20070221
 win32-x86-mingw-gcc3.4.2          Y    Y    -     -   -   Y    Y/19  Y  20070515
 win32-x86-msvc_7.1                -    Y    -     -   -   Y    Y     ?  20070515
-win32-x86-msvc_8.0                -    Y    -     -   -   Y    Y     ?  20070320
+win32-x86-msvc_8.0                -    Y    -     -   -   Y    Y     ?  20070515
 
 ?   ... unknown or untested
 -   ... no
