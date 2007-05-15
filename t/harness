@@ -92,7 +92,7 @@ use lib qw( . lib ../lib ../../lib );
 use Getopt::Std;
 use Test::Harness();
 use Parrot::Config qw/%PConfig/;
-
+use FindBin qw/$Bin/;
 
 # handle the long options
 
@@ -165,8 +165,8 @@ my @distro_tests = map { "t/distro/$_" } qw(
 );
 push @default_tests, @distro_tests;
 
-# collect the coding standard tests (that we want to run) together and
-# append them to the list of default tests
+# collect the coding standard tests (that we want to run) together
+# append them to the list of default tests *only* if this is not a release
 my @coding_std_tests = map { "t/codingstd/$_" } qw(
     c_code_coda.t 
     c_header_guards.t
@@ -179,7 +179,8 @@ my @coding_std_tests = map { "t/codingstd/$_" } qw(
     tabs.t 
     trailing_space.t
 );
-push @default_tests, @coding_std_tests;
+push @default_tests, @coding_std_tests
+    if -e "$Bin/../DEVELOPING";
 
 my @tests = @ARGV ? map { glob( $_ ) } @ARGV : @default_tests;
 
