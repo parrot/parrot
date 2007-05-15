@@ -89,6 +89,9 @@ for my $op (@$Parrot::OpLib::core::ops) {
     $cmds{$basename}{ $op->full_name . ' ' . $args }++;
 }
 
+plan skip_all => 'IMCC cannot do parse-only with JIT enabled'
+    if $ENV{TEST_PROG_ARGS} =~ /-j/;
+
 plan tests => scalar keys %cmds;
 
 for my $cmd ( sort keys %cmds ) {
