@@ -82,7 +82,7 @@
 3-3/3;4+4%4; 5-5+5      2\n4\n5\n       minus, mul, plus, mod expression
 
 # newlines
-1\n1+1\n1+1+1           1\n2\n3         newlines 
+1\n1+1\n1+1+1           1\n2\n3         TODO parse error with newlines and new grammar
 
 # named expressions
 a                       0\n             uninitialized a

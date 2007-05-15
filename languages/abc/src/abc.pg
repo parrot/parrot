@@ -5,10 +5,10 @@ grammar ABC::Grammar;
 token TOP { <program> }
 
 ## recognize terms
-token term { 
+token term {
     | $<float>:=[ \d+\.\d* | \.\d+ ]
-    | $<integer>:=[\d+] 
-    | $<ident>:=[<[a..z]><[_a..z0..9]>*] 
+    | $<integer>:=[\d+]
+    | $<ident>:=[<[a..z]><[_a..z0..9]>*]
         [ $<array>:=[ \[ <expression> \] ]
         | $<call>:=[ \( <expression> \) ]
         ]?
@@ -58,7 +58,7 @@ proto 'term:'       is precedence('=')
     is parsed(&term)
     { ... }
 
-proto 'circumfix:( )'  is equiv('term:') 
+proto 'circumfix:( )'  is equiv('term:')
     is pirop('set')
     { ... }
 
