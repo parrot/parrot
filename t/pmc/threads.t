@@ -34,6 +34,7 @@ my %platforms = map { $_ => 1 } qw/
     openbsd
     solaris
     MSWin32
+    darwin
     /;
 
 if ( $^O eq "cygwin" ) {
