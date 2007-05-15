@@ -75,14 +75,14 @@ there instead.)  The start of the memory region (as returned by malloc()
 is also suitably aligned for any use.  If, for example, malloc() returns
 objects aligned on 8-byte boundaries, and obj->bufstart is also aligned
 on 8-byte boundaries, then there should be 4 bytes of padding.  It is
-handled differently in the two files resources.c and res_lea.c.  (I have
-not yet figured out how the 'possible padding' is handled in resources.c.
---A.D.  2007-05-11.)
+handled differently in the two files resources.c and res_lea.c.
+In resources.c, the buffer is carved out of a larger memory pool.  In
+res_lea.c, each buffer is individually allocated.
 
                      src/gc/resources.c:       src/gc/res_lea.c:
 
 ptr from malloc ->  +------------------+      +------------------+
-                    | possible padding |      | INTVAL ref_count |
+                      [other blocks?]         | INTVAL ref_count |
                     | INTVAL ref_count |      | possible padding |
 obj->bufstart   ->  +------------------+      +------------------+
                     |     data         |      |      data        |

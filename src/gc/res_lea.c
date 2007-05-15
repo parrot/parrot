@@ -15,6 +15,12 @@ passed the C<--gc=malloc> or C<--gc=malloc-trace> options.
 The "lea" in the file name refers to Doug Lea, who wrote malloc
 implementation found in F<src/malloc.c>.
 
+As of May 14, 2007, it doesn't work (and hasn't worked for some
+time.)  The problem appears to be related to strings, but actually
+could be somewhere else.  This allocator does not support any of
+Parrot's Copy-on-Write schemes.  Nor does the string allocator
+handle "external" strings.
+
 =head2 Functions
 
 =over 4
