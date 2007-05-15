@@ -9,6 +9,12 @@
 #ifndef PARROT_SUN4_JIT_EMIT_H_GUARD
 #define PARROT_SUN4_JIT_EMIT_H_GUARD
 
+/* XXX As of rev 11423, sun4 jit no longer compiles due to the missing
+   Parrot_jit_init() function and the corresponding arch_info structure.
+   Prior to that, it compiled, but probably didn't work.  See notes labeled
+   XXX Hack [perl #37819]  below.
+*/
+
 /*
  * SPARC JIT overview:
  *

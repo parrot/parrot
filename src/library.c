@@ -8,7 +8,7 @@ src/library.c - Interface to Parrot's bytecode library
 
 =head1 DESCRIPTION
 
-This file contains a C function to access parrot's bytecode library functions.
+This file contains a C function to access Parrot's bytecode library functions.
 
 =head2 Functions
 
@@ -442,16 +442,16 @@ char*
 Parrot_get_runtime_prefix(Interp *interp, STRING **prefix_str)
 {
     STRING *s, *key;
-    PMC *config_hash;
-    int free_it;
-    char *env;
+    PMC    *config_hash;
+    int     free_it;
+    char   *env;
 
     env = Parrot_getenv("PARROT_RUNTIME", &free_it);
     if (env) {
         if (prefix_str) {
             *prefix_str = string_from_cstring(interp, env, 0);
             if (free_it)
-                free(env);
+                mem_sys_free(env);
             return NULL;
         }
         if (!free_it)
@@ -461,7 +461,8 @@ Parrot_get_runtime_prefix(Interp *interp, STRING **prefix_str)
 
     config_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
             (INTVAL) IGLOBALS_CONFIG_HASH);
-    key = CONST_STRING(interp, "prefix");
+    key         = CONST_STRING(interp, "prefix");
+
     if (!VTABLE_elements(interp, config_hash)) {
         const char *pwd = ".";
         char *ret;
@@ -474,11 +475,14 @@ Parrot_get_runtime_prefix(Interp *interp, STRING **prefix_str)
         strcpy(ret, pwd);
         return ret;
     }
+
     s = VTABLE_get_string_keyed_str(interp, config_hash, key);
+
     if (prefix_str) {
         *prefix_str = s;
         return NULL;
     }
+
     return string_to_cstring(interp, s);
 }
 
