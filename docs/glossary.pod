@@ -7,7 +7,7 @@ docs/glossary.pod - Parrot Glossary
 
 =head1 SUMMARY
 
-Short descriptions of words you might need to know
+Short descriptions of words and acronyms you might want to know
 because they show up in Parrot development.
 
 =head1 GLOSSARY
@@ -154,6 +154,11 @@ Finalization is high-level, user visible cleanup of objects, such as closing an
 associated DB handle. Finalization reduces active objects down to passive
 blocks of memory, but does not actually reclaim that memory. Memory is
 reclaimed by the related L<"destruction"> operation, as and when necessary.
+
+=head2 fotw
+
+File of the week. A file that is designated to be focus of development for a week,
+aiming for code cleanups and general improvements.
 
 =head2 GC
 
