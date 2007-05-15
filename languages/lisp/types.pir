@@ -104,7 +104,7 @@
 .sub _get_body :method
   .local pmc retv
 
-   getattribute retv, self, "LispFunction\0body"
+   getattribute retv, self, "body"
 
   .return(retv)
 .end
