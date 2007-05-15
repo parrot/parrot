@@ -311,9 +311,6 @@ fetch_arg_op(Interp *interp, call_state *st)
                                       : CTX_REG_NUM(st->src.ctx, idx);
             break;
         case PARROT_ARG_PMC:
-            if (st->src.sig & PARROT_ARG_INVOCANT)
-                UVal_pmc(st->val) = CONTEXT(interp->ctx)->current_object;
-            else
                 UVal_pmc(st->val) = constant ? st->src.ctx->constants[idx]->u.key
                                       : CTX_REG_PMC(st->src.ctx, idx);
 

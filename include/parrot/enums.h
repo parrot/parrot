@@ -61,8 +61,7 @@ typedef enum {
     /* unused - 0x040 */
     PARROT_ARG_OPTIONAL         = 0x080, /* 128 */
     PARROT_ARG_OPT_FLAG         = 0x100, /* 256 prev optional was set */
-    PARROT_ARG_NAME             = 0x200, /* 512 this String is an arg name */
-    PARROT_ARG_INVOCANT         = 0x400  /* 1024 arg is method invocant */
+    PARROT_ARG_NAME             = 0x200 /* 512 this String is an arg name */
     /* more to come soon */
 
 } Call_bits_enum_t;
