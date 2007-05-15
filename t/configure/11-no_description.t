@@ -82,7 +82,7 @@ pass("Completed all tests in $0");
 
 =head1 SYNOPSIS
 
-    % prove t/configure11-no_description.t
+    % prove t/configure/11-no_description.t
 
 =head1 DESCRIPTION
 

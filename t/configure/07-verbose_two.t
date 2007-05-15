@@ -82,7 +82,7 @@ pass("Completed all tests in $0");
 
 =head1 SYNOPSIS
 
-    % prove t/configure07-verbose_two.t
+    % prove t/configure/07-verbose_two.t
 
 =head1 DESCRIPTION
 

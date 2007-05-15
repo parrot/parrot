@@ -82,7 +82,7 @@ pass("Completed all tests in $0");
 
 =head1 SYNOPSIS
 
-    % prove t/configure09-verbose_step_regex.t
+    % prove t/configure/09-verbose_step_regex.t
 
 =head1 DESCRIPTION
 

@@ -82,7 +82,7 @@ pass("Completed all tests in $0");
 
 =head1 SYNOPSIS
 
-    % prove t/configure10-verbose_step_number_not_called.t
+    % prove t/configure/10-verbose_step_number_not_called.t
 
 =head1 DESCRIPTION
 

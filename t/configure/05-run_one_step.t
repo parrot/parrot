@@ -98,7 +98,7 @@ pass("Completed all tests in $0");
 
 =head1 SYNOPSIS
 
-    % prove t/configure05-run_one_step.t
+    % prove t/configure/05-run_one_step.t
 
 =head1 DESCRIPTION
 
