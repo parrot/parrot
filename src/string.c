@@ -724,9 +724,7 @@ string_str_index(Interp *interp, const STRING *s,
     if (!string_length(interp, s2))
         return -1;
 
-    saneify_string(s);
-    saneify_string(s2);
-    src = (STRING *)const_cast(s);
+    src    = (STRING *)const_cast(s);
     search = (STRING *)const_cast(s2);
 
     return CHARSET_INDEX(interp, src, search, start);
