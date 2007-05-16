@@ -151,7 +151,7 @@ typedef enum {
     isTAIL_CALL =   0x02
 } pcc_flags_t;
 
-struct pcc_sub_t {
+typedef struct pcc_sub_t {
     SymReg ** args;
     int *arg_flags;    /* :slurpy, :optional, ... */
     int nargs;
@@ -167,7 +167,7 @@ struct pcc_sub_t {
     int flags;    /* isNCI, isTAIL_CALL */
     int label;
     SymReg * object;
-};
+} pcc_sub_t;
 
 
 enum uniq_t {
