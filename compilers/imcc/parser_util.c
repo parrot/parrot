@@ -784,7 +784,7 @@ imcc_compile_file(Parrot_Interp interp, const char *fullname,
 
     fs = string_make(interp, fullname, strlen(fullname), NULL, 0);
     if (Parrot_stat_info_intval(interp, fs, STAT_ISDIR)) {
-        IMCC_fatal(interp, E_IOError,
+        real_exception(interp, NULL, E_IOError,
                 "imcc_compile_file: '%s' is a directory\n", fullname);
         return NULL;
     }
@@ -871,7 +871,7 @@ void *
 IMCC_compile_file_s(Parrot_Interp interp, const char *s,
                    STRING **error_message)
 {
-        return imcc_compile_file(interp, s , error_message);
+    return imcc_compile_file(interp, s , error_message);
 }
 
 /* Register additional compilers with the interpreter */

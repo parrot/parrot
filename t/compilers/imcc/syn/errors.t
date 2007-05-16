@@ -7,7 +7,12 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 4;
+use Parrot::Test;
+
+plan skip_all => 'No reason to compile invalid PBC here'
+    if $ENV{TEST_PROG_ARGS} =~ /-r/;
+
+plan tests => 4;
 
 ## tests for imcc error messages
 

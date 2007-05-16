@@ -54,6 +54,9 @@ if ( $PConfig{bigendian} ) {
 if ( $PConfig{intvalsize} == 8 ) {
     $todo{8} = 'works only with 32-bit integer values';
 }
+if ( $ENV{TEST_PROG_ARGS} =~ /-j/) {
+    $todo{4} = 'broken with -j';
+}
 
 # run all tests and tell about todoness
 foreach ( 1 .. 17 ) {
