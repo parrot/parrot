@@ -67,7 +67,7 @@ that ticket's number.
 Open the link to the previous value of this field.  Copy the resulting full
 URL, then change the ticket number in the C<DependedOnBy> parameter to the
 ticket for the next release.  Take the entire resulting URL to
-U<http://xrl.us/> and get a short URL.  Add that to this field.
+L<http://xrl.us/> and get a short URL.  Add that to this field.
 
 =back
 
@@ -135,7 +135,7 @@ in step 3, above.
 
  $ export SVNPARROT=https://svn.perl.org/parrot
  $ svn copy -m"tagged release a.b.c" \
-   SVNPARROT/trunk $SVNPARROT/tags/RELEASE_a_b_c
+   $SVNPARROT/trunk $SVNPARROT/tags/RELEASE_a_b_c
 
 See also L<Appendix 1> below.
 
