@@ -587,7 +587,8 @@ This method returns the new falling block.
 
 .sub nextBlock :method
     .param int boardID
-    .param int id
+    .param int id       :optional
+    .param int got_id   :opt_flag
     .local pmc temp
 
     print "nextBlock: ("
@@ -596,11 +597,10 @@ This method returns the new falling block.
     print id
     print "\n"
 
-    # check the number of INT args
-    if argcI >= 2 goto SKIP_ID
+    if got_id goto SKIP_SET_ID
     # no INT arg => use a random next block
-    set id, -1
-SKIP_ID:
+    id = -1
+SKIP_SET_ID:
 
     temp = self."board"( boardID )
     if_null temp, APP_NEXTBLOCK_END
@@ -1001,7 +1001,9 @@ Returns the flag's (new) value.
 
 .sub flag :method
     .param string name
-    .param int value
+    .param int value        :optional
+    .param int got_value    :opt_flag
+
     .local pmc flag
     .local int ret
 
@@ -1011,7 +1013,7 @@ Returns the flag's (new) value.
     getattribute flag, self, $I0
 
     # check the number of INT args
-    if argcI <= 1 goto FLAG_GET
+    unless got_value goto FLAG_GET
     # set a new value
     set flag[name], value
 
@@ -1038,7 +1040,8 @@ This method returns nothing.
 =cut
 
 .sub newGame :method
-    .param int players
+    .param int players     :optional
+    .param int got_players :opt_flag
     .local pmc temp
     .local int xpos
 
@@ -1047,7 +1050,7 @@ This method returns nothing.
     set xpos, 10
 
     # check the number of INT args
-    if argcI >= 1 goto SET
+    if got_players goto SET
 
     classoffset $I0, self, "Tetris::App"
     add $I0, tPlayers

@@ -237,15 +237,16 @@ This method returns the block that is now falling down.
 =cut
 
 .sub nextBlock :method
-    .param int id
+    .param int id       :optional
+    .param int got_id   :opt_flag
+
     .local pmc block
     .local pmc temp
     
-    # check the number of INT args
-    if argcI >= 1 goto SKIP_ID
+    if got_id goto SKIP_SET_ID
     # no INT arg => use a random next block
-    set id, -1
-SKIP_ID:
+    id = -1
+SKIP_SET_ID:
 
     # get the 'next block' and store it as the current one
     getprop block, "nextblock", self
