@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 {{ NOTE: "rethrow", and "pushaction" are removed, and "die" is different }}

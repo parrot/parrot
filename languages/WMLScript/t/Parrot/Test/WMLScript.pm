@@ -1,4 +1,4 @@
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
 package Parrot::Test::WMLScript;

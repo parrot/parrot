@@ -1,6 +1,6 @@
 # #############################################################################
 # .NET CLI To PIR Translator
-# Copyright (C) Jonathan Worthington 2005-2006
+# Copyright (C) Jonathan Worthington 2005-2007
 # #############################################################################
 # Configure Script
 # ################
