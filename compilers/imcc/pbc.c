@@ -785,12 +785,14 @@ add_const_key(Interp *interp, opcode_t key[],
 
     if ( (r = _get_sym(&globals.cs->key_consts, s_key)) != 0)
         return r->color;
-    pfc = malloc(sizeof (PackFile_Constant));
+    pfc = mem_allocate_typed(PackFile_Constant);
     rc = PackFile_Constant_unpack_key(interp,
             interp->code->const_table, pfc, key);
-    if (!rc)
+    if (!rc) {
+        mem_sys_free(pfc);
         IMCC_fatal(interp, 1,
             "add_const_key: PackFile_Constant error\n");
+    }
     k = PDB_extend_const_table(interp);
     interp->code->const_table->constants[k]->type = PFC_KEY;
     interp->code->const_table->constants[k]->u.key = pfc->u.key;
@@ -799,6 +801,7 @@ add_const_key(Interp *interp, opcode_t key[],
                s_key, k, size);
     IMCC_debug(interp, DEBUG_PBC_CONST, "\t %x /%x %x/ /%x %x/\n",
                key[0],key[1],key[2],key[3],key[4]);
+    mem_sys_free(pfc);
     return k;
 }
 
