@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 Mines::Field - A minesweeper field
@@ -526,14 +528,10 @@ Returns 1 if successful, 0 otherwise.
     self.'check_end'()
     self.'draw'()
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return (1)
 
 END:
-    .pcc_begin_return
-    .return 0
-    .pcc_end_return
+    .return (0)
 .end
 
 =item setFlag( x, y )
@@ -611,14 +609,10 @@ DRAW:
     self."check_end"()
     self."draw"()
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return (1)
 
 END:
-    .pcc_begin_return
-    .return 0
-    .pcc_end_return
+    .return (0)
 .end
 
 =item undo_mark( i ) B<(internal)>
@@ -754,14 +748,10 @@ DRAW:
     self."check_end"()
     self."draw"()
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return (1)
 
 END:
-    .pcc_begin_return
-    .return 0
-    .pcc_end_return
+    .return (0)
 .end
 
 =item click( x, y, b )
@@ -887,8 +877,7 @@ UNEXPLORED_MINE:
     self.'lost'()
 
 END:
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 =item lost()
@@ -975,13 +964,9 @@ LOOP:
 
 WON:
     self."won"()
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return (1)
 END:
-    .pcc_begin_return
-    .return 0
-    .pcc_end_return
+    .return (0)
 .end
 
 =item setStatus( newStatus )
@@ -1189,9 +1174,7 @@ ENDi:
     inc j
     if j <= j2 goto LOOPj
     
-    .pcc_begin_return
-    .return mines
-    .pcc_end_return
+    .return (mines)
 .end
 
 =item _mine_at( field, pos )
@@ -1213,13 +1196,9 @@ at the specified position, 0 otherwise.
     if v == VAL_UNSURE_MINE goto MINE
     if v == VAL_UNEXPLORED_MINE goto MINE
     if v == VAL_MARK_MINE goto MINE
-    .pcc_begin_return
-    .return 0
-    .pcc_end_return
+    .return (0)
 MINE:
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return (1)
 .end
 
 =item _button_clicked( onField )

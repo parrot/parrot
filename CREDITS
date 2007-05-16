@@ -265,6 +265,7 @@ D: Test system fixes
 
 N: Jens Rieks
 D: Several libraries, examples and patches.
+D: Tetris with SDL
 E: parrot@jensbeimsurfen.de
 S: Wuppertal, Germany
 

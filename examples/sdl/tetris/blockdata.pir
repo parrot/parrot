@@ -94,9 +94,7 @@ DONE:
     if x >= size goto yLOOP
     branch xLOOP
 END:
-    .pcc_begin_return
-    .return olddata
-    .pcc_end_return
+    .return (olddata)
 .end
 
 =item rows = blockdata."vfree"()
@@ -130,9 +128,7 @@ VFREE_LOOP:
 VFREE_END:
     div i, size
 END:
-    .pcc_begin_return
-    .return i
-    .pcc_end_return
+    .return (i)
 .end
 
 =item columns = blockdata."hfree"()
@@ -201,9 +197,7 @@ HFREE_LOOPcheck2:
 HFREE_ERROR2:
     inc free
 HFREE_END:
-    .pcc_begin_return
-    .return free
-    .pcc_end_return
+    .return (free)
 .end
 
 =item size = blockdata."size"()
@@ -224,9 +218,7 @@ items in the blockdata array.
     sqrt $N0, $I0
     $I0 = $N0
 END:
-    .pcc_begin_return
-    .return $I0
-    .pcc_end_return
+    .return ($I0)
 .end
 
 .sub __set_pmc method
@@ -248,9 +240,7 @@ END:
     $I0 = $P0
     if index >= $I0 goto ERR
     $I0 = $P0[index]
-    .pcc_begin_return
-    .return $I0
-    .pcc_end_return
+    .return ($I0)
 
 ERR:
     print "index out of bounds ("
@@ -276,9 +266,7 @@ ERR:
     $I0 = $P0
     if index >= $I0 goto ERR
     $P0[index] = val
-    .pcc_begin_return
-    .return $I0
-    .pcc_end_return
+    .return ($I0)
 
 ERR:
     print "index out of bounds ("

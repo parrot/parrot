@@ -32,9 +32,7 @@ END:
     
     classoffset $I0, self, "Tetris::EventHandler"
     getattribute app, self, $I0
-    .pcc_begin_return
-    .return app
-    .pcc_end_return
+    .return (app)
 .end
 
 .sub dispatch_event method
@@ -49,9 +47,7 @@ END:
     restore app
     ret = I5
     app."setTimer"( 1 )
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return (ret)
 .end
 
 .sub nextBlock method

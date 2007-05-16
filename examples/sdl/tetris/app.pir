@@ -152,9 +152,7 @@ The Tetris::App class provides the following methods:
 
     getattribute $P0, self, $I0
 
-    .pcc_begin_return
-    .return $P0
-    .pcc_end_return
+    .return ($P0)
 .end
 
 =item app."shutdown"()
@@ -301,9 +299,7 @@ Returns the specified color entry from the palette.
     palette = self."palette"()
     color = palette[number]
 
-    .pcc_begin_return
-    .return color
-    .pcc_end_return
+    .return (color)
 .end
 
 =item palette = app."palette"()
@@ -325,9 +321,7 @@ NULL:
     print "warning: no color palette found!\n"
 
 RET:
-    .pcc_begin_return
-    .return palette
-    .pcc_end_return
+    .return (palette)
 .end
 
 =item palette = app."genPalette"() B<(internal)>
@@ -383,9 +377,7 @@ NOT_BRIGHT:
     add $I0, tPalette
     setattribute self, $I0, palette
 
-    .pcc_begin_return
-    .return palette
-    .pcc_end_return
+    .return (palette)
 .end
 
 =item board = self."board"( boardID )
@@ -428,9 +420,7 @@ OK:
     unless $I0 goto ERR
 
 END:
-    .pcc_begin_return
-    .return board
-    .pcc_end_return
+    .return (board)
 .end
 
 =item block = app."currentBlock"( boardID )
@@ -458,9 +448,7 @@ Returns the block object, or NULL if the board was not found.
     temp = temp."currentBlock"()
 
 BLOCKISNULL:
-    .pcc_begin_return
-    .return temp
-    .pcc_end_return
+    .return (temp)
 .end
 
 =item success = app."rotate"( boardID, dir )
@@ -509,9 +497,7 @@ Returns 1 if the rotation was possible, 0 otherwise.
 END:
     self."enableTimer"()
 
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return (ret)
 .end
 
 =item success = app."move"( boardID, xval, yval )
@@ -567,9 +553,7 @@ END:
     # reenable the timer
     self."enableTimer"()
 
-    .pcc_begin_return
-    .return success
-    .pcc_end_return
+    .return (success)
 .end
 
 =item block = self."nextBlock"( boardID, id )
@@ -619,9 +603,7 @@ SKIP_ID:
     temp = temp."nextBlock"(id )
 
 APP_NEXTBLOCK_END:
-    .pcc_begin_return
-    .return temp
-    .pcc_end_return
+    .return (temp)
 .end
 
 =item app."fall"( boardID )
@@ -653,9 +635,7 @@ This method returns 1 if the board was found, 0 otherwise.
     ret = 1
 
 APP_FALL_END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return (ret)
 .end
 
 =item falling = app."falling"( boardID )
@@ -686,9 +666,7 @@ This method returns 1 if the block is falling down fast, 0 otherwise.
     ret = board."falling"()
 
 APP_FALLING_END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return (ret)
 .end
 
 =item interval = app."fallInterval"( boardID )
@@ -719,9 +697,7 @@ to fall down one unit.
     ret = board."fallInterval"()
 
 APP_INTERVAL_END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return (ret)
 .end
 
 =item nextfall = app."nextFallTime"( boardID )
@@ -751,9 +727,7 @@ Returns the time when the block falls down the next time.
     ret = board."nextFallTime"()
 
 APP_NEXTFALL_END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return (ret)
 .end
 
 =item app."setNextFallTime"( boardID, val )
@@ -787,8 +761,7 @@ This method returns nothing.
     board."setNextFallTime"( val )
 
 APP_SETFALL_END:
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 =item redrawn = app."timer"()
@@ -851,9 +824,7 @@ NOREDRAW:
     dec inTimer
 END:
 
-    .pcc_begin_return
-    .return redraw
-    .pcc_end_return
+    .return (redraw)
 .end
 
 =item app."drawScreen"( full )
@@ -960,8 +931,7 @@ LOOP:
     branch LOOP
 
 END:
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 =item (boards, count) = app."boards"()
@@ -983,10 +953,7 @@ the boards array.
     count = boards
 
 END:
-    .pcc_begin_return
-    .return boards
-    .return count
-    .pcc_end_return
+    .return (boards, count)
 .end
 
 =item app."registerBoard"( board, id ) B<(internal)>
@@ -1005,9 +972,7 @@ the board has been added, which is used as the board ID.
     (boards, id) = self."boards"()
     set boards[id], board
 
-    .pcc_begin_return
-    .return id
-    .pcc_end_return
+    .return (id)
 .end
 
 =item value = app."flag"( name, value )
@@ -1049,9 +1014,7 @@ Returns the flag's (new) value.
 FLAG_GET:
     set ret, flag[name]
 
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return (ret)
 .end
 
 =item app."newGame"( boards )
@@ -1127,8 +1090,7 @@ NEWGAME_END:
 
     self."enableTimer"()
 
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 =back

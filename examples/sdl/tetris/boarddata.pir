@@ -136,9 +136,7 @@ END:
     classoffset $I0, self, "Tetris::BoardData"
     getattribute $P0, self, $I0
     $I0 = $P0
-    .pcc_begin_return
-    .return $I0
-    .pcc_end_return
+    .return ($I0)
 .end
 
 .sub __get_integer_keyed method
@@ -158,9 +156,7 @@ END:
 OK:
     $I0 = $P0[$I0]
     
-    .pcc_begin_return
-    .return $I0
-    .pcc_end_return
+    .return ($I0)
 .end
 
 .sub __set_integer_keyed method
@@ -199,9 +195,7 @@ Returns the width (number of blocks in one row) of the board.
     add $I0, bWidth
     getattribute $P0, self, $I0
     $I0 = $P0
-    .pcc_begin_return
-    .return $I0
-    .pcc_end_return
+    .return ($I0)
 .end
 
 =item height = data."height"()
@@ -215,9 +209,7 @@ Returns the height (number of blocks in one column) of the board.
     add $I0, bHeight
     getattribute $P0, self, $I0
     $I0 = $P0
-    .pcc_begin_return
-    .return $I0
-    .pcc_end_return
+    .return ($I0)
 .end
 
 =item (width, height) = data."dimensions"()
@@ -241,10 +233,7 @@ Returns the width and height of the board.
     getattribute $P0, self, $I0
     h = $P0
     
-    .pcc_begin_return
-    .return w
-    .return h
-    .pcc_end_return
+    .return (w, h)
 .end
 
 =back

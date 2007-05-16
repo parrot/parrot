@@ -123,9 +123,8 @@ Returns the created board.
     # make the first block active
     self."nextBlock"()
 
-print "BUILD done\n"
-    .pcc_begin_return
-    .pcc_end_return
+    print "BUILD done\n"
+    .return ()
 .end
 
 =item block = board."application"()
@@ -139,9 +138,7 @@ Returns the application object to which this board belongs to.
 
     getprop app, "app", self
     
-    .pcc_begin_return
-    .return app
-    .pcc_end_return
+    .return (app)
 .end
 
 =item block = board."getNextBlock"()
@@ -157,9 +154,7 @@ in the preview window.
     getprop block, "nextblock", self
     
     # return the block
-    .pcc_begin_return
-    .return block
-    .pcc_end_return
+    .return (block)
 .end
 
 =item board."setNextBlock"( block )
@@ -177,8 +172,7 @@ This method returns nothing.
     setprop self, "nextblock", block
     
     # return the block
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 =item board."setCurrentBlock"( block )
@@ -266,9 +260,7 @@ SKIP_ID:
     
 END:
     # return the block
-    .pcc_begin_return
-    .return block
-    .pcc_end_return
+    .return (block)
 .end
 
 =item board."fall"()
@@ -285,8 +277,7 @@ This method returns nothing.
     getprop block, "block", self
     block."fall"()
     
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 =item falling = board."falling"()
@@ -303,9 +294,7 @@ Returns 1 if the current block is falling down fast, 0 otherwise.
     getprop block, "block", self
     ret = block."falling"()
     
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return (ret)
 .end
 
 =item block = board."currentBlock"()
@@ -319,9 +308,7 @@ Returns the currently falling block.
     
     getprop block, "block", self
 
-    .pcc_begin_return
-    .return block
-    .pcc_end_return
+    .return (block)
 .end
 
 =item size = board."blockSize"()
@@ -340,9 +327,7 @@ measured in pixels.
     getprop temp, "blocksize", self
     set i, temp
     
-    .pcc_begin_return
-    .return i
-    .pcc_end_return
+    .return (i)
 .end
 
 =item offset = board."offset"( x, y )
@@ -377,9 +362,7 @@ Returns the calculated offset.
     mul offset, y
     add offset, x
     
-    .pcc_begin_return
-    .return offset
-    .pcc_end_return
+    .return (offset)
 .end
 
 =item board."tranlateBlockData"( block, data, color )
@@ -451,8 +434,7 @@ TRANS_SKIP:
     branch TRANS_LOOPx
     
 TRANS_LOOPend:
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 =item board."lockBlock"( block )
@@ -480,8 +462,7 @@ This method returns nothing.
     inc value # make first id (0) blue
     self."translateBlockData"( block, self, value )
     
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 =item board."removeLine"( line )
@@ -527,8 +508,7 @@ ERASE:
     dec dst
     branch ERASE
 REMOVELINE_END:
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 =item lines = board."removeFullLines"()
@@ -582,9 +562,7 @@ RFL_LOOPend:
     sleep 10
     print "Continuing...\n"
 RFL_NOHITS:
-    .pcc_begin_return
-    .return hits
-    .pcc_end_return
+    .return (hits)
 .end
 
 =item board."draw"( surface, full )
@@ -775,8 +753,7 @@ LOOPend:
     getprop temp, "nextblock", self
     temp."draw"( surface, xp, yp, blocksize )
 SKIP_NEXTBLOCK:
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 =item redraw = board."timer"()
@@ -797,9 +774,7 @@ Returns 1 if a redraw is necessay, 0 otherwise.
     unless $I0 goto END
     redraw = block."timer"()
 END:
-    .pcc_begin_return
-    .return redraw
-    .pcc_end_return
+    .return (redraw)
 .end
 
 =item interval = board."fallInterval"()
@@ -816,9 +791,7 @@ one unit.
     getprop temp, "FallInterval", self
     set ret, temp
 
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return (ret)
 .end
 
 =item nexttime = board."nextFallTime"()
@@ -835,9 +808,7 @@ the next unit.
     getprop temp, "NextFallTime", self
     set ret, temp
 
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return (ret)
 .end
 
 =item board."setNextFallTime"( val )
@@ -856,8 +827,7 @@ This method returns nothing.
     getprop temp, "NextFallTime", self
     set temp, val
 
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 =item (xpos, ypos) = board."position"()
@@ -877,10 +847,7 @@ left top corner.
     getprop temp, "ypos", self
     set ypos, temp
 
-    .pcc_begin_return
-    .return xpos
-    .return ypos
-    .pcc_end_return
+    .return (xpos, ypos)
 .end
 
 =item board."setPosition"( xpos, ypos )
@@ -899,8 +866,7 @@ This method returns nothing.
     getprop temp, "ypos", self
     set temp, ypos
 
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 =item board."blockID"()
@@ -930,9 +896,7 @@ TDB
 OK:
     ret = blocks[id]
 
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return (ret)
 .end
 
 =back

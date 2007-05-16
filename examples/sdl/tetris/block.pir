@@ -104,9 +104,7 @@ The board the new block will belong to.
     setattribute self, id, board
 
     # return the block
-    .pcc_begin_return
-    .return self
-    .pcc_end_return
+    .return (self)
 .end
 
 =item block."fall"()
@@ -136,9 +134,7 @@ Returns whether the block is falling down fast.
     getattribute $P0, self, $I0
     $I0 = $P0
         
-    .pcc_begin_return
-    .return $I0
-    .pcc_end_return
+    .return ($I0)
 .end
 
 =item (xpos, ypos) = block."position"()
@@ -178,10 +174,7 @@ Returns the x and y position of the block.
     $I0 = xposdiffP
     add xpos, $I0
 
-    .pcc_begin_return
-    .return xpos
-    .return ypos
-    .pcc_end_return
+    .return (xpos, ypos)
 .end
 
 =item success = block."rotate"( dir )
@@ -245,9 +238,7 @@ Returns 1 if the rotation was possible, 0 otherwise.
     assign self, olddata
 
 END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
+    .return (ret)
 .end
 
 =item board = block."board"()
@@ -262,9 +253,7 @@ Returns the board associated with this block.
     add $I0, Board
     getattribute $P0, self, $I0
     
-    .pcc_begin_return
-    .return $P0
-    .pcc_end_return
+    .return ($P0)
 .end
 
 =item block."setBoard"( board )
@@ -354,14 +343,10 @@ SKIP:
 
 END:
 
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
+    .return (1)
 
 ERROR:
-    .pcc_begin_return
-    .return 0
-    .pcc_end_return
+    .return (0)
 .end
 
 =item success = block."move"( xval, yval )
@@ -401,9 +386,7 @@ This method returns 1 on success, 0 otherwise.
     set xpos, xold
     set ypos, yold
 BLOCK_MOVE_DONE:
-    .pcc_begin_return
-    .return valid
-    .pcc_end_return
+    .return (valid)
 .end
 
 =item block."draw"( surface, xshift, yshift, extent )
@@ -551,8 +534,7 @@ SKIP:
     branch LOOPx
 END:
 
-    .pcc_begin_return
-    .pcc_end_return
+    .return ()
 .end
 
 =item redraw = block."timer"()
@@ -605,9 +587,7 @@ AGAIN:
     redraw = fall
 
 NOFALL:
-    .pcc_begin_return
-    .return redraw
-    .pcc_end_return
+    .return (redraw)
 .end
 
 =item success = block."moveDown"()
@@ -637,9 +617,7 @@ the C<next block> has been prepared.
     board."nextBlock"()
 
 BLOCK_MOVEDOWN_OKAY:
-    .pcc_begin_return
-    .return okay
-    .pcc_end_return
+    .return (okay)
 .end
 
 =item app = block."application"()
@@ -654,9 +632,7 @@ Returns the application object assosicated with the block's board.
     temp = self."board"()
     temp = temp."application"()
 
-    .pcc_begin_return
-    .return temp
-    .pcc_end_return
+    .return (temp)
 .end
 
 .sub setXPosition method
