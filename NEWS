@@ -1,5 +1,22 @@
 # $Id$
 
+New in 0.4.12
+- Build:
+ + even more refactorings and improvements in configuration system
+ + improved tests and documentation for configuration system
+- Languages:
+ + Updated abc, PHP ("Plumhead"), Lua, Tcl
+ + Reclaimed Lisp
+- Design:
+ + new PMC PDD draft partially completed
+- Implementation:
+ + continued implementation of PDD 15 (Objects)
+ + minor garbage collector and memory management improvements
+ + several memory leaks resolved
+ + extended support for compilers other than GCC
+ + improved C++ compiler compatibility
+ + enhanced support for Solaris, non-MSVC Win32, and other platforms
+
 New in 0.4.11
 
 - Compilers:

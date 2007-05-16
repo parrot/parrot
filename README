@@ -1,4 +1,4 @@
-This is Parrot, version 0.4.11
+This is Parrot, version 0.4.12
 -----------------------------
 
 Parrot is Copyright (C) 2001-2007, The Perl Foundation.
@@ -110,7 +110,7 @@ This installs a bunch of files in /usr/local. The parrot executable is in
 
 If you want to install Parrot into a non-standard location use:
 
-    perl Configure.pl --prefix=/Users/foo/parrot-0.4.11
+    perl Configure.pl --prefix=/Users/foo/parrot-0.4.12
     make install
 
 But please note that dynamic libs will not be found for non-standard

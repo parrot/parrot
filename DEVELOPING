@@ -1,7 +1,7 @@
 # $Id$
 
-    THIS RELEASE:     Parrot 0.4.11  2007.04.17
-PREVIOUS RELEASE:     Parrot 0.4.10  2007.03.20
+    THIS RELEASE:     Parrot 0.4.12  2007.05.15
+PREVIOUS RELEASE:     Parrot 0.4.11  2007.04.17
 
 This file should only exist in development distributions. Delete it
 (and its entry in the MANIFEST) before packaging Parrot up for a CPAN

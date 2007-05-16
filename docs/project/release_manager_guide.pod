@@ -51,8 +51,25 @@ are being updated as committers work.
 
 =item c
 
-Update release-related information in F<tools/util/release.json>. This
-will be used later when making release announcements.
+Update release-related information in F<tools/util/release.json>. This will be
+used later when making release announcements.  There are a few interesting
+fields:
+
+=over 4
+
+=item C<rt.tracking>
+
+Create a new ticket for the next release.  Change the URL fragment here to use
+that ticket's number.
+
+=item C<rt.saved_search>
+
+Open the link to the previous value of this field.  Copy the resulting full
+URL, then change the ticket number in the C<DependedOnBy> parameter to the
+ticket for the next release.  Take the entire resulting URL to
+U<http://xrl.us/> and get a short URL.  Add that to this field.
+
+=back
 
 =item d
 
@@ -60,7 +77,7 @@ Make sure F<RESPONSIBLE_PARTIES> is still accurate.
 
 =item e
 
-Configure parrot and run C<perl t/harness t/distro/*.t>, and either fix 
+Configure parrot and run C<perl t/harness t/distro/*.t>, and either fix
 what those tests complain about, or fix them so they don't complain.
 
 =item f
@@ -166,7 +183,7 @@ Update the next planned release date on the wiki.
 
 =item d
 
-Update the website. The svn repository for the website is at 
+Update the website. The svn repository for the website is at
 L<https://svn.perl.org/perl.org/docs/live/parrotcode>.
 
 Add a release announcement to news/[year]/Parrot-[release].html.
