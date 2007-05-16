@@ -65,7 +65,7 @@ The board the new block will belong to.
 
 =cut
 
-.sub BUILD method
+.sub BUILD :method
     .param pmc board
     .local pmc prop
     .local int id
@@ -115,7 +115,7 @@ This method returns nothing.
 
 =cut
 
-.sub fall method
+.sub fall :method
     classoffset $I0, self, "Tetris::Block"
     add $I0, Fall
     getattribute $P0, self, $I0
@@ -128,7 +128,7 @@ Returns whether the block is falling down fast.
 
 =cut
 
-.sub falling method
+.sub falling :method
     classoffset $I0, self, "Tetris::Block"
     add $I0, Fall
     getattribute $P0, self, $I0
@@ -143,7 +143,7 @@ Returns the x and y position of the block.
 
 =cut
 
-.sub position method
+.sub position :method
     .local int xpos
     .local int ypos
     .local int vfree
@@ -195,7 +195,7 @@ Returns 1 if the rotation was possible, 0 otherwise.
 
 =cut
 
-.sub rotate method
+.sub rotate :method
     .param int val
     .local pmc board
     .local pmc temp
@@ -247,7 +247,7 @@ Returns the board associated with this block.
 
 =cut
 
-.sub board method
+.sub board :method
     # get the board
     classoffset $I0, self, "Tetris::Block"
     add $I0, Board
@@ -262,7 +262,7 @@ Set the board associated with this block.
 
 =cut
 
-.sub setBoard method
+.sub setBoard :method
     .param pmc board
     
     # get the board
@@ -284,7 +284,7 @@ Returns 1 if position is valid, 0 otherwise.
 
 =cut
 
-.sub validPosition method
+.sub validPosition :method
     .local pmc board
     .local pmc temp
     .local int xpos
@@ -359,7 +359,7 @@ This method returns 1 on success, 0 otherwise.
 
 =cut
 
-.sub move method
+.sub move :method
     .param int xval
     .param int yval
     .local pmc xpos
@@ -417,7 +417,7 @@ This method returns nothing.
 
 =cut
 
-.sub draw method
+.sub draw :method
     .param pmc surface
     .param int xshift
     .param int yshift
@@ -545,7 +545,7 @@ Returns 1 if the screen has to be redrawn.
 
 =cut
 
-.sub timer method
+.sub timer :method
     .local pmc board
     .local pmc app
     .local num curtime
@@ -600,7 +600,7 @@ the C<next block> has been prepared.
 
 =cut
 
-.sub moveDown method
+.sub moveDown :method
     .local pmc board
     .local int okay
 
@@ -626,7 +626,7 @@ Returns the application object assosicated with the block's board.
 
 =cut
 
-.sub application method
+.sub application :method
     .local pmc temp
 
     temp = self."board"()
@@ -635,7 +635,7 @@ Returns the application object assosicated with the block's board.
     .return (temp)
 .end
 
-.sub setXPosition method
+.sub setXPosition :method
     .param int pos
     
     getprop $P0, "xpos", self

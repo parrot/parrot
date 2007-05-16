@@ -127,7 +127,7 @@ get_event:
 
 .namespace [ 'MoveLogo::EventHandler' ]
 
-.sub update_position method
+.sub update_position :method
 	.param pmc sprite
 	.param int frame_count
 
@@ -185,7 +185,7 @@ return:
 	.return( updated )
 .end
 
-.sub draw_screen method
+.sub draw_screen :method
 	.param pmc screen
 	.param pmc sprite
 
@@ -204,7 +204,7 @@ return:
 
 .end
 
-.sub move_sprite_x method
+.sub move_sprite_x :method
 	.param pmc sprite
 	.param int direction
 
@@ -232,7 +232,7 @@ x_update:
 
 .end
 
-.sub move_sprite_y method
+.sub move_sprite_y :method
 	.param pmc sprite
 	.param int direction
 
@@ -260,7 +260,7 @@ y_update:
 
 .end
 
-.sub key_down_down method
+.sub key_down_down :method
 	.param pmc event_args
 
 	.local pmc screen
@@ -281,7 +281,7 @@ return:
 
 .end
 
-.sub key_down_up method
+.sub key_down_up :method
 	.param pmc event_args
 
 	.local pmc screen
@@ -302,7 +302,7 @@ return:
 
 .end
 
-.sub key_down_left method
+.sub key_down_left :method
 	.param pmc event_args
 
 	.local pmc screen
@@ -323,7 +323,7 @@ return:
 
 .end
 
-.sub key_down_right method
+.sub key_down_right :method
 	.param pmc event_args
 
 	.local pmc screen
@@ -344,7 +344,7 @@ return:
 
 .end
 
-.sub key_down_escape method
+.sub key_down_escape :method
 	.param pmc event_args
 
 	# XXX: a silly way to quit

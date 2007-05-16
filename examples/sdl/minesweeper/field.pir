@@ -109,7 +109,7 @@ SDL surface to use for drawing.
 
 =cut
 
-.sub __init method
+.sub __init :method
     .param pmc args
     .local pmc field
     .local pmc screen
@@ -224,7 +224,7 @@ Creates a new level, with the given number as initial seed for the PRNG.
 
 =cut
 
-.sub newLevel method
+.sub newLevel :method
     .param int level
     .local pmc field
     .local pmc cache
@@ -312,7 +312,7 @@ Draws the field, then the LCDs and the smiley button.
 
 =cut
 
-.sub draw method
+.sub draw :method
     .local pmc screen
     .local pmc image
     .local pmc dest_rect
@@ -484,7 +484,7 @@ Returns 1 if successful, 0 otherwise.
 
 =cut
 
-.sub reveal method
+.sub reveal :method
     .param int x
     .param int y
     .local int width
@@ -542,7 +542,7 @@ Returns 1 if successful, 0 otherwise.
 
 =cut
 
-.sub setFlag method
+.sub setFlag :method
     .param int x
     .param int y
     .local int width
@@ -639,7 +639,7 @@ This method returns nothing.
 
 =cut
 
-.sub undo_mark method
+.sub undo_mark :method
     .param int i      :optional
     .param int has_i  :opt_flag
 
@@ -685,7 +685,7 @@ removed if you call this method.
 
 =cut
 
-.sub mark method
+.sub mark :method
     .param int x
     .param int y
     .local int width
@@ -780,7 +780,7 @@ The horizontal mouse position.
 
 =cut
 
-.sub click method
+.sub click :method
     .param int x
     .param int y
     .param int b
@@ -812,7 +812,7 @@ have to be specified for performance reasons.
 
 =cut
 
-.sub reveal_recursive method
+.sub reveal_recursive :method
     .param int x
     .param int y
     .param int width
@@ -887,7 +887,7 @@ Shows the position of all mines on the field.
 
 =cut
 
-.sub lost method
+.sub lost :method
     .local pmc field
     .local int i
     .local int max
@@ -930,7 +930,7 @@ Called when you have won.
 
 =cut
 
-.sub won method
+.sub won :method
     self."setStatus"( STATUS_WON )
 .end
 
@@ -940,7 +940,7 @@ Checks if you have won.
 
 =cut
 
-.sub check_end method
+.sub check_end :method
     .local pmc field
     
     classoffset $I0, self, "Mines::Field"
@@ -975,7 +975,7 @@ Sets a new game status.
 
 =cut
 
-.sub setStatus method
+.sub setStatus :method
     .param int s
     .local pmc screen
     .local pmc watch
@@ -1015,7 +1015,7 @@ Counts the unrevealed mines and updates the LCD.
 
 =cut
 
-.sub update_stats method
+.sub update_stats :method
     .local pmc field
     .local int size
     .local pmc count

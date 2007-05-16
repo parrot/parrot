@@ -42,7 +42,7 @@ Reveals a field or sets a flag.
 
 =cut
 
-.sub mouse_button_down method
+.sub mouse_button_down :method
     .param pmc event
     .param pmc field
     
@@ -71,7 +71,7 @@ Reveals a field or sets a flag.
 
 =cut
 
-.sub mouse_motion method
+.sub mouse_motion :method
     .param pmc event
     .param pmc field
     
@@ -102,7 +102,7 @@ Reveals a field or sets a flag.
 
 =cut
 
-.sub mouse_button_up method
+.sub mouse_button_up :method
     .param pmc event
     .param pmc field
     

@@ -20,14 +20,14 @@ eventhandler.pir - a tetris event handler class
 END:
 .end
 
-.sub BUILD method
+.sub BUILD :method
     .param pmc app
 
     classoffset $I0, self, "Tetris::EventHandler"
     setattribute self, $I0, app
 .end
 
-.sub app method
+.sub app :method
     .local pmc app
     
     classoffset $I0, self, "Tetris::EventHandler"
@@ -35,7 +35,7 @@ END:
     .return (app)
 .end
 
-.sub dispatch_event method
+.sub dispatch_event :method
     .local pmc app
     .local int ret
     
@@ -50,7 +50,7 @@ END:
     .return (ret)
 .end
 
-.sub nextBlock method
+.sub nextBlock :method
     .param int boardID
     .param int blockID
     .local pmc app
@@ -78,73 +78,73 @@ END:
     board."setNextBlock"( block )
 .end
 
-.sub key_down_escape method
+.sub key_down_escape :method
     end
 .end
 
-.sub key_down_0 method
+.sub key_down_0 :method
     self."nextBlock"( 0, -1 )
 .end
 
-.sub key_down_1 method
+.sub key_down_1 :method
     self."nextBlock"( 0, 0 )
 .end
 
-.sub key_down_2 method
+.sub key_down_2 :method
     self."nextBlock"( 0, 1 )
 .end
 
-.sub key_down_3 method
+.sub key_down_3 :method
     self."nextBlock"( 0, 2 )
 .end
 
-.sub key_down_4 method
+.sub key_down_4 :method
     self."nextBlock"( 0, 3 )
 .end
 
-.sub key_down_5 method
+.sub key_down_5 :method
     self."nextBlock"( 0, 4 )
 .end
 
-.sub key_down_6 method
+.sub key_down_6 :method
     self."nextBlock"( 0, 5 )
 .end
 
-.sub key_down_7 method
+.sub key_down_7 :method
     self."nextBlock"( 0, 6 )
 .end
 
-.sub key_down_space method
+.sub key_down_space :method
     $P0 = self."app"()
     $P0."fall"( 0 )
 .end
 
-.sub key_down_left method
+.sub key_down_left :method
     $P0 = self."app"()
     $P0."move"( 0, -1, 0 )
 .end
 
-.sub key_down_right method
+.sub key_down_right :method
     $P0 = self."app"()
     $P0."move"( 0, +1, 0 )
 .end
 
-.sub key_down_up method
+.sub key_down_up :method
     $P0 = self."app"()
     $P0."rotate"( 0, -1 )
 .end
 
-.sub key_down_down method
+.sub key_down_down :method
     $P0 = self."app"()
     $P0."rotate"( 0, +1 )
 .end
 
-.sub key_down_F1 method
+.sub key_down_F1 :method
     $P0 = self."app"()
     $P0."newGame"( 1 )
 .end
 
-.sub key_down_F2 method
+.sub key_down_F2 :method
     $P0 = self."app"()
     $P0."newGame"( 2 )
 .end

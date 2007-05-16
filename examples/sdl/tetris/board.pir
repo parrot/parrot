@@ -57,7 +57,7 @@ Returns the created board.
 
 =cut
 
-.sub BUILD method
+.sub BUILD :method
     .param pmc app
     .local pmc temp
     .local int w
@@ -133,7 +133,7 @@ Returns the application object to which this board belongs to.
 
 =cut
 
-.sub application method
+.sub application :method
     .local pmc app
 
     getprop app, "app", self
@@ -148,7 +148,7 @@ in the preview window.
 
 =cut
 
-.sub getNextBlock method
+.sub getNextBlock :method
     .local pmc block
 
     getprop block, "nextblock", self
@@ -166,7 +166,7 @@ This method returns nothing.
 
 =cut
 
-.sub setNextBlock method
+.sub setNextBlock :method
     .param pmc block
 
     setprop self, "nextblock", block
@@ -181,13 +181,13 @@ This method returns nothing.
 
 =cut
 
-.sub setCurrentBlock method
+.sub setCurrentBlock :method
     .param pmc block
 
     setprop self, "block", block
 .end
 
-.sub newCurrentBlock method
+.sub newCurrentBlock :method
     .param pmc block
     .local int width
     .local int size
@@ -236,7 +236,7 @@ This method returns the block that is now falling down.
 
 =cut
 
-.sub nextBlock method
+.sub nextBlock :method
     .param int id
     .local pmc block
     .local pmc temp
@@ -271,7 +271,7 @@ This method returns nothing.
 
 =cut
 
-.sub fall method
+.sub fall :method
     .local pmc block
     
     getprop block, "block", self
@@ -286,7 +286,7 @@ Returns 1 if the current block is falling down fast, 0 otherwise.
 
 =cut
 
-.sub falling method
+.sub falling :method
     .param pmc self
     .local pmc block
     .local int ret
@@ -303,7 +303,7 @@ Returns the currently falling block.
 
 =cut
 
-.sub currentBlock method
+.sub currentBlock :method
     .local pmc block
     
     getprop block, "block", self
@@ -320,7 +320,7 @@ measured in pixels.
 
 =cut
 
-.sub blockSize method
+.sub blockSize :method
     .local pmc temp
     .local int i
         
@@ -351,7 +351,7 @@ Returns the calculated offset.
 
 =cut
 
-.sub offset method
+.sub offset :method
     .param int x
     .param int y
     .local int offset
@@ -392,7 +392,7 @@ This method returns nothing.
 
 =cut
 
-.sub translateBlockData method
+.sub translateBlockData :method
     .param pmc block
     .param pmc data
     .param int value
@@ -453,7 +453,7 @@ This method returns nothing.
 
 =cut
 
-.sub lockBlock method
+.sub lockBlock :method
     .param pmc block
     .local int value
 
@@ -473,7 +473,7 @@ This method returns nothing.
 
 =cut
 
-.sub removeLine method
+.sub removeLine :method
     .param int line
     .local int w
     .local int src
@@ -519,7 +519,7 @@ This method returns the number of lines removed.
 
 =cut
 
-.sub removeFullLines method
+.sub removeFullLines :method
     .local pmc temp
     .local int w
     .local int h
@@ -587,7 +587,7 @@ This method returns nothing.
 
 =cut
 
-.sub draw method
+.sub draw :method
     .param pmc surface
     .param int full
     .local pmc temp
@@ -764,7 +764,7 @@ Returns 1 if a redraw is necessay, 0 otherwise.
 
 =cut
 
-.sub timer method
+.sub timer :method
     .local pmc block
     .local int redraw
 
@@ -784,7 +784,7 @@ one unit.
 
 =cut
 
-.sub fallInterval method
+.sub fallInterval :method
     .local pmc temp
     .local num ret
 
@@ -801,7 +801,7 @@ the next unit.
 
 =cut
 
-.sub nextFallTime method
+.sub nextFallTime :method
     .local pmc temp
     .local num ret
 
@@ -820,7 +820,7 @@ This method returns nothing.
 
 =cut
 
-.sub setNextFallTime method
+.sub setNextFallTime :method
     .param num val
     .local pmc temp
 
@@ -837,7 +837,7 @@ left top corner.
 
 =cut
 
-.sub position method
+.sub position :method
     .local int xpos
     .local int ypos
     .local pmc temp
@@ -856,7 +856,7 @@ This method returns nothing.
 
 =cut
 
-.sub setPosition method
+.sub setPosition :method
     .param int xpos
     .param int ypos
     .local pmc temp
@@ -875,7 +875,7 @@ TDB
 
 =cut
 
-.sub blockID method
+.sub blockID :method
     .param int id
     .local pmc blocks
     .local int ret

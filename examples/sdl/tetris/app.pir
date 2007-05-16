@@ -86,7 +86,7 @@ This method throws an exception if an error occurs.
 
 =cut
 
-.sub BUILD method
+.sub BUILD :method
     # create the app object
     store_global "Tetris::App", "app", self
 
@@ -146,7 +146,7 @@ The Tetris::App class provides the following methods:
 
 =cut
 
-.sub SDL method
+.sub SDL :method
     classoffset $I0, self, "Tetris::App"
     add $I0, tSDL
 
@@ -166,7 +166,7 @@ This method returns nothing.
 
 =cut
 
-.sub shutdown method
+.sub shutdown :method
     .local pmc sdl
 
     # XXX free data structures
@@ -193,7 +193,7 @@ An exeption is thrown if an error occurs.
     $P0."timer"()
 .end
 
-.sub run method
+.sub run :method
     .local pmc eh
     .local pmc loop
 
@@ -214,7 +214,7 @@ An exeption is thrown if an error occurs.
 
 =cut
 
-.sub initTimer method
+.sub initTimer :method
     $P0 = new SArray
     $P1 = find_global "Tetris::App", "_app_timer"
     $P0 = 8
@@ -250,7 +250,7 @@ An exeption is thrown if an error occurs.
 
 =cut
 
-.sub setTimerStatus method
+.sub setTimerStatus :method
     .param int status
 
     classoffset $I0, self, "Tetris::App"
@@ -263,7 +263,7 @@ An exeption is thrown if an error occurs.
 
 =cut
 
-.sub enableTimer method
+.sub enableTimer :method
     classoffset $I0, self, "Tetris::App"
     add $I0, tTimerDisableCount
     getattribute $P0, self, $I0
@@ -277,7 +277,7 @@ END:
 
 =cut
 
-.sub disableTimer method
+.sub disableTimer :method
     classoffset $I0, self, "Tetris::App"
     add $I0, tTimerDisableCount
     getattribute $P0, self, $I0
@@ -291,7 +291,7 @@ Returns the specified color entry from the palette.
 
 =cut
 
-.sub color method
+.sub color :method
     .param int number
     .local pmc palette
     .local pmc color
@@ -308,7 +308,7 @@ Returns the color palette.
 
 =cut
 
-.sub palette method
+.sub palette :method
     .local pmc palette
 
     classoffset $I0, self, "Tetris::App"
@@ -336,7 +336,7 @@ This method returns the created palette.
 
 =cut
 
-.sub genPalette method
+.sub genPalette :method
     .local pmc palette
     .local pmc hash
     .local pmc color
@@ -401,7 +401,7 @@ no board with the specified ID exists.
 
 =cut
 
-.sub board method
+.sub board :method
     .param int boardID
     .local pmc board
 
@@ -443,7 +443,7 @@ Returns the block object, or NULL if the board was not found.
 
 =cut
 
-.sub currentBlock method
+.sub currentBlock :method
     .param int boardID
     .local pmc temp
 
@@ -477,7 +477,7 @@ Returns 1 if the rotation was possible, 0 otherwise.
 
 =cut
 
-.sub rotate method
+.sub rotate :method
     .param int boardID
     .param int dir
     .local pmc block
@@ -536,7 +536,7 @@ Returns 1 if the movement was possible, 0 otherwise.
 
 =cut
 
-.sub move method
+.sub move :method
     .param int boardID
     .param int xval
     .param int yval
@@ -585,7 +585,7 @@ This method returns the new falling block.
 
 =cut
 
-.sub nextBlock method
+.sub nextBlock :method
     .param int boardID
     .param int id
     .local pmc temp
@@ -627,7 +627,7 @@ This method returns 1 if the board was found, 0 otherwise.
 
 =cut
 
-.sub fall method
+.sub fall :method
     .param int boardID
     .local pmc board
     .local int ret
@@ -659,7 +659,7 @@ This method returns 1 if the block is falling down fast, 0 otherwise.
 
 =cut
 
-.sub falling method
+.sub falling :method
     .param int boardID
     .local pmc board
     .local int ret
@@ -690,7 +690,7 @@ to fall down one unit.
 
 =cut
 
-.sub fallInterval method
+.sub fallInterval :method
     .param int boardID
     .local pmc board
     .local num ret
@@ -721,7 +721,7 @@ Returns the time when the block falls down the next time.
 
 =cut
 
-.sub nextFallTime method
+.sub nextFallTime :method
     .param int boardID
     .local pmc board
     .local num ret
@@ -755,7 +755,7 @@ This method returns nothing.
 
 =cut
 
-.sub setNextFallTime method
+.sub setNextFallTime :method
     .param int boardID
     .param num val
     .local pmc board
@@ -776,7 +776,7 @@ Returns 1 if the screen has been redrawn, 0 otherwise.
 
 =cut
 
-.sub timer method
+.sub timer :method
     .local pmc board
     .local int redraw
     .local int ret
@@ -849,7 +849,7 @@ This method returns nothing.
 
 =cut
 
-.sub drawScreen method
+.sub drawScreen :method
     .param int full
     .local pmc screen
     .local pmc temp
@@ -918,7 +918,7 @@ NO_MAINBACKGROUND:
 
 =cut
 
-.sub drawBoards method
+.sub drawBoards :method
     .param pmc screen
     .param int full
     .local pmc boards
@@ -945,7 +945,7 @@ the boards array.
 
 =cut
 
-.sub boards method
+.sub boards :method
     .local pmc boards
     .local int count
 
@@ -968,7 +968,7 @@ the board has been added, which is used as the board ID.
 
 =cut
 
-.sub registerBoard method
+.sub registerBoard :method
     .param pmc board
     .local pmc boards
     .local int id
@@ -999,7 +999,7 @@ Returns the flag's (new) value.
 
 =cut
 
-.sub flag method
+.sub flag :method
     .param string name
     .param int value
     .local pmc flag
@@ -1037,7 +1037,7 @@ This method returns nothing.
 
 =cut
 
-.sub newGame method
+.sub newGame :method
     .param int players
     .local pmc temp
     .local int xpos

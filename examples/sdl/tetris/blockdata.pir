@@ -45,7 +45,7 @@ This method returns the old data representation.
 
 =cut
 
-.sub rotateData method
+.sub rotateData :method
     .param int val
     .local int size
     .local int x
@@ -106,7 +106,7 @@ Returns the number of free rows.
 
 =cut
 
-.sub vfree method
+.sub vfree :method
     .local int size
     .local int free
     .local int i
@@ -144,7 +144,7 @@ Returns the number of free columns.
 
 =cut
 
-.sub hfree method
+.sub hfree :method
     .local int size
     .local int free
     .local int i
@@ -208,7 +208,7 @@ items in the blockdata array.
 
 =cut
 
-.sub size method
+.sub size :method
     classoffset $I0, self, "Tetris::BlockData"
     getattribute $P0, self, $I0
     $I0 = 0
@@ -221,14 +221,14 @@ END:
     .return ($I0)
 .end
 
-.sub __set_pmc method
+.sub __set_pmc :method
     .param pmc data
     
     classoffset $I0, self, "Tetris::BlockData"
     setattribute self, $I0, data
 .end
 
-.sub __get_integer_keyed method
+.sub __get_integer_keyed :method
     .param pmc key
     .local int index
     
@@ -253,7 +253,7 @@ ERR:
     throw $P0
 .end
 
-.sub __set_integer_keyed method
+.sub __set_integer_keyed :method
     .param pmc key
     .param int val
     .local int index

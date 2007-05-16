@@ -66,7 +66,7 @@ END:
 
 # ##
 # ##
-.sub __init method
+.sub __init :method
     .local pmc block
 
     block = new IntList
@@ -77,7 +77,7 @@ END:
     assign self, block
 .end
 
-.sub id method
+.sub id :method
     .return (0)
 .end
 
@@ -86,7 +86,7 @@ END:
 # ###
 # #..
 # ...
-.sub __init method
+.sub __init :method
     .local pmc block
 
     block = new IntList
@@ -102,7 +102,7 @@ END:
     assign self, block
 .end
 
-.sub id method
+.sub id :method
     .return (1)
 .end
 
@@ -111,7 +111,7 @@ END:
 # ###
 # ..#
 # ...
-.sub __init method
+.sub __init :method
     .local pmc block
     
     block = new IntList
@@ -127,7 +127,7 @@ END:
     assign self, block
 .end
 
-.sub id method
+.sub id :method
     .return (2)
 .end
 
@@ -136,7 +136,7 @@ END:
 # ##.
 # .##
 # ...
-.sub __init method
+.sub __init :method
     .local pmc block
     
     block = new IntList
@@ -152,7 +152,7 @@ END:
     assign self, block
 .end
 
-.sub id method
+.sub id :method
     .return (3)
 .end
 
@@ -161,7 +161,7 @@ END:
 # .##
 # ##.
 # ...
-.sub __init method
+.sub __init :method
     .local pmc block
     
     block = new IntList
@@ -177,7 +177,7 @@ END:
     assign self, block
 .end
 
-.sub id method
+.sub id :method
     .return (4)
 .end
 
@@ -186,7 +186,7 @@ END:
 # ###
 # .#.
 # ...
-.sub __init method
+.sub __init :method
     .local pmc block
     
     block = new IntList
@@ -202,7 +202,7 @@ END:
     assign self, block
 .end
 
-.sub id method
+.sub id :method
     .return (5)
 .end
 
@@ -212,7 +212,7 @@ END:
 # ....
 # ....
 # ....
-.sub __init method
+.sub __init :method
     .local pmc block
     
     block = new IntList
@@ -235,7 +235,7 @@ END:
     assign self, block
 .end
 
-.sub id method
+.sub id :method
     .return (6)
 .end
 
