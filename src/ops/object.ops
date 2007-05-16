@@ -461,17 +461,6 @@ inline op get_class(out PMC, in PMC) :object_classes {
 
 ###############################################################################
 
-=item B<singleton>(invar PMC)  B<(unimplemented)>
-
-Take the object in $1 and put it into its own singleton class, which is
-an anonymous subclass of the object's current class.
-
-=cut
-
-inline op singleton(invar PMC) :object_classes {
-  goto NEXT();
-}
-
 =item B<class>(out PMC, invar PMC)
 
 Get the class PMC for the object in $2 and put it in $1.
@@ -626,27 +615,6 @@ op classoffset(out INT, invar PMC, in STR) :object_classes {
     goto ADDRESS(next);
 }
 
-
-=item B<adddoes>(invar PMC, in STR) B<(unimplemented)>
-
-Add $2 to the list of interfaces that this class claims to implement.
-
-=item B<removedoes>(invar PMC, in STR) B<(unimplemented)>
-
-Remove $2 from the list of interfaces that this class claims to
-implement.
-
-=cut
-
-op adddoes(invar PMC, in STR) :object_classes {
-    internal_exception(UNIMPLEMENTED, "removedoes is not implemented");
-    goto NEXT();
-}
-
-op removedoes(invar PMC, in STR) :object_classes {
-    internal_exception(UNIMPLEMENTED, "removedoes is not implemented");
-    goto NEXT();
-}
 
 ###############################################################################
 

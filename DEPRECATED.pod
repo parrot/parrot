@@ -54,19 +54,6 @@ There are several variants of some of the above ops; all are deprecated,
 and are replaced by the ops {set,get}_[hll,root]_global. See also
 http://www.parrotcode.org/docs/ops/var.html.
 
-Additionally, the following (unimplemented) ops are going to be removed:
-
-=over 4
-
-=item adddoes
-
-=item removedoes
-
-=item singleton
-
-=back
-
-
 =head1 Deprecated vtable methods
 
 The following vtable methods are deprecated:

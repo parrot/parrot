@@ -11,7 +11,6 @@ rule pmc_op {
 | newclass            <arg_hack> #
 | subclass            <arg_hack> #
 | getclass            <arg_hack> #
-| singleton           <arg_hack> #
 | class               <arg_hack> #
 | classname           <arg_hack> #
 | addparent           <arg_hack> #
@@ -21,8 +20,6 @@ rule pmc_op {
 | getattribute        <arg_hack> #
 | setattribute        <arg_hack> #
 | classoffset         <arg_hack> #
-| adddoes             <arg_hack> #
-| removedoes          <arg_hack> #
 | new <var> \, [ <arg_int> | <arg_string> | <macro_id> ]
 | typeof              <arg_hack> #
 | find_type           <arg_hack> #

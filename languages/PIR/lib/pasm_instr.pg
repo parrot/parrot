@@ -50,7 +50,6 @@ token pasm_instruction {
 | sleep             
 | sizeof            
 | sinh              
-| singleton         
 | sin               
 | shr               
 | shl               
@@ -90,7 +89,6 @@ token pasm_instruction {
 | reserved          
 | repeat            
 | removeparent      
-| removedoes        
 | removeattribute   
 | register          
 | recv              
@@ -318,7 +316,6 @@ token pasm_instruction {
 | and               
 | addparent         
 | addmethod         
-| adddoes           
 | addattribute      
 | add               
 | acos              

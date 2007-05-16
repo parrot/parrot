@@ -1,8 +1,10 @@
 #! perl
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
-use warnings;
+
 use strict;
+use warnings;
+
 use Getopt::Long;
 use lib 'lib';
 use Parrot::Ops2pm::Utils;
@@ -167,4 +169,3 @@ Others who provided code cited in the version control logs include:
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-
