@@ -26,11 +26,8 @@ grammar Lua::DumpLex is TGE::Grammar;
 
 transform past (ROOT) :language('PIR') {
     .local pmc past
-    new past, 'PAST::Block'
-    past.'init'('node'=>node, 'name'=>'anon')
-    .local pmc past_stmts
-    new past_stmts, 'PAST::Stmts'
-    past_stmts.'init'('node'=>node)
+    new past, 'PAST::Stmts'
+    past.'init'('node'=>node)
     $P0 = node['token']
     if null $P0 goto L1
     .local pmc iter
@@ -39,10 +36,10 @@ L2:
     unless iter goto L1
     $P0 = shift iter
     $P1 = tree.'get'('past', $P0, 'Lua::TestLex::token')
-    past_stmts.'push'($P1)
+    past.'push'($P1)
     goto L2
 L1:
-    past.'push'(past_stmts)
+    past = past.'new'('PAST::Block', past, 'node'=>node, 'name'=>'anon')
     .return (past)
 }
 
@@ -52,42 +49,12 @@ L1:
 =cut
 
 transform past (Lua::TestLex::token) :language('PIR') {
-    .local pmc past, arg
-    new past, 'PAST::Op'
-    past.'init'('node'=>node, 'name'=>'println')
-    $I0 = defined node['Name']
-    unless $I0 goto L1
-    $P1 = node['Name']
-    arg = tree.get('past', $P1, 'Lua::TestLex::Name')
-    goto L9
-L1:
-    $I0 = defined node['keyword']
-    unless $I0 goto L2
-    $P1 = node['keyword']
-    arg = tree.get('past', $P1, 'Lua::TestLex::keyword')
-    goto L9
-L2:
-    $I0 = defined node['String']
-    unless $I0 goto L3
-    $P1 = node['String']
-    arg = tree.get('past', $P1, 'Lua::TestLex::String')
-    goto L9
-L3:
-    $I0 = defined node['Number']
-    unless $I0 goto L4
-    $P1 = node['Number']
-    arg = tree.get('past', $P1, 'Lua::TestLex::Number')
-    goto L9
-L4:
-    $I0 = defined node['punctuator']
-    unless $I0 goto L5
-    $P1 = node['punctuator']
-    arg = tree.get('past', $P1, 'Lua::TestLex::punctuator')
-    goto L9
-L5:
-    internal_error('unknown token')
-L9:
-    past.'push'(arg)
+    .local pmc past
+    $S0 = node.'find_key'()
+    $P0 = node[$S0]
+    $S1 = concat 'Lua::TestLex::', $S0
+    past = tree.'get'('past', $P0, $S1)
+    past = past.'new'('PAST::Op', past, 'node'=>node, 'name'=>'println')
     .return (past)
 }
 
@@ -99,9 +66,9 @@ L9:
 transform past (Lua::TestLex::keyword) :language('PIR') {
     .local pmc past
     new past, 'PAST::Val'
-    $S0 = node
-    $S0 = concat "keyword:\t", $S0
-    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S0, 'ctype'=>'s~')
+    $S0 = node.'result_object'()
+    $S1 = concat "keyword:\t", $S0
+    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
     .return (past)
 }
 
@@ -113,9 +80,9 @@ transform past (Lua::TestLex::keyword) :language('PIR') {
 transform past (Lua::TestLex::punctuator) :language('PIR') {
     .local pmc past
     new past, 'PAST::Val'
-    $S0 = node
-    $S0 = concat "punct:\t", $S0
-    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S0, 'ctype'=>'s~')
+    $S0 = node.'result_object'()
+    $S1 = concat "punct:\t", $S0
+    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
     .return (past)
 }
 
@@ -127,9 +94,9 @@ transform past (Lua::TestLex::punctuator) :language('PIR') {
 transform past (Lua::TestLex::Name) :language('PIR') {
     .local pmc past
     new past, 'PAST::Val'
-    $S0 = node
-    $S0 = concat "Name:\t", $S0
-    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S0, 'ctype'=>'s~')
+    $S0 = node.'result_object'()
+    $S1 = concat "Name:\t", $S0
+    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
     .return (past)
 }
 
@@ -144,20 +111,20 @@ transform past (Lua::TestLex::String) :language('PIR') {
     $I0 = defined node['quoted_literal']
     unless $I0 goto L1
     $P0 = node['quoted_literal']
-    $S0 = $P0
-    $S0 = concat "String:\t", $S0
+    $S0 = $P0.'result_object'()
+    $S1 = concat "String:\t", $S0
     goto L9
 L1:
     $I0 = defined node['long_string']
     unless $I0 goto L2
     $P0 = node['long_string']
-    $S0 = $P0
-    $S0 = concat "LongString:\t", $S0
+    $S0 = $P0.'result_object'()
+    $S1 = concat "LongString:\t", $S0
     goto L9
 L2:
     internal_error('unknown string')
 L9:
-    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S0, 'ctype'=>'s~')
+    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
     .return (past)
 }
 
@@ -169,9 +136,9 @@ L9:
 transform past (Lua::TestLex::Number) :language('PIR') {
     .local pmc past
     new past, 'PAST::Val'
-    $S0 = node
-    $S0 = concat "Number:\t", $S0
-    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S0, 'ctype'=>'s~')
+    $S0 = node.'result_object'()
+    $S1 = concat "Number:\t", $S0
+    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
     .return (past)
 }
 
