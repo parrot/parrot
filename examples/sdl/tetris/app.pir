@@ -316,6 +316,10 @@ Returns the color palette.
     getattribute palette, self, $I0
     if_null palette, CREATE
     branch RET
+CREATE:
+    (palette) = self."genPalette"()
+    
+    branch RET
 
 NULL:
     print "warning: no color palette found!\n"
