@@ -595,7 +595,7 @@ create_lexinfo(Interp *interp, IMC_Unit *unit, PMC *sub, int need_lex)
      * I think letting this override in PASM/PIR would be a
      * can of worms - how do we call this if it declares .lex
      */
-    decl_func = (decl_func_t) PMC_struct_val(decl_lex_meth);
+    decl_func = (decl_func_t) D2FPTR(PMC_struct_val(decl_lex_meth));
 
     for (i = 0; i < hsh->size; i++) {
         for (r = hsh->data[i]; r; r = r->next) {
@@ -641,13 +641,13 @@ create_lexinfo(Interp *interp, IMC_Unit *unit, PMC *sub, int need_lex)
 static PMC*
 find_outer(Interp *interp, IMC_Unit *unit)
 {
-    UNUSED(interp);
-
     subs_t *s;
     SymReg *sub;
     size_t  len;
     PMC    *current;
     STRING *cur_name;
+
+    UNUSED(interp);
 
     if (!unit->outer)
         return NULL;
@@ -909,6 +909,7 @@ build_key(Interp *interp, SymReg *key_reg)
     int       key_length;     /* P0["hi;there"; S0; 2] has length 3 */
     int       k;
     SymReg   *r;
+    SymReg *reg;
     int       var_type, slice_bits, type;
 
     /* 0 is length */
@@ -918,7 +919,7 @@ build_key(Interp *interp, SymReg *key_reg)
     char     *s  = s_key;
     *s           = 0;
 
-    SymReg *reg  = key_reg->set == 'K' ? key_reg->nextkey : key_reg;
+    reg = key_reg->set == 'K' ? key_reg->nextkey : key_reg;
 
     for (key_length = 0; reg ; reg = reg->nextkey, key_length++) {
         if ((pc - key - 2) >= KEYLEN)
