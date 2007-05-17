@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2007, The Perl Foundation.
+ * $Id$
+ */
+
 #include "imc.h"
 #include "pbc.h"
 #include "parrot/packfile.h"
@@ -578,7 +583,7 @@ create_lexinfo(Interp *interp, IMC_Unit *unit, PMC *sub, int need_lex)
     PMC *decl_lex_meth            = VTABLE_find_method(interp,
                                         lex_info_class, decl_lex);
 
-    if (!decl_lex_meth)
+    if (PMC_IS_NULL(decl_lex_meth))
         real_exception(interp, NULL, METH_NOT_FOUND,
                 "Method '%Ss' not found", decl_lex);
 

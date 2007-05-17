@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2006, The Perl Foundation.
+Copyright (C) 2003-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -1147,7 +1147,7 @@ mmd_search_classes(Interp *interp, STRING *meth, PMC *arg_tuple,
         for (i = start_at_parent; i < n; ++i) {
             _class = VTABLE_get_pmc_keyed_int(interp, mro, i);
             pmc = Parrot_find_method_with_cache(interp, _class, meth);
-            if (pmc) {
+            if (!PMC_IS_NULL(pmc)) {
                 /*
                  * mmd_is_hidden would consider all previous candidates
                  * XXX pass current n so that only candidates from this
@@ -1609,7 +1609,7 @@ mmd_create_builtin_multi_meth_2(Interp *interp, PMC *ns,
     meth_name = const_string(interp, short_name);
     _class = interp->vtables[type]->pmc_class;
     method = Parrot_find_method_direct(interp, _class, meth_name);
-    if (!method) {
+    if (PMC_IS_NULL(method)) {
         /* first method */
         method = constant_pmc_new(interp, enum_class_NCI);
         VTABLE_set_pointer_keyed_str(interp, method,

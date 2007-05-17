@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2007, The Perl Foundation.
 # $Id$
 
 package Parrot::Pmc2c::PCCMETHOD;
@@ -523,7 +523,7 @@ $arg_accessors
       PMC_cont(ret_cont)->from_ctx = ctx;
 
       pccinvoke_meth = VTABLE_find_method(interp, $invocant, $method_name);
-      if (!pccinvoke_meth)
+      if (PMC_IS_NULL(pccinvoke_meth))
           real_exception(interp, NULL, METH_NOT_FOUND,
             "Method '%Ss' not found", $method_name);
       else

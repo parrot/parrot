@@ -1,5 +1,10 @@
 /*
-** object.ops
+
+Copyright (C) 2001-2007, The Perl Foundation.
+$Id$
+
+object.ops
+
 */
 
 
@@ -55,7 +60,7 @@ op callmethodcc(invar PMC, in STR) :object_base {
   meth = $2;
   next = expr NEXT();
   method_pmc = VTABLE_find_method(interp, object, meth);
-  if (!method_pmc) {
+  if (PMC_IS_NULL(method_pmc)) {
     real_exception(interp, next, METH_NOT_FOUND,
         "Method '%Ss' not found", meth);
   }
@@ -91,7 +96,7 @@ op callmethod(invar PMC, in STR, invar PMC) :object_base {
   meth = $2;
   next = expr NEXT();
   method_pmc = VTABLE_find_method(interp, object, meth);
-  if (!method_pmc) {
+  if (PMC_IS_NULL(method_pmc)) {
     real_exception(interp, next, METH_NOT_FOUND,
         "Method '%Ss' not found", meth);
   }
@@ -125,7 +130,7 @@ op tailcallmethod(invar PMC, in STR) :object_base {
   object = $1;
   meth = $2;
   method_pmc = VTABLE_find_method(interp, object, meth);
-  if (!method_pmc) {
+  if (PMC_IS_NULL(method_pmc)) {
     real_exception(interp, next, METH_NOT_FOUND,
         "Method '%Ss' not found", meth);
   }

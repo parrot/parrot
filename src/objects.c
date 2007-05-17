@@ -138,7 +138,7 @@ Parrot_find_vtable_meth(Interp *interp, PMC *pmc, STRING *meth)
     INTVAL vtable_index = Parrot_get_vtable_index(interp, meth);
 
     if (vtable_index == -1)
-        return NULL;
+        return PMCNULL;
 
     /* Get class. */
     if (PObj_is_object_TEST(pmc))
@@ -807,16 +807,16 @@ get_init_meth(Interp *interp, PMC *_class, STRING *prop_str, STRING **meth_str)
     PMC *prop;
     prop = VTABLE_getprop(interp, _class, prop_str);
     if (!VTABLE_defined(interp, prop))
-        return NULL;
+        return PMCNULL;
     meth = VTABLE_get_string(interp, prop);
 #else
     props = PMC_metadata(_class);
     if (!props)
-        return NULL;
+        return PMCNULL;
     b = parrot_hash_get_bucket(interp,
                 (Hash*) PMC_struct_val(props), prop_str);
     if (!b)
-        return NULL;
+        return PMCNULL;
     meth = PMC_str_val((PMC*) b->value);
 #endif
 
@@ -824,7 +824,7 @@ get_init_meth(Interp *interp, PMC *_class, STRING *prop_str, STRING **meth_str)
     ns        = VTABLE_pmc_namespace(interp, _class);
     method    = VTABLE_get_pmc_keyed_str(interp, ns, meth);
 
-    return PMC_IS_NULL(method) ? NULL : method;
+    return method;
 }
 
 
@@ -891,7 +891,7 @@ do_initcall(Interp *interp, PMC* _class, PMC *object, PMC *init)
         meth = get_init_meth(interp, parent_class,
                 CONST_STRING(interp, "BUILD"), &meth_str);
         /* no method found and no BUILD property set? */
-        if (!meth && meth_str == NULL) {
+        if (PMC_IS_NULL(meth) && meth_str == NULL) {
             PMC   *ns;
             INTVAL vtable_index;
 
@@ -1154,7 +1154,7 @@ Parrot_add_parent(Interp *interp, PMC *_class, PMC *parent)
 =item C<PMC * Parrot_remove_parent(Interp *interp, PMC *removed_class,
     PMC *existing_class)>
 
-This currently does nothing but return C<NULL>.
+This currently does nothing but return C<PMCNULL>.
 
 =cut
 
@@ -1162,7 +1162,7 @@ This currently does nothing but return C<NULL>.
 
 PMC *
 Parrot_remove_parent(Interp *interp, PMC *removed_class, PMC *existing_class) {
-    return NULL;
+    return PMCNULL;
 }
 
 /*
@@ -1171,7 +1171,7 @@ Parrot_remove_parent(Interp *interp, PMC *removed_class, PMC *existing_class) {
 Parrot_multi_subclass(Interp *interp, PMC *base_class_array,
     STRING *child_class_name)>
 
-This currently does nothing but return C<NULL>.
+This currently does nothing but return C<PMCNULL>.
 
 =cut
 
@@ -1180,7 +1180,7 @@ This currently does nothing but return C<NULL>.
 PMC *
 Parrot_multi_subclass(Interp *interp, PMC *base_class_array,
     STRING *child_class_name) {
-    return NULL;
+    return PMCNULL;
 }
 
 /*
@@ -1222,7 +1222,7 @@ Parrot_new_method_cache(Interp *interp)>
 
 This should create and return a new method cache PMC.
 
-Currently it does nothing but return C<NULL>.
+Currently it does nothing but return C<PMCNULL>.
 
 =cut
 
@@ -1230,7 +1230,7 @@ Currently it does nothing but return C<NULL>.
 
 PMC *
 Parrot_new_method_cache(Interp *interp) {
-    return NULL;
+    return PMCNULL;
 }
 
 /*
@@ -1378,7 +1378,7 @@ Parrot_find_method_direct(Interp *interp, PMC *_class, STRING *method_name)
     if (string_equal(interp, method_name, s1) == 0)
         return find_method_direct_1(interp, _class, s2);
 
-    return NULL;
+    return PMCNULL;
 }
 
 PMC *
@@ -1508,7 +1508,7 @@ find_method_direct_1(Interp *interp, PMC *_class,
         }
     }
     TRACE_FM(interp, _class, method_name, NULL);
-    return NULL;
+    return PMCNULL;
 }
 
 /*
@@ -1765,17 +1765,17 @@ undefined, is pretty likely).
 
 PMC *Parrot_find_class_constructor(Interp *interp, STRING *_class,
                                    INTVAL classtoken) {
-    return NULL;
+    return PMCNULL;
 }
 
 PMC *Parrot_find_class_destructor(Interp *interp, STRING *_class,
                                   INTVAL classtoken) {
-    return NULL;
+    return PMCNULL;
 }
 
 PMC *Parrot_find_class_fallback(Interp *interp, STRING *_class,
                                 INTVAL classtoken) {
-    return NULL;
+    return PMCNULL;
 }
 
 void Parrot_set_class_constructor(Interp *interp, STRING *_class,
