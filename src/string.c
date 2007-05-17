@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -1878,7 +1878,7 @@ sorts of leak potential otherwise.
 */
 
 void
-string_cstring_free(char *p)
+string_cstring_free(const char * const p)
 {
     mem_sys_free(p);
 }

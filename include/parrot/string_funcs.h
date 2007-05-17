@@ -1,5 +1,5 @@
 /* string_funcs.h
- *  Copyright (C) 2001-2006, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -83,7 +83,7 @@ PARROT_API STRING *string_from_const_cstring(Interp *, const char *, UINTVAL);
 PARROT_API STRING *const_string(Interp *, const char *buffer)
         __attribute__nonnull__(2);
 PARROT_API char *string_to_cstring(Interp *, STRING *);
-PARROT_API void string_cstring_free(char *);
+PARROT_API void string_cstring_free(const char * const);
 PARROT_API void string_pin(Interp *, STRING *);
 PARROT_API void string_unpin(Interp *, STRING *);
 PARROT_API STRING *string_bitwise_and(Interp *interp, STRING *s1,

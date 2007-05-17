@@ -1,5 +1,5 @@
 /* memory.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -19,7 +19,7 @@ PARROT_API void *mem_sys_allocate_zeroed(size_t);
 
 PARROT_API void *mem__sys_realloc(void *, size_t);
 #define mem_sys_realloc(x,y) (assert(x!=NULL), mem__sys_realloc(x,y))
-PARROT_API void mem_sys_free(void *);
+PARROT_API void mem_sys_free(const void * const);
 
 void *mem__internal_allocate(size_t, const char *, int);
 #define mem_internal_allocate(x) mem__internal_allocate(x, __FILE__, __LINE__)
