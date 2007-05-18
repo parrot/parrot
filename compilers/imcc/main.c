@@ -381,9 +381,9 @@ do_pre_process(Parrot_Interp interp)
 {
     int c;
     YYSTYPE val;
-    void *yyscanner;
+    yyscan_t         yyscanner;
 
-    do_yylex_init(interp, &yyscanner);
+    yyscanner   = IMCC_INFO(interp)->yyscanner;
 
     IMCC_push_parser_state(interp);
     while ((c = yylex(&val, yyscanner, interp))) {
@@ -481,6 +481,8 @@ do_pre_process(Parrot_Interp interp)
                 break;
         }
     }
+    printf("\n");
+    fflush(stdout);
     yylex_destroy(&yyscanner);
 }
 

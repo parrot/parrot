@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -20,7 +20,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 12;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -47,6 +47,21 @@ is( `"$PARROT" "$first" "asdf"`,    "first\n", 'ignore nonsense' );
 # redirect STDERR to avoid warnings
 my $redir = '2>' . File::Spec->devnull;
 
+# --pre-process-only
+# This is just sanity testing 
+# Coredumps after the output has been written are ignored
+is( `"$PARROT" -E "$first" $redir`, <<'END_EXPECTED', 'option -E' );
+.sub main :main
+print "first\n" 
+.end
+END_EXPECTED
+
+is( `"$PARROT" --pre-process-only "$first" $redir`, <<'END_EXPECTED', 'option --pre-process-only' );
+.sub main :main
+print "first\n" 
+.end
+END_EXPECTED
+
 # Test the trace option
 is( `"$PARROT" -t "$first" $redir`, "first\n", 'option -t' );
 TODO:
@@ -57,16 +72,17 @@ TODO:
 is( `"$PARROT" -t "$first" "$second" $redir`,      "second\n", 'option -t with flags' );
 is( `"$PARROT" --trace "$first" "$second" $redir`, "second\n", 'option --trace with flags' );
 
+# clean up temporary files
 unlink $first;
 unlink $second;
 
-exit;
-
 sub create_pir_file {
     my $word = shift;
+
     my ( $fh, $filename ) = tempfile( UNLINK => 0, SUFFIX => '.pir' );
     print $fh qq{.sub main :main\n\tprint "$word\\n"\n.end};
     close $fh;
+
     return $filename;
 }
 
