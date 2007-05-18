@@ -400,8 +400,10 @@ do_pre_process(Parrot_Interp interp)
             case ENDNAMESPACE:  printf(".endnamespace"); break;
             case CONST:         printf(".const "); break;
             case PARAM:         printf(".param "); break;
-            case MACRO:         yylex(&val, interp, yyscanner);
-                                break; /* swallow nl */
+            /* TODO: print out more information about the macro */
+            /* case MACRO:         yylex(&val, interp, yyscanner);
+                                break; */ /* swallow nl */
+            case MACRO:         printf(".macro "); break;
 
             case GOTO:          printf("goto ");break;
             case IF:            printf("if ");break;
