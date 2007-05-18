@@ -379,9 +379,9 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
 static void
 do_pre_process(Parrot_Interp interp)
 {
-    int c;
-    YYSTYPE val;
-    yyscan_t         yyscanner;
+    int       c;
+    YYSTYPE   val;
+    yyscan_t  yyscanner;
 
     yyscanner   = IMCC_INFO(interp)->yyscanner;
 
@@ -483,7 +483,8 @@ do_pre_process(Parrot_Interp interp)
     }
     printf("\n");
     fflush(stdout);
-    yylex_destroy(&yyscanner);
+
+    return;
 }
 
 static void
@@ -636,7 +637,8 @@ imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
         Parrot_destroy(interp);
         yylex_destroy(yyscanner);
         IMCC_INFO(interp)->yyscanner = NULL;
-        Parrot_exit(interp, 0);
+
+        return 0;
     }
 
     /* Do we need to produce an output file? If so, what type? */
