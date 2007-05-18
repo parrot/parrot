@@ -611,6 +611,11 @@ Compose the given role into this one, using the given exclusions and aliases.
             PMC* alias_method :optional :named["alias_method"],
             int got_alias_method :opt_flag) {
         Parrot_Role *role_info = PARROT_ROLE(SELF);
+        STRING *s_name, *r_name;
+
+        (STRING *s_name) = PCCINVOKE( interp, SELF, "name" );
+        (STRING *r_name) = PCCINVOKE( interp, role, "name" );
+
         Parrot_ComposeRole(interp, role, exclude_method, got_exclude_method,
                            alias_method, got_alias_method,
                            role_info->methods, role_info->roles);
@@ -636,6 +641,42 @@ parameter is supplied, a particular item of introspection data.
             found = VTABLE_inspect(interp, SELF);
 
         PCCRETURN(PMC *found);
+    }
+
+/*
+
+=item C<void does(STRING *role)>
+
+Returns true if this role (or any role composed into this one) performs the
+named role.  This will recurse through all roles as far back as it can.
+
+=cut
+
+*/
+
+    PCCMETHOD void does(STRING *name) {
+        INTVAL  i, count;
+        STRING *r_name;
+        PMC    *roles, *role;
+
+        (STRING *r_name) = PCCINVOKE(interp, SELF, "name");
+
+        if (string_equal(interp, r_name, name) == 0)
+            PCCRETURN(INTVAL 1);
+
+        (PMC *roles)     = PCCINVOKE(interp, SELF, "roles");
+        count            = VTABLE_elements(interp, roles);
+
+        for (i = 0; i < count; i++) {
+            INTVAL does;
+            role          = VTABLE_get_pmc_keyed_int(interp, roles, i);
+            (INTVAL does) = PCCINVOKE(interp, role, "does", STRING *name);
+
+            if (does)
+                PCCRETURN(INTVAL 1);
+        }
+
+        PCCRETURN(INTVAL 0);
     }
 
 } /* end pmclass Role */

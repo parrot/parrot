@@ -1096,26 +1096,28 @@ false otherwise.
 
 */
     PCCMETHOD void does(STRING *role_name) {
-        INTVAL i, role_count;
-        PMC *role_list = ((Parrot_Class *)PMC_data(SELF))->roles;
+        INTVAL i, role_count, isa;
+        PMC *role_list = (PMC_data_typed(SELF, Parrot_Class *))->roles;
 
-        /* not a coding standards violation; the macro expands greatly! */
-        if (!role_list) {
+        if (!role_list)
             PCCRETURN(INTVAL 0);
-        }
 
         role_count = VTABLE_elements(interp, role_list);
 
         for (i = 0; i < role_count; i++) {
-            STRING *r_name;
-            PMC    *role     = VTABLE_get_pmc_keyed_int(interp, role_list, i);
-            (STRING *r_name) = PCCINVOKE(interp, role, "name");
+            INTVAL  role_does;
+            PMC    *role       = VTABLE_get_pmc_keyed_int(interp, role_list, i);
 
-            if (string_compare(interp, role_name, r_name))
+            (INTVAL role_does) = PCCINVOKE(interp, role, "does",
+                                           STRING *role_name);
+
+            if (role_does)
                 PCCRETURN(INTVAL 1);
         }
 
-        PCCRETURN(INTVAL 0);
+        (INTVAL isa) = PCCINVOKE(interp, SELF, "isa", STRING *role_name);
+
+        PCCRETURN(INTVAL isa);
     }
 } /* END pmclass */
 
