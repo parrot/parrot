@@ -976,7 +976,6 @@ EOC
     if ( $self->{flags}{hll} && $self->{flags}{maps} ) {
 
         my $hll  = ( keys %{ $self->{flags}{hll} } )[0];
-        my $maps = ( keys %{ $self->{flags}{maps} } )[0];
         $cout .= <<"EOC";
 
         {
@@ -985,9 +984,19 @@ EOC
                 interp, const_string(interp, "$hll")
             );
             if (pmc_id > 0)
+EOC
+
+
+        foreach my $map ( keys %{ $self->{flags}{maps} }) {
+
+        $cout .= <<"EOC";
                 Parrot_register_HLL_type(
-                    interp, pmc_id, enum_class_$maps, entry
+                    interp, pmc_id, enum_class_$map, entry
                 );
+EOC
+        }
+
+        $cout .= <<"EOC";
         } /* Register */
 EOC
     }
