@@ -21,7 +21,7 @@
 #include "pbc.h"
 #include "parser.h"
 
-static int load_pbc, run_pbc, write_pbc, pre_process, pasm_file;
+static int load_pbc, run_pbc, write_pbc, pre_process_only, pasm_file;
 
 static void
 usage(FILE* fp)
@@ -291,7 +291,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 yydebug = 1;
                 break;
             case 'E':
-                pre_process = 1;
+                pre_process_only = 1;
                 break;
             case 'o':
                 run_pbc = 0;
@@ -629,7 +629,7 @@ imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
             }
         }
     }
-    if (pre_process) {
+    if (pre_process_only) {
         do_pre_process(interp);
         Parrot_destroy(interp);
         yylex_destroy(yyscanner);
