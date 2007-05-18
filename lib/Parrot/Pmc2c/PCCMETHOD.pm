@@ -235,6 +235,7 @@ sub rewrite_PCCRETURNs {
         my $lineno1     = __LINE__ + 2;
         my $lineno2     = __LINE__ + 7;
         my $replacement = <<END;
+{
 #line $lineno1 $file
     /*BEGIN PCCRETURN $returns */
     /*BEGIN GENERATED ACCESSORS */
@@ -249,6 +250,7 @@ $returns_accessors
         string_from_const_cstring(interp, $returns_flags, 0), 0);
     $goto_string
     /*END PCCRETURN $returns */
+}
 END
         $$body =~ s/\Q$1\E/$replacement/;
     }
