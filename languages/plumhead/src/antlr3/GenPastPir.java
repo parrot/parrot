@@ -1,4 +1,4 @@
-// $ANTLR 3.0b6 src/antlr3/GenPastPir.g 2007-04-16 20:51:56
+// $ANTLR 3.0 src/antlr3/GenPastPir.g 2007-05-19 15:26:59
 
   import java.util.regex.*;
 
@@ -60,7 +60,7 @@ public class GenPastPir extends TreeParser {
 
     // $ANTLR start gen_pir_past
     // src/antlr3/GenPastPir.g:28:1: gen_pir_past : ^( PROGRAM ( node[\"past_stmts\"] )* ) ;
-    public void gen_pir_past() throws RecognitionException {
+    public final void gen_pir_past() throws RecognitionException {
         try {
             // src/antlr3/GenPastPir.g:29:5: ( ^( PROGRAM ( node[\"past_stmts\"] )* ) )
             // src/antlr3/GenPastPir.g:29:5: ^( PROGRAM ( node[\"past_stmts\"] )* )
@@ -123,6 +123,7 @@ public class GenPastPir extends TreeParser {
                 do {
                     int alt1=2;
                     int LA1_0 = input.LA(1);
+
                     if ( ((LA1_0>=NOQUOTE_STRING && LA1_0<=ARRAY)||LA1_0==PREFIX||(LA1_0>=DOUBLEQUOTE_STRING && LA1_0<=VAR_DUMP)||(LA1_0>=INTEGER && LA1_0<=IF)) ) {
                         alt1=1;
                     }
@@ -193,8 +194,8 @@ public class GenPastPir extends TreeParser {
 
 
     // $ANTLR start node
-    // src/antlr3/GenPastPir.g:110:1: node[String reg_mother] : ( ^( ECHO node[\"past_echo\"] ) | ^( VAR_DUMP node[\"past_var_dump\"] ) | NOQUOTE_STRING | SINGLEQUOTE_STRING | DOUBLEQUOTE_STRING | NUMBER | INTEGER | ^(infix= (PLUS|MINUS|MUL_OP|BITWISE_OP) node[reg] node[reg] ) | ^(prefix= PREFIX node[reg] ) | ^( REL_OP node[reg] node[reg] ) | ^( IF node[\"past_if_op\"] node[\"past_if_op\"] ( node[\"past_if_op\"] )? ) | ^( STMTS ( node[reg_stmts] )* ) | ^( ASSIGN_OP node[reg_assign] node[reg_assign] ) | SCALAR | ^( ARRAY node[reg_array] ) );
-    public void node(String reg_mother) throws RecognitionException {
+    // src/antlr3/GenPastPir.g:110:1: node[String reg_mother] : ( ^( ECHO node[\"past_echo\"] ) | ^( VAR_DUMP node[\"past_var_dump\"] ) | NOQUOTE_STRING | SINGLEQUOTE_STRING | DOUBLEQUOTE_STRING | NUMBER | INTEGER | ^(infix= ( PLUS | MINUS | MUL_OP | BITWISE_OP ) node[reg] node[reg] ) | ^(prefix= PREFIX node[reg] ) | ^( REL_OP node[reg] node[reg] ) | ^( IF node[\"past_if_op\"] node[\"past_if_op\"] ( node[\"past_if_op\"] )? ) | ^( STMTS ( node[reg_stmts] )* ) | ^( ASSIGN_OP node[reg_assign] node[reg_assign] ) | SCALAR | ^( ARRAY node[reg_array] ) );
+    public final void node(String reg_mother) throws RecognitionException {
         CommonTree infix=null;
         CommonTree prefix=null;
         CommonTree NOQUOTE_STRING1=null;
@@ -207,60 +208,90 @@ public class GenPastPir extends TreeParser {
         CommonTree ARRAY8=null;
 
         try {
-            // src/antlr3/GenPastPir.g:111:5: ( ^( ECHO node[\"past_echo\"] ) | ^( VAR_DUMP node[\"past_var_dump\"] ) | NOQUOTE_STRING | SINGLEQUOTE_STRING | DOUBLEQUOTE_STRING | NUMBER | INTEGER | ^(infix= (PLUS|MINUS|MUL_OP|BITWISE_OP) node[reg] node[reg] ) | ^(prefix= PREFIX node[reg] ) | ^( REL_OP node[reg] node[reg] ) | ^( IF node[\"past_if_op\"] node[\"past_if_op\"] ( node[\"past_if_op\"] )? ) | ^( STMTS ( node[reg_stmts] )* ) | ^( ASSIGN_OP node[reg_assign] node[reg_assign] ) | SCALAR | ^( ARRAY node[reg_array] ) )
+            // src/antlr3/GenPastPir.g:111:5: ( ^( ECHO node[\"past_echo\"] ) | ^( VAR_DUMP node[\"past_var_dump\"] ) | NOQUOTE_STRING | SINGLEQUOTE_STRING | DOUBLEQUOTE_STRING | NUMBER | INTEGER | ^(infix= ( PLUS | MINUS | MUL_OP | BITWISE_OP ) node[reg] node[reg] ) | ^(prefix= PREFIX node[reg] ) | ^( REL_OP node[reg] node[reg] ) | ^( IF node[\"past_if_op\"] node[\"past_if_op\"] ( node[\"past_if_op\"] )? ) | ^( STMTS ( node[reg_stmts] )* ) | ^( ASSIGN_OP node[reg_assign] node[reg_assign] ) | SCALAR | ^( ARRAY node[reg_array] ) )
             int alt4=15;
             switch ( input.LA(1) ) {
             case ECHO:
+                {
                 alt4=1;
+                }
                 break;
             case VAR_DUMP:
+                {
                 alt4=2;
+                }
                 break;
             case NOQUOTE_STRING:
+                {
                 alt4=3;
+                }
                 break;
             case SINGLEQUOTE_STRING:
+                {
                 alt4=4;
+                }
                 break;
             case DOUBLEQUOTE_STRING:
+                {
                 alt4=5;
+                }
                 break;
             case NUMBER:
+                {
                 alt4=6;
+                }
                 break;
             case INTEGER:
+                {
                 alt4=7;
+                }
                 break;
             case MINUS:
             case PLUS:
             case MUL_OP:
             case BITWISE_OP:
+                {
                 alt4=8;
+                }
                 break;
             case PREFIX:
+                {
                 alt4=9;
+                }
                 break;
             case REL_OP:
+                {
                 alt4=10;
+                }
                 break;
             case IF:
+                {
                 alt4=11;
+                }
                 break;
             case STMTS:
+                {
                 alt4=12;
+                }
                 break;
             case ASSIGN_OP:
+                {
                 alt4=13;
+                }
                 break;
             case SCALAR:
+                {
                 alt4=14;
+                }
                 break;
             case ARRAY:
+                {
                 alt4=15;
+                }
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("110:1: node[String reg_mother] : ( ^( ECHO node[\"past_echo\"] ) | ^( VAR_DUMP node[\"past_var_dump\"] ) | NOQUOTE_STRING | SINGLEQUOTE_STRING | DOUBLEQUOTE_STRING | NUMBER | INTEGER | ^(infix= (PLUS|MINUS|MUL_OP|BITWISE_OP) node[reg] node[reg] ) | ^(prefix= PREFIX node[reg] ) | ^( REL_OP node[reg] node[reg] ) | ^( IF node[\"past_if_op\"] node[\"past_if_op\"] ( node[\"past_if_op\"] )? ) | ^( STMTS ( node[reg_stmts] )* ) | ^( ASSIGN_OP node[reg_assign] node[reg_assign] ) | SCALAR | ^( ARRAY node[reg_array] ) );", 4, 0, input);
+                    new NoViableAltException("110:1: node[String reg_mother] : ( ^( ECHO node[\"past_echo\"] ) | ^( VAR_DUMP node[\"past_var_dump\"] ) | NOQUOTE_STRING | SINGLEQUOTE_STRING | DOUBLEQUOTE_STRING | NUMBER | INTEGER | ^(infix= ( PLUS | MINUS | MUL_OP | BITWISE_OP ) node[reg] node[reg] ) | ^(prefix= PREFIX node[reg] ) | ^( REL_OP node[reg] node[reg] ) | ^( IF node[\"past_if_op\"] node[\"past_if_op\"] ( node[\"past_if_op\"] )? ) | ^( STMTS ( node[reg_stmts] )* ) | ^( ASSIGN_OP node[reg_assign] node[reg_assign] ) | SCALAR | ^( ARRAY node[reg_array] ) );", 4, 0, input);
 
                 throw nvae;
             }
@@ -447,7 +478,7 @@ public class GenPastPir extends TreeParser {
                     }
                     break;
                 case 8 :
-                    // src/antlr3/GenPastPir.g:228:5: ^(infix= (PLUS|MINUS|MUL_OP|BITWISE_OP) node[reg] node[reg] )
+                    // src/antlr3/GenPastPir.g:228:5: ^(infix= ( PLUS | MINUS | MUL_OP | BITWISE_OP ) node[reg] node[reg] )
                     {
 
                           reg_num++;
@@ -467,7 +498,7 @@ public class GenPastPir extends TreeParser {
                     else {
                         MismatchedSetException mse =
                             new MismatchedSetException(null,input);
-                        recoverFromMismatchedSet(input,mse,FOLLOW_set_in_node223);    throw mse;
+                        recoverFromMismatchedSet(input,mse,FOLLOW_set_in_node221);    throw mse;
                     }
 
 
@@ -621,6 +652,7 @@ public class GenPastPir extends TreeParser {
                     // src/antlr3/GenPastPir.g:324:49: ( node[\"past_if_op\"] )?
                     int alt2=2;
                     int LA2_0 = input.LA(1);
+
                     if ( ((LA2_0>=NOQUOTE_STRING && LA2_0<=ARRAY)||LA2_0==PREFIX||(LA2_0>=DOUBLEQUOTE_STRING && LA2_0<=VAR_DUMP)||(LA2_0>=INTEGER && LA2_0<=IF)) ) {
                         alt2=1;
                     }
@@ -672,6 +704,7 @@ public class GenPastPir extends TreeParser {
                         do {
                             int alt3=2;
                             int LA3_0 = input.LA(1);
+
                             if ( ((LA3_0>=NOQUOTE_STRING && LA3_0<=ARRAY)||LA3_0==PREFIX||(LA3_0>=DOUBLEQUOTE_STRING && LA3_0<=VAR_DUMP)||(LA3_0>=INTEGER && LA3_0<=IF)) ) {
                                 alt3=1;
                             }
@@ -826,7 +859,7 @@ public class GenPastPir extends TreeParser {
     public static final BitSet FOLLOW_DOUBLEQUOTE_STRING_in_node175 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_NUMBER_in_node187 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_INTEGER_in_node199 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_set_in_node223 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_set_in_node221 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_node_in_node239 = new BitSet(new long[]{0x00000001FF0785E0L});
     public static final BitSet FOLLOW_node_in_node242 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_PREFIX_in_node267 = new BitSet(new long[]{0x0000000000000004L});
