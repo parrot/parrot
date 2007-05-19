@@ -232,11 +232,15 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
         ok( $self->sort_ops(), "sort_ops returned successfully" );
         $msg = $tie->READLINE;
         untie *STDERR;
+    TODO: {
+        local $TODO = "All ops currently being passed as arguments are found either in ops.num or in ops.skip";
+        
         like(
             $msg,
             qr|not in ops\.num nor ops\.skip|,
             "Got expected warning about ops in neither ops.num or ops.skip"
         );
+    };
 
         # To do:  Test that the sorting was correct.
 
