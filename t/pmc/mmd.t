@@ -23,7 +23,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUTPUT', "PASM divide", todo => 'RT #41374' );
+pir_output_is( <<'CODE', <<'OUTPUT', "Integer_divide_PerlInt  10 / 3 = 1003", todo => 'RT #41374' );
 
 .sub 'test' :main
 
@@ -55,12 +55,13 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PASM divide", todo => 'RT #41374' );
     .param pmc lhs
     $I0 = left
     $I1 = right
-    $I2 = $I0/$I1   # don't call divide Integer/PerlInt here
-    lhs = $I2       # '
+    $I2 = $I0/$I1     # don't call divide Integer/PerlInt here
+    lhs = $I2         # '
+    lhs += 1000  # prove that this function has been called
     .return(lhs)
 .end
 CODE
-3
+1003
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "1+1=3" );
@@ -99,7 +100,7 @@ CODE
 3
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "PASM divide - override builtin" );
+pir_output_is( <<'CODE', <<'OUTPUT', "PASM divide - override builtin 10 / 3 = 42" );
 
 .sub _main
 
