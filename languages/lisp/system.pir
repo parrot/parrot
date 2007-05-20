@@ -14,52 +14,36 @@
   .HASH(value)
 
   # VALID_IN_PARROT_0_2_0  .FUNCTION(function, _left_paren_macro )
-    function = new "LispFunction"
-    .const .Sub temp = "_left_paren_macro"
-    setattribute function, "body", temp
-   value["("] = function
+    .FUNCTION(function, "_left_paren_macro" )
+    value["("] = function
 
   # VALID_IN_PARROT_0_2_0 .FUNCTION(function, _right_paren_macro)
-    function = new "LispFunction"
-    .const .Sub temp = "_right_paren_macro"
-    setattribute function, "body", temp
-   value[")"] = function
+    .FUNCTION(function, "_right_paren_macro" )
+    value[")"] = function
 
   # VALID_IN_PARROT_0_2_0 .FUNCTION(function, _single_quote_macro)
-    function = new "LispFunction"
-    .const .Sub temp = "_single_quote_macro"
-    setattribute function, "body", temp
-   value["'"] = function
+    .FUNCTION(function, "_single_quote_macro" )
+    value["'"] = function
 
   # VALID_IN_PARROT_0_2_0 .FUNCTION(function, _semicolon_macro)
-    function = new "LispFunction"
-    .const .Sub temp = "_semicolon_macro"
-    setattribute function, "body", temp
-   value[";"] = function
+    .FUNCTION(function, "_semicolon_macro" )
+    value[";"] = function
 
   # VALID_IN_PARROT_0_2_0 .FUNCTION(function, _double_quote_macro)
-    function = new "LispFunction"
-    .const .Sub temp = "_double_quote_macro"
-    setattribute function, "body", temp
-   value["\""] = function
+    .FUNCTION(function, "_double_quote_macro" )
+    value['"'] = function
 
   # VALID_IN_PARROT_0_2_0 .FUNCTION(function, _backquote_macro)
-    function = new "LispFunction"
-    .const .Sub temp = "_double_quote_macro"
-    setattribute function, "body", temp
-   value["`"] = function
+    .FUNCTION(function, "_backquote_macro" )
+    value["`"] = function
 
   # VALID_IN_PARROT_0_2_0 .FUNCTION(function, _comma_macro)
-    function = new "LispFunction"
-    .const .Sub temp = "_comma_macro"
-    setattribute function, "body", temp
-   value[","] = function
+    .FUNCTION(function, "_comma_macro" )
+    value[","] = function
 
   # VALID_IN_PARROT_0_2_0 .FUNCTION(function, _sharpsign_macro)
-    function = new "LispFunction"
-    .const .Sub temp = "_sharpsign_macro"
-    setattribute function, "body", temp
-   value["#"] = function
+    .FUNCTION(function, "_sharpsign_macro" )
+    value["#"] = function
 
   .DEFVAR(symbol, package, "*READER-MACROS*", value)
 
