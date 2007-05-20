@@ -10,20 +10,21 @@ Included in this directory are some add-ins for making working on parrot (or in
 parrot) easier, for various popular editors. Mostly that means
 syntax-highlighting and automatic indenting. Read on to see what's available for
 your favorite editor. For a summary on what is available do
-  make help
+  cd editor && make help
 
 =head2 Vim
 
-There are several files here, all with the C<.vim> extension. C<pir.vim>
+Calling C<make vim-install> in the F<editor/> directory 
+will install several files in F<~/.vim>. All these files have 
+the C<.vim> extension. C<pir.vim>
 (generated from C<pir.vim.in>), C<pasm.vim>, and C<pmc.vim> are syntax
 files; C<indent_pir.vim> is an indent plugin;  and C<filetype_parrot.vim> is a
 filetype script that tells vim to associate the extensions .pir, .imc, .imcc,
-.pasm, and .pmc with the right syntax. The syntax files should be installed to
-C<~/.vim/syntax/>; C<filetype_parrot.vim> should be installed to
-C<~/.vim/ftdetect>; C<indent_pir.vim> should be called C<~/.vim/indent/pir.vim>.
-C<make vim-install> in the C<editor/> dir will do this automatically.
+.pasm, and .pmc with the right syntax. The syntax files are installed to
+C<~/.vim/syntax/>; C<filetype_parrot.vim> is installed to
+C<~/.vim/ftdetect>; C<indent_pir.vim> is copied to C<~/.vim/indent/pir.vim>.
 If you want indenting, you should also place C<filetype indent on> somewhere in
-your vimrc.
+your C<~/.vimrc>.
 
 =head2 Kate
 
