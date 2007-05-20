@@ -12,7 +12,7 @@ use Parrot::Test tests => 31;
 
 # macro tests
 
-pir_output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
+pir_output_is( <<'CODE', <<'OUTPUT', 'macro, zero parameters' );
 .sub test :main
 .macro answer()
     print    42
@@ -25,7 +25,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "macro, one unused parameter, literal term" );
+pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one unused parameter, literal term' );
 .sub test :main
 .macro answer(A)
     print    42
@@ -38,7 +38,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "macro, one unused parameter, register term" );
+pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one unused parameter, register term' );
 .sub test :main
 .macro answer(A)
     print    42
@@ -52,7 +52,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, literal" );
+pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one used parameter, literal' );
 .sub test :main
 .macro answer(A)
     print    .A
@@ -65,7 +65,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, register" );
+pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one used parameter, register' );
 .sub test :main
 .macro answer(A)
     print    .A
@@ -79,7 +79,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, called twice" );
+pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one used parameter, called twice' );
 .sub test :main
 .macro answer(A)
     print    .A
@@ -96,7 +96,7 @@ CODE
 43
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, label" );
+pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one used parameter, label' );
 .sub test :main
 .macro answer(A)
     ne    I0,42,.$done
@@ -112,7 +112,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter run twice, label" );
+pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one used parameter run thrice, label' );
 .sub test :main
 .macro answer(A)
     ne    I0,42,.$done
@@ -123,14 +123,15 @@ pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter run twice, label" 
     set    I0,42
     .answer(I0)
     .answer(I0)
-    end
+    inc I0
+    .answer(I0)
 .end
 CODE
 42
 42
 OUTPUT
 
-pir_output_is( <<'CODE', '32', "constant defined and used" );
+pir_output_is( <<'CODE', '32', 'constant defined and used' );
 .sub test :main
 .const int FOO = 32
   print FOO
@@ -138,7 +139,7 @@ pir_output_is( <<'CODE', '32', "constant defined and used" );
 .end
 CODE
 
-pir_output_is( <<'CODE', 'foo', "constant defined and used" );
+pir_output_is( <<'CODE', 'foo', 'constant defined and used' );
 .sub test :main
 .const string FOO = "foo"
   print FOO
@@ -146,7 +147,7 @@ pir_output_is( <<'CODE', 'foo', "constant defined and used" );
 .end
 CODE
 
-pasm_output_is( <<'CODE', 'foo', "constant defined, used in a macro call" );
+pasm_output_is( <<'CODE', 'foo', 'constant defined, used in a macro call' );
 .constant FOO S0
 .macro answer (bar)
   print .bar
@@ -156,13 +157,13 @@ pasm_output_is( <<'CODE', 'foo', "constant defined, used in a macro call" );
   end
 CODE
 
-open FOO, ">", "macro.tempfile";
+open FOO, '>', 'macro.tempfile';
 print FOO <<'ENDF';
   set S0, "Betelgeuse\n"
 ENDF
 close FOO;
 
-pasm_output_is( <<"CODE", <<OUTPUT, "basic include macro" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'basic include macro' );
 .include "macro.tempfile"
   print S0
 
@@ -175,7 +176,7 @@ Betelgeuse
 Betelgeuse
 OUTPUT
 
-open FOO, ">", "macro.tempfile";    # Clobber previous
+open FOO, '>', 'macro.tempfile';    # Clobber previous
 print FOO <<'ENDF';
 .macro multiply(A,B)
     new P0, .Float
@@ -188,19 +189,19 @@ print FOO <<'ENDF';
 ENDF
 close FOO;
 
-pasm_output_is( <<"CODE", <<OUTPUT, "include a file defining a macro" );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'include a file defining a macro' );
 .include "macro.tempfile"
  .multiply(12,13)
  print P2
- print "\\n"
+ print "\n"
  end
 CODE
 156
 OUTPUT
 
-unlink("macro.tempfile");
+unlink('macro.tempfile');
 
-pir_output_is( <<'CODE', <<OUTPUT, ".newid" );
+pir_output_is( <<'CODE', <<'OUTPUT', '.newid' );
 .sub test :main
 .macro newid(ID, CLASS)
     .sym .CLASS .ID
@@ -216,7 +217,7 @@ CODE
 10
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, ".newlex" );
+pir_output_is( <<'CODE', <<'OUTPUT', '.newlex' );
 .sub test :main
 .macro newlex(ID, CLASS)
     .sym .CLASS .ID
@@ -233,7 +234,7 @@ CODE
 10
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<OUTPUT, "too few params");
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'too few params');
 .sub test :main
 .macro M(A, B)
     print .A
@@ -246,7 +247,7 @@ CODE
 /Macro 'M' requires 2 arguments, but 1 given/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<OUTPUT, "too many params");
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'too many params');
 .sub test :main
 .macro M(A, B)
     print .A
@@ -259,7 +260,7 @@ CODE
 /Macro 'M' requires 2 arguments, but 3 given/
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "ok param count" );
+pir_output_is( <<'CODE', <<'OUTPUT', 'ok param count' );
 .sub test :main
 .macro M(A, B)
     print .A
@@ -272,7 +273,7 @@ CODE
 fine
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<OUTPUT, "macro name is no ident");
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro name is no ident');
 .sub test :main
 .macro 42(A, B)
     print .A
@@ -285,7 +286,7 @@ CODE
 /Macro names must be identifiers/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<OUTPUT, "unterminated macro");
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'unterminated macro');
 .sub test :main
 .macro M(
 
@@ -294,7 +295,7 @@ CODE
 /End of file reached/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<OUTPUT, "unterminated macro 2");
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'unterminated macro 2');
 .sub test :main
 .macro M(A, B)
   print .A
@@ -305,7 +306,7 @@ CODE
 /End of file reached/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<OUTPUT, "ill param def");
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'ill param def');
 .sub test :main
 .macro M(A, B
   print .A
@@ -316,7 +317,7 @@ CODE
 /Parameter definition in 'M' must be IDENT/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<OUTPUT, "no params");
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'no params');
 .sub test :main
 .macro M(A, B)
     print .A
@@ -329,7 +330,7 @@ CODE
 /Macro 'M' needs 2 arguments/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<OUTPUT, "unknown macro");
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'unknown macro');
 .sub test :main
 .macro M(A, B)
     print .A
@@ -342,7 +343,7 @@ CODE
 /(unknown macro|unexpected DOT)/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<OUTPUT, "unexpected IDENTIFIER");
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'unexpected IDENTIFIER');
 .sub test :main
 .macro M()
     this gives a parse error
@@ -354,7 +355,7 @@ CODE
 /error, unexpected IDENTIFIER/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<OUTPUT, "unknown macro");
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'unknown macro');
 .sub test :main
 .macro M(A)
     .arg .A
@@ -366,7 +367,7 @@ CODE
 /in macro '.M'/
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "braces in param" );
+pir_output_is( <<'CODE', <<'OUTPUT', 'braces in param' );
 .macro M(A)
     print .A
 .endm
@@ -379,7 +380,7 @@ CODE
 foo
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "braces and comma, with a newline in param" );
+pir_output_is( <<'CODE', <<'OUTPUT', 'braces and comma, with a newline in param' );
 .macro M(A)
     .A
 .endm
@@ -393,7 +394,7 @@ CODE
 bar
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "braces and parenthesis in param" );
+pir_output_is( <<'CODE', <<'OUTPUT', 'braces and parenthesis in param' );
 .macro M(A)
     .A
 .endm
@@ -409,7 +410,7 @@ CODE
 foo
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "test that macros labels names can have the prefix \$" );
+pir_output_is( <<'CODE', <<'OUTPUT', 'test that macros labels names can have the prefix $' );
 .sub test :main
 .macro test_label_names()
     branch .$jump
@@ -424,7 +425,7 @@ CODE
 print this
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "test that macros labels names can have the prefix \$" );
+pir_output_is( <<'CODE', <<'OUTPUT', 'test that macros labels names can have the prefix $' );
 .sub test :main
 .macro SpinForever (Count)
     .local $LOOP: dec .COUNT # ".local $LOOP" defines a local label.
