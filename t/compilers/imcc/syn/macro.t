@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 33;
 
 # macro tests
 
@@ -433,6 +433,74 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'test that macros labels names can have the
 .endm
 .end
 CODE
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'call a sub in a macro' );
+.macro call_sub(L)
+   print "entering macro call_sub\n"
+   .L()
+   print "leaving macro call_sub\n"
+.endm
+
+.sub main :main
+  print_abc()
+  .call_sub(print_abc)
+.end
+
+.sub print_abc
+   print "abc\n"
+.end
+CODE
+abc
+entering macro call_sub
+abc
+leaving macro call_sub
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'set a sub as an attribute, in a macro' );
+
+.macro create_inst(inst_name,M)
+    print "entering macro create_inst\n"
+    .inst_name = new 'MyClass'
+    .const .Sub c3 = .M
+    setattribute .inst_name, 'MyFuncInMyClass', c3
+    print "leaving macro create_inst\n"
+.endm
+
+.sub main :main
+    say_twice( 'say_twice' )
+
+    .local pmc my_class
+    my_class = newclass 'MyClass'
+    addattribute my_class, 'MyFuncInMyClass'
+
+    .local pmc my_inst_1, my_func_1
+    .create_inst(my_inst_1, "say_twice")
+    my_func_1 = getattribute my_inst_1, 'MyFuncInMyClass'
+    my_func_1('my_func_1')
+
+    .local pmc my_inst_2, my_func_2
+    .create_inst(my_inst_2, "say_twice")
+    my_func_2 = getattribute my_inst_2, 'MyFuncInMyClass'
+    my_func_2('my_func_2')
+.end
+
+.sub say_twice
+   .param string msg
+
+   print msg
+   print ' '
+   print msg
+   print "\n"
+.end
+CODE
+say_twice say_twice
+entering macro create_inst
+leaving macro create_inst
+my_func_1 my_func_1
+entering macro create_inst
+leaving macro create_inst
+my_func_2 my_func_2
 OUTPUT
 
 # Local Variables:
