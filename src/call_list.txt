@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2005, The Perl Foundation.
+# Copyright (C) 2002-2007, The Perl Foundation.
 # $Id$
 
 # Function signature declarations for Parrot Native Call Interface.
@@ -422,6 +422,10 @@ l ttl	#  unsigned long mysql_escape_string(char *to,const char *from, unsigned l
 l pttl	#  unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,const char *from, unsigned long length)
 v t	#  void mysql_debug(const char *debug)
 # --- end mysqlclient library ---
+
+i v     # void function returning int like fork()
+i i3i   # POSIX's waitpid
+i ibi   # POSIX's read
 
 # win32
 l lttl
