@@ -107,7 +107,7 @@ needed.
 
 =head2 Garbage Collection
 
-Parrot provides garbage collection, meaning that Parrot programs to do not need
+Parrot provides garbage collection, meaning that Parrot programs do not need
 to free memory explicitly; it will be freed when it is no longer in use (that
 is, no longer referenced) whenever the garbage collector runs.
 
@@ -256,7 +256,7 @@ with a C<#> are comments.
       .local int maxnum
       maxnum = 10
 
-      # Some named registers we'll use. Note how we can declare many
+      # We'll use some named registers. Note that we can declare many
       # registers of the same type on one line.
       .local int i, total, temp
       total = 0
