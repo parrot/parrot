@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Config;
 use Parrot::Test tests => 31;
@@ -14,11 +15,11 @@ use Parrot::Test tests => 31;
 pir_output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
 .sub test :main
 .macro answer()
-	print	42
-	print	"\n"
+    print    42
+    print    "\n"
 .endm
-	.answer()
-	end
+    .answer()
+    end
 .end
 CODE
 42
@@ -27,11 +28,11 @@ OUTPUT
 pir_output_is( <<'CODE', <<OUTPUT, "macro, one unused parameter, literal term" );
 .sub test :main
 .macro answer(A)
-	print	42
+    print    42
 .endm
-	.answer(42)
-	print	"\n"
-	end
+    .answer(42)
+    print    "\n"
+    end
 .end
 CODE
 42
@@ -40,12 +41,12 @@ OUTPUT
 pir_output_is( <<'CODE', <<OUTPUT, "macro, one unused parameter, register term" );
 .sub test :main
 .macro answer(A)
-	print	42
+    print    42
 .endm
-	set	I0, 43
-	.answer(I0)
-	print	"\n"
-	end
+    set    I0, 43
+    .answer(I0)
+    print    "\n"
+    end
 .end
 CODE
 42
@@ -54,11 +55,11 @@ OUTPUT
 pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, literal" );
 .sub test :main
 .macro answer(A)
-	print	.A
+    print    .A
 .endm
-	.answer(42)
-	print	"\n"
-	end
+    .answer(42)
+    print    "\n"
+    end
 .end
 CODE
 42
@@ -67,12 +68,12 @@ OUTPUT
 pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, register" );
 .sub test :main
 .macro answer(A)
-	print	.A
+    print    .A
 .endm
-	set	I0,42
-	.answer(I0)
-	print	"\n"
-	end
+    set    I0,42
+    .answer(I0)
+    print    "\n"
+    end
 .end
 CODE
 42
@@ -81,14 +82,14 @@ OUTPUT
 pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, called twice" );
 .sub test :main
 .macro answer(A)
-	print	.A
-	print	"\n"
-	inc	.A
+    print    .A
+    print    "\n"
+    inc    .A
 .endm
-	set	I0,42
-	.answer(I0)
-	.answer(I0)
-	end
+    set    I0,42
+    .answer(I0)
+    .answer(I0)
+    end
 .end
 CODE
 42
@@ -98,14 +99,14 @@ OUTPUT
 pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, label" );
 .sub test :main
 .macro answer(A)
-	ne	I0,42,.$done
-	print	.A
-	print	"\n"
+    ne    I0,42,.$done
+    print    .A
+    print    "\n"
 .local $done:
 .endm
-	set	I0,42
-	.answer(I0)
-	end
+    set    I0,42
+    .answer(I0)
+    end
 .end
 CODE
 42
@@ -114,15 +115,15 @@ OUTPUT
 pir_output_is( <<'CODE', <<OUTPUT, "macro, one used parameter run twice, label" );
 .sub test :main
 .macro answer(A)
-	ne	I0,42,.$done
-	print	.A
-	print	"\n"
+    ne    I0,42,.$done
+    print    .A
+    print    "\n"
 .local $done:
 .endm
-	set	I0,42
-	.answer(I0)
-	.answer(I0)
-	end
+    set    I0,42
+    .answer(I0)
+    .answer(I0)
+    end
 .end
 CODE
 42
@@ -177,12 +178,12 @@ OUTPUT
 open FOO, ">", "macro.tempfile";    # Clobber previous
 print FOO <<'ENDF';
 .macro multiply(A,B)
-	new P0, .Float
-	set P0, .A
-	new P1, .Float
-	set P1, .B
-	new P2, .Float
-	mul P2, P1, P0
+    new P0, .Float
+    set P0, .A
+    new P1, .Float
+    set P1, .B
+    new P2, .Float
+    mul P2, P1, P0
 .endm
 ENDF
 close FOO;
@@ -220,7 +221,7 @@ pir_output_is( <<'CODE', <<OUTPUT, ".newlex" );
 .macro newlex(ID, CLASS)
     .sym .CLASS .ID
     .ID = new .CLASS
-    # store_lex -1, .ID , .ID	# how to stringify .ID
+    # store_lex -1, .ID , .ID    # how to stringify .ID
 .endm
     .newlex(var, Undef)
     var = 10
@@ -370,7 +371,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "braces in param" );
     print .A
 .endm
 .sub test :main
-	$S0 = "foo\n"
+    $S0 = "foo\n"
     .M({$S0})
     end
 .end
@@ -383,9 +384,9 @@ pir_output_is( <<'CODE', <<OUTPUT, "braces and comma, with a newline in param" )
     .A
 .endm
 .sub test :main
-	$S0 = "foo\n"
+    $S0 = "foo\n"
     .M({set $S0, "bar\n"
-		print $S0})
+    print $S0})
     end
 .end
 CODE
@@ -402,7 +403,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "braces and parenthesis in param" );
 .end
 
 .sub foo
-	print "foo\n"
+    print "foo\n"
 .end
 CODE
 foo
