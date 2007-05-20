@@ -34,7 +34,9 @@ syn keyword pirPMC self
 
 syn keyword pirOp   goto if unless global addr
 
-syn match pirDirective  /\.\(sub\|endm\|pcc_sub\|macro\|end\|emit\|eom\)/
+syn match pirDirectiveSub    /\.\(sub\|end\s*$\)/
+syn match pirDirectiveMacro  /\.\(macro\|endm\)/
+syn match pirDirective  /\.\(pcc_sub\|emit\|eom\)/
 syn match pirDirective  /\.\(local\|sym\|const\|lex\|global\|globalconst\)/
 syn match pirDirective  /\.\(endnamespace\|namespace\)/
 syn match pirDirective  /\.\(param\|arg\|return\|yield\)/
@@ -43,7 +45,7 @@ syn match pirDirective  /\.\(pcc_begin\|pcc_call\|pcc_end\|invocant\|meth_call\|
 syn match pirDirective  /\.\(pcc_begin_return\|pcc_end_return\)/
 syn match pirDirective  /\.\(pcc_begin_yield\|pcc_end_yield\)/
 
-syn match pirDirective  /:\(main\|method\|load\|anon\|multi\|immediate\|outer\|lex\)/
+syn match pirDirective  /:\(main\|method\|load\|init\|anon\|multi\|immediate\|outer\|lex\|vtable\)/
 syn match pirDirective  /:\(flat\|slurpy\|optional\|opt_flag\|named\)/
 
 " Macro invocation
@@ -92,11 +94,20 @@ if version >= 508 || !exists("did_pasm_syntax_inits")
   HiLink pirStringSpecial   Special
   HiLink pirNumber          Number
   HiLink pirDirective       Macro
+  HiLink pirDirectiveSub    Macro
+  HiLink pirDirectiveMacro  Macro
   HiLink pirOp              Conditional
 
   delcommand HiLink
 endif
 
 let b:current_syntax = "pir"
+
+" Folding rules
+syn region foldManual  start=/^\s*#.*{{{/ end=/^\s*#.*}}}/ contains=ALL keepend fold
+syn region foldMakro   start=/\.macro/ end=/\.endm/ contains=ALLBUT,pirDirectiveMacro keepend fold
+syn region foldSub     start=/\.sub/ end=/\.end/ contains=ALLBUT,pirDirectiveSub,pirDirectiveMacro keepend fold
+syn region foldIf      start=/^\s*if.*goto\s*\z(\I\i*\)\s*$/ end=/^\s*\z1:\s*$/ contains=ALLBUT,pirDirectiveSub,pirDirectiveMacro keepend fold
+syn region foldUnless  start=/^\s*unless.*goto\s*\z(\I\i*\)\s*$/ end=/^\s*\z1:\s*$/ contains=ALLBUT,pirDirectiveSub,pirDirectiveMacro keepend fold
 
 " Ops -- dynamically generated from ops2vim.pl
