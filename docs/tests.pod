@@ -130,9 +130,59 @@ Note that it's always a good idea to output "done" to confirm that the compiled
 code executed completely. When mixing C<printf> and C<PIO_printf> always append
 a C<fflush(stdout);> after the former.
 
-=head2 Test Perl5 helpers
+=head2 Test Perl5 components
 
-Perl5 unit tests are in F<t/perl/*.t>.
+At the present time most, if not all, of the programs used to configure, build
+and install Parrot are written in Perl 5.  These programs take the form of
+executable files (F<*.pl>) and Perl modules (F<*.pm>) holding subroutines and
+other variables imported into the executable files.  Examples of such
+executable files can be found under F<tools/>; examples of such Perl modules
+can be found under F<lib/Parrot/>.
+
+All of these Perl 5 components ought to be tested.  Fortunately, over the last
+decade, under the leadership of Michael Schwern, chromatic, Andy Lester and
+many others, the Perl 5 community has developed a rigorous approach to testing
+in which:
+
+=over 4
+
+=item a
+
+Subroutines found in F<*.pl> files are extracted and placed in F<*.pm>
+modules.
+
+=item b
+
+Those subroutines are then imported back into the executable file.
+
+=item c
+
+Those subroutines are also imported into test files (F<*.t>) where are tests
+are run by Test::Builder-based modules such as Test::Simple and Test::More.
+
+=item d
+
+Those test files are run by Test::Harness-based functionality such as
+ExtUtils::MakeMaker's F<make test>, Module::Build's F<build test>, or
+Test::Harness's F<prove>.
+
+=item e
+
+The extent to which the test files exercise all statements in the Perl modules
+being tested is measured in coverage analysis using CPAN module Devel::Cover.
+
+=item f
+
+The underlying code is refactored and improved on the basis of the results of
+tests and coverage analysis.
+
+=back
+
+Tests reflecting this approach can be found in F<t/configure/>,
+F<t/postconfigure/>, F<t/tools/>, and so on.
+
+It is our objective to test all Perl 5 components of the Parrot distribution
+using the methodology above.
 
 =head2 Testing language implementations
 
