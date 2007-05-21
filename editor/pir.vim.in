@@ -20,7 +20,7 @@ endif
 syntax clear
 
 syn include @Pod syntax/pod.vim
-syn region pirPod start="^=[a-z]" end="^=cut" keepend contains=@Pod
+syn region pirPod start="^=[a-z]" end="^=cut" keepend contains=@Pod fold
 
 syn keyword pirType int float num string pmc
 syn match   pirPMC  /\.\(Compiler\|Continuation\|Coroutine\|CSub\|NCI\|Eval\|Sub\|Scratchpad\)/
