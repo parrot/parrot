@@ -116,8 +116,7 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
     lua_checkudata(narg, fh, 'ParrotIO')
     ret =  getattribute fh, 'data'
     unless null ret goto L1
-    $S0 = concat funcname, ": closed file"
-    lua_error($S0)
+    lua_error(funcname, ": closed file")
 L1:
     .return (ret)
 .end
@@ -518,10 +517,7 @@ _handler:
     .local pmc e
     .local string s
     .get_results (e, s)
-    $S0 = concat "cannot open ", $S0
-    $S0 = concat ": "
-    $S0 = concat s
-    lua_error($S0)
+    lua_error("cannot open ", $S0, ": ", s)
 .end
 
 .sub 'dir_aux' :anon :lex :outer(dir)

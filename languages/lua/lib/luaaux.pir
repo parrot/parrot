@@ -16,23 +16,17 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .HLL 'Lua', 'lua_group'
 
 
-=item C<lua_argerror (narg, extramsg)>
+=item C<lua_argerror (narg, extramsg, ...)>
 
 =cut
 
 .sub 'lua_argerror'
     .param int narg
-    .param string extramsg
+    .param pmc extramsg :slurpy
     $S1 = narg
-    $S0 = "bad argument #" . $S1
-    $S0 .= " to '"
     new $P0, .Lua
-    $S1 = $P0.'caller'()
-    $S0 .= $S1
-    $S0 .= "' ("
-    $S0 .= extramsg
-    $S0 .= ")"
-    lua_error($S0)
+    $S0 = $P0.'caller'()
+    lua_error("bad argument #", $S1, " to '", $S0, "' (", extramsg :flat, ")")
 .end
 
 
@@ -96,10 +90,7 @@ L3:
     inc i
     goto L1
 L2:
-    $S0 = "invalid option '"
-    concat $S0, name
-    concat $S0, "'"
-    lua_argerror(narg, $S0)
+    lua_argerror(narg, "invalid option '", name, "'")
 .end
 
 
@@ -175,15 +166,16 @@ L1:
 .end
 
 
-=item C<lua_error (message)>
+=item C<lua_error (message, ...)>
 
 =cut
 
 .sub 'lua_error'
-    .param string message
+    .param pmc message :slurpy
+    $S0 = join '', message
     .local pmc ex
     ex = new .Exception
-    ex['_message'] =  message
+    ex['_message'] =  $S0
     throw ex
 .end
 
@@ -427,10 +419,7 @@ L1:
     .param int narg
     .param string got
     .param string expec
-    $S0 = expec
-    concat $S0, " expected, got "
-    concat $S0, got
-    lua_argerror(narg, $S0)
+    lua_argerror(narg, expec, " expected, got ", got)
 .end
 
 

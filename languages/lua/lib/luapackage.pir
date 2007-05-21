@@ -130,10 +130,7 @@ L2:
     $P0 = $P0[$P1]
     $I0 = isa $P0, 'LuaString'
     if $I0 goto L1
-    $S0 = "'package."
-    $S0 .= pname
-    $S0 .= "' must be a string"
-    lua_error($S0)
+    lua_error("'package.", pname, "' must be a string")
 L1:
     .local string path
     .local string tmpl
@@ -188,13 +185,7 @@ L4:
     .param string name
     .param string filename
     .param string msg
-    $S0 = "error loading module '"
-    $S0 .= name
-    $S0 .= "' from file '"
-    $S0 .= filename
-    $S0 .= "':\n\t"
-    $S0 .= msg
-    lua_error($S0)
+    lua_error("error loading module '", name, "' from file '", filename, "':\n\t", msg)
 .end
 
 .sub 'loader_Lua' :anon
@@ -350,10 +341,7 @@ each option is a function to be applied over the module.
     $P0 = global '_G'
     m = lua_findtable($P0, $S1)
     unless null m goto L2
-    $S0 = "name conflict for module '"
-    $S0 .= $S1
-    $S0 .= "'"
-    lua_error($S0)
+    lua_error("name conflict for module '", $S1, "'")
 L2:
     _LOADED[name] = m
 L1:
@@ -432,10 +420,7 @@ any loader for the module, then C<require> signals an error.
     unless $I0 goto L1
     $I0 = isa ret, 'LuaUserdata'
     unless $I0 goto L2
-    $S0 = "loop or previous error loading module '"
-    $S0 .= $S1
-    $S0 .= "'"
-    lua_error($S0)
+    lua_error("loop or previous error loading module '", $S1, "'")
 L2:
     # package is already loaded
     .return (ret)
@@ -456,12 +441,8 @@ L3:
     $P0 = loaders[i]    # get a loader
     $I0 = isa $P0, 'LuaNil'
     unless $I0 goto L4
-    $S0 = "module '"
-    $S0 .= $S1
-    $S0 .= "' not found:"
-    $S1 = msg
-    $S0 .= $S1
-    lua_error($S0)
+    $S0 = msg
+    lua_error("module '", $S1, "' not found:", $S0)
 L4:
     new $P1, .LuaNil
     $P1 = $P0(modname)  # call it

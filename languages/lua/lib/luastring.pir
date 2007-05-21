@@ -512,9 +512,7 @@ L11:
     buff = sprintf form, $P1
     goto L6
 L10:
-    $S1 = "invalid option '%" . $S0
-    $S1 .= "' to 'format'"
-    lua_error($S1)
+    lua_error("invalid option '%", $S0, "' to 'format'")
 L6:
     b .= buff
     inc idx
@@ -793,11 +791,8 @@ L7:
     if $I0 goto L8
     $I0 = isa $P1, 'LuaNumber'
     if $I0 goto L8
-    $S0 = "invalid replacement value (a "
     $S1 = typeof $P1
-    $S0 .= $S1
-    $S0 .= ")"
-    lua_error($S0)
+    lua_error("invalid replacement value (a ", $S1, ")")
 L8:
     $S1 = b
     $I0 = match.'from'()

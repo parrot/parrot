@@ -464,10 +464,7 @@ L2:
     goto L2
 L1:
     unless d < 0 goto L3
-    $S0 = "field '"
-    $S0 .= key
-    $S0 .= "' missing in date table"
-    lua_error($S0)
+    lua_error("field '", key, "' missing in date table")
 L3:
     ret = d
 L2:
