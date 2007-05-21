@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -1373,9 +1373,9 @@ PDB_unescape(char *string)
 /*
 
 =item C<size_t
-PDB_disassemble_op(Interp *interp, char* dest, int space,
-                   op_info_t* info, opcode_t* op,
-                   PDB_file_t *file, opcode_t* code_start, int full_name)>
+PDB_disassemble_op(Interp *interp, char *dest, int space,
+                   op_info_t *info, opcode_t *op,
+                   PDB_file_t *file, opcode_t *code_start, int full_name)>
 
 Disassembles C<op>.
 
@@ -1384,16 +1384,16 @@ Disassembles C<op>.
 */
 
 size_t
-PDB_disassemble_op(Interp *interp, char* dest, int space,
-                   op_info_t* info, opcode_t* op,
-                   PDB_file_t *file, opcode_t* code_start, int full_name)
+PDB_disassemble_op(Interp *interp, char *dest, int space,
+                   op_info_t *info, opcode_t *op,
+                   PDB_file_t *file, opcode_t *code_start, int full_name)
 {
-    int size = 0;
-    int j;
     const char *p;
+    int         j;
+    int         size = 0;
 
     /* Write the opcode name */
-    p = full_name ? info->full_name : info->name;
+    p     = full_name ? info->full_name : info->name;
     strcpy(dest, p);
     size += strlen(p);
 
@@ -1401,12 +1401,13 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
 
     /* Concat the arguments */
     for (j = 1; j < info->op_count; j++) {
-        char buf[256];
-        INTVAL i = 0;
-        FLOATVAL f;
-        PMC* k;
+        char      buf[256];
+        INTVAL    i = 0;
+        FLOATVAL  f;
+        PMC      *k;
 
         assert(size + 2 < space);
+
         switch (info->types[j-1]) {
         case PARROT_ARG_I:
             dest[size++] = 'I';
@@ -1428,23 +1429,27 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
             {
                 if (file) {
                     dest[size++] = 'L';
-                    i = PDB_add_label(file, op, op[j]);
+                    i            = PDB_add_label(file, op, op[j]);
                 }
                 else if (code_start) {
                     dest[size++] = 'O';
                     dest[size++] = 'P';
-                    i = op[j] + (op - code_start);
+                    i            = op[j] + (op - code_start);
                 }
                 else {
-                    if (op[j] > 0) dest[size++] = '+';
+                    if (op[j] > 0)
+                        dest[size++] = '+';
                     i = op[j];
                 }
             }
 
             /* Convert the integer to a string */
             INTEGER:
-            if (i == 0) i = (INTVAL) op[j];
+            if (i == 0)
+                i = (INTVAL) op[j];
+
             assert(size + 20 < space);
+
             sprintf(&dest[size], INTVAL_FMT, i);
             size += strlen(&dest[size]);
 
@@ -1454,10 +1459,11 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
                 && (strcmp(info->name, "infix") == 0
                     || strcmp(info->name, "n_infix") == 0)) {
                 assert(size + 20 < space);
+
                 sprintf(&dest[size], " [%s]",
                         /* [kludge: the "2+" skips the leading underscores.  --
                            rgr, 6-May-07.] */
-                        2+Parrot_MMD_method_name(interp, op[j]));
+                        2 + Parrot_MMD_method_name(interp, op[j]));
                 size += strlen(&dest[size]);
             }
             break;
@@ -1473,7 +1479,8 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
             if (interp->code->const_table->constants[op[j]]->
                     u.string->strlen)
             {
-                char* escaped = PDB_escape(interp->code->const_table->
+                char *escaped;
+                escaped = PDB_escape(interp->code->const_table->
                            constants[op[j]]->u.string->strstart,
                            interp->code->const_table->
                            constants[op[j]]->u.string->strlen);
@@ -1486,15 +1493,12 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
             dest[size++] = '"';
             break;
         case PARROT_ARG_PC:
-            Parrot_snprintf(interp, buf, sizeof (buf),
-                            "PMC_CONST(%d)", op[j]);
+            Parrot_snprintf(interp, buf, sizeof (buf), "PMC_CONST(%d)", op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
             break;
-
         case PARROT_ARG_K:
-            dest[size-1] = '[';
-            Parrot_snprintf(interp, buf, sizeof (buf),
+            dest[size-1] = '['; Parrot_snprintf(interp, buf, sizeof (buf),
                             "P" INTVAL_FMT, op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
@@ -1502,7 +1506,7 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
             break;
         case PARROT_ARG_KC:
             dest[size-1] = '[';
-            k = interp->code->const_table->constants[op[j]]->u.key;
+            k            = interp->code->const_table->constants[op[j]]->u.key;
             while (k) {
                 switch (PObj_get_FLAGS(k)) {
                 case 0:
@@ -1522,8 +1526,8 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
                 case KEY_string_FLAG:
                     dest[size++] = '"';
                     {
-                        char *temp = string_to_cstring(interp,
-                                                       PMC_str_val(k));
+                        char *temp;
+                        temp = string_to_cstring(interp, PMC_str_val(k));
                         strcpy(&dest[size], temp);
                         string_cstring_free(temp);
                     }
@@ -1558,23 +1562,22 @@ PDB_disassemble_op(Interp *interp, char* dest, int space,
                     dest[size++] = '?';
                     break;
                 }
-                k = (PMC *)PMC_data(k);
-                if (k) dest[size++] = ';';
+                k = PMC_data_typed(k, PMC *);
+                if (k)
+                    dest[size++] = ';';
             }
             dest[size++] = ']';
             break;
         case PARROT_ARG_KI:
             dest[size - 1] = '[';
-            Parrot_snprintf(interp, buf, sizeof (buf),
-                            "I" INTVAL_FMT, op[j]);
+            Parrot_snprintf(interp, buf, sizeof (buf), "I" INTVAL_FMT, op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
             dest[size++] = ']';
             break;
         case PARROT_ARG_KIC:
             dest[size - 1] = '[';
-            Parrot_snprintf(interp, buf, sizeof (buf),
-                            INTVAL_FMT, op[j]);
+            Parrot_snprintf(interp, buf, sizeof (buf), INTVAL_FMT, op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
             dest[size++] = ']';
@@ -1605,83 +1608,89 @@ Disassemble the bytecode.
 void
 PDB_disassemble(Interp *interp, const char *command)
 {
-    PDB_t *pdb = interp->pdb;
-    PDB_file_t *pfile;
-    PDB_line_t *pline,*newline;
+    PDB_t       *pdb = interp->pdb;
+    PDB_file_t  *pfile;
+    PDB_line_t  *pline, *newline;
     PDB_label_t *label;
-    opcode_t *code_end,*pc = interp->code->base.data;
+    opcode_t    *code_end;
+    opcode_t    *pc = interp->code->base.data;
 
     const unsigned int default_size = 32768;
     size_t space;  /* How much space do we have? */
     size_t size, alloced, n;
 
-    pfile = (PDB_file_t *)mem_sys_allocate(sizeof (PDB_file_t));
-    pline = (PDB_line_t *)mem_sys_allocate(sizeof (PDB_line_t));
+    pfile = mem_allocate_typed(PDB_file_t);
+    pline = mem_allocate_typed(PDB_line_t);
 
     /* If we already got a source, free it */
     if (pdb->file)
         PDB_free_file(interp);
 
-    pfile->source = (char *)mem_sys_allocate(default_size);
-    alloced = space = default_size;
-    pfile->line = pline;
-    pfile->label = NULL;
-    pfile->size = 0;
-    pline->number = 1;
+    pline->number        = 1;
+    pfile->line          = pline;
+    pfile->label         = NULL;
+    pfile->size          = 0;
+    pfile->source        = (char *)mem_sys_allocate(default_size);
     pline->source_offset = 0;
-    pline->label = NULL;
 
-    code_end = pc + interp->code->base.size;
+    alloced              = space = default_size;
+    code_end             = pc + interp->code->base.size;
+
     while (pc != code_end) {
-        /* Grow it early*/
+        /* Grow it early */
         if (space < default_size) {
             alloced += default_size;
-            space += default_size;
+            space   += default_size;
             pfile->source = (char *)mem_sys_realloc(pfile->source, alloced);
         }
 
         size = PDB_disassemble_op(interp, pfile->source + pfile->size,
                 space, &interp->op_info_table[*pc], pc, pfile, NULL, 1);
-        space -= size;
+        space       -= size;
         pfile->size += size;
         pfile->source[pfile->size - 1] = '\n';
 
         /* Store the opcode of this line */
         pline->opcode = pc;
-        n = interp->op_info_table[*pc].op_count;
+        n             = interp->op_info_table[*pc].op_count;
+
         ADD_OP_VAR_PART(interp, interp->code, pc, n);
         pc += n;
+
         /* Prepare for next line */
-        newline = (PDB_line_t *)mem_sys_allocate(sizeof (PDB_line_t));
-        newline->number = pline->number + 1;
-        newline->label  = NULL;
-        newline->next   = NULL;
-        pline->next = newline;
-        pline = newline;
+        newline              = mem_allocate_typed(PDB_line_t);
+        newline->label       = NULL;
+        newline->next        = NULL;
+        newline->number      = pline->number + 1;
+        pline->next          = newline;
+        pline                = newline;
         pline->source_offset = pfile->size;
     }
 
     /* Add labels to the lines they belong to */
     label = pfile->label;
+
     while (label) {
         /* Get the line to apply the label */
         pline = pfile->line;
+
         while (pline && pline->opcode != label->opcode)
             pline = pline->next;
 
         if (!(pline)) {
             PIO_eprintf(interp,
                         "Label number %li out of bounds.\n", label->number);
+            /* TODO: free allocated memory */
             return;
         }
 
         pline->label = label;
 
-        label = label->next;
+        label        = label->next;
     }
 
     pdb->state |= PDB_SRC_LOADED;
-    pdb->file = pfile;
+    pdb->file   = pfile;
 }
 
 /*
@@ -1706,21 +1715,25 @@ PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset)
             return label->number;
         label = label->next;
     }
+
     /* Allocate a new label */
-    label = file->label;
-    _new = mem_allocate_typed(PDB_label_t);
+    label        = file->label;
+    _new         = mem_allocate_typed(PDB_label_t);
     _new->opcode = cur_opcode + offset;
     _new->next   = NULL;
+
     if (label) {
         while (label->next)
             label = label->next;
+
         _new->number = label->number + 1;
-        label->next = _new;
+        label->next  = _new;
     }
     else {
-        file->label = _new;
+        file->label  = _new;
         _new->number = 1;
     }
+
     return _new->number;
 }
 
@@ -1737,35 +1750,39 @@ Frees any allocated source files.
 void
 PDB_free_file(Interp *interp)
 {
-    PDB_line_t *nline, *line;
+    PDB_file_t  *nfile,  *file = interp->pdb->file;
+    PDB_line_t  *nline,  *line;
     PDB_label_t *nlabel, *label;
-    PDB_file_t *nfile, *file = interp->pdb->file;
 
     while (file) {
         /* Free all of the allocated line structures */
         line = file->line;
+
         while (line) {
             nline = line->next;
             mem_sys_free(line);
-            line = nline;
+            line  = nline;
         }
 
         /* Free all of the allocated label structures */
         label = file->label;
+
         while (label) {
             nlabel = label->next;
             mem_sys_free(label);
-            label = nlabel;
+            label  = nlabel;
         }
 
         /* Free the remaining allocated portions of the file structure */
         if (file->sourcefilename)
             mem_sys_free(file->sourcefilename);
+
         if (file->source)
             mem_sys_free(file->source);
+
         nfile = file->next;
         mem_sys_free(file);
-        file = nfile;
+        file  = nfile;
     }
 
     /* Make sure we don't end up pointing at garbage memory */
@@ -1786,24 +1803,26 @@ Load a source code file.
 void
 PDB_load_source(Interp *interp, const char *command)
 {
-    FILE *file;
-    char f[255];
-    int i, c;
-    unsigned long size = 0;
-    PDB_t *pdb = interp->pdb;
-    PDB_file_t *pfile;
-    PDB_line_t *pline,*newline;
-    opcode_t *pc = pdb->cur_opcode;
+    FILE          *file;
+    char           f[255];
+    int            i, c;
+    PDB_file_t    *pfile;
+    PDB_line_t    *pline, *newline;
+    PDB_t         *pdb  = interp->pdb;
+    opcode_t      *pc   = pdb->cur_opcode;
+    unsigned long  size = 0;
 
     /* If there was a file already loaded or the bytecode was
        disassembled, free it */
     if (pdb->file)
         PDB_free_file(interp);
+
     /* Get the name of the file */
     for (i = 0; command[i]; i++)
         f[i] = command[i];
 
     f[i] = '\0';
+
     /* open the file */
     file = fopen(f,"r");
 
@@ -1813,11 +1832,11 @@ PDB_load_source(Interp *interp, const char *command)
         return;
     }
 
-    pfile = (PDB_file_t *)mem_sys_allocate_zeroed(sizeof (PDB_file_t));
-    pline = (PDB_line_t *)mem_sys_allocate_zeroed(sizeof (PDB_line_t));
+    pfile = mem_allocate_zeroed_typed(PDB_file_t);
+    pline = mem_allocate_zeroed_typed(PDB_line_t);
 
     pfile->source = (char *)mem_sys_allocate(1024);
-    pfile->line = pline;
+    pfile->line   = pline;
     pline->number = 1;
 
     while ((c = fgetc(file)) != EOF) {
@@ -1837,23 +1856,22 @@ PDB_load_source(Interp *interp, const char *command)
             if (PDB_hasinstruction(pfile->source + pline->source_offset)) {
                 size_t n;
                 pline->opcode = pc;
-                n = interp->op_info_table[*pc].op_count;
+                n             = interp->op_info_table[*pc].op_count;
                 ADD_OP_VAR_PART(interp, interp->code, pc, n);
                 pc += n;
             }
-            newline =
-                    (PDB_line_t *)mem_sys_allocate_zeroed(sizeof (PDB_line_t));
-            newline->number = pline->number + 1;
-            pline->next = newline;
-            pline = newline;
+            newline              = mem_allocate_zeroed_typed(PDB_line_t);
+            newline->number      = pline->number + 1;
+            pline->next          = newline;
+            pline                = newline;
             pline->source_offset = pfile->size;
-            pline->opcode = NULL;
-            pline->label = NULL;
+            pline->opcode        = NULL;
+            pline->label         = NULL;
         }
     }
 
     pdb->state |= PDB_SRC_LOADED;
-    pdb->file = pfile;
+    pdb->file   = pfile;
 }
 
 /*
@@ -1907,11 +1925,12 @@ Show lines from the source code file.
 void
 PDB_list(Interp *interp, const char *command)
 {
-    char *c;
-    long line_number;
-    unsigned long i,n = 10;
-    PDB_t *pdb = interp->pdb;
-    PDB_line_t *line;
+    char          *c;
+    long           line_number;
+    unsigned long  i;
+    PDB_line_t    *line;
+    PDB_t         *pdb = interp->pdb;
+    unsigned long  n   = 10;
 
     if (!pdb->file) {
         PIO_eprintf(interp, "No source file loaded\n");
@@ -1921,12 +1940,11 @@ PDB_list(Interp *interp, const char *command)
     /* set the list line if provided */
     if (isdigit((int) *command)) {
         line_number = atol(command) - 1;
-        if (line_number < 0) {
+        if (line_number < 0)
             pdb->file->list_line = 0;
-        }
-        else {
+        else
             pdb->file->list_line = (unsigned long) line_number;
-        }
+
         na(command);
     }
     else {
@@ -1940,7 +1958,8 @@ PDB_list(Interp *interp, const char *command)
     }
 
     /* if n is zero, we simply return, as we don't have to print anything */
-    if (n == 0) return;
+    if (n == 0)
+        return;
 
     line = pdb->file->line;
 
@@ -1953,11 +1972,16 @@ PDB_list(Interp *interp, const char *command)
         /* If it has a label print it */
         if (line->label)
             PIO_eprintf(interp, "L%li:\t",line->label->number);
+
         c = pdb->file->source + line->source_offset;
+
         while (*c != '\n')
             PIO_eprintf(interp, "%c",*(c++));
+
         PIO_eprintf(interp, "\n");
+
         line = line->next;
+
         if (i++ == n)
             break;
     }
@@ -1999,7 +2023,7 @@ PDB_eval(Interp *interp, const char *command)
 
     if (eval_pf) {
         old_cs = Parrot_switch_to_cs(interp, eval_pf->cur_cs, 1);
-        run = eval_pf->cur_cs->base.data;
+        run    = eval_pf->cur_cs->base.data;
         DO_OP(run,interp);
         Parrot_switch_to_cs(interp, old_cs, 1);
         /* TODO destroy packfile */
@@ -2007,9 +2031,9 @@ PDB_eval(Interp *interp, const char *command)
 #endif
 
     run = PDB_compile(interp, command);
-    if (run) {
+
+    if (run)
         DO_OP(run,interp);
-    }
 }
 
 /*
@@ -2031,18 +2055,18 @@ which generates a malloced string.
 opcode_t *
 PDB_compile(Interp *interp, const char *command)
 {
-    STRING *buf;
-    const char *end = "\nend\n";
-    PMC * compiler;
-    STRING *key = const_string(interp, "PASM");
-    PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interp,
+    STRING     *buf;
+    const char *end      = "\nend\n";
+    STRING     *key      = const_string(interp, "PASM");
+    PMC *compreg_hash    = VTABLE_get_pmc_keyed_int(interp,
             interp->iglobals, IGLOBALS_COMPREG_HASH);
+    PMC        *compiler = VTABLE_get_pmc_keyed_str(interp, compreg_hash, key);
 
-    compiler = VTABLE_get_pmc_keyed_str(interp, compreg_hash, key);
     if (!VTABLE_defined(interp, compiler)) {
         fprintf(stderr, "Couldn't find PASM compiler");
         return NULL;
     }
+
     buf = Parrot_sprintf_c(interp, "%s%s", command, end);
 
     return VTABLE_invoke(interp, compiler, buf);
@@ -2062,10 +2086,9 @@ Extend the constant table.
 int
 PDB_extend_const_table(Interp *interp)
 {
-    int k;
+    int k = ++interp->code->const_table->const_count;
 
     /* Update the constant count and reallocate */
-    k = ++interp->code->const_table->const_count;
     if (interp->code->const_table->constants) {
         interp->code->const_table->constants =
             (PackFile_Constant **)mem_sys_realloc(interp->code->const_table->constants,
@@ -2079,34 +2102,35 @@ PDB_extend_const_table(Interp *interp)
     /* Allocate a new constant */
     interp->code->const_table->constants[--k] =
         PackFile_Constant_new(interp);
+
     return k;
 }
-
 
 /*
 
 =item C<static void
-dump_string(Interp *interp, STRING* s)>
+dump_string(Interp *interp, STRING *s)>
 
-Dumps the buflen, flags, bufused, strlen, offset associated
-with a string and the string itself.
+Dumps the buflen, flags, bufused, strlen, and offset associated with a string
+and the string itself.
 
 =cut
 
 */
 
 static void
-dump_string(Interp *interp, STRING* s)
+dump_string(Interp *interp, STRING *s)
 {
-    if (s) {
-        PIO_eprintf(interp, "\tBuflen  =\t%12ld\n",PObj_buflen(s));
-        PIO_eprintf(interp, "\tFlags   =\t%12ld\n", PObj_get_FLAGS(s));
-        PIO_eprintf(interp, "\tBufused =\t%12ld\n",s->bufused);
-        PIO_eprintf(interp, "\tStrlen  =\t%12ld\n",s->strlen);
-        PIO_eprintf(interp, "\tOffset  =\t%12d\n",
+    if (!s)
+        return;
+
+    PIO_eprintf(interp, "\tBuflen  =\t%12ld\n", PObj_buflen(s));
+    PIO_eprintf(interp, "\tFlags   =\t%12ld\n", PObj_get_FLAGS(s));
+    PIO_eprintf(interp, "\tBufused =\t%12ld\n", s->bufused);
+    PIO_eprintf(interp, "\tStrlen  =\t%12ld\n", s->strlen);
+    PIO_eprintf(interp, "\tOffset  =\t%12d\n",
                     (char*) s->strstart - (char*) PObj_bufstart(s));
-        PIO_eprintf(interp, "\tString  =\t%S\n", s);
-    }
+    PIO_eprintf(interp, "\tString  =\t%S\n", s);
 }
 
 /*
@@ -2123,13 +2147,12 @@ Print an entry from the user stack.
 void
 PDB_print_user_stack(Interp *interp, const char *command)
 {
-    long depth = 0;
-    Stack_Chunk_t *chunk = CONTEXT(interp->ctx)->user_stack;
     Stack_Entry_t *entry;
+    long           depth = 0;
+    Stack_Chunk_t *chunk = CONTEXT(interp->ctx)->user_stack;
 
-    if (*command) {
+    if (*command)
         depth = atol(command);
-    }
 
     entry = stack_entry(interp, chunk, (INTVAL)depth);
 
@@ -2140,12 +2163,10 @@ PDB_print_user_stack(Interp *interp, const char *command)
 
     switch (entry->entry_type) {
         case STACK_ENTRY_INT:
-            PIO_eprintf(interp, "Integer\t=\t%8vi\n",
-                        UVal_int(entry->entry));
+            PIO_eprintf(interp, "Integer\t=\t%8vi\n", UVal_int(entry->entry));
             break;
         case STACK_ENTRY_FLOAT:
-            PIO_eprintf(interp, "Float\t=\t%8.4vf\n",
-                        UVal_num(entry->entry));
+            PIO_eprintf(interp, "Float\t=\t%8.4vf\n", UVal_num(entry->entry));
             break;
         case STACK_ENTRY_STRING:
             PIO_eprintf(interp, "String =\n");
@@ -2180,9 +2201,7 @@ Print interp registers.
 void
 PDB_print(Interp *interp, const char *command)
 {
-    const char *s;
-
-    s = GDB_P(interp->pdb->debugee, command);
+    const char *s = GDB_P(interp->pdb->debugee, command);
     PIO_eprintf(interp, "%s\n", s);
 }
 
@@ -2244,9 +2263,8 @@ void
 PDB_help(Interp *interp, const char *command)
 {
     unsigned long c;
-    const char* temp;
+    const char   *temp = command;
 
-    temp = command;
     command = parse_command(command, &c);
 
     switch (c) {
@@ -2343,25 +2361,25 @@ the -t option.\n");
             /* C89: strings need to be 509 chars or less */
             PIO_eprintf(interp, "\
 List of commands:\n\
-    disassemble -- disassemble the bytecode\n\
-    load -- load a source code file\n\
-    list (l) -- list the source code file\n\
-    run (r) -- run the program\n\
-    break (b) -- add a breakpoint\n\
-    watch (w) -- add a watchpoint\n\
-    delete (d) -- delete a breakpoint\n\
-    disable -- disable a breakpoint\n\
-    enable  -- reenable a disabled breakpoint\n\
+    disassemble  -- disassemble the bytecode\n\
+    load         -- load a source code file\n\
+    list     (l) -- list the source code file\n\
+    run      (r) -- run the program\n\
+    break    (b) -- add a breakpoint\n\
+    watch    (w) -- add a watchpoint\n\
+    delete   (d) -- delete a breakpoint\n\
+    disable      -- disable a breakpoint\n\
+    enable       -- reenable a disabled breakpoint\n\
     continue (c) -- continue the program execution\n");
             PIO_eprintf(interp, "\
-    next (n) -- run the next instruction\n\
-    eval (e) -- run an instruction\n\
-    trace (t) -- trace the next instruction\n\
-    print (p) -- print the interpreter registers\n\
-    stack (s) -- examine the stack\n\
-    info -- print interpreter information\n\
-    quit (q) -- exit the debugger\n\
-    help (h) -- print this help\n\n\
+    next     (n) -- run the next instruction\n\
+    eval     (e) -- run an instruction\n\
+    trace    (t) -- trace the next instruction\n\
+    print    (p) -- print the interpreter registers\n\
+    stack    (s) -- examine the stack\n\
+    info         -- print interpreter information\n\
+    quit     (q) -- exit the debugger\n\
+    help     (h) -- print this help\n\n\
 Type \"help\" followed by a command name for full documentation.\n\n");
             break;
         default:
@@ -2384,15 +2402,14 @@ Prints a backtrace of the interp's call chain.
 void
 PDB_backtrace(Interp *interp)
 {
-    STRING *str;
-    PMC *sub;
-    PMC *old = PMCNULL;
-    int rec_level = 0;
-    parrot_context_t *ctx;
+    STRING           *str;
+    PMC              *old       = PMCNULL;
+    int               rec_level = 0;
 
     /* information about the current sub */
-    sub = interpinfo_p(interp, CURRENT_SUB);
-    ctx = CONTEXT(interp->ctx);
+    PMC              *sub = interpinfo_p(interp, CURRENT_SUB);
+    parrot_context_t *ctx = CONTEXT(interp->ctx);
+
     if (!PMC_IS_NULL(sub)) {
         str = Parrot_Context_infostr(interp, ctx);
         if (str)
@@ -2403,12 +2420,17 @@ PDB_backtrace(Interp *interp)
     while (1) {
         Parrot_cont *sub_cont;
         sub = ctx->current_cont;
+
         if (!sub)
             break;
+
         sub_cont = PMC_cont(sub);
+
         if (!sub_cont)
             break;
+
         str = Parrot_Context_infostr(interp, sub_cont->to_ctx);
+
         if (!str)
             break;
 
@@ -2431,12 +2453,13 @@ PDB_backtrace(Interp *interp)
         /* get the next Continuation */
         ctx = PMC_cont(sub)->to_ctx;
         old = sub;
+
         if (!ctx)
             break;
     }
-    if (rec_level != 0) {
+
+    if (rec_level != 0)
         PIO_eprintf(interp, "... call repeated %d times\n", rec_level);
-    }
 }
 
 /*
@@ -2494,45 +2517,48 @@ static PDB_breakpoint_t *gdb_bps;
  */
 static int
 GDB_B(Interp *interp, char *s) {
+    int               nr;
+    opcode_t         *pc;
     PDB_breakpoint_t *bp, *newbreak;
-    int nr;
-    opcode_t *pc;
 
     if ((unsigned long)s < 0x10000) {
         /* HACK alarm  pb 45 is passed as the integer not a string */
-        unsigned long offs = (unsigned long)s;
         /* TODO check if in bounds */
-        pc = interp->code->base.data + offs;
+        pc = interp->code->base.data + (unsigned long)s;
 
         if (!gdb_bps) {
-            nr = 0;
-            newbreak = mem_allocate_typed(PDB_breakpoint_t);
+            nr             = 0;
+            newbreak       = mem_allocate_typed(PDB_breakpoint_t);
             newbreak->prev = NULL;
             newbreak->next = NULL;
-            gdb_bps = newbreak;
+            gdb_bps        = newbreak;
         }
         else {
             /* create new one */
             for (nr = 0, bp = gdb_bps; ; bp = bp->next, ++nr) {
                 if (bp->pc == pc)
                     return nr;
+
                 if (!bp->next)
                     break;
             }
+
             ++nr;
-            newbreak = mem_allocate_typed(PDB_breakpoint_t);
+            newbreak       = mem_allocate_typed(PDB_breakpoint_t);
             newbreak->prev = bp;
             newbreak->next = NULL;
-            bp->next = newbreak;
+            bp->next       = newbreak;
         }
+
         newbreak->pc = pc;
         newbreak->id = *pc;
-        *pc = PARROT_OP_trap;
+        *pc          = PARROT_OP_trap;
+
         return nr;
     }
+
     return -1;
 }
-
 
 /*
 
@@ -2551,7 +2577,7 @@ F<include/parrot/debug.h>, F<src/pdb.c> and F<ops/debug.ops>.
 =item Start of rewrite - leo 2005.02.16
 
 The debugger now uses its own interpreter. User code is run in
-Interp* debugee. We have:
+Interp *debugee. We have:
 
   debug_interp->pdb->debugee->debugger
     ^                            |
