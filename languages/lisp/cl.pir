@@ -49,69 +49,95 @@
   .STREAM(value,stream)
   .DEFVAR(symbol, package, "*STANDARD-OUTPUT*", value)
 
-  .DEFUN(symbol, package, "APPLY", _apply)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "APPLY", _apply)
+  .DEFUN(symbol, package, "APPLY", "_apply")
 
-  .DEFUN(symbol, package, "ATOM", _atom)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "ATOM", _atom)
+  .DEFUN(symbol, package, "ATOM", "_atom")
 
-  .DEFUN(symbol, package, "BOUNDP", _boundp)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "BOUNDP", _boundp)
+  .DEFUN(symbol, package, "BOUNDP", "_boundp")
 
-  .DEFUN(symbol, package, "CAR", _car)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "CAR", _car)
+  .DEFUN(symbol, package, "CAR", "_car")
 
-  .DEFUN(symbol, package, "CDR", _cdr)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "CDR", _cdr)
+  .DEFUN(symbol, package, "CDR", "_cdr")
 
-  .DEFUN(symbol, package, "CHAR", _char)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "CHAR", _char)
+  .DEFUN(symbol, package, "CHAR", "_char")
 
-  .DEFUN(symbol, package, "CONS", _cons)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "CONS", _cons)
+  .DEFUN(symbol, package, "CONS", "_cons")
 
-  .DEFUN(symbol, package, "EQ", _eq)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "EQ", _eq)
+  .DEFUN(symbol, package, "EQ", "_eq")
 
-  .DEFUN(symbol, package, "EVAL", _eval)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "EVAL", _eval)
+  .DEFUN(symbol, package, "EVAL", "_eval")
 
   .SPECIAL_FORM(symbol, package, "FUNCTION", _function)
 
-  .DEFUN(symbol, package, "GENSYM", _gensym)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "GENSYM", _gensym)
+  .DEFUN(symbol, package, "GENSYM", "_gensym")
 
   .SPECIAL_FORM(symbol, package, "IF", _if)
 
   .SPECIAL_FORM(symbol, package, "LET", _let)
 
-  .DEFUN(symbol, package, "LIST", _list)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "LIST", _list)
+  .DEFUN(symbol, package, "LIST", "_list")
 
-  .DEFUN(symbol, package, "MOD", _modulus)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "MOD", _modulus)
+  .DEFUN(symbol, package, "MOD", "_modulus")
 
-  .DEFUN(symbol, package, "NULL", _null)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "NULL", _null)
+  .DEFUN(symbol, package, "NULL", "_null")
 
-  .DEFUN(symbol, package, "PRINT", _print)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "PRINT", _print)
+  .DEFUN(symbol, package, "PRINT", "_print")
 
   .SPECIAL_FORM(symbol, package, "PROGN", _progn)
 
   .SPECIAL_FORM(symbol, package, "QUOTE", _quote)
 
-  .DEFUN(symbol, package, "READ", _read)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "READ", _read)
+  .DEFUN(symbol, package, "READ", "_read")
 
-  .DEFUN(symbol, package, "READ-DELIMITED-LIST",_read_delimited_list)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "READ-DELIMITED-LIST",_read_delimited_list)
+  .DEFUN(symbol, package, "READ-DELIMITED-LIST","_read_delimited_list")
 
-  .DEFUN(symbol, package, "RPLACA", _rplaca)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "RPLACA", _rplaca)
+  .DEFUN(symbol, package, "RPLACA", "_rplaca")
 
-  .DEFUN(symbol, package, "RPLACD", _rplacd)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "RPLACD", _rplacd)
+  .DEFUN(symbol, package, "RPLACD", "_rplacd")
 
   .SPECIAL_FORM(symbol, package, "SETQ",_setq )
 
-  .DEFUN(symbol, package, "TYPE-OF", _type_of)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "TYPE-OF", _type_of)
+  .DEFUN(symbol, package, "TYPE-OF", "_type_of")
 
-  .DEFUN(symbol, package, "VALUES", _values)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "VALUES", _values)
+  .DEFUN(symbol, package, "VALUES", "_values")
 
-  .DEFUN(symbol, package, "QUIT", _quit)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "QUIT", _quit)
+  .DEFUN(symbol, package, "QUIT", "_quit")
 
-  .DEFUN(symbol, package, "/", _divide)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "/", _divide)
+  .DEFUN(symbol, package, "/", "_divide")
 
-  .DEFUN(symbol, package, "-", _subtract)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "-", _subtract)
+  .DEFUN(symbol, package, "-", "_subtract")
 
-  .DEFUN(symbol, package, "*", _multiply)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "*", _multiply)
+  .DEFUN(symbol, package, "*", "_multiply")
 
-  .DEFUN(symbol, package, "+", _add)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "+", _add)
+  .DEFUN(symbol, package, "+", "_add")
 
-  .DEFUN(symbol, package, "=", _equal)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "=", _equal)
+  .DEFUN(symbol, package, "=", "_equal")
 
   .return(1)
 .end

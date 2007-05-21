@@ -734,7 +734,6 @@ A PIR compiler using Parrot compiler tools.
 Fairly complete, about 95%. Note that this implementation is not exactly the same
 as the language as accepted by IMCC. 
 
-
 =item Last verified with parrot version
 
 0.4.9
@@ -742,6 +741,34 @@ as the language as accepted by IMCC.
 =item location
 
 languages/PIR
+
+=back
+
+
+=head2 PJS
+
+=over 4
+
+=item Description
+
+PJS is a JavaScript (ECMAScript) implementation. It makes use of flex/bison for parsing.
+It can only do basic things right now (variables, if-else, loops, try-catch-finally, eval, etc.).
+
+=item Status
+
+Started.
+
+=item Last verified with parrot version
+
+0.4.12
+
+=item Location
+
+L<http://users.fulladsl.be/spb1622/pjs/>
+
+=item Wiki
+
+L<http://rakudo.org/parrot/index.cgi?javascript>
 
 =back
 

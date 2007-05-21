@@ -52,39 +52,56 @@
 
   .DEFVAR(symbol, package, "*INSIDE-BACKQUOTE-LIST*", value)
 
-  .DEFUN(symbol, package, "%GET-OBJECT-ATTRIBUTE", _get_object_attr)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%GET-OBJECT-ATTRIBUTE", _get_object_attr)
+  .DEFUN(symbol, package, "%GET-OBJECT-ATTRIBUTE", "_get_object_attr")
 
-  .DEFUN(symbol, package, "%SET-OBJECT-ATTRIBUTE", _set_object_attr)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%SET-OBJECT-ATTRIBUTE", _set_object_attr)
+  .DEFUN(symbol, package, "%SET-OBJECT-ATTRIBUTE", "_set_object_attr")
 
-  .DEFUN(symbol, package, "%MAKE-HASH-TABLE", _make_hash)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%MAKE-HASH-TABLE", _make_hash)
+  .DEFUN(symbol, package, "%MAKE-HASH-TABLE", "_make_hash")
 
-  .DEFUN(symbol, package, "%SET-HASH", _set_hash)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%SET-HASH", _set_hash)
+  .DEFUN(symbol, package, "%SET-HASH", "_set_hash")
 
-  .DEFUN(symbol, package, "%GET-HASH", _get_hash)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%GET-HASH", _get_hash)
+  .DEFUN(symbol, package, "%GET-HASH", "_get_hash")
 
-  .DEFUN(symbol, package, "%ALIAS-PACKAGE", _alias_package)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%ALIAS-PACKAGE", _alias_package)
+  .DEFUN(symbol, package, "%ALIAS-PACKAGE", "_alias_package")
 
-  .DEFUN(symbol, package, "%FIND-PACKAGE", _find_package)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%FIND-PACKAGE", _find_package)
+  .DEFUN(symbol, package, "%FIND-PACKAGE", "_find_package")
 
-  .DEFUN(symbol, package, "%MAKE-PACKAGE", _make_package)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%MAKE-PACKAGE", _make_package)
+  .DEFUN(symbol, package, "%MAKE-PACKAGE", "_make_package")
 
-  .DEFUN(symbol, package, "%USE-PACKAGE", _use_package)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%USE-PACKAGE", _use_package)
+  .DEFUN(symbol, package, "%USE-PACKAGE", "_use_package")
 
-  .DEFUN(symbol, package, "%EXPORT", _export)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%EXPORT", _export)
+  .DEFUN(symbol, package, "%EXPORT", "_export")
 
-  .DEFUN(symbol, package, "%OPEN-FILE", _open_file)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%OPEN-FILE", _open_file)
+  .DEFUN(symbol, package, "%OPEN-FILE", "_open_file")
 
-  .DEFUN(symbol, package, "%PEEK", _peek)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%PEEK", _peek)
+  .DEFUN(symbol, package, "%PEEK", "_peek")
 
-  .DEFUN(symbol, package, "%CLOSE", _close)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%CLOSE", _close)
+  .DEFUN(symbol, package, "%CLOSE", "_close")
 
-  .DEFUN(symbol, package, "%STRING-EQUAL", _string_equal)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%STRING-EQUAL", _string_equal)
+  .DEFUN(symbol, package, "%STRING-EQUAL", "_string_equal")
 
-  .DEFUN(symbol, package, "%MAKE-MACRO", _make_macro)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%MAKE-MACRO", _make_macro)
+  .DEFUN(symbol, package, "%MAKE-MACRO", "_make_macro")
 
   # XXX - THESE SHOULD BE REMOVED AND CONVERTED TO PROPER LISP FUNCTIONS
-  .DEFUN(symbol, package, "ERROR", _raise_error)
-  .DEFUN(symbol, package, "LOAD", _load)
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "ERROR", _raise_error)
+  .DEFUN(symbol, package, "ERROR", "_raise_error")
+  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "LOAD", _load)
+  .DEFUN(symbol, package, "LOAD", "_load")
 
   .return(1)
 .end

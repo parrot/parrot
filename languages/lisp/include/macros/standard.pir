@@ -62,8 +62,7 @@ Sets R to true (the TRUE symbol).
   .sym pmc _functionp
   .sym pmc _namep
 
-  # VALID_IN_PARROT_0_2_0 .FUNCTION(_functionp, .L)
-  .FUNCTION(_functionp, ".L")
+  .FUNCTION(_functionp, .L)
 
   _namep = new "LispString"
   _namep = .N
