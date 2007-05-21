@@ -30,9 +30,9 @@ rule statement {
   | <do_block>
   | <for_stat>
   | <repeat_stat>
+  | <function_stat>
   | <local_stat>
   | <expression_stat>
-  | <function_stat>
 }
 
 rule function_stat {
@@ -40,8 +40,16 @@ rule function_stat {
 }
 
 rule last_statement {
-  | (<'return'>) <expression_list>?
-  | (<'break'>)
+  | <return_statement>
+  | <break_statement>
+}
+
+rule return_statement {
+  <'return'> <expression_list>?
+}
+
+token break_statement {
+  <'break'>
 }
 
 rule do_block {
@@ -49,7 +57,7 @@ rule do_block {
 }
 
 rule local_stat {
-  <local_function> | <local_declaration>
+  <'local'> [ <local_function> | <local_declaration> ]
 }
 
 rule expression_stat {
@@ -98,11 +106,11 @@ rule else_block {
 }
 
 rule local_declaration {
-  <'local'> <name> [ <','> <name> ]* [ <'='> <expression_list> ]?
+  <name> [ <','> <name> ]* [ <'='> <expression_list> ]?
 }
 
 rule local_function {
-  <'local'> <'function'> <name> <function_body>
+  <'function'> <name> <function_body>
 }
 
 rule functionname {
@@ -134,8 +142,8 @@ rule tablefield {
 }
 
 rule parameter_list {
-  | <name_list> [ <','> <'...'> ]?
-  | <'...'>
+  | <name_list> [ <','> <vararg> ]?
+  | <vararg>
 }
 
 rule function_body {
@@ -173,10 +181,10 @@ rule primary_expression {
 rule simple_expression {
   | <number>
   | <string>
-  | <'nil'>
-  | <'true'>
-  | <'false'>
-  | <'...'>
+  | <nil>
+  | <true>
+  | <false>
+  | <vararg>
   | <constructor>
   | <'function'> <function_body>
   | <primary_expression>
@@ -191,35 +199,50 @@ Operator precedence is implemented using an optable.
 
 rule 'expression'   is optable { ... }
 
-proto 'term:'       is precedence('=')      is parsed(&simple_expression) { ... }
+proto 'term:'       is precedence('=')
+                    is parsed(&simple_expression)              { ... }
 
-proto 'infix:^'     is looser('term:')
-                    is assoc('right')           { ... }
+proto 'infix:^'     is looser('term:')      is pirop('pow')     is assoc('right')
+                    is returns('.LuaNumber')                    { ... }
 
-proto 'prefix:not'  is looser('infix:^')    is pirop('not')      { ... }
-proto 'prefix:#'    is equiv('prefix:not')  is pirop('elements') { ... } # does this work?? it needs an I register
-proto 'prefix:-'    is equiv('prefix:not')  is pirop('neg')      { ... }
+proto 'prefix:not'  is looser('infix:^')    is pirop('not')
+                    is returns('.LuaBoolean')                   { ... }
+proto 'prefix:#'    is equiv('prefix:not')  is pirop('len')
+                    is returns('.LuaNumber')                    { ... }
+proto 'prefix:-'    is equiv('prefix:not')  is pirop('neg')
+                    is returns('.LuaNumber')                    { ... }
 
-proto 'infix:*'     is looser('prefix:not') is pirop('mul') { ... }
-proto 'infix:/'     is equiv('infix:*')     is pirop('div') { ... }
-proto 'infix:%'     is equiv('infix:*')     is pirop('mod') { ... }
+proto 'infix:*'     is looser('prefix:not') is pirop('mul')
+                    is returns('.LuaNumber')                    { ... }
+proto 'infix:/'     is equiv('infix:*')     is pirop('div')
+                    is returns('.LuaNumber')                    { ... }
+proto 'infix:%'     is equiv('infix:*')     is pirop('mod')
+                    is returns('.LuaNumber')                    { ... }
 
-proto 'infix:+'     is looser('infix:*')    is pirop('add') { ... }
-proto 'infix:-'     is equiv('infix:+')     is pirop('sub') { ... }
+proto 'infix:+'     is looser('infix:*')    is pirop('add')
+                    is returns('.LuaNumber')                    { ... }
+proto 'infix:-'     is equiv('infix:+')     is pirop('sub')
+                    is returns('.LuaNumber')                    { ... }
 
-proto 'infix:..'    is looser('infix:+')    is pirop('concat')
-                    is assoc('right')           { ... }
+proto 'infix:..'    is looser('infix:+')    is pirop('concat')  is assoc('right')
+                    is returns('.LusString')                    { ... }
 
-proto 'infix:<'     is looser('infix:..')       { ... }
-proto 'infix:>'     is equiv('infix:<')         { ... }
-proto 'infix:<='    is equiv('infix:<')         { ... }
-proto 'infix:>='    is equiv('infix:<')         { ... }
-proto 'infix:~='    is equiv('infix:<')         { ... }
-proto 'infix:=='    is equiv('infix:<')         { ... }
+proto 'infix:<'     is looser('infix:..')   is pirop('islt')
+                    is returns('.LuaBoolean')                   { ... }
+proto 'infix:>'     is equiv('infix:<')     is pirop('isgt')
+                    is returns('.LuaBoolean')                   { ... }
+proto 'infix:<='    is equiv('infix:<')     is pirop('isle')
+                    is returns('.LuaBoolean')                   { ... }
+proto 'infix:>='    is equiv('infix:<')     is pirop('isge')
+                    is returns('.LuaBoolean')                   { ... }
+proto 'infix:~='    is equiv('infix:<')     is pirop('isne')
+                    is returns('.LuaBoolean')                   { ... }
+proto 'infix:=='    is equiv('infix:<')     is pirop('iseq')
+                    is returns('.LuaBoolean')                   { ... }
 
-proto 'infix:and'   is looser('infix:<')        { ... }
+proto 'infix:and'   is looser('infix:<')    is past('if')       { ... }
 
-proto 'infix:or'    is looser('infix:and')      { ... }
+proto 'infix:or'    is looser('infix:and')  is past('unless')   { ... }
 
 
 =head2 HELPER RULES
@@ -284,6 +307,21 @@ token string {
   | <long_string>
 }
 
+token nil {
+  <'nil'>
+}
+
+token true {
+  <'true'>
+}
+
+token false {
+  <'false'>
+}
+
+token vararg {
+  <'...'>
+}
 
 token ws {
     [ \s+
