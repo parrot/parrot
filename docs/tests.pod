@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -52,13 +52,20 @@ it might also make sense to create a new F<*.t> file.
 
 =head1 How to write a test
 
+Test scripts must emit text that conforms to the C<Test Anything Protocol>.
+Test scripts are currently usually written in Perl 5 or PIR.
+The Perl 5 module C<Parrot::Test>
+and the PIR module C<Test;More> help with writing tests.
+
 The testing framework needs to know how many tests it should expect.  So the
 number of planned tests needs to be incremented when adding a new test. This
 is done near the top of a test file, in a line that looks like:
 
   use Parrot::Test tests => 8;
 
-=head2 Parrot Assembler
+for Perl 5 based test scripts.
+
+=head2 Testing Parrot Assembler
 
 PASM tests are mostly used for testing ops.  Appropriate test files for basic
 ops are F<t/op/*.t>.  Perl Magic Cookies are tested in F<t/pmc/*.t>.  Add the
@@ -74,7 +81,7 @@ new test like this:
     1
     OUTPUT
 
-=head2 Parrot Intermediate Representation
+=head2 Testing Parrot Intermediate Representation
 
 Writing tests in B<PIR> is more convenient. This is done with
 C<pir_output_is> and friends.
@@ -89,7 +96,7 @@ C<pir_output_is> and friends.
     hi
     OUT
 
-=head2 C source tests
+=head2 Testing C source
 
 C source tests are usually located in F<t/src/*.t>.  A simple test looks like:
 
@@ -130,7 +137,7 @@ Note that it's always a good idea to output "done" to confirm that the compiled
 code executed completely. When mixing C<printf> and C<PIO_printf> always append
 a C<fflush(stdout);> after the former.
 
-=head2 Test Perl5 components
+=head2 Testing Perl5 components
 
 At the present time most, if not all, of the programs used to configure, build
 and install Parrot are written in Perl 5.  These programs take the form of
@@ -187,7 +194,7 @@ using the methodology above.
 =head2 Testing language implementations
 
 Language implementations are usually tested with 
-C<language_output_is> and friends..
+C<language_output_is> and friends.
 
 =head1 Ideal tests:
 
@@ -232,6 +239,8 @@ See L<Test::More> on how to do that.
 =head1 SEE ALSO
 
 L<http://qa.perl.org/>
+L<http://testanything.org/>
+L<http://en.wikipedia.org/wiki/Test_Anything_Protocol>
 F<t/TESTS.STATUS.pod>
 F<t/README>
 
