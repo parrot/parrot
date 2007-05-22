@@ -141,9 +141,9 @@ a C<fflush(stdout);> after the former.
 
 At the present time most, if not all, of the programs used to configure, build
 and install Parrot are written in Perl 5.  These programs take the form of
-executable files (F<*.pl>) and Perl modules (F<*.pm>) holding subroutines and
-other variables imported into the executable files.  Examples of such
-executable files can be found under F<tools/>; examples of such Perl modules
+program files (F<*.pl>) and Perl modules (F<*.pm>) holding subroutines and
+other variables imported into the program files.  Examples of such
+program files can be found under F<tools/>; examples of such Perl modules
 can be found under F<lib/Parrot/>.
 
 All of these Perl 5 components ought to be tested.  Fortunately, over the last
@@ -160,7 +160,7 @@ modules.
 
 =item b
 
-Those subroutines are then imported back into the executable file.
+Those subroutines are then imported back into the program file.
 
 =item c
 
