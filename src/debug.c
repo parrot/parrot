@@ -44,7 +44,7 @@ static const char* GDB_P(Interp *interp, const char *s);
 
 /*
 
-=item C<static char* nextarg(char* command)>
+=item C<static char* nextarg(char *command)>
 
 Returns the position just past the current argument in a PASM
 instruction. This is not the same as C<na()>, above, which is intended
@@ -55,19 +55,21 @@ for debugger commands. This function is used for C<eval>.
 */
 
 static char*
-nextarg(char* command)
+nextarg(char *command)
 {
     while (*command && (isalnum((int) *command) || *command == ',' ||
         *command == ']'))
             command++;
+
     while (*command && isspace((int) *command))
         command++;
+
     return command;
 }
 
 /*
 
-=item C<static const char* skip_ws(const char* str)>
+=item C<static const char* skip_ws(const char *str)>
 
 Returns the pointer past any whitespace.
 
@@ -76,16 +78,17 @@ Returns the pointer past any whitespace.
 */
 
 static const char*
-skip_ws(const char* str)
+skip_ws(const char *str)
 {
     while (*str && isspace((int) *str))
         str++;
+
     return str;
 }
 
 /*
 
-=item C<static const char* skip_command(const char* str)>
+=item C<static const char* skip_command(const char *str)>
 
 Returns the pointer past the current debugger command. (This is an
 alternative to the C<na()> macro above.)
@@ -95,18 +98,20 @@ alternative to the C<na()> macro above.)
 */
 
 static const char*
-skip_command(const char* str)
+skip_command(const char *str)
 {
     while (*str && !isspace((int) *str))
         str++;
+
     while (*str && isspace((int) *str))
         str++;
+
     return str;
 }
 
 /*
 
-=item C<static const char* parse_int(const char* str, int* intP)>
+=item C<static const char* parse_int(const char *str, int *intP)>
 
 Parse an C<int> out of a string and return a pointer to just after the
 C<int>.
@@ -116,9 +121,9 @@ C<int>.
 */
 
 static const char*
-parse_int(const char* str, int* intP)
+parse_int(const char *str, int *intP)
 {
-    char* end;
+    char *end;
 
     *intP = strtol(str, &end, 0);
 
@@ -128,8 +133,7 @@ parse_int(const char* str, int* intP)
 /*
 
 =item C<static const char*
-parse_string(Interp *interp,
-             const char* str, STRING** strP)>
+parse_string(Interp *interp, const char *str, STRING **strP)>
 
 Parse a double-quoted string out of a C string and return a pointer to
 just after the string. The parsed string is converted to a Parrot
@@ -140,15 +144,16 @@ C<STRING>.
 */
 
 static const char*
-parse_string(Interp *interp,
-             const char* str, STRING** strP)
+parse_string(Interp *interp, const char *str, STRING **strP)
 {
-    const char* string;
+    const char *string;
 
     if (*str != '"')
         return NULL;
+
     str++;
     string = str;
+
     while (*str && *str != '"') {
         if (*str == '\\' && str[1])
             str += 2;
@@ -160,13 +165,14 @@ parse_string(Interp *interp,
 
     if (*str)
         str++;
+
     return str;
 }
 
 /*
 
 =item C<static const char*
-parse_key(Interp *interp, const char* str, PMC** keyP)>
+parse_key(Interp *interp, const char *str, PMC **keyP)>
 
 Parse an aggregate key out of a string and return a pointer to just
 after the key. Currently only string and integer keys are allowed.
@@ -176,20 +182,24 @@ after the key. Currently only string and integer keys are allowed.
 */
 
 static const char*
-parse_key(Interp *interp, const char* str, PMC** keyP)
+parse_key(Interp *interp, const char *str, PMC **keyP)
 {
     *keyP = NULL;
+
     if (*str != '[')
         return NULL;
-    str++; /* Skip [ */
+
+    /* Skip [ */
+    str++;
+
     if (*str == '"') {
-        STRING* string;
-        str = parse_string(interp, str, &string);
+        STRING *string;
+        str   = parse_string(interp, str, &string);
         *keyP = key_new_string(interp, string);
     }
     else if (isdigit((int) *str)) {
         int value;
-        str = parse_int(str, &value);
+        str   = parse_int(str, &value);
         *keyP = key_new_integer(interp, (INTVAL) value);
     }
     else {
@@ -198,13 +208,14 @@ parse_key(Interp *interp, const char* str, PMC** keyP)
 
     if (*str != ']')
         return NULL;
+
     return ++str;
 }
 
 /*
 
 =item C<static const char*
-parse_command(const char* command, unsigned long* cmdP)>
+parse_command(const char *command, unsigned long *cmdP)>
 
 Convert the command at the beginning of a string into a numeric value
 that can be used as a switch key for fast lookup.
@@ -214,9 +225,9 @@ that can be used as a switch key for fast lookup.
 */
 
 static const char*
-parse_command(const char* command, unsigned long* cmdP)
+parse_command(const char *command, unsigned long *cmdP)
 {
-    int i;
+    int           i;
     unsigned long c = 0;
 
     if (*command == '\0') {
@@ -258,11 +269,11 @@ The input is saved in C<< pdb->cur_command >>.
 void
 PDB_get_command(Interp *interp)
 {
-    unsigned int i;
-    char *c;
-    PDB_t *pdb = interp->pdb;
-    PDB_line_t *line;
-    int ch;
+    unsigned int  i;
+    int           ch;
+    char         *c;
+    PDB_t        *pdb = interp->pdb;
+    PDB_line_t   *line;
 
     /* flush the buffered data */
     fflush(stdout);
@@ -270,7 +281,7 @@ PDB_get_command(Interp *interp)
     /* not used any more */
     if (pdb->last_command && *pdb->cur_command) {
         mem_sys_free(pdb->last_command);
-    pdb->last_command = NULL;
+        pdb->last_command = NULL;
     }
 
     /* update the last command */
@@ -286,13 +297,15 @@ PDB_get_command(Interp *interp)
 
         PIO_eprintf(interp, "%li  ", line->number);
         c = pdb->file->source + line->source_offset;
+
         while (*c != '\n'  && c)
             PIO_eprintf(interp, "%c", *(c++));
     }
 
     i = 0;
 
-    c = (char *)mem_sys_allocate(255);  /* XXX who frees that */
+    /* XXX who frees that */
+    c = (char *)mem_sys_allocate(255);
 
     PIO_eprintf(interp, "\n(pdb) ");
 
@@ -304,12 +317,14 @@ PDB_get_command(Interp *interp)
     /* generate string (no more than 255 chars) */
      while (ch != EOF && ch != '\n' && (i < 255)) {
         c[i++] = ch;
-        ch = fgetc(stdin);
+        ch     = fgetc(stdin);
     }
 
     c[i] = '\0';
 
-    if (ch == -1) strcpy(c, "quit");
+    if (ch == -1)
+        strcpy(c, "quit");
+
     pdb->cur_command = c;
 }
 
@@ -329,9 +344,9 @@ Hash the command to make a simple switch calling the correct handler.
 void
 PDB_run_command(Interp *interp, const char *command)
 {
-    PDB_t *pdb = interp->pdb;
     unsigned long c;
-    const char* temp;
+    const char   *temp;
+    PDB_t        *pdb = interp->pdb;
 
     /* keep a pointer to the command, in case we need to report an error */
     temp = command;
@@ -339,7 +354,8 @@ PDB_run_command(Interp *interp, const char *command)
     /* get a number from what the user typed */
     command = parse_command(command, &c);
 
-    if (command) na(command);
+    if (command)
+        na(command);
 
     switch (c) {
         case c_disassemble:
@@ -412,8 +428,7 @@ PDB_run_command(Interp *interp, const char *command)
             break;
         default:
             PIO_eprintf(interp,
-                        "Undefined command: \"%s\".  Try \"help\".",
-                        temp);
+                        "Undefined command: \"%s\".  Try \"help\".", temp);
             break;
     }
 }
@@ -434,8 +449,8 @@ Inits the program if needed, runs the next N >= 1 operations and stops.
 void
 PDB_next(Interp *interp, const char *command)
 {
-    PDB_t *pdb = interp->pdb;
-    unsigned long n = 1;
+    unsigned long  n   = 1;
+    PDB_t         *pdb = interp->pdb;
 
     /* Init the program if it's not running */
     if (!(pdb->state & PDB_RUNNING))
@@ -467,8 +482,7 @@ PDB_next(Interp *interp, const char *command)
 /*
 
 =item C<void
-PDB_trace(Interp *interp,
-          const char *command)>
+PDB_trace(Interp *interp, const char *command)>
 
 Execute the next N operations; if no number is specified, it defaults to
 1.
@@ -478,24 +492,21 @@ Execute the next N operations; if no number is specified, it defaults to
 */
 
 void
-PDB_trace(Interp *interp,
-          const char *command)
+PDB_trace(Interp *interp, const char *command)
 {
-    PDB_t *pdb = interp->pdb;
-    unsigned long n = 1;
-    Interp *debugee;
+    unsigned long  n   = 1;
+    PDB_t         *pdb = interp->pdb;
+    Interp        *debugee;
 
     if (!(pdb->state & PDB_RUNNING))
-    {
         PDB_init(interp, command);
-    }
 
     if (command && isdigit((int) *command))
         n = atol(command);
 
     pdb->state &= ~PDB_STOPPED;
+    debugee     = pdb->debugee;
 
-    debugee = pdb->debugee;
     for (; n && pdb->cur_opcode; n--) {
         trace_op(debugee,
                 debugee->code->base.data,
@@ -527,8 +538,8 @@ PDB_condition_t *
 PDB_cond(Interp *interp, const char *command)
 {
     PDB_condition_t *condition;
-    int i, reg_number;
-    char str[255];
+    int              i, reg_number;
+    char             str[255];
 
     /* Return if no more arguments */
     if (!(command && *command)) {
@@ -537,7 +548,7 @@ PDB_cond(Interp *interp, const char *command)
     }
 
     /* Allocate new condition */
-    condition = (PDB_condition_t *)mem_sys_allocate(sizeof (PDB_condition_t));
+    condition = mem_allocate_typed(PDB_condition_t);
 
     switch (*command) {
         case 'i':
@@ -654,27 +665,30 @@ WRONG_REG:      PIO_eprintf(interp, "Register types don't agree\n");
                 mem_sys_free(condition);
                 return NULL;
         }
+
         /* Now we check and store the register number */
         reg_number = (int)atoi(++command);
+
         if (reg_number < 0) {
             PIO_eprintf(interp, "Out-of-bounds register\n");
             mem_sys_free(condition);
             return NULL;
         }
-        condition->value = (void *)mem_sys_allocate(sizeof (int));
+
+        condition->value         = mem_allocate_typed(int);
         *(int *)condition->value = reg_number;
     }
     /* If the first argument was an integer */
     else if (condition->type & PDB_cond_int) {
         /* This must be either an integer constant or register */
-        condition->value = (void *)mem_sys_allocate(sizeof (INTVAL));
-        *(INTVAL *)condition->value = (INTVAL)atoi(command);
-        condition->type |= PDB_cond_const;
+        condition->value             = mem_allocate_typed(INTVAL);
+        *(INTVAL *)condition->value  = (INTVAL)atoi(command);
+        condition->type             |= PDB_cond_const;
     }
     else if (condition->type & PDB_cond_num) {
-        condition->value = (void *)mem_sys_allocate(sizeof (FLOATVAL));
-        *(FLOATVAL *)condition->value = (FLOATVAL)atof(command);
-        condition->type |= PDB_cond_const;
+        condition->value               = mem_allocate_typed(FLOATVAL);
+        *(FLOATVAL *)condition->value  = (FLOATVAL)atof(command);
+        condition->type               |= PDB_cond_const;
     }
     else if (condition->type & PDB_cond_str) {
         for (i = 1; ((command[i] != '"') && (i < 255)); i++)
@@ -712,7 +726,7 @@ Set a watchpoint.
 void
 PDB_watchpoint(Interp *interp, const char *command)
 {
-    PDB_t *pdb = interp->pdb;
+    PDB_t           *pdb = interp->pdb;
     PDB_condition_t *condition;
 
     if (!(condition = PDB_cond(interp, command)))
@@ -739,11 +753,12 @@ Set a break point, the source code file must be loaded.
 void
 PDB_set_break(Interp *interp, const char *command)
 {
-    PDB_t *pdb = interp->pdb;
-    PDB_breakpoint_t *newbreak = NULL, *sbreak;
-    PDB_condition_t *condition;
-    PDB_line_t *line;
-    long ln,i;
+    PDB_t            *pdb      = interp->pdb;
+    PDB_breakpoint_t *newbreak = NULL;
+    PDB_breakpoint_t *sbreak;
+    PDB_condition_t  *condition;
+    PDB_line_t       *line;
+    long              ln, i;
 
     /* If no line number was specified, set it at the current line */
     if (command && *command) {
@@ -751,6 +766,7 @@ PDB_set_break(Interp *interp, const char *command)
 
         /* Move to the line where we will set the break point */
         line = pdb->file->line;
+
         for (i = 1; ((i < ln) && (line->next)); i++)
             line = line->next;
 
@@ -764,6 +780,7 @@ PDB_set_break(Interp *interp, const char *command)
     else {
         /* Get the line to set it */
         line = pdb->file->line;
+
         while (line->opcode != pdb->cur_opcode) {
             line = line->next;
             if (!line) {
@@ -779,7 +796,7 @@ PDB_set_break(Interp *interp, const char *command)
         line = line->next;
 
     /* Allocate the new break point */
-    newbreak = (PDB_breakpoint_t *)mem_sys_allocate(sizeof (PDB_breakpoint_t));
+    newbreak = mem_allocate_typed(PDB_breakpoint_t);
 
     na(command);
     condition = NULL;
@@ -788,42 +805,43 @@ PDB_set_break(Interp *interp, const char *command)
      * it should be an 'if', so we call another handler. */
     if (command && *command) {
         na(command);
-        if ((condition = PDB_cond(interp, command))) {
+        if ((condition = PDB_cond(interp, command)))
             newbreak->condition = condition;
-        }
     }
 
     /* If there are no other arguments, or if there isn't a valid condition,
        then condition will be NULL */
-    if (!condition) {
+    if (!condition)
         newbreak->condition = NULL;
-    }
 
     /* Set the address where to stop */
-    newbreak->pc = line->opcode;
+    newbreak->pc   = line->opcode;
+
     /* No next breakpoint */
     newbreak->next = NULL;
+
     /* Don't skip (at least initially) */
     newbreak->skip = 0;
 
     /* Add the breakpoint to the end of the list */
-    i = 0;
+    i      = 0;
     sbreak = pdb->breakpoint;
+
     if (sbreak) {
-        while (sbreak->next) {
+        while (sbreak->next)
             sbreak = sbreak->next;
-        }
+
         newbreak->prev = sbreak;
-        sbreak->next = newbreak;
-        i = sbreak->next->id = sbreak->id + 1;
+        sbreak->next   = newbreak;
+        i              = sbreak->next->id = sbreak->id + 1;
     }
     else {
-        newbreak->prev = NULL;
+        newbreak->prev  = NULL;
         pdb->breakpoint = newbreak;
-        i = pdb->breakpoint->id = 0;
+        i               = pdb->breakpoint->id = 0;
     }
 
-    PIO_eprintf(interp, "Breakpoint %li at line %li\n",i,line->number);
+    PIO_eprintf(interp, "Breakpoint %li at line %li\n", i, line->number);
 }
 
 /*
@@ -845,6 +863,7 @@ PDB_init(Interp *interp, const char *command)
     PDB_t *pdb = interp->pdb;
 
     UNUSED(command);
+
     /* Restart if we are already running */
     if (pdb->state & PDB_RUNNING)
         PIO_eprintf(interp, "Restarting\n");
@@ -856,8 +875,7 @@ PDB_init(Interp *interp, const char *command)
 /*
 
 =item C<void
-PDB_continue(Interp *interp,
-             const char *command)>
+PDB_continue(Interp *interp, const char *command)>
 
 Continue running the program. If a number is specified, skip that many
 breakpoints.
@@ -867,11 +885,10 @@ breakpoints.
 */
 
 void
-PDB_continue(Interp *interp,
-             const char *command)
+PDB_continue(Interp *interp, const char *command)
 {
     PDB_t *pdb = interp->pdb;
-    long ln;
+    long   ln;
 
     /* Skip any breakpoint? */
     if (command && *command) {
@@ -879,26 +896,20 @@ PDB_continue(Interp *interp,
             PIO_eprintf(interp, "No breakpoints to skip\n");
             return;
         }
+
         ln = atol(command);
-        PDB_skip_breakpoint(interp,ln);
+        PDB_skip_breakpoint(interp, ln);
     }
+
     /* Run while no break point is reached */
     while (!PDB_break(interp))
         DO_OP(pdb->cur_opcode, pdb->debugee);
 }
 
-
-/* PDB_find_breakpoint
- *
- * Find breakpoint number N; returns NULL if the breakpoint doesn't
- * exist or if no breakpoint was specified.
- *
- */
 /*
 
 =item C<PDB_breakpoint_t *
-PDB_find_breakpoint(Interp *interp,
-                      const char *command)>
+PDB_find_breakpoint(Interp *interp, const char *command)>
 
 Find breakpoint number N; returns C<NULL> if the breakpoint doesn't
 exist or if no breakpoint was specified.
@@ -908,31 +919,32 @@ exist or if no breakpoint was specified.
 */
 
 PDB_breakpoint_t *
-PDB_find_breakpoint(Interp *interp,
-                      const char *command)
+PDB_find_breakpoint(Interp *interp, const char *command)
 {
     PDB_breakpoint_t *breakpoint;
-    long n;
+    long              n;
 
     if (isdigit((int) *command)) {
-        n = atol(command);
+        n          = atol(command);
         breakpoint = interp->pdb->breakpoint;
+
         while (breakpoint && breakpoint->id != n)
             breakpoint = breakpoint->next;
+
         if (!breakpoint) {
             PIO_eprintf(interp, "No breakpoint number %ld", n);
             return NULL;
         }
+
         return breakpoint;
     }
     else {
         /* Report an appropriate error */
-        if (*command) {
+        if (*command)
             PIO_eprintf(interp, "Not a valid breakpoint");
-        }
-        else {
+        else
             PIO_eprintf(interp, "No breakpoint specified");
-        }
+
         return NULL;
     }
 }
@@ -940,8 +952,7 @@ PDB_find_breakpoint(Interp *interp,
 /*
 
 =item C<void
-PDB_disable_breakpoint(Interp *interp,
-                       const char *command)>
+PDB_disable_breakpoint(Interp *interp, const char *command)>
 
 Disable a breakpoint; it can be reenabled with the enable command.
 
@@ -950,16 +961,12 @@ Disable a breakpoint; it can be reenabled with the enable command.
 */
 
 void
-PDB_disable_breakpoint(Interp *interp,
-                       const char *command)
+PDB_disable_breakpoint(Interp *interp, const char *command)
 {
-    PDB_breakpoint_t *breakpoint;
+    PDB_breakpoint_t *breakpoint = PDB_find_breakpoint(interp, command);
 
-    breakpoint = PDB_find_breakpoint(interp, command);
-
-    if (breakpoint) {
+    if (breakpoint)
         breakpoint->skip = -1;
-    }
 
     return;
 }
@@ -967,8 +974,7 @@ PDB_disable_breakpoint(Interp *interp,
 /*
 
 =item C<void
-PDB_enable_breakpoint(Interp *interp,
-                      const char *command)>
+PDB_enable_breakpoint(Interp *interp, const char *command)>
 
 Reenable a disabled breakpoint; if the breakpoint was not disabled, has
 no effect.
@@ -978,23 +984,20 @@ no effect.
 */
 
 void
-PDB_enable_breakpoint(Interp *interp,
-                      const char *command)
+PDB_enable_breakpoint(Interp *interp, const char *command)
 {
-    PDB_breakpoint_t *breakpoint;
+    PDB_breakpoint_t *breakpoint = PDB_find_breakpoint(interp, command);
 
-    breakpoint = PDB_find_breakpoint(interp, command);
-    if (breakpoint && breakpoint->skip == -1) {
+    if (breakpoint && breakpoint->skip == -1)
         breakpoint->skip = 0;
-    }
+
     return;
 }
 
 /*
 
 =item C<void
-PDB_delete_breakpoint(Interp *interp,
-                      const char *command)>
+PDB_delete_breakpoint(Interp *interp, const char *command)>
 
 Delete a breakpoint.
 
@@ -1003,15 +1006,14 @@ Delete a breakpoint.
 */
 
 void
-PDB_delete_breakpoint(Interp *interp,
-                      const char *command)
+PDB_delete_breakpoint(Interp *interp, const char *command)
 {
-    PDB_breakpoint_t *breakpoint;
-    PDB_line_t *line;
+    PDB_line_t       *line;
+    PDB_breakpoint_t *breakpoint = PDB_find_breakpoint(interp, command);
 
-    breakpoint = PDB_find_breakpoint(interp, command);
     if (breakpoint) {
         line = interp->pdb->file->line;
+
         while (line->opcode != breakpoint->pc)
             line = line->next;
 
@@ -1030,12 +1032,13 @@ PDB_delete_breakpoint(Interp *interp,
             breakpoint->prev->next = NULL;
         }
         else if (!breakpoint->prev && breakpoint->next) {
-            breakpoint->next->prev = NULL;
+            breakpoint->next->prev  = NULL;
             interp->pdb->breakpoint = breakpoint->next;
         }
         else {
             interp->pdb->breakpoint = NULL;
         }
+
         /* Kill the breakpoint */
         mem_sys_free(breakpoint);
     }
@@ -1044,8 +1047,7 @@ PDB_delete_breakpoint(Interp *interp,
 /*
 
 =item C<void
-PDB_delete_condition(Interp *interp,
-                     PDB_breakpoint_t *breakpoint)>
+PDB_delete_condition(Interp *interp, PDB_breakpoint_t *breakpoint)>
 
 Delete a condition associated with a breakpoint.
 
@@ -1054,8 +1056,7 @@ Delete a condition associated with a breakpoint.
 */
 
 void
-PDB_delete_condition(Interp *interp,
-                     PDB_breakpoint_t *breakpoint)
+PDB_delete_condition(Interp *interp, PDB_breakpoint_t *breakpoint)
 {
     if (breakpoint->condition->value) {
         if (breakpoint->condition->type & PDB_cond_str) {
@@ -1068,9 +1069,10 @@ PDB_delete_condition(Interp *interp,
         else {
             /* 'value' is a float or an int, so we can just free it */
             mem_sys_free(breakpoint->condition->value);
-        breakpoint->condition->value = NULL;
+            breakpoint->condition->value = NULL;
         }
     }
+
     mem_sys_free(breakpoint->condition);
     breakpoint->condition = NULL;
 }
@@ -1089,12 +1091,10 @@ Skip C<i> times all breakpoints.
 void
 PDB_skip_breakpoint(Interp *interp, long i)
 {
-    if (i == 0) {
+    if (i == 0)
         interp->pdb->breakpoint_skip = i;
-    }
-    else {
+    else
         interp->pdb->breakpoint_skip = i - 1;
-    }
 }
 
 /*
@@ -1115,6 +1115,7 @@ PDB_program_end(Interp *interp)
 
     /* Remove the RUNNING state */
     pdb->state &= ~PDB_RUNNING;
+
     PIO_eprintf(interp, "Program exited.\n");
     return 1;
 }
@@ -1122,8 +1123,7 @@ PDB_program_end(Interp *interp)
 /*
 
 =item C<char
-PDB_check_condition(Interp *interp,
-    PDB_condition_t *condition)>
+PDB_check_condition(Interp *interp, PDB_condition_t *condition)>
 
 Returns true if the condition was met.
 
@@ -1132,22 +1132,23 @@ Returns true if the condition was met.
 */
 
 char
-PDB_check_condition(Interp *interp,
-    PDB_condition_t *condition)
+PDB_check_condition(Interp *interp, PDB_condition_t *condition)
 {
-    INTVAL i,j;
-    FLOATVAL k, l;
-    STRING *m, *n;
+    INTVAL   i,  j;
+    FLOATVAL k,  l;
+    STRING  *m, *n;
 
     if (condition->type & PDB_cond_int) {
         /*
          * TODO verify register is in range
          */
         i = REG_INT(condition->reg);
+
         if (condition->type & PDB_cond_const)
             j = *(INTVAL *)condition->value;
         else
             j = REG_INT(*(int *)condition->value);
+
         if (((condition->type & PDB_cond_gt) && (i >  j)) ||
             ((condition->type & PDB_cond_ge) && (i >= j)) ||
             ((condition->type & PDB_cond_eq) && (i == j)) ||
@@ -1155,14 +1156,17 @@ PDB_check_condition(Interp *interp,
             ((condition->type & PDB_cond_le) && (i <= j)) ||
             ((condition->type & PDB_cond_lt) && (i <  j)))
                 return 1;
+
         return 0;
     }
     else if (condition->type & PDB_cond_num) {
         k = REG_NUM(condition->reg);
+
         if (condition->type & PDB_cond_const)
             l = *(FLOATVAL *)condition->value;
         else
             l = REG_NUM(*(int *)condition->value);
+
         if (((condition->type & PDB_cond_gt) && (k >  l)) ||
             ((condition->type & PDB_cond_ge) && (k >= l)) ||
             ((condition->type & PDB_cond_eq) && (k == l)) ||
@@ -1170,14 +1174,17 @@ PDB_check_condition(Interp *interp,
             ((condition->type & PDB_cond_le) && (k <= l)) ||
             ((condition->type & PDB_cond_lt) && (k <  l)))
                 return 1;
+
         return 0;
     }
     else if (condition->type & PDB_cond_str) {
         m = REG_STR(condition->reg);
+
         if (condition->type & PDB_cond_const)
             n = (STRING *)condition->value;
         else
             n = REG_STR(*(int *)condition->value);
+
         if (((condition->type & PDB_cond_gt) &&
                 (string_compare(interp, m, n) >  0)) ||
             ((condition->type & PDB_cond_ge) &&
@@ -1191,8 +1198,10 @@ PDB_check_condition(Interp *interp,
             ((condition->type & PDB_cond_lt) &&
                 (string_compare(interp, m, n) <  0)))
                     return 1;
+
         return 0;
     }
+
     return 0;
 }
 
@@ -1209,9 +1218,9 @@ Returns true if we have to stop running.
 char
 PDB_break(Interp *interp)
 {
-    PDB_t *pdb = interp->pdb;
+    PDB_t            *pdb        = interp->pdb;
     PDB_breakpoint_t *breakpoint = pdb->breakpoint;
-    PDB_condition_t *watchpoint = pdb->watchpoint;
+    PDB_condition_t  *watchpoint = pdb->watchpoint;
 
     /* Check the watchpoints first. */
     while (watchpoint) {
@@ -1219,6 +1228,7 @@ PDB_break(Interp *interp)
             pdb->state |= PDB_STOPPED;
             return 1;
         }
+
         watchpoint = watchpoint->next;
     }
 
@@ -1273,10 +1283,10 @@ char *
 PDB_escape(const char *string, INTVAL length)
 {
     const char *end;
-    char *_new,*fill;
+    char       *_new, *fill;
 
     length = length > 20 ? 20 : length;
-    end = string + length;
+    end    = string + length;
 
     /* Return if there is no string to escape*/
     if (!string)
@@ -1319,7 +1329,9 @@ PDB_escape(const char *string, INTVAL length)
                 break;
         }
     }
+
     *fill = '\0';
+
     return _new;
 }
 
@@ -1337,10 +1349,11 @@ int
 PDB_unescape(char *string)
 {
     char *fill;
-    int i, l = 0;
+    int   i, l = 0;
 
     for (; *string; string++) {
         l++;
+
         if (*string == '\\') {
             switch (string[1]) {
                 case 'n':
@@ -1361,12 +1374,16 @@ PDB_unescape(char *string)
                 default:
                     continue;
             }
+
             fill = string;
+
             for (i = 1; fill[i + 1]; i++)
                 fill[i] = fill[i + 1];
+
             fill[i] = '\0';
         }
     }
+
     return l;
 }
 
