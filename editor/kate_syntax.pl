@@ -2,8 +2,8 @@
 
 # Create Kate syntax highlighting XML file for IMCC
 # Language:     Parrot IMCC
-# Maintainer:   Andy Bussey <andybussey@yahoo.co.uk>
-# Last change:  2003 Aug 19
+# Maintainer:   Andy Bussey <andybussey@yahoo.co.uk>, Parrot Team
+# Last change:  2007 May 22
 
 use strict;
 use warnings;
@@ -29,13 +29,14 @@ my @imcc_spdirec = qw(.pcc_call .result .return .local .const .globalconst
     .pcc_end_yield .loadlib .namespace .endnamespace .macro .include);
 my @pod_start         = qw(head[1-6] over back item for begin end pod);
 my $pod_start_rx      = join '|', @pod_start;
-my @imcc_basic_types  = qw(int float string);
+my @imcc_basic_types  = qw(int float string pmc);
 my $parrot_pmcsh_file = "include/parrot/core_pmcs.h";
 my $date              = localtime(time);
 
-opendir PARROT, "$parrot" or die "Supply Parrot directory as argument!";
-my @ops_files = map { "$parrot/$_" } grep /\.ops$/, readdir PARROT;
-closedir PARROT;
+my $ops_dir="$parrot/src/ops";
+opendir my $PARROT, "$ops_dir" or die "Supply Parrot directory as argument!";
+my @ops_files = map { "$ops_dir/$_" } grep /\.ops$/, readdir $PARROT;
+closedir $PARROT;
 
 print <<END;
 <?xml version="1.0" encoding="UTF-8"?>
@@ -43,7 +44,7 @@ print <<END;
  <!-- Created automatically by kate_syntax.pl  $date -->
 
 <language name="IMCC" version="0.2" kateversion="2.0"
-          section="Sources" extensions="*.imc;*.pasm" mimetype="">
+          section="Sources" extensions="*.imc;*.pasm;*.pir" mimetype="">
 
   <highlighting>
 
@@ -59,7 +60,7 @@ for my $dir (@imcc_spdirec) {
 
 print <<END;
     </list>
-    
+
     <list name="ops">
 END
 
@@ -152,7 +153,7 @@ END
 
 print <<END;
       <context name="string" attribute="String" lineEndContext="#pop">
-          <RegExpr attribute="String" context="#stay" String="'" />
+          <RegExpr attribute="String" context="#pop" String="'" />
       </context>
 
 END
