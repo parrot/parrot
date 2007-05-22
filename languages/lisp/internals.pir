@@ -267,7 +267,8 @@ CALL_FUNCTION:
 
    retv = 1
 
-   getattribute special, symbol, "LispSymbol\0special"
+   # VALID_IN_PARROT_0_2_0 getattribute special, symbol, "LispSymbol\0special"
+   getattribute special, symbol, "special"
    if_null special, NOT_SPECIAL
 
   .NULL(special, NOT_SPECIAL)

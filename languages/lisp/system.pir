@@ -441,29 +441,30 @@ DONE:
 
 .sub _get_object_attr
   .param pmc args
+
   .local string attr
-  .local string objt
+  # VALID_IN_PARROT_0_2_0 .local string objt
   .local pmc symbol
-  .local pmc objstr
+  # VALID_IN_PARROT_0_2_0 .local pmc objstr
   .local pmc attrib
   .local pmc retv
 
   .ASSERT_LENGTH(args,3,ERROR_NARGS)
 
   .CAR(symbol,args)
-  .SECOND(objstr,args)
+   # VALID_IN_PARROT_0_2_0 .SECOND(objstr,args)
   .THIRD(attrib,args)
 
   .NIL(retv)
 
-  .ASSERT_TYPE(objstr, "string")
+   # VALID_IN_PARROT_0_2_0 .ASSERT_TYPE(objstr, "string")
   .ASSERT_TYPE(attrib, "string")
 
    attr = attrib
-   objt = objstr
+   # VALID_IN_PARROT_0_2_0 objt = objstr
 
-   concat objt, objt, "\0"
-   concat attr, objt, attr
+   # VALID_IN_PARROT_0_2_0 concat objt, objt, "\0"
+   # VALID_IN_PARROT_0_2_0 concat attr, objt, attr
 
    getattribute retv, symbol, attr
    if_null retv, NO_VALUE
@@ -484,27 +485,27 @@ DONE:
 .sub _set_object_attr
   .param pmc args
   .local string attr
-  .local string objt
+  # VALID_IN_PARROT_0_2_0 .local string objt
   .local pmc symbol
-  .local pmc objstr
+  # VALID_IN_PARROT_0_2_0 .local pmc objstr
   .local pmc attrib
   .local pmc value
 
   .ASSERT_LENGTH(args,4,ERROR_NARGS)
 
   .CAR(symbol,args)
-  .SECOND(objstr,args)
+  # VALID_IN_PARROT_0_2_0 .SECOND(objstr,args)
   .THIRD(attrib,args)
   .FOURTH(value,args)
 
-  .ASSERT_TYPE(objstr, "string")
+  # VALID_IN_PARROT_0_2_0 .ASSERT_TYPE(objstr, "string")
   .ASSERT_TYPE(attrib, "string")
 
    attr = attrib
-   objt = objstr
+   # VALID_IN_PARROT_0_2_0 objt = objstr
 
-   concat objt, objt, "\0"
-   concat attr, objt, attr
+   # VALID_IN_PARROT_0_2_0 concat objt, objt, "\0"
+   # VALID_IN_PARROT_0_2_0 concat attr, objt, attr
 
    setattribute symbol, attr, value
    goto DONE
