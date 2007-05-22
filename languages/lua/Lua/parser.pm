@@ -2188,6 +2188,7 @@ sub new {
 			"-" => 94,
 			"%" => 98,
 			"*" => 102,
+			".." => 93,
 			"+" => 97,
 			"^" => 101,
 			"/" => 103
@@ -2310,6 +2311,7 @@ sub new {
 			"==" => 99,
 			">=" => 100,
 			"*" => 102,
+			'AND' => 104,
 			"<=" => 106,
 			">" => 107,
 			".." => 93,
@@ -2840,7 +2842,7 @@ sub new {
 	[#Rule 1
 		 'program', 1,
 sub
-#line 46 "Lua\lua51.yp"
+#line 47 "Lua\lua51.yp"
 {
             BuildMain( $_[0], $_[1] );
         }
@@ -2848,7 +2850,7 @@ sub
 	[#Rule 2
 		 'program', 1,
 sub
-#line 50 "Lua\lua51.yp"
+#line 51 "Lua\lua51.yp"
 {
             print "Error (program)\n";
         }
@@ -2856,7 +2858,7 @@ sub
 	[#Rule 3
 		 'chunk', 3,
 sub
-#line 57 "Lua\lua51.yp"
+#line 58 "Lua\lua51.yp"
 {
             [ @{ $_[1] }, @{ $_[2] } ];
         }
@@ -2864,7 +2866,7 @@ sub
 	[#Rule 4
 		 'chunk', 1,
 sub
-#line 61 "Lua\lua51.yp"
+#line 62 "Lua\lua51.yp"
 {
             $_[1];
         }
@@ -2872,7 +2874,7 @@ sub
 	[#Rule 5
 		 '_stat', 3,
 sub
-#line 68 "Lua\lua51.yp"
+#line 69 "Lua\lua51.yp"
 {
             [ @{ $_[1] }, @{ $_[2] } ];
         }
@@ -2880,7 +2882,7 @@ sub
 	[#Rule 6
 		 '_stat', 0,
 sub
-#line 72 "Lua\lua51.yp"
+#line 73 "Lua\lua51.yp"
 {
             [];
         }
@@ -2894,7 +2896,7 @@ sub
 	[#Rule 9
 		 'block', 1,
 sub
-#line 86 "Lua\lua51.yp"
+#line 87 "Lua\lua51.yp"
 {
             PopScope( $_[0] );
             $_[1];
@@ -2903,7 +2905,7 @@ sub
 	[#Rule 10
 		 'stat', 3,
 sub
-#line 94 "Lua\lua51.yp"
+#line 95 "Lua\lua51.yp"
 {
             BuildAssigns( $_[0], $_[1], $_[3] );
         }
@@ -2911,7 +2913,7 @@ sub
 	[#Rule 11
 		 'stat', 1,
 sub
-#line 98 "Lua\lua51.yp"
+#line 99 "Lua\lua51.yp"
 {
             BuildVoidFunctionCall( $_[0], $_[1] );
         }
@@ -2919,7 +2921,7 @@ sub
 	[#Rule 12
 		 '@1-1', 0,
 sub
-#line 102 "Lua\lua51.yp"
+#line 103 "Lua\lua51.yp"
 {
             PushScope( $_[0] );
         }
@@ -2927,7 +2929,7 @@ sub
 	[#Rule 13
 		 'stat', 4,
 sub
-#line 106 "Lua\lua51.yp"
+#line 107 "Lua\lua51.yp"
 {
             $_[3];
         }
@@ -2935,7 +2937,7 @@ sub
 	[#Rule 14
 		 '@2-1', 0,
 sub
-#line 110 "Lua\lua51.yp"
+#line 111 "Lua\lua51.yp"
 {
             PushScope( $_[0] );
         }
@@ -2943,7 +2945,7 @@ sub
 	[#Rule 15
 		 'stat', 6,
 sub
-#line 114 "Lua\lua51.yp"
+#line 115 "Lua\lua51.yp"
 {
             BuildWhile( $_[0], $_[3], $_[5] );
         }
@@ -2951,7 +2953,7 @@ sub
 	[#Rule 16
 		 '@3-1', 0,
 sub
-#line 118 "Lua\lua51.yp"
+#line 119 "Lua\lua51.yp"
 {
             PushScope( $_[0] );
         }
@@ -2959,7 +2961,7 @@ sub
 	[#Rule 17
 		 'stat', 5,
 sub
-#line 122 "Lua\lua51.yp"
+#line 123 "Lua\lua51.yp"
 {
             BuildRepeat( $_[0], $_[3], $_[5] );
         }
@@ -2967,7 +2969,7 @@ sub
 	[#Rule 18
 		 '@4-4', 0,
 sub
-#line 126 "Lua\lua51.yp"
+#line 127 "Lua\lua51.yp"
 {
             PushScope( $_[0] );
         }
@@ -2975,7 +2977,7 @@ sub
 	[#Rule 19
 		 'stat', 7,
 sub
-#line 130 "Lua\lua51.yp"
+#line 131 "Lua\lua51.yp"
 {
             BuildIf( $_[0], $_[1], $_[2], $_[3], $_[6] );
         }
@@ -2983,7 +2985,7 @@ sub
 	[#Rule 20
 		 'stat', 4,
 sub
-#line 134 "Lua\lua51.yp"
+#line 135 "Lua\lua51.yp"
 {
             BuildIf( $_[0], $_[1], $_[2], $_[3], undef );
         }
@@ -2991,7 +2993,7 @@ sub
 	[#Rule 21
 		 '@5-9', 0,
 sub
-#line 138 "Lua\lua51.yp"
+#line 139 "Lua\lua51.yp"
 {
             PushScope( $_[0] );
             my $var = BuildLocalVariable( $_[0], $_[2] );
@@ -3001,7 +3003,7 @@ sub
 	[#Rule 22
 		 'stat', 12,
 sub
-#line 144 "Lua\lua51.yp"
+#line 145 "Lua\lua51.yp"
 {
             BuildForNum( $_[0], $_[10], $_[4], $_[6], $_[8], $_[11] );
         }
@@ -3009,7 +3011,7 @@ sub
 	[#Rule 23
 		 '@6-7', 0,
 sub
-#line 148 "Lua\lua51.yp"
+#line 149 "Lua\lua51.yp"
 {
             PushScope( $_[0] );
             my $var = BuildLocalVariable( $_[0], $_[2] );
@@ -3019,7 +3021,7 @@ sub
 	[#Rule 24
 		 'stat', 10,
 sub
-#line 154 "Lua\lua51.yp"
+#line 155 "Lua\lua51.yp"
 {
             BuildForNum( $_[0], $_[8], $_[4], $_[6], undef, $_[9] );
         }
@@ -3027,7 +3029,7 @@ sub
 	[#Rule 25
 		 '@7-5', 0,
 sub
-#line 158 "Lua\lua51.yp"
+#line 159 "Lua\lua51.yp"
 {
             PushScope( $_[0] );
             InsertList( $_[0], $_[2] );
@@ -3036,7 +3038,7 @@ sub
 	[#Rule 26
 		 'stat', 8,
 sub
-#line 163 "Lua\lua51.yp"
+#line 164 "Lua\lua51.yp"
 {
             BuildForList( $_[0], $_[2], $_[4], $_[7] );
         }
@@ -3044,7 +3046,7 @@ sub
 	[#Rule 27
 		 '@8-2', 0,
 sub
-#line 167 "Lua\lua51.yp"
+#line 168 "Lua\lua51.yp"
 {
             my $var = BuildVariable( $_[0], $_[2] );
             PushScopeF( $_[0] );
@@ -3055,7 +3057,7 @@ sub
 	[#Rule 28
 		 'stat', 4,
 sub
-#line 174 "Lua\lua51.yp"
+#line 175 "Lua\lua51.yp"
 {
             BuildAssigns( $_[0], [ $_[3] ], [ $_[4] ] );
         }
@@ -3063,7 +3065,7 @@ sub
 	[#Rule 29
 		 '@9-3', 0,
 sub
-#line 178 "Lua\lua51.yp"
+#line 179 "Lua\lua51.yp"
 {
             my $var = BuildLocalVariable( $_[0], $_[3] );
             Insert( $_[0], $var );
@@ -3075,7 +3077,7 @@ sub
 	[#Rule 30
 		 'stat', 5,
 sub
-#line 186 "Lua\lua51.yp"
+#line 187 "Lua\lua51.yp"
 {
             BuildAssigns( $_[0], [ $_[4] ], [ $_[5] ] );
         }
@@ -3083,7 +3085,7 @@ sub
 	[#Rule 31
 		 'stat', 4,
 sub
-#line 190 "Lua\lua51.yp"
+#line 191 "Lua\lua51.yp"
 {
             InsertList( $_[0], $_[2] );
             BuildAssigns( $_[0], $_[2], $_[4] );
@@ -3092,7 +3094,7 @@ sub
 	[#Rule 32
 		 'stat', 2,
 sub
-#line 195 "Lua\lua51.yp"
+#line 196 "Lua\lua51.yp"
 {
             InsertList( $_[0], $_[2] );
             BuildAssigns( $_[0], $_[2], [] );
@@ -3101,7 +3103,7 @@ sub
 	[#Rule 33
 		 '_if_then', 3,
 sub
-#line 203 "Lua\lua51.yp"
+#line 204 "Lua\lua51.yp"
 {
             PushScope( $_[0] );
             $_[2];
@@ -3110,7 +3112,7 @@ sub
 	[#Rule 34
 		 '@10-4', 0,
 sub
-#line 211 "Lua\lua51.yp"
+#line 212 "Lua\lua51.yp"
 {
             PushScope( $_[0] );
         }
@@ -3118,7 +3120,7 @@ sub
 	[#Rule 35
 		 '_elseif_star', 6,
 sub
-#line 215 "Lua\lua51.yp"
+#line 216 "Lua\lua51.yp"
 {
             [ @{ $_[1] }, [ $_[3], $_[6] ] ];
         }
@@ -3126,7 +3128,7 @@ sub
 	[#Rule 36
 		 '_elseif_star', 0,
 sub
-#line 219 "Lua\lua51.yp"
+#line 220 "Lua\lua51.yp"
 {
             [];
         }
@@ -3134,7 +3136,7 @@ sub
 	[#Rule 37
 		 'laststat', 2,
 sub
-#line 226 "Lua\lua51.yp"
+#line 227 "Lua\lua51.yp"
 {
             BuildReturn( $_[0], $_[2] );
         }
@@ -3142,7 +3144,7 @@ sub
 	[#Rule 38
 		 'laststat', 1,
 sub
-#line 230 "Lua\lua51.yp"
+#line 231 "Lua\lua51.yp"
 {
             BuildReturn( $_[0], [] );
         }
@@ -3150,7 +3152,7 @@ sub
 	[#Rule 39
 		 'laststat', 1,
 sub
-#line 234 "Lua\lua51.yp"
+#line 235 "Lua\lua51.yp"
 {
             BuildBreak( $_[0] );
         }
@@ -3161,7 +3163,7 @@ sub
 	[#Rule 41
 		 'funcname', 3,
 sub
-#line 243 "Lua\lua51.yp"
+#line 244 "Lua\lua51.yp"
 {
             PrepareMethod( $_[0] );
             [
@@ -3173,7 +3175,7 @@ sub
 	[#Rule 42
 		 '_funcname', 3,
 sub
-#line 254 "Lua\lua51.yp"
+#line 255 "Lua\lua51.yp"
 {
             [
                 @{ $_[1] },
@@ -3184,7 +3186,7 @@ sub
 	[#Rule 43
 		 '_funcname', 1,
 sub
-#line 261 "Lua\lua51.yp"
+#line 262 "Lua\lua51.yp"
 {
             [ $_[1] ];
         }
@@ -3192,7 +3194,7 @@ sub
 	[#Rule 44
 		 'varlist1', 3,
 sub
-#line 268 "Lua\lua51.yp"
+#line 269 "Lua\lua51.yp"
 {
             [
                 @{ $_[1] },
@@ -3203,7 +3205,7 @@ sub
 	[#Rule 45
 		 'varlist1', 1,
 sub
-#line 275 "Lua\lua51.yp"
+#line 276 "Lua\lua51.yp"
 {
             [
                 BuildVariable( $_[0], $_[1] ),
@@ -3213,7 +3215,7 @@ sub
 	[#Rule 46
 		 'var', 1,
 sub
-#line 284 "Lua\lua51.yp"
+#line 285 "Lua\lua51.yp"
 {
             [ $_[1] ];
         }
@@ -3221,7 +3223,7 @@ sub
 	[#Rule 47
 		 'var', 4,
 sub
-#line 288 "Lua\lua51.yp"
+#line 289 "Lua\lua51.yp"
 {
             [ $_[2], $_[4] ];
         }
@@ -3229,7 +3231,7 @@ sub
 	[#Rule 48
 		 'var', 2,
 sub
-#line 292 "Lua\lua51.yp"
+#line 293 "Lua\lua51.yp"
 {
             [ $_[1], $_[2] ];
         }
@@ -3237,7 +3239,7 @@ sub
 	[#Rule 49
 		 'var', 2,
 sub
-#line 296 "Lua\lua51.yp"
+#line 297 "Lua\lua51.yp"
 {
             [ @{ $_[1] }, $_[2] ];
         }
@@ -3245,7 +3247,7 @@ sub
 	[#Rule 50
 		 'key', 3,
 sub
-#line 303 "Lua\lua51.yp"
+#line 304 "Lua\lua51.yp"
 {
             $_[2];
         }
@@ -3253,7 +3255,7 @@ sub
 	[#Rule 51
 		 'key', 2,
 sub
-#line 307 "Lua\lua51.yp"
+#line 308 "Lua\lua51.yp"
 {
             BuildLiteral( $_[0], $_[2], 'key' );
         }
@@ -3261,7 +3263,7 @@ sub
 	[#Rule 52
 		 'namelist', 3,
 sub
-#line 314 "Lua\lua51.yp"
+#line 315 "Lua\lua51.yp"
 {
             [
                 @{ $_[1] },
@@ -3272,7 +3274,7 @@ sub
 	[#Rule 53
 		 'namelist', 1,
 sub
-#line 321 "Lua\lua51.yp"
+#line 322 "Lua\lua51.yp"
 {
             [
                 BuildLocalVariable( $_[0], $_[1] ),
@@ -3282,7 +3284,7 @@ sub
 	[#Rule 54
 		 'explist1', 3,
 sub
-#line 330 "Lua\lua51.yp"
+#line 331 "Lua\lua51.yp"
 {
             [ @{ $_[1] }, $_[3] ];
         }
@@ -3290,7 +3292,7 @@ sub
 	[#Rule 55
 		 'explist1', 1,
 sub
-#line 334 "Lua\lua51.yp"
+#line 335 "Lua\lua51.yp"
 {
             [ $_[1] ];
         }
@@ -3301,7 +3303,7 @@ sub
 	[#Rule 57
 		 'exp', 1,
 sub
-#line 343 "Lua\lua51.yp"
+#line 344 "Lua\lua51.yp"
 {
             BuildCallVariable( $_[0], $_[1] );
         }
@@ -3312,7 +3314,7 @@ sub
 	[#Rule 59
 		 'exp', 3,
 sub
-#line 349 "Lua\lua51.yp"
+#line 350 "Lua\lua51.yp"
 {
             BuildBinop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3320,7 +3322,7 @@ sub
 	[#Rule 60
 		 'exp', 3,
 sub
-#line 353 "Lua\lua51.yp"
+#line 354 "Lua\lua51.yp"
 {
             BuildBinop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3328,7 +3330,7 @@ sub
 	[#Rule 61
 		 'exp', 3,
 sub
-#line 357 "Lua\lua51.yp"
+#line 358 "Lua\lua51.yp"
 {
             BuildBinop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3336,7 +3338,7 @@ sub
 	[#Rule 62
 		 'exp', 3,
 sub
-#line 361 "Lua\lua51.yp"
+#line 362 "Lua\lua51.yp"
 {
             BuildBinop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3344,7 +3346,7 @@ sub
 	[#Rule 63
 		 'exp', 3,
 sub
-#line 365 "Lua\lua51.yp"
+#line 366 "Lua\lua51.yp"
 {
             BuildBinop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3352,7 +3354,7 @@ sub
 	[#Rule 64
 		 'exp', 3,
 sub
-#line 369 "Lua\lua51.yp"
+#line 370 "Lua\lua51.yp"
 {
             BuildBinop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3360,7 +3362,7 @@ sub
 	[#Rule 65
 		 'exp', 3,
 sub
-#line 373 "Lua\lua51.yp"
+#line 374 "Lua\lua51.yp"
 {
             BuildBinop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3368,7 +3370,7 @@ sub
 	[#Rule 66
 		 'exp', 3,
 sub
-#line 377 "Lua\lua51.yp"
+#line 378 "Lua\lua51.yp"
 {
             BuildRelop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3376,7 +3378,7 @@ sub
 	[#Rule 67
 		 'exp', 3,
 sub
-#line 381 "Lua\lua51.yp"
+#line 382 "Lua\lua51.yp"
 {
             BuildRelop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3384,7 +3386,7 @@ sub
 	[#Rule 68
 		 'exp', 3,
 sub
-#line 385 "Lua\lua51.yp"
+#line 386 "Lua\lua51.yp"
 {
             BuildRelop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3392,7 +3394,7 @@ sub
 	[#Rule 69
 		 'exp', 3,
 sub
-#line 389 "Lua\lua51.yp"
+#line 390 "Lua\lua51.yp"
 {
             BuildRelop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3400,7 +3402,7 @@ sub
 	[#Rule 70
 		 'exp', 3,
 sub
-#line 393 "Lua\lua51.yp"
+#line 394 "Lua\lua51.yp"
 {
             BuildRelop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3408,7 +3410,7 @@ sub
 	[#Rule 71
 		 'exp', 3,
 sub
-#line 397 "Lua\lua51.yp"
+#line 398 "Lua\lua51.yp"
 {
             BuildRelop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3416,7 +3418,7 @@ sub
 	[#Rule 72
 		 'exp', 3,
 sub
-#line 401 "Lua\lua51.yp"
+#line 402 "Lua\lua51.yp"
 {
             BuildLogop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3424,7 +3426,7 @@ sub
 	[#Rule 73
 		 'exp', 3,
 sub
-#line 405 "Lua\lua51.yp"
+#line 406 "Lua\lua51.yp"
 {
             BuildLogop( $_[0], $_[1], $_[2], $_[3] );
         }
@@ -3432,7 +3434,7 @@ sub
 	[#Rule 74
 		 'exp', 2,
 sub
-#line 409 "Lua\lua51.yp"
+#line 410 "Lua\lua51.yp"
 {
             BuildUnop( $_[0], $_[1], $_[2] );
         }
@@ -3440,7 +3442,7 @@ sub
 	[#Rule 75
 		 'exp', 2,
 sub
-#line 413 "Lua\lua51.yp"
+#line 414 "Lua\lua51.yp"
 {
             BuildUnop( $_[0], $_[1], $_[2] );
         }
@@ -3448,7 +3450,7 @@ sub
 	[#Rule 76
 		 'exp', 2,
 sub
-#line 417 "Lua\lua51.yp"
+#line 418 "Lua\lua51.yp"
 {
             BuildUnop( $_[0], $_[1], $_[2] );
         }
@@ -3456,7 +3458,7 @@ sub
 	[#Rule 77
 		 'primary', 1,
 sub
-#line 424 "Lua\lua51.yp"
+#line 425 "Lua\lua51.yp"
 {
             BuildLiteral( $_[0], $_[1], 'nil' );
         }
@@ -3464,7 +3466,7 @@ sub
 	[#Rule 78
 		 'primary', 1,
 sub
-#line 428 "Lua\lua51.yp"
+#line 429 "Lua\lua51.yp"
 {
             BuildLiteral( $_[0], $_[1], 'boolean' );
         }
@@ -3472,7 +3474,7 @@ sub
 	[#Rule 79
 		 'primary', 1,
 sub
-#line 432 "Lua\lua51.yp"
+#line 433 "Lua\lua51.yp"
 {
             BuildLiteral( $_[0], $_[1], 'boolean' );
         }
@@ -3480,7 +3482,7 @@ sub
 	[#Rule 80
 		 'primary', 1,
 sub
-#line 436 "Lua\lua51.yp"
+#line 437 "Lua\lua51.yp"
 {
             BuildLiteral( $_[0], $_[1], 'number' );
         }
@@ -3488,7 +3490,7 @@ sub
 	[#Rule 81
 		 'primary', 1,
 sub
-#line 440 "Lua\lua51.yp"
+#line 441 "Lua\lua51.yp"
 {
             BuildLiteral( $_[0], $_[1], 'string' );
         }
@@ -3496,7 +3498,7 @@ sub
 	[#Rule 82
 		 'primary', 1,
 sub
-#line 444 "Lua\lua51.yp"
+#line 445 "Lua\lua51.yp"
 {
             BuildCallVararg( $_[0] );
         }
@@ -3510,7 +3512,7 @@ sub
 	[#Rule 85
 		 'primary', 3,
 sub
-#line 452 "Lua\lua51.yp"
+#line 453 "Lua\lua51.yp"
 {
             BuildParenthesedExpression( $_[0], $_[2] );
         }
@@ -3518,7 +3520,7 @@ sub
 	[#Rule 86
 		 'functioncall', 4,
 sub
-#line 459 "Lua\lua51.yp"
+#line 460 "Lua\lua51.yp"
 {
             BuildCallFunction( $_[0], $_[2], $_[4] );
         }
@@ -3526,7 +3528,7 @@ sub
 	[#Rule 87
 		 'functioncall', 6,
 sub
-#line 463 "Lua\lua51.yp"
+#line 464 "Lua\lua51.yp"
 {
             BuildCallMethod( $_[0], $_[2], $_[5], $_[6] );
         }
@@ -3534,7 +3536,7 @@ sub
 	[#Rule 88
 		 'functioncall', 2,
 sub
-#line 467 "Lua\lua51.yp"
+#line 468 "Lua\lua51.yp"
 {
             my $fct = BuildCallVariable( $_[0], $_[1] );
             BuildCallFunction( $_[0], $fct, $_[2] );
@@ -3543,7 +3545,7 @@ sub
 	[#Rule 89
 		 'functioncall', 4,
 sub
-#line 472 "Lua\lua51.yp"
+#line 473 "Lua\lua51.yp"
 {
             my $obj = BuildCallVariable( $_[0], $_[1] );
             BuildCallMethod( $_[0], $obj, $_[3], $_[4] );
@@ -3552,7 +3554,7 @@ sub
 	[#Rule 90
 		 'functioncall', 2,
 sub
-#line 477 "Lua\lua51.yp"
+#line 478 "Lua\lua51.yp"
 {
             BuildCallFunction( $_[0], $_[1], $_[2] );
         }
@@ -3560,7 +3562,7 @@ sub
 	[#Rule 91
 		 'functioncall', 4,
 sub
-#line 481 "Lua\lua51.yp"
+#line 482 "Lua\lua51.yp"
 {
             BuildCallMethod( $_[0], $_[1], $_[3], $_[4] );
         }
@@ -3568,7 +3570,7 @@ sub
 	[#Rule 92
 		 'args', 3,
 sub
-#line 488 "Lua\lua51.yp"
+#line 489 "Lua\lua51.yp"
 {
             $_[2];
         }
@@ -3576,7 +3578,7 @@ sub
 	[#Rule 93
 		 'args', 2,
 sub
-#line 492 "Lua\lua51.yp"
+#line 493 "Lua\lua51.yp"
 {
             [];
         }
@@ -3584,7 +3586,7 @@ sub
 	[#Rule 94
 		 'args', 1,
 sub
-#line 496 "Lua\lua51.yp"
+#line 497 "Lua\lua51.yp"
 {
             [
                 $_[1],
@@ -3594,7 +3596,7 @@ sub
 	[#Rule 95
 		 'args', 1,
 sub
-#line 502 "Lua\lua51.yp"
+#line 503 "Lua\lua51.yp"
 {
             [
                 BuildLiteral( $_[0], $_[1], 'string' ),
@@ -3604,7 +3606,7 @@ sub
 	[#Rule 96
 		 '@11-1', 0,
 sub
-#line 511 "Lua\lua51.yp"
+#line 512 "Lua\lua51.yp"
 {
             PushScopeF( $_[0] );
             PushScope( $_[0] );
@@ -3613,7 +3615,7 @@ sub
 	[#Rule 97
 		 'function', 3,
 sub
-#line 516 "Lua\lua51.yp"
+#line 517 "Lua\lua51.yp"
 {
             $_[3];
         }
@@ -3621,7 +3623,7 @@ sub
 	[#Rule 98
 		 'funcbody', 5,
 sub
-#line 523 "Lua\lua51.yp"
+#line 524 "Lua\lua51.yp"
 {
             PopScopeF( $_[0] );
             BuildFunctionBody( $_[0], $_[2], $_[4] );
@@ -3630,7 +3632,7 @@ sub
 	[#Rule 99
 		 'funcbody', 4,
 sub
-#line 528 "Lua\lua51.yp"
+#line 529 "Lua\lua51.yp"
 {
             PopScopeF( $_[0] );
             BuildFunctionBody( $_[0], [], $_[3] );
@@ -3639,7 +3641,7 @@ sub
 	[#Rule 100
 		 'parlist1', 3,
 sub
-#line 536 "Lua\lua51.yp"
+#line 537 "Lua\lua51.yp"
 {
             [
                 @{ $_[1] },
@@ -3653,7 +3655,7 @@ sub
 	[#Rule 102
 		 'parlist1', 1,
 sub
-#line 545 "Lua\lua51.yp"
+#line 546 "Lua\lua51.yp"
 {
             [
                 BuildParam( $_[0], $_[1] ),
@@ -3663,7 +3665,7 @@ sub
 	[#Rule 103
 		 'parlist', 3,
 sub
-#line 554 "Lua\lua51.yp"
+#line 555 "Lua\lua51.yp"
 {
             [
                 @{ $_[1] },
@@ -3674,7 +3676,7 @@ sub
 	[#Rule 104
 		 'parlist', 1,
 sub
-#line 561 "Lua\lua51.yp"
+#line 562 "Lua\lua51.yp"
 {
             [
                 BuildParam( $_[0], $_[1] ),
@@ -3684,7 +3686,7 @@ sub
 	[#Rule 105
 		 'tableconstructor', 3,
 sub
-#line 570 "Lua\lua51.yp"
+#line 571 "Lua\lua51.yp"
 {
             BuildTable( $_[0], $_[2] );
         }
@@ -3692,7 +3694,7 @@ sub
 	[#Rule 106
 		 'tableconstructor', 2,
 sub
-#line 574 "Lua\lua51.yp"
+#line 575 "Lua\lua51.yp"
 {
             BuildTable( $_[0], [] );
         }
@@ -3706,7 +3708,7 @@ sub
 	[#Rule 109
 		 '_field_plus', 3,
 sub
-#line 588 "Lua\lua51.yp"
+#line 589 "Lua\lua51.yp"
 {
             [ @{ $_[1] }, $_[3] ];
         }
@@ -3714,7 +3716,7 @@ sub
 	[#Rule 110
 		 '_field_plus', 1,
 sub
-#line 592 "Lua\lua51.yp"
+#line 593 "Lua\lua51.yp"
 {
             [ $_[1] ];
         }
@@ -3722,7 +3724,7 @@ sub
 	[#Rule 111
 		 'field', 5,
 sub
-#line 599 "Lua\lua51.yp"
+#line 600 "Lua\lua51.yp"
 {
             [ $_[2], $_[5] ];
         }
@@ -3730,7 +3732,7 @@ sub
 	[#Rule 112
 		 'field', 3,
 sub
-#line 603 "Lua\lua51.yp"
+#line 604 "Lua\lua51.yp"
 {
             [ BuildLiteral( $_[0], $_[1], 'key' ), $_[3] ];
         }
@@ -3738,7 +3740,7 @@ sub
 	[#Rule 113
 		 'field', 1,
 sub
-#line 607 "Lua\lua51.yp"
+#line 608 "Lua\lua51.yp"
 {
             [ $_[1] ];
         }
@@ -3754,7 +3756,7 @@ sub
     bless($self,$class);
 }
 
-#line 619 "Lua\lua51.yp"
+#line 620 "Lua\lua51.yp"
 
 
 package Lua::parser;

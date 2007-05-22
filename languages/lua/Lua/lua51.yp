@@ -27,12 +27,13 @@
 
 %nonassoc NONARG
 %nonassoc '(' '{' STRING
-%left AND OR
-%left '==' '~=' '>' '<' '<=' '>='
-%left '..'
+%left OR
+%left AND
+%left '<' '>' '<=' '>=' '~=' '=='
+%right '..'
 %left '+' '-'
 %left '*' '/' '%'
-%left NEG '#' NOT
+%left NOT '#' NEG
 %right '^'
 
 %expect 1
