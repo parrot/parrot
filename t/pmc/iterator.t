@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 44;
 
 =head1 NAME
 
@@ -1391,6 +1391,38 @@ CODE
 ok
 OUTPUT
 
+TODO: {
+    local $TODO = "cloned iterator doesn't copy the array to which it 'points'";
+pir_output_is( <<'CODE', <<'OUTPUT', "cloned iterator doesn't copy the array to which it 'points'" );
+.sub main :main
+    .local pmc ar, i1, i2
+    .local Integer temp
+    temp = new Integer
+    ar   = new ResizableIntegerArray
+    push ar, 1
+    new i1, .Iterator, ar
+
+    # i1 and i2 now "point" to the same element of the same array.
+    clone i2, i1
+
+    # Modify the array ...
+    temp = 17
+    i1   = temp
+
+    # Now read back the modified value ...
+    shift temp, i2
+
+    unless temp == 17 goto fail
+
+    say "ok"
+    end
+fail:
+    say "not ok"
+.end
+CODE
+ok
+OUTPUT
+}
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
