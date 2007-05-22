@@ -50,6 +50,18 @@ the L<Parameter List Syntax> section.
 
   PCCRETURN(PMC *status, INTVAL count);
 
+Please note that C<PCCRETURN> expands to multiple lines, so it must
+always be enclosed in a block when contained in the body of a selector.
+For example:
+
+  if(!PMC_IS_NULL(foo))
+      PCCRETURN(PMC *foo);
+
+will not do what you expect. It must be written as:
+
+  if(!PMC_IS_NULL(foo)) {
+      PCCRETURN(PMC *foo);
+  }
 
 =head2 PCCINVOKE
 
