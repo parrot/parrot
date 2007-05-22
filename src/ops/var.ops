@@ -284,14 +284,13 @@ op set_global(in PMC, in STR, invar PMC) {
 
 =item B<set_hll_global>(in STR, invar PMC)
 
-Set $1 to the global named $2 in the current HLL root namespace.  If the
-global doesn't exist, $1 is set to null.
+Set the global named $1 to $2 in the current HLL root namespace.
 
 =item B<set_hll_global>(in PMC, in STR, invar PMC)
 
-Set $1 to the global named $3 in the namespace denoted by the key constant
-$2, relative to the current HLL root namespace.  If the namespace or the
-global doesn't exist, $1 is set to null.
+Set the global named $2 in the namespace denoted by the key constant
+$1 (relative to the current HLL namespace) to $3. If the namespace
+does not exist, it is created.
 
 =cut
 
@@ -310,14 +309,13 @@ op set_hll_global(in PMC, in STR, invar PMC) {
 
 =item B<set_root_global>(in STR, invar PMC)
 
-Set $1 to the global named $2 in the true root namespace.  If the global
-doesn't exist, $1 is set to null.
+Set the global named $1 in the true root namespace to $2.
 
 =item B<set_root_global>(in PMC, in STR, invar PMC)
 
-Set $1 to the global named $3 in the namespace denoted by the key constant
-$2, relative to the true root namespace.  If the namespace or the global
-doesn't exist, $1 is set to null.
+Set the global named $2 in the namespace denoted by the key constant
+$1 (relative to the true root namespace) to $3.  If the namespace does
+not exist, it is created.
 
 =cut
 

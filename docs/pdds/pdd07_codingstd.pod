@@ -146,7 +146,7 @@ the same line as the return type.
 =item *
 
 Pointer types should be written with separation between the star and the base
-type, e.g. C<Interp *foo>, but not e.g. <Interp* foo>.
+type, e.g. C<Interp *foo>, but not C<Interp* foo>.
 
 =item *
 

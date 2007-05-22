@@ -90,7 +90,7 @@ PARROT_API PMC *Parrot_find_vtable_meth(Interp* interp, PMC *pmc, STRING *meth);
 } while (0)
 
 /*
- * class marocs
+ * class macros
  */
 
 #  define CLASS_ATTRIB_COUNT(cl) PMC_int_val2(cl)

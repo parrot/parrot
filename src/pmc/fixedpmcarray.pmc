@@ -411,7 +411,8 @@ Returns the PMC value of the element at index C<*key>.
 
 =item C<void set_integer_native(INTVAL size)>
 
-Resizes the array to C<size> elements.
+Sizes the array to C<size> elements. Can't be used to resize an
+array.
 
 =cut
 

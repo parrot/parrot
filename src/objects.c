@@ -744,7 +744,7 @@ parrot_class_register(Interp *interp, PMC *name,
         VTABLE_set_pmc_keyed(interp, top, name, ns);
     }
 
-    /* attach namspace to vtable */
+    /* attach namespace to vtable */
     new_vtable->_namespace = ns;
 
     if (new_vtable->ro_variant_vtable) {
@@ -782,7 +782,7 @@ parrot_class_register(Interp *interp, PMC *name,
             vtable_pmc = constant_pmc_new(interp, enum_class_VtableCache));
     PMC_struct_val(vtable_pmc) = new_vtable;
 
-    /* attach namspace to object vtable too */
+    /* attach namespace to object vtable too */
     new_vtable->_namespace = ns;
 
     if (new_vtable->ro_variant_vtable) {
