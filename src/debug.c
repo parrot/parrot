@@ -46,21 +46,26 @@ static const char* GDB_P(Interp *interp, const char *s);
 
 =item C<static char* nextarg(char *command)>
 
-Returns the position just past the current argument in a PASM
-instruction. This is not the same as C<na()>, above, which is intended
-for debugger commands. This function is used for C<eval>.
+Returns the position just past the current argument in the PASM instruction
+C<command>. This is not the same as C<na()>, above, which is intended for
+debugger commands. This function is used for C<eval>.
 
 =cut
 
 */
 
-static char*
-nextarg(char *command)
+static char const *
+nextarg(char const *command)
 {
+    /* as long as the character pointed to by command is not NULL,
+     * and it is either alphanumeric, a comma or a closing bracket,
+     * continue looking for the next argument.
+     */
     while (*command && (isalnum((int) *command) || *command == ',' ||
         *command == ']'))
             command++;
 
+    /* eat as much space as possible */
     while (*command && isspace((int) *command))
         command++;
 
@@ -77,9 +82,10 @@ Returns the pointer past any whitespace.
 
 */
 
-static const char*
+static const char *
 skip_ws(const char *str)
 {
+    /* as long as str is not NULL and it contains space, skip it */
     while (*str && isspace((int) *str))
         str++;
 
@@ -97,12 +103,16 @@ alternative to the C<na()> macro above.)
 
 */
 
-static const char*
+static const char *
 skip_command(const char *str)
 {
+    /* while str is not null and it contains a command (no spaces),
+     * skip the character
+     */
     while (*str && !isspace((int) *str))
         str++;
 
+    /* eat all space after that */
     while (*str && isspace((int) *str))
         str++;
 
@@ -113,14 +123,14 @@ skip_command(const char *str)
 
 =item C<static const char* parse_int(const char *str, int *intP)>
 
-Parse an C<int> out of a string and return a pointer to just after the
-C<int>.
+Parse an C<int> out of a string and return a pointer to just after the C<int>.
+The output parameter C<intP> contains the parsed value.
 
 =cut
 
 */
 
-static const char*
+static const char *
 parse_int(const char *str, int *intP)
 {
     char *end;
@@ -137,32 +147,39 @@ parse_string(Interp *interp, const char *str, STRING **strP)>
 
 Parse a double-quoted string out of a C string and return a pointer to
 just after the string. The parsed string is converted to a Parrot
-C<STRING>.
+C<STRING> and placed in the output parameter C<strP>.
 
 =cut
 
 */
 
-static const char*
+static const char *
 parse_string(Interp *interp, const char *str, STRING **strP)
 {
-    const char *string;
+    const char *string_start;
 
+    /* if this is not a quoted string, there's nothing to parse */
     if (*str != '"')
         return NULL;
 
+    /* skip the quote */
     str++;
-    string = str;
 
+    string_start = str;
+
+    /* parse while there's no closing quote */
     while (*str && *str != '"') {
+        /* skip any potentially escaped quotes */
         if (*str == '\\' && str[1])
             str += 2;
         else
             str++;
     }
 
-    *strP = string_make(interp, string, str - string, NULL, 0);
+    /* create the output STRING */
+    *strP = string_make(interp, string_start, str - string_start, NULL, 0);
 
+    /* skip the closing quote */
     if (*str)
         str++;
 
@@ -184,31 +201,38 @@ after the key. Currently only string and integer keys are allowed.
 static const char*
 parse_key(Interp *interp, const char *str, PMC **keyP)
 {
+    /* clear output parameter */
     *keyP = NULL;
 
+    /* make sure it's a key */
     if (*str != '[')
         return NULL;
 
     /* Skip [ */
     str++;
 
+    /* if this is a string key, create a Parrot STRING */
     if (*str == '"') {
-        STRING *string;
-        str   = parse_string(interp, str, &string);
-        *keyP = key_new_string(interp, string);
+        STRING *parrot_string;
+        str   = parse_string(interp, str, &parrot_string);
+        *keyP = key_new_string(interp, parrot_string);
     }
+    /* if this is a numeric key */
     else if (isdigit((int) *str)) {
         int value;
         str   = parse_int(str, &value);
         *keyP = key_new_integer(interp, (INTVAL) value);
     }
+    /* unsupported case; neither a string nor a numeric key */
     else {
         return NULL;
     }
 
+    /* hm, but if this doesn't match, it's probably an error */
     if (*str != ']')
         return NULL;
 
+    /* skip the closing brace on the key */
     return ++str;
 }
 
