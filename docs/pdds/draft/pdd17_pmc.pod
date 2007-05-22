@@ -83,14 +83,11 @@ All PMCs have the form:
         struct PMC_EXT *pmc_ext;
     };
 
-where C<obj> is a pointer to an C<pobj_t> structure:
+where C<obj> is a pointer to a C<pobj_t> structure:
 
     typedef struct pobj_t {
         UnionVal u;
         Parrot_UInt flags;
- #if ! DISABLE_GC_DEBUG
-        UINTVAL _pobj_version;
- #endif
     } pobj_t;
 
 and where:
@@ -109,8 +106,8 @@ and where:
         struct parrot_string_t * _string_val;
     } UnionVal;
 
-C<u> holds data associated with the PMC. This can be in the form of an  integer
-value, a floating-point value, a string value, or a pointer  to other data.
+C<u> holds data associated with the PMC. This can be in the form of an integer
+value, a floating-point value, a string value, or a pointer to other data.
 C<u> may be empty, since the PMC structure also provides a more general data
 pointer, but is useful for PMCs which hold only a single piece of data (e.g.
 C<PerlInts>).
@@ -119,12 +116,9 @@ C<flags> holds a set of flags associated with the PMC; these are documented  in
 F<include/parrot/pobj.h>, and are generally only used within the Parrot 
 internals.
 
-C<_pobj_version> is only used for debugging Parrot's garbage collector. It is
-documented elsewhere (well, it will be once we get around to doing that...).
-
 C<vtable> holds a pointer to the B<vtable> associated with the PMC. This points
 to a set of functions, with interfaces described in
-F<docs/pdds/pdd02_vtables.pod> that implement the basic behaviour of the PMC
+L<Vtable Functions> that implement the basic behaviour of the PMC
 (i.e. how it behaves under addition, subtraction, cloning etc.)
 
 C<data> (if present) holds a pointer to any additional data associated  with
@@ -136,8 +130,8 @@ C<pmc_ext> points to an extended PMC structure. This has the form:
  #if PMC_DATA_IN_EXT
         DPOINTER *data;
  #endif
-        PMC *_metadata;
-        struct _Sync *_synchronize;
+        PMC *_metadata;             # [Note: replaced by roles]
+        struct _Sync *_synchronize; # [Note: may be deprecated, see STM]
         PMC *_next_for_GC;
     };
 
@@ -1005,6 +999,10 @@ same PMC as I<self>; in that case optimizations may be made.
 
 =item add_attribute
 
+=item get_attr
+
+=item set_attr
+
 =item add_parent
 
 =item add_role
@@ -1025,6 +1023,20 @@ generate methods on the fly?]
 
 {{ Address the problem of high-level objects inheriting from low-level PMCs,
 and any structural changes to low-level PMCs that might require. }}
+
+If a low-level PMC expects to be overridden by high-level classes (which means
+all the core low-level PMC types), it must respect a standard interface. It
+must implement the C<get_attr> and C<set_attr> vtable entries for any core
+attributes it expects to be accessible to subclasses.
+
+Subclassing a low-level class from a high-level class makes an entry in the
+high-level class's list of parents. This entry is a proxy class object for the
+low-level PMC class that provides access to the low-level PMC's vtable
+(including the implementations of get_attr and set_attr), and defines the
+storage that the low-level object will need within the high-level object (this
+could be as simple as a single PMC attribute that is an instance of the
+low-level class).
+
 
 =head2 Core PMCs
 
