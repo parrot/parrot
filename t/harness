@@ -161,9 +161,12 @@ my @default_tests = map {glob "t/$_/*.t"} qw(
 # append the distribution checking tests to the default tests
 my @distro_tests = map { "t/distro/$_" } qw(
     manifest.t
-    file_metadata.t
 );
 push @default_tests, @distro_tests;
+
+# append the file_metadata.t only if we're running in a non-release checkout
+push @default_tests, 't/distro/file_metadata.t'
+    if -e "$Bin/../DEVELOPING";
 
 # collect the coding standard tests (that we want to run) together
 # append them to the list of default tests *only* if this is not a release

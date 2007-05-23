@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -275,7 +275,7 @@ sub print_head {
  */
 
 /* nci.c
- *  Copyright (C) 2001-2006, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     \$Id\$
  *  Overview:

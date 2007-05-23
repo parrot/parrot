@@ -27,11 +27,16 @@ gathered in some API calls..
 
 =cut
 
+SKIP:
+{
+#    skip( "compreg disabled", 1 );
+
 c_output_is( <<'CODE', <<'OUTPUT', "compreg/compile" );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include "parrot/extend.h"
 
 extern void imcc_init(Parrot_Interp interp);
 
@@ -49,7 +54,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     compreg = VTABLE_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    pir = const_string(interp, "PIR");
+    pir  = const_string(interp, "PIR");
     comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
     if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
@@ -58,7 +63,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     /*
      * compile source
      */
-    prog = imcc_compile_pir(interp, c_src);
+    prog = Parrot_call_sub(interp, comp, "PS", string_from_cstring(interp, c_src, 0) );
 
     if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog");
@@ -107,6 +112,8 @@ main(int margc, char *margv[])
 CODE
 ok
 OUTPUT
+}
+
 c_output_is( <<'CODE', <<'OUTPUT', "Parror Compile API Single call" );
 
 #include <stdio.h>
@@ -124,40 +131,28 @@ run(Parrot_Interp interp, int argc, char *argv[])
     PMC *comp, *prog, *compreg, *entry;
     opcode_t *dest;
     STRING *error;
-    /*
-     * get PIR compiler  - TODO API
-     */
-    compreg = VTABLE_get_pmc_keyed_int(interp,
-                                       interp->iglobals,
-                                       IGLOBALS_COMPREG_HASH);
-    pir = const_string(interp, "PIR");
-    comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
-    if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
-        PIO_eprintf(interp, "Pir compiler not loaded");
-        exit(1);
-    }
 
     /*
      * compile source
      */
+    pir  = const_string(interp, "PIR");
     prog = Parrot_compile_string(interp, pir, c_src, &error);
 
-    if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
-        PIO_eprintf(interp, "Pir compiler returned no prog");
+    if (PMC_IS_NULL(prog)) {
+        PIO_eprintf(interp, "PIR compiler returned no Sub PMC");
         exit(1);
     }
+
     /* keep eval PMC alive */
     dod_register_pmc(interp, prog);
+
     /* locate function to run */
     smain = const_string(interp, "main");
     entry = Parrot_find_global_cur(interp, smain);
+
     /* location of the entry */
-    interp->current_cont = new_ret_continuation_pmc(interp, NULL);
-    dest = VTABLE_invoke(interp, entry, NULL);
-    /* where to start */
-    interp->resume_offset = dest -interp->code->base.data;
-    /* and go */
-    Parrot_runcode(interp, argc, argv);
+    Parrot_call_sub( interp, entry, "vv" );
+
     return NULL;
 }
 
@@ -189,6 +184,7 @@ main(int margc, char *margv[])
 CODE
 ok
 OUTPUT
+
 c_output_is( <<'CODE', <<'OUTPUT', "Parror Compile API Multiple Calls" );
 
 #include <stdio.h>
@@ -280,6 +276,7 @@ CODE
 ok
 hola
 OUTPUT
+
 c_output_is( <<'CODE', <<'OUTPUT', "Parror Compile API Multiple 1st bad PIR" );
 
 #include <stdio.h>
