@@ -446,7 +446,8 @@ match_continue:
   rule = globber.'compile'(pattern)
   match = rule(the_string)
 
-  .return match.__get_bool()
+  $I0 = istrue match
+  .return ($I0)
 
 bad_option:
   $S1 = 'bad option "'
