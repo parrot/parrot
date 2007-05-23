@@ -16,17 +16,13 @@ This compiler defines the following stages:
 
 =item * parse F<languages/lua/src/lua51.pg>
 
-=item * past  F<languages/lua/src/ASTGrammar.tg>
+=item * PAST  F<languages/lua/src/PASTGrammar.tg>
 
-=item * post  F<languages/lua/src/OSTGrammar.tg>
-
-=item * pir   F<languages/lua/src/PIRGrammar.tg>
-
-=item * run
+=item * POST  F<languages/lua/src/POSTGrammar.tg>
 
 =back
 
-Used by F<languages/lua/luac.pir>.
+Used by F<languages/lua/lua.pir>.
 
 =cut
 
@@ -43,6 +39,7 @@ Used by F<languages/lua/luac.pir>.
     $P0.'language'('Lua')
     $P0.'parsegrammar'('Lua::Grammar')
     $P0.'astgrammar'('Lua::PAST::Grammar')
+    $P0.'ostgrammar'('Lua::POST::Grammar')
 
     $S0 = "Lua 5.1 on Parrot  Copyright (C) 2005-2007, The Perl Foundation.\n"
     $P0.'commandline_banner'($S0)
@@ -701,8 +698,9 @@ L7:
     .return (past)
 .end
 
-.include 'languages/lua/src/ASTGrammar.pir'
-.include 'languages/lua/src/lua51_grammar_gen.pir'
+.include 'languages/lua/src/lua51_gen.pir'
+.include 'languages/lua/src/PASTGrammar_gen.pir'
+.include 'languages/lua/src/POSTGrammar_gen.pir'
 
 =back
 

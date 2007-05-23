@@ -3,8 +3,8 @@
 
 =head1 NAME
 
-ASTGrammar.tg - A grammar for transforming the output of a PGE parse into
-an abstract syntax tree.
+PASTGrammar.tg - A grammar for transforming the output of a PGE parse into
+an abstract syntax tree (PAST).
 
 =head1 DESCRIPTION
 

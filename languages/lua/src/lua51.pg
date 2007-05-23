@@ -191,6 +191,92 @@ rule simple_expression {
 }
 
 
+=head2 HELPER RULES
+
+Helper rules will match a specific token, otherwise a syntax error is generated.
+These rules make the grammar more readable, so the calls to syntax_error() are
+not all over the grammar, but only in these rules.
+
+=cut
+
+rule do {
+  <'do'> | <syntax_error: 'do' expected>
+}
+
+rule then {
+  <'then'> | <syntax_error: 'then' expected>
+}
+
+rule end {
+  <'end'> | <syntax_error: 'end' expected>
+}
+
+rule until {
+  <'until'> | <syntax_error: 'until' expected>
+}
+
+rule comma {
+  <','> | <syntax_error: ',' expected>
+}
+
+rule in {
+  <'in'> | <syntax_error: 'in' expected>
+}
+
+rule assign {
+  <'='>  | <syntax_error: '=' expected>
+}
+
+rule closebracket {
+  <']'>  | <syntax_error: ']' expected>
+}
+
+rule closebrace {
+  <'}'> | <syntax_error: '}' expected>
+}
+
+rule closeparen {
+  <')'> | <syntax_error: ')' expected>
+}
+
+
+=head2 TOKENS
+
+Tokens not defined here (in PGE) are written in PIR in
+F<languages/lua/src/lua51.pir>.
+
+=cut
+
+token string {
+  | \" <quoted_literal: "> \"
+  | \' <quoted_literal: '> \'
+  | <long_string>
+}
+
+token nil {
+  <'nil'>
+}
+
+token true {
+  <'true'>
+}
+
+token false {
+  <'false'>
+}
+
+token vararg {
+  <'...'>
+}
+
+token ws {
+    [ \s+
+    | <'--'> <long_comment>
+    | <'--'> \N*
+    ]*
+}
+
+
 =head2 EXPRESSIONS
 
 Operator precedence is implemented using an optable.
@@ -245,94 +331,11 @@ proto 'infix:and'   is looser('infix:<')    is past('if')       { ... }
 proto 'infix:or'    is looser('infix:and')  is past('unless')   { ... }
 
 
-=head2 HELPER RULES
-
-Helper rules will match a specific token, otherwise a syntax error is generated.
-These rules make the grammar more readable, so the calls to syntax_error() are
-not all over the grammar, but only in these rules.
-
-=cut
-
-rule do {
-  <'do'> | <syntax_error: 'do' expected>
-}
-
-rule then {
-  <'then'> | <syntax_error: 'then' expected>
-}
-
-rule end {
-  <'end'> | <syntax_error: 'end' expected>
-}
-
-rule until {
-  <'until'> | <syntax_error: 'until' expected>
-}
-
-rule comma {
-  <','> | <syntax_error: ',' expected>
-}
-
-rule in {
-  <'in'> | <syntax_error: 'in' expected>
-}
-
-rule assign {
-  <'='>  | <syntax_error: '=' expected>
-}
-
-rule closebracket {
-  <']'>  | <syntax_error: ']' expected>
-}
-
-rule closebrace {
-  <'}'> | <syntax_error: '}' expected>
-}
-
-rule closeparen {
-  <')'> | <syntax_error: ')' expected>
-}
-
-
-=head3 Strings
-
-A string can be either a single-quoted, double-quoted or a long string.
-Long strings are parsed using a custom parsing method.
-
-=cut
-
-token string {
-  | \" <quoted_literal: "> \"
-  | \' <quoted_literal: '> \'
-  | <long_string>
-}
-
-token nil {
-  <'nil'>
-}
-
-token true {
-  <'true'>
-}
-
-token false {
-  <'false'>
-}
-
-token vararg {
-  <'...'>
-}
-
-token ws {
-    [ \s+
-    | <'--'> <long_comment>
-    | <'--'> \N*
-    ]*
-}
-
 =head1 AUTHORS
 
 Klaas-Jan Stol <parrotcode@gmail.com>
+
+Francois Perrad
 
 =cut
 

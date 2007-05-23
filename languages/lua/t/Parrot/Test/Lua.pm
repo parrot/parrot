@@ -79,7 +79,7 @@ foreach my $func ( keys %language_test_map ) {
                 "perl -Ilanguages/lua languages/lua/luac.pl languages/${lang_fn}",
                 "$self->{parrot} --no-gc languages/${pir_fn} $params",
 
-                # "$self->{parrot} languages/lua/luac.pir languages/${lang_fn}",
+                # "$self->{parrot} languages/lua/lua.pbc languages/${lang_fn}",
             );
         }
 

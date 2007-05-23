@@ -58,12 +58,12 @@ LIB_PBCS = \
 GEN_PIR = \
  src/lua51_testlex_gen.pir \
  src/dumplex_gen.pir \
- src/lua51_grammar_gen.pir \
- src/ASTGrammar.pir
+ src/lua51_gen.pir \
+ src/PASTGrammar_gen.pir \
+ src/POSTGrammar_gen.pir
 
 GEN_PBC = \
- src/lua51.pbc \
- luac.pbc
+ lua.pbc
 
 all: \
  pmc/lua_group$(LOAD_EXT) \
@@ -79,18 +79,17 @@ src/lua51_testlex_gen.pir: src/lua51_testlex.pg
 src/dumplex_gen.pir: src/dumplex.tg
 	$(TGE) --output=src/dumplex_gen.pir src/dumplex.tg
 
-src/lua51_grammar_gen.pir: src/lua51.pg
-	$(PGE) --output=src/lua51_grammar_gen.pir src/lua51.pg
+src/lua51_gen.pir: src/lua51.pg
+	$(PGE) --output=src/lua51_gen.pir src/lua51.pg
 
-src/ASTGrammar.pir: src/ASTGrammar.tg
-	$(TGE) --output=src/ASTGrammar.pir src/ASTGrammar.tg
+src/PASTGrammar_gen.pir: src/PASTGrammar.tg
+	$(TGE) --output=src/PASTGrammar_gen.pir src/PASTGrammar.tg
 
-src/lua51.pbc: src/lua51.pir src/lua51_grammar_gen.pir src/ASTGrammar.pir
-	$(PARROT) -o src/lua51.pbc --output-pbc src/lua51.pir
+src/POSTGrammar_gen.pir: src/POSTGrammar.tg
+	$(TGE) --output=src/POSTGrammar_gen.pir src/POSTGrammar.tg
 
-luac.pbc: luac.pir
-	$(PARROT) -o luac.pbc --output-pbc luac.pir
-
+lua.pbc: lua.pir src/lua51.pir src/lua51_gen.pir src/PASTGrammar_gen.pir src/POSTGrammar_gen.pir
+	$(PARROT) -o lua.pbc --output-pbc lua.pir
 
 pmc/lua_group$(LOAD_EXT) : $(PMC_FILES)
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
@@ -184,7 +183,7 @@ testclean:
 
 BUILD_CLEANERS = \
  $(GEN_PIR) \
- "src/*.pbc" \
+ "*.pbc" \
  "$(PMCDIR)/*.dump" \
  "$(PMCDIR)/*.c" \
  "$(PMCDIR)/*.h" \

@@ -19,7 +19,8 @@ This implementation is aligned with Lua 5.1 specifications.
 
 =head1 PIR Compiler/Interpreter
 
-Work started, but B<not functional>, see F<languages/lua/src/lua51.pir>.
+Work started, but B<not functional>, see F<languages/lua/src/lua51.pir> &
+F<languages/lua/lua.pir>.
 
 The lexicography part could be checked with F<languages/lua/test_lex.pir>.
 

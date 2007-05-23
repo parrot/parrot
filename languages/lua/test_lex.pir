@@ -34,7 +34,7 @@ and imports many definitions from the full Lua compiler
 =cut
 
 .sub '__onload' :load :init
-    load_bytecode 'languages/lua/src/lua51.pbc'
+    load_bytecode 'languages/lua/lua.pbc'
 
     $P0 = new [ 'HLLCompiler' ]
     $P0.'language'('LuaTestLex')
