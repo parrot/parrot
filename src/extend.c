@@ -770,6 +770,8 @@ Parrot_call_sub(Parrot_Interp interp, Parrot_PMC sub,
     PARROT_CALLIN_START(interp);
 
     va_start(ap, signature);
+    CONTEXT(interp->ctx)->constants =
+        PMC_sub(sub)->seg->const_table->constants;
     result = Parrot_runops_fromc_arglist(interp, sub, signature, ap);
     va_end(ap);
 
