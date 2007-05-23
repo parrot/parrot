@@ -132,7 +132,8 @@ next_submatch_ind:
   goto subMatches_ind_loop
 
 done:
-   .return match.__get_bool()
+   $I0 = istrue match
+   .return ($I0)
 
 badargs:
   tcl_error 'wrong # args: should be "regexp ?switches? exp string ?matchVar? ?subMatchVar subMatchVar ...?"'
