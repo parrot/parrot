@@ -505,8 +505,8 @@ callmethod - Invokes a method on an object, using children
              called, the second child is the invocant, and
              the remaining children are arguments to the method call.
 
-try        - (preliminary) Execute the code given by the first 
-             child, and if any exceptions occur then handle them 
+try        - (preliminary) Execute the code given by the first
+             child, and if any exceptions occur then handle them
              using the code given by the second child.
 
 If a node doesn't have a value set for C<pasttype>, then it
@@ -604,6 +604,10 @@ given by "%r", "%t", or "%u" in the C<code> string:
 
 =back
 
+=head2 PAST::Stmts
+
+C<PAST::Stmts> is a container of C<PAST::Node> without any specific methods.
+
 =head2 PAST::Block
 
 C<PAST::Block> nodes represent lexical scopes within an abstract
@@ -654,8 +658,8 @@ caller; PAST doesn't use C<symtable> for any code generation.
 
 =item compiler([name])
 
-Indicate that the children nodes of this block are to be 
-compiled using compiler C<name> instead of the standard 
+Indicate that the children nodes of this block are to be
+compiled using compiler C<name> instead of the standard
 PAST compiler.
 
 =cut

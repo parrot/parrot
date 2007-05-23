@@ -7,8 +7,6 @@ POST - Parrot opcode syntax tree
 This file implements the various opcode syntax tree nodes
 for compiling programs in Parrot.
 
-=head1 METHODS
-
 =cut
 
 .namespace [ 'POST' ]
@@ -44,6 +42,15 @@ for compiling programs in Parrot.
     .return ()
 .end
 
+
+=head1 POST Node types
+
+=head2 POST::Node
+
+C<POST::Node> is the base class for all POST nodes.  It's derived from class
+C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
+
+=cut
 
 .namespace [ 'POST::Node' ]
 
@@ -106,12 +113,21 @@ for compiling programs in Parrot.
     .return (code)
 .end
 
+
+=head2 POST::Ops
+
+=cut
+
 .namespace [ 'POST::Ops' ]
 
 .sub 'pir' :method
     .return self.'cpir'()
 .end
 
+
+=head2 POST::Op
+
+=cut
 
 .namespace [ 'POST::Op' ]
 
@@ -178,6 +194,10 @@ for compiling programs in Parrot.
 .end
 
 
+=head2 POST::Label
+
+=cut
+
 .namespace [ 'POST::Label' ]
 
 .sub 'result' :method
@@ -206,6 +226,10 @@ for compiling programs in Parrot.
     .return (code)
 .end
 
+
+=head2 POST::Sub
+
+=cut
 
 .namespace [ 'POST::Sub' ]
 
@@ -352,6 +376,14 @@ for compiling programs in Parrot.
     .return ()
 .end
 
+
+=head1 AUTHOR
+
+Patrick Michaud <pmichaud@pobox.com> is the author and maintainer.
+Please send patches and suggestions to the Parrot porters or
+Perl 6 compilers mailing lists.
+
+=cut
 
 
 # Local Variables:
