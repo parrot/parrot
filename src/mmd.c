@@ -633,31 +633,19 @@ static void
 mmd_expand_y(Interp *interp, INTVAL func_nr, INTVAL new_y)
 {
     funcptr_t *new_table;
-    UINTVAL x;
-    UINTVAL y;
-    UINTVAL i;
+    UINTVAL    new_size;
     MMD_table *table = interp->binop_mmd_funcs + func_nr;
 
-    x = table->x;
-    assert(x);
-    y = table->y;
+    assert(table->x);
 
-    /* First, fill in the whole new table with the default function
-       pointer. We only really need to do the new part, but... */
-    new_table = (funcptr_t *)mem_sys_allocate(sizeof (funcptr_t) * x * new_y);
-    for (i = 0; i < x * new_y; i++) {
-        new_table[i] = NULL;
-    }
+    new_size = sizeof (funcptr_t) * table->x * new_y;
 
-    /* Then copy the old table over, if it existed in the first place. */
-    if (table->mmd_funcs) {
-        memcpy(new_table, table->mmd_funcs,
-               sizeof (funcptr_t) * x * y);
-        mem_sys_free(table->mmd_funcs);
-    }
+    if (table->mmd_funcs)
+        table->mmd_funcs = mem_sys_realloc(table->mmd_funcs, new_size);
+    else
+        table->mmd_funcs = (funcptr_t *)mem_sys_allocate(new_size);
+
     table->y = new_y;
-    table->mmd_funcs = new_table;
-
 }
 
 /*
