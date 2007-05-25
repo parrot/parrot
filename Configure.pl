@@ -333,7 +333,7 @@ my $conf = Parrot::Configure->new;
 # from Parrot::Configure::Step::List
 $conf->add_steps(get_steps_list());
 
-my %args = %$args;
+my %args = %{$args};
 # from Parrot::Configure::Data
 $conf->options->set(%args);
 
