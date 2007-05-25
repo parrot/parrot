@@ -26,8 +26,7 @@ transform post (PAST::Block) :language('PIR') {
     outerpost = get_hll_global ['Lua::POST'], '$?SUB'
     .local pmc post
     post = new 'POST::Sub'
-    post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'pragma'=>pragma, 'blocktype'=>blocktype)
-    post.'result'('')
+    post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'pragma'=>pragma, 'blocktype'=>blocktype, 'result'=>'')
     set_hll_global ['Lua::POST'], '$?SUB', post
     .local pmc iter
     iter = node.'iterator'()
@@ -40,7 +39,11 @@ transform post (PAST::Block) :language('PIR') {
   iter_end:
     set_hll_global ['Lua::POST'], '$?SUB', outerpost
   unless null outerpost goto no_chunk
-    post = post.'new'('Lua::POST::Chunk', post)
+    post = post.'new'('Lua::POST::Chunk', post, 'prologue'=><<'PIRCODE')
+
+.HLL "Lua", "lua_group"
+
+PIRCODE
   no_chunk:
     .return (post)
 }

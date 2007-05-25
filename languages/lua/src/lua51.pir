@@ -727,18 +727,23 @@ L7:
 
 .namespace [ "Lua::POST::Chunk" ]
 
+.sub 'prologue' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('prologue', value, has_value)
+.end
+
 .sub 'pir' :method
     self.'cpir'()
+    $S0 = self.'prologue'()
+    if $S0 == '' goto L1
     .local pmc code
     new code, 'PGE::CodeString'
-    code.'emit'(<<'PIRCODE')
-
-.HLL "Lua", "lua_group"
-
-PIRCODE
+    code.'emit'($S0)
     $P0 = get_hll_global ['POST'], '$!subpir'
     code .= $P0
     set_hll_global ['POST'], '$!subpir', code
+L1:
 .end
 
 
