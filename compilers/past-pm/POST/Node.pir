@@ -332,7 +332,10 @@ C<POST::Sub> nodes represent PIR subroutines.
   iter_end:
     .local string value
     value = self.'result'()
-    code.'emit'("    .return (%0)\n.end\n", value)
+    if value == '' goto no_return
+    code.'emit'("    .return (%0)\n", value)
+  no_return:
+    code.'emit'(".end\n")
     $P0 = get_hll_global ['POST'], '$!subpir'
     code .= $P0
     set_hll_global ['POST'], '$!subpir', code
