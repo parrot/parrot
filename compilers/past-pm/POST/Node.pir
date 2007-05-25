@@ -50,6 +50,12 @@ for compiling programs in Parrot.
 C<POST::Node> is the base class for all POST nodes.  It's derived from class
 C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
 
+=over 4
+
+=item result([value])
+
+Get/set
+
 =cut
 
 .namespace [ 'POST::Node' ]
@@ -73,6 +79,10 @@ C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
     .return (value)
 .end
 
+
+=item push_pirop(pirop [,arglist :slurpy] [,adverbs :slurpy :named])
+
+=cut
 
 .sub 'push_pirop' :method
     .param pmc pirop
@@ -98,6 +108,10 @@ C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
 .end
 
 
+=item cpir()
+
+=cut
+
 .sub 'cpir' :method
     .local pmc code, iter
     code = new 'PGE::CodeString'
@@ -114,7 +128,15 @@ C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
 .end
 
 
+=back
+
 =head2 POST::Ops
+
+C<POST::Ops> is a container of C<POST::Node>.
+
+=over 4
+
+=item pir()
 
 =cut
 
@@ -125,7 +147,17 @@ C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
 .end
 
 
+=back
+
 =head2 POST::Op
+
+C<POST::Op> nodes represents any PIR opcodes.
+
+=over 4
+
+=item pirop([opcode])
+
+Get/set
 
 =cut
 
@@ -136,6 +168,10 @@ C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
     .param int has_value       :opt_flag
     .return self.'attr'('pirop', value, has_value)
 .end
+
+=item arglist(arglist)
+
+=cut
 
 .sub 'arglist' :method
     .param pmc arglist         :slurpy
@@ -157,6 +193,10 @@ C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
     .return (arglist)
 .end
 
+
+=item pir()
+
+=cut
 
 .sub 'pir' :method
     .local pmc code, arglist
@@ -194,7 +234,17 @@ C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
 .end
 
 
+=back
+
 =head2 POST::Label
+
+C<POST::Label> nodes represent PIR labels.
+
+=over 4
+
+=item result([value])
+
+Get/set
 
 =cut
 
@@ -216,6 +266,10 @@ C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
 .end
 
 
+=item pir()
+
+=cut
+
 .sub 'pir' :method
     .local string code
     .local string value
@@ -227,7 +281,15 @@ C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
 .end
 
 
+=back
+
 =head2 POST::Sub
+
+C<POST::Sub> nodes represent PIR subroutines.
+
+=over 4
+
+=item pir()
 
 =cut
 
@@ -322,12 +384,24 @@ C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
 .end
 
 
+=item outer([outer])
+
+Get/set
+
+=cut
+
 .sub 'outer' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .return self.'attr'('outer', value, has_value)
 .end
 
+
+=item pragma([pragma])
+
+Get/set
+
+=cut
 
 .sub 'pragma' :method
     .param pmc value           :optional
@@ -336,12 +410,24 @@ C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
 .end
 
 
+=item blocktype([type])
+
+Get/set
+
+=cut
+
 .sub 'blocktype' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .return self.'attr'('blocktype', value, has_value)
 .end
 
+
+=item paramcode([paramcode])
+
+Get/set
+
+=cut
 
 .sub 'paramcode' :method
     .param pmc value           :optional
@@ -350,12 +436,22 @@ C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
 .end
 
 
+=item compiler([name])
+
+Get/set
+
+=cut
+
 .sub 'compiler' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .return self.'attr'('compiler', value, has_value)
 .end
 
+
+=item push_param(STR regtype, STR pname, STR flags, INT has_flags)
+
+=cut
 
 .sub 'push_param' :method
     .param string regtype
@@ -376,6 +472,8 @@ C<PAST::Node> (see F<compilers/past-pm/PAST/Node.pir>).
     .return ()
 .end
 
+
+=back
 
 =head1 AUTHOR
 
