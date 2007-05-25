@@ -698,6 +698,50 @@ L7:
     .return (past)
 .end
 
+.namespace [ "Lua::POST" ]
+
+.sub '__onload' :load :init
+
+    $P0 = subclass 'POST::Sub', 'Lua::POST::Chunk'
+
+#    .local pmc pirtable
+#    pirtable = new .Hash
+#    pirtable['add'] = '%tP+'
+#    pirtable['sub'] = '%tP+'
+#    pirtable['mul'] = '%tP+'
+#    pirtable['div'] = '%tP+'
+#    pirtable['n_add'] = '%rP+'
+#    pirtable['n_sub'] = '%rP+'
+#    pirtable['n_mul'] = '%rP+'
+#    pirtable['n_div'] = '%rP+'
+#    pirtable['concat'] = '%tP~'
+#    pirtable['abs'] = '%t'
+#    pirtable['say'] = '%v'
+#    pirtable['print'] = '%v'
+#    pirtable['set'] = '%rP'
+#    pirtable['call'] = '%rPPPPPPPPPPPPPPPP'                # FIXME:
+#    pirtable['callmethod'] = '%rPPPPPPPPPPPPPPPP'          # FIXME:
+#    set_hll_global ['Lua::POST'], '%pirtable', pirtable
+    .return ()
+.end
+
+.namespace [ "Lua::POST::Chunk" ]
+
+.sub 'pir' :method
+    self.'cpir'()
+    .local pmc code
+    new code, 'PGE::CodeString'
+    code.'emit'(<<'PIRCODE')
+
+.HLL "Lua", "lua_group"
+
+PIRCODE
+    $P0 = get_hll_global ['POST'], '$!subpir'
+    code .= $P0
+    set_hll_global ['POST'], '$!subpir', code
+.end
+
+
 .include 'languages/lua/src/lua51_gen.pir'
 .include 'languages/lua/src/PASTGrammar_gen.pir'
 .include 'languages/lua/src/POSTGrammar_gen.pir'

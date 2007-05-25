@@ -13,17 +13,6 @@ into an opcode syntax tree (POST).
 
 grammar Lua::POST::Grammar is TGE::Grammar;
 
-transform root (PAST::Block) :language('PIR') {
-    .local pmc post
-    post = tree.'get'('post', node)
-    $I0 = isa post, 'POST::Sub'
-    if $I0 goto end
-    $S0 = post.'unique'('__anon_')
-    post = post.'new'('POST::Sub', post, 'name'=>$S0)
-  end:
-    .return (post)
-}
-
 
 transform post (PAST::Block) :language('PIR') {
     .local string name, pragma, blocktype
@@ -34,42 +23,25 @@ transform post (PAST::Block) :language('PIR') {
     pragma = node.'pragma'()
     blocktype = node.'blocktype'()
     .local pmc outerpost
-    outerpost = get_hll_global ['POST'], '$?SUB'
+    outerpost = get_hll_global ['Lua::POST'], '$?SUB'
     .local pmc post
     post = new 'POST::Sub'
     post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'pragma'=>pragma, 'blocktype'=>blocktype)
-    set_hll_global ['POST'], '$?SUB', post
-    .local string compiler
-    compiler = node.'compiler'()
-    if compiler goto hll_block
-  past_block:
+    post.'result'('')
+    set_hll_global ['Lua::POST'], '$?SUB', post
     .local pmc iter
     iter = node.'iterator'()
-    unless iter goto iter_end
   iter_loop:
-    .local pmc cpast, cpost
-    cpast = shift iter
-    cpost = tree.'get'('post', cpast)
-    post.'push'(cpost)
-    if iter goto iter_loop
-    post.'result'(cpost)
-  iter_end:
-    goto end
-
-  hll_block:
-    post.'compiler'(compiler)
-    iter = node.'iterator'()
-  hll_loop:
-    unless iter goto end
+    unless iter goto iter_end
     $P0 = shift iter
-    post.'push'($P0)
-    goto hll_loop
-
-  end:
-    set_hll_global ['POST'], '$?SUB', outerpost
-    if blocktype != 'immediate' goto blocktype_end
-    post = post.'new'('POST::Op', post, 'node'=>node, 'pirop'=>'call', 'arglist'=>post)
-  blocktype_end:
+    $P1 = tree.'get'('post', $P0)
+    post.'push'($P1)
+    goto iter_loop
+  iter_end:
+    set_hll_global ['Lua::POST'], '$?SUB', outerpost
+  unless null outerpost goto no_chunk
+    post = post.'new'('Lua::POST::Chunk', post)
+  no_chunk:
     .return (post)
 }
 
@@ -395,17 +367,13 @@ transform bind (PAST::Op) :language('PIR') {
 
 
 transform assign (PAST::Op) :language('PIR') {
-    .local pmc lpast, rpast, lpost, rpost, post, alabel
-    rpast = node[1]
-    rpost = tree.'get'('post', rpast)
-    lpast = node[0]
-    lpost = tree.'get'('post', lpast)
+    .local pmc lpost, rpost, post
+    $P0 = node[1]
+    rpost = tree.'get'('post', $P0)
+    $P0 = node[0]
+    lpost = tree.'get'('post', $P0)
     post = lpost.'new'('POST::Ops', rpost, lpost, 'node'=>node, 'result'=>lpost)
-    alabel = post.'new'('POST::Label', 'name'=>'assign_')
-    post.'push_pirop'('eq_addr', lpost, rpost, alabel)
-    post.'push_pirop'('morph', lpost, '.LuaNil')
     post.'push_pirop'('assign', lpost, rpost)
-    post.'push'(alabel)
     .return (post)
 }
 
@@ -469,23 +437,10 @@ transform post (PAST::Val) :language('PIR') {
     .local pmc post
     post = new 'POST::Ops'
     post.'init'('node'=>node)
-
-    .local string atype
-    atype = node.'atype'()
-    if ctype == '' goto return_pmc
-    if atype == '*' goto return_native
-    $I0 = index ctype, atype
-    if $I0 >= 0 goto return_native
-
-  return_pmc:
     $P0 = post.'push_new'('POST::Op', 'pirop'=>'new')
     $P0.'arglist'($P0, vtype)
     $P1 = post.'push_pirop'('assign', $P0, name, 'result'=>$P0)
     post.'result'($P1)
-    .return (post)
-
-  return_native:
-    post.'result'(name)
     .return (post)
 }
 
@@ -552,7 +507,7 @@ transform bind (PAST::Var) :language('PIR') {
 
 
 transform vivipost (PAST::Var) :language('PIR') {
-    .local pmc vivipost, vivilabel
+    .local pmc vivipost
     .local string viviself
     viviself = node.'viviself'()
     if viviself goto have_viviself
@@ -609,47 +564,23 @@ transform post (PAST::Var) :language('PIR') {
     post.'arglist'(name, pname)
     post.'result'(pname)
     .local pmc subpost
-    subpost = get_hll_global ['POST'], '$?SUB'
+    subpost = get_hll_global ['Lua::POST'], '$?SUB'
     subpost.'push_param'('pmc', pname)
     .return (post)
 
   have_scope:
-    post.'push_pirop'(fetchop, vivipost, name)
-    post.'push_pirop'('unless_null', post, vivilabel)
-    post.'push'(vivipost)
-    .local int islvalue
-    islvalue = node.'islvalue'()
-    unless islvalue goto done_lvalue
+#    post.'push_pirop'(fetchop, vivipost, name)
+#    post.'push_pirop'('unless_null', post, vivilabel)
+#    post.'push'(vivipost)
+#    .local int islvalue
+#    islvalue = node.'islvalue'()
+#    unless islvalue goto done_lvalue
     post.'push_pirop'(storeop, name, post)
-  done_lvalue:
-    post.'push'(vivilabel)
+#  done_lvalue:
+#    post.'push'(vivilabel)
     .return (post)
 }
 
-
-transform bind (PAST::VarList) :language('PIR') {
-    .local pmc post, bindvalue, binditer
-    post = new 'POST::Ops'
-    post.'init'('node'=>node)
-
-    bindvalue = node.'bindvalue'()
-    binditer = post.'push_new'('POST::Op', 'pirop'=>'new')
-    binditer.'arglist'(binditer, '.Iterator', bindvalue)
-
-    .local pmc iter
-    iter = node.'iterator'()
-  iter_loop:
-    unless iter goto iter_end
-    .local pmc cpast, cpost
-    cpast = shift iter
-    post.'push_pirop'('shift', post, binditer)
-    cpast.'bindvalue'(post)
-    cpost = tree.'get'('bind', cpast)
-    post.'push'(cpost)
-    goto iter_loop
-  iter_end:
-    .return (post)
-}
 
 =head1 HISTORY
 
