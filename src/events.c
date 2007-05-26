@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -54,7 +54,7 @@ static const char *ev_names[] = {
     "EVENT_TYPE_SUSPEND_FOR_GC"
 };
 static const char*
-et(parrot_event* e)
+et(const parrot_event* const e)
 {
     return ev_names[e->type];
 }
@@ -335,7 +335,7 @@ Create queue entry and insert event into task queue.
 void
 Parrot_schedule_event(Parrot_Interp interp, parrot_event* ev)
 {
-    QUEUE_ENTRY* entry = mem_allocate_typed(QUEUE_ENTRY);
+    QUEUE_ENTRY* const entry = mem_allocate_typed(QUEUE_ENTRY);
     entry->next = NULL;
     ev->interp = interp;
     entry->data = ev;
@@ -364,10 +364,9 @@ Parrot_schedule_event(Parrot_Interp interp, parrot_event* ev)
 static void
 schedule_signal_event(int signum)
 {
-    parrot_event* ev = mem_allocate_typed(parrot_event);
-    QUEUE_ENTRY *entry;
+    parrot_event* const ev = mem_allocate_typed(parrot_event);
+    QUEUE_ENTRY * const entry = mem_allocate_typed(QUEUE_ENTRY);
 
-    entry = mem_allocate_typed(QUEUE_ENTRY);
     entry->next = NULL;
     entry->type = QUEUE_ENTRY_TYPE_EVENT;
     ev->type = EVENT_TYPE_SIGNAL;
@@ -396,7 +395,7 @@ void
 Parrot_new_timer_event(Parrot_Interp interp, PMC *timer, FLOATVAL diff,
         FLOATVAL interval, int repeat, PMC *sub, parrot_event_type_enum typ)
 {
-    parrot_event* ev = mem_allocate_typed(parrot_event);
+    parrot_event* const ev = mem_allocate_typed(parrot_event);
     FLOATVAL now = Parrot_floatval_time();
     ev->type = typ;
     ev->u.timer_event.timer = timer;
@@ -423,8 +422,9 @@ Prepare and schedule a callback event.
 void
 Parrot_new_cb_event(Parrot_Interp interp, PMC *cbi, char *ext)
 {
-    parrot_event* ev = mem_allocate_typed(parrot_event);
-    QUEUE_ENTRY* entry = mem_allocate_typed(QUEUE_ENTRY);
+    parrot_event* const ev = mem_allocate_typed(parrot_event);
+    QUEUE_ENTRY* const entry = mem_allocate_typed(QUEUE_ENTRY);
+
     entry->next = NULL;
     entry->data = ev;
     ev->interp = interp;
@@ -449,14 +449,13 @@ void
 Parrot_del_timer_event(Parrot_Interp interp, PMC *timer)
 {
     QUEUE_ENTRY  *entry;
-    parrot_event *event;
 
     LOCK(event_queue->queue_mutex);
 
     for (entry = event_queue->head; entry; entry = entry->next) {
         if (entry->type == QUEUE_ENTRY_TYPE_TIMED_EVENT) {
 
-            event = (parrot_event *)entry->data;
+            parrot_event * const event = (parrot_event *)entry->data;
 
             if (event->interp == interp
                     && event->u.timer_event.timer == timer) {
@@ -483,7 +482,7 @@ event arrives.
 void
 Parrot_new_terminate_event(Parrot_Interp interp)
 {
-    parrot_event* ev = mem_allocate_typed(parrot_event);
+    parrot_event* const ev = mem_allocate_typed(parrot_event);
     ev->type = EVENT_TYPE_TERMINATE;
     Parrot_schedule_event(interp, ev);
 }
@@ -502,7 +501,7 @@ variable for GC to finish when the event arrives.
 void
 Parrot_new_suspend_for_gc_event(Parrot_Interp interp) {
     QUEUE_ENTRY *qe;
-    parrot_event* ev = mem_allocate_typed(parrot_event);
+    parrot_event* const ev = mem_allocate_typed(parrot_event);
     ev->type = EVENT_TYPE_SUSPEND_FOR_GC;
     qe = mem_allocate_typed(QUEUE_ENTRY);
     qe->next = NULL;
@@ -527,7 +526,7 @@ Schedule event-loop terminate event. This shuts down the event thread.
 void
 Parrot_kill_event_loop(void)
 {
-    parrot_event* ev = mem_allocate_typed(parrot_event);
+    parrot_event* const ev = mem_allocate_typed(parrot_event);
     ev->type = EVENT_TYPE_EVENT_TERMINATE;
     Parrot_schedule_event(NULL, ev);
 }
@@ -547,7 +546,7 @@ checking for the interpreter.
 void
 Parrot_schedule_interp_qentry(Parrot_Interp interp, QUEUE_ENTRY *entry)
 {
-    parrot_event *event = (parrot_event *)entry->data;
+    parrot_event * const event = (parrot_event *)entry->data;
     /*
      * sleep checks events when it awakes
      */
@@ -587,8 +586,7 @@ void
 Parrot_schedule_broadcast_qentry(QUEUE_ENTRY *entry)
 {
     Parrot_Interp interp;
-    parrot_event *event = (parrot_event *)entry->data;
-    size_t        i;
+    parrot_event * const event = (parrot_event *)entry->data;
 
     switch (event->type) {
         case EVENT_TYPE_SIGNAL:
@@ -610,6 +608,7 @@ Parrot_schedule_broadcast_qentry(QUEUE_ENTRY *entry)
                 case SIGHUP:
                 case SIGINT:
                     if (n_interpreters) {
+                        size_t i;
                         LOCK(interpreter_array_mutex);
                         for (i = 1; i < n_interpreters; ++i) {
                             edebug((stderr, "deliver SIGINT to %d\n", i));
@@ -774,8 +773,8 @@ io_thread(void *data)
                                     break;
                                 case IO_THR_MSG_ADD_SELECT_RD:
                                     {
-                                        PMC *pio = buf.ev->u.io_event.pio;
-                                        int fd = PIO_getfd(NULL, pio);
+                                        PMC * const pio = buf.ev->u.io_event.pio;
+                                        const int fd = PIO_getfd(NULL, pio);
                                         if (FD_ISSET(fd, &act_rfds)) {
                                             mem_sys_free(buf.ev);
                                             break;
@@ -846,10 +845,9 @@ void
 Parrot_event_add_io_event(Interp *interp,
         PMC *pio, PMC *sub, PMC *data, INTVAL which)
 {
-    parrot_event *event;
     io_thread_msg buf;
 
-    event = mem_allocate_typed(parrot_event);
+    parrot_event * const event = mem_allocate_typed(parrot_event);
     event->type        = EVENT_TYPE_IO;
     event->interp      = interp;
     /*
@@ -890,9 +888,8 @@ Duplicate queue entry.
 static QUEUE_ENTRY*
 dup_entry(QUEUE_ENTRY *entry)
 {
-    QUEUE_ENTRY *new_entry;
+    QUEUE_ENTRY * const new_entry = mem_allocate_typed(QUEUE_ENTRY);
 
-    new_entry       = mem_allocate_typed(QUEUE_ENTRY);
     new_entry->next = NULL;
     new_entry->type = entry->type;
     new_entry->data = mem_allocate_typed(parrot_event);
@@ -915,8 +912,8 @@ Duplicate timed entry and add interval to C<abs_time>.
 static QUEUE_ENTRY*
 dup_entry_interval(QUEUE_ENTRY *entry, FLOATVAL now)
 {
-    QUEUE_ENTRY  *new_entry       = dup_entry(entry);
-    parrot_event *event           = (parrot_event *)new_entry->data;
+    QUEUE_ENTRY  * const new_entry       = dup_entry(entry);
+    parrot_event * const event           = (parrot_event *)new_entry->data;
 
     event->u.timer_event.abs_time = now + event->u.timer_event.interval;
 
@@ -939,14 +936,13 @@ process_events(QUEUE *event_q)
 {
     FLOATVAL      now;
     QUEUE_ENTRY  *entry;
-    parrot_event *event;
 
     while ((entry = peek_entry(event_q)) != NULL) {
         /*
          * one or more entries arrived - we hold the mutex again
          * so we have to use the nonsyc_pop_entry to pop off event entries
          */
-        event = NULL;
+        parrot_event *event = NULL;
 
         switch (entry->type) {
             case QUEUE_ENTRY_TYPE_EVENT:
@@ -1094,7 +1090,7 @@ wait_for_wakeup(Parrot_Interp interp, opcode_t *next)
 {
     QUEUE_ENTRY  *entry;
     parrot_event *event;
-    QUEUE        *tq = interp->task_queue;
+    QUEUE        * const tq = interp->task_queue;
 
     interp->sleeping = 1;
 
@@ -1198,7 +1194,7 @@ Convert event to exception and throw it.
 static void
 event_to_exception(Parrot_Interp interp, parrot_event* event)
 {
-    int exit_code = -event->u.signal;
+    const int exit_code = -event->u.signal;
 
     switch (event->u.signal) {
         case SIGINT:
@@ -1291,7 +1287,7 @@ Parrot_do_handle_events(Parrot_Interp interp, int restore, opcode_t *next)
 {
     QUEUE_ENTRY  *entry;
     parrot_event *event;
-    QUEUE        *tq = interp->task_queue;
+    QUEUE        * const tq = interp->task_queue;
 
     if (restore)
         disable_event_checking(interp);

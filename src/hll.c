@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005, The Perl Foundation.
+Copyright (C) 2005-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -96,15 +96,13 @@ string_as_const_string(Interp* interp, STRING *src)
 static PMC*
 new_hll_entry(Interp *interp)
 {
-    PMC *hll_info, *entry;
-
-    hll_info = interp->HLL_info;
+    PMC * const hll_info = interp->HLL_info;
     /*
      * ATT: all items that are owned by the HLL_info structure
      *      have to be created as constant objects, because
      *      this structure isn't marked by DOD/GC
      */
-    entry = constant_pmc_new(interp, enum_class_FixedPMCArray);
+    PMC * const entry = constant_pmc_new(interp, enum_class_FixedPMCArray);
     VTABLE_push_pmc(interp, hll_info, entry);
 
     VTABLE_set_integer_native(interp, entry, e_HLL_MAX);
@@ -218,10 +216,10 @@ STRING *
 Parrot_get_HLL_name(Interp *interp, INTVAL id)
 {
     PMC * const hll_info = interp->HLL_info;
-    INTVAL nelements;
     STRING *ret;
 
-    nelements = VTABLE_elements(interp, hll_info);
+    const INTVAL nelements = VTABLE_elements(interp, hll_info);
+
     if (id < 0 || id >= nelements) {
         ret = NULL;
     }
@@ -310,9 +308,8 @@ Parrot_get_HLL_type(Interp *interp, INTVAL hll_id, INTVAL core_type)
 INTVAL
 Parrot_get_ctx_HLL_type(Interp *interp, INTVAL core_type)
 {
-    INTVAL hll_id;
+    const INTVAL hll_id = CONTEXT(interp->ctx)->current_HLL;
 
-    hll_id = CONTEXT(interp->ctx)->current_HLL;
     return Parrot_get_HLL_type(interp, hll_id, core_type);
 }
 
@@ -334,7 +331,7 @@ special value C<PARROT_HLL_NONE>, return the global root namespace.
 PMC*
 Parrot_get_ctx_HLL_namespace(Interp *interp)
 {
-    parrot_context_t *ctx = CONTEXT(interp->ctx);
+    const parrot_context_t * const ctx = CONTEXT(interp->ctx);
 
     return Parrot_get_HLL_namespace(interp, ctx->current_HLL);
 }
