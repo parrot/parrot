@@ -834,7 +834,7 @@ of characters in the specified Parrot string's representation.
 */
 
 INTVAL
-string_max_bytes(Interp *interp, STRING *s, INTVAL nchars)
+string_max_bytes(Interp *interp, const STRING *s, INTVAL nchars)
 {
     assert(s->encoding);
     return ENCODING_MAX_BYTES_PER_CODEPOINT(interp, s) * nchars;
@@ -1202,7 +1202,7 @@ string_chopn(Interp *interp, STRING *s, INTVAL n, int in_place)
 
 
 INTVAL
-string_compare(Interp *interp, STRING *s1, STRING *s2)
+string_compare(Interp *interp, const STRING *s1, const STRING *s2)
 {
     if (!s1 && !s2) {
         return 0;

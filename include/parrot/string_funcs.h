@@ -24,10 +24,10 @@
 PARROT_API STRING *Parrot_reuse_COW_reference(Interp *, STRING *, STRING *);
 PARROT_API STRING *Parrot_make_COW_reference(Interp *, STRING *);
 PARROT_API void Parrot_unmake_COW(Interp *, STRING *);
-PARROT_API INTVAL string_compute_strlen(Interp *, STRING *);
-PARROT_API INTVAL string_max_bytes(Interp *, STRING*, INTVAL);
-PARROT_API STRING *string_concat(Interp *, STRING *, STRING *, UINTVAL);
-PARROT_API STRING *string_append(Interp *, STRING *, STRING *);
+PARROT_API INTVAL string_compute_strlen(Interp *, STRING *str);
+PARROT_API INTVAL string_max_bytes(Interp *, const STRING *str, INTVAL);
+PARROT_API STRING *string_concat(Interp *, STRING *str, STRING *appendage, UINTVAL len);
+PARROT_API STRING *string_append(Interp *, STRING *str, STRING *appendage);
 PARROT_API STRING *string_repeat(Interp *, const STRING *, UINTVAL,
         STRING **);
 PARROT_API STRING *string_chopn(Interp *, STRING *, INTVAL, int in_place);
@@ -39,9 +39,9 @@ PARROT_API STRING *string_nprintf(Interp *,
         STRING *, INTVAL, const char *, ...);
 PARROT_API STRING *string_printf(Interp *interp,
         const char *format, ...);
-PARROT_API INTVAL string_compare(Interp *, STRING *, STRING *);
+PARROT_API INTVAL string_compare(Interp *, const STRING *a, const STRING *b);
 PARROT_API INTVAL string_equal(Interp *, const STRING *a, const STRING *b);
-PARROT_API INTVAL string_bool(Interp *, const STRING *);
+PARROT_API INTVAL string_bool(Interp *, const STRING *a);
 PARROT_API STRING *string_increment(Interp *, const STRING *);
 PARROT_API const char *Parrot_string_cstring(Interp *, const STRING *);
 

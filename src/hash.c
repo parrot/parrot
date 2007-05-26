@@ -172,7 +172,7 @@ key_hash_int(Interp *interp, void *value, size_t seed)
 }
 
 static int
-int_compare(Parrot_Interp interp, void *a, void *b)
+int_compare(Parrot_Interp interp, const void *a, const void *b)
 {
     UNUSED(interp);
     return a != b;
