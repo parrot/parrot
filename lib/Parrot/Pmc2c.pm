@@ -629,15 +629,16 @@ sub methods {
     my ( $self, $line, $out_name ) = @_;
 
     my $cout = "";
+    my %method_used_p;
 
     # vtable methods
     foreach my $method ( @{ $self->{vtable}{methods} } ) {
         my $meth = $method->{meth};
-        next if $meth eq 'class_init';
         if ( $self->implements($meth) ) {
             my $ret = $self->body( $method, $line, $out_name );
             $line += count_newlines($ret);
             $cout .= $ret;
+            $method_used_p{$meth}++;
         }
     }
 
@@ -647,6 +648,14 @@ sub methods {
         my $ret = $self->body( $method, $line, $out_name );
         $line += count_newlines($ret);
         $cout .= $ret;
+        $method_used_p{$method->{meth}}++;
+    }
+
+    # check for misspelled or unimplemented method names.
+    foreach my $method ( @{ $self->{methods} } ) {
+        my $meth = $method->{meth};
+        warn "Cannot generate code for method '$meth', which is unknown.\n"
+            unless $method_used_p{$meth} || $meth eq 'class_init';
     }
 
     $cout =~ s/^\s+$//mg;
