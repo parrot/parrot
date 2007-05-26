@@ -40,10 +40,9 @@ Return index if C<name> is a valid vtable slot name.
 INTVAL
 Parrot_get_vtable_index(Interp *interp, STRING *name)
 {
-    char  *name_c = string_to_cstring(interp, name);
+    const char * const name_c = string_to_cstring(interp, name);
     INTVAL low    = 0;
     INTVAL high   = NUM_VTABLE_FUNCTIONS - 1;
-    INTVAL i;
 
     /* some of the first "slots" don't have names. skip 'em. */
     while (!Parrot_vtable_slot_names[low]) {
@@ -52,16 +51,13 @@ Parrot_get_vtable_index(Interp *interp, STRING *name)
     }
 
     while (low <= high) {
-        char *meth_c;
-        int   cmp;
-
-        i      = (low + high) / 2;
-        meth_c = Parrot_vtable_slot_names[i];
+        const INTVAL i = (low + high) / 2;
+        const char * const meth_c = Parrot_vtable_slot_names[i];
 
         /* XXX slot_names still have __ in front */
-        cmp    = strcmp(name_c, meth_c + 2);
+        const INTVAL cmp = strcmp(name_c, meth_c + 2);
 
-        if (!cmp) {
+        if (cmp == 0) {
             string_cstring_free(name_c);
             return i;
         }
@@ -90,21 +86,19 @@ Return Sub PMC if a method with the vtable name exists in ns
 static PMC*
 find_vtable_meth_ns(Interp *interp, PMC *ns, INTVAL vtable_index)
 {
-    INTVAL k   = VTABLE_elements(interp, ns);
-    PMC   *key = VTABLE_nextkey_keyed(interp, key_new(interp), ns,
+    const INTVAL k   = VTABLE_elements(interp, ns);
+    PMC   * const key = VTABLE_nextkey_keyed(interp, key_new(interp), ns,
         ITERATE_FROM_START);
 
-    const char *meth     = Parrot_vtable_slot_names[vtable_index];
-    STRING     *meth_str = string_from_cstring(interp, meth, strlen(meth));
+    const char * const meth     = Parrot_vtable_slot_names[vtable_index];
+    STRING     * const meth_str = string_from_cstring(interp, meth, strlen(meth));
 
-    STRING     *ns_key;
-    PMC        *res;
     int         j;
 
     for (j = 0; j < k; ++j) {
-        ns_key = (STRING *)parrot_hash_get_idx(interp,
+        STRING * const ns_key = (STRING *)parrot_hash_get_idx(interp,
                             (Hash *)PMC_struct_val(ns), key);
-        res    = VTABLE_get_pmc_keyed_str(interp, ns, ns_key);
+        PMC * const res    = VTABLE_get_pmc_keyed_str(interp, ns, ns_key);
 
         /* success if matching vtable index or double-underscored name */
         if (res->vtable->base_type == enum_class_Sub &&
@@ -131,11 +125,11 @@ PMC*
 Parrot_find_vtable_meth(Interp *interp, PMC *pmc, STRING *meth)
 {
     INTVAL i, n;
-    PMC   *ns, *mro, *self_class, *res;
+    PMC   *ns, *mro, *self_class;
     PMC   *_class       = pmc;
 
     /* Get index in Parrot_vtable_slot_names[]. */
-    INTVAL vtable_index = Parrot_get_vtable_index(interp, meth);
+    const INTVAL vtable_index = Parrot_get_vtable_index(interp, meth);
 
     if (vtable_index == -1)
         return PMCNULL;
@@ -154,7 +148,7 @@ Parrot_find_vtable_meth(Interp *interp, PMC *pmc, STRING *meth)
         ns     = VTABLE_pmc_namespace(interp, _class);
 
         if (!PMC_IS_NULL(ns)) {
-            res = find_vtable_meth_ns(interp, ns, vtable_index);
+            PMC * const res = find_vtable_meth_ns(interp, ns, vtable_index);
 
             if (!PMC_IS_NULL(res))
                 return res;

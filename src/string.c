@@ -1233,7 +1233,7 @@ otherwise.
 */
 
 INTVAL
-string_equal(Interp *interp, STRING *s1, STRING *s2)
+string_equal(Interp *interp, const STRING *s1, const STRING *s2)
 {
     if ((s1 == s2) || (!s1 && !s2)) {
         return 0;

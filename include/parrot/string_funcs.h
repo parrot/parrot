@@ -40,7 +40,7 @@ PARROT_API STRING *string_nprintf(Interp *,
 PARROT_API STRING *string_printf(Interp *interp,
         const char *format, ...);
 PARROT_API INTVAL string_compare(Interp *, STRING *, STRING *);
-PARROT_API INTVAL string_equal(Interp *, STRING *, STRING *);
+PARROT_API INTVAL string_equal(Interp *, const STRING *a, const STRING *b);
 PARROT_API INTVAL string_bool(Interp *, const STRING *);
 PARROT_API STRING *string_increment(Interp *, const STRING *);
 PARROT_API const char *Parrot_string_cstring(Interp *, const STRING *);

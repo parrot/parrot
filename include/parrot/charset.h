@@ -49,7 +49,7 @@ typedef void (*charset_titlecase_t)(Interp *, STRING *source_string);
 typedef void (*charset_upcase_first_t)(Interp *, STRING *source_string);
 typedef void (*charset_downcase_first_t)(Interp *, STRING *source_string);
 typedef void (*charset_titlecase_first_t)(Interp *, STRING *source_string);
-typedef INTVAL (*charset_compare_t)(Interp *, STRING *lhs, STRING *rhs);
+typedef INTVAL (*charset_compare_t)(Interp *, const STRING *lhs, const STRING *rhs);
 typedef INTVAL (*charset_index_t)(Interp *, STRING *source_string, STRING *search_string, UINTVAL offset);
 typedef INTVAL (*charset_rindex_t)(Interp *, STRING *source_string, STRING *search_string, UINTVAL offset);
 typedef UINTVAL (*charset_validate_t)(Interp *, STRING *source_string);
