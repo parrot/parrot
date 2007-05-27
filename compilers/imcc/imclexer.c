@@ -2879,7 +2879,7 @@ static int input (yyscan_t yyscanner );
 		{ \
 		int c = '*'; \
 		size_t n; \
-		for ( n = 0; n < max_size && \
+		for ( n = 0; n < (size_t)max_size && \
 			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
 		if ( c == '\n' ) \
