@@ -1,5 +1,5 @@
 /* encoding.h
- *  Copyright (C) 2004-2006, The Perl Foundation.
+ *  Copyright (C) 2004-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -34,7 +34,7 @@ typedef UINTVAL (*encoding_bytes_t)(Interp*, STRING *src);
 
 struct string_iterator_t;       /* s. parrot/string.h */
 
-typedef void (*encoding_iter_init_t)(Interp *, STRING *src,
+typedef void (*encoding_iter_init_t)(Interp *, const STRING *src,
         struct string_iterator_t *);
 
 struct _encoding {

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -30,7 +30,7 @@ UCS-2 encoding with the help of the ICU library.
 #define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl ucs2")
 
 
-static void iter_init(Interp *, String *src, String_iter *iter);
+static void iter_init(Interp *, const String *src, String_iter *iter);
 
 
 static STRING *
@@ -217,7 +217,7 @@ ucs2_set_position(Interp *interp, String_iter *i, UINTVAL n)
 
 #endif
 static void
-iter_init(Interp *interp, String *src, String_iter *iter)
+iter_init(Interp *interp, const String *src, String_iter *iter)
 {
     iter->str = src;
     iter->bytepos = iter->charpos = 0;

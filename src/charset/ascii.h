@@ -1,5 +1,5 @@
 /* ascii.h
- *  Copyright (C) 2004, The Perl Foundation.
+ *  Copyright (C) 2004-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -27,8 +27,7 @@ STRING *ascii_get_graphemes(Interp *, STRING *source_string,
         UINTVAL offset, UINTVAL count);
 STRING *ascii_get_graphemes_inplace(Interp *, STRING *source_string,
         UINTVAL offset, UINTVAL count, STRING *dest_string);
-INTVAL ascii_compare(Interp *, STRING *lhs, STRING *rhs);
-INTVAL ascii_compare(Interp *, STRING *lhs, STRING *rhs);
+INTVAL ascii_compare(Interp *, const STRING *lhs, const STRING *rhs);
 INTVAL ascii_cs_index(Interp *, STRING *source_string,
         STRING *search_string, UINTVAL offset);
 INTVAL ascii_cs_rindex(Interp *, STRING *source_string,

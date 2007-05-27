@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -234,7 +234,7 @@ titlecase_first(Interp *interp, STRING *source_string)
 }
 
 INTVAL
-ascii_compare(Interp *interp, STRING *lhs, STRING *rhs)
+ascii_compare(Interp *interp, const STRING *lhs, const STRING *rhs)
 {
     UINTVAL offs, l_len, r_len, min_len;
     String_iter iter;

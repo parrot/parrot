@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -187,7 +187,7 @@ fixed8_set_position(Interp *interp, String_iter *iter, UINTVAL pos)
 
 
 static void
-iter_init(Interp *interp, String *src, String_iter *iter)
+iter_init(Interp *interp, const String *src, String_iter *iter)
 {
     iter->str = src;
     iter->bytepos = iter->charpos = 0;

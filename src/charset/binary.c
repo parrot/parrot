@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -98,7 +98,7 @@ titlecase_first(Interp *interp, STRING *source_string)
 }
 
 static INTVAL
-compare(Interp *interp, STRING *lhs, STRING *rhs)
+compare(Interp *interp, const STRING *lhs, const STRING *rhs)
 {
   return 0;
 }
