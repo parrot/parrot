@@ -204,10 +204,10 @@ while (<>) {
     my ( $ret, $args ) = split /\s+/, $_;
 
     $args = '' if not defined $args;
-    $args =~ s/^v$//
-        and warn "Removed deprecated 'v' argument signature on line $. of $ARGV";
+    warn "Removed deprecated 'v' argument signature on line $. of $ARGV\n"
+        if $args =~ s/^v$//;
 
-    die "Invalid return signature char '$ret' on line $. of $ARGV"
+    die "Invalid return signature char '$ret' on line $. of $ARGV\n"
         unless exists $ret_assign{$ret};
 
     if ( ( $seen{"$ret$args"} ||= $. ) != $. ) {

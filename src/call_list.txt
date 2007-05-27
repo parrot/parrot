@@ -423,7 +423,7 @@ l pttl	#  unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,const ch
 v t	#  void mysql_debug(const char *debug)
 # --- end mysqlclient library ---
 
-i v     # void function returning int like fork()
+i       # void function returning int like fork()
 i i3i   # POSIX's waitpid
 i ibi   # POSIX's read
 
