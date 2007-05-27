@@ -179,7 +179,7 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 
         id = string_from_int(interp, current_serno);
 
-        if (has_format && format != PMCNULL) {
+        if (has_format && format != NULL) {
             id = Parrot_sprintf_c(interp, "%Ss%Ss", format, id);
         }
         PCCRETURN(STRING* id);
