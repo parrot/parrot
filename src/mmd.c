@@ -57,7 +57,7 @@ dump_mmd(Interp *interp, INTVAL function)
     UINTVAL x, y;
     UINTVAL offset, x_funcs, y_funcs;
     MMD_table * const table = interp->binop_mmd_funcs + function;
-    funcptr_t func, def;
+    funcptr_t func, def; /* XXX Looks like def is never defined */
 
     x_funcs = table->x;
     y_funcs = table->y;
