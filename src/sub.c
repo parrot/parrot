@@ -302,21 +302,22 @@ Parrot_Context_get_info(Interp *interp, parrot_context_t *ctx,
                     Parrot_Context_info *info)
 {
     Parrot_sub *sub;
+    DECL_CONST_CAST;
 
     /* set file/line/pc defaults */
-    info->file = (char *) "(unknown file)";
-    info->line = -1;
-    info->pc = -1;
-    info->nsname = NULL;
-    info->subname = NULL;
+    info->file     = (char *) const_cast("(unknown file)");
+    info->line     = -1;
+    info->pc       = -1;
+    info->nsname   = NULL;
+    info->subname  = NULL;
     info->fullname = NULL;
 
     /* is the current sub of the specified context valid? */
     if (PMC_IS_NULL(ctx->current_sub)) {
-        info->subname = string_from_cstring(interp, "???", 3);
-        info->nsname = info->subname;
+        info->subname  = string_from_cstring(interp, "???", 3);
+        info->nsname   = info->subname;
         info->fullname = string_from_cstring(interp, "??? :: ???", 10);
-        info->pc = -1;
+        info->pc       = -1;
         return 0;
     }
 
