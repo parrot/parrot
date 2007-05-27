@@ -350,15 +350,6 @@ else {
     $conf->runsteps or exit(1);
 }
 
-# tell users what to do next
-#if ($run_build_tests) {
-#    print "\n\n";
-#    print "As you requested, I will now run some tests of the build tools.\n\n";
-#    system(qq{prove t/postconfigure/*.t t/tools/pmc2cutils/*.t t/tools/ops2cutils/*.t t/tools/ops2pmutils/*.t})
-#        and die "Unable to execute post-configuration and build tools tests";
-#}
-
-
 # build tests will only be run if you requested them 
 # as command-line option
 $opttest->run_build_tests();
