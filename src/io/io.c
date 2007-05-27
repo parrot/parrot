@@ -1170,7 +1170,7 @@ Returns the C<ParrotIO> PMC for C<stdin>.
 
 */
 
-PMC *
+PARROT_API PMC *
 PIO_STDIN ID((Interp *interp))
 {
     return PIO_STDIN(interp);
@@ -1187,7 +1187,7 @@ Returns the C<ParrotIO> PMC for C<stdout>.
 
 */
 
-PMC *
+PARROT_API PMC *
 PIO_STDOUT ID((Interp *interp))
 {
     return PIO_STDOUT(interp);
