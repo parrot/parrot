@@ -1880,7 +1880,8 @@ sorts of leak potential otherwise.
 void
 string_cstring_free(const char * const p)
 {
-    mem_sys_free(p);
+    DECL_CONST_CAST;
+    mem_sys_free((void *)const_cast(p));
 }
 
 /*

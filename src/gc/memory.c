@@ -153,13 +153,13 @@ Free a chunk of memory back to the system.
 */
 
 void
-mem_sys_free(const void * const from)
+mem_sys_free(void * from)
 {
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Freed %p\n", from);
 #endif
     if (from)
-        free((void *)from);
+        free(from);
 }
 
 void
