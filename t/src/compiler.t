@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -27,7 +27,9 @@ gathered in some API calls..
 
 =cut
 
-c_output_is( <<'CODE', <<'OUTPUT', "compreg/compile" );
+SKIP: {
+    skip( 'compreg disabled/imcc_compile_pir() not exported', 1 );
+    c_output_is( <<'CODE', <<'OUTPUT', "compreg/compile" );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
@@ -107,6 +109,8 @@ main(int margc, char *margv[])
 CODE
 ok
 OUTPUT
+}
+
 c_output_is( <<'CODE', <<'OUTPUT', "Parror Compile API Single call" );
 
 #include <stdio.h>

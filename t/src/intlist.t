@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -8,9 +8,9 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan $^O =~ m/MSWin32|cygwin/
-   ? ( skip_all => 'broken on win32 && cygwin' )
-   : ( tests => 4 );
+plan tests => 4;
+
+my @TODO = ( todo => 'Symbols not exported; see RT #43056' );
 
 =head1 NAME
 
@@ -26,7 +26,7 @@ Tests the various intlist_* functions.
 
 =cut
 
-c_output_is( <<'CODE', <<'OUTPUT', "creation" );
+c_output_is( <<'CODE', <<'OUTPUT', "creation", @TODO );
     #include <stdio.h>
     #include "parrot/parrot.h"
     #include "parrot/embed.h"
@@ -53,7 +53,7 @@ CODE
 The answer is 42.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "list aerobics" );
+c_output_is( <<'CODE', <<'OUTPUT', "list aerobics", @TODO );
     #include <stdio.h>
     #include "parrot/parrot.h"
     #include "parrot/embed.h"
@@ -130,7 +130,7 @@ CODE
 I need a shower.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "step aerobics" );
+c_output_is( <<'CODE', <<'OUTPUT', "step aerobics", @TODO );
     #include <stdio.h>
     #include "parrot/parrot.h"
     #include "parrot/embed.h"
@@ -260,7 +260,7 @@ Step 6: 257
 Done.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "yoyo" );
+c_output_is( <<'CODE', <<'OUTPUT', "yoyo", @TODO );
     #include <stdio.h>
     #include "parrot/parrot.h"
     #include "parrot/embed.h"

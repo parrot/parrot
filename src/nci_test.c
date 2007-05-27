@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2005, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -33,6 +33,7 @@ The name of a test function is usually 'nci_<signature>'. E.g. the function
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <parrot/config.h>
 
 /* Declarations of structs */
 
@@ -116,62 +117,63 @@ void nci_cb_D4(cb_D4_func, void*);
 
 /* Variable definitions */
 
-int    nci_dlvar_char      = 22;
-int    nci_dlvar_short     = 333;
-int    nci_dlvar_int       = -4444;
-long   nci_dlvar_long      = -7777777;
-float  nci_dlvar_float     = -333.0;
-double nci_dlvar_double    = -55555.55555;
-char   nci_dlvar_cstring[] = "This is a C-string.\n";
+PARROT_API int    int_cb_D4           = -55555;
+PARROT_API int    nci_dlvar_char      = 22;
+PARROT_API int    nci_dlvar_short     = 333;
+PARROT_API int    nci_dlvar_int       = -4444;
+PARROT_API long   nci_dlvar_long      = -7777777;
+PARROT_API float  nci_dlvar_float     = -333.0;
+PARROT_API double nci_dlvar_double    = -55555.55555;
+PARROT_API char   nci_dlvar_cstring[] = "This is a C-string.\n";
 
 
 /* Function definitions */
 
-char
+PARROT_API char
 nci_c() {
     return nci_dlvar_char;
 }
 
-char
+PARROT_API char
 nci_csc(short l1, char l2) {
     return l1 * l2;
 }
 
-double
+PARROT_API double
 nci_d() {
     nci_dlvar_double *= 10.0;
 
     return nci_dlvar_double;
 }
 
-double
+PARROT_API double
 nci_dd(double d) {
     return d * 2.0;
 }
 
-float
+PARROT_API float
 nci_f() {
     nci_dlvar_float *= 10.0;
 
     return nci_dlvar_float;
 }
 
-float
+PARROT_API float
 nci_fff(float l1, float l2) {
     return l1 / l2;
 }
 
-int
+PARROT_API int
 nci_i(void) {
    return nci_dlvar_int;
 }
 
-int
+PARROT_API int
 nci_isc(short l1, char l2) {
     return l1 * l2;
 }
 
-int
+PARROT_API int
 nci_ip(void *p) {
     typedef struct _dfi {
         double d;
@@ -187,7 +189,7 @@ nci_ip(void *p) {
 }
 
 /* test calls this with a string */
-int
+PARROT_API int
 nci_it(void *p) {
     fprintf(stderr, "%c%c\n", ((char*) p)[1], ((char *) p)[0]);
     fflush(stderr);
@@ -195,23 +197,23 @@ nci_it(void *p) {
     return 2;
 }
 
-long
+PARROT_API long
 nci_l() {
     return nci_dlvar_long;
 }
 
-int *
+PARROT_API int *
 nci_p() {
     return &nci_dlvar_int;
 }
 
-char *
+PARROT_API char *
 nci_t() {
     return nci_dlvar_cstring;
 }
 
 static char b[] = "xx worked\n";
-char *
+PARROT_API char *
 nci_tb(void *p) {
     b[0] = ((char*) p)[1];
     b[1] = ((char*) p)[0];
@@ -220,7 +222,7 @@ nci_tb(void *p) {
 }
 
 static char s[] = "xx worked\n";
-char *
+PARROT_API char *
 nci_tt(void *p) {
     s[0] = ((char*) p)[1];
     s[1] = ((char*) p)[0];
@@ -229,7 +231,7 @@ nci_tt(void *p) {
 }
 
 static char B[] = "xx done\n";
-char *
+PARROT_API char *
 nci_tB(void **p) {
     B[0] = (*(char**) p)[1];
     B[1] = (*(char**) p)[0];
@@ -237,12 +239,12 @@ nci_tB(void **p) {
     return B;
 }
 
-void *
+PARROT_API void *
 nci_pp(void *p) {
     return p;
 }
 
-int
+PARROT_API int
 nci_iiii(int i1, int i2, int i3) {
     fprintf(stderr, "%d %d %d\n", i1, i2, i3);
     fflush(stderr);
@@ -250,13 +252,13 @@ nci_iiii(int i1, int i2, int i3) {
     return 2;
 }
 
-int
+PARROT_API int
 nci_i4i(long * l, int i) {
 
     return (int) (*l * i);
 }
 
-int
+PARROT_API int
 nci_ii3(int a, int *bp) {
     int r = a * *bp;
     *bp = 4711;
@@ -264,7 +266,7 @@ nci_ii3(int a, int *bp) {
     return r;
 }
 
-static int
+PARROT_API static int
 call_back(char *str) {
     puts(str);
     fflush(stdout);
@@ -272,7 +274,7 @@ call_back(char *str) {
     return 4711;
 }
 
-void *
+PARROT_API void *
 nci_pi(int test) {
     switch (test) {
         case 0:
@@ -407,17 +409,17 @@ nci_pi(int test) {
     return NULL;
 }
 
-short
+PARROT_API short
 nci_s() {
     return nci_dlvar_short;
 }
 
-short
+PARROT_API short
 nci_ssc(short l1, char l2) {
     return l1 * l2;
 }
 
-void
+PARROT_API void
 nci_vP(void *pmc) {
     if (pmc)
         puts("ok");
@@ -434,7 +436,7 @@ nci_vP(void *pmc) {
 
 */
 
-void
+PARROT_API void
 nci_cb_C1(cb_C1_func cb, void* user_data) {
     const char *result = "succeeded";
     /* call the cb synchronously */
@@ -443,7 +445,7 @@ nci_cb_C1(cb_C1_func cb, void* user_data) {
     return;
 }
 
-void
+PARROT_API void
 nci_cb_C2(cb_C2_func cb, void* user_data) {
     /* call the cb synchronously */
     (cb)(77, user_data);
@@ -452,7 +454,7 @@ nci_cb_C2(cb_C2_func cb, void* user_data) {
 }
 
 static int int_cb_C3 = 99;
-void
+PARROT_API void
 nci_cb_C3(cb_C3_func cb, void* user_data) {
     /* call the cb synchronously */
     (cb)(&int_cb_C3, user_data);
@@ -460,7 +462,7 @@ nci_cb_C3(cb_C3_func cb, void* user_data) {
     return;
 }
 
-void
+PARROT_API void
 nci_cb_D1(cb_D1_func cb, void* user_data) {
     const char *result = "succeeded";
     /* call the cb synchronously */
@@ -469,7 +471,7 @@ nci_cb_D1(cb_D1_func cb, void* user_data) {
     return;
 }
 
-void
+PARROT_API void
 nci_cb_D2(cb_D2_func cb, void* user_data) {
     /* call the cb synchronously */
     (cb)(user_data, 88);
@@ -478,7 +480,7 @@ nci_cb_D2(cb_D2_func cb, void* user_data) {
 }
 
 static int int_cb_D3 = 111;
-void
+PARROT_API void
 nci_cb_D3(cb_D3_func cb, void* user_data) {
     /* call the cb synchronously */
     (cb)(user_data, &int_cb_D3);
@@ -486,8 +488,7 @@ nci_cb_D3(cb_D3_func cb, void* user_data) {
     return;
 }
 
-int int_cb_D4 = -55555;
-void
+PARROT_API void
 nci_cb_D4(cb_D4_func times_ten, void* user_data) {
     int cnt;
     for (cnt = 0; cnt < 9; cnt++)
@@ -499,7 +500,7 @@ nci_cb_D4(cb_D4_func times_ten, void* user_data) {
     return;
 }
 
-void
+PARROT_API void
 nci_pip(int count, Rect_Like *rects) {
     int i;
     printf("Count: %d\n", count);
@@ -508,7 +509,7 @@ nci_pip(int count, Rect_Like *rects) {
         rects[i].x, rects[i].y, rects[i].w, rects[i].h);
 }
 
-int
+PARROT_API int
 nci_i33(int *double_me, int *triple_me) {
     *double_me *= 2;
     *triple_me *= 3;
@@ -516,14 +517,14 @@ nci_i33(int *double_me, int *triple_me) {
     return (*double_me + *triple_me);
 }
 
-void
+PARROT_API void
 nci_vpii(Outer *my_data, int my_x, int my_y) {
     my_data->x            = my_x;
     my_data->nested->y    = my_y;
 }
 
 static int my_array[4];
-void *
+PARROT_API void *
 nci_piiii(int alpha, int beta, int gamma, int delta) {
     static struct array_container
     {
@@ -542,20 +543,19 @@ nci_piiii(int alpha, int beta, int gamma, int delta) {
     return &container;
 }
 
-void *
+PARROT_API void *
 nci_pii(int fac1, int fac2) {
    nci_dlvar_int = fac1 * fac2;
 
    return &nci_dlvar_int;
 }
 
-
-void
+PARROT_API void
 nci_v() {
     nci_dlvar_int *= 10;
 }
 
-void
+PARROT_API void
 nci_vv(void) {
     nci_dlvar_int *= 3;
 }
