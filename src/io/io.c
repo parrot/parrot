@@ -1204,7 +1204,7 @@ Returns the C<ParrotIO> PMC for C<stderr>.
 
 */
 
-PMC *
+PARROT_API PMC *
 PIO_STDERR ID((Interp *interp))
 {
     return PIO_STDERR(interp);
