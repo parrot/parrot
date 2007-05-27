@@ -842,6 +842,10 @@ sub _generate_functions {
                 $iculibs = $PConfig{icu_shared};
             }
 
+            # set TODO before trying to compile or link
+            local *main::TODO;
+            *main::TODO = \$options{todo} if $options{todo};
+
             my ( $cmd, $exit_code );
             $cmd =
                   "$PConfig{cc} $PConfig{ccflags} $PConfig{cc_debug} "
@@ -887,8 +891,6 @@ sub _generate_functions {
             $exit_code = run_command( $cmd, 'STDOUT' => $out_f, 'STDERR' => $out_f );
 
             my $meth = $c_test_map{$func};
-            local *main::TODO;
-            *main::TODO = \$options{todo} if $options{todo};
             my $pass = $builder->$meth( slurp_file($out_f), $expected, $desc );
             $builder->diag("'$cmd' failed with exit code $exit_code")
                 if $exit_code and not $pass;
