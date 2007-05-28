@@ -33,8 +33,8 @@ PARROT_API STRING *string_repeat(Interp *, const STRING *, UINTVAL,
 PARROT_API STRING *string_chopn(Interp *, STRING *, INTVAL, int in_place);
 PARROT_API STRING *string_substr(Interp *, STRING *, INTVAL,
         INTVAL, STRING **, int replace_dest);
-PARROT_API STRING *string_replace(Interp *, STRING *, INTVAL, INTVAL,
-        STRING *, STRING **);
+PARROT_API STRING *string_replace(Interp *, STRING *src, INTVAL offset, INTVAL length,
+        STRING *rep, STRING **d);
 PARROT_API STRING *string_nprintf(Interp *,
         STRING *, INTVAL, const char *, ...);
 PARROT_API STRING *string_printf(Interp *interp,
@@ -82,8 +82,8 @@ PARROT_API STRING *string_from_cstring(Interp *, const char *, UINTVAL);
 PARROT_API STRING *string_from_const_cstring(Interp *, const char *, UINTVAL);
 PARROT_API STRING *const_string(Interp *, const char *buffer)
         __attribute__nonnull__(2);
-PARROT_API char *string_to_cstring(Interp *, STRING *);
-PARROT_API void string_cstring_free(const char * const);
+PARROT_API char *string_to_cstring(Interp *, const STRING *s);
+PARROT_API void string_cstring_free(char *);
 PARROT_API void string_pin(Interp *, STRING *);
 PARROT_API void string_unpin(Interp *, STRING *);
 PARROT_API STRING *string_bitwise_and(Interp *interp, STRING *s1,
@@ -136,7 +136,7 @@ PARROT_API STRING* Parrot_string_trans_charset(Interp *, STRING *src,
 PARROT_API STRING* Parrot_string_trans_encoding(Interp *, STRING *src,
         INTVAL encoding_nr, STRING *dest);
 
-PARROT_API CHARSET* string_rep_compatible(Interp *, STRING *a, const STRING *b,
+PARROT_API CHARSET* string_rep_compatible(Interp *, const STRING *a, const STRING *b,
         ENCODING**);
 PARROT_API STRING* string_join(Interp *, STRING *j, PMC *ar);
 PARROT_API PMC* string_split(Interp *, STRING *del, STRING *s);

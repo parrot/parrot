@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2002-2005, The Perl Foundation.
+Copyright (C) 2002-2007, The Perl Foundation.
 License:  Artistic/GPL, see README and LICENSES for details
 $Id$
 
@@ -35,13 +35,13 @@ Return datatype C<enum> for C<STRING*> typename.
 */
 
 INTVAL
-Parrot_get_datatype_enum(Interp *interp, STRING *_typename)
+Parrot_get_datatype_enum(Interp *interp, const STRING *_typename /* NN */)
 {
-    char *type = string_to_cstring(interp, _typename);
+    char * const type = string_to_cstring(interp, _typename);
     int i;
 
     for (i = enum_first_type; i < enum_last_type; i++) {
-        if (!strcmp(data_types[i - enum_first_type].name, type)) {
+        if (strcmp(data_types[i - enum_first_type].name, type) == 0) {
             string_cstring_free(type);
             return i;
         }

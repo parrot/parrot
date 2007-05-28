@@ -399,12 +399,11 @@ Returns the PMC type for C<name>.
 */
 
 INTVAL
-pmc_type(Interp* interp, STRING *name)
+pmc_type(Interp* interp, const STRING *name)
 {
     PMC * const classname_hash = interp->class_hash;
-    PMC *item;
+    const PMC * const item = (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
 
-    item = (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
     /* nested namespace with same name */
     if (item->vtable->base_type == enum_class_NameSpace)
         return 0;
@@ -414,12 +413,11 @@ pmc_type(Interp* interp, STRING *name)
 }
 
 INTVAL
-pmc_type_p(Interp* interp, PMC *name)
+pmc_type_p(Interp* interp, const PMC *name)
 {
     PMC * const classname_hash = interp->class_hash;
-    PMC *item;
+    PMC *item = (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
 
-    item = (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
     if (!PMC_IS_NULL(item))
         return PMC_int_val((PMC*) item);
     return 0;

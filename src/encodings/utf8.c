@@ -375,9 +375,7 @@ to_encoding(Interp *interp, STRING *src, STRING *dest)
 static UINTVAL
 get_codepoint(Interp *interp, const STRING *src, UINTVAL offset)
 {
-    const void *start;
-
-    start = utf8_skip_forward(src->strstart, offset);
+    const void * const start = utf8_skip_forward(src->strstart, offset);
     return utf8_decode(start);
 }
 

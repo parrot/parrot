@@ -40,7 +40,7 @@ Return index if C<name> is a valid vtable slot name.
 INTVAL
 Parrot_get_vtable_index(Interp *interp, STRING *name)
 {
-    const char * const name_c = string_to_cstring(interp, name);
+    char * const name_c = string_to_cstring(interp, name);
     INTVAL low    = 0;
     INTVAL high   = NUM_VTABLE_FUNCTIONS - 1;
 
@@ -1376,7 +1376,7 @@ Parrot_find_method_direct(Interp *interp, PMC *_class, STRING *method_name)
 }
 
 PMC *
-Parrot_find_method_with_cache(Interp *interp, PMC *_class, STRING *method_name)
+Parrot_find_method_with_cache(Interp *interp, PMC *_class, STRING *method_name /* NN */)
 {
     UINTVAL type, bits, i;
 
