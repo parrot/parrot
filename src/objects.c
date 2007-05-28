@@ -50,8 +50,8 @@ Parrot_get_vtable_index(Interp *interp, STRING *name)
         high++;
     }
 
-    while (low <= high) {
-        const INTVAL i = (low + high) / 2;
+    while (low < high) {
+        const INTVAL       i      = (low + high) / 2;
         const char * const meth_c = Parrot_vtable_slot_names[i];
 
         /* XXX slot_names still have __ in front */
@@ -62,9 +62,9 @@ Parrot_get_vtable_index(Interp *interp, STRING *name)
             return i;
         }
         else if (cmp > 0)
-            low = i + 1;
+            low  = i + 1;
         else
-            high = i - 1;
+            high = i;
     }
 
     string_cstring_free(name_c);
