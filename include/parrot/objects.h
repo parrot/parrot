@@ -57,7 +57,7 @@ PARROT_API void Parrot_set_class_destructor(Parrot_Interp, STRING *, INTVAL, STR
 PARROT_API void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
 PARROT_API void Parrot_invalidate_method_cache(Interp*, STRING *_class, STRING *meth);
 PARROT_API STRING *readable_name(Parrot_Interp, PMC *);
-PARROT_API INTVAL Parrot_get_vtable_index(Interp *, STRING *name);
+PARROT_API INTVAL Parrot_get_vtable_index(Interp *, const STRING *name);
 PARROT_API PMC *Parrot_find_vtable_meth(Interp* interp, PMC *pmc, STRING *meth);
 
 /* Objects, classes and PMCarrays all use the same data scheme:

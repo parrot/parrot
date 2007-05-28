@@ -38,7 +38,7 @@ Return index if C<name> is a valid vtable slot name.
 */
 
 INTVAL
-Parrot_get_vtable_index(Interp *interp, STRING *name)
+Parrot_get_vtable_index(Interp *interp, const STRING *name /*NN*/)
 {
     char * const name_c = string_to_cstring(interp, name);
     INTVAL low    = 0;
@@ -51,20 +51,20 @@ Parrot_get_vtable_index(Interp *interp, STRING *name)
     }
 
     while (low < high) {
-        const INTVAL       i      = (low + high) / 2;
-        const char * const meth_c = Parrot_vtable_slot_names[i];
+        const INTVAL       mid    = (low + high) / 2;
+        const char * const meth_c = Parrot_vtable_slot_names[mid];
 
         /* XXX slot_names still have __ in front */
         const INTVAL cmp = strcmp(name_c, meth_c + 2);
 
         if (cmp == 0) {
             string_cstring_free(name_c);
-            return i;
+            return mid;
         }
         else if (cmp > 0)
-            low  = i + 1;
+            low  = mid + 1;
         else
-            high = i;
+            high = mid;
     }
 
     string_cstring_free(name_c);
@@ -210,7 +210,7 @@ fail_if_exist(Interp *interp, PMC *name)
     INTVAL      type;
 
     PMC * const classname_hash = interp->class_hash;
-    PMC        *type_pmc       = (PMC *)VTABLE_get_pointer_keyed(interp,
+    PMC * const type_pmc       = (PMC *)VTABLE_get_pointer_keyed(interp,
                                         classname_hash, name);
     if (PMC_IS_NULL(type_pmc) ||
             type_pmc->vtable->base_type == enum_class_NameSpace)
@@ -265,7 +265,6 @@ rebuild_attrib_stuff(Interp *interp, PMC *_class)
 {
     INTVAL    attr_count, cur_offset, n_class, n_mro, offset;
     PMC      *attr_offset_hash, *mro, *attribs;
-    STRING   *classname, *partial_name;
     SLOTTYPE *class_slots;
 
 #ifndef NDEBUG
@@ -288,6 +287,8 @@ rebuild_attrib_stuff(Interp *interp, PMC *_class)
     cur_offset = 0;
 
     for (n_class = n_mro - 1; n_class >= 0; --n_class) {
+        STRING *classname;
+
         _class = VTABLE_get_pmc_keyed_int(interp, mro, n_class);
 
         /* this Class isa PMC - no attributes there */
@@ -301,14 +302,12 @@ rebuild_attrib_stuff(Interp *interp, PMC *_class)
         attr_count = VTABLE_elements(interp, attribs);
 
         if (attr_count) {
-            STRING *attr_name, *full_name;
-
-            partial_name = string_concat(interp, classname,
+            STRING * const partial_name = string_concat(interp, classname,
                     string_from_cstring(interp, "\0", 1), 0);
 
             for (offset = 0; offset < attr_count; offset++) {
-               attr_name = VTABLE_get_string_keyed_int(interp, attribs, offset);
-               full_name = string_concat(interp, partial_name, attr_name, 0);
+               STRING * const attr_name = VTABLE_get_string_keyed_int(interp, attribs, offset);
+               STRING * const full_name = string_concat(interp, partial_name, attr_name, 0);
 
                 /* store this attribute with short and full name */
 
@@ -466,9 +465,8 @@ Parrot_single_subclass(Interp *interp, PMC *base_class, PMC *name)
     else {
         /* XXX not really threadsafe but good enough for now */
         static int anon_count;
-        STRING *child_class_name;
-        child_class_name = Parrot_sprintf_c(interp, "%c%canon_%d", 0, 0,
-                                ++anon_count);
+        STRING * const child_class_name =
+            Parrot_sprintf_c(interp, "%c%canon_%d", 0, 0, ++anon_count);
         name             = pmc_new(interp, enum_class_String);
         VTABLE_set_string_native(interp, name, child_class_name);
     }
@@ -528,15 +526,14 @@ Parrot_single_subclass(Interp *interp, PMC *base_class, PMC *name)
          * if any parent isa PMC, then still individual vtables might
          * be overridden in this subclass
          */
-        const PMC *parent;
-        int i, n, any_pmc_parent;
+        int i, any_pmc_parent;
 
-        n              = VTABLE_elements(interp, mro);
+        const int n = VTABLE_elements(interp, mro);
         any_pmc_parent = 0;
 
         /* 0 = this, 1 = parent (handled above), 2 = grandpa */
         for (i = 2; i < n; ++i) {
-            parent = VTABLE_get_pmc_keyed_int(interp, mro, i);
+            const PMC * const parent = VTABLE_get_pmc_keyed_int(interp, mro, i);
             if (!PObj_is_class_TEST(parent)) {
                 any_pmc_parent = 1;
                 break;
@@ -742,8 +739,8 @@ parrot_class_register(Interp *interp, PMC *name,
     new_vtable->_namespace = ns;
 
     if (new_vtable->ro_variant_vtable) {
-        VTABLE *ro_vt;
-        ro_vt             = new_vtable->ro_variant_vtable;
+        VTABLE * const ro_vt = new_vtable->ro_variant_vtable;
+
         ro_vt->base_type  = new_vtable->base_type;
         ro_vt->pmc_class  = new_vtable->pmc_class;
         ro_vt->mro        = new_vtable->mro;
@@ -780,8 +777,8 @@ parrot_class_register(Interp *interp, PMC *name,
     new_vtable->_namespace = ns;
 
     if (new_vtable->ro_variant_vtable) {
-        VTABLE *ro_vt;
-        ro_vt             = new_vtable->ro_variant_vtable;
+        VTABLE * const ro_vt = new_vtable->ro_variant_vtable;
+
         ro_vt->base_type  = new_vtable->base_type;
         ro_vt->pmc_class  = new_vtable->pmc_class;
         ro_vt->mro        = new_vtable->mro;
@@ -790,7 +787,7 @@ parrot_class_register(Interp *interp, PMC *name,
 }
 
 static PMC*
-get_init_meth(Interp *interp, PMC *_class, STRING *prop_str, STRING **meth_str)
+get_init_meth(Interp *interp, PMC *_class, STRING *prop_str, STRING **meth_str /*NN*/)
 {
     STRING     *meth;
     HashBucket *b;
@@ -1010,10 +1007,9 @@ not_empty(Interp *interp, PMC *seqs)
 {
     INTVAL i;
     PMC * const nseqs = pmc_new(interp, enum_class_ResizablePMCArray);
-    PMC        *list;
 
     for (i = 0; i < VTABLE_elements(interp, seqs); ++i) {
-        list = VTABLE_get_pmc_keyed_int(interp, seqs, i);
+        PMC * const list = VTABLE_get_pmc_keyed_int(interp, seqs, i);
 
         if (VTABLE_elements(interp, list))
             VTABLE_push_pmc(interp, nseqs, list);
@@ -1026,25 +1022,27 @@ not_empty(Interp *interp, PMC *seqs)
 static PMC*
 class_mro_merge(Interp *interp, PMC *seqs)
 {
-    PMC   *seq, *nseqs, *s;
-    INTVAL i, j, k;
-
     /* silence compiler uninit warning */
     PMC *cand = NULL;
-    PMC *res  = pmc_new(interp, enum_class_ResizablePMCArray);
+    PMC * const res = pmc_new(interp, enum_class_ResizablePMCArray);
 
     while (1) {
-        nseqs = not_empty(interp, seqs);
+        PMC * const nseqs = not_empty(interp, seqs);
+        INTVAL i;
+
         if (!VTABLE_elements(interp, nseqs))
             break;
 
         for (i = 0; i < VTABLE_elements(interp, nseqs); ++i) {
-            seq  = VTABLE_get_pmc_keyed_int(interp, nseqs, i);
+            PMC * const seq  = VTABLE_get_pmc_keyed_int(interp, nseqs, i);
+            INTVAL j;
+
             cand = VTABLE_get_pmc_keyed_int(interp, seq, 0);
 
             /* check if candidate is valid */
             for (j = 0; j < VTABLE_elements(interp, nseqs); ++j) {
-                s = VTABLE_get_pmc_keyed_int(interp, nseqs, j);
+                PMC * const s = VTABLE_get_pmc_keyed_int(interp, nseqs, j);
+                INTVAL k;
 
                 for (k = 1; k < VTABLE_elements(interp, s); ++k)
                     if (VTABLE_get_pmc_keyed_int(interp, s, k) == cand) {
@@ -1064,7 +1062,7 @@ class_mro_merge(Interp *interp, PMC *seqs)
 
         /* remove candidate from head of lists */
         for (i = 0; i < VTABLE_elements(interp, nseqs); ++i) {
-            seq = VTABLE_get_pmc_keyed_int(interp, nseqs, i);
+            PMC * const seq = VTABLE_get_pmc_keyed_int(interp, nseqs, i);
 
             if (VTABLE_get_pmc_keyed_int(interp, seq, 0) == cand)
                 VTABLE_shift_pmc(interp, seq);
@@ -1078,7 +1076,7 @@ class_mro_merge(Interp *interp, PMC *seqs)
 static PMC*
 create_class_mro(Interp *interp, PMC *_class)
 {
-    PMC   *lparents, *bases, *base, *lmap;
+    PMC   *lparents, *bases;
     INTVAL i;
 
     /* list of lists
@@ -1093,8 +1091,8 @@ create_class_mro(Interp *interp, PMC *_class)
     bases = get_attrib_num(PMC_data(_class), PCD_PARENTS);
 
     for (i = 0; i < VTABLE_elements(interp, bases); ++i) {
-        base = VTABLE_get_pmc_keyed_int(interp, bases, i);
-        lmap = PObj_is_class_TEST(base) ?
+        PMC * const base = VTABLE_get_pmc_keyed_int(interp, bases, i);
+        PMC * const lmap = PObj_is_class_TEST(base) ?
             create_class_mro(interp, base) : base->vtable->mro;
         VTABLE_push_pmc(interp, lall, lmap);
     }
@@ -1487,12 +1485,13 @@ static PMC *
 find_method_direct_1(Interp *interp, PMC *_class,
                               STRING *method_name)
 {
-    PMC* method, *ns;
     INTVAL i;
 
     PMC * const mro = _class->vtable->mro;
     const INTVAL n = VTABLE_elements(interp, mro);
     for (i = 0; i < n; ++i) {
+        PMC* method, *ns;
+
         _class = VTABLE_get_pmc_keyed_int(interp, mro, i);
         ns = VTABLE_pmc_namespace(interp, _class);
         method = VTABLE_get_pmc_keyed_str(interp, ns, method_name);
