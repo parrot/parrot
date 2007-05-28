@@ -224,9 +224,9 @@ PIOOFF_T PIO_make_offset32(INTVAL hi, INTVAL lo);
 PIOOFF_T PIO_make_offset_pmc(Interp *, PMC *pmc);
 
 /* the internal system redefines them as macros */
-extern PMC *PIO_STDIN(Interp *);
-extern PMC *PIO_STDOUT(Interp *);
-extern PMC *PIO_STDERR(Interp *);
+PARROT_API extern PMC *PIO_STDIN(Interp *);
+PARROT_API extern PMC *PIO_STDOUT(Interp *);
+PARROT_API extern PMC *PIO_STDERR(Interp *);
 
 /*
  * pioctl definitions -- These are mostly for reference
