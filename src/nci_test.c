@@ -58,62 +58,62 @@ typedef struct Rect_Like {
 
 */
 
-char   nci_c(void);
-char   nci_csc(short, char);
-double nci_d(void);
-double nci_dd(double);
-float  nci_f(void);
-float  nci_fff(float, float);
-int    nci_i(void);
-int    nci_ib(int *);
-int    nci_iiii(int, int, int);
-int    nci_ii3(int, int *);
-int    nci_ip(void *);
-int    nci_isc(short, char);
-int    nci_it(void *);
-int    nci_i33(int *, int *);
-int    nci_i4i(long *, int);
-long   nci_l(void);
-int *  nci_p(void);
-void * nci_pi(int);
-void * nci_pii(int, int);
-void * nci_piiii(int, int, int, int);
-void   nci_pip(int, Rect_Like *);
-void * nci_pp(void *);
-short  nci_s(void);
-short  nci_ssc(short, char);
-char * nci_t(void);
-char * nci_tb(void *);
-char * nci_tB(void **);
-char * nci_tt(void *);
-void   nci_v(void);
-void   nci_vP(void *);
-void   nci_vpii(Outer *, int, int);
-void   nci_vv(void);
+PARROT_API char   nci_c(void);
+PARROT_API char   nci_csc(short, char);
+PARROT_API double nci_d(void);
+PARROT_API double nci_dd(double);
+PARROT_API float  nci_f(void);
+PARROT_API float  nci_fff(float, float);
+PARROT_API int    nci_i(void);
+PARROT_API int    nci_ib(int *);
+PARROT_API int    nci_iiii(int, int, int);
+PARROT_API int    nci_ii3(int, int *);
+PARROT_API int    nci_ip(void *);
+PARROT_API int    nci_isc(short, char);
+PARROT_API int    nci_it(void *);
+PARROT_API int    nci_i33(int *, int *);
+PARROT_API int    nci_i4i(long *, int);
+PARROT_API long   nci_l(void);
+PARROT_API int *  nci_p(void);
+PARROT_API void * nci_pi(int);
+PARROT_API void * nci_pii(int, int);
+PARROT_API void * nci_piiii(int, int, int, int);
+PARROT_API void   nci_pip(int, Rect_Like *);
+PARROT_API void * nci_pp(void *);
+PARROT_API short  nci_s(void);
+PARROT_API short  nci_ssc(short, char);
+PARROT_API char * nci_t(void);
+PARROT_API char * nci_tb(void *);
+PARROT_API char * nci_tB(void **);
+PARROT_API char * nci_tt(void *);
+PARROT_API void   nci_v(void);
+PARROT_API void   nci_vP(void *);
+PARROT_API void   nci_vpii(Outer *, int, int);
+PARROT_API void   nci_vv(void);
 
 
 /* Declarations for callback tests */
 
 typedef void (*cb_C1_func)(const char*, void*);
-void nci_cb_C1(cb_C1_func, void*);
+PARROT_API void nci_cb_C1(cb_C1_func, void*);
 
 typedef void (*cb_C2_func)(int, void*);
-void nci_cb_C2(cb_C2_func, void*);
+PARROT_API void nci_cb_C2(cb_C2_func, void*);
 
 typedef void (*cb_C3_func)(void*, void*);
-void nci_cb_C3(cb_C3_func, void*);
+PARROT_API void nci_cb_C3(cb_C3_func, void*);
 
 typedef void (*cb_D1_func)(void*, const char*);
-void nci_cb_D1(cb_D1_func, void*);
+PARROT_API void nci_cb_D1(cb_D1_func, void*);
 
 typedef void (*cb_D2_func)(void*, int);
-void nci_cb_D2(cb_D2_func, void*);
+PARROT_API void nci_cb_D2(cb_D2_func, void*);
 
 typedef void (*cb_D3_func)(void*, void*);
-void nci_cb_D3(cb_D3_func, void*);
+PARROT_API void nci_cb_D3(cb_D3_func, void*);
 
 typedef void (*cb_D4_func)(void*, void*);
-void nci_cb_D4(cb_D4_func, void*);
+PARROT_API void nci_cb_D4(cb_D4_func, void*);
 
 /* Variable definitions */
 
