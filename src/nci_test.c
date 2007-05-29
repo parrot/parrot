@@ -266,7 +266,7 @@ nci_ii3(int a, int *bp) {
     return r;
 }
 
-PARROT_API static int
+PARROT_API int
 call_back(char *str) {
     puts(str);
     fflush(stdout);
