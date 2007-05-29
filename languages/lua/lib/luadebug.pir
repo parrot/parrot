@@ -247,10 +247,10 @@ metatable.
 
 .sub 'getmetatable' :anon
     .param pmc obj :optional
-    .local pmc ret
+    .local pmc res
     lua_checkany(1, obj)
-    ret = obj.'get_metatable'()
-    .return (ret)
+    res = obj.'get_metatable'()
+    .return (res)
 .end
 
 
@@ -261,9 +261,9 @@ Returns the registry table.
 =cut
 
 .sub 'getregistry' :anon
-    .local pmc ret
-    ret = global '_REGISTRY'
-    .return (ret)
+    .local pmc res
+    res = global '_REGISTRY'
+    .return (res)
 .end
 
 
@@ -372,7 +372,7 @@ be B<nil>).
 .sub 'setmetatable' :anon
     .param pmc table :optional
     .param pmc metatable :optional
-    .local pmc ret
+    .local pmc res
     lua_checktype(1, table, 'table')
     if null metatable goto L1
     $I0 = isa metatable, 'LuaNil'
@@ -383,9 +383,9 @@ L1:
     lua_argerror(2, "nil or table expected")
 L2:
     table.'set_metatable'(metatable)
-    new ret, .LuaBoolean
-    set ret, 1
-    .return (ret)
+    new res, .LuaBoolean
+    set res, 1
+    .return (res)
 .end
 
 
@@ -417,15 +417,15 @@ STILL INCOMPLETE (see traceback in lua.pmc).
 .sub 'traceback' :anon
     .param pmc message :optional
     .param pmc level :optional
-    .param pmc ret
+    .param pmc res
     $S1 = optstring(message, '')
     $I2 = optint(level, 1)
     new $P0, .Lua
     $S0 = $P0.'traceback'($I2)
     $S1 .= $S0
-    new ret, .LuaString
-    set ret, $S1
-    .return (ret)
+    new res, .LuaString
+    set res, $S1
+    .return (res)
 .end
 
 

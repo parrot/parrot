@@ -53,7 +53,7 @@ inside C<f>.
 .sub 'alarm' :anon
     .param pmc s :optional
     .param pmc func :optional
-    .local pmc ret
+    .local pmc res
     $I1 = lua_checknumber(1, s)
     $P0 = global '_REGISTRY'
     new $P1, .LuaString
@@ -73,9 +73,9 @@ L2:
     $P0[.PARROT_TIMER_REPEAT] = 0
     $P0[.PARROT_TIMER_HANDLER] = func
     $P0()
-    new ret, .LuaNumber
-    set ret, $I1
-    .return (ret)
+    new res, .LuaNumber
+    set res, $I1
+    .return (res)
 .end
 
 =back

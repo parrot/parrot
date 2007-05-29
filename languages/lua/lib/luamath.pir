@@ -213,171 +213,171 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'abs' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = abs $N1
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'acos' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = acos $N1
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'asin' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = asin $N1
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'atan' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = atan $N1
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'atan2' :anon
     .param pmc y :optional
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, y)
     $N2 = lua_checknumber(2, x)
     $N0 = atan $N1, $N2
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'ceil' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = ceil $N1
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'cos' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = cos $N1
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'deg' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = 3.14159265358979323846 / 180.0
     $N0 = $N1 / $N0
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'exp' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = exp $N1
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'floor' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = floor $N1
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'fmod' :anon
     .param pmc x :optional
     .param pmc y :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N2 = lua_checknumber(1, y)
     $N0 = cmod $N1, $N2
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'frexp' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     lua_checknumber(1, x)
     new $P0, .Lua
-    ret = $P0.'frexp'(x)
-    .return (ret :flat)
+    res = $P0.'frexp'(x)
+    .return (res :flat)
 .end
 
 
 .sub 'ldexp' :anon
     .param pmc x :optional
     .param pmc nexp :optional
-    .local pmc ret
+    .local pmc res
     lua_checknumber(1, x)
     lua_checknumber(2, nexp)
     new $P0, .Lua
-    ret = $P0.'ldexp'(x, nexp)
-    .return (ret)
+    res = $P0.'ldexp'(x, nexp)
+    .return (res)
 .end
 
 
 .sub 'log' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = ln $N1
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'log10' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = log10 $N1
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
@@ -435,36 +435,36 @@ L3:
 
 .sub 'modf' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     lua_checknumber(1, x)
     new $P0, .Lua
-    ret = $P0.'modf'(x)
-    .return (ret :flat)
+    res = $P0.'modf'(x)
+    .return (res :flat)
 .end
 
 
 .sub 'pow' :anon
     .param pmc x :optional
     .param pmc y :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N2 = lua_checknumber(2, y)
     $N0 = pow $N1, $N2
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'rad' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = 3.14159265358979323846 / 180.0
     $N0 = $N1 * $N0
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
@@ -472,14 +472,14 @@ L3:
     .param pmc arg1 :optional
     .param pmc arg2 :optional
     .param pmc extra :slurpy
-    .local pmc ret
+    .local pmc res
     .local int u
     .local int l
     new $P0, .Random
     $N0 = $P0
-    new ret, .LuaNumber
+    new res, .LuaNumber
     unless null arg1 goto L1
-    set ret, $N0
+    set res, $N0
     goto L2
 L1:
     unless null arg2 goto L3
@@ -488,7 +488,7 @@ L1:
     mul $N0, u
     $I0 = floor $N0
     inc $I0
-    set ret, $I0
+    set res, $I0
     goto L2
 L3:
     if extra goto L5
@@ -500,14 +500,14 @@ L3:
     mul $N0, $I0
     $I0 = floor $N0
     add $I0, l
-    set ret, $I0
+    set res, $I0
     goto L2
 L4:
     lua_argerror(1, "interval is empty")
 L5:
     lua_error("wrong number of arguments")
 L2:
-    .return (ret)
+    .return (res)
 .end
 
 
@@ -521,34 +521,34 @@ L2:
 
 .sub 'sin' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = sin $N1
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'sqrt' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = sqrt $N1
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 
 .sub 'tan' :anon
     .param pmc x :optional
-    .local pmc ret
+    .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = tan $N1
-    new ret, .LuaNumber
-    set ret, $N0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $N0
+    .return (res)
 .end
 
 

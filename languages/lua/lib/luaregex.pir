@@ -232,12 +232,12 @@ Francois Perrad
     .return ($P0)
 
   analyze:
-    .local pmc exp, pad
-    exp = match['expr']
+    .local pmc expr, pad
+    expr = match['expr']
     pad = new .Hash
     pad['subpats'] = 0
-    exp = exp.'luaanalyze'(pad)
-    .return exp.'compile'(adverbs :flat :named)
+    expr = expr.'luaanalyze'(pad)
+    .return expr.'compile'(adverbs :flat :named)
 .end
 
 
@@ -572,7 +572,7 @@ Francois Perrad
     (mob, $P0, mfrom, mpos) = newfrom(mob, 0, 'PGE::Exp::Scalar')
     $I0 = $S0
     dec $I0
-    mob["cname"] = $I0
+    mob['cname'] = $I0
     mpos = pos
     .return (mob)
 .end
@@ -604,7 +604,7 @@ Francois Perrad
 
 .sub 'luaanalyze' :method
     .param pmc pad
-    .local pmc exp
+    .local pmc expr
     $I0 = 0
   loop:
     $I1 = defined self[$I0]
@@ -623,7 +623,7 @@ Francois Perrad
 
 .sub 'luaanalyze' :method
     .param pmc pad
-    .local pmc exp
+    .local pmc expr
 
     self['iscapture'] = 0
     if self != '(' goto end
@@ -635,9 +635,9 @@ Francois Perrad
     inc $I0
     pad['subpats'] = $I0
   end:
-    exp = self[0]
-    exp = exp.'luaanalyze'(pad)
-    self[0] = exp
+    expr = self[0]
+    expr = expr.'luaanalyze'(pad)
+    self[0] = expr
     .return (self)
 .end
 
@@ -653,12 +653,12 @@ Francois Perrad
     unless $S0 == '' goto super
 
     .local pmc args
-    args = self.getargs(label, next)
+    args = self.'getargs'(label, next)
 
     .local string captgen, captsave, captback
     (captgen, captsave, captback) = self.'gencapture'(label)
 
-    code.emit(<<"        CODE", captgen, captsave, captback, args :flat :named)
+    code.'emit'(<<"        CODE", captgen, captsave, captback, args :flat :named)
         %L: # empty capture
           %0
           push ustack, captscope
@@ -754,11 +754,11 @@ Francois Perrad
     .local string begin, end
     $S0 = self
     begin = substr $S0, 0, 1
-    begin = code.escape(begin)
+    begin = code.'escape'(begin)
     end = substr $S0, 1, 1
-    end = code.escape(end)
+    end = code.'escape'(end)
 
-    code.emit(<<"        CODE", label, begin, end, next)
+    code.'emit'(<<"        CODE", label, begin, end, next)
         %0: # balanced
           if pos >= lastpos goto fail
           $S0 = substr target, pos, 1

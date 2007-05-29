@@ -108,14 +108,14 @@ Returns C<table[i]..sep..table[i+1] ... sep..table[j]>. The default value for
     .param pmc j :optional
     .local pmc idx
     .local pmc value
-    .local string ret
+    .local string res
     .local int last
     $S2 = lua_optstring(2, sep, '')
     lua_checktype(1, table, 'table')
     $I3 = lua_optint(3, i, 1)
     $I0 = table.'len'()
     last = lua_optint(4, j, $I0)
-    ret = ''
+    res = ''
     new idx, .LuaNumber
 L1:
     unless $I3 <= last goto L2
@@ -128,15 +128,15 @@ L1:
     lua_argerror(1, "table contains non-strings")
 L3:
     $S0 = value
-    concat ret, $S0
+    concat res, $S0
     unless $I3 != last goto L4
-    concat ret, $S2
+    concat res, $S2
 L4:
     inc $I3
     goto L1
 L2:
     new $P0, .LuaString
-    set $P0, ret
+    set $P0, res
     .return ($P0)
 .end
 
@@ -159,7 +159,7 @@ B<DEPRECATED>
     .param pmc f :optional
     .local pmc idx
     .local pmc value
-    .local pmc ret
+    .local pmc res
     lua_checktype(1, table, 'table')
     lua_checktype(2, f, 'function')
     new idx, .LuaNil
@@ -168,10 +168,10 @@ L1:
     unless $P0 goto L2
     idx = $P0[0]
     value = $P0[1]
-    (ret) = f(idx, value)
-    $I0 = defined ret
+    (res) = f(idx, value)
+    $I0 = defined res
     unless $I0 goto L1
-    .return (ret)
+    .return (res)
 L2:
     .return ()
 .end
@@ -194,7 +194,7 @@ B<DEPRECATED>
     .param pmc f :optional
     .local pmc idx
     .local pmc value
-    .local pmc ret
+    .local pmc res
     .local int i
     .local int n
     lua_checktype(1, table, 'table')
@@ -207,10 +207,10 @@ L1:
     unless i <= n goto L2
     set idx, i
     value = table.'rawget'(idx)
-    (ret) = f(idx, value)
-    $I0 = defined ret
+    (res) = f(idx, value)
+    $I0 = defined res
     unless $I0 goto L1
-    .return (ret)
+    .return (res)
 L2:
     .return ()
 .end
@@ -226,10 +226,10 @@ B<DEPRECATED>
 
 .sub 'getn' :anon
     .param pmc table :optional
-    .local pmc ret
+    .local pmc res
     lua_checktype(1, table, 'table')
-    ret = table.'len'()
-    .return (ret)
+    res = table.'len'()
+    .return (res)
 .end
 
 
@@ -322,7 +322,7 @@ table C<t>.
     .param pmc table :optional
     .param pmc pos :optional
     .local pmc idx
-    .local pmc ret
+    .local pmc res
     .local int e
     .local int ipos
     lua_checktype(1, table, 'table')
@@ -330,12 +330,12 @@ table C<t>.
     ipos = lua_optint(2, pos, e)
     unless e <= 0 goto L1
     # table is `empty'
-    new ret, .LuaNil
-    .return (ret)
+    new res, .LuaNil
+    .return (res)
 L1:
     new idx, .LuaNumber
     set idx, ipos
-    ret = table.'rawget'(idx)
+    res = table.'rawget'(idx)
 L2:
     unless ipos < e goto L3
     $I2 = ipos + 1
@@ -349,7 +349,7 @@ L3:
     new $P0, .LuaNil
     set idx, e
     table.'rawset'(idx, $P0)
-    .return (ret)
+    .return (res)
 .end
 
 =item C<table.setn (table, n)>

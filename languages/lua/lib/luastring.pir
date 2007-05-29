@@ -180,9 +180,9 @@ L3:
     .local int n
     n = pose - posi
     inc n
-    .local pmc ret
-    new ret, .FixedPMCArray
-    set ret, n
+    .local pmc res
+    new res, .FixedPMCArray
+    set res, n
     .local int i
     i = 0
 L4:
@@ -192,11 +192,11 @@ L4:
     $I1 = ord $S1, $I0
     new $P0, .LuaNumber
     set $P0, $I1
-    ret[i] = $P0
+    res[i] = $P0
     inc i
     goto L4
 L5:
-    .return (ret :flat)
+    .return (res :flat)
 .end
 
 
@@ -212,7 +212,7 @@ Note that numerical codes are not necessarily portable across platforms.
 
 .sub 'char' :anon
     .param pmc argv :slurpy
-    .local pmc ret
+    .local pmc res
     .local int argc
     .local int i
     .local int c
@@ -231,9 +231,9 @@ L1:
     b = concat b, s
     goto L1
 L2:
-    new ret, .LuaString
-    set ret, b
-    .return (ret)
+    new res, .LuaString
+    set res, b
+    .return (res)
 .end
 
 
@@ -353,21 +353,21 @@ L8:
     .return ($P0 :flat)
 L7:
     # not found
-    .local pmc ret
-    new ret, .LuaNil
-    .return (ret)
+    .local pmc res
+    new res, .LuaNil
+    .return (res)
 .end
 
 .sub 'captures' :anon
     .param pmc match
     .param int whole
-    .local pmc ret
-    new ret, .FixedPMCArray
+    .local pmc res
+    new res, .FixedPMCArray
     .local pmc capts
     capts = match.'get_array'()
     if null capts goto L1
     $I1 = capts
-    set ret, $I1
+    set res, $I1
     $I0 = 0
 L2:
     unless $I0 < $I1 goto L3
@@ -388,14 +388,14 @@ L6:
     new $P1, .LuaString
     set $P1, $S0
 L5:
-    ret[$I0] = $P1
+    res[$I0] = $P1
     inc $I0
     goto L2
 L3:
-    .return (ret)
+    .return (res)
 L1:
     unless whole == 1 goto L7
-    set ret, 1
+    set res, 1
     $S0 = match.'text'()
     $I2 = index $S0, "\0"
     if $I2 < 0 goto L8
@@ -404,9 +404,9 @@ L1:
 L8:
     new $P1, .LuaString
     set $P1, $S0
-    ret[0] = $P1
+    res[0] = $P1
 L7:
-    .return (ret)
+    .return (res)
 .end
 
 =item C<string.format (formatstring, e1, e2, ...)>
@@ -518,10 +518,10 @@ L6:
     inc idx
     goto L1
 L2:
-    .local pmc ret
-    new ret, .LuaString
-    set ret, b
-    .return (ret)
+    .local pmc res
+    new res, .LuaString
+    set res, b
+    .return (res)
 .end
 
 .const string digits = '0123456789'
@@ -642,7 +642,7 @@ table:
 .sub 'gmatch' :anon :lex
     .param pmc s :optional
     .param pmc pattern :optional
-    .local pmc ret
+    .local pmc res
     lua_checkstring(1, s)
     $S2 = lua_checkstring(2, pattern)
     .local pmc regex_comp
@@ -653,15 +653,15 @@ table:
     $P0 = clone s
     .lex 'upvar_s', $P0
     .const .Sub gmatch_aux = 'gmatch_aux'
-    ret = newclosure gmatch_aux
-    .return (ret)
+    res = newclosure gmatch_aux
+    .return (res)
 .end
 
 .sub 'gmatch_aux' :anon :lex :outer(gmatch)
     .local pmc s
     .local pmc rulesub
     .local pmc match
-    .local pmc ret
+    .local pmc res
     s = find_lex 'upvar_s'
     rulesub = find_lex 'upvar_rulesub'
     $S1 = s
@@ -673,9 +673,9 @@ table:
     $P0 = captures(match, 1)
     .return ($P0 :flat)
 L1:
-    .local pmc ret
-    new ret, .LuaNil
-    .return (ret)
+    .local pmc res
+    new res, .LuaNil
+    .return (res)
 .end
 
 =item C<string.gsub (s, pat, repl [, n])>
@@ -874,12 +874,12 @@ Embedded zeros are counted, so C<"a\000b\000c"> has length 5.
 
 .sub 'len' :anon
     .param pmc s :optional
-    .local pmc ret
+    .local pmc res
     $S1 = lua_checkstring(1, s)
     $I0 = length $S1
-    new ret, .LuaNumber
-    set ret, $I0
-    .return (ret)
+    new res, .LuaNumber
+    set res, $I0
+    .return (res)
 .end
 
 
@@ -893,12 +893,12 @@ of what is an uppercase letter depends on the current locale.
 
 .sub 'lower' :anon
     .param pmc s :optional
-    .local pmc ret
+    .local pmc res
     $S1 = lua_checkstring(1, s)
     downcase $S1
-    new ret, .LuaString
-    set ret, $S1
-    .return (ret)
+    new res, .LuaString
+    set res, $S1
+    .return (res)
 .end
 
 
@@ -927,16 +927,16 @@ Returns a string that is the concatenation of C<n> copies of the string C<s>.
 .sub 'rep' :anon
     .param pmc s :optional
     .param pmc n
-    .local pmc ret
+    .local pmc res
     $S1 = lua_checkstring(1, s)
     $I2 = lua_checknumber(2, n)
     if $I2 >= 0 goto L1
     $I2 = 0
 L1:
     $S0 = repeat $S1, $I2
-    new ret, .LuaString
-    set ret, $S0
-    .return (ret)
+    new res, .LuaString
+    set res, $S0
+    .return (res)
 .end
 
 
@@ -948,7 +948,7 @@ Returns a string that is the string C<s> reversed.
 
 .sub 'reverse' :anon
     .param pmc s :optional
-    .local pmc ret
+    .local pmc res
     $S1 = lua_checkstring(1, s)
     $I0 = 0
     $I1 = length $S1
@@ -965,9 +965,9 @@ L1:
     goto L1
 L2:
     $S0 = join '', $P0
-    new ret, .LuaString
-    set ret, $S0
-    .return (ret)
+    new res, .LuaString
+    set res, $S0
+    .return (res)
 .end
 
 
@@ -985,7 +985,7 @@ C<string.sub(s, -i)> returns a suffix of C<s> with length C<i>.
     .param pmc s :optional
     .param pmc i :optional
     .param pmc j :optional
-    .local pmc ret
+    .local pmc res
     $S1 = lua_checkstring(1, s)
     $I1 = length $S1
     $I2 = lua_checknumber(2, i)
@@ -1006,9 +1006,9 @@ L2:
 L3:
     $S0 = ''
 L4:
-    new ret, .LuaString
-    set ret, $S0
-    .return (ret)
+    new res, .LuaString
+    set res, $S0
+    .return (res)
 .end
 
 
@@ -1022,12 +1022,12 @@ of what is a lowercase letter depends on the current locale.
 
 .sub 'upper' :anon
     .param pmc s :optional
-    .local pmc ret
+    .local pmc res
     $S1 = lua_checkstring(1, s)
     upcase $S1
-    new ret, .LuaString
-    set ret, $S1
-    .return (ret)
+    new res, .LuaString
+    set res, $S1
+    .return (res)
 .end
 
 =back

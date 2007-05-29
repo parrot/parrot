@@ -223,15 +223,15 @@ L5:
 
 .sub 'lua_getfenv'
     .param pmc o
-    .local pmc ret
+    .local pmc res
     if null o goto L1
     $I0 = can o, 'getfenv'
     unless $I0 goto L1
-    ret = o.'getfenv'()
-    .return (ret)
+    res = o.'getfenv'()
+    .return (res)
 L1:
-    new ret, .LuaNil
-    .return (ret)
+    new res, .LuaNil
+    .return (res)
 .end
 
 
@@ -331,17 +331,17 @@ L5:
 .sub 'lua_newmetatable'
     .param string tname
     .local pmc _lua__REGISTRY
-    .local pmc ret
+    .local pmc res
     _lua__REGISTRY = global '_REGISTRY'
     new $P1, .LuaString
     set $P1, tname
-    ret = _lua__REGISTRY[$P1]
-    $I0 = isa ret, 'LuaNil'
+    res = _lua__REGISTRY[$P1]
+    $I0 = isa res, 'LuaNil'
     unless $I0 goto L1
-    new ret, .LuaTable
-    _lua__REGISTRY[$P1] = ret
+    new res, .LuaTable
+    _lua__REGISTRY[$P1] = res
 L1:
-    .return (ret)
+    .return (res)
 .end
 
 

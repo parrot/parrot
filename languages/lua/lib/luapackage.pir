@@ -407,7 +407,7 @@ any loader for the module, then C<require> signals an error.
 
 .sub 'require' :anon
     .param pmc modname :optional
-    .local pmc ret
+    .local pmc res
     $S1 = lua_checkstring(1, modname)
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = global '_REGISTRY'
@@ -415,15 +415,15 @@ any loader for the module, then C<require> signals an error.
     set $P1, '_LOADED'
     .local pmc _LOADED
     _LOADED = _lua__REGISTRY[$P1]
-    ret = _LOADED[modname]
-    $I0 = istrue ret
+    res = _LOADED[modname]
+    $I0 = istrue res
     unless $I0 goto L1
-    $I0 = isa ret, 'LuaUserdata'
+    $I0 = isa res, 'LuaUserdata'
     unless $I0 goto L2
     lua_error("loop or previous error loading module '", $S1, "'")
 L2:
     # package is already loaded
-    .return (ret)
+    .return (res)
 L1:
     $P0 = global '_G'
     set $P1, 'package'

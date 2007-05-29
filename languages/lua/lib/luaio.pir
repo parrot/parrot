@@ -194,34 +194,34 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
 .sub 'getmode' :anon
     .param string mode
-    .local string ret
+    .local string res
     unless mode == 'r' goto L1
-    ret = '<'
+    res = '<'
     goto L9
 L1:
     unless mode == 'w' goto L2
-    ret = '>'
+    res = '>'
     goto L9
 L2:
     unless mode == 'a' goto L3
-    ret = '>>'
+    res = '>>'
     goto L9
 L3:
     unless mode == 'r+' goto L4
-    ret = '+<'
+    res = '+<'
     goto L9
 L4:
     unless mode == 'w+' goto L5
-    ret = '+>'
+    res = '+>'
     goto L9
 L5:
     unless mode == 'a+' goto L6
-    ret = '+>>'
+    res = '+>>'
     goto L9
 L6:
-    ret = ''
+    res = ''
 L9:
-    .return (ret)
+    .return (res)
 .end
 
 
@@ -241,39 +241,39 @@ L9:
 .sub 'read_chars'
     .param pmc f
     .param int n
-    .local pmc ret
+    .local pmc res
     $S0 = read f, n
     unless $S0 == '' goto L1
-    new ret, .LuaNil
+    new res, .LuaNil
     goto L2
 L1:
-    new ret, .LuaString
-    set ret, $S0
+    new res, .LuaString
+    set res, $S0
 L2:
-    .return (ret)
+    .return (res)
 .end
 
 
 .sub 'read_line'
     .param pmc f
-    .local pmc ret
+    .local pmc res
     $S0 = readline f
     unless $S0 == '' goto L1
-    new ret, .LuaNil
+    new res, .LuaNil
     goto L2
 L1:
     chopn $S0, 1
-    new ret, .LuaString
-    set ret, $S0
+    new res, .LuaString
+    set res, $S0
 L2:
-    .return (ret)
+    .return (res)
 .end
 
 .include 'cclass.pasm'
 
 .sub 'read_number'
     .param pmc f
-    .local pmc ret
+    .local pmc res
 L1:
     $S0 = peek f
     $I0 = is_cclass .CCLASS_WHITESPACE, $S0, 0
@@ -293,8 +293,8 @@ L3:
 L4:
     new $P1, .LuaString
     set $P1, $S1
-    ret = $P1.'tonumber'()
-    .return (ret)
+    res = $P1.'tonumber'()
+    .return (res)
 .end
 
 
@@ -314,16 +314,16 @@ L4:
 
 .sub 'test_eof'
     .param pmc f
-    .local pmc ret
+    .local pmc res
     $I1 = isfalse f
     unless $I1 goto L1
-    new ret, .LuaNil
+    new res, .LuaNil
     goto L2
 L1:
-    new ret, .LuaString
-    set ret, ''
+    new res, .LuaString
+    set res, ''
 L2:
-    .return (ret)
+    .return (res)
 .end
 
 
@@ -331,7 +331,7 @@ L2:
     .param pmc file
     .local pmc mt
     .local pmc mt_file
-    .local pmc ret
+    .local pmc res
     $I0 = isa file, 'LuaUserdata'
     $S0 = typeof file
     unless $I0 goto L1
@@ -341,8 +341,8 @@ L2:
     .const .LuaString key = 'ParrotIO'
     mt_file = _lua__REGISTRY[key]
     unless mt == mt_file goto L1
-    ret = getattribute file, 'data'
-    .return (ret)
+    res = getattribute file, 'data'
+    .return (res)
 L1:
     lua_typerror(1, $S0, 'file')
 .end
@@ -372,29 +372,29 @@ L1:
 .sub 'aux_lines' :lex
     .param pmc file
     .param pmc toclose
-    .local pmc ret
+    .local pmc res
     .lex 'upvar_file', file
     .lex 'upvar_toclose', toclose
     .const .Sub readline = 'readline'
-    ret = newclosure readline
-    .return (ret)
+    res = newclosure readline
+    .return (res)
 .end
 
 .sub 'readline' :anon :lex :outer(aux_lines)
     .local pmc file
     .local pmc f
-    .local pmc ret
+    .local pmc res
     file = find_lex 'upvar_file'
     f = getattribute file, 'data'
-    ret = read_line(f)
-    $I0 = isa ret, 'LuaNil'
+    res = read_line(f)
+    $I0 = isa res, 'LuaNil'
     unless $I0 goto L1
     .local pmc toclose
     toclose = find_lex 'upvar_toclose'
     unless toclose goto L1
     aux_close(file)
 L1:
-    .return (ret)
+    .return (res)
 .end
 
 =item C<io.close ([file])>
@@ -406,13 +406,13 @@ file.
 
 .sub 'close' :anon
     .param pmc file
-    .local pmc ret
+    .local pmc res
     unless null file goto L1
     file = getiofile(IO_OUTPUT)
 L1:
     tofile(file)
-    ret = aux_close(file)
-    .return (ret)
+    res = aux_close(file)
+    .return (res)
 .end
 
 
@@ -446,7 +446,7 @@ error code.
 .sub 'input' :anon
     .param pmc file :optional
     .local pmc f
-    .local pmc ret
+    .local pmc res
     if null file goto L1
     unless file goto L1
     $I1 = isa file, 'LuaString'
@@ -465,8 +465,8 @@ L2:
     setiofile(IO_INPUT, file)
     goto L1
 L1:
-    ret = getiofile(IO_INPUT)
-    .return (ret)
+    res = getiofile(IO_INPUT)
+    .return (res)
 .end
 
 
@@ -555,25 +555,25 @@ in the standard C function C<fopen>.
     .param pmc filename :optional
     .param pmc mode :optional
     .local pmc f
-    .local pmc ret
+    .local pmc res
     $S1 = lua_checkstring(1, filename)
     $S2 = lua_optstring(2, mode, 'r')
     $S0 = getmode($S2)
     if $S0 == '' goto L1
     f = open $S1, $S0
     unless f goto L1
-    ret = newfile()
-    setattribute ret, 'data', f
-    .return (ret)
+    res = newfile()
+    setattribute res, 'data', f
+    .return (res)
 L1:
-    new ret, .LuaNil
+    new res, .LuaNil
     .local pmc msg
     new msg, .LuaString
     $S0 = err
     concat $S1, ': '
     concat $S1, $S0
     set msg, $S1
-    .return (ret, msg)
+    .return (res, msg)
 .end
 
 
@@ -586,7 +586,7 @@ Similar to C<io.input>, but operates over the default output file.
 .sub 'output' :anon
     .param pmc file :optional
     .local pmc f
-    .local pmc ret
+    .local pmc res
     if null file goto L1
     unless file goto L1
     $I1 = isa file, 'LuaString'
@@ -604,8 +604,8 @@ L2:
     tofile(file)
     setiofile(IO_OUTPUT, file)
 L1:
-    ret = getiofile(IO_OUTPUT)
-    .return (ret)
+    res = getiofile(IO_OUTPUT)
+    .return (res)
 .end
 
 
@@ -678,7 +678,7 @@ handle, and B<nil> if C<obj> is not a file handle.
     .local pmc mt
     .local pmc mt_file
     .local pmc f
-    .local pmc ret
+    .local pmc res
     lua_checkany(1, obj)
     mt = obj.'get_metatable'()
     .local pmc _lua__REGISTRY
@@ -686,18 +686,18 @@ handle, and B<nil> if C<obj> is not a file handle.
     .const .LuaString key = 'ParrotIO'
     mt_file = _lua__REGISTRY[key]
     if mt == mt_file goto L1
-    ret = new .LuaNil
+    res = new .LuaNil
     goto L3
 L1:
-    ret = new .LuaString
+    res = new .LuaString
     f = getattribute obj, 'data'
     unless null f goto L2
-    set ret, 'closed file'
+    set res, 'closed file'
     goto L3
 L2:
-    set ret, 'file'
+    set res, 'file'
 L3:
-    .return (ret)
+    .return (res)
 .end
 
 
@@ -720,14 +720,14 @@ Equivalent to C<io.output():write>.
 .sub 'fclose' :anon
     .param pmc file
     .local pmc f
-    .local pmc ret
+    .local pmc res
     f = topfile(file)
     close f
     null f
     setattribute file, 'data', f
-    new ret, .LuaBoolean
-    set ret, 1
-    .return (ret)
+    new res, .LuaBoolean
+    set res, 1
+    .return (res)
 .end
 
 =back

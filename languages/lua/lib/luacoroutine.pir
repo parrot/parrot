@@ -83,14 +83,14 @@ Returns this new coroutine, an object with type C<"thread">.
 
 .sub 'create' :anon
     .param pmc f :optional
-    .local pmc ret
+    .local pmc res
     lua_checktype(1, f, 'function')
     $I0 = isa f, 'LuaClosure'
     if $I0 goto L1
     lua_argerror(1, 'Lua function expected')
 L1:
-    ret = new .LuaThread, f
-    .return (ret)
+    res = new .LuaThread, f
+    .return (res)
 .end
 
 =item C<coroutine.resume (co [, val1, ..., valn])>
@@ -111,17 +111,17 @@ C<resume> returns B<false> plus the error message.
 .sub 'resume' :anon
     .param pmc co :optional
     .param pmc argv :slurpy
-    .local pmc ret
+    .local pmc res
     .local pmc status
     lua_checktype(1, co, 'thread')
-    ($I0, ret :slurpy) = auxresume(co, argv :flat)
+    ($I0, res :slurpy) = auxresume(co, argv :flat)
     new status, .LuaBoolean
     set status, $I0
     unless $I0 goto L1
-    .return (status, ret :flat)
+    .return (status, res :flat)
 L1:
     .local pmc msg
-    $S0 = ret[0]
+    $S0 = res[0]
     new msg, .LuaString
     set msg, $S0
     .return (status, msg)
@@ -130,7 +130,7 @@ L1:
 .sub 'auxresume' :anon
     .param pmc co :optional
     .param pmc argv :slurpy
-    .local pmc ret
+    .local pmc res
     .local pmc co_stack
     co_stack = global '_COROUTINE_STACK'
     push co_stack, co
@@ -141,8 +141,8 @@ L1:
     .return (0, "cannot resume dead coroutine")
 L1:
     push_eh _handler
-    (ret :slurpy) = $P0.'resume'(argv :flat)
-    .return (1, ret :flat)
+    (res :slurpy) = $P0.'resume'(argv :flat)
+    .return (1, res :flat)
 _handler:
     .local pmc e
     .local string s
@@ -159,17 +159,17 @@ Returns the running coroutine, or B<nil> when called by the main thread.
 
 .sub 'running' :anon
     .local pmc co_stack
-    .local pmc ret
+    .local pmc res
     co_stack = global '_COROUTINE_STACK'
     $I0 = elements co_stack
     if $I0 goto L1
-    new ret, .LuaNil
+    new res, .LuaNil
     goto L2
 L1:
-    ret = pop co_stack
-    push co_stack, ret
+    res = pop co_stack
+    push co_stack, res
 L2:
-    .return (ret)
+    .return (res)
 .end
 
 
@@ -188,18 +188,18 @@ STILL INCOMPLETE.
 
 .sub 'status' :anon
     .param pmc co :optional
-    .local pmc ret
+    .local pmc res
     lua_checktype(1, co, 'thread')
-    new ret, .LuaString
+    new res, .LuaString
     $P0 = getattribute co, 'co'
     $P1 = getattribute $P0, 'state'
     if $P1 goto L1
-    set ret, 'dead'
+    set res, 'dead'
     goto L2
 L1:
-    set ret, 'suspended'
+    set res, 'suspended'
 L2:
-    .return (ret)
+    .return (res)
 .end
 
 =item C<coroutine.wrap (f)>
@@ -215,25 +215,25 @@ case of error, propagates the error.
 .sub 'wrap' :anon :lex
     .param pmc f :optional
     .param pmc argv :slurpy
-    .local pmc ret
+    .local pmc res
     .local pmc co
     .lex 'upvar_co', co
     co = create(f)
     .const .Sub auxwrap = 'auxwrap'
-    ret = newclosure auxwrap
-    .return (ret)
+    res = newclosure auxwrap
+    .return (res)
 .end
 
 .sub 'auxwrap' :anon :lex :outer(wrap)
     .param pmc argv :slurpy
     .local pmc co
-    .local pmc ret
+    .local pmc res
     co = find_lex 'upvar_co'
-    ($I0, ret :slurpy) = auxresume(co, argv :flat)
+    ($I0, res :slurpy) = auxresume(co, argv :flat)
     unless $I0 goto L1
-    .return (ret :flat)
+    .return (res :flat)
 L1:
-    $S0 = ret[0]
+    $S0 = res[0]
     lua_error($S0)
 .end
 
@@ -247,14 +247,14 @@ Any arguments to C<yield> are passed as extra results to C<resume>.
 
 .sub 'yield' :anon
     .param pmc argv :slurpy
-    .local pmc ret
+    .local pmc res
     .local pmc co
     .local pmc co_stack
     co_stack = global '_COROUTINE_STACK'
     co = pop co_stack
     $P0 = getattribute co, 'co'
-    (ret :slurpy) = $P0.'yield'(argv :flat)
-    .return (ret :flat)
+    (res :slurpy) = $P0.'yield'(argv :flat)
+    .return (res :flat)
 .end
 
 =back
