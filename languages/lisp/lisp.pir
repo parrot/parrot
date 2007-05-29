@@ -49,7 +49,7 @@
 
     .local pmc is_qualified
     # todo keyword, split into qualifier, package and symbol
-    is_qualified = p6rule( "^<[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]>*::<[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]>*" )
+    is_qualified = p6rule( '(<[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]>*)\:(<[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%]>*)' )
     set_global 'is_qualified', is_qualified
 
     _init_types()                       # Initialize all the type classes.
@@ -92,6 +92,7 @@ REP_LOOP:
 
     # VALID_IN_PARROT_0_2_0 foldup retv
     ( retv :slurpy) = _eval(args)
+    printerr 'after _eval'
 
     .local int nretv
     nretv = retv

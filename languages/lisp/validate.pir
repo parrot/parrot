@@ -8,20 +8,20 @@
   .local pmc package
   .local pmc symbol
   .local pmc retv
-  .local int flag
+  .local int capture
   .local pmc nil
 
   # VALID_IN_PARROT_0_2_0 flag = _IS_INTEGER(token)
   .local pmc is_integer
   is_integer = get_global 'is_integer'
-  flag = is_integer(token)                                      # attempt to parse token as an integer
-  if flag goto INTEGER
+  capture = is_integer(token)                                   # attempt to parse token as an integer
+  if capture goto INTEGER
 
   # VALID_IN_PARROT_0_2_0 flag = _IS_FLOAT(token) 
   .local pmc is_float
   is_float = get_global 'is_float'
-  flag = is_float(token)                                        # attempt to parse token as a float
-  if flag goto FLOAT
+  capture = is_float(token)                                     # attempt to parse token as a float
+  if capture goto FLOAT
 
   goto QUALIFIED_SYMBOL                                         # else interpret it as a symbol
 
@@ -35,11 +35,13 @@ FLOAT:
 
 QUALIFIED_SYMBOL:
   # VALID_IN_PARROT_0_2_0 (flag,pkgname,symname) = _IS_QUALIFIED(token)
-  .local pmc is_qualified
+  .local pmc is_qualified, capture
   is_qualified = get_global 'is_qualified'
-  (flag,pkgname,symname) = is_qualified(token)
-  if flag != 1 goto SYMBOL
+  capture = is_qualified(token)
+  unless capture goto SYMBOL
 
+  pkgname = capture[0]
+  symname = capture[1]
   retv = _LOOKUP_GLOBAL(pkgname, symname)
   if_null retv, SYMBOL_NOT_FOUND
   goto DONE
