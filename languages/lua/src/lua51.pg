@@ -122,7 +122,7 @@ rule index {
 }
 
 rule record_field {
-  [ <name> | <index> ] <?assign> <expression>
+  [ <name> | <index> ] <'='> <expression>
 }
 
 rule constructor {
@@ -130,7 +130,7 @@ rule constructor {
 }
 
 rule tablefieldlist {
-  <tablefield> [ <?fieldsep> <tablefield> ]* <?fieldsep>?
+  <tablefield> [ <fieldsep> <tablefield> ]* <fieldsep>?
 }
 
 rule fieldsep {
@@ -138,7 +138,7 @@ rule fieldsep {
 }
 
 rule tablefield {
-  [ <record_field> | <expression> ]*
+  <record_field> | <expression>
 }
 
 rule parameter_list {
@@ -221,10 +221,6 @@ rule comma {
 
 rule in {
   <'in'> | <syntax_error: 'in' expected>
-}
-
-rule assign {
-  <'='>  | <syntax_error: '=' expected>
 }
 
 rule closebracket {
@@ -326,9 +322,9 @@ proto 'infix:~='    is equiv('infix:<')     is pirop('isne')
 proto 'infix:=='    is equiv('infix:<')     is pirop('iseq')
                     is returns('.LuaBoolean')                   { ... }
 
-proto 'infix:and'   is looser('infix:<')    is past('if')       { ... }
+proto 'infix:and'   is looser('infix:<')    is past('and')      { ... }
 
-proto 'infix:or'    is looser('infix:and')  is past('unless')   { ... }
+proto 'infix:or'    is looser('infix:and')  is past('or')       { ... }
 
 
 =head1 AUTHORS

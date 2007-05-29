@@ -663,41 +663,6 @@ used in F<languages/lua/src/ASTGrammar.tg>
     exit 1
 .end
 
-.namespace [ "TGE::Tree" ]
-
-.sub 'assigns' :method
-    .param pmc node
-    .param pmc namelist
-    .param pmc explist
-    .local pmc past
-    $I0 = namelist
-    unless $I0 == 1 goto L2
-    past = namelist[0]
-    $P0 = explist[0]
-    if $P0 goto L3
-    $P0 = past.'new'('PAST::Val', 'vtype'=>'.LuaNil')
-L3:
-    .return past.'new'('PAST::Op', past, $P0, 'node'=>node, 'pasttype'=>'assign')
-L2:
-    new past, 'PAST::Stmts'
-    .local pmc iter
-    new iter, .Iterator, namelist
-L6:
-    unless iter goto L7
-    $P0 = shift iter
-    unless explist goto L8
-    $P1 = shift explist
-    goto L9
-L8:
-    $P1 = past.'new'('PAST::Val', 'vtype'=>'.LuaNil')
-L9:
-    $P2 = past.'new'('PAST::Op', $P0, $P1, 'node'=>node, 'pasttype'=>'assign')
-    past.'push'($P2)
-    goto L6
-L7:
-    .return (past)
-.end
-
 .namespace [ "Lua::POST" ]
 
 .sub '__onload' :load :init

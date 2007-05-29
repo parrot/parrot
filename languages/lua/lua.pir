@@ -28,6 +28,20 @@ C<lua> is a interpreter for Lua version 5.1, running on Parrot.
 
 .include 'languages/lua/src/lua51.pir'
 
+.HLL "Lua", "lua_group"
+
+.sub '__onload' :anon :init
+    load_bytecode 'languages/lua/lib/luabasic.pbc'
+    load_bytecode 'languages/lua/lib/luacoroutine.pir'
+    load_bytecode 'languages/lua/lib/luapackage.pbc'
+    load_bytecode 'languages/lua/lib/luastring.pir'
+    load_bytecode 'languages/lua/lib/luatable.pbc'
+    load_bytecode 'languages/lua/lib/luamath.pbc'
+    load_bytecode 'languages/lua/lib/luaio.pir'
+    load_bytecode 'languages/lua/lib/luaos.pbc'
+    load_bytecode 'languages/lua/lib/luadebug.pbc'
+.end
+
 =head1 SEE ALSO
 
 F<languages/lua/doc/status.pod>

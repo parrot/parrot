@@ -39,10 +39,19 @@ transform post (PAST::Block) :language('PIR') {
   iter_end:
     set_hll_global ['Lua::POST'], '$?SUB', outerpost
   unless null outerpost goto no_chunk
+#    .local pmc onload
+#    onload = post.'new'('POST::Sub', 'name'=>'__onload', 'pragma'=>':anon :init', 'result'=>'')
+##    onload.'push_pirop'('inline', '    print "onload\n"')
+#    onload.'push_pirop'('inline', '    load_bytecode "languages/lua/lib/luabasic.pbc"')
+    pragma .= ' :main'
+    post.'pragma'(pragma)
     post = post.'new'('Lua::POST::Chunk', post, 'prologue'=><<'PIRCODE')
 
 .HLL "Lua", "lua_group"
 
+#.sub "__onload" :anon :init
+#    load_bytecode "languages/lua/lib/luabasic.pbc"
+#.end
 PIRCODE
   no_chunk:
     .return (post)
@@ -50,6 +59,19 @@ PIRCODE
 
 
 transform post (PAST::Stmts) :language('PIR') {
+#    .local pmc ops
+#    ops =  new 'POST::Ops'
+#    ops.'init'('node'=>node)
+#    .local pmc iter
+#    iter = node.'iterator'()
+#  iter_loop:
+#    unless iter goto iter_end
+#    $P0 = shift iter
+#    $P1 = tree.'get'('post', $P0)
+#    ops.'push'($P1)
+#    goto iter_loop
+#  iter_end:
+#    .return (ops)
     .local pmc ops
     ops =  new 'POST::Ops'
     ops.'init'('node'=>node)
@@ -57,13 +79,12 @@ transform post (PAST::Stmts) :language('PIR') {
     iter = node.'iterator'()
     unless iter goto end
   iter_loop:
-    .local pmc cpast, cpost
-    cpast = shift iter
-    cpost = tree.'get'('post', cpast)
-    ops.'push'(cpost)
+    $P0 = shift iter
+    $P1 = tree.'get'('post', $P0)
+    ops.'push'($P1)
     if iter goto iter_loop
   iter_end:
-    ops.'result'(cpost)
+    ops.'result'($P1)
   end:
     .return (ops)
 }
@@ -174,15 +195,13 @@ transform pirop (PAST::Op) :language('PIR') {
 
 transform call (PAST::Op) :language('PIR') {
     node.'pirop'('call')
-    $P0 = tree.'get'('pirop', node)
-    .return ($P0)
+    .return tree.'get'('pirop', node)
 }
 
 
 transform callmethod (PAST::Op) :language('PIR') {
     node.'pirop'('callmethod')
-    $P0 = tree.'get'('pirop', node)
-    .return ($P0)
+    .return tree.'get'('pirop', node)
 }
 
 
@@ -236,11 +255,6 @@ transform if (PAST::Op) :language('PIR') {
 }
 
 
-transform unless (PAST::Op) :language('PIR') {
-    .return tree.'get'('if', node)
-}
-
-
 transform while (PAST::Op) :language('PIR') {
     .local pmc ops
     ops = new 'POST::Ops'
@@ -281,147 +295,62 @@ transform while (PAST::Op) :language('PIR') {
 }
 
 
-transform until (PAST::Op) :language('PIR') {
-    .return tree.'get'('while', node)
-}
-
-
-transform try (PAST::Op) :language('PIR') {
-    .local pmc trypast, trypost, post, traplabel, endlabel
-    trypast = node[0]
-    trypost = tree.'get'('post', trypast)
-    post = trypost.'new'('POST::Ops', 'node'=>node, 'result'=>trypost)
-    $S0 = node.'unique'('trap_')
-    traplabel = post.'new'('POST::Label', 'result'=>$S0)
-    $S0 = concat $S0, '_end'
-    endlabel = post.'new'('POST::Label', 'result'=>$S0)
-    post.'push_pirop'('push_eh', traplabel)
-    post.'push'(trypost)
-    post.'push_pirop'('clear_eh')
-    post.'push_pirop'('goto', endlabel)
-    post.'push'(traplabel)
-    .local pmc catchnode, catchpast
-    catchnode = node[1]
-    unless catchnode goto have_catch
-    catchpast = tree.'get'('post', catchnode)
-    post.'push'(catchpast)
-  have_catch:
-    post.'push'(endlabel)
-    .return (post)
-}
-
-
-transform xor (PAST::Op) :language('PIR') {
-    .local pmc ops
-    ops = new 'POST::Ops'
-    ops.'init'('node'=>node)
-
-    .local pmc endlabel, falselabel
-    falselabel = ops.'new'('POST::Label', 'name'=>'xor_false')
-    endlabel = ops.'new'('POST::Label', 'name'=>'xor_end')
-
-    .local pmc iter, apast, apost, i, t, u
-    i = ops.unique('$I')
-    t = ops.unique('$I')
-    u = ops.unique('$I')
-    iter = node.'iterator'()
-    apast = shift iter
-    apost = tree.'get'('post', apast)
-    ops.'push'(apost)
-    ops.'push_pirop'('set', ops, apost)
-    ops.'push_pirop'('istrue', t, apost)
-  middle_child:
-    .local pmc bpast, bpost
-    bpast = shift iter
-    bpost = tree.'get'('post', bpast)
-    ops.'push'(bpost)
-    ops.'push_pirop'('istrue', u, bpost)
-    ops.'push_pirop'('and', i, t, u)
-    ops.'push_pirop'('if', i, falselabel)
-    unless iter goto last_child
-    .local pmc s
-    s = ops.'new'('POST::Label', 'name'=>'xor_skip')
-    ops.'push_pirop'('if', t, s)
-    ops.'push_pirop'('set', ops, bpost)
-    ops.'push_pirop'('set', t, u)
-    ops.'push'(s)
-    goto middle_child
-  last_child:
-    ops.'push_pirop'('if', t, endlabel)
-    ops.'push_pirop'('set', ops, bpost)
-    ops.'push_pirop'('goto', endlabel)
-    ops.'push'(falselabel)
-    ops.'push_pirop'('new', ops, '.LuaNil')
-    ops.'push'(endlabel)
-    .return (ops)
-}
-
-
-transform bind (PAST::Op) :language('PIR') {
-    .local pmc lpast, rpast, lpost, rpost, post
-    rpast = node[1]
-    rpost = tree.'get'('post', rpast)
-    lpast = node[0]
-    lpast.'bindvalue'(rpost)
-    lpost = tree.'get'('bind', lpast)
-    post = lpost.'new'('POST::Ops', rpost, lpost, 'node'=>node)
-    .return (post)
-}
-
-
 transform assign (PAST::Op) :language('PIR') {
-    .local pmc lpost, rpost, post
+    .local pmc lpost, rpost, ops
     $P0 = node[1]
     rpost = tree.'get'('post', $P0)
     $P0 = node[0]
     lpost = tree.'get'('post', $P0)
-    post = lpost.'new'('POST::Ops', rpost, lpost, 'node'=>node, 'result'=>lpost)
-    post.'push_pirop'('assign', lpost, rpost)
-    .return (post)
+#    ops = lpost.'new'('POST::Ops', rpost, lpost, 'node'=>node, 'result'=>lpost)
+    ops = lpost.'new'('POST::Ops', rpost, lpost, 'node'=>node)
+    ops.'push_pirop'('set', lpost, rpost)
+    .return (ops)
 }
 
 
-transform chain (PAST::Op) :language('PIR') {
-    .local pmc clist, cpast
-    clist = new .ResizablePMCArray
-    cpast = node
-  chain_loop:
-    $I0 = isa cpast, 'PAST::Op'
-    if $I0 == 0 goto chain_end
-    .local string pasttype
-    pasttype = cpast.'pasttype'()
-    if pasttype != 'chain' goto chain_end
-    push clist, cpast
-    cpast = cpast[0]
-    goto chain_loop
-  chain_end:
-
-    .local pmc ops, endlabel, apast, apost
-    ops = new 'POST::Ops'
+transform assignlist (PAST::Op) :language('PIR') {
+    .local pmc lpost, rpost, ops
+    ops =  new 'POST::Ops'
     ops.'init'('node'=>node)
-    cpast = pop clist
-    endlabel = ops.'new'('POST::Label', 'name'=>'chain_end_')
-    apast = cpast[0]
-    apost = tree.'get'('post', apast)
-    ops.'push'(apost)
-
-  clist_loop:
-    .local pmc bpast, bpost
-    bpast = cpast[1]
-    bpost = tree.'get'('post', bpast)
-    .local string name
-    name = cpast.'name'()
-    name = cpast.'escape'(name)
-    ops.'push'(bpost)
-    $P0 = ops.'push_pirop'('call', name, apost, bpost)
-    $P0.'result'(ops)
-    unless clist goto clist_end
-    ops.'push_pirop'('unless', ops, endlabel)
-    cpast = pop clist
-    apost = bpost
-    goto clist_loop
-  clist_end:
-    ops.'push'(endlabel)
+    .local pmc namelist, explist
+    namelist = node[0]
+    explist = node[1]
+    $I0 = namelist
+    unless $I0 == 1 goto L1
+    $P1 = explist[0]
+    unless $P1 goto L2
+    rpost = tree.'get'('post', $P1)
+    ops.'push'(rpost)
+    goto L3
+L2:
+    rpost = ops.'push_pirop'('new')
+    rpost.'arglist'(rpost, '.LuaNil')
+L3:
+    $P0 = namelist[0]
+    lpost = tree.'get'('post', $P0)
+    ops.'push'(lpost)
+    ops.'push_pirop'('set', lpost, rpost)
+    .return (ops)
+L1:
+    .local pmc iter
+    new iter, .Iterator, namelist
+L4:
+    unless iter goto L5
+    $P0 = shift iter
+    unless explist goto L6
+    $P1 = shift explist
+    rpost = tree.'get'('post', $P1)
+    ops.'push'(rpost)
+    goto L7
+L6:
+    rpost = ops.'push_pirop'('new')
+    rpost.'arglist'(rpost, '.LuaNil')
+L7:
+    lpost = tree.'get'('post', $P0)
+    ops.'push'(lpost)
+    ops.'push_pirop'('set', lpost, rpost)
+    goto L4
+L5:
     .return (ops)
 }
 
@@ -437,75 +366,16 @@ transform post (PAST::Val) :language('PIR') {
     name = node.'escape'(name)
   skip_escape:
 
-    .local pmc post
-    post = new 'POST::Ops'
-    post.'init'('node'=>node)
-    $P0 = post.'push_new'('POST::Op', 'pirop'=>'new')
+    .local pmc ops
+    ops = new 'POST::Ops'
+    ops.'init'('node'=>node)
+    $P0 = ops.'push_pirop'('new')
     $P0.'arglist'($P0, vtype)
-    $P1 = post.'push_pirop'('assign', $P0, name, 'result'=>$P0)
-    post.'result'($P1)
-    .return (post)
-}
-
-
-transform keypost (PAST::Var) :language('PIR') {
-    .local pmc post
-    post = new 'POST::Ops'
-    post.'init'('node'=>node)
-    .local pmc basepast, keypast
-    .local pmc basepost, keypost
-    basepast = node[0]
-    keypast = node[1]
-    keypast.'atype'('*')
-    keypost = tree.'get'('post', keypast)
-    post.'push'(keypost)
-    basepost = tree.'get'('post', basepast)
-    post.'push'(basepost)
-    .local string key
-    key = basepost.'result'()
-    key = concat key, '['
-    $S0 = keypost.'result'()
-    key .= $S0
-    key .= ']'
-    post.'result'(key)
-    .return (post)
-}
-
-
-transform bind (PAST::Var) :language('PIR') {
-    .local pmc bindvalue
-    .local string scope
-    bindvalue = node.'bindvalue'()
-    scope = node.'scope'()
-    if scope == 'keyed' goto keyed
-
-    .local string name
-    name = node.'name'()
-    name = node.'escape'(name)
-    .local pmc post
-    post = new 'POST::Op'
-    post.'init'('node'=>node, 'result'=>bindvalue, 'pirop'=>'set_global')
-    post.'arglist'(name, bindvalue)
-    if scope == 'lexical' goto lexical
-    .return (post)
-
-  lexical:
-    .local int isdecl
-    isdecl = node.'ismy'()
-    if isdecl goto lexical_decl
-    post.'pirop'('store_lex')
-    .return (post)
-
-  lexical_decl:
-    post.'pirop'('.lex')
-    .return (post)
-
-  keyed:
-    .local pmc post, keypost
-    keypost = tree.'get'('keypost', node)
-    post = keypost.'new'('POST::Op', keypost, 'node'=>node, 'pirop'=>'set', 'result'=>bindvalue)
-    post.'arglist'(keypost, bindvalue)
-    .return (post)
+    if name == '' goto end
+    $P0 = ops.'push_pirop'('set', $P0, name, 'result'=>$P0)
+  end:
+    ops.'result'($P0)
+    .return (ops)
 }
 
 
@@ -525,11 +395,12 @@ transform vivipost (PAST::Var) :language('PIR') {
 
 transform post (PAST::Var) :language('PIR') {
     .local pmc vivipost, vivilabel, post
+    .local pmc keypost, basepost
     vivipost = tree.'get'('vivipost', node)
     post = vivipost.'new'('POST::Ops', 'node'=>node, 'result'=>vivipost)
     vivilabel = post.'new'('POST::Label', 'name'=>'vivify_')
 
-    .local string scope, name, fetchop, storeop
+    .local string scope, name, key, fetchop, storeop
     scope = node.'scope'()
     if scope == 'keyed' goto scope_keyed
     name = node.'name'()
@@ -537,17 +408,20 @@ transform post (PAST::Var) :language('PIR') {
     if scope == 'lexical' goto scope_lexical
     if scope == 'parameter' goto scope_parameter
   scope_package:
-    fetchop = 'get_global'
-    storeop = 'set_global'
+    basepost = post.'push_pirop'('get_global')
+    basepost.'arglist'(basepost, '"_G"')
+    keypost = post.'push_pirop'('new')
+    keypost.'arglist'(keypost, '.LuaString')
+    post.'push_pirop'('set', keypost, name)
     goto have_scope
 
   scope_keyed:
-    .local pmc keypost, basepost
-    keypost = tree.'get'('keypost', node)
+    $P0 = node[0]
+    basepost = tree.'get'('post', $P0)
+    post.'push'(basepost)
+    $P0 = node[1]
+    keypost = tree.'get'('post', $P0)
     post.'push'(keypost)
-    name = keypost.'result'()
-    fetchop = 'set'
-    storeop = 'set'
     goto have_scope
 
   scope_lexical:
@@ -568,19 +442,27 @@ transform post (PAST::Var) :language('PIR') {
     post.'result'(pname)
     .local pmc subpost
     subpost = get_hll_global ['Lua::POST'], '$?SUB'
-    subpost.'push_param'('pmc', pname)
+    $I0 = node.'isslurpy'()
+    unless $I0 goto no_slurpy
+    subpost.'push_param'('pmc', pname, ':slurpy')
+    .return (post)
+  no_slurpy:
+    subpost.'push_param'('pmc', pname, ':optional')
     .return (post)
 
   have_scope:
-#    post.'push_pirop'(fetchop, vivipost, name)
-#    post.'push_pirop'('unless_null', post, vivilabel)
-#    post.'push'(vivipost)
-#    .local int islvalue
-#    islvalue = node.'islvalue'()
-#    unless islvalue goto done_lvalue
-    post.'push_pirop'(storeop, name, post)
-#  done_lvalue:
-#    post.'push'(vivilabel)
+    key = basepost.'result'()
+    key = concat key, '['
+    $S0 = keypost.'result'()
+    key .= $S0
+    key .= ']'
+    post.'result'(key)
+    $I0 = node.'islvalue'()
+    if $I0 goto done_lvalue
+    $P0 = post.'push_pirop'('set')
+    $P0.'arglist'($P0, key)
+    post.'result'($P0)
+  done_lvalue:
     .return (post)
 }
 
