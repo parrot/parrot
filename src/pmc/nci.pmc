@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -112,7 +112,7 @@ Creates and returns a clone of the NCI.
 */
 
     PMC* clone() {
-        PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC* const ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_struct_val(ret) = PMC_struct_val(SELF);
         PMC_pmc_val(ret) = NULL;
         /* FIXME if data is malloced (JIT/i386!) then we need
