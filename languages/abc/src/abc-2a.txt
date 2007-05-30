@@ -1,0 +1,126 @@
+class ABC::Grammar::ASTBuilder;
+
+## DRAFT DRAFT DRAFT DRAFT DRAFT DRAFT DRAFT DRAFT DRAFT DRAFT
+
+## This is a draft concept of building an abstract syntax
+## tree (using PAST-pm) using methods in a parse tree (abc-2.pg)
+## instead of as a separate TGE parse->PAST phase.  The advantage
+## of this approach is that the conversions are easier to write,
+## as they use a fairly simple subset of Perl 6.
+
+## each method here corresponds to a rule of the same name 
+## in ABC::Grammar.  The method is invoked automatically wherever a 
+## {*} appears in the parse rule.  So, for example, where abc-2.pg
+## has a regex like:
+##
+##     token float { [ \d+ '.' \d* | '.' \d+ ]  {*}  }
+##
+## The 'float' method of this class will be invoked at the point
+## of the {*}, with the current match object in the C< $/ > lexical 
+## variable.  For regexes that have multiple points of invocation,
+## the grammar can specify a $key parameter that is passed to the AST
+## method here.
+##
+## token term {
+##     | <float>                     {*#<float>}
+##     | <integer>                   {*#<integer>}
+##     ...
+## }
+##
+## This is just a draft/concept file at the moment, the actual
+## syntax and operation is likely to change.
+
+
+method TOP { 
+    return $<program>; 
+}
+
+method float {
+    return PAST::Val.new( :node($/), :vtype('.Float'), :name($/) );
+}
+
+method integer {
+    return PAST::Val.new( :node($/), :vtype('.Integer'), :name($/) );
+}
+
+method variable {
+    return PAST::Var.new( :node($/), :name($/), :viviself('.Integer'),
+                          :lvalue($+lvalue) ); 
+}
+
+method term(:$key) {
+    if $key eq 'float'         { return $<float>; }
+    if $key eq 'integer'       { return $<integer>; }
+    if $key eq 'variable'      { return $<variable>; }
+    if $key eq 'array'         { 
+        return PAST::Var.new( $<variable>, $<expression>,
+                              :node($/),
+                              :name($<variable>.text ~ '_array'),
+                              :viviself('.Integer') );
+    }
+    if $key eq 'call'          {
+        return PAST::Op.new( $<expression>,
+                             :node($/),
+                             :name($<variable>.text),
+                             :pasttype('call') );
+    }
+}
+
+method compound_statement {
+    return $<statement_list>;
+}
+
+method if_statement {
+    my $x := PAST::Op.new( $<expression>, $<statement>[0],
+                           :node($/), :pasttype('if') );
+    if ($<statement>[1]) { $x.push($<statement>[1]); }
+    return $x;
+}
+
+method while_statement {
+    return PAST::Op.new( $<expression>, $<statement>,
+                         :node($/), :pasttype('while') );
+}
+
+method for_statement {
+    my $iter := PAST::Stmts.new( $<statement>, $<expression>[2] );
+    my $loop := PAST::Op.new( $<expression>[1], $iter, :pasttype('while') );
+    return PAST::Stmts.new( $<expression>[0], $loop );
+}
+
+method statement(:$key) {
+    if $key eq 'if'            { return $<if_statement>; }
+    if $key eq 'while'         { return $<while_statement>; }
+    if $key eq 'for'           { return $<for_statement>; }
+    if $key eq 'compound'      { return $<compound_statement>; }
+    if $key eq 'expression'    { return $<expression>; }
+}
+
+
+method statement_list {
+    my $stmts := PAST::Stmts.new( :node($/) );
+    for @$<statement> { $stmts.push( $_ ); }
+    return $stmts;
+}
+
+method program {
+    return PAST::Block.new( :node($/), $<statement_list> );
+}            
+
+
+method expression {
+    return $<EXPR>;
+}
+
+
+method EXPR(:$key) {
+    if ($key eq 'reduce') {
+        my $op := PAST::Op.new( :node($/),
+                                :name($<top><category> ~ ':' ~ $<top><sym>),
+                                :pasttype($<top><pasttype>),
+                                :pirop($<top><pirop>),
+                                :returns($<top><returns>) );
+        foreach @$/ { $op.push($/); }
+        return $op;
+    }
+}

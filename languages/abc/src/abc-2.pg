@@ -1,5 +1,7 @@
 grammar ABC::Grammar;
 
+## DRAFT DRAFT DRAFT DRAFT DRAFT DRAFT DRAFT DRAFT DRAFT DRAFT
+
 ## an example 'bc' grammar
 ## This version uses a Perl 6 subset to build the abstract
 ## syntax tree as the program is being parsed, instead of a separate
@@ -11,38 +13,21 @@ grammar ABC::Grammar;
 token TOP { <program> { return $<program> }; }
 
 ## recognize terms
-token float {
-    \d+ '.' \d* | '.' \d+
-        { return PAST::Val.new( :node($/), :vtype('.Float'), :name($/); }
-}
+token float { [ \d+ '.' \d* | '.' \d+ ]  {*}  }
 
-token integer {
-    \d+ 
-        { return PAST::Val.new( :node($/), :vtype('.Integer'), :name($/); }
-}
+token integer { \d+  {*} }
 
 ##  FIXME: still need to handle lvalue variables
-token variable {
-    <[a..z]><[_a..z0..9]>*
-        { return PAST::Var.new( :node($/), :name($/), :viviself('.Integer'); }
-}
+token variable { <[a..z]><[_a..z0..9]>*  {*} }
 
 ##  FIXME: still need to handle lvalue array
 token term {
-    | <float> { return $<float>; }
-    | <integer> { return $<integer>; }
+    | <float>                     {*#<float>}
+    | <integer>                   {*#<integer>}
     | <variable> 
-        [ '[' <expression> ']'
-            { return PAST::Var( $<variable>, $<expression>,
-                                :node($/), 
-                                :name($<variable>.text ~ '_array'),
-                                :viviself('.Integer') ); }
-        | '(' <expression> ')'
-            { return PAST::Op( $<expression>
-                               :node($/),
-                               :name($<variable>.text),
-                               :pasttype('call') ); }
-        | <null> { return $<variable>; }
+        [ '[' <expression> ']'    {*#<array>}
+        | '(' <expression> ')'    {*#<call>}
+        | <null>                  {*#<variable>}
         ]
 }
                                 
@@ -57,120 +42,113 @@ rule print {
 }
 
 rule compound_statement { 
-    '{' <statement_list> '}'     { return $<statement_list>; }
+    '{' <statement_list> '}'     {*}
 }
 
 rule if_statement { 
     'if' '(' <expression> ')' <statement> 
     [ 'else' <statement> ]? 
-        { $x = PAST::Op.new( $<expression>, $<statement>[0], 
-                             :node($/), :pasttype('if') );
-          if ($<statement>[1]) { $x.push($<statement>[1]); }
-          return $x;
-        }
+    {*}
 }
 
 rule while_statement {
     'while' '(' <expression> ')' <statement>
-        { return PAST::Op.new( $<expression>, $<statement>,
-                               :node($/), :pasttype('while') );
-        }
+    {*}
 }
 
 rule for_statement {
     'for' '(' <expression> ; <expression> ; <expression> ')' <statement>
-        { $iter = PAST::Stmts.new( $<statement>, $<expression>[2] );
-          $loop = PAST::Op.new( $<expression>[1], $iter, :pasttype('while') );
-          return PAST::Stmts.new( $<expression>[0], $loop );
-        }
+    {*}
 }
 
 rule statement {
-    | <if_statement>          { return $<if_statement> ; }
-    | <while_statement>       { return $<while_statement>; }
-    | <for_statement>         { return $<for_statement>; }
-    | <compound_statement>    { return $<compound_statement>; }
+    | <if_statement>          {*#<if>}
+    | <while_statement>       {*#<while>}
+    | <for_statement>         {*#<for>}
+    | <compound_statement>    {*#<compound>} 
     | \" <string> \"
     | break
     | continue
     | halt
     | return [ \( <expression> \) ]?
-    | <expression>            { return $<expression>; }
+    | <expression>            {*#<expression> }
 }
 
 rule statement_list { 
     <statement>? [ ; <statement>? ]* 
-        { $stmts = PAST::Stmts.new( :node($/) );
-          for @$<statement> { $stmts.push( $_ ); }
-          return $stmts;
-        }
+    {*}
 }
 
 rule program { 
     ^ <statement_list> [ $ | <die: parse error> ] 
-        { return PAST::Block.new( :node($/), $<statement_list> ); }
+    {*}
 }
 
 rule pseudo_statement { limits | quit | warranty }
 
 ## FIXME :  still don't handle $<expression> as PAST
 ## create operator precedence parser
-rule 'expression'   is optable { ... }
 
+rule expression {
+    <EXPR> 
+    {*}
+}
 
-## terms
-proto 'term:'       is precedence('=')
-    is parsed(&term)
-    { ... }
-
-proto 'circumfix:( )'  is equiv('term:') 
+token circumfix:sym<( )> is equiv(&term)  
     is pirop('set')
     { ... }
 
 ## autoincrement
-proto 'postfix:++'  is looser('term:')     is lvalue(1) { ... }
-proto 'postfix:--'  is equiv('postfix:++') is lvalue(1) { ... }
-proto 'prefix:++'   is equiv('postfix:++') is lvalue(1) { ... }
-proto 'prefix:--'   is equiv('postfix:++') is lvalue(1) { ... }
+token postfix:sym<++> is looser(&circumfix:<( )>) 
+    is lvalue(1) 
+    { ... }
+token postfix:sym<--> is equiv(&postfix:<++>) is lvalue(1) { ... }
+token prefix:sym<++>  is equiv(&postfix:<++>) is lvalue(1) { ... }
+token prefix:sym<-->  is equiv(&postfix:<++>) is lvalue(1) { ... }
 
 ## negation
-proto 'prefix:-'    is looser('postfix:++')
+token prefix:sym<->   is looser(&postfix:<++>)    
     is pirop('neg')
     { ... }
 
 ## exponentiation
-proto 'infix:^'     is looser('prefix:-')  { ... }
+token infix:sym<^>    is looser(&prefix:<->)    { ... }
 
 ## multiplicative
-proto 'infix:*'     is looser('infix:^')
+token infix:sym<*>    is looser(&infix:<^>)
     is pirop('mul')
     { ... }
 
-proto 'infix:/'     is equiv('infix:*')
+token infix:sym</>    is equiv(&infix:<*>)
     is pirop('div')
     { ... }
 
-proto 'infix:%'     is equiv('infix:*')
+token infix:sym<%>    is equiv(&infix:<*>)
     is pirop('mod')
     { ... }
 
+
 ## additive
-proto 'infix:+'     is looser('infix:*')
+token infix:sym<+>    is looser(&infix:<*>)
     is pirop('add')
     { ... }
 
-proto 'infix:-'     is equiv('infix:+')
+token infix:sym<->    is equiv(&infix:<+>)
     is pirop('sub')
     { ... }
 
 ## assignment
-proto 'infix:='     is looser('infix:+')
+token infix:sym<=>    is looser(&infix:<+>)
     is assoc('right')
     is past('assign')
     is lvalue(1)
     { ... }
 
 ## relational
+token infix:sym<==>   is looser(&infix:<=>)
+    is assoc('non')
+    {...}
+
 proto 'infix:=='    is looser('infix:=')  is assoc('non')  { ... }
 proto 'infix:!='    is equiv('infix:==') { ... }
 proto 'infix:<'     is equiv('infix:==') { ... }
