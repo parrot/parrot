@@ -388,7 +388,7 @@ Parrot_Context_infostr(Interp *interp, parrot_context_t *ctx)
 
     Parrot_block_DOD(interp);
     if (Parrot_Context_get_info(interp, ctx, &info)) {
-        const char * const file = info.file;
+        char * const file = info.file;
         res        = Parrot_sprintf_c(interp,
             "%s '%Ss' pc %d (%s:%d)", msg,
             info.fullname, info.pc, file, info.line);
