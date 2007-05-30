@@ -54,7 +54,7 @@ L<http://www.parrotcode.org/source.html>
 =head2 Now that I've got Parrot, what do I do?
 
 Now that you've downloaded Parrot, you probably want to try it out. All you
-need is Perl 5.6.1 or later, a C compiler (any ANSI C compliant compiler
+need is Perl 5.8.0 or later, a C compiler (any ANSI C compliant compiler
 should do - if you find one that doesn't work, please report it to us), and
 some reasonable form of C<make>. To do this, follow these three easy steps.
 

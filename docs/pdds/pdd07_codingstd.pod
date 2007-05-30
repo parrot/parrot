@@ -70,9 +70,9 @@ work, or to provide an appropriate #ifdef macro.
 
 =item *
 
-Perl code must be written for Perl 5.6.1 and all later versions.
+Perl code must be written for Perl 5.8.0 and all later versions.
 
-Perl code may use features not available in Perl 5.6.1 only if it is not vital
+Perl code may use features not available in Perl 5.8.0 only if it is not vital
 to Parrot, and if it uses C<$^O> and C<$]> to degrade or fail gracefully when
 it is run where the features it depends on are not available.
 
