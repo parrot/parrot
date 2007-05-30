@@ -120,8 +120,8 @@ Documentation for C<pdb>, the Parrot debugger.
 
 Parrot compiles and runs on a large number of platforms, including all common
 ones. The Parrot team is committed to supporting the following combinations as
-"core platforms": Linux (x86), Cygwin, Win32, Tru64, OpenVMS (Alpha), Solaris
-(Sparc), FreeBSD (x86).
+"core platforms": Linux (x86), Win32, OS X (x86 and PPC), Cygwin, Tru64,
+OpenVMS (Alpha), Solaris (Sparc), FreeBSD (x86).
 
 =head2 Authors
 
@@ -131,13 +131,16 @@ L<http://nntp.perl.org/group/perl.perl6.internals>
 
 =over 4
 
-=item * Chip Salzenberg (C<chip@pobox.com>) is the chief architect.  The mental
-institution he escaped from to accept the role is still searching for him.
+=item * Allison Randal is the chief architect.
+
+=item * Chip Salzenberg (C<chip@pobox.com>) was the second chief architect.
 
 =item * Dan Sugalski (C<dan@sidhe.org>) was the chief architect for the first
 I<5 years> of the project.  Parrot is largely his brainchild.
 
-=item * Leopold Toetsch (C<lt@toetsch.at>) is the current release manager.
+=item * Leopold Toetsch (C<lt@toetsch.at>) was the release manager for some
+time. This position is currently rotated through several members of the
+project team.
 
 =item * Simon Cozens, Jeff Goff and Steve Fink were the release managers 
 for releases 0.0.1 - 0.0.4, 0.0.5 - 0.0.8, and 0.0.9 - 0.0.11 respectively.
@@ -154,11 +157,11 @@ See:
 
 =over 4
 
+=item * L<http://www.parrotcode.org/>
+
 =item * L<http://dev.perl.org/>
 
 =item * L<http://svn.perl.org/>
-
-=item * L<http://www.parrotcode.org/>
 
 =back
 

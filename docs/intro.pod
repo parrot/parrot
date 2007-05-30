@@ -133,7 +133,8 @@ typing:
   perl Configure.pl
 
 Once this is complete, run the C<make> program (sometimes called C<nmake> or
-C<dmake>).  This should complete, giving you a working Parrot executable.
+C<dmake> or C<gmake>).  This should complete, giving you a working Parrot
+executable.
 
 Please report any problems that you encounter while building Parrot so the
 developers can fix them. You can do this by sending a message to
@@ -174,7 +175,6 @@ Create a file called F<hello.pir> that contains the following code.
 
   .sub main
       print "Hello world!\n"
-      end
   .end
 
 Then run it by typing:
@@ -188,8 +188,7 @@ Let's take the program apart. C<.sub main> states that the instructions that
 follow make up a subroutine named C<main>, until a C<.end> is encountered. The
 second line contains the C<print> instruction. In this case, we are calling the
 variant of the instruction that accepts a constant string. The assembler takes
-care of deciding which variant of the instruction to use for us. The third line
-contains the C<end> instruction, which causes the interpreter to terminate.
+care of deciding which variant of the instruction to use for us.
 
 =head2 Using registers
 
@@ -199,7 +198,6 @@ register and then use that register with the print instruction.
   .sub main
       set S0, "Hello world!\n"
       print S0
-      end
   .end
 
 Here we have stated exactly which register to use. However, by
@@ -210,7 +208,6 @@ notation instead of writing the C<set> instruction.
   .sub main
       $S0 = "Hello world!\n"
       print $S0
-      end
   .end
 
 To make PIR even more readable, named registers can be used. These are later
@@ -220,7 +217,6 @@ mapped to real numbered registers.
       .local string hello
       hello = "Hello world!\n"
       print hello
-      end
   .end
 
 The C<.local> directive indicates that the named register is only needed inside
@@ -230,17 +226,6 @@ registers), C<string> (for S registers), C<pmc> (for P registers) or the name
 of a PMC type.
 
 =head2 PIR vs. PASM
-
-PIR can be turned into PASM by running:
-
-  parrot -o hello.pasm hello.pir
-
-The PASM for the final example looks like this:
-
-  _main:
-      set S30, "Hello world!\n"
-      print S30
-      end
 
 PASM does not handle register allocation or provide support for named
 registers.  It also does not have the C<.sub> and C<.end> directives, instead
@@ -275,7 +260,6 @@ with a C<#> are comments.
       print " squares is "
       print total
       print ".\n"
-      end
   .end
 
 PIR provides a bit of syntactic sugar that makes it look more high level than
@@ -352,9 +336,6 @@ compute factorial.
 
       inc i
       if i <= 10 goto loop
-
-      # That's it.
-      end
   .end
 
 The first line, C<.param int n>, specifies that this subroutine takes one
