@@ -1991,7 +1991,7 @@ greater than this as I<\x{hh...hh}>.
 */
 
 STRING *
-string_escape_string(Interp *interp, STRING *src)
+string_escape_string(Interp *interp, const STRING *src)
 {
     return string_escape_string_delimited(interp, src,
             (UINTVAL) ~0);
@@ -2007,7 +2007,7 @@ Like above but limit output to len chars (used for trace output of strings).
 
 STRING *
 string_escape_string_delimited(Interp *interp,
-        STRING *src, UINTVAL limit)
+        const STRING *src, UINTVAL limit)
 {
     STRING *result, *hex;
     UINTVAL i, len, charlen;

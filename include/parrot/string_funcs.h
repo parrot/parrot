@@ -100,8 +100,8 @@ PARROT_API UINTVAL string_decode_and_advance(struct string_iterator_t *i);
 PARROT_API size_t string_hash(Interp *interp, STRING *s, size_t seed);
 PARROT_API STRING * string_unescape_cstring(Interp *,
         const char *cstring, char delimiter, const char *enc_or_charset);
-PARROT_API STRING * string_escape_string(Interp *, STRING *);
-PARROT_API STRING * string_escape_string_delimited(Interp *, STRING *,
+PARROT_API STRING * string_escape_string(Interp *, const STRING *);
+PARROT_API STRING * string_escape_string_delimited(Interp *, const STRING *,
         UINTVAL len);
 PARROT_API STRING * string_compose(Interp *, STRING *);
 
