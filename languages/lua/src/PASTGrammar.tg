@@ -367,10 +367,9 @@ L2:
 
 
 transform past (Lua::Grammar::constructor) :language('PIR') {
-    .local pmc past, table
-    new table, 'PAST::Val'
-    table.'init'('node'=>node, 'vtype'=>'.LuaTable')
-    past = table.'new'('PAST::Stmts', table, 'node'=>node)
+    .local pmc past
+    new past, 'PAST::Val'
+    past.'init'('node'=>node, 'vtype'=>'.LuaTable')
     $P0 = node['tablefieldlist']
     if null $P0 goto L1
     $P0 = shift $P0
@@ -383,34 +382,33 @@ L2:
     $P0 = shift iter
     $S0 = $P0.'find_key'()
     $P0 = $P0[$S0]
-    $S0 = concat 'Lua::Grammar::', $S0
-    expr = tree.'get'('past', $P0, $S0)
-    key = tree.'get'('key', $P0, $S0)
-    unless null key goto L3
-    $S0 = $I0
-    inc $I0
-    key = past.'new'('PAST::Val', 'node'=>$P0, 'vtype'=>'.LuaNumber', 'name'=>$S0, 'ctype'=>'n+')
+    unless $S0 == 'expression' goto L3
+    $P1 = tree.'get'('past', $P0, 'Lua::Grammar::expression')
+    past.'push'($P1)
+    goto L2
 L3:
-    var = past.'new'('PAST::Var', table, key, 'node'=>$P0, 'scope'=>'keyed', 'islvalue'=>1)
-    past.'push_new'('PAST::Op', var, expr, 'node'=>$P0, 'pasttype'=>'assign')
+    $S0 = concat 'Lua::Grammar::', $S0
+    $P1 = tree.'get'('record', $P0, $S0)
+    past.'push'($P1)
     goto L2
 L1:
     .return (past)
 }
 
 
-transform key (Lua::Grammar::expression) :language('PIR') {
-    .local pmc key
-    null key
-    .return (key)
-}
-
-
-transform key (Lua::Grammar::record_field) :language('PIR') {
+transform record (Lua::Grammar::record_field) :language('PIR') {
+    .local pmc record
+    record = new .FixedPMCArray
+    set record, 2
     $S0 = node.'find_key'()
     $P0 = node[$S0]
     $S0 = concat 'Lua::Grammar::', $S0
-    .return tree.'get'('key', $P0, $S0)
+    $P1 = tree.'get'('key', $P0, $S0)
+    record[0] = $P1
+    $P0 = node['expression']
+    $P1 = tree.'get'('past', $P0, 'Lua::Grammar::expression')
+    record[1] = $P1
+    .return (record)
 }
 
 
@@ -424,12 +422,6 @@ transform key (Lua::Grammar::name) :language('PIR') {
 
 
 transform key (Lua::Grammar::index) :language('PIR') {
-    $P0 = node['expression']
-    .return tree.'get'('past', $P0, 'Lua::Grammar::expression')
-}
-
-
-transform past (Lua::Grammar::record_field) :language('PIR') {
     $P0 = node['expression']
     .return tree.'get'('past', $P0, 'Lua::Grammar::expression')
 }

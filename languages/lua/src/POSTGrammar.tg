@@ -205,6 +205,13 @@ transform callmethod (PAST::Op) :language('PIR') {
 }
 
 
+transform len (PAST::Op) :language('PIR') {
+    node.'pirop'('callmethod')
+    node.'name'('len')
+    .return tree.'get'('pirop', node)
+}
+
+
 transform inline (PAST::Op) :language('PIR') {
     node.'pirop'('inline')
     .return tree.'get'('pirop', node)
@@ -223,33 +230,28 @@ transform if (PAST::Op) :language('PIR') {
     elsepast = node[2]
 
     .local pmc thenlabel, endlabel
-    .local string pasttype, n
-    pasttype = node.'pasttype'()
+    .local string n
     n = node.'unique'('_')
-    $S0 = concat pasttype, n
+    $S0 = concat 'if', n
     thenlabel = ops.'new'('POST::Label', 'result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = ops.'new'('POST::Label', 'result'=>$S0)
 
     exprpost = tree.'get'('post', exprpast)
     ops.'push'(exprpost)
-    ops.'push_pirop'(pasttype, exprpost, thenlabel)
-    elsepost = exprpost
+    ops.'push_pirop'('if', exprpost, thenlabel)
     $I0 = defined elsepast
     if $I0 == 0 goto else_done
     elsepost = tree.'get'('post', elsepast)
     ops.'push'(elsepost)
   else_done:
-    ops.'push_pirop'('set', ops, elsepost)
     ops.'push_pirop'('goto', endlabel)
     ops.'push'(thenlabel)
-    thenpost = exprpost
     $I0 = defined thenpast
     if $I0 == 0 goto then_done
     thenpost = tree.'get'('post', thenpast)
     ops.'push'(thenpost)
   then_done:
-    ops.'push_pirop'('set', ops, thenpost)
     ops.'push'(endlabel)
     .return (ops)
 }
@@ -266,26 +268,17 @@ transform while (PAST::Op) :language('PIR') {
     blockpast = node[1]
 
     .local pmc looplabel, endlabel
-    .local string pasttype, n
-    pasttype = node.'pasttype'()
+    .local string n
     n = node.'unique'('_')
-    $S0 = concat pasttype, n
+    $S0 = concat 'while', n
     looplabel = ops.'new'('POST::Label', 'result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = ops.'new'('POST::Label', 'result'=>$S0)
 
-    ##   determine if we need an 'if' or an 'unless' on
-    ##   the conditional (while => if, until => unless)
-    .local string iftype
-    iftype = 'if'
-    if $S0 == 'until' goto done_iftype
-    iftype = 'unless'
-  done_iftype:
-
     ops.'push'(looplabel)
     exprpost = tree.'get'('post', exprpast)
     ops.'push'(exprpost)
-    ops.'push_pirop'(iftype, exprpost, endlabel)
+    ops.'push_pirop'('unless', exprpost, endlabel)
     blockpost = tree.'get'('post', blockpast)
     ops.'push'(blockpost)
     ops.'push_pirop'('goto', looplabel)
@@ -366,15 +359,54 @@ transform post (PAST::Val) :language('PIR') {
     name = node.'escape'(name)
   skip_escape:
 
-    .local pmc ops
+    .local pmc ops, val
     ops = new 'POST::Ops'
     ops.'init'('node'=>node)
-    $P0 = ops.'push_pirop'('new')
-    $P0.'arglist'($P0, vtype)
-    if name == '' goto end
-    $P0 = ops.'push_pirop'('set', $P0, name, 'result'=>$P0)
+    val = ops.'push_pirop'('new')
+    val.'arglist'(val, vtype)
+    if name == '' goto init
+    val = ops.'push_pirop'('set', val, name, 'result'=>val)
+  init:
+    ops.'result'(val)
+
+    unless vtype == '.LuaTable' goto end
+    .local pmc iter, kpost, vpost
+    .local string key
+    .local int i
+    i = 1
+    iter = node.'iterator'()
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    $I0 = does $P0, 'array'
+    if $I0 goto rec_field
+    vpost = tree.'get'('post', $P0)
+    kpost = ops.'new'('POST::Ops', 'node'=>node)
+    $P0 = kpost.'push_pirop'('new')
+    $P0.'arglist'($P0, '.LuaNumber')
+    $S0 = i
+    inc i
+    kpost.'push_pirop'('set', $P0, $S0)
+    kpost.'result'($P0)
+    goto end_rec_field
+  rec_field:
+    $P1 = $P0[0]
+    kpost = tree.'get'('post', $P1)
+    $P1 = $P0[1]
+    vpost = tree.'get'('post', $P1)
+  end_rec_field:
+    ops.'push'(kpost)
+    ops.'push'(vpost)
+    key = val.'result'()
+    key = concat key, '['
+    $S0 = kpost.'result'()
+    key .= $S0
+    key .= ']'
+    ops.'push_pirop'('set', key, vpost)
+    goto iter_loop
+  iter_end:
+
   end:
-    ops.'result'($P0)
     .return (ops)
 }
 

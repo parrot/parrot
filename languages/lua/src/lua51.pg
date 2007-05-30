@@ -130,11 +130,7 @@ rule constructor {
 }
 
 rule tablefieldlist {
-  <tablefield> [ <fieldsep> <tablefield> ]* <fieldsep>?
-}
-
-rule fieldsep {
-  <','> | <';'>
+  <tablefield> [ <[,;]> <tablefield> ]* <[,;]>?
 }
 
 rule tablefield {
@@ -289,7 +285,7 @@ proto 'infix:^'     is looser('term:')      is pirop('pow')     is assoc('right'
 
 proto 'prefix:not'  is looser('infix:^')    is pirop('not')
                     is returns('.LuaBoolean')                   { ... }
-proto 'prefix:#'    is equiv('prefix:not')  is pirop('len')
+proto 'prefix:#'    is equiv('prefix:not')  is past('len')
                     is returns('.LuaNumber')                    { ... }
 proto 'prefix:-'    is equiv('prefix:not')  is pirop('neg')
                     is returns('.LuaNumber')                    { ... }
@@ -309,22 +305,16 @@ proto 'infix:-'     is equiv('infix:+')     is pirop('sub')
 proto 'infix:..'    is looser('infix:+')    is pirop('concat')  is assoc('right')
                     is returns('.LusString')                    { ... }
 
-proto 'infix:<'     is looser('infix:..')   is pirop('islt')
-                    is returns('.LuaBoolean')                   { ... }
-proto 'infix:>'     is equiv('infix:<')     is pirop('isgt')
-                    is returns('.LuaBoolean')                   { ... }
-proto 'infix:<='    is equiv('infix:<')     is pirop('isle')
-                    is returns('.LuaBoolean')                   { ... }
-proto 'infix:>='    is equiv('infix:<')     is pirop('isge')
-                    is returns('.LuaBoolean')                   { ... }
-proto 'infix:~='    is equiv('infix:<')     is pirop('isne')
-                    is returns('.LuaBoolean')                   { ... }
-proto 'infix:=='    is equiv('infix:<')     is pirop('iseq')
-                    is returns('.LuaBoolean')                   { ... }
+proto 'infix:<'     is looser('infix:..')                       { ... }
+proto 'infix:>'     is equiv('infix:<')                         { ... }
+proto 'infix:<='    is equiv('infix:<')                         { ... }
+proto 'infix:>='    is equiv('infix:<')                         { ... }
+proto 'infix:~='    is equiv('infix:<')                         { ... }
+proto 'infix:=='    is equiv('infix:<')                         { ... }
 
-proto 'infix:and'   is looser('infix:<')    is past('and')      { ... }
+proto 'infix:and'   is looser('infix:<')                        { ... }
 
-proto 'infix:or'    is looser('infix:and')  is past('or')       { ... }
+proto 'infix:or'    is looser('infix:and')                      { ... }
 
 
 =head1 AUTHORS

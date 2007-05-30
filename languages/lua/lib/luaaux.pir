@@ -562,6 +562,124 @@ L2:
 
 =back
 
+=head2 Builtins
+
+=over 4
+
+=item C<infix:==>
+
+=cut
+
+.sub 'infix:=='
+    .param pmc a
+    .param pmc b
+    $I0 = iseq a, b
+    new $P0, .LuaBoolean
+    set $P0, $I0
+    .return ($P0)
+.end
+
+
+=item C<infix:!=>
+
+=cut
+
+.sub 'infix:!='
+    .param pmc a
+    .param pmc b
+    $I0 = isne a, b
+    new $P0, .LuaBoolean
+    set $P0, $I0
+    .return ($P0)
+.end
+
+
+=item C<infix:E<lt>=>
+
+=cut
+
+.sub 'infix:E<gt>='
+    .param pmc a
+    .param pmc b
+    $I0 = isle a, b
+    new $P0, .LuaBoolean
+    set $P0, $I0
+    .return ($P0)
+.end
+
+
+=item C<infix:>=>
+
+=cut
+
+.sub 'infix:E<gt>='
+    .param pmc a
+    .param pmc b
+    $I0 = isge a, b
+    new $P0, .LuaBoolean
+    set $P0, $I0
+    .return ($P0)
+.end
+
+
+=item C<infix:E<lt>>
+
+=cut
+
+.sub 'infix:<'
+    .param pmc a
+    .param pmc b
+    $I0 = islt a, b
+    new $P0, .LuaBoolean
+    set $P0, $I0
+    .return ($P0)
+.end
+
+
+=item C<infix:E<gt>>
+
+=cut
+
+.sub 'infix:>'
+    .param pmc a
+    .param pmc b
+    $I0 = isgt a, b
+    new $P0, .LuaBoolean
+    set $P0, $I0
+    .return ($P0)
+.end
+
+
+=item C<infix:and>
+
+=cut
+
+.sub 'infix:and'
+    .param pmc a
+    .param pmc b
+    if a goto L1
+    .return (a)
+L1:
+    .return (b)
+.end
+
+
+=item C<infix:or>
+
+=cut
+
+.sub 'infix:or'
+    .param pmc a
+    .param pmc b
+    unless a goto L1
+    .return (a)
+L1:
+    .return (b)
+.end
+
+
+=back
+
 =head1 AUTHORS
 
 Francois Perrad
