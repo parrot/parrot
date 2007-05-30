@@ -1970,10 +1970,10 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
     PMC *roles_of_role;
     PMC *proposed_add_methods;
 
-    int i, j, roles_count, roles_of_role_count;
+    int i, roles_of_role_count;
 
     /* Check we have not already composed the role; if so, just ignore it. */
-    roles_count = VTABLE_elements(interp, roles_list);
+    int roles_count = VTABLE_elements(interp, roles_list);
 
     for (i = 0; i < roles_count; i++) {
         if (VTABLE_get_pmc_keyed_int(interp, roles_list, i) == role)
@@ -2012,9 +2012,7 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
             exclude_count = VTABLE_elements(interp, exclude);
 
             for (i = 0; i < exclude_count; i++) {
-                STRING *check;
-
-                check = VTABLE_get_string_keyed_int(interp, exclude, i);
+                const STRING * const check = VTABLE_get_string_keyed_int(interp, exclude, i);
 
                 if (string_equal(interp, check, method_name) == 0) {
                     excluded = 1;
@@ -2055,9 +2053,7 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
         /* Now see if we've got an alias. */
         if (got_alias && VTABLE_exists_keyed_str(interp, alias, method_name)) {
             /* Got one. Get name to alias it to. */
-            STRING *alias_name;
-
-            alias_name = VTABLE_get_string_keyed_str(interp,
+            STRING * const alias_name = VTABLE_get_string_keyed_str(interp,
                 alias, method_name);
 
             /* Is there a method with this name already in the class?
@@ -2095,11 +2091,8 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
 
     while (VTABLE_get_bool(interp, methods_iter)) {
         /* Get current method and its name. */
-        STRING *method_name;
-        PMC    *cur_method;
-
-        method_name = VTABLE_shift_string(interp, methods_iter);
-        cur_method  = VTABLE_get_pmc_keyed_str(interp, proposed_add_methods,
+        STRING * const method_name = VTABLE_shift_string(interp, methods_iter);
+        PMC *    const cur_method  = VTABLE_get_pmc_keyed_str(interp, proposed_add_methods,
             method_name);
 
         /* Add it to the methods of the class. */
@@ -2120,8 +2113,8 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
 
     for (i = 0; i < roles_of_role_count; i++) {
         /* Only add if we don't already have it in the list. */
-        PMC *cur_role;
-        cur_role = VTABLE_get_pmc_keyed_int(interp, roles_of_role, i);
+        PMC * const cur_role = VTABLE_get_pmc_keyed_int(interp, roles_of_role, i);
+        int j;
 
         for (j = 0; j < roles_count; j++) {
             if (VTABLE_get_pmc_keyed_int(interp, roles_list, j) == cur_role) {
