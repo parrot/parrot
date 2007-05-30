@@ -720,7 +720,7 @@ parrot_hash_size(Interp *interp, Hash *hash)
 /*
 
 =item C<void *
-parrot_hash_get_idx(Interp *interp, Hash *hash, PMC * key)>
+parrot_hash_get_idx(Interp *interp, const Hash *hash, PMC * key)>
 
 Called by iterator.
 
@@ -729,10 +729,10 @@ Called by iterator.
 */
 
 void *
-parrot_hash_get_idx(Interp *interp, Hash *hash, PMC * key)
+parrot_hash_get_idx(Interp *interp, const Hash *hash, PMC * key)
 {
     INTVAL i = PMC_int_val(key);
-    BucketIndex bi = (BucketIndex)PMC_data(key);
+    const BucketIndex bi = (BucketIndex)PMC_data(key);
     HashBucket *b;
     void *res;
     INTVAL size;
@@ -772,7 +772,7 @@ parrot_hash_get_idx(Interp *interp, Hash *hash, PMC * key)
 /*
 
 =item C<HashBucket *
-parrot_hash_get_bucket(Interp *interp, Hash *hash, void *key)>
+parrot_hash_get_bucket(Interp *interp, const Hash *hash, void *key)>
 
 Returns the bucket for C<key>.
 
@@ -781,7 +781,7 @@ Returns the bucket for C<key>.
 */
 
 HashBucket *
-parrot_hash_get_bucket(Interp *interp, Hash *hash, void *key)
+parrot_hash_get_bucket(Interp *interp, const Hash *hash, void *key)
 {
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
     HashBucket *bucket = hash->bi[hashval & hash->mask];

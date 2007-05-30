@@ -2007,9 +2007,7 @@ void Parrot_ComposeRole(Interp *interp, PMC *role,
 
         /* Check if it's in the exclude list. */
         if (got_exclude) {
-            int exclude_count;
-
-            exclude_count = VTABLE_elements(interp, exclude);
+            const int exclude_count = VTABLE_elements(interp, exclude);
 
             for (i = 0; i < exclude_count; i++) {
                 const STRING * const check = VTABLE_get_string_keyed_int(interp, exclude, i);
