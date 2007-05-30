@@ -182,8 +182,8 @@ High-Level Language
 International Components for Unicode
 
 ICU is a C and C++ library that provides support for Unicode on a variety of
-platforms.  It was added to Parrot with the 0.0.8 release to provide future
-Unicode support.
+platforms.  It was distributed with parrot at one time, but current releases
+require you to get your own copy.
 
 L<http://oss.software.ibm.com/icu/index.html>
 
