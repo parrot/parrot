@@ -1,5 +1,5 @@
 /* trace.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -18,13 +18,12 @@
 void
 trace_pmc_dump(Interp *interp, PMC* pmc);
 
-int trace_key_dump(Interp *interp, PMC *key);
+int trace_key_dump(Interp *interp, const PMC *key);
 
-void trace_op_dump(Interp *interp, opcode_t * code_start,
-                   opcode_t * pc);
+void trace_op_dump(Interp *interp, const opcode_t * code_start, const opcode_t * pc);
 
-void trace_op(Interp *interp, opcode_t * code_start,
-              opcode_t * code_end, opcode_t * pc);
+void trace_op(Interp *interp, const opcode_t * code_start,
+              const opcode_t * code_end, const opcode_t * pc);
 
 #endif /* PARROT_TRACE_H_GUARD */
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -77,7 +77,7 @@ trace_pmc_dump(Interp *interp, PMC* pmc)
         PIO_eprintf(debugger, "Class=%Ss:PMC(%#p)", name, pmc);
     }
     else if (pmc->vtable->base_type == enum_class_String) {
-        STRING * const s = VTABLE_get_string(interp, pmc);
+        const STRING * const s = VTABLE_get_string(interp, pmc);
         if (!s)
             PIO_eprintf(debugger, "%S=PMC(%#p Str:(NULL))",
                     VTABLE_name(interp, pmc), pmc);
@@ -143,7 +143,7 @@ Prints a key to C<stderr>, returns the length of the output.
 */
 
 int
-trace_key_dump(Interp *interp, PMC *key)
+trace_key_dump(Interp *interp, const PMC *key)
 {
     Interp * const debugger = interp->debugger;
 
@@ -159,7 +159,7 @@ trace_key_dump(Interp *interp, PMC *key)
             break;
         case KEY_string_FLAG:
             {
-            STRING * const s = PMC_str_val(key);
+            const STRING * const s = PMC_str_val(key);
             STRING* const escaped = string_escape_string_delimited(
                             interp, s, 20);
             if (escaped)
@@ -178,7 +178,7 @@ trace_key_dump(Interp *interp, PMC *key)
             break;
         case KEY_string_FLAG|KEY_register_FLAG:
             {
-            STRING * const s = REG_STR(PMC_int_val(key));
+            const STRING * const s = REG_STR(PMC_int_val(key));
             STRING* const escaped = string_escape_string_delimited(
                             interp, s, 20);
             if (escaped)
@@ -213,8 +213,7 @@ trace_key_dump(Interp *interp, PMC *key)
 /*
 
 =item C<void
-trace_op_dump(Interp *interp, opcode_t *code_start,
-              opcode_t *pc)>
+trace_op_dump(Interp *interp, const opcode_t *code_start, const opcode_t *pc)>
 
 TODO: This isn't really part of the API, but here's its documentation.
 
@@ -225,13 +224,12 @@ Prints the PC, OP and ARGS. Used by C<trace_op()>.
 */
 
 void
-trace_op_dump(Interp *interp, opcode_t *code_start,
-              opcode_t *pc)
+trace_op_dump(Interp *interp, const opcode_t *code_start, const opcode_t *pc)
 {
-    INTVAL i, s, n;
+    INTVAL s, n;
     int more = 0, var_args;
-    Interp *debugger = interp->debugger;
-    op_info_t *info = &interp->op_info_table[*pc];
+    Interp * const debugger = interp->debugger;
+    op_info_t * const info = &interp->op_info_table[*pc];
     PMC *sig;
     int type;
     int len;
@@ -271,6 +269,7 @@ trace_op_dump(Interp *interp, opcode_t *code_start,
     }
 
     if (n > 1) {
+        INTVAL i;
         len += PIO_eprintf(debugger, " ");
         /* pass 1 print arguments */
         for (i = s; i < n; i++) {
@@ -414,8 +413,8 @@ done:
 /*
 
 =item C<void
-trace_op(Interp *interp, opcode_t *code_start,
-         opcode_t *code_end, opcode_t *pc)>
+trace_op(Interp *interp, const opcode_t *code_start,
+         const opcode_t *code_end, const opcode_t *pc)>
 
 TODO: This isn't really part of the API, but here's its documentation.
 
@@ -427,8 +426,8 @@ checking.
 */
 
 void
-trace_op(Interp *interp, opcode_t *code_start,
-         opcode_t *code_end, opcode_t *pc)
+trace_op(Interp *interp, const opcode_t *code_start,
+         const opcode_t *code_end, const opcode_t *pc)
 {
     if (!pc) {
         return;
