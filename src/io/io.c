@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -232,8 +232,9 @@ PIO_destroy(Interp *interp, PMC *pmc)
     }
 #endif
     if ((io->stack->flags & PIO_L_LAYER_COPIED)) {
-        ParrotIOLayer *p, *down;
+        ParrotIOLayer *p;
         for (p = io->stack; p;) {
+            ParrotIOLayer *down;
             /* if top got copied, all have to be malloced */
             assert(p->flags & PIO_L_LAYER_COPIED);
             down = p->down;
@@ -318,7 +319,7 @@ destruction.
 void
 PIO_finish(Interp *interp)
 {
-    ParrotIOLayer *layer, *down;
+    ParrotIOLayer *layer;
 #if 0
     PMC *pmc;
     ParrotIO *io;
@@ -342,7 +343,7 @@ PIO_finish(Interp *interp)
      * TODO free IO of std-handles
      */
     for (layer = interp->piodata->default_stack; layer;) {
-        down = layer->down;
+        ParrotIOLayer * const down = layer->down;
         if (layer->api->Delete)
             (*layer->api->Delete) (layer);
         layer = down;
@@ -1131,7 +1132,7 @@ Returns C<*pmc>'s file descriptor, or C<0> if it is not defined.
 PIOHANDLE
 PIO_getfd(Interp *interp, PMC *pmc)
 {
-    ParrotIO *io = (ParrotIO *)PMC_data0(pmc);
+    ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
 
     UNUSED(interp);
 
