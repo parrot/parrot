@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -58,7 +58,7 @@ longopt_get(Parrot_Interp interp, int argc, char* argv[],
             const struct longopt_opt_decl options[],
             struct longopt_opt_info* info_buf)
 {
-    int dex = info_buf->opt_index;
+    const int dex = info_buf->opt_index;
 
     info_buf->opt_id = 0;
     info_buf->opt_arg = info_buf->opt_error = NULL;
@@ -110,7 +110,7 @@ longopt_get_longopt(Parrot_Interp interp, int argc, char* argv[],
                     const struct longopt_opt_decl options[],
                     struct longopt_opt_info* info_buf)
 {
-    int dex = info_buf->opt_index;
+    const int dex = info_buf->opt_index;
     int optlen = 0;
     const struct longopt_opt_decl* dptr;
 
@@ -207,7 +207,7 @@ longopt_get_shortopt(Parrot_Interp interp, int argc, char* argv[],
                      const struct longopt_opt_decl options[],
                      struct longopt_opt_info* info_buf)
 {
-    int dex = info_buf->opt_index;
+    const int dex = info_buf->opt_index;
     const struct longopt_opt_decl* dptr;
     const char* pos;
 
