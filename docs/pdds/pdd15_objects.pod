@@ -307,6 +307,10 @@ class.
 Create an (anonymous) clone of the class. Unset the instantiated flag on the
 new class.
 
+=item name(string *)
+
+Returns a simple string name for the class.
+
 =item add_method(string *, method *)
 
 Add a method to the class.
