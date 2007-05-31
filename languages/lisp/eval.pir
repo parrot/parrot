@@ -2,22 +2,20 @@
 
 .sub _eval
   .param pmc args
-  .local string pkgname
+
+  .ASSERT_LENGTH(args, 1, ERROR_NARGS)
+
   .local string symname
   .local string type
-  .local int special
-  .local pmc package
   .local pmc symbol
   .local int found
-  .local pmc form
   .local pmc body
   .local pmc retv
 
-  .ASSERT_LENGTH(args, 1, ERROR_NARGS)
+  # switch based on the type of the first arg
+  .local pmc form
   .CAR(form, args)
-
   typeof type, form
-
   if type == "LispSymbol"  goto SYMBOL
   if type == "LispCons"    goto FUNCTION_FORM
   if type == "LispInteger" goto SELF_EVALUATING_OBJECT
@@ -25,6 +23,7 @@
   if type == "LispFloat"   goto SELF_EVALUATING_OBJECT
 
   .ERROR_1("internal", "Unknown object type in eval: %s", type)
+
 
 FUNCTION_FORM:
   .local pmc function
@@ -72,7 +71,7 @@ FUNCTION_LOOP:
   goto FUNCTION_LOOP
 
 FUNCTION_CALL:
-  _FUNCTION_CALL(function,funcargs)
+  retv = _FUNCTION_CALL(function,funcargs)
   # VALID_IN_PARROT_0_2_0 goto DONE
   .return(retv)
 
@@ -118,12 +117,15 @@ MACRO_FORM:
 SYMBOL:
   symbol = form
   symname = symbol._get_name_as_string()
-
-  special = _IS_SPECIAL(symbol)                 # Check if we're a dynamic
-  if special == 0 goto LEXICAL_SYMBOL           # variable
+  
+  .local int is_special
+  is_special = _IS_SPECIAL(symbol)                 # Check if we're a dynamic
+  unless is_special goto LEXICAL_SYMBOL            # variable
   goto DYNAMIC_SYMBOL
 
 DYNAMIC_SYMBOL:
+  .local pmc package
+  .local string pkgname
   package = symbol._get_package()
   pkgname = package._get_name_as_string()
 
@@ -156,12 +158,11 @@ SYMBOL_NOT_FOUND:
 
 SELF_EVALUATING_OBJECT:
   # Object is a primitive type (ie. a string, integer or float).
-  retv = form
   # VALID_IN_PARROT_0_2_0 argcP = 1                                # One value returned
   # VALID_IN_PARROT_0_2_0 P5 = retv                                # Return value
 
   # VALID_IN_PARROT_0_2_0 goto DONE
-  .return(retv)
+  .return(form)
 
 MACRO_NOT_INITIALIZED:
   .ERROR_0("internal","the macro system has not been initialized")
