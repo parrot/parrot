@@ -71,9 +71,8 @@ FUNCTION_LOOP:
   goto FUNCTION_LOOP
 
 FUNCTION_CALL:
-  retv = _FUNCTION_CALL(function,funcargs)
+  .return _FUNCTION_CALL(function,funcargs)
   # VALID_IN_PARROT_0_2_0 goto DONE
-  .return(retv)
 
 FUNCTION_NOT_FOUND:
   .ERROR_1("undefined-function", "%s is not a function name", symbol)

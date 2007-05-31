@@ -1,5 +1,11 @@
 # $Id$
 
+=head2
+
+Set up the package 'COMMON-LISP'
+
+=cut
+
 .sub _init_cl
   .local pmc function
   .local pmc package

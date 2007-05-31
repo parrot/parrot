@@ -456,6 +456,7 @@ DONE:
 .sub _IS_TYPE
   .param pmc args
   .param string rtype
+
   .local string atype
   .local int retv
 
