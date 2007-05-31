@@ -173,7 +173,8 @@ DONE:
 
 .sub _find_package
   .param pmc args
-  .local string pkgnames
+
+  .local string pkgname_str
   .local pmc pkgname
   .local pmc retv
 
@@ -182,11 +183,12 @@ DONE:
   .CAR(pkgname, args)
   .ASSERT_TYPE(pkgname, "string")
 
-   pkgnames = pkgname
-   upcase pkgnames, pkgnames
+   pkgname_str = pkgname
+   upcase pkgname_str
 
    push_eh PACKAGE_NOT_FOUND
-   find_global retv, "PACKAGES", pkgnames
+   retv = find_global "PACKAGES", pkgname_str
+   if_null retv, PACKAGE_NOT_FOUND
    clear_eh
 
    goto DONE
@@ -308,6 +310,7 @@ DONE:
 
 .sub _export
   .param pmc args
+
   .local string symname
   .local pmc package
   .local pmc symbols
@@ -317,9 +320,11 @@ DONE:
   .ASSERT_MINIMUM_LENGTH(args, 1, ERROR_NARGS)
 
   .CAR(package, args)
-  .CDR(symbols, args)
-
   .ASSERT_TYPE(package, "package")
+
+  .CDR(symbols, args)
+  # TODO: looks like find-package is called twice, problem in eval.pir ?
+  .CDR(symbols, symbols)
 
 LOOP:
   .NULL(symbols, DONE)
@@ -391,6 +396,7 @@ DONE:
 
 .sub _load
   .param pmc args
+
   .local string fname1
   .local pmc stream
   .local pmc fname2
@@ -418,7 +424,9 @@ LOAD_LOOP:
   .NULL(rretv, CLEANUP)
 
   .LIST_1(farg,rretv)
+
    eretv = _eval(farg)
+
 
    goto LOAD_LOOP
 

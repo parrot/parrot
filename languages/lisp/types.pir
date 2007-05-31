@@ -106,6 +106,7 @@
 .sub _get_body :method
   .local pmc retv
 
+   # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispFunction\0body"
    getattribute retv, self, "body"
 
   .return(retv)
@@ -224,7 +225,6 @@ NAMED_FUNCTION:
 
 .sub _lookup_symbol :method
   .param string name
-  .local string type
   .local pmc symbol
   .local pmc stack
   .local int depth
@@ -234,13 +234,9 @@ NAMED_FUNCTION:
    getattribute hash, self,  "internal"
    stack = hash[name]
 
-   typeof type, stack
-   if type == "None" goto SYMBOL_NOT_FOUND
+   if_null stack, SYMBOL_NOT_FOUND
 
-   depth = stack
-   depth = depth - 1
-
-   symbol = stack[depth]
+   symbol = stack[-1]
 
    goto DONE
 
@@ -255,7 +251,6 @@ DONE:
 .sub _import_symbol :method
   .param pmc symbol
   .local string symname
-  .local string type
   .local pmc stack
   .local pmc hash
 
@@ -266,8 +261,7 @@ DONE:
 
    stack = hash[symname]
 
-   typeof type, stack
-   if type == "None" goto CREATE_STACK
+   if_null stack, CREATE_STACK
    goto PUSH_SYMBOL
 
 CREATE_STACK:
@@ -322,7 +316,6 @@ DONE:
 
 .sub _get_exports :method
   .local string keyval
-  .local string type
   .local pmc exports
   .local pmc hash
   .local pmc key
@@ -337,7 +330,6 @@ DONE:
    iter i, hash
    push_eh DONE
 
-  .local string type
 
 LOOP:
    shift key, i
@@ -355,9 +347,12 @@ DONE:
 
 .sub _export_symbol :method
   .param string name
+
+  #print "name: "
+  #print name
+  #print "\n"
   .local pmc external
   .local pmc internal
-  .local string type
   .local pmc symbol
   .local pmc stack
   .local int top
@@ -369,8 +364,7 @@ DONE:
 
    stack = internal[name]
 
-   typeof type, stack
-   if type == "None" goto SYMBOL_NOT_FOUND
+   if_null stack, SYMBOL_NOT_FOUND
 
    external[name] = stack
 
@@ -385,45 +379,42 @@ SYMBOL_NOT_FOUND:
    goto DONE
 
 DONE:
+   symbol = stack[-1]
+
+  .return(symbol)
+.end
+
+.sub _intern_symbol :method
+  .param string name
+
+  .local pmc symbol
+  .local pmc status
+  .local pmc stack
+  .local pmc hash
+  .local int top
+
+  # the attribute internal has been set up in _init_types
+  # VALID_IN_PARROT_0_2_0 getattribute hash, self,  "LispPackage\0internal"
+  getattribute hash, self,  "internal"
+  stack = hash[name]
+
+  unless_null stack, DONE
+
+  symbol = _SYMBOL(name)
+
+  stack = new ResizablePMCArray
+  push stack, symbol
+  hash[name] = stack
+
+  goto DONE
+
+DONE:
    top = stack
    top = top - 1
 
    symbol = stack[top]
 
   .return(symbol)
-.end
-
-.sub _intern_symbol :method
-    .param string name
-
-    # the attribute internal has been set up in _init_types
-    .local pmc internal
-    # VALID_IN_PARROT_0_2_0 getattribute internal, self,  "LispPackage\0internal"
-    getattribute internal, self,  "internal"
-
-    # stack for the name is not known to exist
-    .local pmc stack
-    stack = internal[name]
-    unless_null stack, RETURN_SYMBOL
-        # _dumper( self, "self" )
-        # _dumper( name, "name" )
-        # _dumper( internal, "internal" )
-        # _dumper( stack, "stack" )
-
-        .local pmc new_symbol
-        new_symbol = _SYMBOL(name)
-
-        stack = new ResizablePMCArray
-        push stack, new_symbol
-        internal[name] = stack
-
-    goto RETURN_SYMBOL
-
-RETURN_SYMBOL:
-    .local pmc symbol
-    symbol = stack[-1]
-
-   .return(symbol)
 .end
 
 .sub _get_name :method
@@ -714,7 +705,7 @@ RETURN_SYMBOL:
   .param pmc docs
 
    # VALID_IN_PARROT_0_2_0 setattribute self, "LispSymbol\0documentation", docs
-   setattribute self, "documentation", docs
+   setattribute self, 'documentation', docs
 
   .return(docs)
 .end
@@ -732,7 +723,7 @@ RETURN_SYMBOL:
   .param pmc function
 
    # VALID_IN_PARROT_0_2_0 setattribute self, "LispSymbol\0function", function
-   setattribute self, "function", function
+   setattribute self, 'function', function
 
   .return(function)
 .end
@@ -741,7 +732,7 @@ RETURN_SYMBOL:
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispSymbol\0name"
-   getattribute retv, self, "name"
+   getattribute retv, self, 'name'
 
   .return(retv)
 .end
