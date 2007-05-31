@@ -157,6 +157,81 @@ static void build_attrib_index(Parrot_Interp interp, PMC *self) {
     _class->attrib_cache = pmc_new(interp, enum_class_Hash);
 }
 
+/*
+ * This function throws an exception if a PMC or class with the same name
+ * already exists in the global type registry. The global type registry will go
+ * away eventually, but this allows the new object metamodel to interact with
+ * the old one until it does.
+ */
+
+static void
+fail_if_type_exists(Interp *interp, PMC *name)
+{
+    INTVAL      type;
+
+    PMC * const classname_hash = interp->class_hash;
+    PMC * const type_pmc       = (PMC *)VTABLE_get_pointer_keyed(interp,
+                                        classname_hash, name);
+    if (PMC_IS_NULL(type_pmc) ||
+            type_pmc->vtable->base_type == enum_class_NameSpace)
+        type = 0;
+    else
+        type = VTABLE_get_integer(interp, type_pmc);
+
+    if (type > enum_type_undef) {
+        /* TODO get printable name */
+        real_exception(interp, NULL, INVALID_OPERATION,
+                "Class %Ss already registered!\n",
+                VTABLE_get_string(interp, name));
+    }
+
+    if (type < enum_type_undef)
+        real_exception(interp, NULL, INVALID_OPERATION,
+                "native type with name '%s' already exists - "
+                "can't register Class", data_types[type].name);
+}
+
+/* This function registers a type in the global registry, first checking if it
+ * already exists. The global type registry will go away eventually, but this
+ * allows the new object metamodel to interact with the old one until it does.
+ */
+
+static INTVAL
+register_type(Parrot_Interp interp, STRING *name)
+{
+    INTVAL type;
+    PMC *classname_hash, *item, *name_pmc;
+
+    if (STRING_IS_NULL(name) || STRING_IS_EMPTY(name)) {
+        real_exception(interp, NULL, INVALID_OPERATION,
+                "Can't register type without a name!\n");
+    }
+
+    name_pmc = pmc_new(interp, enum_class_String);
+    VTABLE_set_string_native(interp, name_pmc, name);
+
+    /* First check if the type already exists */
+    fail_if_type_exists(interp, name_pmc);
+
+    /* Type doesn't exist, so go ahead and register it. Lock interpreter so
+     * pt_shared_fixup() can safely do a type lookup. */
+    LOCK_INTERPRETER(interp);
+    classname_hash = interp->class_hash;
+    type = interp->n_vtable_max++;
+
+    /* Have we overflowed the table? */
+    if (type >= interp->n_vtable_alloced)
+        parrot_realloc_vtables(interp);
+
+    /* set entry in name->type hash */
+    item              = pmc_new(interp, enum_class_Integer);
+    PMC_int_val(item) = type;
+    VTABLE_set_pmc_keyed_str(interp, classname_hash, name, item);
+    UNLOCK_INTERPRETER(interp);
+    return type;
+}
+
+
 
 /* Takes a hash and initializes the class based on it. */
 static void init_class_from_hash(Parrot_Interp interp, PMC *self, PMC *info)
@@ -197,6 +272,7 @@ static void init_class_from_hash(Parrot_Interp interp, PMC *self, PMC *info)
         /* Set a (string) name. */
         _class->name = VTABLE_get_string_keyed_str(interp, info,
             string_from_const_cstring(interp, "name", 0));
+        register_type(interp, _class->name);
     }
 
     /* Otherwise, we may just have a name. */
@@ -209,6 +285,7 @@ static void init_class_from_hash(Parrot_Interp interp, PMC *self, PMC *info)
          * the class. */
         _class->_namespace = Parrot_make_namespace_keyed_str(interp,
             CONTEXT(interp->ctx)->current_namespace, _class->name);
+        register_type(interp, _class->name);
     }
 
     /* Otherwise, we may just have a namespace. */
@@ -228,9 +305,10 @@ static void init_class_from_hash(Parrot_Interp interp, PMC *self, PMC *info)
 
         /* Name is that of the most nested part of the namespace. */
         _class->name = VTABLE_get_string(interp, _namespace);
+        register_type(interp, _class->name);
     }
 
-    /* If we were attached to a namespce and are now attached to a new one,
+    /* If we were attached to a namespace and are now attached to a new one,
      * need to unset ourselves in the old namespace. */
     if (!PMC_IS_NULL(old_ns) && _class->_namespace != old_ns)
         Parrot_PCCINVOKE(interp, old_ns,
@@ -427,6 +505,36 @@ The class is attatched to the current namespace.
         init_class_from_hash(interp, SELF, arg);
     }
 
+/*
+
+=item C<PMC* subclass(PMC* name)>
+
+Creates a subclass, optionally with a given C<name>.
+
+=cut
+
+*/
+
+    PMC* subclass(PMC *name) {
+        PMC *child_class;
+
+        /* Create a new class. Set the classname, if we have one. */
+        if (PMC_IS_NULL(name)) {
+            child_class = pmc_new(interp, enum_class_Class);
+        }
+        else {
+            PMC *naming_hash = pmc_new(interp, enum_class_Hash);
+            VTABLE_set_pmc_keyed_str(interp, naming_hash, CONST_STRING(interp, "name"), name);
+            child_class = pmc_new_init(interp, enum_class_Class, naming_hash);
+        }
+
+        /* Make the new class a subclass of the current class */
+        VTABLE_add_parent(interp, child_class, SELF);
+
+        return child_class;
+    }
+
+/*
 
 /*
 
@@ -442,6 +550,23 @@ Free the memory associated with the object's underlying struct.
             mem_sys_free(PMC_data(SELF));
     }
 
+/*
+
+=item C<STRING* name()>
+
+Return the classname.
+
+=cut
+
+*/
+
+    STRING* name() {
+        Parrot_Class * const _class = PARROT_CLASS(SELF);
+        if (STRING_IS_NULL(_class->name) || STRING_IS_EMPTY(_class->name)) {
+            return SELF->vtable->whoami;
+        }
+        return _class->name;
+    }
 
 /*
 
