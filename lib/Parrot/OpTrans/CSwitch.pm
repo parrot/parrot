@@ -153,8 +153,8 @@ sub run_core_func_start {
     return <<END_C;
 /* run_core_func_start - $0 -> $type */
 #if defined(__GNUC__) && defined(I386) && defined(PARROT_SWITCH_REGS)
-    register void **   cur_opcode asm ("esi") = cur_op;
-    register char *   _reg_base   asm ("edi");
+    register void **   cur_opcode __asm__ ("esi") = cur_op;
+    register char *   _reg_base   __asm__ ("edi");
 #else
     void ** cur_opcode = cur_op;
     char * _reg_base;

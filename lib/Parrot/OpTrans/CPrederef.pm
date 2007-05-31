@@ -44,16 +44,6 @@ sub defines {
 END
 }
 
-=item C<opsarraytype()>
-
-The ops array type is C<void *>.
-
-=cut
-
-sub opsarraytype {
-    return 'void *';
-}
-
 =item expr_address($addr)
 
 =item expr_address($offset)

@@ -278,7 +278,7 @@ Returns the C code prior to the run core function.
 sub run_core_func_start {
     return <<END_C;
 #if defined(__GNUC__) && defined(I386) /* && defined(NO_DYNOPS) */
-    register opcode_t *cur_opcode asm ("esi") = cur_op;
+    register opcode_t *cur_opcode __asm__ ("esi") = cur_op;
 #else
     opcode_t *cur_opcode = cur_op;
 #endif

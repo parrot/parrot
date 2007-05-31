@@ -201,7 +201,9 @@ sub new {
     $argsref->{defines}      = $argsref->{trans}->defines();
 
     $argsref->{flag}         = $flagref;
-    return bless $argsref, $class;
+    my $self = bless $argsref, $class;
+    $self->_iterate_over_ops();
+    return $self;
 }
 
 sub _prepare_core {
@@ -292,6 +294,11 @@ sub print_c_header_file {
     $self->_print_guard_prefix($HEADER);
 
     $self->_print_preamble_header($HEADER);
+
+    my @op_protos = @{ $self->{op_protos} };
+    foreach my $proto (@op_protos) {
+        print $HEADER "$proto;\n";
+    }
 
     $self->_print_run_core_func_decl_header($HEADER);
 
@@ -436,9 +443,6 @@ sub print_c_source_top {
 
     $self->_print_run_core_func_decl_source($SOURCE);
 
-    # Iterate over the ops, appending HEADER and SOURCE fragments:
-    $self->_iterate_over_ops();
-
     $self->_print_cg_jump_table($SOURCE);
 
     $self->_print_goto_opcode($SOURCE);
@@ -494,6 +498,7 @@ sub _print_run_core_func_decl_source {
 sub _iterate_over_ops {
     my $self = shift;
     my @op_funcs;
+    my @op_protos;
     my @op_func_table;
     my @cg_jump_table;
     my $index = 0;
@@ -518,7 +523,7 @@ sub _iterate_over_ops {
             $comment    = "/* " . $op->full_name() . " */";
         }
         else {
-            $definition = "$prototype;\n$self->{opsarraytype} *\n$func_name ($args)";
+            $definition = "$self->{opsarraytype} *\n$func_name ($args)";
         }
 
         my $src = $op->source( $self->{trans} );
@@ -542,6 +547,7 @@ sub _iterate_over_ops {
         else {
             $one_op .= "$definition $comment {\n$src}\n\n";
             push @op_funcs, $one_op;
+            push @op_protos, $prototype;
             $prev_src = $src if ( $self->{suffix} eq '_cgp' || $self->{suffix} eq '_switch' );
             $prev_index = $index;
         }
@@ -549,6 +555,7 @@ sub _iterate_over_ops {
     }
     $self->{index}         = $index;
     $self->{op_funcs}      = \@op_funcs;
+    $self->{op_protos}     = \@op_protos;
     $self->{op_func_table} = \@op_func_table;
     $self->{cg_jump_table} = \@cg_jump_table;
 }
@@ -577,7 +584,7 @@ sub _print_goto_opcode {
 #ifdef __GNUC__
 # ifdef I386
     else if (cur_opcode == (void **) 1)
-    asm ("jmp *4(%ebp)");  /* jump to ret addr, used by JIT */
+    __asm__ ("jmp *4(%ebp)");  /* jump to ret addr, used by JIT */
 # endif
 #endif
     _reg_base = (char*)interp->ctx.bp.regs_i;
