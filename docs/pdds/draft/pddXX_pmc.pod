@@ -145,7 +145,7 @@ PMC and the property Hash.
 
 =head2 Locking or opmc->pmc_ext->_synchronize
 
-PMCs do no support locking universally. Creating sharable PMCs at
+PMCs do not support locking universally. Creating sharable PMCs at
 runtime (from standard PMCs) is again done by transparent Refs like
 C<SharedRef> or C<STMRef>.
 
