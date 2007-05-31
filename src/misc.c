@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -84,12 +84,10 @@ STRING *
 Parrot_vsprintf_c(Interp *interp, const char *pat,
                   va_list args)
 {
-    STRING *realpat, *ret;
-
-    realpat = string_make(interp, pat, strlen(pat),
+    STRING * const realpat = string_make(interp, pat, strlen(pat),
                                   NULL, PObj_external_FLAG);
 
-    ret = Parrot_vsprintf_s(interp, realpat, args);
+    STRING * const ret = Parrot_vsprintf_s(interp, realpat, args);
 
     return ret;
 }
@@ -111,12 +109,11 @@ void
 Parrot_vsnprintf(Interp *interp, char *targ,
                  size_t len, const char *pat, va_list args)
 {
-    STRING *ret;
     if (len == 0)
         return;
     len--;
     if (len) {
-        ret = Parrot_vsprintf_c(interp, pat, args);
+        const STRING * const ret = Parrot_vsprintf_c(interp, pat, args);
         /* string_transcode(interp, ret, NULL, NULL, &ret); */
 
         if (len > ret->bufused) {

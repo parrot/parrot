@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -34,7 +34,7 @@ Returns a new C<Key> PMC.
 PMC *
 key_new(Interp *interp)
 {
-    PMC *key = pmc_new(interp, enum_class_Key);
+    PMC * const key = pmc_new(interp, enum_class_Key);
 
     return key;
 }
@@ -53,7 +53,7 @@ Returns a new integer C<Key> PMC with value C<value>.
 PMC *
 key_new_integer(Interp *interp, INTVAL value)
 {
-    PMC *key = pmc_new(interp, enum_class_Key);
+    PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_integer_FLAG;
     PMC_int_val(key) = value;
@@ -75,7 +75,7 @@ Returns a new number C<Key> PMC with value C<value>.
 PMC *
 key_new_number(Interp *interp, FLOATVAL value)
 {
-    PMC *key = pmc_new(interp, enum_class_Key);
+    PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_number_FLAG;
     PMC_num_val(key) = value;
@@ -97,7 +97,7 @@ Returns a new string C<Key> PMC with value C<value>.
 PMC *
 key_new_string(Interp *interp, STRING *value)
 {
-    PMC *key = pmc_new(interp, enum_class_Key);
+    PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_string_FLAG;
     PMC_str_val(key) = value;
@@ -138,7 +138,7 @@ Returns a new PMC C<Key> PMC with value C<value>.
 PMC *
 key_new_pmc(Interp *interp, PMC *value)
 {
-    PMC *key = pmc_new(interp, enum_class_Key);
+    PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
     internal_exception(1, "this is broken - see slice.pmc");
@@ -461,9 +461,8 @@ Marks C<key> as live.
 void
 key_mark(Interp *interp, PMC *key)
 {
-    UINTVAL flags;
+    const UINTVAL flags = PObj_get_FLAGS(key) & KEY_type_FLAGS;
 
-    flags = PObj_get_FLAGS(key) & KEY_type_FLAGS;
     if (flags == KEY_string_FLAG)
         pobject_lives(interp, (PObj *)PMC_str_val(key));
     /*
@@ -491,10 +490,9 @@ key_set_to_string(Interp *interpreter, PMC *key)>
 STRING *
 key_set_to_string(Interp *interp, PMC *key)
 {
-    PMC *reg;
-    STRING *semicolon = string_from_cstring(interp, " ; ", 3);
-    STRING *quote = string_from_cstring(interp, "'", 1);
-    STRING *value = string_from_cstring(interp, "[ ", 2);
+    STRING * const semicolon = string_from_cstring(interp, " ; ", 3);
+    STRING * const quote = string_from_cstring(interp, "'", 1);
+    STRING * const value = string_from_cstring(interp, "[ ", 2);
 
     for (; key; key = (PMC *)PMC_data(key)) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
@@ -518,8 +516,10 @@ key_set_to_string(Interp *interp, PMC *key)
                 string_append(interp, value, quote);
                 break;
             case KEY_pmc_FLAG | KEY_register_FLAG:
-                reg = REG_PMC(PMC_int_val(key));
+                {
+                PMC * const reg = REG_PMC(PMC_int_val(key));
                 string_append(interp, value, VTABLE_get_string(interp, reg));
+                }
                 break;
             default:
                 string_append(interp, value, string_from_cstring(interp, "Key type unknown", 0));
