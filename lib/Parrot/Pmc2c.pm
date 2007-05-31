@@ -654,7 +654,7 @@ sub methods {
     # check for misspelled or unimplemented method names.
     foreach my $method ( @{ $self->{methods} } ) {
         my $meth = $method->{meth};
-        warn "Cannot generate code for method '$meth', which is unknown.\n"
+        warn "Cannot generate $out_name code for unknown method '$meth'.\n"
             unless $method_used_p{$meth} || $meth eq 'class_init';
     }
 
