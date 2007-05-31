@@ -178,7 +178,7 @@ OUT
 
 SKIP:
 {
-skip('only with Parrot', 1) if (exists $ENV{PARROT_LUA_TEST_PROG});
+skip('only with Parrot', 1) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'lua');
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'function lfs.attributes (invalid)' );
 require "lfs"

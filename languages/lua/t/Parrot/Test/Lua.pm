@@ -51,7 +51,7 @@ foreach my $func ( keys %language_test_map ) {
         my $params = $options{params} || q{};
 
         # flatten filenames (don't use directories)
-        my $lua_test = $ENV{PARROT_LUA_TEST_PROG} || q{};
+        my $lua_test = $ENV{PARROT_LUA_TEST_PROG} || 'luac.pl';
         my $lang_fn = Parrot::Test::per_test( '.lua', $count );
         my $pir_fn  = Parrot::Test::per_test( '.pir', $count );
         my $lua_out_fn =
@@ -59,28 +59,23 @@ foreach my $func ( keys %language_test_map ) {
         my $test_prog_args = $ENV{TEST_PROG_ARGS} || q{};
         my @test_prog;
         if ( $lua_test eq 'lua' ) {
-            @test_prog = ( "$ENV{PARROT_LUA_TEST_PROG} ${test_prog_args} languages/${lang_fn} $params", );
-        }
-        elsif ( $lua_test eq 'monkey' ) {
             @test_prog = (
-                "monkey -o languages/${pir_fn} languages/${lang_fn}",
-                "$self->{parrot} languages/${pir_fn}",
+                "$ENV{PARROT_LUA_TEST_PROG} ${test_prog_args} languages/${lang_fn} $params",
             );
         }
-        elsif ( $lua_test eq 'lua2pir' ) {
-            @test_prog = (
-                "luac languages/${lang_fn}",
-                "l2p -o languages/${pir_fn} > nul",
-                "$self->{parrot} languages/${pir_fn}",
-            );
-        }
-        else {
+        elsif ( $lua_test eq 'luac.pl' ) {
             @test_prog = (
                 "perl -Ilanguages/lua languages/lua/luac.pl languages/${lang_fn}",
                 "$self->{parrot} --no-gc languages/${pir_fn} $params",
-
-                # "$self->{parrot} languages/lua/lua.pbc languages/${lang_fn}",
             );
+        }
+        elsif ( $lua_test eq 'lua.pbc' ) {
+            @test_prog = (
+                "$self->{parrot} --no-gc languages/lua/lua.pbc languages/${lang_fn}",
+            );
+        }
+        else {
+            die "unknown option : $lua_test\n";
         }
 
         # This does not create byte code, but lua code

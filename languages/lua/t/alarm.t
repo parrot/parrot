@@ -25,7 +25,7 @@ use lib "$FindBin::Bin";
 use Parrot::Test;
 use Test::More;
 
-if ( exists $ENV{PARROT_LUA_TEST_PROG} ) {
+if ( ($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'lua' ) {
     plan skip_all => "parrot only";
 }
 else {

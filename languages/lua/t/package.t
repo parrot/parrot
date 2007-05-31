@@ -184,7 +184,7 @@ OUTPUT
 
 SKIP:
 {
-skip('only with Parrot', 1) if (exists $ENV{PARROT_LUA_TEST_PROG});
+skip('only with Parrot', 1) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'lua');
 
 unlink('../mod_foo.pbc') if ( -f '../mod_foo.pbc' );
 unlink('../mod_foo.pir') if ( -f '../mod_foo.pir' );
@@ -262,7 +262,7 @@ OUTPUT
 
 SKIP:
 {
-skip('only with Parrot', 3) if (exists $ENV{PARROT_LUA_TEST_PROG});
+skip('only with Parrot', 3) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'lua');
 
 delete $ENV{LUA_PBCPATH};
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'table package.pbcpath' );

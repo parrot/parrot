@@ -121,7 +121,7 @@ language_output_is( 'lua', $code, $out, 'nsieve-bits' );
 
 SKIP:
 {
-    skip('low memory', 1) unless (exists $ENV{PARROT_LUA_TEST_PROG});
+    skip('low memory', 1) unless (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'lua');
 
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'recursive.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'recursive-output.txt' ));
@@ -153,7 +153,7 @@ language_output_is( 'lua', $code, $out, 'n-body', params => '1000' );
 
 SKIP:
 {
-    skip('maximum recursion depth exceeded', 1) unless (exists $ENV{PARROT_LUA_TEST_PROG});
+    skip('maximum recursion depth exceeded', 1) unless (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'lua');
 
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'message.lua-2.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'message-output.txt' ));
@@ -190,7 +190,7 @@ language_output_is( 'lua', $code, $out, 'chameneos', params => '100' );
 
 SKIP:
 {
-    skip('maximum recursion depth exceeded', 1) unless (exists $ENV{PARROT_LUA_TEST_PROG});
+    skip('maximum recursion depth exceeded', 1) unless (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'lua');
 
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'revcomp.lua-3.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'revcomp-output.txt' ));
@@ -205,7 +205,7 @@ language_output_is( 'lua', $code, $out, 'reverse-complement', params => "< $in" 
 
 SKIP:
 {
-    skip('low memory', 1) unless (exists $ENV{PARROT_LUA_TEST_PROG});
+    skip('low memory', 1) unless (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'lua');
 
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'binarytrees.lua-3.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'binarytrees-output.txt' ));
