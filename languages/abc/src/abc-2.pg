@@ -10,7 +10,7 @@ grammar ABC::Grammar;
 ##     - handle lvalue contexts
 ## It won't even parse yet, so don't try.  :-)
 
-token TOP { <program> { return $<program> }; }
+token TOP { <program> {*} }
 
 ## recognize terms
 token float { [ \d+ '.' \d* | '.' \d+ ]  {*}  }
@@ -94,71 +94,73 @@ rule expression {
     {*}
 }
 
-token circumfix:sym<( )> is equiv(&term)  
-    is pirop('set')
-    { ... }
+token term:<> is prec('z=') { ... }
+
+token circumfix:<( )> is equiv(&term:<>) is pirop('set') { ... }
 
 ## autoincrement
-token postfix:sym<++> is looser(&circumfix:<( )>) 
+token postfix:<++> is looser(&circumfix:<( )>) 
     is lvalue(1) 
     { ... }
-token postfix:sym<--> is equiv(&postfix:<++>) is lvalue(1) { ... }
-token prefix:sym<++>  is equiv(&postfix:<++>) is lvalue(1) { ... }
-token prefix:sym<-->  is equiv(&postfix:<++>) is lvalue(1) { ... }
+token postfix:<--> is equiv(&postfix:<++>) is lvalue(1) { ... }
+token prefix:<++>  is equiv(&postfix:<++>) is lvalue(1) { ... }
+token prefix:<-->  is equiv(&postfix:<++>) is lvalue(1) { ... }
 
 ## negation
-token prefix:sym<->   is looser(&postfix:<++>)    
+token prefix:<->   is looser(&postfix:<++>)    
     is pirop('neg')
     { ... }
 
 ## exponentiation
-token infix:sym<^>    is looser(&prefix:<->)    { ... }
+token infix:<^>    is looser(&prefix:<->)    { ... }
 
 ## multiplicative
-token infix:sym<*>    is looser(&infix:<^>)
+token infix:<*>    is looser(&infix:<^>)
     is pirop('mul')
     { ... }
 
-token infix:sym</>    is equiv(&infix:<*>)
+token infix:</>    is equiv(&infix:<*>)
     is pirop('div')
     { ... }
 
-token infix:sym<%>    is equiv(&infix:<*>)
+token infix:<%>    is equiv(&infix:<*>)
     is pirop('mod')
     { ... }
 
 
 ## additive
-token infix:sym<+>    is looser(&infix:<*>)
+token infix:<+>    is looser(&infix:<*>)
     is pirop('add')
     { ... }
 
-token infix:sym<->    is equiv(&infix:<+>)
+token infix:<->    is equiv(&infix:<+>)
     is pirop('sub')
     { ... }
 
 ## assignment
-token infix:sym<=>    is looser(&infix:<+>)
+token infix:<=>    is looser(&infix:<+>)
     is assoc('right')
     is past('assign')
     is lvalue(1)
     { ... }
 
 ## relational
-token infix:sym<==>   is looser(&infix:<=>)
+token infix:<==>   is looser(&infix:<=>)
     is assoc('non')
     {...}
 
-proto 'infix:=='    is looser('infix:=')  is assoc('non')  { ... }
-proto 'infix:!='    is equiv('infix:==') { ... }
-proto 'infix:<'     is equiv('infix:==') { ... }
-proto 'infix:<='    is equiv('infix:==') { ... }
-proto 'infix:>'     is equiv('infix:==') { ... }
-proto 'infix:>='    is equiv('infix:==') { ... }
+token infix:<!=>   is equiv(&infix:<==>) { ... }
+token infix:«<»    is equiv(&infix:<==>) { ... }
+token infix:«<=»   is equiv(&infix:<==>) { ... }
+token infix:«>»    is equiv(&infix:<==>) { ... }
+token infix:«>=»   is equiv(&infix:<==>) { ... }
 
 ## boolean
-proto 'prefix:!'    is looser('infix:==') is pirop('not') is returns('.Integer') { ... }
-proto 'infix:&&'    is looser('prefix:!') is assoc('left') { ... }
-proto 'infix:||'    is looser('infix:&&') is assoc('left') { ... }
+token prefix:<!>   is looser(&infix:<==>)
+    is pirop('not')
+    is returns('.Integer')
+    { ... }
+token infix:<&&>   is looser(&prefix:<!>) is assoc('left') { ... }
+token infix:<||>   is looser(&infix:<&&>) is assoc('left') { ... }
 
 ## vim: expandtab sw=4
