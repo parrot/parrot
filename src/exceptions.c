@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -222,8 +222,6 @@ Find the exception handler for C<exception>.
 static PMC *
 find_exception_handler(Interp *interp, PMC *exception)
 {
-    PMC *handler;
-    STRING *message;
     char *m;
     int exit_status, print_location;
     int depth = 0;
@@ -232,12 +230,13 @@ find_exception_handler(Interp *interp, PMC *exception)
     /* for now, we don't check the exception class and we don't
      * look for matching handlers.  [this is being redesigned anyway.]
      */
-    message = VTABLE_get_string_keyed_int(interp, exception, 0);
+    STRING * const message = VTABLE_get_string_keyed_int(interp, exception, 0);
+
     /* [TODO: replace quadratic search with something linear, hopefully without
        trashing abstraction layers.  -- rgr, 17-Sep-06.] */
     while ((e = stack_entry(interp, interp->dynamic_env, depth)) != NULL) {
         if (e->entry_type == STACK_ENTRY_PMC) {
-            handler = UVal_pmc(e->entry);
+            PMC * const handler = UVal_pmc(e->entry);
             if (handler && handler->vtable->base_type ==
                     enum_class_Exception_Handler) {
                 return handler;
@@ -260,6 +259,7 @@ find_exception_handler(Interp *interp, PMC *exception)
         fputs(m, stderr);
         if (m[strlen(m)-1] != '\n')
             fprintf(stderr, "%c", '\n');
+        string_cstring_free(m);
     }
     else {
         const INTVAL severity =
@@ -272,8 +272,6 @@ find_exception_handler(Interp *interp, PMC *exception)
         else
             fprintf(stderr, "No exception handler and no message\n");
     }
-    if (m)
-        string_cstring_free(m);
     /* caution against output swap (with PDB_backtrace) */
     fflush(stderr);
     if (print_location)
@@ -400,7 +398,7 @@ throw_exception(Interp *interp, PMC *exception, void *dest)
     /* address = VTABLE_get_pointer(interp, handler); */
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
         /* its a C exception handler */
-        Parrot_exception *jb = (Parrot_exception *) address;
+        Parrot_exception * const jb = (Parrot_exception *) address;
         longjmp(jb->destination, 1);
     }
     /* return the address of the handler */
@@ -622,11 +620,8 @@ destroy_exception_list(Interp *interp)
 void
 really_destroy_exception_list(Parrot_exception *e)
 {
-    Parrot_exception *prev;
-
-    while (e != NULL)
-    {
-        prev = e->prev;
+    while (e != NULL) {
+        Parrot_exception * const prev = e->prev;
         mem_sys_free(e);
         e    = prev;
     }

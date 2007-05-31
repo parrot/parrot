@@ -1,5 +1,5 @@
 /* stacks.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -88,7 +88,7 @@ PARROT_API void *pop_dest(Interp *interp);
 PARROT_API void *stack_peek(Interp *interp, Stack_Chunk_t *stack,
                 Stack_entry_type *type);
 
-PARROT_API Stack_entry_type get_entry_type(Interp *interp, Stack_Entry_t *entry)
+PARROT_API Stack_entry_type get_entry_type(Interp *interp, const Stack_Entry_t *entry)
     __attribute__nonnull__(2);
 
 void Parrot_dump_dynamic_environment(Interp *, struct Stack_Chunk *);

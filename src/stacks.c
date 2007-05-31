@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -182,9 +182,7 @@ rotate_entries(Interp *interp,
                Stack_Chunk_t **stack_p /*NN*/,
                INTVAL num_entries)
 {
-    Stack_Chunk_t *stack = *stack_p;
-    Stack_Entry_t temp;
-    INTVAL i;
+    Stack_Chunk_t * const stack = *stack_p;
     INTVAL depth = num_entries - 1;
 
     if (num_entries >= -1 && num_entries <= 1) {
@@ -193,6 +191,9 @@ rotate_entries(Interp *interp,
 
 
     if (num_entries < 0) {
+        INTVAL i;
+        Stack_Entry_t temp;
+
         num_entries = -num_entries;
         depth = num_entries - 1;
 
@@ -209,6 +210,8 @@ rotate_entries(Interp *interp,
         *stack_entry(interp, stack, 0) = temp;
     }
     else {
+        INTVAL i;
+        Stack_Entry_t temp;
 
         if (stack_height(interp, stack) < (size_t)num_entries) {
             internal_exception(ERROR_STACK_SHALLOW, "Stack too shallow!");
@@ -378,7 +381,7 @@ Peek at stack and return pointer to entry and the type of the entry.
 
 void *
 stack_peek(Interp *interp, Stack_Chunk_t *stack_base /*NN*/,
-           Stack_entry_type *type)
+           Stack_entry_type *type /*NULLOK*/)
 {
     Stack_Entry_t * const entry = stack_entry(interp, stack_base, 0);
     if (entry == NULL) {
@@ -399,17 +402,12 @@ stack_peek(Interp *interp, Stack_Chunk_t *stack_base /*NN*/,
 
 /*
 
-=item C<Stack_entry_type
-get_entry_type(Interp *interp, Stack_Entry_t *entry)>
-
 Returns the stack entry type of C<entry>.
-
-=cut
 
 */
 
 Stack_entry_type
-get_entry_type(Interp *interp, Stack_Entry_t *entry /*NN*/)
+get_entry_type(Interp *interp, const Stack_Entry_t *entry /*NN*/)
 {
     return entry->entry_type;
 }
@@ -434,7 +432,7 @@ Parrot_dump_dynamic_environment(Interp *interp,
     int height = (int) stack_height(interp, dynamic_env);
 
     while (dynamic_env->prev != dynamic_env) {
-        Stack_Entry_t *e = stack_entry(interp, dynamic_env, 0);
+        const Stack_Entry_t * const e = stack_entry(interp, dynamic_env, 0);
         if (! e)
             internal_exception(1, "Control stack damaged");
 
@@ -444,7 +442,7 @@ Parrot_dump_dynamic_environment(Interp *interp,
                     e->entry_type, e->cleanup);
         if (e->entry_type == STACK_ENTRY_PMC
                 || e->entry_type == STACK_ENTRY_ACTION) {
-            PMC *thing = UVal_pmc(e->entry);
+            PMC * const thing = UVal_pmc(e->entry);
 
             PIO_eprintf(interp, "[        PMC %p type %d => %Ss]\n",
                         thing, thing->vtable->base_type,
