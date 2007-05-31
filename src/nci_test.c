@@ -58,6 +58,7 @@ typedef struct Rect_Like {
 
 */
 
+PARROT_API int    call_back(char *str);
 PARROT_API char   nci_c(void);
 PARROT_API char   nci_csc(short, char);
 PARROT_API double nci_d(void);
