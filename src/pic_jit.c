@@ -218,7 +218,7 @@ ops_jittable(Interp *interp, PMC *sub, const PMC *sig_results, PackFile_ByteCode
 
         const int op = *pc;
         const op_info_t * const op_info = interp->op_info_table + op;
-        const int n = op_info->op_count;
+        int n = op_info->op_count;
 
         switch (op) {
             case PARROT_OP_returncc:
