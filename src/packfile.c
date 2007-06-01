@@ -2751,19 +2751,19 @@ fixup_unpack(Interp *interp, PackFile_Segment *seg, opcode_t *cursor)
         PackFile_FixupEntry * const entry =
             self->fixups[i] =
             mem_allocate_typed(PackFile_FixupEntry);
-        self->fixups[i]->type = PF_fetch_opcode(pf, &cursor);
-        switch (self->fixups[i]->type) {
+        entry->type = PF_fetch_opcode(pf, &cursor);
+        switch (entry->type) {
             case enum_fixup_label:
             case enum_fixup_sub:
-                self->fixups[i]->name = PF_fetch_cstring(pf, &cursor);
-                self->fixups[i]->offset = PF_fetch_opcode(pf, &cursor);
+                entry->name = PF_fetch_cstring(pf, &cursor);
+                entry->offset = PF_fetch_opcode(pf, &cursor);
                 break;
             case enum_fixup_none:
                 break;
             default:
                 PIO_eprintf(interp,
                         "PackFile_FixupTable_unpack: Unknown fixup type %d!\n",
-                        self->fixups[i]->type);
+                        entry->type);
                 return 0;
         }
     }
