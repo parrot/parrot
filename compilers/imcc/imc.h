@@ -92,7 +92,7 @@ void free_reglist(IMC_Unit *);
 PARROT_API void imcc_init(Parrot_Interp interp);
 PARROT_API void imcc_destroy(Parrot_Interp interp);
 int check_op(Interp *, char * fullname, char *op, SymReg *r[], int narg, int keyvec);
-int is_op(Interp *, char *);
+int is_op(Interp *, const char *opname);
 char *str_dup(const char *);
 char *str_cat(const char *, const char *);
 int imcc_vfprintf(Interp *, FILE *fd, const char *format, va_list ap);

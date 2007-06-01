@@ -227,7 +227,7 @@ maybe_builtin(Interp *interp, IMC_Unit *unit, char *name,
  * Is instruction a parrot opcode?
  */
 int
-is_op(Interp *interp, char *name)
+is_op(Interp *interp, const char *name)
 {
     int (*op_lookup)(const char *, int full) =
         interp->op_lib->op_code;
