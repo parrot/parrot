@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -610,16 +610,14 @@ INTVAL
 Parrot_byte_index(Interp *interp, const STRING *base,
         const STRING *search, UINTVAL start_offset)
 {
-    char *base_start, *search_start;
+    const INTVAL searchlen = search->strlen;
+    const char * const search_start = search->strstart;
+    const INTVAL max_possible_offset = (base->strlen - search->strlen);
     INTVAL current_offset;
-    INTVAL max_possible_offset;
-    INTVAL searchlen = search->strlen;
-    search_start = search->strstart;
-    max_possible_offset = (base->strlen - search->strlen);
 
     for (current_offset = start_offset; current_offset <= max_possible_offset;
             current_offset++) {
-        base_start = (char *)base->strstart + current_offset;
+        const char * const base_start = (char *)base->strstart + current_offset;
         if (!memcmp(base_start, search_start, searchlen)) {
             return current_offset;
         }
@@ -632,18 +630,17 @@ INTVAL
 Parrot_byte_rindex(Interp *interp, const STRING *base,
         const STRING *search, UINTVAL start_offset)
 {
-    char *base_start, *search_start;
+    const INTVAL searchlen = search->strlen;
+    const char * const search_start = search->strstart;
+    UINTVAL max_possible_offset = (base->strlen - search->strlen);
     INTVAL current_offset;
-    UINTVAL max_possible_offset;
-    INTVAL searchlen = search->strlen;
-    search_start = search->strstart;
-    max_possible_offset = (base->strlen - search->strlen);
+
     if (start_offset && start_offset < max_possible_offset) {
         max_possible_offset = start_offset;
     }
     for (current_offset = max_possible_offset; current_offset >= 0;
             current_offset--) {
-        base_start = (char *)base->strstart + current_offset;
+        const char * const base_start = (char *)base->strstart + current_offset;
         if (!memcmp(base_start, search_start, searchlen)) {
             return current_offset;
         }
@@ -678,17 +675,15 @@ case marks it, and set node_index as its backup.
 */
 void
 rec_climb_back_and_mark(int node_index, parrot_prm_context* c) {
-    int pred, pred_index, src, node;
-
-    node = c->dest_regs[node_index];
-    pred = c->src_regs[node_index];
-    pred_index = c->reg_to_index[pred];
+    const int node = c->dest_regs[node_index];
+    const int pred = c->src_regs[node_index];
+    const int pred_index = c->reg_to_index[pred];
 
     if (pred_index < 0) { /* pred has no predecessor */
         move_reg(pred, node, c);
     }
     else { /* pred has a predecessor, so may be processed */
-        src = c->backup[pred_index];
+        const int src = c->backup[pred_index];
         if (src < 0) { /* not visited */
             move_reg(pred, node, c);
             c->backup[pred_index] = node; /* marks pred*/
@@ -719,12 +714,11 @@ For instance: 1-->2, 2-->3, 3-->1
 
 void
 process_cycle_without_exit(int node_index, parrot_prm_context* c) {
-    int pred, pred_index;
     int alt = 0;
 
-    pred = c->src_regs[node_index];
+    const int pred = c->src_regs[node_index];
     /* pred_index has to be defined cause we are in a cycle so each node has a pred*/
-    pred_index = c->reg_to_index[pred];
+    const int pred_index = c->reg_to_index[pred];
 
     /* let's try the alternate move function*/
     if (NULL != c->mov_alt)
@@ -816,7 +810,7 @@ Parrot_register_move(Interp *interp, int n_regs,
                      unsigned char temp_reg,
                      reg_move_func mov, reg_move_func mov_alt, void *info)
 {
-    int i,index;
+    int i;
     int max_reg = 0;
     int* nb_succ = NULL;
     int* backup = NULL;
@@ -864,14 +858,14 @@ Parrot_register_move(Interp *interp, int n_regs,
     for (i = 0; i < max_reg; i++)
         reg_to_index[i] = -1;
     for (i = 0; i < n_regs; i++) {
-        index = dest_regs[i];
+        const int index = dest_regs[i];
         if (index != src_regs[i]) /* get rid of self-assignment */
             reg_to_index[index] = i;
     }
 
     /* count the nb of successors for each reg index */
     for (i = 0; i < n_regs; i++) {
-        index = reg_to_index[ src_regs[i] ];
+        const int index = reg_to_index[ src_regs[i] ];
         if (index >= 0) /* not interested in the wells that have no preds */
             nb_succ[ index ]++;
     }
