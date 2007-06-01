@@ -370,7 +370,7 @@ pass_mixed(Interp *interp, PMC *sig, char *src_base, void **src,
  * the type PARROT_ARG_CONSTANT stands for mixed types or constants
  */
 int
-parrot_pic_check_sig(Interp *interp, PMC *sig1, PMC *sig2, int *type)
+parrot_pic_check_sig(Interp *interp, const PMC *sig1, const PMC *sig2, int *type /*NN*/)
 {
     int i, n, t0, t1, t2;
     t0 = 0; /* silence compiler uninit warning */
