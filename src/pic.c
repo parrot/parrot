@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -419,14 +419,13 @@ is_pic_param(Interp *interp, void **pc, Parrot_MIC* mic, opcode_t op)
     parrot_context_t *caller_ctx;
     INTVAL const_nr;
     opcode_t *args;
-    PMC *ccont;
     PMC * const sig1 = (PMC*)(pc[1]);
     parrot_context_t * const ctx = CONTEXT(interp->ctx);
 
     /* check params */
 
     if (op == PARROT_OP_set_returns_pc) {
-        ccont = ctx->current_cont;
+        PMC * const ccont = ctx->current_cont;
         if (!PMC_cont(ccont)->address)
             return 0;
         caller_ctx = PMC_cont(ccont)->to_ctx;
@@ -437,7 +436,7 @@ is_pic_param(Interp *interp, void **pc, Parrot_MIC* mic, opcode_t op)
         args = interp->current_args;
     }
     if (args) {
-        const_nr = args[1];
+        const INTVAL const_nr = args[1];
         /* check current_args signature */
         sig2 = caller_ctx->constants[const_nr]->u.key;
         n = parrot_pic_check_sig(interp, sig1, sig2, &type);
@@ -481,11 +480,6 @@ is_pic_param(Interp *interp, void **pc, Parrot_MIC* mic, opcode_t op)
 static int
 is_pic_func(Interp *interp, void **pc, Parrot_MIC *mic, int core_type)
 {
-    PMC *sub, *sig_args, *sig_results;
-    parrot_context_t *ctx;
-    opcode_t *op, n;
-    int flags;
-
     /*
      * if we have these opcodes
      *
@@ -504,8 +498,13 @@ is_pic_func(Interp *interp, void **pc, Parrot_MIC *mic, int core_type)
      * pc is at set_args
      */
 
-    ctx = CONTEXT(interp->ctx);
-    sig_args = (PMC*)(pc[1]);
+    PMC *sub, *sig_results;
+    opcode_t *op, n;
+    int flags;
+
+    parrot_context_t * const ctx = CONTEXT(interp->ctx);
+    PMC * const sig_args = (PMC*)(pc[1]);
+
     ASSERT_SIG_PMC(sig_args);
     n = SIG_ELEMS(sig_args);
     interp->current_args = (opcode_t*)pc + ctx->pred_offset;
@@ -556,9 +555,8 @@ parrot_PIC_prederef(Interp *interp, opcode_t op, void **pc_pred, int core)
     switch (op) {
         case PARROT_OP_new_p_sc:
             {
-                STRING *_class;
                 INTVAL type;
-                _class = (STRING *)cur_opcode[2];
+                STRING * const _class = (STRING *)cur_opcode[2];
                 type = pmc_type(interp, _class);
                 if (!type)
                     type = pmc_type(interp, _class);
@@ -605,8 +603,6 @@ parrot_PIC_prederef(Interp *interp, opcode_t op, void **pc_pred, int core)
 static void
 parrot_pic_move(Interp* interp, Parrot_MIC *mic)
 {
-    Parrot_PIC* pic;
-
     /*
      * MIC slot is empty - use it
      */
@@ -622,7 +618,8 @@ parrot_pic_move(Interp* interp, Parrot_MIC *mic)
         /*
          * PIC was already used - shift slots up
          */
-        pic = mic->pic;
+        Parrot_PIC * const pic = mic->pic;
+
         pic->lru[2].u.type = pic->lru[1].u.type;
         pic->lru[2].f.sub = pic->lru[1].f.sub;
         pic->lru[1].u.type = pic->lru[0].u.type;
@@ -663,10 +660,10 @@ parrot_pic_find_infix_v_pp(Interp *interp, PMC *left, PMC *right,
     func = get_mmd_dispatch_type(interp,
             mic->m.func_nr, left_type, right_type, &is_pmc);
     if (is_pmc) {
-        size_t offs = cur_opcode - interp->code->prederef.code;
-        opcode_t* real_op = interp->code->base.data + offs + 1;
-        /* set prederef code address to orig slot for now
-         */
+        const size_t offs = cur_opcode - interp->code->prederef.code;
+        opcode_t* const real_op = interp->code->base.data + offs + 1;
+
+        /* set prederef code address to orig slot for now */
         ((void**)cur_opcode)[0] =
             parrot_pic_opcode(interp, PARROT_OP_infix_ic_p_p);
         /* restore 1st operand i.e. .MMD_func_nr */

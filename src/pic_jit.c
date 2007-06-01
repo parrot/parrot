@@ -212,17 +212,13 @@ static int
 ops_jittable(Interp *interp, PMC *sub, PMC *sig_results, PackFile_ByteCode *seg,
         opcode_t *pc, opcode_t *end, int *flags)
 {
-    int        op;
-    op_info_t *op_info;
-    int        n;
-
     while (pc < end) {
         /* special opcodes which are handled, but not marked as JITtable */
         int i;
 
-        op      = *pc;
-        op_info = interp->op_info_table + op;
-        n       = op_info->op_count;
+        const int op = *pc;
+        const op_info_t * const op_info = interp->op_info_table + op;
+        const int n = op_info->op_count;
 
         switch (op) {
             case PARROT_OP_returncc:
@@ -231,8 +227,7 @@ ops_jittable(Interp *interp, PMC *sub, PMC *sig_results, PackFile_ByteCode *seg,
                 break;
             case PARROT_OP_set_returns_pc:
                 {
-                PMC *sig_ret;
-                sig_ret = seg->const_table->constants[pc[1]]->u.key;
+                PMC * const sig_ret = seg->const_table->constants[pc[1]]->u.key;
                 if (!returns_match_results(interp, sig_ret, sig_results))
                     return 0;
                 }
