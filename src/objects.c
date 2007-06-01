@@ -231,32 +231,6 @@ fail_if_exist(Interp *interp, PMC *name)
                 "can't register Class", data_types[type].name);
 }
 
-/*
- * FIXME make array clone shallow
- */
-static PMC *
-clone_array(Interp *interp, PMC *source_array)
-{
-    PMC * const new_array = pmc_new(interp,
-                                    source_array->vtable->base_type);
-    const INTVAL count    = VTABLE_elements(interp, source_array);
-    INTVAL                  i;
-
-    /*
-     * preserve type, we have OrderedHash and Array
-     * XXX this doesn't preserve the keys of the ordered hash
-     *     (but the keys aren't used -leo)
-     */
-    VTABLE_set_integer_native(interp, new_array, count);
-
-    for (i = 0; i < count; i++) {
-        VTABLE_set_pmc_keyed_int(interp, new_array, i,
-                VTABLE_get_pmc_keyed_int(interp, source_array, i));
-    }
-
-    return new_array;
-}
-
 /* Take the class and completely rebuild the attribute stuff for
    it. Horribly destructive, and definitely not a good thing to do if
    there are instantiated objects for the class */
