@@ -213,7 +213,7 @@ Invokes the subroutine.
     opcode_t* invoke(void *next) {
         struct Parrot_sub     *sub = PMC_sub(SELF);
         parrot_context_t      *caller_ctx;
-        struct Parrot_Context *context;
+        Parrot_Context        *context;
         PMC                   *ccont;
         opcode_t              *pc;
 
