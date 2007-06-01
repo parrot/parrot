@@ -193,14 +193,11 @@ PARROT_API extern INTVAL PIO_putps(Interp *, PMC *io, STRING *s)
         __attribute__nonnull__(2);
 PARROT_API extern INTVAL PIO_fprintf(Interp *, PMC *io, const char *s, ...)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__format__(__printf__, 3, 4);
+        __attribute__nonnull__(3);
 PARROT_API extern INTVAL PIO_printf(Interp *, const char *s, ...)
-        __attribute__nonnull__(2)
-        __attribute__format__(__printf__, 2, 3);
+        __attribute__nonnull__(2);
 PARROT_API extern INTVAL PIO_eprintf(Interp *, const char *s, ...)
-        __attribute__nonnull__(2)
-        __attribute__format__(__printf__, 2, 3);
+        __attribute__nonnull__(2);
 PARROT_API extern PIOHANDLE PIO_getfd(Interp *, PMC *io)
         __attribute__nonnull__(2);
 PARROT_API extern PIOOFF_T PIO_tell(Interp *, PMC *io)
