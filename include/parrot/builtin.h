@@ -17,8 +17,7 @@
 
 void Parrot_init_builtins(Interp *interp);
 int  Parrot_is_builtin(Interp *interp, const char *func, const char *sig)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 PMC* Parrot_find_builtin(Interp *interp, STRING *func)
         __attribute__nonnull__(2);
 const char * Parrot_builtin_get_c_namespace(Interp *interp, int bi);
