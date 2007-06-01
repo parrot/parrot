@@ -1,5 +1,5 @@
 /* exceptions.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -176,12 +176,14 @@ PARROT_API size_t handle_exception(Parrot_Interp);
 
 PARROT_API PMC* new_c_exception_handler(Parrot_Interp, Parrot_exception *jb);
 PARROT_API void push_new_c_exception_handler(Parrot_Interp, Parrot_exception *jb);
-PARROT_API void rethrow_c_exception(Parrot_Interp interp);
+PARROT_API void rethrow_c_exception(Parrot_Interp interp)
+        __attribute__noreturn__;
 
 /*
  * internal exception handling
  */
-PARROT_API void do_exception(Parrot_Interp, INTVAL severity, long error);
+PARROT_API void do_exception(Parrot_Interp, INTVAL severity, long error)
+        __attribute__noreturn__;
 PARROT_API void new_internal_exception(Parrot_Interp);
 PARROT_API void free_internal_exception(Parrot_Interp);
 
