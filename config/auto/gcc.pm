@@ -132,6 +132,7 @@ sub runstep {
             # We shouldn't be using __packed__, but I doubt -Wpacked will harm
             # us -Wpadded may prove interesting, or even noisy.
             # -Wunreachable-code might be useful in a non debugging version
+            4.0 => "-fvisibility=hidden",
         );
         my @cage_opt_and_vers = (
             0 =>
@@ -264,6 +265,9 @@ sub runstep {
         gccversion          => $gccversion,
         HAS_aligned_funcptr => 1
     );
+
+    $conf->data->set( sym_export => '__attribute__ ((visibility("default")))' )
+        if $gccversion > 4.0;
 
     $conf->data->set( HAS_aligned_funcptr => 0 )
         if $^O eq 'hpux';
