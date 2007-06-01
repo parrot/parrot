@@ -23,6 +23,8 @@ use Test::More     tests => 1;
 # Parrot modules
 use Parrot::Test;
 
-language_output_is( 'Lisp', <<'END_CODE', '1', 'integer 1' );
-1
+language_output_is( 'Lisp', <<'END_CODE', <<'END_OUT', 'integer 1' );
+(print 1)
 END_CODE
+1
+END_OUT
