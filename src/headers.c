@@ -497,10 +497,10 @@ Checks that C<ptr> is actually a C<Buffer>.
 */
 
 int
-is_buffer_ptr(Interp *interp, void *ptr)
+is_buffer_ptr(Interp *interp, void *ptr) /* XXX Const this */
 {
     UINTVAL i;
-    Arenas *arena_base = interp->arena_base;;
+    Arenas * const arena_base = interp->arena_base;
 
     for (i = 0; i < arena_base->num_sized; i++) {
         if (arena_base->sized_header_pools[i] &&
@@ -524,7 +524,7 @@ Checks that C<ptr> is actually a PMC.
 */
 
 int
-is_pmc_ptr(Interp *interp, void *ptr)
+is_pmc_ptr(Interp *interp, void *ptr) /* XXX Const this */
 {
     return contained_in_pool(interp,
             interp->arena_base->pmc_pool, ptr);

@@ -116,12 +116,12 @@ void
 destroy_context(Interp *interp)
 {
     int slot;
-    struct Parrot_Context *context, *prev;
+    struct Parrot_Context *context;
 
     /* clear active contexts all the way back to the initial context */
     context = CONTEXT(interp->ctx);
     while (context) {
-        prev    = context->caller_ctx;
+        struct Parrot_Context * prev = context->caller_ctx;
         mem_sys_free(context);
         context = prev;
     }
@@ -253,7 +253,7 @@ clear_regs(Interp *interp, parrot_context_t *ctx)
 }
 
 static void
-init_context(Interp *interp, parrot_context_t *ctx, parrot_context_t *old)
+init_context(Interp *interp, parrot_context_t *ctx, const parrot_context_t *old)
 {
     ctx->ref_count = 0;                 /* TODO 1 - Exceptions !!! */
     ctx->current_results = NULL;
@@ -282,7 +282,7 @@ init_context(Interp *interp, parrot_context_t *ctx, parrot_context_t *old)
 }
 
 struct Parrot_Context *
-Parrot_dup_context(Interp *interp, struct Parrot_Context *old)
+Parrot_dup_context(Interp *interp, const struct Parrot_Context *old)
 {
     size_t diff;
     struct Parrot_Context *ctx;
@@ -422,9 +422,6 @@ Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used)
 void
 Parrot_free_context(Interp *interp, parrot_context_t *ctxp, int re_use)
 {
-    void *ptr;
-    int slot;
-
     /*
      * The context structure has a reference count, initially 0.  This field is
      * incrementented when a continuation that points to it is created -- either
@@ -435,11 +432,13 @@ Parrot_free_context(Interp *interp, parrot_context_t *ctxp, int re_use)
      *
      */
     if (re_use || --ctxp->ref_count == 0) {
+        void *ptr;
+        int slot;
+
 #ifndef NDEBUG
         if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
             /* can't probably PIO_eprintf here */
-            Parrot_sub *doomed;
-            doomed = PMC_sub(ctxp->current_sub);
+            const Parrot_sub * const doomed = PMC_sub(ctxp->current_sub);
 
             fprintf(stderr, "[free  ctx %p of sub '%s']\n",
                     (void *)ctxp,
@@ -571,11 +570,10 @@ Marks the register stack and its registers as live.
 void
 mark_register_stack(Parrot_Interp interp, Stack_Chunk_t* chunk)
 {
-    struct Interp_Context ctx;
-    save_regs_t   *save_r;
-
     for (; ; chunk = chunk->prev) {
         int i;
+        save_regs_t   *save_r;
+        struct Interp_Context ctx;
 
         pobject_lives(interp, (PObj*)chunk);
         if (chunk == chunk->prev)

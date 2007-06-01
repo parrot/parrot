@@ -162,9 +162,8 @@ static funcptr_t
 get_mmd_dispatcher(Interp *interp, PMC *left, PMC * right,
         INTVAL function, int *is_pmc)
 {
-    UINTVAL left_type, right_type;
-    left_type = VTABLE_type(interp, left);
-    right_type = VTABLE_type(interp, right);
+    const UINTVAL left_type = VTABLE_type(interp, left);
+    const UINTVAL right_type = VTABLE_type(interp, right);
     return get_mmd_dispatch_type(interp, function, left_type, right_type,
             is_pmc);
 }
@@ -266,7 +265,6 @@ mmd_dispatch_p_ppp(Interp *interp,
         PMC *left, PMC *right, PMC *dest, INTVAL func_nr)
 {
     mmd_f_p_ppp real_function;
-    PMC *sub;
     int is_pmc;
 
     left = mmd_deref(interp, func_nr, left);
@@ -276,7 +274,7 @@ mmd_dispatch_p_ppp(Interp *interp,
             left, right, func_nr, &is_pmc);
 
     if (is_pmc) {
-        sub = (PMC*)real_function;
+        PMC * const sub = (PMC*)real_function;
         if (dest)
             return Parrot_runops_fromc_args(interp, sub, "PPPP",
                     left, right, dest);
@@ -326,7 +324,6 @@ mmd_dispatch_p_pnp(Interp *interp,
         PMC *left, FLOATVAL right, PMC *dest, INTVAL func_nr)
 {
     mmd_f_p_pnp real_function;
-    PMC *sub;
     int is_pmc;
     UINTVAL left_type;
 
@@ -336,7 +333,7 @@ mmd_dispatch_p_pnp(Interp *interp,
     real_function = (mmd_f_p_pnp)get_mmd_dispatch_type(interp,
             func_nr, left_type, enum_type_FLOATVAL, &is_pmc);
     if (is_pmc) {
-        sub = (PMC*)real_function;
+        PMC * const sub = (PMC*)real_function;
         if (dest)
             return Parrot_runops_fromc_args(interp, sub, "PPNP",
                     left, right, dest);
@@ -354,7 +351,6 @@ mmd_dispatch_p_psp(Interp *interp,
         PMC *left, STRING *right, PMC *dest, INTVAL func_nr)
 {
     mmd_f_p_psp real_function;
-    PMC *sub;
     int is_pmc;
     UINTVAL left_type;
 
@@ -362,7 +358,7 @@ mmd_dispatch_p_psp(Interp *interp,
     real_function = (mmd_f_p_psp)get_mmd_dispatch_type(interp,
             func_nr, left_type, enum_type_STRING, &is_pmc);
     if (is_pmc) {
-        sub = (PMC*)real_function;
+        PMC * const sub = (PMC*)real_function;
         if (dest)
             return Parrot_runops_fromc_args(interp, sub, "PPSP",
                     left, right, dest);
@@ -383,7 +379,6 @@ mmd_dispatch_v_pp(Interp *interp,
         PMC *left, PMC *right, INTVAL func_nr)
 {
     mmd_f_v_pp real_function;
-    PMC *sub;
     int is_pmc;
 
 
@@ -396,7 +391,7 @@ mmd_dispatch_v_pp(Interp *interp,
             left, right, func_nr, &is_pmc);
 
     if (is_pmc) {
-        sub = (PMC*)real_function;
+        PMC * const sub = (PMC*)real_function;
         Parrot_runops_fromc_args(interp, sub, "vPP", left, right);
     }
     else {
@@ -409,7 +404,6 @@ mmd_dispatch_v_pi(Interp *interp,
         PMC *left, INTVAL right, INTVAL func_nr)
 {
     mmd_f_v_pi real_function;
-    PMC *sub;
     int is_pmc;
     UINTVAL left_type;
 
@@ -420,7 +414,7 @@ mmd_dispatch_v_pi(Interp *interp,
     real_function = (mmd_f_v_pi)get_mmd_dispatch_type(interp,
             func_nr, left_type, enum_type_INTVAL, &is_pmc);
     if (is_pmc) {
-        sub = (PMC*)real_function;
+        PMC * const sub = (PMC*)real_function;
         Parrot_runops_fromc_args(interp, sub, "vPI", left, right);
     }
     else {
@@ -433,7 +427,6 @@ mmd_dispatch_v_pn(Interp *interp,
         PMC *left, FLOATVAL right, INTVAL func_nr)
 {
     mmd_f_v_pn real_function;
-    PMC *sub;
     int is_pmc;
     UINTVAL left_type;
 
@@ -444,7 +437,7 @@ mmd_dispatch_v_pn(Interp *interp,
     real_function = (mmd_f_v_pn)get_mmd_dispatch_type(interp,
             func_nr, left_type, enum_type_FLOATVAL, &is_pmc);
     if (is_pmc) {
-        sub = (PMC*)real_function;
+        PMC * const sub = (PMC*)real_function;
         Parrot_runops_fromc_args(interp, sub, "vPN", left, right);
     }
     else {
@@ -457,7 +450,6 @@ mmd_dispatch_v_ps(Interp *interp,
         PMC *left, STRING *right, INTVAL func_nr)
 {
     mmd_f_v_ps real_function;
-    PMC *sub;
     int is_pmc;
     UINTVAL left_type;
 
@@ -468,7 +460,7 @@ mmd_dispatch_v_ps(Interp *interp,
     real_function = (mmd_f_v_ps)get_mmd_dispatch_type(interp,
             func_nr, left_type, enum_type_STRING, &is_pmc);
     if (is_pmc) {
-        sub = (PMC*)real_function;
+        PMC * const sub = (PMC*)real_function;
         Parrot_runops_fromc_args(interp, sub, "vPS", left, right);
     }
     else {
@@ -494,7 +486,6 @@ mmd_dispatch_i_pp(Interp *interp,
         PMC *left, PMC *right, INTVAL func_nr)
 {
     mmd_f_i_pp real_function;
-    PMC *sub;
     int is_pmc;
     INTVAL ret;
 
@@ -505,7 +496,7 @@ mmd_dispatch_i_pp(Interp *interp,
             left, right, func_nr, &is_pmc);
 
     if (is_pmc) {
-        sub = (PMC*)real_function;
+        PMC * const sub = (PMC*)real_function;
         ret = Parrot_runops_fromc_args_reti(interp, sub, "IPP",
                 left, right);
     }
@@ -534,8 +525,8 @@ void
 mmd_add_function(Interp *interp,
         INTVAL func_nr, funcptr_t function)
 {
-    INTVAL i;
     if (func_nr >= (INTVAL)interp->n_binop_mmd_funcs) {
+        INTVAL i;
         if (interp->binop_mmd_funcs) {
             interp->binop_mmd_funcs =
                 (MMD_table *)mem_sys_realloc(interp->binop_mmd_funcs,
@@ -547,8 +538,9 @@ mmd_add_function(Interp *interp,
         }
 
         for (i = interp->n_binop_mmd_funcs; i <= func_nr; ++i)  {
-            MMD_table *table = interp->binop_mmd_funcs + i;
-            table->x = table->y = 0;
+            MMD_table * const table = interp->binop_mmd_funcs + i;
+            table->x = 0;
+            table->y = 0;
             table->mmd_funcs = NULL;
         }
         interp->n_binop_mmd_funcs = func_nr + 1;
@@ -633,7 +625,7 @@ mmd_expand_y(Interp *interp, INTVAL func_nr, INTVAL new_y)
 {
     funcptr_t *new_table;
     UINTVAL    new_size;
-    MMD_table *table = interp->binop_mmd_funcs + func_nr;
+    MMD_table * const table = interp->binop_mmd_funcs + func_nr;
 
     assert(table->x);
 
@@ -768,14 +760,13 @@ mmd_register_sub(Interp *interp,
              INTVAL left_type, INTVAL right_type,
              PMC *sub)
 {
-    PMC *fake;
     if (sub->vtable->base_type == enum_class_NCI) {
         /* returned from mmdvt_find */
         mmd_register(interp, func_nr, left_type, right_type,
                 D2FPTR(PMC_struct_val(sub)));
     }
     else {
-        fake = (PMC*)((UINTVAL) sub | 1);
+        PMC * const fake = (PMC*)((UINTVAL) sub | 1);
         mmd_register(interp, func_nr, left_type, right_type, D2FPTR(fake));
     }
 }
@@ -825,7 +816,7 @@ mmd_vtfind(Parrot_Interp interp, INTVAL func_nr,
            INTVAL left, INTVAL right) {
     int is_pmc;
     PMC *f;
-    funcptr_t func = get_mmd_dispatch_type(interp,
+    const funcptr_t func = get_mmd_dispatch_type(interp,
             func_nr, left, right, &is_pmc);
     if (func && is_pmc) {
         /* TODO if is_pmc == 2 a Bound_NCI is returned, which actually
@@ -854,9 +845,8 @@ PMC *
 Parrot_MMD_search_default_infix(Interp *interp, STRING *meth,
         INTVAL left_type, INTVAL right_type)
 {
-    PMC* arg_tuple;
+    PMC* const arg_tuple = pmc_new(interp, enum_class_FixedIntegerArray);
 
-    arg_tuple = pmc_new(interp, enum_class_FixedIntegerArray);
     VTABLE_set_integer_native(interp, arg_tuple, 2);
     VTABLE_set_integer_keyed_int(interp, arg_tuple, 0, left_type);
     VTABLE_set_integer_keyed_int(interp, arg_tuple, 1, right_type);
@@ -917,16 +907,17 @@ according to calling conventions.
 static PMC*
 mmd_arg_tuple_inline(Interp *interp, STRING *signature, va_list args)
 {
-    INTVAL sig_len, i, type;
-    PMC* arg_tuple, *arg;
+    INTVAL i;
+    PMC *arg;
 
-    arg_tuple = pmc_new(interp, enum_class_FixedIntegerArray);
-    sig_len = string_length(interp, signature);
+    PMC * const arg_tuple = pmc_new(interp, enum_class_FixedIntegerArray);
+    const INTVAL sig_len = string_length(interp, signature);
+
     if (!sig_len)
         return arg_tuple;
     VTABLE_set_integer_native(interp, arg_tuple, sig_len);
     for (i = 0; i < sig_len; ++i) {
-        type = string_index(interp, signature, i);
+        INTVAL type = string_index(interp, signature, i);
         switch (type) {
             case 'I':
                 VTABLE_set_integer_keyed_int(interp, arg_tuple,
@@ -961,7 +952,7 @@ static PMC*
 mmd_arg_tuple_func(Interp *interp)
 {
     INTVAL sig_len, i, type, idx;
-    PMC* arg_tuple, *arg;
+    PMC* arg;
     PMC* args_array;    /* from recent set_args opcode */
     opcode_t *args_op;
     PackFile_Constant **constants;
@@ -974,7 +965,8 @@ mmd_arg_tuple_func(Interp *interp)
      * - dispatch in invoke - yeah ugly
      */
 
-    arg_tuple = pmc_new(interp, enum_class_ResizableIntegerArray);
+    PMC * const arg_tuple = pmc_new(interp, enum_class_ResizableIntegerArray);
+
     args_op = interp->current_args;
     if (!args_op)
         return arg_tuple;
@@ -1051,22 +1043,20 @@ result
 static PMC*
 mmd_search_default(Interp *interp, STRING *meth, PMC *arg_tuple)
 {
-    PMC *candidate_list, *pmc;
     INTVAL n;
-    STRING *_sub;
 
     /*
      * 2) create a list of matching functions
      */
-    candidate_list = mmd_search_scopes(interp, meth, arg_tuple);
+    PMC * const candidate_list = mmd_search_scopes(interp, meth, arg_tuple);
     /*
      * 3) if list is empty fail
      *    if the first found function is a plain Sub: finito
      */
     n = VTABLE_elements(interp, candidate_list);
     if (n == 1) {
-        pmc = VTABLE_get_pmc_keyed_int(interp, candidate_list, 0);
-        _sub = CONST_STRING(interp, "Sub");
+        PMC * const pmc = VTABLE_get_pmc_keyed_int(interp, candidate_list, 0);
+        STRING * const _sub = CONST_STRING(interp, "Sub");
 
         if (VTABLE_isa(interp, pmc, _sub)) {
             return pmc;
@@ -1092,8 +1082,7 @@ mmd_search_default(Interp *interp, STRING *meth, PMC *arg_tuple)
     /*
      * 6) Uff, return first one
      */
-    pmc = VTABLE_get_pmc_keyed_int(interp, candidate_list, 0);
-    return pmc;
+    return VTABLE_get_pmc_keyed_int(interp, candidate_list, 0);
 }
 
 /*
@@ -1269,7 +1258,7 @@ mmd_distance(Interp *interp, PMC *pmc, PMC *arg_tuple)
         mro = interp->vtables[type_call]->mro;
         m = VTABLE_elements(interp, mro);
         for (j = 0; j < m; ++j) {
-            PMC *cl = VTABLE_get_pmc_keyed_int(interp, mro, j);
+            const PMC * const cl = VTABLE_get_pmc_keyed_int(interp, mro, j);
             if (cl->vtable->base_type == type_sig)
                 break;
             ++dist;
@@ -1317,12 +1306,12 @@ Sort the candidate list C<cl> by Manhattan Distance
 static void
 mmd_sort_candidates(Interp *interp, PMC *arg_tuple, PMC *cl)
 {
-    INTVAL i, n, d;
-    PMC *nci, *pmc, *sort;
+    INTVAL i;
+    PMC *nci;
     INTVAL *helper;
     PMC **data;
 
-    n = VTABLE_elements(interp, cl);
+    const INTVAL n = VTABLE_elements(interp, cl);
     /*
      * create a helper structure:
      * bits 0..15  = distance
@@ -1330,12 +1319,12 @@ mmd_sort_candidates(Interp *interp, PMC *arg_tuple, PMC *cl)
      *
      * TODO use half of available INTVAL bits
      */
-    sort = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC * const sort = pmc_new(interp, enum_class_FixedIntegerArray);
     VTABLE_set_integer_native(interp, sort, n);
     helper = (INTVAL *)PMC_data(sort);
     for (i = 0; i < n; ++i) {
-        pmc = VTABLE_get_pmc_keyed_int(interp, cl, i);
-        d = mmd_distance(interp, pmc, arg_tuple);
+        PMC * const pmc = VTABLE_get_pmc_keyed_int(interp, cl, i);
+        const INTVAL d = mmd_distance(interp, pmc, arg_tuple);
         helper[i] = i << 16 | (d & 0xffff);
     }
     /*
@@ -1353,7 +1342,7 @@ mmd_sort_candidates(Interp *interp, PMC *arg_tuple, PMC *cl)
      */
     data = (PMC **)PMC_data(cl);
     for (i = 0; i < n; ++i) {
-        INTVAL idx = helper[i] >> 16;
+        const INTVAL idx = helper[i] >> 16;
         /*
          * if the distance is big stop
          */
@@ -1384,12 +1373,9 @@ C<arg_tuple>.
 static PMC*
 mmd_search_scopes(Interp *interp, STRING *meth, PMC *arg_tuple)
 {
-    PMC *candidate_list;
-    int stop;
+    PMC * const candidate_list = pmc_new(interp, enum_class_ResizablePMCArray);
 
-    candidate_list = pmc_new(interp, enum_class_ResizablePMCArray);
-
-    stop = mmd_search_cur_namespace(interp, meth, arg_tuple, candidate_list);
+    const int stop = mmd_search_cur_namespace(interp, meth, arg_tuple, candidate_list);
     if (stop)
         return candidate_list;
     mmd_search_builtin(interp, meth, arg_tuple, candidate_list);
@@ -1437,11 +1423,10 @@ to continue searching outer scopes.
 static int
 mmd_maybe_candidate(Interp *interp, PMC *pmc, PMC *arg_tuple, PMC *cl)
 {
-    STRING *_sub, *_multi_sub;
     INTVAL i, n;
 
-    _sub = CONST_STRING(interp, "Sub");
-    _multi_sub = CONST_STRING(interp, "MultiSub");
+    STRING * const _sub = CONST_STRING(interp, "Sub");
+    STRING * const _multi_sub = CONST_STRING(interp, "MultiSub");
 
     if (VTABLE_isa(interp, pmc, _sub)) {
         /* a plain sub stops outer searches */
@@ -1482,14 +1467,9 @@ TRUE if the MMD search should stop.
 static int
 mmd_search_cur_namespace(Interp *interp, STRING *meth, PMC *arg_tuple, PMC *cl)
 {
-    PMC *pmc;
+    PMC * const pmc = Parrot_find_global_cur(interp, meth);
 
-    pmc = Parrot_find_global_cur(interp, meth);
-    if (pmc) {
-        if (mmd_maybe_candidate(interp, pmc, arg_tuple, cl))
-            return 1;
-    }
-    return 0;
+    return pmc && mmd_maybe_candidate(interp, pmc, arg_tuple, cl);
 }
 
 /*
@@ -1507,11 +1487,8 @@ search in all the namespaces.
 static PMC*
 mmd_get_ns(Interp *interp)
 {
-    STRING *ns_name;
-    PMC *ns;
-
-    ns_name = CONST_STRING(interp, "__parrot_core");
-    ns = Parrot_get_namespace_keyed_str(interp,
+    STRING * const ns_name = CONST_STRING(interp, "__parrot_core");
+    PMC * const ns = Parrot_get_namespace_keyed_str(interp,
                                         interp->root_namespace, ns_name);
     return ns;
 }
@@ -1519,11 +1496,8 @@ mmd_get_ns(Interp *interp)
 static PMC*
 mmd_make_ns(Interp *interp)
 {
-    STRING *ns_name;
-    PMC *ns;
-
-    ns_name = CONST_STRING(interp, "__parrot_core");
-    ns = Parrot_make_namespace_keyed_str(interp,
+    STRING * const ns_name = CONST_STRING(interp, "__parrot_core");
+    PMC * const ns = Parrot_make_namespace_keyed_str(interp,
                                          interp->root_namespace, ns_name);
     return ns;
 }
@@ -1531,9 +1505,8 @@ mmd_make_ns(Interp *interp)
 static void
 mmd_search_builtin(Interp *interp, STRING *meth, PMC *arg_tuple, PMC *cl)
 {
-    PMC *pmc, *ns;
-    ns = mmd_get_ns(interp);
-    pmc = Parrot_find_global_n(interp, ns, meth);
+    PMC * const ns = mmd_get_ns(interp);
+    PMC * const pmc = Parrot_find_global_n(interp, ns, meth);
     if (pmc)
         mmd_maybe_candidate(interp, pmc, arg_tuple, cl);
 }
@@ -1542,14 +1515,11 @@ mmd_search_builtin(Interp *interp, STRING *meth, PMC *arg_tuple, PMC *cl)
 static PMC *
 mmd_create_builtin_multi_stub(Interp *interp, PMC* ns, INTVAL func_nr)
 {
-    const char *name;
-    STRING *s;
-    PMC *multi;
-
-    name = Parrot_MMD_method_name(interp, func_nr);
+    const char * name = Parrot_MMD_method_name(interp, func_nr);
     /* create in constant pool */
-    s = const_string(interp, name);
-    multi = constant_pmc_new(interp, enum_class_MultiSub);
+    STRING * const s = const_string(interp, name);
+    PMC * multi = constant_pmc_new(interp, enum_class_MultiSub);
+
     VTABLE_set_pmc_keyed_str(interp, ns, s, multi);
     return ns;
 }
@@ -1666,12 +1636,10 @@ void
 Parrot_mmd_register_table(Interp* interp, INTVAL type,
         const MMD_init *mmd_table, INTVAL n)
 {
+    MMD_table * const table = interp->binop_mmd_funcs;
+    PMC * const ns = mmd_make_ns(interp);
     INTVAL i;
-    MMD_table *table;
-    PMC *ns;
 
-    table = interp->binop_mmd_funcs;
-    ns = mmd_make_ns(interp);
     if ((INTVAL)table->x < type && type < enum_class_core_max) {
         /*
          * pre-allocate the function table

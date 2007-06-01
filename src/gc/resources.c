@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -245,7 +245,6 @@ compact_pool(Interp *interp, Memory_Pool *pool)
     char         *cur_spot;      /* Where we're currently copying to */
 
     Small_Object_Arena *cur_buffer_arena;
-    Small_Object_Pool  *header_pool;
     INTVAL             *ref_count  = NULL;
     Arenas * const      arena_base = interp->arena_base;
 
@@ -314,7 +313,7 @@ compact_pool(Interp *interp, Memory_Pool *pool)
 
     /* Run through all the Buffer header pools and copy */
     for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-        header_pool = arena_base->sized_header_pools[j];
+        Small_Object_Pool * const header_pool = arena_base->sized_header_pools[j];
 
         if (header_pool == NULL)
             continue;
@@ -352,7 +351,7 @@ compact_pool(Interp *interp, Memory_Pool *pool)
                     /* buffer has already been moved; just change the header */
                     if (PObj_COW_TEST(b) && *ref_count & Buffer_moved_FLAG) {
                         /* Find out who else references our data */
-                        Buffer *hdr = *(Buffer **)(PObj_bufstart(b));
+                        Buffer * const hdr = *(Buffer **)(PObj_bufstart(b));
 
                         assert(PObj_is_COWable_TEST(b));
 
@@ -375,7 +374,7 @@ compact_pool(Interp *interp, Memory_Pool *pool)
                         cur_spot = aligned_mem(b, cur_spot);
 
                         if (PObj_is_COWable_TEST(b)) {
-                            INTVAL *new_ref_count = ((INTVAL*) cur_spot) - 1;
+                            INTVAL * const new_ref_count = ((INTVAL*) cur_spot) - 1;
                             *new_ref_count        = 2;
                         }
 
@@ -426,12 +425,12 @@ compact_pool(Interp *interp, Memory_Pool *pool)
     /* Now we're done. We're already on the pool's free list, so let us be the
      * only one on the free list and free the rest */
     {
-        Memory_Block *cur_block, *next_block;
+        Memory_Block *cur_block;
 
         assert(new_block == pool->top_block);
         cur_block = new_block->prev;
         while (cur_block) {
-            next_block = cur_block->prev;
+            Memory_Block * const next_block = cur_block->prev;
             /* Note that we don't have it any more */
             arena_base->memory_allocated -= cur_block->size;
             /* We know the pool body and pool header are a single chunk, so
@@ -867,12 +866,11 @@ Merge the memory pools of C<source_interp> into C<dest_interp>.
 static void merge_pools(Memory_Pool *dest, Memory_Pool *source)
 {
     Memory_Block *cur_block;
-    Memory_Block *next_block;
 
     cur_block = source->top_block;
 
     while (cur_block) {
-        next_block = cur_block->prev;
+        Memory_Block * const next_block = cur_block->prev;
 
         if (cur_block->free == cur_block->size) {
             mem_internal_free(cur_block);

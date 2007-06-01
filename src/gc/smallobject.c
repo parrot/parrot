@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -36,6 +36,8 @@ contained_in_pool(Interp *interp, Small_Object_Pool *pool, void *ptr)>
 
 Returns whether C<pool> contains C<*ptr>.
 
+XXX If ever there is a function that ought to be consted, this is it.
+
 =cut
 
 */
@@ -43,7 +45,7 @@ Returns whether C<pool> contains C<*ptr>.
 INTVAL
 contained_in_pool(Interp *interp, Small_Object_Pool *pool, void *ptr)
 {
-    Small_Object_Arena *arena;
+    const Small_Object_Arena *arena;
 
     ptr = PObj_to_ARENA(ptr);
 
@@ -75,8 +77,7 @@ int
 Parrot_is_const_pmc(Parrot_Interp interp, PMC *pmc)
 {
     Small_Object_Pool * const pool = interp->arena_base->constant_pmc_pool;
-    int c;
-    c = contained_in_pool(interp, pool, pmc);
+    const int c = contained_in_pool(interp, pool, pmc);
 
     /* some paranoia first */
     assert(!!PObj_constant_TEST(pmc) == !!c);
@@ -243,12 +244,11 @@ and put them on.
 static void
 gc_ms_alloc_objects(Interp *interp, Small_Object_Pool *pool)
 {
-    Small_Object_Arena *new_arena;
     size_t size;
     UINTVAL start, end;
 
     /* Setup memory for the new objects */
-    new_arena = (Small_Object_Arena *)mem_internal_allocate(
+    Small_Object_Arena * const new_arena = (Small_Object_Arena *)mem_internal_allocate(
         sizeof (Small_Object_Arena));
     if (!new_arena)
         PANIC("Out of arena memory");
@@ -371,7 +371,6 @@ void
 Parrot_small_object_pool_merge(Interp *interp,
         Small_Object_Pool *dest, Small_Object_Pool *source) {
     Small_Object_Arena *cur_arena;
-    Small_Object_Arena *next_arena;
     void **free_list_end;
 
     /* XXX num_free_objects doesn't seem to be accounted correctly in, e.g.,
@@ -402,7 +401,8 @@ Parrot_small_object_pool_merge(Interp *interp,
     cur_arena = source->last_Arena;
     while (cur_arena) {
         size_t total_objects;
-        next_arena = cur_arena->prev;
+        Small_Object_Arena * const next_arena = cur_arena->prev;
+
         cur_arena->next = cur_arena->prev = NULL;
 
         total_objects = cur_arena->total_objects;

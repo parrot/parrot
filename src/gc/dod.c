@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -213,7 +213,7 @@ C<trace_stack> can have these values:
 int
 Parrot_dod_trace_root(Parrot_Interp interp, int trace_stack)
 {
-    Arenas           *arena_base = interp->arena_base;
+    Arenas           * const arena_base = interp->arena_base;
     parrot_context_t *ctx;
 
     /*
@@ -256,7 +256,7 @@ Parrot_dod_trace_root(Parrot_Interp interp, int trace_stack)
      * get created as constant PMCs.
      */
     for (i = 1; i < (unsigned int)interp->n_vtable_max; i++) {
-        VTABLE *vtable = interp->vtables[i];
+        const VTABLE * const vtable = interp->vtables[i];
         /*
          * XXX dynpmc groups have empty slots for abstract objects
          */
@@ -340,7 +340,6 @@ Parrot_dod_trace_children(Parrot_Interp interp, size_t how_many)
     const int     lazy_dod    = arena_base->lazy_dod;
     PMC          *current     = arena_base->dod_mark_start;
     PMC          *next;
-    INTVAL        i           = 0;
 
     const UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
 
@@ -389,9 +388,10 @@ Parrot_dod_trace_children(Parrot_Interp interp, size_t how_many)
         if (bits) {
             if (bits == PObj_data_is_PMC_array_FLAG) {
                 /* malloced array of PMCs */
-                PMC **data = PMC_data_typed(current, PMC **);
+                PMC ** const data = PMC_data_typed(current, PMC **);
 
                 if (data) {
+                    int i;
                     for (i = 0; i < PMC_int_val(current); i++) {
                         if (data[i])
                             pobject_lives(interp, (PObj *)data[i]);
@@ -534,7 +534,7 @@ are immune from collection (i.e. constant).
 void
 Parrot_dod_sweep(Parrot_Interp interp, Small_Object_Pool *pool)
 {
-    Arenas *arena_base    = interp->arena_base;
+    Arenas * const arena_base = interp->arena_base;
     UINTVAL i, total_used = 0;
     UINTVAL object_size   = pool->object_size;
 
@@ -600,7 +600,7 @@ Parrot_dod_sweep(Parrot_Interp interp, Small_Object_Pool *pool)
 
                 /* if object is a PMC and needs destroying */
                 if (PObj_is_PMC_TEST(b)) {
-                    PMC *p = (PMC*)b;
+                    PMC * const p = (PMC*)b;
 
                     /* then destroy it here
                      *
@@ -616,7 +616,7 @@ Parrot_dod_sweep(Parrot_Interp interp, Small_Object_Pool *pool)
                         /* if the PMC has a PMC_EXT structure,
                          * return it to the pool/arena
                          */
-                        Small_Object_Pool *ext_pool = arena_base->pmc_ext_pool;
+                        Small_Object_Pool * const ext_pool = arena_base->pmc_ext_pool;
 
                         if (PObj_is_PMC_shared_TEST(p) && PMC_sync(p)) {
                             MUTEX_DESTROY(PMC_sync(p)->pmc_lock);
@@ -804,11 +804,11 @@ Run through all PMC arenas and clear live bits.
 static void
 clear_live_bits(Parrot_Interp interp, Small_Object_Pool * const pool) {
     Small_Object_Arena *arena;
-    UINTVAL             i;
     const UINTVAL       object_size = pool->object_size;
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
         Buffer *b = (Buffer *)arena->start_objects;
+        UINTVAL i;
 
         for (i = 0; i < arena->used; i++) {
             PObj_live_CLEAR(b);
@@ -938,7 +938,7 @@ sweep_cb(Parrot_Interp interp, Small_Object_Pool *pool, int flag, void *arg)
 void
 Parrot_dod_ms_run(Parrot_Interp interp, int flags)
 {
-    Arenas *arena_base = interp->arena_base;
+    Arenas * const arena_base = interp->arena_base;
 
     /* XXX these should go into the interpreter */
     int total_free     = 0;
