@@ -1,4 +1,4 @@
-# $Id: hello.t 18515 2007-05-12 12:19:34Z bernhard $
+# $Id$
 
 =head1 NAME
 
