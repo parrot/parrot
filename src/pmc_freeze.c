@@ -859,7 +859,7 @@ do_action(Parrot_Interp interp, PMC *pmc, visit_info *info,
                 info->visit_action = pmc->vtable->freeze;
             break;
         default:
-            internal_exception(1, "Illegal action %d", info->what);
+            internal_exception(1, "Illegal action %ld", (long)info->what);
             break;
     }
 }

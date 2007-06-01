@@ -189,12 +189,22 @@ PARROT_API extern INTVAL PIO_listen(Interp *, PMC *pmc, INTVAL backlog);
 PARROT_API extern PMC *PIO_accept(Interp *, PMC *pmc);
 
 
-PARROT_API extern INTVAL PIO_putps(Interp *, PMC *io, STRING *s);
-PARROT_API extern INTVAL PIO_fprintf(Interp *, PMC *io, const char *s, ...);
-PARROT_API extern INTVAL PIO_printf(Interp *, const char *s, ...);
-PARROT_API extern INTVAL PIO_eprintf(Interp *, const char *s, ...);
-PARROT_API extern PIOHANDLE PIO_getfd(Interp *, PMC *io);
-PARROT_API extern PIOOFF_T PIO_tell(Interp *, PMC *io);
+PARROT_API extern INTVAL PIO_putps(Interp *, PMC *io, STRING *s)
+        __attribute__nonnull__(2);
+PARROT_API extern INTVAL PIO_fprintf(Interp *, PMC *io, const char *s, ...)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__format__(__printf__, 3, 4);
+PARROT_API extern INTVAL PIO_printf(Interp *, const char *s, ...)
+        __attribute__nonnull__(2)
+        __attribute__format__(__printf__, 2, 3);
+PARROT_API extern INTVAL PIO_eprintf(Interp *, const char *s, ...)
+        __attribute__nonnull__(2)
+        __attribute__format__(__printf__, 2, 3);
+PARROT_API extern PIOHANDLE PIO_getfd(Interp *, PMC *io)
+        __attribute__nonnull__(2);
+PARROT_API extern PIOOFF_T PIO_tell(Interp *, PMC *io)
+        __attribute__nonnull__(2);
 
 PARROT_API extern void Parrot_IOData_mark(Interp *, ParrotIOData *piodata);
 

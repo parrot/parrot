@@ -2149,18 +2149,13 @@ PDB_extend_const_table(Interp *interp)
 
 /*
 
-=item C<static void
-dump_string(Interp *interp, STRING *s)>
-
 Dumps the buflen, flags, bufused, strlen, and offset associated with a string
 and the string itself.
-
-=cut
 
 */
 
 static void
-dump_string(Interp *interp, STRING *s)
+dump_string(Interp *interp, const STRING *s /*NULLOK*/)
 {
     if (!s)
         return;
@@ -2169,7 +2164,7 @@ dump_string(Interp *interp, STRING *s)
     PIO_eprintf(interp, "\tFlags   =\t%12ld\n", PObj_get_FLAGS(s));
     PIO_eprintf(interp, "\tBufused =\t%12ld\n", s->bufused);
     PIO_eprintf(interp, "\tStrlen  =\t%12ld\n", s->strlen);
-    PIO_eprintf(interp, "\tOffset  =\t%12d\n",
+    PIO_eprintf(interp, "\tOffset  =\t%12ld\n",
                     (char*) s->strstart - (char*) PObj_bufstart(s));
     PIO_eprintf(interp, "\tString  =\t%S\n", s);
 }
@@ -2260,31 +2255,31 @@ Print the interpreter info.
 void
 PDB_info(Interp *interp)
 {
-    PIO_eprintf(interp, "Total memory allocated = %d\n",
+    PIO_eprintf(interp, "Total memory allocated = %ld\n",
             interpinfo(interp, TOTAL_MEM_ALLOC));
-    PIO_eprintf(interp, "DOD runs = %d\n",
+    PIO_eprintf(interp, "DOD runs = %ld\n",
             interpinfo(interp, DOD_RUNS));
-    PIO_eprintf(interp, "Lazy DOD runs = %d\n",
+    PIO_eprintf(interp, "Lazy DOD runs = %ld\n",
             interpinfo(interp, LAZY_DOD_RUNS));
-    PIO_eprintf(interp, "Collect runs = %d\n",
+    PIO_eprintf(interp, "Collect runs = %ld\n",
             interpinfo(interp, COLLECT_RUNS));
-    PIO_eprintf(interp, "Collect memory = %d\n",
+    PIO_eprintf(interp, "Collect memory = %ld\n",
             interpinfo(interp, TOTAL_COPIED));
-    PIO_eprintf(interp, "Active PMCs = %d\n",
+    PIO_eprintf(interp, "Active PMCs = %ld\n",
             interpinfo(interp, ACTIVE_PMCS));
-    PIO_eprintf(interp, "Extended PMCs = %d\n",
+    PIO_eprintf(interp, "Extended PMCs = %ld\n",
             interpinfo(interp, EXTENDED_PMCS));
-    PIO_eprintf(interp, "Timely DOD PMCs = %d\n",
+    PIO_eprintf(interp, "Timely DOD PMCs = %ld\n",
             interpinfo(interp, IMPATIENT_PMCS));
-    PIO_eprintf(interp, "Total PMCs = %d\n",
+    PIO_eprintf(interp, "Total PMCs = %ld\n",
             interpinfo(interp, TOTAL_PMCS));
-    PIO_eprintf(interp, "Active buffers = %d\n",
+    PIO_eprintf(interp, "Active buffers = %ld\n",
             interpinfo(interp, ACTIVE_BUFFERS));
-    PIO_eprintf(interp, "Total buffers = %d\n",
+    PIO_eprintf(interp, "Total buffers = %ld\n",
             interpinfo(interp, TOTAL_BUFFERS));
-    PIO_eprintf(interp, "Header allocations since last collect = %d\n",
+    PIO_eprintf(interp, "Header allocations since last collect = %ld\n",
             interpinfo(interp, HEADER_ALLOCS_SINCE_COLLECT));
-    PIO_eprintf(interp, "Memory allocations since last collect = %d\n",
+    PIO_eprintf(interp, "Memory allocations since last collect = %ld\n",
             interpinfo(interp, MEM_ALLOCS_SINCE_COLLECT));
 }
 

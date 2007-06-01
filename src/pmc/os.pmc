@@ -505,10 +505,9 @@ thrown.
         string_cstring_free(coldpath);
         string_cstring_free(cnewpath);
 
-        if (ret < 0)
-        {
-            char *errmsg = strerror(errno) ;
-            real_exception(interp, NULL, E_SystemError, errmsg);
+        if (ret < 0) {
+            const char * const errmsg = strerror(errno) ;
+            real_exception(interp, NULL, E_SystemError, "%s", errmsg);
         }
     }
 

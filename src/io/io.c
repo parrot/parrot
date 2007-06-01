@@ -693,13 +693,7 @@ PIO_setlinebuf(Interp *interp, PMC *pmc)
 
 /*
 
-=item C<PMC *
-PIO_open(Interp *interp, ParrotIOLayer *layer, const char *spath,
-         const char *sflags)>
-
 Creates and returns a C<ParrotIO> PMC for C<*spath>.
-
-=cut
 
 */
 
@@ -1006,7 +1000,7 @@ Writes C<*s> to C<*pmc>. Parrot string version.
 */
 
 INTVAL
-PIO_putps(Interp *interp, PMC *pmc, STRING *s)
+PIO_putps(Interp *interp, PMC *pmc, STRING *s /*NULLOK*/)
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);

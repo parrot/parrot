@@ -80,7 +80,12 @@ void * parrot_pic_opcode(Interp *, INTVAL op);
 typedef int (*arg_pass_f)(Interp *, PMC *sig,
         char *src_base, void **src_pc, char *dest_base, void **dest_pc);
 
-int parrot_pic_check_sig(Interp *, const PMC *sig1, const PMC *sig2, int *type);
+int parrot_pic_check_sig(Interp *, const PMC *sig1, const PMC *sig2, int *type)
+    __attribute__nonnull__(1)
+    __attribute__nonnull__(2)
+    __attribute__nonnull__(3)
+    __attribute__nonnull__(4);
+
 int parrot_pic_is_safe_to_jit(Interp *, PMC *sub,
         PMC *sig_args, PMC *sig_results, int *flags);
 
