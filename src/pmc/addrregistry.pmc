@@ -43,12 +43,6 @@ int_compare(Interp *interp, const void * const a, const void * const b)
     return a != b;
 }
 
-static void
-pobject_lives_fn(Interp *interp, PObj *o)
-{
-    pobject_lives(interp, o);
-}
-
 pmclass AddrRegistry need_ext does hash {
 /*
 
