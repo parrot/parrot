@@ -79,7 +79,6 @@ my $result = GetOptions( 'html'          => \$do_gen_html,
 # cola                 not maintained
 # conversion           No t/harness
 # forth                No t/harness
-# lisp                 No t/harness
 # miniperl             not maintained, should be removed
 # perl6                test scripts are written in Perl 6, not Perl 5
 # pheme                test scripts are written in Scheme, not Perl 5
@@ -100,6 +99,7 @@ my @unified_testable_languages
               HQ9plus
               jako
               lazy-k
+              lisp
               lua
               m4
               ook
