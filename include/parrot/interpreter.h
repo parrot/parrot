@@ -541,8 +541,6 @@ void do_prederef(void **pc_prederef, Interp *interp, int type);
 
 void clone_interpreter(Parrot_Interp dest, Parrot_Interp self, INTVAL flags);
 
-PARROT_API void enter_nci_method(Interp *, const int type,
-                void *func, const char *name, const char *proto);
 PARROT_API void register_nci_method(Interp *, const int type,
                 void *func, const char *name, const char *proto);
 PARROT_API void register_raw_nci_method_in_ns(Parrot_Interp interp, const int type,

@@ -11,14 +11,7 @@ http://xrl.us/jc4u
 
 =head1 Deprecated C APIs
 
-=over 4
-
-=item enter_nci_method
-
-This function is being renamed to register_nci_method. The original name was
-confusing (see #40801).
-
-=back
+Currently no C APIs are deprecated.
 
 =head1 Deprecated methods
 

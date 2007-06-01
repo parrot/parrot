@@ -1,14 +1,14 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
 
-src/inter_misc.c - Parrot Interpreter - Misc functions
+src/inter_misc.c - Parrot Interpreter miscellaneous functions
 
 =head1 DESCRIPTION
 
-NCI function setup, C<interpinfo>, and C<sysinfo> opcodes.
+NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes.
 
 =head2 Functions
 
@@ -36,13 +36,6 @@ class C<type>.
 
 */
 void Parrot_NCI_nci_make_raw_nci(Interp *interp, PMC *method, void *func);
-
-void
-enter_nci_method(Parrot_Interp interp, const int type, void *func,
-                const char *name, const char *proto)
-{
-    register_nci_method(interp, type, func, name, proto);
-}
 
 void
 register_nci_method(Parrot_Interp interp, const int type, void *func,
@@ -127,7 +120,7 @@ void Parrot_compreg(Parrot_Interp interp, STRING *type,
     }
     nci = pmc_new(interp, enum_class_Compiler);
     VTABLE_set_pmc_keyed_str(interp, hash, type, nci);
-    /* build native call interface fir the C sub in "func" */
+    /* build native call interface for the C sub in "func" */
     sc = CONST_STRING(interp, "PJt");
     VTABLE_set_pointer_keyed_str(interp, nci, sc, (void*)func);
 }
