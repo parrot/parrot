@@ -22,6 +22,7 @@ setup function to initialize the memory pools.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/memory.h"
 
 /* for PANIC */
 #define interp NULL
@@ -122,6 +123,38 @@ mem__sys_realloc(void *from, size_t size)
 #endif
     if (!ptr)
          PANIC("Out of mem");
+    return ptr;
+}
+
+
+/*
+
+=item C<void *
+mem_sys_realloc_zeroed(void *from, size_t size, size_t old_size)>
+
+Resize a chunk of system memory. Fill the newly allocated space with zeroes.
+
+=cut
+
+*/
+
+void *
+mem__sys_realloc_zeroed(void *from, size_t size, size_t old_size)
+{
+    void *ptr;
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Freed %p (realloc -- %i bytes)\n", from, size);
+#endif
+    ptr = realloc(from, size);
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
+#endif
+    if (!ptr)
+         PANIC("Out of mem");
+
+    if (size > old_size)
+        memset((char*)ptr + old_size, 0, size - old_size);
+
     return ptr;
 }
 

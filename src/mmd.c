@@ -585,10 +585,8 @@ mmd_expand_x(Interp *interp, INTVAL func_nr, INTVAL new_x)
 
     /* First, fill in the whole new table with the default function
        pointer. We only really need to do the new part, but... */
-    new_table = (funcptr_t *)mem_sys_allocate(sizeof (funcptr_t) * y * new_x);
-    for (i = 0; i < y * new_x; i++) {
-        new_table[i] = NULL;
-    }
+    new_table = (funcptr_t *)mem_sys_allocate_zeroed(sizeof (funcptr_t) *
+                                                     y * new_x);
 
     /* Then copy the old table over. We have to do this row by row,
        because the rows in the old and new tables are different
@@ -623,17 +621,19 @@ Expands the function table in the Y direction.
 static void
 mmd_expand_y(Interp *interp, INTVAL func_nr, INTVAL new_y)
 {
-    UINTVAL    new_size;
+    UINTVAL           new_size, old_size;
     MMD_table * const table = interp->binop_mmd_funcs + func_nr;
 
     assert(table->x);
 
+    old_size = sizeof (funcptr_t) * table->x * table->y;
     new_size = sizeof (funcptr_t) * table->x * new_y;
 
     if (table->mmd_funcs)
-        table->mmd_funcs = (funcptr_t *)mem_sys_realloc(table->mmd_funcs, new_size);
+        table->mmd_funcs = (funcptr_t *)mem_sys_realloc_zeroed(
+            table->mmd_funcs, new_size, old_size);
     else
-        table->mmd_funcs = (funcptr_t *)mem_sys_allocate(new_size);
+        table->mmd_funcs = (funcptr_t *)mem_sys_allocate_zeroed(new_size);
 
     table->y = new_y;
 }
