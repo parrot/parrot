@@ -1822,6 +1822,9 @@ HEADERIZER_O_FILES = \
 headerizer:
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)
 
+hwork:
+	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl src/string*.o
+
 ###############################################################################
 #
 # smoke:
@@ -1846,6 +1849,7 @@ smoke-clean :
 #
 # Local variables:
 # mode: makefile
+# ex: ft=make
 # End:
 #
 

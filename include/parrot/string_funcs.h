@@ -20,135 +20,297 @@
 /* Declarations of accessors */
 
 /* HEADERIZER BEGIN: src/string.c */
+PARROT_API STRING * Parrot_make_COW_reference( Interp *interp,
+	STRING *s /*NULLOK*/ );
 
-PARROT_API STRING *Parrot_reuse_COW_reference(Interp *, STRING *, STRING *);
-PARROT_API STRING *Parrot_make_COW_reference(Interp *, STRING *);
-PARROT_API void Parrot_unmake_COW(Interp *, STRING *)
-        __attribute__nonnull__(2);
-PARROT_API INTVAL string_compute_strlen(Interp *, STRING *str)
-        __attribute__nonnull__(2);
-PARROT_API INTVAL string_max_bytes(Interp *, const STRING *str, INTVAL);
-PARROT_API STRING *string_concat(Interp *, STRING *str, STRING *appendage, UINTVAL len);
-PARROT_API STRING *string_append(Interp *, STRING *str, STRING *appendage);
-PARROT_API STRING *string_repeat(Interp *, const STRING *, UINTVAL,
-        STRING **);
-PARROT_API STRING *string_chopn(Interp *, STRING *, INTVAL, int in_place);
-PARROT_API STRING *string_substr(Interp *, STRING *, INTVAL,
-        INTVAL, STRING **, int replace_dest);
-PARROT_API STRING *string_replace(Interp *, STRING *src, INTVAL offset, INTVAL length,
-        STRING *rep, STRING **d);
-PARROT_API STRING *string_nprintf(Interp *,
-        STRING *, INTVAL, const char *, ...);
-PARROT_API STRING *string_printf(Interp *interp,
-        const char *format, ...);
-PARROT_API INTVAL string_compare(Interp *, const STRING *a, const STRING *b);
-PARROT_API INTVAL string_equal(Interp *, const STRING *a, const STRING *b);
-PARROT_API INTVAL string_bool(Interp *, const STRING *a);
-PARROT_API STRING *string_increment(Interp *, const STRING *);
-PARROT_API const char *Parrot_string_cstring(Interp *, const STRING *)
-        __attribute__nonnull__(2);
+PARROT_API STRING* Parrot_reuse_COW_reference( Interp *interp,
+	STRING *s /*NULLOK*/,
+	STRING *d /*NN*/ );
 
-/* Declarations of other functions */
-PARROT_API UINTVAL string_length(Interp *, const STRING *);
-PARROT_API INTVAL string_ord(Interp *, const STRING *, INTVAL idx);
-PARROT_API STRING *string_chr(Interp *, UINTVAL character);
-PARROT_API FLOATVAL string_to_num(Interp *, const STRING *);
-PARROT_API INTVAL string_to_int(Interp *, const STRING *);
-PARROT_API STRING *string_from_int(Interp *, INTVAL i);
-PARROT_API STRING *int_to_str(Interp *,
-        char *tc, HUGEINTVAL num, char base);
-PARROT_API STRING *string_from_num(Interp *, FLOATVAL f);
-PARROT_API STRING *string_grow(Interp *, STRING *s, INTVAL addlen)
-        __attribute__nonnull__(2);
-PARROT_API const char* string_primary_encoding_for_representation(Interp *,
-        parrot_string_representation_t representation);
-PARROT_API STRING *string_make(Interp *interp, const char *buffer,
-        UINTVAL len, const char *charset_name, UINTVAL flags);
-PARROT_API STRING *string_make_direct(Interp *interp, const char *buffer,
-        UINTVAL len, ENCODING *encoding, CHARSET *charset, UINTVAL flags);
-PARROT_API STRING * string_make_empty(Interp *interp,
-        parrot_string_representation_t representation,
-        UINTVAL capacity);
-PARROT_API STRING *string_copy(Interp *, STRING *);
-PARROT_API STRING *string_set(Interp *, STRING *d, STRING *s)
-        __attribute__nonnull__(2);
-/* STRING *string_transcode(Interp *, STRING *src,
-        const ENCODING *, const CHARTYPE *,
-        STRING **dest_ptr); */
-PARROT_API void string_init(Parrot_Interp);
-PARROT_API void string_deinit(Parrot_Interp);
-PARROT_API UINTVAL string_capacity(Interp *interp, const STRING *s)
-        __attribute__nonnull__(2);
-PARROT_API void *string_pointer_to_index(Interp *, const STRING *s, UINTVAL idx);
-PARROT_API INTVAL string_index(Interp *, const STRING *, UINTVAL idx);
-PARROT_API INTVAL string_str_index(Interp *interp, const STRING *s,
-        const STRING *s2, INTVAL start);
-PARROT_API STRING *string_from_cstring(Interp *, const char *, UINTVAL);
-PARROT_API STRING *string_from_const_cstring(Interp *, const char *, UINTVAL);
-PARROT_API STRING *const_string(Interp *, const char *buffer)
-        __attribute__nonnull__(2);
-PARROT_API char *string_to_cstring(Interp *, const STRING *s);
-PARROT_API void string_cstring_free(char *);
-PARROT_API void string_pin(Interp *, STRING *);
-PARROT_API void string_unpin(Interp *, STRING *);
-PARROT_API STRING *string_bitwise_and(Interp *interp, STRING *s1,
-        STRING *s2, STRING **dest);
-PARROT_API STRING *string_bitwise_or(Interp *interp, STRING *s1,
-        STRING *s2, STRING **dest);
-PARROT_API STRING *string_bitwise_xor(Interp *interp, STRING *s1,
-        STRING *s2, STRING **dest);
-PARROT_API STRING *string_bitwise_not(Interp *interp, STRING *s,
-        STRING **dest);
-/*void string_iterator_init(struct string_iterator_t *i, const STRING *s);*/
-PARROT_API UINTVAL string_decode_and_advance(struct string_iterator_t *i);
+PARROT_API const char * Parrot_string_cstring( Interp *interp,
+	const STRING *str /*NN*/ );
 
-PARROT_API size_t string_hash(Interp *interp, STRING *s, size_t seed);
-PARROT_API STRING * string_unescape_cstring(Interp *,
-        const char *cstring, char delimiter, const char *enc_or_charset);
-PARROT_API STRING * string_escape_string(Interp *, const STRING *);
-PARROT_API STRING * string_escape_string_delimited(Interp *, const STRING *,
-        UINTVAL len);
-PARROT_API STRING * string_compose(Interp *, STRING *);
+PARROT_API INTVAL Parrot_string_find_cclass( Interp *interp,
+	INTVAL flags,
+	STRING *s,
+	UINTVAL offset,
+	UINTVAL count );
 
-PARROT_API STRING *string_upcase(Interp *, const STRING *);
-PARROT_API STRING *string_downcase(Interp *, const STRING *);
-PARROT_API STRING *string_titlecase(Interp *, const STRING *);
-PARROT_API void string_upcase_inplace(Interp *, STRING *);
-PARROT_API void string_downcase_inplace(Interp *, STRING *);
-PARROT_API void string_titlecase_inplace(Interp *, STRING *);
+PARROT_API INTVAL Parrot_string_find_not_cclass( Interp *interp,
+	INTVAL flags,
+	STRING *s,
+	UINTVAL offset,
+	UINTVAL count );
 
-PARROT_API INTVAL Parrot_string_is_cclass(Interp *, INTVAL,
-        STRING *, UINTVAL offset);
-PARROT_API INTVAL Parrot_string_find_cclass(Interp *, INTVAL,
-        STRING *, UINTVAL offset, UINTVAL count);
-PARROT_API INTVAL Parrot_string_find_not_cclass(Interp *, INTVAL,
-        STRING *, UINTVAL offset, UINTVAL count);
-PARROT_API INTVAL Parrot_string_is_whitespace(Interp *, STRING *, INTVAL offset);
-PARROT_API INTVAL Parrot_string_is_digit(Interp *, STRING *, INTVAL offset);
-PARROT_API INTVAL Parrot_string_is_wordchar(Interp *, STRING *, INTVAL offset);
-PARROT_API INTVAL Parrot_string_is_punctuation(Interp *, STRING *, INTVAL offset);
-PARROT_API INTVAL Parrot_string_is_newline(Interp *, STRING *, INTVAL offset);
+PARROT_API INTVAL Parrot_string_is_cclass( Interp *interp,
+	INTVAL flags,
+	STRING *s,
+	UINTVAL offset );
 
-PARROT_API INTVAL Parrot_string_find_whitespace(Interp *, STRING *, INTVAL offset);
-PARROT_API INTVAL Parrot_string_find_digit(Interp *, STRING *, INTVAL offset);
-PARROT_API INTVAL Parrot_string_find_wordchar(Interp *, STRING *, INTVAL offset);
-PARROT_API INTVAL Parrot_string_find_punctuation(Interp *, STRING *, INTVAL offset);
-PARROT_API INTVAL Parrot_string_find_newline(Interp *, STRING *, INTVAL offset);
-PARROT_API INTVAL Parrot_string_find_word_boundary(Interp *, STRING *, INTVAL offset);
+PARROT_API STRING* Parrot_string_trans_charset( Interp *interp,
+	STRING *src,
+	INTVAL charset_nr,
+	STRING *dest );
 
-PARROT_API STRING* Parrot_string_trans_charset(Interp *, STRING *src,
-        INTVAL charset_nr, STRING *dest);
-PARROT_API STRING* Parrot_string_trans_encoding(Interp *, STRING *src,
-        INTVAL encoding_nr, STRING *dest);
+PARROT_API STRING* Parrot_string_trans_encoding( Interp *interp,
+	STRING *src,
+	INTVAL encoding_nr,
+	STRING *dest );
 
-PARROT_API CHARSET* string_rep_compatible(Interp *, const STRING *a, const STRING *b,
-        ENCODING**);
-PARROT_API STRING* string_join(Interp *, STRING *j, PMC *ar);
-PARROT_API PMC* string_split(Interp *, STRING *del, STRING *s);
-PARROT_API STRING* uint_to_str(Interp *interp, char *tc /*NN*/,
-        UHUGEINTVAL num, char base, int minus);
-PARROT_API STRING* int_to_str(Interp *interp, char *tc /*NN*/, HUGEINTVAL num, char base);
+PARROT_API void Parrot_unmake_COW( Interp *interp,
+	STRING *s /*NN*/ );
+
+PARROT_API STRING * const_string( Interp *interp,
+	const char *buffer /*NN*/ );
+
+PARROT_API STRING * int_to_str( Interp *interp,
+	char *tc /*NN*/,
+	HUGEINTVAL num,
+	char base );
+
+PARROT_API STRING * string_append( Interp *interp,
+	STRING *a /*NULLOK*/,
+	STRING *b /*NULLOK*/ );
+
+PARROT_API STRING * string_bitwise_and( Interp *interp,
+	STRING *s1,
+	STRING *s2,
+	STRING **dest );
+
+PARROT_API STRING * string_bitwise_not( Interp *interp,
+	STRING *s,
+	STRING **dest );
+
+PARROT_API STRING * string_bitwise_or( Interp *interp,
+	STRING *s1,
+	STRING *s2,
+	STRING **dest );
+
+PARROT_API STRING * string_bitwise_xor( Interp *interp,
+	STRING *s1,
+	STRING *s2,
+	STRING **dest );
+
+PARROT_API INTVAL string_bool( Interp *interp,
+	const STRING *s );
+
+PARROT_API UINTVAL string_capacity( Interp *interp,
+	const STRING *s /*NN*/ );
+
+PARROT_API STRING * string_chopn( Interp *interp,
+	STRING *s,
+	INTVAL n,
+	int in_place );
+
+PARROT_API STRING * string_chr( Interp *interp,
+	UINTVAL character );
+
+PARROT_API INTVAL string_compare( Interp *interp,
+	const STRING *s1,
+	const STRING *s2 );
+
+PARROT_API STRING * string_compose( Interp *interp,
+	STRING *src );
+
+PARROT_API INTVAL string_compute_strlen( Interp *interp,
+	STRING *s /*NN*/ );
+
+PARROT_API STRING * string_concat( Interp *interp,
+	STRING *a /*NULLOK*/,
+	STRING *b /*NULLOK*/,
+	UINTVAL Uflags );
+
+PARROT_API STRING * string_copy( Interp *interp,
+	STRING *s /*NULLOK*/ );
+
+PARROT_API void string_cstring_free( char *p );
+
+PARROT_API void string_deinit( Parrot_Interp interp );
+
+PARROT_API STRING * string_downcase( Interp *interp,
+	const STRING *s );
+
+PARROT_API void string_downcase_inplace( Interp *interp,
+	STRING *s );
+
+PARROT_API INTVAL string_equal( Interp *interp,
+	const STRING *s1,
+	const STRING *s2 );
+
+PARROT_API STRING * string_escape_string( Interp *interp,
+	const STRING *src );
+
+PARROT_API STRING * string_escape_string_delimited( Interp *interp,
+	const STRING *src,
+	UINTVAL limit );
+
+PARROT_API STRING * string_from_const_cstring( Interp *interp,
+	const char *buffer,
+	UINTVAL len );
+
+PARROT_API STRING * string_from_cstring( Interp *interp,
+	const char *buffer /*NULLOK*/,
+	UINTVAL len );
+
+PARROT_API STRING * string_from_int( Interp *interp,
+	INTVAL i );
+
+PARROT_API STRING * string_from_num( Interp *interp,
+	FLOATVAL f );
+
+PARROT_API STRING * string_grow( Interp * interp,
+	STRING * s /*NN*/,
+	INTVAL addlen );
+
+PARROT_API size_t string_hash( Interp *interp,
+	STRING *s,
+	size_t seed );
+
+PARROT_API STRING * string_increment( Interp *interp,
+	const STRING *s );
+
+PARROT_API INTVAL string_index( Interp *interp,
+	const STRING *s,
+	UINTVAL idx );
+
+PARROT_API void string_init( Parrot_Interp interp );
+
+PARROT_API STRING* string_join( Interp *interp,
+	STRING *j,
+	PMC *ar );
+
+PARROT_API UINTVAL string_length( Interp *interp,
+	const STRING *s /*NULLOK*/ );
+
+PARROT_API STRING * string_make( Interp *interp,
+	const char *buffer /*NN*/,
+	UINTVAL len,
+	const char *charset_name /*NN*/,
+	UINTVAL flags );
+
+PARROT_API STRING * string_make_direct( Interp *interp,
+	const char *buffer /*NULLOK*/,
+	UINTVAL len,
+	ENCODING *encoding,
+	CHARSET *charset,
+	UINTVAL flags );
+
+PARROT_API STRING * string_make_empty( Interp *interp,
+	parrot_string_representation_t representation,
+	UINTVAL capacity );
+
+PARROT_API INTVAL string_max_bytes( Interp *interp,
+	const STRING *s,
+	INTVAL nchars );
+
+PARROT_API STRING* string_nprintf( Interp *interp,
+	STRING *dest,
+	INTVAL bytelen,
+	const char *format,
+	... );
+
+PARROT_API INTVAL string_ord( Interp *interp,
+	const STRING *s,
+	INTVAL idx );
+
+PARROT_API void string_pin( Interp *interp,
+	STRING * s );
+
+PARROT_API const char* string_primary_encoding_for_representation( Interp *interp,
+	parrot_string_representation_t representation );
+
+PARROT_API STRING* string_printf( Interp *interp,
+	const char *format,
+	... );
+
+PARROT_API CHARSET * string_rep_compatible( Interp *interp,
+	const STRING *a /*NN*/,
+	const STRING *b /*NN*/,
+	ENCODING **e /*NN*/ );
+
+PARROT_API STRING * string_repeat( Interp *interp,
+	const STRING *s,
+	UINTVAL num,
+	STRING **d );
+
+PARROT_API STRING * string_replace( Interp *interp,
+	STRING *src /*NULLOK*/,
+	INTVAL offset,
+	INTVAL length,
+	STRING *rep /*NULLOK*/,
+	STRING **d );
+
+PARROT_API STRING * string_set( Interp *interp,
+	STRING *dest /*NULLOK*/,
+	STRING *src /*NULLOK*/ );
+
+PARROT_API PMC* string_split( Interp *interp,
+	STRING *delim,
+	STRING *str );
+
+PARROT_API INTVAL string_str_index( Interp *interp,
+	const STRING *s,
+	const STRING *s2,
+	INTVAL start );
+
+PARROT_API STRING * string_substr( Interp *interp,
+	STRING *src,
+	INTVAL offset,
+	INTVAL length,
+	STRING **d,
+	int replace_dest );
+
+PARROT_API STRING * string_titlecase( Interp *interp,
+	const STRING *s );
+
+PARROT_API void string_titlecase_inplace( Interp *interp,
+	STRING *s );
+
+PARROT_API char * string_to_cstring( Interp *interp,
+	const STRING * const s /* NULLOK */ );
+
+PARROT_API INTVAL string_to_int( Interp *interp,
+	const STRING *s );
+
+PARROT_API FLOATVAL string_to_num( Interp *interp,
+	const STRING *s );
+
+PARROT_API STRING * string_unescape_cstring( Interp *interp,
+	const char *cstring,
+	char delimiter,
+	const char *enc_char );
+
+PARROT_API void string_unpin( Interp *interp,
+	STRING * s );
+
+PARROT_API STRING * string_upcase( Interp *interp,
+	const STRING *s );
+
+PARROT_API void string_upcase_inplace( Interp *interp,
+	STRING *s );
+
+PARROT_API STRING* uint_to_str( Interp *interp,
+	char *tc /*NN*/,
+	UHUGEINTVAL num,
+	char base,
+	int minus );
 /* HEADERIZER END: src/string.c */
+/* HEADERIZER BEGIN: src/string_primitives.c */
+PARROT_API UINTVAL Parrot_char_digit_value( Interp *interp,
+	UINTVAL character );
+
+PARROT_API void string_fill_from_buffer( Interp *interp,
+	const void *buffer,
+	UINTVAL len,
+	const char *encoding_name,
+	STRING *s );
+
+PARROT_API void string_set_data_directory( const char *dir );
+
+PARROT_API Parrot_UInt4 string_unescape_one( Interp *interp,
+	UINTVAL *offset,
+	STRING *string );
+/* HEADERIZER END: src/string_primitives.c */
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_FUNCS_H_GUARD */

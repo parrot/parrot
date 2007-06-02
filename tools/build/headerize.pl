@@ -152,6 +152,23 @@ sub function_components {
     return [ $static, $returntype, $funcname, @parms ];
 }
 
+sub make_function_decls {
+    my @funcs = @_;
+
+    my @decls;
+    foreach my $func ( @funcs ) {
+        my ($static, $ret_type, $funcname, @args) = @{$func};
+        next if $static;
+
+        push( @decls,
+            sprintf "PARROT_API %s %s( %s );\n",
+            $ret_type, $funcname, join( ",\n\t", @args ),
+        );
+    }
+
+    return @decls;
+}
+
 sub main {
     GetOptions( 'verbose' => \$opt{verbose}, ) or exit(1);
 
@@ -202,26 +219,14 @@ sub main {
 
         for my $cfile ( sort keys %$cfiles ) {
             my $funcs = $cfiles->{$cfile};
+            my @funcs = sort { $a->[2] cmp $b->[2] } @{$funcs};
 
-            my @function_defs;
-            foreach my $func ( sort { $a->[2] cmp $b->[2] } @$funcs ) {
-                my $static = shift @$func;
-                next if $static;
+            my @function_decls = make_function_decls( @funcs );
 
-                my $ret_type = shift @$func;
-                my $funcname = shift @$func;
-                my @args     = @$func;
-
-                push( @function_defs,
-                    sprintf "PARROT_API %s %s( %s );\n",
-                    $ret_type, $funcname, join( ",\n\t", @args ),
-                );
-            }
-
-            my $function_defs = join( "\n", @function_defs );
+            my $function_decls = join( "\n", @function_decls );
             my $STARTMARKER   = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
             my $ENDMARKER     = qr#/\* HEADERIZER END: $cfile \*/\n?#;
-            $header =~ s#($STARTMARKER)(?:.*?)($ENDMARKER)#$1$function_defs$2#s
+            $header =~ s#($STARTMARKER)(?:.*?)($ENDMARKER)#$1$function_decls$2#s
                 or die "Need begin/end HEADERIZER markers for $cfile in $hfile\n";
         }    # for %cfiles
 

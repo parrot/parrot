@@ -119,7 +119,7 @@ allocating a new buffer.
 extern int Parrot_in_memory_pool(Interp *, void *); /* XXX Move this to a public .h file */
 
 STRING *
-Parrot_make_COW_reference(Interp *interp, STRING *s /* NULLOK */)
+Parrot_make_COW_reference(Interp *interp, STRING *s /*NULLOK*/)
 {
     STRING *d;
     if (s == NULL)
@@ -196,7 +196,7 @@ second.
 */
 
 STRING *
-string_set(Interp *interp, STRING *dest /*NN*/, STRING *src /*NULLOK*/)
+string_set(Interp *interp, STRING *dest /*NULLOK*/, STRING *src /*NULLOK*/)
 {
     if (!src)
         return NULL;
@@ -400,7 +400,7 @@ So make sure to _use_ the return value.
 */
 
 STRING *
-string_append(Interp *interp, STRING *a, STRING *b /*NULLOK*/)
+string_append(Interp *interp, STRING *a /*NULLOK*/, STRING *b /*NULLOK*/)
 {
     UINTVAL a_capacity;
     UINTVAL total_length;
@@ -575,8 +575,8 @@ together.
 */
 
 STRING *
-string_make(Interp *interp, const char *buffer,
-    UINTVAL len, const char *charset_name, UINTVAL flags)
+string_make(Interp *interp, const char *buffer /*NN*/,
+    UINTVAL len, const char *charset_name /*NN*/, UINTVAL flags)
 {
     ENCODING *encoding;
     CHARSET *charset;
@@ -596,7 +596,7 @@ string_make(Interp *interp, const char *buffer,
 }
 
 STRING *
-string_make_direct(Interp *interp, const char *buffer,
+string_make_direct(Interp *interp, const char *buffer /*NULLOK*/,
         UINTVAL len, ENCODING *encoding, CHARSET *charset, UINTVAL flags)
 {
     STRING * const s = new_string_header(interp, flags);
