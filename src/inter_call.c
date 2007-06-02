@@ -37,7 +37,6 @@ subroutines.
         orig.bp_ps = save.bp_ps;
 
 
-static int next_arg(Interp *, call_state_item *st);
 static void next_arg_sig(Interp *interp, call_state_item *st);
 static int set_retval_util(Parrot_Interp interp, const char *sig,
     parrot_context_t *ctx, call_state *st);
@@ -241,18 +240,6 @@ next_arg_sig(Interp *interp, call_state_item *st)
             }
             break;
     }
-}
-
-static int
-next_arg(Interp *interp, call_state_item *st)
-{
-    st->i++;
-    if (st->i >= st->n) {
-        st->sig = 0;
-        return 0;
-    }
-    next_arg_sig(interp, st);
-    return 1;
 }
 
 static int
@@ -592,34 +579,6 @@ init_first_dest_named(Interp *interp, call_state *st)
 }
 
 /*
- * locate destination pos, return 0 if state changed
- */
-static int
-locate_pos_named(Interp *interp, call_state *st)
-{
-    int i, n_named;
-    INTVAL sig;
-
-    n_named = -1;
-    for (i = st->first_named; i < st->dest.n; ++i) {
-        sig = SIG_ITEM(st->dest.u.op.signature, i);
-        if (!(sig & PARROT_ARG_NAME))
-            continue;
-        if (sig & PARROT_ARG_SLURPY_ARRAY)
-            break;
-        n_named++;
-        if (st->named_done & (1 << n_named))
-            continue;
-        ++i;
-        st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i);
-        st->dest.i = i;
-        st->named_done |= 1 << n_named;
-        return 1;
-    }
-    return 0;
-}
-
-/*
  * locate destination name, return 0 if not found
  */
 static int
@@ -696,29 +655,12 @@ Parrot_store_arg(Interp *interp, call_state *st)
     return store_current_arg(interp, st);
 }
 
-
-
 static void
-create_slurpy_array(Interp *interp, call_state *st)
+too_few(Interp *interp, const call_state * const st, const char * const action)
 {
-    INTVAL idx = st->dest.u.op.pc[st->dest.i];
-    assert(idx >= 0);
+    const int max_expected_args = st->params;
+    const int min_expected_args = max_expected_args - st->optionals;
 
-    st->dest.slurp =
-        pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
-
-    /* Must register this PMC or it may get collected when only the struct
-     * references it. */
-    dod_register_pmc(interp, st->dest.slurp);
-
-    CTX_REG_PMC(st->dest.ctx, idx) = st->dest.slurp;
-}
-
-static void
-too_few(Interp *interp, call_state *st, const char *action)
-{
-    int max_expected_args = st->params;
-    int min_expected_args = max_expected_args - st->optionals;
     if (st->n_actual_args < min_expected_args) {
         real_exception(interp, NULL, E_ValueError,
                 "too few arguments passed (%d) - %s%d %s expected",
@@ -729,10 +671,11 @@ too_few(Interp *interp, call_state *st, const char *action)
 }
 
 static void
-too_many(Interp *interp, call_state *st, const char *action)
+too_many(Interp *interp, const call_state * const st, const char * const action)
 {
-    int max_expected_args = st->params;
-    int min_expected_args = max_expected_args - st->optionals;
+    const int max_expected_args = st->params;
+    const int min_expected_args = max_expected_args - st->optionals;
+
     if (st->n_actual_args > max_expected_args) {
         real_exception(interp, NULL, E_ValueError,
                 "too many arguments passed (%d) - %s%d %s expected",
