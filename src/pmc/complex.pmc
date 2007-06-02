@@ -1351,7 +1351,6 @@ Returns the inverse function of SELF.
     METHOD PMC* acot() {
         FLOATVAL a, b;
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
         a = RE(SELF);
         b = IM(SELF);
         RE(d) = a/(a*a + b*b);
@@ -1526,7 +1525,6 @@ atanh = i atan(-ix)
     METHOD PMC* acoth() {
         FLOATVAL a, b;
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
         a = RE(SELF);
         b = IM(SELF);
         RE(d) = a/(a*a + b*b);
