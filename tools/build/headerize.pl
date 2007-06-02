@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -77,9 +77,9 @@ sub open_file {
     my $filename  = shift;
 
     my %actions = (
-        "<"  => "Reading",
-        ">"  => "Writing",
-        ">>" => "Appending",
+        '<'  => 'Reading',
+        '>'  => 'Writing',
+        '>>' => 'Appending',
     );
 
     my $action = $actions{$direction} or die "Invalid direction '$direction'";
@@ -141,23 +141,25 @@ sub function_components {
     $parms = $2;
     my @parms = split( /\s*,\s*/, $parms );
     for (@parms) {
-        /\S+\s+\S+/ || ( $_ eq "..." ) || ( $_ eq "void" ) || /theINTERP/
+        /\S+\s+\S+/ || ( $_ eq '...' ) || ( $_ eq 'void' ) || /theINTERP/
             or die "Bad parms in $proto";
     }
 
     my $static;
     $returntype =~ s/^((static)\s+)?//i;
-    $static = $2 || "";
+    $static = $2 || '';
 
     return [ $static, $returntype, $funcname, @parms ];
 }
 
 sub main {
-    GetOptions( "verbose" => \$opt{verbose}, ) or exit(1);
+    GetOptions( 'verbose' => \$opt{verbose}, ) or exit(1);
 
     my $nfuncs = 0;
     my @ofiles = @ARGV;
     my %files;
+
+    # Walk the object files and find corresponding source (either .c or .pmc)
     for my $ofile (@ofiles) {
         next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/;
 
@@ -169,7 +171,7 @@ sub main {
 
         my $sourcefile = -f $pmcfile ? $pmcfile : $cfile;
 
-        my $fh = open_file( "<", $cfile );
+        my $fh = open_file( '<', $cfile );
         my $source = do { local $/; <$fh> };
         close $fh;
 
@@ -220,7 +222,7 @@ sub main {
             my $STARTMARKER   = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
             my $ENDMARKER     = qr#/\* HEADERIZER END: $cfile \*/\n?#;
             $header =~ s#($STARTMARKER)(?:.*?)($ENDMARKER)#$1$function_defs$2#s
-                or die "no HEADERIZER markers for '$cfile' found in '$hfile'";
+                or die "Need begin/end HEADERIZER markers for $cfile in $hfile\n";
         }    # for %cfiles
 
         open $FILE, '>', $hfile or die "couldn't write '$hfile': $!";
