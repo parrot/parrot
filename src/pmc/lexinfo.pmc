@@ -131,6 +131,7 @@ The implementation of the Hash PMC is called.
 
         if (info->extra_flags == EXTRA_IS_NULL) {
             const INTVAL elems = io->vtable->shift_integer(INTERP, io);
+            const INTVAL k_type = io->vtable->shift_integer(INTERP, io);
             const INTVAL v_type = io->vtable->shift_integer(INTERP, io);
             Hash *hash;
 
