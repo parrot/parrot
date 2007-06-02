@@ -19,12 +19,14 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 68;
+use Test::More tests => 74;
+use Carp;
 use File::Basename;
 use File::Copy;
 use FindBin;
 use Data::Dumper;
 use_ok('Parrot::Pmc2c::Pmc2cMain');
+use_ok('Parrot::IO::Capture::Mini');
 use_ok('Cwd');
 use_ok( 'File::Temp', qw| tempdir | );
 
@@ -35,6 +37,9 @@ my $rv;
 my $cwd = cwd();
 
 my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
+my ( $tie, $msg, @lines );
+my $warnpattern =
+    qr/get_bool_keyed_int.*elements_keyed_int.*set_bool_keyed_int.*is_equal_str/s;
 
 # basic test:  @args holds default.pmc
 {
@@ -71,8 +76,20 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     ok( $self->dump_pmc(), "dump_pmc succeeded" );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
 
-    $rv = $self->gen_c();
-    ok( $rv, "gen_c completed successfully; args:  default.pmc" );
+    {
+        $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
+            or croak "Unable to tie";
+        $rv = $self->gen_c();
+        @lines = $tie->READLINE;
+        untie *STDERR or croak "Unable to untie";
+        ok( $rv, "gen_c completed successfully; args:  default.pmc" );
+        $msg = join("\n", @lines);
+        like( $msg, 
+            $warnpattern,
+            "Warnings from Parrot::Pmc2c re 4 unknown methods have been captured"
+        );
+    }
+
 
     ok( chdir $cwd, "changed back to original directory" );
 }
@@ -113,8 +130,19 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
     ok( -f qq{$temppmcdir/array.dump},   "array.dump created as expected" );
 
-    $rv = $self->gen_c();
-    ok( $rv, "gen_c completed successfully; args:  default.pmc and array.pmc" );
+    {
+        $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
+            or croak "Unable to tie";
+        $rv = $self->gen_c();
+        @lines = $tie->READLINE;
+        untie *STDERR or croak "Unable to untie";
+        ok( $rv, "gen_c completed successfully; args:  default.pmc and array.pmc" );
+        $msg = join("\n", @lines);
+        like( $msg, 
+            $warnpattern,
+            "Warnings from Parrot::Pmc2c re 4 unknown methods have been captured"
+        );
+    }
 
     ok( chdir $cwd, "changed back to original directory" );
 }
@@ -155,15 +183,26 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     ok( $self->dump_pmc(), "dump_pmc succeeded" );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
 
-    my ( $fh, $msg, $rv );
     {
-        my $currfh = select($fh);
-        open( $fh, '>', \$msg ) or die "Unable to open handle: $!";
-        $rv = $self->gen_c();
-        select($currfh);
+        $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
+            or croak "Unable to tie";
+        my ( $fh, $dmsg, $rv );
+        {
+            my $currfh = select($fh);
+            open( $fh, '>', \$dmsg ) or die "Unable to open handle: $!";
+            $rv = $self->gen_c();
+            select($currfh);
+        }
+        @lines = $tie->READLINE;
+        untie *STDERR or croak "Unable to untie";
+        ok( $rv, "gen_c completed successfully; args:  default.pmc" );
+        like( $dmsg, qr{src/pmc/default\.pmc}, "debug option worked" );
+        $msg = join("\n", @lines);
+        like( $msg, 
+            $warnpattern,
+            "Warnings from Parrot::Pmc2c re 4 unknown methods have been captured"
+        );
     }
-    ok( $rv, "gen_c completed successfully; args:  default.pmc" );
-    like( $msg, qr{src/pmc/default\.pmc}, "debug option worked" );
 
     ok( chdir $cwd, "changed back to original directory" );
 }
@@ -199,33 +238,44 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
 
-    my ( $fh, $msg, $rv );
+    my ( $fh, $dmsg, $rv );
     {
         my $currfh = select($fh);
-        open( $fh, '>', \$msg ) or die "Unable to open handle: $!";
+        open( $fh, '>', \$dmsg ) or die "Unable to open handle: $!";
         $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
         select($currfh);
     }
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
-    like( $msg, qr{^Writing}, "verbose option worked" );
+    like( $dmsg, qr{^Writing}, "verbose option worked" );
 
     {
         my $currfh = select($fh);
-        open( $fh, '>', \$msg ) or die "Unable to open handle: $!";
+        open( $fh, '>', \$dmsg ) or die "Unable to open handle: $!";
         ok( $self->dump_pmc(), "dump_pmc succeeded" );
         select($currfh);
     }
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
-    like( $msg, qr{^Reading}, "verbose option worked" );
+    like( $dmsg, qr{^Reading}, "verbose option worked" );
 
     {
-        my $currfh = select($fh);
-        open( $fh, '>', \$msg ) or die "Unable to open handle: $!";
-        $rv = $self->gen_c();
-        select($currfh);
+        $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
+            or croak "Unable to tie";
+        {
+            my $currfh = select($fh);
+            open( $fh, '>', \$dmsg ) or die "Unable to open handle: $!";
+            $rv = $self->gen_c();
+            select($currfh);
+        }
+        @lines = $tie->READLINE;
+        untie *STDERR or croak "Unable to untie";
+        ok( $rv, "gen_c completed successfully; args:  default.pmc" );
+        like( $dmsg, qr{src/pmc/default\.pmc}, "debug option worked" );
+        $msg = join("\n", @lines);
+        like( $msg, 
+            $warnpattern,
+            "Warnings from Parrot::Pmc2c re 4 unknown methods have been captured"
+        );
     }
-    ok( $rv, "gen_c completed successfully; args:  default.pmc" );
-    like( $msg, qr{src/pmc/default\.pmc}, "debug option worked" );
 
     ok( chdir $cwd, "changed back to original directory" );
 }
@@ -310,8 +360,19 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
     ok( -f qq{$temppmcdir/class.dump},   "class.dump created as expected" );
 
-    $rv = $self->gen_c();
-    ok( $rv, "gen_c completed successfully; args:  default.pmc and class.pmc" );
+    {
+        $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
+            or croak "Unable to tie";
+        $rv = $self->gen_c();
+        @lines = $tie->READLINE;
+        untie *STDERR or croak "Unable to untie";
+        ok( $rv, "gen_c completed successfully; args:  default.pmc and class.pmc" );
+        $msg = join("\n", @lines);
+        like( $msg, 
+            $warnpattern,
+            "Warnings from Parrot::Pmc2c re 4 unknown methods have been captured"
+        );
+    }
 
     ok( chdir $cwd, "changed back to original directory" );
 }
