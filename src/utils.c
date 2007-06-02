@@ -714,15 +714,13 @@ For instance: 1-->2, 2-->3, 3-->1
 
 void
 process_cycle_without_exit(int node_index, parrot_prm_context* c) {
-    int alt = 0;
-
     const int pred = c->src_regs[node_index];
-    /* pred_index has to be defined cause we are in a cycle so each node has a pred*/
-    const int pred_index = c->reg_to_index[pred];
 
     /* let's try the alternate move function*/
-    if (NULL != c->mov_alt)
-        alt = c->mov_alt(c->interp, c->dest_regs[node_index], pred, c->info);
+    const int alt =
+        c->mov_alt
+            ? c->mov_alt(c->interp, c->dest_regs[node_index], pred, c->info)
+            : 0;
 
     if (0 == alt) { /* use temp reg */
         move_reg(c->dest_regs[node_index],c->temp_reg, c);
