@@ -1775,9 +1775,9 @@ Computes the C3 linearization for the given class.
 static PMC* C3_merge(Interp *interp, PMC *merge_list)
 {
     PMC *result    = pmc_new(interp, enum_class_ResizablePMCArray);
-    int list_count = VTABLE_elements(interp, merge_list);
+    const int list_count = VTABLE_elements(interp, merge_list);
     int cand_count = 0;
-    int i, reject;
+    int i;
     PMC *accepted  = PMCNULL;
 
     /* Try and find something appropriate to add to the MRO - basically, the
@@ -1835,11 +1835,10 @@ static PMC* C3_merge(Interp *interp, PMC *merge_list)
 
     /* Otherwise, remove what was accepted from the merge lists. */
     for (i = 0; i < list_count; i++) {
-        PMC *list;
-        int list_count, j;
+        int j;
 
-        list       = VTABLE_get_pmc_keyed_int(interp, merge_list, i);
-        list_count = VTABLE_elements(interp, list);
+        PMC * const list = VTABLE_get_pmc_keyed_int(interp, merge_list, i);
+        const int list_count = VTABLE_elements(interp, list);
 
         for (j = 0; j < list_count; j++) {
             if (VTABLE_get_pmc_keyed_int(interp, list, j) == accepted) {
