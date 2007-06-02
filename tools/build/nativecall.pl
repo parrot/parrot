@@ -648,7 +648,6 @@ build_call_func(Interp *interp, PMC *pmc_nci,
     UINTVAL    signature_len;
 
     void       *result        = NULL;
-    Hash       *known_frames  = NULL;
     PMC        *HashPointer   = NULL;
 
 #if defined(CAN_BUILD_CALL_FRAMES)
