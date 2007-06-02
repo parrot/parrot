@@ -412,12 +412,11 @@ parrot_pic_check_sig(Interp *interp, const PMC *sig1, const PMC *sig2, int *type
 }
 
 static int
-is_pic_param(Interp *interp, void **pc, Parrot_MIC* mic, opcode_t op)
+is_pic_param(Interp *interp, void **pc, Parrot_MIC* const mic, opcode_t op)
 {
     PMC *sig2;
     int n, type;
     parrot_context_t *caller_ctx;
-    INTVAL const_nr;
     opcode_t *args;
     PMC * const sig1 = (PMC*)(pc[1]);
     parrot_context_t * const ctx = CONTEXT(interp->ctx);
