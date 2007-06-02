@@ -1236,7 +1236,7 @@ mark_object_cache(Interp *interp) {
 void
 init_object_cache(Interp *interp) {
     Caches * const mc = interp->caches = mem_allocate_zeroed_typed(Caches);
-    SET_NULL(mc->idx);
+    mc->idx = NULL;
 }
 
 void

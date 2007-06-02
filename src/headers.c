@@ -349,7 +349,7 @@ new_string_header(Interp *interp, UINTVAL flags)
             ? interp->arena_base->constant_string_header_pool
             : interp->arena_base->string_header_pool);
     PObj_get_FLAGS(string) |= flags | PObj_is_string_FLAG|PObj_is_COWable_FLAG;
-    SET_NULL(string->strstart);
+    string->strstart = NULL;
     return string;
 }
 

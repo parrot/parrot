@@ -304,9 +304,9 @@ new_small_object_pool(Interp *interp,
         (Small_Object_Pool *)mem_internal_allocate_zeroed(
             sizeof (Small_Object_Pool));
 
-    SET_NULL(pool->last_Arena);
-    SET_NULL(pool->free_list);
-    SET_NULL(pool->mem_pool);
+    pool->last_Arena = NULL;
+    pool->free_list = NULL;
+    pool->mem_pool = NULL;
 
     pool->object_size       = object_size;
     pool->objects_per_alloc = objects_per_alloc;

@@ -108,12 +108,12 @@ make_interpreter(Parrot_Interp parent, INTVAL flags)
      * the last interpreter (w/o) parent has to cleanup globals
      * so remember parent if any
      */
-    SET_NULL(interp->lo_var_ptr);
+    interp->lo_var_ptr = NULL;
     if (parent) {
         interp->parent_interpreter = parent;
     }
     else {
-        SET_NULL(interp->parent_interpreter);
+        interp->parent_interpreter = NULL;
         /*
          * we need a global mutex to protect the interpreter array
          */
@@ -130,7 +130,7 @@ make_interpreter(Parrot_Interp parent, INTVAL flags)
     interp->flags = flags;
 
     /* PANIC will fail until this is done */
-    SET_NULL(interp->piodata);
+    interp->piodata = NULL;
     PIO_init(interp);
 
     if (is_env_var_set("PARROT_GC_DEBUG")) {
@@ -163,7 +163,7 @@ make_interpreter(Parrot_Interp parent, INTVAL flags)
     init_object_cache(interp);
 
     /* initialize classes - this needs mmd func table */
-    SET_NULL(interp->HLL_info);
+    interp->HLL_info = NULL;
     Parrot_init(interp);
 
     /* context data */
@@ -193,24 +193,24 @@ make_interpreter(Parrot_Interp parent, INTVAL flags)
     interp->dynamic_env = new_stack(interp, "DynamicEnv");
 
     /* clear context introspection vars */
-    SET_NULL_P(CONTEXT(interp->ctx)->current_sub, PMC*);
-    SET_NULL_P(CONTEXT(interp->ctx)->current_cont, PMC*);
-    SET_NULL_P(CONTEXT(interp->ctx)->current_object, PMC*);
+    CONTEXT(interp->ctx)->current_sub = NULL;
+    CONTEXT(interp->ctx)->current_cont = NULL;
+    CONTEXT(interp->ctx)->current_object = NULL;
 
     /* Load the core op func and info tables */
     interp->op_lib = PARROT_CORE_OPLIB_INIT(1);
     interp->op_count = interp->op_lib->op_count;
     interp->op_func_table = interp->op_lib->op_func_table;
     interp->op_info_table = interp->op_lib->op_info_table;
-    SET_NULL_P(interp->all_op_libs, op_lib_t **);
-    SET_NULL_P(interp->evc_func_table, op_func_t *);
-    SET_NULL_P(interp->save_func_table, op_func_t *);
+    interp->all_op_libs = NULL;
+    interp->evc_func_table = NULL;
+    interp->save_func_table = NULL;
 
-    SET_NULL_P(interp->code, PackFile *);
-    SET_NULL_P(interp->profile, ProfData *);
+    interp->code = NULL;
+    interp->profile = NULL;
 
     /* null out the root set registry */
-    SET_NULL_P(interp->DOD_registry, PMC *);
+    interp->DOD_registry = NULL;
 
     /* create exceptions list */
     interp->current_runloop_level = 0;
@@ -239,8 +239,8 @@ make_interpreter(Parrot_Interp parent, INTVAL flags)
     /* all sys running, init the event and signal stuff
      * the first or "master" interpreter is handling events and signals
      */
-    SET_NULL_P(interp->task_queue, QUEUE*);
-    SET_NULL_P(interp->thread_data, _Thread_data *);
+    interp->task_queue = NULL;
+    interp->thread_data = NULL;
 
     Parrot_init_events(interp);
 

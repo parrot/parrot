@@ -186,7 +186,7 @@ void
 mem_setup_allocator(Interp *interp)
 {
     interp->arena_base = mem_allocate_zeroed_typed(Arenas);
-    SET_NULL(interp->arena_base->sized_header_pools);
+    interp->arena_base->sized_header_pools = NULL;
 
 #if PARROT_GC_MS
     Parrot_gc_ms_init(interp);

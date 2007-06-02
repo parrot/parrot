@@ -71,7 +71,7 @@ alloc_new_block(Interp *interp, size_t size, Memory_Pool *pool, const char *why)
     new_block->free  = alloc_size;
     new_block->size  = alloc_size;
 
-    SET_NULL(new_block->next);
+    new_block->next = NULL;
     new_block->start = (char *)new_block + sizeof (Memory_Block);
     new_block->top   = new_block->start;
 
