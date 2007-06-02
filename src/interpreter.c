@@ -171,7 +171,6 @@ do_prederef(void **pc_prederef, Parrot_Interp interp, int type)
 {
     const size_t offset = pc_prederef - interp->code->prederef.code;
     opcode_t * const pc = ((opcode_t *)interp->code->base.data) + offset;
-    op_func_t * const prederef_op_func = interp->op_lib->op_func_table;
     op_info_t *opinfo;
     size_t n;
 
@@ -1106,7 +1105,6 @@ static void
 notify_func_table(Parrot_Interp interp, op_func_t* table /*NN*/, int on)
 {
     const oplib_init_f init_func = get_op_lib_init(1, interp->run_core, NULL);
-    op_lib_t * const lib = init_func(1);
 
     init_func((long) table);
     switch (interp->run_core) {
