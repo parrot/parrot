@@ -36,7 +36,7 @@ sub defines {
     my $type = __PACKAGE__;
     return <<END;
 /* defines - $0 -> $type */
-#define REL_PC ((size_t)(cur_opcode - interp->code->prederef.code))
+#define REL_PC ((size_t)(cur_opcode - (opcode_t*)interp->code->prederef.code))
 #define CUR_OPCODE \\
     ((opcode_t*)cur_opcode + CONTEXT(interp->ctx)->pred_offset)
 #define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])
@@ -76,7 +76,7 @@ sub run_core_func_decl {
     my $prefix = $self->core_prefix;
     return <<END;
 /* run_core_func_decl - $0 -> $type */
-void ** $prefix$core(void **cur_op, Parrot_Interp interp)
+opcode_t * $prefix$core(opcode_t *cur_op, Parrot_Interp interp)
 END
 }
 

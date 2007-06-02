@@ -108,7 +108,7 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
     if (ascii) {
         /* strip delimiters */
         len = strlen(constant);
-        name = mem_sys_allocate(len);
+        name = (char *)mem_sys_allocate(len);
         constant[len - 1] = '\0';
         strcpy(name, constant + 1);
         free(constant);
@@ -182,7 +182,7 @@ static Instruction * iSUBROUTINE(Interp *interp, IMC_Unit * unit, SymReg * r) {
     Instruction *i;
     i =  iLABEL(interp, unit, r);
     r->type = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
-    r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
+    r->pcc_sub = (pcc_sub_t*)calloc(1, sizeof(struct pcc_sub_t));
     IMCC_INFO(interp)->cur_call = r;
     i->line = IMCC_INFO(interp)->line;
     add_namespace(interp, unit);
@@ -1048,7 +1048,7 @@ id_list :
 id_list_id :
      IDENTIFIER UNIQUE_REG
      {
-         IdList* l = malloc(sizeof(IdList));
+         IdList* l = (IdList*)malloc(sizeof(IdList));
          l->id = $1;
          l->unique_reg = 1;
          $$ = l;
@@ -1056,7 +1056,7 @@ id_list_id :
 
    | IDENTIFIER
      {
-         IdList* l = malloc(sizeof(IdList));
+         IdList* l = (IdList*)malloc(sizeof(IdList));
          l->id = $1;
          l->unique_reg = 0;
          $$ = l;

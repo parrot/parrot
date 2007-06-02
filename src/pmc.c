@@ -402,7 +402,7 @@ INTVAL
 pmc_type(Interp* interp, const STRING *name)
 {
     PMC * const classname_hash = interp->class_hash;
-    const PMC * const item = (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
+    PMC * item = (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
 
     /* nested namespace with same name */
     if (item->vtable->base_type == enum_class_NameSpace)

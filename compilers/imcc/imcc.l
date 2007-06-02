@@ -147,7 +147,7 @@ SP              [ ]
         /* Newline in the heredoc. Realloc and cat on. */
         IMCC_INFO(interp)->line++;
         IMCC_INFO(interp)->heredoc_content =
-            mem_sys_realloc(IMCC_INFO(interp)->heredoc_content,
+            (char*)mem_sys_realloc(IMCC_INFO(interp)->heredoc_content,
                             strlen(IMCC_INFO(interp)->heredoc_content) +
                             strlen(yytext) + 2);
         strcpy(IMCC_INFO(interp)->heredoc_content +
@@ -174,7 +174,7 @@ SP              [ ]
         {
             /* Part of the heredoc. Realloc and cat the line on. */
             IMCC_INFO(interp)->heredoc_content =
-                mem_sys_realloc(IMCC_INFO(interp)->heredoc_content,
+                (char*)mem_sys_realloc(IMCC_INFO(interp)->heredoc_content,
                                 strlen(IMCC_INFO(interp)->heredoc_content) +
                                 strlen(yytext) + 2);
             strcpy(IMCC_INFO(interp)->heredoc_content +
@@ -404,7 +404,7 @@ SP              [ ]
 
             if (!IMCC_INFO(interp)->frames || !IMCC_INFO(interp)->frames->label)
                 IMCC_fataly(interp, E_SyntaxError, "missing space?");
-        label = mem_sys_allocate(yyleng+10);
+        label = (char*)mem_sys_allocate(yyleng+10);
         sprintf(label, "%s%d", yytext, IMCC_INFO(interp)->frames->label);
 
         valp->s = label;
@@ -423,7 +423,7 @@ SP              [ ]
             if (!IMCC_INFO(interp)->frames || !IMCC_INFO(interp)->frames->label)
                 IMCC_fataly(interp, E_SyntaxError, "missing space?");
 
-            label = mem_sys_allocate(yyleng+10);
+            label = (char*)mem_sys_allocate(yyleng+10);
             sprintf(label, "%s%d", yytext, IMCC_INFO(interp)->frames->label);
 
             valp->s = label;
@@ -444,7 +444,7 @@ SP              [ ]
         int type = pmc_type(interp, string_from_cstring(interp, macro_name, 0));
 
         if (type > 0) {
-            char *buf = malloc(16);
+            char *buf = (char*)malloc(16);
             sprintf(buf, "%d", type);
             valp->s = buf;
             free(macro_name);
@@ -515,7 +515,7 @@ SP              [ ]
         frame->s.next = (struct parser_state_t*) IMCC_INFO(interp)->frames;
         IMCC_INFO(interp)->frames = frame;
         /* Start slurping up the heredoc. */
-        IMCC_INFO(interp)->heredoc_content = mem_sys_allocate(2);
+        IMCC_INFO(interp)->heredoc_content = (char*)mem_sys_allocate(2);
         IMCC_INFO(interp)->heredoc_content[0] = yytext[2];        /* preserve delim */
         IMCC_INFO(interp)->heredoc_content[1] = 0;                /* eos */
         yy_push_state(heredoc1, yyscanner);
@@ -572,7 +572,7 @@ SP              [ ]
     if (valp) {
         YYCHOP();
 
-        label = mem_sys_allocate(strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 15);
+        label = (char*)mem_sys_allocate(strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 15);
         sprintf(label, "local__%s__%s__$:", IMCC_INFO(interp)->cur_macro_name, yytext+1);
 
         valp->s = label;
@@ -585,7 +585,7 @@ SP              [ ]
     char *label;
 
     if (valp) {
-        label = mem_sys_allocate(strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 15);
+        label = (char*)mem_sys_allocate(strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 15);
         sprintf(label, "local__%s__%s__$", IMCC_INFO(interp)->cur_macro_name, yytext+2);
 
         valp->s = label;

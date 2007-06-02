@@ -635,10 +635,10 @@ runops_cgp(Interp *interp, opcode_t *pc)
 {
 #ifdef HAVE_COMPUTED_GOTO
     opcode_t *code_start = (opcode_t *)interp->code->base.data;
-    void **pc_prederef;
+    opcode_t *pc_prederef;
     init_prederef(interp, PARROT_CGP_CORE);
-    pc_prederef = interp->code->prederef.code + (pc - code_start);
-    pc = (opcode_t*) cgp_core(pc_prederef, interp);
+    pc_prederef = (opcode_t*)interp->code->prederef.code + (pc - code_start);
+    pc = cgp_core(pc_prederef, interp);
     return pc;
 #else
     PIO_eprintf(interp,
@@ -663,10 +663,10 @@ static opcode_t *
 runops_switch(Interp *interp, opcode_t *pc)
 {
     opcode_t * const code_start = (opcode_t *)interp->code->base.data;
-    void **pc_prederef;
+    opcode_t *pc_prederef;
     init_prederef(interp, PARROT_SWITCH_CORE);
-    pc_prederef = interp->code->prederef.code + (pc - code_start);
-    pc = (opcode_t*) switch_core(pc_prederef, interp);
+    pc_prederef = (opcode_t*)interp->code->prederef.code + (pc - code_start);
+    pc = switch_core(pc_prederef, interp);
     return pc;
 }
 

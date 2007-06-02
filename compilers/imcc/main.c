@@ -198,6 +198,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
 {
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int   status;
+    extern int yydebug;
     if (*argc == 1) {
         usage(stderr);
         exit(1);
@@ -709,7 +710,7 @@ imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
         IMCC_INFO(interp)->state->pasm_file = pasm_file;
         IMCC_TRY(IMCC_INFO(interp)->jump_buf,
                  IMCC_INFO(interp)->error_code) {
-            if (yyparse(yyscanner, (void *) interp))
+            if (yyparse(yyscanner, interp))
                 exit(1);
 
             imc_compile_all_units(interp);

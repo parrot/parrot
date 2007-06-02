@@ -63,7 +63,7 @@ _mk_instruction(const char *op, const char * fmt, int n,
     reg_space = 0;
     if (n > 1)
         reg_space = sizeof (SymReg *) * (n - 1);
-    ins = calloc(sizeof (Instruction) + reg_space, 1);
+    ins = (Instruction*)calloc(sizeof (Instruction) + reg_space, 1);
     if (ins == NULL) {
         fprintf(stderr, "Memory error at mk_instruction\n");
         abort();

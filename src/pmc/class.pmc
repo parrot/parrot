@@ -929,7 +929,7 @@ Gets the namespace that this class is attached to.
 =cut
 
 */
-    PCCMETHOD void pmc_namespace(PMC *namespace :optional, int got_name :opt_flag) {
+    PCCMETHOD void pmc_namespace(PMC *_namespace :optional, int got_name :opt_flag) {
         Parrot_Class *_class = PARROT_CLASS(SELF);
         PMC *ret_namespace = _class->_namespace;
         PCCRETURN(PMC *ret_namespace);

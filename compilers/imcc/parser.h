@@ -24,9 +24,6 @@ typedef struct _IdList {
 /* short ranged globals for lexer state */
 EXTERN int is_def;
 
-/* bison */
-PARROT_API EXTERN int yydebug;
-
 #define KEY_BIT(argnum) (1 << (argnum))
 
 /* An opaque pointer. */

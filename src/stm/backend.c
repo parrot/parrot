@@ -47,7 +47,7 @@ static UINTVAL handle_is_version(Parrot_STM_PMC_handle data) {
 static STM_tx_log *Parrot_STM_tx_log_alloc(Interp *interp, size_t size) {
     int i;
     STM_tx_log *log;
-    log = mem_sys_allocate_zeroed(size);
+    log = (STM_tx_log *)mem_sys_allocate_zeroed(size);
 
     interp->thread_data->stm_log = (void *) log;
 
@@ -62,9 +62,9 @@ static STM_tx_log *Parrot_STM_tx_log_alloc(Interp *interp, size_t size) {
     log->inner[0].first_read = log->inner[0].first_write = 0;
 
     log->writes =
-        mem_sys_allocate(sizeof (STM_write_record) * STM_START_RECORDS);
+        (STM_write_record*)mem_sys_allocate(sizeof (STM_write_record) * STM_START_RECORDS);
     log->writes_alloced = STM_START_RECORDS;
-    log->reads = mem_sys_allocate(sizeof (STM_read_record) * STM_START_RECORDS);
+    log->reads = (STM_read_record*)mem_sys_allocate(sizeof (STM_read_record) * STM_START_RECORDS);
     log->reads_alloced = STM_START_RECORDS;
 
     log->last_read = log->last_write = -1;
@@ -89,7 +89,7 @@ void Parrot_STM_destroy(Interp *interp) {
     if (!interp->thread_data || !interp->thread_data->stm_log)
         return;
 
-    log = interp->thread_data->stm_log;
+    log = (STM_tx_log *)interp->thread_data->stm_log;
     mem_sys_free(log->writes);
     mem_sys_free(log->reads);
     Parrot_STM_waitlist_destroy_thread(interp);
@@ -99,7 +99,7 @@ void Parrot_STM_destroy(Interp *interp) {
 
 
 STM_tx_log *Parrot_STM_tx_log_get(Interp *interp) {
-    STM_tx_log *log = interp->thread_data->stm_log; /* FIXME */
+    STM_tx_log *log = (STM_tx_log *)interp->thread_data->stm_log; /* FIXME */
     if (!log)
         log = Parrot_STM_tx_log_alloc(interp, sizeof (STM_tx_log));
 
@@ -122,7 +122,7 @@ Parrot_STM_PMC_handle Parrot_STM_alloc(Interp *interp, PMC *pmc) {
     STM_TRACE("Parrot_STM_alloc");
 
     make_bufferlike_pool(interp, sizeof (handle_data));
-    handle = new_bufferlike_header(interp, sizeof (handle_data));
+    handle = (handle_data *)new_bufferlike_header(interp, sizeof (handle_data));
     PObj_external_SET(&handle->buf);
     PObj_is_shared_SET(&handle->buf);
     PARROT_ATOMIC_PTR_INIT(handle->owner_or_version);
@@ -174,7 +174,7 @@ static STM_write_record *alloc_write(Interp *interp, STM_tx_log *log) {
     int i = ++log->last_write;
     if (i >= log->writes_alloced) {
         log->writes_alloced *= 2;
-        log->writes = mem_sys_realloc(log->writes,
+        log->writes = (STM_write_record *)mem_sys_realloc(log->writes,
             sizeof (*log->writes) * log->writes_alloced);
     }
     write = get_write(interp, log, i);
@@ -187,7 +187,7 @@ static STM_read_record *alloc_read(Interp *interp, STM_tx_log *log) {
     int i = ++log->last_read;
     if (i >= log->reads_alloced) {
         log->reads_alloced *= 2;
-        log->reads = mem_sys_realloc(log->reads,
+        log->reads = (STM_read_record *)mem_sys_realloc(log->reads,
             sizeof (*log->reads) * log->reads_alloced);
     }
     read = get_read(interp, log, i);
@@ -878,7 +878,7 @@ static void *wait_for_version(Interp *interp,
          * FIXME XXX race if other log goes away
          */
         assert(n_interpreters > 1);
-        other = version;
+        other = (STM_tx_log_sub*)version;
         assert(other < &log->inner[0] || other > &log->inner[STM_MAX_TX_DEPTH]);
         curlog = get_sublog(log, log->depth);
         PARROT_ATOMIC_INT_GET(other_wait_len, other->wait_length);
@@ -1242,11 +1242,11 @@ void* Parrot_STM_extract(Interp *interp) {
 
     cursub = get_sublog(log, log->depth);
 
-    saved = mem_sys_allocate(sizeof (*saved));
+    saved = (STM_saved_tx_log *)mem_sys_allocate(sizeof (*saved));
     saved->num_reads = log->last_read - cursub->first_read + 1;
     saved->num_writes = log->last_write - cursub->first_write + 1;
-    saved->reads = mem_sys_allocate(sizeof (*saved->reads) * saved->num_reads);
-    saved->writes =
+    saved->reads = (STM_read_record*)mem_sys_allocate(sizeof (*saved->reads) * saved->num_reads);
+    saved->writes = (STM_write_record*)
         mem_sys_allocate(sizeof (*saved->writes) * saved->num_writes);
     memcpy(saved->reads, &log->reads[cursub->first_read],
         sizeof (*saved->reads) * saved->num_reads);
@@ -1279,7 +1279,7 @@ void Parrot_STM_replay_extracted(Interp *interp, void *saved_log_data) {
     if (saved_log_data == NULL)
         return;
 
-    saved = saved_log_data;
+    saved = (STM_saved_tx_log *)saved_log_data;
 
     log = Parrot_STM_tx_log_get(interp);
 
@@ -1320,7 +1320,7 @@ void Parrot_STM_mark_extracted(Interp *interp, void *saved_log_data) {
     if (saved_log_data == NULL)
         return;
 
-    saved = saved_log_data;
+    saved = (STM_saved_tx_log *)saved_log_data;
 
     for (i = 0; i < saved->num_reads; ++i)
         mark_read_record(interp, &saved->reads[i]);
@@ -1343,7 +1343,7 @@ void Parrot_STM_destroy_extracted(Interp *interp, void *saved_log_data) {
     if (saved_log_data == NULL)
         return;
 
-    saved = saved_log_data;
+    saved = (STM_saved_tx_log *)saved_log_data;
     mem_sys_free(saved->reads);
     mem_sys_free(saved->writes);
     mem_sys_free(saved);

@@ -483,6 +483,7 @@ PIO_buf_peek(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
     ParrotIOLayer *l = layer;
     ParrotIOBuf *b;
     size_t len = 1;
+    size_t avail = 0;
 
     STRING * const s = PIO_make_io_string(interp, buf, 1);
 
@@ -495,7 +496,7 @@ PIO_buf_peek(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
 
     /* read Data from buffer */
     if (b->flags & PIO_BF_READBUF) {
-        const size_t avail = b->endb - b->next;
+        avail = b->endb - b->next;
 
         /* if we have data available, copy out the next byte */
         if (avail) {

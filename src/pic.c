@@ -632,7 +632,7 @@ parrot_pic_move(Interp* interp, Parrot_MIC *mic)
 
 void
 parrot_pic_find_infix_v_pp(Interp *interp, PMC *left, PMC *right,
-                Parrot_MIC *mic, void **cur_opcode)
+                Parrot_MIC *mic, opcode_t *cur_opcode)
 {
     funcptr_t func;
     int is_pmc;
@@ -660,10 +660,10 @@ parrot_pic_find_infix_v_pp(Interp *interp, PMC *left, PMC *right,
     func = get_mmd_dispatch_type(interp,
             mic->m.func_nr, left_type, right_type, &is_pmc);
     if (is_pmc) {
-        const size_t offs = cur_opcode - interp->code->prederef.code;
-        opcode_t* const real_op = interp->code->base.data + offs + 1;
-
-        /* set prederef code address to orig slot for now */
+        const size_t offs = cur_opcode - (opcode_t *)interp->code->prederef.code;
+        opcode_t* real_op = interp->code->base.data + offs + 1;
+        /* set prederef code address to orig slot for now
+         */
         ((void**)cur_opcode)[0] =
             parrot_pic_opcode(interp, PARROT_OP_infix_ic_p_p);
         /* restore 1st operand i.e. .MMD_func_nr */

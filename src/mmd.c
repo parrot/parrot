@@ -632,7 +632,7 @@ mmd_expand_y(Interp *interp, INTVAL func_nr, INTVAL new_y)
     new_size = sizeof (funcptr_t) * table->x * new_y;
 
     if (table->mmd_funcs)
-        table->mmd_funcs = mem_sys_realloc(table->mmd_funcs, new_size);
+        table->mmd_funcs = (funcptr_t *)mem_sys_realloc(table->mmd_funcs, new_size);
     else
         table->mmd_funcs = (funcptr_t *)mem_sys_allocate(new_size);
 

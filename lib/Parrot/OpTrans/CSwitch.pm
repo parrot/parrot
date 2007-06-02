@@ -76,7 +76,7 @@ sub defines {
     return $pred_def . <<END;
 /* defines - $0 -> $type */
 #  define opcode_to_prederef(i, op)   (op ? \\
-     (void**) (op   - CONTEXT(i->ctx)->pred_offset) : NULL)
+     (opcode_t*) (op   - CONTEXT(i->ctx)->pred_offset) : (opcode_t*)NULL)
 /*
  * if we are using CHECK_EVENTS elsewhere this macro should (again)
  * be in includes/parrot/event.h
@@ -87,7 +87,7 @@ sub defines {
 #undef  CHECK_EVENTS
 #define CHECK_EVENTS(i, n)   \\
         interp->task_queue->head ?  \\
-                Parrot_do_check_events(i, n) : n
+                (opcode_t*)Parrot_do_check_events(i, n) : n
 END
 }
 
@@ -153,10 +153,10 @@ sub run_core_func_start {
     return <<END_C;
 /* run_core_func_start - $0 -> $type */
 #if defined(__GNUC__) && defined(I386) && defined(PARROT_SWITCH_REGS)
-    register void **   cur_opcode __asm__ ("esi") = cur_op;
+    register opcode_t *   cur_opcode __asm__ ("esi") = cur_op;
     register char *   _reg_base   __asm__ ("edi");
 #else
-    void ** cur_opcode = cur_op;
+    opcode_t * cur_opcode = cur_op;
     char * _reg_base;
 #endif
 
@@ -164,7 +164,7 @@ SWITCH_RELOAD:
     _reg_base = (char*)interp->ctx.bp.regs_i;
     do {
 SWITCH_AGAIN:
-    cur_opcode = CHECK_EVENTS(interp, *cur_opcode);
+    cur_opcode = CHECK_EVENTS(interp, cur_opcode);
     if (!cur_opcode)
         break;
     switch (*(opcode_t*)cur_opcode) {

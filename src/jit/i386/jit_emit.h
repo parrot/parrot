@@ -2798,7 +2798,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     else
 #  endif
     {
-        call_func(jit_info, (void (*)(void))pmc_new_noinit);
+        call_func(jit_info, (void*)pmc_new_noinit);
     }
     /* result = eax push pmc */
     emitm_pushl_r(jit_info->native_ptr, emit_EAX);

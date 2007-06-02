@@ -79,7 +79,7 @@ imc_cleanup(Interp *interp, void *yyscanner)
 static IMC_Unit *
 imc_new_unit(IMC_Unit_Type t)
 {
-   IMC_Unit * unit = calloc(1, sizeof (IMC_Unit));
+   IMC_Unit * unit = (IMC_Unit *)calloc(1, sizeof (IMC_Unit));
    create_symhash(&unit->hash);
    unit->type = t;
    return unit;

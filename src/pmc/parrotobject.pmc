@@ -521,18 +521,18 @@ it's just SUPER aka the default implementation.
 
     PMC* share_ro() {
         PMC *ret;
-        PMC *true;
+        PMC *_true;
         PMC **data;
         INTVAL i, n;
 
         if (PObj_is_PMC_shared_TEST(SELF))
             return SELF;
 
-        ret  = pt_shared_fixup(INTERP, SELF);
-        true = pmc_new(INTERP, enum_class_Integer);
+        ret   = pt_shared_fixup(INTERP, SELF);
+        _true = pmc_new(INTERP, enum_class_Integer);
 
-        VTABLE_set_integer_native(INTERP, true, 1);
-        VTABLE_setprop(INTERP, ret, CONST_STRING(interp, "_ro"), true);
+        VTABLE_set_integer_native(INTERP, _true, 1);
+        VTABLE_setprop(INTERP, ret, CONST_STRING(interp, "_ro"), _true);
         PObj_is_PMC_shared_SET(SELF);
 
         n    = PMC_int_val(ret);
