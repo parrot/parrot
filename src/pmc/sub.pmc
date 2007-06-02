@@ -120,7 +120,7 @@ Sets the name of the subroutine.
 */
 
     STRING* get_string() {
-        struct Parrot_sub * const sub = PMC_sub(SELF);
+        const struct Parrot_sub * const sub = PMC_sub(SELF);
         return Parrot_make_COW_reference(INTERP, sub->name);
     }
 
@@ -158,7 +158,7 @@ Returns the address of the actual subroutine.
 */
 
     void* get_pointer() {
-        struct Parrot_sub * const sub = PMC_sub(SELF);
+        const struct Parrot_sub * const sub = PMC_sub(SELF);
         return sub->seg->base.data + sub->start_offs;
     }
 
@@ -191,12 +191,10 @@ Returns True.
 */
 
     INTVAL defined() {
-        struct Parrot_sub * const sub = PMC_sub(SELF);
         return 1;
     }
 
     INTVAL get_bool() {
-        struct Parrot_sub * const sub = PMC_sub(SELF);
         return 1;
     }
 
@@ -211,7 +209,7 @@ Invokes the subroutine.
 */
 
     opcode_t* invoke(void *next) {
-        struct Parrot_sub     *sub = PMC_sub(SELF);
+        struct Parrot_sub     * const sub = PMC_sub(SELF);
         parrot_context_t      *caller_ctx;
         Parrot_Context        *context;
         PMC                   *ccont;
@@ -395,7 +393,7 @@ Marks the sub as live.
 */
 
     void mark() {
-        struct Parrot_sub * const sub = PMC_sub(SELF);
+        const struct Parrot_sub * const sub = PMC_sub(SELF);
         if (!sub)
             return;
         if (sub->name)
@@ -503,7 +501,7 @@ Unarchives the subroutine.
 */
 
     void thaw(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
+        IMAGE_IO * const io = info->image_io;
         SUPER(info);
 
         if (info->extra_flags == EXTRA_IS_NULL) {
@@ -583,17 +581,17 @@ Return the MMD signature PMC, if any or a Null PMC.
     }
 
     METHOD PMC* get_lexinfo() {
-        struct Parrot_sub * const sub = PMC_sub(SELF);
+        const struct Parrot_sub * const sub = PMC_sub(SELF);
         return sub->lex_info ? sub->lex_info : PMCNULL;
     }
 
     METHOD PMC* get_outer() {
-        struct Parrot_sub * const sub = PMC_sub(SELF);
+        const struct Parrot_sub * const sub = PMC_sub(SELF);
         return sub->outer_sub ? sub->outer_sub : PMCNULL;
     }
 
     METHOD PMC* get_multisig() {
-        struct Parrot_sub * const sub = PMC_sub(SELF);
+        const struct Parrot_sub * const sub = PMC_sub(SELF);
         return sub->multi_signature ? sub->multi_signature : PMCNULL;
     }
 }
