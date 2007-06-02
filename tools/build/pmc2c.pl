@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -8,7 +8,6 @@ use FindBin;
 use lib "$FindBin::Bin/../..";
 use lib "$FindBin::Bin/../../lib";
 use Getopt::Long;
-use Data::Dumper;
 use Parrot::Pmc2c::Pmc2cMain;
 
 my ( %action, %options, @pmc_include_paths );
@@ -63,6 +62,7 @@ if ( $action{gen_c} ) {
     exit;
 }
 
+__END__
 =head1 NAME
 
 tools/build/pmc2c.pl - PMC definition to C compiler
