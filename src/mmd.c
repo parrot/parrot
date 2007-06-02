@@ -623,7 +623,6 @@ Expands the function table in the Y direction.
 static void
 mmd_expand_y(Interp *interp, INTVAL func_nr, INTVAL new_y)
 {
-    funcptr_t *new_table;
     UINTVAL    new_size;
     MMD_table * const table = interp->binop_mmd_funcs + func_nr;
 
