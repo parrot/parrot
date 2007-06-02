@@ -23,8 +23,10 @@
 
 PARROT_API STRING *Parrot_reuse_COW_reference(Interp *, STRING *, STRING *);
 PARROT_API STRING *Parrot_make_COW_reference(Interp *, STRING *);
-PARROT_API void Parrot_unmake_COW(Interp *, STRING *);
-PARROT_API INTVAL string_compute_strlen(Interp *, STRING *str);
+PARROT_API void Parrot_unmake_COW(Interp *, STRING *)
+        __attribute__nonnull__(2);
+PARROT_API INTVAL string_compute_strlen(Interp *, STRING *str)
+        __attribute__nonnull__(2);
 PARROT_API INTVAL string_max_bytes(Interp *, const STRING *str, INTVAL);
 PARROT_API STRING *string_concat(Interp *, STRING *str, STRING *appendage, UINTVAL len);
 PARROT_API STRING *string_append(Interp *, STRING *str, STRING *appendage);
@@ -43,7 +45,8 @@ PARROT_API INTVAL string_compare(Interp *, const STRING *a, const STRING *b);
 PARROT_API INTVAL string_equal(Interp *, const STRING *a, const STRING *b);
 PARROT_API INTVAL string_bool(Interp *, const STRING *a);
 PARROT_API STRING *string_increment(Interp *, const STRING *);
-PARROT_API const char *Parrot_string_cstring(Interp *, const STRING *);
+PARROT_API const char *Parrot_string_cstring(Interp *, const STRING *)
+        __attribute__nonnull__(2);
 
 /* Declarations of other functions */
 PARROT_API UINTVAL string_length(Interp *, const STRING *);
@@ -55,7 +58,8 @@ PARROT_API STRING *string_from_int(Interp *, INTVAL i);
 PARROT_API STRING *int_to_str(Interp *,
         char *tc, HUGEINTVAL num, char base);
 PARROT_API STRING *string_from_num(Interp *, FLOATVAL f);
-PARROT_API STRING *string_grow(Interp *, STRING *s, INTVAL addlen);
+PARROT_API STRING *string_grow(Interp *, STRING *s, INTVAL addlen)
+        __attribute__nonnull__(2);
 PARROT_API const char* string_primary_encoding_for_representation(Interp *,
         parrot_string_representation_t representation);
 PARROT_API STRING *string_make(Interp *interp, const char *buffer,
@@ -66,7 +70,8 @@ PARROT_API STRING * string_make_empty(Interp *interp,
         parrot_string_representation_t representation,
         UINTVAL capacity);
 PARROT_API STRING *string_copy(Interp *, STRING *);
-PARROT_API STRING *string_set(Interp *, STRING *d, STRING *s);
+PARROT_API STRING *string_set(Interp *, STRING *d, STRING *s)
+        __attribute__nonnull__(2);
 /* STRING *string_transcode(Interp *, STRING *src,
         const ENCODING *, const CHARTYPE *,
         STRING **dest_ptr); */
