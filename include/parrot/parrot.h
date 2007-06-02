@@ -1,5 +1,5 @@
 /* parrot.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -127,14 +127,6 @@ typedef struct parrot_interp_t Interp;
  * isn't represented by zeroes, so don't use these, for resetting
  * non-null pointers
  */
-
-#ifdef HAS_NON_ZERO_NULL
-#  define SET_NULL(x) x = NULL
-#  define SET_NULL_P(x, s) x = (s)NULL
-#else
-#  define SET_NULL(x)
-#  define SET_NULL_P(x, s)
-#endif /* HAS_NON_ZERO_NULL */
 
 /*  Casting between pointers and integers:  If pointers and integers
     are the same size, then direct casting is fine.  If pointers and
