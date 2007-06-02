@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -85,11 +85,11 @@ Parrot_charsets_encodings_deinit(Interp *interp)
 CHARSET *
 Parrot_find_charset(Interp *interp, const char *charsetname)
 {
-    int i, n;
+    int i;
+    const int n = all_charsets->n_charsets;
 
-    n = all_charsets->n_charsets;
     for (i = 0; i < n; ++i) {
-        if (!strcmp(all_charsets->set[i].charset->name, charsetname)) {
+        if (strcmp(all_charsets->set[i].charset->name, charsetname) == 0) {
             return all_charsets->set[i].charset;
         }
     }
@@ -120,9 +120,9 @@ Return the number of the charset of the given string or -1 if not found.
 INTVAL
 Parrot_charset_number(Interp *interp, STRING *charsetname)
 {
-    int i, n;
+    int i;
+    const int n = all_charsets->n_charsets;
 
-    n = all_charsets->n_charsets;
     for (i = 0; i < n; ++i) {
         if (!string_equal(interp, all_charsets->set[i].name, charsetname))
             return i;
@@ -133,9 +133,9 @@ Parrot_charset_number(Interp *interp, STRING *charsetname)
 INTVAL
 Parrot_charset_number_of_str(Interp *interp, STRING *src)
 {
-    int i, n;
+    int i;
+    const int n = all_charsets->n_charsets;
 
-    n = all_charsets->n_charsets;
     for (i = 0; i < n; ++i) {
         if (src->charset == all_charsets->set[i].charset)
             return i;
@@ -171,11 +171,11 @@ static INTVAL
 register_charset(Interp *interp, const char *charsetname,
         CHARSET *charset)
 {
-    int i, n;
+    const int n = all_charsets->n_charsets;
+    int i;
 
-    n = all_charsets->n_charsets;
     for (i = 0; i < n; ++i) {
-        if (!strcmp(all_charsets->set[i].charset->name, charsetname))
+        if (strcmp(all_charsets->set[i].charset->name, charsetname) == 0)
             return 0;
     }
     /*
@@ -290,14 +290,15 @@ Parrot_default_charset(Interp *interp)
 charset_converter_t
 Parrot_find_charset_converter(Interp *interp, CHARSET *lhs, CHARSET *rhs)
 {
-    int i, j, n, nc;
+    int i;
+    const int n = all_charsets->n_charsets;
 
-    n = all_charsets->n_charsets;
     for (i = 0; i < n; ++i) {
         if (lhs == all_charsets->set[i].charset) {
-            One_charset *left = all_charsets->set + i;
+            One_charset * const left = all_charsets->set + i;
+            const int nc = left->n_converters;
+            int j;
 
-            nc = left->n_converters;
             for (j = 0; j < nc; ++j) {
                 if (left->to_converters[j].to == rhs)
                     return left->to_converters[j].func;
@@ -311,14 +312,14 @@ void
 Parrot_register_charset_converter(Interp *interp,
         CHARSET *lhs, CHARSET *rhs, charset_converter_t func)
 {
-    int i, n, nc;
+    const int n = all_charsets->n_charsets;
+    int i;
 
-    n = all_charsets->n_charsets;
     for (i = 0; i < n; ++i) {
         if (lhs == all_charsets->set[i].charset) {
-            One_charset *left = all_charsets->set + i;
+            One_charset * const left = all_charsets->set + i;
+            const int nc = left->n_converters++;
 
-            nc = left->n_converters++;
             if (nc) {
                 left->to_converters = (To_converter *)mem_sys_realloc(
                         left->to_converters, sizeof (To_converter) * (nc + 1));
