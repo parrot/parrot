@@ -25,7 +25,7 @@ These are the vtable functions for the lexinfo PMC.
 static size_t
 key_hash_STRING(Interp *interp, void *value, size_t seed)
 {
-    STRING *s = (STRING *)value;
+    STRING * const s = (STRING *)value;
 
     if (s->hashval)
         return s->hashval;
@@ -127,11 +127,10 @@ The implementation of the Hash PMC is called.
     }
 
     void thaw(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
+        IMAGE_IO * const io = info->image_io;
 
         if (info->extra_flags == EXTRA_IS_NULL) {
             const INTVAL elems = io->vtable->shift_integer(INTERP, io);
-            const INTVAL k_type = io->vtable->shift_integer(INTERP, io);
             const INTVAL v_type = io->vtable->shift_integer(INTERP, io);
             Hash *hash;
 
