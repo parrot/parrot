@@ -22,8 +22,8 @@ strings.
 
 #include "parrot/parrot.h"
 #include "parrot/compiler.h"
-#include "string_private_cstring.h"
 #include "parrot/string_funcs.h"
+#include "string_private_cstring.h"
 #include <assert.h>
 
 /*
@@ -2539,6 +2539,64 @@ string_split(Interp *interp, STRING *delim, STRING *str)
             pe = slen;
     }
     return res;
+}
+
+/*
+
+FUNCDOC: uint_to_str
+
+Returns C<num> converted to a Parrot C<STRING>.
+
+Note that C<base> must be defined, a default of 10 is not assumed. The
+caller has to verify that C<< base >= 2 && base <= 36 >>
+The buffer C<tc> must be at least C<sizeof (UHUGEINTVAL)*8 + 1> chars big.
+
+If C<minus> is true then C<-> is prepended to the string representation.
+
+*/
+
+STRING*
+uint_to_str(Interp *interp,
+            char *tc /*NN*/, UHUGEINTVAL num, char base, int minus)
+{
+    /* the buffer must be at least as long as this */
+    char *p = tc + sizeof (UHUGEINTVAL)*8 + 1;
+    const char * const tail = p;
+
+    assert(base >= 2 && base <= 36);
+    do {
+        const char cur = (char)(num % base);
+        if (cur < 10) {
+            *--p = (char)('0' + cur);
+        }
+        else {
+            *--p = (char)('a' + cur - 10);
+        }
+    } while (num /= base);
+    if (minus)
+        *--p = '-';
+    return string_make(interp, p, tail - p, "ascii", 0);
+}
+
+/*
+
+FUNCDOC: int_to_str
+
+Returns C<num> converted to a Parrot C<STRING>.
+
+Note that C<base> must be defined, a default of 10 is not assumed.
+
+If C<< num < 0 >> then C<-> is prepended to the string representation.
+
+*/
+
+STRING *
+int_to_str(Interp *interp, char *tc /*NN*/, HUGEINTVAL num, char base)
+{
+    const int minus = (num<0);
+    if (minus)
+        num = -num;
+    return uint_to_str(interp, tc, (UHUGEINTVAL) num, base, minus);
 }
 
 /*

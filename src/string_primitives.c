@@ -19,6 +19,8 @@ API.
 
 */
 
+/* HEADER: include/parrot/string_funcs.h */
+
 #include "parrot/parrot.h"
 #if PARROT_HAS_ICU
 #  include <unicode/ucnv.h>

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -22,6 +22,7 @@ and its utility functions.
 #define IN_SPF_SYSTEM
 
 #include "parrot/parrot.h"
+#include "parrot/string_funcs.h"
 #include "spf_render.str"
 #include <assert.h>
 
@@ -31,76 +32,6 @@ and its utility functions.
 #ifdef _MSC_VER
 #  define snprintf _snprintf
 #endif
-
-/*
-
-=item C<static STRING*
-uint_to_str(Interp *interp,
-            char *tc, UHUGEINTVAL num, char base, int minus)>
-
-Returns C<num> converted to a Parrot C<STRING>.
-
-Note that C<base> must be defined, a default of 10 is not assumed. The
-caller has to verify that C<< base >= 2 && base <= 36 >>
-The buffer C<tc> must be at least C<sizeof (UHUGEINTVAL)*8 + 1> chars big.
-
-If C<minus> is true then C<-> is prepended to the string representation.
-
-=cut
-
-*/
-
-static STRING*
-uint_to_str(Interp *interp,
-            char *tc, UHUGEINTVAL num, char base, int minus)
-{
-    /* the buffer must be at least as long as this */
-    char *p = tc + sizeof (UHUGEINTVAL)*8 + 1;
-    const char * const tail = p;
-
-    assert(base >= 2 && base <= 36);
-    do {
-        const char cur = (char)(num % base);
-        if (cur < 10) {
-            *--p = (char)('0' + cur);
-        }
-        else {
-            *--p = (char)('a' + cur - 10);
-        }
-    } while (num /= base);
-    if (minus)
-        *--p = '-';
-    return string_make(interp, p, tail - p, "ascii", 0);
-}
-
-/*
-
-=item C<STRING *
-int_to_str(Interp *interp,
-           char *tc, HUGEINTVAL num, char base)>
-
-Returns C<num> converted to a Parrot C<STRING>.
-
-Note that C<base> must be defined, a default of 10 is not assumed.
-
-If C<num < 0> then C<-> is prepended to the string representation.
-
-=cut
-
-*/
-
-STRING *
-int_to_str(Interp *interp,
-           char *tc, HUGEINTVAL num, char base)
-{
-    int minus = 0;
-
-    if (num < 0) {
-        minus = 1;
-        num = -num;
-    }
-    return uint_to_str(interp, tc, (UHUGEINTVAL) num, base, minus);
-}
 
 /*
 

@@ -145,6 +145,9 @@ PARROT_API CHARSET* string_rep_compatible(Interp *, const STRING *a, const STRIN
         ENCODING**);
 PARROT_API STRING* string_join(Interp *, STRING *j, PMC *ar);
 PARROT_API PMC* string_split(Interp *, STRING *del, STRING *s);
+PARROT_API STRING* uint_to_str(Interp *interp, char *tc /*NN*/,
+        UHUGEINTVAL num, char base, int minus);
+PARROT_API STRING* int_to_str(Interp *interp, char *tc /*NN*/, HUGEINTVAL num, char base);
 /* HEADERIZER END: src/string.c */
 
 #endif /* PARROT_IN_CORE */
