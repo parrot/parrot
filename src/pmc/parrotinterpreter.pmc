@@ -593,12 +593,10 @@ Finish thawing.
     }
 
     void freeze(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
         SUPER(info);
     }
 
     void thaw(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
         if (info->extra_flags == EXTRA_IS_PROP_HASH) {
             SUPER(info);
         }
