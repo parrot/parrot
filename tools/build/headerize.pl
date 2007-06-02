@@ -162,7 +162,7 @@ sub make_function_decls {
 
         push( @decls,
             sprintf "PARROT_API %s %s( %s );\n",
-            $ret_type, $funcname, join( ",\n\t", @args ),
+            $ret_type, $funcname, join( ",\n    ", @args ),
         );
     }
 
