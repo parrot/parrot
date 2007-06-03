@@ -119,7 +119,7 @@ A newline is automatically added to the end of the fmt.
         {
             key = string_substr(interp, format, position + 1, 1, NULL, 0);
             /* named substitution  %position */
-            if ( named_args != PMCNULL && VTABLE_exists_keyed_str(interp, named_args, key)) {
+            if ( !PMC_IS_NULL(named_args) && VTABLE_exists_keyed_str(interp, named_args, key)) {
                 repl = VTABLE_get_string_keyed_str(interp, named_args, key);
             }
             /* positional substutution  %7 */

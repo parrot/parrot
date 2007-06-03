@@ -31,7 +31,7 @@ size_of_shape(Interp *interpreter, PMC* self, PMC* shape)
     INTVAL length;
     INTVAL pos;
 
-    if (!shape || shape == PMCNULL) {
+    if (!shape || PMC_IS_NULL(shape)) {
         /* not set, so a simple 1D */
         return VTABLE_get_integer(interpreter, self);
     }
@@ -116,7 +116,7 @@ Returns a vector-like PMC containing the shape of this PMC.
 
         property_name = string_from_cstring(INTERP,"shape",0);
         shape = VTABLE_getprop(INTERP, SELF, property_name);
-        if (shape == PMCNULL) {
+        if (PMC_IS_NULL(shape)) {
            /*
             * No shape has been set yet. This means that we are
             * a simple vector
