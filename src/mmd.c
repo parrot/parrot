@@ -95,7 +95,7 @@ dump_mmd(Interp *interp, INTVAL function)
 
 funcptr_t
 get_mmd_dispatch_type(Interp *interp, INTVAL func_nr, INTVAL left_type,
-        INTVAL right_type, int *is_pmc)
+        INTVAL right_type, int *is_pmc /*NN*/)
 {
     funcptr_t func, func_;
     INTVAL r;

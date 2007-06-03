@@ -65,26 +65,50 @@ typedef struct Parrot_pic_store_t {
     size_t n_mics;                      /* range check, debugging mainly */
 } Parrot_PIC_store;
 
-/* more or less private interfaces */
-void parrot_PIC_prederef(Interp *, opcode_t op, void **pc_pred, int type);
-void parrot_PIC_alloc_store(Interp *, struct PackFile_ByteCode *, size_t n);
-void parrot_PIC_destroy(Interp *, struct PackFile_ByteCode *);
-int  parrot_PIC_op_is_cached(Interp *, int op_code);
-Parrot_MIC* parrot_PIC_alloc_mic(Interp*, size_t n);
-Parrot_PIC* parrot_PIC_alloc_pic(Interp*);
-
-void parrot_pic_find_infix_v_pp(Interp *, PMC *left, PMC *right,
-                Parrot_MIC *mic, opcode_t *cur_opcode);
-void * parrot_pic_opcode(Interp *, INTVAL op);
-
 typedef int (*arg_pass_f)(Interp *, PMC *sig,
-        char *src_base, void **src_pc, char *dest_base, void **dest_pc);
+            char *src_base, void **src_pc, char *dest_base, void **dest_pc);
 
-int parrot_pic_check_sig(Interp *, const PMC *sig1, const PMC *sig2, int *type)
-    __attribute__nonnull__(1)
-    __attribute__nonnull__(2)
-    __attribute__nonnull__(3)
-    __attribute__nonnull__(4);
+/* more or less private interfaces */
+
+/* HEADERIZER BEGIN: src/pic.c */
+
+Parrot_MIC* parrot_PIC_alloc_mic( Interp *interp, size_t n );
+Parrot_PIC* parrot_PIC_alloc_pic( Interp *interp );
+void parrot_PIC_alloc_store( Interp *interp,
+    struct PackFile_ByteCode *cs /*NN*/,
+    size_t n )
+        __attribute__nonnull__(2);
+
+void parrot_PIC_destroy( Interp *interp, struct PackFile_ByteCode *cs /*NN*/ )
+        __attribute__nonnull__(2);
+
+int parrot_PIC_op_is_cached( Interp *interp, int op_code );
+void parrot_PIC_prederef( Interp *interp,
+    opcode_t op,
+    void **pc_pred,
+    int core );
+
+int parrot_pic_check_sig( Interp *interp,
+    const PMC *sig1 /*NN*/,
+    const PMC *sig2 /*NN*/,
+    int *type /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
+void parrot_pic_find_infix_v_pp( Interp *interp,
+    PMC *left /*NN*/,
+    PMC *right /*NN*/,
+    Parrot_MIC *mic /*NN*/,
+    opcode_t *cur_opcode /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+void * parrot_pic_opcode( Interp *interp, INTVAL op );
+/* HEADERIZER END: src/pic.c */
+
 
 int parrot_pic_is_safe_to_jit(Interp *, PMC *sub,
         PMC *sig_args, PMC *sig_results, int *flags);

@@ -76,6 +76,7 @@ lookup of the cache has to be done in the opcode itself.
 
 */
 
+/* HEADER: include/parrot/pic.h */
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include <assert.h>
@@ -121,7 +122,7 @@ Free memory for the PIC storage.
 */
 
 void
-parrot_PIC_alloc_store(Interp *interp, PackFile_ByteCode *cs, size_t n)
+parrot_PIC_alloc_store(Interp *interp, struct PackFile_ByteCode * const cs /*NN*/, size_t n)
 {
     size_t size, poly;
     Parrot_PIC_store *store;
@@ -148,7 +149,7 @@ parrot_PIC_alloc_store(Interp *interp, PackFile_ByteCode *cs, size_t n)
 }
 
 void
-parrot_PIC_destroy(Interp *interp, PackFile_ByteCode *cs)
+parrot_PIC_destroy(Interp *interp, struct PackFile_ByteCode * const cs /*NN*/)
 {
     Parrot_PIC_store *store;
 
@@ -230,19 +231,6 @@ parrot_PIC_alloc_pic(Interp *interp)
     store->usable -= sizeof (Parrot_PIC);
     return --store->pic;
 }
-
-/*
-
-=item C<void parrot_PIC_prederef(Interp *, opcode_t op,
-                                 void **pc_pred, int type)>
-
-Define either the normal prederef function or the PIC stub, if PIC for
-this opcode function is available. Called from C<do_prederef>.
-
-=cut
-
-*/
-
 
 void *
 parrot_pic_opcode(Interp *interp, INTVAL op)
@@ -370,7 +358,8 @@ pass_mixed(Interp *interp, PMC *sig, char *src_base, void **src,
  * the type PARROT_ARG_CONSTANT stands for mixed types or constants
  */
 int
-parrot_pic_check_sig(Interp *interp, const PMC *sig1, const PMC *sig2, int *type /*NN*/)
+parrot_pic_check_sig(Interp *interp, const PMC * const sig1 /*NN*/,
+        const PMC * const sig2 /*NN*/, int * const type /*NN*/)
 {
     int i, n, t0, t1, t2;
     t0 = 0; /* silence compiler uninit warning */
@@ -533,6 +522,18 @@ is_pic_func(Interp *interp, void **pc, Parrot_MIC *mic, int core_type)
     return 1;
 }
 
+/*
+
+=item C<void parrot_PIC_prederef(Interp *, opcode_t op,
+                                 void **pc_pred, int type)>
+
+Define either the normal prederef function or the PIC stub, if PIC for
+this opcode function is available. Called from C<do_prederef>.
+
+=cut
+
+*/
+
 void
 parrot_PIC_prederef(Interp *interp, opcode_t op, void **pc_pred, int core)
 {
@@ -541,7 +542,7 @@ parrot_PIC_prederef(Interp *interp, opcode_t op, void **pc_pred, int core)
     Parrot_MIC *mic = NULL;
 
     if (parrot_PIC_op_is_cached(interp, op)) {
-        PackFile_ByteCode *cs = interp->code;
+        const PackFile_ByteCode * const cs = interp->code;
         size_t n = cur_opcode - (opcode_t*)cs->prederef.code;
         /*
          * pic_index is half the size of the code
@@ -630,8 +631,8 @@ parrot_pic_move(Interp* interp, Parrot_MIC *mic)
 }
 
 void
-parrot_pic_find_infix_v_pp(Interp *interp, PMC *left, PMC *right,
-                Parrot_MIC *mic, opcode_t *cur_opcode)
+parrot_pic_find_infix_v_pp(Interp *interp, PMC * const left /*NN*/, PMC * const right /*NN*/,
+                Parrot_MIC * const mic /*NN*/, opcode_t * const cur_opcode /*NN*/)
 {
     funcptr_t func;
     int is_pmc;

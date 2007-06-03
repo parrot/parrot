@@ -278,7 +278,7 @@ sub main {
             my $function_decls = join( "\n", @function_decls );
             my $STARTMARKER   = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
             my $ENDMARKER     = qr#/\* HEADERIZER END: $cfile \*/\n?#;
-            $header =~ s#($STARTMARKER)(?:.*?)($ENDMARKER)#$1$function_decls$2#s
+            $header =~ s#($STARTMARKER)(?:.*?)($ENDMARKER)#$1\n$function_decls\n$2#s
                 or die "Need begin/end HEADERIZER markers for $cfile in $hfile\n";
         }    # for %cfiles
 

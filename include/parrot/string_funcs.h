@@ -20,6 +20,7 @@
 /* Declarations of accessors */
 
 /* HEADERIZER BEGIN: src/string.c */
+
 PARROT_API STRING * Parrot_make_COW_reference( Interp *interp,
     STRING *s /*NULLOK*/ );
 
@@ -294,8 +295,10 @@ PARROT_API STRING* uint_to_str( Interp *interp,
     char base,
     int minus )
         __attribute__nonnull__(2);
+
 /* HEADERIZER END: src/string.c */
 /* HEADERIZER BEGIN: src/string_primitives.c */
+
 PARROT_API UINTVAL Parrot_char_digit_value( Interp *interp,
     UINTVAL character );
 
@@ -310,6 +313,7 @@ PARROT_API Parrot_UInt4 string_unescape_one( Interp *interp,
     UINTVAL *offset /*NN*/,
     STRING *string )
         __attribute__nonnull__(2);
+
 /* HEADERIZER END: src/string_primitives.c */
 
 #endif /* PARROT_IN_CORE */

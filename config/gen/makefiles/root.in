@@ -1827,6 +1827,7 @@ hwork:
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl \
 		src/string.o \
 		src/string_primitives.o \
+		src/pic.o \
 
 ###############################################################################
 #
