@@ -17,18 +17,18 @@
 
 /* Set the directory where ICU finds its data files (encodings,
    locales, etc.) */
-void string_set_data_directory(const char *dir);
+PARROT_API void string_set_data_directory(const char *dir);
 
 /* Convert from any supported encoding, into our internal format */
-void string_fill_from_buffer(Interp *interp,
+PARROT_API void string_fill_from_buffer(Interp *interp,
         const void *buffer, UINTVAL len, const char *encoding_name, STRING *s);
 
 /* Utility method which knows how to uwind a single escape sequence */
 typedef Parrot_UInt2 (*Parrot_unescape_cb)(Parrot_Int4 offset, void *context);
-Parrot_UInt4
+PARROT_API Parrot_UInt4
 string_unescape_one(Interp *interp, UINTVAL *offset, STRING *string);
 
-UINTVAL
+PARROT_API UINTVAL
 Parrot_char_digit_value(Interp *interp, UINTVAL character);
 
 #endif /* PARROT_IN_CORE */
