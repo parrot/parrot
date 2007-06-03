@@ -1274,7 +1274,7 @@ XXXXXXXXXXXX
 >< done
 OUTPUT
 
-pasm_error_output_is( <<'CODE', "Cannot repeat with negative arg\n", 'repeat OOB' );
+pasm_error_output_like( <<'CODE', qr/Cannot repeat with negative arg\n/, 'repeat OOB' );
 	repeat S0, "japh", -1
 	end
 CODE

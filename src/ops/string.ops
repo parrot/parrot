@@ -140,9 +140,9 @@ The C<PMC> versions are MMD operations.
 =cut
 
 inline op repeat(out STR, in STR, in INT) :base_mem {
-  if ($3 < 0) {
-      internal_exception(NEG_REPEAT, "Cannot repeat with negative arg");
-  }
+  if ($3 < 0)
+      real_exception(interp, NULL, NEG_REPEAT,
+                     "Cannot repeat with negative arg");
   $1 = string_repeat(interp, $2, (UINTVAL)$3, NULL);
   goto NEXT();
 }
