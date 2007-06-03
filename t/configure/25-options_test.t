@@ -50,7 +50,7 @@ use Test::More tests => 1;
 TEST
 
 {
-    my $tdir = tempdir;
+    my $tdir = tempdir(CLEANUP => 1);
     ok( (chdir $tdir), "Changed to temporary directory for testing");
     my $test = q{testfile};
     open my $T, ">", $test

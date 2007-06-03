@@ -16,7 +16,7 @@ use lib qw( . lib ../lib ../../lib );
 my $cwd = cwd();
 my $errstr;
 {
-    my $tdir = tempdir();
+    my $tdir = tempdir(CLEANUP => 1);
     ok(chdir $tdir, "Changed to temporary directory for testing");
     ok((mkdir "lib"), "Able to make directory lib");
     ok((mkdir "lib/Parrot"), "Able to make directory lib/Parrot");

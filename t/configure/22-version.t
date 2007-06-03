@@ -17,7 +17,7 @@ use_ok( 'Make_VERSION_File', qw| make_VERSION_file |);
 my $cwd = cwd();
 my $errstr;
 {
-    my $tdir = tempdir();
+    my $tdir = tempdir(CLEANUP => 1);
     ok(chdir $tdir, "Changed to temporary directory for testing");
     ok((mkdir "lib"), "Able to make directory lib");
     ok((mkdir "lib/Parrot"), "Able to make directory lib/Parrot");
