@@ -82,14 +82,14 @@ Set up the package 'COMMON-LISP'
   # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "EVAL", _eval)
   .DEFUN(symbol, package, "EVAL", "_eval")
 
-  .SPECIAL_FORM(symbol, package, "FUNCTION", _function)
+  .SPECIAL_FORM(symbol, package, "FUNCTION", '_function')
 
   # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "GENSYM", _gensym)
   .DEFUN(symbol, package, "GENSYM", "_gensym")
 
-  .SPECIAL_FORM(symbol, package, "IF", _if)
+  .SPECIAL_FORM(symbol, package, "IF", '_if')
 
-  .SPECIAL_FORM(symbol, package, "LET", _let)
+  .SPECIAL_FORM(symbol, package, "LET", '_let')
 
   # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "LIST", _list)
   .DEFUN(symbol, package, "LIST", "_list")
@@ -103,9 +103,9 @@ Set up the package 'COMMON-LISP'
   # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "PRINT", _print)
   .DEFUN(symbol, package, "PRINT", "_print")
 
-  .SPECIAL_FORM(symbol, package, "PROGN", _progn)
+  .SPECIAL_FORM(symbol, package, "PROGN", '_progn')
 
-  .SPECIAL_FORM(symbol, package, "QUOTE", _quote)
+  .SPECIAL_FORM(symbol, package, "QUOTE", '_quote')
 
   # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "READ", _read)
   .DEFUN(symbol, package, "READ", "_read")
@@ -119,7 +119,7 @@ Set up the package 'COMMON-LISP'
   # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "RPLACD", _rplacd)
   .DEFUN(symbol, package, "RPLACD", "_rplacd")
 
-  .SPECIAL_FORM(symbol, package, "SETQ",_setq )
+  .SPECIAL_FORM(symbol, package, "SETQ", '_setq')
 
   # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "TYPE-OF", _type_of)
   .DEFUN(symbol, package, "TYPE-OF", "_type_of")
@@ -925,6 +925,7 @@ DONE:
 
 .sub _setq
   .param pmc args
+
   .local string name
   .local pmc lexical
   .local pmc symbol
