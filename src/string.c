@@ -2483,7 +2483,7 @@ string_compose(Interp *interp, STRING *src /*NULLOK*/)
 }
 
 STRING*
-string_join(Interp *interp, STRING *j, PMC *ar)
+string_join(Interp *interp, STRING *j /*NULLOK*/, PMC *ar)
 {
     STRING *res;
     STRING *s;
@@ -2503,7 +2503,7 @@ string_join(Interp *interp, STRING *j, PMC *ar)
 }
 
 PMC*
-string_split(Interp *interp, STRING *delim, STRING *str)
+string_split(Interp *interp, STRING *delim /*NN*/, STRING *str /*NN*/)
 {
     PMC * const res =  pmc_new(interp, enum_class_ResizableStringArray);
     const int slen = string_length(interp, str);

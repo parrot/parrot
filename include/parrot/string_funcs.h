@@ -165,7 +165,10 @@ PARROT_API INTVAL string_index( Interp *interp,
         __attribute__nonnull__(2);
 
 PARROT_API void string_init( Parrot_Interp interp );
-PARROT_API STRING* string_join( Interp *interp, STRING *j, PMC *ar );
+PARROT_API STRING* string_join( Interp *interp,
+    STRING *j /*NULLOK*/,
+    PMC *ar );
+
 PARROT_API UINTVAL string_length( Interp *interp, const STRING *s /*NULLOK*/ );
 PARROT_API STRING * string_make( Interp *interp,
     const char *buffer /*NULLOK*/,
@@ -238,7 +241,12 @@ PARROT_API STRING * string_set( Interp *interp,
     STRING *dest /*NULLOK*/,
     STRING *src /*NULLOK*/ );
 
-PARROT_API PMC* string_split( Interp *interp, STRING *delim, STRING *str );
+PARROT_API PMC* string_split( Interp *interp,
+    STRING *delim /*NN*/,
+    STRING *str /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 PARROT_API INTVAL string_str_index( Interp *interp,
     const STRING *s /*NN*/,
     const STRING *s2 /*NN*/,
@@ -295,12 +303,13 @@ PARROT_API void string_fill_from_buffer( Interp *interp,
     const void *buffer,
     UINTVAL len,
     const char *encoding_name,
-    STRING *s );
+    STRING *s /*NULLOK*/ );
 
 PARROT_API void string_set_data_directory( const char *dir );
 PARROT_API Parrot_UInt4 string_unescape_one( Interp *interp,
-    UINTVAL *offset,
-    STRING *string );
+    UINTVAL *offset /*NN*/,
+    STRING *string )
+        __attribute__nonnull__(2);
 /* HEADERIZER END: src/string_primitives.c */
 
 #endif /* PARROT_IN_CORE */

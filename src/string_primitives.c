@@ -82,7 +82,7 @@ supported encoding into Parrot string's internal format.
 
 void
 string_fill_from_buffer(Interp *interp, const void *buffer,
-            UINTVAL len, const char *encoding_name, STRING *s)
+            UINTVAL len, const char *encoding_name, STRING *s /*NULLOK*/)
 {
 #if PARROT_HAS_ICU
     UErrorCode icuError = U_ZERO_ERROR;
@@ -162,7 +162,7 @@ string_fill_from_buffer(Interp *interp, const void *buffer,
 /* Unescape a single character. We assume that we're at the start of a
    sequence, right after the \ */
 Parrot_UInt4
-string_unescape_one(Interp *interp, UINTVAL *offset,
+string_unescape_one(Interp *interp, UINTVAL *offset /*NN*/,
         STRING *string)
 {
     UINTVAL workchar = 0;
