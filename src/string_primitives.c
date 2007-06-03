@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2006, The Perl Foundation.
+Copyright (C) 2006-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -44,6 +44,7 @@ etc.).
 
 */
 
+PARROT_API
 void
 string_set_data_directory(const char *dir)
 {
@@ -69,17 +70,12 @@ string_set_data_directory(const char *dir)
 
 /*
 
-=item C<void
-string_fill_from_buffer(Interp *interp, const void *buffer,
-            UINTVAL len, const char *encoding_name, STRING *s)>
-
 Creates a Parrot string from an "external" buffer, converting from any
 supported encoding into Parrot string's internal format.
 
-=cut
-
 */
 
+PARROT_API
 void
 string_fill_from_buffer(Interp *interp, const void *buffer,
             UINTVAL len, const char *encoding_name, STRING *s /*NULLOK*/)
@@ -161,6 +157,7 @@ string_fill_from_buffer(Interp *interp, const void *buffer,
 
 /* Unescape a single character. We assume that we're at the start of a
    sequence, right after the \ */
+PARROT_API
 Parrot_UInt4
 string_unescape_one(Interp *interp, UINTVAL *offset /*NN*/,
         STRING *string)
@@ -375,6 +372,7 @@ C<Parrot_char_is_digit()> returns false.
 
 */
 
+PARROT_API
 UINTVAL
 Parrot_char_digit_value(Interp *interp, UINTVAL character)
 {

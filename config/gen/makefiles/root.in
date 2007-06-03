@@ -1822,8 +1822,11 @@ HEADERIZER_O_FILES = \
 headerizer:
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)
 
+# Slowing working my way up to having everything headerized in $(HEADERIZER_O_FILES)
 hwork:
-	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl src/string*.o
+	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl \
+		src/string.o \
+		src/string_primitives.o \
 
 ###############################################################################
 #

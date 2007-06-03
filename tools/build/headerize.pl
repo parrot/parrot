@@ -130,9 +130,16 @@ sub extract_functions {
 sub function_components {
     my $proto = shift;
 
-    my @parts      = split( /\n/, $proto, 2 );
-    my $returntype = $parts[0];
-    my $parms      = $parts[1];
+    my @lines = split( /\n/, $proto );
+    chomp @lines;
+    my $parrot_api;
+    if ( $lines[0] eq 'PARROT_API' ) {
+        $parrot_api = 1;
+        shift @lines;
+    }
+
+    my $returntype = shift @lines;
+    my $parms      = join( " ", @lines );
 
     $parms =~ s/\s+/ /g;
     $parms =~ s/([^(]+)\s*\((.+)\);?/$2/ or die "Couldn't handle $proto";
@@ -148,7 +155,9 @@ sub function_components {
     $returntype =~ s/^((static)\s+)?//i;
     $static = $2 || '';
 
-    return [ $static, $returntype, $funcname, @parms ];
+    die "Impossible to have both static and PARROT_API" if $parrot_api && $static;
+
+    return [ $parrot_api, $static, $returntype, $funcname, @parms ];
 }
 
 sub attrs_from_args {
@@ -172,12 +181,13 @@ sub make_function_decls {
 
     my @decls;
     foreach my $func ( @funcs ) {
-        my ($static, $ret_type, $funcname, @args) = @{$func};
+        my ($parrot_api, $static, $ret_type, $funcname, @args) = @{$func};
         next if $static;
 
         my $multiline = 0;
 
-        my $decl = sprintf( "PARROT_API %s %s(", $ret_type, $funcname );
+        my $decl = sprintf( "%s %s(", $ret_type, $funcname );
+        $decl = "PARROT_API $decl" if $parrot_api;
 
         my @attrs = attrs_from_args( @args );
         my $argline = join( ", ", @args );
@@ -253,9 +263,9 @@ sub main {
         my $header = do { local $/ = undef; <$FILE> };    # slurp
         close $FILE;
 
-        for my $cfile ( sort keys %$cfiles ) {
+        for my $cfile ( sort keys %{$cfiles} ) {
             my $funcs = $cfiles->{$cfile};
-            my @funcs = sort { $a->[2] cmp $b->[2] } @{$funcs};
+            my @funcs = sort { $a->[3] cmp $b->[3] } @{$funcs};
 
             my @function_decls = make_function_decls( @funcs );
 
