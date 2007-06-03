@@ -807,7 +807,7 @@ Each source file (e.g. a F<foo.c> F<foo.h> pair), should contain inline POD
 documentation containing information on the implementation decisions associated
 with the source file. (Note that this is in contrast to PDDs, which describe
 design decisions). In addition, more discussive documentation can be placed in
-F<*.dev> files in the F<docs/dev> directory. This is the place for mini-essays
+F<*.pod> files in the F<docs/dev> directory. This is the place for mini-essays
 on how to avoid overflows in unsigned arithmetic, or on the pros and cons of
 differing hash algorithms, and why the current one was chosen, and how it
 works.
@@ -898,7 +898,7 @@ reasons, you should point this out - if nothing else, to avoid some poor
 schmuck trying subsequently to replace it with something 'cleaner'.
 
     /* The loop is partially unrolled here as it makes it a lot faster.
-     * See the .dev file for the full details
+     * See the file in docs/dev for the full details
      */
 
 =item General comments

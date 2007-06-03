@@ -120,11 +120,11 @@ mini-essays on how to avoid overflows in unsigned arithmetic, or on the pros
 and cons of differing hash algorithms, and why the current one was chosen, and
 how it works.
 
-If you are coming to a particular source file for the first time, you should be
-able to read the F<.dev> file and gain an immediate overview of what the source
-file is for, the algorithms it implements, etc.
+If you are coming to a particular source file for the first time, you should
+be able to read the developer file and gain an immediate overview of what
+the source file is for, the algorithms it implements, etc.
 
-NB: We need more F<.dev> files too. Patches welcome!
+NB: We need more developer files too. Patches welcome!
 
 =item * Source file documentation
 

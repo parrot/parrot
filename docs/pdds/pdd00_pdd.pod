@@ -21,7 +21,7 @@ and contemplated design of Parrot.
 
 The key aspects of Parrot's design are its interface to the outside world --
 its feature set -- and its internal structure, both in code and in the broader
-project.  Thus, PDDs descirbe Parrot's:
+project.  Thus, PDDs describe Parrot's:
 
 =over 4
 
@@ -48,8 +48,8 @@ More? - FIXME
 
 PDDS B<should not> discuss the implementation details or trade-offs, unless
 they absolutely have to.  Such implementation documentation should go in the
-relevant F<*.dev> file.  On the other hand, PDDs B<should> document design
-trade-offs, i.e. the paths not chosen.
+relevant F<docs/dev/*.pod> file.  On the other hand, PDDs B<should> document
+design trade-offs, i.e. the paths not chosen.
 
 These guidelines may seem fuzzy.  The line between "design" and
 "implementation" is a murky one.  Still, please try to adhere to this design

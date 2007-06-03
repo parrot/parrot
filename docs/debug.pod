@@ -47,7 +47,7 @@ management in general, and garbage collection in particular.
 
 Infant mortality
 
-See F<docs/dev/infant.dev> for details of one frequent problem: infant
+See F<docs/dev/infant.pod> for details of one frequent problem: infant
 mortality. Infant mortality is when you create a Parrot object, but the garbage
 collector runs before you put it into a Parrot register or in something else
 that is itself within a Parrot register.
