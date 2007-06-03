@@ -575,7 +575,7 @@ together.
 */
 
 STRING *
-string_make(Interp *interp, const char *buffer /*NN*/,
+string_make(Interp *interp, const char *buffer /*NULLOK*/,
     UINTVAL len, const char *charset_name /*NULLOK*/, UINTVAL flags)
 {
     ENCODING *encoding;
@@ -596,8 +596,8 @@ string_make(Interp *interp, const char *buffer /*NN*/,
 }
 
 STRING *
-string_make_direct(Interp *interp, const char *buffer /*NULLOK*/,
-        UINTVAL len, ENCODING *encoding, CHARSET *charset, UINTVAL flags)
+string_make_direct(Interp *interp, const char *buffer /*NULLOK*/, UINTVAL len,
+        ENCODING *encoding /*NN*/, CHARSET *charset /*NN*/, UINTVAL flags)
 {
     STRING * const s = new_string_header(interp, flags);
     DECL_CONST_CAST;
@@ -691,7 +691,7 @@ Note that this is not range-checked.
 */
 
 INTVAL
-string_index(Interp *interp, const STRING *s, UINTVAL idx)
+string_index(Interp *interp, const STRING *s /*NN*/, UINTVAL idx)
 {
     saneify_string(s);
     return (INTVAL)CHARSET_GET_CODEPOINT(interp, s, idx);
@@ -708,8 +708,8 @@ characters, not bytes. If second string is not specified, then return
 */
 
 INTVAL
-string_str_index(Interp *interp, const STRING *s,
-        const STRING *s2, INTVAL start)
+string_str_index(Interp *interp, const STRING *s /*NN*/,
+        const STRING *s2 /*NN*/, INTVAL start)
 {
     STRING *src, *search;
     UINTVAL len;
@@ -740,7 +740,7 @@ are treated as counting from the end of the string.
 */
 
 INTVAL
-string_ord(Interp *interp, const STRING *s, INTVAL idx)
+string_ord(Interp *interp, const STRING *s /*NULLOK*/, INTVAL idx)
 {
     const UINTVAL len = string_length(interp, s);
 
@@ -835,7 +835,7 @@ of characters in the specified Parrot string's representation.
 */
 
 INTVAL
-string_max_bytes(Interp *interp, const STRING *s, INTVAL nchars)
+string_max_bytes(Interp *interp, const STRING *s /*NN*/, INTVAL nchars)
 {
     assert(s->encoding);
     return ENCODING_MAX_BYTES_PER_CODEPOINT(interp, s) * nchars;
@@ -900,8 +900,8 @@ necessary.
 */
 
 STRING *
-string_repeat(Interp *interp, const STRING *s,
-    UINTVAL num, STRING **d)
+string_repeat(Interp *interp, const STRING *s /*NN*/,
+    UINTVAL num, STRING **d /*NULLOK*/)
 {
     UINTVAL i;
 
@@ -938,8 +938,8 @@ necessary. The substring is also returned.
 */
 
 STRING *
-string_substr(Interp *interp, STRING *src,
-    INTVAL offset, INTVAL length, STRING **d, int replace_dest)
+string_substr(Interp *interp, STRING *src /*NN*/, INTVAL offset, INTVAL length,
+        STRING **d /*NULLOK*/, int replace_dest)
 {
     STRING *dest;
     UINTVAL true_offset;
@@ -968,7 +968,7 @@ string_substr(Interp *interp, STRING *src,
     }
 
     /* do in-place i.e. reuse existing header if one */
-    if (replace_dest && *d) {
+    if (replace_dest && d && *d) {
         assert(src->encoding == Parrot_fixed_8_encoding_ptr);
         dest = *d;
         dest->encoding = src->encoding;
@@ -1013,7 +1013,7 @@ A negative offset is allowed to replace from the end.
 
 STRING *
 string_replace(Interp *interp, STRING *src /*NULLOK*/,
-    INTVAL offset, INTVAL length, STRING *rep /*NULLOK*/, STRING **d)
+    INTVAL offset, INTVAL length, STRING *rep /*NULLOK*/, STRING **d /*NULLOK*/)
 {
     STRING *dest = NULL;
     UINTVAL start_byte, end_byte;
@@ -1152,7 +1152,7 @@ of the string is chopped and returned.
 */
 
 STRING *
-string_chopn(Interp *interp, STRING *s, INTVAL n, int in_place)
+string_chopn(Interp *interp, STRING *s /*NULLOK*/, INTVAL n, int in_place)
 {
     UINTVAL new_length, uchar_size;
     String_iter iter;
@@ -1203,7 +1203,7 @@ string_chopn(Interp *interp, STRING *s, INTVAL n, int in_place)
 
 
 INTVAL
-string_compare(Interp *interp, const STRING *s1, const STRING *s2)
+string_compare(Interp *interp, const STRING *s1 /*NULLOK*/, const STRING *s2 /*NULLOK*/)
 {
     if (!s1 && !s2) {
         return 0;
@@ -1234,7 +1234,7 @@ otherwise.
 */
 
 INTVAL
-string_equal(Interp *interp, const STRING *s1, const STRING *s2)
+string_equal(Interp *interp, const STRING *s1 /*NULLOK*/, const STRING *s2 /*NULLOK*/)
 {
     if ((s1 == s2) || (!s1 && !s2)) {
         return 0;
@@ -1310,7 +1310,8 @@ then it is reused, otherwise a new Parrot string is created.
 */
 
 STRING *
-string_bitwise_and(Interp *interp, STRING *s1, STRING *s2, STRING **dest)
+string_bitwise_and(Interp *interp, STRING *s1 /*NULLOK*/,
+        STRING *s2 /*NULLOK*/, STRING **dest /*NULLOK*/)
 {
     STRING *res = NULL;
     size_t minlen;
@@ -1412,7 +1413,8 @@ then it is reused, otherwise a new Parrot string is created.
 */
 
 STRING *
-string_bitwise_or(Interp *interp, STRING *s1, STRING *s2, STRING **dest)
+string_bitwise_or(Interp *interp, STRING *s1 /*NULLOK*/,
+        STRING *s2 /*NULLOK*/, STRING **dest /*NULLOK*/)
 {
     STRING *res;
     size_t maxlen = 0;
@@ -1481,7 +1483,8 @@ then it is reused, otherwise a new Parrot string is created.
 */
 
 STRING *
-string_bitwise_xor(Interp *interp, STRING *s1, STRING *s2, STRING **dest)
+string_bitwise_xor(Interp *interp, STRING *s1 /*NULLOK*/,
+        STRING *s2 /*NULLOK*/, STRING **dest /*NULLOK*/)
 {
     STRING *res;
     size_t maxlen = 0;
@@ -1561,7 +1564,7 @@ not C<NULL> then it is reused, otherwise a new Parrot string is created.
 */
 
 STRING *
-string_bitwise_not(Interp *interp, STRING *s, STRING **dest)
+string_bitwise_not(Interp *interp, STRING *s /*NULLOK*/, STRING **dest /*NULLOK*/)
 {
     STRING *res;
     size_t len;
@@ -1619,7 +1622,7 @@ if it is equal to anything other than C<0>, C<""> or C<"0">.
 */
 
 INTVAL
-string_bool(Interp *interp, const STRING *s)
+string_bool(Interp *interp, const STRING *s /*NULLOK*/)
 {
     const INTVAL len = string_length(interp, s);
 
@@ -1656,7 +1659,7 @@ encoding of C<*dest>.
 
 STRING*
 string_nprintf(Interp *interp,
-    STRING *dest, INTVAL bytelen, const char *format, ...)
+    STRING *dest, INTVAL bytelen, const char *format /*NN*/, ...)
 {
     STRING *output;
     va_list args;
@@ -1691,7 +1694,7 @@ Writes and returns a Parrot string.
 */
 
 STRING*
-string_printf(Interp *interp, const char *format, ...)
+string_printf(Interp *interp, const char *format /*NN*/, ...)
 {
     STRING *output;
     va_list args;
@@ -1726,7 +1729,7 @@ number, rounding towards zero.
 */
 
 INTVAL
-string_to_int(Interp *interp, const STRING *s)
+string_to_int(Interp *interp, const STRING *s /*NULLOK*/)
 {
 #if 1
     INTVAL i = 0;
@@ -1781,7 +1784,7 @@ returned.
 */
 
 FLOATVAL
-string_to_num(Interp *interp, const STRING *s)
+string_to_num(Interp *interp, const STRING *s /*NULLOK*/)
 {
     FLOATVAL f = 0.0;
     DECL_CONST_CAST;
@@ -1879,7 +1882,7 @@ sorts of leak potential otherwise.
 */
 
 void
-string_cstring_free(char *p)
+string_cstring_free(char *p /*NULLOK*/)
 {
     DECL_CONST_CAST;
     mem_sys_free((void *)const_cast(p));
@@ -1894,7 +1897,7 @@ memory.
 */
 
 void
-string_pin(Interp *interp, STRING * s)
+string_pin(Interp *interp, STRING *s /*NN*/)
 {
     char *memory;
     INTVAL size;
@@ -1922,7 +1925,7 @@ memory.
 */
 
 void
-string_unpin(Interp *interp, STRING * s)
+string_unpin(Interp *interp, STRING *s /*NN*/)
 {
     void *memory;
     INTVAL size;
@@ -1963,7 +1966,7 @@ C<< s->hashval >>.
 */
 
 size_t
-string_hash(Interp *interp, STRING *s, size_t seed)
+string_hash(Interp *interp, STRING *s /*NULLOK*/, size_t seed)
 {
     register size_t h;
 
@@ -1991,7 +1994,7 @@ greater than this as I<\x{hh...hh}>.
 */
 
 STRING *
-string_escape_string(Interp *interp, const STRING *src)
+string_escape_string(Interp *interp, const STRING *src /*NULLOK*/)
 {
     return string_escape_string_delimited(interp, src,
             (UINTVAL) ~0);
@@ -2007,7 +2010,7 @@ Like above but limit output to len chars (used for trace output of strings).
 
 STRING *
 string_escape_string_delimited(Interp *interp,
-        const STRING *src, UINTVAL limit)
+        const STRING *src /*NULLOK*/, UINTVAL limit)
 {
     STRING *result, *hex;
     UINTVAL i, len, charlen;
@@ -2118,7 +2121,7 @@ Unescapes the specified C string. These sequences are covered:
 
 STRING *
 string_unescape_cstring(Interp *interp,
-    const char *cstring, char delimiter, const char *enc_char)
+    const char *cstring /*NN*/, char delimiter, const char *enc_char /*NULLOK*/)
 {
     size_t clength = strlen(cstring);
     STRING *result;
@@ -2212,7 +2215,7 @@ TODO - implemented only for ASCII.
 
 
 STRING *
-string_upcase(Interp *interp, const STRING *s)
+string_upcase(Interp *interp, const STRING *s /*NULLOK*/)
 {
     DECL_CONST_CAST;
     STRING * const dest = string_copy(interp, (STRING *)const_cast(s));
@@ -2228,7 +2231,7 @@ Converts the specified Parrot string to upper case.
 */
 
 void
-string_upcase_inplace(Interp *interp, STRING *s)
+string_upcase_inplace(Interp *interp, STRING *s /*NULLOK*/)
 {
     if (!s)
         return;
@@ -2245,7 +2248,7 @@ Non-caseable characters are left unchanged.
 */
 
 STRING *
-string_downcase(Interp *interp, const STRING *s)
+string_downcase(Interp *interp, const STRING *s /*NULLOK*/)
 {
     DECL_CONST_CAST;
     STRING * const dest = string_copy(interp, (STRING *)const_cast(s));
@@ -2284,7 +2287,7 @@ Non-caseable characters are left unchanged.
 */
 
 STRING *
-string_titlecase(Interp *interp, const STRING *s)
+string_titlecase(Interp *interp, const STRING *s /*NULLOK*/)
 {
     DECL_CONST_CAST;
     STRING * const dest = string_copy(interp, (STRING *)const_cast(s));
@@ -2300,7 +2303,7 @@ Converts the specified Parrot string to title case.
 */
 
 void
-string_titlecase_inplace(Interp *interp, STRING *s)
+string_titlecase_inplace(Interp *interp, STRING *s /*NULLOK*/)
 {
     if (!s)
         return;
@@ -2316,7 +2319,7 @@ Perl5ish increment the string. Currently single char only.
 */
 
 STRING *
-string_increment(Interp *interp, const STRING *s)
+string_increment(Interp *interp, const STRING *s /*NULLOK*/)
 {
     INTVAL o;
 
@@ -2377,7 +2380,7 @@ Parrot_string_find_cclass(Interp *interp, INTVAL flags, STRING *s,
 }
 
 INTVAL
-Parrot_string_find_not_cclass(Interp *interp, INTVAL flags, STRING *s,
+Parrot_string_find_not_cclass(Interp *interp, INTVAL flags, STRING *s /*NULLOK*/,
                               UINTVAL offset, UINTVAL count)
 {
     if (!s)
@@ -2394,8 +2397,8 @@ else returns a copy of C<src> with the charset/encoding in dest.
 */
 
 STRING*
-Parrot_string_trans_charset(Interp *interp, STRING *src,
-        INTVAL charset_nr, STRING *dest)
+Parrot_string_trans_charset(Interp *interp, STRING *src /*NULLOK*/,
+        INTVAL charset_nr, STRING *dest /*NULLOK*/)
 {
     CHARSET *new_charset;
 
@@ -2438,8 +2441,8 @@ else returns a copy of C<src> with the charset/encoding in dest.
 */
 
 STRING*
-Parrot_string_trans_encoding(Interp *interp, STRING *src,
-        INTVAL encoding_nr, STRING *dest)
+Parrot_string_trans_encoding(Interp *interp, STRING *src /*NULLOK*/,
+        INTVAL encoding_nr, STRING *dest /*NULLOK*/)
 {
     ENCODING *new_encoding;
 
@@ -2470,7 +2473,7 @@ Parrot_string_trans_encoding(Interp *interp, STRING *src,
 }
 
 STRING *
-string_compose(Interp *interp, STRING *src)
+string_compose(Interp *interp, STRING *src /*NULLOK*/)
 {
     if (!src)
         return NULL;
