@@ -59,7 +59,6 @@ One or more object file names.
 
 =cut
 
-use Data::Dumper;
 use Getopt::Long;
 use lib qw( lib );
 use Parrot::Config;
@@ -152,6 +151,22 @@ sub function_components {
     return [ $static, $returntype, $funcname, @parms ];
 }
 
+sub attrs_from_args {
+    my @args = @_;
+
+    my @attrs = ();
+
+    my $n = 0;
+    for my $arg ( @args ) {
+        ++$n;
+        if ( $arg =~ m{/\*\s*NN\s*\*/} ) {
+            push( @attrs, "__attribute__nonnull__($n)" );
+        }
+    }
+
+    return @attrs;
+}
+
 sub make_function_decls {
     my @funcs = @_;
 
@@ -160,10 +175,32 @@ sub make_function_decls {
         my ($static, $ret_type, $funcname, @args) = @{$func};
         next if $static;
 
-        push( @decls,
-            sprintf "PARROT_API %s %s( %s );\n",
-            $ret_type, $funcname, join( ",\n    ", @args ),
-        );
+        my $multiline = 0;
+
+        my $decl = sprintf( "PARROT_API %s %s(", $ret_type, $funcname );
+
+        my @attrs = attrs_from_args( @args );
+        my $argline = join( ", ", @args );
+        if ( length($decl.$argline) <= 75 ) {
+            $decl = "$decl $argline )";
+        }
+        else {
+            if ( $args[0] =~ /^Interp\b/ ) {
+                $decl .= " " . (shift @args);
+                $decl .= "," if @args;
+            }
+            $argline = join( ",", map { "\n\t$_" } @args );
+            $decl = "$decl$argline )";
+            $multiline = 1;
+        }
+        my $attrs = join( "", map { "\n\t\t$_" } @attrs );
+        if ( $attrs ) {
+            $decl .= $attrs;
+            $multiline = 1;
+        }
+        $decl .= $multiline ? ";\n" : ";";
+        $decl =~ s/\t/    /g;
+        push( @decls, $decl );
     }
 
     return @decls;
@@ -207,7 +244,6 @@ sub main {
         }
     }    # for @cfiles
     my $nfiles = scalar keys %files;
-    print Dumper( \%files ) if $opt{verbose};
     print "$nfuncs funcs in $nfiles files\n";
 
     for my $hfile ( sort keys %files ) {

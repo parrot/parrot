@@ -576,7 +576,7 @@ together.
 
 STRING *
 string_make(Interp *interp, const char *buffer /*NN*/,
-    UINTVAL len, const char *charset_name /*NN*/, UINTVAL flags)
+    UINTVAL len, const char *charset_name /*NULLOK*/, UINTVAL flags)
 {
     ENCODING *encoding;
     CHARSET *charset;
@@ -651,7 +651,7 @@ Grows the Parrot string's buffer by the specified number of characters.
 */
 
 STRING *
-string_grow(Interp * interp, STRING * s /*NN*/, INTVAL addlen)
+string_grow(Interp * interp, STRING *s /*NN*/, INTVAL addlen)
 {
     Parrot_unmake_COW(interp,s);
 
@@ -2261,7 +2261,7 @@ Converts the specified Parrot string to lower case.
 */
 
 void
-string_downcase_inplace(Interp *interp, STRING *s)
+string_downcase_inplace(Interp *interp, STRING *s /*NULLOK*/)
 {
     if (!s)
         return;
