@@ -488,7 +488,7 @@ Make a Parrot string from a specified C string.
 PARROT_API
 STRING *
 string_from_cstring(Interp *interp,
-    const char *buffer /*NULLOK*/, UINTVAL len)
+    const char * const buffer /*NULLOK*/, const UINTVAL len)
 {
     return string_make_direct(interp, buffer, len ? len :
             buffer ? strlen(buffer) : 0,
@@ -508,7 +508,7 @@ Make a Parrot string from a specified C string.
 PARROT_API
 STRING *
 string_from_const_cstring(Interp *interp,
-    const char *buffer /*NULLOK*/, UINTVAL len)
+    const char * const buffer /*NULLOK*/, const UINTVAL len)
 {
     return string_make_direct(interp, buffer, len ? len :
             buffer ? strlen(buffer) : 0,
@@ -1234,7 +1234,7 @@ string_chopn(Interp *interp, STRING *s /*NULLOK*/, INTVAL n, int in_place)
 
 PARROT_API
 INTVAL
-string_compare(Interp *interp, const STRING *s1 /*NULLOK*/, const STRING *s2 /*NULLOK*/)
+string_compare(Interp *interp, const STRING * const s1 /*NULLOK*/, const STRING * const s2 /*NULLOK*/)
 {
     if (!s1 && !s2) {
         return 0;

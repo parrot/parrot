@@ -269,7 +269,7 @@ PARROT_API void string_titlecase_inplace( Interp *interp,
     STRING *s /*NULLOK*/ );
 
 PARROT_API char * string_to_cstring( Interp *interp,
-    const STRING * const s /* NULLOK */ );
+    const STRING *s /* NULLOK */ );
 
 PARROT_API INTVAL string_to_int( Interp *interp, const STRING *s /*NULLOK*/ );
 PARROT_API FLOATVAL string_to_num( Interp *interp,

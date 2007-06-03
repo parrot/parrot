@@ -149,6 +149,12 @@ sub function_components {
     for (@parms) {
         /\S+\s+\S+/ || ( $_ eq '...' ) || ( $_ eq 'void' ) || /theINTERP/
             or die "Bad parms in $proto";
+        if ( m{(?<!/)\*} ) { # Pointers?
+            s/\*\s*const\s+/*/;
+        }
+        else {
+            s/^const\s+//;
+        }
     }
 
     my $static;
