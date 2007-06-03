@@ -221,7 +221,7 @@ a NameSpace or a var, the NameSpace is returned.
             }
         }
 
-        real_exception(INTERP, NULL, E_NameError, "Invalid namespace key");
+        real_exception(INTERP, NULL, E_NameError, "Invalid namespace key in set_pmc_keyed");
     }
 
     PMC* get_pmc_keyed_str(STRING *key) {
@@ -258,7 +258,7 @@ a NameSpace or a var, the NameSpace is returned.
             return ns;
         }
 
-        real_exception(INTERP, NULL, E_NameError, "Invalid namespace key");
+        real_exception(INTERP, NULL, E_NameError, "Invalid namespace key in get_pmc_keyed_str");
         /* NOTREACHED */
         return PMCNULL;
     }
@@ -312,7 +312,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
             return ns;
         }
 
-        real_exception(INTERP, NULL, E_NameError, "Invalid namespace key");
+        real_exception(INTERP, NULL, E_NameError, "Invalid namespace key in get_pointer_keyed");
         /* NOTREACHED */
         return PMCNULL;
     }
