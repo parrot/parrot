@@ -161,7 +161,7 @@ sub pre_call {
     \$I0 = $nb_arg
     dec \$I0
     \$I1 = \$I0
-L1_\${CURIC}:
+  L1_\${CURIC}:
     unless \$I1 >= 0 goto L2_\${CURIC}
     \${INS} = concat "  \$P"
     \$S0 = \$I1
@@ -169,13 +169,13 @@ L1_\${CURIC}:
     \${INS} = concat " = pop s\\n"
     if \$I1 == \$I0 goto L3_\${CURIC}
     \${PARAMS} = concat ", ", \${PARAMS}
-L3_\${CURIC}:
+  L3_\${CURIC}:
     \$S1 = "\$P"
     \$S1 = concat \$S1, \$S0
     \${PARAMS} = concat \$S1, \${PARAMS}
     dec \$I1
     goto L1_\${CURIC}
-L2_\${CURIC}:
+  L2_\${CURIC}:
     # Just got it in the 0th register.
     \${DEST0} = "reg0"
 PIR

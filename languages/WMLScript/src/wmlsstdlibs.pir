@@ -71,7 +71,7 @@ helper for CALL_LIB* opcodes.
     $P1 = $P0[lindex]
     $P2 = $P1[findex]
     .return ($P2)
-_handler:
+  _handler:
     .const .Sub not_implemented = 'not_implemented'
     .return (not_implemented)
 .end
@@ -112,7 +112,7 @@ helper for CALL_URL* opcodes.
     entry = global $S0
     if_null entry, _handler_2
     .return (entry)
-_handler_1:
+  _handler_1:
     .local pmc e
     .local string s
     .get_results (e, s)
@@ -124,7 +124,7 @@ _handler_1:
     $S0 .= "')"
     ex['_message'] = $S0
     throw ex
-_handler_2:
+  _handler_2:
     new ex, .Exception
     $S0 = "external function '"
     $S0 .= function
@@ -133,7 +133,7 @@ _handler_2:
     $S0 .= "'"
     ex['_message'] = $S0
     throw ex
-L1:
+  L1:
     new ex, .Exception
     $S0 = "unable to load compilation unit"
     ex['_message'] = $S0
@@ -154,8 +154,8 @@ L1:
     print "' ("
     print $S0
     print ")\n"
-L1:
-_handler:
+  L1:
+  _handler:
     .return (content)
 .end
 
@@ -174,10 +174,10 @@ _handler:
     print $S0
     print ")\n"
     goto L2
-L1:
+  L1:
     print fh, pbc_out
     close fh
-L2:
+  L2:
     .return (output)
 .end
 
@@ -196,10 +196,10 @@ L2:
     print $S0
     print ")\n"
     goto L2
-L1:
+  L1:
     print fh, gen_pir
     close fh
-L2:
+  L2:
 .end
 
 =back

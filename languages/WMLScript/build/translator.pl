@@ -347,7 +347,7 @@ PIRCODE
 
     gen_pir = concat "\n# BEGIN OF TRANSLATED BYTECODE\n\n"
 
-LOOP:
+  LOOP:
     pc = next_pc
     if pc >= bc_length goto COMPLETE
     $S0 = substr code, pc, 1
@@ -393,7 +393,7 @@ sub generate_initial_dump {
     bc_length = length code
     next_pc = 0
 
-LOOP:
+  LOOP:
     pc = next_pc
     if pc >= bc_length goto COMPLETE
     $S0 = substr code, pc, 1
@@ -428,7 +428,7 @@ PIRCODE
 
     # Emit unknown instruction code.
     $pir .= <<'PIRCODE';
-BDISPATCH_NOT_FOUND:
+  BDISPATCH_NOT_FOUND:
     .local pmc ex
     .local string msg
     new ex, .Exception
@@ -480,9 +480,9 @@ sub binary_dispatch_table {
         $pir .= "    if cur_ic < 0x$r2[0]->{code} goto ${prefix}_$r1[$#r1]->{code}\n";
 
         # Recurse to make code for sub branches.
-        $pir .= "${prefix}_$r1[$#r1]->{code}:\n";
+        $pir .= "  ${prefix}_$r1[$#r1]->{code}:\n";
         $pir .= binary_dispatch_table( $prefix, @r1 );
-        $pir .= "${prefix}_$r2[0]->{code}:\n";
+        $pir .= "  ${prefix}_$r2[0]->{code}:\n";
         $pir .= binary_dispatch_table( $prefix, @r2 );
     }
 
@@ -502,7 +502,7 @@ sub generate_rule_code {
 
     # Emit dispatch label.
     my $pir = <<"PIRCODE";
-BDISPATCH_$rule->{name}:
+  BDISPATCH_$rule->{name}:
     # Translation code for $rule->{name} ($rule->{code})
     gen_pir = concat "  # $rule->{name}\\n"
 PIRCODE
@@ -750,7 +750,7 @@ sub generate_rule_dump {
 
     # Emit dispatch label.
     my $pir = <<"PIRCODE";
-BDISPATCH_$rule->{name}:
+  BDISPATCH_$rule->{name}:
     # Dump code for $rule->{name}
 PIRCODE
 
@@ -826,7 +826,7 @@ sub generate_final_dump {
     # Emit complete label.
     # Emit the end of the dumper.
     my $pir = <<'PIRCODE';
-COMPLETE:
+  COMPLETE:
 .end
 
 PIRCODE
@@ -843,7 +843,7 @@ sub generate_final_code {
     # Emit complete label.
     # Emit label generation code.
     my $pir = <<'PIRCODE';
-COMPLETE:
+  COMPLETE:
 
     $S0 = pc
     gen_pir = concat "PC"
@@ -855,13 +855,13 @@ COMPLETE:
     # Insert constants.
     $P0 = iter h_const
     $S0 = "\n"
-L1_CST:
+  L1_CST:
     $S1 = shift $P0
     if null $S1 goto L2_CST
     $S1 = $P0[$S1]
     $S0 = concat $S1
     goto L1_CST
-L2_CST:
+  L2_CST:
     $S0 = concat "\n"
     gen_pir = concat $S0, gen_pir
 PIRCODE

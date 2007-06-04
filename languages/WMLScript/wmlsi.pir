@@ -60,14 +60,14 @@ Francois Perrad.
     load_bytecode $S0
     .local pmc params
     params = new .ResizablePMCArray
-L2:
+  L2:
     unless argv goto L3
     $S0 = shift argv
     new $P0, .WmlsString
     $P0 = $S0
     push params, $P0
     goto L2
-L3:
+  L3:
     .local pmc entry
     $S0 = filename
     $S0 .= ':'
@@ -75,15 +75,15 @@ L3:
     entry = global $S0
     entry(params :flat)
     end
-_handler:
+  _handler:
     .local pmc e
     .local string s
     .get_results (e, s)
     print s
     print "\n"
-L1:
+  L1:
     end
-USAGE:
+  USAGE:
     printerr "Usage: parrot wmlsi.pbc filename entry\n"
     exit -1
 .end

@@ -78,10 +78,10 @@ Number or invalid.
 
 .sub '_lang_abs' :anon
     .param pmc value
-    .local pmc ret
-    ret = clone value
-    ret = abs value
-    .return (ret)
+    .local pmc res
+    res = clone value
+    res = abs value
+    .return (res)
 .end
 
 
@@ -126,30 +126,30 @@ Number or invalid.
 .sub '_lang_min' :anon
     .param pmc value1
     .param pmc value2
-    .local pmc ret
+    .local pmc res
     $P1 = value1
     $I0 = isa value1, 'WmlsString'
     unless $I0 goto L1
     $P1 = value1.'parseNumber'()
-L1:
+  L1:
     $P2 = value2
     $I0 = isa value2, 'WmlsString'
     unless $I0 goto L2
     $P2 = value2.'parseNumber'()
-L2:
+  L2:
     $P0 = isle $P1, $P2
     $I0 = isa $P0, 'WmlsInvalid'
     unless $I0 goto L3
     .return ($P0)
-L3:
+  L3:
     $I0 = $P0
     unless $I0 goto L4
-    ret = clone value1
+    res = clone value1
     goto L5
-L4:
-    ret = clone value2
-L5:
-    .return (ret)
+  L4:
+    res = clone value2
+  L5:
+    .return (res)
 .end
 
 
@@ -194,30 +194,30 @@ Number or invalid.
 .sub '_lang_max' :anon
     .param pmc value1
     .param pmc value2
-    .local pmc ret
+    .local pmc res
     $P1 = value1
     $I0 = isa value1, 'WmlsString'
     unless $I0 goto L1
     $P1 = value1.'parseNumber'()
-L1:
+  L1:
     $P2 = value2
     $I0 = isa value2, 'WmlsString'
     unless $I0 goto L2
     $P2 = value2.'parseNumber'()
-L2:
+  L2:
     $P0 = isge $P1, $P2
     $I0 = isa $P0, 'WmlsInvalid'
     unless $I0 goto L3
     .return ($P0)
-L3:
+  L3:
     $I0 = $P0
     unless $I0 goto L4
-    ret = clone value1
+    res = clone value1
     goto L5
-L4:
-    ret = clone value2
-L5:
-    .return (ret)
+  L4:
+    res = clone value2
+  L5:
+    .return (res)
 .end
 
 
@@ -257,18 +257,18 @@ In case of a parsing error an C<invalid> value is returned.
 
 .sub '_lang_parseInt' :anon
     .param pmc value
-    .local pmc ret
+    .local pmc res
     $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
-    ret = value.'parseInt'()
-    .return (ret)
-L1:
-    ret = value
+    res = value.'parseInt'()
+    .return (res)
+  L1:
+    res = value
     $I0 = isa value, 'WmlsInteger'
     if $I0 goto L2
-    new ret, .WmlsInvalid
-L2:
-    .return (ret)
+    new res, .WmlsInvalid
+  L2:
+    .return (res)
 .end
 
 
@@ -308,25 +308,25 @@ In case of a parsing error an C<invalid> value is returned.
 
 .sub '_lang_parseFloat' :anon
     .param pmc value
-    .local pmc ret
+    .local pmc res
     $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
-    ret = value.'parseFloat'()
-    .return (ret)
-L1:
-    ret = value
+    res = value.'parseFloat'()
+    .return (res)
+  L1:
+    res = value
     $I0 = isa value, 'WmlsFloat'
     if $I0 goto L2
     $I0 = isa value, 'WmlsInteger'
     unless $I0 goto L3
     $I0 = value
-    new ret, .WmlsFloat
-    set ret, $I0
+    new res, .WmlsFloat
+    set res, $I0
     goto L2
-L3:
-    new ret, .WmlsInvalid
-L2:
-    .return (ret)
+  L3:
+    new res, .WmlsInvalid
+  L2:
+    .return (res)
 .end
 
 
@@ -350,22 +350,22 @@ Boolean or invalid.
 
 .sub '_lang_isInt' :anon
     .param pmc value
-    .local pmc ret
+    .local pmc res
     $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
     $P0 = value.'parseInt'()
-    ret = defined $P0
-    .return (ret)
-L1:
+    res = defined $P0
+    .return (res)
+  L1:
     $I0 = isa value, 'WmlsInvalid'
     unless $I0 goto L2
-    new ret, .WmlsInvalid
-    .return (ret)
-L2:
-    new ret, .WmlsBoolean
+    new res, .WmlsInvalid
+    .return (res)
+  L2:
+    new res, .WmlsBoolean
     $I0 = isa value, 'WmlsInteger'
-    set ret, $I0
-    .return (ret)
+    set res, $I0
+    .return (res)
 .end
 
 
@@ -389,26 +389,26 @@ Boolean or invalid.
 
 .sub '_lang_isFloat' :anon
     .param pmc value
-    .local pmc ret
+    .local pmc res
     $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
     $P0 = value.'parseFloat'()
-    ret = defined $P0
-    .return (ret)
-L1:
+    res = defined $P0
+    .return (res)
+  L1:
     $I0 = isa value, 'WmlsInvalid'
     unless $I0 goto L2
-    new ret, .WmlsInvalid
-    .return (ret)
-L2:
-    new ret, .WmlsBoolean
+    new res, .WmlsInvalid
+    .return (res)
+  L2:
+    new res, .WmlsBoolean
     $I0 = isa value, 'WmlsFloat'
-    set ret, $I0
+    set res, $I0
     if $I0 goto L3
     $I0 = isa value, 'WmlsInteger'
-    set ret, $I0
-L3:
-    .return (ret)
+    set res, $I0
+  L3:
+    .return (res)
 .end
 
 
@@ -425,10 +425,10 @@ Integer 2147483647.
 =cut
 
 .sub '_lang_maxInt' :anon
-    .local pmc ret
-    new ret, .WmlsInteger
-    set ret, 2147483647
-    .return (ret)
+    .local pmc res
+    new res, .WmlsInteger
+    set res, 2147483647
+    .return (res)
 .end
 
 
@@ -445,10 +445,10 @@ Integer -2147483648.
 =cut
 
 .sub '_lang_minInt' :anon
-    .local pmc ret
-    new ret, .WmlsInteger
-    set ret, -2147483648
-    .return (ret)
+    .local pmc res
+    new res, .WmlsInteger
+    set res, -2147483648
+    .return (res)
 .end
 
 
@@ -465,10 +465,10 @@ Boolean.
 =cut
 
 .sub '_lang_float' :anon
-    .local pmc ret
-    new ret, .WmlsBoolean
-    set ret, 1
-    .return (ret)
+    .local pmc res
+    new res, .WmlsBoolean
+    set res, 1
+    .return (res)
 .end
 
 
@@ -493,13 +493,13 @@ None (this function ends the interpretation).
 
 .sub '_lang_exit' :anon
     .param pmc value
-    .local pmc ret
+    .local pmc res
     $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
-    $P0 = value.parseInt()
+    $P0 = value.'parseInt'()
     $I0 = $P0
     exit $I0
-L1:
+  L1:
     $I0 = value
     exit $I0
 .end
@@ -566,12 +566,12 @@ If value is less than zero (0), the function returns C<invalid>.
 
 .sub '_lang_random' :anon
     .param pmc value
-    .local pmc ret
+    .local pmc res
     $P0 = value
     $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
     $P0 = value.'parseNumber'()
-L1:
+  L1:
     $I0 = isa $P0, 'WmlsInvalid'
     if $I0 goto L2
     $I0 = $P0
@@ -580,13 +580,13 @@ L1:
     $N0 = $P0
     $N0 = mul $I0
     $I0 = $N0
-    new ret, .WmlsInteger
-    set ret, $I0
+    new res, .WmlsInteger
+    set res, $I0
     goto L3
-L2:
-    new ret, .WmlsInvalid
-L3:
-    .return (ret)
+  L2:
+    new res, .WmlsInvalid
+  L3:
+    .return (res)
 .end
 
 
@@ -617,26 +617,26 @@ String or invalid.
 
 .sub '_lang_seed' :anon
     .param pmc value
-    .local pmc ret
+    .local pmc res
     $P0 = value
     $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
     $P0 = value.'parseNumber'()
-L1:
+  L1:
     $I0 = isa $P0, 'WmlsInvalid'
     if $I0 goto L2
     $I0 = $P0
     if $I0 >= 0 goto L3
     $I0 = time
-L3:
+  L3:
     new $P0, .Random
     $P0 = $I0
-    new ret, .WmlsString, ''
+    new res, .WmlsString, ''
     goto L4
-L2:
-    new ret, .WmlsInvalid
-L4:
-    .return (ret)
+  L2:
+    new res, .WmlsInvalid
+  L4:
+    .return (res)
 .end
 
 
@@ -655,10 +655,10 @@ Integer.
 =cut
 
 .sub '_lang_characterSet' :anon
-    .local pmc ret
-    new ret, .WmlsInteger
-    ret = 4     # latin1
-    .return (ret)
+    .local pmc res
+    new res, .WmlsInteger
+    res = 4     # latin1
+    .return (res)
 .end
 
 

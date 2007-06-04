@@ -48,15 +48,15 @@ Francois Perrad.
     script['filename'] = filename
     script.dump()
     end
-_handler:
+  _handler:
     .local pmc e
     .local string s
     .get_results (e, s)
     print s
     print "\n"
-L1:
+  L1:
     end
-USAGE:
+  USAGE:
     printerr "Usage: parrot wmlsd.pbc filename\n"
     exit -1
 .end

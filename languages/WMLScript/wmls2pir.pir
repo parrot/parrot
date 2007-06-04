@@ -51,15 +51,15 @@ Francois Perrad.
     gen_pir = script.translate()
     save_pir(gen_pir, filename)
     end
-_handler:
+  _handler:
     .local pmc e
     .local string s
     .get_results (e, s)
     print s
     print "\n"
-L1:
+  L1:
     end
-USAGE:
+  USAGE:
     printerr "Usage: parrot wmls2pir.pbc filename\n"
     exit -1
 .end

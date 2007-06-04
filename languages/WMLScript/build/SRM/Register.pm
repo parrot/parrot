@@ -160,11 +160,11 @@ sub pre_call {
     \${PARAMS} = ""
     \$I0 = $nb_arg
     \$I1 = 0
-L1_\${CURIC}:
+  L1_\${CURIC}:
     unless \$I1 < \$I0 goto L2_\${CURIC}
     if \$I1 == 0 goto L3_\${CURIC}
     \${PARAMS} = concat ", ", \${PARAMS}
-L3_\${CURIC}:
+  L3_\${CURIC}:
     \$S0 = "\$P"
     \$S1 = stack_depth
     \$S0 = concat \$S1
@@ -173,7 +173,7 @@ L3_\${CURIC}:
     dec stack_depth
     inc \$I1
     goto L1_\${CURIC}
-L2_\${CURIC}:
+  L2_\${CURIC}:
     # Increment stack depth.
     inc stack_depth
     # Assign register name.

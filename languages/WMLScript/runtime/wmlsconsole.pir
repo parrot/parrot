@@ -46,19 +46,19 @@ Number or invalid.
 
 .sub '_console_print' :anon
     .param pmc str
-    .local pmc ret
+    .local pmc res
     $I0 = isa str, 'WmlsInvalid'
     if $I0 goto L1
     $S0 = str
     print $S0
     $I0 = length $S0
-    new ret, .WmlsInteger
-    ret = $I0
+    new res, .WmlsInteger
+    set res, $I0
     goto L2
-L1:
-    new ret, .WmlsInvalid
-L2:
-    .return (ret)
+  L1:
+    new res, .WmlsInvalid
+  L2:
+    .return (res)
 .end
 
 
@@ -79,20 +79,20 @@ Number or invalid.
 
 .sub '_console_println' :anon
     .param pmc str
-    .local pmc ret
+    .local pmc res
     $I0 = isa str, 'WmlsInvalid'
     if $I0 goto L1
     $S0 = str
     print $S0
     print "\n"
     $I0 = length $S0
-    new ret, .WmlsInteger
-    ret = $I0
+    new res, .WmlsInteger
+    set res, $I0
     goto L2
-L1:
-    new ret, .WmlsInvalid
-L2:
-    .return (ret)
+  L1:
+    new res, .WmlsInvalid
+  L2:
+    .return (res)
 .end
 
 

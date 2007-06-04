@@ -63,22 +63,22 @@ Integer or invalid.
 
 .sub '_float_int' :anon
     .param pmc value
-    .local pmc ret
+    .local pmc res
     $P0 = value
     $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
     $P0 = value.'parseNumber'()
-L1:
+  L1:
     $I0 = isa $P0, 'WmlsInvalid'
     if $I0 goto L2
     $I0 = $P0
-    new ret, .WmlsInteger
-    set ret, $I0
+    new res, .WmlsInteger
+    set res, $I0
     goto L3
-L2:
-    new ret, .WmlsInvalid
-L3:
-    .return (ret)
+  L2:
+    new res, .WmlsInvalid
+  L3:
+    .return (res)
 .end
 
 
@@ -101,23 +101,23 @@ Integer or invalid.
 
 .sub '_float_floor' :anon
     .param pmc value
-    .local pmc ret
+    .local pmc res
     $P0 = value
     $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
     $P0 = value.'parseNumber'()
-L1:
+  L1:
     $I0 = isa $P0, 'WmlsInvalid'
     if $I0 goto L2
     $N0 = $P0
     $I0 = floor $N0
-    new ret, .WmlsInteger
-    set ret, $I0
+    new res, .WmlsInteger
+    set res, $I0
     goto L3
-L2:
-    new ret, .WmlsInvalid
-L3:
-    .return (ret)
+  L2:
+    new res, .WmlsInvalid
+  L3:
+    .return (res)
 .end
 
 
@@ -140,23 +140,23 @@ Integer or invalid.
 
 .sub '_float_ceil' :anon
     .param pmc value
-    .local pmc ret
+    .local pmc res
     $P0 = value
     $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
     $P0 = value.'parseNumber'()
-L1:
+  L1:
     $I0 = isa $P0, 'WmlsInvalid'
     if $I0 goto L2
     $N0 = $P0
     $I0 = ceil $N0
-    new ret, .WmlsInteger
-    set ret, $I0
+    new res, .WmlsInteger
+    set res, $I0
     goto L3
-L2:
-    new ret, .WmlsInvalid
-L3:
-    .return (ret)
+  L2:
+    new res, .WmlsInvalid
+  L3:
+    .return (res)
 .end
 
 
@@ -189,12 +189,12 @@ If value1 < 0 and value2 is not an integer then C<invalid> is returned.
 .sub '_float_pow' :anon
     .param pmc value1
     .param pmc value2
-    .local pmc ret
+    .local pmc res
     $P1 = value1
     $I0 = isa value1, 'WmlsString'
     unless $I0 goto L1
     $P1 = value1.'parseNumber'()
-L1:
+  L1:
     $I0 = isa $P1, 'WmlsInvalid'
     if $I0 goto L2
     $N1 = $P1
@@ -202,28 +202,28 @@ L1:
     $I0 = isa value2, 'WmlsString'
     unless $I0 goto L3
     $P2 = value2.'parseNumber'()
-L3:
+  L3:
     $I0 = isa $P2, 'WmlsInvalid'
     if $I0 goto L2
     $N2 = $P2
     unless $N1 == 0.0 goto L4
     if $N2 < 0.0 goto L2
-    new ret, .WmlsFloat
-    set ret, 0.0
+    new res, .WmlsFloat
+    set res, 0.0
     goto L5
-L4:
+  L4:
     unless $N1 < 0.0 goto L6
     $I0 = isa $P2, 'WmlsFloat'
     if $I0 goto L2
-L6:
+  L6:
     $N0 = pow $N1, $N2
-    new ret, .WmlsFloat
-    set ret, $N0
+    new res, .WmlsFloat
+    set res, $N0
     goto L5
-L2:
-    new ret, .WmlsInvalid
-L5:
-    .return (ret)
+  L2:
+    new res, .WmlsInvalid
+  L5:
+    .return (res)
 .end
 
 
@@ -248,24 +248,24 @@ Integer or invalid.
 
 .sub '_float_round' :anon
     .param pmc value
-    .local pmc ret
+    .local pmc res
     $P0 = value
     $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
     $P0 = value.'parseNumber'()
-L1:
+  L1:
     $I0 = isa $P0, 'WmlsInvalid'
     if $I0 goto L2
     $N0 = $P0
     $N0 += 0.5
     $I0 = floor $N0
-    new ret, .WmlsInteger
-    set ret, $I0
+    new res, .WmlsInteger
+    set res, $I0
     goto L3
-L2:
-    new ret, .WmlsInvalid
-L3:
-    .return (ret)
+  L2:
+    new res, .WmlsInvalid
+  L3:
+    .return (res)
 .end
 
 
@@ -292,24 +292,24 @@ If value is a negative number then invalid is returned.
 
 .sub '_float_sqrt' :anon
     .param pmc value
-    .local pmc ret
+    .local pmc res
     $P0 = value
     $I0 = isa value, 'WmlsString'
     unless $I0 goto L1
     $P0 = value.'parseNumber'()
-L1:
+  L1:
     $I0 = isa $P0, 'WmlsInvalid'
     if $I0 goto L2
     $N0 = $P0
     if $N0 < 0.0 goto L2
     $N1 = sqrt $N0
-    new ret, .WmlsFloat
-    set ret, $N1
+    new res, .WmlsFloat
+    set res, $N1
     goto L3
-L2:
-    new ret, .WmlsInvalid
-L3:
-    .return (ret)
+  L2:
+    new res, .WmlsInvalid
+  L3:
+    .return (res)
 .end
 
 
@@ -327,10 +327,10 @@ Floating-point 3.40282347e+38.
 =cut
 
 .sub '_float_maxFloat' :anon
-    .local pmc ret
-    new ret, .WmlsFloat
-    set ret, 3.40282347e+38
-    .return (ret)
+    .local pmc res
+    new res, .WmlsFloat
+    set res, 3.40282347e+38
+    .return (res)
 .end
 
 
@@ -349,10 +349,10 @@ precision floating-point value: 1.17549435e-38.
 =cut
 
 .sub '_float_minFloat' :anon
-    .local pmc ret
-    new ret, .WmlsFloat
-    set ret, 1.17549435e-38
-    .return (ret)
+    .local pmc res
+    new res, .WmlsFloat
+    set res, 1.17549435e-38
+    .return (res)
 .end
 
 

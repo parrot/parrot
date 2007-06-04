@@ -144,7 +144,7 @@ PIRCODE
     .local pmc constant
     nb = elements self
     idx = 0
-L1:
+  L1:
     unless idx < nb goto L2
     constant = self[idx]
     print "cst"
@@ -154,7 +154,7 @@ L1:
     print "\n"
     inc idx
     goto L1
-L2:
+  L2:
 .end
 
 .sub 'translate' :method
@@ -297,7 +297,7 @@ L2:
     .local pmc pragma
     nb = elements self
     idx = 0
-L1:
+  L1:
     unless idx < nb goto L2
     pragma = self[idx]
     print "pragma"
@@ -307,7 +307,7 @@ L1:
     print "\n"
     inc idx
     goto L1
-L2:
+  L2:
 .end
 
 .namespace ['Wmls::AccessDomain']
@@ -373,7 +373,7 @@ L2:
     .local int function_name_size
     .local int function_index
     idx = 0
-L1:
+  L1:
     unless idx < number_of_function_names goto L2
     couple = self[idx]
     function_index = couple[0]
@@ -387,7 +387,7 @@ L1:
     print "\n"
     inc idx
     goto L1
-L2:
+  L2:
 .end
 
 .sub 'translate' :method
@@ -403,7 +403,7 @@ L2:
     .local pmc couple
     .local string function_name
     .local int function_index
-L1:
+  L1:
     unless idx < nb goto L2
     couple = self[idx]
     function_index = couple[0]
@@ -422,7 +422,7 @@ L1:
     pir .= "\n"
     inc idx
     goto L1
-L2:
+  L2:
     .return (pir)
 .end
 
@@ -434,7 +434,7 @@ L2:
     .local pmc function
     nb = elements self
     idx = 0
-L1:
+  L1:
     unless idx < nb goto L2
     function = self[idx]
     print "## function "
@@ -443,7 +443,7 @@ L1:
     function.dump()
     inc idx
     goto L1
-L2:
+  L2:
 .end
 
 .sub 'translate' :method
@@ -455,14 +455,14 @@ L2:
     .local pmc function
     nb = elements self
     idx = 0
-L1:
+  L1:
     unless idx < nb goto L2
     function = self[idx]
     $S0 = function.translate(script, idx)
     pir .= $S0
     inc idx
     goto L1
-L2:
+  L2:
     .return (pir)
 .end
 
@@ -502,7 +502,7 @@ L2:
     number_of_arguments = self['NumberOfArguments']
     .local int idx
     idx = 0
-L1:
+  L1:
     unless idx < number_of_arguments goto L2
     pir .= "  .param pmc arg"
     $S0 = idx
@@ -510,14 +510,14 @@ L1:
     pir .= "\n"
     inc idx
     goto L1
-L2:
+  L2:
 
     .local int number_of_local_variables
     number_of_local_variables = self['NumberOfLocalVariables']
     .local int number_of_variables
     number_of_variables = number_of_arguments + number_of_local_variables
     idx = 0
-L3:
+  L3:
     unless idx < number_of_variables goto L4
     pir .= "  .local pmc local"
     $S0 = idx
@@ -525,10 +525,10 @@ L3:
     pir .= "\n"
     inc idx
     goto L3
-L4:
+  L4:
 
     idx = 0
-L5:
+  L5:
     unless idx < number_of_arguments goto L6
     pir .= "  local"
     $S0 = idx
@@ -538,11 +538,11 @@ L5:
     pir .= "\n"
     inc idx
     goto L5
-L6:
+  L6:
 
     unless number_of_local_variables goto L7
     pir .= "  new $P0, .WmlsString, ''\n"
-L7:
+  L7:
     unless idx < number_of_variables goto L8
     pir .= "  local"
     $S0 = idx
@@ -550,7 +550,7 @@ L7:
     pir .= " = $P0\n"
     inc idx
     goto L7
-L8:
+  L8:
 
     .local string code_array
     code_array = self['CodeArray']
