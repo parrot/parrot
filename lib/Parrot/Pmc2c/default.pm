@@ -1,4 +1,7 @@
-
+/*
+Copyright (C) 2007, The Perl Foundation.
+$Id$
+*/
 =head1 Parrot::Pmc2c::default Instance Methods
 
 =over 4
@@ -49,7 +52,8 @@ sub body {
     if ( $method->{type} ne 'void' ) {
 
         # This cheats, assuming that all return types can be cast from zero.
-        $ret = "return ($method->{type})0;";
+        $ret = $method->{type} eq 'PMC*' ? "return PMCNULL;"
+                                         : "return ($method->{type})0;";
     }
 
     # I think that these will be out by one - NWC

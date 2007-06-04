@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -42,7 +42,7 @@ my $classname = shift
 ## emit file header
 print <<"EOF";
 /* ${classname}.pmc
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     \$Id\$
  *  Overview:
@@ -70,8 +70,10 @@ for (@$vtbl) {
     }
 
     print "    $retval $methname ($args) {\n";
+
     if ( $retval ne 'void' ) {
-        print "        return ($retval)0;\n";
+        print $retval eq 'PMC*' ? "        return PMCNULL;\n"
+                                : "        return ($retval)0;\n";
     }
     print "    }\n\n";
 }
