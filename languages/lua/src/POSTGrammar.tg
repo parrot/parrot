@@ -227,38 +227,31 @@ transform inline (PAST::Op) :language('PIR') {
 
 
 transform if (PAST::Op) :language('PIR') {
-    .local pmc ops
+    .local pmc ops, expr, then, else
     ops = new 'POST::Ops'
     ops.'init'('node'=>node)
-
-    .local pmc exprpast, thenpast, elsepast
-    .local pmc exprpost, thenpost, elsepost
-    exprpast = node[0]
-    thenpast = node[1]
-    elsepast = node[2]
-
     .local pmc thenlabel, endlabel
-    .local string n
-    n = node.'unique'('_')
-    $S0 = concat 'if', n
+    $S0 = node.'unique'('if_')
     thenlabel = ops.'new'('POST::Label', 'result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = ops.'new'('POST::Label', 'result'=>$S0)
-
-    exprpost = tree.'get'('post', exprpast)
-    ops.'push'(exprpost)
-    ops.'push_pirop'('if', exprpost, thenlabel)
-    $I0 = defined elsepast
+    $P0 = node[0]
+    expr = tree.'get'('post', $P0)
+    ops.'push'(expr)
+    ops.'push_pirop'('if', expr, thenlabel)
+    $P0 = node[2]
+    $I0 = defined $P0
     if $I0 == 0 goto else_done
-    elsepost = tree.'get'('post', elsepast)
-    ops.'push'(elsepost)
+    else = tree.'get'('post', $P0)
+    ops.'push'(else)
   else_done:
     ops.'push_pirop'('goto', endlabel)
     ops.'push'(thenlabel)
-    $I0 = defined thenpast
+    $P0 = node[1]
+    $I0 = defined $P0
     if $I0 == 0 goto then_done
-    thenpost = tree.'get'('post', thenpast)
-    ops.'push'(thenpost)
+    then = tree.'get'('post', $P0)
+    ops.'push'(then)
   then_done:
     ops.'push'(endlabel)
     .return (ops)
@@ -266,32 +259,113 @@ transform if (PAST::Op) :language('PIR') {
 
 
 transform while (PAST::Op) :language('PIR') {
-    .local pmc ops
+    .local pmc ops, expr, blk
     ops = new 'POST::Ops'
     ops.'init'('node'=>node)
-
-    .local pmc exprpast, blockpast
-    .local pmc exprpost, blockpost
-    exprpast = node[0]
-    blockpast = node[1]
-
     .local pmc looplabel, endlabel
-    .local string n
-    n = node.'unique'('_')
-    $S0 = concat 'while', n
+    $S0 = node.'unique'('while_')
     looplabel = ops.'new'('POST::Label', 'result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = ops.'new'('POST::Label', 'result'=>$S0)
-
     ops.'push'(looplabel)
-    exprpost = tree.'get'('post', exprpast)
-    ops.'push'(exprpost)
-    ops.'push_pirop'('unless', exprpost, endlabel)
-    blockpost = tree.'get'('post', blockpast)
-    ops.'push'(blockpost)
+    $P0 = node[0]
+    expr = tree.'get'('post', $P0)
+    ops.'push'(expr)
+    ops.'push_pirop'('unless', expr, endlabel)
+    $P0 = node[1]
+    blk = tree.'get'('post', $P0)
+    ops.'push'(blk)
     ops.'push_pirop'('goto', looplabel)
     ops.'push'(endlabel)
-    ops.'result'(exprpost)
+    .return (ops)
+}
+
+
+transform repeat (PAST::Op) :language('PIR') {
+    .local pmc ops, expr, blk
+    ops = new 'POST::Ops'
+    ops.'init'('node'=>node)
+    .local pmc looplabel, endlabel
+    $S0 = node.'unique'('repeat_')
+    looplabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $S0 = concat $S0, '_end'
+    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    ops.'push'(looplabel)
+    $P0 = node[1]
+    blk = tree.'get'('post', $P0)
+    ops.'push'(blk)
+    $P0 = node[0]
+    expr = tree.'get'('post', $P0)
+    ops.'push'(expr)
+    ops.'push_pirop'('if', expr, endlabel)
+    ops.'push_pirop'('goto', looplabel)
+    ops.'push'(endlabel)
+    .return (ops)
+}
+
+
+transform fornum (PAST::Op) :language('PIR') {
+    internal_error("not implemented (fornum)")
+    .local pmc ops, var, limit, step, blk
+    ops = new 'POST::Ops'
+    ops.'init'('node'=>node)
+
+    $P0 = node[1]
+    $P1 = $P0[0]
+    $P2 = tree.'get'('post', $P1)
+    ops.'push'($P2)
+    var = ops.'push_pirop'('new')
+    var.'arglist'(var, '.LuaNil')
+#    ops.'push_pirop'('set', var, $P2)
+
+    $P1 = $P0[1]
+    $P2 = tree.'get'('post', $P1)
+    ops.'push'($P2)
+    limit = ops.'push_pirop'('new')
+    limit.'arglist'(limit, '.LuaNil')
+#    ops.'push_pirop'('set', limit, $P2)
+
+    $P1 = $P0[2]
+    if $P1 goto L1
+    goto L2
+    $P2 = ops.'push_pirop'('new')
+    $P2.'arglist'($P2, '.LuaNumber')
+    $P2 = ops.'push_pirop'('set', $P2, '1', 'result'=>$P2)
+    #ops.'result'($P2)
+  L1:
+    $P2 = tree.'get'('post', $P1)
+    ops.'push'($P2)
+  L2:
+    step = ops.'push_pirop'('new')
+    step.'arglist'(step, '.LuaNil')
+#    ops.'push_pirop'('set', step, $P2)
+
+    .local pmc looplabel, endlabel
+    $S0 = node.'unique'('fornum_')
+    looplabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $S0 = concat $S0, '_end'
+    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    ops.'push'(looplabel)
+
+    ops.'push'(endlabel)
+    .return (ops)
+}
+
+
+transform forlist (PAST::Op) :language('PIR') {
+    internal_error("not implemented (forlist)")
+    .local pmc ops, var, limit, step, blk
+    ops = new 'POST::Ops'
+    ops.'init'('node'=>node)
+
+    .local pmc looplabel, endlabel
+    $S0 = node.'unique'('forlist_')
+    looplabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $S0 = concat $S0, '_end'
+    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    ops.'push'(looplabel)
+
+    ops.'push'(endlabel)
     .return (ops)
 }
 
@@ -323,19 +397,19 @@ transform assignlist (PAST::Op) :language('PIR') {
     rpost = tree.'get'('post', $P1)
     ops.'push'(rpost)
     goto L3
-L2:
+  L2:
     rpost = ops.'push_pirop'('new')
     rpost.'arglist'(rpost, '.LuaNil')
-L3:
+  L3:
     $P0 = namelist[0]
     lpost = tree.'get'('post', $P0)
     ops.'push'(lpost)
     ops.'push_pirop'('set', lpost, rpost)
     .return (ops)
-L1:
+  L1:
     .local pmc iter
     new iter, .Iterator, namelist
-L4:
+  L4:
     unless iter goto L5
     $P0 = shift iter
     unless explist goto L6
@@ -343,15 +417,15 @@ L4:
     rpost = tree.'get'('post', $P1)
     ops.'push'(rpost)
     goto L7
-L6:
+  L6:
     rpost = ops.'push_pirop'('new')
     rpost.'arglist'(rpost, '.LuaNil')
-L7:
+  L7:
     lpost = tree.'get'('post', $P0)
     ops.'push'(lpost)
     ops.'push_pirop'('set', lpost, rpost)
     goto L4
-L5:
+  L5:
     .return (ops)
 }
 
@@ -465,12 +539,19 @@ transform post (PAST::Var) :language('PIR') {
     goto have_scope
 
   scope_lexical:
-    fetchop = 'find_lex'
-    storeop = 'store_lex'
     $I0 = node.'ismy'()
-    if $I0 == 0 goto have_scope
+    if $I0 == 0 goto L1
     post.'push'(vivipost)
     post.'push_pirop'('.lex', name, vivipost)
+    .return (post)
+  L1:
+    $I0 = node.'islvalue'()
+    unless $I0 goto L2
+    post.'push_pirop'('store_lex', name, post)
+    .return (post)
+  L2:
+    post.'push_pirop'('find_lex', vivipost, name)
+    post.'result'(post)
     .return (post)
 
   scope_parameter:

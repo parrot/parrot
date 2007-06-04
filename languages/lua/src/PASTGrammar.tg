@@ -16,6 +16,8 @@ grammar Lua::PAST::Grammar is TGE::Grammar;
 
 transform past (ROOT) :language('PIR') {
     .local pmc past
+    $P0 = new 'Lua::Symbtab'
+    set_hll_global ['Lua::PAST'], '$symbtab', $P0
     $P0 = node['block']
     past = tree.'get'('past', $P0, 'Lua::Grammar::block')
     .return past.'new'('PAST::Block', past, 'node'=>node, 'name'=>'_main', 'pragma'=>':anon :lex')
@@ -30,19 +32,19 @@ transform past (Lua::Grammar::block) :language('PIR') {
     if null $P0 goto L1
     .local pmc iter
     iter = new .Iterator, $P0
-L2:
+  L2:
     unless iter goto L1
     $P0 = shift iter
     $P1 = tree.'get'('past', $P0, 'Lua::Grammar::statement')
     past.'push'($P1)
     goto L2
-L1:
+  L1:
     $P0 = node['last_statement']
     if null $P0 goto L3
     $P0 = shift $P0
     $P1 = tree.'get'('past', $P0, 'Lua::Grammar::statement')
     past.'push'($P1)
-L3:
+  L3:
     .return (past)
 }
 
@@ -67,20 +69,20 @@ transform past (Lua::Grammar::if_stat) :language('PIR') {
     if null $P0 goto L1
     .local pmc iter
     iter = new .Iterator, $P0
-L2:
+  L2:
     unless iter goto L1
     $P0 = shift iter
     $P1 = tree.'get'('past', $P0, 'Lua::Grammar::elseif_block')
     cpast.'push'($P1)
     cpast = $P1
     goto L2
-L1:
+  L1:
     $P0 = node['else_block']
     if null $P0 goto L3
     $P0 = shift $P0
     $P1 = tree.'get'('past', $P0, 'Lua::Grammar::else_block')
     cpast.'push'($P1)
-L3:
+  L3:
     .return (past)
 }
 
@@ -124,20 +126,65 @@ transform past (Lua::Grammar::repeat_stat) :language('PIR') {
 
 
 transform past (Lua::Grammar::for_stat) :language('PIR') {
+    .local pmc past
     $S0 = node.'find_key'()
     $P0 = node[$S0]
     $S1 = concat 'Lua::Grammar::', $S0
-    .return tree.'get'('past', $P0, $S1)
+    past = tree.'get'('past', $P0, $S1)
+    $P0 = node['for_body']
+    $P0 = $P0['block']
+    $P1 = tree.'get'('past', $P0, 'Lua::Grammar::block')
+    past.'push'($P1)
+    .return (past)
 }
 
 
 transform past (Lua::Grammar::fornum) :language('PIR') {
-    internal_error("not implemented (fornum)")
+    .local pmc name, explist
+    .local pmc symbtab
+    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    $P0 = node['name']
+    $S0 = $P0.'result_object'()
+    symbtab.'insert'($S0)
+    name = new 'PAST::Var'
+    name.'init'('node'=>node, 'name'=>$S0, 'scope'=>'lexical', 'ismy'=>1, 'islvalue'=>1)
+    explist = new .ResizablePMCArray
+    $P0 = node['expression']
+    .local pmc iter
+    iter = new .Iterator, $P0
+  L1:
+    unless iter goto L2
+    $P0 = shift iter
+    $P1 = tree.'get'('past', $P0, 'Lua::Grammar::expression')
+    push explist, $P1
+    goto L1
+  L2:
+    .return name.'new'('PAST::Op', name, explist, 'node'=>node, 'pasttype'=>'fornum')
 }
 
 
 transform past (Lua::Grammar::forlist) :language('PIR') {
-    internal_error("not implemented (forlist)")
+    .local pmc past, namelist, explist
+    .local pmc symbtab
+    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    namelist = new .ResizablePMCArray
+    $P0 = node['name_list']
+    $P0 = $P0['name']
+    .local pmc iter
+    iter = new .Iterator, $P0
+  L1:
+    unless iter goto L2
+    $P0 = shift iter
+    $S0 = $P0.'result_object'()
+    symbtab.'insert'($S0)
+    past = new 'PAST::Var'
+    past.'init'('node'=>node, 'name'=>$S0, 'scope'=>'lexical', 'ismy'=>1, 'islvalue'=>1)
+    push namelist, past
+    goto L1
+  L2:
+    $P0 = node['expression_list']
+    explist = tree.'get'('explist', $P0, 'Lua::Grammar::expression_list')
+    .return past.'new'('PAST::Op', namelist, explist, 'node'=>node, 'pasttype'=>'forlist')
 }
 
 
@@ -150,29 +197,31 @@ transform past (Lua::Grammar::local_stat) :language('PIR') {
 
 
 transform past (Lua::Grammar::local_declaration) :language('PIR') {
-    .local pmc past
-    .local pmc namelist, explist
+    .local pmc past, namelist, explist
+    .local pmc symbtab
+    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
     $P0 = node['name']
     namelist = new .ResizablePMCArray
     .local pmc iter
     iter = new .Iterator, $P0
-L1:
+  L1:
     unless iter goto L2
     $P0 = shift iter
     $S0 = $P0.'result_object'()
+    symbtab.'insert'($S0)
     past = new 'PAST::Var'
     past.'init'('node'=>node, 'name'=>$S0, 'scope'=>'lexical', 'ismy'=>1, 'islvalue'=>1)
     push namelist, past
     goto L1
-L2:
+  L2:
     $P0 = node['expression_list']
     if null $P0 goto L3
     $P0 = shift $P0
     explist = tree.'get'('explist', $P0, 'Lua::Grammar::expression_list')
-L3:
+  L3:
     unless null explist goto L4
     explist = new .ResizablePMCArray
-L4:
+  L4:
     past = new 'PAST::Op'
     past.'init'(namelist, explist, 'node'=>node, 'pasttype'=>'assignlist')
     .return (past)
@@ -181,10 +230,13 @@ L4:
 
 transform past (Lua::Grammar::local_function) :language('PIR') {
     .local pmc past, var
+    .local pmc symbtab
+    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
     $P0 = node['function_body']
     past = tree.'get'('past', $P0, 'Lua::Grammar::function_body')
     $P0 = node['name']
     $S0 = $P0.'result_object'()
+    symbtab.'insert'($S0)
     past.'name'($S0)
     var = past.'new'('PAST::Var', 'node'=>$P0, 'name'=>$S0, 'scope'=>'lexical', 'ismy'=>1, 'islvalue'=>1)
     .return past.'new'('PAST::Op', var, past, 'node'=>node, 'pasttype'=>'assign')
@@ -200,7 +252,7 @@ transform past (Lua::Grammar::return_statement) :language('PIR') {
     $P1 = tree.'get'('explist', $P0, 'Lua::Grammar::expression_list')
     past.'init'($P1 :flat, 'node'=>node, 'pasttype'=>'pirop', 'pirop'=>'return')
     .return (past)
-L1:
+  L1:
     past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'return')
     .return (past)
 }
@@ -219,7 +271,7 @@ transform past (Lua::Grammar::expression_stat) :language('PIR') {
     unless null $P0 goto L1
     $P0 = node['primary_expression']
     .return tree.'get'('past', $P0, 'Lua::Grammar::primary_expression')
-L1:
+  L1:
     .local pmc varlist, explist
     $P0 = shift $P0
     explist = tree.'get'('explist', $P0, 'Lua::Grammar::assignment')
@@ -241,7 +293,7 @@ transform varlist (Lua::Grammar::assignment) :language('PIR') {
     if null $P0 goto L1
     varlist = new .ResizablePMCArray
     .return (varlist)
-L1:
+  L1:
     $P0 = node['assignment']
     varlist = tree.'get'('varlist', $P0, 'Lua::Grammar::assignment')
     $P0 = node['primary_expression']
@@ -256,7 +308,7 @@ transform explist (Lua::Grammar::assignment) :language('PIR') {
     $P0 = node['expression_list']
     if null $P0 goto L1
     .return tree.'get'('explist', $P0, 'Lua::Grammar::expression_list')
-L1:
+  L1:
     $P0 = node['assignment']
     .return tree.'get'('explist', $P0, 'Lua::Grammar::assignment')
 }
@@ -270,19 +322,19 @@ transform explist (Lua::Grammar::function_args) :language('PIR') {
     explist = new .ResizablePMCArray
     push explist, past
     .return (explist)
-L1:
+  L1:
     $P0 = node['string']
     if null $P0 goto L2
     past = tree.'get'('past', $P0, 'Lua::Grammar::string')
     explist = new .ResizablePMCArray
     push explist, past
     .return (explist)
-L2:
+  L2:
     $P0 = node['expression_list']
     unless null $P0 goto L3
     explist = new .ResizablePMCArray
     .return (explist)
-L3:
+  L3:
     $P0 = shift $P0
     .return tree.'get'('explist', $P0, 'Lua::Grammar::expression_list')
 }
@@ -295,10 +347,13 @@ transform past (Lua::Grammar::function_stat) :language('PIR') {
     $S0 = $P0.'result_object'()
     $I0 = index $S0, ':'
     if $I0 < 0 goto L1
+    .local pmc symbtab
+    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab.'insert'('self')
     past = new 'PAST::Var'
     past.'init'('node'=>$P0, 'name'=>'self', 'scope'=>'parameter')
     set_hll_global ['Lua::PAST'], '$?self', past
-L1:
+  L1:
     $P0 = node['function_body']
     past = tree.'get'('past', $P0, 'Lua::Grammar::function_body')
     past.'name'($S0)
@@ -314,14 +369,14 @@ transform past (Lua::Grammar::functionname) :language('PIR') {
     $S0 = $P0.'result_object'()
     past = new 'PAST::Var'
     past.'init'('node'=>node, 'name'=>$S0, 'scope'=>'package')
-L2:
+  L2:
     unless iter goto L1
     $P0 = shift iter
     $S0 = $P0.'result_object'()
     key = past.'new'('PAST::Val', 'node'=>$P0, 'vtype'=>'.LuaString', 'name'=>$S0, 'ctype'=>'s~')
     past = past.'new'('PAST::Var', past, key, 'node'=>node, 'scope'=>'keyed')
     goto L2
-L1:
+  L1:
     past.'islvalue'(1)
     .return (past)
 }
@@ -329,13 +384,15 @@ L1:
 
 transform past (Lua::Grammar::function_body) :language('PIR') {
     .local pmc past, parlist, var
+    .local pmc symbtab
+    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
     parlist = new .ResizablePMCArray
     var = get_hll_global ['Lua::PAST'], '$?self'
     if null var goto L1
     push parlist, var
     null var
     set_hll_global ['Lua::PAST'], '$?self', var
-L1:
+  L1:
     $P0 = node['parameter_list']
     if null $P0 goto L2
     $P0 = shift $P0
@@ -344,25 +401,27 @@ L1:
     $P1 = $P1['name']
     .local pmc iter
     iter = new .Iterator, $P1
-L4:
+  L4:
     unless iter goto L3
     $P1 = shift iter
     $S0 = $P1.'result_object'()
+    symbtab.'insert'($S0)
     var = new 'PAST::Var'
     var.'init'('node'=>$P1, 'name'=>$S0, 'scope'=>'parameter')
     push parlist, var
     goto L4
-L3:
+  L3:
     $P1 = $P0['vararg']
     if null $P1 goto L2
     $P1 = shift $P1
     var = new 'PAST::Var'
     var.'init'('node'=>$P1, 'name'=>'...', 'scope'=>'parameter', 'isslurpy'=>1)
     push parlist, var
-L2:
+  L2:
     $P0 = node['block']
     past = tree.'get'('past', $P0, 'Lua::Grammar::block')
-    .return past.'new'('PAST::Block', parlist :flat, past, 'node'=>node, 'pragma'=>':anon :lex')
+    $P0 = new 'Lua::Symbtab'
+    .return past.'new'('PAST::Block', parlist :flat, past, 'node'=>node, 'symtable'=>$P0, 'pragma'=>':anon :lex')
 }
 
 
@@ -377,7 +436,7 @@ transform past (Lua::Grammar::constructor) :language('PIR') {
     .local pmc iter, key, expr, var
     $I0 = 1
     iter = new .Iterator, $P0
-L2:
+  L2:
     unless iter goto L1
     $P0 = shift iter
     $S0 = $P0.'find_key'()
@@ -386,12 +445,12 @@ L2:
     $P1 = tree.'get'('past', $P0, 'Lua::Grammar::expression')
     past.'push'($P1)
     goto L2
-L3:
+  L3:
     $S0 = concat 'Lua::Grammar::', $S0
     $P1 = tree.'get'('record', $P0, $S0)
     past.'push'($P1)
     goto L2
-L1:
+  L1:
     .return (past)
 }
 
@@ -433,13 +492,13 @@ transform explist (Lua::Grammar::expression_list) :language('PIR') {
     $P0 = node['expression']
     .local pmc iter
     iter = new .Iterator, $P0
-L1:
+  L1:
     unless iter goto L2
     $P0 = shift iter
     $P1 = tree.'get'('past', $P0, 'Lua::Grammar::expression')
     push explist, $P1
     goto L1
-L2:
+  L2:
     .return (explist)
 }
 
@@ -458,7 +517,7 @@ transform past (Lua::Grammar::expr) :language('PIR') {
     $P0 = node[$S0]
     $S0 = concat 'Lua::Grammar::', $S0
     .return tree.'get'('past', $P0, $S0)
-L1:
+  L1:
     .local pmc optable, optok
     .local string pirop, returns
     optable = get_hll_global [ 'Lua::Grammar' ], '$optable'
@@ -470,20 +529,20 @@ L1:
     returns = optok['returns']
     past.'init'('node'=>node, 'name'=>type, 'pasttype'=>'pirop', 'pirop'=>pirop, 'returns'=>returns)
     goto L3
-L2:
+  L2:
     $S0 = optok['past']
     past.'init'('node'=>node, 'name'=>type, 'pasttype'=>$S0)
-L3:
+  L3:
     $P0 = node.'get_array'()
     .local pmc iter
     iter = new .Iterator, $P0
-L5:
+  L5:
     unless iter goto L4
     $P0 = shift iter
     $P1 = tree.'get'('past', $P0, 'Lua::Grammar::expr')
     past.'push'($P1)
     goto L5
-L4:
+  L4:
     .return (past)
 }
 
@@ -504,30 +563,30 @@ transform past (Lua::Grammar::primary_expression) :language('PIR') {
     $P0 = node['name']
     if null $P0 goto L1
     iter = new .Iterator, $P0
-L2:
+  L2:
     unless iter goto L1
     $P0 = shift iter
     key = tree.'get'('key', $P0, 'Lua::Grammar::name')
     past = past.'new'('PAST::Var', past, key, 'node'=>node, 'scope'=>'keyed')
     goto L2
-L1:
+  L1:
 
     $P0 = node['index']
     if null $P0 goto L3
     iter = new .Iterator, $P0
-L4:
+  L4:
     unless iter goto L3
     $P0 = shift iter
     key = tree.'get'('key', $P0, 'Lua::Grammar::index')
     past = past.'new'('PAST::Var', past, key, 'node'=>node, 'scope'=>'keyed')
     goto L4
-L3:
+  L3:
 
     $P0 = node['function_args']
     unless null $P0 goto L9
     .return (past)
 
-L9:
+  L9:
     $P0 = shift $P0
     $P1 = tree.'get'('explist', $P0, 'Lua::Grammar::function_args')
     .return past.'new'('PAST::Op', past, $P1 :flat, 'node'=>node, 'pasttype'=>'call')
@@ -544,8 +603,15 @@ transform past (Lua::Grammar::prefix_expression) :language('PIR') {
 
 transform past (Lua::Grammar::name) :language('PIR') {
     .local pmc past
+    .local pmc symbtab
+    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
     $S0 = node.'result_object'()
     past = new 'PAST::Var'
+    $I0 = symbtab.'lookup'($S0)
+    unless $I0 goto L1
+    past.'init'('node'=>node, 'name'=>$S0, 'scope'=>'lexical')
+    .return (past)
+  L1:
     past.'init'('node'=>node, 'name'=>$S0, 'scope'=>'package')
     .return (past)
 }
