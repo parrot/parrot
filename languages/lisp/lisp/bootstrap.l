@@ -88,12 +88,12 @@
 ;; Create the KEYWORD package.
 (sys:%make-package "KEYWORD")
 
-;        (sys:load "lisp/objects.l")
-;        (sys:load "lisp/core.l")
-;        (sys:load "lisp/logic.l")
-;        (sys:load "lisp/pred.l")
-;        (sys:load "lisp/list.l")
-;        (sys:load "lisp/math.l")
+(sys:load "lisp/objects.l")
+(sys:load "lisp/core.l")
+(sys:load "lisp/logic.l")
+(sys:load "lisp/pred.l")
+(sys:load "lisp/list.l")
+(sys:load "lisp/math.l")
 
 ;; Create and alias the COMMON-LISP-USER package.
 (sys:%make-package "COMMON-LISP-USER")
