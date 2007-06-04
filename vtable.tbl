@@ -365,14 +365,7 @@ void remove_method(STRING* method_name) :write
 PMC* inspect()
 PMC* inspect_str(STRING* what)
 
-## Unspecified
-PMC* new_singleton()
-## Unspecified
-PMC* get_anonymous_subclass()
-
-## Deprecated
-void become_parent(PMC* _class)
-## Deprecated
+u# Deprecated
 PMC* subclass(PMC* name)
 
 void freeze(visit_info* info)

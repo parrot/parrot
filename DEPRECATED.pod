@@ -53,13 +53,7 @@ The following vtable methods are deprecated:
 
 =over 4
 
-=item void become_parent(PMC* class)
-
 =item PMC* subclass(PMC* name)
-
-=item PMC* get_anonymous_subclass()
-
-=item PMC* new_singleton()
 
 =back
 
