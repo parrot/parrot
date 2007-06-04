@@ -69,8 +69,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "find_type nested, with key" );
     newclass P1, ["Foo"; "Bar"]
 
     find_type I0, ["Foo"; "Bar"]
-    isgt I0, I0, 0
-    print I0
+    isgt I1, I0, 0
+    print I1
     print "\n"
 
     new P3, I0
