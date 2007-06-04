@@ -47,6 +47,9 @@ There are several variants of some of the above ops; all are deprecated,
 and are replaced by the ops {set,get}_[hll,root]_global. See also
 http://www.parrotcode.org/docs/ops/var.html.
 
+The C<classname> op will deprecated in the 0.5.0 release. It's an exact
+duplicate of the string return variant of the C<typeof> op.
+
 =head1 Deprecated vtable methods
 
 The following vtable methods are deprecated:
