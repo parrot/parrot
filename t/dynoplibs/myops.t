@@ -62,7 +62,11 @@ OUTPUT
 
 {
     my @todo;
-    @todo = ( todo => 'broken with -j' ) if $ENV{TEST_PROG_ARGS} =~ /-j/;
+
+    if ($ENV{TEST_PROG_ARGS}) {
+        @todo = ( todo => 'broken with -j' ) if $ENV{TEST_PROG_ARGS} =~ /-j/;
+    }
+
     my $quine = <<'END_PASM';
 .loadlib "myops_ops"
 q
