@@ -2,6 +2,7 @@
 # $Id$
 package Parrot::Configure::Options::Test;
 use strict;
+use warnings;
 
 our @preconfiguration_tests = qw(
     t/configure/*.t
