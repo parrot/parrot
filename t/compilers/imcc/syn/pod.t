@@ -52,15 +52,15 @@ pass
 ok
 OUT
 
-open FOO, ">", "include.tempfile";
-print FOO <<'ENDF';
+open my $FOO, ">", "include.tempfile";
+print $FOO <<'ENDF';
 
 =head1 Foobar
 
 we don't cut out!!!
 
 ENDF
-close FOO;
+close $FOO;
 
 SKIP: {
     skip( "Closing out of pod from included files", 1 );

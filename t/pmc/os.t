@@ -197,9 +197,9 @@ CODE
 SKIP: {
     skip 'not implemented on windows yet', 1 if ( $MSWin32 && $MSVC );
 
-    opendir IN, '.';
-    my @entries = readdir IN;
-    closedir IN;
+    opendir my $IN, '.';
+    my @entries = readdir $IN;
+    closedir $IN;
     my $entries = join( ' ', @entries ) . "\n";
     pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
 .sub main :main
@@ -215,8 +215,8 @@ CODE
 
 # test rename
 SKIP: {
-    open FILE, ">", "____some_test_file";
-    close FILE;
+    open my $FILE, ">", "____some_test_file";
+    close $FILE;
     pir_output_is( <<'CODE', <<"OUT", 'Test OS.rename' );
 .sub main :main
     $P1 = new .OS

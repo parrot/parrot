@@ -157,11 +157,11 @@ pasm_output_is( <<'CODE', 'foo', 'constant defined, used in a macro call' );
   end
 CODE
 
-open FOO, '>', 'macro.tempfile';
-print FOO <<'ENDF';
+open my $FOO, '>', 'macro.tempfile';
+print $FOO <<'ENDF';
   set S0, "Betelgeuse\n"
 ENDF
-close FOO;
+close $FOO;
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'basic include macro' );
 .include "macro.tempfile"
@@ -176,8 +176,8 @@ Betelgeuse
 Betelgeuse
 OUTPUT
 
-open FOO, '>', 'macro.tempfile';    # Clobber previous
-print FOO <<'ENDF';
+open $FOO, '>', 'macro.tempfile';    # Clobber previous
+print $FOO <<'ENDF';
 .macro multiply(A,B)
     new P0, .Float
     set P0, .A
@@ -187,7 +187,7 @@ print FOO <<'ENDF';
     mul P2, P1, P0
 .endm
 ENDF
-close FOO;
+close $FOO;
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'include a file defining a macro' );
 .include "macro.tempfile"
