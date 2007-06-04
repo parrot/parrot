@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2004, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -15,26 +15,23 @@ These stacks all differ only in the size of items.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
+#include "parrot/stacks.h"
 #include <assert.h>
+
+/* HEADER: include/parrot/stacks.h */
 
 /*
 
-=item C<void stack_system_init(Interp *interp)>
-
+FUNCDOC:
 Called from C<make_interpreter()> to initialize the interpreter's
 register stacks.
 
-=cut
-
 */
 
+PARROT_API
 void
 stack_system_init(Interp *interp)
 {
@@ -43,18 +40,15 @@ stack_system_init(Interp *interp)
 
 /*
 
-=item C<Stack_Chunk_t *
-register_new_stack(Interp *interp, const char *name, size_t item_size)>
-
+FUNCDOC:
 Create a new stack and name it. C<< stack->name >> is used for
 debugging/error reporting.
 
-=cut
-
 */
 
-Stack_Chunk_t * register_new_stack(Interp *interp,
-                                   const char *name /*NN*/, size_t item_size)
+PARROT_API
+Stack_Chunk_t *
+register_new_stack(Interp *interp, const char *name /*NN*/, size_t item_size)
 {
     Stack_Chunk_t *chunk;
 
@@ -69,17 +63,14 @@ Stack_Chunk_t * register_new_stack(Interp *interp,
 
 /*
 
-=item C<Stack_Chunk_t *
-cst_new_stack_chunk(Interp *interp, const Stack_Chunk_t *chunk)>
-
+FUNCDOC:
 Get a new chunk either from the freelist or allocate one.
-
-=cut
 
 */
 
-Stack_Chunk_t *cst_new_stack_chunk(Parrot_Interp interp,
-                                   const Stack_Chunk_t *chunk /*NN*/)
+PARROT_API
+Stack_Chunk_t *
+cst_new_stack_chunk(Parrot_Interp interp, const Stack_Chunk_t *chunk /*NN*/)
 {
     Small_Object_Pool * const pool =
         get_bufferlike_pool(interp, chunk->size);
@@ -95,15 +86,12 @@ Stack_Chunk_t *cst_new_stack_chunk(Parrot_Interp interp,
 
 /*
 
-=item C<void*
-stack_prepare_push(Parrot_Interp interp, Stack_Chunk_t **stack_p)>
-
+FUNCDOC:
 Return a pointer, where new entries go for push.
-
-=cut
 
 */
 
+PARROT_API
 void*
 stack_prepare_push(Parrot_Interp interp, Stack_Chunk_t **stack_p /*NN*/)
 {
@@ -118,15 +106,12 @@ stack_prepare_push(Parrot_Interp interp, Stack_Chunk_t **stack_p /*NN*/)
 
 /*
 
-=item C<void*
-stack_prepare_pop(Parrot_Interp interp, Stack_Chunk_t **stack_p)>
-
+FUNCDOC:
 Return a pointer, where new entries are poped off.
-
-=cut
 
 */
 
+PARROT_API
 void*
 stack_prepare_pop(Parrot_Interp interp, Stack_Chunk_t **stack_p /*NN*/)
 {
@@ -143,8 +128,6 @@ stack_prepare_pop(Parrot_Interp interp, Stack_Chunk_t **stack_p /*NN*/)
 }
 
 /*
-
-=back
 
 =head1 SEE ALSO
 
