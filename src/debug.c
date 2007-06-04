@@ -29,25 +29,14 @@ debugger, and the C<debug> ops.
 #include "parrot/debug.h"
 #include "parrot/oplib/ops.h"
 
-
 static const char* GDB_P(Interp *interp, const char *s);
-
-/* na(c) [Next Argument (Char pointer)]
- *
- * Moves the pointer to the next argument in the user input.
- */
-#define na(c) { \
-    while (*c && !isspace((int) *c)) \
-        c++; \
-    while (*c && isspace((int) *c)) \
-        c++; }
 
 /*
 
 =item C<static char* nextarg(char *command)>
 
 Returns the position just past the current argument in the PASM instruction
-C<command>. This is not the same as C<na()>, above, which is intended for
+C<command>. This is not the same as C<skip_command()>, which is intended for
 debugger commands. This function is used for C<eval>.
 
 =cut
@@ -97,7 +86,7 @@ skip_ws(const char *str)
 =item C<static const char* skip_command(const char *str)>
 
 Returns the pointer past the current debugger command. (This is an
-alternative to the C<na()> macro above.)
+alternative to the C<skip_command()> macro above.)
 
 =cut
 
@@ -238,7 +227,7 @@ parse_key(Interp *interp, const char *str, PMC **keyP)
 
 /*
 
-=item C<static const char*
+=item C<static const char *
 parse_command(const char *command, unsigned long *cmdP)>
 
 Convert the command at the beginning of a string into a numeric value
@@ -248,7 +237,7 @@ that can be used as a switch key for fast lookup.
 
 */
 
-static const char*
+static const char *
 parse_command(const char *command, unsigned long *cmdP)
 {
     int           i;
@@ -379,7 +368,7 @@ PDB_run_command(Interp *interp, const char *command)
     command = parse_command(command, &c);
 
     if (command)
-        na(command);
+        skip_command(command);
 
     switch (c) {
         case c_disassemble:
@@ -508,8 +497,7 @@ PDB_next(Interp *interp, const char *command)
 =item C<void
 PDB_trace(Interp *interp, const char *command)>
 
-Execute the next N operations; if no number is specified, it defaults to
-1.
+Execute the next N operations; if no number is specified, it defaults to 1.
 
 =cut
 
@@ -522,15 +510,19 @@ PDB_trace(Interp *interp, const char *command)
     PDB_t         *pdb = interp->pdb;
     Interp        *debugee;
 
+    /* if debugger is not running yet, initialize */
     if (!(pdb->state & PDB_RUNNING))
         PDB_init(interp, command);
 
+    /* if the number of ops to run is specified, convert to a long */
     if (command && isdigit((int) *command))
         n = atol(command);
 
+    /* clear the PDB_STOPPED flag, we'll be running n ops now */
     pdb->state &= ~PDB_STOPPED;
     debugee     = pdb->debugee;
 
+    /* execute n ops */
     for (; n && pdb->cur_opcode; n--) {
         trace_op(debugee,
                 debugee->code->base.data,
@@ -540,6 +532,7 @@ PDB_trace(Interp *interp, const char *command)
         DO_OP(pdb->cur_opcode, debugee);
     }
 
+    /* we just stopped */
     pdb->state |= PDB_STOPPED;
 
     /* If program ended */
@@ -604,11 +597,14 @@ PDB_cond(Interp *interp, const char *command)
      * condition. */
     command++;
 
+    /* XXX Does /this/ have to do with the fact that PASM registers used to have
+     * maximum of 2 digits? If so, there should be a while loop, I think.
+     */
     if (condition->reg > 9)
         command++;
 
     if (*command == ' ')
-        na(command);
+        skip_command(command);
 
     /* Now the condition */
     switch (*command) {
@@ -646,13 +642,14 @@ INV_COND:   PIO_eprintf(interp, "Invalid condition\n");
             return NULL;
     }
 
+    /* if there's an '=', skip it */
     if (*(command + 1) == '=')
         command += 2;
     else
-        command ++;
+        command++;
 
     if (*command == ' ')
-        na(command);
+        skip_command(command);
 
     /* return if no more arguments */
     if (!(command && *command)) {
@@ -797,7 +794,7 @@ PDB_set_break(Interp *interp, const char *command)
         /* Abort if the line number provided doesn't exist */
         if (!line->next) {
             PIO_eprintf(interp,
-                        "Can't set a breakpoint at line number %li\n",ln);
+                "Can't set a breakpoint at line number %li\n", ln);
             return;
         }
     }
@@ -822,13 +819,13 @@ PDB_set_break(Interp *interp, const char *command)
     /* Allocate the new break point */
     newbreak = mem_allocate_typed(PDB_breakpoint_t);
 
-    na(command);
+    skip_command(command);
     condition = NULL;
 
     /* if there is another argument to break, besides the line number,
      * it should be an 'if', so we call another handler. */
     if (command && *command) {
-        na(command);
+        skip_command(command);
         if ((condition = PDB_cond(interp, command)))
             newbreak->condition = condition;
     }
@@ -989,10 +986,9 @@ PDB_disable_breakpoint(Interp *interp, const char *command)
 {
     PDB_breakpoint_t *breakpoint = PDB_find_breakpoint(interp, command);
 
+    /* if the breakpoint exists, disable it. */
     if (breakpoint)
         breakpoint->skip = -1;
-
-    return;
 }
 
 /*
@@ -1012,10 +1008,9 @@ PDB_enable_breakpoint(Interp *interp, const char *command)
 {
     PDB_breakpoint_t *breakpoint = PDB_find_breakpoint(interp, command);
 
+    /* if the breakpoint exists, and it was disabled, enable it. */
     if (breakpoint && breakpoint->skip == -1)
         breakpoint->skip = 0;
-
-    return;
 }
 
 /*
@@ -1941,11 +1936,18 @@ PDB_hasinstruction(char *c)
 {
     char h = 0;
 
+    /* as long as c is not NULL, we're not looking at a comment (#...) or a '\n'... */
     while (*c && *c != '#' && *c != '\n') {
-        if (isalnum((int) *c) || *c == '"')
+        /* ... and c is alphanumeric or a quoted string then the line contains
+         * an instruction. */
+        if (isalnum((int) *c) || *c == '"') {
             h = 1;
-        else if (*c == ':')
+        }
+        else if (*c == ':') {
+            /* this is a label. XXX right? */
             h = 0;
+        }
+
         c++;
     }
 
@@ -1986,7 +1988,7 @@ PDB_list(Interp *interp, const char *command)
         else
             pdb->file->list_line = (unsigned long) line_number;
 
-        na(command);
+        skip_command(command);
     }
     else {
         pdb->file->list_line = 0;
@@ -1995,7 +1997,7 @@ PDB_list(Interp *interp, const char *command)
     /* set the number of lines to print */
     if (isdigit((int) *command)) {
         n = atol(command);
-        na(command);
+        skip_command(command);
     }
 
     /* if n is zero, we simply return, as we don't have to print anything */
