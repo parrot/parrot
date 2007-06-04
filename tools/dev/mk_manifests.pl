@@ -117,9 +117,9 @@ while (<>) {
 
 while ( my ( $package, $files ) = each %FILES ) {
     my $manifest = "MANIFEST.$package";
-    open( MANIFEST, ">", "$manifest" ) or die "create $manifest: $!";
-    print MANIFEST "$_\n" foreach (@$files);
-    close MANIFEST;
+    open( my $MANIFEST, ">", "$manifest" ) or die "create $manifest: $!";
+    print $MANIFEST "$_\n" foreach (@$files);
+    close $MANIFEST;
     print "Wrote $manifest\n";
 }
 

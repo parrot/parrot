@@ -52,9 +52,9 @@ my @topsrcdir = @toolsrcdir[ 0 .. $#toolsrcdir - 2 ];
 my $topsrcdir = File::Spec->catdir(@topsrcdir);
 my $manifest  = File::Spec->catfile( $topsrcdir, "MANIFEST" );
 my @srcfiles  = ();
-if ( open( MANIFEST, '<', $manifest ) ) {
+if ( open( my $MANIFEST, '<', $manifest ) ) {
     my %dstdir;
-    while (<MANIFEST>) {
+    while (<$MANIFEST>) {
         next if /^\#/;
         if (/^(.+?)\s+\[/) {
             my $manifile = $1;
@@ -101,7 +101,7 @@ if ( open( MANIFEST, '<', $manifest ) ) {
         }
     }
     warn "$self: could not find any files to symlink\n" unless @srcfiles;
-    close(MANIFEST);
+    close($MANIFEST);
 }
 else {
     die "$self: Failed to open $manifest: $!\n";

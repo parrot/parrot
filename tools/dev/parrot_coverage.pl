@@ -97,10 +97,10 @@ foreach my $da_file (@dafiles) {
     # block (.bb) files.
     my $cmd = "gcov -f -b -o $dirname $src_filename";
     print "Running $cmd\n" if $DEBUG;
-    open( GCOVSUMMARY, '<', "$cmd |" ) or die "Error invoking '$cmd': $!";
+    open( my $GCOVSUMMARY, '<', "$cmd |" ) or die "Error invoking '$cmd': $!";
     my $tmp;
     my %generated_files;
-    while (<GCOVSUMMARY>) {
+    while (<$GCOVSUMMARY>) {
         if (/^Creating (.*)\./) {
             my $path = "$dirname/$1";
             rename( $1, "$dirname/$1" )
@@ -113,7 +113,7 @@ foreach my $da_file (@dafiles) {
             $tmp .= $_;
         }
     }
-    close(GCOVSUMMARY);
+    close($GCOVSUMMARY);
 
     foreach my $gcov_file ( keys %generated_files ) {
         my $source_file = $gcov_file;
@@ -192,7 +192,7 @@ exit(0);
 
 sub write_index {
     print "Writing $HTMLDIR/index.html..\n" if $DEBUG;
-    open( OUT, ">", "$HTMLDIR/index.html" )
+    open( my $OUT, ">", "$HTMLDIR/index.html" )
         or die "Can't open $HTMLDIR/index.html for writing: $!\n";
 
     $totals{line_coverage} = sprintf( "%.2f",
@@ -202,8 +202,8 @@ sub write_index {
     $totals{call_coverage} = sprintf( "%.2f",
         ( $totals{calls} ? ( $totals{covered_calls} / $totals{calls} * 100 ) : 0 ) );
 
-    print OUT page_header("Parrot Test Coverage");
-    print OUT qq(
+    print $OUT page_header("Parrot Test Coverage");
+    print $OUT qq(
             <ul>
               <li><a href="file_summary.html">File Summary</a>
               <li><a href="function_summary.html">Function Summary</a>
@@ -224,17 +224,17 @@ sub write_index {
             </table>
             </ul>
     );
-    print OUT page_footer();
+    print $OUT page_footer();
 }
 
 sub write_file_coverage_summary {
 
     print "Writing $HTMLDIR/file_summary.html..\n" if $DEBUG;
-    open( OUT, ">", "$HTMLDIR/file_summary.html" )
+    open( my $OUT, ">", "$HTMLDIR/file_summary.html" )
         or die "Can't open $HTMLDIR/file_summary.html for writing: $!\n";
 
-    print OUT page_header("File Coverage Summary");
-    print OUT qq(
+    print $OUT page_header("File Coverage Summary");
+    print $OUT qq(
             <i>You may click on a percentage to see line-by-line detail</i>
             <table border="1">
               <tbody>
@@ -250,7 +250,7 @@ sub write_file_coverage_summary {
         my $outfile_base = $source_file;
         $outfile_base =~ s/\//_/g;
 
-        print OUT qq(
+        print $OUT qq(
            <tr>
              <td>$source_file</td>
              <td><a href="$outfile_base.lines.html">@{[$file_line_coverage{$source_file} ? "$file_line_coverage{$source_file} %" : "n/a" ]}</a></td>
@@ -261,29 +261,29 @@ sub write_file_coverage_summary {
        );
     }
 
-    print OUT qq(
+    print $OUT qq(
             </tbody>
           </table>
     );
-    print OUT page_footer();
+    print $OUT page_footer();
 
-    close(OUT);
+    close($OUT);
 }
 
 sub write_function_coverage_summary {
 
     print "Writing $HTMLDIR/function_summary.html..\n" if $DEBUG;
-    open( OUT, ">", "$HTMLDIR/function_summary.html" )
+    open( my $OUT, ">", "$HTMLDIR/function_summary.html" )
         or die "Can't open $HTMLDIR/function_summary.html for writing: $!\n";
 
-    print OUT page_header("Function Coverage Summary");
-    print OUT qq(
+    print $OUT page_header("Function Coverage Summary");
+    print $OUT qq(
             <i>You may click on a percentage to see line-by-line detail</i>
     );
 
     foreach my $source_file ( sort keys %file_line_coverage ) {
 
-        print OUT qq(
+        print $OUT qq(
             <hr noshade>
             <a name="$source_file"></a>
             <b>File: $source_file</b><br>
@@ -301,7 +301,7 @@ sub write_function_coverage_summary {
 
         foreach my $function ( sort keys %{ $function_line_coverage{$source_file} } ) {
 
-            print OUT qq(
+            print $OUT qq(
            <tr>
              <td>$function</td>
              <td><a href="$outfile_base.lines.html#$function">@{[$function_line_coverage{$source_file}{$function} ? "$function_line_coverage{$source_file}{$function} %" : "n/a" ]}</a></td>
@@ -310,15 +310,15 @@ sub write_function_coverage_summary {
            </tr>
             );
         }
-        print OUT qq(
+        print $OUT qq(
             </tbody>
             </table>
         );
     }
 
-    print OUT page_footer();
+    print $OUT page_footer();
 
-    close(OUT);
+    close($OUT);
 }
 
 sub filter_gcov {
@@ -333,61 +333,62 @@ sub filter_gcov {
 
     my $outfile = "$outfile_base.lines.html";
     print "Writing $outfile..\n" if $DEBUG;
-    open( IN,  "<", "$infile" )  or die "Can't read $infile: $!\n";
-    open( OUT, ">", "$outfile" ) or die "Can't write $outfile: $!\n";
+    our ($IN, $OUT);
+    open( $IN,  "<", "$infile" )  or die "Can't read $infile: $!\n";
+    open( $OUT, ">", "$outfile" ) or die "Can't write $outfile: $!\n";
 
-    print OUT page_header("Line Coverage for $source_file");
-    print OUT "<pre>";
+    print $OUT page_header("Line Coverage for $source_file");
+    print $OUT "<pre>";
 
     # filter out any branch or call coverage lines.
     do_filter( sub { /^(call|branch)/ } );
 
-    print OUT "</pre>";
-    print OUT page_footer();
+    print $OUT "</pre>";
+    print $OUT page_footer();
 
-    close(OUT);
-    close(IN);
+    close($OUT);
+    close($IN);
 
     $outfile = "$outfile_base.branches.html";
     print "Writing $outfile..\n" if $DEBUG;
-    open( IN,  "<", "$infile" )  or die "Can't read $infile: $!\n";
-    open( OUT, ">", "$outfile" ) or die "Can't write $outfile: $!\n";
+    open( $IN,  "<", "$infile" )  or die "Can't read $infile: $!\n";
+    open( $OUT, ">", "$outfile" ) or die "Can't write $outfile: $!\n";
 
-    print OUT page_header("Branch Coverage for $source_file");
-    print OUT "<pre>";
+    print $OUT page_header("Branch Coverage for $source_file");
+    print $OUT "<pre>";
 
     # filter out any call coverage lines.
     do_filter( sub { /^call/ } );
 
-    print OUT "</pre>";
-    print OUT page_footer();
+    print $OUT "</pre>";
+    print $OUT page_footer();
 
-    close(OUT);
-    close(IN);
+    close($OUT);
+    close($IN);
 
     $outfile = "$outfile_base.calls.html";
     print "Writing $outfile..\n" if $DEBUG;
-    open( IN,  "<", "$infile" )  or die "Can't read $infile: $!\n";
-    open( OUT, ">", "$outfile" ) or die "Can't write $outfile: $!\n";
+    open( $IN,  "<", "$infile" )  or die "Can't read $infile: $!\n";
+    open( $OUT, ">", "$outfile" ) or die "Can't write $outfile: $!\n";
 
-    print OUT page_header("Call Coverage for $source_file");
-    print OUT "<pre>";
+    print $OUT page_header("Call Coverage for $source_file");
+    print $OUT "<pre>";
 
     # filter out any branch coverage lines.
     do_filter( sub { /^branch/ } );
 
-    print OUT "</pre>";
-    print OUT page_footer();
+    print $OUT "</pre>";
+    print $OUT page_footer();
 
-    close(OUT);
-    close(IN);
+    close($OUT);
+    close($IN);
 
     return;
 
     sub do_filter {
         my ($skip_func) = @_;
 
-        while (<IN>) {
+        while (<$IN>) {
             s/&/&amp;/g;
             s/</&lt;/g;
             s/>/&gt;/g;
@@ -401,25 +402,25 @@ sub filter_gcov {
 
             my ($initial) = substr( $_, 0, 16 );
             if ( $initial =~ /^\s*\d+\s*$/ ) {
-                print OUT qq($atag<font color="green">$_</font>);
+                print $OUT qq($atag<font color="green">$_</font>);
             }
             elsif ( $_ =~ /branch \d+ taken = 0%/ ) {
-                print OUT qq($atag<font color="red">$_</font>);
+                print $OUT qq($atag<font color="red">$_</font>);
             }
             elsif ( $_ =~ /call \d+ returns = 0%/ ) {
-                print OUT qq($atag<font color="red">$_</font>);
+                print $OUT qq($atag<font color="red">$_</font>);
             }
             elsif ( $_ =~ /^call \d+ never executed/ ) {
-                print OUT qq($atag<font color="red">$_</font>);
+                print $OUT qq($atag<font color="red">$_</font>);
             }
             elsif ( $_ =~ /^branch \d+ never executed/ ) {
-                print OUT qq($atag<font color="red">$_</font>);
+                print $OUT qq($atag<font color="red">$_</font>);
             }
             elsif ( $initial =~ /\#\#\#/ ) {
-                print OUT qq($atag<font color="red">$_</font>);
+                print $OUT qq($atag<font color="red">$_</font>);
             }
             else {
-                print OUT $_;
+                print $OUT $_;
             }
         }
     }

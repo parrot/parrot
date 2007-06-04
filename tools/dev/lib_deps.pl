@@ -101,7 +101,7 @@ sub do_source {
     print "Running cxref (pass 1)\n";
     system("$cmd > $devnull 2>$devnull");
     print "Running cxref (pass 2)\n";
-    open( F, '<', "$cmd 2>$devnull|" )
+    open( my $F, '<', "$cmd 2>$devnull|" )
         || die "Can't run $cmd.\n";
 
     my %external_calls;
@@ -109,7 +109,7 @@ sub do_source {
     my %variable_visible;
     my %system_include;
     my ( $file, $function, $variable );
-    while (<F>) {
+    while (<$F>) {
 
         if (/----------------------------------------/) {
             undef $file if defined($file);
@@ -182,7 +182,7 @@ sub do_source {
         }
     }
 
-    close(F);
+    close($F);
 
     # filter out things that start with _.  Probably internal libc stuff.
     my @external_calls          = grep { !/^_/ } sort keys %external_calls;
@@ -215,9 +215,9 @@ sub do_source {
 
 sub do_object {
     foreach my $obj (@files) {
-        open( F, '<', "nm -a $obj|" ) || die "Can't run nm on $obj\n";
+        open( my $F, '<', "nm -a $obj|" ) || die "Can't run nm on $obj\n";
 
-        while (<F>) {
+        while (<$F>) {
             chomp;
 
             my ( $type, $symbol ) = /^........ (\S) (.*)/;
@@ -231,7 +231,7 @@ sub do_object {
             }
         }
 
-        close(F);
+        close($F);
     }
 
     # omit symbols which begin with _.  These are likely to be internal

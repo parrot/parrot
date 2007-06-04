@@ -65,11 +65,11 @@ sub create_s {
 
 sub parse_s {
     my $s = shift;
-    open IN, "<", "$s" or die "Can't read '$s': $1";
+    open my $IN, "<", "$s" or die "Can't read '$s': $1";
     my ($in_comment);
     $in_comment = 1;
     print "/*\n";
-    while (<IN>) {
+    while (<$IN>) {
         next if (/^\f/);             # FF
         next if (/#(?:NO_)?APP/);    # APP, NO_APP
         chomp;
@@ -101,16 +101,16 @@ sub parse_s {
     }
     print "    0x00\n";
     print "};\n";
-    close IN;
+    close $IN;
 }
 
 sub add_glue {
     my $s = shift;
-    open IN, "<", "$s" or die "Can't read '$s': $1";
-    while (<IN>) {
+    open $IN, "<", "$s" or die "Can't read '$s': $1";
+    while (<$IN>) {
         if (/\/\*INTERFACE/) {
             my $text = "";
-            while (<IN>) {
+            while (<$IN>) {
                 last if (/INTERFACE\*\//);
                 $text .= $_;
             }
@@ -120,7 +120,7 @@ sub add_glue {
             print $text;
         }
     }
-    close IN;
+    close $IN;
 }
 
 # Local Variables:

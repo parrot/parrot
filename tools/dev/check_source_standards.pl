@@ -56,12 +56,12 @@ exit 0;
 ###############################################################################
 
 sub check_manifest {
-    open( F, "<", "MANIFEST" ) || die "Unable to read MANIFEST: $!\n";
+    open( my $F, "<", "MANIFEST" ) || die "Unable to read MANIFEST: $!\n";
 
     my %files_in_dir_nocase;
     my %files_in_dir_8dot3;
     my $line = 0;
-    while (<F>) {
+    while (<$F>) {
         $line++;
 
         chomp;
@@ -98,7 +98,7 @@ sub check_manifest {
         $files_in_dir_nocase{$dirname}{ lc($filename) } = $_;
     }
 
-    close(F);
+    close($F);
 }
 
 sub info {

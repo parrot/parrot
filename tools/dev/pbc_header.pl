@@ -35,9 +35,9 @@ sub get_fp {
 
     # s. also fingerprint_c.pl
     my $compat_file = 'PBC_COMPAT';
-    open IN, '<', $compat_file or die "Can't read $compat_file";
-    my @lines = <IN>;
-    close IN;
+    open my $IN, '<', $compat_file or die "Can't read $compat_file";
+    my @lines = <$IN>;
+    close $IN;
 
     my $len = 10;
     my $fingerprint = md5 join "\n", grep { !/^#/ } @lines;
@@ -46,9 +46,9 @@ sub get_fp {
 
 sub get_version {
     my $version_file = 'VERSION';
-    open IN, '<', $version_file or die "Can't read $version_file";
-    my $v = <IN>;
-    close IN;
+    open my $IN, '<', $version_file or die "Can't read $version_file";
+    my $v = <$IN>;
+    close $IN;
     $v =~ /^(\d+)\.(\d+)/;
     ( $1, $2 );
 }
@@ -58,20 +58,20 @@ sub update_fp {
     my $fp = get_fp;
     my ( $major, $minor ) = get_version;
     for my $f (@args) {
-        open F, "+<", "$f" or die "Can't open $f: $!";
-        seek F, 2, 0;    # pos 2: major, minor
-        print F pack "cc", $major, $minor;
-        seek F, 6, 0;    # pos 6: pad = finger_print
-        print F $fp;
-        close F;
+        open my $F, "+<", "$f" or die "Can't open $f: $!";
+        seek $F, 2, 0;    # pos 2: major, minor
+        print $F pack "cc", $major, $minor;
+        seek $F, 6, 0;    # pos 6: pad = finger_print
+        print $F $fp;
+        close $F;
     }
 }
 
 sub pbc_info {
     for my $f (@ARGV) {
-        open F, "<", "$f" or die "Can't open $f: $!";
+        open my $F, "<", "$f" or die "Can't open $f: $!";
         my $header;
-        read F, $header, 16;
+        read $F, $header, 16;
         my (@fields) = qw( wordsize byteorder major minor
             intvalsize floattype );
         print "$f\n";

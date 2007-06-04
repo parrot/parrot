@@ -218,9 +218,9 @@ else {
 }
 print "\n";
 
-open( COPYOUT, ">&STDOUT" ) or die "Unable to copy STDOUT";
+open( my $COPYOUT, ">&STDOUT" ) or die "Unable to copy STDOUT";
 open( STDOUT, '>', File::Spec->devnull ) or die "Unable to redirect STDOUT";
-select COPYOUT;
+select $COPYOUT;
 $| = 1;
 
 my @max = $cfg{method} == 1 ? (5) x @program : (6) x @program;

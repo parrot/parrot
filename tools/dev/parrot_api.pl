@@ -149,13 +149,13 @@ $| = 1;
 my @H = qw(include/parrot/embed.h include/parrot/extend.h);
 
 for my $h (@H) {
-    if ( open( H, '<', $h ) ) {
-        while (<H>) {
+    if ( open( my $H, '<', $h ) ) {
+        while (<$H>) {
             if (/^\w+\s+(Parrot_\w+)\(/) {
                 $ParrotAPI{$1}++;
             }
         }
-        close(H);
+        close($H);
     }
     else {
         die "$0: Header '$h': $!\n";

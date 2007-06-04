@@ -124,16 +124,16 @@ sub write_buildscripts {
     ## GCC ##
 
     print "- miniparrot/build_gcc.sh\n";
-    open( F, ">", "miniparrot/build_gcc.sh" )
+    open( my $F, ">", "miniparrot/build_gcc.sh" )
         || die "Unable to write miniparrot/build_gcc.sh: $!\n";
-    print F "#!/bin/sh\n";
-    print F "\nset -x -e\n";
+    print $F "#!/bin/sh\n";
+    print $F "\nset -x -e\n";
     foreach (@compiled_files) {
-        print F "gcc -DMINIPARROT -I./include -c $_->[0] -o $_->[1]\n";
+        print $F "gcc -DMINIPARROT -I./include -c $_->[0] -o $_->[1]\n";
     }
     my @obj_files = map { $_->[1] } @compiled_files;
-    print F "gcc -lm -o parrot " . ( join ' ', @obj_files ) . "\n";
-    close(F);
+    print $F "gcc -lm -o parrot " . ( join ' ', @obj_files ) . "\n";
+    close($F);
 }
 
 ############################################################################

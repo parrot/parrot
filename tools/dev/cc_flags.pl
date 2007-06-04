@@ -32,11 +32,11 @@ use warnings;
 
 my $cflags = shift;
 
-open F, '<', $cflags or die "open $cflags: $!\n";
+open my $F, '<', $cflags or die "open $cflags: $!\n";
 
 my @options;
 
-while (<F>) {
+while (<$F>) {
     chomp;
     s/#.*//;
     next unless /\S/;
