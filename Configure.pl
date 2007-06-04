@@ -321,7 +321,7 @@ my $args = process_options( {
 exit unless defined $args;
 
 my $opttest = Parrot::Configure::Options::Test->new($args);
-# configuration tests will only be run if you requested them 
+# configuration tests will only be run if you requested them
 # as command-line option
 $opttest->run_configure_tests();
 
@@ -350,7 +350,7 @@ else {
     $conf->runsteps or exit(1);
 }
 
-# build tests will only be run if you requested them 
+# build tests will only be run if you requested them
 # as command-line option
 $opttest->run_build_tests();
 
