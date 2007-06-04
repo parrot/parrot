@@ -84,7 +84,7 @@ my $warnpattern =
         untie *STDERR or croak "Unable to untie";
         ok( $rv, "gen_c completed successfully; args:  default.pmc" );
         $msg = join("\n", @lines);
-        like( $msg, 
+        like( $msg,
             $warnpattern,
             "Warnings from Parrot::Pmc2c re 4 unknown methods have been captured"
         );
@@ -138,7 +138,7 @@ my $warnpattern =
         untie *STDERR or croak "Unable to untie";
         ok( $rv, "gen_c completed successfully; args:  default.pmc and array.pmc" );
         $msg = join("\n", @lines);
-        like( $msg, 
+        like( $msg,
             $warnpattern,
             "Warnings from Parrot::Pmc2c re 4 unknown methods have been captured"
         );
@@ -198,7 +198,7 @@ my $warnpattern =
         ok( $rv, "gen_c completed successfully; args:  default.pmc" );
         like( $dmsg, qr{src/pmc/default\.pmc}, "debug option worked" );
         $msg = join("\n", @lines);
-        like( $msg, 
+        like( $msg,
             $warnpattern,
             "Warnings from Parrot::Pmc2c re 4 unknown methods have been captured"
         );
@@ -271,7 +271,7 @@ my $warnpattern =
         ok( $rv, "gen_c completed successfully; args:  default.pmc" );
         like( $dmsg, qr{src/pmc/default\.pmc}, "debug option worked" );
         $msg = join("\n", @lines);
-        like( $msg, 
+        like( $msg,
             $warnpattern,
             "Warnings from Parrot::Pmc2c re 4 unknown methods have been captured"
         );
@@ -368,7 +368,7 @@ my $warnpattern =
         untie *STDERR or croak "Unable to untie";
         ok( $rv, "gen_c completed successfully; args:  default.pmc and class.pmc" );
         $msg = join("\n", @lines);
-        like( $msg, 
+        like( $msg,
             $warnpattern,
             "Warnings from Parrot::Pmc2c re 4 unknown methods have been captured"
         );

@@ -247,7 +247,7 @@ DUMMYOPS
         ok( $self->sort_ops(), "sort_ops returned successfully" );
         $msg = $tie->READLINE;
         untie *STDERR;
-        
+
         like(
             $msg,
             qr|not in ops\.num nor ops\.skip|,

@@ -48,7 +48,7 @@ is( `"$PARROT" "$first" "asdf"`,    "first\n", 'ignore nonsense' );
 my $redir = '2>' . File::Spec->devnull;
 
 # --pre-process-only
-# This is just sanity testing 
+# This is just sanity testing
 # Coredumps after the output has been written are ignored
 is( `"$PARROT" -E "$first" $redir`, <<'END_EXPECTED', 'option -E' );
 .sub main :main

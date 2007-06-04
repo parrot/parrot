@@ -63,25 +63,25 @@ TEST
 
     my $reason = q{Devel::Cover gags on this test};
 
-    @Parrot::Configure::Options::Test::preconfiguration_tests = 
+    @Parrot::Configure::Options::Test::preconfiguration_tests =
         ( $test );
     {
         $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
             or croak "Unable to tie";
         SKIP: {
-            skip $reason, 1 if $ENV{PERL5OPT};        
+            skip $reason, 1 if $ENV{PERL5OPT};
             ok($opttest->run_configure_tests(),
                 "Configuration tests are runnable");
         }
     }
 
-    @Parrot::Configure::Options::Test::postconfiguration_tests = 
+    @Parrot::Configure::Options::Test::postconfiguration_tests =
         ( $test );
     {
         $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
             or croak "Unable to tie";
         SKIP: {
-            skip $reason, 1 if $ENV{PERL5OPT};        
+            skip $reason, 1 if $ENV{PERL5OPT};
             ok($opttest->run_build_tests(),
                 "Build tests are runnable");
         }
