@@ -136,7 +136,7 @@ function, and so have no direct access to local variables.
     .local string buffer
     .local pmc stdin
     stdin = getstdin
-L1:
+  L1:
     printerr 'lua_debug> '
     buffer = readline stdin
     if buffer == '' goto L2
@@ -147,18 +147,18 @@ L1:
     printerr $S0
     printerr "\n"
     goto L1
-L3:
+  L3:
     push_eh _handler
     $P0()
     goto L1
-_handler:
+  _handler:
     .local pmc e
     .local string msg
     .get_results (e, msg)
     printerr msg
     printerr "\n"
     goto L1
-L2:
+  L2:
 .end
 
 
@@ -295,7 +295,7 @@ Sets the environment of the given C<object> to the given C<table>.
     $I0 = lua_setfenv(o, table)
     unless $I0 goto L1
     .return (o)
-L1:
+  L1:
     lua_error("'setfenv' cannot change environment of given object")
 .end
 
@@ -379,9 +379,9 @@ be B<nil>).
     if $I0 goto L2
     $I0 = isa metatable, 'LuaTable'
     if $I0 goto L2
-L1:
+  L1:
     lua_argerror(2, "nil or table expected")
-L2:
+  L2:
     table.'set_metatable'(metatable)
     new res, .LuaBoolean
     set res, 1

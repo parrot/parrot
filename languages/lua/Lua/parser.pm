@@ -3862,7 +3862,7 @@ sub Generate {
                 die;
             }
         }
-        print {$FH} "  # end of prolog\n";
+        print {$FH} "    # end of prolog\n";
         foreach my $op ( @{$fct} ) {
             $op->visit($generator) unless ( exists $op->{prolog} );
         }

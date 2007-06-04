@@ -109,10 +109,10 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     if $S0 goto L1
     $S0 = default
     goto L2
-L1:
+  L1:
     $S0 = lua_gsub($S0, ';;', ';,;')
     $S0 = lua_gsub($S0, ',', default)
-L2:
+  L2:
     new $P0, .LuaString
     set $P0, $S0
     package[$P1] = $P0
@@ -131,14 +131,14 @@ L2:
     $I0 = isa $P0, 'LuaString'
     if $I0 goto L1
     lua_error("'package.", pname, "' must be a string")
-L1:
+  L1:
     .local string path
     .local string tmpl
     path = $P0
     .local pmc msg      # error accumulator
     new msg, .LuaString
     set msg, ''
-L2:
+  L2:
     (path, tmpl) = nexttemplate(path)
     if tmpl == '' goto L3
     .local string filename
@@ -146,35 +146,35 @@ L2:
     $I0 = stat filename, 0
     unless $I0 goto L4
     .return (filename)
-L4:
+  L4:
     $S0 = msg
     $S0 .= "\n\tno file '"
     $S0 .= filename
     $S0 .= "'"
     set msg, $S0
     goto L2
-L3:
+  L3:
     # not found
     .return ('', msg)
 .end
 
 .sub 'nexttemplate' :anon
     .param string path
-L1:
+  L1:
     $S0 = substr path, 0, 1
     unless $S0 == ';' goto L2
     # skip separators
     path = substr path, 1
     goto L1
-L2:
+  L2:
     unless path == '' goto L3
     # no more templates
     .return ('', '')
-L3:
+  L3:
     $I0 = index path, ';'
     unless $I0 < 0 goto L4
     .return ('', path)
-L4:
+  L4:
     $S0 = substr path, 0, $I0
     inc $I0
     path = substr path, $I0
@@ -196,11 +196,11 @@ L4:
     unless filename == '' goto L1
     # library not found in this path
     .return ($P0)
-L1:
+  L1:
     ($P0, $S0) = lua_loadfile(filename)
     unless null $P0 goto L2
     loaderror($S1, filename, $S0)
-L2:
+  L2:
     # library loaded successfully
     .return ($P0)
 .end
@@ -214,12 +214,12 @@ L2:
     unless filename == '' goto L1
     # library not found in this path
     .return ($P0)
-L1:
+  L1:
     funcname = mkfuncname($S1)
     ($P0, $S0) = loadfunc(filename, funcname)
     unless null $P0 goto L2
     loaderror($S1, filename, $S0)
-L2:
+  L2:
     # library loaded successfully
     .return ($P0)
 .end
@@ -233,18 +233,18 @@ L2:
     unless $I0 < 0 goto L1
     new $P0, .LuaString
     .return ($P0)
-L1:
+  L1:
     $S0 = substr name, 0, $I0
     (filename, $P0) = findfile($S1, 'pbcpath')
     unless filename == '' goto L2
     # root not found
     .return ($P0)
-L2:
+  L2:
     funcname = mkfuncname($S1)
     ($P0, $S0) = loadfunc(filename, funcname)
     unless null $P0 goto L3
     loaderror($S1, filename, $S0)
-L3:
+  L3:
     # library loaded successfully
     .return ($P0)
 .end
@@ -262,7 +262,7 @@ L3:
     $P0 = get_root_global sym
     if null $P0 goto L1
     .return ($P0)
-L1:
+  L1:
     $S0 = "can't found function '"
     $S0 .= sym
     $S0 .= "' in module '"
@@ -283,7 +283,7 @@ L1:
     $I0 = isa $P0, 'LuaTable'
     if $I0 goto L1
     lua_error("'package.preload' must be a table")
-L1:
+  L1:
     $P0 = $P0[name]
     $I0 = isa $P0, 'LuaNil'
     unless $I0 goto L2
@@ -292,7 +292,7 @@ L1:
     $S0 .= "']"
     new $P0, .LuaString
     set $P0, $S0
-L2:
+  L2:
     .return ($P0)
 .end
 
@@ -342,9 +342,9 @@ each option is a function to be applied over the module.
     m = lua_findtable($P0, $S1)
     unless null m goto L2
     lua_error("name conflict for module '", $S1, "'")
-L2:
+  L2:
     _LOADED[name] = m
-L1:
+  L1:
     # check whether table already has a _NAME field
     set $P1, '_NAME'
     $P0 = m[$P1]
@@ -358,7 +358,7 @@ L1:
     set $P1, '_PACKAGE'
     $I0 = index $S1, '.'
     if $I0 < 0 goto L4
-L5:
+  L5:
     $I1 = $I0
     inc $I0
     $I0 = index $S1, '.', $I0
@@ -370,18 +370,18 @@ L5:
     set $P0, $S0
     m[$P1] = $P0
     goto L3
-L4:
+  L4:
     m[$P1] = name
-L3:
+  L3:
     $P2 = getinterp
     $P3 = $P2['sub'; 1]
     lua_setfenv($P3, m)
-L6:
+  L6:
     unless options goto L7
     $P0 = shift options
     $P0(m)
     goto L6
-L7:
+  L7:
 .end
 
 
@@ -421,10 +421,10 @@ any loader for the module, then C<require> signals an error.
     $I0 = isa res, 'LuaUserdata'
     unless $I0 goto L2
     lua_error("loop or previous error loading module '", $S1, "'")
-L2:
+  L2:
     # package is already loaded
     .return (res)
-L1:
+  L1:
     $P0 = global '_G'
     set $P1, 'package'
     $P0 = $P0[$P1]
@@ -437,13 +437,13 @@ L1:
     .local pmc msg      # error message accumulator
     new msg, .LuaString
     set msg, ''
-L3:
+  L3:
     $P0 = loaders[i]    # get a loader
     $I0 = isa $P0, 'LuaNil'
     unless $I0 goto L4
     $S0 = msg
     lua_error("module '", $S1, "' not found:", $S0)
-L4:
+  L4:
     new $P1, .LuaNil
     $P1 = $P0(modname)  # call it
     $I0 = isa $P1 , 'LuaClosure'
@@ -453,10 +453,10 @@ L4:
     $I0 = isa $P1 , 'LuaString'
     unless $I0 goto L6
     msg .= $P1
-L6:
+  L6:
     inc i
     goto L3
-L5:
+  L5:
     .local pmc sentinel
     new sentinel, .LuaUserdata
     _LOADED[modname] = sentinel
@@ -467,7 +467,7 @@ L5:
     # use true as result
     new $P0, .LuaBoolean
     set $P0, 1
-L7:
+  L7:
     _LOADED[modname] = $P0
     .return ($P0)
 .end
@@ -560,7 +560,7 @@ environment. To be used as an option to function C<module>.
     unless $I0 goto L1
     new mt, .LuaTable
     module.'set_metatable'(mt)
-L1:
+  L1:
     # mt.__index = _G
     $P0 = global '_G'
     new $P1, .LuaString

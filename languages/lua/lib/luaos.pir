@@ -151,13 +151,13 @@ representation that depends on the host system and on the current locale
     $P0 = decodetime t
     $S1 = substr $S1, 1
     goto L2
-L1:
+  L1:
     $P0 = decodelocaltime t
-L2:
+  L2:
     unless null $P0 goto L3
     new res, .LuaNil
     .return (res)
-L3:
+  L3:
     unless $S1 == '*t' goto L4
     new res, .LuaTable
     new $P1, .LuaString
@@ -202,14 +202,14 @@ L3:
     set $P2, $I0
     res[$P1] = $P2
     .return (res)
-L4:
+  L4:
     .local string b
     .local int idx
     b = ''
     idx = 0
     $I1 = length $S1
     new $P1, .Lua
-L5:
+  L5:
     unless idx < $I1 goto L6
     $S0 = substr $S1, idx, 1
     if $S0 != '%' goto L7
@@ -218,11 +218,11 @@ L5:
     $S0 = substr $S1, idx, 1
     $S2 = '%' . $S0
     $S0 = $P1.'strftime'($S2, $P0)
-L7:
+  L7:
     b .= $S0
     inc idx
     goto L5
-L6:
+  L6:
     new res, .LuaString
     set res, b
     .return (res)
@@ -269,10 +269,10 @@ shell is available and zero otherwise.
     unless $S1 == '' goto L1
     $I0 = 1
     goto L2
-L1:
+  L1:
     $I0 = spawnw $S1
     $I0 = $I0 / 256
-L2:
+  L2:
     new res, .LuaNumber
     res = $I0
     .return (res)
@@ -309,7 +309,7 @@ if the variable is not defined.
     if $S0 goto L1
     new res, .LuaNil
     .return (res)
-L1:
+  L1:
     new res, .LuaString
     set res, $S0
     .return (res)
@@ -335,7 +335,7 @@ describing the error.
     new res, .LuaBoolean
     set res, 1
     .return (res)
-_handler:
+  _handler:
     .local pmc nil
     .local pmc msg
     .local pmc e
@@ -370,7 +370,7 @@ fails, it returns B<nil>, plus a string describing the error.
     new res, .LuaBoolean
     set res, 1
     .return (res)
-_handler:
+  _handler:
     .local pmc nil
     .local pmc msg
     .local pmc e
@@ -430,12 +430,12 @@ STILL INCOMPLETE (no mktime).
     if null table goto L1
     $I0 = isa table, 'LuaNil'
     unless $I0 goto L2
-L1:
+  L1:
     $I0 = time
     new res, .LuaNumber
     set res, $I0
     .return (res)
-L2:
+  L2:
     lua_checktype(1, table, 'table')
     $I1 = getfield(table, 'sec', 0)
     $I2 = getfield(table, 'min', 0)
@@ -462,12 +462,12 @@ L2:
     unless $I0 goto L1
     res = $P0
     goto L2
-L1:
+  L1:
     unless d < 0 goto L3
     lua_error("field '", key, "' missing in date table")
-L3:
+  L3:
     res = d
-L2:
+  L2:
     .return (res)
 .end
 
@@ -482,9 +482,9 @@ L2:
     unless $I0 goto L1
     res = -1
     goto L2
-L1:
+  L1:
     res = istrue $P0
-L2:
+  L2:
     .return (res)
 .end
 

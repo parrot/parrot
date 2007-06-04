@@ -170,7 +170,7 @@ empty string, or B<nil> on end of file.
     f = getattribute self, 'data'
     if formats goto L1
     .return read_line(f)
-L1:
+  L1:
     .local int narg
     .local int i
     .local pmc format
@@ -178,7 +178,7 @@ L1:
     new res, .FixedPMCArray
     set res, narg
     i = 0
-L2:
+  L2:
     unless i < narg goto L3
     format = formats[i]
     $I0 = isa format, 'LuaNumber'
@@ -189,11 +189,11 @@ L2:
     $P0 = test_eof(f)
     res[i] = $P0
     goto L6
-L5:
+  L5:
     $P0 = read_chars(f, l)
     res[i] = $P0
     goto L6
-L4:
+  L4:
     $S0 = lua_checkstring(i, format)
     $I0 = index $S0, '*n'
     unless $I0 == 0 goto L7
@@ -201,27 +201,27 @@ L4:
     $P0 = read_number(f)
     res[i] = $P0
     goto L6
-L7:
+  L7:
     $I0 = index $S0, '*l'
     unless $I0 == 0 goto L8
     # line
     $P0 = read_line(f)
     res[i] = $P0
     goto L6
-L8:
+  L8:
     $I0 = index $S0, '*a'
     unless $I0 == 0 goto L9
     # file
     $P0 = read_chars(f, 65535)
     res[i] = $P0
     goto L6
-L9:
+  L9:
     inc i
     lua_argerror(i, "invalid format")
-L6:
+  L6:
     inc i
     goto L2
-L3:
+  L3:
     .return (res :flat)
 .end
 
@@ -328,7 +328,7 @@ NOT YET IMPLEMENTED.
     f.'buffer_type'($I0)
     if $I1 == 0 goto L1
     f.'buffer_size'($I2)
-L1:
+  L1:
     new res, .LuaBoolean
     set res, 1
     .return (res)
@@ -353,7 +353,7 @@ or C<string.format> before write.
     f = getattribute self, 'data'
     argc = argv
     i = 0
-L1:
+  L1:
     if i >= argc goto L2
     $P0 = argv[i]
     inc i
@@ -361,11 +361,11 @@ L1:
     unless $I0 goto L3
     print f, $P0
     goto L1
-L3:
+  L3:
     $S0 = lua_checkstring(i, $P0)
     print f, $S0
     goto L1
-L2:
+  L2:
     new res, .LuaBoolean
     set res, 1
     .return (res)
@@ -388,7 +388,7 @@ L2:
     if $I0 goto L1
     printerr "closing file for you.\n"
     aux_close(self)
-L1:
+  L1:
     .return ()
 .end
 
@@ -401,13 +401,13 @@ L1:
     if f goto L1
     $S0 = "file (closed)"
     goto L2
-L1:
+  L1:
     $S0 = "file ("
     $S1 = self
     $S1 = substr $S1, 10, 8
     concat $S0, $S1
     concat $S0, ")"
-L2:
+  L2:
     set res, $S0
     .return (res)
 .end

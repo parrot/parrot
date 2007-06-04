@@ -88,7 +88,7 @@ Returns this new coroutine, an object with type C<"thread">.
     $I0 = isa f, 'LuaClosure'
     if $I0 goto L1
     lua_argerror(1, 'Lua function expected')
-L1:
+  L1:
     res = new .LuaThread, f
     .return (res)
 .end
@@ -119,7 +119,7 @@ C<resume> returns B<false> plus the error message.
     set status, $I0
     unless $I0 goto L1
     .return (status, res :flat)
-L1:
+  L1:
     .local pmc msg
     $S0 = res[0]
     new msg, .LuaString
@@ -139,11 +139,11 @@ L1:
     if $P1 goto L1
     $P0 = pop co_stack
     .return (0, "cannot resume dead coroutine")
-L1:
+  L1:
     push_eh _handler
     (res :slurpy) = $P0.'resume'(argv :flat)
     .return (1, res :flat)
-_handler:
+  _handler:
     .local pmc e
     .local string s
     .get_results (e, s)
@@ -165,10 +165,10 @@ Returns the running coroutine, or B<nil> when called by the main thread.
     if $I0 goto L1
     new res, .LuaNil
     goto L2
-L1:
+  L1:
     res = pop co_stack
     push co_stack, res
-L2:
+  L2:
     .return (res)
 .end
 
@@ -196,9 +196,9 @@ STILL INCOMPLETE.
     if $P1 goto L1
     set res, 'dead'
     goto L2
-L1:
+  L1:
     set res, 'suspended'
-L2:
+  L2:
     .return (res)
 .end
 
@@ -232,7 +232,7 @@ case of error, propagates the error.
     ($I0, res :slurpy) = auxresume(co, argv :flat)
     unless $I0 goto L1
     .return (res :flat)
-L1:
+  L1:
     $S0 = res[0]
     lua_error($S0)
 .end

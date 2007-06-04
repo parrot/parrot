@@ -198,29 +198,29 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     unless mode == 'r' goto L1
     res = '<'
     goto L9
-L1:
+  L1:
     unless mode == 'w' goto L2
     res = '>'
     goto L9
-L2:
+  L2:
     unless mode == 'a' goto L3
     res = '>>'
     goto L9
-L3:
+  L3:
     unless mode == 'r+' goto L4
     res = '+<'
     goto L9
-L4:
+  L4:
     unless mode == 'w+' goto L5
     res = '+>'
     goto L9
-L5:
+  L5:
     unless mode == 'a+' goto L6
     res = '+>>'
     goto L9
-L6:
+  L6:
     res = ''
-L9:
+  L9:
     .return (res)
 .end
 
@@ -246,10 +246,10 @@ L9:
     unless $S0 == '' goto L1
     new res, .LuaNil
     goto L2
-L1:
+  L1:
     new res, .LuaString
     set res, $S0
-L2:
+  L2:
     .return (res)
 .end
 
@@ -261,11 +261,11 @@ L2:
     unless $S0 == '' goto L1
     new res, .LuaNil
     goto L2
-L1:
+  L1:
     chopn $S0, 1
     new res, .LuaString
     set res, $S0
-L2:
+  L2:
     .return (res)
 .end
 
@@ -274,15 +274,15 @@ L2:
 .sub 'read_number'
     .param pmc f
     .local pmc res
-L1:
+  L1:
     $S0 = peek f
     $I0 = is_cclass .CCLASS_WHITESPACE, $S0, 0
     unless $I0 goto L2
     $S0 = read f, 1
     goto L1
-L2:
+  L2:
     $S1 = ''
-L3:
+  L3:
     $S0 = peek f
     if $S0 == '' goto L4
     $I0 = is_cclass .CCLASS_WHITESPACE, $S0, 0
@@ -290,7 +290,7 @@ L3:
     $S0 = read f, 1
     $S1 .= $S0
     goto L3
-L4:
+  L4:
     new $P1, .LuaString
     set $P1, $S1
     res = $P1.'tonumber'()
@@ -319,10 +319,10 @@ L4:
     unless $I1 goto L1
     new res, .LuaNil
     goto L2
-L1:
+  L1:
     new res, .LuaString
     set res, ''
-L2:
+  L2:
     .return (res)
 .end
 
@@ -343,7 +343,7 @@ L2:
     unless mt == mt_file goto L1
     res = getattribute file, 'data'
     .return (res)
-L1:
+  L1:
     lua_typerror(1, $S0, 'file')
 .end
 
@@ -353,7 +353,7 @@ L1:
     f = topfile(file)
     if null f goto L1
     .return (f)
-L1:
+  L1:
     lua_error("attempt to use a closed file")
 .end
 
@@ -393,7 +393,7 @@ L1:
     toclose = find_lex 'upvar_toclose'
     unless toclose goto L1
     aux_close(file)
-L1:
+  L1:
     .return (res)
 .end
 
@@ -409,7 +409,7 @@ file.
     .local pmc res
     unless null file goto L1
     file = getiofile(IO_OUTPUT)
-L1:
+  L1:
     tofile(file)
     res = aux_close(file)
     .return (res)
@@ -455,16 +455,16 @@ error code.
     f = open $S1, '<'
     unless null f goto L3
     lua_argerror(1, file)
-L3:
+  L3:
     $P0 = newfile()
     setattribute $P0, 'data', f
     setiofile(IO_INPUT, $P0)
     goto L1
-L2:
+  L2:
     tofile(file)
     setiofile(IO_INPUT, file)
     goto L1
-L1:
+  L1:
     res = getiofile(IO_INPUT)
     .return (res)
 .end
@@ -497,12 +497,12 @@ input file. In this case it does not close the file when the loop ends.
     file = getiofile(IO_INPUT)
     $P0 = file[key]
     .return $P0(file)
-L1:
+  L1:
     $S1 = lua_checkstring(1, filename)
     f = open $S1, '<'
     unless null f goto L2
     lua_argerror(1, $S1)
-L2:
+  L2:
     file = newfile()
     setattribute file, 'data', f
     .return aux_lines(file, 1)
@@ -565,7 +565,7 @@ in the standard C function C<fopen>.
     res = newfile()
     setattribute res, 'data', f
     .return (res)
-L1:
+  L1:
     new res, .LuaNil
     .local pmc msg
     new msg, .LuaString
@@ -595,15 +595,15 @@ Similar to C<io.input>, but operates over the default output file.
     f = open $S1, '>'
     unless null f goto L3
     lua_argerror(1, file)
-L3:
+  L3:
     $P0 = newfile()
     setattribute $P0, 'data', f
     setiofile(IO_OUTPUT, $P0)
     goto L1
-L2:
+  L2:
     tofile(file)
     setiofile(IO_OUTPUT, file)
-L1:
+  L1:
     res = getiofile(IO_OUTPUT)
     .return (res)
 .end
@@ -688,15 +688,15 @@ handle, and B<nil> if C<obj> is not a file handle.
     if mt == mt_file goto L1
     res = new .LuaNil
     goto L3
-L1:
+  L1:
     res = new .LuaString
     f = getattribute obj, 'data'
     unless null f goto L2
     set res, 'closed file'
     goto L3
-L2:
+  L2:
     set res, 'file'
-L3:
+  L3:
     .return (res)
 .end
 

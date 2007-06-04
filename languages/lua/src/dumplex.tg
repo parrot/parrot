@@ -32,13 +32,13 @@ transform past (ROOT) :language('PIR') {
     if null $P0 goto L1
     .local pmc iter
     new iter, .Iterator, $P0
-L2:
+  L2:
     unless iter goto L1
     $P0 = shift iter
     $P1 = tree.'get'('past', $P0, 'Lua::TestLex::token')
     past.'push'($P1)
     goto L2
-L1:
+  L1:
     past = past.'new'('PAST::Block', past, 'node'=>node, 'name'=>'anon')
     .return (past)
 }
@@ -114,16 +114,16 @@ transform past (Lua::TestLex::String) :language('PIR') {
     $S0 = $P0.'result_object'()
     $S1 = concat "String:\t", $S0
     goto L9
-L1:
+  L1:
     $I0 = defined node['long_string']
     unless $I0 goto L2
     $P0 = node['long_string']
     $S0 = $P0.'result_object'()
     $S1 = concat "LongString:\t", $S0
     goto L9
-L2:
+  L2:
     internal_error('unknown string')
-L9:
+  L9:
     past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
     .return (past)
 }

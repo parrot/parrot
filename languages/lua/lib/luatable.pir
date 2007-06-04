@@ -117,7 +117,7 @@ Returns C<table[i]..sep..table[i+1] ... sep..table[j]>. The default value for
     last = lua_optint(4, j, $I0)
     res = ''
     new idx, .LuaNumber
-L1:
+  L1:
     unless $I3 <= last goto L2
     set idx, $I3
     value = table.'rawget'(idx)
@@ -126,15 +126,15 @@ L1:
     $I0 = isa value, 'LuaNumber'
     if $I0 goto L3
     lua_argerror(1, "table contains non-strings")
-L3:
+  L3:
     $S0 = value
     concat res, $S0
     unless $I3 != last goto L4
     concat res, $S2
-L4:
+  L4:
     inc $I3
     goto L1
-L2:
+  L2:
     new $P0, .LuaString
     set $P0, res
     .return ($P0)
@@ -163,7 +163,7 @@ B<DEPRECATED>
     lua_checktype(1, table, 'table')
     lua_checktype(2, f, 'function')
     new idx, .LuaNil
-L1:
+  L1:
     $P0 = table.'next'(idx)
     unless $P0 goto L2
     idx = $P0[0]
@@ -172,7 +172,7 @@ L1:
     $I0 = defined res
     unless $I0 goto L1
     .return (res)
-L2:
+  L2:
     .return ()
 .end
 
@@ -202,7 +202,7 @@ B<DEPRECATED>
     n = table.'len'()
     i = 0
     new idx, .LuaNumber
-L1:
+  L1:
     inc i
     unless i <= n goto L2
     set idx, i
@@ -211,7 +211,7 @@ L1:
     $I0 = defined res
     unless $I0 goto L1
     .return (res)
-L2:
+  L2:
     .return ()
 .end
 
@@ -258,13 +258,13 @@ inserts C<x> at the end of table C<t>.
     pos = e
     value = arg2
     goto L2
-L1:
+  L1:
     pos = lua_checknumber(2, arg2)
     unless pos > e goto L3
     e = pos
-L3:
+  L3:
     value = arg3
-L4:
+  L4:
     dec e
     unless e >= pos goto L2
     set idx, e
@@ -272,7 +272,7 @@ L4:
     inc idx
     table.'rawset'(idx, $P0)
     goto L4
-L2:
+  L2:
     set idx, pos
     table.'rawset'(idx, value)
 .end
@@ -294,7 +294,7 @@ does a linear traversal of the whole table.)
     new max, .LuaNumber
     set max, 0
     new idx, .LuaNil
-L1:
+  L1:
     $P0 = table.'next'(idx)
     unless $P0 goto L2
     idx = $P0[0]
@@ -303,7 +303,7 @@ L1:
     unless idx > max goto L1
     max = clone idx
     goto L1
-L2:
+  L2:
     .return (max)
 .end
 
@@ -332,11 +332,11 @@ table C<t>.
     # table is `empty'
     new res, .LuaNil
     .return (res)
-L1:
+  L1:
     new idx, .LuaNumber
     set idx, ipos
     res = table.'rawget'(idx)
-L2:
+  L2:
     unless ipos < e goto L3
     $I2 = ipos + 1
     set idx, $I2
@@ -345,7 +345,7 @@ L2:
     table.'rawset'(idx, $P0)
     ipos = $I2
     goto L2
-L3:
+  L3:
     new $P0, .LuaNil
     set idx, e
     table.'rawset'(idx, $P0)
@@ -390,7 +390,7 @@ the given order may have their relative positions changed by the sort.
     $I0 = isa comp, 'LuaNil'
     if $I0 goto L1
     lua_checktype(2, comp, 'function')
-L1:
+  L1:
     auxsort(table, comp, 1, n)
 .end
 
@@ -406,7 +406,7 @@ L1:
     .local int tmp
     new idx1, .LuaNumber
     new idx2, .LuaNumber
-L1:
+  L1:
     unless l < u goto L2
     # sort elements a[l], a[(l+u)/2] and a[u]
     set idx1, l
@@ -418,7 +418,7 @@ L1:
     # swap a[l] - a[u]
     table.'rawset'(idx1, $P2)
     table.'rawset'(idx2, $P1)
-L3:
+  L3:
     tmp = u - l
     if tmp == 1 goto L2 # break: only 2 elements
     i = l + u
@@ -432,14 +432,14 @@ L3:
     table.'rawset'(idx1, $P2)
     table.'rawset'(idx2, $P1)
     goto L5
-L4:
+  L4:
     set idx2, u
     $P2 = table.'rawget'(idx2)
     $I0 = sort_comp(comp, $P2, $P1) # a[u]<a[i]?
     unless $I0 goto L5
     table.'rawset'(idx1, $P2)
     table.'rawset'(idx2, $P1)
-L5:
+  L5:
     tmp = u - l
     if tmp == 2 goto L2 # break: only 3 elements
     set idx1, i
@@ -452,7 +452,7 @@ L5:
     # a[l] <= P == a[u-1] <= a[u], only need to sort from l+1 to u-2 */
     i = l
     j = u - 1
-L6: # invariant: a[l..i] <= P <= a[j..u]
+  L6: # invariant: a[l..i] <= P <= a[j..u]
     # repeat ++i until a[i] >= P
     inc i
     set idx2, i
@@ -462,7 +462,7 @@ L6: # invariant: a[l..i] <= P <= a[j..u]
     unless i > u goto L6
     lua_error("invalid order function for sorting")
     goto L6
-L7:
+  L7:
     # repeat --j until a[j] <= P
     dec j
     set idx1, j
@@ -472,12 +472,12 @@ L7:
     unless j < l goto L7
     lua_error("invalid order function for sorting")
     goto L7
-L8:
+  L8:
     if j < i goto L9
     table.'rawset'(idx2, $P3)
     table.'rawset'(idx1, $P2)
     goto L6
-L9:
+  L9:
     tmp = u - 1
     set idx1, tmp
     set idx2, i
@@ -494,16 +494,16 @@ L9:
     i = i - 1
     l = i + 2
     goto L11
-L10:
+  L10:
     j = i + 1
     i = u
     u = j - 2
-L11:
+  L11:
     # call recursively the smaller one
     auxsort(table, comp, j, i)
     # repeat the routine for the larger one
     goto L1
-L2:
+  L2:
 .end
 
 .sub 'sort_comp' :anon
@@ -515,7 +515,7 @@ L2:
     $P0 = comp(a, b)
     $I0 = istrue $P0
     .return ($I0)
-L1:
+  L1:
     $I0 = islt a, b
     .return ($I0)
 .end

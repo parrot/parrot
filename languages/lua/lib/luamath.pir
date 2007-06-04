@@ -389,11 +389,11 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     argc = argv
     unless argc == 0 goto L1
     lua_typerror(1, "no value", 'number')
-L1:
+  L1:
     $P0 = argv[0]
     i = 1
     dmax = lua_checknumber(i, $P0)
-L2:
+  L2:
     if i >= argc goto L3
     $P0 = argv[i]
     inc i
@@ -401,7 +401,7 @@ L2:
     if dmax > $P1 goto L2
     dmax = $P1
     goto L2
-L3:
+  L3:
     $P0 = clone dmax
     .return ($P0)
 .end
@@ -415,11 +415,11 @@ L3:
     argc = argv
     unless argc == 0 goto L1
     lua_typerror(1, "no value", 'number')
-L1:
+  L1:
     $P0 = argv[0]
     i = 1
     dmin = lua_checknumber(i, $P0)
-L2:
+  L2:
     if i >= argc goto L3
     $P0 = argv[i]
     inc i
@@ -427,7 +427,7 @@ L2:
     if dmin < $P1 goto L2
     dmin = $P1
     goto L2
-L3:
+  L3:
     $P0 = clone dmin
     .return ($P0)
 .end
@@ -481,7 +481,7 @@ L3:
     unless null arg1 goto L1
     set res, $N0
     goto L2
-L1:
+  L1:
     unless null arg2 goto L3
     u = lua_checknumber(1, arg1)
     unless 1 <= u goto L4
@@ -490,7 +490,7 @@ L1:
     inc $I0
     set res, $I0
     goto L2
-L3:
+  L3:
     if extra goto L5
     l = lua_checknumber(1, arg1)
     u = lua_checknumber(2, arg2)
@@ -502,11 +502,11 @@ L3:
     add $I0, l
     set res, $I0
     goto L2
-L4:
+  L4:
     lua_argerror(1, "interval is empty")
-L5:
+  L5:
     lua_error("wrong number of arguments")
-L2:
+  L2:
     .return (res)
 .end
 

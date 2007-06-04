@@ -43,7 +43,7 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     new $P0, .OS
     push_eh _handler
     $P0.'rm'(filename)
-_handler:
+  _handler:
     .return ()
 .end
 
@@ -60,10 +60,10 @@ _handler:
     print $S0
     print ")\n"
     goto L2
-L1:
+  L1:
     print fh, code
     close fh
-L2:
+  L2:
 .end
 
 
@@ -82,10 +82,10 @@ L2:
     print $S0
     print ")\n"
     goto L2
-L1:
+  L1:
     print fh, pbc_out
     close fh
-L2:
+  L2:
     .return (output)
 .end
 
@@ -104,8 +104,8 @@ L2:
     print "' ("
     print $S0
     print ")\n"
-L1:
-_handler:
+  L1:
+  _handler:
     .return (content)
 .end
 
@@ -133,7 +133,7 @@ _handler:
     ex = new .Exception
     ex['_message'] = $S0
     throw ex
-L1:
+  L1:
     .local pmc pir_comp
     pir_comp = compreg 'PIR'
     $P0 = pir_comp(pir)
@@ -155,7 +155,7 @@ Compile C<source>.
     unless null $P0 goto L1
     new $P0, .Integer
     set $P0, 0
-L1:
+  L1:
     inc $P0
     $S1 = $P0
     $S0 .= $S1

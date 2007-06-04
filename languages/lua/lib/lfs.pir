@@ -117,7 +117,7 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
     res =  getattribute fh, 'data'
     unless null res goto L1
     lua_error(funcname, ": closed file")
-L1:
+  L1:
     .return (res)
 .end
 
@@ -240,21 +240,21 @@ optimal file system I/O blocksize; (Unix only)
     $P2 = members[$S2]
     unless null $P2 goto L3
     lua_checkoption(2, $S2, '')
-L3:
+  L3:
     res = $P2($P1)
     .return (res)
-L2:
+  L2:
     $I0 = isa aname, 'LuaTable'
     unless $I0 goto L1
     res = aname
     goto L4
-L1:
+  L1:
     new res, .LuaTable
-L4:
+  L4:
     .local pmc iter
     new iter, .Iterator, members
     new $P2, .LuaString
-L5:
+  L5:
     unless iter goto L6
     $S2 = shift iter
     set $P2, $S2
@@ -262,9 +262,9 @@ L5:
     $P4 = $P3($P1)
     res[$P2] = $P4
     goto L5
-L6:
+  L6:
     .return (res)
-_handler:
+  _handler:
     .local pmc nil
     .local pmc msg
     new nil, .LuaNil
@@ -309,31 +309,31 @@ _handler:
     unless $I0 == S_IFREG goto L1
     set $P0, 'file'
     .return ($P0)
-L1:
+  L1:
     unless $I0 == S_IFDIR goto L2
     set $P0, 'dir'
     .return ($P0)
-L2:
+  L2:
     unless $I0 == S_IFLNK goto L3
     set $P0, 'link'
     .return ($P0)
-L3:
+  L3:
     unless $I0 == S_IFSOCK goto L4
     set $P0, 'socket'
     .return ($P0)
-L4:
+  L4:
     unless $I0 == S_IFIFO goto L5
     set $P0, 'named pipe'
     .return ($P0)
-L5:
+  L5:
     unless $I0 == S_IFCHR goto L6
     set $P0, 'char device'
     .return ($P0)
-L6:
+  L6:
     unless $I0 == S_IFBLK goto L7
     set $P0, 'block device'
     .return ($P0)
-L7:
+  L7:
     set $P0, 'other'
     .return ($P0)
 .end
@@ -410,7 +410,7 @@ L7:
     new $P0, .LuaNumber
     set $P0, $I0
     .return ($P0)
-L1:
+  L1:
     new $P0, .LuaNil
     .return ($P0)
 .end
@@ -423,7 +423,7 @@ L1:
     new $P0, .LuaNumber
     set $P0, $I0
     .return ($P0)
-L1:
+  L1:
     new $P0, .LuaNil
     .return ($P0)
 .end
@@ -448,7 +448,7 @@ Returns C<true> in case of success or C<nil> plus an error string.
     new res, .LuaBoolean
     set res, 1
     .return (res)
-_handler:
+  _handler:
     .local pmc nil
     .local pmc msg
     .local pmc e
@@ -480,7 +480,7 @@ string.
     new res, .LuaString
     set res, $S0
     .return (res)
-_handler:
+  _handler:
     .local pmc nil
     .local pmc msg
     .local pmc e
@@ -513,7 +513,7 @@ when there is no more entries. Raises an error if C<path> is not a directory.
     .const .Sub dir_aux = 'dir_aux'
     res = newclosure dir_aux
     .return (res)
-_handler:
+  _handler:
     .local pmc e
     .local string s
     .get_results (e, s)
@@ -528,7 +528,7 @@ _handler:
     new res, .LuaString
     set res, $S1
     .return (res)
-L1:
+  L1:
     new res, .LuaNil
     .return (res)
 .end
@@ -582,7 +582,7 @@ C<nil> plus an error string.
     new res, .LuaBoolean
     set res, 1
     .return (res)
-_handler:
+  _handler:
     .local pmc nil
     .local pmc msg
     .local pmc e
@@ -614,7 +614,7 @@ C<nil> plus an error string.
     new res, .LuaBoolean
     set res, 1
     .return (res)
-_handler:
+  _handler:
     .local pmc nil
     .local pmc msg
     .local pmc e

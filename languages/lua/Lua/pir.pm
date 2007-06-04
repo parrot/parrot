@@ -18,44 +18,44 @@ package pirVisitor;
 .HLL 'Lua', 'lua_group'
 
 .sub '__start' :main
-  .param pmc args
-  $S0 = shift args
-  $I1 = args
-  $P1 = new .Array
-  set $P1, $I1
-  $I0 = 0
-L1:
-  unless $I0 < $I1 goto L2
-  $S0 = shift args
-  $P0 = new .LuaString
-  set $P0, $S0
-  $P1[$I0] = $P0
-  inc $I0
-  goto L1
-L2:
-#  print "start Lua\n"
+    .param pmc args
+    $S0 = shift args
+    $I1 = args
+    $P1 = new .Array
+    set $P1, $I1
+    $I0 = 0
+  L1:
+    unless $I0 < $I1 goto L2
+    $S0 = shift args
+    $P0 = new .LuaString
+    set $P0, $S0
+    $P1[$I0] = $P0
+    inc $I0
+    goto L1
+  L2:
+#    print "start Lua\n"
 
-  load_bytecode 'languages/lua/lib/luabasic.pbc'
-  load_bytecode 'languages/lua/lib/luacoroutine.pir'
-  load_bytecode 'languages/lua/lib/luapackage.pbc'
-  load_bytecode 'languages/lua/lib/luastring.pir'
-  load_bytecode 'languages/lua/lib/luatable.pbc'
-  load_bytecode 'languages/lua/lib/luamath.pbc'
-  load_bytecode 'languages/lua/lib/luaio.pir'
-  load_bytecode 'languages/lua/lib/luaos.pbc'
-  load_bytecode 'languages/lua/lib/luadebug.pbc'
-  load_bytecode 'languages/lua/lib/luaperl.pbc'
+    load_bytecode 'languages/lua/lib/luabasic.pbc'
+    load_bytecode 'languages/lua/lib/luacoroutine.pir'
+    load_bytecode 'languages/lua/lib/luapackage.pbc'
+    load_bytecode 'languages/lua/lib/luastring.pir'
+    load_bytecode 'languages/lua/lib/luatable.pbc'
+    load_bytecode 'languages/lua/lib/luamath.pbc'
+    load_bytecode 'languages/lua/lib/luaio.pir'
+    load_bytecode 'languages/lua/lib/luaos.pbc'
+    load_bytecode 'languages/lua/lib/luadebug.pbc'
+    load_bytecode 'languages/lua/lib/luaperl.pbc'
 
-  .const .Sub main = '_main'
-  $P0 = get_global '_G'
-  main.'setfenv'($P0)
-  docall(main, $P1 :flat)
+    .const .Sub main = '_main'
+    $P0 = get_global '_G'
+    main.'setfenv'($P0)
+    docall(main, $P1 :flat)
 .end
 
 .sub '__onload' :anon :init
-  .const .Sub main = '_main'
-#  print "onload tmp\n"
-  set_root_global 'tmp', main
+    .const .Sub main = '_main'
+#    print "onload tmp\n"
+    set_root_global 'tmp', main
 .end
 
 };
@@ -66,7 +66,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}\n";
+        print {$FH} "    $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}\n";
         return;
     }
 
@@ -75,11 +75,11 @@ L2:
         my ($op) = @_;
         my $FH   = $self->{fh};
         if ( $op->{result} == $op->{arg1} ) {
-            print {$FH} "  $op->{op} $op->{result}->{symbol}, $op->{arg2}->{symbol}\n";
+            print {$FH} "    $op->{op} $op->{result}->{symbol}, $op->{arg2}->{symbol}\n";
         }
         else {
             print {$FH}
-"  $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}, $op->{arg2}->{symbol}\n";
+"    $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}, $op->{arg2}->{symbol}\n";
         }
         return;
     }
@@ -89,7 +89,7 @@ L2:
         my ($op) = @_;
         my $FH   = $self->{fh};
         print {$FH}
-            "  $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}, $op->{arg2}->{symbol}\n";
+            "    $op->{result}->{symbol} = $op->{op} $op->{arg1}->{symbol}, $op->{arg2}->{symbol}\n";
         return;
     }
 
@@ -97,7 +97,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  $op->{result}->{symbol} = $op->{arg1}->{symbol}\n";
+        print {$FH} "    $op->{result}->{symbol} = $op->{arg1}->{symbol}\n";
         return;
     }
 
@@ -105,7 +105,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  $op->{result}->{symbol} = $op->{arg1}->{symbol}\[$op->{arg2}->{symbol}\]\n";
+        print {$FH} "    $op->{result}->{symbol} = $op->{arg1}->{symbol}\[$op->{arg2}->{symbol}\]\n";
         return;
     }
 
@@ -113,7 +113,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  $op->{result}->{symbol}\[$op->{arg1}->{symbol}\] = $op->{arg2}->{symbol}\n";
+        print {$FH} "    $op->{result}->{symbol}\[$op->{arg1}->{symbol}\] = $op->{arg2}->{symbol}\n";
         return;
     }
 
@@ -121,7 +121,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  inc $op->{result}->{symbol}\n";
+        print {$FH} "    inc $op->{result}->{symbol}\n";
         return;
     }
 
@@ -129,7 +129,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  $op->{result}->{symbol} = interpinfo $op->{arg1}\n";
+        print {$FH} "    $op->{result}->{symbol} = interpinfo $op->{arg1}\n";
         return;
     }
 
@@ -137,7 +137,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  $op->{result}->{symbol} = find_lex '$op->{arg1}->{symbol}'\n";
+        print {$FH} "    $op->{result}->{symbol} = find_lex '$op->{arg1}->{symbol}'\n";
         return;
     }
 
@@ -145,7 +145,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  store_lex '$op->{arg1}->{symbol}', $op->{arg2}->{symbol}\n";
+        print {$FH} "    store_lex '$op->{arg1}->{symbol}', $op->{arg2}->{symbol}\n";
         return;
     }
 
@@ -153,7 +153,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  $op->{result}->{symbol} = clone $op->{arg1}->{symbol}\n";
+        print {$FH} "    $op->{result}->{symbol} = clone $op->{arg1}->{symbol}\n";
         return;
     }
 
@@ -161,7 +161,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  $op->{result}->{symbol} = new $op->{arg1}\n";
+        print {$FH} "    $op->{result}->{symbol} = new $op->{arg1}\n";
         return;
     }
 
@@ -169,7 +169,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  $op->{result}->{symbol} = newclosure $op->{arg1}->{symbol}\n";
+        print {$FH} "    $op->{result}->{symbol} = newclosure $op->{arg1}->{symbol}\n";
         return;
     }
 
@@ -178,7 +178,7 @@ L2:
         #my $self = shift;
         #my ($op) = @_;
         #my $FH   = $self->{fh};
-        #print {$FH} "  noop\n";
+        #print {$FH} "    noop\n";
         return;
     }
 
@@ -186,7 +186,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  $op->{result}->{symbol} = $op->{arg1}->{symbol}\n";
+        print {$FH} "    $op->{result}->{symbol} = $op->{arg1}->{symbol}\n";
         return;
     }
 
@@ -194,7 +194,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  ";
+        print {$FH} "    ";
         if ( exists $op->{result} and scalar( @{ $op->{result} } ) ) {
             print {$FH} "(";
             my $first = 1;
@@ -231,7 +231,7 @@ L2:
             $self->{getfenv} = 1;
         }
         my $FH   = $self->{fh};
-        print {$FH} "  ";
+        print {$FH} "    ";
         if ( exists $op->{result} and scalar( @{ $op->{result} } ) ) {
             print {$FH} "(" if ( scalar( @{ $op->{result} } ) > 1 );
             my $first = 1;
@@ -263,7 +263,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  .return $op->{arg1}->{symbol}(";
+        print {$FH} "    .return $op->{arg1}->{symbol}(";
         my $first = 1;
         foreach ( @{ $op->{arg2} } ) {
             print {$FH} ", " unless ($first);
@@ -293,7 +293,7 @@ L2:
         else {
             $cond = "$op->{arg1}->{symbol}";
         }
-        print {$FH} "  if $cond goto $op->{result}->{symbol}\n";
+        print {$FH} "    if $cond goto $op->{result}->{symbol}\n";
         return;
     }
 
@@ -313,7 +313,7 @@ L2:
         else {
             $cond = "$op->{arg1}->{symbol}";
         }
-        print {$FH} "  unless $cond goto $op->{result}->{symbol}\n";
+        print {$FH} "    unless $cond goto $op->{result}->{symbol}\n";
         return;
     }
 
@@ -321,7 +321,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "  goto $op->{result}->{symbol}\n";
+        print {$FH} "    goto $op->{result}->{symbol}\n";
         return;
     }
 
@@ -329,7 +329,7 @@ L2:
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "$op->{arg1}->{symbol}:\n";
+        print {$FH} "  $op->{arg1}->{symbol}:\n";
         delete $self->{getfenv};
         return;
     }
@@ -361,10 +361,10 @@ L2:
         my ($dir) = @_;
         my $FH    = $self->{fh};
         if ( exists $dir->{pragma} ) {
-            print {$FH} "  .param $dir->{result}->{type} $dir->{result}->{symbol} $dir->{pragma}\n";
+            print {$FH} "    .param $dir->{result}->{type} $dir->{result}->{symbol} $dir->{pragma}\n";
         }
         else {
-            print {$FH} "  .param $dir->{result}->{type} $dir->{result}->{symbol} :optional\n";
+            print {$FH} "    .param $dir->{result}->{type} $dir->{result}->{symbol} :optional\n";
         }
         return;
     }
@@ -373,7 +373,7 @@ L2:
         my $self  = shift;
         my ($dir) = @_;
         my $FH    = $self->{fh};
-        print {$FH} "  .return (";
+        print {$FH} "    .return (";
         my $first = 1;
         foreach ( @{ $dir->{result} } ) {
             print {$FH} ", " unless ($first);
@@ -392,7 +392,7 @@ L2:
         my ($dir) = @_;
         return if ( $dir->{result}->{symbol} =~ /^\$/ );
         my $FH = $self->{fh};
-        print {$FH} "  .local $dir->{result}->{type} $dir->{result}->{symbol}\n";
+        print {$FH} "    .local $dir->{result}->{type} $dir->{result}->{symbol}\n";
         return;
     }
 
@@ -400,7 +400,7 @@ L2:
         my $self  = shift;
         my ($dir) = @_;
         my $FH    = $self->{fh};
-        print {$FH} "  .lex '$dir->{arg1}->{symbol}', $dir->{arg1}->{symbol}\n";
+        print {$FH} "    .lex '$dir->{arg1}->{symbol}', $dir->{arg1}->{symbol}\n";
         return;
     }
 
@@ -408,7 +408,7 @@ L2:
         my $self  = shift;
         my ($dir) = @_;
         my $FH    = $self->{fh};
-        print {$FH} "  .const .$dir->{type} $dir->{result}->{symbol} = '$dir->{arg1}'\n";
+        print {$FH} "    .const .$dir->{type} $dir->{result}->{symbol} = '$dir->{arg1}'\n";
         return;
     }
 
