@@ -15,7 +15,6 @@
 
     print "loaded p6rule\n"
     "loadexpr"("Simple", "expr")
-    "loadexpr"("Perl6", "expr")
 
     p6rule = compreg "PGE::P6Rule"
     cmdpat = p6rule("^(rule|next|trace|pir)\\s*(.*)$")
@@ -94,7 +93,6 @@ PROMPT
 .end
 
 .include "simple.pir"
-.include "p6parse.pir"
 
 # Local Variables:
 #   mode: pir

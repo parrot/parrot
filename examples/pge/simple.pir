@@ -11,31 +11,31 @@
     store_global "Simple", "$optable", optable
 
     p6rule = compreg "PGE::P6Rule"
-    term = p6rule("\\d+ | <ident>", "Simple", "term")
+    term = p6rule("\\d+ | <ident>", 'grammar' => "Simple", 'name' => "term")
 
-    optable.addtok("infix:+")
-    optable.addtok("infix:-", "infix:+")
+    optable.'newtok'("infix:+", 'precedence' => '=')
+    optable.'newtok'("infix:-", 'equiv' => 'infix:+')
 
-    optable.addtok("infix:*", ">infix:+")
-    optable.addtok("infix:/", "infix:*")
-    optable.addtok("infix:%", "infix:*")
+    optable.'newtok'("infix:*", 'tighter' => 'infix:+')
+    optable.'newtok'("infix:/", 'equiv' => 'infix:*')
+    optable.'newtok'("infix:%", 'equiv' => 'infix:*')
 
-    optable.addtok("prefix:+", ">infix:*")
-    optable.addtok("prefix:-", "prefix:+")
-    optable.addtok("prefix:!", "prefix:+")
+    optable.'newtok'("prefix:+", 'tighter' => 'infix:*')
+    optable.'newtok'("prefix:-", 'equiv' => 'prefix:+')
+    optable.'newtok'("prefix:!", 'equiv' => 'prefix:+')
 
-    optable.addtok("infix:**", ">prefix:+")
+    optable.'newtok'("infix:**", 'tighter' => '>prefix:+')
 
-    optable.addtok("postcircumfix:( )", ">infix:**", "nullterm")
+    optable.'newtok'("postcircumfix:( )", 'tighter' => "infix:**", 'nullterm' => 1)
 
-    optable.addtok("term:", ">postcircumfix:( )", "left", term)
-    optable.addtok("circumfix:( )", "term:")
+    optable.'newtok'("term:", 'tighter' => 'postcircumfix:( )', 'parsed' => term)
+    optable.'newtok'("circumfix:( )", 'equiv' => 'term:')
 
-    optable.addtok("infix:==", "<infix:+")
-    optable.addtok("infix:!=", "infix:==")
+    optable.'newtok'("infix:==", 'looser' => 'infix:+')
+    optable.'newtok'("infix:!=", 'equiv' => 'infix:==')
 
-    optable.addtok("ternary:? :", "<infix:==", "right")
-    optable.addtok("infix:=", "<ternary:? :", "right")
+    optable.'newtok'("ternary:? :", 'looser' => 'infix:==', 'assoc' => 'right')
+    optable.'newtok'("infix:=", 'looser' => 'ternary:? :', 'assoc' => 'right')
 .end
 
 .sub "expr"
