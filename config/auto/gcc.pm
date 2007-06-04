@@ -247,6 +247,9 @@ sub runstep {
         }
     }
 
+    $conf->data->set( sym_export => '__attribute__ ((visibility("default")))' )
+        if $gccversion >= 4.0;
+
     if ( defined $conf->options->get('miniparrot') && $gccversion ) {
 
         # make the compiler act as ANSIish as possible, and avoid enabling
@@ -265,9 +268,6 @@ sub runstep {
         gccversion          => $gccversion,
         HAS_aligned_funcptr => 1
     );
-
-    $conf->data->set( sym_export => '__attribute__ ((visibility("default")))' )
-        if $gccversion > 4.0;
 
     $conf->data->set( HAS_aligned_funcptr => 0 )
         if $^O eq 'hpux';
