@@ -1,7 +1,6 @@
-/*
-Copyright (C) 2007, The Perl Foundation.
-$Id$
-*/
+# Copyright (C) 2007, The Perl Foundation.
+# $Id$
+
 package Parrot::Pmc2c::UtilFunctions;
 use strict;
 use warnings;

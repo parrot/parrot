@@ -1,7 +1,6 @@
-/*
-Copyright (C) 2007, The Perl Foundation.
-$Id$
-*/
+# Copyright (C) 2007, The Perl Foundation.
+# $Id$
+
 =head1 Parrot::Pmc2c::default Instance Methods
 
 =over 4
