@@ -353,7 +353,7 @@ get_nci_P(Interp *interp, call_state *st, int n)
     if (n < st->src.n)
         Parrot_fetch_arg_nci(interp, st);
     else
-        UVal_pmc(st->val) = NULL;
+        UVal_pmc(st->val) = PMCNULL;
 
     return UVal_pmc(st->val);
 }
