@@ -2047,31 +2047,8 @@ C<eval>s an instruction.
 void
 PDB_eval(Interp *interp, const char *command)
 {
-    opcode_t *run;
-#if 0
-    PackFile *eval_pf;
-    PackFile_ByteCode *old_cs;
-#endif
-
-    /*
-    The replacement code is almost certainly wrong. The previous
-    code is almost certainly wrong as well. Obviously, the
-    Parrot debugger needs some love.
-    */
-
-#if 0
-    eval_pf = PDB_compile(interp, command);
-
-    if (eval_pf) {
-        old_cs = Parrot_switch_to_cs(interp, eval_pf->cur_cs, 1);
-        run    = eval_pf->cur_cs->base.data;
-        DO_OP(run,interp);
-        Parrot_switch_to_cs(interp, old_cs, 1);
-        /* TODO destroy packfile */
-    }
-#endif
-
-    run = PDB_compile(interp, command);
+    /* This code is almost certainly wrong. The Parrot debugger needs love. */
+    opcode_t *run = PDB_compile(interp, command);
 
     if (run)
         DO_OP(run,interp);
