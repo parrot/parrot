@@ -45,7 +45,7 @@ static INTVAL get_attrib_index(Parrot_Interp interp, PMC *self, STRING *name) {
             Parrot_Class *class_info = PARROT_CLASS(cur_class);
 
             /* Build a string representing the fully qualified attribute name. */
-            STRING *fq_name = Parrot_Class_get_fq_classname(interp, class_info);
+            STRING *fq_name = VTABLE_get_string(interp, cur_class);
             fq_name = string_append(interp, fq_name, name);
 
             /* Look up. */
