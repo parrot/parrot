@@ -16,7 +16,7 @@ sub get_valid_options {
         jitcapable ld ldflags lex libdir libexecdir libs link linkflags
         localstatedir m maintainer mandir miniparrot nomanicheck oldincludedir
         opcode ops optimize parrot_is_shared pmc prefix profile sbindir
-        sharedstatedir step sysconfdir test verbose verbose-step version 
+        sharedstatedir step sysconfdir test verbose verbose-step version
         without-gdbm without-gmp without-icu yacc);
 }
 

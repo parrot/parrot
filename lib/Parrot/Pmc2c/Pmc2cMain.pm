@@ -480,7 +480,7 @@ sub gen_parent_list {
 
         for my $parent_name (@parent_names) {
             #load $parent_name into $all
-            $all->{$parent_name} = 
+            $all->{$parent_name} =
                 $self->read_dump( lc("$parent_name.pmc") ) if not $all->{$parent_name};
 
             #add parent's has_method hash to pmc_class' has_parent hash

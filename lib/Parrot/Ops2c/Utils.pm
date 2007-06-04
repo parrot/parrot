@@ -352,7 +352,7 @@ sub _generate_guard_macro_name {
     shift @path if $path[0] eq 'include';
     shift @path if $path[0] eq 'parrot';
     return uc(join('_', 'parrot', @path, 'h', 'guard'));
-    
+
 }
 
 sub _print_guard_prefix {
