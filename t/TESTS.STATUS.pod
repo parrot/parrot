@@ -146,8 +146,8 @@ exist for include files. Tests under B<t/library/>.
 
 =item Status
 
-B<Poor>. Tests exist, but do not yet cover basic functionality of all
-components. Tests under B<t/configure/>.
+B<Good>. Tests exist, and the coverage is decent and improving.  Tests under
+B<t/configure/>.
 
 =back
 
@@ -180,8 +180,7 @@ Tests under B<t/doc>.
 
 =item Status
 
-B<Poor>. In the test suite there is only F<t/codingstd/cppcomments.t>.
-There is also an unmaintained script F<tools/dev/check_source_standards.pl>.
+B<Good>. Tests under F<t/codingstd/*.t>.
 
 =back
 
