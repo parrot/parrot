@@ -99,8 +99,8 @@
 (sys:%make-package "COMMON-LISP-USER")
 (sys:%alias-package (sys:%find-package "COMMON-LISP-USER") "CL-USER")
 
-;        (cl:setq *package* (sys:%find-package "CL-USER"))
-;        (sys:%use-package (sys:%find-package "CL-USER")
-;        		  (sys:%find-package "COMMON-LISP"))
+(cl:setq *package* (sys:%find-package "CL-USER"))
+(sys:%use-package (sys:%find-package "CL-USER")
+		  (sys:%find-package "COMMON-LISP"))
 
 ;        (in-package "COMMON-LISP-USER")

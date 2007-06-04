@@ -296,6 +296,7 @@ DONE:
 
 .sub _IS_ORDINARY_LAMBDA_LIST
   .param pmc form
+
   .local string type
   .local pmc symbol
   .local pmc args

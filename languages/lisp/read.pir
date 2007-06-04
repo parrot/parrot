@@ -186,7 +186,6 @@ DONE:
   .local pmc stream
   .local pmc symbol
   .local pmc tretv
-  .local pmc ntretv
   .local pmc retv
   .local pmc lptr
   .local int ordv
@@ -266,11 +265,13 @@ CALL_MACRO:
   .STRING(mchar, char)
   .LIST_2(margs, istream, mchar)           # Create a list of args to pass in
 
+   null tretv
    tretv = _FUNCTION_CALL(macro, margs)   # Call the readmacro
+   if_null tretv, LOOP
 
    # VALID_IN_PARROT_0_2_0 if argcP == 0 goto LOOP                # If macro is NULL, start loop again
-   ntretv = tretv
-   if ntretv == 0 goto LOOP               # If macro is NULL, start loop again
+   # VALID_IN_PARROT_0_2_0 ntretv = tretv
+   # VALID_IN_PARROT_0_2_0 if ntretv == 0 goto LOOP               # If macro is NULL, start loop again
    goto APPEND_TO_LIST                    # else add the return value to list
 
 DELIMIT_CHAR:                             # We've hit the delimter char -
