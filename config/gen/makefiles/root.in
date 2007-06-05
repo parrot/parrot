@@ -1830,6 +1830,8 @@ hwork:
 		src/pic.o \
 		src/stacks.o \
 		src/stack_common.o \
+		src/mmd.o \
+		src/objects.o
 
 ###############################################################################
 #

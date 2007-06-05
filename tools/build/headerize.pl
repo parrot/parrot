@@ -28,6 +28,8 @@ on the command line.
 
 * Test the POD of the stuff we're parsing.
 
+* Somehow handle static functions in the source file
+
 =head1 NOTES
 
 * the .c files MUST have a /* HEADER: foo/bar.h */ directive in them
@@ -142,7 +144,7 @@ sub function_components {
     my $parms      = join( " ", @lines );
 
     $parms =~ s/\s+/ /g;
-    $parms =~ s/([^(]+)\s*\((.+)\);?/$2/ or die "Couldn't handle $proto";
+    $parms =~ s/([^(]+)\s*\((.+)\);?/$2/ or die qq{Couldn't handle "$proto"};
     my $funcname = $1;
     $parms = $2;
     my @parms = split( /\s*,\s*/, $parms );

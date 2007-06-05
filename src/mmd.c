@@ -40,10 +40,14 @@ not highest type in table.
 
 */
 
+#include "parrot/compiler.h"
 #include "parrot/parrot.h"
+#include "parrot/mmd.h"
 #include "parrot/oplib/ops.h"
 #include "mmd.str"
 #include <assert.h>
+
+/* HEADER: include/parrot/mmd.h */
 
 #define MMD_DEBUG 0
 
@@ -92,14 +96,14 @@ dump_mmd(Interp *interp, INTVAL function)
 }
 #endif
 
-
+PARROT_API
 funcptr_t
 get_mmd_dispatch_type(Interp *interp, INTVAL func_nr, INTVAL left_type,
-        INTVAL right_type, int *is_pmc /*NN*/)
+        INTVAL right_type, int * const is_pmc /*NN*/ )
 {
     funcptr_t func, func_;
     INTVAL r;
-    MMD_table *table = interp->binop_mmd_funcs + func_nr;
+    MMD_table * const table = interp->binop_mmd_funcs + func_nr;
     const UINTVAL x_funcs = table->x;
     const UINTVAL y_funcs = table->y;
 
@@ -159,8 +163,12 @@ get_mmd_dispatch_type(Interp *interp, INTVAL func_nr, INTVAL left_type,
 
 
 static funcptr_t
-get_mmd_dispatcher(Interp *interp, PMC *left, PMC * right,
-        INTVAL function, int *is_pmc)
+get_mmd_dispatcher(Interp *interp, PMC *left, PMC *right,
+        INTVAL function, int *is_pmc /*NN*/)
+        __attribute__nonnull__(5);
+static funcptr_t
+get_mmd_dispatcher(Interp *interp, PMC *left, PMC *right,
+        INTVAL function, int *is_pmc /*NN*/)
 {
     const UINTVAL left_type = VTABLE_type(interp, left);
     const UINTVAL right_type = VTABLE_type(interp, right);
@@ -170,18 +178,17 @@ get_mmd_dispatcher(Interp *interp, PMC *left, PMC * right,
 
 /*
 
-=item C<static PMC*
-mmd_deref(Interp *interp, INTVAL function, PMC *value)>
-
+FUNCDOC:
 If C<value> is a reference-like PMC, dereference it so we can make an MMD
 call on the 'real' value.
-
-=cut
 
 */
 
 static PMC *
-mmd_deref(Interp *interp, INTVAL function, PMC *value)
+mmd_deref(Interp *interp, INTVAL function, PMC *value /*NN*/)
+        __attribute__nonnull__(3);
+static PMC *
+mmd_deref(Interp *interp, INTVAL function, PMC *value /*NN*/)
 {
     if (VTABLE_type(interp, value) != value->vtable->base_type)
         return VTABLE_get_pmc(interp, value);
@@ -191,17 +198,13 @@ mmd_deref(Interp *interp, INTVAL function, PMC *value)
 
 /*
 
-=item C<static void
-mmd_ensure_writable(Interp *, INTVAL function, PMC *pmc)>
-
+FUNCDOC:
 Make sure C<pmc> is writable enough for C<function>.
-
-=cut
 
 */
 
 static void
-mmd_ensure_writable(Interp *interp, INTVAL function, PMC *pmc) {
+mmd_ensure_writable(Interp *interp, INTVAL function, PMC *pmc /*NULLOK*/) {
     if (!PMC_IS_NULL(pmc) && (pmc->vtable->flags & VTABLE_IS_READONLY_FLAG))
         real_exception(interp, 0, 1, "%s applied to read-only argument",
             Parrot_MMD_method_name(interp, function));
@@ -260,6 +263,7 @@ Inplace dispatch functions for C<< left <op=> right >>.
 
 */
 
+PARROT_API
 PMC*
 mmd_dispatch_p_ppp(Interp *interp,
         PMC *left, PMC *right, PMC *dest, INTVAL func_nr)
@@ -287,6 +291,7 @@ mmd_dispatch_p_ppp(Interp *interp,
     }
 }
 
+PARROT_API
 PMC*
 mmd_dispatch_p_pip(Interp *interp,
         PMC *left, INTVAL right, PMC *dest, INTVAL func_nr)
@@ -319,6 +324,7 @@ mmd_dispatch_p_pip(Interp *interp,
     }
 }
 
+PARROT_API
 PMC*
 mmd_dispatch_p_pnp(Interp *interp,
         PMC *left, FLOATVAL right, PMC *dest, INTVAL func_nr)
@@ -346,15 +352,15 @@ mmd_dispatch_p_pnp(Interp *interp,
     }
 }
 
+PARROT_API
 PMC*
 mmd_dispatch_p_psp(Interp *interp,
         PMC *left, STRING *right, PMC *dest, INTVAL func_nr)
 {
     mmd_f_p_psp real_function;
     int is_pmc;
-    UINTVAL left_type;
+    const UINTVAL left_type = left->vtable->base_type;
 
-    left_type = left->vtable->base_type;
     real_function = (mmd_f_p_psp)get_mmd_dispatch_type(interp,
             func_nr, left_type, enum_type_STRING, &is_pmc);
     if (is_pmc) {
@@ -374,13 +380,13 @@ mmd_dispatch_p_psp(Interp *interp,
 /*
  * inplace variants
  */
+PARROT_API
 void
 mmd_dispatch_v_pp(Interp *interp,
-        PMC *left, PMC *right, INTVAL func_nr)
+        PMC *left /*NN*/, PMC *right /*NN*/, INTVAL func_nr)
 {
     mmd_f_v_pp real_function;
     int is_pmc;
-
 
     left = mmd_deref(interp, func_nr, left);
     right = mmd_deref(interp, func_nr, right);
@@ -399,6 +405,7 @@ mmd_dispatch_v_pp(Interp *interp,
     }
 }
 
+PARROT_API
 void
 mmd_dispatch_v_pi(Interp *interp,
         PMC *left, INTVAL right, INTVAL func_nr)
@@ -422,9 +429,10 @@ mmd_dispatch_v_pi(Interp *interp,
     }
 }
 
+PARROT_API
 void
 mmd_dispatch_v_pn(Interp *interp,
-        PMC *left, FLOATVAL right, INTVAL func_nr)
+        PMC *left /*NN*/, FLOATVAL right, INTVAL func_nr)
 {
     mmd_f_v_pn real_function;
     int is_pmc;
@@ -445,9 +453,10 @@ mmd_dispatch_v_pn(Interp *interp,
     }
 }
 
+PARROT_API
 void
 mmd_dispatch_v_ps(Interp *interp,
-        PMC *left, STRING *right, INTVAL func_nr)
+        PMC *left /*NN*/, STRING *right, INTVAL func_nr)
 {
     mmd_f_v_ps real_function;
     int is_pmc;
@@ -470,20 +479,16 @@ mmd_dispatch_v_ps(Interp *interp,
 
 /*
 
-=item C<INTVAL
-mmd_dispatch_i_pp(Interp *interp,
-        PMC *left, PMC *right, INTVAL func_nr)>
-
+FUNCDOC:
 Like C<mmd_dispatch_p_ppp()>, only it returns an C<INTVAL>. This is used
 by MMD compare functions.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
 mmd_dispatch_i_pp(Interp *interp,
-        PMC *left, PMC *right, INTVAL func_nr)
+        PMC *left /*NN*/, PMC *right /*NN*/, INTVAL func_nr)
 {
     mmd_f_i_pp real_function;
     int is_pmc;
@@ -508,19 +513,15 @@ mmd_dispatch_i_pp(Interp *interp,
 
 /*
 
-=item C<void
-mmd_add_function(Interp *interp,
-        INTVAL funcnum, funcptr_t function)>
-
+FUNCDOC:
 Add a new binary MMD function to the list of functions the MMD system knows
 of. C<func_num> is the number of the new function. C<function> is ignored.
 
 TODO change this to a MMD register interface that takes a function *name*.
 
-=cut
-
 */
 
+PARROT_API
 void
 mmd_add_function(Interp *interp,
         INTVAL func_nr, funcptr_t function)
@@ -550,12 +551,8 @@ mmd_add_function(Interp *interp,
 
 /*
 
-=item C<static void
-mmd_expand_x(Interp *interp, INTVAL func_nr, INTVAL new_x)>
-
+FUNCDOC:
 Expands the function table in the X dimension to include C<new_x>.
-
-=cut
 
 */
 
@@ -609,12 +606,8 @@ mmd_expand_x(Interp *interp, INTVAL func_nr, INTVAL new_x)
 
 /*
 
-=item C<static void
-mmd_expand_y(Interp *interp, INTVAL func_nr, INTVAL new_y)>
-
+FUNCDOC:
 Expands the function table in the Y direction.
-
-=cut
 
 */
 
@@ -640,12 +633,7 @@ mmd_expand_y(Interp *interp, INTVAL func_nr, INTVAL new_y)
 
 /*
 
-=item C<void
-mmd_add_by_class(Interp *interp,
-             INTVAL functype,
-             STRING *left_class, STRING *right_class,
-             funcptr_t funcptr)>
-
+FUNCDOC:
 Add a function to the MMD table by class name, rather than class number.
 Handles the case where the named class isn't loaded yet.
 
@@ -666,10 +654,9 @@ installed when it's needed.
 The function table must exist, but if it is too small, it will
 automatically be expanded.
 
-=cut
-
 */
 
+PARROT_API
 void
 mmd_add_by_class(Interp *interp,
              INTVAL functype,
@@ -692,12 +679,7 @@ mmd_add_by_class(Interp *interp,
 
 /*
 
-=item C<void
-mmd_register(Interp *interp,
-             INTVAL func_num,
-             INTVAL left_type, INTVAL right_type,
-             funcptr_t funcptr)>
-
+FUNCDOC:
 Register a function C<funcptr> for MMD function table C<func_num> for classes
 C<left_type> and C<right_type>. The left and right types are C<INTVAL>s that
 represent the class ID numbers.
@@ -718,10 +700,9 @@ searching, as it assumes that all PMC types have no parent type. This
 can be considered a bug, and will be resolved at some point in the
 future.
 
-=cut
-
 */
 
+PARROT_API
 void
 mmd_register(Interp *interp,
              INTVAL func_nr,
@@ -753,6 +734,7 @@ mmd_register(Interp *interp,
     table->mmd_funcs[offset] = funcptr;
 }
 
+PARROT_API
 void
 mmd_register_sub(Interp *interp,
              INTVAL func_nr,
@@ -772,15 +754,12 @@ mmd_register_sub(Interp *interp,
 
 /*
 
-=item C<void
-mmd_destroy(Parrot_Interp interp)>
-
+FUNCDOC:
 Frees all the memory allocated used the MMD subsystem.
-
-=cut
 
 */
 
+PARROT_API
 void
 mmd_destroy(Parrot_Interp interp)
 {
@@ -799,20 +778,18 @@ mmd_destroy(Parrot_Interp interp)
 
 /*
 
-=item C<PMC *
-mmd_vtfind(Parrot_Interp interp, INTVAL type, INTVAL left, INTVAL right)>
-
+FUNCDOC:
 Return an MMD PMC function for the given data types. The return result is
 either a Sub PMC (for PASM MMD functions) or a NCI PMC holding the
 C function pointer in PMC_struct_val.
 
-=cut
-
 */
 
+PARROT_API
 PMC *
 mmd_vtfind(Parrot_Interp interp, INTVAL func_nr,
-           INTVAL left, INTVAL right) {
+           INTVAL left, INTVAL right)
+{
     int is_pmc;
     PMC *f;
     const funcptr_t func = get_mmd_dispatch_type(interp,
@@ -840,6 +817,7 @@ static void mmd_search_builtin(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
 static int  mmd_maybe_candidate(Interp *, PMC *pmc, PMC *arg_tuple, PMC *cl);
 static void mmd_sort_candidates(Interp *, PMC *arg_tuple, PMC *cl);
 
+PARROT_API
 PMC *
 Parrot_MMD_search_default_infix(Interp *interp, STRING *meth,
         INTVAL left_type, INTVAL right_type)
@@ -863,7 +841,9 @@ manhatten distance to the current args.
 
 */
 
-PMC *Parrot_mmd_sort_candidate_list(Interp *interp, PMC *candidates)
+PARROT_API
+PMC *
+Parrot_mmd_sort_candidate_list(Interp *interp, PMC *candidates)
 {
     PMC *arg_tuple;
     INTVAL n;
@@ -1622,15 +1602,12 @@ mmd_create_builtin_multi_meth(Interp *interp, PMC *ns, INTVAL type,
 
 /*
 
-=item C<void Parrot_mmd_register_table(Interp*, INTVAL type,
-   MMD_init *, INTVAL)>
-
+FUNCDOC:
 Register MMD functions for this PMC type.
-
-=cut
 
 */
 
+PARROT_API
 void
 Parrot_mmd_register_table(Interp* interp, INTVAL type,
         const MMD_init *mmd_table, INTVAL n)
@@ -1682,6 +1659,7 @@ negative all MMD functions are rebuilt.
 
 */
 
+PARROT_API
 void
 Parrot_mmd_rebuild_table(Interp* interp, INTVAL type, INTVAL func_nr)
 {

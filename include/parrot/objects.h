@@ -28,37 +28,125 @@ typedef enum {
     PCD_MAX
 } PARROT_CLASS_DATA_ENUM;
 
-PARROT_API PMC *Parrot_single_subclass(Parrot_Interp, PMC *, PMC *);
-PARROT_API void Parrot_new_class(Parrot_Interp, PMC *, PMC *);
-PARROT_API PMC *Parrot_class_lookup(Parrot_Interp, STRING *);
-PARROT_API PMC *Parrot_class_lookup_p(Parrot_Interp, PMC *);
-PARROT_API void Parrot_add_parent(Parrot_Interp, PMC *, PMC *);
-PARROT_API PMC *Parrot_remove_parent(Parrot_Interp, PMC *, PMC *);
-PARROT_API PMC *Parrot_multi_subclass(Parrot_Interp, PMC *, STRING *);
-PARROT_API void Parrot_instantiate_object(Parrot_Interp, PMC *);
-PARROT_API void Parrot_instantiate_object_init(Parrot_Interp, PMC *, PMC *);
-PARROT_API INTVAL Parrot_object_isa(Parrot_Interp interp, PMC *, PMC *);
-PARROT_API PMC *Parrot_new_method_cache(Parrot_Interp);
-PARROT_API PMC *Parrot_find_method_with_cache(Parrot_Interp, PMC *, STRING *);
-PARROT_API PMC *Parrot_find_method_direct(Parrot_Interp, PMC *, STRING *);
-PARROT_API INTVAL Parrot_add_attribute(Parrot_Interp, PMC*, STRING*);
-PARROT_API void Parrot_note_method_offset(Parrot_Interp, UINTVAL, PMC *);
-PARROT_API PMC *Parrot_get_attrib_by_num(Parrot_Interp, PMC *, INTVAL);
-PARROT_API void Parrot_set_attrib_by_num(Parrot_Interp, PMC *, INTVAL, PMC *);
-PARROT_API PMC *Parrot_get_attrib_by_str(Parrot_Interp, PMC *, STRING*);
-PARROT_API void Parrot_set_attrib_by_str(Parrot_Interp, PMC *, STRING*, PMC *);
-PARROT_API INTVAL Parrot_get_attrib_num(Parrot_Interp, PMC *, STRING *);
-PARROT_API INTVAL Parrot_class_offset(Parrot_Interp, PMC *, STRING *);
-PARROT_API PMC *Parrot_find_class_constructor(Parrot_Interp, STRING *, INTVAL);
-PARROT_API PMC *Parrot_find_class_destructor(Parrot_Interp, STRING *, INTVAL);
-PARROT_API PMC *Parrot_find_class_fallback(Parrot_Interp, STRING *, INTVAL);
-PARROT_API void Parrot_set_class_constructor(Parrot_Interp, STRING *, INTVAL, STRING *);
-PARROT_API void Parrot_set_class_destructor(Parrot_Interp, STRING *, INTVAL, STRING *);
-PARROT_API void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
-PARROT_API void Parrot_invalidate_method_cache(Interp*, STRING *_class, STRING *meth);
-PARROT_API STRING *readable_name(Parrot_Interp, PMC *);
-PARROT_API INTVAL Parrot_get_vtable_index(Interp *, const STRING *name);
-PARROT_API PMC *Parrot_find_vtable_meth(Interp* interp, PMC *pmc, STRING *meth);
+/* HEADERIZER BEGIN: src/objects.c */
+
+void Parrot_ComposeRole( Interp *interp,
+    PMC *role,
+    PMC *exclude,
+    int got_exclude,
+    PMC *alias,
+    int got_alias,
+    PMC *methods_hash,
+    PMC *roles_list );
+
+PMC* Parrot_ComputeMRO_C3( Interp *interp, PMC *_class );
+PARROT_API INTVAL Parrot_MMD_method_idx( Interp *interp, const char *name );
+PARROT_API const char* Parrot_MMD_method_name( Interp *interp, INTVAL idx );
+PARROT_API INTVAL Parrot_add_attribute( Interp *interp,
+    PMC* _class,
+    STRING* attr );
+
+PARROT_API void Parrot_add_parent( Interp *interp, PMC *_class, PMC *parent );
+PARROT_API PMC * Parrot_class_lookup( Interp *interp, STRING *class_name );
+PMC * Parrot_class_lookup_p( Interp *interp, PMC *class_name );
+PARROT_API INTVAL Parrot_class_offset( Interp *interp,
+    PMC *object,
+    STRING *_class );
+
+PARROT_API PMC * Parrot_find_class_constructor( Interp *interp,
+    STRING *_class,
+    INTVAL classtoken );
+
+PARROT_API PMC * Parrot_find_class_destructor( Interp *interp,
+    STRING *_class,
+    INTVAL classtoken );
+
+PARROT_API PMC * Parrot_find_class_fallback( Interp *interp,
+    STRING *_class,
+    INTVAL classtoken );
+
+PARROT_API PMC * Parrot_find_method_direct( Interp *interp,
+    PMC *_class,
+    STRING *method_name );
+
+PARROT_API PMC * Parrot_find_method_with_cache( Interp *interp,
+    PMC *_class,
+    STRING *method_name /*NN*/ )
+        __attribute__nonnull__(3);
+
+PARROT_API PMC* Parrot_find_vtable_meth( Interp *interp,
+    PMC *pmc,
+    STRING *meth );
+
+PARROT_API PMC * Parrot_get_attrib_by_num( Interp *interp,
+    PMC *object,
+    INTVAL attrib );
+
+PARROT_API PMC * Parrot_get_attrib_by_str( Interp *interp,
+    PMC *object,
+    STRING *attr );
+
+PARROT_API INTVAL Parrot_get_vtable_index( Interp *interp,
+    const STRING *name /*NN*/ )
+        __attribute__nonnull__(2);
+
+PARROT_API void Parrot_instantiate_object( Interp *interp, PMC *object );
+PARROT_API void Parrot_instantiate_object_init( Interp *interp,
+    PMC *object,
+    PMC *init );
+
+PARROT_API void Parrot_invalidate_method_cache( Interp *interp,
+    STRING *_class,
+    STRING *meth );
+
+PARROT_API PMC * Parrot_multi_subclass( Interp *interp,
+    PMC *base_class_array,
+    STRING *child_class_name );
+
+PARROT_API void Parrot_new_class( Interp *interp, PMC *_class, PMC *name );
+PARROT_API PMC * Parrot_new_method_cache( Interp *interp );
+PARROT_API void Parrot_note_method_offset( Interp *interp,
+    UINTVAL offset,
+    PMC *method );
+
+PARROT_API INTVAL Parrot_object_isa( Interp *interp, PMC *pmc, PMC *_class );
+PARROT_API PMC * Parrot_remove_parent( Interp *interp,
+    PMC *removed_class,
+    PMC *existing_class );
+
+PARROT_API void Parrot_set_attrib_by_num( Interp *interp,
+    PMC *object,
+    INTVAL attrib,
+    PMC *value );
+
+PARROT_API void Parrot_set_attrib_by_str( Interp *interp,
+    PMC *object,
+    STRING *attr,
+    PMC *value );
+
+PARROT_API void Parrot_set_class_constructor( Interp *interp,
+    STRING *_class,
+    INTVAL classtoken,
+    STRING *method );
+
+PARROT_API void Parrot_set_class_destructor( Interp *interp,
+    STRING *_class,
+    INTVAL classtoken,
+    STRING *method );
+
+PARROT_API void Parrot_set_class_fallback( Interp *interp,
+    STRING *_class,
+    INTVAL classtoken,
+    STRING *method );
+
+PARROT_API PMC * Parrot_single_subclass( Interp *interp,
+    PMC *base_class,
+    PMC *name );
+
+void destroy_object_cache( Interp *interp );
+void mark_object_cache( Interp *interp );
+PARROT_API STRING* readable_name( Interp *interp, PMC *name );
+/* HEADERIZER END: src/objects.c */
 
 /* Objects, classes and PMCarrays all use the same data scheme:
  * PMC_data() holds a malloced array, PMC_int_val() is the size of it
