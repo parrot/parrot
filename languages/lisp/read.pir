@@ -165,6 +165,7 @@ DONE:
 .sub _error
   .param string type                    # There's current no way to add more
   .param string mesg                    # than just _message to the exception.
+
   .local pmc e
 
   e = new Exception
@@ -176,6 +177,7 @@ DONE:
 
 .sub _read_delimited_list
   .param pmc args
+
   .local string dchar
   .local string char
   .local pmc readmacros
@@ -305,6 +307,7 @@ DONE:
 
 .sub _left_paren_macro                  # As described in CLtL section 2.4.1
   .param pmc args
+
   .local pmc stream
   .local pmc delimit
   .local pmc rargs
@@ -328,6 +331,7 @@ DONE:
 
 .sub _single_quote_macro                # As described in CLtL section 2.4.3
   .param pmc args
+
   .local pmc stream
   .local pmc symbol
   .local pmc rargs
@@ -378,6 +382,7 @@ RETURN:
 
 .sub _double_quote_macro                # As described in CLtL section 2.4.5.
   .param pmc args
+
   .local string strtok
   .local pmc istream
   .local pmc stream
@@ -448,8 +453,8 @@ DONE:
 
 .sub _sharpsign_macro                   # As described in CLtL section 2.4.8
   .param pmc args
+
   .local string char
-  .local string test
   .local pmc istream
   .local pmc stream
   .local pmc symbol
@@ -471,8 +476,7 @@ DONE:
 
   macro = macros[char]
 
-  typeof test, macro
-  if test == "None" goto MACRO_NOT_DEFINED
+  if_null macro, MACRO_NOT_DEFINED
 
   .ASSERT_TYPE(macro, "function")
   _FUNCTION_CALL(macro,args)
