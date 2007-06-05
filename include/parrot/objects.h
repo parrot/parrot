@@ -75,8 +75,9 @@ PARROT_API PMC * Parrot_find_method_with_cache( Interp *interp,
         __attribute__nonnull__(3);
 
 PARROT_API PMC* Parrot_find_vtable_meth( Interp *interp,
-    PMC *pmc,
-    STRING *meth );
+    PMC *pmc /*NN*/,
+    STRING *meth )
+        __attribute__nonnull__(2);
 
 PARROT_API PMC * Parrot_get_attrib_by_num( Interp *interp,
     PMC *object,
@@ -141,7 +142,7 @@ PARROT_API void Parrot_set_class_fallback( Interp *interp,
 
 PARROT_API PMC * Parrot_single_subclass( Interp *interp,
     PMC *base_class,
-    PMC *name );
+    PMC *name /*NULLOK*/ );
 
 void destroy_object_cache( Interp *interp );
 void mark_object_cache( Interp *interp );

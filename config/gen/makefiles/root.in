@@ -1836,7 +1836,9 @@ hwork:
 		src/stacks.o \
 		src/stack_common.o \
 		src/mmd.o \
-		src/objects.o
+		src/objects.o \
+		src/key.o \
+
 
 ###############################################################################
 #
