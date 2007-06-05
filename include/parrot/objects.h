@@ -39,7 +39,7 @@ void Parrot_ComposeRole( Interp *interp,
     PMC *methods_hash,
     PMC *roles_list );
 
-PMC* Parrot_ComputeMRO_C3( Interp *interp, PMC *_class );
+PARROT_API PMC* Parrot_ComputeMRO_C3( Interp *interp, PMC *_class );
 PARROT_API INTVAL Parrot_MMD_method_idx( Interp *interp, const char *name );
 PARROT_API const char* Parrot_MMD_method_name( Interp *interp, INTVAL idx );
 PARROT_API INTVAL Parrot_add_attribute( Interp *interp,

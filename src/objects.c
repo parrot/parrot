@@ -1833,6 +1833,7 @@ Computes the C3 linearization for the given class.
 
 */
 
+PARROT_API
 PMC*
 Parrot_ComputeMRO_C3(Interp *interp, PMC *_class)
 {
