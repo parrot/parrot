@@ -113,7 +113,7 @@ Return the vtable method PMC if found.
 
 PARROT_API
 PMC*
-Parrot_find_vtable_meth(Interp *interp, PMC *pmc, STRING *meth)
+Parrot_find_vtable_meth(Interp *interp, PMC *pmc /*NN*/, STRING *meth)
 {
     INTVAL i, n;
     PMC   *ns, *mro, *self_class;
@@ -161,7 +161,7 @@ XXX this function, key_set_to_string, and the key PMC get_repr should be consoli
 
 PARROT_API
 STRING*
-readable_name(Interp *interp, PMC *name)
+readable_name(Interp *interp, PMC *name /*NN*/)
 {
     STRING *join_on;
     PMC    *array;
@@ -413,7 +413,7 @@ function.
 
 PARROT_API
 PMC *
-Parrot_single_subclass(Interp *interp, PMC *base_class, PMC *name)
+Parrot_single_subclass(Interp *interp, PMC *base_class, PMC *name /*NULLOK*/)
 {
     PMC      *child_class, *parents, *temp_pmc, *mro;
     SLOTTYPE *child_class_array;
@@ -1908,6 +1908,7 @@ the default implementation.
 
 */
 
+PARROT_API
 void
 Parrot_ComposeRole(Interp *interp, PMC *role,
                         PMC *exclude, int got_exclude,

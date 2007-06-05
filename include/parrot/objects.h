@@ -30,7 +30,7 @@ typedef enum {
 
 /* HEADERIZER BEGIN: src/objects.c */
 
-void Parrot_ComposeRole( Interp *interp,
+PARROT_API void Parrot_ComposeRole( Interp *interp,
     PMC *role,
     PMC *exclude,
     int got_exclude,
@@ -145,7 +145,9 @@ PARROT_API PMC * Parrot_single_subclass( Interp *interp,
 
 void destroy_object_cache( Interp *interp );
 void mark_object_cache( Interp *interp );
-PARROT_API STRING* readable_name( Interp *interp, PMC *name );
+PARROT_API STRING* readable_name( Interp *interp, PMC *name /*NN*/ )
+        __attribute__nonnull__(2);
+
 /* HEADERIZER END: src/objects.c */
 
 /* Objects, classes and PMCarrays all use the same data scheme:
