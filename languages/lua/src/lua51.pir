@@ -734,18 +734,36 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .namespace [ "Lua::Symbtab" ]
 
 .sub '__onload' :load :init
-    $P0 = subclass 'Hash', 'Lua::Symbtab'
+    $P0 = subclass 'ResizablePMCArray', 'Lua::Symbtab'
 .end
 
 .sub 'insert' :method
     .param string name
-    self[name] = 1
+    $P0 = self[0]
+    $P0[name] = 1
 .end
 
 .sub 'lookup' :method
     .param string name
-    $I0 = exists self[name]
-    .return ($I0)
+    .local pmc iter
+    new iter, .Iterator, self
+  L1:
+    unless iter goto L2
+    $P0 = shift iter
+    $I0 = exists $P0[name]
+    unless $I0 goto L1
+    .return (1)
+  L2:
+    .return (0)
+.end
+
+.sub 'push_scope' :method
+    new $P0, .Hash
+    unshift self, $P0
+.end
+
+.sub 'pop_scope' :method
+    $P0 = shift self
 .end
 
 .include 'languages/lua/src/lua51_gen.pir'

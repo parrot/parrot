@@ -291,10 +291,10 @@ transform repeat (PAST::Op) :language('PIR') {
     $S0 = concat $S0, '_end'
     endlabel = ops.'new'('POST::Label', 'result'=>$S0)
     ops.'push'(looplabel)
-    $P0 = node[1]
+    $P0 = node[0]
     blk = tree.'get'('post', $P0)
     ops.'push'(blk)
-    $P0 = node[0]
+    $P0 = node[1]
     expr = tree.'get'('post', $P0)
     ops.'push'(expr)
     ops.'push_pirop'('if', expr, endlabel)
@@ -407,25 +407,35 @@ transform assignlist (PAST::Op) :language('PIR') {
     ops.'push_pirop'('set', lpost, rpost)
     .return (ops)
   L1:
-    .local pmc iter
-    new iter, .Iterator, namelist
+    .local pmc iter, tmp
+    new tmp, .ResizablePMCArray
+    new iter, .Iterator, explist
   L4:
     unless iter goto L5
     $P0 = shift iter
-    unless explist goto L6
-    $P1 = shift explist
-    rpost = tree.'get'('post', $P1)
+    rpost = tree.'get'('post', $P0)
     ops.'push'(rpost)
-    goto L7
+    $P1 = ops.'push_pirop'('set')
+    $P1.'arglist'($P1, rpost)
+    push tmp, $P1
+    goto L4
+  L5:
+    new iter, .Iterator, namelist
   L6:
+    unless iter goto L7
+    $P0 = shift iter
+    unless tmp goto L8
+    rpost = shift tmp
+    goto L9
+  L8:
     rpost = ops.'push_pirop'('new')
     rpost.'arglist'(rpost, '.LuaNil')
-  L7:
+  L9:
     lpost = tree.'get'('post', $P0)
     ops.'push'(lpost)
     ops.'push_pirop'('set', lpost, rpost)
-    goto L4
-  L5:
+    goto L6
+  L7:
     .return (ops)
 }
 
