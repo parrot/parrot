@@ -1819,6 +1819,11 @@ HEADERIZER_O_FILES = \
     $(CLASS_O_FILES) \
     $(ENCODING_O_FILES)
 
+# This target will eventually create all the headers automatically.
+# If you are having problems with linkage in Win32 (or elsewhere), because something
+# is not PARROT_API, but should be, then put PARROT_API in the C file and 
+# run "make hwork".  The .h file will get updated.
+
 headerizer:
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)
 
