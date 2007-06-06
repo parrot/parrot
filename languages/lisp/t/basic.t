@@ -2,11 +2,11 @@
 
 =head1 NAME
 
-lisp/t/atoms.t - tests for Parrot Common Lisp
+lisp/t/basic.t - tests for Parrot Common Lisp
 
 =head1 DESCRIPTION
 
-Basic types.
+Basic stuff.
 
 =cut
 
@@ -18,35 +18,29 @@ use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 # core Perl modules
-use Test::More; 
+use Test::More;
 
 # Parrot modules
 use Parrot::Test;
 
 my @test_cases = (
-    [ q{ 1 },
-      1,
-      'integer 1'
+    [ q{ ( list 1 2 ) },
+      q{(1 . (2 . NIL))},
     ],
-    [ q{ -2 },
-      -2,
-      'integer -2'
+    [ q{ ( car ( list 1 2 )) },
+      q{1},
     ],
-    [ q{ (- 3) },
-      -3,
-      '3 negated'
+    [ q{( cdr ( list 1 2 )) },
+      q{(2 . NIL)},
     ],
-    [ q{ 0 },
-      0,
-      'zero'
+    [ q{( cons 1 2 ) },
+      q{(1 . 2)},
     ],
-    [ q{ nil },
-      'NIL',
-      'false'
+    [ q{ ( car ( cons 1 2 )) },
+      q{1},
     ],
-    [ q{ t },
-      'T',
-      'true'
+    [ q{ ( cdr ( cons 1 2 )) },
+      q{(2)},
     ],
 );
 
@@ -56,5 +50,6 @@ foreach ( @test_cases )
 {
      my ( $code, $out, $desc ) = @{ $_ };
 
+     $desc ||= substr( $code, 0, 16 ); 
      language_output_is( 'Lisp', "( print $code )", $out . "\n", $desc );
 }

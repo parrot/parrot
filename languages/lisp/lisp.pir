@@ -92,7 +92,6 @@ REP_LOOP:
 
     # VALID_IN_PARROT_0_2_0 foldup retv
     ( retv :slurpy) = _eval(args)
-    printerr 'after _eval'
 
     .local int nretv
     nretv = retv
