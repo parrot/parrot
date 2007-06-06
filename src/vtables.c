@@ -90,13 +90,9 @@ parrot_realloc_vtables(Interp *interp)
        table and we could get bigger without blowing much memory
        */
     const INTVAL new_max = interp->n_vtable_alloced + 16;
-    const INTVAL new_size = new_max * sizeof (VTABLE *);
-    INTVAL i;
-    interp->vtables = (VTABLE **)mem_sys_realloc(interp->vtables, new_size);
-    /* Should set all the empty slots to the null PMC's
-       vtable pointer */
-    for (i = interp->n_vtable_max; i < new_max; ++i)
-        interp->vtables[i] = NULL;
+    const INTVAL new_size = new_max              * sizeof (VTABLE *);
+    const INTVAL old_size = interp->n_vtable_max * sizeof (VTABLE *);
+    interp->vtables = (VTABLE **)mem_sys_realloc_zeroed(interp->vtables, new_size, old_size);
     interp->n_vtable_alloced = new_max;
 }
 

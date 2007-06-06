@@ -62,6 +62,9 @@ In addition, C code may assume that any pointer value can be coerced to an
 integral type (no smaller than typedef C<INTVAL> in Parrot), then back to its
 original type, without loss.
 
+Also C code may assume that there is a single NULL pointer representation
+and that it consists of a number, usually 4 or 8, of '\0' chars in memory.
+
 C code that makes assumptions beyond these must depend on the configuration
 system, either to not compile an entire non-portable source where it will not
 work, or to provide an appropriate #ifdef macro.

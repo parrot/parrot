@@ -1317,7 +1317,7 @@ PARROT_API
 PMC *
 Parrot_find_method_with_cache(Interp *interp, PMC *_class, STRING *method_name /*NN*/)
 {
-    UINTVAL type, bits, i;
+    UINTVAL type, bits;
 
     Caches           *mc;
     Meth_cache_entry *e, *old;
@@ -1337,26 +1337,20 @@ Parrot_find_method_with_cache(Interp *interp, PMC *_class, STRING *method_name /
 
     if (type >= mc->mc_size) {
         if (mc->idx) {
-            mc->idx = (Meth_cache_entry ***)mem_sys_realloc(mc->idx,
-                sizeof (Meth_cache_entry ***) * (type + 1));
+            mc->idx = (Meth_cache_entry ***)mem_sys_realloc_zeroed(mc->idx,
+                sizeof (Meth_cache_entry ***) * (type + 1),
+                sizeof (Meth_cache_entry ***) * mc->mc_size);
         }
         else {
-            mc->idx = (Meth_cache_entry ***)mem_sys_allocate(
+            mc->idx = (Meth_cache_entry ***)mem_sys_allocate_zeroed(
                 sizeof (Meth_cache_entry ***) * (type + 1));
         }
-
-        for (i = mc->mc_size; i <= type; ++i)
-            mc->idx[i] = NULL;
-
         mc->mc_size = type + 1;
     }
 
     if (!mc->idx[type]) {
-        mc->idx[type] = (Meth_cache_entry **)mem_sys_allocate(
+        mc->idx[type] = (Meth_cache_entry **)mem_sys_allocate_zeroed(
             sizeof (Meth_cache_entry *) * TBL_SIZE);
-
-        for (i = 0; i < TBL_SIZE; ++i)
-            mc->idx[type][i] = NULL;
     }
 
     e   = mc->idx[type][bits];

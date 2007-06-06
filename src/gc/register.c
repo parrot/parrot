@@ -141,7 +141,6 @@ destroy_context(Interp *interp)
 void
 create_initial_context(Interp *interp)
 {
-    int i;
     static INTVAL num_regs[] ={32,32,32,32};
 
     /* Create some initial free_list slots. */
@@ -149,10 +148,8 @@ create_initial_context(Interp *interp)
 #define INITIAL_FREE_SLOTS 8
     interp->ctx_mem.n_free_slots = INITIAL_FREE_SLOTS;
     interp->ctx_mem.free_list    =
-        (void **)mem_sys_allocate(INITIAL_FREE_SLOTS * sizeof (void *));
+        (void **)mem_sys_allocate_zeroed(INITIAL_FREE_SLOTS * sizeof (void *));
 
-    for (i = 0; i < INITIAL_FREE_SLOTS; ++i)
-        interp->ctx_mem.free_list[i] = NULL;
     /*
      * For now create context with 32 regs each. Some src tests (and maybe other
      * extenders) are assuming the presence of these registers
