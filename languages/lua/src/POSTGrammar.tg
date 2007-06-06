@@ -66,11 +66,13 @@ transform post (PAST::Block) :language('PIR') {
     $S0 = node.'unique'('fct_')
     $S1 = node.'escape'(name)
     ops.'push_pirop'('inline', '    .const .Sub %0 = %1', $S0, $S1)
-    $P0 = ops.'push_pirop'('get_global')
-    $P0.'arglist'($P0, '"_G"')
-    #ops.'push_pirop'('callmethod', 'setfenv', $S0, $P0, 'result'=>'')
-    ops.'push_pirop'('callmethod', 'setfenv', $S0, $P0)
-    ops.'result'($S0)
+    $P0 = ops.'push_pirop'('newclosure')
+    $P0.'arglist'($P0, $S0)
+    $P1 = ops.'push_pirop'('get_global')
+    $P1.'arglist'($P1, '"_G"')
+    #ops.'push_pirop'('callmethod', 'setfenv', $P0, $P1, 'result'=>'')
+    ops.'push_pirop'('callmethod', 'setfenv', $P0, $P1)
+    ops.'result'($P0)
     .return (ops)
 }
 

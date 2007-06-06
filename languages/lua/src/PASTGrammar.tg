@@ -363,10 +363,31 @@ transform past (Lua::Grammar::function_stat) :language('PIR') {
     past.'init'('node'=>$P0, 'name'=>'self', 'scope'=>'parameter')
     set_hll_global ['Lua::PAST'], '$?self', past
   L1:
+    $S0 = tree.'get'('name', $P0, 'Lua::Grammar::functionname')
     $P0 = node['function_body']
     past = tree.'get'('past', $P0, 'Lua::Grammar::function_body')
     past.'name'($S0)
     .return past.'new'('PAST::Op', var, past, 'node'=>node, 'pasttype'=>'assign')
+}
+
+
+transform name (Lua::Grammar::functionname) :language('PIR') {
+    .local string name
+    name = ''
+    $P0 = node['name']
+    .local pmc iter
+    iter = new .Iterator, $P0
+  L2:
+    unless iter goto L1
+    if name == '' goto L3
+    name = concat '.'
+  L3:
+    $P0 = shift iter
+    $S0 = $P0.'result_object'()
+    name = concat $S0
+    goto L2
+  L1:
+    .return (name)
 }
 
 
