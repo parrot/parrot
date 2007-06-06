@@ -1158,7 +1158,7 @@ mmd_cvt_to_types(Interp* interp, PMC *multi_sig)
         PMC * const sig_elem = VTABLE_get_pmc_keyed_int(interp, multi_sig, i);
 
         if (sig_elem->vtable->base_type == enum_class_String) {
-            const STRING * const sig = VTABLE_get_string(interp, sig_elem);
+            STRING * const sig = VTABLE_get_string(interp, sig_elem);
             if (memcmp(sig->strstart, "__VOID", 6) == 0) {
                 PMC_int_val(ar)--;  /* XXX */
                 break;

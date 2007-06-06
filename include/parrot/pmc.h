@@ -35,12 +35,13 @@ PARROT_API PMC * pmc_new_init( Interp *interp, INTVAL base_type, PMC *init );
 PARROT_API PMC * pmc_new_noinit( Interp *interp, INTVAL base_type );
 PARROT_API INTVAL pmc_register( Interp* interp, STRING *name );
 PARROT_API PMC* pmc_reuse( Interp *interp,
-    PMC *pmc,
+    PMC *pmc /*NN*/,
     INTVAL new_type,
-    UINTVAL flags );
+    UINTVAL flags )
+        __attribute__nonnull__(2);
 
-PARROT_API INTVAL pmc_type( Interp* interp, const STRING *name );
-PARROT_API INTVAL pmc_type_p( Interp* interp, const PMC *name );
+PARROT_API INTVAL pmc_type( Interp* interp, STRING *name );
+PARROT_API INTVAL pmc_type_p( Interp* interp, PMC *name );
 /* HEADERIZER END: src/pmc.c */
 
 /* Internal use */
