@@ -251,13 +251,12 @@ Run autoloaded or immediate bytecode, mark MAIN subroutine entry
 */
 
 static PMC*
-do_1_sub_pragma(Parrot_Interp interp, PMC *sub_pmc, int action)
+do_1_sub_pragma(Parrot_Interp interp, PMC *sub_pmc /*NN*/, int action)
 {
 
     size_t start_offs;
     Parrot_sub const * sub = PMC_sub(sub_pmc);
     PMC *result;
-    void *lo_var_ptr;
 
     switch (action) {
         case PBC_IMMEDIATE:
@@ -265,6 +264,8 @@ do_1_sub_pragma(Parrot_Interp interp, PMC *sub_pmc, int action)
              * run IMMEDIATE sub
              */
             if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_IMMEDIATE) {
+                void *lo_var_ptr;
+
                 PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_IMMEDIATE;
                 lo_var_ptr = interp->lo_var_ptr;
                 result = run_sub(interp, sub_pmc);
@@ -303,7 +304,7 @@ do_1_sub_pragma(Parrot_Interp interp, PMC *sub_pmc, int action)
             if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MAIN) {
                 if ((interp->resume_flag & RESUME_INITIAL) &&
                         interp->resume_offset == 0) {
-                    ptrdiff_t code = (ptrdiff_t) sub->seg->base.data;
+                    const ptrdiff_t code = (ptrdiff_t) sub->seg->base.data;
 
                     start_offs =
                         ((ptrdiff_t) VTABLE_get_pointer(interp, sub_pmc)
