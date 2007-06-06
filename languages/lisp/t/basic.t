@@ -24,23 +24,26 @@ use Test::More;
 use Parrot::Test;
 
 my @test_cases = (
-    [ q{ ( list 1 2 ) },
+    [ q{ ( print ( list 1 2 ) ) },
       q{(1 . (2 . NIL))},
     ],
-    [ q{ ( car ( list 1 2 )) },
+    [ q{ ( print ( car ( list 1 2 )) ) },
       q{1},
     ],
-    [ q{( cdr ( list 1 2 )) },
+    [ q{( print ( cdr ( list 1 2 )) ) },
       q{(2 . NIL)},
     ],
-    [ q{( cons 1 2 ) },
+    [ q{( print ( cons 1 2 ) ) },
       q{(1 . 2)},
     ],
-    [ q{ ( car ( cons 1 2 )) },
+    [ q{ ( print ( car ( cons 1 2 )) ) },
       q{1},
     ],
-    [ q{ ( cdr ( cons 1 2 )) },
+    [ q{ ( print ( cdr ( cons 1 2 )) ) },
       q{(2)},
+    ],
+    [ q{ ( setq asdf 1234 ) ( print asdf ) },
+      q{1234},
     ],
 );
 
@@ -50,6 +53,6 @@ foreach ( @test_cases )
 {
      my ( $code, $out, $desc ) = @{ $_ };
 
-     $desc ||= substr( $code, 0, 16 ); 
-     language_output_is( 'Lisp', "( print $code )", $out . "\n", $desc );
+     $desc ||= substr( $code, 0, 32 ); 
+     language_output_is( 'Lisp', $code, $out . "\n", $desc );
 }
