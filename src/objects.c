@@ -26,6 +26,8 @@ Handles class and object manipulation.
 static void parrot_class_register(Interp *interp, PMC *name,
         PMC *new_class, PMC *parent, PMC *mro);
 
+static void invalidate_type_caches(Interp *interp, UINTVAL type);
+
 /*
 
 FUNCDOC:
@@ -1180,9 +1182,10 @@ destroy_object_cache(Interp *interp)
     UINTVAL i;
     Caches * const mc = interp->caches;
 
+    /* mc->idx[type][bits] = e; */
     for (i = 0; i < mc->mc_size; i++) {
         if (mc->idx[i])
-            mem_sys_free(mc->idx[i]);
+            invalidate_type_caches(interp, i);
     }
 
     mem_sys_free(mc->idx);
