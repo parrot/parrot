@@ -121,7 +121,7 @@ destroy_context(Interp *interp)
     /* clear active contexts all the way back to the initial context */
     context = CONTEXT(interp->ctx);
     while (context) {
-        Parrot_Context * prev = context->caller_ctx;
+        Parrot_Context * const prev = context->caller_ctx;
         mem_sys_free(context);
         context = prev;
     }
@@ -308,7 +308,7 @@ Parrot_dup_context(Interp *interp, const Parrot_Context *old)
 }
 
 Parrot_Context *
-Parrot_push_context(Interp *interp, INTVAL *n_regs_used)
+Parrot_push_context(Interp *interp, INTVAL *n_regs_used /*NN*/)
 {
     Parrot_Context * const old = CONTEXT(interp->ctx);
     Parrot_Context * const ctx =
@@ -335,7 +335,7 @@ Parrot_pop_context(Interp *interp)
 
 
 Parrot_Context *
-Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used)
+Parrot_alloc_context(Interp *interp, INTVAL *n_regs_used /*NN*/)
 {
     Parrot_Context *old, *ctx;
     void *ptr, *p;
