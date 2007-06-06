@@ -1,5 +1,5 @@
 /* pmc.h
- *  Copyright (C) 2001-2006, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -19,30 +19,32 @@
 
 #define PARROT_MAX_CLASSES 100
 
+/* HEADERIZER BEGIN: src/pmc.c */
+
+PARROT_API void Parrot_create_mro( Interp *interp, INTVAL type );
+PARROT_API PMC * constant_pmc_new( Interp *interp, INTVAL base_type );
+PARROT_API PMC * constant_pmc_new_init( Interp *interp,
+    INTVAL base_type,
+    PMC *init );
+
+PARROT_API PMC * constant_pmc_new_noinit( Interp *interp, INTVAL base_type );
+PARROT_API void dod_register_pmc( Interp* interp, PMC* pmc );
+void dod_unregister_pmc( Interp* interp, PMC* pmc );
+PARROT_API PMC * pmc_new( Interp *interp, INTVAL base_type );
+PARROT_API PMC * pmc_new_init( Interp *interp, INTVAL base_type, PMC *init );
+PARROT_API PMC * pmc_new_noinit( Interp *interp, INTVAL base_type );
+PARROT_API INTVAL pmc_register( Interp* interp, STRING *name );
+PARROT_API PMC* pmc_reuse( Interp *interp,
+    PMC *pmc,
+    INTVAL new_type,
+    UINTVAL flags );
+
+PARROT_API INTVAL pmc_type( Interp* interp, const STRING *name );
+PARROT_API INTVAL pmc_type_p( Interp* interp, const PMC *name );
+/* HEADERIZER END: src/pmc.c */
+
 /* Internal use */
 PMC *pmc_init_null(Interp *interp);
-
-/* Prototypes */
-PARROT_API PMC *pmc_new(Interp *interp, INTVAL base_type);
-PARROT_API PMC *pmc_reuse(Interp *interp, PMC *pmc, INTVAL new_type, UINTVAL flags);
-PARROT_API PMC *pmc_new_noinit(Interp *interp, INTVAL base_type);
-PARROT_API PMC *pmc_new_init(Interp *interp, INTVAL base_type, PMC *p);
-PARROT_API PMC *constant_pmc_new_noinit(Interp *, INTVAL base_type);
-PARROT_API PMC *constant_pmc_new(Interp *, INTVAL base_type);
-PARROT_API PMC *constant_pmc_new_init(Interp *, INTVAL base_type, PMC *);
-
-PARROT_API INTVAL pmc_register(Interp *, STRING *);
-PARROT_API INTVAL pmc_type(Interp *, const STRING *s);
-PARROT_API INTVAL pmc_type_p(Interp *, const PMC *p);
-
-/*
- * DOD registry interface
- */
-PARROT_API void dod_register_pmc(Interp *, PMC*);
-PARROT_API void dod_unregister_pmc(Interp *, PMC*);
-
-/* mro creation */
-PARROT_API void Parrot_create_mro(Interp *, INTVAL);
 
 /* pmcinfo parameters */
 

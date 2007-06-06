@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -10,15 +10,13 @@ src/pmc.c - The base vtable calling functions
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 #include <assert.h>
 #include "pmc.str"
+
+/* HEADER: include/parrot/pmc.h */
 
 static PMC* get_new_pmc_header(Interp*, INTVAL base_type, UINTVAL flags);
 
@@ -27,19 +25,16 @@ PMC * PMCNULL;
 
 /*
 
-=item C<PMC *
-pmc_new(Interp *interp, INTVAL base_type)>
-
+FUNCDOC: pmc_new
 Creates a new PMC of type C<base_type> (which is an index into the list
 of PMC types declared in C<vtables> in
 F<include/parrot/pmc.h>). Once the PMC has been successfully created and
 its vtable pointer initialized, we call its C<init> method to perform
 any other necessary initialization.
 
-=cut
-
 */
 
+PARROT_API
 PMC *
 pmc_new(Interp *interp, INTVAL base_type)
 {
@@ -50,10 +45,7 @@ pmc_new(Interp *interp, INTVAL base_type)
 
 /*
 
-=item C<PMC *
-pmc_reuse(Interp *interp, PMC *pmc, INTVAL new_type,
-          UINTVAL flags)>
-
+FUNCDOC: pmc_reuse
 Reuse an existing PMC, turning it into an empty PMC of the new
 type. Any required internal structure will be put in place (such as
 the extension area) and the PMC will be ready to go. This will throw
@@ -61,12 +53,11 @@ an exception if the PMC is constant or of a singleton type (such as
 the environment PMC) or is being turned into a PMC of a singleton
 type.
 
-=cut
-
 */
 
+PARROT_API
 PMC*
-pmc_reuse(Interp *interp, PMC *pmc, INTVAL new_type,
+pmc_reuse(Interp *interp, PMC *pmc /*NN*/, INTVAL new_type,
           UINTVAL flags)
 {
     INTVAL has_ext, new_flags;
@@ -157,12 +148,8 @@ pmc_reuse(Interp *interp, PMC *pmc, INTVAL new_type,
 
 /*
 
-=item C<static PMC*
-get_new_pmc_header(Interp *interp, INTVAL base_type, UINTVAL flags)>
-
+FUNCDOC: get_new_pmc_header
 Gets a new PMC header.
-
-=cut
 
 */
 
@@ -249,19 +236,16 @@ get_new_pmc_header(Interp *interp, INTVAL base_type, UINTVAL flags)
 
 /*
 
-=item C<PMC *
-pmc_new_noinit(Interp *interp, INTVAL base_type)>
-
+FUNCDOC: pmc_new_noinit
 Creates a new PMC of type C<base_type> (which is an index into the list
 of PMC types declared in C<vtables> in
 F<include/parrot/pmc.h>). Unlike C<pmc_new()>, C<pmc_new_noinit()> does
 not call its C<init> method.  This allows separate allocation and
 initialization for continuations.
 
-=cut
-
 */
 
+PARROT_API
 PMC *
 pmc_new_noinit(Interp *interp, INTVAL base_type)
 {
@@ -272,15 +256,12 @@ pmc_new_noinit(Interp *interp, INTVAL base_type)
 
 /*
 
-=item C<PMC *
-constant_pmc_new_noinit(Interp *interp, INTVAL base_type)>
-
+FUNCDOC: constant_pmc_new_noinit
 Creates a new constant PMC of type C<base_type>.
-
-=cut
 
 */
 
+PARROT_API
 PMC *
 constant_pmc_new_noinit(Interp *interp, INTVAL base_type)
 {
@@ -291,15 +272,12 @@ constant_pmc_new_noinit(Interp *interp, INTVAL base_type)
 
 /*
 
-=item C<PMC *
-constant_pmc_new(Interp *interp, INTVAL base_type)>
-
+FUNCDOC: constant_pmc_new
 Creates a new constant PMC of type C<base_type>, the call C<init>.
-
-=cut
 
 */
 
+PARROT_API
 PMC *
 constant_pmc_new(Interp *interp, INTVAL base_type)
 {
@@ -311,15 +289,12 @@ constant_pmc_new(Interp *interp, INTVAL base_type)
 
 /*
 
-=item C<PMC *
-pmc_new_init(Interp *interp, INTVAL base_type, PMC *init)>
-
+FUNCDOC: pmc_new_init
 As C<pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> method.
-
-=cut
 
 */
 
+PARROT_API
 PMC *
 pmc_new_init(Interp *interp, INTVAL base_type, PMC *init)
 {
@@ -332,15 +307,12 @@ pmc_new_init(Interp *interp, INTVAL base_type, PMC *init)
 
 /*
 
-=item C<PMC *
-constant_pmc_new_init(Interp *interp, INTVAL base_type, PMC *init)>
-
+FUNCDOC: constant_pmc_new_init
 As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
-
-=cut
 
 */
 
+PARROT_API
 PMC *
 constant_pmc_new_init(Interp *interp, INTVAL base_type, PMC *init)
 {
@@ -351,15 +323,12 @@ constant_pmc_new_init(Interp *interp, INTVAL base_type, PMC *init)
 
 /*
 
-=item C<INTVAL
-pmc_register(Interp* interp, STRING *name)>
-
+FUNCDOC: pmc_register
 This segment handles PMC registration and such.
-
-=cut
 
 */
 
+PARROT_API
 INTVAL
 pmc_register(Interp* interp, STRING *name)
 {
@@ -389,20 +358,17 @@ pmc_register(Interp* interp, STRING *name)
 
 /*
 
-=item C<INTVAL
-pmc_type(Interp* interp, STRING *name)>
-
+FUNCDOC: pmc_type
 Returns the PMC type for C<name>.
-
-=cut
 
 */
 
+PARROT_API
 INTVAL
-pmc_type(Interp* interp, const STRING *name)
+pmc_type(Interp* interp, const STRING * const name)
 {
     PMC * const classname_hash = interp->class_hash;
-    PMC * item = (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
+    PMC * const item = (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
 
     /* nested namespace with same name */
     if (item->vtable->base_type == enum_class_NameSpace)
@@ -412,11 +378,19 @@ pmc_type(Interp* interp, const STRING *name)
     return Parrot_get_datatype_enum(interp, name);
 }
 
+/*
+
+FUNCDOC: pmc_type
+Returns the PMC type for C<name>.
+
+*/
+
+PARROT_API
 INTVAL
-pmc_type_p(Interp* interp, const PMC *name)
+pmc_type_p(Interp* interp, const PMC * const name)
 {
     PMC * const classname_hash = interp->class_hash;
-    PMC *item = (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
+    PMC * const item = (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
 
     if (!PMC_IS_NULL(item))
         return PMC_int_val((PMC*) item);
@@ -468,24 +442,21 @@ create_class_pmc(Interp *interp, INTVAL type)
 
 /*
 
-=item C<void Parrot_create_mro(Interp *interp, INTVAL type)>
-
+FUNCDOC: Parrot_create_mro
 Create the MRO (method resolution order) array for this type.
-
-=cut
 
 */
 
+PARROT_API
 void
 Parrot_create_mro(Interp *interp, INTVAL type)
 {
-    VTABLE *vtable;
     STRING *class_name, *isa;
     INTVAL pos, parent_type, total;
     PMC *_class, *mro;
-    PMC *ns;
 
-    vtable = interp->vtables[type];
+    VTABLE *vtable = interp->vtables[type];
+
     /* multithreaded: has already mro */
     if (vtable->mro)
         return;
@@ -506,7 +477,7 @@ Parrot_create_mro(Interp *interp, INTVAL type)
         vtable = interp->vtables[parent_type];
         if (!vtable->_namespace) {
             /* need a namespace Hash, anchor at parent, name it */
-            ns = pmc_new(interp,
+            PMC * const ns = pmc_new(interp,
                     Parrot_get_ctx_HLL_type(interp, enum_class_NameSpace));
             vtable->_namespace = ns;
             /* anchor at parent, aka current_namespace, that is 'parrot' */
@@ -532,21 +503,14 @@ Parrot_create_mro(Interp *interp, INTVAL type)
 
 /*
 
-=back
-
 =head2 DOD registry interface
 
-=over 4
-
-=item C<void
-dod_register_pmc(Interp* interp, PMC* pmc)>
-
+FUNCDOC: dod_register_pmc
 Registers the PMC with the interpreter's DOD registery.
-
-=cut
 
 */
 
+PARROT_API
 void
 dod_register_pmc(Interp* interp, PMC* pmc)
 {
@@ -567,12 +531,8 @@ dod_register_pmc(Interp* interp, PMC* pmc)
 
 /*
 
-=item C<void
-dod_unregister_pmc(Interp* interp, PMC* pmc)>
-
+FUNCDOC: dod_unregister_pmc
 Unregisters the PMC from the interpreter's DOD registery.
-
-=cut
 
 */
 
@@ -585,8 +545,6 @@ dod_unregister_pmc(Interp* interp, PMC* pmc)
 }
 
 /*
-
-=back
 
 =head1 SEE ALSO
 
