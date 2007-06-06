@@ -1517,9 +1517,9 @@ directory_destroy(Interp *interp, PackFile_Segment *self)
     PackFile_Directory *dir = (PackFile_Directory *)self;
     size_t i;
 
-    for (i = 0; i < dir->num_segments; i++) {
+    for (i = 0; i < dir->num_segments; i++)
         PackFile_Segment_destroy(interp, dir->segments[i]);
-    }
+
     if (dir->segments) {
         mem_sys_free(dir->segments);
         dir->segments = NULL;
@@ -1831,10 +1831,10 @@ byte_code_destroy(Interp *interp, PackFile_Segment *self)
             byte_code->prederef.branches = NULL;
         }
     }
-    byte_code->fixups = NULL;
-    byte_code->debugs = NULL;
+    byte_code->fixups      = NULL;
     byte_code->const_table = NULL;
-    byte_code->pic_index = NULL;
+    byte_code->pic_index   = NULL;
+    byte_code->debugs      = NULL;
 }
 
 /*
@@ -1898,7 +1898,7 @@ pf_debug_destroy(Interp *interp, PackFile_Segment *self)
 
     /* Free mappings pointer array. */
     mem_sys_free(debug->mappings);
-    debug->mappings = NULL;
+    debug->mappings     = NULL;
     debug->num_mappings = 0;
 }
 
@@ -2189,9 +2189,6 @@ Parrot_new_debug_seg(Interp *interp, PackFile_ByteCode *cs, size_t size)
 
         debug->base.data    = (opcode_t *)mem_sys_allocate(size *
             sizeof (opcode_t));
-        debug->num_mappings = 0;
-        debug->mappings     = mem_allocate_typed(PackFile_DebugMapping *);
-
         debug->code = cs;
         cs->debugs = debug;
     }

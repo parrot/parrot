@@ -395,18 +395,14 @@ Parrot_really_destroy(Interp *interp, int exit_code, void *arg)
     interp->arena_base = NULL;
     /* cache structure */
     destroy_object_cache(interp);
-    /* packfile */
 
-    if (!Interp_flags_TEST(interp, PARROT_EXTERN_CODE_FLAG))  {
-        PackFile *pf = interp->initial_pf;
-        if (pf)
-            PackFile_destroy(interp, pf);
-    }
+    /* packfile */
+    if (interp->initial_pf)
+        PackFile_destroy(interp, interp->initial_pf);
 
     /* free vtables */
     parrot_free_vtables(interp);
     mmd_destroy(interp);
-
 
     if (interp->profile) {
         mem_sys_free(interp->profile->data);
