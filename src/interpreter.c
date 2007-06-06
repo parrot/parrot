@@ -304,6 +304,7 @@ get_op_lib_init(int core_op, int which, PMC *lib)
                 init_func = PARROT_CORE_OPLIB_INIT;
                 break;
             default:
+                init_func = NULL;
                 internal_exception(1, "Couldn't find init_func for core %d", which);
                 break;
         }
