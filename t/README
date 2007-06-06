@@ -1,24 +1,28 @@
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 This directory contains the Parrot test suite.
 
 For details on how tests are written see the documentation in '../docs/tests.pod'.
 For status of the testing effort, see 'TESTS.STATUS.pod' in this directory.
+The script 'harness' actually runs the test suite.
 
-See below for a list of subdirs along with a short description of what is tested.
+Below is a list of subdirs along with a short description
+of what is tested in there.
 
 benchmark:      Run benchmarks
+
+codingstd:      Conventions and Guidelines for Parrot Source Code
 
 compilers:      Mini languages distributed with Parrot
 
 configure:      Perl modules of configuration subsystem
 
-codingstd:      Conventions and Guidelines for Parrot Source Code
-
-distro:         Tests run before a distro is released
+distro:         Tests run before a distribution is released
 
 doc:            Completeness and sanity of the documentation
+
+dynoplibs:      Dynamic opcode libraries
 
 dynpmc:         Dynamic PMCs
 
@@ -28,7 +32,11 @@ library:        Parrot modules
 
 native_pbc:     Parrot Byte Code
 
+oo:             Object oriented features of Parrot
+
 op:             Try to cover all core operators
+
+pdd15oo:        New version of the object support as specified in PDD15
 
 perl:           Test Perl 5 modules used for configuration, building and testing of Parrot.
 
@@ -39,8 +47,10 @@ postconfigure:  Tests of configuration system which cannot be run until
 
 run:            Mostly command line options of the 'parrot' executable
 
-src:            Tests written in C. XXX Is this a meaningful category?
+src:            Tests written in C.
 
-stress:         Stress testing
+stm:            Storage transactional memory
 
-tools:          Executables besides 'parrot'
+stress:         Stress testing. Make Parrot sweat.
+
+tools:          Executables and script besides 'parrot'. Tools for development.
