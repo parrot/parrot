@@ -262,10 +262,10 @@ transform past (Lua::Grammar::return_statement) :language('PIR') {
     if null $P0 goto L1
     $P0 = shift $P0
     $P1 = tree.'get'('explist', $P0, 'Lua::Grammar::expression_list')
-    past.'init'($P1 :flat, 'node'=>node, 'pasttype'=>'pirop', 'pirop'=>'return')
+    past.'init'($P1 :flat, 'node'=>node, 'pasttype'=>'return')
     .return (past)
   L1:
-    past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'return')
+    past.'init'('node'=>node, 'pasttype'=>'return')
     .return (past)
 }
 
@@ -273,7 +273,7 @@ transform past (Lua::Grammar::return_statement) :language('PIR') {
 transform past (Lua::Grammar::break_statement) :language('PIR') {
     .local pmc past
     past = new 'PAST::Op'
-    past.'init'('node'=>node, 'pasttype'=>'pirop', 'pirop'=>'goto')
+    past.'init'('node'=>node, 'pasttype'=>'break')
     .return (past)
 }
 
@@ -431,7 +431,7 @@ transform past (Lua::Grammar::function_body) :language('PIR') {
   L2:
     $P0 = node['block']
     past = tree.'get'('past', $P0, 'Lua::Grammar::block')
-    .return past.'new'('PAST::Block', parlist :flat, past, 'node'=>node, 'pragma'=>':anon :lex')
+    .return past.'new'('PAST::Block', parlist :flat, past, 'node'=>node)
 }
 
 
@@ -624,6 +624,11 @@ transform past (Lua::Grammar::name) :language('PIR') {
   L1:
     past.'init'('node'=>node, 'name'=>$S0, 'scope'=>'package')
     .return (past)
+}
+
+
+transform past (Lua::Grammar::vararg) :language('PIR') {
+    internal_error("not implemented (vararg)")
 }
 
 

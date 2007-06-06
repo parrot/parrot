@@ -580,11 +580,11 @@ Support variable number of arguments function call.
 .end
 
 
-=item C<infix:!=>
+=item C<infix:~=>
 
 =cut
 
-.sub 'infix:!='
+.sub 'infix:~='
     .param pmc a
     .param pmc b
     $I0 = isne a, b

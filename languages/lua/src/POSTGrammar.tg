@@ -15,18 +15,16 @@ grammar Lua::POST::Grammar is TGE::Grammar;
 
 
 transform post (PAST::Block) :language('PIR') {
-    .local string name, pragma, blocktype
+    .local string name
     name = node.'name'()
     if name != '' goto with_name
-    name = node.unique('_block')
+    name = node.unique('anon_')
   with_name:
-    pragma = node.'pragma'()
-    blocktype = node.'blocktype'()
     .local pmc outerpost
     outerpost = get_hll_global ['Lua::POST'], '$?SUB'
     .local pmc post
     post = new 'POST::Sub'
-    post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'pragma'=>pragma, 'blocktype'=>blocktype, 'result'=>'')
+    post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'pragma'=>':anon :lex', 'blocktype'=>'declaration', 'result'=>'')
     set_hll_global ['Lua::POST'], '$?SUB', post
     .local pmc iter
     iter = node.'iterator'()
@@ -60,9 +58,20 @@ transform post (PAST::Block) :language('PIR') {
     onload = post.'new'('POST::Sub', 'name'=>'__onload', 'pragma'=>':anon :init', 'result'=>'')
     onload.'push_pirop'('inline', '    .const .Sub main = "_main"')
     onload.'push_pirop'('inline', '#    print "onload\n"')
-    post = post.'new'('Lua::POST::Chunk', post, onload, start, 'prologue'=>'.HLL "Lua", "lua_group"')
+    .return post.'new'('Lua::POST::Chunk', post, onload, start, 'prologue'=>'.HLL "Lua", "lua_group"')
   no_chunk:
-    .return (post)
+    .local pmc ops
+    ops = post.'new'('POST::Ops', 'node'=>node)
+    ops.'push'(post)
+    $S0 = node.'unique'('fct_')
+    $S1 = node.'escape'(name)
+    ops.'push_pirop'('inline', '    .const .Sub %0 = %1', $S0, $S1)
+    $P0 = ops.'push_pirop'('get_global')
+    $P0.'arglist'($P0, '"_G"')
+    #ops.'push_pirop'('callmethod', 'setfenv', $S0, $P0, 'result'=>'')
+    ops.'push_pirop'('callmethod', 'setfenv', $S0, $P0)
+    ops.'result'($S0)
+    .return (ops)
 }
 
 
@@ -367,6 +376,35 @@ transform forlist (PAST::Op) :language('PIR') {
 
     ops.'push'(endlabel)
     .return (ops)
+}
+
+
+transform return (PAST::Op) :language('PIR') {
+    .local pmc ops, var, limit, step, blk
+    ops = new 'POST::Ops'
+    ops.'init'('node'=>node)
+    $S0 = ''
+    .local pmc iter
+    iter = node.'iterator'()
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    $P1 = tree.'get'('post', $P0)
+    ops.'push'($P1)
+    $S1 = $P1.'result'()
+    if $S0 == '' goto first
+    $S0 = concat ', '
+  first:
+    $S0 = concat $S1
+    goto iter_loop
+  iter_end:
+    ops.'push_pirop'('inline', '    .return (%0)', $S0)
+    .return (ops)
+}
+
+
+transform break (PAST::Op) :language('PIR') {
+    internal_error("not implemented (break)")
 }
 
 
