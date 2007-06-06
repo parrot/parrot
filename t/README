@@ -2,39 +2,45 @@
 # $Id$
 
 This directory contains the Parrot test suite.
-For details, see the documentation in '../docs/tests.pod'.
+
+For details on how tests are written see the documentation in '../docs/tests.pod'.
 For status of the testing effort, see 'TESTS.STATUS.pod' in this directory.
 
-benchmark:    Run all benchmarks
+See below for a list of subdirs along with a short description of what is tested.
 
-compilers:    Mini languages distributed with Parrot
+benchmark:      Run benchmarks
 
-configure:    Perl modules of configuration subsystem
+compilers:      Mini languages distributed with Parrot
 
-codingstd:    Conventions and Guidelines for Parrot Source Code
+configure:      Perl modules of configuration subsystem
 
-distro:       Tests run before a distro is released
+codingstd:      Conventions and Guidelines for Parrot Source Code
 
-doc:          Completeness and sanity of the documentation
+distro:         Tests run before a distro is released
 
-dynpmc:       Dynamic PMCs
+doc:            Completeness and sanity of the documentation
 
-examples:     Check whether the examples are still working
+dynpmc:         Dynamic PMCs
 
-library:      Parrot modules
+examples:       Check whether the examples are still working
 
-native_pbc:   Parrot Byte Code
+library:        Parrot modules
 
-op:           Try to cover all core operators
+native_pbc:     Parrot Byte Code
 
-perl:         Test Perl5 modules used for configuration, building and testing of Parrot.
+op:             Try to cover all core operators
 
-pmc:          Try to cover all builtin PMCs
+perl:           Test Perl 5 modules used for configuration, building and testing of Parrot.
 
-run:          Mostly command line options of the 'parrot' executable
+pmc:            Try to cover all builtin PMCs
 
-src:          Tests written in C. XXX Is this a meaningful category?
+postconfigure:  Tests of configuration system which cannot be run until
+                configuration has completed.
 
-stress:       Stress testing
+run:            Mostly command line options of the 'parrot' executable
 
-tools:        Executables besides 'parrot'
+src:            Tests written in C. XXX Is this a meaningful category?
+
+stress:         Stress testing
+
+tools:          Executables besides 'parrot'
