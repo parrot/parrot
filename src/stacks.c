@@ -378,7 +378,7 @@ Returns the stack entry type of C<entry>.
 
 PARROT_API
 Stack_entry_type
-get_entry_type(Interp *interp, const Stack_Entry_t * const entry /*NN*/)
+get_entry_type(Interp *interp, const Stack_Entry_t *entry /*NN*/)
     /* PURE, WARN_UNUSED */
 {
     return entry->entry_type;

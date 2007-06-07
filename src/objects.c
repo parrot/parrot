@@ -392,7 +392,7 @@ TODO allow dynamic expansion at runtime.
 
 PARROT_API
 INTVAL
-Parrot_MMD_method_idx(Interp *interp, const char * const name)
+Parrot_MMD_method_idx(Interp *interp, const char *name)
     /* WARN_UNUSED, PURE */
 {
     INTVAL i;

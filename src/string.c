@@ -490,6 +490,7 @@ PARROT_API
 STRING *
 string_from_cstring(Interp *interp,
     const char * const buffer /*NULLOK*/, const UINTVAL len)
+    /* WARN_UNUSED */
 {
     return string_make_direct(interp, buffer, len ? len :
             buffer ? strlen(buffer) : 0,
@@ -509,7 +510,8 @@ Make a Parrot string from a specified C string.
 PARROT_API
 STRING *
 string_from_const_cstring(Interp *interp,
-    const char * const buffer /*NULLOK*/, const UINTVAL len)
+    const char *buffer /*NULLOK*/, const UINTVAL len)
+    /* WARN_UNUSED */
 {
     return string_make_direct(interp, buffer, len ? len :
             buffer ? strlen(buffer) : 0,
@@ -1236,7 +1238,7 @@ string_chopn(Interp *interp, STRING *s /*NULLOK*/, INTVAL n, int in_place)
 
 PARROT_API
 INTVAL
-string_compare(Interp *interp, const STRING * const s1 /*NULLOK*/, const STRING * const s2 /*NULLOK*/)
+string_compare(Interp *interp, const STRING *s1 /*NULLOK*/, const STRING *s2 /*NULLOK*/)
     /* PURE, WARN_UNUSED */
 {
     if (!s1 && !s2) {
@@ -1269,7 +1271,7 @@ otherwise.
 
 PARROT_API
 INTVAL
-string_equal(Interp *interp, const STRING * const s1 /*NULLOK*/, const STRING * const s2 /*NULLOK*/)
+string_equal(Interp *interp, const STRING *s1 /*NULLOK*/, const STRING *s2 /*NULLOK*/)
     /* PURE, WARN_UNUSED */
 {
     if ((s1 == s2) || (!s1 && !s2)) {
@@ -1903,7 +1905,8 @@ result in a memory leak.
 
 PARROT_API
 char *
-string_to_cstring(Interp *interp, const STRING * const s /* NULLOK */)
+string_to_cstring(Interp *interp, const STRING *s /* NULLOK */)
+    /* WARN_UNUSED */
 {
     char *p;
     /*

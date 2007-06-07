@@ -166,7 +166,7 @@ Print out the hash in human-readable form.  Except it's empty.
 
 PARROT_API
 void
-parrot_dump_hash(Interp *interp, const Hash * const hash)
+parrot_dump_hash(Interp *interp, const Hash *hash)
 {
 }
 
@@ -179,7 +179,7 @@ Marks the hash and its contents as live.
 
 PARROT_API
 void
-parrot_mark_hash(Interp *interp, Hash * const hash /*NN*/)
+parrot_mark_hash(Interp *interp, Hash *hash /*NN*/)
 {
     UINTVAL found = 0;
     int mark_key = 0;
@@ -674,7 +674,7 @@ Called by iterator.
 
 PARROT_API
 void *
-parrot_hash_get_idx(Interp *interp, const Hash *hash, PMC * const key /*NN*/)
+parrot_hash_get_idx(Interp *interp, const Hash *hash, PMC *key /*NN*/)
     /* PURE, WARN_UNUSED */
 {
     INTVAL i = PMC_int_val(key);

@@ -122,7 +122,7 @@ Free memory for the PIC storage.
 */
 
 void
-parrot_PIC_alloc_store(Interp *interp, struct PackFile_ByteCode * const cs /*NN*/, size_t n)
+parrot_PIC_alloc_store(Interp *interp, struct PackFile_ByteCode *cs /*NN*/, size_t n)
 {
     size_t size, poly;
     Parrot_PIC_store *store;
@@ -149,7 +149,7 @@ parrot_PIC_alloc_store(Interp *interp, struct PackFile_ByteCode * const cs /*NN*
 }
 
 void
-parrot_PIC_destroy(Interp *interp, struct PackFile_ByteCode * const cs /*NN*/)
+parrot_PIC_destroy(Interp *interp, struct PackFile_ByteCode *cs /*NN*/)
 {
     Parrot_PIC_store *store;
 
@@ -358,8 +358,8 @@ pass_mixed(Interp *interp, PMC *sig, char *src_base, void **src,
  * the type PARROT_ARG_CONSTANT stands for mixed types or constants
  */
 int
-parrot_pic_check_sig(Interp *interp, const PMC * const sig1 /*NN*/,
-        const PMC * const sig2 /*NN*/, int * const type /*NN*/)
+parrot_pic_check_sig(Interp *interp, const PMC *sig1 /*NN*/,
+        const PMC *sig2 /*NN*/, int *type /*NN*/)
 {
     int i, n, t0, t1, t2;
     t0 = 0; /* silence compiler uninit warning */
@@ -631,8 +631,8 @@ parrot_pic_move(Interp* interp, Parrot_MIC *mic)
 }
 
 void
-parrot_pic_find_infix_v_pp(Interp *interp, PMC * const left /*NN*/, PMC * const right /*NN*/,
-                Parrot_MIC * const mic /*NN*/, opcode_t * const cur_opcode /*NN*/)
+parrot_pic_find_infix_v_pp(Interp *interp, PMC *left /*NN*/, PMC *right /*NN*/,
+                Parrot_MIC *mic /*NN*/, opcode_t *cur_opcode /*NN*/)
 {
     funcptr_t func;
     int is_pmc;

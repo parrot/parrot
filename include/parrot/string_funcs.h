@@ -151,11 +151,13 @@ PARROT_API STRING * string_escape_string_delimited( Interp *interp,
 
 PARROT_API STRING * string_from_const_cstring( Interp *interp,
     const char *buffer /*NULLOK*/,
-    UINTVAL len );
+    const UINTVAL len )
+        __attribute__warn_unused_result__;
 
 PARROT_API STRING * string_from_cstring( Interp *interp,
-    const char *buffer /*NULLOK*/,
-    UINTVAL len );
+    const char * const buffer /*NULLOK*/,
+    const UINTVAL len )
+        __attribute__warn_unused_result__;
 
 PARROT_API STRING * string_from_int( Interp *interp, INTVAL i );
 PARROT_API STRING * string_from_num( Interp *interp, FLOATVAL f );
@@ -284,7 +286,8 @@ PARROT_API void string_titlecase_inplace( Interp *interp,
     STRING *s /*NULLOK*/ );
 
 PARROT_API char * string_to_cstring( Interp *interp,
-    const STRING *s /* NULLOK */ );
+    const STRING *s /* NULLOK */ )
+        __attribute__warn_unused_result__;
 
 PARROT_API INTVAL string_to_int( Interp *interp, const STRING *s /*NULLOK*/ );
 PARROT_API FLOATVAL string_to_num( Interp *interp,

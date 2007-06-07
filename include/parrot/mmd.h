@@ -67,7 +67,8 @@ PARROT_API funcptr_t get_mmd_dispatch_type( Interp *interp,
     INTVAL left_type,
     INTVAL right_type,
     int *is_pmc /*NN*/  )
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        __attribute__warn_unused_result__;
 
 PARROT_API void mmd_add_by_class( Interp *interp,
     INTVAL functype,

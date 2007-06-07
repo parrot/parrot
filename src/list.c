@@ -1277,7 +1277,7 @@ TODO - The *other arg should be able to be a const pointer
 
 PARROT_API
 List *
-list_clone(Interp *interp, List * const other /*NN*/)
+list_clone(Interp *interp, List *other /*NN*/)
     /* WARN_UNUSED */
 {
     List *l;
@@ -1421,7 +1421,7 @@ Returns the length of the list.
 
 PARROT_API
 INTVAL
-list_length(Interp *interp, const List * const list /*NN*/)
+list_length(Interp *interp, const List *list /*NN*/)
     /* PURE, WARN_UNUSED */
 {
     UNUSED(interp);
