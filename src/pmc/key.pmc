@@ -408,12 +408,13 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
     }
 
     void thaw(visit_info *info /*NN*/) {
-        IMAGE_IO * const io = info->image_io;
-        /* get flags */
-        INTVAL flags = io->vtable->shift_integer(INTERP, io);
-        flags &= KEY_type_FLAGS;
+        IMAGE_IO * const io    = info->image_io;
+        INTVAL     const flags = io->vtable->shift_integer(INTERP, io)
+                                    & KEY_type_FLAGS;
+
         PObj_get_FLAGS(SELF) |= flags;
         PObj_custom_mark_SET(SELF);
+
         /* get contents */
         switch (flags) {
             case KEY_integer_FLAG:
@@ -427,7 +428,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
                 break;
             default:
                 real_exception(INTERP, NULL, E_KeyError,
-                        "Unsupported key type in Key.freeze");
+                        "Unsupported key type in Key.thaw");
                 break;
         }
     }
