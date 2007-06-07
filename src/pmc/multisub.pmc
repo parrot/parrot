@@ -25,8 +25,8 @@ Sub PMCs with the same short name, but different long names.
 pmclass MultiSub extends ResizablePMCArray need_ext does array {
 
     void push_pmc(PMC* value) {
-        STRING *_sub = CONST_STRING(interp, "Sub");
-        STRING *_nci = CONST_STRING(interp, "NCI");
+        STRING * const _sub = CONST_STRING(interp, "Sub");
+        STRING * const _nci = CONST_STRING(interp, "NCI");
         if (!VTABLE_isa(interp, value, _sub) &&
             !VTABLE_isa(interp, value, _nci))
             real_exception(interp, NULL, E_TypeError,
@@ -58,10 +58,11 @@ pmclass MultiSub extends ResizablePMCArray need_ext does array {
     }
 
     opcode_t* invoke(void *next) {
-        PMC *list = Parrot_mmd_sort_candidate_list(interp, SELF);
-        PMC *func = PMCNULL;
-        if (!PMC_IS_NULL(list))
-            func = VTABLE_get_pmc_keyed_int(interp, list, 0);
+        PMC * const list = Parrot_mmd_sort_candidate_list(interp, SELF);
+        PMC * const func =
+            PMC_IS_NULL(list)
+                ? PMCNULL
+                : VTABLE_get_pmc_keyed_int(interp, list, 0);
         return VTABLE_invoke(INTERP, func, next);
     }
 }

@@ -92,21 +92,21 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     INTVAL exists_keyed_str(STRING* name) {
-        PMC *info = PMC_pmc_val(SELF);
+        PMC * const info = PMC_pmc_val(SELF);
         return parrot_hash_get_bucket(INTERP,
             (Hash*) PMC_struct_val(info), name) != 0;
     }
 
     INTVAL exists_keyed(PMC *name) {
-        STRING *s = key_string(INTERP, name);
+        STRING * const s = key_string(INTERP, name);
         return SELF.exists_keyed_str(s);
     }
 
     PMC* get_pmc_keyed_str(STRING* name) {
-        PMC              *info = PMC_pmc_val(SELF);
-        Hash             *hash = (Hash *)PMC_struct_val(info);
-        parrot_context_t *ctx  = (parrot_context_t *)PMC_struct_val(SELF);
-        HashBucket       *b    = parrot_hash_get_bucket(INTERP, hash, name);
+        PMC              * const info = PMC_pmc_val(SELF);
+        Hash             * const hash = (Hash *)PMC_struct_val(info);
+        parrot_context_t * const ctx  = (parrot_context_t *)PMC_struct_val(SELF);
+        HashBucket       * const b    = parrot_hash_get_bucket(INTERP, hash, name);
         INTVAL            regno;
 
         if (!b)
@@ -118,15 +118,15 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     PMC* get_pmc_keyed(PMC *name) {
-        STRING *s = key_string(INTERP, name);
+        STRING * const s = key_string(INTERP, name);
         return SELF.get_pmc_keyed_str(s);
     }
 
     void set_pmc_keyed_str(STRING *name, PMC *value) {
-        PMC              *info  = PMC_pmc_val(SELF);
-        Hash             *hash  = (Hash *)PMC_struct_val(info);
-        parrot_context_t *ctx   = (parrot_context_t *)PMC_struct_val(SELF);
-        HashBucket       *b     = parrot_hash_get_bucket(INTERP, hash, name);
+        PMC              * const info  = PMC_pmc_val(SELF);
+        Hash             * const hash  = (Hash *)PMC_struct_val(info);
+        parrot_context_t * const ctx   = (parrot_context_t *)PMC_struct_val(SELF);
+        HashBucket       * const b     = parrot_hash_get_bucket(INTERP, hash, name);
         INTVAL            regno;
 
         if (!b)
@@ -138,7 +138,7 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     void set_pmc_keyed(PMC *name, PMC *value) {
-        STRING *s = key_string(INTERP, name);
+        STRING * const s = key_string(INTERP, name);
         SELF.set_pmc_keyed_str(s, value);
     }
 
