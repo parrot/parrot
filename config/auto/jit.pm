@@ -88,7 +88,7 @@ sub runstep {
         -e "$jitbase/$cpuarch/core.jit" ? 'yes' : 'no', "\n" )
         if $verbose;
 
-    # XXX disable all but i386, ppc
+    # RT#43145 disable all but i386, ppc
     my %jit_is_working = (
         i386 => 1,
         ppc  => 1,
@@ -187,7 +187,7 @@ sub runstep {
             cc_clean();
         }
 
-        # TODO use executable memory for this test if needed
+        # RT#43146 use executable memory for this test if needed
         #
         # test for some instructions
         if ( $jitcpuarch eq 'i386' ) {
