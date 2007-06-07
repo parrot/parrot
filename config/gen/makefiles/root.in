@@ -734,6 +734,8 @@ help :
 	@echo "  lint:              code checking with lint."
 	@echo "  splint:            code checking with splint."
 	@echo "  splint2:           another code checking with splint."
+	@echo "  hwork:             recreate header files for appropriate"
+	@echo "                     C-source file"
 	@echo ""
 	@echo "Release:"
 	@echo "  release:           create a TAR ball."
