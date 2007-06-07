@@ -292,11 +292,62 @@ transform while (PAST::Op) :language('PIR') {
     .return (ops)
 }
 
-
 transform until (PAST::Op) :language('PIR') {
     .return tree.'get'('while', node)
 }
 
+transform for (PAST::Op) :language('PIR') {
+    .local pmc ops
+    ops = new 'POST::Ops'
+    ops.'init'('node'=>node)
+
+    .local pmc looplabel, endlabel
+    .local string pasttype, n
+    pasttype = node.'pasttype'()
+    n = node.'unique'('_')
+    $S0 = concat pasttype, n
+    looplabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $S0 = concat $S0, '_end'
+    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+
+    .local pmc collpast, collpost
+    collpast = node[0] 
+    collpost = tree.'get'('post', collpast)
+
+    .local pmc collvar
+    collvar=collpost['result']
+
+    # reference our collection ...
+    ops.'push'(collpost)
+    # Create a temporary iterator for our collection
+    # $P<unique> = new .Iterator, obj from collection.
+    .local pmc iter
+    iter = ops.'unique'('$P')
+    ops.'push_pirop'('new',iter,'.Iterator',collvar)
+
+    # loop
+    ops.'push'(looplabel)
+    ops.'push_pirop'('unless', iter, endlabel)
+    # end unless iterator
+    
+    # assign nextval to loop variable
+    .local pmc nextval
+    nextval = ops.'unique'('$P')
+    ops.'push_pirop'('shift', nextval, iter)
+
+    # execute block
+    .local pmc subpast, subpost
+    subpast = node[1] 
+    subpost = tree.'get'('post', subpast)
+    $P0 = subpost[0] # get to the sub so we can add the param..
+    ops.'push'(subpost)
+    ops.'push_pirop'('call',subpost,nextval)
+
+    # goto loop
+    ops.'push_pirop'('goto', looplabel)
+    ops.'push'(endlabel)
+    .return (ops)
+}
 
 transform try (PAST::Op) :language('PIR') {
     .local pmc trypast, trypost, post, traplabel, endlabel

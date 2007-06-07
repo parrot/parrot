@@ -482,6 +482,10 @@ while      - Evaluate the first child, if the result is
 until      - Evaluate the first child, if the result is
              false then evaluate the second child and repeat.
 
+for        - Iterate over the first child. For each element, 
+             invoke the sub in the second child, passing the
+             element as the only parameter.
+
 call       - Call a subroutine, passing the results of any
              child nodes as arguments.  The subroutine to be
              called is given by the node's C<name> attribute,
