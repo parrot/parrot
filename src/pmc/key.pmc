@@ -21,7 +21,7 @@ These are the vtable functions for the Key PMC class.
 #include "parrot/parrot.h"
 
 static int
-is_hash_iter(PMC *agg, PMC *key)
+is_hash_iter(PMC *key /*NN*/)
 {
     if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) ==
         KEY_hash_iterator_FLAGS)
@@ -56,7 +56,7 @@ Creates and returns a clone of the key.
 */
 
     PMC* clone() {
-        PMC *dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC *dkey = dest;
         PMC *key = SELF;
         PMC *p;
@@ -226,7 +226,7 @@ Appends C<*value> to the key.
 
 */
 
-    void push_pmc(PMC * value) {
+    void push_pmc(PMC * value /*NN*/) {
         if (value->vtable->base_type != enum_class_Key)
             real_exception(interp, NULL, INVALID_OPERATION,
                 "Can only push another Key onto a Key PMC.");
@@ -282,7 +282,7 @@ PMC_int_val(-1) means end of iteration.
 */
 
     PMC* nextkey_keyed(PMC* agg, INTVAL what) {
-        INTVAL n = VTABLE_elements(INTERP, agg);
+        const INTVAL n = VTABLE_elements(INTERP, agg);
         PMC *ret = SELF;
         STRING *_hash;
 
@@ -319,7 +319,7 @@ PMC_int_val(-1) means end of iteration.
                  * iterating over a hash needs additionally the
                  * Bucket index
                  */
-                if (is_hash_iter(agg, ret))
+                if (is_hash_iter(ret))
                     PMC_data(ret) = (void *)INITBucketIndex;
                 break;
             case ITERATE_GET_NEXT:
@@ -327,7 +327,7 @@ PMC_int_val(-1) means end of iteration.
                  * src/hash.c:parrot_hash_get_idx() advances to next
                  * so, if we are iterating over a hash do nothing
                  * */
-                if (!is_hash_iter(agg, ret)) {
+                if (!is_hash_iter(ret)) {
                     if (PMC_int_val(ret) < n - 1)
                         ++PMC_int_val(ret);
                     else
@@ -373,15 +373,15 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
          * at end a PMC_NULL is written during thaw,
          * which should stop visiting the key
          */
-        PMC **pos = (PMC**)&PMC_data(SELF);
+        PMC ** const pos = (PMC**)&PMC_data(SELF);
         info->thaw_ptr = pos;
         (info->visit_pmc_now)(INTERP, *pos, info);
     }
 
-    void freeze(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
+    void freeze(visit_info *info /*NN*/) {
+        IMAGE_IO * const io = info->image_io;
         /* write flags */
-        INTVAL flags = (PObj_get_FLAGS(SELF) & KEY_type_FLAGS);
+        const INTVAL flags = (PObj_get_FLAGS(SELF) & KEY_type_FLAGS);
         /* write the contents of a register - else thaw can't restore
          * the register state
          */
@@ -407,8 +407,8 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         }
     }
 
-    void thaw(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
+    void thaw(visit_info *info /*NN*/) {
+        IMAGE_IO * const io = info->image_io;
         /* get flags */
         INTVAL flags = io->vtable->shift_integer(INTERP, io);
         flags &= KEY_type_FLAGS;
@@ -434,10 +434,9 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 
     void thawfinish(visit_info *info) {
         PMC *key = SELF;
-        PMC *next;
 
         while (1) {
-            next = (PMC *)PMC_data(key);
+            PMC * const next = (PMC *)PMC_data(key);
 
             if (PMC_IS_NULL(next)) {
                 PMC_data(key) = NULL;
