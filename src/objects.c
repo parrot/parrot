@@ -371,6 +371,7 @@ Return the method name for the given MMD enum.
 PARROT_API
 const char*
 Parrot_MMD_method_name(Interp *interp, INTVAL idx)
+    /* WARN_UNUSED, PURE */
 {
     assert(idx >= 0);
 
@@ -392,6 +393,7 @@ TODO allow dynamic expansion at runtime.
 PARROT_API
 INTVAL
 Parrot_MMD_method_idx(Interp *interp, const char * const name)
+    /* WARN_UNUSED, PURE */
 {
     INTVAL i;
 

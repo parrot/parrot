@@ -43,18 +43,26 @@ typedef IntList_Chunk IntList;
 void intlist_assign( Interp *i, IntList *l /*NN*/, INTVAL idx, INTVAL val )
         __attribute__nonnull__(2);
 
-IntList * intlist_clone( Interp *i, IntList *list );
+IntList * intlist_clone( Interp *i, IntList *list )
+        __attribute__warn_unused_result__;
+
 void intlist_dump( FILE *fp, IntList *list /*NN*/, int verbose )
         __attribute__nonnull__(2);
 
 INTVAL intlist_get( Interp *i, IntList *l /*NN*/, INTVAL idx )
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__pure__
+        __attribute__warn_unused_result__;
 
 INTVAL intlist_length( Interp *interp, IntList *list /*NN*/ )
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__pure__
+        __attribute__warn_unused_result__;
 
 void intlist_mark( Interp *i, IntList *l );
-IntList * intlist_new( Interp *i );
+IntList * intlist_new( Interp *i )
+        __attribute__warn_unused_result__;
+
 INTVAL intlist_pop( Interp *i, IntList *l /*NN*/ )
         __attribute__nonnull__(2);
 

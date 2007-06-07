@@ -168,6 +168,7 @@ Returns a clone of the list.
 
 IntList *
 intlist_clone(Interp *i, IntList *list)
+    /* WARN_UNUSED */
 {
     return (IntList *)list_clone(i, (List *)list);
 }
@@ -185,6 +186,7 @@ Returns a new list.
 
 IntList *
 intlist_new(Interp *i)
+    /* WARN_UNUSED */
 {
     return (IntList *)list_new(i, enum_type_INTVAL);
 }
@@ -202,6 +204,7 @@ Returns the length of the list.
 
 INTVAL
 intlist_length(Interp *interp, IntList *list /*NN*/)
+    /* PURE, WARN_UNUSED */
 {
     UNUSED(interp);
     return ((List *)list)->length;
@@ -309,6 +312,7 @@ Returns the item at C<idx>.
 
 INTVAL
 intlist_get(Interp *i, IntList *l /*NN*/, INTVAL idx)
+    /* PURE, WARN_UNUSED */
 {
     void * const ret = list_get(i, (List *)l, idx, enum_type_INTVAL);
     const INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;

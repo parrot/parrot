@@ -78,7 +78,10 @@ typedef enum {
 
 /* HEADERIZER BEGIN: src/list.c */
 
-PARROT_API UINTVAL ld( UINTVAL x );
+PARROT_API UINTVAL ld( UINTVAL x )
+        __attribute__const__
+        __attribute__warn_unused_result__;
+
 PARROT_API void list_assign( Interp *interp,
     List *list /*NN*/,
     INTVAL idx,
@@ -87,7 +90,8 @@ PARROT_API void list_assign( Interp *interp,
         __attribute__nonnull__(2);
 
 PARROT_API List * list_clone( Interp *interp, List *other /*NN*/ )
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
 
 PARROT_API void list_delete( Interp *interp,
     List *list /*NN*/,
@@ -99,7 +103,9 @@ PARROT_API void * list_get( Interp *interp,
     List *list /*NN*/,
     INTVAL idx,
     int type )
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__
+        __attribute__pure__;
 
 PARROT_API void list_insert( Interp *interp,
     List *list /*NN*/,
@@ -108,16 +114,21 @@ PARROT_API void list_insert( Interp *interp,
         __attribute__nonnull__(2);
 
 PARROT_API INTVAL list_length( Interp *interp, const List *list /*NN*/ )
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__pure__
+        __attribute__warn_unused_result__;
 
 PARROT_API void list_mark( Interp *interp, List *list /*NN*/ )
         __attribute__nonnull__(2);
 
-PARROT_API List * list_new( Interp *interp, INTVAL type );
+PARROT_API List * list_new( Interp *interp, INTVAL type )
+        __attribute__warn_unused_result__;
+
 PARROT_API List * list_new_init( Interp *interp,
     INTVAL type,
     PMC *init /*NN*/ )
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
 
 PARROT_API void list_pmc_new( Interp *interp, PMC *container /*NN*/ )
         __attribute__nonnull__(2);

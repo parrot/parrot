@@ -655,6 +655,7 @@ Return the number of used entries in the hash.
 PARROT_API
 INTVAL
 parrot_hash_size(Interp *interp, Hash *hash /*NN*/)
+    /*PURE, WARN_UNUSED*/
 {
     UNUSED(interp);
 
@@ -674,6 +675,7 @@ Called by iterator.
 PARROT_API
 void *
 parrot_hash_get_idx(Interp *interp, const Hash *hash, PMC * const key /*NN*/)
+    /* PURE, WARN_UNUSED */
 {
     INTVAL i = PMC_int_val(key);
     const BucketIndex bi = (BucketIndex)PMC_data(key);
@@ -722,6 +724,7 @@ Returns the bucket for C<key>.
 PARROT_API
 HashBucket *
 parrot_hash_get_bucket(Interp *interp, const Hash *hash, void *key)
+    /* PURE, WARN_UNUSED */
 {
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
     HashBucket *bucket = hash->bi[hashval & hash->mask];
@@ -744,6 +747,7 @@ Returns the bucket for C<key> or C<NULL> if no bucket is found.
 PARROT_API
 void *
 parrot_hash_get(Interp *interp, Hash *hash, void *key)
+    /* PURE, WARN_UNUSED */
 {
     const HashBucket * const bucket = parrot_hash_get_bucket(interp, hash, key);
     return bucket ? bucket->value : NULL;
@@ -759,6 +763,7 @@ Returns whether the key exists in the hash.
 PARROT_API
 INTVAL
 parrot_hash_exists(Interp *interp, Hash *hash, void *key)
+    /* PURE, WARN_UNUSED */
 {
     const HashBucket * const bucket = parrot_hash_get_bucket(interp, hash, key);
     return bucket ? 1 : 0;

@@ -144,9 +144,11 @@ sub function_components {
     my $parms      = join( " ", @lines );
 
     $parms =~ s/\s+/ /g;
-    $parms =~ s/([^(]+)\s*\((.+)\);?/$2/ or die qq{Couldn't handle "$proto"};
+    $parms =~ s{([^(]+)\s*\((.+)\)\s*(/\*\s*(.*?)\s*\*/)?;?}{$2} or die qq{Couldn't handle "$proto"};
     my $funcname = $1;
     $parms = $2;
+    my $funcflags = $4;
+
     my @parms = split( /\s*,\s*/, $parms );
     for (@parms) {
         /\S+\s+\S+/ || ( $_ eq '...' ) || ( $_ eq 'void' ) || /theINTERP/
@@ -165,7 +167,7 @@ sub function_components {
 
     die "Impossible to have both static and PARROT_API" if $parrot_api && $static;
 
-    return [ $parrot_api, $static, $returntype, $funcname, @parms ];
+    return [ $parrot_api, $static, $returntype, $funcname, $funcflags, @parms ];
 }
 
 sub attrs_from_args {
@@ -184,12 +186,44 @@ sub attrs_from_args {
     return @attrs;
 }
 
+sub attrs_from_funcflags {
+    my $funcflags = shift;
+
+    return if not $funcflags;
+    return if $funcflags =~ /XXX/;
+
+    my @attrs = ();
+    my @opts = split( /\s*,\s*/, $funcflags );
+
+    # For details about these attributes, see
+    # http://gcc.gnu.org/onlinedocs/gcc-4.2.0/gcc/Function-Attributes.html
+    for my $opt ( @opts ) {
+        if ( $opt eq 'WARN_UNUSED' ) {
+            push( @attrs, '__attribute__warn_unused_result__' );
+        }
+        elsif ( $opt eq 'NORETURN' ) {
+            push( @attrs, '__attribute__noreturn__' );
+        }
+        elsif ( $opt eq 'CONST' ) {
+            push( @attrs, '__attribute__const__' );
+        }
+        elsif ( $opt eq 'PURE' ) {
+            push( @attrs, '__attribute__pure__' );
+        }
+        else {
+            die qq{Unknown function flag "$funcflags" -> "$opt"\n};
+        }
+    }
+
+    return @attrs;
+}
+
 sub make_function_decls {
     my @funcs = @_;
 
     my @decls;
     foreach my $func ( @funcs ) {
-        my ($parrot_api, $static, $ret_type, $funcname, @args) = @{$func};
+        my ($parrot_api, $static, $ret_type, $funcname, $funcflags, @args) = @{$func};
         next if $static;
 
         my $multiline = 0;
@@ -198,6 +232,8 @@ sub make_function_decls {
         $decl = "PARROT_API $decl" if $parrot_api;
 
         my @attrs = attrs_from_args( @args );
+        push( @attrs, attrs_from_funcflags( $funcflags ) );
+
         my $argline = join( ", ", @args );
         if ( length($decl.$argline) <= 75 ) {
             $decl = "$decl $argline )";
@@ -211,6 +247,7 @@ sub make_function_decls {
             $decl = "$decl$argline )";
             $multiline = 1;
         }
+
         my $attrs = join( "", map { "\n\t\t$_" } @attrs );
         if ( $attrs ) {
             $decl .= $attrs;

@@ -84,16 +84,26 @@ PARROT_API void parrot_hash_delete( Interp *interp, Hash *hash, void *key );
 PARROT_API void parrot_hash_destroy( Interp *interp, Hash *hash /*NN*/ )
         __attribute__nonnull__(2);
 
-PARROT_API INTVAL parrot_hash_exists( Interp *interp, Hash *hash, void *key );
-PARROT_API void * parrot_hash_get( Interp *interp, Hash *hash, void *key );
+PARROT_API INTVAL parrot_hash_exists( Interp *interp, Hash *hash, void *key )
+        __attribute__pure__
+        __attribute__warn_unused_result__;
+
+PARROT_API void * parrot_hash_get( Interp *interp, Hash *hash, void *key )
+        __attribute__pure__
+        __attribute__warn_unused_result__;
+
 PARROT_API HashBucket * parrot_hash_get_bucket( Interp *interp,
     const Hash *hash,
-    void *key );
+    void *key )
+        __attribute__pure__
+        __attribute__warn_unused_result__;
 
 PARROT_API void * parrot_hash_get_idx( Interp *interp,
     const Hash *hash,
     PMC *key /*NN*/ )
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__pure__
+        __attribute__warn_unused_result__;
 
 PARROT_API HashBucket* parrot_hash_put( Interp *interp,
     Hash *hash,
@@ -101,7 +111,9 @@ PARROT_API HashBucket* parrot_hash_put( Interp *interp,
     void *value );
 
 PARROT_API INTVAL parrot_hash_size( Interp *interp, Hash *hash /*NN*/ )
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__pure__
+        __attribute__warn_unused_result__;
 
 PARROT_API void parrot_hash_visit( Interp *interp,
     Hash *hash,

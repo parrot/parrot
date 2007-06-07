@@ -31,6 +31,9 @@
 #ifdef HASATTRIBUTE_PURE
 #  define __attribute__pure__               __attribute__((pure))
 #endif
+#ifdef HASATTRIBUTE_CONST
+#  define __attribute__const__              __attribute__((const))
+#endif
 #ifdef HASATTRIBUTE_UNUSED
 #  define __attribute__unused__             __attribute__((unused))
 #endif

@@ -40,7 +40,10 @@ PARROT_API PMC* pmc_reuse( Interp *interp,
     UINTVAL flags )
         __attribute__nonnull__(2);
 
-PARROT_API INTVAL pmc_type( Interp* interp, STRING *name );
+PARROT_API INTVAL pmc_type( Interp* interp, STRING *name )
+        __attribute__pure__
+        __attribute__warn_unused_result__;
+
 PARROT_API INTVAL pmc_type_p( Interp* interp, PMC *name );
 /* HEADERIZER END: src/pmc.c */
 

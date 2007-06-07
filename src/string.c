@@ -299,6 +299,7 @@ is how many bytes can be appended onto strstart.
 PARROT_API
 UINTVAL
 string_capacity(Interp *interp, const STRING *s /*NN*/)
+    /*PURE,WARN_UNUSED*/
 {
     return ((ptrcast_t)PObj_bufstart(s) + PObj_buflen(s) -
             (ptrcast_t)s->strstart);
@@ -691,6 +692,7 @@ Returns the number of characters in the specified Parrot string.
 PARROT_API
 UINTVAL
 string_length(Interp *interp, const STRING *s /*NULLOK*/)
+    /*PURE,WARN_UNUSED*/
 {
     return s ? s->strlen : 0;
 }
@@ -1235,6 +1237,7 @@ string_chopn(Interp *interp, STRING *s /*NULLOK*/, INTVAL n, int in_place)
 PARROT_API
 INTVAL
 string_compare(Interp *interp, const STRING * const s1 /*NULLOK*/, const STRING * const s2 /*NULLOK*/)
+    /* PURE, WARN_UNUSED */
 {
     if (!s1 && !s2) {
         return 0;
@@ -1266,7 +1269,8 @@ otherwise.
 
 PARROT_API
 INTVAL
-string_equal(Interp *interp, const STRING *s1 /*NULLOK*/, const STRING *s2 /*NULLOK*/)
+string_equal(Interp *interp, const STRING * const s1 /*NULLOK*/, const STRING * const s2 /*NULLOK*/)
+    /* PURE, WARN_UNUSED */
 {
     if ((s1 == s2) || (!s1 && !s2)) {
         return 0;
@@ -1660,6 +1664,7 @@ if it is equal to anything other than C<0>, C<""> or C<"0">.
 PARROT_API
 INTVAL
 string_bool(Interp *interp, const STRING *s /*NULLOK*/)
+    /* PURE, WARN_UNUSED */
 {
     const INTVAL len = string_length(interp, s);
 
@@ -2403,6 +2408,7 @@ as constants -- i.e. do not resize the result.
 PARROT_API
 const char *
 Parrot_string_cstring(Interp *interp, const STRING *str /*NN*/)
+    /* PURE, WARN_UNUSED */
 {
     /* TODO handle NUL and friends */
     return str->strstart;

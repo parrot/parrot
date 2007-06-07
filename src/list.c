@@ -703,6 +703,7 @@ Stolen from F<src/malloc.c>.
 PARROT_API
 UINTVAL
 ld(UINTVAL x)
+    /* CONST, WARN_UNUSED */
 {
     UINTVAL m;                  /* bit position of highest set bit of m */
 
@@ -1104,6 +1105,7 @@ Returns a new list of type C<type>.
 PARROT_API
 List *
 list_new(Interp *interp, INTVAL type)
+    /*WARN_UNUSED*/
 {
     List * const list = (List *)new_bufferlike_header(interp, sizeof (*list));
 
@@ -1175,6 +1177,7 @@ these values is stored in user_data, where the keys are explicit.
 PARROT_API
 List *
 list_new_init(Interp *interp, INTVAL type, PMC *init /*NN*/)
+    /* WARN_UNUSED */
 {
     List *list;
     PMC * user_array, *multi_key;
@@ -1268,11 +1271,14 @@ Return a clone of the list.
 
 TODO - Barely tested. Optimize new array structure, fixed if big.
 
+TODO - The *other arg should be able to be a const pointer
+
 */
 
 PARROT_API
 List *
-list_clone(Interp *interp, List *other /*NN*/) /* XXX This should be constable */
+list_clone(Interp *interp, List * const other /*NN*/)
+    /* WARN_UNUSED */
 {
     List *l;
     List_chunk *chunk, *prev;
@@ -1416,6 +1422,7 @@ Returns the length of the list.
 PARROT_API
 INTVAL
 list_length(Interp *interp, const List * const list /*NN*/)
+    /* PURE, WARN_UNUSED */
 {
     UNUSED(interp);
     return list->length;
@@ -1757,6 +1764,7 @@ Returns the item of type C<type> at index C<idx>.
 PARROT_API
 void *
 list_get(Interp *interp, List *list /*NN*/, INTVAL idx, int type)
+    /* WARN_UNUSED, PURE */
 {
     const INTVAL length = list->length;
 

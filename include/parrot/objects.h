@@ -40,8 +40,14 @@ PARROT_API void Parrot_ComposeRole( Interp *interp,
     PMC *roles_list );
 
 PARROT_API PMC* Parrot_ComputeMRO_C3( Interp *interp, PMC *_class );
-PARROT_API INTVAL Parrot_MMD_method_idx( Interp *interp, const char *name );
-PARROT_API const char* Parrot_MMD_method_name( Interp *interp, INTVAL idx );
+PARROT_API INTVAL Parrot_MMD_method_idx( Interp *interp, const char *name )
+        __attribute__warn_unused_result__
+        __attribute__pure__;
+
+PARROT_API const char* Parrot_MMD_method_name( Interp *interp, INTVAL idx )
+        __attribute__warn_unused_result__
+        __attribute__pure__;
+
 PARROT_API INTVAL Parrot_add_attribute( Interp *interp,
     PMC* _class,
     STRING* attr );
