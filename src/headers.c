@@ -345,11 +345,16 @@ Returns a new C<STRING> header.
 STRING *
 new_string_header(Interp *interp, UINTVAL flags)
 {
-    STRING * const string = (STRING *)get_free_buffer(interp, (flags & PObj_constant_FLAG)
+    STRING * const string = (STRING *)get_free_buffer(interp,
+        (flags & PObj_constant_FLAG)
             ? interp->arena_base->constant_string_header_pool
             : interp->arena_base->string_header_pool);
-    PObj_get_FLAGS(string) |= flags | PObj_is_string_FLAG|PObj_is_COWable_FLAG;
-    string->strstart = NULL;
+
+    PObj_get_FLAGS(string) |=
+        flags | PObj_is_string_FLAG | PObj_is_COWable_FLAG | PObj_live_FLAG;
+
+    string->strstart        = NULL;
+
     return string;
 }
 
