@@ -54,6 +54,9 @@
 #ifndef __attribute__noreturn__
 #  define __attribute__noreturn__
 #endif
+#ifndef __attribute__const__
+#  define __attribute__const__
+#endif
 #ifndef __attribute__pure__
 #  define __attribute__pure__
 #endif
