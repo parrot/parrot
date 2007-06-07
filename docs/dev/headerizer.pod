@@ -1,0 +1,35 @@
+# Copyright (C) 2007, The Perl Foundation.
+# $Id: fhs.pod 18563 2007-05-16 00:53:55Z chromatic $
+
+=pod
+
+=head1 TITLE
+
+The Headerizer
+
+=head1 AUTHOR
+
+Andy Lester C<< andy@petdance.com >>
+
+=head1 INTRODUCTION
+
+The Headerizer (F<tools/build/headerizer.pl>) is a tool that generates
+chunks of F<.h> header files based on C source code.
+
+The long-term plan for the headerizer is that it will take all
+the prototypes for all the functions and populate all the .h files
+automatically.  No need to worry about differences between header and
+source, because the header comes from it.  It'll also auto-generate
+attributes for each of the functions that work with GCC.
+
+=head1 RUNNING THE HEADERIZER
+
+Yesterday there was a problem where I forgot to put PARROT_API on the
+function in source, so linking on Windows broke.  If that happens again,
+here's what you do:
+
+* Run Configure.pl
+* Update the source with PARROT_API above the return type
+* Run "make headerizer"
+
+The .h file should now have PARROT_API for the function in question.
