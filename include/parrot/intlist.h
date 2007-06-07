@@ -1,5 +1,5 @@
 /* stacks.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -38,28 +38,36 @@ struct IntList_chunk_t {
 
 typedef IntList_Chunk IntList;
 
-void intlist_mark(Interp *, IntList*);
+/* HEADERIZER BEGIN: src/intlist.c */
 
-IntList *intlist_clone(Interp *i, IntList *list);
+void intlist_assign( Interp *i, IntList *l /*NN*/, INTVAL idx, INTVAL val )
+        __attribute__nonnull__(2);
 
-IntList *intlist_new(Interp *);
+IntList * intlist_clone( Interp *i, IntList *list );
+void intlist_dump( FILE *fp, IntList *list /*NN*/, int verbose )
+        __attribute__nonnull__(2);
 
-INTVAL intlist_length(Interp *interp, IntList* list);
+INTVAL intlist_get( Interp *i, IntList *l /*NN*/, INTVAL idx )
+        __attribute__nonnull__(2);
 
-void intlist_assign(Interp *, IntList*, INTVAL idx, INTVAL val);
+INTVAL intlist_length( Interp *interp, IntList *list /*NN*/ )
+        __attribute__nonnull__(2);
 
-void intlist_push(Interp *, IntList*, INTVAL);
+void intlist_mark( Interp *i, IntList *l );
+IntList * intlist_new( Interp *i );
+INTVAL intlist_pop( Interp *i, IntList *l /*NN*/ )
+        __attribute__nonnull__(2);
 
-INTVAL intlist_pop(Interp*, IntList*);
+void intlist_push( Interp *i, IntList *l /*NN*/, INTVAL val )
+        __attribute__nonnull__(2);
 
-void intlist_unshift(Interp*, IntList**, INTVAL);
+INTVAL intlist_shift( Interp *i, IntList **l /*NN*/ )
+        __attribute__nonnull__(2);
 
-INTVAL intlist_shift(Interp *, IntList**);
+void intlist_unshift( Interp *i, IntList **l /*NN*/, INTVAL val )
+        __attribute__nonnull__(2);
 
-INTVAL intlist_get(Interp*, IntList*, INTVAL idx);
-
-/* Debugging use only */
-void intlist_dump(FILE* fp, IntList* list, int verbose);
+/* HEADERIZER END: src/intlist.c */
 
 #endif /* PARROT_INTLIST_H_GUARD */
 

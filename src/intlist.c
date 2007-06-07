@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -134,7 +134,9 @@ Of course, a check for valid pointers could be added here.
 
 */
 
-#include <parrot/parrot.h>
+#include "parrot/parrot.h"
+
+/* HEADER: include/parrot/intlist.h */
 
 /*
 
@@ -199,7 +201,7 @@ Returns the length of the list.
 */
 
 INTVAL
-intlist_length(Interp *interp, IntList *list)
+intlist_length(Interp *interp, IntList *list /*NN*/)
 {
     UNUSED(interp);
     return ((List *)list)->length;
@@ -217,7 +219,7 @@ Assigns <val> to the item at C<idx>.
 */
 
 void
-intlist_assign(Interp *i, IntList *l, INTVAL idx, INTVAL val)
+intlist_assign(Interp *i, IntList *l /*NN*/, INTVAL idx, INTVAL val)
 {
     list_assign(i, (List *)l, idx, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
@@ -234,7 +236,7 @@ Pushes C<val> on the end of the list.
 */
 
 void
-intlist_push(Interp *i, IntList *l, INTVAL val)
+intlist_push(Interp *i, IntList *l /*NN*/, INTVAL val)
 {
     list_push(i, (List *)l, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
@@ -251,7 +253,7 @@ Pushes C<val> on the front of the list.
 */
 
 void
-intlist_unshift(Interp *i, IntList **l, INTVAL val)
+intlist_unshift(Interp *i, IntList **l /*NN*/, INTVAL val)
 {
     list_unshift(i, (List *)*l, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
@@ -268,10 +270,10 @@ Popping/shifting into a sparse hole returns 0.
 */
 
 INTVAL
-intlist_pop(Interp *i, IntList *l)
+intlist_pop(Interp *i, IntList *l /*NN*/)
 {
-    void *ret = list_pop(i, (List *)l, enum_type_INTVAL);
-    INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
+    void * const ret = list_pop(i, (List *)l, enum_type_INTVAL);
+    const INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
     return retval;
 }
 
@@ -287,10 +289,10 @@ Removes and returns the first item on the list.
 */
 
 INTVAL
-intlist_shift(Interp *i, IntList **l)
+intlist_shift(Interp *i, IntList **l /*NN*/)
 {
-    void *ret = list_shift(i, (List *)*l, enum_type_INTVAL);
-    INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
+    void * const ret = list_shift(i, (List *)*l, enum_type_INTVAL);
+    const INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
     return retval;
 }
 
@@ -306,10 +308,10 @@ Returns the item at C<idx>.
 */
 
 INTVAL
-intlist_get(Interp *i, IntList *l, INTVAL idx)
+intlist_get(Interp *i, IntList *l /*NN*/, INTVAL idx)
 {
-    void *ret = list_get(i, (List *)l, idx, enum_type_INTVAL);
-    INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
+    void * const ret = list_get(i, (List *)l, idx, enum_type_INTVAL);
+    const INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
     return retval;
 }
 
@@ -325,7 +327,7 @@ Prints out the list in human-readable form.
 */
 
 void
-intlist_dump(FILE *fp, IntList *list, int verbose)
+intlist_dump(FILE *fp, IntList *list /*NN*/, int verbose)
 {
 #ifdef LIST_DEBUG
     list_dump(fp, (List *)list, verbose);

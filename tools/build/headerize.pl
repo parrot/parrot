@@ -247,7 +247,7 @@ sub main {
         my $source = do { local $/; <$fh> };
         close $fh;
 
-        print "\n=== $cfile ===\n";
+        print "=== $cfile ===\n";
 
         die "can't find HEADER directive in '$cfile'"
             unless $source =~ m#/\*\s+HEADER:\s+([^*]+?)\s+\*/#s;

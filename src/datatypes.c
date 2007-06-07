@@ -15,29 +15,24 @@ F<include/parrot/datatypes.h>.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 
+/* HEADER: include/parrot/datatypes.h */
+
 /*
 
-=item C<INTVAL
-Parrot_get_datatype_enum(Interp *interp, STRING *typename)>
-
+FUNCDOC: Parrot_get_datatype_enum
 Return datatype C<enum> for C<STRING*> typename.
-
-=cut
 
 */
 
+PARROT_API
 INTVAL
-Parrot_get_datatype_enum(Interp *interp, const STRING *_typename /* NN */)
+Parrot_get_datatype_enum(Interp *interp, const STRING * const typename /*NN*/)
 {
-    char * const type = string_to_cstring(interp, _typename);
+    char * const type = string_to_cstring(interp, typename);
     int i;
 
     for (i = enum_first_type; i < enum_last_type; i++) {
@@ -54,35 +49,28 @@ Parrot_get_datatype_enum(Interp *interp, const STRING *_typename /* NN */)
 
 /*
 
-=item C<STRING *
-Parrot_get_datatype_name(Interp *interp, INTVAL type)>
-
+FUNCDOC:
 Return datatype name for C<type>.
-
-=cut
 
 */
 
+PARROT_API
 STRING *
 Parrot_get_datatype_name(Interp *interp, INTVAL type)
 {
-    const char *s;
-    if (type < enum_first_type || type >= enum_last_type)
-        s = "illegal";
-    else
-        s = data_types[type - enum_first_type].name;
+    const char * const s =
+        (type < enum_first_type || type >= enum_last_type)
+            ? "illegal"
+            : data_types[type - enum_first_type].name;
+
     return string_make(interp, s, strlen(s), NULL, PObj_external_FLAG);
 }
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/datatypes.h>.
-
-=cut
 
 */
 

@@ -1812,6 +1812,11 @@ tags: tags.dummy
 
 tags.dummy:
 
+# This target will eventually create all the headers automatically.
+# If you are having problems with linkage in Win32 (or elsewhere), because something
+# is not PARROT_API, but should be, then put PARROT_API in the C file and 
+# run "make hwork".  The .h file will get updated.
+
 HEADERIZER_O_FILES = \
     $(INTERP_O_FILES) \
     $(CHARSET_O_FILES) \
@@ -1819,29 +1824,24 @@ HEADERIZER_O_FILES = \
     $(CLASS_O_FILES) \
     $(ENCODING_O_FILES)
 
-# This target will eventually create all the headers automatically.
-# If you are having problems with linkage in Win32 (or elsewhere), because something
-# is not PARROT_API, but should be, then put PARROT_API in the C file and 
-# run "make hwork".  The .h file will get updated.
+# Slowing working my way up to having everything headerized in $(HEADERIZER_O_FILES)
+HEADERIZER_O_FILES = \
+    src/string.o \
+    src/string_primitives.o \
+    src/pic.o \
+    src/stacks.o \
+    src/stack_common.o \
+    src/mmd.o \
+    src/objects.o \
+    src/key.o \
+    src/hash.o \
+    src/pmc.o \
+    src/list.o \
+    src/intlist.o \
+    src/datatypes.o \
 
 headerizer:
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)
-
-# Slowing working my way up to having everything headerized in $(HEADERIZER_O_FILES)
-hwork:
-	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl \
-		src/string.o \
-		src/string_primitives.o \
-		src/pic.o \
-		src/stacks.o \
-		src/stack_common.o \
-		src/mmd.o \
-		src/objects.o \
-		src/key.o \
-		src/hash.o \
-		src/pmc.o \
-		src/list.o \
-
 
 ###############################################################################
 #
