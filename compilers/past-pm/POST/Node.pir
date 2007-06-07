@@ -344,7 +344,14 @@ C<POST::Sub> nodes represent PIR subroutines.
     $S0 = self.'blocktype'()
     if $S0 == 'declaration' goto skip_declaration
     code.'emit'("    %0 = find_name %1", value, name)
+    if $S0 == 'END'         goto add_end_block
   skip_declaration:
+    .return (code)
+  add_end_block:
+    $S1 = code.'unique'('$P')
+    code.'emit'("    %0 = find_global '_perl6', '%BLOCKS'", $S1)
+    code.'emit'("    %0 = %0['END']", $S1)
+    code.'emit'("    push %0, %1", $S1, value)
     .return (code)
 .end
 
