@@ -68,6 +68,7 @@ typedef struct Parrot_PMCProxy {
     PMC *_namespace;      /* The namespace it's linked to, if any. */
     PMC *parents;         /* Proxy PMCs of any immediate parent classes. */
     PMC *all_parents;     /* Cached list of ourself and all parents, in MRO order. */
+    PMC *methods;         /* PMC's non-vtable methods. Hash of method names to invokables. */
 } Parrot_PMCProxy;
 
 /* Macro to access underlying structure of a PMCProxy PMC. */

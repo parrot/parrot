@@ -134,6 +134,191 @@ Mark any referenced strings and PMCs in the structure as live.
             pobject_lives(interp, (PObj*)_pmc->all_parents);
     }
 
+/*
+
+=item C<PMC* inspect_str(STRING *what)>
+
+Provides introspection of a specific piece of information about the PMC. The
+available information is:
+
+=over 8
+
+=item name
+
+String PMC containing the name of the PMC
+
+=item namespce
+
+NameSpace PMC of the the namespace attached to the PMC
+
+=item methods
+
+Hash keyed on method name, value is an invokable PMC
+
+=item parents
+
+Array of PMCProxy PMCs representing the direct parents of this class.
+
+=back
+
+=cut
+
+*/
+    PMC* inspect_str(STRING *what)
+    {
+        Parrot_PMCProxy *_pmc = PARROT_PMCPROXY(SELF);
+
+        /* What should we return? */
+        PMC          *found  = PMCNULL;
+
+        if (string_equal(interp, what, CONST_STRING(interp, "name")) == 0) {
+            found = pmc_new(interp, enum_class_String);
+            VTABLE_set_string_native(interp, found, _pmc->name);
+        }
+        else if (string_equal(interp, what, CONST_STRING(interp, "namespace")) == 0) {
+            /* Should not clone this. */
+            return _pmc->_namespace;
+        }
+        else if (string_equal(interp, what, CONST_STRING(interp, "methods")) == 0) {
+            found = _pmc->methods;
+        }
+        else if (string_equal(interp, what, CONST_STRING(interp, "parents")) == 0) {
+            found = _pmc->parents;
+        }
+        else {
+            real_exception(interp, NULL, INVALID_OPERATION,
+                "Unknown introspection value '%S'", what);
+        }
+
+        /* Clone and return. */
+        return PMC_IS_NULL(found) ? PMCNULL : VTABLE_clone(interp, found);
+    }
+
+/*
+
+=item C<PMC* inspect()>
+
+Returns a Hash describing the PMC, with key/value pairs as described in
+inspect_str.
+
+=cut
+
+*/
+    PMC* inspect()
+    {
+        /* Create a hash, then use inspect_str to get all of the data to
+         * fill it up with. */
+        PMC *metadata = pmc_new(interp, enum_class_Hash);
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "name"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "name")));
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "namespace"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "namespace")));
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "methods"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "methods")));
+        VTABLE_set_pmc_keyed_str(interp, metadata, CONST_STRING(interp, "parents"),
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "parents")));
+        return metadata;
+    }
+
+/*
+
+=item C<STRING* name()>
+
+Gets the name of the PMC.
+
+=cut
+
+*/
+    PCCMETHOD void name() {
+        Parrot_PMCProxy *_pmc = PARROT_PMCPROXY(SELF);
+        STRING *ret_name = _pmc->name;
+        PCCRETURN(STRING *ret_name);
+    }
+
+/*
+
+=item C<void pmc_namespace()>
+
+Gets the namespace that this class is attached to.
+
+=cut
+
+*/
+    PCCMETHOD void pmc_namespace() {
+        Parrot_PMCProxy *_pmc = PARROT_PMCPROXY(SELF);
+        PMC *ret_namespace = _pmc->_namespace;
+        PCCRETURN(PMC *ret_namespace);
+    }
+
+/*
+
+=item C<void new(PMC *args)>
+
+Creates an instance of the PMC.
+
+=cut
+
+*/
+    PCCMETHOD void new(PMC *args :optional, int got_args :opt_flag) {
+        Parrot_PMCProxy *_pmc = PARROT_PMCPROXY(SELF);
+        PMC *created;
+        if (got_args)
+            created = pmc_new_init(interp, _pmc->id, args);
+        else
+            created = pmc_new(interp, _pmc->id);
+        PCCRETURN(PMC *created);
+    }
+
+/*
+
+=item C<void methods()>
+
+Return a hash where the keys are method names and the values are methods.
+
+=cut
+
+*/
+    PCCMETHOD void methods() {
+        PMC *ret_methods = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "methods"));
+        PCCRETURN(PMC *ret_methods);
+    }
+
+/*
+
+=item C<void parents()>
+
+Return the parents array PMC.
+
+=cut
+
+*/
+    PCCMETHOD void parents() {
+        PMC *ret_parents = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "parents"));
+        PCCRETURN(PMC *ret_parents);
+    }
+
+/*
+
+=item C<void inspect(STRING *what :optional)>
+
+Gets all introspection data for the PMC or, if the optional string
+parameter is supplied, a particular item of introspection data.
+
+=cut
+
+*/
+    PCCMETHOD void inspect(STRING *what :optional, int got_what :opt_flag) {
+        PMC *found;
+
+        /* Just delegate to the appropriate vtable method. */
+        if (got_what)
+            found = VTABLE_inspect_str(interp, SELF, what);
+        else
+            found = VTABLE_inspect(interp, SELF);
+
+        PCCRETURN(PMC *found);
+    }
+
 } /* END pmclass */
 
 /*

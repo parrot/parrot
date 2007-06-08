@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 =head1 NAME
 
@@ -58,6 +58,36 @@ ok_1:
 CODE
 ok 1 - get_class returned something
 ok 2 - isa $P0, 'PMCProxy'
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'Proxy PMC supplies name, namespace' );
+.sub 'test' :main
+push_eh nok_1
+    $P0 = get_class 'NameSpace'
+    clear_eh
+    goto ok_1
+nok_1:
+    print "not "
+ok_1:
+    print "ok 1 - get_class returned something\n"
+
+    $S1 = $P0.'name'()
+    print $S1
+    print "\n"
+    print "ok 2 - got name\n"
+
+    $P1 = $P0.'pmc_namespace'()
+    $S1 = $P1
+    print $S1
+    print "\n"
+    print "ok 3 - got namespace\n"
+.end
+CODE
+ok 1 - get_class returned something
+NameSpace
+ok 2 - got name
+NameSpace
+ok 3 - got namespace
 OUT
 
 # Local Variables:
