@@ -47,9 +47,6 @@ sub runstep {
         parrot_is_shared       => 0,
         libparrot_shared       => 'libparrot.$(SOVERSION)$(SHARE_EXT)',
         libparrot_shared_alias => 'libparrot$(SHARE_EXT)',
-
-        # This variable needs renaming to be more general
-        # RT#43148 ugly hack for rpath_lib in config/inter/libparrot.pm
         rpath            => "-L",
         libparrot_soname => "-install_name "
             . $conf->data->get('lib_dir')
