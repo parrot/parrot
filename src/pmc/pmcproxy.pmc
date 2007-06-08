@@ -51,17 +51,6 @@ NOTE: No doubt we will need other things later; this is a start.
 
 #include "parrot/parrot.h"
 
-typedef struct Parrot_PMCProxy {
-    int id;               /* The type number of the PMC. */
-    STRING *name;         /* The name of the PMC. */
-    PMC *_namespace;      /* The namespace it's linked to, if any. */
-    PMC *parents;         /* Proxy PMCs of any immediate parent classes. */
-    PMC *all_parents;     /* Cached list of ourself and all parents, in MRO order. */
-} Parrot_PMCProxy;
-
-/* Macro to access underlying structure of a PMCProxy PMC. */
-#define PARROT_PMCPROXY(o) ((Parrot_PMCProxy *) PMC_data(o))
-
 /*
 
 =head2 Functions

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
 =head1 NAME
 
@@ -35,6 +35,28 @@ pir_output_is( <<'CODE', <<'OUT', 'new' );
 .end
 CODE
 ok 1 - $P0 = new .PMCProxy
+ok 2 - isa $P0, 'PMCProxy'
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'get_class gives back Proxy PMC' );
+.sub 'test' :main
+push_eh nok_1
+    $P0 = get_class 'NameSpace'
+    clear_eh
+    goto ok_1
+nok_1:
+    print "not "
+ok_1:
+    print "ok 1 - get_class returned something\n"
+
+    $I0 = isa $P0, 'PMCProxy'
+    if $I0 goto ok_2
+    print 'not '
+  ok_2:
+    say "ok 2 - isa $P0, 'PMCProxy'"
+.end
+CODE
+ok 1 - get_class returned something
 ok 2 - isa $P0, 'PMCProxy'
 OUT
 

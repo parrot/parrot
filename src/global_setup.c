@@ -114,6 +114,7 @@ init_world(Interp *interp)
 {
     PMC *iglobals;
     PMC *self, *pmc;
+    int i;
 
 #ifdef PARROT_HAS_PLATFORM_INIT_CODE
     Parrot_platform_init_code();
@@ -123,6 +124,14 @@ init_world(Interp *interp)
 
     /* Call base vtable class constructor methods */
     Parrot_initialize_core_pmcs(interp);
+
+    /* We have a Proxy PMC for each of the PMCs; now need to attach that to
+     * the class slot for the namespace each of the PMCs reference. */
+    for (i = 0; i <= interp->n_vtable_max; i++)
+        if (interp->vtables[i])
+            Parrot_PCCINVOKE(interp, interp->vtables[i]->_namespace,
+                string_from_const_cstring(interp, "set_class", 0), "P->",
+                VTABLE_get_pmc_keyed_int(interp, interp->pmc_proxies, i));
 
     iglobals = interp->iglobals;
     VTABLE_set_pmc_keyed_int(interp, iglobals,

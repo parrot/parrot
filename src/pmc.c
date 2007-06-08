@@ -545,6 +545,44 @@ dod_unregister_pmc(Interp* interp, PMC* pmc)
     VTABLE_delete_keyed(interp, interp->DOD_registry, pmc);
 }
 
+
+/*
+
+=head2 PMC Proxy related things
+
+FUNCDOC: Parrot_create_pmc_proxy
+Creates a PMC Proxy for the supplied class number and puts it into the array
+of proxies.
+
+*/
+
+PARROT_API
+void
+Parrot_create_pmc_proxy(Interp* interp, int type_num)
+{
+    PMC *proxy;
+    Parrot_PMCProxy *proxy_info;
+
+    /* Ensure that it's a valid type number. */
+    if (type_num > interp->n_vtable_max || type_num < 0)
+        internal_exception(1, 
+            "Attempt to create PMC Proxy for invalid type number!");
+
+    /* Create PMC proxy object and set up number, name and namespcae. */
+    proxy = pmc_new(interp, enum_class_PMCProxy);
+    proxy_info = PARROT_PMCPROXY(proxy);
+    proxy_info->id = type_num;
+    proxy_info->name = interp->vtables[type_num]->whoami;
+    proxy_info->_namespace = interp->vtables[type_num]->_namespace;
+
+    /* XXX Parents and MRO still todo. */
+        
+    /* Enter it in the list of proxy objects. */
+    VTABLE_set_pmc_keyed_int(interp, interp->pmc_proxies, type_num, proxy);    
+}
+
+
+
 /*
 
 =head1 SEE ALSO

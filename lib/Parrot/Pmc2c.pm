@@ -1013,6 +1013,8 @@ EOC
     $cout .= <<"EOC";
         /* setup MRO and _namespace */
         Parrot_create_mro(interp, entry);
+        /* create PMC Proxy object */
+        Parrot_create_pmc_proxy(interp, entry);
 EOC
 
     # declare each nci method for this class

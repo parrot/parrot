@@ -45,6 +45,8 @@ PARROT_API INTVAL pmc_type( Interp* interp, STRING *name )
         __attribute__warn_unused_result__;
 
 PARROT_API INTVAL pmc_type_p( Interp* interp, PMC *name );
+
+PARROT_API void Parrot_create_pmc_proxy( Interp* interp, int type_num );
 /* HEADERIZER END: src/pmc.c */
 
 /* Internal use */
@@ -57,6 +59,19 @@ PMC *pmc_init_null(Interp *interp);
 #define PMCINFO_FLAGS    4      /* see also STRINGINFO_FLAGS */
 
 /* &end_gen */
+
+/* This is the underlying structure for a PMC Proxy object; we need to set it
+ * up from outside of the PMC. */
+typedef struct Parrot_PMCProxy {
+    int id;               /* The type number of the PMC. */
+    STRING *name;         /* The name of the PMC. */
+    PMC *_namespace;      /* The namespace it's linked to, if any. */
+    PMC *parents;         /* Proxy PMCs of any immediate parent classes. */
+    PMC *all_parents;     /* Cached list of ourself and all parents, in MRO order. */
+} Parrot_PMCProxy;
+
+/* Macro to access underlying structure of a PMCProxy PMC. */
+#define PARROT_PMCPROXY(o) ((Parrot_PMCProxy *) PMC_data(o))
 
 #endif /* PARROT_PMC_H_GUARD */
 
