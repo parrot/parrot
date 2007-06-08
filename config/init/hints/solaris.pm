@@ -54,7 +54,7 @@ sub runstep {
     # code for use in shared libraries.  -KPIC for Sun's compiler, -fPIC for
     # gcc.  We don't know which compiler we're using till after the
     # gccversion test.
-    # XXX Should this go into the shlibs.pl Configure.pl unit instead?
+    # RT#43150 Should this go into the shlibs.pl Configure.pl unit instead?
     my $solaris_cc_shared_cb = sub {
         my ( $key, $gccversion ) = @_;
 

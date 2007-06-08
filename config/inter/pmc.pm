@@ -117,7 +117,7 @@ END
         }
     }
 
-    # XXX:leo do we really need an interactive step for this
+    # RT#43172 :leo do we really need an interactive step for this
     # user could deactivate vital PMCs like SArray
     # so there would be tests needed, that check for vital classes
 

@@ -43,7 +43,7 @@ sub runstep {
 
             # use perl5's value
             # gcc 4.1 doesn't like -mcpu=xx, i.e. it's deprecated
-            # XXX do we know compiler (version) already?
+            # RT#43151 do we know compiler (version) already?
             my $opts = $Config{optimize};
             $opts =~ s/-mcpu=\S+//;
             $conf->data->add( ' ', ccflags => $opts );
