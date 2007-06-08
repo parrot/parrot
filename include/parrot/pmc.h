@@ -21,32 +21,45 @@
 
 /* HEADERIZER BEGIN: src/pmc.c */
 
-PARROT_API void Parrot_create_mro( Interp *interp, INTVAL type );
+PARROT_API void Parrot_create_mro( Interp *interp /*NN*/, INTVAL type )
+        __attribute__nonnull__(1);
+
+PARROT_API void Parrot_create_pmc_proxy( Interp* interp /*NN*/, int type_num )
+        __attribute__nonnull__(1);
+
 PARROT_API PMC * constant_pmc_new( Interp *interp, INTVAL base_type );
 PARROT_API PMC * constant_pmc_new_init( Interp *interp,
     INTVAL base_type,
     PMC *init );
 
 PARROT_API PMC * constant_pmc_new_noinit( Interp *interp, INTVAL base_type );
-PARROT_API void dod_register_pmc( Interp* interp, PMC* pmc );
-void dod_unregister_pmc( Interp* interp, PMC* pmc );
+PARROT_API void dod_register_pmc( Interp* interp /*NN*/, PMC* pmc )
+        __attribute__nonnull__(1);
+
+void dod_unregister_pmc( Interp* interp /*NN*/, PMC* pmc )
+        __attribute__nonnull__(1);
+
 PARROT_API PMC * pmc_new( Interp *interp, INTVAL base_type );
 PARROT_API PMC * pmc_new_init( Interp *interp, INTVAL base_type, PMC *init );
 PARROT_API PMC * pmc_new_noinit( Interp *interp, INTVAL base_type );
-PARROT_API INTVAL pmc_register( Interp* interp, STRING *name );
-PARROT_API PMC* pmc_reuse( Interp *interp,
+PARROT_API INTVAL pmc_register( Interp* interp /*NN*/, STRING *name )
+        __attribute__nonnull__(1);
+
+PARROT_API PMC* pmc_reuse( Interp *interp /*NN*/,
     PMC *pmc /*NN*/,
     INTVAL new_type,
     UINTVAL flags )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API INTVAL pmc_type( Interp* interp, STRING *name )
+PARROT_API INTVAL pmc_type( Interp* interp /*NN*/, STRING *name )
+        __attribute__nonnull__(1)
         __attribute__pure__
         __attribute__warn_unused_result__;
 
-PARROT_API INTVAL pmc_type_p( Interp* interp, PMC *name );
+PARROT_API INTVAL pmc_type_p( Interp* interp /*NN*/, PMC *name )
+        __attribute__nonnull__(1);
 
-PARROT_API void Parrot_create_pmc_proxy( Interp* interp, int type_num );
 /* HEADERIZER END: src/pmc.c */
 
 /* Internal use */

@@ -89,7 +89,9 @@ PARROT_API void list_assign( Interp *interp,
     int type )
         __attribute__nonnull__(2);
 
-PARROT_API List * list_clone( Interp *interp, List *other /*NN*/ )
+PARROT_API List * list_clone( Interp *interp /*NN*/,
+    const List *other /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
@@ -153,7 +155,9 @@ PARROT_API void list_set_length( Interp *interp,
     INTVAL len )
         __attribute__nonnull__(2);
 
-PARROT_API void * list_shift( Interp *interp, List *list, int type );
+PARROT_API void * list_shift( Interp *interp, List *list /*NN*/, int type )
+        __attribute__nonnull__(2);
+
 PARROT_API void list_splice( Interp *interp,
     List *list /*NN*/,
     List *value_list /*NULLOK*/,

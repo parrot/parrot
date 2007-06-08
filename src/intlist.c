@@ -150,7 +150,7 @@ Marks the list as live.
 */
 
 void
-intlist_mark(Interp *i, IntList *l)
+intlist_mark(Interp *i, IntList *l /*NN*/)
 {
     list_mark(i, (List *)l);
 }
@@ -167,7 +167,7 @@ Returns a clone of the list.
 */
 
 IntList *
-intlist_clone(Interp *i, IntList *list)
+intlist_clone(Interp *i /*NN*/, IntList *list/*NN*/)
     /* WARN_UNUSED */
 {
     return (IntList *)list_clone(i, (List *)list);

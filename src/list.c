@@ -465,7 +465,7 @@ Called to optimise the list when modifying it in some way.
 */
 
 static UINTVAL
-rebuild_chunk_list(Interp *interp, List *list /*NN*/)
+rebuild_chunk_list(Interp *interp /*NN*/, List *list /*NN*/)
 {
     List_chunk *chunk, *prev, *first;
     UINTVAL len;
@@ -543,7 +543,7 @@ rebuild_chunk_list(Interp *interp, List *list /*NN*/)
             }
             /* growing chunk block could optimize small growing blocks, they
              * are probably not worth the effort. */
-            else if (prev->items == chunk->items >> 1) {
+            else if (prev && (prev->items == chunk->items >> 1)) {
                 first->n_chunks++;
                 first->n_items += chunk->items;
                 first->flags = grow_items;
@@ -1271,13 +1271,11 @@ Return a clone of the list.
 
 TODO - Barely tested. Optimize new array structure, fixed if big.
 
-TODO - The *other arg should be able to be a const pointer
-
 */
 
 PARROT_API
 List *
-list_clone(Interp *interp, List *other /*NN*/)
+list_clone(Interp *interp /*NN*/, const List *other /*NN*/)
     /* WARN_UNUSED */
 {
     List *l;
@@ -1701,7 +1699,7 @@ Removes and returns the first item of type C<type> from the start of the list.
 
 PARROT_API
 void *
-list_shift(Interp *interp, List *list, int type)
+list_shift(Interp *interp, List *list /*NN*/, int type)
 {
     void *ret;
     UINTVAL idx = list->start++;

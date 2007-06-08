@@ -985,8 +985,8 @@ parameter list.
         iter = VTABLE_get_iter(interp, args);
         while (VTABLE_get_bool(interp, iter)) {
             /* Get name and value. */
-            STRING *attr_name = VTABLE_shift_string(interp, iter);
-            PMC *attr_value = VTABLE_get_pmc_keyed_str(interp, args, attr_name);
+            STRING * const attr_name = VTABLE_shift_string(interp, iter);
+            PMC * const attr_value = VTABLE_get_pmc_keyed_str(interp, args, attr_name);
 
             /* Set the attribute. */
             VTABLE_set_attr_str(interp, obj, attr_name, attr_value);
@@ -997,14 +997,14 @@ parameter list.
          * optimize this away, using a flag or something. */
         mro_length = VTABLE_elements(interp, _class->all_parents);
         for (i = 0; i < mro_length; i++) {
-            PMC *class_check = VTABLE_get_pmc_keyed_int(interp, 
+            PMC * const class_check = VTABLE_get_pmc_keyed_int(interp,
                 _class->all_parents, i);
             if (!VTABLE_isa(interp, class_check, CONST_STRING(interp, "Class"))) {
                 /* From another universe. Create instance... */
                 PMC *parent_ins;
                 int position;
                 (PMC *parent_ins) = PCCINVOKE(interp, class_check, "new");
-                
+
                 /* ...and tack on end of the attribute store (after all the
                  * slots for attributes). */
                 position = VTABLE_elements(interp, obj_guts->attrib_store);

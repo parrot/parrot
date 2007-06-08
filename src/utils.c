@@ -466,7 +466,8 @@ Note that you need to free this array with C<Parrot_destroy_cpa()>.
 
 PARROT_API
 void *
-Parrot_make_cpa(Interp *interp, PMC *array) {
+Parrot_make_cpa(Interp *interp, PMC *array)
+{
     const INTVAL arraylen = VTABLE_elements(interp, array);
     INTVAL cur;
 
@@ -501,7 +502,8 @@ Use this to destroy an array created with C<Parrot_make_cpa()>.
 
 PARROT_API
 void
-Parrot_destroy_cpa(char **array /*NN*/) {
+Parrot_destroy_cpa(char **array /*NN*/)
+{
     UINTVAL offset = 0;
     /* Free each piece */
     while (array[offset] != NULL) {
@@ -620,8 +622,10 @@ case marks it, and set node_index as its backup.
   c           ... the graph and all the needed params : the context
 
 */
+
 static void
-rec_climb_back_and_mark(int node_index, parrot_prm_context* c) {
+rec_climb_back_and_mark(int node_index, parrot_prm_context* c /*NN*/)
+{
     const int node = c->dest_regs[node_index];
     const int pred = c->src_regs[node_index];
     const int pred_index = c->reg_to_index[pred];
@@ -658,8 +662,9 @@ For instance: 1-->2, 2-->3, 3-->1
 
 */
 
-void
-process_cycle_without_exit(int node_index, parrot_prm_context* c) {
+static void
+process_cycle_without_exit(int node_index, parrot_prm_context* c /*NN*/)
+{
     const int pred = c->src_regs[node_index];
 
     /* let's try the alternate move function*/
@@ -681,8 +686,9 @@ process_cycle_without_exit(int node_index, parrot_prm_context* c) {
  should be self-speaking
  */
 
-void
-move_reg(int from, int dest, parrot_prm_context* c) {
+static void
+move_reg(int from, int dest, parrot_prm_context* c /*NN*/)
+{
    /* fprintf(stderr,"move %i ==> %i\n",from,dest);*/
     c->mov(c->interp, dest, from, c->info);
 }

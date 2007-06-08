@@ -57,7 +57,7 @@ type.
 
 PARROT_API
 PMC*
-pmc_reuse(Interp *interp, PMC *pmc /*NN*/, INTVAL new_type,
+pmc_reuse(Interp *interp /*NN*/, PMC *pmc /*NN*/, INTVAL new_type,
           UINTVAL flags)
 {
     INTVAL has_ext, new_flags;
@@ -154,7 +154,7 @@ Gets a new PMC header.
 */
 
 static PMC*
-get_new_pmc_header(Interp *interp, INTVAL base_type, UINTVAL flags)
+get_new_pmc_header(Interp *interp /*NN*/, INTVAL base_type, UINTVAL flags)
 {
     PMC *pmc;
     VTABLE *vtable = interp->vtables[base_type];
@@ -330,7 +330,7 @@ This segment handles PMC registration and such.
 
 PARROT_API
 INTVAL
-pmc_register(Interp* interp, STRING *name)
+pmc_register(Interp* interp /*NN*/, STRING *name)
 {
     INTVAL type;
     PMC *classname_hash;
@@ -365,7 +365,7 @@ Returns the PMC type for C<name>.
 
 PARROT_API
 INTVAL
-pmc_type(Interp* interp, STRING *name)
+pmc_type(Interp* interp /*NN*/, STRING *name)
     /* PURE, WARN_UNUSED */
 {
     PMC * const classname_hash = interp->class_hash;
@@ -388,7 +388,7 @@ Returns the PMC type for C<name>.
 
 PARROT_API
 INTVAL
-pmc_type_p(Interp* interp, PMC *name)
+pmc_type_p(Interp* interp /*NN*/, PMC *name)
 {
     PMC * const classname_hash = interp->class_hash;
     PMC * const item = (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
@@ -450,7 +450,7 @@ Create the MRO (method resolution order) array for this type.
 
 PARROT_API
 void
-Parrot_create_mro(Interp *interp, INTVAL type)
+Parrot_create_mro(Interp *interp /*NN*/, INTVAL type)
 {
     STRING *class_name, *isa;
     INTVAL pos, parent_type, total;
@@ -513,7 +513,7 @@ Registers the PMC with the interpreter's DOD registery.
 
 PARROT_API
 void
-dod_register_pmc(Interp* interp, PMC* pmc)
+dod_register_pmc(Interp* interp /*NN*/, PMC* pmc)
 {
     PMC *registry;
     /* Better not trigger a DOD run with a potentially unanchored PMC */
@@ -538,7 +538,7 @@ Unregisters the PMC from the interpreter's DOD registery.
 */
 
 void
-dod_unregister_pmc(Interp* interp, PMC* pmc)
+dod_unregister_pmc(Interp* interp /*NN*/, PMC* pmc)
 {
     if (!interp->DOD_registry)
         return; /* XXX or signal exception? */
@@ -558,14 +558,14 @@ of proxies.
 
 PARROT_API
 void
-Parrot_create_pmc_proxy(Interp* interp, int type_num)
+Parrot_create_pmc_proxy(Interp* interp /*NN*/, int type_num)
 {
     PMC *proxy;
     Parrot_PMCProxy *proxy_info;
 
     /* Ensure that it's a valid type number. */
     if (type_num > interp->n_vtable_max || type_num < 0)
-        internal_exception(1, 
+        internal_exception(1,
             "Attempt to create PMC Proxy for invalid type number!");
 
     /* Create PMC proxy object and set up number, name and namespcae. */
@@ -576,9 +576,9 @@ Parrot_create_pmc_proxy(Interp* interp, int type_num)
     proxy_info->_namespace = interp->vtables[type_num]->_namespace;
 
     /* XXX Parents and MRO still todo. */
-        
+
     /* Enter it in the list of proxy objects. */
-    VTABLE_set_pmc_keyed_int(interp, interp->pmc_proxies, type_num, proxy);    
+    VTABLE_set_pmc_keyed_int(interp, interp->pmc_proxies, type_num, proxy);
 }
 
 

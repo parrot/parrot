@@ -43,9 +43,13 @@ PARROT_API INTVAL Parrot_byte_rindex( Interp *interp,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_API void Parrot_destroy_cpa( char **array /*NN*/ )
+        __attribute__nonnull__(1);
+
 PARROT_API void Parrot_destroy_la( long *array );
 PARROT_API FLOATVAL Parrot_float_rand( INTVAL how_random );
 PARROT_API INTVAL Parrot_int_rand( INTVAL how_random );
+PARROT_API void * Parrot_make_cpa( Interp *interp, PMC *array );
 PARROT_API void * Parrot_make_la( Interp *interp, PMC *array /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
