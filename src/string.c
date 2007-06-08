@@ -24,6 +24,7 @@ strings.
 #include "parrot/compiler.h"
 #include "parrot/string_funcs.h"
 #include "string_private_cstring.h"
+#include "parrot/resources.h"
 #include <assert.h>
 
 /*
@@ -116,8 +117,6 @@ Creates a copy-on-write string by cloning a string header without
 allocating a new buffer.
 
 */
-
-extern int Parrot_in_memory_pool(Interp *, void *); /* XXX Move this to a public .h file */
 
 PARROT_API
 STRING *

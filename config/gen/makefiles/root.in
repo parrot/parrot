@@ -1841,6 +1841,7 @@ HEADERIZER_O_FILES = \
     src/list.o \
     src/intlist.o \
     src/datatypes.o \
+    src/gc/resources.o \
 
 headerizer:
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)

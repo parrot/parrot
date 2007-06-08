@@ -1,5 +1,5 @@
 /* resources.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -36,23 +36,58 @@ typedef struct Memory_Pool {
 } Memory_Pool;
 
 
+/* HEADERIZER BEGIN: src/gc/resources.c */
 
+void Parrot_allocate( Interp *interp /*NN*/,
+    Buffer *buffer /*NN*/,
+    size_t size )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void Parrot_allocate(Interp *, Buffer *, size_t size);
-void Parrot_allocate_aligned(Interp *, Buffer *, size_t size);
-void Parrot_allocate_string(Interp *, STRING *, size_t size);
-void Parrot_reallocate(Interp *interp, Buffer *from, size_t tosize);
-void Parrot_reallocate_string(Interp *interp, STRING *, size_t tosize);
+void Parrot_allocate_aligned( Interp *interp /*NN*/,
+    Buffer *buffer /*NN*/,
+    size_t size )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void Parrot_initialize_memory_pools(Interp *);
-void Parrot_destroy_memory_pools(Interp *interp);
+void Parrot_allocate_string( Interp *interp /*NN*/,
+    STRING *str /*NN*/,
+    size_t size )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void Parrot_merge_memory_pools(Interp *dest, Interp *source);
+void Parrot_destroy_memory_pools( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
 
-/* XXX FIXME */
-int Parrot_in_memory_pool(Interp *interp, void *bufstart);
+void Parrot_go_collect( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
 
-void Parrot_go_collect(Interp *);
+int Parrot_in_memory_pool( Interp *interp /*NN*/, void *bufstart /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+void Parrot_initialize_memory_pools( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+void Parrot_merge_memory_pools( Interp *dest_interp /*NN*/,
+    Interp *source_interp /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void Parrot_reallocate( Interp *interp /*NN*/,
+    Buffer *buffer /*NN*/,
+    size_t tosize )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void Parrot_reallocate_string( Interp *interp /*NN*/,
+    STRING *str /*NN*/,
+    size_t tosize )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: src/gc/resources.c */
 
 typedef struct Arenas {
     Memory_Pool *memory_pool;
