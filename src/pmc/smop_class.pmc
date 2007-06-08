@@ -98,12 +98,10 @@ argument is not a PMC* but the C<classname> STRING.
         SMOP_Class *smop;
         /* But we are a class, really */
         PObj_is_class_SET(SELF);
-        /* turn on marking of the class_data array */
-        PObj_data_is_PMC_array_SET(SELF);
         /* turn on custom destruction since our PMC* array is dynamically allocated */
         PObj_active_destroy_SET(SELF);
 
-        PMC_data(SELF) = mem_sys_allocate_zeroed(sizeof(SMOP_Class));
+        PMC_data(SELF)      = mem_allocate_zeroed_typed(SMOP_Class);
         smop                = SMOP(SELF);
         smop->attributes    = pmc_new(interp, enum_class_Hash);
         smop->methods       = pmc_new(interp, enum_class_Hash);
