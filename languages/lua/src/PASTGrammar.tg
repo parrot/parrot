@@ -15,6 +15,9 @@ grammar Lua::PAST::Grammar is TGE::Grammar;
 
 
 transform past (ROOT) :language('PIR') {
+    $P0 = new .Integer
+    set $P0, 0
+    set_hll_global ['Lua::PAST'], '$looplevel', $P0
     .local pmc past
     $P0 = new 'Lua::Symbtab'
     $P0.'push_scope'()
@@ -119,6 +122,9 @@ transform past (Lua::Grammar::elseif_block) :language('PIR') {
 
 
 transform past (Lua::Grammar::while_stat) :language('PIR') {
+    .local pmc looplevel
+    looplevel = get_hll_global ['Lua::PAST'], '$looplevel'
+    inc looplevel
     .local pmc expr, blk
     $P0 = node['expression']
     expr = tree.'get'('past', $P0, 'Lua::Grammar::expression')
@@ -127,11 +133,15 @@ transform past (Lua::Grammar::while_stat) :language('PIR') {
     symbtab.'push_scope'()
     $P0 = node['block']
     blk = tree.'get'('past', $P0, 'Lua::Grammar::block')
+    dec looplevel
     .return expr.'new'('PAST::Op', expr, blk, 'node'=>node, 'pasttype'=>'while')
 }
 
 
 transform past (Lua::Grammar::repeat_stat) :language('PIR') {
+    .local pmc looplevel
+    looplevel = get_hll_global ['Lua::PAST'], '$looplevel'
+    inc looplevel
     .local pmc expr, blk
     .local pmc symbtab
     symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
@@ -140,11 +150,15 @@ transform past (Lua::Grammar::repeat_stat) :language('PIR') {
     blk = tree.'get'('past', $P0, 'Lua::Grammar::block')
     $P0 = node['expression']
     expr = tree.'get'('past', $P0, 'Lua::Grammar::expression')
+    dec looplevel
     .return expr.'new'('PAST::Op', blk, expr, 'node'=>node, 'pasttype'=>'repeat')
 }
 
 
 transform past (Lua::Grammar::for_stat) :language('PIR') {
+    .local pmc looplevel
+    looplevel = get_hll_global ['Lua::PAST'], '$looplevel'
+    inc looplevel
     .local pmc past
     $S0 = node.'find_key'()
     $P0 = node[$S0]
@@ -153,6 +167,7 @@ transform past (Lua::Grammar::for_stat) :language('PIR') {
     $P0 = node['for_body']
     $P0 = $P0['block']
     $P1 = tree.'get'('past', $P0, 'Lua::Grammar::block')
+    dec looplevel
     past.'push'($P1)
     .return (past)
 }
@@ -280,10 +295,15 @@ transform past (Lua::Grammar::return_statement) :language('PIR') {
 
 
 transform past (Lua::Grammar::break_statement) :language('PIR') {
+    .local pmc looplevel
+    looplevel = get_hll_global ['Lua::PAST'], '$looplevel'
+    if looplevel <= 0 goto L1
     .local pmc past
     past = new 'PAST::Op'
-    past.'init'(node, 'node'=>node, 'pasttype'=>'break')
+    past.'init'('node'=>node, 'pasttype'=>'break')
     .return (past)
+  L1:
+    node.'syntax_error'("no loop to break")
 }
 
 
@@ -452,19 +472,33 @@ transform past (Lua::Grammar::function_body) :language('PIR') {
     goto L4
   L3:
     $P1 = $P0['vararg']
+    $I0 = 0
     if null $P1 goto L2
     $P1 = shift $P1
     var = new 'PAST::Var'
     var.'init'('node'=>$P1, 'name'=>'vararg', 'scope'=>'parameter', 'isslurpy'=>1)
     push parlist, var
+    $I0 = 1
     goto L5
   L2:
     var = new 'PAST::Var'
     var.'init'('node'=>$P0, 'name'=>'extra', 'scope'=>'parameter', 'isslurpy'=>1)
     push parlist, var
   L5:
+    .local pmc has_vararg
+    has_vararg = get_hll_global ['Lua::PAST'], '?vararg'
+    $P0 = new .Boolean
+    set $P0, $I0
+    set_hll_global ['Lua::PAST'], '?vararg', $P0
+    .local pmc looplevel
+    looplevel = get_hll_global ['Lua::PAST'], '$looplevel'
+    $P0 = new .Integer
+    set $P0, 0
+    set_hll_global ['Lua::PAST'], '$looplevel', $P0
     $P0 = node['block']
     past = tree.'get'('past', $P0, 'Lua::Grammar::block')
+    set_hll_global ['Lua::PAST'], '$looplevel', looplevel
+    set_hll_global ['Lua::PAST'], '?vararg', has_vararg
     .return past.'new'('PAST::Block', parlist :flat, past, 'node'=>node)
 }
 
@@ -662,10 +696,15 @@ transform past (Lua::Grammar::name) :language('PIR') {
 
 
 transform past (Lua::Grammar::vararg) :language('PIR') {
+    .local pmc has_vararg
+    has_vararg = get_hll_global ['Lua::PAST'], '?vararg'
+    unless has_vararg goto L1
     .local pmc past
     new past, 'PAST::Op'
     past.'init'('node'=>node, 'pasttype'=>'vararg')
     .return (past)
+  L1:
+    node.'syntax_error'("cannot use '...' outside a vararg function")
 }
 
 

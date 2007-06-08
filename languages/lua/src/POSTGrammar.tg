@@ -438,18 +438,12 @@ transform return (PAST::Op) :language('PIR') {
 transform break (PAST::Op) :language('PIR') {
     .local pmc endlabels
     endlabels = get_hll_global ['Lua::POST'], '@endlabels'
-    $I0 = endlabels
-    unless $I0 > 0 goto L1
     .local pmc post
     post = new 'POST::Op'
     post.'init'('node'=>node, 'pirop'=>'goto')
     $P0 = endlabels[0]
     post.'arglist'($P0)
     .return (post)
-  L1:
-    $P0 = get_hll_global ['Lua::Grammar'], 'syntax_error'
-    $P1 = node[0]
-    $P1.$P0("no loop to break")
 }
 
 
