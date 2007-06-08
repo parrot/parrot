@@ -15,6 +15,7 @@
    Programs embedding parrot should include <parrot/embed.h>.
 */
 
+#pragma once
 #ifndef PARROT_PARROT_H_GUARD
 #define PARROT_PARROT_H_GUARD
 

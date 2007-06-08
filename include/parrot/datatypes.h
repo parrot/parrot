@@ -12,6 +12,7 @@
  *     Though appending a type and a name should be safe.
  */
 
+#pragma once
 #ifndef PARROT_DATATYPES_H_GUARD
 #define PARROT_DATATYPES_H_GUARD
 

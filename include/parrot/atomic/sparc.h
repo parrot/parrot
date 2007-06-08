@@ -12,6 +12,7 @@
  *  References:
  */
 
+#pragma once
 #ifndef PARROT_ATOMIC_SPARC_H_GUARD
 #define PARROT_ATOMIC_SPARC_H_GUARD
 

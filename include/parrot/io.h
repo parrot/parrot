@@ -16,6 +16,7 @@
  *      Some ideas from AT&T SFIO
  */
 
+#pragma once
 #ifndef PARROT_IO_H_GUARD
 #define PARROT_IO_H_GUARD
 

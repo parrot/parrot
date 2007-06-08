@@ -56,6 +56,7 @@ sub runstep {
 ** This file is generated automatically by Configure.pl
 */
 
+#pragma once
 #ifndef PARROT_HAS_HEADER_H_GUARD
 #define PARROT_HAS_HEADER_H_GUARD
 

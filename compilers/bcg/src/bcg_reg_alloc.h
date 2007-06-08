@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PARROT_BCG_REG_ALLOC_H_GUARD
 #define PARROT_BCG_REG_ALLOC_H_GUARD
 

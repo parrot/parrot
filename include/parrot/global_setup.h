@@ -11,6 +11,7 @@
  *  References:
  */
 
+#pragma once
 #ifndef PARROT_GLOBAL_SETUP_H_GUARD
 #define PARROT_GLOBAL_SETUP_H_GUARD
 

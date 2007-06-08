@@ -26,6 +26,7 @@ print $OUT $header, <<'EOF';
 /*
 Copyright (C) 2005-2007, The Perl Foundation.
 */
+#pragma once
 #ifndef PARROT_EXTEND_VTABLE_H_GUARD
 #define PARROT_EXTEND_VTABLE_H_GUARD
 

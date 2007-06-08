@@ -161,6 +161,7 @@ sub create_c_include {
  *
  */
 
+#pragma once
 #ifndef PARROT_SRC_STRING_PRIVATE_CSTRING_H_GUARD
 #define PARROT_SRC_STRING_PRIVATE_CSTRING_H_GUARD
 

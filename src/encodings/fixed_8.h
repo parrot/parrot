@@ -10,6 +10,7 @@
  *  References:
  */
 
+#pragma once
 #ifndef PARROT_ENCODING_FIXED_8_H_GUARD
 #define PARROT_ENCODING_FIXED_8_H_GUARD
 

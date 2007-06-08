@@ -1180,6 +1180,7 @@ sub gen_h {
     my $name = uc $self->{class};
     $hout .= <<"EOH";
 
+#pragma once
 #ifndef PARROT_PMC_${name}_H_GUARD
 #define PARROT_PMC_${name}_H_GUARD
 

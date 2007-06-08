@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PARROT_PLATFORM_WIN32_IO_H_GUARD
 #define PARROT_PLATFORM_WIN32_IO_H_GUARD
 

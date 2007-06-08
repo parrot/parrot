@@ -10,6 +10,7 @@
  *  References:
  */
 
+#pragma once
 #ifndef PARROT_ENCODING_UTF16_H_GUARD
 #define PARROT_ENCODING_UTF16_H_GUARD
 

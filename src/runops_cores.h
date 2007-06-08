@@ -10,6 +10,7 @@
  *  References:
  */
 
+#pragma once
 #ifndef PARROT_RUNOPS_CORES_H_GUARD
 #define PARROT_RUNOPS_CORES_H_GUARD
 

@@ -42,6 +42,7 @@ print $OUT <<'EOF';
 ** This file is generated automatically from 'vtable.tbl' by vtable_h.pl
 */
 
+#pragma once
 #ifndef PARROT_VTABLE_H_GUARD
 #define PARROT_VTABLE_H_GUARD
 

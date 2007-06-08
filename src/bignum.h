@@ -25,6 +25,7 @@ L<https://rt.perl.org/rt3/Ticket/Display.html?id=36330>
 
 */
 
+#pragma once
 #ifndef PARROT_TYPES_BIGNUM_H_GUARD
 #define PARROT_TYPES_BIGNUM_H_GUARD
 

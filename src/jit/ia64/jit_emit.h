@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PARROT_JIT_IA64_JIT_EMIT_H_GUARD
 #define PARROT_JIT_IA64_JIT_EMIT_H_GUARD
 

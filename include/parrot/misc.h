@@ -17,6 +17,7 @@
  *  References: misc.c, spf_vtable.c, spf_render.c
  */
 
+#pragma once
 #ifndef PARROT_MISC_H_GUARD
 #define PARROT_MISC_H_GUARD
 

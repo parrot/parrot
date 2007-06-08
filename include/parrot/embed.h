@@ -12,6 +12,7 @@
  *      embed.c, docs/embed.pod.
  */
 
+#pragma once
 #ifndef PARROT_EMBED_H_GUARD
 #define PARROT_EMBED_H_GUARD
 

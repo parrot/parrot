@@ -12,6 +12,7 @@
  *      extend.c, docs/pdds/pdd11_extending.pod.
  */
 
+#pragma once
 #ifndef PARROT_EXTEND_H_GUARD
 #define PARROT_EXTEND_H_GUARD
 

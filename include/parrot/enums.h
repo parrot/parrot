@@ -8,6 +8,7 @@
  *  References:
  */
 
+#pragma once
 #ifndef PARROT_ENUMS_H_GUARD
 #define PARROT_ENUMS_H_GUARD
 

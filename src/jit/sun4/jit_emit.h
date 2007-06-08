@@ -6,6 +6,7 @@
 ** $Id$
 **/
 
+#pragma once
 #ifndef PARROT_SUN4_JIT_EMIT_H_GUARD
 #define PARROT_SUN4_JIT_EMIT_H_GUARD
 

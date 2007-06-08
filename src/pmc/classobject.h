@@ -7,6 +7,7 @@
 ** documented interface.
 */
 
+#pragma once
 #ifndef PARROT_CLASSOBJECT_H_GUARD
 #define PARROT_CLASSOBJECT_H_GUARD
 

@@ -79,6 +79,7 @@ CODA
 **
 ** This file is generated automatically by config/gen/platform.pm
 */
+#pragma once
 #ifndef PARROT_PLATFORM_H_GUARD
 #define PARROT_PLATFORM_H_GUARD
 

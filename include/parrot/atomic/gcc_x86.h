@@ -12,6 +12,7 @@
  *  References:
  */
 
+#pragma once
 #ifndef PARROT_ATOMIC_GCC_X86_H_GUARD
 #define PARROT_ATOMIC_GCC_X86_H_GUARD
 

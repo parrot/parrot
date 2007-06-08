@@ -5,6 +5,7 @@
 *   Parrot dynamic extensions
 */
 
+#pragma once
 #ifndef PARROT_DYNEXT_H_GUARD
 #define PARROT_DYNEXT_H_GUARD
 

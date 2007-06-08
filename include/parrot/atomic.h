@@ -11,6 +11,7 @@
  */
 
 
+#pragma once
 #ifndef PARROT_ATOMIC_H_GUARD
 #define PARROT_ATOMIC_H_GUARD
 

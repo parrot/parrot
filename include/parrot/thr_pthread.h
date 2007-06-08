@@ -13,6 +13,7 @@
  *  References:
  */
 
+#pragma once
 #ifndef PARROT_THR_PTHREAD_H_GUARD
 #define PARROT_THR_PTHREAD_H_GUARD
 

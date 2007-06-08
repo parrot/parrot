@@ -11,6 +11,7 @@
 
 #include "parrot/parrot.h"
 
+#pragma once
 #ifndef PARROT_LIST_H_GUARD
 #define PARROT_LIST_H_GUARD
 

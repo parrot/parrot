@@ -13,6 +13,7 @@
  *     pdd03 - Calling Conventions
  */
 
+#pragma once
 #ifndef PARROT_INTER_CALL_H_GUARD
 #define PARROT_INTER_CALL_H_GUARD
 

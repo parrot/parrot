@@ -10,6 +10,7 @@
  *  References: See also enums.h
  */
 
+#pragma once
 #ifndef PARROT_STACKS_H_GUARD
 #define PARROT_STACKS_H_GUARD
 

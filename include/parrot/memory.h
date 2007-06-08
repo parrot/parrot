@@ -10,6 +10,7 @@
  *  References:
  */
 
+#pragma once
 #ifndef PARROT_MEMORY_H_GUARD
 #define PARROT_MEMORY_H_GUARD
 #include <assert.h>
