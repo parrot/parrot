@@ -1843,6 +1843,7 @@ HEADERIZER_O_FILES = \
     src/datatypes.o \
     src/gc/resources.o \
     src/utils.o \
+    src/headers.o \
 
 headerizer:
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)
