@@ -181,6 +181,8 @@ parrot_global_setup_2(Interp *interp)
     interp->class_hash = classname_hash =
         pmc_new(interp, enum_class_NameSpace);
     Parrot_register_core_pmcs(interp, classname_hash);
+    /* Also a PMC array to store PMC Proxy objects. */
+    interp->pmc_proxies = pmc_new(interp, enum_class_ResizablePMCArray);
     /* init the interpreter globals array */
     iglobals = pmc_new(interp, enum_class_SArray);
     interp->iglobals = iglobals;

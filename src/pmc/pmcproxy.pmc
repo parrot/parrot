@@ -11,7 +11,7 @@ src/pmc/pmcproxy.pmc - proxy class object for a PMC enabling introspection
 This class is used to describe a PMC. It can sit in an inheritance hierarchy
 of a PDD15 class as well as allowing introspection of the PMC.
 
-Class is not derived from any other PMC.
+PMCProxy is not derived from any other PMC.
 
 =head2 Structure
 
