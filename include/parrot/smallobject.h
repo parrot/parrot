@@ -131,25 +131,50 @@ typedef struct Small_Object_Pool {
 #  define ARENA_to_PObj(p) (p)
 #endif
 
-INTVAL contained_in_pool(Interp *,
-                         struct Small_Object_Pool *, void *);
-size_t get_max_pool_address(Interp *interp,
-                            struct Small_Object_Pool *pool);
-size_t get_min_pool_address(Interp *interp,
-                            struct Small_Object_Pool *pool);
 
-struct Small_Object_Pool * new_small_object_pool(Interp *,
-                                                 size_t, size_t);
+/* HEADERIZER BEGIN: src/gc/smallobject.c */
 
-int Parrot_is_const_pmc(Parrot_Interp, PMC *);
+void Parrot_add_to_free_list( Interp *interp,
+    Small_Object_Pool *pool /*NN*/,
+    Small_Object_Arena *arena /*NN*/,
+    UINTVAL start,
+    UINTVAL end )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-void Parrot_append_arena_in_pool(Interp *, struct Small_Object_Pool *pool,
-    Small_Object_Arena *new_arena, size_t size);
-void Parrot_add_to_free_list(Interp *, struct Small_Object_Pool *pool,
-        Small_Object_Arena *arena, UINTVAL start, UINTVAL end);
+void Parrot_append_arena_in_pool( Interp *interp /*NN*/,
+    Small_Object_Pool *pool /*NN*/,
+    Small_Object_Arena *new_arena /*NN*/,
+    size_t size )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-void Parrot_small_object_pool_merge(Interp *dest_interp,
-        struct Small_Object_Pool *dest, struct Small_Object_Pool *source);
+void Parrot_gc_ms_init( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+int Parrot_is_const_pmc( Parrot_Interp interp /*NN*/, PMC *pmc )
+        __attribute__nonnull__(1);
+
+void Parrot_small_object_pool_merge( Interp *interp,
+    Small_Object_Pool *dest /*NN*/,
+    Small_Object_Pool *source /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+INTVAL contained_in_pool( Interp *interp,
+    Small_Object_Pool *pool /*NN*/,
+    void *ptr )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+void gc_pmc_ext_pool_init( Interp *interp, Small_Object_Pool *pool );
+Small_Object_Pool * new_small_object_pool( Interp *interp,
+    size_t object_size,
+    size_t objects_per_alloc )
+        __attribute__warn_unused_result__;
+
+/* HEADERIZER END: src/gc/smallobject.c */
 
 #endif /* PARROT_SMALLOBJECT_H_GUARD */
 

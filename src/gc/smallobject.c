@@ -12,14 +12,13 @@ Handles the accessing of small object pools (header pools).
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
+#include "parrot/smallobject.h"
 #include <assert.h>
+
+/* HEADER: include/parrot/smallobject.h */
 
 #define GC_DEBUG_REPLENISH_LEVEL_FACTOR 0.0
 #define GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR 1
@@ -31,19 +30,17 @@ Handles the accessing of small object pools (header pools).
 
 /*
 
-=item C<INTVAL
-contained_in_pool(Interp *interp, Small_Object_Pool *pool, void *ptr)>
+FUNCDOC: contained_in_pool
 
 Returns whether C<pool> contains C<*ptr>.
 
 XXX If ever there is a function that ought to be consted, this is it.
 
-=cut
-
 */
 
 INTVAL
-contained_in_pool(Interp *interp, Small_Object_Pool *pool, void *ptr)
+contained_in_pool(Interp *interp, Small_Object_Pool *pool /*NN*/, void *ptr)
+    /* WARN_UNUSED */
 {
     const Small_Object_Arena *arena;
 
@@ -64,17 +61,14 @@ contained_in_pool(Interp *interp, Small_Object_Pool *pool, void *ptr)
 
 /*
 
-=item C<int
-Parrot_is_const_pmc(Parrot_Interp interp, PMC *pmc)>
+FUNCDOC: Parrot_is_const_pmc
 
 Returns whether C<*pmc> is a constant PMC.
-
-=cut
 
 */
 
 int
-Parrot_is_const_pmc(Parrot_Interp interp, PMC *pmc)
+Parrot_is_const_pmc(Parrot_Interp interp /*NN*/, PMC *pmc)
 {
     Small_Object_Pool * const pool = interp->arena_base->constant_pmc_pool;
     const int c = contained_in_pool(interp, pool, pmc);
@@ -87,17 +81,14 @@ Parrot_is_const_pmc(Parrot_Interp interp, PMC *pmc)
 
 /*
 
-=item C<void
-more_traceable_objects(Interp *interp, Small_Object_Pool *pool)>
+FUNCDOC: more_traceable_objects
 
 We're out of traceable objects. Try a DOD, then get some more if needed.
-
-=cut
 
 */
 
 static void
-more_traceable_objects(Interp *interp, Small_Object_Pool *pool)
+more_traceable_objects(Interp *interp, Small_Object_Pool *pool /*NN*/)
 {
     if (pool->skip)
         pool->skip = 0;
@@ -121,30 +112,29 @@ more_traceable_objects(Interp *interp, Small_Object_Pool *pool)
 
 /*
 
-=item C<static void
-gc_ms_add_free_object(Interp *interp, Small_Object_Pool *pool, void *to_add)>
+FUNCDOC: gc_ms_add_free_object
 
 Add an unused object back to the free pool for later reuse.
-
-=item C<static void *
-gc_ms_get_free_object(Interp *interp, Small_Object_Pool *pool)>
-
-Get a new object from the free pool and return it.
-
-=cut
 
 */
 
 static void
-gc_ms_add_free_object(Interp *interp, Small_Object_Pool *pool, void *to_add)
+gc_ms_add_free_object(Interp *interp, Small_Object_Pool *pool /*NN*/, void *to_add)
 {
     *(void **)to_add = pool->free_list;
     pool->free_list = to_add;
 }
 
+/*
+
+FUNCDOC: gc_ms_get_free_object
+
+Get a new object from the free pool and return it.
+
+*/
 
 static void *
-gc_ms_get_free_object(Interp *interp, Small_Object_Pool *pool)
+gc_ms_get_free_object(Interp *interp, Small_Object_Pool *pool /*NN*/)
 {
     void *ptr;
 
@@ -160,23 +150,16 @@ gc_ms_get_free_object(Interp *interp, Small_Object_Pool *pool)
 
 /*
 
-=item C< void
-Parrot_add_to_free_list(Interp *interp,
-        Small_Object_Pool *pool,
-        Small_Object_Arena *arena,
-        UINTVAL start,
-        UINTVAL end)>
+FUNCDOC: Parrot_add_to_free_list
 
 Adds the memory between C<start> and C<end> to the free list.
-
-=cut
 
 */
 
 void
 Parrot_add_to_free_list(Interp *interp,
-        Small_Object_Pool *pool,
-        Small_Object_Arena *arena,
+        Small_Object_Pool *pool /*NN*/,
+        Small_Object_Arena *arena /*NN*/,
         UINTVAL start,
         UINTVAL end)
 {
@@ -203,11 +186,15 @@ Parrot_add_to_free_list(Interp *interp,
 }
 
 /*
- * insert the new arena into the pool's structure, update stats
- */
+
+FUNCDOC: Parrot_append_arrena_in_pool
+
+insert the new arena into the pool's structure, update stats
+
+*/
 void
-Parrot_append_arena_in_pool(Interp *interp, Small_Object_Pool *pool,
-    Small_Object_Arena *new_arena, size_t size)
+Parrot_append_arena_in_pool(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/,
+    Small_Object_Arena *new_arena /*NN*/, size_t size)
 {
 
     /* Maintain the *_arena_memory invariant for stack walking code. Set it
@@ -231,18 +218,15 @@ Parrot_append_arena_in_pool(Interp *interp, Small_Object_Pool *pool,
 
 /*
 
-=item C<static void
-gc_ms_alloc_objects(Interp *interp, Small_Object_Pool *pool)>
+FUNCDOC: gc_ms_alloc_objects
 
 We have no more headers on the free header pool. Go allocate more
 and put them on.
 
-=cut
-
 */
 
 static void
-gc_ms_alloc_objects(Interp *interp, Small_Object_Pool *pool)
+gc_ms_alloc_objects(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
 {
     size_t size;
     UINTVAL start, end;
@@ -285,13 +269,9 @@ gc_ms_alloc_objects(Interp *interp, Small_Object_Pool *pool)
 
 /*
 
-=item C<Small_Object_Pool *
-new_small_object_pool(Interp *interp,
-        size_t object_size, size_t objects_per_alloc)>
+FUNCDOC: new_small_object_pool
 
 Creates a new C<Small_Object_Pool> and returns a pointer to it.
-
-=cut
 
 */
 
@@ -299,6 +279,7 @@ Creates a new C<Small_Object_Pool> and returns a pointer to it.
 Small_Object_Pool *
 new_small_object_pool(Interp *interp,
         size_t object_size, size_t objects_per_alloc)
+    /* WARN_UNUSED */
 {
     Small_Object_Pool * const pool =
         (Small_Object_Pool *)mem_internal_allocate_zeroed(
@@ -334,19 +315,17 @@ gc_ms_pool_init(Interp *interp, Small_Object_Pool *pool)
 
 /*
 
-=item C<void Parrot_gc_ms_init(Interp *interp)>
+FUNCDOC: Parrot_gc_ms_init
 
 Initialize the state structures of the gc system. Called immediately before
 creation of memory pools. This function must set the function pointers
 for C<add_free_object_fn>, C<get_free_object_fn>, C<alloc_object_fn>, and
 C<more_object_fn>.
 
-=cut
-
 */
 
 void
-Parrot_gc_ms_init(Interp *interp)
+Parrot_gc_ms_init(Interp *interp /*NN*/)
 {
     Arenas * const arena_base = interp->arena_base;
 
@@ -357,19 +336,16 @@ Parrot_gc_ms_init(Interp *interp)
 
 /*
 
-=item C<void
-Parrot_small_object_pool_merge(Interp *interp,
-            Small_Object_Pool *dest, Small_Object_Pool *source)>
+FUNCDOC: Parrot_small_object_pool_merge
 
 Merge C<source> into C<dest>.
-
-=cut
 
 */
 
 void
 Parrot_small_object_pool_merge(Interp *interp,
-        Small_Object_Pool *dest, Small_Object_Pool *source) {
+        Small_Object_Pool *dest /*NN*/, Small_Object_Pool *source /*NN*/)
+{
     Small_Object_Arena *cur_arena;
     void **free_list_end;
 
@@ -424,8 +400,6 @@ Parrot_small_object_pool_merge(Interp *interp,
 
 }
 /*
-
-=back
 
 =head1 SEE ALSO
 
