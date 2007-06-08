@@ -105,11 +105,12 @@ L<http://www.lua.org/manual/5.1/manual.html#2.1>.
     .param pmc mob
     .param string message
     .local int lineno
+    $S0 = 'lua: '
 #    .local pmc infile
 #    infile = get_hll_global ['TGE::Compiler'], '$!infile'
 #    $S0 = infile
 #    $S0 .= ':'
-    $S0 = '_._:'
+    $S0 .= '_._:'
     $P0 = get_hll_global ['PGE::Util'], 'line_number'
     lineno = mob.$P0()
     inc lineno

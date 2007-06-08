@@ -139,11 +139,11 @@ rule tablefield {
 
 rule parameter_list {
   | <name_list> [ <','> <vararg> ]?
-  | <vararg>
+  | <vararg>?
 }
 
 rule function_body {
-  <'('> <parameter_list>? <?closeparen> <block> <?end>
+  <'('> <parameter_list> <?closeparen> <block> <?end>
 }
 
 rule expression_list {

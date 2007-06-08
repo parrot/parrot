@@ -61,6 +61,15 @@ transform past (Lua::Grammar::statement) :language('PIR') {
 }
 
 
+transform past (Lua::Grammar::do_block) :language('PIR') {
+    .local pmc symbtab
+    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab.'push_scope'()
+    $P0 = node['block']
+    .return tree.'get'('past', $P0, 'Lua::Grammar::block')
+}
+
+
 transform past (Lua::Grammar::if_stat) :language('PIR') {
     .local pmc past, cpast, expr, blk
     $P0 = node['expression']
@@ -273,7 +282,7 @@ transform past (Lua::Grammar::return_statement) :language('PIR') {
 transform past (Lua::Grammar::break_statement) :language('PIR') {
     .local pmc past
     past = new 'PAST::Op'
-    past.'init'('node'=>node, 'pasttype'=>'break')
+    past.'init'(node, 'node'=>node, 'pasttype'=>'break')
     .return (past)
 }
 
@@ -427,7 +436,6 @@ transform past (Lua::Grammar::function_body) :language('PIR') {
   L1:
     $P0 = node['parameter_list']
     if null $P0 goto L2
-    $P0 = shift $P0
     $P1 = $P0['name_list']
     if null $P1 goto L3
     $P1 = $P1['name']
@@ -447,9 +455,14 @@ transform past (Lua::Grammar::function_body) :language('PIR') {
     if null $P1 goto L2
     $P1 = shift $P1
     var = new 'PAST::Var'
-    var.'init'('node'=>$P1, 'name'=>'...', 'scope'=>'parameter', 'isslurpy'=>1)
+    var.'init'('node'=>$P1, 'name'=>'vararg', 'scope'=>'parameter', 'isslurpy'=>1)
     push parlist, var
+    goto L5
   L2:
+    var = new 'PAST::Var'
+    var.'init'('node'=>$P0, 'name'=>'extra', 'scope'=>'parameter', 'isslurpy'=>1)
+    push parlist, var
+  L5:
     $P0 = node['block']
     past = tree.'get'('past', $P0, 'Lua::Grammar::block')
     .return past.'new'('PAST::Block', parlist :flat, past, 'node'=>node)
@@ -649,7 +662,10 @@ transform past (Lua::Grammar::name) :language('PIR') {
 
 
 transform past (Lua::Grammar::vararg) :language('PIR') {
-    internal_error("not implemented (vararg)")
+    .local pmc past
+    new past, 'PAST::Op'
+    past.'init'('node'=>node, 'pasttype'=>'vararg')
+    .return (past)
 }
 
 
