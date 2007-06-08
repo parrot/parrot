@@ -99,32 +99,37 @@ static void build_attrib_index(Parrot_Interp interp, PMC *self) {
 
     /* We will go over the list of all parents to construct the table. */
     for (i = 0; i < num_classes; i++) {
-       /* Get the class and its attribute metadata hash. */
+       /* Get the class and check it's from this class universe (if not we
+        * don't know how it stores it's attributes, so we'll have to delegate
+        * the lookup). */
         PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
-        Parrot_Class *class_info = PARROT_CLASS(cur_class);
-        PMC *attribs = class_info->attrib_metadata;
-        PMC *iter = VTABLE_get_iter(interp, attribs);
+        if (VTABLE_isa(interp, cur_class, string_from_const_cstring(interp, "Class", 0))) {
+            /* The the attribute metadata hash. */
+            Parrot_Class *class_info = PARROT_CLASS(cur_class);
+            PMC *attribs = class_info->attrib_metadata;
+            PMC *iter = VTABLE_get_iter(interp, attribs);
 
-        /* Build a string representing the fully qualified class name. */
-        /* Retrieve the fully qualified class name for the class. */
-        STRING *fq_class = VTABLE_get_string(interp, cur_class);
+            /* Build a string representing the fully qualified class name. */
+            /* Retrieve the fully qualified class name for the class. */
+            STRING *fq_class = VTABLE_get_string(interp, cur_class);
 
-        /* Iterate over the attributes. */
-        while (VTABLE_get_bool(interp, iter)) {
-            /* Get attribute. */
-            PMC *cur_attrib = VTABLE_get_pmc_keyed_str(interp, attribs,
-                VTABLE_shift_string(interp, iter));
-            STRING *attrib_name;
-            STRING *full_key = string_copy(interp, fq_class);
+            /* Iterate over the attributes. */
+            while (VTABLE_get_bool(interp, iter)) {
+                /* Get attribute. */
+                PMC *cur_attrib = VTABLE_get_pmc_keyed_str(interp, attribs,
+                    VTABLE_shift_string(interp, iter));
+                STRING *attrib_name;
+                STRING *full_key = string_copy(interp, fq_class);
 
-            /* Get attribute name and append it to the key. */
-            attrib_name = VTABLE_get_string_keyed_str(interp, cur_attrib,
-                string_from_const_cstring(interp, "name", 0));
-            full_key = string_append(interp, full_key, attrib_name);
+                /* Get attribute name and append it to the key. */
+                attrib_name = VTABLE_get_string_keyed_str(interp, cur_attrib,
+                    string_from_const_cstring(interp, "name", 0));
+                full_key = string_append(interp, full_key, attrib_name);
 
-            /* Insert into hash, along with index. */
-            VTABLE_set_integer_keyed_str(interp, table, full_key, cur_index);
-            cur_index++;
+                /* Insert into hash, along with index. */
+                VTABLE_set_integer_keyed_str(interp, table, full_key, cur_index);
+                cur_index++;
+            }
         }
     }
 
@@ -933,12 +938,12 @@ parameter list.
         PMC *obj;
         PMC *iter;
         Parrot_Object *obj_guts = NULL;
+        int i, mro_length;
 
         /* If we've not been instantiated before... */
         if (!_class->instantiated) {
             /* Check that we have all methods listed in resolve list. */
             int resolve_count = VTABLE_elements(interp, _class->resolve_method);
-            int i;
             for (i = 0; i < resolve_count; i++) {
                 STRING *check_meth = VTABLE_get_string_keyed_int(interp,
                     _class->resolve_method, i);
@@ -985,6 +990,27 @@ parameter list.
 
             /* Set the attribute. */
             VTABLE_set_attr_str(interp, obj, attr_name, attr_value);
+        }
+
+        /* We may have parents that are out of this class universe. Check the
+         * MRO for them, and if so create instances of them. Would be nice to
+         * optimize this away, using a flag or something. */
+        mro_length = VTABLE_elements(interp, _class->all_parents);
+        for (i = 0; i < mro_length; i++) {
+            PMC *class_check = VTABLE_get_pmc_keyed_int(interp, 
+                _class->all_parents, i);
+            if (!VTABLE_isa(interp, class_check, CONST_STRING(interp, "Class"))) {
+                /* From another universe. Create instance... */
+                PMC *parent_ins;
+                int position;
+                (PMC *parent_ins) = PCCINVOKE(interp, class_check, "new");
+                
+                /* ...and tack on end of the attribute store (after all the
+                 * slots for attributes). */
+                position = VTABLE_elements(interp, obj_guts->attrib_store);
+                VTABLE_set_pmc_keyed_int(interp, obj_guts->attrib_store,
+                    position, class_check);
+            }
         }
 
         PCCRETURN(PMC *obj)

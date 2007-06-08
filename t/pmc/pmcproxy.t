@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -147,6 +147,27 @@ CODE
 ok 1 - get_class returned something
 ok 2 - created a PMC
 ok 3 - created the Right Thing
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'can add_parent a ProxyPMC in a PDD15 class' );
+.sub 'test' :main
+    $P0 = new 'Class'
+    print "ok 1 - created a PDD15 class\n"
+    
+    $P1 = get_class 'Hash'
+    print "ok 2 - got the PMCProxy for Hash\n"
+    
+    addparent $P0, $P1
+    print "ok 3 - added Hash's PMCProxy as a parent of the PDD15 class\n"
+
+    $P2 = $P0.'new'()
+    print "ok 4 - instantiated the class\n"
+.end
+CODE
+ok 1 - created a PDD15 class
+ok 2 - got the PMCProxy for Hash
+ok 3 - added Hash's PMCProxy as a parent of the PDD15 class
+ok 4 - instantiated the class
 OUT
 
 # Local Variables:
