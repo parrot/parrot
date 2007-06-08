@@ -1,0 +1,39 @@
+# Copyright (C) 2007, The Perl Foundation.
+# $Id$
+
+=head1 NAME
+
+docs/dev/parrot_api.pod - Notes on the PARROT_API macro
+
+
+=head1 OVERVIEW
+
+Some compilers and platforms export all symbols either by default or through
+a switch. Others have no such mechanism and either need a list of symbols to
+export or need the symbols annotating in the source.
+
+The C<PARROT_API> macro exists for the purpose of annotating symbols that
+should be exported. One day, it may be used to express which functions are in
+the Parrot extension API and which are not. For now it should be used to mark
+anything that will be used by a shared library or by the main Parrot executable
+when Parrot is built as a shared library.
+
+
+=head1 USAGE NOTES
+
+Incorrect usage of C<PARROT_API> can break the build on some platforms,
+especially Win32. The rules for how to use it are as follows.
+
+=over 4
+
+=item If you decorate a function with C<PARROT_API> in a .c file, you must
+also decorate the symbol with C<PARROT_API> in all .h files that mention it.
+
+=item If the symbol appears in more than one header file, all of them must
+have C<PARROT_API> or none of them should. Some with and some without won't
+work.
+
+=back
+
+# vim: expandtab shiftwidth=2 tw=70:
+
