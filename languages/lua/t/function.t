@@ -24,7 +24,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'add' );
@@ -189,6 +189,19 @@ a	1	2
 1	b
 c	1
 OUT
+
+TODO: {
+    local $TODO = "cannot use '...' outside a vararg function";
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'invalid var args' );
+function f ()
+    print(...)
+end
+f()
+CODE
+/^[^:]+: [^:]+:\d+: cannot use '...' outside a vararg function/
+OUT
+}
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'orphan break' );
 function f()
