@@ -73,6 +73,11 @@ PARROT_API void Parrot_register_move( Interp *interp,
 
 PARROT_API void Parrot_srand( INTVAL seed );
 PARROT_API INTVAL Parrot_uint_rand( INTVAL how_random );
+PARROT_API PMC* tm_to_array(
+    Parrot_Interp interp,
+    const struct tm *tm /*NN*/ )
+        __attribute__nonnull__(2);
+
 FLOATVAL floatval_mod( FLOATVAL n2, FLOATVAL n3 )
         __attribute__pure__
         __attribute__warn_unused_result__;
@@ -80,11 +85,6 @@ FLOATVAL floatval_mod( FLOATVAL n2, FLOATVAL n3 )
 INTVAL intval_mod( INTVAL i2, INTVAL i3 )
         __attribute__pure__
         __attribute__warn_unused_result__;
-
-PARROT_API PMC* tm_to_array(
-    Parrot_Interp interp,
-    const struct tm *tm /*NN*/ )
-        __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/utils.c */
 

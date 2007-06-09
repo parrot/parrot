@@ -134,6 +134,18 @@ typedef struct Small_Object_Pool {
 
 /* HEADERIZER BEGIN: src/gc/smallobject.c */
 
+INTVAL contained_in_pool( Interp *interp,
+    Small_Object_Pool *pool /*NN*/,
+    void *ptr )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+void gc_pmc_ext_pool_init( Interp *interp, Small_Object_Pool *pool );
+Small_Object_Pool * new_small_object_pool( Interp *interp,
+    size_t object_size,
+    size_t objects_per_alloc )
+        __attribute__warn_unused_result__;
+
 void Parrot_add_to_free_list( Interp *interp,
     Small_Object_Pool *pool /*NN*/,
     Small_Object_Arena *arena /*NN*/,
@@ -161,18 +173,6 @@ void Parrot_small_object_pool_merge( Interp *interp,
     Small_Object_Pool *source /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-
-INTVAL contained_in_pool( Interp *interp,
-    Small_Object_Pool *pool /*NN*/,
-    void *ptr )
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
-
-void gc_pmc_ext_pool_init( Interp *interp, Small_Object_Pool *pool );
-Small_Object_Pool * new_small_object_pool( Interp *interp,
-    size_t object_size,
-    size_t objects_per_alloc )
-        __attribute__warn_unused_result__;
 
 /* HEADERIZER END: src/gc/smallobject.c */
 

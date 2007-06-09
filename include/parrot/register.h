@@ -71,11 +71,6 @@ struct Parrot_Context;        /* parrot/interpreter.h */
 
 /* HEADERIZER BEGIN: src/gc/register.c */
 
-struct Parrot_Context * Parrot_alloc_context( Interp *interp /*NN*/,
-    INTVAL *n_regs_used /*NN*/ )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_API void Parrot_clear_i( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
@@ -88,16 +83,14 @@ PARROT_API void Parrot_clear_p( Interp *interp /*NN*/ )
 PARROT_API void Parrot_clear_s( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-struct Parrot_Context * Parrot_dup_context( Interp *interp /*NN*/,
-    const struct Parrot_Context *old /*NN*/ )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_API void Parrot_free_context( Interp *interp /*NN*/,
     struct Parrot_Context *ctxp /*NN*/,
     int re_use )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+PARROT_API void parrot_gc_context( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
 
 PARROT_API void Parrot_pop_context( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
@@ -125,8 +118,15 @@ void destroy_context( Interp *interp /*NN*/ )
 void mark_register_stack( Parrot_Interp interp, Stack_Chunk_t* chunk /*NN*/ )
         __attribute__nonnull__(2);
 
-PARROT_API void parrot_gc_context( Interp *interp /*NN*/ )
-        __attribute__nonnull__(1);
+struct Parrot_Context * Parrot_alloc_context( Interp *interp /*NN*/,
+    INTVAL *n_regs_used /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+struct Parrot_Context * Parrot_dup_context( Interp *interp /*NN*/,
+    const struct Parrot_Context *old /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void setup_register_stacks( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);

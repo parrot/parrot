@@ -49,11 +49,6 @@ typedef void (*Stack_cleanup_method)(Interp*, Stack_Entry_t *);
 
 /* HEADERIZER BEGIN: src/stacks.c */
 
-PARROT_API void Parrot_dump_dynamic_environment( Interp *interp /*NN*/,
-    Stack_Chunk_t *dynamic_env /*NN*/ )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_API Stack_entry_type get_entry_type( Interp *interp,
     const Stack_Entry_t *entry /*NN*/ )
         __attribute__nonnull__(2)
@@ -67,6 +62,11 @@ PARROT_API Stack_Chunk_t * new_stack( Interp *interp,
     const char *name /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
+
+PARROT_API void Parrot_dump_dynamic_environment( Interp *interp /*NN*/,
+    Stack_Chunk_t *dynamic_env /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API void * pop_dest( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);

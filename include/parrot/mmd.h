@@ -46,23 +46,6 @@ typedef struct _MMD_table {
 
 /* HEADERIZER BEGIN: src/mmd.c */
 
-PARROT_API PMC * Parrot_MMD_search_default_infix( Interp *interp,
-    STRING *meth,
-    INTVAL left_type,
-    INTVAL right_type );
-
-PARROT_API void Parrot_mmd_rebuild_table( Interp* interp,
-    INTVAL type,
-    INTVAL func_nr );
-
-PARROT_API void Parrot_mmd_register_table( Interp* interp,
-    INTVAL type,
-    const MMD_init *mmd_table,
-    INTVAL n );
-
-PARROT_API PMC * Parrot_mmd_sort_candidate_list( Interp *interp,
-    PMC *candidates );
-
 PARROT_API funcptr_t get_mmd_dispatch_type( Interp *interp,
     INTVAL func_nr,
     INTVAL left_type,
@@ -154,6 +137,23 @@ PARROT_API PMC * mmd_vtfind(
     INTVAL func_nr,
     INTVAL left,
     INTVAL right );
+
+PARROT_API void Parrot_mmd_rebuild_table( Interp* interp,
+    INTVAL type,
+    INTVAL func_nr );
+
+PARROT_API void Parrot_mmd_register_table( Interp* interp,
+    INTVAL type,
+    const MMD_init *mmd_table,
+    INTVAL n );
+
+PARROT_API PMC * Parrot_MMD_search_default_infix( Interp *interp,
+    STRING *meth,
+    INTVAL left_type,
+    INTVAL right_type );
+
+PARROT_API PMC * Parrot_mmd_sort_candidate_list( Interp *interp,
+    PMC *candidates );
 
 /* HEADERIZER END: src/mmd.c */
 

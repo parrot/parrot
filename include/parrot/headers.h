@@ -48,22 +48,6 @@ typedef int (*pool_iter_fn)(Interp *, struct Small_Object_Pool *, int, void*);
 
 /* HEADERIZER BEGIN: src/headers.c */
 
-void Parrot_destroy_header_pools( Interp *interp );
-int Parrot_forall_header_pools( Interp *interp,
-    int flag,
-    void *arg,
-    pool_iter_fn func /*NN*/ )
-        __attribute__nonnull__(4);
-
-void Parrot_initialize_header_pool_names( Interp *interp );
-void Parrot_initialize_header_pools( Interp *interp /*NN*/ )
-        __attribute__nonnull__(1);
-
-void Parrot_merge_header_pools( Interp *dest_interp /*NN*/,
-    Interp *source_interp /*NN*/ )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 void add_pmc_ext( Interp *interp /*NN*/, PMC *pmc /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -132,6 +116,22 @@ STRING * new_string_header( Interp *interp /*NN*/, UINTVAL flags )
 Small_Object_Pool * new_string_pool( Interp *interp /*NN*/, INTVAL constant )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
+
+void Parrot_destroy_header_pools( Interp *interp );
+int Parrot_forall_header_pools( Interp *interp,
+    int flag,
+    void *arg,
+    pool_iter_fn func /*NN*/ )
+        __attribute__nonnull__(4);
+
+void Parrot_initialize_header_pool_names( Interp *interp );
+void Parrot_initialize_header_pools( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+void Parrot_merge_header_pools( Interp *dest_interp /*NN*/,
+    Interp *source_interp /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/headers.c */
 

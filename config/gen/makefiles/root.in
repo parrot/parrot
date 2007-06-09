@@ -1828,25 +1828,25 @@ HEADERIZER_O_FILES = \
 
 # Slowing working my way up to having everything headerized in $(HEADERIZER_O_FILES)
 HEADERIZER_O_FILES = \
-    src/string.o \
-    src/string_primitives.o \
-    src/pic.o \
-    src/stacks.o \
-    src/stack_common.o \
-    src/mmd.o \
-    src/objects.o \
-    src/key.o \
-    src/hash.o \
-    src/pmc.o \
-    src/list.o \
-    src/intlist.o \
     src/datatypes.o \
-    src/gc/resources.o \
-    src/utils.o \
-    src/headers.o \
-    src/gc/smallobject.o \
     src/gc/memory.o \
     src/gc/register.o \
+    src/gc/resources.o \
+    src/gc/smallobject.o \
+    src/hash.o \
+    src/headers.o \
+    src/intlist.o \
+    src/key.o \
+    src/list.o \
+    src/mmd.o \
+    src/objects.o \
+    src/pic.o \
+    src/pmc.o \
+    src/stack_common.o \
+    src/stacks.o \
+    src/string.o \
+    src/string_primitives.o \
+    src/utils.o \
 
 headerizer:
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)

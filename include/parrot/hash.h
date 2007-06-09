@@ -74,7 +74,6 @@ typedef struct _hash {
 
 /* HEADERIZER BEGIN: src/hash.c */
 
-PARROT_API PMC* Parrot_new_INTVAL_hash( Interp *interp, UINTVAL flags );
 PARROT_API void parrot_dump_hash( Interp *interp, const Hash *hash );
 PARROT_API void parrot_hash_clone( Interp *interp,
     Hash *hash /*NN*/,
@@ -126,6 +125,11 @@ PARROT_API void parrot_mark_hash( Interp *interp, Hash *hash /*NN*/ )
 
 PARROT_API void parrot_new_cstring_hash( Interp *interp, Hash **hptr );
 PARROT_API void parrot_new_hash( Interp *interp, Hash **hptr );
+PARROT_API PMC* Parrot_new_INTVAL_hash( Interp *interp, UINTVAL flags );
+PARROT_API void parrot_new_pmc_hash( Interp *interp, PMC *container );
+PARROT_API void parrot_new_pointer_hash( Interp *interp, Hash **hptr /*NN*/ )
+        __attribute__nonnull__(2);
+
 void parrot_new_hash_x( Interp *interp,
     Hash **hptr /*NN*/,
     PARROT_DATA_TYPES val_type,
@@ -134,16 +138,12 @@ void parrot_new_hash_x( Interp *interp,
     hash_hash_key_fn keyhash )
         __attribute__nonnull__(2);
 
-PARROT_API void parrot_new_pmc_hash( Interp *interp, PMC *container );
 void parrot_new_pmc_hash_x( Interp *interp,
     PMC *container /*NN*/,
     PARROT_DATA_TYPES val_type,
     Hash_key_type hkey_type,
     hash_comp_fn compare,
     hash_hash_key_fn keyhash )
-        __attribute__nonnull__(2);
-
-PARROT_API void parrot_new_pointer_hash( Interp *interp, Hash **hptr /*NN*/ )
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/hash.c */

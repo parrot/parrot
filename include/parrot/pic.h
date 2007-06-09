@@ -80,15 +80,6 @@ void parrot_PIC_alloc_store( Interp *interp,
     size_t n )
         __attribute__nonnull__(2);
 
-void parrot_PIC_destroy( Interp *interp, struct PackFile_ByteCode *cs /*NN*/ )
-        __attribute__nonnull__(2);
-
-int parrot_PIC_op_is_cached( Interp *interp, int op_code );
-void parrot_PIC_prederef( Interp *interp,
-    opcode_t op,
-    void **pc_pred,
-    int core );
-
 int parrot_pic_check_sig( Interp *interp,
     const PMC *sig1 /*NN*/,
     const PMC *sig2 /*NN*/,
@@ -96,6 +87,9 @@ int parrot_pic_check_sig( Interp *interp,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
+
+void parrot_PIC_destroy( Interp *interp, struct PackFile_ByteCode *cs /*NN*/ )
+        __attribute__nonnull__(2);
 
 void parrot_pic_find_infix_v_pp( Interp *interp,
     PMC *left /*NN*/,
@@ -107,7 +101,13 @@ void parrot_pic_find_infix_v_pp( Interp *interp,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
+int parrot_PIC_op_is_cached( Interp *interp, int op_code );
 void * parrot_pic_opcode( Interp *interp, INTVAL op );
+void parrot_PIC_prederef( Interp *interp,
+    opcode_t op,
+    void **pc_pred,
+    int core );
+
 /* HEADERIZER END: src/pic.c */
 
 

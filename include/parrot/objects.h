@@ -31,6 +31,16 @@ typedef enum {
 
 /* HEADERIZER BEGIN: src/objects.c */
 
+PARROT_API INTVAL Parrot_add_attribute( Interp *interp,
+    PMC* _class,
+    STRING* attr );
+
+PARROT_API void Parrot_add_parent( Interp *interp, PMC *_class, PMC *parent );
+PARROT_API PMC * Parrot_class_lookup( Interp *interp, STRING *class_name );
+PARROT_API INTVAL Parrot_class_offset( Interp *interp,
+    PMC *object,
+    STRING *_class );
+
 PARROT_API void Parrot_ComposeRole( Interp *interp,
     PMC *role,
     PMC *exclude,
@@ -41,25 +51,6 @@ PARROT_API void Parrot_ComposeRole( Interp *interp,
     PMC *roles_list );
 
 PARROT_API PMC* Parrot_ComputeMRO_C3( Interp *interp, PMC *_class );
-PARROT_API INTVAL Parrot_MMD_method_idx( Interp *interp, const char *name )
-        __attribute__warn_unused_result__
-        __attribute__pure__;
-
-PARROT_API const char* Parrot_MMD_method_name( Interp *interp, INTVAL idx )
-        __attribute__warn_unused_result__
-        __attribute__pure__;
-
-PARROT_API INTVAL Parrot_add_attribute( Interp *interp,
-    PMC* _class,
-    STRING* attr );
-
-PARROT_API void Parrot_add_parent( Interp *interp, PMC *_class, PMC *parent );
-PARROT_API PMC * Parrot_class_lookup( Interp *interp, STRING *class_name );
-PMC * Parrot_class_lookup_p( Interp *interp, PMC *class_name );
-PARROT_API INTVAL Parrot_class_offset( Interp *interp,
-    PMC *object,
-    STRING *_class );
-
 PARROT_API PMC * Parrot_find_class_constructor( Interp *interp,
     STRING *_class,
     INTVAL classtoken );
@@ -107,6 +98,14 @@ PARROT_API void Parrot_invalidate_method_cache( Interp *interp,
     STRING *_class,
     STRING *meth );
 
+PARROT_API INTVAL Parrot_MMD_method_idx( Interp *interp, const char *name )
+        __attribute__warn_unused_result__
+        __attribute__pure__;
+
+PARROT_API const char* Parrot_MMD_method_name( Interp *interp, INTVAL idx )
+        __attribute__warn_unused_result__
+        __attribute__pure__;
+
 PARROT_API PMC * Parrot_multi_subclass( Interp *interp,
     PMC *base_class_array,
     STRING *child_class_name );
@@ -151,11 +150,12 @@ PARROT_API PMC * Parrot_single_subclass( Interp *interp,
     PMC *base_class,
     PMC *name /*NULLOK*/ );
 
-void destroy_object_cache( Interp *interp );
-void mark_object_cache( Interp *interp );
 PARROT_API STRING* readable_name( Interp *interp, PMC *name /*NN*/ )
         __attribute__nonnull__(2);
 
+void destroy_object_cache( Interp *interp );
+void mark_object_cache( Interp *interp );
+PMC * Parrot_class_lookup_p( Interp *interp, PMC *class_name );
 /* HEADERIZER END: src/objects.c */
 
 /* Objects, classes and PMCarrays all use the same data scheme:

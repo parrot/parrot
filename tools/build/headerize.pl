@@ -307,7 +307,7 @@ sub main {
 
         for my $cfile ( sort keys %{$cfiles} ) {
             my $funcs = $cfiles->{$cfile};
-            my @funcs = sort { $a->[3] cmp $b->[3] } @{$funcs};
+            my @funcs = sort api_first_then_alpha @{$funcs};
 
             my @function_decls = make_function_decls( @funcs );
 
@@ -325,6 +325,14 @@ sub main {
     }    # for %files
 
     return;
+}
+
+sub api_first_then_alpha {
+    return
+        ( ($b->[0]||0) <=> ($a->[0]||0) )
+            ||
+        ( lc $a->[3] cmp lc $b->[3] )
+    ;
 }
 
 # Local Variables:
