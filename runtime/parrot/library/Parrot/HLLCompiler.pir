@@ -499,6 +499,7 @@ Generic method for compilers invoked from a shell command line.
 
     load_bytecode 'Getopt/Obj.pbc'
     load_bytecode 'dumper.pbc'
+    load_bytecode 'PGE/Dumper.pbc'
 
     ##   perform option processing of command-line args
     .local string arg0
