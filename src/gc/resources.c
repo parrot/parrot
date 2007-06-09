@@ -183,7 +183,6 @@ static const char*
 buffer_location(Interp *interp, const PObj *b)
 {
     int i;
-    const char *s = "???";
     static char reg[10];
 
     parrot_context_t* const ctx = CONTEXT(interp->ctx);
@@ -196,7 +195,7 @@ buffer_location(Interp *interp, const PObj *b)
         }
     }
 
-    return s;
+    return "???";
 }
 
 static void

@@ -178,7 +178,7 @@ parrot_gc_context(Interp *interp /*NN*/)
 }
 
 static void
-clear_regs(Interp *interp, parrot_context_t *ctx)
+clear_regs(Interp *interp /*NN*/, parrot_context_t *ctx /*NN*/)
 {
     int i;
 
@@ -217,8 +217,8 @@ clear_regs(Interp *interp, parrot_context_t *ctx)
 }
 
 static void
-init_context(Interp *interp, parrot_context_t *ctx /*NN*/,
-        parrot_context_t *old /*NULLOK*/)
+init_context(Interp *interp /*NN*/, parrot_context_t *ctx /*NN*/,
+        const parrot_context_t *old /*NULLOK*/)
 {
     ctx->ref_count = 0;                 /* TODO 1 - Exceptions !!! */
     ctx->current_results = NULL;
@@ -228,6 +228,7 @@ init_context(Interp *interp, parrot_context_t *ctx /*NN*/,
     ctx->current_cont = NULL;
     ctx->current_object = NULL; /* XXX who clears it?  */
     ctx->current_HLL = 0;
+
     if (old) {
         /* some items should better be COW copied */
         ctx->constants = old->constants;
