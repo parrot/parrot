@@ -38,7 +38,8 @@ int CONSERVATIVE_POINTER_CHASING = 0;
 #endif
 
 static size_t find_common_mask(size_t val1, size_t val2)
-    __attribute__pure__;
+    __attribute__const__
+    __attribute__warn_unused_result__;
 
 /*
 
@@ -313,7 +314,7 @@ whether the run completed, that is, whether it's safe to proceed with GC.
 */
 
 static int
-trace_active_PMCs(Interp *interp, int trace_stack)
+trace_active_PMCs(Interp *interp /*NN*/, int trace_stack)
 {
     if (!Parrot_dod_trace_root(interp, trace_stack))
         return 0;
@@ -332,7 +333,7 @@ Returns whether the tracing process completed.
 */
 
 int
-Parrot_dod_trace_children(Interp *interp, size_t how_many)
+Parrot_dod_trace_children(Interp *interp /*NN*/, size_t how_many)
 {
     Arenas * const arena_base = interp->arena_base;
     const int     lazy_dod    = arena_base->lazy_dod;
@@ -787,7 +788,7 @@ Run through all PMC arenas and clear live bits.
 
 /* interp is unused and can be removed */
 static void
-clear_live_bits(Interp *interp /*NULLOK*/, Small_Object_Pool * const pool)
+clear_live_bits(Interp *interp /*NULLOK*/, Small_Object_Pool *pool /*NN*/)
 {
     Small_Object_Arena *arena;
     const UINTVAL       object_size = pool->object_size;

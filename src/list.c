@@ -669,7 +669,7 @@ Add chunk at start or end.
 */
 
 static List_chunk *
-add_chunk(Interp *interp, List *list /*NN*/, int where, UINTVAL idx)
+add_chunk(Interp *interp /*NN*/, List *list /*NN*/, int where, UINTVAL idx)
 {
     List_chunk * const chunk = where ? list->last : list->first;
     List_chunk * const new_chunk = alloc_next_size(interp, list, where, idx);
@@ -1082,7 +1082,7 @@ Add one or more chunks to end of list.
 */
 
 static void
-list_append(Interp *interp, List *list /*NN*/, void *item, int type, UINTVAL idx)
+list_append(Interp *interp /*NN*/, List *list /*NN*/, void *item, int type, UINTVAL idx)
 {
     /* initially, list may be empty, also used by assign */
     while (idx >= list->cap)
@@ -1196,20 +1196,16 @@ list_new_init(Interp *interp, INTVAL type, PMC *init /*NN*/)
         const INTVAL val = i + 1;
         switch (key) {
             case 0:
-                size = VTABLE_get_integer_keyed_int(interp,
-                        init, val);
+                size = VTABLE_get_integer_keyed_int(interp, init, val);
                 break;
             case 1:
-                multi_key = VTABLE_get_pmc_keyed_int(interp,
-                        init, val);
+                multi_key = VTABLE_get_pmc_keyed_int(interp, init, val);
                 break;
             case 2:
-                type = VTABLE_get_integer_keyed_int(interp,
-                        init, val);
+                type = VTABLE_get_integer_keyed_int(interp, init, val);
                 break;
             case 3:
-                item_size = VTABLE_get_integer_keyed_int(interp,
-                        init, val);
+                item_size = VTABLE_get_integer_keyed_int(interp, init, val);
                 break;
             case 4:
                 items_per_chunk = VTABLE_get_integer_keyed_int(
@@ -1222,13 +1218,10 @@ list_new_init(Interp *interp, INTVAL type, PMC *init /*NN*/)
         if (!item_size)
             internal_exception(1, "No item_size for type_sized list\n");
         list->item_size = item_size;
-        if (items_per_chunk) {
-            /* make power of 2 */
-            items_per_chunk = 1 << (ld(items_per_chunk) + 1);
-            list->items_per_chunk = items_per_chunk;
-        }
-        else
-            list->items_per_chunk = MAX_ITEMS;
+        list->items_per_chunk =
+            items_per_chunk
+                ? (1 << (ld(items_per_chunk) + 1)) /* make power of 2 */
+                : MAX_ITEMS;
     }
     if (size)
         list_set_length(interp, list, size);
@@ -1348,7 +1341,7 @@ Mark the list and its contents as live.
 
 PARROT_API
 void
-list_mark(Interp *interp, List *list /*NN*/)
+list_mark(Interp *interp /*NN*/, List *list /*NN*/)
 {
     List_chunk *chunk;
 
@@ -1385,7 +1378,7 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 
 PARROT_API
 void
-list_visit(Interp *interp, List *list, void *pinfo)
+list_visit(Interp *interp, List *list /*NN*/, void *pinfo)
 {
     List_chunk *chunk;
     visit_info * const info = (visit_info*) pinfo;
@@ -1438,12 +1431,10 @@ PARROT_API
 void
 list_set_length(Interp *interp, List *list /*NN*/, INTVAL len)
 {
-    UINTVAL idx;
-
     if (len < 0)
         len += list->length;
     if (len >= 0) {
-        idx = list->start + (UINTVAL)len;
+        const UINTVAL idx = list->start + (UINTVAL)len;
         list->length = len;
         if (idx >= list->cap) {
             /* assume user will fill it, so don't generate sparse
@@ -1476,9 +1467,7 @@ PARROT_API
 void
 list_insert(Interp *interp, List *list /*NN*/, INTVAL idx, INTVAL n_items)
 {
-    List_chunk *chunk, *new_chunk, *rest;
-
-    INTVAL items;
+    List_chunk *chunk;
 
     assert(idx >= 0);
     idx += list->start;
@@ -1500,6 +1489,9 @@ list_insert(Interp *interp, List *list /*NN*/, INTVAL idx, INTVAL n_items)
     if (chunk->flags & sparse)
         chunk->items += n_items;
     else {
+        List_chunk *new_chunk;
+        INTVAL items;
+
         /* 1. cut this chunk at idx */
         list->grow_policy = enum_grow_mixed;
         /* allocate a sparse chunk, n_items big */
@@ -1508,6 +1500,8 @@ list_insert(Interp *interp, List *list /*NN*/, INTVAL idx, INTVAL n_items)
         new_chunk->flags |= sparse;
         items = chunk->items - idx;
         if (items) {
+            List_chunk *rest;
+
             /* allocate a small chunk, holding the rest of chunk beyond idx */
             chunk->flags = no_power_2;
             rest = allocate_chunk(interp, list, items,

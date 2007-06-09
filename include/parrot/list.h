@@ -121,7 +121,8 @@ PARROT_API INTVAL list_length( Interp *interp, const List *list /*NN*/ )
         __attribute__pure__
         __attribute__warn_unused_result__;
 
-PARROT_API void list_mark( Interp *interp, List *list /*NN*/ )
+PARROT_API void list_mark( Interp *interp /*NN*/, List *list /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API List * list_new( Interp *interp, INTVAL type )
@@ -172,7 +173,9 @@ PARROT_API void list_unshift( Interp *interp,
     int type )
         __attribute__nonnull__(2);
 
-PARROT_API void list_visit( Interp *interp, List *list, void *pinfo );
+PARROT_API void list_visit( Interp *interp, List *list /*NN*/, void *pinfo )
+        __attribute__nonnull__(2);
+
 /* HEADERIZER END: src/list.c */
 
 #endif /* PARROT_LIST_H_GUARD */
