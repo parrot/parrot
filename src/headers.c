@@ -452,7 +452,7 @@ Checks that C<ptr> is actually a C<Buffer>.
 */
 
 int
-is_buffer_ptr(Interp *interp, void *ptr) /* XXX Const this */
+is_buffer_ptr(Interp *interp /*NN*/, void *ptr) /* XXX Const this */
 {
     UINTVAL i;
     Arenas * const arena_base = interp->arena_base;

@@ -982,8 +982,9 @@ Free unused resources, put white objects onto free_list.
 
 */
 
+PARROT_API
 void
-parrot_gc_gms_pobject_lives(Interp* interp, PObj *obj)
+parrot_gc_gms_pobject_lives(Interp* interp /*NN*/, PObj *obj /*NN*/)
 {
     Gc_gms_hdr *h;
     int priority;

@@ -80,7 +80,9 @@ size_t get_min_pmc_address( Interp *interp /*NN*/ )
         __attribute__pure__
         __attribute__warn_unused_result__;
 
-int is_buffer_ptr( Interp *interp, void *ptr );
+int is_buffer_ptr( Interp *interp /*NN*/, void *ptr )
+        __attribute__nonnull__(1);
+
 int is_pmc_ptr( Interp *interp, void *ptr );
 Small_Object_Pool * make_bufferlike_pool( Interp *interp /*NN*/,
     size_t buffer_size )

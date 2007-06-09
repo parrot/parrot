@@ -16,17 +16,16 @@ processor registers. The actual checking is implemented in F<src/cpu_dep.c>.
 
 There's also a verbose mode for garbage collection.
 
-=head2 Functions
-
-=over 4
-
-=cut
+=head1 FUNCTIONS
 
 */
 
 #define DOD_C_SOURCE
 #include "parrot/parrot.h"
+#include "parrot/dod.h"
 #include <assert.h>
+
+/* HEADER: include/parrot/dod.h */
 
 /* Set this to 1 to see if unanchored objects are found in system areas.
  * Please note: these objects might be bogus
@@ -38,12 +37,12 @@ There's also a verbose mode for garbage collection.
 int CONSERVATIVE_POINTER_CHASING = 0;
 #endif
 
-static size_t find_common_mask(size_t val1, size_t val2);
+static size_t find_common_mask(size_t val1, size_t val2)
+    __attribute__pure__;
 
 /*
 
-=item C<static void
-mark_special(Parrot_Interp interp, PMC* obj)>
+FUNCDOC: mark_special
 
 Mark a special PMC. If it has a C<PMC_EXT> structure, append or prepend
 the C<next_for_GC> pointer; otherwise, do the custom mark directly.
@@ -51,12 +50,10 @@ the C<next_for_GC> pointer; otherwise, do the custom mark directly.
 This should really be inline, so if inline isn't available, it would
 be better if it were a macro.
 
-=cut
-
 */
 
 static void
-mark_special(Parrot_Interp interp, PMC *obj)
+mark_special(Interp *interp /*NN*/, PMC *obj /*NN*/)
 {
     int     hi_prio;
     Arenas *arena_base;
@@ -136,7 +133,7 @@ mark_special(Parrot_Interp interp, PMC *obj)
 
 /* XXX This should really use the same header, with different guts #ifdeffed */
 void
-pobject_lives(Parrot_Interp interp, PObj *obj)
+pobject_lives(Interp *interp /*NN*/, PObj *obj /*NN*/)
 {
     /* if object is live or on free list return */
     if (PObj_is_live_or_free_TESTALL(obj)) {
@@ -188,14 +185,7 @@ pobject_lives(Parrot_Interp interp, PObj *obj)
 
 /*
 
-=item C<static int
-trace_active_PMCs(Parrot_Interp interp, int trace_stack)>
-
-Do a full trace run and mark all the PMCs as active if they are. Returns
-whether the run completed, that is, whether it's safe to proceed with GC.
-
-=item C<int
-Parrot_dod_trace_root(Parrot_Interp interp, int trace_stack)>
+FUNCDOC: Parrot_dod_trace_root
 
 Trace the root set. Returns 0 if it's a lazy DOD run and all objects
 that need timely destruction were found.
@@ -206,12 +196,10 @@ C<trace_stack> can have these values:
  1 ... trace whole root set
  2 ... trace system areas only
 
-=cut
-
 */
 
 int
-Parrot_dod_trace_root(Parrot_Interp interp, int trace_stack)
+Parrot_dod_trace_root(Interp *interp /*NN*/, int trace_stack)
 {
     Arenas           * const arena_base = interp->arena_base;
     parrot_context_t *ctx;
@@ -314,8 +302,18 @@ Parrot_dod_trace_root(Parrot_Interp interp, int trace_stack)
     return 1;
 }
 
+
+/*
+
+FUNCDOC: trace_active_PMCs
+
+Do a full trace run and mark all the PMCs as active if they are. Returns
+whether the run completed, that is, whether it's safe to proceed with GC.
+
+*/
+
 static int
-trace_active_PMCs(Parrot_Interp interp, int trace_stack)
+trace_active_PMCs(Interp *interp, int trace_stack)
 {
     if (!Parrot_dod_trace_root(interp, trace_stack))
         return 0;
@@ -327,17 +325,14 @@ trace_active_PMCs(Parrot_Interp interp, int trace_stack)
 
 /*
 
-=item C<int
-Parrot_dod_trace_children(Parrot_Interp interp, size_t how_many)>
+FUNCDOC: Parrot_dod_trace_children
 
 Returns whether the tracing process completed.
-
-=cut
 
 */
 
 int
-Parrot_dod_trace_children(Parrot_Interp interp, size_t how_many)
+Parrot_dod_trace_children(Interp *interp, size_t how_many)
 {
     Arenas * const arena_base = interp->arena_base;
     const int     lazy_dod    = arena_base->lazy_dod;
@@ -434,17 +429,14 @@ Parrot_dod_trace_children(Parrot_Interp interp, size_t how_many)
 
 /*
 
-=item C<void
-clear_cow(Parrot_Interp interp, Small_Object_Pool *pool, int cleanup)>
+FUNCDOC: clear_cow
 
 Clear the COW ref count.
-
-=cut
 
 */
 
 void
-clear_cow(Parrot_Interp interp, Small_Object_Pool *pool, int cleanup)
+clear_cow(Interp *interp, Small_Object_Pool *pool /*NN*/, int cleanup)
 {
     const UINTVAL       object_size = pool->object_size;
     Small_Object_Arena *cur_arena;
@@ -480,24 +472,21 @@ clear_cow(Parrot_Interp interp, Small_Object_Pool *pool, int cleanup)
 
 /*
 
-=item C<void
-used_cow(Parrot_Interp interp, Small_Object_Pool *pool, int cleanup)>
+FUNCDOC: used_cow
 
 Find other users of COW's C<bufstart>.
-
-=cut
 
 */
 
 void
-used_cow(Parrot_Interp interp, Small_Object_Pool *pool, int cleanup)
+used_cow(Interp *interp, Small_Object_Pool *pool /*NN*/, int cleanup)
 {
     UINTVAL             object_size = pool->object_size;
     Small_Object_Arena *cur_arena;
 
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
-        Buffer *b = cur_arena->start_objects;
+        const Buffer *b = cur_arena->start_objects;
         UINTVAL i;
 
         for (i = 0; i < cur_arena->used; i++) {
@@ -523,19 +512,16 @@ used_cow(Parrot_Interp interp, Small_Object_Pool *pool, int cleanup)
 
 /*
 
-=item C<void
-Parrot_dod_sweep(Parrot_Interp interp, Small_Object_Pool *pool)>
+FUNCDOC: Parrot_dod_sweep
 
 Put any buffers/PMCs that are now unused onto the pool's free list. If
 C<GC_IS_MALLOC>, bufstart gets freed too, if possible. Avoid buffers that
 are immune from collection (i.e. constant).
 
-=cut
-
 */
 
 void
-Parrot_dod_sweep(Parrot_Interp interp, Small_Object_Pool *pool)
+Parrot_dod_sweep(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
 {
     Arenas * const arena_base = interp->arena_base;
     UINTVAL i, total_used = 0;
@@ -693,11 +679,9 @@ next:
 
 /*
 
-=item C<static size_t find_common_mask(size_t val1, size_t val2)>
+FUNCDOC: find_common_mask
 
 Find a mask covering the longest common bit-prefix of C<val1> and C<val2>.
-
-=cut
 
 */
 
@@ -731,17 +715,14 @@ find_common_mask(size_t val1, size_t val2)
 
 /*
 
-=item C<void
-trace_mem_block(Parrot_Interp interp, size_t lo_var_ptr, size_t hi_var_ptr)>
+FUNCDOC: trace_mem_block
 
 Traces the memory block between C<lo_var_ptr> and C<hi_var_ptr>.
-
-=cut
 
 */
 
 void
-trace_mem_block(Parrot_Interp interp, size_t lo_var_ptr, size_t hi_var_ptr)
+trace_mem_block(Interp *interp /*NN*/, size_t lo_var_ptr, size_t hi_var_ptr)
 {
     size_t    prefix;
     ptrdiff_t cur_var_ptr;
@@ -804,8 +785,10 @@ Run through all PMC arenas and clear live bits.
 
 */
 
+/* interp is unused and can be removed */
 static void
-clear_live_bits(Parrot_Interp interp, Small_Object_Pool * const pool) {
+clear_live_bits(Interp *interp /*NULLOK*/, Small_Object_Pool * const pool)
+{
     Small_Object_Arena *arena;
     const UINTVAL       object_size = pool->object_size;
 
@@ -822,7 +805,7 @@ clear_live_bits(Parrot_Interp interp, Small_Object_Pool * const pool) {
 }
 
 void
-Parrot_dod_clear_live_bits(Parrot_Interp interp)
+Parrot_dod_clear_live_bits(Interp *interp /*NN*/)
 {
     Small_Object_Pool * const pool = interp->arena_base->pmc_pool;
     clear_live_bits(interp, pool);
@@ -830,17 +813,14 @@ Parrot_dod_clear_live_bits(Parrot_Interp interp)
 
 /*
 
-=item C<void
-Parrot_dod_profile_start(Parrot_Interp interp)>
+FUNCDOC: Parrot_dod_profile_start
 
 Records the start time of a DOD run when profiling is enabled.
-
-=cut
 
 */
 
 void
-Parrot_dod_profile_start(Parrot_Interp interp)
+Parrot_dod_profile_start(Interp *interp /*NN*/)
 {
     if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG))
         interp->profile->dod_time = Parrot_floatval_time();
@@ -848,18 +828,15 @@ Parrot_dod_profile_start(Parrot_Interp interp)
 
 /*
 
-=item C<void
-Parrot_dod_profile_end(Parrot_Interp interp, int what)>
+FUNCDOC: Parrot_dod_profile_end
 
 Records the end time of the DOD part C<what> run when profiling is enabled.
 Also record start time of next part.
 
-=cut
-
 */
 
 void
-Parrot_dod_profile_end(Parrot_Interp interp, int what)
+Parrot_dod_profile_end(Interp *interp /*NN*/, int what)
 {
     if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
         RunProfile * const profile = interp->profile;
@@ -883,27 +860,14 @@ Parrot_dod_profile_end(Parrot_Interp interp, int what)
 
 /*
 
-=item C<void
-Parrot_do_dod_run(Parrot_Interp interp, UINTVAL flags)>
-
-Call the configured garbage collector to reclaim unused headers.
-
-=item C<void
-Parrot_dod_ms_run(Parrot_Interp interp, UINTVAL flags)>
-
-Run the stop-the-world mark & sweep collector.
-
-=item C<void
-Parrot_dod_ms_run_init(Parrot_Interp interp)>
+FUNCDOC: Parrot_dod_ms_run_init
 
 Prepare for a mark & sweep DOD run.
-
-=cut
 
 */
 
 void
-Parrot_dod_ms_run_init(Parrot_Interp interp)
+Parrot_dod_ms_run_init(Interp *interp /*NN*/)
 {
     Arenas * const arena_base       = interp->arena_base;
 
@@ -914,7 +878,7 @@ Parrot_dod_ms_run_init(Parrot_Interp interp)
 }
 
 static int
-sweep_cb(Parrot_Interp interp, Small_Object_Pool *pool, int flag, void *arg)
+sweep_cb(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/, int flag, void *arg)
 {
     int * const total_free = (int *) arg;
 
@@ -938,8 +902,16 @@ sweep_cb(Parrot_Interp interp, Small_Object_Pool *pool, int flag, void *arg)
     return 0;
 }
 
+/*
+
+FUNCDOC: Parrot_dod_ms_run
+
+Run the stop-the-world mark & sweep collector.
+
+*/
+
 void
-Parrot_dod_ms_run(Parrot_Interp interp, int flags)
+Parrot_dod_ms_run(Interp *interp /*NN*/, int flags)
 {
     Arenas * const arena_base = interp->arena_base;
 
@@ -1021,16 +993,24 @@ Parrot_dod_ms_run(Parrot_Interp interp, int flags)
     return;
 }
 
+
+/*
+
+FUNCDOC: Parrot_do_dod_run
+
+Call the configured garbage collector to reclaim unused headers.
+
+*/
+
+PARROT_API
 void
-Parrot_do_dod_run(Parrot_Interp interp, UINTVAL flags)
+Parrot_do_dod_run(Interp *interp /*NN*/, UINTVAL flags)
 {
     interp->arena_base->do_dod_run(interp, flags);
     parrot_gc_context(interp);
 }
 
 /*
-
-=back
 
 =head1 SEE ALSO
 
@@ -1040,8 +1020,6 @@ F<docs/pdds/pdd09_gc.pod>.
 =head1 HISTORY
 
 Initial version by Mike Lambert on 2002.05.27.
-
-=cut
 
 */
 
