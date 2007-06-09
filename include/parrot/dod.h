@@ -51,54 +51,17 @@ enum {
                                              set, i.e. registers */
 };
 
-/* HEADERIZER BEGIN: src/gc/dod.c */
-
-PARROT_API void Parrot_do_dod_run( Interp *interp /*NN*/, UINTVAL flags )
-        __attribute__nonnull__(1);
-
-void clear_cow( Interp *interp, Small_Object_Pool *pool /*NN*/, int cleanup )
-        __attribute__nonnull__(2);
-
-void Parrot_dod_clear_live_bits( Interp *interp /*NN*/ )
-        __attribute__nonnull__(1);
-
-void Parrot_dod_ms_run( Interp *interp /*NN*/, int flags )
-        __attribute__nonnull__(1);
-
-void Parrot_dod_ms_run_init( Interp *interp /*NN*/ )
-        __attribute__nonnull__(1);
-
-void Parrot_dod_profile_end( Interp *interp /*NN*/, int what )
-        __attribute__nonnull__(1);
-
-void Parrot_dod_profile_start( Interp *interp /*NN*/ )
-        __attribute__nonnull__(1);
-
-void Parrot_dod_sweep( Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/ )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-int Parrot_dod_trace_children( Interp *interp, size_t how_many );
-int Parrot_dod_trace_root( Interp *interp /*NN*/, int trace_stack )
-        __attribute__nonnull__(1);
-
-void pobject_lives( Interp *interp /*NN*/, PObj *obj /*NN*/ )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-void trace_mem_block( Interp *interp /*NN*/,
-    size_t lo_var_ptr,
-    size_t hi_var_ptr )
-        __attribute__nonnull__(1);
-
-void used_cow( Interp *interp, Small_Object_Pool *pool /*NN*/, int cleanup )
-        __attribute__nonnull__(2);
-
-/* HEADERIZER END: src/gc/dod.c */
-
-
-/* cpu_dep.c */
+PARROT_API void Parrot_do_dod_run(Interp *, UINTVAL flags);
 void trace_system_areas(Interp *);
+void trace_mem_block(Interp *, size_t, size_t);
+
+void free_unused_pobjects(Interp *interp,
+                    struct Small_Object_Pool *pool);
+
+void used_cow(Interp *interp,
+        struct Small_Object_Pool *pool, int cleanup);
+void clear_cow(Interp *interp,
+        struct Small_Object_Pool *pool, int cleanup);
 
 /* mark a PObj live during DOD */
 
