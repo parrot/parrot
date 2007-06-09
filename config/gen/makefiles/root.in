@@ -1845,6 +1845,8 @@ HEADERIZER_O_FILES = \
     src/utils.o \
     src/headers.o \
     src/gc/smallobject.o \
+    src/gc/memory.o \
+    src/gc/register.o \
 
 headerizer:
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)

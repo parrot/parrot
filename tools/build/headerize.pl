@@ -109,8 +109,11 @@ sub extract_functions {
     # If it doesn't start in the left column, it's not a func
     @funcs = grep /^\S/, @funcs;
 
-    # Typedefs and structs are no good
-    @funcs = grep !/^(typedef|struct|enum|extern)/, @funcs;
+    # Typedefs, enums and externs are no good
+    @funcs = grep !/^(typedef|enum|extern)/, @funcs;
+
+    # Structs are OK if they're not alone on the line
+    @funcs = grep { !/^struct.+;\n/ } @funcs;
 
     # Variables are of no use to us
     @funcs = grep !/=/, @funcs;

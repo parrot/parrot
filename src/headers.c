@@ -152,7 +152,6 @@ Make and return a bufferlike header pool.
 
 Small_Object_Pool *
 make_bufferlike_pool(Interp *interp /*NN*/, size_t buffer_size)
-    /* WARN_UNUSED */
 {
     const UINTVAL num_old = interp->arena_base->num_sized;
     Small_Object_Pool **sized_pools =

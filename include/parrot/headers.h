@@ -100,8 +100,7 @@ int is_buffer_ptr( Interp *interp, void *ptr );
 int is_pmc_ptr( Interp *interp, void *ptr );
 Small_Object_Pool * make_bufferlike_pool( Interp *interp /*NN*/,
     size_t buffer_size )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 Buffer * new_buffer_header( Interp *interp /*NN*/ )
         __attribute__nonnull__(1)

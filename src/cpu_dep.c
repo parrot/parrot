@@ -40,16 +40,14 @@ static void trace_system_stack(Interp *interp);
 
 /*
 
-=item C<void trace_system_areas(Interp *interp)>
+FUNCDOC: trace_system_areas
 
 Traces the system stack and any additional CPU-specific areas.
-
-=cut
 
 */
 
 void
-trace_system_areas(Interp *interp)
+trace_system_areas(Interp *interp /*NN*/)
 {
 #if defined(__sparc) /* Flush register windows */
     static union {

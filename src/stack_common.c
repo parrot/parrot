@@ -49,6 +49,7 @@ debugging/error reporting.
 PARROT_API
 Stack_Chunk_t *
 register_new_stack(Interp *interp, const char *name /*NN*/, size_t item_size)
+    /* WARN_UNUSED */
 {
     Stack_Chunk_t *chunk;
 
@@ -71,6 +72,7 @@ Get a new chunk either from the freelist or allocate one.
 PARROT_API
 Stack_Chunk_t *
 cst_new_stack_chunk(Parrot_Interp interp, const Stack_Chunk_t *chunk /*NN*/)
+    /* WARN_UNUSED */
 {
     Small_Object_Pool * const pool =
         get_bufferlike_pool(interp, chunk->size);
@@ -107,7 +109,7 @@ stack_prepare_push(Parrot_Interp interp, Stack_Chunk_t **stack_p /*NN*/)
 /*
 
 FUNCDOC:
-Return a pointer, where new entries are poped off.
+Return a pointer, where new entries are popped off.
 
 */
 
