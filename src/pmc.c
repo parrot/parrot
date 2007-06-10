@@ -36,7 +36,7 @@ any other necessary initialization.
 
 PARROT_API
 PMC *
-pmc_new(Interp *interp, INTVAL base_type)
+pmc_new(Interp *interp /*NN*/, INTVAL base_type)
 {
     PMC * const pmc = pmc_new_noinit(interp, base_type);
     VTABLE_init(interp, pmc);
@@ -247,7 +247,7 @@ initialization for continuations.
 
 PARROT_API
 PMC *
-pmc_new_noinit(Interp *interp, INTVAL base_type)
+pmc_new_noinit(Interp *interp /*NN*/, INTVAL base_type)
 {
     PMC * const pmc = get_new_pmc_header(interp, base_type, 0);
 
