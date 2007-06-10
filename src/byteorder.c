@@ -197,7 +197,7 @@ fetch_buf_le_4(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 }
 
 void
-fetch_buf_be_8(unsigned char *rb /*NN*/, const unsigned char *b)
+fetch_buf_be_8(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 8);

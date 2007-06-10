@@ -431,8 +431,9 @@ void fetch_buf_be_4( unsigned char *rb /*NN*/, const unsigned char *b /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void fetch_buf_be_8( unsigned char *rb /*NN*/, const unsigned char *b )
-        __attribute__nonnull__(1);
+void fetch_buf_be_8( unsigned char *rb /*NN*/, const unsigned char *b /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void fetch_buf_le_12(
     unsigned char *rb /*NN*/,
