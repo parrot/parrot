@@ -89,7 +89,7 @@
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispFunction\0args"
-   getattribute retv, self, "args"
+   retv = getattribute self, "args"
 
   .return(retv)
 .end
@@ -107,7 +107,7 @@
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispFunction\0body"
-   getattribute retv, self, "body"
+   retv =  getattribute self, "body"
 
   .return(retv)
 .end
@@ -125,7 +125,7 @@
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispFunction\0name"
-   getattribute retv, self, "name"
+   retv = getattribute self, "name"
 
   .return(retv)
 .end
@@ -143,7 +143,7 @@
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispFunction\0scope"
-   getattribute retv, self, "scope"
+   retv = getattribute self, "scope"
 
   .return(retv)
 .end
@@ -231,7 +231,7 @@ NAMED_FUNCTION:
   .local pmc hash
 
    # VALID_IN_PARROT_0_2_0 getattribute hash, self,  "LispPackage\0internal"
-   getattribute hash, self,  "internal"
+   hash = getattribute self,  "internal"
    stack = hash[name]
 
    if_null stack, SYMBOL_NOT_FOUND
@@ -257,7 +257,7 @@ DONE:
    symname = symbol._get_name_as_string()
 
    # VALID_IN_PARROT_0_2_0 getattribute hash, self,  "LispPackage\0internal"
-   getattribute hash, self,  "internal"
+   hash = getattribute self,  "internal"
 
    stack = hash[symname]
 
@@ -284,7 +284,7 @@ DONE:
   .local pmc hash
 
    # VALID_IN_PARROT_0_2_0 getattribute hash, self,  "LispPackage\0internal"
-   getattribute hash, self,  "internal"
+   hash = getattribute self,  "internal"
    stack = hash[name]
 
    symbol = _SYMBOL(name)
@@ -303,7 +303,7 @@ DONE:
   .local int size
 
    # VALID_IN_PARROT_0_2_0 getattribute hash, self,  "LispPackage\0internal"
-   getattribute hash, self,  "internal"
+   hash = getattribute self,  "internal"
    stack = hash[name]
 
    size = stack
@@ -325,7 +325,7 @@ DONE:
    exports = new ResizablePMCArray
 
    # VALID_IN_PARROT_0_2_0 getattribute hash, self,  "LispPackage\0external"
-   getattribute hash, self,  "external"
+   hash = getattribute self,  "external"
 
    iter i, hash
    push_eh DONE
@@ -358,9 +358,9 @@ DONE:
   .local int top
 
    # VALID_IN_PARROT_0_2_0 getattribute internal, self,  "LispPackage\0internal"
-   getattribute internal, self,  "internal"
+   internal = getattribute self,  "internal"
    # VALID_IN_PARROT_0_2_0 getattribute external, self,  "LispPackage\0external"
-   getattribute external, self,  "external"
+   external = getattribute self,  "external"
 
    stack = internal[name]
 
@@ -395,7 +395,7 @@ DONE:
 
   # the attribute internal has been set up in _init_types
   # VALID_IN_PARROT_0_2_0 getattribute hash, self,  "LispPackage\0internal"
-  getattribute hash, self,  "internal"
+  hash = getattribute self,  "internal"
   stack = hash[name]
 
   unless_null stack, DONE
@@ -421,7 +421,7 @@ DONE:
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispPackage\0name"
-   getattribute retv, self, "name"
+   retv = getattribute self, "name"
 
   .return(retv)
 .end
@@ -440,7 +440,7 @@ DONE:
   .local string retv
 
    # VALID_IN_PARROT_0_2_0 getattribute name, self, "LispPackage\0name"
-   getattribute name, self, "name"
+   name = getattribute self, "name"
    retv = name
 
   .return(retv)
@@ -452,7 +452,7 @@ DONE:
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute name, self, "LispPackage\0name"
-   getattribute name, self, "name"
+   name = getattribute self, "name"
 
    retv = new String
    tmps = new String
@@ -473,7 +473,7 @@ DONE:
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispReadtable\0table"
-   getattribute retv, self, "table"
+   retv = getattribute self, "table"
 
   .return(retv)
 .end
@@ -491,7 +491,7 @@ DONE:
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispReadtable\0case"
-   getattribute retv, self, "case"
+   retv = getattribute self, "case"
 
   .return(retv)
 .end
@@ -667,7 +667,7 @@ DONE:
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispStream\0stream"
-   getattribute retv, self, "stream"
+   retv = getattribute self, "stream"
 
   .return(retv)
 .end
@@ -696,7 +696,7 @@ DONE:
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispSymbol\0documentation"
-   getattribute retv, self, "documentation"
+   retv = getattribute self, "documentation"
 
   .return(retv)
 .end
@@ -714,7 +714,7 @@ DONE:
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispSymbol\0function"
-   getattribute retv, self, "function"
+   retv = getattribute self, "function"
 
   .return(retv)
 .end
@@ -732,7 +732,7 @@ DONE:
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispSymbol\0name"
-   getattribute retv, self, 'name'
+   retv = getattribute self, 'name'
 
   .return(retv)
 .end
@@ -751,7 +751,7 @@ DONE:
   .local string retv
 
    # VALID_IN_PARROT_0_2_0 getattribute name, self, "LispSymbol\0name"
-   getattribute name, self, "name"
+   name = getattribute self, "name"
    retv = name
 
   .return(retv)
@@ -761,7 +761,7 @@ DONE:
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispSymbol\0package"
-   getattribute retv, self, "package"
+   retv = getattribute self, "package"
 
   .return(retv)
 .end
@@ -779,7 +779,7 @@ DONE:
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispSymbol\0special"
-   getattribute retv, self, "special"
+   retv = getattribute self, "special"
 
   .return(retv)
 .end
@@ -797,7 +797,7 @@ DONE:
   .local pmc retv
 
    # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispSymbol\0value"
-   getattribute retv, self, "value"
+   retv = getattribute self, "value"
 
   .return(retv)
 .end
@@ -815,7 +815,7 @@ DONE:
   .local pmc name
 
    # VALID_IN_PARROT_0_2_0 getattribute name, self, "LispSymbol\0name"
-   getattribute name, self, "name"
+   name = getattribute self, "name"
 
   .return(name)
 .end

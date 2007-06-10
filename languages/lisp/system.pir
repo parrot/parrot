@@ -472,7 +472,7 @@ DONE:
    # VALID_IN_PARROT_0_2_0 concat objt, objt, "\0"
    # VALID_IN_PARROT_0_2_0 concat attr, objt, attr
 
-   getattribute retv, symbol, attr
+   retv = getattribute symbol, attr
    if_null retv, NO_VALUE
    goto DONE
 
