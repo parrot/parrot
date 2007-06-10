@@ -1829,6 +1829,7 @@ HEADERIZER_O_FILES = \
 # Slowing working my way up to having everything headerized in $(HEADERIZER_O_FILES)
 HEADERIZER_O_FILES = \
     src/datatypes.o \
+    src/byteorder.o \
     src/gc/dod.o \
     src/gc/memory.o \
     src/gc/register.o \

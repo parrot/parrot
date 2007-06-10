@@ -11,7 +11,7 @@
 #ifndef PARROT_PACKFILE_H_GUARD
 #define PARROT_PACKFILE_H_GUARD
 
-#include <parrot/parrot.h>
+#include "parrot/parrot.h"
 
 #define PF_NCONST(pf)  ((pf)->const_table->const_count)
 #define PF_CONST(pf,i) ((pf)->const_table->constants[(i)])
@@ -413,20 +413,64 @@ void PackFile_assign_transforms(PackFile *pf);
 ** Byte Ordering Functions (byteorder.c)
 */
 
-INTVAL fetch_iv_le(INTVAL w);
-INTVAL fetch_iv_be(INTVAL w);
-opcode_t fetch_op_be(opcode_t w);
-opcode_t fetch_op_le(opcode_t w);
-void fetch_buf_be_4(unsigned char * rb, unsigned char * b);
-void fetch_buf_le_4(unsigned char * rb, unsigned char * b);
-void fetch_buf_be_8(unsigned char * rb, unsigned char * b);
-void fetch_buf_le_8(unsigned char * rb, unsigned char * b);
-void fetch_buf_le_12(unsigned char * rb, unsigned char * b);
-void fetch_buf_be_12(unsigned char * rb, unsigned char * b);
-void fetch_buf_le_16(unsigned char * rb, unsigned char * b);
-void fetch_buf_be_16(unsigned char * rb, unsigned char * b);
+/* HEADERIZER BEGIN: src/byteorder.c */
 
+void fetch_buf_be_12(
+    unsigned char *rb /*NN*/,
+    const unsigned char *b /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
+void fetch_buf_be_16(
+    unsigned char *rb /*NN*/,
+    const unsigned char *b /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void fetch_buf_be_4( unsigned char *rb /*NN*/, const unsigned char *b /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void fetch_buf_be_8( unsigned char *rb /*NN*/, const unsigned char *b )
+        __attribute__nonnull__(1);
+
+void fetch_buf_le_12(
+    unsigned char *rb /*NN*/,
+    const unsigned char *b /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void fetch_buf_le_16(
+    unsigned char *rb /*NN*/,
+    const unsigned char *b /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void fetch_buf_le_4( unsigned char *rb /*NN*/, const unsigned char *b /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void fetch_buf_le_8( unsigned char *rb /*NN*/, const unsigned char *b /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+INTVAL fetch_iv_be( INTVAL w )
+        __attribute__const__
+        __attribute__warn_unused_result__;
+
+INTVAL fetch_iv_le( INTVAL w )
+        __attribute__const__
+        __attribute__warn_unused_result__;
+
+opcode_t fetch_op_be( opcode_t w )
+        __attribute__const__
+        __attribute__warn_unused_result__;
+
+opcode_t fetch_op_le( opcode_t w )
+        __attribute__const__
+        __attribute__warn_unused_result__;
+
+/* HEADERIZER END: src/byteorder.c */
 
 #endif /* PARROT_PACKFILE_H_GUARD */
 

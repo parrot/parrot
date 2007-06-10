@@ -19,28 +19,26 @@ it in.
 
 Configure will have checked for supported word sizes.
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
+#include "parrot/packfile.h"
+
+/* HEADER: include/parrot/packfile.h */
 
 /*
 
-=item C<INTVAL fetch_iv_le(INTVAL w)>
+FUNCDOC: fetch_iv_le
 
 This function converts a 4 or 8 byte C<INTVAL> into little endian
 format. If the native format is already little endian, then no
 conversion is done.
 
-=cut
-
 */
 
 INTVAL
 fetch_iv_le(INTVAL w)
+    /* CONST,WARN_UNUSED */
 {
 #if !PARROT_BIGENDIAN
     return w;
@@ -65,17 +63,16 @@ fetch_iv_le(INTVAL w)
 
 /*
 
-=item C<INTVAL fetch_iv_be(INTVAL w)>
+FUNCDOC: fetch_iv_be
 
 This function converts a 4 or 8 byte C<INTVAL> into big endian format.
 If the native format is already big endian, then no conversion is done.
-
-=cut
 
 */
 
 INTVAL
 fetch_iv_be(INTVAL w)
+    /* CONST, WARN_UNUSED */
 {
 #if PARROT_BIGENDIAN
     return w;
@@ -99,18 +96,15 @@ fetch_iv_be(INTVAL w)
 
 /*
 
-=item C<opcode_t fetch_op_be(opcode_t w)>
+FUNCDOC: fetch_op_be
 
-=item C<opcode_t fetch_op_le(opcode_t w)>
-
-Same as above for C<opcode_t>.
-
-=cut
+Same as C<fetch_iv_be> for opcode_t
 
 */
 
 opcode_t
 fetch_op_be(opcode_t w)
+    /* CONST, WARN_UNUSED */
 {
 #if PARROT_BIGENDIAN
     return w;
@@ -134,8 +128,17 @@ fetch_op_be(opcode_t w)
 #endif
 }
 
+/*
+
+FUNCDOC: fetch_op_le
+
+Same as C<fetch_iv_le> for opcode_t
+
+*/
+
 opcode_t
 fetch_op_le(opcode_t w)
+    /* CONST, WARN_UNUSED */
 {
 #if !PARROT_BIGENDIAN
     return w;
@@ -160,33 +163,15 @@ fetch_op_le(opcode_t w)
 }
 
 /*
-
-=item C<void fetch_buf_be_4(unsigned char *rb, unsigned char *b)>
-
-=item C<void fetch_buf_le_4(unsigned char *rb, unsigned char *b)>
-
-=item C<void fetch_buf_be_8(unsigned char *rb, unsigned char *b)>
-
-=item C<void fetch_buf_le_8(unsigned char *rb, unsigned char *b)>
-
-=item C<void fetch_buf_le_12(unsigned char *rb, unsigned char *b)>
-
-=item C<void fetch_buf_be_12(unsigned char *rb, unsigned char *b)>
-
-=item C<void fetch_buf_le_16(unsigned char *rb, unsigned char *b)>
-
-=item C<void fetch_buf_be_16(unsigned char *rb, unsigned char *b)>
 
 Unrolled routines for swapping various sizes from 32-128 bits. These
 should only be used if alignment is unknown or we are pulling something
 out of a padded buffer.
 
-=cut
-
 */
 
 void
-fetch_buf_be_4(unsigned char *rb, unsigned char *b)
+fetch_buf_be_4(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 4);
@@ -199,7 +184,7 @@ fetch_buf_be_4(unsigned char *rb, unsigned char *b)
 }
 
 void
-fetch_buf_le_4(unsigned char *rb, unsigned char *b)
+fetch_buf_le_4(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 4);
@@ -212,7 +197,7 @@ fetch_buf_le_4(unsigned char *rb, unsigned char *b)
 }
 
 void
-fetch_buf_be_8(unsigned char *rb, unsigned char *b)
+fetch_buf_be_8(unsigned char *rb /*NN*/, const unsigned char *b)
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 8);
@@ -229,7 +214,7 @@ fetch_buf_be_8(unsigned char *rb, unsigned char *b)
 }
 
 void
-fetch_buf_le_8(unsigned char *rb, unsigned char *b)
+fetch_buf_le_8(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 8);
@@ -246,7 +231,7 @@ fetch_buf_le_8(unsigned char *rb, unsigned char *b)
 }
 
 void
-fetch_buf_le_12(unsigned char *rb, unsigned char *b)
+fetch_buf_le_12(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 12);
@@ -267,7 +252,7 @@ fetch_buf_le_12(unsigned char *rb, unsigned char *b)
 }
 
 void
-fetch_buf_be_12(unsigned char *rb, unsigned char *b)
+fetch_buf_be_12(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 12);
@@ -288,7 +273,7 @@ fetch_buf_be_12(unsigned char *rb, unsigned char *b)
 }
 
 void
-fetch_buf_le_16(unsigned char *rb, unsigned char *b)
+fetch_buf_le_16(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 16);
@@ -313,7 +298,7 @@ fetch_buf_le_16(unsigned char *rb, unsigned char *b)
 }
 
 void
-fetch_buf_be_16(unsigned char *rb, unsigned char *b)
+fetch_buf_be_16(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 16);
@@ -339,13 +324,9 @@ fetch_buf_be_16(unsigned char *rb, unsigned char *b)
 
 /*
 
-=back
-
 =head1 HISTORY
 
-Initial version by Melvin on 2002/05/1
-
-=cut
+Initial version by Melvin on 2002/05/01
 
 */
 
