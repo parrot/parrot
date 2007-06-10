@@ -194,6 +194,15 @@ PARROT_API void push_new_c_exception_handler( Interp *interp /*NN*/,
     Parrot_exception *jb )
         __attribute__nonnull__(1);
 
+PARROT_API void real_exception( Interp *interp /*NN*/,
+    void *ret_addr,
+    int exitcode,
+    const char *format /*NN*/,
+    ... )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4)
+        __attribute__noreturn__;
+
 PARROT_API opcode_t * rethrow_exception( Interp *interp /*NN*/,
     PMC *exception /*NN*/ )
         __attribute__nonnull__(1)
@@ -214,14 +223,6 @@ void do_panic( Interp *interp /*NULLOK*/,
 
 void Parrot_init_exceptions( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
-
-void real_exception( Interp *interp /*NN*/,
-    void *ret_addr,
-    int exitcode,
-    const char *format /*NN*/,
-    ... )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(4);
 
 void really_destroy_exception_list( Parrot_exception *e /*NULLOK*/ );
 void rethrow_c_exception( Interp *interp /*NN*/ )

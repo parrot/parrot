@@ -636,9 +636,11 @@ C<throw_exception>, which calls the handler.
 
 */
 
+PARROT_API
 void
 real_exception(Interp *interp /*NN*/, void *ret_addr,
         int exitcode, const char *format /*NN*/, ...)
+    /* NORETURN */
 {
     STRING *msg;
     Parrot_exception * const the_exception = interp->exceptions;
