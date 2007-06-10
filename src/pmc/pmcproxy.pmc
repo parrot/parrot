@@ -133,6 +133,8 @@ Mark any referenced strings and PMCs in the structure as live.
             pobject_lives(interp, (PObj*)_pmc->parents);
         if (_pmc->all_parents)
             pobject_lives(interp, (PObj*)_pmc->all_parents);
+        if (_pmc->methods)
+            pobject_lives(interp, (PObj*)_pmc->methods);
     }
 
 /*
