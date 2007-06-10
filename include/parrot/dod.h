@@ -111,7 +111,6 @@ extern int CONSERVATIVE_POINTER_CHASING;
 
 /* GC subsystem init functions */
 PARROT_API void parrot_gc_gms_pobject_lives(Interp *interp, PObj *obj);
-PARROT_API void Parrot_gc_ms_init(Interp *interp);
 PARROT_API void Parrot_gc_ims_init(Interp *interp);
 PARROT_API void Parrot_gc_gms_init(Interp *interp);
 
