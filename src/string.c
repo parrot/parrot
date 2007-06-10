@@ -43,9 +43,9 @@ strings.
 
 
 #define saneify_string(s) \
-    assert(s->encoding && \
-           s->charset && \
-           !PObj_on_free_list_TEST(s))
+    assert(s->encoding); \
+    assert(s->charset); \
+    assert(!PObj_on_free_list_TEST(s))
 
 /* HEADER: include/parrot/string_funcs.h */
 
