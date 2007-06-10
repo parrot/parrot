@@ -1817,7 +1817,7 @@ tags.dummy:
 # This target will eventually create all the headers automatically.
 # If you are having problems with linkage in Win32 (or elsewhere), because something
 # is not PARROT_API, but should be, then put PARROT_API in the C file and 
-# run "make hwork".  The .h file will get updated.
+# run "make headerizer".  The .h file will get updated.
 
 HEADERIZER_O_FILES = \
     $(INTERP_O_FILES) \
