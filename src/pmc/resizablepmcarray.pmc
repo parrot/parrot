@@ -679,8 +679,8 @@ everything via the VTABLE api.
 */
 
     void splice(PMC* value, INTVAL offset, INTVAL count) {
-        INTVAL length = VTABLE_elements(INTERP, SELF);
-        INTVAL elems  = VTABLE_elements(INTERP, value);
+        const INTVAL length = VTABLE_elements(INTERP, SELF);
+        const INTVAL elems  = VTABLE_elements(INTERP, value);
         INTVAL shift  = elems - count;
         INTVAL i;
 

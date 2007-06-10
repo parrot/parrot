@@ -37,9 +37,13 @@ PARROT_API void Parrot_create_mro( Interp *interp /*NN*/, INTVAL type )
 PARROT_API void Parrot_create_pmc_proxy( Interp* interp /*NN*/, int type_num )
         __attribute__nonnull__(1);
 
-PARROT_API PMC * pmc_new( Interp *interp, INTVAL base_type );
+PARROT_API PMC * pmc_new( Interp *interp /*NN*/, INTVAL base_type )
+        __attribute__nonnull__(1);
+
 PARROT_API PMC * pmc_new_init( Interp *interp, INTVAL base_type, PMC *init );
-PARROT_API PMC * pmc_new_noinit( Interp *interp, INTVAL base_type );
+PARROT_API PMC * pmc_new_noinit( Interp *interp /*NN*/, INTVAL base_type )
+        __attribute__nonnull__(1);
+
 PARROT_API INTVAL pmc_register( Interp* interp /*NN*/, STRING *name )
         __attribute__nonnull__(1);
 
