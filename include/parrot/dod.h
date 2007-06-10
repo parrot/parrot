@@ -83,11 +83,11 @@ PARROT_API int Parrot_dod_trace_children( Interp *interp /*NN*/,
 PARROT_API int Parrot_dod_trace_root( Interp *interp /*NN*/, int trace_stack )
         __attribute__nonnull__(1);
 
-void clear_cow( Interp *interp, Small_Object_Pool *pool /*NN*/, int cleanup )
+PARROT_API void pobject_lives( Interp *interp /*NN*/, PObj *obj /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void pobject_lives( Interp *interp /*NN*/, PObj *obj /*NN*/ )
-        __attribute__nonnull__(1)
+void clear_cow( Interp *interp, Small_Object_Pool *pool /*NN*/, int cleanup )
         __attribute__nonnull__(2);
 
 void trace_mem_block( Interp *interp /*NN*/,

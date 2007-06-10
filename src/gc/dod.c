@@ -130,6 +130,7 @@ mark_special(Interp *interp /*NN*/, PMC *obj /*NN*/)
     }
 }
 
+PARROT_API
 void
 pobject_lives(Interp *interp /*NN*/, PObj *obj /*NN*/)
 {
