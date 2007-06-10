@@ -130,12 +130,16 @@ mark_special(Interp *interp /*NN*/, PMC *obj /*NN*/)
     }
 }
 
-#if !PARROT_GC_GMS
-
-/* XXX This should really use the same header, with different guts #ifdeffed */
 void
 pobject_lives(Interp *interp /*NN*/, PObj *obj /*NN*/)
 {
+#if PARROT_GC_GMS
+    do {
+        if (!PObj_live_TEST(obj) && \
+                PObj_to_GMSH(obj)->gen->gen_no >= interp->gc_generation) \
+            parrot_gc_gms_pobject_lives(interp, obj); \
+    } while (0);
+#else /* not PARROT_GC_GMS */
     /* if object is live or on free list return */
     if (PObj_is_live_or_free_TESTALL(obj)) {
         return;
@@ -180,9 +184,8 @@ pobject_lives(Interp *interp /*NN*/, PObj *obj /*NN*/)
                 obj, PObj_bufstart((Buffer*) obj));
     }
 #  endif
-}
-
 #endif  /* PARROT_GC_GMS */
+}
 
 /*
 
@@ -199,6 +202,7 @@ C<trace_stack> can have these values:
 
 */
 
+PARROT_API
 int
 Parrot_dod_trace_root(Interp *interp /*NN*/, int trace_stack)
 {
@@ -332,6 +336,7 @@ Returns whether the tracing process completed.
 
 */
 
+PARROT_API
 int
 Parrot_dod_trace_children(Interp *interp /*NN*/, size_t how_many)
 {
@@ -521,6 +526,7 @@ are immune from collection (i.e. constant).
 
 */
 
+PARROT_API
 void
 Parrot_dod_sweep(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
 {
@@ -805,6 +811,7 @@ clear_live_bits(Interp *interp /*NULLOK*/, Small_Object_Pool *pool /*NN*/)
 
 }
 
+PARROT_API
 void
 Parrot_dod_clear_live_bits(Interp *interp /*NN*/)
 {
@@ -820,6 +827,7 @@ Records the start time of a DOD run when profiling is enabled.
 
 */
 
+PARROT_API
 void
 Parrot_dod_profile_start(Interp *interp /*NN*/)
 {
@@ -836,6 +844,7 @@ Also record start time of next part.
 
 */
 
+PARROT_API
 void
 Parrot_dod_profile_end(Interp *interp /*NN*/, int what)
 {
@@ -867,6 +876,7 @@ Prepare for a mark & sweep DOD run.
 
 */
 
+PARROT_API
 void
 Parrot_dod_ms_run_init(Interp *interp /*NN*/)
 {
@@ -911,6 +921,7 @@ Run the stop-the-world mark & sweep collector.
 
 */
 
+PARROT_API
 void
 Parrot_dod_ms_run(Interp *interp /*NN*/, int flags)
 {

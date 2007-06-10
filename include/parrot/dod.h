@@ -51,53 +51,69 @@ enum {
                                              set, i.e. registers */
 };
 
-PARROT_API void Parrot_do_dod_run(Interp *, UINTVAL flags);
-void trace_system_areas(Interp *);
-void trace_mem_block(Interp *, size_t, size_t);
+/* HEADERIZER BEGIN: src/gc/dod.c */
 
-void free_unused_pobjects(Interp *interp,
-                    struct Small_Object_Pool *pool);
+PARROT_API void Parrot_do_dod_run( Interp *interp /*NN*/, UINTVAL flags )
+        __attribute__nonnull__(1);
 
-void used_cow(Interp *interp,
-        struct Small_Object_Pool *pool, int cleanup);
-void clear_cow(Interp *interp,
-        struct Small_Object_Pool *pool, int cleanup);
+PARROT_API void Parrot_dod_clear_live_bits( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
 
-/* mark a PObj live during DOD */
+PARROT_API void Parrot_dod_ms_run( Interp *interp /*NN*/, int flags )
+        __attribute__nonnull__(1);
 
-#if PARROT_GC_GMS
-#  define pobject_lives(i, o) do { \
-    if (!PObj_live_TEST(o) && \
-            PObj_to_GMSH(o)->gen->gen_no >= i->gc_generation) \
-        parrot_gc_gms_pobject_lives(i, o); \
-  } while (0)
+PARROT_API void Parrot_dod_ms_run_init( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
 
-PARROT_API void parrot_gc_gms_pobject_lives(Interp *interp, PObj *obj);
+PARROT_API void Parrot_dod_profile_end( Interp *interp /*NN*/, int what )
+        __attribute__nonnull__(1);
 
-#else
-PARROT_API void pobject_lives(Interp *interp, PObj *buffer);
-#endif
+PARROT_API void Parrot_dod_profile_start( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+PARROT_API void Parrot_dod_sweep( Interp *interp /*NN*/,
+    Small_Object_Pool *pool /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API int Parrot_dod_trace_children( Interp *interp /*NN*/,
+    size_t how_many )
+        __attribute__nonnull__(1);
+
+PARROT_API int Parrot_dod_trace_root( Interp *interp /*NN*/, int trace_stack )
+        __attribute__nonnull__(1);
+
+void clear_cow( Interp *interp, Small_Object_Pool *pool /*NN*/, int cleanup )
+        __attribute__nonnull__(2);
+
+void pobject_lives( Interp *interp /*NN*/, PObj *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void trace_mem_block( Interp *interp /*NN*/,
+    size_t lo_var_ptr,
+    size_t hi_var_ptr )
+        __attribute__nonnull__(1);
+
+void used_cow( Interp *interp, Small_Object_Pool *pool /*NN*/, int cleanup )
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: src/gc/dod.c */
+
+/* XXX Needs to go into another header */
+void trace_system_areas(Interp *interp /*NN*/);
 
 #if ! DISABLE_GC_DEBUG
 /* Set when walking the system stack */
 extern int CONSERVATIVE_POINTER_CHASING;
 #endif
 
-PARROT_API int Parrot_dod_trace_root(Interp *, int trace_stack);
-PARROT_API int Parrot_dod_trace_children(Interp *, size_t how_many);
-PARROT_API void Parrot_dod_sweep(Interp *, struct Small_Object_Pool *pool);
-PARROT_API void Parrot_dod_ms_run_init(Interp *interp);
-PARROT_API void Parrot_dod_clear_live_bits(Interp*);
-
-PARROT_API void Parrot_dod_profile_start(Parrot_Interp interp);
-PARROT_API void Parrot_dod_profile_end(Parrot_Interp interp, int what);
 
 /* GC subsystem init functions */
+PARROT_API void parrot_gc_gms_pobject_lives(Interp *interp, PObj *obj);
 PARROT_API void Parrot_gc_ms_init(Interp *interp);
 PARROT_API void Parrot_gc_ims_init(Interp *interp);
 PARROT_API void Parrot_gc_gms_init(Interp *interp);
-/* do_dod_run function for MS */
-PARROT_API void Parrot_dod_ms_run(Interp *interp, int flags);
 
 PARROT_API void Parrot_dod_ims_wb(Interp*, PMC *, PMC *);
 /*
