@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 $Id$
@@ -12,15 +12,13 @@ src/packout.c - Functions for writing out packfiles
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 #include "parrot/packfile.h"
 #include <assert.h>
+
+/* HEADER: include/parrot/packfile.h */
 
 /***************************************
 Determine the size of the buffer needed in order to pack the PackFile into a
@@ -29,20 +27,7 @@ contiguous region of memory.
 
 #define TRACE_PACKFILE_PMC 0
 
-/* XXX This should be in an external file */
-extern PackFile_Directory *directory_new(Interp *interp, PackFile *pf);
-
-/*
-
-=item C<opcode_t
-PackFile_pack_size(Interp *interp, PackFile *self)>
-
-Description.
-
-=cut
-
-*/
-
+PARROT_API
 opcode_t
 PackFile_pack_size(Interp *interp, PackFile *self)
 {
@@ -61,8 +46,7 @@ PackFile_pack_size(Interp *interp, PackFile *self)
 
 /*
 
-=item C<void
-PackFile_pack(Interp*, PackFile *self, opcode_t *cursor)>
+FUNCDOC: PackFile_pack
 
 Pack the PackFile into a contiguous region of memory.
 
@@ -74,12 +58,11 @@ C<PackFile_pack()>
 
 Other pack routines are in F<src/packfile.c>.
 
-=cut
-
 */
 
+PARROT_API
 void
-PackFile_pack(Interp *interp, PackFile *self, opcode_t *cursor)
+PackFile_pack(Interp *interp, PackFile *self /*NN*/, opcode_t *cursor /*NN*/)
 {
     opcode_t *ret;
 
@@ -110,18 +93,16 @@ PackFile_pack(Interp *interp, PackFile *self, opcode_t *cursor)
 
 /*
 
-=item C<size_t
-PackFile_ConstTable_pack_size(PackFile_Segment *seg)>
+PackFile_ConstTable_pack_size
 
 Determine the size of the buffer needed in order to pack the PackFile
 constant table into a contiguous region of memory.
 
-=cut
-
 */
 
+PARROT_API
 size_t
-PackFile_ConstTable_pack_size(Interp *interp, PackFile_Segment *seg)
+PackFile_ConstTable_pack_size(Interp *interp, PackFile_Segment *seg /*NN*/)
 {
     opcode_t i;
     PackFile_ConstTable* const self = (PackFile_ConstTable *) seg;
@@ -134,8 +115,7 @@ PackFile_ConstTable_pack_size(Interp *interp, PackFile_Segment *seg)
 
 /*
 
-=item C<opcode_t *PackFile_ConstTable_pack(Interp *, PackFile_Segment *seg,
-                                           opcode_t *cursor)>
+FUNCDOC: PackFile_ConstTable_pack
 
 Pack the PackFile ConstTable into a contiguous region of memory.
 
@@ -145,13 +125,12 @@ indicated by C<PackFile_pack_size()>.
 This means that you MUST call C<PackFile_pack_size()> before
 C<PackFile_ConstTable_pack()>
 
-=cut
-
 */
 
+PARROT_API
 opcode_t *
 PackFile_ConstTable_pack(Interp *interp,
-        PackFile_Segment *seg, opcode_t *cursor)
+        PackFile_Segment *seg /*NN*/, opcode_t *cursor)
 {
     PackFile_ConstTable * const self = (PackFile_ConstTable *)seg;
     opcode_t i;
@@ -167,18 +146,16 @@ PackFile_ConstTable_pack(Interp *interp,
 
 /*
 
-=item C<static int
-find_in_const(Interp *interp, PMC *key, int type)>
+FUNCDOC: find_in_const
 
 This is really ugly, we don't know where our C<PARROT_ARG_SC> key
 constant is in constant table, so we have to search for it.
 
-=cut
-
 */
 
+PARROT_API
 int
-PackFile_find_in_const(Interp *interp, PackFile_ConstTable *ct, PMC *key,
+PackFile_find_in_const(Interp *interp, PackFile_ConstTable *ct /*NN*/, PMC *key,
                        int type)
 {
     int i;
@@ -196,9 +173,7 @@ PackFile_find_in_const(Interp *interp, PackFile_ConstTable *ct, PMC *key,
 
 /*
 
-=item C<opcode_t *
-PackFile_Constant_pack(Interp*, PackFile_ConstTable * const_table,
-                       PackFile_Constant *self, opcode_t *cursor)>
+FUNCDOC: PackFile_Constant_pack
 
 Pack a PackFile Constant into a contiguous region of memory.
 
@@ -211,10 +186,9 @@ C<PackFile_Constant_pack()>
 The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 (Note this padding is not yet implemented for FLOATVALs.)
 
-=cut
-
 */
 
+PARROT_API
 opcode_t *
 PackFile_Constant_pack(Interp* interp, PackFile_ConstTable * const_table,
         PackFile_Constant *self, opcode_t *cursor)
@@ -314,16 +288,12 @@ PackFile_Constant_pack(Interp* interp, PackFile_ConstTable * const_table,
 
 /*
 
-=back
-
 =head1 HISTORY
 
 Rework by Melvin; new bytecode format, make bytecode portable. (Do
 endian conversion and wordsize transforms on the fly.)
 
 leo: rewrite to use new directory-based format.
-
-=cut
 
 */
 

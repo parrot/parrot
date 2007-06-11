@@ -42,7 +42,8 @@ PARROT_API INTVAL Parrot_byte_rindex( Interp *interp,
     const STRING *search /*NN*/,
     UINTVAL start_offset )
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
 
 PARROT_API void Parrot_destroy_cpa( char **array /*NN*/ )
         __attribute__nonnull__(1);
