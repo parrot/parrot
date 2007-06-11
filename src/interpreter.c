@@ -894,8 +894,8 @@ dynop_register(Parrot_Interp interp, PMC* lib_pmc)
      * the base names of this lib and the previous one are the same
      */
     if (interp->n_libs >= 2 &&
-            !strcmp(interp->all_op_libs[interp->n_libs-2]->name,
-                lib->name)) {
+            (strcmp(interp->all_op_libs[interp->n_libs-2]->name,
+                lib->name) == 0) ) {
         /* registering is handled below */
         return;
     }

@@ -75,7 +75,7 @@ Parrot_find_encoding(Interp *interp, const char *encodingname)
 
     n = all_encodings->n_encodings;
     for (i = 0; i < n; ++i) {
-        if (!strcmp(all_encodings->enc[i].encoding->name, encodingname)) {
+        if (strcmp(all_encodings->enc[i].encoding->name, encodingname) == 0) {
             return all_encodings->enc[i].encoding;
         }
     }
@@ -166,7 +166,7 @@ register_encoding(Interp *interp, const char *encodingname,
 
     n = all_encodings->n_encodings;
     for (i = 0; i < n; ++i) {
-        if (!strcmp(all_encodings->enc[i].encoding->name, encodingname))
+        if (strcmp(all_encodings->enc[i].encoding->name, encodingname) == 0)
             return 0;
     }
     /*
@@ -195,7 +195,7 @@ Parrot_register_encoding(Interp *interp, const char *encodingname,
         all_encodings->n_encodings = 0;
         all_encodings->enc = NULL;
     }
-    if (!strcmp("fixed_8", encodingname)) {
+    if (strcmp("fixed_8", encodingname) == 0) {
         Parrot_fixed_8_encoding_ptr = encoding;
         if (!Parrot_default_encoding_ptr) {
             Parrot_default_encoding_ptr = encoding;
@@ -203,15 +203,15 @@ Parrot_register_encoding(Interp *interp, const char *encodingname,
         }
         return register_encoding(interp, encodingname, encoding);
     }
-    if (!strcmp("utf8", encodingname)) {
+    if (strcmp("utf8", encodingname) == 0) {
         Parrot_utf8_encoding_ptr = encoding;
         return register_encoding(interp, encodingname, encoding);
     }
-    if (!strcmp("utf16", encodingname)) {
+    if (strcmp("utf16", encodingname) == 0) {
         Parrot_utf16_encoding_ptr = encoding;
         return register_encoding(interp, encodingname, encoding);
     }
-    if (!strcmp("ucs2", encodingname)) {
+    if (strcmp("ucs2", encodingname) == 0) {
         Parrot_ucs2_encoding_ptr = encoding;
         return register_encoding(interp, encodingname, encoding);
     }

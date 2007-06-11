@@ -223,19 +223,19 @@ Parrot_register_charset(Interp *interp, const char *charsetname,
         all_charsets->n_charsets = 0;
         all_charsets->set = NULL;
     }
-    if (!strcmp("binary", charsetname)) {
+    if (strcmp("binary", charsetname) == 0) {
         Parrot_binary_charset_ptr = charset;
         return register_charset(interp, charsetname, charset);
     }
-    if (!strcmp("iso-8859-1", charsetname)) {
+    if (strcmp("iso-8859-1", charsetname) == 0) {
         Parrot_iso_8859_1_charset_ptr = charset;
         return register_charset(interp, charsetname, charset);
     }
-    if (!strcmp("unicode", charsetname)) {
+    if (strcmp("unicode", charsetname) == 0) {
         Parrot_unicode_charset_ptr = charset;
         return register_charset(interp, charsetname, charset);
     }
-    if (!strcmp("ascii", charsetname)) {
+    if (strcmp("ascii", charsetname) == 0) {
         if (!Parrot_default_charset_ptr) {
             Parrot_default_charset_ptr = charset;
         }

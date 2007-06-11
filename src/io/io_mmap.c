@@ -104,7 +104,7 @@ PIO_mmap_open(Interp *interp, ParrotIOLayer *layer,
 
     if (!l) {
         l = interp->piodata->default_stack;
-        if (!strcmp(l->name, "buf"))
+        if (strcmp(l->name, "buf") == 0)
             l = PIO_DOWNLAYER(l);
     }
     io = PIO_open_down(interp, l, path, flags);

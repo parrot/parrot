@@ -580,6 +580,7 @@ PARROT_API
 INTVAL
 Parrot_byte_rindex(Interp *interp, const STRING *base /*NN*/,
         const STRING *search /*NN*/, UINTVAL start_offset)
+    /* WARN_UNUSED */
 {
     const INTVAL searchlen = search->strlen;
     const char * const search_start = search->strstart;
@@ -592,7 +593,7 @@ Parrot_byte_rindex(Interp *interp, const STRING *base /*NN*/,
     for (current_offset = max_possible_offset; current_offset >= 0;
             current_offset--) {
         const char * const base_start = (char *)base->strstart + current_offset;
-        if (!memcmp(base_start, search_start, searchlen)) {
+        if (memcmp(base_start, search_start, searchlen) == 0) {
             return current_offset;
         }
     }

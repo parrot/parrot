@@ -398,7 +398,7 @@ Parrot_MMD_method_idx(Interp *interp, const char *name)
     INTVAL i;
 
     for (i = 0; i < MMD_USER_FIRST; ++i) {
-        if (!strcmp(Parrot_mmd_func_names[i], name))
+        if (strcmp(Parrot_mmd_func_names[i], name) == 0)
             return i;
     }
 

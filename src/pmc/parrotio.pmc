@@ -77,14 +77,14 @@ Opens the file with the given mode, using the given IO layer.
         if (!pio || !PMC_struct_val(pio))
             return pmc_new(INTERP, enum_class_Undef);
         if (l) {
-            ParrotIO *io = (ParrotIO *)PMC_data(pio);
-            int is_mmap = strcmp(c_layer, "mmap") == 0;
+            ParrotIO * const io = (ParrotIO *)PMC_data(pio);
+            const int is_mmap = strcmp(c_layer, "mmap") == 0;
             /*
              * XXX move this into the layer
              */
             if ((is_mmap && (io->b.flags & PIO_BF_MMAP)) || !is_mmap) {
                 l = interp->piodata->default_stack;
-                if (!strcmp(l->name, "buf"))
+                if (strcmp(l->name, "buf") == 0)
                     l = l->down;
                 /* XXX layer is stored twice - which is used when */
                 io->stack           = l;

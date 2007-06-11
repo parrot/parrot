@@ -311,7 +311,7 @@ symbol_list_find(Parrot_exec_objfile_t *obj /*NN*/, const char *symbol /*NN*/)
     int i;
 
     for (i = 0; i < obj->symbol_count; i++)
-        if (!strcmp(symbol, obj->symbol_table[i].symbol))
+        if (strcmp(symbol, obj->symbol_table[i].symbol) == 0)
             return i;
     return -1;
 }

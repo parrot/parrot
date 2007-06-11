@@ -282,7 +282,7 @@ main(int argc, char *argv[]) {
 
     prog = usage;
     if (argc > 1) {
-        if (!strcmp(argv[1], "mops"))
+        if (strcmp(argv[1], "mops") == 0)
             prog = mops;
     }
     init(interpreter, prog);
