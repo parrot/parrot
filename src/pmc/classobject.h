@@ -43,6 +43,12 @@ typedef struct Parrot_Object {
 /* Fully qualified class name generation; defined in Class, used by Object. */
 STRING* Parrot_Class_get_fq_classname(Parrot_Interp interp, Parrot_Class *class_info);
 
+/* We have a flag to mark if the class inherits from anything from a different
+ * class universe (for example, a PMC). */
+#define PObj_HasAlienParents_FLAG PObj_private0_FLAG
+#define PObj_HasAlienParents_TEST(o) PObj_flag_TEST(HasAlienParents, o)
+#define PObj_HasAlienParents_SET(o) PObj_flag_SET(HasAlienParents, o)
+
 #endif /* PARROT_CLASSOBJECT_H_GUARD */
 
 

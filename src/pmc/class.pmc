@@ -962,6 +962,19 @@ parameter list.
             build_attrib_index(interp, SELF);
             if (PMC_IS_NULL(_class->attrib_index))
                 return;
+
+            /* See if we have any parents from other universes and if so set a
+             * flag stating so. */
+            mro_length = VTABLE_elements(interp, _class->all_parents);
+            for (i = 0; i < mro_length; i++) {
+                PMC * const class_check = VTABLE_get_pmc_keyed_int(interp,
+                    _class->all_parents, i);
+                if (!VTABLE_isa(interp, class_check, CONST_STRING(interp, "Class"))) {
+                    /* Found one; that's enough. */
+                    PObj_HasAlienParents_SET(SELF);
+                    break;
+                }
+            }
         }
 
         /* Set instantiated flag. */
@@ -992,24 +1005,25 @@ parameter list.
             VTABLE_set_attr_str(interp, obj, attr_name, attr_value);
         }
 
-        /* We may have parents that are out of this class universe. Check the
-         * MRO for them, and if so create instances of them. Would be nice to
-         * optimize this away, using a flag or something. */
-        mro_length = VTABLE_elements(interp, _class->all_parents);
-        for (i = 0; i < mro_length; i++) {
-            PMC * const class_check = VTABLE_get_pmc_keyed_int(interp,
-                _class->all_parents, i);
-            if (!VTABLE_isa(interp, class_check, CONST_STRING(interp, "Class"))) {
-                /* From another universe. Create instance... */
-                PMC *parent_ins;
-                int position;
-                (PMC *parent_ins) = PCCINVOKE(interp, class_check, "new");
+        /* If we have parents that are out of this class universe, find them
+         * in the MRO and create instances of them. */
+        if (PObj_HasAlienParents_TEST(SELF)) {
+            mro_length = VTABLE_elements(interp, _class->all_parents);
+            for (i = 0; i < mro_length; i++) {
+                PMC * const class_check = VTABLE_get_pmc_keyed_int(interp,
+                    _class->all_parents, i);
+                if (!VTABLE_isa(interp, class_check, CONST_STRING(interp, "Class"))) {
+                    /* From another universe. Create instance... */
+                    PMC *parent_ins;
+                    int position;
+                    (PMC *parent_ins) = PCCINVOKE(interp, class_check, "new");
 
-                /* ...and tack on end of the attribute store (after all the
-                 * slots for attributes). */
-                position = VTABLE_elements(interp, obj_guts->attrib_store);
-                VTABLE_set_pmc_keyed_int(interp, obj_guts->attrib_store,
-                    position, class_check);
+                    /* ...and tack on end of the attribute store (after all the
+                     * slots for attributes). */
+                    position = VTABLE_elements(interp, obj_guts->attrib_store);
+                    VTABLE_set_pmc_keyed_int(interp, obj_guts->attrib_store,
+                        position, class_check);
+                }
             }
         }
 
