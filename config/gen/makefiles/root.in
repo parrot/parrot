@@ -1831,6 +1831,7 @@ HEADERIZER_O_FILES = \
     src/datatypes.o \
     src/byteorder.o \
     src/exceptions.o \
+    src/exit.o \
     src/gc/dod.o \
     src/gc/memory.o \
     src/gc/register.o \

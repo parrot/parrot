@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -15,28 +15,25 @@ called by C<Parrot_exit()> when the interpreter exits.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include <stdlib.h>
+#include "parrot/parrot.h"
 
-#include <parrot/parrot.h>
+/* HEADER: include/parrot/exit.h */
 
 /*
 
-=item C<int Parrot_on_exit(Interp *, exit_handler_f func, void *arg)>
+FUNCDOC: Parrot_on_exit
 
 Register the specified function to be called on exit.
 
-=cut
-
 */
 
+PARROT_API
 int
-Parrot_on_exit(Interp *interp, exit_handler_f function, void *arg) {
+Parrot_on_exit(Interp *interp /*NN*/, exit_handler_f function /*NN*/, void *arg)
+{
     /* XXX  we might want locking around the list access.   I'm sure this
      * will be the least of the threading issues. */
 
@@ -51,33 +48,33 @@ Parrot_on_exit(Interp *interp, exit_handler_f function, void *arg) {
 
 /*
 
-=item C<void Parrot_exit(int status)>
+FUNCDOC: Parrot_exit
 
 Exit, calling any registered exit handlers.
 
-=cut
-
 */
 
+PARROT_API
 void
-Parrot_exit(Interp *interp, int status) {
-    handler_node_t * next, *node;
+Parrot_exit(Interp *interp /*NN*/, int status)
+    /* NORETURN */
+{
     /* call all the exit handlers */
-
     /* we are well "below" the runloop now, where lo_var_ptr
      * is set usually - exit handlers may run some resource-hungry
      * stuff like printing profile stats - a DOD run would kill
      * resources - TODO reset stacktop or better disable GC
      */
-    node = interp->exit_handler_list;
     /*
      * we don't allow new exit_handlers being installed inside exit handlers
      * - do we?
      * and: interp->exit_handler_list is gone, after the last exit handler
      *      (Parrot_really_destroy) has run
      */
+    handler_node_t *node = interp->exit_handler_list;
     while (node) {
-        next = node->next;
+        handler_node_t * const next = node->next;
+
         (node->function)(interp, status, node->arg);
         mem_sys_free(node);
         node = next;
@@ -88,8 +85,6 @@ Parrot_exit(Interp *interp, int status) {
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/exit.h> and F<t/src/exit.t>.
@@ -97,8 +92,6 @@ F<include/parrot/exit.h> and F<t/src/exit.t>.
 =head1 HISTORY
 
 Initial version by Josh Wilmes.
-
-=cut
 
 */
 
