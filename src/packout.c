@@ -29,7 +29,7 @@ contiguous region of memory.
 
 PARROT_API
 opcode_t
-PackFile_pack_size(Interp *interp, PackFile *self)
+PackFile_pack_size(Interp *interp, PackFile *self /*NN*/)
 {
     opcode_t size;
     PackFile_Directory * const dir = &self->directory;
@@ -155,7 +155,7 @@ constant is in constant table, so we have to search for it.
 
 PARROT_API
 int
-PackFile_find_in_const(Interp *interp, PackFile_ConstTable *ct /*NN*/, PMC *key,
+PackFile_find_in_const(Interp *interp, PackFile_ConstTable *ct /*NN*/, PMC *key /*NN*/,
                        int type)
 {
     int i;
@@ -191,7 +191,7 @@ The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 PARROT_API
 opcode_t *
 PackFile_Constant_pack(Interp* interp, PackFile_ConstTable * const_table,
-        PackFile_Constant *self, opcode_t *cursor)
+        PackFile_Constant *self, opcode_t *cursor /*NN*/)
 {
     PMC *key;
     size_t i;

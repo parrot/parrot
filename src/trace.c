@@ -143,7 +143,7 @@ Prints a key to C<stderr>, returns the length of the output.
 */
 
 int
-trace_key_dump(Interp *interp, const PMC *key)
+trace_key_dump(Interp *interp /*NN*/, const PMC *key)
 {
     Interp * const debugger = interp->debugger;
 

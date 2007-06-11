@@ -241,7 +241,8 @@ typedef enum {
 PARROT_API opcode_t * PackFile_Constant_pack( Interp* interp,
     PackFile_ConstTable * const_table,
     PackFile_Constant *self,
-    opcode_t *cursor );
+    opcode_t *cursor /*NN*/ )
+        __attribute__nonnull__(4);
 
 PARROT_API opcode_t * PackFile_ConstTable_pack( Interp *interp,
     PackFile_Segment *seg /*NN*/,
@@ -254,9 +255,10 @@ PARROT_API size_t PackFile_ConstTable_pack_size( Interp *interp,
 
 PARROT_API int PackFile_find_in_const( Interp *interp,
     PackFile_ConstTable *ct /*NN*/,
-    PMC *key,
+    PMC *key /*NN*/,
     int type )
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API void PackFile_pack( Interp *interp,
     PackFile *self /*NN*/,
@@ -264,7 +266,10 @@ PARROT_API void PackFile_pack( Interp *interp,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API opcode_t PackFile_pack_size( Interp *interp, PackFile *self );
+PARROT_API opcode_t PackFile_pack_size( Interp *interp,
+    PackFile *self /*NN*/ )
+        __attribute__nonnull__(2);
+
 /* HEADERIZER END: src/packout.c */
 
 /* HEADERIZER BEGIN: src/packfile.c */
