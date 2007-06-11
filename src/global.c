@@ -541,7 +541,7 @@ store_sub_in_multi(Parrot_Interp interp, PMC *sub, PMC *ns)
 }
 
 void
-Parrot_store_sub_in_namespace(Parrot_Interp interp, PMC *sub)
+Parrot_store_sub_in_namespace(Interp *interp /*NN*/, PMC *sub)
 {
     INTVAL cur_id = CONTEXT(interp->ctx)->current_HLL;
     PMC *ns;

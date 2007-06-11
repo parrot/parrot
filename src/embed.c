@@ -262,7 +262,7 @@ Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 */
 
 PackFile *
-Parrot_readbc(Interp *interp, const char *fullname)
+Parrot_readbc(Interp *interp, const char *fullname /*NULLOK*/)
 {
     INTVAL program_size, wanted;
     char *program_code;
