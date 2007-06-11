@@ -365,7 +365,7 @@ Returns the PMC type for C<name>.
 
 PARROT_API
 INTVAL
-pmc_type(Interp* interp /*NN*/, STRING *name)
+pmc_type(Interp* interp /*NN*/, STRING *name /*NN*/)
     /* PURE, WARN_UNUSED */
 {
     PMC * const classname_hash = interp->class_hash;
@@ -388,7 +388,7 @@ Returns the PMC type for C<name>.
 
 PARROT_API
 INTVAL
-pmc_type_p(Interp* interp /*NN*/, PMC *name)
+pmc_type_p(Interp* interp /*NN*/, PMC *name /*NN*/)
 {
     PMC * const classname_hash = interp->class_hash;
     PMC * const item = (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
