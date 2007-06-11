@@ -40,7 +40,7 @@ my @test_cases = (
       q{1},
     ],
     [ q{ ( print ( cdr ( cons 1 2 )) ) },
-      q{(2)},
+      q{2},
     ],
     [ q{ ( setq asdf 1234 ) ( print asdf ) },
       q{1234},
