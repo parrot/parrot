@@ -35,15 +35,13 @@ void PackFile_Fixup_dump(Interp *, PackFile_FixupTable *ft);
 
 /*
 
-=item C<void
-PackFile_ConstTable_dump(Interp *interp, PackFile_ConstTable *self)>
+FUNCDOC: PackFile_ConstTable_dump
 
 Dumps the constant table C<self>.
 
-=cut
-
 */
 
+PARROT_API
 void
 PackFile_ConstTable_dump(Interp *interp, PackFile_ConstTable *self)
 {

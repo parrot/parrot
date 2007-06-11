@@ -631,7 +631,7 @@ Fetch a cstring from bytecode and return an allocated copy
 */
 
 char *
-PF_fetch_cstring(PackFile *pf, opcode_t **cursor)
+PF_fetch_cstring(PackFile *pf, opcode_t **cursor /*NN*/)
 {
     size_t str_len = strlen ((char *)(*cursor)) + 1;
     char *p = (char *)mem_sys_allocate(str_len);

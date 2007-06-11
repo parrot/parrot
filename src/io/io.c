@@ -1000,7 +1000,7 @@ Writes C<*s> to C<*pmc>. Parrot string version.
 */
 
 INTVAL
-PIO_putps(Interp *interp, PMC *pmc, STRING *s /*NULLOK*/)
+PIO_putps(Interp *interp /*NN*/, PMC *pmc, STRING *s /*NULLOK*/)
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -1055,7 +1055,7 @@ Writes a C string format with varargs to C<stdout>.
 */
 
 INTVAL
-PIO_printf(Interp *interp, const char *s, ...) {
+PIO_printf(Interp *interp /*NN*/, const char *s, ...) {
     va_list args;
     INTVAL ret;
 
