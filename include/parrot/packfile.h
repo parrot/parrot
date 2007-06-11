@@ -478,9 +478,17 @@ PARROT_API void PackFile_Fixup_dump( Interp *interp /*NN*/,
 
 /* HEADERIZER END: src/packdump.c */
 
-/* fingerprint functions */
-PARROT_API int PackFile_check_fingerprint(void *cursor);
-PARROT_API size_t PackFile_write_fingerprint(void *cursor);
+/* HEADERIZER BEGIN: src/fingerprint.c */
+
+PARROT_API int PackFile_check_fingerprint( const void *cursor /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__pure__
+        __attribute__warn_unused_result__;
+
+PARROT_API size_t PackFile_write_fingerprint( void *cursor /*NN*/ )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: src/fingerprint.c */
 
 
 /*
