@@ -65,7 +65,7 @@ trace_pmc_dump(Interp *interp, PMC* pmc)
         PIO_eprintf(debugger, "PMCNULL");
         return;
     }
-    if (!pmc->vtable || pmc->vtable == 0xdeadbeef) {
+    if (!pmc->vtable || (INTVAL)pmc->vtable == 0xdeadbeef) {
         PIO_eprintf(debugger, "<!!no vtable!!>");
         return;
     }
