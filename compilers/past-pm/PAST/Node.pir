@@ -64,6 +64,7 @@ Other node attributes are generally defined by subclasses of C<PAST::Node>.
 Initialize a PAST node with the given children and attributes.
 Adds each child to the node (using the C<push> method, below) and
 calls the appropriate accessor method for each attribute.
+And returns the node.
 
 =cut
 
@@ -92,7 +93,7 @@ calls the appropriate accessor method for each attribute.
     goto adverbs_loop
   adverbs_end:
   end:
-    .return ()
+    .return (self)
 .end
 
 
