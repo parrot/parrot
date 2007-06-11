@@ -195,9 +195,10 @@ start_flatten(Interp *interp, call_state *st, PMC *p_arg)
         }
 
         /* create key needed to iterate the hash */
-        st->key = pmc_new(interp, enum_class_Key);
+        st->key              = pmc_new(interp, enum_class_Key);
         PMC_int_val(st->key) = 0;
         PMC_data(st->key)    = (void*)INITBucketIndex;
+        dod_register_pmc(interp, st->key);
     }
     else {
         /* src ought to be an array */
@@ -263,14 +264,22 @@ fetch_arg_sig(Interp *interp, call_state *st)
                 UVal_pmc(st->val) = va_arg(*ap, PMC*);
 
             if (st->src.sig & PARROT_ARG_FLATTEN) {
+                int retval;
                 start_flatten(interp, st, UVal_pmc(st->val));
+
                 /* if the :flat arg is empty, just go to the next arg */
                 if (!st->src.slurp_n) {
                     st->src.mode &= ~CALL_STATE_FLATTEN;
                     st->src.i++;
                 }
+
                 st->src.used = 1;
-                return Parrot_fetch_arg(interp, st);
+                retval       = Parrot_fetch_arg(interp, st);
+
+                if (!PMC_IS_NULL(st->key))
+                    dod_unregister_pmc(interp, st->key);
+
+                return retval;
             }
             break;
     }
@@ -302,14 +311,22 @@ fetch_arg_op(Interp *interp, call_state *st)
                                       : CTX_REG_PMC(st->src.ctx, idx);
 
             if (st->src.sig & PARROT_ARG_FLATTEN) {
+                int retval;
                 start_flatten(interp, st, UVal_pmc(st->val));
+
                 /* if the :flat arg is empty, just go to the next arg */
                 if (!st->src.slurp_n) {
                     st->src.mode &= ~CALL_STATE_FLATTEN;
                     st->src.i++;
                 }
+
                 st->src.used = 1;
-                return Parrot_fetch_arg(interp, st);
+                retval       = Parrot_fetch_arg(interp, st);
+
+                if (!PMC_IS_NULL(st->key))
+                    dod_unregister_pmc(interp, st->key);
+
+                return retval;
             }
             break;
     }
@@ -333,7 +350,7 @@ Parrot_fetch_arg(Interp *interp, call_state *st)
     if (st->src.mode & CALL_STATE_FLATTEN) {
         PMC *elem;
         assert(st->src.slurp_i < st->src.slurp_n);
-        if (st->key) {
+        if (!PMC_IS_NULL(st->key)) {
             st->src.slurp_i++;
             st->name = (STRING *)parrot_hash_get_idx(interp,
                             (Hash *)PMC_struct_val(st->src.slurp), st->key);
@@ -349,7 +366,9 @@ Parrot_fetch_arg(Interp *interp, call_state *st)
         /* done with flattening */
         if (st->src.slurp_i == st->src.slurp_n) {
             st->src.mode &= ~CALL_STATE_FLATTEN;
-            st->key = NULL;
+            if (!PMC_IS_NULL(st->key))
+                dod_unregister_pmc(interp, st->key);
+            st->key = PMCNULL;
             st->src.i++;
         }
 
@@ -777,7 +796,7 @@ init_call_stats(call_state *st)
     st->optionals     = 0;
     st->params        = st->dest.n;
     st->name          = NULL;
-    st->key           = NULL;
+    st->key           = PMCNULL;
     st->first_named   = -1;
 }
 

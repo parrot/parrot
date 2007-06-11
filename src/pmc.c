@@ -525,7 +525,7 @@ dod_register_pmc(Interp* interp /*NN*/, PMC* pmc)
     }
     else
         registry = interp->DOD_registry;
-    VTABLE_set_pmc_keyed(interp, registry, pmc, NULL);
+    VTABLE_set_pmc_keyed(interp, registry, pmc, PMCNULL);
     Parrot_unblock_DOD(interp);
 
 }
