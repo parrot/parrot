@@ -205,6 +205,9 @@ sub attrs_from_funcflags {
         elsif ( $opt eq 'PURE' ) {
             push( @attrs, '__attribute__pure__' );
         }
+        elsif ( $opt eq 'MALLOC' ) {
+            push( @attrs, '__attribute__malloc__' );
+        }
         else {
             die qq{Unknown function flag "$funcflags" -> "$opt"\n};
         }

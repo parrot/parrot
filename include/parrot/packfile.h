@@ -491,28 +491,82 @@ PARROT_API size_t PackFile_write_fingerprint( void *cursor /*NN*/ )
 /* HEADERIZER END: src/fingerprint.c */
 
 
-/*
- * pf_items low level Parrot items fetch routines
- */
-opcode_t PF_fetch_opcode(PackFile *pf, opcode_t **stream);
-INTVAL   PF_fetch_integer(PackFile *pf, opcode_t **stream);
-FLOATVAL PF_fetch_number(PackFile *pf, opcode_t **stream);
-STRING*  PF_fetch_string(Interp*, PackFile *pf, opcode_t **stream);
-char *   PF_fetch_cstring(PackFile *pf, opcode_t **stream);
+/* HEADERIZER BEGIN: src/packfile/pf_items.c */
 
-size_t   PF_size_opcode(void);
-size_t   PF_size_integer(void);
-size_t   PF_size_number(void);
-size_t   PF_size_string(STRING *);
-size_t   PF_size_cstring(const char *);
+void PackFile_assign_transforms( PackFile *pf /*NN*/ )
+        __attribute__nonnull__(1);
 
-opcode_t* PF_store_opcode(opcode_t *, opcode_t);
-opcode_t* PF_store_integer(opcode_t *, INTVAL);
-opcode_t* PF_store_number(opcode_t *, FLOATVAL *);
-opcode_t* PF_store_string(opcode_t *, STRING *);
-opcode_t* PF_store_cstring(opcode_t *, const char *);
+char * PF_fetch_cstring( PackFile *pf /*NN*/, opcode_t **cursor /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__
+        __attribute__malloc__;
 
-void PackFile_assign_transforms(PackFile *pf);
+INTVAL PF_fetch_integer( PackFile *pf /*NULLOK*/, opcode_t **stream /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+FLOATVAL PF_fetch_number( PackFile *pf /*NULLOK*/, opcode_t **stream /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+opcode_t PF_fetch_opcode( PackFile *pf /*NULLOK*/, opcode_t **stream /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+STRING * PF_fetch_string( Interp *interp /*NN*/,
+    PackFile *pf /*NN*/,
+    opcode_t **cursor /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
+
+size_t PF_size_cstring( const char *s /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__pure__
+        __attribute__warn_unused_result__;
+
+size_t PF_size_integer( void )
+        __attribute__const__
+        __attribute__warn_unused_result__;
+
+size_t PF_size_number( void )
+        __attribute__const__
+        __attribute__warn_unused_result__;
+
+size_t PF_size_opcode( void )
+        __attribute__const__
+        __attribute__warn_unused_result__;
+
+size_t PF_size_string( const STRING *s /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__pure__
+        __attribute__warn_unused_result__;
+
+opcode_t* PF_store_cstring( opcode_t *cursor /*NN*/, const char *s /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+opcode_t* PF_store_integer( opcode_t *cursor, INTVAL val );
+opcode_t* PF_store_number(
+    opcode_t *cursor /*NN*/,
+    const FLOATVAL *val /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+opcode_t* PF_store_opcode( opcode_t *cursor /*NN*/, opcode_t val )
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__;
+
+opcode_t* PF_store_string( opcode_t *cursor /*NN*/, STRING *s /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: src/packfile/pf_items.c */
+
+
 
 /*
 ** Byte Ordering Functions (byteorder.c)

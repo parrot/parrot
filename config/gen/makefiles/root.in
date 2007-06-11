@@ -1847,6 +1847,7 @@ HEADERIZER_O_FILES = \
     src/objects.o \
     src/packdump.o \
     src/packfile.o \
+    src/packfile/pf_items.o \
     src/packout.o \
     src/pic.o \
     src/pmc.o \

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -23,14 +23,12 @@ C<opcode_t> units.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 #include <assert.h>
+
+/* HEADER: include/parrot/packfile.h */
 
 #define TRACE_PACKFILE 0
 #define TRACE_PACKFILE_PMC 0
@@ -268,17 +266,16 @@ fetch_op_le_8(unsigned char *b)
 
 /*
 
-=item C<opcode_t
-PF_fetch_opcode(PackFile *pf, opcode_t **stream)>
+FUNCDOC: PF_fetch_opcode
 
 Fetch an C<opcode_t> from the stream, converting byteorder if needed.
-
-=cut
 
 */
 
 opcode_t
-PF_fetch_opcode(PackFile *pf, opcode_t **stream) {
+PF_fetch_opcode(PackFile *pf /*NULLOK*/, opcode_t **stream /*NN*/)
+    /* WARN_UNUSED */
+{
     opcode_t o;
     if (!pf || !pf->fetch_op)
         return *(*stream)++;
@@ -292,17 +289,15 @@ PF_fetch_opcode(PackFile *pf, opcode_t **stream) {
 
 /*
 
-=item C<opcode_t*
-PF_store_opcode(opcode_t *cursor, opcode_t val)>
+FUNCDOC: PF_store_opcode
 
 Store an C<opcode_t> to stream as is.
-
-=cut
 
 */
 
 opcode_t*
-PF_store_opcode(opcode_t *cursor, opcode_t val)
+PF_store_opcode(opcode_t *cursor /*NN*/, opcode_t val)
+    /* WARN_UNUSED */
 {
     *cursor++ = val;
     return cursor;
@@ -310,38 +305,35 @@ PF_store_opcode(opcode_t *cursor, opcode_t val)
 
 /*
 
-=item C<size_t
-PF_size_opcode(void)>
+FUNCDOC: PF_size_opcode
 
 Return size of an item in C<opcode_t> units, which is 1 I<per
 definitionem>.
-
-=cut
 
 */
 
 size_t
 PF_size_opcode(void)
+    /* CONST, WARN_UNUSED */
 {
     return 1;
 }
 
 /*
 
-=item C<INTVAL
-PF_fetch_integer(PackFile *pf, opcode_t **stream)>
+FUNCDOC: PF_fetch_integer
 
 Fetch an C<INTVAL> from the stream, converting byteorder if needed.
 
 XXX assumes C<sizeof (INTVAL) == sizeof (opcode_t)> - we don't have
 C<INTVAL> size in the PackFile header.
 
-=cut
-
 */
 
 INTVAL
-PF_fetch_integer(PackFile *pf, opcode_t **stream) {
+PF_fetch_integer(PackFile *pf /*NULLOK*/, opcode_t **stream /*NN*/)
+    /* WARN_UNUSED */
+{
     INTVAL i;
     if (!pf || pf->fetch_iv == NULL)
         return *(*stream)++;
@@ -356,12 +348,9 @@ PF_fetch_integer(PackFile *pf, opcode_t **stream) {
 
 /*
 
-=item C<opcode_t*
-PF_store_integer(opcode_t *cursor, INTVAL val)>
+FUNCDOC: PF_store_integer
 
 Store an C<INTVAL> to stream as is.
-
-=cut
 
 */
 
@@ -374,36 +363,33 @@ PF_store_integer(opcode_t *cursor, INTVAL val)
 
 /*
 
-=item C<size_t
-PF_size_integer(void)>
+FUNCDOC: PF_size_integer
 
 Return store size of C<INTVAL> in C<opcode_t> units.
-
-=cut
 
 */
 
 size_t
 PF_size_integer(void)
+    /* CONST, WARN_UNUSED */
 {
-    size_t s = sizeof (INTVAL) / sizeof (opcode_t);
+    const size_t s = sizeof (INTVAL) / sizeof (opcode_t);
     return s ? s : 1;
 }
 
 /*
 
-=item C<FLOATVAL
-PF_fetch_number(PackFile *pf, opcode_t **stream)>
+FUNCDOC: PF_fetch_number
 
 Fetch a C<FLOATVAL> from the stream, converting byteorder if needed.
 Then advance stream pointer by amount of packfile float size.
 
-=cut
-
 */
 
 FLOATVAL
-PF_fetch_number(PackFile *pf, opcode_t **stream) {
+PF_fetch_number(PackFile *pf /*NULLOK*/, opcode_t **stream /*NN*/)
+    /* WARN_UNUSED */
+{
     /* When we have alignment all squared away we don't need
      * to use memcpy() for native byteorder.
      */
@@ -438,17 +424,14 @@ PF_fetch_number(PackFile *pf, opcode_t **stream) {
 
 /*
 
-=item C<opcode_t*
-PF_store_number(opcode_t *cursor, FLOATVAL *val)>
+FUNCDOC: PF_store_number
 
 Write a C<FLOATVAL> to the opcode stream as is.
-
-=cut
 
 */
 
 opcode_t*
-PF_store_number(opcode_t *cursor, FLOATVAL *val)
+PF_store_number(opcode_t *cursor /*NN*/, const FLOATVAL *val /*NN*/)
 {
     opcode_t padded_size  = (sizeof (FLOATVAL) + sizeof (opcode_t) - 1) /
         sizeof (opcode_t);
@@ -459,25 +442,22 @@ PF_store_number(opcode_t *cursor, FLOATVAL *val)
 
 /*
 
-=item C<size_t
-PF_size_number(void)>
+FUNCDOC: PF_size_number
 
 Return store size of FLOATVAL in opcode_t units.
-
-=cut
 
 */
 
 size_t
 PF_size_number(void)
+    /* CONST, WARN_UNUSED */
 {
     return ROUND_UP(sizeof (FLOATVAL), sizeof (opcode_t));
 }
 
 /*
 
-=item C<STRING *
-PF_fetch_string(Parrot_Interp interp, PackFile *pf, opcode_t **cursor)>
+FUNCDOC: PF_fetch_string
 
 Fetch a C<STRING> from bytecode and return a new C<STRING>.
 
@@ -489,18 +469,17 @@ Opcode format is:
     opcode_t size
     * data
 
-=cut
-
 */
 
 STRING *
-PF_fetch_string(Parrot_Interp interp, PackFile *pf, opcode_t **cursor)
+PF_fetch_string(Interp *interp /*NN*/, PackFile *pf /*NN*/, opcode_t **cursor /*NN*/)
+    /* WARN_UNUSED */
 {
     UINTVAL flags;
     opcode_t charset_nr;
     size_t size;
     STRING *s;
-    int wordsize = pf ? pf->header->wordsize : sizeof (opcode_t);
+    const int wordsize = pf ? pf->header->wordsize : sizeof (opcode_t);
     const char *charset_name;
 
     flags = PF_fetch_opcode(pf, cursor);
@@ -540,17 +519,14 @@ PF_fetch_string(Parrot_Interp interp, PackFile *pf, opcode_t **cursor)
 
 /*
 
-=item C<opcode_t*
-PF_store_string(opcode_t *cursor, STRING *s)>
+FUNCDOC: PF_store_string
 
 Write a STRING to the opcode stream.
-
-=cut
 
 */
 
 opcode_t*
-PF_store_string(opcode_t *cursor, STRING *s)
+PF_store_string(opcode_t *cursor /*NN*/, STRING *s /*NN*/)
 {
     opcode_t padded_size = s->bufused;
     char *charcursor;
@@ -597,17 +573,15 @@ PF_store_string(opcode_t *cursor, STRING *s)
 
 /*
 
-=item C<size_t
-PF_size_string(STRING *s)>
+FUNCDOC: PF_size_string
 
 Report store size of C<STRING> in C<opcode_t> units.
-
-=cut
 
 */
 
 size_t
-PF_size_string(STRING *s)
+PF_size_string(const STRING *s /*NN*/)
+    /* PURE, WARN_UNUSED */
 {
     opcode_t padded_size = s->bufused;
 
@@ -621,23 +595,21 @@ PF_size_string(STRING *s)
 
 /*
 
-=item C<char *
-PF_fetch_cstring(PackFile *pf, opcode_t **cursor)>
+FUNCDOC: PF_fetch_cstring
 
 Fetch a cstring from bytecode and return an allocated copy
-
-=cut
 
 */
 
 char *
-PF_fetch_cstring(PackFile *pf, opcode_t **cursor /*NN*/)
+PF_fetch_cstring(PackFile *pf /*NN*/, opcode_t **cursor /*NN*/)
+    /* WARN_UNUSED, MALLOC */
 {
-    size_t str_len = strlen ((char *)(*cursor)) + 1;
-    char *p = (char *)mem_sys_allocate(str_len);
+    const size_t str_len = strlen ((char *)(*cursor)) + 1;
+    char * const p = (char *)mem_sys_allocate(str_len);
 
     if (p) {
-        int wordsize = pf->header->wordsize;
+        const int wordsize = pf->header->wordsize;
 
         strcpy(p, (char*) (*cursor));
         *((unsigned char **) (cursor)) += ROUND_UP_B(str_len, wordsize);
@@ -648,17 +620,15 @@ PF_fetch_cstring(PackFile *pf, opcode_t **cursor /*NN*/)
 
 /*
 
-=item C<opcode_t*
-PF_store_cstring(opcode_t *cursor, const char *s)>
+FUNCDOC: PF_store_cstring
 
-Write a 0-terminate string to the stream.
-
-=cut
+Write a 0-terminated string to the stream.
 
 */
 
 opcode_t*
-PF_store_cstring(opcode_t *cursor, const char *s)
+PF_store_cstring(opcode_t *cursor /*NN*/, const char *s /*NN*/)
+    /* WARN_UNUSED */
 {
     strcpy((char *) cursor, s);
     return cursor + PF_size_cstring(s);
@@ -666,17 +636,15 @@ PF_store_cstring(opcode_t *cursor, const char *s)
 
 /*
 
-=item C<size_t
-PF_size_cstring(const char *s)>
+FUNCDOC: PF_size_cstring
 
 Return store size of a C-string in C<opcode_t> units.
-
-=cut
 
 */
 
 size_t
-PF_size_cstring(const char *s)
+PF_size_cstring(const char *s /*NN*/)
+    /* PURE, WARN_UNUSED */
 {
     size_t str_len;
 
@@ -687,20 +655,17 @@ PF_size_cstring(const char *s)
 
 /*
 
-=item C<void
-PackFile_assign_transforms(PackFile *pf)>
+FUNCDOC: PackFile_assign_transforms
 
 Assign transform functions to vtable.
-
-=cut
 
 */
 
 void
-PackFile_assign_transforms(PackFile *pf)
+PackFile_assign_transforms(PackFile *pf /*NN*/)
 {
-    int need_endianize = pf->header->byteorder != PARROT_BIGENDIAN;
-    int need_wordsize  = pf->header->wordsize != sizeof (opcode_t);
+    const int need_endianize = pf->header->byteorder != PARROT_BIGENDIAN;
+    const int need_wordsize  = pf->header->wordsize != sizeof (opcode_t);
 
     pf->need_endianize = need_endianize;
     pf->need_wordsize  = need_wordsize;
@@ -754,8 +719,6 @@ PackFile_assign_transforms(PackFile *pf)
 
 /*
 
-=back
-
 =head1 HISTORY
 
 Initial review by leo 2003.11.21
@@ -773,8 +736,6 @@ C<<PF_fetch_<type>()>> - read items and possibly convert the foreign
 format.
 
 C<<PF_size_<type>()>> - return the needed size in C<opcode_t> units.
-
-=cut
 
 */
 
