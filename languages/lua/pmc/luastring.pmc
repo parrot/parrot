@@ -75,32 +75,14 @@ Allow :
 
 */
     PMC* new_from_string (STRING *rep, INTVAL flags) {
-        INTVAL type;
         PMC *res;
-
-        type = SELF->vtable->base_type;
+        INTVAL type = SELF->vtable->base_type;
         if (flags & PObj_constant_FLAG)
             res = constant_pmc_new(INTERP, type);
         else
             res = pmc_new(INTERP, type);
-
         PMC_str_val(res) = string_copy(INTERP, rep);
         return res;
-    }
-
-/*
-
-=item C<void morph(INTVAL type)>
-
-Morphs the scalar to the specified type.
-
-=cut
-
-*/
-    void morph (INTVAL type) {
-        if (SELF->vtable->base_type == type)
-            return;
-        pmc_reuse(INTERP, SELF, type, 0);
     }
 
 /*
@@ -167,7 +149,7 @@ Return the string "string".
 
 */
     void set_number_native(FLOATVAL value) {
-        SELF.morph(dynpmc_LuaNumber);
+        DYNSELF.morph(dynpmc_LuaNumber);
         DYNSELF.set_number_native(value);
     }
 
@@ -179,7 +161,7 @@ Return the string "string".
 
 */
     void set_number_native (FLOATVAL value) {
-        SELF.morph(dynpmc_LuaNumber);
+        DYNSELF.morph(dynpmc_LuaNumber);
         DYNSELF.set_number_native(value);
     }
 
@@ -194,6 +176,20 @@ Sets the value of the string to that of the specified C<string>.
 */
     void set_string_native (STRING* value) {
         PMC_str_val(SELF) = value;
+    }
+
+/*
+
+=item C<VOID set_pmc(PMC* value)>
+
+Sets the value of the string to the string value of
+the specified C<PMC>.
+
+=cut
+
+*/
+    void set_pmc(PMC* value) {
+        PMC_str_val(SELF) = VTABLE_get_string(INTERP, value);
     }
 
 /*
@@ -322,7 +318,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == dest) {
+                if (PMC_IS_NULL(dest)) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return dest;
@@ -369,7 +365,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == SELF) {
+                if (PMC_IS_NULL(SELF)) {
                     SELF = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return;
@@ -419,7 +415,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == dest) {
+                if (PMC_IS_NULL(dest)) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return dest;
@@ -466,7 +462,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == SELF) {
+                if (PMC_IS_NULL(SELF)) {
                     SELF = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return;
@@ -516,7 +512,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == dest) {
+                if (PMC_IS_NULL(dest)) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return dest;
@@ -563,7 +559,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == SELF) {
+                if (PMC_IS_NULL(SELF)) {
                     SELF = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return;
@@ -613,7 +609,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == dest) {
+                if (PMC_IS_NULL(dest)) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return dest;
@@ -660,7 +656,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == SELF) {
+                if (PMC_IS_NULL(SELF)) {
                     SELF = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return;
@@ -710,7 +706,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == dest) {
+                if (PMC_IS_NULL(dest)) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return dest;
@@ -757,7 +753,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == SELF) {
+                if (PMC_IS_NULL(SELF)) {
                     SELF = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return;
@@ -805,7 +801,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == dest) {
+                if (PMC_IS_NULL(dest)) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return dest;
@@ -852,7 +848,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == SELF) {
+                if (PMC_IS_NULL(SELF)) {
                     SELF = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return;
@@ -923,8 +919,7 @@ MMD_LuaNumber: {
             STRING* s = string_concat(INTERP,
                 SELF.get_string(),
                 LuaNumber.value.get_string(), 0);
-            if (NULL == dest)
-                dest = pmc_new(INTERP, dynpmc_LuaString);
+            dest = pmc_new(INTERP, dynpmc_LuaString);
             VTABLE_set_string_native(INTERP, dest, s);
             return dest;
         }
@@ -932,8 +927,7 @@ MMD_LuaString: {
             STRING* s = string_concat(INTERP,
                 SELF.get_string(),
                 LuaString.value.get_string(), 0);
-            if (NULL == dest)
-                dest = pmc_new(INTERP, dynpmc_LuaString);
+            dest = pmc_new(INTERP, dynpmc_LuaString);
             VTABLE_set_string_native(INTERP, dest, s);
             return dest;
         }
@@ -942,7 +936,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == dest) {
+                if (PMC_IS_NULL(dest)) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return dest;
@@ -977,7 +971,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == SELF) {
+                if (PMC_IS_NULL(SELF)) {
                     SELF = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return;
@@ -1004,9 +998,9 @@ MMD_DEFAULT: {
     METHOD PMC* get_metatable() {
         PMC *retval = Parrot_find_global_cur(INTERP,
                              const_string(INTERP, "mt_string"));
-        if (retval != NULL)
-            return retval;
-        return pmc_new(INTERP, dynpmc_LuaNil);
+        if (NULL == retval)
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
+        return retval;
     }
 
 /*
@@ -1018,9 +1012,7 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* len () {
-        PMC *retval;
-
-        retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
         PMC_num_val(retval) = SELF.elements();
         return retval;
     }
@@ -1033,9 +1025,7 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* rawequal (PMC* value) {
-        PMC *retval;
-
-        retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
         if (SELF->vtable->base_type == value->vtable->base_type
          && 0 == string_equal(INTERP, PMC_str_val(SELF), PMC_str_val(value)))
             PMC_int_val(retval) = 1;

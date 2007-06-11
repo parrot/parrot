@@ -58,6 +58,9 @@ use base qw(Lua::opcode);
 package AssignOp;
 use base qw(Lua::opcode);
 
+package SetOp;
+use base qw(Lua::opcode);
+
 package KeyedGetOp;
 use base qw(Lua::opcode);
 

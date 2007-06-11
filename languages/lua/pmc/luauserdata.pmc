@@ -131,6 +131,18 @@ Return the string "userdata".
 
 /*
 
+=item C<void set_pmc(PMC *value)>
+
+=cut
+
+*/
+    void set_pmc(PMC *value) {
+        PMC_struct_val(SELF) = PMC_struct_val(value);
+        PMC_metadata(SELF) = PMC_metadata(value);
+    }
+
+/*
+
 =item C<PMC* get_attr_str(STRING* key)>
 
 =cut
@@ -172,7 +184,7 @@ MMD_LuaUserdata: {
             if (meth != NULL) {
                 PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                        SELF, value);
-                if (NULL == retval) {
+                if (PMC_IS_NULL(retval)) {
                     return (INTVAL)0;
                 }
                 return VTABLE_get_bool(INTERP, retval);
@@ -223,10 +235,9 @@ MMD_DEFAULT: {
 */
     METHOD PMC* get_metatable() {
         PMC *retval = PMC_metadata(SELF);
-        if (retval != NULL)
-            return retval;
-        else
-            return pmc_new(INTERP, dynpmc_LuaNil);
+        if (NULL == retval)
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
+        return retval;
     }
 
 /*

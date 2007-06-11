@@ -164,16 +164,15 @@ stat
         {
             BuildForList( $_[0], $_[2], $_[4], $_[7] );
         }
-|   FUNCTION    funcname
+|   FUNCTION
         {
-            my $var = BuildVariable( $_[0], $_[2] );
             PushScopeF( $_[0] );
             PushScope( $_[0] );
-            return $var;
         }
-                            funcbody
+                funcname    funcbody
         {
-            BuildAssigns( $_[0], [ $_[3] ], [ $_[4] ] );
+            my $var = BuildVariable( $_[0], $_[3] );
+            BuildAssigns( $_[0], [ $var ], [ $_[4] ] );
         }
 |   LOCAL   FUNCTION    NAME
         {

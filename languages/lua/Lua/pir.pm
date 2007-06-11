@@ -97,7 +97,15 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "    $op->{result}->{symbol} = $op->{arg1}->{symbol}\n";
+        print {$FH} "    assign $op->{result}->{symbol}, $op->{arg1}->{symbol}\n";
+        return;
+    }
+
+    sub visitSetOp {
+        my $self = shift;
+        my ($op) = @_;
+        my $FH   = $self->{fh};
+        print {$FH} "    set $op->{result}->{symbol}, $op->{arg1}->{symbol}\n";
         return;
     }
 
@@ -186,7 +194,7 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "    $op->{result}->{symbol} = $op->{arg1}->{symbol}\n";
+        print {$FH} "    set $op->{result}->{symbol}, $op->{arg1}->{symbol}\n";
         return;
     }
 

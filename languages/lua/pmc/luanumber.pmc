@@ -78,32 +78,14 @@ Allow :
 
 */
     PMC* new_from_string (STRING *rep, INTVAL flags) {
-        INTVAL type;
         PMC *res;
-
-        type = SELF->vtable->base_type;
+        INTVAL type = SELF->vtable->base_type;
         if (flags & PObj_constant_FLAG)
             res = constant_pmc_new(INTERP, type);
         else
             res = pmc_new(INTERP, type);
-
         PMC_num_val(res) = string_to_num(INTERP, rep);
         return res;
-    }
-
-/*
-
-=item C<void morph(INTVAL type)>
-
-Morphs the scalar to the specified type.
-
-=cut
-
-*/
-    void morph (INTVAL type) {
-        if (SELF->vtable->base_type == type)
-            return;
-        pmc_reuse(INTERP, SELF, type, 0);
     }
 
 /*
@@ -204,8 +186,21 @@ Returns a Parrot string representation of the number.
 
 */
     void set_string_native (STRING *value) {
-        SELF.morph(dynpmc_LuaString);
+        DYNSELF.morph(dynpmc_LuaString);
         DYNSELF.set_string_native(value);
+    }
+
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the value of the number to the value in C<*value>.
+
+=cut
+
+*/
+    void set_pmc(PMC *value) {
+        PMC_num_val(SELF) = VTABLE_get_number(INTERP, value);
     }
 
 /*
@@ -243,8 +238,7 @@ Decrements the number.
 */
     PMC* neg (PMC * dest) {
         FLOATVAL a = - SELF.get_number();
-        if (NULL == dest)
-            dest = pmc_new(INTERP, dynpmc_LuaNumber);
+        dest = pmc_new(INTERP, dynpmc_LuaNumber);
         VTABLE_set_number_native(INTERP, dest, a);
         return dest;
     }
@@ -276,8 +270,7 @@ Decrements the number.
 */
     PMC* add (PMC* value, PMC* dest) {
 MMD_LuaNumber: {
-            if (NULL == dest)
-                dest = pmc_new(INTERP, dynpmc_LuaNumber);
+            dest = pmc_new(INTERP, dynpmc_LuaNumber);
             VTABLE_set_number_native(INTERP, dest,
                     SELF.get_number() + VTABLE_get_number(INTERP, value));
             return dest;
@@ -299,7 +292,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == dest) {
+                if (PMC_IS_NULL(dest)) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return dest;
@@ -360,8 +353,7 @@ MMD_DEFAULT: {
 */
     PMC* subtract (PMC* value, PMC* dest) {
 MMD_LuaNumber: {
-            if (NULL == dest)
-                dest = pmc_new(INTERP, dynpmc_LuaNumber);
+            dest = pmc_new(INTERP, dynpmc_LuaNumber);
             VTABLE_set_number_native(INTERP, dest,
                     SELF.get_number() - VTABLE_get_number(INTERP, value));
             return dest;
@@ -384,7 +376,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == dest) {
+                if (PMC_IS_NULL(dest)) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return dest;
@@ -445,8 +437,7 @@ MMD_DEFAULT: {
 */
     PMC* multiply (PMC* value, PMC* dest) {
 MMD_LuaNumber: {
-            if (NULL == dest)
-                dest = pmc_new(INTERP, dynpmc_LuaNumber);
+            dest = pmc_new(INTERP, dynpmc_LuaNumber);
             VTABLE_set_number_native(INTERP, dest,
                     SELF.get_number() * VTABLE_get_number(INTERP, value));
             return dest;
@@ -469,7 +460,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == dest) {
+                if (PMC_IS_NULL(dest)) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return dest;
@@ -530,8 +521,7 @@ MMD_DEFAULT: {
 */
     PMC* divide (PMC* value, PMC* dest) {
 MMD_LuaNumber: {
-            if (NULL == dest)
-                dest = pmc_new(INTERP, dynpmc_LuaNumber);
+            dest = pmc_new(INTERP, dynpmc_LuaNumber);
             VTABLE_set_number_native(INTERP, dest,
                     SELF.get_number() / VTABLE_get_number(INTERP, value));
             return dest;
@@ -554,7 +544,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == dest) {
+                if (PMC_IS_NULL(dest)) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return dest;
@@ -617,9 +607,7 @@ MMD_DEFAULT: {
 MMD_LuaNumber: {
             FLOATVAL a = SELF.get_number();
             FLOATVAL b = VTABLE_get_number(INTERP, value);
-
-            if (NULL == dest)
-                dest = pmc_new(INTERP, dynpmc_LuaNumber);
+            dest = pmc_new(INTERP, dynpmc_LuaNumber);
             VTABLE_set_number_native(INTERP, dest, a - floor(a/b)*b);
             return dest;
         }
@@ -641,7 +629,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == dest) {
+                if (PMC_IS_NULL(dest)) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return dest;
@@ -703,8 +691,7 @@ MMD_DEFAULT: {
 */
     PMC* pow (PMC* value, PMC* dest) {
 MMD_LuaNumber: {
-            if (NULL == dest)
-                dest = pmc_new(INTERP, dynpmc_LuaNumber);
+            dest = pmc_new(INTERP, dynpmc_LuaNumber);
             VTABLE_set_number_native(INTERP, dest,
                   pow(SELF.get_number(), VTABLE_get_number(INTERP, value)));
             return dest;
@@ -726,7 +713,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == dest) {
+                if (PMC_IS_NULL(dest)) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return dest;
@@ -827,8 +814,7 @@ MMD_LuaNumber: {
             STRING* s = string_concat(INTERP,
                 SELF.get_string(),
                 LuaNumber.value.get_string(), 0);
-            if (NULL == dest)
-                dest = pmc_new(INTERP, dynpmc_LuaNumber);
+            dest = pmc_new(INTERP, dynpmc_LuaNumber);
             VTABLE_set_string_native(INTERP, dest, s);
             return dest;
         }
@@ -836,8 +822,7 @@ MMD_LuaString: {
             STRING* s = string_concat(INTERP,
                 SELF.get_string(),
                 LuaString.value.get_string(), 0);
-            if (NULL == dest)
-                dest = pmc_new(INTERP, dynpmc_LuaNumber);
+            dest = pmc_new(INTERP, dynpmc_LuaNumber);
             VTABLE_set_string_native(INTERP, dest, s);
             return dest;
         }
@@ -846,7 +831,7 @@ MMD_DEFAULT: {
             if (meth != NULL) {
                 dest = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                 SELF, value);
-                if (NULL == dest) {
+                if (PMC_IS_NULL(dest)) {
                     dest = pmc_new(INTERP, dynpmc_LuaNil);
                 }
                 return dest;
@@ -906,9 +891,7 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* rawequal (PMC* value) {
-        PMC *retval;
-
-        retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
         if (SELF->vtable->base_type == value->vtable->base_type
          && PMC_num_val(SELF) == PMC_num_val(value))
             PMC_int_val(retval) = 1;
@@ -925,10 +908,7 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* tonumber() {
-        PMC *retval;
-
-        retval = SELF.clone();
-        return retval;
+        return SELF.clone();
     }
 
 }

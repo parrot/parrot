@@ -122,6 +122,17 @@ Return the string "thread".
 
 /*
 
+=item C<void set_pmc(PMC *value)>
+
+=cut
+
+*/
+    void set_pmc(PMC *value) {
+        PMC_pmc_val(SELF) = PMC_pmc_val(value);
+    }
+
+/*
+
 =back
 
 =head2 non-Vtable Methods

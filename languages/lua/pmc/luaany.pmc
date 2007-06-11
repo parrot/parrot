@@ -67,6 +67,21 @@ pmclass LuaAny
     hll Lua {
 /*
 
+=item C<void morph(INTVAL type)>
+
+Changes the PMC to a PMC of a new type
+
+=cut
+
+*/
+    void morph (INTVAL type) {
+        if (SELF->vtable->base_type == type)
+            return;
+        pmc_reuse(INTERP, SELF, type, 0);
+    }
+
+/*
+
 =item C<INTVAL get_bool()>
 
 Returns C<true>.
@@ -89,6 +104,19 @@ Returns the address of the PMC.
 */
     void* get_pointer () {
         return SELF;
+    }
+
+/*
+
+=item C<void assign_pmc(PMC* value)>
+
+=cut
+
+*/
+    void assign_pmc(PMC* value) {
+        VTABLE_morph(INTERP, SELF, value->vtable->base_type);
+        if (value->vtable->base_type != dynpmc_LuaNil)
+            DYNSELF.set_pmc(value);
     }
 
 /*
@@ -164,7 +192,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__unm");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
-            if (NULL == dest) {
+            if (PMC_IS_NULL(dest)) {
                 dest = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return dest;
@@ -179,7 +207,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__unm");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
-            if (NULL == SELF) {
+            if (PMC_IS_NULL(SELF)) {
                 SELF = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return;
@@ -291,7 +319,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__add");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
-            if (NULL == dest) {
+            if (PMC_IS_NULL(dest)) {
                 dest = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return dest;
@@ -306,7 +334,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__add");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
-            if (NULL == SELF) {
+            if (PMC_IS_NULL(SELF)) {
                 SELF = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return;
@@ -320,7 +348,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__sub");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
-            if (NULL == dest) {
+            if (PMC_IS_NULL(dest)) {
                 dest = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return dest;
@@ -335,7 +363,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__sub");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
-            if (NULL == SELF) {
+            if (PMC_IS_NULL(SELF)) {
                 SELF = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return;
@@ -349,7 +377,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__mul");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
-            if (NULL == dest) {
+            if (PMC_IS_NULL(dest)) {
                 dest = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return dest;
@@ -364,7 +392,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__mul");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
-            if (NULL == SELF) {
+            if (PMC_IS_NULL(SELF)) {
                 SELF = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return;
@@ -378,7 +406,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__div");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
-            if (NULL == dest) {
+            if (PMC_IS_NULL(dest)) {
                 dest = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return dest;
@@ -393,7 +421,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__div");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
-            if (NULL == SELF) {
+            if (PMC_IS_NULL(SELF)) {
                 SELF = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return;
@@ -407,7 +435,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__mod");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
-            if (NULL == dest) {
+            if (PMC_IS_NULL(dest)) {
                 dest = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return dest;
@@ -422,7 +450,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__mod");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
-            if (NULL == SELF) {
+            if (PMC_IS_NULL(SELF)) {
                 SELF = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return;
@@ -436,7 +464,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__pow");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
-            if (NULL == dest) {
+            if (PMC_IS_NULL(dest)) {
                 dest = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return dest;
@@ -451,7 +479,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__pow");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
-            if (NULL == SELF) {
+            if (PMC_IS_NULL(SELF)) {
                 SELF = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return;
@@ -465,7 +493,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__concat");
         if (meth != NULL) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
-            if (NULL == dest) {
+            if (PMC_IS_NULL(dest)) {
                 dest = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return dest;
@@ -480,7 +508,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__concat");
         if (meth != NULL) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
-            if (NULL == SELF) {
+            if (PMC_IS_NULL(SELF)) {
                 SELF = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return;
@@ -552,7 +580,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__len");
         if (meth != NULL) {
             PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
-            if (NULL == retval) {
+            if (PMC_IS_NULL(retval)) {
                 retval = pmc_new(INTERP, dynpmc_LuaNil);
             }
             return retval;
@@ -593,7 +621,7 @@ Common implementation (use C<__tostring> or C<get_string>).
         PMC *meth = find_meth(INTERP, SELF, "__tostring");
         if (meth != NULL) {
             retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
-            if (NULL == retval) {
+            if (PMC_IS_NULL(retval)) {
                 retval = pmc_new(INTERP, dynpmc_LuaNil);
             }
         }

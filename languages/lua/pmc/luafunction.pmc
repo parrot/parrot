@@ -88,6 +88,18 @@ Return the string "function".
 
 /*
 
+=item C<void set_pmc(PMC *value)>
+
+=cut
+
+*/
+    void set_pmc(PMC *value) {
+        PMC_struct_val(SELF) = PMC_struct_val(value);
+        PMC_metadata(SELF) = PMC_metadata(value);
+    }
+
+/*
+
 =item C<INTVAL is_equal (PMC* value)>
 
 =cut
@@ -132,9 +144,7 @@ MMD_DEFAULT: {
 
 */
     METHOD PMC* rawequal (PMC* value) {
-        PMC *retval;
-
-        retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
         if ( SELF->vtable->base_type == value->vtable->base_type
          && (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
          && (PMC_sub(SELF))->seg == (PMC_sub(value))->seg )

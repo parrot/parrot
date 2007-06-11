@@ -119,21 +119,6 @@ Initializes the instance.
 
 /*
 
-=item C<void morph(INTVAL type)>
-
-Morphs the scalar to the specified type.
-
-=cut
-
-*/
-    void morph (INTVAL type) {
-        if (SELF->vtable->base_type == type)
-            return;
-        pmc_reuse(INTERP, SELF, type, 0);
-    }
-
-/*
-
 =item C<void mark()>
 
 Marks the hash as live.
@@ -204,6 +189,18 @@ therefore only clone the reference to themselves, not make a deep copy.
 */
     STRING* get_string () {
         return Parrot_sprintf_c(INTERP, "table: %08X", SELF);
+    }
+
+/*
+
+=item C<void set_pmc(PMC *other)>
+
+=cut
+
+*/
+    void set_pmc(PMC *other) {
+        PMC_struct_val(SELF) = PMC_struct_val(other);
+        PMC_metadata(SELF) = PMC_metadata(other);
     }
 
 /*
@@ -315,7 +312,7 @@ MMD_LuaTable: {
             if (meth != NULL) {
                 PMC* retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                        SELF, value);
-                if (NULL == retval) {
+                if (PMC_IS_NULL(retval)) {
                     return (INTVAL)0;
                 }
                 return VTABLE_get_bool(INTERP, retval);
@@ -414,10 +411,9 @@ MMD_DEFAULT: {
 */
     METHOD PMC* get_metatable() {
         PMC* retval = PMC_metadata(SELF);
-        if (retval != NULL)
-            return retval;
-        else
-            return pmc_new(INTERP, dynpmc_LuaNil);
+        if (NULL == retval)
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
+        return retval;
     }
 
 /*
@@ -512,9 +508,8 @@ MMD_DEFAULT: {
 */
     METHOD PMC* rawget (PMC* key) {
         PMC* value = _get(INTERP, SELF, key);
-        if (value == NULL) {
-            return pmc_new(INTERP, dynpmc_LuaNil);
-        }
+        if (NULL == value)
+            value = pmc_new(INTERP, dynpmc_LuaNil);
         return value;
     }
 
