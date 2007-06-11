@@ -889,7 +889,7 @@ PackFile_new(Interp *interp, INTVAL is_mapped)
     pf->directory = *pf->dirp;
     pf->fetch_op = (opcode_t (*)(unsigned char*)) NULLfunc;
     pf->fetch_iv = (INTVAL (*)(unsigned char*)) NULLfunc;
-    pf->fetch_nv = (void (*)(unsigned char *, unsigned char *)) NULLfunc;
+    pf->fetch_nv = (void (*)(unsigned char *, const unsigned char *)) NULLfunc;
     return pf;
 }
 
