@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2005, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 $Id$
@@ -14,24 +14,16 @@ This is only used by the PBC dumper C<pdump>.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 #include "parrot/packfile.h"
 
-/*
-** FIXME: this should also be segmentized.
-** For now just remove some warnings
-*/
+/* HEADER: include/parrot/packfile.h */
 
-void PackFile_ConstTable_dump(Interp *, PackFile_ConstTable *);
-static void PackFile_Constant_dump(Interp *, PackFile_ConstTable *ct,
-                                   PackFile_Constant *);
-void PackFile_Fixup_dump(Interp *, PackFile_FixupTable *ft);
+static void
+PackFile_Constant_dump(Interp *interp /*NN*/, PackFile_ConstTable *ct /*NN*/,
+                       PackFile_Constant *self /*NN*/)
 
 /*
 
@@ -43,7 +35,7 @@ Dumps the constant table C<self>.
 
 PARROT_API
 void
-PackFile_ConstTable_dump(Interp *interp, PackFile_ConstTable *self)
+PackFile_ConstTable_dump(Interp *interp /*NN*/, const PackFile_ConstTable *self /*NN*/)
 {
     opcode_t i;
 
@@ -55,25 +47,18 @@ PackFile_ConstTable_dump(Interp *interp, PackFile_ConstTable *self)
 
 /*
 
-=item C<void
-PackFile_Constant_dump(Interp *interp, PackFile_ConstTable *ct,
-                       PackFile_Constant *self)>
+FUNCDOC: PackFile_Constant_dump
 
 Dumps the constant C<self>.
 
-=cut
-
 */
 
-void
-PackFile_Constant_dump(Interp *interp, PackFile_ConstTable *ct,
-                       PackFile_Constant *self)
+static void
+PackFile_Constant_dump(Interp *interp /*NN*/, PackFile_ConstTable *ct /*NN*/,
+                       PackFile_Constant *self /*NN*/)
 {
     PMC *key;
     size_t i;
-    size_t ct_index;
-    opcode_t slice_bits;
-    PackFile_Constant *detail;
 
     switch (self->type) {
 
@@ -105,6 +90,8 @@ PackFile_Constant_dump(Interp *interp, PackFile_ConstTable *ct,
         /* and now type / value per component */
         for (key = self->u.key; key; key = PMC_data(key)) {
             opcode_t type = PObj_get_FLAGS(key);
+            opcode_t slice_bits = 0; /* XXX slice_bits gets set, but never used */
+
             PIO_printf(interp, "       {\n");
             slice_bits = 0;
             if ((type & (KEY_start_slice_FLAG|KEY_inf_slice_FLAG)) ==
@@ -130,14 +117,23 @@ PackFile_Constant_dump(Interp *interp, PackFile_ConstTable *ct,
                     PIO_printf(interp, "       },\n");
                     break;
                 case KEY_number_FLAG:
+                    {
+                    const PackFile_Constant *detail;
+                    size_t ct_index;
+
                     PIO_printf(interp, "        TYPE        => NUMBER\n");
                     ct_index = PackFile_find_in_const(interp, ct, key, PFC_NUMBER);
                     PIO_printf(interp, "        PFC_OFFSET  => %ld\n", ct_index);
                     detail = ct->constants[ct_index];
                     PIO_printf(interp, "        DATA        => %ld\n", detail->u.number);
                     PIO_printf(interp, "       },\n");
+                    }
                     break;
                 case KEY_string_FLAG:
+                    {
+                    const PackFile_Constant *detail;
+                    size_t ct_index;
+
                     PIO_printf(interp, "        TYPE        => STRING\n");
                     ct_index = PackFile_find_in_const(interp, ct, key, PFC_STRING);
                     PIO_printf(interp, "        PFC_OFFSET  => %ld\n", ct_index);
@@ -146,6 +142,7 @@ PackFile_Constant_dump(Interp *interp, PackFile_ConstTable *ct,
                               (int)detail->u.string->bufused,
                               (char *)detail->u.string->strstart);
                     PIO_printf(interp, "       },\n");
+                    }
                     break;
                 case KEY_integer_FLAG | KEY_register_FLAG:
                     PIO_printf(interp, "        TYPE        => I REGISTER\n");
@@ -178,13 +175,11 @@ PackFile_Constant_dump(Interp *interp, PackFile_ConstTable *ct,
     case PFC_PMC:
         PIO_printf(interp, "    [ 'PFC_PMC', {\n");
         {
-            PMC *pmc = self->u.key;
+            PMC * const pmc = self->u.key;
             Parrot_sub *sub;
-            STRING *a_key = const_string(interp, "(keyed)");
             STRING *null = const_string(interp, "(null)");
             STRING *namespace_description;
-            opcode_t *code_start =
-                interp->code->base.data;
+
             switch (pmc->vtable->base_type) {
                 case enum_class_FixedBooleanArray:
                 case enum_class_FixedFloatArray:
@@ -196,7 +191,7 @@ PackFile_Constant_dump(Interp *interp, PackFile_ConstTable *ct,
                 case enum_class_ResizablePMCArray:
                 case enum_class_ResizableStringArray:
                     {
-                    int n = VTABLE_get_integer(interp, pmc);
+                    const int n = VTABLE_get_integer(interp, pmc);
                     STRING* out_buffer = VTABLE_get_repr(interp, pmc);
                     PIO_printf(interp,
                             "\tclass => %Ss,\n"
@@ -270,17 +265,15 @@ PackFile_Constant_dump(Interp *interp, PackFile_ConstTable *ct,
 
 /*
 
-=item C<void
-PackFile_Fixup_dump(Interp *interp, PackFile_FixupTable *ft)>
+FUNCDOC: PackFile_Fixup_dump
 
 Dumps the fix-up table C<ft>.
 
-=cut
-
 */
 
+PARROT_API
 void
-PackFile_Fixup_dump(Interp *interp, PackFile_FixupTable *ft)
+PackFile_Fixup_dump(Interp *interp /*NN*/, const PackFile_FixupTable *ft /*NN*/)
 {
     opcode_t i;
 
@@ -305,13 +298,9 @@ PackFile_Fixup_dump(Interp *interp, PackFile_FixupTable *ft)
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<src/pdump.c>.
-
-=cut
 
 */
 

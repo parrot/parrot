@@ -1844,6 +1844,7 @@ HEADERIZER_O_FILES = \
     src/list.o \
     src/mmd.o \
     src/objects.o \
+    src/packdump.o \
     src/packfile.o \
     src/packout.o \
     src/pic.o \

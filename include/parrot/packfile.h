@@ -464,17 +464,24 @@ void mark_const_subs( Interp *interp /*NN*/ )
 /* HEADERIZER END: src/packfile.c */
 
 
+/* HEADERIZER BEGIN: src/packdump.c */
+
+PARROT_API void PackFile_ConstTable_dump( Interp *interp /*NN*/,
+    const PackFile_ConstTable *self /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API void PackFile_Fixup_dump( Interp *interp /*NN*/,
+    const PackFile_FixupTable *ft /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: src/packdump.c */
 
 /* fingerprint functions */
 PARROT_API int PackFile_check_fingerprint(void *cursor);
 PARROT_API size_t PackFile_write_fingerprint(void *cursor);
 
-/* packdump.c */
-PARROT_API void PackFile_Fixup_dump(Interp *, PackFile_FixupTable *ft);
-PARROT_API void PackFile_ConstTable_dump(Interp *, PackFile_ConstTable *);
-
-/* packout.c */
-PARROT_API opcode_t * PackFile_Constant_pack(Interp *, PackFile_ConstTable *ct, PackFile_Constant *, opcode_t *);
 
 /*
  * pf_items low level Parrot items fetch routines
