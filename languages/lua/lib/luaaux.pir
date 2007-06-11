@@ -658,9 +658,11 @@ Support variable number of arguments function call.
     .param pmc a
     .param pmc b
     if a goto L1
-    .return (a)
+    $P0 = clone a
+    .return ($P0)
   L1:
-    .return (b)
+    $P0 = clone b
+    .return ($P0)
 .end
 
 
@@ -672,9 +674,11 @@ Support variable number of arguments function call.
     .param pmc a
     .param pmc b
     unless a goto L1
-    .return (a)
+    $P0 = clone a
+    .return ($P0)
   L1:
-    .return (b)
+    $P0 = clone b
+    .return ($P0)
 .end
 
 

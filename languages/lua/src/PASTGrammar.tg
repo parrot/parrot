@@ -185,6 +185,7 @@ transform past (Lua::Grammar::fornum) :language('PIR') {
     name.'init'('node'=>node, 'name'=>$S0, 'scope'=>'lexical', 'ismy'=>1, 'islvalue'=>1)
     explist = new .ResizablePMCArray
     $P0 = node['expression']
+    $I0 = $P0
     .local pmc iter
     iter = new .Iterator, $P0
   L1:
@@ -194,6 +195,10 @@ transform past (Lua::Grammar::fornum) :language('PIR') {
     push explist, $P1
     goto L1
   L2:
+    unless $I0 < 3 goto L3
+    $P1 = name.'new'('PAST::Val', 'node'=>node, 'vtype'=>'.LuaNumber', 'name'=>'1', 'ctype'=>'n+')
+    push explist, $P1
+  L3:
     .return name.'new'('PAST::Op', name, explist, 'node'=>node, 'pasttype'=>'fornum')
 }
 

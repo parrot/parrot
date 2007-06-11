@@ -342,51 +342,60 @@ transform repeat (PAST::Op) :language('PIR') {
 
 
 transform fornum (PAST::Op) :language('PIR') {
-    internal_error("not implemented (fornum)")
     .local pmc endlabels
     endlabels = get_hll_global ['Lua::POST'], '@endlabels'
-    .local pmc ops, var, limit, step, blk
+    .local pmc ops, e_var, e_limit, e_step, blk, zero
+    .local string var, limit, step
     ops = new 'POST::Ops'
     ops.'init'('node'=>node)
-
     $P0 = node[1]
     $P1 = $P0[0]
-    $P2 = tree.'get'('post', $P1)
-    ops.'push'($P2)
-    var = ops.'push_pirop'('new')
-    var.'arglist'(var, '.LuaNil')
-#    ops.'push_pirop'('set', var, $P2)
-
+    e_var = tree.'get'('post', $P1)
+    ops.'push'(e_var)
     $P1 = $P0[1]
-    $P2 = tree.'get'('post', $P1)
-    ops.'push'($P2)
-    limit = ops.'push_pirop'('new')
-    limit.'arglist'(limit, '.LuaNil')
-#    ops.'push_pirop'('set', limit, $P2)
-
+    e_limit = tree.'get'('post', $P1)
+    ops.'push'(e_limit)
     $P1 = $P0[2]
-    if $P1 goto L1
-    goto L2
-    $P2 = ops.'push_pirop'('new')
-    $P2.'arglist'($P2, '.LuaNumber')
-    $P2 = ops.'push_pirop'('set', $P2, '1', 'result'=>$P2)
-    #ops.'result'($P2)
-  L1:
-    $P2 = tree.'get'('post', $P1)
-    ops.'push'($P2)
-  L2:
-    step = ops.'push_pirop'('new')
-    step.'arglist'(step, '.LuaNil')
-#    ops.'push_pirop'('set', step, $P2)
-
-    .local pmc looplabel, endlabel
+    e_step = tree.'get'('post', $P1)
+    ops.'push'(e_step)
+    var = ops.'unique'('$P')
+    limit = ops.'unique'('$P')
+    step = ops.'unique'('$P')
+    ops.'push_pirop'('inline', '    (%0, %1, %2) = checkforloop(%3, %4, %5)', var, limit, step, e_var, e_limit, e_step)
+    .local string v
+    $P0 = node[0]
+    $S0 = $P0.'name'()
+    v = node.'escape'($S0)
+    $P1 = tree.'get'('post', $P0)
+    ops.'push'($P1)
+    zero = ops.'push_pirop'('new')
+    zero.'arglist'(zero, '.LuaNumber')
+    ops.'push_pirop'('set', zero, '0.0')
+    .local pmc looplabel, endlabel, orlabel, blklabel
     $S0 = node.'unique'('fornum_')
     looplabel = ops.'new'('POST::Label', 'result'=>$S0)
-    $S0 = concat $S0, '_end'
-    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $S1 = concat $S0, '_or'
+    orlabel = ops.'new'('POST::Label', 'result'=>$S1)
+    $S1 = concat $S0, '_blk'
+    blklabel = ops.'new'('POST::Label', 'result'=>$S1)
+    $S1 = concat $S0, '_end'
+    endlabel = ops.'new'('POST::Label', 'result'=>$S1)
+    unshift endlabels, endlabel
     ops.'push'(looplabel)
-
+    ops.'push_pirop'('inline', '    unless %0 > %1 goto %2', step, zero, orlabel)
+    ops.'push_pirop'('inline', '    unless %0 <= %1 goto %2', var, limit, endlabel)
+    ops.'push_pirop'('goto', blklabel)
+    ops.'push'(orlabel)
+    ops.'push_pirop'('inline', '    unless %0 >= %1 goto %2', var, limit, endlabel)
+    ops.'push'(blklabel)
+    ops.'push_pirop'('store_lex', v, var)
+    $P0 = node[2]
+    blk = tree.'get'('post', $P0)
+    ops.'push'(blk)
+    ops.'push_pirop'('add', var, step)
+    ops.'push_pirop'('goto', looplabel)
     ops.'push'(endlabel)
+    $P0 = shift endlabels
     .return (ops)
 }
 
@@ -395,18 +404,27 @@ transform forlist (PAST::Op) :language('PIR') {
     internal_error("not implemented (forlist)")
     .local pmc endlabels
     endlabels = get_hll_global ['Lua::POST'], '@endlabels'
-    .local pmc ops, var, limit, step, blk
+    .local pmc ops, blk, nil
     ops = new 'POST::Ops'
     ops.'init'('node'=>node)
 
+
+    nil = ops.'push_pirop'('new')
+    nil.'arglist'(nil, '.LuaNil')
     .local pmc looplabel, endlabel
     $S0 = node.'unique'('forlist_')
     looplabel = ops.'new'('POST::Label', 'result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    unshift endlabels, endlabel
     ops.'push'(looplabel)
 
+    $P0 = node[2]
+    blk = tree.'get'('post', $P0)
+    ops.'push'(blk)
+    ops.'push_pirop'('goto', looplabel)
     ops.'push'(endlabel)
+    $P0 = shift endlabels
     .return (ops)
 }
 
