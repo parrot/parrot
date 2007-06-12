@@ -114,7 +114,7 @@ the output to the correct output file.
           [ \{<regex>\} | <?PGE::Util::die: unable to parse regex> ]
       | [multi]? $<cmd>:=(proto)
           $<name>:=<arg>
-          ( is $<trait>:=[\w+]<arg>? )*
+          ( is $<trait>:=[\w+]['('<arg>')']? )*
           [ \{ <-[}]>*: \} | ';' | <?PGE::Util::die: missing proto/sub body> ]
       | [$|<PGE::Util::die: unrecognized statement>]
       STMT_PARSE
@@ -347,23 +347,30 @@ the output to the correct output file.
     .local string trait, arg
     trait = t['trait']
     $P0 = t['arg']
-    if null $P0 goto trait_arg_1
+    if null $P0 goto trait_arg_null
+    ##   convert parsed arg to single string
     $P0 = $P0[0]
-    arg = $P0[0]
-    if trait != 'parsed' goto trait_arg
-  trait_parsed:
-    ##   handle "is parsed" specially by removing any '&'
+    $S0 = $P0['category']
+    $S1 = $P0[0]
+    arg = concat $S0, $S1
+    if arg == '' goto trait_arg_null
+    ##   args starting with & are symbol lookups
     $S0 = substr arg, 0, 1
-    if $S0 != '&' goto trait_parsed_1
+    if $S0 != '&' goto trait_arg
     arg = substr arg, 1
-  trait_parsed_1:
+    goto trait_sub
+  trait_arg:
+    if trait == 'parsed' goto trait_sub
+    arg = concat "'", arg
+    arg = concat arg, "'"
+    goto trait_arg_done
+  trait_sub:
     optable.emit("          $P0 = get_hll_global ['%0'], '%1'", namespace, arg)
     arg = '$P0'
-  trait_arg:
-    if arg > '' goto trait_arg_2
-  trait_arg_1:
+    goto trait_arg_done
+  trait_arg_null:
     arg = '1'
-  trait_arg_2:
+  trait_arg_done:
     concat traitlist, ", '"
     concat traitlist, trait
     concat traitlist, "'=>"
