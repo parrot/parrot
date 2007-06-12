@@ -25,10 +25,11 @@
 PARROT_API STRING * const_string( Interp *interp, const char *buffer /*NN*/ )
         __attribute__nonnull__(2);
 
-PARROT_API STRING * int_to_str( Interp *interp,
+PARROT_API STRING * int_to_str( Interp *interp /*NN*/,
     char *tc /*NN*/,
     HUGEINTVAL num,
     char base )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API STRING * Parrot_make_COW_reference( Interp *interp /*NN*/,
@@ -68,10 +69,11 @@ PARROT_API STRING* Parrot_string_trans_charset( Interp *interp,
     INTVAL charset_nr,
     STRING *dest /*NULLOK*/ );
 
-PARROT_API STRING* Parrot_string_trans_encoding( Interp *interp,
+PARROT_API STRING* Parrot_string_trans_encoding( Interp *interp /*NN*/,
     STRING *src /*NULLOK*/,
     INTVAL encoding_nr,
-    STRING *dest /*NULLOK*/ );
+    STRING *dest /*NULLOK*/ )
+        __attribute__nonnull__(1);
 
 PARROT_API void Parrot_unmake_COW( Interp *interp, STRING *s /*NN*/ )
         __attribute__nonnull__(2);
@@ -127,7 +129,10 @@ PARROT_API INTVAL string_compare( Interp *interp,
         __attribute__pure__
         __attribute__warn_unused_result__;
 
-PARROT_API STRING * string_compose( Interp *interp, STRING *src /*NULLOK*/ );
+PARROT_API STRING * string_compose( Interp *interp /*NN*/,
+    STRING *src /*NULLOK*/ )
+        __attribute__nonnull__(1);
+
 PARROT_API INTVAL string_compute_strlen( Interp *interp, STRING *s /*NN*/ )
         __attribute__nonnull__(2);
 
@@ -181,8 +186,9 @@ PARROT_API size_t string_hash( Interp *interp,
     STRING *s /*NULLOK*/,
     size_t seed );
 
-PARROT_API STRING * string_increment( Interp *interp,
-    const STRING *s /*NULLOK*/ );
+PARROT_API STRING * string_increment( Interp *interp /*NN*/,
+    const STRING *s /*NULLOK*/ )
+        __attribute__nonnull__(1);
 
 PARROT_API INTVAL string_index( Interp *interp,
     const STRING *s /*NN*/,
@@ -200,11 +206,12 @@ PARROT_API UINTVAL string_length( Interp *interp, const STRING *s /*NULLOK*/ )
         __attribute__pure__
         __attribute__warn_unused_result__;
 
-PARROT_API STRING * string_make( Interp *interp,
+PARROT_API STRING * string_make( Interp *interp /*NN*/,
     const char *buffer /*NULLOK*/,
     UINTVAL len,
     const char *charset_name /*NULLOK*/,
-    UINTVAL flags );
+    UINTVAL flags )
+        __attribute__nonnull__(1);
 
 PARROT_API STRING * string_make_direct( Interp *interp,
     const char *buffer /*NULLOK*/,
@@ -215,9 +222,10 @@ PARROT_API STRING * string_make_direct( Interp *interp,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-PARROT_API STRING * string_make_empty( Interp *interp,
+PARROT_API STRING * string_make_empty( Interp *interp /*NN*/,
     parrot_string_representation_t representation,
-    UINTVAL capacity );
+    UINTVAL capacity )
+        __attribute__nonnull__(1);
 
 PARROT_API INTVAL string_max_bytes( Interp *interp,
     const STRING *s /*NN*/,
@@ -305,16 +313,18 @@ PARROT_API void string_titlecase_inplace( Interp *interp,
 
 PARROT_API char * string_to_cstring( Interp *interp,
     const STRING *s /* NULLOK */ )
+        __attribute__malloc__
         __attribute__warn_unused_result__;
 
 PARROT_API INTVAL string_to_int( Interp *interp, const STRING *s /*NULLOK*/ );
 PARROT_API FLOATVAL string_to_num( Interp *interp,
     const STRING *s /*NULLOK*/ );
 
-PARROT_API STRING * string_unescape_cstring( Interp *interp,
+PARROT_API STRING * string_unescape_cstring( Interp *interp /*NN*/,
     const char *cstring /*NN*/,
     char delimiter,
     const char *enc_char /*NULLOK*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API void string_unpin( Interp *interp, STRING *s /*NN*/ )
@@ -324,11 +334,12 @@ PARROT_API STRING * string_upcase( Interp *interp,
     const STRING *s /*NULLOK*/ );
 
 PARROT_API void string_upcase_inplace( Interp *interp, STRING *s /*NULLOK*/ );
-PARROT_API STRING* uint_to_str( Interp *interp,
+PARROT_API STRING* uint_to_str( Interp *interp /*NN*/,
     char *tc /*NN*/,
     UHUGEINTVAL num,
     char base,
     int minus )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/string.c */

@@ -313,7 +313,7 @@ Creates and returns an empty Parrot string.
 
 PARROT_API
 STRING *
-string_make_empty(Interp *interp,
+string_make_empty(Interp *interp /*NN*/,
     parrot_string_representation_t representation, UINTVAL capacity)
 {
     STRING * const s = new_string_header(interp, 0);
@@ -592,7 +592,7 @@ together.
 
 PARROT_API
 STRING *
-string_make(Interp *interp, const char *buffer /*NULLOK*/,
+string_make(Interp *interp /*NN*/, const char *buffer /*NULLOK*/,
     UINTVAL len, const char *charset_name /*NULLOK*/, UINTVAL flags)
 {
     ENCODING *encoding;
@@ -1904,7 +1904,7 @@ result in a memory leak.
 PARROT_API
 char *
 string_to_cstring(Interp *interp, const STRING *s /* NULLOK */)
-    /* WARN_UNUSED */
+    /* MALLOC, WARN_UNUSED */
 {
     char *p;
     /*
@@ -2175,7 +2175,7 @@ Unescapes the specified C string. These sequences are covered:
 
 PARROT_API
 STRING *
-string_unescape_cstring(Interp *interp,
+string_unescape_cstring(Interp *interp /*NN*/,
     const char *cstring /*NN*/, char delimiter, const char *enc_char /*NULLOK*/)
 {
     size_t clength = strlen(cstring);
@@ -2380,7 +2380,7 @@ Perl5ish increment the string. Currently single char only.
 
 PARROT_API
 STRING *
-string_increment(Interp *interp, const STRING *s /*NULLOK*/)
+string_increment(Interp *interp /*NN*/, const STRING *s /*NULLOK*/)
 {
     INTVAL o;
 
@@ -2509,7 +2509,7 @@ else returns a copy of C<src> with the charset/encoding in dest.
 
 PARROT_API
 STRING*
-Parrot_string_trans_encoding(Interp *interp, STRING *src /*NULLOK*/,
+Parrot_string_trans_encoding(Interp *interp /*NN*/, STRING *src /*NULLOK*/,
         INTVAL encoding_nr, STRING *dest /*NULLOK*/)
 {
     ENCODING *new_encoding;
@@ -2542,7 +2542,7 @@ Parrot_string_trans_encoding(Interp *interp, STRING *src /*NULLOK*/,
 
 PARROT_API
 STRING *
-string_compose(Interp *interp, STRING *src /*NULLOK*/)
+string_compose(Interp *interp /*NN*/, STRING *src /*NULLOK*/)
 {
     if (!src)
         return NULL;
@@ -2631,7 +2631,7 @@ If C<minus> is true then C<-> is prepended to the string representation.
 
 PARROT_API
 STRING*
-uint_to_str(Interp *interp,
+uint_to_str(Interp *interp /*NN*/,
             char *tc /*NN*/, UHUGEINTVAL num, char base, int minus)
 {
     /* the buffer must be at least as long as this */
@@ -2667,7 +2667,7 @@ If C<< num < 0 >> then C<-> is prepended to the string representation.
 
 PARROT_API
 STRING *
-int_to_str(Interp *interp, char *tc /*NN*/, HUGEINTVAL num, char base)
+int_to_str(Interp *interp /*NN*/, char *tc /*NN*/, HUGEINTVAL num, char base)
 {
     const int minus = (num<0);
     if (minus)

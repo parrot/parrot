@@ -36,7 +36,7 @@ Uses C<malloc> to allocate system memory.
 PARROT_API
 void *
 mem_sys_allocate(size_t size)
-    /* WARN_UNUSED */
+    /* MALLOC, WARN_UNUSED */
 {
     void * const ptr = malloc((size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
@@ -49,7 +49,7 @@ mem_sys_allocate(size_t size)
 
 void *
 mem__internal_allocate(size_t size, const char *file, int line)
-    /* WARN_UNUSED */
+    /* MALLOC, WARN_UNUSED */
 {
     void * const ptr = malloc((size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
@@ -72,7 +72,7 @@ Uses C<calloc> to allocate system memory.
 PARROT_API
 void *
 mem_sys_allocate_zeroed(size_t size)
-    /* WARN_UNUSED */
+    /* MALLOC, WARN_UNUSED */
 {
     void * const ptr = calloc(1, (size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
@@ -85,7 +85,7 @@ mem_sys_allocate_zeroed(size_t size)
 
 void *
 mem__internal_allocate_zeroed(size_t size, const char *file, int line)
-    /* WARN_UNUSED */
+    /* MALLOC, WARN_UNUSED */
 {
     void * const ptr = calloc(1, (size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
@@ -108,7 +108,7 @@ Resize a chunk of system memory.
 PARROT_API
 void *
 mem__sys_realloc(void *from /*NULLOK*/, size_t size)
-    /* WARN_UNUSED */
+    /* MALLOC, WARN_UNUSED */
 {
     void *ptr;
 #ifdef DETAIL_MEMORY_DEBUG
@@ -135,7 +135,7 @@ Resize a chunk of system memory. Fill the newly allocated space with zeroes.
 PARROT_API
 void *
 mem__sys_realloc_zeroed(void *from /*NULLOK*/, size_t size, size_t old_size)
-    /* WARN_UNUSED */
+    /* MALLOC, WARN_UNUSED */
 {
     void *ptr;
 #ifdef DETAIL_MEMORY_DEBUG
@@ -157,7 +157,7 @@ mem__sys_realloc_zeroed(void *from /*NULLOK*/, size_t size, size_t old_size)
 void *
 mem__internal_realloc(void *from /*NN*/, size_t size,
         const char *file /*NN*/, int line)
-    /* WARN_UNUSED */
+    /* MALLOC, WARN_UNUSED */
 {
     void * const ptr = realloc(from, size);
 #ifdef DETAIL_MEMORY_DEBUG
@@ -226,7 +226,6 @@ mem_setup_allocator(Interp *interp /*NN*/)
 
     Parrot_initialize_memory_pools(interp);
     Parrot_initialize_header_pools(interp);
-
 }
 
 /*
