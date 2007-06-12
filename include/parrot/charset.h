@@ -1,5 +1,5 @@
 /* charset.h
- *  Copyright (C) 2004, The Perl Foundation.
+ *  Copyright (C) 2004-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -75,25 +75,76 @@ typedef INTVAL (*charset_find_word_boundary_t)(Interp *, STRING *source_string, 
 typedef STRING *(*charset_string_from_codepoint_t)(Interp *, UINTVAL codepoint);
 typedef size_t (*charset_compute_hash_t)(Interp *, STRING *, size_t seed);
 
-PARROT_API CHARSET *Parrot_new_charset(Interp *);
-PARROT_API CHARSET *Parrot_load_charset(Interp *, const char *charsetname);
-PARROT_API CHARSET *Parrot_find_charset(Interp *, const char *charsetname);
-PARROT_API INTVAL Parrot_register_charset(Interp *, const char *charsetname, CHARSET *charset);
-PARROT_API INTVAL Parrot_make_default_charset(Interp *, const char *charsetname, CHARSET *charset);
-PARROT_API CHARSET *Parrot_default_charset(Interp *);
 typedef STRING* (*charset_converter_t)(Interp *, STRING *src, STRING *dst);
-PARROT_API charset_converter_t Parrot_find_charset_converter(Interp *, CHARSET *lhs, CHARSET *rhs);
-PARROT_API void Parrot_register_charset_converter(Interp *,
-        CHARSET *lhs, CHARSET *rhs, charset_converter_t func);
 
-PARROT_API void Parrot_charsets_encodings_init(Interp *);
-PARROT_API void Parrot_charsets_encodings_deinit(Interp *);
+/* HEADERIZER BEGIN: src/charset.c */
 
-PARROT_API INTVAL Parrot_charset_number(Interp *, STRING *charsetname);
-PARROT_API STRING* Parrot_charset_name(Interp *, INTVAL);
-PARROT_API const char* Parrot_charset_c_name(Interp *, INTVAL);
-PARROT_API INTVAL Parrot_charset_number_of_str(Interp *, STRING *src);
-PARROT_API CHARSET* Parrot_get_charset(Interp *, INTVAL number_of_charset);
+PARROT_API const char * Parrot_charset_c_name( Interp *interp,
+    INTVAL number_of_charset );
+
+PARROT_API STRING* Parrot_charset_name( Interp *interp,
+    INTVAL number_of_charset )
+        __attribute__warn_unused_result__;
+
+PARROT_API INTVAL Parrot_charset_number_of_str( Interp *interp,
+    STRING *src /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+PARROT_API void Parrot_charsets_encodings_deinit( Interp *interp );
+PARROT_API void Parrot_charsets_encodings_init( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+PARROT_API CHARSET * Parrot_default_charset( Interp *interp )
+        __attribute__warn_unused_result__;
+
+PARROT_API CHARSET * Parrot_find_charset( Interp *interp,
+    const char *charsetname /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+PARROT_API charset_converter_t Parrot_find_charset_converter( Interp *interp,
+    CHARSET *lhs /*NN*/,
+    CHARSET *rhs /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
+
+PARROT_API CHARSET* Parrot_get_charset( Interp *interp,
+    INTVAL number_of_charset );
+
+PARROT_API CHARSET * Parrot_load_charset( Interp *interp,
+    const char *charsetname /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__
+        __attribute__noreturn__;
+
+PARROT_API INTVAL Parrot_make_default_charset( Interp *interp,
+    const char *charsetname,
+    CHARSET *charset /*NN*/ )
+        __attribute__nonnull__(3);
+
+PARROT_API CHARSET * Parrot_new_charset( Interp *interp )
+        __attribute__malloc__
+        __attribute__warn_unused_result__;
+
+PARROT_API INTVAL Parrot_register_charset( Interp *interp,
+    const char *charsetname /*NN*/,
+    CHARSET *charset /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
+
+PARROT_API void Parrot_register_charset_converter( Interp *interp,
+    CHARSET *lhs /*NN*/,
+    CHARSET *rhs /*NN*/,
+    charset_converter_t func /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
+INTVAL Parrot_charset_number( Interp *interp, STRING *charsetname );
+/* HEADERIZER END: src/charset.c */
 
 struct _charset {
     const char *name;
