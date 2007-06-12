@@ -146,7 +146,7 @@ caught it
 something happend
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
     new P0, .Exception
     set P0["_message"], "something happend"
     throw P0
@@ -156,7 +156,7 @@ CODE
 /something happend/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
     push_eh _handler
     new P0, .Exception
     clear_eh
@@ -169,7 +169,7 @@ CODE
 /No exception handler and no message/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
     new P0, .Exception
     throw P0
     print "not reached\n"
@@ -272,7 +272,7 @@ error 100
 severity 3
 OUT
 
-pasm_output_like( <<'CODE', <<OUT, "die - no handler" );
+pasm_error_output_like( <<'CODE', <<OUT, "die - no handler" );
     die 3, 100
     print "not reached\n"
     end
@@ -332,7 +332,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "pushmark - pop wrong one" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "pushmark - pop wrong one" );
     pushmark 10
     print "ok 1\n"
     popmark 500
@@ -487,7 +487,7 @@ Error: something happened
 Outer value
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', 'clear_eh out of context (1)' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'clear_eh out of context (1)' );
 .sub main :main
     pushmark 1
     clear_eh
@@ -559,7 +559,7 @@ CODE
 caught
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "pushaction - throw in main" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "pushaction - throw in main" );
 .sub main :main
     print "main\n"
     .const .Sub at_exit = "exit_handler"
@@ -639,7 +639,7 @@ OUTPUT
 
 ## Regression test for r14697.  This probably won't be needed when PDD23 is
 ## fully implemented.
-pir_output_like( <<'CODE', <<'OUTPUT', "invoke handler in calling sub" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "invoke handler in calling sub" );
 ## This tests that error handlers are out of scope when invoked (necessary for
 ## rethrow) when the error is signalled in another sub.
 .sub main :main

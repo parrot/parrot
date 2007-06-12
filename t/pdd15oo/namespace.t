@@ -161,7 +161,7 @@ ok
 baz
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "find_global Foo::bazz not found" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "find_global Foo::bazz not found" );
 .sub 'main' :main
     $P2 = find_global ["Foo"], "bazz"
     $P2()
@@ -172,7 +172,7 @@ CODE
 OUTPUT
 
 # [this used to behave differently from the previous case.]
-pir_output_like( <<'CODE', <<'OUTPUT', "find_global Foo::Bar::bazz not found" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "find_global Foo::Bar::bazz not found" );
 .sub 'main' :main
     $P2 = find_global ["Foo";"Bar"], "bazz"
     $P2()
@@ -236,7 +236,7 @@ ok
 baz
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "func() namespace resolution" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "func() namespace resolution" );
 .sub 'main' :main
     print "calling foo\n"
     foo()
@@ -684,7 +684,7 @@ print $S <<'EOF';
 EOF
 close $S;
 
-pir_output_like( <<'CODE', <<'OUTPUT', 'export_to() with null destination throws exception' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'export_to() with null destination throws exception' );
 .sub 'test' :main
     .local pmc nsa, nsb, ar
 
@@ -702,7 +702,7 @@ CODE
 /^destination namespace not specified\n/
 OUTPUT
 
-pir_output_like(
+pir_error_output_like(
     <<'CODE', <<'OUTPUT', 'export_to() with null exports default object set !!!UNSPECIFIED!!!' );
 .sub 'test' :main
     .local pmc nsa, nsb, ar
@@ -720,7 +720,7 @@ CODE
 /^exporting default object set not yet implemented\n/
 OUTPUT
 
-pir_output_like(
+pir_error_output_like(
     <<'CODE', <<'OUTPUT', 'export_to() with empty array exports default object set !!!UNSPECIFIED!!!' );
 .sub 'test' :main
     .local pmc nsa, nsb, ar
@@ -738,7 +738,7 @@ CODE
 /^exporting default object set not yet implemented\n/
 OUTPUT
 
-pir_output_like(
+pir_error_output_like(
     <<'CODE', <<'OUTPUT', 'export_to() with empty hash exports default object set !!!UNSPECIFIED!!!' );
 .sub 'test' :main
     .local pmc nsa, nsb, ar
@@ -802,7 +802,7 @@ a_foo
 b_foo
 OUTPUT
 
-pir_output_like( <<"CODE", <<'OUTPUT', "export_to -- success with hash (and value)" );
+pir_error_output_like( <<"CODE", <<'OUTPUT', "export_to -- success with hash (and value)" );
 .HLL 'A', ''
 .sub main :main
     a_foo()
@@ -1650,7 +1650,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', 'del_var()' );
 CODE
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', 'overriding find_method()' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'overriding find_method()' );
 .sub 'main' :main
     $P0 = newpdd15class 'Override'
     $P1 = new 'Override'
