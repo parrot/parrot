@@ -9,8 +9,8 @@ token term {
     | $<float>:=[ \d+\.\d* | \.\d+ ]
     | $<integer>:=[\d+]
     | $<ident>:=[<[a..z]><[_a..z0..9]>*]
-        [ $<array>:=[ \[ <expression> \] ]
-        | $<call>:=[ \( <expression> \) ]
+        [ $<array>:=[ '[' <expression> ']' ]
+        | $<call>:=[ '(' <expression> ')' ]
         ]?
 }
 
@@ -21,32 +21,45 @@ token string { <-["]>* }
 ## 'print' is a GNU extension to bc
 ## backslashed characters are ignored for now
 rule print {
-    print [ <string> | <expression> ] [ , [ <string> | <expression> ] ]*
+    print [ <string> | <expression> ] [ ',' [ <string> | <expression> ] ]*
 }
 
-rule compound_statement { \{ <statement_list> \} }
-rule if_statement { if \( <expression> \) <statement> [ else <statement> ]? }
-rule while_statement { while \( <expression> \) <statement> }
-rule for_statement {
-    for \( <expression> ; <expression> ; <expression> \) <statement>
+rule compound_statement { 
+    '{' <statement_list> '}' 
 }
+
+rule if_statement { 
+    'if' '(' <expression> ')' <statement> [ 'else' <statement> ]? 
+}
+
+rule while_statement { 
+    'while' '(' <expression> ')' <statement> 
+}
+
+rule for_statement {
+    'for' '(' <expression> ';' <expression> ';' <expression> ')' <statement>
+}
+
 rule statement {
     | <if_statement>
     | <while_statement>
     | <for_statement>
     | <compound_statement>
-    | \" <string> \"
-    | break
-    | continue
-    | halt
-    | return [ \( <expression> \) ]?
+    | '"' <string> '"'
+    | 'break'
+    | 'continue'
+    | 'halt'
+    | 'return' [ '(' <expression> ')' ]?
     | <expression>
 }
-rule statement_list { <statement>? [ ; <statement>? ]* }
+
+rule statement_list { 
+  <statement>? [ ';' <statement>? ]* 
+}
+
 rule program { ^ <statement_list> [ $ | <die: parse error> ] }
 
-rule pseudo_statement { limits | quit | warranty }
-
+rule pseudo_statement { 'limits' | 'quit' | 'warranty' }
 
 
 ## create operator precedence parser
