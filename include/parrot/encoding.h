@@ -71,23 +71,64 @@ PARROT_API extern ENCODING *Parrot_default_encoding_ptr;
 #define PARROT_FIXED_8_ENCODING Parrot_fixed_8_encoding_ptr
 #define PARROT_DEFAULT_FOR_UNICODE_ENCODING NULL
 
-PARROT_API ENCODING *Parrot_new_encoding(Interp*);
-PARROT_API ENCODING *Parrot_load_encoding(Interp*, const char *encoding_name);
-PARROT_API ENCODING *Parrot_find_encoding(Interp *, const char *encodingname);
-PARROT_API INTVAL Parrot_register_encoding(Interp *, const char *encodingname, ENCODING *encoding);
-PARROT_API INTVAL Parrot_make_default_encoding(Interp *, const char *encodingname, ENCODING *encoding);
-PARROT_API ENCODING *Parrot_default_encoding(Interp *);
 typedef INTVAL (*encoding_converter_t)(Interp *, ENCODING *lhs, ENCODING *rhs);
-PARROT_API encoding_converter_t Parrot_find_encoding_converter(Interp *, ENCODING *lhs, ENCODING *rhs);
 
-void parrot_init_encodings_2(Interp *);
-void parrot_deinit_encodings(Interp *);
+/* HEADERIZER BEGIN: src/encoding.c */
 
-PARROT_API INTVAL Parrot_encoding_number(Interp *, STRING *encodingname);
-PARROT_API INTVAL Parrot_encoding_number_of_str(Interp *, STRING *src);
-PARROT_API STRING* Parrot_encoding_name(Interp *, INTVAL number_of_encoding);
-PARROT_API ENCODING* Parrot_get_encoding(Interp *, INTVAL number_of_encoding);
-PARROT_API const char * Parrot_encoding_c_name(Interp *, INTVAL number_of_encoding);
+PARROT_API ENCODING * Parrot_default_encoding( Interp *interp );
+PARROT_API const char * Parrot_encoding_c_name( Interp *interp,
+    INTVAL number_of_encoding )
+        __attribute__warn_unused_result__;
+
+PARROT_API STRING* Parrot_encoding_name( Interp *interp,
+    INTVAL number_of_encoding )
+        __attribute__warn_unused_result__;
+
+PARROT_API INTVAL Parrot_encoding_number( Interp *interp,
+    STRING *encodingname /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+PARROT_API INTVAL Parrot_encoding_number_of_str( Interp *interp,
+    STRING *src /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+PARROT_API ENCODING * Parrot_find_encoding( Interp *interp,
+    const char *encodingname /*NN*/ )
+        __attribute__nonnull__(2);
+
+PARROT_API encoding_converter_t Parrot_find_encoding_converter( Interp *interp,
+    ENCODING *lhs,
+    ENCODING *rhs );
+
+PARROT_API ENCODING* Parrot_get_encoding( Interp *interp,
+    INTVAL number_of_encoding )
+        __attribute__warn_unused_result__;
+
+PARROT_API ENCODING * Parrot_load_encoding( Interp *interp,
+    const char *encodingname )
+        __attribute__warn_unused_result__
+        __attribute__noreturn__;
+
+PARROT_API INTVAL Parrot_make_default_encoding( Interp *interp,
+    const char *encodingname,
+    ENCODING *encoding /*NN*/ )
+        __attribute__nonnull__(3);
+
+PARROT_API ENCODING * Parrot_new_encoding( Interp *interp )
+        __attribute__malloc__
+        __attribute__warn_unused_result__;
+
+PARROT_API INTVAL Parrot_register_encoding( Interp *interp,
+    const char *encodingname /*NN*/,
+    ENCODING *encoding /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+void parrot_deinit_encodings( Interp *interp );
+void parrot_init_encodings_2( Interp *interp );
+/* HEADERIZER END: src/encoding.c */
 
 #define ENCODING_MAX_BYTES_PER_CODEPOINT(i, src) \
     ((const ENCODING *)src->encoding)->max_bytes_per_codepoint

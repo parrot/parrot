@@ -122,7 +122,7 @@ Return the number of the charset or -1 if not found.
 
 PARROT_API
 INTVAL
-Parrot_charset_number(Interp *interp, STRING *charsetname)
+Parrot_charset_number(Interp *interp, STRING *charsetname /*NN*/)
     /* WARN_UNUSED */
 {
     int i;
@@ -171,6 +171,7 @@ Parrot_charset_name(Interp *interp, INTVAL number_of_charset)
 PARROT_API
 CHARSET*
 Parrot_get_charset(Interp *interp, INTVAL number_of_charset)
+    /* WARN_UNUSED */
 {
     if (number_of_charset >= all_charsets->n_charsets)
         return NULL;
@@ -180,6 +181,7 @@ Parrot_get_charset(Interp *interp, INTVAL number_of_charset)
 PARROT_API
 const char *
 Parrot_charset_c_name(Interp *interp, INTVAL number_of_charset)
+    /* WARN_UNUSED */
 {
     if (number_of_charset >= all_charsets->n_charsets)
         return NULL;

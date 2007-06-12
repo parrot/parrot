@@ -1829,9 +1829,10 @@ HEADERIZER_O_FILES = \
 
 # Slowing working my way up to having everything headerized in $(HEADERIZER_O_FILES)
 HEADERIZER_O_FILES = \
+    src/byteorder.o \
     src/charset.o \
     src/datatypes.o \
-    src/byteorder.o \
+    src/encoding.o \
     src/exceptions.o \
     src/exit.o \
     src/fingerprint.o \

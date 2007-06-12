@@ -80,10 +80,16 @@ typedef STRING* (*charset_converter_t)(Interp *, STRING *src, STRING *dst);
 /* HEADERIZER BEGIN: src/charset.c */
 
 PARROT_API const char * Parrot_charset_c_name( Interp *interp,
-    INTVAL number_of_charset );
+    INTVAL number_of_charset )
+        __attribute__warn_unused_result__;
 
 PARROT_API STRING* Parrot_charset_name( Interp *interp,
     INTVAL number_of_charset )
+        __attribute__warn_unused_result__;
+
+PARROT_API INTVAL Parrot_charset_number( Interp *interp,
+    STRING *charsetname /*NN*/ )
+        __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
 PARROT_API INTVAL Parrot_charset_number_of_str( Interp *interp,
@@ -111,7 +117,8 @@ PARROT_API charset_converter_t Parrot_find_charset_converter( Interp *interp,
         __attribute__warn_unused_result__;
 
 PARROT_API CHARSET* Parrot_get_charset( Interp *interp,
-    INTVAL number_of_charset );
+    INTVAL number_of_charset )
+        __attribute__warn_unused_result__;
 
 PARROT_API CHARSET * Parrot_load_charset( Interp *interp,
     const char *charsetname /*NN*/ )
@@ -143,7 +150,6 @@ PARROT_API void Parrot_register_charset_converter( Interp *interp,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-INTVAL Parrot_charset_number( Interp *interp, STRING *charsetname );
 /* HEADERIZER END: src/charset.c */
 
 struct _charset {
