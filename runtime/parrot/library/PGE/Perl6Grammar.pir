@@ -106,7 +106,7 @@ the output to the correct output file.
     p6regex($S0, 'grammar'=>'PGE::Perl6Grammar', 'name'=>'arg')
 
     $S0 = <<'      STMT_PARSE'
-        $<cmd>:=(grammar) $<name>:=<arg> ';'?
+        $<cmd>:=(grammar) <name> ';'?
       | $<cmd>:=(regex|token|rule) 
           $<name>:=<arg>
           $<optable>:=(is optable)?
@@ -221,8 +221,7 @@ the output to the correct output file.
 
     ##   get the grammar name
     .local string name
-    $P0 = stmt['name']
-    name = $P0[0]
+    name = stmt['name']
 
     ##   remove any trailing semicolon
     $S0 = substr name, -1
