@@ -14,6 +14,7 @@ CP       = @cp@
 O        = @o@
 LOAD_EXT = @load_ext@
 PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
+PGE_LIBRARY = @build_dir@/runtime/parrot/library/PGE
 
 PMCDIR   = src/pmc
 
@@ -28,10 +29,11 @@ SOURCES = pynie.pir \
   src/builtins/oper.pir
 
 # the default target
-pynie.pbc: $(PARROT) $(PGE_DIR)/pgc.pir $(SOURCES)
-	$(PARROT) $(PGE_DIR)/pgc.pir --output=src/parser/Grammar_gen.pir \
-	    src/parser/Grammar.pg
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/PAST/Grammar_gen.pir src/PAST/Grammar.tg
+pynie.pbc: $(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
+	$(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir \
+	    --output=src/parser/Grammar_gen.pir src/parser/Grammar.pg
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/PAST/Grammar_gen.pir \
+	    src/PAST/Grammar.tg
 	$(PARROT) -o pynie.pbc pynie.pir
 
 # This is a listing of all targets, that are meant to be called by users

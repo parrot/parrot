@@ -18,7 +18,7 @@ token TOP { <?indent_zero> <file_input> }
 
 token newline { [ <?ws> \n ]+ }
 
-token ws { \h* [ <'#'> \N* ]? }
+token ws { \h* [ '#' \N* ]? }
 
 token file_input { ^ [ <?newline> | <statement> ]* [ $ | <?die: syntax_error> ] }
 
@@ -34,7 +34,7 @@ token statement {
     | <stmt_list> <?newline>
 }
 
-token stmt_list { <simple_stmt> [ <';'> <simple_stmt> ]* <';'>? }
+token stmt_list { <simple_stmt> [ ';' <simple_stmt> ]* ';'? }
 
 token compound_stmt {
     | <if_stmt>
@@ -47,19 +47,19 @@ token compound_stmt {
 }
 
 rule if_stmt {
-    <'if'> <expression> <':'> <suite>
-    [ <'elif'> <expression> <':'> <suite> ]*
-    [ <'else'> <':'> <suite> ]?
+    'if' <expression> ':' <suite>
+    [ 'elif' <expression> ':' <suite> ]*
+    [ 'else' ':' <suite> ]?
 }
 
 rule while_stmt {
-    <'while'> <expression> <':'> <suite>
-    [ <'else'> <':'> <suite> ]?
+    'while' <expression> ':' <suite>
+    [ 'else' ':' <suite> ]?
 }
 
 rule for_stmt {
-    <'for'> <target_list> <'in'> <expression_list> <':'> <suite>
-    [ <'else'> <':'> <suite> ]?
+    'for' <target_list> 'in' <expression_list> ':' <suite>
+    [ 'else' ':' <suite> ]?
 }
 
 rule try_stmt {
@@ -67,24 +67,24 @@ rule try_stmt {
 }
 
 rule try1_stmt {
-    <'try'> <':'> <suite>
-    [ <'except'> [ <expression> [ <','> <target> ]? ]? <':'> <suite> ]+
-    [ <'else'> <':'> <suite> ]?
-    [ <'finally'> <':'> <suite> ]?
+    'try' ':' <suite>
+    [ 'except' [ <expression> [ ',' <target> ]? ]? ':' <suite> ]+
+    [ 'else' ':' <suite> ]?
+    [ 'finally' ':' <suite> ]?
 }
 
 rule try2_stmt {
-    <'try'> <':'> <suite>
-    <'finally'> <':'> <suite>
+    'try' ':' <suite>
+    'finally' ':' <suite>
 }
 
 rule with_stmt {
-    <'with'> <expression> [ <'as'> <target> ]? <':'> <suite>
+    'with' <expression> [ 'as' <target> ]? ':' <suite>
 }
 
 rule funcdef {
-    <decorators>? <'def'> <funcname> <'('> <parameter_list>? <')'>
-    <':'> <suite>
+    <decorators>? 'def' <funcname> '(' <parameter_list>? ')'
+    ':' <suite>
 }
 
 
@@ -93,35 +93,35 @@ rule decorators {
 }
 
 rule decorator {
-    <'@'> <dotted_name> [ <'('> [ <argument_list> <','>? ]? <')'> ]? <?newline>
+    '@' <dotted_name> [ '(' [ <argument_list> ','? ]? ')' ]? <?newline>
 }
 
 rule argument_list {
-    | <positional_arguments> [ <','> <keyword_arguments> ]?
-        [ <','> <'*'> <expression> ]?
-        [ <','> <'**'> <expression> ]?
+    | <positional_arguments> [ ',' <keyword_arguments> ]?
+        [ ',' '*' <expression> ]?
+        [ ',' '**' <expression> ]?
     | <keyword_arguments>
-        [ <','> <'*'> <expression> ]?
-        [ <','> <'**'> <expression> ]?
-    | <'*'> <expression>
-        [ <','> <'**'> <expression> ]?
-    | <'**'> <expression>
+        [ ',' '*' <expression> ]?
+        [ ',' '**' <expression> ]?
+    | '*' <expression>
+        [ ',' '**' <expression> ]?
+    | '**' <expression>
 }
 
 rule positional_arguments {
-    <expression> [ <','> <expression> ]*
+    <expression> [ ',' <expression> ]*
 }
 
 rule keyword_arguments {
-    <keyword_item> [ <','> <keyword_item> ]*
+    <keyword_item> [ ',' <keyword_item> ]*
 }
 
 rule keyword_item {
-    <identifier> <'='> <expression>
+    <identifier> '=' <expression>
 }
 
 rule dotted_name {
-    <identifier> [ <'.'> <identifier> ]*
+    <identifier> [ '.' <identifier> ]*
 }
 
 rule funcname {
@@ -129,28 +129,28 @@ rule funcname {
 }
 
 rule parameter_list {
-    [ <defparameter> <','> ]*
-    [ <'*'> <identifier> [ <','> <'**'> <identifier> ]?
-    | <'**'> <identifier>
-    | <defparameter> <','>?
+    [ <defparameter> ',' ]*
+    [ '*' <identifier> [ ',' '**' <identifier> ]?
+    | '**' <identifier>
+    | <defparameter> ','?
     ]
 }
 
 rule defparameter {
-    <parameter> [ <'='> <expression> ]?
+    <parameter> [ '=' <expression> ]?
 }
 
 rule sublist {
-    <parameter> [ <','> <parameter> ]* <','>?
+    <parameter> [ ',' <parameter> ]* ','?
 }
 
 rule parameter {
-    <identifier> | <'('> <sublist> <')'>
+    <identifier> | '(' <sublist> ')'
 }
 
 
 rule classdef {
-    <'class'> <classname> <inheritance>? <':'> <suite>
+    'class' <classname> <inheritance>? ':' <suite>
 }
 
 rule classname {
@@ -158,12 +158,12 @@ rule classname {
 }
 
 rule inheritance {
-    <'('> <expression_list>? <')'>
+    '(' <expression_list>? ')'
 }
 
 
 rule lambda_form {
-    <'lambda'> <parameter_list>? <':'> <expression>
+    'lambda' <parameter_list>? ':' <expression>
 }
 
 token simple_stmt {
@@ -189,18 +189,18 @@ token simple_stmt {
 #}
 
 rule assert_stmt {
-    <'assert'> <expression> [ <','> <expression> ]?
+    'assert' <expression> [ ',' <expression> ]?
 }
 
-rule assignment_stmt { [ <target_list> <'='> ]+ <expression_list> }
+rule assignment_stmt { [ <target_list> '=' ]+ <expression_list> }
 
 rule augmented_assignment_stmt { <target> <augop> <expression_list> }
 
-rule target_list { <target> [ <','> <target> ]* <','>? }
+rule target_list { <target> [ ',' <target> ]* ','? }
 
 rule target {
-    | <'('> <target_list> <')'>
-    | <'['> <target_list> <']'>
+    | '(' <target_list> ')'
+    | '[' <target_list> ']'
     | <identifier>
     #| <primary>
     #| <primary> <attributeref>
@@ -209,16 +209,16 @@ rule target {
 }
 
 rule call {
-    | <'('> [ <argument_list>? <','>? ]? <')'>
-    | <'('> [ <argument_list> <','>? | <test> <genexpr_for> ] <')'>
+    | '(' [ <argument_list>? ','? ]? ')'
+    | '(' [ <argument_list> ','? | <test> <genexpr_for> ] ')'
 }
 
 rule attributeref {
-    <'.'> <identifier>
+    '.' <identifier>
 }
 
 rule subscription {
-    <'['> <expression_list> <']'>
+    '[' <expression_list> ']'
 }
 
 rule slicing {
@@ -226,19 +226,19 @@ rule slicing {
 }
 
 rule simple_slicing {
-    <'['> <short_slice> <']'>
+    '[' <short_slice> ']'
 }
 
 rule extended_slicing {
-    <'['> <slice_list> <']'>
+    '[' <slice_list> ']'
 }
 
 rule slice_list {
-    <slice_item> [ <','> <slice_item> ]* <','>?
+    <slice_item> [ ',' <slice_item> ]* ','?
 }
 
 rule slice_item {
-    <expression> | <proper_slice> | <'...'>
+    <expression> | <proper_slice> | '...'
 }
 
 rule proper_slice {
@@ -246,79 +246,79 @@ rule proper_slice {
 }
 
 rule short_slice {
-    <expression>? <':'> <expression>?
+    <expression>? ':' <expression>?
 }
 
 rule long_slice {
-    <short_slice> <':'> <expression>?
+    <short_slice> ':' <expression>?
 }
 
-token identifier { <!reserved> [ <?alpha> | <'_'> ] \w* }
+token identifier { <!reserved> [ <?alpha> | '_' ] \w* }
 
-token name { <!reserved> <[a..z]> [ <alpha> | <'_'> ]* }
+token name { <!reserved> <[a..z]> [ <alpha> | '_' ]* }
 
 rule print_stmt {
-    <'print'> [ <expression> [ <','> <expression> ]* ( <','>? ) ]?
+    'print' [ <expression> [ ',' <expression> ]* ( ','? ) ]?
 }
 
 rule pass_stmt {
-    <'pass'>
+    'pass'
 }
 
 rule del_stmt {
-    <'del'> <target_list>
+    'del' <target_list>
 }
 
 rule return_stmt {
-    <'return'> <expression_list>?
+    'return' <expression_list>?
 }
 
 rule yield_stmt {
-    <'yield'> <expression_list>
+    'yield' <expression_list>
 }
 
 rule break_stmt {
-    <'break'>
+    'break'
 }
 
 rule continue_stmt {
-    <'continue'>
+    'continue'
 }
 
 rule raise_stmt {
-    <'raise'> [ <expression> [ <','> <expression>
-    [ <','> <expression> ]? ]? ]?
+    'raise' [ <expression> [ ',' <expression>
+    [ ',' <expression> ]? ]? ]?
 }
 
 rule global_stmt {
-    <'global'> <identifier> [ <','> <identifier> ]*
+    'global' <identifier> [ ',' <identifier> ]*
 }
 
 rule exec_stmt {
-    <'exec'> <expression>
-    [ <'in'> <expression> [ <','> <expression> ]? ]?
+    'exec' <expression>
+    [ 'in' <expression> [ ',' <expression> ]? ]?
 }
 
 rule import_stmt {
-    | <'import'> <module> <import_alias>?
-      [ <','> <module> <import_alias>? ]*
+    | 'import' <module> <import_alias>?
+      [ ',' <module> <import_alias>? ]*
     | <import_module> <identifier> <import_alias>?
-      [ <','> <identifier> <import_alias>? ]*
-    | <import_module> <'('> <identifier> <import_alias>?
-      [ <','> <identifier> <import_alias>? ]* <','>? <')'>
-    | <import_module> <'*'>
+      [ ',' <identifier> <import_alias>? ]*
+    | <import_module> '(' <identifier> <import_alias>?
+      [ ',' <identifier> <import_alias>? ]* ','? ')'
+    | <import_module> '*'
 }
 
 rule import_module {
-    <'from'> <module> <'import'>
+    'from' <module> 'import'
 }
 
 rule import_alias {
-    <'as'> <name>
+    'as' <name>
 }
 
 rule module {
-    [ <identifier> <'.'> ]* <identifier>
+    [ <identifier> '.' ]* <identifier>
 }
 
 token literal {
@@ -330,9 +330,9 @@ token literal {
 }
 
 token integer {
-    | <'0'> <[0..7]>+
-    | <'0'> <[xX]> [ \d | <[a..f]> | <[A..F]> ]+
-    | <[1..9]> \d* | <'0'>
+    | '0' <[0..7]>+
+    | '0' <[xX]> [ \d | <[a..f]> | <[A..F]> ]+
+    | <[1..9]> \d* | '0'
 }
 
 token intpart { \d+ }
@@ -342,8 +342,8 @@ token longinteger { <integer> <[lL]> }
 token imagnumber { [ <floatnumber> | <intpart> ] <[jJ]> }
 
 token floatnumber {
-    | \d* <'.'> \d+ [ <[eE]> <[+\-]>? \d+ ]?
-    | \d+ <'.'> [ <[eE]> <[+\-]>? \d+ ]?
+    | \d* '.' \d+ [ <[eE]> <[+\-]>? \d+ ]?
+    | \d+ '.' [ <[eE]> <[+\-]>? \d+ ]?
     | \d+ <[eE]> <[+\-]>? \d+
 }
 
@@ -353,28 +353,28 @@ token stringliteral {
 }
 
 token shortstring {
-    | " ( [ \\ . | <-["\n]> ]* ) "
-    | ' ( [ \\ . | <-['\n]> ]* ) '
+    | \" ( [ \\ . | <-["\n]> ]* ) \"
+    | \' ( [ \\ . | <-['\n]> ]* ) \'
 }
 
 regex longstring {
-    | """ ( [ \\ . | . ]* ) """
-    | ''' ( [ \\ . | . ]* ) '''
+    | \"\"\" ( [ \\ . | . ]* ) \"\"\"
+    | \'\'\' ( [ \\ . | . ]* ) \'\'\'
 }
 
 
 token stringprefix {
-    <'r'> | <'u'> | <'ur'> | <'R'> | <'U'> | <'UR'> | <'Ur'> | <'uR'>
+    'r' | 'u' | 'ur' | 'R' | 'U' | 'UR' | 'Ur' | 'uR'
 }
 
-rule expression_list { <expression> [ , <expression> ]* <','>? }
+rule expression_list { <expression> [ ',' <expression> ]* ','? }
 
-rule list_display { <'['> <listmaker>? <']'> }
+rule list_display { '[' <listmaker>? ']' }
 
 rule listmaker {
     <expression>
     [ <list_for>
-    | [ <','> <expression> ]* <','>?
+    | [ ',' <expression> ]* ','?
     ]
 }
 
@@ -383,7 +383,7 @@ rule list_iter {
 }
 
 rule list_for {
-    <'for'> <expression_list> <'in'> <testlist>
+    'for' <expression_list> 'in' <testlist>
     <list_iter>?
 }
 
@@ -392,16 +392,16 @@ rule test {
 }
 
 rule testlist {
-    <test> [ <','> <test> ]* <','>?
+    <test> [ ',' <test> ]* ','?
 }
 
 rule list_if {
-    <'if'> <test> <list_iter>?
+    'if' <test> <list_iter>?
 }
 
 token augop {
-    | <'+='>  | <'-='>  | <'*='> | <'/='> | <'\%='> | <'**='>
-    | <'>>='> | <'<<='> | <'&='> | <'^='> | <'|='>
+    | '+='  | '-='  | '*=' | '/=' | '\%=' | '**='
+    | '>>=' | '<<=' | '&=' | '^=' | '|='
 }
 
 rule primary {
@@ -427,15 +427,15 @@ rule atom {
 }
 
 rule parenth_form {
-    <'('> <expression_list>? <')'>
+    '(' <expression_list>? ')'
 }
 
 rule generator_expression {
-    <'('> <test> <genexpr_for> <')'>
+    '(' <test> <genexpr_for> ')'
 }
 
 rule genexpr_for {
-    <'for'> <expression_list> <'in'> <test>
+    'for' <expression_list> 'in' <test>
     <genexpr_iter>?
 }
 
@@ -444,23 +444,23 @@ rule genexpr_iter {
 }
 
 rule genexpr_if {
-    <'if'> <test> <genexpr_iter>?
+    'if' <test> <genexpr_iter>?
 }
 
 rule dict_display {
-    <'{'> <key_datum_list>? <'}'>
+    '{' <key_datum_list>? '}'
 }
 
 rule key_datum_list {
-    <key_datum> [ <','> <key_datum> ]* <','>?
+    <key_datum> [ ',' <key_datum> ]* ','?
 }
 
 rule key_datum {
-    <expression> <':'> <expression>
+    <expression> ':' <expression>
 }
 
 rule string_conversion {
-    <'`'> <expression_list> <'`'>
+    '`' <expression_list> '`'
 }
 
 # Evaluation order of expressions is based on the table as provided in
@@ -468,71 +468,71 @@ rule string_conversion {
 #
 #
 rule expression {
-    | <or_test> [ <'if'> <or_test> <'else'> <test> ]?
+    | <or_test> [ 'if' <or_test> 'else' <test> ]?
     | <lambda_form>
 }
 
 rule or_test {
-    <and_test> [ <'or'> <and_test> ]*
+    <and_test> [ 'or' <and_test> ]*
 }
 
 rule and_test {
-    <not_test> [ <'and'> <not_test> ]*
+    <not_test> [ 'and' <not_test> ]*
 }
 
 rule not_test {
-    | <'not'> <not_test>
+    | 'not' <not_test>
     | <in_test>
 }
 
 rule in_test {
-    <is_test> [ (<'not'>)? <'in'> <is_test> ]*
+    <is_test> [ ('not')? 'in' <is_test> ]*
 }
 
 rule is_test {
-    <comparison> [ <'is'> (<'not'>)? <comparison> ]*
+    <comparison> [ 'is' ('not')? <comparison> ]*
 }
 
 token 'comparison' is optable { ... }
 
 proto 'term:'      is precedence('=')    is parsed(&primary) { ... }
-proto 'infix:**'   is looser('term:')        { ... }
-proto 'prefix:~'   is looser('infix:**')     { ... }
-proto 'prefix:+'   is looser('prefix:~')     { ... }
-proto 'prefix:-'   is equiv('prefix:+')  is pirop('neg')     { ... }
-proto 'infix:*'    is looser('prefix:+') is pirop('mul')     { ... }
-proto 'infix:/'    is equiv('infix:*')   is pirop('div')     { ... }
-proto 'infix://'   is equiv('infix:*')   is pirop('fdiv')    { ... }
-proto 'infix:%'    is equiv('infix:*')   is pirop('mod')     { ... }
-proto 'infix:+'    is looser('infix:*')  is pirop('add')     { ... }
-proto 'infix:-'    is equiv('infix:+')   is pirop('sub')     { ... }
+proto infix:<**>   is looser('term:')        { ... }
+proto prefix:<~>   is looser(infix:<**>)     { ... }
+proto prefix:<+>   is looser(prefix:<~>)     { ... }
+proto prefix:<->   is equiv(prefix:<+>)  is pirop('neg')     { ... }
+proto infix:<*>    is looser(prefix:<+>) is pirop('mul')     { ... }
+proto infix:</>    is equiv(infix:<*>)   is pirop('div')     { ... }
+proto infix:<//>   is equiv(infix:<*>)   is pirop('fdiv')    { ... }
+proto infix:<%>    is equiv(infix:<*>)   is pirop('mod')     { ... }
+proto infix:<+>    is looser(infix:<*>)  is pirop('add')     { ... }
+proto infix:<->    is equiv(infix:<+>)   is pirop('sub')     { ... }
 
-proto 'infix:<<'   is looser('infix:+')  is pirop('shl')     { ... }
-proto 'infix:>>'   is equiv('infix:<<')  is pirop('shr')     { ... }
-proto 'infix:&'    is looser('infix:<<')     { ... }
-proto 'infix:^'    is looser('infix:&')      { ... }
-proto 'infix:|'    is looser('infix:^')      { ... }
+proto infix:«<<»   is looser(infix:<+>)  is pirop('shl')     { ... }
+proto infix:«>>»   is equiv(infix:«<<»)  is pirop('shr')     { ... }
+proto infix:<&>    is looser(infix:«<<»)     { ... }
+proto infix:<^>    is looser(infix:<&>)      { ... }
+proto infix:<|>    is looser(infix:<^>)      { ... }
 
-proto 'infix:=='   is looser('infix:|')      { ... }
-proto 'infix:!='   is equiv('infix:==')      { ... }
-proto 'infix:<='   is equiv('infix:==')      { ... }
-proto 'infix:>='   is equiv('infix:==')      { ... }
-proto 'infix:<'    is equiv('infix:==')      { ... }
-proto 'infix:>'    is equiv('infix:==')      { ... }
+proto infix:<==>   is looser(infix:<|>)      { ... }
+proto infix:<!=>   is equiv(infix:<==>)      { ... }
+proto infix:«<=»   is equiv(infix:<==>)      { ... }
+proto infix:«>=»   is equiv(infix:<==>)      { ... }
+proto infix:«<»    is equiv(infix:<==>)      { ... }
+proto infix:«>»    is equiv(infix:<==>)      { ... }
 
 
 ## Python reserved words and keywords
 
 token reserved {
-    <keyword> | <'None'>
+    <keyword> | 'None'
 }
 
 token keyword {
-    [ <'and'>   | <'assert'> | <'break'>  | <'class'>  | <'continue'> | <'def'>
-    | <'del'>   | <'elif'>   | <'else'>   | <'except'> | <'exec'>     | <'finally'>
-    | <'for'>   | <'from'>   | <'global'> | <'if'>     | <'import'>   | <'in'>
-    | <'is'>    | <'lambda'> | <'not'>    | <'or'>     | <'pass'>     | <'print'>
-    | <'raise'> | <'return'> | <'try'>    | <'while'>  | <'with'>     | <'yield'> ] \b
+    [ 'and'   | 'assert' | 'break'  | 'class'  | 'continue' | 'def'
+    | 'del'   | 'elif'   | 'else'   | 'except' | 'exec'     | 'finally'
+    | 'for'   | 'from'   | 'global' | 'if'     | 'import'   | 'in'
+    | 'is'    | 'lambda' | 'not'    | 'or'     | 'pass'     | 'print'
+    | 'raise' | 'return' | 'try'    | 'while'  | 'with'     | 'yield' ] \b
 }
 
 ## vim: expandtab sw=4
