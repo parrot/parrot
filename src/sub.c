@@ -33,7 +33,7 @@ Marks the context C<*ctx>.
 */
 
 void
-mark_context(Interp *interp, parrot_context_t* ctx)
+mark_context(Interp *interp, parrot_context_t* ctx /*NN*/)
 {
     PObj *obj;
     int i;

@@ -205,6 +205,9 @@ typedef struct Parrot_Context_info {
     opcode_t *address;
 } Parrot_Context_info;
 
+/* HEADERIZER BEGIN: src/sub.c */
+/* HEADERIZER END: src/sub.c */
+
 struct Parrot_sub * new_sub(Interp * interp);
 struct Parrot_sub * new_closure(Interp * interp);
 struct Parrot_coro * new_coroutine(Interp * interp);

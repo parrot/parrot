@@ -1857,6 +1857,7 @@ HEADERIZER_O_FILES = \
     src/string.o \
     src/string_primitives.o \
     src/utils.o \
+    src/vtables.o \
 
 headerizer:
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)
