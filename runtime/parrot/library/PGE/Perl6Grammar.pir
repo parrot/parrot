@@ -95,6 +95,7 @@ the output to the correct output file.
     p6regex($S0, 'grammar'=>'PGE::Perl6Grammar', 'name'=>'pod_comment')
 
     $S0 = <<'      END_ARG_RULE'
+      $<category>:=[\w+\:]?
       [  \' (<-[']>*:) \'
       | '"' (<-["]>*:) '"'
       | '(' (<-[)]>*:) ')'
@@ -254,7 +255,9 @@ the output to the correct output file.
     ##   get the regex name
     .local string name
     $P0 = stmt['name']
-    name = $P0[0]
+    $S0 = $P0['category']
+    $S1 = $P0[0]
+    name = concat $S0, $S1
 
     ##   set compile adverbs
     .local pmc adverbs
@@ -323,7 +326,9 @@ the output to the correct output file.
 
     .local string name
     $P0 = stmt['name']
-    name = $P0[0]
+    $S0 = $P0['category']
+    $S1 = $P0[0]
+    name = concat $S0, $S1
 
     .local pmc optable
     $P0 = nstable[namespace]
