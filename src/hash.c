@@ -726,8 +726,8 @@ HashBucket *
 parrot_hash_get_bucket(Interp *interp, const Hash *hash, void *key)
     /* PURE, WARN_UNUSED */
 {
-    const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
-    HashBucket *bucket = hash->bi[hashval & hash->mask];
+    const UINTVAL  hashval = (hash->hash_val)(interp, key, hash->seed);
+    HashBucket    *bucket  = hash->bi[hashval & hash->mask];
     while (bucket) {
         /* store hash_val or not */
         if ((hash->compare)(interp, key, bucket->key) == 0)
@@ -782,7 +782,8 @@ HashBucket*
 parrot_hash_put(Interp *interp, Hash *hash, void *key, void *value)
 {
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
-    HashBucket *bucket = hash->bi[hashval & hash->mask];
+    HashBucket   *bucket = hash->bi[hashval & hash->mask];
+
     while (bucket) {
         /* store hash_val or not */
         if ((hash->compare)(interp, key, bucket->key) == 0)
@@ -802,18 +803,22 @@ parrot_hash_put(Interp *interp, Hash *hash, void *key, void *value)
             DOD_WRITE_BARRIER_KEY(interp, hash->container,
                     NULL, NULL, (PMC*)value, key);
         }
+
         bucket = hash->free_list;
+
         if (!bucket) {
             expand_hash(interp, hash);
             bucket = hash->free_list;
         }
+
         hash->entries++;
-        hash->free_list = bucket->next;
-        bucket->key = key;
-        bucket->value = value;
-        bucket->next = hash->bi[hashval & hash->mask];
+        hash->free_list                = bucket->next;
+        bucket->key                    = key;
+        bucket->value                  = value;
+        bucket->next                   = hash->bi[hashval & hash->mask];
         hash->bi[hashval & hash->mask] = bucket;
     }
+
     return bucket;
 }
 
@@ -865,24 +870,26 @@ parrot_hash_clone(Interp *interp, Hash *hash /*NN*/, Hash **dest)
 
     parrot_new_hash_x(interp, dest, hash->entry_type,
             hash->key_type, hash->compare, hash->hash_val);
+
     for (i = 0; i <= hash->mask; i++) {
         HashBucket *b = hash->bi[i];
         while (b) {
-            void * const key = b->key;
-            void *valtmp;
+            void * const  key = b->key;
+            void         *valtmp;
+
             switch (hash->entry_type) {
             case enum_type_undef:
             case enum_type_ptr:
             case enum_type_INTVAL:
-                valtmp = b->value;
+                valtmp = (void *)b->value;
                 break;
 
             case enum_type_STRING:
-                valtmp = string_copy(interp, (STRING *)b->value);
+                valtmp = (void *)string_copy(interp, (STRING *)b->value);
                 break;
 
             case enum_type_PMC:
-                valtmp = VTABLE_clone(interp, (PMC*)b->value);
+                valtmp = (void *)VTABLE_clone(interp, (PMC*)b->value);
                 break;
 
             default:

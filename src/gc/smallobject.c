@@ -20,13 +20,14 @@ Handles the accessing of small object pools (header pools).
 
 /* HEADER: include/parrot/smallobject.h */
 
-#define GC_DEBUG_REPLENISH_LEVEL_FACTOR 0.0
+#define GC_DEBUG_REPLENISH_LEVEL_FACTOR        0.0
 #define GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR 1
-#define REPLENISH_LEVEL_FACTOR 0.3
-/* this factor is totally arbitrary, but gives good timings for stress.pasm */
-#define UNITS_PER_ALLOC_GROWTH_FACTOR 1.75
+#define REPLENISH_LEVEL_FACTOR                 0.3
 
-#define POOL_MAX_BYTES 65536*128
+/* this factor is totally arbitrary, but gives good timings for stress.pasm */
+#define UNITS_PER_ALLOC_GROWTH_FACTOR          1.75
+
+#define POOL_MAX_BYTES                         65536 * 128
 
 /*
 
@@ -51,11 +52,11 @@ contained_in_pool(Interp *interp, Small_Object_Pool *pool /*NN*/, void *ptr)
             (ptrdiff_t)ptr - (ptrdiff_t)arena->start_objects;
 
         if (0 <= ptr_diff
-                && ptr_diff <
-                (ptrdiff_t)(arena->used * pool->object_size)
+                && ptr_diff < (ptrdiff_t)(arena->used * pool->object_size)
                 && ptr_diff % pool->object_size == 0)
             return 1;
     }
+
     return 0;
 }
 
@@ -71,10 +72,11 @@ int
 Parrot_is_const_pmc(Parrot_Interp interp /*NN*/, PMC *pmc)
 {
     Small_Object_Pool * const pool = interp->arena_base->constant_pmc_pool;
-    const int c = contained_in_pool(interp, pool, pmc);
+    const               int   c    = contained_in_pool(interp, pool, pmc);
 
     /* some paranoia first */
     assert(!!PObj_constant_TEST(pmc) == !!c);
+
     return c;
 }
 
@@ -97,6 +99,7 @@ more_traceable_objects(Interp *interp, Small_Object_Pool *pool /*NN*/)
         if (arena) {
             if (arena->used == arena->total_objects)
                 Parrot_do_dod_run(interp, DOD_trace_stack_FLAG);
+
             if (pool->num_free_objects <= pool->replenish_level)
                 pool->skip = 1;
         }
@@ -104,11 +107,9 @@ more_traceable_objects(Interp *interp, Small_Object_Pool *pool /*NN*/)
 
     /* requires that num_free_objects be updated in Parrot_do_dod_run. If dod
      * is disabled, then we must check the free list directly. */
-    if (!pool->free_list) {
+    if (!pool->free_list)
         (*pool->alloc_objects) (interp, pool);
-    }
 }
-
 
 /*
 
@@ -119,10 +120,11 @@ Add an unused object back to the free pool for later reuse.
 */
 
 static void
-gc_ms_add_free_object(Interp *interp, Small_Object_Pool *pool /*NN*/, void *to_add)
+gc_ms_add_free_object(Interp *interp, Small_Object_Pool *pool /*NN*/,
+                      void   *to_add)
 {
     *(void **)to_add = pool->free_list;
-    pool->free_list = to_add;
+    pool->free_list  = to_add;
 }
 
 /*
@@ -141,10 +143,14 @@ gc_ms_get_free_object(Interp *interp, Small_Object_Pool *pool /*NN*/)
     /* if we don't have any objects */
     if (!pool->free_list)
         (*pool->more_objects)(interp, pool);
-    ptr = pool->free_list;
+
+    ptr             = pool->free_list;
     pool->free_list = *(void **)ptr;
+
     PObj_flags_SETTO((PObj*) ptr, 0);
+
     --pool->num_free_objects;
+
     return ptr;
 }
 
@@ -158,20 +164,20 @@ Adds the memory between C<start> and C<end> to the free list.
 
 void
 Parrot_add_to_free_list(Interp *interp,
-        Small_Object_Pool *pool /*NN*/,
+        Small_Object_Pool  *pool /*NN*/,
         Small_Object_Arena *arena /*NN*/,
-        UINTVAL start,
-        UINTVAL end)
+        UINTVAL             start,
+        UINTVAL             end)
 {
-    UINTVAL i;
-    void *object;
+    UINTVAL  i;
+    void    *object;
 
     pool->total_objects += end - start;
-    arena->used = end;
+    arena->used          = end;
 
     /* Move all the new objects into the free list */
-    object = (void *)((char *)arena->start_objects +
-            start * pool->object_size);
+    object = (void *)((char *)arena->start_objects + start * pool->object_size);
+
     for (i = start; i < end; i++) {
         PObj_flags_SETTO((PObj *)object, PObj_on_free_list_FLAG);
         /*
@@ -182,6 +188,7 @@ Parrot_add_to_free_list(Interp *interp,
         pool->add_free_object(interp, pool, object);
         object = (void *)((char *)object + pool->object_size);
     }
+
     pool->num_free_objects += end - start;
 }
 
@@ -193,7 +200,8 @@ insert the new arena into the pool's structure, update stats
 
 */
 void
-Parrot_append_arena_in_pool(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/,
+Parrot_append_arena_in_pool(Interp *interp /*NN*/,
+    Small_Object_Pool  *pool /*NN*/,
     Small_Object_Arena *new_arena /*NN*/, size_t size)
 {
 
@@ -206,12 +214,14 @@ Parrot_append_arena_in_pool(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*
     if (!pool->last_Arena || (pool->end_arena_memory <
                 (size_t)new_arena->start_objects + size))
         pool->end_arena_memory = (size_t)new_arena->start_objects + size;
+
     new_arena->total_objects = pool->objects_per_alloc;
-    new_arena->next = NULL;
-    new_arena->prev = pool->last_Arena;
-    if (new_arena->prev) {
+    new_arena->next          = NULL;
+    new_arena->prev          = pool->last_Arena;
+
+    if (new_arena->prev)
         new_arena->prev->next = new_arena;
-    }
+
     pool->last_Arena = new_arena;
     interp->arena_base->header_allocs_since_last_collect++;
 }
@@ -228,22 +238,25 @@ and put them on.
 static void
 gc_ms_alloc_objects(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
 {
-    size_t size;
+    size_t  size;
     UINTVAL start, end;
 
     /* Setup memory for the new objects */
-    Small_Object_Arena * const new_arena = (Small_Object_Arena *)mem_internal_allocate(
-        sizeof (Small_Object_Arena));
+    Small_Object_Arena * const new_arena =
+        mem_internal_allocate_typed(Small_Object_Arena);
+
     if (!new_arena)
         PANIC("Out of arena memory");
-    size = pool->object_size * pool->objects_per_alloc;
+
+    size                     = pool->object_size * pool->objects_per_alloc;
+
     /* could be mem_internal_allocate too, but calloc is fast */
     new_arena->start_objects = mem_internal_allocate_zeroed(size);
 
     Parrot_append_arena_in_pool(interp, pool, new_arena, size);
 
     start = 0;
-    end = pool->objects_per_alloc;
+    end   = pool->objects_per_alloc;
     Parrot_add_to_free_list(interp, pool, new_arena, start, end);
 
     /* Allocate more next time */
@@ -256,15 +269,15 @@ gc_ms_alloc_objects(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
     else {
         pool->objects_per_alloc = (size_t)(pool->objects_per_alloc *
             UNITS_PER_ALLOC_GROWTH_FACTOR);
-        pool->replenish_level =
+        pool->replenish_level   =
                 (size_t)(pool->total_objects * REPLENISH_LEVEL_FACTOR);
     }
+
     /* check alloc size against maximum */
     size = pool->object_size * pool->objects_per_alloc;
 
-    if (size > POOL_MAX_BYTES) {
+    if (size > POOL_MAX_BYTES)
         pool->objects_per_alloc = POOL_MAX_BYTES / pool->object_size;
-    }
 }
 
 /*
@@ -275,20 +288,17 @@ Creates a new C<Small_Object_Pool> and returns a pointer to it.
 
 */
 
-
 Small_Object_Pool *
 new_small_object_pool(Interp *interp,
         size_t object_size, size_t objects_per_alloc)
     /* WARN_UNUSED */
 {
     Small_Object_Pool * const pool =
-        (Small_Object_Pool *)mem_internal_allocate_zeroed(
-            sizeof (Small_Object_Pool));
+        mem_internal_allocate_zeroed_typed(Small_Object_Pool);
 
-    pool->last_Arena = NULL;
-    pool->free_list = NULL;
-    pool->mem_pool = NULL;
-
+    pool->last_Arena        = NULL;
+    pool->free_list         = NULL;
+    pool->mem_pool          = NULL;
     pool->object_size       = object_size;
     pool->objects_per_alloc = objects_per_alloc;
 
@@ -310,7 +320,7 @@ gc_ms_pool_init(Interp *interp, Small_Object_Pool *pool)
     pool->add_free_object = gc_ms_add_free_object;
     pool->get_free_object = gc_ms_get_free_object;
     pool->alloc_objects   = gc_ms_alloc_objects;
-    pool->more_objects = more_traceable_objects;
+    pool->more_objects    = more_traceable_objects;
 }
 
 /*
@@ -327,11 +337,11 @@ C<more_object_fn>.
 void
 Parrot_gc_ms_init(Interp *interp /*NN*/)
 {
-    Arenas * const arena_base = interp->arena_base;
+    Arenas * const arena_base     = interp->arena_base;
 
-    arena_base->do_dod_run = Parrot_dod_ms_run;
+    arena_base->do_dod_run        = Parrot_dod_ms_run;
     arena_base->de_init_gc_system = (void (*)(Interp*)) NULLfunc;
-    arena_base->init_pool = gc_ms_pool_init;
+    arena_base->init_pool         = gc_ms_pool_init;
 }
 
 /*
@@ -346,8 +356,8 @@ void
 Parrot_small_object_pool_merge(Interp *interp,
         Small_Object_Pool *dest /*NN*/, Small_Object_Pool *source /*NN*/)
 {
-    Small_Object_Arena *cur_arena;
-    void **free_list_end;
+    Small_Object_Arena  *cur_arena;
+    void               **free_list_end;
 
     /* XXX num_free_objects doesn't seem to be accounted correctly in, e.g.,
      * the PMC_EXT pool.
@@ -367,38 +377,41 @@ Parrot_small_object_pool_merge(Interp *interp,
 
     /* append new free_list to old */
     /* XXX this won't work with, e.g., gc_gms */
-    free_list_end = &dest->free_list;
-    while (*free_list_end) {
+    free_list_end  = &dest->free_list;
+
+    while (*free_list_end)
         free_list_end = (void **)*free_list_end;
-    }
+
     *free_list_end = source->free_list;
 
     /* now append source arenas */
     cur_arena = source->last_Arena;
+
     while (cur_arena) {
-        size_t total_objects;
+        size_t                     total_objects;
         Small_Object_Arena * const next_arena = cur_arena->prev;
 
         cur_arena->next = cur_arena->prev = NULL;
 
-        total_objects = cur_arena->total_objects;
+        total_objects   = cur_arena->total_objects;
 
         Parrot_append_arena_in_pool(interp, dest, cur_arena,
             cur_arena->total_objects);
 
-        cur_arena->total_objects = total_objects; /* XXX needed? */
+        /* XXX needed? */
+        cur_arena->total_objects = total_objects;
 
         cur_arena = next_arena;
     }
 
     /* remove things from source */
     /* XXX is this enough? */
-    source->last_Arena = NULL;
-    source->free_list = NULL;
-    source->total_objects = 0;
+    source->last_Arena       = NULL;
+    source->free_list        = NULL;
+    source->total_objects    = 0;
     source->num_free_objects = 0;
-
 }
+
 /*
 
 =head1 SEE ALSO
@@ -408,7 +421,6 @@ F<include/parrot/smallobject.h>, F<docs/memory_internals.pod>.
 =cut
 
 */
-
 
 /*
  * Local variables:
