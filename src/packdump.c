@@ -23,7 +23,7 @@ This is only used by the PBC dumper C<pdump>.
 
 static void
 PackFile_Constant_dump(Interp *interp /*NN*/, PackFile_ConstTable *ct /*NN*/,
-                       PackFile_Constant *self /*NN*/)
+                       PackFile_Constant *self /*NN*/);
 
 /*
 
