@@ -10,8 +10,6 @@ src/charset.c - global charset functions
 
 These are Parrot's generic charset handling functions
 
-=cut
-
 */
 
 #define PARROT_NO_EXTERN_CHARSET_PTRS
@@ -123,8 +121,8 @@ INTVAL
 Parrot_charset_number(Interp *interp, STRING *charsetname /*NN*/)
     /* WARN_UNUSED */
 {
-    int i;
     const int n = all_charsets->n_charsets;
+    int i;
 
     for (i = 0; i < n; ++i) {
         if (!string_equal(interp, all_charsets->set[i].name, charsetname))
@@ -237,7 +235,6 @@ PARROT_API
 INTVAL
 Parrot_register_charset(Interp *interp, const char *charsetname /*NN*/,
         CHARSET *charset /*NN*/)
-    /* WARN_UNUSED */
 {
     if (!all_charsets) {
         all_charsets = mem_allocate_typed(All_charsets);

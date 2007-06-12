@@ -139,8 +139,7 @@ PARROT_API INTVAL Parrot_register_charset( Interp *interp,
     const char *charsetname /*NN*/,
     CHARSET *charset /*NN*/ )
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
 PARROT_API void Parrot_register_charset_converter( Interp *interp,
     CHARSET *lhs /*NN*/,

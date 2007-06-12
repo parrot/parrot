@@ -1841,6 +1841,7 @@ HEADERIZER_O_FILES = \
     src/gc/register.o \
     src/gc/resources.o \
     src/gc/smallobject.o \
+    src/global_setup.o \
     src/hash.o \
     src/headers.o \
     src/intlist.o \
