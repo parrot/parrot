@@ -8,9 +8,7 @@ src/charset.c - global charset functions
 
 =head1 DESCRIPTION
 
-These are parrot's generic charset handling functions
-
-=over 4
+These are Parrot's generic charset handling functions
 
 =cut
 
