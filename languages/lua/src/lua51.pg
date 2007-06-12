@@ -24,6 +24,7 @@ rule block {
   [ <statement> <';'>? ]* [ <last_statement> <';'>? ]?
 }
 
+
 rule statement {
   | <if_stat>
   | <while_stat>
@@ -35,63 +36,11 @@ rule statement {
   | <expression_stat>
 }
 
-rule function_stat {
-  <'function'> <functionname> <function_body>
-}
-
 rule last_statement {
   | <return_statement>
   | <break_statement>
 }
 
-rule return_statement {
-  <'return'> <expression_list>?
-}
-
-token break_statement {
-  <'break'>
-}
-
-rule do_block {
-  <'do'> <block> <?end>
-}
-
-rule local_stat {
-  <'local'> [ <local_function> | <local_declaration> ]
-}
-
-rule expression_stat {
-  <primary_expression> <assignment>?
-}
-
-rule assignment {
-  | <','> <primary_expression> <assignment>
-  | <'='> <expression_list>
-}
-
-rule while_stat {
-  <'while'> <expression> <?do> <block> <?end>
-}
-
-rule repeat_stat {
-  <'repeat'> <block> <?until> <expression>
-}
-
-rule for_body {
-  <?do> <block> <?end>
-}
-
-rule fornum {
-  <name> <'='> <expression> <?comma> <expression> [ <','> <expression> ]?
-}
-
-rule forlist {
-  <name_list> <?in> <expression_list>
-}
-
-rule for_stat {
-  <'for'> [ <fornum> | <forlist> ] <for_body>
-}
 
 rule if_stat {
   <'if'> <expression> <?then> <block> <elseif_block>* <else_block>? <?end>
@@ -105,25 +54,97 @@ rule else_block {
   <'else'> <block>
 }
 
-rule local_declaration {
-  <name> [ <','> <name> ]* [ <'='> <expression_list> ]?
+
+rule while_stat {
+  <'while'> <expression> <?do> <block> <?end>
 }
 
-rule local_function {
-  <'function'> <name> <function_body>
+
+rule do_block {
+  <'do'> <block> <?end>
+}
+
+
+rule for_stat {
+  <'for'> [ <fornum> | <forlist> ] <for_body>
+}
+
+rule fornum {
+  <name> <'='> <expression> <?comma> <expression> [ <','> <expression> ]?
+}
+
+rule forlist {
+  <name_list> <?in> <expression_list>
+}
+
+rule for_body {
+  <?do> <block> <?end>
+}
+
+
+rule repeat_stat {
+  <'repeat'> <block> <?until> <expression>
+}
+
+
+rule function_stat {
+  <'function'> <functionname> <function_body>
 }
 
 rule functionname {
   <name> [ <'.'> <name> ]* [ <':'> <name> ]?
 }
 
-rule index {
-  <'['> <expression> <?closebracket>
+rule function_body {
+  <'('> <parameter_list> <?closeparen> <block> <?end>
 }
 
-rule record_field {
-  [ <name> | <index> ] <'='> <expression>
+rule parameter_list {
+  | <name_list> [ <','> <vararg> ]?
+  | <vararg>?
 }
+
+rule name_list {
+  <name> [ <','> <name> ]*
+}
+
+
+rule local_stat {
+  <'local'> [ <local_function> | <local_declaration> ]
+}
+
+rule local_function {
+  <'function'> <name> <function_body>
+}
+
+rule local_declaration {
+  <name> [ <','> <name> ]* [ <'='> <expression_list> ]?
+}
+
+
+rule expression_stat {
+  <primary_expression> <assignment>?
+}
+
+rule assignment {
+  | <','> <primary_expression> <assignment>
+  | <'='> <expression_list>
+}
+
+rule expression_list {
+  <expression> [ <','> <expression> ]*
+}
+
+
+rule return_statement {
+  <'return'> <expression_list>?
+}
+
+
+token break_statement {
+  <'break'>
+}
+
 
 rule constructor {
   <'{'> <tablefieldlist>? <?closebrace>
@@ -137,41 +158,35 @@ rule tablefield {
   <record_field> | <expression>
 }
 
-rule parameter_list {
-  | <name_list> [ <','> <vararg> ]?
-  | <vararg>?
+rule record_field {
+  [ <name> | <index> ] <'='> <expression>
 }
 
-rule function_body {
-  <'('> <parameter_list> <?closeparen> <block> <?end>
+rule index {
+  <'['> <expression> <?closebracket>
 }
 
-rule expression_list {
-  <expression> [ <','> <expression> ]*
+
+rule primary_expression {
+  <prefix_expression> <slice_expression>*
 }
 
-rule name_list {
-  <name> [ <','> <name> ]*
+rule prefix_expression {
+  | <'('> <expression> <?closeparen>
+  | <name>
+}
+
+rule slice_expression {
+  | <'.'> <name>
+  | <index>
+  | <':'> <name> <function_args>
+  | <function_args>
 }
 
 rule function_args {
   | <'('> <expression_list>? <?closeparen>
   | <constructor>
   | <string>
-}
-
-rule prefix_expression {
-  | <name>
-  | <'('> <expression> <?closeparen>
-}
-
-rule primary_expression {
-  <prefix_expression>
-  [ <'.'> <name>
-  | <index>
-  | <':'> <name> <function_args>
-  | <function_args>
-  ]*
 }
 
 rule simple_expression {
@@ -278,32 +293,24 @@ Operator precedence is implemented using an optable.
 rule 'expression'   is optable { ... }
 
 proto 'term:'       is precedence('=')
-                    is parsed(&simple_expression)              { ... }
+                    is parsed(&simple_expression)               { ... }
 
-proto 'infix:^'     is looser('term:')      is pirop('pow')     is assoc('right')
-                    is returns('.LuaNumber')                    { ... }
+proto 'infix:^'     is looser('term:')      is pirop('pow')
+                    is assoc('right')                           { ... }
 
-proto 'prefix:not'  is looser('infix:^')    is pirop('not')
-                    is returns('.LuaBoolean')                   { ... }
-proto 'prefix:#'    is equiv('prefix:not')  is past('len')
-                    is returns('.LuaNumber')                    { ... }
-proto 'prefix:-'    is equiv('prefix:not')  is pirop('neg')
-                    is returns('.LuaNumber')                    { ... }
+proto 'prefix:not'  is looser('infix:^')    is pirop('not')     { ... }
+proto 'prefix:#'    is equiv('prefix:not')  is past('len')      { ... }
+proto 'prefix:-'    is equiv('prefix:not')  is pirop('neg')     { ... }
 
-proto 'infix:*'     is looser('prefix:not') is pirop('mul')
-                    is returns('.LuaNumber')                    { ... }
-proto 'infix:/'     is equiv('infix:*')     is pirop('div')
-                    is returns('.LuaNumber')                    { ... }
-proto 'infix:%'     is equiv('infix:*')     is pirop('mod')
-                    is returns('.LuaNumber')                    { ... }
+proto 'infix:*'     is looser('prefix:not') is pirop('mul')     { ... }
+proto 'infix:/'     is equiv('infix:*')     is pirop('div')     { ... }
+proto 'infix:%'     is equiv('infix:*')     is pirop('mod')     { ... }
 
-proto 'infix:+'     is looser('infix:*')    is pirop('add')
-                    is returns('.LuaNumber')                    { ... }
-proto 'infix:-'     is equiv('infix:+')     is pirop('sub')
-                    is returns('.LuaNumber')                    { ... }
+proto 'infix:+'     is looser('infix:*')    is pirop('add')     { ... }
+proto 'infix:-'     is equiv('infix:+')     is pirop('sub')     { ... }
 
-proto 'infix:..'    is looser('infix:+')    is pirop('concat')  is assoc('right')
-                    is returns('.LuaString')                    { ... }
+proto 'infix:..'    is looser('infix:+')    is pirop('concat')
+                    is assoc('right')                           { ... }
 
 proto 'infix:<'     is looser('infix:..')                       { ... }
 proto 'infix:>'     is equiv('infix:<')                         { ... }

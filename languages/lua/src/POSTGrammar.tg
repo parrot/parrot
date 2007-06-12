@@ -45,7 +45,7 @@ transform post (PAST::Block) :language('PIR') {
     set_hll_global ['Lua::POST'], '@endlabels', endlabels
   unless null outerpost goto no_chunk
     .local pmc start
-    start = post.'new'('POST::Sub', 'name'=>'__start', 'pragma'=>':main', 'result'=>'')
+    start = post.'new'('POST::Sub', 'name'=>'&start', 'pragma'=>':main', 'result'=>'')
     start.'push_pirop'('inline', '#    print "start\n"')
     start.'push_pirop'('inline', '    load_bytecode "languages/lua/lib/luabasic.pbc"')
     start.'push_pirop'('inline', '    load_bytecode "languages/lua/lib/luacoroutine.pir"')
@@ -56,14 +56,14 @@ transform post (PAST::Block) :language('PIR') {
     start.'push_pirop'('inline', '    load_bytecode "languages/lua/lib/luaio.pbc"')
     start.'push_pirop'('inline', '    load_bytecode "languages/lua/lib/luaos.pbc"')
     start.'push_pirop'('inline', '    load_bytecode "languages/lua/lib/luadebug.pbc"')
-    start.'push_pirop'('inline', '    .const .Sub main = "_main"')
+    start.'push_pirop'('inline', '    .const .Sub main = "&main"')
     start.'push_pirop'('inline', '    $P0 = get_global "_G"')
     start.'push_pirop'('inline', '    main."setfenv"($P0)')
     start.'push_pirop'('inline', '    docall(main)')
     post.'init'('outer'=>start)
     .local pmc onload
-    onload = post.'new'('POST::Sub', 'name'=>'__onload', 'pragma'=>':anon :init', 'result'=>'')
-    onload.'push_pirop'('inline', '    .const .Sub main = "_main"')
+    onload = post.'new'('POST::Sub', 'name'=>'&onload', 'pragma'=>':anon :init', 'result'=>'')
+    onload.'push_pirop'('inline', '    .const .Sub main = "&main"')
     onload.'push_pirop'('inline', '#    print "onload\n"')
     .return post.'new'('Lua::POST::Chunk', post, onload, start, 'prologue'=><<'PIRCODE')
 .include 'interpinfo.pasm'

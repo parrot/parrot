@@ -24,7 +24,7 @@ transform past (ROOT) :language('PIR') {
     set_hll_global ['Lua::PAST'], '$symbtab', $P0
     $P0 = node['block']
     past = tree.'get'('past', $P0, 'Lua::Grammar::block')
-    .return past.'new'('PAST::Block', past, 'node'=>node, 'name'=>'_main', 'pragma'=>':anon :lex')
+    .return past.'new'('PAST::Block', past, 'node'=>node, 'name'=>'&main')
 }
 
 
@@ -602,15 +602,14 @@ transform past (Lua::Grammar::expr) :language('PIR') {
     .return tree.'get'('past', $P0, $S0)
   L1:
     .local pmc optable, optok
-    .local string pirop, returns
+    .local string pirop
     optable = get_hll_global [ 'Lua::Grammar' ], '$optable'
     optok = optable[type]
     pirop = optok['pirop']
     .local pmc past
     past = new 'PAST::Op'
     if pirop == '' goto L2
-    returns = optok['returns']
-    past.'init'('node'=>node, 'name'=>type, 'pasttype'=>'pirop', 'pirop'=>pirop, 'returns'=>returns)
+    past.'init'('node'=>node, 'name'=>type, 'pasttype'=>'pirop', 'pirop'=>pirop)
     goto L3
   L2:
     $S0 = optok['past']
@@ -639,40 +638,45 @@ transform past (Lua::Grammar::simple_expression) :language('PIR') {
 
 
 transform past (Lua::Grammar::primary_expression) :language('PIR') {
-    # INCOMPLETE
-    .local pmc past, iter, key
+    .local pmc past
     $P0 = node['prefix_expression']
     past = tree.'get'('past', $P0, 'Lua::Grammar::prefix_expression')
-    $P0 = node['name']
+    $P0 = node['slice_expression']
     if null $P0 goto L1
+    .local pmc iter, key, args, obj
     iter = new .Iterator, $P0
   L2:
     unless iter goto L1
     $P0 = shift iter
-    key = tree.'get'('key', $P0, 'Lua::Grammar::name')
+    $P1 = $P0['function_args']
+    if null $P1 goto L3
+    args = tree.'get'('explist', $P1, 'Lua::Grammar::function_args')
+    $P1 = $P0['name']
+    if null $P1 goto L4
+    key = tree.'get'('key', $P1, 'Lua::Grammar::name')
+    obj = past
+    past = past.'new'('PAST::Var', past, key, 'node'=>node, 'scope'=>'keyed')
+    past = past.'new'('PAST::Op', past, obj, args :flat, 'node'=>node, 'pasttype'=>'callmethod')
+    goto L2
+  L4:
+    past = past.'new'('PAST::Op', past, args :flat, 'node'=>node, 'pasttype'=>'call')
+    goto L2
+  L3:
+    $P1 = $P0['name']
+    if null $P1 goto L5
+    key = tree.'get'('key', $P1, 'Lua::Grammar::name')
     past = past.'new'('PAST::Var', past, key, 'node'=>node, 'scope'=>'keyed')
     goto L2
-  L1:
-
-    $P0 = node['index']
-    if null $P0 goto L3
-    iter = new .Iterator, $P0
-  L4:
-    unless iter goto L3
-    $P0 = shift iter
-    key = tree.'get'('key', $P0, 'Lua::Grammar::index')
+  L5:
+    $P1 = $P0['index']
+    if null $P1 goto L6
+    key = tree.'get'('key', $P1, 'Lua::Grammar::index')
     past = past.'new'('PAST::Var', past, key, 'node'=>node, 'scope'=>'keyed')
-    goto L4
-  L3:
-
-    $P0 = node['function_args']
-    unless null $P0 goto L9
+    goto L2
+  L6:
+    internal_error("primary expression")
+  L1:
     .return (past)
-
-  L9:
-    $P0 = shift $P0
-    $P1 = tree.'get'('explist', $P0, 'Lua::Grammar::function_args')
-    .return past.'new'('PAST::Op', past, $P1 :flat, 'node'=>node, 'pasttype'=>'call')
 }
 
 
