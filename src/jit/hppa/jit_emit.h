@@ -6,7 +6,6 @@
  * $Id$
  */
 
-#pragma once
 #ifndef PARROT_HPPA_JIT_EMIT_H_GUARD
 #define PARROT_HPPA_JIT_EMIT_H_GUARD
 

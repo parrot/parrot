@@ -5,7 +5,6 @@
 *   Parrot character classes
 */
 
-#pragma once
 #ifndef PARROT_CCLASS_H_GUARD
 #define PARROT_CCLASS_H_GUARD
 

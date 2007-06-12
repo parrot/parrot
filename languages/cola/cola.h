@@ -8,7 +8,6 @@
  * The giant, hulking header file.
  */
 
-#pragma once
 #ifndef PARROT_LANGUAGES_COLA_H_GUARD
 #define PARROT_LANGUAGES_COLA_H_GUARD
 

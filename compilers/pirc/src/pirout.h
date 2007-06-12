@@ -1,4 +1,3 @@
-#pragma once
 #ifndef PARROT_PIRC_PIROUT_H_GUARD
 #define PARROT_PIRC_PIROUT_H_GUARD
 

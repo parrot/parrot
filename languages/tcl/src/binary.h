@@ -1,4 +1,3 @@
-#pragma once
 #ifndef PARROT_TCL_BINARY_H_GUARD
 #define PARROT_TCL_BINARY_H_GUARD
 

@@ -1,6 +1,5 @@
 /* $Id$ */
 
-#pragma once
 #ifndef PARROT_PUGS_COMMONL_H_GUARD
 #define PARROT_PUGS_COMMONL_H_GUARD
 

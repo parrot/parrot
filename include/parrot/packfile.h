@@ -7,7 +7,6 @@
 *   (Do endian conversion and wordsize transforms on the fly.)
 */
 
-#pragma once
 #ifndef PARROT_PACKFILE_H_GUARD
 #define PARROT_PACKFILE_H_GUARD
 

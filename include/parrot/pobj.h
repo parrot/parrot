@@ -10,7 +10,6 @@
  *  References: memory_internals.pod
  */
 
-#pragma once
 #ifndef PARROT_POBJ_H_GUARD
 #define PARROT_POBJ_H_GUARD
 

@@ -2,7 +2,6 @@
 /* Data structures: */
 
 /* Two-way linked list of predecessors and successors */
-#pragma once
 #ifndef PARROT_CFG_H_GUARD
 #define PARROT_CFG_H_GUARD
 

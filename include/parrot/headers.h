@@ -11,7 +11,6 @@
  *  References:
  */
 
-#pragma once
 #ifndef PARROT_HEADERS_H_GUARD
 #define PARROT_HEADERS_H_GUARD
 

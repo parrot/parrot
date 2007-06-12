@@ -11,7 +11,6 @@
  * References:
  */
 
-#pragma once
 #ifndef PARROT_PDB_H_GUARD
 #define PARROT_PDB_H_GUARD
 

@@ -2,7 +2,6 @@
 ** I/O:
 */
 
-#pragma once
 #ifndef PARROT_PLATFORM_ANSI_IO_H_GUARD
 #define PARROT_PLATFORM_ANSI_IO_H_GUARD
 

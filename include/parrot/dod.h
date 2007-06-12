@@ -8,7 +8,6 @@
  *     Initial version by Mike Lambert on 2002.05.27
  */
 
-#pragma once
 #ifndef PARROT_DOD_H_GUARD
 #define PARROT_DOD_H_GUARD
 

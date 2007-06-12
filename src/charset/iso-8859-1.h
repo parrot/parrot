@@ -10,7 +10,6 @@
  *  References:
  */
 
-#pragma once
 #ifndef PARROT_CHARSET_ISO_8859_1_H_GUARD
 #define PARROT_CHARSET_ISO_8859_1_H_GUARD
 

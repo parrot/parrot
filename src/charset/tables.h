@@ -13,7 +13,6 @@
  *  References:
  */
 
-#pragma once
 #ifndef PARROT_CHARSET_TABLES_H_GUARD
 #define PARROT_CHARSET_TABLES_H_GUARD
 #include "parrot/cclass.h"

@@ -12,7 +12,6 @@
  *  References:
  */
 
-#pragma once
 #ifndef PARROT_INTLIST_H_GUARD
 #define PARROT_INTLIST_H_GUARD
 

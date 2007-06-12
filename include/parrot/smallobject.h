@@ -1,4 +1,3 @@
-#pragma once
 #ifndef PARROT_SMALLOBJECT_H_GUARD
 #define PARROT_SMALLOBJECT_H_GUARD
 

@@ -592,7 +592,6 @@ sub print_h {
  * Any changes made here will be lost!
  */
 
-#pragma once
 #ifndef PARROT_OPS_H_GUARD
 #define PARROT_OPS_H_GUARD
 

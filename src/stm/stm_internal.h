@@ -1,4 +1,3 @@
-#pragma once
 #ifndef PARROT_STM_INTERNAL_H_GUARD
 #define PARROT_STM_INTERNAL_H_GUARD
 

@@ -11,7 +11,6 @@
  * References:
  */
 
-#pragma once
 #ifndef PARROT_I386_EXEC_DEP_H_GUARD
 #define PARROT_I386_EXEC_DEP_H_GUARD
 

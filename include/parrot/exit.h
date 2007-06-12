@@ -11,7 +11,6 @@
  *      exit.c
  */
 
-#pragma once
 #ifndef PARROT_EXIT_H_GUARD
 #define PARROT_EXIT_H_GUARD
 

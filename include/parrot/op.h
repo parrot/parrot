@@ -10,7 +10,6 @@
  *  References:
  */
 
-#pragma once
 #ifndef PARROT_OP_H_GUARD
 #define PARROT_OP_H_GUARD
 

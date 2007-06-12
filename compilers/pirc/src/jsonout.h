@@ -1,4 +1,3 @@
-#pragma once
 #ifndef PARROT_PIRC_JSONOUT_H_GUARD
 #define PARROT_PIRC_JSONOUT_H_GUARD
 
