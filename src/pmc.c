@@ -188,7 +188,7 @@ get_new_pmc_header(Interp *interp /*NN*/, INTVAL base_type, UINTVAL flags)
         return pmc;
     }
     if (vtable->flags & VTABLE_IS_CONST_PMC_FLAG) {
-        flags = PObj_constant_FLAG;
+        flags |= PObj_constant_FLAG;
     }
     else if (vtable->flags & VTABLE_IS_CONST_FLAG) {
         /* put the normal vtable in, so that the pmc can be initialized first
@@ -204,7 +204,7 @@ get_new_pmc_header(Interp *interp /*NN*/, INTVAL base_type, UINTVAL flags)
          * see e.g. t/pmc/sarray_13.pir
          */
 #if 0
-        flags = PObj_constant_FLAG;
+        flags |= PObj_constant_FLAG;
 #endif
         --base_type;
         vtable = interp->vtables[base_type];
@@ -316,7 +316,7 @@ PARROT_API
 PMC *
 constant_pmc_new_init(Interp *interp, INTVAL base_type, PMC *init)
 {
-    PMC * const pmc = get_new_pmc_header(interp, base_type, 1);
+    PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
     VTABLE_init_pmc(interp, pmc, init);
     return pmc;
 }
