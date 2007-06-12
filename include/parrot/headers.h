@@ -92,10 +92,12 @@ Buffer * new_buffer_header( Interp *interp /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
-Small_Object_Pool * new_buffer_pool( Interp *interp )
+Small_Object_Pool * new_buffer_pool( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
-void * new_bufferlike_header( Interp *interp, size_t size )
+void * new_bufferlike_header( Interp *interp /*NN*/, size_t size )
+        __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
 Small_Object_Pool * new_bufferlike_pool( Interp *interp /*NN*/,
@@ -119,11 +121,14 @@ Small_Object_Pool * new_string_pool( Interp *interp /*NN*/, INTVAL constant )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
-void Parrot_destroy_header_pools( Interp *interp );
-int Parrot_forall_header_pools( Interp *interp,
+void Parrot_destroy_header_pools( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+int Parrot_forall_header_pools( Interp *interp /*NN*/,
     int flag,
     void *arg,
     pool_iter_fn func /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
 void Parrot_initialize_header_pool_names( Interp *interp );

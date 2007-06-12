@@ -31,10 +31,11 @@ PARROT_API STRING * int_to_str( Interp *interp,
     char base )
         __attribute__nonnull__(2);
 
-PARROT_API STRING * Parrot_make_COW_reference( Interp *interp,
-    STRING *s /*NULLOK*/ );
+PARROT_API STRING * Parrot_make_COW_reference( Interp *interp /*NN*/,
+    STRING *s /*NULLOK*/ )
+        __attribute__nonnull__(1);
 
-PARROT_API STRING* Parrot_reuse_COW_reference( Interp *interp,
+PARROT_API STRING* Parrot_reuse_COW_reference( Interp *interp /*NULLOK*/,
     STRING *s /*NULLOK*/,
     STRING *d /*NN*/ )
         __attribute__nonnull__(3);
@@ -79,30 +80,37 @@ PARROT_API STRING * string_append( Interp *interp,
     STRING *a /*NULLOK*/,
     STRING *b /*NULLOK*/ );
 
-PARROT_API STRING * string_bitwise_and( Interp *interp,
+PARROT_API STRING * string_bitwise_and( Interp *interp /*NN*/,
     STRING *s1 /*NULLOK*/,
     STRING *s2 /*NULLOK*/,
-    STRING **dest /*NULLOK*/ );
+    STRING **dest /*NULLOK*/ )
+        __attribute__nonnull__(1);
 
-PARROT_API STRING * string_bitwise_not( Interp *interp,
+PARROT_API STRING * string_bitwise_not( Interp *interp /*NN*/,
     STRING *s /*NULLOK*/,
-    STRING **dest /*NULLOK*/ );
+    STRING **dest /*NULLOK*/ )
+        __attribute__nonnull__(1);
 
-PARROT_API STRING * string_bitwise_or( Interp *interp,
+PARROT_API STRING * string_bitwise_or( Interp *interp /*NN*/,
     STRING *s1 /*NULLOK*/,
     STRING *s2 /*NULLOK*/,
-    STRING **dest /*NULLOK*/ );
+    STRING **dest /*NULLOK*/ )
+        __attribute__nonnull__(1);
 
-PARROT_API STRING * string_bitwise_xor( Interp *interp,
+PARROT_API STRING * string_bitwise_xor( Interp *interp /*NN*/,
     STRING *s1 /*NULLOK*/,
     STRING *s2 /*NULLOK*/,
-    STRING **dest /*NULLOK*/ );
+    STRING **dest /*NULLOK*/ )
+        __attribute__nonnull__(1);
 
-PARROT_API INTVAL string_bool( Interp *interp, const STRING *s /*NULLOK*/ )
+PARROT_API INTVAL string_bool( Interp *interp /*NN*/,
+    const STRING *s /*NULLOK*/ )
+        __attribute__nonnull__(1)
         __attribute__pure__
         __attribute__warn_unused_result__;
 
-PARROT_API UINTVAL string_capacity( Interp *interp, const STRING *s /*NN*/ )
+PARROT_API UINTVAL string_capacity( Interp *interp /*NULLOK*/,
+    const STRING *s /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__pure__
         __attribute__warn_unused_result__;
@@ -130,7 +138,9 @@ PARROT_API STRING * string_concat( Interp *interp,
 
 PARROT_API STRING * string_copy( Interp *interp, STRING *s /*NULLOK*/ );
 PARROT_API void string_cstring_free( char *p /*NULLOK*/ );
-PARROT_API void string_deinit( Parrot_Interp interp );
+PARROT_API void string_deinit( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
 PARROT_API STRING * string_downcase( Interp *interp,
     const STRING *s /*NULLOK*/ );
 
@@ -179,7 +189,9 @@ PARROT_API INTVAL string_index( Interp *interp,
     UINTVAL idx )
         __attribute__nonnull__(2);
 
-PARROT_API void string_init( Parrot_Interp interp );
+PARROT_API void string_init( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
 PARROT_API STRING* string_join( Interp *interp,
     STRING *j /*NULLOK*/,
     PMC *ar );
@@ -219,15 +231,17 @@ PARROT_API STRING* string_nprintf( Interp *interp,
     ... )
         __attribute__nonnull__(4);
 
-PARROT_API INTVAL string_ord( Interp *interp,
+PARROT_API INTVAL string_ord( Interp *interp /*NN*/,
     const STRING *s /*NULLOK*/,
-    INTVAL idx );
+    INTVAL idx )
+        __attribute__nonnull__(1);
 
 PARROT_API void string_pin( Interp *interp, STRING *s /*NN*/ )
         __attribute__nonnull__(2);
 
-PARROT_API const char* string_primary_encoding_for_representation( Interp *interp,
-    parrot_string_representation_t representation );
+PARROT_API const char* string_primary_encoding_for_representation( Interp *interp /*NN*/,
+    parrot_string_representation_t representation )
+        __attribute__nonnull__(1);
 
 PARROT_API STRING* string_printf( Interp *interp,
     const char *format /*NN*/,
@@ -248,16 +262,18 @@ PARROT_API STRING * string_repeat( Interp *interp,
     STRING **d /*NULLOK*/ )
         __attribute__nonnull__(2);
 
-PARROT_API STRING * string_replace( Interp *interp,
+PARROT_API STRING * string_replace( Interp *interp /*NN*/,
     STRING *src /*NULLOK*/,
     INTVAL offset,
     INTVAL length,
     STRING *rep /*NULLOK*/,
-    STRING **d /*NULLOK*/ );
+    STRING **d /*NULLOK*/ )
+        __attribute__nonnull__(1);
 
-PARROT_API STRING * string_set( Interp *interp,
+PARROT_API STRING * string_set( Interp *interp /*NN*/,
     STRING *dest /*NULLOK*/,
-    STRING *src /*NULLOK*/ );
+    STRING *src /*NULLOK*/ )
+        __attribute__nonnull__(1);
 
 PARROT_API PMC* string_split( Interp *interp,
     STRING *delim /*NN*/,
@@ -272,12 +288,13 @@ PARROT_API INTVAL string_str_index( Interp *interp,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API STRING * string_substr( Interp *interp,
+PARROT_API STRING * string_substr( Interp *interp /*NN*/,
     STRING *src /*NN*/,
     INTVAL offset,
     INTVAL length,
     STRING **d /*NULLOK*/,
     int replace_dest )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API STRING * string_titlecase( Interp *interp,

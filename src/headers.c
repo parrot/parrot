@@ -113,7 +113,7 @@ Non-constant strings and plain Buffers are in the sized header pools.
 */
 
 Small_Object_Pool *
-new_buffer_pool(Interp *interp)
+new_buffer_pool(Interp *interp /*NN*/)
     /* WARN_UNUSED */
 {
     return make_bufferlike_pool(interp, sizeof (Buffer));
@@ -353,7 +353,7 @@ Creates and returns a new buffer-like header.
 */
 
 void *
-new_bufferlike_header(Interp *interp, size_t size)
+new_bufferlike_header(Interp *interp /*NN*/, size_t size)
     /* WARN_UNUSED */
 {
     Small_Object_Pool * const pool = get_bufferlike_pool(interp, size);
@@ -453,6 +453,7 @@ Checks that C<ptr> is actually a C<Buffer>.
 
 int
 is_buffer_ptr(Interp *interp /*NN*/, void *ptr) /* XXX Const this */
+    /* WARN_UNUSED */
 {
     UINTVAL i;
     Arenas * const arena_base = interp->arena_base;
@@ -568,7 +569,7 @@ If the function returns a non-zero value iteration will stop.
 */
 
 int
-Parrot_forall_header_pools(Interp *interp, int flag, void *arg, pool_iter_fn func /*NN*/)
+Parrot_forall_header_pools(Interp *interp /*NN*/, int flag, void *arg, pool_iter_fn func /*NN*/)
 {
     Arenas * const arena_base = interp->arena_base;
     int i;
@@ -626,7 +627,7 @@ free_pool(Interp *interp, Small_Object_Pool *pool /*NN*/)
 }
 
 static int
-sweep_cb_buf(Interp *interp, Small_Object_Pool *pool, int flag,
+sweep_cb_buf(Interp *interp /*NN*/, Small_Object_Pool *pool, int flag,
         void *arg)
 {
 #ifdef GC_IS_MALLOC
@@ -647,7 +648,7 @@ sweep_cb_buf(Interp *interp, Small_Object_Pool *pool, int flag,
 }
 
 static int
-sweep_cb_pmc(Interp *interp, Small_Object_Pool *pool, int flag,
+sweep_cb_pmc(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/, int flag,
         void *arg)
 {
     Parrot_dod_sweep(interp, pool);
@@ -656,7 +657,7 @@ sweep_cb_pmc(Interp *interp, Small_Object_Pool *pool, int flag,
 }
 
 void
-Parrot_destroy_header_pools(Interp *interp)
+Parrot_destroy_header_pools(Interp *interp /*NN*/)
 {
     INTVAL pass, start;
 
@@ -682,7 +683,9 @@ Parrot_destroy_header_pools(Interp *interp)
     mem_internal_free(interp->arena_base->sized_header_pools);
 }
 
-static void fix_pmc_syncs(Interp *dest_interp, Small_Object_Pool *pool) {
+static void
+fix_pmc_syncs(Interp *dest_interp, Small_Object_Pool *pool /*NN*/)
+{
     /* XXX largely copied from dod_sweep */
     Small_Object_Arena *cur_arena;
     const UINTVAL object_size = pool->object_size;
