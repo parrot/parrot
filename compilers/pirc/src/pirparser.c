@@ -2172,7 +2172,7 @@ macro_parameters(parser_state *p) {
 
 =item *
 
-  '.macro' IDENTIFIER parameters '\n' macro_body '.endm'
+ macro-definition -> '.macro' IDENTIFIER macro_parameters '\n' macro_body '.endm'
 
 =cut
 
