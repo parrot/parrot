@@ -148,7 +148,7 @@ main(int argc, char **argv) {
             vtable = new_pirvtable();
 
             /* if the user did specify an output file, this doesn't make sense */
-            if (outputfile != NULL) 
+            if (outputfile != NULL)
                 fprintf(stderr, "No output specified: output file will be ignored\n");
 
             break;
