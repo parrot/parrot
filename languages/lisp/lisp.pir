@@ -37,7 +37,7 @@
 
     # compile a couble of regexes that are needed in validate.pir
     .local pmc p6rule
-    p6rule = compreg "PGE::P6Regex"
+    p6rule = compreg "PGE::Perl6Regex"
 
     .local pmc is_integer
     is_integer = p6rule( '^<[+\-]>?\d+\.?$' )
