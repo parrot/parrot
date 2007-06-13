@@ -1,5 +1,5 @@
 /* iso_8859_1.h
- *  Copyright (C) 2004, The Perl Foundation.
+ *  Copyright (C) 2004-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -13,9 +13,18 @@
 #ifndef PARROT_CHARSET_ISO_8859_1_H_GUARD
 #define PARROT_CHARSET_ISO_8859_1_H_GUARD
 
-STRING *charset_cvt_iso_8859_1_to_ascii(Interp *, STRING *src, STRING *dest);
+/* HEADERIZER BEGIN: src/charset/iso-8859-1.c */
 
-CHARSET *Parrot_charset_iso_8859_1_init(Interp *);
+STRING * charset_cvt_iso_8859_1_to_ascii( Interp *interp,
+    STRING *src /*NN*/,
+    STRING *dest /*NULLOK*/ )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+CHARSET * Parrot_charset_iso_8859_1_init( Interp *interp )
+        __attribute__warn_unused_result__;
+
+/* HEADERIZER END: src/charset/iso-8859-1.c */
 
 #endif /* PARROT_CHARSET_ISO_8859_1_H_GUARD */
 

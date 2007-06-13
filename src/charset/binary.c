@@ -15,8 +15,12 @@ This file implements the charset functions for binary data
 */
 
 #include "parrot/parrot.h"
-#include "binary.h"
+
+/* In local src/charset/ directory */
 #include "ascii.h"
+#include "binary.h"
+
+/* HEADER: src/charset/binary.h */
 
 #ifdef EXCEPTION
 #  undef EXCEPTION
@@ -157,7 +161,7 @@ string_from_codepoint(Interp *interp, UINTVAL codepoint)
 CHARSET *
 Parrot_charset_binary_init(Interp *interp)
 {
-    CHARSET *return_set = Parrot_new_charset(interp);
+    CHARSET * const return_set = Parrot_new_charset(interp);
     static const CHARSET base_set = {
         "binary",
         ascii_get_graphemes,

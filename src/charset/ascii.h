@@ -17,28 +17,81 @@
  * common functions for ascii-ish charsets
  */
 
-INTVAL
-ascii_find_thing(Interp *interp, STRING *string, UINTVAL start,
-        PARROT_CCLASS_FLAGS type, const PARROT_CCLASS_FLAGS *table);
-INTVAL
-ascii_find_not_thing(Interp *interp, STRING *string, UINTVAL start,
-        PARROT_CCLASS_FLAGS type, const PARROT_CCLASS_FLAGS *table);
-STRING *ascii_get_graphemes(Interp *, STRING *source_string,
-        UINTVAL offset, UINTVAL count);
-STRING *ascii_get_graphemes_inplace(Interp *, STRING *source_string,
-        UINTVAL offset, UINTVAL count, STRING *dest_string);
-INTVAL ascii_compare(Interp *, const STRING *lhs, const STRING *rhs);
-INTVAL ascii_cs_index(Interp *, STRING *source_string,
-        STRING *search_string, UINTVAL offset);
-INTVAL ascii_cs_rindex(Interp *, STRING *source_string,
-        STRING *search_string, UINTVAL offset);
-size_t ascii_compute_hash(Interp *, STRING *source_string, size_t seed);
-INTVAL mixed_cs_index(Interp *, STRING *src, STRING *search, UINTVAL offs);
+/* HEADERIZER BEGIN: src/charset/ascii.c */
 
-CHARSET *Parrot_charset_ascii_init(Interp *);
+INTVAL ascii_compare( Interp *interp,
+    const STRING *lhs /*NN*/,
+    const STRING *rhs /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
 
-STRING *charset_cvt_ascii_to_binary(Interp *, STRING *src, STRING *dest);
-STRING *charset_cvt_ascii_to_iso_8859_1(Interp *, STRING *src, STRING *dest);
+size_t ascii_compute_hash( Interp *interp,
+    STRING *source_string /*NN*/,
+    size_t seed )
+        __attribute__nonnull__(2)
+        __attribute__pure__
+        __attribute__warn_unused_result__;
+
+INTVAL ascii_cs_index( Interp *interp,
+    STRING *source_string,
+    STRING *search_string,
+    UINTVAL offset )
+        __attribute__warn_unused_result__;
+
+INTVAL ascii_cs_rindex( Interp *interp,
+    STRING *source_string,
+    STRING *search_string,
+    UINTVAL offset )
+        __attribute__warn_unused_result__;
+
+INTVAL ascii_find_not_thing( Interp *interp,
+    STRING *string /*NN*/,
+    UINTVAL start,
+    PARROT_CCLASS_FLAGS type,
+    const PARROT_CCLASS_FLAGS *table /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5)
+        __attribute__warn_unused_result__;
+
+INTVAL ascii_find_thing( Interp *interp,
+    STRING *string /*NN*/,
+    UINTVAL start,
+    PARROT_CCLASS_FLAGS type,
+    const PARROT_CCLASS_FLAGS *table /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5)
+        __attribute__warn_unused_result__;
+
+STRING * ascii_get_graphemes( Interp *interp,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL count )
+        __attribute__warn_unused_result__;
+
+STRING * ascii_get_graphemes_inplace( Interp *interp,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL count,
+    STRING *dest_string )
+        __attribute__warn_unused_result__;
+
+STRING * charset_cvt_ascii_to_binary( Interp *interp,
+    STRING *src,
+    STRING *dest );
+
+STRING * charset_cvt_ascii_to_iso_8859_1( Interp *interp,
+    STRING *src,
+    STRING *dest );
+
+INTVAL mixed_cs_index( Interp *interp,
+    STRING *src,
+    STRING *search,
+    UINTVAL offs )
+        __attribute__warn_unused_result__;
+
+CHARSET * Parrot_charset_ascii_init( Interp *interp );
+/* HEADERIZER END: src/charset/ascii.c */
 
 #endif /* PARROT_CHARSET_ASCII_H_GUARD */
 

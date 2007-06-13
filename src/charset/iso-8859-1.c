@@ -1,5 +1,6 @@
 /*
-Copyright (C) 2004, The Perl Foundation.
+ *
+Copyright (C) 2004-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -10,13 +11,13 @@ src/charset/iso-8859-1.c
 
 This file implements the charset functions for iso-8859-1 data
 
-=cut
-
 */
 
 #include "parrot/parrot.h"
 #include "iso-8859-1.h"
 #include "ascii.h"
+
+/* HEADER: src/charset/iso-8859-1.h */
 
 #ifdef EXCEPTION
 #  undef EXCEPTION
@@ -328,8 +329,9 @@ string_from_codepoint(Interp *interp, UINTVAL codepoint)
 
 CHARSET *
 Parrot_charset_iso_8859_1_init(Interp *interp)
+    /* WARN_UNUSED */
 {
-    CHARSET *return_set = Parrot_new_charset(interp);
+    CHARSET * const return_set = Parrot_new_charset(interp);
     static const CHARSET base_set = {
         "iso-8859-1",
         ascii_get_graphemes,
@@ -363,7 +365,8 @@ Parrot_charset_iso_8859_1_init(Interp *interp)
 }
 
 STRING *
-charset_cvt_iso_8859_1_to_ascii(Interp *interp, STRING *src, STRING *dest)
+charset_cvt_iso_8859_1_to_ascii(Interp *interp, STRING *src /*NN*/, STRING *dest /*NULLOK*/)
+    /* WARN_UNUSED */
 {
     UINTVAL offs, c;
     if (dest) {

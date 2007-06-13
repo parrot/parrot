@@ -1829,6 +1829,7 @@ HEADERIZER_O_FILES = \
 
 # Slowing working my way up to having everything headerized in $(HEADERIZER_O_FILES)
 HEADERIZER_O_FILES = \
+    $(CHARSET_O_FILES) \
     src/byteorder.o \
     src/charset.o \
     src/datatypes.o \
@@ -1862,7 +1863,7 @@ HEADERIZER_O_FILES = \
     src/utils.o \
     src/vtables.o \
 
-headerizer : $(SRC_DIR)/fingerprint.c 
+headerizer : $(SRC_DIR)/fingerprint.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)
 
 ###############################################################################

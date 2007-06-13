@@ -19,6 +19,8 @@ charset functionality for similar charsets like iso-8859-1.
 #include "ascii.h"
 #include <assert.h>
 
+/* HEADER: src/charset/ascii.h */
+
 #ifdef EXCEPTION
 #  undef EXCEPTION
 #endif
@@ -32,9 +34,11 @@ charset functionality for similar charsets like iso-8859-1.
 
 #include "tables.h"
 
+/* XXX Apparently unused, and not part of the API */
 INTVAL
-ascii_find_thing(Interp *interp, STRING *string, UINTVAL start,
-        PARROT_CCLASS_FLAGS type, const PARROT_CCLASS_FLAGS *table)
+ascii_find_thing(Interp *interp, STRING *string /*NN*/, UINTVAL start,
+        PARROT_CCLASS_FLAGS type, const PARROT_CCLASS_FLAGS *table /*NN*/)
+    /* WARN_UNUSED */
 {
     for (; start < string->strlen; start++) {
         if (table[ENCODING_GET_BYTE(interp, string, start)] & type) {
@@ -45,8 +49,9 @@ ascii_find_thing(Interp *interp, STRING *string, UINTVAL start,
 }
 
 INTVAL
-ascii_find_not_thing(Interp *interp, STRING *string, UINTVAL start,
-        PARROT_CCLASS_FLAGS type, const PARROT_CCLASS_FLAGS *table)
+ascii_find_not_thing(Interp *interp, STRING *string /*NN*/, UINTVAL start,
+        PARROT_CCLASS_FLAGS type, const PARROT_CCLASS_FLAGS *table /*NN*/)
+    /* WARN_UNUSED */
 {
     for (; start < string->strlen; start++) {
         if (!(table[ENCODING_GET_BYTE(interp, string, start)] & type)) {
@@ -59,6 +64,7 @@ ascii_find_not_thing(Interp *interp, STRING *string, UINTVAL start,
 STRING *
 ascii_get_graphemes(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL count)
+    /* WARN_UNUSED */
 {
     return ENCODING_GET_BYTES(interp, source_string, offset, count);
 }
@@ -75,13 +81,15 @@ set_graphemes(Interp *interp, STRING *source_string,
 STRING *
 ascii_get_graphemes_inplace(Interp *interp, STRING *source_string,
         UINTVAL offset, UINTVAL count, STRING *dest_string)
+    /* WARN_UNUSED */
 {
     return ENCODING_GET_BYTES_INPLACE(interp, source_string,
             offset, count, dest_string);
 }
 
 static STRING *
-to_ascii(Interp *interp, STRING *src, STRING *dest)
+to_ascii(Interp *interp, STRING *src /*NN*/, STRING *dest /*NULLOK*/)
+    /* WARN_UNUSED */
 {
     String_iter iter;
     UINTVAL c, len, offs;
@@ -155,7 +163,7 @@ decompose(Interp *interp, STRING *src)
 }
 
 static void
-upcase(Interp *interp, STRING *source_string)
+upcase(Interp *interp, STRING *source_string /*NN*/)
 {
     char *buffer;
     UINTVAL offset = 0;
@@ -222,7 +230,7 @@ downcase_first(Interp *interp, STRING *source_string)
 }
 
 static void
-titlecase_first(Interp *interp, STRING *source_string)
+titlecase_first(Interp *interp, STRING *source_string /*NN*/)
 {
     char *buffer;
     if (!source_string->strlen) {
@@ -234,27 +242,27 @@ titlecase_first(Interp *interp, STRING *source_string)
 }
 
 INTVAL
-ascii_compare(Interp *interp, const STRING *lhs, const STRING *rhs)
+ascii_compare(Interp *interp, const STRING *lhs /*NN*/, const STRING *rhs /*NN*/)
+    /* WARN_UNUSED */
 {
-    UINTVAL offs, l_len, r_len, min_len;
     String_iter iter;
 
-    l_len = lhs->strlen;
-    r_len = rhs->strlen;
-    min_len = l_len > r_len ? r_len : l_len;
+    const UINTVAL l_len = lhs->strlen;
+    const UINTVAL r_len = rhs->strlen;
+    const UINTVAL min_len = l_len > r_len ? r_len : l_len;
 
     if (lhs->encoding == Parrot_fixed_8_encoding_ptr &&
             rhs->encoding == Parrot_fixed_8_encoding_ptr) {
-        int ret_val = memcmp(lhs->strstart, rhs->strstart, min_len);
+        const int ret_val = memcmp(lhs->strstart, rhs->strstart, min_len);
         if (ret_val)
             return ret_val < 0 ? -1 : 1;
     }
     else {
-        UINTVAL cl, cr;
+        UINTVAL offs;
         ENCODING_ITER_INIT(interp, rhs, &iter);
         for (offs = 0; offs < min_len; ++offs) {
-            cl = ENCODING_GET_BYTE(interp, lhs, offs);
-            cr = iter.get_and_advance(interp, &iter);
+            const UINTVAL cl = ENCODING_GET_BYTE(interp, lhs, offs);
+            const UINTVAL cr = iter.get_and_advance(interp, &iter);
             if (cl != cr)
                 return cl < cr ? -1 : 1;
         }
@@ -270,6 +278,7 @@ ascii_compare(Interp *interp, const STRING *lhs, const STRING *rhs)
 
 INTVAL
 mixed_cs_index(Interp *interp, STRING *src, STRING *search, UINTVAL offs)
+    /* WARN_UNUSED */
 {
     String_iter src_iter, search_iter;
     UINTVAL c1, c2, len;
@@ -303,6 +312,7 @@ mixed_cs_index(Interp *interp, STRING *src, STRING *search, UINTVAL offs)
 INTVAL
 ascii_cs_index(Interp *interp, STRING *source_string,
         STRING *search_string, UINTVAL offset)
+    /* WARN_UNUSED */
 {
     INTVAL retval;
     if (source_string->charset != search_string->charset) {
@@ -318,7 +328,9 @@ ascii_cs_index(Interp *interp, STRING *source_string,
 
 INTVAL
 ascii_cs_rindex(Interp *interp, STRING *source_string,
-        STRING *search_string, UINTVAL offset) {
+        STRING *search_string, UINTVAL offset)
+    /* WARN_UNUSED */
+{
     INTVAL retval;
     if (source_string->charset != search_string->charset) {
         internal_exception(UNIMPLEMENTED, "Cross-charset index not supported");
@@ -332,6 +344,7 @@ ascii_cs_rindex(Interp *interp, STRING *source_string,
 
 static UINTVAL
 validate(Interp *interp, STRING *src)
+    /* WARN_UNUSED */
 {
     UINTVAL codepoint, offset;
     String_iter iter;
@@ -347,15 +360,16 @@ validate(Interp *interp, STRING *src)
 
 static STRING *
 string_from_codepoint(Interp *interp, UINTVAL codepoint)
+    /* WARN_UNUSED */
 {
-    STRING *return_string = NULL;
     char real_codepoint = (char)codepoint;
-    return_string = string_make(interp, &real_codepoint, 1, "ascii", 0);
+    STRING * const return_string = string_make(interp, &real_codepoint, 1, "ascii", 0);
     return return_string;
 }
 
 static INTVAL
 is_cclass(Interp *interp, INTVAL flags, STRING *source_string, UINTVAL offset)
+    /* WARN_UNUSED */
 {
     UINTVAL codepoint;
 
@@ -373,6 +387,7 @@ is_cclass(Interp *interp, INTVAL flags, STRING *source_string, UINTVAL offset)
 static INTVAL
 find_cclass(Interp *interp, INTVAL flags, STRING *source_string,
             UINTVAL offset, UINTVAL count)
+    /* WARN_UNUSED */
 {
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
@@ -412,11 +427,12 @@ find_not_cclass(Interp *interp, INTVAL flags, STRING *source_string,
  * TODO pass in the Hash's seed value as initial hashval
  */
 size_t
-ascii_compute_hash(Interp *interp, STRING *source_string, size_t seed)
+ascii_compute_hash(Interp *interp, STRING *source_string /*NN*/, size_t seed)
+    /* PURE,WARN_UNUSED */
 {
     size_t hashval = seed;
 
-    char *buffptr = (char *)source_string->strstart;
+    const char *buffptr = (char *)source_string->strstart;
     UINTVAL len = source_string->strlen;
 
     assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
