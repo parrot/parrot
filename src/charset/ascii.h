@@ -34,33 +34,19 @@ size_t ascii_compute_hash( Interp *interp,
         __attribute__warn_unused_result__;
 
 INTVAL ascii_cs_index( Interp *interp,
-    STRING *source_string,
-    STRING *search_string,
+    STRING *source_string /*NN*/,
+    STRING *search_string /*NN*/,
     UINTVAL offset )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
 INTVAL ascii_cs_rindex( Interp *interp,
-    STRING *source_string,
-    STRING *search_string,
+    STRING *source_string /*NN*/,
+    STRING *search_string /*NN*/,
     UINTVAL offset )
-        __attribute__warn_unused_result__;
-
-INTVAL ascii_find_not_thing( Interp *interp,
-    STRING *string /*NN*/,
-    UINTVAL start,
-    PARROT_CCLASS_FLAGS type,
-    const PARROT_CCLASS_FLAGS *table /*NN*/ )
         __attribute__nonnull__(2)
-        __attribute__nonnull__(5)
-        __attribute__warn_unused_result__;
-
-INTVAL ascii_find_thing( Interp *interp,
-    STRING *string /*NN*/,
-    UINTVAL start,
-    PARROT_CCLASS_FLAGS type,
-    const PARROT_CCLASS_FLAGS *table /*NN*/ )
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(5)
+        __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
 STRING * ascii_get_graphemes( Interp *interp,
@@ -85,9 +71,11 @@ STRING * charset_cvt_ascii_to_iso_8859_1( Interp *interp,
     STRING *dest );
 
 INTVAL mixed_cs_index( Interp *interp,
-    STRING *src,
-    STRING *search,
+    STRING *src /*NN*/,
+    STRING *search /*NN*/,
     UINTVAL offs )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
 CHARSET * Parrot_charset_ascii_init( Interp *interp );
