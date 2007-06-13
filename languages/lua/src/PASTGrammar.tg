@@ -264,8 +264,7 @@ transform past (Lua::Grammar::local_declaration) :language('PIR') {
     explist = new .ResizablePMCArray
   L4:
     past = new 'PAST::Op'
-    past.'init'(namelist, explist, 'node'=>node, 'pasttype'=>'assignlist')
-    .return (past)
+    .return past.'init'(namelist, explist, 'node'=>node, 'pasttype'=>'assignlist')
 }
 
 
@@ -291,11 +290,9 @@ transform past (Lua::Grammar::return_statement) :language('PIR') {
     if null $P0 goto L1
     $P0 = shift $P0
     $P1 = tree.'get'('explist', $P0, 'Lua::Grammar::expression_list')
-    past.'init'($P1 :flat, 'node'=>node, 'pasttype'=>'return')
-    .return (past)
+    .return past.'init'($P1 :flat, 'node'=>node, 'pasttype'=>'return')
   L1:
-    past.'init'('node'=>node, 'pasttype'=>'return')
-    .return (past)
+    .return past.'init'('node'=>node, 'pasttype'=>'return')
 }
 
 
@@ -305,8 +302,7 @@ transform past (Lua::Grammar::break_statement) :language('PIR') {
     if looplevel <= 0 goto L1
     .local pmc past
     past = new 'PAST::Op'
-    past.'init'('node'=>node, 'pasttype'=>'break')
-    .return (past)
+    .return past.'init'('node'=>node, 'pasttype'=>'break')
   L1:
     node.'syntax_error'("no loop to break")
 }
@@ -328,8 +324,7 @@ transform past (Lua::Grammar::expression_stat) :language('PIR') {
     unshift varlist, $P1
     .local pmc past
     past = new 'PAST::Op'
-    past.'init'(varlist, explist, 'node'=>node, 'pasttype'=>'assignlist')
-    .return (past)
+    .return past.'init'(varlist, explist, 'node'=>node, 'pasttype'=>'assignlist')
 }
 
 
@@ -558,8 +553,7 @@ transform key (Lua::Grammar::name) :language('PIR') {
     .local pmc past
     $S0 = node.'result_object'()
     past = new 'PAST::Val'
-    past.'init'('node'=>node, 'vtype'=>'.LuaString', 'name'=>$S0, 'ctype'=>'s~')
-    .return (past)
+    .return past.'init'('node'=>node, 'vtype'=>'.LuaString', 'name'=>$S0, 'ctype'=>'s~')
 }
 
 
@@ -696,11 +690,9 @@ transform past (Lua::Grammar::name) :language('PIR') {
     past = new 'PAST::Var'
     $I0 = symbtab.'lookup'($S0)
     unless $I0 goto L1
-    past.'init'('node'=>node, 'name'=>$S0, 'scope'=>'lexical')
-    .return (past)
+    .return past.'init'('node'=>node, 'name'=>$S0, 'scope'=>'lexical')
   L1:
-    past.'init'('node'=>node, 'name'=>$S0, 'scope'=>'package')
-    .return (past)
+    .return past.'init'('node'=>node, 'name'=>$S0, 'scope'=>'package')
 }
 
 
@@ -710,8 +702,7 @@ transform past (Lua::Grammar::vararg) :language('PIR') {
     unless has_vararg goto L1
     .local pmc past
     new past, 'PAST::Op'
-    past.'init'('node'=>node, 'pasttype'=>'vararg')
-    .return (past)
+    .return past.'init'('node'=>node, 'pasttype'=>'vararg')
   L1:
     node.'syntax_error'("cannot use '...' outside a vararg function")
 }
@@ -720,24 +711,21 @@ transform past (Lua::Grammar::vararg) :language('PIR') {
 transform past (Lua::Grammar::nil) :language('PIR') {
     .local pmc past
     new past, 'PAST::Val'
-    past.'init'('node'=>node, 'vtype'=>'.LuaNil')
-    .return (past)
+    .return past.'init'('node'=>node, 'vtype'=>'.LuaNil')
 }
 
 
 transform past (Lua::Grammar::true) :language('PIR') {
     .local pmc past
     past = new 'PAST::Val'
-    past.'init'('node'=>node, 'vtype'=>'.LuaBoolean', 'name'=>1)
-    .return (past)
+    .return past.'init'('node'=>node, 'vtype'=>'.LuaBoolean', 'name'=>1)
 }
 
 
 transform past (Lua::Grammar::false) :language('PIR') {
     .local pmc past
     past = new 'PAST::Val'
-    past.'init'('node'=>node, 'vtype'=>'.LuaBoolean', 'name'=>0)
-    .return (past)
+    .return past.'init'('node'=>node, 'vtype'=>'.LuaBoolean', 'name'=>0)
 }
 
 
@@ -745,8 +733,7 @@ transform past (Lua::Grammar::number) :language('PIR') {
     .local pmc past
     past = new 'PAST::Val'
     $S0 = node.'result_object'()
-    past.'init'('node'=>node, 'vtype'=>'.LuaNumber', 'name'=>$S0, 'ctype'=>'n+')
-    .return (past)
+    .return past.'init'('node'=>node, 'vtype'=>'.LuaNumber', 'name'=>$S0, 'ctype'=>'n+')
 }
 
 
@@ -756,8 +743,7 @@ transform past (Lua::Grammar::string) :language('PIR') {
     $S1 = $P0.'result_object'()
     .local pmc past
     past = new 'PAST::Val'
-    past.'init'('node'=>node, 'vtype'=>'.LuaString', 'name'=>$S1, 'ctype'=>'s~')
-    .return (past)
+    .return past.'init'('node'=>node, 'vtype'=>'.LuaString', 'name'=>$S1, 'ctype'=>'s~')
 }
 
 =head1 AUTHORS
