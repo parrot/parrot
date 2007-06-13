@@ -24,16 +24,16 @@ F<include/parrot/datatypes.h>.
 /*
 
 FUNCDOC: Parrot_get_datatype_enum
-Return datatype C<enum> for C<STRING*> typename.
+Return datatype C<enum> for C<STRING*> type_name.
 
 */
 
 PARROT_API
 INTVAL
-Parrot_get_datatype_enum(Interp *interp, const STRING *typename /*NN*/)
+Parrot_get_datatype_enum(Interp *interp, const STRING *type_name /*NN*/)
     /* PURE, WARN_UNUSED */
 {
-    char * const type = string_to_cstring(interp, typename);
+    char * const type = string_to_cstring(interp, type_name);
     int i;
 
     for (i = enum_first_type; i < enum_last_type; i++) {

@@ -129,7 +129,7 @@ extern const struct _data_types data_types[];
 /* HEADERIZER BEGIN: src/datatypes.c */
 
 PARROT_API INTVAL Parrot_get_datatype_enum( Interp *interp,
-    const STRING *typename /*NN*/ )
+    const STRING *type_name /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__pure__
         __attribute__warn_unused_result__;
