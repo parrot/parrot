@@ -178,10 +178,10 @@ information as to what file that line is from will be stored in this stream.
 The header will start with a count of the number of source file to bytecode
 position mappings that are in the header.
 
-0 (relative)
-+----------+----------+----------+----------+
-|   number of source => bytecode mappings   |
-+----------+----------+----------+----------+
+  0 (relative)
+  +----------+----------+----------+----------+
+  |   number of source => bytecode mappings   |
+  +----------+----------+----------+----------+
 
 A source to bytecode position mapping simply states that the bytecode that 
 starts from the specified offset up until the offset in the next mapping, or 
@@ -191,15 +191,15 @@ location X.
 A mapping always starts with the offset in the bytecode, followed by the 
 type of the mapping.
 
-0 (relative)
-+----------+----------+----------+----------+
-|              bytecode offset              |
-+----------+----------+----------+----------+
+  0 (relative)
+  +----------+----------+----------+----------+
+  |              bytecode offset              |
+  +----------+----------+----------+----------+
 
-4
-+----------+----------+----------+----------+
-|                mapping type               |
-+----------+----------+----------+----------+
+  4
+  +----------+----------+----------+----------+
+  |                mapping type               |
+  +----------+----------+----------+----------+
 
 There are 3 mapping types.
 
