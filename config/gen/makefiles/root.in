@@ -1862,7 +1862,7 @@ HEADERIZER_O_FILES = \
     src/utils.o \
     src/vtables.o \
 
-headerizer:
+headerizer : $(SRC_DIR)/fingerprint.c 
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)
 
 ###############################################################################
