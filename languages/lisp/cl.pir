@@ -307,6 +307,7 @@ DONE:
 
 .sub _char
  .param pmc args
+
  .local pmc retval
  .local pmc ke
  .local string str

@@ -78,6 +78,14 @@ my @test_cases = (
       'T',
       'string 999 is an atom'
     ],
+    [ q{ (atom ( + 1 2 )) },
+      'T',
+      'result of an addition is an atom'
+    ],
+    [ q{ (atom '( + 1 2 )) },
+      'NIL',
+      'a quoted addition is not an atom'
+    ],
 );
 
 Test::More::plan( tests => scalar @test_cases );
