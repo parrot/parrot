@@ -1371,7 +1371,7 @@ invokable(parser_state *p) {
   long-invocation -> '.pcc_begin' '\n'
                      { '.arg' expression arg_flags }
                      ( '.pcc_call'|'.nci_call') invokable '\n'
-                     | '.invocant' invocant '\n'
+                     | '.invocant' invokable '\n'
                        '.meth_call' method '\n'
                      )
                      { (local_declaration | '.result' target param_flags '\n') }
@@ -1957,7 +1957,7 @@ multi_type_list(parser_state *p) {
              | ':main'
              | ':method'
              | ':lex'
-             | ':outer' '(' STRINGC ')'
+             | ':outer' '(' ( STRINGC | IDENTIFIER )  ')'
              | ':vtable' '(' STRINGC ')'
              | ':multi' multi-type-list
              | ':postcomp'
@@ -1987,6 +1987,15 @@ sub_flags(parser_state *p) {
                 next(p);
                 break;
             case T_OUTER_FLAG:
+                if (p->curtoken == T_STRING_CONSTANT
+                        || p->curtoken == T_IDENTIFIER) {
+                    next(p);
+                }
+                else {
+                    syntax_error(p, 1, "argument for :outer flag must be"
+                                       " a string constant or identifier");
+                }
+                break;
             case T_VTABLE_FLAG: {
                 emit_sub_flag(p, p->curtoken); /* emit current flag */
                 next(p);

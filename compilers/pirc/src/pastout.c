@@ -227,7 +227,8 @@ past_op(struct emit_data *data, char *op) {
 */
 static void
 past_expr(struct emit_data *data, char *expr) {
-    fprintf(data->file, "%*s[%d] => \"%s\"\n", data->indent, " ", data->index++, expr); /* fix index */
+    fprintf(data->file, "%*s[%d] => \"%s\"\n", data->indent, " ", data->index++, expr); 
+    /* fix index */
 }
 
 /*
