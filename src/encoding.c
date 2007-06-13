@@ -49,7 +49,7 @@ parrot_init_encodings_2(Interp *interp)
 void
 parrot_deinit_encodings(Interp *interp)
 {
-    const n = all_encodings->n_encodings;
+    const int n = all_encodings->n_encodings;
     int i;
 
     for (i = 0; i < n; ++i) {
@@ -72,7 +72,7 @@ PARROT_API
 ENCODING *
 Parrot_find_encoding(Interp *interp, const char *encodingname /*NN*/)
 {
-    const n = all_encodings->n_encodings;
+    const int n = all_encodings->n_encodings;
     int i;
 
     for (i = 0; i < n; ++i) {
@@ -177,7 +177,7 @@ static INTVAL
 register_encoding(Interp *interp, const char *encodingname,
         ENCODING *encoding)
 {
-    const n = all_encodings->n_encodings;
+    const int n = all_encodings->n_encodings;
     int i;
 
     for (i = 0; i < n; ++i) {
