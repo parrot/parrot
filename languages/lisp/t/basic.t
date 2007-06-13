@@ -24,6 +24,15 @@ use Test::More;
 use Parrot::Test;
 
 my @test_cases = (
+    [ q{  (print '(1 2)) },
+      q{(1 . (2 . NIL))},
+      q{function apply},
+    ],
+    [ q{ ( setq my_function '+) ( print (apply my_function '(1 2)) ) },
+      q{3},
+      q{function apply},
+      todo => 'apply does not evaluate',
+    ],
     [ q{ ( print ( list 1 2 ) ) },
       q{(1 . (2 . NIL))},
     ],
@@ -45,14 +54,17 @@ my @test_cases = (
     [ q{ ( setq asdf 1234 ) ( print asdf ) },
       q{1234},
     ],
+    [ q{ ( setq asdf 1234 ) ( print asdf ) },
+      q{1234},
+    ],
 );
 
 Test::More::plan( tests => scalar @test_cases );
 
 foreach ( @test_cases )
 {
-     my ( $code, $out, $desc ) = @{ $_ };
+    my ( $code, $out, $desc, @other ) = @{ $_ };
 
-     $desc ||= substr( $code, 0, 32 ); 
-     language_output_is( 'Lisp', $code, $out . "\n", $desc );
+    $desc ||= substr( $code, 0, 32 ); 
+    language_output_is( 'Lisp', $code, $out . "\n", $desc, @other );
 }

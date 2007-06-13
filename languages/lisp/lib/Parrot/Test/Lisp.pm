@@ -20,9 +20,16 @@ sub new {
 }
 
 sub output_is {
-    my ( $self, $code, $output, $desc ) = @_;
+    my ( $self, $code, $output, $desc, %extra ) = @_;
 
     my $count = $self->{builder}->current_test() + 1;
+
+    # set a TODO for Test::Builder to find
+    my $call_pkg = $self->{builder}->exported_to() || '';
+
+    no strict 'refs';
+    local *{ $call_pkg . '::TODO' } = \$extra{todo}
+        if defined $extra{todo};
 
     my $lang_fn = File::Spec->rel2abs(Parrot::Test::per_test( '.l',  $count ));
     my $out_fn  = File::Spec->rel2abs(Parrot::Test::per_test( '.out', $count ));
