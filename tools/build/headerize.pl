@@ -263,7 +263,8 @@ sub main {
     GetOptions( 'verbose' => \$opt{verbose}, ) or exit(1);
 
     my $nfuncs = 0;
-    my @ofiles = @ARGV;
+    my %ofiles = map {($_,1)} @ARGV;
+    my @ofiles = sort keys %ofiles;
     my %files;
 
     # Walk the object files and find corresponding source (either .c or .pmc)
@@ -271,7 +272,7 @@ sub main {
         next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/;
 
         my $cfile = $ofile;
-        $cfile =~ s/\Q$PConfig{o}\E$/.c/;
+        $cfile =~ s/\Q$PConfig{o}\E$/.c/ or die "$cfile doesn't look like an object file";
 
         my $pmcfile = $ofile;
         $pmcfile =~ s/\Q$PConfig{o}\E$/.pmc/;
