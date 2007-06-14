@@ -65,29 +65,22 @@ STDERR by default.
 	getstderr diag_output
 
   SET_OUTPUT:
-  	.local int offset
-	classoffset offset, self, 'Test::Builder::Output'
-	setattribute self, offset, output
-	inc offset
-	setattribute self, offset, diag_output
+	setattribute self, "output", output
+	setattribute self, "diag_output", diag_output
 .end
 
 .sub output :method
 	.local pmc output
-	.local int offset
 
-	classoffset offset, self, 'Test::Builder::Output'
-	getattribute output, self, offset
+	getattribute output, self, "output"
 
 	.return( output )
 .end
 
 .sub diag_output :method
 	.local pmc diag_output
-	.local int offset
 
-	classoffset offset, self, 'Test::Builder::Output'
-	getattribute diag_output, self, offset
+	getattribute diag_output, self, "diag_output"
 
 	.return( diag_output )
 .end
@@ -210,7 +203,7 @@ to the Perl 6 internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005, The Perl Foundation.
+Copyright (C) 2005-2007, The Perl Foundation.
 
 =cut
 

@@ -67,13 +67,10 @@ Test::Builder::NullPlan object, do not pass the hash.
 	throw plan_exception
 
   SET_ATTRIBUTES:
-	.local int offset
-	classoffset offset, self, 'Test::Builder::TestPlan'
-
 	.local pmc intvalue
 	intvalue = new .Integer
 	intvalue = expect
-	setattribute self, offset, intvalue
+	setattribute self, "expect", intvalue
 .end
 
 =item C<header()>
@@ -85,13 +82,10 @@ plan.
 
 .sub header :method
 	.local string expect
-	.local int    offset
 	.local string header
 
-	classoffset offset, self, 'Test::Builder::TestPlan'
-
 	.local pmc expect_int
-	getattribute expect_int, self, offset
+	getattribute expect_int, self, "expect"
 	expect = expect_int
 
 	header = '1..'
@@ -111,15 +105,12 @@ plan.
 	.param int    ran
 
 	.local int    expect
-	.local int    offset
 	.local string footer
 	.local string expect_string
 	.local string ran_string
 
-	classoffset offset, self, 'Test::Builder::TestPlan'
-
 	.local pmc expect_int
-	getattribute expect_int, self, offset
+	getattribute expect_int, self, "expect"
 
 	expect        = expect_int
 	expect_string = expect_int
@@ -168,7 +159,7 @@ to the Perl 6 internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005, The Perl Foundation.
+Copyright (C) 2005-2007, The Perl Foundation.
 
 =cut
 

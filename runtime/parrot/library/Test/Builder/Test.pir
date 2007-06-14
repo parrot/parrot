@@ -132,17 +132,13 @@ Returns the TAP-compatible string representation of this test.
 .sub init_pmc :vtable :method
 	.param pmc args
 
-	.local int offset
 	.local pmc passed
 	.local pmc number
 	.local pmc diagnostic
 	.local pmc description
 
-	classoffset offset, self, 'Test::Builder::Test::Base'
-
 	passed = args['passed']
-	setattribute self, offset, passed
-	inc offset
+	setattribute self, "passed", passed
 
 	number = args['number']
 	unless null number goto SET_NUMBER
@@ -150,8 +146,7 @@ Returns the TAP-compatible string representation of this test.
 	number = 0
 
   SET_NUMBER:
-  	setattribute self, offset, number
-	inc offset
+  	setattribute self, "number", number
 
 	diagnostic = args['diagnostic']
 	unless null diagnostic goto SET_DIAGNOSTIC
@@ -159,8 +154,7 @@ Returns the TAP-compatible string representation of this test.
 	set diagnostic, '???'
 
   SET_DIAGNOSTIC:
-  	setattribute self, offset, diagnostic
-	inc offset
+  	setattribute self, "diagnostic", diagnostic
 
 	description = args['description']
 	unless null description goto SET_DESCRIPTION
@@ -168,49 +162,38 @@ Returns the TAP-compatible string representation of this test.
 	set description, ''
 
   SET_DESCRIPTION:
-  	setattribute self, offset, description
+  	setattribute self, "description", description
 .end
 
 .sub passed :method
 	.local pmc passed
-	.local int offset
 
-	classoffset offset, self, 'Test::Builder::Test::Base'
-	getattribute passed, self, offset
+	getattribute passed, self, "passed"
 
 	.return( passed )
 .end
 
 .sub number :method
 	.local pmc number
-	.local int offset
 
-	classoffset offset, self, 'Test::Builder::Test::Base'
-	inc offset
+	getattribute number, self, "number"
 
-	getattribute number, self, offset
 	.return( number )
 .end
 
 .sub diagnostic :method
 	.local pmc diagnostic
-	.local int offset
 
-	classoffset offset, self, 'Test::Builder::Test::Base'
-	add offset, 2
+	getattribute diagnostic, self, "diagnostic"
 
-	getattribute diagnostic, self, offset
 	.return( diagnostic )
 .end
 
 .sub description :method
 	.local pmc description
-	.local int offset
 
-	classoffset offset, self, 'Test::Builder::Test::Base'
-	add offset, 3
+	getattribute description, self, "description"
 
-	getattribute description, self, offset
 	.return( description )
 .end
 
@@ -269,7 +252,6 @@ Returns the TAP-compatible string representation of this test.
 .sub init_pmc :vtable :method
 	.param pmc args
 
-	.local int offset
 	.local pmc reason
 	reason = new .String
 	set reason, ''
@@ -280,16 +262,13 @@ Returns the TAP-compatible string representation of this test.
 	reason = args['reason']
 
   SET_ATTRIBUTE:
-	classoffset offset, self, 'Test::Builder::Test::WithReason'
-	setattribute self, offset, reason
+	setattribute self, "reason", reason
 .end
 
 .sub reason :method
 	.local pmc reason
-	.local int offset
 
-	classoffset offset, self, 'Test::Builder::Test::WithReason'
-	getattribute reason, self, offset
+	getattribute reason, self, "reason"
 
 	.return( reason )
 .end
@@ -401,7 +380,7 @@ to the Perl 6 internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005, The Perl Foundation.
+Copyright (C) 2005-2007, The Perl Foundation.
 
 =cut
 

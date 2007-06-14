@@ -99,7 +99,6 @@ the same state.
 	.local pmc testplan
 	.local pmc results
 
-    null args
 	(output, testplan, results) = self.'_assign_default_args'( args )
 	self.'_assign_args'( output, testplan, results )
 .end
@@ -119,13 +118,11 @@ the same state.
 	.param pmc testplan
 	.param pmc results
 
-	.local int offset
-	classoffset offset, self, 'Test::Builder'
-	setattribute self, offset, output
-	inc offset
-	setattribute self, offset, testplan
-	inc offset
-	setattribute self, offset, results
+	setattribute self, "output", output
+	setattribute self, "testplan", testplan
+	setattribute self, "results", results
+
+    results = self.'results'()
 .end
 
 =item C<create( args_hash )>
@@ -170,9 +167,9 @@ This probably doesn't work correctly yet, but you will probably never use it.
 	find_type test_builder_type, 'Test::Builder'
 	.local pmc real_init
 	.local pmc blank_init
-	real_init  = find_global 'Test::Builder', '__init'
-	blank_init = find_global 'Test::Builder', '__fake_init'
-	store_global 'Test::Builder', '__init', blank_init
+	real_init  = find_global 'Test::Builder', 'init'
+	blank_init = find_global 'Test::Builder', 'fake_init'
+	store_global 'Test::Builder', 'init', blank_init
 
 	.local pmc test
 	test       = new test_builder_type
@@ -244,33 +241,24 @@ This probably doesn't work correctly yet, but you will probably never use it.
 
 .sub output :method
 	.local pmc output
-	.local int offset
 
-	classoffset offset, self, 'Test::Builder'
-	getattribute output, self, offset
+	getattribute output, self, "output"
 
 	.return( output )
 .end
 
 .sub testplan :method
 	.local pmc testplan
-	.local int offset
 
-	classoffset offset, self, 'Test::Builder'
-	inc offset
-	getattribute testplan, self, offset
+	getattribute testplan, self, "testplan"
 
 	.return( testplan )
 .end
 
 .sub results :method
-	.local pmc output
-	.local int offset
 	.local pmc results
 
-	classoffset offset, self, 'Test::Builder'
-	offset += 2
-	getattribute results, self, offset
+	getattribute results, self, "results"
 
 	.return( results )
 .end
@@ -395,10 +383,8 @@ declared a plan or if you pass an invalid argument.
 	.local string header
 	header = testplan.'header'()
 
-	.local int offset
-	classoffset offset, self, 'Test::Builder'
-	inc offset
-	setattribute self, offset, testplan
+	setattribute self, "testplan", testplan
+
 	output.write( header )
 .end
 
@@ -656,7 +642,7 @@ to the Perl 6 internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005, The Perl Foundation.
+Copyright (C) 2005-2007, The Perl Foundation.
 
 =cut
 
