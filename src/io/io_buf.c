@@ -22,6 +22,8 @@ The "buf" layer of Parrot IO. Buffering and all the fun stuff.
 #include "io_private.h"
 #include <assert.h>
 
+/* HEADER: none */
+
 /* Defined at bottom */
 extern const ParrotIOLayerAPI pio_buf_layer_api;
 
