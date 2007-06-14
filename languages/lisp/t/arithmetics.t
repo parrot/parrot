@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 # core Perl modules
-use Test::More     tests => 4;
+use Test::More     tests => 5;
 
 # Parrot modules
 use Parrot::Test;
@@ -45,4 +45,10 @@ language_output_is( 'Lisp', <<'END_CODE', <<'END_OUT', '2 equals 1+1' );
 ( print ( =  2 ( + 1 1 ) ) )
 END_CODE
 NIL
+END_OUT
+
+language_output_is( 'Lisp', <<'END_CODE', <<'END_OUT', '2 equals 1+1' );
+( print ( mod  11 3 ) )
+END_CODE
+2
 END_OUT
