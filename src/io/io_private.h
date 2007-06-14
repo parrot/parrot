@@ -126,9 +126,6 @@ struct _ParrotIOData {
 };
 
 /* functions internal to the subsystem */
-extern ParrotIOTable alloc_pio_array(int);
-extern int realloc_pio_array(ParrotIOTable *, int);
-extern STRING * PIO_make_io_string(Interp *interp, STRING **buf, size_t);
 
 /* redefine PIO_STD* for internal use */
 #define _PIO_STDIN(i)   (((ParrotIOData*)i->piodata)->table[PIO_STDIN_FILENO])

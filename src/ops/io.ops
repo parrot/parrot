@@ -102,17 +102,17 @@ store it in $1
 =cut
 
 inline op getstdin(out PMC) :base_io {
-  $1 = PIO_STDIN(interp);
+  $1 = _PIO_STDIN(interp);
   goto NEXT();
 }
 
 inline op getstdout(out PMC) :base_io {
-  $1 = PIO_STDOUT(interp);
+  $1 = _PIO_STDOUT(interp);
   goto NEXT();
 }
 
 inline op getstderr(out PMC) :base_io {
-  $1 = PIO_STDERR(interp);
+  $1 = _PIO_STDERR(interp);
   goto NEXT();
 }
 
@@ -132,12 +132,12 @@ PMC.
 =cut
 
 inline op setstdout(invar PMC) :base_io {
-        PIO_STDOUT(interp) = $1;
+        _PIO_STDOUT(interp) = $1;
         goto NEXT();
 }
 
 inline op setstderr(invar PMC) :base_io {
-        PIO_STDERR(interp) = $1;
+        _PIO_STDERR(interp) = $1;
         goto NEXT();
 }
 
@@ -226,7 +226,7 @@ inline op print(in NUM) :base_io {
 op print(in STR) :base_io {
   STRING * const s = $1;
   if (s && string_length(interp, s)) {
-    PIO_putps(interp, PIO_STDOUT(interp), s);
+    PIO_putps(interp, _PIO_STDOUT(interp), s);
   }
   goto NEXT();
 }
@@ -235,7 +235,7 @@ op print(invar PMC) :base_io {
   PMC * const p = $1;
   STRING * const s = (VTABLE_get_string(interp, p));
   if (s) {
-    PIO_putps(interp, PIO_STDOUT(interp), s);
+    PIO_putps(interp, _PIO_STDOUT(interp), s);
   }
   goto NEXT();
 }
@@ -267,7 +267,7 @@ op printerr(in NUM) :base_io {
 op printerr(in STR) :base_io {
   STRING * const s = $1;
   if (s && string_length(interp, s)) {
-    PIO_putps(interp, PIO_STDERR(interp), s);
+    PIO_putps(interp, _PIO_STDERR(interp), s);
   }
   goto NEXT();
 }
@@ -276,7 +276,7 @@ op printerr(invar PMC) :base_io {
   PMC * const p = $1;
   STRING * const s = (VTABLE_get_string(interp, p));
   if (s) {
-    PIO_putps(interp, PIO_STDERR(interp), s);
+    PIO_putps(interp, _PIO_STDERR(interp), s);
   }
   goto NEXT();
 }
@@ -351,7 +351,7 @@ Read up to N bytes from IO PMC stream.
 =cut
 
 op read(out STR, in INT) :base_io {
-  $1 = PIO_reads(interp, PIO_STDIN(interp), (size_t)$2);
+  $1 = PIO_reads(interp, _PIO_STDIN(interp), (size_t)$2);
   goto NEXT();
 }
 
@@ -405,7 +405,7 @@ op peek(out STR) :base_io {
   STRING ** const s = &$1;
 
   *s = NULL;
-  PIO_peek(interp, PIO_STDIN(interp), s);
+  PIO_peek(interp, _PIO_STDIN(interp), s);
   goto NEXT();
 }
 

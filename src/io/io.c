@@ -118,41 +118,6 @@ PIO_make_io_string(Interp *interp, STRING **buf /*NN*/, size_t len)
 
 /*
 
-FUNCDOC: alloc_pio_array
-
-Allocates an interpreter's IO handle table with room for C<numhandles> IO
-handles.
-
-Called from C<PIO_init()>.
-
-*/
-
-ParrotIOTable
-alloc_pio_array(int numhandles)
-    /* MALLOC, WARN_UNUSED */
-{
-    const size_t size = numhandles * sizeof (ParrotIO *);
-    return (ParrotIOTable)mem_sys_allocate_zeroed(size);
-}
-
-/*
-
-FUNCDOC: realloc_pio_array
-
-Unimplemented; returns C<-1>.
-
-*/
-
-int
-realloc_pio_array(ParrotIOTable *table, int numhandles)
-{
-    UNUSED(table);
-    UNUSED(numhandles);
-    return -1;
-}
-
-/*
-
 FUNCDOC: PIO_new
 
 Creates a new IO stream.
@@ -283,7 +248,7 @@ PIO_init(Interp *interp /*NN*/)
     if (interp->piodata == NULL)
         internal_exception(PIO_ERROR, "PIO alloc piodata failure.");
     interp->piodata->default_stack = NULL;
-    interp->piodata->table = alloc_pio_array(PIO_NR_OPEN);
+    interp->piodata->table = mem_sys_allocate_zeroed(PIO_NR_OPEN * sizeof(ParrotIO *));
     if (interp->piodata->table == NULL)
         internal_exception(PIO_ERROR, "PIO alloc table failure.");
 
@@ -739,6 +704,7 @@ Flushes, closes, and destroys the C<ParrotIO> PMC C<*pmc>.
 
 */
 
+PARROT_API
 INTVAL
 PIO_close(Interp *interp, PMC *pmc /*NULLOK*/)
 {
@@ -1297,6 +1263,7 @@ C<-1> if it cannot send the message.
 
 */
 
+PARROT_API
 INTVAL
 PIO_send(Interp *interp, PMC *pmc /*NN*/, STRING *buf /*NN*/)
     /* WARN_UNUSED */
@@ -1358,6 +1325,7 @@ Listens for new connections on socket C<*pmc>.  Returns C<-1> on failure.
 
 */
 
+PARROT_API
 INTVAL
 PIO_listen(Interp *interp, PMC *pmc /*NN*/, INTVAL backlog)
     /* WARN_UNUSED */
@@ -1379,6 +1347,7 @@ Returns C<NULL> on failure.
 
 */
 
+PARROT_API
 PMC *
 PIO_accept(Interp *interp, PMC *pmc /*NN*/)
 {

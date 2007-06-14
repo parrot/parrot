@@ -1845,6 +1845,7 @@ HEADERIZER_O_FILES = \
     src/hash.o \
     src/headers.o \
     src/intlist.o \
+    src/io/io.c \
     src/key.o \
     src/list.o \
     src/mmd.o \

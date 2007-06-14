@@ -143,69 +143,218 @@ extern ParrotIOLayer pio_string_layer;
 
 extern INTVAL pio_errno;
 
-/* io.c - If you add new layers, register them in init_layers() */
-PARROT_API extern void PIO_init(Interp *);
-PARROT_API extern void PIO_finish(Interp *);
-PARROT_API void PIO_internal_shutdown(Interp *);
-PARROT_API extern INTVAL PIO_init_stacks(Interp *);
-PARROT_API extern void PIO_atexit(Interp *);
+/* HEADERIZER BEGIN: src/io/io.c */
+
+PARROT_API PMC * new_io_pmc( Interp *interp, ParrotIO *io /*NULLOK*/ );
+PARROT_API void Parrot_IOData_mark( Interp *interp,
+    ParrotIOData *piodata /*NN*/ )
+        __attribute__nonnull__(2);
+
+PARROT_API PMC * PIO_accept( Interp *interp, PMC *pmc /*NN*/ )
+        __attribute__nonnull__(2);
+
+PARROT_API INTVAL PIO_base_init( Interp *interp, ParrotIOLayer *l );
+PARROT_API INTVAL PIO_bind( Interp *interp,
+    PMC *pmc /*NN*/,
+    STRING *address /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_API INTVAL PIO_close( Interp *interp, PMC *pmc /*NULLOK*/ );
+PARROT_API INTVAL PIO_connect( Interp *interp,
+    PMC *pmc /*NN*/,
+    STRING *address /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_API void PIO_destroy( Interp *interp, PMC *pmc /*NN*/ )
+        __attribute__nonnull__(2);
+
+PARROT_API INTVAL PIO_eof( Interp *interp, PMC *pmc /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+PARROT_API INTVAL PIO_eprintf( Interp *interp /*NULLOK*/,
+    const char *s /*NN*/,
+    ... )
+        __attribute__nonnull__(2);
+
+PARROT_API PMC * PIO_fdopen( Interp *interp,
+    ParrotIOLayer *layer /*NULLOK*/,
+    PIOHANDLE fd,
+    const char *sflags /*NN*/ )
+        __attribute__nonnull__(4)
+        __attribute__warn_unused_result__;
+
+PARROT_API void PIO_finish( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+PARROT_API void PIO_flush( Interp *interp, PMC *pmc /*NN*/ )
+        __attribute__nonnull__(2);
+
+PARROT_API INTVAL PIO_fprintf( Interp *interp /*NN*/,
+    PMC *pmc /*NN*/,
+    const char *s /*NN*/,
+    ... )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_API PIOHANDLE PIO_getfd( Interp *interp, PMC *pmc /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+PARROT_API void PIO_init( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+PARROT_API INTVAL PIO_init_stacks( Interp *interp );
+PARROT_API void PIO_internal_shutdown( Interp *interp );
+PARROT_API INTVAL PIO_isatty( Interp *interp, PMC *pmc /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__pure__
+        __attribute__warn_unused_result__;
+
+PARROT_API INTVAL PIO_listen( Interp *interp,
+    PMC *pmc /*NN*/,
+    INTVAL backlog )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+PARROT_API ParrotIO * PIO_new( Interp *interp,
+    INTVAL iotype,
+    INTVAL flags,
+    INTVAL mode )
+        __attribute__warn_unused_result__;
+
+PARROT_API PMC * PIO_open( Interp *interp,
+    ParrotIOLayer *layer /*NULLOK*/,
+    const char *spath /*NN*/,
+    const char *sflags /*NN*/ )
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__warn_unused_result__;
+
+PARROT_API INTVAL PIO_parse_open_flags( const char *flagstr /*NULLOK*/ )
+        __attribute__warn_unused_result__;
+
+PARROT_API INTVAL PIO_peek( Interp *interp,
+    PMC *pmc /*NN*/,
+    STRING **buffer /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_API INTVAL PIO_pioctl( Interp *interp,
+    PMC *pmc /*NN*/,
+    INTVAL cmd,
+    INTVAL arg )
+        __attribute__nonnull__(2);
+
+PARROT_API INTVAL PIO_poll( Interp *interp /*NN*/,
+    PMC *pmc /*NN*/,
+    INTVAL which,
+    INTVAL sec,
+    INTVAL usec )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API INTVAL PIO_printf( Interp *interp /*NN*/,
+    const char *s /*NN*/,
+    ... )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API INTVAL PIO_putps( Interp *interp /*NN*/,
+    PMC *pmc /*NN*/,
+    STRING *s /*NULLOK*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API INTVAL PIO_puts( Interp *interp,
+    PMC *pmc /*NN*/,
+    const char *s /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_API INTVAL PIO_read( Interp *interp,
+    PMC *pmc /*NN*/,
+    char *buffer /*NN*/,
+    size_t len )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
+
+PARROT_API STRING * PIO_reads( Interp *interp, PMC *pmc /*NN*/, size_t len )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+PARROT_API INTVAL PIO_recv( Interp *interp,
+    PMC *pmc /*NN*/,
+    STRING **buf /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_API PIOOFF_T PIO_seek( Interp *interp,
+    PMC *pmc /*NN*/,
+    PIOOFF_T offset,
+    INTVAL w )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+PARROT_API INTVAL PIO_send( Interp *interp,
+    PMC *pmc /*NN*/,
+    STRING *buf /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
+
+PARROT_API INTVAL PIO_setbuf( Interp *interp,
+    PMC *pmc /*NN*/,
+    size_t bufsize )
+        __attribute__nonnull__(2);
+
+PARROT_API INTVAL PIO_setlinebuf( Interp *interp, PMC *pmc /*NN*/ )
+        __attribute__nonnull__(2);
+
+PARROT_API PMC * PIO_socket( Interp *interp,
+    INTVAL fam,
+    INTVAL type,
+    INTVAL proto );
+
+PARROT_API PMC * PIO_STDERR( Interp *interp );
+PARROT_API PMC * PIO_STDIN( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+PARROT_API PMC * PIO_STDOUT( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+PARROT_API PIOOFF_T PIO_tell( Interp *interp, PMC *pmc /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+PARROT_API INTVAL PIO_write( Interp *interp,
+    PMC *pmc /*NN*/,
+    const void *buffer /*NN*/,
+    size_t len )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
+
+STRING * PIO_make_io_string( Interp *interp, STRING **buf /*NN*/, size_t len )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+PIOOFF_T PIO_make_offset( INTVAL offset );
+PIOOFF_T PIO_make_offset32( INTVAL hi, INTVAL lo );
+PIOOFF_T PIO_make_offset_pmc( Interp *interp, PMC *pmc );
+/* HEADERIZER END: src/io/io.c */
+
+/* io_layers.c - If you add new layers, register them in init_layers() */
 PARROT_API extern INTVAL PIO_push_layer(Interp *, PMC *, ParrotIOLayer *);
 PARROT_API extern ParrotIOLayer *PIO_pop_layer(Interp *, PMC *);
 PARROT_API extern ParrotIOLayer *PIO_copy_stack(ParrotIOLayer *);
 PARROT_API ParrotIOLayer *PIO_get_layer(Interp *, const char *name);
-
-
-PARROT_API extern struct PMC *new_io_pmc(Interp *, ParrotIO *);
-PARROT_API extern void free_io_header(ParrotIO *);
-PARROT_API extern ParrotIO *PIO_new(Interp *, INTVAL, INTVAL, INTVAL);
-PARROT_API extern void PIO_destroy(Interp *, PMC *io);
-
-PARROT_API extern INTVAL PIO_base_init(Interp *, ParrotIOLayer *proto);
 PARROT_API extern ParrotIOLayer *PIO_base_new_layer(ParrotIOLayer *proto);
 PARROT_API extern void PIO_base_delete_layer(ParrotIOLayer *proto);
-
-PARROT_API extern INTVAL PIO_parse_open_flags(const char *flagstr);
-PARROT_API extern PMC *PIO_open(Interp *, ParrotIOLayer *, const char *, const char *);
-PARROT_API extern PMC *PIO_fdopen(Interp *, ParrotIOLayer *, PIOHANDLE, const char *);
-PARROT_API extern INTVAL PIO_close(Interp *, PMC *);
-PARROT_API extern void PIO_flush(Interp *, PMC *);
-PARROT_API extern STRING *PIO_reads(Interp *, PMC *, size_t);
-PARROT_API extern INTVAL PIO_read(Interp *, PMC *, char *, size_t);
-PARROT_API extern INTVAL PIO_write(Interp *, PMC *, const void *, size_t);
-PARROT_API extern INTVAL PIO_setbuf(Interp *, PMC *, size_t);
-PARROT_API extern INTVAL PIO_setlinebuf(Interp *, PMC *);
-PARROT_API extern INTVAL PIO_puts(Interp *, PMC *, const char *);
-PARROT_API extern INTVAL PIO_peek(Interp *, PMC *, STRING **);
-PARROT_API extern PIOOFF_T PIO_seek(Interp *, PMC *, PIOOFF_T offset, INTVAL whence);
-PARROT_API extern INTVAL PIO_eof(Interp *, PMC *);
-PARROT_API extern INTVAL PIO_pioctl(Interp *, PMC *, INTVAL cmd, INTVAL arg);
-PARROT_API extern INTVAL PIO_poll(Interp *, PMC *pmc, INTVAL which, INTVAL sec, INTVAL usec);
-PARROT_API extern PMC *PIO_socket(Interp *, INTVAL fam, INTVAL type, INTVAL proto);
-PARROT_API extern INTVAL PIO_recv(Interp *, PMC *pmc, STRING **buf);
-PARROT_API extern INTVAL PIO_send(Interp *, PMC *pmc, STRING *buf);
-PARROT_API extern INTVAL PIO_connect(Interp *, PMC *pmc, STRING *address);
-PARROT_API extern INTVAL PIO_bind(Interp *, PMC *pmc, STRING *address);
-PARROT_API extern INTVAL PIO_listen(Interp *, PMC *pmc, INTVAL backlog);
-PARROT_API extern PMC *PIO_accept(Interp *, PMC *pmc);
-
-
-PARROT_API extern INTVAL PIO_putps(Interp *, PMC *io, STRING *s)
-        __attribute__nonnull__(2);
-PARROT_API extern INTVAL PIO_fprintf(Interp *, PMC *io, const char *s, ...)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-PARROT_API extern INTVAL PIO_printf(Interp *, const char *s, ...)
-        __attribute__nonnull__(2);
-PARROT_API extern INTVAL PIO_eprintf(Interp *, const char *s, ...)
-        __attribute__nonnull__(2);
-PARROT_API extern PIOHANDLE PIO_getfd(Interp *, PMC *io)
-        __attribute__nonnull__(2);
-PARROT_API extern PIOOFF_T PIO_tell(Interp *, PMC *io)
-        __attribute__nonnull__(2);
-
-PARROT_API extern void Parrot_IOData_mark(Interp *, ParrotIOData *piodata);
-
-PARROT_API extern INTVAL PIO_isatty(Interp *, PMC *io);
 
 /* Put platform specific macros here if you must */
 #ifdef PIO_OS_WIN32
@@ -226,14 +375,6 @@ extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
 #  define PIO_getblksize(x)   PIO_stdio_getblksize(x)
 #endif
 
-PIOOFF_T PIO_make_offset(INTVAL offset);
-PIOOFF_T PIO_make_offset32(INTVAL hi, INTVAL lo);
-PIOOFF_T PIO_make_offset_pmc(Interp *, PMC *pmc);
-
-/* the internal system redefines them as macros */
-PARROT_API extern PMC *PIO_STDIN(Interp *);
-PARROT_API extern PMC *PIO_STDOUT(Interp *);
-PARROT_API extern PMC *PIO_STDERR(Interp *);
 
 /*
  * pioctl definitions -- These are mostly for reference
