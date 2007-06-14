@@ -12,15 +12,13 @@ UTF-8 (L<http://www.utf-8.com/>).
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 #include "../unicode.h"
 #include "utf8.h"
+
+/* HEADER: src/encodings/utf8.h */
 
 #define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl utf8")
 
@@ -48,14 +46,12 @@ typedef unsigned char utf8_t;
 #endif
 
 static void iter_init(Interp *, const String *src, String_iter *iter);
+
 /*
 
-=item C<static UINTVAL
-utf8_characters(const void *ptr, UINTVAL bytes)>
+FUNCDOC: utf8_characters
 
 Returns the number of characters in the C<byte_len> bytes from C<*ptr>.
-
-=cut
 
 */
 
@@ -80,12 +76,9 @@ utf8_characters(const utf8_t *ptr, UINTVAL byte_len)
 
 /*
 
-=item C<static UINTVAL
-utf8_decode(const void *ptr)>
+FUNCDOC: utf8_decode
 
 Returns the integer for the UTF-8 character found at C<*ptr>.
-
-=cut
 
 */
 
@@ -121,12 +114,9 @@ utf8_decode(const utf8_t *ptr)
 
 /*
 
-=item C<static void *
-utf8_encode(void *ptr, UINTVAL c)>
+FUNCDOC: utf8_encode
 
 Returns the UTF-8 encoding of integer C<c>.
-
-=cut
 
 */
 
@@ -154,12 +144,9 @@ utf8_encode(void *ptr, UINTVAL c)
 
 /*
 
-=item C<static const void *
-utf8_skip_forward(const void *ptr, UINTVAL n)>
+FUNCDOC: utf8_skip_forward
 
 Moves C<ptr> C<n> characters forward.
-
-=cut
 
 */
 
@@ -177,12 +164,9 @@ utf8_skip_forward(const void *ptr, UINTVAL n)
 
 /*
 
-=item C<static const void *
-utf8_skip_backward(const void *ptr, UINTVAL n)>
+FUNCDOC: utf8_skip_backward
 
 Moves C<ptr> C<n> characters back.
-
-=cut
 
 */
 
@@ -202,25 +186,17 @@ utf8_skip_backward(const void *ptr, UINTVAL n)
 
 /*
 
-=back
-
 =head2 Iterator Functions
 
-=over 4
-
-=item C<static UINTVAL
-utf8_decode_and_advance(Interp *, String_iter *i)>
+FUNCDOC: utf8_decode_and_advance
 
 The UTF-8 implementation of the string iterator's C<get_and_advance>
 function.
 
-=item C<static void
-utf8_encode_and_advance(Interp *, String_iter *i, UINTVAL c)>
+FUNCDOC: utf8_encode_and_advance
 
 The UTF-8 implementation of the string iterator's C<set_and_advance>
 function.
-
-=cut
 
 */
 
@@ -274,12 +250,10 @@ utf8_encode_and_advance(Interp *interp, String_iter *i, UINTVAL c)
 
 /*
 
-=item C<func>
+FUNCDOC: utf8_set_position
 
 The UTF-8 implementation of the string iterator's C<set_position>
 function.
-
-=cut
 
 */
 
@@ -565,16 +539,12 @@ Parrot_encoding_utf8_init(Interp *interp)
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<src/encodings/fixed_8.c>,
 F<src/string.c>,
 F<include/parrot/string.h>,
 F<docs/string.pod>.
-
-=cut
 
 */
 

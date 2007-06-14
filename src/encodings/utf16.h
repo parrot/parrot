@@ -1,5 +1,5 @@
 /* utf16.h
- *  Copyright (C) 2004, The Perl Foundation.
+ *  Copyright (C) 2004-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -13,7 +13,10 @@
 #ifndef PARROT_ENCODING_UTF16_H_GUARD
 #define PARROT_ENCODING_UTF16_H_GUARD
 
-ENCODING *Parrot_encoding_utf16_init(Interp *);
+/* HEADERIZER BEGIN: src/encodings/utf16.c */
+
+ENCODING * Parrot_encoding_utf16_init( Interp *interp );
+/* HEADERIZER END: src/encodings/utf16.c */
 
 #endif /* PARROT_ENCODING_UTF16_H_GUARD */
 

@@ -12,14 +12,12 @@ UCS-2 encoding with the help of the ICU library.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 #include "../unicode.h"
+
+/* HEADER: src/encodings/ucs2.h */
 
 #include "ucs2.h"
 
@@ -36,8 +34,8 @@ static void iter_init(Interp *, const String *src, String_iter *iter);
 static STRING *
 to_encoding(Interp *interp, STRING *src, STRING *dest)
 {
-    STRING *result = Parrot_utf16_encoding_ptr->to_encoding(interp,
-                                                            src, dest);
+    STRING * const result =
+        Parrot_utf16_encoding_ptr->to_encoding(interp, src, dest);
     /*
      * conversion to utf16 downgrads to ucs-2 if possible - check result
      */
@@ -262,8 +260,6 @@ Parrot_encoding_ucs2_init(Interp *interp)
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<src/encodings/fixed_8.c>,
@@ -271,8 +267,6 @@ F<src/encodings/utf8.c>,
 F<src/string.c>,
 F<include/parrot/string.h>,
 F<docs/string.pod>.
-
-=cut
 
 */
 

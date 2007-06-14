@@ -96,7 +96,8 @@ PARROT_API INTVAL Parrot_encoding_number_of_str( Interp *interp,
 
 PARROT_API ENCODING * Parrot_find_encoding( Interp *interp,
     const char *encodingname /*NN*/ )
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
 
 PARROT_API encoding_converter_t Parrot_find_encoding_converter( Interp *interp,
     ENCODING *lhs,

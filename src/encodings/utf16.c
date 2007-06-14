@@ -12,14 +12,12 @@ UTF-16 encoding with the help of the ICU library.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 #include "../unicode.h"
+
+/* HEADER: src/encodings/utf16.h */
 
 #include "utf16.h"
 
@@ -35,17 +33,16 @@ static void iter_init(Interp *, const String *src, String_iter *iter);
 
 /*
 
-=item C<static STRING *to_encoding(Interp *, STRING *src, STRING *dest)>
+FUNCDOC: to_encoding
 
 Convert string C<src> to this encoding. If C<dest> is set
 fill it with the converted result, else operate inplace.
 
-=cut
-
 */
 
 static STRING *
-to_encoding(Interp *interp, STRING *src, STRING *dest)
+to_encoding(Interp *interp, STRING *src /*NN*/, STRING *dest)
+    /* WARN_UNUSED */
 {
 #if PARROT_HAS_ICU
     UErrorCode err;
@@ -165,7 +162,7 @@ set_codepoint(Interp *interp, STRING *src,
 }
 
 static UINTVAL
-get_byte(Interp *interp, const STRING *src, UINTVAL offset)
+get_byte(Interp *interp, const STRING *src /*NN*/, UINTVAL offset)
 {
     unsigned char *contents = (unsigned char *)src->strstart;
     if (offset >= src->bufused) {
@@ -195,8 +192,8 @@ get_codepoints(Interp *interp, STRING *src,
 {
     String_iter iter;
     UINTVAL start;
-    STRING *return_string = Parrot_make_COW_reference(interp,
-            src);
+    STRING * const return_string = Parrot_make_COW_reference(interp, src);
+
     iter_init(interp, src, &iter);
     iter.set_position(interp, &iter, offset);
     start = iter.bytepos;
@@ -228,8 +225,7 @@ get_codepoints_inplace(Interp *interp, STRING *src,
 }
 
 static STRING *
-get_bytes(Interp *interp, STRING *src,
-        UINTVAL offset, UINTVAL count)
+get_bytes(Interp *interp, STRING *src, UINTVAL offset, UINTVAL count)
 {
     UNIMPL;
     return NULL;
@@ -371,8 +367,6 @@ Parrot_encoding_utf16_init(Interp *interp)
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<src/encodings/fixed_8.c>,
@@ -380,8 +374,6 @@ F<src/encodings/utf8.c>,
 F<src/string.c>,
 F<include/parrot/string.h>,
 F<docs/string.pod>.
-
-=cut
 
 */
 

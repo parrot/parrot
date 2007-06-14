@@ -13,7 +13,10 @@
 #ifndef PARROT_ENCODING_UCS2_H_GUARD
 #define PARROT_ENCODING_UCS2_H_GUARD
 
-ENCODING *Parrot_encoding_ucs2_init(Interp *);
+/* HEADERIZER BEGIN: src/encodings/ucs2.c */
+
+ENCODING * Parrot_encoding_ucs2_init( Interp *interp );
+/* HEADERIZER END: src/encodings/ucs2.c */
 
 #endif /* PARROT_ENCODING_UCS2_H_GUARD */
 
