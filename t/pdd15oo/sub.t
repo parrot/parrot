@@ -662,7 +662,7 @@ first
 second
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "implicit :main with wrong # args." );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "implicit :main with wrong # args." );
 .sub a
   .param int op1
   .param int op2
@@ -671,7 +671,7 @@ CODE
 /argument count mismatch in main \(more than 1 param\)/
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', "explicit :main with wrong # args." );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "explicit :main with wrong # args." );
 .sub a :main
   .param int op1
   .param int op2
@@ -1301,7 +1301,7 @@ CODE
 "VAR1" => PMC 'PGE::Match' => "aabbb" @ 3
 OUTPUT
 
-pir_output_like( <<'CODE', qr/Null PMC access in invoke()/, 'invoking null pmc' );
+pir_error_output_like( <<'CODE', qr/Null PMC access in invoke()/, 'invoking null pmc' );
 .sub main :main
     null $P0
     $P0()
