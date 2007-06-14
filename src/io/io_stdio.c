@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -25,7 +25,9 @@ Win32), this is I<buffered> IO, out of necessity.
 #include "parrot/parrot.h"
 #include "io_private.h"
 
-extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
+/* HEADER: none */
+
+extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd); /* XXX Use a declaration in a header file */
 
 /* Defined at bottom */
 extern const ParrotIOLayerAPI pio_stdio_layer_api;

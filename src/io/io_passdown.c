@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -14,33 +14,28 @@ appropriate arguments and return the value returned.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include <parrot/parrot.h>
 #include "io_private.h"
 
+/* HEADER: src/io/io_private.h */
+
 /*
 
-=item C<ParrotIO *
-PIO_open_down(Interp *interp, ParrotIOLayer * layer, const char * name,
-              INTVAL flags)>
+FUNCDOC: PIO_open_down
 
 Looks for the implementation of C<Open> and calls it if found, returning
 its return value.
 
 Returns C<NULL> if no implementation is found.
 
-=cut
-
 */
 
 ParrotIO *
-PIO_open_down(Interp *interp, ParrotIOLayer * layer, const char * name,
+PIO_open_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, const char *name /*NN*/,
               INTVAL flags)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Open) {
@@ -54,22 +49,19 @@ PIO_open_down(Interp *interp, ParrotIOLayer * layer, const char * name,
 
 /*
 
-=item C<ParrotIO *
-PIO_open_async_down(Interp *interp, ParrotIOLayer * layer, const char * name,
-                    const char * mode, DummyCodeRef * dummy)>
+FUNCDOC: PIO_open_async_down
 
 Looks for the implementation of C<Open_ASync> and calls it if found,
 returning its return value.
 
 Returns C<NULL> if no implementation is found.
 
-=cut
-
 */
 
 ParrotIO *
-PIO_open_async_down(Interp *interp, ParrotIOLayer * layer, const char * name,
-                    const char * mode, DummyCodeRef * dummy)
+PIO_open_async_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, const char *name /*NN*/,
+                    const char *mode /*NN*/, DummyCodeRef * dummy)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Open_ASync) {
@@ -84,20 +76,18 @@ PIO_open_async_down(Interp *interp, ParrotIOLayer * layer, const char * name,
 
 /*
 
-=item C<ParrotIO *
-PIO_fdopen_down(Interp *interp, ParrotIOLayer * layer, PIOHANDLE fd, INTVAL flags)>
+PIO_fdopen_down
 
 Looks for the implementation of C<FDOpen> and calls it if found,
 returning its return value.
 
 Returns C<NULL> if no implementation is found.
 
-=cut
-
 */
 
 ParrotIO *
-PIO_fdopen_down(Interp *interp, ParrotIOLayer * layer, PIOHANDLE fd, INTVAL flags)
+PIO_fdopen_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, PIOHANDLE fd, INTVAL flags)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->FDOpen) {
@@ -109,22 +99,9 @@ PIO_fdopen_down(Interp *interp, ParrotIOLayer * layer, PIOHANDLE fd, INTVAL flag
     return NULL;
 }
 
-/*
-
-=item C<INTVAL
-PIO_close_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)>
-
-Looks for the implementation of C<Close> and calls it if found,
-returning its return value.
-
-Returns C<-1> if no implementation is found.
-
-=cut
-
-*/
-
 size_t
-PIO_peek_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io, STRING ** buf)
+PIO_peek_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io, STRING ** buf)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Peek) {
@@ -138,8 +115,20 @@ PIO_peek_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io, STRING ** bu
 }
 
 
+/*
+
+FUNCDOC: PIO_close_down
+
+Looks for the implementation of C<Close> and calls it if found,
+returning its return value.
+
+Returns C<-1> if no implementation is found.
+
+*/
+
 INTVAL
-PIO_close_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)
+PIO_close_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Close) {
@@ -153,20 +142,18 @@ PIO_close_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)
 
 /*
 
-=item C<size_t
-PIO_write_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io, STRING *)>
+PIO_write_down
 
 Looks for the implementation of C<Write> and calls it if found,
 returning its return value.
 
 Returns C<0> if no implementation is found.
 
-=cut
-
 */
 
 size_t
-PIO_write_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io, STRING *s)
+PIO_write_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io, STRING *s)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Write) {
@@ -180,22 +167,19 @@ PIO_write_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io, STRING *s)
 
 /*
 
-=item C<size_t
-PIO_write_async_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io,
-                     STRING *s, DummyCodeRef *dummy)>
+FUNCDOC: PIO_write_async_down
 
 Looks for the implementation of C<WriteASync> and calls it if found,
 returning its return value.
 
 Returns C<0> if no implementation is found.
 
-=cut
-
 */
 
 size_t
-PIO_write_async_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io,
+PIO_write_async_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io,
                      STRING *s, DummyCodeRef *dummy)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Write_ASync) {
@@ -209,21 +193,18 @@ PIO_write_async_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io,
 
 /*
 
-=item C<size_t
-PIO_read_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io, void * buf,
-              size_t len)>
+FUNCDOC: PIO_read_down
 
 Looks for the implementation of C<Read> and calls it if found, returning
 its return value.
 
 Returns C<0> if no implementation is found.
 
-=cut
-
 */
 
 size_t
-PIO_read_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io, STRING ** buf)
+PIO_read_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io, STRING ** buf)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Read) {
@@ -237,22 +218,19 @@ PIO_read_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io, STRING ** bu
 
 /*
 
-=item C<size_t
-PIO_read_async_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io,
-                    STRING ** buf, DummyCodeRef *dummy)>
+FUNCDOC: PIO_read_async_down
 
 Looks for the implementation of C<Read_ASync> and calls it if found,
 returning its return value.
 
 Returns C<0> if no implementation is found.
 
-=cut
-
 */
 
 size_t
-PIO_read_async_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io,
+PIO_read_async_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io,
                     STRING ** buf, DummyCodeRef *dummy)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Read_ASync) {
@@ -266,20 +244,18 @@ PIO_read_async_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io,
 
 /*
 
-=item C<INTVAL
-PIO_flush_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)>
+FUNCDOC: PIO_flush_down
 
 Looks for the implementation of C<Flush> and calls it if found,
 returning its return value.
 
 Returns C<0> if no implementation is found.
 
-=cut
-
 */
 
 INTVAL
-PIO_flush_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)
+PIO_flush_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Flush) {
@@ -293,22 +269,19 @@ PIO_flush_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)
 
 /*
 
-=item C<PIOOFF_T
-PIO_seek_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io, PIOOFF_T offset,
-              INTVAL whence)>
+FUNCDOC: PIO_seek_down
 
 Looks for the implementation of C<Seek> and calls it if found, returning
 its return value.
 
 Returns C<-1> if no implementation is found.
 
-=cut
-
 */
 
 PIOOFF_T
-PIO_seek_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io, PIOOFF_T offset,
+PIO_seek_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io, PIOOFF_T offset,
               INTVAL whence)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Seek) {
@@ -322,20 +295,18 @@ PIO_seek_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io, PIOOFF_T off
 
 /*
 
-=item C<PIOOFF_T
-PIO_tell_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)>
+FUNCDOC: PIO_tell_down
 
 Looks for the implementation of C<Tell> and calls it if found, returning
 its return value.
 
 Returns C<0> if no implementation is found.
 
-=cut
-
 */
 
 PIOOFF_T
-PIO_tell_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)
+PIO_tell_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Tell) {
@@ -349,22 +320,19 @@ PIO_tell_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)
 
 /*
 
-=item C<INTVAL
-PIO_setbuf_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io,
-                size_t bufsize)>
+FUNCDOC: PIO_setbuf_down
 
 Looks for the implementation of C<SetBuf> and calls it if found,
 returning its return value.
 
 Returns C<-1> if no implementation is found.
 
-=cut
-
 */
 
 INTVAL
-PIO_setbuf_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io,
+PIO_setbuf_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io,
                 size_t bufsize)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->SetBuf) {
@@ -378,20 +346,18 @@ PIO_setbuf_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io,
 
 /*
 
-=item C<INTVAL
-PIO_setlinebuf_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)>
+FUNCDOC: PIO_setlinebuf_down
 
 Looks for the implementation of C<SetLineBuf> and calls it if found,
 returning its return value.
 
 Returns C<-1> if no implementation is found.
 
-=cut
-
 */
 
 INTVAL
-PIO_setlinebuf_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)
+PIO_setlinebuf_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->SetLineBuf) {
@@ -405,20 +371,18 @@ PIO_setlinebuf_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)
 
 /*
 
-=item C<INTVAL
-PIO_eof_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)>
+FUNCDOC: PIO_eof_down
 
 Looks for the implementation of C<Eof> and calls it if found, returning
 its return value.
 
 Returns C<-1> if no implementation is found.
 
-=cut
-
 */
 
 INTVAL
-PIO_eof_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)
+PIO_eof_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Eof) {
@@ -432,22 +396,19 @@ PIO_eof_down(Interp *interp, ParrotIOLayer * layer, ParrotIO * io)
 
 /*
 
-=item C<INTVAL
-PIO_poll_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
-    INTVAL which, INTVAL sec, INTVAL usec)>
+FUNCDOC: PIO_poll_down
 
 Looks for the implementation of C<Poll> and calls it if found, returning
 its return value.
 
 Returns C<-1> if no implementation is found.
 
-=cut
-
 */
 
 INTVAL
 PIO_poll_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
-    INTVAL which, INTVAL sec, INTVAL usec)
+        INTVAL which, INTVAL sec, INTVAL usec)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Poll) {
@@ -460,22 +421,19 @@ PIO_poll_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
 
 /*
 
-=item C<ParrotIO *
-PIO_socket_down(Interp *interp, ParrotIOLayer *layer, INTVAL fam, INTVAL type,
-                INTVAL proto)>
+FUNCDOC: PIO_socket_down
 
 Looks for the implementation of C<Socket> and calls it if found,
 returning its return value.
 
 Returns C<NULL> if no implementation is found.
 
-=cut
-
 */
 
 ParrotIO *
 PIO_socket_down(Interp *interp, ParrotIOLayer *layer, INTVAL fam, INTVAL type,
                 INTVAL proto)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Socket) {
@@ -488,20 +446,18 @@ PIO_socket_down(Interp *interp, ParrotIOLayer *layer, INTVAL fam, INTVAL type,
 
 /*
 
-=item C<INTVAL
-PIO_recv_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)>
+FUNCDOC: PIO_recv_down
 
 Looks for the implementation of C<Recv> and calls it if found, returning
 its return value.
 
 Returns C<-1> if no implementation is found.
 
-=cut
-
 */
 
 INTVAL
 PIO_recv_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Recv) {
@@ -514,21 +470,18 @@ PIO_recv_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
 
 /*
 
-=item C<INTVAL
-PIO_send_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *buf)>
+FUNCDOC: PIO_send_down
 
 Looks for the implementation of C<Send> and calls it if found, returning
 its return value.
 
 Returns C<-1> if no implementation is found.
 
-
-=cut
-
 */
 
 INTVAL
 PIO_send_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *buf)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Send) {
@@ -541,22 +494,18 @@ PIO_send_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *buf)
 
 /*
 
-=item C<INTVAL
-PIO_connect_down(Interp *interp, ParrotIOLayer *layer,
-                 ParrotIO *io, STRING *address)>
+FUNCDOC: PIO_connect_down
 
 Looks for the implementation of C<Connect> and calls it if found,
 returning its return value.
 
 Returns C<-1> if no implementation is found.
 
-
-=cut
-
 */
 
 INTVAL
 PIO_connect_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *address)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Connect) {
@@ -569,21 +518,18 @@ PIO_connect_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *add
 
 /*
 
-=item C<INTVAL
-PIO_bind_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *address)>
+FUNCDOC: PIO_bind_down
 
 Looks for the implementation of C<Bind> and calls it if found,
 returning its return value.
 
 Returns C<-1> if no implementation is found.
 
-
-=cut
-
 */
 
 INTVAL
 PIO_bind_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *address)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Bind) {
@@ -596,21 +542,18 @@ PIO_bind_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *addres
 
 /*
 
-=item C<INTVAL
-PIO_listen_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, INTVAL backlog)>
+FUNCDOC: PIO_listen_down
 
 Looks for the implementation of C<listen> and calls it if found,
 returning its return value.
 
 Returns C<-1> if no implementation is found.
 
-
-=cut
-
 */
 
 INTVAL
 PIO_listen_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, INTVAL backlog)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Listen) {
@@ -623,22 +566,18 @@ PIO_listen_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, INTVAL backl
 
 /*
 
-=item C<ParrotIO *
-PIO_accept_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *address)>
-
+FUNCDOC: PIO_accept_down
 
 Looks for the implementation of C<Accept> and calls it if found,
 returning its return value.
 
 Returns C<-1> if no implementation is found.
 
-
-=cut
-
 */
 
 ParrotIO *
 PIO_accept_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)
+    /* WARN_UNUSED */
 {
     while (layer) {
         if (layer->api->Accept) {
@@ -650,8 +589,6 @@ PIO_accept_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)
 }
 
 /*
-
-=back
 
 =head1 SEE ALSO
 
@@ -668,8 +605,6 @@ F<src/io/io_private.h>.
 Initially written by Juergen Boemmels
 
 Some ideas and goals from Perl5.7 and Nick Ing-Simmons' work.
-
-=cut
 
 */
 

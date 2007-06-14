@@ -10,10 +10,6 @@ src/io/io_mmap.c - IO Layer for mmaped files
 
 Open mmaps the file.
 
-*/
-
-/*
-
 =head2 mmap layer functions
 
 =over 4
@@ -24,6 +20,8 @@ Open mmaps the file.
 
 #include "parrot/parrot.h"
 #include "io_private.h"
+
+/* HEADER: none */
 
 static ParrotIO *
 PIO_mmap_open(Interp *interp, ParrotIOLayer *layer,

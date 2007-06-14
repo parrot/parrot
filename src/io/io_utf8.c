@@ -27,6 +27,8 @@ representation.
 #include "io_private.h"
 #include "../unicode.h"
 
+/* HEADER: none */
+
 static size_t
 PIO_utf8_write(Interp *interp, ParrotIOLayer *l, ParrotIO *io, STRING *s);
 

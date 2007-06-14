@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2006, The Perl Foundation.
+Copyright (c) 2006-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -9,10 +9,6 @@ src/io/io_string.c - IO Layer for strings
 =head1 DESCRIPTION
 
 Capture output to a string PMC.
-
-*/
-
-/*
 
 =head2 String Layer Functions
 
@@ -24,6 +20,8 @@ Capture output to a string PMC.
 
 #include "parrot/parrot.h"
 #include "io_private.h"
+
+/* HEADER: none */
 
 static size_t
 PIO_string_read(Interp *interp, ParrotIOLayer *l, ParrotIO *io, STRING **buf);

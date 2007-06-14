@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -14,28 +14,23 @@ C<ParrotIOLayerAPI> vtable. To find an IO function the layer
 stack is searched downwards until a non-C<NULL> function pointer
 is found for that particular slot.
 
-*/
-
-/*
-
 =head2 Layer and Stack Functions
 
-=over 4
-
-=item C<ParrotIOLayer *
-PIO_base_new_layer(ParrotIOLayer *proto)>
+FUNCDOC: PIO_base_new_layer
 
 The default IO layer constructor. Creates and returns a new
 C<ParrotIOLayer>. If a prototype C<*proto> is supplied then its values
 will be copied to the new instance.
 
-=cut
-
 */
 
 #include "parrot/parrot.h"
+#include "parrot/io.h"
 #include "io_private.h"
 
+/* HEADER: include/parrot/io.h */
+
+PARROT_API
 ParrotIOLayer *
 PIO_base_new_layer(ParrotIOLayer *proto)
 {
@@ -63,18 +58,16 @@ PIO_base_new_layer(ParrotIOLayer *proto)
 
 /*
 
-=item C<void
-PIO_base_delete_layer(ParrotIOLayer *layer)>
+PIO_base_delete_layer
 
 The default IO layer destructor. Frees the memory associated with
 C<*layer>.
 
-=cut
-
 */
 
+PARROT_API
 void
-PIO_base_delete_layer(ParrotIOLayer *layer)
+PIO_base_delete_layer(ParrotIOLayer *layer /*NULLOK*/)
 {
     if (layer != NULL)
         mem_sys_free(layer);
@@ -191,24 +184,20 @@ PIO_push_layer_str(Interp *interp, PMC *pmc, STRING *ls)
 
 /*
 
-=item C<ParrotIOLayer *
-PIO_pop_layer(Interp *interp, PMC *pmc)>
+FUNCDOC: PIO_pop_layer
 
 Pop a layer from an IO object (C<*pmc>) or the default stack.
 
-=item C<STRING *
-PIO_pop_layer_str(Interp *interp, PMC *pmc)>
+FUNCDOC: PIO_pop_layer_str
 
 Pop a layer from an IO object (C<*pmc>) and return the name of the
 popped layer. The layer gets freed.
-
-=cut
 
 */
 
 PARROT_API
 ParrotIOLayer *
-PIO_pop_layer(Interp *interp, PMC *pmc)
+PIO_pop_layer(Interp *interp, PMC *pmc /*NULLOK*/)
 {
     ParrotIO * const io = PMC_data_typed(pmc, ParrotIO *);
 
@@ -269,24 +258,21 @@ PIO_pop_layer_str(Interp *interp, PMC *pmc)
 
 /*
 
-=item C<ParrotIOLayer *
-PIO_copy_stack(ParrotIOLayer *stack)>
+FUNCDOC: PIO_copy_stack
 
 Primarily used to copy the default IO stack for a new IO object. Later
 we will do some funky copy-on-write stuff.
-
-=cut
 
 */
 
 PARROT_API
 ParrotIOLayer *
-PIO_copy_stack(ParrotIOLayer *stack)
+PIO_copy_stack(ParrotIOLayer *stack /*NULLOK*/)
 {
     ParrotIOLayer *ptr_new = NULL;
-    ParrotIOLayer **ptr_ptr_new;
     ParrotIOLayer *ptr_last = NULL;
-    ptr_ptr_new = &ptr_new;
+    ParrotIOLayer **ptr_ptr_new = &ptr_new;
+
     while (stack) {
         *ptr_ptr_new = PIO_base_new_layer(stack);
         (*ptr_ptr_new)->flags |= PIO_L_LAYER_COPIED;
@@ -298,15 +284,6 @@ PIO_copy_stack(ParrotIOLayer *stack)
 
     return ptr_new;
 }
-
-/*
-
-=back
-
-=cut
-
-*/
-
 
 
 /*

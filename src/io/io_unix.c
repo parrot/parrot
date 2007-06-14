@@ -30,6 +30,8 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl5 (Nick Ing-Simmons)
 #include "parrot/parrot.h"
 #include "io_private.h"
 
+/* HEADER: none */
+
 #ifdef PIO_OS_UNIX
 
 /* Defined at bottom */

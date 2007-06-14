@@ -349,12 +349,26 @@ PIOOFF_T PIO_make_offset_pmc( Interp *interp, PMC *pmc );
 /* HEADERIZER END: src/io/io.c */
 
 /* io_layers.c - If you add new layers, register them in init_layers() */
-PARROT_API extern INTVAL PIO_push_layer(Interp *, PMC *, ParrotIOLayer *);
-PARROT_API extern ParrotIOLayer *PIO_pop_layer(Interp *, PMC *);
-PARROT_API extern ParrotIOLayer *PIO_copy_stack(ParrotIOLayer *);
-PARROT_API ParrotIOLayer *PIO_get_layer(Interp *, const char *name);
-PARROT_API extern ParrotIOLayer *PIO_base_new_layer(ParrotIOLayer *proto);
-PARROT_API extern void PIO_base_delete_layer(ParrotIOLayer *proto);
+/* HEADERIZER BEGIN: src/io/io_layers.c */
+
+PARROT_API void PIO_base_delete_layer( ParrotIOLayer *layer /*NULLOK*/ );
+PARROT_API ParrotIOLayer * PIO_base_new_layer( ParrotIOLayer *proto );
+PARROT_API ParrotIOLayer * PIO_copy_stack( ParrotIOLayer *stack /*NULLOK*/ );
+PARROT_API ParrotIOLayer * PIO_get_layer( Interp *interp,
+    const char *name /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+PARROT_API ParrotIOLayer * PIO_pop_layer( Interp *interp,
+    PMC *pmc /*NULLOK*/ );
+
+PARROT_API INTVAL PIO_push_layer( Interp *interp,
+    PMC *pmc /*NULLOK*/,
+    ParrotIOLayer *layer /*NULLOK*/ );
+
+STRING * PIO_pop_layer_str( Interp *interp, PMC *pmc );
+void PIO_push_layer_str( Interp *interp, PMC *pmc, STRING *ls );
+/* HEADERIZER END: src/io/io_layers.c */
 
 /* Put platform specific macros here if you must */
 #ifdef PIO_OS_WIN32
