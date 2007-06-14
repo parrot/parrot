@@ -261,14 +261,14 @@ PIO_init(Interp *interp /*NN*/)
          * see also #36677
          *
          */
-        if (!PIO_STDIN(interp)) {
-            PIO_STDIN(interp) = pmc_new(interp, enum_class_Undef);
+        if (!_PIO_STDIN(interp)) {
+            _PIO_STDIN(interp) = pmc_new(interp, enum_class_Undef);
         }
-        if (!PIO_STDOUT(interp)) {
-            PIO_STDOUT(interp) = pmc_new(interp, enum_class_Undef);
+        if (!_PIO_STDOUT(interp)) {
+            _PIO_STDOUT(interp) = pmc_new(interp, enum_class_Undef);
         }
-        if (!PIO_STDERR(interp)) {
-            PIO_STDERR(interp) = pmc_new(interp, enum_class_Undef);
+        if (!_PIO_STDERR(interp)) {
+            _PIO_STDERR(interp) = pmc_new(interp, enum_class_Undef);
         }
 
         if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
@@ -1018,7 +1018,7 @@ PIO_printf(Interp *interp /*NN*/, const char *s /*NN*/, ...)
 
     if (interp) {
         STRING * const str = Parrot_vsprintf_c(interp, s, args);
-        ret=PIO_putps(interp, PIO_STDOUT(interp), str);
+        ret=PIO_putps(interp, _PIO_STDOUT(interp), str);
     }
     else {
         /* Be nice about this...
@@ -1052,7 +1052,7 @@ PIO_eprintf(Interp *interp /*NULLOK*/, const char *s /*NN*/, ...)
     if (interp) {
         STRING * const str = Parrot_vsprintf_c(interp, s, args);
 
-        ret=PIO_putps(interp, PIO_STDERR(interp), str);
+        ret=PIO_putps(interp, _PIO_STDERR(interp), str);
     }
     else {
         /* Be nice about this...
@@ -1094,12 +1094,7 @@ PIO_getfd(Interp *interp, PMC *pmc /*NN*/)
 
 =head2 C<PIO_STD*> Functions
 
-The C<PIO_STD*> functions are defined using the C<Interp *interp> macro. The
-prototype is protected with an identity macro.
-
 */
-
-#define ID(a) a
 
 /*
 
@@ -1111,9 +1106,9 @@ Returns the C<ParrotIO> PMC for C<stdin>.
 
 PARROT_API
 PMC *
-PIO_STDIN ID((Interp *interp))
+PIO_STDIN(Interp *interp /*NN*/)
 {
-    return PIO_STDIN(interp);
+    return _PIO_STDIN(interp);
 }
 
 /*
@@ -1126,9 +1121,9 @@ Returns the C<ParrotIO> PMC for C<stdout>.
 
 PARROT_API
 PMC *
-PIO_STDOUT ID((Interp *interp))
+PIO_STDOUT(Interp *interp /*NN*/)
 {
-    return PIO_STDOUT(interp);
+    return _PIO_STDOUT(interp);
 }
 
 /*
@@ -1141,9 +1136,9 @@ Returns the C<ParrotIO> PMC for C<stderr>.
 
 PARROT_API
 PMC *
-PIO_STDERR ID((Interp *interp))
+PIO_STDERR(Interp *interp)
 {
-    return PIO_STDERR(interp);
+    return _PIO_STDERR(interp);
 }
 
 /*

@@ -121,21 +121,21 @@ success and C<-1> on error.
 static INTVAL
 PIO_unix_init(Interp *interp, ParrotIOLayer *layer)
 {
-    ParrotIOData *d = interp->piodata;
+    ParrotIOData * const d = interp->piodata;
     if (d != NULL && d->table != NULL) {
         ParrotIO *io;
 
         io = PIO_unix_fdopen(interp, layer, STDIN_FILENO, PIO_F_READ);
         if (!io) return -1;
-        PIO_STDIN(interp) = new_io_pmc(interp, io);
+        _PIO_STDIN(interp) = new_io_pmc(interp, io);
 
         io = PIO_unix_fdopen(interp, layer, STDOUT_FILENO, PIO_F_WRITE);
         if (!io) return -1;
-        PIO_STDOUT(interp) = new_io_pmc(interp, io);
+        _PIO_STDOUT(interp) = new_io_pmc(interp, io);
 
         io = PIO_unix_fdopen(interp, layer, STDERR_FILENO, PIO_F_WRITE);
         if (!io) return -1;
-        PIO_STDERR(interp) = new_io_pmc(interp, io);
+        _PIO_STDERR(interp) = new_io_pmc(interp, io);
 
         return 0;
     }

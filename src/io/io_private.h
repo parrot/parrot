@@ -131,9 +131,9 @@ extern int realloc_pio_array(ParrotIOTable *, int);
 extern STRING * PIO_make_io_string(Interp *interp, STRING **buf, size_t);
 
 /* redefine PIO_STD* for internal use */
-#define PIO_STDIN(i)   (((ParrotIOData*)i->piodata)->table[PIO_STDIN_FILENO])
-#define PIO_STDOUT(i)  (((ParrotIOData*)i->piodata)->table[PIO_STDOUT_FILENO])
-#define PIO_STDERR(i)  (((ParrotIOData*)i->piodata)->table[PIO_STDERR_FILENO])
+#define _PIO_STDIN(i)   (((ParrotIOData*)i->piodata)->table[PIO_STDIN_FILENO])
+#define _PIO_STDOUT(i)  (((ParrotIOData*)i->piodata)->table[PIO_STDOUT_FILENO])
+#define _PIO_STDERR(i)  (((ParrotIOData*)i->piodata)->table[PIO_STDERR_FILENO])
 
 /*
  * These function walk down the layerstack starting at l
