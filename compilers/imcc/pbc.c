@@ -782,8 +782,6 @@ add_const_pmc_sub(Interp *interp, SymReg *r,
     else
         sub->multi_signature = NULL;
 
-    Parrot_store_sub_in_namespace(interp, sub_pmc);
-
     if (unit->is_vtable_method == 1) {
         /* Work out the name of the vtable method. */
         if (unit->vtable_name != NULL)
@@ -807,6 +805,8 @@ add_const_pmc_sub(Interp *interp, SymReg *r,
         /* TODO check for duplicates */
         sub->vtable_index = vtable_index;
     }
+
+    Parrot_store_sub_in_namespace(interp, sub_pmc);
 
     pfc->type     = PFC_PMC;
     pfc->u.key    = sub_pmc;

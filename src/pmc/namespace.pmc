@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005, The Perl Foundation.
+Copyright (C) 2005-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -12,8 +12,8 @@ These are the vtable functions for the namespace PMC.
 
 =head2 Data
 
-  PMC_struct_val       ... the hash, bucket->value is either a
-                           var/sub or a namespace, of a FixedPMCarray
+  PMC_struct_val       ... the hash, bucket->value is a
+                           var/sub, a namespace, or a FixedPMCarray
                            of 2 PMCs (namespace, sub/var) slots
   PMC_pmc_val          ... parent namespace
   PMC_data             ... Namespace information struct (name, class/role)
@@ -30,14 +30,14 @@ These are the vtable functions for the namespace PMC.
 #include <assert.h>
 
 /*
- * Typically a named slot either contains another namespace or a
+ * Typically a named slot contains either another namespace or a
  * var/sub (not both).
  * In case that the bucket->value is occupied, a FixedPMCArray is
  * created, and the items are moved over to that extra storage.
  * The array is flagged with FPA_is_ns_ext to distinguish it from a
  * plain array variable.
  *
- * This could easily expanded to a full-fledged typed namespace if needed.
+ * This could easily expand to a full-fledged typed namespace if needed.
  */
 
 enum {
@@ -52,11 +52,12 @@ enum {
 /* We store extra information about the namespace in a struct, which we will
  * hang off the PMC_data slot. */
 typedef struct Parrot_NSInfo {
-    STRING *name;  /* Name of this namespace part. */
-    PMC *_class;   /* The class or role attached to this namespace. */
+    STRING *name;     /* Name of this namespace part. */
+    PMC    *_class;   /* The class or role attached to this namespace. */
+    PMC    *vtable;   /* A Hash of vtable subs, keyed on the vtable index */
 } Parrot_NSInfo;
 
-/* Macro for easy access to the namespcae info. */
+/* Macro for easy access to the namespace info. */
 #define PARROT_NSINFO(o) ((Parrot_NSInfo *) PMC_data(o))
 
 
@@ -74,9 +75,10 @@ other fields.
 */
 
     void init() {
-        SUPER();                        /* _struct_val := Hash */
-        PMC_pmc_val(SELF) = NULL;       /* parent */
-        PMC_data(SELF)    = mem_allocate_zeroed_typed(Parrot_NSInfo);
+        SUPER();                             /* _struct_val := Hash */
+        PMC_pmc_val(SELF)           = NULL;  /* parent */
+        PMC_data(SELF)              = mem_allocate_zeroed_typed(Parrot_NSInfo);
+        PARROT_NSINFO(SELF)->vtable = PMCNULL;
     }
 
 /*
@@ -97,6 +99,8 @@ Marks the namespace as live.
             pobject_lives(INTERP, (PObj*)nsinfo->name);
         if (nsinfo->_class)
             pobject_lives(INTERP, (PObj*)nsinfo->_class);
+        if (nsinfo->vtable)
+            pobject_lives(INTERP, (PObj*)nsinfo->vtable);
     }
 
 /*
@@ -132,10 +136,15 @@ of strings or a chained key, add all components to the namespace.
 Return the given namespace or PMCNULL. C<key> is either an array of
 strings, or a possibly nested key.
 
-=item C<PMC* get_pmc_keyed_str(PMC *key)>
+=item C<PMC* get_pmc_keyed_str(STRING *key)>
 
 Return the given namespace item or PMCNULL. If the named item is either
 a NameSpace or a var, the NameSpace is returned.
+
+=item C<PMC *get_pmc_keyed_int(INTVAL key)>
+
+Return a Sub representing an overridden vtable entry or PMCNULL.  This is not
+really a public API.
 
 =cut
 
@@ -197,6 +206,31 @@ a NameSpace or a var, the NameSpace is returned.
                 (PMC *)b->value);
             VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_var_sub, value);
             b->value = new_tuple;
+        }
+
+        if (value->vtable->base_type == enum_class_Sub) {
+            Parrot_NSInfo *nsinfo    = PARROT_NSINFO(SELF);
+            PMC           *vtable    = nsinfo->vtable;
+            Parrot_sub    *sub       = PMC_sub(value);
+
+            if (PMC_IS_NULL(vtable))
+                nsinfo->vtable = vtable = pmc_new(interp, enum_class_Hash);
+
+            if (sub->vtable_index == -1) {
+                STRING *meth_name = key;
+
+                if (string_str_index(interp, key,
+                    CONST_STRING(interp, "__"), 0 == 0)) {
+                    meth_name = string_substr(interp, key, 2,
+                        string_length(interp, key) - 2, NULL, 0);
+                }
+
+                sub->vtable_index = Parrot_get_vtable_index(interp, meth_name);
+            }
+
+            if (sub->vtable_index != -1)
+                VTABLE_set_pmc_keyed_int(INTERP, vtable,
+                    sub->vtable_index, value);
         }
     }
 
@@ -261,6 +295,16 @@ a NameSpace or a var, the NameSpace is returned.
         real_exception(INTERP, NULL, E_NameError, "Invalid namespace key in get_pmc_keyed_str");
         /* NOTREACHED */
         return PMCNULL;
+    }
+
+    PMC* get_pmc_keyed_int(INTVAL key) {
+        Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
+        PMC           *vtable = nsinfo->vtable;
+
+        if (PMC_IS_NULL(vtable))
+            return PMCNULL;
+
+        return VTABLE_get_pmc_keyed_int(interp, vtable, key);
     }
 
 /*
