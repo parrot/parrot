@@ -1,5 +1,4 @@
 /*
- *
 Copyright (C) 2004-2007, The Perl Foundation.
 $Id$
 
@@ -41,9 +40,9 @@ set_graphemes(Interp *interp, STRING *source_string,
 }
 
 static STRING *
-to_latin1(Interp *interp, STRING *src, STRING *dest)
+to_latin1(Interp *interp, STRING *src /*NN*/, STRING *dest)
 {
-    UINTVAL offs, c, src_len;
+    UINTVAL offs, src_len;
     String_iter iter;
 
     ENCODING_ITER_INIT(interp, src, &iter);
@@ -60,7 +59,7 @@ to_latin1(Interp *interp, STRING *src, STRING *dest)
     dest->charset = Parrot_iso_8859_1_charset_ptr;
     dest->encoding = Parrot_fixed_8_encoding_ptr;
     for (offs = 0; offs < src_len; ++offs) {
-        c = iter.get_and_advance(interp, &iter);
+        const UINTVAL c = iter.get_and_advance(interp, &iter);
         if (c >= 0x100) {
             EXCEPTION(LOSSY_CONVERSION, "lossy conversion to ascii");
         }
@@ -70,18 +69,19 @@ to_latin1(Interp *interp, STRING *src, STRING *dest)
 }
 
 static STRING *
-to_unicode(Interp *interp, STRING *src, STRING *dest)
+to_unicode(Interp *interp, STRING *src, STRING *dest /*NULLOK*/)
 {
-    UINTVAL offs, c;
-    String_iter iter;
-
     if (dest) {
+        UINTVAL offs;
+        String_iter iter;
+
         dest->charset = Parrot_unicode_charset_ptr;
         dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, dest);
         Parrot_reallocate_string(interp, dest, src->strlen);
         ENCODING_ITER_INIT(interp, dest, &iter);
         for (offs = 0; offs < src->strlen; ++offs) {
-            c = ENCODING_GET_BYTE(interp, src, offs);
+            const UINTVAL c = ENCODING_GET_BYTE(interp, src, offs);
+
             if (iter.bytepos >= PObj_buflen(dest) - 4) {
                 UINTVAL need = (UINTVAL)((src->strlen - offs) * 1.5);
                 if (need < 16)
@@ -155,22 +155,22 @@ upcase(Interp *interp, STRING *source_string)
 }
 
 static void
-downcase(Interp *interp, STRING *source_string)
+downcase(Interp *interp, STRING *source_string /*NN*/)
 {
-    UINTVAL offset = 0;
-    unsigned char *buffer;
-    if (!source_string->strlen) {
-        return;
-    }
-    Parrot_unmake_COW(interp, source_string);
-    buffer = (unsigned char *)source_string->strstart;
-    for (offset = 0; offset < source_string->strlen; offset++) {
-        unsigned int c = buffer[offset];
-        if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
-            c |= 0x20;
-        else
-            c = tolower(c);
-        buffer[offset] = c;
+    if (source_string->strlen) {
+        UINTVAL offset;
+        unsigned char *buffer;
+
+        Parrot_unmake_COW(interp, source_string);
+        buffer = (unsigned char *)source_string->strstart;
+        for (offset = 0; offset < source_string->strlen; offset++) {
+            unsigned int c = buffer[offset];
+            if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
+                c |= 0x20;
+            else
+                c = tolower(c);
+            buffer[offset] = c;
+        }
     }
 }
 
@@ -204,58 +204,56 @@ titlecase(Interp *interp, STRING *source_string)
 }
 
 static void
-upcase_first(Interp *interp, STRING *source_string)
+upcase_first(Interp *interp, STRING *source_string /*NN*/)
 {
-    unsigned char *buffer;
-    unsigned int c;
+    if (source_string->strlen) {
+        unsigned char *buffer;
+        unsigned int c;
 
-    if (!source_string->strlen) {
-        return;
+        Parrot_unmake_COW(interp, source_string);
+        buffer = (unsigned char *)source_string->strstart;
+        c = buffer[0];
+        if (c >= 0xe0 && c != 0xf7)
+            c &= ~0x20;
+        else
+            c = toupper(c);
+        buffer[0] = c;
     }
-    Parrot_unmake_COW(interp, source_string);
-    buffer = (unsigned char *)source_string->strstart;
-    c = buffer[0];
-    if (c >= 0xe0 && c != 0xf7)
-        c &= ~0x20;
-    else
-        c = toupper(c);
-    buffer[0] = c;
 }
 
 static void
-downcase_first(Interp *interp, STRING *source_string)
+downcase_first(Interp *interp, STRING *source_string /*NN*/)
 {
-    unsigned char *buffer;
-    unsigned int c;
+    if (source_string->strlen) {
+        unsigned char *buffer;
+        unsigned int c;
 
-    if (!source_string->strlen) {
-        return;
+        Parrot_unmake_COW(interp, source_string);
+        buffer = (unsigned char *)source_string->strstart;
+        c = buffer[0];
+        if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
+            c &= ~0x20;
+        else
+            c = tolower(c);
+        buffer[0] = c;
+        buffer[0] = toupper(buffer[0]);
     }
-    Parrot_unmake_COW(interp, source_string);
-    buffer = (unsigned char *)source_string->strstart;
-    c = buffer[0];
-    if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
-        c &= ~0x20;
-    else
-        c = tolower(c);
-    buffer[0] = c;
-    buffer[0] = toupper(buffer[0]);
 }
 
 static void
-titlecase_first(Interp *interp, STRING *source_string)
+titlecase_first(Interp *interp, STRING *source_string /*NN*/)
 {
     upcase_first(interp, source_string);
 }
 
 
 static UINTVAL
-validate(Interp *interp, STRING *src)
+validate(Interp *interp, STRING *src /*NN*/)
 {
-    UINTVAL codepoint, offset;
+    UINTVAL offset;
 
     for (offset = 0; offset < string_length(interp, src); ++offset) {
-        codepoint = ENCODING_GET_CODEPOINT(interp, src, offset);
+        const UINTVAL codepoint = ENCODING_GET_CODEPOINT(interp, src, offset);
         if (codepoint >= 0x100)
             return 0;
     }
@@ -264,7 +262,7 @@ validate(Interp *interp, STRING *src)
 
 static INTVAL
 is_cclass(Interp *interp, INTVAL flags,
-          STRING *source_string, UINTVAL offset)
+          STRING *source_string /*NN*/, UINTVAL offset)
 {
     UINTVAL codepoint;
 
@@ -299,16 +297,15 @@ find_cclass(Interp *interp, INTVAL flags,
 
 static INTVAL
 find_not_cclass(Interp *interp, INTVAL flags,
-                STRING *source_string, UINTVAL offset, UINTVAL count)
+                STRING *source_string /*NN*/, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
-    UINTVAL codepoint;
 
     assert(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
-        codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);
+        const UINTVAL codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);
         if ((Parrot_iso_8859_1_typetable[codepoint] & flags) == 0) {
             return pos;
         }
@@ -320,16 +317,14 @@ find_not_cclass(Interp *interp, INTVAL flags,
 static STRING *
 string_from_codepoint(Interp *interp, UINTVAL codepoint)
 {
-    STRING *return_string = NULL;
     char real_codepoint = (char)codepoint;
-    return_string = string_make(interp, &real_codepoint, 1,
+    STRING * const return_string = string_make(interp, &real_codepoint, 1,
             "iso-8859-1", 0);
     return return_string;
 }
 
 CHARSET *
 Parrot_charset_iso_8859_1_init(Interp *interp)
-    /* WARN_UNUSED */
 {
     CHARSET * const return_set = Parrot_new_charset(interp);
     static const CHARSET base_set = {
