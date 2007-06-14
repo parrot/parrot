@@ -82,22 +82,19 @@ PIO_base_delete_layer(ParrotIOLayer *layer)
 
 /*
 
-=item C<INTVAL
-PIO_push_layer(Interp *interp,  PMC *pmc, ParrotIOLayer *layer)>
+FUNCDOC: PIO_push_layer
 
 Push a layer onto an IO object (C<*pmc>) or the default stack.
 
-=item C<void
-PIO_push_layer_str(Interp *interp, PMC *pmc, STRING *layer_name)>
+FUNCDOC: PIO_push_layer_str
 
 Push a layer onto an IO object (C<*pmc>).
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_push_layer(Interp *interp,  PMC *pmc, ParrotIOLayer *layer)
+PIO_push_layer(Interp *interp, PMC *pmc /*NULLOK*/, ParrotIOLayer *layer /*NULLOK*/)
 {
     if (layer == NULL)
         return -1;
@@ -160,8 +157,11 @@ PIO_push_layer(Interp *interp,  PMC *pmc, ParrotIOLayer *layer)
     }
     return -1;
 }
+
+PARROT_API
 ParrotIOLayer *
-PIO_get_layer(Interp *interp, const char *name)
+PIO_get_layer(Interp *interp, const char *name /*NN*/)
+    /* WARN_UNUSED */
 {
     ParrotIOLayer **t;
 
@@ -206,6 +206,7 @@ popped layer. The layer gets freed.
 
 */
 
+PARROT_API
 ParrotIOLayer *
 PIO_pop_layer(Interp *interp, PMC *pmc)
 {
@@ -278,6 +279,7 @@ we will do some funky copy-on-write stuff.
 
 */
 
+PARROT_API
 ParrotIOLayer *
 PIO_copy_stack(ParrotIOLayer *stack)
 {

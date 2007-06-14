@@ -22,10 +22,6 @@ Parrot ops. The C<ParrotIO struct> is defined in F<src/io/io_private.h>.
 
 =head2 Resource Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
@@ -33,6 +29,8 @@ Parrot ops. The C<ParrotIO struct> is defined in F<src/io/io_private.h>.
 
 #include <stdarg.h>
 #include <assert.h>
+
+/* HEADER: include/parrot/io.h */
 
 /* This is list of valid layers */
 ParrotIOLayer **pio_registered_layers = NULL;
@@ -53,17 +51,15 @@ PIOOFF_T piooffsetzero;
 
 /*
 
-=item C<PMC *
-new_io_pmc(Interp *interp, ParrotIO *io)>
+FUNCDOC: new_io_pmc
 
 Creates and returns a new C<ParrotIO> PMC.
 
-=cut
-
 */
 
+PARROT_API
 PMC *
-new_io_pmc(Interp *interp, ParrotIO *io)
+new_io_pmc(Interp *interp, ParrotIO *io /*NULLOK*/)
 {
     PMC * const new_pmc = pmc_new(interp, enum_class_ParrotIO);
     PMC_data(new_pmc) = io;
@@ -73,7 +69,7 @@ new_io_pmc(Interp *interp, ParrotIO *io)
 
 /*
 
-=item C<STRING *PIO_make_io_string(Interp *, STRING **buf, size_t default_len)>
+FUNCDOC: PIO_make_io_string
 
 Creates a STRING* suitable for returning results from IO read functions.
 The passed in C<buf> parameter can:
@@ -99,12 +95,11 @@ In the third case, the buffer or STRING must be able to hold the required
 amount of data. For cases 1 and 2, a NULL C<strstart> tells this function to
 allocate the STRING memory.
 
-=cut
-
 */
 
 STRING *
-PIO_make_io_string(Interp *interp, STRING **buf, size_t len)
+PIO_make_io_string(Interp *interp, STRING **buf /*NN*/, size_t len)
+    /* WARN_UNUSED */
 {
     STRING *s;
     /*
@@ -123,20 +118,18 @@ PIO_make_io_string(Interp *interp, STRING **buf, size_t len)
 
 /*
 
-=item C<ParrotIOTable
-alloc_pio_array(int numhandles)>
+FUNCDOC: alloc_pio_array
 
 Allocates an interpreter's IO handle table with room for C<numhandles> IO
 handles.
 
 Called from C<PIO_init()>.
 
-=cut
-
 */
 
 ParrotIOTable
 alloc_pio_array(int numhandles)
+    /* MALLOC, WARN_UNUSED */
 {
     const size_t size = numhandles * sizeof (ParrotIO *);
     return (ParrotIOTable)mem_sys_allocate_zeroed(size);
@@ -144,12 +137,9 @@ alloc_pio_array(int numhandles)
 
 /*
 
-=item C<int
-realloc_pio_array(ParrotIOTable *table, int numhandles)>
+FUNCDOC: realloc_pio_array
 
 Unimplemented; returns C<-1>.
-
-=cut
 
 */
 
@@ -163,8 +153,7 @@ realloc_pio_array(ParrotIOTable *table, int numhandles)
 
 /*
 
-=item C<ParrotIO *
-PIO_new(Interp *interp, INTVAL iotype, INTVAL flags, INTVAL mode)>
+FUNCDOC: PIO_new
 
 Creates a new IO stream.
 
@@ -172,12 +161,12 @@ The values of C<flags> and C<mode> are set in the returned C<ParrotIO>.
 
 Currently C<iotype> is unused.
 
-=cut
-
 */
 
+PARROT_API
 ParrotIO *
 PIO_new(Interp *interp, INTVAL iotype, INTVAL flags, INTVAL mode)
+    /* WARN_UNUSED */
 {
     ParrotIO * const new_io = (ParrotIO *)mem_sys_allocate(sizeof (ParrotIO));
     UNUSED(iotype);
@@ -196,18 +185,16 @@ PIO_new(Interp *interp, INTVAL iotype, INTVAL flags, INTVAL mode)
 
 /*
 
-=item C<void
-PIO_destroy(Interp *interp, PMC *pmc)>
+FUNCDOC: PIO_destroy
 
 Destroys the IO stream.  At the moment, this only frees the memory and removes
 the pointers from the PMC.
 
-=cut
-
 */
 
+PARROT_API
 void
-PIO_destroy(Interp *interp, PMC *pmc)
+PIO_destroy(Interp *interp, PMC *pmc /*NN*/)
 {
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
     UNUSED(interp);
@@ -250,19 +237,17 @@ PIO_destroy(Interp *interp, PMC *pmc)
 
 /*
 
-=item C<void
-PIO_init(Interp *interp)>
+FUNCDOC: PIO_init
 
 Sets up the interpreter's layer stack and creates the C<STD*> handles.
 
 Called when creating an interpreter.
 
-=cut
-
 */
 
+PARROT_API
 void
-PIO_init(Interp *interp)
+PIO_init(Interp *interp /*NN*/)
 {
     /* Has interp been initialized already? */
     if (interp->piodata) {
@@ -306,18 +291,16 @@ PIO_init(Interp *interp)
 
 /*
 
-=item C<void
-PIO_finish(Interp *interp)>
+FUNCDOC: PIO_finish
 
 Closes the interpreter's IO resourses.  Called during its interpreter
 destruction.
 
-=cut
-
 */
 
+PARROT_API
 void
-PIO_finish(Interp *interp)
+PIO_finish(Interp *interp /*NN*/)
 {
     ParrotIOLayer *layer;
 #if 0
@@ -357,15 +340,13 @@ PIO_finish(Interp *interp)
 
 /*
 
-=item C<void
-PIO_internal_shutdown(Interp *interp)>
+FUNCDOC: PIO_internal_shutdown
 
 IO system destructor, called on destruction of the last interpreter.
 
-=cut
-
 */
 
+PARROT_API
 void
 PIO_internal_shutdown(Interp *interp)
 {
@@ -376,16 +357,14 @@ PIO_internal_shutdown(Interp *interp)
 
 /*
 
-=item C<INTVAL
-PIO_init_stacks(Interp *interp)>
+FUNCDOC: PIO_init_stacks
 
 Initializes the interpreter's default IO stack by pushing on the IO
 layers (OS-specific first).
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
 PIO_init_stacks(Interp *interp)
 {
@@ -456,18 +435,16 @@ PIO_init_stacks(Interp *interp)
 
 /*
 
-=item C<INTVAL
-PIO_base_init(Interp *interp, ParrotIOLayer *l)>
+FUNCDOC: PIO_base_init
 
 Init routine called once for each layer at interpreter creation time.
 This is similar to a Perl module C<INIT {}> block.
 
 This default implementation does nothing and returns C<0>.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
 PIO_base_init(Interp *interp, ParrotIOLayer *l)
 {
@@ -479,14 +456,9 @@ PIO_base_init(Interp *interp, ParrotIOLayer *l)
 
 /*
 
-=back
-
 =head2 Generic top-level C<ParrotIO> interface
 
-=over 4
-
-=item C<INTVAL
-PIO_parse_open_flags(const char *flagstr)>
+FUNCDOC: PIO_parse_open_flags
 
 Parses C<*flagstr> for Perl-style file open mode flags (C<< < >>, C<< > >>,
 C<<< >> >>>, C<< +< >>, C<< +> >>) and returns the combined generic bit flags.
@@ -496,12 +468,12 @@ depending on platform.
 
 XXX BD Should this be static?
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_parse_open_flags(const char *flagstr)
+PIO_parse_open_flags(const char *flagstr /*NULLOK*/)
+    /* WARN_UNUSED */
 {
     INTVAL flags;
     const char *s;
@@ -566,17 +538,16 @@ PIO_parse_open_flags(const char *flagstr)
 }
 
 /*
-=item C<INTVAL
-PIO_peek(Interp *interp, PMC *pmc, void *buffer)>
+
+FUNCDOC: PIO_peek
 
 Iterates down the stack to the first layer implementing "Peek" API.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_peek(Interp *interp, PMC *pmc, STRING **buffer)
+PIO_peek(Interp *interp, PMC *pmc /*NN*/, STRING **buffer /*NN*/)
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -589,8 +560,7 @@ PIO_peek(Interp *interp, PMC *pmc, STRING **buffer)
 
 /*
 
-=item C<INTVAL
-PIO_pioctl(Interp *interp, PMC *pmc, INTVAL cmd, INTVAL arg)>
+FUNCDOC: PIO_pioctl
 
 General purpose interface for manipulating IO objects and layer attributes.
 
@@ -601,17 +571,17 @@ C<get> operations use the return value as the value requested, but should
 always be C<< >= 0 >>. A negative value indicates an error. This may be too
 limited, but we will see. --Melvin
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_pioctl(Interp *interp, PMC *pmc, INTVAL cmd, INTVAL arg)
+PIO_pioctl(Interp *interp, PMC *pmc /*NN*/, INTVAL cmd, INTVAL arg)
 {
 
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
     ParrotIOBuf * b;
-    if (!io) return -1;
+    if (!io)
+        return -1;
     b = &io->b;
 
     switch (cmd) {
@@ -647,18 +617,16 @@ PIO_pioctl(Interp *interp, PMC *pmc, INTVAL cmd, INTVAL arg)
 
 /*
 
-=item C<INTVAL
-PIO_setbuf(Interp *interp, PMC *pmc, size_t bufsize)>
+FUNCDOC: PIO_setbuf
 
 Sets the buffer size for C<*pmc> to C<bufsize>. Returns C<0> if the
 buffering was enabled.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_setbuf(Interp *interp, PMC *pmc, size_t bufsize)
+PIO_setbuf(Interp *interp, PMC *pmc /*NN*/, size_t bufsize)
 {
     ParrotIOLayer * const layer = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -670,18 +638,16 @@ PIO_setbuf(Interp *interp, PMC *pmc, size_t bufsize)
 
 /*
 
-=item C<INTVAL
-PIO_setlinebuf(Interp *interp, PMC *pmc)>
+FUNCDOC: PIO_setlinebuf
 
 Enables line buffering for C<*pmc>. Returns C<0> if line buffering was
 successfully set, or already enabled.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_setlinebuf(Interp *interp, PMC *pmc)
+PIO_setlinebuf(Interp *interp, PMC *pmc /*NN*/)
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -693,13 +659,17 @@ PIO_setlinebuf(Interp *interp, PMC *pmc)
 
 /*
 
+FUNCDOC: PIO_open
+
 Creates and returns a C<ParrotIO> PMC for C<*spath>.
 
 */
 
+PARROT_API
 PMC *
-PIO_open(Interp *interp, ParrotIOLayer *layer, const char *spath,
-         const char *sflags)
+PIO_open(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, const char *spath /*NN*/,
+         const char *sflags /*NN*/)
+    /* WARN_UNUSED */
 {
     ParrotIO *io;
     const INTVAL flags = PIO_parse_open_flags(sflags);
@@ -722,8 +692,8 @@ PIO_open(Interp *interp, ParrotIOLayer *layer, const char *spath,
 
 /*
 
-=item C<PMC *
-PIO_fdopen(Interp *interp, ParrotIOLayer *layer, PIOHANDLE fd, const char *sflags)>
+
+FUNCDOC: PIO_fdopen
 
 Creates and returns a C<ParrotIO> PMC for C<*spath> on an existing, open
 file descriptor.
@@ -731,12 +701,12 @@ file descriptor.
 This is used particularly to initialize the C<STD*> IO handles onto the
 OS IO handles (0,1,2).
 
-=cut
-
 */
 
+PARROT_API
 PMC *
-PIO_fdopen(Interp *interp, ParrotIOLayer *layer, PIOHANDLE fd, const char *sflags)
+PIO_fdopen(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, PIOHANDLE fd, const char *sflags /*NN*/)
+    /* WARN_UNUSED */
 {
     ParrotIO *io;
     INTVAL flags;
@@ -746,7 +716,8 @@ PIO_fdopen(Interp *interp, ParrotIOLayer *layer, PIOHANDLE fd, const char *sflag
     }
 
     flags = PIO_parse_open_flags(sflags);
-    if (!flags) return NULL;
+    if (!flags)
+        return NULL;
 
     io = PIO_fdopen_down(interp, layer, fd, flags);
     /* io could be null here but we still have to
@@ -762,17 +733,14 @@ PIO_fdopen(Interp *interp, ParrotIOLayer *layer, PIOHANDLE fd, const char *sflag
 
 /*
 
-=item C<INTVAL
-PIO_close(Interp *interp, PMC *pmc)>
+FUNCDOC: PIO_close
 
 Flushes, closes, and destroys the C<ParrotIO> PMC C<*pmc>.
-
-=cut
 
 */
 
 INTVAL
-PIO_close(Interp *interp, PMC *pmc)
+PIO_close(Interp *interp, PMC *pmc /*NULLOK*/)
 {
     INTVAL res;
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
@@ -788,17 +756,15 @@ PIO_close(Interp *interp, PMC *pmc)
 
 /*
 
-=item C<void
-PIO_flush(Interp *interp, PMC *pmc)>
+FUNCDOC: PIO_flush
 
 Flushes the C<ParrotIO> PMC C<*pmc>.
 
-=cut
-
 */
 
+PARROT_API
 void
-PIO_flush(Interp *interp, PMC *pmc)
+PIO_flush(Interp *interp, PMC *pmc /*NN*/)
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -810,23 +776,21 @@ PIO_flush(Interp *interp, PMC *pmc)
 
 /*
 
-=item C<STRING *
-PIO_reads(Interp *interp, PMC *pmc, size_t len)>
+FUNCDOC: PIO_reads
 
 Return a new C<STRING*> holding up to C<len> bytes.
 
-=item C<INTVAL
-PIO_read(Interp *interp, PMC *pmc, void *buffer, size_t len)>
+FUNCDOC: PIO_read
 
 Reads up to C<len> bytes from C<*pmc> and copies them into C<*buffer>.
-
-=cut
 
 */
 
 
+PARROT_API
 STRING *
-PIO_reads(Interp *interp, PMC *pmc, size_t len)
+PIO_reads(Interp *interp, PMC *pmc /*NN*/, size_t len)
+    /* WARN_UNUSED */
 {
     STRING *res = NULL;
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
@@ -849,8 +813,10 @@ PIO_reads(Interp *interp, PMC *pmc, size_t len)
     return res;
 }
 
+PARROT_API
 INTVAL
-PIO_read(Interp *interp, PMC *pmc, char *buffer, size_t len)
+PIO_read(Interp *interp, PMC *pmc /*NN*/, char *buffer /*NN*/, size_t len)
+    /* WARN_UNUSED */
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -865,17 +831,16 @@ PIO_read(Interp *interp, PMC *pmc, char *buffer, size_t len)
 
 /*
 
-=item C<INTVAL
-PIO_write(Interp *interp, PMC *pmc, const void *buffer, size_t len)>
+FUNCDOC: PIO_write
 
 Writes C<len> bytes from C<*buffer> to C<*pmc>.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_write(Interp *interp, PMC *pmc, const void *buffer, size_t len)
+PIO_write(Interp *interp, PMC *pmc /*NN*/, const void *buffer /*NN*/, size_t len)
+    /* WARN_UNUSED */
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -899,19 +864,18 @@ PIO_write(Interp *interp, PMC *pmc, const void *buffer, size_t len)
 
 /*
 
-=item C<PIOOFF_T
-PIO_seek(Interp *interp, PMC *pmc, PIOOFF_T offset, INTVAL w)>
+FUNCDOC: PIO_seek
 
 Moves the read/write position of C<*pmc> to offset C<bytes> from the
 position indicated by C<w>. Typically C<w> will be C<0> for the start of
 the file, C<1> for the current position, and C<2> for the end.
 
-=cut
-
 */
 
+PARROT_API
 PIOOFF_T
-PIO_seek(Interp *interp, PMC *pmc, PIOOFF_T offset, INTVAL w)
+PIO_seek(Interp *interp, PMC *pmc /*NN*/, PIOOFF_T offset, INTVAL w)
+    /* WARN_UNUSED */
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -923,17 +887,16 @@ PIO_seek(Interp *interp, PMC *pmc, PIOOFF_T offset, INTVAL w)
 
 /*
 
-=item C<PIOOFF_T
-PIO_tell(Interp *interp, PMC *pmc)>
+FUNCDOC: PIO_tell
 
 Returns the current read/write position of C<*pmc>.
 
-=cut
-
 */
 
+PARROT_API
 PIOOFF_T
-PIO_tell(Interp *interp, PMC *pmc)
+PIO_tell(Interp *interp, PMC *pmc /*NN*/)
+    /* WARN_UNUSED */
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -945,18 +908,17 @@ PIO_tell(Interp *interp, PMC *pmc)
 
 /*
 
-=item C<INTVAL
-PIO_eof(Interp *interp, PMC *pmc)>
+FUNCDOC: PIO_eof
 
 Returns a boolean value indication whether C<*pmc>'s current read/write
 position is C<EOF>.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_eof(Interp *interp, PMC *pmc)
+PIO_eof(Interp *interp, PMC *pmc /*NN*/)
+    /* WARN_UNUSED */
 {
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
 
@@ -973,34 +935,30 @@ PIO_eof(Interp *interp, PMC *pmc)
 
 /*
 
-=item C<INTVAL
-PIO_puts(Interp *interp, PMC *pmc, const char *s)>
+FUNCDOC: PIO_puts
 
 Writes C<*s> tp C<*pmc>. C string version.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_puts(Interp *interp, PMC *pmc, const char *s)
+PIO_puts(Interp *interp, PMC *pmc /*NN*/, const char *s /*NN*/)
 {
     return PIO_write(interp, pmc, s, strlen(s));
 }
 
 /*
 
-=item C<INTVAL
-PIO_putps(Interp *interp, PMC *pmc, STRING *s)>
+FUNCDOC: PIO_putps
 
 Writes C<*s> to C<*pmc>. Parrot string version.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_putps(Interp *interp /*NN*/, PMC *pmc, STRING *s /*NULLOK*/)
+PIO_putps(Interp *interp /*NN*/, PMC *pmc /*NN*/, STRING *s /*NULLOK*/)
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
@@ -1019,17 +977,15 @@ PIO_putps(Interp *interp /*NN*/, PMC *pmc, STRING *s /*NULLOK*/)
 
 /*
 
-=item C<INTVAL
-PIO_fprintf(Interp *interp, PMC *pmc, const char *s, ...)>
+FUNCDOC: PIO_fprintf
 
 Writes a C string format with varargs to C<*pmc>.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_fprintf(Interp *interp, PMC *pmc, const char *s, ...)
+PIO_fprintf(Interp *interp /*NN*/, PMC *pmc /*NN*/, const char *s /*NN*/, ...)
 {
     va_list args;
     INTVAL ret;
@@ -1045,17 +1001,16 @@ PIO_fprintf(Interp *interp, PMC *pmc, const char *s, ...)
 
 /*
 
-=item C<INTVAL
-PIO_printf(Interp *interp, const char *s, ...)>
+FUNCDOC: PIO_printf
 
 Writes a C string format with varargs to C<stdout>.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_printf(Interp *interp /*NN*/, const char *s, ...) {
+PIO_printf(Interp *interp /*NN*/, const char *s /*NN*/, ...)
+{
     va_list args;
     INTVAL ret;
 
@@ -1079,17 +1034,16 @@ PIO_printf(Interp *interp /*NN*/, const char *s, ...) {
 
 /*
 
-=item C<INTVAL
-PIO_eprintf(Interp *interp, const char *s, ...)>
+FUNCDOC: PIO_eprintf
 
 Writes a C string format with varargs to C<stderr>.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_eprintf(Interp *interp, const char *s, ...) {
+PIO_eprintf(Interp *interp /*NULLOK*/, const char *s /*NN*/, ...)
+{
     va_list args;
     INTVAL ret;
 
@@ -1114,17 +1068,16 @@ PIO_eprintf(Interp *interp, const char *s, ...) {
 
 /*
 
-=item C<PIOHANDLE
-PIO_getfd(Interp *interp, PMC *pmc)>
+FUNCDOC: PIO_getfd
 
 Returns C<*pmc>'s file descriptor, or C<0> if it is not defined.
 
-=cut
-
 */
 
+PARROT_API
 PIOHANDLE
-PIO_getfd(Interp *interp, PMC *pmc)
+PIO_getfd(Interp *interp, PMC *pmc /*NN*/)
+    /* WARN_UNUSED */
 {
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
 
@@ -1139,14 +1092,10 @@ PIO_getfd(Interp *interp, PMC *pmc)
 
 /*
 
-=back
-
 =head2 C<PIO_STD*> Functions
 
 The C<PIO_STD*> functions are defined using the C<Interp *interp> macro. The
 prototype is protected with an identity macro.
-
-=cut
 
 */
 
@@ -1154,18 +1103,14 @@ prototype is protected with an identity macro.
 
 /*
 
-=over 4
-
-=item C<PMC *
-PIO_STDIN ID((Interp *interp))>
+FUNCDOC: PIO_STDIN
 
 Returns the C<ParrotIO> PMC for C<stdin>.
 
-=cut
-
 */
 
-PARROT_API PMC *
+PARROT_API
+PMC *
 PIO_STDIN ID((Interp *interp))
 {
     return PIO_STDIN(interp);
@@ -1173,16 +1118,14 @@ PIO_STDIN ID((Interp *interp))
 
 /*
 
-=item C<PMC *
-PIO_STDOUT ID((Interp *interp))>
+FUNCDOC: PIO_STDOUT
 
 Returns the C<ParrotIO> PMC for C<stdout>.
 
-=cut
-
 */
 
-PARROT_API PMC *
+PARROT_API
+PMC *
 PIO_STDOUT ID((Interp *interp))
 {
     return PIO_STDOUT(interp);
@@ -1190,16 +1133,14 @@ PIO_STDOUT ID((Interp *interp))
 
 /*
 
-=item C<PMC *
-PIO_STDERR ID((Interp *interp))>
+FUNCDOC: PIO_STDERR
 
 Returns the C<ParrotIO> PMC for C<stderr>.
 
-=cut
-
 */
 
-PARROT_API PMC *
+PARROT_API
+PMC *
 PIO_STDERR ID((Interp *interp))
 {
     return PIO_STDERR(interp);
@@ -1207,23 +1148,17 @@ PIO_STDERR ID((Interp *interp))
 
 /*
 
-=back
-
 =head2 DOD-related Functions
 
-=over 4
-
-=item C<void
-Parrot_IOData_mark(Interp *interp, ParrotIOData *piodata)>
+FUNCDOC: Parrot_IOData_mark
 
 Called from C<trace_active_PMCs()> to mark the IO data live.
 
-=cut
-
 */
 
+PARROT_API
 void
-Parrot_IOData_mark(Interp *interp, ParrotIOData *piodata)
+Parrot_IOData_mark(Interp *interp, ParrotIOData *piodata /*NN*/)
 {
     INTVAL i;
     ParrotIOTable table = piodata->table;
@@ -1240,20 +1175,13 @@ Parrot_IOData_mark(Interp *interp, ParrotIOData *piodata)
 
 /*
 
-=back
-
 =head2 Offset Functions
 
 These are used to create offsets for the C<seek> op.
 
-=over 4
-
-=item C<PIOOFF_T
-PIO_make_offset(INTVAL offset)>
+FUNCDOC: PIO_make_offset
 
 Returns C<offset>.
-
-=cut
 
 */
 
@@ -1265,13 +1193,10 @@ PIO_make_offset(INTVAL offset)
 
 /*
 
-=item C<PIOOFF_T
-PIO_make_offset32(INTVAL hi, INTVAL lo)>
+FUNCDOC: PIO_make_offset32
 
 C<hi> is shifted 32 bytes to the left and C<or>ed together with C<lo>.
 This allows 64-bit seeks with only 32-bit C<INTVALS>.
-
-=cut
 
 */
 
@@ -1283,12 +1208,9 @@ PIO_make_offset32(INTVAL hi, INTVAL lo)
 
 /*
 
-=item C<PIOOFF_T
-PIO_make_offset_pmc(Interp *interp, PMC *pmc)>
+FUNCDOC: PIO_make_offset_pmc
 
 Returns the return value of the C<get_integer> vtable method on C<*pmc>.
-
-=cut
 
 */
 
@@ -1301,24 +1223,18 @@ PIO_make_offset_pmc(Interp *interp, PMC *pmc)
 
 /*
 
-=back
-
 =head2 Networking Functions
 
-=over 4
-
-=item C<INTVAL
-PIO_poll(Interp *interp, PMC *pmc, INTVAL which, INTVAL sec, INTVAL usec)>
+FUNCDOC: PIO_poll
 
 Polls C<*pmc> for the events in C<which> every C<sec> seconds + C<usec>
 microseconds.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_poll(Interp *interp, PMC *pmc, INTVAL which, INTVAL sec, INTVAL usec)
+PIO_poll(Interp *interp /*NN*/, PMC *pmc /*NN*/, INTVAL which, INTVAL sec, INTVAL usec)
 {
     ParrotIOLayer *l;
     ParrotIO *io;
@@ -1334,17 +1250,15 @@ PIO_poll(Interp *interp, PMC *pmc, INTVAL which, INTVAL sec, INTVAL usec)
 
 /*
 
-=item C<PMC *
-PIO_socket(Interp *interp, INTVAL fam, INTVAL type, INTVAL proto)>
+FUNCDOC: PIO_socket
 
 Creates and returns a socket using the specified address family, socket type,
 and protocol number. Check the returned PMC with a boolean test to see whether
 the socket was successfully created.
 
-=cut
-
 */
 
+PARROT_API
 PMC *
 PIO_socket(Interp *interp, INTVAL fam, INTVAL type, INTVAL proto)
 {
@@ -1360,18 +1274,16 @@ PIO_socket(Interp *interp, INTVAL fam, INTVAL type, INTVAL proto)
 
 /*
 
-=item C<INTVAL
-PIO_recv(Interp *interp, PMC *pmc, STRING **buf)>
+FUNCDOC: PIO_recv
 
 Receives a message from the connected socket C<*pmc> in C<*buf>.  Returns C<-1>
 if it fails.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_recv(Interp *interp, PMC *pmc, STRING **buf)
+PIO_recv(Interp *interp, PMC *pmc /*NN*/, STRING **buf /*NN*/)
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
@@ -1383,18 +1295,16 @@ PIO_recv(Interp *interp, PMC *pmc, STRING **buf)
 
 /*
 
-=item C<INTVAL
-PIO_send(Interp *interp, PMC *pmc, STRING *buf)>
+FUNCDOC: PIO_send
 
 Sends the message C<*buf> to the connected socket C<*pmc>.  Returns
 C<-1> if it cannot send the message.
 
-=cut
-
 */
 
 INTVAL
-PIO_send(Interp *interp, PMC *pmc, STRING *buf)
+PIO_send(Interp *interp, PMC *pmc /*NN*/, STRING *buf /*NN*/)
+    /* WARN_UNUSED */
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
@@ -1406,17 +1316,15 @@ PIO_send(Interp *interp, PMC *pmc, STRING *buf)
 
 /*
 
-=item C<INTVAL
-PIO_connect(Interp *interp, PMC *pmc, STRING *address)>
+FUNCDOC: PIO_connect
 
 Connects C<*pmc> to C<*address>.  Returns C<-1> on failure.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_connect(Interp *interp, PMC *pmc, STRING *address)
+PIO_connect(Interp *interp, PMC *pmc /*NN*/, STRING *address /*NN*/)
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
@@ -1428,18 +1336,16 @@ PIO_connect(Interp *interp, PMC *pmc, STRING *address)
 
 /*
 
-=item C<INTVAL
-PIO_bind(Interp *interp, PMC *pmc, STRING *address)>
+FUNCDOC: PIO_bind
 
 Binds C<*pmc>'s socket to the local address and port specified by
 C<*address>.  Returns C<-1> on failure.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_bind(Interp *interp, PMC *pmc, STRING *address)
+PIO_bind(Interp *interp, PMC *pmc /*NN*/, STRING *address /*NN*/)
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
@@ -1451,17 +1357,15 @@ PIO_bind(Interp *interp, PMC *pmc, STRING *address)
 
 /*
 
-=item C<INTVAL
-PIO_listen(Interp *interp, PMC *pmc, INTVAL backlog)>
+FUNCDOC: PIO_listen
 
 Listens for new connections on socket C<*pmc>.  Returns C<-1> on failure.
-
-=cut
 
 */
 
 INTVAL
-PIO_listen(Interp *interp, PMC *pmc, INTVAL backlog)
+PIO_listen(Interp *interp, PMC *pmc /*NN*/, INTVAL backlog)
+    /* WARN_UNUSED */
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
@@ -1473,18 +1377,15 @@ PIO_listen(Interp *interp, PMC *pmc, INTVAL backlog)
 
 /*
 
-=item C<INTVAL
-PIO_accept(Interp *interp, PMC *pmc)>
+FUNCDOC: PIO_accept
 
 Accepts a new connection and returns a newly created C<ParrotIO> socket.
 Returns C<NULL> on failure.
 
-=cut
-
 */
 
 PMC *
-PIO_accept(Interp *interp, PMC *pmc)
+PIO_accept(Interp *interp, PMC *pmc /*NN*/)
 {
     ParrotIO *io2;
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
@@ -1500,17 +1401,16 @@ PIO_accept(Interp *interp, PMC *pmc)
 
 /*
 
-=item C<INTVAL
-PIO_isatty(Interp *interp, PMC *pmc)>
+FUNCDOC: PIO_isatty
 
 Returns a boolean value indicating whether C<*pmc> is a console/tty.
 
-=cut
-
 */
 
+PARROT_API
 INTVAL
-PIO_isatty(Interp *interp, PMC *pmc)
+PIO_isatty(Interp *interp, PMC *pmc /*NN*/)
+    /* PURE, WARN_UNUSED */
 {
     ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
 
@@ -1523,8 +1423,6 @@ PIO_isatty(Interp *interp, PMC *pmc)
 }
 
 /*
-
-=back
 
 =head1 SEE ALSO
 
