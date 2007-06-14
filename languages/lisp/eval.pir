@@ -15,7 +15,7 @@
   # switch based on the type of the first arg
   .local pmc form
   .CAR(form, args)
-  typeof type, form
+  type = typeof form
   if type == "LispSymbol"  goto SYMBOL
   if type == "LispCons"    goto FUNCTION_FORM
   if type == "LispInteger" goto SELF_EVALUATING_OBJECT
@@ -46,7 +46,7 @@ FUNCTION_FORM:
 
   # Check to see if the function is a special form (which aren't subject to
   # normal function evaluation rules).
-  typeof type, function
+  type = typeof function
   if type == "LispSpecialForm" goto SPECIAL_FORMS
   if type == "LispMacro" goto MACRO_FORM
 

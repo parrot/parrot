@@ -240,7 +240,7 @@ DONE:
   proto = function._get_args()
   body  = function._get_body()
 
-  typeof type, body                     # Get the function type
+  type = typeof body                     # Get the function type
 
   if type == "Sub" goto COMPILED_FUNCTION
   goto INTERPRETED_FUNCTION
@@ -461,7 +461,7 @@ DONE:
   .local string atype
   .local int retv
 
-   typeof atype, args
+   atype = typeof args
    retv = 1
 
    if rtype == "cons"     goto CONS_TYPE
