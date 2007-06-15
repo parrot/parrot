@@ -462,7 +462,7 @@ Parrot_free_context(Interp *interp /*NN*/, struct Parrot_Context *ctxp /*NN*/, i
                      : (char*)doomed->name->strstart));
         }
 #endif
-        ptr = ctxp;
+        ptr  = ctxp;
         slot = CALCULATE_SLOT_NUM(ctxp->regs_mem_size);
 
         assert(slot < interp->ctx_mem.n_free_slots);

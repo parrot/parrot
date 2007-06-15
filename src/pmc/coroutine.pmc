@@ -65,11 +65,9 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 static void
 print_sub_name(Interp* interp, PMC* sub)
 {
-    struct Parrot_coro * co = PMC_coro(sub);
-    Interp *tracer;
+    Parrot_coro *co     = PMC_coro(sub);
+    Interp      *tracer = interp->debugger ? interp->debugger : interp;
 
-    tracer = interp->debugger ?
-        interp->debugger : interp;
     PIO_eprintf(tracer, "# %s coro '%Ss'",
         !(PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF) ?
         "Calling" : "yielding from",
@@ -107,16 +105,16 @@ Clone the couroutine.
     }
 
     PMC* clone() {
-        struct Parrot_coro * sub;
-        PMC* ret            = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        Parrot_coro *sub;
+        PMC         *ret    = pmc_new_noinit(INTERP, SELF->vtable->base_type);
 
         PObj_custom_mark_destroy_SETALL(ret);
 
-        sub                 = mem_allocate_typed(struct Parrot_coro);
+        sub                 = mem_allocate_typed(Parrot_coro);
         PMC_struct_val(ret) = sub;
         PMC_pmc_val(ret)    = NULL;
 
-        memcpy(sub, PMC_sub(SELF), sizeof (struct Parrot_coro));
+        memcpy(sub, PMC_sub(SELF), sizeof (Parrot_coro));
 
         sub->name           = string_copy(INTERP, sub->name);
 
@@ -139,7 +137,7 @@ Swaps the "context".
         struct Stack_Chunk *state;
         parrot_context_t   *ctx;
         PMC                *ccont;
-        struct Parrot_coro *co   = PMC_coro(SELF);
+        Parrot_coro        *co   = PMC_coro(SELF);
         opcode_t           *dest = co->address;
 
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
@@ -257,7 +255,7 @@ Marks the coroutine as live.
 */
 
     void mark() {
-        struct Parrot_coro *c = PMC_coro(SELF);
+        Parrot_coro *c = PMC_coro(SELF);
         if (c && c->ctx)
             mark_context(INTERP, c->ctx);
         if (c && c->dynamic_state)
