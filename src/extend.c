@@ -61,6 +61,8 @@ can.
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
 
+/* HEADER: none */ /* XXX a lie for the headerizer so I can work on others */
+
 /*
 
 =item C<Parrot_String
