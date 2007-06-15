@@ -471,7 +471,8 @@ variable for GC to finish when the event arrives.
 
 PARROT_API
 void
-Parrot_new_suspend_for_gc_event(Interp *interp /*NN*/) {
+Parrot_new_suspend_for_gc_event(Interp *interp /*NN*/)
+{
     QUEUE_ENTRY *qe;
     parrot_event* const ev = mem_allocate_typed(parrot_event);
     ev->type = EVENT_TYPE_SUSPEND_FOR_GC;
@@ -1145,7 +1146,7 @@ Run user code or such.
 */
 
 static opcode_t *
-do_event(Interp *interp, parrot_event* event, opcode_t *next)
+do_event(Interp *interp, parrot_event* event /*NN*/, opcode_t *next)
 {
     edebug((stderr, "do_event %s\n", et(event)));
     switch (event->type) {

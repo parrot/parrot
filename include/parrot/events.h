@@ -103,6 +103,9 @@ PARROT_API void Parrot_new_cb_event( Interp *interp /*NN*/,
     char *ext )
         __attribute__nonnull__(1);
 
+PARROT_API void Parrot_new_suspend_for_gc_event( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
 PARROT_API void Parrot_new_terminate_event( Interp *interp );
 PARROT_API void Parrot_new_timer_event( Interp *interp,
     PMC *timer,

@@ -509,6 +509,8 @@ PARROT_API INTVAL Parrot_run_meth_fromc_arglist_reti(Interp *, PMC *sub,
 PARROT_API FLOATVAL Parrot_run_meth_fromc_arglist_retf(Interp *, PMC *sub,
         PMC* obj, STRING *meth, const char *signature, va_list);
 
+PARROT_API void Parrot_run_callback(Parrot_Interp, PMC* cbi, char *ext);
+
 PARROT_API void Parrot_callback_C(char *external_data, PMC *callback_info);
 PARROT_API void Parrot_callback_D(PMC *callback_info, char *external_data);
 PARROT_API PMC* Parrot_make_cb(Interp *interp, PMC* sub, PMC* user_data,
