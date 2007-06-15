@@ -37,7 +37,7 @@ pmclass TclFloat
         PMC * const hll_ns  = VTABLE_get_pmc_keyed_str(INTERP, root_ns, _tcl);
         PMC * precision_pmc =
             Parrot_find_global_op(INTERP, hll_ns, _precision, NULL);
-        INTVAL* precision = VTABLE_get_integer(INTERP, precision_pmc);
+        INTVAL precision = VTABLE_get_integer(INTERP, precision_pmc);
 
         if (precision == 0)
             precision = 16; /* RT#40639: hack to approximate right output.*/

@@ -109,7 +109,7 @@ Returns the dict as a string
 
     STRING* get_string() {
         PMC *dictToString, *namespace;
-        STRING *_tcl_namespace, *sub, *value;
+        STRING *_tcl_namespace, *sub;
 
         _tcl_namespace = string_from_const_cstring(INTERP, "_tcl", 4);
         sub            = string_from_const_cstring(INTERP, "__dictToString",14);
@@ -120,8 +120,7 @@ Returns the dict as a string
 
         CONTEXT(INTERP->ctx)->constants =
           PMC_sub(dictToString)->seg->const_table->constants;
-        value = Parrot_runops_fromc_args(INTERP, dictToString, "SP", SELF);
-        return value;
+        return (STRING *)Parrot_runops_fromc_args(INTERP, dictToString, "SP", SELF);
 
     }
 }
