@@ -115,11 +115,36 @@ extern int CONSERVATIVE_POINTER_CHASING;
 
 
 /* GC subsystem init functions */
-PARROT_API void parrot_gc_gms_pobject_lives(Interp *interp, PObj *obj);
-PARROT_API void Parrot_gc_ims_init(Interp *interp);
-PARROT_API void Parrot_gc_gms_init(Interp *interp);
+/* HEADERIZER BEGIN: src/gc/gc_gms.c */
 
-PARROT_API void Parrot_dod_ims_wb(Interp*, PMC *, PMC *);
+PARROT_API void Parrot_gc_gms_init( Interp* interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+PARROT_API void parrot_gc_gms_pobject_lives( Interp* interp /*NN*/,
+    PObj *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void parrot_gc_gms_wb( Interp *interp, PMC *agg, void *old, void *new /*NN*/ )
+        __attribute__nonnull__(4);
+
+void parrot_gc_gms_wb_key( Interp *interp,
+    PMC *agg,
+    void *old,
+    void *old_key,
+    void *new,
+    void *new_key );
+
+/* HEADERIZER END: src/gc/gc_gms.c */
+
+/* HEADERIZER BEGIN: src/gc/gc_ims.c */
+
+PARROT_API void Parrot_dod_ims_wb( Interp* interp, PMC *agg, PMC *_new );
+PARROT_API void Parrot_gc_ims_init( Interp* interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: src/gc/gc_ims.c */
+
 /*
  * write barrier
  */
@@ -164,10 +189,6 @@ PARROT_API void Parrot_dod_ims_wb(Interp*, PMC *, PMC *);
     if (gen_agg < gen_new || gen_agg < gen_key) \
         parrot_gc_gms_wb_key(interp, agg, old, old_key, new, new_key); \
 } while (0)
-
-void parrot_gc_gms_wb(Interp *, PMC *agg, void *old, void *new);
-void parrot_gc_gms_wb_key(Interp *, PMC *agg,
-        void *old, void *old_key, void *new, void *new_key);
 
 #endif
 

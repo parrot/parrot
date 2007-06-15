@@ -1869,7 +1869,7 @@ Returns a Parrot string representation of the specified integer value.
 
 PARROT_API
 STRING *
-string_from_int(Interp *interp, INTVAL i)
+string_from_int(Interp *interp /*NN*/, INTVAL i)
 {
     char buf[128];
     return int_to_str(interp, buf, i, 10);

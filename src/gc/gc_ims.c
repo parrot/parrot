@@ -334,7 +334,10 @@ a sleep opcode.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/dod.h"
 #include <assert.h>
+
+/* HEADER: include/parrot/dod.h */
 
 /*
  * size of one arena
@@ -521,8 +524,9 @@ C<more_objects_fn>.
 
 */
 
+PARROT_API
 void
-Parrot_gc_ims_init(Interp* interp)
+Parrot_gc_ims_init(Interp* interp /*NN*/)
 {
     Arenas * const arena_base = interp->arena_base;
 
@@ -926,7 +930,7 @@ be greyed or the aggregate must be rescanned - by greying it.
 
 #define DOD_IMS_GREY_NEW 1
 
-
+PARROT_API
 void
 Parrot_dod_ims_wb(Interp* interp, PMC *agg, PMC *_new)
 {

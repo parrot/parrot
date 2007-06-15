@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -23,6 +23,8 @@ tdb
 #include "parrot/parrot.h"
 #include "global.str"
 
+/* HEADER: none */ /* XXX It's really include/parrot/global.h, but not yet */
+
 #define DEBUG_GLOBAL 0
 
 /*
@@ -34,8 +36,9 @@ tdb
 /* flags for internal_ns_keyed */
 #define INTERN_NS_CREAT 1       /* I'm a fan of the classics */
 
-static PMC * internal_ns_keyed(Interp *interp, PMC *base_ns, PMC *pmc_key,
-                               STRING *str_key, int flags)
+static PMC *
+internal_ns_keyed(Interp *interp, PMC *base_ns, PMC *pmc_key,
+                               STRING *str_key /*NULLOK*/, int flags)
 {
     PMC *ns, *sub_ns;
     INTVAL i, n;
@@ -85,9 +88,8 @@ static PMC * internal_ns_keyed(Interp *interp, PMC *base_ns, PMC *pmc_key,
                 return PMCNULL;
             VTABLE_set_pmc_keyed_str(interp, ns, part, sub_ns);
         }
-
         ns = sub_ns;
-    }
+    } /* for */
 
     return ns;
 }
@@ -125,30 +127,33 @@ will result in exceptions.
 
 */
 
-
+PARROT_API
 PMC *
-Parrot_get_namespace_keyed(Interp *interp, PMC *base_ns, PMC *pmc_key)
+Parrot_get_namespace_keyed(Interp *interp /*NN*/, PMC *base_ns, PMC *pmc_key)
 {
     return internal_ns_keyed(interp, base_ns,
                              pmc_key, NULL, 0);
 }
 
+PARROT_API
 PMC *
-Parrot_get_namespace_keyed_str(Interp *interp, PMC *base_ns, STRING *str_key)
+Parrot_get_namespace_keyed_str(Interp *interp /*NN*/, PMC *base_ns, STRING *str_key)
 {
     return internal_ns_keyed(interp, base_ns,
                              PMCNULL, str_key, 0);
 }
 
+PARROT_API
 PMC *
-Parrot_make_namespace_keyed(Interp *interp, PMC *base_ns, PMC *pmc_key)
+Parrot_make_namespace_keyed(Interp *interp /*NN*/, PMC *base_ns, PMC *pmc_key)
 {
     return internal_ns_keyed(interp, base_ns,
                              pmc_key, NULL, INTERN_NS_CREAT);
 }
 
+PARROT_API
 PMC *
-Parrot_make_namespace_keyed_str(Interp *interp, PMC *base_ns, STRING *str_key)
+Parrot_make_namespace_keyed_str(Interp *interp /*NN*/, PMC *base_ns, STRING *str_key)
 {
     return internal_ns_keyed(interp, base_ns,
                              NULL, str_key, INTERN_NS_CREAT);
@@ -177,9 +182,9 @@ root namespace. Return the namespace.  Errors will result in exceptions.
 
 */
 
-
+PARROT_API
 PMC *
-Parrot_make_namespace_autobase(Interp *interp, PMC *key)
+Parrot_make_namespace_autobase(Interp *interp /*NN*/, PMC *key)
 {
     PMC *base_ns;
     if (VTABLE_isa(interp, key, string_from_const_cstring(interp, "String", 0)))
@@ -190,8 +195,9 @@ Parrot_make_namespace_autobase(Interp *interp, PMC *key)
     return Parrot_make_namespace_keyed(interp, base_ns, key);
 }
 
+PARROT_API
 PMC *
-Parrot_get_namespace_autobase(Interp *interp, PMC *key)
+Parrot_get_namespace_autobase(Interp *interp /*NN*/, PMC *key)
 {
     PMC *base_ns;
     if (VTABLE_isa(interp, key, string_from_const_cstring(interp, "String", 0)))
@@ -222,8 +228,21 @@ Set the global named C<globalname> in the namespace C<ns> to the value C<val>.
 
 */
 
+
+/*
+ * {get,set}_global.
+ *
+ * Parrot_get_global allows a null namespace without throwing an exception; it
+ * simply returns PMCNULL in that case.
+ *
+ * NOTE: At present the use of the {get,set}_global functions is mandatory due to the
+ *       wacky namespace typing of the default Parrot namespace.  Eventually it will be
+ *       safe to just use the standard hash interface (if desired).
+ */
+
+PARROT_API
 PMC *
-Parrot_get_global(Interp *interp, PMC *ns, STRING *globalname)
+Parrot_get_global(Interp *interp, PMC *ns /*NULLOK*/, STRING *globalname)
 {
     if (PMC_IS_NULL(ns))
         return PMCNULL;
@@ -231,6 +250,7 @@ Parrot_get_global(Interp *interp, PMC *ns, STRING *globalname)
     return (PMC *)VTABLE_get_pointer_keyed_str(interp, ns, globalname);
 }
 
+PARROT_API
 void
 Parrot_set_global(Interp *interp, PMC *ns, STRING *globalname, PMC *val)
 {
@@ -273,8 +293,9 @@ entirely use the untyped interface.
 
 */
 
+PARROT_API
 PMC *
-Parrot_find_global_n(Interp *interp, PMC *ns, STRING *globalname)
+Parrot_find_global_n(Interp *interp, PMC *ns /*NULLOK*/, STRING *globalname)
 {
     PMC *res;
 
@@ -299,13 +320,15 @@ Parrot_find_global_n(Interp *interp, PMC *ns, STRING *globalname)
     return PMC_IS_NULL(res) ? NULL : res;
 }
 
+PARROT_API
 PMC *
-Parrot_find_global_cur(Interp *interp, STRING *globalname)
+Parrot_find_global_cur(Interp *interp /*NN*/, STRING *globalname)
 {
     PMC * const ns = CONTEXT(interp->ctx)->current_namespace;
     return Parrot_find_global_n(interp, ns, globalname);
 }
 
+PARROT_API
 PMC *
 Parrot_find_global_k(Interp *interp, PMC *pmc_key, STRING *globalname)
 {
@@ -316,6 +339,7 @@ Parrot_find_global_k(Interp *interp, PMC *pmc_key, STRING *globalname)
     return Parrot_find_global_n(interp, ns, globalname);
 }
 
+PARROT_API
 PMC *
 Parrot_find_global_s(Interp *inter, STRING *str_key, STRING *globalname)
 {
@@ -353,8 +377,9 @@ the HLL root if C<str_key> is NULL, with the name C<globalname>.
 
 */
 
+PARROT_API
 void
-Parrot_store_global_n(Interp *interp, PMC *ns,
+Parrot_store_global_n(Interp *interp /*NN*/, PMC *ns /*NULLOK*/,
                       STRING *globalname, PMC *val)
 {
 #if DEBUG_GLOBAL
@@ -368,8 +393,9 @@ Parrot_store_global_n(Interp *interp, PMC *ns,
     VTABLE_set_pmc_keyed_str(interp, ns, globalname, val);
 }
 
+PARROT_API
 void
-Parrot_store_global_cur(Interp *interp, STRING *globalname, PMC *val)
+Parrot_store_global_cur(Interp *interp /*NN*/, STRING *globalname, PMC *val)
 {
     Parrot_store_global_n(interp,
                           CONTEXT(interp->ctx)->current_namespace,
@@ -378,8 +404,9 @@ Parrot_store_global_cur(Interp *interp, STRING *globalname, PMC *val)
     /* FIXME - method cache invalidation should occur */
 }
 
+PARROT_API
 void
-Parrot_store_global_k(Interp *interp, PMC *pmc_key,
+Parrot_store_global_k(Interp *interp /*NN*/, PMC *pmc_key /*NN*/,
                       STRING *globalname, PMC *val)
 {
     PMC *ns;
@@ -404,13 +431,12 @@ Parrot_store_global_k(Interp *interp, PMC *pmc_key,
     /* FIXME - method cache invalidation should occur */
 }
 
+PARROT_API
 void
-Parrot_store_global_s(Interp *inter, STRING *str_key,
+Parrot_store_global_s(Interp *inter /*NN*/, STRING *str_key,
                       STRING *globalname, PMC *val)
 {
-    PMC *ns;
-
-    ns = Parrot_make_namespace_keyed_str(inter,
+    PMC * const ns = Parrot_make_namespace_keyed_str(inter,
                                          Parrot_get_ctx_HLL_namespace(inter),
                                          str_key);
 
@@ -435,7 +461,7 @@ PMCNULL.
 
 PMC *
 Parrot_find_global_op(Interp *interp, PMC *ns,
-                      STRING *globalname, void *next)
+                      STRING *globalname /*NN*/, void *next)
 {
     PMC *res;
 
@@ -466,8 +492,9 @@ anywhere, return PMCNULL.
 
 */
 
+PARROT_API
 PMC *
-Parrot_find_name_op(Interp *interp, STRING *name, void *next)
+Parrot_find_name_op(Interp *interp /*NN*/, STRING *name, void *next)
 {
     parrot_context_t * const ctx = CONTEXT(interp->ctx);
     PMC *g, *lex_pad;
@@ -540,10 +567,12 @@ store_sub_in_multi(Parrot_Interp interp, PMC *sub, PMC *ns)
     string_cstring_free(c_meth);
 }
 
+PARROT_API
 void
 Parrot_store_sub_in_namespace(Interp *interp /*NN*/, PMC *sub)
 {
-    INTVAL cur_id = CONTEXT(interp->ctx)->current_HLL;
+    const INTVAL cur_id = CONTEXT(interp->ctx)->current_HLL;
+
     PMC *ns;
     /* PF structures aren't fully constructed yet */
     Parrot_block_DOD(interp);
@@ -560,15 +589,14 @@ Parrot_store_sub_in_namespace(Interp *interp /*NN*/, PMC *sub)
         store_sub_in_multi(interp, sub, ns);
     /* store other subs (as long as they're not :anon) */
     else if (!(PObj_get_FLAGS(sub) & SUB_FLAG_PF_ANON)) {
-        STRING *name   = PMC_sub(sub)->name;
-        PMC    *nsname = PMC_sub(sub)->namespace_name;
+        STRING * const name   = PMC_sub(sub)->name;
+        PMC    * const nsname = PMC_sub(sub)->namespace_name;
 
         Parrot_store_global_n(interp, ns, name, sub);
 
         /* TEMPORARY HACK - cache invalidation should be a namespace function */
-        if (!PMC_IS_NULL(nsname))
-        {
-            STRING *nsname_s = VTABLE_get_string(interp, nsname);
+        if (!PMC_IS_NULL(nsname)) {
+            STRING * const nsname_s = VTABLE_get_string(interp, nsname);
             Parrot_invalidate_method_cache(interp, nsname_s, name);
         }
     }
@@ -577,6 +605,7 @@ Parrot_store_sub_in_namespace(Interp *interp /*NN*/, PMC *sub)
     CONTEXT(interp->ctx)->current_HLL = cur_id;
     Parrot_unblock_DOD(interp);
 }
+
 /*
 
 =back

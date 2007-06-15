@@ -1834,19 +1834,22 @@ HEADERIZER_O_FILES = \
     src/core_pmcs.o \
     src/cpu_dep.o \
     src/datatypes.o \
-    src/datatypes.o \
     src/debug.o \
     src/dynext.o \
     src/encoding.o \
     src/events.o \
     src/exceptions.o \
     src/exit.o \
+    src/extend.o \
     src/fingerprint.o \
     src/gc/dod.o \
+    src/gc/gc_gms.o \
+    src/gc/gc_ims.o \
     src/gc/memory.o \
     src/gc/register.o \
     src/gc/resources.o \
     src/gc/smallobject.o \
+    src/global.o \
     src/global_setup.o \
     src/hash.o \
     src/headers.o \

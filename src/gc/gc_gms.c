@@ -108,8 +108,11 @@ A chained list of headers used e.g. for the IGP list.
 
 */
 
-#include <parrot/parrot.h>
+#include "parrot/parrot.h"
+#include "parrot/dod.h"
 #include <assert.h>
+
+/* HEADER: include/parrot/dod.h */
 
 #if PARROT_GC_GMS
 
@@ -214,7 +217,7 @@ creation of memory pools.
 */
 
 static void
-parrot_gc_gms_deinit(Interp* interp)
+parrot_gc_gms_deinit(Interp* interp /*NN*/)
 {
     Arenas * const arena_base = interp->arena_base;
 
@@ -226,7 +229,7 @@ parrot_gc_gms_deinit(Interp* interp)
 }
 
 static void
-gc_gms_pool_init(Interp *interp, Small_Object_Pool *pool)
+gc_gms_pool_init(Interp *interp, Small_Object_Pool *pool /*NN*/)
 {
     pool->add_free_object = gc_gms_add_free_object;
     pool->get_free_object = gc_gms_get_free_object;
@@ -240,8 +243,9 @@ gc_gms_pool_init(Interp *interp, Small_Object_Pool *pool)
     pool->object_size += sizeof (Gc_gms_hdr);
 }
 
+PARROT_API
 void
-Parrot_gc_gms_init(Interp* interp)
+Parrot_gc_gms_init(Interp* interp /*NN*/)
 {
     Arenas * const arena_base = interp->arena_base;
 
@@ -526,7 +530,7 @@ to other items, and promote it to the old generation.
 */
 
 static Gc_gms_gen *
-gc_gms_find_gen(Interp *interp, Gc_gms_hdr *h, UINTVAL gen_no)
+gc_gms_find_gen(Interp *interp, Gc_gms_hdr *h /*NN*/, UINTVAL gen_no)
 {
     Gc_gms_gen *gen;
     Small_Object_Pool * const pool = h->gen->pool;
@@ -550,7 +554,7 @@ gc_gms_find_gen(Interp *interp, Gc_gms_hdr *h, UINTVAL gen_no)
 }
 
 static void
-gc_gms_promote(Interp *interp, Gc_gms_hdr *h, UINTVAL gen_no)
+gc_gms_promote(Interp *interp, Gc_gms_hdr *h /*NN*/, UINTVAL gen_no)
 {
     Gc_gms_gen *gen;
     Gc_gms_hdr *prev, *next;
@@ -587,9 +591,9 @@ gc_gms_promote(Interp *interp, Gc_gms_hdr *h, UINTVAL gen_no)
 }
 
 static void
-gc_gms_store_hdr_list(Interp *interp, Gc_gms_hdr_list *l, Gc_gms_hdr *h)
+gc_gms_store_hdr_list(Interp *interp, Gc_gms_hdr_list *l /*NN*/, Gc_gms_hdr *h)
 {
-    Gc_gms_hdr_store *s = l->last;
+    Gc_gms_hdr_store * const s = l->last;
 
     /* if it's not created or if it's full allocate new store */
     if (!s || s->ptr == &s->store[GC_GMS_STORE_SIZE]) {
@@ -622,7 +626,7 @@ gc_gms_clear_hdr_list(Interp *interp, Gc_gms_hdr_list *l)
 }
 
 static void
-gc_gms_store_igp(Interp *interp, Gc_gms_hdr *h)
+gc_gms_store_igp(Interp *interp, Gc_gms_hdr *h /*NN*/)
 {
     Gc_gms_gen * const gen = h->gen;
     Gc_gms_hdr_list * const igp = &gen->igp;
@@ -639,7 +643,7 @@ gc_gms_clear_igp(Interp *interp, Gc_gms_gen *gen)
 }
 
 void
-parrot_gc_gms_wb(Interp *interp, PMC *agg, void *old, void *new)
+parrot_gc_gms_wb(Interp *interp, PMC *agg, void *old, void *new /*NN*/)
 {
     Gc_gms_hdr * const nh = PObj_to_GMSH(new);
     Gc_gms_hdr * const ah = PObj_to_GMSH(agg);

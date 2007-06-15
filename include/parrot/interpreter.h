@@ -552,6 +552,8 @@ PARROT_API void Parrot_mark_method_writes(Interp *, int type, const char *name);
 
 void Parrot_setup_event_func_ptrs(Parrot_Interp interp);
 
+PARROT_API void disable_event_checking(Interp *interp /*NN*/);
+PARROT_API void enable_event_checking(Interp *interp /*NN*/);
 #else
 
 struct Parrot_Interp_;

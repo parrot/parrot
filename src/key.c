@@ -291,7 +291,7 @@ key_number(Interp *interp, PMC *key /*NN*/)
 
 PARROT_API
 STRING *
-key_string(Interp *interp, PMC *key /*NN*/)
+key_string(Interp *interp /*NN*/, PMC *key /*NN*/)
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_string_FLAG:

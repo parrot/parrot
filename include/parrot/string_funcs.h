@@ -176,7 +176,9 @@ PARROT_API STRING * string_from_cstring( Interp *interp,
     const UINTVAL len )
         __attribute__warn_unused_result__;
 
-PARROT_API STRING * string_from_int( Interp *interp, INTVAL i );
+PARROT_API STRING * string_from_int( Interp *interp /*NN*/, INTVAL i )
+        __attribute__nonnull__(1);
+
 PARROT_API STRING * string_from_num( Interp *interp, FLOATVAL f );
 PARROT_API STRING * string_grow( Interp * interp,
     STRING *s /*NN*/,

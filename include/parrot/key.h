@@ -92,7 +92,8 @@ PARROT_API void key_set_string( Interp *interp,
         __attribute__nonnull__(2);
 
 PARROT_API STRING * key_set_to_string( Interp *interp, PMC *key /*NULLOK*/ );
-PARROT_API STRING * key_string( Interp *interp, PMC *key /*NN*/ )
+PARROT_API STRING * key_string( Interp *interp /*NN*/, PMC *key /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API INTVAL key_type( Interp *interp, PMC *key /*NN*/ )
