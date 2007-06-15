@@ -29,22 +29,22 @@ debugger, and the C<debug> ops.
 #include "parrot/debug.h"
 #include "parrot/oplib/ops.h"
 
+/* HEADER: include/parrot/debug.h */
+
 static const char* GDB_P(Interp *interp, const char *s);
 
 /*
 
-=item C<static char* nextarg(char *command)>
+FUNCDOC: nextarg
 
 Returns the position just past the current argument in the PASM instruction
 C<command>. This is not the same as C<skip_command()>, which is intended for
 debugger commands. This function is used for C<eval>.
 
-=cut
-
 */
 
 static char const *
-nextarg(char const *command)
+nextarg(char const *command /*NN*/)
 {
     /* as long as the character pointed to by command is not NULL,
      * and it is either alphanumeric, a comma or a closing bracket,
@@ -63,16 +63,14 @@ nextarg(char const *command)
 
 /*
 
-=item C<static const char* skip_ws(const char *str)>
+FUNCDOC: skip_ws
 
 Returns the pointer past any whitespace.
-
-=cut
 
 */
 
 static const char *
-skip_ws(const char *str)
+skip_ws(const char *str /*NN*/)
 {
     /* as long as str is not NULL and it contains space, skip it */
     while (*str && isspace((int) *str))
@@ -83,17 +81,15 @@ skip_ws(const char *str)
 
 /*
 
-=item C<static const char* skip_command(const char *str)>
+FUNCDOC: skip_command
 
 Returns the pointer past the current debugger command. (This is an
 alternative to the C<skip_command()> macro above.)
 
-=cut
-
 */
 
 static const char *
-skip_command(const char *str)
+skip_command(const char *str /*NN*/)
 {
     /* while str is not null and it contains a command (no spaces),
      * skip the character
@@ -262,7 +258,7 @@ parse_command(const char *command, unsigned long *cmdP)
 
 /*
 
-=item C<void PDB_get_command(Interp *interp)>
+FUNCDOC: PDB_get_command
 
 Get a command from the user input to execute.
 
@@ -275,17 +271,15 @@ The user input can't be longer than 255 characters.
 
 The input is saved in C<< pdb->cur_command >>.
 
-=cut
-
 */
 
 void
-PDB_get_command(Interp *interp)
+PDB_get_command(Interp *interp /*NN*/)
 {
     unsigned int  i;
     int           ch;
     char         *c;
-    PDB_t        *pdb = interp->pdb;
+    PDB_t        * const pdb = interp->pdb;
     PDB_line_t   *line;
 
     /* flush the buffered data */
@@ -343,23 +337,20 @@ PDB_get_command(Interp *interp)
 
 /*
 
-=item C<void
-PDB_run_command(Interp *interp, const char *command)>
+FUNCDOC: PDB_run_command
 
 Run a command.
 
 Hash the command to make a simple switch calling the correct handler.
 
-=cut
-
 */
 
 void
-PDB_run_command(Interp *interp, const char *command)
+PDB_run_command(Interp *interp /*NN*/, const char *command /*NN*/)
 {
     unsigned long c;
     const char   *temp;
-    PDB_t        *pdb = interp->pdb;
+    PDB_t        * const pdb = interp->pdb;
 
     /* keep a pointer to the command, in case we need to report an error */
     temp = command;
@@ -2204,19 +2195,16 @@ PDB_print_user_stack(Interp *interp, const char *command)
 
 /*
 
-=item C<void
-PDB_print(Interp *interp, const char *command)>
+FUNCDOC: PDB_print
 
 Print interp registers.
-
-=cut
 
 */
 
 void
-PDB_print(Interp *interp, const char *command)
+PDB_print(Interp *interp /*NN*/, const char *command /*NN*/)
 {
-    const char *s = GDB_P(interp->pdb->debugee, command);
+    const char * const s = GDB_P(interp->pdb->debugee, command);
     PIO_eprintf(interp, "%s\n", s);
 }
 
@@ -2486,7 +2474,7 @@ PDB_backtrace(Interp *interp)
  */
 
 static const char*
-GDB_P(Interp *interp, const char *s) {
+GDB_P(Interp *interp, const char *s /*NN*/) {
     int t, n;
     switch (*s) {
         case 'I': t = REGNO_INT; break;

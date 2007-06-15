@@ -99,8 +99,14 @@ void used_cow( Interp *interp, Small_Object_Pool *pool /*NN*/, int cleanup )
 
 /* HEADERIZER END: src/gc/dod.c */
 
-/* XXX Needs to go into another header */
-void trace_system_areas(Interp *interp /*NN*/);
+
+/* HEADERIZER BEGIN: src/cpu_dep.c */
+
+void trace_system_areas( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: src/cpu_dep.c */
+
 
 #if ! DISABLE_GC_DEBUG
 /* Set when walking the system stack */

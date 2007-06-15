@@ -164,125 +164,62 @@ typedef struct PDB {
     Interp                  *debugee;
 } PDB_t;
 
-void PDB_run_command(Interp *interp, const char *command);
 
-void PDB_get_command(Interp *interp);
+/* HEADERIZER BEGIN: src/debug.c */
 
-void PDB_print(Interp *interp, const char *command);
+long PDB_add_label( PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset );
+void PDB_backtrace( Interp *interp );
+char PDB_break( Interp *interp );
+char PDB_check_condition( Interp *interp, PDB_condition_t *condition );
+opcode_t * PDB_compile( Interp *interp, const char *command );
+PDB_condition_t * PDB_cond( Interp *interp, const char *command );
+void PDB_continue( Interp *interp, const char *command );
+void PDB_delete_breakpoint( Interp *interp, const char *command );
+void PDB_delete_condition( Interp *interp, PDB_breakpoint_t *breakpoint );
+void PDB_disable_breakpoint( Interp *interp, const char *command );
+void PDB_disassemble( Interp *interp, const char *command );
+size_t PDB_disassemble_op( Interp *interp,
+    char *dest,
+    int space,
+    op_info_t *info,
+    opcode_t *op,
+    PDB_file_t *file,
+    opcode_t *code_start,
+    int full_name );
 
-#if 0
-/* XXX TODO reimplement this cruft */
-void PDB_print_int(Interp *interp, struct IReg *int_reg, int regnum);
-void PDB_print_int_frame(Interp *interp,
-                         struct IRegFrame *int_reg, int regnum);
+void PDB_enable_breakpoint( Interp *interp, const char *command );
+char * PDB_escape( const char *string, INTVAL length );
+void PDB_eval( Interp *interp, const char *command );
+int PDB_extend_const_table( Interp *interp );
+PDB_breakpoint_t * PDB_find_breakpoint( Interp *interp, const char *command );
+void PDB_free_file( Interp *interp );
+void PDB_get_command( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
 
-void PDB_print_num(Interp *interp, struct NReg *num_reg, int regnum);
-void PDB_print_num_frame(Interp *interp,
-                         struct NRegFrame *num_reg, int regnum);
+char PDB_hasinstruction( char *c );
+void PDB_help( Interp *interp, const char *command );
+void PDB_info( Interp *interp );
+void PDB_init( Interp *interp, const char *command );
+void PDB_list( Interp *interp, const char *command );
+void PDB_load_source( Interp *interp, const char *command );
+void PDB_next( Interp *interp, const char *command );
+void PDB_print( Interp *interp /*NN*/, const char *command /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void PDB_print_string(Interp *interp,
-                      struct SReg *string_reg, int regnum);
-void PDB_print_string_frame(Interp *interp,
-                            struct SRegFrame *string_reg, int regnum);
+void PDB_print_user_stack( Interp *interp, const char *command );
+char PDB_program_end( Interp *interp );
+void PDB_run_command( Interp *interp /*NN*/, const char *command /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void PDB_print_pmc(Interp *interp,
-                   struct PReg *pmc_reg, int regnum, PMC* key);
-void PDB_print_pmc_frame(Interp *interp,
-                         struct PRegFrame *pmc_reg, int regnum, PMC* key);
-#endif
+void PDB_set_break( Interp *interp, const char *command );
+void PDB_skip_breakpoint( Interp *interp, long i );
+void PDB_trace( Interp *interp, const char *command );
+int PDB_unescape( char *string );
+void PDB_watchpoint( Interp *interp, const char *command );
+/* HEADERIZER END: src/debug.c */
 
-void PDB_debug(Interp *interp);
-
-void PDB_next(Interp *interp, const char *command);
-
-void PDB_trace(Interp *interp, const char *command);
-
-void PDB_eval(Interp *interp, const char *command);
-opcode_t * PDB_compile(Interp *, const char *);
-
-int PDB_extend_const_table(Interp *interp);
-
-void PDB_init(Interp *interp, const char *command);
-
-void PDB_continue(Interp *interp, const char *command);
-
-char PDB_break(Interp *interp);
-
-PDB_breakpoint_t* PDB_find_breakpoint(Interp *interp,
-                                     const char *command);
-
-void PDB_disable_breakpoint(Interp *interp,
-                            const char *command);
-
-void PDB_enable_breakpoint(Interp *interp,
-                           const char *command);
-
-void PDB_delete_breakpoint(Interp *interp,
-    const char *command);
-
-void PDB_delete_condition(Interp *interp,
-                          PDB_breakpoint_t *breakpoint);
-
-void PDB_skip_breakpoint(Interp *interp, long i);
-
-char *PDB_escape(const char *string, INTVAL length);
-
-int PDB_unescape(char *string);
-
-size_t PDB_disassemble_op(Interp *interp,
-                          char* dest, int space,
-                          op_info_t* info, opcode_t* op,
-                          PDB_file_t *file, opcode_t* code_start,
-                          int full_name);
-
-void PDB_disassemble(Interp *interp, const char *command);
-
-long PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset);
-
-void PDB_load_source(Interp *interp, const char *command);
-
-void PDB_free_file(Interp *interp);
-
-void PDB_list(Interp *interp, const char *command);
-
-void PDB_set_break(Interp *interp, const char *command);
-
-PDB_condition_t *PDB_cond(Interp *interp,
-    const char *command);
-
-char PDB_check_condition(Interp *interp,
-    PDB_condition_t *condition);
-
-void PDB_watchpoint(Interp *interp,
-    const char *command);
-
-char PDB_program_end(Interp *interp);
-
-char PDB_hasinstruction(char *);
-
-void PDB_print_stack(Interp *interp,
-    const char *command);
-
-void PDB_print_user_stack(Interp *interp,
-    const char *command);
-
-void PDB_print_stack_int(Interp *interp,
-    const char *command);
-
-void PDB_print_stack_num(Interp *interp,
-    const char *command);
-
-void PDB_print_stack_string(Interp *interp,
-    const char *command);
-
-void PDB_print_stack_pmc(Interp *interp,
-    const char *command);
-
-void PDB_info(Interp *interp);
-
-void PDB_help(Interp *interp, const char *command);
-
-void PDB_backtrace(Interp *interp);
 
 /*
  * These constants correspond to the debugger commands and are

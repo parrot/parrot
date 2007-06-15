@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -20,13 +20,11 @@ Remember you read something about it in F<docs/infant.dev>?
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
+
+/* HEADER: include/parrot/dod.h */
 
 #ifdef __ia64__
 
@@ -98,12 +96,9 @@ trace_system_areas(Interp *interp /*NN*/)
 
 /*
 
-=item C<static void
-trace_system_stack(Interp *interp)>
+FUNCDOC: trace_system_stack
 
 Traces the memory block starting at C<< interp->lo_var_ptr >>.
-
-=cut
 
 */
 
@@ -118,13 +113,9 @@ trace_system_stack(Interp *interp)
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<src/dod.c>, F<include/parrot/dod.h> and F<docs/infant.dev>.
-
-=cut
 
 */
 
