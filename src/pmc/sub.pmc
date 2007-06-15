@@ -279,11 +279,12 @@ Invokes the subroutine.
         /* set context of the sub */
         sub->ctx = context;
 
-        if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
-            /* don't destroy context */
+        /* don't destroy context */
+        if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER)
             ccont->vtable = interp->vtables[enum_class_Continuation];
-            context->ref_count++;
-        }
+
+        /* reference counting should work */
+        context->ref_count++;
 
         if (!PMC_IS_NULL(INTERP->current_object)) {
             context->current_object = INTERP->current_object;
@@ -320,7 +321,7 @@ Invokes the subroutine.
                 PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
                 context->caller_ctx    = caller_ctx->caller_ctx;
 
-                Parrot_free_context(INTERP, caller_ctx, 1);
+                Parrot_free_context(INTERP, caller_ctx, 0);
             }
         }
 

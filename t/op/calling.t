@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 94;
+use Parrot::Test tests => 95;
 
 =head1 NAME
 
@@ -2406,6 +2406,45 @@ pir_output_is( <<'CODE', <<'OUTPUT', "RT #40490 - flat/slurpy named arguments" )
 .end
 CODE
 Have bar: 2
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "Tail call without arguments should not free the context when a closure depends on it" );
+.sub main :main
+    $P0 = create_closure_and_run_it()
+.end
+
+.sub create_closure_and_run_it
+    P0 = new "Integer"
+    P0 = 3
+    .lex "val", P0
+    P2 = get_global "myclosure"
+    P1 = newclosure P2
+    # There is a closure depending on our current context, so this shouldn't
+    # free it.
+    .return P1()
+.end
+
+.sub myclosure :outer(create_closure_and_run_it)
+    P1 = find_lex "val"
+    say P1
+    donothing()
+    P1 = find_lex "val"
+    say P1
+    .return ()
+.end
+
+.sub donothing
+    P0 = new "Integer"
+    P0 = 5
+    # This creates a new binding that is not accessible by the
+    # caller (myclosure)
+    .lex "val", P0
+    P2 = null
+    P1 = null
+.end
+CODE
+3
+3
 OUTPUT
 
 # Local Variables:
