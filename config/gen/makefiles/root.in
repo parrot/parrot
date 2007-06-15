@@ -1836,6 +1836,7 @@ HEADERIZER_O_FILES = \
     src/datatypes.o \
     src/datatypes.o \
     src/debug.o \
+    src/dynext.o \
     src/encoding.o \
     src/exceptions.o \
     src/exit.o \

@@ -10,33 +10,27 @@ src/dynext.c - Dynamic extensions to Parrot
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
+
+/* HEADER: include/parrot/dynext.h */
 
 /* _PARROTLIB is now the default */
 /*#define _PARROTLIB not working: "make testr" */
 
 /*
 
-=item C<static void
-set_cstring_prop(Parrot_Interp interp, PMC *lib_pmc, const char *what,
-        STRING *name)>
+FUNCDOC: set_cstring_prop
 
 Set a property C<name> with value C<what> on the C<ParrotLibrary>
 C<lib_pmc>.
 
-=cut
-
 */
 
 static void
-set_cstring_prop(Parrot_Interp interp, PMC *lib_pmc, const char *what,
+set_cstring_prop(Parrot_Interp interp, PMC *lib_pmc, const char *what /*NN*/,
         STRING *name)
 {
     STRING *key;
@@ -49,13 +43,9 @@ set_cstring_prop(Parrot_Interp interp, PMC *lib_pmc, const char *what,
 
 /*
 
-=item C<static void
-store_lib_pmc(Parrot_Interp interp, PMC* lib_pmc, STRING *path,
-        STRING *type, STRING *lib_name)>
+FUNCDOC: store_lib_pmc
 
 Store a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
-
-=cut
 
 */
 
@@ -78,18 +68,15 @@ store_lib_pmc(Parrot_Interp interp, PMC* lib_pmc, STRING *path,
 
 /*
 
-=item C<static PMC*
-is_loaded(Parrot_Interp interp, STRING *path)>
+FUNCDOC: is_loaded
 
 Check if a C<ParrotLibrary> PMC with the filename path exists.
 If it does, return it. Otherwise, return NULL.
 
-=cut
-
 */
 
 static PMC*
-is_loaded(Parrot_Interp interp, STRING *path)
+is_loaded(Interp *interp /*NN*/, STRING *path)
 {
     PMC * const iglobals = interp->iglobals;
     PMC * const dyn_libs = VTABLE_get_pmc_keyed_int(interp, iglobals,
@@ -101,17 +88,15 @@ is_loaded(Parrot_Interp interp, STRING *path)
 
 /*
 
-=item C<static STRING *
-get_path(Interp *interp, STRING *lib, void **handle, char **lib_name)>
+FUNCDOC: get_path
 
 Return path and handle of a dynamic lib, setting lib_name to just the filestem
 (i.e. without path or extension) as a freshly-allocated C string.
 
-=cut
-
 */
 
-static STRING * get_path(Interp *interp, STRING *lib, void **handle,
+static STRING *
+get_path(Interp *interp /*NN*/, STRING *lib, void **handle /*NN*/,
                          STRING *wo_ext, STRING *ext)
 {
     STRING *path, *full_name;
@@ -205,8 +190,7 @@ static STRING * get_path(Interp *interp, STRING *lib, void **handle,
 
 /*
 
-=item C<PMC *
-Parrot_load_lib(Interp *interp, STRING *lib, PMC *initializer)>
+FUNCDOC: Parrot_load_lib
 
 Dynamic library loader.
 
@@ -225,14 +209,13 @@ condition, an exception should be thrown.
 
 TODO: fetch Parrot_lib load/init handler exceptions
 
-=cut
-
 */
 
+PARROT_API
 PMC *
 Parrot_init_lib(Interp *interp,
-                PMC *(*load_func)(Interp *),
-                void (*init_func)(Interp *, PMC *))
+                PMC *(*load_func)(Interp *) /*NULLOK*/,
+                void (*init_func)(Interp *, PMC *) /*NULLOK*/)
 {
     PMC *lib_pmc = NULL;
 
@@ -258,12 +241,14 @@ Parrot_init_lib(Interp *interp,
     return lib_pmc;
 }
 
-static PMC *run_init_lib(Interp *interp, void *handle,
-                         STRING *lib_name, STRING *wo_ext) {
-    STRING *load_func_name, *init_func_name, *type;
+static PMC *
+run_init_lib(Interp *interp, void *handle,
+                         STRING *lib_name /*NN*/, STRING *wo_ext)
+{
+    STRING *type;
     PMC *(*load_func)(Interp *);
     void (*init_func)(Interp *, PMC *);
-    char *cinit_func_name, *cload_func_name;
+    char *cinit_func_name;
     PMC *lib_pmc;
 
     /*
@@ -273,9 +258,11 @@ static PMC *run_init_lib(Interp *interp, void *handle,
     Parrot_block_DOD(interp);
     /* get load_func */
     if (lib_name != NULL) {
-        load_func_name = Parrot_sprintf_c(interp, "Parrot_lib_%Ss_load",
+        STRING * const load_func_name = Parrot_sprintf_c(interp, "Parrot_lib_%Ss_load",
                                           lib_name);
-        cload_func_name = string_to_cstring(interp, load_func_name);
+        char * const cload_func_name = string_to_cstring(interp, load_func_name);
+        STRING *init_func_name;
+
         load_func = (PMC * (*)(Interp *))D2FPTR(Parrot_dlsym(handle,
                     cload_func_name));
         string_cstring_free(cload_func_name);
@@ -314,43 +301,39 @@ static PMC *run_init_lib(Interp *interp, void *handle,
     return lib_pmc;
 }
 
-static
-STRING *clone_string_into(Interp *d, Interp *s, PMC *value) {
-    STRING *orig;
-    STRING *ret;
-    char *raw_str;
-    orig = VTABLE_get_string(s, value);
-    raw_str = string_to_cstring(s, orig);
-    ret = string_make_direct(d, raw_str, strlen(raw_str),
+static STRING *
+clone_string_into(Interp *d, Interp *s, PMC *value) {
+    STRING * const orig = VTABLE_get_string(s, value);
+    char * const raw_str = string_to_cstring(s, orig);
+    STRING * const ret =
+        string_make_direct(d, raw_str, strlen(raw_str),
             PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
             PObj_constant_FLAG);
     string_cstring_free(raw_str);
     return ret;
 }
 
-static PMC *make_string_pmc(Interp *interp, STRING *string) {
-    PMC *ret;
-    ret = VTABLE_new_from_string(interp,
+static PMC *
+make_string_pmc(Interp *interp /*NN*/, STRING *string)
+{
+    PMC * const ret = VTABLE_new_from_string(interp,
         interp->vtables[enum_class_String]->pmc_class,
         string, PObj_constant_FLAG);
     return ret;
 }
 
+PARROT_API
 PMC *
-Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc) {
-    STRING *wo_ext;
-    STRING *lib_name;
-    STRING *type;
-    void *handle;
-
-    wo_ext = clone_string_into(d, s, VTABLE_getprop(s, lib_pmc,
+Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc)
+{
+    STRING * const wo_ext = clone_string_into(d, s, VTABLE_getprop(s, lib_pmc,
         const_string(s, "_filename")));
-    lib_name = clone_string_into(d, s, VTABLE_getprop(s, lib_pmc,
+    STRING * const lib_name = clone_string_into(d, s, VTABLE_getprop(s, lib_pmc,
         const_string(s, "_lib_name")));
-    handle = PMC_data(lib_pmc);
-
-    type = VTABLE_get_string(s,
+    void * const handle = PMC_data(lib_pmc);
+    STRING * const type = VTABLE_get_string(s,
         VTABLE_getprop(s, lib_pmc, const_string(s, "_type")));
+
     if (0 == string_equal(s, type, const_string(s, "Ops"))) {
         PMC *new_lib_pmc;
 
@@ -390,8 +373,9 @@ Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc) {
     }
 }
 
+PARROT_API
 PMC *
-Parrot_load_lib(Interp *interp, STRING *lib, PMC *initializer)
+Parrot_load_lib(Interp *interp /*NN*/, STRING *lib /*NULLOK*/, PMC *initializer)
 {
     void * handle;
     PMC *lib_pmc;
@@ -433,8 +417,6 @@ Parrot_load_lib(Interp *interp, STRING *lib, PMC *initializer)
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/dynext.h> and F<src/pmc/parrotlibrary.pmc>.
@@ -442,8 +424,6 @@ F<include/parrot/dynext.h> and F<src/pmc/parrotlibrary.pmc>.
 =head1 HISTORY
 
 Initial rev by leo 2003.08.06.
-
-=cut
 
 */
 
