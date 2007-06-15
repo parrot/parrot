@@ -557,7 +557,7 @@ Creates and returns a constant Parrot string.
 
 PARROT_API
 STRING *
-const_string(Interp *interp, const char *buffer /*NN*/)
+const_string(Interp *interp /*NN*/, const char *buffer /*NN*/)
 {
     /* TODO cache the strings */
     return string_make_direct(interp, buffer, strlen(buffer),
@@ -615,7 +615,7 @@ string_make(Interp *interp /*NN*/, const char *buffer /*NULLOK*/,
 
 PARROT_API
 STRING *
-string_make_direct(Interp *interp, const char *buffer /*NULLOK*/, UINTVAL len,
+string_make_direct(Interp *interp /*NN*/, const char *buffer /*NULLOK*/, UINTVAL len,
         ENCODING *encoding /*NN*/, CHARSET *charset /*NN*/, UINTVAL flags)
 {
     STRING * const s = new_string_header(interp, flags);

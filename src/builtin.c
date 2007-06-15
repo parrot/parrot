@@ -12,16 +12,14 @@ src/builtin.c - Builtin Methods
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 #include "parrot/compiler.h"
 #include "builtin.str"
 #include <assert.h>
+
+/* HEADER: include/parrot/builtin.h */
 
 
 typedef struct _builtin {
@@ -84,24 +82,22 @@ static Builtins builtins[] = {
 
 /*
 
-=item C<void Parrot_init_builtins(Interp *)>
+FUNCDOC: Parrot_init_builtins
 
 Initialize the builtins structure.
 
-=item C<int Parrot_is_builtin(Interp *, char *func, char *sig)>
+FUNCDOC: Parrot_is_builtin
 
 Return the index of the builtin or -1 on failure.
 
-=item C<PMC* Parrot_find_builtin(Interp *, STRING *func)>
+FUNCDOC: Parrot_find_builtin
 
 Return the NCI PMC of the builtin or NULL.
-
-=cut
 
 */
 
 void
-Parrot_init_builtins(Interp *interp)
+Parrot_init_builtins(Interp *interp /*NN*/)
 {
     size_t i;
     char buffer[128];
@@ -164,11 +160,10 @@ find_builtin_s(Interp *interp, STRING *func /*NN*/)
     int low  = 0;
     int high = N_BUILTINS - 1;
 
-    /* binary search */
-    while (low <= high)
-    {
-        int i   = (low + high) / 2;
-        int cmp = string_compare(interp, func, builtins[i].meth_name);
+    /* binary search */ /* XXX isn't there a standard C func for this? */
+    while (low <= high) {
+        const int i   = (low + high) / 2;
+        const int cmp = string_compare(interp, func, builtins[i].meth_name);
 
         if (!cmp)
             return i;
@@ -214,7 +209,8 @@ check_builtin_sig(Interp *interp, size_t i,
 }
 
 int
-Parrot_is_builtin(Interp *interp, const char *func, const char *sig)
+Parrot_is_builtin(Interp *interp, const char *func /*NN*/, const char *sig)
+    /* WARN_UNUSED */
 {
     int bi, i, pass;
 
@@ -241,7 +237,8 @@ again:
 }
 
 PMC*
-Parrot_find_builtin(Interp *interp, STRING *func)
+Parrot_find_builtin(Interp *interp, STRING *func /*NN*/)
+    /* WARN_UNUSED */
 {
     const int i = find_builtin_s(interp, func);
     if (i < 0)
@@ -277,13 +274,9 @@ Parrot_builtin_is_void(Interp *interp, int bi)
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<ops/math.ops>
-
-=cut
 
 */
 

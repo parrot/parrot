@@ -21,7 +21,9 @@
 
 /* HEADERIZER BEGIN: src/string.c */
 
-PARROT_API STRING * const_string( Interp *interp, const char *buffer /*NN*/ )
+PARROT_API STRING * const_string( Interp *interp /*NN*/,
+    const char *buffer /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API STRING * int_to_str( Interp *interp /*NN*/,
@@ -212,12 +214,13 @@ PARROT_API STRING * string_make( Interp *interp /*NN*/,
     UINTVAL flags )
         __attribute__nonnull__(1);
 
-PARROT_API STRING * string_make_direct( Interp *interp,
+PARROT_API STRING * string_make_direct( Interp *interp /*NN*/,
     const char *buffer /*NULLOK*/,
     UINTVAL len,
     ENCODING *encoding /*NN*/,
     CHARSET *charset /*NN*/,
     UINTVAL flags )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 

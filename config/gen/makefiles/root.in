@@ -1822,13 +1822,13 @@ tags.dummy:
 
 HEADERIZER_O_FILES = \
     $(INTERP_O_FILES) \
-    $(CLASS_O_FILES) \
 
 # Slowing working my way up to having everything headerized in $(HEADERIZER_O_FILES)
 HEADERIZER_O_FILES = \
     $(CHARSET_O_FILES) \
     $(ENCODING_O_FILES) \
     $(IO_O_FILES) \
+    src/builtin.o \
     src/byteorder.o \
     src/charset.o \
     src/datatypes.o \
