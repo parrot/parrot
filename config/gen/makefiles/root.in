@@ -1838,6 +1838,7 @@ HEADERIZER_O_FILES = \
     src/debug.o \
     src/dynext.o \
     src/encoding.o \
+    src/events.o \
     src/exceptions.o \
     src/exit.o \
     src/fingerprint.o \

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -12,26 +12,22 @@ This file implements the Parrot embedding interface.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/oplib/ops.h"
 
+/* HEADER: include/parrot/embed.h */
+
 /*
 
-=item C<Parrot_Interp Parrot_new(Parrot_Interp parent)>
+FUNCDOC: Parrot_new
 
 Returns a new Parrot interpreter.
 
 The first created interpreter (C<parent> is C<NULL>) is the last one
 to get destroyed.
-
-=cut
 
 */
 
@@ -41,6 +37,8 @@ to get destroyed.
 #  endif /* EXEC_CAPABLE */
 #  include "jit.h"
 #endif
+
+PARROT_API
 Parrot_Interp
 Parrot_new(Parrot_Interp parent)
 {
@@ -48,11 +46,11 @@ Parrot_new(Parrot_Interp parent)
     return make_interpreter(parent, PARROT_NO_FLAGS);
 }
 
-extern void Parrot_initialize_core_pmcs(Interp *interp);
+extern void Parrot_initialize_core_pmcs(Parrot_Interp interp);
 
 /*
 
-=item C<void Parrot_init(Interp *interp)>
+FUNCDOC: Parrot_init
 
 Initializes the new interpreter. This function only has effect the first
 time it is called. Therefore Parrot_init() doesn't have to be called
@@ -61,7 +59,7 @@ on an interpreter returned from Parrot_new().
 Use this function when you intend to enter the run loop,
 which automatically sets the top of stack pointer.
 
-=item C<void Parrot_init_stacktop(Interp *interp, void *stack_top)>
+FUNCDOC: Parrot_init_stacktop
 
 Like above. Additionally sets the stack top, so that Parrot objects created
 in inner stack frames will be visible during DODs stack walking code.
@@ -71,12 +69,12 @@ frames so that they are not destroyed during DOD runs.
 
 Use this function when you call into Parrot before entering a run loop.
 
-=cut
-
 */
 
+/* XXX Parrot_init() should be removed, no longer required for embedders */
+PARROT_API
 void
-Parrot_init(Interp *interp)
+Parrot_init(Parrot_Interp interp /*NN*/)
 {
     if (!interp->world_inited) {
         /* global_setup.c:init_world sets up some vtable stuff.
@@ -88,8 +86,9 @@ Parrot_init(Interp *interp)
     }
 }
 
+PARROT_API
 void
-Parrot_init_stacktop(Interp *interp, void *stack_top)
+Parrot_init_stacktop(Parrot_Interp interp /*NN*/, void *stack_top)
 {
     interp->lo_var_ptr = stack_top;
     Parrot_init(interp);
@@ -97,7 +96,7 @@ Parrot_init_stacktop(Interp *interp, void *stack_top)
 
 /*
 
-=item C<void Parrot_set_flag(Interp *interp, INTVAL flag)>
+FUNCDOC: Parrot_set_flag
 
 Sets a flag in the interpreter specified by C<flag>, any of
 C<PARROT_BOUNDS_FLAG>, or C<PARROT_PROFILE_FLAG> to enable profiling, and
@@ -106,20 +105,19 @@ C<PARROT_THR_TYPE_3> to disable thread communication and variable sharing,
 disable variable sharing but enable thread communication, or to enable variable
 sharing.
 
-=item C<void Parrot_set_debug(Interp *interp, UINTVAL flag)>
+FUNCDOC: Parrot_set_debug
 
 Set a debug flag: C<PARROT_DEBUG_FLAG>.
 
-=item C<void Parrot_set_trace(Interp *interp, UINTVAL flag)>
+FUNCDOC: Parrot_set_trace
 
 Set a trace flag: C<PARROT_TRACE_FLAG>
 
-=cut
-
 */
 
+PARROT_API
 void
-Parrot_set_flag(Interp *interp, INTVAL flag)
+Parrot_set_flag(Parrot_Interp interp /*NN*/, INTVAL flag)
 {
     /* These two macros (from interpreter.h) do exactly what they look like. */
 
@@ -134,117 +132,121 @@ Parrot_set_flag(Interp *interp, INTVAL flag)
     }
 }
 
+PARROT_API
 void
-Parrot_set_debug(Interp *interp, UINTVAL flag)
+Parrot_set_debug(Parrot_Interp interp /*NN*/, UINTVAL flag)
 {
     interp->debug_flags |= flag;
 }
 
+PARROT_API
 void
-Parrot_set_trace(Interp *interp, UINTVAL flag)
+Parrot_set_trace(Parrot_Interp interp /*NN*/, UINTVAL flag)
 {
-
     CONTEXT(interp->ctx)->trace_flags |= flag;
     Interp_core_SET(interp, PARROT_SLOW_CORE);
 }
 
 /*
 
-=item C<void Parrot_clear_flag(Interp *, INTVAL flag)>
-
-=item C<void Parrot_clear_debug(Interp *, UINTVAL flag)>
-
-=item C<void Parrot_clear_trace(Interp *, UINTVAL flag)>
+FUNCDOC: Parrot_clear_flag
 
 Clears a flag in the interpreter.
 
-=cut
+FUNCDOC: Parrot_clear_debug
+
+Clears a flag in the interpreter.
+
+FUNCDOC: Parrot_clear_trace
+
+Clears a flag in the interpreter.
 
 */
 
+PARROT_API
 void
 Parrot_clear_flag(Parrot_Interp interp, INTVAL flag)
 {
     Interp_flags_CLEAR(interp, flag);
 }
 
+PARROT_API
 void
-Parrot_clear_debug(Interp *interp, UINTVAL flag)
+Parrot_clear_debug(Parrot_Interp interp /*NN*/, UINTVAL flag)
 {
     interp->debug_flags &= ~flag;
 }
 
+PARROT_API
 void
-Parrot_clear_trace(Interp *interp, UINTVAL flag)
+Parrot_clear_trace(Parrot_Interp interp /*NN*/, UINTVAL flag)
 {
     CONTEXT(interp->ctx)->trace_flags &= ~flag;
 }
 
 /*
 
-=item C<Parrot_Int
-Parrot_test_flag(Interp*, INTVAL flag)>
-
-=item C<UINTVAL
-Parrot_test_debug(Interp*, UINTVAL flag)>
-
-=item C<UINTVAL
-Parrot_test_trace(Interp*, UINTVAL flag)>
+FUNCDOC: Parrot_test_flag
 
 Test the interpreter flags specified in C<flag>.
 
-=cut
+FUNCDOC: Parrot_test_debug
+
+Test the interpreter flags specified in C<flag>.
+
+FUNCDOC: Parrot_test_trace
+
+Test the interpreter flags specified in C<flag>.
 
 */
 
+PARROT_API
 Parrot_Int
-Parrot_test_flag(Interp* interp, INTVAL flag)
+Parrot_test_flag(Interp* interp /*NN*/, INTVAL flag)
 {
     return Interp_flags_TEST(interp, flag);
 }
 
+PARROT_API
 UINTVAL
-Parrot_test_debug(Interp *interp, UINTVAL flag)
+Parrot_test_debug(Parrot_Interp interp /*NN*/, UINTVAL flag)
 {
     return interp->debug_flags & flag;
 }
 
+PARROT_API
 UINTVAL
-Parrot_test_trace(Interp *interp, UINTVAL flag)
+Parrot_test_trace(Parrot_Interp interp /*NN*/, UINTVAL flag)
 {
     return CONTEXT(interp->ctx)->trace_flags & flag;
 }
 
 /*
 
-=item C<void
-Parrot_set_run_core(Interp *interp, Parrot_Run_core_t core)>
+FUNCDOC: Parrot_set_run_core
 
 Sets the specified run core.
 
-=cut
-
 */
 
+PARROT_API
 void
-Parrot_set_run_core(Interp *interp, Parrot_Run_core_t core)
+Parrot_set_run_core(Parrot_Interp interp /*NN*/, Parrot_Run_core_t core)
 {
     Interp_core_SET(interp, core);
 }
 
 /*
 
-=item C<void
-Parrot_setwarnings(Interp *interp, Parrot_warnclass wc)>
+FUNCDOC: Parrot_setwarnings
 
 Activates the given warnings.
 
-=cut
-
 */
 
+PARROT_API
 void
-Parrot_setwarnings(Interp *interp, Parrot_warnclass wc)
+Parrot_setwarnings(Parrot_Interp interp /*NN*/, Parrot_warnclass wc)
 {
     /* Activates the given warnings.  (Macro from warnings.h.) */
     PARROT_WARNINGS_on(interp, wc);
@@ -252,17 +254,15 @@ Parrot_setwarnings(Interp *interp, Parrot_warnclass wc)
 
 /*
 
-=item C<PackFile *
-Parrot_readbc(Interp *interp, const char *filename)>
+FUNCDOC: Parrot_readbc
 
 Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 
-=cut
-
 */
 
+PARROT_API
 PackFile *
-Parrot_readbc(Interp *interp, const char *fullname /*NULLOK*/)
+Parrot_readbc(Parrot_Interp interp, const char *fullname /*NULLOK*/)
 {
     INTVAL program_size, wanted;
     char *program_code;
@@ -420,17 +420,15 @@ again:
 
 /*
 
-=item C<void
-Parrot_loadbc(Interp *interp, PackFile *pf)>
+FUNCDOC: Parrot_loadbc
 
 Loads the C<PackFile> returned by C<Parrot_readbc()>.
 
-=cut
-
 */
 
+PARROT_API
 void
-Parrot_loadbc(Interp *interp, PackFile *pf)
+Parrot_loadbc(Parrot_Interp interp /*NN*/, PackFile *pf /*NULLOK*/)
 {
     if (pf == NULL) {
         PIO_eprintf(interp, "Invalid packfile\n");
@@ -442,17 +440,14 @@ Parrot_loadbc(Interp *interp, PackFile *pf)
 
 /*
 
-=item C<static PMC*
-setup_argv(Interp *interp, int argc, char ** argv)>
+FUNCDOC: setup_argv
 
 Creates and returns C<ARGS> array PMC.
-
-=cut
 
 */
 
 static PMC*
-setup_argv(Interp *interp, int argc, char ** argv)
+setup_argv(Parrot_Interp interp, int argc, char ** argv)
 {
     INTVAL i;
     PMC *userargv;
@@ -486,17 +481,14 @@ setup_argv(Interp *interp, int argc, char ** argv)
 
 /*
 
-=item C<static int
-prof_sort_f(const void *a, const void *b)>
+FUNCDOC: prof_sort_f
 
 Sort function for profile data. Sorts by time.
-
-=cut
 
 */
 
 static int
-prof_sort_f(const void *a, const void *b)
+prof_sort_f(const void *a /*NN*/, const void *b /*NN*/)
 {
     const ProfData *pa = (const ProfData *) a;
     const ProfData *pb = (const ProfData *) b;
@@ -509,17 +501,14 @@ prof_sort_f(const void *a, const void *b)
 
 /*
 
-=item C<static const char *
-op_name(Parrot_Interp interp, int k)>
+FUNCDOC: op_name
 
 Returns the name of the opcode.
-
-=cut
 
 */
 
 static const char *
-op_name(Parrot_Interp interp, int k)
+op_name(Parrot_Interp interp /*NN*/, int k)
 {
     switch (k) {
         case PARROT_PROF_DOD_p1:
@@ -542,18 +531,15 @@ op_name(Parrot_Interp interp, int k)
 
 /*
 
-=item C<static FLOATVAL
-calibrate(Parrot_Interp interp)>
+FUNCDOC: calibrate
 
 With this calibration, reported times of C<parrot -p> almost match those
 measured with time C<parrot -b>.
 
-=cut
-
 */
 
 static FLOATVAL
-calibrate(Parrot_Interp interp)
+calibrate(Parrot_Interp interp /*NN*/)
 {
     size_t n = interp->op_count;
     size_t i;
@@ -572,32 +558,31 @@ calibrate(Parrot_Interp interp)
 
 /*
 
-=item C<static void print_profile(Interp*, int status, void *p)>
+FUNCDOC: print_profile
 
 Prints out a profile listing.
-
-=cut
 
 */
 
 static void
-print_profile(Interp *interp, int status, void *p)
+print_profile(Parrot_Interp interp /*NN*/, int status, void *p)
 {
-    if (interp->profile != NULL) {
+    RunProfile * const profile = interp->profile;
+
+    if (profile) {
         UINTVAL j;
         int k;
         int jit;
         UINTVAL op_count = 0;
         UINTVAL call_count = 0;
         FLOATVAL sum_time = 0.0;
-        RunProfile *profile = interp->profile;
         FLOATVAL empty = calibrate(interp);
 
         PIO_printf(interp,
                    " Code J Name                         "
                    "Calls  Total/s       Avg/ms\n");
         for (j = 0; j < interp->op_count + PARROT_PROF_EXTRA; j++) {
-            UINTVAL n = profile->data[j].numcalls;
+            const UINTVAL n = profile->data[j].numcalls;
             profile->data[j].op = j;
             if (j >= PARROT_PROF_EXTRA) {
                 profile->data[j].time -= empty * n;
@@ -609,9 +594,11 @@ print_profile(Interp *interp, int status, void *p)
                 PARROT_PROF_EXTRA,
                 sizeof (ProfData), prof_sort_f);
         for (j = 0; j < interp->op_count + PARROT_PROF_EXTRA; j++) {
-            UINTVAL n = profile->data[j].numcalls;
-            FLOATVAL t = profile->data[j].time;
+            const UINTVAL n = profile->data[j].numcalls;
+
             if (n > 0) {
+                const FLOATVAL t = profile->data[j].time;
+
                 op_count++;
                 call_count += n;
                 sum_time += t;
@@ -644,16 +631,14 @@ print_profile(Interp *interp, int status, void *p)
 
 /*
 
-=item C<static void print_debug(Interp*, int status, void *p)>
+FUNCDOC: print_debug
 
 Prints GC info.
-
-=cut
 
 */
 
 static void
-print_debug(Interp *interp, int status, void *p)
+print_debug(Parrot_Interp interp /*NN*/, int status, void *p)
 {
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
         /* Give the souls brave enough to activate debugging an earful
@@ -665,25 +650,23 @@ print_debug(Interp *interp, int status, void *p)
 }
 
 static PMC*
-set_current_sub(Interp *interp)
+set_current_sub(Parrot_Interp interp /*NN*/)
 {
     opcode_t i, ci;
-    PackFile_ByteCode *cur_cs;
-    PackFile_FixupTable *ft;
-    PackFile_ConstTable *ct;
     Parrot_sub *sub;
     PMC *sub_pmc;
     opcode_t *code_start;
     size_t offs;
+
+    PackFile_ByteCode * const cur_cs = interp->code;
+    PackFile_FixupTable * const ft = cur_cs->fixups;
+    PackFile_ConstTable * const ct = cur_cs->const_table;
 
     /*
      * Walk the fixup table.  The first Sub-like entry should be our
      * entry point with the address at our resume_offset.
      */
 
-    cur_cs = interp->code;
-    ft = cur_cs->fixups;
-    ct = cur_cs->const_table;
     for (i = 0; i < ft->fixup_count; i++) {
         switch (ft->fixups[i]->type) {
             case enum_fixup_sub:
@@ -713,24 +696,22 @@ set_current_sub(Interp *interp)
 
 /*
 
-=item C<void
-Parrot_runcode(Interp *interp, int argc, char *argv[])>
+FUNCDOC: Parrot_runcode
 
 Sets up C<ARGV> and runs the ops.
 
-=cut
-
 */
 
+PARROT_API
 void
-Parrot_runcode(Interp *interp, int argc, char *argv[])
+Parrot_runcode(Parrot_Interp interp /*NN*/, int argc, char *argv[])
 {
     PMC *userargv, *main_sub;
 
-        if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
-            PIO_eprintf(interp,
-                    "*** Parrot VM: Setting stack top. ***\n");
-        }
+    if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
+        PIO_eprintf(interp,
+                "*** Parrot VM: Setting stack top. ***\n");
+    }
     /* Debugging mode nonsense. */
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
         if (Interp_flags_TEST(interp, PARROT_BOUNDS_FLAG)) {
@@ -806,23 +787,20 @@ Parrot_runcode(Interp *interp, int argc, char *argv[])
 
 /*
 
-=item C<void
-Parrot_debug(Interp *interp, int argc, char **argv)>
+FUNCDOC: Parrot_debug
 
 Runs the interpreter's bytecode in debugging mode.
 
-=cut
-
 */
 
+PARROT_API
 opcode_t *
-Parrot_debug(Interp *debugger, opcode_t * pc)
+Parrot_debug(Parrot_Interp debugger /*NN*/, opcode_t * pc)
 {
-    PDB_t *pdb;
     const char *command;
-    Interp *interp;
+    Parrot_Interp interp;
 
-    pdb = debugger->pdb;
+    PDB_t * const pdb = debugger->pdb;
 
     pdb->cur_opcode = pc;
 
@@ -844,19 +822,17 @@ Parrot_debug(Interp *debugger, opcode_t * pc)
 
 /*
 
-=item C<void
-Parrot_disassemble(Interp *interp)>
+FUNCDOC: Parrot_disassemble
 
 Disassembles and prints out the interpreter's bytecode.
 
 This is used by the Parrot disassembler.
 
-=cut
-
 */
 
+PARROT_API
 void
-Parrot_disassemble(Interp *interp)
+Parrot_disassemble(Parrot_Interp interp /*NN*/)
 {
     char       *c;
     PDB_t      *pdb             = mem_allocate_zeroed_typed(PDB_t);
@@ -926,8 +902,7 @@ Parrot_disassemble(Interp *interp)
 
 /*
 
-=item C<void
-Parrot_run_native(Parrot_Interp interp, native_func_t func)>
+FUNCDOC: Parrot_run_native
 
 Run the C function C<func> through the program C<[enternative, end]>.
 This ensures that the function is run with the same setup as in other
@@ -936,12 +911,11 @@ run loops.
 This function is used in some of the source tests in F<t/src> which use
 the interpreter outside a runloop.
 
-=cut
-
 */
 
+PARROT_API
 void
-Parrot_run_native(Parrot_Interp interp, native_func_t func)
+Parrot_run_native(Parrot_Interp interp /*NN*/, native_func_t func)
 {
     static opcode_t program_code[2];
     PackFile *          pf;
@@ -964,8 +938,6 @@ Parrot_run_native(Parrot_Interp interp, native_func_t func)
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/embed.h> and F<docs/embed.pod>.
@@ -973,8 +945,6 @@ F<include/parrot/embed.h> and F<docs/embed.pod>.
 =head1 HISTORY
 
 Initial version by Brent Dax on 2002.1.28.
-
-=cut
 
 */
 

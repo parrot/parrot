@@ -244,20 +244,17 @@ callback_CD(Parrot_Interp interp, char *external_data, PMC *user_data)
 
 /*
 
-=item C<void
-Parrot_run_callback(Parrot_Interp interp,
-                    PMC* user_data, void* external_data)>
+FUNCDOC: Parrot_run_callback
 
 Run a callback function. The PMC* user_data holds all
 necessary items in its properties.
 
-=cut
-
 */
 
+PARROT_API
 void
-Parrot_run_callback(Parrot_Interp interp,
-                    PMC* user_data, char* external_data)
+Parrot_run_callback(Interp *interp /*NN*/,
+        PMC* user_data, char* external_data)
 {
     PMC *    signature;
     PMC *    sub;

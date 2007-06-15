@@ -1,5 +1,5 @@
 /* events.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -74,32 +74,60 @@ typedef struct parrot_event {
 } parrot_event;
 
 struct QUEUE_ENTRY;
-PARROT_API void Parrot_schedule_event(Parrot_Interp, parrot_event*);
-PARROT_API void Parrot_schedule_interp_event(Parrot_Interp, parrot_event*);
-PARROT_API void Parrot_schedule_interp_qentry(Parrot_Interp, struct QUEUE_ENTRY* entry);
 
 #define CHECK_EVENTS(i, n)  (opcode_t *)Parrot_do_check_events(i, n)
 #define HANDLE_EVENTS(i, n) (opcode_t *)Parrot_do_handle_events(i, 1, n)
 
-PARROT_API void Parrot_init_signals(void);
-PARROT_API void Parrot_init_events(Parrot_Interp);
-PARROT_API opcode_t * Parrot_do_check_events(Parrot_Interp, opcode_t *);
-PARROT_API opcode_t * Parrot_do_handle_events(Parrot_Interp, int, opcode_t *);
+/* HEADERIZER BEGIN: src/events.c */
 
-PARROT_API void Parrot_new_timer_event(Parrot_Interp, PMC*, FLOATVAL,
-        FLOATVAL, int, PMC*, parrot_event_type_enum);
-PARROT_API void Parrot_del_timer_event(Parrot_Interp, PMC* timer);
-PARROT_API void Parrot_new_terminate_event(Parrot_Interp);
-PARROT_API void Parrot_new_suspend_for_gc_event(Parrot_Interp);
-PARROT_API void disable_event_checking(Parrot_Interp);
-PARROT_API void enable_event_checking(Parrot_Interp);
+PARROT_API void Parrot_del_timer_event( Interp *interp, PMC *timer );
+PARROT_API opcode_t * Parrot_do_check_events( Interp *interp, opcode_t *next );
+PARROT_API opcode_t * Parrot_do_handle_events( Interp *interp /*NN*/,
+    int restore,
+    opcode_t *next )
+        __attribute__nonnull__(1);
 
-PARROT_API void Parrot_new_cb_event(Parrot_Interp, PMC* cbi, char *ext);
-PARROT_API void Parrot_run_callback(Parrot_Interp, PMC* cbi, char *ext);
+PARROT_API void Parrot_event_add_io_event( Interp *interp,
+    PMC *pio,
+    PMC *sub,
+    PMC *data,
+    INTVAL which );
 
-PARROT_API void Parrot_kill_event_loop(void);
-PARROT_API opcode_t * Parrot_sleep_on_event(Parrot_Interp, FLOATVAL t,
-                                                           opcode_t *next);
+PARROT_API void Parrot_init_events( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+PARROT_API void Parrot_init_signals( void );
+PARROT_API void Parrot_kill_event_loop( void );
+PARROT_API void Parrot_new_cb_event( Interp *interp /*NN*/,
+    PMC *cbi,
+    char *ext )
+        __attribute__nonnull__(1);
+
+PARROT_API void Parrot_new_terminate_event( Interp *interp );
+PARROT_API void Parrot_new_timer_event( Interp *interp,
+    PMC *timer,
+    FLOATVAL diff,
+    FLOATVAL interval,
+    int repeat,
+    PMC *sub,
+    parrot_event_type_enum typ );
+
+PARROT_API void Parrot_schedule_event( Interp *interp,
+    parrot_event* ev /*NN*/ )
+        __attribute__nonnull__(2);
+
+PARROT_API void Parrot_schedule_interp_qentry( Interp *interp /*NN*/,
+    struct QUEUE_ENTRY *entry /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API opcode_t * Parrot_sleep_on_event( Interp *interp /*NN*/,
+    FLOATVAL t,
+    opcode_t *next )
+        __attribute__nonnull__(1);
+
+void Parrot_schedule_broadcast_qentry( struct QUEUE_ENTRY *entry );
+/* HEADERIZER END: src/events.c */
 
 /* &gen_from_enum(io_thr_msg.pasm) */
 typedef enum {
@@ -108,9 +136,6 @@ typedef enum {
     IO_THR_MSG_ADD_SELECT_RD
 } io_thread_msg_type;
 /* &end_gen */
-
-PARROT_API void Parrot_event_add_io_event(Interp*,
-        PMC* pio, PMC* sub, PMC* data, INTVAL which);
 
 #endif /* PARROT_EVENTS_H_GUARD */
 

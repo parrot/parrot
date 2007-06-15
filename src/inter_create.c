@@ -77,19 +77,16 @@ setup_default_compreg(Parrot_Interp interp)
 
 /*
 
-=item C<Parrot_Interp
-make_interpreter(Parrot_Interp parent, INTVAL flags)>
+FUNCDOC: make_interpreter
 
 Create the Parrot interpreter. Allocate memory and clear the registers.
-
-=cut
 
 */
 
 void Parrot_really_destroy(Interp *, int exit_code, void *);
 
 Parrot_Interp
-make_interpreter(Parrot_Interp parent, INTVAL flags)
+make_interpreter(Interp *parent /*NULLOK*/, INTVAL flags)
 {
     Interp *interp;
 #if EXEC_CAPABLE
@@ -259,18 +256,16 @@ make_interpreter(Parrot_Interp parent, INTVAL flags)
 
 /*
 
-=item C<void
-Parrot_destroy(Interp *interp)>
+FUNCDOC: Parrot_destroy
 
 Does nothing if C<ATEXIT_DESTROY> is defined. Otherwise calls
 C<Parrot_really_destroy()> with exit code 0.
 
 This function is not currently used.
 
-=cut
-
 */
 
+PARROT_API
 void
 Parrot_destroy(Interp *interp)
 {
