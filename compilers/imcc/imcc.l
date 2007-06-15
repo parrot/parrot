@@ -73,6 +73,16 @@ static void include_file (Interp* interp, char *file_name, void *yyscanner);
       return token;                          \
   } while (0)
 
+#define DUP_AND_RET_FREE(valp, token)        \
+  do {                                       \
+      if (valp) {                            \
+          if ((valp)->s)                     \
+              mem_sys_free((valp)->s);       \
+          (valp)->s = str_dup(yytext);       \
+          return token;                      \
+      }                                      \
+  } while (0)
+
 %}
 
 %option reentrant
@@ -446,7 +456,8 @@ SP              [ ]
         if (type > 0) {
             char *buf = (char*)malloc(16);
             sprintf(buf, "%d", type);
-            valp->s = buf;
+            valp->s = str_dup(buf);
+            mem_sys_free(buf);
             free(macro_name);
             return INTC;
         }
@@ -588,7 +599,8 @@ SP              [ ]
         label = (char*)mem_sys_allocate(strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 15);
         sprintf(label, "local__%s__%s__$", IMCC_INFO(interp)->cur_macro_name, yytext+2);
 
-        valp->s = label;
+        valp->s = str_dup(label);
+        mem_sys_free(label);
     }
 
     return IDENTIFIER;
@@ -685,9 +697,8 @@ destroy_frame (struct macro_frame_t *frame, void *yyscanner)
 
     mem_sys_free(frame);
 
-    if (buffer != NULL) {
+    if (buffer != NULL)
         yy_switch_to_buffer(buffer, yyscanner);
-    }
 
     return ret;
 }
@@ -708,7 +719,7 @@ yylex_skip (YYSTYPE *valp, void *interp, const char *skip, void *yyscanner)
     } while (*p != '\0');
 
     if (c)
-        DUP_AND_RET(valp, c);
+        DUP_AND_RET_FREE(valp, c);
     else
         return c;
 }
@@ -995,7 +1006,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name, void *yyscanner)
             if (current[0] == '.') { /* parameter of outer macro */
                 s = find_macro_param(interp, current + 1);
                 if (s) {
-                    frame->expansion.name[i] = strdup(s);
+                    frame->expansion.name[i] = str_dup(s);
                     free(current);
                 }
             }
@@ -1032,10 +1043,9 @@ include_file (Interp* interp, char *file_name, void *yyscanner)
                                    PARROT_RUNTIME_FT_INCLUDE);
     if (s) {
         file = fopen(s, "r");
-        if (!file) {
-            mem_sys_free(s);
+        mem_sys_free(s);
+        if (!file)
             IMCC_fataly(interp, E_IOError, strerror(errno));
-        }
     }
     else
         IMCC_fataly(interp, E_IOError, strerror(errno));

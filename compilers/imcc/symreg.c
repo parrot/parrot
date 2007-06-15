@@ -85,7 +85,7 @@ _mk_symreg(SymHash* hsh, char * name, int t)
         fprintf(stderr, "Memory error at mk_symreg\n");
         abort();
     }
-    r->name = name;
+    r->name = str_dup(name);
     r->color = -1;
     r->want_regno = -1;
     r->set = t;
@@ -243,7 +243,6 @@ mk_pasm_reg(Interp *interp, char * name)
 {
     SymReg * r;
     if ((r = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name))) {
-        free(name);
         return r;
     }
     r = mk_symreg(interp, name, *name);

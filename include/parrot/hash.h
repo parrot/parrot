@@ -82,6 +82,8 @@ PARROT_API void parrot_hash_clone( Interp *interp,
 PARROT_API void parrot_hash_delete( Interp *interp, Hash *hash, void *key );
 PARROT_API void parrot_hash_destroy( Interp *interp, Hash *hash /*NN*/ )
         __attribute__nonnull__(2);
+void parrot_chash_destroy( Interp *interp, Hash *hash /*NN*/ )
+        __attribute__nonnull__(2);
 
 PARROT_API INTVAL parrot_hash_exists( Interp *interp, Hash *hash, void *key )
         __attribute__pure__

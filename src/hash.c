@@ -554,6 +554,23 @@ parrot_hash_destroy(Interp *interp, Hash *hash /*NN*/)
     mem_sys_free(hash);
 }
 
+void
+parrot_chash_destroy(Interp *interp, Hash *hash /*NN*/)
+{
+    UINTVAL i;
+
+    for (i = 0; i <= hash->mask; i++) {
+        HashBucket *bucket = hash->bi[i];
+        while (bucket) {
+            mem_sys_free(bucket->key);
+            mem_sys_free(bucket->value);
+            bucket = bucket->next;
+        }
+    }
+
+    parrot_hash_destroy(interp, hash);
+}
+
 /*
 
 FUNCDOC: parrot_new_hash_x

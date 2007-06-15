@@ -1277,6 +1277,11 @@ imcc_init(Parrot_Interp interp)
 void
 imcc_destroy(Parrot_Interp interp)
 {
+    Hash  *macros = IMCC_INFO(interp)->macros;
+
+    if (macros)
+        parrot_chash_destroy(interp, macros);
+
     mem_sys_free(IMCC_INFO(interp));
     IMCC_INFO(interp) = NULL;
 }

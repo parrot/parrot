@@ -303,19 +303,19 @@ binary_format_number_field(Interp *interp, char field, STRING *binstr, PMC *valu
         case 'd':
             d      = (double)VTABLE_get_number(interp, value);
             len    = sizeof (double)/sizeof (char);
-            binstr = string_concat(interp, binstr, string_from_cstring(interp, &d, len), 0);
+            binstr = string_concat(interp, binstr, string_from_num(interp, (float)d), 0);
             break;
         /* a float */
         case 'f':
             f      = (float)VTABLE_get_number(interp, value);
             len    = sizeof (float)/sizeof (char);
-            binstr = string_concat(interp, binstr, string_from_cstring(interp, &f, len), 0);
+            binstr = string_concat(interp, binstr, string_from_num(interp, f), 0);
             break;
         /* a native integer */
         case 'n':
             n      = (int)VTABLE_get_integer(interp, value);
             len    = sizeof (int)/sizeof (char);
-            binstr = string_concat(interp, binstr, string_from_cstring(interp, &n, len), 0);
+            binstr = string_concat(interp, binstr, string_from_int(interp, n), 0);
             break;
     }
 
