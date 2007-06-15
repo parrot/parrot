@@ -106,6 +106,9 @@ END_C
 
     print {$OUT} <<"END_C";
 
+/* HEADER: none */
+/* This isn't strictly true, but the headerizer should not bother */
+
 void Parrot_register_core_pmcs(Interp *interp, PMC* registry);
 extern void Parrot_initialize_core_pmcs(Interp *interp);
 void Parrot_initialize_core_pmcs(Interp *interp)
@@ -130,7 +133,7 @@ END_C
 
 static void register_pmc(Interp *interp, PMC* registry, int pmc_id)
 {
-    STRING* key = interp->vtables[pmc_id]->whoami;
+    STRING* const key = interp->vtables[pmc_id]->whoami;
     VTABLE_set_integer_keyed_str(interp, registry, key, pmc_id);
 }
 
