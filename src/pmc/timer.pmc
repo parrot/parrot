@@ -186,7 +186,7 @@ Destroys the timer.
 */
 
     void destroy() {
-        parrot_timer_event *t = (parrot_timer_event *)PMC_struct_val(SELF);
+        parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
         del_timer(INTERP, SELF);
         mem_sys_free(t);
     }
@@ -202,7 +202,7 @@ Returns the timer info for C<key>.
 */
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-        parrot_timer_event *t = (parrot_timer_event *)PMC_struct_val(SELF);
+        parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
 
         switch (key) {
             case PARROT_TIMER_SEC:
@@ -228,7 +228,7 @@ Returns the PMC associated with C<key>.
 */
 
     PMC* get_pmc_keyed_int(INTVAL key) {
-        parrot_timer_event *t = (parrot_timer_event *)PMC_struct_val(SELF);
+        parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
 
         switch (key) {
             case PARROT_TIMER_HANDLER:
@@ -249,7 +249,7 @@ Returns the number associated with C<key>.
 */
 
     FLOATVAL get_number_keyed_int(INTVAL key) {
-        parrot_timer_event *t = (parrot_timer_event *)PMC_struct_val(SELF);
+        parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
 
         switch (key) {
             case PARROT_TIMER_NSEC:
@@ -270,7 +270,7 @@ Sets the value associated with C<key> to C<value>.
 */
 
     void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        parrot_timer_event *t = (parrot_timer_event *)PMC_struct_val(SELF);
+        parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
 
         switch (key) {
             case PARROT_TIMER_SEC:
@@ -304,7 +304,7 @@ Sets the PMC associated with C<key> to C<*value>.
 */
 
     void set_pmc_keyed_int(INTVAL key, PMC* value) {
-        parrot_timer_event *t = (parrot_timer_event *)PMC_struct_val(SELF);
+        parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
 
         switch (key) {
             case PARROT_TIMER_HANDLER:
@@ -339,7 +339,7 @@ Sets the floating-point value associated with C<key> to C<value>.
 */
 
     void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        parrot_timer_event *t = (parrot_timer_event *)PMC_struct_val(SELF);
+        parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
 
         switch (key) {
             case PARROT_TIMER_NSEC:
