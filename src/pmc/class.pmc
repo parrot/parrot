@@ -410,7 +410,6 @@ The class is attatched to the current namespace.
     }
 
     void init_pmc(PMC* init_data) {
-        Parrot_Class *_class = NULL;
         PMC *arg;
         const INTVAL arg_type = VTABLE_type(interp, init_data);
         STRING * const name_str = CONST_STRING(interp, "name");
