@@ -14,8 +14,6 @@
 #define PARROT_MEMORY_H_GUARD
 #include <assert.h>
 
-/* HEADER: src/gc/memory.c */
-
 /* Use these macros instead of calling the functions listed below. */
 /* They protect against things like passing null to mem__sys_realloc, */
 /* which is not portable. */
