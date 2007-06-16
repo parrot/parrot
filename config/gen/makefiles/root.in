@@ -1853,6 +1853,7 @@ HEADERIZER_O_FILES = \
     src/global_setup.o \
     src/hash.o \
     src/headers.o \
+    src/hll.o \
     src/intlist.o \
     src/key.o \
     src/list.o \
