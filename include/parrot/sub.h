@@ -1,5 +1,5 @@
 /* sub.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -206,25 +206,62 @@ typedef struct Parrot_Context_info {
 } Parrot_Context_info;
 
 /* HEADERIZER BEGIN: src/sub.c */
+
+PARROT_API PMC * new_ret_continuation_pmc( Interp *interp /*NN*/,
+    opcode_t *address )
+        __attribute__nonnull__(1);
+
+PARROT_API int Parrot_Context_get_info( Interp *interp /*NN*/,
+    parrot_context_t *ctx /*NN*/,
+    Parrot_Context_info *info /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_API STRING* Parrot_Context_infostr( Interp *interp /*NN*/,
+    parrot_context_t *ctx /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API STRING* Parrot_full_sub_name( Interp *interp /*NN*/,
+    PMC* sub /*NULLOK*/ )
+        __attribute__nonnull__(1);
+
+PARROT_API PMC* parrot_new_closure( Interp *interp /*NN*/, PMC *sub_pmc )
+        __attribute__nonnull__(1);
+
+void invalidate_retc_context( Interp *interp /*NN*/, PMC *cont /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void mark_context( Interp *interp /*NN*/, parrot_context_t* ctx /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+Parrot_sub * new_closure( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+Parrot_cont * new_continuation( Interp *interp /*NN*/,
+    Parrot_cont *to /*NULLOK*/ )
+        __attribute__nonnull__(1);
+
+Parrot_coro * new_coroutine( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+Parrot_cont * new_ret_continuation( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+Parrot_sub * new_sub( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+PMC* Parrot_find_pad( Interp *interp /*NN*/,
+    STRING *lex_name,
+    parrot_context_t *ctx /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
 /* HEADERIZER END: src/sub.c */
 
-struct Parrot_sub * new_sub(Interp * interp);
-struct Parrot_sub * new_closure(Interp * interp);
-struct Parrot_coro * new_coroutine(Interp * interp);
-struct Parrot_cont * new_continuation(Interp * interp, struct Parrot_cont *to);
-struct Parrot_cont * new_ret_continuation(Interp * interp);
-
-PARROT_API PMC * new_ret_continuation_pmc(Interp *, opcode_t * address);
-
-void mark_context(Interp *, parrot_context_t *);
-
-void invalidate_retc_context(Interp *interp, PMC *cont);
-
-PARROT_API STRING* Parrot_full_sub_name(Interp *interp, PMC* sub);
-PARROT_API int Parrot_Context_get_info(Interp *interp, parrot_context_t *, Parrot_Context_info *);
-PARROT_API STRING* Parrot_Context_infostr(Interp *interp, parrot_context_t *);
-
-PARROT_API PMC* Parrot_find_pad(Interp*, STRING *lex_name, parrot_context_t *);
 PARROT_API PMC* parrot_new_closure(Interp*, PMC*);
 
 #endif /* PARROT_SUB_H_GUARD */
