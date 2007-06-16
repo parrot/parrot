@@ -70,10 +70,10 @@ sub new {
                 'A table showing which aspects of Parrot run on various platforms.', 'PLATFORMS'
             ),
             $self->new_item( 'Contains the version number of the distribution.', 'VERSION' ),
-            $self->new_item(
+            do { -e '../DEVELOPING' ?  $self->new_item(
 'The presence of this file indicates that the distribution is a development version.',
-                'DEVELOPING'
-            ),
+                'DEVELOPING' ) : ()
+            },
             $self->new_item( 'The status of the Parrot test suite.', 't/TESTS.STATUS.pod' ),
         ),
         $self->new_group(
