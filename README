@@ -23,18 +23,16 @@ the GNU General Public License or the Artistic License for more details.
 PREREQUISITES
 -------------
 
-You'll need a C compiler, a linker and a make program of course. If you
-will be linking with the ICU library you have to download and install it
-before configuring Parrot.
+You need a C compiler, a linker and a make program of course. If you will be
+linking with the ICU library you have to download and install it before
+configuring Parrot.
 
 Get it from http://www-306.ibm.com/software/globalization/icu/downloads.jsp
 
-You'll also need Perl 5.8.0 or above to run various configure and build
-scripts.
+You also need Perl 5.8.0 or newer to run various configure and build scripts.
 
-For most of the platforms that we are supporting initially,
-Parrot should build out of the box.
-The list of targeted platforms can be found in PLATFORMS.
+For most of the platforms that we are supporting initially, Parrot should build
+out of the box.  The list of targeted platforms can be found in PLATFORMS.
 
 The current configure system is primitive, as it's only
 a temporary solution. It will be happy with most any answers
@@ -140,7 +138,7 @@ MAILING LISTS
 -------------
 
 The mailing list for parrot is parrot-porters.  Subscribe by sending mail to
-parrot-porters-subscribe@perl.org. It is archived at
+perl6-internals-subscribe@perl.org. It is archived at
 http://www.nntp.perl.org/group/perl.perl6.internals
 and available via NNTP at nntp://nntp.perl.org/perl.perl6.internals
 

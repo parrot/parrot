@@ -281,7 +281,7 @@ F<lib/Parrot/Configure/Step.pm>, F<docs/configuration.pod>
 
 =cut
 
-use 5.006_001;
+use 5.008_000;
 use strict;
 use warnings;
 use Data::Dumper;
