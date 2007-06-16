@@ -896,7 +896,7 @@ sub extract_multiple (;$$$$)    # ($text, $functions_ref, $max_fields, $ignoreun
                         }
                 }
 
-                FIELD: while (pos($$textref) < length($$textref))
+                FIELD: while ((defined(pos($$textref)) || 0) < length $$textref)
                 {
                         my $field;
                         my @bits;
