@@ -201,9 +201,10 @@ PARROT_API INTVAL string_index( Interp *interp,
 PARROT_API void string_init( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API STRING* string_join( Interp *interp,
+PARROT_API STRING* string_join( Interp *interp /*NN*/,
     STRING *j /*NULLOK*/,
-    PMC *ar );
+    PMC *ar )
+        __attribute__nonnull__(1);
 
 PARROT_API UINTVAL string_length( Interp *interp, const STRING *s /*NULLOK*/ )
         __attribute__pure__

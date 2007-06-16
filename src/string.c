@@ -2554,7 +2554,7 @@ string_compose(Interp *interp /*NN*/, STRING *src /*NULLOK*/)
 
 PARROT_API
 STRING*
-string_join(Interp *interp, STRING *j /*NULLOK*/, PMC *ar)
+string_join(Interp *interp /*NN*/, STRING *j /*NULLOK*/, PMC *ar)
 {
     STRING *res;
     STRING *s;
