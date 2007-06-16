@@ -14,31 +14,25 @@ This is turned on with Parrot's C<-t> option.
 
 src/test_main.c
 
-
 =head2 Functions
-
-=over 4
-
-=cut
 
 */
 
 #include "trace.h"
 #include "parrot/oplib/ops.h"
 
+/* HEADER: src/trace.h */
+
 /*
 
-=item C<void
-trace_pmc_dump(Interp *interp, PMC* pmc)>
+FUNCDOC: trace_pmc_dump
 
 Prints a PMC to C<stderr>.
-
-=cut
 
 */
 
 static STRING*
-trace_class_name(Interp *interp, PMC* pmc)
+trace_class_name(Interp *interp, PMC* pmc /*NN*/)
 {
     STRING *class_name;
     if (PObj_is_class_TEST(pmc)) {
@@ -53,7 +47,7 @@ trace_class_name(Interp *interp, PMC* pmc)
 }
 
 void
-trace_pmc_dump(Interp *interp, PMC* pmc)
+trace_pmc_dump(Interp *interp /*NN*/, PMC* pmc /*NN*/)
 {
     Interp * const debugger = interp->debugger;
 
@@ -133,17 +127,14 @@ trace_pmc_dump(Interp *interp, PMC* pmc)
 
 /*
 
-=item C<int
-trace_key_dump(Interp *interp, PMC *key)>
+FUNCDOC: trace_key_dump
 
 Prints a key to C<stderr>, returns the length of the output.
-
-=cut
 
 */
 
 int
-trace_key_dump(Interp *interp /*NN*/, const PMC *key)
+trace_key_dump(Interp *interp /*NN*/, const PMC *key /*NN*/)
 {
     Interp * const debugger = interp->debugger;
 
@@ -212,19 +203,16 @@ trace_key_dump(Interp *interp /*NN*/, const PMC *key)
 
 /*
 
-=item C<void
-trace_op_dump(Interp *interp, const opcode_t *code_start, const opcode_t *pc)>
+FUNCDOC: trace_op_dump
 
 TODO: This isn't really part of the API, but here's its documentation.
 
 Prints the PC, OP and ARGS. Used by C<trace_op()>.
 
-=cut
-
 */
 
 void
-trace_op_dump(Interp *interp, const opcode_t *code_start, const opcode_t *pc)
+trace_op_dump(Interp *interp /*NN*/, const opcode_t *code_start, const opcode_t *pc /*NN*/)
 {
     INTVAL s, n;
     int more = 0, var_args;
@@ -412,44 +400,34 @@ done:
 
 /*
 
-=item C<void
-trace_op(Interp *interp, const opcode_t *code_start,
-         const opcode_t *code_end, const opcode_t *pc)>
+FUNCDOC: trace_op
 
 TODO: This isn't really part of the API, but here's its documentation.
 
 Prints the PC, OP and ARGS. Used by C<runops_trace()>. With bounds
 checking.
 
-=cut
-
 */
 
 void
 trace_op(Interp *interp, const opcode_t *code_start,
-         const opcode_t *code_end, const opcode_t *pc)
+         const opcode_t *code_end, const opcode_t *pc /*NULLOK*/)
 {
     if (!pc) {
         return;
     }
 
-    if (pc >= code_start && pc < code_end) {
+    if (pc >= code_start && pc < code_end)
         trace_op_dump(interp, code_start, pc);
-    }
-    else if (pc) {
+    else
         PIO_eprintf(interp, "PC=%ld; OP=<err>\n", (long)(pc - code_start));
-    }
 }
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<src/trace.h>
-
-=cut
 
 */
 
