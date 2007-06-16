@@ -100,8 +100,24 @@ Clone the couroutine.
 
     void init() {
         PMC_struct_val(SELF) = new_coroutine(INTERP);
-        PMC_pmc_val(SELF) = NULL;
+        PMC_pmc_val(SELF)    = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the coroutine.
+
+*/
+
+    void destroy () {
+        Parrot_coro *sub = PMC_coro(SELF);
+        if (sub->ctx)
+            Parrot_free_context(interp, sub->ctx, 0);
+
+        SUPER();
     }
 
     PMC* clone() {
