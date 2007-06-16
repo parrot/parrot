@@ -54,7 +54,9 @@ PARROT_API Stack_entry_type get_entry_type( Interp *interp,
         __attribute__pure__
         __attribute__warn_unused_result__;
 
-PARROT_API void mark_stack( Interp *interp, Stack_Chunk_t *chunk /*NN*/ )
+PARROT_API void mark_stack( Interp *interp /*NN*/,
+    Stack_Chunk_t *chunk /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API Stack_Chunk_t * new_stack( Interp *interp,

@@ -47,7 +47,7 @@ Mark entries in a stack structure during DOD.
 
 PARROT_API
 void
-mark_stack(Interp *interp, Stack_Chunk_t *chunk /*NN*/)
+mark_stack(Interp *interp /*NN*/, Stack_Chunk_t *chunk /*NN*/)
 {
     for (; ; chunk = chunk->prev) {
         Stack_Entry_t *entry;
