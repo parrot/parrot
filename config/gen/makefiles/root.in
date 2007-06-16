@@ -1868,6 +1868,7 @@ HEADERIZER_O_FILES = \
     src/stacks.o \
     src/string.o \
     src/string_primitives.o \
+    src/tsq.o \
     src/utils.o \
     src/vtables.o \
 

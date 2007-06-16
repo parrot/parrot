@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -10,28 +10,23 @@ src/tsq.c - Thread-safe queues
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 #include <assert.h>
 
+/* HEADER: include/parrot/tsq.h */
+
 /*
 
-=item C<QUEUE_ENTRY *
-pop_entry(QUEUE *queue)>
+FUNCDOC: pop_entry
 
 Does a synchronized removal of the head entry off the queue and returns it.
-
-=cut
 
 */
 
 QUEUE_ENTRY *
-pop_entry(QUEUE *queue)
+pop_entry(QUEUE *queue /*NN*/)
 {
     QUEUE_ENTRY *returnval;
     queue_lock(queue);
@@ -42,37 +37,32 @@ pop_entry(QUEUE *queue)
 
 /*
 
-=item C<QUEUE_ENTRY *
-peek_entry(QUEUE *queue)>
+FUNCDOC: peek_entry
 
 This does no locking, so the result might have changed by the time you
 get the entry, but a synchronized C<pop_entry()> will check again and
 return C<NULL> if the queue is empty.
 
-=cut
-
 */
+
 QUEUE_ENTRY *
-peek_entry(QUEUE *queue)
+peek_entry(QUEUE *queue /*NN*/)
 {
     return queue->head;
 }
 
 /*
 
-=item C<QUEUE_ENTRY *
-nosync_pop_entry(QUEUE *queue)>
+FUNCDOC: nosync_pop_entry
 
 Grab an entry off the queue with no synchronization. Internal only,
 because it's darned evil and shouldn't be used outside the module. It's
 in here so we don't have to duplicate pop code.
 
-=cut
-
 */
 
 QUEUE_ENTRY *
-nosync_pop_entry(QUEUE *queue)
+nosync_pop_entry(QUEUE *queue /*NN*/)
 {
     QUEUE_ENTRY *returnval;
     if (!queue->head) {
@@ -92,20 +82,18 @@ nosync_pop_entry(QUEUE *queue)
 
 /*
 
-=item C<QUEUE_ENTRY *
-wait_for_entry(QUEUE *queue)>
+FUNCDOC: wait_for_entry
 
 Does a synchronized removal of the head entry off the queue, waiting if
 necessary until there is an entry, and then returns it.
 
-=cut
-
 */
 
 QUEUE_ENTRY *
-wait_for_entry(QUEUE *queue)
+wait_for_entry(QUEUE *queue /*NN*/)
 {
     QUEUE_ENTRY *returnval;
+
     queue_lock(queue);
     while (queue->head == NULL) {
         queue_wait(queue);
@@ -118,17 +106,14 @@ wait_for_entry(QUEUE *queue)
 
 /*
 
-=item C<void
-push_entry(QUEUE *queue, QUEUE_ENTRY *entry)>
+FUNCDOC: push_entry
 
 Does a synchronized insertion of C<entry> onto the tail of the queue.
-
-=cut
 
 */
 
 void
-push_entry(QUEUE *queue, QUEUE_ENTRY *entry)
+push_entry(QUEUE *queue /*NN*/, QUEUE_ENTRY *entry)
 {
     queue_lock(queue);
     /* Is there something in the queue? */
@@ -146,17 +131,14 @@ push_entry(QUEUE *queue, QUEUE_ENTRY *entry)
 
 /*
 
-=item C<void
-unshift_entry(QUEUE *queue, QUEUE_ENTRY *entry)>
+FUNCDOC: unshift_entry
 
 Does a synchronized insertion of C<entry> into the head of the queue.
-
-=cut
 
 */
 
 void
-unshift_entry(QUEUE *queue, QUEUE_ENTRY *entry)
+unshift_entry(QUEUE *queue /*NN*/, QUEUE_ENTRY *entry)
 {
     QUEUE_ENTRY *cur;
 
@@ -177,20 +159,18 @@ unshift_entry(QUEUE *queue, QUEUE_ENTRY *entry)
 
 /*
 
-=item C<void
-nosync_insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)>
+FUNCDOC: nosync_insert_entry
 
 Inserts a timed event according to C<abstime>. The caller has to hold the
 queue mutex.
 
-=cut
-
 */
 
 void
-nosync_insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)
+nosync_insert_entry(QUEUE *queue /*NN*/, QUEUE_ENTRY *entry /*NN*/)
 {
-    QUEUE_ENTRY *cur = queue->head, *prev;
+    QUEUE_ENTRY *cur = queue->head;
+    QUEUE_ENTRY *prev;
     parrot_event *event;
     FLOATVAL abs_time;
 
@@ -229,17 +209,14 @@ nosync_insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)
 
 /*
 
-=item C<void
-insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)>
+FUNCDOC: insert_entry
 
 Does a synchronized insert of C<entry>.
-
-=cut
 
 */
 
 void
-insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)
+insert_entry(QUEUE *queue /*NN*/, QUEUE_ENTRY *entry /*NN*/)
 {
     queue_lock(queue);
     nosync_insert_entry(queue, entry);
@@ -249,114 +226,93 @@ insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)
 
 /*
 
-=item C<void
-queue_lock(QUEUE *queue)>
+FUNCDOC: queue_lock
 
 Locks the queue's mutex.
-
-=cut
 
 */
 
 void
-queue_lock(QUEUE *queue)
+queue_lock(QUEUE *queue /*NN*/)
 {
     LOCK(queue->queue_mutex);
 }
 
 /*
 
-=item C<void
-queue_unlock(QUEUE *queue)>
+FUNCDOC: queue_unlock
 
 Unlocks the queue's mutex.
-
-=cut
 
 */
 
 void
-queue_unlock(QUEUE *queue)
+queue_unlock(QUEUE *queue /*NN*/)
 {
     UNLOCK(queue->queue_mutex);
 }
 
 /*
 
-=item C<void
-queue_broadcast(QUEUE *queue)>
+FUNCDOC: queue_broadcast
 
 This function wakes up I<every> thread waiting on the queue.
-
-=cut
 
 */
 
 void
-queue_broadcast(QUEUE *queue)
+queue_broadcast(QUEUE *queue /*NN*/)
 {
     COND_BROADCAST(queue->queue_condition);
 }
 
 /*
 
-=item C<void
-queue_signal(QUEUE *queue)>
+FUNCDOC: queue_signal
 
-Description.
-
-=cut
+XXX Needs a description
 
 */
 
 void
-queue_signal(QUEUE *queue)
+queue_signal(QUEUE *queue /*NN*/)
 {
     COND_SIGNAL(queue->queue_condition);
 }
 
 /*
 
-=item C<void
-queue_wait(QUEUE *queue)>
+FUNCDOC: queue_wait
 
 Instructs the queue to wait.
-
-=cut
 
 */
 
 void
-queue_wait(QUEUE *queue)
+queue_wait(QUEUE *queue /*NN*/)
 {
     COND_WAIT(queue->queue_condition, queue->queue_mutex);
 }
 
 /*
 
-=item C<void
-queue_timedwait(QUEUE *queue, struct timespec *abs_time)>
+FUNCDOC: queue_timedwait
 
 Instructs the queue to wait for C<abs_time> seconds (?).
-
-=cut
 
 */
 
 void
-queue_timedwait(QUEUE *queue, struct timespec *abs_time)
+queue_timedwait(QUEUE *queue /*NN*/, struct timespec *abs_time /*NN*/)
 {
     COND_TIMED_WAIT(queue->queue_condition, queue->queue_mutex, abs_time);
 }
 
 /*
 
-=item C<QUEUE*
-queue_init(UINTVAL prio)>
+FUNCDOC: queue_init
 
 Initializes the queue, setting C<prio> as the queue's priority.
-
-=cut
 
 */
 
@@ -364,6 +320,7 @@ QUEUE*
 queue_init(UINTVAL prio)
 {
     QUEUE * const queue = mem_allocate_typed(QUEUE);
+
     queue->head = queue->tail = NULL;
     queue->max_prio = prio;
     COND_INIT(queue->queue_condition);
@@ -373,17 +330,14 @@ queue_init(UINTVAL prio)
 
 /*
 
-=item C<void
-queue_destroy(QUEUE *queue)>
+FUNCDOC: queue_destroy
 
 Destroys the queue, raising an exception if it is not empty.
-
-=cut
 
 */
 
 void
-queue_destroy(QUEUE *queue)
+queue_destroy(QUEUE *queue /*NN*/)
 {
     if (peek_entry(queue))
         internal_exception(1, "Queue not empty on destroy");
@@ -394,13 +348,9 @@ queue_destroy(QUEUE *queue)
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/tsq.h>.
-
-=cut
 
 */
 
