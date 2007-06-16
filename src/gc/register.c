@@ -359,11 +359,10 @@ Parrot_alloc_context(Interp *interp /*NN*/, INTVAL *n_regs_used /*NN*/)
     const size_t size_s = sizeof (STRING*)  * n_regs_used[REGNO_STR];
     const size_t size_p = sizeof (PMC*)     * n_regs_used[REGNO_PMC];
 
-    const size_t size_nip = size_n + size_i + size_p;
-    const size_t all_regs_size  = size_n + size_i + size_p + size_s;
-
-    const size_t reg_alloc = ROUND_ALLOC_SIZE(all_regs_size);
-    const int slot = CALCULATE_SLOT_NUM(reg_alloc);
+    const size_t size_nip      = size_n + size_i + size_p;
+    const size_t all_regs_size = size_n + size_i + size_p + size_s;
+    const size_t reg_alloc     = ROUND_ALLOC_SIZE(all_regs_size);
+    const int    slot          = CALCULATE_SLOT_NUM(reg_alloc);
 
     /*
      * If slot is beyond the end of the allocated list, extend the list to
@@ -388,6 +387,7 @@ Parrot_alloc_context(Interp *interp /*NN*/, INTVAL *n_regs_used /*NN*/)
      */
     ptr = interp->ctx_mem.free_list[slot];
     old = CONTEXT(interp->ctx);
+
     if (ptr) {
         /*
          * Store the next pointer from the linked list for this size (slot
@@ -449,12 +449,13 @@ Parrot_free_context(Interp *interp /*NN*/, struct Parrot_Context *ctxp /*NN*/, i
      * excecute "debug 0x80" in a (preferably small) test case.
      *
      */
-    if (re_use || --ctxp->ref_count == 0) {
+    if (re_use || --ctxp->ref_count <= 0) {
         void *ptr;
         int slot;
 
 #ifndef NDEBUG
-        if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
+        if (   Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)
+            && ctxp->current_sub) {
             /* can't probably PIO_eprintf here */
             const Parrot_sub * const doomed = PMC_sub(ctxp->current_sub);
 

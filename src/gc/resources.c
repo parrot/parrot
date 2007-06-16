@@ -693,7 +693,7 @@ Parrot_allocate_aligned(Interp *interp /*NN*/, Buffer *buffer /*NN*/, size_t siz
 FUNCDOC: Parrot_allocate_string
 
 Allocate the STRING's buffer memory to the given size. The allocated
-buffer maybe be slightly bigger than the given C<size>. This function
+buffer maybe slightly bigger than the given C<size>. This function
 sets also C<< str->strstart >> to the new buffer location, C<< str->bufused >>
 is B<not> changed.
 

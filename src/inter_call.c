@@ -1472,6 +1472,7 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
     interp->current_cont         = NEED_CONTINUATION;
     ctx->current_cont            = ret_cont;
     PMC_cont(ret_cont)->from_ctx = ctx;
+    ctx->ref_count++;
     pccinvoke_meth               = VTABLE_find_method(interp, pmc, method_name);
 
     if (PMC_IS_NULL(pccinvoke_meth))
