@@ -133,7 +133,7 @@ new_string_pool(Interp *interp /*NN*/, INTVAL constant)
 {
     Small_Object_Pool *pool;
     if (constant) {
-        pool = new_bufferlike_pool(interp, sizeof (STRING));
+        pool           = new_bufferlike_pool(interp, sizeof (STRING));
         pool->mem_pool = interp->arena_base->constant_string_pool;
     }
     else

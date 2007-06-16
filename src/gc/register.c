@@ -298,11 +298,13 @@ struct Parrot_Context *
 Parrot_push_context(Interp *interp /*NN*/, INTVAL *n_regs_used /*NN*/)
 {
     Parrot_Context * const old = CONTEXT(interp->ctx);
-    Parrot_Context * const ctx =
-        Parrot_alloc_context(interp, n_regs_used);
+    Parrot_Context * const ctx = Parrot_alloc_context(interp, n_regs_used);
 
-    ctx->caller_ctx = old;
-    ctx->current_sub = old->current_sub;  /* doesn't change */
+    ctx->caller_ctx  = old;
+
+    /* doesn't change */
+    ctx->current_sub = old->current_sub;
+
     /* copy more ? */
     return ctx;
 }
@@ -324,10 +326,11 @@ Parrot_pop_context(Interp *interp /*NN*/)
     Parrot_Context * const old = ctx->caller_ctx;
 
     Parrot_free_context(interp, ctx, 1);
+
     /* restore old, set cached interpreter base pointers */
     CONTEXT(interp->ctx) = old;
-    interp->ctx.bp = old->bp;
-    interp->ctx.bp_ps = old->bp_ps;
+    interp->ctx.bp       = old->bp;
+    interp->ctx.bp_ps    = old->bp_ps;
 }
 
 
