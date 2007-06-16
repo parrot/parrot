@@ -248,16 +248,19 @@ EOM
  * vtable slot names
  */
 #ifdef PARROT_IN_OBJECTS_C
+
+#define PARROT_VTABLE_LOW 9
+
 static const char * const Parrot_vtable_slot_names[] = {
-    "",     /* Pointer to namespace for this class */
-    "",     /* 'type' value for MMD */
-    "",     /* Name of class this vtable is for */
-    "",     /* Flags. Duh */
-    "",     /* space-separated list of interfaces */
-    "",     /* space-separated list of classes */
-    "",     /* class */
-    "",     /* mro */
-    "",     /* ro_variant_vtable */
+    "",   /* Pointer to namespace for this class */
+    "",   /* 'type' value for MMD */
+    "",   /* Name of class this vtable is for */
+    "",   /* Flags. Duh */
+    "",   /* space-separated list of interfaces */
+    "",   /* space-separated list of classes */
+    "",   /* class */
+    "",   /* mro */
+    "",   /* ro_variant_vtable */
 
     /* Vtable Functions */
 EOM

@@ -39,15 +39,11 @@ PARROT_API
 INTVAL
 Parrot_get_vtable_index(Interp *interp, const STRING *name /*NN*/)
 {
-    char * const name_c = string_to_cstring(interp, name);
-    INTVAL low    = 0;
-    INTVAL high   = NUM_VTABLE_FUNCTIONS - 1;
+    char * const name_c      = string_to_cstring(interp, name);
 
     /* some of the first "slots" don't have names. skip 'em. */
-    while (!Parrot_vtable_slot_names[low]) {
-        low++;
-        high++;
-    }
+    INTVAL low               = PARROT_VTABLE_LOW;
+    INTVAL high              = NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW;
 
     while (low < high) {
         const INTVAL       mid    = (low + high) / 2;
