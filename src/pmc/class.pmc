@@ -853,6 +853,45 @@ unset to allow further modifications.
         return copy;
     }
 
+/*
+
+=item C<INTVAL isa(STRING *classname)>
+
+Returns whether the class is or inherits from C<*classname>.
+
+=cut
+
+*/
+
+    INTVAL isa(STRING *classname) {
+        Parrot_Class *_class = PARROT_CLASS(SELF);
+        const INTVAL num_classes = VTABLE_elements(interp, _class->parents);
+        STRING *name;
+        INTVAL i;
+
+        if (SUPER(classname))
+            return 1;
+
+        /* Check if the passed name is the same as the stored short name. */
+        if (string_equal(interp, classname, _class->name) == 0)
+            return 1;
+
+        /* Check if the passed name is the same as the fully qualified name. */
+        if (string_equal(interp, classname, VTABLE_get_string(interp, SELF)) == 0)
+            return 1;
+
+        /* Iterate over all the parents and check if they respond true
+         * for 'isa' on the classname.
+         */
+        for (i = 0; i < num_classes; i++) {
+            PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, _class->parents, i);
+            if (VTABLE_isa(interp, cur_class, classname))
+                return 1;
+        }
+
+        return 0;
+    }
+
     /* **********************************************************************
      * Below here are non-vtable methods that eventually will go in a role
      * that is composed into here to optionally give a nice interface from

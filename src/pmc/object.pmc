@@ -240,6 +240,28 @@ non-zero value if it does.
         return !PMC_IS_NULL(method);
     }
 
+/*
+
+=item C<INTVAL isa(STRING *classname)>
+
+Returns whether the class is or inherits from C<*classname>.
+
+=cut
+
+*/
+    INTVAL isa(STRING *classname)
+    {
+        PMC *class;
+        INTVAL isa;
+
+        if (SUPER(classname))
+            return 1;
+
+        class = VTABLE_get_class(interp, SELF);
+        isa = VTABLE_isa(interp, class, classname);
+        return isa;
+    }
+
 }
 
 /*
