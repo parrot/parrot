@@ -29,6 +29,8 @@ the C-library.
 #include "inter_cb.str"
 
 
+/* HEADER: none */ /* XXX Needs to get done at the same time as the other interpreter files */
+
 /*
 
 =item C<PMC* Parrot_make_cb(Parrot_Interp interp, PMC* sub, PMC* user

@@ -24,6 +24,8 @@ Create or destroy a Parrot interpreter
 #include "parrot/oplib/core_ops.h"
 #include "../compilers/imcc/imc.h"
 
+/* HEADER: none */ /* XXX Headerize this at the same time as the other interpreter files */
+
 #if EXEC_CAPABLE
 Interp interpre;
 #endif
@@ -41,10 +43,10 @@ Checks whether the specified environment variable is set.
 */
 
 static int
-is_env_var_set(const char* var)
+is_env_var_set(const char* var /*NN*/)
 {
     int free_it, retval;
-    char* value = Parrot_getenv(var, &free_it);
+    char* const value = Parrot_getenv(var, &free_it);
     if (value == NULL)
         retval = 0;
     else if (*value == '\0')
@@ -69,7 +71,7 @@ Setup default compiler for PASM.
 static void
 setup_default_compreg(Parrot_Interp interp)
 {
-    STRING *pasm1 = string_from_cstring(interp, "PASM1", 0);
+    STRING * const pasm1 = string_from_cstring(interp, "PASM1", 0);
 
     /* register the nci compiler object */
     Parrot_compreg(interp, pasm1, (Parrot_compiler_func_t)PDB_compile);
