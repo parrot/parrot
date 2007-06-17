@@ -2448,7 +2448,7 @@ CODE
 OUTPUT
 
 
-pir_output_is( <<'CODE', <<'OUTPUT', "slurpy named after :optional", 'todo'=>'RT #43231' );
+pir_output_is( <<'CODE', <<'OUTPUT', "slurpy named after :optional" );
 .sub main :main
     foo(0, 'abc' => 1)
     foo('abc' => 2)

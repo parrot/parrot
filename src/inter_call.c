@@ -850,7 +850,22 @@ Parrot_process_args(Interp *interp /*NN*/, call_state *st /*NN*/, arg_pass_t par
 
         /* if the src arg is named, we're done here */
         if (st->name)
+        {
+            /* but first, take care of any :optional arguments */
+            while (dest->sig & PARROT_ARG_OPTIONAL) {
+                null_val(st->dest.sig, st);
+                /* actually store the argument */
+                idx = st->dest.u.op.pc[st->dest.i];
+                assert(idx >= 0);
+                store_arg(st, idx);
+                /* check for :opt_flag */
+                check_for_opt_flag(st, 0);
+                /* next dest arg */
+                dest->i++;
+                next_arg_sig(dest);
+            }
             break;
+        }
 
         /* if the dest is a named argument, we need to fill it as a positional
          * since no named arguments have been given. so skip the name. */
