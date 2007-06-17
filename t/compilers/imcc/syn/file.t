@@ -355,14 +355,14 @@ OUT
 .end
 END_PIR
         close $FOO;
-        local *OLDERR;
-        open OLDERR, ">&", "STDERR"   or die "Can't save STDERR\n";
+        my $OLDERR;
+        open $OLDERR, ">&", "STDERR"   or die "Can't save STDERR\n";
         open STDERR, ">",  "temp.out" or die "Can't write temp.out\n";
         system "$PARROT temp.pir";
         open $FOO, "<", "temp.out" or die "Can't read temp.out\n";
         { local $/; $err_msg = <$FOO>; }
         close $FOO;
-        open STDERR, ">&", "OLDERR" or die "Can't restore STDERR\n";
+        open STDERR, ">&", $OLDERR or die "Can't restore STDERR\n";
         unlink "temp.out";
     }
 
