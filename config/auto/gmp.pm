@@ -56,7 +56,7 @@ sub runstep {
     my $osname = $Config{osname};
 
     # On OS X check the presence of the gmp header in the standard
-    # Fink location. 
+    # Fink location.
     # RT#43134: Need a more generalized way for finding
     # where Fink lives.
     if ( $osname =~ /darwin/ ) {

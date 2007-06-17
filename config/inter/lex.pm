@@ -66,7 +66,7 @@ sub runstep {
         return;
     }
 
-    # RT#43170 should --ask be handled like the other user defines or 
+    # RT#43170 should --ask be handled like the other user defines or
     # checked for version requirements?
     if ( $conf->options->get('ask') ) {
         $prog = prompt( $prompt, $prog ? $prog : $conf->data->get($util) );
