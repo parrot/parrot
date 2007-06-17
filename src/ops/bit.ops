@@ -2,6 +2,21 @@
 ** bit.ops
 */
 
+ /* Signed shift operator that is compatible with PMC shifts.  This is
+  * guaranteed to produce the same result as bitwise_left_shift_internal modulo
+  * word size, ignoring the fact that Parrot integers are always signed.  This
+  * usually gives the same answer regardless whether you shift PMC operands and
+  * then assign to an I-reg, or move the operands to I-regs and do the shift
+  * there -- except when the true result is between 2^{w-1} and 2^w (where w is
+  * the word size), in which case the high order bit is taken as the sign,
+  * giving a truncated result that is 2^w lower.
+  */
+#define bit_shift_left(number, bits) \
+    ((bits) >= 8*INTVAL_SIZE     ? 0                    \
+     : (bits) >= 0               ? (number) << (bits)   \
+     : (bits) > -8*INTVAL_SIZE   ? (number) >> -(bits)   \
+     : 0)
+
 VERSION = PARROT_VERSION;
 
 =head1 NAME
@@ -209,12 +224,12 @@ Set $1 to the value of $2 shifted left by $3 bits.
 =cut
 
 inline op shl(inout INT, in INT) :base_core {
-  $1 <<= $2;
+  $1 = bit_shift_left($1, $2);
   goto NEXT();
 }
 
 inline op shl(out INT, in INT, in INT) :base_core {
-  $1 = $2 << $3;
+  $1 = bit_shift_left($2, $3);
   goto NEXT();
 }
 
@@ -231,12 +246,14 @@ Set $1 to the value of $2 shifted right by $3 bits.
 =cut
 
 inline op shr(inout INT, in INT) :base_core {
-  $1 >>= $2;
+  INTVAL signed_shift = -$2;
+  $1 = bit_shift_left($1, signed_shift);
   goto NEXT();
 }
 
 inline op shr(out INT, in INT, in INT) :base_core {
-  $1 = $2 >> $3;
+  INTVAL signed_shift = -$3;
+  $1 = bit_shift_left($2, signed_shift);
   goto NEXT();
 }
 
