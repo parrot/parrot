@@ -1,6 +1,6 @@
 /*
   On Windows there are two ways to access the environment.  Either through the
-  Windows environment block, using GetEnvironmentVariable, 
+  Windows environment block, using GetEnvironmentVariable,
   SetEnvironmentVariable and GetEnvironmentStrings, or the C runtime using
   _getenv, _putenv and _environ.
 
@@ -22,7 +22,7 @@ Parrot_setenv(const char *name, const char *value)
     assert(name  != NULL);
     assert(value != NULL);
 
-    { 
+    {
         const int name_len  = strlen(name );
         const int value_len = strlen(value);
 
@@ -46,7 +46,8 @@ Parrot_setenv(const char *name, const char *value)
 
             if (_putenv(envstring) == 0) {
                 /* success */
-            } else {
+            }
+            else {
                 /* TODO: Shouldn't we tell anyone that we failed? */
             }
             free(envstring);
