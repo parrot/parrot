@@ -1859,6 +1859,8 @@ HEADERIZER_O_FILES = \
     src/key.o \
     src/library.o \
     src/list.o \
+    src/longopt.o \
+    src/misc.o \
     src/mmd.o \
     src/objects.o \
     src/packdump.o \

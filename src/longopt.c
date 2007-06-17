@@ -12,14 +12,12 @@ This is used by C<parrot>.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 #include "parrot/longopt.h"
+
+/* HEADER: include/parrot/longopt.h */
 
 static int longopt_get_longopt(Parrot_Interp, int argc, char* argv[],
                                const struct longopt_opt_decl options[],
@@ -33,10 +31,7 @@ static char longopt_error_buffer[512];
 
 /*
 
-=item C<int
-longopt_get(Parrot_Interp interp, int argc, char* argv[],
-            const struct longopt_opt_decl options[],
-            struct longopt_opt_info* info_buf)>
+FUNCDOC: longopt_get
 
 Gets long or short options, specified in C<options[]> (see
 F<docs/dev/longopt.dev>).
@@ -49,14 +44,13 @@ Call it iteratively with the same C<info_buf> until it returns 0 or -1.
 
 Any other value is a valid option identifier.
 
-=cut
-
 */
 
+PARROT_API
 int
-longopt_get(Parrot_Interp interp, int argc, char* argv[],
-            const struct longopt_opt_decl options[],
-            struct longopt_opt_info* info_buf)
+longopt_get(Interp *interp /*NN*/, int argc, char* argv[] /*NN*/,
+            const struct longopt_opt_decl options[] /*NN*/,
+            struct longopt_opt_info* info_buf /*NN*/)
 {
     const int dex = info_buf->opt_index;
 
@@ -89,10 +83,7 @@ longopt_get(Parrot_Interp interp, int argc, char* argv[],
 
 /*
 
-=item C<static int
-longopt_get_longopt(Parrot_Interp interp, int argc, char* argv[],
-                    const struct longopt_opt_decl options[],
-                    struct longopt_opt_info* info_buf)>
+FUNCDOC: longopt_get_longopt
 
 Find the option identifier of a long option.
 
@@ -101,13 +92,11 @@ Fill C<info_buf> appropriately, and return the option identifier.
 C<argv[info_buf->opt_index]> is guaranteed to have at least three
 characters and start with C<-->.
 
-=cut
-
 */
 
 static int
-longopt_get_longopt(Parrot_Interp interp, int argc, char* argv[],
-                    const struct longopt_opt_decl options[],
+longopt_get_longopt(Interp *interp /*NN*/, int argc, char* argv[] /*NN*/,
+                    const struct longopt_opt_decl options[] /*NN*/,
                     struct longopt_opt_info* info_buf)
 {
     const int dex = info_buf->opt_index;
@@ -185,10 +174,7 @@ longopt_get_longopt(Parrot_Interp interp, int argc, char* argv[],
 
 /*
 
-=item C<static int
-longopt_get_shortopt(Parrot_Interp interp, int argc, char* argv[],
-                     const struct longopt_opt_decl options[],
-                     struct longopt_opt_info* info_buf)>
+FUNCDOC: longopt_get_shortopt
 
 Find the option identifier of the next short option.
 
@@ -198,14 +184,12 @@ C<< info_buf->_shortopt_pos >> maintains a pointer into that bundle.
 C<< argv[info_buf->opt_index] >> is guaranteed to be at least two
 characters long and start with a dash.
 
-=cut
-
 */
 
 static int
-longopt_get_shortopt(Parrot_Interp interp, int argc, char* argv[],
-                     const struct longopt_opt_decl options[],
-                     struct longopt_opt_info* info_buf)
+longopt_get_shortopt(Interp *interp /*NN*/, int argc, char* argv[] /*NN*/,
+                     const struct longopt_opt_decl options[] /*NN*/,
+                     struct longopt_opt_info* info_buf /*NN*/)
 {
     const int dex = info_buf->opt_index;
     const struct longopt_opt_decl* dptr;
@@ -279,13 +263,9 @@ longopt_get_shortopt(Parrot_Interp interp, int argc, char* argv[],
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/longopt.h> and F<docs/dev/longopt.dev>.
-
-=cut
 
 */
 

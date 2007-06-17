@@ -88,6 +88,7 @@ INTVAL intval_mod( INTVAL i2, INTVAL i3 )
 
 /* HEADERIZER END: src/utils.c */
 
+
 /*
  * IMCC API
  */
@@ -99,31 +100,64 @@ PMC * IMCC_compile_pir_s(Parrot_Interp interp, const char *s,
 PMC * IMCC_compile_pasm_s(Parrot_Interp interp, const char *s,
         STRING **error_message);
 
-/*
- * misc.c
- */
 
-PARROT_API STRING *Parrot_vsprintf_s(Interp *, STRING *pat, va_list);
+/* HEADERIZER BEGIN: src/misc.c */
 
-PARROT_API STRING *Parrot_vsprintf_c(Interp *, const char *pat, va_list);
+PARROT_API STRING * Parrot_psprintf( Interp *interp /*NN*/,
+    STRING *pat /*NN*/,
+    PMC *ary /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
 
-PARROT_API void Parrot_vsprintf(Interp *, char *targ, const char *pat,
-                     va_list);
+PARROT_API void Parrot_snprintf( Interp *interp /*NN*/,
+    char *targ /*NN*/,
+    size_t len,
+    const char *pat /*NN*/,
+    ... )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
-PARROT_API void Parrot_vsnprintf(Interp *, char *targ, size_t len,
-                      const char *pat, va_list);
+PARROT_API STRING * Parrot_sprintf_c( Interp *interp /*NN*/,
+    const char *pat /*NN*/,
+    ... )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
 
-PARROT_API STRING *Parrot_sprintf_s(Interp *, STRING *pat, ...);
+PARROT_API STRING * Parrot_sprintf_s( Interp *interp /*NN*/,
+    STRING *pat /*NN*/,
+    ... )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
 
-PARROT_API STRING *Parrot_sprintf_c(Interp *, const char *pat, ...);
+PARROT_API void Parrot_vsnprintf( Interp *interp /*NN*/,
+    char *targ /*NN*/,
+    size_t len,
+    const char *pat /*NN*/,
+    va_list args )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
-PARROT_API void Parrot_sprintf(Interp *, char *targ, const char *pat, ...);
+PARROT_API STRING * Parrot_vsprintf_c( Interp *interp /*NN*/,
+    const char *pat /*NN*/,
+    va_list args )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
 
-PARROT_API void Parrot_snprintf(Interp *, char *targ, size_t len,
-                     const char *pat, ...);
+PARROT_API STRING * Parrot_vsprintf_s( Interp *interp /*NN*/,
+    STRING *pat /*NN*/,
+    va_list args )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
 
-PARROT_API STRING *Parrot_psprintf(Interp *interp, STRING *pat,
-                        PMC * ary);
+/* HEADERIZER END: src/misc.c */
 
 
 #ifdef IN_SPF_SYSTEM

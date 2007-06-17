@@ -36,31 +36,28 @@ the type for the format.
 
 =back
 
-=over 4
-
-=cut
-
 */
 
 #define IN_SPF_SYSTEM
 
 #include "parrot/parrot.h"
 
+/* HEADER: include/parrot/misc.h */
+
 /*
 
-=item C<STRING *
-Parrot_vsprintf_s(Interp *interp, STRING *pat, va_list args)>
+FUNCDOC: Parrot_vsprintf_s
 
 Almost all the other sprintf variants in this file are implemented in
 terms of this function (see C<Parrot_psprintf()> for the exception). It
 in turn calls C<Parrot_sprintf_format()> (see F<src/spf_render.c>).
 
-=cut
-
 */
 
+PARROT_API
 STRING *
-Parrot_vsprintf_s(Interp *interp, STRING *pat, va_list args)
+Parrot_vsprintf_s(Interp *interp /*NN*/, STRING *pat /*NN*/, va_list args)
+    /* WARN_UNUSED */
 {
     SPRINTF_OBJ obj = va_core;
     obj.data = PARROT_VA_TO_VAPTR(args);
@@ -70,19 +67,16 @@ Parrot_vsprintf_s(Interp *interp, STRING *pat, va_list args)
 
 /*
 
-=item C<STRING *
-Parrot_vsprintf_c(Interp *interp, const char *pat,
-                  va_list args)>
+FUNCDOC: Parrot_vsprintf_c
 
 C string version of C<Parrot_vsprintf_s()>.
 
-=cut
-
 */
 
+PARROT_API
 STRING *
-Parrot_vsprintf_c(Interp *interp, const char *pat,
-                  va_list args)
+Parrot_vsprintf_c(Interp *interp /*NN*/, const char *pat /*NN*/, va_list args)
+    /* WARN_UNUSED */
 {
     STRING * const realpat = string_make(interp, pat, strlen(pat),
                                   NULL, PObj_external_FLAG);
@@ -94,20 +88,17 @@ Parrot_vsprintf_c(Interp *interp, const char *pat,
 
 /*
 
-=item C<void
-Parrot_vsnprintf(Interp *interp, char *targ,
-                 size_t len, const char *pat, va_list args)>
+FUNCDOC: Parrot_vsnprintf
 
 Similar to C<Parrot_vsprintf()> but with an option to specify the length
 (C<len>) of the returned C string.
 
-=cut
-
 */
 
+PARROT_API
 void
-Parrot_vsnprintf(Interp *interp, char *targ,
-                 size_t len, const char *pat, va_list args)
+Parrot_vsnprintf(Interp *interp /*NN*/, char *targ /*NN*/,
+                 size_t len, const char *pat /*NN*/, va_list args)
 {
     if (len == 0)
         return;
@@ -128,17 +119,16 @@ Parrot_vsnprintf(Interp *interp, char *targ,
 
 /*
 
-=item C<STRING *
-Parrot_sprintf_s(Interp *interp, STRING *pat, ...)>
+FUNCDOC: Parrot_sprintf_s
 
 Calls C<Parrot_vsprintf_s()> with the C<va_list> obtained from C<...>.
 
-=cut
-
 */
 
+PARROT_API
 STRING *
-Parrot_sprintf_s(Interp *interp, STRING *pat, ...)
+Parrot_sprintf_s(Interp *interp /*NN*/, STRING *pat /*NN*/, ...)
+    /* WARN_UNUSED */
 {
     STRING *ret;
     va_list args;
@@ -154,17 +144,16 @@ Parrot_sprintf_s(Interp *interp, STRING *pat, ...)
 
 /*
 
-=item C<STRING *
-Parrot_sprintf_c(Interp *interp, const char *pat, ...)>
+FUNCDOC: Parrot_sprintf_c
 
 C string version of C<Parrot_sprintf_s()>.
 
-=cut
-
 */
 
+PARROT_API
 STRING *
-Parrot_sprintf_c(Interp *interp, const char *pat, ...)
+Parrot_sprintf_c(Interp *interp /*NN*/, const char *pat /*NN*/, ...)
+    /* WARN_UNUSED */
 {
     STRING *ret;
     va_list args;
@@ -180,20 +169,17 @@ Parrot_sprintf_c(Interp *interp, const char *pat, ...)
 
 /*
 
-=item C<void
-Parrot_snprintf(Interp *interp, char *targ, size_t len,
-                const char *pat, ...)>
+FUNCDOC: Parrot_snprintf
 
 Similar to C<Parrot_sprintf()> but with an option to specify the length
 (C<len>) of the returned C string.
 
-=cut
-
 */
 
+PARROT_API
 void
-Parrot_snprintf(Interp *interp, char *targ, size_t len,
-                const char *pat, ...)
+Parrot_snprintf(Interp *interp /*NN*/, char *targ /*NN*/, size_t len,
+                const char *pat /*NN*/, ...)
 {
     va_list args;
 
@@ -206,18 +192,17 @@ Parrot_snprintf(Interp *interp, char *targ, size_t len,
 
 /*
 
-=item C<STRING *
-Parrot_psprintf(Interp *interp, STRING *pat, PMC *ary)>
+FUNCDOC: Parrot_psprintf
 
 Calls C<Parrot_sprintf_format()> with the insertion arguments in an
 C<Array> PMC.
 
-=cut
-
 */
 
+PARROT_API
 STRING *
-Parrot_psprintf(Interp *interp, STRING *pat, PMC *ary)
+Parrot_psprintf(Interp *interp /*NN*/, STRING *pat /*NN*/, PMC *ary /*NN*/)
+    /* WARN_UNUSED */
 {
     SPRINTF_OBJ obj = pmc_core;
     obj.data = ary;
@@ -226,8 +211,6 @@ Parrot_psprintf(Interp *interp, STRING *pat, PMC *ary)
 }
 
 /*
-
-=back
 
 =head1 SEE ALSO
 
@@ -238,8 +221,6 @@ F<src/misc.h>, F<src/spf_vtable.c>, F<src/spf_render.c>.
 This was once a simple, vararg-based implementation that existed
 completely within this file.  When the file grew to be nearly 1,000
 lines long, I split it into three. --BD
-
-=cut
 
 */
 
