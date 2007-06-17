@@ -85,8 +85,7 @@ PARROT_API PMC* mmd_dispatch_p_pip( Interp *interp /*NN*/,
     PMC *dest,
     INTVAL func_nr )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API PMC* mmd_dispatch_p_pnp( Interp *interp /*NN*/,
     PMC *left /*NN*/,
@@ -94,8 +93,7 @@ PARROT_API PMC* mmd_dispatch_p_pnp( Interp *interp /*NN*/,
     PMC *dest,
     INTVAL func_nr )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API PMC* mmd_dispatch_p_ppp( Interp *interp,
     PMC *left /*NN*/,
@@ -103,8 +101,7 @@ PARROT_API PMC* mmd_dispatch_p_ppp( Interp *interp,
     PMC *dest,
     INTVAL func_nr )
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
 PARROT_API PMC* mmd_dispatch_p_psp( Interp *interp /*NN*/,
     PMC *left /*NN*/,
@@ -112,8 +109,7 @@ PARROT_API PMC* mmd_dispatch_p_psp( Interp *interp /*NN*/,
     PMC *dest,
     INTVAL func_nr )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API void mmd_dispatch_v_pn( Interp *interp /*NN*/,
     PMC *left /*NN*/,

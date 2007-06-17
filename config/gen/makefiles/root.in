@@ -1857,6 +1857,7 @@ HEADERIZER_O_FILES = \
     src/inter_call.o \
     src/intlist.o \
     src/key.o \
+    src/library.o \
     src/list.o \
     src/mmd.o \
     src/objects.o \
