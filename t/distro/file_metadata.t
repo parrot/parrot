@@ -8,7 +8,8 @@ use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
 use File::Basename qw( fileparse );
-use File::Spec::Functions qw( catfile );
+use File::Spec::Functions qw( catfile splitpath splitdir );
+use File::Spec::Unix;
 use Parrot::Config;
 use Parrot::Revision;
 use ExtUtils::Manifest qw( maniread );
@@ -270,13 +271,21 @@ sub get_attribute {
 
                 # This RE may be a little wonky.
                 if ( $result =~ m{(.*) - (.*)} ) {
-                    my ( $file, $attribute ) = ( $1, $2 );
-
-                    # file names are reported with backslashes on Windows,
-                    # but we want forward slashes
-                    $file =~ s!\\!/!g if $^O eq 'MSWin32';
-
-                    $results{$file} = $attribute;
+                    my ( $full_path, $attribute ) = ( $1, $2 );
+    
+                    # split the path
+                    my ( $volume, $directories, $file ) = splitpath $full_path;
+                    my @directories = splitdir $directories;
+    
+                    # put it back together as a unix path (to match MANIFEST)
+                    $full_path = File::Spec::Unix->catpath(
+                        $volume,
+                        File::Spec::Unix->catdir(@directories),
+                        $file
+                    );
+    
+                    # store the attribute into the results hash
+                    $results{$full_path} = $attribute;
                 }
             }
 
