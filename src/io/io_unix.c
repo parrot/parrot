@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -573,12 +573,25 @@ static PIOOFF_T
 PIO_unix_seek(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
               PIOOFF_T offset, INTVAL whence)
 {
-    PIOOFF_T pos;
+    PIOOFF_T pos, avail;
 
     UNUSED(interp);
     UNUSED(layer);
 
     if ((pos = lseek(io->fd, offset, whence)) >= 0) {
+        switch (whence) {
+            case SEEK_SET:
+                io->fsize = offset > io->fsize ? offset : io->fsize;
+                break;
+            case SEEK_CUR:
+                avail     = io->b.next - io->b.startb + offset;
+                io->fsize = ( avail > io->fsize) ? avail : io->fsize;
+                break;
+            case SEEK_END:
+            default:
+                break;
+        }
+
         io->lpos = io->fpos;
         io->fpos = pos;
     }
