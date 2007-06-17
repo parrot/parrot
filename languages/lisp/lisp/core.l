@@ -1,6 +1,6 @@
-;        (setq cl:*package* (sys:%find-package "COMMON-LISP"))
-;        
-;        ;; Define a temporary, primitive version of the defun macro.
+(setq cl:*package* (sys:%find-package "COMMON-LISP"))
+
+;; Define a temporary, primitive version of the defun macro.
 ;        (sys:set-symbol-function 'defun
 ;        			 (sys:%make-macro
 ;        			  #'(lambda (form env)
@@ -16,6 +16,3 @@
 ;        
 ;        (defun in-package (pkg)
 ;          (setq *package* (sys:%find-package pkg)))
-;        			     
-;        
-;        

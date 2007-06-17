@@ -1,4 +1,4 @@
-;        (cl:setq cl:*package* (sys:%find-package "SYSTEM"))
+(cl:setq cl:*package* (sys:%find-package "SYSTEM"))
 ;        
 ;        ;; Set up some of the accessors for the LispSymbol class attributes.
 ;        (%set-object-attribute 'set-symbol-function

@@ -86,21 +86,21 @@
 ;;     ;        			     (apply fn (list form env))))
 ;;     
 ;; Create the KEYWORD package.
-;;     (sys:%make-package "KEYWORD")
-;;     
-;;     (sys:load "lisp/objects.l")
-;;     (sys:load "lisp/core.l")
-;;     (sys:load "lisp/logic.l")
-;;     (sys:load "lisp/pred.l")
-;;     (sys:load "lisp/list.l")
-;;     (sys:load "lisp/math.l")
-;;     
+(sys:%make-package "KEYWORD")
+
+(sys:load "lisp/objects.l")
+(sys:load "lisp/core.l")
+(sys:load "lisp/logic.l")
+(sys:load "lisp/pred.l")
+(sys:load "lisp/list.l")
+(sys:load "lisp/math.l")
+
 ;; Create and alias the COMMON-LISP-USER package.
-;;     (sys:%make-package "COMMON-LISP-USER")
-;;     (sys:%alias-package (sys:%find-package "COMMON-LISP-USER") "CL-USER")
-;;     
-;;     (cl:setq *package* (sys:%find-package "CL-USER"))
-;;     (sys:%use-package (sys:%find-package "CL-USER")
-;;     		  (sys:%find-package "COMMON-LISP"))
-;;     
-;;     ;        (in-package "COMMON-LISP-USER")
+(sys:%make-package "COMMON-LISP-USER")
+(sys:%alias-package (sys:%find-package "COMMON-LISP-USER") "CL-USER")
+
+;;        (cl:setq *package* (sys:%find-package "CL-USER"))
+(sys:%use-package (sys:%find-package "CL-USER")
+                  (sys:%find-package "COMMON-LISP"))
+
+;        (in-package "COMMON-LISP-USER")
