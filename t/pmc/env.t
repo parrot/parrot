@@ -92,11 +92,7 @@ ok 1
 ok 2
 OUT
 
-SKIP:
-{
-    skip 'iterator not available on win32' => 1
-        if 'MSWin32' eq $^O;
-    pasm_output_is( <<'CODE', <<OUT, "iterate" );
+pasm_output_is( <<'CODE', <<OUT, "iterate" );
     new P0, .Env
     set P0["PARROT_1"], "hello"
     set P0["PARROT_2"], "polly"
@@ -121,10 +117,8 @@ isok:
 CODE
 ok
 OUT
-}
 
 SKIP: {
-
     # This will not work on our unsetenv implementation
     skip( "no native unsetenv", 1 ) unless $PConfig{"unsetenv"};
     pasm_output_is( <<'CODE', <<OUT, "exists/delete" );
@@ -173,10 +167,7 @@ CODE
 0
 OUTPUT
 
-SKIP: {
-    skip 'not changing environment on windows', 2 if $^O eq 'MSWin32';
-
-    pir_output_is( << 'CODE', << 'OUTPUT', "get_integer()" );
+pir_output_is( << 'CODE', << 'OUTPUT', "get_integer()" );
 .sub main
     .local pmc env
     .local int num_before, num_after, num_diff
@@ -197,7 +188,7 @@ CODE
 3
 OUTPUT
 
-    pir_output_is( << 'CODE', << 'OUTPUT', "get_number()" );
+pir_output_is( << 'CODE', << 'OUTPUT', "get_number()" );
 .sub main
     .local pmc env
     .local num num_before, num_after, num_diff
@@ -217,7 +208,6 @@ OUTPUT
 CODE
 3.000000
 OUTPUT
-}
 
 pasm_output_is( <<'CODE', <<OUT, "getenv - null key" );
     new P0, .Env
