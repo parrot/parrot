@@ -380,17 +380,17 @@ sub short_description {
                 last if $line =~ /\S/o;
             }
 
-            my @abstract = $line;
+            my @abstract_text = $line;
 
             while (@lines) {
                 $line = shift @lines;
 
                 last if $line !~ /\S/o;
 
-                push @abstract, $line;
+                push @abstract_text, $line;
             }
 
-            my $desc = join ' ', @abstract;
+            my $desc = join ' ', @abstract_text;
 
             # Joining lines may have created a bit of extra whitespace.
             $desc =~ s/\s+/ /osg;
