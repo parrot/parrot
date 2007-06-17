@@ -1,6 +1,6 @@
 grammar PunieGrammar;
 
-token apply    { ^<lineseq>$ }
+token TOP    { ^<lineseq>$ }
 
 rule block { \s* \{ <lineseq> \} \s* }
 
