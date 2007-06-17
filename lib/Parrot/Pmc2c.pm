@@ -676,7 +676,7 @@ sub pmc_is_dynpmc {
 
 # XXX quick hack - to get MMD variants
 sub get_super_mmds {
-    my ( $self, $meth, $right, $func ) = @_;
+    my ( $self, $meth, $right_type, $func ) = @_;
     ## use Data::Dumper;
     ## printf "******* $meth_name **********\n";
     ## print Dumper($self);
@@ -712,12 +712,13 @@ sub get_super_mmds {
 
 Returns three values:
 
-The first is an arrayref of <[ mmd_number, left, right, implementation_func]>
+The first is an arrayref of 
+<[ mmd_number, left_type, right_type, implementation_func]>
 suitable for initializing the MMD list.
 
 The second is a arrayref listing dynamic PMCs which will need to be looked up.
 
-The third is a list of C<[index, dynamic PMC]> pairs of right entries
+The third is a list of C<[index, dynamic PMC]> pairs of right_type entries
 in the MMD table that will need to be resolved at runtime.
 
 =cut
@@ -741,31 +742,31 @@ sub find_mmd_methods {
             $meth_name = "Parrot_${classname}_$meth";
         }
         next unless $method->{mmd} =~ /MMD_/;
-        my ( $func, $left, $right );
+        my ( $func, $left_type, $right_type );
         $func = $method->{mmd};
 
         # dynamic PMCs need the runtime type
         # which is passed in entry to class_init
-        $left  = 0;                 # set to 'entry' below in initialization loop.
-        $right = 'enum_type_PMC';
-        $right = 'enum_type_INTVAL' if ( $func =~ s/_INT$// );
-        $right = 'enum_type_FLOATVAL' if ( $func =~ s/_FLOAT$// );
-        $right = 'enum_type_STRING' if ( $func =~ s/_STR$// );
+        $left_type  = 0;  # set to 'entry' below in initialization loop.
+        $right_type = 'enum_type_PMC';
+        $right_type = 'enum_type_INTVAL' if ( $func =~ s/_INT$// );
+        $right_type = 'enum_type_FLOATVAL' if ( $func =~ s/_FLOAT$// );
+        $right_type = 'enum_type_STRING' if ( $func =~ s/_STR$// );
         if ( exists $self->{super}{$meth} ) {
-            push @mmds, $self->get_super_mmds( $meth, $right, $func );
+            push @mmds, $self->get_super_mmds( $meth, $right_type, $func );
         }
-        push @mmds, [ $func, $left, $right, $meth_name ];
+        push @mmds, [ $func, $left_type, $right_type, $meth_name ];
         foreach my $variant ( @{ $self->{mmd_variants}{$meth} } ) {
             if ( $self->pmc_is_dynpmc( $variant->[0] ) ) {
-                $right = 0;
+                $right_type = 0;
                 push @init_mmds, [ $#mmds + 1, $variant->[0] ];
                 $init_mmds{ $variant->[0] } = 1;
             }
             else {
-                $right = "enum_class_$variant->[0]";
+                $right_type = "enum_class_$variant->[0]";
             }
             $meth_name = $variant->[1] . '_' . $variant->[0];
-            push @mmds, [ $func, $left, $right, $meth_name ];
+            push @mmds, [ $func, $left_type, $right_type, $meth_name ];
         }
         $self->{mmds} = @mmds;    # XXX?
     }
