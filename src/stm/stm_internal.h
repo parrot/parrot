@@ -22,7 +22,8 @@
           else { \
               if (time_bucket >= TIME_BUCKETS) { \
                   time_bucket = TIME_BUCKETS - 1; \
-              } else if (time_bucket == 0) { \
+              } \
+              else if (time_bucket == 0) { \
                   abort(); \
                   time_bucket = 0; \
               } \

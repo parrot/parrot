@@ -2444,7 +2444,8 @@ PDB_backtrace(Interp *interp)
             PMC_cont(old)->to_ctx->current_sub ==
             PMC_cont(sub)->to_ctx->current_sub) {
                 ++rec_level;
-        } else if (rec_level != 0) {
+        }
+        else if (rec_level != 0) {
             PIO_eprintf(interp, "... call repeated %d times\n", rec_level);
             rec_level = 0;
         }

@@ -173,11 +173,14 @@ string_unescape_one(Interp *interp, UINTVAL *offset /*NN*/,
             codepoint = CHARSET_GET_BYTE(interp, string, *offset);
             if (codepoint >= '0' && codepoint <= '9') {
                 workchar = codepoint - '0';
-            } else if (codepoint >= 'a' && codepoint <= 'f') {
+            }
+            else if (codepoint >= 'a' && codepoint <= 'f') {
                 workchar = codepoint - 'a' + 10;
-            } else if (codepoint >= 'A' && codepoint <= 'F') {
+            }
+            else if (codepoint >= 'A' && codepoint <= 'F') {
                 workchar = codepoint - 'A' + 10;
-            } else if (codepoint == '{') {
+            }
+            else if (codepoint == '{') {
                 int i;
                 ++*offset;
                 workchar = 0;
@@ -190,9 +193,11 @@ string_unescape_one(Interp *interp, UINTVAL *offset /*NN*/,
                     workchar *= 16;
                     if (codepoint >= '0' && codepoint <= '9') {
                         workchar += codepoint - '0';
-                    } else if (codepoint >= 'a' && codepoint <= 'f') {
+                    }
+                    else if (codepoint >= 'a' && codepoint <= 'f') {
                         workchar += codepoint - 'a' + 10;
-                    } else if (codepoint >= 'A' && codepoint <= 'F') {
+                    }
+                    else if (codepoint >= 'A' && codepoint <= 'F') {
                         workchar += codepoint - 'A' + 10;
                     }
                     else {
@@ -213,9 +218,11 @@ string_unescape_one(Interp *interp, UINTVAL *offset /*NN*/,
                 codepoint = CHARSET_GET_BYTE(interp, string, *offset);
                 if (codepoint >= '0' && codepoint <= '9') {
                     workchar += codepoint - '0';
-                } else if (codepoint >= 'a' && codepoint <= 'f') {
+                }
+                else if (codepoint >= 'a' && codepoint <= 'f') {
                     workchar += codepoint - 'a' + 10;
-                } else if (codepoint >= 'A' && codepoint <= 'F') {
+                }
+                else if (codepoint >= 'A' && codepoint <= 'F') {
                     workchar += codepoint - 'A' + 10;
                 }
                 else {
@@ -245,9 +252,11 @@ string_unescape_one(Interp *interp, UINTVAL *offset /*NN*/,
                     codepoint = CHARSET_GET_BYTE(interp, string, *offset);
                     if (codepoint >= '0' && codepoint <= '9') {
                         workchar += codepoint - '0';
-                    } else if (codepoint >= 'a' && codepoint <= 'f') {
+                    }
+                    else if (codepoint >= 'a' && codepoint <= 'f') {
                         workchar += codepoint - 'a' + 10;
-                    } else if (codepoint >= 'A' && codepoint <= 'F') {
+                    }
+                    else if (codepoint >= 'A' && codepoint <= 'F') {
                         workchar += codepoint - 'A' + 10;
                     }
                     else {
@@ -270,9 +279,11 @@ string_unescape_one(Interp *interp, UINTVAL *offset /*NN*/,
                     codepoint = CHARSET_GET_BYTE(interp, string, *offset);
                     if (codepoint >= '0' && codepoint <= '9') {
                         workchar += codepoint - '0';
-                    } else if (codepoint >= 'a' && codepoint <= 'f') {
+                    }
+                    else if (codepoint >= 'a' && codepoint <= 'f') {
                         workchar += codepoint - 'a' + 10;
-                    } else if (codepoint >= 'A' && codepoint <= 'F') {
+                    }
+                    else if (codepoint >= 'A' && codepoint <= 'F') {
                         workchar += codepoint - 'A' + 10;
                     }
                     else {

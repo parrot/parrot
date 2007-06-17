@@ -5272,7 +5272,8 @@ static void *sbrk (long size) {
         g_last->top_allocated = (char *) g_last->top_allocated + allocate_size;
         result = (char *) g_last->top_allocated - size;
     /* Deallocation requested? */
-    } else if (size < 0) {
+    }
+    else if (size < 0) {
         long deallocate_size = - size;
         /* As long as we have a region to release */
         while ((char *) g_last->top_allocated - deallocate_size

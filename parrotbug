@@ -99,8 +99,9 @@ sub trivial_subject {
          length($subject) < 4 ||
          $subject !~ /\s/ ) {
         return 1;
-    } else {
-	return 0;
+    }
+    else {
+        return 0;
     }
 }
 
@@ -182,11 +183,11 @@ sub init {
             local $/;
             $report{body} = <BODY>;
             close BODY or  die "Can't close '$opts{input}': $!";
-        } else {
+        }
+        else {
             # No file provided...
             $report{body} = "";
         }
-            
 
       nok_report: {
             last nok_report unless defined $opts{nok};
@@ -239,9 +240,11 @@ sub init {
     eval "use Mail::Util;";
     if ( $@ eq "" ) {
         $domain = Mail::Util::maildomain();
-    } elsif ($is_mswin32) {
+    }
+    elsif ($is_mswin32) {
         $domain = $ENV{USERDOMAIN};
-    } else {
+    }
+    else {
         require Sys::Hostname;
         $domain = Sys::Hostname::hostname();
     }
@@ -323,7 +326,8 @@ EOT
     if ( $opts{editor} ) {
         $editor = $opts{editor};
 
-    } else {
+    }
+    else {
         ask_for_editor($opts{quiet} ? "" : <<EOT);
 You will probably want to use an editor to enter the report. If the
 default editor proposed below is the editor you want to use, then just
@@ -615,7 +619,8 @@ sub send_report {
 
 	print "\nMessage sent.\n";
 
-    } else {
+    }
+    else {
 	my $sendmail = "";
 	for ( qw[ /usr/lib/sendmail /usr/sbin/sendmail 
                   /usr/ucblib/sendmail /var/qmail/bin/sendmail ] ) {
@@ -644,7 +649,8 @@ EOT
         print SENDMAIL format_message();
 	if (close(SENDMAIL)) {
 	    printf "\nMessage sent.\n";
-	} else {
+        }
+        else {
 	    warn "\nSendmail returned status '", $? >> 8, "'\n";
 	}
     }

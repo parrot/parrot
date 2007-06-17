@@ -1058,7 +1058,8 @@ Parrot_add_parent(Interp *interp, PMC *_class, PMC *parent)
             VTABLE_name(interp, _class));
 
         create_deleg_pmc_vtable(interp, _class, class_name, 1);
-    } else if (!PObj_is_class_TEST(parent)) {
+    }
+    else if (!PObj_is_class_TEST(parent)) {
         internal_exception(1, "Parent isn't a ParrotClass");
     }
 

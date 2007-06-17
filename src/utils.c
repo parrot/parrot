@@ -677,7 +677,8 @@ process_cycle_without_exit(int node_index, parrot_prm_context* c /*NN*/)
     if (0 == alt) { /* use temp reg */
         move_reg(c->dest_regs[node_index],c->temp_reg, c);
         c->backup[node_index] = c->temp_reg;
-    } else
+    }
+    else
         c->backup[node_index] = c->dest_regs[node_index];
 
     rec_climb_back_and_mark(node_index, c);

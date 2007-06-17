@@ -1342,7 +1342,8 @@ directory_unpack(Interp *interp, PackFile_Segment *segp /*NN*/, opcode_t *cursor
             if (pf->header->wordsize == 8)
                 pos = pf->src + seg->file_offset * 2;
 #endif
-        } else
+        }
+        else
             pos = pf->src + seg->file_offset;
         tmp = PF_fetch_opcode(pf, &pos);
         if (seg->op_count != tmp) {
@@ -1388,7 +1389,8 @@ directory_unpack(Interp *interp, PackFile_Segment *segp /*NN*/, opcode_t *cursor
             if (pf->header->wordsize == 8)
                 delta = (pos - cursor) / 2;
 #endif
-        } else
+        }
+        else
             delta = pos - cursor;
         if ((size_t)delta != tmp || dir->segments[i]->op_count != tmp)
             fprintf(stderr, "PackFile_unpack segment '%s' directory length %d "

@@ -62,9 +62,11 @@ make_local_copy(Parrot_Interp interp, Parrot_Interp from, PMC *arg)
 
     if (PMC_IS_NULL(arg)) {
         ret_val = PMCNULL;
-    } else if (PObj_is_PMC_shared_TEST(arg)) {
+    }
+    else if (PObj_is_PMC_shared_TEST(arg)) {
         ret_val = arg;
-    } else if (VTABLE_isa(from, arg, _multi_sub)) {
+    }
+    else if (VTABLE_isa(from, arg, _multi_sub)) {
         INTVAL i = 0;
         INTVAL n = VTABLE_elements(from, arg);
         ret_val  = pmc_new(interp, enum_class_MultiSub);
@@ -74,7 +76,8 @@ make_local_copy(Parrot_Interp interp, Parrot_Interp from, PMC *arg)
             PMC *const copy = make_local_copy(interp, from, orig);
             VTABLE_push_pmc(interp, ret_val, copy);
         }
-    } else if (VTABLE_isa(from, arg, _sub)) {
+    }
+    else if (VTABLE_isa(from, arg, _sub)) {
         /* this is a workaround for cloning subroutines not actually
          * working as one might expect mainly because the segment is
          * not correctly copied
@@ -401,7 +404,8 @@ thread_func(void *arg)
         interpreter_array[tid] = NULL;
         TRACE_THREAD("really destroying an interpreter [exit while detached]");
         Parrot_really_destroy(interp, 0, NULL);
-    } else if (interp->thread_data->state & THREAD_STATE_JOINED) {
+    }
+    else if (interp->thread_data->state & THREAD_STATE_JOINED) {
         pt_thread_signal(interp, interp->thread_data->joiner);
     }
 
@@ -1419,13 +1423,15 @@ pt_DOD_start_mark(Parrot_Interp interp)
                  THREAD_STATE_SUSPEND_GC_REQUESTED));
         TRACE_THREAD("already suspended...");
         UNLOCK(interpreter_array_mutex);
-    } else if (block_level) {
+    }
+    else if (block_level) {
         /* unthreaded collection */
         TRACE_THREAD("... but blocked");
 
         /* holding the lock */
         return;
-    } else if (interp->thread_data->state &
+    }
+    else if (interp->thread_data->state &
                THREAD_STATE_SUSPEND_GC_REQUESTED) {
         while (remove_queued_suspend_gc(interp));
 
