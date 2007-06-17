@@ -79,9 +79,10 @@ PARROT_API STRING* Parrot_string_trans_encoding( Interp *interp /*NN*/,
 PARROT_API void Parrot_unmake_COW( Interp *interp, STRING *s /*NN*/ )
         __attribute__nonnull__(2);
 
-PARROT_API STRING * string_append( Interp *interp,
+PARROT_API STRING * string_append( Interp *interp /*NN*/,
     STRING *a /*NULLOK*/,
-    STRING *b /*NULLOK*/ );
+    STRING *b /*NULLOK*/ )
+        __attribute__nonnull__(1);
 
 PARROT_API STRING * string_bitwise_and( Interp *interp /*NN*/,
     STRING *s1 /*NULLOK*/,
@@ -142,7 +143,9 @@ PARROT_API STRING * string_concat( Interp *interp,
     STRING *b /*NULLOK*/,
     UINTVAL Uflags );
 
-PARROT_API STRING * string_copy( Interp *interp, STRING *s /*NULLOK*/ );
+PARROT_API STRING * string_copy( Interp *interp /*NN*/, STRING *s /*NULLOK*/ )
+        __attribute__nonnull__(1);
+
 PARROT_API void string_cstring_free( char *p /*NULLOK*/ );
 PARROT_API void string_deinit( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);

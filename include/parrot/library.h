@@ -33,13 +33,37 @@ typedef enum {
     PARROT_LIB_PATH_SIZE
 } enum_lib_paths;
 
-PARROT_API char* Parrot_locate_runtime_file(Interp *, const char *file_name,
-        enum_runtime_ft);
-PARROT_API STRING* Parrot_locate_runtime_file_str(Interp *, STRING *file_name,
-        enum_runtime_ft);
+/* HEADERIZER BEGIN: src/library.c */
 
-PARROT_API char* Parrot_get_runtime_prefix(Interp *, STRING **prefix);
-void parrot_init_library_paths(Interp *);
+PARROT_API char* Parrot_get_runtime_prefix( Interp *interp /*NN*/,
+    STRING **prefix_str /*NULLOK*/ )
+        __attribute__nonnull__(1);
+
+PARROT_API char* Parrot_locate_runtime_file( Interp *interp /*NN*/,
+    const char *file_name /*NN*/,
+    enum_runtime_ft type )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+PARROT_API STRING* Parrot_locate_runtime_file_str( Interp *interp /*NN*/,
+    STRING *file /*NN*/,
+    enum_runtime_ft type )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void parrot_init_library_paths( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+STRING * parrot_split_path_ext( Interp* interp /*NN*/,
+    STRING *in,
+    STRING **wo_ext,
+    STRING **ext )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: src/library.c */
+
+
 STRING * parrot_split_path_ext(Interp* , STRING *in,
         STRING **wo_ext, STRING **ext);
 

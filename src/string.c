@@ -411,7 +411,7 @@ So make sure to _use_ the return value.
 
 PARROT_API
 STRING *
-string_append(Interp *interp, STRING *a /*NULLOK*/, STRING *b /*NULLOK*/)
+string_append(Interp *interp /*NN*/, STRING *a /*NULLOK*/, STRING *b /*NULLOK*/)
 {
     UINTVAL a_capacity;
     UINTVAL total_length;
@@ -830,7 +830,7 @@ Creates and returns a copy of the specified Parrot string.
 
 PARROT_API
 STRING *
-string_copy(Interp *interp, STRING *s /*NULLOK*/)
+string_copy(Interp *interp /*NN*/, STRING *s /*NULLOK*/)
 {
     return Parrot_make_COW_reference(interp, s);
 }
