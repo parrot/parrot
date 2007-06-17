@@ -124,6 +124,7 @@ parrot_init_library_paths(Interp *interp /*NN*/)
 
 static PMC*
 get_search_paths(Interp *interp /*NN*/, enum_lib_paths which)
+    /* WARN_UNUSED */
 {
     PMC * const iglobals = interp->iglobals;
     PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interp, iglobals,
@@ -133,6 +134,7 @@ get_search_paths(Interp *interp /*NN*/, enum_lib_paths which)
 
 static int
 is_abs_path(const STRING *file /*NN*/)
+    /* WARN_UNUSED */
 {
     const char * const file_name = file->strstart;
     if (file->strlen <= 1)
@@ -264,7 +266,8 @@ static const char* load_ext_code[ LOAD_EXT_CODE_LAST + 1 ] = {
 };
 
 static STRING*
-try_load_path(Interp *interp, STRING* path /*NN*/)
+try_load_path(Interp *interp /*NN*/, STRING* path /*NN*/)
+    /* WARN_UNUSED */
 {
     STRING *final;
 
@@ -275,9 +278,9 @@ try_load_path(Interp *interp, STRING* path /*NN*/)
            string_to_cstring(interp, final ));
 #endif
 
-    final = path_finalize(interp, final );
+    final = path_finalize(interp, final);
 
-    if (Parrot_stat_info_intval(interp, final , STAT_EXISTS)) {
+    if (Parrot_stat_info_intval(interp, final, STAT_EXISTS)) {
         return final;
     }
 
@@ -291,7 +294,8 @@ try_load_path(Interp *interp, STRING* path /*NN*/)
  */
 
 static STRING*
-try_bytecode_extensions(Interp *interp, STRING* path /*NN*/)
+try_bytecode_extensions(Interp *interp /*NN*/, STRING* path /*NN*/)
+    /* WARN_UNUSED */
 {
     STRING *with_ext, *result;
 
@@ -349,6 +353,7 @@ PARROT_API
 STRING*
 Parrot_locate_runtime_file_str(Interp *interp /*NN*/, STRING *file /*NN*/,
         enum_runtime_ft type)
+    /* WARN_UNUSED */
 {
     STRING *prefix;
     STRING *full_name;
@@ -422,6 +427,7 @@ Parrot_locate_runtime_file(Interp *interp /*NN*/, const char *file_name /*NN*/,
      */
     return string_to_cstring(interp, result);
 }
+
 /*
 
 FUNCDOC: Parrot_get_runtime_prefix
@@ -429,6 +435,9 @@ FUNCDOC: Parrot_get_runtime_prefix
 If C<prefix_str> is not NULL, set it to the prefix, else return a malloced
 c-string for the runtime prefix.  Remember to free the string with
 C<string_cstring_free()>.
+
+XXX This is suboptimal.  We should have two funcs, so it's explicit
+whether we're searching for a STRING or a cstring.
 
 */
 
@@ -536,6 +545,7 @@ parrot_split_path_ext(Interp* interp /*NN*/, STRING *in,
     }
     return stem;
 }
+
 /*
 
 =head1 SEE ALSO

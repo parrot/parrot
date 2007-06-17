@@ -50,7 +50,8 @@ PARROT_API STRING* Parrot_locate_runtime_file_str( Interp *interp /*NN*/,
     STRING *file /*NN*/,
     enum_runtime_ft type )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
 
 void parrot_init_library_paths( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
