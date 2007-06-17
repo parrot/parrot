@@ -272,18 +272,18 @@ sub get_attribute {
                 # This RE may be a little wonky.
                 if ( $result =~ m{(.*) - (.*)} ) {
                     my ( $full_path, $attribute ) = ( $1, $2 );
-    
+
                     # split the path
                     my ( $volume, $directories, $file ) = splitpath $full_path;
                     my @directories = splitdir $directories;
-    
+
                     # put it back together as a unix path (to match MANIFEST)
                     $full_path = File::Spec::Unix->catpath(
                         $volume,
                         File::Spec::Unix->catdir(@directories),
                         $file
                     );
-    
+
                     # store the attribute into the results hash
                     $results{$full_path} = $attribute;
                 }
