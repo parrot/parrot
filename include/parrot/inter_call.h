@@ -1,5 +1,5 @@
 /* inter_call.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *Id: inter_call.h 17714 2007-03-24 17:04:39Z tewk
  *  Overview:
@@ -68,41 +68,97 @@ typedef enum arg_pass_t {
     PARROT_PASS_RESULTS         = 0x01
 } arg_pass_t;
 
-PARROT_API int Parrot_init_arg_indexes_and_sig_pmc(Interp *interp, parrot_context_t *ctx,
-        opcode_t *indexes, PMC* sig_pmc, call_state_item *st);
+/* HEADERIZER BEGIN: src/inter_call.c */
 
-PARROT_API int Parrot_init_arg_sig(Interp *, parrot_context_t *ctx,
-        const char *sig, void *ap, call_state_item *st);
+PARROT_API void Parrot_convert_arg( Interp *interp, call_state *st /*NN*/ )
+        __attribute__nonnull__(2);
 
-PARROT_API int Parrot_init_arg_op(Interp *, parrot_context_t *ctx,
-        opcode_t *pc, call_state_item *st);
+PARROT_API int Parrot_fetch_arg( Interp *interp, call_state *st /*NN*/ )
+        __attribute__nonnull__(2);
 
-PARROT_API void Parrot_process_args(Interp *interp, call_state *st,
-        arg_pass_t param_or_result);
+PARROT_API int Parrot_fetch_arg_nci( Interp *interp, call_state *st /*NN*/ )
+        __attribute__nonnull__(2);
 
-PARROT_API int Parrot_init_arg_nci(Interp *, call_state *st, const char *sig);
-PARROT_API int Parrot_init_ret_nci(Interp *, call_state *st, const char *sig);
+PARROT_API int Parrot_init_arg_indexes_and_sig_pmc( Interp *interp,
+    parrot_context_t *ctx /*NN*/,
+    opcode_t *indexes /*NN*/,
+    PMC* sig_pmc /*NN*/,
+    call_state_item *st /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
-PARROT_API int Parrot_fetch_arg(Interp *, call_state *st);
-PARROT_API int Parrot_fetch_arg_nci(Interp *, call_state *st);
-PARROT_API void Parrot_convert_arg(Interp *, call_state *st);
-PARROT_API int Parrot_store_arg(Interp *, call_state *st);
+PARROT_API int Parrot_init_arg_nci( Interp *interp /*NN*/,
+    call_state *st /*NN*/,
+    const char *sig )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-PARROT_API void parrot_pass_args(Interp *, parrot_context_t *src_ctx,
-        parrot_context_t *dest_ctx, opcode_t *src_indexes, opcode_t *dest_indexes,
-        arg_pass_t param_or_result);
-opcode_t * parrot_pass_args_fromc(Interp *, const char *sig,
-        opcode_t *dest, parrot_context_t * ctx, va_list ap);
+PARROT_API int Parrot_init_arg_op( Interp *interp,
+    parrot_context_t *ctx /*NN*/,
+    opcode_t *pc /*NULLOK*/,
+    call_state_item *st /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
-void* set_retval(Interp*, int sig_ret, parrot_context_t *ctx);
-INTVAL set_retval_i(Interp*, int sig_ret, parrot_context_t *ctx);
-FLOATVAL set_retval_f(Interp*, int sig_ret, parrot_context_t *ctx);
-STRING* set_retval_s(Interp*, int sig_ret, parrot_context_t *ctx);
-PMC* set_retval_p(Interp*, int sig_ret, parrot_context_t *ctx);
+PARROT_API int Parrot_init_arg_sig( Interp *interp,
+    parrot_context_t *ctx,
+    const char *sig /*NN*/,
+    void *ap,
+    call_state_item *st /*NN*/ )
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(5);
 
-/* PMC Method Invoke */
-PARROT_API void Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name,
-  const char *signature, ... );
+PARROT_API int Parrot_init_ret_nci( Interp *interp /*NN*/,
+    call_state *st,
+    const char *sig )
+        __attribute__nonnull__(1);
+
+PARROT_API void parrot_pass_args( Interp *interp,
+    parrot_context_t *src_ctx,
+    parrot_context_t *dest_ctx,
+    opcode_t *src_indexes,
+    opcode_t *dest_indexes,
+    arg_pass_t param_or_result );
+
+PARROT_API void Parrot_PCCINVOKE( Interp* interp,
+    PMC* pmc,
+    STRING *method_name,
+    const char *signature,
+    ... );
+
+PARROT_API void Parrot_process_args( Interp *interp,
+    call_state *st,
+    arg_pass_t param_or_result );
+
+opcode_t * parrot_pass_args_fromc( Interp *interp,
+    const char *sig,
+    opcode_t *dest,
+    parrot_context_t *old_ctxp,
+    va_list ap );
+
+int Parrot_store_arg( Interp *interp, call_state *st );
+void* set_retval( Parrot_Interp interp, int sig_ret, parrot_context_t *ctx );
+FLOATVAL set_retval_f( Interp *interp /*NN*/,
+    int sig_ret,
+    parrot_context_t *ctx )
+        __attribute__nonnull__(1);
+
+INTVAL set_retval_i( Interp *interp /*NN*/,
+    int sig_ret,
+    parrot_context_t *ctx )
+        __attribute__nonnull__(1);
+
+PMC* set_retval_p( Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx )
+        __attribute__nonnull__(1);
+
+STRING* set_retval_s( Interp *interp /*NN*/,
+    int sig_ret,
+    parrot_context_t *ctx )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: src/inter_call.c */
 
 #define ASSERT_SIG_PMC(sig) \
     assert(PObj_is_PMC_TEST(sig) && \

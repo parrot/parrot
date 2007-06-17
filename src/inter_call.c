@@ -25,6 +25,8 @@ subroutines.
 #include "parrot/oplib/ops.h"
 #include "inter_call.str"
 
+/* HEADER: include/parrot/inter_call.h */
+
 
 #define SAVE_OFF_REGS(orig, next, save) \
         save.bp = orig.bp;\
@@ -38,8 +40,6 @@ subroutines.
 
 
 static void next_arg_sig(Interp *interp, call_state_item *st);
-static int set_retval_util(Parrot_Interp interp, const char *sig,
-    parrot_context_t *ctx, call_state *st);
 static void check_for_opt_flag(Interp *interp, call_state *st, int has_arg);
 
 /*
@@ -56,8 +56,9 @@ Initialize the return value passing state C<call_state> for the given NCI signat
 
 */
 
+PARROT_API
 int
-Parrot_init_arg_nci(Interp *interp, call_state *st, const char *sig)
+Parrot_init_arg_nci(Interp *interp /*NN*/, call_state *st /*NN*/, const char *sig)
 {
     if (PMC_IS_NULL(interp->args_signature))
         Parrot_init_arg_op(interp, CONTEXT(interp->ctx), interp->current_args, &st->src);
@@ -68,8 +69,9 @@ Parrot_init_arg_nci(Interp *interp, call_state *st, const char *sig)
     return 1;
 }
 
+PARROT_API
 int
-Parrot_init_ret_nci(Interp *interp, call_state *st, const char *sig)
+Parrot_init_ret_nci(Interp *interp /*NN*/, call_state *st, const char *sig)
 {
     Parrot_Context *ctx          = CONTEXT(interp->ctx);
     PMC            *current_cont = ctx->current_cont;
@@ -115,9 +117,10 @@ These functions return 0, if no arguments are present, or 1 on success.
 
 */
 
+PARROT_API
 int
-Parrot_init_arg_indexes_and_sig_pmc(Interp *interp, parrot_context_t *ctx,
-        opcode_t *indexes, PMC* sig_pmc, call_state_item *st)
+Parrot_init_arg_indexes_and_sig_pmc(Interp *interp, parrot_context_t *ctx /*NN*/,
+        opcode_t *indexes /*NN*/, PMC* sig_pmc /*NN*/, call_state_item *st /*NN*/)
 {
     if (!sig_pmc && indexes) {
         ++indexes;
@@ -146,9 +149,10 @@ Parrot_init_arg_indexes_and_sig_pmc(Interp *interp, parrot_context_t *ctx,
     return st->n > 0;
 }
 
+PARROT_API
 int
-Parrot_init_arg_op(Interp *interp, parrot_context_t *ctx, opcode_t *pc,
-    call_state_item *st)
+Parrot_init_arg_op(Interp *interp, parrot_context_t *ctx /*NN*/, opcode_t *pc /*NULLOK*/,
+    call_state_item *st /*NN*/)
 {
     PMC *sig_pmc = PMCNULL;
     if (pc) {
@@ -160,9 +164,10 @@ Parrot_init_arg_op(Interp *interp, parrot_context_t *ctx, opcode_t *pc,
     return Parrot_init_arg_indexes_and_sig_pmc(interp, ctx, pc, sig_pmc, st);
 }
 
+PARROT_API
 int
-Parrot_init_arg_sig(Interp *interp, parrot_context_t *ctx, const char *sig,
-    void *ap, call_state_item *st)
+Parrot_init_arg_sig(Interp *interp, parrot_context_t *ctx, const char *sig /*NN*/,
+    void *ap, call_state_item *st /*NN*/)
 {
     st->used = 1;
     st->i = 0;
@@ -334,9 +339,9 @@ fetch_arg_op(Interp *interp, call_state *st)
     return 1;
 }
 
-
+PARROT_API
 int
-Parrot_fetch_arg(Interp *interp, call_state *st)
+Parrot_fetch_arg(Interp *interp, call_state *st /*NN*/)
 {
     if (!st->src.used)
         return 1;
@@ -394,8 +399,9 @@ Parrot_fetch_arg(Interp *interp, call_state *st)
 }
 
 
+PARROT_API
 int
-Parrot_fetch_arg_nci(Interp *interp, call_state *st)
+Parrot_fetch_arg_nci(Interp *interp, call_state *st /*NN*/)
 {
     next_arg_sig(interp, &st->dest);
     if (st->dest.sig & PARROT_ARG_SLURPY_ARRAY) {
@@ -654,7 +660,7 @@ store_arg(call_state *st, INTVAL idx)
 
 
 static int
-store_current_arg(Interp *interp, call_state *st)
+store_current_arg(Interp *interp, call_state *st /*NN*/)
 {
     INTVAL idx;
     if (st->dest.i >= st->dest.n)
@@ -800,6 +806,7 @@ init_call_stats(call_state *st)
     st->first_named   = -1;
 }
 
+PARROT_API
 void
 Parrot_process_args(Interp *interp, call_state *st, arg_pass_t param_or_result)
 {
@@ -963,8 +970,9 @@ Parrot_process_args(Interp *interp, call_state *st, arg_pass_t param_or_result)
     dod_unregister_pmc(interp, dest->slurp);
 }
 
+PARROT_API
 void
-Parrot_convert_arg(Interp *interp, call_state *st)
+Parrot_convert_arg(Interp *interp, call_state *st /*NN*/)
 {
     /* register key args have to be cloned */
     if ((st->src.sig & PARROT_ARG_TYPE_MASK) == PARROT_ARG_PMC)
@@ -1014,6 +1022,7 @@ the latter handles return values and yields.
 
 */
 
+PARROT_API
 void
 parrot_pass_args(Interp *interp, parrot_context_t *src_ctx, parrot_context_t *dest_ctx,
         opcode_t *src_indexes, opcode_t *dest_indexes, arg_pass_t  param_or_result)
@@ -1055,6 +1064,7 @@ Prerequsits are like above.
 =cut
 
 */
+
 opcode_t *
 parrot_pass_args_fromc(Interp *interp, const char *sig,
         opcode_t *dest, parrot_context_t *old_ctxp, va_list ap)
@@ -1067,11 +1077,11 @@ parrot_pass_args_fromc(Interp *interp, const char *sig,
     return dest + st.dest.n + 2;
 }
 
-int
-set_retval_util(Parrot_Interp interp, const char *sig, parrot_context_t *ctx,
+static int
+set_retval_util(Interp *interp /*NN*/, const char *sig, parrot_context_t *ctx,
         call_state *st)
 {
-    opcode_t *src_pc = interp->current_returns;
+    opcode_t * const src_pc = interp->current_returns;
     int todo = Parrot_init_arg_op(interp, ctx, src_pc, &st->src);
 
     interp->current_returns = NULL;
@@ -1112,8 +1122,9 @@ set_retval(Parrot_Interp interp, int sig_ret, parrot_context_t *ctx)
 /*
  * handle INTVAL return value
  */
+
 INTVAL
-set_retval_i(Parrot_Interp interp, int sig_ret, parrot_context_t *ctx)
+set_retval_i(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx)
 {
     call_state st;
 
@@ -1130,7 +1141,7 @@ set_retval_i(Parrot_Interp interp, int sig_ret, parrot_context_t *ctx)
  * handle FLOATVAL return value
  */
 FLOATVAL
-set_retval_f(Parrot_Interp interp, int sig_ret, parrot_context_t *ctx)
+set_retval_f(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx)
 {
     call_state st;
 
@@ -1147,7 +1158,7 @@ set_retval_f(Parrot_Interp interp, int sig_ret, parrot_context_t *ctx)
  * handle STRING return value
  */
 STRING*
-set_retval_s(Parrot_Interp interp, int sig_ret, parrot_context_t *ctx)
+set_retval_s(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx)
 {
     call_state st;
 
@@ -1164,7 +1175,7 @@ set_retval_s(Parrot_Interp interp, int sig_ret, parrot_context_t *ctx)
  * handle PMC return value
  */
 PMC*
-set_retval_p(Parrot_Interp interp, int sig_ret, parrot_context_t *ctx)
+set_retval_p(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx)
 {
     call_state st;
 
@@ -1273,6 +1284,7 @@ invokes a PMC method
 
 */
 
+PARROT_API
 void
 Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *signature, ...)
 {

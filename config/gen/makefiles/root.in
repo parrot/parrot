@@ -1854,6 +1854,7 @@ HEADERIZER_O_FILES = \
     src/hash.o \
     src/headers.o \
     src/hll.o \
+    src/inter_call.o \
     src/intlist.o \
     src/key.o \
     src/list.o \
