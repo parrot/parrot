@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 95;
+use Parrot::Test tests => 96;
 
 =head1 NAME
 
@@ -2446,6 +2446,35 @@ CODE
 3
 3
 OUTPUT
+
+
+pir_output_is( <<'CODE', <<'OUTPUT', "slurpy named after :optional", 'todo'=>'RT #43231' );
+.sub main :main
+    foo(0, 'abc' => 1)
+    foo('abc' => 2)
+    $P0 = new .ResizablePMCArray
+    push $P0, 1
+    foo($P0 :flat, 'abc' => 3)
+    $P0 = new .ResizablePMCArray
+    foo($P0 :flat, 'abc' => 4)
+.end
+
+.sub foo
+        .param pmc val     :optional
+        .param int has_val :opt_flag
+        .param pmc hash    :slurpy :named
+        print "ok "
+        $P0 = hash['abc']
+        print $P0
+        print "\n"
+.end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl
