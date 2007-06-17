@@ -684,7 +684,7 @@ Parrot_store_arg(Interp *interp, call_state *st /*NN*/)
 }
 
 static void
-too_few(Interp *interp, const call_state * const st, const char * const action)
+too_few(Interp *interp, const call_state *st /*NN*/, const char *action /*NN*/)
 {
     const int max_expected_args = st->params;
     const int min_expected_args = max_expected_args - st->optionals;
@@ -699,7 +699,7 @@ too_few(Interp *interp, const call_state * const st, const char * const action)
 }
 
 static void
-too_many(Interp *interp, const call_state * const st, const char * const action)
+too_many(Interp *interp, const call_state *st /*NN*/, const char *action /*NN*/)
 {
     const int max_expected_args = st->params;
     const int min_expected_args = max_expected_args - st->optionals;
@@ -714,7 +714,7 @@ too_many(Interp *interp, const call_state * const st, const char * const action)
 }
 
 static void
-null_val(int sig, call_state *st)
+null_val(int sig, call_state *st /*NN*/)
 {
     switch (sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:
@@ -736,18 +736,15 @@ null_val(int sig, call_state *st)
  * STRING* name, [INPS] actual_arg, int opt_arg_flag
  */
 static void
-check_named(Interp *interp, call_state *st, const char *action)
+check_named(Interp *interp /*NN*/, call_state *st /*NN*/, const char *action /*NN*/)
 {
     int i;
     int n_named = -1;
 
     for (i = st->first_named; i < st->dest.n; ++i) {
-        INTVAL idx;
-
         /* verify that a name exists */
-        INTVAL sig = st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i);
-        if (sig & PARROT_ARG_NAME)
-        {
+        const INTVAL sig = st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i);
+        if (sig & PARROT_ARG_NAME) {
             INTVAL arg_sig;
             int last_name_pos;
             /* if slurpy then no errors, return */
@@ -769,6 +766,7 @@ check_named(Interp *interp, call_state *st, const char *action)
                 continue;
             }
             else if (arg_sig & PARROT_ARG_OPTIONAL) {
+                INTVAL idx;
                 null_val(arg_sig, st);
                 idx = st->dest.u.op.pc[i];
                 store_arg(st, idx);
@@ -782,9 +780,8 @@ check_named(Interp *interp, call_state *st, const char *action)
                 continue;
             }
             else {
-                STRING *param;
-                idx = st->dest.u.op.pc[last_name_pos];
-                param = PARROT_ARG_CONSTANT_ISSET(sig)
+                const INTVAL idx = st->dest.u.op.pc[last_name_pos];
+                STRING * const param = PARROT_ARG_CONSTANT_ISSET(sig)
                     ? st->dest.ctx->constants[idx]->u.string
                     : CTX_REG_STR(st->dest.ctx, idx);
                 real_exception(interp, NULL, E_ValueError,
@@ -799,7 +796,7 @@ check_named(Interp *interp, call_state *st, const char *action)
 }
 
 static void
-init_call_stats(call_state *st)
+init_call_stats(call_state *st /*NN*/)
 {
     st->n_actual_args = st->src.n;  /* initial guess, adjusted for :flat args */
     st->optionals     = 0;
@@ -811,13 +808,13 @@ init_call_stats(call_state *st)
 
 PARROT_API
 void
-Parrot_process_args(Interp *interp, call_state *st, arg_pass_t param_or_result)
+Parrot_process_args(Interp *interp /*NN*/, call_state *st /*NN*/, arg_pass_t param_or_result)
 {
     int has_arg, n_named;
     int err_check = 1;
     call_state_item *src, *dest;
 
-    const char *action = (param_or_result == PARROT_PASS_RESULTS) ? "results" : "params";
+    const char * const action = (param_or_result == PARROT_PASS_RESULTS) ? "results" : "params";
 
     /* Check if we should be throwing errors. This can be configured separately
      * for parameters and return values. */
@@ -893,9 +890,9 @@ Parrot_process_args(Interp *interp, call_state *st, arg_pass_t param_or_result)
      * 2nd: Positional :slurpy
      */
     if (dest->sig & PARROT_ARG_SLURPY_ARRAY && !(dest->sig & PARROT_ARG_NAME)) {
-        PMC *array = pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC * const array = pmc_new(interp, enum_class_ResizablePMCArray);
 
-        INTVAL idx = st->dest.u.op.pc[dest->i];
+        const INTVAL idx = st->dest.u.op.pc[dest->i];
         assert(idx >= 0);
         /* Must register this PMC or it may get collected when only the struct
          * references it. */
@@ -975,7 +972,7 @@ Parrot_process_args(Interp *interp, call_state *st, arg_pass_t param_or_result)
 
 PARROT_API
 void
-Parrot_convert_arg(Interp *interp, call_state *st /*NN*/)
+Parrot_convert_arg(Interp *interp /*NN*/, call_state *st /*NN*/)
 {
     /* register key args have to be cloned */
     if ((st->src.sig & PARROT_ARG_TYPE_MASK) == PARROT_ARG_PMC)
@@ -1027,8 +1024,8 @@ the latter handles return values and yields.
 
 PARROT_API
 void
-parrot_pass_args(Interp *interp, parrot_context_t *src_ctx, parrot_context_t *dest_ctx,
-        opcode_t *src_indexes, opcode_t *dest_indexes, arg_pass_t  param_or_result)
+parrot_pass_args(Interp *interp /*NN*/, parrot_context_t *src_ctx /*NN*/, parrot_context_t *dest_ctx /*NN*/,
+        opcode_t *src_indexes /*NN*/, opcode_t *dest_indexes /*NN*/, arg_pass_t param_or_result)
 {
     call_state st;
     PMC* src_signature;
@@ -1069,7 +1066,7 @@ Prerequsits are like above.
 */
 
 opcode_t *
-parrot_pass_args_fromc(Interp *interp, const char *sig,
+parrot_pass_args_fromc(Interp *interp /*NN*/, const char *sig,
         opcode_t *dest, parrot_context_t *old_ctxp, va_list ap)
 {
     call_state st;
@@ -1081,8 +1078,8 @@ parrot_pass_args_fromc(Interp *interp, const char *sig,
 }
 
 static int
-set_retval_util(Interp *interp /*NN*/, const char *sig, parrot_context_t *ctx,
-        call_state *st)
+set_retval_util(Interp *interp /*NN*/, const char *sig, parrot_context_t *ctx /*NN*/,
+        call_state *st /*NN*/)
 {
     opcode_t * const src_pc = interp->current_returns;
     int todo = Parrot_init_arg_op(interp, ctx, src_pc, &st->src);
@@ -1104,7 +1101,7 @@ set_retval_util(Interp *interp /*NN*/, const char *sig, parrot_context_t *ctx,
  * handle void, and pointer (PMC*, STRING*) return values
  */
 void*
-set_retval(Parrot_Interp interp, int sig_ret, parrot_context_t *ctx)
+set_retval(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx /*NN*/)
 {
     call_state st;
 
@@ -1127,7 +1124,7 @@ set_retval(Parrot_Interp interp, int sig_ret, parrot_context_t *ctx)
  */
 
 INTVAL
-set_retval_i(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx)
+set_retval_i(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx /*NN*/)
 {
     call_state st;
 
@@ -1144,7 +1141,7 @@ set_retval_i(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx)
  * handle FLOATVAL return value
  */
 FLOATVAL
-set_retval_f(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx)
+set_retval_f(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx /*NN*/)
 {
     call_state st;
 
@@ -1161,7 +1158,7 @@ set_retval_f(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx)
  * handle STRING return value
  */
 STRING*
-set_retval_s(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx)
+set_retval_s(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx /*NN*/)
 {
     call_state st;
 
@@ -1178,7 +1175,7 @@ set_retval_s(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx)
  * handle PMC return value
  */
 PMC*
-set_retval_p(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx)
+set_retval_p(Interp *interp /*NN*/, int sig_ret, parrot_context_t *ctx /*NN*/)
 {
     call_state st;
 
@@ -1237,8 +1234,8 @@ commit_last_arg(Interp *interp, int index, int cur, opcode_t *n_regs_used, int s
             case PARROT_ARG_PMC:
                 CTX_REG_PMC(ctx, reg_offset) = va_arg(*list, PMC*); break;
             default:
-                      real_exception(interp, NULL, E_IndexError,
-                          "Parrot_PCCINVOKE: invalid reg type");
+                real_exception(interp, NULL, E_IndexError,
+                    "Parrot_PCCINVOKE: invalid reg type");
         }
     }
 }
