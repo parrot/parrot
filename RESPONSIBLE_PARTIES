@@ -35,7 +35,7 @@ Committers
 ----------
 
 Core Developer                  -
-                                Jonathan Worthington (bytecode format/loader)
+                                Jonathan Worthington
                                 Matt Diephouse
                                 Bernhard Schmalhofer
                                 Kevin Tew
@@ -64,8 +64,25 @@ Platform Porter                 Florian Ragwitz (Debian)
                                 Aldo Calpini (PocketPC)
                                 Francois Perrad (MinGW32)
 
+Patch Monster                   chromatic
+                                Jonathan Worthington
+                                Paul Cochrane
+                                Jerry Gay
+                                Matt Diephouse
+                                Will Coleda
+                                James Keenan
+
+
 Contributors
 ------------
 
-See CREDITS.
+Cage Cleaner                    James Keenan
+                                Paul Cochrane
+                                Mike Mattie
+                                Steve Peters
+                                Jerry Gay
+                                chromatic
+                                Andy Lester
+
+General Contributor             See CREDITS
 
