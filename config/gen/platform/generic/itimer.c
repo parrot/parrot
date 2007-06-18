@@ -49,7 +49,7 @@ get_sys_timer_ms(void *handle)
  * The returned handle is passed to the other timer functions.
  */
 void *
-new_sys_timer_ms()
+new_sys_timer_ms(void)
 {
     return 0;
 }
