@@ -1,5 +1,5 @@
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: fhs.pod 18563 2007-05-16 00:53:55Z chromatic $
+# $Id$
 
 =pod
 
