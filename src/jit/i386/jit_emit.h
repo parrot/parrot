@@ -3705,7 +3705,7 @@ count_regs(char *sig, char *sig_start)
  */
 void *
 Parrot_jit_build_call_func(Interp *interp, PMC *pmc_nci,
-        String *signature)
+        STRING *signature)
 {
     Parrot_jit_info_t jit_info;
     char *sig, *pc;

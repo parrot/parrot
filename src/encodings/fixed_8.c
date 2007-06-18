@@ -200,7 +200,7 @@ fixed8_set_position(Interp *interp, String_iter *iter, UINTVAL pos)
 
 
 static void
-iter_init(Interp *interp, const String *src, String_iter *iter)
+iter_init(Interp *interp, const STRING *src, String_iter *iter)
 {
     iter->str = src;
     iter->bytepos = iter->charpos = 0;

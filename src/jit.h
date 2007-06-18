@@ -318,7 +318,7 @@ parrot_build_asm(Interp *interp,
 /*
  * NCI interface
  */
-void *Parrot_jit_build_call_func(Interp *, PMC *, String *);
+void *Parrot_jit_build_call_func(Interp *, PMC *, STRING *);
 
 #endif /* PARROT_JIT_H_GUARD */
 

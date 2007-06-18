@@ -29,7 +29,7 @@ UTF-16 encoding with the help of the ICU library.
 #define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl utf16")
 
 
-static void iter_init(Interp *, const String *src, String_iter *iter);
+static void iter_init(Interp *, const STRING *src, String_iter *iter);
 
 /*
 
@@ -322,7 +322,7 @@ utf16_set_position(Interp *interp, String_iter *i, UINTVAL n)
 
 #endif
 static void
-iter_init(Interp *interp, const String *src, String_iter *iter)
+iter_init(Interp *interp, const STRING *src, String_iter *iter)
 {
     iter->str = src;
     iter->bytepos = iter->charpos = 0;

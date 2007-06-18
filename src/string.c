@@ -104,9 +104,9 @@ Copies the string header from the first Parrot string to the second.
 */
 
 static void
-copy_string_header(String *dest /*NN*/, const String *src /*NN*/)
+copy_string_header(STRING *dest /*NN*/, const STRING *src /*NN*/)
 {
-    memcpy(dest, src, sizeof (String));
+    memcpy(dest, src, sizeof (STRING));
 }
 
 /*

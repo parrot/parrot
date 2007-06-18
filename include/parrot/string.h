@@ -22,7 +22,7 @@ struct parrot_string_t;
 
 #include "parrot/parrot.h"
 
-typedef struct parrot_string_t String;
+typedef struct parrot_string_t STRING;
 
 typedef enum Forward_flag {
     Buffer_moved_FLAG = 1 << 0
@@ -30,7 +30,7 @@ typedef enum Forward_flag {
 
 /* String iterator */
 typedef struct string_iterator_t {
-    const String *str;
+    const STRING *str;
     UINTVAL bytepos;
     UINTVAL charpos;
     UINTVAL (*get_and_advance)(Interp *, struct string_iterator_t *i);
@@ -38,7 +38,7 @@ typedef struct string_iterator_t {
     void (*set_position)(Interp *, struct string_iterator_t *i, UINTVAL pos);
 } String_iter;
 
-void string_iter_init(Interp *, const String *str, String_iter *);
+void string_iter_init(Interp *, const STRING *str, String_iter *);
 
 /* stringinfo parameters */
 
@@ -52,7 +52,6 @@ void string_iter_init(Interp *, const String *str, String_iter *);
 #define STRINGINFO_STRLEN   6
 
 /* &end_gen */
-typedef struct parrot_string_t STRING;
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_H_GUARD */

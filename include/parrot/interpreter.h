@@ -530,7 +530,7 @@ PARROT_API void Parrot_compreg(Interp *interp, STRING *, Parrot_compiler_func_t 
 PARROT_API PMC *Parrot_compile_string(Parrot_Interp interp,
         STRING *type, char *code, STRING **error);
 PARROT_API void *Parrot_compile_file(Parrot_Interp interp,
-        char *fullname, String **error);
+        char *fullname, STRING **error);
 
 INTVAL sysinfo_i(Interp *interp, INTVAL info_wanted);
 STRING *sysinfo_s(Interp *interp, INTVAL info_wanted);

@@ -15,7 +15,7 @@
 
 #include "parrot/parrot.h"
 
-void *build_call_func(Interp *, PMC *, String *);
+void *build_call_func(Interp *, PMC *, STRING *);
 
 #endif /* PARROT_NCI_H_GUARD */
 

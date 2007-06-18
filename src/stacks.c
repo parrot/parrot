@@ -248,7 +248,7 @@ stack_push(Interp *interp, Stack_Chunk_t **stack_p /*NN*/,
             UVal_pmc(entry->entry) = (PMC *)thing;
             break;
         case STACK_ENTRY_STRING:
-            UVal_str(entry->entry) = (String *)thing;
+            UVal_str(entry->entry) = (STRING *)thing;
             break;
         case STACK_ENTRY_POINTER:
         case STACK_ENTRY_DESTINATION:
@@ -305,7 +305,7 @@ stack_pop(Interp *interp, Stack_Chunk_t **stack_p /*NN*/,
         *(PMC **)where     = UVal_pmc(entry->entry);
         break;
     case STACK_ENTRY_STRING:
-        *(String **)where  = UVal_str(entry->entry);
+        *(STRING **)where  = UVal_str(entry->entry);
         break;
     case STACK_ENTRY_POINTER:
     case STACK_ENTRY_DESTINATION:
