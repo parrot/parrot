@@ -21,15 +21,15 @@
  * Macros to make accessing registers more convenient/readable.
  */
 
-#  define INTERP_REG_NUM(i, x) i->ctx.bp.regs_n[-1L-(x)]
-#  define INTERP_REG_INT(i, x) i->ctx.bp.regs_i[x]
-#  define INTERP_REG_PMC(i, x) i->ctx.bp_ps.regs_p[-1L-(x)]
-#  define INTERP_REG_STR(i, x) i->ctx.bp_ps.regs_s[x]
+#define INTERP_REG_NUM(i, x) (i)->ctx.bp.regs_n[-1L-(x)]
+#define INTERP_REG_INT(i, x) (i)->ctx.bp.regs_i[x]
+#define INTERP_REG_PMC(i, x) (i)->ctx.bp_ps.regs_p[-1L-(x)]
+#define INTERP_REG_STR(i, x) (i)->ctx.bp_ps.regs_s[x]
 
-#  define CTX_REG_NUM(ctx, x) (ctx)->bp.regs_n[-1L-(x)]
-#  define CTX_REG_INT(ctx, x) (ctx)->bp.regs_i[x]
-#  define CTX_REG_PMC(ctx, x) (ctx)->bp_ps.regs_p[-1L-(x)]
-#  define CTX_REG_STR(ctx, x) (ctx)->bp_ps.regs_s[x]
+#define CTX_REG_NUM(ctx, x) (ctx)->bp.regs_n[-1L-(x)]
+#define CTX_REG_INT(ctx, x) (ctx)->bp.regs_i[x]
+#define CTX_REG_PMC(ctx, x) (ctx)->bp_ps.regs_p[-1L-(x)]
+#define CTX_REG_STR(ctx, x) (ctx)->bp_ps.regs_s[x]
 /*
  * and a set of macros to access a register by offset, used
  * in JIT emit prederef code
@@ -43,17 +43,17 @@
 #define REGNO_STR 2
 #define REGNO_PMC 3
 
-#  define __CTX interp->ctx.state
-#  define _SIZEOF_INTS    (sizeof (INTVAL) * __CTX->n_regs_used[REGNO_INT])
-#  define _SIZEOF_NUMS    (sizeof (FLOATVAL) * __CTX->n_regs_used[REGNO_NUM])
-#  define _SIZEOF_PMCS    (sizeof (PMC*) * __CTX->n_regs_used[REGNO_PMC])
-#  define _SIZEOF_STRS    (sizeof (STRING*) * __CTX->n_regs_used[REGNO_STR])
+#define __CTX interp->ctx.state
+#define _SIZEOF_INTS    (sizeof (INTVAL) * __CTX->n_regs_used[REGNO_INT])
+#define _SIZEOF_NUMS    (sizeof (FLOATVAL) * __CTX->n_regs_used[REGNO_NUM])
+#define _SIZEOF_PMCS    (sizeof (PMC*) * __CTX->n_regs_used[REGNO_PMC])
+#define _SIZEOF_STRS    (sizeof (STRING*) * __CTX->n_regs_used[REGNO_STR])
 
-#  define REG_OFFS_NUM(x) (sizeof (FLOATVAL) * (-1L - (x)))
-#  define REG_OFFS_INT(x) (sizeof (INTVAL) * (x))
-#  define REG_OFFS_PMC(x) (_SIZEOF_INTS + sizeof (PMC*) * \
+#define REG_OFFS_NUM(x) (sizeof (FLOATVAL) * (-1L - (x)))
+#define REG_OFFS_INT(x) (sizeof (INTVAL) * (x))
+#define REG_OFFS_PMC(x) (_SIZEOF_INTS + sizeof (PMC*) * \
         (__CTX->n_regs_used[REGNO_PMC] - 1L - (x)))
-#  define REG_OFFS_STR(x) (sizeof (STRING*) * (x) + _SIZEOF_INTS + _SIZEOF_PMCS)
+#define REG_OFFS_STR(x) (sizeof (STRING*) * (x) + _SIZEOF_INTS + _SIZEOF_PMCS)
 
 
 /*
