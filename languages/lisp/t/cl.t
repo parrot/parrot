@@ -2,11 +2,11 @@
 
 =head1 NAME
 
-lisp/t/basic.t - tests for Parrot Common Lisp
+lisp/t/cl.t - tests function in COMMON-LISP
 
 =head1 DESCRIPTION
 
-Basic stuff.
+Functions defined in cl.pir.
 
 =cut
 
