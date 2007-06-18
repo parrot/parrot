@@ -417,7 +417,7 @@ Returns whether the two subroutines are equal.
 
 */
 
-    INTVAL is_equal(const PMC* value) {
+    INTVAL is_equal(PMC* value) {
         return SELF->vtable == value->vtable &&
             (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs &&
             (PMC_sub(SELF))->seg == (PMC_sub(value))->seg;
