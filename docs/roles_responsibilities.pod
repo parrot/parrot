@@ -95,6 +95,11 @@ platforms.
 
 Develops and maintains installation packages on various platforms.
 
+=head2 Patch Monster
+
+Reviews and applies patches submitted by general contributors, keeping an eye
+on conformance with coding standards and desirability of features.
+
 =head1 Contributors
 
 Contributors are volunteers who write code or documentation patches, take
@@ -117,9 +122,9 @@ internals necessary.
 =head2 Cage Cleaner
 
 Fixes failing tests, makes sure coding standards are implemented, reviews
-documentation and examples. A class of tickets in the tracking system (RT)
-has been created for use by this group. This is an entry level position, and
-viewed as a good way to get familiar with parrot internals.
+documentation and examples. A class of tickets in the tracking system (RT) has
+been created for use by this group. This position encompasses tasks from entry
+level to advanced, and is a good way to get familiar with Parrot internals.
 
 =head1 STABILITY
 
