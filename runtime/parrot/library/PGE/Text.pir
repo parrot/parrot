@@ -36,6 +36,7 @@ of the extraction.
     .param pmc tgt                                 # target to match
     .param string delim        :optional           # optional delimiters
     .param int has_delim       :opt_flag
+    .param pmc adverbs         :slurpy :named      # named options
     .local pmc newfrom                             # newfrom sub
     .local pmc mob, mfrom, mpos                    # return match object
     .local string target                           # target as string
