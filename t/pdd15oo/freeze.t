@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -347,6 +347,12 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class" );
     classname S10, P10
     print S10
     print "\n"
+    typeof S10, P10
+    print S10
+    print "\n"
+    set S10, P10
+    print S10
+    print "\n"
     freeze S11, P10
     print "ok 1\n"
     open P3, "temp.fpmc", ">"
@@ -355,7 +361,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class" );
     print "ok 2\n"
     end
 CODE
-Foo
+Class
+Class
+parrot;Foo
 ok 1
 ok 2
 OUTPUT
@@ -374,39 +382,39 @@ ok1:
     print "ok 1\n"
     thaw P4, S3
     print "ok 2\n"
-    classname S10, P4
+    set S10, P4
     print S10
     print "\n"
     end
 CODE
 ok 1
 ok 2
-Foo
+parrot;Foo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw simple class" );
     newpdd15class P10, "Foo"
-    classname S10, P10
+    set S10, P10
     print S10
     print "\n"
     freeze S11, P10
 
     thaw P4, S11
     print "ok\n"
-    classname S12, P4
+    set S12, P4
     print S12
     print "\n"
     end
 CODE
-Foo
+parrot;Foo
 ok
-Foo
+parrot;Foo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class w attr" );
     newpdd15class P10, "Foo"
     addattribute P10, ".aa"
-    classname S10, P10
+    set S10, P10
     print S10
     print "\n"
     freeze S11, P10
@@ -417,7 +425,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class w attr" );
     print "ok 2\n"
     end
 CODE
-Foo
+parrot;Foo
 ok 1
 ok 2
 OUTPUT
@@ -438,25 +446,24 @@ ok1:
     print "ok 1\n"
     thaw P4, S3
     print "ok 2\n"
-    classname S10, P4
+    set S10, P4
     print S10
     print "\n"
 
     find_type I4, S10
     new P5, I4
     print "ok 3\n"
-    classoffset I5, P5, S10
     new P6, .String
     set P6, "ok 5\n"
-    setattribute P5, I5, P6
+    setattribute P5, ".aa", P6
     print "ok 4\n"
-    getattribute P7, P5, I5
+    getattribute P7, P5, ".aa"
     print P7
     end
 CODE
 ok 1
 ok 2
-Foo
+parrot;Foo
 ok 3
 ok 4
 ok 5
@@ -466,7 +473,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
     newpdd15class P10, "Foo"
     addattribute P10, ".aa"
     addattribute P10, ".bb"
-    classname S10, P10
+    set S10, P10
     print S10
     print "\n"
     freeze S3, P10
@@ -479,14 +486,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
     print "ok 1\n"
     thaw P4, S3
     print "ok 2\n"
-    classname S10, P4
+    set S10, P4
     print S10
     print "\n"
 
     find_type I4, S10
     new P5, I4
     print "ok 3\n"
-    classoffset I5, P5, S10
     new P6, .String
     set P6, "ok 5\n"
     setattribute P5, "Foo\0.aa", P6
@@ -494,19 +500,18 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
     set P6, "ok 6\n"
     setattribute P5, "Foo\0.bb", P6
     print "ok 4\n"
-    getattribute P7, P5, I5
+    getattribute P7, P5, ".aa"
     print P7
-    inc I5
-    getattribute P7, P5, I5
+    getattribute P7, P5, ".aa"
     print P7
     end
 
 
 CODE
-Foo
+parrot;Foo
 ok 1
 ok 2
-Foo
+parrot;Foo
 ok 3
 ok 4
 ok 5
@@ -519,7 +524,6 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter"
     addattribute P10, ".bb"
     find_type I4, "Foo"
     new P10, I4
-    print S10
     freeze S3, P10
     open P3, "temp.fpmc", ">"
     print P3, S3
@@ -528,12 +532,11 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter"
 
     thaw P5, S3
     print "ok 2\n"
-    classname S10, P5
+    set S10, P5
     print S10
     print "\n"
 
     print "ok 3\n"
-    classoffset I5, P5, S10
     new P6, .String
     set P6, "ok 5\n"
     setattribute P5, "Foo\0.aa", P6
@@ -541,16 +544,16 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter"
     set P6, "ok 6\n"
     setattribute P5, "Foo\0.bb", P6
     print "ok 4\n"
-    getattribute P7, P5, I5
+    getattribute P7, P5, ".aa"
     print P7
     inc I5
-    getattribute P7, P5, I5
+    getattribute P7, P5, ".bb"
     print P7
     end
 CODE
 ok 1
 ok 2
-Foo
+parrot;Foo
 ok 3
 ok 4
 ok 5
@@ -571,12 +574,11 @@ ok1:
 
     thaw P5, S3
     print "ok 2\n"
-    classname S10, P5
+    set S10, P5
     print S10
     print "\n"
 
     print "ok 3\n"
-    classoffset I5, P5, S10
     new P6, .String
     set P6, "ok 5\n"
     setattribute P5, "Foo\0.aa", P6
@@ -584,15 +586,15 @@ ok1:
     set P6, "ok 6\n"
     setattribute P5, "Foo\0.bb", P6
     print "ok 4\n"
-    getattribute P7, P5, I5
+    getattribute P7, P5, ".aa"
     print P7
     inc I5
-    getattribute P7, P5, I5
+    getattribute P7, P5, ".bb"
     print P7
     end
 CODE
 ok 2
-Foo
+parrot;Foo
 ok 3
 ok 4
 ok 5
@@ -775,7 +777,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Conure" );
 .end
 
 .namespace ['Conure']
-.sub __init :method
+.sub 'init' :method :vtable
     $P0 = new .Integer
     $P0 = 37
     setattribute self, 'temperature', $P0
@@ -795,8 +797,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw obj of class w Hash attrs" );
     o = new 'OPTable'
     o."init"()
     o."test"()
-    $S0 = freeze o 
-    $P1 = thaw $S0 
+    $S0 = freeze o
+    $P1 = thaw $S0
     $P1."test"()
 .end
 

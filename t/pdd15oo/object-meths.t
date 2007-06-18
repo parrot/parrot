@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -200,14 +200,12 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - init attr" );
     print "ok 1\n"
     new P10, .Integer
     set P10, 42
-    classoffset I0, P2, "Foo"
-    setattribute P2, I0, P10
+    setattribute P2, ".i", P10
     set_returns "()"
     returncc
 .pcc_sub __get_string:
     get_params "(0)", P2
-    classoffset I0, P2, "Foo"
-    getattribute P10, P2, I0
+    getattribute P10, P2, ".i"
     set_returns "(0)", P10
     returncc
 CODE
@@ -942,7 +940,7 @@ CODE
 0
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "kind of a super" );
+pir_output_is( <<'CODE', <<'OUTPUT', "kind of a super", todo => 'needs super()' );
 .sub main :main
     .local pmc cl, o
     cl = subclass "String", "MyString"
@@ -1347,26 +1345,15 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overloading attribute accessor vtable" );
     o = new 'MyClass'
     $P2 = new String
     $P2 = "blue"
-    setattribute o, 0, $P2
     setattribute o, "blue", $P2
-    $P1 = getattribute o, 0
     $P1 = getattribute o, "blue"
 .end
 
 .namespace ['MyClass']
 
-.sub get_attr :method :vtable
-    .param int offset
-    print "get_attr was called\n"
-.end
 .sub get_attr_str :method :vtable
     .param string attrname
     print "get_attr_str was called\n"
-.end
-.sub set_attr :method :vtable
-    .param int offset
-    .param pmc val
-    print "set_attr was called\n"
 .end
 .sub set_attr_str :method :vtable
     .param string attrname
@@ -1374,9 +1361,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overloading attribute accessor vtable" );
     print "set_attr_str was called\n"
 .end
 CODE
-set_attr was called
 set_attr_str was called
-get_attr was called
 get_attr_str was called
 OUTPUT
 

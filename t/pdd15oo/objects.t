@@ -401,20 +401,16 @@ pir_output_is( <<'CODE', <<'OUTPUT', "addattribute subclass - same name" );
     print "ok 1\n"
     .local pmc o
     o = new 'Bar'
-    $I0 = classoffset o, 'Foo'
-    $P0 = getattribute o, $I0
+    $P0 = getattribute o, 'i'
     print $P0
     print ' '
-    inc $I0
-    $P0 = getattribute o, $I0
+    $P0 = getattribute o, 'Foo\0j'
     print $P0
     print ' '
-    $I0 = classoffset o, 'Bar'
-    $P0 = getattribute o, $I0
+    $P0 = getattribute o, 'Bar\0j'
     print $P0
     print ' '
-    inc $I0
-    $P0 = getattribute o, $I0
+    $P0 = getattribute o, 'k'
     print $P0
     print_newline
     $P0 = getattribute o, 'i'
@@ -451,52 +447,18 @@ Foo.i Foo.j Bar.j Bar.k
 Foo.i Foo.j Bar.j Bar.k
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "classoffset: normal operation" );
-    newpdd15class P1, "Foo"
-    find_type I0, "Foo"
-    new P2, I0
-    classoffset I1, P2, "Foo"
-    print I1
-    end
-CODE
-/\d+/
-OUTPUT
-
-pasm_output_like( <<'CODE', <<'OUTPUT', "classoffset: invalid parent class" );
-    newpdd15class P1, "Foo"
-    find_type I0, "Foo"
-    new P2, I0
-    classoffset I1, P2, "Bar"
-    print I1
-    end
-CODE
-/Class not parent of object/
-OUTPUT
-
-pasm_output_like( <<'CODE', <<'OUTPUT', "classoffset: non-object argument" );
-    newpdd15class P1, "Foo"
-    find_type I0, "Foo"
-    new P2, .Undef
-    classoffset I1, P2, "Foo"
-    print I1
-    end
-CODE
-/Not an object/
-OUTPUT
-
 pasm_output_is( <<'CODE', <<'OUTPUT', "set/get object attribs" );
     newpdd15class P1, "Foo"
     addattribute P1, "i"
     find_type I0, "Foo"
     new P2, I0
-    classoffset I1, P2, "Foo"
 
     new P3, .Integer
     set P3, 1024
-    setattribute P2, I1, P3
+    setattribute P2, "i", P3
 
     new P4, .Integer
-    getattribute P4, P2, I1
+    getattribute P4, P2, "i"
     print P4
     print "\n"
     end
@@ -510,21 +472,19 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "set/get multiple object attribs" );
     addattribute P1, "j"
     find_type I0, "Foo"
     new P2, I0
-    classoffset I1, P2, "Foo"
 
     new P3, .Integer
     set P3, 4201
     new P4, .Hash
     set P4["Key"], "Value"
 
-    setattribute P2, I1, P3
-    add I2, I1, 1
-    setattribute P2, I2, P4
+    setattribute P2, "i", P3
+    setattribute P2, "j", P4
 
-    getattribute P5, P2, I1
+    getattribute P5, P2, "i"
     print P5
     print "\n"
-    getattribute P6, P2, I2
+    getattribute P6, P2, "j"
     set S0, P6["Key"]
     print S0
     print "\n"
@@ -538,10 +498,9 @@ pasm_output_like( <<'CODE', <<'OUTPUT', "setting non-existent attribute" );
     newpdd15class P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
-    classoffset I1, P2, "Foo"
 
     new P3, .Integer
-    setattribute P2, I1, P3
+    setattribute P2, "bar", P3
     end
 CODE
 /No such attribute/
@@ -572,28 +531,13 @@ CODE
 /Null PMC access/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "setting non-existent attribute - 1" );
-    newpdd15class P1, "Foo"
-    find_type I0, "Foo"
-    new P2, I0
-    classoffset I1, P2, "Foo"
-
-    new P3, .Integer
-    dec I1
-    setattribute P2, I1, P3
-    end
-CODE
-/No such attribute/
-OUTPUT
-
 pasm_output_like( <<'CODE', <<'OUTPUT', "getting non-existent attribute" );
     newpdd15class P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
-    classoffset I1, P2, "Foo"
     add I2, I1, 6
 
-    getattribute P3, P2, I2
+    getattribute P3, P2, "bar"
     end
 CODE
 /No such attribute/
@@ -604,21 +548,19 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values are specific to objects"
     addattribute P1, "i"
     find_type I0, "Foo"
     new P2, I0
-    classoffset I1, P2, "Foo"
     new P3, I0
-    classoffset I2, P3, "Foo"
 
     new P4, .Integer
     set P4, 100
-    setattribute P2, I1, P4
+    setattribute P2, "i", P4
     new P5, .String
     set P5, "One hundred"
-    setattribute P3, I2, P5
+    setattribute P3, "i", P5
 
-    getattribute P6, P2, I1
+    getattribute P6, P2, "i"
     print P6
     print "\n"
-    getattribute P6, P3, I2
+    getattribute P6, P3, "i"
     print P6
     print "\n"
     end
@@ -637,35 +579,30 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values and subclassing" );
 
     find_type I0, "Bar"
     new P2, I0
-    classoffset I1, P2, "Foo"
     new P3, I0
-    classoffset I3, P3, "Foo"
 
 # Note that setattribute holds the actual PMC, not a copy, so
 # in this test both attributes get the PMC from P4, and should
 # both have the same value, despite the C<inc>.
     new P4, .Integer
     set P4, 10
-    setattribute P2, I1, P4
-    inc P4
-    add I2, I1, 1
-    setattribute P2, I2, P4
+    setattribute P2, "i", P4
+    setattribute P2, "j", P4
 
     new P5, .Integer
     set P5, 100
-    setattribute P3, I3, P5
+    setattribute P3, "i", P5
     inc P5
-    add I4, I3, 1
-    setattribute P3, I4, P5
+    setattribute P3, "j", P5
 
-    getattribute P6, P2, I1
+    getattribute P6, P2, "i"
     bsr l1
-    getattribute P6, P2, I2
+    getattribute P6, P2, "j"
     bsr l1
 
-    getattribute P6, P3, I3
+    getattribute P6, P3, "i"
     bsr l1
-    getattribute P6, P3, I4
+    getattribute P6, P3, "j"
     bsr l1
     branch end
 l1:
@@ -701,45 +638,35 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values and subclassing 2" );
     find_type I1, "Bar"
     new P3, I1
 
-    classoffset I3, P3, "Foo"   # The parent class
     # print I3                  # don't assume anything about this offset
     # print "\n"		# ' for vim
 
-    set I0, I3			# access Foo attribs, remember offset
-
     new P10, .String		# set attribute values
     set P10, "i\n"		# attribute slots have reference semantics
-    setattribute P3, I0, P10	# so always put new PMCs in
+    setattribute P3, ".i", P10	# so always put new PMCs in
                                 # if you have unique values
-    inc I0			# next attribute
     new P10, .String
     set P10, "j\n"
-    setattribute P3, I0, P10
-
-    classoffset I4, P3, "Bar"   # set Bar attribs
-    set I1, I4			# dup offset for retrieval again
+    setattribute P3, ".j", P10
 
     new P10, .String
     set P10, "k\n"
-    setattribute P3, I1, P10
-    inc I1
+    setattribute P3, ".k", P10
     new P10, .String
     set P10, "l\n"
-    setattribute P3, I1, P10
+    setattribute P3, ".l", P10
 
-    getattribute P11, P3, I3	# retrieve attribs
+    getattribute P11, P3, ".i"	# retrieve attribs
     print P11
-    inc I3
-    getattribute P11, P3, I3
-    print P11
-
-    getattribute P11, P3, I4
-    print P11
-    inc I4
-    getattribute P11, P3, I4
+    getattribute P11, P3, ".j"
     print P11
 
-    classname S0, P3		# verify classname is still ok
+    getattribute P11, P3, ".k"
+    print P11
+    getattribute P11, P3, ".l"
+    print P11
+
+    set S0, P3		# verify classname is still ok
     print S0
     print "\n"
     end
@@ -748,7 +675,7 @@ i
 j
 k
 l
-Bar
+parrot;Bar
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meths " );
@@ -778,45 +705,45 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meth
     # Foo and Bar have attribute accessor methods
     new P5, .String		# set attribute values
     set P5, "i\n"		# attribute slots have reference semantics
-    set_args "(0,0)", P5, 0
+    set_args "(0,0)", P5, "i"
     get_results "()"
     callmethodcc P13, "Foo::set"
 
     new P5, .String
     set P5, "j\n"
-    set_args "(0,0)", P5, 1
+    set_args "(0,0)", P5, "j"
     get_results "()"
     callmethodcc  P13,"Foo::set"
 
     new P5, .String
     set P5, "k\n"
-    set_args "(0,0)", P5, 0
+    set_args "(0,0)", P5, "k"
     get_results "()"
     callmethodcc  P13,"Bar::set"
 
     new P5, .String
     set P5, "l\n"
-    set_args "(0,0)", P5, 1
+    set_args "(0,0)", P5, "l"
     get_results "()"
     callmethodcc  P13,"Bar::set"
 
     # now retrieve attributes
-    set_args "(0)",  0
+    set_args "(0)",  "i"
     get_results "(0)", P5
     callmethodcc  P13,"Foo::get"
     print P5			# return result
 
-    set_args "(0)",  1
+    set_args "(0)",  "j"
     get_results "(0)", P5
     callmethodcc  P13,"Foo::get"
     print P5
 
-    set_args "(0)",  0
+    set_args "(0)",  "k"
     get_results "(0)", P5
     callmethodcc  P13,"Bar::get"
     print P5			# return result
 
-    set_args "(0)",  1
+    set_args "(0)",  "l"
     get_results "(0)", P5
     callmethodcc  P13,"Bar::get"
     print P5
@@ -824,44 +751,36 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meth
 
 # set(obj: Pvalue, Iattr_idx)
 .pcc_sub Foo::set:
-    get_params "(0,0)", P5, I5
+    get_params "(0,0)", P5, S4
     print "in Foo::set\n"
 .include "interpinfo.pasm"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
-    classoffset I3, P2, "Foo"
-    add I4, I3, I5
-    setattribute P2, I4, P5	# so always put new PMCs in
+    setattribute P2, S4, P5	# so always put new PMCs in
     set_returns "()"
     returncc
 
 # Pattr = get(obj: Iattr_idx)
 .pcc_sub Foo::get:
-    get_params "(0)", I5
+    get_params "(0)", S4
     print "in Foo::get\n"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
-    classoffset I3, P2, "Foo"
-    add I4, I3, I5
-    getattribute P5, P2, I4
+    getattribute P5, P2, S4
     set_returns "(0)", P5
     returncc
 
 .pcc_sub Bar::set:
-    get_params "(0,0)", P5, I5
+    get_params "(0,0)", P5, S4
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     print "in Bar::set\n"
-    classoffset I3, P2, "Bar"
-    add I4, I3, I5
-    setattribute P2, I4, P5	# so always put new PMCs in
+    setattribute P2, S4, P5	# so always put new PMCs in
     set_returns "()"
     returncc
 
 .pcc_sub Bar::get:
-    get_params "(0)", I5
+    get_params "(0)", S4
     print "in Bar::get\n"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
-    classoffset I3, P2, "Bar"
-    add I4, I3, I5
-    getattribute P5, P2, I4
+    getattribute P5, P2, S4
     set_returns "(0)", P5
     returncc
 CODE
@@ -908,57 +827,57 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, inherited access meths"
     # Foo and Bar have attribute accessor methods
     new P5, .String		# set attribute values
     set P5, "i\n"		# attribute slots have reference semantics
-    set_args "(0,0,0)", P5, "Foo", 0
+    set_args "(0,0,0)", P5, "Foo", "i"
     get_results "()"
     callmethodcc P2, "set"
 
     new P5, .String
     set P5, "j\n"
-    set_args "(0,0,0)", P5, "Foo", 1
+    set_args "(0,0,0)", P5, "Foo", "j"
     get_results "()"
     callmethodcc P2, "set"
 
     new P5, .String
     set P5, "k\n"
-    set_args "(0,0,0)", P5, "Bar", 0
+    set_args "(0,0,0)", P5, "Bar", "k"
     get_results "()"
     callmethodcc P2, "set"
 
     new P5, .String
     set P5, "l\n"
-    set_args "(0,0,0)", P5, "Bar", 1
+    set_args "(0,0,0)", P5, "Bar", "l"
     get_results "()"
     callmethodcc P2, "set"
 
     new P5, .String
     set P5, "m\n"
-    set_args "(0,0,0)", P5, "Bar", 2
+    set_args "(0,0,0)", P5, "Bar", "m"
     get_results "()"
     callmethodcc P2, "set"
 
     # now retrieve attributes
-    set_args "(0,0)", "Foo", 0
+    set_args "(0,0)", "Foo", "i"
     get_results "(0)", P5
     callmethodcc P2, "get"
     print P5			# return result
 
-    set_args "(0,0)", "Foo", 1
+    set_args "(0,0)", "Foo", "j"
     get_results "(0)", P5
     callmethodcc P2, "get"
     print P5
 
 
-    set_args "(0,0)", "Bar", 0
+    set_args "(0,0)", "Bar", "k"
     get_results "(0)", P5
     callmethodcc P2, "get"
     print P5
 
-    set_args "(0,0)", "Bar", 1
+    set_args "(0,0)", "Bar", "l"
     get_results "(0)", P5
     callmethodcc P2, "get"
     print P5
 
-    set_args "(0,0)", "Bar", 2
+    set_args "(0,0)", "Bar", "m"
     get_results "(0)", P5
     callmethodcc P2, "get"
     print P5
@@ -967,25 +886,21 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, inherited access meths"
 # Foo provides accessor functions which Bar inherits
 # they take an additional classname argument SClass
 
-# set(obj: Pvalue, SClass, Iattr_idx)
+# set(obj: Pvalue, SClass, Sattr)
 .pcc_sub set:
 .include "interpinfo.pasm"
-    get_params "(0,0,0)", P5, S5, I5
+    get_params "(0,0,0)", P5, S4, S5
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
-    classoffset I3, P2, S5
-    add I4, I3, I5
-    setattribute P2, I4, P5
+    setattribute P2, S4, P5
     set_returns "()"
     returncc
 
-# Pattr = get(obj: SClass, Iattr_idx)
+# Pattr = get(obj: SClass, Sattr)
 .pcc_sub get:
-    get_params "(0,0)", S5, I5
+    get_params "(0,0)", S5, S4
 .include "interpinfo.pasm"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
-    classoffset I3, P2, S5
-    add I4, I3, I5
-    getattribute P5, P2, I4
+    getattribute P5, P2, S4
     set_returns "(0)", P5
     returncc
 
@@ -1032,28 +947,25 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "overridden vtables" );
 .pcc_sub set_i:
     get_params "(0,0)", P2, I5
     print "in set_integer\n"
-    classoffset I0, P2, "Foo"
     new P6, .Integer
     set P6, I5
-    setattribute P2, I0, P6
+    setattribute P2, ".i", P6
     set_returns "()"
     returncc
 .pcc_sub add:
     get_params "(0,0,0)", P5, P6, P7
     print "in add\n"
-    classoffset I0, P5, "Foo"
     getattribute P10, P5, I0
     getattribute P11, P6, I0
     new P12, .Integer
     add P12, P10, P11
-    setattribute P7, I0, P12
+    setattribute P7, ".i", P12
     set_returns "(0)", P7
     returncc
 .pcc_sub get_s:
     get_params "(0)", P2
     print "in get_string\n"
-    classoffset I0, P2, "Foo"
-    getattribute P10, P2, I0
+    getattribute P10, P2, ".i"
     set S5, P10
     set I0, P10
     ne I0, 2, no_2
@@ -1122,20 +1034,18 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "multiple inheritance, with attributes" );
     find_type I0, "Sun"
     new P4, I0
 
-    classoffset I1, P4, "Star"
     new P5, .String
     set P5, "G"
-    setattribute P4, I1, P5
+    setattribute P4, "Spectral Type", P5
 
-    classoffset I2, P4, "Company"
     new P6, .String
     set P6, "$100,000,000"
-    setattribute P4, I2, P6
+    setattribute P4, "Annual Profit", P6
 
-    getattribute P7, P4, I1
+    getattribute P7, P4, "Spectral Type"
     print P7
     print "\n"
-    getattribute P8, P4, I2
+    getattribute P8, P4, "Annual Profit"
     print P8
     print "\n"
     end
@@ -1157,12 +1067,11 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "two levels of inheritance" );
 
     find_type I0, "Sun"
     new P4, I0
-    classoffset I1, P4, "Astronomical Object"
 
     new P5, .String
     set P5, "Taurus"
-    setattribute P4, I1, P5
-    getattribute P6, P4, I1
+    setattribute P4, "Location", P5
+    getattribute P6, P4, "Location"
     print P6
     print "\n"
     end
@@ -1242,10 +1151,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get attrib by name" );
     addattribute P1, "i"
     find_type I1, "Foo"
     new P2, I1
-    classoffset I2, P2, "Foo"
     new P3, .String
     set P3, "ok\n"
-    setattribute P2, I2, P3
+    setattribute P2, "i", P3
 
     getattribute P4, P2, "Foo\x0i"
     print P4
@@ -1261,14 +1169,12 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get attrib by name subclass" );
     addattribute P1, "i"
     find_type I1, "Foo"
     new P2, I1
-    classoffset I2, P2, "Foo"
     new P3, .String
     set P3, "foo i\n"
-    setattribute P2, I2, P3
-    classoffset I2, P2, "Bar"
+    setattribute P2, "i", P3
     new P3, .String
     set P3, "bar j\n"
-    setattribute P2, I2, P3
+    setattribute P2, "j", P3
 
     getattribute P4, P2, "Foo\x0i"
     print P4
@@ -1294,11 +1200,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "set attrib by name subclass" );
     set P3, "bar j\n"
     setattribute P2, "Bar\x0j", P3
 
-    classoffset I2, P2, "Foo"
-    getattribute P4, P2, I2
+    getattribute P4, P2, "i"
     print P4
-    classoffset I2, P2, "Bar"
-    getattribute P4, P2, I2
+    getattribute P4, P2, "j"
     print P4
     end
 CODE
@@ -1376,7 +1280,7 @@ ok 2
 ok 3
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - methods" );
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - methods", todo => 'needs super()' );
 
 .sub main :main
   .local pmc MyInt
@@ -1428,7 +1332,7 @@ ok 4
 MyInt(42)
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - mmd methods" );
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - mmd methods", todo => 'needs super()' );
 
 
 .sub main :main
@@ -1471,7 +1375,7 @@ CODE
 MyInt(42)
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods" );
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods", todo => 'needs super()' );
 
 .sub main :main
   .local pmc MyInt
@@ -1516,7 +1420,7 @@ in add
 106
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 1" );
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 1", todo => 'needs super()' );
 
 .sub main :main
   .local pmc MyInt
@@ -1580,7 +1484,7 @@ ok 4
 MyInt2(42)
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 2" );
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 2", todo => 'needs super()' );
 
 .sub main :main
   .local pmc MyInt
@@ -1656,7 +1560,7 @@ ok 4
 MyInt2(42)
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 3" );
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 3", todo => 'needs super()' );
 
 .sub main :main
   .local pmc MyInt
@@ -1743,7 +1647,7 @@ OUTPUT
 
 SKIP: {
     skip( "instantiate disabled", 2 );
-    pasm_output_is( <<'CODE', <<'OUTPUT', "instantiate" );
+    pasm_output_is( <<'CODE', <<'OUTPUT', "instantiate", todo => 'needs super()' );
     subclass P2, "Integer", "Foo"
     set I0, 0
     set I3, 1
@@ -1767,7 +1671,7 @@ CODE
 42
 OUTPUT
 
-    pir_output_is( <<'CODE', <<'OUTPUT', "instantiate - PIR" );
+    pir_output_is( <<'CODE', <<'OUTPUT', "instantiate - PIR", todo => 'needs super()' );
 
 .sub main :main
     .local pmc cl
