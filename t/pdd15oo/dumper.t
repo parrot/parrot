@@ -512,6 +512,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
 
 .sub test :main
+    .local pmc o
     .local pmc temp
     .local pmc array
 
@@ -519,10 +520,10 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
 
     find_type I0, "TestClass"
     new array, .ResizablePMCArray
-    new temp, I0
-    push array, temp
-    new temp, I0
-    push array, temp
+    o = temp.'new'()
+    push array, o
+    o = temp.'new'()
+    push array, o
 
     _dumper( array )
 .end
@@ -544,7 +545,7 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
 
     print subindent
     print "_"
-    classname name, self
+    name = self
     print name
     print "::__dump\n"
 
@@ -553,18 +554,17 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
 
     dumper."deleteIndent"()
 
-    .pcc_begin_return
-    .pcc_end_return
+    .return()
 .end
 .namespace
 .include "library/dumper.pir"
 CODE
 "VAR1" => ResizablePMCArray (size:2) [
-    PMC 'TestClass' {
+    PMC 'Object' {
         this is
         _TestClass::__dump
     },
-    PMC 'TestClass' {
+    PMC 'Object' {
         this is
         _TestClass::__dump
     }
