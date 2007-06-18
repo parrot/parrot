@@ -59,6 +59,7 @@
 /*
  * same with the default name interpreter
  */
+/* XXX Redfine these to explicitly pass interp, rather than assuming it's there */
 #define REG_INT(x) INTERP_REG_INT(interp, x)
 #define REG_NUM(x) INTERP_REG_NUM(interp, x)
 #define REG_STR(x) INTERP_REG_STR(interp, x)
