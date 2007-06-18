@@ -910,7 +910,7 @@ static int get_op(const char * name, int full) {
     }
     return -1;
 }
-static void hop_init() {
+static void hop_init(void) {
     size_t i;
     op_info_t * info = $self->{bs}op_lib.op_info_table;
     /* store full names */
