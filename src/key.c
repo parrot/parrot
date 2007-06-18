@@ -28,7 +28,7 @@ Returns a new C<Key> PMC.
 
 PARROT_API
 PMC *
-key_new(Interp *interp)
+key_new(Interp *interp /*NN*/)
 {
     PMC * const key = pmc_new(interp, enum_class_Key);
 
@@ -44,7 +44,7 @@ Returns a new integer C<Key> PMC with value C<value>.
 
 PARROT_API
 PMC *
-key_new_integer(Interp *interp, INTVAL value)
+key_new_integer(Interp *interp /*NN*/, INTVAL value)
 {
     PMC * const key = pmc_new(interp, enum_class_Key);
 
@@ -63,7 +63,7 @@ Returns a new number C<Key> PMC with value C<value>.
 
 PARROT_API
 PMC *
-key_new_number(Interp *interp, FLOATVAL value)
+key_new_number(Interp *interp /*NN*/, FLOATVAL value)
 {
     PMC * const key = pmc_new(interp, enum_class_Key);
 
@@ -82,7 +82,7 @@ Returns a new string C<Key> PMC with value C<value>.
 
 PARROT_API
 PMC *
-key_new_string(Interp *interp, STRING *value)
+key_new_string(Interp *interp /*NN*/, STRING *value)
 {
     PMC * const key = pmc_new(interp, enum_class_Key);
 
@@ -102,7 +102,7 @@ C<STRING>.
 
 PARROT_API
 PMC *
-key_new_cstring(Interp *interp, const char *value /*NULLOK*/)
+key_new_cstring(Interp *interp /*NN*/, const char *value /*NULLOK*/)
 {
     return key_new_string(interp,
             string_from_cstring(interp, value, 0));
@@ -117,7 +117,7 @@ Returns a new PMC C<Key> PMC with value C<value>.
 
 PARROT_API
 PMC *
-key_new_pmc(Interp *interp, PMC *value)
+key_new_pmc(Interp *interp /*NN*/, PMC *value)
 {
     PMC * const key = pmc_new(interp, enum_class_Key);
 
@@ -233,7 +233,7 @@ Returns the type of C<key>.
 
 PARROT_API
 INTVAL
-key_type(Interp *interp, PMC *key /*NN*/)
+key_type(Interp *interp, const PMC *key /*NN*/)
 {
     return (PObj_get_FLAGS(key) & KEY_type_FLAGS) & ~KEY_register_FLAG;
 }
@@ -386,7 +386,7 @@ Marks C<key> as live.
 
 PARROT_API
 void
-key_mark(Interp *interp, PMC *key /*NN*/)
+key_mark(Interp *interp /*NN*/, PMC *key /*NN*/)
 {
     const UINTVAL flags = PObj_get_FLAGS(key) & KEY_type_FLAGS;
 
@@ -407,7 +407,7 @@ key_mark(Interp *interp, PMC *key /*NN*/)
 
 PARROT_API
 STRING *
-key_set_to_string(Interp *interp, PMC *key /*NULLOK*/)
+key_set_to_string(Interp *interp /*NN*/, PMC *key /*NULLOK*/)
 {
     STRING * const semicolon = string_from_cstring(interp, " ; ", 3);
     STRING * const quote = string_from_cstring(interp, "'", 1);

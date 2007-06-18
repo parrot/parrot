@@ -488,7 +488,7 @@ Make a Parrot string from a specified C string.
 
 PARROT_API
 STRING *
-string_from_cstring(Interp *interp,
+string_from_cstring(Interp *interp /*NN*/,
     const char * const buffer /*NULLOK*/, const UINTVAL len)
     /* WARN_UNUSED */
 {

@@ -174,9 +174,10 @@ PARROT_API STRING * string_from_const_cstring( Interp *interp,
     const UINTVAL len )
         __attribute__warn_unused_result__;
 
-PARROT_API STRING * string_from_cstring( Interp *interp,
+PARROT_API STRING * string_from_cstring( Interp *interp /*NN*/,
     const char * const buffer /*NULLOK*/,
     const UINTVAL len )
+        __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
 PARROT_API STRING * string_from_int( Interp *interp /*NN*/, INTVAL i )
