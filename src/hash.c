@@ -98,7 +98,7 @@ static size_t
 key_hash_cstring(Interp *interp, const void *value /*NN*/, size_t seed)
 {
     register size_t h = seed;
-    unsigned char * p = (unsigned char *) value;
+    const unsigned char * p = (const unsigned char *) value;
     while (*p) {
         h += h << 5;
         h += *p++;
