@@ -205,9 +205,9 @@ static void
 compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
             char *argv[])
 {
-    String *smain;
+    STRING *smain;
     PMC *prog, *entry;
-    String *error;
+    STRING *error;
     opcode_t *dest;
     prog = Parrot_compile_string(interp, type, src, &error);
 
