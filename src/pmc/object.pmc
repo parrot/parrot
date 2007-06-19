@@ -173,35 +173,15 @@ of the given name walking up the inheritance tree.
 
 /*
 
-=item C<PMC* find_method(STRING *method_name)>
+=item C<PMC* find_method(STRING *name)>
 
-Walks the MRO of the class and finds the method with the given name.
+Queries this object's class to find the method with the given name.
 
 =cut
 
 */
-    PMC* find_method(STRING *name)
-    {
-        Parrot_Object * const  obj    = PARROT_OBJECT(SELF);
-        Parrot_Class  * const  _class = PARROT_CLASS(obj->_class);
-
-        /* Walk and search. One day, we'll use the cache first. */
-        int num_classes = VTABLE_elements(interp, _class->all_parents);
-        int i;
-
-        for (i = 0; i < num_classes; i++) {
-            /* Get the class and see if it has the method. */
-            PMC * const cur_class =
-                VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
-            const Parrot_Class * const class_info = PARROT_CLASS(cur_class);
-
-            /* Found it! */
-            if (VTABLE_exists_keyed_str(interp, class_info->methods, name))
-                return VTABLE_get_pmc_keyed_str(interp, class_info->methods,
-                    name);
-        }
-
-        return PMCNULL;
+    PMC* find_method(STRING *name) {
+        return VTABLE_find_method(interp, PARROT_OBJECT(SELF)->_class, name);
     }
 
 /*
