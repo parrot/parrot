@@ -502,7 +502,11 @@ CODE
 6
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUT', "I-reg shl and PMC shl are consistent");
+SKIP: {
+    skip 'no BigInt lib found' => 1
+        unless $PConfig{gmp};
+
+    pir_output_is( <<'CODE', <<'OUT', "I-reg shl and PMC shl are consistent");
 ## The PMC shl op will promote Integer to Bigint when needed.  We can't stuff a
 ## BigInt in an I register, but we can produce the same result modulo wordsize.
 ## [Only we cheat by using the word size minus one, so that we don't have to
@@ -583,6 +587,8 @@ CODE
 done.
 done.
 OUT
+}
+
 
 # Local Variables:
 #   mode: cperl
