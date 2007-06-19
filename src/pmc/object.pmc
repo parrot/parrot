@@ -23,43 +23,42 @@ Implements an instance of a class.
 
 /* This finds the index of an attribute in an object's attribute store and
  * returns it. Returns -1 if the attribute does not exist. */
-static INTVAL get_attrib_index(Parrot_Interp interp, PMC *self, STRING *name) {
+static INTVAL
+get_attrib_index(Parrot_Interp interp, PMC *self, STRING *name) {
     Parrot_Class * const _class = PARROT_CLASS(self);
-
-    /* If we can't find the attribute, we hand back -1. */
-    INTVAL index = -1;
+    int                  num_classes, i;
 
     /* First see if we can find it in the cache. */
-    if (VTABLE_exists_keyed_str(interp, _class->attrib_cache, name)) {
-        /* Yay! We got a cache hit! */
-        index = VTABLE_get_integer_keyed_str(interp, _class->attrib_cache, name);
-    }
-    else {
-        /* No hit. We need to walk up the list of parents to try and find the
-         * attribute. */
-        const int num_classes = VTABLE_elements(interp, _class->all_parents);
-        int i;
-        for (i = 0; i < num_classes; i++) {
-            /* Get the class and its attribute metadata hash. */
-            PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
+    if (VTABLE_exists_keyed_str(interp, _class->attrib_cache, name))
+        return VTABLE_get_integer_keyed_str(interp, _class->attrib_cache, name);
 
-            /* Build a string representing the fully qualified attribute name. */
-            STRING *fq_name = VTABLE_get_string(interp, cur_class);
-            fq_name = string_append(interp, fq_name, name);
+    /* No hit. We need to walk up the list of parents to try and find the
+     * attribute. */
+    num_classes = VTABLE_elements(interp, _class->all_parents);
 
-            /* Look up. */
-            if (VTABLE_exists_keyed_str(interp, _class->attrib_index, fq_name)) {
-                /* Found it. Get value, cache it and we're done. */
-                index = VTABLE_get_integer_keyed_str(interp, _class->attrib_index, fq_name);
-                VTABLE_set_integer_keyed_str(interp, _class->attrib_cache, name, index);
-                break;
-            }
+    for (i = 0; i < num_classes; i++) {
+        /* Get the class and its attribute metadata hash. */
+        PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp,
+            _class->all_parents, i);
+
+        /* Build a string representing the fully qualified attribute name. */
+        STRING *fq_name = VTABLE_get_string(interp, cur_class);
+        fq_name         = string_append(interp, fq_name, name);
+
+        /* Look up. */
+        if (VTABLE_exists_keyed_str(interp, _class->attrib_index, fq_name)) {
+            /* Found it. Get value, cache it and we're done. */
+            INTVAL index = VTABLE_get_integer_keyed_str(interp,
+                _class->attrib_index, fq_name);
+            VTABLE_set_integer_keyed_str(interp, _class->attrib_cache, name,
+                index);
+
+            return index;
         }
     }
 
-    return index;
+    return -1;
 }
-
 
 pmclass Object need_ext {
 
@@ -104,7 +103,7 @@ Free the object's underlying struct.
 
 */
     void destroy() {
-            mem_sys_free(PMC_data(SELF));
+        mem_sys_free(PMC_data(SELF));
     }
 
 /*
@@ -142,12 +141,12 @@ of the given name walking up the inheritance tree.
 
         /* If lookup failed, exception. */
         if (index == -1) {
-            real_exception(interp, NULL, ATTRIB_NOT_FOUND, "No such attribute '%S'", name);
+            real_exception(interp, NULL, ATTRIB_NOT_FOUND,
+                "No such attribute '%S'", name);
             return PMCNULL;
         }
-        else {
-            return VTABLE_get_pmc_keyed_int(interp, obj->attrib_store, index);
-        }
+
+        return VTABLE_get_pmc_keyed_int(interp, obj->attrib_store, index);
     }
 
 /*
@@ -162,17 +161,14 @@ of the given name walking up the inheritance tree.
 */
     void set_attr_str(STRING* name, PMC* value) {
         Parrot_Object * const obj = PARROT_OBJECT(SELF);
-
-        /* Look up the index. */
-        const INTVAL index = get_attrib_index(interp, obj->_class, name);
+        const INTVAL index        = get_attrib_index(interp, obj->_class, name);
 
         /* If lookup failed, exception. */
-        if (index == -1) {
-            real_exception(interp, NULL, ATTRIB_NOT_FOUND, "No such attribute '%S'", name);
-        }
-        else {
-            VTABLE_set_pmc_keyed_int(interp, obj->attrib_store, index, value);
-        }
+        if (index == -1)
+            real_exception(interp, NULL, ATTRIB_NOT_FOUND,
+                "No such attribute '%S'", name);
+
+        VTABLE_set_pmc_keyed_int(interp, obj->attrib_store, index, value);
     }
 
 /*
@@ -186,26 +182,26 @@ Walks the MRO of the class and finds the method with the given name.
 */
     PMC* find_method(STRING *name)
     {
-        Parrot_Object * const obj = PARROT_OBJECT(SELF);
-        Parrot_Class * const _class = PARROT_CLASS(obj->_class);
-        PMC *method = PMCNULL;
+        Parrot_Object * const  obj    = PARROT_OBJECT(SELF);
+        Parrot_Class  * const  _class = PARROT_CLASS(obj->_class);
 
         /* Walk and search. One day, we'll use the cache first. */
         int num_classes = VTABLE_elements(interp, _class->all_parents);
         int i;
+
         for (i = 0; i < num_classes; i++) {
             /* Get the class and see if it has the method. */
-            PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
+            PMC * const cur_class =
+                VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
             const Parrot_Class * const class_info = PARROT_CLASS(cur_class);
-            if (VTABLE_exists_keyed_str(interp, class_info->methods, name)) {
-                /* Found it! */
-                method = VTABLE_get_pmc_keyed_str(interp, class_info->methods, name);
-                break;
-            }
+
+            /* Found it! */
+            if (VTABLE_exists_keyed_str(interp, class_info->methods, name))
+                return VTABLE_get_pmc_keyed_str(interp, class_info->methods,
+                    name);
         }
 
-        /* Return the method that was found, if any. */
-        return method;
+        return PMCNULL;
     }
 
 /*
@@ -219,8 +215,7 @@ Get the class PMC representing the class that this object is an instance of.
 */
     PMC* get_class()
     {
-        const Parrot_Object * const obj = PARROT_OBJECT(SELF);
-        return obj->_class;
+        return PARROT_OBJECT(SELF)->_class;
     }
 
 /*
@@ -251,15 +246,13 @@ Returns whether the class is or inherits from C<*classname>.
 */
     INTVAL isa(STRING *classname)
     {
-        PMC *class;
-        INTVAL isa;
+        PMC   *class;
 
         if (SUPER(classname))
             return 1;
 
         class = VTABLE_get_class(interp, SELF);
-        isa = VTABLE_isa(interp, class, classname);
-        return isa;
+        return VTABLE_isa(interp, class, classname);
     }
 
 }
