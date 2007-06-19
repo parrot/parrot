@@ -174,14 +174,9 @@ language_output_is( 'lua', $code, $out, 'spectral-norm', params => '100' );
 #       Symmetrical thread rendez-vous requests
 #
 
-TODO:
-{
-    local $TODO = 'pb with tail call ?';
-
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'chameneos.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'chameneos-output.txt' ));
 language_output_is( 'lua', $code, $out, 'chameneos', params => '100' );
-}
 
 #
 #   reverse-complement
