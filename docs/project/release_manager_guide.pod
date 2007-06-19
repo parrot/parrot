@@ -256,7 +256,7 @@ Tuesday of the month.
  - Feb 20th (0.4.9)  Patrick Michaud (pmichaud)
  - Mar 20th (0.4.10) Will Coleda (Coke)
  - Apr 17th (0.4.11) Matt Diephouse (mdiep)
- - May 15th, chromatic
+ - May 15th (0.4.12) chromatic
  - Jun 19th, Allison Randal
  - Jul 17th, Jerry Gay (particle)
  - Aug 21th, Patrick Michaud (pmichaud)
