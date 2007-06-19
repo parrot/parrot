@@ -197,7 +197,8 @@ Test locally in combust before pushing update out.
 =item 10.
 
 Close any release-related tickets in RT. If they are not yet resolved,
-migrate them to the next milestone release ticket.
+migrate the critical ones to the next milestone release ticket.
+Non-critical unresolved tickets can be simply unlinked.
 
 =item 11.
 
