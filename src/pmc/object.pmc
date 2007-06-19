@@ -181,7 +181,13 @@ Queries this object's class to find the method with the given name.
 
 */
     PMC* find_method(STRING *name) {
-        return VTABLE_find_method(interp, PARROT_OBJECT(SELF)->_class, name);
+        PMC *method;
+
+        Parrot_PCCINVOKE(interp, PARROT_OBJECT(SELF)->_class,
+            string_from_cstring(interp, "find_method", 11), "S->P", name,
+            &method);
+
+        return method;
     }
 
 /*

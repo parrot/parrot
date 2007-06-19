@@ -507,36 +507,6 @@ Free the memory associated with the object's underlying struct.
 
 /*
 
-=item C<PMC* find_method(STRING *name)>
-
-Walks the MRO of the class and finds the method with the given name.
-
-*/
-
-    PMC* find_method(STRING *name) {
-        Parrot_Class * const _class      = PARROT_CLASS(SELF);
-
-        /* Walk and search. One day, we'll use the cache first. */
-        int num_classes = VTABLE_elements(interp, _class->all_parents);
-        int i;
-
-        for (i = 0; i < num_classes; i++) {
-            /* Get the class and see if it has the method. */
-            PMC * const cur_class =
-                VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
-            const Parrot_Class * const class_info = PARROT_CLASS(cur_class);
-
-            /* Found it! */
-            if (VTABLE_exists_keyed_str(interp, class_info->methods, name))
-                return VTABLE_get_pmc_keyed_str(interp, class_info->methods,
-                    name);
-        }
-
-        return PMCNULL;
-    }
-
-/*
-
 =item C<STRING* get_string()>
 
 Return the fully qualified name of the class.
@@ -1183,6 +1153,45 @@ C<add_method> vtable method.
     PCCMETHOD void add_method(STRING *name, PMC *sub)
     {
         VTABLE_add_method(interp, SELF, name, sub);
+    }
+
+/*
+
+=item C<PMC* find_method(STRING *name)>
+
+Walks the MRO of the class and finds the method with the given name.
+
+*/
+
+    PCCMETHOD void find_method(STRING *name) {
+        Parrot_Class * const  _class    = PARROT_CLASS(SELF);
+        PMC                  *namespace = _class->_namespace;
+
+        if (  ! PMC_IS_NULL(namespace)
+            &&  VTABLE_exists_keyed_str(interp, namespace, name)) {
+            PMC *ret = VTABLE_get_pmc_keyed_str(interp, namespace, name);
+            PCCRETURN(PMC *ret);
+        }
+
+        /* Walk and search. One day, we'll use the cache first. */
+        int num_classes = VTABLE_elements(interp, _class->all_parents);
+        int i;
+
+        for (i = 0; i < num_classes; i++) {
+            /* Get the class and see if it has the method. */
+            PMC * const cur_class =
+                VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
+            const Parrot_Class * const class_info = PARROT_CLASS(cur_class);
+
+            /* Found it! */
+            if (VTABLE_exists_keyed_str(interp, class_info->methods, name)) {
+                PMC *ret = VTABLE_get_pmc_keyed_str(interp, class_info->methods,
+                    name);
+                PCCRETURN(PMC *ret);
+            }
+        }
+
+        PCCRETURN(PMC *PMCNULL);
     }
 
 /*
