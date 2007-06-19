@@ -1,5 +1,29 @@
 # $Id$
 
+New in 0.4.13
+- Languages:
+ + Updated Lisp, Lua, PHP ("Plumhead"), Python ("Pynie"), ABC,
+   WMLScript, and Tcl ("ParTcl").
+ + Perl 6 passes all of the sanity tests.
+ + PGE supports latest Perl 6 grammar syntax. Perl 6, Python
+   ("Pynie"), and ABC parsers updated to match.
+ + Updated PHP ("Plumhead") to Antlr 3.0.
+ + Lua added the beginnings of a PGE/TGE based compiler (not yet
+   replacing the Perl/Yapp compiler).
+ + Lisp updated for current features, added a test suite.
+- Core Implementation:
+ + Filled in features and backward compatibility for PDD 15 objects.
+   New object metamodel passes 85% of old test suite.
+ + GCC API symbols are visible externally only when explicitly exported.
+ + Added generated GCC compiler attributes to increase warnings, and
+   cleaned up resulting warnings.
+ + Code cleanup efforts and fixed memory leaks by the cage cleaners,
+   resulting in notable speed increases.
+- Misc:
+ + Updated Parrot distribution to Artistic License 2.0, from dual
+   Artistic 1/GPL license.
+ + SDL examples brought up-to-date with current features.
+
 New in 0.4.12
 - Build:
  + even more refactorings and improvements in configuration system
