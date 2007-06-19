@@ -95,7 +95,7 @@ If called with no args, run the suite.
     elsif ( @{ $options{arguments} } ) {
 
         # Someone specified tests for me to run.
-        return grep { -f $_ } @{ $options{arguments} };
+        return grep { -f $_ } map { glob $_ } @{ $options{arguments} };
     }
     else {
 
