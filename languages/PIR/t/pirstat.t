@@ -6,7 +6,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 3;
 use Test::More;
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'globalconst' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'globalconst' );
 
 .sub main
 	.globalconst int x = 42
@@ -15,11 +15,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'globalconst' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'namespace' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'namespace' );
 
 .sub main
 	.namespace x
@@ -29,11 +26,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'namespace' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'const' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'const' );
 
 .sub main
 	.const int x = 42
@@ -42,7 +36,4 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'const' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 

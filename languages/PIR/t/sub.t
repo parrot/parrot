@@ -6,63 +6,42 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 22;
 use Test::More;
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'basic sub' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'basic sub' );
 .sub main			
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'main flag' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'main flag' );
 .sub main :main	
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'load flag' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'load flag' );
 .sub main :load
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'init flag' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'init flag' );
 .sub main :init
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'immediate flag' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'immediate flag' );
 .sub main :immediate
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'lex flag' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'lex flag' );
 .sub main :lex
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'anon flag' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'anon flag' );
 .sub main :anon
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'outer flag' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'outer flag' );
 
 .sub outer_sub
 .end
@@ -74,93 +53,60 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'outer flag' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'multi flag 1' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'multi flag 1' );
 .sub main :multi(int)
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'multi flag 2' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'multi flag 2' );
 .sub main :multi(int, num)
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'multi flag 3' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'multi flag 3' );
 .sub main :multi(_, int, num, string, pmc)
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'multi flag 4' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'multi flag 4' );
 .sub main :multi(int, _, num, string, _)
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'multi flag 5' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'multi flag 5' );
 .sub main :multi(_)
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'multi flag 6' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'multi flag 6' );
 .sub main :multi(int, int, int, int)
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'multi flag 7' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'multi flag 7' );
 .sub main :multi(_, _, _, _, _, _)
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'vtable flag' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'vtable flag' );
 .sub main :vtable('__set_int')
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'combine flags without commas' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'combine flags without commas' );
 .sub main :main :load :immediate :init
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'combine flags with commas' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'combine flags with commas' );
 .sub main :main, :load, :immediate, :init
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'parameters' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'parameters' );
 .sub main
 	.param pmc pargs
 	.param int iarg
@@ -169,11 +115,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'parameters' );
 	.param object oargs
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'parameter flags' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'parameter flags' );
 .sub main
 	.param pmc args1 :slurpy
 	.param pmc args2 :named
@@ -181,11 +124,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'parameter flags' );
 	.param int arg3  :opt_flag
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'pcc_sub' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'pcc_sub' );
 .pcc_sub x
 	.param int i                    # positional parameter
   .param pmc argv :slurpy         # slurpy array
@@ -195,12 +135,9 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'pcc_sub' );
   .param pmc kw :slurpy :named    # slurpy hash
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'wrap flag -- new!' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'wrap flag -- new!' );
 
 # This test makes sure pir.pbc is running, not IMCC, as :wrap is still unimplemented and undecided.
 .sub x :wrap('y')
@@ -209,7 +146,4 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'wrap flag -- new!' );
 
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 

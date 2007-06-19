@@ -11,7 +11,7 @@ use Test::More;
 # 
 #
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, '' );
 .sub main			
 	
 	x = y[0 .. 1]
@@ -21,11 +21,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '' );
 
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, '' );
 
 .sub main			
 	x->hello()
@@ -33,26 +30,17 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, '' );
 .sub main			
 
 
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, '' );
 .sub main			
 
 
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT

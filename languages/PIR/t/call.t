@@ -6,7 +6,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 10;
 use Test::More;
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'long sub invocation' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'long sub invocation' );
 
 .sub main :main
 	.local int x, y, z
@@ -31,11 +31,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'long sub invocation' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'long sub invocation 2' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'long sub invocation 2' );
 
 .sub main :main
 	.pcc_begin
@@ -49,12 +46,9 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'long sub invocation 2' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'short sub invocation' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'short sub invocation' );
 
 .sub main :main
 	.local int x, y, z
@@ -68,11 +62,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'short sub invocation' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'short yield' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'short yield' );
 
 .sub main :main
 	.yield(1,2,3)
@@ -81,11 +72,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'short yield' );
 
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'long yield' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'long yield' );
 
 .sub main :main
 	.pcc_begin_yield
@@ -96,12 +84,9 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'long yield' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'tail call' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'tail call' );
 
 .sub main :main
 	.return foo()	
@@ -116,11 +101,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'tail call' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'tail method call' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'tail method call' );
 
 .sub main :main
 	.return obj.foo()	
@@ -135,11 +117,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'tail method call' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'nci call' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'nci call' );
 
 .sub main :main
 	.local pmc x
@@ -149,11 +128,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'nci call' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'long method call' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'long method call' );
 
 .sub main :main
 	.local pmc x
@@ -164,12 +140,9 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'long method call' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'short sub call with flags' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'short sub call with flags' );
 
 # the sub body is taken from PDD03
 .sub main :main
@@ -189,7 +162,4 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'short sub call with flags' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 

@@ -6,41 +6,32 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 10;
 use Test::More;
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'comments before code' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'comments before code' );
 #
 # pre-code comment
 #
 .sub main			
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'comments after code' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'comments after code' );
 .sub main			
 .end
 #
 # comments after code
 #
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'comments in code' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'comments in code' );
 .sub main			
 #
 # in-code comment
 #
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'comments after code' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'comments after code' );
 .sub main			
 
 	x = 1 # this is an assignment!
@@ -48,11 +39,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'comments after code' );
 	
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'pre-code whitespace' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'pre-code whitespace' );
 
 
 
@@ -163,11 +151,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'pre-code whitespace' );
 .sub main			
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'in-code whitespace' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'in-code whitespace' );
 .sub main			
 
 
@@ -346,11 +331,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'in-code whitespace' );
 
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'after-code whitespace' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'after-code whitespace' );
 .sub main			
 .end
 
@@ -460,12 +442,9 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'after-code whitespace' );
 
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'pre-code pod comments' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'pre-code pod comments' );
 =pod
 
 hi there
@@ -486,11 +465,8 @@ documentation rocks!
 .sub main			
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'in-code pod comments' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'in-code pod comments' );
 .sub main			
 
 =pod 
@@ -502,12 +478,9 @@ Parrot rocks too!
 =cut
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'after-code pod comments' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'after-code pod comments' );
 .sub main			
 .end
 
@@ -518,7 +491,4 @@ Don't forget to hit enter after typing last OUT marker in the test file!
 =cut
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 

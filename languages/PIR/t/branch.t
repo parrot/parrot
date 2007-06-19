@@ -6,7 +6,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 3;
 use Test::More;
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'if statement' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'if statement' );
 .sub main			
 	
 	if 1 < 2 goto L1
@@ -24,12 +24,9 @@ L6:
 
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'unless statement' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'unless statement' );
 .sub main			
 	
 	unless 1 < 2 goto L1
@@ -47,11 +44,8 @@ L6:
 
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'goto statement' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'goto statement' );
 .sub main			
 	
 	goto L1
@@ -59,6 +53,3 @@ L1:
 
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT

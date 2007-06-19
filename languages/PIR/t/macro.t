@@ -6,7 +6,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 5;
 use Test::More;
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'macro pasring' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'macro pasring' );
 
 .sub main
 	.local int i
@@ -37,31 +37,22 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'macro pasring' );
 
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple macro, no params' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'simple macro, no params' );
 
 .macro myMacro
 .endm
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple macro, params' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'simple macro, params' );
 
 .macro doIt(A,B)
 .endm
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '.constant' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, '.constant' );
 
 .constant answer 42
 
@@ -73,18 +64,12 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '.constant' );
 .constant b P20
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', '.include' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, '.include' );
 
 .include "Hello"
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 

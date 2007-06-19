@@ -6,7 +6,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 5;
 use Test::More;
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'local decls 1' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'local decls 1' );
 
 .sub main
 	.local int a
@@ -16,11 +16,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'local decls 1' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'local decls 2' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'local decls 2' );
 
 .sub main
 	.local int a, k, l, m
@@ -30,12 +27,9 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'local decls 2' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'local decls - unique_reg' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'local decls - unique_reg' );
 
 .sub main
 	.local int a :unique_reg, b, c
@@ -44,11 +38,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'local decls - unique_reg' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'sym decls - unique_reg' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'sym decls - unique_reg' );
 
 .sub main
 	.sym int a :unique_reg, b, c
@@ -57,12 +48,9 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'sym decls - unique_reg' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'lexicals' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'lexicals' );
 
 .sub main
 	.local pmc a
@@ -71,8 +59,5 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'lexicals' );
 .end
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 

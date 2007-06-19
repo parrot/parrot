@@ -6,18 +6,15 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 12;
 use Test::More;
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'global defs' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'global defs' );
 
 .global g_X
 
 .global g_Y
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'const defs' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'const defs' );
 
 .const int iConst = 42
 
@@ -28,113 +25,78 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'const defs' );
 .const pmc pConst = "is a PMC const a string?"
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'loadlib directive' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'loadlib directive' );
 
 .loadlib "Hitchhikers"
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'n_operators directive' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'n_operators directive' );
 
 .pragma n_operators 1
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'namespaces 1' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'namespaces 1' );
 
 .namespace ['']
 .namespace [""]
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'namespaces 2' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'namespaces 2' );
 
 .namespace ['PIR']
 .namespace ["PIR"]
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'namespaces 3' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'namespaces 3' );
 
 .namespace ['PIR';'Grammar']
 .namespace ["PIR";"Grammar"]
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'Root namespace' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'Root namespace' );
 
 .namespace
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'HLL' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'HLL' );
 
 .HLL 'PIR', 'PIRlib'
 .HLL "PIR", "PIRlib"
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'HLL map' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'HLL map' );
 
 .HLL_map 42, 10
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'source line info' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'source line info' );
 
 .line 42
 
 .line 42, "Hitchhikers.pir"
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'emit' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'emit' );
 
 .emit
 	set P0, 1
 .eom
 
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
-
-

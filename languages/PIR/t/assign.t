@@ -6,7 +6,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 7;
 use Test::More;
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple assignments' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'simple assignments' );
 .sub main			
 	a = 1
 	b = 1.1
@@ -14,22 +14,16 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple assignments' );
 	d = e
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'int/hex/bin' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'int/hex/bin' );
 .sub main			
 	a = 10
 	b = 0b10
 	c = 0x10	
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'get keyed assignments' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'get keyed assignments' );
 .sub main			
 	e = x[1]
 	f = x[1.1]
@@ -37,11 +31,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'get keyed assignments' );
 	h = x[e]	
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'set keyed assignments' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'set keyed assignments' );
 .sub main			
 	x[1]				= 1
 	x[1.1]			= 2.222
@@ -49,11 +40,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'set keyed assignments' );
 	x[e]				= f
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple expressions' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'simple expressions' );
 .sub main			
 	.local int x,y,z,a,b,c
 	x = 1 + 2
@@ -74,11 +62,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'simple expressions' );
 	a = ~ x
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'assign operators' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'assign operators' );
 .sub main			
 	.local int x
 	x = 0
@@ -92,11 +77,8 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'assign operators' );
 	x >>>= 1
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
-language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'string charset modifiers' );
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'string charset modifiers' );
 .sub main			
 	.local string s
 	s = ascii:"Hello World"
@@ -106,7 +88,4 @@ language_output_is( 'PIR_PGE', <<'CODE', <<'OUT', 'string charset modifiers' );
 	s = utf8:unicode:"Hello World"
 .end
 CODE
-"parse" => PMC 'PIR::Grammar' { ... }
-Parse successful!
-OUT
 
