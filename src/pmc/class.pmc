@@ -878,7 +878,6 @@ Returns whether the class is or inherits from C<*classname>.
     INTVAL isa(STRING *classname) {
         Parrot_Class *_class      = PARROT_CLASS(SELF);
         const INTVAL  num_classes = VTABLE_elements(interp, _class->parents);
-        STRING       *name;
         INTVAL        i;
 
         if (SUPER(classname))
@@ -1166,6 +1165,7 @@ Walks the MRO of the class and finds the method with the given name.
     PCCMETHOD void find_method(STRING *name) {
         Parrot_Class * const  _class    = PARROT_CLASS(SELF);
         PMC                  *namespace = _class->_namespace;
+        int num_classes, i;
 
         if (  ! PMC_IS_NULL(namespace)
             &&  VTABLE_exists_keyed_str(interp, namespace, name)) {
@@ -1174,8 +1174,7 @@ Walks the MRO of the class and finds the method with the given name.
         }
 
         /* Walk and search. One day, we'll use the cache first. */
-        int num_classes = VTABLE_elements(interp, _class->all_parents);
-        int i;
+        num_classes = VTABLE_elements(interp, _class->all_parents);
 
         for (i = 0; i < num_classes; i++) {
             /* Get the class and see if it has the method. */
