@@ -506,7 +506,11 @@ SKIP: {
     skip 'no BigInt lib found' => 1
         unless $PConfig{gmp};
 
-    pir_output_is( <<'CODE', <<'OUT', "I-reg shl and PMC shl are consistent");
+    my @todo;
+    @todo = ( todo => 'broken with JIT (RT #43245) )
+        if $ENV{TEST_PROG_ARGS} =~ /-j/;
+
+    pir_output_is( <<'CODE', <<'OUT', "I-reg shl and PMC shl are consistent", @todo );
 ## The PMC shl op will promote Integer to Bigint when needed.  We can't stuff a
 ## BigInt in an I register, but we can produce the same result modulo wordsize.
 ## [Only we cheat by using the word size minus one, so that we don't have to

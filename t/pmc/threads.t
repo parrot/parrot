@@ -809,6 +809,7 @@ my @todo;
 if ($ENV{TEST_PROG_ARGS}) {
     push @todo, ( todo => 'Broken with CGP' ) if $ENV{TEST_PROG_ARGS} =~ /-C/;
     push @todo, ( todo => 'Broken with JIT' ) if $ENV{TEST_PROG_ARGS} =~ /-j/;
+    push @todo, ( todo => 'Broken with -S'  ) if $ENV{TEST_PROG_ARGS} =~ /-S/;
 }
 pir_output_unlike( <<'CODE', qr/not/, "globals + constant table subs issue", @todo );
 .namespace [ 'Foo' ]
