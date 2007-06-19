@@ -507,7 +507,7 @@ SKIP: {
         unless $PConfig{gmp};
 
     my @todo;
-    @todo = ( todo => 'broken with JIT (RT #43245) )
+    @todo = ( todo => 'broken with JIT (RT #43245)' )
         if $ENV{TEST_PROG_ARGS} =~ /-j/;
 
     pir_output_is( <<'CODE', <<'OUT', "I-reg shl and PMC shl are consistent", @todo );
