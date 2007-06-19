@@ -1,11 +1,11 @@
 Name:           parrot
-Version:        0.4.12
+Version:        0.4.13
 Release:        1%{?dist}
 Summary:        Parrot Virtual Machine
-License:        GPL or Artistic
+License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            http://www.parrotcode.org/
-Source0:        http://www.cpan.org/authors/id/M/MD/MDIEP/parrot-%{version}.tar.gz
+Source0:        http://www.cpan.org/authors/id/A/AR/ARANDAL/parrot-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  readline-devel
 BuildRequires:  ncurses-devel
@@ -19,7 +19,7 @@ BuildRequires:  perl-SVK
 
 %package devel
 Summary:        Parrot Virtual Machine development headers and libraries
-License:        GPL or Artistic
+License:        Artistic 2.0
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{_libdir}/pkgconfig
