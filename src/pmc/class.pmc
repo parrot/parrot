@@ -599,7 +599,8 @@ Returns an error if an attribute of C<name> already exists.
         /* If we've already got an attribute of this name, it's an error. */
         if (VTABLE_exists_keyed_str(interp, _class->attrib_metadata, name))
             real_exception(interp, NULL, INVALID_OPERATION,
-                "An attribute of this name already exists.");
+                "Attribute '%s' already exists.",
+                string_to_cstring(interp, name));
 
         /* Set name and type. */
         VTABLE_set_string_keyed_str(interp, new_attribute,
@@ -659,8 +660,7 @@ Adds the supplied PMC to the list of parents for the class.
 
         /* Ensure it really is a class. */
         if (!PObj_is_class_TEST(parent)) {
-            real_exception(interp, NULL, E_TypeError,
-                "You can only add a class as a parent to another class.");
+            real_exception(interp, NULL, E_TypeError, "Parent isn't a Class.");
             return;
         }
 
