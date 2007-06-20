@@ -247,8 +247,17 @@ PARROT_API STRING * Parrot_vsprintf_s( Interp *interp /*NN*/,
     extern SPRINTF_OBJ pmc_core;
     extern SPRINTF_OBJ va_core;
 
-    STRING *Parrot_sprintf_format(Interp *interp,
-                                  STRING *pat, SPRINTF_OBJ * obj);
+/* HEADERIZER BEGIN: src/spf_render.c */
+
+STRING * Parrot_sprintf_format( Interp *interp /*NN*/,
+    STRING *pat /*NN*/,
+    SPRINTF_OBJ *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
+
+/* HEADERIZER END: src/spf_render.c */
 
 #endif /* IN_SPF_SYSTEM */
 

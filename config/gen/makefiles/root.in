@@ -1869,6 +1869,7 @@ HEADERIZER_O_FILES = \
     src/packout.o \
     src/pic.o \
     src/pmc.o \
+    src/spf_render.o \
     src/stack_common.o \
     src/stacks.o \
     src/string.o \

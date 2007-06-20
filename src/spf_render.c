@@ -13,10 +13,6 @@ and its utility functions.
 
 =head2 Utility Functions
 
-=over 4
-
-=cut
-
 */
 
 #define IN_SPF_SYSTEM
@@ -25,6 +21,8 @@ and its utility functions.
 #include "parrot/string_funcs.h"
 #include "spf_render.str"
 #include <assert.h>
+
+/* HEADER: include/parrot/misc.h */
 
 /* Per Dan's orders, we will not use sprintf if snprintf isn't
  * around for us.
@@ -35,13 +33,9 @@ and its utility functions.
 
 /*
 
-=item C<static STRING *
-handle_flags(Interp *interp,
-             SpfInfo info, STRING *str, INTVAL is_int_type, const char *prefix)>
+FUNCDOC: handle_flags
 
 Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
-
-=cut
 
 */
 
@@ -140,7 +134,8 @@ handle_flags(Interp *interp,
     return str;
 }
 
-static STRING* str_append_w_flags(Interp *interp,
+static STRING*
+str_append_w_flags(Interp *interp,
         STRING* dest, SpfInfo info, STRING* src, STRING *prefix)
 {
     src = handle_flags(interp, info, src, 1, prefix);
@@ -210,19 +205,16 @@ gen_sprintf_call(char *out, SpfInfo info /*NN*/, int thingy)
 
 /*
 
-=item C<STRING *
-Parrot_sprintf_format(Interp *interp, STRING *pat,
-                      SPRINTF_OBJ * obj)>
+FUNCDOC: Parrot_sprintf_format
 
 This is the engine that does all the formatting.
-
-=cut
 
 */
 
 STRING *
-Parrot_sprintf_format(Interp *interp, STRING *pat,
-                      SPRINTF_OBJ * obj)
+Parrot_sprintf_format(Interp *interp /*NN*/,
+        STRING *pat /*NN*/, SPRINTF_OBJ *obj /*NN*/)
+    /* WARN_UNUSED */
 {
     INTVAL i, len, old;
     /*
@@ -744,13 +736,9 @@ do_sprintf:
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<src/misc.h>, F<src/misc.c>, F<src/spf_vtable.c>.
-
-=cut
 
 */
 
