@@ -114,6 +114,7 @@ PMC * IMCC_compile_pir_s(Parrot_Interp interp, const char *s,
       STRING **error_message);
 PMC * IMCC_compile_pasm_s(Parrot_Interp interp, const char *s,
       STRING **error_message);
+void IMCC_print_inc(Interp *interp);
 
 /* Call convention independant API */
 

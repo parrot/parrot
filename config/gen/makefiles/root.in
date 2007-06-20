@@ -1882,6 +1882,7 @@ HEADERIZER_O_FILES = \
     src/utils.o \
     src/vtables.o \
     compilers/imcc/sets.o \
+    compilers/imcc/debug.o \
 
 headerizer : $(SRC_DIR)/fingerprint.c $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)
