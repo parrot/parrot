@@ -37,8 +37,7 @@ sub get_test_prog {
               $self->{parrot},
               File::Spec->join( qw( languages m4 m4.pbc ) ),
               $test_prog_args,
-              File::Spec->join( qw( languages $lang_fn ) ),
-              $lang_fn );
+              File::Spec->join( qw( languages $lang_fn ) ) );
 }
 
 1;
