@@ -11,6 +11,8 @@
 #include "pbc.h"
 #include "optimizer.h"
 
+/* HEADERIZER TARGET: compilers/imcc/optimizer.h */
+
 
 /*
  * pre_optimizer
@@ -84,7 +86,7 @@ static int clone_remove(Interp *, IMC_Unit *);
  * Handles optimizations occuring before the construction of the CFG.
  */
 int
-pre_optimize(Interp *interp, IMC_Unit * unit)
+pre_optimize(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
 {
     int changed = 0;
 
@@ -104,7 +106,7 @@ pre_optimize(Interp *interp, IMC_Unit * unit)
  * FALSE.
  */
 int
-cfg_optimize(Interp *interp, IMC_Unit * unit)
+cfg_optimize(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
 {
     if (IMCC_INFO(interp)->dont_optimize)
         return 0;
@@ -126,13 +128,13 @@ cfg_optimize(Interp *interp, IMC_Unit * unit)
 }
 
 int
-optimize(Interp *interp, IMC_Unit * unit)
+optimize(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
 {
     int any = 0;
     if (IMCC_INFO(interp)->optimizer_level & OPT_CFG) {
         IMCC_info(interp, 2, "optimize\n");
         any = constant_propagation(interp, unit);
-        if (0 && clone_remove(interp, unit))
+        if (0 && clone_remove(interp, unit)) /* XXX Why is this commented out? */
             return 1;
         if (used_once(interp, unit))
             return 1;
@@ -854,7 +856,7 @@ IMCC_subst_constants(Interp *interp, IMC_Unit * unit, char *name,
  * FALSE.
  */
 static int
-branch_branch(Interp *interp, IMC_Unit * unit)
+branch_branch(Interp *interp, IMC_Unit * unit /*NN*/)
 {
     Instruction *ins, *next;
     SymReg * r;

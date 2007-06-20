@@ -1886,6 +1886,7 @@ HEADERIZER_O_FILES = \
     compilers/imcc/pcc.o \
     compilers/imcc/pbc.o \
     compilers/imcc/imc.o \
+    compilers/imcc/optimizer.o \
 
 headerizer : $(SRC_DIR)/fingerprint.c $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)
