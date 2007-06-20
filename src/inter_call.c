@@ -27,6 +27,8 @@ subroutines.
 
 /* HEADER: include/parrot/inter_call.h */
 
+/* Make sure we don't conflict with any other MAX() macros defined elsewhere */
+#define PARROT_MAX(a,b) (((a)) > (b) ? (a) : (b))
 
 #define SAVE_OFF_REGS(orig, next, save) \
         save.bp = orig.bp;\
@@ -1255,8 +1257,6 @@ commit_last_arg(Interp *interp, int index, int cur, opcode_t *n_regs_used, int s
     }
 }
 
-#define MAX(a,b) (((a)) > (b) ? (a) : (b))
-
 /*
 
 =item C<void
@@ -1381,10 +1381,10 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
     }
 
     /* calculate max reg types needed for both args and results */
-    n_regs_used[0] = MAX(max_regs[0], max_regs[4]);
-    n_regs_used[1] = MAX(max_regs[1], max_regs[5]);
-    n_regs_used[2] = MAX(max_regs[2], max_regs[6]);
-    n_regs_used[3] = MAX(max_regs[3], max_regs[7]);
+    n_regs_used[0] = PARROT_MAX(max_regs[0], max_regs[4]);
+    n_regs_used[1] = PARROT_MAX(max_regs[1], max_regs[5]);
+    n_regs_used[2] = PARROT_MAX(max_regs[2], max_regs[6]);
+    n_regs_used[3] = PARROT_MAX(max_regs[3], max_regs[7]);
 
     /* initialize arg and return sig FIAs with collected info */
     if (arg_ret_cnt[0] > 0)
