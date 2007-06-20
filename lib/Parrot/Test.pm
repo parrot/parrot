@@ -324,7 +324,7 @@ sub run_command {
     # removed exec warnings to prevent this warning from messing up test results
     {
         no warnings 'exec';
-        system($_ ) for ( @{$command} );
+        system($_) for ( @{$command} );
     }
 
     if ($chdir) {
@@ -458,7 +458,6 @@ sub generate_languages_functions {
     
                 my $meth = $test_map{$func};
     
-                # That's the reason for:   no strict 'refs';
                 my $pass = $self->{builder}->$meth( Parrot::Test::slurp_file($out_fn), $output, $desc );
                 unless ($pass) {
                     my $diag = '';
@@ -693,6 +692,7 @@ sub _generate_functions {
         };
 
         no strict 'refs';
+
         *{ $package . '::' . $func } = $test_sub;
     }
 
@@ -707,7 +707,7 @@ sub _generate_functions {
         push @EXPORT, $func;
         no strict 'refs';
 
-        *{ $package . '::' . $func } = sub {
+        my $test_sub = sub {
             my ( $code, $expected, $desc, %extra ) = @_;
 
             # Strange Win line endings
@@ -771,6 +771,10 @@ sub _generate_functions {
 
             return $pass;
         };
+
+        no strict 'refs';
+
+        *{ $package . '::' . $func } = $test_sub;
     }
 
     my %builtin_language_prefix = (
@@ -786,9 +790,8 @@ sub _generate_functions {
 
     foreach my $func ( keys %language_test_map ) {
         push @EXPORT, $func;
-        no strict 'refs';
 
-        *{ $package . '::' . $func } = sub {
+        my $test_sub = sub {
             my ( $language, @remaining ) = @_;
 
             my $meth = $language_test_map{$func};
@@ -798,6 +801,9 @@ sub _generate_functions {
                 my $level = $builder->level();
                 $builder->level( $level + 2 );
                 my $test_func = "${package}::${prefix}_${meth}";
+
+                no strict 'refs';
+
                 $test_func->(@remaining);
                 $builder->level($level);
             }
@@ -827,7 +833,11 @@ sub _generate_functions {
                 # restore prior level, just in case.
                 $builder->level($level);
             }
-        }
+        };
+
+        no strict 'refs';
+
+        *{ $package . '::' . $func } = $test_sub;
     }
 
     # XXX this is broken WRT todo tests
@@ -839,9 +849,8 @@ sub _generate_functions {
 
     foreach my $func ( keys %example_test_map ) {
         push @EXPORT, $func;
-        no strict 'refs';
 
-        *{ $package . '::' . $func } = sub {
+        my $test_sub = sub {
             my ( $example_f, $expected, @options ) = @_;
 
             my %lang_for_extension = (
@@ -854,8 +863,11 @@ sub _generate_functions {
                                                \z                     # at end of string
                                              }ixms or Usage();
             if ( defined $extension ) {
-                my $code = slurp_file($example_f);
+                my $code      = slurp_file($example_f);
                 my $test_func = join( '::', $package, $example_test_map{$func} );
+        
+                no strict 'refs';
+
                 $test_func->(
                     $lang_for_extension{$extension},
                     $code, $expected, $example_f, @options
@@ -864,7 +876,11 @@ sub _generate_functions {
             else {
                 fail( defined $extension, "no extension recognized for $example_f" );
             }
-        }
+        };
+
+        no strict 'refs';
+
+        *{ $package . '::' . $func } = $test_sub;
     }
 
     my %c_test_map = (
@@ -875,9 +891,8 @@ sub _generate_functions {
 
     foreach my $func ( keys %c_test_map ) {
         push @EXPORT, $func;
-        no strict 'refs';
 
-        *{ $package . '::' . $func } = sub {
+        my $test_sub = sub {
             my ( $source, $expected, $desc, %options ) = @_;
 
             # $test_no will be part of temporary file
@@ -973,7 +988,11 @@ sub _generate_functions {
             }
 
             return $pass;
-        }
+        };
+
+        no strict 'refs';
+
+        *{ $package . '::' . $func } = $test_sub;
     }
 
     return;
