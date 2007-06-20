@@ -290,6 +290,8 @@ sub print_head {
 #include "parrot/hash.h"
 #include "parrot/oplib/ops.h"
 
+/* HEADER: none */
+
 /*
  * if the architecture can build some or all of these signatures
  * enable the define below
