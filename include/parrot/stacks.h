@@ -77,7 +77,7 @@ PARROT_API void rotate_entries( Interp *interp,
     INTVAL num_entries )
         __attribute__nonnull__(2);
 
-PARROT_API void stack_destroy( Stack_Chunk_t * top );
+PARROT_API void stack_destroy( Stack_Chunk_t *top );
 PARROT_API Stack_Entry_t * stack_entry( Interp *interp /*NN*/,
     Stack_Chunk_t *stack /*NN*/,
     INTVAL depth )
@@ -128,8 +128,7 @@ PARROT_API Stack_Chunk_t * register_new_stack( Interp *interp,
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
-PARROT_API void* stack_prepare_pop(
-    Parrot_Interp interp,
+PARROT_API void* stack_prepare_pop( Interp *interp,
     Stack_Chunk_t **stack_p /*NN*/ )
         __attribute__nonnull__(2);
 
