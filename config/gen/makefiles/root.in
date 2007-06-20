@@ -1821,15 +1821,14 @@ tags.dummy:
 # run "make headerizer".  The .h file will get updated.
 
 HEADERIZER_O_FILES = \
-    $(IMCC_O_FILES) \
     $(INTERP_O_FILES) \
+    $(IMCC_O_FILES) \
 
 # Slowing working my way up to having everything headerized in $(HEADERIZER_O_FILES)
 HEADERIZER_O_FILES = \
     $(CHARSET_O_FILES) \
     $(ENCODING_O_FILES) \
     $(IO_O_FILES) \
-    src/pic_jit.o \
     src/builtin.o \
     src/byteorder.o \
     src/charset.o \
@@ -1869,6 +1868,7 @@ HEADERIZER_O_FILES = \
     src/packfile.o \
     src/packfile/pf_items.o \
     src/packout.o \
+    src/pic_jit.o \
     src/pic.o \
     src/pmc.o \
     src/spf_render.o \
@@ -1881,6 +1881,7 @@ HEADERIZER_O_FILES = \
     src/tsq.o \
     src/utils.o \
     src/vtables.o \
+    compilers/imcc/sets.o \
 
 headerizer : $(SRC_DIR)/fingerprint.c $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerize.pl $(HEADERIZER_O_FILES)

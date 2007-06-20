@@ -1,5 +1,8 @@
 
 #include "imc.h"
+#include "sets.h"
+
+/* HEADERIZER TARGET: compilers/imcc/sets.h */
 
 /* XXX */
 #define fatal(e, s1, s2) do { \
@@ -9,8 +12,9 @@
 
 Set*
 set_make(int length)
+    /* WARN_UNUSED, MALLOC */
 {
-    Set *s = mem_sys_allocate(sizeof (Set));
+    Set * const s = mem_sys_allocate(sizeof (Set));
     s->length = length;
     s->bmp = mem_sys_allocate_zeroed(length/8 + 1);
     return s;
@@ -18,10 +22,11 @@ set_make(int length)
 
 Set*
 set_make_full(int length)
+    /* WARN_UNUSED, MALLOC */
 {
-    Set *s = set_make(length);
+    Set * const s = set_make(length);
     int i;
-    int bytes = length/8;
+    const int bytes = length/8;
 
     if (bytes)
         memset(s->bmp, 0xff, bytes);
@@ -34,22 +39,23 @@ set_make_full(int length)
 }
 
 void
-set_free(Set *s)
+set_free(Set *s /*NN*/)
 {
     mem_sys_free(s->bmp);
     mem_sys_free(s);
 }
 
 void
-set_clear(Set *s)
+set_clear(Set *s /*NN*/)
 {
     memset(s->bmp, 0, s->length/8 +1);
 }
 
 Set*
-set_copy(Set *s1)
+set_copy(Set *s1 /*NN*/)
+    /* WARN_UNUSED, MALLOC */
 {
-    Set *s = set_make(s1->length);
+    Set * const s = set_make(s1->length);
 
     memcpy(s->bmp, s1->bmp, s->length/8 + 1);
     return s;
@@ -57,10 +63,11 @@ set_copy(Set *s1)
 
 
 int
-set_equal(Set *s1, Set *s2)
+set_equal(const Set *s1 /*NN*/, const Set *s2 /*NN*/)
 {
     int mask;
-    int bytes = s1->length/8;
+    const int bytes = s1->length/8;
+
     if (s1->length != s2->length) {
         fatal(1, "set_equal", "Sets don't have the same length\n");
     }
@@ -77,13 +84,14 @@ set_equal(Set *s1, Set *s2)
 }
 
 void
-set_add(Set *s, int element)
+set_add(Set *s /*NN*/, int element)
 {
     s->bmp[element >> 3] |= (1 << (element & 7));
 }
 
 int
-set_first_zero(Set *s)
+set_first_zero(const Set *s /*NN*/)
+    /* WARN_UNUSED */
 {
     int i;
     for (i = 0; i < s->length; ++i)
@@ -93,11 +101,12 @@ set_first_zero(Set *s)
 }
 
 int
-set_contains(Set *s, int element)
+set_contains(const Set *s /*NN*/, int element)
+    /* WARN_UNUSED */
 {
 #ifdef __LCC__
     /* workaround for another lcc bug.. */
-    int tmp = (1 << (element & 7));
+    const int tmp = (1 << (element & 7));
     return s->bmp[element >> 3] & tmp;
 #else
     return s->bmp[element >> 3] & (1 << (element & 7));
@@ -105,10 +114,11 @@ set_contains(Set *s, int element)
 }
 
 Set *
-set_union(Set *s1, Set *s2)
+set_union(const Set *s1 /*NN*/, const Set *s2 /*NN*/)
+    /* WARN_UNUSED, MALLOC */
 {
     int i;
-    Set *s = set_make(s1->length);
+    Set * const s = set_make(s1->length);
 
     if (s1->length != s2->length) {
         fatal(1, "set_union", "Sets don't have the same length\n");
@@ -123,10 +133,11 @@ set_union(Set *s1, Set *s2)
 
 
 Set *
-set_intersec(Set *s1, Set *s2)
+set_intersec(const Set *s1 /*NN*/, const Set *s2 /*NN*/)
+    /* WARN_UNUSED, MALLOC */
 {
     int i;
-    Set *s = set_make(s1->length);
+    Set * const s = set_make(s1->length);
 
     if (s1->length != s2->length) {
         fatal(1, "set_intersec", "Sets don't have the same length\n");
@@ -139,7 +150,7 @@ set_intersec(Set *s1, Set *s2)
 }
 
 void
-set_intersec_inplace(Set *s1, Set *s2)
+set_intersec_inplace(Set *s1 /*NN*/, const Set *s2 /*NN*/)
 {
     int i;
 

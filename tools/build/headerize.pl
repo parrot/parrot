@@ -108,10 +108,16 @@ sub extract_functions {
     @funcs = grep /^\S/, @funcs;
 
     # Typedefs, enums and externs are no good
-    @funcs = grep !/^(typedef|enum|extern)/, @funcs;
+    @funcs = grep !/^(typedef|enum|extern)\b/, @funcs;
 
     # Structs are OK if they're not alone on the line
     @funcs = grep { !/^struct.+;\n/ } @funcs;
+
+    # Structs are OK if they're not being defined
+    @funcs = grep { !/^(static\s+)?struct.+{\n/ } @funcs;
+
+    # Ignore magic function name YY_DECL
+    @funcs = grep !/YY_DECL/, @funcs;
 
     # Variables are of no use to us
     @funcs = grep !/=/, @funcs;
@@ -286,7 +292,7 @@ sub main {
         print "=== $cfile ===\n";
 
         die "can't find HEADER directive in '$cfile'"
-            unless $source =~ m#/\*\s+HEADER:\s+([^*]+?)\s+\*/#s;
+            unless $source =~ m#/\*\s+HEADER(?:IZER TARGET)?:\s+([^*]+?)\s+\*/#s;
         my $hfile = $1;
         next if $hfile eq 'none';
         die "'$hfile' not found (referenced from '$cfile')" unless -f $hfile;

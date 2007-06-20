@@ -6,19 +6,59 @@ typedef struct _Set {
    unsigned char* bmp;
 } Set;
 
-Set* set_make(int);
-Set* set_make_full(int);
-void set_free(Set*);
-void set_clear(Set *s) ;
-Set* set_copy(Set*);
+/* HEADERIZER BEGIN: compilers/imcc/sets.c */
 
-int set_equal(Set*, Set*);
-void set_add(Set*, int);
-int set_contains(Set*, int);
-Set* set_union(Set*, Set*);
-Set* set_intersec(Set*, Set*);
-void set_intersec_inplace(Set*, Set*);
-int set_first_zero(Set *s);
+void set_add( Set *s /*NN*/, int element )
+        __attribute__nonnull__(1);
+
+void set_clear( Set *s /*NN*/ )
+        __attribute__nonnull__(1);
+
+int set_contains( const Set *s /*NN*/, int element )
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__;
+
+Set* set_copy( Set *s1 /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__
+        __attribute__malloc__;
+
+int set_equal( const Set *s1 /*NN*/, const Set *s2 /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+int set_first_zero( const Set *s /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__;
+
+void set_free( Set *s /*NN*/ )
+        __attribute__nonnull__(1);
+
+Set * set_intersec( const Set *s1 /*NN*/, const Set *s2 /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__
+        __attribute__malloc__;
+
+void set_intersec_inplace( Set *s1 /*NN*/, const Set *s2 /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+Set* set_make( int length )
+        __attribute__warn_unused_result__
+        __attribute__malloc__;
+
+Set* set_make_full( int length )
+        __attribute__warn_unused_result__
+        __attribute__malloc__;
+
+Set * set_union( const Set *s1 /*NN*/, const Set *s2 /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__
+        __attribute__malloc__;
+
+/* HEADERIZER END: compilers/imcc/sets.c */
 
 #endif /* PARROT_IMCC_SETS_H_GUARD */
 
