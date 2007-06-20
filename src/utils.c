@@ -329,6 +329,8 @@ PARROT_API
 FLOATVAL
 Parrot_float_rand(INTVAL how_random)
 {
+    UNUSED(how_random);
+
     return _drand48();          /* [0.0..1.0] */
 }
 
@@ -346,6 +348,8 @@ PARROT_API
 INTVAL
 Parrot_uint_rand(INTVAL how_random)
 {
+    UNUSED(how_random);
+
     return _lrand48();          /* [0..2^31] */
 }
 
@@ -363,6 +367,8 @@ PARROT_API
 INTVAL
 Parrot_int_rand(INTVAL how_random)
 {
+    UNUSED(how_random);
+
     return _mrand48();          /* [-2^31..2^31] */
 }
 

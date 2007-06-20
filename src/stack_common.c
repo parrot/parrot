@@ -35,6 +35,7 @@ PARROT_API
 void
 stack_system_init(Interp *interp)
 {
+    UNUSED(interp);
 }
 
 
@@ -115,9 +116,11 @@ Return a pointer, where new entries are popped off.
 
 PARROT_API
 void*
-stack_prepare_pop(Parrot_Interp interp, Stack_Chunk_t **stack_p /*NN*/)
+stack_prepare_pop(Interp *interp, Stack_Chunk_t **stack_p /*NN*/)
 {
     Stack_Chunk_t * const chunk = *stack_p;
+    UNUSED(interp);
+
     /*
      * the first entry (initial top) refers to itself
      */

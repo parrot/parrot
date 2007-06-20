@@ -81,9 +81,10 @@ stack_destroy() doesn't need to do anything, since GC does it all.
 
 PARROT_API
 void
-stack_destroy(Stack_Chunk_t * top)
+stack_destroy(Stack_Chunk_t *top)
 {
-   /* GC does it all */
+    UNUSED(top)
+    /* GC does it all */
 }
 
 /*
@@ -99,6 +100,7 @@ stack_height(Interp *interp, const Stack_Chunk_t *chunk /*NN*/)
     /* PURE, WARN_UNUSED */
 {
     size_t height = 0;
+    UNUSED(interp);
 
     for (; ; chunk = chunk->prev) {
         if (chunk == chunk->prev)
