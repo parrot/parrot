@@ -276,8 +276,6 @@ typedef struct _imc_info_t {
 PARROT_API Instruction * IMCC_create_itcall_label(Interp *);
 PARROT_API void IMCC_itcall_sub(Interp* interp, SymReg* sub);
 
-STRING * IMCC_string_from_reg(Interp *interp, SymReg *r);
-INTVAL   IMCC_int_from_reg(Interp *interp, SymReg *r);
 Instruction * IMCC_subst_constants_umix(Interp *, IMC_Unit * unit, char *name,
         SymReg **r, int n);
 Instruction * IMCC_subst_constants(Interp *, IMC_Unit * unit, char *name,
