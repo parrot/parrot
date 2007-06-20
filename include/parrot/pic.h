@@ -110,10 +110,18 @@ void parrot_PIC_prederef( Interp *interp,
 /* HEADERIZER END: src/pic.c */
 
 
-int parrot_pic_is_safe_to_jit(Interp *, PMC *sub,
-        PMC *sig_args, PMC *sig_results, int *flags);
+/* HEADERIZER BEGIN: src/pic_jit.c */
 
-funcptr_t  parrot_pic_JIT_sub(Interp *, PMC *sub, int flags);
+int parrot_pic_is_safe_to_jit( Interp *interp /*NN*/,
+    PMC *sub /*NN*/,
+    PMC *sig_args,
+    PMC *sig_results,
+    int *flags )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+funcptr_t parrot_pic_JIT_sub( Interp *interp, PMC *sub, int flags );
+/* HEADERIZER END: src/pic_jit.c */
 
 #endif /* PARROT_PIC_H_GUARD */
 

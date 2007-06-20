@@ -1821,6 +1821,7 @@ tags.dummy:
 # run "make headerizer".  The .h file will get updated.
 
 HEADERIZER_O_FILES = \
+    $(IMCC_O_FILES) \
     $(INTERP_O_FILES) \
 
 # Slowing working my way up to having everything headerized in $(HEADERIZER_O_FILES)
@@ -1828,6 +1829,7 @@ HEADERIZER_O_FILES = \
     $(CHARSET_O_FILES) \
     $(ENCODING_O_FILES) \
     $(IO_O_FILES) \
+    src/pic_jit.o \
     src/builtin.o \
     src/byteorder.o \
     src/charset.o \

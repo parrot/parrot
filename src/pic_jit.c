@@ -25,15 +25,14 @@ TODO:
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include <assert.h>
+
+/* HEADER: include/parrot/pic.h */
+
 #ifdef HAVE_COMPUTED_GOTO
 #  include "parrot/oplib/core_ops_cgp.h"
 #endif
@@ -268,10 +267,14 @@ op_is_ok:
     return 1;
 }
 
+#endif     /* HAS_JIT */
+
+
 int
-parrot_pic_is_safe_to_jit(Interp *interp, PMC *sub,
+parrot_pic_is_safe_to_jit(Interp *interp /*NN*/, PMC *sub /*NN*/,
         PMC *sig_args, PMC *sig_results, int *flags)
 {
+#ifdef HAS_JIT
     opcode_t *base, *start, *end;
 
     *flags = 0;
@@ -309,11 +312,15 @@ parrot_pic_is_safe_to_jit(Interp *interp, PMC *sub,
         return 0;
 
     return 1;
+#else
+    return 0;
+#endif
 }
 
 funcptr_t
 parrot_pic_JIT_sub(Interp *interp, PMC *sub, int flags)
 {
+#ifdef HAS_JIT
 #  if PIC_TEST
     UNUSED(interp);
     UNUSED(sub);
@@ -335,30 +342,16 @@ parrot_pic_JIT_sub(Interp *interp, PMC *sub, int flags)
 
     return (funcptr_t) jit_info->arena.start;
 #  endif
-}
-
-#else   /* HAS_JIT */
-
-int
-parrot_pic_is_safe_to_jit(Interp *interp, PMC *sub,
-        PMC *sig_args, PMC *sig_results, int *flags)
-{
-    return 0;
-}
-
-funcptr_t
-parrot_pic_JIT_sub(Interp *interp, PMC *sub, int flags) {
+#else
     UNUSED(interp);
     UNUSED(sub);
 
     return NULLfunc;
+#endif
 }
 
-#endif     /* HAS_JIT */
 
 /*
-
-=back
 
 =head1 AUTHOR
 
@@ -368,8 +361,6 @@ Leopold Toetsch
 
 F<src/pic.c>, F<src/jit.c>, F<ops/core_ops_cgp.c>,
 F<include/parrot/pic.h>, F<ops/pic.ops>
-
-=cut
 
 */
 
