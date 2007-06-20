@@ -8,6 +8,7 @@
  */
 #include <string.h>
 #include "imc.h"
+#include "pbc.h"
 #include "optimizer.h"
 
 

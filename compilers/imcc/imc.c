@@ -11,28 +11,36 @@
 #include "imc.h"
 #include "optimizer.h"
 
-#define COMPILE_IMMEDIATE 1
+/* HEADERIZER TARGET: compilers/imcc/imc.h */
+
+/* HEADERIZER BEGIN: static */
 static void imc_free_unit(Parrot_Interp interp, IMC_Unit * unit);
+/* HEADERIZER END: static */
+
+#define COMPILE_IMMEDIATE 1
 /*
 extern FILE* yyin;
 */
 
+
+PARROT_API
 void
-imc_compile_all_units(Interp *interp)
+imc_compile_all_units(Interp *interp /*NN*/)
 {
-    IMC_Unit *unit, *unit_next;
+    IMC_Unit *unit;
     Instruction *ins, *ins_next;
 #if ! COMPILE_IMMEDIATE
-    for (unit = IMCC_INFO(interp)->imc_units; unit; unit = unit_next) {
-        unit_next = unit->next;
+    for (unit = IMCC_INFO(interp)->imc_units; unit; ) {
+        IMC_Unit * const unit_next = unit->next;
         imc_compile_unit(interp, unit);
+        unit = unit_next;
     }
 #endif
     emit_close(interp, NULL);
     /* All done with compilation, now free instructions and other structures */
 
     for (unit = IMCC_INFO(interp)->imc_units; unit;) {
-        unit_next = unit->next;
+        IMC_Unit * const unit_next = unit->next;
         for (ins = unit->instructions; ins; ) {
             ins_next = ins->next;
             free_ins(ins);
@@ -49,8 +57,11 @@ imc_compile_all_units(Interp *interp)
 /* imc_compile_unit is the main loop of the IMC compiler for each unit. It
  * operates on a single compilation unit at a time.
  */
+
+PARROT_API
 void
-imc_compile_unit(Interp *interp, IMC_Unit * unit) {
+imc_compile_unit(Interp *interp, IMC_Unit *unit)
+{
     /* Not much here for now except the allocator */
     IMCC_INFO(interp)->cur_unit = unit;
 
@@ -63,8 +74,10 @@ imc_compile_unit(Interp *interp, IMC_Unit * unit) {
  * Any activity required to cleanup the compiler state and be
  * ready for a new compiler invocation goes here.
  */
+
+PARROT_API
 void
-imc_cleanup(Interp *interp, void *yyscanner)
+imc_cleanup(Interp *interp /*NN*/, void *yyscanner)
 {
     IMCC_pop_parser_state(interp, yyscanner);
     clear_globals(interp);
@@ -79,10 +92,10 @@ imc_cleanup(Interp *interp, void *yyscanner)
 static IMC_Unit *
 imc_new_unit(IMC_Unit_Type t)
 {
-   IMC_Unit * unit = (IMC_Unit *)calloc(1, sizeof (IMC_Unit));
-   create_symhash(&unit->hash);
-   unit->type = t;
-   return unit;
+    IMC_Unit * const unit = (IMC_Unit *)calloc(1, sizeof (IMC_Unit));
+    create_symhash(&unit->hash);
+    unit->type = t;
+    return unit;
 }
 
 /*
@@ -90,6 +103,7 @@ imc_new_unit(IMC_Unit_Type t)
  * This sets the current state of the parser. The unit
  * can be closed later retaining all the current state.
  */
+
 IMC_Unit *
 imc_open_unit(Parrot_Interp interp, IMC_Unit_Type t)
 {
@@ -130,9 +144,9 @@ imc_close_unit(Parrot_Interp interp, IMC_Unit * unit)
 }
 
 static void
-imc_free_unit(Parrot_Interp interp, IMC_Unit * unit)
+imc_free_unit(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
 {
-    imc_info_t *imc = IMCC_INFO(interp);
+    imc_info_t * const imc = IMCC_INFO(interp);
 
 #if IMC_TRACE_HIGH
     fprintf(stderr, "imc_free_unit()\n");

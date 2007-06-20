@@ -63,12 +63,17 @@
 /*
  * imc.c
  */
-PARROT_API void imc_compile_all_units(Interp *);
-PARROT_API void imc_compile_unit(Interp *, IMC_Unit * unit);
-PARROT_API void imc_cleanup(Interp *, void *yyscanner);
-PARROT_API void imc_pragma(char * str);
-PARROT_API FILE* imc_yyin_set(FILE*, void*);
-PARROT_API FILE* imc_yyin_get(void*);
+
+/* HEADERIZER BEGIN: compilers/imcc/imc.c */
+
+PARROT_API void imc_cleanup( Interp *interp, void *yyscanner );
+PARROT_API void imc_compile_all_units( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+PARROT_API void imc_compile_unit( Interp *interp, IMC_Unit *unit );
+void imc_close_unit( Parrot_Interp interp, IMC_Unit * unit );
+IMC_Unit * imc_open_unit( Parrot_Interp interp, IMC_Unit_Type t );
+/* HEADERIZER END: compilers/imcc/imc.c */
 
 /*
  * instructions.c
@@ -280,6 +285,11 @@ Instruction * IMCC_subst_constants_umix(Interp *, IMC_Unit * unit, char *name,
         SymReg **r, int n);
 Instruction * IMCC_subst_constants(Interp *, IMC_Unit * unit, char *name,
         SymReg **r, int n, int *op);
+
+/* imclexer.c */
+PARROT_API FILE* imc_yyin_set(FILE* new_yyin, void *yyscanner);
+PARROT_API FILE* imc_yyin_get(void *yyscanner);
+
 
 #endif /* PARROT_IMCC_IMC_H_GUARD */
 
