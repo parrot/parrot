@@ -1202,11 +1202,11 @@ PackFile_Segment_unpack(Interp *interp, PackFile_Segment *self /*NN*/,
 
     cursor = default_unpack(interp, self, cursor);
     if (!cursor)
-        return 0;
+        return NULL;
     if (f) {
         cursor = (f)(interp, self, cursor);
         if (!cursor)
-            return 0;
+            return NULL;
     }
     ALIGN_16(self->pf->src, cursor);
     return cursor;
@@ -1515,7 +1515,7 @@ Packs the directory C<self>.
 static opcode_t *
 directory_pack(Interp *interp, PackFile_Segment *self /*NN*/, opcode_t *cursor /*NN*/)
 {
-    PackFile_Directory *dir = (PackFile_Directory *)self;
+    PackFile_Directory * const dir = (PackFile_Directory *)self;
     size_t i;
     size_t align;
     const size_t num_segs = dir->num_segments;
