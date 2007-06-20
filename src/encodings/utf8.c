@@ -349,12 +349,12 @@ to_encoding(Interp *interp, STRING *src, STRING *dest)
 static UINTVAL
 get_codepoint(Interp *interp, const STRING *src, UINTVAL offset)
 {
-    const utf8_t * const start = (utf8_t *)utf8_skip_forward(src->strstart, offset);
+    const utf8_t * const start = (const utf8_t *)utf8_skip_forward(src->strstart, offset);
     return utf8_decode(start);
 }
 
 static void
-set_codepoint(Interp *interp, STRING *src,
+set_codepoint(Interp *interp, STRING *src /*NN*/,
         UINTVAL offset, UINTVAL codepoint)
 {
     const void *start;
