@@ -223,6 +223,12 @@ PARROT_API Parrot_PMC Parrot_PMC_get_pmc_intkey(
     Parrot_Int key )
         __attribute__nonnull__(1);
 
+PARROT_API void * Parrot_PMC_get_pointer_intkey(
+    Parrot_Interp interp /*NN*/,
+    Parrot_PMC pmc,
+    Parrot_Int key )
+        __attribute__nonnull__(1);
+
 PARROT_API Parrot_String Parrot_PMC_get_string_intkey(
     Parrot_Interp interp /*NN*/,
     Parrot_PMC pmc,

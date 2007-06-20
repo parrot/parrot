@@ -90,8 +90,9 @@ Return the keyed, signed integer value of the value in the PMC.
 
 PARROT_API
 void *
-Parrot_PMC_get_pointer_intkey(Parrot_Interp interp /*NN*/, Parrot_PMC pmc,
-                              Parrot_Int key) {
+Parrot_PMC_get_pointer_intkey(Parrot_Interp interp /*NN*/,
+        Parrot_PMC pmc, Parrot_Int key)
+{
     void *retval;
     PARROT_CALLIN_START(interp);
     retval = VTABLE_get_pointer_keyed_int(interp, pmc, key);
