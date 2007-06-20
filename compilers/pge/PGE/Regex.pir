@@ -511,6 +511,7 @@ success.
     .param pmc mob
     .param string pattern      :optional
     .param int has_pattern     :opt_flag
+    .param pmc adverbs         :slurpy :named
     .local pmc cache, rule
 
     if has_pattern goto lookahead
@@ -558,6 +559,7 @@ potentially very inefficient, but it "works" for now.
     .param pmc mob
     .param string pattern      :optional
     .param int has_pattern     :opt_flag
+    .param pmc adverbs         :slurpy :named
     .local pmc cache, rule
     .local int from
 
