@@ -8,6 +8,9 @@ use warnings;
 
 use base 'Parrot::Test::Plumhead';
 
+# Generate output_is(), output_isnt() and output_like() in current package.
+Parrot::Test::generate_languages_functions(); 
+
 sub get_out_fn {
     my $self = shift;
     my ( $count, $options ) = @_;

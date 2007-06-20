@@ -59,7 +59,7 @@ result.
 Runs a language test and passes the test if a string comparison
 if a string comparison of the output with the unexpected result is false.
 
-=item C<pasm_output_is($code, $expected, $description)> or C<output_is($code, $expected, $description)>
+=item C<pasm_output_is($code, $expected, $description)>
 
 Runs the Parrot Assembler code and passes the test if a string comparison of
 the output with the expected result it true.
@@ -70,7 +70,7 @@ Runs the Parrot Assembler code and passes the test if a string comparison of
 the output with the expected result it true I<and> if Parrot exits with a
 non-zero exit code.
 
-=item C<pasm_output_like($code, $expected, $description)> or C<output_like($code, $expected, $description)>
+=item C<pasm_output_like($code, $expected, $description)>
 
 Runs the Parrot Assembler code and passes the test if the output matches the
 
@@ -79,7 +79,7 @@ Runs the Parrot Assembler code and passes the test if the output matches the
 Runs the Parrot Assembler code and passes the test if the output the expected
 result it true I<and> if Parrot exits with a non-zero exit code.
 
-=item C<pasm_output_isnt($code, $unexpected, $description)> or C<output_isnt($code, $unexpected, $description)>
+=item C<pasm_output_isnt($code, $unexpected, $description)>
 
 Runs the Parrot Assembler code and passes the test if a string comparison of
 the output with the unexpected result is false.
@@ -244,6 +244,7 @@ use warnings;
 
 use Cwd;
 use Data::Dumper;
+use File::Basename;
 use File::Spec;
 use Parrot::Config;
 
@@ -409,6 +410,76 @@ sub path_to_parrot {
     }
 
     return $path;
+}
+
+
+# These functions are only used by various
+# Parrot::Test::<lang> modules.
+# See RT#43266
+# This implementation is experimental and currently only works
+# for languages/plumhead
+sub generate_languages_functions {
+
+    my %test_map = (
+        output_is   => 'is_eq',
+        output_like => 'like',
+        output_isnt => 'isnt_eq'
+    );
+
+    foreach my $func ( keys %test_map ) {
+    
+        my $test_sub = sub {
+            my $self = shift;
+            my ( $code, $output, $desc, %options ) = @_;
+    
+            my $count = $self->{builder}->current_test() + 1;
+    
+            # These are the thing that depend on the actual language implementation
+            my $out_fn    = $self->get_out_fn( $count,    \%options );
+            my $lang_fn   = $self->get_lang_fn( $count,    \%options );
+            my @test_prog = $self->get_test_prog( $count, \%options );
+    
+            Parrot::Test::write_code_to_file( $code, $lang_fn );
+    
+            # set a TODO for Test::Builder to find
+            my $skip_why = $self->skip_why( \%options );
+            if ($skip_why) {
+                $self->{builder}->skip($skip_why);
+            }
+            else {
+    
+                # STDERR is written into same output file
+                my $exit_code = Parrot::Test::run_command(
+                    \@test_prog,
+                    CD     => $self->{relpath},
+                    STDOUT => $out_fn,
+                    STDERR => $out_fn
+                );
+    
+                my $meth = $test_map{$func};
+    
+                # That's the reason for:   no strict 'refs';
+                my $pass = $self->{builder}->$meth( Parrot::Test::slurp_file($out_fn), $output, $desc );
+                unless ($pass) {
+                    my $diag = '';
+                    my $test_prog = join ' && ', @test_prog;
+                    $diag .= "'$test_prog' failed with exit code $exit_code." if $exit_code;
+                    $self->{builder}->diag($diag) if $diag;
+                }
+            }
+    
+            # The generated files are left in the t/* directories.
+            # Let 'make clean' and 'svn:ignore' take care of them.
+    
+            return;
+        };
+
+        my ( $package ) = caller();
+
+        no strict 'refs';
+
+        *{ $package . '::' . $func } = $test_sub;
+    }
 }
 
 #
@@ -793,7 +864,7 @@ sub _generate_functions {
             else {
                 fail( defined $extension, "no extension recognized for $example_f" );
             }
-            }
+        }
     }
 
     my %c_test_map = (
@@ -902,8 +973,10 @@ sub _generate_functions {
             }
 
             return $pass;
-            }
+        }
     }
+
+    return;
 }
 
 Parrot::Test::_generate_functions();
@@ -943,6 +1016,7 @@ package DB;
 
 sub uplevel_args {
     my @foo = caller(2);
+
     return @DB::args;
 }
 

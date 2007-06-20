@@ -116,7 +116,7 @@ foreach my $func ( keys %language_test_map ) {
         # Let 'make clean' and 'svn:ignore' take care of them.
 
         return $pass;
-        }
+    }
 }
 
 1;
