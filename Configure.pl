@@ -319,6 +319,7 @@ my $args = process_options( {
     svnid           => '$Id$',
 } );
 exit unless defined $args;
+my %args = %{$args};
 
 my $opttest = Parrot::Configure::Options::Test->new($args);
 # configuration tests will only be run if you requested them
@@ -326,14 +327,13 @@ my $opttest = Parrot::Configure::Options::Test->new($args);
 $opttest->run_configure_tests();
 
 # from Parrot::Configure::Messages
-print_introduction($parrot_version);
+print_introduction($parrot_version) unless exists $args{step};
 
 my $conf = Parrot::Configure->new;
 
 # from Parrot::Configure::Step::List
 $conf->add_steps(get_steps_list());
 
-my %args = %{$args};
 # from Parrot::Configure::Data
 $conf->options->set(%args);
 
@@ -355,7 +355,7 @@ else {
 $opttest->run_build_tests();
 
 # from Parrot::Configure::Messages
-print_conclusion($conf->data->get('make'));
+print_conclusion($conf->data->get('make')) unless exists $args{step};
 
 exit(0);
 
