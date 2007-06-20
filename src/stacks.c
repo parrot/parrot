@@ -383,6 +383,8 @@ Stack_entry_type
 get_entry_type(Interp *interp, const Stack_Entry_t *entry /*NN*/)
     /* PURE, WARN_UNUSED */
 {
+    UNUSED(interp);
+
     return entry->entry_type;
 }
 

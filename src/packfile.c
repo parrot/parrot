@@ -2823,6 +2823,7 @@ PackFile_Constant_new(Interp *interp)
 {
     PackFile_Constant * const self =
         mem_allocate_zeroed_typed(PackFile_Constant);
+    UNUSED(interp);
 
     self->type = PFC_NONE;
 
