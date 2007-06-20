@@ -121,6 +121,34 @@ void IMCC_print_inc(Interp *interp);
 /*
  * pcc.c
  */
+
+/* HEADERIZER BEGIN: compilers/imcc/pcc.c */
+
+void expand_pcc_sub(
+    Parrot_Interp interp,
+    IMC_Unit *unit /*NN*/,
+    Instruction *ins /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+void expand_pcc_sub_call(
+    Parrot_Interp interp,
+    IMC_Unit *unit,
+    Instruction *ins );
+
+void expand_pcc_sub_ret(
+    Parrot_Interp interp,
+    IMC_Unit *unit,
+    Instruction *ins );
+
+SymReg* get_const( Interp *interp /*NN*/, const char *name, int type )
+        __attribute__nonnull__(1);
+
+SymReg* get_pasm_reg( Interp* interp /*NN*/, const char *name )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: compilers/imcc/pcc.c */
+
 void expand_pcc_sub(Parrot_Interp interp, IMC_Unit *, Instruction *ins);
 void expand_pcc_sub_ret(Parrot_Interp interp, IMC_Unit *, Instruction *ins);
 void expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit *, Instruction *ins);
@@ -130,9 +158,8 @@ typedef enum {
   PR_N_OPERATORS = 0x01
 } _imc_pragmas;
 
-#define PARROT_MAX_RECOVER_ERRORS 40 /* this is the number of times
-                                      * parrot will try to retry while
-                                      * compiling. */
+#define PARROT_MAX_RECOVER_ERRORS 40
+/* this is the number of times parrot will try to retry while compiling. */
 
 typedef enum _enum_opt {
     OPT_NONE,

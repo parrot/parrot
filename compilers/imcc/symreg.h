@@ -182,7 +182,6 @@ void free_sym(SymReg *r);
 void store_symreg(Interp *interp, SymReg * r);
 SymReg * find_sym(Interp *, const char * name);
 SymReg * get_sym(Interp *interp, const char * name);
-SymReg* get_pasm_reg(Interp *interp, char *name);
 SymReg* get_const(Interp *interp, const char *name, int type);
 SymReg * _get_sym(SymHash *hash, const char * name);
 SymReg * _mk_symreg(SymHash *hash,char * name, int t);

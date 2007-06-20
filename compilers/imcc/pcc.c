@@ -14,6 +14,8 @@
 #include "imc.h"
 #include "parser.h"
 
+/* HEADERIZER TARGET: compilers/imcc/imc.h */
+
 /*
  * Utility instruction routine. Creates and inserts an instruction
  * into the current block in one call.
@@ -22,7 +24,7 @@ static Instruction *
 insINS(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
         char *name, SymReg **regs, int n)
 {
-    Instruction *tmp = INS(interp, unit, name, NULL, regs, n, 0, 0);
+    Instruction * const tmp = INS(interp, unit, name, NULL, regs, n, 0, 0);
     insert_ins(unit, ins, tmp);
     return tmp;
 }
@@ -31,11 +33,11 @@ insINS(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
  * get or create the SymReg
  */
 SymReg*
-get_pasm_reg(Interp* interp, char *name)
+get_pasm_reg(Interp* interp /*NN*/, const char *name)
 {
-    SymReg *r;
+    SymReg * const r = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name);
 
-    if ((r = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name)))
+    if (r)
         return r;
     return mk_pasm_reg(interp, str_dup(name));
 }
@@ -44,12 +46,13 @@ get_pasm_reg(Interp* interp, char *name)
  * get or create a constant
  */
 SymReg*
-get_const(Interp *interp, const char *name, int type)
+get_const(Interp *interp /*NN*/, const char *name, int type)
 {
-    SymReg *r;
+    SymReg * const r = _get_sym(&IMCC_INFO(interp)->ghash, name);
 
-    if ((r = _get_sym(&IMCC_INFO(interp)->ghash, name)) && r->set == type)
+    if (r && r->set == type)
         return r;
+
     return mk_const(interp, str_dup(name), type);
 }
 
@@ -64,12 +67,12 @@ pcc_get_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
 {
     int i, l, flags;
     char buf[1024], s[16];
-    SymReg **regs, *arg;
+    SymReg ** const regs  = (SymReg **)mem_sys_allocate((n + 1) * sizeof (SymReg *));
 
-    regs = (SymReg **)mem_sys_allocate((n + 1) * sizeof (SymReg *));
     strcpy(buf, "\"(");
     for (i = 0; i < n; i++) {
-        arg = args[i];
+        SymReg *arg = args[i];
+
         if (arg->type & VT_CONSTP)
             arg = arg->reg;
         regs[i + 1] = arg;
@@ -117,11 +120,10 @@ pcc_get_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
  * prepend the object to args or self to params
  */
 static void
-unshift_self(Interp *interp, SymReg *sub, SymReg *obj)
+unshift_self(SymReg *sub /*NN*/, SymReg *obj)
 {
     int i;
-    int n = sub->pcc_sub->nargs;
-    UNUSED(interp);
+    const int n = sub->pcc_sub->nargs;
 
     sub->pcc_sub->args      = (SymReg **)realloc(sub->pcc_sub->args,
             (n + 1) * sizeof (SymReg *));
@@ -144,15 +146,14 @@ unshift_self(Interp *interp, SymReg *sub, SymReg *obj)
  * by generating the appropriate prologue and epilogue
  * for parameter passing/returning.
  */
+
 void
-expand_pcc_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
+expand_pcc_sub(Parrot_Interp interp, IMC_Unit *unit /*NN*/, Instruction *ins /*NN*/)
 {
     int          nargs;
-    SymReg      *sub;
+    SymReg      *sub = ins->r[0];
     SymReg      *regs[2];
     Instruction *tmp;
-
-    sub = ins->r[0];
 
     /*
      * if this sub isa method, unshift 'self' as first param
@@ -163,7 +164,7 @@ expand_pcc_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
             self       = mk_symreg(interp, str_dup("self"), 'P');
             self->type = VTIDENTIFIER;
         }
-        unshift_self(interp, sub, self);
+        unshift_self(sub, self);
     }
 
     /* Don't generate any parameter checking code if there
@@ -213,16 +214,13 @@ expand_pcc_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
  * Expand a PCC sub return directive into its PASM instructions
  */
 void
-expand_pcc_sub_ret(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
+expand_pcc_sub_ret(Parrot_Interp interp, IMC_Unit *unit, Instruction *ins)
 {
-    SymReg *sub, *regs[2];
-    int  n, is_yield;
-
-    is_yield = ins->type & ITPCCYIELD;
+    const int is_yield = ins->type & ITPCCYIELD;
+    SymReg * const sub = ins->r[0];
+    const int n        = sub->pcc_sub->nret;
 
     /* TODO implement return conventions */
-    sub = ins->r[0];
-    n   = sub->pcc_sub->nret;
     ins = pcc_get_args(interp, unit, ins, "set_returns", n,
                        sub->pcc_sub->ret, sub->pcc_sub->ret_flags);
 
@@ -230,10 +228,12 @@ expand_pcc_sub_ret(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
      * we have a pcc_begin_yield
      */
     if (is_yield) {
+        SymReg *regs[2];
         ins        = insINS(interp, unit, ins, "yield", regs, 0);
         ins->type |= ITPCCYIELD;
     }
     else {
+        SymReg *regs[2];
         /*
          * insert return invoke
          */
@@ -257,11 +257,12 @@ pcc_reg_mov(Interp *interp, unsigned char d, unsigned char s,
     struct move_info_t *info = (struct move_info_t *)vinfo;
     SymReg *regs[2], *src, *dest;
     static SymReg *temps[4];
-    char types[] = "INSP";
-    int t;
+    const char types[] = "INSP";
 
     src = dest = NULL;
     if (d == 255) {
+        int t;
+
         /* handle temp use/create temp of src type */
         assert(s != 255);
         assert(s < 2 * info->n);
@@ -281,6 +282,7 @@ pcc_reg_mov(Interp *interp, unsigned char d, unsigned char s,
         }
     }
     else if (s == 255) {
+        int t;
         /* handle temp use/create temp of dest type */
         assert(d < 2 * info->n);
 
@@ -315,8 +317,7 @@ move_regs(Parrot_Interp interp, IMC_Unit * unit,
         Instruction *ins, int n, SymReg **dest, SymReg **src)
 {
     unsigned char *move_list;
-    int i, j;
-    SymReg *ri, *rj;
+    int i;
     struct move_info_t move_info;
 
     if (!n)
@@ -332,9 +333,10 @@ move_regs(Parrot_Interp interp, IMC_Unit * unit,
     memset(move_list, -1, 2 * n);
 
     for (i = 0; i < 2 * n; ++i) {
-        ri = i < n ? dest[i] : src[i - n];
+        SymReg * const ri = i < n ? dest[i] : src[i - n];
+        int j;
         for (j = 0; j < i; ++j) {
-            rj = j < n ? dest[j] : src[j - n];
+            SymReg * const rj = j < n ? dest[j] : src[j - n];
             if (ri == rj) {
                 assert(j < 255);
                 move_list[i] = j;
@@ -437,7 +439,7 @@ insert_tail_call(Parrot_Interp interp, IMC_Unit * unit,
  *
  */
 void
-expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
+expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit *unit, Instruction *ins)
 {
     SymReg *arg, *sub, *reg, *regs[3];
     int          n;
@@ -449,7 +451,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     sub = ins->r[0];
 
     if (ins->type & ITRESULT) {
-        n = sub->pcc_sub->nret;
+        const int n = sub->pcc_sub->nret;
         ins = pcc_get_args(interp, unit, ins, "get_results", n,
                 sub->pcc_sub->ret, sub->pcc_sub->ret_flags);
         return;
@@ -508,7 +510,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     }
 
     if (sub->pcc_sub->object) {
-        unshift_self(interp, sub, sub->pcc_sub->object);
+        unshift_self(sub, sub->pcc_sub->object);
     }
     /*
      * insert arguments
