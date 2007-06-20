@@ -459,11 +459,15 @@ sub generate_languages_functions {
                 my $meth = $test_map{$func};
     
                 my $pass = $self->{builder}->$meth( Parrot::Test::slurp_file($out_fn), $output, $desc );
-                unless ($pass) {
+                if ( ! $pass) {
                     my $diag = '';
                     my $test_prog = join ' && ', @test_prog;
-                    $diag .= "'$test_prog' failed with exit code $exit_code." if $exit_code;
-                    $self->{builder}->diag($diag) if $diag;
+                    if ($exit_code) {
+                        $diag .= "'$test_prog' failed with exit code $exit_code.";
+                    }
+                    if ($diag) {
+                        $self->{builder}->diag($diag);
+                    }
                 }
             }
     

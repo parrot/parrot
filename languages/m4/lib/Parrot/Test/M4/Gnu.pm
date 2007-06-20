@@ -8,7 +8,8 @@ use 5.006;
 
 use base 'Parrot::Test::M4';
 
-our $VERSION = 0.01;
+# Generate output_is(), output_isnt() and output_like() in current package.
+Parrot::Test::generate_languages_functions(); 
 
 sub get_out_fn {
     my $self = shift;
