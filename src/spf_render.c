@@ -150,21 +150,16 @@ static STRING* str_append_w_flags(Interp *interp,
 
 /*
 
-=item C<static void
-gen_sprintf_call(Interp *interp, char *out,
-                 SpfInfo info, int thingy)>
+FUNCDOC: gen_sprintf_call
 
 Turn the info structure back into an sprintf format. Far from being
 pointless, this is used to call C<snprintf()> when we're confronted with
 a float.
 
-=cut
-
 */
 
 static void
-gen_sprintf_call(Interp *interp, char *out,
-                 SpfInfo info, int thingy)
+gen_sprintf_call(char *out, SpfInfo info /*NN*/, int thingy)
 {
     int i = 0;
 
@@ -572,7 +567,7 @@ Parrot_sprintf_format(Interp *interp, STRING *pat,
                                 info.flags &= ~FLAG_ZERO;
                             theint = obj->getint(interp, info.type, obj);
 do_sprintf:
-                            gen_sprintf_call(interp, tc, &info, ch);
+                            gen_sprintf_call(tc, &info, ch);
                             ts = cstr2pstr(tc);
                             {
                                 char * const tempstr =
@@ -610,7 +605,7 @@ do_sprintf:
                             thefloat = obj->getfloat(interp, info.type, obj);
                             /* turn -0.0 into 0.0 */
                             /* WTF if( thefloat == 0.0 ) { thefloat = 0.0; } */
-                            gen_sprintf_call(interp, tc, &info, ch);
+                            gen_sprintf_call(tc, &info, ch);
                             ts = cstr2pstr(tc);
                             /* XXX lost precision if %Hg or whatever
                                */
@@ -636,7 +631,7 @@ do_sprintf:
                              */
 
                             if (ch == 'g' || ch == 'G' || ch == 'e' || ch == 'E') {
-                                size_t tclen = strlen(tc);
+                                const size_t tclen = strlen(tc);
                                 size_t j;
                                 for (j = 0; j < tclen; j++) {
                                     if ((tc[j] == 'e' || tc[j] == 'E')
