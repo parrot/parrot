@@ -22,6 +22,8 @@
 #include <errno.h>
 #include <stdlib.h>
 
+/* HEADER: none */
+
 /* end standard C headers. */
 
 /* flex integer type definitions */
