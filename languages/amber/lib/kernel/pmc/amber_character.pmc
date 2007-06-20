@@ -27,7 +27,7 @@ pmclass Amber_CHARACTER extends Integer extends Amber_DEFAULT does string dynpmc
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
         );
         VTABLE_set_string_native(
-            INTERP, result, string_from_const_cstring(INTERP, "CHARACTER", 9)
+            INTERP, result, string_from_cstring(INTERP, "CHARACTER", 9)
         );
         return result;
     }

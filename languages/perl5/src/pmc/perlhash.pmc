@@ -37,7 +37,7 @@ pmclass PerlHash
 
     void class_init() {
         _PerlUndef = pmc_type(INTERP,
-                string_from_const_cstring(INTERP, "PerlUndef", 0));
+                string_from_cstring(INTERP, "PerlUndef", 0));
     }
 
     PMC* get_pmc_keyed(PMC *key) {

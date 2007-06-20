@@ -29,7 +29,7 @@ pmclass Amber_ARRAY need_ext extends Array extends Amber_DEFAULT does array dynp
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
         );
         VTABLE_set_string_native(
-            INTERP, result, string_from_const_cstring(INTERP, "ARRAY", 5)
+            INTERP, result, string_from_cstring(INTERP, "ARRAY", 5)
         );
         return result;
     }

@@ -71,7 +71,7 @@ Returns the number as a Parrot string.
         INTVAL dynpmc_PerlInt;
 
         dynpmc_PerlInt = pmc_type(interp,
-            string_from_const_cstring(interp, "PerlInt", 0));
+            string_from_cstring(interp, "PerlInt", 0));
         DYNSELF.morph(dynpmc_PerlInt);
         DYNSELF.set_integer_native(value);
     }
@@ -113,7 +113,7 @@ Note that this method morphs the number into a C<PerlString>.
         INTVAL dynpmc_PerlString;
 
         dynpmc_PerlString = pmc_type(interp,
-            string_from_const_cstring(interp, "PerlString", 0));
+            string_from_cstring(interp, "PerlString", 0));
         DYNSELF.morph(dynpmc_PerlString);
         DYNSELF.set_string_native(value);
     }

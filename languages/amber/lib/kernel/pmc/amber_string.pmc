@@ -42,7 +42,7 @@ pmclass Amber_STRING extends String extends Amber_DEFAULT does string dynpmc gro
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
         );
         VTABLE_set_string_native(
-            INTERP, result, string_from_const_cstring(INTERP, "STRING", 6)
+            INTERP, result, string_from_cstring(INTERP, "STRING", 6)
         );
         return result;
     }

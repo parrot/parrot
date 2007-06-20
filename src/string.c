@@ -502,26 +502,6 @@ string_from_cstring(Interp *interp /*NN*/,
 /*
 
 FUNCDOC:
-Make a Parrot string from a specified C string.
-
-*/
-
-/* XXX This is identical to string_from_cstring and should be removed */
-PARROT_API
-STRING *
-string_from_const_cstring(Interp *interp,
-    const char *buffer /*NULLOK*/, const UINTVAL len)
-    /* WARN_UNUSED */
-{
-    return string_make_direct(interp, buffer, len ? len :
-            buffer ? strlen(buffer) : 0,
-                          PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0);
-    /* make this utf-8 eventually? */
-}
-
-/*
-
-FUNCDOC:
 Returns the primary encoding for the specified representation.
 
 This is needed for packfile unpacking, unless we just always use UTF-8

@@ -19,8 +19,8 @@ pmclass Amber_BOOLEAN extends Boolean extends Amber_DEFAULT does boolean dynpmc 
 
     STRING* get_string () {
         return PMC_int_val(SELF)
-                ? string_from_const_cstring(INTERP, "true", 4)
-                : string_from_const_cstring(INTERP, "false", 5);
+                ? string_from_cstring(INTERP, "true", 4)
+                : string_from_cstring(INTERP, "false", 5);
     }
 
 /* non-vtable methods follow */
@@ -38,7 +38,7 @@ pmclass Amber_BOOLEAN extends Boolean extends Amber_DEFAULT does boolean dynpmc 
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
         );
         VTABLE_set_string_native(
-            INTERP, result, string_from_const_cstring(INTERP, "BOOLEAN", 7)
+            INTERP, result, string_from_cstring(INTERP, "BOOLEAN", 7)
         );
         return result;
     }

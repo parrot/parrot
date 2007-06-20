@@ -73,7 +73,7 @@ pmclass CodeString extends String does string dynpmc group pge
 
             PIO_printf(interp, "%d %Ss, %d\n", cur_ns, (STRING*)PMC_data(cur_ns), global_serno);
             VTABLE_set_integer_native(INTERP, global_serno, 10);
-            Parrot_set_global(INTERP, cur_ns, string_from_const_cstring(INTERP, "$!serno", 0), global_serno);
+            Parrot_set_global(INTERP, cur_ns, string_from_cstring(INTERP, "$!serno", 0), global_serno);
         }
     }
             */
@@ -108,9 +108,9 @@ A newline is automatically added to the end of the fmt.
         STRING *format;
         STRING *key;
         STRING *repl;
-        STRING *PERCENT = string_from_const_cstring(INTERP, "%", 0);
-        STRING *COMMA   = string_from_const_cstring(INTERP, ",", 0);
-        STRING *NEWLINE = string_from_const_cstring(INTERP, "\n", 0);
+        STRING *PERCENT = string_from_cstring(INTERP, "%", 0);
+        STRING *COMMA   = string_from_cstring(INTERP, ",", 0);
+        STRING *NEWLINE = string_from_cstring(INTERP, "\n", 0);
 
         format = string_copy(interp, orig_format);
 
@@ -197,14 +197,14 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 
 */
     METHOD STRING* escape(STRING *str) {
-        STRING *SLASH_U = string_from_const_cstring(INTERP, "\\u", 0);
-        STRING *SLASH_X = string_from_const_cstring(INTERP, "\\x", 0);
+        STRING *SLASH_U = string_from_cstring(INTERP, "\\u", 0);
+        STRING *SLASH_X = string_from_cstring(INTERP, "\\x", 0);
 
         str = string_escape_string(interp, str);
         str = Parrot_sprintf_c(interp, "\"%Ss\"", str);
         if (string_str_index(interp, str, SLASH_U, 0) >= 0
                 || string_str_index(interp, str, SLASH_X, 0) >= 0) {
-            str = string_concat(interp, string_from_const_cstring(interp, "unicode:", 0), str, 0);
+            str = string_concat(interp, string_from_cstring(interp, "unicode:", 0), str, 0);
         }
         return str;
     }

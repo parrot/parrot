@@ -47,7 +47,7 @@ Class initialization. Caches the type id of various PMCs.
     void class_init() {
         if (pass) {
             dynpmc_TclInt = pmc_type(INTERP,
-                string_from_const_cstring(INTERP, "TclInt", 0));
+                string_from_cstring(INTERP, "TclInt", 0));
         }
     }
 
@@ -65,8 +65,8 @@ Returns the list as a string
         PMC *listToString, *namespace;
         STRING *_tcl_namespace, *sub;
 
-        _tcl_namespace = string_from_const_cstring(INTERP, "_tcl", 4);
-        sub            = string_from_const_cstring(INTERP, "__listToString",14);
+        _tcl_namespace = string_from_cstring(INTERP, "_tcl", 4);
+        sub            = string_from_cstring(INTERP, "__listToString",14);
 
         namespace = INTERP->root_namespace;
         namespace = VTABLE_get_pmc_keyed_str(INTERP, namespace, _tcl_namespace);
@@ -105,9 +105,9 @@ Copy the contents of other to self.
 */
 
     void assign_pmc(PMC *other) {
-        STRING *array  = string_from_const_cstring(INTERP, "array", 5);
-        STRING *string = string_from_const_cstring(INTERP, "String", 6);
-        STRING *undef  = string_from_const_cstring(INTERP, "Undef", 5);
+        STRING *array  = string_from_cstring(INTERP, "array", 5);
+        STRING *string = string_from_cstring(INTERP, "String", 6);
+        STRING *undef  = string_from_cstring(INTERP, "Undef", 5);
 
         if (VTABLE_does(INTERP, other, array))
         {

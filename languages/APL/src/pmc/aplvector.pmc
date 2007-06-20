@@ -126,7 +126,7 @@ Returns a vector-like PMC containing the shape of this PMC.
             */
             /*
             array_t = pmc_type(INTERP,
-                string_from_const_cstring(INTERP, "APLVector", 0)
+                string_from_cstring(INTERP, "APLVector", 0)
             );
             */
             shape = pmc_new(INTERP,VTABLE_type(INTERP,SELF));

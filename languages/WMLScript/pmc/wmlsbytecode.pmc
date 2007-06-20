@@ -246,7 +246,7 @@ static int _load_constant_pool(Interp *interp)
         case 6:
         {
             UINTVAL StringSize = _get_mb32();
-            STRING * String = string_from_const_cstring(interp,
+            STRING * String = string_from_cstring(interp,
               _get_pos(), StringSize);
             while (StringSize --) {
                 (void)_get_uint8();

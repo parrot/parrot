@@ -41,7 +41,7 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
         PMC* result = pmc_new(
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Array)
         );
-        STRING* delimiter = string_from_const_cstring(INTERP, "/", 1);
+        STRING* delimiter = string_from_cstring(INTERP, "/", 1);
         /* --WINDOWS */
         STRING* pathname = VTABLE_get_string(INTERP, SELF);
         int pathlength = string_length(INTERP, pathname);
@@ -76,7 +76,7 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
         );
         VTABLE_set_string_native(
-            INTERP, result, string_from_const_cstring(INTERP, "PATHNAME", 8)
+            INTERP, result, string_from_cstring(INTERP, "PATHNAME", 8)
         );
         return result;
     }
@@ -168,7 +168,7 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
                         string_concat(INTERP,
                             VTABLE_get_string(INTERP, SELF),
                             string_concat(INTERP,
-                                string_from_const_cstring(INTERP, "/", 1),
+                                string_from_cstring(INTERP, "/", 1),
                                 string_from_cstring(INTERP, ep->d_name, 0),
                                 0
                             ),
@@ -273,7 +273,7 @@ pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dy
                             string_concat(INTERP,
                                 VTABLE_get_string(INTERP, SELF),
                                 string_concat(INTERP,
-                                    string_from_const_cstring(INTERP, "/", 1),
+                                    string_from_cstring(INTERP, "/", 1),
                                     string_from_cstring(INTERP, dirname, 0),
                                     0
                                 ),

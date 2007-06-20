@@ -52,7 +52,7 @@ Initializes variables needed by the class.
     void class_init() {
         if (pass) {
             dynpmc_TclString = pmc_type(INTERP,
-                string_from_const_cstring(INTERP, "TclString", 0));
+                string_from_cstring(INTERP, "TclString", 0));
         }
     }
 
@@ -67,8 +67,8 @@ Copy the contents of other to self.
 */
 
     void assign_pmc(PMC *other) {
-        STRING *hash   = string_from_const_cstring(INTERP, "hash", 4);
-        STRING *undef  = string_from_const_cstring(INTERP, "Undef", 5);
+        STRING *hash   = string_from_cstring(INTERP, "hash", 4);
+        STRING *undef  = string_from_cstring(INTERP, "Undef", 5);
 
         if (VTABLE_does(INTERP, other, hash))
         {

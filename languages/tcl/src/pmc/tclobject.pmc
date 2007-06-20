@@ -29,11 +29,11 @@ pmclass TclObject dynpmc group tcl_group {
     void class_init() {
         if (pass) {
             dynpmc_TclString = pmc_type(INTERP,
-                string_from_const_cstring(INTERP, "TclString", 0));
+                string_from_cstring(INTERP, "TclString", 0));
             dynpmc_TclInt    = pmc_type(INTERP,
-                string_from_const_cstring(INTERP, "TclInt", 0));
+                string_from_cstring(INTERP, "TclInt", 0));
             dynpmc_TclFloat  = pmc_type(INTERP,
-                string_from_const_cstring(INTERP, "TclFloat", 0));
+                string_from_cstring(INTERP, "TclFloat", 0));
         }
     }
 

@@ -34,7 +34,7 @@ static PMC* undef(Interp* interp) {
     INTVAL dynpmc_PerlUndef;
 
     dynpmc_PerlUndef = pmc_type(interp,
-        string_from_const_cstring(interp, "PerlUndef", 0));
+        string_from_cstring(interp, "PerlUndef", 0));
 
     return pmc_new(interp, dynpmc_PerlUndef);
 }
@@ -97,7 +97,7 @@ C<key>.
         PMC    *src;
 
         dynpmc_PerlInt = pmc_type(interp,
-            string_from_const_cstring(interp, "PerlInt", 0));
+            string_from_cstring(interp, "PerlInt", 0));
         src = pmc_new_noinit(INTERP, dynpmc_PerlInt);
         PMC_int_val(src) = value;
         list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);

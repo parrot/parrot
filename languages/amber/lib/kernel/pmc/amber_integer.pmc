@@ -58,7 +58,7 @@ pmclass Amber_INTEGER extends Integer extends Amber_DEFAULT does integer dynpmc 
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
         );
         VTABLE_set_string_native(
-            INTERP, result, string_from_const_cstring(INTERP, "INTEGER", 7)
+            INTERP, result, string_from_cstring(INTERP, "INTEGER", 7)
         );
         return result;
     }

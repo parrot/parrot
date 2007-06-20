@@ -169,11 +169,6 @@ PARROT_API STRING * string_escape_string_delimited( Interp *interp,
     const STRING *src /*NULLOK*/,
     UINTVAL limit );
 
-PARROT_API STRING * string_from_const_cstring( Interp *interp,
-    const char *buffer /*NULLOK*/,
-    const UINTVAL len )
-        __attribute__warn_unused_result__;
-
 PARROT_API STRING * string_from_cstring( Interp *interp /*NN*/,
     const char * const buffer /*NULLOK*/,
     const UINTVAL len )

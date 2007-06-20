@@ -23,7 +23,7 @@ pmclass Amber_TABLE need_ext extends Hash extends Amber_DEFAULT does hash dynpmc
             INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
         );
         VTABLE_set_string_native(
-            INTERP, result, string_from_const_cstring(INTERP, "TABLE", 5)
+            INTERP, result, string_from_cstring(INTERP, "TABLE", 5)
         );
         return result;
     }

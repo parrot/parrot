@@ -71,7 +71,7 @@ Returns the result of C<get_string_keyed(key)> as a C<PerlString>.
         STRING  *string;
 
         dynpmc_PerlString = pmc_type(interp,
-            string_from_const_cstring(interp, "PerlString", 0));
+            string_from_cstring(interp, "PerlString", 0));
         ret = pmc_new(INTERP, dynpmc_PerlString);
         string = DYNSELF.get_string_keyed(key);
         VTABLE_set_string_native(INTERP, ret, string);

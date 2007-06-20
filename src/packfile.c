@@ -2141,20 +2141,20 @@ Parrot_debug_pc_to_filename(Interp *interp, PackFile_Debug *debug /*NN*/, opcode
         {
             switch (debug->mappings[i]->mapping_type) {
                 case PF_DEBUGMAPPINGTYPE_NONE:
-                    return string_from_const_cstring(interp,
+                    return string_from_cstring(interp,
                         "(unknown file)", 0);
                 case PF_DEBUGMAPPINGTYPE_FILENAME:
                     return PF_CONST(debug->code,
                         debug->mappings[i]->u.filename)->u.string;
                 case PF_DEBUGMAPPINGTYPE_SOURCESEG:
-                    return string_from_const_cstring(interp,
+                    return string_from_cstring(interp,
                         "(unknown file)", 0);
             }
         }
     }
 
     /* Otherwise, no mappings = no filename. */
-    return string_from_const_cstring(interp, "(unknown file)", 0);
+    return string_from_cstring(interp, "(unknown file)", 0);
 }
 
 /*

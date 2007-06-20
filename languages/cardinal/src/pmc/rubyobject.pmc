@@ -32,11 +32,11 @@ pmclass RubyObject
     void class_init() {
         if (pass) {
             dynpmc_RubyString = pmc_type(INTERP,
-                string_from_const_cstring(INTERP, "RubyString", 0));
+                string_from_cstring(INTERP, "RubyString", 0));
             dynpmc_RubyInteger    = pmc_type(INTERP,
-                string_from_const_cstring(INTERP, "RubyInteger", 0));
+                string_from_cstring(INTERP, "RubyInteger", 0));
             dynpmc_RubyFloat  = pmc_type(INTERP,
-                string_from_const_cstring(INTERP, "RubyFloat", 0));
+                string_from_cstring(INTERP, "RubyFloat", 0));
         }
     }
 

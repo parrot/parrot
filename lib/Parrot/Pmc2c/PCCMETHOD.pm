@@ -196,7 +196,7 @@ sub gen_arg_accessor {
         return "    $name = CTX_REG_$tiss(ctx, $index);\n";
     }
     elsif ( 'name' eq $arg_type ) {
-        return "    CTX_REG_$tiss(ctx, $index) = string_from_const_cstring(interp, $name, 0);\n";
+        return "    CTX_REG_$tiss(ctx, $index) = string_from_cstring(interp, $name, 0);\n";
     }
     else {                                           #$arg_type eq 'param' or $arg_type eq 'return'
         return "    CTX_REG_$tiss(ctx, $index) = $name;\n";
@@ -247,7 +247,7 @@ $returns_accessors
         return_indexes = temp_return_indexes;
     }
     return_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
-        string_from_const_cstring(interp, $returns_flags, 0), 0);
+        string_from_cstring(interp, $returns_flags, 0), 0);
     $goto_string
     /*END PCCRETURN $returns */
 }
@@ -370,7 +370,7 @@ sub rewrite_pccmethod {
     opcode_t *current_args;
     PMC* _type      = pmc_new(interp, enum_class_FixedIntegerArray);
     PMC* param_sig  = Parrot_FixedIntegerArray_new_from_string(interp, _type,
-        string_from_const_cstring(interp, $params_flags, 0), 0);
+        string_from_cstring(interp, $params_flags, 0), 0);
 
     PMC* return_sig              = PMCNULL;
 
@@ -481,7 +481,7 @@ sub rewrite_pccinvoke {
 
         my $n_regs_used = find_max_regs( [ $result_n_regs_used, $args_n_regs_used ] );
 
-        $method_name = "string_from_const_cstring(interp, (const char *) $method_name, 0)"
+        $method_name = "string_from_cstring(interp, (const char *) $method_name, 0)"
             if isquoted($method_name);
 
         my $file   = '"' . __FILE__ . '"';
@@ -498,9 +498,9 @@ sub rewrite_pccinvoke {
       PMC* _type                = pmc_new(interp, enum_class_FixedIntegerArray);
 
       PMC* args_sig         = Parrot_FixedIntegerArray_new_from_string(interp,
-            _type, string_from_const_cstring(interp, $arg_flags, 0), 0);
+            _type, string_from_cstring(interp, $arg_flags, 0), 0);
       PMC* results_sig      = Parrot_FixedIntegerArray_new_from_string(interp,
-            _type, string_from_const_cstring(interp, $result_flags, 0), 0);
+            _type, string_from_cstring(interp, $result_flags, 0), 0);
       PMC* ret_cont         = new_ret_continuation_pmc(interp, NULL);
 
       parrot_context_t *ctx = Parrot_push_context(interp, n_regs_used);
