@@ -443,6 +443,8 @@ static void
 rebuild_fix_ends(Interp *interp, List *list /*NN*/)
 {
     List_chunk * const chunk = list->first;
+    UNUSED(interp);
+
     /* first is irregular, next is empty */
     if (list->n_chunks <= 2 && (chunk->flags & no_power_2) &&
             (!chunk->next || chunk->next->items == 0 ||
