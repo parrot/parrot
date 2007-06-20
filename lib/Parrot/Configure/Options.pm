@@ -13,7 +13,7 @@ sub get_valid_options {
     return qw(ask bindir cage cc ccflags ccwarn cgoto cxx datadir
         debugging define exec-prefix execcapable floatval gc help icu-config
         icudatadir icuheaders icushared includedir infodir inline intval
-        jitcapable ld ldflags lex libdir libexecdir libs link linkflags
+        jitcapable languages ld ldflags lex libdir libexecdir libs link linkflags
         localstatedir m maintainer mandir miniparrot nomanicheck oldincludedir
         opcode ops optimize parrot_is_shared pmc prefix profile sbindir
         sharedstatedir step sysconfdir test verbose verbose-step version
@@ -86,6 +86,8 @@ General Options:
    --nomanicheck        Don't check the MANIFEST
    --step=(gen::languages)
                         Execute a single configure step
+   --languages="list of languages"
+                        Specify a list of languages to process
 
    --ask                Have Configure ask for commonly-changed info
    --test=configure     Run tests of configuration tools before configuring

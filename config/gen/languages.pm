@@ -21,20 +21,21 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step ':gen';
 
 our $description = 'Configuring languages';
-our @args;
+our @args        = qw(languages);
 
 sub runstep {
     my ( $self, $conf ) = @_;
 
     genfile( 'config/gen/makefiles/languages.in' => 'languages/Makefile' );
 
-    my @languages = qw{
+    my $languages = $conf->options->get('languages');
+    $languages = qq{
         APL amber abc befunge bf cardinal c99 cola ecmascript forth HQ9plus
         jako lisp lua m4 ook parrot_compiler perl5 perl6 pheme PIR plumhead
         pugs punie pynie regex scheme tap urm WMLScript Zcode
-    };
+    } unless defined $languages;
 
-    foreach my $language (@languages) {
+    foreach my $language (split ' ', $languages) {
         genfile( "languages/$language/config/makefiles/root.in" => "languages/$language/Makefile" );
     }
 
