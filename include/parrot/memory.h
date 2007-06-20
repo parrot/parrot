@@ -3,7 +3,7 @@
  *  SVN Info
  *     $Id$
  *  Overview:
- *     This is the api header for the memory subsystem
+ *     This is the API header for the memory subsystem
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
@@ -88,27 +88,6 @@ void mem_setup_allocator( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/gc/memory.c */
-
-PARROT_API void *mem_sys_allocate(size_t);
-
-PARROT_API void *mem_sys_allocate_zeroed(size_t);
-
-PARROT_API void *mem__sys_realloc(void *, size_t);
-
-PARROT_API void *mem__sys_realloc_zeroed(void *, size_t, size_t);
-
-PARROT_API void mem_sys_free(void *);
-
-void *mem__internal_allocate(size_t, const char *, int);
-
-void *mem__internal_allocate_zeroed(size_t, const char *, int);
-
-void *mem__internal_realloc(void *, size_t, const char *, int);
-
-void mem__internal_free(void *, const char *, int);
-
-void mem_setup_allocator(Interp *);
-
 
 #endif /* PARROT_MEMORY_H_GUARD */
 
