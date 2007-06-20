@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 
 =head1 NAME
 
@@ -243,6 +243,80 @@ ok 3 - set an attribute
 42
 ok 4 - got an attribute
 OUT
+
+
+# L<PDD15/Class PMC API/=item add_method>
+pir_output_is( <<'CODE', <<'OUT', 'add_method', todo => 'not yet implemented' );
+.sub 'test' :main
+    new $P0, .Class
+
+    push_eh ok_1
+    $P0.'add_method'()
+    clear_eh
+
+    print 'not '
+  ok_1:
+    say 'ok 1 - add_method() with no args fails'
+
+    push_eh ok_2
+    $P0.'add_method'( 'foo' )
+    clear_eh
+
+    print 'not '
+  ok_2:
+    say 'ok 2 - add_method() with valid single arg fails'
+
+    # note this test depends on 'add_attribute'/'attributes'
+    $P0.'add_attribute'( 'foo', 'String' )
+    $P1 = $P0.'attributes'()
+    $P1['foo'] = 'bar'
+
+    .const .Sub $P99 = 'foo'
+
+    $P0.'add_method'( 'foo', $P99 )
+    $P1 = $P0.'methods'()
+    $I0 = $P1
+    if $I0 != 1 goto nok_3
+    $I0 = exists $P1['foo']
+    if $I0 != 1 goto nok_3
+    $I0 = defined $P1['foo']
+    $P2 = $P1['foo']
+    $I0 = isa $P2, 'Sub'
+    if $I0 != 1 goto nok_3
+    goto ok_3
+  nok_3:
+    print 'not '
+  ok_3:
+    say 'ok 3 - add_method() with valid args adds a method'
+
+    $S0 = $P0.'foo'()
+    if $S0 == 'bar' goto ok_4
+    print 'not '
+  ok_4:
+    say 'ok 4 - invoking method added to class works'
+
+    push_eh ok_5
+    $P0.'add_method'( 'foo' )
+    clear_eh
+
+    print 'not '
+  ok_5:
+    say 'ok 5 - add_method() with existing method name fails'
+.end
+
+.sub 'foo' :method
+    .return ('foo')
+.end
+
+
+CODE
+ok 1 - add_method() with no args fails
+ok 2 - add_method() with valid single arg fails
+ok 3 - add_method() with valid args adds a method
+ok 4 - invoking method added to class works
+ok 5 - add_method() with existing method name fails
+OUT
+
 
 # L<PDD15/Class PMC API/=item parents>
 pir_output_is( <<'CODE', <<'OUT', 'parents' );
