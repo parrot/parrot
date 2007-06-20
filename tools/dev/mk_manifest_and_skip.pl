@@ -25,6 +25,7 @@ my @dirs;    # will be filled in wanted
 
 # XXX Most of these can probably be cleaned up
 my %special = qw(
+    LICENSE                                         [main]doc
     NEWS                                            [devel]doc
     PBC_COMPAT                                      [devel]doc
     PLATFORMS                                       [devel]doc
