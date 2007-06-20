@@ -249,9 +249,9 @@ Parrot_full_sub_name(Interp *interp /*NN*/, PMC* sub /*NULLOK*/)
     Parrot_sub * s;
     STRING *res;
 
-
     if (!sub || !VTABLE_defined(interp, sub))
         return NULL;
+
     s = PMC_sub(sub);
     if (PMC_IS_NULL(s->namespace_stash)) {
         return s->name;
@@ -418,7 +418,6 @@ Parrot_find_pad(Interp *interp /*NN*/, STRING *lex_name, parrot_context_t *ctx /
 #endif
         ctx = outer;
     }
-    return NULL;
 }
 
 PARROT_API
