@@ -159,7 +159,7 @@ called from Sub 'rec' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline (#RT43269)");
+pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline", todo => "#RT43269");
 .sub main :main
     setfile "xyz.pir"
     setline 123
@@ -171,7 +171,7 @@ CODE
 /\(xyz.foo:123\)/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline (#RT43269)");
+pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline", todo => "#RT43269");
 .sub main :main
     setfile "foo.p6"
     setline 123
