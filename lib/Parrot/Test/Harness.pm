@@ -95,7 +95,12 @@ If called with no args, run the suite.
     elsif ( @{ $options{arguments} } ) {
 
         # Someone specified tests for me to run.
-        return grep { -f $_ } map { glob $_ } @{ $options{arguments} };
+        my @files = ();
+        foreach my $arg (@{ $options{arguments} }) {
+            -f $arg && push @files, glob $arg;
+            -d $arg && push @files, glob( File::Spec->catfile( $arg, '*.t' ) );
+        }
+        return @files;
     }
     else {
 
