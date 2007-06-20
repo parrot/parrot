@@ -66,13 +66,19 @@
 
 /* HEADERIZER BEGIN: compilers/imcc/imc.c */
 
-PARROT_API void imc_cleanup( Interp *interp, void *yyscanner );
+PARROT_API void imc_cleanup( Interp *interp /*NN*/, void *yyscanner )
+        __attribute__nonnull__(1);
+
 PARROT_API void imc_compile_all_units( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void imc_compile_unit( Interp *interp, IMC_Unit *unit );
-void imc_close_unit( Parrot_Interp interp, IMC_Unit * unit );
-IMC_Unit * imc_open_unit( Parrot_Interp interp, IMC_Unit_Type t );
+PARROT_API void imc_compile_unit( Interp *interp /*NN*/, IMC_Unit *unit )
+        __attribute__nonnull__(1);
+
+void imc_close_unit( Interp *interp, IMC_Unit *unit /*NULLOK*/ );
+IMC_Unit * imc_open_unit( Interp *interp /*NN*/, IMC_Unit_Type t )
+        __attribute__nonnull__(1);
+
 /* HEADERIZER END: compilers/imcc/imc.c */
 
 /*

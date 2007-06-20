@@ -28,7 +28,6 @@ void
 imc_compile_all_units(Interp *interp /*NN*/)
 {
     IMC_Unit *unit;
-    Instruction *ins, *ins_next;
 #if ! COMPILE_IMMEDIATE
     for (unit = IMCC_INFO(interp)->imc_units; unit; ) {
         IMC_Unit * const unit_next = unit->next;
@@ -41,8 +40,10 @@ imc_compile_all_units(Interp *interp /*NN*/)
 
     for (unit = IMCC_INFO(interp)->imc_units; unit;) {
         IMC_Unit * const unit_next = unit->next;
+        Instruction *ins;
+
         for (ins = unit->instructions; ins; ) {
-            ins_next = ins->next;
+            Instruction * const ins_next = ins->next;
             free_ins(ins);
             ins = ins_next;
         }
@@ -60,7 +61,7 @@ imc_compile_all_units(Interp *interp /*NN*/)
 
 PARROT_API
 void
-imc_compile_unit(Interp *interp, IMC_Unit *unit)
+imc_compile_unit(Interp *interp /*NN*/, IMC_Unit *unit)
 {
     /* Not much here for now except the allocator */
     IMCC_INFO(interp)->cur_unit = unit;
@@ -105,24 +106,23 @@ imc_new_unit(IMC_Unit_Type t)
  */
 
 IMC_Unit *
-imc_open_unit(Parrot_Interp interp, IMC_Unit_Type t)
+imc_open_unit(Interp *interp /*NN*/, IMC_Unit_Type t)
 {
-    IMC_Unit * unit;
-    imc_info_t *imc_info;
+    IMC_Unit * const unit = imc_new_unit(t);
+    imc_info_t * const imc_info = IMCC_INFO(interp);
 
-    unit = imc_new_unit(t);
-    imc_info = IMCC_INFO(interp);
     if (!imc_info->imc_units)
-       imc_info->imc_units = unit;
+        imc_info->imc_units = unit;
     if (!imc_info->ghash.data)
-       create_symhash(&imc_info->ghash);
+        create_symhash(&imc_info->ghash);
     unit->prev = imc_info->last_unit;
     if (imc_info->last_unit)
-       imc_info->last_unit->next = unit;
+        imc_info->last_unit->next = unit;
     imc_info->last_unit = unit;
     imc_info->n_comp_units++;
     unit->file = imc_info->state->file;
     unit->pasm_file = imc_info->state->pasm_file;
+
     return unit;
 }
 
@@ -132,7 +132,7 @@ imc_open_unit(Parrot_Interp interp, IMC_Unit_Type t)
  * list.
  */
 void
-imc_close_unit(Parrot_Interp interp, IMC_Unit * unit)
+imc_close_unit(Interp *interp, IMC_Unit *unit /*NULLOK*/)
 {
     UNUSED(interp);
     if (unit) {

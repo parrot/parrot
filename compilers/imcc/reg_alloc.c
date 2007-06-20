@@ -76,7 +76,7 @@ static unsigned int* ig_allocate(int N)
  * on a single compilation unit at a time.
  */
 void
-imc_reg_alloc(Interp *interp, IMC_Unit * unit)
+imc_reg_alloc(Interp *interp, IMC_Unit *unit /*NULLOK*/)
 {
     int first;
     char *function;
