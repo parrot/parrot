@@ -38,11 +38,12 @@ sub new {
         : ( bless {}, 'Parrot::Test::M4::PIR' );
 }
 
-my %language_test_map = (
-    output_is   => 'is_eq',
-    output_like => 'like',
-    output_isnt => 'isnt_eq',
-);
+sub get_cd {
+    my $self = shift;
+    my ( $options ) = @_;
+
+    return $self->{relpath};
+}
 
 sub get_lang_fn {
     my $self = shift;

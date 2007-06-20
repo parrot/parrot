@@ -41,6 +41,13 @@ sub new {
     return bless {}, $test_module;
 }
 
+sub get_cd {
+    my $self = shift;
+    my ( $options ) = @_;
+
+    return $self->{relpath};
+}
+
 sub get_lang_fn {
     my $self = shift;
     my ( $count, $options ) = @_;

@@ -31,13 +31,12 @@ sub get_test_prog {
 
     my $test_prog_args = $ENV{TEST_PROG_ARGS} || q{};
 
-    return "./parrot languages/m4/m4.pbc languages/${lang_fn}";
     return 
         join( ' ',
               $self->{parrot},
               File::Spec->join( qw( languages m4 m4.pbc ) ),
               $test_prog_args,
-              File::Spec->join( qw( languages $lang_fn ) ) );
+              File::Spec->join( 'languages', $lang_fn ) );
 }
 
 1;

@@ -437,6 +437,7 @@ sub generate_languages_functions {
             # These are the thing that depend on the actual language implementation
             my $out_fn    = $self->get_out_fn( $count,    \%options );
             my $lang_fn   = $self->get_lang_fn( $count,    \%options );
+            my $cd        = $self->get_cd( \%options );
             my @test_prog = $self->get_test_prog( $count, \%options );
     
             Parrot::Test::write_code_to_file( $code, $lang_fn );
@@ -451,7 +452,7 @@ sub generate_languages_functions {
                 # STDERR is written into same output file
                 my $exit_code = Parrot::Test::run_command(
                     \@test_prog,
-                    CD     => $self->{relpath},
+                    CD     => $cd,
                     STDOUT => $out_fn,
                     STDERR => $out_fn
                 );
