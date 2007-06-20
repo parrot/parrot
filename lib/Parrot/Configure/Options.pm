@@ -38,7 +38,7 @@ sub process_options {
         $value = 1      unless defined $value;
 
         unless ( grep $key eq $_, @valid_opts ) {
-            die qq/Invalid option $key. See "perl Configure.pl --help" for valid options\n/;
+            die qq/Invalid option "$key". See "perl Configure.pl --help" for valid options\n/;
         }
 
         for ($key) {

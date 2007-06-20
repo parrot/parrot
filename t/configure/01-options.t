@@ -146,7 +146,7 @@ eval {
 };
 like(
     $@,
-    qr/^Invalid option $badoption/,
+    qr/^Invalid option "$badoption"/,
     "process_options() failed due to bad option '$badoption'"
 );
 
