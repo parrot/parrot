@@ -66,8 +66,8 @@ typedef struct _IMC_Unit {
 } IMC_Unit;
 
 
-IMC_Unit * imc_open_unit(Parrot_Interp, IMC_Unit_Type);
-void imc_close_unit(Parrot_Interp, IMC_Unit *);
+/* HEADERIZER BEGIN: compilers/imcc/unit.c */
+/* HEADERIZER END: compilers/imcc/unit.c */
 
 #endif /* PARROT_IMCC_UNIT_H_GUARD */
 

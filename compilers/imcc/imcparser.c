@@ -463,18 +463,18 @@ func_ins(Parrot_Interp interp, IMC_Unit *unit, SymReg *lhs, char *op,
  * labels and such
  */
 
-static void clear_state(Interp *interp)
+static void
+clear_state(Interp *interp)
 {
     IMCC_INFO(interp) -> nargs = 0;
     IMCC_INFO(interp) -> keyvec = 0;
 }
 
-Instruction * INS_LABEL(Interp * interp, IMC_Unit * unit, SymReg * r0, int emit)
+Instruction *
+INS_LABEL(Interp *interp, IMC_Unit *unit, SymReg *r0, int emit)
 {
+    Instruction * const ins = _mk_instruction("","%s:", 1, &r0, 0);
 
-    Instruction *ins;
-
-    ins = _mk_instruction("","%s:", 1, &r0, 0);
     ins->type = ITLABEL;
     r0->first_ins = ins;
     if (emit)

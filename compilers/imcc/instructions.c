@@ -29,10 +29,13 @@ static Instruction * last_ins;
 int n_comp_units;
 #endif
 
+/* HEADERIZER TARGET: compilers/imcc/instructions.h */
 
+/* HEADERIZER BEGIN: static */
 static int e_file_open(Interp *, void *);
 static int e_file_close(Interp *, void *);
 static int e_file_emit(Interp *, void *param, IMC_Unit *, Instruction *);
+/* HEADERIZER END: static */
 
 Emitter emitters[2] = {
     {e_file_open,
@@ -121,7 +124,7 @@ imcc_init_tables(Interp *interp)
  * Returns TRUE if instruction ins reads from a register of type t
  */
 int
-ins_reads2(Instruction *ins, int t)
+ins_reads2(Instruction *ins /*NN*/, int t)
 {
     size_t i, idx;
     const char types[] = "INPS";
@@ -167,19 +170,15 @@ ins_writes2(Instruction *ins, int t)
 /* next 2 functions are called very often, says gprof
  * they should be fast
  */
-#ifdef HAS_INLINE
-inline
-#endif
-int
-instruction_reads(Instruction* ins, SymReg* r) {
+inline int
+instruction_reads(Instruction *ins /*NN*/, SymReg *r) {
     int f, i;
     SymReg *key;
-    SymReg *ri;
 
     if (ins->opnum == PARROT_OP_set_args_pc ||
             ins->opnum == PARROT_OP_set_returns_pc) {
         for (i = 0; i < ins->n_r; i++) {
-            ri = ins->r[i];
+            const SymReg * const ri = ins->r[i];
             if (ri == r)
                 return 1;
         }
@@ -192,7 +191,7 @@ instruction_reads(Instruction* ins, SymReg* r) {
     f = ins->flags;
     for (i = 0; i < ins->n_r; i++) {
         if (f & (1<<i)) {
-            ri = ins->r[i];
+            const SymReg * const ri = ins->r[i];
             if (ri == r)
                 return 1;
             /* this additional test for _kc ops seems to slow
@@ -220,10 +219,7 @@ instruction_reads(Instruction* ins, SymReg* r) {
     return 0;
 }
 
-#ifdef HAS_INLINE
-inline
-#endif
-int
+inline int
 instruction_writes(Instruction* ins, SymReg* r) {
     int f, i;
 
@@ -289,7 +285,7 @@ instruction_writes(Instruction* ins, SymReg* r) {
  * Get the register number of an address which is a branch target
  */
 int
-get_branch_regno(Instruction * ins)
+get_branch_regno(const Instruction *ins /*NN*/)
 {
     int j;
     for (j = ins->opsize - 2;  j >= 0 && ins->r[j] ; --j)
@@ -302,9 +298,9 @@ get_branch_regno(Instruction * ins)
  * Get the register corresponding to an address which is a branch target
  */
 SymReg *
-get_branch_reg(Instruction * ins)
+get_branch_reg(const Instruction *ins /*NN*/)
 {
-    int r = get_branch_regno(ins);
+    const int r = get_branch_regno(ins);
     if (r >= 0)
         return ins->r[r];
     return 0;
@@ -317,12 +313,11 @@ get_branch_reg(Instruction * ins)
  * The instruction following ins is returned.
  */
 Instruction *
-delete_ins(IMC_Unit *unit, Instruction *ins, int needs_freeing)
+delete_ins(struct _IMC_Unit *unit /*NN*/, Instruction *ins /*NN*/, int needs_freeing)
 {
-    Instruction *next, *prev;
+    Instruction * const next = ins->next;
+    Instruction * const prev = ins->prev;
 
-    next = ins->next;
-    prev = ins->prev;
     if (prev)
         prev->next = next;
     else
@@ -341,11 +336,11 @@ delete_ins(IMC_Unit *unit, Instruction *ins, int needs_freeing)
  */
 
 void
-insert_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp)
+insert_ins(struct _IMC_Unit *unit /*NN*/, Instruction *ins /*NULLOK*/, Instruction *tmp /*NN*/)
 {
-    Instruction *next;
     if (!ins) {
-        next = unit->instructions;
+        Instruction * const next = unit->instructions;
+
         unit->instructions = tmp;
         tmp->next = next;
         next->prev = tmp;
@@ -354,7 +349,8 @@ insert_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp)
             unit->last_ins = tmp;
     }
     else {
-        next = ins->next;
+        Instruction * const next = ins->next;
+
         ins->next = tmp;
         tmp->prev = ins;
         tmp->next = next;
@@ -371,18 +367,19 @@ insert_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp)
  * insert tmp before ins
  */
 void
-prepend_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp)
+prepend_ins(struct _IMC_Unit *unit /*NN*/, Instruction *ins /*NULLOK*/, Instruction *tmp /*NN*/)
 {
-    Instruction *next, *prev;
     if (!ins) {
-        next = unit->instructions;
+        Instruction * const next = unit->instructions;
+
         unit->instructions = tmp;
         tmp->next = next;
         next->prev = tmp;
         tmp->line = next->line;
     }
     else {
-        prev = ins->prev;
+        Instruction * const prev = ins->prev;
+
         ins->prev = tmp;
         tmp->next = ins;
         tmp->prev = prev;
@@ -398,10 +395,11 @@ prepend_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp)
  */
 
 void
-subst_ins(IMC_Unit *unit, Instruction *ins,
-          Instruction * tmp, int needs_freeing)
+subst_ins(struct _IMC_Unit *unit /*NN*/, Instruction *ins /*NN*/,
+          Instruction *tmp /*NN*/, int needs_freeing)
 {
-    Instruction *prev = ins->prev;
+    Instruction * const prev = ins->prev;
+
     if (prev)
         prev->next = tmp;
     else
@@ -424,9 +422,9 @@ subst_ins(IMC_Unit *unit, Instruction *ins,
  * initial position of ins.
  */
 Instruction *
-move_ins(IMC_Unit * unit, Instruction *ins, Instruction *to)
+move_ins(struct _IMC_Unit *unit /*NN*/, Instruction *ins /*NN*/, Instruction *to)
 {
-    Instruction *next = delete_ins(unit, ins, 0);
+    Instruction * const next = delete_ins(unit, ins, 0);
     insert_ins(unit, to, ins);
     return next;
 }
@@ -434,7 +432,7 @@ move_ins(IMC_Unit * unit, Instruction *ins, Instruction *to)
 
 /* Emit a single instruction into the current unit buffer. */
 Instruction *
-emitb(Interp * interp, IMC_Unit * unit, Instruction * i)
+emitb(Interp *interp, struct _IMC_Unit *unit /*NULLOK*/, Instruction *i /*NULLOK*/)
 {
 
     if (!unit || !i)
@@ -454,7 +452,7 @@ emitb(Interp * interp, IMC_Unit * unit, Instruction * i)
  * Free the Instruction structure ins.
  */
 void
-free_ins(Instruction *ins)
+free_ins(Instruction *ins /*NN*/)
 {
     free(ins->fmt);
     free(ins->op);
@@ -465,12 +463,11 @@ free_ins(Instruction *ins)
  * Print details of instruction ins in file fd.
  */
 int
-ins_print(Interp *interp, FILE *fd, Instruction * ins)
+ins_print(Interp *interp /*NN*/, FILE *fd /*NN*/, Instruction *ins /*NN*/)
 {
     char regb[IMCC_MAX_FIX_REGS][256];      /* XXX */
     /* only long key constants can overflow */
     char *regstr[IMCC_MAX_FIX_REGS];
-    SymReg *p;
     int i;
     int len;
 
@@ -482,7 +479,7 @@ ins_print(Interp *interp, FILE *fd, Instruction * ins)
         return fprintf(fd, "%s", ins->fmt);
     }
     for (i = 0; i < ins->n_r; i++) {
-        p = ins->r[i];
+        SymReg *p = ins->r[i];
         if (!p)
             continue;
         if (p->type & VT_CONSTP)
@@ -603,8 +600,9 @@ e_file_emit(Interp *interp, void *param, IMC_Unit * unit, Instruction * ins)
     return 0;
 }
 
+PARROT_API
 int
-emit_open(Interp *interp, int type, void *param)
+emit_open(Interp *interp /*NN*/, int type, void *param)
 {
     emitter = type;
     IMCC_INFO(interp)->has_compile = 0;
@@ -612,8 +610,9 @@ emit_open(Interp *interp, int type, void *param)
     return (emitters[emitter]).open(interp, param);
 }
 
+PARROT_API
 int
-emit_flush(Interp *interp, void *param, IMC_Unit * unit)
+emit_flush(Interp *interp /*NN*/, void *param, struct _IMC_Unit *unit /*NN*/)
 {
     Instruction * ins;
 
@@ -628,6 +627,7 @@ emit_flush(Interp *interp, void *param, IMC_Unit * unit)
     return 0;
 }
 
+PARROT_API
 int
 emit_close(Interp *interp, void *param)
 {

@@ -52,8 +52,8 @@ static INTVAL eval_nr = 0;
  * best would be to have a flag in core.ops, where a PMC type is expected
  */
 Instruction *
-iNEW(Interp *interp, IMC_Unit * unit, SymReg * r0,
-        char * type, SymReg *init, int emit)
+iNEW(Interp *interp, struct _IMC_Unit *unit, SymReg *r0,
+        char *type, SymReg *init, int emit)
 {
     char fmt[256];
     SymReg *regs[3];
