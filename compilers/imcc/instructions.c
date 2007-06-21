@@ -171,9 +171,9 @@ ins_writes2(Instruction *ins, int t)
  * they should be fast
  */
 int
-instruction_reads(Instruction *ins /*NN*/, SymReg *r) {
+instruction_reads(const Instruction *ins /*NN*/, const SymReg *r /*NN*/)
+{
     int f, i;
-    SymReg *key;
 
     if (ins->opnum == PARROT_OP_set_args_pc ||
             ins->opnum == PARROT_OP_set_returns_pc) {
@@ -199,6 +199,7 @@ instruction_reads(Instruction *ins /*NN*/, SymReg *r) {
              * _writes below
              */
             if (ri->set == 'K') {
+                const SymReg *key;
                 for (key = ri->nextkey; key; key = key->nextkey)
                     if (key->reg && key->reg == r)
                         return 1;
@@ -220,10 +221,10 @@ instruction_reads(Instruction *ins /*NN*/, SymReg *r) {
 }
 
 int
-instruction_writes(Instruction* ins, SymReg* r) {
-    int f, i;
-
-    f = ins->flags;
+instruction_writes(const Instruction *ins /*NN*/, const SymReg *r /*NN*/)
+{
+    const int f = ins->flags;
+    int i;
 
     /*
      * a get_results opcode is before the actual sub call

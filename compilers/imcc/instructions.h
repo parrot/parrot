@@ -157,10 +157,16 @@ void insert_ins(
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-int instruction_reads( Instruction *ins /*NN*/, SymReg *r )
-        __attribute__nonnull__(1);
+int instruction_reads( const Instruction *ins /*NN*/, const SymReg *r /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-int instruction_writes( Instruction* ins, SymReg* r );
+int instruction_writes(
+    const Instruction *ins /*NN*/,
+    const SymReg *r /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 Instruction * move_ins(
     struct _IMC_Unit *unit /*NN*/,
     Instruction *ins /*NN*/,
