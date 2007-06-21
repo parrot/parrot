@@ -428,7 +428,7 @@ Loads the C<PackFile> returned by C<Parrot_readbc()>.
 
 PARROT_API
 void
-Parrot_loadbc(Parrot_Interp interp /*NN*/, PackFile *pf /*NULLOK*/)
+Parrot_loadbc(Parrot_Interp interp /*NN*/, PackFile *pf /*NN*/)
 {
     if (pf == NULL) {
         PIO_eprintf(interp, "Invalid packfile\n");
