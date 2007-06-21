@@ -1195,7 +1195,8 @@ classes at runtime will be needed too.
 
 =head2 Meta-classes
 
-Ruby: Ruby has meta classes.  It would be nice if classes were objects in Parrots OO model.
+Ruby: Ruby has meta-classes.  It would be nice if classes were objects in
+Parrot's OO model.
 
 =head2 Attributes
 
