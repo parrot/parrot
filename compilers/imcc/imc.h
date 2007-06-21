@@ -91,11 +91,20 @@ void imcc_init_tables(Interp * interp);
  */
 const char * get_neg_op(char *op, int *nargs);
 
-/*
- * reg_alloc.c
- */
-void imc_reg_alloc(Interp *, IMC_Unit * unit);
-void free_reglist(IMC_Unit *);
+/* HEADERIZER BEGIN: compilers/imcc/reg_alloc.c */
+
+void free_reglist( IMC_Unit *unit /*NN*/ )
+        __attribute__nonnull__(1);
+
+void graph_coloring_reg_alloc( Interp *interp /*NN*/, IMC_Unit *unit /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+int ig_test( int i, int j, int N, unsigned int* graph );
+void imc_reg_alloc( Interp *interp /*NN*/, IMC_Unit *unit /*NULLOK*/ )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: compilers/imcc/reg_alloc.c */
 
 /*
  * parser_util.c

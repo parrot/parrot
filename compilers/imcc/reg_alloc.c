@@ -19,12 +19,14 @@
 #include "imc.h"
 #include "optimizer.h"
 
-void graph_coloring_reg_alloc(Interp *interp, IMC_Unit * unit);
+/* HEADERIZER TARGET: compilers/imcc/imc.h */
+
+/* HEADERIZER BEGIN: static */
 static void make_stat(IMC_Unit *, int *sets, int *cols);
 static void imc_stat_init(IMC_Unit *);
 static void print_stat(Parrot_Interp, IMC_Unit *);
 static void build_reglist(Parrot_Interp, IMC_Unit * unit);
-static void rebuild_reglist(Parrot_Interp, IMC_Unit * unit);
+static void rebuild_reglist(IMC_Unit * unit);
 static void build_interference_graph(Parrot_Interp, IMC_Unit *);
 static void compute_du_chain(IMC_Unit * unit);
 static void compute_one_du_chain(SymReg * r, IMC_Unit * unit);
@@ -35,40 +37,41 @@ static int try_allocate(Parrot_Interp, IMC_Unit *);
 static void allocate_lexicals(Parrot_Interp, IMC_Unit *);
 static void vanilla_reg_alloc(Parrot_Interp, IMC_Unit *);
 static void allocate_non_volatile(Parrot_Interp, IMC_Unit *);
-#if 0
-static int neighbours(int node);
-#endif
 
-static unsigned int* ig_get_word(int i, int j, int N, unsigned int* graph,
-                                 int* bit_ofs)
+/* HEADERIZER END: static */
+
+static unsigned int*
+ig_get_word(int i, int j, int N, unsigned int* graph, int* bit_ofs)
 {
     unsigned int bit = i * N + j;
     *bit_ofs = bit % sizeof (*graph);
     return &graph[bit / sizeof (*graph)];
 }
 
-static void ig_set(int i, int j, int N, unsigned int* graph)
+static void
+ig_set(int i, int j, int N, unsigned int* graph)
 {
     int bit_ofs;
     unsigned int* word = ig_get_word(i, j, N, graph, &bit_ofs);
     *word |= (1 << bit_ofs);
 }
 
-int ig_test(int i, int j, int N, unsigned int* graph);
-int ig_test(int i, int j, int N, unsigned int* graph)
+int
+ig_test(int i, int j, int N, unsigned int* graph)
 {
     int bit_ofs;
     unsigned int* word = ig_get_word(i, j, N, graph, &bit_ofs);
     return *word & (1 << bit_ofs);
 }
 
-static unsigned int* ig_allocate(int N)
+static unsigned int*
+ig_allocate(int N)
 {
     /* size is N*N bits, but we want don't want to allocate a partial
      * word, so round up to the nearest multiple of sizeof (int).
      */
-    int need_bits = N * N;
-    int num_words = (need_bits + sizeof (int) - 1) / sizeof (int);
+    const int need_bits = N * N;
+    const int num_words = (need_bits + sizeof (int) - 1) / sizeof (int);
     return (unsigned int*) mem_sys_allocate_zeroed(num_words * sizeof (int));
 }
 
@@ -76,9 +79,8 @@ static unsigned int* ig_allocate(int N)
  * on a single compilation unit at a time.
  */
 void
-imc_reg_alloc(Interp *interp, IMC_Unit *unit /*NULLOK*/)
+imc_reg_alloc(Interp *interp /*NN*/, IMC_Unit *unit /*NULLOK*/)
 {
-    int first;
     char *function;
 
     if (!unit)
@@ -122,7 +124,7 @@ imc_reg_alloc(Interp *interp, IMC_Unit *unit /*NULLOK*/)
 
     /* build CFG and life info, and optimize iteratively */
     do {
-        first = 1;
+        int first = 1;
         do {
             while (pre_optimize(interp, unit));
 
@@ -147,7 +149,7 @@ imc_reg_alloc(Interp *interp, IMC_Unit *unit /*NULLOK*/)
     if (IMCC_INFO(interp)->debug & DEBUG_IMC)
         dump_symreg(unit);
 
-    rebuild_reglist(interp, unit);
+    rebuild_reglist(unit);
     if (IMCC_INFO(interp)->allocator == IMCC_VANILLA_ALLOCATOR)
         vanilla_reg_alloc(interp, unit);
     else
@@ -166,7 +168,7 @@ done:
 }
 
 void
-free_reglist(IMC_Unit * unit)
+free_reglist(IMC_Unit *unit /*NN*/)
 {
 #if IMC_TRACE
     fprintf(stderr, "reg_alloc.c: free_reglist\n");
@@ -186,9 +188,8 @@ free_reglist(IMC_Unit * unit)
 }
 
 void
-graph_coloring_reg_alloc(Interp *interp, IMC_Unit * unit)
+graph_coloring_reg_alloc(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
 {
-
     build_interference_graph(interp, unit);
 
     try_allocate(interp, unit);
@@ -199,16 +200,18 @@ graph_coloring_reg_alloc(Interp *interp, IMC_Unit * unit)
  * printed with --verbose --verbose
  */
 static void
-make_stat(IMC_Unit * unit, int *sets, int *cols)
+make_stat(IMC_Unit *unit /*NN*/, int *sets /*NULLOK*/, int *cols /*NULLOK*/)
 {
     /* register usage summary */
-    char type[] = "INSP";
-    int i, j;
-    SymHash *hsh = &unit->hash;
-    SymReg * r;
+    const char type[] = "INSP";
+    int i;
+    SymHash * const hsh = &unit->hash;
 
     for (i = 0; i < hsh->size; i++) {
+        SymReg *r;
+
         for (r = hsh->data[i]; r; r = r->next) {
+            int j;
             if (r->color > unit->max_color)
                 unit->max_color = r->color;
             for (j = 0; j < 4; j++)
@@ -222,6 +225,7 @@ make_stat(IMC_Unit * unit, int *sets, int *cols)
         }
     }
     if (cols) {
+        int j;
         for (j = 0; j < 4; j++)
             ++cols[j];
     }
@@ -229,7 +233,7 @@ make_stat(IMC_Unit * unit, int *sets, int *cols)
 
 /* registes usage of .pir */
 static void
-imc_stat_init(IMC_Unit * unit)
+imc_stat_init(IMC_Unit *unit /*NN*/)
 {
     int j;
 
@@ -239,20 +243,19 @@ imc_stat_init(IMC_Unit * unit)
         unit->first_avail[j] = 0;
     }
 
-    memset(&(unit->ostat), 0, sizeof (struct imcc_ostat));
+    memset(&(unit->ostat), 0, sizeof(unit->ostat));
 }
 
 /* and final */
 static void
-print_stat(Parrot_Interp interp, IMC_Unit * unit)
+print_stat(Interp *interp /*N*/, IMC_Unit *unit /*NN*/)
 {
     int sets[4] = {0,0,0,0};
 
-    char *function;
-    if (unit->instructions->n_r)
-        function = unit->instructions->r[0]->name;
-    else
-        function = "(not a function)";
+    const char * const function =
+        unit->instructions->n_r
+            ? unit->instructions->r[0]->name
+            : "(not a function)";
 
     make_stat(unit, sets, unit->n_regs_used);
     IMCC_info(interp, 1,
@@ -285,8 +288,9 @@ print_stat(Parrot_Interp interp, IMC_Unit * unit)
 static int
 reg_sort_f(const void *a, const void *b)
 {
-    SymReg *ra = *(SymReg**) a;
-    SymReg *rb = *(SymReg**) b;
+    const SymReg * const ra = *(SymReg**) a;
+    const SymReg * const rb = *(SymReg**) b;
+
     if (ra->first_ins->index < rb->first_ins->index) {
         return -1;
     }
@@ -299,7 +303,7 @@ reg_sort_f(const void *a, const void *b)
 }
 
 static void
-sort_reglist(IMC_Unit *unit)
+sort_reglist(IMC_Unit *unit /*NN*/)
 {
     qsort(unit->reglist, unit->n_symbols, sizeof (SymReg*), reg_sort_f);
 }
@@ -319,11 +323,10 @@ sort_reglist(IMC_Unit *unit)
  */
 
 static void
-build_reglist(Parrot_Interp interp, IMC_Unit * unit)
+build_reglist(Parrot_Interp interp, IMC_Unit *unit /*NN*/)
 {
     int i, count, unused, n_symbols;
-    SymHash *hsh = &unit->hash;
-    SymReg * r;
+    SymHash  const *hsh = &unit->hash;
 
     IMCC_info(interp, 2, "build_reglist\n");
     /* count symbols */
@@ -335,6 +338,7 @@ build_reglist(Parrot_Interp interp, IMC_Unit * unit)
     unit->reglist = mem_sys_allocate(count * sizeof (SymReg*));
 
     for (i = count = 0; i < hsh->size; i++) {
+        SymReg *r;
         for (r = hsh->data[i]; r; r = r->next) {
             /* Add each symbol to reglist  */
             if (r->type & VTREGISTER) {
@@ -366,15 +370,16 @@ build_reglist(Parrot_Interp interp, IMC_Unit * unit)
  * significantly
  */
 static void
-rebuild_reglist(Parrot_Interp interp, IMC_Unit * unit)
+rebuild_reglist(IMC_Unit *unit /*NN*/)
 {
-    int i, count, unused, reg_set;
-    SymReg * r;
-    char types[] = "INSP", *p;
+    int i, count, unused;
+    const char types[] = "INSP";
 
-    UNUSED(interp);
     for (i = count = unused = 0; i < unit->n_symbols; i++) {
-        r = unit->reglist[i];
+        SymReg * const r = unit->reglist[i];
+        char *p;
+        int reg_set;
+
         if (r->color == -1)
             goto use_it;
         p = strchr(types, r->set);
@@ -404,12 +409,12 @@ use_it:
  */
 
 static void
-build_interference_graph(Parrot_Interp interp, IMC_Unit * unit)
+build_interference_graph(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
 {
-    int x, y, n_symbols;
+    int x;
     unsigned int* interference_graph;
 
-    n_symbols = unit->n_symbols;
+    const int n_symbols = unit->n_symbols;
     if (!n_symbols)
         return;
 
@@ -422,6 +427,7 @@ build_interference_graph(Parrot_Interp interp, IMC_Unit * unit)
     /* Calculate interferences between each chain and populate the the Y-axis */
     for (x = 0; x < n_symbols; x++) {
         /* If symbol was never used in a statment, it can't interfere */
+        int y;
         if (!unit->reglist[x]->first_ins)
             continue;
         for (y = x + 1; y < n_symbols; y++) {
@@ -443,15 +449,14 @@ build_interference_graph(Parrot_Interp interp, IMC_Unit * unit)
 /* Compute a DU-chain for each symbolic in a compilation unit
  */
 static void
-compute_du_chain(IMC_Unit * unit)
+compute_du_chain(IMC_Unit *unit /*NN*/)
 {
-    Instruction * ins, *lastbranch;
+    Instruction *ins = unit->instructions;
+    Instruction *lastbranch = NULL;
     int i;
 
-    lastbranch = 0;
-
     /* Compute last branch in this procedure, update instruction index */
-    for (i = 0, ins = unit->instructions; ins; ins = ins->next) {
+    for (i = 0; ins; ins = ins->next) {
         ins->index = i++;
         if (ins->type == ITBRANCH)
             lastbranch = ins;
@@ -459,7 +464,7 @@ compute_du_chain(IMC_Unit * unit)
 
     /* Compute du-chains for all symbolics */
     for (i = 0; i < unit->n_symbols; i++) {
-        SymReg * r = unit->reglist[i];
+        SymReg * const r = unit->reglist[i];
         compute_one_du_chain(r, unit);
         /* what is this used for? -lt */
         if (r->type == VTIDENTIFIER
@@ -471,7 +476,7 @@ compute_du_chain(IMC_Unit * unit)
 }
 
 static void
-compute_one_du_chain(SymReg * r, IMC_Unit * unit)
+compute_one_du_chain(SymReg *r /*NN*/, IMC_Unit *unit /*NN*/)
 {
     Instruction * ins;
 
@@ -483,9 +488,9 @@ compute_one_du_chain(SymReg * r, IMC_Unit * unit)
     r->first_ins = 0;
     r->use_count = r->lhs_use_count = 0;
     for (ins = unit->instructions; ins; ins = ins->next) {
-        int ro, rw;
-        ro = instruction_reads(ins, r);
-        rw = instruction_writes(ins, r);
+        const int ro = instruction_reads(ins, r);
+        const int rw = instruction_writes(ins, r);
+
         if (ro || rw) {
             if (!r->first_ins) {
                 r->first_ins = ins;
@@ -512,9 +517,8 @@ compute_one_du_chain(SymReg * r, IMC_Unit * unit)
  */
 
 static int
-interferes(Interp *interp, IMC_Unit * unit, SymReg * r0, SymReg * r1)
+interferes(Interp *interp, IMC_Unit *unit /*NN*/, SymReg *r0 /*NN*/, SymReg *r1 /*NN*/)
 {
-
     int i;
 
     /* Registers don't interfere with themselves
@@ -547,8 +551,7 @@ interferes(Interp *interp, IMC_Unit * unit, SymReg * r0, SymReg * r1)
             instruction_writes(r0->first_ins, r0) &&
             instruction_reads(r1->last_ins, r1) &&
             !instruction_reads(r0->first_ins, r0)) {
-        Basic_block *bb;
-        bb = unit->bb_list[r0->first_ins->bbindex];
+        const Basic_block * const bb = unit->bb_list[r0->first_ins->bbindex];
         if (bb->loop_depth == 0)
             return 0;
     }
@@ -556,8 +559,7 @@ interferes(Interp *interp, IMC_Unit * unit, SymReg * r0, SymReg * r1)
             instruction_writes(r1->first_ins, r1) &&
             instruction_reads(r0->last_ins, r0) &&
             !instruction_reads(r1->first_ins, r1)) {
-        Basic_block *bb;
-        bb = unit->bb_list[r1->first_ins->bbindex];
+        const Basic_block * const bb = unit->bb_list[r1->first_ins->bbindex];
         if (bb->loop_depth == 0)
             return 0;
     }
@@ -570,10 +572,8 @@ interferes(Interp *interp, IMC_Unit * unit, SymReg * r0, SymReg * r1)
     }
 
     for (i=0; i < unit->n_basic_blocks; i++) {
-        Life_range *l0, *l1;
-
-        l0 = r0->life_info[i];
-        l1 = r1->life_info[i];
+        const Life_range * const l0 = r0->life_info[i];
+        const Life_range * const l1 = r1->life_info[i];
 
         /* One or both are not alive in this block, so we have
          * no conflict
@@ -589,10 +589,8 @@ interferes(Interp *interp, IMC_Unit * unit, SymReg * r0, SymReg * r1)
         if (l1->first_ins->index > l0->last_ins->index)
             continue;
 
-
         return 1;
     }
-
     return 0;
 }
 
@@ -600,12 +598,10 @@ interferes(Interp *interp, IMC_Unit * unit, SymReg * r0, SymReg * r1)
  * find available color for register #x in available colors
  */
 static int
-ig_find_color(Interp* interp, IMC_Unit *unit, int x, char *avail)
+ig_find_color(const IMC_Unit *unit /*NN*/, const char *avail /*NN*/)
 {
     int c;
 
-    UNUSED(interp);
-    UNUSED(x);
     for (c = 0; c < unit->n_symbols; c++)
         if (avail[c])
             return c;
@@ -621,15 +617,13 @@ ig_find_color(Interp* interp, IMC_Unit *unit, int x, char *avail)
  */
 
 static int
-try_allocate(Parrot_Interp interp, IMC_Unit * unit)
+try_allocate(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
 {
     int x;
-    int color;
     char *avail;
     int t, n;
     unsigned int *graph = unit->interference_graph;
-    SymReg ** reglist = unit->reglist;
-    SymReg *r;
+    SymReg ** const reglist = unit->reglist;
 
     /*
      * unit->n_symbols should be an upper limit of needed colors
@@ -640,19 +634,21 @@ try_allocate(Parrot_Interp interp, IMC_Unit * unit)
     avail = mem_sys_allocate(n);
 
     for (x = 0; x < unit->n_symbols; ++x) {
-        r = reglist[x];
+        SymReg *r = reglist[x];
         if (r->color >= 0)
             continue;
         for (t = 0; t < 4; t++) {
-            int typ = "INSP"[t];
+            const int typ = "INSP"[t];
             int already_allocated = unit->first_avail[t];
             /*
              * don't even consider these regs
              */
             if (r->set == typ) {
+                int color;
+
                 memset(avail, 1, n);
                 map_colors(unit, x, graph, avail, typ, already_allocated );
-                color = ig_find_color(interp, unit, x, avail);
+                color = ig_find_color(unit, avail);
                 if (color >= 0) {
                     color += already_allocated;
                     r->color = color;

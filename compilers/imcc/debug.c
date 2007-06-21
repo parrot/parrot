@@ -12,9 +12,6 @@
 
 /* HEADER: compilers/imcc/debug.h */
 
-/* XXX Remove this */
-extern int ig_test(int i, int j, int N, unsigned int* graph); /* reg_alloc.c */
-
 PARROT_API
 void
 IMCC_fatal(Interp *interp /*NN*/, int code, const char *fmt /*NN*/, ...)
