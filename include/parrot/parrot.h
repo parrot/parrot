@@ -246,14 +246,6 @@ typedef void (*funcptr_t)(void);
 #define UNUSED(a) if (a) {}
 
 
-/* parrot uses 'inline' in a few places where performance *really* matters.
- * unfortunately, C89 doesn't understand 'inline'. */
-#ifndef HAS_INLINE
-#  define INLINE inline
-#else
-#  define INLINE
-#endif
-
 /* Hide our struct copying behind macros */
 #define STRUCT_COPY(d,s)    assert(d);assert(s);*(d)=*(s);
 #define STRUCT_COPY_N(d,s,n) assert(d);assert(s);assert(sizeof(*d)==sizeof(*s));memcpy((d),(s),sizeof(*d)*(n));
