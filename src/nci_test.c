@@ -131,7 +131,7 @@ PARROT_API char   nci_dlvar_cstring[] = "This is a C-string.\n";
 /* Function definitions */
 
 PARROT_API char
-nci_c() {
+nci_c(void) {
     return nci_dlvar_char;
 }
 
@@ -141,7 +141,7 @@ nci_csc(short l1, char l2) {
 }
 
 PARROT_API double
-nci_d() {
+nci_d(void) {
     nci_dlvar_double *= 10.0;
 
     return nci_dlvar_double;
@@ -153,7 +153,7 @@ nci_dd(double d) {
 }
 
 PARROT_API float
-nci_f() {
+nci_f(void) {
     nci_dlvar_float *= 10.0;
 
     return nci_dlvar_float;
@@ -199,17 +199,17 @@ nci_it(void *p) {
 }
 
 PARROT_API long
-nci_l() {
+nci_l(void) {
     return nci_dlvar_long;
 }
 
 PARROT_API int *
-nci_p() {
+nci_p(void) {
     return &nci_dlvar_int;
 }
 
 PARROT_API char *
-nci_t() {
+nci_t(void) {
     return nci_dlvar_cstring;
 }
 
@@ -411,7 +411,7 @@ nci_pi(int test) {
 }
 
 PARROT_API short
-nci_s() {
+nci_s(void) {
     return nci_dlvar_short;
 }
 
@@ -552,7 +552,7 @@ nci_pii(int fac1, int fac2) {
 }
 
 PARROT_API void
-nci_v() {
+nci_v(void) {
     nci_dlvar_int *= 10;
 }
 
@@ -566,7 +566,7 @@ nci_vv(void) {
 char l2 = 4;
 float f2 = 4.0;
 int
-main() {
+main(void) {
     short l1 = 3;
     float f, f1 = 3.0;
     int l = nci_ssc(l1, l2);
