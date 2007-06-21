@@ -37,6 +37,8 @@ static int e_file_close(Interp *, void *);
 static int e_file_emit(Interp *, void *param, IMC_Unit *, Instruction *);
 /* HEADERIZER END: static */
 
+const char types[] = "INPS";
+
 Emitter emitters[2] = {
     {e_file_open,
      e_file_emit,
@@ -127,7 +129,6 @@ int
 ins_reads2(Instruction *ins /*NN*/, int t)
 {
     size_t i, idx;
-    const char types[] = "INPS";
     char *p;
 
     if (ins->opnum == r_special[0])
@@ -150,7 +151,6 @@ int
 ins_writes2(Instruction *ins, int t)
 {
     size_t i, idx;
-    const char types[] = "INPS";
     char *p;
 
     if (ins->opnum == w_special[0])
