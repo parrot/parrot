@@ -107,31 +107,68 @@ struct _IMC_Unit;
 
 /* functions */
 
-SymReg * mk_symreg(Interp *, char *, int t);
-SymReg * mk_temp_reg(Interp *, int t);
-SymReg * mk_ident(Interp *, char *, int t);
-SymReg * mk_ident_ur(Interp *, char *, int t);
-SymReg * mk_const(Interp *, char *, int t);
-SymReg * mk_const_ident(Interp *, char *, int t, SymReg *, int);
+/* HEADERIZER BEGIN: compilers/imcc/symreg.c */
 
-/* Eventually make mk_address static */
-SymReg * mk_address(Interp *, char *, int uniq);
-/* Expose API through these */
-SymReg * mk_sub_label(Interp *, char *);
-SymReg * mk_sub_address(Interp *, char *);
-SymReg * mk_local_label(Interp *, char *);
-SymReg * mk_label_address(Interp *, char *);
-SymReg * mk_pcc_sub(Interp *, char *, int proto);
+SymReg * _find_sym( Interp *interp,
+    Namespace * nspace,
+    SymHash * hsh,
+    const char * name );
 
-char * symreg_to_str(SymReg *);
-void add_pcc_arg(SymReg *r, SymReg * arg);
-void add_pcc_sub(SymReg *r, SymReg * arg);
-void add_pcc_cc(SymReg *r, SymReg * arg);
-void add_pcc_result(SymReg *r, SymReg * arg);
-void add_pcc_param(SymReg *r, SymReg * arg);
-void add_pcc_return(SymReg *r, SymReg * arg);
-void add_pcc_multi(SymReg *r, SymReg * arg);
-void add_namespace(Parrot_Interp interp, struct _IMC_Unit *);
+SymReg * _get_sym( SymHash * hsh, const char * name );
+SymReg * _mk_address( Interp *interp, SymHash *hsh, char * name, int uniq );
+SymReg * _mk_const( SymHash *hsh, char * name, int t );
+char * _mk_fullname( Namespace * ns, const char * name );
+SymReg * _mk_symreg( SymHash* hsh, const char *name /*NN*/, int t )
+        __attribute__nonnull__(2);
+
+void _store_symreg( SymHash *hsh, SymReg * r );
+void add_namespace( Parrot_Interp interp, struct _IMC_Unit *unit );
+void add_pcc_arg( SymReg *r, SymReg * arg );
+void add_pcc_cc( SymReg *r, SymReg * arg );
+void add_pcc_multi( SymReg *r, SymReg * arg );
+void add_pcc_param( SymReg *r, SymReg * arg );
+void add_pcc_result( SymReg *r, SymReg * arg );
+void add_pcc_return( SymReg *r, SymReg * arg );
+void add_pcc_sub( SymReg *r, SymReg * arg );
+void clear_globals( Interp *interp );
+void clear_locals( struct _IMC_Unit * unit );
+void clear_sym_hash( SymHash *hsh );
+void create_symhash( SymHash *hash );
+void debug_dump_sym_hash( SymHash *hsh );
+SymReg * dup_sym( SymReg *r );
+SymReg * find_sym( Interp *interp, const char * name );
+void free_sym( SymReg *r );
+SymReg * get_sym( Interp *interp, const char * name );
+unsigned int hash_str( const char * str );
+SymReg * link_keys( Interp *interp, int nargs, SymReg * keys[], int force );
+SymReg * mk_address( Interp *interp, char * name, int uniq );
+SymReg * mk_const( Interp *interp, char * name, int t );
+SymReg * mk_const_ident( Interp *interp,
+    char *name,
+    int t,
+    SymReg *val,
+    int global );
+
+char * mk_fullname( const char * name );
+SymReg * mk_ident( Interp *interp, char * name, int t );
+SymReg* mk_ident_ur( Interp *interp, char * name, int t );
+SymReg * mk_label_address( Interp *interp, char * name );
+SymReg * mk_local_label( Interp *interp, char * name );
+SymReg * mk_pasm_reg( Interp *interp, char * name );
+SymReg * mk_pcc_sub( Interp *interp, char * name, int proto );
+SymReg * mk_sub_address( Interp *interp, char * name );
+SymReg * mk_sub_label( Interp *interp, char * name );
+SymReg * mk_symreg( Interp *interp, char * name, int t );
+SymReg * mk_temp_reg( Interp *interp, int t );
+void pop_namespace( char * name );
+void push_namespace( char * name );
+void store_symreg( Interp * interp, SymReg * r );
+char * symreg_to_str( const SymReg *s /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__malloc__
+        __attribute__warn_unused_result__;
+
+/* HEADERIZER END: compilers/imcc/symreg.c */
 
 typedef enum {
     P_NONE           = 0x00,                  /* 0<<0 */
@@ -174,36 +211,8 @@ enum uniq_t {
     U_add_once,
     U_add_uniq_label,
     U_add_uniq_sub,
-    U_add_all };
-SymReg * mk_pasm_reg(Interp*, char *);
-
-
-void free_sym(SymReg *r);
-void store_symreg(Interp *interp, SymReg * r);
-SymReg * find_sym(Interp *, const char * name);
-SymReg * get_sym(Interp *interp, const char * name);
-SymReg* get_const(Interp *interp, const char *name, int type);
-SymReg * _get_sym(SymHash *hash, const char * name);
-SymReg * _mk_symreg(SymHash *hash,char * name, int t);
-void   create_symhash(SymHash *hash);
-SymReg * _mk_const(SymHash *hash, char * name, int t);
-void _store_symreg(SymHash *hash, SymReg * r);
-SymReg * _mk_address(Interp *, SymHash *hash, char * name, int uniq);
-SymReg * link_keys(Interp *, int nargs, SymReg *keys[], int force);
-void clear_locals(struct _IMC_Unit *);
-void clear_sym_hash(SymHash *);
-void clear_globals(Interp *);
-unsigned int  hash_str(const char * str);
-SymReg * dup_sym(SymReg *r);
-void debug_dump_sym_hash(SymHash *hsh);
-
-
-SymReg * _find_sym(Interp *,Namespace * ns, SymHash *hash, const char * name);
-char * _mk_fullname(Namespace * ns, const char * name);
-char * mk_fullname(const char * name);
-void push_namespace(char * name);
-void pop_namespace(char * name);
-
+    U_add_all
+};
 
 #endif /* PARROT_IMCC_SYMREG_H_GUARD */
 

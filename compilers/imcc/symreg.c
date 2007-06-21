@@ -14,11 +14,13 @@
 /* Globals: */
 /* Code: */
 
+/* HEADERIZER TARGET: compilers/imcc/symreg.h */
 
 void
 push_namespace(char * name)
 {
-    Namespace * ns = (Namespace *) malloc(sizeof (*ns));
+    Namespace * const ns = (Namespace *) malloc(sizeof (*ns));
+
     ns->parent = _namespace;
     ns->name = name;
     ns->idents = NULL;
@@ -55,7 +57,7 @@ static SymReg *
 _get_sym_typed(SymHash * hsh, const char * name, int t)
 {
     SymReg * p;
-    int i = hash_str(name) % hsh->size;
+    const int i = hash_str(name) % hsh->size;
     for (p = hsh->data[i]; p; p = p->next) {
         if (!strcmp(name, p->name) && t == p->set)
             return p;
@@ -73,7 +75,7 @@ _get_sym_typed(SymHash * hsh, const char * name, int t)
  * should be changed.
  */
 SymReg *
-_mk_symreg(SymHash* hsh, char * name, int t)
+_mk_symreg(SymHash* hsh, const char *name /*NN*/, int t)
 {
     SymReg * r;
     if ((r = _get_sym_typed(hsh, name, t))) {
@@ -107,12 +109,14 @@ mk_symreg(Interp *interp, char * name, int t)
  * Dump a SymReg to a printable format.
  */
 char *
-symreg_to_str(SymReg * s)
+symreg_to_str(const SymReg *s /*NN*/)
+    /* MALLOC, WARN_UNUSED */
 {
     /* NOTE: the below magic number encompasses all the quoted strings which may be included in the
      * sprintf output */
-    char *buf = (char *) malloc(250 + strlen(s->name));
-    int t = s->type;
+    char * const buf = (char *) malloc(250 + strlen(s->name));
+    const int t = s->type;
+
     sprintf(buf, "symbol [%s]  set [%c]  color [" INTVAL_FMT "]  type [",
                  s->name, s->set, s->color);
     if (t & VTCONST)      { strcat(buf, "VTCONST ");      }
@@ -141,9 +145,11 @@ mk_temp_reg(Interp *interp, int t)
 }
 
 SymReg *
-mk_pcc_sub(Interp *interp, char * name, int proto) {
-    IMC_Unit *unit = IMCC_INFO(interp)->last_unit;
-    SymReg *r = _mk_symreg(&unit->hash, name, proto);
+mk_pcc_sub(Interp *interp, char * name, int proto)
+{
+    IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
+    SymReg * const      r = _mk_symreg(&unit->hash, name, proto);
+
     r->type = VT_PCC_SUB;
     r->pcc_sub = (pcc_sub_t*)calloc(1, sizeof (struct pcc_sub_t));
     return r;
@@ -153,7 +159,7 @@ mk_pcc_sub(Interp *interp, char * name, int proto) {
  * add current namespace to sub decl
  */
 void
-add_namespace(Parrot_Interp interp, IMC_Unit *unit)
+add_namespace(Parrot_Interp interp, struct _IMC_Unit *unit)
 {
     SymReg *ns = IMCC_INFO(interp)->cur_namespace;
     SymReg *r, *g;
@@ -464,6 +470,7 @@ _mk_address(Interp *interp, SymHash *hsh, char * name, int uniq)
     return r;
 }
 
+/* Eventually make mk_address static */
 SymReg *
 mk_address(Interp *interp, char * name, int uniq)
 {
@@ -826,7 +833,7 @@ debug_dump_sym_hash(SymHash *hsh)
 
 /* Deletes all local symbols and clears life info */
 void
-clear_locals(IMC_Unit * unit)
+clear_locals(struct _IMC_Unit * unit)
 {
     int i;
     SymReg * p, *next;
