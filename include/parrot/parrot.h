@@ -245,6 +245,14 @@ typedef void (*funcptr_t)(void);
    used to make an empty block.  */
 #define UNUSED(a) if (a) {}
 
+
+/* parrot uses 'inline' in a few places where performance *really* matters.
+ * unfortunately, C89 doesn't understand 'inline'. */
+#ifndef HAS_INLINE
+#  define inline
+#endif
+
+
 #include "parrot/settings.h"
 #include "parrot/enums.h"
 #include "parrot/platform.h"
