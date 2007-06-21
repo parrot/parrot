@@ -8,10 +8,9 @@ languages/HQ9plus/t/harness - A harness for Parrot HQ9plus
 
   cd languages && perl -I../lib HQ9plus/t/harness --files
 
-  cd languages && perl -I../lib HQ9plus/t/harness 
+  cd languages/HQ9plus && perl -I../../lib t/harness 
 
-  cd languages && perl -I../lib HQ9plus/t/harness \
-                   HQ9plus/t/basic/integer.t 
+  cd languages/HQ9plus && perl -I../../lib t/harness t/basic.t 
 
 =head1 DESCRIPTION
 
