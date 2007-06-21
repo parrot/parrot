@@ -491,7 +491,7 @@ do_pre_process(Parrot_Interp interp)
 }
 
 static void
-imcc_get_optimization_description(Interp *interp, int opt_level, char *opt_desc)
+imcc_get_optimization_description(const Interp *interp /*NN*/, int opt_level, char *opt_desc)
 {
     int i = 0;
 
@@ -600,7 +600,6 @@ imcc_write_pbc(Interp *interp, const char *output_file)
 int
 imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
 {
-    PackFile *pf;
     int              obj_file;
     const char      *output_file;
     yyscan_t         yyscanner;
@@ -618,8 +617,8 @@ imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
         imc_yyin_set(stdin, yyscanner);
     }
     else {
-        char *ext;
-        ext = strrchr(sourcefile, '.');
+        const char * const ext = strrchr(sourcefile, '.');
+
         if (ext && strcmp(ext, ".pbc") == 0) {
             load_pbc  = 1;
             write_pbc = 0;
@@ -647,8 +646,8 @@ imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
     /* Do we need to produce an output file? If so, what type? */
     obj_file = 0;
     if (interp->output_file) {
-        char *ext;
-        ext = strrchr(interp->output_file, '.');
+        const char * const ext = strrchr(interp->output_file, '.');
+
         if (ext && strcmp(ext, ".pbc") == 0) {
             write_pbc = 1;
         }
@@ -679,15 +678,17 @@ imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
     /* If the input file is Parrot bytecode, then we simply read it
        into a packfile, which Parrot then loads */
     if (load_pbc) {
-        pf = Parrot_readbc(interp, sourcefile);
+        PackFile * const pf = Parrot_readbc(interp, sourcefile);
+
         if (!pf)
             IMCC_fatal_standalone(interp, 1, "main: Packfile loading failed\n");
         Parrot_loadbc(interp, pf);
     }
     else {
         /* Otherwise, we need to compile our input to bytecode. */
-        int per_pbc   = (write_pbc | run_pbc) != 0;
-        int opt_level = IMCC_INFO(interp)->optimizer_level;
+        const int per_pbc   = (write_pbc | run_pbc) != 0;
+        const int opt_level = IMCC_INFO(interp)->optimizer_level;
+        PackFile *pf;
 
         /* Shouldn't be more than five, but five extra is cheap */
         char opt_desc[10];
@@ -697,7 +698,7 @@ imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
         IMCC_info(interp, 1, "using optimization '-O%s' (%x) \n",
                   opt_desc, opt_level);
 
-        pf            = PackFile_new(interp, 0);
+        pf = PackFile_new(interp, 0);
         Parrot_loadbc(interp, pf);
 
         IMCC_push_parser_state(interp);
@@ -726,7 +727,7 @@ imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
             Parrot_exit(interp, IMCC_FATAL_EXCEPTION);
         }
         IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
-            char *error_str = string_to_cstring(interp,
+            char * const error_str = string_to_cstring(interp,
                     IMCC_INFO(interp)->error_message);
 
             IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
@@ -747,18 +748,21 @@ imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
     }
 
     /* Produce a PBC output file, if one was requested */
-    if (write_pbc)
+    if (write_pbc) {
         imcc_write_pbc(interp, output_file);
 
-    /* If necessary, load the file written above */
-    if (run_pbc == 2 && write_pbc && strcmp(output_file, "-")) {
-        IMCC_info(interp, 1, "Loading %s\n", output_file);
-        pf = Parrot_readbc(interp, output_file);
-        if (!pf)
-            IMCC_fatal_standalone(interp, 1,
-            "Packfile loading failed\n");
-        Parrot_loadbc(interp, pf);
-        load_pbc = 1;
+        /* If necessary, load the file written above */
+        if (run_pbc == 2 && strcmp(output_file, "-")) {
+            PackFile *pf;
+
+            IMCC_info(interp, 1, "Loading %s\n", output_file);
+            pf = Parrot_readbc(interp, output_file);
+            if (!pf)
+                IMCC_fatal_standalone(interp, 1,
+                "Packfile loading failed\n");
+            Parrot_loadbc(interp, pf);
+            load_pbc = 1;
+        }
     }
 
     /* Run the bytecode */
