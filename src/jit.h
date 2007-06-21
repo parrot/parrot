@@ -7,6 +7,10 @@
 #ifndef PARROT_JIT_H_GUARD
 #define PARROT_JIT_H_GUARD
 
+#if EXEC_CAPABLE
+#include "parrot/exec.h"
+#endif
+
 typedef void (*jit_f)(Interp *interp, opcode_t *pc);
 
 
