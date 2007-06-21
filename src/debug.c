@@ -460,6 +460,7 @@ PDB_next(Interp *interp, const char *command)
     if (!(pdb->state & PDB_RUNNING))
         PDB_init(interp, command);
 
+    command = nextarg(command);
     /* Get the number of operations to execute if any */
     if (command && isdigit((int) *command))
         n = atol(command);
@@ -505,6 +506,7 @@ PDB_trace(Interp *interp, const char *command)
     if (!(pdb->state & PDB_RUNNING))
         PDB_init(interp, command);
 
+    command = nextarg(command);
     /* if the number of ops to run is specified, convert to a long */
     if (command && isdigit((int) *command))
         n = atol(command);
@@ -772,6 +774,7 @@ PDB_set_break(Interp *interp, const char *command)
     PDB_line_t       *line;
     long              ln, i;
 
+    command = nextarg(command);
     /* If no line number was specified, set it at the current line */
     if (command && *command) {
         ln = atol(command);
@@ -909,6 +912,7 @@ PDB_continue(Interp *interp, const char *command)
             return;
         }
 
+        command = nextarg(command);
         ln = atol(command);
         PDB_skip_breakpoint(interp, ln);
     }
@@ -936,6 +940,7 @@ PDB_find_breakpoint(Interp *interp, const char *command)
     PDB_breakpoint_t *breakpoint;
     long              n;
 
+    command = nextarg(command);
     if (isdigit((int) *command)) {
         n          = atol(command);
         breakpoint = interp->pdb->breakpoint;
@@ -1971,6 +1976,7 @@ PDB_list(Interp *interp, const char *command)
         return;
     }
 
+    command = nextarg(command);
     /* set the list line if provided */
     if (isdigit((int) *command)) {
         line_number = atol(command) - 1;
@@ -2157,6 +2163,7 @@ PDB_print_user_stack(Interp *interp, const char *command)
     long           depth = 0;
     Stack_Chunk_t *chunk = CONTEXT(interp->ctx)->user_stack;
 
+    command = nextarg(command);
     if (*command)
         depth = atol(command);
 
