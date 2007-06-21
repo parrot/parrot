@@ -432,6 +432,14 @@ sub generate_languages_functions {
             my $self = shift;
             my ( $code, $output, $desc, %options ) = @_;
     
+            # set a TODO for Test::Builder to find
+            my $call_pkg = $self->{builder}->exported_to() || '';
+
+            no strict 'refs';
+
+            local *{ $call_pkg . '::TODO' } = \$options{todo}
+                if defined $options{todo};
+
             my $count = $self->{builder}->current_test() + 1;
     
             # These are the thing that depend on the actual language implementation
