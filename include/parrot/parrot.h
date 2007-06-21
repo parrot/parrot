@@ -249,7 +249,9 @@ typedef void (*funcptr_t)(void);
 /* parrot uses 'inline' in a few places where performance *really* matters.
  * unfortunately, C89 doesn't understand 'inline'. */
 #ifndef HAS_INLINE
-#  define inline
+#  define INLINE inline
+#else
+#  define INLINE
 #endif
 
 

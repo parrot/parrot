@@ -170,7 +170,7 @@ ins_writes2(Instruction *ins, int t)
 /* next 2 functions are called very often, says gprof
  * they should be fast
  */
-inline int
+INLINE int
 instruction_reads(Instruction *ins /*NN*/, SymReg *r) {
     int f, i;
     SymReg *key;
@@ -219,7 +219,7 @@ instruction_reads(Instruction *ins /*NN*/, SymReg *r) {
     return 0;
 }
 
-inline int
+INLINE int
 instruction_writes(Instruction* ins, SymReg* r) {
     int f, i;
 
