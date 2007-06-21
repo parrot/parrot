@@ -109,38 +109,107 @@ void imc_reg_alloc( Interp *interp /*NN*/, IMC_Unit *unit /*NULLOK*/ )
 /*
  * parser_util.c
  */
-PARROT_API void imcc_init(Parrot_Interp interp);
-PARROT_API void imcc_destroy(Parrot_Interp interp);
-int check_op(Interp *, char * fullname, char *op, SymReg *r[], int narg, int keyvec);
-int is_op(Interp *, const char *opname);
-char *str_dup(const char *);
-char *str_cat(const char *, const char *);
-int imcc_vfprintf(Interp *, FILE *fd, const char *format, va_list ap);
-int imcc_fprintf(Interp *, FILE *fd, const char *fmt, ...);
 
-/*
- * FIXME create an official interface
- * imcc compile interface
- *       this is needed for the debugger pdb and called from imcc/main.c
- */
-PMC *imcc_compile_pir(Parrot_Interp interp, const char *s);
-PMC *imcc_compile_pasm(Parrot_Interp interp, const char *s);
-PMC *imcc_compile_pir_ex(Parrot_Interp interp, const char *s);
-PMC *imcc_compile_pasm_ex(Parrot_Interp interp, const char *s);
-void *IMCC_compile_file(Parrot_Interp interp, const char *s);
-void *IMCC_compile_file_s(Parrot_Interp interp, const char *s,
-      STRING **error_message);
-PMC * IMCC_compile_pir_s(Parrot_Interp interp, const char *s,
-      STRING **error_message);
-PMC * IMCC_compile_pasm_s(Parrot_Interp interp, const char *s,
-      STRING **error_message);
+#ifndef YY_TYPEDEF_YY_SCANNER_T
+#  define YY_TYPEDEF_YY_SCANNER_T
+typedef void* yyscan_t;
+#endif
+/* HEADERIZER BEGIN: compilers/imcc/parser_util.c */
+
+PARROT_API int do_yylex_init( Interp* interp, yyscan_t* yyscanner );
+PARROT_API void imcc_destroy( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+PARROT_API void imcc_init( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+int check_op( Interp *interp,
+    char *fullname,
+    char *name,
+    SymReg *r[],
+    int narg,
+    int keyvec );
+
+PMC * imcc_compile(
+    Parrot_Interp interp,
+    const char *s,
+    int pasm_file,
+    STRING **error_message );
+
+void * IMCC_compile_file( Parrot_Interp interp, const char *s );
+void * IMCC_compile_file_s(
+    Parrot_Interp interp,
+    const char *s,
+    STRING **error_message );
+
+PMC * imcc_compile_pasm( Parrot_Interp interp, const char *s );
+PMC * imcc_compile_pasm_ex( Parrot_Interp interp, const char *s );
+PMC * IMCC_compile_pasm_s(
+    Parrot_Interp interp,
+    const char *s,
+    STRING **error_message );
+
+PMC * imcc_compile_pir( Parrot_Interp interp, const char *s );
+PMC * imcc_compile_pir_ex( Parrot_Interp interp, const char *s );
+PMC * IMCC_compile_pir_s(
+    Parrot_Interp interp,
+    const char *s,
+    STRING **error_message );
+
+int imcc_fprintf( Interp *interp, FILE *fd, const char *fmt, ... );
+int imcc_vfprintf( Interp *interp, FILE *fd, const char *format, va_list ap );
+Instruction * iNEW( Interp *interp,
+    struct _IMC_Unit *unit,
+    SymReg *r0,
+    char *type,
+    SymReg *init,
+    int emit );
+
+Instruction * INS( Interp *interp,
+    IMC_Unit * unit,
+    char *name,
+    const char *fmt,
+    SymReg **r,
+    int n,
+    int keyvec,
+    int emit );
+
+int is_op( Interp *interp, const char *name );
+Instruction * multi_keyed( Interp *interp,
+    IMC_Unit * unit,
+    char *name,
+    SymReg ** r,
+    int nr,
+    int keyvec,
+    int emit );
+
+void op_fullname(
+    char * dest,
+    const char * name,
+    SymReg * args[],
+    int narg,
+    int keyvec );
+
+void register_compilers( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+char * str_cat( const char * s1, const char * s2 );
+char * str_dup( const char * old );
+int try_find_op(
+    Parrot_Interp interp,
+    IMC_Unit * unit,
+    char *name,
+    SymReg ** r,
+    int n,
+    int keyvec,
+    int emit );
+
+/* HEADERIZER END: compilers/imcc/parser_util.c */
+
+/* imclexer.c */
 void IMCC_print_inc(Interp *interp);
 
 /* Call convention independant API */
-
-/*
- * pcc.c
- */
 
 /* HEADERIZER BEGIN: compilers/imcc/pcc.c */
 
@@ -168,10 +237,6 @@ SymReg* get_pasm_reg( Interp* interp /*NN*/, const char *name )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: compilers/imcc/pcc.c */
-
-void expand_pcc_sub(Parrot_Interp interp, IMC_Unit *, Instruction *ins);
-void expand_pcc_sub_ret(Parrot_Interp interp, IMC_Unit *, Instruction *ins);
-void expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit *, Instruction *ins);
 
 /* pragmas avialable: */
 typedef enum {

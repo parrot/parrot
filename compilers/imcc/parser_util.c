@@ -4,7 +4,7 @@
  * Intermediate Code Compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
- * Copyright (C) 2002-2006, The Perl Foundation.
+ * Copyright (C) 2002-2007, The Perl Foundation.
  *
  * parser support functions
  *
@@ -26,10 +26,12 @@
 #include "pbc.h"
 #include "parser.h"
 
-PMC * imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
-                   STRING **error_message);
+/* HEADERIZER TARGET: compilers/imcc/imc.h */
+
+/* HEADERIZER BEGIN: static */
 static const char *try_rev_cmp(Parrot_Interp, IMC_Unit *unit, char *name,
                                SymReg **r);
+/* HEADERIZER END: static */
 
 /*
  * FIXME:
@@ -99,7 +101,8 @@ iNEW(Interp *interp, struct _IMC_Unit *unit, SymReg *r0,
  */
 void
 op_fullname(char * dest, const char * name, SymReg * args[],
-        int narg, int keyvec) {
+        int narg, int keyvec)
+{
     int i;
 #if IMC_TRACE_HIGH
     char * full = dest;
@@ -574,7 +577,7 @@ found_ins:
  */
 extern void* yy_scan_string(const char *);
 
-
+PARROT_API
 int
 do_yylex_init(Interp* interp, yyscan_t* yyscanner)
 {
@@ -876,7 +879,7 @@ IMCC_compile_file_s(Parrot_Interp interp, const char *s,
 
 /* Register additional compilers with the interpreter */
 void
-register_compilers(Parrot_Interp interp)
+register_compilers(Interp *interp /*NN*/)
 {
     Parrot_compreg(interp, const_string(interp, "PASM"), imcc_compile_pasm_ex);
     Parrot_compreg(interp, const_string(interp, "PIR"), imcc_compile_pir_ex);
@@ -1156,7 +1159,8 @@ imcc_fprintf(Interp *interp, FILE *fd, const char *fmt, ...)
 }
 
 int
-imcc_vfprintf(Interp *interp, FILE *fd, const char *format, va_list ap) {
+imcc_vfprintf(Interp *interp, FILE *fd, const char *format, va_list ap)
+{
     int len;
     const char *cp;
     const char *fmt;
@@ -1266,18 +1270,20 @@ str_cat(const char * s1, const char * s2)
 }
 
 
+PARROT_API
 void
-imcc_init(Parrot_Interp interp)
+imcc_init(Interp *interp /*NN*/)
 {
     IMCC_INFO(interp) = mem_sys_allocate_zeroed(sizeof (imc_info_t));
     /* register PASM and PIR compilers to parrot core */
     register_compilers(interp);
 }
 
+PARROT_API
 void
-imcc_destroy(Parrot_Interp interp)
+imcc_destroy(Interp *interp /*NN*/)
 {
-    Hash  *macros = IMCC_INFO(interp)->macros;
+    Hash * const macros = IMCC_INFO(interp)->macros;
 
     if (macros)
         parrot_chash_destroy(interp, macros);

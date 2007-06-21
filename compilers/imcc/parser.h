@@ -37,7 +37,6 @@ SymReg * macro(Interp *, char *name);
 PARROT_API int yyparse(yyscan_t, Interp*);
 PARROT_API int yylex(YYSTYPE *, yyscan_t, Interp*);
 PARROT_API int yylex_destroy(yyscan_t);
-PARROT_API int do_yylex_init(Interp*, yyscan_t*);
 
 int yylex_init(yyscan_t*);
 int yyget_column(yyscan_t);
@@ -49,15 +48,6 @@ int yyerror(yyscan_t, Interp*, char *);
 #define YY_EXTRA_TYPE Interp*
 YY_EXTRA_TYPE yyget_extra(yyscan_t yyscanner );
 void yyset_extra(YY_EXTRA_TYPE user_defined ,yyscan_t yyscanner );
-
-void op_fullname(char * dest, const char * name, SymReg * args[], int, int);
-PARROT_API void open_comp_unit(void);
-void register_compilers(Parrot_Interp);
-void *imcc_eval_pasm(Parrot_Interp, const char *s);
-void *imcc_eval_pir(Parrot_Interp, const char *s);
-int try_find_op(Parrot_Interp, IMC_Unit *, char *, SymReg **, int, int, int);
-Instruction * multi_keyed(Interp *interp, IMC_Unit *, char *name,
-    SymReg ** r, int nr, int keyvec, int emit);
 
 extern void compile_file(Interp *interp, FILE *file, void *);
 extern void compile_string(Interp *interp, char *, void *);
