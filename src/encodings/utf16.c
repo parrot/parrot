@@ -337,9 +337,9 @@ iter_init(Interp *interp, const STRING *src, String_iter *iter)
 }
 
 ENCODING *
-Parrot_encoding_utf16_init(Interp *interp)
+Parrot_encoding_utf16_init(Interp *interp /*NN*/)
 {
-    ENCODING *return_encoding = Parrot_new_encoding(interp);
+    ENCODING * const return_encoding = Parrot_new_encoding(interp);
 
     static const ENCODING base_encoding = {
         "utf16",
@@ -360,7 +360,7 @@ Parrot_encoding_utf16_init(Interp *interp)
         bytes,
         iter_init
     };
-    memcpy(return_encoding, &base_encoding, sizeof (ENCODING));
+    STRUCT_COPY(return_encoding, &base_encoding);
     Parrot_register_encoding(interp, "utf16", return_encoding);
     return return_encoding;
 }

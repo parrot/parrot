@@ -570,7 +570,7 @@ mmd_expand_x(Interp *interp /*NN*/, INTVAL func_nr, INTVAL new_x)
     old_dp = sizeof (funcptr_t) * x;
     new_dp = sizeof (funcptr_t) * new_x;
     for (i = 0; i < y; i++) {
-        memcpy(dest_ptr, src_ptr, sizeof (funcptr_t) * x);
+        STRUCT_COPY_N(dest_ptr, src_ptr, x);
         src_ptr  += old_dp;
         dest_ptr += new_dp;
     }

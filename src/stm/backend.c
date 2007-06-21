@@ -1314,11 +1314,8 @@ void* Parrot_STM_extract(Interp *interp) {
     saved->writes     = (STM_write_record *)
         mem_sys_allocate(sizeof (*saved->writes) * saved->num_writes);
 
-    memcpy(saved->reads, &log->reads[cursub->first_read],
-        sizeof (*saved->reads) * saved->num_reads);
-
-    memcpy(saved->writes, &log->writes[cursub->first_write],
-        sizeof (*saved->writes) * saved->num_writes);
+    STRUCT_COPY_N(saved->reads,  &log->reads[cursub->first_read],   saved->num_reads);
+    STRUCT_COPY_N(saved->writes, &log->writes[cursub->first_write], saved->num_writes);
 
     return saved;
 }

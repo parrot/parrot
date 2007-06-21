@@ -97,20 +97,6 @@ Parrot_unmake_COW(Interp *interp, STRING *s /*NN*/)
 
 /*
 
-FUNCDOC: copy_string_header
-
-Copies the string header from the first Parrot string to the second.
-
-*/
-
-static void
-copy_string_header(STRING *dest /*NN*/, const STRING *src /*NN*/)
-{
-    memcpy(dest, src, sizeof (STRING));
-}
-
-/*
-
 FUNCDOC: Parrot_make_COW_reference
 
 Creates a copy-on-write string by cloning a string header without
@@ -129,7 +115,7 @@ Parrot_make_COW_reference(Interp *interp /*NN*/, STRING *s /*NULLOK*/)
     if (PObj_constant_TEST(s)) {
         d = new_string_header(interp, PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
         PObj_COW_SET(s);
-        copy_string_header(d, s);
+        STRUCT_COPY(d,s);
         /* we can't move the memory, because constants aren't
          * scanned in compact_pool, therefore the other end
          * would point to garbage.
@@ -140,7 +126,7 @@ Parrot_make_COW_reference(Interp *interp /*NN*/, STRING *s /*NULLOK*/)
     else {
         d = new_string_header(interp, PObj_get_FLAGS(s));
         PObj_COW_SET(s);
-        copy_string_header(d, s);
+        STRUCT_COPY(d,s);
         PObj_sysmem_CLEAR(d);
 #if 0
         /* XXX FIXME hack to avoid cross-interpreter issue until it
@@ -177,13 +163,13 @@ Parrot_reuse_COW_reference(Interp *interp /*NULLOK*/, STRING *s /*NULLOK*/, STRI
     }
     if (PObj_constant_TEST(s)) {
         PObj_COW_SET(s);
-        copy_string_header(d, s);
+        STRUCT_COPY(d,s);
         PObj_constant_CLEAR(d);
         PObj_external_SET(d);
     }
     else {
         PObj_COW_SET(s);
-        copy_string_header(d, s);
+        STRUCT_COPY(d,s);
         PObj_sysmem_CLEAR(d);
     }
     return d;

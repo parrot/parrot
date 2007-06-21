@@ -15,7 +15,9 @@
 
 /* HEADERIZER BEGIN: src/encodings/utf16.c */
 
-ENCODING * Parrot_encoding_utf16_init( Interp *interp );
+ENCODING * Parrot_encoding_utf16_init( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
 /* HEADERIZER END: src/encodings/utf16.c */
 
 #endif /* PARROT_ENCODING_UTF16_H_GUARD */

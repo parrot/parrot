@@ -121,9 +121,10 @@ PARROT_API ENCODING * Parrot_new_encoding( Interp *interp )
         __attribute__malloc__
         __attribute__warn_unused_result__;
 
-PARROT_API INTVAL Parrot_register_encoding( Interp *interp,
+PARROT_API INTVAL Parrot_register_encoding( Interp *interp /*NN*/,
     const char *encodingname /*NN*/,
     ENCODING *encoding /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 

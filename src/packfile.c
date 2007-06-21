@@ -23,6 +23,7 @@ structure of the frozen bytecode.
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/packfile.h"
+#include "jit.h"
 
 /* HEADER: include/parrot/packfile.h */
 
@@ -1660,13 +1661,11 @@ default_pack(Interp *interp, const PackFile_Segment *self /*NN*/,
     *dest++ = self->itype;
     *dest++ = self->id;
     *dest++ = self->size;
-    if (self->size)
-        memcpy(dest, self->data, self->size * sizeof (opcode_t));
+    if (self->size) {
+        STRUCT_COPY_N(dest, self->data, self->size);
+    }
     return dest + self->size;
 }
-
-/* XXX Should be declared elsewhere */
-extern void Parrot_destroy_jit(void *ptr);
 
 /*
 

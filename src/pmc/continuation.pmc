@@ -151,10 +151,10 @@ Assign context.
 
 */
     void set_pmc(PMC* src) {
-        struct Parrot_cont *cc_self = PMC_cont(SELF);
-        struct Parrot_cont *cc_src  = PMC_cont(src);
+        struct Parrot_cont * const cc_self = PMC_cont(SELF);
+        struct Parrot_cont * const cc_src  = PMC_cont(src);
 
-        memcpy(cc_self, cc_src, sizeof (struct Parrot_cont));
+        STRUCT_COPY(cc_self, cc_src);
         PMC_pmc_val(SELF) = PMC_pmc_val(src);
     }
 /*
