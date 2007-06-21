@@ -42,7 +42,7 @@ Gets a free C<Buffer> from C<pool> and returns it. Memory is cleared.
 */
 
 static void *
-get_free_buffer(Interp *interp, Small_Object_Pool *pool /*NN*/)
+get_free_buffer(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
     /* WARN_UNUSED */
 {
     PObj * const buffer = (PObj *)pool->get_free_object(interp, pool);
@@ -73,7 +73,7 @@ new_pmc_pool(Interp *interp /*NN*/)
 {
     const int num_headers = PMC_HEADERS_PER_ALLOC;
     Small_Object_Pool * const pmc_pool =
-        new_small_object_pool(interp, sizeof (PMC), num_headers);
+        new_small_object_pool(sizeof (PMC), num_headers);
 
     pmc_pool->mem_pool = NULL;
     (interp->arena_base->init_pool)(interp, pmc_pool);
@@ -97,7 +97,7 @@ new_bufferlike_pool(Interp *interp /*NN*/, size_t actual_buffer_size)
     const size_t buffer_size =
             (actual_buffer_size + sizeof (void *) - 1) & ~(sizeof (void *) - 1);
     Small_Object_Pool * const pool =
-            new_small_object_pool(interp, buffer_size, num_headers);
+            new_small_object_pool(buffer_size, num_headers);
 
     pool->mem_pool = interp->arena_base->memory_pool;
     (interp->arena_base->init_pool)(interp, pool);
@@ -452,7 +452,7 @@ Checks that C<ptr> is actually a C<Buffer>.
 */
 
 int
-is_buffer_ptr(Interp *interp /*NN*/, void *ptr) /* XXX Const this */
+is_buffer_ptr(Interp *interp /*NN*/, const void *ptr /*NN*/) /* XXX Const this */
     /* WARN_UNUSED */
 {
     UINTVAL i;
@@ -460,8 +460,7 @@ is_buffer_ptr(Interp *interp /*NN*/, void *ptr) /* XXX Const this */
 
     for (i = 0; i < arena_base->num_sized; i++) {
         if (arena_base->sized_header_pools[i] &&
-                contained_in_pool(interp,
-                        arena_base->sized_header_pools[i], ptr))
+                contained_in_pool(arena_base->sized_header_pools[i], ptr))
             return 1;
     }
 
@@ -477,10 +476,10 @@ Checks that C<ptr> is actually a PMC.
 */
 
 int
-is_pmc_ptr(Interp *interp, void *ptr) /* XXX Const this */
-    /* PURE, WARN_UNUSED */
+is_pmc_ptr(Interp *interp /*NN*/, const void *ptr) /* XXX Const this */
+    /* WARN_UNUSED */
 {
-    return contained_in_pool(interp, interp->arena_base->pmc_pool, ptr);
+    return contained_in_pool(interp->arena_base->pmc_pool, ptr);
 }
 
 
@@ -520,14 +519,14 @@ Parrot_initialize_header_pools(Interp *interp /*NN*/)
 
     /* pmc extension buffer */
     arena_base->pmc_ext_pool =
-        new_small_object_pool(interp, sizeof (PMC_EXT), 1024);
+        new_small_object_pool(sizeof (PMC_EXT), 1024);
     /*
      * pmc_ext isn't a managed item. If a PMC has a pmc_ext structure
      * it is returned to the pool instantly - the structure is never
      * marked.
      * Use GS MS pool functions
      */
-    gc_pmc_ext_pool_init(interp, arena_base->pmc_ext_pool);
+    gc_pmc_ext_pool_init(arena_base->pmc_ext_pool);
     arena_base->pmc_ext_pool->name = "pmc_ext";
 
     /* constant PMCs */

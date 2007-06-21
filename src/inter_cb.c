@@ -158,8 +158,7 @@ verify_CD(char *external_data, PMC *user_data)
             continue;
         interp = interpreter_array[i];
         if (interp)
-            if (contained_in_pool(interp,
-                        interp->arena_base->pmc_pool, user_data))
+            if (contained_in_pool(interp->arena_base->pmc_pool, user_data))
                 break;
     }
     UNLOCK(interpreter_array_mutex);

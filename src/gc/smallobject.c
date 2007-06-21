@@ -40,7 +40,7 @@ XXX If ever there is a function that ought to be consted, this is it.
 */
 
 INTVAL
-contained_in_pool(Interp *interp, Small_Object_Pool *pool /*NN*/, void *ptr)
+contained_in_pool(const Small_Object_Pool *pool /*NN*/, const void *ptr)
     /* WARN_UNUSED */
 {
     const Small_Object_Arena *arena;
@@ -72,7 +72,7 @@ int
 Parrot_is_const_pmc(Parrot_Interp interp /*NN*/, PMC *pmc)
 {
     Small_Object_Pool * const pool = interp->arena_base->constant_pmc_pool;
-    const               int   c    = contained_in_pool(interp, pool, pmc);
+    const               int   c    = contained_in_pool(pool, pmc);
 
     /* some paranoia first */
     assert(!!PObj_constant_TEST(pmc) == !!c);
@@ -90,7 +90,7 @@ We're out of traceable objects. Try a DOD, then get some more if needed.
 */
 
 static void
-more_traceable_objects(Interp *interp, Small_Object_Pool *pool /*NN*/)
+more_traceable_objects(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
 {
     if (pool->skip)
         pool->skip = 0;
@@ -123,6 +123,7 @@ static void
 gc_ms_add_free_object(Interp *interp, Small_Object_Pool *pool /*NN*/,
                       void   *to_add)
 {
+    UNUSED(interp);
     *(void **)to_add = pool->free_list;
     pool->free_list  = to_add;
 }
@@ -248,7 +249,7 @@ gc_ms_alloc_objects(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
     if (!new_arena)
         PANIC("Out of arena memory");
 
-    size                     = pool->object_size * pool->objects_per_alloc;
+    size = pool->object_size * pool->objects_per_alloc;
 
     /* could be mem_internal_allocate too, but calloc is fast */
     new_arena->start_objects = mem_internal_allocate_zeroed(size);
@@ -289,9 +290,8 @@ Creates a new C<Small_Object_Pool> and returns a pointer to it.
 */
 
 Small_Object_Pool *
-new_small_object_pool(Interp *interp,
-        size_t object_size, size_t objects_per_alloc)
-    /* WARN_UNUSED */
+new_small_object_pool(size_t object_size, size_t objects_per_alloc)
+    /* WARN_UNUSED, MALLOC */
 {
     Small_Object_Pool * const pool =
         mem_internal_allocate_zeroed_typed(Small_Object_Pool);
@@ -306,7 +306,7 @@ new_small_object_pool(Interp *interp,
 }
 
 void
-gc_pmc_ext_pool_init(Interp *interp, Small_Object_Pool *pool)
+gc_pmc_ext_pool_init(Small_Object_Pool *pool /*NN*/)
 {
     pool->add_free_object = gc_ms_add_free_object;
     pool->get_free_object = gc_ms_get_free_object;
@@ -315,8 +315,10 @@ gc_pmc_ext_pool_init(Interp *interp, Small_Object_Pool *pool)
 }
 
 static void
-gc_ms_pool_init(Interp *interp, Small_Object_Pool *pool)
+gc_ms_pool_init(Interp *interp, Small_Object_Pool *pool /*NN*/)
 {
+    UNUSED(interp);
+
     pool->add_free_object = gc_ms_add_free_object;
     pool->get_free_object = gc_ms_get_free_object;
     pool->alloc_objects   = gc_ms_alloc_objects;

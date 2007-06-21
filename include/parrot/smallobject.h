@@ -133,17 +133,20 @@ typedef struct Small_Object_Pool {
 
 /* HEADERIZER BEGIN: src/gc/smallobject.c */
 
-INTVAL contained_in_pool( Interp *interp,
-    Small_Object_Pool *pool /*NN*/,
-    void *ptr )
-        __attribute__nonnull__(2)
+INTVAL contained_in_pool(
+    const Small_Object_Pool *pool /*NN*/,
+    const void *ptr )
+        __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
-void gc_pmc_ext_pool_init( Interp *interp, Small_Object_Pool *pool );
-Small_Object_Pool * new_small_object_pool( Interp *interp,
+void gc_pmc_ext_pool_init( Small_Object_Pool *pool /*NN*/ )
+        __attribute__nonnull__(1);
+
+Small_Object_Pool * new_small_object_pool(
     size_t object_size,
     size_t objects_per_alloc )
-        __attribute__warn_unused_result__;
+        __attribute__warn_unused_result__
+        __attribute__malloc__;
 
 void Parrot_add_to_free_list( Interp *interp,
     Small_Object_Pool *pool /*NN*/,
