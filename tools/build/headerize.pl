@@ -167,7 +167,7 @@ sub function_components {
     $static = $2 || '';
 
     # No inline in the header file
-    $returntype =~ s/^INLINE\s+//;
+    $returntype =~ s/^PARROT_INLINE\s+//;
 
     die "Impossible to have both static and PARROT_API" if $parrot_api && $static;
 
