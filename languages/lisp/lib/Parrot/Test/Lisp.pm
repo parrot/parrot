@@ -15,11 +15,64 @@ This is largely a copy of Parrot::Test::Punie.
 
 =cut
 
+# Generate output_is(), output_isnt() and output_like() in current package.
+Parrot::Test::generate_languages_functions(); 
+
 sub new {
     return bless {};
 }
 
-sub output_is {
+
+sub get_lang_fn {
+    my $self = shift;
+    my ( $count, $options ) = @_;
+
+    return File::Spec->rel2abs(Parrot::Test::per_test( '.l',  $count ));
+}
+
+sub get_out_fn {
+    my $self = shift;
+    my ( $count, $options ) = @_;
+
+    return File::Spec->rel2abs(Parrot::Test::per_test( '.out', $count ));
+}
+
+sub get_cd {
+    my $self = shift;
+    my ( $options ) = @_;
+
+    return "$self->{relpath}/languages/lisp";
+}
+
+# never skip
+sub skip_why {
+    my $self = shift;
+    my ($options) = @_;
+
+    return;
+}
+
+sub get_test_prog {
+    my $self = shift;
+    my ( $count, $options ) = @_;
+
+    my $lang_fn = Parrot::Test::per_test( '.l', $count );
+    ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
+    if ( $current_dir eq 'languages' ) {
+        $lang_fn = File::Spec->catdir( '..', $lang_fn );
+    }
+
+    my $test_prog_args = $ENV{TEST_PROG_ARGS} || q{};
+
+    return 
+        join( ' ',
+              "../../$self->{parrot}",
+              'lisp.pbc',
+              $test_prog_args,
+              $lang_fn );
+}
+
+sub output_is_aaaaaaaaaa {
     my ( $self, $code, $output, $desc, %extra ) = @_;
 
     my $count = $self->{builder}->current_test() + 1;

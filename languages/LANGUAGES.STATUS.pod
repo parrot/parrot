@@ -297,7 +297,9 @@ Aspires to implement a significant subset of the Common Lisp language.
 
 =item Status
 
-Broken due to changes in Parrot after Parrot 0.2.0.
+Working for some simple forms.
+Due to some broken features, most of the bootstrapping code
+has been commented out.
 
 =item Last verified with parrot version
 
