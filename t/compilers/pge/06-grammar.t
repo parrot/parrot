@@ -164,3 +164,4 @@ Nuno 'smash' Carvalho <mestre.smash@gmail.com>
 
 =cut
 
+# vi: ft=pir
