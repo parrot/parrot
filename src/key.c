@@ -441,7 +441,7 @@ key_set_to_string(Interp *interp /*NN*/, PMC *key /*NULLOK*/)
                 }
                 break;
             default:
-                string_append(interp, value, string_from_cstring(interp, "Key type unknown", 0));
+                string_append(interp, value, string_from_literal(interp, "Key type unknown"));
                 break;
         }
 

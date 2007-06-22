@@ -179,7 +179,7 @@ japh_compiler(Parrot_Interp interpreter, const char *program)
     sub_data->seg = cur_cs;
     sub_data->address = cur_cs->base.data;
     sub_data->end = cur_cs->base.data + cur_cs->base.size;
-    sub_data->name = string_from_cstring(interpreter, "JaPHC", 0);
+    sub_data->name = string_from_literal(interpreter, "JaPHC");
     return sub;
 }
 

@@ -422,7 +422,7 @@ inline op get_class(out PMC, in STR) :object_classes {
       CONTEXT(interp->ctx)->current_namespace, $2);
   if (!PMC_IS_NULL(ns))
       Parrot_PCCINVOKE(interp, ns,
-          string_from_cstring(interp, "get_class", 0), "->P", &_class);
+          string_from_literal(interp, "get_class"), "->P", &_class);
 
   /* If class is not found, throw an exception; otherwise, put it in $1. */
   if (PMC_IS_NULL(_class))
@@ -440,7 +440,7 @@ inline op get_class(out PMC, in PMC) :object_classes {
   /* If we were not passed a namespace PMC, look it up, otherwise just use
    * the supplied namespace PMC. */
   PMC *ns;
-  if (!VTABLE_isa(interp, $2, string_from_cstring(interp, "NameSpace", 0)))
+  if (!VTABLE_isa(interp, $2, string_from_literal(interp, "NameSpace")))
       ns = Parrot_get_namespace_autobase(interp, $2);
   else
       ns = $2;
@@ -448,7 +448,7 @@ inline op get_class(out PMC, in PMC) :object_classes {
   /* If we have got a namespace, get the class associated with it, if any. */
   if (!PMC_IS_NULL(ns))
       Parrot_PCCINVOKE(interp, ns,
-          string_from_cstring(interp, "get_class", 0), "->P", &_class);
+          string_from_literal(interp, "get_class"), "->P", &_class);
 
   /* If class is not found, throw an exception; otherwise, put it in $1. */
   if (PMC_IS_NULL(_class)) {
@@ -532,8 +532,8 @@ Add the attribute named $2 to the class $1.
 =cut
 
 inline op addattribute(invar PMC, in STR) :object_classes {
-    STRING *class_name  = string_from_cstring(interp, "Class", 0);
-    STRING *pclass_name = string_from_cstring(interp, "ParrotClass", 0);
+    STRING *class_name  = string_from_literal(interp, "Class");
+    STRING *pclass_name = string_from_literal(interp, "ParrotClass");
 
     if (VTABLE_isa(interp, $1, class_name))
         VTABLE_add_attribute(interp, $1, $2, PMCNULL);

@@ -32,7 +32,7 @@ pmclass RubyString
             yes   = string_from_cstring(INTERP, "yes",3);
             no    = string_from_cstring(INTERP, "no",2);
 
-            fixedstringarray_typenum = pmc_type(INTERP, string_from_cstring(INTERP, "FixedStringArray", 0));
+            fixedstringarray_typenum = pmc_type(INTERP, string_from_literal(INTERP, "FixedStringArray"));
             string_anchor = pmc_new(INTERP,fixedstringarray_typenum);
 
             VTABLE_set_integer_native(INTERP,string_anchor,4);

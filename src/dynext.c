@@ -111,7 +111,7 @@ get_path(Interp *interp /*NN*/, STRING *lib, void **handle /*NN*/,
     if (lib == NULL) {
         *handle = Parrot_dlopen((char *)NULL);
         if (*handle) {
-            return string_from_cstring(interp, "", 0);
+            return string_from_literal(interp, "");
         }
         err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
@@ -391,7 +391,7 @@ Parrot_load_lib(Interp *interp /*NN*/, STRING *lib /*NULLOK*/, PMC *initializer)
      * LOCK()
      */
     if (lib == NULL) {
-        wo_ext   = string_from_cstring(interp, "", 0);
+        wo_ext   = string_from_literal(interp, "");
         lib_name = NULL;
     }
     else {

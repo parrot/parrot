@@ -247,7 +247,7 @@ TODO implement freeze/thaw and use that instead.
         INTVAL j, n;
         PMC *val;
 
-        res = string_from_cstring(INTERP, "(", 0);
+        res = string_from_literal(INTERP, "(");
         n = VTABLE_elements(INTERP, SELF);
         for (j = 0; j < n; ++j) {
             val = SELF.get_pmc_keyed_int(j);

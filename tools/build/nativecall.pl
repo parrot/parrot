@@ -621,7 +621,7 @@ HEADER
     push @{$put_pointer_ref}, <<"PUT_POINTER";
         temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
         PMC_data(temp_pmc) = (void*)$value;
-        VTABLE_set_pmc_keyed_str(interp, HashPointer, string_from_cstring(interp, "$key", 0), temp_pmc);
+        VTABLE_set_pmc_keyed_str(interp, HashPointer, string_from_literal(interp, "$key"), temp_pmc);
 PUT_POINTER
 
     #        qq|        parrot_hash_put( interp, known_frames, const_cast("$key"), $value );|;

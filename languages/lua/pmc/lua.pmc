@@ -216,7 +216,7 @@ information see F<src/pmc.c>.
         STRING *str;
         parrot_context_t *ctx;
 
-        bt = string_from_cstring(INTERP, "stack traceback:\n", 0);
+        bt = string_from_literal(INTERP, "stack traceback:\n");
         /* information about the current sub */
         ctx = CONTEXT(INTERP->ctx);
 

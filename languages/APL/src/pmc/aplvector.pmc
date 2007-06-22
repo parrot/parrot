@@ -114,7 +114,7 @@ Returns a vector-like PMC containing the shape of this PMC.
         INTVAL array_t;
         STRING* property_name;
 
-        property_name = string_from_cstring(INTERP,"shape",0);
+        property_name = string_from_literal(INTERP,"shape");
         shape = VTABLE_getprop(INTERP, SELF, property_name);
         if (PMC_IS_NULL(shape)) {
            /*
@@ -126,7 +126,7 @@ Returns a vector-like PMC containing the shape of this PMC.
             */
             /*
             array_t = pmc_type(INTERP,
-                string_from_cstring(INTERP, "APLVector", 0)
+                string_from_literal(INTERP, "APLVector")
             );
             */
             shape = pmc_new(INTERP,VTABLE_type(INTERP,SELF));
@@ -165,7 +165,7 @@ the end of the APLv.
         INTVAL  old_size,new_size,pos;
 
         /* save the old shape momentarily, set the new shape */
-        property_name = string_from_cstring(INTERP,"shape",0);
+        property_name = string_from_literal(INTERP,"shape");
         old_shape = VTABLE_getprop(INTERP, SELF, property_name);
         VTABLE_setprop(INTERP, SELF, property_name, new_shape);
 

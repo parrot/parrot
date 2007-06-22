@@ -39,7 +39,7 @@ inline op fortytwo(out INT) {
 }
 
 inline op what_do_you_get_if_you_multiply_six_by_nine(out STR) {
-    $1 = string_from_cstring(interp, "fortytwo", 0);
+    $1 = string_from_literal(interp, "fortytwo");
     goto NEXT();
 }
 

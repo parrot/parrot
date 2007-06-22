@@ -47,7 +47,7 @@ Class initialization. Caches the type id of various PMCs.
     void class_init() {
         if (pass) {
             dynpmc_TclInt = pmc_type(INTERP,
-                string_from_cstring(INTERP, "TclInt", 0));
+                string_from_literal(INTERP, "TclInt"));
         }
     }
 

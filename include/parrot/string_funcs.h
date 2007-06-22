@@ -175,6 +175,9 @@ PARROT_API STRING * string_from_cstring( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
+#define CSTRING_WITH_LEN(s) (s ""), (sizeof(s)-1)
+#define string_from_literal(i,s) string_from_cstring((i),CSTRING_WITH_LEN(s))
+
 PARROT_API STRING * string_from_int( Interp *interp /*NN*/, INTVAL i )
         __attribute__nonnull__(1);
 

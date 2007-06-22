@@ -1352,9 +1352,9 @@ create_image(Parrot_Interp interp, PMC *pmc, visit_info *info)
 {
     INTVAL len;
     if (!PMC_IS_NULL(pmc) && (VTABLE_does(interp, pmc,
-                string_from_cstring(interp, "array", 0)) ||
+                string_from_literal(interp, "array")) ||
         VTABLE_does(interp, pmc,
-                string_from_cstring(interp, "hash", 0)))) {
+                string_from_literal(interp, "hash")))) {
         const INTVAL items = VTABLE_elements(interp, pmc);
         /*
          * TODO check e.g. first item of aggregate and estimate size

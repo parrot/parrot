@@ -534,7 +534,7 @@ mk_multi_sig(Interp *interp /*NN*/, SymReg *r /*NN*/)
     /* :multi() n = 1, reg = NULL */
     if (!pcc_sub->multi[0]) {
         STRING *sig;
-        sig     = string_from_cstring(interp, "__VOID", 0);
+        sig     = string_from_literal(interp, "__VOID");
         sig_pmc = pmc_new(interp, enum_class_String);
 
         VTABLE_set_string_native(interp, sig_pmc, sig);

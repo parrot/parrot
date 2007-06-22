@@ -113,10 +113,10 @@ inline op tcl_error(in STR, in PMC) {
   PMC* exception = pmc_new(interp, enum_class_Exception);
   PMC* tcl_key = pmc_new(interp, enum_class_Key);
 
-  VTABLE_set_string_native(interp, tcl_key, string_from_cstring(interp,"tcl",0));
+  VTABLE_set_string_native(interp, tcl_key, string_from_literal(interp,"tcl"));
   ns = Parrot_get_namespace_keyed(interp, root_ns, tcl_key);
 
-  errorCode = Parrot_find_global_n(interp, ns, string_from_cstring(interp,"$errorCode",0));
+  errorCode = Parrot_find_global_n(interp, ns, string_from_literal(interp,"$errorCode"));
   VTABLE_assign_pmc(interp, errorCode, $2);
 
   VTABLE_set_string_keyed_int(interp, exception, 0, $1);

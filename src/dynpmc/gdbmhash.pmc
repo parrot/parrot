@@ -90,7 +90,7 @@ So we do a bit of cheating here, and load it during class initialization.
 #ifdef WIN32
             /* XXX: What if libgdbm.so cannot be loaded */
             /* Parrot_load_lib(INTERP, slib, NULL); */
-            STRING *slib = string_from_cstring(INTERP, "gdbm3", 0);
+            STRING *slib = string_from_literal(INTERP, "gdbm3");
 #endif
         }
     }

@@ -71,7 +71,7 @@ Setup default compiler for PASM.
 static void
 setup_default_compreg(Parrot_Interp interp)
 {
-    STRING * const pasm1 = string_from_cstring(interp, "PASM1", 0);
+    STRING * const pasm1 = string_from_literal(interp, "PASM1");
 
     /* register the nci compiler object */
     Parrot_compreg(interp, pasm1, (Parrot_compiler_func_t)PDB_compile);

@@ -232,7 +232,7 @@ pmclass PugsCapture extends PugsAny
 
 
     STRING* get_repr() {
-        return string_from_cstring(INTERP, "toto", 0);
+        return string_from_literal(INTERP, "toto");
     }
 
     STRING* get_string() {

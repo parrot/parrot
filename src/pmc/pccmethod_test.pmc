@@ -62,7 +62,7 @@ Marks the hash as live.
     }
     PCCMETHOD void test_method2(int a1 :optional, int a1o :opt_flag, PMC *slurpy_pos :slurpy)
     {
-        STRING* kevin = string_from_cstring(interp, "KEVIN", 0);
+        STRING* kevin = string_from_literal(interp, "KEVIN");
         PIO_printf(interp, "test_method2\n");
         PIO_printf(interp, "%d, %d, %Ss %Ss\n", a1, a1o, VTABLE_name(interp, slurpy_pos),
                 VTABLE_get_repr(interp,slurpy_pos));
