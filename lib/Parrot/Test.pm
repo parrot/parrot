@@ -297,8 +297,8 @@ sub run_command {
     local *OLDERR if $err;
 
     # Save the old filehandles; we must not let them get closed.
-    open OLDOUT, ">&STDOUT" or die "Can't save     stdout" if $out;
-    open OLDERR, ">&STDERR" or die "Can't save     stderr" if $err;
+    open OLDOUT, '>&STDOUT' or die "Can't save     stdout" if $out;  ## no critic InputOutput::ProhibitBarewordFileHandles 
+    open OLDERR, '>&STDERR' or die "Can't save     stderr" if $err;  ## no critic InputOutput::ProhibitBarewordFileHandles 
 
     open STDOUT, ">", "$out" or die "Can't redirect stdout to $out" if $out;
     open STDERR, ">$err" or die "Can't redirect stderr to $err" if $err;
@@ -386,7 +386,7 @@ sub write_code_to_file {
 sub slurp_file {
     my ($file_name) = @_;
 
-    open( SLURP, "<", "$file_name" ) or die "open '$file_name': $!";
+    open( SLURP, '<', $file_name ) or die "open '$file_name': $!";
     local $/ = undef;
     my $file = <SLURP> . '';
     $file =~ s/\cM\cJ/\n/g;
@@ -427,11 +427,11 @@ sub generate_languages_functions {
     );
 
     foreach my $func ( keys %test_map ) {
-    
+
         my $test_sub = sub {
             my $self = shift;
             my ( $code, $output, $desc, %options ) = @_;
-    
+
             # set a TODO for Test::Builder to find
             my $call_pkg = $self->{builder}->exported_to() || '';
 
@@ -441,22 +441,22 @@ sub generate_languages_functions {
                 if defined $options{todo};
 
             my $count = $self->{builder}->current_test() + 1;
-    
+
             # These are the thing that depend on the actual language implementation
             my $out_fn    = $self->get_out_fn( $count,    \%options );
             my $lang_fn   = $self->get_lang_fn( $count,    \%options );
             my $cd        = $self->get_cd( \%options );
             my @test_prog = $self->get_test_prog( $count, \%options );
-    
+
             Parrot::Test::write_code_to_file( $code, $lang_fn );
-    
+
             # set a TODO for Test::Builder to find
             my $skip_why = $self->skip_why( \%options );
             if ($skip_why) {
                 $self->{builder}->skip($skip_why);
             }
             else {
-    
+
                 # STDERR is written into same output file
                 my $exit_code = Parrot::Test::run_command(
                     \@test_prog,
@@ -464,9 +464,9 @@ sub generate_languages_functions {
                     STDOUT => $out_fn,
                     STDERR => $out_fn
                 );
-    
+
                 my $meth = $test_map{$func};
-    
+
                 my $pass = $self->{builder}->$meth( Parrot::Test::slurp_file($out_fn), $output, $desc );
                 if ( ! $pass) {
                     my $diag = '';
@@ -479,10 +479,10 @@ sub generate_languages_functions {
                     }
                 }
             }
-    
+
             # The generated files are left in the t/* directories.
             # Let 'make clean' and 'svn:ignore' take care of them.
-    
+
             return;
         };
 
@@ -878,7 +878,7 @@ sub _generate_functions {
             if ( defined $extension ) {
                 my $code      = slurp_file($example_f);
                 my $test_func = join( '::', $package, $example_test_map{$func} );
-        
+
                 no strict 'refs';
 
                 $test_func->(

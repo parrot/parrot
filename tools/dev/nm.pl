@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2004, The Perl Foundation.
+# Copyright (C) 2004-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -298,8 +298,8 @@ for my $f (@ARGV) {
         warn "$ME: No such file: $f\n";
         next;
     }
-    if ( open( my $NM, "$nm_cmd $nm_opt $f |" ) ) {
-        my $o = "?";
+    if ( open( my $NM, '<',  "$nm_cmd $nm_opt $f |" ) ) {
+        my $o = '?';
         $o = $f if $f =~ /\.o$/;
         my $file;
         while (<$NM>) {

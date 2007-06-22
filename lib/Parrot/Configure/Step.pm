@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -247,8 +247,7 @@ syntax works ok.
 sub genfile {
     my ( $source, $target, %options ) = @_;
 
-    open my $in, '<', $source or die "Can't open $source: $!";
-
+    open my $in,  '<', $source       or die "Can't open $source: $!";
     open my $out, '>', "$target.tmp" or die "Can't open $target.tmp: $!";
 
     if ( !exists $options{makefile} && $target =~ m/makefile$/i ) {
@@ -431,15 +430,12 @@ sub _run_command {
         $err = "&STDOUT";
     }
 
-    local *OLDOUT if $out;
-    local *OLDERR if $err;
-
     # Save the old filehandles; we must not let them get closed.
-    open OLDOUT, ">&STDOUT" or die "Can't save     stdout" if $out;
-    open OLDERR, ">&STDERR" or die "Can't save     stderr" if $err;
+    open my $OLDOUT, '>&', \*STDOUT or die "Can't save     stdout" if $out;
+    open my $OLDERR, '>&', \*STDERR or die "Can't save     stderr" if $err;
 
-    open STDOUT, ">", "$out" or die "Can't redirect stdout" if $out;
-    open STDERR, ">$err" or die "Can't redirect stderr" if $err;
+    open STDOUT, '>', $out or die "Can't redirect stdout" if $out;
+    open STDERR, '>', $err or die "Can't redirect stderr" if $err;
 
     system $command;
     my $exit_code = $? >> 8;
@@ -447,8 +443,8 @@ sub _run_command {
     close STDOUT or die "Can't close    stdout" if $out;
     close STDERR or die "Can't close    stderr" if $err;
 
-    open STDOUT, ">&", \*OLDOUT or die "Can't restore  stdout" if $out;
-    open STDERR, ">&", \*OLDERR or die "Can't restore  stderr" if $err;
+    open STDOUT, '>&', $OLDOUT or die "Can't restore  stdout" if $out;
+    open STDERR, '>&', $OLDERR or die "Can't restore  stderr" if $err;
 
     if ($verbose) {
         foreach ( $out, $err ) {
@@ -456,7 +452,7 @@ sub _run_command {
                 && ( $_ ne File::Spec->devnull )
                 && ( !m/^&/ ) )
             {
-                open( my $out, "<", $_ );
+                open( my $out, '<', $_ );
                 print <$out>;
                 close $out;
             }
@@ -582,15 +578,15 @@ sub capture_output {
     my $command = join ' ', @_;
 
     # disable STDERR
-    open OLDERR, ">&STDERR";
-    open STDERR, ">", "test.err";
+    open my $OLDERR, '>&', \*STDERR;
+    open STDERR,     '>',  'test.err';
 
     my $output = `$command`;
     my $retval = ( $? == -1 ) ? -1 : ( $? >> 8 );
 
     # reenable STDERR
     close STDERR;
-    open STDERR, ">&", \*OLDERR;
+    open STDERR, '>&', $OLDERR;
 
     # slurp stderr
     my $out_err = _slurp('./test.err');

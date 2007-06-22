@@ -712,7 +712,7 @@ sub get_super_mmds {
 
 Returns three values:
 
-The first is an arrayref of 
+The first is an arrayref of
 <[ mmd_number, left_type, right_type, implementation_func]>
 suitable for initializing the MMD list.
 

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2004, The Perl Foundation.
+# Copyright (C) 2004-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -175,7 +175,7 @@ my %DataR;
 my %Undef;
 my %API;
 
-if ( open( my $NM, "perl tools/dev/nm.pl -BDo '$Obj' |" ) ) {
+if ( open( my $NM, '<', "perl tools/dev/nm.pl -BDo '$Obj' |" ) ) {
     while (<$NM>) {
         my ( $o, $s, $v ) = split;
         $API{$s} = $o;
