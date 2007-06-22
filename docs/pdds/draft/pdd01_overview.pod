@@ -48,7 +48,7 @@ transform data structures. In most compilers, the syntax tree goes
 through a series of transformations, starting with the raw parse tree,
 through a syntax tree that is close to the semantics of the HLL, and
 ending in a syntax tree that is close to the semantics of Parrot's
-bytecode. Some compilers will also insert optimizations stages into the
+bytecode. Some compilers will also insert optimization stages into the
 compilation process between the common transformation stages.
 
 =head2 IMCC
