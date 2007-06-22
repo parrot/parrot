@@ -209,7 +209,7 @@ void PDB_print( Interp *interp /*NN*/, const char *command /*NN*/ )
 
 void PDB_print_user_stack( Interp *interp, const char *command );
 char PDB_program_end( Interp *interp );
-void PDB_run_command( Interp *interp /*NN*/, const char *command /*NN*/ )
+int PDB_run_command( Interp *interp /*NN*/, const char *command /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -218,6 +218,7 @@ void PDB_skip_breakpoint( Interp *interp, long i );
 void PDB_trace( Interp *interp, const char *command );
 int PDB_unescape( char *string );
 void PDB_watchpoint( Interp *interp, const char *command );
+void PDB_script_file(Interp *interp, const char *command );
 /* HEADERIZER END: src/debug.c */
 
 
@@ -260,6 +261,7 @@ void PDB_watchpoint( Interp *interp, const char *command );
 #define c_watch         416160
 #define c_enable        571455
 #define c_delete        588285
+#define c_script_file   617610
 #define c_disable       772140
 #define c_continue      1053405
 #define c_disassemble   1903830

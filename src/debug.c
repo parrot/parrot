@@ -337,6 +337,59 @@ PDB_get_command(Interp *interp /*NN*/)
 
 /*
 
+FUNCDOC: PDB_script_file
+
+Interprets the contents of a file as user input commands
+
+*/
+
+void
+PDB_script_file(Interp *interp /*NN*/, const char *command /*NN*/)
+{
+    char buf[1024];
+    const char *ptr = (const char *)&buf;
+    int line = 0;
+    FILE *fd;
+
+    command = nextarg(command);
+
+    fd = fopen(command, "r");
+    if (!fd) {
+        IMCC_warning(interp, "script_file: "
+            "Error reading script file %s.\n",
+            command);
+        return;
+    }
+
+    while(!feof(fd)) {
+        line++;
+        buf[0]='\0';
+        fgets(buf, 1024, fd);
+
+        /* skip spaces */
+        for(ptr=(char *)&buf;*ptr&&isspace(*ptr);ptr=ptr+1);
+
+        /* avoid null blank and commented lines */
+        if (*buf == '\0' || *buf == '#')
+            continue;
+        
+        buf[strlen(buf)-1]='\0';
+        /* TODO: handle command error and print out script line
+         *       PDB_run_command should return non-void value?
+         *       stop execution of script if fails
+         * TODO: avoid this verbose output? add -v flag? */
+        if (PDB_run_command(interp, buf)) {
+            IMCC_warning(interp, "script_file: "
+                "Error interpreting command at line %d (%s).\n",
+                line, command);
+                break;
+        }
+    }
+    fclose(fd);
+}
+
+/*
+
 FUNCDOC: PDB_run_command
 
 Run a command.
@@ -345,7 +398,7 @@ Hash the command to make a simple switch calling the correct handler.
 
 */
 
-void
+int
 PDB_run_command(Interp *interp /*NN*/, const char *command /*NN*/)
 {
     unsigned long c;
@@ -362,6 +415,9 @@ PDB_run_command(Interp *interp /*NN*/, const char *command /*NN*/)
         skip_command(command);
 
     switch (c) {
+        case c_script_file:
+            PDB_script_file(interp, command);
+            break;
         case c_disassemble:
             PDB_disassemble(interp, command);
             break;
@@ -433,8 +489,9 @@ PDB_run_command(Interp *interp /*NN*/, const char *command /*NN*/)
         default:
             PIO_eprintf(interp,
                         "Undefined command: \"%s\".  Try \"help\".", temp);
-            break;
+            return 1;
     }
+    return 0;
 }
 
 /*
@@ -2308,6 +2365,11 @@ For example:\n\n\
            break 45 if S1 == \"foo\"\n\n\
 The command returns a number which is the breakpoint identifier.");
             break;
+        case c_script_file:
+PIO_eprintf(interp, "Interprets a file.\n\
+Usage:\n\
+(pdb) script file.script\n");
+            break;
         case c_watch:
             PIO_eprintf(interp,"No documentation yet");
             break;
@@ -2376,6 +2438,7 @@ List of commands:\n\
     list     (l) -- list the source code file\n\
     run      (r) -- run the program\n\
     break    (b) -- add a breakpoint\n\
+    script   (f) -- interprets a file as user commands\n\
     watch    (w) -- add a watchpoint\n\
     delete   (d) -- delete a breakpoint\n\
     disable      -- disable a breakpoint\n\
