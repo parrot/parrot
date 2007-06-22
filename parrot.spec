@@ -70,8 +70,8 @@ make reallyinstall DESTDIR=$RPM_BUILD_ROOT
 rm -rf $RPM_BUILD_ROOT/%{_docdir}/parrot
 
 # Force permissions on doc directories.
-find LICENSES docs examples -type d -exec chmod 755 {} \;
-find LICENSES docs examples -type f -exec chmod 644 {} \;
+find docs examples -type d -exec chmod 755 {} \;
+find docs examples -type f -exec chmod 644 {} \;
 
 # Force permissions on shared libs so they get stripped.
 find $RPM_BUILD_ROOT%{_libdir} -type f \( -name '*.so' -o -name '*.so.*' \) \
@@ -101,7 +101,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc ABI_CHANGES ChangeLog CREDITS NEWS PBC_COMPAT PLATFORMS README
 %doc RESPONSIBLE_PARTIES TODO
-%doc LICENSES docs examples
+%doc docs examples
 %exclude %{_bindir}/parrot-config
 %{_bindir}/*
 %{_libdir}/parrot
