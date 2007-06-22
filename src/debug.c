@@ -372,7 +372,7 @@ PDB_script_file(Interp *interp /*NN*/, const char *command /*NN*/)
         /* avoid null blank and commented lines */
         if (*buf == '\0' || *buf == '#')
             continue;
-        
+
         buf[strlen(buf)-1]='\0';
         /* TODO: handle command error and print out script line
          *       PDB_run_command should return non-void value?
