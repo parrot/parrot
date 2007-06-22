@@ -79,11 +79,11 @@ PARROT_API PMC* tm_to_array(
         __attribute__nonnull__(2);
 
 FLOATVAL floatval_mod( FLOATVAL n2, FLOATVAL n3 )
-        __attribute__pure__
+        __attribute__const__
         __attribute__warn_unused_result__;
 
 INTVAL intval_mod( INTVAL i2, INTVAL i3 )
-        __attribute__pure__
+        __attribute__const__
         __attribute__warn_unused_result__;
 
 /* HEADERIZER END: src/utils.c */

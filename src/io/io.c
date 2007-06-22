@@ -1374,7 +1374,7 @@ Returns a boolean value indicating whether C<*pmc> is a console/tty.
 PARROT_API
 INTVAL
 PIO_isatty(Interp *interp, PMC *pmc /*NN*/)
-    /* PURE, WARN_UNUSED */
+    /* WARN_UNUSED */
 {
     ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
 

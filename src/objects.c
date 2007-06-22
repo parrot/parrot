@@ -348,6 +348,7 @@ const char*
 Parrot_MMD_method_name(Interp *interp, INTVAL idx)
     /* WARN_UNUSED, PURE */
 {
+    UNUSED(interp);
     assert(idx >= 0);
 
     if (idx >= MMD_USER_FIRST)
@@ -371,6 +372,7 @@ Parrot_MMD_method_idx(Interp *interp, const char *name)
     /* WARN_UNUSED, PURE */
 {
     INTVAL i;
+    UNUSED(interp);
 
     for (i = 0; i < MMD_USER_FIRST; ++i) {
         if (strcmp(Parrot_mmd_func_names[i], name) == 0)

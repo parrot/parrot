@@ -66,7 +66,6 @@ PARROT_API PMC* pmc_reuse( Interp *interp /*NN*/,
 PARROT_API INTVAL pmc_type( Interp* interp /*NN*/, STRING *name /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__pure__
         __attribute__warn_unused_result__;
 
 PARROT_API INTVAL pmc_type_p( Interp* interp /*NN*/, PMC *name /*NN*/ )

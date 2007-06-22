@@ -388,13 +388,14 @@ find_not_cclass(Interp *interp, INTVAL flags, STRING *source_string /*NN*/,
  * TODO pass in the Hash's seed value as initial hashval
  */
 size_t
-ascii_compute_hash(Interp *interp, STRING *source_string /*NN*/, size_t seed)
+ascii_compute_hash(Interp *interp, const STRING *source_string /*NN*/, size_t seed)
     /* PURE,WARN_UNUSED */
 {
     size_t hashval = seed;
-
     const char *buffptr = (char *)source_string->strstart;
     UINTVAL len = source_string->strlen;
+
+    UNUSED(interp);
 
     assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
     while (len--) {

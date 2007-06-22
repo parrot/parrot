@@ -106,8 +106,7 @@ PARROT_API void * list_get( Interp *interp,
     INTVAL idx,
     int type )
         __attribute__nonnull__(2)
-        __attribute__warn_unused_result__
-        __attribute__pure__;
+        __attribute__warn_unused_result__;
 
 PARROT_API void list_insert( Interp *interp,
     List *list /*NN*/,

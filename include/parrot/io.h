@@ -211,7 +211,6 @@ PARROT_API INTVAL PIO_init_stacks( Interp *interp );
 PARROT_API void PIO_internal_shutdown( Interp *interp );
 PARROT_API INTVAL PIO_isatty( Interp *interp, PMC *pmc /*NN*/ )
         __attribute__nonnull__(2)
-        __attribute__pure__
         __attribute__warn_unused_result__;
 
 PARROT_API INTVAL PIO_listen( Interp *interp,

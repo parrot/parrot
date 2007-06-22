@@ -64,7 +64,7 @@ Mathematics*, Second Edition. Addison-Wesley, 1994.
 
 INTVAL
 intval_mod(INTVAL i2, INTVAL i3)
-    /* PURE,WARN_UNUSED */
+    /* CONST, WARN_UNUSED */
 {
     INTVAL y;
     INTVAL z = i3;
@@ -105,7 +105,7 @@ Includes a workaround for buggy code generation in the C<lcc> compiler.
 
 FLOATVAL
 floatval_mod(FLOATVAL n2, FLOATVAL n3)
-    /* PURE, WARN_UNUSED */
+    /* CONST, WARN_UNUSED */
 {
 #ifdef __LCC__
 

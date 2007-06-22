@@ -97,7 +97,7 @@ Returns the height of the stack. The maximum "depth" is height - 1.
 PARROT_API
 size_t
 stack_height(Interp *interp, const Stack_Chunk_t *chunk /*NN*/)
-    /* PURE, WARN_UNUSED */
+    /* WARN_UNUSED */
 {
     size_t height = 0;
     UNUSED(interp);
@@ -125,7 +125,7 @@ if C<|depth| > number> of entries in stack.
 PARROT_API
 Stack_Entry_t *
 stack_entry(Interp *interp /*NN*/, Stack_Chunk_t *stack /*NN*/, INTVAL depth)
-    /* PURE, WARN_UNUSED */
+    /* WARN_UNUSED */
 {
     Stack_Chunk_t *chunk;
     Stack_Entry_t *entry;
@@ -352,7 +352,7 @@ PARROT_API
 void *
 stack_peek(Interp *interp /*NN*/, Stack_Chunk_t *stack_base /*NN*/,
            Stack_entry_type *type /*NULLOK*/)
-    /* PURE, WARN_UNUSED */
+    /* WARN_UNUSED */
 {
     const Stack_Entry_t * const entry = stack_entry(interp, stack_base, 0);
     if (entry == NULL) {

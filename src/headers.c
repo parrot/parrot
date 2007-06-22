@@ -371,7 +371,7 @@ Calculates the maximum buffer address and returns it.
 
 size_t
 get_max_buffer_address(Interp *interp /*NN*/)
-    /* PURE, WARN_UNUSED */
+    /* WARN_UNUSED */
 {
     UINTVAL i;
     size_t max = 0;
@@ -397,7 +397,7 @@ Calculates the minimum buffer address and returns it.
 
 size_t
 get_min_buffer_address(Interp *interp /*NN*/)
-    /* PURE, WARN_UNUSED */
+    /* WARN_UNUSED */
 {
     UINTVAL i;
     Arenas * const arena_base = interp->arena_base;
@@ -423,7 +423,7 @@ Calculates the maximum PMC address and returns it.
 
 size_t
 get_max_pmc_address(const Interp *interp /*NN*/)
-    /* PURE, WARN_UNUSED */
+    /* WARN_UNUSED */
 {
     return interp->arena_base->pmc_pool->end_arena_memory;
 }
@@ -438,7 +438,7 @@ Calculates the maximum PMC address and returns it.
 
 size_t
 get_min_pmc_address(Interp *interp /*NN*/)
-    /* PURE, WARN_UNUSED */
+    /* WARN_UNUSED */
 {
     return interp->arena_base->pmc_pool->start_arena_memory;
 }
@@ -452,7 +452,7 @@ Checks that C<ptr> is actually a C<Buffer>.
 */
 
 int
-is_buffer_ptr(Interp *interp /*NN*/, const void *ptr /*NN*/) /* XXX Const this */
+is_buffer_ptr(const Interp *interp /*NN*/, const void *ptr /*NN*/)
     /* WARN_UNUSED */
 {
     UINTVAL i;
@@ -476,7 +476,7 @@ Checks that C<ptr> is actually a PMC.
 */
 
 int
-is_pmc_ptr(Interp *interp /*NN*/, const void *ptr) /* XXX Const this */
+is_pmc_ptr(const Interp *interp /*NN*/, const void *ptr)
     /* WARN_UNUSED */
 {
     return contained_in_pool(interp->arena_base->pmc_pool, ptr);

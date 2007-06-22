@@ -465,7 +465,7 @@ aligned_size(const Buffer *buffer /*NN*/, size_t len)
 
 static char *
 aligned_mem(const Buffer *buffer /*NN*/, char *mem)
-    /* PURE, WARN_UNUSED */
+    /* WARN_UNUSED */
 {
     if (PObj_is_COWable_TEST(buffer))
         mem += sizeof (void*);

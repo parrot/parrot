@@ -83,13 +83,11 @@ PARROT_API Stack_Entry_t * stack_entry( Interp *interp /*NN*/,
     INTVAL depth )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__pure__
         __attribute__warn_unused_result__;
 
 PARROT_API size_t stack_height( Interp *interp,
     const Stack_Chunk_t *chunk /*NN*/ )
         __attribute__nonnull__(2)
-        __attribute__pure__
         __attribute__warn_unused_result__;
 
 PARROT_API void * stack_peek( Interp *interp /*NN*/,
@@ -97,7 +95,6 @@ PARROT_API void * stack_peek( Interp *interp /*NN*/,
     Stack_entry_type *type /*NULLOK*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__pure__
         __attribute__warn_unused_result__;
 
 PARROT_API void * stack_pop( Interp *interp,

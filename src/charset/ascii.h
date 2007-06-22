@@ -27,7 +27,7 @@ INTVAL ascii_compare( Interp *interp,
         __attribute__warn_unused_result__;
 
 size_t ascii_compute_hash( Interp *interp,
-    STRING *source_string /*NN*/,
+    const STRING *source_string /*NN*/,
     size_t seed )
         __attribute__nonnull__(2)
         __attribute__pure__

@@ -1238,8 +1238,10 @@ otherwise.
 PARROT_API
 INTVAL
 string_equal(Interp *interp, const STRING *s1 /*NULLOK*/, const STRING *s2 /*NULLOK*/)
-    /* PURE, WARN_UNUSED */
+    /* WARN_UNUSED */
 {
+    UNUSED(interp);
+
     if ((s1 == s2) || (!s1 && !s2)) {
         return 0;
     }
@@ -1632,7 +1634,7 @@ if it is equal to anything other than C<0>, C<""> or C<"0">.
 PARROT_API
 INTVAL
 string_bool(Interp *interp /*NN*/, const STRING *s /*NULLOK*/)
-    /* PURE, WARN_UNUSED */
+    /* WARN_UNUSED */
 {
     const INTVAL len = string_length(interp, s);
 

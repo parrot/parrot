@@ -1758,7 +1758,7 @@ Returns the item of type C<type> at index C<idx>.
 PARROT_API
 void *
 list_get(Interp *interp, List *list /*NN*/, INTVAL idx, int type)
-    /* WARN_UNUSED, PURE */
+    /* WARN_UNUSED */
 {
     const INTVAL length = list->length;
 

@@ -81,7 +81,10 @@ struct QUEUE_ENTRY;
 /* HEADERIZER BEGIN: src/events.c */
 
 PARROT_API void Parrot_del_timer_event( Interp *interp, PMC *timer );
-PARROT_API opcode_t * Parrot_do_check_events( Interp *interp, opcode_t *next );
+PARROT_API opcode_t * Parrot_do_check_events( Interp *interp /*NN*/,
+    opcode_t *next )
+        __attribute__nonnull__(1);
+
 PARROT_API opcode_t * Parrot_do_handle_events( Interp *interp /*NN*/,
     int restore,
     opcode_t *next )

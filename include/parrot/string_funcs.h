@@ -110,7 +110,6 @@ PARROT_API STRING * string_bitwise_xor( Interp *interp /*NN*/,
 PARROT_API INTVAL string_bool( Interp *interp /*NN*/,
     const STRING *s /*NULLOK*/ )
         __attribute__nonnull__(1)
-        __attribute__pure__
         __attribute__warn_unused_result__;
 
 PARROT_API UINTVAL string_capacity( Interp *interp /*NULLOK*/,
@@ -161,7 +160,6 @@ PARROT_API void string_downcase_inplace( Interp *interp,
 PARROT_API INTVAL string_equal( Interp *interp,
     const STRING *s1 /*NULLOK*/,
     const STRING *s2 /*NULLOK*/ )
-        __attribute__pure__
         __attribute__warn_unused_result__;
 
 PARROT_API STRING * string_escape_string( Interp *interp,
