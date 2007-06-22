@@ -71,8 +71,7 @@ static void* io_thread(void *data);
 static opcode_t * do_event(Parrot_Interp, parrot_event *, opcode_t *);
 static void stop_io_thread(void);
 static void schedule_signal_event(int signum);
-void Parrot_schedule_broadcast_qentry(QUEUE_ENTRY *entry);
-static QUEUE_ENTRY* dup_entry(QUEUE_ENTRY *entry);
+static QUEUE_ENTRY* dup_entry(const QUEUE_ENTRY *entry);
 
 /*
  * we have exactly one global event_queue
@@ -112,8 +111,6 @@ typedef struct io_thread_msg {
     parrot_event *ev;
 } io_thread_msg;
 
-
-#define MSG_SIZE (sizeof (io_thread_msg))
 
 /*
 
@@ -724,7 +721,7 @@ io_thread(void *data)
                              * a command arrived
                              */
                             edebug((stderr, "msg arrived\n"));
-                            if (read(PIPE_READ_FD, &buf, MSG_SIZE) != MSG_SIZE)
+                            if (read(PIPE_READ_FD, &buf, sizeof(buf)) != sizeof(buf))
                                 internal_exception(1,
                                         "read error from msg pipe");
                             switch (buf.command) {
@@ -791,9 +788,10 @@ stop_io_thread(void)
     /*
      * tell IO thread to stop
      */
+    memset(&buf, 0, sizeof(buf));
     buf.command = IO_THR_MSG_TERMINATE;
 #ifndef WIN32
-    if (write(PIPE_WRITE_FD, &buf, MSG_SIZE) != MSG_SIZE)
+    if (write(PIPE_WRITE_FD, &buf, sizeof(buf)) != sizeof(buf))
         internal_exception(1, "msg pipe write failed");
 #endif
 }
@@ -804,8 +802,8 @@ Parrot_event_add_io_event(Interp *interp,
         PMC *pio, PMC *sub, PMC *data, INTVAL which)
 {
     io_thread_msg buf;
-
     parrot_event * const event = mem_allocate_typed(parrot_event);
+
     event->type        = EVENT_TYPE_IO;
     event->interp      = interp;
     /*
@@ -820,7 +818,7 @@ Parrot_event_add_io_event(Interp *interp,
     buf.command = which;
     buf.ev      = event;
 #ifndef WIN32
-    if (write(PIPE_WRITE_FD, &buf, MSG_SIZE) != MSG_SIZE)
+    if (write(PIPE_WRITE_FD, &buf, sizeof(buf)) != sizeof(buf))
         internal_exception(1, "msg pipe write failed");
 #endif
 }
@@ -837,7 +835,8 @@ Duplicate queue entry.
 */
 
 static QUEUE_ENTRY*
-dup_entry(QUEUE_ENTRY *entry)
+dup_entry(const QUEUE_ENTRY *entry /*NN*/)
+    /* MALLOC, WARN_UNUSED */
 {
     QUEUE_ENTRY * const new_entry = mem_allocate_typed(QUEUE_ENTRY);
 
@@ -960,9 +959,7 @@ events for all interpreters.
 static void*
 event_thread(void *data)
 {
-    QUEUE *event_q = (QUEUE *) data;
-    parrot_event* event;
-    QUEUE_ENTRY *entry;
+    QUEUE * const event_q = (QUEUE *) data;
     int running = 1;
 
     LOCK(event_q->queue_mutex);
@@ -972,7 +969,8 @@ event_thread(void *data)
     if (peek_entry(event_q))
         running = process_events(event_q);
     while (running) {
-        entry = peek_entry(event_q);
+        QUEUE_ENTRY * const entry = peek_entry(event_q);
+
         if (!entry) {
             /* wait infinite until entry arrives */
             queue_wait(event_q);
@@ -980,9 +978,9 @@ event_thread(void *data)
         else if (entry->type == QUEUE_ENTRY_TYPE_TIMED_EVENT) {
             /* do a_timedwait for entry */
             struct timespec abs_time;
-            FLOATVAL when;
-            event = (parrot_event*)entry->data;
-            when = event->u.timer_event.abs_time;
+            parrot_event * const event = (parrot_event*)entry->data;
+            const FLOATVAL when = event->u.timer_event.abs_time;
+
             abs_time.tv_sec = (time_t) when;
             abs_time.tv_nsec = (long)((when - abs_time.tv_sec)*1000.0f)
                 *1000L*1000L;
@@ -1023,10 +1021,8 @@ is processed. Terminate the loop if sleeping is finished.
 */
 
 static opcode_t *
-wait_for_wakeup(Interp *interp, opcode_t *next)
+wait_for_wakeup(Interp *interp /*NN*/, opcode_t *next)
 {
-    QUEUE_ENTRY  *entry;
-    parrot_event *event;
     QUEUE        * const tq = interp->task_queue;
 
     interp->sleeping = 1;
@@ -1046,8 +1042,9 @@ wait_for_wakeup(Interp *interp, opcode_t *next)
      */
 
     while (interp->sleeping) {
-        entry = wait_for_entry(tq);
-        event = (parrot_event*)entry->data;
+        QUEUE_ENTRY * const entry = wait_for_entry(tq);
+        parrot_event * const event = (parrot_event*)entry->data;
+
         mem_sys_free(entry);
         edebug((stderr, "got ev %s head : %p\n", et(event), tq->head));
         next  = do_event(interp, event, next);
@@ -1101,7 +1098,7 @@ Explicitly C<sync> called by the check_event opcode from run loops.
 
 PARROT_API
 opcode_t *
-Parrot_do_check_events(Interp *interp, opcode_t *next)
+Parrot_do_check_events(Interp *interp /*NN*/, opcode_t *next)
 {
     if (peek_entry(interp->task_queue))
         return Parrot_do_handle_events(interp, 0, next);
@@ -1118,7 +1115,7 @@ Convert event to exception and throw it.
 */
 
 static void
-event_to_exception(Interp *interp, parrot_event* event)
+event_to_exception(Interp *interp /*NN*/, const parrot_event* event /*NN*/)
 {
     const int exit_code = -event->u.signal;
 
