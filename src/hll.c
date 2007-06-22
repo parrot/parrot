@@ -158,7 +158,7 @@ Parrot_register_HLL(Interp *interp /*NN*/, STRING *hll_name /*NULLOK*/, STRING *
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_name, name);
 
     /* create HLL namespace */
-    string_downcase_inplace(interp, hll_name);
+    hll_name = string_downcase(interp, hll_name);
 
     /* HLL type mappings aren't yet created, we can't create
      * a namespace in HLL's flavor yet - maybe promote the
