@@ -158,7 +158,7 @@ Parrot_register_HLL(Interp *interp /*NN*/, STRING *hll_name /*NULLOK*/, STRING *
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_name, name);
 
     /* create HLL namespace */
-    hll_name = string_downcase(interp, hll_name);
+    string_downcase_inplace(interp, hll_name);
 
     /* HLL type mappings aren't yet created, we can't create
      * a namespace in HLL's flavor yet - maybe promote the
@@ -406,14 +406,13 @@ Parrot_regenerate_HLL_namespaces(Interp *interp /*NN*/)
             VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace, hll_id);
 
         if (PMC_IS_NULL(ns_hash) ||
-            ns_hash->vtable->base_type == enum_class_Undef)
+                ns_hash->vtable->base_type == enum_class_Undef)
         {
-            STRING *hll_name = Parrot_get_HLL_name(interp, hll_id);
-
+            STRING * const hll_name = Parrot_get_HLL_name(interp, hll_id);
             if (!hll_name)
                 continue;
 
-            hll_name = string_downcase(interp, hll_name);
+            string_downcase_inplace(interp, hll_name);
 
             /* XXX as in Parrot_register_HLL() this needs to be fixed to use
              * the correct type of namespace. It's relatively easy to do that

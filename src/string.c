@@ -2238,6 +2238,7 @@ TODO - implemented only for ASCII.
 PARROT_API
 STRING *
 string_upcase(Interp *interp, const STRING *s /*NULLOK*/)
+    /* WARN_UNUSED, MALLOC */
 {
     DECL_CONST_CAST;
     STRING * const dest = string_copy(interp, (STRING *)const_cast(s));
@@ -2273,6 +2274,7 @@ Non-caseable characters are left unchanged.
 PARROT_API
 STRING *
 string_downcase(Interp *interp, const STRING *s /*NULLOK*/)
+    /* WARN_UNUSED, MALLOC */
 {
     DECL_CONST_CAST;
     STRING * const dest = string_copy(interp, (STRING *)const_cast(s));
@@ -2314,6 +2316,7 @@ Non-caseable characters are left unchanged.
 PARROT_API
 STRING *
 string_titlecase(Interp *interp, const STRING *s /*NULLOK*/)
+    /* WARN_UNUSED, MALLOC */
 {
     DECL_CONST_CAST;
     STRING * const dest = string_copy(interp, (STRING *)const_cast(s));

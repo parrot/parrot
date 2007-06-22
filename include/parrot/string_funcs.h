@@ -151,7 +151,9 @@ PARROT_API void string_deinit( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
 PARROT_API STRING * string_downcase( Interp *interp,
-    const STRING *s /*NULLOK*/ );
+    const STRING *s /*NULLOK*/ )
+        __attribute__warn_unused_result__
+        __attribute__malloc__;
 
 PARROT_API void string_downcase_inplace( Interp *interp,
     STRING *s /*NULLOK*/ );
@@ -310,7 +312,9 @@ PARROT_API STRING * string_substr( Interp *interp /*NN*/,
         __attribute__nonnull__(2);
 
 PARROT_API STRING * string_titlecase( Interp *interp,
-    const STRING *s /*NULLOK*/ );
+    const STRING *s /*NULLOK*/ )
+        __attribute__warn_unused_result__
+        __attribute__malloc__;
 
 PARROT_API void string_titlecase_inplace( Interp *interp,
     STRING *s /*NULLOK*/ );
@@ -335,7 +339,9 @@ PARROT_API void string_unpin( Interp *interp, STRING *s /*NN*/ )
         __attribute__nonnull__(2);
 
 PARROT_API STRING * string_upcase( Interp *interp,
-    const STRING *s /*NULLOK*/ );
+    const STRING *s /*NULLOK*/ )
+        __attribute__warn_unused_result__
+        __attribute__malloc__;
 
 PARROT_API void string_upcase_inplace( Interp *interp, STRING *s /*NULLOK*/ );
 PARROT_API STRING* uint_to_str( Interp *interp /*NN*/,
