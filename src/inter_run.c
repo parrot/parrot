@@ -43,12 +43,12 @@ static int
 runloop_id_counter = 0;          /* for synthesizing runloop ids. */
 
 void
-runops(Interp *interp, size_t offs)
+runops(Interp *interp /*NN*/, size_t offs)
 {
     volatile size_t offset = offs;
-    int old_runloop_id = interp->current_runloop_id;
-    int our_runloop_level = ++interp->current_runloop_level;
-    int our_runloop_id = ++runloop_id_counter;
+    const int old_runloop_id    = interp->current_runloop_id;
+    const int our_runloop_level = ++interp->current_runloop_level;
+    const int our_runloop_id    = ++runloop_id_counter;
 
     /* It is OK if the runloop ID overflows; we only ever test it for equality,
        so the chance of collision is slight. */
@@ -100,7 +100,7 @@ runops(Interp *interp, size_t offs)
     fprintf(stderr, "[exiting loop %d, level %d]\n",
             our_runloop_id, our_runloop_level);
 #endif
-    interp->current_runloop_level = --our_runloop_level;
+    interp->current_runloop_level = our_runloop_level - 1;
     interp->current_runloop_id = old_runloop_id;
     /*
      * not yet - this needs classifying of exceptions and handlers
@@ -125,15 +125,14 @@ is an invocable C<Sub> PMC.
 */
 
 parrot_context_t *
-Parrot_runops_fromc(Parrot_Interp interp, PMC *sub)
+Parrot_runops_fromc(Interp *interp /*NN*/, PMC *sub)
 {
-    PMC *ret_c;
     opcode_t offset, *dest;
     parrot_context_t *ctx;
 
     /* we need one return continuation with a NULL offset */
-    interp->current_cont = ret_c =
-        new_ret_continuation_pmc(interp, NULL);
+    PMC * const ret_c = new_ret_continuation_pmc(interp, NULL);
+    interp->current_cont = ret_c;
 #if GC_VERBOSE
     PObj_report_SET(ret_c);     /* s. also dod.c */
 #endif
@@ -157,14 +156,13 @@ runops_args(Parrot_Interp interp, PMC *sub, PMC *obj,
 {
     opcode_t offset, *dest;
     parrot_context_t *ctx;
-    parrot_context_t *old_ctx;
     /*
      * FIXME argument count limited - check strlen of sig
      */
     char new_sig[10];
     const char *sig_p;
+    parrot_context_t * const old_ctx = CONTEXT(interp->ctx);
 
-    old_ctx = CONTEXT(interp->ctx);
     interp->current_cont  = new_ret_continuation_pmc(interp, NULL);
     interp->current_object = obj;
     dest = VTABLE_invoke(interp, sub, NULL);
@@ -179,7 +177,7 @@ runops_args(Parrot_Interp interp, PMC *sub, PMC *obj,
         sig_p = sig + 1;
     }
     else  {
-        size_t len = strlen(sig);
+        const size_t len = strlen(sig);
         if (len > 8)
             internal_exception(1, "too many arguments in runops_args");
         new_sig[0] = 'O';
