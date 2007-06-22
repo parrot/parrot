@@ -100,7 +100,7 @@ iNEW(Interp *interp, struct _IMC_Unit *unit, SymReg *r0,
  * out, but please don't remove it. :) -Mel
  */
 void
-op_fullname(char * dest, const char * name, SymReg * args[],
+op_fullname(char *dest /*NN*/, const char *name /*NN*/, SymReg * args[],
         int narg, int keyvec)
 {
     int i;
@@ -159,8 +159,8 @@ op_fullname(char * dest, const char * name, SymReg * args[],
  * Return opcode value for op name
  */
 int
-check_op(Interp *interp, char *fullname,
-        char *name, SymReg *r[], int narg, int keyvec)
+check_op(Interp *interp /*NN*/, char *fullname /*NN*/,
+        const char *name, SymReg *r[], int narg, int keyvec)
 {
     int op;
 
@@ -277,7 +277,7 @@ to_infix(Interp *interp, char *name, SymReg **r, int *n, int mmd_op)
 }
 
 static int
-is_infix(const char *name, int n, SymReg **r)
+is_infix(const char *name, int n, SymReg **r /*NN*/)
 {
     if (n < 2 || r[0]->set != 'P')
         return -1;
@@ -1147,7 +1147,7 @@ multi_keyed(Interp *interp, IMC_Unit * unit, char *name,
 }
 
 int
-imcc_fprintf(Interp *interp, FILE *fd, const char *fmt, ...)
+imcc_fprintf(Interp *interp /*NN*/, FILE *fd /*NN*/, const char *fmt /*NN*/, ...)
 {
     va_list ap;
     int len;
@@ -1159,7 +1159,7 @@ imcc_fprintf(Interp *interp, FILE *fd, const char *fmt, ...)
 }
 
 int
-imcc_vfprintf(Interp *interp, FILE *fd, const char *format, va_list ap)
+imcc_vfprintf(Interp *interp /*NN*/, FILE *fd /*NN*/, const char *format /*NN*/, va_list ap)
 {
     int len;
     const char *cp;
@@ -1249,10 +1249,12 @@ imcc_vfprintf(Interp *interp, FILE *fd, const char *format, va_list ap)
  */
 
 char *
-str_dup(const char * old)
+str_dup(const char *old /*NN*/)
+    /* MALLOC, WARN_UNUSED */
 {
-    char * copy = mem_sys_allocate(strlen(old) + 1);
-    strcpy(copy, old);
+    const size_t bytes = strlen(old) + 1;
+    char * const copy = mem_sys_allocate(bytes);
+    memcpy(copy, old, bytes);
 #ifdef MEMDEBUG
     debug(interp, 1,"line %d str_dup %s [%x]\n", line, old, copy);
 #endif
@@ -1260,12 +1262,15 @@ str_dup(const char * old)
 }
 
 char *
-str_cat(const char * s1, const char * s2)
+str_cat(const char *s1 /*NN*/, const char *s2 /*NN*/)
 {
-    int len = strlen(s1) + strlen(s2) + 1;
-    char * s3 = mem_sys_allocate(len);
-    strcpy(s3, s1);
-    strcat(s3, s2);
+    const size_t len1 = strlen(s1);
+    const size_t len2 = strlen(s2);
+
+    char * const s3 = mem_sys_allocate(len1 + len2 + 1);
+    memcpy(s3, s1, len1);
+    memcpy(s3+len1, s2, len2+1);
+
     return s3;
 }
 

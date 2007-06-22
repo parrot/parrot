@@ -59,8 +59,9 @@ static int emitter;     /* XXX */
 /* Creates a new instruction */
 
 Instruction *
-_mk_instruction(const char *op, const char * fmt, int n,
+_mk_instruction(const char *op /*NN*/, const char *fmt /*NN*/, int n,
         SymReg ** r, int flags)
+    /* MALLOC, WARN_UNUSED */
 {
     int i, reg_space;
     Instruction * ins;

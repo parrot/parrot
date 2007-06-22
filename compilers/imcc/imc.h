@@ -123,12 +123,14 @@ PARROT_API void imcc_destroy( Interp *interp /*NN*/ )
 PARROT_API void imcc_init( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-int check_op( Interp *interp,
-    char *fullname,
-    char *name,
+int check_op( Interp *interp /*NN*/,
+    char *fullname /*NN*/,
+    const char *name,
     SymReg *r[],
     int narg,
-    int keyvec );
+    int keyvec )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PMC * imcc_compile(
     Parrot_Interp interp,
@@ -156,8 +158,22 @@ PMC * IMCC_compile_pir_s(
     const char *s,
     STRING **error_message );
 
-int imcc_fprintf( Interp *interp, FILE *fd, const char *fmt, ... );
-int imcc_vfprintf( Interp *interp, FILE *fd, const char *format, va_list ap );
+int imcc_fprintf( Interp *interp /*NN*/,
+    FILE *fd /*NN*/,
+    const char *fmt /*NN*/,
+    ... )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+int imcc_vfprintf( Interp *interp /*NN*/,
+    FILE *fd /*NN*/,
+    const char *format /*NN*/,
+    va_list ap )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 Instruction * iNEW( Interp *interp,
     struct _IMC_Unit *unit,
     SymReg *r0,
@@ -184,17 +200,26 @@ Instruction * multi_keyed( Interp *interp,
     int emit );
 
 void op_fullname(
-    char * dest,
-    const char * name,
+    char *dest /*NN*/,
+    const char *name /*NN*/,
     SymReg * args[],
     int narg,
-    int keyvec );
+    int keyvec )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void register_compilers( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-char * str_cat( const char * s1, const char * s2 );
-char * str_dup( const char * old );
+char * str_cat( const char *s1 /*NN*/, const char *s2 /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+char * str_dup( const char *old /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__malloc__
+        __attribute__warn_unused_result__;
+
 int try_find_op(
     Parrot_Interp interp,
     IMC_Unit * unit,

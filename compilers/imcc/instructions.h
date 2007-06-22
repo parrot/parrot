@@ -112,11 +112,15 @@ PARROT_API int emit_open( Interp *interp /*NN*/, int type, void *param )
         __attribute__nonnull__(1);
 
 Instruction * _mk_instruction(
-    const char *op,
-    const char * fmt,
+    const char *op /*NN*/,
+    const char *fmt /*NN*/,
     int n,
     SymReg ** r,
-    int flags );
+    int flags )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__malloc__
+        __attribute__warn_unused_result__;
 
 Instruction * delete_ins(
     struct _IMC_Unit *unit /*NN*/,

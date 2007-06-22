@@ -213,12 +213,15 @@ int PDB_run_command( Interp *interp /*NN*/, const char *command /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+void PDB_script_file( Interp *interp /*NN*/, const char *command /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void PDB_set_break( Interp *interp, const char *command );
 void PDB_skip_breakpoint( Interp *interp, long i );
 void PDB_trace( Interp *interp, const char *command );
 int PDB_unescape( char *string );
 void PDB_watchpoint( Interp *interp, const char *command );
-void PDB_script_file(Interp *interp, const char *command );
 /* HEADERIZER END: src/debug.c */
 
 
