@@ -911,15 +911,15 @@ sub _generate_functions {
             # $test_no will be part of temporary file
             my $test_no = $builder->current_test() + 1;
 
-            $expected =~ s/\cM\cJ/\n/g;
+            $expected    =~ s/\cM\cJ/\n/g;
             my $source_f = per_test( '.c',          $test_no );
             my $obj_f    = per_test( $PConfig{o},   $test_no );
             my $exe_f    = per_test( $PConfig{exe}, $test_no );
-            $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
-            my $out_f   = per_test( '.out',   $test_no );
-            my $build_f = per_test( '.build', $test_no );
-            my $pdb_f   = per_test( '.pdb',   $test_no );
-            my $ilk_f   = per_test( '.ilk',   $test_no );
+            $exe_f       =~ s@[\\/:]@$PConfig{slash}@g;
+            my $out_f    = per_test( '.out',   $test_no );
+            my $build_f  = per_test( '.build', $test_no );
+            my $pdb_f    = per_test( '.pdb',   $test_no );
+            my $ilk_f    = per_test( '.ilk',   $test_no );
 
             open my $SOURCE, '>', $source_f or die "Unable to open '$source_f'";
             binmode $SOURCE;
@@ -983,21 +983,25 @@ sub _generate_functions {
                 return 0;
             }
 
-            $cmd = ".$PConfig{slash}$exe_f";
+            $cmd       = ".$PConfig{slash}$exe_f";
             $exit_code = run_command( $cmd, 'STDOUT' => $out_f, 'STDERR' => $out_f );
+            my $output = slurp_file($out_f);
+            my $pass;
 
-            my $meth = $c_test_map{$func};
-            my $pass = $builder->$meth( slurp_file($out_f), $expected, $desc );
-            $builder->diag("'$cmd' failed with exit code $exit_code")
-                if $exit_code and not $pass;
+            if ($exit_code) {
+                $pass = $builder->ok(0, $desc);
+                $builder->diag("Exited with error code: $exit_code\n" .
+                    "Received:\n$output\nExpected:\n$expected\n" );
+            }
+            else {
+                my $meth = $c_test_map{$func};
+                $pass    = $builder->$meth($output, $expected, $desc);
+                $builder->diag("'$cmd' failed with exit code $exit_code")
+                    unless $pass;
+            }
 
             unless ( $ENV{POSTMORTEM} ) {
-                unlink $out_f;
-                unlink $build_f;
-                unlink $exe_f;
-                unlink $obj_f;
-                unlink $pdb_f;
-                unlink $ilk_f;
+                unlink $out_f, $build_f, $exe_f, $obj_f, $pdb_f, $ilk_f;
             }
 
             return $pass;
