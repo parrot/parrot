@@ -39,6 +39,7 @@ PGE::Exp - base class for expressions
     $P1 = subclass $P0, "PGE::Exp::Quant"
     $P1 = subclass $P0, "PGE::Exp::Modifier"
     $P1 = subclass $P0, "PGE::Exp::Closure"
+    $P1 = subclass $P0, "PGE::Exp::Action"
 .end
 
 
@@ -810,7 +811,8 @@ tree as a PIR code object that can be compiled.
     ##   or to a small subroutine below that will keep backtracking into
     ##   the subrule until it no longer produces a match.
     code.emit(<<"        CODE", PGE_CUT_MATCH, $S0, captgen, captsave, captback, subarg)
-          captob = $P0(captob%5)
+          $P2 = adverbs['action']
+          captob = $P0(captob%5, 'action'=>$P2)
           $P1 = getattribute captob, '$.pos'
           if $P1 <= %0 goto fail_match
           if $P1 < 0 goto fail
@@ -1399,6 +1401,47 @@ tree as a PIR code object that can be compiled.
     .return ()
 .end
  
+.namespace [ "PGE::Exp::Action" ]
+
+.sub 'reduce' :method
+    .param pmc next
+    .return (self)
+.end
+
+.sub 'pir' :method
+    .param pmc code
+    .param string label
+    .param string next
+    .local string actionname, actionkey
+    code.emit("        %0: # action", label)
+    actionname = self['actionname']
+    if actionname == '' goto end
+    actionname = code.'escape'(actionname)
+    actionkey = self['actionkey']
+    if actionkey == '' goto have_actionkey
+    actionkey = code.'escape'(actionkey)
+    actionkey = concat ', ', actionkey
+  have_actionkey:
+    code.emit(<<"        CODE", label, next, actionname, actionkey)
+          $P1 = adverbs['action']
+          if null $P1 goto %1
+          $I1 = can $P1, %2
+          if $I1 == 0 goto %1
+          mpos = pos
+          ($P0 :optional, $I0 :opt_flag) = $P1.%2(mob%3)
+          if $I0 == 0 goto %1
+          mob.'result_object'($P0)
+          push ustack, pos
+          bsr succeed
+          pos = pop ustack
+          null $P0
+          mob.'result_object'($P0)
+          goto fail
+        CODE
+  end:
+    .return ()
+.end
+
 
 # Local Variables:
 #   mode: pir

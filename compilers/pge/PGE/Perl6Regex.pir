@@ -221,6 +221,10 @@ needed for compiling regexes.
     $P0 = get_global 'parse_closure'
     optable.newtok("term:{{",       'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
+    $P0 = get_global 'parse_action'
+    optable.newtok("term:{*}",      'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+
+
     optable.newtok('circumfix:[ ]', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Group')
     optable.newtok('circumfix:( )', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::CGroup')
 
@@ -1053,6 +1057,26 @@ Parse a modifier.
 .end
 
 
+.sub 'parse_action'
+    .param pmc mob
+    .local string target
+    .local int pos, keypos
+    (mob, pos, target) = mob.'new'(mob, 'grammar' => 'PGE::Exp::Action')
+    keypos = index target, '#= ', pos
+    if keypos < 0 goto end
+    $I0 = find_cclass .CCLASS_NEWLINE, target, pos, keypos
+    if $I0 < keypos goto end
+    .local string actionkey
+    keypos += 3
+    $I0 -= keypos
+    actionkey = substr target, keypos, $I0
+    mob['actionkey'] = actionkey
+  end:
+    mob.'to'(pos)
+    .return (mob)
+.end
+    
+
 .sub 'parse_error'
     .param pmc mob
     .param int pos
@@ -1502,6 +1526,16 @@ already present.
     code .= "\n.end\n"
   end:
     .return (code)
+.end
+
+
+.namespace [ 'PGE::Exp::Action' ]
+
+.sub 'perl6exp' :method
+    .param pmc pad
+    $S0 = pad['name']
+    self['actionname'] = $S0
+    .return (self)
 .end
 
 
