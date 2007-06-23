@@ -1,0 +1,92 @@
+=pod
+
+=head1 Project Overview
+
+Z<CHP-1>
+
+X<Parrot>
+The heart of Parrot is a grandiose idea that turned out to be more
+realistic than anyone originally could have believed: why not have a
+single interpreter for several languages? The plan for Parrot
+formed in bits and pieces over the period of a year.
+
+On April 1st, 2001, Simon CozensX<Cozens, Simon> published an article
+titled "Programming Parrot" as an April Fools' joke
+(U<http://www.perl.com/pub/a/2001/04/01/parrot.htm>).  It was a
+contrived interview with Larry Wall and Guido van Rossum detailing
+their plans to merge Python and Perl into a new language called
+Parrot. A few months later, when Perl 6 internals began to take an
+independent path within the larger project, they dubbed the subproject
+"Parrot" in a fitting turn of life imitating art.
+
+The plan for Parrot was to build a language-neutral run-time
+environment. It would support all the features of dynamic languages
+such as Python, Ruby, Scheme, Befunge, and others. It would have
+threading and Unicode support (two of the most problematic features to
+add into Perl 5 code) designed in from the start. It would support
+exceptions and compilation to bytecode, and have clean extension and
+embedding mechanisms.
+
+The language-neutral interpreter was originally just a side effect of
+good design. Keeping the implementation independent of the syntax
+would make the code cleaner and easier to maintain. One practical
+advantage of this design was that Parrot development could begin even
+though the Perl 6 language specification was still in flux.
+
+The bigger win in the long term, though, was that since Parrot would
+support the features of the major dynamic languages and wasn't biased
+to a particular syntax, it could run all these languages with little
+additional effort.  It's generally acknowledged that different
+languages are suited to different tasks. Picking which language will
+be used in a large software project is a common planning problem.
+There's never a perfect fit. It usually boils down to picking the
+language with the most advantages and the least noticeable
+disadvantages. The ability to easily combine multiple languages within
+a project could be a huge benefit. Use well-tested libraries from one
+language for one task. Take advantage of a clean way of expressing a
+particular problem domain in a second, without being forced to use it
+in areas where it's weak.
+
+The modular design also benefits future language designers. Instead of
+targeting I<lex>/I<yacc> and reimplementing low-level features such as
+garbage collection and dynamic types, designers can write a parser
+that targets the Parrot virtual machine.
+
+X<Randal, Allison>
+X<Salzenberg, Chip>
+X<Coleda, Will>
+Allison Randal leads the Parrot project as chief architect, Chip
+Salzenberg is the current pumpking, and Will Coleda is the project
+manager. As is typical of open source development projects, managing the
+Parrot project is quite different from managing a commercial project of
+the same size and complexity.  There are no schedules, no deadlines, no
+hiring and firing, and no salaries, bonuses, or stock options. There are
+no employees or bosses; there is very little hierarchy whatsoever.
+Management in this context isn't about giving orders, it's about making
+sure everyone has what they need to keep moving forward.
+
+[Insert info about release managers, cage cleaners, patch monsters, etc.]
+
+X<Hansen, Ask BjE<oslash>rn>
+X<Spier, Robert>
+Last, but not least, is the glue that holds the project together.  Ask
+BjE<oslash>rn Hansen and Robert Spier manage the email, revision
+control, and bug-tracking systems, as well as the web site for Parrot,
+U<http://www.parrotcode.org>. Without these systems, the project would
+grind to a screeching halt.
+
+In the end, it is the developers themselves who hold the project
+together. Individuals bear their own share of responsibility for
+finding tasks that suit their skills, coordinating with others to keep
+duplicated effort minimal, and making sure the job gets done.
+
+=head2 Where to go
+
+X<Parrot;mailing lists>
+The core communication line for the Parrot project is the mailing list,
+U<parrot-porters@perl.org>, otherwise known as "p2." Workflow in Parrot takes
+the form of submitted patches. Anyone is free to submit a patch, and
+contributors who consistently submit valuable patches over a long period of
+time are granted check-in access to the CVS repository.
+
+=cut

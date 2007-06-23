@@ -1,0 +1,239 @@
+=pod
+
+=head1 Project Development
+
+Z<CHP-2>
+
+Organization of the Parrot project is lightweight but efficient. It's
+a meritocracy--people who make valuable contributions are offered more
+responsibility. Communication is relaxed and informal. As Dan is so
+fond of saying, "This is far too important to take seriously." It's a
+bit like a special forces unit--the work gets done not because of
+tight control from the top, but because the whole team knows the task
+at hand and does it.
+
+=head2 Development Cycles
+
+Z<CHP-2-SECT-2.1>
+
+X<development cycles;Parrot>
+The cycles in Parrot development center on "point releases." A point
+release is a version change, such as 0.4.x to 0.5.x. The architect and
+project manager decide when point releases happen and what features are
+included.  Usually one or two solid new features trigger a point release.
+
+Development proceeds at a steady pace of bug reports, patches
+submitted, and patches applied. The pace isn't so much a result of
+careful planning as it is the law of averages--on any given day,
+someone, somewhere, is working on Parrot. A release is a spike in that
+activity, but since Parrot tends to follow the "release early, release
+often" strategy, the spike is relatively small.
+
+Typically, the release manager for the month declares a feature freeze a
+few days before each release and all development efforts center on bug
+squashing. This periodic cleanup is one of the most valuable aspects of
+a release.
+
+=head2 Getting Involved
+
+Z<CHP-2-SECT-2.2>
+
+X<p2 (Parrot mailing list)>
+X<Parrot;getting involved>
+Just like design work, the first step to participating in Parrot
+development is joining the list. The topics on p2 tend to stick to
+practical matters: bug reports, patches, notifications of changes
+committed to the subversion repository, and questions on coding style.
+Occasionally there are discussions about how to implement a particular
+feature. 
+
+=head3 Use the source
+
+Z<CHP-2-SECT-2.2.1>
+
+X<Parrot;source code>
+The second step to participating in Parrot development is to get a
+copy of the source code. If you just want to try it out--experiment
+with a few features and see how it feels--you're probably best off
+downloading a tarball. For the most stable copy, grab the latest point
+release from CPAN. The sure way to get the most recent release is at
+U<http://search.cpan.org/dist/parrot/> (or search for "parrot" in
+"Distributions"). If you want something a little more cutting edge than
+the packaged release, a new snapshot of the subversion repository is
+created every eight hours. The most recent snapshot is always available
+at U<http://cvs.perl.org/snapshots/parrot/parrot-latest.tar.gz>.
+
+If you plan to get involved in development, you'll want to check out
+the source from the subversion repository. Anyone can get anonymous
+access, committers use their U<http://auth.perl.org> username..
+
+  svn co https://svn.perl.org/parrot/trunk parrot
+
+There's also a web interface for viewing files in the repository at
+U<http://svn.perl.org/viewcvs/parrot/>.
+
+Now that you've got the source, take a moment to look around. The code
+changes constantly, so a detailed description of every file is
+impossible. But a few road signs are helpful starting out.
+
+The most important top-level directory is F<docs/>.  The content isn't
+always up to date, but it is a good place to start. F<parrot.pod>
+provides a quick overview of what's in each documentation file.
+
+The F<languages/> directory contains the code that implements various
+language compilers: Perl 6, Python ("Pynie"), Ruby ("Cardinal"), PHP
+("Plumhead"), Python ("Pynie"), Lisp, Lua, Tcl ("ParTcl"), ABC, and
+WMLScript, as well as Forth, Scheme, Befunge, BASIC, etc. Most are in
+various stages of partial completion.  F<LANGUAGES.STATUS> provides meta
+information on the included languages, and on languages maintained
+outside the Parrot repository.  If you have a language you're
+particularly interested to see implemented on Parrot, you might take a
+peek to see how far along it is. 
+
+The F<lib/> directory contains Perl 5 classes currently used in
+developing Parrot. The F<src/pmc/> directory contains the C source
+code for Parrot classes (PMCs, which you'll read more about in
+A<CHP-9>Chapter 9). The F<examples/> directory contains some example
+Parrot assembler code, as well as benchmarks.
+
+For instructions on building Parrot, see A<CHP-9-SECT-1>"Getting
+Started" in Chapter 9.
+
+=head3 Patch submission
+
+Z<CHP-2-SECT-2.2.2>
+
+X<Parrot;patch submission>
+Parrot development is a continuous stream of patches. Patches are the
+currency of exchange in the project--the unit of work. They fix bugs,
+add features, modify features, remove features, and improve the
+documentation. Pretty much anything that changes, changes via a patch.
+
+While anyone is free to submit a patch, a small number of people have
+access to commit changes to the subversion repository. This system works
+well. It means the project can harness the efforts of a large group,
+but still keep the same high quality as a small group of experienced
+developers.
+
+Every submitted patch is automatically forwarded to the p2 list where
+it's subject to peer review. Patches spark little debate.  Patches are
+typically small modular changes, to make them easy to evaluate.
+Occasionally an entire language implementation is submitted in a single
+patch, but these are the exceptions.
+
+Submitting a patch is fairly straightforward. You create a file that
+lists all your changes and email it to the ticket tracking system
+at U<parrotbug@parrotcode.org>. But a few common-sense guidelines
+will make your patches cleaner, better, and less likely to give the
+pumpking hives.
+
+First off, create your patches from a checked-out subversion repository, not
+from a tarball, so your diff is running against the latest version of
+the files. Then, make sure the paths listed in the patch match those in
+the repository. There are two methods of creating patches that will do
+this for you. You can make changes directly in your checked-out copy of
+the subversion repository and then create diffs using C<svn diff>. Or you
+can make a copy of the repository and then create diffs between the two
+copies with the C<diff -u> command:
+
+  diff -u parrot/README parrot_changed/README
+
+Either method is fine, and both are equally common on p2. Your
+working style and the types of changes you make--small and modular
+versus large and sweeping--will influence which method you choose.
+
+Next, when you're making changes, take some extra time to consider how
+your patch affects the rest of the system. If your patch adds a new
+file, patch the main F<MANIFEST> file to include it. If you add a new
+feature, add a test for it. If you fix a bug, add a test for it. See
+A<CHP-9-SECT-13>"Writing Tests" in Chapter 9 for more on writing tests
+for Parrot. Before you submit a patch, always recompile the system with
+your patch included and run all tests as follows:
+
+  make clean
+  perl Configure.pl
+  make
+  make test
+
+Then consider the people who will review and apply your patch, and try
+to make their jobs easier. Patch filenames should be as descriptive as
+possible: F<fix_readme_aardvark_typo.patch> is better than
+F<README.patch>. An attached file is better than a diff pasted into an
+email, because it can be applied without manual editing. The
+conventional extension for patch files is F<.patch>.
+
+In the email message, always start the subject with "[PATCH]", and
+make the subject as clear as possible: "[PATCH] misspelled aardvark in
+main README file" is better than "[PATCH] typo". The body of the
+message should clearly explain what the patch is supposed to do and
+why you're submitting it. Make a note if you're adding or deleting
+files so they won't be missed.
+
+Here is a good example of a patch submission using the subversion diff
+method (an actual patch from p2). It's short, sticks to the point, and
+clearly expresses the problem and the solution. The patch filename and
+the subject of the message are both descriptive:
+
+=for author
+
+Possible alternates: ticket #23501, #24053 (not from top level)
+
+=end for
+
+  Subject: [PATCH] Pointers in List_chunk not initialized
+  From: Bruce Gray
+  
+  On Win32, these tests are segfaulting due to invalid 
+  pointers in List_chunk structs:
+  t/op/string.t             97-98
+  t/pmc/intlist.t           3-4
+  t/pmc/pmc.t               80
+  
+  The problem is caused by list.c/allocate_chunk not 
+  initializing the pointers. This patch corrects the problem.
+  
+  --
+  Hope this helps,
+  Bruce Gray
+
+With the attached file F<list_chunk_initialize.patch>:
+
+
+  Index: list.c
+  =========================================  
+  RCS file: /cvs/public/parrot/list.c,v
+  retrieving revision 1.23
+  diff -u -r1.23 list.c
+  --- list.c        27 Dec 2002 09:33:11 -0000        1.23
+  +++ list.c        28 Dec 2002 03:37:35 -0000
+  @@ -187,6 +187,10 @@
+       Parrot_block_GC(interpreter);
+       chunk = (List_chunk *)new_bufferlike_header(interpreter, sizeof(*chunk));
+       chunk->items = items;
+  +    chunk->n_chunks = 0;
+  +    chunk->n_items  = 0;
+  +    chunk->next     = NULL;
+  +    chunk->prev     = NULL;
+       Parrot_allocate_zeroed(interpreter, (Buffer *)chunk, size);
+       Parrot_unblock_DOD(interpreter);
+       Parrot_unblock_GC(interpreter);
+
+=head3 Bug tracking
+
+Z<CHP-2-SECT-2.2.3>
+
+X<Parrot;bug tracking>
+Bug reports go to the same address as patch submissions
+(U<parrotbug@parrotcode.org>). Similar conventions apply: make the
+subject and the message as clear and descriptive as possible. The
+subject line should start with "[BUG]"  to make it immediately obvious
+what the message is about.
+
+X<Parrot;bug tracking>
+If you want to track a bug or patch you've submitted, the current
+queue of bugs and patches is publicly viewable at
+U<http://rt.perl.org>. Bug tracking for Parrot is handled by the
+Request Tracker (RT) ticket tracking system from Best Practical
+Solutions.
+
+=cut

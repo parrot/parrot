@@ -1,0 +1,439 @@
+=pod
+
+=head1 Subroutines
+
+Z<CHP-10-SECT-6>
+
+X<PIR (Parrot intermediate representation);subroutines>
+X<subroutines;in PIR>
+A calculation like "the factorial of a number" may be used several
+times in a large program. Subroutines allow this kind of functionality
+to be abstracted into a unit. It's a benefit for code reuse and
+maintainability. Even though PASM is just an assembly language for a
+virtual processor, it has a number of features to support high-level
+subroutine calls. PIR offers a smoother interface to those features.
+
+PIR provides several different sets of syntax for subroutine calls.
+This is a language designed to implement other languages, and every
+language does subroutine calls a little differently. What's needed is
+a set of building blocks and tools, not a single prepackaged solution.
+
+=head2 Parrot Calling Conventions
+
+Z<CHP-10-SECT-6.1>
+
+X<PIR (Parrot intermediate representation);subroutines;Parrot calling conventions>
+X<subroutines;Parrot calling conventions;in PIR>
+As we mentioned in the previous chapter, Parrot defines a set of
+calling conventions for externally visible subroutines. In these
+calls, the caller is responsible for preserving its own registers, and
+arguments and return values are passed in a predefined set of Parrot
+registers. The calling conventions use the Continuation Passing Style
+X<Continuation Passing Style (CPS)>X<CPS (Continuation Passing Style)>
+to pass control to subroutines and back again.
+
+X<PIR (Parrot intermediate representation);subroutine calls>
+The fact that the Parrot calling conventions are clearly defined also
+makes it possible to provide some higher-level syntax for it. Manually
+setting up all the registers for each subroutine call isn't just
+tedious, it's also prone to bugs introduced by typos. PIR's simplest
+subroutine call syntax looks much like a high-level language. This
+example calls the subroutine C<_fact> with two arguments and assigns
+the result to C<$I0>:
+
+     ($I0, $I1) = _fact(count, product)
+
+This simple statement hides a great deal of complexity. It generates a
+subroutine object and stores it in C<P0>. It assigns the arguments to
+the appropriate registers, assigning any extra arguments to the
+overflow array in C<P3>. It also sets up the other registers to mark
+whether this is a prototyped call and how many arguments it passes of
+each type. It calls the subroutine stored in C<P0>, saving and
+restoring the top half of all register frames around the call. And
+finally, it assigns the result of the call to the given temporary
+register variables (for a single result you can drop the parentheses).
+If the one line above were written out in basic PIR it would be
+something like:
+
+  newsub P0, .Sub, _fact
+  I5 = count
+  I6 = product
+  I0 = 1
+  I1 = 2
+  I2 = 0
+  I3 = 0
+  I4 = 0
+  savetop
+  invokecc
+  restoretop
+  $I0 = I5
+  $I1 = I6
+
+The PIR code actually generates an C<invokecc> opcode internally. It
+not only invokes the subroutine in C<P0>, but also generates a new
+return continuation in C<P1>. The called subroutine invokes this
+continuation to return control to the caller.
+
+The single line subroutine call is incredibly convenient, but it isn't
+always flexible enough. So PIR also has a more verbose call syntax
+that is still more convenient than manual calls. This example pulls
+the subroutine C<_fact> out of the global symbol table and calls it:
+
+  find_global $P1, "_fact"
+
+  .pcc_begin prototyped
+    .arg count
+    .arg product
+    .pcc_call $P1
+    .result $I0
+  .pcc_end
+
+X<.arg directive>
+X<.result directive>
+The whole chunk of code from C<.pcc_begin> to C<.pcc_end> acts as a
+single unit. The C<.pcc_begin> directive can be marked as
+C<prototyped> or C<unprototyped>, which corresponds to the flag C<I0>
+in the calling conventions. The C<.arg> directive sets up arguments to
+the call. The C<.pcc_call> directive saves top register frames, calls
+the subroutine, and restores the top registers. The C<.result>
+directive retrieves return values from the call.
+
+X<.param directive>
+In addition to syntax for subroutine calls, PIR provides syntax for
+subroutine definitions. The C<.param> directive pulls parameters out
+of the registers and creates local named variables for them:
+
+  .param int c
+
+X<.pcc_begin_return directive>
+X<.pcc_end_return directive>
+The C<.pcc_begin_return> and C<.pcc_end_return> directives act as a
+unit much like the C<.pcc_begin> and C<.pcc_end> directives:
+
+  .pcc_begin_return
+    .return p
+  .pcc_end_return
+
+X<.return directive>
+The C<.return> directive sets up return values in the appropriate
+registers. After all the registers are set up the unit invokes the
+return continuation in C<P1> to return control to the caller.
+
+Here's a complete code example that reimplements the factorial code
+from the previous section as an independent subroutine. The subroutine
+C<_fact> is a separate compilation unit, assembled and processed after
+the C<_main> function.  Parrot resolves global symbols like the
+C<_fact> label between different units.
+
+  # factorial.imc
+  .sub _main
+     .local int count
+     .local int product
+     count = 5
+     product = 1
+
+     $I0 = _fact(count, product)
+
+     print $I0
+     print "\n"
+     end
+  .end
+
+  .sub _fact
+     .param int c
+     .param int p
+
+  loop:
+     if c <= 1 goto fin
+     p = c * p
+     dec c
+     branch loop
+  fin:
+     .pcc_begin_return
+     .return p
+     .pcc_end_return
+  .end
+
+
+This example defines two local named variables, C<count> and
+C<product>, and assigns them the values 1 and 5. It calls the C<_fact>
+subroutine passing the two variables as arguments. In the call, the
+two arguments are assigned to consecutive integer registers, because
+they're stored in typed integer variables. The C<_fact> subroutine
+uses C<.param> and the return directives for retrieving parameters and
+returning results. The final printed result is 120.
+
+You may want to generate a PASM source file for the above example to
+look at the details of how the PIR code translates to PASM:
+
+  $ parrot -o- factorial.imc
+
+=head2 Stack-Based Subroutine Calls
+
+Z<CHP-10-SECT-6.2>
+
+The Parrot calling conventions are PIR's default for subroutine calls,
+but it does also provide some syntax for stack-based calls.
+Stack-based calls are fast, so they're sometimes useful for purely
+internal code. To turn on support for stack-based calls, you have to
+set the C<fastcall> pragma:
+
+  .pragma fastcall       # turn on stack calling conventions
+
+The standard calling conventions are set by the C<prototyped> pragma.
+You'll rarely need to explicitly set C<prototyped> since it's on by
+default. You can mix stack-based subroutines and prototyped
+subroutines in the same file, but you really shouldn't--stack-based
+calls interfere with exception handling, and don't interoperate well
+with prototyped calls.
+
+When the C<fastcall> pragma is on, the C<.arg>, C<.result>, C<.param>,
+and C<.return> directives push and pop on the user stack instead of
+setting registers. Internally they are just the PASM C<save> and
+C<restore> opcodes. Because of this, you have to reverse the order of
+your arguments. You push the final argument onto the user stack first,
+because it'll be the last parameter popped off the stack on the other
+end:
+
+  .arg y             # save args in reverse order
+  .arg x
+  call _foo          # (r, s) = _foo(x,y)
+  .result r
+  .result s          # restore results in order
+
+Multiple return values are also passed in reverse order for the same
+reason.  Often the first parameter or result in a stack-based call
+will be a count of values passed in, especially when the number of
+arguments can vary.
+
+X<call instruction (PIR)>
+Another significant difference is that instead of the single line call
+or a C<.pcc_call>, stack-based calls use the C<call> instruction. This
+is the same as PASM's C<bsr>X<bsr opcode (PASM)> opcode. It branches
+to a subroutine label and pushes the current location onto the control
+stack so it can return to it later.
+
+This example reworks the factorial code above to use stack-based
+calls:
+
+  .pragma fastcall       # turn on stack calling conventions
+  .sub _main
+      .local int count
+      .local int product
+      count = 5
+      product = 1
+      .arg product       # second argument
+      .arg count         # first argument
+      call _fact         # call the subroutine
+      .result $I0        # retrieve the result
+      print $I0
+      print "\n"
+      end
+  .end
+
+  .sub _fact
+      saveall            # save caller's registers
+      .param int c       # retrieve the parameters
+      .param int p
+
+  loop:
+     if c <= 1 goto fin
+     p = c * p
+     dec c
+     branch loop
+  fin:
+      .return p          # return the result
+      restoreall         # restore caller's registers
+      ret                # back to the caller
+  .end
+
+The C<_main> compilation unit sets up two local variables and pushes
+them onto the user stack in reverse order using the C<.arg> directive.
+It then calls C<_fact> with the C<call> instruction. The C<.result>
+directive pops a return value off the user stack.
+
+X<saveall opcode (PASM)>
+This example uses the callee save convention, so the first statement
+in the C<_fact> subroutine is C<saveall>. (See
+A<CHP-9-SECT-7.1.2>"Callee saves" in Chapter 9 for more details on
+this convention.) With callee save in PIR, Parrot can ignore the
+subroutine's register usage when it allocates registers for the
+calling routine.
+
+X<.param directive>
+The C<.param> directive pops a function parameter off the user stack
+as an integer and creates a new named local variable for the
+parameter. Parrot does check the types of the
+parameters to make sure they match what the the caller passes to the
+subroutine, but the amount of paramets isn't checked, so both sides
+have to agree on the argument count.
+
+The C<.return>X<.return directive> statement at the end pushes the
+final value of C<p> onto the user stack, so C<.result> can retrieve it
+after the subroutine ends. C<restoreall> restores the caller's
+register values, and C<ret> pops the top item off the control
+stack--in this case, the location of the call to C<_fact>--and returns
+to it.
+
+=head2 Compilation Units Revisited
+
+Z<CHP-10-SECT-6.3>
+
+The example above could have been written using simple labels instead
+of separate compilation units:
+
+  .sub _main
+      $I1 = 5         # counter
+      call fact       # same as bsr fact
+      print $I0
+      print "\n"
+      $I1 = 6         # counter
+      call fact
+      print $I0
+      print "\n"
+      end
+
+  fact:
+      $I0 = 1           # product
+  L1:
+      $I0 = $I0 * $I1
+      dec $I1
+      if $I1 > 0 goto L1
+      ret
+  .end
+
+The unit of code from the C<fact> label definition to C<ret> is a
+reusable routine. There are several problems with this simple
+approach. First, the caller has to know to pass the argument to
+C<fact> in C<$I1> and to get the result from C<$I0>. Second, neither
+the caller nor the function itself preserves any registers. This is
+fine for the example above, because very few registers are used. But
+if this same bit of code were buried deeply in a math routine package,
+you would have a high risk of clobbering the caller's register values.
+
+X<PIR (Parrot intermediate representation);register allocation>
+X<data flow graph (DFG)>
+Another disadvantage of this approach is that C<_main> and C<fact>
+share the same compilation unit, so they're parsed and processed as
+one piece of code. When Parrot does register allocation, it calculates
+the data flow graph (DFG) of all symbols,N<The operation to calculate
+the DFG has a quadratic cost or better. It depends on I<n_lines *
+n_symbols>.> looks at their usage, calculates the interference between
+all possible combinations of symbols, and then assigns a Parrot
+register to each symbol. This process is less efficient for large
+compilation units than it is for several small ones, so it's better to
+keep the code modular. The optimizer will decide whether register
+usage is light enough to merit combining two compilation units, or
+even inlining the entire function.
+
+=begin sidebar A Short Note on the Optimizer
+
+Z<CHP-10-SIDEBAR-1>
+
+X<optimizer>
+The optimizer isn't powerful enough to inline small subroutines yet.
+But it already does other simpler optimizations. You may recall that
+the PASM opcode C<mul> (multiply) has a two-argument version that uses
+the same register for the destination and the first operand. When
+Parrot
+comes across a PIR statement like C<$I0 = $I0 * $I1>, it can optimize
+it to the two-argument C<mul $I0>, C<$I1> instead of C<mul $I0, $I0,
+$I1>. This kind of optimization is enabled by the C<-O1> command-line
+option.
+
+So you don't need to worry about finding the shortest PASM
+instruction, calculating constant terms, or avoiding branches to speed
+up your code. Parrot does it already.
+
+=end sidebar
+
+
+=head2 PASM Subroutines
+
+Z<CHP-10-SECT-6.4>
+
+X<subroutines;PASM>
+X<PASM (Parrot assembly language);subroutines>
+PIR code can include pure PASM compilation units. These are wrapped in
+the C<.emit> and C<.eom> directives instead of C<.sub> and C<.end>.
+The C<.emit> directive doesn't take a name, it only acts as a
+container for the PASM code. These primitive compilation units can be
+useful for grouping PASM functions or function wrappers. Subroutine
+entry labels inside C<.emit> blocks have to be global labels:
+
+  .emit
+  _substr:
+      ...
+      ret
+  _grep:
+      ...
+      ret
+  .eom
+
+=head1 Methods
+
+Z<CHP-10-SECT-7>
+
+X<PIR (Parrot intermediate representation);methods>
+X<methods;in PIR>
+X<classes;methods>
+X<. (dot);. (method call);instruction (PIR)>
+PIR provides syntax to simplify writing methods and method calls.
+These calls follow the Parrot calling conventions. The basic syntax is
+similar to the single line subroutine call above, but instead of a
+subroutine label name it takes a variable for the invocant PMC and a
+string with the name of the method:
+
+  object."methodname"(arguments)
+
+The invocant can be a variable or register, and the method name can be
+a literal string, string variable, or method object register. This
+tiny bit of code sets up all the registers for a method call and makes
+the call, saving and restoring the top half of the register frames
+around the call. Internally, the call is a C<callmethodcc> opcode, so
+it also generates a return continuation.
+
+This example defines two methods in the C<Foo> class. It calls one
+from the main body of the subroutine and the other from within the
+first method:
+
+  .sub _main
+    .local pmc class
+    .local pmc obj
+    newclass class, "Foo"       # create a new Foo class
+    find_type $I0, "Foo"        # find its dynamic type number
+    new obj, $I0                # instantiate a Foo object
+    obj."_meth"()               # call obj."_meth" which is actually
+    print "done\n"              # "_meth" in the "Foo" namespace
+    end
+  .end
+
+  .namespace [ "Foo" ]          # start namespace "Foo"
+
+  .sub _meth method             # define Foo::_meth global
+     print "in meth\n"
+     $S0 = "_other_meth"        # method names can be in a register too
+     self.$S0()                 # self is the invocant
+  .end
+
+  .sub _other_meth method       # define another method
+     print "in other_meth\n"    # as above Parrot provides a return
+  .end                          # statement
+
+Each method call looks up the method name in the symbol table of the
+object's class. Like C<.pcc_sub> in PASM, C<.sub> makes a symbol table
+entry for the subroutine in the current namespace.
+
+When a C<.sub> is declared as a C<method>, it automatically creates a
+local variable named C<self> and assigns it the object passed in
+C<P2>.
+
+You can pass multiple arguments to a method and retrieve multiple
+return values just like a single line subroutine call:
+
+  (res1, res2) = obj."method"(arg1, arg2)
+
+
+=cut
+
+# vim: expandtab shiftwidth=2 tw=70:
