@@ -29,6 +29,13 @@ debugger, and the C<debug> ops.
 #include "parrot/debug.h"
 #include "parrot/oplib/ops.h"
 
+
+/* Not sure how we want to handle this sort of cross-project header */
+PARROT_API
+void
+IMCC_warning(Interp *interp /*NN*/, const char *fmt /*NN*/, ...);
+
+
 /* HEADER: include/parrot/debug.h */
 
 static const char* GDB_P(Interp *interp, const char *s);
@@ -402,14 +409,13 @@ int
 PDB_run_command(Interp *interp /*NN*/, const char *command /*NN*/)
 {
     unsigned long c;
-    const char   *temp;
     PDB_t        * const pdb = interp->pdb;
+    const char   * const original_command = command;
 
     /* keep a pointer to the command, in case we need to report an error */
-    temp = command;
 
     /* get a number from what the user typed */
-    command = parse_command(command, &c);
+    command = parse_command(original_command, &c);
 
     if (command)
         skip_command(command);
@@ -488,7 +494,7 @@ PDB_run_command(Interp *interp /*NN*/, const char *command /*NN*/)
             break;
         default:
             PIO_eprintf(interp,
-                        "Undefined command: \"%s\".  Try \"help\".", temp);
+                        "Undefined command: \"%s\".  Try \"help\".", original_command);
             return 1;
     }
     return 0;
@@ -511,7 +517,7 @@ void
 PDB_next(Interp *interp, const char *command)
 {
     unsigned long  n   = 1;
-    PDB_t         *pdb = interp->pdb;
+    PDB_t  * const pdb = interp->pdb;
 
     /* Init the program if it's not running */
     if (!(pdb->state & PDB_RUNNING))
@@ -556,7 +562,7 @@ void
 PDB_trace(Interp *interp, const char *command)
 {
     unsigned long  n   = 1;
-    PDB_t         *pdb = interp->pdb;
+    PDB_t *  const pdb = interp->pdb;
     Interp        *debugee;
 
     /* if debugger is not running yet, initialize */
