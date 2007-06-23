@@ -1990,6 +1990,7 @@ HEADERIZER_O_FILES = \
     src/vtables.o \
     compilers/imcc/debug.o \
     compilers/imcc/imc.o \
+    compilers/imcc/imcparser.o \
     compilers/imcc/instructions.o \
     compilers/imcc/optimizer.o \
     compilers/imcc/parser_util.o \

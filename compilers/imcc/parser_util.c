@@ -374,7 +374,7 @@ var_arg_ins(Interp *interp, IMC_Unit * unit, const char *name,
  * s. e.g. imc.c for usage
  */
 Instruction *
-INS(Interp *interp, IMC_Unit * unit, char *name,
+INS(Interp *interp, IMC_Unit * unit, const char *name,
         const char *fmt, SymReg **r, int n, int keyvec, int emit)
 {
     char fullname[64];

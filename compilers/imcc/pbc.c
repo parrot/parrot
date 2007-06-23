@@ -1227,10 +1227,10 @@ e_pbc_end_sub(Interp *interp /*NN*/, void *param, IMC_Unit *unit /*NN*/)
  */
 
 static void
-verify_signature(Interp *interp /*NN*/, Instruction *ins /*NN*/, opcode_t *pc)
+verify_signature(Interp *interp /*NN*/, const Instruction *ins /*NN*/, opcode_t *pc)
 {
     INTVAL  i, n;
-    int     no_consts, k;
+    int     no_consts;
 
     int     needed      = 0;
     PMC    *changed_sig = NULL;
@@ -1282,7 +1282,7 @@ verify_signature(Interp *interp /*NN*/, Instruction *ins /*NN*/, opcode_t *pc)
 
     if (changed_sig) {
         /* append PMC constant */
-        k      = PDB_extend_const_table(interp);
+        const int k = PDB_extend_const_table(interp);
 
         interp->code->const_table->constants[k]->type  = PFC_PMC;
         interp->code->const_table->constants[k]->u.key = changed_sig;
@@ -1314,10 +1314,10 @@ e_pbc_emit(Interp *interp /*NN*/, void *param, IMC_Unit *unit /*NN*/, const Inst
 
     /* first instruction, do initialisation ... */
     if (ins == unit->instructions) {
-        int code_size, ins_size, oldsize, bytes;
+        int ins_size, bytes;
 
-        oldsize   = get_old_size(interp, &ins_line);
-        code_size = get_codesize(interp, unit, &ins_size);
+        const int oldsize   = get_old_size(interp, &ins_line);
+        const int code_size = get_codesize(interp, unit, &ins_size);
 
         IMCC_debug(interp, DEBUG_PBC, "code_size(ops) %d  oldsize %d\n",
                 code_size, oldsize);
@@ -1353,8 +1353,7 @@ e_pbc_emit(Interp *interp /*NN*/, void *param, IMC_Unit *unit /*NN*/, const Inst
         /* add debug if necessary */
         if (!IMCC_INFO(interp)->optimizer_level ||
             IMCC_INFO(interp)->optimizer_level == OPT_PASM) {
-            const char *sourcefile;
-            sourcefile = unit->file;
+            const char * const sourcefile = unit->file;
 
             /* FIXME length and multiple subs */
             debug_seg  = Parrot_new_debug_seg(interp,
@@ -1418,8 +1417,7 @@ e_pbc_emit(Interp *interp /*NN*/, void *param, IMC_Unit *unit /*NN*/, const Inst
 
         /* add PIC idx */
         if (parrot_PIC_op_is_cached(interp, op)) {
-            size_t offs;
-            offs = pc - interp->code->base.data;
+            const size_t offs = pc - interp->code->base.data;
             /*
              * for pic_idx fitting into a short, we could
              * further reduce the size by storing shorts

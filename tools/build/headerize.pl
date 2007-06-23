@@ -92,6 +92,8 @@ sub open_file {
 sub extract_functions {
     my $text = shift;
 
+    $text =~ s[/\*\s*HEADERIZER STOP.+][]s;
+
     # Strip blocks of comments
     $text =~ s[^/\*.*?\*/][]mxsg;
 

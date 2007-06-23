@@ -9,7 +9,10 @@ int cfg_optimize( Interp *interp /*NN*/, IMC_Unit *unit /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-const char * get_neg_op( char *op, int *n );
+const char * get_neg_op( const char *op /*NN*/, int *n /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 Instruction * IMCC_subst_constants( Interp *interp,
     IMC_Unit * unit,
     char *name,

@@ -81,15 +81,6 @@ IMC_Unit * imc_open_unit( Interp *interp /*NN*/, IMC_Unit_Type t )
 
 /* HEADERIZER END: compilers/imcc/imc.c */
 
-/*
- * instructions.c
- */
-void imcc_init_tables(Interp * interp);
-
-/*
- * optimizer.c
- */
-const char * get_neg_op(char *op, int *nargs);
 
 /* HEADERIZER BEGIN: compilers/imcc/reg_alloc.c */
 
@@ -106,14 +97,26 @@ void imc_reg_alloc( Interp *interp /*NN*/, IMC_Unit *unit /*NULLOK*/ )
 
 /* HEADERIZER END: compilers/imcc/reg_alloc.c */
 
-/*
- * parser_util.c
- */
-
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #  define YY_TYPEDEF_YY_SCANNER_T
 typedef void* yyscan_t;
 #endif
+
+
+/* HEADERIZER BEGIN: compilers/imcc/imcparser.c */
+
+Instruction * IMCC_create_itcall_label( Interp* interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+void IMCC_itcall_sub( Interp* interp, SymReg* sub );
+Instruction * INS_LABEL( Interp *interp /*NN*/,
+    IMC_Unit *unit,
+    SymReg *r0,
+    int emit )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: compilers/imcc/imcparser.c */
+
 /* HEADERIZER BEGIN: compilers/imcc/parser_util.c */
 
 PARROT_API int do_yylex_init( Interp* interp, yyscan_t* yyscanner );
@@ -183,7 +186,7 @@ Instruction * iNEW( Interp *interp,
 
 Instruction * INS( Interp *interp,
     IMC_Unit * unit,
-    char *name,
+    const char *name,
     const char *fmt,
     SymReg **r,
     int n,

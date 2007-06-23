@@ -146,25 +146,27 @@ optimize(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
     return any;
 }
 
+#define N_ELEMENTS(x) (sizeof(x)/sizeof((x)[0]))
+
 /*
  * Get negated form of operator. If no negated form is known, return 0.
  */
 const char *
-get_neg_op(char *op, int *n)
+get_neg_op(const char *op /*NN*/, int *n /*NN*/)
 {
     static struct br_pairs {
         const char *op;
         const char *nop;
         int n;
     } br_pairs[] = {
-    { "if", "unless", 2 },
-    { "eq", "ne", 3 },
-    { "gt", "le", 3 },
-    { "ge", "lt", 3 },
+        { "if", "unless", 2 },
+        { "eq", "ne", 3 },
+        { "gt", "le", 3 },
+        { "ge", "lt", 3 },
     };
     unsigned int i;
-    for (i = 0; i < sizeof (br_pairs)/sizeof (br_pairs[0]); i++) {
-        *n= br_pairs[i].n;
+    for (i = 0; i < N_ELEMENTS(br_pairs); i++) {
+        *n = br_pairs[i].n;
         if (strcmp(op, br_pairs[i].op) == 0)
             return br_pairs[i].nop;
         if (strcmp(op, br_pairs[i].nop) == 0)
@@ -186,7 +188,7 @@ get_neg_op(char *op, int *n)
  *
  */
 static int
-if_branch(Interp *interp, IMC_Unit * unit)
+if_branch(Interp *interp, IMC_Unit *unit)
 {
     Instruction *ins, *last;
     int reg, changed = 0;

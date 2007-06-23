@@ -335,6 +335,9 @@
 #include "parrot/dynext.h"
 #include "pbc.h"
 #include "parser.h"
+#include "optimizer.h"
+
+/* HEADERIZER TARGET: compilers/imcc/imc.h */
 
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 1
@@ -366,7 +369,7 @@
  *        code.
  */
 static Instruction *
-MK_I(Interp *interp, IMC_Unit * unit, const char * fmt, int n, ...)
+MK_I(Interp *interp, IMC_Unit * unit, const char *fmt /*NN*/, int n, ...)
 {
     char opname[64];
     char *p;
@@ -397,9 +400,9 @@ MK_I(Interp *interp, IMC_Unit * unit, const char * fmt, int n, ...)
 
 static Instruction*
 mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
-             char *type, SymReg *left, char *constant)
+             const char *type /*NN*/, SymReg *left /*NN*/, char *constant /*NN*/)
 {
-    int type_enum = atoi(type);
+    const int type_enum = atoi(type);
     SymReg *rhs;
     SymReg *r[2];
     char *name;
@@ -464,14 +467,14 @@ func_ins(Parrot_Interp interp, IMC_Unit *unit, SymReg *lhs, char *op,
  */
 
 static void
-clear_state(Interp *interp)
+clear_state(Interp *interp /*NN*/)
 {
     IMCC_INFO(interp) -> nargs = 0;
     IMCC_INFO(interp) -> keyvec = 0;
 }
 
 Instruction *
-INS_LABEL(Interp *interp, IMC_Unit *unit, SymReg *r0, int emit)
+INS_LABEL(Interp *interp /*NN*/, IMC_Unit *unit, SymReg *r0, int emit)
 {
     Instruction * const ins = _mk_instruction("","%s:", 1, &r0, 0);
 
@@ -482,16 +485,21 @@ INS_LABEL(Interp *interp, IMC_Unit *unit, SymReg *r0, int emit)
     return ins;
 }
 
-static Instruction * iLABEL(Interp *interp, IMC_Unit * unit, SymReg * r0) {
-    Instruction *i = INS_LABEL(interp, unit, r0, 1);
+static Instruction *
+iLABEL(Interp *interp /*NN*/, IMC_Unit *unit, SymReg * r0)
+{
+    Instruction * const i = INS_LABEL(interp, unit, r0, 1);
+
     i->line = IMCC_INFO(interp)->line;
     clear_state(interp);
     return i;
 }
 
-static Instruction * iSUBROUTINE(Interp *interp, IMC_Unit * unit, SymReg * r) {
-    Instruction *i;
-    i =  iLABEL(interp, unit, r);
+static Instruction *
+iSUBROUTINE(Interp *interp /*NN*/, IMC_Unit *unit, SymReg *r /*NN*/)
+{
+    Instruction * const i =  iLABEL(interp, unit, r);
+
     r->type = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
     r->pcc_sub = (pcc_sub_t*)calloc(1, sizeof(struct pcc_sub_t));
     IMCC_INFO(interp)->cur_call = r;
@@ -508,7 +516,7 @@ iINDEXFETCH(Interp *interp, IMC_Unit * unit, SymReg * r0, SymReg * r1,
             SymReg * r2)
 {
     if (r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
-        SymReg * r3 = mk_const(interp, str_dup("1"), 'I');
+        SymReg * const r3 = mk_const(interp, str_dup("1"), 'I');
         return MK_I(interp, unit, "substr %s, %s, %s, 1", 4, r0, r1, r2, r3);
     }
     IMCC_INFO(interp) -> keyvec |= KEY_BIT(2);
@@ -538,13 +546,15 @@ iINDEXSET(Interp *interp, IMC_Unit * unit,
     return 0;
 }
 
-static char * inv_op(char *op) {
+static char *
+inv_op(const char *op)
+{
     int n;
     return (char *) get_neg_op(op, &n);
 }
 
 Instruction *
-IMCC_create_itcall_label(Interp* interp)
+IMCC_create_itcall_label(Interp* interp /*NN*/)
 {
     char name[128];
     SymReg * r;
@@ -683,12 +693,14 @@ adv_named_set(Interp *interp, char *name) {
 }
 
 static void
-do_loadlib(Interp *interp, char *lib)
+do_loadlib(Interp *interp /*NN*/, const char *lib /*NN*/)
 {
-    STRING *s = string_unescape_cstring(interp, lib + 1, '"', NULL);
+    STRING * const s = string_unescape_cstring(interp, lib + 1, '"', NULL);
     Parrot_load_lib(interp, s, NULL);
     Parrot_register_HLL(interp, NULL, s);
 }
+
+/* HEADERIZER STOP */
 
 
 
