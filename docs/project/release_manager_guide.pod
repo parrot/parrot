@@ -43,6 +43,10 @@ Also update the version number, date, and your name in the
 following files: F<DEVELOPING>, F<docs/parrothist.pod>,
 and F<docs/ROADMAP.pod>
 
+Also update the URL in F<parrot.spec> for "Source0" to point to the
+current release manager's CPAN directory. [Really, we should provide a
+more standard location for the release tarball.]
+
 =item b
 
 Update F<ChangeLog>, F<NEWS> with the new version number and any other
