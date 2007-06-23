@@ -81,11 +81,6 @@ Instruction * _mk_instruction(const char *,const char *, int n, SymReg **, int);
 #else
 #  define _mk_instruction(a,b,n,c,d) dont_use(a,b)
 #endif
-Instruction * INS(Interp *, struct _IMC_Unit *, char * name,
-        const char *fmt, SymReg **regs, int nargs, int keyv, int emit);
-Instruction * INS_LABEL(Interp * interp, struct _IMC_Unit *, SymReg * r0, int emit);
-Instruction * iNEW(Interp *, struct _IMC_Unit *, SymReg * r0, char * type,
-        SymReg *init, int emit);
 
 /* Globals */
 

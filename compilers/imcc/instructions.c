@@ -210,6 +210,7 @@ instruction_reads(const Instruction *ins /*NN*/, const SymReg *r /*NN*/)
     }
     /* a sub call reads the previous args */
     if (ins->type & ITPCCSUB) {
+        int i;
         while (ins && ins->opnum != PARROT_OP_set_args_pc)
             ins = ins->prev;
         if (!ins)
@@ -279,10 +280,9 @@ instruction_writes(const Instruction *ins /*NN*/, const SymReg *r /*NN*/)
         return 0;
     }
     for (i = 0; i < ins->n_r; i++)
-        if (f & (1<<(16+i))) {
+        if (f & (1<<(16+i)))
             if (ins->r[i] == r)
                 return 1;
-        }
 
     return 0;
 }
