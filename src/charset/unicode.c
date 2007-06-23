@@ -513,15 +513,15 @@ string_from_codepoint(Interp *interp, UINTVAL codepoint)
 }
 
 static size_t
-compute_hash(Interp *interp, STRING *src, size_t seed)
+compute_hash(Interp *interp, const STRING *src, size_t seed)
 {
     String_iter iter;
     size_t hashval = seed;
-    UINTVAL offs, c;
+    UINTVAL offs;
 
     ENCODING_ITER_INIT(interp, src, &iter);
     for (offs = 0; offs < src->strlen; ++offs) {
-        c = iter.get_and_advance(interp, &iter);
+        const UINTVAL c = iter.get_and_advance(interp, &iter);
         hashval += hashval << 5;
         hashval += c;
     }

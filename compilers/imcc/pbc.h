@@ -9,7 +9,7 @@ int e_pbc_close( Interp *interp /*NN*/, void *param )
 int e_pbc_emit( Interp *interp /*NN*/,
     void *param,
     IMC_Unit *unit /*NN*/,
-    Instruction *ins /*NN*/ )
+    const Instruction *ins /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);

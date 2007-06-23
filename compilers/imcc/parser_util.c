@@ -339,7 +339,7 @@ is_infix(const char *name, int n, SymReg **r /*NN*/)
 }
 
 static Instruction *
-var_arg_ins(Interp *interp, IMC_Unit * unit, char *name,
+var_arg_ins(Interp *interp, IMC_Unit * unit, const char *name,
         SymReg **r, int n, int emit)
 {
     int op;

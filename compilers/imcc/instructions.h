@@ -91,7 +91,7 @@ Instruction * iNEW(Interp *, struct _IMC_Unit *, SymReg * r0, char * type,
 
 typedef struct _emittert {
     int (*open)(Interp *, void *param);
-    int (*emit)(Interp *, void *param, struct _IMC_Unit *, Instruction *ins);
+    int (*emit)(Interp *, void *param, struct _IMC_Unit *, const Instruction *ins);
     int (*new_sub)(Interp *, void *param, struct _IMC_Unit *);
     int (*end_sub)(Interp *, void *param, struct _IMC_Unit *);
     int (*close)(Interp *, void *param);
@@ -129,9 +129,10 @@ Instruction * delete_ins(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-Instruction * emitb( Interp *interp,
+Instruction * emitb( Interp *interp /*NN*/,
     struct _IMC_Unit *unit /*NULLOK*/,
-    Instruction *i /*NULLOK*/ );
+    Instruction *i /*NULLOK*/ )
+        __attribute__nonnull__(1);
 
 void free_ins( Instruction *ins /*NN*/ )
         __attribute__nonnull__(1);
@@ -142,18 +143,22 @@ SymReg * get_branch_reg( const Instruction *ins /*NN*/ )
 int get_branch_regno( const Instruction *ins /*NN*/ )
         __attribute__nonnull__(1);
 
-void imcc_init_tables( Interp *interp );
+void imcc_init_tables( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
 int ins_print( Interp *interp /*NN*/,
     FILE *fd /*NN*/,
-    Instruction *ins /*NN*/ )
+    const Instruction *ins /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-int ins_reads2( Instruction *ins /*NN*/, int t )
+int ins_reads2( const Instruction *ins /*NN*/, int t )
         __attribute__nonnull__(1);
 
-int ins_writes2( Instruction *ins, int t );
+int ins_writes2( const Instruction *ins /*NN*/, int t )
+        __attribute__nonnull__(1);
+
 void insert_ins(
     struct _IMC_Unit *unit /*NN*/,
     Instruction *ins /*NULLOK*/,
@@ -174,9 +179,10 @@ int instruction_writes(
 Instruction * move_ins(
     struct _IMC_Unit *unit /*NN*/,
     Instruction *ins /*NN*/,
-    Instruction *to )
+    Instruction *to /*NN*/ )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 void prepend_ins(
     struct _IMC_Unit *unit /*NN*/,

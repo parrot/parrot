@@ -73,7 +73,7 @@ typedef INTVAL (*charset_find_newline_t)(Interp *, STRING *source_string, UINTVA
 typedef INTVAL (*charset_find_not_newline_t)(Interp *, STRING *source_string, UINTVAL offset);
 typedef INTVAL (*charset_find_word_boundary_t)(Interp *, STRING *source_string, UINTVAL offset);
 typedef STRING *(*charset_string_from_codepoint_t)(Interp *, UINTVAL codepoint);
-typedef size_t (*charset_compute_hash_t)(Interp *, STRING *, size_t seed);
+typedef size_t (*charset_compute_hash_t)(Interp *, const STRING *, size_t seed);
 
 typedef STRING* (*charset_converter_t)(Interp *, STRING *src, STRING *dst);
 

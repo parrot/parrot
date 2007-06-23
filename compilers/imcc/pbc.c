@@ -1293,7 +1293,7 @@ verify_signature(Interp *interp /*NN*/, Instruction *ins /*NN*/, opcode_t *pc)
 
 /* now let the fun begin, actually emit code for one ins */
 int
-e_pbc_emit(Interp *interp /*NN*/, void *param, IMC_Unit *unit /*NN*/, Instruction *ins /*NN*/)
+e_pbc_emit(Interp *interp /*NN*/, void *param, IMC_Unit *unit /*NN*/, const Instruction *ins /*NN*/)
 {
     int        op, i;
     int        ok = 0;
@@ -1376,8 +1376,7 @@ e_pbc_emit(Interp *interp /*NN*/, void *param, IMC_Unit *unit /*NN*/, Instructio
         }
         else {
             /* need a dummy to hold register usage */
-            SymReg *r;
-            r          = mk_sub_label(interp, str_dup("(null)"));
+            SymReg * const r = mk_sub_label(interp, str_dup("(null)"));
             r->type    = VT_PCC_SUB;
             r->pcc_sub = calloc(1, sizeof (pcc_sub_t));
 
