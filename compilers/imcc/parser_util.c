@@ -25,11 +25,12 @@
 #include "parrot/builtin.h"
 #include "pbc.h"
 #include "parser.h"
+#include "optimizer.h"
 
 /* HEADERIZER TARGET: compilers/imcc/imc.h */
 
 /* HEADERIZER BEGIN: static */
-static const char *try_rev_cmp(Parrot_Interp, IMC_Unit *unit, char *name,
+static const char *try_rev_cmp(Parrot_Interp, IMC_Unit *unit, const char *name,
                                SymReg **r);
 /* HEADERIZER END: static */
 
@@ -170,7 +171,7 @@ check_op(Interp *interp /*NN*/, char *fullname /*NN*/,
 }
 
 static Instruction *
-maybe_builtin(Interp *interp, IMC_Unit *unit, char *name,
+maybe_builtin(Interp *interp, IMC_Unit *unit, const char *name /*NN*/,
         SymReg **r, int n)
 {
     Instruction *ins;
@@ -197,10 +198,9 @@ maybe_builtin(Interp *interp, IMC_Unit *unit, char *name,
     is_void = Parrot_builtin_is_void(interp, bi);
     meth = mk_sub_address(interp, str_dup(name));
     if (is_class_meth) {    /* ParrotIO.open() */
-        const char *ns = Parrot_builtin_get_c_namespace(interp, bi);
-        SymReg *ns_sym;
+        const char * const ns = Parrot_builtin_get_c_namespace(interp, bi);
+        SymReg * const ns_sym = mk_const(interp, str_dup(ns), 'S');
 
-        ns_sym = mk_const(interp, str_dup(ns), 'S');
         ins = IMCC_create_itcall_label(interp);
         sub = ins->r[0];
         IMCC_itcall_sub(interp, meth);
@@ -244,7 +244,7 @@ is_op(Interp *interp, const char *name)
 
 /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
 static char *
-to_infix(Interp *interp, char *name, SymReg **r, int *n, int mmd_op)
+to_infix(Interp *interp, const char *name, SymReg **r, int *n, int mmd_op)
 {
     SymReg *mmd;
     char buf[10];
@@ -935,7 +935,7 @@ change_op(Interp *interp, IMC_Unit *unit, SymReg **r, int num, int emit)
  *      acos_n_i   => acos_n_n
  */
 int
-try_find_op(Parrot_Interp interp, IMC_Unit * unit, char *name,
+try_find_op(Interp *interp /*NN*/, IMC_Unit * unit, const char *name /*NN*/,
         SymReg ** r, int n, int keyvec, int emit)
 {
     char fullname[64];
@@ -1017,7 +1017,7 @@ try_find_op(Parrot_Interp interp, IMC_Unit * unit, char *name,
 }
 
 static const char *
-try_rev_cmp(Parrot_Interp interp, IMC_Unit * unit, char *name,
+try_rev_cmp(Parrot_Interp interp, IMC_Unit * unit, const char *name,
         SymReg ** r)
 {
     static struct br_pairs {

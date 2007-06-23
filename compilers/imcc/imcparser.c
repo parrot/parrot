@@ -546,11 +546,11 @@ iINDEXSET(Interp *interp, IMC_Unit * unit,
     return 0;
 }
 
-static char *
+static const char *
 inv_op(const char *op)
 {
     int n;
-    return (char *) get_neg_op(op, &n);
+    return get_neg_op(op, &n);
 }
 
 Instruction *
@@ -590,7 +590,7 @@ mk_sub_address_u(Interp *interp, char * name)
 }
 
 void
-IMCC_itcall_sub(Interp* interp, SymReg* sub)
+IMCC_itcall_sub(Interp* interp /*NN*/, SymReg* sub)
 {
     IMCC_INFO(interp)->cur_call->pcc_sub->sub = sub;
     if (IMCC_INFO(interp)->cur_obj) {

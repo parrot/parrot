@@ -578,7 +578,7 @@ next_constant:;
  * rewrite e.g. add_n_ic => add_n_nc
  */
 Instruction *
-IMCC_subst_constants_umix(Interp *interp, IMC_Unit * unit, char *name,
+IMCC_subst_constants_umix(Interp *interp, IMC_Unit * unit, const char *name /*NN*/,
         SymReg **r, int n)
 {
     Instruction *tmp;
@@ -589,7 +589,7 @@ IMCC_subst_constants_umix(Interp *interp, IMC_Unit * unit, char *name,
     char b[128];
 
     tmp = NULL;
-    for (i = 0; i < sizeof (ops)/sizeof (ops[0]); i++) {
+    for (i = 0; i < N_ELEMENTS(ops); i++) {
         if (n == 3 &&
                 r[0]->set == 'N' &&
                 r[1]->type == VTCONST &&
@@ -685,8 +685,8 @@ eval_ins(Interp *interp, char *op, size_t ops, SymReg **r)
  */
 
 Instruction *
-IMCC_subst_constants(Interp *interp, IMC_Unit * unit, char *name,
-        SymReg **r, int n, int *ok)
+IMCC_subst_constants(Interp *interp, IMC_Unit * unit, const char *name /*NN*/,
+        SymReg **r, int n, int *ok /*NN*/)
 {
     Instruction *tmp;
     const char *ops[] = {
@@ -734,7 +734,7 @@ IMCC_subst_constants(Interp *interp, IMC_Unit * unit, char *name,
 
     tmp = NULL;
     found = 0;
-    for (i = 0; i < sizeof (ops)/sizeof (ops[0]); i++) {
+    for (i = 0; i < N_ELEMENTS(ops); i++) {
         if (n == 4 &&
                 r[1]->type & (VTCONST|VT_CONSTP) &&
                 r[2]->type & (VTCONST|VT_CONSTP) &&
@@ -749,7 +749,7 @@ IMCC_subst_constants(Interp *interp, IMC_Unit * unit, char *name,
             break;
         }
     }
-    for (i = 0; !found && i < sizeof (ops2)/sizeof (ops2[0]); i++) {
+    for (i = 0; !found && i < N_ELEMENTS(ops2); i++) {
         /*
          * abs_i_ic ...
          */
@@ -763,7 +763,7 @@ IMCC_subst_constants(Interp *interp, IMC_Unit * unit, char *name,
             break;
         }
     }
-    for (i = 0; !found && i < sizeof (ops3)/sizeof (ops3[0]); i++) {
+    for (i = 0; !found && i < N_ELEMENTS(ops3); i++) {
         /*
          * eq_xc_xc_labelc ...
          */
@@ -778,7 +778,7 @@ IMCC_subst_constants(Interp *interp, IMC_Unit * unit, char *name,
             break;
         }
     }
-    for (i = 0; !found && i < sizeof (ops4)/sizeof (ops4[0]); i++) {
+    for (i = 0; !found && i < N_ELEMENTS(ops4); i++) {
         /*
          * if_xc_labelc, unless
          */
