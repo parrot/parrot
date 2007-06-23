@@ -1,12 +1,11 @@
-=head1 Parrot abstract syntax tree
+=head1 Parrot Compiler Toolkit (PCT)
 
-This is a new implementation of PAST, the Parrot abstract syntax
-tree.  It's still somewhat early, only simple PAST nodes are
-available, but it will expand rapidly as we identify more features
-to be added.
+This is an implementation of an abstract tree representation
+and compiler for Parrot.  This version is a redesign based
+on PAST-pm.  Only simple nodes are available, but it will
+expand rapidly.
 
-PAST also needs documentation.  In lieu of documentation, the
-best examples to look at thus far are in L<languages/abc> and
-L<languages/perl6>.
+There aren't any compilers using PCT yet, but that should
+change soon.
 
 
