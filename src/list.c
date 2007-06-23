@@ -200,7 +200,7 @@ static void *list_item(Interp *interp, List *list, int type, INTVAL idx);
 static void list_append(Interp *interp, List *list, void *item,
         int type, UINTVAL idx);
 #ifdef LIST_DEBUG
-static void list_dump(FILE *fp, List *list, INTVAL type);
+static void list_dump(List *list, INTVAL type);
 #endif
 
 #define chunk_list_size(list) \
@@ -219,7 +219,8 @@ Make a new chunk, size bytes big, holding items items.
 */
 
 static List_chunk *
-allocate_chunk(Interp *interp, List *list /*NN*/, UINTVAL items, UINTVAL size)
+allocate_chunk(Interp *interp /*NN*/, List *list /*NN*/, UINTVAL items, UINTVAL size)
+    /* MALLOC, WARN_UNUSED */
 {
     List_chunk *chunk;
 
@@ -252,9 +253,9 @@ Only char and int are supported currently.
 */
 
 static void
-list_dump(FILE *fp, List *list /*NN*/, INTVAL type)
+list_dump(const List *list /*NN*/, INTVAL type)
 {
-    List_chunk *chunk = list->first;
+    const List_chunk *chunk = list->first;
     UINTVAL idx = 0;
 
     for (; chunk; chunk = chunk->next) {
@@ -375,7 +376,7 @@ Coalesce adjacent irregular chunks.
 */
 
 static void
-rebuild_other(Interp *interp, List *list /*NN*/)
+rebuild_other(Interp *interp /*NN*/, List *list /*NN*/)
 {
     List_chunk *chunk = list->first;
     List_chunk *prev = NULL;
@@ -440,10 +441,9 @@ Called by C<rebuild_chunk_list()>.
 */
 
 static void
-rebuild_fix_ends(Interp *interp, List *list /*NN*/)
+rebuild_fix_ends(List *list /*NN*/)
 {
     List_chunk * const chunk = list->first;
-    UNUSED(interp);
 
     /* first is irregular, next is empty */
     if (list->n_chunks <= 2 && (chunk->flags & no_power_2) &&
@@ -480,7 +480,7 @@ rebuild_chunk_list(Interp *interp /*NN*/, List *list /*NN*/)
     if (list->grow_policy == enum_grow_mixed) {
         rebuild_sparse(list);
         rebuild_other(interp, list);
-        rebuild_fix_ends(interp, list);
+        rebuild_fix_ends(list);
     }
 
     /* allocate a new chunk_list buffer, if old one has moved or is too small */
@@ -576,7 +576,7 @@ Calculate size and items for next chunk and allocate it.
 */
 
 static List_chunk *
-alloc_next_size(Interp *interp, List *list /*NN*/, int where, UINTVAL idx)
+alloc_next_size(Interp *interp /*NN*/, List *list /*NN*/, int where, UINTVAL idx)
 {
     UINTVAL items, size;
     List_chunk *new_chunk;
@@ -794,7 +794,7 @@ sized, when this would improve performance.
 */
 
 static List_chunk *
-get_chunk(Interp *interp, List *list /*NN*/, UINTVAL *idx /*NN*/)
+get_chunk(Interp *interp /*NN*/, List *list /*NN*/, UINTVAL *idx /*NN*/)
 {
     List_chunk *chunk;
     UINTVAL i;
@@ -804,6 +804,7 @@ get_chunk(Interp *interp, List *list /*NN*/, UINTVAL *idx /*NN*/)
         rebuild_chunk_list(interp, list);
 #endif
 #ifdef SLOW_AND_BORING
+    UNUSED(interp);
     for (chunk = list->first; chunk; chunk = chunk->next) {
         if (*idx < chunk->items)
             return chunk;
@@ -899,7 +900,7 @@ would make C<MAX_ITEMS> sized real chunks.
 */
 
 static void
-split_chunk(Interp *interp, List *list /*NN*/, List_chunk *chunk /*NN*/, UINTVAL ix)
+split_chunk(Interp *interp /*NN*/, List *list /*NN*/, List_chunk *chunk /*NN*/, UINTVAL ix)
 {
 
     /* allocate space at idx */
@@ -962,7 +963,7 @@ Set C<item> of type C<type> in chunk at C<idx>.
 */
 
 static void
-list_set(Interp *interp, List *list /*NN*/, void *item, INTVAL type, INTVAL idx)
+list_set(Interp *interp /*NN*/, List *list /*NN*/, void *item, INTVAL type, INTVAL idx)
 {
     const INTVAL oidx = idx;
     List_chunk *chunk = get_chunk(interp, list, (UINTVAL *)&idx);
@@ -1152,7 +1153,7 @@ Create a new list containing PMC* values in PMC_data(container).
 
 PARROT_API
 void
-list_pmc_new(Interp *interp, PMC *container /*NN*/)
+list_pmc_new(Interp *interp /*NN*/, PMC *container /*NN*/)
 {
     List * const l = list_new(interp, enum_type_PMC);
     l->container = container;
@@ -1178,7 +1179,7 @@ these values is stored in user_data, where the keys are explicit.
 
 PARROT_API
 List *
-list_new_init(Interp *interp, INTVAL type, PMC *init /*NN*/)
+list_new_init(Interp *interp /*NN*/, INTVAL type, PMC *init /*NN*/)
     /* WARN_UNUSED */
 {
     List *list;
@@ -1247,7 +1248,7 @@ Create a new list containing PMC* values in PMC_data(container).
 
 PARROT_API
 void
-list_pmc_new_init(Interp *interp, PMC *container /*NN*/, PMC *init /*NN*/)
+list_pmc_new_init(Interp *interp /*NN*/, PMC *container /*NN*/, PMC *init /*NN*/)
 {
     List * const l = list_new_init(interp, enum_type_PMC, init);
     l->container = container;
@@ -1271,7 +1272,7 @@ TODO - Barely tested. Optimize new array structure, fixed if big.
 PARROT_API
 List *
 list_clone(Interp *interp /*NN*/, const List *other /*NN*/)
-    /* WARN_UNUSED */
+    /* MALLOC, WARN_UNUSED */
 {
     List *l;
     List_chunk *chunk, *prev;
@@ -1283,7 +1284,7 @@ list_clone(Interp *interp /*NN*/, const List *other /*NN*/)
     Parrot_block_GC(interp);
 
     l = list_new(interp, other->item_type);
-    mem_sys_memcopy(l, other, sizeof (List));
+    STRUCT_COPY(l,other);
     PObj_buflen(&l->chunk_list) = 0;
     PObj_bufstart(&l->chunk_list) = 0;
 
@@ -1618,7 +1619,7 @@ Pushes C<item> of type C<type> on to the end of the list.
 
 PARROT_API
 void
-list_push(Interp *interp, List *list /*NN*/, void *item, int type)
+list_push(Interp *interp /*NN*/, List *list /*NN*/, void *item, int type)
 {
     const INTVAL idx = list->start + list->length++;
 
@@ -1730,7 +1731,7 @@ Assigns C<item> of type C<type> to index C<idx>.
 
 PARROT_API
 void
-list_assign(Interp *interp, List *list /*NN*/, INTVAL idx, void *item, int type)
+list_assign(Interp *interp /*NN*/, List *list /*NN*/, INTVAL idx, void *item, int type)
 {
     const INTVAL length = list->length;
 
@@ -1784,7 +1785,7 @@ If C<count> is 0 then the items in C<value> will be inserted after C<offset>.
 
 PARROT_API
 void
-list_splice(Interp *interp, List *list /*NN*/, List *value_list /*NULLOK*/,
+list_splice(Interp *interp /*NN*/, List *list /*NN*/, List *value_list /*NULLOK*/,
         INTVAL offset, INTVAL count)
 {
     const INTVAL value_length = value_list ? value_list->length : 0;

@@ -82,17 +82,19 @@ PARROT_API UINTVAL ld( UINTVAL x )
         __attribute__const__
         __attribute__warn_unused_result__;
 
-PARROT_API void list_assign( Interp *interp,
+PARROT_API void list_assign( Interp *interp /*NN*/,
     List *list /*NN*/,
     INTVAL idx,
     void *item,
     int type )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API List * list_clone( Interp *interp /*NN*/,
     const List *other /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__malloc__
         __attribute__warn_unused_result__;
 
 PARROT_API void list_delete( Interp *interp,
@@ -126,28 +128,32 @@ PARROT_API void list_mark( Interp *interp /*NN*/, List *list /*NN*/ )
 PARROT_API List * list_new( Interp *interp, INTVAL type )
         __attribute__warn_unused_result__;
 
-PARROT_API List * list_new_init( Interp *interp,
+PARROT_API List * list_new_init( Interp *interp /*NN*/,
     INTVAL type,
     PMC *init /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
-PARROT_API void list_pmc_new( Interp *interp, PMC *container /*NN*/ )
+PARROT_API void list_pmc_new( Interp *interp /*NN*/, PMC *container /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API void list_pmc_new_init( Interp *interp,
+PARROT_API void list_pmc_new_init( Interp *interp /*NN*/,
     PMC *container /*NN*/,
     PMC *init /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API void * list_pop( Interp *interp, List *list /*NN*/, int type )
         __attribute__nonnull__(2);
 
-PARROT_API void list_push( Interp *interp,
+PARROT_API void list_push( Interp *interp /*NN*/,
     List *list /*NN*/,
     void *item,
     int type )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API void list_set_length( Interp *interp,
@@ -158,11 +164,12 @@ PARROT_API void list_set_length( Interp *interp,
 PARROT_API void * list_shift( Interp *interp, List *list /*NN*/, int type )
         __attribute__nonnull__(2);
 
-PARROT_API void list_splice( Interp *interp,
+PARROT_API void list_splice( Interp *interp /*NN*/,
     List *list /*NN*/,
     List *value_list /*NULLOK*/,
     INTVAL offset,
     INTVAL count )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API void list_unshift( Interp *interp,

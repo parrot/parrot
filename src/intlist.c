@@ -128,10 +128,6 @@ Of course, a check for valid pointers could be added here.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
@@ -140,65 +136,53 @@ Of course, a check for valid pointers could be added here.
 
 /*
 
-=item C<void
-intlist_mark(Interp *i, IntList *l)>
+FUNCDOC: intlist_mark
 
 Marks the list as live.
-
-=cut
 
 */
 
 void
-intlist_mark(Interp *i, IntList *l /*NN*/)
+intlist_mark(Interp *i /*NN*/, IntList *l /*NN*/)
 {
     list_mark(i, (List *)l);
 }
 
 /*
 
-=item C<IntList *
-intlist_clone(Interp *i, IntList *list)>
+FUNCDOC: intlist_clone
 
 Returns a clone of the list.
-
-=cut
 
 */
 
 IntList *
-intlist_clone(Interp *i /*NN*/, IntList *list/*NN*/)
-    /* WARN_UNUSED */
+intlist_clone(Interp *i /*NN*/, const IntList *list/*NN*/)
+    /* MALLOC, WARN_UNUSED */
 {
-    return (IntList *)list_clone(i, (List *)list);
+    return (IntList *)list_clone(i, (const List *)list);
 }
 
 /*
 
-=item C<IntList *
-intlist_new(Interp *i)>
+FUNCDOC: intlist_new
 
 Returns a new list.
-
-=cut
 
 */
 
 IntList *
-intlist_new(Interp *i)
-    /* WARN_UNUSED */
+intlist_new(Interp *i /*NN*/)
+    /* MALLOC, WARN_UNUSED */
 {
     return (IntList *)list_new(i, enum_type_INTVAL);
 }
 
 /*
 
-=item C<INTVAL
-intlist_length(Interp *interp, IntList *list)>
+FUNCDOC: intlist_length
 
 Returns the length of the list.
-
-=cut
 
 */
 
@@ -207,73 +191,61 @@ intlist_length(Interp *interp, const IntList *list /*NN*/)
     /* PURE, WARN_UNUSED */
 {
     UNUSED(interp);
-    return ((List *)list)->length;
+    return ((const List *)list)->length;
 }
 
 /*
 
-=item C<void
-intlist_assign(Interp *i, IntList *l, INTVAL idx, INTVAL val)>
+FUNCDOC: intlist_assign
 
 Assigns <val> to the item at C<idx>.
-
-=cut
 
 */
 
 void
-intlist_assign(Interp *i, IntList *l /*NN*/, INTVAL idx, INTVAL val)
+intlist_assign(Interp *i /*NN*/, IntList *l /*NN*/, INTVAL idx, INTVAL val)
 {
     list_assign(i, (List *)l, idx, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
 
 /*
 
-=item C<void
-intlist_push(Interp *i, IntList *l, INTVAL val)>
+FUNCDOC: intlist_push
 
 Pushes C<val> on the end of the list.
-
-=cut
 
 */
 
 void
-intlist_push(Interp *i, IntList *l /*NN*/, INTVAL val)
+intlist_push(Interp *i /*NN*/, IntList *l /*NN*/, INTVAL val)
 {
     list_push(i, (List *)l, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
 
 /*
 
-=item C<void
-intlist_unshift(Interp *i, IntList **l, INTVAL val)>
+FUNCDOC: intlist_unshift
 
 Pushes C<val> on the front of the list.
-
-=cut
 
 */
 
 void
-intlist_unshift(Interp *i, IntList **l /*NN*/, INTVAL val)
+intlist_unshift(Interp *i /*NN*/, IntList **l /*NN*/, INTVAL val)
 {
     list_unshift(i, (List *)*l, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
 
 /*
 
-=item C<INTVAL
-intlist_pop(Interp *i, IntList *l)>
+FUNCDOC: intlist_pop
 
 Popping/shifting into a sparse hole returns 0.
-
-=cut
 
 */
 
 INTVAL
-intlist_pop(Interp *i, IntList *l /*NN*/)
+intlist_pop(Interp *i /*NN*/, IntList *l /*NN*/)
 {
     void * const ret = list_pop(i, (List *)l, enum_type_INTVAL);
     const INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
@@ -282,12 +254,9 @@ intlist_pop(Interp *i, IntList *l /*NN*/)
 
 /*
 
-=item C<INTVAL
-intlist_shift(Interp *i, IntList **l)>
+FUNCDOC: intlist_shift
 
 Removes and returns the first item on the list.
-
-=cut
 
 */
 
@@ -301,17 +270,14 @@ intlist_shift(Interp *i, IntList **l /*NN*/)
 
 /*
 
-=item C<INTVAL
-intlist_get(Interp *i, IntList *l, INTVAL idx)>
+FUNCDOC: intlist_get
 
 Returns the item at C<idx>.
-
-=cut
 
 */
 
 INTVAL
-intlist_get(Interp *interp, IntList *list /*NN*/, INTVAL idx)
+intlist_get(Interp *interp /*NN*/, IntList *list /*NN*/, INTVAL idx)
     /* WARN_UNUSED */
 {
     void * const ret = list_get(interp, (List *)list, idx, enum_type_INTVAL);
@@ -321,12 +287,9 @@ intlist_get(Interp *interp, IntList *list /*NN*/, INTVAL idx)
 
 /*
 
-=item C<void
-intlist_dump(FILE *fp, IntList *list, int verbose)>
+FUNCDOC: intlist_dump
 
 Prints out the list in human-readable form.
-
-=cut
 
 */
 
@@ -340,13 +303,9 @@ intlist_dump(FILE *fp, IntList *list /*NN*/, int verbose)
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/intlist.h>, F<src/list.c> and F<include/parrot/list.h>.
-
-=cut
 
 */
 
