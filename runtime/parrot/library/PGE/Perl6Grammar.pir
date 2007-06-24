@@ -107,7 +107,7 @@ the output to the correct output file.
     p6regex($S0, 'grammar'=>'PGE::Perl6Grammar', 'name'=>'arg')
 
     $S0 = <<'      STMT_PARSE'
-        $<cmd>:=(grammar) <name> ';'?
+        $<cmd>:=(grammar) <name> [ 'is' $<inherit>:=<name> ]? ';'?
       | $<cmd>:=(regex|token|rule) 
           $<name>:=<arg>
           $<optable>:=(is optable)?
@@ -175,13 +175,15 @@ the output to the correct output file.
     rulepir .= $P0
     if namespace == 'PGE::Grammar' goto ns_optable
     if namespace == '' goto ns_optable
+    .local string inherit
+    inherit = ns['inherit']
     $S0 = initpir.unique('onload_')
-    initpir.emit(<<'        CODE', namespace, $S0)
+    initpir.emit(<<'        CODE', namespace, inherit, $S0)
           ## namespace %0
           $I0 = find_type '%0'
-          if $I0 != 0 goto %1
-          $P0 = subclass 'PGE::Grammar', '%0'
-        %1:
+          if $I0 != 0 goto %2
+          $P0 = subclass '%1', '%0'
+        %2:
         CODE
   ns_optable:
     $P0 = ns['optable']
@@ -221,27 +223,28 @@ the output to the correct output file.
     .param pmc nstable
 
     ##   get the grammar name
-    .local string name
+    .local string name, inherit
     name = stmt['name']
+    inherit = 'PGE::Grammar'
+    $P0 = stmt['inherit']
+    if null $P0 goto have_inherit
+    inherit = $P0[0]
+  have_inherit:
 
-    ##   remove any trailing semicolon
-    $S0 = substr name, -1
-    if $S0 != ';' goto grammar_1
-    chopn name, 1
-
-  grammar_1:
     ##   set the new namespace, and create any nstable entries
     ##   if needed.
     assign namespace, name
     name = clone name
     $I0 = exists nstable[name]
     if $I0 goto end
-    $P0 = new .Hash
+    .local pmc ns
+    ns = new .Hash
+    ns['inherit'] = inherit
     $P1 = new 'PGE::CodeString'
-    $P0['optable'] = $P1
+    ns['optable'] = $P1
     $P1 = new 'PGE::CodeString'
-    $P0['rule'] = $P1
-    nstable[name] = $P0
+    ns['rule'] = $P1
+    nstable[name] = ns
 
   end:
     .return ()
