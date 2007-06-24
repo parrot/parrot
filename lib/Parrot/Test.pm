@@ -465,19 +465,17 @@ sub generate_languages_functions {
                     STDERR => $out_fn
                 );
 
-                my $meth = $test_map{$func};
+                if ( $exit_code ) {
+                    $self->{builder}->ok( 0, $desc );
 
-                my $pass = $self->{builder}->$meth( Parrot::Test::slurp_file($out_fn), $output, $desc );
-                if ( ! $pass) {
-                    my $diag = '';
                     my $test_prog = join ' && ', @test_prog;
-                    if ($exit_code) {
-                        $diag .= "'$test_prog' failed with exit code $exit_code.";
-                    }
-                    if ($diag) {
-                        $self->{builder}->diag($diag);
-                    }
+                    $self->{builder}->diag( "'$test_prog' failed with exit code $exit_code." );
+             
+                    return 0;
                 }
+
+                my $meth = $test_map{$func};
+                $self->{builder}->$meth( Parrot::Test::slurp_file($out_fn), $output, $desc );
             }
 
             # The generated files are left in the t/* directories.
